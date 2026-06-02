@@ -1,0 +1,174 @@
+{
+  "cleanup_version": "step5_v3_corrected_calibrated_default_cleanup_20260420",
+  "reviewer_id": "codex_step5_v3_calibrated_default_rereview_20260420",
+  "inputs": {
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "targeted_rereview_queue": "reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_default_v3.csv"
+  },
+  "audit_basis": {
+    "source_review_policy": "schema/step5_v3_targeted_review_policy.json",
+    "source_queue_summary": "reports/step5_v3_targeted_review_queue_summary.calibrated_default.json",
+    "source_step11_summary": "reports/step11_core_calibrated_default_clustering_summary.json",
+    "source_step11_scorer_token": "core_calibrated_default",
+    "graph_primary_threshold": 0.8,
+    "threshold_pass_edge_count": 305,
+    "post_filter_edge_count": 65,
+    "reviewed_rereview_row_count": 65,
+    "audit_rule": "Direct shared-contact anchors may remain positive. Template-clone edges without a shared seller-specific anchor default to uncertain. Template/resource/data-package clones with no shared contact or with distinct seller contacts are negative only when the evidence supports seller-distinct reuse."
+  },
+  "bucket_defaults": {
+    "calibrated_default_identifier_anchor": {
+      "new_review_label": "positive",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: direct shared-contact anchor retained in the current Step 11 primary graph. The shared seller-specific contact plus content overlap is strong enough to keep as positive supervision."
+    },
+    "calibrated_default_template_clone": {
+      "new_review_label": "uncertain",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: retained in the Step 11 primary graph as a no-shared-contact template clone. The overlap is too strong to ignore but is not seller-specific enough for positive supervision, and not strong enough by itself to assert seller-distinct negative supervision."
+    }
+  },
+  "pair_overrides": {
+    "market_item.xlsx|茶马古道|seller_raw:/shop/396011||market_item.xlsx|茶马古道|seller_raw:/shop/416838": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/416838||market_item.xlsx|茶马古道|seller_raw:/shop/422413": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/422413||market_item.xlsx|茶马古道|seller_raw:/shop/455899": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/396011||market_item.xlsx|茶马古道|seller_raw:/shop/455899": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/416838||market_item.xlsx|茶马古道|seller_raw:/shop/455899": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/394520||market_item.xlsx|茶马古道|seller_raw:/shop/455899": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/394520||market_item.xlsx|茶马古道|seller_raw:/shop/416838": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/394520||market_item.xlsx|茶马古道|seller_raw:/shop/396011": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/394520||market_item.xlsx|茶马古道|seller_raw:/shop/422413": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/425704||market_item.xlsx|茶马古道|seller_raw:/shop/464140": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Revoke the previous no-anchor positive and freeze as negative."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:581460||market_item.xlsx|茶马古道|seller_raw:/shop/427282": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/425704||market_item.xlsx|茶马古道|seller_raw:/shop/427282": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:581460||market_item.xlsx|茶马古道|seller_raw:/shop/425704": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/427282||market_item.xlsx|茶马古道|seller_raw:/shop/464140": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:188608||market_item.xlsx|茶马古道|seller_raw:/shop/433600": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:188608||market_item.xlsx|茶马古道|seller_raw:/shop/439425": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/433600||market_item.xlsx|茶马古道|seller_raw:/shop/439425": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a reusable tutorial/resource-package template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:592056||market_item.xlsx|茶马古道|seller_raw:/shop/406792": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a generic data-package resale surface inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/406792||market_item.xlsx|茶马古道|seller_raw:/shop/433442": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a generic data-package resale surface inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:592056||market_item.xlsx|茶马古道|seller_raw:/shop/433442": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a generic data-package resale surface inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:54824||market_item.xlsx|中文暗网交易市场|seller_raw:58725": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public media/resource-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:58725||market_item.xlsx|中文暗网交易市场|seller_raw:70335": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public media/resource-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:54824||market_item.xlsx|中文暗网交易市场|seller_raw:70335": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public media/resource-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:415649||market_item.xlsx|茶马古道|seller_raw:/shop/427108": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|中文暗网交易市场|seller_raw:415649||market_item.xlsx|茶马古道|seller_raw:/shop/441122": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/427108||market_item.xlsx|茶马古道|seller_raw:/shop/441122": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public data-package resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/4165||market_item.xlsx|茶马古道|seller_raw:/shop/451126": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public tutorial/source-code resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/4165||market_item.xlsx|茶马古道|seller_raw:/shop/442518": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public tutorial/source-code resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/442518||market_item.xlsx|茶马古道|seller_raw:/shop/451126": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: no shared contact or PGP; overlap is a public tutorial/source-code resale template inside a template-clone-not-controller cluster. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/463435||market_item.xlsx|茶马古道|seller_raw:/shop/468839": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same wanted-post/four-piece template. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/448451||market_item.xlsx|茶马古道|seller_raw:/shop/463435": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same wanted-post/four-piece template. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/448451||market_item.xlsx|茶马古道|seller_raw:/shop/468839": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same wanted-post/four-piece template. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/442431||market_item.xlsx|茶马古道|seller_raw:/shop/444654": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same four-piece template. Freeze as seller-distinct template reuse."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/444654||market_item.xlsx|茶马古道|seller_raw:/shop/454420": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same four-piece template. Preserve the existing negative label."
+    },
+    "market_item.xlsx|茶马古道|seller_raw:/shop/442431||market_item.xlsx|茶马古道|seller_raw:/shop/454420": {
+      "new_review_label": "negative",
+      "review_notes": "Corrected Step 5 v3 calibrated-default cleanup: sellers expose distinct contact handles while reusing the same four-piece template. Freeze as seller-distinct template reuse."
+    }
+  },
+  "outputs": {
+    "summary": "reports/step5_v3_targeted_cleanup_summary.calibrated_default_20260420.json"
+  }
+}

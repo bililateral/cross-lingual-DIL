@@ -1,0 +1,87 @@
+{
+  "version": "2026-04-10",
+  "objective": "Step-9 frozen-score calibration adaptation policy on zh_target_strict using synchronized Step-7 scorers",
+  "input_dependencies": [
+    "schema/step7_transfer_safe_pair_feature_schema.json",
+    "schema/step7_training_policy.json",
+    "reports/step7_training_summary.json",
+    "reports/step5_en_frozen_silver_labels.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "reports/step7_pair_features.en_content_train_pool.csv",
+    "reports/step7_pair_features.zh_target_strict.csv"
+  ],
+  "baseline_reference": {
+    "step7_summary": "reports/step7_training_summary.json"
+  },
+  "default_experiments": [
+    "core_calibrated_bge_m3"
+  ],
+  "experiments": {
+    "core_calibrated_default": {
+      "base_step7_experiment": "core_zero_shot_default",
+      "calibrator_type": "platt_scaling"
+    },
+    "core_calibrated_bge_m3": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "calibrator_type": "platt_scaling"
+    },
+    "identifier_augmented_calibrated_default": {
+      "base_step7_experiment": "identifier_augmented_default",
+      "calibrator_type": "platt_scaling"
+    }
+  },
+  "splits": {
+    "target_train_split": "train",
+    "target_valid_split": "valid",
+    "target_test_split": "test",
+    "source_test_split": "test"
+  },
+  "calibration": {
+    "fit_split": "zh_train",
+    "primary_threshold_source": "fixed_calibrated_threshold",
+    "fixed_calibrated_threshold": 0.5,
+    "experiment_threshold_overrides": {},
+    "calibrators": {
+      "platt_scaling": {
+        "type": "platt_scaling",
+        "clip_eps": 1e-06,
+        "l2_penalty": 0.001,
+        "max_iter": 100,
+        "tolerance": 1e-08
+      }
+    }
+  },
+  "threshold_selection": {
+    "mode": "single_valid",
+    "split": "zh_valid",
+    "metric": "balanced_accuracy",
+    "candidate_mode": "midpoints",
+    "tie_break_order": [
+      "specificity",
+      "precision",
+      "f1",
+      "higher_threshold"
+    ],
+    "degenerate_prediction_guard": {
+      "enabled": true,
+      "min_predicted_positive": 1,
+      "min_predicted_negative": 1,
+      "max_primary_metric_drop": 0.125,
+      "tie_break_order": [
+        "f1",
+        "recall",
+        "precision",
+        "specificity",
+        "lower_threshold"
+      ]
+    }
+  },
+  "output_templates": {
+    "summary": "reports/step9_calibration_summary.json",
+    "calibrator": "reports/step9_calibration_{experiment_name}_artifact.json",
+    "zh_train_predictions": "reports/step9_calibration_{experiment_name}_predictions.zh_train.csv",
+    "zh_valid_predictions": "reports/step9_calibration_{experiment_name}_predictions.zh_valid.csv",
+    "zh_test_predictions": "reports/step9_calibration_{experiment_name}_predictions.zh_test.csv",
+    "en_test_predictions": "reports/step9_calibration_{experiment_name}_predictions.en_test.csv"
+  }
+}

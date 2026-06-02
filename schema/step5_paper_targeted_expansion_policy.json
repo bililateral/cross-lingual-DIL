@@ -1,0 +1,74 @@
+{
+  "version": "step5_paper_targeted_expansion_20260422_v1",
+  "objective": "Build a paper-targeted Step 5 expansion queue focused on defensible positive evidence: direct-identity anchor neighborhoods, LR/L2-stable high-scoring discoveries, and identifier-control high-score candidates. Step 11 is used only as a candidate miner, not as ground truth.",
+  "scope": "zh_target_strict",
+  "input_dependencies": [
+    "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "reports/step11_cluster_manual_review_edges.strict_direct_all.current_20260422.csv",
+    "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260320_clustering_summary.json",
+    "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260321_clustering_summary.json",
+    "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260322_clustering_summary.json",
+    "reports/step11_core_zero_shot_bge_m3_clustering_summary.json",
+    "reports/step11_identifier_augmented_few_shot_default_ratio_50pct_seed_20260321_clustering_summary.json",
+    "reports/step11_identifier_augmented_few_shot_default_ratio_100pct_seed_20260322_clustering_summary.json"
+  ],
+  "inputs": {
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "strict_direct_edge_review": "reports/step11_cluster_manual_review_edges.strict_direct_all.current_20260422.csv",
+    "step11_summaries": [
+      "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260320_clustering_summary.json",
+      "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260321_clustering_summary.json",
+      "reports/step11_core_few_shot_bge_m3_lr_l2_ratio_10pct_seed_20260322_clustering_summary.json",
+      "reports/step11_core_zero_shot_bge_m3_clustering_summary.json",
+      "reports/step11_identifier_augmented_few_shot_default_ratio_50pct_seed_20260321_clustering_summary.json",
+      "reports/step11_identifier_augmented_few_shot_default_ratio_100pct_seed_20260322_clustering_summary.json"
+    ]
+  },
+  "selection": {
+    "exclude_reviewed_rows": true,
+    "exclude_frozen_rows": true,
+    "max_queue_rows": 120,
+    "buckets": {
+      "robust_lr_l2_high_score_unreviewed": {
+        "max_rows": 50,
+        "min_lr_l2_seed_count": 3,
+        "min_lr_l2_prob_min": 0.9,
+        "target_reason": "paper_targeted_expansion|robust_lr_l2_high_score_unreviewed",
+        "review_priority": "high",
+        "suggested_label": "review_required",
+        "review_instruction": "Review as possible non-identifier positive only if there is exact low-frequency text/structure closure strong enough to survive the template-resale objection. Do not mark positive from model score alone."
+      },
+      "identifier_control_high_score_unreviewed": {
+        "max_rows": 40,
+        "min_identifier_prob_max": 0.9,
+        "target_reason": "paper_targeted_expansion|identifier_control_high_score_unreviewed",
+        "review_priority": "high",
+        "suggested_label": "review_required",
+        "review_instruction": "Use the identifier-augmented scorer only as a triage signal. Mark positive only with seller-facing shared contact or unusually strong content closure; product/victim-data emails and public URLs are not positives."
+      },
+      "direct_proof_anchor_neighbor_unreviewed": {
+        "max_rows": 30,
+        "min_any_current_prob": 0.5,
+        "target_reason": "paper_targeted_expansion|direct_proof_anchor_neighbor_unreviewed",
+        "review_priority": "medium",
+        "suggested_label": "review_required",
+        "review_instruction": "This row touches a seller from a strict direct Telegram proof pair. It may reveal expansion around a known controller, but it is not independent proof and must not be placed in test without component-leakage review."
+      }
+    }
+  },
+  "hard_rules": [
+    "Never treat a Step 11 cluster as ground truth.",
+    "Never auto-promote a row to positive from model probability alone.",
+    "Product/victim-data emails, public content URLs, file-host links, and external URLs without seller-operated context are not direct identity positives.",
+    "Rows touching a proof-anchor seller must be handled as same-component risk; if later marked positive, split assignment must preserve seller/component isolation.",
+    "If this queue cannot find new direct-contact positives, report direct-identity evidence scarcity instead of diluting labels with weak positives."
+  ],
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_paper_targeted_expansion_queue.20260422.csv",
+    "summary": "reports/step5_paper_targeted_expansion_queue_summary.20260422.json"
+  }
+}

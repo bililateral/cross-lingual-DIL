@@ -1,0 +1,106 @@
+{
+  "version": "2026-03-11",
+  "objective": "Step-7 multilingual semantic feature extraction policy for backbone and reranker scoring",
+  "input_dependencies": [
+    "schema/step7_transfer_safe_pair_feature_schema.json",
+    "reports/step3_seller_profiles.en_content_train_pool.jsonl",
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step3_seller_profiles.zh_target_aux.jsonl",
+    "reports/step7_pair_feature_preview.en_content_train_pool.csv",
+    "reports/step7_pair_feature_preview.zh_target_strict.csv",
+    "reports/step7_pair_feature_preview.zh_target_aux.csv"
+  ],
+  "profile_text_field": "profile_text",
+  "deboilerplate_profile_text": {
+    "enabled": false,
+    "max_sentence_seller_share": 0.01,
+    "min_normalized_char_length": 8,
+    "min_kept_segments": 1
+  },
+  "model_root": "models/step7",
+  "device_preference": [
+    "cuda",
+    "cpu"
+  ],
+  "embedding_models": {
+    "gte_multilingual_base": {
+      "repo_id": "Alibaba-NLP/gte-multilingual-base",
+      "local_path": "models/step7/embeddings/gte_multilingual_base",
+      "feature_name": "embedding_cosine_gte_multilingual_base",
+      "batch_size": 24,
+      "max_length": 512,
+      "normalize_embeddings": true,
+      "text_prefix": "",
+      "trust_remote_code": true
+    },
+    "bge_m3": {
+      "repo_id": "BAAI/bge-m3",
+      "local_path": "models/step7/embeddings/bge_m3",
+      "feature_name": "embedding_cosine_bge_m3",
+      "batch_size": 16,
+      "max_length": 512,
+      "normalize_embeddings": true,
+      "text_prefix": "",
+      "trust_remote_code": true
+    },
+    "multilingual_e5_large": {
+      "repo_id": "intfloat/multilingual-e5-large",
+      "local_path": "models/step7/embeddings/multilingual_e5_large",
+      "feature_name": "embedding_cosine_multilingual_e5_large",
+      "batch_size": 16,
+      "max_length": 512,
+      "normalize_embeddings": true,
+      "text_prefix": "passage: ",
+      "trust_remote_code": false
+    },
+    "labse": {
+      "repo_id": "sentence-transformers/LaBSE",
+      "local_path": "models/step7/embeddings/labse",
+      "feature_name": "embedding_cosine_labse",
+      "batch_size": 24,
+      "max_length": 512,
+      "normalize_embeddings": true,
+      "text_prefix": "",
+      "trust_remote_code": false
+    },
+    "paraphrase_multilingual_mpnet_base_v2": {
+      "repo_id": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+      "local_path": "models/step7/embeddings/paraphrase_multilingual_mpnet_base_v2",
+      "feature_name": "embedding_cosine_paraphrase_multilingual_mpnet",
+      "batch_size": 16,
+      "max_length": 512,
+      "normalize_embeddings": true,
+      "text_prefix": "",
+      "trust_remote_code": false
+    }
+  },
+  "reranker_models": {
+    "gte_multilingual_reranker_base": {
+      "repo_id": "Alibaba-NLP/gte-multilingual-reranker-base",
+      "local_path": "models/step7/rerankers/gte_multilingual_reranker_base",
+      "feature_name": "reranker_score_gte_multilingual_reranker_base",
+      "batch_size": 8,
+      "max_length": 512,
+      "trust_remote_code": true
+    },
+    "bge_reranker_v2_m3": {
+      "repo_id": "BAAI/bge-reranker-v2-m3",
+      "local_path": "models/step7/rerankers/bge_reranker_v2_m3",
+      "feature_name": "reranker_score_bge_reranker_v2_m3",
+      "batch_size": 8,
+      "max_length": 512,
+      "trust_remote_code": true
+    }
+  },
+  "output_files": {
+    "pair_feature_tables": {
+      "en_content_train_pool": "reports/step7_pair_features.en_content_train_pool.csv",
+      "zh_target_strict": "reports/step7_pair_features.zh_target_strict.csv",
+      "zh_target_aux": "reports/step7_pair_features.zh_target_aux.csv"
+    },
+    "summary": "reports/step7_semantic_feature_summary.json",
+    "download_summary": "reports/step7_model_download_summary.json",
+    "embedding_cache_template": "reports/step7_embedding_cache.{pool}.{model_key}.npy",
+    "embedding_manifest_template": "reports/step7_embedding_cache.{pool}.{model_key}.json"
+  }
+}

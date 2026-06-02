@@ -1,0 +1,102 @@
+{
+  "queue_version": "step5_item_identity_expansion_20260422",
+  "scope": "zh_target_strict",
+  "objective": "Use Step-3 item-level seller-facing identity signals to mine high-precision Step-5 positive candidates without treating Step-11 predictions as labels.",
+  "input_dependencies": [
+    "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "schema/step4_silver_candidate_schema.json"
+  ],
+  "inputs": {
+    "item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "step4_schema": "schema/step4_silver_candidate_schema.json"
+  },
+  "selection": {
+    "target_queue_size": {
+      "goal_min": 200,
+      "goal_max": 300,
+      "note": "This is not a quota. If seller-facing direct identity evidence is exhausted, leave the queue small rather than dilute it with soft semantic candidates."
+    },
+    "eligible_contact_types": [
+      "telegram",
+      "wickr",
+      "wechat",
+      "jabber",
+      "qq",
+      "phone",
+      "crypto_wallet",
+      "pgp_public_key",
+      "pgp_fingerprint",
+      "bat",
+      "email"
+    ],
+    "type_priority": [
+      "pgp_public_key",
+      "pgp_fingerprint",
+      "crypto_wallet",
+      "telegram",
+      "wickr",
+      "wechat",
+      "jabber",
+      "qq",
+      "bat",
+      "phone",
+      "email"
+    ],
+    "min_token_seller_frequency": 2,
+    "max_token_seller_frequency_default": 8,
+    "max_token_seller_frequency_by_type": {
+      "email": 4,
+      "telegram": 8,
+      "wickr": 8,
+      "wechat": 8,
+      "jabber": 4,
+      "qq": 8,
+      "phone": 6,
+      "crypto_wallet": 4,
+      "pgp_public_key": 8,
+      "pgp_fingerprint": 8,
+      "bat": 8
+    },
+    "require_direct_identity_eligible": true,
+    "exclude_product_data_risk": true,
+    "exclude_support_only": true,
+    "exclude_already_reviewed_rows": true,
+    "dedupe_by_pair_uid": true,
+    "pending_active_rows_allowed": true
+  },
+  "review_guidelines": {
+    "positive": [
+      "Use positive only when both sides expose the same seller-facing direct identifier, such as Telegram/Wickr/Wechat/Jabber/QQ/Bat/phone/wallet/PGP.",
+      "Email is positive only when it is clearly seller-facing contact, not a leaked account, sample credential, or customer/victim data field.",
+      "A shared external URL remains support-only unless there is separate seller-facing direct contact evidence."
+    ],
+    "uncertain": [
+      "Use uncertain for product/victim-data ambiguity, one-sided context weakness, or shared identifiers embedded inside sample data.",
+      "Use uncertain when a parser hit is plausible but cannot survive paper-level identity-proof scrutiny."
+    ],
+    "negative": [
+      "Use negative only for clear parser noise or evidence that the sellers are controller-distinct.",
+      "Do not mark negative merely because products differ."
+    ]
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_item_identity_expansion_queue.20260422.csv",
+    "summary": "reports/step5_item_identity_expansion_queue_summary.20260422.json",
+    "codex_review_summary": "reports/step5_item_identity_expansion_codex_review_summary.20260422.json"
+  },
+  "hard_rules": [
+    "Step-3 item-level identity signals are extraction evidence only; they do not create labels by themselves.",
+    "Do not use Step-11 cluster membership or model score as a positive label.",
+    "Do not auto-promote product/victim-data emails, public URLs, high-frequency generic handles, or parser fragments.",
+    "If the queue cannot produce enough defensible positives, report direct-identity evidence scarcity instead of forcing few-shot improvement claims.",
+    "After any reviewed labels are applied, rerun Step 5 freeze and then rerun Step 7/9/11 from the refreshed boundary."
+  ]
+}

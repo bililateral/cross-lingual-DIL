@@ -1,0 +1,66 @@
+{
+  "queue_version": "step5_v2_targeted_review_step11_20260415",
+  "scope": "zh_target_strict",
+  "inputs": {
+    "step11_summary": "reports/step11_core_few_shot_default_ratio_20pct_seed_20260321_clustering_summary.json",
+    "step11_scored_pairs": "reports/step11_core_few_shot_default_ratio_20pct_seed_20260321_zh_target_strict_scored_pairs.csv",
+    "step11_clusters": "reports/step11_core_few_shot_default_ratio_20pct_seed_20260321_zh_target_strict_clusters.threshold_0550157.csv",
+    "step11_policy": "schema/step11_clustering_policy.json",
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv"
+  },
+  "selection": {
+    "cluster_one_template_review": {
+      "cluster_rank": 1,
+      "top_cross_market_limit": 5,
+      "tail_cross_market_limit": 1
+    },
+    "cluster_two_mixed_review": {
+      "cluster_rank": 2,
+      "explicit_pairs": [
+        {
+          "seller_uid_left": "market_item.xlsx|中文暗网交易市场|seller_raw:457175",
+          "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/442431",
+          "target_reason": "step11_cluster2_mixed_expansion|semantic_only_no_anchor",
+          "suggested_label": "negative_candidate",
+          "suggested_confidence": "medium",
+          "review_notes": "Retained semantic_only expansion inside the 8-node mixed-evidence cluster. No shared contact, no clone sentence support, pure semantic neighbor in a template-heavy four-piece niche."
+        },
+        {
+          "seller_uid_left": "market_item.xlsx|中文暗网交易市场|seller_raw:457175",
+          "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/444654",
+          "target_reason": "step11_cluster2_mixed_expansion|semantic_only_no_anchor",
+          "suggested_label": "negative_candidate",
+          "suggested_confidence": "medium",
+          "review_notes": "Retained semantic_only expansion inside the 8-node mixed-evidence cluster. No shared contact, no clone sentence support, and sits next to the true anchor pair rather than carrying its own identifier evidence."
+        },
+        {
+          "seller_uid_left": "market_item.xlsx|茶马古道|seller_raw:/shop/435963",
+          "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/462498",
+          "target_reason": "step11_cluster2_mixed_expansion|semantic_structural_no_anchor",
+          "suggested_label": "negative_candidate",
+          "suggested_confidence": "medium",
+          "review_notes": "Retained semantic_structural expansion inside the 8-node mixed-evidence cluster. Same-market same-business edge with no shared contact anchor; review carefully as a possible template-family false positive."
+        }
+      ]
+    }
+  },
+  "anchor_controls_not_queued": [
+    {
+      "seller_uid_left": "market_item.xlsx|茶马古道|seller_raw:/shop/444654",
+      "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/459141",
+      "reason": "strong positive anchor; shared exact Telegram fz12120 and should not be mixed into the hard-negative queue"
+    },
+    {
+      "seller_uid_left": "market_item.xlsx|茶马古道|seller_raw:/shop/454420",
+      "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/462498",
+      "reason": "audited as likely false positive earlier, but not retained in the current final Step 11 primary graph; keep as a secondary watchlist item rather than a queued hard negative"
+    }
+  ],
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_targeted_review_queue.step11_v1.csv",
+    "targeted_rereview_queue": "reports/step5_zh_target_strict_targeted_rereview_queue.step11_v1.csv",
+    "summary": "reports/step5_targeted_review_queue_summary.json"
+  }
+}

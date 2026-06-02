@@ -1,0 +1,323 @@
+{
+  "version": "2026-04-22",
+  "objective": "Step-7 full supervised baseline policy with multilingual semantics, LightGBM fusion, and semantic-activation augmentation against structure-only shortcut learning",
+  "input_dependencies": [
+    "schema/step7_transfer_safe_pair_feature_schema.json",
+    "schema/step7_semantic_model_policy.json",
+    "reports/step5_en_frozen_silver_labels.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "reports/step7_pair_features.en_content_train_pool.csv",
+    "reports/step7_pair_features.zh_target_strict.csv"
+  ],
+  "train_pool": "en_content_train_pool",
+  "zero_shot_target_pool": "zh_target_strict",
+  "label_vocab": [
+    "positive",
+    "negative"
+  ],
+  "split_names": {
+    "train": "train",
+    "valid": "valid",
+    "test": "test"
+  },
+  "semantic_feature_sets": {
+    "default_gte": [
+      "embedding_cosine_gte_multilingual_base",
+      "reranker_score_gte_multilingual_reranker_base"
+    ],
+    "default_gte_embedding_only": [
+      "embedding_cosine_gte_multilingual_base"
+    ],
+    "default_gte_reranker_only": [
+      "reranker_score_gte_multilingual_reranker_base"
+    ],
+    "no_semantics": [],
+    "strong_bge_m3": [
+      "embedding_cosine_bge_m3",
+      "reranker_score_bge_reranker_v2_m3"
+    ],
+    "strong_bge_m3_embedding_only": [
+      "embedding_cosine_bge_m3"
+    ],
+    "classic_multilingual_e5_large": [
+      "embedding_cosine_multilingual_e5_large"
+    ],
+    "classic_multilingual_e5_large_with_gte_reranker": [
+      "embedding_cosine_multilingual_e5_large",
+      "reranker_score_gte_multilingual_reranker_base"
+    ],
+    "alignment_labse": [
+      "embedding_cosine_labse"
+    ],
+    "alignment_labse_with_gte_reranker": [
+      "embedding_cosine_labse",
+      "reranker_score_gte_multilingual_reranker_base"
+    ],
+    "alignment_paraphrase_multilingual_mpnet": [
+      "embedding_cosine_paraphrase_multilingual_mpnet"
+    ],
+    "alignment_paraphrase_multilingual_mpnet_with_gte_reranker": [
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base"
+    ]
+  },
+  "default_experiments": [
+    "core_zero_shot_default",
+    "identifier_augmented_default",
+    "en_only_ablation_default",
+    "core_zero_shot_bge_m3",
+    "core_zero_shot_bge_m3_embedding_only",
+    "core_zero_shot_multilingual_e5_large",
+    "core_zero_shot_multilingual_e5_large_plus_gte_reranker",
+    "core_zero_shot_labse",
+    "core_zero_shot_labse_plus_gte_reranker",
+    "core_zero_shot_paraphrase_multilingual_mpnet",
+    "core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker",
+    "core_zero_shot_default_no_reranker",
+    "core_zero_shot_default_reranker_only",
+    "core_zero_shot_default_no_semantics",
+    "core_zero_shot_default_no_style_gap",
+    "core_zero_shot_default_no_structural",
+    "core_zero_shot_default_raw_style_gap_control"
+  ],
+  "semantic_activation_augmentation": {
+    "enabled": true,
+    "augmentation_weight": 0.35,
+    "mask_value": "nan"
+  },
+  "experiments": {
+    "core_zero_shot_default": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte",
+      "random_seed": 20260312,
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "identifier_augmented_default": {
+      "feature_views": [
+        "core_zero_shot_ready_now",
+        "identifier_augmented"
+      ],
+      "semantic_feature_set": "default_gte",
+      "identifier_positive_mask_rate": 0.4,
+      "zero_shot_safe": true
+    },
+    "en_only_ablation_default": {
+      "feature_views": [
+        "core_zero_shot_ready_now",
+        "en_only_ablation"
+      ],
+      "semantic_feature_set": "default_gte",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": false
+    },
+    "core_zero_shot_bge_m3": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "strong_bge_m3",
+      "random_seed": 20260312,
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_bge_m3_embedding_only": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "strong_bge_m3_embedding_only",
+      "random_seed": 20260312,
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_multilingual_e5_large": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "classic_multilingual_e5_large",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_multilingual_e5_large_plus_gte_reranker": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "classic_multilingual_e5_large_with_gte_reranker",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_labse": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_labse",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_labse_plus_gte_reranker": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_labse_with_gte_reranker",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_paraphrase_multilingual_mpnet": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_paraphrase_multilingual_mpnet",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_paraphrase_multilingual_mpnet_with_gte_reranker",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_no_reranker": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte_embedding_only",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_reranker_only": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte_reranker_only",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_no_semantics": {
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "no_semantics",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_no_style_gap": {
+      "feature_views": [
+        "core_structural_only"
+      ],
+      "semantic_feature_set": "default_gte",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_no_structural": {
+      "feature_views": [
+        "core_style_gap_only"
+      ],
+      "semantic_feature_set": "default_gte",
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": true
+    },
+    "core_zero_shot_default_raw_style_gap_control": {
+      "feature_views": [
+        "core_structural_only",
+        "core_style_gap_raw_only"
+      ],
+      "semantic_feature_set": "default_gte",
+      "random_seed": 20260312,
+      "identifier_positive_mask_rate": 0.0,
+      "zero_shot_safe": false,
+      "report_zh_zero_shot_metrics": true
+    }
+  },
+  "optimization": {
+    "random_seed": 20260311,
+    "num_boost_round": 500,
+    "early_stopping_rounds": 50,
+    "small_validation_guard": {
+      "enabled": true,
+      "max_valid_rows": 100,
+      "fixed_tree_training": {
+        "num_boost_round": 120,
+        "disable_early_stopping": true,
+        "lightgbm_param_overrides": {
+          "learning_rate": 0.03,
+          "feature_fraction": 0.6,
+          "bagging_fraction": 0.8
+        },
+        "post_train_iteration_scan": {
+          "enabled": true,
+          "min_best_iteration": 8,
+          "min_unique_valid_probabilities": 6,
+          "probability_round_decimals": 6,
+          "selection": {
+            "min_iteration": 8,
+            "max_primary_metric_drop": 0.03
+          }
+        }
+      }
+    },
+    "collapse_guard": {
+      "enabled": true,
+      "min_best_iteration": 8,
+      "min_unique_valid_probabilities": 6,
+      "probability_round_decimals": 6,
+      "selection": {
+        "min_iteration": 8,
+        "max_primary_metric_drop": 0.04
+      }
+    },
+    "lightgbm_params": {
+      "objective": "binary",
+      "metric": [
+        "binary_logloss",
+        "auc"
+      ],
+      "boosting_type": "gbdt",
+      "learning_rate": 0.05,
+      "num_leaves": 11,
+      "max_depth": 4,
+      "min_data_in_leaf": 6,
+      "feature_fraction": 0.85,
+      "bagging_fraction": 0.85,
+      "bagging_freq": 1,
+      "lambda_l1": 0.5,
+      "lambda_l2": 1.5,
+      "min_gain_to_split": 0.02,
+      "verbosity": -1,
+      "deterministic": true,
+      "force_col_wise": true
+    }
+  },
+  "threshold_selection": {
+    "split": "valid",
+    "metric": "balanced_accuracy",
+    "candidate_mode": "midpoints",
+    "tie_break_order": [
+      "specificity",
+      "precision",
+      "f1",
+      "higher_threshold"
+    ],
+    "degenerate_prediction_guard": {
+      "enabled": true,
+      "min_predicted_positive": 1,
+      "min_predicted_negative": 1,
+      "max_primary_metric_drop": 0.125,
+      "tie_break_order": [
+        "f1",
+        "recall",
+        "precision",
+        "specificity",
+        "lower_threshold"
+      ]
+    }
+  },
+  "output_templates": {
+    "summary": "reports/step7_training_summary.json",
+    "model": "reports/step7_{experiment_name}_model.txt",
+    "en_eval_predictions": "reports/step7_{experiment_name}_predictions.en_eval.csv",
+    "zh_test_predictions": "reports/step7_{experiment_name}_predictions.zh_target_strict_test.csv"
+  }
+}

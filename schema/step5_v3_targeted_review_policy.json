@@ -1,0 +1,66 @@
+{
+  "queue_version": "step5_v3_targeted_review_step11_calibrated_default_20260420",
+  "scope": "zh_target_strict",
+  "milestone_prerequisite": "reports/step5_v2_milestone_snapshot_summary.json",
+  "inputs": {
+    "step11_summary": "reports/step11_core_calibrated_default_clustering_summary.json",
+    "step11_scored_pairs": "reports/step11_core_calibrated_default_zh_target_strict_scored_pairs.csv",
+    "step11_clusters": "reports/step11_core_calibrated_default_zh_target_strict_clusters.threshold_0800000.csv",
+    "step11_policy": "schema/step11_clustering_policy.json",
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv"
+  },
+  "review_guidelines": {
+    "positive": [
+      "Only assign positive when a direct seller-specific anchor is present, such as shared contact, shared PGP, or another stable identity marker.",
+      "Do not promote a whole graph component just because one edge has an anchor."
+    ],
+    "negative": [
+      "Template clone, repeated product copy, public resource-package text, or shared topic evidence alone is not enough for a same-controller label.",
+      "Use negative only when the row has no seller-specific anchor and the business evidence supports seller-distinct template reuse."
+    ],
+    "uncertain": [
+      "Use uncertain for dense template overlap without contact or PGP evidence.",
+      "Use uncertain when a cluster contains a real anchor core but the queued edge is part of a semantic or template expansion."
+    ]
+  },
+  "selection": {
+    "clusters": {
+      "calibrated_default_primary_graph": {
+        "selection_mode": "all_retained_cluster_edges",
+        "target_bucket_prefix": "calibrated_default_cluster",
+        "target_reason_prefix": "step11_calibrated_default_v3",
+        "review_notes": "Corrected Step 5 v3 targeted review: retained in the current calibrated-default Step 11 primary graph at threshold 0.8. Review the exact edge only; do not treat the whole component as one controller unless the edge has direct seller-specific identity evidence.",
+        "bucket_rules": {
+          "identifier_anchor": {
+            "target_bucket": "calibrated_default_identifier_anchor",
+            "target_reason": "step11_calibrated_default_v3|identifier_anchor_edge",
+            "suggested_label": "positive_candidate",
+            "suggested_confidence": "high",
+            "review_notes": "Corrected Step 5 v3 targeted review: retained in the calibrated-default primary graph and has direct shared contact or PGP evidence. Verify that the shared identifier is seller-specific before preserving or assigning a positive label."
+          },
+          "template_clone": {
+            "target_bucket": "calibrated_default_template_clone",
+            "target_reason": "step11_calibrated_default_v3|template_clone_edge",
+            "suggested_label": "uncertain_candidate",
+            "suggested_confidence": "medium",
+            "review_notes": "Corrected Step 5 v3 targeted review: retained in the calibrated-default primary graph as a text/template clone edge. Without shared contact or PGP, review as possible public-template reuse rather than automatic same-controller evidence."
+          },
+          "semantic_or_structural": {
+            "target_bucket": "calibrated_default_semantic_structural",
+            "target_reason": "step11_calibrated_default_v3|semantic_structural_edge",
+            "suggested_label": "uncertain_candidate",
+            "suggested_confidence": "medium",
+            "review_notes": "Corrected Step 5 v3 targeted review: retained in the calibrated-default primary graph from semantic or structural evidence. Require direct identity evidence before assigning any positive supervision label."
+          }
+        }
+      }
+    }
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_targeted_review_queue.step11_calibrated_default_v3.csv",
+    "targeted_rereview_queue": "reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_default_v3.csv",
+    "summary": "reports/step5_v3_targeted_review_queue_summary.calibrated_default.json"
+  }
+}

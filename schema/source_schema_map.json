@@ -1,0 +1,464 @@
+{
+  "version": "2026-03-10",
+  "goal": "Phase-1 canonical schema and source mappings for cross-lingual sockpuppet-account research",
+  "canonical_tables": {
+    "item_records": {
+      "primary_key": "item_uid",
+      "description": "Canonical item-level table used to build seller profiles for EN-Content and ZH-Target.",
+      "fields": [
+        {
+          "name": "item_uid",
+          "type": "string",
+          "required": true,
+          "description": "Deterministic unique row id. Use a raw item id when available; otherwise hash the full raw row tuple plus source_row_number."
+        },
+        {
+          "name": "seller_uid",
+          "type": "string",
+          "required": true,
+          "description": "Deterministic seller id scoped to a source dataset and market. Never merge cross-source sellers by alias alone."
+        },
+        {
+          "name": "source_dataset",
+          "type": "string",
+          "required": true,
+          "description": "Source file identifier, for example market_item.xlsx or products_data.csv."
+        },
+        {
+          "name": "source_row_number",
+          "type": "integer",
+          "required": true,
+          "description": "1-based source row number for reproducibility."
+        },
+        {
+          "name": "source_market_raw",
+          "type": "string",
+          "required": true,
+          "description": "Raw market name from source. Use __unknown__ when provenance is unresolved."
+        },
+        {
+          "name": "source_seller_raw",
+          "type": "string",
+          "required": true,
+          "description": "Raw seller alias or seller path string."
+        },
+        {
+          "name": "source_seller_id_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw numeric seller id when present."
+        },
+        {
+          "name": "source_item_id_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw item or transaction id when present."
+        },
+        {
+          "name": "title_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw listing title."
+        },
+        {
+          "name": "description_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw listing description."
+        },
+        {
+          "name": "category_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw category text without ontology remapping."
+        },
+        {
+          "name": "ship_from_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw origin field when present."
+        },
+        {
+          "name": "price_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw price string preserved exactly as source."
+        },
+        {
+          "name": "rating_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw rating string when present."
+        },
+        {
+          "name": "remarks_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw remarks field when present."
+        },
+        {
+          "name": "成交额_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw gross sales string from products_data.csv."
+        },
+        {
+          "name": "成交量_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw sales volume string from products_data.csv."
+        },
+        {
+          "name": "好评_风险_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw reputation-risk summary from products_data.csv."
+        },
+        {
+          "name": "咨询数_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw inquiry-count field from products_data.csv."
+        },
+        {
+          "name": "热度_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw popularity field from products_data.csv."
+        },
+        {
+          "name": "卖家在线时长_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw seller-online-duration field from products_data.csv."
+        }
+      ]
+    },
+    "vendor_registry": {
+      "primary_key": "vendor_row_uid",
+      "description": "Canonical vendor registry table used for EN-Gold benchmark and leakage auditing.",
+      "fields": [
+        {
+          "name": "vendor_row_uid",
+          "type": "string",
+          "required": true,
+          "description": "Deterministic row id based on source dataset, market_id_raw, and vendor_id_raw."
+        },
+        {
+          "name": "source_dataset",
+          "type": "string",
+          "required": true,
+          "description": "Source file identifier."
+        },
+        {
+          "name": "market_id_raw",
+          "type": "integer",
+          "required": true,
+          "description": "Raw numeric market id from tijkc3xx.sql."
+        },
+        {
+          "name": "source_market_host",
+          "type": "string",
+          "required": true,
+          "description": "Vendor-link onion host used for stable market identification."
+        },
+        {
+          "name": "vendor_id_raw",
+          "type": "integer",
+          "required": true,
+          "description": "Raw vendor id from tijkc3xx.sql."
+        },
+        {
+          "name": "user_name_raw",
+          "type": "string",
+          "required": true,
+          "description": "Raw vendor alias."
+        },
+        {
+          "name": "user_id_raw",
+          "type": "integer",
+          "required": false,
+          "description": "Raw user id from tijkc3xx.sql."
+        },
+        {
+          "name": "link_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw numeric link id from tijkc3xx.sql."
+        },
+        {
+          "name": "profile_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw profile text from tijkc3xx.sql."
+        },
+        {
+          "name": "vendor_link_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw vendor profile URL."
+        },
+        {
+          "name": "imposter_flag",
+          "type": "integer",
+          "required": false,
+          "description": "Raw imposter indicator from tijkc3xx.sql."
+        }
+      ]
+    },
+    "identity_evidence": {
+      "primary_key": "evidence_uid",
+      "description": "Canonical evidence table for PGP-linkage, strong or weak sockpuppet groups, and imposter flags.",
+      "fields": [
+        {
+          "name": "evidence_uid",
+          "type": "string",
+          "required": true,
+          "description": "Deterministic row id scoped to the source file and raw evidence key."
+        },
+        {
+          "name": "source_dataset",
+          "type": "string",
+          "required": true,
+          "description": "Source file identifier."
+        },
+        {
+          "name": "evidence_type",
+          "type": "string",
+          "required": true,
+          "description": "One of pgp_key, strong_sockpuppet_group, weak_sockpuppet_group, imposter_flag."
+        },
+        {
+          "name": "confidence_level",
+          "type": "string",
+          "required": true,
+          "description": "One of gold, strong_silver, weak_silver, flag_only."
+        },
+        {
+          "name": "market_id_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw market id when present."
+        },
+        {
+          "name": "vendor_id_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw vendor id when present."
+        },
+        {
+          "name": "user_name_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw vendor alias when present."
+        },
+        {
+          "name": "evidence_key_raw",
+          "type": "string",
+          "required": true,
+          "description": "Fingerprint, key alias, or imposter marker exactly as observed."
+        },
+        {
+          "name": "fingerprint_raw",
+          "type": "string",
+          "required": false,
+          "description": "Full PGP fingerprint when present."
+        },
+        {
+          "name": "fingerprint_short_raw",
+          "type": "string",
+          "required": false,
+          "description": "Short PGP fingerprint when present."
+        },
+        {
+          "name": "group_size_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw group-size field from suspected group CSVs."
+        },
+        {
+          "name": "review_count_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw review count from Vendor_pgp_keys."
+        },
+        {
+          "name": "star_rate_raw",
+          "type": "string",
+          "required": false,
+          "description": "Raw star rate from Vendor_pgp_keys."
+        }
+      ]
+    }
+  },
+  "source_mappings": {
+    "products_data.csv": {
+      "table": "item_records",
+      "source_language": "zh",
+      "market_scope": "__unknown__",
+      "field_map": {
+        "source_seller_id_raw": "卖家ID",
+        "source_item_id_raw": "交易编号",
+        "title_raw": "标题",
+        "description_raw": "商品描述",
+        "category_raw": "类别",
+        "price_raw": "单价(USD)",
+        "成交额_raw": "成交额",
+        "成交量_raw": "成交量",
+        "好评_风险_raw": "好评_风险",
+        "咨询数_raw": "咨询数",
+        "热度_raw": "热度",
+        "卖家在线时长_raw": "卖家在线时长"
+      },
+      "notes": [
+        "No explicit seller alias column is present; seller_uid must be built from seller_id plus source scope.",
+        "Market provenance is unresolved in the raw file and must remain __unknown__ until externally verified."
+      ]
+    },
+    "market_item.xlsx": {
+      "table": "item_records",
+      "source_language": "mixed",
+      "market_scope": "multi_market",
+      "field_map": {
+        "source_seller_raw": "vendor",
+        "ship_from_raw": "ship_from",
+        "title_raw": "title",
+        "description_raw": "description",
+        "price_raw": "price",
+        "category_raw": "category",
+        "source_market_raw": "market"
+      },
+      "notes": [
+        "This file contains both EN-Content and ZH-Target rows.",
+        "ZH-Target must be restricted to market in {中文暗网交易市场, 茶马古道}.",
+        "Non-target rows with Chinese characters must not automatically be treated as target-domain Chinese data."
+      ]
+    },
+    "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx": {
+      "table": "item_records",
+      "source_language": "en",
+      "market_scope": "agora",
+      "field_map": {
+        "source_seller_raw": "Vendor",
+        "category_raw": " Category",
+        "title_raw": " Item",
+        "description_raw": " Item Description",
+        "price_raw": " Price",
+        "ship_from_raw": " Origin",
+        "rating_raw": " Rating",
+        "remarks_raw": " Remarks"
+      },
+      "notes": [
+        "Treat source_market_raw as agora for all rows because the raw file is a single-market export.",
+        "No raw item id is present; item_uid must be deterministic-hash based."
+      ]
+    },
+    "tijkc3xx.sql": {
+      "table": "vendor_registry",
+      "source_language": "en",
+      "field_map": {
+        "vendor_id_raw": "vendor_id",
+        "user_name_raw": "user_name",
+        "market_id_raw": "market_id",
+        "user_id_raw": "user_id",
+        "link_raw": "link",
+        "profile_raw": "profile",
+        "vendor_link_raw": "vendor_link",
+        "imposter_flag": "imposter"
+      },
+      "notes": [
+        "This file is EN-Gold vendor metadata, not content-training data.",
+        "Market identity should be normalized from vendor_link host, not only numeric market_id."
+      ]
+    },
+    "3z669jwe.sql": {
+      "table": "identity_evidence",
+      "source_language": "en",
+      "field_map": {
+        "user_name_raw": "alias",
+        "fingerprint_short_raw": "fingerprint_f",
+        "fingerprint_raw": "fingerprint",
+        "evidence_key_raw": "fingerprint",
+        "review_count_raw": "review_count",
+        "star_rate_raw": "star_rate"
+      },
+      "notes": [
+        "Use vendor_ids as the linkage payload and fingerprint as the evidence key.",
+        "This file is the strongest available linkage evidence for EN-Gold."
+      ]
+    },
+    "suspected_sockpuppet_strong.csv": {
+      "table": "identity_evidence",
+      "source_language": "en",
+      "field_map": {
+        "vendor_id_raw": "vendor_id",
+        "user_name_raw": "user_name",
+        "market_id_raw": "market_id",
+        "evidence_key_raw": "key_alias",
+        "fingerprint_raw": "fingerprint",
+        "fingerprint_short_raw": "fingerprint_f",
+        "group_size_raw": "strong_group_distinct_user_count"
+      },
+      "notes": [
+        "Treat as strong_silver evidence unless independently promoted to gold by a stricter protocol."
+      ]
+    },
+    "suspected_sockpuppet_weak.csv": {
+      "table": "identity_evidence",
+      "source_language": "en",
+      "field_map": {
+        "vendor_id_raw": "vendor_id",
+        "user_name_raw": "user_name",
+        "market_id_raw": "market_id",
+        "evidence_key_raw": "key_alias",
+        "fingerprint_raw": "fingerprint",
+        "fingerprint_short_raw": "fingerprint_f",
+        "group_size_raw": "weak_group_distinct_user_count"
+      },
+      "notes": [
+        "Treat as weak_silver evidence and keep separate from strict benchmark data."
+      ]
+    },
+    "suspected_imposter_rows.csv": {
+      "table": "identity_evidence",
+      "source_language": "en",
+      "field_map": {
+        "vendor_id_raw": "vendor_id",
+        "user_name_raw": "user_name",
+        "market_id_raw": "market_id",
+        "evidence_key_raw": "imposter"
+      },
+      "notes": [
+        "This file records imposter flags and should be modeled separately from positive sockpuppet linkage."
+      ]
+    }
+  },
+  "auxiliary_sources": {
+    "file_analysis_catalog.csv": {
+      "role": "inventory_only",
+      "notes": [
+        "Catalog of local files with inferred roles.",
+        "Useful for coverage auditing but not a direct training table."
+      ]
+    },
+    "html-rips": {
+      "role": "aux_vendor_snapshot",
+      "notes": [
+        "Unstructured Grams InfoDesk HTML vendor snapshots.",
+        "Use one mirror only after deduplication."
+      ]
+    },
+    "2017-12-09-grams-christopher": {
+      "role": "aux_vendor_snapshot",
+      "notes": [
+        "Appears to mirror html-rips for the sampled files checked so far."
+      ]
+    }
+  },
+  "hard_rules": [
+    "Do not merge cross-source sellers only because lowercased aliases match.",
+    "Do not use EN-Gold aliases or PGP-linked vendor groups inside EN-Content training after leakage auditing.",
+    "Do not treat all Chinese-character rows in market_item.xlsx as ZH-Target.",
+    "Keep raw text fields untouched in canonical storage; normalization and token cleanup belong to downstream feature pipelines."
+  ]
+}

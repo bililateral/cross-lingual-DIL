@@ -1,0 +1,108 @@
+{
+  "queue_version": "step5_boundary_expansion_zero_shot_bge_20260421",
+  "scope": "zh_target_strict",
+  "objective": "Expand Step 5 Chinese target-domain supervision with precision-targeted boundary samples for future few-shot adaptation tests.",
+  "input_dependencies": [
+    "reports/step11_core_zero_shot_bge_m3_clustering_summary.json",
+    "reports/step11_core_zero_shot_bge_m3_zh_target_strict_scored_pairs.csv",
+    "schema/step11_clustering_policy.json",
+    "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv"
+  ],
+  "inputs": {
+    "step11_summary": "reports/step11_core_zero_shot_bge_m3_clustering_summary.json",
+    "step11_scored_pairs": "reports/step11_core_zero_shot_bge_m3_zh_target_strict_scored_pairs.csv",
+    "step11_policy": "schema/step11_clustering_policy.json",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv"
+  },
+  "selection": {
+    "pending_only": true,
+    "dedupe_by_pair_uid": true,
+    "exclude_identifier_edges_by_default": true,
+    "style_gap_features": [
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs",
+      "uppercase_ratio_mean_percentile_gap_abs"
+    ],
+    "buckets": [
+      {
+        "bucket_id": "positive_probe_high_semantic_high_structure",
+        "target_count": 260,
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "medium",
+        "review_priority": "high",
+        "target_reason": "boundary_expansion|high_semantic_high_structure|zero_shot_bge",
+        "review_notes": "Boundary expansion: high BGE-M3 semantic similarity plus high structural overlap. Assign positive only if seller-specific evidence or coherent cross-listing behavior supports same-controller identity; otherwise use negative or uncertain.",
+        "filters": {
+          "min_embedding_cosine_bge_m3": 0.78,
+          "min_structural_support_score_raw": 0.5,
+          "min_prob_positive": 0.56,
+          "exclude_identifier_edges": true
+        },
+        "ranking": "prefer_graph_retained_then_high_score_structure_semantic"
+      },
+      {
+        "bucket_id": "negative_probe_high_semantic_style_divergence",
+        "target_count": 260,
+        "suggested_label": "negative_candidate",
+        "suggested_confidence": "medium",
+        "review_priority": "high",
+        "target_reason": "boundary_expansion|high_semantic_style_divergence|zero_shot_bge",
+        "review_notes": "Boundary expansion: high semantic similarity with strong profile/style divergence and no direct identifier anchor. This is a hard-negative probe for template resale or public-copy reuse; assign negative only when the two sellers appear controller-distinct.",
+        "filters": {
+          "min_embedding_cosine_bge_m3": 0.75,
+          "min_style_gap_score": 2.0,
+          "min_prob_positive": 0.48,
+          "max_prob_positive": 0.69,
+          "exclude_identifier_edges": true
+        },
+        "ranking": "prefer_not_graph_retained_then_style_gap_and_boundary_score"
+      }
+    ]
+  },
+  "review_guidelines": {
+    "positive": [
+      "Use positive only when the edge-level evidence supports same-controller identity, not merely shared product topic or public template reuse.",
+      "High semantic similarity and structural overlap are triage signals, not labels."
+    ],
+    "negative": [
+      "Use negative for high-semantic template-resale or public-copy rows when profile/style/business evidence points to distinct controllers.",
+      "Do not mark a row negative just because one side has sparse data; use uncertain when the evidence is insufficient."
+    ],
+    "uncertain": [
+      "Use uncertain for strong overlap without enough seller-specific identity evidence.",
+      "Use uncertain when the row is plausible same-controller but cannot be defended as a training label."
+    ]
+  },
+  "target_after_review": {
+    "minimum_new_reviewed_rows": 500,
+    "desired_total_zh_supervision_rows": 500,
+    "desired_zh_test_rows": 100,
+    "recommended_future_zh_target_strict_split_ratios": {
+      "train": 0.65,
+      "valid": 0.15,
+      "test": 0.2
+    },
+    "note": "Do not change the frozen benchmark until the boundary expansion queue is human-reviewed and copied back into the active Step 5 queue."
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_boundary_expansion_queue.zero_shot_bge_20260421.csv",
+    "summary": "reports/step5_boundary_expansion_queue_summary.zero_shot_bge_20260421.json",
+    "application_summary": "reports/step5_boundary_expansion_apply_summary.zero_shot_bge_20260421.json"
+  },
+  "hard_rules": [
+    "Do not auto-label any selected row.",
+    "Select only rows that are pending in the active Step 5 Chinese strict review queue.",
+    "Exclude rows already present in active frozen labels.",
+    "Keep the active frozen benchmark unchanged until the targeted queue is human-reviewed and explicitly applied back to the active queue.",
+    "After applying reviewed labels, rerun Step 5 freeze before rerunning Step 7, Step 9, or Step 11."
+  ]
+}

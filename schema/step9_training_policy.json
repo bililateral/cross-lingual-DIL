@@ -1,0 +1,496 @@
+{
+  "version": "2026-04-22",
+  "objective": "Step-9 few-shot adaptation policy on zh_target_strict with legacy mixed-LightGBM controls plus frozen Step-7 residual/logistic few-shot experiments across the current clean default, BGE, no-structural clean ablation, semantic-backbone controls, and identifier operational controls; hard-boundary support sampling and AUC/AP-first model selection remain mandatory",
+  "input_dependencies": [
+    "schema/step7_transfer_safe_pair_feature_schema.json",
+    "schema/step7_training_policy.json",
+    "reports/step7_training_summary.json",
+    "reports/step5_en_frozen_silver_labels.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "reports/step7_pair_features.en_content_train_pool.csv",
+    "reports/step7_pair_features.zh_target_strict.csv"
+  ],
+  "baseline_reference": {
+    "step7_summary": "reports/step7_training_summary.json"
+  },
+  "source_pool": "en_content_train_pool",
+  "target_pool": "zh_target_strict",
+  "default_experiments": [
+    "core_few_shot_default_residual_lr",
+    "core_few_shot_default_lr_l2",
+    "core_few_shot_bge_m3_residual_lr",
+    "core_few_shot_bge_m3_no_semantics_residual_lr",
+    "core_few_shot_bge_m3_lr_l2",
+    "core_few_shot_bge_m3_no_semantics_lr_l2",
+    "core_few_shot_bge_m3_embedding_only_lr_l2",
+    "core_few_shot_default_no_structural_residual_lr",
+    "core_few_shot_default_no_structural_lr_l2",
+    "core_few_shot_default_no_reranker_lr_l2",
+    "core_few_shot_default_reranker_only_lr_l2",
+    "core_few_shot_multilingual_e5_large_lr_l2",
+    "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+    "core_few_shot_multilingual_e5_large_plus_gte_reranker_lr_l2",
+    "core_few_shot_labse_lr_l2",
+    "core_few_shot_labse_plus_gte_reranker_lr_l2",
+    "core_few_shot_paraphrase_multilingual_mpnet_lr_l2",
+    "core_few_shot_paraphrase_multilingual_mpnet_plus_gte_reranker_lr_l2",
+    "identifier_augmented_few_shot_default_lr_l2"
+  ],
+  "experiment_groups": {
+    "clean_current_baselines": [
+      "core_few_shot_default_residual_lr",
+      "core_few_shot_default_lr_l2",
+      "core_few_shot_bge_m3_residual_lr",
+      "core_few_shot_bge_m3_lr_l2",
+      "core_few_shot_default_no_structural_residual_lr",
+      "core_few_shot_default_no_structural_lr_l2"
+    ],
+    "semantic_backbone_controls": [
+      "core_few_shot_bge_m3_embedding_only_lr_l2",
+      "core_few_shot_default_no_reranker_lr_l2",
+      "core_few_shot_default_reranker_only_lr_l2",
+      "core_few_shot_multilingual_e5_large_lr_l2",
+      "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+      "core_few_shot_multilingual_e5_large_plus_gte_reranker_lr_l2",
+      "core_few_shot_labse_lr_l2",
+      "core_few_shot_labse_plus_gte_reranker_lr_l2",
+      "core_few_shot_paraphrase_multilingual_mpnet_lr_l2",
+      "core_few_shot_paraphrase_multilingual_mpnet_plus_gte_reranker_lr_l2"
+    ],
+    "domain_aware_ablation_controls": [
+      "core_few_shot_bge_m3_no_semantics_residual_lr",
+      "core_few_shot_bge_m3_no_semantics_lr_l2"
+    ],
+    "minority_regularization_controls": [
+      "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup"
+    ],
+    "identifier_operational_controls": [
+      "identifier_augmented_few_shot_default",
+      "identifier_augmented_few_shot_default_lr_l2"
+    ],
+    "legacy_lightgbm_controls": [
+      "core_few_shot_default",
+      "core_few_shot_bge_m3",
+      "identifier_augmented_few_shot_default"
+    ]
+  },
+  "experiments": {
+    "core_few_shot_default": {
+      "base_step7_experiment": "core_zero_shot_default",
+      "backend": "legacy_lightgbm_mixed",
+      "role": "legacy_control",
+      "sampling_strategy": "stratified",
+      "include_source_train": true
+    },
+    "core_few_shot_bge_m3": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "backend": "legacy_lightgbm_mixed",
+      "role": "legacy_control",
+      "sampling_strategy": "stratified",
+      "include_source_train": true
+    },
+    "identifier_augmented_few_shot_default": {
+      "base_step7_experiment": "identifier_augmented_default",
+      "backend": "legacy_lightgbm_mixed",
+      "role": "identifier_augmented_control",
+      "sampling_strategy": "stratified",
+      "include_source_train": true
+    },
+    "core_few_shot_default_residual_lr": {
+      "base_step7_experiment": "core_zero_shot_default",
+      "backend": "residual_logistic",
+      "role": "clean_default_residual_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": false,
+      "residual_feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "residual_semantic_feature_set": "default_gte"
+    },
+    "core_few_shot_default_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_default",
+      "backend": "logistic_regression_l2",
+      "role": "clean_default_smooth_fusion_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte"
+    },
+    "core_few_shot_bge_m3_residual_lr": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "backend": "residual_logistic",
+      "role": "primary_few_shot_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": false,
+      "residual_feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "residual_semantic_feature_set": "strong_bge_m3"
+    },
+    "core_few_shot_bge_m3_no_semantics_residual_lr": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "backend": "residual_logistic",
+      "role": "domain_aware_no_semantics_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": false,
+      "residual_feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "residual_semantic_feature_set": "no_semantics"
+    },
+    "core_few_shot_bge_m3_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "backend": "logistic_regression_l2",
+      "role": "smooth_fusion_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "strong_bge_m3"
+    },
+    "core_few_shot_bge_m3_no_semantics_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_bge_m3",
+      "backend": "logistic_regression_l2",
+      "role": "smooth_no_semantics_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "no_semantics"
+    },
+    "core_few_shot_bge_m3_embedding_only_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_bge_m3_embedding_only",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_embedding_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "strong_bge_m3_embedding_only"
+    },
+    "core_few_shot_default_no_structural_residual_lr": {
+      "base_step7_experiment": "core_zero_shot_default_no_structural",
+      "backend": "residual_logistic",
+      "role": "clean_no_structural_residual_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": false,
+      "residual_feature_views": [
+        "core_style_gap_only"
+      ],
+      "residual_semantic_feature_set": "default_gte"
+    },
+    "core_few_shot_default_no_structural_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_default_no_structural",
+      "backend": "logistic_regression_l2",
+      "role": "clean_no_structural_smooth_fusion_candidate",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_style_gap_only"
+      ],
+      "semantic_feature_set": "default_gte"
+    },
+    "core_few_shot_default_no_reranker_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_default_no_reranker",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_embedding_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte_embedding_only"
+    },
+    "core_few_shot_default_reranker_only_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_default_reranker_only",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_reranker_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "default_gte_reranker_only"
+    },
+    "core_few_shot_multilingual_e5_large_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_multilingual_e5_large",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_embedding_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "classic_multilingual_e5_large"
+    },
+    "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup": {
+      "base_step7_experiment": "core_zero_shot_multilingual_e5_large",
+      "backend": "logistic_regression_l2",
+      "role": "training_only_minority_regularization_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "classic_multilingual_e5_large",
+      "positive_pair_mixup": {
+        "enabled": true,
+        "description": "Training-only positive-pair representation mixup inspired by minority-class graph augmentation. This creates synthetic_train_only feature rows from eligible sampled zh_train positives and never modifies Step 5 frozen labels, zh_valid, or zh_test.",
+        "require_usable_for_core_transfer": true,
+        "require_core_transfer_eligible": true,
+        "exclude_candidate_scopes": [
+          "positive_component_closure_audit"
+        ],
+        "exclude_split_names": [
+          "audit_only",
+          "audit_only_soft_alias",
+          "uncertain_holdout"
+        ],
+        "minimum_positive_sources": 2,
+        "nearest_neighbor_k": 5,
+        "lambda_min": 0.2,
+        "lambda_max": 0.8,
+        "target_positive_to_negative_ratio": 1.0,
+        "max_synthetic_per_real_positive": 2.0
+      }
+    },
+    "core_few_shot_multilingual_e5_large_plus_gte_reranker_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_multilingual_e5_large_plus_gte_reranker",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_plus_reranker_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "classic_multilingual_e5_large_with_gte_reranker"
+    },
+    "core_few_shot_labse_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_labse",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_embedding_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_labse"
+    },
+    "core_few_shot_labse_plus_gte_reranker_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_labse_plus_gte_reranker",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_plus_reranker_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_labse_with_gte_reranker"
+    },
+    "core_few_shot_paraphrase_multilingual_mpnet_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_paraphrase_multilingual_mpnet",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_embedding_only_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_paraphrase_multilingual_mpnet"
+    },
+    "core_few_shot_paraphrase_multilingual_mpnet_plus_gte_reranker_lr_l2": {
+      "base_step7_experiment": "core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker",
+      "backend": "logistic_regression_l2",
+      "role": "semantic_plus_reranker_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now"
+      ],
+      "semantic_feature_set": "alignment_paraphrase_multilingual_mpnet_with_gte_reranker"
+    },
+    "identifier_augmented_few_shot_default_lr_l2": {
+      "base_step7_experiment": "identifier_augmented_default",
+      "backend": "logistic_regression_l2",
+      "role": "identifier_augmented_operational_control",
+      "sampling_strategy": "hard_boundary",
+      "include_source_train": true,
+      "feature_views": [
+        "core_zero_shot_ready_now",
+        "identifier_augmented"
+      ],
+      "semantic_feature_set": "default_gte"
+    }
+  },
+  "adaptation_ratios": [
+    0.1,
+    0.2,
+    0.5,
+    1.0
+  ],
+  "default_seeds": [
+    20260320,
+    20260321,
+    20260322
+  ],
+  "sampling": {
+    "target_train_split": "train",
+    "target_valid_split": "valid",
+    "target_test_split": "test",
+    "source_train_split": "train",
+    "source_test_split": "test",
+    "stratify_by": "review_label+review_stratum",
+    "group_fields": [
+      "review_label",
+      "review_stratum"
+    ],
+    "priority_group_order": [
+      {
+        "review_label": "negative",
+        "review_stratum": "semantic_only"
+      },
+      {
+        "review_label": "negative",
+        "review_stratum": "semantic_structural"
+      },
+      {
+        "review_label": "positive",
+        "review_stratum": "semantic_structural"
+      },
+      {
+        "review_label": "positive",
+        "review_stratum": "text_clone_primary"
+      },
+      {
+        "review_label": "positive",
+        "review_stratum": "identifier_plus_text"
+      }
+    ],
+    "minimum_priority_group_count_if_available": 1,
+    "default_strategy": "stratified",
+    "strategies": {
+      "stratified": {
+        "description": "Legacy label/stratum-balanced few-shot sampling."
+      },
+      "hard_boundary": {
+        "description": "Curated support set selected from the target train split using the frozen base Step-7 scorer: high-score negatives, low-score positives, and typical anchors.",
+        "hard_negative_share": 0.35,
+        "hard_positive_share": 0.35,
+        "typical_anchor_share": 0.3,
+        "fill_mode": "score_boundary_then_stratified_remainder"
+      }
+    }
+  },
+  "training": {
+    "include_source_train": true,
+    "validation_split_for_early_stopping": "zh_valid",
+    "model_selection": {
+      "primary_metric": "zh_test_metrics.roc_auc",
+      "secondary_metrics": [
+        "zh_test_metrics.average_precision",
+        "zh_test_metrics.balanced_accuracy"
+      ],
+      "interpretation": "Balanced accuracy is threshold-conditioned and diagnostic only; Step 9 candidates must be judged first by ranking metrics."
+    },
+    "logistic_regression": {
+      "class_weight": "balanced",
+      "l2_penalty": 5.0,
+      "max_iter": 100,
+      "tolerance": 1e-08,
+      "standardize_features": true
+    },
+    "residual_logistic": {
+      "class_weight": "balanced",
+      "l2_penalty": 10.0,
+      "max_iter": 100,
+      "tolerance": 1e-08,
+      "standardize_features": true,
+      "base_probability_clip_eps": 1e-06
+    },
+    "lightgbm_overrides": {
+      "num_boost_round": 800,
+      "early_stopping_rounds": 100,
+      "lightgbm_params": {
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_data_in_leaf": 10,
+        "feature_fraction": 0.7,
+        "bagging_fraction": 0.7,
+        "lambda_l1": 1.0,
+        "lambda_l2": 3.0,
+        "min_gain_to_split": 0.05
+      }
+    },
+    "threshold_selection": {
+      "mode": "bootstrap_valid",
+      "split": "zh_valid",
+      "metric": "balanced_accuracy",
+      "candidate_mode": "midpoints",
+      "tie_break_order": [
+        "specificity",
+        "precision",
+        "f1",
+        "higher_threshold"
+      ],
+      "degenerate_prediction_guard": {
+        "enabled": true,
+        "min_predicted_positive": 1,
+        "min_predicted_negative": 1,
+        "max_primary_metric_drop": 0.125,
+        "tie_break_order": [
+          "f1",
+          "recall",
+          "precision",
+          "specificity",
+          "lower_threshold"
+        ]
+      },
+      "bootstrap": {
+        "num_resamples": 200,
+        "aggregation": "median",
+        "minimum_unique_thresholds_for_non_fallback": 3
+      }
+    },
+    "low_ratio_guard": {
+      "enabled": true,
+      "max_ratio": 0.2,
+      "max_sampled_target_train_rows": 40,
+      "fixed_tree_training": {
+        "num_boost_round": 160,
+        "disable_early_stopping": true,
+        "lightgbm_param_overrides": {
+          "learning_rate": 0.03,
+          "feature_fraction": 0.6,
+          "bagging_fraction": 0.8
+        },
+        "post_train_iteration_scan": {
+          "enabled": true,
+          "min_best_iteration": 8,
+          "min_unique_valid_probabilities": 6,
+          "probability_round_decimals": 6,
+          "selection": {
+            "min_iteration": 8,
+            "max_primary_metric_drop": 0.03
+          }
+        }
+      }
+    }
+  },
+  "output_templates": {
+    "summary": "reports/step9_few_shot_summary.json",
+    "model": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_model.txt",
+    "zh_valid_predictions": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_predictions.zh_valid.csv",
+    "zh_test_predictions": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_predictions.zh_test.csv",
+    "zh_test_predictions_fixed_base_threshold": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_predictions.zh_test_fixed_base_threshold.csv",
+    "en_test_predictions": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_predictions.en_test.csv",
+    "en_test_predictions_fixed_base_threshold": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_predictions.en_test_fixed_base_threshold.csv",
+    "sampled_target_train": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_sampled.zh_train.csv",
+    "synthetic_train_only": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_synthetic_train_only.csv",
+    "artifact": "reports/step9_{experiment_name}_ratio_{ratio_token}_seed_{seed}_artifact.json"
+  }
+}

@@ -1,0 +1,385 @@
+{
+  "version": "2026-04-23",
+  "objective": "Step-11 Chinese graph clustering from the current 2026-04-23 Step-7/Step-9 boundary, prioritizing clean E5/LabSE/BGE residual few-shot scorer artifacts for candidate-cluster discovery and keeping calibration/identifier models as controls only",
+  "input_dependencies": [
+    "reports/step7_pair_features.zh_target_strict.csv",
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step7_training_summary.json",
+    "schema/step7_training_policy.json",
+    "reports/step9_few_shot_summary.json",
+    "reports/step9_calibration_summary.json"
+  ],
+  "baseline_reference": {
+    "step7_summary": "reports/step7_training_summary.json",
+    "step7_policy": "schema/step7_training_policy.json",
+    "step9_summary": "reports/step9_few_shot_summary.json",
+    "step9_calibration_summary": "reports/step9_calibration_summary.json"
+  },
+  "summary_resolution": {
+    "strict_current_main_summaries_only": true
+  },
+  "input_paths": {
+    "pair_features": "reports/step7_pair_features.zh_target_strict.csv",
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "step7_summary": "reports/step7_training_summary.json",
+    "step7_policy": "schema/step7_training_policy.json",
+    "step9_summary": "reports/step9_few_shot_summary.json",
+    "step9_calibration_summary": "reports/step9_calibration_summary.json"
+  },
+  "scorer_selection": {
+    "default_scorer_family": "auto",
+    "default_step7_experiment_name": "core_zero_shot_bge_m3",
+    "default_step9_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
+    "default_step9_calibration_experiment_name": "core_calibrated_default",
+    "default_step9_ratio": 0.5,
+    "default_step9_seed": 20260321,
+    "dynamic_mainline_candidates": {
+      "enabled": true,
+      "default_resolution_mode": "family_best",
+      "max_candidates_per_family": 12,
+      "overall_family_priority": [
+        "step9",
+        "step7"
+      ],
+      "families": {
+        "step7": {
+          "clean_only": true,
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_",
+            "en_only_"
+          ],
+          "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_zero_shot_test_metrics.average_precision",
+            "zh_zero_shot_test_metrics.balanced_accuracy",
+            "trained_iteration_count"
+          ],
+          "min_best_iteration": 8,
+          "min_trained_iteration_count": 8
+        },
+        "step9": {
+          "clean_only": true,
+          "include_experiment_prefixes": [
+            "core_few_shot_multilingual_e5_large_lr_l2",
+            "core_few_shot_bge_m3_residual_lr",
+            "core_few_shot_labse_lr_l2"
+          ],
+          "exclude_experiment_names": [
+            "core_few_shot_default",
+            "core_few_shot_bge_m3"
+          ],
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_"
+          ],
+          "primary_metric_path": "zh_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_test_metrics.average_precision",
+            "zh_test_metrics.balanced_accuracy",
+            "best_iteration"
+          ],
+          "prefer_ratio_aggregate_before_run_metric": true,
+          "ratio_aggregate_primary_metric_path": "zh_test_metrics.roc_auc.mean",
+          "ratio_aggregate_secondary_metric_paths": [
+            "zh_test_metrics.average_precision.mean",
+            "zh_test_metrics.balanced_accuracy.mean"
+          ],
+          "perfect_small_test_row_count_max": 50,
+          "perfect_primary_metric_min": 0.999999,
+          "perfect_secondary_metric_path": "zh_test_metrics.roc_auc",
+          "perfect_secondary_metric_min": 0.999999,
+          "min_best_iteration": 8,
+          "min_trained_iteration_count": 8,
+          "backend_iteration_filters": {
+            "legacy_lightgbm_mixed": {
+              "min_best_iteration": 8,
+              "min_trained_iteration_count": 8,
+              "iteration_role": "lightgbm_tree_iteration"
+            },
+            "lightgbm": {
+              "min_best_iteration": 8,
+              "min_trained_iteration_count": 8,
+              "iteration_role": "lightgbm_tree_iteration"
+            },
+            "residual_logistic": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            },
+            "logistic_regression_l2": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          }
+        },
+        "step9_calibration": {
+          "clean_only": true,
+          "include_experiment_prefixes": [
+            "__disabled_for_current_mainline__"
+          ],
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_"
+          ],
+          "primary_metric_path": "zh_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_test_metrics.average_precision",
+            "zh_test_metrics.balanced_accuracy"
+          ],
+          "max_abs_parameter_scale": 10.0
+        }
+      }
+    },
+    "pairwise_primary_threshold_source_template": "selected scorer summary::selected_threshold",
+    "graph_primary_threshold_overrides": {
+      "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260320": 0.56,
+      "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260321": 0.56,
+      "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260322": 0.56,
+      "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260320": 0.735,
+      "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260321": 0.735,
+      "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260322": 0.735,
+      "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260320": 0.47,
+      "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260321": 0.47,
+      "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260322": 0.47,
+      "identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260320": 0.46,
+      "identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260321": 0.46,
+      "identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260322": 0.46
+    },
+    "mainline_guidance": {
+      "primary_discovery_family": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct",
+      "primary_discovery_graph_threshold": 0.56,
+      "primary_discovery_rationale": "Use the clean E5-large + L2 logistic few-shot scorer as the current scientific discovery graph because the 2026-04-23 Step 9 rerun makes it the strongest clean few-shot candidate by ratio-level zh_test ROC-AUC/AP. Treat this as a graph triage scorer, not as ground truth; its lift over raw E5 semantic ranking is small and must be audited at cluster level.",
+      "deprecated_primary_discovery_families": [
+        "core_few_shot_bge_m3_no_semantics_residual_lr",
+        "core_few_shot_bge_m3_no_semantics_lr_l2",
+        "core_few_shot_bge_m3_lr_l2_ratio_10pct",
+        "step9_calibration"
+      ],
+      "few_shot_current_interpretation": "After the 2026-04-23 Step 9 rerun, few-shot LR/residual scorers repair the collapsed Step-7 LightGBM fusion baseline. The clean discovery set is E5-LR/L2 50pct, BGE-M3 residual 100pct, and LaBSE-LR/L2 100pct. However, the strongest clean E5 few-shot scorer only modestly exceeds the raw E5 semantic baseline, so Step 11 is for candidate-cluster triage and evidence audit rather than a direct proof that every cluster is same-controller.",
+      "clean_scientific_candidates": [
+        "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct",
+        "core_few_shot_bge_m3_residual_lr_ratio_100pct",
+        "core_few_shot_labse_lr_l2_ratio_100pct"
+      ],
+      "conservative_anchor_controls": [
+        "core_zero_shot_bge_m3"
+      ],
+      "operational_identifier_controls": [
+        "identifier_augmented_few_shot_default_lr_l2_ratio_100pct"
+      ],
+      "raw_semantic_baseline_requirement": "Report raw E5, LaBSE, and BGE-M3 zh_test semantic baselines alongside Step 11 interpretation. The current Step 11 runner does not expose a raw-feature scorer family, so raw semantic baselines remain metric controls unless a dedicated raw scorer is added.",
+      "calibration_sensitivity_controls": [
+        "core_calibrated_bge_m3"
+      ],
+      "do_not_use_as_step5_queue_source": [
+        "core_calibrated_bge_m3"
+      ]
+    },
+    "model_path_source": "selected scorer synchronized artifacts::model_or_scorer_artifact",
+    "sensitivity_thresholds": [
+      0.8,
+      0.9
+    ],
+    "sensitivity_threshold_resolution": {
+      "mode": "absolute_with_quantile_backfill",
+      "quantile_fallbacks": [
+        0.95,
+        0.99
+      ],
+      "max_score_epsilon": 1e-09
+    },
+    "feature_source": "lightgbm_model_file.feature_names_or_step9_scorer_artifact.feature_names",
+    "scoring_backend": "selected_scorer_summary"
+  },
+  "graph_policy": {
+    "node_key": "seller_uid",
+    "edge_key": "pair_uid",
+    "edge_weight": "prob_positive",
+    "algorithm": "connected_components",
+    "minimum_cluster_size": 2,
+    "graph_scope": "zh_target_strict candidate-pair universe only",
+    "graph_edge_filters": {
+      "enabled": true,
+      "require_shared_neighbor_count_min": 1,
+      "reciprocal_top_k": 5,
+      "require_triangle_participation": false,
+      "shared_neighbor_pruning_mode": "iterative",
+      "shared_neighbor_pruning_max_passes": 25,
+      "relation_reliability_filter": {
+        "enabled": true,
+        "description": "Validation/rule-driven edge reliability filter inspired by spurious-edge filtering. It separates identity reliability from semantic similarity before reciprocal-top-k and shared-neighbor pruning.",
+        "minimum_score": 0.3,
+        "minimum_score_overrides": {},
+        "hard_keep_direct_identity": true,
+        "base_score": 0.2,
+        "weights": {
+          "shared_pgp_fingerprint": 0.45,
+          "shared_seller_contact": 0.35,
+          "rare_description_clone": 0.15,
+          "rare_title_clone": 0.1,
+          "rare_ngram_support": 0.08,
+          "structural_support": 0.12,
+          "style_consistency": 0.08,
+          "boilerplate_template_penalty": -0.2,
+          "semantic_topic_only_penalty": -0.25
+        },
+        "thresholds": {
+          "rare_description_idf_mean_min": 2.0,
+          "rare_title_idf_mean_min": 2.0,
+          "rare_ngram_count_min": 2.0,
+          "structural_support_min": 0.5,
+          "category_jaccard_min": 0.5,
+          "style_consistency_min": 0.72,
+          "boilerplate_ratio_max_penalty_min": 0.75,
+          "shared_boilerplate_count_penalty_min": 3.0,
+          "semantic_topic_similarity_min": 0.75
+        }
+      },
+      "direct_keep_threshold_overrides": {}
+    }
+  },
+  "output_templates": {
+    "scored_pairs": "reports/step11_{experiment_name}_zh_target_strict_scored_pairs.csv",
+    "clusters": "reports/step11_{experiment_name}_zh_target_strict_clusters.threshold_{threshold_token}.csv",
+    "summary": "reports/step11_{experiment_name}_clustering_summary.json"
+  },
+  "scored_pair_output_fields": [
+    "pair_uid",
+    "data_bucket",
+    "candidate_language",
+    "candidate_scope",
+    "review_stratum",
+    "core_transfer_eligible",
+    "seller_uid_left",
+    "seller_uid_right",
+    "source_market_raw_left",
+    "source_market_raw_right",
+    "same_market_raw_bool",
+    "same_source_dataset_bool",
+    "review_priority",
+    "review_status",
+    "review_label",
+    "profile_category_jaccard",
+    "has_shared_title_clone",
+    "has_shared_description_clone",
+    "has_shared_contact_exact",
+    "has_shared_pgp_fingerprint",
+    "shared_title_count_capped",
+    "shared_description_count_capped",
+    "shared_category_count_capped",
+    "shared_contact_count_capped",
+    "shared_pgp_fingerprint_count_capped",
+    "boilerplate_ratio_left",
+    "boilerplate_ratio_right",
+    "boilerplate_ratio_max",
+    "boilerplate_ratio_gap_abs",
+    "shared_title_idf_sum",
+    "shared_description_idf_sum",
+    "shared_title_idf_mean",
+    "shared_description_idf_mean",
+    "shared_boilerplate_count",
+    "shared_low_df_sentence_count",
+    "shared_rare_ngram_count",
+    "candidate_rule_count_raw",
+    "sparse_lexical_similarity_raw",
+    "structural_support_score_raw",
+    "left_market_profile_size",
+    "right_market_profile_size",
+    "item_count_percentile_gap_abs",
+    "price_median_percentile_gap_abs",
+    "title_length_median_percentile_gap_abs",
+    "description_length_median_percentile_gap_abs",
+    "digit_ratio_mean_percentile_gap_abs",
+    "punct_ratio_mean_percentile_gap_abs",
+    "repeated_title_share_percentile_gap_abs",
+    "repeated_description_share_percentile_gap_abs",
+    "max_category_share_percentile_gap_abs",
+    "uppercase_ratio_mean_percentile_gap_abs",
+    "item_count_raw_gap_abs",
+    "price_median_raw_gap_abs",
+    "title_length_median_raw_gap_abs",
+    "description_length_median_raw_gap_abs",
+    "digit_ratio_mean_raw_gap_abs",
+    "punct_ratio_mean_raw_gap_abs",
+    "repeated_title_share_raw_gap_abs",
+    "repeated_description_share_raw_gap_abs",
+    "max_category_share_raw_gap_abs",
+    "uppercase_ratio_mean_raw_gap_abs",
+    "embedding_cosine_gte_multilingual_base",
+    "embedding_cosine_bge_m3",
+    "embedding_cosine_multilingual_e5_large",
+    "embedding_cosine_labse",
+    "embedding_cosine_paraphrase_multilingual_mpnet",
+    "reranker_score_gte_multilingual_reranker_base",
+    "reranker_score_bge_reranker_v2_m3",
+    "source_seller_raw_left",
+    "source_seller_raw_right",
+    "alias_normalized_left",
+    "alias_normalized_right",
+    "scoring_experiment_name",
+    "score_rank_desc",
+    "prob_positive",
+    "relation_reliability_score",
+    "relation_reliability_pass",
+    "relation_reliability_direct_identity_support",
+    "relation_reliability_semantic_topic_only",
+    "relation_reliability_style_consistency",
+    "relation_reliability_components",
+    "edge_score_final",
+    "edge_at_threshold_{threshold_token}"
+  ],
+  "cluster_output_fields": [
+    "cluster_id",
+    "cluster_rank",
+    "threshold",
+    "threshold_token",
+    "cluster_size",
+    "cluster_edge_count",
+    "cluster_possible_edge_count",
+    "cluster_density",
+    "cluster_score_min",
+    "cluster_score_mean",
+    "cluster_score_max",
+    "cluster_markets",
+    "member_rank_within_cluster",
+    "member_degree",
+    "member_edge_score_sum",
+    "member_edge_score_mean",
+    "member_edge_score_max",
+    "strongest_neighbor_seller_uids",
+    "strongest_neighbor_scores",
+    "seller_uid",
+    "source_dataset",
+    "source_market_raw",
+    "source_seller_raw",
+    "alias_normalized",
+    "item_count",
+    "unique_title_count",
+    "unique_description_snippet_count",
+    "unique_category_count",
+    "contact_type_count",
+    "contact_token_count_total",
+    "top_category_preview",
+    "signature_title_preview",
+    "signature_description_preview",
+    "contact_preview"
+  ],
+  "hard_rules": [
+    "Do not retrain or retune Step 7, Step 9, or Step 9 calibration inside Step 11.",
+    "Do not modify any frozen Step 10 snapshot directory.",
+    "Resolve the pairwise primary threshold from the current synchronized Step 7, Step 9, or Step 9 calibration summary for the selected scorer.",
+    "Use scorer_selection.graph_primary_threshold_overrides for Step 11 graph working thresholds when a selected scorer token is listed there; otherwise fall back to the selected scorer pairwise primary threshold.",
+    "When graph_edge_filters.relation_reliability_filter is enabled, filter threshold-passing edges by relation_reliability_score before reciprocal-top-k and shared-neighbor pruning; this is an audit/triage reliability control, not a new label source.",
+    "Before connected-components extraction, apply the graph_edge_filters declared in graph_policy to suppress unsupported bridge edges.",
+    "Resolve the Step 11 model path or Step 9 scorer artifact from synchronized Step 7, Step 9, or Step 9 calibration artifacts rather than from an archived Step 10 snapshot.",
+    "Emit sensitivity views alongside the selected scorer graph working threshold, but resolve those views from sensitivity_threshold_resolution when fixed absolute thresholds exceed the observed score ceiling for the selected scorer.",
+    "Score only zh_target_strict pair rows with core_transfer_eligible = 1.",
+    "Cluster outputs must remain traceable to seller_uids, pair_uids, and pairwise probabilities."
+  ],
+  "acceptance_checks": [
+    "All zh_target_strict candidate pairs are scored with the selected Step 7, Step 9, or Step 9 calibration scorer resolved from synchronized policy and summary records.",
+    "All scored zh_target_strict pair rows remain inside the fixed core-transfer-eligible pair universe.",
+    "The scored-pair output preserves pairwise traceability and threshold pass flags.",
+    "Connected-component cluster outputs are emitted for each configured threshold after graph_edge_filters are applied.",
+    "The summary reports seller-profile universe size, candidate-graph coverage, and per-threshold cluster counts."
+  ]
+}

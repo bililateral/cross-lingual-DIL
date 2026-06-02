@@ -1,0 +1,192 @@
+{
+  "queue_version": "step5_positive_anchor_expansion_20260421_direct_identity_v2",
+  "scope": "zh_target_strict",
+  "objective": "Expand Chinese positive supervision with conservative seller-specific identity anchors instead of generic high-semantic overlap.",
+  "input_dependencies": [
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "schema/step4_silver_candidate_schema.json"
+  ],
+  "inputs": {
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "active_review_queue": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+    "active_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "step4_schema": "schema/step4_silver_candidate_schema.json"
+  },
+  "selection": {
+    "target_queue_size": {
+      "goal_min": 200,
+      "goal_max": 300,
+      "note": "This is a mining target, not a quota. If direct identity evidence is exhausted, the queue must remain smaller rather than dilute with generic semantic neighbors."
+    },
+    "positive_split_targets": {
+      "zh_train_positive_min": 100,
+      "zh_train_positive_preferred": 150,
+      "zh_valid_positive_min": 25,
+      "scientific_stop_rule": "If direct positive anchors cannot reach these targets, do not claim few-shot should necessarily improve AUC; report target-domain identity evidence scarcity instead."
+    },
+    "pending_only_for_existing_active_rows": true,
+    "exclude_already_reviewed_rows": true,
+    "dedupe_by_pair_uid": true,
+    "supplemental_contact_extraction": {
+      "enabled": true,
+      "contact_types": [
+        "email",
+        "telegram",
+        "wickr",
+        "wechat",
+        "jabber",
+        "qq",
+        "phone",
+        "crypto_wallet",
+        "external_url"
+      ],
+      "min_token_seller_frequency": 2,
+      "max_token_seller_frequency": 6,
+      "max_token_seller_frequency_by_type": {
+        "email": 4,
+        "telegram": 8,
+        "wickr": 8,
+        "wechat": 8,
+        "jabber": 4,
+        "qq": 8,
+        "phone": 6,
+        "crypto_wallet": 4,
+        "external_url": 12
+      },
+      "require_contact_cue_for_at_handle": true,
+      "require_pair_text_support": true,
+      "external_url_requires_text_support": true,
+      "external_url_excluded_hosts": [
+        "youtube.com",
+        "www.youtube.com",
+        "telegram.org",
+        "t.me",
+        "telegram.me",
+        "mega.nz",
+        "nordvpn.com",
+        "www.nordvpn.com",
+        "expressvpn.com",
+        "www.expressvpn.com"
+      ],
+      "exclude_tokens": [
+        "http",
+        "https",
+        "telegram",
+        "contact",
+        "admin",
+        "service",
+        "username",
+        "channel",
+        "group",
+        "wallet",
+        "address",
+        "phone",
+        "mobilephone",
+        "telephone",
+        "shares",
+        "changerecords",
+        "cathaylife"
+      ],
+      "false_positive_context_patterns": [
+        "不要让@",
+        "email spoof",
+        "电子邮件欺骗",
+        "mobilephone",
+        "telephone",
+        "onion/viewtopic"
+      ]
+    },
+    "positive_component_closure": {
+      "enabled": true,
+      "exclude_components_with_reviewed_negative_or_uncertain_internal_edges": true,
+      "max_new_edges_per_component": 5,
+      "audit_only_candidate_scope": "positive_component_closure_audit",
+      "note": "Closure-derived positives are not independent evidence units; they are retained for audit and excluded from primary supervision/evaluation counts."
+    },
+    "buckets": [
+      {
+        "bucket_id": "supplemental_shared_seller_contact",
+        "target_reason": "positive_anchor_expansion|supplemental_shared_contact",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "high",
+        "review_priority": "high",
+        "review_notes": "Positive anchor expansion: supplemental parser found the same low-frequency seller-contact handle in both profiles. Use positive only when the contact context is seller-facing rather than leaked victim data or parser noise."
+      },
+      {
+        "bucket_id": "direct_contact_existing_pending",
+        "target_reason": "positive_anchor_expansion|existing_pending_direct_contact",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "medium",
+        "review_priority": "high",
+        "review_notes": "Positive anchor expansion: existing pending Step 5 row has a direct contact/PGP field. Keep positive only if the shared identifier is seller-specific; use uncertain for victim-data emails or unsupported contact-only rows."
+      },
+      {
+        "bucket_id": "rare_identity_with_text_overlap",
+        "target_reason": "positive_anchor_expansion|rare_identity_with_text_overlap",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "medium",
+        "review_priority": "high",
+        "review_notes": "Positive anchor expansion: rare shared email/IM/phone/wallet identifier plus profile text or structural support. Use positive only when the identifier is seller-facing and not copied victim/product data."
+      },
+      {
+        "bucket_id": "rare_external_url_with_text_overlap",
+        "target_reason": "positive_anchor_expansion|rare_external_url_with_text_overlap",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "low",
+        "review_priority": "medium",
+        "review_notes": "Positive anchor expansion: rare shared external URL plus text/structural support. Treat as positive only when the URL is plausibly seller-operated identity infrastructure; otherwise uncertain."
+      },
+      {
+        "bucket_id": "cross_market_unique_alias_closure",
+        "target_reason": "positive_anchor_expansion|cross_market_unique_alias_closure",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "medium",
+        "review_priority": "high",
+        "review_notes": "Positive anchor expansion: cross-market uncommon alias plus direct identifier or content closure. Same-alias alone is insufficient; require additional seller-specific support."
+      },
+      {
+        "bucket_id": "positive_component_transitive_closure",
+        "target_reason": "positive_anchor_expansion|reviewed_positive_component_closure",
+        "suggested_label": "positive_candidate",
+        "suggested_confidence": "high",
+        "review_priority": "high",
+        "review_notes": "Positive anchor expansion: the two sellers are connected by an already-reviewed clean positive component with no internal negative/uncertain contradiction. Marked separately because it is closure-derived rather than independent raw evidence."
+      }
+    ]
+  },
+  "review_guidelines": {
+    "positive": [
+      "Use positive only for seller-specific identity anchors: explicit shared Telegram/Wickr/Wechat/Jabber/QQ/phone/wallet contact, PGP, seller-operated URL, or contradiction-free reviewed positive component closure.",
+      "A shared contact in leaked data rows is not a seller identity anchor.",
+      "A shared external URL is not a positive anchor unless context supports seller-operated infrastructure; public content links and file-hosting links are not sufficient.",
+      "A closure-derived edge is useful for audit closure only unless a future policy adds explicit train-only handling; it must not be counted as an independent test discovery."
+    ],
+    "uncertain": [
+      "Use uncertain when the contact appears only in victim-data samples, public scraped rows, or one side lacks enough seller-facing context.",
+      "Use uncertain when the row is plausible but not defensible as a positive training label."
+    ],
+    "negative": [
+      "Use negative only for clear parser noise or controller-distinct evidence.",
+      "Do not mark a contact row negative merely because the products differ."
+    ]
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_positive_anchor_expansion_queue.20260421.csv",
+    "summary": "reports/step5_positive_anchor_expansion_queue_summary.20260421.json",
+    "codex_review_summary": "reports/step5_positive_anchor_expansion_codex_review_summary.20260421.json",
+    "application_summary": "reports/step5_positive_anchor_expansion_apply_summary.20260421.json"
+  },
+  "hard_rules": [
+    "Do not use generic high semantic similarity as a positive label.",
+    "Do not auto-promote victim-data contacts, public URL/parser fragments, exchange/file-host links, or high-frequency handles.",
+    "Append net-new candidate pairs to Step 4 only after this positive-anchor queue has been reviewed.",
+    "After applying reviewed labels, rerun Step 5 freeze.",
+    "Closure-derived rows must use candidate_scope=positive_component_closure_audit so they do not enter primary supervision/evaluation counts.",
+    "If the direct identity queue cannot reach the configured positive split targets, report evidence scarcity rather than claiming few-shot should improve AUC.",
+    "Because Step 4 may receive net-new pairs, rerun the full Step 7 preview and semantic feature pipeline before Step 7 training."
+  ]
+}

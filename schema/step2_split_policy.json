@@ -1,0 +1,102 @@
+{
+  "version": "2026-03-11",
+  "objective": "Step-2 strict split and leakage-isolation policy for cross-lingual sockpuppet-account research",
+  "official_buckets": {
+    "en_gold_benchmark": {
+      "description": "Strict English benchmark pool. Do not use for English content training.",
+      "sources": [
+        "tijkc3xx.sql",
+        "suspected_sockpuppet_strong.csv",
+        "suspected_sockpuppet_weak.csv",
+        "suspected_imposter_rows.csv"
+      ]
+    },
+    "en_content_train_pool": {
+      "description": "English content-training pool after strong identity-overlap exclusion and row-level CJK filtering.",
+      "sources": [
+        "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+        "market_item.xlsx"
+      ]
+    },
+    "zh_target_strict": {
+      "description": "Strict Chinese target-domain pool used for target evaluation and target-domain silver labels.",
+      "sources": [
+        "market_item.xlsx"
+      ],
+      "market_filter": [
+        "中文暗网交易市场",
+        "茶马古道"
+      ]
+    },
+    "zh_target_aux": {
+      "description": "Chinese auxiliary target-domain pool kept outside strict target benchmark because market provenance is unresolved.",
+      "sources": [
+        "products_data.csv"
+      ]
+    },
+    "excluded": {
+      "description": "Rows or sellers excluded from the English content-training pool."
+    }
+  },
+  "auxiliary_sources": {
+    "3z669jwe.sql": {
+      "description": "Auxiliary PGP identity evidence used to expand benchmark-linked alias and fingerprint closure.",
+      "bucket": "aux_identity_evidence"
+    },
+    "html-rips": {
+      "description": "Local Grams InfoDesk vendor snapshots used to mine benchmark-linked high-precision contact identifiers from header regions.",
+      "bucket": "aux_identity_evidence"
+    }
+  },
+  "normalization_rules": {
+    "alias_normalization": "casefold + strip",
+    "fingerprint_normalization": "hex uppercase; short form normalized to 0x + last 16 hex chars",
+    "contact_normalization": "strict per-type normalization; non-email handle extraction ignores PGP public-key block content",
+    "item_uid_rule": "Use deterministic hash when no raw item id exists",
+    "seller_uid_rule": "Always scope by source_dataset and source_market_raw"
+  },
+  "exclusion_rules": [
+    {
+      "rule_id": "en_alias_overlap_with_en_gold",
+      "scope": "seller_level",
+      "applies_to": [
+        "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+        "market_item.xlsx non-target rows"
+      ],
+      "logic": "Exclude if normalized seller alias appears in the official EN-Gold alias ledger, including benchmark user_name and benchmark key_alias values"
+    },
+    {
+      "rule_id": "en_pgp_fingerprint_overlap_via_aux_alias",
+      "scope": "seller_level",
+      "applies_to": [
+        "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+        "market_item.xlsx non-target rows"
+      ],
+      "logic": "Exclude if seller alias maps via auxiliary PGP evidence to any fingerprint in the benchmark-linked identity closure"
+    },
+    {
+      "rule_id": "en_contact_overlap_with_en_gold",
+      "scope": "row_level",
+      "applies_to": [
+        "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+        "market_item.xlsx non-target rows"
+      ],
+      "logic": "Exclude if row text contains a high-precision benchmark-linked contact identifier mined from local Grams header snapshots"
+    },
+    {
+      "rule_id": "non_target_contains_cjk",
+      "scope": "row_level",
+      "applies_to": [
+        "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+        "market_item.xlsx non-target rows"
+      ],
+      "logic": "Exclude if title, description, or category contains CJK characters"
+    }
+  ],
+  "post_conditions": [
+    "The normalized seller-alias overlap between en_content_train_pool and en_gold_benchmark must equal 0.",
+    "The auxiliary-PGP fingerprint overlap between en_content_train_pool and the benchmark-linked identity closure must equal 0.",
+    "Rows in zh_target_strict must come only from market_item.xlsx with market in {中文暗网交易市场, 茶马古道}.",
+    "products_data.csv must remain in zh_target_aux until market provenance is independently verified."
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "queue_version": "step5_en_source_expansion_valid_test_topup_20260423",
+  "reviewer_id": "codex_en_source_expansion_valid_test_topup_review_20260423",
+  "objective": "Increase English source-domain valid/test stability using remaining pending high-evidence Step-4 candidates, without random easy-negative padding or any Chinese blind expansion.",
+  "inputs": {
+    "active_review_queue": "reports/step5_en_balanced_review_queue.csv",
+    "active_frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
+    "step4_candidates": "reports/step4_en_silver_candidate_pairs.csv",
+    "step5_freeze_policy": "schema/step5_freeze_policy.json"
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_en_source_expansion_valid_test_topup_queue.20260423.csv",
+    "queue_summary": "reports/step5_en_source_expansion_valid_test_topup_queue_summary.20260423.json",
+    "codex_review_summary": "reports/step5_en_source_expansion_valid_test_topup_codex_review_summary.20260423.json",
+    "application_summary": "reports/step5_en_source_expansion_valid_test_topup_apply_summary.20260423.json"
+  },
+  "supervision_targets": {
+    "target_total_supervision_rows": {
+      "minimum": 560,
+      "preferred": 620,
+      "maximum": 700
+    },
+    "target_split_counts_after_refreeze": {
+      "train_min": 300,
+      "valid_min": 105,
+      "valid_preferred_range": [
+        110,
+        140
+      ],
+      "test_min": 130,
+      "test_preferred_range": [
+        140,
+        175
+      ]
+    },
+    "recommended_en_split_ratios": {
+      "train": 0.55,
+      "valid": 0.2,
+      "test": 0.25
+    },
+    "scientific_rationale": "The previous English freeze had 77 validation rows, which still triggered Step 7's small-validation guard. A 55/20/25 split plus a targeted top-up should move English validation above 100 while keeping test above 130."
+  },
+  "selection_buckets": [
+    {
+      "bucket_id": "seller_facing_identifier_plus_text",
+      "source_strata": [
+        "identifier_plus_text"
+      ],
+      "target_label_hint": "positive",
+      "target_count": 10,
+      "max_per_seller": 2,
+      "description": "Any remaining shared contact/PGP plus text evidence; reviewer still rejects product-sample identifiers."
+    },
+    {
+      "bucket_id": "seller_facing_identifier_primary",
+      "source_strata": [
+        "identifier_primary"
+      ],
+      "target_label_hint": "positive",
+      "target_count": 30,
+      "max_per_seller": 2,
+      "description": "Remaining direct seller-facing contact candidates, kept small because previous top-up showed most leftovers lack enough seller-facing context."
+    },
+    {
+      "bucket_id": "strong_text_clone_positive_probe",
+      "source_strata": [
+        "text_clone_primary"
+      ],
+      "target_label_hint": "positive_or_uncertain",
+      "target_count": 100,
+      "max_per_seller": 2,
+      "description": "A controlled slice of high-rank exact title/description clones; reviewer promotes only alias-related or seller-specific operational clones."
+    },
+    {
+      "bucket_id": "english_hard_negative_template_probe",
+      "source_strata": [
+        "semantic_structural",
+        "semantic_only"
+      ],
+      "target_label_hint": "negative",
+      "target_count": 220,
+      "max_per_seller": 3,
+      "description": "Hard-boundary negatives: high semantic or structural similarity without direct identifiers, dominated by templates, product boilerplate, and same-topic independent sellers."
+    }
+  ],
+  "review_rubric": {
+    "positive": [
+      "Shared PGP fingerprint.",
+      "Shared seller-facing Telegram/Wickr/phone/IM/contact handle with support from cloned text, structural overlap, or coherent seller profile context.",
+      "Shared email only when clearly presented as seller contact and not as product/victim/sample account data.",
+      "Strong text-clone rows only when alias relation, migration wording, or seller-specific operational copy makes same-control evidence stronger than generic template reuse."
+    ],
+    "negative": [
+      "Generic placeholders such as No Item Name / No Description Specified across unrelated sellers.",
+      "High semantic overlap caused by public product descriptions, medication boilerplate, software/book templates, leaked-data field formats, or inventory templates without identity closure.",
+      "Shared contact parser artifacts or product sample credentials, not seller identity."
+    ],
+    "uncertain": [
+      "Strong content overlap without seller-specific identity closure.",
+      "Emails, URLs, account credentials, or phone-like tokens embedded in product/victim data.",
+      "Text clones that may be reseller/template reuse but cannot be confidently separated from same-controller reuse."
+    ]
+  },
+  "hard_rules": [
+    "Do not label same-alias or soft-same-alias continuity rows for primary supervision in this top-up.",
+    "Do not use product sample credentials, victim data, leaked account data, or format examples as seller identity anchors.",
+    "Do not pad the English set with random easy negatives; negative additions must be hard-boundary or template-boilerplate controls.",
+    "Do not modify Chinese Step 5 queues in this expansion.",
+    "After applying labels, run Step 5 freeze and audit train/valid/test counts and seller overlap.",
+    "Step 7 semantic extraction/training still belongs on the Linux runtime after the refreeze."
+  ]
+}

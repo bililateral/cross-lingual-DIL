@@ -1,0 +1,147 @@
+{
+  "version": "2026-03-11",
+  "objective": "Step-3 seller-level profile schema for cross-lingual sockpuppet-account research",
+  "input_dependencies": [
+    "reports/step2_content_item_manifest.csv",
+    "reports/step2_content_seller_manifest.csv",
+    "reports/step2_split_summary.json"
+  ],
+  "eligible_buckets": [
+    "en_content_train_pool",
+    "zh_target_strict",
+    "zh_target_aux"
+  ],
+  "compression_policy": {
+    "title_top_k": 20,
+    "description_top_k": 12,
+    "description_snippet_chars": 280,
+    "signature_title_top_k": 8,
+    "signature_description_top_k": 10,
+    "category_top_k": 15,
+    "contact_top_k_per_type": 10,
+    "price_top_k": 10,
+    "origin_top_k": 10,
+    "structured_snapshot_top_k": 12,
+    "overview_ordering": "frequency desc, then first_seen asc",
+    "signature_selection": "long-tail description segments and seller-specific titles ranked by corpus-level specificity"
+  },
+  "item_identity_signal_outputs": [
+    "reports/step3_item_identity_signals.en_content_train_pool.csv",
+    "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "reports/step3_item_identity_signals.zh_target_aux.csv"
+  ],
+  "item_identity_signal_fields": [
+    "signal_uid",
+    "data_bucket",
+    "source_dataset",
+    "source_row_number",
+    "seller_uid",
+    "source_market_raw",
+    "source_seller_raw",
+    "source_seller_id_raw",
+    "alias_normalized",
+    "source_field",
+    "contact_type",
+    "normalized_value",
+    "raw_value",
+    "evidence_level",
+    "seller_facing_context",
+    "product_data_risk_context",
+    "direct_identity_eligible",
+    "support_only",
+    "context",
+    "title_snippet",
+    "description_snippet"
+  ],
+  "item_identity_extraction_policy": {
+    "direct_identity_types": [
+      "email",
+      "telegram",
+      "wickr",
+      "wechat",
+      "jabber",
+      "qq",
+      "phone",
+      "crypto_wallet",
+      "pgp_public_key",
+      "pgp_fingerprint",
+      "bat"
+    ],
+    "support_only_types": [
+      "external_url"
+    ],
+    "hard_rule": "Item-level signals are parser evidence for manual review queues only; they are not supervision labels or ground truth.",
+    "positive_label_gate": "A positive Step 5 label still requires seller-facing direct identity context and rejection of product/victim-data ambiguity."
+  },
+  "profile_fields": [
+    "seller_uid",
+    "data_bucket",
+    "source_dataset",
+    "source_market_raw",
+    "source_seller_raw",
+    "source_seller_id_raw",
+    "alias_normalized",
+    "item_count",
+    "first_source_row_number",
+    "last_source_row_number",
+    "unique_title_count",
+    "unique_description_snippet_count",
+    "unique_category_count",
+    "cjk_item_count",
+    "parsed_price_count",
+    "parsed_rating_count",
+    "contact_type_count",
+    "contact_token_count_total",
+    "title_length_stats",
+    "description_length_stats",
+    "style_stats",
+    "price_numeric_approx_stats",
+    "rating_numeric_stats",
+    "source_specific_numeric_stats",
+    "top_categories",
+    "signature_titles",
+    "top_titles",
+    "signature_description_segments",
+    "top_description_snippets",
+    "top_price_strings",
+    "top_ship_from_values",
+    "contact_signals",
+    "structured_snapshot_examples",
+    "category_concat_top",
+    "signature_title_concat",
+    "title_concat_top",
+    "signature_description_concat",
+    "description_concat_top",
+    "contact_concat_top",
+    "structured_snapshot_concat_top",
+    "profile_text"
+  ],
+  "source_specific_numeric_fields": {
+    "products_data.csv": [
+      "sales_amount",
+      "sales_volume",
+      "inquiry_count",
+      "heat_score",
+      "online_hours",
+      "reputation_positive",
+      "reputation_risk"
+    ],
+    "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx": [
+      "rating_numeric"
+    ],
+    "market_item.xlsx": [
+      "ship_from_raw"
+    ]
+  },
+  "hard_rules": [
+    "Only aggregate rows whose data_bucket is one of the eligible buckets.",
+    "Do not mix excluded English rows back into seller profiles.",
+    "Keep profile_text deterministic and reproducible from overview top-k fields plus signature long-tail fields.",
+    "Treat price_numeric_approx as approximate only; no cross-currency normalization is performed at Step 3."
+  ],
+  "acceptance_checks": [
+    "Seller-profile counts by bucket must match Step-2 seller counts for eligible buckets.",
+    "Item counts aggregated into seller profiles must match Step-2 eligible item counts by bucket.",
+    "Each generated seller profile must have non-empty profile_text unless the raw source is structurally empty."
+  ]
+}
