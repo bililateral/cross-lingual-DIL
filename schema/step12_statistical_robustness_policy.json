@@ -75,8 +75,19 @@
       "step15_clean_multitask_phase4_seed_mean",
       "step15_identity_only_phase4_seed_mean"
     ],
+    "step15_v2_evidence_type_curriculum": [
+      "step15_v2_identity_from_scratch_phase4_seed_mean",
+      "step15_v2_warm_start_phase4_seed_mean",
+      "step15_v2_domain_balanced_phase4_seed_mean",
+      "step15_v2_target_only_phase4_seed_mean",
+      "step15_v2_source_only_phase4_seed_mean",
+      "step15_v2_zh_positive_mixup_phase4_seed_mean",
+      "step15_v2_same_evidence_mixup_phase4_seed_mean",
+      "step15_v2_multitask_ablation_phase4_seed_mean"
+    ],
     "step15_operational_control": [
-      "step15_identifier_operational_phase4_seed_mean"
+      "step15_identifier_operational_phase4_seed_mean",
+      "step15_v2_identifier_operational_phase4_seed_mean"
     ]
   },
   "paired_comparison_policy": {
@@ -87,14 +98,19 @@
       "step15_phase4_clean_vs_raw_e5",
       "step15_phase4_clean_vs_step9_mixup100",
       "step15_phase4_multitask_vs_identity_only",
-      "step15_phase4_clean_vs_phase3_clean"
+      "step15_phase4_clean_vs_phase3_clean",
+      "step15_v2_primary_vs_raw_e5",
+      "step15_v2_primary_vs_step9_mixup100",
+      "step15_v2_warm_start_vs_from_scratch",
+      "step15_v2_domain_balanced_vs_from_scratch",
+      "step15_v2_zh_positive_mixup_vs_from_scratch"
     ],
     "p_value": "Two-sided bootstrap sign probability over grouped resamples; descriptive only, not a formal DeLong test."
   },
   "outputs": {
-    "summary_json": "reports/step12_statistical_robustness_zh_test_20260513.json",
-    "model_metrics_csv": "reports/step12_statistical_robustness_model_metrics_20260513.csv",
-    "paired_comparisons_csv": "reports/step12_statistical_robustness_paired_comparisons_20260513.csv"
+    "summary_json": "reports/step12_v2_statistical_robustness_zh_test_20260602.json",
+    "model_metrics_csv": "reports/step12_v2_statistical_robustness_model_metrics_20260602.csv",
+    "paired_comparisons_csv": "reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv"
   },
   "hard_rules": [
     "Do not merge zh_train, zh_valid, and zh_test for the primary robustness audit.",

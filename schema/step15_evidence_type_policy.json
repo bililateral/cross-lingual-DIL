@@ -242,26 +242,127 @@
     }
   ],
   "default_experiments": [
-    "step15_e5_multitask_clean_curriculum",
-    "step15_e5_identity_only_clean_curriculum",
-    "step15_e5_multitask_identifier_operational"
+    "step15_v2_identity_only_curriculum_from_scratch",
+    "step15_v2_identity_only_curriculum_warm_start",
+    "step15_v2_identity_only_curriculum_domain_balanced",
+    "step15_v2_identity_only_curriculum_target_only",
+    "step15_v2_identity_only_curriculum_source_only",
+    "step15_v2_identity_only_curriculum_zh_positive_mixup",
+    "step15_v2_identity_only_curriculum_same_evidence_mixup",
+    "step15_v2_multitask_curriculum_ablation",
+    "step15_v2_identifier_operational"
   ],
   "experiments": {
-    "step15_e5_multitask_clean_curriculum": {
-      "role": "clean_scientific_candidate",
+    "step15_v2_multitask_curriculum_ablation": {
+      "role": "clean_multitask_ablation_v2",
       "model_backend": "numpy_mlp_multitask",
       "feature_set": "clean_semantic_structural_style",
       "include_source_train": true,
       "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
       "lambda_evidence": 0.35,
       "use_identifier_features": false
     },
-    "step15_e5_identity_only_clean_curriculum": {
-      "role": "identity_only_control",
+    "step15_v2_identity_only_curriculum_from_scratch": {
+      "role": "clean_primary_identity_only_curriculum_v2",
       "model_backend": "numpy_mlp_identity_only",
       "feature_set": "clean_semantic_structural_style",
       "include_source_train": true,
       "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_warm_start": {
+      "role": "clean_primary_warm_start_curriculum_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "warm_start_curriculum",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_domain_balanced": {
+      "role": "clean_domain_balanced_control_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "domain_balanced_identity_loss": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_target_only": {
+      "role": "target_only_control_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": false,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_source_only": {
+      "role": "source_only_control_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": false,
+      "training_mode": "from_scratch_each_phase",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_zh_positive_mixup": {
+      "role": "target_positive_mixup_control_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "positive_mixup_scope_override": "target_train_only",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identity_only_curriculum_same_evidence_mixup": {
+      "role": "same_evidence_positive_mixup_control_v2",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "positive_mixup_scope_override": "same_evidence_type_only",
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v2_identifier_operational": {
+      "role": "identifier_operational_control_v2",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "identifier_operational",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "lambda_evidence": 0.35,
+      "use_identifier_features": true
+    },
+    "step15_e5_multitask_clean_curriculum": {
+      "role": "clean_multitask_ablation",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "lambda_evidence": 0.35,
+      "use_identifier_features": false
+    },
+    "step15_e5_identity_only_clean_curriculum": {
+      "role": "clean_primary_identity_only_curriculum",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
       "lambda_evidence": 0.0,
       "use_identifier_features": false
     },
@@ -271,6 +372,7 @@
       "feature_set": "identifier_operational",
       "include_source_train": true,
       "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
       "lambda_evidence": 0.35,
       "use_identifier_features": true
     }
@@ -299,8 +401,25 @@
     "positive_mixup": {
       "multiplier": 1.0,
       "beta_alpha": 0.4,
+      "scope": "all_positive",
       "label_policy": "identity_positive_only_evidence_masked",
       "synthetic_scope": "train_only"
+    }
+  },
+  "slice_level_audit": {
+    "default_model_ids": [
+      "raw_e5_cosine",
+      "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+      "step15_identity_only_phase4_seed_mean",
+      "step15_v2_identity_from_scratch_phase4_seed_mean",
+      "step15_v2_warm_start_phase4_seed_mean",
+      "step15_v2_domain_balanced_phase4_seed_mean",
+      "step15_v2_zh_positive_mixup_phase4_seed_mean",
+      "step15_v2_identifier_operational_phase4_seed_mean"
+    ],
+    "outputs": {
+      "summary_json": "reports/step15_v2_slice_level_audit.json",
+      "slice_metrics_csv": "reports/step15_v2_slice_level_audit.csv"
     }
   },
   "threshold_selection": {
@@ -326,7 +445,7 @@
     }
   },
   "outputs": {
-    "summary_json": "reports/step15_incremental_hard_negative_summary.json",
+    "summary_json": "reports/step15_v2_incremental_hard_negative_summary.json",
     "artifact_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_artifact.json",
     "zh_valid_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_valid.csv",
     "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv"

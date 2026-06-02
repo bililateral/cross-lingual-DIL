@@ -99,6 +99,7 @@ def load_pool(pool_name: str, pool_cfg: dict) -> list[dict]:
     for row in joined_rows:
         label_row = label_index[row["pair_uid"]]
         merged_row = dict(row)
+        merged_row["step15_pool"] = pool_name
         for key, value in label_row.items():
             if key in {
                 "identity_label",
@@ -210,6 +211,20 @@ def balanced_binary_weights(y: np.ndarray) -> np.ndarray:
     return np.where(y == 1.0, pos_weight, neg_weight).astype(float)
 
 
+def domain_balanced_binary_weights(y: np.ndarray, rows: list[dict]) -> np.ndarray:
+    weights = balanced_binary_weights(y)
+    domain_counts = Counter(str(row.get("step15_pool", "")) for row in rows)
+    present_domains = [domain for domain, count in domain_counts.items() if count > 0]
+    if not present_domains:
+        return weights
+    total = max(len(rows), 1)
+    domain_factor = {
+        domain: total / (len(present_domains) * max(domain_counts[domain], 1))
+        for domain in present_domains
+    }
+    return weights * np.asarray([domain_factor.get(str(row.get("step15_pool", "")), 1.0) for row in rows], dtype=float)
+
+
 def evidence_weights(y_evidence: np.ndarray, evidence_type_count: int) -> np.ndarray:
     weights = np.zeros(len(y_evidence), dtype=float)
     mask = y_evidence >= 0
@@ -231,24 +246,63 @@ def add_positive_mixup(
     rows: list[dict],
     cfg: dict,
     rng: np.random.Generator,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
+    scope_override: str | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict], int]:
+    scope = str(scope_override or cfg.get("scope", "all_positive"))
     pos_indices = np.where(y_train == 1.0)[0]
+    if scope == "target_train_only":
+        pos_indices = np.asarray(
+            [idx for idx in pos_indices if rows[int(idx)].get("step15_pool") == "zh_target_strict"],
+            dtype=int,
+        )
+    elif scope == "source_train_only":
+        pos_indices = np.asarray(
+            [idx for idx in pos_indices if rows[int(idx)].get("step15_pool") == "en_content_train_pool"],
+            dtype=int,
+        )
+    elif scope not in {"all_positive", "same_evidence_type_only"}:
+        raise ValueError(f"Unsupported Step15 positive_mixup scope: {scope}")
     if len(pos_indices) < 2:
-        return x_train, y_train, y_evidence, 0
+        return x_train, y_train, y_evidence, rows, 0
     multiplier = float(cfg.get("multiplier", 0.0))
     synthetic_count = int(math.ceil(len(pos_indices) * multiplier))
     if synthetic_count <= 0:
-        return x_train, y_train, y_evidence, 0
+        return x_train, y_train, y_evidence, rows, 0
     alpha = float(cfg.get("beta_alpha", 0.4))
     synthetic_x = []
+    synthetic_rows = []
     for _ in range(synthetic_count):
-        left, right = rng.choice(pos_indices, size=2, replace=False)
+        if scope == "same_evidence_type_only":
+            evidence_groups: dict[int, list[int]] = defaultdict(list)
+            for idx in pos_indices:
+                evidence_groups[int(y_evidence[int(idx)])].append(int(idx))
+            eligible_groups = [indices for evidence, indices in evidence_groups.items() if evidence >= 0 and len(indices) >= 2]
+            if not eligible_groups:
+                return x_train, y_train, y_evidence, rows, 0
+            group_indices = eligible_groups[int(rng.integers(0, len(eligible_groups)))]
+            left, right = rng.choice(np.asarray(group_indices, dtype=int), size=2, replace=False)
+        else:
+            left, right = rng.choice(pos_indices, size=2, replace=False)
         lam = float(rng.beta(alpha, alpha))
         synthetic_x.append((1.0 - lam) * x_train[left] + lam * x_train[right])
+        left_row = rows[int(left)]
+        right_row = rows[int(right)]
+        left_pool = str(left_row.get("step15_pool", ""))
+        right_pool = str(right_row.get("step15_pool", ""))
+        synthetic_pool = left_pool if left_pool == right_pool else "cross_domain_mixup"
+        synthetic_rows.append(
+            {
+                "pair_uid": f"synthetic_mixup::{len(synthetic_rows)}",
+                "review_label": "positive",
+                "evidence_type": "synthetic_train_only",
+                "step15_pool": synthetic_pool,
+                "synthetic_train_only": "1",
+            }
+        )
     x_aug = np.vstack([x_train, np.asarray(synthetic_x, dtype=float)])
     y_aug = np.concatenate([y_train, np.ones(synthetic_count, dtype=float)])
     evidence_aug = np.concatenate([y_evidence, np.full(synthetic_count, -1, dtype=int)])
-    return x_aug, y_aug, evidence_aug, synthetic_count
+    return x_aug, y_aug, evidence_aug, rows + synthetic_rows, synthetic_count
 
 
 def init_params(input_dim: int, hidden_dim: int, evidence_type_count: int, rng: np.random.Generator) -> dict[str, np.ndarray]:
@@ -374,16 +428,24 @@ def train_model(
     train_cfg: dict,
     lambda_evidence: float,
     seed: int,
+    train_rows: list[dict],
+    initial_params: dict[str, np.ndarray] | None = None,
+    domain_balanced_identity_loss: bool = False,
 ) -> tuple[dict[str, np.ndarray], dict]:
     rng = np.random.default_rng(seed)
     hidden_dim = int(train_cfg["hidden_dim"])
-    params = init_params(x_train.shape[1], hidden_dim, evidence_type_count, rng)
+    params = copy.deepcopy(initial_params) if initial_params is not None else init_params(x_train.shape[1], hidden_dim, evidence_type_count, rng)
     state = {
         "m": {key: np.zeros_like(value) for key, value in params.items()},
         "v": {key: np.zeros_like(value) for key, value in params.items()},
     }
 
-    identity_weights = balanced_binary_weights(y_train) if train_cfg.get("class_balanced_identity_loss", True) else np.ones(len(y_train))
+    if domain_balanced_identity_loss:
+        identity_weights = domain_balanced_binary_weights(y_train, train_rows)
+    elif train_cfg.get("class_balanced_identity_loss", True):
+        identity_weights = balanced_binary_weights(y_train)
+    else:
+        identity_weights = np.ones(len(y_train))
     ev_weights = (
         evidence_weights(y_evidence, evidence_type_count)
         if train_cfg.get("class_balanced_evidence_loss", True)
@@ -434,6 +496,8 @@ def train_model(
         "best_valid_metric": round(float(best_metric), 6),
         "last_loss": {key: round(float(value), 6) for key, value in last_loss.items()},
         "lambda_evidence": round(float(lambda_evidence), 6),
+        "initialization": "warm_start" if initial_params is not None else "random",
+        "domain_balanced_identity_loss": bool(domain_balanced_identity_loss),
     }
     return best_params, diagnostics
 
@@ -509,7 +573,9 @@ def run_single(
     seed: int,
     policy: dict,
     rows_by_pool: dict[str, list[dict]],
-) -> dict:
+    initial_params: dict[str, np.ndarray] | None = None,
+    standardizer_override: tuple[np.ndarray, np.ndarray] | None = None,
+) -> tuple[dict, dict[str, np.ndarray]]:
     feature_names = policy["feature_sets"][experiment_cfg["feature_set"]]
     validate_features(rows_by_pool, feature_names)
 
@@ -524,7 +590,12 @@ def run_single(
     x_train_raw = rows_to_feature_matrix(train_rows, feature_names)
     x_valid_raw = rows_to_feature_matrix(valid_rows, feature_names)
     x_test_raw = rows_to_feature_matrix(test_rows, feature_names)
-    means, stds = fit_standardizer(x_train_raw)
+    if standardizer_override is None:
+        means, stds = fit_standardizer(x_train_raw)
+        standardizer_source = "current_phase_train"
+    else:
+        means, stds = standardizer_override
+        standardizer_source = "warm_start_final_phase_train"
     x_train = apply_standardizer(x_train_raw, means, stds)
     x_valid = apply_standardizer(x_valid_raw, means, stds)
     x_test = apply_standardizer(x_test_raw, means, stds)
@@ -532,16 +603,18 @@ def run_single(
     y_valid = y_from_rows(valid_rows)
     y_test = y_from_rows(test_rows)
     y_ev = evidence_indices(train_rows, policy["evidence_types"])
+    train_rows_for_weights = list(train_rows)
 
     synthetic_count = 0
     if bool(phase_cfg.get("use_positive_mixup", False)):
-        x_train, y_train, y_ev, synthetic_count = add_positive_mixup(
+        x_train, y_train, y_ev, train_rows_for_weights, synthetic_count = add_positive_mixup(
             x_train,
             y_train,
             y_ev,
             train_rows,
             policy["training"].get("positive_mixup", {}),
             np.random.default_rng(seed + 7919),
+            experiment_cfg.get("positive_mixup_scope_override"),
         )
 
     lambda_evidence = float(experiment_cfg.get("lambda_evidence", 0.0))
@@ -555,7 +628,16 @@ def run_single(
         policy["training"],
         lambda_evidence,
         seed,
+        train_rows_for_weights,
+        initial_params=initial_params,
+        domain_balanced_identity_loss=bool(experiment_cfg.get("domain_balanced_identity_loss", False)),
     )
+    diagnostics["training_mode"] = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
+    diagnostics["positive_mixup_scope"] = str(
+        experiment_cfg.get("positive_mixup_scope_override")
+        or policy["training"].get("positive_mixup", {}).get("scope", "all_positive")
+    )
+    diagnostics["standardizer_source"] = standardizer_source
 
     _, valid_prob, valid_evidence_prob = forward(params, x_valid)
     _, test_prob, test_evidence_prob = forward(params, x_test)
@@ -577,7 +659,7 @@ def run_single(
     artifact["feature_importance"] = feature_importance(params, feature_names)
     step7.write_json(artifact_path, artifact)
 
-    return {
+    run_record = {
         "experiment_name": experiment_name,
         "phase_id": phase_cfg["phase_id"],
         "phase_index": int(phase_cfg["phase_index"]),
@@ -600,6 +682,7 @@ def run_single(
         },
         "top_feature_importance": artifact["feature_importance"][:10],
     }
+    return run_record, params
 
 
 def summarize_runs(runs: list[dict]) -> dict:
@@ -644,9 +727,37 @@ def main() -> None:
         if experiment_name not in policy["experiments"]:
             raise SystemExit(f"Unknown Step15 experiment: {experiment_name}")
         experiment_cfg = policy["experiments"][experiment_name]
-        for phase_cfg in phases:
+        training_mode = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
+        if training_mode == "warm_start_curriculum":
+            feature_names = policy["feature_sets"][experiment_cfg["feature_set"]]
+            validate_features(rows_by_pool, feature_names)
+            final_phase_cfg = phases[-1]
+            final_train_rows = select_train_rows(rows_by_pool, experiment_cfg, final_phase_cfg, policy)
+            if not final_train_rows:
+                raise ValueError(f"{experiment_name}/{final_phase_cfg['phase_id']} has no final-phase train rows")
+            final_x_train_raw = rows_to_feature_matrix(final_train_rows, feature_names)
+            warm_start_standardizer = fit_standardizer(final_x_train_raw)
             for seed in seeds:
-                runs.append(run_single(experiment_name, experiment_cfg, phase_cfg, int(seed), policy, rows_by_pool))
+                initial_params = None
+                for phase_cfg in phases:
+                    run_record, initial_params = run_single(
+                        experiment_name,
+                        experiment_cfg,
+                        phase_cfg,
+                        int(seed),
+                        policy,
+                        rows_by_pool,
+                        initial_params=initial_params,
+                        standardizer_override=warm_start_standardizer,
+                    )
+                    runs.append(run_record)
+        elif training_mode == "from_scratch_each_phase":
+            for phase_cfg in phases:
+                for seed in seeds:
+                    run_record, _ = run_single(experiment_name, experiment_cfg, phase_cfg, int(seed), policy, rows_by_pool)
+                    runs.append(run_record)
+        else:
+            raise ValueError(f"Unsupported Step15 training_mode for {experiment_name}: {training_mode}")
 
     summary = {
         "step": "step15_train_incremental_hard_negative",

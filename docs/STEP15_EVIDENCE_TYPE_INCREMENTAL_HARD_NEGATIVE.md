@@ -2,7 +2,7 @@
 
 Updated: 2026-06-02
 
-Branch: `method/evidence-type-incremental-hard-negative`
+Branch: `method/step15-v2-curriculum-audit`
 
 ## Purpose
 
@@ -258,6 +258,164 @@ step15_clean_multitask_phase4_seed_mean
 step15_identity_only_phase4_seed_mean
 step15_identifier_operational_phase4_seed_mean
 ```
+
+## V2 Revision
+
+The 2026-06-02 v2 revision keeps all first-pass Step 15 artifacts intact and writes new experiments under a separate `step15_v2_*` namespace. This prevents old and new experiment dimensions from overwriting each other.
+
+New v2 summary output:
+
+```text
+reports/step15_v2_incremental_hard_negative_summary.json
+```
+
+New v2 Step 12 outputs:
+
+```text
+reports/step12_v2_statistical_robustness_zh_test_20260602.json
+reports/step12_v2_statistical_robustness_model_metrics_20260602.csv
+reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv
+```
+
+New v2 slice-level audit outputs:
+
+```text
+reports/step15_v2_slice_level_audit.json
+reports/step15_v2_slice_level_audit.csv
+```
+
+The legacy first-pass Step 15 experiments remain available only as controls:
+
+```text
+step15_e5_multitask_clean_curriculum
+step15_e5_identity_only_clean_curriculum
+step15_e5_multitask_identifier_operational
+```
+
+They are no longer the default experiments in the v2 policy.
+
+## V2 Experiment Set
+
+The v2 primary clean candidate is identity-only rather than multitask:
+
+```text
+step15_v2_identity_only_curriculum_from_scratch
+```
+
+Reason: the first-pass results did not support a claim that the auxiliary evidence-type head improved the binary identity ranking. The identity-only phase-4 seed mean was slightly stronger than the multitask phase-4 seed mean. Therefore v2 treats the evidence head as an ablation, not the main claim.
+
+V2 controls:
+
+```text
+step15_v2_identity_only_curriculum_warm_start
+step15_v2_identity_only_curriculum_domain_balanced
+step15_v2_identity_only_curriculum_target_only
+step15_v2_identity_only_curriculum_source_only
+step15_v2_identity_only_curriculum_zh_positive_mixup
+step15_v2_identity_only_curriculum_same_evidence_mixup
+step15_v2_multitask_curriculum_ablation
+step15_v2_identifier_operational
+```
+
+### Warm-Start Curriculum
+
+The first implementation retrained each phase from scratch. That design can show staged hard-negative ablation, but it is not a strict incremental curriculum.
+
+The v2 warm-start control changes this:
+
+```text
+phase0 -> phase1 -> phase2 -> phase3 -> phase4
+```
+
+For the same experiment and seed, each phase initializes from the previous phase's best parameters.
+
+To keep parameter scales meaningful, the warm-start run uses one shared standardizer fitted on the final phase's training rows. The artifact records:
+
+```text
+initialization: random / warm_start
+standardizer_source: warm_start_final_phase_train
+training_mode: warm_start_curriculum
+```
+
+This tests whether gradual exposure to semantic-topic, template-clone, and contact/URL-noise negatives is better than independently retraining each phase.
+
+### Domain-Balanced Control
+
+The source English pool is larger than the target Chinese pool. V2 adds a domain-balanced identity loss control:
+
+```text
+step15_v2_identity_only_curriculum_domain_balanced
+```
+
+This keeps class-balanced positive/negative weighting, but also weights source and target domains so the larger English side cannot dominate the identity loss purely by row count.
+
+Source/target controls are also added:
+
+```text
+step15_v2_identity_only_curriculum_source_only
+step15_v2_identity_only_curriculum_target_only
+```
+
+These controls answer whether the observed ranking gain comes from source-domain strength, target-domain adaptation, or their combination.
+
+### Mixup Scope Controls
+
+The first implementation mixed all positive training rows. V2 separates mixup scope:
+
+```text
+all_positive
+target_train_only
+same_evidence_type_only
+```
+
+The two new v2 controls are:
+
+```text
+step15_v2_identity_only_curriculum_zh_positive_mixup
+step15_v2_identity_only_curriculum_same_evidence_mixup
+```
+
+`target_train_only` tests whether synthetic minority regularization should be restricted to Chinese positives. `same_evidence_type_only` prevents direct-identifier positives and style/structural soft positives from being mixed into unrealistic synthetic rows.
+
+Synthetic rows remain train-only. They are not written into Step 5, `zh_valid`, or `zh_test`, and their evidence-type loss is masked.
+
+## V2 Slice-Level Audit
+
+Overall ROC-AUC/AP is not enough for Step 15. The method is designed to reduce target-domain hard-negative concept drift, so v2 adds:
+
+```text
+scripts/step15_slice_level_audit.py
+```
+
+The audit reads fixed `zh_test` only and reports metrics by:
+
+```text
+evidence_type
+review_stratum
+hard_negative_any
+negative_template_or_topic
+positive_direct_or_component_anchor
+positive_style_structural_soft
+identifier_present
+identifier_absent
+```
+
+The key scientific question is not only whether Step 15 improves global AP. It is whether it reduces scores for:
+
+```text
+template_clone_not_controller
+semantic_topic_not_controller
+public_contact_or_url_noise
+```
+
+while preserving recall for:
+
+```text
+same_controller_direct_identifier
+same_controller_style_structural_soft
+```
+
+Only if the slice audit shows the expected hard-negative behavior should Step 15 be considered for exploratory Step 11 scoring.
 
 This integration is for robustness testing only. It does not authorize Step 11 consumption until the fixed-test bootstrap comparisons justify it.
 

@@ -4,6 +4,29 @@ Updated: 2026-06-02
 
 ## Current Stage
 
+`2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
+
+- Active branch: `method/step15-v2-curriculum-audit`.
+- The first-pass Step 15 result remains preserved under the original `step15_e5_*` experiment namespace and original `reports/step15_incremental_hard_negative_summary.json`.
+- V2 experiments now use a separate `step15_v2_*` namespace and write the main training summary to `reports/step15_v2_incremental_hard_negative_summary.json`, avoiding old/new result overwrites.
+- Step 12 v2 robustness outputs now default to:
+  - `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
+  - `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`
+  - `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
+- Step 15 v2 changes:
+  - identity-only curriculum is promoted to the clean primary candidate because the first-pass evidence-type multitask head was not supported by fixed-test results;
+  - multitask remains as an ablation, not the main claim;
+  - true warm-start curriculum is added, with phase `n+1` initialized from phase `n` under a shared final-phase standardizer;
+  - domain-balanced, target-only, and source-only controls are added to separate source-domain scale from target-domain adaptation;
+  - mixup scope controls are added for `target_train_only` and `same_evidence_type_only`;
+  - `scripts/step15_slice_level_audit.py` adds fixed `zh_test` evidence-type/review-stratum slice diagnostics.
+- V2 still obeys the hard rules: Step 5 labels remain frozen, `zh_train/zh_valid/zh_test` are not mixed, uncertain rows are not used for binary identity training, synthetic rows remain train-only, and Step 11 cluster decisions are not used as ground truth.
+- Local smoke validation completed for:
+  - `step15_v2_identity_only_curriculum_target_only / phase0 / seed 20260320`;
+  - `step15_v2_identity_only_curriculum_warm_start / phase0+phase1 / seed 20260320`, confirming `initialization = warm_start` for phase1 and `standardizer_source = warm_start_final_phase_train`.
+- Smoke artifacts were deleted after validation so they cannot be mistaken for complete Linux results.
+- Required next action: sync code/config/doc changes to Linux, run the full Step 15 v2 matrix, rerun Step 12 v2, then generate Step 15 v2 slice-level audit. Step 11 should still not consume Step 15 until fixed-test and slice-level evidence justify it.
+
 `2026-06-02` evidence-type incremental hard-negative method branch initialized:
 
 - Active branch: `method/evidence-type-incremental-hard-negative`.

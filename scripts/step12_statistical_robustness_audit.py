@@ -22,9 +22,9 @@ from typing import Any
 
 DEFAULT_LABELS = Path("reports/step5_zh_target_strict_frozen_silver_labels.csv")
 DEFAULT_FEATURES = Path("reports/step7_pair_features.zh_target_strict.csv")
-DEFAULT_OUT_JSON = Path("reports/step12_statistical_robustness_zh_test_20260513.json")
-DEFAULT_OUT_METRICS = Path("reports/step12_statistical_robustness_model_metrics_20260513.csv")
-DEFAULT_OUT_COMPARISONS = Path("reports/step12_statistical_robustness_paired_comparisons_20260513.csv")
+DEFAULT_OUT_JSON = Path("reports/step12_v2_statistical_robustness_zh_test_20260602.json")
+DEFAULT_OUT_METRICS = Path("reports/step12_v2_statistical_robustness_model_metrics_20260602.csv")
+DEFAULT_OUT_COMPARISONS = Path("reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv")
 
 DEFAULT_RESAMPLES = 5000
 DEFAULT_SEED = 20260513
@@ -264,6 +264,78 @@ for group in STEP15_MODEL_GROUPS:
             }
         )
 
+STEP15_V2_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_v2_identity_from_scratch_phase4",
+        "role": "step15_v2_clean_primary_identity_only_seed",
+        "experiment": "step15_v2_identity_only_curriculum_from_scratch",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_warm_start_phase4",
+        "role": "step15_v2_clean_warm_start_seed",
+        "experiment": "step15_v2_identity_only_curriculum_warm_start",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_domain_balanced_phase4",
+        "role": "step15_v2_clean_domain_balanced_seed",
+        "experiment": "step15_v2_identity_only_curriculum_domain_balanced",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_target_only_phase4",
+        "role": "step15_v2_target_only_seed",
+        "experiment": "step15_v2_identity_only_curriculum_target_only",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_source_only_phase4",
+        "role": "step15_v2_source_only_seed",
+        "experiment": "step15_v2_identity_only_curriculum_source_only",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_zh_positive_mixup_phase4",
+        "role": "step15_v2_target_positive_mixup_seed",
+        "experiment": "step15_v2_identity_only_curriculum_zh_positive_mixup",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_same_evidence_mixup_phase4",
+        "role": "step15_v2_same_evidence_mixup_seed",
+        "experiment": "step15_v2_identity_only_curriculum_same_evidence_mixup",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_multitask_ablation_phase4",
+        "role": "step15_v2_multitask_ablation_seed",
+        "experiment": "step15_v2_multitask_curriculum_ablation",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v2_identifier_operational_phase4",
+        "role": "step15_v2_operational_identifier_seed",
+        "experiment": "step15_v2_identifier_operational",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
+for group in STEP15_V2_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
 ENSEMBLES: dict[str, dict[str, Any]] = {
     "step9_e5_lr_l2_50pct_seed_mean": {
         "role": "step9_clean_current_seed_mean",
@@ -318,6 +390,13 @@ ENSEMBLES: dict[str, dict[str, Any]] = {
 }
 
 for group in STEP15_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
+for group in STEP15_V2_MODEL_GROUPS:
     ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
         "role": group["role"].replace("_seed", "_seed_mean"),
         "optional_until_generated": True,
@@ -397,6 +476,61 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
         "step15_identifier_operational_phase4_seed_mean",
         "step15_clean_multitask_phase4_seed_mean",
         "step15_identifier_operational_vs_clean_phase4",
+    ),
+    (
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v2_primary_vs_raw_e5",
+    ),
+    (
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v2_primary_vs_step9_mixup100",
+    ),
+    (
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_identity_only_phase4_seed_mean",
+        "step15_v2_primary_vs_legacy_identity_only",
+    ),
+    (
+        "step15_v2_warm_start_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_warm_start_vs_from_scratch",
+    ),
+    (
+        "step15_v2_domain_balanced_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_domain_balanced_vs_from_scratch",
+    ),
+    (
+        "step15_v2_target_only_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_target_only_vs_from_scratch",
+    ),
+    (
+        "step15_v2_source_only_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_source_only_vs_from_scratch",
+    ),
+    (
+        "step15_v2_zh_positive_mixup_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_zh_positive_mixup_vs_from_scratch",
+    ),
+    (
+        "step15_v2_same_evidence_mixup_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_same_evidence_mixup_vs_from_scratch",
+    ),
+    (
+        "step15_v2_multitask_ablation_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_multitask_vs_identity_only",
+    ),
+    (
+        "step15_v2_identifier_operational_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v2_identifier_operational_vs_clean_primary",
     ),
 ]
 
