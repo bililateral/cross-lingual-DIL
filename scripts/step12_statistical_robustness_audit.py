@@ -971,7 +971,7 @@ def main() -> None:
     )
 
     summary = {
-        "audit_version": "step12_statistical_robustness_zh_test_20260513",
+        "audit_version": "step12_v2_statistical_robustness_zh_test_20260602",
         "scope": "zh_target_strict_fixed_test",
         "fixed_test_policy": {
             "split_name": "test",

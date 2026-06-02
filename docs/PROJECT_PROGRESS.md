@@ -9,6 +9,7 @@ Updated: 2026-06-02
 - Active branch: `method/step15-v2-curriculum-audit`.
 - The first-pass Step 15 result remains preserved under the original `step15_e5_*` experiment namespace and original `reports/step15_incremental_hard_negative_summary.json`.
 - V2 experiments now use a separate `step15_v2_*` namespace and write the main training summary to `reports/step15_v2_incremental_hard_negative_summary.json`, avoiding old/new result overwrites.
+- The Step 15 runner now refuses to run legacy `step15_e5_*` experiments by default because those names write the original first-pass artifact/prediction paths. An intentional legacy rerun must pass `--allow-legacy-output-overwrite`.
 - Step 12 v2 robustness outputs now default to:
   - `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
   - `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`

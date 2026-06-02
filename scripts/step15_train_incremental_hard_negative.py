@@ -31,6 +31,14 @@ def parse_args() -> argparse.Namespace:
         help="Experiment name from policy. Defaults to policy default_experiments.",
     )
     parser.add_argument(
+        "--allow-legacy-output-overwrite",
+        action="store_true",
+        help=(
+            "Allow explicit runs of legacy step15_e5_* experiments. Those names write the original "
+            "first-pass artifact/prediction paths and can overwrite old Step 15 outputs."
+        ),
+    )
+    parser.add_argument(
         "--phase",
         action="append",
         dest="phases",
@@ -716,6 +724,14 @@ def main() -> None:
     policy = step7.load_json(policy_path)
 
     experiments = args.experiments or policy["default_experiments"]
+    legacy_experiments = [experiment for experiment in experiments if experiment.startswith("step15_e5_")]
+    if legacy_experiments and not args.allow_legacy_output_overwrite:
+        raise SystemExit(
+            "Refusing to run legacy Step 15 experiments because they write first-pass "
+            "artifact/prediction filenames and may overwrite old outputs: "
+            f"{', '.join(legacy_experiments)}. Use step15_v2_* experiments, or pass "
+            "--allow-legacy-output-overwrite only for an intentional legacy rerun."
+        )
     seeds = args.seeds or policy["training"]["default_seeds"]
     phase_by_id = {phase["phase_id"]: phase for phase in policy["curriculum_phases"]}
     phases = [phase_by_id[phase_id] for phase_id in (args.phases or list(phase_by_id.keys()))]

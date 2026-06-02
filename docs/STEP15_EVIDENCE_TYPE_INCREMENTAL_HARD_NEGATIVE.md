@@ -293,6 +293,7 @@ step15_e5_multitask_identifier_operational
 ```
 
 They are no longer the default experiments in the v2 policy.
+The Step 15 runner refuses these legacy names by default because their artifact and prediction templates resolve to the original first-pass paths. If a legacy control must be intentionally regenerated, the command must include `--allow-legacy-output-overwrite`; otherwise v2 work must use the `step15_v2_*` names.
 
 ## V2 Experiment Set
 
@@ -435,12 +436,12 @@ python3 scripts/step15_train_incremental_hard_negative.py \
   --policy schema/step15_evidence_type_policy.json
 ```
 
-Run only the clean multitask candidate:
+Run only the v2 clean primary candidate:
 
 ```bash
 python3 scripts/step15_train_incremental_hard_negative.py \
   --policy schema/step15_evidence_type_policy.json \
-  --experiment step15_e5_multitask_clean_curriculum
+  --experiment step15_v2_identity_only_curriculum_from_scratch
 ```
 
 Run only the final mixup phase for all seeds:
@@ -448,7 +449,7 @@ Run only the final mixup phase for all seeds:
 ```bash
 python3 scripts/step15_train_incremental_hard_negative.py \
   --policy schema/step15_evidence_type_policy.json \
-  --experiment step15_e5_multitask_clean_curriculum \
+  --experiment step15_v2_identity_only_curriculum_zh_positive_mixup \
   --phase phase4_add_positive_pair_mixup
 ```
 
