@@ -1,0 +1,352 @@
+{
+  "version": "2026-06-02",
+  "objective": "Evidence-type incremental hard-negative learning for cross-lingual seller-pair verification. Step 15 keeps Step 5 frozen binary labels unchanged, adds conservative auxiliary evidence_type labels for training diagnostics, and trains a lightweight multitask curriculum scorer on fixed train/valid/test boundaries.",
+  "input_dependencies": [
+    "docs/EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE_PLAN.md",
+    "reports/step5_en_frozen_silver_labels.csv",
+    "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "reports/step7_pair_features.en_content_train_pool.csv",
+    "reports/step7_pair_features.zh_target_strict.csv",
+    "reports/step11_cluster_level_audit.current_20260517.csv",
+    "reports/step13_concept_drift_audit.json"
+  ],
+  "pools": {
+    "en_content_train_pool": {
+      "frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
+      "pair_features": "reports/step7_pair_features.en_content_train_pool.csv",
+      "label_output": "reports/step15_evidence_type_labels.en_content_train_pool.csv"
+    },
+    "zh_target_strict": {
+      "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+      "pair_features": "reports/step7_pair_features.zh_target_strict.csv",
+      "label_output": "reports/step15_evidence_type_labels.zh_target_strict.csv"
+    }
+  },
+  "label_summary_output": "reports/step15_evidence_type_label_summary.json",
+  "identity_label_mapping": {
+    "positive": "same_controller",
+    "negative": "different_controller",
+    "uncertain": "uncertain"
+  },
+  "evidence_types": [
+    "same_controller_direct_identifier",
+    "same_controller_component_anchor",
+    "same_controller_style_structural_soft",
+    "template_clone_not_controller",
+    "semantic_topic_not_controller",
+    "public_contact_or_url_noise",
+    "ordinary_negative",
+    "uncertain_insufficient_evidence"
+  ],
+  "auxiliary_label_rules": {
+    "direct_identifier_positive": {
+      "shared_contact_count_min": 1,
+      "shared_pgp_fingerprint_count_min": 1,
+      "review_stratum_contains": [
+        "identifier"
+      ],
+      "candidate_rule_hits_any": [
+        "shared_contact_exact",
+        "shared_pgp_fingerprint"
+      ]
+    },
+    "component_anchor_positive": {
+      "review_notes_keywords": [
+        "component",
+        "closure",
+        "anchor pair",
+        "clean reviewed positive"
+      ]
+    },
+    "template_clone_negative": {
+      "shared_title_count_min": 1,
+      "shared_description_count_min": 1,
+      "shared_low_df_sentence_count_min": 1,
+      "shared_rare_ngram_count_min": 1,
+      "review_stratum_contains": [
+        "text_clone",
+        "template"
+      ],
+      "candidate_rule_hits_any": [
+        "shared_title_clone",
+        "shared_description_clone"
+      ]
+    },
+    "semantic_topic_negative": {
+      "embedding_cosine_multilingual_e5_large_min": 0.8,
+      "embedding_cosine_bge_m3_min": 0.8,
+      "embedding_cosine_labse_min": 0.8,
+      "embedding_cosine_gte_multilingual_base_min": 0.8,
+      "structural_support_score_raw_max": 0.35,
+      "shared_title_count_max": 0,
+      "shared_description_count_max": 0
+    },
+    "public_contact_or_url_noise": {
+      "review_notes_keywords": [
+        "public",
+        "parser noise",
+        "product/victim",
+        "victim",
+        "support-only",
+        "support only",
+        "marketplace support",
+        "demo url",
+        "sample data",
+        "leaked",
+        "external url",
+        "url/product",
+        "not seller",
+        "non-seller"
+      ]
+    }
+  },
+  "feature_sets": {
+    "clean_semantic_structural_style": [
+      "embedding_cosine_multilingual_e5_large",
+      "embedding_cosine_bge_m3",
+      "embedding_cosine_labse",
+      "embedding_cosine_gte_multilingual_base",
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base",
+      "profile_category_jaccard",
+      "has_shared_title_clone",
+      "has_shared_description_clone",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_title_idf_mean",
+      "shared_description_idf_mean",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count",
+      "candidate_rule_count_raw",
+      "sparse_lexical_similarity_raw",
+      "structural_support_score_raw",
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs",
+      "uppercase_ratio_mean_percentile_gap_abs"
+    ],
+    "identifier_operational": [
+      "embedding_cosine_multilingual_e5_large",
+      "embedding_cosine_bge_m3",
+      "embedding_cosine_labse",
+      "embedding_cosine_gte_multilingual_base",
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base",
+      "profile_category_jaccard",
+      "has_shared_title_clone",
+      "has_shared_description_clone",
+      "has_shared_contact_exact",
+      "has_shared_pgp_fingerprint",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "shared_contact_count_capped",
+      "shared_pgp_fingerprint_count_capped",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count",
+      "candidate_rule_count_raw",
+      "sparse_lexical_similarity_raw",
+      "structural_support_score_raw",
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs",
+      "uppercase_ratio_mean_percentile_gap_abs"
+    ]
+  },
+  "curriculum_phases": [
+    {
+      "phase_id": "phase0_identity_warm_start",
+      "phase_index": 0,
+      "included_evidence_types": [
+        "same_controller_direct_identifier",
+        "ordinary_negative"
+      ],
+      "use_positive_mixup": false,
+      "purpose": "Learn the cleanest binary identity boundary from direct positive anchors and easy negatives."
+    },
+    {
+      "phase_id": "phase1_add_semantic_topic_negative",
+      "phase_index": 1,
+      "included_evidence_types": [
+        "same_controller_direct_identifier",
+        "same_controller_style_structural_soft",
+        "ordinary_negative",
+        "semantic_topic_not_controller"
+      ],
+      "use_positive_mixup": false,
+      "purpose": "Teach the model that same topic or product similarity does not imply same controller."
+    },
+    {
+      "phase_id": "phase2_add_template_clone_negative",
+      "phase_index": 2,
+      "included_evidence_types": [
+        "same_controller_direct_identifier",
+        "same_controller_style_structural_soft",
+        "ordinary_negative",
+        "semantic_topic_not_controller",
+        "template_clone_not_controller"
+      ],
+      "use_positive_mixup": false,
+      "purpose": "Reduce false positives caused by copied product descriptions, reusable templates, and boilerplate."
+    },
+    {
+      "phase_id": "phase3_add_contact_url_noise",
+      "phase_index": 3,
+      "included_evidence_types": [
+        "same_controller_direct_identifier",
+        "same_controller_style_structural_soft",
+        "ordinary_negative",
+        "semantic_topic_not_controller",
+        "template_clone_not_controller",
+        "public_contact_or_url_noise"
+      ],
+      "use_positive_mixup": false,
+      "purpose": "Prevent contact-like or URL-like overlap from being treated as identity evidence when it is public or non-seller-specific."
+    },
+    {
+      "phase_id": "phase4_add_positive_pair_mixup",
+      "phase_index": 4,
+      "included_evidence_types": [
+        "same_controller_direct_identifier",
+        "same_controller_style_structural_soft",
+        "ordinary_negative",
+        "semantic_topic_not_controller",
+        "template_clone_not_controller",
+        "public_contact_or_url_noise"
+      ],
+      "use_positive_mixup": true,
+      "purpose": "Regularize the minority positive boundary with synthetic_train_only feature-space mixup."
+    }
+  ],
+  "default_experiments": [
+    "step15_e5_multitask_clean_curriculum",
+    "step15_e5_identity_only_clean_curriculum",
+    "step15_e5_multitask_identifier_operational"
+  ],
+  "experiments": {
+    "step15_e5_multitask_clean_curriculum": {
+      "role": "clean_scientific_candidate",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "lambda_evidence": 0.35,
+      "use_identifier_features": false
+    },
+    "step15_e5_identity_only_clean_curriculum": {
+      "role": "identity_only_control",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_e5_multitask_identifier_operational": {
+      "role": "identifier_operational_control",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "identifier_operational",
+      "include_source_train": true,
+      "include_target_train": true,
+      "lambda_evidence": 0.35,
+      "use_identifier_features": true
+    }
+  },
+  "splits": {
+    "source_train": "train",
+    "target_train": "train",
+    "target_valid": "valid",
+    "target_test": "test"
+  },
+  "training": {
+    "default_seeds": [
+      20260320,
+      20260321,
+      20260322
+    ],
+    "hidden_dim": 16,
+    "max_epochs": 900,
+    "learning_rate": 0.01,
+    "patience_epochs": 120,
+    "l2_weight": 0.0005,
+    "dropout_rate": 0.0,
+    "class_balanced_identity_loss": true,
+    "class_balanced_evidence_loss": true,
+    "early_stopping_metric": "average_precision",
+    "positive_mixup": {
+      "multiplier": 1.0,
+      "beta_alpha": 0.4,
+      "label_policy": "identity_positive_only_evidence_masked",
+      "synthetic_scope": "train_only"
+    }
+  },
+  "threshold_selection": {
+    "metric": "balanced_accuracy",
+    "tie_break_order": [
+      "f1",
+      "precision",
+      "recall",
+      "higher_threshold"
+    ],
+    "degenerate_prediction_guard": {
+      "enabled": true,
+      "min_predicted_positive": 1,
+      "min_predicted_negative": 1,
+      "max_primary_metric_drop": 0.03,
+      "tie_break_order": [
+        "f1",
+        "recall",
+        "precision",
+        "specificity",
+        "lower_threshold"
+      ]
+    }
+  },
+  "outputs": {
+    "summary_json": "reports/step15_incremental_hard_negative_summary.json",
+    "artifact_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_artifact.json",
+    "zh_valid_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_valid.csv",
+    "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv"
+  },
+  "baseline_references": {
+    "raw_e5": {
+      "roc_auc": 0.806723,
+      "average_precision": 0.520573
+    },
+    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean": {
+      "roc_auc": 0.842017,
+      "average_precision": 0.588995
+    }
+  },
+  "hard_rules": [
+    "Do not modify Step 5 frozen labels.",
+    "Do not mix zh_train, zh_valid, and zh_test.",
+    "Do not train the binary identity head on uncertain rows.",
+    "Do not use Step 11 cluster decisions as same-controller ground truth.",
+    "Do not write synthetic rows into validation, test, or Step 5 files.",
+    "Keep clean scientific models separate from identifier operational controls."
+  ]
+}

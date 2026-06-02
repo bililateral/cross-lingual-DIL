@@ -1,0 +1,309 @@
+# Step 15 Evidence-Type Incremental Hard-Negative Experiment
+
+Updated: 2026-06-02
+
+Branch: `method/evidence-type-incremental-hard-negative`
+
+## Purpose
+
+Step 15 implements the first runnable version of the evidence-type incremental hard-negative plan.
+
+The goal is not to replace the project task with ordinary multiclass classification. The final task remains:
+
+```text
+same_controller vs different_controller
+```
+
+The new idea is to keep the binary identity head, but add conservative evidence/noise-type supervision during training. This targets the current Chinese-domain failure mode:
+
+```text
+semantic/topic/template similarity is often high even when identity reliability is low.
+```
+
+The experiment asks whether teaching the model these hard-negative regimes can reduce template/topic false positives while preserving or improving fixed `zh_test` ranking.
+
+## Non-Negotiable Controls
+
+Step 15 does not modify Step 5 frozen labels.
+
+Step 15 does not mix `zh_train`, `zh_valid`, and `zh_test`.
+
+Step 15 does not train the binary identity head on `uncertain` rows.
+
+Step 15 does not use Step 11 cluster decisions as same-controller ground truth.
+
+Step 15 does not write synthetic rows into Step 5, `zh_valid`, or `zh_test`.
+
+Clean scientific experiments are kept separate from identifier-augmented operational controls.
+
+## Files
+
+Policy:
+
+```text
+schema/step15_evidence_type_policy.json
+```
+
+Auxiliary label builder:
+
+```text
+scripts/step15_build_evidence_type_labels.py
+```
+
+Curriculum training runner:
+
+```text
+scripts/step15_train_incremental_hard_negative.py
+```
+
+Planned outputs:
+
+```text
+reports/step15_evidence_type_label_summary.json
+reports/step15_evidence_type_labels.en_content_train_pool.csv
+reports/step15_evidence_type_labels.zh_target_strict.csv
+reports/step15_incremental_hard_negative_summary.json
+reports/step15_<experiment>_<phase>_seed_<seed>_predictions.zh_valid.csv
+reports/step15_<experiment>_<phase>_seed_<seed>_predictions.zh_test.csv
+reports/step15_<experiment>_<phase>_seed_<seed>_artifact.json
+```
+
+## Auxiliary Label Construction
+
+The auxiliary label builder joins:
+
+```text
+reports/step5_en_frozen_silver_labels.csv
+reports/step5_zh_target_strict_frozen_silver_labels.csv
+reports/step7_pair_features.en_content_train_pool.csv
+reports/step7_pair_features.zh_target_strict.csv
+```
+
+The join key is:
+
+```text
+pair_uid
+```
+
+The Step 7 feature CSV contains stale or blank review columns in some rows, so the builder always overlays labels, splits, review notes, and supervision flags from the Step 5 frozen files. This is important: Step 5 remains the source of truth for labels.
+
+The builder emits two label layers.
+
+Identity label:
+
+```text
+positive  -> same_controller
+negative  -> different_controller
+uncertain -> uncertain
+```
+
+Evidence type:
+
+```text
+same_controller_direct_identifier
+same_controller_component_anchor
+same_controller_style_structural_soft
+template_clone_not_controller
+semantic_topic_not_controller
+public_contact_or_url_noise
+ordinary_negative
+uncertain_insufficient_evidence
+```
+
+The evidence-type rules are conservative and rule-based. They use only frozen labels, review strata, review notes, candidate rule hits, and Step 7 transfer-safe features. They do not create new positives.
+
+## Curriculum Phases
+
+Phase 0:
+
+```text
+same_controller_direct_identifier
+ordinary_negative
+```
+
+Purpose: learn the cleanest identity boundary from direct positive anchors and ordinary negatives.
+
+Phase 1:
+
+```text
+add semantic_topic_not_controller
+```
+
+Purpose: teach the model that same topic or same product does not imply same controller.
+
+Phase 2:
+
+```text
+add template_clone_not_controller
+```
+
+Purpose: reduce false positives from copied product text, reusable templates, and boilerplate.
+
+Phase 3:
+
+```text
+add public_contact_or_url_noise
+```
+
+Purpose: prevent public or non-seller-specific contact-like overlap from acting as identity proof.
+
+Phase 4:
+
+```text
+add synthetic_train_only positive pair mixup
+```
+
+Purpose: regularize the minority positive boundary without changing Step 5 labels.
+
+## Model
+
+The first implementation deliberately avoids large models.
+
+Backend:
+
+```text
+numpy_mlp_multitask
+```
+
+Architecture:
+
+```text
+standardized pair features
+-> small tanh hidden layer
+-> identity head: P(same_controller)
+-> evidence head: P(evidence_type)
+```
+
+Loss:
+
+```text
+L_total = L_identity + lambda_evidence * L_evidence + L2
+```
+
+The identity head uses only `positive` and `negative` rows that are eligible for core transfer.
+
+The evidence head uses confident evidence-type rows only.
+
+`uncertain` rows are excluded from identity training.
+
+Synthetic mixup rows, when enabled in Phase 4, are positive identity rows only and have masked evidence-type loss.
+
+## Experiments
+
+Clean scientific candidate:
+
+```text
+step15_e5_multitask_clean_curriculum
+```
+
+This uses semantic, structural, style, lexical, and template-proxy features. It excludes direct identifier features.
+
+Identity-only control:
+
+```text
+step15_e5_identity_only_clean_curriculum
+```
+
+This uses the same clean feature set but sets `lambda_evidence = 0.0`. It tests whether the auxiliary evidence head matters.
+
+Operational identifier control:
+
+```text
+step15_e5_multitask_identifier_operational
+```
+
+This includes direct identifier features and must not be mixed into the clean scientific claim.
+
+## Evaluation
+
+Primary evaluation remains the fixed Chinese test split:
+
+```text
+zh_target_strict test = 106 rows
+positive = 21
+negative = 85
+```
+
+Primary metrics:
+
+```text
+ROC-AUC
+Average Precision
+balanced accuracy
+precision
+recall
+F1
+```
+
+Current reference baselines:
+
+```text
+raw E5:
+  ROC-AUC = 0.806723
+  AP      = 0.520573
+
+Step9 E5 LR/L2 positive-pair mixup 100pct:
+  ROC-AUC = 0.842017
+  AP      = 0.588995
+```
+
+Step15 should not be claimed as successful from point estimates alone. After pair-level training, it must be added to Step 12 grouped bootstrap and then, only if justified, to Step 11 graph-level audit.
+
+The Step 12 runner is prepared to read the main Step 15 candidates:
+
+```text
+step15_clean_multitask_phase2_seed_mean
+step15_clean_multitask_phase3_seed_mean
+step15_clean_multitask_phase4_seed_mean
+step15_identity_only_phase4_seed_mean
+step15_identifier_operational_phase4_seed_mean
+```
+
+This integration is for robustness testing only. It does not authorize Step 11 consumption until the fixed-test bootstrap comparisons justify it.
+
+## Commands
+
+Build auxiliary labels:
+
+```bash
+python3 scripts/step15_build_evidence_type_labels.py \
+  --policy schema/step15_evidence_type_policy.json
+```
+
+Run the full first-pass Step15 experiment set:
+
+```bash
+python3 scripts/step15_train_incremental_hard_negative.py \
+  --policy schema/step15_evidence_type_policy.json
+```
+
+Run only the clean multitask candidate:
+
+```bash
+python3 scripts/step15_train_incremental_hard_negative.py \
+  --policy schema/step15_evidence_type_policy.json \
+  --experiment step15_e5_multitask_clean_curriculum
+```
+
+Run only the final mixup phase for all seeds:
+
+```bash
+python3 scripts/step15_train_incremental_hard_negative.py \
+  --policy schema/step15_evidence_type_policy.json \
+  --experiment step15_e5_multitask_clean_curriculum \
+  --phase phase4_add_positive_pair_mixup
+```
+
+Run the official Step 12 grouped bootstrap after Step 15 predictions exist:
+
+```bash
+python3 scripts/step12_statistical_robustness_audit.py
+```
+
+## Interpretation Rules
+
+If Step15 improves AP but Step11 still produces mostly template/topic clusters, it is not a success.
+
+If Step15 improves hard-negative slice behavior but global AP changes only modestly, it is still useful evidence that structured hard-negative training addresses concept drift.
+
+If Step15 fails to improve over raw E5 and Step9 mixup, the result remains scientifically meaningful: it strengthens the conclusion that the current bottleneck is direct target-domain positive evidence scarcity, not simply model design.

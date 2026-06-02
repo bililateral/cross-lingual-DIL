@@ -215,6 +215,55 @@ MODEL_SPECS: list[dict[str, Any]] = [
     },
 ]
 
+STEP15_SEEDS = [20260320, 20260321, 20260322]
+STEP15_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_clean_multitask_phase2",
+        "role": "step15_clean_evidence_type_curriculum_seed",
+        "experiment": "step15_e5_multitask_clean_curriculum",
+        "phase": "phase2_add_template_clone_negative",
+    },
+    {
+        "model_prefix": "step15_clean_multitask_phase3",
+        "role": "step15_clean_evidence_type_curriculum_seed",
+        "experiment": "step15_e5_multitask_clean_curriculum",
+        "phase": "phase3_add_contact_url_noise",
+    },
+    {
+        "model_prefix": "step15_clean_multitask_phase4",
+        "role": "step15_clean_evidence_type_curriculum_seed",
+        "experiment": "step15_e5_multitask_clean_curriculum",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_identity_only_phase4",
+        "role": "step15_identity_only_curriculum_control_seed",
+        "experiment": "step15_e5_identity_only_clean_curriculum",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_identifier_operational_phase4",
+        "role": "step15_operational_identifier_control_seed",
+        "experiment": "step15_e5_multitask_identifier_operational",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
+for group in STEP15_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
 ENSEMBLES: dict[str, dict[str, Any]] = {
     "step9_e5_lr_l2_50pct_seed_mean": {
         "role": "step9_clean_current_seed_mean",
@@ -268,6 +317,13 @@ ENSEMBLES: dict[str, dict[str, Any]] = {
     },
 }
 
+for group in STEP15_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
 PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
     ("step9_e5_lr_l2_50pct_seed_mean", "raw_e5_cosine", "primary_clean_vs_raw_e5"),
     ("step9_e5_lr_l2_50pct_seed_20260320", "raw_e5_cosine", "primary_seed_vs_raw_e5"),
@@ -315,6 +371,33 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
     ("step9_bge_m3_residual_lr_100pct_seed_mean", "raw_bge_m3_cosine", "bge_residual_vs_raw_bge"),
     ("step9_labse_lr_l2_100pct_seed_mean", "raw_labse_cosine", "labse_lr_vs_raw_labse"),
     ("step9_identifier_augmented_lr_l2_100pct_seed_mean", "raw_e5_cosine", "operational_identifier_vs_raw_e5"),
+    ("step15_clean_multitask_phase2_seed_mean", "raw_e5_cosine", "step15_phase2_clean_vs_raw_e5"),
+    (
+        "step15_clean_multitask_phase3_seed_mean",
+        "step15_clean_multitask_phase2_seed_mean",
+        "step15_phase3_clean_vs_phase2_clean",
+    ),
+    (
+        "step15_clean_multitask_phase4_seed_mean",
+        "step15_clean_multitask_phase3_seed_mean",
+        "step15_phase4_clean_vs_phase3_clean",
+    ),
+    ("step15_clean_multitask_phase4_seed_mean", "raw_e5_cosine", "step15_phase4_clean_vs_raw_e5"),
+    (
+        "step15_clean_multitask_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_phase4_clean_vs_step9_mixup100",
+    ),
+    (
+        "step15_clean_multitask_phase4_seed_mean",
+        "step15_identity_only_phase4_seed_mean",
+        "step15_phase4_multitask_vs_identity_only",
+    ),
+    (
+        "step15_identifier_operational_phase4_seed_mean",
+        "step15_clean_multitask_phase4_seed_mean",
+        "step15_identifier_operational_vs_clean_phase4",
+    ),
 ]
 
 

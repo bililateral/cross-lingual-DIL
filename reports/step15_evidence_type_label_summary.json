@@ -1,0 +1,179 @@
+{
+  "step": "step15_build_evidence_type_labels",
+  "policy": "schema\\step15_evidence_type_policy.json",
+  "policy_version": "2026-06-02",
+  "pools": {
+    "en_content_train_pool": {
+      "row_count": 1321,
+      "review_label_counts": {
+        "negative": 525,
+        "positive": 226,
+        "uncertain": 570
+      },
+      "evidence_type_counts": {
+        "ordinary_negative": 340,
+        "public_contact_or_url_noise": 101,
+        "same_controller_component_anchor": 3,
+        "same_controller_direct_identifier": 158,
+        "same_controller_style_structural_soft": 65,
+        "semantic_topic_not_controller": 52,
+        "template_clone_not_controller": 32,
+        "uncertain_insufficient_evidence": 570
+      },
+      "evidence_type_by_split": {
+        "audit_only": {
+          "same_controller_direct_identifier": 7,
+          "same_controller_style_structural_soft": 4
+        },
+        "audit_only_soft_alias": {
+          "same_controller_direct_identifier": 3,
+          "same_controller_style_structural_soft": 3
+        },
+        "test": {
+          "ordinary_negative": 74,
+          "public_contact_or_url_noise": 44,
+          "same_controller_component_anchor": 1,
+          "same_controller_direct_identifier": 36,
+          "same_controller_style_structural_soft": 14,
+          "semantic_topic_not_controller": 8,
+          "template_clone_not_controller": 4
+        },
+        "train": {
+          "ordinary_negative": 179,
+          "public_contact_or_url_noise": 50,
+          "same_controller_direct_identifier": 82,
+          "same_controller_style_structural_soft": 34,
+          "semantic_topic_not_controller": 28,
+          "template_clone_not_controller": 28
+        },
+        "uncertain_holdout": {
+          "uncertain_insufficient_evidence": 570
+        },
+        "valid": {
+          "ordinary_negative": 87,
+          "public_contact_or_url_noise": 7,
+          "same_controller_component_anchor": 2,
+          "same_controller_direct_identifier": 30,
+          "same_controller_style_structural_soft": 10,
+          "semantic_topic_not_controller": 16
+        }
+      },
+      "identity_training_eligible_by_split_evidence": {
+        "test": {
+          "ordinary_negative": 74,
+          "public_contact_or_url_noise": 44,
+          "same_controller_component_anchor": 1,
+          "same_controller_direct_identifier": 36,
+          "same_controller_style_structural_soft": 14,
+          "semantic_topic_not_controller": 8,
+          "template_clone_not_controller": 4
+        },
+        "train": {
+          "ordinary_negative": 179,
+          "public_contact_or_url_noise": 50,
+          "same_controller_direct_identifier": 82,
+          "same_controller_style_structural_soft": 34,
+          "semantic_topic_not_controller": 28,
+          "template_clone_not_controller": 28
+        },
+        "valid": {
+          "ordinary_negative": 87,
+          "public_contact_or_url_noise": 7,
+          "same_controller_component_anchor": 2,
+          "same_controller_direct_identifier": 30,
+          "same_controller_style_structural_soft": 10,
+          "semantic_topic_not_controller": 16
+        }
+      },
+      "pool": "en_content_train_pool",
+      "frozen_labels": "reports\\step5_en_frozen_silver_labels.csv",
+      "pair_features": "reports\\step7_pair_features.en_content_train_pool.csv",
+      "output": "reports\\step15_evidence_type_labels.en_content_train_pool.csv"
+    },
+    "zh_target_strict": {
+      "row_count": 1016,
+      "review_label_counts": {
+        "negative": 426,
+        "positive": 102,
+        "uncertain": 488
+      },
+      "evidence_type_counts": {
+        "ordinary_negative": 287,
+        "public_contact_or_url_noise": 17,
+        "same_controller_component_anchor": 7,
+        "same_controller_direct_identifier": 26,
+        "same_controller_style_structural_soft": 69,
+        "semantic_topic_not_controller": 69,
+        "template_clone_not_controller": 53,
+        "uncertain_insufficient_evidence": 488
+      },
+      "evidence_type_by_split": {
+        "audit_only": {
+          "same_controller_component_anchor": 6
+        },
+        "test": {
+          "ordinary_negative": 61,
+          "public_contact_or_url_noise": 6,
+          "same_controller_component_anchor": 1,
+          "same_controller_direct_identifier": 5,
+          "same_controller_style_structural_soft": 15,
+          "semantic_topic_not_controller": 11,
+          "template_clone_not_controller": 7
+        },
+        "train": {
+          "ordinary_negative": 186,
+          "public_contact_or_url_noise": 11,
+          "same_controller_direct_identifier": 17,
+          "same_controller_style_structural_soft": 44,
+          "semantic_topic_not_controller": 45,
+          "template_clone_not_controller": 32
+        },
+        "uncertain_holdout": {
+          "uncertain_insufficient_evidence": 488
+        },
+        "valid": {
+          "ordinary_negative": 40,
+          "same_controller_direct_identifier": 4,
+          "same_controller_style_structural_soft": 10,
+          "semantic_topic_not_controller": 13,
+          "template_clone_not_controller": 14
+        }
+      },
+      "identity_training_eligible_by_split_evidence": {
+        "test": {
+          "ordinary_negative": 61,
+          "public_contact_or_url_noise": 6,
+          "same_controller_component_anchor": 1,
+          "same_controller_direct_identifier": 5,
+          "same_controller_style_structural_soft": 15,
+          "semantic_topic_not_controller": 11,
+          "template_clone_not_controller": 7
+        },
+        "train": {
+          "ordinary_negative": 186,
+          "public_contact_or_url_noise": 11,
+          "same_controller_direct_identifier": 17,
+          "same_controller_style_structural_soft": 44,
+          "semantic_topic_not_controller": 45,
+          "template_clone_not_controller": 32
+        },
+        "valid": {
+          "ordinary_negative": 40,
+          "same_controller_direct_identifier": 4,
+          "same_controller_style_structural_soft": 10,
+          "semantic_topic_not_controller": 13,
+          "template_clone_not_controller": 14
+        }
+      },
+      "pool": "zh_target_strict",
+      "frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+      "pair_features": "reports\\step7_pair_features.zh_target_strict.csv",
+      "output": "reports\\step15_evidence_type_labels.zh_target_strict.csv"
+    }
+  },
+  "hard_rule_status": {
+    "step5_files_modified": false,
+    "auxiliary_labels_only": true,
+    "uncertain_rows_binary_training_eligible": false
+  }
+}

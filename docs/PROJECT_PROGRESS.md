@@ -1,8 +1,25 @@
 # Project Progress
 
-Updated: 2026-06-01
+Updated: 2026-06-02
 
 ## Current Stage
+
+`2026-06-02` evidence-type incremental hard-negative method branch initialized:
+
+- Active branch: `method/evidence-type-incremental-hard-negative`.
+- Added the runnable Step 15 design for evidence-type incremental hard-negative learning:
+  - `schema/step15_evidence_type_policy.json`
+  - `scripts/step15_build_evidence_type_labels.py`
+  - `scripts/step15_train_incremental_hard_negative.py`
+  - `docs/STEP15_EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE.md`
+- Step 15 keeps Step 5 frozen labels unchanged and adds auxiliary `evidence_type` labels only for training diagnostics.
+- The final task remains binary `same_controller` vs `different_controller`; evidence types are an auxiliary objective, not a replacement label space.
+- The first Step 15 model family is intentionally lightweight: a NumPy MLP with an identity head and an evidence-type head. It does not download or train large language models.
+- Clean Step 15 experiments exclude direct identifier features; `step15_e5_multitask_identifier_operational` is explicitly marked as an operational control.
+- Local Step 15 smoke/full-run validation completed on Windows: auxiliary labels were generated for both pools, and the first-pass runner completed `45` runs across `3` experiments, `5` curriculum phases, and `3` seeds.
+- The local point-estimate run suggests the clean Step 15 phase-4 seed mean is stronger than raw E5 and the previous Step 9 E5 mixup point estimate, but this is not yet a publication claim because the official `5000`-resample Step 12 grouped bootstrap has not been rerun.
+- `scripts/step12_statistical_robustness_audit.py` and `schema/step12_statistical_robustness_policy.json` now include Step 15 prediction specs for robustness testing only; Step 11 must not consume Step 15 until Step 12 justifies it.
+- Required next action: reproduce Step 15 on Linux, rerun the official fixed-test Step 12 grouped bootstrap, and only then decide whether any Step 15 scorer should enter Step 11. Step 11 must not consume Step 15 from local point estimates alone.
 
 `2026-06-01` discontinued parameter-efficient adaptation branch removed from the active project tree:
 

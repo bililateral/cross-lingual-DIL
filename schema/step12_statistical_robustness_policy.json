@@ -59,12 +59,36 @@
     ],
     "step9_operational_control": [
       "step9_identifier_augmented_lr_l2_100pct_seed_mean"
+    ],
+    "step15_evidence_type_incremental_hard_negative": [
+      "step15_clean_multitask_phase2_seed_20260320",
+      "step15_clean_multitask_phase2_seed_20260321",
+      "step15_clean_multitask_phase2_seed_20260322",
+      "step15_clean_multitask_phase2_seed_mean",
+      "step15_clean_multitask_phase3_seed_20260320",
+      "step15_clean_multitask_phase3_seed_20260321",
+      "step15_clean_multitask_phase3_seed_20260322",
+      "step15_clean_multitask_phase3_seed_mean",
+      "step15_clean_multitask_phase4_seed_20260320",
+      "step15_clean_multitask_phase4_seed_20260321",
+      "step15_clean_multitask_phase4_seed_20260322",
+      "step15_clean_multitask_phase4_seed_mean",
+      "step15_identity_only_phase4_seed_mean"
+    ],
+    "step15_operational_control": [
+      "step15_identifier_operational_phase4_seed_mean"
     ]
   },
   "paired_comparison_policy": {
     "primary_baseline": "raw_e5_cosine",
     "must_compare_against_raw_semantic": true,
     "must_compare_against_step7_collapsed_fusion": true,
+    "step15_required_comparisons": [
+      "step15_phase4_clean_vs_raw_e5",
+      "step15_phase4_clean_vs_step9_mixup100",
+      "step15_phase4_multitask_vs_identity_only",
+      "step15_phase4_clean_vs_phase3_clean"
+    ],
     "p_value": "Two-sided bootstrap sign probability over grouped resamples; descriptive only, not a formal DeLong test."
   },
   "outputs": {
@@ -77,6 +101,7 @@
     "Do not use this audit to relabel Step 5 rows.",
     "Do not report few-shot improvement without paired comparison against raw semantic baselines.",
     "Positive-pair mixup rows are training-only minority regularization artifacts and must be evaluated against both raw semantic controls and the non-mixup E5 LR/L2 baseline.",
-    "Identifier-augmented models remain operational controls and must not be mixed into the clean scientific claim."
+    "Identifier-augmented models remain operational controls and must not be mixed into the clean scientific claim.",
+    "Step15 evidence-type auxiliary labels are training diagnostics; they do not replace Step5 frozen labels and do not authorize direct Step11 graph claims without pair-level audit."
   ]
 }
