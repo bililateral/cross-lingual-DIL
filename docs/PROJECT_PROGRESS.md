@@ -14,6 +14,11 @@ Updated: 2026-06-02
   - `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
   - `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`
   - `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
+- Linux Step 15 v2 and Step 12 v2 outputs are now synchronized back. The full Step 15 v2 matrix completed `135` runs (`9` experiments x `5` phases x `3` seeds), with all expected artifacts and fixed `zh_valid` / `zh_test` predictions present.
+- The strongest clean Step 15 v2 point estimate is `step15_v2_domain_balanced_phase4_seed_mean`: ROC-AUC `0.901401`, AP `0.714371` on the fixed `zh_test = 106` split.
+- The clean primary `step15_v2_identity_from_scratch_phase4_seed_mean` improves over raw E5 in point estimate, but Step 12 v2 paired bootstrap still does not support a statistically robust positive difference: ROC-AUC diff `+0.082913`, CI `[-0.076627, 0.250000]`; AP diff `+0.178725`, CI `[-0.176207, 0.466066]`.
+- Against Step 9 E5 positive-pair mixup 100pct, the clean primary remains uncertainty-bounded: ROC-AUC diff `+0.047619`, CI `[-0.037055, 0.125878]`; AP diff `+0.110304`, CI `[-0.086075, 0.273455]`.
+- Slice audit shows the remaining high-risk failure mode is `public_contact_or_url_noise`: the clean domain-balanced score mean is `0.620560` with max `0.958353` on six negative rows, so Step 15 remains a ranking/audit candidate generator rather than proof-level identity evidence.
 - Step 15 v2 changes:
   - identity-only curriculum is promoted to the clean primary candidate because the first-pass evidence-type multitask head was not supported by fixed-test results;
   - multitask remains as an ablation, not the main claim;
@@ -26,7 +31,7 @@ Updated: 2026-06-02
   - `step15_v2_identity_only_curriculum_target_only / phase0 / seed 20260320`;
   - `step15_v2_identity_only_curriculum_warm_start / phase0+phase1 / seed 20260320`, confirming `initialization = warm_start` for phase1 and `standardizer_source = warm_start_final_phase_train`.
 - Smoke artifacts were deleted after validation so they cannot be mistaken for complete Linux results.
-- Required next action: sync code/config/doc changes to Linux, run the full Step 15 v2 matrix, rerun Step 12 v2, then generate Step 15 v2 slice-level audit. Step 11 should still not consume Step 15 until fixed-test and slice-level evidence justify it.
+- Required next action: keep Step 15 v2 as the current best clean point-estimate method, but do not route it into Step 11 as a proof-level discovery scorer until a Step 11 integration plan explicitly addresses the `public_contact_or_url_noise` false-positive slice.
 
 `2026-06-02` evidence-type incremental hard-negative method branch initialized:
 
@@ -704,7 +709,7 @@ The active evidence currently supports:
 - `core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct` is the current clean Step 11 discovery candidate family; `core_few_shot_bge_m3_residual_lr_ratio_100pct` and `core_few_shot_labse_lr_l2_ratio_100pct` are current clean controls
 - `core_zero_shot_bge_m3` remains the conservative zero-shot anchor/control and now falls back to its pairwise selected graph threshold `0.483444`
 - Step 11 dynamic Step 9 candidate filtering is backend-aware, so residual/logistic scorer artifacts are not rejected by LightGBM-only iteration guards
-- Step 12 fixed-test robustness audit now exists: `scripts/step12_statistical_robustness_audit.py` with policy `schema/step12_statistical_robustness_policy.json`; outputs are `reports/step12_statistical_robustness_zh_test_20260513.json`, `reports/step12_statistical_robustness_model_metrics_20260513.csv`, and `reports/step12_statistical_robustness_paired_comparisons_20260513.csv`
+- Step 12 fixed-test robustness audit now exists: `scripts/step12_statistical_robustness_audit.py` with policy `schema/step12_statistical_robustness_policy.json`; current outputs are `reports/step12_v2_statistical_robustness_zh_test_20260602.json`, `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`, and `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
 - Step 12 keeps fixed `zh_test = 106` rows (`21` positive / `85` negative) and uses grouped bootstrap over `39` Step 5 split components; it does not mix `zh_train`, `zh_valid`, and `zh_test`
 - RABot-inspired method branches are now encoded for the next rerun: Step 9 positive-pair mixup as training-only minority regularization, and Step 11 relation reliability filtering as a deterministic spurious-edge control
 - targeted Step 5 boundary-expansion and positive-anchor routes now exist for testing whether a larger Chinese support/test boundary helps few-shot adaptation
@@ -728,11 +733,11 @@ The active evidence does not yet support:
 - treating `121394 || 435064 || 95895` as a confirmed LR/L2 same-controller core
 - treating template-clone or semantic-only Step 11 clusters as final same-controller rings
 - merging identifier-augmented control results into the clean cross-lingual few-shot claim
-- claiming the current clean E5 LR/L2 few-shot line statistically robustly beats raw E5 semantic ranking on the fixed `zh_test`; Step 12 finds E5 LR/L2 seed-mean vs raw E5 ROC-AUC diff `+0.012325` with grouped 95% CI `[-0.108240, 0.147650]`, and AP diff `+0.019920` with CI `[-0.251152, 0.326280]`
+- claiming the current clean Step 15 v2 line statistically robustly beats raw E5 semantic ranking on the fixed `zh_test`; Step 12 v2 finds `step15_v2_identity_from_scratch_phase4_seed_mean` vs raw E5 ROC-AUC diff `+0.082913` with grouped 95% CI `[-0.076627, 0.250000]`, and AP diff `+0.178725` with CI `[-0.176207, 0.466066]`
 
 ## Recommended Next Actions
 
-1. Use `reports/step12_statistical_robustness_zh_test_20260513.json/csv` as the current statistical evidence for Step 7/9 pairwise claims; report few-shot gains as modest and uncertainty-bounded against raw semantic baselines.
+1. Use `reports/step12_v2_statistical_robustness_zh_test_20260602.json/csv` as the current statistical evidence for Step 7/9/15 pairwise claims; report Step 15 v2 gains as strong point-estimate improvements but still uncertainty-bounded against raw semantic baselines.
 2. Use `reports/step11_current_manifest_20260424.json` as the authoritative current Step 11 allow-list; do not glob `reports/step11_*` files.
 3. Use `reports/step11_cluster_level_audit.current_20260424.csv/json` as the current cluster-level audit; it was built from summary `output_paths` only and classifies cluster evidence by direct identifier/contact, partial anchor, template clone, semantic topic, or uncertain.
 4. Use the 2026-04-23 Step 3 high-precision parser outputs as audit evidence, but do not refreeze Step 5 unless a future review queue contains new reviewed labels.

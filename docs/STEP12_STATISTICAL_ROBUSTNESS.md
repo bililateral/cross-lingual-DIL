@@ -1,10 +1,10 @@
 # Step 12: Statistical Robustness
 
-Status: current-boundary fixed `zh_test` robustness audit completed locally on `2026-05-13`; this page records the grouped bootstrap and paired-comparison result for the `2026-04-23` active Step 5 boundary.
+Status: current-boundary fixed `zh_test` robustness audit updated on `2026-06-02`; this page records the grouped bootstrap and paired-comparison result for the `2026-04-23` active Step 5 boundary plus Step 15 v2 evidence-type curriculum scorers.
 
 ## Role
 
-Step 12 turns the current Step 7 / Step 9 point estimates into uncertainty-aware reporting evidence.
+Step 12 turns the current Step 7 / Step 9 / Step 15 point estimates into uncertainty-aware reporting evidence.
 
 It does not:
 
@@ -18,7 +18,7 @@ It does:
 - keep the fixed `zh_target_strict` test split
 - resample by Step 5 `split_component_id`
 - report 95% grouped bootstrap confidence intervals
-- run paired bootstrap comparisons against raw semantic and Step 7 fusion baselines
+- run paired bootstrap comparisons against raw semantic, Step 7 fusion, Step 9 adaptation, and Step 15 v2 curriculum baselines
 
 ## Inputs
 
@@ -28,6 +28,7 @@ It does:
 - pair features: `reports/step7_pair_features.zh_target_strict.csv`
 - Step 7 prediction CSVs for current clean / identifier controls
 - Step 9 prediction CSVs for current E5 LR/L2, BGE residual, LaBSE LR/L2, and identifier operational controls
+- Step 15 v2 prediction CSVs for identity-only curriculum, domain-balanced, target/source-only, mixup-scope, multitask ablation, and identifier operational controls
 
 ## Fixed Test Container
 
@@ -43,65 +44,69 @@ The bootstrap unit is `split_component_id`, not individual edge rows. This keeps
 
 ## Outputs
 
-- summary: `reports/step12_statistical_robustness_zh_test_20260513.json`
-- model metrics: `reports/step12_statistical_robustness_model_metrics_20260513.csv`
-- paired comparisons: `reports/step12_statistical_robustness_paired_comparisons_20260513.csv`
+- summary: `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
+- model metrics: `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`
+- paired comparisons: `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
 
 ## Current Metric Reading
 
 Key ROC-AUC readings:
 
-- `step9_e5_lr_l2_50pct_seed_mean`: observed `0.819048`, 95% grouped CI `[0.701728, 0.916886]`
-- `step9_bge_m3_residual_lr_100pct_seed_mean`: observed `0.817367`, CI `[0.726018, 0.914507]`
+- `step15_v2_domain_balanced_phase4_seed_mean`: observed `0.901401`, CI `[0.797735, 0.968098]`
+- `step15_v2_identity_from_scratch_phase4_seed_mean`: observed `0.889636`, CI `[0.775385, 0.963048]`
+- `step15_v2_zh_positive_mixup_phase4_seed_mean`: observed `0.892997`, CI `[0.784912, 0.965366]`
+- `step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean`: observed `0.842017`, CI `[0.720812, 0.928571]`
 - `raw_e5_cosine`: observed `0.806723`, CI `[0.638524, 0.916667]`
 - `raw_labse_cosine`: observed `0.806162`, CI `[0.708636, 0.906667]`
 - `raw_bge_m3_cosine`: observed `0.783754`, CI `[0.624193, 0.936095]`
-- `step7_core_zero_shot_bge_m3`: observed `0.601681`, CI `[0.420804, 0.819306]`
-- `step7_core_zero_shot_default`: observed `0.588235`, CI `[0.410808, 0.819153]`
 
 Key average-precision readings:
 
-- `step9_e5_lr_l2_50pct_seed_mean`: observed `0.540494`, CI `[0.301265, 0.763798]`
+- `step15_v2_identifier_operational_phase4_seed_mean`: observed `0.745849`, CI `[0.479067, 0.906404]`
+- `step15_v2_domain_balanced_phase4_seed_mean`: observed `0.714371`, CI `[0.390322, 0.905488]`
+- `step15_v2_identity_from_scratch_phase4_seed_mean`: observed `0.699299`, CI `[0.421039, 0.884818]`
+- `step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean`: observed `0.588995`, CI `[0.275049, 0.836304]`
 - `raw_e5_cosine`: observed `0.520573`, CI `[0.220730, 0.745153]`
 - `raw_labse_cosine`: observed `0.518581`, CI `[0.296728, 0.711879]`
-- `step9_identifier_augmented_lr_l2_100pct_seed_mean`: observed `0.647686`, CI `[0.347406, 0.866396]`
 
-Identifier-augmented AP remains the strongest operational AP point estimate, but it is not a clean transfer-safe scientific line.
+The identifier operational control has the strongest AP point estimate, but it uses direct identifier features and is not the clean transfer-safe scientific mainline.
 
 ## Paired Comparisons
 
-Primary clean E5 LR/L2 seed-mean versus raw E5:
+Primary clean Step 15 v2 seed-mean versus raw E5:
 
-- ROC-AUC diff: `+0.012325`, 95% CI `[-0.108240, 0.147650]`, bootstrap sign p `0.736800`
-- AP diff: `+0.019920`, 95% CI `[-0.251152, 0.326280]`, bootstrap sign p `0.805600`
+- ROC-AUC diff: `+0.082913`, 95% CI `[-0.076627, 0.250000]`, bootstrap sign p `0.269200`
+- AP diff: `+0.178725`, 95% CI `[-0.176207, 0.466066]`, bootstrap sign p `0.268800`
 
-Primary clean E5 LR/L2 seed-mean versus Step 7 BGE fusion:
+Primary clean Step 15 v2 versus Step 9 mixup 100pct:
 
-- ROC-AUC diff: `+0.217367`, 95% CI `[-0.005893, 0.382821]`, bootstrap sign p `0.053200`
-- AP diff: `+0.091733`, 95% CI `[-0.094190, 0.391933]`, bootstrap sign p `0.168400`
+- ROC-AUC diff: `+0.047619`, 95% CI `[-0.037055, 0.125878]`, bootstrap sign p `0.232800`
+- AP diff: `+0.110304`, 95% CI `[-0.086075, 0.273455]`, bootstrap sign p `0.252000`
 
-Primary clean E5 LR/L2 seed-mean versus Step 7 default fusion:
+Other important comparisons:
 
-- ROC-AUC diff: `+0.230812`, 95% CI `[-0.011315, 0.400449]`, bootstrap sign p `0.060000`
-- AP diff: `+0.091946`, 95% CI `[-0.093644, 0.406710]`, bootstrap sign p `0.163600`
-
-Other clean controls:
-
-- BGE residual vs raw BGE: ROC-AUC diff `+0.033613`, CI `[-0.140493, 0.176280]`
-- LaBSE LR/L2 vs raw LaBSE: ROC-AUC diff `-0.006723`, CI `[-0.092913, 0.073583]`
-- identifier operational vs raw E5: AP diff `+0.127113`, CI `[-0.278566, 0.523619]`
+- Step 15 v2 domain-balanced vs from-scratch: ROC-AUC diff `+0.011765`, CI `[-0.033585, 0.053476]`; AP diff `+0.015072`, CI `[-0.108300, 0.074526]`
+- Step 15 v2 identifier operational vs clean primary: ROC-AUC diff `-0.006723`, CI `[-0.063915, 0.060250]`; AP diff `+0.046550`, CI `[-0.083281, 0.221741]`
+- Step 9 mixup 100pct vs Step 7 default fusion: ROC-AUC diff `+0.253782`, CI `[0.018175, 0.410672]`
 
 ## Interpretation
 
-The current Step 12 result supports a cautious reading:
+The current Step 12 v2 result supports a cautious reading:
 
-- Step 9 E5 LR/L2 is a useful clean graph-triage scorer and has a better point estimate than raw E5.
-- The grouped bootstrap interval for E5 LR/L2 versus raw E5 crosses zero, so the project should not claim a statistically robust improvement over raw E5 on the current fixed `zh_test`.
-- E5 LR/L2 strongly improves over the collapsed Step 7 fusion point estimate, but grouped CIs still barely cross zero because the fixed test split has only `21` positives across dependent seller components.
-- The correct paper wording is therefore: few-shot LR/L2 repairs the collapsed fusion baseline and provides a useful graph-triage surface, while the strongest clean claim against raw semantic baselines remains modest and statistically uncertain under grouped bootstrap.
+- Step 15 v2 provides the strongest current clean point estimates, especially the domain-balanced control.
+- The grouped bootstrap intervals for Step 15 v2 primary versus raw E5 and versus Step 9 mixup 100pct still cross zero, so the project should not claim statistically robust superiority on the current fixed `zh_test`.
+- Domain-balanced is a useful clean control, but its improvement over from-scratch is also not statistically separable under paired grouped bootstrap.
+- The correct paper wording is therefore: evidence-type incremental hard-negative learning gives a strong and coherent point-estimate improvement, but publication claims must remain uncertainty-bounded unless more positive test evidence or external validation reduces the grouped-bootstrap uncertainty.
 
 ## Run Command
 
 ```bash
-python scripts/step12_statistical_robustness_audit.py --resamples 5000
+python scripts/step12_statistical_robustness_audit.py \
+  --labels reports/step5_zh_target_strict_frozen_silver_labels.csv \
+  --features reports/step7_pair_features.zh_target_strict.csv \
+  --resamples 5000 \
+  --seed 20260513 \
+  --output-json reports/step12_v2_statistical_robustness_zh_test_20260602.json \
+  --output-metrics reports/step12_v2_statistical_robustness_model_metrics_20260602.csv \
+  --output-comparisons reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv
 ```
