@@ -1,0 +1,2037 @@
+{
+  "reviewer_id": "codex_en_source_expansion_topup_review_20260421",
+  "review_timestamp_local": "2026-04-21T20:09:12",
+  "policy_path": "schema\\step5_en_source_expansion_topup_policy.json",
+  "queue_path": "reports\\step5_en_source_expansion_topup_queue.20260421.csv",
+  "reviewed_row_count": 220,
+  "label_counts": {
+    "uncertain": 162,
+    "positive": 2,
+    "negative": 56
+  },
+  "rule_counts": {
+    "contact_not_seller_facing_enough": 104,
+    "email_product_data_ambiguous": 3,
+    "contact_inside_product_or_victim_data": 13,
+    "text_clone_without_identity_closure": 36,
+    "alias_related_text_clone_positive": 2,
+    "public_or_product_template_clone": 2,
+    "generic_placeholder_hard_negative": 20,
+    "public_template_hard_negative": 8,
+    "alias_related_hard_negative_uncertain": 4,
+    "same_topic_no_identity_anchor_hard_negative": 28
+  },
+  "bucket_label_counts": {
+    "seller_facing_identifier_primary": {
+      "uncertain": 120
+    },
+    "strong_text_clone_positive_probe": {
+      "uncertain": 38,
+      "positive": 2
+    },
+    "english_hard_negative_template_probe": {
+      "negative": 56,
+      "uncertain": 4
+    }
+  },
+  "rubric": {
+    "positive": [
+      "Shared PGP fingerprint.",
+      "Shared seller-facing Telegram/Wickr/phone/IM/contact handle with support from cloned text, structural overlap, or coherent seller profile context.",
+      "Shared email only when clearly presented as seller contact and not as product/victim/sample account data.",
+      "Strong text-clone rows only when alias relation, migration wording, or seller-specific operational copy makes same-control evidence stronger than generic template reuse."
+    ],
+    "negative": [
+      "Generic placeholders such as No Item Name / No Description Specified across unrelated sellers.",
+      "High semantic overlap caused by public product descriptions, medication boilerplate, software/book templates, leaked-data field formats, or inventory templates without identity closure.",
+      "Shared contact parser artifacts or product sample credentials, not seller identity."
+    ],
+    "uncertain": [
+      "Strong content overlap without seller-specific identity closure.",
+      "Emails, URLs, account credentials, or phone-like tokens embedded in product/victim data.",
+      "Text clones that may be reseller/template reuse but cannot be confidently separated from same-controller reuse."
+    ]
+  },
+  "reviewed_rows": [
+    {
+      "en_source_expansion_rank": "1",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:gennexlabs||market_item.xlsx|silk road 3.1|seller_raw:welcuredrugs",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "gennexlabs",
+      "source_seller_raw_right": "welcuredrugs"
+    },
+    {
+      "en_source_expansion_rank": "2",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Rozaydaplug||market_item.xlsx|agartha market|seller_raw:willson99",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Rozaydaplug",
+      "source_seller_raw_right": "willson99"
+    },
+    {
+      "en_source_expansion_rank": "3",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:gennexlabs||market_item.xlsx|silk road 3.1|seller_raw:ssdsolution",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "gennexlabs",
+      "source_seller_raw_right": "ssdsolution"
+    },
+    {
+      "en_source_expansion_rank": "4",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:anshumala||market_item.xlsx|silk road 3.1|seller_raw:kome",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "anshumala",
+      "source_seller_raw_right": "kome"
+    },
+    {
+      "en_source_expansion_rank": "5",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:forthefallen||market_item.xlsx|Lime|seller_raw:lizardpro",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "forthefallen",
+      "source_seller_raw_right": "lizardpro"
+    },
+    {
+      "en_source_expansion_rank": "6",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Benzopharma||market_item.xlsx|dark0de|seller_raw:coady2011",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Benzopharma",
+      "source_seller_raw_right": "coady2011"
+    },
+    {
+      "en_source_expansion_rank": "7",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:HappyHarry78||market_item.xlsx|silk road 3.1|seller_raw:hotdog26",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "HappyHarry78",
+      "source_seller_raw_right": "hotdog26"
+    },
+    {
+      "en_source_expansion_rank": "8",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Legitsales||market_item.xlsx|agartha market|seller_raw:private",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Legitsales",
+      "source_seller_raw_right": "private"
+    },
+    {
+      "en_source_expansion_rank": "9",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:anshumala||market_item.xlsx|silk road 3.1|seller_raw:vagi",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "anshumala",
+      "source_seller_raw_right": "vagi"
+    },
+    {
+      "en_source_expansion_rank": "10",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Counterfeitking2013||market_item.xlsx|silk road 3.1|seller_raw:ibuyuk",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Counterfeitking2013",
+      "source_seller_raw_right": "ibuyuk"
+    },
+    {
+      "en_source_expansion_rank": "11",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:makershop||market_item.xlsx|agartha market|seller_raw:private",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "makershop",
+      "source_seller_raw_right": "private"
+    },
+    {
+      "en_source_expansion_rank": "12",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Thegoatman||market_item.xlsx|agartha market|seller_raw:lizardpro",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Thegoatman",
+      "source_seller_raw_right": "lizardpro"
+    },
+    {
+      "en_source_expansion_rank": "13",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Kojak (97%)||market_item.xlsx|apollon market|seller_raw:Ondemand (100%)",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "email_product_data_ambiguous",
+      "source_seller_raw_left": "Kojak (97%)",
+      "source_seller_raw_right": "Ondemand (100%)"
+    },
+    {
+      "en_source_expansion_rank": "14",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Lowkey||market_item.xlsx|agartha market|seller_raw:davidesales",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Lowkey",
+      "source_seller_raw_right": "davidesales"
+    },
+    {
+      "en_source_expansion_rank": "15",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:kome||market_item.xlsx|silk road 3.1|seller_raw:lorialex903",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "kome",
+      "source_seller_raw_right": "lorialex903"
+    },
+    {
+      "en_source_expansion_rank": "16",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Kojak (97%)||market_item.xlsx|dark0de|seller_raw:princeharry",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "email_product_data_ambiguous",
+      "source_seller_raw_left": "Kojak (97%)",
+      "source_seller_raw_right": "princeharry"
+    },
+    {
+      "en_source_expansion_rank": "17",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:kome||market_item.xlsx|silk road 3.1|seller_raw:vagi",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "kome",
+      "source_seller_raw_right": "vagi"
+    },
+    {
+      "en_source_expansion_rank": "18",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:drugcenter||market_item.xlsx|agartha market|seller_raw:legit1",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "drugcenter",
+      "source_seller_raw_right": "legit1"
+    },
+    {
+      "en_source_expansion_rank": "19",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Ondemand (100%)||market_item.xlsx|dark0de|seller_raw:kojak",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "Ondemand (100%)",
+      "source_seller_raw_right": "kojak"
+    },
+    {
+      "en_source_expansion_rank": "20",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:CannaCare||market_item.xlsx|agartha market|seller_raw:Legitsales",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "CannaCare",
+      "source_seller_raw_right": "Legitsales"
+    },
+    {
+      "en_source_expansion_rank": "21",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Counterfeitking2013||market_item.xlsx|silk road 3.1|seller_raw:stokeontrent",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Counterfeitking2013",
+      "source_seller_raw_right": "stokeontrent"
+    },
+    {
+      "en_source_expansion_rank": "22",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Antoniowalls||market_item.xlsx|silk road 3.1|seller_raw:cyrus8888",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Antoniowalls",
+      "source_seller_raw_right": "cyrus8888"
+    },
+    {
+      "en_source_expansion_rank": "23",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Rickwoodopoids||market_item.xlsx|silk road 3.1|seller_raw:cocainelord110",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Rickwoodopoids",
+      "source_seller_raw_right": "cocainelord110"
+    },
+    {
+      "en_source_expansion_rank": "24",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:legit1||market_item.xlsx|agartha market|seller_raw:vendor_men",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "legit1",
+      "source_seller_raw_right": "vendor_men"
+    },
+    {
+      "en_source_expansion_rank": "25",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:IAim2Please||market_item.xlsx|silk road 3.1|seller_raw:c0nsumedbyc0ntent",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "IAim2Please",
+      "source_seller_raw_right": "c0nsumedbyc0ntent"
+    },
+    {
+      "en_source_expansion_rank": "26",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:fastsupplies||market_item.xlsx|silk road 3.1|seller_raw:gunguy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "fastsupplies",
+      "source_seller_raw_right": "gunguy"
+    },
+    {
+      "en_source_expansion_rank": "27",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Stokiebuyer||market_item.xlsx|silk road 3.1|seller_raw:gunman2013",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Stokiebuyer",
+      "source_seller_raw_right": "gunman2013"
+    },
+    {
+      "en_source_expansion_rank": "28",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:gunman2013||market_item.xlsx|silk road 3.1|seller_raw:stokeontrent",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "gunman2013",
+      "source_seller_raw_right": "stokeontrent"
+    },
+    {
+      "en_source_expansion_rank": "29",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:Aliance||market_item.xlsx|darkfox market|seller_raw:Aliancepro",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Aliance",
+      "source_seller_raw_right": "Aliancepro"
+    },
+    {
+      "en_source_expansion_rank": "30",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:ssdsolution||market_item.xlsx|silk road 3.1|seller_raw:welcuredrugs",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "ssdsolution",
+      "source_seller_raw_right": "welcuredrugs"
+    },
+    {
+      "en_source_expansion_rank": "31",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:drugcenter||market_item.xlsx|agartha market|seller_raw:vendor_men",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "drugcenter",
+      "source_seller_raw_right": "vendor_men"
+    },
+    {
+      "en_source_expansion_rank": "32",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:gunman2013||market_item.xlsx|silk road 3.1|seller_raw:ibuyuk",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "gunman2013",
+      "source_seller_raw_right": "ibuyuk"
+    },
+    {
+      "en_source_expansion_rank": "33",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:mark64812ATgmail||market_item.xlsx|silk road 3.1|seller_raw:markwhite",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "mark64812ATgmail",
+      "source_seller_raw_right": "markwhite"
+    },
+    {
+      "en_source_expansion_rank": "34",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:davidesales||market_item.xlsx|darkfox market|seller_raw:soluctionman",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "davidesales",
+      "source_seller_raw_right": "soluctionman"
+    },
+    {
+      "en_source_expansion_rank": "35",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Legithustle420||market_item.xlsx|darkfox market|seller_raw:ahemweedshop",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "Legithustle420",
+      "source_seller_raw_right": "ahemweedshop"
+    },
+    {
+      "en_source_expansion_rank": "36",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Killerpains||market_item.xlsx|silk road 3.1|seller_raw:darkwebpartners",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Killerpains",
+      "source_seller_raw_right": "darkwebpartners"
+    },
+    {
+      "en_source_expansion_rank": "37",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:lorialex903||market_item.xlsx|silk road 3.1|seller_raw:vatsal",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "lorialex903",
+      "source_seller_raw_right": "vatsal"
+    },
+    {
+      "en_source_expansion_rank": "38",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Shwanski||market_item.xlsx|silk road 3.1|seller_raw:dmonice",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Shwanski",
+      "source_seller_raw_right": "dmonice"
+    },
+    {
+      "en_source_expansion_rank": "39",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:DOSEPLUGS||market_item.xlsx|Lime|seller_raw:michaeldean",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "DOSEPLUGS",
+      "source_seller_raw_right": "michaeldean"
+    },
+    {
+      "en_source_expansion_rank": "40",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Drmeds||market_item.xlsx|silk road 3.1|seller_raw:macfish114",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Drmeds",
+      "source_seller_raw_right": "macfish114"
+    },
+    {
+      "en_source_expansion_rank": "41",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:dozy1992||market_item.xlsx|agartha market|seller_raw:private",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "dozy1992",
+      "source_seller_raw_right": "private"
+    },
+    {
+      "en_source_expansion_rank": "42",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:anshumala||market_item.xlsx|silk road 3.1|seller_raw:vatsalmedsgmailcom",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "anshumala",
+      "source_seller_raw_right": "vatsalmedsgmailcom"
+    },
+    {
+      "en_source_expansion_rank": "43",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:lorialex903||market_item.xlsx|silk road 3.1|seller_raw:vatsalmedsgmailcom",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "lorialex903",
+      "source_seller_raw_right": "vatsalmedsgmailcom"
+    },
+    {
+      "en_source_expansion_rank": "44",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Aliancepro||market_item.xlsx|darkfox market|seller_raw:Hassan",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "email_product_data_ambiguous",
+      "source_seller_raw_left": "Aliancepro",
+      "source_seller_raw_right": "Hassan"
+    },
+    {
+      "en_source_expansion_rank": "45",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:chemzy3813||market_item.xlsx|agartha market|seller_raw:vendor_men",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "chemzy3813",
+      "source_seller_raw_right": "vendor_men"
+    },
+    {
+      "en_source_expansion_rank": "46",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Ortegameds||market_item.xlsx|agartha market|seller_raw:blackhathacker",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Ortegameds",
+      "source_seller_raw_right": "blackhathacker"
+    },
+    {
+      "en_source_expansion_rank": "47",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:dongreenplug||market_item.xlsx|darkfox market|seller_raw:drdacky11",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "dongreenplug",
+      "source_seller_raw_right": "drdacky11"
+    },
+    {
+      "en_source_expansion_rank": "48",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:fastsupplies||market_item.xlsx|silk road 3.1|seller_raw:shilpameds",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "fastsupplies",
+      "source_seller_raw_right": "shilpameds"
+    },
+    {
+      "en_source_expansion_rank": "49",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Movingtrain||market_item.xlsx|agartha market|seller_raw:Royalstore",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Movingtrain",
+      "source_seller_raw_right": "Royalstore"
+    },
+    {
+      "en_source_expansion_rank": "50",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:STOKECITY||market_item.xlsx|silk road 3.1|seller_raw:stokeontrent",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "STOKECITY",
+      "source_seller_raw_right": "stokeontrent"
+    },
+    {
+      "en_source_expansion_rank": "51",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:brother_hood||market_item.xlsx|cypher market|seller_raw:trusteelucky",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "brother_hood",
+      "source_seller_raw_right": "trusteelucky"
+    },
+    {
+      "en_source_expansion_rank": "52",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Mrroxy||market_item.xlsx|silk road 3.1|seller_raw:ssdsolution",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Mrroxy",
+      "source_seller_raw_right": "ssdsolution"
+    },
+    {
+      "en_source_expansion_rank": "53",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:thimasnow||market_item.xlsx|darkfox market|seller_raw:soluctionman",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "thimasnow",
+      "source_seller_raw_right": "soluctionman"
+    },
+    {
+      "en_source_expansion_rank": "54",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:grandmaster||market_item.xlsx|agartha market|seller_raw:Lordpharma",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "grandmaster",
+      "source_seller_raw_right": "Lordpharma"
+    },
+    {
+      "en_source_expansion_rank": "55",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:niketeam (98%)||market_item.xlsx|apollon market|seller_raw:weedcity (100%)",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "niketeam (98%)",
+      "source_seller_raw_right": "weedcity (100%)"
+    },
+    {
+      "en_source_expansion_rank": "56",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:thimasnow||market_item.xlsx|darkfox market|seller_raw:CARDVENDOR",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "thimasnow",
+      "source_seller_raw_right": "CARDVENDOR"
+    },
+    {
+      "en_source_expansion_rank": "57",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Hackman4all||market_item.xlsx|agartha market|seller_raw:Ortegameds",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "Hackman4all",
+      "source_seller_raw_right": "Ortegameds"
+    },
+    {
+      "en_source_expansion_rank": "58",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Ondemand (100%)||market_item.xlsx|dark0de|seller_raw:princeharry",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Ondemand (100%)",
+      "source_seller_raw_right": "princeharry"
+    },
+    {
+      "en_source_expansion_rank": "59",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:gennexlabs||market_item.xlsx|silk road 3.1|seller_raw:gunguy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "gennexlabs",
+      "source_seller_raw_right": "gunguy"
+    },
+    {
+      "en_source_expansion_rank": "60",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:whiteheaven||market_item.xlsx|Lime|seller_raw:zulvinapills",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "whiteheaven",
+      "source_seller_raw_right": "zulvinapills"
+    },
+    {
+      "en_source_expansion_rank": "61",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:thimoty99||market_item.xlsx|darkfox market|seller_raw:drdacky11",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "thimoty99",
+      "source_seller_raw_right": "drdacky11"
+    },
+    {
+      "en_source_expansion_rank": "62",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:kalemeds||market_item.xlsx|silk road 3.1|seller_raw:vatsalmedsgmailcom",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "kalemeds",
+      "source_seller_raw_right": "vatsalmedsgmailcom"
+    },
+    {
+      "en_source_expansion_rank": "63",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Legithustle420||market_item.xlsx|agartha market|seller_raw:Megashop",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Legithustle420",
+      "source_seller_raw_right": "Megashop"
+    },
+    {
+      "en_source_expansion_rank": "64",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:michaeldean||market_item.xlsx|agartha market|seller_raw:dcthugy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "michaeldean",
+      "source_seller_raw_right": "dcthugy"
+    },
+    {
+      "en_source_expansion_rank": "65",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:bodypartsguy||market_item.xlsx|silk road 3.1|seller_raw:welcuredrugs",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "bodypartsguy",
+      "source_seller_raw_right": "welcuredrugs"
+    },
+    {
+      "en_source_expansion_rank": "66",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:ahemweedshop||market_item.xlsx|incognito|seller_raw:/vendor/tomandjerry",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "ahemweedshop",
+      "source_seller_raw_right": "/vendor/tomandjerry"
+    },
+    {
+      "en_source_expansion_rank": "67",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:grandmaster||market_item.xlsx|agartha market|seller_raw:WEEDKING01",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "grandmaster",
+      "source_seller_raw_right": "WEEDKING01"
+    },
+    {
+      "en_source_expansion_rank": "68",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:AMAZONSHOP||market_item.xlsx|agartha market|seller_raw:sanj",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "AMAZONSHOP",
+      "source_seller_raw_right": "sanj"
+    },
+    {
+      "en_source_expansion_rank": "69",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:thimasnow||market_item.xlsx|darkfox market|seller_raw:usdrill",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "thimasnow",
+      "source_seller_raw_right": "usdrill"
+    },
+    {
+      "en_source_expansion_rank": "70",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:grandmaster||market_item.xlsx|agartha market|seller_raw:Rodrigomendez",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "grandmaster",
+      "source_seller_raw_right": "Rodrigomendez"
+    },
+    {
+      "en_source_expansion_rank": "71",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:CHEMONICS||market_item.xlsx|agartha market|seller_raw:caliscoties",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "CHEMONICS",
+      "source_seller_raw_right": "caliscoties"
+    },
+    {
+      "en_source_expansion_rank": "72",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:BossAmerica||market_item.xlsx|agartha market|seller_raw:bluesstore",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "BossAmerica",
+      "source_seller_raw_right": "bluesstore"
+    },
+    {
+      "en_source_expansion_rank": "73",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:TOPMONEYMAKER (98%)||market_item.xlsx|apollon market|seller_raw:anonyps (100%)",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "TOPMONEYMAKER (98%)",
+      "source_seller_raw_right": "anonyps (100%)"
+    },
+    {
+      "en_source_expansion_rank": "74",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:kalemeds||market_item.xlsx|silk road 3.1|seller_raw:vatsal",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "kalemeds",
+      "source_seller_raw_right": "vatsal"
+    },
+    {
+      "en_source_expansion_rank": "75",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:STOKECITY||market_item.xlsx|silk road 3.1|seller_raw:Stokiebuyer",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "STOKECITY",
+      "source_seller_raw_right": "Stokiebuyer"
+    },
+    {
+      "en_source_expansion_rank": "76",
+      "pair_uid": "market_item.xlsx|cypher market|seller_raw:Raperholic||market_item.xlsx|cypher market|seller_raw:trusteelucky",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Raperholic",
+      "source_seller_raw_right": "trusteelucky"
+    },
+    {
+      "en_source_expansion_rank": "77",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Biopharmacy||market_item.xlsx|silk road 3.1|seller_raw:Nickybeverly110",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Biopharmacy",
+      "source_seller_raw_right": "Nickybeverly110"
+    },
+    {
+      "en_source_expansion_rank": "78",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:ketplug||market_item.xlsx|agartha market|seller_raw:Rodrigomendez",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "ketplug",
+      "source_seller_raw_right": "Rodrigomendez"
+    },
+    {
+      "en_source_expansion_rank": "79",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Legithustle420||market_item.xlsx|agartha market|seller_raw:worldfaka",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "Legithustle420",
+      "source_seller_raw_right": "worldfaka"
+    },
+    {
+      "en_source_expansion_rank": "80",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:caliscoties||market_item.xlsx|agartha market|seller_raw:kaiserplug",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "caliscoties",
+      "source_seller_raw_right": "kaiserplug"
+    },
+    {
+      "en_source_expansion_rank": "81",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Biopharmacy||market_item.xlsx|silk road 3.1|seller_raw:BECKYAMANPOUR",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Biopharmacy",
+      "source_seller_raw_right": "BECKYAMANPOUR"
+    },
+    {
+      "en_source_expansion_rank": "82",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Santiago||market_item.xlsx|agartha market|seller_raw:ProGlobalSam",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Santiago",
+      "source_seller_raw_right": "ProGlobalSam"
+    },
+    {
+      "en_source_expansion_rank": "83",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:vagi||market_item.xlsx|silk road 3.1|seller_raw:vatsal",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "vagi",
+      "source_seller_raw_right": "vatsal"
+    },
+    {
+      "en_source_expansion_rank": "84",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:alexcookerr||market_item.xlsx|Lime|seller_raw:tomandjerry1",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "alexcookerr",
+      "source_seller_raw_right": "tomandjerry1"
+    },
+    {
+      "en_source_expansion_rank": "85",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:STOKECITY||market_item.xlsx|silk road 3.1|seller_raw:iselluk",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "STOKECITY",
+      "source_seller_raw_right": "iselluk"
+    },
+    {
+      "en_source_expansion_rank": "86",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:davidesales||market_item.xlsx|darkfox market|seller_raw:CARDVENDOR",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "davidesales",
+      "source_seller_raw_right": "CARDVENDOR"
+    },
+    {
+      "en_source_expansion_rank": "87",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:princeharry||market_item.xlsx|silk road 3.1|seller_raw:prohack",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "princeharry",
+      "source_seller_raw_right": "prohack"
+    },
+    {
+      "en_source_expansion_rank": "88",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:ketplug||market_item.xlsx|agartha market|seller_raw:truu00",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "ketplug",
+      "source_seller_raw_right": "truu00"
+    },
+    {
+      "en_source_expansion_rank": "89",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:sokeplug||market_item.xlsx|agartha market|seller_raw:Legitwhite",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "sokeplug",
+      "source_seller_raw_right": "Legitwhite"
+    },
+    {
+      "en_source_expansion_rank": "90",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Lordpharma||market_item.xlsx|agartha market|seller_raw:everready",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Lordpharma",
+      "source_seller_raw_right": "everready"
+    },
+    {
+      "en_source_expansion_rank": "91",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:worldfaka||market_item.xlsx|darkfox market|seller_raw:ahemweedshop",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "worldfaka",
+      "source_seller_raw_right": "ahemweedshop"
+    },
+    {
+      "en_source_expansion_rank": "92",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:zulvinapills||market_item.xlsx|agartha market|seller_raw:Bestplug",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "zulvinapills",
+      "source_seller_raw_right": "Bestplug"
+    },
+    {
+      "en_source_expansion_rank": "93",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:soniabrito44||market_item.xlsx|silk road 3.1|seller_raw:sinaloacartel",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "soniabrito44",
+      "source_seller_raw_right": "sinaloacartel"
+    },
+    {
+      "en_source_expansion_rank": "94",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:bestdealer||market_item.xlsx|silk road 3.1|seller_raw:cyrus8888",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "bestdealer",
+      "source_seller_raw_right": "cyrus8888"
+    },
+    {
+      "en_source_expansion_rank": "95",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:ketplug||market_item.xlsx|agartha market|seller_raw:WEEDKING01",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "ketplug",
+      "source_seller_raw_right": "WEEDKING01"
+    },
+    {
+      "en_source_expansion_rank": "96",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:Apavlik2plug||market_item.xlsx|vice city|seller_raw:Jackwilldogs",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Apavlik2plug",
+      "source_seller_raw_right": "Jackwilldogs"
+    },
+    {
+      "en_source_expansion_rank": "97",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:frankDuke||market_item.xlsx|silk road 3.1|seller_raw:dope903",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "frankDuke",
+      "source_seller_raw_right": "dope903"
+    },
+    {
+      "en_source_expansion_rank": "98",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:AMGOLD||market_item.xlsx|agartha market|seller_raw:Ammagold",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "AMGOLD",
+      "source_seller_raw_right": "Ammagold"
+    },
+    {
+      "en_source_expansion_rank": "99",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Major_Distributor||market_item.xlsx|agartha market|seller_raw:USA_PITCHER",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Major_Distributor",
+      "source_seller_raw_right": "USA_PITCHER"
+    },
+    {
+      "en_source_expansion_rank": "100",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Santiago||market_item.xlsx|darkfox market|seller_raw:Hassan",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Santiago",
+      "source_seller_raw_right": "Hassan"
+    },
+    {
+      "en_source_expansion_rank": "101",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Mrroxy||market_item.xlsx|silk road 3.1|seller_raw:gunguy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Mrroxy",
+      "source_seller_raw_right": "gunguy"
+    },
+    {
+      "en_source_expansion_rank": "102",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Mrroxy||market_item.xlsx|silk road 3.1|seller_raw:shilpameds",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Mrroxy",
+      "source_seller_raw_right": "shilpameds"
+    },
+    {
+      "en_source_expansion_rank": "103",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:michael||market_item.xlsx|agartha market|seller_raw:dcthugy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "michael",
+      "source_seller_raw_right": "dcthugy"
+    },
+    {
+      "en_source_expansion_rank": "104",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:AMAZONSHOP||market_item.xlsx|agartha market|seller_raw:Fragy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "AMAZONSHOP",
+      "source_seller_raw_right": "Fragy"
+    },
+    {
+      "en_source_expansion_rank": "105",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:frankDuke||market_item.xlsx|silk road 3.1|seller_raw:mark7000",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "frankDuke",
+      "source_seller_raw_right": "mark7000"
+    },
+    {
+      "en_source_expansion_rank": "106",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Damason||market_item.xlsx|agartha market|seller_raw:dragonman32",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Damason",
+      "source_seller_raw_right": "dragonman32"
+    },
+    {
+      "en_source_expansion_rank": "107",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Micheal555||market_item.xlsx|silk road 3.1|seller_raw:bodypartsguy",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Micheal555",
+      "source_seller_raw_right": "bodypartsguy"
+    },
+    {
+      "en_source_expansion_rank": "108",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Budboos||market_item.xlsx|Lime|seller_raw:michaeldean",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Budboos",
+      "source_seller_raw_right": "michaeldean"
+    },
+    {
+      "en_source_expansion_rank": "109",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Benzopharma||market_item.xlsx|incognito|seller_raw:/vendor/vinicius12",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Benzopharma",
+      "source_seller_raw_right": "/vendor/vinicius12"
+    },
+    {
+      "en_source_expansion_rank": "110",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:johnstone||market_item.xlsx|agartha market|seller_raw:Thomastruth",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "johnstone",
+      "source_seller_raw_right": "Thomastruth"
+    },
+    {
+      "en_source_expansion_rank": "111",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:chris023||market_item.xlsx|silk road 3.1|seller_raw:CokeGuru",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "chris023",
+      "source_seller_raw_right": "CokeGuru"
+    },
+    {
+      "en_source_expansion_rank": "112",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:whiteheaven||market_item.xlsx|agartha market|seller_raw:Bestplug",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "whiteheaven",
+      "source_seller_raw_right": "Bestplug"
+    },
+    {
+      "en_source_expansion_rank": "113",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:Lowkey||market_item.xlsx|agartha market|seller_raw:rhizosciences",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Lowkey",
+      "source_seller_raw_right": "rhizosciences"
+    },
+    {
+      "en_source_expansion_rank": "114",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:WhiteEnigma||market_item.xlsx|darkfox market|seller_raw:dotzero",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_inside_product_or_victim_data",
+      "source_seller_raw_left": "WhiteEnigma",
+      "source_seller_raw_right": "dotzero"
+    },
+    {
+      "en_source_expansion_rank": "115",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Cleo710||market_item.xlsx|agartha market|seller_raw:jimmydalot",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "Cleo710",
+      "source_seller_raw_right": "jimmydalot"
+    },
+    {
+      "en_source_expansion_rank": "116",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:DONMAN50000||market_item.xlsx|silk road 3.1|seller_raw:CokeGuru",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "DONMAN50000",
+      "source_seller_raw_right": "CokeGuru"
+    },
+    {
+      "en_source_expansion_rank": "117",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:brother_hood||market_item.xlsx|cypher market|seller_raw:Raperholic",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "brother_hood",
+      "source_seller_raw_right": "Raperholic"
+    },
+    {
+      "en_source_expansion_rank": "118",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:jimmydalot||market_item.xlsx|darkfox market|seller_raw:Doncarlo",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "jimmydalot",
+      "source_seller_raw_right": "Doncarlo"
+    },
+    {
+      "en_source_expansion_rank": "119",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:drdacky11||market_item.xlsx|silk road 3.1|seller_raw:Hateparker",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "drdacky11",
+      "source_seller_raw_right": "Hateparker"
+    },
+    {
+      "en_source_expansion_rank": "120",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:programmers||market_item.xlsx|agartha market|seller_raw:Thegoatman",
+      "target_bucket": "seller_facing_identifier_primary",
+      "review_label": "uncertain",
+      "rule_id": "contact_not_seller_facing_enough",
+      "source_seller_raw_left": "programmers",
+      "source_seller_raw_right": "Thegoatman"
+    },
+    {
+      "en_source_expansion_rank": "121",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:NightlifeKings (99%)||market_item.xlsx|versus market|seller_raw:AmphetamineCowboys",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "NightlifeKings (99%)",
+      "source_seller_raw_right": "AmphetamineCowboys"
+    },
+    {
+      "en_source_expansion_rank": "122",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Schneider||market_item.xlsx|tor2door market|seller_raw:cokespecialist",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Schneider",
+      "source_seller_raw_right": "cokespecialist"
+    },
+    {
+      "en_source_expansion_rank": "123",
+      "pair_uid": "market_item.xlsx|vice city|seller_raw:RamashkaCC||market_item.xlsx|vice city|seller_raw:Sputnik706",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "RamashkaCC",
+      "source_seller_raw_right": "Sputnik706"
+    },
+    {
+      "en_source_expansion_rank": "124",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:sixxzeros||market_item.xlsx|darkfox market|seller_raw:dotzero",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "sixxzeros",
+      "source_seller_raw_right": "dotzero"
+    },
+    {
+      "en_source_expansion_rank": "125",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:drugs-bunny (99%)||market_item.xlsx|apollon market|seller_raw:snow-white (100%)",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "drugs-bunny (99%)",
+      "source_seller_raw_right": "snow-white (100%)"
+    },
+    {
+      "en_source_expansion_rank": "126",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:Dimma||market_item.xlsx|silk road 3.1|seller_raw:Mirando",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Dimma",
+      "source_seller_raw_right": "Mirando"
+    },
+    {
+      "en_source_expansion_rank": "127",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:pringless555||market_item.xlsx|versus market|seller_raw:pringles555",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "pringless555",
+      "source_seller_raw_right": "pringles555"
+    },
+    {
+      "en_source_expansion_rank": "128",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Chrisdaniel||market_item.xlsx|silk road 3.1|seller_raw:Donaldsilk",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Chrisdaniel",
+      "source_seller_raw_right": "Donaldsilk"
+    },
+    {
+      "en_source_expansion_rank": "129",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:highsierra||market_item.xlsx|vice city|seller_raw:Highsierraranch",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "highsierra",
+      "source_seller_raw_right": "Highsierraranch"
+    },
+    {
+      "en_source_expansion_rank": "130",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Tig3r (90%)||market_item.xlsx|apollon market|seller_raw:infinity2019 (100%)",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Tig3r (90%)",
+      "source_seller_raw_right": "infinity2019 (100%)"
+    },
+    {
+      "en_source_expansion_rank": "131",
+      "pair_uid": "market_item.xlsx|darkfox market|seller_raw:premierpharma||market_item.xlsx|versus market|seller_raw:stealthmedsuk",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "premierpharma",
+      "source_seller_raw_right": "stealthmedsuk"
+    },
+    {
+      "en_source_expansion_rank": "132",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:DerFeinschmecker (100%)||market_item.xlsx|darkfox market|seller_raw:Feinschmecker",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "positive",
+      "rule_id": "alias_related_text_clone_positive",
+      "source_seller_raw_left": "DerFeinschmecker (100%)",
+      "source_seller_raw_right": "Feinschmecker"
+    },
+    {
+      "en_source_expansion_rank": "133",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:likeseun||market_item.xlsx|silk road 3.1|seller_raw:theopenmind",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "likeseun",
+      "source_seller_raw_right": "theopenmind"
+    },
+    {
+      "en_source_expansion_rank": "134",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:BlueMoonMorning (100%)||market_item.xlsx|apollon market|seller_raw:greenpirate (100%)",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "BlueMoonMorning (100%)",
+      "source_seller_raw_right": "greenpirate (100%)"
+    },
+    {
+      "en_source_expansion_rank": "135",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:PharmaWorldUK||market_item.xlsx|versus market|seller_raw:ldnexpert",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "PharmaWorldUK",
+      "source_seller_raw_right": "ldnexpert"
+    },
+    {
+      "en_source_expansion_rank": "136",
+      "pair_uid": "market_item.xlsx|cypher market|seller_raw:Pinoccio||market_item.xlsx|dark0de|seller_raw:pinoccio77",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Pinoccio",
+      "source_seller_raw_right": "pinoccio77"
+    },
+    {
+      "en_source_expansion_rank": "137",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:mark7000||market_item.xlsx|silk road 3.1|seller_raw:maryjohanna",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "mark7000",
+      "source_seller_raw_right": "maryjohanna"
+    },
+    {
+      "en_source_expansion_rank": "138",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Gecko (100%)||market_item.xlsx|dark0de|seller_raw:gecko123",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Gecko (100%)",
+      "source_seller_raw_right": "gecko123"
+    },
+    {
+      "en_source_expansion_rank": "139",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:everready||market_item.xlsx|agartha market|seller_raw:fivestarlegit",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "everready",
+      "source_seller_raw_right": "fivestarlegit"
+    },
+    {
+      "en_source_expansion_rank": "140",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:Hilfiger||market_item.xlsx|dark0de|seller_raw:pillsdr",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Hilfiger",
+      "source_seller_raw_right": "pillsdr"
+    },
+    {
+      "en_source_expansion_rank": "141",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:rightshop||market_item.xlsx|agartha market|seller_raw:smack112",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "rightshop",
+      "source_seller_raw_right": "smack112"
+    },
+    {
+      "en_source_expansion_rank": "142",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Moneymover007||market_item.xlsx|silk road 3.1|seller_raw:QuantichR",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Moneymover007",
+      "source_seller_raw_right": "QuantichR"
+    },
+    {
+      "en_source_expansion_rank": "143",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Karky (100%)||market_item.xlsx|tor2door market|seller_raw:DARKNOOB",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Karky (100%)",
+      "source_seller_raw_right": "DARKNOOB"
+    },
+    {
+      "en_source_expansion_rank": "144",
+      "pair_uid": "market_item.xlsx|cypher market|seller_raw:sococreations||market_item.xlsx|dark0de|seller_raw:sococreationsco",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "sococreations",
+      "source_seller_raw_right": "sococreationsco"
+    },
+    {
+      "en_source_expansion_rank": "145",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:amazon8888||market_item.xlsx|silk road 3.1|seller_raw:maxcell5555",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "amazon8888",
+      "source_seller_raw_right": "maxcell5555"
+    },
+    {
+      "en_source_expansion_rank": "146",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:brandon77||market_item.xlsx|darkfox market|seller_raw:MOLADVI",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "brandon77",
+      "source_seller_raw_right": "MOLADVI"
+    },
+    {
+      "en_source_expansion_rank": "147",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:pabloescobar007||market_item.xlsx|agartha market|seller_raw:swisstreet",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "pabloescobar007",
+      "source_seller_raw_right": "swisstreet"
+    },
+    {
+      "en_source_expansion_rank": "148",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Karky (100%)||market_item.xlsx|apollon market|seller_raw:greatwhite (100%)",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Karky (100%)",
+      "source_seller_raw_right": "greatwhite (100%)"
+    },
+    {
+      "en_source_expansion_rank": "149",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:ChokoLoko||market_item.xlsx|silk road 3.1|seller_raw:Moneyman22",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "ChokoLoko",
+      "source_seller_raw_right": "Moneyman22"
+    },
+    {
+      "en_source_expansion_rank": "150",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:Walgreens||market_item.xlsx|agartha market|seller_raw:fivestarlegit",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Walgreens",
+      "source_seller_raw_right": "fivestarlegit"
+    },
+    {
+      "en_source_expansion_rank": "151",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:themoons||market_item.xlsx|vice city|seller_raw:Perfectway",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "themoons",
+      "source_seller_raw_right": "Perfectway"
+    },
+    {
+      "en_source_expansion_rank": "152",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:CCSELL||market_item.xlsx|silk road 3.1|seller_raw:CCSELL123",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "CCSELL",
+      "source_seller_raw_right": "CCSELL123"
+    },
+    {
+      "en_source_expansion_rank": "153",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:Ketaminedomestic||market_item.xlsx|vice city|seller_raw:Suriv01",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "Ketaminedomestic",
+      "source_seller_raw_right": "Suriv01"
+    },
+    {
+      "en_source_expansion_rank": "154",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:cicinaty (98%)||market_item.xlsx|darkfox market|seller_raw:procarder2",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "cicinaty (98%)",
+      "source_seller_raw_right": "procarder2"
+    },
+    {
+      "en_source_expansion_rank": "155",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:bestgroup1 (100%)||market_item.xlsx|dark0de|seller_raw:monsterlabstore",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "bestgroup1 (100%)",
+      "source_seller_raw_right": "monsterlabstore"
+    },
+    {
+      "en_source_expansion_rank": "156",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:twinkle (96%)||market_item.xlsx|vice city|seller_raw:Flexowned",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "public_or_product_template_clone",
+      "source_seller_raw_left": "twinkle (96%)",
+      "source_seller_raw_right": "Flexowned"
+    },
+    {
+      "en_source_expansion_rank": "157",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:lloydspharma||market_item.xlsx|dark0de|seller_raw:lloydspharma1",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "positive",
+      "rule_id": "alias_related_text_clone_positive",
+      "source_seller_raw_left": "lloydspharma",
+      "source_seller_raw_right": "lloydspharma1"
+    },
+    {
+      "en_source_expansion_rank": "158",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:QuantichR||market_item.xlsx|silk road 3.1|seller_raw:endofmypain",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "QuantichR",
+      "source_seller_raw_right": "endofmypain"
+    },
+    {
+      "en_source_expansion_rank": "159",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:bennyman||market_item.xlsx|silk road 3.1|seller_raw:remijouly",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "text_clone_without_identity_closure",
+      "source_seller_raw_left": "bennyman",
+      "source_seller_raw_right": "remijouly"
+    },
+    {
+      "en_source_expansion_rank": "160",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Wellplay||market_item.xlsx|versus market|seller_raw:wealthly",
+      "target_bucket": "strong_text_clone_positive_probe",
+      "review_label": "uncertain",
+      "rule_id": "public_or_product_template_clone",
+      "source_seller_raw_left": "Wellplay",
+      "source_seller_raw_right": "wealthly"
+    },
+    {
+      "en_source_expansion_rank": "161",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:TheExpansionsLevande||market_item.xlsx|silk road 3.1|seller_raw:fluxay",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "TheExpansionsLevande",
+      "source_seller_raw_right": "fluxay"
+    },
+    {
+      "en_source_expansion_rank": "162",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:fluxay||market_item.xlsx|silk road 3.1|seller_raw:janmolen",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "fluxay",
+      "source_seller_raw_right": "janmolen"
+    },
+    {
+      "en_source_expansion_rank": "163",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:fluxay||market_item.xlsx|silk road 3.1|seller_raw:johnsenasss666",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "fluxay",
+      "source_seller_raw_right": "johnsenasss666"
+    },
+    {
+      "en_source_expansion_rank": "164",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:TheExpansionsLevande||market_item.xlsx|silk road 3.1|seller_raw:caug",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "TheExpansionsLevande",
+      "source_seller_raw_right": "caug"
+    },
+    {
+      "en_source_expansion_rank": "165",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:asimpleuser||market_item.xlsx|silk road 3.1|seller_raw:caug",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "asimpleuser",
+      "source_seller_raw_right": "caug"
+    },
+    {
+      "en_source_expansion_rank": "166",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:caug||market_item.xlsx|silk road 3.1|seller_raw:janmolen",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "caug",
+      "source_seller_raw_right": "janmolen"
+    },
+    {
+      "en_source_expansion_rank": "167",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:TheExpansionsLevande||market_item.xlsx|silk road 3.1|seller_raw:t2delrosario2",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "TheExpansionsLevande",
+      "source_seller_raw_right": "t2delrosario2"
+    },
+    {
+      "en_source_expansion_rank": "168",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:janmolen||market_item.xlsx|silk road 3.1|seller_raw:t2delrosario2",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "janmolen",
+      "source_seller_raw_right": "t2delrosario2"
+    },
+    {
+      "en_source_expansion_rank": "169",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:johnsenasss666||market_item.xlsx|silk road 3.1|seller_raw:t2delrosario2",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "johnsenasss666",
+      "source_seller_raw_right": "t2delrosario2"
+    },
+    {
+      "en_source_expansion_rank": "170",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:melvinbankz||market_item.xlsx|darkfox market|seller_raw:fraudbuddy",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "melvinbankz",
+      "source_seller_raw_right": "fraudbuddy"
+    },
+    {
+      "en_source_expansion_rank": "171",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:melvinbankz||market_item.xlsx|versus market|seller_raw:fraudbuddy",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "melvinbankz",
+      "source_seller_raw_right": "fraudbuddy"
+    },
+    {
+      "en_source_expansion_rank": "172",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:MickeyMouseNL (96%)||market_item.xlsx|vice city|seller_raw:MickeyMouseNLL",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "uncertain",
+      "rule_id": "alias_related_hard_negative_uncertain",
+      "source_seller_raw_left": "MickeyMouseNL (96%)",
+      "source_seller_raw_right": "MickeyMouseNLL"
+    },
+    {
+      "en_source_expansion_rank": "173",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:CardMoneyPro||market_item.xlsx|silk road 3.1|seller_raw:jebak123",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "CardMoneyPro",
+      "source_seller_raw_right": "jebak123"
+    },
+    {
+      "en_source_expansion_rank": "174",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:bestgroup||market_item.xlsx|silk road 3.1|seller_raw:bralle",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "bestgroup",
+      "source_seller_raw_right": "bralle"
+    },
+    {
+      "en_source_expansion_rank": "175",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:mcpickles||market_item.xlsx|silk road 3.1|seller_raw:vartanxd",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "mcpickles",
+      "source_seller_raw_right": "vartanxd"
+    },
+    {
+      "en_source_expansion_rank": "176",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Sk8rkid779||market_item.xlsx|silk road 3.1|seller_raw:anonionmys6",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Sk8rkid779",
+      "source_seller_raw_right": "anonionmys6"
+    },
+    {
+      "en_source_expansion_rank": "177",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:LILpump305 (100%)||market_item.xlsx|apollon market|seller_raw:Xanos (100%)",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "LILpump305 (100%)",
+      "source_seller_raw_right": "Xanos (100%)"
+    },
+    {
+      "en_source_expansion_rank": "178",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:fedex||market_item.xlsx|vice city|seller_raw:AudiRS7",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "fedex",
+      "source_seller_raw_right": "AudiRS7"
+    },
+    {
+      "en_source_expansion_rank": "179",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Weedangel1||market_item.xlsx|silk road 3.1|seller_raw:luckyweed",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Weedangel1",
+      "source_seller_raw_right": "luckyweed"
+    },
+    {
+      "en_source_expansion_rank": "180",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:IAim2Please||market_item.xlsx|silk road 3.1|seller_raw:reloadedudjtjvxr",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "IAim2Please",
+      "source_seller_raw_right": "reloadedudjtjvxr"
+    },
+    {
+      "en_source_expansion_rank": "181",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Ahero||market_item.xlsx|silk road 3.1|seller_raw:camelstate",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Ahero",
+      "source_seller_raw_right": "camelstate"
+    },
+    {
+      "en_source_expansion_rank": "182",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Bnnemannen||market_item.xlsx|silk road 3.1|seller_raw:camelstate",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Bnnemannen",
+      "source_seller_raw_right": "camelstate"
+    },
+    {
+      "en_source_expansion_rank": "183",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:FABIUS007||market_item.xlsx|silk road 3.1|seller_raw:camelstate",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "FABIUS007",
+      "source_seller_raw_right": "camelstate"
+    },
+    {
+      "en_source_expansion_rank": "184",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Junky10||market_item.xlsx|silk road 3.1|seller_raw:junky02",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "uncertain",
+      "rule_id": "alias_related_hard_negative_uncertain",
+      "source_seller_raw_left": "Junky10",
+      "source_seller_raw_right": "junky02"
+    },
+    {
+      "en_source_expansion_rank": "185",
+      "pair_uid": "market_item.xlsx|Cartel|seller_raw:fraudbuddy||market_item.xlsx|Cartel|seller_raw:melvinbankz",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "fraudbuddy",
+      "source_seller_raw_right": "melvinbankz"
+    },
+    {
+      "en_source_expansion_rank": "186",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Mouncer96||market_item.xlsx|silk road 3.1|seller_raw:hamma1",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "Mouncer96",
+      "source_seller_raw_right": "hamma1"
+    },
+    {
+      "en_source_expansion_rank": "187",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:DutchXMDMAX||market_item.xlsx|silk road 3.1|seller_raw:MollyMadness",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "DutchXMDMAX",
+      "source_seller_raw_right": "MollyMadness"
+    },
+    {
+      "en_source_expansion_rank": "188",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Benjo||market_item.xlsx|silk road 3.1|seller_raw:chani",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "Benjo",
+      "source_seller_raw_right": "chani"
+    },
+    {
+      "en_source_expansion_rank": "189",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:Colombiandrugz (100%)||market_item.xlsx|dark0de|seller_raw:colombiandrug",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "uncertain",
+      "rule_id": "alias_related_hard_negative_uncertain",
+      "source_seller_raw_left": "Colombiandrugz (100%)",
+      "source_seller_raw_right": "colombiandrug"
+    },
+    {
+      "en_source_expansion_rank": "190",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:premiumaccounts||market_item.xlsx|silk road 3.1|seller_raw:zymo",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "premiumaccounts",
+      "source_seller_raw_right": "zymo"
+    },
+    {
+      "en_source_expansion_rank": "191",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:luckyy7||market_item.xlsx|silk road 3.1|seller_raw:KingKongNL",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "luckyy7",
+      "source_seller_raw_right": "KingKongNL"
+    },
+    {
+      "en_source_expansion_rank": "192",
+      "pair_uid": "market_item.xlsx|tor2door market|seller_raw:ddprovider||market_item.xlsx|vice city|seller_raw:Lordsheng",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "ddprovider",
+      "source_seller_raw_right": "Lordsheng"
+    },
+    {
+      "en_source_expansion_rank": "193",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:2GD4DN (100%)||market_item.xlsx|dark0de|seller_raw:yourgirlmolly",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "2GD4DN (100%)",
+      "source_seller_raw_right": "yourgirlmolly"
+    },
+    {
+      "en_source_expansion_rank": "194",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:gocash||market_item.xlsx|vice city|seller_raw:Guthguth",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "gocash",
+      "source_seller_raw_right": "Guthguth"
+    },
+    {
+      "en_source_expansion_rank": "195",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Kiros666||market_item.xlsx|silk road 3.1|seller_raw:mcpickles",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Kiros666",
+      "source_seller_raw_right": "mcpickles"
+    },
+    {
+      "en_source_expansion_rank": "196",
+      "pair_uid": "market_item.xlsx|Lime|seller_raw:sweetNtreat||market_item.xlsx|cannazon market|seller_raw:Weed365",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "sweetNtreat",
+      "source_seller_raw_right": "Weed365"
+    },
+    {
+      "en_source_expansion_rank": "197",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:FeltonJohn||market_item.xlsx|silk road 3.1|seller_raw:smarttiger",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "FeltonJohn",
+      "source_seller_raw_right": "smarttiger"
+    },
+    {
+      "en_source_expansion_rank": "198",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:newosasuna||market_item.xlsx|silk road 3.1|seller_raw:osasuna",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "uncertain",
+      "rule_id": "alias_related_hard_negative_uncertain",
+      "source_seller_raw_left": "newosasuna",
+      "source_seller_raw_right": "osasuna"
+    },
+    {
+      "en_source_expansion_rank": "199",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:DrawkwarDAccounts||market_item.xlsx|silk road 3.1|seller_raw:thebuffalo",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "DrawkwarDAccounts",
+      "source_seller_raw_right": "thebuffalo"
+    },
+    {
+      "en_source_expansion_rank": "200",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:dddprovider||market_item.xlsx|dark0de|seller_raw:lordsheng",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "dddprovider",
+      "source_seller_raw_right": "lordsheng"
+    },
+    {
+      "en_source_expansion_rank": "201",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:ldnexpert||market_item.xlsx|versus market|seller_raw:PharmaWorldUK",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "ldnexpert",
+      "source_seller_raw_right": "PharmaWorldUK"
+    },
+    {
+      "en_source_expansion_rank": "202",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:kkarolekk12||market_item.xlsx|silk road 3.1|seller_raw:whistle1221",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "kkarolekk12",
+      "source_seller_raw_right": "whistle1221"
+    },
+    {
+      "en_source_expansion_rank": "203",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:monoko (99%)||market_item.xlsx|apollon market|seller_raw:trooper941 (100%)",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "monoko (99%)",
+      "source_seller_raw_right": "trooper941 (100%)"
+    },
+    {
+      "en_source_expansion_rank": "204",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:c2c22||market_item.xlsx|tor2door market|seller_raw:VEVO",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "c2c22",
+      "source_seller_raw_right": "VEVO"
+    },
+    {
+      "en_source_expansion_rank": "205",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:polinomi2||market_item.xlsx|silk road 3.1|seller_raw:sevomllik",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "polinomi2",
+      "source_seller_raw_right": "sevomllik"
+    },
+    {
+      "en_source_expansion_rank": "206",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:DrawkwarDAccounts||market_item.xlsx|silk road 3.1|seller_raw:thugdos",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "DrawkwarDAccounts",
+      "source_seller_raw_right": "thugdos"
+    },
+    {
+      "en_source_expansion_rank": "207",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:dn21||market_item.xlsx|silk road 3.1|seller_raw:misaca",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "dn21",
+      "source_seller_raw_right": "misaca"
+    },
+    {
+      "en_source_expansion_rank": "208",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:TeslaTradings||market_item.xlsx|silk road 3.1|seller_raw:TransferMafia",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "TeslaTradings",
+      "source_seller_raw_right": "TransferMafia"
+    },
+    {
+      "en_source_expansion_rank": "209",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:misaca||market_item.xlsx|silk road 3.1|seller_raw:thebuffalo",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "misaca",
+      "source_seller_raw_right": "thebuffalo"
+    },
+    {
+      "en_source_expansion_rank": "210",
+      "pair_uid": "market_item.xlsx|dark0de|seller_raw:tiktokcc||market_item.xlsx|darkfox market|seller_raw:ramashkaCC",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "tiktokcc",
+      "source_seller_raw_right": "ramashkaCC"
+    },
+    {
+      "en_source_expansion_rank": "211",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:jacob077342||market_item.xlsx|silk road 3.1|seller_raw:mandiz",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "jacob077342",
+      "source_seller_raw_right": "mandiz"
+    },
+    {
+      "en_source_expansion_rank": "212",
+      "pair_uid": "market_item.xlsx|agartha market|seller_raw:blueheavens||market_item.xlsx|agartha market|seller_raw:lizardpro",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "blueheavens",
+      "source_seller_raw_right": "lizardpro"
+    },
+    {
+      "en_source_expansion_rank": "213",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:megaup||market_item.xlsx|silk road 3.1|seller_raw:reg0rk",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "megaup",
+      "source_seller_raw_right": "reg0rk"
+    },
+    {
+      "en_source_expansion_rank": "214",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:karmic01110||market_item.xlsx|silk road 3.1|seller_raw:underdog1955",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "karmic01110",
+      "source_seller_raw_right": "underdog1955"
+    },
+    {
+      "en_source_expansion_rank": "215",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:candirose||market_item.xlsx|silk road 3.1|seller_raw:libertasgoods2",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "candirose",
+      "source_seller_raw_right": "libertasgoods2"
+    },
+    {
+      "en_source_expansion_rank": "216",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:markjonson||market_item.xlsx|silk road 3.1|seller_raw:wondas500",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "markjonson",
+      "source_seller_raw_right": "wondas500"
+    },
+    {
+      "en_source_expansion_rank": "217",
+      "pair_uid": "market_item.xlsx|apollon market|seller_raw:ProVendor (100%)||market_item.xlsx|silk road 3.1|seller_raw:SouthernSpecial",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "ProVendor (100%)",
+      "source_seller_raw_right": "SouthernSpecial"
+    },
+    {
+      "en_source_expansion_rank": "218",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Qwerty8520||market_item.xlsx|silk road 3.1|seller_raw:lomskipystinqk",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "generic_placeholder_hard_negative",
+      "source_seller_raw_left": "Qwerty8520",
+      "source_seller_raw_right": "lomskipystinqk"
+    },
+    {
+      "en_source_expansion_rank": "219",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:WillyWonka1||market_item.xlsx|silk road 3.1|seller_raw:prettyshemale",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "same_topic_no_identity_anchor_hard_negative",
+      "source_seller_raw_left": "WillyWonka1",
+      "source_seller_raw_right": "prettyshemale"
+    },
+    {
+      "en_source_expansion_rank": "220",
+      "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:SKuszHk||market_item.xlsx|silk road 3.1|seller_raw:imnicetoyou",
+      "target_bucket": "english_hard_negative_template_probe",
+      "review_label": "negative",
+      "rule_id": "public_template_hard_negative",
+      "source_seller_raw_left": "SKuszHk",
+      "source_seller_raw_right": "imnicetoyou"
+    }
+  ]
+}

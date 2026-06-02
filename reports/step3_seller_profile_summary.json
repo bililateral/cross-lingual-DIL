@@ -1,0 +1,178 @@
+{
+  "schema_path": "schema\\step3_seller_profile_schema.json",
+  "input_dependencies": [
+    "reports\\step2_content_item_manifest.csv",
+    "reports\\step2_split_summary.json"
+  ],
+  "profile_count_total": 13292,
+  "expected_counts_from_step2": {
+    "seller_count_by_bucket": {
+      "en_content_train_pool": 7522,
+      "zh_target_strict": 5097,
+      "zh_target_aux": 673
+    },
+    "item_count_by_bucket": {
+      "en_content_train_pool": 311019,
+      "zh_target_strict": 17556,
+      "zh_target_aux": 2104
+    }
+  },
+  "observed_counts": {
+    "seller_count_by_bucket": {
+      "en_content_train_pool": 7522,
+      "zh_target_strict": 5097,
+      "zh_target_aux": 673
+    },
+    "item_count_by_bucket": {
+      "en_content_train_pool": 311019,
+      "zh_target_strict": 17556,
+      "zh_target_aux": 2104
+    },
+    "profiles_with_contacts_by_bucket": {
+      "en_content_train_pool": 984,
+      "zh_target_strict": 836,
+      "zh_target_aux": 10
+    },
+    "profiles_with_parsed_price_by_bucket": {
+      "en_content_train_pool": 7491,
+      "zh_target_strict": 5097,
+      "zh_target_aux": 673
+    },
+    "profiles_with_signature_titles_by_bucket": {
+      "en_content_train_pool": 7519,
+      "zh_target_strict": 5096,
+      "zh_target_aux": 673
+    },
+    "profiles_with_signature_descriptions_by_bucket": {
+      "en_content_train_pool": 7232,
+      "zh_target_strict": 4773,
+      "zh_target_aux": 658
+    },
+    "profile_text_nonempty_count": 13292,
+    "profile_text_max_length": 32487
+  },
+  "item_identity_signal_summary": {
+    "output_files": {
+      "zh_target_strict": "reports\\step3_item_identity_signals.zh_target_strict.csv",
+      "en_content_train_pool": "reports\\step3_item_identity_signals.en_content_train_pool.csv",
+      "zh_target_aux": "reports\\step3_item_identity_signals.zh_target_aux.csv"
+    },
+    "signal_count_total": 298775,
+    "signal_counts_by_bucket": {
+      "en_content_train_pool": 294167,
+      "zh_target_aux": 178,
+      "zh_target_strict": 4430
+    },
+    "direct_identity_eligible_counts_by_bucket": {
+      "en_content_train_pool": 184650,
+      "zh_target_aux": 89,
+      "zh_target_strict": 1890
+    },
+    "seller_facing_counts_by_bucket": {
+      "en_content_train_pool": 253065,
+      "zh_target_aux": 106,
+      "zh_target_strict": 3300
+    },
+    "product_data_risk_counts_by_bucket": {
+      "en_content_train_pool": 67155,
+      "zh_target_aux": 43,
+      "zh_target_strict": 1844
+    },
+    "signal_counts_by_type": {
+      "external_url": 43661,
+      "email": 36652,
+      "pgp_public_key": 78,
+      "crypto_wallet": 305,
+      "wickr": 112309,
+      "phone": 62616,
+      "bat": 168,
+      "wechat": 74,
+      "jabber": 374,
+      "telegram": 42405,
+      "qq": 133
+    },
+    "direct_identity_eligible_counts_by_type": {
+      "pgp_public_key": 68,
+      "crypto_wallet": 251,
+      "email": 8741,
+      "wickr": 89746,
+      "bat": 103,
+      "jabber": 297,
+      "phone": 49485,
+      "wechat": 40,
+      "telegram": 37822,
+      "qq": 76
+    },
+    "seller_counts_by_type": {
+      "bat": 93,
+      "crypto_wallet": 51,
+      "email": 680,
+      "external_url": 1198,
+      "jabber": 39,
+      "pgp_public_key": 28,
+      "phone": 267,
+      "qq": 78,
+      "telegram": 972,
+      "wechat": 40,
+      "wickr": 390
+    },
+    "direct_identity_seller_counts_by_type": {
+      "bat": 63,
+      "crypto_wallet": 39,
+      "email": 294,
+      "jabber": 32,
+      "pgp_public_key": 24,
+      "phone": 193,
+      "qq": 43,
+      "telegram": 701,
+      "wechat": 25,
+      "wickr": 360
+    },
+    "shared_direct_token_counts_by_type": {
+      "bat": 2,
+      "crypto_wallet": 4,
+      "email": 58,
+      "jabber": 1,
+      "pgp_fingerprint": 0,
+      "pgp_public_key": 1,
+      "phone": 26,
+      "qq": 0,
+      "telegram": 31,
+      "wechat": 0,
+      "wickr": 69
+    },
+    "hard_rule": "Item-level identity signals are extraction evidence only; they are not Step 5 labels or ground truth."
+  },
+  "acceptance_checks": {
+    "seller_count_match": {
+      "zh_target_strict": true,
+      "en_content_train_pool": true,
+      "zh_target_aux": true
+    },
+    "item_count_match": {
+      "zh_target_strict": true,
+      "en_content_train_pool": true,
+      "zh_target_aux": true
+    },
+    "all_profile_text_nonempty": true
+  },
+  "residual_risks": [
+    "price_numeric_approx_stats are approximate and not currency-normalized across markets.",
+    "contact extraction uses strict context cues for phones and may under-recall some identifiers by design.",
+    "profile_text now preserves long-tail signature fields, but it is still a compressed profile rather than a full seller archive.",
+    "Item-level identity signals are parser evidence for review queues; product/victim-data risk flags must be honored before any positive labeling."
+  ],
+  "manifest_counts": {
+    "item_count_by_bucket": {
+      "zh_target_aux": 2104,
+      "en_content_train_pool": 311019,
+      "zh_target_strict": 17556
+    },
+    "seller_uids_by_bucket": null,
+    "seller_count_by_bucket": {
+      "zh_target_aux": 673,
+      "en_content_train_pool": 7522,
+      "zh_target_strict": 5097
+    }
+  }
+}

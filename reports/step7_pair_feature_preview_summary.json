@@ -1,0 +1,505 @@
+{
+  "schema_path": "schema/step7_transfer_safe_pair_feature_schema.json",
+  "input_dependencies": [
+    "reports/step3_seller_profiles.en_content_train_pool.jsonl",
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step3_seller_profiles.zh_target_aux.jsonl",
+    "reports/step4_en_silver_candidate_pairs.csv",
+    "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "reports/step4_zh_target_aux_silver_candidate_pairs.csv"
+  ],
+  "output_files": {
+    "en_content_train_pool": "reports/step7_pair_feature_preview.en_content_train_pool.csv",
+    "zh_target_strict": "reports/step7_pair_feature_preview.zh_target_strict.csv",
+    "zh_target_aux": "reports/step7_pair_feature_preview.zh_target_aux.csv"
+  },
+  "feature_views": {
+    "core_zero_shot_ready_now": [
+      "same_market_raw_bool",
+      "same_source_dataset_bool",
+      "profile_category_jaccard",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_title_idf_mean",
+      "shared_description_idf_mean",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count",
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs"
+    ],
+    "core_structural_only": [
+      "same_market_raw_bool",
+      "same_source_dataset_bool",
+      "profile_category_jaccard",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_title_idf_mean",
+      "shared_description_idf_mean",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count"
+    ],
+    "core_style_gap_only": [
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs"
+    ],
+    "core_style_gap_raw_only": [
+      "item_count_raw_gap_abs",
+      "price_median_raw_gap_abs",
+      "title_length_median_raw_gap_abs",
+      "description_length_median_raw_gap_abs",
+      "digit_ratio_mean_raw_gap_abs",
+      "punct_ratio_mean_raw_gap_abs",
+      "repeated_title_share_raw_gap_abs",
+      "repeated_description_share_raw_gap_abs",
+      "max_category_share_raw_gap_abs"
+    ],
+    "identifier_augmented": [
+      "has_shared_contact_exact",
+      "has_shared_pgp_fingerprint",
+      "shared_contact_count_capped",
+      "shared_pgp_fingerprint_count_capped"
+    ],
+    "retrieval_only": [
+      "sparse_lexical_similarity_raw",
+      "structural_support_score_raw",
+      "candidate_rule_count_raw"
+    ],
+    "future_multilingual_semantics": [
+      "embedding_cosine_gte_multilingual_base",
+      "embedding_cosine_bge_m3",
+      "embedding_cosine_multilingual_e5_large",
+      "embedding_cosine_labse",
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base",
+      "reranker_score_bge_reranker_v2_m3"
+    ],
+    "en_only_ablation": [
+      "uppercase_ratio_mean_percentile_gap_abs"
+    ],
+    "en_only_ablation_raw": [
+      "uppercase_ratio_mean_raw_gap_abs"
+    ]
+  },
+  "pool_summaries": {
+    "en_content_train_pool": {
+      "row_count": 6683,
+      "review_stratum_counts": {
+        "identifier_plus_text": 87,
+        "text_clone_primary": 3155,
+        "identifier_primary": 324,
+        "semantic_structural": 1069,
+        "semantic_only": 978,
+        "same_alias_continuity": 1070
+      },
+      "label_state_counts": {
+        "__blank__": 6683
+      },
+      "core_transfer_eligible_count": 5613,
+      "missing_rate_by_percentile_gap_feature": {
+        "item_count_percentile_gap_abs": 0.0,
+        "price_median_percentile_gap_abs": 0.009277,
+        "title_length_median_percentile_gap_abs": 0.0,
+        "description_length_median_percentile_gap_abs": 0.0,
+        "digit_ratio_mean_percentile_gap_abs": 0.0,
+        "punct_ratio_mean_percentile_gap_abs": 0.0,
+        "repeated_title_share_percentile_gap_abs": 0.0,
+        "repeated_description_share_percentile_gap_abs": 0.0,
+        "max_category_share_percentile_gap_abs": 0.0,
+        "uppercase_ratio_mean_percentile_gap_abs": 0.0
+      },
+      "missing_rate_by_raw_gap_feature": {
+        "item_count_raw_gap_abs": 0.0,
+        "price_median_raw_gap_abs": 0.009277,
+        "title_length_median_raw_gap_abs": 0.0,
+        "description_length_median_raw_gap_abs": 0.0,
+        "digit_ratio_mean_raw_gap_abs": 0.0,
+        "punct_ratio_mean_raw_gap_abs": 0.0,
+        "repeated_title_share_raw_gap_abs": 0.0,
+        "repeated_description_share_raw_gap_abs": 0.0,
+        "max_category_share_raw_gap_abs": 0.0,
+        "uppercase_ratio_mean_raw_gap_abs": 0.0
+      },
+      "top_rows": [
+        {
+          "pair_uid": "market_item.xlsx|apollon market|seller_raw:Bestbars (100%)||market_item.xlsx|apollon market|seller_raw:keranvends (100%)",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 44.13554,
+          "shared_contact_count_capped": 3
+        },
+        {
+          "pair_uid": "market_item.xlsx|agartha market|seller_raw:Rodrigomendez||market_item.xlsx|agartha market|seller_raw:truu00",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 25.970498,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|apollon market|seller_raw:MrSoSa (95%)||market_item.xlsx|darkfox market|seller_raw:MrSoSa",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 8.827108,
+          "shared_contact_count_capped": 2
+        },
+        {
+          "pair_uid": "market_item.xlsx|apollon market|seller_raw:Crownstar (100%)||market_item.xlsx|apollon market|seller_raw:Shan (100%)",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 17.366534,
+          "shared_contact_count_capped": 2
+        },
+        {
+          "pair_uid": "market_item.xlsx|Cartel|seller_raw:mr_dough||market_item.xlsx|darkfox market|seller_raw:mrdough",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 8.827108,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|versus market|seller_raw:TheBodyShops||market_item.xlsx|vice city|seller_raw:TheBodyShop",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 35.02075,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|Lime|seller_raw:dongreenplug||market_item.xlsx|Lime|seller_raw:thimoty99",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 2,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 17.654216,
+          "shared_contact_count_capped": 2
+        },
+        {
+          "pair_uid": "market_item.xlsx|agartha market|seller_raw:Daha2020||market_item.xlsx|agartha market|seller_raw:wolfhon66",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 0,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Pfizer||market_item.xlsx|silk road 3.1|seller_raw:kennedybrown",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 33.480305,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|Cartel|seller_raw:dddprovider||market_item.xlsx|tor2door market|seller_raw:ddprovider",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 4,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 25.788177,
+          "shared_contact_count_capped": 1
+        }
+      ]
+    },
+    "zh_target_strict": {
+      "row_count": 3857,
+      "review_stratum_counts": {
+        "identifier_plus_text": 13,
+        "text_clone_primary": 710,
+        "identifier_primary": 74,
+        "semantic_structural": 2294,
+        "semantic_only": 766
+      },
+      "label_state_counts": {
+        "__blank__": 3857
+      },
+      "core_transfer_eligible_count": 3851,
+      "missing_rate_by_percentile_gap_feature": {
+        "item_count_percentile_gap_abs": 0.0,
+        "price_median_percentile_gap_abs": 0.0,
+        "title_length_median_percentile_gap_abs": 0.0,
+        "description_length_median_percentile_gap_abs": 0.0,
+        "digit_ratio_mean_percentile_gap_abs": 0.0,
+        "punct_ratio_mean_percentile_gap_abs": 0.0,
+        "repeated_title_share_percentile_gap_abs": 0.0,
+        "repeated_description_share_percentile_gap_abs": 0.0,
+        "max_category_share_percentile_gap_abs": 0.0,
+        "uppercase_ratio_mean_percentile_gap_abs": 0.0
+      },
+      "missing_rate_by_raw_gap_feature": {
+        "item_count_raw_gap_abs": 0.0,
+        "price_median_raw_gap_abs": 0.0,
+        "title_length_median_raw_gap_abs": 0.0,
+        "description_length_median_raw_gap_abs": 0.0,
+        "digit_ratio_mean_raw_gap_abs": 0.0,
+        "punct_ratio_mean_raw_gap_abs": 0.0,
+        "repeated_title_share_raw_gap_abs": 0.0,
+        "repeated_description_share_raw_gap_abs": 0.0,
+        "max_category_share_raw_gap_abs": 0.0,
+        "uppercase_ratio_mean_raw_gap_abs": 0.0
+      },
+      "top_rows": [
+        {
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/449035||market_item.xlsx|茶马古道|seller_raw:/shop/461222",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 33.464282,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/454497||market_item.xlsx|茶马古道|seller_raw:/shop/454507",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 8.437991,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:167147||market_item.xlsx|中文暗网交易市场|seller_raw:65684",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 71.859999,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:564088||market_item.xlsx|茶马古道|seller_raw:/shop/9636",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 16.875982,
+          "shared_contact_count_capped": 3
+        },
+        {
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/402037||market_item.xlsx|茶马古道|seller_raw:/shop/6332",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 16.875982,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:597091||market_item.xlsx|茶马古道|seller_raw:/shop/439316",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 65.606809,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:595944||market_item.xlsx|茶马古道|seller_raw:/shop/439854",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 8.437991,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/410559||market_item.xlsx|茶马古道|seller_raw:/shop/413373",
+          "review_stratum": "identifier_plus_text",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 42.189955,
+          "shared_contact_count_capped": 1
+        },
+        {
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/397616||market_item.xlsx|茶马古道|seller_raw:/shop/398592",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 8.437991,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:573258||market_item.xlsx|茶马古道|seller_raw:/shop/455140",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 16.875982,
+          "shared_contact_count_capped": 0
+        }
+      ]
+    },
+    "zh_target_aux": {
+      "row_count": 580,
+      "review_stratum_counts": {
+        "text_clone_primary": 53,
+        "semantic_structural": 485,
+        "semantic_only": 42
+      },
+      "label_state_counts": {
+        "__blank__": 580
+      },
+      "core_transfer_eligible_count": 580,
+      "missing_rate_by_percentile_gap_feature": {
+        "item_count_percentile_gap_abs": 0.0,
+        "price_median_percentile_gap_abs": 0.0,
+        "title_length_median_percentile_gap_abs": 0.0,
+        "description_length_median_percentile_gap_abs": 0.0,
+        "digit_ratio_mean_percentile_gap_abs": 0.0,
+        "punct_ratio_mean_percentile_gap_abs": 0.0,
+        "repeated_title_share_percentile_gap_abs": 0.0,
+        "repeated_description_share_percentile_gap_abs": 0.0,
+        "max_category_share_percentile_gap_abs": 0.0,
+        "uppercase_ratio_mean_percentile_gap_abs": 0.0
+      },
+      "missing_rate_by_raw_gap_feature": {
+        "item_count_raw_gap_abs": 0.0,
+        "price_median_raw_gap_abs": 0.0,
+        "title_length_median_raw_gap_abs": 0.0,
+        "description_length_median_raw_gap_abs": 0.0,
+        "digit_ratio_mean_raw_gap_abs": 0.0,
+        "punct_ratio_mean_raw_gap_abs": 0.0,
+        "repeated_title_share_raw_gap_abs": 0.0,
+        "repeated_description_share_raw_gap_abs": 0.0,
+        "max_category_share_raw_gap_abs": 0.0,
+        "uppercase_ratio_mean_raw_gap_abs": 0.0
+      },
+      "top_rows": [
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:1880883||products_data.csv|__unknown__|seller_id:1889980",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 57.731562,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:566317||products_data.csv|__unknown__|seller_id:588456",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 6.414618,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:187565||products_data.csv|__unknown__|seller_id:49925",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 35.422752,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:425820||products_data.csv|__unknown__|seller_id:665332",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 2,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 11.981938,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:342919||products_data.csv|__unknown__|seller_id:75066",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 2,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 5.903792,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:506844||products_data.csv|__unknown__|seller_id:528850",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 3,
+          "shared_boilerplate_count": 3,
+          "shared_description_idf_sum": 27.318224,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:319180||products_data.csv|__unknown__|seller_id:65684",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 5,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 34.328826,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:28409||products_data.csv|__unknown__|seller_id:697110",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 6.126936,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:569984||products_data.csv|__unknown__|seller_id:640120",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 3,
+          "shared_description_idf_sum": 16.301367,
+          "shared_contact_count_capped": 0
+        },
+        {
+          "pair_uid": "products_data.csv|__unknown__|seller_id:504679||products_data.csv|__unknown__|seller_id:569161",
+          "review_stratum": "text_clone_primary",
+          "review_priority": "high",
+          "shared_description_count_capped": 1,
+          "shared_boilerplate_count": 0,
+          "shared_description_idf_sum": 5.903792,
+          "shared_contact_count_capped": 0
+        }
+      ]
+    }
+  },
+  "acceptance_checks": {
+    "same_alias_not_marked_core_transfer": true,
+    "all_rows_have_review_stratum": true,
+    "all_rows_have_pair_uid": true
+  }
+}

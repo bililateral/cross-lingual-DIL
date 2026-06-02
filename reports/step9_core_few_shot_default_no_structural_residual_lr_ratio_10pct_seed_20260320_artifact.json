@@ -1,0 +1,86 @@
+{
+  "standardization": {
+    "enabled": true,
+    "mean": [
+      0.122869382353,
+      0.254142441176,
+      0.226596147059,
+      0.259809529412,
+      0.227967705882,
+      0.261766852941,
+      0.004569411765,
+      0.011910970588,
+      0.403088029412,
+      0.975316058824,
+      0.701250970588
+    ],
+    "scale": [
+      0.129047874712,
+      0.198392870671,
+      0.203423143203,
+      0.201380105039,
+      0.200979794403,
+      0.225173121739,
+      0.007078902267,
+      0.019600809454,
+      0.407011197931,
+      0.018974714252,
+      0.07873463576
+    ]
+  },
+  "parameter_intercept": 1.412946973871,
+  "parameter_coefficients": [
+    0.472396030733,
+    0.155895037735,
+    0.35344213644,
+    0.069237536527,
+    0.01324053083,
+    0.416354563613,
+    -0.0876461949,
+    -0.302566517874,
+    -0.183952006416,
+    -0.170030422023,
+    0.001785139293
+  ],
+  "l2_penalty": 10.0,
+  "class_weight": "balanced",
+  "max_iter": 100,
+  "tolerance": 1e-08,
+  "solver_iterations": 6,
+  "solver_converged": true,
+  "solver_final_delta_norm": 2e-12,
+  "train_logloss": 0.738984,
+  "artifact_type": "residual_logistic",
+  "calibrator_type": "residual_logistic",
+  "scoring_backend": "residual_logistic",
+  "experiment_name": "core_few_shot_default_no_structural_residual_lr",
+  "run_key": "10pct_seed_20260320",
+  "base_step7_experiment": "core_zero_shot_default_no_structural",
+  "base_step7_model_path": "reports/step7_core_zero_shot_default_no_structural_model.txt",
+  "base_probability_clip_eps": 1e-06,
+  "feature_names": [
+    "item_count_percentile_gap_abs",
+    "price_median_percentile_gap_abs",
+    "title_length_median_percentile_gap_abs",
+    "description_length_median_percentile_gap_abs",
+    "digit_ratio_mean_percentile_gap_abs",
+    "punct_ratio_mean_percentile_gap_abs",
+    "repeated_title_share_percentile_gap_abs",
+    "repeated_description_share_percentile_gap_abs",
+    "max_category_share_percentile_gap_abs",
+    "embedding_cosine_gte_multilingual_base",
+    "reranker_score_gte_multilingual_reranker_base"
+  ],
+  "feature_mode": "default_gte",
+  "fit_split": "sampled_zh_train",
+  "train_base_probability_stats": {
+    "min": 0.072728,
+    "mean": 0.233331,
+    "max": 0.791777
+  },
+  "train_probability_stats": {
+    "min": 0.163807,
+    "mean": 0.498992,
+    "max": 0.877087
+  }
+}

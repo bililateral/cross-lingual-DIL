@@ -1,0 +1,75 @@
+{
+  "policy_path": "schema\\step2_split_policy.json",
+  "official_gold_alias_exclusion_count": 24944,
+  "strong_gold_alias_exclusion_count": 24985,
+  "strong_gold_fingerprint_exclusion_count": 19507,
+  "benchmark_manifest_counts": {
+    "tijkc3xx_rows": 38315,
+    "suspected_strong_rows": 1630,
+    "suspected_weak_rows": 9657,
+    "suspected_imposter_rows": 129
+  },
+  "auxiliary_identity_evidence_counts": {
+    "aux_pgp_rows": 22357
+  },
+  "exclusion_ledger_counts": {
+    "strong_alias_rows": 24985,
+    "expanded_alias_rows": 41
+  },
+  "benchmark_contact_counts": {
+    "benchmark_contact_values": 3,
+    "benchmark_contact_pages": 19131
+  },
+  "identity_closure": {
+    "closure_iterations": 3,
+    "expanded_alias_count": 41,
+    "strong_vendor_id_count": 31850,
+    "strong_fingerprint_short_count": 19507,
+    "strong_fingerprint_raw_count": 19507
+  },
+  "content_split_summary": {
+    "en_content_raw_item_count": 459669,
+    "en_content_eligible_item_count": 311019,
+    "en_content_excluded_alias_overlap_item_count": 147475,
+    "en_content_excluded_pgp_overlap_item_count": 0,
+    "en_content_excluded_contact_overlap_item_count": 0,
+    "en_content_excluded_non_target_cjk_item_count": 1175,
+    "zh_target_strict_item_count": 17556,
+    "zh_target_aux_item_count": 2104,
+    "zh_target_strict_by_market": {
+      "茶马古道": 8069,
+      "中文暗网交易市场": 9487
+    },
+    "en_content_raw_seller_uids": null,
+    "en_content_eligible_seller_uids": null,
+    "en_content_raw_seller_count": 11981,
+    "en_content_eligible_seller_count": 7522,
+    "en_content_postfilter_alias_overlap_count": 0,
+    "en_content_postfilter_aux_fingerprint_overlap_count": 0,
+    "en_content_prefilter_alias_overlap_count": 3873,
+    "seller_summary_counts": {
+      "en_content_eligible_sellers": 7522,
+      "excluded_alias_overlap_sellers": 4442,
+      "excluded_cjk_only_sellers": 17,
+      "zh_target_strict_sellers": 5097,
+      "zh_target_aux_sellers": 673
+    }
+  },
+  "acceptance_checks": {
+    "en_content_postfilter_alias_overlap_count": 0,
+    "en_content_postfilter_alias_overlap_pass": true,
+    "en_content_postfilter_aux_fingerprint_overlap_count": 0,
+    "en_content_postfilter_aux_fingerprint_overlap_pass": true,
+    "zh_target_strict_markets": [
+      "中文暗网交易市场",
+      "茶马古道"
+    ],
+    "products_data_bucket": "zh_target_aux"
+  },
+  "residual_risks": [
+    "Identity-closure exclusion is intentionally strict and may over-remove legitimate English content sellers linked via reused fingerprints or contacts.",
+    "CJK filtering removes the strongest observed target-language contamination, but non-CJK non-English rows are not separately filtered at this step.",
+    "Benchmark-linked contacts are extracted from local Grams HTML header regions and remain incomplete when a seller has no matching snapshot page.",
+    "products_data.csv remains auxiliary because market provenance is unresolved in the raw file."
+  ]
+}
