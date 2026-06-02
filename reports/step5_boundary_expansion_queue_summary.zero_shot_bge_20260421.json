@@ -1,0 +1,107 @@
+{
+  "queue_version": "step5_boundary_expansion_zero_shot_bge_20260421",
+  "scope": "zh_target_strict",
+  "policy_path": "schema\\step5_boundary_expansion_policy.json",
+  "active_boundary_kept_fixed": true,
+  "source_step11_summary": "reports/step11_core_zero_shot_bge_m3_clustering_summary.json",
+  "source_step11_scorer_token": "core_zero_shot_bge_m3",
+  "graph_primary_threshold": 0.56,
+  "graph_edge_filtering": {
+    "enabled": true,
+    "require_shared_neighbor_count_min": 1,
+    "reciprocal_top_k": 5,
+    "require_triangle_participation": false,
+    "shared_neighbor_pruning_mode": "iterative",
+    "shared_neighbor_pruning_max_passes": 25,
+    "shared_neighbor_pruning_passes": 2,
+    "direct_keep_threshold": null,
+    "pre_filter_edge_count": 1764,
+    "after_reciprocal_top_k_edge_count": 1559,
+    "after_shared_neighbor_edge_count": 421,
+    "after_triangle_edge_count": 1764,
+    "removed_by_reciprocal_top_k": 205,
+    "removed_by_shared_neighbor": 1138,
+    "removed_by_triangle": 0,
+    "post_filter_edge_count": 421
+  },
+  "active_review_queue_row_count": 3793,
+  "active_pending_row_count": 3418,
+  "active_frozen_row_count": 375,
+  "candidate_row_count": 3418,
+  "selected_row_count": 520,
+  "selected_bucket_counts": {
+    "positive_probe_high_semantic_high_structure": 260,
+    "negative_probe_high_semantic_style_divergence": 260
+  },
+  "selected_review_stratum_counts": {
+    "text_clone_primary": 98,
+    "semantic_structural": 302,
+    "semantic_only": 120
+  },
+  "selected_graph_filter_retained_count": 225,
+  "selected_threshold_pass_count": 384,
+  "bucket_summaries": [
+    {
+      "bucket_id": "positive_probe_high_semantic_high_structure",
+      "target_count": 260,
+      "available_count_after_prior_bucket_dedupe": 994,
+      "selected_count": 260,
+      "selected_review_stratum_counts": {
+        "text_clone_primary": 69,
+        "semantic_structural": 191
+      },
+      "selected_graph_filter_retained_count": 225,
+      "selected_threshold_pass_count": 260
+    },
+    {
+      "bucket_id": "negative_probe_high_semantic_style_divergence",
+      "target_count": 260,
+      "available_count_after_prior_bucket_dedupe": 772,
+      "selected_count": 260,
+      "selected_review_stratum_counts": {
+        "semantic_only": 120,
+        "semantic_structural": 111,
+        "text_clone_primary": 29
+      },
+      "selected_graph_filter_retained_count": 0,
+      "selected_threshold_pass_count": 124
+    }
+  ],
+  "review_guidelines": {
+    "positive": [
+      "Use positive only when the edge-level evidence supports same-controller identity, not merely shared product topic or public template reuse.",
+      "High semantic similarity and structural overlap are triage signals, not labels."
+    ],
+    "negative": [
+      "Use negative for high-semantic template-resale or public-copy rows when profile/style/business evidence points to distinct controllers.",
+      "Do not mark a row negative just because one side has sparse data; use uncertain when the evidence is insufficient."
+    ],
+    "uncertain": [
+      "Use uncertain for strong overlap without enough seller-specific identity evidence.",
+      "Use uncertain when the row is plausible same-controller but cannot be defended as a training label."
+    ]
+  },
+  "target_after_review": {
+    "minimum_new_reviewed_rows": 500,
+    "desired_total_zh_supervision_rows": 500,
+    "desired_zh_test_rows": 100,
+    "recommended_future_zh_target_strict_split_ratios": {
+      "train": 0.65,
+      "valid": 0.15,
+      "test": 0.2
+    },
+    "note": "Do not change the frozen benchmark until the boundary expansion queue is human-reviewed and copied back into the active Step 5 queue."
+  },
+  "outputs": {
+    "targeted_review_queue": "reports/step5_zh_target_strict_boundary_expansion_queue.zero_shot_bge_20260421.csv",
+    "summary": "reports/step5_boundary_expansion_queue_summary.zero_shot_bge_20260421.json",
+    "application_summary": "reports/step5_boundary_expansion_apply_summary.zero_shot_bge_20260421.json"
+  },
+  "acceptance_checks": {
+    "no_auto_labels": true,
+    "no_duplicate_pair_uid": true,
+    "all_selected_rows_pending_in_active_queue": true,
+    "no_selected_rows_in_active_frozen_labels": true,
+    "all_selected_rows_have_source_scores": true
+  }
+}

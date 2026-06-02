@@ -1,0 +1,225 @@
+{
+  "policy_path": "schema\\step5_positive_anchor_expansion_policy.json",
+  "queue_version": "step5_positive_anchor_expansion_20260421_direct_identity_v2",
+  "targeted_review_queue": "reports\\step5_zh_target_strict_positive_anchor_expansion_queue.20260421.csv",
+  "selected_row_count": 105,
+  "selected_bucket_counts": {
+    "rare_identity_with_text_overlap": 2,
+    "rare_external_url_with_text_overlap": 102,
+    "positive_component_transitive_closure": 1
+  },
+  "selected_action_counts": {
+    "append_candidate_then_review": 54,
+    "review_existing_pending_queue_row": 51
+  },
+  "selected_review_stratum_counts": {
+    "identifier_primary": 53,
+    "text_clone_primary": 37,
+    "semantic_structural": 11,
+    "semantic_only": 4
+  },
+  "source_existing_active_counts": {
+    "0": 54,
+    "1": 51
+  },
+  "source_existing_step4_counts": {
+    "0": 54,
+    "1": 51
+  },
+  "supplemental_contact_token_count": 2526,
+  "supplemental_contact_rejected_counts": {
+    "at_handle_without_contact_cue": 469,
+    "excluded_token": 603,
+    "false_positive_context": 10
+  },
+  "supplemental_contact_filter_counts": {
+    "token_frequency_outside_bounds": 2361,
+    "pair_lacks_text_or_structural_support": 68,
+    "already_selected_or_reviewed": 100
+  },
+  "active_pending_direct_identifier_rows": 0,
+  "closure_rows": 1,
+  "target_queue_size": {
+    "goal_min": 200,
+    "goal_max": 300,
+    "note": "This is a mining target, not a quota. If direct identity evidence is exhausted, the queue must remain smaller rather than dilute with generic semantic neighbors."
+  },
+  "positive_split_targets": {
+    "zh_train_positive_min": 100,
+    "zh_train_positive_preferred": 150,
+    "zh_valid_positive_min": 25,
+    "scientific_stop_rule": "If direct positive anchors cannot reach these targets, do not claim few-shot should necessarily improve AUC; report target-domain identity evidence scarcity instead."
+  },
+  "current_positive_supervision_by_split_before_review": {
+    "train": 61,
+    "test": 19,
+    "valid": 16
+  },
+  "acceptance_checks": {
+    "no_duplicate_pair_uid": true,
+    "all_selected_rows_pending_or_new": true,
+    "all_new_rows_have_candidate_fields": true
+  },
+  "top_rows": [
+    {
+      "positive_anchor_queue_rank": 1,
+      "target_bucket": "rare_identity_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:636288||market_item.xlsx|中文暗网交易市场|seller_raw:636666",
+      "anchor_token": "email:shipeijie_001@163.com",
+      "candidate_rank_score": 8.441122,
+      "review_stratum": "identifier_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 2,
+      "target_bucket": "rare_identity_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:556868||market_item.xlsx|茶马古道|seller_raw:/shop/6982",
+      "anchor_token": "email:8268545@qq.com",
+      "candidate_rank_score": 6.643928,
+      "review_stratum": "identifier_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 3,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:465763||market_item.xlsx|中文暗网交易市场|seller_raw:499990",
+      "anchor_token": "external_url:5bc08.com",
+      "candidate_rank_score": "13.12155",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 4,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:562015||market_item.xlsx|茶马古道|seller_raw:/shop/414257",
+      "anchor_token": "external_url:www.ppdai.com",
+      "candidate_rank_score": "11.786804",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 5,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:596059||market_item.xlsx|茶马古道|seller_raw:/shop/446570",
+      "anchor_token": "external_url:3376.com",
+      "candidate_rank_score": "11.370136",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 6,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605912||market_item.xlsx|茶马古道|seller_raw:/shop/446569",
+      "anchor_token": "external_url:wcai06.com",
+      "candidate_rank_score": "10.973382",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 7,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605607||market_item.xlsx|茶马古道|seller_raw:/shop/446569",
+      "anchor_token": "external_url:xc832.com",
+      "candidate_rank_score": "10.841056",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 8,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:606038||market_item.xlsx|茶马古道|seller_raw:/shop/453234",
+      "anchor_token": "external_url:ys6699.com",
+      "candidate_rank_score": "10.595882",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 9,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605878||market_item.xlsx|茶马古道|seller_raw:/shop/446570",
+      "anchor_token": "external_url:www.jj.cn",
+      "candidate_rank_score": "10.591242",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 10,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605928||market_item.xlsx|茶马古道|seller_raw:/shop/453234",
+      "anchor_token": "external_url:yj0666.com",
+      "candidate_rank_score": "10.35385",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 11,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605669||market_item.xlsx|茶马古道|seller_raw:/shop/446583",
+      "anchor_token": "external_url:950337.com",
+      "candidate_rank_score": "10.319656",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 12,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:596096||market_item.xlsx|茶马古道|seller_raw:/shop/446569",
+      "anchor_token": "external_url:xingcai168.vip",
+      "candidate_rank_score": "10.23887",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 13,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605668||market_item.xlsx|茶马古道|seller_raw:/shop/453265",
+      "anchor_token": "external_url:fxmillion.com",
+      "candidate_rank_score": "10.061846",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 14,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605663||market_item.xlsx|茶马古道|seller_raw:/shop/453265",
+      "anchor_token": "external_url:www.cfd139.com",
+      "candidate_rank_score": "10.054282",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 15,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605883||market_item.xlsx|茶马古道|seller_raw:/shop/446583",
+      "anchor_token": "external_url:www.367528.com",
+      "candidate_rank_score": "9.787448",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 16,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605876||market_item.xlsx|茶马古道|seller_raw:/shop/446583",
+      "anchor_token": "external_url:www.cyp538.com",
+      "candidate_rank_score": "9.776912",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 17,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605890||market_item.xlsx|茶马古道|seller_raw:/shop/453234",
+      "anchor_token": "external_url:5312u.com",
+      "candidate_rank_score": "9.71245",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 18,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:596066||market_item.xlsx|茶马古道|seller_raw:/shop/446567",
+      "anchor_token": "external_url:la0111.com",
+      "candidate_rank_score": "9.598816",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 19,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:596053||market_item.xlsx|茶马古道|seller_raw:/shop/446567",
+      "anchor_token": "external_url:hbs363.com",
+      "candidate_rank_score": "9.466042",
+      "review_stratum": "text_clone_primary"
+    },
+    {
+      "positive_anchor_queue_rank": 20,
+      "target_bucket": "rare_external_url_with_text_overlap",
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:603737||market_item.xlsx|茶马古道|seller_raw:/shop/453234",
+      "anchor_token": "external_url:esb1788.org",
+      "candidate_rank_score": "9.452848",
+      "review_stratum": "text_clone_primary"
+    }
+  ]
+}

@@ -1,0 +1,1560 @@
+{
+  "policy_path": "schema/step11_clustering_policy.json",
+  "input_dependencies": [
+    "reports/step7_pair_features.zh_target_strict.csv",
+    "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "reports/step7_training_summary.json",
+    "schema/step7_training_policy.json",
+    "reports/step9_few_shot_summary.json",
+    "reports/step9_calibration_summary.json"
+  ],
+  "output_paths": {
+    "scored_pairs": "reports/step11_core_zero_shot_bge_m3_zh_target_strict_scored_pairs.csv",
+    "clusters_by_threshold": {
+      "0483444": "reports/step11_core_zero_shot_bge_m3_zh_target_strict_clusters.threshold_0483444.csv",
+      "0522445": "reports/step11_core_zero_shot_bge_m3_zh_target_strict_clusters.threshold_0522445.csv"
+    },
+    "summary": "reports/step11_core_zero_shot_bge_m3_clustering_summary.json"
+  },
+  "scorer_reference": {
+    "scorer_family": "step7",
+    "summary_path": "reports/step7_training_summary.json",
+    "policy_path": "schema/step7_training_policy.json",
+    "resolved_pairwise_primary_threshold": 0.483444,
+    "resolved_graph_primary_threshold": 0.483444,
+    "resolved_graph_primary_threshold_source": "selected scorer summary::pairwise_primary_threshold",
+    "scoring_backend": "lightgbm",
+    "resolved_model_path": "reports/step7_core_zero_shot_bge_m3_model.txt",
+    "resolved_calibration_artifact_path": null,
+    "resolved_scorer_artifact_path": null
+  },
+  "selected_scorer": {
+    "default_scorer_family": "auto",
+    "default_step7_experiment_name": "core_zero_shot_bge_m3",
+    "default_step9_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
+    "default_step9_calibration_experiment_name": "core_calibrated_default",
+    "default_step9_ratio": 0.5,
+    "default_step9_seed": 20260321,
+    "requested_scorer_family": "step7",
+    "requested_step7_experiment": "core_zero_shot_bge_m3",
+    "requested_step9_experiment": null,
+    "requested_step9_ratio": null,
+    "requested_step9_seed": null,
+    "requested_step9_calibration_experiment": null,
+    "scorer_family": "step7",
+    "scorer_token": "core_zero_shot_bge_m3",
+    "source_experiment_name": "core_zero_shot_bge_m3",
+    "source_run_key": null,
+    "source_ratio": null,
+    "source_ratio_token": null,
+    "source_seed": null,
+    "scoring_backend": "lightgbm",
+    "model_path": "reports/step7_core_zero_shot_bge_m3_model.txt",
+    "calibration_artifact_path": null,
+    "scorer_artifact_path": null,
+    "calibrator_type": null,
+    "selection_mode": "explicit",
+    "dynamic_candidate_rank": null,
+    "dynamic_candidate": null,
+    "model_num_trees": 1,
+    "model_feature_names": [
+      "same_market_raw_bool",
+      "same_source_dataset_bool",
+      "profile_category_jaccard",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_title_idf_mean",
+      "shared_description_idf_mean",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count",
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs",
+      "embedding_cosine_bge_m3",
+      "reranker_score_bge_reranker_v2_m3"
+    ],
+    "pairwise_primary_threshold": 0.483444,
+    "graph_primary_threshold": 0.483444,
+    "graph_primary_threshold_source": "selected scorer summary::pairwise_primary_threshold",
+    "primary_threshold": 0.483444,
+    "thresholds": [
+      0.483444,
+      0.522445
+    ],
+    "threshold_resolution": {
+      "mode": "absolute_with_quantile_backfill",
+      "graph_primary_threshold": 0.483444,
+      "requested_sensitivity_thresholds": [
+        0.8,
+        0.9
+      ],
+      "resolved_sensitivity_thresholds": [
+        0.522445
+      ],
+      "skipped_sensitivity_thresholds": [
+        0.8,
+        0.9
+      ],
+      "quantile_backfills": [
+        {
+          "quantile": 0.95,
+          "resolved_threshold": 0.522445
+        }
+      ],
+      "score_distribution": {
+        "min": 0.476893,
+        "p05": 0.476893,
+        "p25": 0.476893,
+        "median": 0.476893,
+        "mean": 0.486129,
+        "p75": 0.489994,
+        "p95": 0.522445,
+        "max": 0.522445
+      }
+    }
+  },
+  "dynamic_mainline_candidates": {
+    "enabled": true,
+    "default_resolution_mode": "family_best",
+    "max_candidates_per_family": 12,
+    "overall_family_priority": [
+      "step9",
+      "step7"
+    ],
+    "families": {
+      "step7": {
+        "config": {
+          "clean_only": true,
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_",
+            "en_only_"
+          ],
+          "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_zero_shot_test_metrics.average_precision",
+            "zh_zero_shot_test_metrics.balanced_accuracy",
+            "trained_iteration_count"
+          ],
+          "min_best_iteration": 8,
+          "min_trained_iteration_count": 8
+        },
+        "candidate_count": 6,
+        "candidates": [
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_default_no_structural",
+            "source_experiment_name": "core_zero_shot_default_no_structural",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.623529,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.287652,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.572269,
+              "trained_iteration_count": 54.0
+            },
+            "best_iteration": 54,
+            "trained_iteration_count": 54,
+            "selected_threshold": 0.265769
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker",
+            "source_experiment_name": "core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.604482,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.366364,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.52465,
+              "trained_iteration_count": 47.0
+            },
+            "best_iteration": 47,
+            "trained_iteration_count": 47,
+            "selected_threshold": 0.304893
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_paraphrase_multilingual_mpnet",
+            "source_experiment_name": "core_zero_shot_paraphrase_multilingual_mpnet",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.557983,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.387651,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.596359,
+              "trained_iteration_count": 69.0
+            },
+            "best_iteration": 69,
+            "trained_iteration_count": 69,
+            "selected_threshold": 0.127958
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_multilingual_e5_large_plus_gte_reranker",
+            "source_experiment_name": "core_zero_shot_multilingual_e5_large_plus_gte_reranker",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.54958,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.384533,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.578711,
+              "trained_iteration_count": 65.0
+            },
+            "best_iteration": 65,
+            "trained_iteration_count": 65,
+            "selected_threshold": 0.086316
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_default_no_semantics",
+            "source_experiment_name": "core_zero_shot_default_no_semantics",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.535574,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.365896,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.527731,
+              "trained_iteration_count": 11.0
+            },
+            "best_iteration": 11,
+            "trained_iteration_count": 11,
+            "selected_threshold": 0.301678
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_default_raw_style_gap_control",
+            "source_experiment_name": "core_zero_shot_default_raw_style_gap_control",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.503641,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.325214,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.513165,
+              "trained_iteration_count": 57.0
+            },
+            "best_iteration": 57,
+            "trained_iteration_count": 57,
+            "selected_threshold": 0.07812
+          }
+        ]
+      },
+      "step9": {
+        "config": {
+          "clean_only": true,
+          "include_experiment_prefixes": [
+            "core_few_shot_multilingual_e5_large_lr_l2",
+            "core_few_shot_bge_m3_residual_lr",
+            "core_few_shot_labse_lr_l2"
+          ],
+          "exclude_experiment_names": [
+            "core_few_shot_default",
+            "core_few_shot_bge_m3"
+          ],
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_"
+          ],
+          "primary_metric_path": "zh_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_test_metrics.average_precision",
+            "zh_test_metrics.balanced_accuracy",
+            "best_iteration"
+          ],
+          "prefer_ratio_aggregate_before_run_metric": true,
+          "ratio_aggregate_primary_metric_path": "zh_test_metrics.roc_auc.mean",
+          "ratio_aggregate_secondary_metric_paths": [
+            "zh_test_metrics.average_precision.mean",
+            "zh_test_metrics.balanced_accuracy.mean"
+          ],
+          "perfect_small_test_row_count_max": 50,
+          "perfect_primary_metric_min": 0.999999,
+          "perfect_secondary_metric_path": "zh_test_metrics.roc_auc",
+          "perfect_secondary_metric_min": 0.999999,
+          "min_best_iteration": 8,
+          "min_trained_iteration_count": 8,
+          "backend_iteration_filters": {
+            "legacy_lightgbm_mixed": {
+              "min_best_iteration": 8,
+              "min_trained_iteration_count": 8,
+              "iteration_role": "lightgbm_tree_iteration"
+            },
+            "lightgbm": {
+              "min_best_iteration": 8,
+              "min_trained_iteration_count": 8,
+              "iteration_role": "lightgbm_tree_iteration"
+            },
+            "residual_logistic": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            },
+            "logistic_regression_l2": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          }
+        },
+        "candidate_count": 48,
+        "candidates": [
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "100pct_seed_20260320",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.844818,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.593742,
+              "zh_test_metrics.balanced_accuracy": 0.62521,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.720543,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.84183,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.587521,
+              "zh_test_metrics.balanced_accuracy.mean": 0.615219
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "100pct_seed_20260321",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.841457,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.589403,
+              "zh_test_metrics.balanced_accuracy": 0.613165,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.792627,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.84183,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.587521,
+              "zh_test_metrics.balanced_accuracy.mean": 0.615219
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "100pct_seed_20260322",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.839216,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.579418,
+              "zh_test_metrics.balanced_accuracy": 0.607283,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.720528,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.84183,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.587521,
+              "zh_test_metrics.balanced_accuracy.mean": 0.615219
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "50pct_seed_20260320",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.831373,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.558135,
+              "zh_test_metrics.balanced_accuracy": 0.607283,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.663659,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.824276,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.548972,
+              "zh_test_metrics.balanced_accuracy.mean": 0.59944
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "50pct_seed_20260321",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.82521,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.557788,
+              "zh_test_metrics.balanced_accuracy": 0.595518,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.666773,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.824276,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.548972,
+              "zh_test_metrics.balanced_accuracy.mean": 0.59944
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "source_run_key": "50pct_seed_20260322",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.816246,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.530994,
+              "zh_test_metrics.balanced_accuracy": 0.595518,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.62038,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.824276,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.548972,
+              "zh_test_metrics.balanced_accuracy.mean": 0.59944
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
+            "source_run_key": "50pct_seed_20260321",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.82465,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.541473,
+              "zh_test_metrics.balanced_accuracy": 0.583473,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.566787,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.818488,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.538712,
+              "zh_test_metrics.balanced_accuracy.mean": 0.587395
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
+            "source_run_key": "50pct_seed_20260320",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.819048,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.540482,
+              "zh_test_metrics.balanced_accuracy": 0.589356,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.586845,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.818488,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.538712,
+              "zh_test_metrics.balanced_accuracy.mean": 0.587395
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
+            "source_run_key": "50pct_seed_20260322",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.811765,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.53418,
+              "zh_test_metrics.balanced_accuracy": 0.589356,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.584435,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.818488,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.538712,
+              "zh_test_metrics.balanced_accuracy.mean": 0.587395
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_bge_m3_residual_lr",
+            "source_run_key": "100pct_seed_20260321",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.817367,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.515857,
+              "zh_test_metrics.balanced_accuracy": 0.595798,
+              "best_iteration": 7.0
+            },
+            "best_iteration": 7,
+            "trained_iteration_count": 7,
+            "selected_threshold": 0.759046,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.515857,
+              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "residual_logistic",
+            "scoring_backend": "residual_logistic",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_bge_m3_residual_lr",
+            "source_run_key": "100pct_seed_20260320",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.817367,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.515857,
+              "zh_test_metrics.balanced_accuracy": 0.589916,
+              "best_iteration": 7.0
+            },
+            "best_iteration": 7,
+            "trained_iteration_count": 7,
+            "selected_threshold": 0.735461,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.515857,
+              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "residual_logistic",
+            "scoring_backend": "residual_logistic",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_bge_m3_residual_lr",
+            "source_run_key": "100pct_seed_20260322",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.817367,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.515857,
+              "zh_test_metrics.balanced_accuracy": 0.589916,
+              "best_iteration": 7.0
+            },
+            "best_iteration": 7,
+            "trained_iteration_count": 7,
+            "selected_threshold": 0.735461,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.515857,
+              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+            },
+            "zh_test_row_count": 106,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "residual_logistic",
+            "scoring_backend": "residual_logistic",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          }
+        ]
+      },
+      "step9_calibration": {
+        "config": {
+          "clean_only": true,
+          "include_experiment_prefixes": [
+            "__disabled_for_current_mainline__"
+          ],
+          "exclude_experiment_prefixes": [
+            "identifier_augmented_"
+          ],
+          "primary_metric_path": "zh_test_metrics.roc_auc",
+          "secondary_metric_paths": [
+            "zh_test_metrics.average_precision",
+            "zh_test_metrics.balanced_accuracy"
+          ],
+          "max_abs_parameter_scale": 10.0
+        },
+        "candidate_count": 0,
+        "candidates": []
+      }
+    },
+    "best_overall": {
+      "scorer_family": "step9",
+      "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320",
+      "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+      "source_run_key": "100pct_seed_20260320",
+      "source_ratio": 1.0,
+      "source_ratio_token": "100pct",
+      "source_seed": 20260320,
+      "primary_metric_path": "zh_test_metrics.roc_auc",
+      "primary_metric": 0.844818,
+      "secondary_metrics": {
+        "zh_test_metrics.average_precision": 0.593742,
+        "zh_test_metrics.balanced_accuracy": 0.62521,
+        "best_iteration": 8.0
+      },
+      "best_iteration": 8,
+      "trained_iteration_count": 8,
+      "selected_threshold": 0.720543,
+      "low_ratio_guard_triggered": false,
+      "ratio_aggregate_primary_metric_mean": 0.84183,
+      "ratio_aggregate_secondary_metrics": {
+        "zh_test_metrics.average_precision.mean": 0.587521,
+        "zh_test_metrics.balanced_accuracy.mean": 0.615219
+      },
+      "zh_test_row_count": 106,
+      "suspicious_perfect_small_test": false,
+      "training_backend": "logistic_regression_l2",
+      "scoring_backend": "logistic_regression_l2",
+      "iteration_filter": {
+        "min_best_iteration": 0,
+        "min_trained_iteration_count": 0,
+        "iteration_role": "logistic_solver_iteration"
+      }
+    }
+  },
+  "graph_policy": {
+    "node_key": "seller_uid",
+    "edge_key": "pair_uid",
+    "edge_weight": "prob_positive",
+    "algorithm": "connected_components",
+    "minimum_cluster_size": 2,
+    "graph_scope": "zh_target_strict candidate-pair universe only",
+    "graph_edge_filters": {
+      "enabled": true,
+      "require_shared_neighbor_count_min": 1,
+      "reciprocal_top_k": 5,
+      "require_triangle_participation": false,
+      "shared_neighbor_pruning_mode": "iterative",
+      "shared_neighbor_pruning_max_passes": 25,
+      "relation_reliability_filter": {
+        "enabled": true,
+        "description": "Validation/rule-driven edge reliability filter inspired by spurious-edge filtering. It separates identity reliability from semantic similarity before reciprocal-top-k and shared-neighbor pruning.",
+        "minimum_score": 0.3,
+        "minimum_score_overrides": {},
+        "hard_keep_direct_identity": true,
+        "base_score": 0.2,
+        "weights": {
+          "shared_pgp_fingerprint": 0.45,
+          "shared_seller_contact": 0.35,
+          "rare_description_clone": 0.15,
+          "rare_title_clone": 0.1,
+          "rare_ngram_support": 0.08,
+          "structural_support": 0.12,
+          "style_consistency": 0.08,
+          "boilerplate_template_penalty": -0.2,
+          "semantic_topic_only_penalty": -0.25
+        },
+        "thresholds": {
+          "rare_description_idf_mean_min": 2.0,
+          "rare_title_idf_mean_min": 2.0,
+          "rare_ngram_count_min": 2.0,
+          "structural_support_min": 0.5,
+          "category_jaccard_min": 0.5,
+          "style_consistency_min": 0.72,
+          "boilerplate_ratio_max_penalty_min": 0.75,
+          "shared_boilerplate_count_penalty_min": 3.0,
+          "semantic_topic_similarity_min": 0.75
+        }
+      },
+      "direct_keep_threshold_overrides": {}
+    }
+  },
+  "universes": {
+    "seller_profile_count": 5097,
+    "pair_row_count": 3851,
+    "pair_universe_unique_seller_count": 2729,
+    "seller_profiles_not_in_candidate_universe": 2368,
+    "candidate_universe_share_of_profiles": 0.535413
+  },
+  "pair_table_diagnostics": {
+    "review_stratum_counts": {
+      "identifier_plus_text": 13,
+      "text_clone_primary": 710,
+      "identifier_primary": 74,
+      "semantic_structural": 2289,
+      "semantic_only": 765
+    },
+    "review_priority_counts": {
+      "high": 686,
+      "medium": 1564,
+      "low": 1601
+    },
+    "candidate_scope_counts": {
+      "sockpuppet_primary": 3851
+    },
+    "core_transfer_eligible_counts": {
+      "1": 3851
+    }
+  },
+  "pair_score_distribution": {
+    "min": 0.476893,
+    "p05": 0.476893,
+    "p25": 0.476893,
+    "median": 0.476893,
+    "mean": 0.486129,
+    "p75": 0.489994,
+    "p95": 0.522445,
+    "max": 0.522445
+  },
+  "relation_reliability_policy": {
+    "enabled": true,
+    "description": "Validation/rule-driven edge reliability filter inspired by spurious-edge filtering. It separates identity reliability from semantic similarity before reciprocal-top-k and shared-neighbor pruning.",
+    "minimum_score": 0.3,
+    "minimum_score_overrides": {},
+    "hard_keep_direct_identity": true,
+    "base_score": 0.2,
+    "weights": {
+      "shared_pgp_fingerprint": 0.45,
+      "shared_seller_contact": 0.35,
+      "rare_description_clone": 0.15,
+      "rare_title_clone": 0.1,
+      "rare_ngram_support": 0.08,
+      "structural_support": 0.12,
+      "style_consistency": 0.08,
+      "boilerplate_template_penalty": -0.2,
+      "semantic_topic_only_penalty": -0.25
+    },
+    "thresholds": {
+      "rare_description_idf_mean_min": 2.0,
+      "rare_title_idf_mean_min": 2.0,
+      "rare_ngram_count_min": 2.0,
+      "structural_support_min": 0.5,
+      "category_jaccard_min": 0.5,
+      "style_consistency_min": 0.72,
+      "boilerplate_ratio_max_penalty_min": 0.75,
+      "shared_boilerplate_count_penalty_min": 3.0,
+      "semantic_topic_similarity_min": 0.75
+    }
+  },
+  "relation_reliability_distribution": {
+    "min": 0.0,
+    "p05": 0.03,
+    "p25": 0.4,
+    "median": 0.4,
+    "mean": 0.363337,
+    "p75": 0.4,
+    "p95": 0.55,
+    "max": 1.0
+  },
+  "edge_score_final_distribution": {
+    "min": 0.0,
+    "p05": 0.014307,
+    "p25": 0.190757,
+    "median": 0.190757,
+    "mean": 0.176984,
+    "p75": 0.195998,
+    "p95": 0.276896,
+    "max": 0.522445
+  },
+  "calibration_artifact": null,
+  "scorer_artifact": null,
+  "graph_threshold_diagnostics": {
+    "graph_primary_threshold": 0.483444,
+    "score_max": 0.522445,
+    "score_ceiling_margin": -0.039001,
+    "graph_primary_threshold_exceeds_score_ceiling": false,
+    "graph_primary_threshold_has_candidate_edges": true,
+    "graph_primary_threshold_has_post_filter_edges": true,
+    "threshold_pass_edge_count": 1425,
+    "post_filter_edge_count": 197
+  },
+  "threshold_views": {
+    "0483444": {
+      "threshold": 0.483444,
+      "threshold_token": "0483444",
+      "threshold_pass_edge_count": 1425,
+      "edge_count": 197,
+      "edge_rate_within_candidate_pairs": 0.051156,
+      "seller_count_with_edge": 160,
+      "seller_count_without_edge_in_candidate_universe": 2569,
+      "cluster_count": 43,
+      "largest_cluster_size": 7,
+      "largest_cluster_edge_count": 11,
+      "cluster_size_distribution": {
+        "3": 28,
+        "4": 4,
+        "5": 7,
+        "6": 3,
+        "7": 1
+      },
+      "cluster_size_buckets": {
+        "size_2": 0,
+        "size_3_to_5": 39,
+        "size_6_to_10": 4,
+        "size_11_plus": 0
+      },
+      "edge_score_distribution": {
+        "min": 0.489994,
+        "p05": 0.489994,
+        "p25": 0.489994,
+        "median": 0.489994,
+        "mean": 0.500783,
+        "p75": 0.522445,
+        "p95": 0.522445,
+        "max": 0.522445
+      },
+      "graph_edge_filtering": {
+        "enabled": true,
+        "require_shared_neighbor_count_min": 1,
+        "reciprocal_top_k": 5,
+        "require_triangle_participation": false,
+        "shared_neighbor_pruning_mode": "iterative",
+        "shared_neighbor_pruning_max_passes": 25,
+        "shared_neighbor_pruning_passes": 2,
+        "direct_keep_threshold": null,
+        "relation_reliability_filter": {
+          "enabled": true,
+          "minimum_score": 0.3,
+          "hard_keep_direct_identity": true,
+          "pre_filter_edge_count": 1425,
+          "post_filter_edge_count": 1165,
+          "removed_by_relation_reliability": 260,
+          "direct_identity_hard_kept_count": 0,
+          "score_distribution": {
+            "min": 0.0,
+            "p05": 0.03,
+            "p25": 0.38,
+            "median": 0.4,
+            "mean": 0.386604,
+            "p75": 0.5,
+            "p95": 0.61,
+            "max": 1.0
+          }
+        },
+        "pre_filter_edge_count": 1425,
+        "after_relation_reliability_edge_count": 1165,
+        "after_reciprocal_top_k_edge_count": 1005,
+        "after_shared_neighbor_edge_count": 197,
+        "after_triangle_edge_count": 1425,
+        "removed_by_relation_reliability": 260,
+        "removed_by_reciprocal_top_k": 160,
+        "removed_by_shared_neighbor": 808,
+        "removed_by_triangle": 0,
+        "post_filter_edge_count": 197
+      },
+      "tree_cluster_count": 0,
+      "tree_cluster_share": 0.0,
+      "leaf_member_count_in_clusters": 0,
+      "cluster_member_count": 160,
+      "leaf_member_share_in_clusters": 0.0,
+      "top_clusters_by_size": [
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0001",
+          "cluster_rank": 1,
+          "cluster_size": 7,
+          "cluster_edge_count": 11,
+          "cluster_density": 0.52381,
+          "cluster_score_mean": 0.491803,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 5,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "250456",
+            "253337",
+            "253419",
+            "327588",
+            "327625"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0002",
+          "cluster_rank": 2,
+          "cluster_size": 6,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.6,
+          "cluster_score_mean": 0.505249,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 5,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/398130",
+            "/shop/448945",
+            "/shop/452097",
+            "/shop/452596",
+            "/shop/463004"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0003",
+          "cluster_rank": 3,
+          "cluster_size": 6,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.6,
+          "cluster_score_mean": 0.4936,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 5,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "167147",
+            "319180",
+            "344175",
+            "65684",
+            "81020"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0004",
+          "cluster_rank": 4,
+          "cluster_size": 6,
+          "cluster_edge_count": 8,
+          "cluster_density": 0.533333,
+          "cluster_score_mean": 0.494986,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/406241",
+            "/shop/431289",
+            "/shop/440693",
+            "/shop/441616",
+            "/shop/444329"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0005",
+          "cluster_rank": 5,
+          "cluster_size": 5,
+          "cluster_edge_count": 10,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 4,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "32635",
+            "550208",
+            "560066",
+            "582675",
+            "584654"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0006",
+          "cluster_rank": 6,
+          "cluster_size": 5,
+          "cluster_edge_count": 6,
+          "cluster_density": 0.6,
+          "cluster_score_mean": 0.508438,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/405657",
+            "/shop/412039",
+            "/shop/413435",
+            "/shop/449479",
+            "/shop/454105"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0007",
+          "cluster_rank": 7,
+          "cluster_size": 5,
+          "cluster_edge_count": 6,
+          "cluster_density": 0.6,
+          "cluster_score_mean": 0.50622,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "569984",
+            "/shop/397312",
+            "/shop/415595",
+            "/shop/422565",
+            "/shop/458140"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0008",
+          "cluster_rank": 8,
+          "cluster_size": 5,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.9,
+          "cluster_score_mean": 0.503122,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 3,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "446883",
+            "504187",
+            "/shop/4165",
+            "/shop/442518",
+            "/shop/451126"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0009",
+          "cluster_rank": 9,
+          "cluster_size": 5,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.9,
+          "cluster_score_mean": 0.491099,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 3,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/394520",
+            "/shop/396011",
+            "/shop/416838",
+            "/shop/422413",
+            "/shop/455899"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0483444_c0010",
+          "cluster_rank": 10,
+          "cluster_size": 5,
+          "cluster_edge_count": 7,
+          "cluster_density": 0.7,
+          "cluster_score_mean": 0.489994,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "117631",
+            "331162",
+            "354172",
+            "375149",
+            "506844"
+          ]
+        }
+      ]
+    },
+    "0522445": {
+      "threshold": 0.522445,
+      "threshold_token": "0522445",
+      "threshold_pass_edge_count": 384,
+      "edge_count": 37,
+      "edge_rate_within_candidate_pairs": 0.009608,
+      "seller_count_with_edge": 32,
+      "seller_count_without_edge_in_candidate_universe": 2697,
+      "cluster_count": 10,
+      "largest_cluster_size": 5,
+      "largest_cluster_edge_count": 10,
+      "cluster_size_distribution": {
+        "3": 9,
+        "5": 1
+      },
+      "cluster_size_buckets": {
+        "size_2": 0,
+        "size_3_to_5": 10,
+        "size_6_to_10": 0,
+        "size_11_plus": 0
+      },
+      "edge_score_distribution": {
+        "min": 0.522445,
+        "p05": 0.522445,
+        "p25": 0.522445,
+        "median": 0.522445,
+        "mean": 0.522445,
+        "p75": 0.522445,
+        "p95": 0.522445,
+        "max": 0.522445
+      },
+      "graph_edge_filtering": {
+        "enabled": true,
+        "require_shared_neighbor_count_min": 1,
+        "reciprocal_top_k": 5,
+        "require_triangle_participation": false,
+        "shared_neighbor_pruning_mode": "iterative",
+        "shared_neighbor_pruning_max_passes": 25,
+        "shared_neighbor_pruning_passes": 2,
+        "direct_keep_threshold": null,
+        "relation_reliability_filter": {
+          "enabled": true,
+          "minimum_score": 0.3,
+          "hard_keep_direct_identity": true,
+          "pre_filter_edge_count": 384,
+          "post_filter_edge_count": 344,
+          "removed_by_relation_reliability": 40,
+          "direct_identity_hard_kept_count": 0,
+          "score_distribution": {
+            "min": 0.2,
+            "p05": 0.28,
+            "p25": 0.38,
+            "median": 0.53,
+            "mean": 0.481328,
+            "p75": 0.53,
+            "p95": 0.65,
+            "max": 1.0
+          }
+        },
+        "pre_filter_edge_count": 384,
+        "after_relation_reliability_edge_count": 344,
+        "after_reciprocal_top_k_edge_count": 326,
+        "after_shared_neighbor_edge_count": 37,
+        "after_triangle_edge_count": 384,
+        "removed_by_relation_reliability": 40,
+        "removed_by_reciprocal_top_k": 18,
+        "removed_by_shared_neighbor": 289,
+        "removed_by_triangle": 0,
+        "post_filter_edge_count": 37
+      },
+      "tree_cluster_count": 0,
+      "tree_cluster_share": 0.0,
+      "leaf_member_count_in_clusters": 0,
+      "cluster_member_count": 32,
+      "leaf_member_share_in_clusters": 0.0,
+      "top_clusters_by_size": [
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0001",
+          "cluster_rank": 1,
+          "cluster_size": 5,
+          "cluster_edge_count": 10,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 4,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "32635",
+            "550208",
+            "560066",
+            "582675",
+            "584654"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0002",
+          "cluster_rank": 2,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "101978",
+            "432202",
+            "481541"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0003",
+          "cluster_rank": 3,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "171918",
+            "563971",
+            "/shop/402697"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0004",
+          "cluster_rank": 4,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "482639",
+            "537467",
+            "541533"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0005",
+          "cluster_rank": 5,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "541551",
+            "551033",
+            "565149"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0006",
+          "cluster_rank": 6,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "542584",
+            "634642",
+            "/shop/399905"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0007",
+          "cluster_rank": 7,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "569984",
+            "/shop/415595",
+            "/shop/422565"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0008",
+          "cluster_rank": 8,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "581460",
+            "/shop/427282",
+            "/shop/464140"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0009",
+          "cluster_rank": 9,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/413435",
+            "/shop/449479",
+            "/shop/454105"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_core_zero_shot_bge_m3_thr_0522445_c0010",
+          "cluster_rank": 10,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.522445,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/452097",
+            "/shop/452596",
+            "/shop/463004"
+          ]
+        }
+      ]
+    }
+  },
+  "acceptance_checks": {
+    "pair_rows_scored": true,
+    "feature_names_resolved_for_scorer": true,
+    "all_pair_rows_core_transfer_eligible": true,
+    "graph_primary_threshold_present": true,
+    "cluster_files_emitted_for_all_thresholds": true,
+    "graph_primary_threshold_not_above_score_ceiling": true,
+    "graph_primary_threshold_has_candidate_edges": true,
+    "graph_primary_threshold_has_post_filter_edges": true
+  },
+  "acceptance_checks_failed": []
+}

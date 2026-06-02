@@ -1,0 +1,113 @@
+{
+  "policy_path": "schema\\step5_en_source_expansion_valid_test_topup_policy.json",
+  "active_review_queue": "reports\\step5_en_balanced_review_queue.csv",
+  "active_frozen_labels": "reports\\step5_en_frozen_silver_labels.csv",
+  "step4_candidates": "reports\\step4_en_silver_candidate_pairs.csv",
+  "targeted_review_queue": "reports\\step5_en_source_expansion_valid_test_topup_queue.20260423.csv",
+  "current_frozen_summary": {
+    "reviewed_row_count": 945,
+    "supervision_row_count": 476,
+    "label_counts": {
+      "positive": 196,
+      "negative": 297,
+      "uncertain": 452
+    },
+    "split_counts": {
+      "train": 280,
+      "test": 119,
+      "valid": 77
+    },
+    "split_label_counts": {
+      "train": {
+        "positive": 105,
+        "negative": 175
+      },
+      "test": {
+        "positive": 44,
+        "negative": 75
+      },
+      "valid": {
+        "negative": 47,
+        "positive": 30
+      }
+    }
+  },
+  "active_queue_row_count": 6683,
+  "pending_primary_eligible_count": 4318,
+  "selected_row_count": 330,
+  "selected_bucket_counts": {
+    "seller_facing_identifier_primary": 10,
+    "strong_text_clone_positive_probe": 100,
+    "english_hard_negative_template_probe": 220
+  },
+  "selected_hint_counts": {
+    "positive": 10,
+    "positive_or_uncertain": 100,
+    "negative": 220
+  },
+  "skipped_counts": {
+    "not_pending": 991,
+    "non_primary_scope": 1059,
+    "soft_same_alias": 315
+  },
+  "bucket_summaries": {
+    "seller_facing_identifier_plus_text": {
+      "eligible_count": 0,
+      "selected_count": 0,
+      "target_count": 10,
+      "max_per_seller": 2
+    },
+    "seller_facing_identifier_primary": {
+      "eligible_count": 12,
+      "selected_count": 10,
+      "target_count": 30,
+      "max_per_seller": 2
+    },
+    "strong_text_clone_positive_probe": {
+      "eligible_count": 2693,
+      "selected_count": 100,
+      "target_count": 100,
+      "max_per_seller": 2
+    },
+    "english_hard_negative_template_probe": {
+      "eligible_count": 1613,
+      "selected_count": 220,
+      "target_count": 220,
+      "max_per_seller": 3
+    }
+  },
+  "supervision_targets": {
+    "target_total_supervision_rows": {
+      "minimum": 560,
+      "preferred": 620,
+      "maximum": 700
+    },
+    "target_split_counts_after_refreeze": {
+      "train_min": 300,
+      "valid_min": 105,
+      "valid_preferred_range": [
+        110,
+        140
+      ],
+      "test_min": 130,
+      "test_preferred_range": [
+        140,
+        175
+      ]
+    },
+    "recommended_en_split_ratios": {
+      "train": 0.55,
+      "valid": 0.2,
+      "test": 0.25
+    },
+    "scientific_rationale": "The previous English freeze had 77 validation rows, which still triggered Step 7's small-validation guard. A 55/20/25 split plus a targeted top-up should move English validation above 100 while keeping test above 130."
+  },
+  "hard_rules": [
+    "Do not label same-alias or soft-same-alias continuity rows for primary supervision in this top-up.",
+    "Do not use product sample credentials, victim data, leaked account data, or format examples as seller identity anchors.",
+    "Do not pad the English set with random easy negatives; negative additions must be hard-boundary or template-boilerplate controls.",
+    "Do not modify Chinese Step 5 queues in this expansion.",
+    "After applying labels, run Step 5 freeze and audit train/valid/test counts and seller overlap.",
+    "Step 7 semantic extraction/training still belongs on the Linux runtime after the refreeze."
+  ]
+}

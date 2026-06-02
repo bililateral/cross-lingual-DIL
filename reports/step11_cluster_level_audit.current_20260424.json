@@ -1,0 +1,44 @@
+{
+  "audit_version": "codex_step11_cluster_level_audit_current_manifest",
+  "generated_at": "2026-04-24",
+  "input_summary_count": 13,
+  "input_summaries": [
+    "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260320_clustering_summary.json",
+    "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260321_clustering_summary.json",
+    "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260322_clustering_summary.json",
+    "reports\\step11_core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260320_clustering_summary.json",
+    "reports\\step11_core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260321_clustering_summary.json",
+    "reports\\step11_core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260322_clustering_summary.json",
+    "reports\\step11_core_few_shot_labse_lr_l2_ratio_100pct_seed_20260320_clustering_summary.json",
+    "reports\\step11_core_few_shot_labse_lr_l2_ratio_100pct_seed_20260321_clustering_summary.json",
+    "reports\\step11_core_few_shot_labse_lr_l2_ratio_100pct_seed_20260322_clustering_summary.json",
+    "reports\\step11_core_zero_shot_bge_m3_clustering_summary.json",
+    "reports\\step11_identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260320_clustering_summary.json",
+    "reports\\step11_identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260321_clustering_summary.json",
+    "reports\\step11_identifier_augmented_few_shot_default_lr_l2_ratio_100pct_seed_20260322_clustering_summary.json"
+  ],
+  "summary_selection_mode": "explicit",
+  "primary_cluster_count_total": 447,
+  "unique_cluster_set_count": 140,
+  "decision_counts": {
+    "same_controller_high_confidence": 7,
+    "same_controller_core_with_possible_expansion": 1,
+    "partial_anchor": 6,
+    "template_clone_not_controller": 66,
+    "semantic_topic_not_controller": 60,
+    "uncertain": 0
+  },
+  "confidence_counts": {
+    "high": 8,
+    "low": 126,
+    "medium": 6
+  },
+  "output_csv": "reports\\step11_cluster_level_audit.current_20260424.csv",
+  "method_notes": [
+    "When --summary is provided, only those explicit Step 11 summaries are audited; reports/ globbing is skipped.",
+    "Only each summary's primary graph threshold and output_paths-referenced files are read.",
+    "Retained edges are reconstructed with scripts/step11_cluster_chinese_graph.py graph filters.",
+    "Exact seller_uid sets are deduplicated across all current primary Step 11 graph views.",
+    "Same-controller claims are allowed only for direct identifier/contact-anchored cores; template or semantic cliques remain review-discovery surfaces."
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "queue_version": "step5_v2_targeted_review_step11_20260415",
+  "scope": "zh_target_strict",
+  "active_boundary_kept_fixed": true,
+  "source_step11_summary": "reports/step11_core_few_shot_default_ratio_20pct_seed_20260321_clustering_summary.json",
+  "source_step11_scorer_token": "core_few_shot_default_ratio_20pct_seed_20260321",
+  "graph_primary_threshold": 0.550157,
+  "graph_edge_filtering": {
+    "enabled": true,
+    "require_shared_neighbor_count_min": 1,
+    "reciprocal_top_k": 5,
+    "require_triangle_participation": false,
+    "shared_neighbor_pruning_mode": "iterative",
+    "shared_neighbor_pruning_max_passes": 25,
+    "shared_neighbor_pruning_passes": 2,
+    "direct_keep_threshold": null,
+    "pre_filter_edge_count": 1020,
+    "after_reciprocal_top_k_edge_count": 962,
+    "after_shared_neighbor_edge_count": 233,
+    "after_triangle_edge_count": 1020,
+    "removed_by_reciprocal_top_k": 58,
+    "removed_by_shared_neighbor": 729,
+    "removed_by_triangle": 0,
+    "post_filter_edge_count": 233
+  },
+  "targeted_review_queue_path": "reports/step5_zh_target_strict_targeted_review_queue.step11_v1.csv",
+  "targeted_rereview_queue_path": "reports/step5_zh_target_strict_targeted_rereview_queue.step11_v1.csv",
+  "targeted_review_queue_row_count": 0,
+  "targeted_rereview_queue_row_count": 9,
+  "cluster_one_template_review": {
+    "cluster_rank": 1,
+    "cluster_id": "zh_target_strict_core_few_shot_default_ratio_20pct_seed_20260321_thr_0550157_c0001",
+    "selected_pair_uids": [],
+    "selected_rereview_pair_uids": [
+      "market_item.xlsx|中文暗网交易市场|seller_raw:506844||market_item.xlsx|茶马古道|seller_raw:/shop/8264",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:331162||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:347765||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:238938||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:493430||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:50649||market_item.xlsx|茶马古道|seller_raw:/shop/2417"
+    ]
+  },
+  "cluster_two_mixed_review": {
+    "cluster_rank": 2,
+    "cluster_id": "zh_target_strict_core_few_shot_default_ratio_20pct_seed_20260321_thr_0550157_c0002",
+    "selected_pair_uids": [],
+    "selected_rereview_pair_uids": [
+      "market_item.xlsx|中文暗网交易市场|seller_raw:457175||market_item.xlsx|茶马古道|seller_raw:/shop/442431",
+      "market_item.xlsx|中文暗网交易市场|seller_raw:457175||market_item.xlsx|茶马古道|seller_raw:/shop/444654",
+      "market_item.xlsx|茶马古道|seller_raw:/shop/435963||market_item.xlsx|茶马古道|seller_raw:/shop/462498"
+    ],
+    "missing_or_not_retained_pairs": []
+  },
+  "anchor_controls_not_queued": [
+    {
+      "seller_uid_left": "market_item.xlsx|茶马古道|seller_raw:/shop/444654",
+      "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/459141",
+      "reason": "strong positive anchor; shared exact Telegram fz12120 and should not be mixed into the hard-negative queue"
+    },
+    {
+      "seller_uid_left": "market_item.xlsx|茶马古道|seller_raw:/shop/454420",
+      "seller_uid_right": "market_item.xlsx|茶马古道|seller_raw:/shop/462498",
+      "reason": "audited as likely false positive earlier, but not retained in the current final Step 11 primary graph; keep as a secondary watchlist item rather than a queued hard negative"
+    }
+  ],
+  "skipped_existing": [
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:506844||market_item.xlsx|茶马古道|seller_raw:/shop/8264",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:331162||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:347765||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:238938||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:493430||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:50649||market_item.xlsx|茶马古道|seller_raw:/shop/2417",
+      "reason": "already_in_active_boundary::queue"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:457175||market_item.xlsx|茶马古道|seller_raw:/shop/442431",
+      "reason": "already_in_active_boundary::frozen"
+    },
+    {
+      "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:457175||market_item.xlsx|茶马古道|seller_raw:/shop/444654",
+      "reason": "already_in_active_boundary::frozen"
+    },
+    {
+      "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/435963||market_item.xlsx|茶马古道|seller_raw:/shop/462498",
+      "reason": "already_in_active_boundary::queue"
+    }
+  ]
+}

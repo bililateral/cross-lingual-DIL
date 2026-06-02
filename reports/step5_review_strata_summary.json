@@ -1,0 +1,352 @@
+{
+  "schema_path": "schema\\step5_review_policy.json",
+  "input_dependencies": [
+    "reports/step4_en_silver_candidate_pairs.csv",
+    "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "reports/step4_zh_target_aux_silver_candidate_pairs.csv"
+  ],
+  "output_files": {
+    "en_content_train_pool": "reports\\step5_en_balanced_review_queue.csv",
+    "zh_target_strict": "reports\\step5_zh_target_strict_balanced_review_queue.csv",
+    "zh_target_aux": "reports\\step5_zh_target_aux_balanced_review_queue.csv"
+  },
+  "pool_summaries": {
+    "en_content_train_pool": {
+      "candidate_row_count": 6623,
+      "balanced_queue_count": 6623,
+      "review_stratum_counts": {
+        "identifier_plus_text": 82,
+        "text_clone_primary": 3159,
+        "semantic_structural": 1071,
+        "identifier_primary": 261,
+        "semantic_only": 980,
+        "same_alias_continuity": 1070
+      },
+      "review_priority_counts": {
+        "high": 3126,
+        "medium": 1989,
+        "low": 1508
+      },
+      "label_state_counts": {
+        "__blank__": 6623
+      },
+      "non_identifier_positive_eligible_count": 5210,
+      "top_balanced_pairs": [
+        {
+          "balanced_review_rank": 1,
+          "review_stratum": "identifier_plus_text",
+          "pair_uid": "market_item.xlsx|apollon market|seller_raw:Bestbars (100%)||market_item.xlsx|apollon market|seller_raw:keranvends (100%)",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 2,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "market_item.xlsx|apollon market|seller_raw:cocaineuk1 (98%)||market_item.xlsx|apollon market|seller_raw:ukcocaine (100%)",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 3,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Ahero||market_item.xlsx|silk road 3.1|seller_raw:Bnnemannen",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 4,
+          "review_stratum": "identifier_primary",
+          "pair_uid": "market_item.xlsx|Lime|seller_raw:Benzopharma||market_item.xlsx|agartha market|seller_raw:vinicius12",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact"
+        },
+        {
+          "balanced_review_rank": 5,
+          "review_stratum": "semantic_only",
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:hitler123||market_item.xlsx|silk road 3.1|seller_raw:mcpickles",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 6,
+          "review_stratum": "same_alias_continuity",
+          "pair_uid": "market_item.xlsx|Cartel|seller_raw:melvinbankz||market_item.xlsx|tor2door market|seller_raw:Melvinbankz",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone"
+        },
+        {
+          "balanced_review_rank": 7,
+          "review_stratum": "identifier_plus_text",
+          "pair_uid": "market_item.xlsx|agartha market|seller_raw:Rodrigomendez||market_item.xlsx|agartha market|seller_raw:truu00",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 8,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:1SRRR1||market_item.xlsx|silk road 3.1|seller_raw:SRRR",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 9,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Ahero||market_item.xlsx|silk road 3.1|seller_raw:FABIUS007",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 10,
+          "review_stratum": "identifier_primary",
+          "pair_uid": "market_item.xlsx|silk road 3.1|seller_raw:Redstevens07||market_item.xlsx|silk road 3.1|seller_raw:maskmark",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|structural_support"
+        },
+        {
+          "balanced_review_rank": 11,
+          "review_stratum": "semantic_only",
+          "pair_uid": "market_item.xlsx|versus market|seller_raw:melvinbankz||market_item.xlsx|vice city|seller_raw:Fraudbuddy",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 12,
+          "review_stratum": "same_alias_continuity",
+          "pair_uid": "market_item.xlsx|Cartel|seller_raw:fraudbuddy||market_item.xlsx|tor2door market|seller_raw:fraudbuddy",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone"
+        }
+      ]
+    },
+    "zh_target_strict": {
+      "candidate_row_count": 3793,
+      "balanced_queue_count": 3793,
+      "review_stratum_counts": {
+        "identifier_plus_text": 13,
+        "text_clone_primary": 710,
+        "semantic_structural": 2290,
+        "identifier_primary": 15,
+        "semantic_only": 765
+      },
+      "review_priority_counts": {
+        "high": 678,
+        "medium": 1514,
+        "low": 1601
+      },
+      "label_state_counts": {
+        "__blank__": 3793
+      },
+      "non_identifier_positive_eligible_count": 3765,
+      "top_balanced_pairs": [
+        {
+          "balanced_review_rank": 1,
+          "review_stratum": "identifier_plus_text",
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/449035||market_item.xlsx|茶马古道|seller_raw:/shop/461222",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone"
+        },
+        {
+          "balanced_review_rank": 2,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:167147||market_item.xlsx|中文暗网交易市场|seller_raw:65684",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 3,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:210589||market_item.xlsx|中文暗网交易市场|seller_raw:58949",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 4,
+          "review_stratum": "identifier_primary",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:605194||market_item.xlsx|茶马古道|seller_raw:/shop/441160",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact"
+        },
+        {
+          "balanced_review_rank": 5,
+          "review_stratum": "semantic_only",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:610694||market_item.xlsx|中文暗网交易市场|seller_raw:611478",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 6,
+          "review_stratum": "identifier_plus_text",
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/454497||market_item.xlsx|茶马古道|seller_raw:/shop/454507",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 7,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:597091||market_item.xlsx|茶马古道|seller_raw:/shop/439316",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone"
+        },
+        {
+          "balanced_review_rank": 8,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:38978||market_item.xlsx|中文暗网交易市场|seller_raw:99610",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 9,
+          "review_stratum": "identifier_primary",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:516000||market_item.xlsx|茶马古道|seller_raw:/shop/5524",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact"
+        },
+        {
+          "balanced_review_rank": 10,
+          "review_stratum": "semantic_only",
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/395618||market_item.xlsx|茶马古道|seller_raw:/shop/9931",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 11,
+          "review_stratum": "identifier_plus_text",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:564088||market_item.xlsx|茶马古道|seller_raw:/shop/9636",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_contact_exact|shared_description_clone|shared_title_clone"
+        },
+        {
+          "balanced_review_rank": 12,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:595944||market_item.xlsx|茶马古道|seller_raw:/shop/439854",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone"
+        }
+      ]
+    },
+    "zh_target_aux": {
+      "candidate_row_count": 580,
+      "balanced_queue_count": 580,
+      "review_stratum_counts": {
+        "text_clone_primary": 53,
+        "semantic_structural": 485,
+        "semantic_only": 42
+      },
+      "review_priority_counts": {
+        "high": 53,
+        "medium": 247,
+        "low": 280
+      },
+      "label_state_counts": {
+        "__blank__": 580
+      },
+      "non_identifier_positive_eligible_count": 580,
+      "top_balanced_pairs": [
+        {
+          "balanced_review_rank": 1,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:1880883||products_data.csv|__unknown__|seller_id:1889980",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 2,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:570730||products_data.csv|__unknown__|seller_id:588456",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 3,
+          "review_stratum": "semantic_only",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:443620||products_data.csv|__unknown__|seller_id:565911",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 4,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:566317||products_data.csv|__unknown__|seller_id:588456",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|shared_title_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 5,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:524273||products_data.csv|__unknown__|seller_id:700071",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 6,
+          "review_stratum": "semantic_only",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:531338||products_data.csv|__unknown__|seller_id:707157",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 7,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:187565||products_data.csv|__unknown__|seller_id:49925",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 8,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:562273||products_data.csv|__unknown__|seller_id:633274",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 9,
+          "review_stratum": "semantic_only",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:176839||products_data.csv|__unknown__|seller_id:86267",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        },
+        {
+          "balanced_review_rank": 10,
+          "review_stratum": "text_clone_primary",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:425820||products_data.csv|__unknown__|seller_id:665332",
+          "review_priority": "high",
+          "candidate_rule_hits": "profile_lexical_neighbor|shared_description_clone|structural_support"
+        },
+        {
+          "balanced_review_rank": 11,
+          "review_stratum": "semantic_structural",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:522821||products_data.csv|__unknown__|seller_id:523410",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor|structural_support"
+        },
+        {
+          "balanced_review_rank": 12,
+          "review_stratum": "semantic_only",
+          "pair_uid": "products_data.csv|__unknown__|seller_id:1882373||products_data.csv|__unknown__|seller_id:1893440",
+          "review_priority": "medium",
+          "candidate_rule_hits": "profile_lexical_neighbor"
+        }
+      ]
+    }
+  },
+  "acceptance_checks": {
+    "all_rows_have_review_stratum": true,
+    "same_alias_scope_kept_separate": true,
+    "balanced_queue_is_deterministic": true,
+    "global_review_stratum_counts": {
+      "identifier_plus_text": 95,
+      "text_clone_primary": 3922,
+      "semantic_structural": 3846,
+      "identifier_primary": 276,
+      "semantic_only": 1787,
+      "same_alias_continuity": 1070
+    }
+  },
+  "recommended_training_constraints": {
+    "minimum_non_identifier_positive_share_if_available": 0.3,
+    "identifier_positive_mask_rate_range": [
+      0.3,
+      0.5
+    ]
+  }
+}
