@@ -18,15 +18,20 @@ Updated: 2026-06-03
   - The runner also supports train-only negative mixup for selected negative evidence types. This is available for v4 conservative stress controls but is not the current clean default because it lowers overall AP too much.
   - `scripts/step12_statistical_robustness_audit.py` now registers v3/v4/v5 Step 15 prediction ensembles and paired comparisons.
   - `scripts/step15_slice_level_audit.py` now includes v4/v5 defaults.
-- Local v3/v4/v5 point-estimate checks were run on Windows. Official publication claims still require the Linux Step 12 grouped bootstrap rerun.
+- Linux Step 15 v5 slice audit and corrected Step 12 v5 grouped bootstrap have been synchronized back. Step 12 v5 now uses `audit_version = step12_v5_statistical_robustness_zh_test_20260603` and includes explicit paired comparisons against raw E5 and Step 9 E5 mixup 100pct.
 - Public-contact/URL slice findings on the six fixed `zh_test` negative rows:
   - v2 clean primary: previous slice audit mean `0.503034`, max `0.876515`.
   - v2 domain-balanced: previous slice audit mean `0.620560`, max `0.958353`.
   - v3 domain-balanced public-noise weighting lowered the v2 domain-balanced risk to approximately mean `0.532494`, max `0.867701`, while keeping strong overall point estimates.
   - v4 negative-mixup variants lowered public-noise scores further but caused substantial clean metric degradation; v4 is retained only as a conservative robustness/control branch.
-  - v5 clean public-noise weighted strong, without negative mixup, is the current recommended clean fix: approximate public-noise mean `0.474575`, max `0.768054`, with fixed-test point estimates ROC-AUC `0.895612`, AP `0.682490`.
-  - v5 domain-balanced weighted strong has stronger overall AP, ROC-AUC `0.896919`, AP `0.718659`, and approximate public-noise mean `0.499258`, max `0.856277`; this is a balanced candidate, but it must be verified by Step 12 v5 bootstrap and slice audit on Linux.
-- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode, but it is still not proof-level identity evidence. Step 15 should remain a pairwise ranking/audit scorer until Step 12 v5 and Step 11 cluster-level audit confirm that the fix improves graph outputs without suppressing true direct-identifier positives.
+  - v5 clean public-noise weighted strong, without negative mixup, lowers the slice to mean `0.474575`, max `0.768054`; fixed-test seed-mean ROC-AUC `0.904202`, AP `0.701809`.
+  - v5 domain-balanced weighted strong is the best balanced candidate: fixed-test seed-mean ROC-AUC `0.913725`, AP `0.738951`, public-noise mean `0.499258`, max `0.856277`.
+- Corrected Step 12 v5 paired-bootstrap interpretation:
+  - v5 domain-balanced vs Step 9 E5 mixup 100pct supports a positive ROC-AUC difference: observed diff `+0.071709`, CI `[0.006751, 0.152423]`, bootstrap sign p `0.031200`.
+  - The corresponding AP difference is positive but not statistically locked: observed diff `+0.149956`, CI `[-0.032434, 0.304387]`.
+  - v5 domain-balanced vs raw E5 is stronger in point estimate for both ROC-AUC and AP, but both CIs still cross 0.
+  - v5 domain-balanced vs v2 domain-balanced remains only a point-estimate improvement: ROC-AUC diff `+0.012325`, CI `[-0.012943, 0.062131]`; AP diff `+0.024580`, CI `[-0.057586, 0.168206]`.
+- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics. Step 15 should remain a pairwise ranking/audit scorer until Step 11 cluster-level audit confirms that the fix improves graph outputs without suppressing true direct-identifier positives.
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 
