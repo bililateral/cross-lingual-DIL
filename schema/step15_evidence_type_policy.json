@@ -1,6 +1,6 @@
 {
-  "version": "2026-06-02",
-  "objective": "Evidence-type incremental hard-negative learning for cross-lingual seller-pair verification. Step 15 keeps Step 5 frozen binary labels unchanged, adds conservative auxiliary evidence_type labels for training diagnostics, and trains a lightweight multitask curriculum scorer on fixed train/valid/test boundaries.",
+  "version": "2026-06-03-public-contact-url-noise-v5",
+  "objective": "Evidence-type incremental hard-negative learning for cross-lingual seller-pair verification. Step 15 keeps Step 5 frozen binary labels unchanged, adds conservative auxiliary evidence_type labels for training diagnostics, and trains lightweight curriculum scorers on fixed train/valid/test boundaries. The v5 clean defaults stress public-contact/URL noise by strongly up-weighting reviewed public_contact_or_url_noise negatives during training without using test evidence_type labels as prediction features; v4 negative-mixup experiments remain available as conservative robustness controls.",
   "input_dependencies": [
     "docs/EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE_PLAN.md",
     "reports/step5_en_frozen_silver_labels.csv",
@@ -238,19 +238,14 @@
         "public_contact_or_url_noise"
       ],
       "use_positive_mixup": true,
+      "use_negative_mixup": true,
       "purpose": "Regularize the minority positive boundary with synthetic_train_only feature-space mixup."
     }
   ],
   "default_experiments": [
-    "step15_v2_identity_only_curriculum_from_scratch",
-    "step15_v2_identity_only_curriculum_warm_start",
-    "step15_v2_identity_only_curriculum_domain_balanced",
-    "step15_v2_identity_only_curriculum_target_only",
-    "step15_v2_identity_only_curriculum_source_only",
-    "step15_v2_identity_only_curriculum_zh_positive_mixup",
-    "step15_v2_identity_only_curriculum_same_evidence_mixup",
-    "step15_v2_multitask_curriculum_ablation",
-    "step15_v2_identifier_operational"
+    "step15_v5_identity_only_curriculum_public_noise_weighted_strong",
+    "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "step15_v4_identifier_operational_public_noise_robust"
   ],
   "experiments": {
     "step15_v2_multitask_curriculum_ablation": {
@@ -346,6 +341,167 @@
       "lambda_evidence": 0.35,
       "use_identifier_features": true
     },
+    "step15_v3_identity_only_curriculum_public_noise_weighted": {
+      "role": "clean_public_noise_weighted_identity_only_v3",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 4.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v3_identity_only_curriculum_domain_balanced_public_noise_weighted": {
+      "role": "clean_domain_balanced_public_noise_weighted_v3",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "domain_balanced_identity_loss": true,
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 5.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v3_identifier_operational_public_noise_weighted": {
+      "role": "identifier_operational_public_noise_weighted_v3",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "identifier_operational",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 4.0,
+        "template_clone_not_controller": 1.25,
+        "semantic_topic_not_controller": 1.25
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.35,
+      "use_identifier_features": true
+    },
+    "step15_v4_identity_only_curriculum_public_noise_robust": {
+      "role": "clean_public_noise_robust_identity_only_v4",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 2.0,
+        "semantic_topic_not_controller": 2.0
+      },
+      "negative_mixup": {
+        "enabled": true,
+        "evidence_types": [
+          "public_contact_or_url_noise"
+        ],
+        "scope": "all_negative",
+        "multiplier": 2.0,
+        "beta_alpha": 0.6,
+        "synthetic_scope": "train_only"
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v4_identity_only_curriculum_domain_balanced_public_noise_robust": {
+      "role": "clean_domain_balanced_public_noise_robust_v4",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "domain_balanced_identity_loss": true,
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 2.0,
+        "semantic_topic_not_controller": 2.0
+      },
+      "negative_mixup": {
+        "enabled": true,
+        "evidence_types": [
+          "public_contact_or_url_noise"
+        ],
+        "scope": "all_negative",
+        "multiplier": 2.0,
+        "beta_alpha": 0.6,
+        "synthetic_scope": "train_only"
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v4_identifier_operational_public_noise_robust": {
+      "role": "identifier_operational_public_noise_robust_v4",
+      "model_backend": "numpy_mlp_multitask",
+      "feature_set": "identifier_operational",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 6.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "negative_mixup": {
+        "enabled": true,
+        "evidence_types": [
+          "public_contact_or_url_noise"
+        ],
+        "scope": "all_negative",
+        "multiplier": 1.5,
+        "beta_alpha": 0.6,
+        "synthetic_scope": "train_only"
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.35,
+      "use_identifier_features": true
+    },
+    "step15_v5_identity_only_curriculum_public_noise_weighted_strong": {
+      "role": "clean_public_noise_weighted_strong_identity_only_v5",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong": {
+      "role": "clean_domain_balanced_public_noise_weighted_strong_v5",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "domain_balanced_identity_loss": true,
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
     "step15_e5_multitask_clean_curriculum": {
       "role": "clean_multitask_ablation",
       "model_backend": "numpy_mlp_multitask",
@@ -410,16 +566,23 @@
     "default_model_ids": [
       "raw_e5_cosine",
       "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
-      "step15_identity_only_phase4_seed_mean",
       "step15_v2_identity_from_scratch_phase4_seed_mean",
       "step15_v2_warm_start_phase4_seed_mean",
       "step15_v2_domain_balanced_phase4_seed_mean",
       "step15_v2_zh_positive_mixup_phase4_seed_mean",
-      "step15_v2_identifier_operational_phase4_seed_mean"
+      "step15_v2_identifier_operational_phase4_seed_mean",
+      "step15_v3_public_noise_weighted_phase4_seed_mean",
+      "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean",
+      "step15_v3_identifier_public_noise_weighted_phase4_seed_mean",
+      "step15_v4_public_noise_robust_phase4_seed_mean",
+      "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean",
+      "step15_v4_identifier_public_noise_robust_phase4_seed_mean",
+      "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+      "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean"
     ],
     "outputs": {
-      "summary_json": "reports/step15_v2_slice_level_audit.json",
-      "slice_metrics_csv": "reports/step15_v2_slice_level_audit.csv"
+      "summary_json": "reports/step15_v5_slice_level_audit.json",
+      "slice_metrics_csv": "reports/step15_v5_slice_level_audit.csv"
     }
   },
   "threshold_selection": {
@@ -445,7 +608,7 @@
     }
   },
   "outputs": {
-    "summary_json": "reports/step15_v2_incremental_hard_negative_summary.json",
+    "summary_json": "reports/step15_v5_public_noise_weighted_summary.json",
     "artifact_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_artifact.json",
     "zh_valid_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_valid.csv",
     "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv"
@@ -466,6 +629,7 @@
     "Do not train the binary identity head on uncertain rows.",
     "Do not use Step 11 cluster decisions as same-controller ground truth.",
     "Do not write synthetic rows into validation, test, or Step 5 files.",
-    "Keep clean scientific models separate from identifier operational controls."
+    "Keep clean scientific models separate from identifier operational controls.",
+    "Public-contact/URL noise weighting and negative mixup may use evidence_type labels only for train-split loss construction, never as valid/test prediction features."
   ]
 }

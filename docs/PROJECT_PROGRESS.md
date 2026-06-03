@@ -1,8 +1,32 @@
 # Project Progress
 
-Updated: 2026-06-02
+Updated: 2026-06-03
 
 ## Current Stage
+
+`2026-06-03` Step 15 public-contact/URL noise fix branch added:
+
+- Active branch: `method/step15-public-contact-url-noise-fix`.
+- The Step 15 policy now defaults to a v5 public-contact/URL noise stress configuration and writes separate v5 outputs, so v2/v3/v4 artifacts are preserved and not overwritten:
+  - `reports/step15_v5_public_noise_weighted_summary.json`
+  - `reports/step15_v5_slice_level_audit.json`
+  - `reports/step15_v5_slice_level_audit.csv`
+  - Step 12 default outputs now use `reports/step12_v5_statistical_robustness_*_20260603.*`
+- Code changes:
+  - `scripts/step15_train_incremental_hard_negative.py` now supports per-evidence-type identity-loss multipliers.
+  - The multiplier is applied only to train rows and is mean-normalized to avoid destabilizing the optimizer.
+  - The runner also supports train-only negative mixup for selected negative evidence types. This is available for v4 conservative stress controls but is not the current clean default because it lowers overall AP too much.
+  - `scripts/step12_statistical_robustness_audit.py` now registers v3/v4/v5 Step 15 prediction ensembles and paired comparisons.
+  - `scripts/step15_slice_level_audit.py` now includes v4/v5 defaults.
+- Local v3/v4/v5 point-estimate checks were run on Windows. Official publication claims still require the Linux Step 12 grouped bootstrap rerun.
+- Public-contact/URL slice findings on the six fixed `zh_test` negative rows:
+  - v2 clean primary: previous slice audit mean `0.503034`, max `0.876515`.
+  - v2 domain-balanced: previous slice audit mean `0.620560`, max `0.958353`.
+  - v3 domain-balanced public-noise weighting lowered the v2 domain-balanced risk to approximately mean `0.532494`, max `0.867701`, while keeping strong overall point estimates.
+  - v4 negative-mixup variants lowered public-noise scores further but caused substantial clean metric degradation; v4 is retained only as a conservative robustness/control branch.
+  - v5 clean public-noise weighted strong, without negative mixup, is the current recommended clean fix: approximate public-noise mean `0.474575`, max `0.768054`, with fixed-test point estimates ROC-AUC `0.895612`, AP `0.682490`.
+  - v5 domain-balanced weighted strong has stronger overall AP, ROC-AUC `0.896919`, AP `0.718659`, and approximate public-noise mean `0.499258`, max `0.856277`; this is a balanced candidate, but it must be verified by Step 12 v5 bootstrap and slice audit on Linux.
+- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode, but it is still not proof-level identity evidence. Step 15 should remain a pairwise ranking/audit scorer until Step 12 v5 and Step 11 cluster-level audit confirm that the fix improves graph outputs without suppressing true direct-identifier positives.
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 

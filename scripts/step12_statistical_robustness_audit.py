@@ -22,9 +22,9 @@ from typing import Any
 
 DEFAULT_LABELS = Path("reports/step5_zh_target_strict_frozen_silver_labels.csv")
 DEFAULT_FEATURES = Path("reports/step7_pair_features.zh_target_strict.csv")
-DEFAULT_OUT_JSON = Path("reports/step12_v2_statistical_robustness_zh_test_20260602.json")
-DEFAULT_OUT_METRICS = Path("reports/step12_v2_statistical_robustness_model_metrics_20260602.csv")
-DEFAULT_OUT_COMPARISONS = Path("reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv")
+DEFAULT_OUT_JSON = Path("reports/step12_v5_statistical_robustness_zh_test_20260603.json")
+DEFAULT_OUT_METRICS = Path("reports/step12_v5_statistical_robustness_model_metrics_20260603.csv")
+DEFAULT_OUT_COMPARISONS = Path("reports/step12_v5_statistical_robustness_paired_comparisons_20260603.csv")
 
 DEFAULT_RESAMPLES = 5000
 DEFAULT_SEED = 20260513
@@ -321,7 +321,109 @@ STEP15_V2_MODEL_GROUPS: list[dict[str, str]] = [
     },
 ]
 
+STEP15_V3_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_v3_public_noise_weighted_phase4",
+        "role": "step15_v3_clean_public_noise_weighted_seed",
+        "experiment": "step15_v3_identity_only_curriculum_public_noise_weighted",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v3_domain_balanced_public_noise_weighted_phase4",
+        "role": "step15_v3_clean_domain_balanced_public_noise_weighted_seed",
+        "experiment": "step15_v3_identity_only_curriculum_domain_balanced_public_noise_weighted",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v3_identifier_public_noise_weighted_phase4",
+        "role": "step15_v3_identifier_public_noise_weighted_seed",
+        "experiment": "step15_v3_identifier_operational_public_noise_weighted",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
+STEP15_V4_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_v4_public_noise_robust_phase4",
+        "role": "step15_v4_clean_public_noise_robust_seed",
+        "experiment": "step15_v4_identity_only_curriculum_public_noise_robust",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v4_domain_balanced_public_noise_robust_phase4",
+        "role": "step15_v4_clean_domain_balanced_public_noise_robust_seed",
+        "experiment": "step15_v4_identity_only_curriculum_domain_balanced_public_noise_robust",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v4_identifier_public_noise_robust_phase4",
+        "role": "step15_v4_identifier_public_noise_robust_seed",
+        "experiment": "step15_v4_identifier_operational_public_noise_robust",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
+STEP15_V5_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_v5_public_noise_weighted_strong_phase4",
+        "role": "step15_v5_clean_public_noise_weighted_strong_seed",
+        "experiment": "step15_v5_identity_only_curriculum_public_noise_weighted_strong",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v5_domain_balanced_public_noise_weighted_strong_phase4",
+        "role": "step15_v5_clean_domain_balanced_public_noise_weighted_strong_seed",
+        "experiment": "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
 for group in STEP15_V2_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
+for group in STEP15_V3_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
+for group in STEP15_V4_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
+for group in STEP15_V5_MODEL_GROUPS:
     for seed in STEP15_SEEDS:
         MODEL_SPECS.append(
             {
@@ -397,6 +499,27 @@ for group in STEP15_MODEL_GROUPS:
     }
 
 for group in STEP15_V2_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
+for group in STEP15_V3_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
+for group in STEP15_V4_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
+for group in STEP15_V5_MODEL_GROUPS:
     ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
         "role": group["role"].replace("_seed", "_seed_mean"),
         "optional_until_generated": True,
@@ -531,6 +654,96 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
         "step15_v2_identifier_operational_phase4_seed_mean",
         "step15_v2_identity_from_scratch_phase4_seed_mean",
         "step15_v2_identifier_operational_vs_clean_primary",
+    ),
+    (
+        "step15_v3_public_noise_weighted_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v3_public_noise_weighted_vs_v2_primary",
+    ),
+    (
+        "step15_v3_public_noise_weighted_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v3_public_noise_weighted_vs_raw_e5",
+    ),
+    (
+        "step15_v3_public_noise_weighted_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v3_public_noise_weighted_vs_step9_mixup100",
+    ),
+    (
+        "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean",
+        "step15_v2_domain_balanced_phase4_seed_mean",
+        "step15_v3_domain_balanced_public_noise_weighted_vs_v2_domain_balanced",
+    ),
+    (
+        "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v3_domain_balanced_public_noise_weighted_vs_v2_primary",
+    ),
+    (
+        "step15_v3_identifier_public_noise_weighted_phase4_seed_mean",
+        "step15_v2_identifier_operational_phase4_seed_mean",
+        "step15_v3_identifier_public_noise_weighted_vs_v2_identifier",
+    ),
+    (
+        "step15_v4_public_noise_robust_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v4_public_noise_robust_vs_v2_primary",
+    ),
+    (
+        "step15_v4_public_noise_robust_phase4_seed_mean",
+        "step15_v3_public_noise_weighted_phase4_seed_mean",
+        "step15_v4_public_noise_robust_vs_v3_weighted",
+    ),
+    (
+        "step15_v4_public_noise_robust_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v4_public_noise_robust_vs_raw_e5",
+    ),
+    (
+        "step15_v4_public_noise_robust_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v4_public_noise_robust_vs_step9_mixup100",
+    ),
+    (
+        "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean",
+        "step15_v2_domain_balanced_phase4_seed_mean",
+        "step15_v4_domain_balanced_public_noise_robust_vs_v2_domain_balanced",
+    ),
+    (
+        "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean",
+        "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean",
+        "step15_v4_domain_balanced_public_noise_robust_vs_v3_domain_weighted",
+    ),
+    (
+        "step15_v4_identifier_public_noise_robust_phase4_seed_mean",
+        "step15_v2_identifier_operational_phase4_seed_mean",
+        "step15_v4_identifier_public_noise_robust_vs_v2_identifier",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v2_identity_from_scratch_phase4_seed_mean",
+        "step15_v5_public_noise_weighted_strong_vs_v2_primary",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v3_public_noise_weighted_phase4_seed_mean",
+        "step15_v5_public_noise_weighted_strong_vs_v3_weighted",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v4_public_noise_robust_phase4_seed_mean",
+        "step15_v5_public_noise_weighted_strong_vs_v4_negative_mixup",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v2_domain_balanced_phase4_seed_mean",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_v2_domain_balanced",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_v3_domain_weighted",
     ),
 ]
 

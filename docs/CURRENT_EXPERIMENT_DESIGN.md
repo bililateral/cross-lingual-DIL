@@ -31,7 +31,7 @@
 | Step 7 | 英文源域训练 zero-shot pair verifier，并在中文测试 | `reports/step7_training_summary.json` |
 | Step 9 | 中文少样本适配和 calibration 控制实验 | `reports/step9_few_shot_summary.json` |
 | Step 11 | 把 scorer 投影成中文候选图和候选簇 | `reports/step11_current_manifest_20260517.json` |
-| Step 12 | 固定中文测试集上的统计稳健性审计 | `reports/step12_v2_statistical_robustness_zh_test_20260602.json` |
+| Step 12 | 固定中文测试集上的统计稳健性审计 | 当前已扩展到 Step 15 v5 public-noise 修复配置；v2 已审计结果仍保留为 `reports/step12_v2_statistical_robustness_zh_test_20260602.json` |
 | Step 13 | 概念漂移与切片诊断 | `reports/step13_concept_drift_audit.json` |
 
 实验设计的核心原则是：
@@ -553,7 +553,7 @@ mixup 参数：
 | 100pct | 20260321 | `61` | `274` | `122` | `0.841457` | `0.589403` |
 | 100pct | 20260322 | `61` | `274` | `122` | `0.839216` | `0.579418` |
 
-当前解读：mixup 100pct 是最强 Step 9 点估计，但 Step 12 显示它尚不能稳健声称超过 raw E5。Step 15 v2 进一步提高了 clean 点估计，但 paired grouped bootstrap 仍要求保守表述。
+当前解读：mixup 100pct 是最强 Step 9 点估计，但 Step 12 显示它尚不能稳健声称超过 raw E5。Step 15 v2 进一步提高了 clean 点估计，但 paired grouped bootstrap 仍要求保守表述。Step 15 v5 进一步针对 `public_contact_or_url_noise` 失败切片加入 train-only loss reweighting；本地固定测试点估计显示该切片风险下降，但正式结论必须等 Linux 上的 Step 12 v5 grouped bootstrap 和 slice audit。
 
 ### 6.8 Step 9 当前关键结果
 

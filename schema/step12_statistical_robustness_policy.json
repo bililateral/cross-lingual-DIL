@@ -85,9 +85,23 @@
       "step15_v2_same_evidence_mixup_phase4_seed_mean",
       "step15_v2_multitask_ablation_phase4_seed_mean"
     ],
+    "step15_v3_public_contact_url_noise_fix": [
+      "step15_v3_public_noise_weighted_phase4_seed_mean",
+      "step15_v3_domain_balanced_public_noise_weighted_phase4_seed_mean"
+    ],
+    "step15_v4_public_contact_url_noise_fix": [
+      "step15_v4_public_noise_robust_phase4_seed_mean",
+      "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean"
+    ],
+    "step15_v5_public_contact_url_noise_fix": [
+      "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+      "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean"
+    ],
     "step15_operational_control": [
       "step15_identifier_operational_phase4_seed_mean",
-      "step15_v2_identifier_operational_phase4_seed_mean"
+      "step15_v2_identifier_operational_phase4_seed_mean",
+      "step15_v3_identifier_public_noise_weighted_phase4_seed_mean",
+      "step15_v4_identifier_public_noise_robust_phase4_seed_mean"
     ]
   },
   "paired_comparison_policy": {
@@ -103,14 +117,31 @@
       "step15_v2_primary_vs_step9_mixup100",
       "step15_v2_warm_start_vs_from_scratch",
       "step15_v2_domain_balanced_vs_from_scratch",
-      "step15_v2_zh_positive_mixup_vs_from_scratch"
+      "step15_v2_zh_positive_mixup_vs_from_scratch",
+      "step15_v3_public_noise_weighted_vs_v2_primary",
+      "step15_v3_public_noise_weighted_vs_raw_e5",
+      "step15_v3_public_noise_weighted_vs_step9_mixup100",
+      "step15_v3_domain_balanced_public_noise_weighted_vs_v2_domain_balanced",
+      "step15_v3_identifier_public_noise_weighted_vs_v2_identifier",
+      "step15_v4_public_noise_robust_vs_v2_primary",
+      "step15_v4_public_noise_robust_vs_v3_weighted",
+      "step15_v4_public_noise_robust_vs_raw_e5",
+      "step15_v4_public_noise_robust_vs_step9_mixup100",
+      "step15_v4_domain_balanced_public_noise_robust_vs_v2_domain_balanced",
+      "step15_v4_domain_balanced_public_noise_robust_vs_v3_domain_weighted",
+      "step15_v4_identifier_public_noise_robust_vs_v2_identifier",
+      "step15_v5_public_noise_weighted_strong_vs_v2_primary",
+      "step15_v5_public_noise_weighted_strong_vs_v3_weighted",
+      "step15_v5_public_noise_weighted_strong_vs_v4_negative_mixup",
+      "step15_v5_domain_balanced_public_noise_weighted_strong_vs_v2_domain_balanced",
+      "step15_v5_domain_balanced_public_noise_weighted_strong_vs_v3_domain_weighted"
     ],
     "p_value": "Two-sided bootstrap sign probability over grouped resamples; descriptive only, not a formal DeLong test."
   },
   "outputs": {
-    "summary_json": "reports/step12_v2_statistical_robustness_zh_test_20260602.json",
-    "model_metrics_csv": "reports/step12_v2_statistical_robustness_model_metrics_20260602.csv",
-    "paired_comparisons_csv": "reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv"
+    "summary_json": "reports/step12_v5_statistical_robustness_zh_test_20260603.json",
+    "model_metrics_csv": "reports/step12_v5_statistical_robustness_model_metrics_20260603.csv",
+    "paired_comparisons_csv": "reports/step12_v5_statistical_robustness_paired_comparisons_20260603.csv"
   },
   "hard_rules": [
     "Do not merge zh_train, zh_valid, and zh_test for the primary robustness audit.",
@@ -118,6 +149,7 @@
     "Do not report few-shot improvement without paired comparison against raw semantic baselines.",
     "Positive-pair mixup rows are training-only minority regularization artifacts and must be evaluated against both raw semantic controls and the non-mixup E5 LR/L2 baseline.",
     "Identifier-augmented models remain operational controls and must not be mixed into the clean scientific claim.",
-    "Step15 evidence-type auxiliary labels are training diagnostics; they do not replace Step5 frozen labels and do not authorize direct Step11 graph claims without pair-level audit."
+    "Step15 evidence-type auxiliary labels are training diagnostics; they do not replace Step5 frozen labels and do not authorize direct Step11 graph claims without pair-level audit.",
+    "Step15 v5 public-contact/URL noise weighting must be validated by slice-level public_contact_or_url_noise score reduction and paired fixed-test robustness before it is used in Step11; v4 negative-mixup variants remain conservative stress controls."
   ]
 }

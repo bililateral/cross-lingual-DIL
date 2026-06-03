@@ -33,6 +33,11 @@ DEFAULT_MODEL_IDS = [
     "step15_v2_domain_balanced_phase4_seed_mean",
     "step15_v2_zh_positive_mixup_phase4_seed_mean",
     "step15_v2_identifier_operational_phase4_seed_mean",
+    "step15_v4_public_noise_robust_phase4_seed_mean",
+    "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean",
+    "step15_v4_identifier_public_noise_robust_phase4_seed_mean",
+    "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+    "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
 ]
 
 
