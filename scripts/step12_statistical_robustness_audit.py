@@ -722,6 +722,16 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
     ),
     (
         "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5_public_noise_weighted_strong_vs_raw_e5",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v5_public_noise_weighted_strong_vs_step9_mixup100",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
         "step15_v2_identity_from_scratch_phase4_seed_mean",
         "step15_v5_public_noise_weighted_strong_vs_v2_primary",
     ),
@@ -734,6 +744,16 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
         "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
         "step15_v4_public_noise_robust_phase4_seed_mean",
         "step15_v5_public_noise_weighted_strong_vs_v4_negative_mixup",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_raw_e5",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_step9_mixup100",
     ),
     (
         "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
@@ -1184,7 +1204,7 @@ def main() -> None:
     )
 
     summary = {
-        "audit_version": "step12_v2_statistical_robustness_zh_test_20260602",
+        "audit_version": "step12_v5_statistical_robustness_zh_test_20260603",
         "scope": "zh_target_strict_fixed_test",
         "fixed_test_policy": {
             "split_name": "test",
