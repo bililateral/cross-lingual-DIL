@@ -1,6 +1,6 @@
 # Step 11: Chinese Graph Clustering
 
-Status: current-boundary Step 11 rerun synchronized and manifest-cleaned on `2026-04-24`; locally rechecked on `2026-05-13` with exactly `13` current summaries still present; authoritative project-level status is in `docs/PROJECT_PROGRESS.md`; run new Step 11 scoring on the Linux runtime server only
+Status: current-boundary Step 11 rerun synchronized and manifest-cleaned on `2026-04-24`; locally rechecked on `2026-05-13` with exactly `13` current summaries still present; on `2026-06-03`, Step 11 gained explicit frozen Step 15 v5 ensemble scoring for graph validation; authoritative project-level status is in `docs/PROJECT_PROGRESS.md`; run new Step 11 scoring on the Linux runtime server only
 
 ## Role
 
@@ -50,8 +50,9 @@ As of the `2026-04-21` methodological re-audit patch:
 2. `core_zero_shot_bge_m3` used a Step 11 graph threshold override of `0.56` in that historical boundary; this is superseded. The current boundary has no BGE graph override and resolves to pairwise selected threshold `0.483444`.
 3. Legacy `core_few_shot_bge_m3` `10pct` is demoted to adaptation sensitivity/stress-test evidence because its earlier balanced-accuracy gain was threshold-driven while ROC-AUC degraded relative to the then-current zero-shot BGE line.
 4. Step 11 now supports new Step 9 `residual_logistic` and `logistic_regression_l2` scorer artifacts in addition to legacy LightGBM model files.
-5. The zero-shot BGE Linux Step 11 rerun has been synchronized; current `core_zero_shot_bge_m3` outputs use primary graph threshold `0.483444`.
-6. Step 11 dynamic Step 9 candidate selection is backend-aware: legacy LightGBM candidates still use tree-iteration guards, while residual/logistic candidates use logistic solver semantics.
+5. Step 11 now supports explicit frozen Step 15 MLP ensemble scoring through `--scorer-family step15`. This is for graph validation of the frozen Step15 v5 scorer only; Step 11 does not retrain Step15 or use Step11 clusters as labels.
+6. The zero-shot BGE Linux Step 11 rerun has been synchronized; current `core_zero_shot_bge_m3` outputs use primary graph threshold `0.483444`.
+7. Step 11 dynamic Step 9 candidate selection is backend-aware: legacy LightGBM candidates still use tree-iteration guards, while residual/logistic candidates use logistic solver semantics.
 
 As of the previous `2026-04-22` Step 11 rerun before the later Step 5 label-stratified split repair:
 

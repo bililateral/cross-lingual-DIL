@@ -4,9 +4,16 @@ Updated: 2026-06-03
 
 ## Current Stage
 
-`2026-06-03` Step 15 public-contact/URL noise fix branch added:
+`2026-06-03` Step 15 v5 frozen for Step 11 graph validation:
 
-- Active branch: `method/step15-public-contact-url-noise-fix`.
+- Active branch: `method/step15-v5-step11-validation`.
+- Step 15 v5 is now frozen as a pairwise scorer. No further Step 15 tuning should be done unless Step 11 cluster-level validation exposes a specific failure mode.
+- Step 11 policy and runner now support explicit frozen Step 15 MLP ensemble scoring through `--scorer-family step15`. The current primary Step 15 graph-validation candidate is:
+  - experiment: `step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong`
+  - phase: `phase4_add_positive_pair_mixup`
+  - seed ensemble: `20260320 / 20260321 / 20260322`
+  - output token: `step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean`
+- Step 11 computes the Step 15 ensemble threshold from the three seed-aligned `zh_valid_predictions` files, rather than averaging per-seed thresholds. This keeps the graph threshold tied to the frozen validation split and avoids using `zh_test` for graph-threshold selection.
 - The Step 15 policy now defaults to a v5 public-contact/URL noise stress configuration and writes separate v5 outputs, so v2/v3/v4 artifacts are preserved and not overwritten:
   - `reports/step15_v5_public_noise_weighted_summary.json`
   - `reports/step15_v5_slice_level_audit.json`
@@ -31,7 +38,7 @@ Updated: 2026-06-03
   - The corresponding AP difference is positive but not statistically locked: observed diff `+0.149956`, CI `[-0.032434, 0.304387]`.
   - v5 domain-balanced vs raw E5 is stronger in point estimate for both ROC-AUC and AP, but both CIs still cross 0.
   - v5 domain-balanced vs v2 domain-balanced remains only a point-estimate improvement: ROC-AUC diff `+0.012325`, CI `[-0.012943, 0.062131]`; AP diff `+0.024580`, CI `[-0.057586, 0.168206]`.
-- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics. Step 15 should remain a pairwise ranking/audit scorer until Step 11 cluster-level audit confirms that the fix improves graph outputs without suppressing true direct-identifier positives.
+- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics. The next required action is Step 11 graph validation: compare Step15 v5 clusters against raw/Step9 controls and confirm whether graph outputs improve without suppressing true direct-identifier positives.
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 

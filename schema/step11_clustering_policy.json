@@ -1,19 +1,23 @@
 {
   "version": "2026-04-23",
-  "objective": "Step-11 Chinese graph clustering from the current 2026-04-23 Step-7/Step-9 boundary, prioritizing clean E5/LabSE/BGE residual few-shot scorer artifacts for candidate-cluster discovery and keeping calibration/identifier models as controls only",
+  "objective": "Step-11 Chinese graph clustering from the current Step-7/Step-9/Step-15 boundary, validating whether the frozen Step15 v5 evidence-type hard-negative scorer improves candidate-cluster discovery quality while keeping Step7/Step9 baselines and identifier models as controls only",
   "input_dependencies": [
     "reports/step7_pair_features.zh_target_strict.csv",
     "reports/step3_seller_profiles.zh_target_strict.jsonl",
     "reports/step7_training_summary.json",
     "schema/step7_training_policy.json",
     "reports/step9_few_shot_summary.json",
-    "reports/step9_calibration_summary.json"
+    "reports/step9_calibration_summary.json",
+    "reports/step15_v5_public_noise_weighted_summary.json",
+    "schema/step15_evidence_type_policy.json"
   ],
   "baseline_reference": {
     "step7_summary": "reports/step7_training_summary.json",
     "step7_policy": "schema/step7_training_policy.json",
     "step9_summary": "reports/step9_few_shot_summary.json",
-    "step9_calibration_summary": "reports/step9_calibration_summary.json"
+    "step9_calibration_summary": "reports/step9_calibration_summary.json",
+    "step15_summary": "reports/step15_v5_public_noise_weighted_summary.json",
+    "step15_policy": "schema/step15_evidence_type_policy.json"
   },
   "summary_resolution": {
     "strict_current_main_summaries_only": true
@@ -24,7 +28,9 @@
     "step7_summary": "reports/step7_training_summary.json",
     "step7_policy": "schema/step7_training_policy.json",
     "step9_summary": "reports/step9_few_shot_summary.json",
-    "step9_calibration_summary": "reports/step9_calibration_summary.json"
+    "step9_calibration_summary": "reports/step9_calibration_summary.json",
+    "step15_summary": "reports/step15_v5_public_noise_weighted_summary.json",
+    "step15_policy": "schema/step15_evidence_type_policy.json"
   },
   "scorer_selection": {
     "default_scorer_family": "auto",
@@ -33,6 +39,17 @@
     "default_step9_calibration_experiment_name": "core_calibrated_default",
     "default_step9_ratio": 0.5,
     "default_step9_seed": 20260321,
+    "default_step15_experiment_name": "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "default_step15_phase": "phase4_add_positive_pair_mixup",
+    "default_step15_seeds": [
+      20260320,
+      20260321,
+      20260322
+    ],
+    "step15_scorer_token_aliases": {
+      "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_public_noise_weighted_strong_phase4_seed_mean"
+    },
     "dynamic_mainline_candidates": {
       "enabled": true,
       "default_resolution_mode": "family_best",
@@ -187,7 +204,7 @@
       ],
       "max_score_epsilon": 1e-09
     },
-    "feature_source": "lightgbm_model_file.feature_names_or_step9_scorer_artifact.feature_names",
+    "feature_source": "lightgbm_model_file.feature_names_or_step9_scorer_artifact.feature_names_or_step15_artifact.feature_names",
     "scoring_backend": "selected_scorer_summary"
   },
   "graph_policy": {
@@ -364,19 +381,19 @@
     "contact_preview"
   ],
   "hard_rules": [
-    "Do not retrain or retune Step 7, Step 9, or Step 9 calibration inside Step 11.",
+    "Do not retrain or retune Step 7, Step 9, Step 9 calibration, or Step 15 inside Step 11.",
     "Do not modify any frozen Step 10 snapshot directory.",
-    "Resolve the pairwise primary threshold from the current synchronized Step 7, Step 9, or Step 9 calibration summary for the selected scorer.",
+    "Resolve the pairwise primary threshold from the current synchronized Step 7, Step 9, Step 9 calibration, or frozen Step 15 summary/prediction records for the selected scorer.",
     "Use scorer_selection.graph_primary_threshold_overrides for Step 11 graph working thresholds when a selected scorer token is listed there; otherwise fall back to the selected scorer pairwise primary threshold.",
     "When graph_edge_filters.relation_reliability_filter is enabled, filter threshold-passing edges by relation_reliability_score before reciprocal-top-k and shared-neighbor pruning; this is an audit/triage reliability control, not a new label source.",
     "Before connected-components extraction, apply the graph_edge_filters declared in graph_policy to suppress unsupported bridge edges.",
-    "Resolve the Step 11 model path or Step 9 scorer artifact from synchronized Step 7, Step 9, or Step 9 calibration artifacts rather than from an archived Step 10 snapshot.",
+    "Resolve the Step 11 model path, Step 9 scorer artifact, or frozen Step 15 scorer artifacts from synchronized current summaries rather than from an archived Step 10 snapshot.",
     "Emit sensitivity views alongside the selected scorer graph working threshold, but resolve those views from sensitivity_threshold_resolution when fixed absolute thresholds exceed the observed score ceiling for the selected scorer.",
     "Score only zh_target_strict pair rows with core_transfer_eligible = 1.",
     "Cluster outputs must remain traceable to seller_uids, pair_uids, and pairwise probabilities."
   ],
   "acceptance_checks": [
-    "All zh_target_strict candidate pairs are scored with the selected Step 7, Step 9, or Step 9 calibration scorer resolved from synchronized policy and summary records.",
+    "All zh_target_strict candidate pairs are scored with the selected Step 7, Step 9, Step 9 calibration, or frozen Step 15 scorer resolved from synchronized policy and summary records.",
     "All scored zh_target_strict pair rows remain inside the fixed core-transfer-eligible pair universe.",
     "The scored-pair output preserves pairwise traceability and threshold pass flags.",
     "Connected-component cluster outputs are emitted for each configured threshold after graph_edge_filters are applied.",

@@ -16,13 +16,15 @@ STEP7_SUMMARY_PATH = ROOT / "reports" / "step7_training_summary.json"
 STEP7_POLICY_PATH = ROOT / "schema" / "step7_training_policy.json"
 STEP9_SUMMARY_PATH = ROOT / "reports" / "step9_few_shot_summary.json"
 STEP9_CALIBRATION_SUMMARY_PATH = ROOT / "reports" / "step9_calibration_summary.json"
+STEP15_SUMMARY_PATH = ROOT / "reports" / "step15_v5_public_noise_weighted_summary.json"
+STEP15_POLICY_PATH = ROOT / "schema" / "step15_evidence_type_policy.json"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Score all zh_target_strict candidate seller pairs with a selected synchronized "
-            "Step 7, Step 9, or Step 9 calibration scorer, then extract connected-component clusters at "
+            "Step 7, Step 9, Step 9 calibration, or frozen Step 15 scorer, then extract connected-component clusters at "
             "the configured thresholds."
         )
     )
@@ -34,7 +36,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--scorer-family",
-        choices=("step7", "step9", "step9_calibration", "auto"),
+        choices=("step7", "step9", "step9_calibration", "step15", "auto"),
         help=(
             "Scorer family to project into the Chinese graph. If omitted, Step 11 uses the "
             "policy default unless the provided CLI arguments imply a specific family."
@@ -76,6 +78,29 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Optional Step 9 calibration experiment name to use as the pair scorer. "
             "Must exist inside reports/step9_calibration_summary.json."
+        ),
+    )
+    parser.add_argument(
+        "--step15-experiment",
+        type=str,
+        help=(
+            "Optional frozen Step 15 experiment name to use as the pair scorer. "
+            "Must exist inside reports/step15_v5_public_noise_weighted_summary.json unless policy paths are changed."
+        ),
+    )
+    parser.add_argument(
+        "--step15-phase",
+        type=str,
+        help="Optional Step 15 phase id to use. Defaults to scorer_selection.default_step15_phase.",
+    )
+    parser.add_argument(
+        "--step15-seed",
+        action="append",
+        dest="step15_seeds",
+        type=int,
+        help=(
+            "Optional Step 15 random seed to use. Repeat this option to form a seed-mean ensemble. "
+            "Defaults to scorer_selection.default_step15_seeds."
         ),
     )
     parser.add_argument(
@@ -335,6 +360,10 @@ def resolve_scorer_selection(policy: dict) -> dict:
             ),
             "default_step9_ratio": scorer_selection.get("default_step9_ratio"),
             "default_step9_seed": scorer_selection.get("default_step9_seed"),
+            "default_step15_experiment_name": scorer_selection.get("default_step15_experiment_name"),
+            "default_step15_phase": scorer_selection.get("default_step15_phase"),
+            "default_step15_seeds": scorer_selection.get("default_step15_seeds", []),
+            "step15_scorer_token_aliases": scorer_selection.get("step15_scorer_token_aliases", {}),
             "pairwise_primary_threshold_source_template": scorer_selection.get(
                 "pairwise_primary_threshold_source_template"
             )
@@ -907,34 +936,58 @@ def detect_requested_scorer_family(
         )
     )
     has_step9_calibration_request = bool(args.step9_calibration_experiment)
-    request_count = sum(int(flag) for flag in (has_step7_request, has_step9_request, has_step9_calibration_request))
+    has_step15_request = any(
+        value is not None
+        for value in (
+            args.step15_experiment,
+            args.step15_phase,
+            args.step15_seeds,
+        )
+    )
+    request_count = sum(
+        int(flag)
+        for flag in (
+            has_step7_request,
+            has_step9_request,
+            has_step9_calibration_request,
+            has_step15_request,
+        )
+    )
     if request_count > 1:
         raise SystemExit(
-            "Step 11 scorer selection is ambiguous. Do not mix Step 7, Step 9, and Step 9 calibration "
+            "Step 11 scorer selection is ambiguous. Do not mix Step 7, Step 9, Step 9 calibration, and Step 15 "
             "selector arguments in the same command."
         )
     if args.scorer_family:
-        if args.scorer_family == "step7" and (has_step9_request or has_step9_calibration_request):
+        if args.scorer_family == "step7" and (has_step9_request or has_step9_calibration_request or has_step15_request):
             raise SystemExit(
-                "Step 11 received Step 9 selector arguments together with --scorer-family step7. "
-                "Remove the Step 9 arguments or switch --scorer-family to the matching family."
+                "Step 11 received non-Step-7 selector arguments together with --scorer-family step7. "
+                "Remove the conflicting arguments or switch --scorer-family to the matching family."
             )
-        if args.scorer_family == "step9" and has_step7_request:
+        if args.scorer_family == "step9" and (has_step7_request or has_step9_calibration_request or has_step15_request):
             raise SystemExit(
-                "Step 11 received --step7-experiment together with --scorer-family step9. "
-                "Remove --step7-experiment or switch --scorer-family to step7."
+                "Step 11 received non-Step-9 selector arguments together with --scorer-family step9. "
+                "Remove the conflicting arguments or switch --scorer-family to the matching family."
             )
-        if args.scorer_family == "step9" and has_step9_calibration_request:
+        if args.scorer_family == "step9_calibration" and (has_step7_request or has_step9_request or has_step15_request):
             raise SystemExit(
-                "Step 11 received --step9-calibration-experiment together with --scorer-family step9. "
-                "Remove the calibration selector or switch --scorer-family to step9_calibration."
-            )
-        if args.scorer_family == "step9_calibration" and (has_step7_request or has_step9_request):
-            raise SystemExit(
-                "Step 11 received Step 7 or Step 9 few-shot selectors together with --scorer-family "
+                "Step 11 received non-calibration selectors together with --scorer-family "
                 "step9_calibration. Remove the conflicting selectors or switch to the matching family."
             )
+        if args.scorer_family == "step15" and (has_step7_request or has_step9_request or has_step9_calibration_request):
+            raise SystemExit(
+                "Step 11 received Step 7 or Step 9 selectors together with --scorer-family step15. "
+                "Remove the conflicting selectors or switch to the matching family."
+            )
         if args.scorer_family == "auto":
+            if has_step7_request:
+                return "step7"
+            if has_step9_request:
+                return "step9"
+            if has_step9_calibration_request:
+                return "step9_calibration"
+            if has_step15_request:
+                return "step15"
             best_overall = (dynamic_snapshot or {}).get("best_overall")
             if best_overall:
                 return str(best_overall["scorer_family"])
@@ -949,6 +1002,8 @@ def detect_requested_scorer_family(
         return "step9"
     if has_step9_calibration_request:
         return "step9_calibration"
+    if has_step15_request:
+        return "step15"
     default_family = str(scorer_selection.get("default_scorer_family", "step7") or "step7")
     if default_family == "auto":
         best_overall = (dynamic_snapshot or {}).get("best_overall")
@@ -1371,6 +1426,238 @@ def resolve_step9_calibration_scorer_reference(
     }
 
 
+def step15_scorer_token_for_selection(
+    scorer_selection: dict,
+    experiment_name: str,
+    phase_id: str,
+    seeds: list[int],
+) -> str:
+    seed_token = "seed_mean" if len(seeds) > 1 else f"seed_{int(seeds[0])}"
+    aliases = scorer_selection.get("step15_scorer_token_aliases", {}) or {}
+    for key in (
+        f"{experiment_name}::{phase_id}::{seed_token}",
+        f"{experiment_name}::{phase_id}",
+    ):
+        alias = str(aliases.get(key, "") or "").strip()
+        if alias:
+            return alias
+    return f"{experiment_name}_{phase_id}_{seed_token}"
+
+
+def find_step15_run(summary: dict, experiment_name: str, phase_id: str, seed: int, summary_path: Path) -> dict:
+    matches = [
+        run
+        for run in summary.get("runs", []) or []
+        if str(run.get("experiment_name", "") or "") == experiment_name
+        and str(run.get("phase_id", "") or "") == phase_id
+        and int(run.get("seed", 0) or 0) == int(seed)
+    ]
+    if not matches:
+        available_preview = [
+            {
+                "experiment_name": run.get("experiment_name"),
+                "phase_id": run.get("phase_id"),
+                "seed": run.get("seed"),
+            }
+            for run in (summary.get("runs", []) or [])[:20]
+        ]
+        raise SystemExit(
+            "Step 11 could not resolve the requested frozen Step 15 run "
+            f"{experiment_name!r}/{phase_id!r}/seed={seed} inside {summary_path}. "
+            f"First available runs: {available_preview}"
+        )
+    if len(matches) > 1:
+        raise SystemExit(
+            "Step 11 found duplicate frozen Step 15 run records for "
+            f"{experiment_name!r}/{phase_id!r}/seed={seed} inside {summary_path}."
+        )
+    return matches[0]
+
+
+def resolve_step15_run_paths(run: dict, experiment_name: str, phase_id: str, seed: int) -> tuple[Path, Path]:
+    output_paths = run.get("output_paths", {}) or {}
+    artifact_rel_path = str(output_paths.get("artifact", "") or "").strip()
+    valid_rel_path = str(output_paths.get("zh_valid_predictions", "") or "").strip()
+    if not artifact_rel_path or not valid_rel_path:
+        raise SystemExit(
+            "Step 11 requires frozen Step 15 output_paths.artifact and output_paths.zh_valid_predictions "
+            f"for {experiment_name!r}/{phase_id!r}/seed={seed}."
+        )
+    artifact_path = resolve_policy_path(artifact_rel_path, ROOT / artifact_rel_path)
+    valid_prediction_path = resolve_policy_path(valid_rel_path, ROOT / valid_rel_path)
+    if not artifact_path.exists():
+        raise SystemExit(f"Step 11 resolved Step 15 artifact path to {artifact_path}, but that file does not exist.")
+    if not valid_prediction_path.exists():
+        raise SystemExit(
+            "Step 11 resolved Step 15 zh_valid prediction path to "
+            f"{valid_prediction_path}, but that file does not exist."
+        )
+    return artifact_path, valid_prediction_path
+
+
+def step15_ensemble_threshold_from_valid_predictions(
+    valid_prediction_paths: list[Path],
+    step15_policy: dict,
+) -> tuple[float, dict]:
+    y_by_pair: dict[str, float] = {}
+    seed_probabilities: list[dict[str, float]] = []
+    seed_row_counts = []
+    for valid_prediction_path in valid_prediction_paths:
+        rows = step7.load_csv(valid_prediction_path)
+        step7.ensure_non_empty(rows, f"step15.zh_valid_predictions::{valid_prediction_path}")
+        probabilities_by_pair: dict[str, float] = {}
+        for row in rows:
+            pair_uid = str(row.get("pair_uid", "") or "").strip()
+            if not pair_uid:
+                raise SystemExit(f"Step 15 valid prediction row in {valid_prediction_path} is missing pair_uid.")
+            if pair_uid in probabilities_by_pair:
+                raise SystemExit(
+                    f"Step 15 valid prediction file {valid_prediction_path} contains duplicate pair_uid {pair_uid!r}."
+                )
+            y_true = float(step7.to_float(row.get("y_true")))
+            probability = float(step7.to_float(row.get("prob_positive")))
+            if not np.isfinite(y_true) or y_true not in {0.0, 1.0}:
+                raise SystemExit(
+                    f"Step 15 valid prediction row {pair_uid!r} in {valid_prediction_path} has invalid y_true={row.get('y_true')!r}."
+                )
+            if not np.isfinite(probability):
+                raise SystemExit(
+                    f"Step 15 valid prediction row {pair_uid!r} in {valid_prediction_path} has invalid prob_positive."
+                )
+            if pair_uid in y_by_pair and y_by_pair[pair_uid] != y_true:
+                raise SystemExit(
+                    f"Step 15 valid prediction files disagree on y_true for pair_uid {pair_uid!r}."
+                )
+            y_by_pair[pair_uid] = y_true
+            probabilities_by_pair[pair_uid] = probability
+        seed_row_counts.append(len(rows))
+        seed_probabilities.append(probabilities_by_pair)
+
+    expected_pairs = set(y_by_pair)
+    for valid_prediction_path, probabilities_by_pair in zip(valid_prediction_paths, seed_probabilities, strict=True):
+        current_pairs = set(probabilities_by_pair)
+        missing = sorted(expected_pairs - current_pairs)
+        extra = sorted(current_pairs - expected_pairs)
+        if missing or extra:
+            raise SystemExit(
+                "Step 15 valid prediction seed files do not cover the same pair universe. "
+                f"{valid_prediction_path} missing={missing[:5]} extra={extra[:5]}"
+            )
+
+    pair_order = sorted(expected_pairs)
+    y_valid = np.asarray([y_by_pair[pair_uid] for pair_uid in pair_order], dtype=float)
+    probability_matrix = np.asarray(
+        [
+            [probabilities_by_pair[pair_uid] for pair_uid in pair_order]
+            for probabilities_by_pair in seed_probabilities
+        ],
+        dtype=float,
+    )
+    ensemble_probabilities = probability_matrix.mean(axis=0)
+    metric_name = str(step15_policy["threshold_selection"]["metric"])
+    threshold = step7.choose_threshold(y_valid, ensemble_probabilities, metric_name, step15_policy)
+    metrics = step7.evaluate_probabilities(y_valid, ensemble_probabilities, threshold)
+    return round_float(float(threshold)), {
+        "source": "step15_ensemble_zh_valid_predictions",
+        "valid_prediction_paths": [relative_path(path) for path in valid_prediction_paths],
+        "seed_count": len(valid_prediction_paths),
+        "seed_row_counts": seed_row_counts,
+        "valid_pair_count": len(pair_order),
+        "threshold_metric": metric_name,
+        "ensemble_valid_metrics": metrics,
+    }
+
+
+def resolve_step15_scorer_reference(
+    policy: dict,
+    requested_experiment_name: str | None,
+    requested_phase: str | None,
+    requested_seeds: list[int] | None,
+) -> dict:
+    baseline_reference = policy.get("baseline_reference", {})
+    input_paths = policy.get("input_paths", {})
+    step15_summary_path = resolve_current_main_summary_path(
+        policy,
+        baseline_reference.get("step15_summary") or input_paths.get("step15_summary"),
+        STEP15_SUMMARY_PATH,
+        "Step 15 summary",
+    )
+    step15_policy_path = resolve_policy_path(
+        baseline_reference.get("step15_policy") or input_paths.get("step15_policy"),
+        STEP15_POLICY_PATH,
+    )
+    if not step15_summary_path.exists():
+        raise SystemExit(
+            "Step 11 could not find the required Step 15 summary at "
+            f"{step15_summary_path}. Sync reports/step15_v5_public_noise_weighted_summary.json or update "
+            "schema/step11_clustering_policy.json."
+        )
+    if not step15_policy_path.exists():
+        raise SystemExit(
+            "Step 11 could not find the required Step 15 policy at "
+            f"{step15_policy_path}. Sync schema/step15_evidence_type_policy.json or update "
+            "schema/step11_clustering_policy.json."
+        )
+
+    scorer_selection = resolve_scorer_selection(policy)
+    summary = step7.load_json(step15_summary_path)
+    step15_policy = step7.load_json(step15_policy_path)
+    experiment_name = str(
+        requested_experiment_name
+        or scorer_selection.get("default_step15_experiment_name")
+        or ""
+    ).strip()
+    phase_id = str(requested_phase or scorer_selection.get("default_step15_phase") or "").strip()
+    seeds = requested_seeds or [int(seed) for seed in scorer_selection.get("default_step15_seeds", []) or []]
+    if not experiment_name or not phase_id or not seeds:
+        raise SystemExit(
+            "Step 11 requires a frozen Step 15 experiment, phase, and seed list. Pass "
+            "--step15-experiment, --step15-phase, and one or more --step15-seed values, or set "
+            "scorer_selection.default_step15_* in schema/step11_clustering_policy.json."
+        )
+    seeds = [int(seed) for seed in seeds]
+    if len(set(seeds)) != len(seeds):
+        raise SystemExit(f"Step 11 received duplicate Step 15 seeds: {seeds}")
+
+    runs = [find_step15_run(summary, experiment_name, phase_id, seed, step15_summary_path) for seed in seeds]
+    artifact_paths = []
+    valid_prediction_paths = []
+    for run, seed in zip(runs, seeds, strict=True):
+        artifact_path, valid_prediction_path = resolve_step15_run_paths(run, experiment_name, phase_id, seed)
+        artifact_paths.append(artifact_path)
+        valid_prediction_paths.append(valid_prediction_path)
+
+    selected_threshold, threshold_diagnostics = step15_ensemble_threshold_from_valid_predictions(
+        valid_prediction_paths,
+        step15_policy,
+    )
+    scorer_token = step15_scorer_token_for_selection(scorer_selection, experiment_name, phase_id, seeds)
+    return {
+        "scorer_family": "step15",
+        "scorer_token": scorer_token,
+        "source_experiment_name": experiment_name,
+        "source_run_key": [
+            f"{experiment_name}::{phase_id}::seed_{seed}"
+            for seed in seeds
+        ],
+        "source_ratio": None,
+        "source_ratio_token": None,
+        "source_seed": seeds,
+        "source_phase": phase_id,
+        "summary_path": step15_summary_path,
+        "policy_path": step15_policy_path,
+        "model_path": None,
+        "scoring_backend": "step15_mlp_ensemble",
+        "scorer_artifact_path": artifact_paths[0] if len(artifact_paths) == 1 else None,
+        "scorer_artifact_paths": artifact_paths,
+        "primary_threshold": selected_threshold,
+        "primary_threshold_diagnostics": threshold_diagnostics,
+        "selection_mode": "explicit" if requested_experiment_name or requested_phase or requested_seeds else "policy_default",
+        "dynamic_candidate_rank": None,
+        "dynamic_candidate": None,
+    }
+
+
 def resolve_scorer_reference(policy: dict, args: argparse.Namespace, dynamic_snapshot: dict | None = None) -> dict:
     scorer_selection = resolve_scorer_selection(policy)
     scorer_family = detect_requested_scorer_family(args, scorer_selection, dynamic_snapshot)
@@ -1389,6 +1676,13 @@ def resolve_scorer_reference(policy: dict, args: argparse.Namespace, dynamic_sna
             policy,
             args.step9_calibration_experiment,
             dynamic_snapshot,
+        )
+    if scorer_family == "step15":
+        return resolve_step15_scorer_reference(
+            policy,
+            args.step15_experiment,
+            args.step15_phase,
+            args.step15_seeds,
         )
     raise SystemExit(f"Unsupported Step 11 scorer family: {scorer_family}")
 
@@ -1570,6 +1864,50 @@ def apply_step9_logistic_artifact(
         clip_eps = float(artifact.get("base_probability_clip_eps", 1e-6))
         logits = safe_logit(base_probabilities, clip_eps) + logits
     return safe_sigmoid(logits)
+
+
+def apply_step15_mlp_artifact(pair_rows: list[dict], artifact: dict) -> tuple[list[str], np.ndarray]:
+    feature_names = [str(name) for name in artifact.get("feature_names", [])]
+    if not feature_names:
+        raise SystemExit("Step 15 scorer artifact does not contain feature_names.")
+    step7.validate_feature_columns(pair_rows, feature_names, "step11.zh_target_strict_pairs")
+    x_pairs = rows_to_feature_matrix(pair_rows, feature_names)
+    means = np.asarray(artifact.get("feature_means", []), dtype=float)
+    stds = np.asarray(artifact.get("feature_stds", []), dtype=float)
+    if means.size != x_pairs.shape[1] or stds.size != x_pairs.shape[1]:
+        raise SystemExit("Step 15 scorer artifact feature standardizer dimensions do not match Step 11 features.")
+    stds = np.where(stds > 1e-9, stds, 1.0)
+    x_scaled = (np.where(np.isfinite(x_pairs), x_pairs, means) - means) / stds
+
+    params = artifact.get("params", {}) or {}
+    w1 = np.asarray(params.get("w1", []), dtype=float)
+    b1 = np.asarray(params.get("b1", []), dtype=float)
+    wi = np.asarray(params.get("wi", []), dtype=float)
+    bi = np.asarray(params.get("bi", []), dtype=float)
+    if w1.ndim != 2 or w1.shape[0] != x_scaled.shape[1]:
+        raise SystemExit("Step 15 scorer artifact w1 dimensions do not match Step 11 feature matrix.")
+    hidden_dim = w1.shape[1]
+    if b1.size != hidden_dim or wi.size != hidden_dim or bi.size < 1:
+        raise SystemExit("Step 15 scorer artifact identity-head dimensions are invalid.")
+    hidden = np.tanh(x_scaled @ w1 + b1)
+    probabilities = safe_sigmoid(hidden @ wi + float(bi.reshape(-1)[0]))
+    return feature_names, probabilities
+
+
+def apply_step15_mlp_ensemble(pair_rows: list[dict], artifacts: list[dict]) -> tuple[list[str], np.ndarray]:
+    if not artifacts:
+        raise SystemExit("Step 11 Step 15 ensemble scoring requires at least one artifact.")
+    probability_columns = []
+    common_feature_names: list[str] | None = None
+    for artifact in artifacts:
+        feature_names, probabilities = apply_step15_mlp_artifact(pair_rows, artifact)
+        if common_feature_names is None:
+            common_feature_names = feature_names
+        elif feature_names != common_feature_names:
+            raise SystemExit("Step 15 ensemble artifacts do not share the same feature_names.")
+        probability_columns.append(np.asarray(probabilities, dtype=float))
+    probability_matrix = np.vstack(probability_columns)
+    return list(common_feature_names or []), probability_matrix.mean(axis=0)
 
 
 def rows_to_feature_matrix(rows: list[dict], feature_names: list[str]) -> np.ndarray:
@@ -2219,10 +2557,11 @@ def main() -> None:
     scoring_backend = str(scorer_reference.get("scoring_backend", "lightgbm") or "lightgbm")
     calibration_artifact_path = scorer_reference.get("calibration_artifact_path")
     scorer_artifact_path = scorer_reference.get("scorer_artifact_path")
+    scorer_artifact_paths = [Path(path) for path in scorer_reference.get("scorer_artifact_paths", []) or []]
 
     minimum_cluster_size = int(policy["graph_policy"]["minimum_cluster_size"])
 
-    lgb = None if scoring_backend == "logistic_regression_l2" else step7.require_lightgbm()
+    lgb = None if scoring_backend in {"logistic_regression_l2", "step15_mlp_ensemble"} else step7.require_lightgbm()
     seller_index = load_seller_index(seller_profile_path)
     pair_rows = step7.load_csv(pair_feature_path)
     step7.ensure_non_empty(pair_rows, "step11.zh_target_strict_pairs")
@@ -2272,6 +2611,17 @@ def main() -> None:
         scorer_artifact = step7.load_json(Path(scorer_artifact_path))
         feature_names = [str(name) for name in scorer_artifact.get("feature_names", [])]
         probabilities = apply_step9_logistic_artifact(pair_rows, scorer_artifact)
+    elif scoring_backend == "step15_mlp_ensemble":
+        if not scorer_artifact_paths:
+            raise SystemExit("Step 11 Step 15 MLP ensemble scoring requires scorer_artifact_paths.")
+        step15_artifacts = [step7.load_json(path) for path in scorer_artifact_paths]
+        feature_names, probabilities = apply_step15_mlp_ensemble(pair_rows, step15_artifacts)
+        scorer_artifact = {
+            "artifact_type": "step15_mlp_ensemble",
+            "artifact_count": len(scorer_artifact_paths),
+            "artifact_paths": [relative_path(path) for path in scorer_artifact_paths],
+            "primary_threshold_diagnostics": scorer_reference.get("primary_threshold_diagnostics"),
+        }
     else:
         raise SystemExit(f"Unsupported Step 11 scoring backend: {scoring_backend}")
 
@@ -2407,6 +2757,8 @@ def main() -> None:
             "resolved_scorer_artifact_path": None
             if scorer_artifact_path is None
             else relative_path(Path(scorer_artifact_path)),
+            "resolved_scorer_artifact_paths": [relative_path(path) for path in scorer_artifact_paths],
+            "primary_threshold_diagnostics": scorer_reference.get("primary_threshold_diagnostics"),
         },
         "selected_scorer": {
             "default_scorer_family": str(scorer_selection.get("default_scorer_family", "") or ""),
@@ -2417,12 +2769,18 @@ def main() -> None:
             ),
             "default_step9_ratio": scorer_selection.get("default_step9_ratio"),
             "default_step9_seed": scorer_selection.get("default_step9_seed"),
+            "default_step15_experiment_name": str(scorer_selection.get("default_step15_experiment_name", "") or ""),
+            "default_step15_phase": str(scorer_selection.get("default_step15_phase", "") or ""),
+            "default_step15_seeds": scorer_selection.get("default_step15_seeds", []),
             "requested_scorer_family": args.scorer_family,
             "requested_step7_experiment": args.step7_experiment,
             "requested_step9_experiment": args.step9_experiment,
             "requested_step9_ratio": args.step9_ratio,
             "requested_step9_seed": args.step9_seed,
             "requested_step9_calibration_experiment": args.step9_calibration_experiment,
+            "requested_step15_experiment": args.step15_experiment,
+            "requested_step15_phase": args.step15_phase,
+            "requested_step15_seeds": args.step15_seeds,
             "scorer_family": scorer_reference["scorer_family"],
             "scorer_token": scorer_token,
             "source_experiment_name": scorer_reference["source_experiment_name"],
@@ -2430,6 +2788,7 @@ def main() -> None:
             "source_ratio": scorer_reference["source_ratio"],
             "source_ratio_token": scorer_reference["source_ratio_token"],
             "source_seed": scorer_reference["source_seed"],
+            "source_phase": scorer_reference.get("source_phase"),
             "scoring_backend": scoring_backend,
             "model_path": None if model_path is None else relative_path(model_path),
             "calibration_artifact_path": None
@@ -2438,6 +2797,7 @@ def main() -> None:
             "scorer_artifact_path": None
             if scorer_artifact_path is None
             else relative_path(Path(scorer_artifact_path)),
+            "scorer_artifact_paths": [relative_path(path) for path in scorer_artifact_paths],
             "calibrator_type": scorer_reference.get("calibrator_type"),
             "selection_mode": str(scorer_reference.get("selection_mode", "") or ""),
             "dynamic_candidate_rank": scorer_reference.get("dynamic_candidate_rank"),
