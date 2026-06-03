@@ -1,33 +1,37 @@
 {
-  "policy_path": "schema\\step11_clustering_policy.json",
+  "policy_path": "schema/step11_clustering_policy.json",
   "input_dependencies": [
     "reports/step7_pair_features.zh_target_strict.csv",
     "reports/step3_seller_profiles.zh_target_strict.jsonl",
     "reports/step7_training_summary.json",
     "schema/step7_training_policy.json",
     "reports/step9_few_shot_summary.json",
-    "reports/step9_calibration_summary.json"
+    "reports/step9_calibration_summary.json",
+    "reports/step15_v5_public_noise_weighted_summary.json",
+    "schema/step15_evidence_type_policy.json"
   ],
   "output_paths": {
-    "scored_pairs": "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_scored_pairs.csv",
+    "scored_pairs": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_scored_pairs.csv",
     "clusters_by_threshold": {
-      "0720543": "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0720543.csv",
-      "0800000": "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0800000.csv",
-      "0900000": "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0900000.csv"
+      "0720543": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0720543.csv",
+      "0800000": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0800000.csv",
+      "0900000": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_zh_target_strict_clusters.threshold_0900000.csv"
     },
-    "summary": "reports\\step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json"
+    "summary": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json"
   },
   "scorer_reference": {
     "scorer_family": "step9",
-    "summary_path": "reports\\step9_few_shot_summary.json",
-    "policy_path": "schema\\step9_training_policy.json",
+    "summary_path": "reports/step9_few_shot_summary.json",
+    "policy_path": "schema/step9_training_policy.json",
     "resolved_pairwise_primary_threshold": 0.720543,
     "resolved_graph_primary_threshold": 0.720543,
     "resolved_graph_primary_threshold_source": "selected scorer summary::pairwise_primary_threshold",
     "scoring_backend": "logistic_regression_l2",
-    "resolved_model_path": "reports\\step7_core_zero_shot_multilingual_e5_large_model.txt",
+    "resolved_model_path": "reports/step7_core_zero_shot_multilingual_e5_large_model.txt",
     "resolved_calibration_artifact_path": null,
-    "resolved_scorer_artifact_path": "reports\\step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_artifact.json"
+    "resolved_scorer_artifact_path": "reports/step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_artifact.json",
+    "resolved_scorer_artifact_paths": [],
+    "primary_threshold_diagnostics": null
   },
   "selected_scorer": {
     "default_scorer_family": "auto",
@@ -36,12 +40,22 @@
     "default_step9_calibration_experiment_name": "core_calibrated_default",
     "default_step9_ratio": 0.5,
     "default_step9_seed": 20260321,
+    "default_step15_experiment_name": "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "default_step15_phase": "phase4_add_positive_pair_mixup",
+    "default_step15_seeds": [
+      20260320,
+      20260321,
+      20260322
+    ],
     "requested_scorer_family": "step9",
     "requested_step7_experiment": null,
     "requested_step9_experiment": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
     "requested_step9_ratio": 1.0,
     "requested_step9_seed": 20260320,
     "requested_step9_calibration_experiment": null,
+    "requested_step15_experiment": null,
+    "requested_step15_phase": null,
+    "requested_step15_seeds": null,
     "scorer_family": "step9",
     "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320",
     "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
@@ -49,10 +63,12 @@
     "source_ratio": 1.0,
     "source_ratio_token": "100pct",
     "source_seed": 20260320,
+    "source_phase": null,
     "scoring_backend": "logistic_regression_l2",
-    "model_path": "reports\\step7_core_zero_shot_multilingual_e5_large_model.txt",
+    "model_path": "reports/step7_core_zero_shot_multilingual_e5_large_model.txt",
     "calibration_artifact_path": null,
-    "scorer_artifact_path": "reports\\step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_artifact.json",
+    "scorer_artifact_path": "reports/step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_artifact.json",
+    "scorer_artifact_paths": [],
     "calibrator_type": null,
     "selection_mode": "dynamic_family_best",
     "dynamic_candidate_rank": 1,

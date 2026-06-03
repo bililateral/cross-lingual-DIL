@@ -38,7 +38,42 @@ Updated: 2026-06-03
   - The corresponding AP difference is positive but not statistically locked: observed diff `+0.149956`, CI `[-0.032434, 0.304387]`.
   - v5 domain-balanced vs raw E5 is stronger in point estimate for both ROC-AUC and AP, but both CIs still cross 0.
   - v5 domain-balanced vs v2 domain-balanced remains only a point-estimate improvement: ROC-AUC diff `+0.012325`, CI `[-0.012943, 0.062131]`; AP diff `+0.024580`, CI `[-0.057586, 0.168206]`.
-- Scientific interpretation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics. The next required action is Step 11 graph validation: compare Step15 v5 clusters against raw/Step9 controls and confirm whether graph outputs improve without suppressing true direct-identifier positives.
+- Scientific interpretation before graph validation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics.
+- Step 11 graph validation has now been rerun on Linux and synchronized back. The validation audit was generated with explicit `--summary` allow-list inputs, not by globbing `reports/`, and the audit records `summary_selection_mode = explicit`.
+- The six accepted Step 11 validation summaries are:
+  - `step11_step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
+  - `step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
+  - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json`
+  - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321_clustering_summary.json`
+  - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_clustering_summary.json`
+  - `step11_core_zero_shot_bge_m3_clustering_summary.json`
+- Synchronization/integrity checks for the Step 11 validation are clean: all six summaries exist, every summary has `acceptance_checks_failed = []`, and every path referenced by each summary's `output_paths` exists locally.
+- Primary Step 11 graph outputs:
+  - `step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean`: selected threshold `0.925494`; `226` pre-filter edges, `190` after relation reliability, `187` after reciprocal top-k, `26` after shared-neighbor pruning; `6` primary clusters, largest size `5`.
+  - `step15_v5_public_noise_weighted_strong_phase4_seed_mean`: selected threshold `0.598927`; `677` pre-filter edges, `572` after relation reliability, `560` after reciprocal top-k, `112` after shared-neighbor pruning; `21` primary clusters, largest size `7`.
+  - `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320`: selected threshold `0.720543`; `408` pre-filter edges, `332` after relation reliability, `321` after reciprocal top-k, `70` after shared-neighbor pruning; `11` primary clusters, largest size `7`.
+  - `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321`: selected threshold `0.792627`; `203` pre-filter edges, `172` after relation reliability, `167` after reciprocal top-k, `35` after shared-neighbor pruning; `7` primary clusters, largest size `7`.
+  - `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322`: selected threshold `0.720528`; `345` pre-filter edges, `267` after relation reliability, `258` after reciprocal top-k, `61` after shared-neighbor pruning; `12` primary clusters, largest size `7`.
+  - `core_zero_shot_bge_m3`: selected threshold `0.483444`; `1425` pre-filter edges, `1165` after relation reliability, `1005` after reciprocal top-k, `197` after shared-neighbor pruning; `43` primary clusters, largest size `7`.
+- The explicit cluster-level validation audit is:
+  - `reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv`
+  - `reports/step11_cluster_level_audit.step15_v5_validation_20260603.json`
+  - `input_summary_count = 6`, `primary_cluster_count_total = 100`, `unique_cluster_set_count = 79`.
+  - decision counts: `same_controller_high_confidence = 0`, `same_controller_core_with_possible_expansion = 0`, `partial_anchor = 5`, `template_clone_not_controller = 33`, `semantic_topic_not_controller = 35`, `uncertain = 6`.
+  - confidence counts: `low = 74`, `medium = 5`.
+- Best-scorer distribution in the unique cluster audit:
+  - `core_zero_shot_bge_m3`: `43` unique cluster sets; `3` partial anchors, `26` template-clone non-controller sets, `11` semantic-topic non-controller sets, `3` uncertain.
+  - `step15_v5_public_noise_weighted_strong_phase4_seed_mean`: `17` unique cluster sets; `1` partial anchor, `2` template-clone non-controller sets, `12` semantic-topic non-controller sets, `2` uncertain.
+  - `step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean`: `3` unique cluster sets; `1` partial anchor, `1` semantic-topic non-controller set, `1` uncertain.
+  - Step 9 E5 mixup 100pct seeds together contribute `16` unique cluster sets, all audited as template-clone or semantic-topic non-controller sets.
+- Step 11 validation conclusion: Step 15 v5 domain-balanced is useful as a conservative graph triage/noise-compression scorer, because it produces the smallest retained graph while preserving one partial-anchor candidate. It does not yet prove better same-controller discovery quality: the validation audit found no high-confidence same-controller cluster and no same-controller core-with-expansion cluster for any candidate. Step 15 v5 must therefore be reported as a pairwise robustness and graph-triage improvement, not as proof-level identity-cluster discovery.
+- Cross-step design audit after Step 7 through Step 15:
+  - No new evidence was found of a current result-overwrite bug in the active Step 9/Step 11/Step 12/Step 15 outputs. New Step 15 v5 outputs use separate names, and the Step 11 validation audit uses explicit summary inputs.
+  - No new validation/test leakage was found in the active validation path. Step 15 graph thresholds are selected from frozen `zh_valid` seed-ensemble predictions, not from `zh_test`; Step 11 cluster decisions are audit outputs and are not fed back into Step 5 labels.
+  - The main remaining Step 7 design limitation is scientific, not a sync bug: LightGBM fusion remains shallow/collapsed relative to raw semantic scoring on the Chinese target test, so raw semantic baselines, especially raw E5, must remain first-class controls in every claim.
+  - The Step 9 "few-shot" terminology remains potentially misleading. Ratio `1.0` means all frozen Chinese train support is used; it should be described as target-domain support-ratio adaptation. Positive-pair mixup is training-only minority regularization and must not be described as new ground-truth labels.
+  - The Step 11 validation is correct as an allow-list audit, but future Step 13/table-generation code must not fall back to an older `step11_current_manifest_*.json` or a `reports/` glob. Any follow-up Step 13 run should explicitly consume this Step 11 validation audit or a newly generated validation manifest.
+  - Step 15 v5 is not a successful standard multi-task-learning proof. Its active value is identity-only curriculum/reweighting with evidence-type diagnostics, plus public-contact/URL-noise stress control. Any paper text should avoid claiming that the evidence-type auxiliary head itself solved the task.
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 

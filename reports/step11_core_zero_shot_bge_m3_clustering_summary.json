@@ -6,7 +6,9 @@
     "reports/step7_training_summary.json",
     "schema/step7_training_policy.json",
     "reports/step9_few_shot_summary.json",
-    "reports/step9_calibration_summary.json"
+    "reports/step9_calibration_summary.json",
+    "reports/step15_v5_public_noise_weighted_summary.json",
+    "schema/step15_evidence_type_policy.json"
   ],
   "output_paths": {
     "scored_pairs": "reports/step11_core_zero_shot_bge_m3_zh_target_strict_scored_pairs.csv",
@@ -26,7 +28,9 @@
     "scoring_backend": "lightgbm",
     "resolved_model_path": "reports/step7_core_zero_shot_bge_m3_model.txt",
     "resolved_calibration_artifact_path": null,
-    "resolved_scorer_artifact_path": null
+    "resolved_scorer_artifact_path": null,
+    "resolved_scorer_artifact_paths": [],
+    "primary_threshold_diagnostics": null
   },
   "selected_scorer": {
     "default_scorer_family": "auto",
@@ -35,12 +39,22 @@
     "default_step9_calibration_experiment_name": "core_calibrated_default",
     "default_step9_ratio": 0.5,
     "default_step9_seed": 20260321,
+    "default_step15_experiment_name": "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "default_step15_phase": "phase4_add_positive_pair_mixup",
+    "default_step15_seeds": [
+      20260320,
+      20260321,
+      20260322
+    ],
     "requested_scorer_family": "step7",
     "requested_step7_experiment": "core_zero_shot_bge_m3",
     "requested_step9_experiment": null,
     "requested_step9_ratio": null,
     "requested_step9_seed": null,
     "requested_step9_calibration_experiment": null,
+    "requested_step15_experiment": null,
+    "requested_step15_phase": null,
+    "requested_step15_seeds": null,
     "scorer_family": "step7",
     "scorer_token": "core_zero_shot_bge_m3",
     "source_experiment_name": "core_zero_shot_bge_m3",
@@ -48,10 +62,12 @@
     "source_ratio": null,
     "source_ratio_token": null,
     "source_seed": null,
+    "source_phase": null,
     "scoring_backend": "lightgbm",
     "model_path": "reports/step7_core_zero_shot_bge_m3_model.txt",
     "calibration_artifact_path": null,
     "scorer_artifact_path": null,
+    "scorer_artifact_paths": [],
     "calibrator_type": null,
     "selection_mode": "explicit",
     "dynamic_candidate_rank": null,

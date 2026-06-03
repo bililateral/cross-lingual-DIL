@@ -11,27 +11,67 @@
     "schema/step15_evidence_type_policy.json"
   ],
   "output_paths": {
-    "scored_pairs": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_zh_target_strict_scored_pairs.csv",
+    "scored_pairs": "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_zh_target_strict_scored_pairs.csv",
     "clusters_by_threshold": {
-      "0720528": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_zh_target_strict_clusters.threshold_0720528.csv",
-      "0800000": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_zh_target_strict_clusters.threshold_0800000.csv",
-      "0900000": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_zh_target_strict_clusters.threshold_0900000.csv"
+      "0598927": "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_zh_target_strict_clusters.threshold_0598927.csv",
+      "0800000": "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_zh_target_strict_clusters.threshold_0800000.csv",
+      "0900000": "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_zh_target_strict_clusters.threshold_0900000.csv"
     },
-    "summary": "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_clustering_summary.json"
+    "summary": "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json"
   },
   "scorer_reference": {
-    "scorer_family": "step9",
-    "summary_path": "reports/step9_few_shot_summary.json",
-    "policy_path": "schema/step9_training_policy.json",
-    "resolved_pairwise_primary_threshold": 0.720528,
-    "resolved_graph_primary_threshold": 0.720528,
+    "scorer_family": "step15",
+    "summary_path": "reports/step15_v5_public_noise_weighted_summary.json",
+    "policy_path": "schema/step15_evidence_type_policy.json",
+    "resolved_pairwise_primary_threshold": 0.598927,
+    "resolved_graph_primary_threshold": 0.598927,
     "resolved_graph_primary_threshold_source": "selected scorer summary::pairwise_primary_threshold",
-    "scoring_backend": "logistic_regression_l2",
-    "resolved_model_path": "reports/step7_core_zero_shot_multilingual_e5_large_model.txt",
+    "scoring_backend": "step15_mlp_ensemble",
+    "resolved_model_path": null,
     "resolved_calibration_artifact_path": null,
-    "resolved_scorer_artifact_path": "reports/step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_artifact.json",
-    "resolved_scorer_artifact_paths": [],
-    "primary_threshold_diagnostics": null
+    "resolved_scorer_artifact_path": null,
+    "resolved_scorer_artifact_paths": [
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260320_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260321_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260322_artifact.json"
+    ],
+    "primary_threshold_diagnostics": {
+      "source": "step15_ensemble_zh_valid_predictions",
+      "valid_prediction_paths": [
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260320_predictions.zh_valid.csv",
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260321_predictions.zh_valid.csv",
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260322_predictions.zh_valid.csv"
+      ],
+      "seed_count": 3,
+      "seed_row_counts": [
+        81,
+        81,
+        81
+      ],
+      "valid_pair_count": 81,
+      "threshold_metric": "balanced_accuracy",
+      "ensemble_valid_metrics": {
+        "row_count": 81,
+        "positive_count": 14,
+        "negative_count": 67,
+        "logloss": 0.441506,
+        "roc_auc": 0.867804,
+        "average_precision": 0.747859,
+        "threshold": 0.598927,
+        "accuracy": 0.814815,
+        "precision": 0.478261,
+        "recall": 0.785714,
+        "specificity": 0.820896,
+        "balanced_accuracy": 0.803305,
+        "f1": 0.594595,
+        "confusion": {
+          "tp": 11,
+          "tn": 55,
+          "fp": 12,
+          "fn": 3
+        }
+      }
+    }
   },
   "selected_scorer": {
     "default_scorer_family": "auto",
@@ -47,82 +87,74 @@
       20260321,
       20260322
     ],
-    "requested_scorer_family": "step9",
+    "requested_scorer_family": "step15",
     "requested_step7_experiment": null,
-    "requested_step9_experiment": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-    "requested_step9_ratio": 1.0,
-    "requested_step9_seed": 20260322,
+    "requested_step9_experiment": null,
+    "requested_step9_ratio": null,
+    "requested_step9_seed": null,
     "requested_step9_calibration_experiment": null,
-    "requested_step15_experiment": null,
-    "requested_step15_phase": null,
-    "requested_step15_seeds": null,
-    "scorer_family": "step9",
-    "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322",
-    "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-    "source_run_key": "100pct_seed_20260322",
-    "source_ratio": 1.0,
-    "source_ratio_token": "100pct",
-    "source_seed": 20260322,
-    "source_phase": null,
-    "scoring_backend": "logistic_regression_l2",
-    "model_path": "reports/step7_core_zero_shot_multilingual_e5_large_model.txt",
+    "requested_step15_experiment": "step15_v5_identity_only_curriculum_public_noise_weighted_strong",
+    "requested_step15_phase": "phase4_add_positive_pair_mixup",
+    "requested_step15_seeds": [
+      20260320,
+      20260321,
+      20260322
+    ],
+    "scorer_family": "step15",
+    "scorer_token": "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+    "source_experiment_name": "step15_v5_identity_only_curriculum_public_noise_weighted_strong",
+    "source_run_key": [
+      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_20260320",
+      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_20260321",
+      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_20260322"
+    ],
+    "source_ratio": null,
+    "source_ratio_token": null,
+    "source_seed": [
+      20260320,
+      20260321,
+      20260322
+    ],
+    "source_phase": "phase4_add_positive_pair_mixup",
+    "scoring_backend": "step15_mlp_ensemble",
+    "model_path": null,
     "calibration_artifact_path": null,
-    "scorer_artifact_path": "reports/step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_artifact.json",
-    "scorer_artifact_paths": [],
+    "scorer_artifact_path": null,
+    "scorer_artifact_paths": [
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260320_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260321_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260322_artifact.json"
+    ],
     "calibrator_type": null,
-    "selection_mode": "dynamic_family_best",
-    "dynamic_candidate_rank": 3,
-    "dynamic_candidate": {
-      "scorer_family": "step9",
-      "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322",
-      "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-      "source_run_key": "100pct_seed_20260322",
-      "source_ratio": 1.0,
-      "source_ratio_token": "100pct",
-      "source_seed": 20260322,
-      "primary_metric_path": "zh_test_metrics.roc_auc",
-      "primary_metric": 0.839216,
-      "secondary_metrics": {
-        "zh_test_metrics.average_precision": 0.579418,
-        "zh_test_metrics.balanced_accuracy": 0.607283,
-        "best_iteration": 8.0
-      },
-      "best_iteration": 8,
-      "trained_iteration_count": 8,
-      "selected_threshold": 0.720528,
-      "low_ratio_guard_triggered": false,
-      "ratio_aggregate_primary_metric_mean": 0.84183,
-      "ratio_aggregate_secondary_metrics": {
-        "zh_test_metrics.average_precision.mean": 0.587521,
-        "zh_test_metrics.balanced_accuracy.mean": 0.615219
-      },
-      "zh_test_row_count": 106,
-      "suspicious_perfect_small_test": false,
-      "training_backend": "logistic_regression_l2",
-      "scoring_backend": "logistic_regression_l2",
-      "iteration_filter": {
-        "min_best_iteration": 0,
-        "min_trained_iteration_count": 0,
-        "iteration_role": "logistic_solver_iteration"
-      }
-    },
+    "selection_mode": "explicit",
+    "dynamic_candidate_rank": null,
+    "dynamic_candidate": null,
     "model_num_trees": null,
     "model_feature_names": [
-      "same_market_raw_bool",
-      "same_source_dataset_bool",
+      "embedding_cosine_multilingual_e5_large",
+      "embedding_cosine_bge_m3",
+      "embedding_cosine_labse",
+      "embedding_cosine_gte_multilingual_base",
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base",
       "profile_category_jaccard",
+      "has_shared_title_clone",
+      "has_shared_description_clone",
       "shared_title_count_capped",
       "shared_description_count_capped",
       "shared_category_count_capped",
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
       "shared_title_idf_sum",
       "shared_description_idf_sum",
       "shared_title_idf_mean",
       "shared_description_idf_mean",
-      "boilerplate_ratio_max",
-      "boilerplate_ratio_gap_abs",
       "shared_boilerplate_count",
       "shared_low_df_sentence_count",
       "shared_rare_ngram_count",
+      "candidate_rule_count_raw",
+      "sparse_lexical_similarity_raw",
+      "structural_support_score_raw",
       "item_count_percentile_gap_abs",
       "price_median_percentile_gap_abs",
       "title_length_median_percentile_gap_abs",
@@ -132,20 +164,20 @@
       "repeated_title_share_percentile_gap_abs",
       "repeated_description_share_percentile_gap_abs",
       "max_category_share_percentile_gap_abs",
-      "embedding_cosine_multilingual_e5_large"
+      "uppercase_ratio_mean_percentile_gap_abs"
     ],
-    "pairwise_primary_threshold": 0.720528,
-    "graph_primary_threshold": 0.720528,
+    "pairwise_primary_threshold": 0.598927,
+    "graph_primary_threshold": 0.598927,
     "graph_primary_threshold_source": "selected scorer summary::pairwise_primary_threshold",
-    "primary_threshold": 0.720528,
+    "primary_threshold": 0.598927,
     "thresholds": [
-      0.720528,
+      0.598927,
       0.8,
       0.9
     ],
     "threshold_resolution": {
       "mode": "absolute_with_quantile_backfill",
-      "graph_primary_threshold": 0.720528,
+      "graph_primary_threshold": 0.598927,
       "requested_sensitivity_thresholds": [
         0.8,
         0.9
@@ -157,14 +189,14 @@
       "skipped_sensitivity_thresholds": [],
       "quantile_backfills": [],
       "score_distribution": {
-        "min": 0.004216,
-        "p05": 0.060127,
-        "p25": 0.180803,
-        "median": 0.33592,
-        "mean": 0.370026,
-        "p75": 0.532357,
-        "p95": 0.790856,
-        "max": 0.999905
+        "min": 0.000159,
+        "p05": 0.002273,
+        "p25": 0.021709,
+        "median": 0.113253,
+        "mean": 0.257384,
+        "p75": 0.436761,
+        "p95": 0.889551,
+        "max": 0.999916
       }
     }
   },
@@ -909,14 +941,14 @@
     }
   },
   "pair_score_distribution": {
-    "min": 0.004216,
-    "p05": 0.060127,
-    "p25": 0.180803,
-    "median": 0.33592,
-    "mean": 0.370026,
-    "p75": 0.532357,
-    "p95": 0.790856,
-    "max": 0.999905
+    "min": 0.000159,
+    "p05": 0.002273,
+    "p25": 0.021709,
+    "median": 0.113253,
+    "mean": 0.257384,
+    "p75": 0.436761,
+    "p95": 0.889551,
+    "max": 0.999916
   },
   "relation_reliability_policy": {
     "enabled": true,
@@ -960,222 +992,105 @@
   },
   "edge_score_final_distribution": {
     "min": 0.0,
-    "p05": 0.005595,
-    "p25": 0.040116,
-    "median": 0.11551,
-    "mean": 0.136313,
-    "p75": 0.207423,
-    "p95": 0.334745,
-    "max": 0.993403
+    "p05": 0.000191,
+    "p25": 0.005364,
+    "median": 0.03394,
+    "mean": 0.102301,
+    "p75": 0.15545,
+    "p95": 0.36772,
+    "max": 0.999774
   },
   "calibration_artifact": null,
   "scorer_artifact": {
-    "standardization": {
-      "enabled": true,
-      "mean": [
-        0.702783634535,
-        0.996503496503,
-        0.409617330154,
-        0.358147543958,
-        0.463169025823,
-        0.917398762027,
-        2.054075438283,
-        4.310232117797,
-        1.065248116992,
-        1.613579528867,
-        0.000348031469,
-        0.000270331002,
-        0.001165501166,
-        0.510426730417,
-        0.240284580793,
-        0.151584896477,
-        0.223460575955,
-        0.236899317399,
-        0.203312480395,
-        0.271280365641,
-        0.289652829005,
-        0.053810319946,
-        0.0721529739,
-        0.285781002317,
-        0.922115839429
+    "artifact_type": "step15_mlp_ensemble",
+    "artifact_count": 3,
+    "artifact_paths": [
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260320_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260321_artifact.json",
+      "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260322_artifact.json"
+    ],
+    "primary_threshold_diagnostics": {
+      "source": "step15_ensemble_zh_valid_predictions",
+      "valid_prediction_paths": [
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260320_predictions.zh_valid.csv",
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260321_predictions.zh_valid.csv",
+        "reports/step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_20260322_predictions.zh_valid.csv"
       ],
-      "scale": [
-        0.453336356206,
-        0.059027772784,
-        0.410904381029,
-        1.02979326803,
-        1.194032667026,
-        1.084756873846,
-        6.529728771939,
-        11.281342403031,
-        2.789140259671,
-        3.275380895883,
-        0.006085346599,
-        0.004999279375,
-        0.034119536523,
-        1.332779382039,
-        0.760626596511,
-        0.147791500758,
-        0.214481856752,
-        0.201041273223,
-        0.191781665978,
-        0.240822254365,
-        0.257158269461,
-        0.114848751068,
-        0.121434022175,
-        0.348356316889,
-        0.026707173111
-      ]
-    },
-    "parameter_intercept": -0.16188956468,
-    "parameter_coefficients": [
-      -0.239792438298,
-      0.131654073132,
-      -0.612570566525,
-      1.224317174671,
-      0.243645025607,
-      0.221285794872,
-      0.071208970039,
-      0.143034552747,
-      -0.593276240318,
-      -0.413821623402,
-      -0.008921355289,
-      0.034112042659,
-      -0.098839580999,
-      0.158201865413,
-      0.038411198217,
-      0.211722233183,
-      -0.211700539239,
-      -0.01886502489,
-      0.074585784753,
-      -0.364399909999,
-      -0.079711588236,
-      0.287130318477,
-      -0.29605804465,
-      0.014980443685,
-      1.142661271548
-    ],
-    "l2_penalty": 5.0,
-    "class_weight": "balanced",
-    "max_iter": 100,
-    "tolerance": 1e-08,
-    "solver_iterations": 8,
-    "solver_converged": true,
-    "solver_final_delta_norm": 5e-12,
-    "train_logloss": 0.456214,
-    "artifact_type": "logistic_regression_l2",
-    "scoring_backend": "logistic_regression_l2",
-    "experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-    "run_key": "100pct_seed_20260322",
-    "base_step7_experiment": "core_zero_shot_multilingual_e5_large",
-    "base_step7_model_path": "reports/step7_core_zero_shot_multilingual_e5_large_model.txt",
-    "feature_names": [
-      "same_market_raw_bool",
-      "same_source_dataset_bool",
-      "profile_category_jaccard",
-      "shared_title_count_capped",
-      "shared_description_count_capped",
-      "shared_category_count_capped",
-      "shared_title_idf_sum",
-      "shared_description_idf_sum",
-      "shared_title_idf_mean",
-      "shared_description_idf_mean",
-      "boilerplate_ratio_max",
-      "boilerplate_ratio_gap_abs",
-      "shared_boilerplate_count",
-      "shared_low_df_sentence_count",
-      "shared_rare_ngram_count",
-      "item_count_percentile_gap_abs",
-      "price_median_percentile_gap_abs",
-      "title_length_median_percentile_gap_abs",
-      "description_length_median_percentile_gap_abs",
-      "digit_ratio_mean_percentile_gap_abs",
-      "punct_ratio_mean_percentile_gap_abs",
-      "repeated_title_share_percentile_gap_abs",
-      "repeated_description_share_percentile_gap_abs",
-      "max_category_share_percentile_gap_abs",
-      "embedding_cosine_multilingual_e5_large"
-    ],
-    "feature_mode": "classic_multilingual_e5_large",
-    "positive_pair_mixup": {
-      "enabled": true,
-      "scope": "zh_train_sampled_positive_pairs_only",
-      "synthetic_train_only": true,
-      "source_positive_count": 61,
-      "source_negative_count": 274,
-      "eligible_positive_source_count": 61,
-      "synthetic_row_count": 122,
-      "skipped_reason": null,
-      "target_positive_to_negative_ratio": 1.0,
-      "max_synthetic_per_real_positive": 2.0,
-      "desired_positive_count": 274,
-      "max_synthetic_count": 122,
-      "lambda_min": 0.2,
-      "lambda_max": 0.8,
-      "nearest_neighbor_k": 5,
-      "exclusion_policy": {
-        "require_usable_for_core_transfer": true,
-        "require_core_transfer_eligible": true,
-        "exclude_candidate_scopes": [
-          "positive_component_closure_audit"
-        ],
-        "exclude_split_names": [
-          "audit_only",
-          "audit_only_soft_alias",
-          "uncertain_holdout"
-        ]
+      "seed_count": 3,
+      "seed_row_counts": [
+        81,
+        81,
+        81
+      ],
+      "valid_pair_count": 81,
+      "threshold_metric": "balanced_accuracy",
+      "ensemble_valid_metrics": {
+        "row_count": 81,
+        "positive_count": 14,
+        "negative_count": 67,
+        "logloss": 0.441506,
+        "roc_auc": 0.867804,
+        "average_precision": 0.747859,
+        "threshold": 0.598927,
+        "accuracy": 0.814815,
+        "precision": 0.478261,
+        "recall": 0.785714,
+        "specificity": 0.820896,
+        "balanced_accuracy": 0.803305,
+        "f1": 0.594595,
+        "confusion": {
+          "tp": 11,
+          "tn": 55,
+          "fp": 12,
+          "fn": 3
+        }
       }
-    },
-    "fit_split": "source_train_plus_sampled_zh_train",
-    "train_probability_stats": {
-      "min": 0.001118,
-      "mean": 0.443251,
-      "max": 0.999886
     }
   },
   "graph_threshold_diagnostics": {
-    "graph_primary_threshold": 0.720528,
-    "score_max": 0.999905,
-    "score_ceiling_margin": -0.279377,
+    "graph_primary_threshold": 0.598927,
+    "score_max": 0.999916,
+    "score_ceiling_margin": -0.400989,
     "graph_primary_threshold_exceeds_score_ceiling": false,
     "graph_primary_threshold_has_candidate_edges": true,
     "graph_primary_threshold_has_post_filter_edges": true,
-    "threshold_pass_edge_count": 345,
-    "post_filter_edge_count": 61
+    "threshold_pass_edge_count": 677,
+    "post_filter_edge_count": 112
   },
   "threshold_views": {
-    "0720528": {
-      "threshold": 0.720528,
-      "threshold_token": "0720528",
-      "threshold_pass_edge_count": 345,
-      "edge_count": 61,
-      "edge_rate_within_candidate_pairs": 0.01584,
-      "seller_count_with_edge": 45,
-      "seller_count_without_edge_in_candidate_universe": 2684,
-      "cluster_count": 12,
+    "0598927": {
+      "threshold": 0.598927,
+      "threshold_token": "0598927",
+      "threshold_pass_edge_count": 677,
+      "edge_count": 112,
+      "edge_rate_within_candidate_pairs": 0.029083,
+      "seller_count_with_edge": 81,
+      "seller_count_without_edge_in_candidate_universe": 2648,
+      "cluster_count": 21,
       "largest_cluster_size": 7,
-      "largest_cluster_edge_count": 16,
+      "largest_cluster_edge_count": 15,
       "cluster_size_distribution": {
-        "3": 8,
-        "4": 1,
-        "5": 2,
+        "3": 13,
+        "4": 3,
+        "5": 1,
+        "6": 3,
         "7": 1
       },
       "cluster_size_buckets": {
         "size_2": 0,
-        "size_3_to_5": 11,
-        "size_6_to_10": 1,
+        "size_3_to_5": 17,
+        "size_6_to_10": 4,
         "size_11_plus": 0
       },
       "edge_score_distribution": {
-        "min": 0.720799,
-        "p05": 0.725031,
-        "p25": 0.751555,
-        "median": 0.832584,
-        "mean": 0.831279,
-        "p75": 0.900783,
-        "p95": 0.939315,
-        "max": 0.996798
+        "min": 0.598927,
+        "p05": 0.611369,
+        "p25": 0.717113,
+        "median": 0.79824,
+        "mean": 0.805103,
+        "p75": 0.911879,
+        "p95": 0.97913,
+        "max": 0.994634
       },
       "graph_edge_filtering": {
         "enabled": true,
@@ -1190,49 +1105,49 @@
           "enabled": true,
           "minimum_score": 0.3,
           "hard_keep_direct_identity": true,
-          "pre_filter_edge_count": 345,
-          "post_filter_edge_count": 267,
-          "removed_by_relation_reliability": 78,
+          "pre_filter_edge_count": 677,
+          "post_filter_edge_count": 572,
+          "removed_by_relation_reliability": 105,
           "direct_identity_hard_kept_count": 0,
           "score_distribution": {
             "min": 0.0,
             "p05": 0.03,
             "p25": 0.4,
             "median": 0.4,
-            "mean": 0.380058,
+            "mean": 0.406499,
             "p75": 0.43,
-            "p95": 0.61,
+            "p95": 0.75,
             "max": 1.0
           }
         },
-        "pre_filter_edge_count": 345,
-        "after_relation_reliability_edge_count": 267,
-        "after_reciprocal_top_k_edge_count": 258,
-        "after_shared_neighbor_edge_count": 61,
-        "after_triangle_edge_count": 345,
-        "removed_by_relation_reliability": 78,
-        "removed_by_reciprocal_top_k": 9,
-        "removed_by_shared_neighbor": 197,
+        "pre_filter_edge_count": 677,
+        "after_relation_reliability_edge_count": 572,
+        "after_reciprocal_top_k_edge_count": 560,
+        "after_shared_neighbor_edge_count": 112,
+        "after_triangle_edge_count": 677,
+        "removed_by_relation_reliability": 105,
+        "removed_by_reciprocal_top_k": 12,
+        "removed_by_shared_neighbor": 448,
         "removed_by_triangle": 0,
-        "post_filter_edge_count": 61
+        "post_filter_edge_count": 112
       },
       "tree_cluster_count": 0,
       "tree_cluster_share": 0.0,
       "leaf_member_count_in_clusters": 0,
-      "cluster_member_count": 45,
+      "cluster_member_count": 81,
       "leaf_member_share_in_clusters": 0.0,
       "top_clusters_by_size": [
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0001",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0001",
           "cluster_rank": 1,
           "cluster_size": 7,
-          "cluster_edge_count": 16,
-          "cluster_density": 0.761905,
-          "cluster_score_mean": 0.875649,
+          "cluster_edge_count": 15,
+          "cluster_density": 0.714286,
+          "cluster_score_mean": 0.835321,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 5,
-          "min_member_degree": 3,
+          "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
             "茶马古道"
@@ -1246,12 +1161,35 @@
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0002",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0002",
           "cluster_rank": 2,
-          "cluster_size": 5,
-          "cluster_edge_count": 7,
-          "cluster_density": 0.7,
-          "cluster_score_mean": 0.813177,
+          "cluster_size": 6,
+          "cluster_edge_count": 11,
+          "cluster_density": 0.733333,
+          "cluster_score_mean": 0.912308,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 5,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "121394",
+            "149940",
+            "157835",
+            "312538",
+            "435064"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0003",
+          "cluster_rank": 3,
+          "cluster_size": 6,
+          "cluster_edge_count": 8,
+          "cluster_density": 0.533333,
+          "cluster_score_mean": 0.866649,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 4,
@@ -1264,40 +1202,64 @@
             "507092",
             "565793",
             "569611",
-            "579776",
-            "582222"
+            "579292",
+            "579776"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0003",
-          "cluster_rank": 3,
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0004",
+          "cluster_rank": 4,
+          "cluster_size": 6,
+          "cluster_edge_count": 14,
+          "cluster_density": 0.933333,
+          "cluster_score_mean": 0.758546,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 5,
+          "min_member_degree": 4,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "370168",
+            "413239",
+            "436711",
+            "442988",
+            "470888"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0005",
+          "cluster_rank": 5,
           "cluster_size": 5,
           "cluster_edge_count": 8,
           "cluster_density": 0.8,
-          "cluster_score_mean": 0.737679,
+          "cluster_score_mean": 0.761962,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 4,
           "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
-            "中文暗网交易市场"
+            "中文暗网交易市场",
+            "茶马古道"
           ],
           "sample_members": [
+            "596061",
             "596149",
             "605004",
             "605180",
-            "606036",
-            "606193"
+            "/shop/447283"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0004",
-          "cluster_rank": 4,
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0006",
+          "cluster_rank": 6,
           "cluster_size": 4,
           "cluster_edge_count": 6,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.780799,
+          "cluster_score_mean": 0.850801,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 3,
@@ -1314,120 +1276,57 @@
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0005",
-          "cluster_rank": 5,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.916742,
-          "leaf_member_count": 0,
-          "leaf_member_share": 0.0,
-          "max_member_degree": 2,
-          "min_member_degree": 2,
-          "is_tree": false,
-          "cluster_markets": [
-            "中文暗网交易市场",
-            "茶马古道"
-          ],
-          "sample_members": [
-            "542584",
-            "634642",
-            "/shop/399905"
-          ]
-        },
-        {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0006",
-          "cluster_rank": 6,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.892296,
-          "leaf_member_count": 0,
-          "leaf_member_share": 0.0,
-          "max_member_degree": 2,
-          "min_member_degree": 2,
-          "is_tree": false,
-          "cluster_markets": [
-            "茶马古道"
-          ],
-          "sample_members": [
-            "/shop/448945",
-            "/shop/463004",
-            "/shop/463446"
-          ]
-        },
-        {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0007",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0007",
           "cluster_rank": 7,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.942214,
+          "cluster_size": 4,
+          "cluster_edge_count": 5,
+          "cluster_density": 0.833333,
+          "cluster_score_mean": 0.729964,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
-          "max_member_degree": 2,
+          "max_member_degree": 3,
           "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
-            "中文暗网交易市场",
-            "茶马古道"
+            "中文暗网交易市场"
           ],
           "sample_members": [
-            "604051",
-            "99981",
-            "/shop/408791"
+            "161178",
+            "352921",
+            "381572",
+            "64037"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0008",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0008",
           "cluster_rank": 8,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
+          "cluster_size": 4,
+          "cluster_edge_count": 6,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.907705,
+          "cluster_score_mean": 0.662261,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
-          "max_member_degree": 2,
-          "min_member_degree": 2,
+          "max_member_degree": 3,
+          "min_member_degree": 3,
           "is_tree": false,
           "cluster_markets": [
             "中文暗网交易市场",
             "茶马古道"
           ],
           "sample_members": [
-            "503330",
-            "639133",
-            "/shop/430143"
+            "605669",
+            "605876",
+            "605883",
+            "/shop/446583"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0009",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0009",
           "cluster_rank": 9,
           "cluster_size": 3,
           "cluster_edge_count": 3,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.83937,
-          "leaf_member_count": 0,
-          "leaf_member_share": 0.0,
-          "max_member_degree": 2,
-          "min_member_degree": 2,
-          "is_tree": false,
-          "cluster_markets": [
-            "茶马古道"
-          ],
-          "sample_members": [
-            "/shop/417050",
-            "/shop/436613",
-            "/shop/440442"
-          ]
-        },
-        {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0720528_c0010",
-          "cluster_rank": 10,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.79146,
+          "cluster_score_mean": 0.981444,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 2,
@@ -1438,9 +1337,30 @@
             "茶马古道"
           ],
           "sample_members": [
-            "347765",
-            "493430",
-            "/shop/2417"
+            "51470",
+            "54210",
+            "/shop/400997"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0598927_c0010",
+          "cluster_rank": 10,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.977223,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "101978",
+            "432202",
+            "481541"
           ]
         }
       ]
@@ -1448,33 +1368,35 @@
     "0800000": {
       "threshold": 0.8,
       "threshold_token": "0800000",
-      "threshold_pass_edge_count": 172,
-      "edge_count": 22,
-      "edge_rate_within_candidate_pairs": 0.005713,
-      "seller_count_with_edge": 18,
-      "seller_count_without_edge_in_candidate_universe": 2711,
-      "cluster_count": 5,
+      "threshold_pass_edge_count": 319,
+      "edge_count": 45,
+      "edge_rate_within_candidate_pairs": 0.011685,
+      "seller_count_with_edge": 35,
+      "seller_count_without_edge_in_candidate_universe": 2694,
+      "cluster_count": 9,
       "largest_cluster_size": 6,
       "largest_cluster_edge_count": 10,
       "cluster_size_distribution": {
-        "3": 4,
+        "3": 5,
+        "4": 1,
+        "5": 2,
         "6": 1
       },
       "cluster_size_buckets": {
         "size_2": 0,
-        "size_3_to_5": 4,
+        "size_3_to_5": 8,
         "size_6_to_10": 1,
         "size_11_plus": 0
       },
       "edge_score_distribution": {
-        "min": 0.817468,
-        "p05": 0.837394,
-        "p25": 0.874479,
-        "median": 0.901116,
-        "mean": 0.899909,
-        "p75": 0.925009,
-        "p95": 0.953746,
-        "max": 0.996798
+        "min": 0.800451,
+        "p05": 0.824453,
+        "p25": 0.874934,
+        "median": 0.912369,
+        "mean": 0.911828,
+        "p75": 0.952682,
+        "p95": 0.985149,
+        "max": 0.994634
       },
       "graph_edge_filtering": {
         "enabled": true,
@@ -1489,45 +1411,45 @@
           "enabled": true,
           "minimum_score": 0.3,
           "hard_keep_direct_identity": true,
-          "pre_filter_edge_count": 172,
-          "post_filter_edge_count": 136,
-          "removed_by_relation_reliability": 36,
+          "pre_filter_edge_count": 319,
+          "post_filter_edge_count": 263,
+          "removed_by_relation_reliability": 56,
           "direct_identity_hard_kept_count": 0,
           "score_distribution": {
             "min": 0.0,
             "p05": 0.03,
             "p25": 0.4,
             "median": 0.4,
-            "mean": 0.409128,
+            "mean": 0.426301,
             "p75": 0.53,
-            "p95": 0.619,
+            "p95": 0.75,
             "max": 1.0
           }
         },
-        "pre_filter_edge_count": 172,
-        "after_relation_reliability_edge_count": 136,
-        "after_reciprocal_top_k_edge_count": 134,
-        "after_shared_neighbor_edge_count": 22,
-        "after_triangle_edge_count": 172,
-        "removed_by_relation_reliability": 36,
-        "removed_by_reciprocal_top_k": 2,
-        "removed_by_shared_neighbor": 112,
+        "pre_filter_edge_count": 319,
+        "after_relation_reliability_edge_count": 263,
+        "after_reciprocal_top_k_edge_count": 260,
+        "after_shared_neighbor_edge_count": 45,
+        "after_triangle_edge_count": 319,
+        "removed_by_relation_reliability": 56,
+        "removed_by_reciprocal_top_k": 3,
+        "removed_by_shared_neighbor": 215,
         "removed_by_triangle": 0,
-        "post_filter_edge_count": 22
+        "post_filter_edge_count": 45
       },
       "tree_cluster_count": 0,
       "tree_cluster_share": 0.0,
       "leaf_member_count_in_clusters": 0,
-      "cluster_member_count": 18,
+      "cluster_member_count": 35,
       "leaf_member_share_in_clusters": 0.0,
       "top_clusters_by_size": [
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0800000_c0001",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0001",
           "cluster_rank": 1,
           "cluster_size": 6,
           "cluster_edge_count": 10,
           "cluster_density": 0.666667,
-          "cluster_score_mean": 0.89799,
+          "cluster_score_mean": 0.899886,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 5,
@@ -1538,85 +1460,130 @@
           ],
           "sample_members": [
             "/shop/403489",
+            "/shop/435963",
             "/shop/442431",
             "/shop/444654",
-            "/shop/459141",
-            "/shop/462494"
+            "/shop/459141"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0800000_c0002",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0002",
           "cluster_rank": 2,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.916742,
+          "cluster_size": 5,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.9,
+          "cluster_score_mean": 0.940235,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
-          "max_member_degree": 2,
-          "min_member_degree": 2,
+          "max_member_degree": 4,
+          "min_member_degree": 3,
           "is_tree": false,
           "cluster_markets": [
-            "中文暗网交易市场",
-            "茶马古道"
+            "中文暗网交易市场"
           ],
           "sample_members": [
-            "542584",
-            "634642",
-            "/shop/399905"
+            "121394",
+            "149940",
+            "157835",
+            "312538",
+            "436422"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0800000_c0003",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0003",
           "cluster_rank": 3,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.942214,
+          "cluster_size": 5,
+          "cluster_edge_count": 6,
+          "cluster_density": 0.6,
+          "cluster_score_mean": 0.908454,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
-          "max_member_degree": 2,
+          "max_member_degree": 4,
           "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
-            "中文暗网交易市场",
-            "茶马古道"
+            "中文暗网交易市场"
           ],
           "sample_members": [
-            "604051",
-            "99981",
-            "/shop/408791"
+            "507092",
+            "565793",
+            "569611",
+            "579776",
+            "588888"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0800000_c0004",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0004",
           "cluster_rank": 4,
-          "cluster_size": 3,
-          "cluster_edge_count": 3,
-          "cluster_density": 1.0,
-          "cluster_score_mean": 0.907705,
+          "cluster_size": 4,
+          "cluster_edge_count": 5,
+          "cluster_density": 0.833333,
+          "cluster_score_mean": 0.864817,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
-          "max_member_degree": 2,
+          "max_member_degree": 3,
           "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
-            "中文暗网交易市场",
-            "茶马古道"
+            "中文暗网交易市场"
           ],
           "sample_members": [
-            "503330",
-            "639133",
-            "/shop/430143"
+            "250456",
+            "253337",
+            "327625",
+            "432530"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0800000_c0005",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0005",
           "cluster_rank": 5,
           "cluster_size": 3,
           "cluster_edge_count": 3,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.83937,
+          "cluster_score_mean": 0.981444,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场",
+            "茶马古道"
+          ],
+          "sample_members": [
+            "51470",
+            "54210",
+            "/shop/400997"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0006",
+          "cluster_rank": 6,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.977223,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "101978",
+            "432202",
+            "481541"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0007",
+          "cluster_rank": 7,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.896753,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 2,
@@ -1626,9 +1593,51 @@
             "茶马古道"
           ],
           "sample_members": [
-            "/shop/417050",
-            "/shop/436613",
-            "/shop/440442"
+            "/shop/443705",
+            "/shop/445000",
+            "/shop/445752"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0008",
+          "cluster_rank": 8,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.885202,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "361068",
+            "465763",
+            "501102"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0800000_c0009",
+          "cluster_rank": 9,
+          "cluster_size": 3,
+          "cluster_edge_count": 3,
+          "cluster_density": 1.0,
+          "cluster_score_mean": 0.858208,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 2,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "413239",
+            "436711",
+            "500238"
           ]
         }
       ]
@@ -1636,32 +1645,34 @@
     "0900000": {
       "threshold": 0.9,
       "threshold_token": "0900000",
-      "threshold_pass_edge_count": 61,
-      "edge_count": 6,
-      "edge_rate_within_candidate_pairs": 0.001558,
-      "seller_count_with_edge": 6,
-      "seller_count_without_edge_in_candidate_universe": 2723,
-      "cluster_count": 2,
-      "largest_cluster_size": 3,
-      "largest_cluster_edge_count": 3,
+      "threshold_pass_edge_count": 181,
+      "edge_count": 20,
+      "edge_rate_within_candidate_pairs": 0.005193,
+      "seller_count_with_edge": 15,
+      "seller_count_without_edge_in_candidate_universe": 2714,
+      "cluster_count": 4,
+      "largest_cluster_size": 5,
+      "largest_cluster_edge_count": 9,
       "cluster_size_distribution": {
-        "3": 2
+        "3": 2,
+        "4": 1,
+        "5": 1
       },
       "cluster_size_buckets": {
         "size_2": 0,
-        "size_3_to_5": 2,
+        "size_3_to_5": 4,
         "size_6_to_10": 0,
         "size_11_plus": 0
       },
       "edge_score_distribution": {
-        "min": 0.900783,
-        "p05": 0.902881,
-        "p25": 0.911114,
-        "median": 0.926216,
-        "mean": 0.925589,
-        "p75": 0.936354,
-        "p95": 0.950039,
-        "max": 0.954505
+        "min": 0.902878,
+        "p05": 0.904852,
+        "p25": 0.92634,
+        "median": 0.952581,
+        "mean": 0.94946,
+        "p75": 0.974489,
+        "p95": 0.989656,
+        "max": 0.994634
       },
       "graph_edge_filtering": {
         "enabled": true,
@@ -1676,45 +1687,90 @@
           "enabled": true,
           "minimum_score": 0.3,
           "hard_keep_direct_identity": true,
-          "pre_filter_edge_count": 61,
-          "post_filter_edge_count": 55,
-          "removed_by_relation_reliability": 6,
+          "pre_filter_edge_count": 181,
+          "post_filter_edge_count": 145,
+          "removed_by_relation_reliability": 36,
           "direct_identity_hard_kept_count": 0,
           "score_distribution": {
             "min": 0.03,
-            "p05": 0.28,
-            "p25": 0.4,
-            "median": 0.43,
-            "mean": 0.491967,
+            "p05": 0.03,
+            "p25": 0.38,
+            "median": 0.4,
+            "mean": 0.445691,
             "p75": 0.61,
-            "p95": 0.73,
+            "p95": 0.75,
             "max": 1.0
           }
         },
-        "pre_filter_edge_count": 61,
-        "after_relation_reliability_edge_count": 55,
-        "after_reciprocal_top_k_edge_count": 55,
-        "after_shared_neighbor_edge_count": 6,
-        "after_triangle_edge_count": 61,
-        "removed_by_relation_reliability": 6,
+        "pre_filter_edge_count": 181,
+        "after_relation_reliability_edge_count": 145,
+        "after_reciprocal_top_k_edge_count": 145,
+        "after_shared_neighbor_edge_count": 20,
+        "after_triangle_edge_count": 181,
+        "removed_by_relation_reliability": 36,
         "removed_by_reciprocal_top_k": 0,
-        "removed_by_shared_neighbor": 49,
+        "removed_by_shared_neighbor": 125,
         "removed_by_triangle": 0,
-        "post_filter_edge_count": 6
+        "post_filter_edge_count": 20
       },
       "tree_cluster_count": 0,
       "tree_cluster_share": 0.0,
       "leaf_member_count_in_clusters": 0,
-      "cluster_member_count": 6,
+      "cluster_member_count": 15,
       "leaf_member_share_in_clusters": 0.0,
       "top_clusters_by_size": [
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0900000_c0001",
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0900000_c0001",
           "cluster_rank": 1,
+          "cluster_size": 5,
+          "cluster_edge_count": 9,
+          "cluster_density": 0.9,
+          "cluster_score_mean": 0.940235,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 4,
+          "min_member_degree": 3,
+          "is_tree": false,
+          "cluster_markets": [
+            "中文暗网交易市场"
+          ],
+          "sample_members": [
+            "121394",
+            "149940",
+            "157835",
+            "312538",
+            "436422"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0900000_c0002",
+          "cluster_rank": 2,
+          "cluster_size": 4,
+          "cluster_edge_count": 5,
+          "cluster_density": 0.833333,
+          "cluster_score_mean": 0.930217,
+          "leaf_member_count": 0,
+          "leaf_member_share": 0.0,
+          "max_member_degree": 3,
+          "min_member_degree": 2,
+          "is_tree": false,
+          "cluster_markets": [
+            "茶马古道"
+          ],
+          "sample_members": [
+            "/shop/403489",
+            "/shop/435963",
+            "/shop/444654",
+            "/shop/459141"
+          ]
+        },
+        {
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0900000_c0003",
+          "cluster_rank": 3,
           "cluster_size": 3,
           "cluster_edge_count": 3,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.942214,
+          "cluster_score_mean": 0.981444,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 2,
@@ -1725,30 +1781,30 @@
             "茶马古道"
           ],
           "sample_members": [
-            "604051",
-            "99981",
-            "/shop/408791"
+            "51470",
+            "54210",
+            "/shop/400997"
           ]
         },
         {
-          "cluster_id": "zh_target_strict_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_thr_0900000_c0002",
-          "cluster_rank": 2,
+          "cluster_id": "zh_target_strict_step15_v5_public_noise_weighted_strong_phase4_seed_mean_thr_0900000_c0004",
+          "cluster_rank": 4,
           "cluster_size": 3,
           "cluster_edge_count": 3,
           "cluster_density": 1.0,
-          "cluster_score_mean": 0.908964,
+          "cluster_score_mean": 0.977223,
           "leaf_member_count": 0,
           "leaf_member_share": 0.0,
           "max_member_degree": 2,
           "min_member_degree": 2,
           "is_tree": false,
           "cluster_markets": [
-            "茶马古道"
+            "中文暗网交易市场"
           ],
           "sample_members": [
-            "/shop/403489",
-            "/shop/444654",
-            "/shop/462498"
+            "101978",
+            "432202",
+            "481541"
           ]
         }
       ]
