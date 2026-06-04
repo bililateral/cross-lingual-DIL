@@ -390,12 +390,19 @@
     "include_source_train": true,
     "validation_split_for_early_stopping": "zh_valid",
     "model_selection": {
+      "status": "deprecated_diagnostic_only",
+      "selection_allowed": false,
+      "selection_basis": "pre_registered_experiment_set_and_fixed_zh_valid_thresholding",
+      "publication_rule": "Do not select Step 9 models by zh_test_metrics. Treat zh_test_metrics only as final held-out reporting after the experiment set is fixed."
+    },
+    "final_test_reporting": {
       "primary_metric": "zh_test_metrics.roc_auc",
       "secondary_metrics": [
         "zh_test_metrics.average_precision",
         "zh_test_metrics.balanced_accuracy"
       ],
-      "interpretation": "Balanced accuracy is threshold-conditioned and diagnostic only; Step 9 candidates must be judged first by ranking metrics."
+      "role": "held_out_test_reporting_not_model_selection",
+      "interpretation": "Balanced accuracy is threshold-conditioned and diagnostic only; Step 9 candidates must be judged first by ranking metrics and Step 12 paired robustness."
     },
     "logistic_regression": {
       "class_weight": "balanced",

@@ -1,6 +1,6 @@
 # Project Progress
 
-Updated: 2026-06-03
+Updated: 2026-06-04
 
 ## Current Stage
 
@@ -74,6 +74,13 @@ Updated: 2026-06-03
   - The Step 9 "few-shot" terminology remains potentially misleading. Ratio `1.0` means all frozen Chinese train support is used; it should be described as target-domain support-ratio adaptation. Positive-pair mixup is training-only minority regularization and must not be described as new ground-truth labels.
   - The Step 11 validation is correct as an allow-list audit, but future Step 13/table-generation code must not fall back to an older `step11_current_manifest_*.json` or a `reports/` glob. Any follow-up Step 13 run should explicitly consume this Step 11 validation audit or a newly generated validation manifest.
   - Step 15 v5 is not a successful standard multi-task-learning proof. Its active value is identity-only curriculum/reweighting with evidence-type diagnostics, plus public-contact/URL-noise stress control. Any paper text should avoid claiming that the evidence-type auxiliary head itself solved the task.
+- `2026-06-04` methodology-hygiene patch after the Step 2-15 design review:
+  - `schema/step9_training_policy.json` no longer presents `zh_test_metrics` as the Step 9 model-selection metric. Held-out Chinese test metrics are now recorded under `final_test_reporting` and explicitly marked as reporting-only.
+  - `schema/step11_clustering_policy.json` now defaults to the frozen Step 15 scorer instead of `auto`; the old dynamic auto selector remains available only as diagnostic exploration and is marked `diagnostic_only_not_publication_model_selection`.
+  - The current Step 11 publication-validation summaries are now listed in policy under `scorer_selection.publication_validation.current_validation_summaries`; publication cluster audits must use this explicit allow-list rather than globbing `reports/` or relying on `--scorer-family auto`.
+  - `scripts/step13_concept_drift_audit.py` now accepts explicit `--step11-manifest` and `--step11-audit` inputs. It no longer silently consumes older `step11_current_manifest_*.json` / `step11_cluster_level_audit.current_*.json` files unless `--allow-step11-auto-discovery` is intentionally passed.
+  - `schema/step15_evidence_type_policy.json` now separates historical Step 11 audit files into `diagnostic_dependencies_only`; Step 11 audit outputs are not Step 15 identity-training ground truth.
+  - Step 15 phase4 now documents that `use_negative_mixup` is only a phase capability flag; negative mixup is applied only when the selected experiment also enables `experiments.<name>.negative_mixup.enabled`.
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 

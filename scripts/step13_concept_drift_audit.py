@@ -147,6 +147,17 @@ def newest_existing(pattern: str, fallback: Path | None = None) -> Path | None:
     return None
 
 
+def explicit_existing_path(value: str | None, arg_name: str) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if not path.exists():
+        raise SystemExit(f"{arg_name} does not exist: {path}")
+    if path.is_dir():
+        raise SystemExit(f"{arg_name} must be a file, not a directory: {path}")
+    return path
+
+
 def truthy(value: Any) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "y"}
 
@@ -1111,6 +1122,21 @@ def main() -> int:
     parser.add_argument("--output-json", default=str(OUT_JSON))
     parser.add_argument("--output-csv", default=str(OUT_CSV))
     parser.add_argument("--output-md", default=str(OUT_MD))
+    parser.add_argument(
+        "--step11-manifest",
+        default=None,
+        help="Explicit Step 11 manifest JSON. If omitted, Step 13 does not read a Step 11 manifest unless --allow-step11-auto-discovery is set.",
+    )
+    parser.add_argument(
+        "--step11-audit",
+        default=None,
+        help="Explicit Step 11 cluster-level audit JSON. Use this for current validation audits instead of relying on current_* filename discovery.",
+    )
+    parser.add_argument(
+        "--allow-step11-auto-discovery",
+        action="store_true",
+        help="Compatibility mode only: discover newest reports/step11_current_manifest_*.json and reports/step11_cluster_level_audit.current_*.json.",
+    )
     args = parser.parse_args()
 
     required = [EN_LABELS, ZH_LABELS, EN_FEATURES, ZH_FEATURES, STEP7_SUMMARY, STEP9_SUMMARY]
@@ -1142,8 +1168,16 @@ def main() -> int:
     step7_summary = read_json(STEP7_SUMMARY)
     step7_rows = build_step7_diagnostics(step7_summary)
 
-    step11_manifest_path = newest_existing("step11_current_manifest_*.json", STEP11_MANIFEST_FALLBACK)
-    step11_audit_path = newest_existing("step11_cluster_level_audit.current_*.json", STEP11_AUDIT_FALLBACK)
+    step11_manifest_path = explicit_existing_path(args.step11_manifest, "--step11-manifest")
+    step11_audit_path = explicit_existing_path(args.step11_audit, "--step11-audit")
+    step11_selection_mode = "explicit"
+    if step11_manifest_path is None and step11_audit_path is None:
+        if args.allow_step11_auto_discovery:
+            step11_manifest_path = newest_existing("step11_current_manifest_*.json", STEP11_MANIFEST_FALLBACK)
+            step11_audit_path = newest_existing("step11_cluster_level_audit.current_*.json", STEP11_AUDIT_FALLBACK)
+            step11_selection_mode = "auto_discovery_compatibility"
+        else:
+            step11_selection_mode = "not_provided"
     step11_manifest = read_json(step11_manifest_path) if step11_manifest_path else None
     step11_audit = read_json(step11_audit_path) if step11_audit_path else None
     step11_rows = build_step11_evidence_rows(step11_manifest, step11_audit)
@@ -1178,6 +1212,7 @@ def main() -> int:
             "no_train_valid_test_mixing": True,
             "no_label_writeback": True,
             "high_semantic_threshold_policy": "English negative q90 per semantic feature",
+            "step11_selection_mode": step11_selection_mode,
             "step11_manifest_path": str(step11_manifest_path) if step11_manifest_path else None,
             "step11_audit_path": str(step11_audit_path) if step11_audit_path else None,
         },

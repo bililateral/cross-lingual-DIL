@@ -33,7 +33,8 @@
     "step15_policy": "schema/step15_evidence_type_policy.json"
   },
   "scorer_selection": {
-    "default_scorer_family": "auto",
+    "default_scorer_family": "step15",
+    "auto_selector_role": "diagnostic_only_not_publication_model_selection",
     "default_step7_experiment_name": "core_zero_shot_bge_m3",
     "default_step9_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
     "default_step9_calibration_experiment_name": "core_calibrated_default",
@@ -50,8 +51,24 @@
       "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
       "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_public_noise_weighted_strong_phase4_seed_mean"
     },
+    "publication_validation": {
+      "selection_mode": "explicit_allowlist_only",
+      "auto_selector_allowed": false,
+      "current_validation_audit": "reports/step11_cluster_level_audit.step15_v5_validation_20260603.json",
+      "current_validation_summaries": [
+        "reports/step11_step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json",
+        "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json",
+        "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json",
+        "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321_clustering_summary.json",
+        "reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_clustering_summary.json",
+        "reports/step11_core_zero_shot_bge_m3_clustering_summary.json"
+      ],
+      "rule": "Publication tables and cluster-level audits must pass explicit --summary paths from current_validation_summaries; do not glob reports/ and do not use --scorer-family auto as the publication selector."
+    },
     "dynamic_mainline_candidates": {
       "enabled": true,
+      "role": "diagnostic_only_not_publication_model_selection",
+      "metric_source_warning": "These automatic candidates rank already-finished artifacts by held-out test metrics; use only for exploratory diagnostics, never as the publication model-selection rule.",
       "default_resolution_mode": "family_best",
       "max_candidates_per_family": 12,
       "overall_family_priority": [
@@ -61,6 +78,7 @@
       "families": {
         "step7": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "exclude_experiment_prefixes": [
             "identifier_augmented_",
             "en_only_"
@@ -76,6 +94,7 @@
         },
         "step9": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "include_experiment_prefixes": [
             "core_few_shot_multilingual_e5_large_lr_l2",
             "core_few_shot_bge_m3_residual_lr",
@@ -131,6 +150,7 @@
         },
         "step9_calibration": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "include_experiment_prefixes": [
             "__disabled_for_current_mainline__"
           ],

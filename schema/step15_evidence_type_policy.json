@@ -7,9 +7,16 @@
     "reports/step5_zh_target_strict_frozen_silver_labels.csv",
     "reports/step7_pair_features.en_content_train_pool.csv",
     "reports/step7_pair_features.zh_target_strict.csv",
-    "reports/step11_cluster_level_audit.current_20260517.csv",
     "reports/step13_concept_drift_audit.json"
   ],
+  "diagnostic_dependencies_only": [
+    "reports/step11_cluster_level_audit.current_20260517.csv",
+    "reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv"
+  ],
+  "dependency_roles": {
+    "reports/step11_cluster_level_audit.current_20260517.csv": "historical_diagnostic_source_for_evidence_type_audit_context_not_identity_training_ground_truth",
+    "reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv": "posthoc_step11_validation_audit_not_step15_training_input"
+  },
   "pools": {
     "en_content_train_pool": {
       "frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
@@ -239,6 +246,7 @@
       ],
       "use_positive_mixup": true,
       "use_negative_mixup": true,
+      "negative_mixup_activation_rule": "Phase-level capability only; negative mixup is applied only when the selected experiment also has experiments.<name>.negative_mixup.enabled=true.",
       "purpose": "Regularize the minority positive boundary with synthetic_train_only feature-space mixup."
     }
   ],
