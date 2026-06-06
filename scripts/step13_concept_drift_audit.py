@@ -607,6 +607,16 @@ def collect_models(zh_test_rows: list[dict[str, Any]]) -> tuple[dict[str, dict[s
         "step9_training_only_minority_regularization_control",
         "step9_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_*_predictions.zh_test.csv",
     )
+    add_ensemble(
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5_identity_curriculum_public_noise_weighted_seed_mean",
+        "step15_v5_identity_only_curriculum_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_*_predictions.zh_test.csv",
+    )
+    add_ensemble(
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5_identity_curriculum_domain_balanced_public_noise_weighted_seed_mean",
+        "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_phase4_add_positive_pair_mixup_seed_*_predictions.zh_test.csv",
+    )
     return models, missing
 
 
@@ -890,6 +900,11 @@ def build_findings(
         "all_zh_test",
         "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
     )
+    step15_v5_domain = row_by_model(
+        slice_rows,
+        "all_zh_test",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+    )
     if raw_e5 and step7_e5:
         findings.append(
             "Raw E5 remains stronger than Step 7 E5 fusion on fixed ZH test: "
@@ -903,9 +918,15 @@ def build_findings(
         )
     if raw_e5 and step9_mixup_100:
         findings.append(
-            "The E5 LR/L2 positive-pair mixup 100pct seed-mean has the strongest current fixed-test point estimate, "
+            "The E5 LR/L2 positive-pair mixup 100pct seed-mean is the strongest current Step 9 minority-regularization baseline, "
             f"with AUC delta {step9_mixup_100.get('delta_auc_vs_raw_e5')} and AP delta {step9_mixup_100.get('delta_ap_vs_raw_e5')} versus raw E5; "
             "Step 12 paired bootstrap decides whether this can be treated as a robust improvement."
+        )
+    if raw_e5 and step15_v5_domain:
+        findings.append(
+            "Step 15 v5 domain-balanced public-noise-weighted curriculum has the strongest current fixed-test point estimate, "
+            f"with AUC delta {step15_v5_domain.get('delta_auc_vs_raw_e5')} and AP delta {step15_v5_domain.get('delta_ap_vs_raw_e5')} versus raw E5; "
+            "Step 12 v5 paired bootstrap supports its ROC-AUC improvement over Step 9 mixup100 but not yet over raw E5."
         )
 
     collapsed = [row for row in step7_rows if row.get("collapse_guard_triggered")]
@@ -996,6 +1017,8 @@ def build_markdown(summary: dict[str, Any]) -> str:
             "step9_identifier_augmented_lr_l2_100pct_seed_mean",
             "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean",
             "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+            "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+            "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
         }
     ]
 
@@ -1235,7 +1258,7 @@ def main() -> int:
         "limitations": [
             "Slice metrics with fewer than five positives or five negatives are diagnostic only.",
             "Step 11 cluster audit is evidence triage, not ground truth.",
-            "This audit uses existing predictions; local positive-pair mixup and relation-reliability code must be rerun on Linux before their effects can be audited.",
+            "This audit uses existing synchronized predictions and the explicit Step 11 validation audit; any future scorer must be added as an explicit prediction source before being described in findings.",
             "The audit does not infer same-controller labels from semantic or template similarity.",
         ],
     }

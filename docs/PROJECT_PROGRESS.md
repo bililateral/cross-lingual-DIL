@@ -1,6 +1,6 @@
 # Project Progress
 
-Updated: 2026-06-04
+Updated: 2026-06-06
 
 ## Current Stage
 
@@ -81,6 +81,20 @@ Updated: 2026-06-04
   - `scripts/step13_concept_drift_audit.py` now accepts explicit `--step11-manifest` and `--step11-audit` inputs. It no longer silently consumes older `step11_current_manifest_*.json` / `step11_cluster_level_audit.current_*.json` files unless `--allow-step11-auto-discovery` is intentionally passed.
   - `schema/step15_evidence_type_policy.json` now separates historical Step 11 audit files into `diagnostic_dependencies_only`; Step 11 audit outputs are not Step 15 identity-training ground truth.
   - Step 15 phase4 now documents that `use_negative_mixup` is only a phase capability flag; negative mixup is applied only when the selected experiment also enables `experiments.<name>.negative_mixup.enabled`.
+- `2026-06-06` Step 13 was regenerated against the latest explicit Step 11 v5 validation audit:
+  - runner: `scripts/step13_concept_drift_audit.py`
+  - explicit Step 11 audit input: `reports/step11_cluster_level_audit.step15_v5_validation_20260603.json`
+  - outputs:
+    - `reports/step13_concept_drift_audit.step15_v5_validation_20260606.json`
+    - `reports/step13_concept_drift_audit.step15_v5_validation_20260606.csv`
+    - `docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP15_V5_VALIDATION_20260606.md`
+  - integrity: the new Step 13 summary records `step11_selection_mode = explicit` and `step11_audit_path = reports\step11_cluster_level_audit.step15_v5_validation_20260603.json`; no `current_*` auto-discovery or `reports/` glob was used.
+  - Step 13 now includes synchronized Step 15 v5 prediction ensembles in the fixed `zh_test` slice audit. The current all-test readings in the Step 13 table are:
+    - raw E5: ROC-AUC `0.806723`, AP `0.520573`
+    - Step 9 E5 LR/L2 positive-pair mixup 100pct seed mean: ROC-AUC `0.842017`, AP `0.588995`
+    - Step 15 v5 domain-balanced public-noise-weighted phase4 seed mean: ROC-AUC `0.913725`, AP `0.738951`
+  - Corrected interpretation: Step 9 mixup 100pct is the strongest current Step 9 minority-regularization baseline; Step 15 v5 domain-balanced is the strongest current fixed-test point estimate. Step 12 v5 supports Step 15 v5's ROC-AUC improvement over Step 9 mixup100, but not a statistically locked AP improvement or a robust improvement over raw E5.
+  - Concept-drift diagnosis remains: marginal EN-to-ZH shifts are strongest in digit/repetition/punctuation gap features; high-semantic negatives are not uniformly inflated in ZH under the EN-negative q90 E5 threshold; the latest explicit Step 11 validation audit is still dominated by template/topic non-controller evidence (`68` template/topic clusters vs `0` anchored same-controller cores).
 
 `2026-06-02` Step 15 v2 curriculum/slice-audit branch prepared:
 
@@ -145,7 +159,7 @@ Updated: 2026-06-04
 - Step 11 current manifest was regenerated as `reports/step11_current_manifest_20260517.json`: `19` current summaries, `75` referenced CSVs, `0` unreferenced Step 11 CSVs.
 - Step 11 current manifest was re-audited on `2026-05-18` with a stricter proof-edge rule. Identifier-like Step 11 features are no longer sufficient for a same-controller claim; a retained edge must join to Step 5 frozen `positive` / `usable_for_core_transfer = 1` evidence with seller-facing direct contact or PGP support.
 - The strict cluster-level audit remains manifest-only and explicit-summary-bound: `reports/step11_cluster_level_audit.current_20260517.json/csv` now records `125` unique cluster sets, `0` high-confidence same-controller full clusters, `0` same-controller cores with expansion, `6` partial anchors, `8` uncertain identifier-like clusters, and `111` template/topic non-controller clusters.
-- Step 13 was regenerated on `2026-05-18` and now reads the strict `20260517` Step 11 audit plus both mixup 50pct and 100pct prediction ensembles.
+- Step 13 was regenerated on `2026-05-18` against the strict `20260517` Step 11 audit plus both mixup 50pct and 100pct prediction ensembles. This record is now superseded for current reporting by the explicit Step 15 v5 validation audit rerun on `2026-06-06`.
 
 Current scientific interpretation: positive-pair mixup is a useful training-only minority regularization control and improves point estimates, especially at 100pct support, but the fixed-test grouped bootstrap still does not justify a statistically robust claim over raw E5. The strict cluster review further shows that Step 11 should be treated as candidate triage rather than discovery proof: current retained clusters do not support a full same-controller cluster claim without pair-level seller-facing identity evidence.
 
@@ -812,13 +826,12 @@ The active evidence does not yet support:
 - treating template-clone or semantic-only Step 11 clusters as final same-controller rings
 - merging identifier-augmented control results into the clean cross-lingual few-shot claim
 - claiming the current clean Step 15 v2 line statistically robustly beats raw E5 semantic ranking on the fixed `zh_test`; Step 12 v2 finds `step15_v2_identity_from_scratch_phase4_seed_mean` vs raw E5 ROC-AUC diff `+0.082913` with grouped 95% CI `[-0.076627, 0.250000]`, and AP diff `+0.178725` with CI `[-0.176207, 0.466066]`
+- claiming Step 15 v5 has produced proof-level same-controller clusters; the latest explicit Step 11 validation audit still has `0` high-confidence same-controller clusters and `0` same-controller cores with expansion
 
 ## Recommended Next Actions
 
-1. Use `reports/step12_v2_statistical_robustness_zh_test_20260602.json/csv` as the current statistical evidence for Step 7/9/15 pairwise claims; report Step 15 v2 gains as strong point-estimate improvements but still uncertainty-bounded against raw semantic baselines.
-2. Use `reports/step11_current_manifest_20260424.json` as the authoritative current Step 11 allow-list; do not glob `reports/step11_*` files.
-3. Use `reports/step11_cluster_level_audit.current_20260424.csv/json` as the current cluster-level audit; it was built from summary `output_paths` only and classifies cluster evidence by direct identifier/contact, partial anchor, template clone, semantic topic, or uncertain.
-4. Use the 2026-04-23 Step 3 high-precision parser outputs as audit evidence, but do not refreeze Step 5 unless a future review queue contains new reviewed labels.
-5. Do not apply the 2026-04-22 paper-targeted Chinese queue to Step 5 supervision; it found only uncertain rows.
-6. Sync the 2026-05-14 Step 9/Step 11 code and policy updates to Linux, rerun the new `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` branch, then rerun Step 11 so `relation_reliability_filter` is reflected in scored-pair and cluster summaries.
-7. If publication requires stronger Chinese identity-proof claims, the next evidence source must be new raw/OCR/source fields or external corroborating evidence; the current Chinese item-level text extraction has exhausted unreviewed direct-token pairs.
+1. Use `reports/step12_v5_statistical_robustness_zh_test_20260603.json/csv` and `reports/step13_concept_drift_audit.step15_v5_validation_20260606.json/csv` as the current pairwise/statistical/concept-drift evidence set.
+2. Use `reports/step11_cluster_level_audit.step15_v5_validation_20260603.json/csv` as the current graph-validation audit. Do not glob `reports/step11_*`; publication cluster audits must use the explicit allow-list in `schema/step11_clustering_policy.json`.
+3. Keep Step 15 v5 frozen. Do not tune Step 15 further against the fixed `zh_test`; any new method branch should be separated from this frozen validation branch.
+4. Current paper wording should frame Step 15 v5 as hard-negative concept-drift mitigation and graph triage/noise compression. It can cautiously claim a Step12-supported ROC-AUC improvement over Step9 mixup100, but not a proof-level same-controller cluster discovery result.
+5. If publication requires stronger identity-discovery claims, the next evidence source must be new raw/OCR/source fields or external corroborating evidence; the current Chinese item-level text extraction has exhausted unreviewed direct-token pairs under the conservative seller-facing direct-identity standard.
