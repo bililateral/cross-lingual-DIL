@@ -1,8 +1,40 @@
 # Project Progress
 
-Updated: 2026-06-06
+Updated: 2026-07-04
 
 ## Current Stage
+
+`2026-07-04` Step 7 / Step 9 / Step 15 rerun with extended ranking metrics synchronized back:
+
+- Active branch: `method/add-ranking-evaluation-metrics`.
+- Code change scope is metric/reporting only. Training data, model features, sampling, thresholds, and Step 15 v5 experiment definitions were not changed.
+- New metrics are now emitted by the shared Step 7 evaluator and inherited by Step 9 and Step 15 run records:
+  - `pr_auc`: same numerical definition as `average_precision` under the current binary pair-ranking setup.
+  - `map`: same global pair-ranking definition as `average_precision`; no seller-group query partition is applied.
+  - `mrr`: reciprocal rank of the first positive pair in the global ranked list.
+  - `f1`: thresholded binary F1, now also included in Step 9 / Step 15 aggregate summaries.
+- Synchronization completeness checks:
+  - Step 7 summary contains `17` experiments; all valid/test/zh-test metric blocks include `pr_auc`, `map`, `mrr`, and `f1`.
+  - Step 9 few-shot summary contains `19` experiments and `228` runs (`19` experiments x `4` ratios x `3` seeds); all run metrics and aggregate-by-ratio metrics include the new fields.
+  - Step 15 v5 summary contains `30` runs (`2` experiments x `5` phases x `3` seeds); all run metrics include the new fields.
+  - Step 12 v5 grouped bootstrap now reports `roc_auc`, `average_precision`, `pr_auc`, `map`, and `mrr` for model metrics and paired comparisons.
+- Current fixed-test Step 7 zero-shot readings remain weak relative to later methods:
+  - best Step 7 zh zero-shot ROC-AUC is `0.631373` from `core_zero_shot_default_no_structural`, with AP/PR-AUC/MAP `0.290316` and MRR `0.333333`.
+  - `core_zero_shot_bge_m3` has ROC-AUC `0.601681`, AP/PR-AUC/MAP `0.448761`, MRR `1.000000`, F1 `0.342105`, and recall `0.619048`.
+  - `core_zero_shot_multilingual_e5_large` remains collapsed/weak as a fused Step 7 model: ROC-AUC `0.550140`, AP/PR-AUC/MAP `0.384493`.
+- Current Step 9 fixed-test summary:
+  - strongest clean ranking candidate by ROC-AUC remains `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` at `100pct`: mean ROC-AUC `0.841830`, AP/PR-AUC/MAP `0.587521`, F1 `0.375838`, MRR `1.000000`.
+  - strongest operational AP candidate remains `identifier_augmented_few_shot_default_lr_l2` at `50pct`: mean ROC-AUC `0.779272`, AP/PR-AUC/MAP `0.652021`, F1 `0.545809`, MRR `1.000000`. This remains an operational identifier control, not the clean scientific mainline.
+  - Step 9 calibration control `core_calibrated_bge_m3` now emits the extended metrics. Its fixed `zh_test` ranking remains ROC-AUC `0.601681`, AP/PR-AUC/MAP `0.448761`, MRR `1.000000`; at threshold `0.5`, F1 is `0.0`, so it is not a useful thresholded detector.
+- Current Step 15 v5 fixed-test summary:
+  - `step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean` remains the current clean main scorer: ROC-AUC `0.913725`, AP/PR-AUC/MAP `0.738951`, MRR `1.000000`.
+  - Step 12 grouped bootstrap for this scorer: ROC-AUC mean `0.913844`, CI `[0.837521, 0.968700]`; AP/PR-AUC/MAP mean `0.733387`, CI `[0.480227, 0.894451]`; MRR mean `0.998106`, CI `[1.000000, 1.000000]`.
+  - The non-domain-balanced v5 phase4 seed mean is lower: ROC-AUC `0.904202`, AP/PR-AUC/MAP `0.701809`, MRR `1.000000`.
+- Current paired-bootstrap interpretation is unchanged by adding metric aliases:
+  - Step 15 v5 domain-balanced vs Step 9 E5 mixup100 supports a positive ROC-AUC difference: observed diff `+0.071709`, CI `[0.006751, 0.152423]`.
+  - The AP/PR-AUC/MAP difference vs Step 9 mixup100 remains positive but uncertainty-bounded: observed diff `+0.149956`, CI `[-0.032434, 0.304387]`.
+  - The ROC-AUC and AP/PR-AUC/MAP differences vs raw E5 remain positive in point estimate but not statistically locked because grouped-bootstrap CIs cross zero.
+  - MRR is not discriminative for the main models because several methods rank at least one positive pair first; it should be reported as a supplementary ranking diagnostic only.
 
 `2026-06-03` Step 15 v5 frozen for Step 11 graph validation:
 
