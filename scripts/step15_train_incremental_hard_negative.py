@@ -836,12 +836,30 @@ def summarize_runs(runs: list[dict]) -> dict:
         grouped[f"{run['experiment_name']}::{run['phase_id']}"].append(run)
     summary = {}
     for key, items in sorted(grouped.items()):
-        auc_values = [item["zh_test_metrics"]["roc_auc"] for item in items if item["zh_test_metrics"]["roc_auc"] is not None]
-        ap_values = [
-            item["zh_test_metrics"]["average_precision"]
-            for item in items
-            if item["zh_test_metrics"]["average_precision"] is not None
-        ]
+        def metric_values(metric_name: str) -> list[float]:
+            values = []
+            for item in items:
+                value = item["zh_test_metrics"].get(metric_name)
+                if value is not None:
+                    values.append(float(value))
+            return values
+
+        def summarize_metric(metric_name: str) -> dict[str, float | None]:
+            values = metric_values(metric_name)
+            if not values:
+                return {"mean": None, "min": None, "max": None}
+            return {
+                "mean": round(float(np.mean(values)), 6),
+                "min": round(float(np.min(values)), 6),
+                "max": round(float(np.max(values)), 6),
+            }
+
+        auc_values = metric_values("roc_auc")
+        ap_values = metric_values("average_precision")
+        pr_auc_summary = summarize_metric("pr_auc")
+        f1_summary = summarize_metric("f1")
+        map_summary = summarize_metric("map")
+        mrr_summary = summarize_metric("mrr")
         summary[key] = {
             "run_count": len(items),
             "seeds": [item["seed"] for item in items],
@@ -851,6 +869,18 @@ def summarize_runs(runs: list[dict]) -> dict:
             "zh_test_average_precision_mean": round(float(np.mean(ap_values)), 6) if ap_values else None,
             "zh_test_average_precision_min": round(float(np.min(ap_values)), 6) if ap_values else None,
             "zh_test_average_precision_max": round(float(np.max(ap_values)), 6) if ap_values else None,
+            "zh_test_pr_auc_mean": pr_auc_summary["mean"],
+            "zh_test_pr_auc_min": pr_auc_summary["min"],
+            "zh_test_pr_auc_max": pr_auc_summary["max"],
+            "zh_test_f1_mean": f1_summary["mean"],
+            "zh_test_f1_min": f1_summary["min"],
+            "zh_test_f1_max": f1_summary["max"],
+            "zh_test_map_mean": map_summary["mean"],
+            "zh_test_map_min": map_summary["min"],
+            "zh_test_map_max": map_summary["max"],
+            "zh_test_mrr_mean": mrr_summary["mean"],
+            "zh_test_mrr_min": mrr_summary["min"],
+            "zh_test_mrr_max": mrr_summary["max"],
         }
     return summary
 

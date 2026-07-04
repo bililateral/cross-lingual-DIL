@@ -1248,12 +1248,23 @@ def build_step9_training_policy(step7_policy: dict, step9_policy: dict) -> tuple
     return merged, applied
 
 def summarize_metric_series(values: list[float]) -> dict:
-    ordered = [float(value) for value in values]
+    ordered = [float(value) for value in values if value is not None]
+    if not ordered:
+        return {"mean": None, "min": None, "max": None}
     return {
         "mean": round(float(np.mean(ordered)), 6),
         "min": round(float(np.min(ordered)), 6),
         "max": round(float(np.max(ordered)), 6),
     }
+
+
+def collect_metric(runs: list[dict], metrics_key: str, metric_name: str) -> list[float]:
+    values = []
+    for run in runs:
+        value = run.get(metrics_key, {}).get(metric_name)
+        if value is not None:
+            values.append(float(value))
+    return values
 
 
 def summarize_step9_experiment_runs(experiment_summary: dict) -> dict[str, dict]:
@@ -1263,12 +1274,20 @@ def summarize_step9_experiment_runs(experiment_summary: dict) -> dict[str, dict]
 
     aggregate: dict[str, dict] = {}
     for ratio_token, runs in sorted(grouped_runs.items()):
-        adaptive_balanced_accuracy = [run["zh_test_metrics"]["balanced_accuracy"] for run in runs]
-        adaptive_roc_auc = [run["zh_test_metrics"]["roc_auc"] for run in runs]
-        adaptive_average_precision = [run["zh_test_metrics"]["average_precision"] for run in runs]
-        fixed_balanced_accuracy = [run["zh_test_metrics_fixed_base_threshold"]["balanced_accuracy"] for run in runs]
-        fixed_roc_auc = [run["zh_test_metrics_fixed_base_threshold"]["roc_auc"] for run in runs]
-        fixed_average_precision = [run["zh_test_metrics_fixed_base_threshold"]["average_precision"] for run in runs]
+        adaptive_balanced_accuracy = collect_metric(runs, "zh_test_metrics", "balanced_accuracy")
+        adaptive_roc_auc = collect_metric(runs, "zh_test_metrics", "roc_auc")
+        adaptive_average_precision = collect_metric(runs, "zh_test_metrics", "average_precision")
+        adaptive_pr_auc = collect_metric(runs, "zh_test_metrics", "pr_auc")
+        adaptive_f1 = collect_metric(runs, "zh_test_metrics", "f1")
+        adaptive_map = collect_metric(runs, "zh_test_metrics", "map")
+        adaptive_mrr = collect_metric(runs, "zh_test_metrics", "mrr")
+        fixed_balanced_accuracy = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "balanced_accuracy")
+        fixed_roc_auc = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "roc_auc")
+        fixed_average_precision = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "average_precision")
+        fixed_pr_auc = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "pr_auc")
+        fixed_f1 = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "f1")
+        fixed_map = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "map")
+        fixed_mrr = collect_metric(runs, "zh_test_metrics_fixed_base_threshold", "mrr")
         selected_thresholds = [run["selected_threshold"] for run in runs]
 
         aggregate[ratio_token] = {
@@ -1279,11 +1298,19 @@ def summarize_step9_experiment_runs(experiment_summary: dict) -> dict[str, dict]
                 "balanced_accuracy": summarize_metric_series(adaptive_balanced_accuracy),
                 "roc_auc": summarize_metric_series(adaptive_roc_auc),
                 "average_precision": summarize_metric_series(adaptive_average_precision),
+                "pr_auc": summarize_metric_series(adaptive_pr_auc),
+                "f1": summarize_metric_series(adaptive_f1),
+                "map": summarize_metric_series(adaptive_map),
+                "mrr": summarize_metric_series(adaptive_mrr),
             },
             "zh_test_metrics_fixed_base_threshold": {
                 "balanced_accuracy": summarize_metric_series(fixed_balanced_accuracy),
                 "roc_auc": summarize_metric_series(fixed_roc_auc),
                 "average_precision": summarize_metric_series(fixed_average_precision),
+                "pr_auc": summarize_metric_series(fixed_pr_auc),
+                "f1": summarize_metric_series(fixed_f1),
+                "map": summarize_metric_series(fixed_map),
+                "mrr": summarize_metric_series(fixed_mrr),
             },
         }
     return aggregate

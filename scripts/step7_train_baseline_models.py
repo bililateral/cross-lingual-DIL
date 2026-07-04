@@ -279,6 +279,19 @@ def average_precision_score(y_true: np.ndarray, y_score: np.ndarray) -> float | 
     return float(np.sum(precision[y_sorted == 1.0]) / positives)
 
 
+def mean_reciprocal_rank_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
+    positives = int(y_true.sum())
+    if positives == 0:
+        return None
+    order = np.argsort(-y_score, kind="mergesort")
+    y_sorted = y_true[order]
+    positive_positions = np.flatnonzero(y_sorted == 1.0)
+    if len(positive_positions) == 0:
+        return None
+    first_positive_rank = int(positive_positions[0]) + 1
+    return float(1.0 / first_positive_rank)
+
+
 def binary_logloss(y_true: np.ndarray, y_prob: np.ndarray) -> float:
     y_prob = np.clip(y_prob, EPS, 1.0 - EPS)
     return float(-np.mean(y_true * np.log(y_prob) + (1.0 - y_true) * np.log(1.0 - y_prob)))
@@ -313,6 +326,7 @@ def evaluate_probabilities(y_true: np.ndarray, y_prob: np.ndarray, threshold: fl
     accuracy = (counts["tp"] + counts["tn"]) / max(len(y_true), 1)
     roc_auc = roc_auc_score(y_true, y_prob)
     average_precision = average_precision_score(y_true, y_prob)
+    mean_reciprocal_rank = mean_reciprocal_rank_score(y_true, y_prob)
     return {
         "row_count": int(len(y_true)),
         "positive_count": int(y_true.sum()),
@@ -320,6 +334,10 @@ def evaluate_probabilities(y_true: np.ndarray, y_prob: np.ndarray, threshold: fl
         "logloss": round(binary_logloss(y_true, y_prob), 6),
         "roc_auc": None if roc_auc is None else round(roc_auc, 6),
         "average_precision": None if average_precision is None else round(average_precision, 6),
+        "pr_auc": None if average_precision is None else round(average_precision, 6),
+        "map": None if average_precision is None else round(average_precision, 6),
+        "mrr": None if mean_reciprocal_rank is None else round(mean_reciprocal_rank, 6),
+        "ranking_scope": "global_pair_ranking",
         "threshold": round(float(threshold), 6),
         "accuracy": round(float(accuracy), 6),
         "precision": round(float(precision), 6),
