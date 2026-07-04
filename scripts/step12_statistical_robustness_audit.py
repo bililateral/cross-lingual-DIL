@@ -29,6 +29,7 @@ DEFAULT_OUT_COMPARISONS = Path("reports/step12_v5_statistical_robustness_paired_
 DEFAULT_RESAMPLES = 5000
 DEFAULT_SEED = 20260513
 CONFIDENCE_LEVEL = 0.95
+RANKING_METRICS = ("roc_auc", "average_precision", "pr_auc", "map", "mrr")
 
 
 MODEL_SPECS: list[dict[str, Any]] = [
@@ -892,11 +893,24 @@ def average_precision(y_true: list[int], scores: list[float]) -> float:
     return precision_sum / pos_count
 
 
+def mean_reciprocal_rank(y_true: list[int], scores: list[float]) -> float:
+    pos_count = sum(y_true)
+    if pos_count == 0:
+        return math.nan
+    order = sorted(range(len(scores)), key=lambda idx: scores[idx], reverse=True)
+    for rank, idx in enumerate(order, start=1):
+        if y_true[idx] == 1:
+            return 1.0 / rank
+    return math.nan
+
+
 def metric_value(metric: str, y_true: list[int], scores: list[float]) -> float:
     if metric == "roc_auc":
         return roc_auc(y_true, scores)
-    if metric == "average_precision":
+    if metric in {"average_precision", "pr_auc", "map"}:
         return average_precision(y_true, scores)
+    if metric == "mrr":
+        return mean_reciprocal_rank(y_true, scores)
     raise ValueError(f"Unsupported metric: {metric}")
 
 
@@ -1078,7 +1092,7 @@ def main() -> None:
     for model_id in sorted(score_maps):
         scores = [score_maps[model_id][pair_uid] for pair_uid in pair_uids]
         metrics_json[model_id] = {}
-        for metric in ("roc_auc", "average_precision"):
+        for metric in RANKING_METRICS:
             observed = metric_value(metric, y_true, scores)
             distribution = bootstrap_distribution(metric, y_true, scores, bootstrap_indices)
             row = {
@@ -1122,7 +1136,7 @@ def main() -> None:
             continue
         scores_a = [score_maps[model_a][pair_uid] for pair_uid in pair_uids]
         scores_b = [score_maps[model_b][pair_uid] for pair_uid in pair_uids]
-        for metric in ("roc_auc", "average_precision"):
+        for metric in RANKING_METRICS:
             observed_a = metric_value(metric, y_true, scores_a)
             observed_b = metric_value(metric, y_true, scores_b)
             observed_diff = observed_a - observed_b
