@@ -33,6 +33,7 @@ Updated: 2026-07-06
 - Training scripts were updated so weak labels are not treated as equal-strength gold labels:
   - `scripts/step7_train_baseline_models.py` now propagates `training_sample_weight` from Step 5 labels and multiplies LightGBM class-balanced weights by this row multiplier.
   - `scripts/step9_run_few_shot_adaptation.py` now applies the same row multiplier to logistic / residual logistic backends and passes row weights through the Step 9 LightGBM backend.
+  - `scripts/step9_run_few_shot_adaptation.py` now backs up but does not merge old Step 9 summaries when the data-context fingerprint changes. This prevents pre-Step16B and post-Step16B runs from being mixed inside one summary file.
   - `scripts/step15_train_incremental_hard_negative.py` now multiplies Step 15 identity-loss weights by `training_sample_weight`.
 - Updated outputs:
   - `reports/step16b_silver_positive_candidate_pairs.csv`

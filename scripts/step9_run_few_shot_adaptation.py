@@ -1389,39 +1389,18 @@ def merge_with_existing_summary(summary_path: Path, new_summary: dict) -> dict:
     existing_context = existing_summary.get("summary_context_fingerprints", {})
     if existing_context.get("fingerprint") != context.get("fingerprint"):
         backup_path = backup_existing_summary(summary_path, "context_mismatch")
-        merged_summary = dict(new_summary)
-        existing_experiments = existing_summary.get("experiments", {})
-        merged_experiments = dict(existing_experiments)
-        for experiment_name, experiment_summary in new_summary["experiments"].items():
-            merged_experiments[experiment_name] = merge_step9_experiment_summary(
-                existing_experiments.get(experiment_name),
-                experiment_summary,
-            )
-        merged_summary["experiments"] = merged_experiments
-        merged_summary["selected_experiments"] = ordered_union(
-            existing_summary.get("selected_experiments", []),
-            new_summary.get("selected_experiments", []),
-        )
-        merged_summary["selected_ratios"] = ordered_union(
-            existing_summary.get("selected_ratios", []),
-            new_summary.get("selected_ratios", []),
-        )
-        merged_summary["selected_seeds"] = ordered_union(
-            existing_summary.get("selected_seeds", []),
-            new_summary.get("selected_seeds", []),
-        )
-        merged_summary["summary_merge_mode"] = "merged_context_mismatch"
-        merged_summary["summary_merge_history"] = list(existing_summary.get("summary_merge_history", [])) + [
+        new_summary["summary_merge_mode"] = "new_summary_after_context_mismatch"
+        new_summary["summary_merge_history"] = list(existing_summary.get("summary_merge_history", [])) + [
             {
-                "event": "existing_summary_backed_up_before_context_mismatch_merge",
+                "event": "existing_summary_backed_up_before_context_mismatch_replacement",
                 "backup_path": str(backup_path.relative_to(ROOT)),
                 "existing_fingerprint": existing_context.get("fingerprint"),
                 "new_fingerprint": context.get("fingerprint"),
-                "merge_policy": "preserve_existing_experiments_and_replace_selected_runs",
+                "merge_policy": "do_not_merge_old_experiments_across_data_contexts",
             }
         ]
-        set_step9_acceptance_checks(merged_summary)
-        return merged_summary
+        set_step9_acceptance_checks(new_summary)
+        return new_summary
 
     merged_summary = dict(new_summary)
     existing_experiments = existing_summary.get("experiments", {})
