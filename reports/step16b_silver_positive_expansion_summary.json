@@ -1,0 +1,43 @@
+{
+  "step": "step16b_silver_positive_expansion",
+  "policy": "schema\\step16b_silver_positive_expansion_policy.json",
+  "dry_run": false,
+  "input_counts": {
+    "frozen_rows": 1016,
+    "candidate_pairs": 3857,
+    "pair_feature_rows": 3857,
+    "valid_test_seller_count": 198,
+    "train_positive_before": 61
+  },
+  "candidate_count": 141,
+  "selected_direct_silver_count": 141,
+  "selected_closure_silver_count": 29,
+  "selected_total_silver_count": 170,
+  "train_positive_after": 231,
+  "added_positive_train_rows": 170,
+  "selected_label_tier_counts": {
+    "silver_template_structural": 85,
+    "silver_direct_or_contact": 56,
+    "silver_component_closure": 29
+  },
+  "selected_reason_counts": {
+    "template_structural_weak": 48,
+    "clone_overlap_weak": 14,
+    "high_similarity_weak": 30,
+    "rank_structural_weak": 27,
+    "shared_contact_weak": 56,
+    "component_closure": 29
+  },
+  "safety_checks": {
+    "valid_test_rows_modified": false,
+    "selected_pair_feature_coverage": true,
+    "selected_valid_test_seller_overlap_count": 0,
+    "existing_negative_converted_count": 0
+  },
+  "outputs": {
+    "candidate_audit_csv": "reports\\step16b_silver_positive_candidate_pairs.csv",
+    "applied_training_pairs_csv": "reports\\step16b_silver_positive_training_pairs.csv",
+    "expanded_frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+    "summary_json": "reports\\step16b_silver_positive_expansion_summary.json"
+  }
+}

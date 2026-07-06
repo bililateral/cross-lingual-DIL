@@ -1,6 +1,6 @@
 {
   "step": "step15_build_evidence_type_labels",
-  "policy": "schema/step15_evidence_type_policy.json",
+  "policy": "schema\\step15_evidence_type_policy.json",
   "policy_version": "2026-06-03-public-contact-url-noise-v5",
   "pools": {
     "en_content_train_pool": {
@@ -86,26 +86,26 @@
         }
       },
       "pool": "en_content_train_pool",
-      "frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
-      "pair_features": "reports/step7_pair_features.en_content_train_pool.csv",
-      "output": "reports/step15_evidence_type_labels.en_content_train_pool.csv"
+      "frozen_labels": "reports\\step5_en_frozen_silver_labels.csv",
+      "pair_features": "reports\\step7_pair_features.en_content_train_pool.csv",
+      "output": "reports\\step15_evidence_type_labels.en_content_train_pool.csv"
     },
     "zh_target_strict": {
-      "row_count": 1016,
+      "row_count": 1077,
       "review_label_counts": {
         "negative": 426,
-        "positive": 102,
-        "uncertain": 488
+        "positive": 272,
+        "uncertain": 379
       },
       "evidence_type_counts": {
         "ordinary_negative": 287,
         "public_contact_or_url_noise": 17,
-        "same_controller_component_anchor": 7,
-        "same_controller_direct_identifier": 26,
-        "same_controller_style_structural_soft": 69,
+        "same_controller_component_anchor": 36,
+        "same_controller_direct_identifier": 82,
+        "same_controller_style_structural_soft": 154,
         "semantic_topic_not_controller": 69,
         "template_clone_not_controller": 53,
-        "uncertain_insufficient_evidence": 488
+        "uncertain_insufficient_evidence": 379
       },
       "evidence_type_by_split": {
         "audit_only": {
@@ -123,13 +123,14 @@
         "train": {
           "ordinary_negative": 186,
           "public_contact_or_url_noise": 11,
-          "same_controller_direct_identifier": 17,
-          "same_controller_style_structural_soft": 44,
+          "same_controller_component_anchor": 29,
+          "same_controller_direct_identifier": 73,
+          "same_controller_style_structural_soft": 129,
           "semantic_topic_not_controller": 45,
           "template_clone_not_controller": 32
         },
         "uncertain_holdout": {
-          "uncertain_insufficient_evidence": 488
+          "uncertain_insufficient_evidence": 379
         },
         "valid": {
           "ordinary_negative": 40,
@@ -152,8 +153,9 @@
         "train": {
           "ordinary_negative": 186,
           "public_contact_or_url_noise": 11,
-          "same_controller_direct_identifier": 17,
-          "same_controller_style_structural_soft": 44,
+          "same_controller_component_anchor": 29,
+          "same_controller_direct_identifier": 73,
+          "same_controller_style_structural_soft": 129,
           "semantic_topic_not_controller": 45,
           "template_clone_not_controller": 32
         },
@@ -166,9 +168,9 @@
         }
       },
       "pool": "zh_target_strict",
-      "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
-      "pair_features": "reports/step7_pair_features.zh_target_strict.csv",
-      "output": "reports/step15_evidence_type_labels.zh_target_strict.csv"
+      "frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+      "pair_features": "reports\\step7_pair_features.zh_target_strict.csv",
+      "output": "reports\\step15_evidence_type_labels.zh_target_strict.csv"
     }
   },
   "hard_rule_status": {

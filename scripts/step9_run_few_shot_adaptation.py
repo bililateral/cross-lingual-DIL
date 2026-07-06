@@ -631,11 +631,39 @@ def logistic_sample_weights(y_true: np.ndarray, cfg: dict) -> np.ndarray:
     raise ValueError(f"Unsupported Step 9 logistic class_weight: {class_weight}")
 
 
+def apply_logistic_row_sample_weights(weights: np.ndarray, multipliers: np.ndarray | None) -> tuple[np.ndarray, dict]:
+    if multipliers is None:
+        return weights, {
+            "enabled": False,
+            "min_multiplier": 1.0,
+            "mean_multiplier": 1.0,
+            "max_multiplier": 1.0,
+        }
+    if len(multipliers) != len(weights):
+        raise ValueError("Step 9 logistic sample-weight multiplier length mismatch")
+    adjusted = weights.astype(float, copy=True) * multipliers.astype(float)
+    before_mean = float(np.mean(weights)) if len(weights) else 0.0
+    after_mean = float(np.mean(adjusted)) if len(adjusted) else 0.0
+    if before_mean > 0.0 and after_mean > 0.0:
+        adjusted *= before_mean / after_mean
+    return adjusted, {
+        "enabled": bool(np.any(np.abs(multipliers - 1.0) > 1e-12)),
+        "min_multiplier": round(float(np.min(multipliers)), 6) if len(multipliers) else 1.0,
+        "mean_multiplier": round(float(np.mean(multipliers)), 6) if len(multipliers) else 1.0,
+        "max_multiplier": round(float(np.max(multipliers)), 6) if len(multipliers) else 1.0,
+    }
+
+
+def row_sample_weight_multipliers(rows: list[dict]) -> np.ndarray:
+    return np.asarray([step7.row_training_sample_weight(row) for row in rows], dtype=float)
+
+
 def fit_regularized_logistic(
     x_train: np.ndarray,
     y_train: np.ndarray,
     cfg: dict,
     offset: np.ndarray | None = None,
+    sample_weight_multipliers: np.ndarray | None = None,
 ) -> tuple[dict, np.ndarray]:
     if len(y_train) == 0:
         raise ValueError("Step 9 logistic fitting requires a non-empty training split")
@@ -648,6 +676,7 @@ def fit_regularized_logistic(
     x_scaled, standardization = fit_standardization(x_train, standardize)
     y = np.array(y_train, dtype=float)
     weights = logistic_sample_weights(y, cfg)
+    weights, row_sample_weight_summary = apply_logistic_row_sample_weights(weights, sample_weight_multipliers)
     offset_vector = np.zeros(len(y), dtype=float) if offset is None else np.array(offset, dtype=float)
     if len(offset_vector) != len(y):
         raise ValueError("Step 9 residual logistic offset length does not match y_train")
@@ -703,6 +732,7 @@ def fit_regularized_logistic(
         "parameter_coefficients": [round(float(value), 12) for value in params[1:]],
         "l2_penalty": round(float(l2_penalty), 12),
         "class_weight": str(cfg.get("class_weight", "balanced") or "balanced"),
+        "row_sample_weight_multipliers": row_sample_weight_summary,
         "max_iter": max_iter,
         "tolerance": tolerance,
         "solver_iterations": int(iteration),
@@ -1122,6 +1152,7 @@ def fit_for_step9(
     step7_policy_for_step9: dict,
     step7_experiment: dict,
     seed: int,
+    train_rows: list[dict] | None = None,
 ) -> dict:
     train_policy = json.loads(json.dumps(step7_policy_for_step9))
     train_policy["optimization"]["random_seed"] = int(seed)
@@ -1136,6 +1167,7 @@ def fit_for_step9(
         feature_names,
         train_policy,
         train_experiment,
+        train_rows=train_rows,
     )
 
 
@@ -1704,6 +1736,7 @@ def main() -> None:
                         run_train_policy,
                         base_step7_experiment,
                         int(seed),
+                        train_rows=train_rows,
                     )
                     valid_prob = model["booster"].predict(x_valid, num_iteration=model["best_iteration"])
                     zh_test_prob = model["booster"].predict(x_zh_test, num_iteration=model["best_iteration"])
@@ -1721,6 +1754,7 @@ def main() -> None:
                 elif backend == "logistic_regression_l2":
                     logistic_cfg = step9_policy["training"]["logistic_regression"]
                     x_train, y_train = step7.rows_to_matrix(train_rows, feature_names)
+                    train_weight_multipliers = row_sample_weight_multipliers(train_rows)
                     if positive_mixup_enabled(experiment_cfg):
                         x_synthetic, y_synthetic, synthetic_train_rows, positive_pair_mixup = (
                             build_positive_pair_mixup_augmentation(
@@ -1735,10 +1769,14 @@ def main() -> None:
                         if len(y_synthetic) > 0:
                             x_train = np.vstack([x_train, x_synthetic])
                             y_train = np.concatenate([y_train, y_synthetic])
+                            train_weight_multipliers = np.concatenate(
+                                [train_weight_multipliers, np.ones(len(y_synthetic), dtype=float)]
+                            )
                     scorer_artifact, train_prob = fit_regularized_logistic(
                         x_train,
                         y_train,
                         logistic_cfg,
+                        sample_weight_multipliers=train_weight_multipliers,
                     )
                     scorer_artifact.update(
                         {
@@ -1785,6 +1823,7 @@ def main() -> None:
                         y_train,
                         residual_cfg,
                         offset=safe_logit(sampled_base_prob, clip_eps),
+                        sample_weight_multipliers=row_sample_weight_multipliers(sampled_zh_train_rows),
                     )
                     scorer_artifact.update(
                         {

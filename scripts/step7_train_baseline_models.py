@@ -103,8 +103,13 @@ def join_frozen_with_features(frozen_rows: list[dict], feature_rows: list[dict])
             "split_component_size",
             "source_seller_raw_left",
             "source_seller_raw_right",
+            "label_tier",
+            "benchmark_eligible",
+            "silver_train_only",
+            "training_sample_weight",
+            "silver_positive_reasons",
         ):
-            row[key] = frozen[key]
+            row[key] = frozen.get(key, "")
         joined.append(row)
     if missing:
         raise ValueError(f"Missing semantic pair features for {len(missing)} frozen rows")
@@ -143,6 +148,41 @@ def balanced_sample_weights(y_true: np.ndarray) -> np.ndarray:
     pos_weight = total / (2.0 * positives)
     neg_weight = total / (2.0 * negatives)
     return np.where(y_true == 1.0, pos_weight, neg_weight)
+
+
+def row_training_sample_weight(row: dict) -> float:
+    value = row.get("training_sample_weight", "")
+    if value in {"", None}:
+        return 1.0
+    try:
+        weight = float(value)
+    except (TypeError, ValueError):
+        return 1.0
+    if not math.isfinite(weight) or weight <= 0.0:
+        return 1.0
+    return weight
+
+
+def apply_row_sample_weight_multipliers(weights: np.ndarray, rows: list[dict]) -> tuple[np.ndarray, dict]:
+    if not rows:
+        return weights, {
+            "enabled": False,
+            "min_multiplier": 1.0,
+            "mean_multiplier": 1.0,
+            "max_multiplier": 1.0,
+        }
+    multipliers = np.asarray([row_training_sample_weight(row) for row in rows], dtype=float)
+    adjusted = weights.astype(float, copy=True) * multipliers
+    before_mean = float(np.mean(weights)) if len(weights) else 0.0
+    after_mean = float(np.mean(adjusted)) if len(adjusted) else 0.0
+    if before_mean > 0.0 and after_mean > 0.0:
+        adjusted *= before_mean / after_mean
+    return adjusted, {
+        "enabled": bool(np.any(np.abs(multipliers - 1.0) > 1e-12)),
+        "min_multiplier": round(float(np.min(multipliers)), 6) if len(multipliers) else 1.0,
+        "mean_multiplier": round(float(np.mean(multipliers)), 6) if len(multipliers) else 1.0,
+        "max_multiplier": round(float(np.max(multipliers)), 6) if len(multipliers) else 1.0,
+    }
 
 
 def semantic_feature_names_for_experiment(policy: dict, experiment: dict, feature_names: list[str]) -> list[str]:
@@ -740,6 +780,7 @@ def fit_lightgbm(
     feature_names: list[str],
     policy: dict,
     experiment: dict,
+    train_rows: list[dict] | None = None,
 ) -> dict:
     effective_policy, small_validation_guard, post_train_scan_cfg = resolve_small_validation_guard(
         policy,
@@ -755,6 +796,7 @@ def fit_lightgbm(
         random_seed,
     )
     base_weights = balanced_sample_weights(y_train)
+    base_weights, row_sample_weight_multipliers = apply_row_sample_weight_multipliers(base_weights, train_rows or [])
     x_train_final, y_train_final, train_weights, semantic_activation_augmentation = apply_semantic_activation_augmentation(
         x_train_masked,
         y_train,
@@ -836,6 +878,7 @@ def fit_lightgbm(
         "small_validation_guard": small_validation_guard,
         "feature_importance": feature_importance,
         "semantic_activation_augmentation": semantic_activation_augmentation,
+        "row_sample_weight_multipliers": row_sample_weight_multipliers,
         "feature_family_gain": feature_family_gain,
     }
 
@@ -890,7 +933,7 @@ def run_experiment(lgb, experiment_name: str, schema: dict, policy: dict, en_row
     x_valid, y_valid = rows_to_matrix(valid_rows, feature_names)
     x_test, y_test = rows_to_matrix(test_rows, feature_names)
 
-    model = fit_lightgbm(lgb, x_train, y_train, x_valid, y_valid, feature_names, policy, experiment)
+    model = fit_lightgbm(lgb, x_train, y_train, x_valid, y_valid, feature_names, policy, experiment, train_rows=train_rows)
     valid_prob = model["booster"].predict(x_valid, num_iteration=model["best_iteration"])
     threshold = choose_threshold(y_valid, valid_prob, policy["threshold_selection"]["metric"], policy)
     test_prob = model["booster"].predict(x_test, num_iteration=model["best_iteration"])

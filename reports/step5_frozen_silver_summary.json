@@ -335,34 +335,40 @@
       ]
     },
     "zh_target_strict": {
-      "reviewed_row_count": 1016,
-      "supervision_row_count": 522,
+      "reviewed_row_count": 1077,
+      "supervision_row_count": 692,
       "label_counts": {
-        "positive": 102,
-        "uncertain": 488,
-        "negative": 426
+        "positive": 272,
+        "negative": 426,
+        "uncertain": 379
       },
       "review_stratum_counts": {
-        "identifier_plus_text": 13,
-        "text_clone_primary": 235,
-        "semantic_structural": 403,
-        "identifier_primary": 74,
-        "semantic_only": 291
+        "identifier_plus_text": 12,
+        "silver_template_structural": 85,
+        "semantic_structural": 379,
+        "identifier_primary": 19,
+        "silver_direct_or_contact": 56,
+        "semantic_only": 289,
+        "text_clone_primary": 208,
+        "silver_component_closure": 29
       },
       "supervision_review_stratum_counts": {
         "identifier_plus_text": 12,
+        "silver_template_structural": 85,
         "semantic_structural": 188,
         "identifier_primary": 17,
+        "silver_direct_or_contact": 56,
         "text_clone_primary": 78,
-        "semantic_only": 227
+        "semantic_only": 227,
+        "silver_component_closure": 29
       },
       "split_counts": {
-        "train": 335,
+        "train": 505,
         "valid": 81,
         "test": 106
       },
       "split_seller_counts": {
-        "train": 452,
+        "train": 638,
         "valid": 66,
         "test": 132
       },
@@ -378,7 +384,7 @@
       },
       "split_label_counts": {
         "train": {
-          "positive": 61,
+          "positive": 231,
           "negative": 274
         },
         "valid": {
@@ -392,52 +398,55 @@
       },
       "split_label_stratum_counts": {
         "train": {
+          "positive": {
+            "identifier_plus_text": 8,
+            "silver_template_structural": 85,
+            "silver_direct_or_contact": 56,
+            "text_clone_primary": 9,
+            "identifier_primary": 9,
+            "semantic_structural": 14,
+            "semantic_only": 21,
+            "silver_component_closure": 29
+          },
           "negative": {
             "semantic_structural": 106,
             "semantic_only": 126,
             "identifier_primary": 3,
             "text_clone_primary": 39
-          },
-          "positive": {
-            "identifier_plus_text": 8,
-            "text_clone_primary": 9,
-            "identifier_primary": 9,
-            "semantic_structural": 14,
-            "semantic_only": 21
           }
         },
         "valid": {
-          "negative": {
-            "semantic_only": 29,
-            "semantic_structural": 26,
-            "text_clone_primary": 12
-          },
           "positive": {
             "identifier_primary": 2,
             "text_clone_primary": 2,
             "identifier_plus_text": 2,
             "semantic_structural": 3,
             "semantic_only": 5
+          },
+          "negative": {
+            "semantic_only": 29,
+            "semantic_structural": 26,
+            "text_clone_primary": 12
           }
         },
         "test": {
-          "negative": {
-            "semantic_only": 39,
-            "semantic_structural": 33,
-            "text_clone_primary": 13
-          },
           "positive": {
             "identifier_plus_text": 2,
             "identifier_primary": 3,
             "text_clone_primary": 3,
             "semantic_structural": 6,
             "semantic_only": 7
+          },
+          "negative": {
+            "semantic_only": 39,
+            "semantic_structural": 33,
+            "text_clone_primary": 13
           }
         }
       },
-      "positive_supervision_count": 96,
-      "non_identifier_positive_count": 70,
-      "non_identifier_positive_share": 0.729167,
+      "positive_supervision_count": 266,
+      "non_identifier_positive_count": 240,
+      "non_identifier_positive_share": 0.902256,
       "soft_same_alias_reviewed_count": 0,
       "status_inferred_from_label_count": 0,
       "top_frozen_rows": [
@@ -643,5 +652,34 @@
     "coverage_requirements_pass": true,
     "coverage_requirement_warnings": [],
     "coverage_requirement_errors": []
+  },
+  "silver_positive_train_expansion": {
+    "status": "applied_train_only_weak_supervision",
+    "policy": "schema/step16b_silver_positive_expansion_policy.json",
+    "summary": "reports/step16b_silver_positive_expansion_summary.json",
+    "candidate_audit_csv": "reports/step16b_silver_positive_candidate_pairs.csv",
+    "applied_training_pairs_csv": "reports/step16b_silver_positive_training_pairs.csv",
+    "gold_benchmark_valid_test_unchanged": true,
+    "silver_train_only_rows": 170,
+    "silver_label_tier_counts": {
+      "silver_template_structural": 85,
+      "silver_direct_or_contact": 56,
+      "silver_component_closure": 29
+    },
+    "silver_training_weight_counts": {
+      "0.400000": 85,
+      "0.550000": 56,
+      "0.250000": 29
+    },
+    "zh_train_positive_before": 61,
+    "zh_train_positive_after": 231,
+    "zh_valid_positive_after": 14,
+    "zh_test_positive_after": 21,
+    "train_valid_test_seller_overlap_counts_after": {
+      "train__valid": 0,
+      "train__test": 0,
+      "valid__test": 0
+    },
+    "interpretation": "Silver rows expand training positives only and are not gold benchmark labels."
   }
 }

@@ -276,6 +276,23 @@ def apply_identity_weight_multipliers(
     }
 
 
+def apply_row_training_sample_weights(weights: np.ndarray, rows: list[dict]) -> tuple[np.ndarray, dict]:
+    multipliers = np.asarray([step7.row_training_sample_weight(row) for row in rows], dtype=float)
+    if len(multipliers) != len(weights):
+        raise ValueError("Step15 row sample-weight multiplier length mismatch")
+    adjusted = weights.astype(float, copy=True) * multipliers
+    before_mean = float(np.mean(weights)) if len(weights) else 0.0
+    after_mean = float(np.mean(adjusted)) if len(adjusted) else 0.0
+    if before_mean > 0.0 and after_mean > 0.0:
+        adjusted *= before_mean / after_mean
+    return adjusted, {
+        "enabled": bool(np.any(np.abs(multipliers - 1.0) > 1e-12)),
+        "min_multiplier": round(float(np.min(multipliers)), 6) if len(multipliers) else 1.0,
+        "mean_multiplier": round(float(np.mean(multipliers)), 6) if len(multipliers) else 1.0,
+        "max_multiplier": round(float(np.max(multipliers)), 6) if len(multipliers) else 1.0,
+    }
+
+
 def evidence_weights(y_evidence: np.ndarray, evidence_type_count: int) -> np.ndarray:
     weights = np.zeros(len(y_evidence), dtype=float)
     mask = y_evidence >= 0
@@ -574,6 +591,7 @@ def train_model(
         identity_weight_multipliers or {},
         normalize_mean=normalize_identity_weight_mean,
     )
+    identity_weights, row_sample_weight_diagnostics = apply_row_training_sample_weights(identity_weights, train_rows)
     ev_weights = (
         evidence_weights(y_evidence, evidence_type_count)
         if train_cfg.get("class_balanced_evidence_loss", True)
@@ -627,6 +645,7 @@ def train_model(
         "initialization": "warm_start" if initial_params is not None else "random",
         "domain_balanced_identity_loss": bool(domain_balanced_identity_loss),
         "identity_weight_multipliers": identity_weight_multiplier_diagnostics,
+        "row_sample_weight_multipliers": row_sample_weight_diagnostics,
     }
     return best_params, diagnostics
 

@@ -1,8 +1,48 @@
 # Project Progress
 
-Updated: 2026-07-04
+Updated: 2026-07-06
 
 ## Current Stage
+
+`2026-07-06` Step 16B silver positive train-only expansion added:
+
+- Active branch: `method/step16b-silver-positive-expansion`.
+- Motivation: strict Chinese proof-level positive labels were too scarce for stable target-domain training. The project now separates strict benchmark labels from weak training support.
+- New policy/script:
+  - `schema/step16b_silver_positive_expansion_policy.json`
+  - `scripts/step16b_expand_silver_positive_train.py`
+  - design note: `docs/STEP16B_SILVER_POSITIVE_EXPANSION.md`
+- Step 16B does not invent sellers or item text. It selects weakly supervised Chinese positive pairs from the existing `zh_target_strict` Step 4 / Step 7 pair universe.
+- Safety constraints applied:
+  - no existing reviewed negative rows were converted;
+  - no existing `valid` / `test` rows were modified;
+  - any pair sharing a seller with current `zh_valid` or `zh_test` supervision was excluded;
+  - every added row already has a Step 7 pair-feature row;
+  - all added rows are `split_name = train`, `silver_train_only = 1`, and `benchmark_eligible = 0`.
+- Applied expansion:
+  - Chinese train positives before: `61`
+  - Chinese train positives after: `231`
+  - added silver train-only positives: `170`
+  - Chinese valid positives unchanged: `14`
+  - Chinese test positives unchanged: `21`
+  - train / valid / test seller-overlap counts remain `0`.
+- Silver composition:
+  - `silver_template_structural = 85`, training weight `0.40`
+  - `silver_direct_or_contact = 56`, training weight `0.55`
+  - `silver_component_closure = 29`, training weight `0.25`
+- Training scripts were updated so weak labels are not treated as equal-strength gold labels:
+  - `scripts/step7_train_baseline_models.py` now propagates `training_sample_weight` from Step 5 labels and multiplies LightGBM class-balanced weights by this row multiplier.
+  - `scripts/step9_run_few_shot_adaptation.py` now applies the same row multiplier to logistic / residual logistic backends and passes row weights through the Step 9 LightGBM backend.
+  - `scripts/step15_train_incremental_hard_negative.py` now multiplies Step 15 identity-loss weights by `training_sample_weight`.
+- Updated outputs:
+  - `reports/step16b_silver_positive_candidate_pairs.csv`
+  - `reports/step16b_silver_positive_training_pairs.csv`
+  - `reports/step16b_silver_positive_expansion_summary.json`
+  - `reports/step5_zh_target_strict_frozen_silver_labels.csv`
+  - `reports/step5_frozen_silver_summary.json`
+  - `reports/step15_evidence_type_labels.zh_target_strict.csv`
+  - `reports/step15_evidence_type_label_summary.json`
+- Scientific interpretation: these rows are weak training support, not gold benchmark truth. Paper text must describe them as `silver_train_only` auxiliary positives. Final evaluation should still report the unchanged fixed `zh_valid` / `zh_test` gold benchmark unless a separate future benchmark is explicitly constructed.
 
 `2026-07-04` Step 7 / Step 9 / Step 15 rerun with extended ranking metrics synchronized back:
 
