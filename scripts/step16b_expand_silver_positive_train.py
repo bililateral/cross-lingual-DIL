@@ -59,6 +59,12 @@ def write_json(path: Path, payload: dict) -> None:
         json.dump(payload, handle, ensure_ascii=False, indent=2)
 
 
+def dry_run_path(path: Path, enabled: bool) -> Path:
+    if not enabled:
+        return path
+    return path.with_name(f"{path.stem}.dry_run{path.suffix}")
+
+
 def as_float(value: str, default: float = 0.0) -> float:
     try:
         return float(value or default)
@@ -442,9 +448,9 @@ def main() -> None:
         if row["pair_uid"] not in existing_uids:
             expanded_rows.append(row)
 
-    candidate_audit_path = resolve(outputs["candidate_audit_csv"])
-    applied_path = resolve(outputs["applied_training_pairs_csv"])
-    summary_path = resolve(outputs["summary_json"])
+    candidate_audit_path = dry_run_path(resolve(outputs["candidate_audit_csv"]), args.dry_run)
+    applied_path = dry_run_path(resolve(outputs["applied_training_pairs_csv"]), args.dry_run)
+    summary_path = dry_run_path(resolve(outputs["summary_json"]), args.dry_run)
     write_csv(candidate_audit_path, candidate_records, list(candidate_records[0].keys()) if candidate_records else [])
     write_csv(applied_path, selected_records, list(selected_records[0].keys()) if selected_records else [])
 
