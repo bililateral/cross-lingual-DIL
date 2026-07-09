@@ -4,6 +4,38 @@ Updated: 2026-07-09
 
 ## Current Stage
 
+`2026-07-09` Step 16F valid/test positive evidence re-audit completed:
+
+- Active branch: `method/step16b-silver-positive-expansion`.
+- Purpose: after the Step 16C/E component-safe refreeze, the Chinese validation/test splits have larger positive counts (`valid = 30`, `test = 50`), but those positives must be stratified by evidence strength before being used in paper claims.
+- New audit script/output:
+  - script: `scripts/step16f_valid_test_positive_reaudit.py`
+  - CSV: `reports/step16f_valid_test_positive_reaudit.csv`
+  - JSON: `reports/step16f_valid_test_positive_reaudit_summary.json`
+  - note: `docs/STEP16F_VALID_TEST_POSITIVE_REAUDIT.md`
+- Scope: only current `zh_target_strict` `valid` / `test` positives were rechecked. The script does not modify Step 5 labels.
+- Audited positive rows: `80 = 30 valid / 50 test`.
+- Evidence tiers:
+  - `gold_direct_seller_contact`: `19`
+  - `gold_direct_seller_contact_weaker_type`: `2`
+  - `gold_component_anchor`: `1`
+  - `strong_soft_structural_clone`: `11`
+  - `component_or_contact_supported_soft_positive`: `3`
+  - `moderate_soft_structural_positive`: `3`
+  - `soft_product_data_clone_not_direct_identity`: `4`
+  - `weak_component_or_semantic_positive`: `31`
+  - `weak_soft_positive_needs_reaudit`: `6`
+- Paper reporting buckets:
+  - strict direct/component primary positives: `22`
+  - broader soft primary/slice positives: `14`
+  - secondary/sensitivity-only positives: `44`
+- Risk flags:
+  - `product_data_email_not_seller_identity`: `4`
+  - `contact_context_also_mentions_data_product`: `14`
+  - `direct_contact_not_in_pair_feature`: `3`
+  - weak or non-direct-identity soft evidence remains common.
+- Interpretation: the current valid/test benchmark is usable only with tiered reporting. It is not defensible to describe all `80` positives as direct identity-anchor gold labels. The strongest paper claim should report the strict direct/component positive slice separately; softer structural/clone positives should be reported as soft or sensitivity slices.
+
 `2026-07-09` Step 16C / Step 16E component-safe benchmark refreeze and train-balance repair applied:
 
 - Active branch: `method/step16b-silver-positive-expansion`.

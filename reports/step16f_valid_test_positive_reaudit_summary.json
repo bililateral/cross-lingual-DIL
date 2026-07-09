@@ -1,0 +1,117 @@
+{
+  "step": "step16f_valid_test_positive_reaudit",
+  "scope": "zh_target_strict valid/test positives only",
+  "input_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+  "input_evidence": "reports\\step15_evidence_type_labels.zh_target_strict.csv",
+  "input_signals": "reports\\step3_item_identity_signals.zh_target_strict.csv",
+  "row_count": 80,
+  "split_counts": {
+    "valid": 30,
+    "test": 50
+  },
+  "paper_evidence_tier_counts": {
+    "gold_direct_seller_contact": 19,
+    "soft_product_data_clone_not_direct_identity": 4,
+    "strong_soft_structural_clone": 11,
+    "gold_direct_seller_contact_weaker_type": 2,
+    "moderate_soft_structural_positive": 3,
+    "weak_component_or_semantic_positive": 31,
+    "weak_soft_positive_needs_reaudit": 6,
+    "gold_component_anchor": 1,
+    "component_or_contact_supported_soft_positive": 3
+  },
+  "recommended_use_counts": {
+    "primary_gold_benchmark": 19,
+    "secondary_or_sensitivity_only": 4,
+    "primary_gold_benchmark_soft_slice": 11,
+    "primary_gold_benchmark_with_contact_slice": 2,
+    "secondary_or_slice_reported_gold": 3,
+    "sensitivity_only_or_reaudit": 31,
+    "sensitivity_only_or_exclude_from_primary": 6,
+    "primary_gold_benchmark_component_slice": 1,
+    "primary_gold_benchmark_with_soft_slice": 3
+  },
+  "confidence_counts": {
+    "high": 19,
+    "medium": 7,
+    "medium_high": 17,
+    "low_medium": 31,
+    "low": 6
+  },
+  "paper_bucket_counts": {
+    "direct_or_component_primary": 22,
+    "soft_primary_or_slice": 14,
+    "secondary_or_sensitivity_only": 44
+  },
+  "by_split_paper_evidence_tier_counts": {
+    "test": {
+      "gold_direct_seller_contact": 16,
+      "soft_product_data_clone_not_direct_identity": 4,
+      "strong_soft_structural_clone": 3,
+      "gold_direct_seller_contact_weaker_type": 1,
+      "moderate_soft_structural_positive": 1,
+      "weak_component_or_semantic_positive": 19,
+      "weak_soft_positive_needs_reaudit": 2,
+      "gold_component_anchor": 1,
+      "component_or_contact_supported_soft_positive": 3
+    },
+    "valid": {
+      "gold_direct_seller_contact": 3,
+      "strong_soft_structural_clone": 8,
+      "gold_direct_seller_contact_weaker_type": 1,
+      "moderate_soft_structural_positive": 2,
+      "weak_component_or_semantic_positive": 12,
+      "weak_soft_positive_needs_reaudit": 4
+    }
+  },
+  "by_split_recommended_use_counts": {
+    "test": {
+      "primary_gold_benchmark": 16,
+      "secondary_or_sensitivity_only": 4,
+      "primary_gold_benchmark_soft_slice": 3,
+      "primary_gold_benchmark_with_contact_slice": 1,
+      "secondary_or_slice_reported_gold": 1,
+      "sensitivity_only_or_reaudit": 19,
+      "sensitivity_only_or_exclude_from_primary": 2,
+      "primary_gold_benchmark_component_slice": 1,
+      "primary_gold_benchmark_with_soft_slice": 3
+    },
+    "valid": {
+      "primary_gold_benchmark": 3,
+      "primary_gold_benchmark_soft_slice": 8,
+      "primary_gold_benchmark_with_contact_slice": 1,
+      "secondary_or_slice_reported_gold": 2,
+      "sensitivity_only_or_reaudit": 12,
+      "sensitivity_only_or_exclude_from_primary": 4
+    }
+  },
+  "by_split_confidence_counts": {
+    "test": {
+      "high": 16,
+      "medium": 5,
+      "medium_high": 8,
+      "low_medium": 19,
+      "low": 2
+    },
+    "valid": {
+      "high": 3,
+      "medium_high": 9,
+      "medium": 2,
+      "low_medium": 12,
+      "low": 4
+    }
+  },
+  "needs_manual_recheck_count": 50,
+  "risk_flag_counts": {
+    "contact_context_also_mentions_data_product": 14,
+    "product_data_email_not_seller_identity": 4,
+    "not_direct_identity": 14,
+    "weak_soft_positive": 37,
+    "direct_contact_not_in_pair_feature": 3
+  },
+  "outputs": {
+    "csv": "reports\\step16f_valid_test_positive_reaudit.csv",
+    "json": "reports\\step16f_valid_test_positive_reaudit_summary.json",
+    "md": "docs\\STEP16F_VALID_TEST_POSITIVE_REAUDIT.md"
+  }
+}
