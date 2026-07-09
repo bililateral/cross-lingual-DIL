@@ -1,0 +1,44 @@
+{
+  "step": "step16e_relaxed_silver_negative_balance",
+  "policy": "schema\\step16e_relaxed_silver_negative_balance_policy.json",
+  "dry_run": false,
+  "input_counts": {
+    "frozen_rows": 1104,
+    "candidate_pairs": 3857,
+    "pair_feature_rows": 3857,
+    "current_eval_seller_count": 439
+  },
+  "train_label_counts_before": {
+    "positive": 229,
+    "negative": 186
+  },
+  "train_label_counts_after": {
+    "positive": 229,
+    "negative": 229
+  },
+  "negative_gap_before": 43,
+  "target_additional_negative_train_rows": 43,
+  "candidate_count": 89,
+  "selected_total_silver_count": 43,
+  "selected_label_tier_counts": {
+    "silver_template_noise_negative_relaxed": 38,
+    "silver_semantic_low_structure_negative_relaxed": 5
+  },
+  "selected_reason_counts": {
+    "silver_template_noise_negative_relaxed": 38,
+    "silver_semantic_low_structure_negative_relaxed": 5
+  },
+  "selected_existing_uncertain_count": 3,
+  "safety_checks": {
+    "valid_test_rows_modified": false,
+    "selected_pair_feature_coverage": true,
+    "selected_eval_seller_overlap_count": 0,
+    "existing_positive_converted_count": 0
+  },
+  "outputs": {
+    "candidate_audit_csv": "reports\\step16e_relaxed_silver_negative_balance_candidates.csv",
+    "applied_training_pairs_csv": "reports\\step16e_relaxed_silver_negative_balance_training_pairs.csv",
+    "expanded_frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+    "summary_json": "reports\\step16e_relaxed_silver_negative_balance_summary.json"
+  }
+}

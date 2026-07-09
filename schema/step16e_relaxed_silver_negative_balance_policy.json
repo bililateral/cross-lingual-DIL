@@ -1,0 +1,71 @@
+{
+  "version": "2026-07-09-relaxed-silver-negative-balance",
+  "objective": "After the Step16C gold valid/test refreeze, add only enough low-weight train-only weak negatives to restore Chinese train class balance.",
+  "inputs": {
+    "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "candidate_pairs": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "pair_features": "reports/step7_pair_features.zh_target_strict.csv"
+  },
+  "outputs": {
+    "expanded_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "candidate_audit_csv": "reports/step16e_relaxed_silver_negative_balance_candidates.csv",
+    "applied_training_pairs_csv": "reports/step16e_relaxed_silver_negative_balance_training_pairs.csv",
+    "summary_json": "reports/step16e_relaxed_silver_negative_balance_summary.json"
+  },
+  "selection": {
+    "target_mode": "balance_current_train_negative_to_positive",
+    "max_additional_negative_train_rows": 60,
+    "candidate_scope": "sockpuppet_primary",
+    "candidate_language": "zh",
+    "exclude_current_valid_test_seller_overlap": true,
+    "exclude_existing_positive_negative": true,
+    "allow_existing_uncertain": true,
+    "require_pair_feature_row": true,
+    "relaxed_negative_rules": {
+      "silver_ordinary_negative_relaxed": {
+        "enabled": true,
+        "max_shared_title_count": 0,
+        "max_shared_description_count": 0,
+        "max_lexical_similarity": 0.5,
+        "max_structural_support_score": 0.24,
+        "training_sample_weight": 0.2
+      },
+      "silver_semantic_low_structure_negative_relaxed": {
+        "enabled": true,
+        "max_shared_text_overlap": 1,
+        "max_lexical_similarity": 0.6,
+        "max_structural_support_score": 0.25,
+        "training_sample_weight": 0.18
+      },
+      "silver_template_noise_negative_relaxed": {
+        "enabled": true,
+        "min_shared_title_count": 1,
+        "min_shared_description_count": 1,
+        "max_lexical_similarity": 0.6,
+        "max_structural_support_score": 0.28,
+        "training_sample_weight": 0.16
+      }
+    },
+    "positive_like_exclusion": {
+      "high_similarity_min_lexical_similarity": 0.78,
+      "high_similarity_min_structural_support_score": 0.2,
+      "template_min_shared_title_count": 1,
+      "template_min_shared_description_count": 1,
+      "template_min_lexical_similarity": 0.28,
+      "template_min_structural_support_score": 0.2,
+      "rank_min_candidate_rank_score": 8.0,
+      "rank_min_lexical_similarity": 0.28,
+      "rank_min_structural_support_score": 0.3
+    }
+  },
+  "safety_rules": [
+    "All added rows must be negative train-only weak supervision.",
+    "No relaxed negative row may enter validation or test.",
+    "No existing positive or negative row may be converted.",
+    "Existing uncertain rows may only be converted to train-only silver negative with benchmark_eligible=0.",
+    "Rows overlapping current valid/test sellers are forbidden.",
+    "Every selected row must already have Step7 pair features.",
+    "Positive-like candidates are excluded before weak negative selection.",
+    "Relaxed negatives are weak training support, not gold benchmark truth."
+  ]
+}

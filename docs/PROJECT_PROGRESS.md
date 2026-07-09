@@ -4,9 +4,54 @@ Updated: 2026-07-09
 
 ## Current Stage
 
+`2026-07-09` Step 16C / Step 16E component-safe benchmark refreeze and train-balance repair applied:
+
+- Active branch: `method/step16b-silver-positive-expansion`.
+- Motivation: the Step 16D state balanced `zh_train`, but left `zh_valid = 14 positive / 67 negative` and `zh_test = 21 positive / 85 negative`. That was still too small and imbalanced for paper-grade evaluation. The current boundary fixes the evaluation splits first, then restores train balance with low-weight train-only weak negatives.
+- Step 16C applied a component-safe gold valid/test refreeze:
+  - script: `scripts/step16c_plan_gold_valid_test_refreeze.py`
+  - plan: `reports/step16c_gold_valid_test_refreeze_plan.csv`
+  - summary: `reports/step16c_gold_valid_test_refreeze_plan_summary.json`
+  - backup before application: `reports/step5_zh_target_strict_frozen_silver_labels.pre_step16c_gold_valid_test_refreeze_20260709.csv`
+  - target valid split: `120 = 30 positive / 90 negative`
+  - target test split: `200 = 50 positive / 150 negative`
+  - no silver rows were moved into valid/test;
+  - whole seller-connected components were moved;
+  - train / valid / test seller-overlap counts are `0`.
+- Step 16E then restored training balance after the refreeze:
+  - policy: `schema/step16e_relaxed_silver_negative_balance_policy.json`
+  - script: `scripts/step16e_relaxed_silver_negative_balance.py`
+  - selected train-only weak negatives: `43`
+  - selected existing uncertain rows converted to train-only silver negative: `3`
+  - existing reviewed positives converted: `0`
+  - selected valid/test seller overlap: `0`
+  - all selected rows have Step 7 pair-feature coverage.
+- Current Chinese `zh_target_strict` after Step 16C/E:
+  - total frozen rows: `1144`
+  - label counts: `315 positive / 469 negative / 360 uncertain`
+  - binary supervision rows: `778`
+  - train: `458 = 229 positive / 229 negative`
+  - valid: `120 = 30 positive / 90 negative`
+  - test: `200 = 50 positive / 150 negative`
+  - audit-only positives: `6`
+  - train / valid / test seller-overlap counts: `0 / 0 / 0`.
+- Current split quality:
+  - valid/test are gold/original only: `silver_positive = 0`, `silver_negative = 0`, `benchmark_eligible=0 count = 0`.
+  - train contains weak supervision only as training support: `213` silver positives and `43` silver negatives.
+  - all binary supervision rows have Step 7 feature coverage and Step 15 evidence-type coverage.
+- Current evidence-type distribution:
+  - train positives: `57 direct_identifier`, `29 component_anchor`, `143 style_structural_soft`
+  - train negatives: `129 ordinary`, `61 template_clone`, `31 semantic_topic`, `8 public_contact_or_url_noise`
+  - valid positives: `4 direct_identifier`, `26 style_structural_soft`
+  - valid negatives: `46 ordinary`, `25 template_clone`, `16 semantic_topic`, `3 public_contact_or_url_noise`
+  - test positives: `21 direct_identifier`, `1 component_anchor`, `28 style_structural_soft`
+  - test negatives: `112 ordinary`, `22 semantic_topic`, `10 template_clone`, `6 public_contact_or_url_noise`
+- Scientific interpretation: this is the current paper-oriented internal benchmark boundary. It is stronger than the prior fixed `zh_test = 106` boundary because test positives increase from `21` to `50`, and valid positives increase from `14` to `30`. It is still not an external prospective holdout; paper text must call it a component-safe internal refreeze. All Step 7 / Step 9 / Step 15 / Step 12 / Step 11 results before this boundary are now stale and must be rerun.
+
 `2026-07-09` Step 16D relaxed silver positive train-only top-up applied:
 
 - Active branch: `method/step16b-silver-positive-expansion`.
+- Status: superseded as the final active data boundary by the Step 16C/E refreeze and balance repair above. The Step 16D outputs remain part of the data-construction provenance.
 - Motivation: after Step 16B, the Chinese training split still had fewer positives than negatives (`231 positive / 274 negative`). The requested expansion priority is positive sample volume; negatives should only be expanded when needed for class balance.
 - New policy/script:
   - `schema/step16d_relaxed_silver_positive_topup_policy.json`

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import shutil
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Iterable
@@ -13,6 +14,7 @@ DEFAULT_LABELS = ROOT / "reports" / "step5_zh_target_strict_frozen_silver_labels
 DEFAULT_EVIDENCE = ROOT / "reports" / "step15_evidence_type_labels.zh_target_strict.csv"
 DEFAULT_PLAN = ROOT / "reports" / "step16c_gold_valid_test_refreeze_plan.csv"
 DEFAULT_SUMMARY = ROOT / "reports" / "step16c_gold_valid_test_refreeze_plan_summary.json"
+DEFAULT_APPLIED_LABELS = ROOT / "reports" / "step5_zh_target_strict_frozen_silver_labels.csv"
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -240,6 +242,17 @@ def main() -> None:
     parser.add_argument("--test-public-noise-negative-move-quota", type=int, default=4)
     parser.add_argument("--output-plan", type=Path, default=DEFAULT_PLAN)
     parser.add_argument("--output-summary", type=Path, default=DEFAULT_SUMMARY)
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="Apply the planned component-safe refreeze to the label CSV after writing the plan.",
+    )
+    parser.add_argument("--output-labels", type=Path, default=DEFAULT_APPLIED_LABELS)
+    parser.add_argument(
+        "--backup-suffix",
+        default="pre_step16c_gold_valid_test_refreeze_20260709",
+        help="Suffix for the label CSV backup written before --apply.",
+    )
     args = parser.parse_args()
 
     rows = read_csv(args.labels)
@@ -361,6 +374,10 @@ def main() -> None:
         target_split = selected.get(row_to_component.get(row.get("pair_uid", ""), ""))
         if target_split:
             updated["split_name"] = target_split
+            if updated.get("review_label") in {"positive", "negative"}:
+                updated["benchmark_eligible"] = "1"
+                if not updated.get("training_sample_weight"):
+                    updated["training_sample_weight"] = "1.000000"
         simulated_rows.append(updated)
 
     fieldnames = [
@@ -383,7 +400,7 @@ def main() -> None:
 
     summary = {
         "step": "step16c_gold_valid_test_refreeze_plan",
-        "mode": "plan_only_no_label_file_modified",
+        "mode": "applied" if args.apply else "plan_only_no_label_file_modified",
         "input_labels": str(args.labels.relative_to(ROOT) if args.labels.is_absolute() else args.labels),
         "input_evidence": str(args.evidence.relative_to(ROOT) if args.evidence.is_absolute() else args.evidence),
         "targets": {
@@ -410,13 +427,33 @@ def main() -> None:
             "silver_rows_allowed_in_valid_or_test": False,
             "moves_only_from_current_train": True,
             "moves_whole_split_components": True,
-            "script_does_not_apply_changes": True,
+            "script_does_not_apply_changes": not args.apply,
         },
         "outputs": {
             "plan_csv": str(args.output_plan.relative_to(ROOT) if args.output_plan.is_absolute() else args.output_plan),
             "summary_json": str(args.output_summary.relative_to(ROOT) if args.output_summary.is_absolute() else args.output_summary),
+            "applied_labels": str(args.output_labels.relative_to(ROOT) if args.output_labels.is_absolute() else args.output_labels)
+            if args.apply
+            else None,
         },
     }
+
+    if args.apply:
+        if any(value != 0 for value in summary["simulated_seller_overlap_counts"].values()):
+            raise ValueError(f"Refreeze would create seller leakage: {summary['simulated_seller_overlap_counts']}")
+        for row in simulated_rows:
+            if row.get("split_name") in {"valid", "test"} and row_is_silver(row):
+                raise ValueError(f"Refreeze would move silver row into evaluation split: {row.get('pair_uid')}")
+        output_labels = args.output_labels
+        if not output_labels.is_absolute():
+            output_labels = ROOT / output_labels
+        backup_path = output_labels.with_name(f"{output_labels.stem}.{args.backup_suffix}{output_labels.suffix}")
+        if output_labels.exists() and not backup_path.exists():
+            shutil.copy2(output_labels, backup_path)
+        fieldnames = list(rows[0].keys()) if rows else []
+        write_csv(output_labels, simulated_rows, fieldnames)
+        summary["outputs"]["backup_labels"] = str(backup_path.relative_to(ROOT))
+
     write_json(args.output_summary, summary)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
