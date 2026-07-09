@@ -22,9 +22,11 @@ from typing import Any
 
 DEFAULT_LABELS = Path("reports/step5_zh_target_strict_frozen_silver_labels.csv")
 DEFAULT_FEATURES = Path("reports/step7_pair_features.zh_target_strict.csv")
-DEFAULT_OUT_JSON = Path("reports/step12_v5_statistical_robustness_zh_test_20260603.json")
-DEFAULT_OUT_METRICS = Path("reports/step12_v5_statistical_robustness_model_metrics_20260603.csv")
-DEFAULT_OUT_COMPARISONS = Path("reports/step12_v5_statistical_robustness_paired_comparisons_20260603.csv")
+DEFAULT_OUT_JSON = Path("reports/step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709.json")
+DEFAULT_OUT_METRICS = Path("reports/step12_v5_statistical_robustness_model_metrics_step16c_refreeze_20260709.csv")
+DEFAULT_OUT_COMPARISONS = Path(
+    "reports/step12_v5_statistical_robustness_paired_comparisons_step16c_refreeze_20260709.csv"
+)
 
 DEFAULT_RESAMPLES = 5000
 DEFAULT_SEED = 20260513
@@ -769,6 +771,112 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
 ]
 
 
+# Current Step16C/E refreeze audit scope.
+#
+# Older Step15 v1-v4 artifacts may still exist in reports/, but their fixed-test
+# prediction files were produced for earlier zh_test boundaries. If they are
+# loaded here, Step12 can either fail with missing pair_uids or, worse, make a
+# stale comparison look current. Keep the default audit restricted to the
+# models regenerated for the active Step16C/E boundary.
+CURRENT_STEP16C_MODEL_IDS = {
+    "raw_e5_cosine",
+    "raw_labse_cosine",
+    "raw_bge_m3_cosine",
+    "step7_core_zero_shot_default",
+    "step7_core_zero_shot_bge_m3",
+    "step7_core_zero_shot_default_no_structural",
+    "step7_identifier_augmented_default",
+    "step9_e5_lr_l2_50pct_seed_20260320",
+    "step9_e5_lr_l2_50pct_seed_20260321",
+    "step9_e5_lr_l2_50pct_seed_20260322",
+    "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260320",
+    "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260321",
+    "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260322",
+    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_20260320",
+    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_20260321",
+    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_20260322",
+    "step9_bge_m3_residual_lr_100pct_seed_20260320",
+    "step9_bge_m3_residual_lr_100pct_seed_20260321",
+    "step9_bge_m3_residual_lr_100pct_seed_20260322",
+    "step9_labse_lr_l2_100pct_seed_20260320",
+    "step9_labse_lr_l2_100pct_seed_20260321",
+    "step9_labse_lr_l2_100pct_seed_20260322",
+    "step9_identifier_augmented_lr_l2_100pct_seed_20260320",
+    "step9_identifier_augmented_lr_l2_100pct_seed_20260321",
+    "step9_identifier_augmented_lr_l2_100pct_seed_20260322",
+    "step15_v5_public_noise_weighted_strong_phase4_seed_20260320",
+    "step15_v5_public_noise_weighted_strong_phase4_seed_20260321",
+    "step15_v5_public_noise_weighted_strong_phase4_seed_20260322",
+    "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260320",
+    "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260321",
+    "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260322",
+}
+
+MODEL_SPECS = [spec for spec in MODEL_SPECS if str(spec["model_id"]) in CURRENT_STEP16C_MODEL_IDS]
+for spec in MODEL_SPECS:
+    if str(spec["model_id"]).startswith("step15_v5_"):
+        spec.pop("optional_until_generated", None)
+
+ENSEMBLES = {
+    "step9_e5_lr_l2_50pct_seed_mean": ENSEMBLES["step9_e5_lr_l2_50pct_seed_mean"],
+    "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean": ENSEMBLES[
+        "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean"
+    ],
+    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean": ENSEMBLES[
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean"
+    ],
+    "step9_bge_m3_residual_lr_100pct_seed_mean": ENSEMBLES["step9_bge_m3_residual_lr_100pct_seed_mean"],
+    "step9_labse_lr_l2_100pct_seed_mean": ENSEMBLES["step9_labse_lr_l2_100pct_seed_mean"],
+    "step9_identifier_augmented_lr_l2_100pct_seed_mean": ENSEMBLES[
+        "step9_identifier_augmented_lr_l2_100pct_seed_mean"
+    ],
+    "step15_v5_public_noise_weighted_strong_phase4_seed_mean": ENSEMBLES[
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean"
+    ],
+    "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean": ENSEMBLES[
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean"
+    ],
+}
+for ensemble in ENSEMBLES.values():
+    if str(ensemble["role"]).startswith("step15_v5_"):
+        ensemble.pop("optional_until_generated", None)
+
+PAIRED_COMPARISONS = [
+    ("step9_e5_lr_l2_50pct_seed_mean", "raw_e5_cosine", "step9_e5_lr_l2_50pct_vs_raw_e5"),
+    ("step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean", "raw_e5_cosine", "step9_mixup100_vs_raw_e5"),
+    (
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step9_e5_lr_l2_50pct_seed_mean",
+        "step9_mixup100_vs_non_mixup_e5_lr_l2_50pct",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5_public_noise_weighted_strong_vs_raw_e5",
+    ),
+    (
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v5_public_noise_weighted_strong_vs_step9_mixup100",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_raw_e5",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_vs_step9_mixup100",
+    ),
+    (
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5_domain_balanced_vs_non_domain_balanced",
+    ),
+]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=DEFAULT_LABELS)
@@ -1218,7 +1326,7 @@ def main() -> None:
     )
 
     summary = {
-        "audit_version": "step12_v5_statistical_robustness_zh_test_20260603",
+        "audit_version": "step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709",
         "scope": "zh_target_strict_fixed_test",
         "fixed_test_policy": {
             "split_name": "test",

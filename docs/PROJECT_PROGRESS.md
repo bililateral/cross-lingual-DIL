@@ -4,6 +4,21 @@ Updated: 2026-07-09
 
 ## Current Stage
 
+`2026-07-09` Step 5-19 output-overwrite audit and current-boundary result guard completed:
+
+- Purpose: before rerunning the Step16C/E benchmark boundary on Linux, rechecked the Step 5 through Step 19 result-writing surface for stale-summary and accidental-overwrite risks.
+- Confirmed current execution rule:
+  - do not rerun generic `scripts/step5_freeze_silver_labels.py` for the active boundary, because the current Step16C/E frozen labels are already the intended start point;
+  - Step 7 / Step 9 / Step 15 outputs are intentionally overwritten at their canonical current paths when rerun on the active boundary;
+  - Step 11 cluster audit and Step 13 concept-drift audit must use explicit current output paths, not `reports/` globbing.
+- Fixes applied:
+  - `scripts/step12_statistical_robustness_audit.py` now defaults to `step16c_refreeze_20260709` output filenames and restricts the default model set to current-boundary models: raw semantic controls, Step 7 controls, Step 9 current candidates, and Step 15 v5 scorers.
+  - legacy Step15 v1-v4 prediction files are no longer auto-loaded by the default Step 12 audit, preventing missing-pair errors and stale cross-boundary comparisons.
+  - `schema/step12_statistical_robustness_policy.json` now points to the Step16C/E output names and lists the current extended metrics.
+  - `schema/step15_evidence_type_policy.json` no longer carries old static baseline metric numbers; current baseline comparisons must be read from the new Step 12 outputs.
+  - `schema/step11_clustering_policy.json` now records `current_validation_run_id = step16c_refreeze_validation_20260709`.
+- Validation: JSON policy parsing and Python compile checks passed for the touched scripts.
+
 `2026-07-09` Step 16F valid/test positive evidence re-audit completed:
 
 - Active branch: `method/step16b-silver-positive-expansion`.

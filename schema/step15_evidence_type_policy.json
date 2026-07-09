@@ -622,13 +622,12 @@
     "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv"
   },
   "baseline_references": {
-    "raw_e5": {
-      "roc_auc": 0.806723,
-      "average_precision": 0.520573
-    },
-    "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean": {
-      "roc_auc": 0.842017,
-      "average_precision": 0.588995
+    "status": "static_numeric_references_removed_for_step16c_refreeze",
+    "reason": "Step15 summaries must not carry old-boundary baseline metrics. Use the current Step12 output files for raw E5, Step9 mixup, and paired comparison baselines.",
+    "current_step12_outputs": {
+      "summary_json": "reports/step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709.json",
+      "model_metrics_csv": "reports/step12_v5_statistical_robustness_model_metrics_step16c_refreeze_20260709.csv",
+      "paired_comparisons_csv": "reports/step12_v5_statistical_robustness_paired_comparisons_step16c_refreeze_20260709.csv"
     }
   },
   "hard_rules": [
