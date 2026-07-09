@@ -1,8 +1,57 @@
 # Project Progress
 
-Updated: 2026-07-06
+Updated: 2026-07-09
 
 ## Current Stage
+
+`2026-07-09` Step 16D relaxed silver positive train-only top-up applied:
+
+- Active branch: `method/step16b-silver-positive-expansion`.
+- Motivation: after Step 16B, the Chinese training split still had fewer positives than negatives (`231 positive / 274 negative`). The requested expansion priority is positive sample volume; negatives should only be expanded when needed for class balance.
+- New policy/script:
+  - `schema/step16d_relaxed_silver_positive_topup_policy.json`
+  - `scripts/step16d_relaxed_silver_positive_topup.py`
+- Step 16D adds only weak `positive` rows and stops exactly when the current Chinese training split is balanced. It does not add negative rows in this pass.
+- Safety constraints applied:
+  - no existing reviewed negative rows were converted;
+  - no `valid` / `test` rows were modified;
+  - any pair sharing a seller with current `zh_valid` / `zh_test` supervision was excluded;
+  - any pair sharing a seller with the Step 16C planned valid/test refreeze set was also excluded;
+  - every selected row already has a Step 7 pair-feature row;
+  - all added rows are `split_name = train`, `silver_train_only = 1`, `benchmark_eligible = 0`, and low-weight weak supervision.
+- Applied Step 16D top-up:
+  - candidate count under relaxed positive rules: `63`
+  - selected train-only silver positives: `43`
+  - selected existing uncertain rows converted to train-only silver positive: `16`
+  - selected existing reviewed negatives converted: `0`
+  - protected valid/test seller overlap: `0`
+- Step 16D silver composition:
+  - `silver_rank_structural_relaxed = 30`, training weight `0.18`
+  - `silver_template_structural_relaxed = 11`, training weight `0.20`
+  - `silver_high_similarity_relaxed = 2`, training weight `0.24`
+- Current Chinese `zh_target_strict` after Step 16D:
+  - total frozen rows: `1104`
+  - label counts: `315 positive / 426 negative / 363 uncertain`
+  - supervision rows: `735`
+  - train: `548 = 274 positive / 274 negative`
+  - valid: `81 = 14 positive / 67 negative`
+  - test: `106 = 21 positive / 85 negative`
+  - audit-only positives: `6`
+  - train / valid / test seller-overlap counts remain `0`.
+- Current Chinese train positive composition:
+  - original/gold positives: `61`
+  - Step 16B silver positives: `170`
+  - Step 16D relaxed silver positives: `43`
+  - total train positives: `274`
+- Updated outputs:
+  - `reports/step16d_relaxed_silver_positive_topup_candidates.csv`
+  - `reports/step16d_relaxed_silver_positive_topup_training_pairs.csv`
+  - `reports/step16d_relaxed_silver_positive_topup_summary.json`
+  - `reports/step5_zh_target_strict_frozen_silver_labels.csv`
+  - `reports/step5_frozen_silver_summary.json`
+  - `reports/step15_evidence_type_labels.zh_target_strict.csv`
+  - `reports/step15_evidence_type_label_summary.json`
+- Scientific interpretation: Step 16D is a low-weight weak-supervision top-up for target-domain training balance. It is not gold truth and must not be used as validation/test evidence. Any final paper claim must report gold-only `zh_valid` / `zh_test` metrics, and should include an ablation comparing no-silver, Step16B, and Step16B+Step16D training.
 
 `2026-07-06` Step 16B silver positive train-only expansion added:
 

@@ -1,0 +1,92 @@
+{
+  "step": "step16c_gold_valid_test_refreeze_plan",
+  "mode": "plan_only_no_label_file_modified",
+  "input_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+  "input_evidence": "reports\\step15_evidence_type_labels.zh_target_strict.csv",
+  "targets": {
+    "valid": {
+      "positive": 30,
+      "negative": 90
+    },
+    "test": {
+      "positive": 50,
+      "negative": 150
+    }
+  },
+  "minimum_move_quotas": {
+    "valid_direct_identifier_positive": 0,
+    "test_direct_identifier_positive": 10,
+    "valid_public_contact_or_url_noise_negative": 4,
+    "test_public_contact_or_url_noise_negative": 4
+  },
+  "current_split_counts": {
+    "test": {
+      "positive": 21,
+      "negative": 85
+    },
+    "train": {
+      "positive": 231,
+      "negative": 274
+    },
+    "valid": {
+      "positive": 14,
+      "negative": 67
+    }
+  },
+  "required_moves_from_train": {
+    "valid": {
+      "positive": 16,
+      "negative": 23,
+      "positive_selected": 16,
+      "direct_identifier_positive_selected": 0,
+      "negative_selected": 23,
+      "public_contact_or_url_noise_selected": 3
+    },
+    "test": {
+      "positive": 29,
+      "negative": 65,
+      "positive_selected": 29,
+      "direct_identifier_positive_selected": 16,
+      "negative_selected": 65,
+      "public_contact_or_url_noise_selected": 0
+    }
+  },
+  "eligible_component_counts": {
+    "positive": 48,
+    "negative": 114
+  },
+  "selected_component_count": 112,
+  "selected_row_counts": {
+    "test": 87,
+    "valid": 25
+  },
+  "simulated_split_counts": {
+    "test": {
+      "positive": 50,
+      "negative": 150
+    },
+    "train": {
+      "positive": 186,
+      "negative": 186
+    },
+    "valid": {
+      "positive": 30,
+      "negative": 90
+    }
+  },
+  "simulated_seller_overlap_counts": {
+    "train__valid": 0,
+    "train__test": 0,
+    "valid__test": 0
+  },
+  "hard_rules": {
+    "silver_rows_allowed_in_valid_or_test": false,
+    "moves_only_from_current_train": true,
+    "moves_whole_split_components": true,
+    "script_does_not_apply_changes": true
+  },
+  "outputs": {
+    "plan_csv": "reports\\step16c_gold_valid_test_refreeze_plan.csv",
+    "summary_json": "reports\\step16c_gold_valid_test_refreeze_plan_summary.json"
+  }
+}

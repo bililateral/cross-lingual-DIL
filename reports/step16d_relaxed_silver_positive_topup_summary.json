@@ -1,0 +1,49 @@
+{
+  "step": "step16d_relaxed_silver_positive_topup",
+  "policy": "schema\\step16d_relaxed_silver_positive_topup_policy.json",
+  "dry_run": false,
+  "input_counts": {
+    "frozen_rows": 1077,
+    "candidate_pairs": 3857,
+    "pair_feature_rows": 3857,
+    "current_eval_seller_count": 198,
+    "planned_eval_seller_count": 241,
+    "protected_eval_seller_count": 439
+  },
+  "train_label_counts_before": {
+    "positive": 231,
+    "negative": 274
+  },
+  "train_label_counts_after": {
+    "positive": 274,
+    "negative": 274
+  },
+  "positive_gap_before": 43,
+  "target_additional_positive_train_rows": 43,
+  "candidate_count": 63,
+  "selected_total_silver_count": 43,
+  "selected_label_tier_counts": {
+    "silver_template_structural_relaxed": 11,
+    "silver_high_similarity_relaxed": 2,
+    "silver_rank_structural_relaxed": 30
+  },
+  "selected_reason_counts": {
+    "silver_template_structural_relaxed": 11,
+    "silver_clone_overlap_relaxed": 1,
+    "silver_rank_structural_relaxed": 34,
+    "silver_high_similarity_relaxed": 2
+  },
+  "selected_existing_uncertain_count": 16,
+  "safety_checks": {
+    "valid_test_rows_modified": false,
+    "selected_pair_feature_coverage": true,
+    "selected_protected_eval_seller_overlap_count": 0,
+    "existing_negative_converted_count": 0
+  },
+  "outputs": {
+    "candidate_audit_csv": "reports\\step16d_relaxed_silver_positive_topup_candidates.csv",
+    "applied_training_pairs_csv": "reports\\step16d_relaxed_silver_positive_topup_training_pairs.csv",
+    "expanded_frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+    "summary_json": "reports\\step16d_relaxed_silver_positive_topup_summary.json"
+  }
+}
