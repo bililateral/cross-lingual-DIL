@@ -29,6 +29,14 @@ Linux synchronization incident and repair:
 - the Windows preflight was rerun with the exact Linux experiment arguments and returned `status = pass`, policy version `2026-07-11-v5r-trusted-weighted-same-domain-mixup`, both v5r experiments, both requested phases, all three seeds, and the isolated v5r summary path;
 - the local test suite now contains five passing tests, including a policy/runtime contract test. No model training was performed on Windows.
 
+Linux v5r manifest serialization incident and repair:
+
+- after the synchronized config preflight passed, the second Linux attempt reached the first Phase-4 manifest write and failed because five synthetic eligibility fields were present in each internal row but absent from the fixed CSV field list;
+- model construction was not the failing operation; `csv.DictWriter` rejected undeclared dictionary keys before the Phase-4 artifact/prediction set and top-level summary could complete;
+- `write_positive_mixup_manifest()` now includes the five audit fields and explicitly projects every internal row onto the declared manifest schema, so future internal metadata cannot break CSV serialization;
+- a dedicated write/read unit test passes a row containing all current eligibility fields plus an undeclared future field, verifies successful output, verifies `core_transfer_eligible = 1`, and verifies the internal-only field is excluded;
+- Python compile, the exact v5r config-only command, and all six unit tests pass on Windows. No model training was run on Windows.
+
 Interpretation rule before Linux results return:
 
 - v5r is an implementation-correctness repair, not an assumed performance improvement;

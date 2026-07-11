@@ -954,9 +954,14 @@ def write_positive_mixup_manifest(path: Path, rows: list[dict]) -> None:
         "review_label",
         "identity_label",
         "evidence_type",
+        "evidence_type_confident",
+        "identity_training_eligible",
         "step15_pool",
         "split_name",
         "synthetic_train_only",
+        "usable_for_supervision",
+        "usable_for_core_transfer",
+        "core_transfer_eligible",
         "training_sample_weight",
         "mixup_parent_left_pair_uid",
         "mixup_parent_right_pair_uid",
@@ -968,7 +973,11 @@ def write_positive_mixup_manifest(path: Path, rows: list[dict]) -> None:
         "mixup_parent_right_training_sample_weight",
         "mixup_lambda_right",
     ]
-    step7.write_csv(path, rows, fields)
+    manifest_rows = [
+        {field: row.get(field, "") for field in fields}
+        for row in rows
+    ]
+    step7.write_csv(path, manifest_rows, fields)
 
 
 def artifact_payload(

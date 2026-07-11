@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import csv
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -15,6 +17,41 @@ import step15_train_incremental_hard_negative as step15  # noqa: E402
 
 
 class Step15WeightedMixupTests(unittest.TestCase):
+    def test_mixup_manifest_projects_rows_to_declared_schema(self) -> None:
+        row = {
+            "pair_uid": "synthetic_positive_mixup::0",
+            "review_label": "positive",
+            "identity_label": "same_controller",
+            "evidence_type": "synthetic_train_only",
+            "evidence_type_confident": "0",
+            "identity_training_eligible": "1",
+            "step15_pool": "zh_target_strict",
+            "split_name": "train",
+            "synthetic_train_only": "1",
+            "usable_for_supervision": "1",
+            "usable_for_core_transfer": "1",
+            "core_transfer_eligible": "1",
+            "training_sample_weight": 0.55,
+            "mixup_parent_left_pair_uid": "left",
+            "mixup_parent_right_pair_uid": "right",
+            "mixup_parent_left_pool": "zh_target_strict",
+            "mixup_parent_right_pool": "zh_target_strict",
+            "mixup_parent_left_evidence_type": "same_controller_direct_identifier",
+            "mixup_parent_right_evidence_type": "same_controller_direct_identifier",
+            "mixup_parent_left_training_sample_weight": 0.55,
+            "mixup_parent_right_training_sample_weight": 1.0,
+            "mixup_lambda_right": 0.25,
+            "future_internal_field_not_in_manifest": "must_not_break_csv_writer",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "manifest.csv"
+            step15.write_positive_mixup_manifest(path, [row])
+            with path.open("r", encoding="utf-8", newline="") as handle:
+                written = list(csv.DictReader(handle))
+        self.assertEqual(len(written), 1)
+        self.assertEqual(written[0]["core_transfer_eligible"], "1")
+        self.assertNotIn("future_internal_field_not_in_manifest", written[0])
+
     def test_v5r_policy_runtime_contract(self) -> None:
         with (ROOT / "schema" / "step15_evidence_type_policy.json").open("r", encoding="utf-8") as handle:
             policy = json.load(handle)

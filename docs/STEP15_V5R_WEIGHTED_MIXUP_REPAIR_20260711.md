@@ -144,3 +144,5 @@ reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_2026
 Linux runner 会在统计审计前调用 `scripts/step15_validate_v5r_outputs.py`。该验证器逐一检查 6 个 Phase-4 run 的 artifact 和 parent manifest；一旦发现跨域/跨证据父样本、错误继承权重、manifest 行数不一致或两域有效质量不相等，流水线立即失败，不继续生成 Step 12 结论。
 
 第一次 Linux 尝试暴露了同步契约缺口：运行脚本已是 v5r，但 Linux policy 仍是旧版，因此训练入口报告 unknown experiment。为避免再次发生，训练入口新增 `--validate-config-only`。runner 在读取数据前，用正式运行完全相同的两个 experiment、两个 phase 和三个 seed 做解析，并检查 policy version、v5r summary 隔离路径、mixup scope、最小父权重、最近邻数量、合成权重模式和有效域平衡模式。Windows 已用该正式入口完成预检并通过；测试总数现为 5。Windows 仍未执行模型训练。
+
+第二次 Linux 尝试在 Phase-4 manifest 写盘时暴露了 CSV schema 缺口：合成行包含资格审计字段，但旧 manifest field list 未声明这些键。writer 现同时保留 `evidence_type_confident`、`identity_training_eligible`、`usable_for_supervision`、`usable_for_core_transfer` 和 `core_transfer_eligible`，并在写盘前把内部 row 显式投影到固定 schema。新增测试还注入一个未来内部字段，确认它既不会使 writer 崩溃，也不会泄漏到 manifest。当前测试总数为 6，全部通过。
