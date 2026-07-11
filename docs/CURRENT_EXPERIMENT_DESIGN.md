@@ -1,6 +1,6 @@
 # 当前实验设计说明
 
-更新日期：`2026-05-22`
+更新日期：`2026-07-11`
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
@@ -30,9 +30,11 @@
 | Step 5 | 人工/规则辅助审查并冻结监督标签 | `reports/step5_*_frozen_silver_labels.csv` |
 | Step 7 | 英文源域训练 zero-shot pair verifier，并在中文测试 | `reports/step7_training_summary.json` |
 | Step 9 | 中文少样本适配和 calibration 控制实验 | `reports/step9_few_shot_summary.json` |
-| Step 11 | 把 scorer 投影成中文候选图和候选簇 | `reports/step11_current_manifest_20260517.json` |
-| Step 12 | 固定中文测试集上的统计稳健性审计 | 当前已扩展到 Step 15 v5 public-noise 修复配置；v2 已审计结果仍保留为 `reports/step12_v2_statistical_robustness_zh_test_20260602.json` |
-| Step 13 | 概念漂移与切片诊断 | `reports/step13_concept_drift_audit.json` |
+| Step 11 | 把 scorer 投影成中文候选图和候选簇，并做 explicit allow-list audit | `reports/step11_cluster_level_audit.step16g_imbalance_validation_20260710.json` |
+| Step 12 | 固定中文测试集上的 grouped-bootstrap 稳健性审计 | 当前已审计 `step16g_imbalance_20260710`；v5r 待生成 `reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json` |
+| Step 13 | 概念漂移与切片诊断 | `reports/step13_concept_drift_audit.step16g_imbalance_validation_20260710.json` |
+| Step 15 | evidence-type hard-negative curriculum 与轻量 MLP scorer | 旧 v5 已冻结；v5r 待生成 `reports/step15_v5r_weighted_mixup_summary.json` |
+| Step 16G | train-only weak hard-negative support，用于恢复正式 mixup 消融 | `reports/step16g_hard_negative_imbalance_summary.json` |
 
 实验设计的核心原则是：
 
@@ -42,6 +44,26 @@
 4. 中文 `zh_test` 是固定测试集，不能与 train/valid 随机混合。
 5. Step 11 只生成候选簇，不把聚类结果当 ground truth。
 6. 同控制结论必须有 seller-facing identity proof，例如 Telegram、PGP、Jabber、QQ、微信、电话、钱包等直接证据；商品内容、模板、URL、受害者数据 email 不能直接作为同控制证明。
+
+### 2.1 Step 15 v5r 修复版状态
+
+旧 `v5` 结果保留为实现修复前的历史对照。当前待 Linux 验证的新分支是 `v5r`，其输出与旧版物理隔离：
+
+- 新 summary：`reports/step15_v5r_weighted_mixup_summary.json`；
+- 新 slice audit：`reports/step15_v5r_weighted_mixup_slice_level_audit.json/csv`；
+- 新 Step 12：`reports/step12_v5r_statistical_robustness_*_weighted_mixup_20260711.*`；
+- 新实验名均以 `step15_v5r_` 开头，不覆盖任何 `step15_v5_` artifact 或 prediction。
+
+`v5r` 只修复已确认的训练目标缺陷，不改变 frozen labels、固定 `zh_valid/zh_test`、特征集或 MLP 容量：
+
+1. Phase 4 正例父样本必须能用于核心迁移、证据类型可信且权重不低于 `0.55`。
+2. 只在同一语言域和同一 evidence type 内选择最近邻正例配对，不再做英文/中文跨域向量插值。
+3. synthetic row 的 `training_sample_weight` 取两个父样本权重的较小值。
+4. 布尔和计数特征从 anchor parent 原样复制，只插值连续特征。
+5. domain-balanced 版本在类别、evidence type、row quality 权重全部应用后，再平衡两个真实域的有效权重总量。
+6. 每个合成样本写入独立 parent-provenance manifest，便于复核并证明没有进入 validation/test/Step 5。
+
+修复不是预设结果。正式判定依赖 `v5r Phase4 - v5r Phase3`、`v5r - legacy v5` 和 `v5r domain-balanced - v5r non-domain` 的 Step 12 配对 grouped bootstrap。
 
 ## 3. 数据域设计
 
@@ -367,26 +389,26 @@ Step 7 使用 LightGBM fusion，在英文 train 上训练、英文 valid 上早�
 
 ### 5.5 Step 7 当前结果
 
-固定中文 strict test：`106` rows, `21` positive, `85` negative。
+固定中文 strict test：`200` rows, `50` positive, `150` negative。
 
 关键 Step 7 clean zero-shot 结果：
 
 | experiment | best_iteration | ROC-AUC | AP | balanced accuracy | collapse |
 | --- | ---: | ---: | ---: | ---: | --- |
-| `core_zero_shot_default` | `1` | `0.588235` | `0.448547` | `0.562465` | true |
-| `core_zero_shot_bge_m3` | `1` | `0.601681` | `0.448761` | `0.562465` | true |
-| `core_zero_shot_multilingual_e5_large` | `1` | `0.550140` | `0.384493` | `0.538655` | true |
-| `core_zero_shot_default_no_structural` | `54` | `0.623529` | `0.287652` | `0.572269` | false |
-| `core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker` | `47` | `0.604482` | `0.366364` | `0.524650` | false |
-| `identifier_augmented_default` | `1` | `0.606443` | `0.418989` | `0.619888` | true |
+| `core_zero_shot_default` | `1` | `0.604000` | `0.490156` | `0.573333` | true |
+| `core_zero_shot_bge_m3` | `1` | `0.604200` | `0.494441` | `0.573333` | true |
+| `core_zero_shot_multilingual_e5_large` | `1` | `0.623733` | `0.519158` | `0.573333` | true |
+| `core_zero_shot_default_no_structural` | `54` | `0.768800` | `0.514122` | `0.603333` | false |
+| `core_zero_shot_paraphrase_multilingual_mpnet_plus_gte_reranker` | `47` | `0.662133` | `0.461304` | `0.573333` | false |
+| `identifier_augmented_default` | `1` | `0.691200` | `0.599287` | `0.703333` | true |
 
 Raw semantic baselines 在中文 test 上反而更强：
 
 | raw baseline | ROC-AUC | AP |
 | --- | ---: | ---: |
-| raw E5 cosine | `0.806723` | `0.520573` |
-| raw LaBSE cosine | `0.806162` | `0.518581` |
-| raw BGE-M3 cosine | `0.783754` | `0.492048` |
+| raw E5 cosine | `0.748000` | `0.542839` |
+| raw LaBSE cosine | `0.813333` | `0.608477` |
+| raw BGE-M3 cosine | `0.748933` | `0.526585` |
 
 这说明当前源域 LightGBM fusion 不是一个强 zero-shot 模型。它在英文源域学到的结构/模板 shortcut 没有稳定迁移到中文目标域。Raw multilingual semantic ranking 仍然是必须报告的强基线。
 
@@ -486,7 +508,7 @@ seed 为：
 
 `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` 是当前新增的 minority regularization control，灵感来自少数类增强思想（**原论文 :《RABot: Reinforcement-Guided Graph Augmentation for Imbalanced and Noisy Social Bot Detection** 》）。
 
-它要解决的问题不是“增加中文候选边数量”，而是缓解中文目标域监督中的 positive 稀缺和类别不平衡。当前 `zh_train` 只有 `61` 条 positive、`274` 条 negative；如果直接训练 LR/L2，模型容易把高语义 negative、模板复用 negative 和少数 positive 的边界学得不稳定。mixup 的目的就是在不放松 Step 5 标注纪律的前提下，给 positive decision region 增加平滑约束。
+它要解决的问题不是“增加中文候选边数量”，而是缓解中文目标域监督中的 positive 稀缺和类别不平衡。Step 16G 当前训练边界为 `229` 条 positive、`344` 条 negative。这里必须区分证据强度：229 条 positive 中只有 `16` 条原始满权重训练正例，另有 `213` 条 Step 16B/D 低权重 silver positive；344 条 negative 中新增的 `115` 条 Step 16G 行同样是低权重、train-only weak supervision。mixup 的目的，是在不改动 validation/test 和不伪造新标签的前提下，对较高可信 positive decision region 施加平滑约束。
 
 它做的不是生成新 seller，也不是生成新文本，更不是写入新标签，而是在 Step 9 训练矩阵中生成 synthetic positive pair representation。每一条 seller-pair 在 Step 7 后已经被表示成一组数值特征，例如：
 
@@ -512,13 +534,13 @@ English source train rows
 + synthetic_train_only positive rows
 ```
 
-以 `100pct` 为例，实际训练矩阵为：
+以 Step 16G 边界下的 `100pct` 为例，预期训练矩阵为：
 
 ```text
-English source train: 401 rows
-Chinese zh_train: 335 rows = 61 positive / 274 negative
-Synthetic positive mixup: 122 rows
-Final training matrix: 858 rows = 299 positive / 559 negative
+English source train: 401 rows = 116 positive / 285 negative
+Chinese zh_train: 573 rows = 229 positive / 344 negative
+Synthetic positive mixup: 115 rows
+Final training matrix: 1089 rows = 460 positive / 629 negative
 ```
 
 约束：
@@ -527,6 +549,8 @@ Final training matrix: 858 rows = 299 positive / 559 negative
 - 只使用 `review_label = positive` 的真实监督行。
 - 要求 `usable_for_core_transfer = 1`。
 - 要求 `core_transfer_eligible = 1`。
+- 要求来源行 `training_sample_weight >= 0.55`，排除低可信 silver positive。
+- 合成行权重取两个父样本权重的较小值，不得把弱标签放大为满权重。
 - 排除 `positive_component_closure_audit`。
 - 排除 `audit_only`、`audit_only_soft_alias`、`uncertain_holdout`。
 - 不写回 Step 5 frozen labels。
@@ -541,29 +565,48 @@ mixup 参数：
 - lambda range: `[0.2, 0.8]`
 - target positive-to-negative ratio: `1.0`
 - max synthetic per real positive: `2.0`
+- minimum source training weight: `0.55`
+- synthetic weight mode: `minimum_parent_weight`
+- `100pct` contract: `synthetic_row_count` 必须大于 `0`，否则运行直接失败。
 
-当前 mixup 实际生成情况：
+Step 16G 应用后的直接 augmentation smoke test：
 
-| ratio | seed | sampled positives | sampled negatives | synthetic rows | zh_test ROC-AUC | zh_test AP |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 50pct | 20260320 | `59` | `109` | `50` | `0.831373` | `0.558135` |
-| 50pct | 20260321 | `59` | `109` | `50` | `0.825210` | `0.557788` |
-| 50pct | 20260322 | `59` | `109` | `50` | `0.816246` | `0.530994` |
-| 100pct | 20260320 | `61` | `274` | `122` | `0.844818` | `0.593742` |
-| 100pct | 20260321 | `61` | `274` | `122` | `0.841457` | `0.589403` |
-| 100pct | 20260322 | `61` | `274` | `122` | `0.839216` | `0.579418` |
+| ratio | real positive | real negative | eligible positive sources | synthetic rows | synthetic weight range |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 100pct | `229` | `344` | `72` | `115` | `[0.55, 1.0]` |
 
-当前解读：mixup 100pct 是最强 Step 9 点估计，但 Step 12 显示它尚不能稳健声称超过 raw E5。Step 15 v2 进一步提高了 clean 点估计，但 paired grouped bootstrap 仍要求保守表述。Step 15 v5 进一步针对 `public_contact_or_url_noise` 失败切片加入 train-only loss reweighting；本地固定测试点估计显示该切片风险下降，但正式结论必须等 Linux 上的 Step 12 v5 grouped bootstrap 和 slice audit。
+此前 Step 16C/E 平衡训练边界下的 Step 9 artifacts 记录 `synthetic_row_count = 0`，因此那一批结果不是有效 mixup 结果。Step 16G Linux 重跑已经确认 100pct 三个 seed 均生成 `115` 条 synthetic rows，但同支持比例的正式消融没有证明收益：mixup 相对 non-mixup 的 AUC 差值为 `-0.006000`，AP 差值为 `+0.001205`，两项 grouped-bootstrap CI 均跨 `0`。
 
-### 6.8 Step 9 当前关键结果
+Step 12 的正式消融现已改为相同中文支持比例：`mixup 100pct` 对 `non-mixup E5 LR/L2 100pct`。旧的 `mixup 100pct` 对 `non-mixup 50pct` 同时改变了 support ratio 和 augmentation，不能用于隔离 mixup 的因果效果。
 
-| experiment | ratio | seeds | ROC-AUC | AP | 角色 |
-| --- | --- | --- | ---: | ---: | --- |
-| `core_few_shot_multilingual_e5_large_lr_l2` | 50pct | 3 seeds | `0.811765` 到 `0.824650` | `0.534180` 到 `0.541473` | clean current candidate |
-| `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` | 100pct | 3 seeds | `0.839216` 到 `0.844818` | `0.579418` 到 `0.593742` | training-only minority regularization |
-| `core_few_shot_bge_m3_residual_lr` | 100pct | 3 seeds | `0.817367` | `0.515857` | residual clean control |
-| `core_few_shot_labse_lr_l2` | 100pct | 3 seeds | `0.799440` | `0.531286` | semantic control |
-| `identifier_augmented_few_shot_default_lr_l2` | 100pct | 3 seeds | `0.783754` | `0.647686` | operational control |
+### 6.8 Step 9 当前 Step16G 结果
+
+当前固定测试边界为 `200 = 50 positive / 150 negative`。下表的 seed-mean 指先对三个 seed 的同一 pair 分数求均值，再计算排序指标；它不等于三个单 seed 指标的算术平均。
+
+| experiment | ratio | ROC-AUC | AP | 角色 |
+| --- | ---: | ---: | ---: | --- |
+| raw E5 cosine | n/a | `0.748000` | `0.542839` | raw semantic control |
+| `core_few_shot_multilingual_e5_large_lr_l2` | 100pct | `0.762667` | `0.556429` | same-ratio non-mixup control |
+| `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` | 100pct | `0.756667` | `0.557633` | training-only mixup control |
+| `core_few_shot_default_no_structural_lr_l2` | 10pct | `0.825867` | `0.616743` | exploratory clean candidate; not yet in Step12 paired audit |
+| `identifier_augmented_few_shot_default_lr_l2` | 50pct | `0.874444` | `0.800381` | operational identifier control, not clean mainline |
+
+100pct same-ratio paired comparison：
+
+| comparison | metric | difference | 95% grouped-bootstrap CI | supports positive difference |
+| --- | --- | ---: | --- | --- |
+| mixup minus non-mixup | ROC-AUC | `-0.006000` | `[-0.031289, 0.021427]` | no |
+| mixup minus non-mixup | AP | `+0.001205` | `[-0.049545, 0.053483]` | no |
+
+当前 mixup 无效的根因不是“没有生成合成行”，而是：
+
+- 训练器是标准化线性 LR/L2，`class_weight = balanced`、`l2_penalty = 5.0`；同类样本的凸组合不产生新的非线性可分方向。
+- 类别平衡权重会随增广后的类别计数重新计算，抵消单纯 oversampling。seed `20260320` 中，加入 mixup 后的有效正类权重占比反而从 `0.439745` 轻微降至 `0.436759`。
+- 115 条合成行中每个 seed 有 `102-106` 条权重仅为 `0.55`；它们主要重复已有弱正例邻域，而不是增加新的 proof-level identity variation。
+- seed `20260320` 的 non-mixup/mixup 系数余弦相似度为 `0.976459`，中文测试分数 Pearson 相关为 `0.959852`。mixup 主要移动分数尺度，没有稳定改善排序。
+- 当前 25 维向量混合了连续 embedding、binary flags 和 capped counts。seed `20260320` 有 `15/115` 条合成行在原本离散的特征上产生小数值，存在 off-manifold 风险。
+
+因此该实验应保留为负面 minority-regularization control，不能写成“mixup 提升了中文马甲识别”。
 
 实现文件：
 
@@ -681,18 +724,16 @@ Relation reliability filter 的目的，是把“语义相似”与“身份可�
 
 ### 8.6 当前 Step 11 图规模示例
 
-当前 `20260517` manifest 的 primary threshold 图概况：
+当前 Step16G explicit six-summary validation 的 primary threshold 图概况：
 
 | scorer | threshold | pre-filter edges | removed by reliability | removed by shared-neighbor | post-filter edges | clusters | largest |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| BGE residual 100pct | `0.735` | `896` | `123` | `514` | `221` | `39` | `12` |
-| LaBSE LR/L2 100pct | `0.47` | `962` | `166` | `521` | `235` | `44` | `13` |
-| E5 mixup 100pct seed 20260320 | `0.720543` | `408` | `76` | `251` | `70` | `11` | `7` |
-| E5 mixup 100pct seed 20260321 | `0.792627` | `203` | `31` | `132` | `35` | `7` | `7` |
-| E5 mixup 100pct seed 20260322 | `0.720528` | `345` | `78` | `197` | `61` | `12` | `7` |
-| E5 LR/L2 50pct seed 20260321 | `0.56` | `440` | `112` | `270` | `51` | `12` | `7` |
+| Step15 v5 non-domain seed mean | `0.376301` | `1218` | `101` | `706` | `336` | `58` | `11` |
+| Step15 v5 domain-balanced seed mean | `0.456284` | `1783` | `189` | `882` | `524` | `84` | `13` |
+| E5 mixup 100pct seed 20260320 | `0.403304` | `1836` | `161` | `968` | `528` | `96` | `9` |
+| E5 mixup 100pct seed 20260321 | `0.450980` | `1549` | `142` | `835` | `458` | `81` | `10` |
+| E5 mixup 100pct seed 20260322 | `0.406027` | `1834` | `176` | `992` | `498` | `92` | `9` |
 | zero-shot BGE-M3 | `0.483444` | `1425` | `260` | `808` | `197` | `43` | `7` |
-| identifier LR/L2 100pct | `0.46` | `523` | `91` | `317` | `94` | `17` | `8` |
 
 解读：
 
@@ -704,7 +745,7 @@ Relation reliability filter 的目的，是把“语义相似”与“身份可�
 
 - policy: `schema/step11_clustering_policy.json`
 - runner: `scripts/step11_cluster_chinese_graph.py`
-- manifest: `reports/step11_current_manifest_20260517.json`
+- current audit input mode: six explicit summaries; no `reports/` globbing
 
 ## 9. Step 11 cluster-level audit 设计
 
@@ -736,11 +777,11 @@ Relation reliability filter 的目的，是把“语义相似”与“身份可�
 
 当前 audit：
 
-- summary: `reports/step11_cluster_level_audit.current_20260517.json`
-- CSV: `reports/step11_cluster_level_audit.current_20260517.csv`
-- input summary count: `19`
-- primary cluster count total: `441`
-- unique cluster set count: `125`
+- summary: `reports/step11_cluster_level_audit.step16g_imbalance_validation_20260710.json`
+- CSV: `reports/step11_cluster_level_audit.step16g_imbalance_validation_20260710.csv`
+- input summary count: `6`
+- primary cluster appearances: `454`
+- unique cluster set count: `212`
 - summary selection mode: `explicit`
 
 决策分布：
@@ -748,22 +789,23 @@ Relation reliability filter 的目的，是把“语义相似”与“身份可�
 | decision | count |
 | --- | ---: |
 | `same_controller_high_confidence` | `0` |
-| `same_controller_core_with_possible_expansion` | `0` |
-| `partial_anchor` | `6` |
-| `template_clone_not_controller` | `59` |
-| `semantic_topic_not_controller` | `52` |
-| `uncertain` | `8` |
+| `same_controller_core_with_possible_expansion` | `2` |
+| `partial_anchor` | `8` |
+| `template_clone_not_controller` | `78` |
+| `semantic_topic_not_controller` | `111` |
+| `uncertain` | `13` |
 
 置信度：
 
 | confidence | count |
 | --- | ---: |
-| medium | `6` |
-| low | `119` |
+| high | `2` |
+| medium | `8` |
+| low | `202` |
 
 当前最重要结论：
 
-> 目前没有任何完整 Step 11 cluster 可以被宣称为 high-confidence same-controller cluster。只有 6 个 partial anchors 可以作为 case-study seed，而且只能宣称其中 proof pair/core，不能宣称整个扩展簇都同控制。
+> 目前仍没有任何完整 Step 11 cluster 可以被宣称为 high-confidence same-controller cluster。两个 high-confidence anchored cores 是同一底层 seller core 的重叠子集，不是两个独立新发现；189/212 个唯一 seller sets 被判为 template/topic non-controller。
 
 实现文件：
 
@@ -786,10 +828,10 @@ Step 12 做的是统计稳健性审计，而不是重定义 benchmark。
 
 固定测试容器：
 
-- `zh_test` rows: `106`
-- positives: `21`
-- negatives: `85`
-- bootstrap groups: `39`
+- `zh_test` rows: `200`
+- positives: `50`
+- negatives: `150`
+- bootstrap groups: `126`
 - largest group size: `14`
 
 Bootstrap 单位是 `split_component_id`，不是单条 edge。原因是同一 seller component 内的 pair 不是独立样本，按 edge 重采样会让置信区间虚窄。
@@ -800,36 +842,30 @@ Bootstrap 单位是 `split_component_id`，不是单条 edge。原因是同一 s
 
 | model | ROC-AUC | AUC 95% CI | AP | AP 95% CI |
 | --- | ---: | --- | ---: | --- |
-| raw E5 cosine | `0.806723` | `[0.638524, 0.916667]` | `0.520573` | `[0.220730, 0.745153]` |
-| raw LaBSE cosine | `0.806162` | `[0.708636, 0.906667]` | `0.518581` | `[0.296728, 0.711879]` |
-| raw BGE-M3 cosine | `0.783754` | `[0.624193, 0.936095]` | `0.492048` | `[0.255147, 0.789091]` |
-| Step 7 default fusion | `0.588235` | `[0.410808, 0.819153]` | `0.448547` | `[0.153907, 0.638187]` |
-| Step 7 BGE fusion | `0.601681` | `[0.420804, 0.819306]` | `0.448761` | `[0.157892, 0.651601]` |
-| E5 LR/L2 50pct seed mean | `0.819048` | `[0.701728, 0.916886]` | `0.540494` | `[0.301265, 0.763798]` |
-| E5 mixup 50pct seed mean | `0.826891` | `[0.709282, 0.918753]` | `0.549271` | `[0.312801, 0.767063]` |
-| E5 mixup 100pct seed mean | `0.842017` | `[0.727517, 0.926377]` | `0.588995` | `[0.338429, 0.790663]` |
-| BGE residual 100pct seed mean | `0.817367` | `[0.726018, 0.914507]` | `0.515857` | `[0.286507, 0.744768]` |
-| LaBSE LR/L2 100pct seed mean | `0.799440` | `[0.683225, 0.930634]` | `0.531286` | `[0.306771, 0.786867]` |
-| identifier LR/L2 100pct seed mean | `0.783754` | `[0.592593, 0.946429]` | `0.647686` | `[0.347406, 0.866396]` |
+| raw E5 cosine | `0.748000` | `[0.643574, 0.841912]` | `0.542839` | `[0.388123, 0.679719]` |
+| E5 LR/L2 100pct seed mean | `0.762667` | `[0.672478, 0.845673]` | `0.556429` | `[0.409951, 0.693599]` |
+| E5 mixup 100pct seed mean | `0.756667` | `[0.665910, 0.838327]` | `0.557633` | `[0.410763, 0.694825]` |
+| Step15 v5 non-domain seed mean | `0.866533` | `[0.799393, 0.919161]` | `0.725220` | `[0.572913, 0.837135]` |
+| Step15 v5 domain-balanced seed mean | `0.865333` | `[0.797979, 0.925327]` | `0.644989` | `[0.490746, 0.796990]` |
 
 关键 paired comparisons：
 
 | comparison | metric | diff | 95% CI | p | supports positive difference |
 | --- | --- | ---: | --- | ---: | --- |
-| E5 LR/L2 50pct vs raw E5 | ROC-AUC | `+0.012325` | `[-0.108240, 0.147650]` | `0.7368` | false |
-| E5 LR/L2 50pct vs raw E5 | AP | `+0.019920` | `[-0.251152, 0.326280]` | `0.8056` | false |
-| E5 mixup 100pct vs raw E5 | ROC-AUC | `+0.035294` | `[-0.086161, 0.158168]` | `0.4812` | false |
-| E5 mixup 100pct vs raw E5 | AP | `+0.068422` | `[-0.207105, 0.331671]` | `0.5308` | false |
-| E5 mixup 100pct vs non-mixup E5 LR/L2 50pct | ROC-AUC | `+0.022969` | `[-0.015896, 0.057428]` | `0.2488` | false |
-| E5 mixup 100pct vs Step 7 default fusion | ROC-AUC | `+0.253782` | `[0.018175, 0.410672]` | `0.0332` | true |
-| E5 mixup 100pct vs Step 7 default fusion | AP | `+0.140448` | `[-0.080072, 0.447818]` | `0.1336` | false |
+| E5 mixup 100pct vs E5 non-mixup 100pct | ROC-AUC | `-0.006000` | `[-0.031289, 0.021427]` | `0.6464` | false |
+| E5 mixup 100pct vs E5 non-mixup 100pct | AP | `+0.001205` | `[-0.049545, 0.053483]` | `0.9860` | false |
+| Step15 non-domain vs raw E5 | ROC-AUC | `+0.118533` | `[0.012272, 0.223274]` | `0.0276` | true |
+| Step15 non-domain vs raw E5 | AP | `+0.182381` | `[0.019890, 0.324430]` | `0.0304` | true |
+| Step15 domain-balanced vs raw E5 | ROC-AUC | `+0.117333` | `[0.013792, 0.228072]` | `0.0284` | true |
+| Step15 domain-balanced vs raw E5 | AP | `+0.102150` | `[-0.066863, 0.284338]` | `0.2412` | false |
+| Step15 domain-balanced vs non-domain | AP | `-0.080231` | `[-0.189542, 0.023211]` | `0.1476` | false |
 
 当前统计结论：
 
-- Mixup 100pct 是当前最强点估计。
-- 它能稳健超过 collapsed Step 7 default fusion 的 AUC。
-- 它不能稳健声称超过 raw E5 semantic baseline。
-- 因此不能写“few-shot 已统计显著超过 zero-shot/raw semantic baseline”。
+- Step9 100pct mixup 已真实执行，但不能改善同支持比例 non-mixup；这是负面消融结论。
+- Step15 v5 non-domain 是当前 clean fixed-test 最强点估计，并在 paired grouped bootstrap 中超过 raw E5 的 AUC 和 AP。
+- Step15 domain-balanced 的 AUC 与 non-domain 接近，但 AP 低 `0.080231`；该差值本身 CI 仍跨 `0`。
+- 当前 Step15 Phase4 存在弱父样本放大和跨域合成行权重缺陷，因此上述 Step15 提升只能称为 promising internal result，不能直接归因于 mixup，也不能替代 prospective holdout。
 
 实现文件：
 
@@ -862,32 +898,36 @@ Step 13 检查：
 当前监督数据仍小且不平衡：
 
 - EN: `734` supervision rows, `209` positive, `525` negative
-- ZH: `522` supervision rows, `96` positive, `426` negative
+- ZH: `893` supervision rows, `309` positive, `584` negative
 
 最大 EN->ZH 边特征漂移集中在 style gap 和 identifier：
 
 | feature | SMD ZH minus EN |
 | --- | ---: |
-| `digit_ratio_mean_raw_gap_abs` | `0.854419` |
-| `repeated_description_share_percentile_gap_abs` | `-0.852279` |
-| `repeated_title_share_percentile_gap_abs` | `-0.849901` |
-| `repeated_title_share_raw_gap_abs` | `-0.676433` |
-| `punct_ratio_mean_raw_gap_abs` | `0.673458` |
-| `has_shared_contact_exact` | `-0.515466` |
+| `repeated_description_share_percentile_gap_abs` | `-0.853096` |
+| `repeated_title_share_percentile_gap_abs` | `-0.832624` |
+| `digit_ratio_mean_raw_gap_abs` | `0.704300` |
+| `repeated_title_share_raw_gap_abs` | `-0.661037` |
+| `shared_category_count_capped` | `-0.551895` |
 
 Raw E5 与 Step 7 E5 fusion 对比：
 
-- raw E5: AUC `0.806723`, AP `0.520573`
-- Step 7 E5 fusion: AUC `0.550140`, AP `0.384493`
+- raw E5: AUC `0.748000`, AP `0.542839`
+- Step 7 E5 fusion: AUC `0.623733`, AP `0.519158`
 
-Step 13 的解释是：source-domain fusion 特征不是简单“弱”，而是存在 source-domain shortcut。英文中有效的模板/结构/identifier 关联，迁移到中文时被中文模板复用、商品主题相似、身份锚点稀缺共同破坏。
+Step 13 的解释是：source-domain fusion 特征不是简单“弱”，而是存在 source-domain shortcut。英文中有效的模板/结构关联迁移到中文后发生条件分布变化。当前审计同时否定了“中文所有语义负例都更高”这种过度简化：在英文负例 q90 阈值下，中文高语义负例率反而更低，真正漂移集中在重复率、风格 gap、结构计数和证据类型组合。
+
+当前自动生成的 Step13 findings 还有两处必须按数值修正：
+
+- 当前最强 Step15 clean point estimate 是 non-domain-balanced (`0.866533 / 0.725220`)，不是 domain-balanced (`0.865333 / 0.644989`)。
+- domain-balanced 相对 raw E5 的 ROC-AUC 差异已有统计支持；没有统计支持的是 AP 差异。
 
 实现文件：
 
 - runner: `scripts/step13_concept_drift_audit.py`
-- summary: `reports/step13_concept_drift_audit.json`
-- CSV: `reports/step13_concept_drift_audit.csv`
-- doc: `docs/STEP13_CONCEPT_DRIFT_AUDIT.md`
+- summary: `reports/step13_concept_drift_audit.step16g_imbalance_validation_20260710.json`
+- CSV: `reports/step13_concept_drift_audit.step16g_imbalance_validation_20260710.csv`
+- generated doc expected from Linux: `docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP16G_IMBALANCE_VALIDATION_20260710.md` (not yet synchronized locally)
 
 ## 12. 为什么当前实验这样设计
 
@@ -938,21 +978,16 @@ Step 11 的图边来自模型分数和图过滤，不是人工真值。即使图
 
 所以 Step 11 只能输出候选簇。真正能写成同控制发现的，必须有 pair-level seller-facing identity proof。
 
-### 12.5 为什么当前不宣称 few-shot 显著超过 raw E5
+### 12.5 为什么当前不宣称 Step 9 mixup 有效
 
-虽然 E5 mixup 100pct 点估计最高：
+Step16G 已让 E5 mixup 100pct 真正生成 `115` 条 synthetic rows，但相对相同 100pct support 的 non-mixup：
 
-- AUC `0.842017`
-- AP `0.588995`
-
-但和 raw E5 的 paired bootstrap CI 跨零：
-
-- AUC diff `+0.035294`, CI `[-0.086161, 0.158168]`
-- AP diff `+0.068422`, CI `[-0.207105, 0.331671]`
+- AUC diff `-0.006000`, CI `[-0.031289, 0.021427]`
+- AP diff `+0.001205`, CI `[-0.049545, 0.053483]`
 
 因此当前最严谨的表述是：
 
-> Few-shot LR/L2 和 positive-pair mixup 修复了 collapsed Step 7 fusion baseline，并提供更好的图 triage surface；但在当前固定中文测试集上，尚不能稳健声称 clean few-shot 统计显著超过 raw E5 semantic baseline。
+> 当前数据不支持 Step 9 positive-pair mixup 的正向效果。Step15 v5 non-domain scorer 在当前固定测试集上显著超过 raw E5，但其 Phase4 mixup 存在弱父样本放大和跨域插值混杂，因此不能把 Step15 的提升归因于 mixup。
 
 ## 13. 当前可写入论文的结论边界
 
@@ -963,9 +998,10 @@ Step 11 的图边来自模型分数和图过滤，不是人工真值。即使图
 3. Raw multilingual semantic ranking 在中文目标域上仍然很强，尤其 raw E5 和 LaBSE。
 4. Step 7 LightGBM fusion 在当前边界下发生浅层 collapse，说明简单源域融合不能稳定迁移。
 5. Step 9 LR/L2 和 residual adaptation 比 collapsed fusion 更有用。
-6. Positive-pair mixup 是有效的 training-only minority regularization control，提升点估计，但当前统计稳健性不足以宣称超过 raw E5。
-7. Step 11 图聚类适合候选 triage，但不能自动产生 same-controller ground truth。
-8. 严格 cluster audit 显示当前 `125` 个 unique cluster sets 中没有完整 high-confidence same-controller cluster，只有 `6` 个 partial anchors。
+6. Step 9 positive-pair mixup 是一个已执行但结果为负面的 training-only minority-regularization control。
+7. Step15 v5 non-domain scorer 在当前 fixed test 上获得 `0.866533` AUC 和 `0.725220` AP，并在 paired grouped bootstrap 中超过 raw E5；这是 promising internal result，不是 prospective holdout 结论。
+8. Step 11 图聚类适合候选 triage，但不能自动产生 same-controller ground truth。
+9. 严格 cluster audit 显示当前 `212` 个 unique cluster sets 中没有完整 high-confidence same-controller cluster；两个 anchored cores 是同一底层 core 的重叠子集，另有 `8` 个 partial anchors。
 
 当前不能写：
 
@@ -993,6 +1029,8 @@ Step 11 的图边来自模型分数和图过滤，不是人工真值。即使图
 | Step 11 audit | manifest + Step 5 labels | `scripts/step11_cluster_level_audit.py` |
 | Step 12 | `schema/step12_statistical_robustness_policy.json` | `scripts/step12_statistical_robustness_audit.py` |
 | Step 13 | current summaries | `scripts/step13_concept_drift_audit.py` |
+| Step 15 | `schema/step15_evidence_type_policy.json` | `scripts/step15_train_incremental_hard_negative.py` |
+| Step 16G | `schema/step16g_hard_negative_imbalance_policy.json` | `scripts/step16g_expand_hard_negative_train.py` |
 
 运行环境纪律：
 
@@ -1009,15 +1047,16 @@ Step 11 的图边来自模型分数和图过滤，不是人工真值。即使图
 3. Clean scientific model 与 identifier operational control 分离，避免把直接证据当模型泛化能力。
 4. Step 7/9/12/13 构成了从点估计到统计稳健性再到概念漂移解释的完整链条。
 5. Step 11 严格降级为候选 triage，避免把模型预测反喂成真值。
-6. Positive-pair mixup 被限制在 training-only，不污染 frozen labels、valid 或 test。
+6. Positive-pair mixup 被限制在 training-only，不污染 frozen labels、valid 或 test；但 Step15 当前仍需修复父样本权重继承和跨域配对约束。
 
 当前主要限制也很明确：
 
-1. 中文 strict test 只有 `21` 个 positive，统计功效有限。
+1. 中文 strict test 已扩为 `50` 个 positive / `150` 个 negative，但其中只有 `22` 个 direct/component primary positives，软证据标签仍占较大比例。
 2. 中文 seller-facing proof positives 稀缺，限制了 few-shot 的可学习空间。
 3. Step 7 fusion 在中文上弱于 raw semantic baseline，说明源域融合存在 shortcut。
 4. Step 11 目前多为模板/主题候选，proof-level full cluster 尚未出现。
 5. Relation reliability filter 仍依赖已有特征和抽取质量，不能替代人工证据审计。
+6. Step15 Phase4 让低权重父样本生成默认满权重 synthetic positives，并把跨中英文合成行当成独立 domain；当前 domain-balanced 结果因此存在目标函数混杂。
 
 因此，当前项目最可信的科研方向不是简单宣称 few-shot 胜利，而是围绕以下主题组织：
 
@@ -1026,4 +1065,3 @@ Step 11 的图边来自模型分数和图过滤，不是人工真值。即使图
 - minority regularization under imbalanced target supervision
 - graph candidate triage with strict evidence audit
 - distinction between semantic similarity and identity reliability in darknet seller linkage
-

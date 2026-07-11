@@ -16,7 +16,7 @@ STEP7_SUMMARY_PATH = ROOT / "reports" / "step7_training_summary.json"
 STEP7_POLICY_PATH = ROOT / "schema" / "step7_training_policy.json"
 STEP9_SUMMARY_PATH = ROOT / "reports" / "step9_few_shot_summary.json"
 STEP9_CALIBRATION_SUMMARY_PATH = ROOT / "reports" / "step9_calibration_summary.json"
-STEP15_SUMMARY_PATH = ROOT / "reports" / "step15_v5_public_noise_weighted_summary.json"
+STEP15_SUMMARY_PATH = ROOT / "reports" / "step15_v5r_weighted_mixup_summary.json"
 STEP15_POLICY_PATH = ROOT / "schema" / "step15_evidence_type_policy.json"
 
 
@@ -85,7 +85,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help=(
             "Optional frozen Step 15 experiment name to use as the pair scorer. "
-            "Must exist inside reports/step15_v5_public_noise_weighted_summary.json unless policy paths are changed."
+            "Must exist inside the Step 15 summary configured by schema/step11_clustering_policy.json."
         ),
     )
     parser.add_argument(
@@ -1589,7 +1589,7 @@ def resolve_step15_scorer_reference(
     if not step15_summary_path.exists():
         raise SystemExit(
             "Step 11 could not find the required Step 15 summary at "
-            f"{step15_summary_path}. Sync reports/step15_v5_public_noise_weighted_summary.json or update "
+            f"{step15_summary_path}. Sync the configured Step 15 summary or update "
             "schema/step11_clustering_policy.json."
         )
     if not step15_policy_path.exists():

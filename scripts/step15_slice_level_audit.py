@@ -38,6 +38,8 @@ DEFAULT_MODEL_IDS = [
     "step15_v4_identifier_public_noise_robust_phase4_seed_mean",
     "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
     "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
 ]
 
 

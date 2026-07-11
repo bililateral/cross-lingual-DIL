@@ -1,8 +1,97 @@
 # Project Progress
 
-Updated: 2026-07-09
+Updated: 2026-07-11
 
 ## Current Stage
+
+`2026-07-11` Step 15 v5r implementation repair completed locally; Linux rerun is pending:
+
+- active repair branch: `fix/step15-weighted-same-domain-mixup`;
+- legacy v5 artifacts and the synchronized `2026-07-10` metrics remain untouched as the pre-fix comparison;
+- new experiments use distinct `step15_v5r_*` names and write `reports/step15_v5r_weighted_mixup_summary.json`, so the rerun cannot overwrite v5 results;
+- Phase 4 now admits only positive parents with `training_sample_weight >= 0.55`, `usable_for_core_transfer = 1`, `core_transfer_eligible = 1`, and confident evidence type;
+- parent selection is restricted to the same real language domain and same evidence type, then to one of the five nearest eligible positive neighbors;
+- synthetic rows inherit `min(parent_weight_left, parent_weight_right)` instead of defaulting to `1.0`;
+- binary/count features are copied from the anchor parent; only continuous features are interpolated;
+- every synthetic row records both parent `pair_uid` values, domains, evidence types, parent weights, interpolation coefficient, and inherited weight in a per-run manifest;
+- domain-balanced v5r computes class, evidence-type, and row-quality weights first, then equalizes effective mass across only `en_content_train_pool` and `zh_target_strict`; unknown pseudo-domains such as `cross_domain_mixup` are rejected;
+- Step 12 now has isolated v5r Phase3-vs-Phase4, v5r-vs-v5, raw-E5, and domain-vs-non-domain paired comparisons with new `20260711` output paths;
+- three focused unit tests pass: same-domain/evidence parent enforcement and discrete-feature preservation, inherited parent weight, effective domain-mass equality, and pseudo-domain rejection;
+- no Windows model experiment was run. The next evidence must come from the Linux three-seed rerun.
+
+Interpretation rule before Linux results return:
+
+- v5r is an implementation-correctness repair, not an assumed performance improvement;
+- Step 9 mixup remains an honest negative/neutral control because its standardized LR/L2 backend and post-augmentation class balancing make same-class convex interpolation nearly boundary-invariant;
+- a positive Step 15 mixup claim is allowed only if v5r Phase 4 improves over the matching v5r Phase 3 in the fixed-test paired grouped-bootstrap audit.
+
+`2026-07-11` Step 16G full Linux rerun completed and synchronized; Step 9/15/11/12/13 results audited:
+
+- Data provenance conclusion:
+  - the active Chinese strict pool is still derived from `market_item.xlsx` through Step 2/3/4; no external spam corpus or fabricated seller record was added;
+  - Step 16B added `170` low-weight train-only weak positives and Step 16D added another `43`; these `213` rows are silver training support, not benchmark gold;
+  - Step 16C moved only non-silver seller-connected components into validation/test, but Step 16F found that the resulting `80` evaluation positives are evidence-tiered: `22` direct/component primary, `14` soft primary/slice, and `44` secondary/sensitivity-only;
+  - therefore the current Chinese benchmark is a component-safe internal, tiered-evidence benchmark, not an independently annotated external gold benchmark.
+- Pre-Step16G failure that motivated the current rerun:
+  - the Chinese train split was exactly balanced at `229 positive / 229 negative`;
+  - `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup` consequently produced `synthetic_row_count = 0` at every ratio/seed with `skipped_reason = positive_count_already_meets_configured_target`;
+  - its 100pct predictions were therefore identical to the non-mixup model and could not be interpreted as a mixup result.
+- Step 16G implementation:
+  - policy: `schema/step16g_hard_negative_imbalance_policy.json`;
+  - runner: `scripts/step16g_expand_hard_negative_train.py`;
+  - selected `115` previously unsupervised Step 4 Chinese candidate pairs as low-weight train-only weak negatives;
+  - selected tiers: `83 silver_semantic_low_structure_negative_imbalance` and `32 silver_ordinary_negative_imbalance`;
+  - Step 15 independently maps those same 115 rows to `66 semantic_topic_not_controller` and `49 template_clone_not_controller`; Step16G tiers describe selection confidence, while Step15 evidence types describe curriculum role;
+  - current train becomes `573 = 229 positive / 344 negative`; valid remains `120 = 30 / 90`; test remains `200 = 50 / 150`;
+  - no uncertain row was converted, no existing supervised row was converted, all rows have Step 7 feature coverage, no selected pair lies inside a known positive component, and seller overlap across train/valid/test remains `0`;
+  - additions are `benchmark_eligible = 0`, low-weight weak supervision. They do not increase evaluation-set size or gold-label credibility.
+- Step 9 mixup contract repair:
+  - 100pct runs now fail fast unless mixup creates at least one synthetic row;
+  - mixup sources now require `training_sample_weight >= 0.55`, leaving `72` eligible higher-confidence positive sources rather than amplifying all `229` positives;
+  - synthetic rows inherit the minimum parent weight instead of receiving full weight `1.0`;
+  - a direct augmentation smoke test on the Step 16G boundary generated exactly `115` train-only synthetic positives, with weights from `0.55` to `1.0`.
+- Step 12 comparison repair:
+  - added non-mixup E5 LR/L2 100pct three-seed and seed-mean controls;
+  - the formal mixup ablation is now `mixup 100pct` versus `non-mixup 100pct`, so support ratio and augmentation are no longer confounded;
+  - new Step 12 outputs use the `step16g_imbalance_20260710` boundary identifier.
+- Step 5 summary was refreshed non-destructively with `scripts/step5_refresh_frozen_summary.py`; the script rewrites only summary metadata and never regenerates frozen labels.
+- Linux rerun completeness:
+  - `reports/step16g_full_rerun_20260710.log` reached `[10/10]` with no traceback or runtime error;
+  - Step 9 contains `19 experiments x 4 ratios x 3 seeds = 228` complete runs and all referenced artifacts are present;
+  - Step 15 contains `2 experiments x 5 phases x 3 seeds = 30` complete runs and all referenced artifacts are present;
+  - Step 12 and Step 13 recorded input hashes for `69` files; every synchronized file exists and every SHA-256 matches;
+  - the generated Step 13 JSON/CSV are synchronized, but `docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP16G_IMBALANCE_VALIDATION_20260710.md` is still absent locally.
+- Step 9 100pct mixup now executes as intended at the file-contract level:
+  - each seed uses `229 positive / 344 negative` real Chinese support rows;
+  - `72` positive parents satisfy `training_sample_weight >= 0.55`;
+  - each seed creates `115` train-only synthetic positives and inherits the minimum parent weight;
+  - formal same-ratio comparison: non-mixup AUC/AP `0.762667 / 0.556429`, mixup AUC/AP `0.756667 / 0.557633`;
+  - paired grouped-bootstrap mixup-minus-non-mixup differences are AUC `-0.006000`, CI `[-0.031289, 0.021427]`, and AP `+0.001205`, CI `[-0.049545, 0.053483]`; neither supports a positive mixup claim.
+- Step 9 mixup root-cause audit:
+  - the backend is standardized linear LR/L2 with `class_weight = balanced` and `l2_penalty = 5.0`; same-class convex interpolation adds little new separating direction;
+  - after class balancing and row-quality weights, synthetic augmentation changes effective positive weight share only from `0.439745` to `0.436759` for seed `20260320`, so count balancing does not create additional effective minority mass;
+  - `106/115` to `105/115` synthetic rows per seed carry weight `0.55`; the augmentation is dominated by the same weak-positive support rather than new proof-level diversity;
+  - the non-mixup/mixup coefficient cosine is `0.976459` and test-score Pearson correlation is `0.959852` for seed `20260320`; mixup mainly shifts score calibration and does not materially repair ranking;
+  - `15/115` seed-20260320 synthetic rows contain fractional values in originally discrete/count features, confirming a smaller off-manifold feature-interpolation risk.
+- Step 15 current fixed-test result:
+  - non-domain-balanced seed-mean ensemble: ROC-AUC `0.866533`, AP `0.725220`;
+  - domain-balanced seed-mean ensemble: ROC-AUC `0.865333`, AP `0.644989`;
+  - non-domain-balanced versus raw E5 is supported by grouped bootstrap for both AUC (`+0.118533`, CI `[0.012272, 0.223274]`) and AP (`+0.182381`, CI `[0.019890, 0.324430]`);
+  - this remains an internal fixed-test result, not an independent prospective-holdout confirmation.
+- Step 15 Phase 4 mixup design defect found during the post-rerun audit:
+  - the `316` positive parents are `116` English full-weight, `16` Chinese full-weight, and `184` Chinese weak-supervision rows;
+  - `add_positive_mixup()` samples all positives without a minimum parent-weight or same-domain constraint, and generated rows omit `training_sample_weight`, so they default to full weight `1.0`;
+  - depending on seed, `251` to `275` of `316` synthetic rows have at least one weak parent, `137` to `155` are cross-language-domain interpolations, and `302` to `307` contain fractional values in originally discrete/count features;
+  - current Phase 4 performance therefore cannot be attributed cleanly to valid minority regularization until parent eligibility, inherited weight, same-domain/evidence controls, and a Phase3-vs-Phase4 paired audit are added.
+- Domain-balanced regression root cause:
+  - domain balancing uses raw row counts before applying `training_sample_weight` and treats `cross_domain_mixup` as a third domain;
+  - Step16G added `115` low-weight Chinese negatives, increasing the real Chinese phase-4 row count from `429` to `544` even though their effective evidence weight is low;
+  - after weighting, the real Chinese-domain share falls from about `0.24` pre-Step16G to about `0.21`, while cross-domain synthetic share rises from about `0.24` to `0.274-0.277`;
+  - the domain-balanced scorer raises hard-negative scores (mean `0.460732` versus `0.316558`) and lowers direct/component-positive scores (`0.507233` versus `0.610381`), explaining its much lower AP;
+  - on the top 20 ranked test pairs, non-domain-balanced retrieves `18` positives while domain-balanced retrieves `12`.
+- Step 11 explicit six-summary audit remains discovery-limited: `212` unique seller sets contain `0` whole-cluster high-confidence decisions, `2` overlapping anchored cores, `8` partial anchors, `78` template-clone negatives, `111` semantic-topic negatives, and `13` uncertain sets.
+- Step 13 generated findings require correction before publication: the non-domain-balanced Step 15 model, not the domain-balanced model, has the strongest current AUC/AP point estimate; domain-balanced AUC does significantly exceed raw E5, while its AP difference does not.
+- Linux first-run hotfix: the initial Step 9 rerun reached synthetic CSV serialization and failed because `training_sample_weight` was present in each synthetic row but absent from `synthetic_train_fieldnames()`. The field contract is now synchronized. This was an output-schema error, not a completed model result. `scripts/run_step16g_full_rerun_20260710.sh` supports `SKIP_PRE_STEP9=1` to resume from Step 9 without rerunning completed Step5/7/calibration stages.
 
 `2026-07-09` Step 5-19 output-overwrite audit and current-boundary result guard completed:
 

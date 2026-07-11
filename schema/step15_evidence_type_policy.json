@@ -1,6 +1,6 @@
 {
-  "version": "2026-06-03-public-contact-url-noise-v5",
-  "objective": "Evidence-type incremental hard-negative learning for cross-lingual seller-pair verification. Step 15 keeps Step 5 frozen binary labels unchanged, adds conservative auxiliary evidence_type labels for training diagnostics, and trains lightweight curriculum scorers on fixed train/valid/test boundaries. The v5 clean defaults stress public-contact/URL noise by strongly up-weighting reviewed public_contact_or_url_noise negatives during training without using test evidence_type labels as prediction features; v4 negative-mixup experiments remain available as conservative robustness controls.",
+  "version": "2026-07-11-v5r-trusted-weighted-same-domain-mixup",
+  "objective": "Evidence-type incremental hard-negative learning for cross-lingual seller-pair verification. Step 15 keeps Step 5 frozen binary labels unchanged, adds conservative auxiliary evidence_type labels for training diagnostics, and trains lightweight curriculum scorers on fixed train/valid/test boundaries. The v5r defaults retain the v5 public-contact/URL hard-negative curriculum while repairing Phase-4 positive mixup: only trusted same-domain, same-evidence-type nearest-neighbor parents are mixed, synthetic rows inherit the minimum parent quality weight, discrete/count features are copied from the anchor parent, and optional domain balancing is applied after evidence and row-quality weights using only the two real language domains.",
   "input_dependencies": [
     "docs/EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE_PLAN.md",
     "reports/step5_en_frozen_silver_labels.csv",
@@ -251,8 +251,8 @@
     }
   ],
   "default_experiments": [
-    "step15_v5_identity_only_curriculum_public_noise_weighted_strong",
-    "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup",
+    "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup",
     "step15_v4_identifier_operational_public_noise_robust"
   ],
   "experiments": {
@@ -510,6 +510,84 @@
       "lambda_evidence": 0.0,
       "use_identifier_features": false
     },
+    "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup": {
+      "role": "clean_public_noise_weighted_strong_identity_only_v5r_weighted_mixup",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "positive_mixup": {
+        "scope": "same_domain_same_evidence_type",
+        "minimum_source_training_sample_weight": 0.55,
+        "require_usable_for_core_transfer": true,
+        "require_core_transfer_eligible": true,
+        "require_evidence_type_confident": true,
+        "nearest_neighbor_k": 5,
+        "synthetic_weight_mode": "minimum_parent_weight",
+        "copy_anchor_feature_names": [
+          "has_shared_title_clone",
+          "has_shared_description_clone",
+          "shared_title_count_capped",
+          "shared_description_count_capped",
+          "shared_category_count_capped",
+          "shared_boilerplate_count",
+          "shared_low_df_sentence_count",
+          "shared_rare_ngram_count",
+          "candidate_rule_count_raw"
+        ]
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
+    "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup": {
+      "role": "clean_domain_balanced_public_noise_weighted_strong_v5r_weighted_mixup",
+      "model_backend": "numpy_mlp_identity_only",
+      "feature_set": "clean_semantic_structural_style",
+      "include_source_train": true,
+      "include_target_train": true,
+      "training_mode": "from_scratch_each_phase",
+      "domain_balanced_identity_loss": true,
+      "domain_balance_mode": "post_quality_effective_weight_mass",
+      "domain_balance_domains": [
+        "en_content_train_pool",
+        "zh_target_strict"
+      ],
+      "identity_evidence_type_weight_multipliers": {
+        "public_contact_or_url_noise": 8.0,
+        "template_clone_not_controller": 1.5,
+        "semantic_topic_not_controller": 1.5
+      },
+      "positive_mixup": {
+        "scope": "same_domain_same_evidence_type",
+        "minimum_source_training_sample_weight": 0.55,
+        "require_usable_for_core_transfer": true,
+        "require_core_transfer_eligible": true,
+        "require_evidence_type_confident": true,
+        "nearest_neighbor_k": 5,
+        "synthetic_weight_mode": "minimum_parent_weight",
+        "copy_anchor_feature_names": [
+          "has_shared_title_clone",
+          "has_shared_description_clone",
+          "shared_title_count_capped",
+          "shared_description_count_capped",
+          "shared_category_count_capped",
+          "shared_boilerplate_count",
+          "shared_low_df_sentence_count",
+          "shared_rare_ngram_count",
+          "candidate_rule_count_raw"
+        ]
+      },
+      "normalize_identity_weight_mean": true,
+      "lambda_evidence": 0.0,
+      "use_identifier_features": false
+    },
     "step15_e5_multitask_clean_curriculum": {
       "role": "clean_multitask_ablation",
       "model_backend": "numpy_mlp_multitask",
@@ -586,11 +664,13 @@
       "step15_v4_domain_balanced_public_noise_robust_phase4_seed_mean",
       "step15_v4_identifier_public_noise_robust_phase4_seed_mean",
       "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
-      "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean"
+      "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+      "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+      "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean"
     ],
     "outputs": {
-      "summary_json": "reports/step15_v5_slice_level_audit.json",
-      "slice_metrics_csv": "reports/step15_v5_slice_level_audit.csv"
+      "summary_json": "reports/step15_v5r_weighted_mixup_slice_level_audit.json",
+      "slice_metrics_csv": "reports/step15_v5r_weighted_mixup_slice_level_audit.csv"
     }
   },
   "threshold_selection": {
@@ -616,18 +696,19 @@
     }
   },
   "outputs": {
-    "summary_json": "reports/step15_v5_public_noise_weighted_summary.json",
+    "summary_json": "reports/step15_v5r_weighted_mixup_summary.json",
     "artifact_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_artifact.json",
     "zh_valid_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_valid.csv",
-    "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv"
+    "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv",
+    "positive_mixup_manifest_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_positive_mixup_manifest.csv"
   },
   "baseline_references": {
-    "status": "static_numeric_references_removed_for_step16c_refreeze",
+    "status": "static_numeric_references_removed_for_step16g_imbalance",
     "reason": "Step15 summaries must not carry old-boundary baseline metrics. Use the current Step12 output files for raw E5, Step9 mixup, and paired comparison baselines.",
     "current_step12_outputs": {
-      "summary_json": "reports/step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709.json",
-      "model_metrics_csv": "reports/step12_v5_statistical_robustness_model_metrics_step16c_refreeze_20260709.csv",
-      "paired_comparisons_csv": "reports/step12_v5_statistical_robustness_paired_comparisons_step16c_refreeze_20260709.csv"
+      "summary_json": "reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json",
+      "model_metrics_csv": "reports/step12_v5r_statistical_robustness_model_metrics_weighted_mixup_20260711.csv",
+      "paired_comparisons_csv": "reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
     }
   },
   "hard_rules": [

@@ -219,18 +219,88 @@ def balanced_binary_weights(y: np.ndarray) -> np.ndarray:
     return np.where(y == 1.0, pos_weight, neg_weight).astype(float)
 
 
-def domain_balanced_binary_weights(y: np.ndarray, rows: list[dict]) -> np.ndarray:
+def legacy_domain_balanced_binary_weights(y: np.ndarray, rows: list[dict]) -> tuple[np.ndarray, dict]:
+    """Preserve the pre-v5r raw-row-count behavior for explicit legacy reruns."""
     weights = balanced_binary_weights(y)
     domain_counts = Counter(str(row.get("step15_pool", "")) for row in rows)
     present_domains = [domain for domain, count in domain_counts.items() if count > 0]
     if not present_domains:
-        return weights
+        return weights, {
+            "enabled": True,
+            "method": "legacy_raw_row_count_before_quality_weights",
+            "row_counts": {},
+            "domain_factors": {},
+        }
     total = max(len(rows), 1)
     domain_factor = {
         domain: total / (len(present_domains) * max(domain_counts[domain], 1))
         for domain in present_domains
     }
-    return weights * np.asarray([domain_factor.get(str(row.get("step15_pool", "")), 1.0) for row in rows], dtype=float)
+    adjusted = weights * np.asarray(
+        [domain_factor.get(str(row.get("step15_pool", "")), 1.0) for row in rows],
+        dtype=float,
+    )
+    return adjusted, {
+        "enabled": True,
+        "method": "legacy_raw_row_count_before_quality_weights",
+        "row_counts": dict(sorted(domain_counts.items())),
+        "domain_factors": {key: round(value, 6) for key, value in sorted(domain_factor.items())},
+    }
+
+
+def apply_effective_domain_balance(
+    weights: np.ndarray,
+    rows: list[dict],
+    allowed_domains: list[str],
+) -> tuple[np.ndarray, dict]:
+    """Equalize effective domain mass after all other sample weights are applied."""
+    domains = [str(value) for value in allowed_domains]
+    if len(domains) < 2 or len(set(domains)) != len(domains):
+        raise ValueError("Step15 effective domain balancing requires at least two unique allowed domains")
+    if len(weights) != len(rows):
+        raise ValueError("Step15 effective domain-balance row/weight length mismatch")
+
+    observed = [str(row.get("step15_pool", "")) for row in rows]
+    unknown_counts = Counter(domain for domain in observed if domain not in domains)
+    if unknown_counts:
+        raise ValueError(
+            "Step15 effective domain balancing encountered non-real or unknown domains: "
+            + ", ".join(f"{domain or '<empty>'}={count}" for domain, count in sorted(unknown_counts.items()))
+        )
+
+    before_mass = {
+        domain: float(np.sum(weights[np.asarray([value == domain for value in observed], dtype=bool)]))
+        for domain in domains
+    }
+    empty_domains = [domain for domain, mass in before_mass.items() if mass <= 0.0]
+    if empty_domains:
+        raise ValueError(f"Step15 effective domain balancing has zero weighted mass for: {empty_domains}")
+
+    total_mass = float(sum(before_mass.values()))
+    target_mass = total_mass / float(len(domains))
+    factors = {domain: target_mass / before_mass[domain] for domain in domains}
+    adjusted = weights.astype(float, copy=True) * np.asarray([factors[domain] for domain in observed], dtype=float)
+
+    mean_before = float(np.mean(weights)) if len(weights) else 0.0
+    mean_after_raw = float(np.mean(adjusted)) if len(adjusted) else 0.0
+    if mean_before > 0.0 and mean_after_raw > 0.0:
+        adjusted *= mean_before / mean_after_raw
+
+    after_mass = {
+        domain: float(np.sum(adjusted[np.asarray([value == domain for value in observed], dtype=bool)]))
+        for domain in domains
+    }
+    return adjusted, {
+        "enabled": True,
+        "method": "post_quality_effective_weight_mass",
+        "allowed_domains": domains,
+        "row_counts": dict(sorted(Counter(observed).items())),
+        "mass_before": {key: round(value, 6) for key, value in before_mass.items()},
+        "domain_factors": {key: round(value, 6) for key, value in factors.items()},
+        "mass_after": {key: round(value, 6) for key, value in after_mass.items()},
+        "mean_before": round(mean_before, 6),
+        "mean_after": round(float(np.mean(adjusted)), 6) if len(adjusted) else 0.0,
+    }
 
 
 def apply_identity_weight_multipliers(
@@ -314,10 +384,44 @@ def add_positive_mixup(
     rows: list[dict],
     cfg: dict,
     rng: np.random.Generator,
+    feature_names: list[str],
     scope_override: str | None = None,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict], int]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict], int, dict]:
     scope = str(scope_override or cfg.get("scope", "all_positive"))
-    pos_indices = np.where(y_train == 1.0)[0]
+    all_pos_indices = np.where(y_train == 1.0)[0]
+    rejection_counts: Counter[str] = Counter()
+    pos_indices_list: list[int] = []
+    minimum_source_weight = float(cfg.get("minimum_source_training_sample_weight", 0.0) or 0.0)
+    require_core_transfer = bool(cfg.get("require_usable_for_core_transfer", False))
+    require_core_eligible = bool(cfg.get("require_core_transfer_eligible", False))
+    require_confident_evidence = bool(cfg.get("require_evidence_type_confident", False))
+    for raw_idx in all_pos_indices:
+        idx = int(raw_idx)
+        row = rows[idx]
+        if require_core_transfer and str(row.get("usable_for_core_transfer", "")).strip().lower() not in {
+            "1",
+            "true",
+            "yes",
+            "y",
+        }:
+            rejection_counts["not_usable_for_core_transfer"] += 1
+            continue
+        if require_core_eligible and str(row.get("core_transfer_eligible", "")).strip().lower() not in {
+            "1",
+            "true",
+            "yes",
+            "y",
+        }:
+            rejection_counts["not_core_transfer_eligible"] += 1
+            continue
+        if require_confident_evidence and str(row.get("evidence_type_confident", "")) != "1":
+            rejection_counts["evidence_type_not_confident"] += 1
+            continue
+        if step7.row_training_sample_weight(row) + 1e-12 < minimum_source_weight:
+            rejection_counts["below_minimum_source_weight"] += 1
+            continue
+        pos_indices_list.append(idx)
+    pos_indices = np.asarray(pos_indices_list, dtype=int)
     if scope == "target_train_only":
         pos_indices = np.asarray(
             [idx for idx in pos_indices if rows[int(idx)].get("step15_pool") == "zh_target_strict"],
@@ -328,49 +432,167 @@ def add_positive_mixup(
             [idx for idx in pos_indices if rows[int(idx)].get("step15_pool") == "en_content_train_pool"],
             dtype=int,
         )
-    elif scope not in {"all_positive", "same_evidence_type_only"}:
+    elif scope not in {"all_positive", "same_evidence_type_only", "same_domain_same_evidence_type"}:
         raise ValueError(f"Unsupported Step15 positive_mixup scope: {scope}")
+
+    diagnostics = {
+        "enabled": True,
+        "scope": scope,
+        "all_positive_source_count": int(len(all_pos_indices)),
+        "eligible_positive_source_count": int(len(pos_indices)),
+        "minimum_source_training_sample_weight": round(minimum_source_weight, 6),
+        "require_usable_for_core_transfer": require_core_transfer,
+        "require_core_transfer_eligible": require_core_eligible,
+        "require_evidence_type_confident": require_confident_evidence,
+        "rejection_counts": dict(sorted(rejection_counts.items())),
+        "synthetic_train_only": True,
+        "synthetic_row_count": 0,
+        "skipped_reason": None,
+    }
     if len(pos_indices) < 2:
-        return x_train, y_train, y_evidence, rows, 0
+        diagnostics["skipped_reason"] = "fewer_than_two_eligible_positive_sources"
+        return x_train, y_train, y_evidence, rows, 0, diagnostics
     multiplier = float(cfg.get("multiplier", 0.0))
     synthetic_count = int(math.ceil(len(pos_indices) * multiplier))
     if synthetic_count <= 0:
-        return x_train, y_train, y_evidence, rows, 0
+        diagnostics["skipped_reason"] = "non_positive_multiplier_or_synthetic_count"
+        return x_train, y_train, y_evidence, rows, 0, diagnostics
     alpha = float(cfg.get("beta_alpha", 0.4))
-    synthetic_x = []
-    synthetic_rows = []
+    if alpha <= 0.0:
+        raise ValueError("Step15 positive_mixup beta_alpha must be positive")
+
+    grouped_indices: dict[tuple[str, ...], list[int]] = defaultdict(list)
+    if scope == "same_domain_same_evidence_type":
+        for idx in pos_indices:
+            row = rows[int(idx)]
+            grouped_indices[(str(row.get("step15_pool", "")), str(row.get("evidence_type", "")))].append(int(idx))
+    elif scope == "same_evidence_type_only":
+        for idx in pos_indices:
+            if int(y_evidence[int(idx)]) >= 0:
+                grouped_indices[(str(int(y_evidence[int(idx)])),)].append(int(idx))
+    else:
+        grouped_indices[(scope,)] = [int(value) for value in pos_indices]
+
+    eligible_groups = {key: values for key, values in grouped_indices.items() if len(values) >= 2}
+    eligible_anchor_indices = [idx for values in eligible_groups.values() for idx in values]
+    diagnostics["eligible_group_counts"] = {
+        "||".join(key): len(values) for key, values in sorted(eligible_groups.items())
+    }
+    diagnostics["eligible_anchor_count"] = len(eligible_anchor_indices)
+    if not eligible_anchor_indices:
+        diagnostics["skipped_reason"] = "no_group_with_two_eligible_positive_sources"
+        return x_train, y_train, y_evidence, rows, 0, diagnostics
+
+    synthetic_count = int(math.ceil(len(eligible_anchor_indices) * multiplier))
+    if synthetic_count <= 0:
+        diagnostics["skipped_reason"] = "non_positive_grouped_synthetic_count"
+        return x_train, y_train, y_evidence, rows, 0, diagnostics
+
+    nearest_neighbor_k = int(cfg.get("nearest_neighbor_k", 0) or 0)
+    neighbor_map: dict[int, list[int]] = {}
+    for group_indices in eligible_groups.values():
+        group_array = np.asarray(group_indices, dtype=int)
+        if nearest_neighbor_k <= 0:
+            for idx in group_indices:
+                neighbor_map[idx] = [candidate for candidate in group_indices if candidate != idx]
+            continue
+        group_x = x_train[group_array]
+        limit = max(1, min(nearest_neighbor_k, len(group_indices) - 1))
+        for local_idx, global_idx in enumerate(group_indices):
+            distances = np.sum((group_x - group_x[local_idx]) ** 2, axis=1)
+            ranked_local = [int(value) for value in np.argsort(distances) if int(value) != local_idx]
+            neighbor_map[global_idx] = [group_indices[value] for value in ranked_local[:limit]]
+
+    copy_anchor_feature_names = [
+        str(name) for name in cfg.get("copy_anchor_feature_names", []) if str(name) in feature_names
+    ]
+    copy_anchor_indices = {feature_names.index(name) for name in copy_anchor_feature_names}
+    interpolate_indices = [idx for idx in range(len(feature_names)) if idx not in copy_anchor_indices]
+    synthetic_weight_mode = str(cfg.get("synthetic_weight_mode", "uniform"))
+    if synthetic_weight_mode not in {"uniform", "minimum_parent_weight"}:
+        raise ValueError(f"Unsupported Step15 positive_mixup synthetic_weight_mode: {synthetic_weight_mode}")
+
+    synthetic_x: list[np.ndarray] = []
+    synthetic_rows: list[dict] = []
+    cross_domain_parent_count = 0
+    cross_evidence_parent_count = 0
+    weak_parent_count = 0
     for _ in range(synthetic_count):
-        if scope == "same_evidence_type_only":
-            evidence_groups: dict[int, list[int]] = defaultdict(list)
-            for idx in pos_indices:
-                evidence_groups[int(y_evidence[int(idx)])].append(int(idx))
-            eligible_groups = [indices for evidence, indices in evidence_groups.items() if evidence >= 0 and len(indices) >= 2]
-            if not eligible_groups:
-                return x_train, y_train, y_evidence, rows, 0
-            group_indices = eligible_groups[int(rng.integers(0, len(eligible_groups)))]
-            left, right = rng.choice(np.asarray(group_indices, dtype=int), size=2, replace=False)
-        else:
-            left, right = rng.choice(pos_indices, size=2, replace=False)
+        left = int(rng.choice(np.asarray(eligible_anchor_indices, dtype=int)))
+        candidates = neighbor_map[left]
+        right = int(rng.choice(np.asarray(candidates, dtype=int)))
         lam = float(rng.beta(alpha, alpha))
-        synthetic_x.append((1.0 - lam) * x_train[left] + lam * x_train[right])
+        synthetic_vector = x_train[left].copy()
+        if interpolate_indices:
+            synthetic_vector[interpolate_indices] = (
+                (1.0 - lam) * x_train[left, interpolate_indices]
+                + lam * x_train[right, interpolate_indices]
+            )
+        synthetic_x.append(synthetic_vector)
         left_row = rows[int(left)]
         right_row = rows[int(right)]
         left_pool = str(left_row.get("step15_pool", ""))
         right_pool = str(right_row.get("step15_pool", ""))
         synthetic_pool = left_pool if left_pool == right_pool else "cross_domain_mixup"
+        left_evidence = str(left_row.get("evidence_type", ""))
+        right_evidence = str(right_row.get("evidence_type", ""))
+        left_weight = float(step7.row_training_sample_weight(left_row))
+        right_weight = float(step7.row_training_sample_weight(right_row))
+        synthetic_weight = min(left_weight, right_weight) if synthetic_weight_mode == "minimum_parent_weight" else 1.0
+        cross_domain_parent_count += int(left_pool != right_pool)
+        cross_evidence_parent_count += int(left_evidence != right_evidence)
+        weak_parent_count += int(min(left_weight, right_weight) < 1.0 - 1e-12)
         synthetic_rows.append(
             {
-                "pair_uid": f"synthetic_mixup::{len(synthetic_rows)}",
+                "pair_uid": f"synthetic_positive_mixup::{len(synthetic_rows)}",
                 "review_label": "positive",
+                "identity_label": "same_controller",
                 "evidence_type": "synthetic_train_only",
+                "evidence_type_confident": "0",
+                "identity_training_eligible": "1",
                 "step15_pool": synthetic_pool,
+                "split_name": "train",
                 "synthetic_train_only": "1",
+                "usable_for_supervision": "1",
+                "usable_for_core_transfer": "1",
+                "core_transfer_eligible": "1",
+                "training_sample_weight": round(float(synthetic_weight), 6),
+                "mixup_parent_left_pair_uid": str(left_row.get("pair_uid", "")),
+                "mixup_parent_right_pair_uid": str(right_row.get("pair_uid", "")),
+                "mixup_parent_left_pool": left_pool,
+                "mixup_parent_right_pool": right_pool,
+                "mixup_parent_left_evidence_type": left_evidence,
+                "mixup_parent_right_evidence_type": right_evidence,
+                "mixup_parent_left_training_sample_weight": round(left_weight, 6),
+                "mixup_parent_right_training_sample_weight": round(right_weight, 6),
+                "mixup_lambda_right": round(lam, 8),
             }
         )
     x_aug = np.vstack([x_train, np.asarray(synthetic_x, dtype=float)])
     y_aug = np.concatenate([y_train, np.ones(synthetic_count, dtype=float)])
     evidence_aug = np.concatenate([y_evidence, np.full(synthetic_count, -1, dtype=int)])
-    return x_aug, y_aug, evidence_aug, rows + synthetic_rows, synthetic_count
+    diagnostics.update(
+        {
+            "synthetic_row_count": synthetic_count,
+            "nearest_neighbor_k": nearest_neighbor_k,
+            "synthetic_weight_mode": synthetic_weight_mode,
+            "copy_anchor_feature_names": copy_anchor_feature_names,
+            "interpolated_feature_count": len(interpolate_indices),
+            "cross_domain_parent_count": cross_domain_parent_count,
+            "cross_evidence_type_parent_count": cross_evidence_parent_count,
+            "synthetic_rows_with_any_subunit_parent_weight": weak_parent_count,
+            "synthetic_weight_min": round(
+                min(float(row["training_sample_weight"]) for row in synthetic_rows), 6
+            ),
+            "synthetic_weight_mean": round(
+                float(np.mean([float(row["training_sample_weight"]) for row in synthetic_rows])), 6
+            ),
+            "synthetic_weight_max": round(
+                max(float(row["training_sample_weight"]) for row in synthetic_rows), 6
+            ),
+        }
+    )
+    return x_aug, y_aug, evidence_aug, rows + synthetic_rows, synthetic_count, diagnostics
 
 
 def add_negative_mixup(
@@ -568,6 +790,8 @@ def train_model(
     train_rows: list[dict],
     initial_params: dict[str, np.ndarray] | None = None,
     domain_balanced_identity_loss: bool = False,
+    domain_balance_mode: str = "legacy_raw_row_count_before_quality_weights",
+    domain_balance_domains: list[str] | None = None,
     identity_weight_multipliers: dict[str, float] | None = None,
     normalize_identity_weight_mean: bool = True,
 ) -> tuple[dict[str, np.ndarray], dict]:
@@ -579,12 +803,20 @@ def train_model(
         "v": {key: np.zeros_like(value) for key, value in params.items()},
     }
 
-    if domain_balanced_identity_loss:
-        identity_weights = domain_balanced_binary_weights(y_train, train_rows)
+    if domain_balanced_identity_loss and domain_balance_mode == "legacy_raw_row_count_before_quality_weights":
+        identity_weights, domain_balance_diagnostics = legacy_domain_balanced_binary_weights(y_train, train_rows)
     elif train_cfg.get("class_balanced_identity_loss", True):
         identity_weights = balanced_binary_weights(y_train)
+        domain_balance_diagnostics = {
+            "enabled": False,
+            "method": domain_balance_mode,
+        }
     else:
         identity_weights = np.ones(len(y_train))
+        domain_balance_diagnostics = {
+            "enabled": False,
+            "method": domain_balance_mode,
+        }
     identity_weights, identity_weight_multiplier_diagnostics = apply_identity_weight_multipliers(
         identity_weights,
         train_rows,
@@ -592,6 +824,20 @@ def train_model(
         normalize_mean=normalize_identity_weight_mean,
     )
     identity_weights, row_sample_weight_diagnostics = apply_row_training_sample_weights(identity_weights, train_rows)
+    if domain_balanced_identity_loss and domain_balance_mode == "post_quality_effective_weight_mass":
+        identity_weights, domain_balance_diagnostics = apply_effective_domain_balance(
+            identity_weights,
+            train_rows,
+            domain_balance_domains or ["en_content_train_pool", "zh_target_strict"],
+        )
+    elif domain_balanced_identity_loss and domain_balance_mode != "legacy_raw_row_count_before_quality_weights":
+        raise ValueError(f"Unsupported Step15 domain_balance_mode: {domain_balance_mode}")
+    elif not domain_balanced_identity_loss:
+        domain_balance_diagnostics = {
+            "enabled": False,
+            "method": domain_balance_mode,
+            "allowed_domains": list(domain_balance_domains or ["en_content_train_pool", "zh_target_strict"]),
+        }
     ev_weights = (
         evidence_weights(y_evidence, evidence_type_count)
         if train_cfg.get("class_balanced_evidence_loss", True)
@@ -644,6 +890,7 @@ def train_model(
         "lambda_evidence": round(float(lambda_evidence), 6),
         "initialization": "warm_start" if initial_params is not None else "random",
         "domain_balanced_identity_loss": bool(domain_balanced_identity_loss),
+        "effective_domain_balance": domain_balance_diagnostics,
         "identity_weight_multipliers": identity_weight_multiplier_diagnostics,
         "row_sample_weight_multipliers": row_sample_weight_diagnostics,
     }
@@ -691,6 +938,29 @@ def feature_importance(params: dict[str, np.ndarray], feature_names: list[str], 
     ]
     records.sort(key=lambda item: (-item["importance"], item["feature_name"]))
     return records[:limit]
+
+
+def write_positive_mixup_manifest(path: Path, rows: list[dict]) -> None:
+    fields = [
+        "pair_uid",
+        "review_label",
+        "identity_label",
+        "evidence_type",
+        "step15_pool",
+        "split_name",
+        "synthetic_train_only",
+        "training_sample_weight",
+        "mixup_parent_left_pair_uid",
+        "mixup_parent_right_pair_uid",
+        "mixup_parent_left_pool",
+        "mixup_parent_right_pool",
+        "mixup_parent_left_evidence_type",
+        "mixup_parent_right_evidence_type",
+        "mixup_parent_left_training_sample_weight",
+        "mixup_parent_right_training_sample_weight",
+        "mixup_lambda_right",
+    ]
+    step7.write_csv(path, rows, fields)
 
 
 def artifact_payload(
@@ -756,16 +1026,30 @@ def run_single(
     synthetic_count = 0
     positive_synthetic_count = 0
     negative_synthetic_count = 0
+    positive_synthetic_rows: list[dict] = []
+    positive_mixup_cfg = dict(policy["training"].get("positive_mixup", {}))
+    positive_mixup_cfg.update(experiment_cfg.get("positive_mixup", {}))
+    positive_mixup_diagnostics = {
+        "enabled": False,
+        "scope": str(
+            experiment_cfg.get("positive_mixup_scope_override")
+            or positive_mixup_cfg.get("scope", "all_positive")
+        ),
+        "synthetic_row_count": 0,
+        "skipped_reason": "phase_does_not_enable_positive_mixup",
+    }
     if bool(phase_cfg.get("use_positive_mixup", False)):
-        x_train, y_train, y_ev, train_rows_for_weights, positive_synthetic_count = add_positive_mixup(
+        x_train, y_train, y_ev, train_rows_for_weights, positive_synthetic_count, positive_mixup_diagnostics = add_positive_mixup(
             x_train,
             y_train,
             y_ev,
             train_rows,
-            policy["training"].get("positive_mixup", {}),
+            positive_mixup_cfg,
             np.random.default_rng(seed + 7919),
+            feature_names,
             experiment_cfg.get("positive_mixup_scope_override"),
         )
+        positive_synthetic_rows = train_rows_for_weights[len(train_rows):]
     if bool(phase_cfg.get("use_negative_mixup", False)) and bool(experiment_cfg.get("negative_mixup", {}).get("enabled", False)):
         x_train, y_train, y_ev, train_rows_for_weights, negative_synthetic_count = add_negative_mixup(
             x_train,
@@ -791,14 +1075,19 @@ def run_single(
         train_rows_for_weights,
         initial_params=initial_params,
         domain_balanced_identity_loss=bool(experiment_cfg.get("domain_balanced_identity_loss", False)),
+        domain_balance_mode=str(
+            experiment_cfg.get("domain_balance_mode", "legacy_raw_row_count_before_quality_weights")
+        ),
+        domain_balance_domains=[str(value) for value in experiment_cfg.get(
+            "domain_balance_domains",
+            ["en_content_train_pool", "zh_target_strict"],
+        )],
         identity_weight_multipliers=experiment_cfg.get("identity_evidence_type_weight_multipliers", {}),
         normalize_identity_weight_mean=bool(experiment_cfg.get("normalize_identity_weight_mean", True)),
     )
     diagnostics["training_mode"] = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
-    diagnostics["positive_mixup_scope"] = str(
-        experiment_cfg.get("positive_mixup_scope_override")
-        or policy["training"].get("positive_mixup", {}).get("scope", "all_positive")
-    )
+    diagnostics["positive_mixup_scope"] = str(positive_mixup_diagnostics.get("scope", "all_positive"))
+    diagnostics["positive_pair_mixup"] = positive_mixup_diagnostics
     diagnostics["standardizer_source"] = standardizer_source
 
     _, valid_prob, valid_evidence_prob = forward(params, x_valid)
@@ -814,6 +1103,11 @@ def run_single(
     valid_path = output_path(policy["outputs"]["zh_valid_predictions_template"], experiment_name, phase_cfg["phase_id"], seed)
     test_path = output_path(policy["outputs"]["zh_test_predictions_template"], experiment_name, phase_cfg["phase_id"], seed)
     artifact_path = output_path(policy["outputs"]["artifact_template"], experiment_name, phase_cfg["phase_id"], seed)
+    mixup_manifest_path = None
+    mixup_manifest_template = policy["outputs"].get("positive_mixup_manifest_template")
+    if positive_synthetic_rows and mixup_manifest_template:
+        mixup_manifest_path = output_path(mixup_manifest_template, experiment_name, phase_cfg["phase_id"], seed)
+        write_positive_mixup_manifest(mixup_manifest_path, positive_synthetic_rows)
     step7.write_csv(valid_path, valid_predictions, list(valid_predictions[0].keys()))
     step7.write_csv(test_path, test_predictions, list(test_predictions[0].keys()))
 
@@ -843,6 +1137,9 @@ def run_single(
             "artifact": str(artifact_path.relative_to(ROOT)),
             "zh_valid_predictions": str(valid_path.relative_to(ROOT)),
             "zh_test_predictions": str(test_path.relative_to(ROOT)),
+            "positive_mixup_manifest": (
+                str(mixup_manifest_path.relative_to(ROOT)) if mixup_manifest_path is not None else None
+            ),
         },
         "top_feature_importance": artifact["feature_importance"][:10],
     }

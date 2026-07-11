@@ -22,10 +22,10 @@ from typing import Any
 
 DEFAULT_LABELS = Path("reports/step5_zh_target_strict_frozen_silver_labels.csv")
 DEFAULT_FEATURES = Path("reports/step7_pair_features.zh_target_strict.csv")
-DEFAULT_OUT_JSON = Path("reports/step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709.json")
-DEFAULT_OUT_METRICS = Path("reports/step12_v5_statistical_robustness_model_metrics_step16c_refreeze_20260709.csv")
+DEFAULT_OUT_JSON = Path("reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json")
+DEFAULT_OUT_METRICS = Path("reports/step12_v5r_statistical_robustness_model_metrics_weighted_mixup_20260711.csv")
 DEFAULT_OUT_COMPARISONS = Path(
-    "reports/step12_v5_statistical_robustness_paired_comparisons_step16c_refreeze_20260709.csv"
+    "reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
 )
 
 DEFAULT_RESAMPLES = 5000
@@ -103,6 +103,27 @@ MODEL_SPECS: list[dict[str, Any]] = [
         "role": "step9_clean_current_seed",
         "kind": "prediction",
         "path": Path("reports/step9_core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260322_predictions.zh_test.csv"),
+        "score_column": "prob_positive",
+    },
+    {
+        "model_id": "step9_e5_lr_l2_100pct_seed_20260320",
+        "role": "step9_clean_same_ratio_mixup_ablation_seed",
+        "kind": "prediction",
+        "path": Path("reports/step9_core_few_shot_multilingual_e5_large_lr_l2_ratio_100pct_seed_20260320_predictions.zh_test.csv"),
+        "score_column": "prob_positive",
+    },
+    {
+        "model_id": "step9_e5_lr_l2_100pct_seed_20260321",
+        "role": "step9_clean_same_ratio_mixup_ablation_seed",
+        "kind": "prediction",
+        "path": Path("reports/step9_core_few_shot_multilingual_e5_large_lr_l2_ratio_100pct_seed_20260321_predictions.zh_test.csv"),
+        "score_column": "prob_positive",
+    },
+    {
+        "model_id": "step9_e5_lr_l2_100pct_seed_20260322",
+        "role": "step9_clean_same_ratio_mixup_ablation_seed",
+        "kind": "prediction",
+        "path": Path("reports/step9_core_few_shot_multilingual_e5_large_lr_l2_ratio_100pct_seed_20260322_predictions.zh_test.csv"),
         "score_column": "prob_positive",
     },
     {
@@ -381,6 +402,33 @@ STEP15_V5_MODEL_GROUPS: list[dict[str, str]] = [
     },
 ]
 
+STEP15_V5R_MODEL_GROUPS: list[dict[str, str]] = [
+    {
+        "model_prefix": "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3",
+        "role": "step15_v5r_clean_public_noise_weighted_strong_phase3_seed",
+        "experiment": "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup",
+        "phase": "phase3_add_contact_url_noise",
+    },
+    {
+        "model_prefix": "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4",
+        "role": "step15_v5r_clean_public_noise_weighted_strong_phase4_seed",
+        "experiment": "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+    {
+        "model_prefix": "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3",
+        "role": "step15_v5r_clean_domain_balanced_public_noise_weighted_strong_phase3_seed",
+        "experiment": "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup",
+        "phase": "phase3_add_contact_url_noise",
+    },
+    {
+        "model_prefix": "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4",
+        "role": "step15_v5r_clean_domain_balanced_public_noise_weighted_strong_phase4_seed",
+        "experiment": "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup",
+        "phase": "phase4_add_positive_pair_mixup",
+    },
+]
+
 for group in STEP15_V2_MODEL_GROUPS:
     for seed in STEP15_SEEDS:
         MODEL_SPECS.append(
@@ -441,6 +489,21 @@ for group in STEP15_V5_MODEL_GROUPS:
             }
         )
 
+for group in STEP15_V5R_MODEL_GROUPS:
+    for seed in STEP15_SEEDS:
+        MODEL_SPECS.append(
+            {
+                "model_id": f"{group['model_prefix']}_seed_{seed}",
+                "role": group["role"],
+                "kind": "prediction",
+                "path": Path(
+                    f"reports/{group['experiment']}_{group['phase']}_seed_{seed}_predictions.zh_test.csv"
+                ),
+                "score_column": "prob_positive",
+                "optional_until_generated": True,
+            }
+        )
+
 ENSEMBLES: dict[str, dict[str, Any]] = {
     "step9_e5_lr_l2_50pct_seed_mean": {
         "role": "step9_clean_current_seed_mean",
@@ -448,6 +511,14 @@ ENSEMBLES: dict[str, dict[str, Any]] = {
             "step9_e5_lr_l2_50pct_seed_20260320",
             "step9_e5_lr_l2_50pct_seed_20260321",
             "step9_e5_lr_l2_50pct_seed_20260322",
+        ],
+    },
+    "step9_e5_lr_l2_100pct_seed_mean": {
+        "role": "step9_clean_same_ratio_mixup_ablation_seed_mean",
+        "members": [
+            "step9_e5_lr_l2_100pct_seed_20260320",
+            "step9_e5_lr_l2_100pct_seed_20260321",
+            "step9_e5_lr_l2_100pct_seed_20260322",
         ],
     },
     "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean": {
@@ -523,6 +594,13 @@ for group in STEP15_V4_MODEL_GROUPS:
     }
 
 for group in STEP15_V5_MODEL_GROUPS:
+    ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
+        "role": group["role"].replace("_seed", "_seed_mean"),
+        "optional_until_generated": True,
+        "members": [f"{group['model_prefix']}_seed_{seed}" for seed in STEP15_SEEDS],
+    }
+
+for group in STEP15_V5R_MODEL_GROUPS:
     ENSEMBLES[f"{group['model_prefix']}_seed_mean"] = {
         "role": group["role"].replace("_seed", "_seed_mean"),
         "optional_until_generated": True,
@@ -771,14 +849,14 @@ PAIRED_COMPARISONS: list[tuple[str, str, str]] = [
 ]
 
 
-# Current Step16C/E refreeze audit scope.
+# Current Step16G boundary plus the isolated Step15 v5r repair audit scope.
 #
 # Older Step15 v1-v4 artifacts may still exist in reports/, but their fixed-test
 # prediction files were produced for earlier zh_test boundaries. If they are
 # loaded here, Step12 can either fail with missing pair_uids or, worse, make a
 # stale comparison look current. Keep the default audit restricted to the
-# models regenerated for the active Step16C/E boundary.
-CURRENT_STEP16C_MODEL_IDS = {
+# models regenerated for the active Step16G boundary.
+CURRENT_STEP16G_MODEL_IDS = {
     "raw_e5_cosine",
     "raw_labse_cosine",
     "raw_bge_m3_cosine",
@@ -789,6 +867,9 @@ CURRENT_STEP16C_MODEL_IDS = {
     "step9_e5_lr_l2_50pct_seed_20260320",
     "step9_e5_lr_l2_50pct_seed_20260321",
     "step9_e5_lr_l2_50pct_seed_20260322",
+    "step9_e5_lr_l2_100pct_seed_20260320",
+    "step9_e5_lr_l2_100pct_seed_20260321",
+    "step9_e5_lr_l2_100pct_seed_20260322",
     "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260320",
     "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260321",
     "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_20260322",
@@ -810,15 +891,28 @@ CURRENT_STEP16C_MODEL_IDS = {
     "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260320",
     "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260321",
     "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_20260322",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260320",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260321",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260322",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260320",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260321",
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260322",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260320",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260321",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_20260322",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260320",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260321",
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_20260322",
 }
 
-MODEL_SPECS = [spec for spec in MODEL_SPECS if str(spec["model_id"]) in CURRENT_STEP16C_MODEL_IDS]
+MODEL_SPECS = [spec for spec in MODEL_SPECS if str(spec["model_id"]) in CURRENT_STEP16G_MODEL_IDS]
 for spec in MODEL_SPECS:
-    if str(spec["model_id"]).startswith("step15_v5_"):
+    if str(spec["model_id"]).startswith(("step15_v5_", "step15_v5r_")):
         spec.pop("optional_until_generated", None)
 
 ENSEMBLES = {
     "step9_e5_lr_l2_50pct_seed_mean": ENSEMBLES["step9_e5_lr_l2_50pct_seed_mean"],
+    "step9_e5_lr_l2_100pct_seed_mean": ENSEMBLES["step9_e5_lr_l2_100pct_seed_mean"],
     "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean": ENSEMBLES[
         "step9_e5_lr_l2_positive_pair_mixup_50pct_seed_mean"
     ],
@@ -836,6 +930,18 @@ ENSEMBLES = {
     "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean": ENSEMBLES[
         "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean"
     ],
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean": ENSEMBLES[
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean"
+    ],
+    "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean": ENSEMBLES[
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean"
+    ],
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean": ENSEMBLES[
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean"
+    ],
+    "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean": ENSEMBLES[
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean"
+    ],
 }
 for ensemble in ENSEMBLES.values():
     if str(ensemble["role"]).startswith("step15_v5_"):
@@ -846,8 +952,8 @@ PAIRED_COMPARISONS = [
     ("step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean", "raw_e5_cosine", "step9_mixup100_vs_raw_e5"),
     (
         "step9_e5_lr_l2_positive_pair_mixup_100pct_seed_mean",
-        "step9_e5_lr_l2_50pct_seed_mean",
-        "step9_mixup100_vs_non_mixup_e5_lr_l2_50pct",
+        "step9_e5_lr_l2_100pct_seed_mean",
+        "step9_mixup100_vs_non_mixup100_same_ratio",
     ),
     (
         "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
@@ -873,6 +979,41 @@ PAIRED_COMPARISONS = [
         "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
         "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
         "step15_v5_domain_balanced_vs_non_domain_balanced",
+    ),
+    (
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean",
+        "step15_v5r_weighted_mixup_phase4_vs_phase3",
+    ),
+    (
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase3_seed_mean",
+        "step15_v5r_domain_balanced_weighted_mixup_phase4_vs_phase3",
+    ),
+    (
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5r_non_domain_repair_vs_v5_legacy_mixup",
+    ),
+    (
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
+        "step15_v5r_domain_repair_vs_v5_legacy_domain_balance",
+    ),
+    (
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5r_non_domain_vs_raw_e5",
+    ),
+    (
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "raw_e5_cosine",
+        "step15_v5r_domain_balanced_vs_raw_e5",
+    ),
+    (
+        "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+        "step15_v5r_domain_balanced_vs_non_domain_balanced",
     ),
 ]
 
@@ -1326,7 +1467,7 @@ def main() -> None:
     )
 
     summary = {
-        "audit_version": "step12_v5_statistical_robustness_zh_test_step16c_refreeze_20260709",
+        "audit_version": "step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711",
         "scope": "zh_target_strict_fixed_test",
         "fixed_test_policy": {
             "split_name": "test",

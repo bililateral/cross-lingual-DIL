@@ -1,6 +1,6 @@
 {
-  "version": "2026-04-23",
-  "objective": "Step-11 Chinese graph clustering from the current Step-7/Step-9/Step-15 boundary, validating whether the frozen Step15 v5 evidence-type hard-negative scorer improves candidate-cluster discovery quality while keeping Step7/Step9 baselines and identifier models as controls only",
+  "version": "2026-07-11-step15-v5r-candidate-validation",
+  "objective": "Step-11 Chinese graph clustering from the current Step-7/Step-9/Step-15 boundary. The publication validation remains the frozen explicit Step16G allow-list; repaired Step15 v5r scorers are isolated candidate validations and may enter a new allow-list only after Step12 paired robustness succeeds.",
   "input_dependencies": [
     "reports/step7_pair_features.zh_target_strict.csv",
     "reports/step3_seller_profiles.zh_target_strict.jsonl",
@@ -8,7 +8,7 @@
     "schema/step7_training_policy.json",
     "reports/step9_few_shot_summary.json",
     "reports/step9_calibration_summary.json",
-    "reports/step15_v5_public_noise_weighted_summary.json",
+    "reports/step15_v5r_weighted_mixup_summary.json",
     "schema/step15_evidence_type_policy.json"
   ],
   "baseline_reference": {
@@ -16,7 +16,7 @@
     "step7_policy": "schema/step7_training_policy.json",
     "step9_summary": "reports/step9_few_shot_summary.json",
     "step9_calibration_summary": "reports/step9_calibration_summary.json",
-    "step15_summary": "reports/step15_v5_public_noise_weighted_summary.json",
+    "step15_summary": "reports/step15_v5r_weighted_mixup_summary.json",
     "step15_policy": "schema/step15_evidence_type_policy.json"
   },
   "summary_resolution": {
@@ -29,7 +29,7 @@
     "step7_policy": "schema/step7_training_policy.json",
     "step9_summary": "reports/step9_few_shot_summary.json",
     "step9_calibration_summary": "reports/step9_calibration_summary.json",
-    "step15_summary": "reports/step15_v5_public_noise_weighted_summary.json",
+    "step15_summary": "reports/step15_v5r_weighted_mixup_summary.json",
     "step15_policy": "schema/step15_evidence_type_policy.json"
   },
   "scorer_selection": {
@@ -40,7 +40,7 @@
     "default_step9_calibration_experiment_name": "core_calibrated_default",
     "default_step9_ratio": 0.5,
     "default_step9_seed": 20260321,
-    "default_step15_experiment_name": "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong",
+    "default_step15_experiment_name": "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup",
     "default_step15_phase": "phase4_add_positive_pair_mixup",
     "default_step15_seeds": [
       20260320,
@@ -49,13 +49,15 @@
     ],
     "step15_scorer_token_aliases": {
       "step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean",
-      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_public_noise_weighted_strong_phase4_seed_mean"
+      "step15_v5_identity_only_curriculum_public_noise_weighted_strong::phase4_add_positive_pair_mixup::seed_mean": "step15_v5_public_noise_weighted_strong_phase4_seed_mean",
+      "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup::phase4_add_positive_pair_mixup::seed_mean": "step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean",
+      "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup::phase4_add_positive_pair_mixup::seed_mean": "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean"
     },
     "publication_validation": {
       "selection_mode": "explicit_allowlist_only",
       "auto_selector_allowed": false,
-      "current_validation_run_id": "step16c_refreeze_validation_20260709",
-      "current_validation_audit": "reports/step11_cluster_level_audit.step16c_refreeze_validation_20260709.json",
+      "current_validation_run_id": "step16g_imbalance_validation_20260710",
+      "current_validation_audit": "reports/step11_cluster_level_audit.step16g_imbalance_validation_20260710.json",
       "current_validation_summaries": [
         "reports/step11_step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json",
         "reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json",
@@ -65,6 +67,15 @@
         "reports/step11_core_zero_shot_bge_m3_clustering_summary.json"
       ],
       "rule": "Publication tables and cluster-level audits must pass explicit --summary paths from current_validation_summaries; do not glob reports/ and do not use --scorer-family auto as the publication selector."
+    },
+    "step15_v5r_candidate_validation": {
+      "status": "pending_step12_then_explicit_step11",
+      "not_current_publication_allowlist": true,
+      "candidate_summaries": [
+        "reports/step11_step15_v5r_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean_clustering_summary.json",
+        "reports/step11_step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean_clustering_summary.json"
+      ],
+      "promotion_rule": "Run Step12 first. Only a v5r scorer that passes the preregistered paired comparisons may be evaluated in a new explicit cluster-audit allow-list; never append it silently to the frozen Step16G publication validation."
     },
     "dynamic_mainline_candidates": {
       "enabled": true,

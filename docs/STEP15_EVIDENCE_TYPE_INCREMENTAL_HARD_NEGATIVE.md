@@ -1,8 +1,101 @@
 # Step 15 Evidence-Type Incremental Hard-Negative Experiment
 
-Updated: 2026-06-02
+Updated: 2026-07-11
 
-Branch: `method/step15-v2-curriculum-audit`
+Current branch: `fix/step15-weighted-same-domain-mixup`
+
+## 2026-07-11 v5r Implementation Repair
+
+The legacy v5 outputs remain frozen as the pre-fix comparison. The repaired experiments use separate names:
+
+```text
+step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup
+step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup
+```
+
+The repair changes only Phase-4 augmentation and domain-weight construction. It does not change Step 5 labels, the fixed validation/test boundary, the clean feature set, MLP hidden size, or public-noise evidence multipliers.
+
+Positive parent eligibility now requires:
+
+```text
+review_label = positive
+usable_for_core_transfer = 1
+core_transfer_eligible = 1
+evidence_type_confident = 1
+training_sample_weight >= 0.55
+```
+
+Parents must come from the same `step15_pool` and the same `evidence_type`. The second parent is sampled from the five nearest eligible neighbors in the standardized clean feature space. The synthetic weight is:
+
+```text
+training_sample_weight_synthetic = min(weight_left, weight_right)
+```
+
+Boolean/count features are copied from the anchor parent rather than interpolated. Continuous features retain the Beta mixup rule with `alpha = 0.4`. Each Phase-4 seed writes a parent-provenance manifest with both parent pair IDs, domains, evidence types, weights, lambda, and inherited synthetic weight.
+
+The domain-balanced v5r no longer balances raw row counts before quality weighting. It first applies:
+
+```text
+binary class balance
+-> evidence-type multipliers
+-> row training_sample_weight
+-> effective domain-mass balance over EN and ZH only
+```
+
+Any third or pseudo-domain is a hard error. After balancing, the total effective English and Chinese weight masses must be equal up to floating-point tolerance.
+
+The repaired method must be evaluated against its matching Phase 3. A v5r Phase-4 gain over legacy v5 alone is insufficient because other implementation changes could explain it. Step 12 therefore includes:
+
+```text
+v5r non-domain Phase4 vs v5r non-domain Phase3
+v5r domain Phase4 vs v5r domain Phase3
+v5r non-domain Phase4 vs legacy v5 non-domain Phase4
+v5r domain Phase4 vs legacy v5 domain Phase4
+v5r variants vs raw E5
+v5r domain vs v5r non-domain
+```
+
+The Linux rerun is pending. No performance improvement is claimed until those outputs are synchronized and audited.
+
+## 2026-07-11 Current-Boundary Audit
+
+The current Step16G boundary is `zh_train = 229 positive / 344 negative`, `zh_valid = 30 / 90`, and `zh_test = 50 / 150`. The synchronized Linux rerun completed two Step15 v5 experiments across five phases and three seeds.
+
+Current Step12 seed-mean results:
+
+| experiment | ROC-AUC | AP |
+| --- | ---: | ---: |
+| `step15_v5_identity_only_curriculum_public_noise_weighted_strong` | `0.866533` | `0.725220` |
+| `step15_v5_identity_only_curriculum_domain_balanced_public_noise_weighted_strong` | `0.865333` | `0.644989` |
+
+The non-domain-balanced scorer is therefore the current clean primary point estimate. Its paired grouped-bootstrap differences over raw E5 are `+0.118533` AUC, CI `[0.012272, 0.223274]`, and `+0.182381` AP, CI `[0.019890, 0.324430]`. These are promising internal fixed-test results, not prospective-holdout confirmation.
+
+### Phase 4 mixup defect
+
+The current v5 Phase 4 implementation must not be interpreted as a clean positive-mixup causal result:
+
+- The real positive parent pool contains `316` rows: `116` full-weight English, `16` full-weight Chinese, and `184` weak-supervision Chinese positives.
+- `add_positive_mixup()` selects from all positive rows. It has no minimum parent-weight rule and no same-domain or same-evidence-type constraint.
+- Synthetic metadata does not carry `training_sample_weight`; `row_training_sample_weight()` therefore assigns the default `1.0`.
+- Across the three seeds, `251-275/316` synthetic rows have at least one weak parent and `137-155/316` mix one English and one Chinese parent.
+- `302-307/316` synthetic rows contain fractional values in originally binary/count features. The current vector-space interpolation is therefore mostly off the observed discrete feature manifold.
+
+This is not train/test leakage: synthetic rows remain train-only, and seller/component overlap checks still pass. It is weak-label amplification and training-objective confounding. Phase 4 must inherit the minimum parent weight, restrict eligible parents, record parent provenance, and be compared against Phase 3 with paired grouped bootstrap before a mixup claim is made.
+
+### Why domain balancing regressed
+
+`domain_balanced_binary_weights()` balances domains by raw row count before row-quality weights are applied. Phase 4 also names cross-language synthetic rows `cross_domain_mixup`, which makes them a third domain.
+
+Step16G added `115` low-weight Chinese negatives. They increase the raw Chinese phase-4 count from `429` to `544`, even though their individual weights are only `0.12` or `0.15`. The resulting domain factors downweight all real Chinese rows and upweight the separate synthetic domain. Across seeds, effective real-Chinese weight falls from about `24%` before Step16G to about `21%`, while cross-domain synthetic weight rises from about `24%` to `27.4-27.7%`.
+
+The ranking consequence is visible on the fixed test:
+
+- direct/component positive mean score: non-domain `0.610381`, domain-balanced `0.507233`;
+- hard-negative mean score: non-domain `0.316558`, domain-balanced `0.460732`;
+- top-20 positives: non-domain `18/20`, domain-balanced `12/20`;
+- template-negative false positives at each seed-mean validation threshold: non-domain `3/10`, domain-balanced `8/10`.
+
+The old assumption that the English source pool numerically dominated the Chinese target pool is no longer true for Phase 4 (`401` English real rows versus `544` Chinese real rows). Domain balancing was useful on the earlier smaller target boundary, but the current count-only implementation now overcorrects and is especially sensitive to low-weight target additions.
 
 ## Purpose
 
@@ -219,9 +312,9 @@ This includes direct identifier features and must not be mixed into the clean sc
 Primary evaluation remains the fixed Chinese test split:
 
 ```text
-zh_target_strict test = 106 rows
-positive = 21
-negative = 85
+zh_target_strict test = 200 rows
+positive = 50
+negative = 150
 ```
 
 Primary metrics:
@@ -239,12 +332,16 @@ Current reference baselines:
 
 ```text
 raw E5:
-  ROC-AUC = 0.806723
-  AP      = 0.520573
+  ROC-AUC = 0.748000
+  AP      = 0.542839
 
-Step9 E5 LR/L2 positive-pair mixup 100pct:
-  ROC-AUC = 0.842017
-  AP      = 0.588995
+Step9 E5 LR/L2 non-mixup 100pct seed mean:
+  ROC-AUC = 0.762667
+  AP      = 0.556429
+
+Step9 E5 LR/L2 positive-pair mixup 100pct seed mean:
+  ROC-AUC = 0.756667
+  AP      = 0.557633
 ```
 
 Step15 should not be claimed as successful from point estimates alone. After pair-level training, it must be added to Step 12 grouped bootstrap and then, only if justified, to Step 11 graph-level audit.
