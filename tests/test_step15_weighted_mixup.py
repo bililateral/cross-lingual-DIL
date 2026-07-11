@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -14,6 +15,24 @@ import step15_train_incremental_hard_negative as step15  # noqa: E402
 
 
 class Step15WeightedMixupTests(unittest.TestCase):
+    def test_v5r_policy_runtime_contract(self) -> None:
+        with (ROOT / "schema" / "step15_evidence_type_policy.json").open("r", encoding="utf-8") as handle:
+            policy = json.load(handle)
+        experiment_names = {
+            "step15_v5r_identity_only_curriculum_public_noise_weighted_strong_weighted_mixup",
+            "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup",
+        }
+        self.assertTrue(experiment_names.issubset(policy["experiments"]))
+        self.assertEqual(policy["outputs"]["summary_json"], "reports/step15_v5r_weighted_mixup_summary.json")
+        for experiment_name in experiment_names:
+            cfg = policy["experiments"][experiment_name]
+            mixup_cfg = dict(policy["training"]["positive_mixup"])
+            mixup_cfg.update(cfg["positive_mixup"])
+            self.assertEqual(mixup_cfg["scope"], "same_domain_same_evidence_type")
+            self.assertEqual(mixup_cfg["minimum_source_training_sample_weight"], 0.55)
+            self.assertEqual(mixup_cfg["nearest_neighbor_k"], 5)
+            self.assertEqual(mixup_cfg["synthetic_weight_mode"], "minimum_parent_weight")
+
     def test_trusted_mixup_preserves_domain_evidence_weight_and_discrete_features(self) -> None:
         feature_names = ["continuous", "binary", "count"]
         x = np.asarray(

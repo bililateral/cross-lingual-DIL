@@ -20,6 +20,15 @@ Updated: 2026-07-11
 - `scripts/step15_validate_v5r_outputs.py` adds a post-training fail-fast check over all six Phase-4 artifacts/manifests before Step 12 runs;
 - no Windows model experiment was run. The next evidence must come from the Linux three-seed rerun.
 
+Linux synchronization incident and repair:
+
+- the first Linux v5r attempt stopped at `[3/7]` with `Unknown Step15 experiment`, because the runtime training script referenced the new v5r name while the Linux `schema/step15_evidence_type_policy.json` did not contain that experiment;
+- this was a mixed-version synchronization failure, but the original runner should have detected it before rebuilding labels or entering the training stage;
+- `scripts/step15_train_incremental_hard_negative.py` now supports `--validate-config-only`, which validates the exact experiment/phase/seed selection and v5r output/mixup/domain-balance contract before loading data;
+- the Linux runner now invokes that exact dry configuration command in `[1/7]`; an omitted script or policy update therefore fails immediately with the policy path and version;
+- the Windows preflight was rerun with the exact Linux experiment arguments and returned `status = pass`, policy version `2026-07-11-v5r-trusted-weighted-same-domain-mixup`, both v5r experiments, both requested phases, all three seeds, and the isolated v5r summary path;
+- the local test suite now contains five passing tests, including a policy/runtime contract test. No model training was performed on Windows.
+
 Interpretation rule before Linux results return:
 
 - v5r is an implementation-correctness repair, not an assumed performance improvement;

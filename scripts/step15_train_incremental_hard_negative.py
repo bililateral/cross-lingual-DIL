@@ -51,6 +51,14 @@ def parse_args() -> argparse.Namespace:
         type=int,
         help="Training seed. Repeat for multiple seeds. Defaults to policy training.default_seeds.",
     )
+    parser.add_argument(
+        "--validate-config-only",
+        action="store_true",
+        help=(
+            "Validate the selected experiment/phase/seed contract and output isolation against the policy, "
+            "then exit before loading data or training."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1217,14 +1225,76 @@ def main() -> None:
         )
     seeds = args.seeds or policy["training"]["default_seeds"]
     phase_by_id = {phase["phase_id"]: phase for phase in policy["curriculum_phases"]}
-    phases = [phase_by_id[phase_id] for phase_id in (args.phases or list(phase_by_id.keys()))]
+    requested_phase_ids = args.phases or list(phase_by_id.keys())
+    unknown_experiments = [experiment for experiment in experiments if experiment not in policy["experiments"]]
+    if unknown_experiments:
+        raise SystemExit(
+            "Unknown Step15 experiment(s) for policy "
+            f"{policy_path} version={policy.get('version')}: {', '.join(unknown_experiments)}"
+        )
+    unknown_phases = [phase_id for phase_id in requested_phase_ids if phase_id not in phase_by_id]
+    if unknown_phases:
+        raise SystemExit(
+            "Unknown Step15 phase(s) for policy "
+            f"{policy_path} version={policy.get('version')}: {', '.join(unknown_phases)}"
+        )
+    phases = [phase_by_id[phase_id] for phase_id in requested_phase_ids]
+
+    if args.validate_config_only:
+        v5r_experiments = [experiment for experiment in experiments if experiment.startswith("step15_v5r_")]
+        if v5r_experiments:
+            expected_summary = "reports/step15_v5r_weighted_mixup_summary.json"
+            actual_summary = str(policy.get("outputs", {}).get("summary_json", ""))
+            if actual_summary != expected_summary:
+                raise SystemExit(
+                    "Step15 v5r output isolation failed: expected summary_json="
+                    f"{expected_summary}, got {actual_summary or '<missing>'}"
+                )
+            for experiment in v5r_experiments:
+                experiment_cfg = policy["experiments"][experiment]
+                mixup_cfg = dict(policy.get("training", {}).get("positive_mixup", {}))
+                mixup_cfg.update(experiment_cfg.get("positive_mixup", {}))
+                required_contract = {
+                    "scope": "same_domain_same_evidence_type",
+                    "synthetic_weight_mode": "minimum_parent_weight",
+                    "minimum_source_training_sample_weight": 0.55,
+                    "nearest_neighbor_k": 5,
+                }
+                mismatches = {
+                    key: {"expected": value, "actual": mixup_cfg.get(key)}
+                    for key, value in required_contract.items()
+                    if mixup_cfg.get(key) != value
+                }
+                if mismatches:
+                    raise SystemExit(f"Step15 v5r mixup contract mismatch for {experiment}: {mismatches}")
+                if bool(experiment_cfg.get("domain_balanced_identity_loss", False)) and str(
+                    experiment_cfg.get("domain_balance_mode", "")
+                ) != "post_quality_effective_weight_mass":
+                    raise SystemExit(
+                        f"Step15 v5r domain-balance contract mismatch for {experiment}: "
+                        f"domain_balance_mode={experiment_cfg.get('domain_balance_mode')!r}"
+                    )
+        print(
+            json.dumps(
+                {
+                    "status": "pass",
+                    "mode": "validate_config_only",
+                    "policy": str(policy_path.relative_to(ROOT)),
+                    "policy_version": policy.get("version"),
+                    "experiments": experiments,
+                    "phases": requested_phase_ids,
+                    "seeds": seeds,
+                    "summary_json": policy.get("outputs", {}).get("summary_json"),
+                },
+                indent=2,
+            )
+        )
+        return
 
     rows_by_pool = {pool_name: load_pool(pool_name, pool_cfg) for pool_name, pool_cfg in policy["pools"].items()}
 
     runs = []
     for experiment_name in experiments:
-        if experiment_name not in policy["experiments"]:
-            raise SystemExit(f"Unknown Step15 experiment: {experiment_name}")
         experiment_cfg = policy["experiments"][experiment_name]
         training_mode = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
         if training_mode == "warm_start_curriculum":

@@ -14,6 +14,16 @@ python3 -m py_compile \
   scripts/step15_slice_level_audit.py \
   scripts/step12_statistical_robustness_audit.py
 python3 -m unittest tests/test_step15_weighted_mixup.py -v
+python3 scripts/step15_train_incremental_hard_negative.py \
+  --policy schema/step15_evidence_type_policy.json \
+  --experiment "$NON_DOMAIN_EXPERIMENT" \
+  --experiment "$DOMAIN_EXPERIMENT" \
+  --phase phase3_add_contact_url_noise \
+  --phase phase4_add_positive_pair_mixup \
+  --seed 20260320 \
+  --seed 20260321 \
+  --seed 20260322 \
+  --validate-config-only
 
 echo "[2/7] Rebuild Step15 evidence-type labels from the active frozen boundary"
 python3 scripts/step15_build_evidence_type_labels.py \
