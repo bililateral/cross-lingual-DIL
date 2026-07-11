@@ -16,7 +16,8 @@ Updated: 2026-07-11
 - every synthetic row records both parent `pair_uid` values, domains, evidence types, parent weights, interpolation coefficient, and inherited weight in a per-run manifest;
 - domain-balanced v5r computes class, evidence-type, and row-quality weights first, then equalizes effective mass across only `en_content_train_pool` and `zh_target_strict`; unknown pseudo-domains such as `cross_domain_mixup` are rejected;
 - Step 12 now has isolated v5r Phase3-vs-Phase4, v5r-vs-v5, raw-E5, and domain-vs-non-domain paired comparisons with new `20260711` output paths;
-- three focused unit tests pass: same-domain/evidence parent enforcement and discrete-feature preservation, inherited parent weight, effective domain-mass equality, and pseudo-domain rejection;
+- four focused unit tests pass: same-domain/evidence parent enforcement and discrete-feature preservation, inherited parent weight, effective domain-mass equality, pseudo-domain rejection, and legacy-domain replay compatibility;
+- `scripts/step15_validate_v5r_outputs.py` adds a post-training fail-fast check over all six Phase-4 artifacts/manifests before Step 12 runs;
 - no Windows model experiment was run. The next evidence must come from the Linux three-seed rerun.
 
 Interpretation rule before Linux results return:

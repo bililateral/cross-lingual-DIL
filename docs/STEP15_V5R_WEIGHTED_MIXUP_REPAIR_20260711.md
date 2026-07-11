@@ -114,6 +114,7 @@ zh_target_strict
 
 ```text
 reports/step15_v5r_weighted_mixup_summary.json
+reports/step15_v5r_output_contract_validation.json
 reports/step15_v5r_weighted_mixup_slice_level_audit.json
 reports/step15_v5r_weighted_mixup_slice_level_audit.csv
 reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json
@@ -139,3 +140,5 @@ reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_2026
 ## 6. 当前状态
 
 实现、policy、独立输出命名、Step 12 配对比较和单元测试已完成。三个本地单元测试全部通过；Windows 未运行模型实验。当前状态是等待 Linux 三 seed 重跑并同步结果。
+
+Linux runner 会在统计审计前调用 `scripts/step15_validate_v5r_outputs.py`。该验证器逐一检查 6 个 Phase-4 run 的 artifact 和 parent manifest；一旦发现跨域/跨证据父样本、错误继承权重、manifest 行数不一致或两域有效质量不相等，流水线立即失败，不继续生成 Step 12 结论。
