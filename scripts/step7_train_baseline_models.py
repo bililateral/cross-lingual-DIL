@@ -22,6 +22,7 @@ PAIR_FEATURE_PATHS = {
     "zh_target_strict": ROOT / "reports" / "step7_pair_features.zh_target_strict.csv",
 }
 EPS = 1e-9
+METRIC_SEMANTICS_VERSION = "2026-07-v2-tie-aware"
 
 
 def require_lightgbm():
@@ -308,15 +309,58 @@ def roc_auc_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
 
 
 def average_precision_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
+    """Order-invariant AP evaluated at complete, equal-score threshold groups."""
     positives = int(y_true.sum())
     if positives == 0:
         return None
     order = np.argsort(-y_score, kind="mergesort")
+    scores_sorted = y_score[order]
     y_sorted = y_true[order]
-    tp = np.cumsum(y_sorted == 1.0)
-    fp = np.cumsum(y_sorted == 0.0)
-    precision = tp / np.maximum(tp + fp, 1.0)
-    return float(np.sum(precision[y_sorted == 1.0]) / positives)
+    tp = 0
+    fp = 0
+    previous_recall = 0.0
+    average_precision = 0.0
+    start = 0
+    while start < len(y_sorted):
+        end = start + 1
+        while end < len(y_sorted) and scores_sorted[end] == scores_sorted[start]:
+            end += 1
+        group = y_sorted[start:end]
+        tp += int(np.sum(group == 1.0))
+        fp += int(np.sum(group == 0.0))
+        recall = tp / positives
+        precision = tp / max(tp + fp, 1)
+        average_precision += (recall - previous_recall) * precision
+        previous_recall = recall
+        start = end
+    return float(average_precision)
+
+
+def precision_recall_auc_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
+    """Trapezoidal area under the tie-grouped precision-recall curve."""
+    positives = int(y_true.sum())
+    if positives == 0:
+        return None
+    order = np.argsort(-y_score, kind="mergesort")
+    scores_sorted = y_score[order]
+    y_sorted = y_true[order]
+    recalls = [0.0]
+    precisions = [1.0]
+    tp = 0
+    fp = 0
+    start = 0
+    while start < len(y_sorted):
+        end = start + 1
+        while end < len(y_sorted) and scores_sorted[end] == scores_sorted[start]:
+            end += 1
+        group = y_sorted[start:end]
+        tp += int(np.sum(group == 1.0))
+        fp += int(np.sum(group == 0.0))
+        recalls.append(tp / positives)
+        precisions.append(tp / max(tp + fp, 1))
+        start = end
+    integrate = getattr(np, "trapezoid", np.trapz)
+    return float(integrate(np.asarray(precisions, dtype=float), np.asarray(recalls, dtype=float)))
 
 
 def mean_reciprocal_rank_score(y_true: np.ndarray, y_score: np.ndarray) -> float | None:
@@ -366,17 +410,20 @@ def evaluate_probabilities(y_true: np.ndarray, y_prob: np.ndarray, threshold: fl
     accuracy = (counts["tp"] + counts["tn"]) / max(len(y_true), 1)
     roc_auc = roc_auc_score(y_true, y_prob)
     average_precision = average_precision_score(y_true, y_prob)
-    mean_reciprocal_rank = mean_reciprocal_rank_score(y_true, y_prob)
+    pr_auc = precision_recall_auc_score(y_true, y_prob)
     return {
+        "metric_semantics_version": METRIC_SEMANTICS_VERSION,
         "row_count": int(len(y_true)),
         "positive_count": int(y_true.sum()),
         "negative_count": int(len(y_true) - y_true.sum()),
         "logloss": round(binary_logloss(y_true, y_prob), 6),
         "roc_auc": None if roc_auc is None else round(roc_auc, 6),
         "average_precision": None if average_precision is None else round(average_precision, 6),
-        "pr_auc": None if average_precision is None else round(average_precision, 6),
-        "map": None if average_precision is None else round(average_precision, 6),
-        "mrr": None if mean_reciprocal_rank is None else round(mean_reciprocal_rank, 6),
+        "pr_auc": None if pr_auc is None else round(pr_auc, 6),
+        "pr_auc_definition": "trapezoidal_area_under_tie_grouped_precision_recall_curve",
+        "map": None,
+        "mrr": None,
+        "map_mrr_status": "not_applicable_without_preregistered_query_groups",
         "ranking_scope": "global_pair_ranking",
         "threshold": round(float(threshold), 6),
         "accuracy": round(float(accuracy), 6),

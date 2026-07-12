@@ -359,6 +359,20 @@ def build_pair_rows(
             "shared_low_df_sentence_count": shared_low_df_sentence_count,
             "shared_rare_ngram_count": shared_rare_ngram_count,
             "candidate_rule_count_raw": to_int(row["candidate_rule_count"]),
+            "candidate_rule_count_non_identifier": to_int(
+                row.get("candidate_rule_count_non_identifier", "")
+            )
+            if str(row.get("candidate_rule_count_non_identifier", "")).strip()
+            else sum(
+                1
+                for rule_name in str(row.get("candidate_rule_hits", "")).split("|")
+                if rule_name
+                not in {
+                    "shared_contact_exact",
+                    "shared_pgp_fingerprint",
+                    "shared_pgp_fingerprint_via_aux_alias",
+                }
+            ),
             "sparse_lexical_similarity_raw": round(to_float(row["lexical_similarity"]) or 0.0, 6),
             "structural_support_score_raw": round(to_float(row["structural_support_score"]) or 0.0, 6),
             "left_market_profile_size": len(groups.get((left["data_bucket"], left["source_market_raw"]), {}).get("item_count", [])),

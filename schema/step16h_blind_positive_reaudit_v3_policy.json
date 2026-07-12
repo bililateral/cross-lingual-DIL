@@ -1,0 +1,56 @@
+{
+  "version": "2026-07-12-step16h-evidence-complete-blind-review-v3",
+  "objective": "Evidence-complete, label-concealed and score-blind sensitivity review of all 80 current Chinese valid/test positive candidates mixed with 80 frozen negative controls. Reviewers receive raw Step4 pair evidence, raw per-side Step3 contact occurrences, and independently reconstructed contact-component candidate paths, but no prior label, tier, parser eligibility flag, model score, graph membership, or review conclusion.",
+  "inputs": {
+    "positive_reaudit": "reports/step16f_valid_test_positive_reaudit.csv",
+    "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "step3_item_signals": "reports/step3_item_identity_signals.zh_target_strict.csv"
+  },
+  "expected_positive_candidate_count": 80,
+  "negative_control_count": 80,
+  "expected_row_count": 160,
+  "negative_control_selection": {
+    "eligible_splits": ["valid", "test"],
+    "required_usable_for_supervision": true,
+    "required_usable_for_core_transfer": true,
+    "selection_seed": "step16h-negative-controls-20260712",
+    "split_targets": {"valid": 30, "test": 50}
+  },
+  "reviewers": ["reviewer_a", "reviewer_b"],
+  "review_key_field": "blind_id",
+  "blind_id_seed": "step16h-v3-opaque-review-key-20260712",
+  "reviewer_execution_type": "independent_ai_subagents_requested_by_user_not_human_annotators",
+  "component_candidate_path": {
+    "source": "Step3 direct_identity_eligible token graph, exposed only as raw token/path candidates",
+    "max_token_sellers": 5,
+    "max_hops": 3,
+    "scientific_role": "candidate evidence only; every occurrence context must be independently checked"
+  },
+  "allowed_decisions": [
+    "strict_same_controller",
+    "soft_same_controller",
+    "different_controller",
+    "uncertain"
+  ],
+  "strict_positive_requirement": "Shared seller-facing direct identifier visible in raw occurrences, or an independently closed component path whose every seller-facing token occurrence is visible and credible. Template, topic, product/victim data, public URL, and marketplace-support overlap are insufficient.",
+  "soft_positive_requirement": "Strong structural/style/clone support without sufficient direct identity proof; sensitivity analysis only and never strict gold.",
+  "hard_rules": [
+    "Reviewers must not inspect Step7, Step9, Step15, Step17, or Step11 scores or predictions.",
+    "Reviewers must not see pair_uid, previous review_label, evidence_type, paper_evidence_tier, parser seller_facing/direct_identity eligibility flags, or old review notes.",
+    "Raw occurrence source_field/raw_value/context/title/description snippets may be shown because they are evidence, not prior conclusions.",
+    "The concealed blind-id mapping must not be provided to reviewers or the adjudicator.",
+    "Every disagreement requires a separate adjudication decision with written evidence rationale.",
+    "The aggregation script never modifies Step5 or Step16F and v3 cannot be used to retune Step15-v6."
+  ],
+  "outputs": {
+    "manifest": "reports/step16h_blind_review/v3/manifest.json",
+    "blind_mapping": "reports/step16h_blind_review/v3/blind_mapping.csv",
+    "reviewer_a_queue": "reports/step16h_blind_review/v3/reviewer_a_queue.csv",
+    "reviewer_b_queue": "reports/step16h_blind_review/v3/reviewer_b_queue.csv",
+    "agreement_summary": "reports/step16h_blind_review/v3/agreement_summary.json",
+    "adjudication_queue": "reports/step16h_blind_review/v3/adjudication_queue.csv",
+    "final_pair_decisions": "reports/step16h_blind_review/v3/final_pair_decisions.csv",
+    "completion_manifest": "reports/step16h_blind_review/v3/completion_manifest.json"
+  }
+}

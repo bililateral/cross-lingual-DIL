@@ -1,0 +1,95 @@
+{
+  "step": "step16g_hard_negative_imbalance",
+  "policy": "schema\\step16g_hard_negative_imbalance_policy.json",
+  "policy_version": "2026-07-10-step16g-hard-negative-imbalance-v1",
+  "dry_run": false,
+  "input_hashes": {
+    "frozen_labels_sha256": "e5b11a2966418c332a029e72e73e542d92b7baaa1f6624973a7396067f3af4c2",
+    "candidate_pairs_sha256": "bafcdf0a24f4e19832858972898534ead2da05d89ec6d3f94b8cca18d0c385b8",
+    "pair_features_sha256": "5894bbc8a6e7f443f720e2da4cab94257273e961243de8b7aa9005dd42e7815f"
+  },
+  "split_counts_before": {
+    "audit_only": {
+      "positive": 6
+    },
+    "test": {
+      "positive": 50,
+      "negative": 150
+    },
+    "train": {
+      "positive": 229,
+      "negative": 229
+    },
+    "valid": {
+      "positive": 30,
+      "negative": 90
+    }
+  },
+  "split_counts_after": {
+    "audit_only": {
+      "positive": 6
+    },
+    "test": {
+      "positive": 50,
+      "negative": 150
+    },
+    "train": {
+      "positive": 229,
+      "negative": 344
+    },
+    "valid": {
+      "positive": 30,
+      "negative": 90
+    }
+  },
+  "target_negative_to_positive_ratio": 1.5,
+  "desired_train_negative_count": 344,
+  "target_additional_negative_train_rows": 115,
+  "candidate_count": 126,
+  "selected_total_silver_count": 115,
+  "selected_label_tier_counts": {
+    "silver_semantic_low_structure_negative_imbalance": 83,
+    "silver_ordinary_negative_imbalance": 32
+  },
+  "selected_existing_uncertain_count": 0,
+  "candidate_rejection_counts": {
+    "already_supervised": 778,
+    "evaluation_seller_overlap": 805,
+    "existing_uncertain": 360,
+    "negative_rule_not_met": 1763,
+    "positive_like": 15,
+    "known_positive_component_conflict": 4,
+    "scope": 6
+  },
+  "safety_checks": {
+    "valid_test_rows_byte_equivalent": true,
+    "selected_pair_feature_coverage": true,
+    "selected_eval_seller_overlap_count": 0,
+    "selected_known_positive_component_conflict_count": 0,
+    "existing_positive_or_negative_converted_count": 0,
+    "seller_overlap_counts_after": {
+      "train__valid": 0,
+      "train__test": 0,
+      "valid__test": 0
+    },
+    "maximum_selected_pairs_per_seller": 2,
+    "target_negative_count_reached": true
+  },
+  "scientific_scope": {
+    "training_only_weak_supervision": true,
+    "benchmark_eligible": false,
+    "validation_test_unchanged": true,
+    "purpose": "hard_negative_training_support_and_positive_pair_mixup_factorial_control",
+    "not_a_claim_of_gold_negative_truth": true
+  },
+  "outputs": {
+    "candidate_audit_csv": "reports\\step16g_hard_negative_imbalance_candidates.csv",
+    "applied_training_pairs_csv": "reports\\step16g_hard_negative_imbalance_training_pairs.csv",
+    "expanded_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "summary_json": "reports\\step16g_hard_negative_imbalance_summary.json",
+    "backup_frozen_labels": "reports\\step5_zh_target_strict_frozen_silver_labels.pre_step16g_hard_negative_imbalance_20260710.csv"
+  },
+  "output_hashes": {
+    "expanded_frozen_labels_sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee"
+  }
+}

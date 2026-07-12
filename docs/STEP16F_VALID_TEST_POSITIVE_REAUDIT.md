@@ -84,5 +84,5 @@ Rows in `secondary_or_sensitivity_only` should be used for sensitivity analysis 
 
 ## Outputs
 
-- CSV: `reports\step16f_valid_test_positive_reaudit.csv`
-- JSON summary: `reports\step16f_valid_test_positive_reaudit_summary.json`
+- CSV: `reports/step16f_valid_test_positive_reaudit.csv`
+- JSON summary: `reports/step16f_valid_test_positive_reaudit_summary.json`

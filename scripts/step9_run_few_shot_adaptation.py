@@ -64,7 +64,40 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Disable English source-train rows and run pure target-only few-shot adaptation.",
     )
+    parser.add_argument(
+        "--output-root",
+        help=(
+            "Optional isolated directory for every Step9 artifact and summary. Templates keep "
+            "their canonical basenames but never overwrite reports/ canonical outputs."
+        ),
+    )
+    parser.add_argument(
+        "--en-pair-features",
+        help="Optional isolated English pair-feature CSV; must be supplied with --zh-pair-features.",
+    )
+    parser.add_argument(
+        "--zh-pair-features",
+        help="Optional isolated Chinese pair-feature CSV; must be supplied with --en-pair-features.",
+    )
     return parser.parse_args()
+
+
+def redirect_output_templates(step9_policy: dict, output_root: str | None) -> None:
+    if not output_root:
+        return
+    root = Path(output_root)
+    if root.is_absolute():
+        try:
+            root = root.relative_to(ROOT)
+        except ValueError as exc:
+            raise ValueError("Step9 isolated output root must remain inside the project") from exc
+    if any(part == ".." for part in root.parts):
+        raise ValueError("Step9 isolated output root must remain inside the project")
+    rewritten = {}
+    for key, template in step9_policy["output_templates"].items():
+        rewritten[key] = str(root / Path(str(template)).name).replace("\\", "/")
+    step9_policy["output_templates"] = rewritten
+    step9_policy["runtime_output_root"] = str(root).replace("\\", "/")
 
 
 def output_path(template: str, experiment_name: str, ratio_token: str, seed: int) -> Path:
@@ -105,8 +138,10 @@ def context_file_record(path: Path) -> dict:
     }
 
 
-def summary_context_fingerprints(step9_policy: dict) -> dict:
+def summary_context_fingerprints(step9_policy: dict, pair_feature_paths: dict[str, Path]) -> dict:
     context_paths = [
+        Path(__file__).resolve(),
+        Path(step7.__file__).resolve(),
         SCHEMA_PATH,
         STEP7_POLICY_PATH,
         STEP9_POLICY_PATH,
@@ -116,6 +151,8 @@ def summary_context_fingerprints(step9_policy: dict) -> dict:
         if not path.is_absolute():
             path = ROOT / path
         context_paths.append(path)
+    context_paths.extend(pair_feature_paths.values())
+    context_paths = list(dict.fromkeys(path.resolve() for path in context_paths))
 
     records = [context_file_record(path) for path in context_paths]
     combined = hashlib.sha256()
@@ -264,6 +301,7 @@ def synthetic_train_fieldnames() -> list[str]:
         "source_pair_uid_left",
         "source_pair_uid_right",
         "lambda",
+        "training_sample_weight",
         "source_review_stratum_left",
         "source_review_stratum_right",
         "source_seller_raw_left",
@@ -969,6 +1007,7 @@ def positive_mixup_enabled(experiment_cfg: dict) -> bool:
 def positive_mixup_source_rows(rows: list[dict], cfg: dict) -> list[dict]:
     excluded_scopes = {str(value) for value in cfg.get("exclude_candidate_scopes", []) or []}
     excluded_splits = {str(value) for value in cfg.get("exclude_split_names", []) or []}
+    minimum_source_weight = float(cfg.get("minimum_source_training_sample_weight", 0.0) or 0.0)
     selected = []
     for row in rows:
         if row.get("review_label") != "positive":
@@ -984,6 +1023,8 @@ def positive_mixup_source_rows(rows: list[dict], cfg: dict) -> list[dict]:
         if str(row.get("candidate_scope", "") or "") in excluded_scopes:
             continue
         if str(row.get("split_name", "") or "") in excluded_splits:
+            continue
+        if step7.row_training_sample_weight(row) + 1e-12 < minimum_source_weight:
             continue
         selected.append(row)
     return selected
@@ -1092,6 +1133,10 @@ def build_positive_pair_mixup_augmentation(
 
     synthetic_features = np.empty((synthetic_count, len(feature_names)), dtype=float)
     synthetic_rows: list[dict] = []
+    synthetic_weights: list[float] = []
+    synthetic_weight_mode = str(cfg.get("synthetic_weight_mode", "minimum_parent_weight"))
+    if synthetic_weight_mode != "minimum_parent_weight":
+        raise ValueError(f"Unsupported positive-pair mixup synthetic_weight_mode: {synthetic_weight_mode}")
     for synthetic_idx in range(synthetic_count):
         left_idx = int(rng.integers(0, len(source_positive_rows)))
         neighbor_candidates = neighbor_lists[left_idx] or [
@@ -1104,6 +1149,11 @@ def build_positive_pair_mixup_augmentation(
         )
         left_row = source_positive_rows[left_idx]
         right_row = source_positive_rows[right_idx]
+        synthetic_weight = min(
+            step7.row_training_sample_weight(left_row),
+            step7.row_training_sample_weight(right_row),
+        )
+        synthetic_weights.append(float(synthetic_weight))
         synthetic_rows.append(
             {
                 "synthetic_pair_uid": f"synthetic_train_only::{experiment_name}::{run_key}::{synthetic_idx + 1:05d}",
@@ -1113,6 +1163,7 @@ def build_positive_pair_mixup_augmentation(
                 "source_pair_uid_left": left_row["pair_uid"],
                 "source_pair_uid_right": right_row["pair_uid"],
                 "lambda": round(float(lambda_value), 6),
+                "training_sample_weight": round(float(synthetic_weight), 6),
                 "source_review_stratum_left": left_row.get("review_stratum", ""),
                 "source_review_stratum_right": right_row.get("review_stratum", ""),
                 "source_seller_raw_left": left_row.get("source_seller_raw_left", ""),
@@ -1131,6 +1182,15 @@ def build_positive_pair_mixup_augmentation(
             "lambda_min": round(float(lambda_min), 6),
             "lambda_max": round(float(lambda_max), 6),
             "nearest_neighbor_k": int(cfg.get("nearest_neighbor_k", 5) or 5),
+            "minimum_source_training_sample_weight": round(
+                float(cfg.get("minimum_source_training_sample_weight", 0.0) or 0.0), 6
+            ),
+            "synthetic_weight_mode": synthetic_weight_mode,
+            "synthetic_weight_stats": {
+                "min": round(float(np.min(synthetic_weights)), 6),
+                "mean": round(float(np.mean(synthetic_weights)), 6),
+                "max": round(float(np.max(synthetic_weights)), 6),
+            },
             "exclusion_policy": {
                 "require_usable_for_core_transfer": bool(cfg.get("require_usable_for_core_transfer", True)),
                 "require_core_transfer_eligible": bool(cfg.get("require_core_transfer_eligible", True)),
@@ -1443,6 +1503,18 @@ def main() -> None:
     schema = step7.load_json(SCHEMA_PATH)
     step7_policy = step7.load_json(STEP7_POLICY_PATH)
     step9_policy = step7.load_json(STEP9_POLICY_PATH)
+    redirect_output_templates(step9_policy, args.output_root)
+    if bool(args.en_pair_features) != bool(args.zh_pair_features):
+        raise SystemExit("Step9 isolated feature inputs require both --en-pair-features and --zh-pair-features")
+    pair_feature_paths = dict(PAIR_FEATURE_PATHS)
+    if args.en_pair_features:
+        pair_feature_paths = {
+            "en_content_train_pool": resolve_policy_path(args.en_pair_features, PAIR_FEATURE_PATHS["en_content_train_pool"]),
+            "zh_target_strict": resolve_policy_path(args.zh_pair_features, PAIR_FEATURE_PATHS["zh_target_strict"]),
+        }
+    for pool_name, path in pair_feature_paths.items():
+        if not path.exists():
+            raise FileNotFoundError(f"Step9 pair feature input is missing for {pool_name}: {path}")
     policy_step7_summary = step9_policy.get("baseline_reference", {}).get("step7_summary")
     preferred_step7_summary_path = resolve_policy_path(
         policy_step7_summary,
@@ -1469,11 +1541,11 @@ def main() -> None:
 
     en_rows = step7.join_frozen_with_features(
         step7.load_csv(FROZEN_PATHS["en_content_train_pool"]),
-        step7.load_csv(PAIR_FEATURE_PATHS["en_content_train_pool"]),
+        step7.load_csv(pair_feature_paths["en_content_train_pool"]),
     )
     zh_rows = step7.join_frozen_with_features(
         step7.load_csv(FROZEN_PATHS["zh_target_strict"]),
-        step7.load_csv(PAIR_FEATURE_PATHS["zh_target_strict"]),
+        step7.load_csv(pair_feature_paths["zh_target_strict"]),
     )
 
     source_train_rows = step7.select_rows(en_rows, step9_policy["sampling"]["source_train_split"], require_core_transfer=True)
@@ -1508,13 +1580,18 @@ def main() -> None:
         "schema_path": str(SCHEMA_PATH.relative_to(ROOT)),
         "step7_policy_path": str(STEP7_POLICY_PATH.relative_to(ROOT)),
         "step9_policy_path": str(STEP9_POLICY_PATH.relative_to(ROOT)),
+        "runtime_output_root": step9_policy.get("runtime_output_root"),
         "step7_summary_path": str(preferred_step7_summary_path.relative_to(ROOT)),
         "step7_summary_resolution_mode": (
             "explicit_policy_path" if policy_step7_summary else "top_level_or_archive_fallback"
         ),
         "step7_summary_search_paths": [str(path.relative_to(ROOT)) for path, _payload in step7_summary_records],
         "input_dependencies": step9_policy["input_dependencies"],
-        "summary_context_fingerprints": summary_context_fingerprints(step9_policy),
+        "runtime_pair_feature_paths": {
+            pool_name: str(path.relative_to(ROOT)).replace("\\", "/")
+            for pool_name, path in pair_feature_paths.items()
+        },
+        "summary_context_fingerprints": summary_context_fingerprints(step9_policy, pair_feature_paths),
         "selected_experiments": selected_experiments,
         "selected_ratios": selected_ratios,
         "selected_seeds": selected_seeds,
@@ -1745,11 +1822,27 @@ def main() -> None:
                                 run_key,
                             )
                         )
+                        required_mixup_ratios = [
+                            float(value)
+                            for value in (
+                                experiment_cfg.get("positive_pair_mixup", {}).get(
+                                    "require_nonzero_synthetic_for_ratios", []
+                                )
+                                or []
+                            )
+                        ]
+                        if any(abs(float(ratio) - required) <= 1e-12 for required in required_mixup_ratios):
+                            synthetic_count = int(positive_pair_mixup.get("synthetic_row_count", 0))
+                            if synthetic_count <= 0:
+                                raise ValueError(
+                                    f"{experiment_name}.{run_key} requires non-zero positive-pair mixup, "
+                                    f"but augmentation was skipped: {positive_pair_mixup.get('skipped_reason')}"
+                                )
                         if len(y_synthetic) > 0:
                             x_train = np.vstack([x_train, x_synthetic])
                             y_train = np.concatenate([y_train, y_synthetic])
                             train_weight_multipliers = np.concatenate(
-                                [train_weight_multipliers, np.ones(len(y_synthetic), dtype=float)]
+                                [train_weight_multipliers, row_sample_weight_multipliers(synthetic_train_rows)]
                             )
                     scorer_artifact, train_prob = fit_regularized_logistic(
                         x_train,

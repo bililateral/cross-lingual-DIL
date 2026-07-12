@@ -1,5 +1,5 @@
 {
-  "schema_path": "schema\\step5_freeze_policy.json",
+  "schema_path": "schema/step5_freeze_policy.json",
   "input_dependencies": [
     "reports/step5_en_balanced_review_queue.csv",
     "reports/step5_zh_target_strict_balanced_review_queue.csv",
@@ -10,11 +10,11 @@
   ],
   "output_files": {
     "frozen_labels": {
-      "en_content_train_pool": "reports\\step5_en_frozen_silver_labels.csv",
-      "zh_target_strict": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
-      "zh_target_aux": "reports\\step5_zh_target_aux_frozen_silver_labels.csv"
+      "en_content_train_pool": "reports/step5_en_frozen_silver_labels.csv",
+      "zh_target_strict": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+      "zh_target_aux": "reports/step5_zh_target_aux_frozen_silver_labels.csv"
     },
-    "summary": "reports\\step5_frozen_silver_summary.json"
+    "summary": "reports/step5_frozen_silver_summary.json"
   },
   "pool_summaries": {
     "en_content_train_pool": {
@@ -335,11 +335,11 @@
       ]
     },
     "zh_target_strict": {
-      "reviewed_row_count": 1144,
-      "supervision_row_count": 778,
+      "reviewed_row_count": 1259,
+      "supervision_row_count": 893,
       "label_counts": {
         "positive": 315,
-        "negative": 469,
+        "negative": 584,
         "uncertain": 360
       },
       "review_stratum_counts": {
@@ -355,7 +355,9 @@
         "silver_rank_structural_relaxed": 30,
         "silver_template_noise_negative_relaxed": 38,
         "silver_high_similarity_relaxed": 2,
-        "silver_semantic_low_structure_negative_relaxed": 5
+        "silver_semantic_low_structure_negative_relaxed": 5,
+        "silver_semantic_low_structure_negative_imbalance": 83,
+        "silver_ordinary_negative_imbalance": 32
       },
       "supervision_review_stratum_counts": {
         "identifier_plus_text": 12,
@@ -370,15 +372,17 @@
         "silver_rank_structural_relaxed": 30,
         "silver_template_noise_negative_relaxed": 38,
         "silver_high_similarity_relaxed": 2,
-        "silver_semantic_low_structure_negative_relaxed": 5
+        "silver_semantic_low_structure_negative_relaxed": 5,
+        "silver_semantic_low_structure_negative_imbalance": 83,
+        "silver_ordinary_negative_imbalance": 32
       },
       "split_counts": {
-        "train": 458,
+        "train": 573,
         "valid": 120,
         "test": 200
       },
       "split_seller_counts": {
-        "train": 522,
+        "train": 676,
         "valid": 127,
         "test": 312
       },
@@ -395,7 +399,7 @@
       "split_label_counts": {
         "train": {
           "positive": 229,
-          "negative": 229
+          "negative": 344
         },
         "valid": {
           "positive": 30,
@@ -408,6 +412,15 @@
       },
       "split_label_stratum_counts": {
         "train": {
+          "negative": {
+            "semantic_structural": 76,
+            "semantic_only": 85,
+            "text_clone_primary": 25,
+            "silver_template_noise_negative_relaxed": 38,
+            "silver_semantic_low_structure_negative_relaxed": 5,
+            "silver_semantic_low_structure_negative_imbalance": 83,
+            "silver_ordinary_negative_imbalance": 32
+          },
           "positive": {
             "identifier_plus_text": 1,
             "silver_template_structural": 85,
@@ -418,48 +431,41 @@
             "silver_component_closure": 29,
             "silver_rank_structural_relaxed": 30,
             "silver_high_similarity_relaxed": 2
-          },
-          "negative": {
-            "semantic_structural": 76,
-            "semantic_only": 85,
-            "text_clone_primary": 25,
-            "silver_template_noise_negative_relaxed": 38,
-            "silver_semantic_low_structure_negative_relaxed": 5
           }
         },
         "valid": {
+          "negative": {
+            "semantic_only": 38,
+            "identifier_primary": 3,
+            "semantic_structural": 26,
+            "text_clone_primary": 23
+          },
           "positive": {
             "identifier_primary": 2,
             "text_clone_primary": 10,
             "identifier_plus_text": 2,
             "semantic_structural": 5,
             "semantic_only": 11
-          },
-          "negative": {
-            "semantic_only": 38,
-            "identifier_primary": 3,
-            "semantic_structural": 26,
-            "text_clone_primary": 23
           }
         },
         "test": {
+          "negative": {
+            "semantic_only": 71,
+            "semantic_structural": 63,
+            "text_clone_primary": 16
+          },
           "positive": {
             "identifier_plus_text": 9,
             "identifier_primary": 12,
             "text_clone_primary": 4,
             "semantic_structural": 12,
             "semantic_only": 13
-          },
-          "negative": {
-            "semantic_only": 71,
-            "semantic_structural": 63,
-            "text_clone_primary": 16
           }
         }
       },
       "positive_supervision_count": 309,
-      "non_identifier_positive_count": 283,
-      "non_identifier_positive_share": 0.915858,
+      "non_identifier_positive_count": 227,
+      "non_identifier_positive_share": 0.734628,
       "soft_same_alias_reviewed_count": 0,
       "status_inferred_from_label_count": 0,
       "top_frozen_rows": [
@@ -497,6 +503,55 @@
           "review_stratum": "silver_template_structural",
           "review_label": "positive",
           "split_name": "train"
+        },
+        {
+          "balanced_review_rank": "6",
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/454497||market_item.xlsx|茶马古道|seller_raw:/shop/454507",
+          "review_stratum": "identifier_plus_text",
+          "review_label": "positive",
+          "split_name": "test"
+        },
+        {
+          "balanced_review_rank": "3859",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:597091||market_item.xlsx|茶马古道|seller_raw:/shop/439316",
+          "review_stratum": "silver_template_structural",
+          "review_label": "positive",
+          "split_name": "train"
+        },
+        {
+          "balanced_review_rank": "8",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:38978||market_item.xlsx|中文暗网交易市场|seller_raw:99610",
+          "review_stratum": "semantic_structural",
+          "review_label": "negative",
+          "split_name": "train"
+        },
+        {
+          "balanced_review_rank": "3870",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:516000||market_item.xlsx|茶马古道|seller_raw:/shop/5524",
+          "review_stratum": "silver_direct_or_contact",
+          "review_label": "positive",
+          "split_name": "train"
+        },
+        {
+          "balanced_review_rank": "10",
+          "pair_uid": "market_item.xlsx|茶马古道|seller_raw:/shop/395618||market_item.xlsx|茶马古道|seller_raw:/shop/9931",
+          "review_stratum": "semantic_only",
+          "review_label": "uncertain",
+          "split_name": "uncertain_holdout"
+        },
+        {
+          "balanced_review_rank": "11",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:564088||market_item.xlsx|茶马古道|seller_raw:/shop/9636",
+          "review_stratum": "identifier_plus_text",
+          "review_label": "positive",
+          "split_name": "test"
+        },
+        {
+          "balanced_review_rank": "12",
+          "pair_uid": "market_item.xlsx|中文暗网交易市场|seller_raw:595944||market_item.xlsx|茶马古道|seller_raw:/shop/439854",
+          "review_stratum": "text_clone_primary",
+          "review_label": "positive",
+          "split_name": "valid"
         }
       ],
       "coverage_requirement_results": [
@@ -509,9 +564,9 @@
           "require_if_pool_available_at_least": 1,
           "pool_available_count": 33,
           "split_counts": {
-            "train": 21,
-            "valid": 5,
-            "test": 7
+            "train": 9,
+            "valid": 11,
+            "test": 13
           },
           "applicable": true,
           "missing_splits": [],
@@ -528,9 +583,9 @@
           "require_if_pool_available_at_least": 3,
           "pool_available_count": 33,
           "split_counts": {
-            "train": 21,
-            "valid": 5,
-            "test": 7
+            "train": 9,
+            "valid": 11,
+            "test": 13
           },
           "applicable": true,
           "missing_splits": [],
@@ -547,9 +602,9 @@
           "require_if_pool_available_at_least": 3,
           "pool_available_count": 33,
           "split_counts": {
-            "train": 21,
-            "valid": 5,
-            "test": 7
+            "train": 9,
+            "valid": 11,
+            "test": 13
           },
           "applicable": true,
           "missing_splits": [],
@@ -607,9 +662,9 @@
     "all_supervision_rows_have_split_name": true,
     "no_seller_overlap_across_supervision_splits": true,
     "no_normalized_alias_overlap_across_supervision_splits": true,
-    "global_positive_supervision_count": 305,
-    "global_non_identifier_positive_count": 131,
-    "global_non_identifier_positive_share": 0.429508,
+    "global_positive_supervision_count": 518,
+    "global_non_identifier_positive_count": 288,
+    "global_non_identifier_positive_share": 0.555985,
     "non_identifier_positive_share_pass": true,
     "coverage_requirement_warning_count": 0,
     "coverage_requirement_error_count": 0,
@@ -645,5 +700,15 @@
       "valid__test": 0
     },
     "interpretation": "Silver rows expand training positives only and are not gold benchmark labels."
+  },
+  "summary_refresh": {
+    "boundary_id": "step16g_hard_negative_imbalance_20260710",
+    "reason": "Step16G train-only hard-negative expansion; valid/test unchanged",
+    "frozen_labels_modified": false,
+    "frozen_label_sha256": {
+      "en_content_train_pool": "97d2985956e463e89df23acf5c854facc3cb8f61eb0365618a5c9db478a230dd",
+      "zh_target_strict": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee",
+      "zh_target_aux": "9f4c0e926a7bf1867295629cbb8a5d39c1cbb7596b55b291582f9c3dcd28e751"
+    }
   }
 }

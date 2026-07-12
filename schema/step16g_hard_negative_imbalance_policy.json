@@ -1,0 +1,66 @@
+{
+  "version": "2026-07-10-step16g-hard-negative-imbalance-v1",
+  "objective": "Add seller-diverse, low-weight, train-only Chinese hard negatives so positive-pair mixup is a real minority-regularization experiment while keeping the component-safe validation/test benchmark unchanged.",
+  "metadata": {
+    "reviewer_id": "step16g_hard_negative_imbalance_20260710",
+    "source_scope": "existing_zh_target_strict_step4_candidates_only",
+    "label_status": "weak_supervision_train_only_not_gold"
+  },
+  "inputs": {
+    "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "candidate_pairs": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "pair_features": "reports/step7_pair_features.zh_target_strict.csv"
+  },
+  "outputs": {
+    "expanded_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "backup_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.pre_step16g_hard_negative_imbalance_20260710.csv",
+    "candidate_audit_csv": "reports/step16g_hard_negative_imbalance_candidates.csv",
+    "applied_training_pairs_csv": "reports/step16g_hard_negative_imbalance_training_pairs.csv",
+    "summary_json": "reports/step16g_hard_negative_imbalance_summary.json"
+  },
+  "selection": {
+    "target_negative_to_positive_ratio": 1.5,
+    "max_additional_negative_train_rows": 115,
+    "max_selected_pairs_per_seller": 2,
+    "exclude_existing_uncertain": true,
+    "candidate_scope": "sockpuppet_primary",
+    "candidate_language": "zh",
+    "negative_rules": {
+      "ordinary_low_overlap": {
+        "max_lexical_similarity": 0.5,
+        "max_structural_support_score": 0.28,
+        "training_sample_weight": 0.15
+      },
+      "semantic_low_structure": {
+        "max_shared_text_overlap": 1,
+        "max_lexical_similarity": 0.65,
+        "max_structural_support_score": 0.32,
+        "training_sample_weight": 0.12
+      }
+    },
+    "positive_like_exclusion": {
+      "high_similarity_min_lexical_similarity": 0.78,
+      "high_similarity_min_structural_support_score": 0.2,
+      "template_min_shared_title_count": 1,
+      "template_min_shared_description_count": 1,
+      "template_min_lexical_similarity": 0.28,
+      "template_min_structural_support_score": 0.2,
+      "rank_min_candidate_rank_score": 8.0,
+      "rank_min_lexical_similarity": 0.28,
+      "rank_min_structural_support_score": 0.3
+    }
+  },
+  "hard_rules": [
+    "Only existing zh_target_strict Step4 candidate pairs may be selected.",
+    "Every selected pair must already have a Step7 feature row.",
+    "Validation and test labels, rows, sellers, and components must remain unchanged.",
+    "Candidates sharing a seller with validation/test are forbidden.",
+    "Candidates inside any existing positive seller component are forbidden.",
+    "Shared contact or PGP candidates are forbidden from weak-negative expansion.",
+    "Existing positive and negative labels may not be converted.",
+    "Existing uncertain labels may not be converted; Step16G may only add previously unsupervised candidates.",
+    "At most two selected pairs may touch the same seller.",
+    "All additions are low-weight train-only weak supervision with benchmark_eligible=0.",
+    "The resulting imbalance is a training condition, not a change to the fixed evaluation prevalence."
+  ]
+}

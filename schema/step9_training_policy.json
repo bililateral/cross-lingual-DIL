@@ -1,6 +1,6 @@
 {
-  "version": "2026-04-22",
-  "objective": "Step-9 few-shot adaptation policy on zh_target_strict with legacy mixed-LightGBM controls plus frozen Step-7 residual/logistic few-shot experiments across the current clean default, BGE, no-structural clean ablation, semantic-backbone controls, and identifier operational controls; hard-boundary support sampling and AUC/AP-first model selection remain mandatory",
+  "version": "2026-07-10-step16g-mixup-contract",
+  "objective": "Step-9 target-domain support adaptation on zh_target_strict with source-retained controls, hard-boundary sampling, and a confidence-weighted positive-pair mixup ablation that must execute at 100pct support on the Step16G train boundary.",
   "input_dependencies": [
     "schema/step7_transfer_safe_pair_feature_schema.json",
     "schema/step7_training_policy.json",
@@ -252,11 +252,16 @@
           "uncertain_holdout"
         ],
         "minimum_positive_sources": 2,
+        "minimum_source_training_sample_weight": 0.55,
         "nearest_neighbor_k": 5,
         "lambda_min": 0.2,
         "lambda_max": 0.8,
         "target_positive_to_negative_ratio": 1.0,
-        "max_synthetic_per_real_positive": 2.0
+        "max_synthetic_per_real_positive": 2.0,
+        "synthetic_weight_mode": "minimum_parent_weight",
+        "require_nonzero_synthetic_for_ratios": [
+          1.0
+        ]
       }
     },
     "core_few_shot_multilingual_e5_large_plus_gte_reranker_lr_l2": {

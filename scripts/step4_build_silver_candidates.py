@@ -13,6 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "step4_silver_candidate_schema.json"
 STEP2_PGP_PATH = ROOT / "reports" / "step2_aux_pgp_evidence_manifest.csv"
+IDENTIFIER_CANDIDATE_RULES = {
+    "shared_contact_exact",
+    "shared_pgp_fingerprint",
+    "shared_pgp_fingerprint_via_aux_alias",
+}
 PROFILE_PATHS = {
     "en_content_train_pool": ROOT / "reports" / "step3_seller_profiles.en_content_train_pool.jsonl",
     "zh_target_strict": ROOT / "reports" / "step3_seller_profiles.zh_target_strict.jsonl",
@@ -654,6 +659,9 @@ def build_candidates_for_pool(
         ]
 
         rule_hits = sorted(evidence.keys())
+        non_identifier_rule_hits = [
+            rule_name for rule_name in rule_hits if rule_name not in IDENTIFIER_CANDIDATE_RULES
+        ]
         rank_score = 0.0
         rank_score += 6.0 * (1 if shared_contacts else 0)
         rank_score += 5.0 * (1 if shared_descs else 0)
@@ -711,6 +719,7 @@ def build_candidates_for_pool(
                 "pgp_alias_hit_count_right": len(right_profile.pgp_fingerprints),
                 "candidate_rule_hits": "|".join(rule_hits),
                 "candidate_rule_count": len(rule_hits),
+                "candidate_rule_count_non_identifier": len(non_identifier_rule_hits),
                 "candidate_rank_score": round(rank_score, 6),
                 "review_priority": review_priority,
                 "left_preview": left_profile.preview,

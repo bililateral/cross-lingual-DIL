@@ -13,7 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = ROOT / "scripts"
 REPORTS = ROOT / "reports"
-AUDIT_VERSION = "codex_step11_cluster_level_audit_current_manifest"
+AUDIT_VERSION = "step11_cluster_level_audit_v2_hash_closed"
+PUBLICATION_MANIFEST_VERSION = "step11_explicit_summary_manifest_v2_hash_closed"
 DEFAULT_OUTPUT_CSV = REPORTS / "step11_cluster_level_audit.current_manifest.csv"
 DEFAULT_OUTPUT_SUMMARY = REPORTS / "step11_cluster_level_audit.current_manifest.json"
 DEFAULT_STEP5_ZH_LABELS = REPORTS / "step5_zh_target_strict_frozen_silver_labels.csv"
@@ -56,6 +57,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 import step11_cluster_chinese_graph as step11  # noqa: E402
+from immutable_artifact_io import csv_bytes, json_bytes, write_immutable_bundle  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -72,10 +74,17 @@ def parse_args() -> argparse.Namespace:
         action="append",
         type=Path,
         default=[],
-        required=True,
         help=(
             "Explicit Step 11 clustering summary path. Repeat this option to lock the audit "
             "to a reviewed current summary set. Reports-dir globbing is intentionally disabled."
+        ),
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        help=(
+            "Hash-verified explicit Step11 summary manifest. This is the preferred v6 mode; "
+            "do not combine it with --summary."
         ),
     )
     parser.add_argument("--output-csv", type=Path, default=DEFAULT_OUTPUT_CSV)
@@ -89,7 +98,19 @@ def parse_args() -> argparse.Namespace:
             "Step 11 predictions are still treated as candidate discovery surfaces."
         ),
     )
+    parser.add_argument(
+        "--publication-v6",
+        action="store_true",
+        help="Require a publication-v6 explicit manifest; --summary inputs are rejected.",
+    )
     return parser.parse_args()
+
+
+def validate_input_mode(args: argparse.Namespace) -> None:
+    if args.publication_v6 and (args.summary_paths or not args.manifest):
+        raise SystemExit("--publication-v6 accepts --manifest only; --summary is prohibited")
+    if bool(args.manifest) == bool(args.summary_paths):
+        raise SystemExit("Pass exactly one of --manifest or one-or-more --summary paths")
 
 
 def rel(path: Path) -> str:
@@ -104,23 +125,93 @@ def load_json(path: Path) -> dict:
         return json.load(handle)
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def summary_paths_from_manifest(
+    manifest_path: Path,
+    *,
+    require_publication_v6: bool = False,
+    required_graph_mode: str | None = None,
+) -> tuple[list[Path], dict]:
+    manifest = load_json(manifest_path)
+    expected_manifest_sha = str(manifest.get("manifest_sha256", ""))
+    core = {key: value for key, value in manifest.items() if key != "manifest_sha256"}
+    observed_manifest_sha = hashlib.sha256(
+        json.dumps(core, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    if not expected_manifest_sha or observed_manifest_sha != expected_manifest_sha:
+        raise ValueError(f"Step11 manifest self-hash mismatch: {manifest_path}")
+    if manifest.get("selection_mode") != "explicit_allowlist_only":
+        raise ValueError(f"Step11 manifest is not explicit allow-list mode: {manifest_path}")
+    if require_publication_v6 and not bool(manifest.get("publication_v6", False)):
+        raise ValueError(f"Step11 manifest is not publication-v6 mode: {manifest_path}")
+    if require_publication_v6 and manifest.get("manifest_version") != PUBLICATION_MANIFEST_VERSION:
+        raise ValueError(f"Step11 publication manifest format is stale: {manifest_path}")
+    manifest_csv_value = str(manifest.get("manifest_csv_path", "") or "").strip()
+    manifest_csv_sha = str(manifest.get("manifest_csv_sha256", "") or "").strip()
+    if require_publication_v6 and (not manifest_csv_value or not manifest_csv_sha):
+        raise ValueError(f"Step11 publication manifest does not bind its CSV: {manifest_path}")
+    if manifest_csv_value:
+        manifest_csv_path = resolve_input_path(Path(manifest_csv_value)).resolve()
+        if not manifest_csv_path.exists() or sha256_file(manifest_csv_path) != manifest_csv_sha:
+            raise ValueError(f"Step11 manifest CSV hash mismatch: {manifest_csv_path}")
+        manifest_csv_rows = load_csv(manifest_csv_path)
+        if int(manifest.get("manifest_csv_row_count", -1)) != len(manifest_csv_rows):
+            raise ValueError(f"Step11 manifest CSV row count mismatch: {manifest_csv_path}")
+    graph_mode = str(manifest.get("graph_validation_mode", "") or "")
+    if required_graph_mode and graph_mode != required_graph_mode:
+        raise ValueError(
+            f"Step11 manifest graph mode mismatch: expected={required_graph_mode!r} actual={graph_mode!r}"
+        )
+    records = manifest.get("summaries") or []
+    if int(manifest.get("summary_count", -1)) != len(records) or not records:
+        raise ValueError(f"Step11 manifest summary count mismatch: {manifest_path}")
+    paths: list[Path] = []
+    scorer_tokens: list[str] = []
+    for record in records:
+        path = resolve_input_path(Path(str(record["summary_path"]))).resolve()
+        if not path.exists() or sha256_file(path) != record.get("summary_sha256"):
+            raise ValueError(f"Step11 manifest summary hash mismatch: {path}")
+        runtime_policy_path = resolve_input_path(Path(str(record["runtime_policy_path"]))).resolve()
+        if not runtime_policy_path.exists() or sha256_file(runtime_policy_path) != record.get(
+            "runtime_policy_sha256"
+        ):
+            raise ValueError(f"Step11 manifest runtime-policy hash mismatch: {runtime_policy_path}")
+        for output_record in json.loads(record.get("output_file_records_json", "[]")):
+            output_path = resolve_input_path(Path(str(output_record["path"]))).resolve()
+            if not output_path.exists() or sha256_file(output_path) != output_record.get("sha256"):
+                raise ValueError(f"Step11 manifest output hash mismatch: {output_path}")
+        if str(record.get("graph_validation_mode", "")) != graph_mode:
+            raise ValueError(f"Step11 manifest record graph mode mismatch: {path}")
+        summary = load_json(path)
+        scorer_token = str((summary.get("selected_scorer", {}) or {}).get("scorer_token", ""))
+        if not scorer_token or scorer_token != str(record.get("scorer_token", "")):
+            raise ValueError(f"Step11 manifest scorer-token mismatch: {path}")
+        scorer_tokens.append(scorer_token)
+        paths.append(path)
+    if len(paths) != len(set(paths)):
+        raise ValueError(f"Step11 manifest contains duplicate summary paths: {manifest_path}")
+    if len(scorer_tokens) != len(set(scorer_tokens)):
+        raise ValueError(f"Step11 manifest contains duplicate scorer tokens: {manifest_path}")
+    expected_tokens = [str(value) for value in manifest.get("expected_scorer_tokens", []) or []]
+    if require_publication_v6 and (
+        not expected_tokens or set(expected_tokens) != set(scorer_tokens)
+    ):
+        raise ValueError(f"Step11 publication manifest scorer roster is incomplete: {manifest_path}")
+    return paths, manifest
+
+
 def load_csv(path: Path) -> list[dict]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
-
-
-def write_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2)
-
-
-def write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
 
 
 def resolve_path(path_value: str) -> Path:
@@ -349,7 +440,7 @@ def label_counts_text(counter: Counter) -> str:
 
 
 def choose_best_appearance(appearances: list[dict]) -> dict:
-    family_priority = {"step9": 0, "step9_calibration": 1, "step7": 2}
+    family_priority = {"step15": 0, "step9": 1, "step9_calibration": 2, "step7": 3}
     return sorted(
         appearances,
         key=lambda item: (
@@ -434,8 +525,53 @@ def decide_cluster(aggregate: dict) -> tuple[str, str, str, str]:
     )
 
 
-def audit_summary(summary_path: Path, policy: dict, label_index: dict[str, dict]) -> list[dict]:
+def validate_runtime_posthoc_label_binding(
+    summary: dict,
+    policy: dict,
+    label_path: Path,
+) -> None:
+    gate = policy.get("step15_v6_validation_gate", {}) or {}
+    if not gate:
+        return
+    configured = str((policy.get("input_paths", {}) or {}).get("step5_frozen_labels", ""))
+    if not configured:
+        raise ValueError("Step11-v6 runtime policy does not record its Step5 posthoc label path")
+    configured_path = resolve_input_path(Path(configured)).resolve()
+    if configured_path != label_path.resolve():
+        raise ValueError(
+            f"Cluster audit label path differs from Step11 runtime binding: {configured_path}"
+        )
+    expected_hash = str(
+        (gate.get("frozen_input_file_sha256", {}) or {}).get(Path(configured).as_posix(), "")
+    )
+    observed_hash = sha256_file(label_path)
+    if not expected_hash or observed_hash != expected_hash:
+        raise ValueError("Cluster audit Step5 label hash differs from the frozen runtime binding")
+    posthoc = summary.get("posthoc_frozen_label_audit", {}) or {}
+    if str(posthoc.get("sha256", "")) != observed_hash:
+        raise ValueError("Step11 summary posthoc label hash differs from cluster-audit labels")
+    if bool(posthoc.get("used_by_model_features", True)) or bool(
+        posthoc.get("used_by_graph_filter_decisions", True)
+    ):
+        raise ValueError("Step11 summary violates posthoc-only frozen-label use")
+
+
+def audit_summary(
+    summary_path: Path,
+    label_index: dict[str, dict],
+    label_path: Path,
+) -> list[dict]:
     summary = load_json(summary_path)
+    runtime_policy_value = str(summary.get("policy_path", "")).strip()
+    if not runtime_policy_value:
+        raise ValueError(f"Step11 summary does not record policy_path: {summary_path}")
+    runtime_policy_path = resolve_input_path(Path(runtime_policy_value)).resolve()
+    if not runtime_policy_path.exists():
+        raise FileNotFoundError(
+            f"Step11 summary runtime policy is missing: {runtime_policy_path}"
+        )
+    policy = load_json(runtime_policy_path)
+    validate_runtime_posthoc_label_binding(summary, policy, label_path)
     threshold, threshold_token = primary_threshold_token(summary)
     cluster_path = find_primary_cluster_path(summary, threshold_token)
     clusters = read_primary_cluster_members(cluster_path)
@@ -464,6 +600,7 @@ def audit_summary(summary_path: Path, policy: dict, label_index: dict[str, dict]
                 "top_categories": payload["top_categories"],
                 "contact_member_preview_count": payload["contact_member_preview_count"],
                 "summary_path": rel(summary_path),
+                "runtime_policy_path": rel(runtime_policy_path),
                 "cluster_path": rel(cluster_path),
                 "scorer_token": scorer.get("scorer_token", ""),
                 "family": scorer.get("scorer_family", ""),
@@ -478,12 +615,12 @@ def audit_summary(summary_path: Path, policy: dict, label_index: dict[str, dict]
 
 
 def aggregate_audit_rows(cluster_rows: list[dict]) -> list[dict]:
-    grouped: dict[str, list[dict]] = defaultdict(list)
+    grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in cluster_rows:
-        grouped[row["seller_set_id"]].append(row)
+        grouped[(row["scorer_token"], row["seller_set_id"])].append(row)
 
     audit_rows = []
-    for seller_set_key, appearances in sorted(grouped.items()):
+    for (scorer_token, seller_set_key), appearances in sorted(grouped.items()):
         best = choose_best_appearance(appearances)
         aggregate_strata = Counter()
         aggregate_labels = Counter()
@@ -518,7 +655,11 @@ def aggregate_audit_rows(cluster_rows: list[dict]) -> list[dict]:
         audit_rows.append(
             {
                 "audit_version": AUDIT_VERSION,
-                "audit_cluster_set_id": seller_set_key,
+                "comparison_scope": "per_scorer_no_cross_model_max",
+                "audit_cluster_set_id": f"{scorer_token}::{seller_set_key}",
+                "seller_set_id": seller_set_key,
+                "scorer_token": scorer_token,
+                "family": best["family"],
                 "decision": decision,
                 "confidence": confidence,
                 "recommended_action": recommended_action,
@@ -564,19 +705,31 @@ def aggregate_audit_rows(cluster_rows: list[dict]) -> list[dict]:
 
 def main() -> None:
     args = parse_args()
-    policy = load_json(ROOT / "schema" / "step11_clustering_policy.json")
+    validate_input_mode(args)
     label_path = resolve_input_path(args.step5_label_csv)
     label_index = load_step5_label_index(label_path)
-    summary_paths = [resolve_input_path(path).resolve() for path in args.summary_paths]
+    manifest_path = resolve_input_path(args.manifest).resolve() if args.manifest else None
+    manifest = None
+    if manifest_path is not None:
+        summary_paths, manifest = summary_paths_from_manifest(
+            manifest_path,
+            require_publication_v6=args.publication_v6,
+        )
+    else:
+        summary_paths = [resolve_input_path(path).resolve() for path in args.summary_paths]
 
     cluster_rows = []
     for summary_path in summary_paths:
-        cluster_rows.extend(audit_summary(summary_path, policy, label_index))
+        cluster_rows.extend(audit_summary(summary_path, label_index, label_path))
 
     audit_rows = aggregate_audit_rows(cluster_rows)
     fieldnames = [
         "audit_version",
+        "comparison_scope",
         "audit_cluster_set_id",
+        "seller_set_id",
+        "scorer_token",
+        "family",
         "decision",
         "confidence",
         "recommended_action",
@@ -608,33 +761,69 @@ def main() -> None:
         "seller_raw_members",
         "appearances",
     ]
-    write_csv(args.output_csv, audit_rows, fieldnames)
-
     decision_counts = Counter(row["decision"] for row in audit_rows)
     confidence_counts = Counter(row["confidence"] for row in audit_rows)
+    per_scorer_decision_counts: dict[str, dict[str, int]] = {}
+    per_scorer_cluster_counts: Counter = Counter()
+    for row in audit_rows:
+        token = str(row["scorer_token"])
+        per_scorer_cluster_counts[token] += 1
+        per_scorer_decision_counts.setdefault(token, {decision: 0 for decision in DECISION_ORDER})
+        per_scorer_decision_counts[token][str(row["decision"])] += 1
+    unique_seller_sets = {str(row["seller_set_id"]) for row in audit_rows}
+    output_csv_path = resolve_input_path(args.output_csv)
+    output_summary_path = resolve_input_path(args.output_summary)
+    audit_csv_payload = csv_bytes(audit_rows, fieldnames, encoding="utf-8-sig")
     summary_payload = {
         "audit_version": AUDIT_VERSION,
         "generated_at": datetime.now().date().isoformat(),
         "input_summary_count": len(summary_paths),
         "input_summaries": [rel(path) for path in summary_paths],
         "strict_step5_label_csv": rel(label_path),
-        "summary_selection_mode": "explicit",
+        "summary_selection_mode": "explicit_manifest" if manifest_path else "explicit_paths",
+        "publication_v6": bool(args.publication_v6),
+        "input_manifest": rel(manifest_path) if manifest_path else None,
+        "input_manifest_sha256": manifest.get("manifest_sha256") if manifest else None,
+        "input_manifest_file_sha256": sha256_file(manifest_path) if manifest_path else None,
+        "graph_validation_mode": manifest.get("graph_validation_mode") if manifest else None,
         "primary_cluster_count_total": len(cluster_rows),
-        "unique_cluster_set_count": len(audit_rows),
+        "audited_per_scorer_cluster_count": len(audit_rows),
+        "unique_cluster_set_count": len(unique_seller_sets),
+        "decision_count_scope": "per_scorer_cluster_appearances_no_cross_model_max",
         "decision_counts": {decision: decision_counts.get(decision, 0) for decision in DECISION_ORDER},
+        "per_scorer_cluster_counts": dict(sorted(per_scorer_cluster_counts.items())),
+        "per_scorer_decision_counts": dict(sorted(per_scorer_decision_counts.items())),
         "confidence_counts": dict(sorted(confidence_counts.items())),
-        "output_csv": rel(args.output_csv),
+        "output_csv": rel(output_csv_path),
+        "output_csv_sha256": hashlib.sha256(audit_csv_payload).hexdigest(),
+        "output_csv_row_count": len(audit_rows),
         "method_notes": [
-            "Only explicit --summary inputs are audited; reports/ globbing is disabled.",
+            "Only an explicit hash-verified --manifest or explicit --summary inputs are audited; reports/ globbing is disabled.",
             "Only each summary's primary graph threshold and output_paths-referenced files are read.",
             "Retained edges are reconstructed with scripts/step11_cluster_chinese_graph.py graph filters.",
             "Exact seller_uid sets are deduplicated across all current primary Step 11 graph views.",
+            "Decisions are computed independently per scorer. Cross-model maximum appearances are never used to assign a decision or hide scorer differences.",
             "Identifier-like Step 11 features are not sufficient for a same-controller claim.",
             "Same-controller claims are allowed only for retained edges that join to Step 5 frozen positive usable_for_core_transfer labels and expose proof-level seller-facing contact/PGP evidence.",
             "External URL, product/victim-data email, parser-noise contact, negative, uncertain, and unlabeled edges remain review-discovery surfaces.",
         ],
     }
-    write_json(args.output_summary, summary_payload)
+    canonical = json.dumps(
+        summary_payload,
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    summary_payload["audit_sha256"] = hashlib.sha256(canonical).hexdigest()
+    write_immutable_bundle(
+        [
+            (output_csv_path, audit_csv_payload),
+            (
+                output_summary_path,
+                json_bytes(summary_payload, ensure_ascii=False, indent=2),
+            ),
+        ]
+    )
     print(json.dumps(summary_payload, ensure_ascii=False, indent=2))
 
 

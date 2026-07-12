@@ -1,6 +1,6 @@
 {
-  "version": "2026-04-23",
-  "objective": "Step-5 silver-label freeze policy for reviewed sockpuppet candidate pairs, including the Chinese boundary-expansion holdout target",
+  "version": "2026-07-10-step16g-summary-compatibility",
+  "objective": "Step-5 silver-label freeze policy for reviewed sockpuppet candidate pairs, including current train-only silver strata in non-identifier-positive summary accounting.",
   "input_dependencies": [
     "reports/step5_en_balanced_review_queue.csv",
     "reports/step5_zh_target_strict_balanced_review_queue.csv",
@@ -26,7 +26,12 @@
   "non_identifier_positive_strata": [
     "text_clone_primary",
     "semantic_structural",
-    "semantic_only"
+    "semantic_only",
+    "silver_template_structural",
+    "silver_component_closure",
+    "silver_template_structural_relaxed",
+    "silver_rank_structural_relaxed",
+    "silver_high_similarity_relaxed"
   ],
   "training_label_vocab": [
     "positive",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -8,6 +9,8 @@ from pathlib import Path
 import numpy as np
 
 import step7_train_baseline_models as step7
+import step9_run_few_shot_adaptation as step9_adaptation
+from immutable_artifact_io import csv_bytes, json_bytes, write_immutable_bundle
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,7 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Score all zh_target_strict candidate seller pairs with a selected synchronized "
-            "Step 7, Step 9, Step 9 calibration, or frozen Step 15 scorer, then extract connected-component clusters at "
+            "raw semantic feature, Step 7, Step 9, Step 9 calibration, or frozen Step 15 scorer, then extract connected-component clusters at "
             "the configured thresholds."
         )
     )
@@ -36,10 +39,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--scorer-family",
-        choices=("step7", "step9", "step9_calibration", "step15", "auto"),
+        choices=("raw_feature", "step7", "step9", "step9_calibration", "step15", "auto"),
         help=(
             "Scorer family to project into the Chinese graph. If omitted, Step 11 uses the "
             "policy default unless the provided CLI arguments imply a specific family."
+        ),
+    )
+    parser.add_argument(
+        "--raw-feature-control",
+        type=str,
+        help=(
+            "Optional policy-defined raw semantic control token. Publication-v6 uses "
+            "raw_bge_m3_cosine with a threshold frozen from Step12 zh_valid metrics."
         ),
     )
     parser.add_argument(
@@ -69,8 +80,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--step9-seed",
+        action="append",
+        dest="step9_seeds",
         type=int,
-        help="Optional Step 9 random seed to use for the selected Step 9 experiment.",
+        help=(
+            "Optional Step 9 random seed. Repeat this option to score one fair seed-mean "
+            "ensemble graph. A publication-v6 ten-seed run must not emit ten separate graphs."
+        ),
     )
     parser.add_argument(
         "--step9-calibration-experiment",
@@ -146,16 +162,25 @@ def resolve_current_main_summary_path(
     configured_path_value: str | None,
     default_path: Path,
     label: str,
+    summary_key: str,
 ) -> Path:
     resolved_path = resolve_policy_path(configured_path_value, default_path)
     summary_resolution = policy.get("summary_resolution", {}) or {}
     strict_current_only = bool(summary_resolution.get("strict_current_main_summaries_only", True))
-    if strict_current_only and resolved_path.resolve() != default_path.resolve():
+    allowed_values = (
+        (summary_resolution.get("allowed_current_main_summary_paths", {}) or {}).get(summary_key, [])
+        or []
+    )
+    allowed_paths = {
+        default_path.resolve(),
+        *(resolve_policy_path(str(value), default_path).resolve() for value in allowed_values),
+    }
+    if strict_current_only and resolved_path.resolve() not in allowed_paths:
         raise SystemExit(
             "Step 11 is configured to use only the current main synchronized summary files, but "
-            f"{label} resolved to {resolved_path} instead of {default_path}. "
-            "Update schema/step11_clustering_policy.json to point back to the main reports/*.json "
-            "files rather than an archived snapshot."
+            f"{label} resolved to {resolved_path}, outside the policy allow-list "
+            f"{sorted(str(path) for path in allowed_paths)}. Update the generated runtime policy "
+            "rather than selecting an archived or unbound summary."
         )
     return resolved_path
 
@@ -165,6 +190,167 @@ def relative_path(path: Path) -> str:
         return str(path.relative_to(ROOT))
     except ValueError:
         return str(path)
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def normalized_project_path(path: Path | str) -> str:
+    value = Path(path)
+    if value.is_absolute():
+        try:
+            value = value.resolve().relative_to(ROOT.resolve())
+        except ValueError as exc:
+            raise SystemExit(f"Step11-v6 frozen input is outside the project root: {value}") from exc
+    return value.as_posix()
+
+
+def scorer_dependency_paths(scorer_reference: dict) -> list[Path]:
+    values: list[Path] = []
+    for key in (
+        "summary_path",
+        "policy_path",
+        "model_path",
+        "calibration_artifact_path",
+        "scorer_artifact_path",
+        "threshold_metrics_path",
+    ):
+        value = scorer_reference.get(key)
+        if value is not None:
+            values.append(Path(value))
+    for key in ("model_paths", "scorer_artifact_paths", "threshold_input_paths"):
+        values.extend(Path(value) for value in (scorer_reference.get(key, []) or []))
+    for member in scorer_reference.get("ensemble_members", []) or []:
+        for key in ("model_path", "scorer_artifact_path", "valid_prediction_path"):
+            value = member.get(key)
+            if value is not None:
+                values.append(Path(value))
+    return list(dict.fromkeys(values))
+
+
+def verify_runtime_frozen_inputs(
+    policy: dict,
+    scorer_reference: dict,
+    pair_feature_path: Path,
+    seller_profile_path: Path,
+) -> dict:
+    gate = policy.get("step15_v6_validation_gate", {}) or {}
+    if not gate:
+        return {"enabled": False, "verified_file_count": 0, "required_scorer_files": []}
+    frozen_hashes = gate.get("frozen_input_file_sha256", {}) or {}
+    if not frozen_hashes:
+        raise SystemExit("Step11-v6 runtime policy has no frozen_input_file_sha256 map")
+    normalized_hashes = {
+        normalized_project_path(path): str(expected)
+        for path, expected in frozen_hashes.items()
+    }
+    lineage = gate.get("inductive_feature_lineage_verification", {}) or {}
+    if not lineage or bool(
+        lineage.get("transductive_valid_or_test_covariates_used_for_reference", True)
+    ):
+        raise SystemExit(
+            "Step11-v6 runtime policy has no verified non-transductive inductive feature lineage"
+        )
+    for relative, expected in normalized_hashes.items():
+        path = ROOT / relative
+        if not path.exists():
+            raise SystemExit(f"Step11-v6 frozen input is missing: {path}")
+        observed = sha256_file(path)
+        if observed != expected:
+            raise SystemExit(
+                f"Step11-v6 frozen input hash mismatch for {relative}: "
+                f"expected={expected} observed={observed}"
+            )
+
+    label_value = str((policy.get("input_paths", {}) or {}).get("step5_frozen_labels", ""))
+    required = [
+        pair_feature_path,
+        seller_profile_path,
+        *scorer_dependency_paths(scorer_reference),
+    ]
+    if not label_value:
+        raise SystemExit("Step11-v6 runtime policy does not bind Step5 frozen labels")
+    required.append(resolve_policy_path(label_value, ROOT / label_value))
+    missing_bindings = [
+        normalized_project_path(path)
+        for path in required
+        if normalized_project_path(path) not in normalized_hashes
+    ]
+    if missing_bindings:
+        raise SystemExit(
+            "Step11-v6 scorer dependency is not frozen by the Step12 active manifest: "
+            f"{sorted(set(missing_bindings))}"
+        )
+    return {
+        "enabled": True,
+        "source": gate.get("frozen_input_hash_source"),
+        "sources": gate.get("frozen_input_hash_sources")
+        or [gate.get("frozen_input_hash_source")],
+        "active_manifest_path": gate.get("active_manifest_path"),
+        "active_manifest_sha256": gate.get("active_manifest_sha256"),
+        "verified_file_count": len(normalized_hashes),
+        "required_scorer_files": sorted(
+            {normalized_project_path(path) for path in required}
+        ),
+    }
+
+
+def strip_posthoc_review_labels(pair_rows: list[dict]) -> list[dict]:
+    """Remove any stale supervision label before scoring and graph filtering."""
+    return [
+        {key: value for key, value in row.items() if key != "review_label"}
+        for row in pair_rows
+    ]
+
+
+def load_posthoc_label_index(path: Path) -> dict[str, dict]:
+    rows = step7.load_csv(path)
+    index: dict[str, dict] = {}
+    for row in rows:
+        pair_uid = str(row.get("pair_uid", "") or "").strip()
+        if not pair_uid or pair_uid in index:
+            raise SystemExit(
+                f"Step11 posthoc Step5 label file has a missing/duplicate pair_uid: {path}"
+            )
+        index[pair_uid] = row
+    if not index:
+        raise SystemExit(f"Step11 posthoc Step5 label file is empty: {path}")
+    return index
+
+
+def attach_posthoc_review_labels(
+    pair_records: list[dict],
+    label_index: dict[str, dict],
+) -> tuple[list[dict], dict]:
+    """Join labels after scoring; returned copies are audit-only and never filter inputs."""
+    audit_records = []
+    matched = 0
+    label_counts: Counter = Counter()
+    for record in pair_records:
+        audit_record = dict(record)
+        label_row = label_index.get(str(record.get("pair_uid", "")))
+        review_label = str((label_row or {}).get("review_label", "") or "").strip().lower()
+        audit_record["review_label"] = review_label
+        audit_record["posthoc_review_label_source"] = "step5_frozen_labels_pair_uid_join_after_scoring"
+        if label_row is not None:
+            matched += 1
+        label_counts[review_label or "missing"] += 1
+        audit_records.append(audit_record)
+    return audit_records, {
+        "role": "posthoc_filter_audit_only_never_model_or_filter_input",
+        "pair_record_count": len(pair_records),
+        "matched_pair_uid_count": matched,
+        "unmatched_pair_uid_count": len(pair_records) - matched,
+        "label_counts": dict(sorted(label_counts.items())),
+        "auditable_reviewed_label_count": int(
+            label_counts.get("positive", 0) + label_counts.get("negative", 0)
+        ),
+    }
 
 
 def append_unique(base: list[str], extra: list[str]) -> list[str]:
@@ -354,12 +540,20 @@ def resolve_scorer_selection(policy: dict) -> dict:
             "default_scorer_family": str(scorer_selection.get("default_scorer_family", "step7") or "step7"),
             "default_step7_experiment_name": scorer_selection.get("default_step7_experiment_name")
             or scorer_selection.get("default_experiment_name"),
+            "default_raw_feature_control": scorer_selection.get(
+                "default_raw_feature_control"
+            ),
+            "raw_feature_controls": scorer_selection.get("raw_feature_controls", {}),
             "default_step9_experiment_name": scorer_selection.get("default_step9_experiment_name"),
             "default_step9_calibration_experiment_name": scorer_selection.get(
                 "default_step9_calibration_experiment_name"
             ),
             "default_step9_ratio": scorer_selection.get("default_step9_ratio"),
             "default_step9_seed": scorer_selection.get("default_step9_seed"),
+            "default_step9_seeds": scorer_selection.get("default_step9_seeds", []),
+            "step9_scorer_token_aliases": scorer_selection.get(
+                "step9_scorer_token_aliases", {}
+            ),
             "default_step15_experiment_name": scorer_selection.get("default_step15_experiment_name"),
             "default_step15_phase": scorer_selection.get("default_step15_phase"),
             "default_step15_seeds": scorer_selection.get("default_step15_seeds", []),
@@ -375,6 +569,7 @@ def resolve_scorer_selection(policy: dict) -> dict:
             "feature_source": scorer_selection.get("feature_source"),
             "scoring_backend": scorer_selection.get("scoring_backend"),
             "dynamic_mainline_candidates": scorer_selection.get("dynamic_mainline_candidates", {}),
+            "publication_validation": scorer_selection.get("publication_validation", {}),
         }
 
     legacy_fixed_scorer = policy.get("fixed_scorer")
@@ -382,10 +577,14 @@ def resolve_scorer_selection(policy: dict) -> dict:
         return {
             "default_scorer_family": "step7",
             "default_step7_experiment_name": legacy_fixed_scorer.get("experiment_name"),
+            "default_raw_feature_control": None,
+            "raw_feature_controls": {},
             "default_step9_experiment_name": None,
             "default_step9_calibration_experiment_name": None,
             "default_step9_ratio": None,
             "default_step9_seed": None,
+            "default_step9_seeds": [],
+            "step9_scorer_token_aliases": {},
             "pairwise_primary_threshold_source_template": legacy_fixed_scorer.get("primary_threshold_source"),
             "graph_primary_threshold_overrides": {},
             "model_path_source": legacy_fixed_scorer.get("model_path_source"),
@@ -394,6 +593,7 @@ def resolve_scorer_selection(policy: dict) -> dict:
             "feature_source": legacy_fixed_scorer.get("feature_source"),
             "scoring_backend": legacy_fixed_scorer.get("scoring_backend"),
             "dynamic_mainline_candidates": {},
+            "publication_validation": {},
         }
 
     raise SystemExit(
@@ -586,6 +786,7 @@ def build_step7_dynamic_candidates(policy: dict, family_cfg: dict) -> list[dict]
         baseline_reference.get("step7_summary") or input_paths.get("step7_summary"),
         STEP7_SUMMARY_PATH,
         "Step 7 summary",
+        "step7_summary",
     )
     if not step7_summary_path.exists():
         return []
@@ -642,6 +843,7 @@ def build_step9_dynamic_candidates(policy: dict, family_cfg: dict) -> list[dict]
         baseline_reference.get("step9_summary") or input_paths.get("step9_summary"),
         STEP9_SUMMARY_PATH,
         "Step 9 few-shot summary",
+        "step9_summary",
     )
     if not step9_summary_path.exists():
         return []
@@ -749,6 +951,7 @@ def build_step9_calibration_dynamic_candidates(policy: dict, family_cfg: dict) -
         baseline_reference.get("step9_calibration_summary") or input_paths.get("step9_calibration_summary"),
         STEP9_CALIBRATION_SUMMARY_PATH,
         "Step 9 calibration summary",
+        "step9_calibration_summary",
     )
     if not calibration_summary_path.exists():
         return []
@@ -926,13 +1129,14 @@ def detect_requested_scorer_family(
     scorer_selection: dict,
     dynamic_snapshot: dict | None = None,
 ) -> str:
+    has_raw_feature_request = bool(args.raw_feature_control)
     has_step7_request = bool(args.step7_experiment)
     has_step9_request = any(
         value is not None
         for value in (
             args.step9_experiment,
             args.step9_ratio,
-            args.step9_seed,
+            args.step9_seeds,
         )
     )
     has_step9_calibration_request = bool(args.step9_calibration_experiment)
@@ -947,6 +1151,7 @@ def detect_requested_scorer_family(
     request_count = sum(
         int(flag)
         for flag in (
+            has_raw_feature_request,
             has_step7_request,
             has_step9_request,
             has_step9_calibration_request,
@@ -955,31 +1160,43 @@ def detect_requested_scorer_family(
     )
     if request_count > 1:
         raise SystemExit(
-            "Step 11 scorer selection is ambiguous. Do not mix Step 7, Step 9, Step 9 calibration, and Step 15 "
+            "Step 11 scorer selection is ambiguous. Do not mix raw feature, Step 7, Step 9, Step 9 calibration, and Step 15 "
             "selector arguments in the same command."
         )
     if args.scorer_family:
-        if args.scorer_family == "step7" and (has_step9_request or has_step9_calibration_request or has_step15_request):
+        if args.scorer_family == "raw_feature" and (
+            has_step7_request
+            or has_step9_request
+            or has_step9_calibration_request
+            or has_step15_request
+        ):
             raise SystemExit(
-                "Step 11 received non-Step-7 selector arguments together with --scorer-family step7. "
+                "Step 11 received model selector arguments together with --scorer-family raw_feature. "
+                "Remove the conflicting selectors or switch to the matching family."
+            )
+        if args.scorer_family == "step7" and (has_raw_feature_request or has_step9_request or has_step9_calibration_request or has_step15_request):
+            raise SystemExit(
+                "Step 11 received a non-Step-7 selector together with --scorer-family step7. "
                 "Remove the conflicting arguments or switch --scorer-family to the matching family."
             )
-        if args.scorer_family == "step9" and (has_step7_request or has_step9_calibration_request or has_step15_request):
+        if args.scorer_family == "step9" and (has_raw_feature_request or has_step7_request or has_step9_calibration_request or has_step15_request):
             raise SystemExit(
                 "Step 11 received non-Step-9 selector arguments together with --scorer-family step9. "
                 "Remove the conflicting arguments or switch --scorer-family to the matching family."
             )
-        if args.scorer_family == "step9_calibration" and (has_step7_request or has_step9_request or has_step15_request):
+        if args.scorer_family == "step9_calibration" and (has_raw_feature_request or has_step7_request or has_step9_request or has_step15_request):
             raise SystemExit(
                 "Step 11 received non-calibration selectors together with --scorer-family "
                 "step9_calibration. Remove the conflicting selectors or switch to the matching family."
             )
-        if args.scorer_family == "step15" and (has_step7_request or has_step9_request or has_step9_calibration_request):
+        if args.scorer_family == "step15" and (has_raw_feature_request or has_step7_request or has_step9_request or has_step9_calibration_request):
             raise SystemExit(
                 "Step 11 received Step 7 or Step 9 selectors together with --scorer-family step15. "
                 "Remove the conflicting selectors or switch to the matching family."
             )
         if args.scorer_family == "auto":
+            if has_raw_feature_request:
+                return "raw_feature"
             if has_step7_request:
                 return "step7"
             if has_step9_request:
@@ -996,6 +1213,8 @@ def detect_requested_scorer_family(
                 "Pass an explicit family or enable scorer_selection.dynamic_mainline_candidates."
             )
         return str(args.scorer_family)
+    if has_raw_feature_request:
+        return "raw_feature"
     if has_step7_request:
         return "step7"
     if has_step9_request:
@@ -1016,6 +1235,85 @@ def detect_requested_scorer_family(
     return default_family
 
 
+def resolve_raw_feature_scorer_reference(
+    policy: dict,
+    requested_control: str | None,
+) -> dict:
+    scorer_selection = resolve_scorer_selection(policy)
+    controls = scorer_selection.get("raw_feature_controls", {}) or {}
+    default_control = str(
+        scorer_selection.get("default_raw_feature_control", "") or ""
+    ).strip()
+    control_token = str(requested_control or default_control).strip()
+    if not control_token:
+        raise SystemExit(
+            "Step 11 could not resolve a raw feature control. Pass --raw-feature-control "
+            "or configure scorer_selection.default_raw_feature_control."
+        )
+    control = controls.get(control_token)
+    if not isinstance(control, dict):
+        raise SystemExit(
+            f"Unknown Step 11 raw feature control {control_token!r}; "
+            f"available={sorted(controls)}"
+        )
+    feature_name = str(control.get("feature_name", "") or "").strip()
+    threshold_value = control.get("primary_threshold")
+    threshold_source = str(control.get("threshold_source", "") or "").strip()
+    metrics_value = str(control.get("threshold_metrics_path", "") or "").strip()
+    step12_summary_value = str(control.get("step12_summary_path", "") or "").strip()
+    if not feature_name or threshold_value is None or not metrics_value or not step12_summary_value:
+        raise SystemExit(
+            f"Raw feature control {control_token!r} is missing feature/threshold provenance"
+        )
+    if bool(control.get("test_metrics_used_for_threshold_selection", True)):
+        raise SystemExit(
+            f"Raw feature control {control_token!r} is not validation-only thresholded"
+        )
+    if "zh_valid" not in threshold_source and "mean_zh_valid_scores" not in threshold_source:
+        raise SystemExit(
+            f"Raw feature control {control_token!r} has an unrecognized threshold source: "
+            f"{threshold_source!r}"
+        )
+    input_paths = policy.get("input_paths", {}) or {}
+    step12_policy_value = str(input_paths.get("step12_v6_policy", "") or "").strip()
+    if not step12_policy_value:
+        step12_summary_path = resolve_policy_path(
+            step12_summary_value, ROOT / step12_summary_value
+        )
+        step12_summary = step7.load_json(step12_summary_path)
+        step12_policy_value = str(step12_summary.get("policy", "") or "").strip()
+    summary_path = resolve_policy_path(step12_summary_value, ROOT / step12_summary_value)
+    policy_path = resolve_policy_path(step12_policy_value, ROOT / step12_policy_value)
+    metrics_path = resolve_policy_path(metrics_value, ROOT / metrics_value)
+    for path in (summary_path, policy_path, metrics_path):
+        if not path.exists():
+            raise SystemExit(f"Raw feature control dependency does not exist: {path}")
+    return {
+        "scorer_family": "raw_feature",
+        "scorer_token": control_token,
+        "source_experiment_name": control_token,
+        "source_run_key": None,
+        "source_ratio": None,
+        "source_ratio_token": None,
+        "source_seed": None,
+        "summary_path": summary_path,
+        "policy_path": policy_path,
+        "model_path": None,
+        "scoring_backend": "raw_feature",
+        "raw_feature_name": feature_name,
+        "threshold_metrics_path": metrics_path,
+        "primary_threshold": round_float(float(threshold_value)),
+        "primary_threshold_diagnostics": {
+            "source": threshold_source,
+            "test_metrics_used_for_threshold_selection": False,
+            "model_metrics_path": relative_path(metrics_path),
+        },
+        "selection_mode": "explicit" if requested_control else "policy_default",
+        "dynamic_candidate_rank": None,
+        "dynamic_candidate": None,
+    }
+
+
 def resolve_step7_scorer_reference(
     policy: dict,
     requested_experiment_name: str | None,
@@ -1028,6 +1326,7 @@ def resolve_step7_scorer_reference(
         baseline_reference.get("step7_summary") or input_paths.get("step7_summary"),
         STEP7_SUMMARY_PATH,
         "Step 7 summary",
+        "step7_summary",
     )
     step7_policy_path = resolve_policy_path(
         baseline_reference.get("step7_policy") or input_paths.get("step7_policy"),
@@ -1119,11 +1418,116 @@ def resolve_step7_scorer_reference(
     }
 
 
+def step9_scorer_token_for_selection(
+    scorer_selection: dict,
+    experiment_name: str,
+    ratio_token: str,
+    seeds: list[int],
+) -> str:
+    seed_token = "seed_mean" if len(seeds) > 1 else f"seed_{int(seeds[0])}"
+    aliases = scorer_selection.get("step9_scorer_token_aliases", {}) or {}
+    alias = str(
+        aliases.get(f"{experiment_name}::{ratio_token}::{seed_token}", "") or ""
+    ).strip()
+    if alias:
+        return alias
+    return f"{experiment_name}_ratio_{ratio_token}_{seed_token}"
+
+
+def find_step9_run(
+    experiment_summary: dict,
+    experiment_name: str,
+    ratio: float,
+    seed: int,
+    summary_path: Path,
+) -> tuple[str, dict]:
+    matches = []
+    for run_key, run in (experiment_summary.get("runs", {}) or {}).items():
+        run_ratio = normalize_step9_ratio(run.get("ratio"))
+        run_seed = int(run.get("seed", 0) or 0)
+        if run_ratio is not None and abs(run_ratio - ratio) <= 1e-9 and run_seed == seed:
+            matches.append((str(run_key), run))
+    if len(matches) != 1:
+        raise SystemExit(
+            "Step 11 requires exactly one frozen Step 9 run for "
+            f"experiment={experiment_name!r}, ratio={ratio}, seed={seed} in {summary_path}; "
+            f"found={len(matches)}"
+        )
+    return matches[0]
+
+
+def step9_ensemble_threshold_from_valid_predictions(
+    valid_prediction_paths: list[Path],
+    step9_policy: dict,
+    seeds: list[int],
+) -> tuple[float, dict]:
+    y_by_pair: dict[str, float] = {}
+    probability_maps: list[dict[str, float]] = []
+    for path in valid_prediction_paths:
+        rows = step7.load_csv(path)
+        step7.ensure_non_empty(rows, f"step9.seed_mean.zh_valid::{path}")
+        current: dict[str, float] = {}
+        for row in rows:
+            pair_uid = str(row.get("pair_uid", "") or "").strip()
+            if not pair_uid or pair_uid in current:
+                raise SystemExit(
+                    f"Step 9 seed-mean valid predictions have a missing/duplicate pair_uid in {path}"
+                )
+            y_true = float(step7.to_float(row.get("y_true")))
+            probability = float(step7.to_float(row.get("prob_positive")))
+            if y_true not in {0.0, 1.0} or not np.isfinite(probability):
+                raise SystemExit(f"Invalid Step 9 zh_valid prediction for {pair_uid!r} in {path}")
+            if pair_uid in y_by_pair and y_by_pair[pair_uid] != y_true:
+                raise SystemExit(
+                    f"Step 9 seed valid predictions disagree on y_true for {pair_uid!r}"
+                )
+            y_by_pair[pair_uid] = y_true
+            current[pair_uid] = probability
+        probability_maps.append(current)
+    expected = set(y_by_pair)
+    for path, current in zip(valid_prediction_paths, probability_maps, strict=True):
+        if set(current) != expected:
+            raise SystemExit(
+                "Step 9 seed-mean valid prediction files do not share the same frozen pair set: "
+                f"{path}"
+            )
+    pair_order = sorted(expected)
+    y_valid = np.asarray([y_by_pair[pair_uid] for pair_uid in pair_order], dtype=float)
+    seed_matrix = np.asarray(
+        [[current[pair_uid] for pair_uid in pair_order] for current in probability_maps],
+        dtype=float,
+    )
+    mean_probabilities = seed_matrix.mean(axis=0)
+    threshold_policy = (step9_policy.get("training", {}) or {}).get(
+        "threshold_selection", {}
+    ) or {}
+    if not threshold_policy:
+        raise SystemExit("Step 9 policy has no threshold_selection configuration")
+    threshold, diagnostics = step9_adaptation.choose_threshold_for_step9(
+        y_valid,
+        mean_probabilities,
+        threshold_policy,
+        seed=20260712,
+    )
+    return round_float(threshold), {
+        "source": "ten_seed_mean_zh_valid_predictions_only",
+        "test_metrics_used_for_threshold_selection": False,
+        "valid_prediction_paths": [relative_path(path) for path in valid_prediction_paths],
+        "seeds": [int(seed) for seed in seeds],
+        "seed_count": len(seeds),
+        "valid_pair_count": len(pair_order),
+        "threshold_selection_diagnostics": diagnostics,
+        "ensemble_valid_metrics": step7.evaluate_probabilities(
+            y_valid, mean_probabilities, threshold
+        ),
+    }
+
+
 def resolve_step9_scorer_reference(
     policy: dict,
     requested_experiment_name: str | None,
     requested_ratio: float | None,
-    requested_seed: int | None,
+    requested_seeds: list[int] | None,
     dynamic_snapshot: dict | None = None,
 ) -> dict:
     baseline_reference = policy.get("baseline_reference", {})
@@ -1133,6 +1537,7 @@ def resolve_step9_scorer_reference(
         baseline_reference.get("step9_summary") or input_paths.get("step9_summary"),
         STEP9_SUMMARY_PATH,
         "Step 9 few-shot summary",
+        "step9_summary",
     )
     if not step9_summary_path.exists():
         raise SystemExit(
@@ -1146,13 +1551,16 @@ def resolve_step9_scorer_reference(
     normalized_requested_ratio = normalize_step9_ratio(requested_ratio)
     dynamic_candidate = None
     dynamic_candidate_rank = None
-    if dynamic_snapshot:
+    requested_seed_for_dynamic = (
+        int(requested_seeds[0]) if requested_seeds and len(requested_seeds) == 1 else None
+    )
+    if dynamic_snapshot and not (requested_seeds and len(requested_seeds) > 1):
         dynamic_candidate, dynamic_candidate_rank = select_fresh_dynamic_candidate(
             policy,
             "step9",
             experiment_name=requested_experiment_name,
             ratio=normalized_requested_ratio,
-            seed=requested_seed,
+            seed=requested_seed_for_dynamic,
         )
     experiment_name = str(
         requested_experiment_name
@@ -1180,14 +1588,21 @@ def resolve_step9_scorer_reference(
         ratio = normalize_step9_ratio((dynamic_candidate or {}).get("source_ratio"))
     if ratio is None:
         ratio = normalize_step9_ratio(scorer_selection.get("default_step9_ratio"))
-    seed = int(
-        requested_seed
-        if requested_seed is not None
-        else (dynamic_candidate or {}).get("source_seed")
-        or scorer_selection.get("default_step9_seed")
-        or 0
-    )
-    if ratio is None or seed <= 0:
+    seeds = [int(seed) for seed in (requested_seeds or [])]
+    if not seeds:
+        seeds = [
+            int(seed)
+            for seed in (scorer_selection.get("default_step9_seeds", []) or [])
+        ]
+    if not seeds:
+        fallback_seed = int(
+            (dynamic_candidate or {}).get("source_seed")
+            or scorer_selection.get("default_step9_seed")
+            or 0
+        )
+        if fallback_seed > 0:
+            seeds = [fallback_seed]
+    if ratio is None or not seeds or any(seed <= 0 for seed in seeds):
         available_runs = sorted(
             (
                 run["ratio"],
@@ -1197,118 +1612,121 @@ def resolve_step9_scorer_reference(
             for run in experiment_summary.get("runs", {}).values()
         )
         raise SystemExit(
-            "Step 11 requires an explicit Step 9 run selection. Pass --step9-ratio and --step9-seed, "
-            "or set scorer_selection.default_step9_ratio/default_step9_seed in "
+            "Step 11 requires an explicit Step 9 run selection. Pass --step9-ratio and one-or-more "
+            "--step9-seed values, or set scorer_selection.default_step9_ratio/default_step9_seeds in "
             "schema/step11_clustering_policy.json. Available runs: "
             f"{available_runs}"
         )
 
-    matched_run_key = None
-    matched_run = None
-    for run_key, run in experiment_summary.get("runs", {}).items():
-        run_ratio = normalize_step9_ratio(run.get("ratio"))
-        run_seed = int(run.get("seed", 0) or 0)
-        if run_ratio is None:
-            continue
-        if abs(run_ratio - ratio) > 1e-9 or run_seed != seed:
-            continue
-        matched_run_key = run_key
-        matched_run = run
-        break
-    if matched_run is None or matched_run_key is None:
-        available_runs = sorted(
-            (
-                normalize_step9_ratio(run.get("ratio")),
-                run.get("ratio_token"),
-                int(run.get("seed", 0) or 0),
-            )
-            for run in experiment_summary.get("runs", {}).values()
-        )
-        raise SystemExit(
-            "Step 11 could not resolve the requested Step 9 run "
-            f"for experiment={experiment_name!r}, ratio={ratio}, seed={seed} inside {step9_summary_path}. "
-            f"Available runs: {available_runs}"
-        )
-
-    selected_threshold = matched_run.get("selected_threshold")
-    if selected_threshold is None:
-        raise SystemExit(
-            "Step 11 could not resolve the primary threshold from the Step 9 summary for "
-            f"{experiment_name!r} run {matched_run_key!r} inside {step9_summary_path}."
-        )
-
-    artifacts = matched_run.get("artifacts", {})
-    scoring_backend = str(
-        matched_run.get("scoring_backend")
-        or matched_run.get("training_backend")
-        or "legacy_lightgbm_mixed"
-    )
-    model_path = None
-    scorer_artifact_path = None
-
-    if scoring_backend in {"legacy_lightgbm_mixed", "lightgbm"}:
-        model_rel_path = str(artifacts.get("model", "") or "").strip()
-        if not model_rel_path:
-            raise SystemExit(
-                "Step 11 could not resolve the Step 9 model path from the Step 9 summary for "
-                f"{experiment_name!r} run {matched_run_key!r}."
-            )
-        model_path = resolve_policy_path(model_rel_path, ROOT / model_rel_path)
-        if not model_path.exists():
-            raise SystemExit(
-                "Step 11 resolved the Step 9 model path to "
-                f"{model_path}, but that file does not exist."
-            )
-    elif scoring_backend in {"residual_logistic", "logistic_regression_l2"}:
-        artifact_rel_path = str(artifacts.get("scorer_artifact", "") or "").strip()
-        if not artifact_rel_path:
-            raise SystemExit(
-                "Step 11 could not resolve the Step 9 scorer artifact path from the Step 9 summary for "
-                f"{experiment_name!r} run {matched_run_key!r}."
-            )
-        scorer_artifact_path = resolve_policy_path(artifact_rel_path, ROOT / artifact_rel_path)
-        if not scorer_artifact_path.exists():
-            raise SystemExit(
-                "Step 11 resolved the Step 9 scorer artifact path to "
-                f"{scorer_artifact_path}, but that file does not exist."
-            )
-        model_rel_path = str(artifacts.get("base_model", "") or "").strip()
-        if model_rel_path:
-            model_path = resolve_policy_path(model_rel_path, ROOT / model_rel_path)
-            if not model_path.exists():
-                raise SystemExit(
-                    "Step 11 resolved the Step 9 base model path to "
-                    f"{model_path}, but that file does not exist."
-                )
-        elif scoring_backend == "residual_logistic":
-            raise SystemExit(
-                "Step 11 residual logistic scoring requires artifacts.base_model in the Step 9 summary for "
-                f"{experiment_name!r} run {matched_run_key!r}."
-            )
-    else:
-        raise SystemExit(
-            "Unsupported Step 9 scoring_backend in Step 11: "
-            f"{scoring_backend!r} for {experiment_name!r} run {matched_run_key!r}."
-        )
-
     policy_path = resolve_policy_path(summary.get("step9_policy_path"), ROOT / "schema" / "step9_training_policy.json")
-    ratio_token = str(matched_run.get("ratio_token", "") or "").strip() or f"{int(round(ratio * 100))}pct"
-    scorer_token = f"{experiment_name}_ratio_{ratio_token}_seed_{seed}"
+    step9_policy = step7.load_json(policy_path)
+    if len(set(seeds)) != len(seeds):
+        raise SystemExit(f"Step 11 received duplicate Step 9 seeds: {seeds}")
+    matched_runs = [
+        (*find_step9_run(experiment_summary, experiment_name, ratio, seed, step9_summary_path), seed)
+        for seed in seeds
+    ]
+    ratio_tokens = {
+        str(run.get("ratio_token", "") or "").strip()
+        for _run_key, run, _seed in matched_runs
+    }
+    ratio_tokens.discard("")
+    ratio_token = next(iter(ratio_tokens), f"{int(round(ratio * 100))}pct")
+    if len(ratio_tokens) > 1:
+        raise SystemExit(f"Step 9 seed runs disagree on ratio_token: {sorted(ratio_tokens)}")
+
+    ensemble_members = []
+    valid_prediction_paths = []
+    for run_key, run, seed in matched_runs:
+        artifacts = run.get("artifacts", {}) or {}
+        backend = str(
+            run.get("scoring_backend")
+            or run.get("training_backend")
+            or "legacy_lightgbm_mixed"
+        )
+        if backend not in {
+            "legacy_lightgbm_mixed",
+            "lightgbm",
+            "residual_logistic",
+            "logistic_regression_l2",
+        }:
+            raise SystemExit(f"Unsupported Step 9 seed-mean backend: {backend!r}")
+        model_value = str(
+            artifacts.get("model") or artifacts.get("base_model") or ""
+        ).strip()
+        artifact_value = str(artifacts.get("scorer_artifact") or "").strip()
+        valid_value = str(artifacts.get("zh_valid_predictions") or "").strip()
+        if not valid_value:
+            raise SystemExit(f"Step 9 run {run_key!r} has no frozen zh_valid predictions")
+        if backend in {"legacy_lightgbm_mixed", "lightgbm", "residual_logistic"} and not model_value:
+            raise SystemExit(f"Step 9 run {run_key!r} has no required model/base_model")
+        if backend in {"residual_logistic", "logistic_regression_l2"} and not artifact_value:
+            raise SystemExit(f"Step 9 run {run_key!r} has no scorer_artifact")
+        model_path = resolve_policy_path(model_value, ROOT / model_value) if model_value else None
+        artifact_path = (
+            resolve_policy_path(artifact_value, ROOT / artifact_value) if artifact_value else None
+        )
+        valid_path = resolve_policy_path(valid_value, ROOT / valid_value)
+        for path in (model_path, artifact_path, valid_path):
+            if path is not None and not path.exists():
+                raise SystemExit(f"Step 9 seed-mean dependency does not exist: {path}")
+        valid_prediction_paths.append(valid_path)
+        ensemble_members.append(
+            {
+                "run_key": run_key,
+                "seed": int(seed),
+                "scoring_backend": backend,
+                "model_path": model_path,
+                "scorer_artifact_path": artifact_path,
+                "valid_prediction_path": valid_path,
+            }
+        )
+    if len(seeds) == 1:
+        selected_value = matched_runs[0][1].get("selected_threshold")
+        if selected_value is None:
+            raise SystemExit(f"Step 9 run {matched_runs[0][0]!r} has no selected_threshold")
+        selected_threshold = round_float(float(selected_value))
+        threshold_diagnostics = {
+            "source": "single_seed_frozen_step9_run_selected_threshold",
+            "test_metrics_used_for_threshold_selection": False,
+            "valid_prediction_paths": [relative_path(valid_prediction_paths[0])],
+            "seeds": seeds,
+            "seed_count": 1,
+        }
+    else:
+        selected_threshold, threshold_diagnostics = step9_ensemble_threshold_from_valid_predictions(
+            valid_prediction_paths, step9_policy, seeds
+        )
+    scorer_token = step9_scorer_token_for_selection(
+        scorer_selection, experiment_name, ratio_token, seeds
+    )
     return {
         "scorer_family": "step9",
         "scorer_token": scorer_token,
         "source_experiment_name": experiment_name,
-        "source_run_key": matched_run_key,
+        "source_run_key": [run_key for run_key, _run, _seed in matched_runs],
         "source_ratio": ratio,
         "source_ratio_token": ratio_token,
-        "source_seed": seed,
+        "source_seed": seeds,
         "summary_path": step9_summary_path,
         "policy_path": policy_path,
-        "model_path": model_path,
-        "scoring_backend": scoring_backend,
-        "scorer_artifact_path": scorer_artifact_path,
+        "model_path": ensemble_members[0]["model_path"] if len(seeds) == 1 else None,
+        "model_paths": [
+            member["model_path"] for member in ensemble_members if member["model_path"] is not None
+        ],
+        "scoring_backend": "step9_seed_mean_ensemble",
+        "scorer_artifact_path": (
+            ensemble_members[0]["scorer_artifact_path"] if len(seeds) == 1 else None
+        ),
+        "scorer_artifact_paths": [
+            member["scorer_artifact_path"]
+            for member in ensemble_members
+            if member["scorer_artifact_path"] is not None
+        ],
+        "ensemble_members": ensemble_members,
         "primary_threshold": round_float(float(selected_threshold)),
-        "selection_mode": "dynamic_family_best" if dynamic_candidate else ("explicit" if requested_experiment_name or requested_ratio is not None or requested_seed is not None else "policy_default"),
+        "primary_threshold_diagnostics": threshold_diagnostics,
+        "selection_mode": "dynamic_family_best" if dynamic_candidate else ("explicit" if requested_experiment_name or requested_ratio is not None or requested_seeds else "policy_default"),
         "dynamic_candidate_rank": dynamic_candidate_rank,
         "dynamic_candidate": dynamic_candidate,
     }
@@ -1326,6 +1744,7 @@ def resolve_step9_calibration_scorer_reference(
         baseline_reference.get("step9_calibration_summary") or input_paths.get("step9_calibration_summary"),
         STEP9_CALIBRATION_SUMMARY_PATH,
         "Step 9 calibration summary",
+        "step9_calibration_summary",
     )
     if not calibration_summary_path.exists():
         raise SystemExit(
@@ -1581,6 +2000,7 @@ def resolve_step15_scorer_reference(
         baseline_reference.get("step15_summary") or input_paths.get("step15_summary"),
         STEP15_SUMMARY_PATH,
         "Step 15 summary",
+        "step15_summary",
     )
     step15_policy_path = resolve_policy_path(
         baseline_reference.get("step15_policy") or input_paths.get("step15_policy"),
@@ -1650,6 +2070,7 @@ def resolve_step15_scorer_reference(
         "scoring_backend": "step15_mlp_ensemble",
         "scorer_artifact_path": artifact_paths[0] if len(artifact_paths) == 1 else None,
         "scorer_artifact_paths": artifact_paths,
+        "threshold_input_paths": valid_prediction_paths,
         "primary_threshold": selected_threshold,
         "primary_threshold_diagnostics": threshold_diagnostics,
         "selection_mode": "explicit" if requested_experiment_name or requested_phase or requested_seeds else "policy_default",
@@ -1658,33 +2079,67 @@ def resolve_step15_scorer_reference(
     }
 
 
+def validate_publication_scorer_allowlist(policy: dict, scorer_reference: dict) -> None:
+    publication = (
+        (resolve_scorer_selection(policy).get("publication_validation", {}) or {})
+    )
+    if publication.get("selection_mode") != "explicit_allowlist_only":
+        return
+    family = str(scorer_reference.get("scorer_family", ""))
+    token = str(scorer_reference.get("scorer_token", ""))
+    allowed_families = {
+        str(value) for value in publication.get("allowed_scorer_families", []) or []
+    }
+    allowed_tokens = {
+        str(value) for value in publication.get("allowed_scorer_tokens", []) or []
+    }
+    if not allowed_families or not allowed_tokens:
+        raise SystemExit(
+            "Step11-v6 publication runtime policy has no explicit scorer family/token allow-list"
+        )
+    if family not in allowed_families or token not in allowed_tokens:
+        raise SystemExit(
+            "Step11-v6 publication runtime rejected a scorer outside its frozen allow-list: "
+            f"family={family!r} token={token!r}"
+        )
+
+
 def resolve_scorer_reference(policy: dict, args: argparse.Namespace, dynamic_snapshot: dict | None = None) -> dict:
     scorer_selection = resolve_scorer_selection(policy)
     scorer_family = detect_requested_scorer_family(args, scorer_selection, dynamic_snapshot)
-    if scorer_family == "step7":
-        return resolve_step7_scorer_reference(policy, args.step7_experiment, dynamic_snapshot)
-    if scorer_family == "step9":
-        return resolve_step9_scorer_reference(
+    if scorer_family == "raw_feature":
+        scorer_reference = resolve_raw_feature_scorer_reference(
+            policy, args.raw_feature_control
+        )
+    elif scorer_family == "step7":
+        scorer_reference = resolve_step7_scorer_reference(
+            policy, args.step7_experiment, dynamic_snapshot
+        )
+    elif scorer_family == "step9":
+        scorer_reference = resolve_step9_scorer_reference(
             policy,
             args.step9_experiment,
             args.step9_ratio,
-            args.step9_seed,
+            args.step9_seeds,
             dynamic_snapshot,
         )
-    if scorer_family == "step9_calibration":
-        return resolve_step9_calibration_scorer_reference(
+    elif scorer_family == "step9_calibration":
+        scorer_reference = resolve_step9_calibration_scorer_reference(
             policy,
             args.step9_calibration_experiment,
             dynamic_snapshot,
         )
-    if scorer_family == "step15":
-        return resolve_step15_scorer_reference(
+    elif scorer_family == "step15":
+        scorer_reference = resolve_step15_scorer_reference(
             policy,
             args.step15_experiment,
             args.step15_phase,
             args.step15_seeds,
         )
-    raise SystemExit(f"Unsupported Step 11 scorer family: {scorer_family}")
+    else:
+        raise SystemExit(f"Unsupported Step 11 scorer family: {scorer_family}")
+    validate_publication_scorer_allowlist(policy, scorer_reference)
+    return scorer_reference
 
 
 def resolve_graph_primary_threshold(scorer_selection: dict, scorer_reference: dict) -> tuple[float, str]:
@@ -1872,8 +2327,35 @@ def apply_step15_mlp_artifact(pair_rows: list[dict], artifact: dict) -> tuple[li
         raise SystemExit("Step 15 scorer artifact does not contain feature_names.")
     step7.validate_feature_columns(pair_rows, feature_names, "step11.zh_target_strict_pairs")
     x_pairs = rows_to_feature_matrix(pair_rows, feature_names)
-    means = np.asarray(artifact.get("feature_means", []), dtype=float)
-    stds = np.asarray(artifact.get("feature_stds", []), dtype=float)
+    standardizer_bundle = artifact.get("standardizer_bundle", {}) or {}
+    domain_feature_names = [
+        str(name) for name in standardizer_bundle.get("domain_standardized_features", [])
+    ]
+    if domain_feature_names:
+        unknown_features = [name for name in domain_feature_names if name not in feature_names]
+        if unknown_features:
+            raise SystemExit(f"Step 15 scorer domain-standardizer features are missing: {unknown_features}")
+        domain_stats = (standardizer_bundle.get("domain_stats", {}) or {}).get("zh_target_strict")
+        if not domain_stats:
+            raise SystemExit("Step 15 scorer has no zh_target_strict domain-standardizer statistics.")
+        indices = [feature_names.index(name) for name in domain_feature_names]
+        domain_means = np.asarray(domain_stats.get("means", []), dtype=float)
+        domain_stds = np.asarray(domain_stats.get("stds", []), dtype=float)
+        if domain_means.size != len(indices) or domain_stds.size != len(indices):
+            raise SystemExit("Step 15 scorer domain-standardizer dimensions are invalid.")
+        domain_stds = np.where(domain_stds > 1e-9, domain_stds, 1.0)
+        values = x_pairs[:, indices]
+        x_pairs[:, indices] = (
+            np.where(np.isfinite(values), values, domain_means) - domain_means
+        ) / domain_stds
+    means = np.asarray(
+        standardizer_bundle.get("global_means", artifact.get("feature_means", [])),
+        dtype=float,
+    )
+    stds = np.asarray(
+        standardizer_bundle.get("global_stds", artifact.get("feature_stds", [])),
+        dtype=float,
+    )
     if means.size != x_pairs.shape[1] or stds.size != x_pairs.shape[1]:
         raise SystemExit("Step 15 scorer artifact feature standardizer dimensions do not match Step 11 features.")
     stds = np.where(stds > 1e-9, stds, 1.0)
@@ -1918,6 +2400,85 @@ def rows_to_feature_matrix(rows: list[dict], feature_names: list[str]) -> np.nda
     return matrix
 
 
+def apply_raw_feature_scorer(
+    pair_rows: list[dict],
+    feature_name: str,
+) -> tuple[list[str], np.ndarray]:
+    if not feature_name:
+        raise SystemExit("Step 11 raw feature scorer has no feature name")
+    step7.validate_feature_columns(
+        pair_rows, [feature_name], "step11.raw_feature.zh_target_strict_pairs"
+    )
+    scores = np.asarray(
+        [step7.to_float(row.get(feature_name)) for row in pair_rows],
+        dtype=float,
+    )
+    if not np.all(np.isfinite(scores)):
+        raise SystemExit(
+            f"Step 11 raw feature scorer found non-finite values in {feature_name!r}"
+        )
+    return [feature_name], scores
+
+
+def apply_step9_seed_mean_ensemble(
+    pair_rows: list[dict],
+    members: list[dict],
+    lgb_module: object | None,
+) -> tuple[list[str], np.ndarray, dict]:
+    if not members:
+        raise SystemExit("Step11 Step9 scorer requires at least one frozen seed member")
+    probability_columns: list[np.ndarray] = []
+    feature_union: list[str] = []
+    backend_counts: Counter = Counter()
+    booster_cache: dict[str, object] = {}
+    for member in members:
+        backend = str(member.get("scoring_backend", ""))
+        backend_counts[backend] += 1
+        model_path = member.get("model_path")
+        artifact_path = member.get("scorer_artifact_path")
+        base_probabilities = None
+        booster = None
+        if backend in {"legacy_lightgbm_mixed", "lightgbm", "residual_logistic"}:
+            if lgb_module is None or model_path is None:
+                raise SystemExit(f"Step9 seed-mean member {member.get('run_key')} requires LightGBM")
+            model_key = str(Path(model_path).resolve())
+            booster = booster_cache.get(model_key)
+            if booster is None:
+                booster = lgb_module.Booster(model_file=str(model_path))
+                booster_cache[model_key] = booster
+            base_features = list(booster.feature_name())
+            step7.validate_feature_columns(pair_rows, base_features, "step11.step9_seed_mean_pairs")
+            base_probabilities = np.asarray(
+                booster.predict(rows_to_feature_matrix(pair_rows, base_features)), dtype=float
+            )
+            feature_union = append_unique(feature_union, base_features)
+        if backend in {"legacy_lightgbm_mixed", "lightgbm"}:
+            probabilities = base_probabilities
+        elif backend in {"residual_logistic", "logistic_regression_l2"}:
+            if artifact_path is None:
+                raise SystemExit(f"Step9 seed-mean member {member.get('run_key')} has no artifact")
+            artifact = step7.load_json(Path(artifact_path))
+            artifact_features = [str(value) for value in artifact.get("feature_names", [])]
+            feature_union = append_unique(feature_union, artifact_features)
+            probabilities = apply_step9_logistic_artifact(
+                pair_rows,
+                artifact,
+                base_probabilities=base_probabilities,
+            )
+        else:
+            raise SystemExit(f"Unsupported Step9 seed-mean member backend: {backend!r}")
+        probability_columns.append(np.asarray(probabilities, dtype=float))
+    matrix = np.vstack(probability_columns)
+    return feature_union, matrix.mean(axis=0), {
+        "artifact_type": "step9_seed_mean_ensemble",
+        "aggregation": "arithmetic_mean_of_per_seed_probabilities",
+        "seed_count": len(members),
+        "seeds": [int(member["seed"]) for member in members],
+        "backend_counts": dict(sorted(backend_counts.items())),
+        "test_metrics_used_for_model_or_threshold_selection": False,
+    }
+
+
 def ranked_index_map(probabilities: np.ndarray, pair_rows: list[dict]) -> dict[int, int]:
     order = sorted(range(len(pair_rows)), key=lambda idx: (-float(probabilities[idx]), pair_rows[idx]["pair_uid"]))
     return {idx: rank for rank, idx in enumerate(order, start=1)}
@@ -1946,6 +2507,11 @@ def resolve_relation_reliability_min_score(reliability_cfg: dict, scorer_token: 
     return round_float(float(reliability_cfg.get("minimum_score", 0.0) or 0.0))
 
 
+def reliability_field_allowed(reliability_cfg: dict, field: str) -> bool:
+    allowlist = reliability_cfg.get("feature_allowlist")
+    return allowlist is None or field in {str(value) for value in allowlist}
+
+
 def style_consistency_score(row: dict, reliability_cfg: dict) -> float:
     fields = reliability_cfg.get("style_gap_fields") or [
         "item_count_percentile_gap_abs",
@@ -1959,14 +2525,18 @@ def style_consistency_score(row: dict, reliability_cfg: dict) -> float:
         "max_category_share_percentile_gap_abs",
         "uppercase_ratio_mean_percentile_gap_abs",
     ]
-    values = [row_float(row, str(field), 0.0) for field in fields if str(field) in row]
+    values = [
+        row_float(row, str(field), 0.0)
+        for field in fields
+        if str(field) in row and reliability_field_allowed(reliability_cfg, str(field))
+    ]
     if not values:
         return 0.0
     clipped = np.clip(np.asarray(values, dtype=float), 0.0, 1.0)
     return float(1.0 - np.median(clipped))
 
 
-def max_semantic_similarity(row: dict) -> float:
+def max_semantic_similarity(row: dict, reliability_cfg: dict) -> float:
     semantic_fields = [
         "embedding_cosine_gte_multilingual_base",
         "embedding_cosine_bge_m3",
@@ -1976,7 +2546,14 @@ def max_semantic_similarity(row: dict) -> float:
         "reranker_score_gte_multilingual_reranker_base",
         "reranker_score_bge_reranker_v2_m3",
     ]
-    return max((row_float(row, field, 0.0) for field in semantic_fields if field in row), default=0.0)
+    return max(
+        (
+            row_float(row, field, 0.0)
+            for field in semantic_fields
+            if field in row and reliability_field_allowed(reliability_cfg, field)
+        ),
+        default=0.0,
+    )
 
 
 def compute_relation_reliability(row: dict, reliability_cfg: dict) -> dict:
@@ -1988,36 +2565,62 @@ def compute_relation_reliability(row: dict, reliability_cfg: dict) -> dict:
     has_pgp = row_flag(row, "has_shared_pgp_fingerprint") or row_float(row, "shared_pgp_fingerprint_count_capped") > 0.0
     has_contact = row_flag(row, "has_shared_contact_exact") or row_float(row, "shared_contact_count_capped") > 0.0
     has_direct_identity = bool(has_pgp or has_contact)
-    if has_pgp:
+    use_direct_identity_context = bool(
+        reliability_cfg.get("use_direct_identity_context_for_reliability_rules", True)
+    )
+    direct_identity_context = has_direct_identity if use_direct_identity_context else False
+    if has_pgp and reliability_field_allowed(reliability_cfg, "has_shared_pgp_fingerprint"):
         value = float(weights.get("shared_pgp_fingerprint", 0.45))
         score += value
         components.append(f"+shared_pgp_fingerprint:{value:.3f}")
-    if has_contact:
+    if has_contact and reliability_field_allowed(reliability_cfg, "has_shared_contact_exact"):
         value = float(weights.get("shared_seller_contact", 0.35))
         score += value
         components.append(f"+shared_seller_contact:{value:.3f}")
 
     description_idf_mean = row_float(row, "shared_description_idf_mean")
     title_idf_mean = row_float(row, "shared_title_idf_mean")
-    if row_flag(row, "has_shared_description_clone") and description_idf_mean >= float(
+    if (
+        reliability_field_allowed(reliability_cfg, "has_shared_description_clone")
+        and reliability_field_allowed(reliability_cfg, "shared_description_idf_mean")
+        and row_flag(row, "has_shared_description_clone")
+        and description_idf_mean >= float(
         thresholds.get("rare_description_idf_mean_min", 2.0)
+        )
     ):
         value = float(weights.get("rare_description_clone", 0.15))
         score += value
         components.append(f"+rare_description_clone:{value:.3f}")
-    if row_flag(row, "has_shared_title_clone") and title_idf_mean >= float(
+    if (
+        reliability_field_allowed(reliability_cfg, "has_shared_title_clone")
+        and reliability_field_allowed(reliability_cfg, "shared_title_idf_mean")
+        and row_flag(row, "has_shared_title_clone")
+        and title_idf_mean >= float(
         thresholds.get("rare_title_idf_mean_min", 2.0)
+        )
     ):
         value = float(weights.get("rare_title_clone", 0.10))
         score += value
         components.append(f"+rare_title_clone:{value:.3f}")
-    if row_float(row, "shared_rare_ngram_count") >= float(thresholds.get("rare_ngram_count_min", 2.0)):
+    if reliability_field_allowed(
+        reliability_cfg, "shared_rare_ngram_count"
+    ) and row_float(row, "shared_rare_ngram_count") >= float(
+        thresholds.get("rare_ngram_count_min", 2.0)
+    ):
         value = float(weights.get("rare_ngram_support", 0.08))
         score += value
         components.append(f"+rare_ngram_support:{value:.3f}")
 
-    structural_score = row_float(row, "structural_support_score_raw")
-    category_jaccard = row_float(row, "profile_category_jaccard")
+    structural_score = (
+        row_float(row, "structural_support_score_raw")
+        if reliability_field_allowed(reliability_cfg, "structural_support_score_raw")
+        else 0.0
+    )
+    category_jaccard = (
+        row_float(row, "profile_category_jaccard")
+        if reliability_field_allowed(reliability_cfg, "profile_category_jaccard")
+        else 0.0
+    )
     if structural_score >= float(thresholds.get("structural_support_min", 0.5)) or category_jaccard >= float(
         thresholds.get("category_jaccard_min", 0.5)
     ):
@@ -2031,8 +2634,16 @@ def compute_relation_reliability(row: dict, reliability_cfg: dict) -> dict:
         score += value
         components.append(f"+style_consistency:{value:.3f}")
 
-    boilerplate_ratio_max = row_float(row, "boilerplate_ratio_max")
-    shared_boilerplate_count = row_float(row, "shared_boilerplate_count")
+    boilerplate_ratio_max = (
+        row_float(row, "boilerplate_ratio_max")
+        if reliability_field_allowed(reliability_cfg, "boilerplate_ratio_max")
+        else 0.0
+    )
+    shared_boilerplate_count = (
+        row_float(row, "shared_boilerplate_count")
+        if reliability_field_allowed(reliability_cfg, "shared_boilerplate_count")
+        else 0.0
+    )
     if boilerplate_ratio_max >= float(thresholds.get("boilerplate_ratio_max_penalty_min", 0.75)) or (
         shared_boilerplate_count >= float(thresholds.get("shared_boilerplate_count_penalty_min", 3.0))
     ):
@@ -2041,14 +2652,20 @@ def compute_relation_reliability(row: dict, reliability_cfg: dict) -> dict:
         components.append(f"{value:.3f}:boilerplate_template_penalty")
 
     clone_or_structural_support = bool(
-        row_flag(row, "has_shared_description_clone")
-        or row_flag(row, "has_shared_title_clone")
+        (
+            reliability_field_allowed(reliability_cfg, "has_shared_description_clone")
+            and row_flag(row, "has_shared_description_clone")
+        )
+        or (
+            reliability_field_allowed(reliability_cfg, "has_shared_title_clone")
+            and row_flag(row, "has_shared_title_clone")
+        )
         or structural_score >= float(thresholds.get("structural_support_min", 0.5))
         or category_jaccard >= float(thresholds.get("category_jaccard_min", 0.5))
     )
     semantic_topic_only = (
-        max_semantic_similarity(row) >= float(thresholds.get("semantic_topic_similarity_min", 0.75))
-        and not has_direct_identity
+        max_semantic_similarity(row, reliability_cfg) >= float(thresholds.get("semantic_topic_similarity_min", 0.75))
+        and not direct_identity_context
         and not clone_or_structural_support
     )
     if semantic_topic_only:
@@ -2061,10 +2678,73 @@ def compute_relation_reliability(row: dict, reliability_cfg: dict) -> dict:
         "score": round_float(score),
         "components": components,
         "has_direct_identity_support": has_direct_identity,
+        "direct_identity_context_used_for_reliability_rules": use_direct_identity_context,
         "style_consistency_score": round_float(style_score),
-        "max_semantic_similarity": round_float(max_semantic_similarity(row)),
+        "max_semantic_similarity": round_float(max_semantic_similarity(row, reliability_cfg)),
         "semantic_topic_only": semantic_topic_only,
     }
+
+
+def validate_clean_scoring_feature_contract(feature_names: list[str], policy: dict) -> None:
+    gate = policy.get("step15_v6_validation_gate", {}) or {}
+    if str(gate.get("graph_validation_mode", "")) != "clean_topology":
+        return
+    forbidden = {
+        "has_shared_contact_exact",
+        "has_shared_pgp_fingerprint",
+        "shared_contact_count_capped",
+        "shared_pgp_fingerprint_count_capped",
+    }
+    used = sorted(forbidden & set(feature_names))
+    if used:
+        raise SystemExit(
+            "Step11-v6 clean mode refuses identifier-bearing scorer features: "
+            f"{used}"
+        )
+
+
+def validate_clean_runtime_contract(policy: dict) -> None:
+    gate = policy.get("step15_v6_validation_gate", {}) or {}
+    if str(gate.get("graph_validation_mode", "")) != "clean_topology":
+        return
+    expected_scope = (
+        "identifier_free_scoring_and_graph_filter_conditional_on_fixed_candidate_universe"
+    )
+    if str(gate.get("scientific_scope", "")) != expected_scope:
+        raise SystemExit("Step11-v6 clean runtime policy has an invalid scientific scope")
+    step15_policy_value = str((policy.get("input_paths", {}) or {}).get("step15_policy", ""))
+    if not step15_policy_value:
+        raise SystemExit("Step11-v6 clean runtime does not bind the Step15-v6 feature policy")
+    step15_policy = step7.load_json(
+        resolve_policy_path(step15_policy_value, ROOT / step15_policy_value)
+    )
+    expected = [
+        str(value)
+        for value in (step15_policy.get("feature_sets", {}) or {}).get("strict_clean_30d", [])
+    ]
+    actual = [
+        str(value)
+        for value in relation_reliability_config(policy).get("feature_allowlist", []) or []
+    ]
+    if len(expected) != 30 or actual != expected:
+        raise SystemExit(
+            "Step11-v6 clean reliability allow-list is not the exact strict_clean_30d policy list"
+        )
+    forbidden = {
+        "candidate_rule_count_raw",
+        "candidate_rule_count_non_identifier",
+        "sparse_lexical_similarity_raw",
+        "structural_support_score_raw",
+        "uppercase_ratio_mean_percentile_gap_abs",
+        "uppercase_ratio_mean_raw_gap_abs",
+        "has_shared_contact_exact",
+        "has_shared_pgp_fingerprint",
+        "shared_contact_count_capped",
+        "shared_pgp_fingerprint_count_capped",
+    }
+    leaked = sorted(forbidden & set(actual))
+    if leaked:
+        raise SystemExit(f"Step11-v6 clean reliability allow-list contains forbidden fields: {leaked}")
 
 
 def build_pair_records(
@@ -2230,11 +2910,107 @@ def resolve_shared_neighbor_pruning_mode(edge_filter_cfg: dict) -> str:
     return value
 
 
+def is_reviewed_direct_proof_positive(edge: dict) -> bool:
+    """Return true only for reviewed positives with seller-facing direct identity support."""
+    return str(edge.get("review_label", "")).strip().lower() == "positive" and row_flag(
+        edge, "relation_reliability_direct_identity_support"
+    )
+
+
+def isolated_direct_proof_pair_uids(reference_edges: list[dict]) -> set[str]:
+    proof_edges = [edge for edge in reference_edges if is_reviewed_direct_proof_positive(edge)]
+    adjacency = build_adjacency_from_edges(proof_edges)
+    isolated: set[str] = set()
+    for edge in proof_edges:
+        left = str(edge.get("seller_uid_left", ""))
+        right = str(edge.get("seller_uid_right", ""))
+        if adjacency.get(left, set()) == {right} and adjacency.get(right, set()) == {left}:
+            isolated.add(str(edge.get("pair_uid", "")))
+    return isolated
+
+
+def build_graph_filter_reference_audit(
+    reference_edges: list[dict],
+    stage_edges: dict[str, list[dict]],
+) -> dict:
+    """Audit graph filtering against frozen reviewed labels without using them for filtering."""
+    reference_by_uid = {
+        str(edge.get("pair_uid", "")): edge
+        for edge in reference_edges
+        if str(edge.get("pair_uid", ""))
+    }
+    proof_uids = {
+        pair_uid
+        for pair_uid, edge in reference_by_uid.items()
+        if is_reviewed_direct_proof_positive(edge)
+    }
+    reviewed_negative_uids = {
+        pair_uid
+        for pair_uid, edge in reference_by_uid.items()
+        if str(edge.get("review_label", "")).strip().lower() == "negative"
+    }
+    isolated_uids = isolated_direct_proof_pair_uids(reference_edges)
+    threshold_uids = {
+        str(edge.get("pair_uid", "")) for edge in stage_edges.get("model_threshold", [])
+    }
+    threshold_negative_uids = reviewed_negative_uids & threshold_uids
+    stage_rows = []
+    for stage_name, edges in stage_edges.items():
+        retained_uids = {str(edge.get("pair_uid", "")) for edge in edges}
+        retained_adjacency = build_adjacency_from_edges(edges)
+        retained_components = find_components(retained_adjacency)
+        retained_proof = proof_uids & retained_uids
+        retained_negative = reviewed_negative_uids & retained_uids
+        retained_threshold_negative = threshold_negative_uids & retained_uids
+        retained_isolated = isolated_uids & retained_uids
+        stage_rows.append(
+            {
+                "stage": stage_name,
+                "edge_count": len(retained_uids),
+                "seller_count_with_edge": len(retained_adjacency),
+                "connected_component_count": len(retained_components),
+                "reviewed_direct_proof_positive_total": len(proof_uids),
+                "reviewed_direct_proof_positive_retained": len(retained_proof),
+                "reviewed_direct_proof_positive_retention_rate": round_float(
+                    len(retained_proof) / max(len(proof_uids), 1)
+                ),
+                "reviewed_negative_total": len(reviewed_negative_uids),
+                "reviewed_negative_retained": len(retained_negative),
+                "reviewed_negative_removal_rate_vs_candidate_universe": round_float(
+                    1.0 - len(retained_negative) / max(len(reviewed_negative_uids), 1)
+                ),
+                "threshold_pass_reviewed_negative_total": len(threshold_negative_uids),
+                "threshold_pass_reviewed_negative_retained": len(retained_threshold_negative),
+                "reviewed_negative_removal_rate_after_threshold": round_float(
+                    1.0
+                    - len(retained_threshold_negative) / max(len(threshold_negative_uids), 1)
+                ),
+                "isolated_direct_proof_pair_total": len(isolated_uids),
+                "isolated_direct_proof_pair_retained": len(retained_isolated),
+                "isolated_direct_proof_pair_retention_rate": round_float(
+                    len(retained_isolated) / max(len(isolated_uids), 1)
+                ),
+            }
+        )
+    return {
+        "role": "post_hoc_frozen_label_audit_not_used_by_graph_filters",
+        "proof_definition": "review_label=positive AND seller-facing shared contact/PGP support",
+        "false_edge_definition": "review_label=negative; unlabeled candidate edges are not counted as false",
+        "isolated_true_pair_definition": "direct-proof positive whose two sellers form a size-2 component in the reviewed direct-proof graph",
+        "candidate_universe_edge_count": len(reference_by_uid),
+        "reviewed_direct_proof_positive_count": len(proof_uids),
+        "reviewed_negative_count": len(reviewed_negative_uids),
+        "isolated_direct_proof_pair_count": len(isolated_uids),
+        "stages": stage_rows,
+    }
+
+
 def apply_graph_edge_filters(
     edges: list[dict],
     pair_score_lookup: dict[str, float],
     scorer_token: str,
     policy: dict,
+    reference_universe: list[dict] | None = None,
 ) -> tuple[list[dict], dict]:
     graph_policy = policy.get("graph_policy", {})
     edge_filter_cfg = graph_policy.get("graph_edge_filters", {}) or {}
@@ -2274,9 +3050,20 @@ def apply_graph_edge_filters(
         "removed_by_reciprocal_top_k": 0,
         "removed_by_shared_neighbor": 0,
         "removed_by_triangle": 0,
+        "direct_identity_hard_kept_by_reciprocal_top_k": 0,
+        "direct_identity_hard_kept_by_shared_neighbor": 0,
+        "direct_identity_hard_kept_by_triangle": 0,
         "post_filter_edge_count": int(len(edges)),
     }
+    stage_edges: dict[str, list[dict]] = {
+        "candidate_universe": list(reference_universe or edges),
+        "model_threshold": list(edges),
+    }
     if not enabled or not edges:
+        stage_edges["post_filter"] = list(edges)
+        diagnostics["frozen_label_reference_audit"] = build_graph_filter_reference_audit(
+            list(reference_universe or edges), stage_edges
+        )
         return edges, diagnostics
 
     filtered_edges = list(edges)
@@ -2302,20 +3089,32 @@ def apply_graph_edge_filters(
             }
         )
         filtered_edges = reliability_edges
+    stage_edges["after_relation_reliability"] = list(filtered_edges)
 
     reciprocal_top_k = int(edge_filter_cfg.get("reciprocal_top_k", 0) or 0)
     if reciprocal_top_k > 0:
         adjacency_scores = build_adjacency_scores(filtered_edges, pair_score_lookup)
         top_k_map = top_k_neighbors(adjacency_scores, reciprocal_top_k)
         reciprocal_edges = []
+        reciprocal_direct_kept = 0
         for edge in filtered_edges:
             seller_left = edge["seller_uid_left"]
             seller_right = edge["seller_uid_right"]
-            if seller_right in top_k_map.get(seller_left, set()) and seller_left in top_k_map.get(seller_right, set()):
+            reciprocal_pass = (
+                seller_right in top_k_map.get(seller_left, set())
+                and seller_left in top_k_map.get(seller_right, set())
+            )
+            direct_hard_keep = reliability_hard_keep_direct and row_flag(
+                edge, "relation_reliability_direct_identity_support"
+            )
+            if reciprocal_pass or direct_hard_keep:
                 reciprocal_edges.append(edge)
+                reciprocal_direct_kept += int(direct_hard_keep and not reciprocal_pass)
         diagnostics["after_reciprocal_top_k_edge_count"] = int(len(reciprocal_edges))
         diagnostics["removed_by_reciprocal_top_k"] = int(len(filtered_edges) - len(reciprocal_edges))
+        diagnostics["direct_identity_hard_kept_by_reciprocal_top_k"] = int(reciprocal_direct_kept)
         filtered_edges = reciprocal_edges
+    stage_edges["after_reciprocal_top_k"] = list(filtered_edges)
 
     shared_neighbor_min = int(edge_filter_cfg.get("require_shared_neighbor_count_min", 0) or 0)
     if shared_neighbor_min > 0 and filtered_edges:
@@ -2324,6 +3123,7 @@ def apply_graph_edge_filters(
         original_edge_count = len(filtered_edges)
         supported_edges = list(filtered_edges)
         pass_count = 0
+        shared_neighbor_direct_kept: set[str] = set()
         while supported_edges:
             pass_count += 1
             adjacency = build_adjacency_from_edges(supported_edges)
@@ -2333,10 +3133,16 @@ def apply_graph_edge_filters(
                 seller_right = edge["seller_uid_right"]
                 shared_neighbor_count = len(adjacency[seller_left] & adjacency[seller_right])
                 score = float(pair_score_lookup[edge["pair_uid"]])
-                if shared_neighbor_count >= shared_neighbor_min or (
+                direct_hard_keep = reliability_hard_keep_direct and row_flag(
+                    edge, "relation_reliability_direct_identity_support"
+                )
+                topology_keep = shared_neighbor_count >= shared_neighbor_min or (
                     direct_keep_threshold is not None and score >= direct_keep_threshold
-                ):
+                )
+                if topology_keep or direct_hard_keep:
                     next_supported_edges.append(edge)
+                    if direct_hard_keep and not topology_keep:
+                        shared_neighbor_direct_kept.add(str(edge.get("pair_uid", "")))
             if len(next_supported_edges) == len(supported_edges):
                 supported_edges = next_supported_edges
                 break
@@ -2348,21 +3154,35 @@ def apply_graph_edge_filters(
         diagnostics["shared_neighbor_pruning_passes"] = int(pass_count)
         diagnostics["after_shared_neighbor_edge_count"] = int(len(supported_edges))
         diagnostics["removed_by_shared_neighbor"] = int(original_edge_count - len(supported_edges))
+        diagnostics["direct_identity_hard_kept_by_shared_neighbor"] = len(shared_neighbor_direct_kept)
         filtered_edges = supported_edges
+    stage_edges["after_shared_neighbor"] = list(filtered_edges)
 
     if bool(edge_filter_cfg.get("require_triangle_participation", False)) and filtered_edges:
         adjacency = build_adjacency_from_edges(filtered_edges)
         triangle_edges = []
+        triangle_direct_kept = 0
         for edge in filtered_edges:
             seller_left = edge["seller_uid_left"]
             seller_right = edge["seller_uid_right"]
-            if adjacency[seller_left] & adjacency[seller_right]:
+            triangle_pass = bool(adjacency[seller_left] & adjacency[seller_right])
+            direct_hard_keep = reliability_hard_keep_direct and row_flag(
+                edge, "relation_reliability_direct_identity_support"
+            )
+            if triangle_pass or direct_hard_keep:
                 triangle_edges.append(edge)
+                triangle_direct_kept += int(direct_hard_keep and not triangle_pass)
         diagnostics["after_triangle_edge_count"] = int(len(triangle_edges))
         diagnostics["removed_by_triangle"] = int(len(filtered_edges) - len(triangle_edges))
+        diagnostics["direct_identity_hard_kept_by_triangle"] = int(triangle_direct_kept)
         filtered_edges = triangle_edges
+    stage_edges["after_triangle"] = list(filtered_edges)
 
     diagnostics["post_filter_edge_count"] = int(len(filtered_edges))
+    stage_edges["post_filter"] = list(filtered_edges)
+    diagnostics["frozen_label_reference_audit"] = build_graph_filter_reference_audit(
+        list(reference_universe or edges), stage_edges
+    )
     return filtered_edges, diagnostics
 
 
@@ -2376,6 +3196,7 @@ def build_cluster_rows_and_summary(
     minimum_cluster_size: int,
     scorer_token: str,
     policy: dict,
+    audit_reference_universe: list[dict] | None = None,
 ) -> tuple[list[dict], dict]:
     threshold_edges = [row for row in pair_records if pair_score_lookup[row["pair_uid"]] >= threshold]
     kept_edges, filter_diagnostics = apply_graph_edge_filters(
@@ -2383,6 +3204,7 @@ def build_cluster_rows_and_summary(
         pair_score_lookup,
         scorer_token,
         policy,
+        reference_universe=audit_reference_universe or pair_records,
     )
     adjacency = build_adjacency_from_edges(kept_edges)
 
@@ -2538,12 +3360,18 @@ def main() -> None:
     args = parse_args()
     policy_path = args.policy.resolve()
     policy = step7.load_json(policy_path)
+    validate_clean_runtime_contract(policy)
     scorer_selection = resolve_scorer_selection(policy)
     dynamic_mainline_candidates = build_dynamic_mainline_candidates(policy, scorer_selection)
     input_paths = policy.get("input_paths", {})
-    pair_feature_path = ROOT / input_paths.get("pair_features", policy["input_dependencies"][0])
-    seller_profile_path = ROOT / input_paths.get("seller_profiles", policy["input_dependencies"][1])
+    pair_feature_value = str(input_paths.get("pair_features", policy["input_dependencies"][0]))
+    seller_profile_value = str(input_paths.get("seller_profiles", policy["input_dependencies"][1]))
+    pair_feature_path = resolve_policy_path(pair_feature_value, ROOT / pair_feature_value)
+    seller_profile_path = resolve_policy_path(seller_profile_value, ROOT / seller_profile_value)
     scorer_reference = resolve_scorer_reference(policy, args, dynamic_mainline_candidates)
+    frozen_input_verification = verify_runtime_frozen_inputs(
+        policy, scorer_reference, pair_feature_path, seller_profile_path
+    )
     scorer_token = str(scorer_reference["scorer_token"])
     pairwise_primary_threshold = float(scorer_reference["primary_threshold"])
     graph_primary_threshold, graph_primary_threshold_source = resolve_graph_primary_threshold(
@@ -2555,26 +3383,43 @@ def main() -> None:
     model_path_value = scorer_reference.get("model_path")
     model_path = Path(model_path_value) if model_path_value is not None else None
     scoring_backend = str(scorer_reference.get("scoring_backend", "lightgbm") or "lightgbm")
+    raw_feature_name = str(scorer_reference.get("raw_feature_name", "") or "").strip()
     calibration_artifact_path = scorer_reference.get("calibration_artifact_path")
     scorer_artifact_path = scorer_reference.get("scorer_artifact_path")
     scorer_artifact_paths = [Path(path) for path in scorer_reference.get("scorer_artifact_paths", []) or []]
+    step9_ensemble_members = scorer_reference.get("ensemble_members", []) or []
 
     minimum_cluster_size = int(policy["graph_policy"]["minimum_cluster_size"])
 
-    lgb = None if scoring_backend in {"logistic_regression_l2", "step15_mlp_ensemble"} else step7.require_lightgbm()
+    ensemble_requires_lightgbm = any(
+        str(member.get("scoring_backend", ""))
+        in {"legacy_lightgbm_mixed", "lightgbm", "residual_logistic"}
+        for member in step9_ensemble_members
+    )
+    lgb = (
+        None
+        if scoring_backend in {"raw_feature", "logistic_regression_l2", "step15_mlp_ensemble"}
+        or (scoring_backend == "step9_seed_mean_ensemble" and not ensemble_requires_lightgbm)
+        else step7.require_lightgbm()
+    )
     seller_index = load_seller_index(seller_profile_path)
     pair_rows = step7.load_csv(pair_feature_path)
     step7.ensure_non_empty(pair_rows, "step11.zh_target_strict_pairs")
     ensure_unique_pair_uids(pair_rows)
     ensure_pair_sellers_exist(pair_rows, seller_index)
     pair_rows = ensure_core_transfer_eligible(pair_rows)
+    pair_rows = strip_posthoc_review_labels(pair_rows)
 
     booster = None
     calibration_artifact = None
     scorer_artifact = None
     model_num_trees = None
     base_probabilities = None
-    if scoring_backend in {"lightgbm", "legacy_lightgbm_mixed", "lightgbm_with_calibration"}:
+    if scoring_backend == "raw_feature":
+        feature_names, probabilities = apply_raw_feature_scorer(
+            pair_rows, raw_feature_name
+        )
+    elif scoring_backend in {"lightgbm", "legacy_lightgbm_mixed", "lightgbm_with_calibration"}:
         if model_path is None:
             raise SystemExit(f"Step 11 scoring backend {scoring_backend!r} requires a LightGBM model path.")
         booster = lgb.Booster(model_file=str(model_path))
@@ -2622,8 +3467,14 @@ def main() -> None:
             "artifact_paths": [relative_path(path) for path in scorer_artifact_paths],
             "primary_threshold_diagnostics": scorer_reference.get("primary_threshold_diagnostics"),
         }
+    elif scoring_backend == "step9_seed_mean_ensemble":
+        feature_names, probabilities, scorer_artifact = apply_step9_seed_mean_ensemble(
+            pair_rows, step9_ensemble_members, lgb
+        )
     else:
         raise SystemExit(f"Unsupported Step 11 scoring backend: {scoring_backend}")
+
+    validate_clean_scoring_feature_contract(feature_names, policy)
 
     calibration_artifact = None
     if calibration_artifact_path is not None:
@@ -2647,6 +3498,29 @@ def main() -> None:
         for row, probability in zip(pair_rows, probabilities, strict=True)
     }
     pair_records = build_pair_records(pair_rows, probabilities, seller_index, thresholds, scorer_token, policy)
+    step5_label_value = str(input_paths.get("step5_frozen_labels", "") or "").strip()
+    posthoc_label_path = (
+        resolve_policy_path(step5_label_value, ROOT / step5_label_value)
+        if step5_label_value
+        else None
+    )
+    if (policy.get("step15_v6_validation_gate", {}) or {}) and posthoc_label_path is None:
+        raise SystemExit("Step11-v6 requires a frozen Step5 label source for posthoc audit")
+    if posthoc_label_path is not None:
+        posthoc_label_index = load_posthoc_label_index(posthoc_label_path)
+        posthoc_audit_records, posthoc_label_diagnostics = attach_posthoc_review_labels(
+            pair_records, posthoc_label_index
+        )
+    else:
+        posthoc_audit_records = [dict(record) for record in pair_records]
+        posthoc_label_diagnostics = {
+            "role": "not_configured",
+            "pair_record_count": len(pair_records),
+            "matched_pair_uid_count": 0,
+            "unmatched_pair_uid_count": len(pair_records),
+            "label_counts": {"missing": len(pair_records)},
+            "auditable_reviewed_label_count": 0,
+        }
     pair_universe_sellers = sorted(
         {
             seller_uid
@@ -2673,11 +3547,12 @@ def main() -> None:
             "Step 11 scored-pair fieldnames no longer match schema/step11_clustering_policy.json. "
             "Update the policy or the script before running on Linux."
         )
-    step7.write_csv(
-        scored_pair_output_path,
-        pair_records,
-        scored_pair_fieldnames,
-    )
+    output_bundle = [
+        (
+            scored_pair_output_path,
+            csv_bytes(pair_records, scored_pair_fieldnames, encoding="utf-8-sig"),
+        )
+    ]
 
     cluster_output_paths = {}
     threshold_views = {}
@@ -2692,13 +3567,23 @@ def main() -> None:
             minimum_cluster_size,
             scorer_token,
             policy,
+            audit_reference_universe=posthoc_audit_records,
         )
         cluster_path = output_path(
             policy["output_templates"]["clusters"],
             experiment_name=scorer_token,
             threshold_token=threshold_token(threshold),
         )
-        step7.write_csv(cluster_path, cluster_rows, policy["cluster_output_fields"])
+        output_bundle.append(
+            (
+                cluster_path,
+                csv_bytes(
+                    cluster_rows,
+                    policy["cluster_output_fields"],
+                    encoding="utf-8-sig",
+                ),
+            )
+        )
         cluster_output_paths[threshold_token(threshold)] = relative_path(cluster_path)
         threshold_views[threshold_token(threshold)] = threshold_summary
 
@@ -2716,6 +3601,11 @@ def main() -> None:
         ),
         "graph_primary_threshold_present": threshold_token(graph_primary_threshold) in threshold_views,
         "cluster_files_emitted_for_all_thresholds": len(cluster_output_paths) == len(thresholds),
+        "posthoc_frozen_label_audit_nonempty": (
+            int(posthoc_label_diagnostics.get("auditable_reviewed_label_count", 0)) > 0
+            if posthoc_label_path is not None
+            else True
+        ),
         "graph_primary_threshold_not_above_score_ceiling": not graph_diagnostics[
             "graph_primary_threshold_exceeds_score_ceiling"
         ],
@@ -2751,6 +3641,10 @@ def main() -> None:
             "resolved_graph_primary_threshold_source": graph_primary_threshold_source,
             "scoring_backend": scoring_backend,
             "resolved_model_path": None if model_path is None else relative_path(model_path),
+            "resolved_model_paths": [
+                relative_path(Path(path))
+                for path in (scorer_reference.get("model_paths", []) or [])
+            ],
             "resolved_calibration_artifact_path": None
             if calibration_artifact_path is None
             else relative_path(Path(calibration_artifact_path)),
@@ -2758,6 +3652,10 @@ def main() -> None:
             if scorer_artifact_path is None
             else relative_path(Path(scorer_artifact_path)),
             "resolved_scorer_artifact_paths": [relative_path(path) for path in scorer_artifact_paths],
+            "resolved_raw_feature_name": raw_feature_name or None,
+            "resolved_threshold_metrics_path": None
+            if scorer_reference.get("threshold_metrics_path") is None
+            else relative_path(Path(scorer_reference["threshold_metrics_path"])),
             "primary_threshold_diagnostics": scorer_reference.get("primary_threshold_diagnostics"),
         },
         "selected_scorer": {
@@ -2769,14 +3667,16 @@ def main() -> None:
             ),
             "default_step9_ratio": scorer_selection.get("default_step9_ratio"),
             "default_step9_seed": scorer_selection.get("default_step9_seed"),
+            "default_step9_seeds": scorer_selection.get("default_step9_seeds", []),
             "default_step15_experiment_name": str(scorer_selection.get("default_step15_experiment_name", "") or ""),
             "default_step15_phase": str(scorer_selection.get("default_step15_phase", "") or ""),
             "default_step15_seeds": scorer_selection.get("default_step15_seeds", []),
             "requested_scorer_family": args.scorer_family,
+            "requested_raw_feature_control": args.raw_feature_control,
             "requested_step7_experiment": args.step7_experiment,
             "requested_step9_experiment": args.step9_experiment,
             "requested_step9_ratio": args.step9_ratio,
-            "requested_step9_seed": args.step9_seed,
+            "requested_step9_seeds": args.step9_seeds,
             "requested_step9_calibration_experiment": args.step9_calibration_experiment,
             "requested_step15_experiment": args.step15_experiment,
             "requested_step15_phase": args.step15_phase,
@@ -2812,6 +3712,15 @@ def main() -> None:
             "threshold_resolution": threshold_resolution,
         },
         "dynamic_mainline_candidates": dynamic_mainline_candidates,
+        "frozen_input_verification": frozen_input_verification,
+        "posthoc_frozen_label_audit": {
+            **posthoc_label_diagnostics,
+            "path": None if posthoc_label_path is None else relative_path(posthoc_label_path),
+            "sha256": None if posthoc_label_path is None else sha256_file(posthoc_label_path),
+            "join_timing": "after_all_model_probabilities_and_relation_reliability_scores_are_computed",
+            "used_by_model_features": False,
+            "used_by_graph_filter_decisions": False,
+        },
         "graph_policy": policy["graph_policy"],
         "universes": {
             "seller_profile_count": len(seller_index),
@@ -2842,7 +3751,18 @@ def main() -> None:
         "acceptance_checks_failed": acceptance_checks_failed,
     }
 
-    step7.write_json(summary_path, summary)
+    output_bundle.append(
+        (
+            summary_path,
+            json_bytes(
+                summary,
+                ensure_ascii=False,
+                indent=2,
+                trailing_newline=False,
+            ),
+        )
+    )
+    write_immutable_bundle(output_bundle)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 

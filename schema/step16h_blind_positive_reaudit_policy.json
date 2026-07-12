@@ -1,0 +1,47 @@
+{
+  "version": "2026-07-12-step16h-label-concealed-review-v2",
+  "objective": "Independent label-concealed and score-blind review of 80 current Chinese valid/test positive candidates mixed with 80 frozen negative controls. Reviewers see raw pair evidence but no prior label, evidence tier, review conclusion, model score, or graph membership.",
+  "inputs": {
+    "positive_reaudit": "reports/step16f_valid_test_positive_reaudit.csv",
+    "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv"
+  },
+  "expected_positive_candidate_count": 80,
+  "negative_control_count": 80,
+  "expected_row_count": 160,
+  "negative_control_selection": {
+    "eligible_splits": ["valid", "test"],
+    "required_usable_for_supervision": true,
+    "required_usable_for_core_transfer": true,
+    "selection_seed": "step16h-negative-controls-20260712",
+    "split_targets": {"valid": 30, "test": 50}
+  },
+  "reviewers": ["reviewer_a", "reviewer_b"],
+  "review_key_field": "pair_uid",
+  "reviewer_execution_type": "independent_ai_subagents_requested_by_user_not_human_annotators",
+  "allowed_decisions": [
+    "strict_same_controller",
+    "soft_same_controller",
+    "different_controller",
+    "uncertain"
+  ],
+  "strict_positive_requirement": "Shared seller-facing direct identifier or independently closed component/alias evidence. Template, topic, product, victim-data, public URL, and marketplace-support overlap are insufficient.",
+  "soft_positive_requirement": "Strong structural/style/clone support without sufficient direct identity proof; may be used only in sensitivity analysis, never as strict gold.",
+  "hard_rules": [
+    "Reviewers must not inspect Step7, Step9, Step15, Step17, or Step11 scores and predictions.",
+    "Reviewers must not see the previous review_label, evidence_type, paper_evidence_tier, recommended_use, confidence, rationale, reviewer_id, or review_notes fields.",
+    "No old conclusion-bearing review note may be copied into a reviewer queue.",
+    "Every queue row must include raw Step4 left/right previews so seller-facing context can be checked directly.",
+    "The aggregation script never modifies Step5 labels.",
+    "Every disagreement requires a separate adjudication decision with written evidence rationale."
+  ],
+  "outputs": {
+    "manifest": "reports/step16h_blind_review/manifest.json",
+    "reviewer_a_queue": "reports/step16h_blind_review/reviewer_a_queue.csv",
+    "reviewer_b_queue": "reports/step16h_blind_review/reviewer_b_queue.csv",
+    "agreement_summary": "reports/step16h_blind_review/agreement_summary.json",
+    "adjudication_queue": "reports/step16h_blind_review/adjudication_queue.csv",
+    "final_pair_decisions": "reports/step16h_blind_review/final_pair_decisions.csv",
+    "completion_manifest": "reports/step16h_blind_review/completion_manifest.json"
+  }
+}

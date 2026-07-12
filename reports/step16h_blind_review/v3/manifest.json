@@ -1,0 +1,59 @@
+{
+  "step": "step16h_prepare_blind_positive_reaudit",
+  "policy": "schema\\step16h_blind_positive_reaudit_v3_policy.json",
+  "policy_version": "2026-07-12-step16h-evidence-complete-blind-review-v3",
+  "inputs": [
+    {
+      "path": "reports\\step16f_valid_test_positive_reaudit.csv",
+      "sha256": "39f2d8663aceaeb4a2079b23e079295c2f8d64eb2e5a9f7d0e4390c8feef4519"
+    },
+    {
+      "path": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+      "sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee"
+    },
+    {
+      "path": "reports\\step4_zh_target_strict_silver_candidate_pairs.csv",
+      "sha256": "bafcdf0a24f4e19832858972898534ead2da05d89ec6d3f94b8cca18d0c385b8"
+    },
+    {
+      "path": "reports\\step3_item_identity_signals.zh_target_strict.csv",
+      "sha256": "189197bbfa5f859e38db02d8c00244b054c570de5609edb80b61f4b47bc9b76c"
+    }
+  ],
+  "row_count": 160,
+  "concealed_reference_counts": {
+    "positive_candidates": 80,
+    "negative_controls": 80
+  },
+  "concealed_pair_universe_sha256": "dfb5ec11a5cc9b1e8751ff15bd57082268bf0a1368aa8d5e282c80679e0b76aa",
+  "old_decision_fields_removed": [
+    "review_label",
+    "evidence_type",
+    "paper_evidence_tier",
+    "recommended_use",
+    "confidence",
+    "needs_manual_recheck",
+    "risk_flags",
+    "rationale",
+    "reviewer_id",
+    "review_notes"
+  ],
+  "model_or_graph_score_fields_present": false,
+  "prior_label_or_conclusion_fields_present": false,
+  "raw_step4_previews_present": true,
+  "raw_item_contact_occurrences_present": true,
+  "opaque_review_keys": true,
+  "blind_mapping": "reports\\step16h_blind_review\\v3\\blind_mapping.csv",
+  "blind_mapping_sha256": "7526f6387f6df2981e90cbbf833356d6568c8779070027afa138d590800793b1",
+  "blindness_scope": "procedural_score_and_prior-label_blinding; shared-workspace filesystem ACL isolation is not claimed",
+  "queues": {
+    "reviewer_a": {
+      "path": "reports\\step16h_blind_review\\v3\\reviewer_a_queue.csv",
+      "sha256": "792b99782f7795ad9274b5910975e11e1483f5e88a4c3f9169987268c7d9d689"
+    },
+    "reviewer_b": {
+      "path": "reports\\step16h_blind_review\\v3\\reviewer_b_queue.csv",
+      "sha256": "52268080c79a8773f06905685c7a23254885fb23cd150a08cb969f5b01fc3072"
+    }
+  }
+}

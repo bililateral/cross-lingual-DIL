@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import math
+import subprocess
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -59,6 +61,14 @@ def parse_args() -> argparse.Namespace:
             "then exit before loading data or training."
         ),
     )
+    parser.add_argument(
+        "--validation-only",
+        action="store_true",
+        help=(
+            "Train and write validation artifacts only. No zh_test row is loaded or scored, "
+            "including validation-selected endpoints."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -100,6 +110,20 @@ def label_to_int(label: str) -> int:
 
 def output_path(template: str, experiment_name: str, phase_id: str, seed: int) -> Path:
     return ROOT / template.format(experiment_name=experiment_name, phase_id=phase_id, seed=seed)
+
+
+def atomic_write_csv(path: Path, rows: list[dict], fieldnames: list[str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    step7.write_csv(temporary, rows, fieldnames)
+    temporary.replace(path)
+
+
+def atomic_write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    step7.write_json(temporary, payload)
+    temporary.replace(path)
 
 
 def load_pool(pool_name: str, pool_cfg: dict) -> list[dict]:
@@ -164,6 +188,114 @@ def apply_standardizer(x: np.ndarray, means: np.ndarray, stds: np.ndarray) -> np
     return (filled - means) / stds
 
 
+def canonical_json_sha256(payload: dict) -> str:
+    encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def current_git_commit() -> str | None:
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    value = completed.stdout.strip()
+    return value or None
+
+
+def fit_standardizer_bundle(
+    rows: list[dict],
+    feature_names: list[str],
+    preprocessing_cfg: dict | None = None,
+) -> dict:
+    preprocessing_cfg = preprocessing_cfg or {}
+    raw = rows_to_feature_matrix(rows, feature_names)
+    transformed = raw.copy()
+    domain_feature_names = [
+        str(name) for name in preprocessing_cfg.get("domain_standardized_features", [])
+    ]
+    unknown_features = [name for name in domain_feature_names if name not in feature_names]
+    if unknown_features:
+        raise ValueError(f"Domain-standardized features are absent from the feature set: {unknown_features}")
+    allowed_domains = [str(name) for name in preprocessing_cfg.get("allowed_domains", [])]
+    domain_stats: dict[str, dict] = {}
+    if domain_feature_names:
+        if not allowed_domains:
+            raise ValueError("Domain-standardized features require explicit allowed_domains")
+        observed_domains = [str(row.get("step15_pool", "")) for row in rows]
+        unknown_domains = sorted(set(observed_domains) - set(allowed_domains))
+        if unknown_domains:
+            raise ValueError(f"Unknown domains while fitting Step15 scaler: {unknown_domains}")
+        feature_indices = [feature_names.index(name) for name in domain_feature_names]
+        for domain in allowed_domains:
+            row_indices = [idx for idx, value in enumerate(observed_domains) if value == domain]
+            if not row_indices:
+                raise ValueError(f"No train rows available for configured scaler domain: {domain}")
+            values = raw[np.asarray(row_indices, dtype=int)][:, feature_indices]
+            means, stds = fit_standardizer(values)
+            transformed[np.ix_(np.asarray(row_indices, dtype=int), np.asarray(feature_indices, dtype=int))] = apply_standardizer(
+                values,
+                means,
+                stds,
+            )
+            domain_stats[domain] = {
+                "means": [float(value) for value in means],
+                "stds": [float(value) for value in stds],
+                "row_count": len(row_indices),
+            }
+    global_means, global_stds = fit_standardizer(transformed)
+    serializable = {
+        "version": "step15-v6-train-only-domain-aware-v1",
+        "feature_names": feature_names,
+        "domain_standardized_features": domain_feature_names,
+        "allowed_domains": allowed_domains,
+        "domain_stats": domain_stats,
+        "global_means": [float(value) for value in global_means],
+        "global_stds": [float(value) for value in global_stds],
+        "fit_row_count": len(rows),
+    }
+    serializable["sha256"] = canonical_json_sha256(serializable)
+    return serializable
+
+
+def apply_standardizer_bundle(rows: list[dict], feature_names: list[str], bundle: dict) -> np.ndarray:
+    if list(bundle.get("feature_names", [])) != list(feature_names):
+        raise ValueError("Step15 standardizer feature lineage mismatch")
+    raw = rows_to_feature_matrix(rows, feature_names)
+    transformed = raw.copy()
+    domain_feature_names = list(bundle.get("domain_standardized_features", []))
+    if domain_feature_names:
+        feature_indices = [feature_names.index(name) for name in domain_feature_names]
+        domain_stats = bundle.get("domain_stats", {})
+        for idx, row in enumerate(rows):
+            domain = str(row.get("step15_pool", ""))
+            if domain not in domain_stats:
+                raise ValueError(f"Unknown domain while applying Step15 scaler: {domain or '<empty>'}")
+            stats = domain_stats[domain]
+            means = np.asarray(stats["means"], dtype=float)
+            stds = np.asarray(stats["stds"], dtype=float)
+            values = raw[idx, feature_indices][None, :]
+            transformed[idx, feature_indices] = apply_standardizer(values, means, stds)[0]
+    return apply_standardizer(
+        transformed,
+        np.asarray(bundle["global_means"], dtype=float),
+        np.asarray(bundle["global_stds"], dtype=float),
+    )
+
+
 def select_train_rows(
     rows_by_pool: dict[str, list[dict]],
     experiment_cfg: dict,
@@ -189,7 +321,26 @@ def select_train_rows(
             and row.get("identity_training_eligible") == "1"
             and row.get("evidence_type") in included_evidence
         )
-    return train_rows
+    label_scope = str(experiment_cfg.get("training_label_scope", "gold_plus_all_silver"))
+    if label_scope == "gold_plus_all_silver":
+        return train_rows
+    if label_scope == "gold_only":
+        return [row for row in train_rows if str(row.get("silver_train_only", "")) != "1"]
+    if label_scope == "gold_plus_high_confidence_silver":
+        allowed_tiers = {
+            str(value) for value in experiment_cfg.get("high_confidence_silver_label_tiers", [])
+        }
+        if not allowed_tiers:
+            raise ValueError(
+                "gold_plus_high_confidence_silver requires high_confidence_silver_label_tiers"
+            )
+        return [
+            row
+            for row in train_rows
+            if str(row.get("silver_train_only", "")) != "1"
+            or str(row.get("label_tier", "")) in allowed_tiers
+        ]
+    raise ValueError(f"Unsupported Step15 training_label_scope: {label_scope}")
 
 
 def select_eval_rows(rows: list[dict], split_name: str) -> list[dict]:
@@ -371,18 +522,144 @@ def apply_row_training_sample_weights(weights: np.ndarray, rows: list[dict]) -> 
     }
 
 
-def evidence_weights(y_evidence: np.ndarray, evidence_type_count: int) -> np.ndarray:
+def apply_component_inverse_sqrt_weights(weights: np.ndarray, rows: list[dict]) -> tuple[np.ndarray, dict]:
+    """Downweight repeated train edges from the same seller component."""
+    real_rows = [row for row in rows if str(row.get("synthetic_train_only", "")) != "1"]
+    component_keys = [
+        (str(row.get("step15_pool", "")), str(row.get("split_component_id", "")))
+        for row in real_rows
+    ]
+    if any(not pool or not component for pool, component in component_keys):
+        missing = sum(1 for pool, component in component_keys if not pool or not component)
+        raise ValueError(f"Step15 component weighting found {missing} real rows without component lineage")
+    counts = Counter(component_keys)
+    pair_uid_to_factor = {
+        (str(row.get("step15_pool", "")), str(row.get("pair_uid", ""))): 1.0 / math.sqrt(counts[key])
+        for row, key in zip(real_rows, component_keys, strict=True)
+    }
+    factors: list[float] = []
+    for row in rows:
+        if str(row.get("synthetic_train_only", "")) != "1":
+            factors.append(
+                pair_uid_to_factor[(str(row.get("step15_pool", "")), str(row.get("pair_uid", "")))]
+            )
+            continue
+        parent_keys = (
+            (
+                str(row.get("mixup_parent_left_pool", "")),
+                str(row.get("mixup_parent_left_pair_uid", "")),
+            ),
+            (
+                str(row.get("mixup_parent_right_pool", "")),
+                str(row.get("mixup_parent_right_pair_uid", "")),
+            ),
+        )
+        parent_factors = [pair_uid_to_factor[key] for key in parent_keys if key in pair_uid_to_factor]
+        factors.append(min(parent_factors) if parent_factors else 1.0)
+    factors_array = np.asarray(factors, dtype=float)
+    if len(factors_array) != len(weights):
+        raise ValueError("Step15 component-weight row/weight length mismatch")
+    mean_factor = float(np.mean(factors_array)) if len(factors_array) else 1.0
+    if mean_factor <= 0.0:
+        raise ValueError("Step15 component weights have non-positive mean")
+    factors_array /= mean_factor
+    adjusted = weights.astype(float, copy=True) * factors_array
+    return adjusted, {
+        "enabled": True,
+        "method": "inverse_sqrt_train_edge_count_normalized_mean_one",
+        "real_component_count": len(counts),
+        "largest_component_edge_count": max(counts.values(), default=0),
+        "factor_min": round(float(np.min(factors_array)), 6) if len(factors_array) else 1.0,
+        "factor_mean": round(float(np.mean(factors_array)), 6) if len(factors_array) else 1.0,
+        "factor_max": round(float(np.max(factors_array)), 6) if len(factors_array) else 1.0,
+    }
+
+
+def apply_class_balance_multipliers(
+    weights: np.ndarray,
+    y: np.ndarray,
+) -> tuple[np.ndarray, dict]:
+    base_weights = weights.astype(float, copy=True)
+    positive_mask = y == 1.0
+    negative_mask = y == 0.0
+    positive_mass = float(base_weights[positive_mask].sum())
+    negative_mass = float(base_weights[negative_mask].sum())
+    if positive_mass <= 0.0 or negative_mass <= 0.0:
+        raise ValueError(
+            "Step15 class balancing requires positive effective weight mass and negative effective weight mass"
+        )
+    target_mass = (positive_mass + negative_mass) / 2.0
+    positive_factor = target_mass / positive_mass
+    negative_factor = target_mass / negative_mass
+    factors = np.where(positive_mask, positive_factor, negative_factor)
+    adjusted = base_weights * factors
+    before_mean = float(np.mean(weights)) if len(weights) else 0.0
+    raw_mean = float(np.mean(adjusted)) if len(adjusted) else 0.0
+    if before_mean > 0.0 and raw_mean > 0.0:
+        adjusted *= before_mean / raw_mean
+    positive_mass_after = float(adjusted[positive_mask].sum())
+    negative_mass_after = float(adjusted[negative_mask].sum())
+    return adjusted, {
+        "enabled": True,
+        "method": "equalize_effective_weight_mass_after_component_and_row_quality_weights",
+        "positive_factor": round(float(positive_factor), 6),
+        "negative_factor": round(float(negative_factor), 6),
+        "positive_mass_before": round(positive_mass, 6),
+        "negative_mass_before": round(negative_mass, 6),
+        "positive_mass_after": round(positive_mass_after, 6),
+        "negative_mass_after": round(negative_mass_after, 6),
+        "mean_before": round(before_mean, 6),
+        "mean_after": round(float(np.mean(adjusted)), 6) if len(adjusted) else 0.0,
+    }
+
+
+def evidence_weights(
+    y_evidence: np.ndarray,
+    evidence_type_count: int,
+    base_effective_weights: np.ndarray | None = None,
+    *,
+    class_balance: bool = True,
+) -> tuple[np.ndarray, dict]:
     weights = np.zeros(len(y_evidence), dtype=float)
     mask = y_evidence >= 0
     if not np.any(mask):
-        return weights
-    counts = Counter(int(value) for value in y_evidence[mask])
-    total = int(np.sum(mask))
-    for idx, value in enumerate(y_evidence):
-        if value < 0:
-            continue
-        weights[idx] = total / (max(evidence_type_count, 1) * max(counts[int(value)], 1))
-    return weights
+        return weights, {"enabled": False, "labeled_row_count": 0, "class_factors": {}}
+    base = (
+        np.ones(len(y_evidence), dtype=float)
+        if base_effective_weights is None
+        else np.asarray(base_effective_weights, dtype=float).copy()
+    )
+    if len(base) != len(y_evidence):
+        raise ValueError("Step15 auxiliary evidence/base effective weight length mismatch")
+    weights[mask] = base[mask]
+    present_classes = sorted({int(value) for value in y_evidence[mask]})
+    unknown_classes = [value for value in present_classes if value >= evidence_type_count]
+    if unknown_classes:
+        raise ValueError(f"Step15 auxiliary evidence labels exceed configured classes: {unknown_classes}")
+    factors: dict[int, float] = {value: 1.0 for value in present_classes}
+    mass_before = {
+        value: float(weights[y_evidence == value].sum()) for value in present_classes
+    }
+    if class_balance:
+        if any(mass <= 0.0 for mass in mass_before.values()):
+            raise ValueError("Step15 auxiliary evidence class has non-positive effective mass")
+        target_mass = sum(mass_before.values()) / max(len(present_classes), 1)
+        factors = {value: target_mass / mass_before[value] for value in present_classes}
+        for value, factor in factors.items():
+            weights[y_evidence == value] *= factor
+    return weights, {
+        "enabled": True,
+        "method": "identity_effective_weight_chain_then_evidence_class_balance",
+        "class_balance": bool(class_balance),
+        "labeled_row_count": int(mask.sum()),
+        "present_class_count": len(present_classes),
+        "class_mass_before": {str(key): round(value, 6) for key, value in mass_before.items()},
+        "class_factors": {str(key): round(value, 6) for key, value in factors.items()},
+        "class_mass_after": {
+            str(value): round(float(weights[y_evidence == value].sum()), 6)
+            for value in present_classes
+        },
+    }
 
 
 def add_positive_mixup(
@@ -802,6 +1079,9 @@ def train_model(
     domain_balance_domains: list[str] | None = None,
     identity_weight_multipliers: dict[str, float] | None = None,
     normalize_identity_weight_mean: bool = True,
+    component_aware_identity_loss: bool = False,
+    weight_pipeline_version: str = "legacy_v5r",
+    fixed_update_budget: int | None = None,
 ) -> tuple[dict[str, np.ndarray], dict]:
     rng = np.random.default_rng(seed)
     hidden_dim = int(train_cfg["hidden_dim"])
@@ -811,7 +1091,35 @@ def train_model(
         "v": {key: np.zeros_like(value) for key, value in params.items()},
     }
 
-    if domain_balanced_identity_loss and domain_balance_mode == "legacy_raw_row_count_before_quality_weights":
+    component_weight_diagnostics = {"enabled": False, "method": "disabled"}
+    class_weight_diagnostics = {"enabled": bool(train_cfg.get("class_balanced_identity_loss", True))}
+    if weight_pipeline_version == "v6_component_row_class_evidence_domain":
+        identity_weights = np.ones(len(y_train), dtype=float)
+        if component_aware_identity_loss:
+            identity_weights, component_weight_diagnostics = apply_component_inverse_sqrt_weights(
+                identity_weights,
+                train_rows,
+            )
+        identity_weights, row_sample_weight_diagnostics = apply_row_training_sample_weights(
+            identity_weights,
+            train_rows,
+        )
+        if train_cfg.get("class_balanced_identity_loss", True):
+            identity_weights, class_weight_diagnostics = apply_class_balance_multipliers(
+                identity_weights,
+                y_train,
+            )
+        identity_weights, identity_weight_multiplier_diagnostics = apply_identity_weight_multipliers(
+            identity_weights,
+            train_rows,
+            identity_weight_multipliers or {},
+            normalize_mean=normalize_identity_weight_mean,
+        )
+        domain_balance_diagnostics = {
+            "enabled": False,
+            "method": domain_balance_mode,
+        }
+    elif domain_balanced_identity_loss and domain_balance_mode == "legacy_raw_row_count_before_quality_weights":
         identity_weights, domain_balance_diagnostics = legacy_domain_balanced_binary_weights(y_train, train_rows)
     elif train_cfg.get("class_balanced_identity_loss", True):
         identity_weights = balanced_binary_weights(y_train)
@@ -825,13 +1133,14 @@ def train_model(
             "enabled": False,
             "method": domain_balance_mode,
         }
-    identity_weights, identity_weight_multiplier_diagnostics = apply_identity_weight_multipliers(
-        identity_weights,
-        train_rows,
-        identity_weight_multipliers or {},
-        normalize_mean=normalize_identity_weight_mean,
-    )
-    identity_weights, row_sample_weight_diagnostics = apply_row_training_sample_weights(identity_weights, train_rows)
+    if weight_pipeline_version != "v6_component_row_class_evidence_domain":
+        identity_weights, identity_weight_multiplier_diagnostics = apply_identity_weight_multipliers(
+            identity_weights,
+            train_rows,
+            identity_weight_multipliers or {},
+            normalize_mean=normalize_identity_weight_mean,
+        )
+        identity_weights, row_sample_weight_diagnostics = apply_row_training_sample_weights(identity_weights, train_rows)
     if domain_balanced_identity_loss and domain_balance_mode == "post_quality_effective_weight_mass":
         identity_weights, domain_balance_diagnostics = apply_effective_domain_balance(
             identity_weights,
@@ -846,13 +1155,16 @@ def train_model(
             "method": domain_balance_mode,
             "allowed_domains": list(domain_balance_domains or ["en_content_train_pool", "zh_target_strict"]),
         }
-    ev_weights = (
-        evidence_weights(y_evidence, evidence_type_count)
-        if train_cfg.get("class_balanced_evidence_loss", True)
-        else np.where(y_evidence >= 0, 1.0, 0.0)
+    ev_weights, auxiliary_weight_diagnostics = evidence_weights(
+        y_evidence,
+        evidence_type_count,
+        identity_weights,
+        class_balance=bool(train_cfg.get("class_balanced_evidence_loss", True)),
     )
 
-    max_epochs = int(train_cfg["max_epochs"])
+    max_epochs = int(fixed_update_budget or train_cfg["max_epochs"])
+    if max_epochs <= 0:
+        raise ValueError("Step15 training update budget must be positive")
     patience = int(train_cfg["patience_epochs"])
     learning_rate = float(train_cfg["learning_rate"])
     l2_weight = float(train_cfg["l2_weight"])
@@ -886,12 +1198,16 @@ def train_model(
             epochs_without_improvement = 0
         else:
             epochs_without_improvement += 1
-        if epochs_without_improvement >= patience:
+        if fixed_update_budget is None and epochs_without_improvement >= patience:
             break
 
     diagnostics = {
         "best_epoch": int(best_epoch),
         "trained_epoch_count": int(epoch),
+        "training_budget_mode": "fixed_optimizer_updates_with_best_valid_checkpoint"
+        if fixed_update_budget is not None
+        else "validation_early_stopping",
+        "fixed_update_budget": fixed_update_budget,
         "early_stopping_metric": metric_name,
         "best_valid_metric": round(float(best_metric), 6),
         "last_loss": {key: round(float(value), 6) for key, value in last_loss.items()},
@@ -901,6 +1217,10 @@ def train_model(
         "effective_domain_balance": domain_balance_diagnostics,
         "identity_weight_multipliers": identity_weight_multiplier_diagnostics,
         "row_sample_weight_multipliers": row_sample_weight_diagnostics,
+        "component_weight_multipliers": component_weight_diagnostics,
+        "class_weight_multipliers": class_weight_diagnostics,
+        "auxiliary_evidence_weight_multipliers": auxiliary_weight_diagnostics,
+        "weight_pipeline_version": weight_pipeline_version,
     }
     return best_params, diagnostics
 
@@ -918,7 +1238,9 @@ def prediction_rows(rows: list[dict], probabilities: np.ndarray, threshold: floa
                 "review_label": row["review_label"],
                 "y_true": label_to_int(row["review_label"]),
                 "prob_positive": round(float(probability), 6),
+                "threshold": round(float(threshold), 6),
                 "pred_positive": int(prediction),
+                "split_component_id": row.get("split_component_id", ""),
                 "review_stratum": row.get("review_stratum", ""),
                 "evidence_type": row.get("evidence_type", ""),
                 "identity_label": row.get("identity_label", ""),
@@ -977,21 +1299,21 @@ def write_positive_mixup_manifest(path: Path, rows: list[dict]) -> None:
         {field: row.get(field, "") for field in fields}
         for row in rows
     ]
-    step7.write_csv(path, manifest_rows, fields)
+    atomic_write_csv(path, manifest_rows, fields)
 
 
 def artifact_payload(
     params: dict[str, np.ndarray],
     feature_names: list[str],
-    means: np.ndarray,
-    stds: np.ndarray,
+    standardizer_bundle: dict,
     evidence_types: list[str],
     diagnostics: dict,
 ) -> dict:
     return {
         "feature_names": feature_names,
-        "feature_means": [round(float(value), 10) for value in means],
-        "feature_stds": [round(float(value), 10) for value in stds],
+        "feature_means": [round(float(value), 10) for value in standardizer_bundle["global_means"]],
+        "feature_stds": [round(float(value), 10) for value in standardizer_bundle["global_stds"]],
+        "standardizer_bundle": standardizer_bundle,
         "evidence_types": evidence_types,
         "training_diagnostics": diagnostics,
         "params": {
@@ -1009,34 +1331,51 @@ def run_single(
     policy: dict,
     rows_by_pool: dict[str, list[dict]],
     initial_params: dict[str, np.ndarray] | None = None,
-    standardizer_override: tuple[np.ndarray, np.ndarray] | None = None,
+    standardizer_override: dict | None = None,
+    evaluate_test: bool = True,
 ) -> tuple[dict, dict[str, np.ndarray]]:
     feature_names = policy["feature_sets"][experiment_cfg["feature_set"]]
     validate_features(rows_by_pool, feature_names)
 
-    train_rows = select_train_rows(rows_by_pool, experiment_cfg, phase_cfg, policy)
+    train_phase_cfg = phase_cfg
+    evidence_override = experiment_cfg.get("training_evidence_types_override")
+    if evidence_override is not None:
+        train_phase_cfg = {
+            **phase_cfg,
+            "included_evidence_types": [str(value) for value in evidence_override],
+        }
+    train_rows = select_train_rows(rows_by_pool, experiment_cfg, train_phase_cfg, policy)
     valid_rows = select_eval_rows(rows_by_pool["zh_target_strict"], policy["splits"]["target_valid"])
-    test_rows = select_eval_rows(rows_by_pool["zh_target_strict"], policy["splits"]["target_test"])
+    test_rows = (
+        select_eval_rows(rows_by_pool["zh_target_strict"], policy["splits"]["target_test"])
+        if evaluate_test
+        else []
+    )
     if not train_rows:
         raise ValueError(f"{experiment_name}/{phase_cfg['phase_id']} has no train rows")
-    if not valid_rows or not test_rows:
-        raise ValueError("Step15 requires non-empty fixed zh_valid and zh_test rows")
+    if not valid_rows or (evaluate_test and not test_rows):
+        raise ValueError("Step15 requires non-empty fixed zh_valid and endpoint zh_test rows")
 
-    x_train_raw = rows_to_feature_matrix(train_rows, feature_names)
-    x_valid_raw = rows_to_feature_matrix(valid_rows, feature_names)
-    x_test_raw = rows_to_feature_matrix(test_rows, feature_names)
     if standardizer_override is None:
-        means, stds = fit_standardizer(x_train_raw)
+        standardizer_bundle = fit_standardizer_bundle(
+            train_rows,
+            feature_names,
+            policy.get("feature_preprocessing", {}).get(experiment_cfg["feature_set"], {}),
+        )
         standardizer_source = "current_phase_train"
     else:
-        means, stds = standardizer_override
-        standardizer_source = "warm_start_final_phase_train"
-    x_train = apply_standardizer(x_train_raw, means, stds)
-    x_valid = apply_standardizer(x_valid_raw, means, stds)
-    x_test = apply_standardizer(x_test_raw, means, stds)
+        standardizer_bundle = standardizer_override
+        standardizer_source = "common_final_phase_train"
+    x_train = apply_standardizer_bundle(train_rows, feature_names, standardizer_bundle)
+    x_valid = apply_standardizer_bundle(valid_rows, feature_names, standardizer_bundle)
+    x_test = (
+        apply_standardizer_bundle(test_rows, feature_names, standardizer_bundle)
+        if evaluate_test
+        else None
+    )
     y_train = y_from_rows(train_rows)
     y_valid = y_from_rows(valid_rows)
-    y_test = y_from_rows(test_rows)
+    y_test = y_from_rows(test_rows) if evaluate_test else None
     y_ev = evidence_indices(train_rows, policy["evidence_types"])
     train_rows_for_weights = list(train_rows)
 
@@ -1055,7 +1394,9 @@ def run_single(
         "synthetic_row_count": 0,
         "skipped_reason": "phase_does_not_enable_positive_mixup",
     }
-    if bool(phase_cfg.get("use_positive_mixup", False)):
+    if bool(phase_cfg.get("use_positive_mixup", False)) and not bool(
+        experiment_cfg.get("disable_positive_mixup", False)
+    ):
         x_train, y_train, y_ev, train_rows_for_weights, positive_synthetic_count, positive_mixup_diagnostics = add_positive_mixup(
             x_train,
             y_train,
@@ -1101,36 +1442,71 @@ def run_single(
         )],
         identity_weight_multipliers=experiment_cfg.get("identity_evidence_type_weight_multipliers", {}),
         normalize_identity_weight_mean=bool(experiment_cfg.get("normalize_identity_weight_mean", True)),
+        component_aware_identity_loss=bool(experiment_cfg.get("component_aware_identity_loss", False)),
+        weight_pipeline_version=str(experiment_cfg.get("weight_pipeline_version", "legacy_v5r")),
+        fixed_update_budget=(
+            int(experiment_cfg["fixed_update_budget_per_phase"])
+            if experiment_cfg.get("fixed_update_budget_per_phase") is not None
+            else None
+        ),
     )
     diagnostics["training_mode"] = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
+    diagnostics["training_evidence_types"] = list(train_phase_cfg["included_evidence_types"])
+    diagnostics["positive_mixup_disabled_by_experiment"] = bool(
+        experiment_cfg.get("disable_positive_mixup", False)
+    )
     diagnostics["positive_mixup_scope"] = str(positive_mixup_diagnostics.get("scope", "all_positive"))
     diagnostics["positive_pair_mixup"] = positive_mixup_diagnostics
     diagnostics["standardizer_source"] = standardizer_source
+    diagnostics["standardizer_sha256"] = standardizer_bundle["sha256"]
 
     _, valid_prob, valid_evidence_prob = forward(params, x_valid)
-    _, test_prob, test_evidence_prob = forward(params, x_test)
+    test_prob = None
+    if evaluate_test:
+        assert x_test is not None
+        _, test_prob, _ = forward(params, x_test)
     threshold = step7.choose_threshold(y_valid, valid_prob, policy["threshold_selection"]["metric"], policy)
     valid_metrics = step7.evaluate_probabilities(y_valid, valid_prob, threshold)
-    test_metrics = step7.evaluate_probabilities(y_test, test_prob, threshold)
+    test_metrics = (
+        step7.evaluate_probabilities(y_test, test_prob, threshold)
+        if evaluate_test and y_test is not None and test_prob is not None
+        else None
+    )
 
     experiment_token = f"{experiment_name}_{phase_cfg['phase_id']}_seed_{seed}"
     valid_predictions = prediction_rows(valid_rows, valid_prob, threshold, experiment_token)
-    test_predictions = prediction_rows(test_rows, test_prob, threshold, experiment_token)
+    test_predictions = (
+        prediction_rows(test_rows, test_prob, threshold, experiment_token)
+        if evaluate_test and test_prob is not None
+        else []
+    )
 
     valid_path = output_path(policy["outputs"]["zh_valid_predictions_template"], experiment_name, phase_cfg["phase_id"], seed)
-    test_path = output_path(policy["outputs"]["zh_test_predictions_template"], experiment_name, phase_cfg["phase_id"], seed)
+    test_path = (
+        output_path(
+            policy["outputs"]["zh_test_predictions_template"],
+            experiment_name,
+            phase_cfg["phase_id"],
+            seed,
+        )
+        if evaluate_test
+        else None
+    )
     artifact_path = output_path(policy["outputs"]["artifact_template"], experiment_name, phase_cfg["phase_id"], seed)
     mixup_manifest_path = None
     mixup_manifest_template = policy["outputs"].get("positive_mixup_manifest_template")
     if positive_synthetic_rows and mixup_manifest_template:
         mixup_manifest_path = output_path(mixup_manifest_template, experiment_name, phase_cfg["phase_id"], seed)
         write_positive_mixup_manifest(mixup_manifest_path, positive_synthetic_rows)
-    step7.write_csv(valid_path, valid_predictions, list(valid_predictions[0].keys()))
-    step7.write_csv(test_path, test_predictions, list(test_predictions[0].keys()))
+    atomic_write_csv(valid_path, valid_predictions, list(valid_predictions[0].keys()))
+    if test_path is not None:
+        atomic_write_csv(test_path, test_predictions, list(test_predictions[0].keys()))
 
-    artifact = artifact_payload(params, feature_names, means, stds, policy["evidence_types"], diagnostics)
+    artifact = artifact_payload(params, feature_names, standardizer_bundle, policy["evidence_types"], diagnostics)
+    artifact["frozen_zh_valid_threshold"] = float(threshold)
+    artifact["threshold_selection_scope"] = "fixed_zh_valid_only_never_zh_test"
     artifact["feature_importance"] = feature_importance(params, feature_names)
-    step7.write_json(artifact_path, artifact)
+    atomic_write_json(artifact_path, artifact)
 
     run_record = {
         "experiment_name": experiment_name,
@@ -1140,20 +1516,26 @@ def run_single(
         "role": experiment_cfg.get("role", ""),
         "feature_set": experiment_cfg["feature_set"],
         "use_identifier_features": bool(experiment_cfg.get("use_identifier_features", False)),
-        "included_evidence_types": phase_cfg["included_evidence_types"],
+        "configured_phase_evidence_types": phase_cfg["included_evidence_types"],
+        "training_evidence_types": train_phase_cfg["included_evidence_types"],
+        "included_evidence_types": train_phase_cfg["included_evidence_types"],
         "synthetic_train_only_mixup_count": int(synthetic_count),
         "synthetic_train_only_positive_mixup_count": int(positive_synthetic_count),
         "synthetic_train_only_negative_mixup_count": int(negative_synthetic_count),
         "train_dataset": summarize_rows(train_rows),
         "zh_valid_dataset": summarize_rows(valid_rows),
-        "zh_test_dataset": summarize_rows(test_rows),
+        "zh_test_dataset": summarize_rows(test_rows) if evaluate_test else None,
+        "zh_test_evaluation_role": (
+            "final_preregistered_endpoint_only" if evaluate_test else "not_evaluated_intermediate_phase"
+        ),
         "training_diagnostics": diagnostics,
         "zh_valid_metrics": valid_metrics,
+        "frozen_zh_valid_threshold": float(threshold),
         "zh_test_metrics": test_metrics,
         "output_paths": {
             "artifact": str(artifact_path.relative_to(ROOT)),
             "zh_valid_predictions": str(valid_path.relative_to(ROOT)),
-            "zh_test_predictions": str(test_path.relative_to(ROOT)),
+            "zh_test_predictions": str(test_path.relative_to(ROOT)) if test_path is not None else None,
             "positive_mixup_manifest": (
                 str(mixup_manifest_path.relative_to(ROOT)) if mixup_manifest_path is not None else None
             ),
@@ -1172,7 +1554,8 @@ def summarize_runs(runs: list[dict]) -> dict:
         def metric_values(metric_name: str) -> list[float]:
             values = []
             for item in items:
-                value = item["zh_test_metrics"].get(metric_name)
+                metrics = item.get("zh_test_metrics") or {}
+                value = metrics.get(metric_name)
                 if value is not None:
                     values.append(float(value))
             return values
@@ -1218,6 +1601,325 @@ def summarize_runs(runs: list[dict]) -> dict:
     return summary
 
 
+def select_validation_only_candidates(runs: list[dict], policy: dict) -> dict:
+    selections: dict[str, dict] = {}
+    expected_seeds = sorted(int(seed) for seed in policy["training"]["default_seeds"])
+    for group_name, cfg in sorted(policy.get("validation_only_model_selection", {}).items()):
+        candidates = [str(value) for value in cfg["candidate_experiments"]]
+        phase_id = str(cfg["phase_id"])
+        metric_name = str(cfg.get("metric", "average_precision"))
+        candidate_runs = [run for run in runs if run["experiment_name"] in candidates]
+        if not candidate_runs:
+            selections[group_name] = {
+                "selection_scope": "fixed_zh_valid_only_never_zh_test",
+                "metric": metric_name,
+                "status": "not_run",
+                "candidates": [],
+                "selected_experiment": None,
+            }
+            continue
+        records = []
+        for experiment_name in candidates:
+            matching = [
+                run
+                for run in runs
+                if run["experiment_name"] == experiment_name and run["phase_id"] == phase_id
+            ]
+            matching_seeds = sorted(int(run["seed"]) for run in matching)
+            if matching_seeds != expected_seeds:
+                raise ValueError(
+                    "Step15 validation-only selection requires the complete preregistered seed set; "
+                    f"experiment={experiment_name}, phase={phase_id}, "
+                    f"expected={expected_seeds}, actual={matching_seeds}"
+                )
+            values = [
+                float(run["zh_valid_metrics"][metric_name])
+                for run in matching
+                if run["zh_valid_metrics"].get(metric_name) is not None
+            ]
+            ensemble_metric = None
+            if matching:
+                y_by_pair: dict[str, float] = {}
+                score_maps: list[dict[str, float]] = []
+                for run in matching:
+                    prediction_path = resolve_path(run["output_paths"]["zh_valid_predictions"])
+                    prediction_rows = step7.load_csv(prediction_path)
+                    score_map = {}
+                    for row in prediction_rows:
+                        pair_uid = str(row["pair_uid"])
+                        y_true = float(row["y_true"])
+                        if pair_uid in y_by_pair and y_by_pair[pair_uid] != y_true:
+                            raise ValueError(f"Step15 validation files disagree on y_true for {pair_uid}")
+                        y_by_pair[pair_uid] = y_true
+                        score_map[pair_uid] = float(row["prob_positive"])
+                    score_maps.append(score_map)
+                pair_order = sorted(y_by_pair)
+                if any(set(score_map) != set(pair_order) for score_map in score_maps):
+                    raise ValueError(f"Step15 validation seed files have mismatched pair coverage for {experiment_name}")
+                y_valid = np.asarray([y_by_pair[pair_uid] for pair_uid in pair_order], dtype=float)
+                ensemble_scores = np.asarray(
+                    [[score_map[pair_uid] for pair_uid in pair_order] for score_map in score_maps],
+                    dtype=float,
+                ).mean(axis=0)
+                if metric_name == "average_precision":
+                    ensemble_metric = step7.average_precision_score(y_valid, ensemble_scores)
+                elif metric_name == "roc_auc":
+                    ensemble_metric = step7.roc_auc_score(y_valid, ensemble_scores)
+                else:
+                    raise ValueError(f"Unsupported Step15 validation-only selection metric: {metric_name}")
+            records.append(
+                {
+                    "experiment_name": experiment_name,
+                    "phase_id": phase_id,
+                    "expected_seeds": expected_seeds,
+                    "actual_seeds": matching_seeds,
+                    "seed_count": len(values),
+                    "mean_per_seed_zh_valid_metric": round(float(np.mean(values)), 8) if values else None,
+                    "ensemble_zh_valid_metric": None
+                    if ensemble_metric is None
+                    else round(float(ensemble_metric), 8),
+                }
+            )
+        eligible = [record for record in records if record["ensemble_zh_valid_metric"] is not None]
+        tie_break_order = [str(value) for value in cfg.get("tie_break_order", candidates)]
+        if set(tie_break_order) != set(candidates):
+            raise ValueError(
+                f"Step15 validation selection tie-break must list every candidate exactly once: {group_name}"
+            )
+        tie_rank = {experiment_name: index for index, experiment_name in enumerate(tie_break_order)}
+        selected = min(
+            eligible,
+            key=lambda record: (
+                -float(record["ensemble_zh_valid_metric"]),
+                tie_rank[record["experiment_name"]],
+            ),
+        ) if eligible else None
+        selections[group_name] = {
+            "selection_scope": "fixed_zh_valid_only_never_zh_test",
+            "metric": metric_name,
+            "status": "selected" if selected else "incomplete",
+            "tie_break_order": tie_break_order,
+            "candidates": records,
+            "selected_experiment": selected["experiment_name"] if selected else None,
+        }
+    return selections
+
+
+def validation_selection_candidate_experiments(policy: dict) -> set[str]:
+    return {
+        str(experiment_name)
+        for cfg in policy.get("validation_only_model_selection", {}).values()
+        for experiment_name in cfg.get("candidate_experiments", [])
+    }
+
+
+def params_from_artifact(artifact: dict) -> dict[str, np.ndarray]:
+    params = artifact.get("params") or {}
+    required = {"w1", "b1", "wi", "bi", "we", "be"}
+    missing = sorted(required - set(params))
+    if missing:
+        raise ValueError(f"Step15 artifact is missing frozen model parameters: {missing}")
+    return {key: np.asarray(params[key], dtype=float) for key in sorted(required)}
+
+
+def materialize_validation_selected_test_predictions(
+    runs: list[dict],
+    selections: dict[str, dict],
+    policy: dict,
+    rows_by_pool: dict[str, list[dict]],
+) -> list[dict]:
+    selected_pairs = {
+        (str(selection["selected_experiment"]), str(cfg["phase_id"]))
+        for group_name, cfg in policy.get("validation_only_model_selection", {}).items()
+        for selection in [selections.get(group_name, {})]
+        if selection.get("selected_experiment")
+    }
+    if not selected_pairs:
+        return runs
+    expected_seeds = sorted(int(seed) for seed in policy["training"]["default_seeds"])
+    test_rows = select_eval_rows(rows_by_pool["zh_target_strict"], policy["splits"]["target_test"])
+    if not test_rows:
+        raise ValueError("Cannot materialize a validation-selected endpoint without fixed zh_test rows")
+    updated = []
+    for run in runs:
+        key = (str(run["experiment_name"]), str(run["phase_id"]))
+        if key not in selected_pairs:
+            updated.append(run)
+            continue
+        matching_seeds = sorted(
+            int(item["seed"])
+            for item in runs
+            if (str(item["experiment_name"]), str(item["phase_id"])) == key
+        )
+        if matching_seeds != expected_seeds:
+            raise ValueError(
+                "Validation-selected test materialization requires all preregistered seeds: "
+                f"endpoint={key}, expected={expected_seeds}, actual={matching_seeds}"
+            )
+        artifact_path = resolve_path(run["output_paths"]["artifact"])
+        valid_path = resolve_path(run["output_paths"]["zh_valid_predictions"])
+        artifact = step7.load_json(artifact_path)
+        valid_predictions = step7.load_csv(valid_path)
+        rounded_thresholds = {float(row["threshold"]) for row in valid_predictions}
+        if len(rounded_thresholds) != 1:
+            raise ValueError(f"Validation predictions do not bind one frozen threshold: {valid_path}")
+        threshold = float(artifact["frozen_zh_valid_threshold"])
+        if round(threshold, 6) != next(iter(rounded_thresholds)):
+            raise ValueError(f"Artifact and validation prediction thresholds disagree: {artifact_path}")
+        feature_names = list(artifact["feature_names"])
+        x_test = apply_standardizer_bundle(test_rows, feature_names, artifact["standardizer_bundle"])
+        _, test_prob, _ = forward(params_from_artifact(artifact), x_test)
+        y_test = y_from_rows(test_rows)
+        experiment_token = f"{run['experiment_name']}_{run['phase_id']}_seed_{run['seed']}"
+        test_predictions = prediction_rows(test_rows, test_prob, threshold, experiment_token)
+        test_path = output_path(
+            policy["outputs"]["zh_test_predictions_template"],
+            run["experiment_name"],
+            run["phase_id"],
+            int(run["seed"]),
+        )
+        atomic_write_csv(test_path, test_predictions, list(test_predictions[0].keys()))
+        updated_run = copy.deepcopy(run)
+        updated_run["zh_test_dataset"] = summarize_rows(test_rows)
+        updated_run["zh_test_evaluation_role"] = (
+            "validation_selected_frozen_artifact_preregistered_endpoint_only"
+        )
+        updated_run["zh_test_metrics"] = step7.evaluate_probabilities(y_test, test_prob, threshold)
+        updated_run["output_paths"]["zh_test_predictions"] = str(test_path.relative_to(ROOT))
+        updated_run["test_materialization"] = {
+            "training_reused": False,
+            "artifact_sha256": file_sha256(artifact_path),
+            "selection_scope": "fixed_zh_valid_only_never_zh_test",
+            "threshold_source": "frozen_zh_valid_predictions",
+        }
+        updated.append(updated_run)
+    return updated
+
+
+def build_input_manifest(
+    policy_path: Path,
+    policy: dict,
+    extra_paths: list[Path] | None = None,
+) -> dict:
+    paths = {
+        policy_path,
+        Path(__file__).resolve(),
+        Path(step7.__file__).resolve(),
+    }
+    for pool_cfg in policy["pools"].values():
+        for key in ("frozen_labels", "pair_features", "label_output"):
+            paths.add(resolve_path(pool_cfg[key]))
+    lineage_cfg = policy.get("inductive_feature_lineage", {})
+    if bool(lineage_cfg.get("enabled", False)):
+        paths.add(ROOT / "scripts" / "step15_build_v6_inductive_pair_features.py")
+        paths.add(resolve_path(lineage_cfg["reference_bundle_output"]))
+        paths.add(resolve_path(lineage_cfg["manifest_output"]))
+    paths.update(path.resolve() for path in (extra_paths or []))
+    records = []
+    for path in sorted(paths, key=lambda value: str(value)):
+        if not path.exists():
+            raise FileNotFoundError(f"Step15 input manifest path does not exist: {path}")
+        records.append(
+            {
+                "path": str(path.relative_to(ROOT)),
+                "sha256": file_sha256(path),
+                "size_bytes": path.stat().st_size,
+            }
+        )
+    return {
+        "git_commit": current_git_commit(),
+        "inputs": records,
+        "manifest_sha256": canonical_json_sha256({"inputs": records}),
+    }
+
+
+def validate_inductive_feature_lineage(policy_path: Path, policy: dict) -> dict | None:
+    cfg = policy.get("inductive_feature_lineage", {})
+    if not bool(cfg.get("enabled", False)):
+        return None
+    manifest_path = resolve_path(cfg["manifest_output"])
+    reference_path = resolve_path(cfg["reference_bundle_output"])
+    manifest = step7.load_json(manifest_path)
+    expected_self_hash = str(manifest.get("manifest_sha256", ""))
+    core = {key: value for key, value in manifest.items() if key != "manifest_sha256"}
+    if not expected_self_hash or canonical_json_sha256(core) != expected_self_hash:
+        raise ValueError("Step15-v6 inductive feature manifest self-hash mismatch")
+    if manifest.get("reference_scope") != "frozen_train_sellers_only" or bool(
+        manifest.get("transductive_valid_or_test_covariates_used_for_reference", True)
+    ):
+        raise ValueError("Step15-v6 pair features do not satisfy the train-only reference contract")
+    if file_sha256(policy_path) != manifest.get("policy_sha256"):
+        raise ValueError("Step15-v6 inductive feature manifest was built under a different policy")
+    producer_path = resolve_path(str(manifest.get("producer", "")))
+    if not producer_path.exists() or file_sha256(producer_path) != manifest.get("producer_sha256"):
+        raise ValueError("Step15-v6 inductive feature producer hash mismatch")
+    if not reference_path.exists() or file_sha256(reference_path) != manifest.get("reference_bundle_sha256"):
+        raise ValueError("Step15-v6 train-only corpus reference hash mismatch")
+    for domain, pool_cfg in policy["pools"].items():
+        record = (manifest.get("domains") or {}).get(domain)
+        feature_path = resolve_path(pool_cfg["pair_features"])
+        if not record or str(feature_path.relative_to(ROOT)) != record.get("output_path"):
+            raise ValueError(f"Step15-v6 inductive feature path is not manifest-bound: {domain}")
+        if not feature_path.exists() or file_sha256(feature_path) != record.get("output_sha256"):
+            raise ValueError(f"Step15-v6 inductive feature hash mismatch: {domain}")
+    return manifest
+
+
+def resolve_experiment_phase_plan(
+    experiment_name: str,
+    experiment_cfg: dict,
+    requested_phase_ids: list[str],
+    phase_by_id: dict[str, dict],
+) -> list[dict]:
+    configured_ids = [
+        str(value) for value in experiment_cfg.get("phase_ids", list(phase_by_id.keys()))
+    ]
+    selected_ids = [phase_id for phase_id in configured_ids if phase_id in set(requested_phase_ids)]
+    if not selected_ids:
+        raise ValueError(f"{experiment_name} has no selected phases after applying phase_ids")
+    training_mode = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
+    if training_mode == "warm_start_curriculum":
+        final_position = max(configured_ids.index(phase_id) for phase_id in selected_ids)
+        required_prefix = configured_ids[: final_position + 1]
+        if selected_ids != required_prefix:
+            raise ValueError(
+                f"{experiment_name} warm-start phases must be a complete configured prefix; "
+                f"requested_selected={selected_ids}, required_prefix={required_prefix}"
+            )
+    return [phase_by_id[phase_id] for phase_id in selected_ids]
+
+
+def should_evaluate_test_endpoint(
+    experiment_name: str,
+    phase_id: str,
+    selected_phase_ids: list[str],
+    policy: dict,
+    *,
+    validation_only: bool = False,
+) -> bool:
+    if validation_only:
+        return False
+    endpoint_only = (
+        str(
+            (policy.get("evaluation_boundary", {}) or {}).get(
+                "zh_test_evaluation_schedule", "all_phases"
+            )
+        )
+        == "final_preregistered_endpoint_only"
+    )
+    if not endpoint_only:
+        return True
+    configured_phase_ids = [
+        str(value)
+        for value in policy["experiments"][experiment_name].get("phase_ids", [])
+    ]
+    if not configured_phase_ids or selected_phase_ids != configured_phase_ids:
+        return False
+    if phase_id != configured_phase_ids[-1]:
+        return False
+    return experiment_name not in validation_selection_candidate_experiments(policy)
+
+
 def main() -> None:
     args = parse_args()
     policy_path = resolve_path(args.policy)
@@ -1248,6 +1950,21 @@ def main() -> None:
             f"{policy_path} version={policy.get('version')}: {', '.join(unknown_phases)}"
         )
     phases = [phase_by_id[phase_id] for phase_id in requested_phase_ids]
+    if len(experiments) != len(set(experiments)):
+        raise SystemExit("Duplicate --experiment selections are not allowed")
+    if len(requested_phase_ids) != len(set(requested_phase_ids)):
+        raise SystemExit("Duplicate --phase selections are not allowed")
+    if len(seeds) != len(set(seeds)):
+        raise SystemExit("Duplicate --seed selections are not allowed")
+    experiment_phase_plans = {
+        experiment_name: resolve_experiment_phase_plan(
+            experiment_name,
+            policy["experiments"][experiment_name],
+            requested_phase_ids,
+            phase_by_id,
+        )
+        for experiment_name in experiments
+    }
 
     if args.validate_config_only:
         v5r_experiments = [experiment for experiment in experiments if experiment.startswith("step15_v5r_")]
@@ -1283,6 +2000,95 @@ def main() -> None:
                         f"Step15 v5r domain-balance contract mismatch for {experiment}: "
                         f"domain_balance_mode={experiment_cfg.get('domain_balance_mode')!r}"
                     )
+        if "step15-v6" in str(policy.get("version", "")):
+            expected_seeds = list(range(20260320, 20260330))
+            if list(policy["training"].get("default_seeds", [])) != expected_seeds:
+                raise SystemExit("Step15 v6 requires the preregistered ten seeds 20260320..20260329")
+            if int(policy["training"].get("hidden_dim", 0)) != 16:
+                raise SystemExit("Step15 v6 hidden_dim must remain fixed at 16")
+            if not bool(policy.get("common_standardizer", {}).get("enabled", False)):
+                raise SystemExit("Step15 v6 common final-Phase3 train-only standardizer is disabled")
+            lineage_cfg = policy.get("inductive_feature_lineage", {})
+            if not bool(lineage_cfg.get("enabled", False)) or lineage_cfg.get("reference_scope") != "frozen_train_sellers_only":
+                raise SystemExit("Step15 v6 requires frozen train-seller corpus reference features")
+            for pool_name, pool_cfg in policy["pools"].items():
+                if not str(pool_cfg.get("pair_features", "")).startswith("reports/step15_v6/features/"):
+                    raise SystemExit(f"Step15 v6 pool does not use isolated inductive features: {pool_name}")
+            if str(
+                (policy.get("evaluation_boundary", {}) or {}).get(
+                    "zh_test_evaluation_schedule", ""
+                )
+            ) != "final_preregistered_endpoint_only":
+                raise SystemExit("Step15 v6 must evaluate zh_test only at preregistered endpoints")
+            strict_features = set(policy["feature_sets"]["strict_clean_30d"])
+            forbidden = set(policy.get("forbidden_strict_clean_features", []))
+            leakage = sorted(strict_features & forbidden)
+            if leakage:
+                raise SystemExit(f"Step15 v6 strict-clean feature contract failed: {leakage}")
+            if len(strict_features) != 30:
+                raise SystemExit(f"Step15 v6 strict-clean feature count must be 30, got {len(strict_features)}")
+            for selection_name, selection_cfg in policy.get("validation_only_model_selection", {}).items():
+                candidates = [str(value) for value in selection_cfg.get("candidate_experiments", [])]
+                tie_order = [str(value) for value in selection_cfg.get("tie_break_order", [])]
+                if not candidates or tie_order != candidates:
+                    raise SystemExit(
+                        f"Step15 v6 validation selection lacks preregistered simplicity tie-break: {selection_name}"
+                    )
+            summary_path = str(policy.get("outputs", {}).get("summary_json", ""))
+            if not summary_path.startswith("reports/step15_v6/"):
+                raise SystemExit(f"Step15 v6 outputs are not isolated: {summary_path}")
+            matched_pairs = [
+                (
+                    "step15_v6_m2b_matched_budget_full_data_replay",
+                    "step15_v6_m3_warm_start_curriculum",
+                ),
+                (
+                    "step15_v6_m4c_matched_continuation_no_mixup",
+                    "step15_v6_m4_trusted_positive_mixup",
+                ),
+            ]
+            for control_name, treatment_name in matched_pairs:
+                control_cfg = policy["experiments"][control_name]
+                treatment_cfg = policy["experiments"][treatment_name]
+                if control_cfg.get("phase_ids") != treatment_cfg.get("phase_ids"):
+                    raise SystemExit(
+                        f"Step15 v6 matched comparison has unequal phase plans: {control_name} vs {treatment_name}"
+                    )
+                control_budget = control_cfg.get("fixed_update_budget_per_phase")
+                treatment_budget = treatment_cfg.get("fixed_update_budget_per_phase")
+                if control_budget != treatment_budget or int(control_budget or 0) <= 0:
+                    raise SystemExit(
+                        f"Step15 v6 matched comparison has unequal fixed update budgets: "
+                        f"{control_name}={control_budget}, {treatment_name}={treatment_budget}"
+                    )
+            curriculum_cfg = policy["experiments"]["step15_v6_m3_warm_start_curriculum"]
+            curriculum_total_budget = int(curriculum_cfg["fixed_update_budget_per_phase"]) * len(
+                curriculum_cfg["phase_ids"]
+            )
+            for all_at_once_name in (
+                "step15_v6_m0_all_at_once_binary",
+                "step15_v6_m1_evidence_weighted",
+                "step15_v6_m2_domain_balanced",
+            ):
+                all_at_once_cfg = policy["experiments"][all_at_once_name]
+                all_at_once_total_budget = int(
+                    all_at_once_cfg.get("fixed_update_budget_per_phase") or 0
+                ) * len(all_at_once_cfg.get("phase_ids", []))
+                if all_at_once_total_budget != curriculum_total_budget:
+                    raise SystemExit(
+                        "Step15 v6 all-at-once/curriculum total-budget mismatch: "
+                        f"{all_at_once_name}={all_at_once_total_budget}, "
+                        f"step15_v6_m3_warm_start_curriculum={curriculum_total_budget}"
+                    )
+            for experiment in experiments:
+                cfg = policy["experiments"][experiment]
+                if not bool(cfg.get("component_aware_identity_loss", False)):
+                    raise SystemExit(f"Step15 v6 experiment lacks component-aware weighting: {experiment}")
+                if cfg.get("weight_pipeline_version") != "v6_component_row_class_evidence_domain":
+                    raise SystemExit(f"Step15 v6 weight pipeline mismatch: {experiment}")
+                unknown = sorted(set(cfg.get("phase_ids", [])) - set(phase_by_id))
+                if unknown:
+                    raise SystemExit(f"Step15 v6 experiment has unknown phases: {experiment} {unknown}")
         print(
             json.dumps(
                 {
@@ -1300,24 +2106,94 @@ def main() -> None:
         )
         return
 
+    inductive_feature_manifest = validate_inductive_feature_lineage(policy_path, policy)
+    input_manifest = build_input_manifest(policy_path, policy)
+    if inductive_feature_manifest is not None:
+        input_manifest["inductive_feature_manifest_sha256"] = inductive_feature_manifest["manifest_sha256"]
+    summary_path = resolve_path(policy["outputs"]["summary_json"])
+    summary_write_mode = str(policy.get("outputs", {}).get("summary_write_mode", "replace"))
+    previous_summary = None
+    if summary_write_mode == "merge_by_experiment_phase_seed_same_input_manifest_only" and summary_path.exists():
+        previous_summary = step7.load_json(summary_path)
+        if previous_summary.get("policy_version") != policy.get("version"):
+            raise ValueError(
+                "Refusing to start Step15 training because the existing summary uses a different policy version; use a new versioned output path"
+            )
+        previous_manifest_sha = (previous_summary.get("input_manifest") or {}).get("manifest_sha256")
+        if previous_manifest_sha != input_manifest.get("manifest_sha256"):
+            raise ValueError(
+                "Refusing to start Step15 training because the existing summary uses a different code/data input manifest; use a new versioned output path"
+            )
+    elif summary_write_mode not in {"replace", "merge_by_experiment_phase_seed_same_input_manifest_only"}:
+        raise ValueError(f"Unsupported Step15 summary_write_mode: {summary_write_mode}")
+
     rows_by_pool = {pool_name: load_pool(pool_name, pool_cfg) for pool_name, pool_cfg in policy["pools"].items()}
+    def should_evaluate_test(experiment_name: str, phase_id: str) -> bool:
+        selected_phase_ids = [
+            str(phase["phase_id"])
+            for phase in experiment_phase_plans[experiment_name]
+        ]
+        return should_evaluate_test_endpoint(
+            experiment_name,
+            phase_id,
+            selected_phase_ids,
+            policy,
+            validation_only=args.validation_only,
+        )
+
+    common_standardizers: dict[str, dict] = {}
+    common_standardizer_cfg = policy.get("common_standardizer", {})
+    if bool(common_standardizer_cfg.get("enabled", False)):
+        reference_experiment_name = str(common_standardizer_cfg["reference_experiment"])
+        reference_phase_id = str(common_standardizer_cfg["reference_phase_id"])
+        if reference_experiment_name not in policy["experiments"]:
+            raise ValueError(f"Unknown common-standardizer reference experiment: {reference_experiment_name}")
+        if reference_phase_id not in phase_by_id:
+            raise ValueError(f"Unknown common-standardizer reference phase: {reference_phase_id}")
+        reference_cfg = policy["experiments"][reference_experiment_name]
+        for feature_set_name in sorted({policy["experiments"][name]["feature_set"] for name in experiments}):
+            feature_names = policy["feature_sets"][feature_set_name]
+            validate_features(rows_by_pool, feature_names)
+            scaler_reference_cfg = dict(reference_cfg)
+            scaler_reference_cfg["feature_set"] = feature_set_name
+            scaler_reference_cfg["training_label_scope"] = str(
+                common_standardizer_cfg.get("training_label_scope", "gold_plus_all_silver")
+            )
+            reference_rows = select_train_rows(
+                rows_by_pool,
+                scaler_reference_cfg,
+                phase_by_id[reference_phase_id],
+                policy,
+            )
+            if not reference_rows:
+                raise ValueError(f"No rows for common Step15 standardizer feature set: {feature_set_name}")
+            common_standardizers[feature_set_name] = fit_standardizer_bundle(
+                reference_rows,
+                feature_names,
+                policy.get("feature_preprocessing", {}).get(feature_set_name, {}),
+            )
 
     runs = []
     for experiment_name in experiments:
         experiment_cfg = policy["experiments"][experiment_name]
+        experiment_phases = experiment_phase_plans[experiment_name]
+        shared_standardizer = common_standardizers.get(experiment_cfg["feature_set"])
         training_mode = str(experiment_cfg.get("training_mode", "from_scratch_each_phase"))
         if training_mode == "warm_start_curriculum":
             feature_names = policy["feature_sets"][experiment_cfg["feature_set"]]
             validate_features(rows_by_pool, feature_names)
-            final_phase_cfg = phases[-1]
+            final_phase_cfg = experiment_phases[-1]
             final_train_rows = select_train_rows(rows_by_pool, experiment_cfg, final_phase_cfg, policy)
             if not final_train_rows:
                 raise ValueError(f"{experiment_name}/{final_phase_cfg['phase_id']} has no final-phase train rows")
-            final_x_train_raw = rows_to_feature_matrix(final_train_rows, feature_names)
-            warm_start_standardizer = fit_standardizer(final_x_train_raw)
+            warm_start_standardizer = shared_standardizer or fit_standardizer_bundle(
+                final_train_rows,
+                feature_names,
+                policy.get("feature_preprocessing", {}).get(experiment_cfg["feature_set"], {}),
+            )
             for seed in seeds:
                 initial_params = None
-                for phase_cfg in phases:
+                for phase_cfg in experiment_phases:
                     run_record, initial_params = run_single(
                         experiment_name,
                         experiment_cfg,
@@ -1327,23 +2203,72 @@ def main() -> None:
                         rows_by_pool,
                         initial_params=initial_params,
                         standardizer_override=warm_start_standardizer,
+                        evaluate_test=should_evaluate_test(
+                            experiment_name, str(phase_cfg["phase_id"])
+                        ),
                     )
                     runs.append(run_record)
         elif training_mode == "from_scratch_each_phase":
-            for phase_cfg in phases:
+            for phase_cfg in experiment_phases:
                 for seed in seeds:
-                    run_record, _ = run_single(experiment_name, experiment_cfg, phase_cfg, int(seed), policy, rows_by_pool)
+                    run_record, _ = run_single(
+                        experiment_name,
+                        experiment_cfg,
+                        phase_cfg,
+                        int(seed),
+                        policy,
+                        rows_by_pool,
+                        standardizer_override=shared_standardizer,
+                        evaluate_test=should_evaluate_test(
+                            experiment_name, str(phase_cfg["phase_id"])
+                        ),
+                    )
                     runs.append(run_record)
         else:
             raise ValueError(f"Unsupported Step15 training_mode for {experiment_name}: {training_mode}")
+
+    merged_runs = list(runs)
+    merged_experiments = list(experiments)
+    merged_seeds = [int(seed) for seed in seeds]
+    merged_phases = [phase["phase_id"] for phase in phases]
+    merged_standardizers = dict(common_standardizers)
+    if summary_write_mode == "merge_by_experiment_phase_seed_same_input_manifest_only" and previous_summary:
+        previous = previous_summary
+        keyed_runs = {
+            (str(run["experiment_name"]), str(run["phase_id"]), int(run["seed"])): run
+            for run in previous.get("runs", [])
+        }
+        for run in runs:
+            keyed_runs[(str(run["experiment_name"]), str(run["phase_id"]), int(run["seed"]))] = run
+        merged_runs = [keyed_runs[key] for key in sorted(keyed_runs)]
+        merged_experiments = sorted(set(previous.get("experiments", [])) | set(experiments))
+        merged_seeds = sorted({int(seed) for seed in previous.get("seeds", [])} | {int(seed) for seed in seeds})
+        merged_phases = sorted(
+            set(previous.get("phases", [])) | {phase["phase_id"] for phase in phases},
+            key=lambda phase_id: int(phase_by_id[phase_id]["phase_index"]),
+        )
+        merged_standardizers = {
+            **(previous.get("standardizer_bundles") or {}),
+            **common_standardizers,
+        }
+
+    validation_selections = select_validation_only_candidates(merged_runs, policy)
+    if not args.validation_only:
+        merged_runs = materialize_validation_selected_test_predictions(
+            merged_runs,
+            validation_selections,
+            policy,
+            rows_by_pool,
+        )
 
     summary = {
         "step": "step15_train_incremental_hard_negative",
         "policy": str(policy_path.relative_to(ROOT)),
         "policy_version": policy.get("version"),
-        "experiments": experiments,
-        "seeds": seeds,
-        "phases": [phase["phase_id"] for phase in phases],
+        "experiments": merged_experiments,
+        "seeds": merged_seeds,
+        "phases": merged_phases,
+        "summary_write_mode": summary_write_mode,
         "baseline_references": policy.get("baseline_references", {}),
         "hard_rule_status": {
             "step5_files_modified": False,
@@ -1351,13 +2276,28 @@ def main() -> None:
             "uncertain_rows_used_for_identity_training": False,
             "synthetic_rows_train_only": True,
             "step11_cluster_decisions_used_as_same_controller_ground_truth": False,
+            "zh_test_role": policy.get("evaluation_boundary", {}).get(
+                "zh_test_role",
+                "fixed_internal_development_test",
+            ),
         },
-        "runs": runs,
-        "run_summary": summarize_runs(runs),
+        "input_manifest": input_manifest,
+        "validation_only_model_selection": validation_selections,
+        "standardizer_bundles": merged_standardizers,
+        "runs": merged_runs,
+        "run_summary": summarize_runs(merged_runs),
     }
-    summary_path = resolve_path(policy["outputs"]["summary_json"])
-    step7.write_json(summary_path, summary)
-    print(json.dumps({"summary": str(summary_path.relative_to(ROOT)), "run_count": len(runs)}, indent=2))
+    atomic_write_json(summary_path, summary)
+    print(
+        json.dumps(
+            {
+                "summary": str(summary_path.relative_to(ROOT)),
+                "new_run_count": len(runs),
+                "merged_run_count": len(merged_runs),
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":
