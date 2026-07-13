@@ -347,6 +347,45 @@ class Step15V6ContractTests(unittest.TestCase):
         self.assertFalse(source_cfg["target_identity_labels_used_for_training"])
         self.assertFalse(source_cfg["strict_zero_shot_without_target_covariates"])
 
+    def test_prediction_writers_preserve_sub_micro_ranking_differences(self) -> None:
+        rows = [
+            {
+                "pair_uid": "positive",
+                "data_bucket": "zh_target_strict",
+                "split_name": "valid",
+                "review_label": "positive",
+                "review_stratum": "semantic_structural",
+                "source_seller_raw_left": "seller-a",
+                "source_seller_raw_right": "seller-b",
+            },
+            {
+                "pair_uid": "negative",
+                "data_bucket": "zh_target_strict",
+                "split_name": "valid",
+                "review_label": "negative",
+                "review_stratum": "semantic_structural",
+                "source_seller_raw_left": "seller-c",
+                "source_seller_raw_right": "seller-d",
+            },
+        ]
+        probabilities = np.asarray([0.5000004, 0.5000003], dtype=float)
+
+        for prediction_builder in (
+            lambda: step15.prediction_rows(rows, probabilities, 0.5, "step15"),
+            lambda: step15.step7.prediction_rows(rows, probabilities, 0.5, "step7"),
+            lambda: source_lr.prediction_rows(rows, probabilities, 0.5, "source"),
+        ):
+            predictions = prediction_builder()
+            persisted_scores = np.asarray(
+                [float(row["prob_positive"]) for row in predictions],
+                dtype=float,
+            )
+            self.assertGreater(persisted_scores[0], persisted_scores[1])
+            self.assertEqual(
+                step15.step7.roc_auc_score(np.asarray([1.0, 0.0]), persisted_scores),
+                1.0,
+            )
+
     def test_output_paths_are_isolated(self) -> None:
         for key, value in self.policy["outputs"].items():
             if key == "summary_write_mode":

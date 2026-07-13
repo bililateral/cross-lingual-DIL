@@ -1,10 +1,16 @@
 # Project Progress
 
-Updated: 2026-07-12
+Updated: 2026-07-13
 
 ## Current Stage
 
-`2026-07-12` Step15 v6.4 inductive paper-hardening implementation completed locally; Linux model execution is pending:
+`2026-07-13` Step15 v6.4 inductive paper-hardening implementation completed locally; the first Linux execution reached Step12 input validation, exposed a prediction-serialization precision defect, and requires a corrected rerun:
+
+- the failed Step12 check was `step15_v6_m0/seed=20260325/valid`: the Step15 summary reported ROC-AUC `0.766667`, while the persisted CSV reproduced `0.766852`;
+- root cause: Step15 calculated summary metrics from full-precision in-memory probabilities but persisted `prob_positive` and threshold at six decimals. Quantization created artificial score ties, so rank metrics recomputed by Step12 were not guaranteed to match the summary;
+- this is an artifact reproducibility defect, not evidence that the model changed or that Step12's tolerance should be relaxed. Step12 remains fail-closed at `2e-5`;
+- Step15, its source-only control, and the Step7 prediction writer reused by isolated Step9 now persist Python round-trip float values. A regression test proves that positive/negative scores separated by less than `1e-6` remain rank-distinct;
+- because the active manifest binds producer-script and prediction hashes, the incomplete Linux v6 outputs must be archived and Step9/source-only/Step15/manifest/Step12 regenerated together. The failed bundle is not a valid result set and no metric may be reported from it;
 
 - active branch: `method/step15-v6-paper-hardening`;
 - the synchronized v5r run is frozen as `internal-dev-v5r-20260711` in `reports/manifests/step15_internal_dev_v5r_20260711.json`; all 44 referenced summary/policy/output files exist and are SHA-256 recorded;
@@ -31,8 +37,8 @@ Updated: 2026-07-12
 - every publication manifest binds its CSV by SHA-256 and row count. Every cluster-audit JSON self-hashes its canonical content and binds its CSV by SHA-256, row count, decision counts and per-scorer counts; Step13 independently rechecks that full chain before reading graph evidence;
 - Step16H v2 is superseded and excluded from the current hash-closed bundle because its completion manifest no longer binds the current producer-script bytes. Only the v3 bundle is current;
 - Step16H v3 evidence-complete dual AI review and third-reviewer adjudication are complete without writing back to Step5/Step16F. Overall agreement is `0.875`, kappa `0.7992`, alpha `0.7980`; final old-positive decisions are `18 strict / 48 soft / 11 different / 3 uncertain`, while negative controls contain `0 strict / 24 soft / 55 different / 1 uncertain`. This is an AI-assisted sensitivity audit with procedural blinding, not human gold annotation;
-- the complete local preflight passes `78/78` tests. Coverage includes train-only corpus references, candidate-universe invariance, M5 valid-only selection and frozen-artifact test materialization, metric semantics, paired component randomization, Holm families, strict+soft promotion, weights/budgets/mixup, immutable-output rejection, Step11 raw-BGE/allow-list/empty-graph gates, Step11 audit CSV integrity, Step13 provenance and Step16H concealment;
-- the 11-stage Linux core runner compiles the synchronized scripts and reruns all 78 contract tests before training. It blocks manifest creation until `step15_validate_v6_outputs.py` proves complete experiment/phase/seed coverage, all fixed update counts, exact M4/M4c Phase0-3 valid predictions and artifact parameters, M4-only Phase4 mixup, selected-only M5 test output, and complete source-only runs. It ends at Step12; the separate promotion-gated Step11 runner recompiles the graph/audit scripts, performs graph validation and only then generates Step13;
+- the complete local preflight passes `79/79` tests. Coverage includes train-only corpus references, candidate-universe invariance, M5 valid-only selection and frozen-artifact test materialization, metric semantics, sub-micro score serialization, paired component randomization, Holm families, strict+soft promotion, weights/budgets/mixup, immutable-output rejection, Step11 raw-BGE/allow-list/empty-graph gates, Step11 audit CSV integrity, Step13 provenance and Step16H concealment;
+- the 11-stage Linux core runner compiles the synchronized scripts and reruns all 79 contract tests before training. It blocks manifest creation until `step15_validate_v6_outputs.py` proves complete experiment/phase/seed coverage, all fixed update counts, exact M4/M4c Phase0-3 valid predictions and artifact parameters, M4-only Phase4 mixup, selected-only M5 test output, and complete source-only runs. It ends at Step12; the separate promotion-gated Step11 runner recompiles the graph/audit scripts, performs graph validation and only then generates Step13;
 - no Windows model training was performed. Full Linux runner: `scripts/run_step15_v6_linux_20260711.sh`; post-promotion Step11 runner: `scripts/run_step11_v6_after_promotion_20260711.sh`.
 
 Detailed implementation record: `docs/STEP15_V6_PAPER_HARDENING_IMPLEMENTATION_20260711.zh.md`.

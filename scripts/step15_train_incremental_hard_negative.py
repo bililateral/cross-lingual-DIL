@@ -1237,8 +1237,11 @@ def prediction_rows(rows: list[dict], probabilities: np.ndarray, threshold: floa
                 "split_name": row["split_name"],
                 "review_label": row["review_label"],
                 "y_true": label_to_int(row["review_label"]),
-                "prob_positive": round(float(probability), 6),
-                "threshold": round(float(threshold), 6),
+                # Keep Python's round-trip float representation. Ranking metrics are
+                # recomputed from this CSV, so six-decimal quantization can create
+                # artificial score ties and change ROC-AUC/AP/PR-AUC.
+                "prob_positive": float(probability),
+                "threshold": float(threshold),
                 "pred_positive": int(prediction),
                 "split_component_id": row.get("split_component_id", ""),
                 "review_stratum": row.get("review_stratum", ""),

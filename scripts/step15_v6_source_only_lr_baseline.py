@@ -99,8 +99,8 @@ def prediction_rows(rows: list[dict], probabilities: np.ndarray, threshold: floa
                 "split_component_id": row.get("split_component_id", ""),
                 "review_label": row["review_label"],
                 "y_true": step15.label_to_int(row["review_label"]),
-                "prob_positive": round(float(probability), 8),
-                "threshold": round(float(threshold), 8),
+                "prob_positive": float(probability),
+                "threshold": float(threshold),
                 "pred_positive": int(probability >= threshold),
             }
         )

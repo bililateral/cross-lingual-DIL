@@ -942,7 +942,10 @@ def prediction_rows(rows: list[dict], probabilities: np.ndarray, threshold: floa
                 "split_name": row["split_name"],
                 "review_label": row["review_label"],
                 "y_true": label_to_int(row["review_label"]),
-                "prob_positive": round(float(probability), 6),
+                # Step9 reuses this writer and Step12 recomputes ranking metrics from
+                # the persisted scores. Preserve enough precision for exact float
+                # round trips instead of introducing six-decimal ranking ties.
+                "prob_positive": float(probability),
                 "pred_positive": int(prediction),
                 "review_stratum": row["review_stratum"],
                 "source_seller_raw_left": row["source_seller_raw_left"],
