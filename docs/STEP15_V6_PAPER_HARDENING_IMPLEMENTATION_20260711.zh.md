@@ -387,7 +387,7 @@ v6 全部结果位于：
 - `reports/step12_v6/`
 - `reports/step11_v6/`
 
-Step4、Step7 和 Step15 evidence labels 都作为只读冻结输入，不由 v6 runner 重建。Step7 不重新训练或覆盖 canonical summary；`step15_v6_refresh_step7_control.py` 只读旧预测并把 metric-v2 control 写入 `reports/step15_v6/baselines/`。Step9 使用 `--output-root reports/step15_v6/baselines/step9`，并显式读取 v6 归纳式 EN/ZH pair features；所有模型、预测和 summary 均写入隔离目录。Step15 的 intermediate phases 只写 artifact 与 `zh_valid` prediction；部分 warm-start phase prefix 永远不能被当作 endpoint。除 M5 valid-selected 特例外，每个实验只有完整预注册 endpoint phase 才能读取并输出 `zh_test` prediction/metrics。核心 runner 共 11 个阶段，第一阶段在训练前编译脚本并运行全部 80 项契约测试，最终终止于 Step12；Step13 只存在于 promotion 后的 Step11 runner 最后阶段。
+Step4、Step7 和 Step15 evidence labels 都作为只读冻结输入，不由 v6 runner 重建。Step7 不重新训练或覆盖 canonical summary；`step15_v6_refresh_step7_control.py` 只读旧预测并把 metric-v2 control 写入 `reports/step15_v6/baselines/`。Step9 使用 `--output-root reports/step15_v6/baselines/step9`，并显式读取 v6 归纳式 EN/ZH pair features；所有模型、预测和 summary 均写入隔离目录。Step15 的 intermediate phases 只写 artifact 与 `zh_valid` prediction；部分 warm-start phase prefix 永远不能被当作 endpoint。除 M5 valid-selected 特例外，每个实验只有完整预注册 endpoint phase 才能读取并输出 `zh_test` prediction/metrics。核心 runner 共 11 个阶段，第一阶段在训练前编译脚本并运行全部 85 项契约测试，最终终止于 Step12；Step13 只存在于 promotion 后的 Step11 runner 最后阶段。
 
 Step15 v6 summary 的写入模式是：
 
@@ -395,7 +395,7 @@ Step15 v6 summary 的写入模式是：
 
 因此核心 M0-M5 和 ablations 可以分两条命令运行，不会相互覆盖。只有 policy version、代码/输入文件 hash 完全相同时才允许按 `(experiment, phase, seed)` 合并；任何输入边界变化都会拒绝合并并要求新版本输出路径。
 
-兼容性检查发生在训练和任何 v6 文件写入之前；首次创建新子目录由原子写函数负责。训练后先由 `step15_validate_v6_outputs.py` 证明完整 experiment/phase/seed coverage、固定更新数、M4/M4c Phase0-3 valid predictions 和参数完全一致、M4-only Phase4 synthetic rows、M5 双候选十种子 valid 覆盖、仅 selected M5 test 输出和 source-only 十种子，再允许生成 manifest。活动 manifest 同时冻结归纳式 feature reference/manifest、该验证报告、主 Step15 summary、source-only summary、隔离的 Step7/Step9 summaries、五组 Step9 十种子所引用的 artifacts、Step3 profiles、Step4 candidates、Step5 labels、canonical/inductive Step7 features、Step15 evidence labels、policy、producer scripts 和所有被引用输出的 SHA-256，并复算 manifest 自身哈希。Step12 逐文件复核上述绑定，拒绝中断重跑留下的旧预测。canonical Step12 v4 输出固定使用 5000 次 bootstrap 与 5000 次 paired randomization，并写入 `reports/step12_v6/method_audit_v4_inductive_20260712/`；目标文件任一已存在即 fail closed，不能静默覆盖。
+兼容性检查发生在训练和任何 v6 文件写入之前；首次创建新子目录由原子写函数负责。训练后先由 `step15_validate_v6_outputs.py` 证明完整 experiment/phase/seed coverage、固定更新数、M4/M4c Phase0-3 valid predictions 和参数完全一致、M4-only Phase4 synthetic rows、M5 双候选十种子 valid 覆盖、仅 selected M5 test 输出和 source-only 十种子，再允许生成 manifest。活动 manifest 同时冻结归纳式 feature reference/manifest、该验证报告、主 Step15 summary、source-only summary、隔离的 Step7/Step9 summaries、五组 Step9 十种子所引用的 artifacts、Step3 profiles、Step4 candidates、Step5 labels、canonical/inductive Step7 features、Step15 evidence labels、policy、producer scripts 和所有被引用输出的 SHA-256，并复算 manifest 自身哈希。Step12 逐文件复核上述绑定，拒绝中断重跑留下的旧预测。canonical Step12 policy v5 输出固定使用 5000 次 bootstrap 与 5000 次 paired randomization，并写入 `reports/step12_v6/method_audit_v4_inductive_20260712/`；目标文件任一已存在即 fail closed，不能静默覆盖。
 
 ## 17. 预测分数序列化完整性
 
@@ -404,6 +404,18 @@ Step15 v6 summary 的写入模式是：
 修复后，Step15 主模型、source-only 对照以及被 Step9 复用的 Step7 prediction writer 均输出 Python 可往返的完整浮点表示。Step12 的严格复算容差不放宽；新增测试专门验证小于 `1e-6` 的正负分数差不会在落盘时消失。由于 producer-script 和预测文件均受活动 manifest 哈希约束，修复前的未完成 Linux bundle 必须归档，不能与修复后的结果混用或作为论文指标来源。
 
 第一次修复后的 Linux resume 又在 M5 test 物化处发现一个旧消费者契约：代码仍对 artifact threshold 先做六位舍入，再与全精度 CSV threshold 比较。现在物化前会严格绑定 artifact、run record 和所有 validation prediction rows 的完整精度 threshold，检查数值有限且位于 `[0,1]`，并逐行验证 `pred_positive == (prob_positive >= threshold)`。端到端 M5 测试使用 `0.5000003456789012`，另有负测试确认 threshold drift 和 prediction drift 都会 fail closed。Step15-v6/Step12-v6 相关路径已不存在旧式 rounded-threshold equality check。
+
+### 17.1 Step12 确定性 CPU 并行优化
+
+第一次 canonical Step12 统计运行只有一个 Python 进程持续占用约一个逻辑核。它并未卡死，但旧实现对每个 grouped-bootstrap 样本分别为 13 个指标重复调用完整评估函数：fixed seed-mean 与 two-level 各一次，因此同一标签/分数向量最多被完整排序和计算 26 次。模型审计、5 个 evidence slices 以及 19 个 comparison scopes 也全部串行。5000 次 bootstrap 和 5000 次 randomization 的科研设计本身没有问题，问题是执行计划重复计算且没有利用服务器的 24 个物理核。
+
+优化版不改变统计定义。每个重采样分数向量只调用一次 `evaluate_probabilities`，然后从同一返回对象提取 AP、ROC-AUC、PR-AUC、阈值指标和 confusion counts；metric-specific paired randomization 只计算当次需要的排名指标。并行任务按三类固定边界划分：24 个 model/alias、5 x 24 个 evidence-slice/model、以及按 policy 原顺序生成的 19 个 comparison-scope。policy 上限固定为 24 个 worker，每个 worker 固定 1 个 native thread，避免 24 个 Python 进程各自再次启动多线程库造成过度订阅。
+
+随机性仍由原公式唯一决定。每个 model task 使用原 bootstrap seed 与 `bootstrap_seed + 1000003 * seed_count`；每个 slice task 使用原 `base_seed + 200003 * (slice_offset + 1)` 及 seed-count 偏移；每个 comparison scope 保留原 comparison、scope、two-level 和 metric-specific randomization 偏移。worker 不接收共享 RNG，也不依赖领取任务顺序。`ProcessPoolExecutor.map` 按输入顺序返回，最终 CSV 的 model、slice、comparison、analysis-mode 与 metric 行顺序和旧版一致。
+
+等价性验证分三层：所有 24 个原有 Step12 单元测试继续通过；新增测试证明 `workers=1` 与 `workers=2` 的 model rows、slice rows 和 comparison rows 完全相同；并直接从 commit `0fced64` 动态加载优化前实现，在相同 ties、components、seed scores 和随机种子下逐字段比较 model metrics、slice metrics、primary grouped bootstrap/randomization 与 supplemental two-level 输出，结果均为 exact match。小型旧/新基准中，消除重复评估本身得到 `7.19x` model-loop 加速，尚未计入 24 进程并行收益。
+
+该优化不使用 GPU。Step12 操作的是每次约 150-200 行的小数组，并反复做稳定排序、组件索引和 Python 控制流；迁移 CUDA 会增加传输、kernel launch、tie/rounding 重实现和结果一致性风险。RTX 5090 应用于需要大模型前向或训练的步骤，而 Step12 最合理的硬件路径是当前双路 CPU 的 24 个物理核。运行过程中会分别打印 model bootstrap、slice bootstrap 和 paired comparison 三阶段完成时间，避免长时间无输出被误判为卡死。
 
 ## 18. 当前允许与禁止的论文结论
 
@@ -428,7 +440,7 @@ Windows 本地已通过：
 - Python compile；
 - 两份 Bash runner 已通过 Git Bash `bash -n`；
 - Step15、source-only、Step12 config-only；
-- 全量本地测试为 `80/80` 通过，覆盖特征参考、M5 frozen-artifact test 物化、exact frozen-threshold binding、sub-micro prediction score 序列化、paired component randomization、Holm family、strict+soft promotion gate、manifest/hash、raw-BGE threshold provenance、publication scorer allow-list、空主图拒收、不可变写入、cluster-audit CSV 完整性、Step13 provenance 和图验证合同；
+- 全量本地测试为 `85/85` 通过，覆盖特征参考、M5 frozen-artifact test 物化、exact frozen-threshold binding、sub-micro prediction score 序列化、paired component randomization、Holm family、strict+soft promotion gate、串行/进程池确定性等价、manifest/hash、raw-BGE threshold provenance、publication scorer allow-list、空主图拒收、不可变写入、cluster-audit CSV 完整性、Step13 provenance 和图验证合同；
 - Step4 candidate universe：EN `6683`、ZH strict `3857`、ZH aux `580`，修改前后 pair hash 完全一致。
 
 整个仓库同步到 Linux 后，从仓库根目录运行：

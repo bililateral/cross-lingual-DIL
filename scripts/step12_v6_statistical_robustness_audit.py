@@ -7,9 +7,21 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import subprocess
+import time
 from collections import Counter
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+
+NATIVE_THREAD_ENV_VARS = (
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+)
+for _variable in NATIVE_THREAD_ENV_VARS:
+    os.environ[_variable] = "1"
 
 import numpy as np
 
@@ -29,6 +41,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy", default=str(DEFAULT_POLICY))
     parser.add_argument("--resamples", type=int, default=None)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help=(
+            "CPU worker processes. Defaults to the policy limit, capped by the available "
+            "logical CPUs. This changes execution only, never resampling or statistics."
+        ),
+    )
     parser.add_argument("--validate-config-only", action="store_true")
     parser.add_argument(
         "--validate-only",
@@ -921,9 +942,60 @@ def load_models(
 
 
 def metric_value(metric: str, y: np.ndarray, scores: np.ndarray, threshold: float) -> float | None:
+    ranking_functions = {
+        "roc_auc": step7.roc_auc_score,
+        "average_precision": step7.average_precision_score,
+        "pr_auc": step7.precision_recall_auc_score,
+    }
+    ranking_function = ranking_functions.get(metric)
+    if ranking_function is not None:
+        value = ranking_function(y, scores)
+        return None if value is None else float(round(value, 6))
     values = step7.evaluate_probabilities(y, scores, threshold)
-    value = (values.get("confusion") or {}).get(metric) if metric in {"tp", "tn", "fp", "fn"} else values.get(metric)
+    value = evaluation_metric_value(values, metric)
     return None if value is None else float(value)
+
+
+def evaluation_metric_value(values: dict, metric: str) -> float | int | None:
+    """Extract one metric from an already computed evaluation payload."""
+    if metric in {"tp", "tn", "fp", "fn"}:
+        return (values.get("confusion") or {}).get(metric)
+    return values.get(metric)
+
+
+def append_evaluation_metrics(
+    distributions: dict[str, list[float]],
+    values: dict,
+    metrics: list[str],
+) -> None:
+    for metric in metrics:
+        value = evaluation_metric_value(values, metric)
+        if value is not None:
+            distributions[metric].append(float(value))
+
+
+def resolve_worker_count(policy: dict, requested: int | None) -> int:
+    execution = policy.get("parallel_execution") or {}
+    configured = int(execution.get("max_workers", 1))
+    if configured <= 0:
+        raise ValueError("Step12-v6 parallel_execution.max_workers must be positive")
+    workers = configured if requested is None else int(requested)
+    if workers <= 0:
+        raise ValueError("Step12-v6 --workers must be positive")
+    if workers > configured:
+        raise ValueError(
+            "Step12-v6 --workers exceeds the preregistered operational ceiling: "
+            f"requested={workers} configured_max={configured}"
+        )
+    return min(workers, os.cpu_count() or 1)
+
+
+def ordered_process_map(worker, tasks: list[tuple], worker_count: int) -> list:
+    """Map deterministic, independently seeded tasks while preserving input order."""
+    if worker_count <= 1 or len(tasks) <= 1:
+        return [worker(task) for task in tasks]
+    with ProcessPoolExecutor(max_workers=min(worker_count, len(tasks))) as executor:
+        return list(executor.map(worker, tasks, chunksize=1))
 
 
 def component_groups(rows: list[dict]) -> list[np.ndarray]:
@@ -1088,14 +1160,8 @@ def masked_model(model: dict, mask: np.ndarray) -> dict:
     }
 
 
-def model_metric_rows(
-    models: dict[str, dict],
-    test_rows: list[dict],
-    y_test: np.ndarray,
-    groups: list[np.ndarray],
-    policy: dict,
-    resamples: int,
-) -> list[dict]:
+def _model_metric_row_task(task: tuple) -> dict:
+    model_id, model, y_test, groups, policy, resamples = task
     bootstrap_seed = int(policy["bootstrap"]["random_seed"])
     component_rng = np.random.default_rng(bootstrap_seed)
     confidence = float(policy["bootstrap"]["confidence_level"])
@@ -1105,98 +1171,226 @@ def model_metric_rows(
         *policy["metrics"]["threshold"],
         *policy["metrics"].get("confusion", []),
     ]
-    component_draws = [sampled_component_indices(groups, component_rng) for _ in range(resamples)]
-    seed_draws_by_count: dict[int, list[np.ndarray]] = {}
-    for seed_count in sorted({int(model["seed_scores"].shape[0]) for model in models.values()}):
-        seed_rng = np.random.default_rng(bootstrap_seed + 1000003 * seed_count)
-        seed_draws_by_count[seed_count] = [
-            seed_rng.integers(0, seed_count, size=seed_count) for _ in range(resamples)
+    component_draws = [
+        sampled_component_indices(groups, component_rng) for _ in range(resamples)
+    ]
+    seed_count = int(model["seed_scores"].shape[0])
+    seed_rng = np.random.default_rng(bootstrap_seed + 1000003 * seed_count)
+    seed_draws = [
+        seed_rng.integers(0, seed_count, size=seed_count) for _ in range(resamples)
+    ]
+    distributions = {metric: [] for metric in metrics}
+    component_only_distributions = {metric: [] for metric in metrics}
+    for indices, seed_indices in zip(component_draws, seed_draws, strict=True):
+        y_sample = y_test[indices]
+        if len(set(y_sample.tolist())) < 2:
+            continue
+        fixed_values = step7.evaluate_probabilities(
+            y_sample, model["scores"][indices], model["threshold"]
+        )
+        append_evaluation_metrics(component_only_distributions, fixed_values, metrics)
+        sampled_scores = model["seed_scores"][seed_indices].mean(axis=0)[indices]
+        sampled_values = step7.evaluate_probabilities(
+            y_sample, sampled_scores, model["threshold"]
+        )
+        append_evaluation_metrics(distributions, sampled_values, metrics)
+
+    point = step7.evaluate_probabilities(y_test, model["scores"], model["threshold"])
+    record = {
+        "model_id": model_id,
+        "role": model["role"],
+        "alias_of": model.get("alias_of"),
+        "seed_count": seed_count,
+        "bootstrap_mode": (
+            "primary_split_component_fixed_seed_mean_with_"
+            "supplemental_two_level_seed_and_component"
+        ),
+        "threshold": round(float(model["threshold"]), 8),
+        "threshold_source": model["threshold_source"],
+        "valid_average_precision": None
+        if model["valid_average_precision"] is None
+        else round(float(model["valid_average_precision"]), 8),
+        "seed_ids": ";".join(str(seed_id) for seed_id in model["seed_ids"]),
+        "metric_semantics_version": policy["metrics"]["metric_semantics_version"],
+        "pr_auc_definition": PR_AUC_DEFINITION,
+    }
+    ranking_metrics = [policy["metrics"]["primary"], *policy["metrics"]["secondary"]]
+    per_seed_evaluations = [
+        step7.evaluate_probabilities(y_test, seed_scores, model["threshold"])
+        for seed_scores in model["seed_scores"]
+    ]
+    for ranking_metric in ranking_metrics:
+        per_seed_values = [
+            evaluation_metric_value(values, ranking_metric)
+            for values in per_seed_evaluations
         ]
-    rows = []
-    for model_id, model in models.items():
-        distributions = {metric: [] for metric in metrics}
-        component_only_distributions = {metric: [] for metric in metrics}
-        seed_count = int(model["seed_scores"].shape[0])
-        for indices, seed_indices in zip(
-            component_draws,
-            seed_draws_by_count[seed_count],
-            strict=True,
-        ):
-            y_sample = y_test[indices]
-            if len(set(y_sample.tolist())) < 2:
-                continue
-            fixed_seed_mean_scores = model["scores"][indices]
-            for metric in metrics:
-                fixed_value = metric_value(
-                    metric, y_sample, fixed_seed_mean_scores, model["threshold"]
-                )
-                if fixed_value is not None:
-                    component_only_distributions[metric].append(fixed_value)
-            scores_sample = model["seed_scores"][seed_indices].mean(axis=0)[indices]
-            for metric in metrics:
-                value = metric_value(metric, y_sample, scores_sample, model["threshold"])
-                if value is not None:
-                    distributions[metric].append(value)
-        point = step7.evaluate_probabilities(y_test, model["scores"], model["threshold"])
-        record = {
-            "model_id": model_id,
-            "role": model["role"],
-            "alias_of": model.get("alias_of"),
-            "seed_count": int(model["seed_scores"].shape[0]),
-            "bootstrap_mode": (
-                "primary_split_component_fixed_seed_mean_with_"
-                "supplemental_two_level_seed_and_component"
-            ),
-            "threshold": round(float(model["threshold"]), 8),
-            "threshold_source": model["threshold_source"],
-            "valid_average_precision": None
-            if model["valid_average_precision"] is None
-            else round(float(model["valid_average_precision"]), 8),
-            "seed_ids": ";".join(str(seed_id) for seed_id in model["seed_ids"]),
-            "metric_semantics_version": policy["metrics"]["metric_semantics_version"],
-            "pr_auc_definition": PR_AUC_DEFINITION,
-        }
-        for ranking_metric in [policy["metrics"]["primary"], *policy["metrics"]["secondary"]]:
-            per_seed_values = [
-                metric_value(ranking_metric, y_test, seed_scores, model["threshold"])
-                for seed_scores in model["seed_scores"]
-            ]
-            finite_values = [float(value) for value in per_seed_values if value is not None]
-            record[f"{ranking_metric}_per_seed_values"] = ";".join(
-                "" if value is None else f"{float(value):.8f}" for value in per_seed_values
+        finite_values = [float(value) for value in per_seed_values if value is not None]
+        record[f"{ranking_metric}_per_seed_values"] = ";".join(
+            "" if value is None else f"{float(value):.8f}" for value in per_seed_values
+        )
+        record[f"{ranking_metric}_seed_mean"] = (
+            round(float(np.mean(finite_values)), 8) if finite_values else None
+        )
+        record[f"{ranking_metric}_seed_std"] = (
+            round(float(np.std(finite_values, ddof=1)), 8) if len(finite_values) > 1 else 0.0
+        )
+        record[f"{ranking_metric}_seed_min"] = (
+            round(float(np.min(finite_values)), 8) if finite_values else None
+        )
+        record[f"{ranking_metric}_seed_max"] = (
+            round(float(np.max(finite_values)), 8) if finite_values else None
+        )
+    for metric in metrics:
+        low, high = percentile_interval(component_only_distributions[metric], confidence)
+        two_level_low, two_level_high = percentile_interval(distributions[metric], confidence)
+        record[metric] = evaluation_metric_value(point, metric)
+        record[f"{metric}_ci_low"] = None if low is None else round(low, 8)
+        record[f"{metric}_ci_high"] = None if high is None else round(high, 8)
+        record[f"{metric}_two_level_ci_low"] = (
+            None if two_level_low is None else round(two_level_low, 8)
+        )
+        record[f"{metric}_two_level_ci_high"] = (
+            None if two_level_high is None else round(two_level_high, 8)
+        )
+    return record
+
+
+def model_metric_rows(
+    models: dict[str, dict],
+    test_rows: list[dict],
+    y_test: np.ndarray,
+    groups: list[np.ndarray],
+    policy: dict,
+    resamples: int,
+    worker_count: int = 1,
+) -> list[dict]:
+    del test_rows
+    tasks = [
+        (model_id, model, y_test, groups, policy, resamples)
+        for model_id, model in models.items()
+    ]
+    return ordered_process_map(_model_metric_row_task, tasks, worker_count)
+
+
+def _evidence_slice_row_task(task: tuple) -> dict:
+    (
+        slice_offset,
+        slice_name,
+        mask,
+        model_id,
+        model,
+        test_rows,
+        y_test,
+        policy,
+        resamples,
+    ) = task
+    confidence = float(policy["bootstrap"]["confidence_level"])
+    base_seed = int(policy["bootstrap"]["random_seed"])
+    y_slice = y_test[mask]
+    slice_source_rows = [row for row, keep in zip(test_rows, mask, strict=True) if keep]
+    slice_groups = component_groups(slice_source_rows)
+    slice_seed = base_seed + 200003 * (slice_offset + 1)
+    component_rng = np.random.default_rng(slice_seed)
+    component_draws = [
+        sampled_component_indices(slice_groups, component_rng) for _ in range(resamples)
+    ]
+    seed_count = int(model["seed_scores"].shape[0])
+    seed_rng = np.random.default_rng(slice_seed + 1000003 * seed_count)
+    seed_draws = [
+        seed_rng.integers(0, seed_count, size=seed_count) for _ in range(resamples)
+    ]
+    prevalence = float(y_slice.mean()) if len(y_slice) else 0.0
+    metrics = step7.evaluate_probabilities(
+        y_slice, model["scores"][mask], model["threshold"]
+    )
+    component_only_distributions: dict[str, list[float]] = {
+        "roc_auc": [],
+        "average_precision": [],
+        "pr_auc": [],
+        "average_precision_prevalence_lift": [],
+    }
+    two_level_distributions: dict[str, list[float]] = {
+        metric_name: [] for metric_name in component_only_distributions
+    }
+    slice_seed_scores = model["seed_scores"][:, mask]
+    slice_seed_mean_scores = model["scores"][mask]
+    for indices, seed_indices in zip(component_draws, seed_draws, strict=True):
+        y_sample = y_slice[indices]
+        if len(set(y_sample.tolist())) < 2:
+            continue
+        fixed_metrics = step7.evaluate_probabilities(
+            y_sample, slice_seed_mean_scores[indices], model["threshold"]
+        )
+        two_level_metrics = step7.evaluate_probabilities(
+            y_sample,
+            slice_seed_scores[seed_indices].mean(axis=0)[indices],
+            model["threshold"],
+        )
+        sampled_prevalence = float(y_sample.mean())
+        for metric_name in ("roc_auc", "average_precision", "pr_auc"):
+            fixed_value = fixed_metrics.get(metric_name)
+            if fixed_value is not None:
+                component_only_distributions[metric_name].append(float(fixed_value))
+            two_level_value = two_level_metrics.get(metric_name)
+            if two_level_value is not None:
+                two_level_distributions[metric_name].append(float(two_level_value))
+        fixed_ap = fixed_metrics.get("average_precision")
+        if fixed_ap is not None and sampled_prevalence > 0.0:
+            component_only_distributions["average_precision_prevalence_lift"].append(
+                float(fixed_ap) / sampled_prevalence
             )
-            record[f"{ranking_metric}_seed_mean"] = (
-                round(float(np.mean(finite_values)), 8) if finite_values else None
+        two_level_ap = two_level_metrics.get("average_precision")
+        if two_level_ap is not None and sampled_prevalence > 0.0:
+            two_level_distributions["average_precision_prevalence_lift"].append(
+                float(two_level_ap) / sampled_prevalence
             )
-            record[f"{ranking_metric}_seed_std"] = (
-                round(float(np.std(finite_values, ddof=1)), 8) if len(finite_values) > 1 else 0.0
-            )
-            record[f"{ranking_metric}_seed_min"] = (
-                round(float(np.min(finite_values)), 8) if finite_values else None
-            )
-            record[f"{ranking_metric}_seed_max"] = (
-                round(float(np.max(finite_values)), 8) if finite_values else None
-            )
-        for metric in metrics:
-            low, high = percentile_interval(component_only_distributions[metric], confidence)
-            two_level_low, two_level_high = percentile_interval(
-                distributions[metric], confidence
-            )
-            record[metric] = (
-                (point.get("confusion") or {}).get(metric)
-                if metric in {"tp", "tn", "fp", "fn"}
-                else point.get(metric)
-            )
-            record[f"{metric}_ci_low"] = None if low is None else round(low, 8)
-            record[f"{metric}_ci_high"] = None if high is None else round(high, 8)
-            record[f"{metric}_two_level_ci_low"] = (
-                None if two_level_low is None else round(two_level_low, 8)
-            )
-            record[f"{metric}_two_level_ci_high"] = (
-                None if two_level_high is None else round(two_level_high, 8)
-            )
-        rows.append(record)
-    return rows
+    interval_fields = {}
+    for metric_name, values in component_only_distributions.items():
+        low, high = percentile_interval(values, confidence)
+        interval_fields[f"{metric_name}_ci_low"] = None if low is None else round(low, 8)
+        interval_fields[f"{metric_name}_ci_high"] = None if high is None else round(high, 8)
+        two_level_low, two_level_high = percentile_interval(
+            two_level_distributions[metric_name], confidence
+        )
+        interval_fields[f"{metric_name}_two_level_ci_low"] = (
+            None if two_level_low is None else round(two_level_low, 8)
+        )
+        interval_fields[f"{metric_name}_two_level_ci_high"] = (
+            None if two_level_high is None else round(two_level_high, 8)
+        )
+    return {
+        "slice_name": slice_name,
+        "model_id": model_id,
+        "row_count": len(y_slice),
+        "positive_count": int(y_slice.sum()),
+        "negative_count": int(len(y_slice) - y_slice.sum()),
+        "prevalence": round(prevalence, 8),
+        "unstable_slice": int(y_slice.sum()) < 10,
+        "bootstrap_mode": (
+            "primary_split_component_fixed_seed_mean_with_"
+            "supplemental_two_level_seed_and_component"
+        ),
+        "valid_bootstrap_resamples": len(
+            component_only_distributions["average_precision"]
+        ),
+        "valid_two_level_bootstrap_resamples": len(
+            two_level_distributions["average_precision"]
+        ),
+        "metric_semantics_version": policy["metrics"]["metric_semantics_version"],
+        "pr_auc_definition": PR_AUC_DEFINITION,
+        "roc_auc": metrics["roc_auc"],
+        "average_precision": metrics["average_precision"],
+        "average_precision_prevalence_lift": None
+        if metrics["average_precision"] is None or prevalence <= 0.0
+        else round(float(metrics["average_precision"]) / prevalence, 8),
+        "pr_auc": metrics["pr_auc"],
+        "accuracy": metrics["accuracy"],
+        "balanced_accuracy": metrics["balanced_accuracy"],
+        "f1": metrics["f1"],
+        "precision": metrics["precision"],
+        "recall": metrics["recall"],
+        **interval_fields,
+    }
 
 
 def evidence_slice_rows(
@@ -1206,125 +1400,24 @@ def evidence_slice_rows(
     masks: dict[str, np.ndarray],
     policy: dict,
     resamples: int,
+    worker_count: int = 1,
 ) -> list[dict]:
-    rows = []
-    confidence = float(policy["bootstrap"]["confidence_level"])
-    base_seed = int(policy["bootstrap"]["random_seed"])
-    for slice_offset, (slice_name, mask) in enumerate(masks.items()):
-        y_slice = y_test[mask]
-        slice_source_rows = [row for row, keep in zip(test_rows, mask, strict=True) if keep]
-        slice_groups = component_groups(slice_source_rows)
-        component_rng = np.random.default_rng(base_seed + 200003 * (slice_offset + 1))
-        component_draws = [
-            sampled_component_indices(slice_groups, component_rng) for _ in range(resamples)
-        ]
-        seed_draws_by_count: dict[int, list[np.ndarray]] = {}
-        for seed_count in sorted({int(model["seed_scores"].shape[0]) for model in models.values()}):
-            seed_rng = np.random.default_rng(
-                base_seed + 200003 * (slice_offset + 1) + 1000003 * seed_count
-            )
-            seed_draws_by_count[seed_count] = [
-                seed_rng.integers(0, seed_count, size=seed_count) for _ in range(resamples)
-            ]
-        prevalence = float(y_slice.mean()) if len(y_slice) else 0.0
-        for model_id, model in models.items():
-            metrics = step7.evaluate_probabilities(y_slice, model["scores"][mask], model["threshold"])
-            component_only_distributions: dict[str, list[float]] = {
-                "roc_auc": [],
-                "average_precision": [],
-                "pr_auc": [],
-                "average_precision_prevalence_lift": [],
-            }
-            two_level_distributions: dict[str, list[float]] = {
-                metric_name: [] for metric_name in component_only_distributions
-            }
-            seed_count = int(model["seed_scores"].shape[0])
-            slice_seed_scores = model["seed_scores"][:, mask]
-            slice_seed_mean_scores = model["scores"][mask]
-            for indices, seed_indices in zip(
-                component_draws,
-                seed_draws_by_count[seed_count],
-                strict=True,
-            ):
-                y_sample = y_slice[indices]
-                if len(set(y_sample.tolist())) < 2:
-                    continue
-                fixed_score_sample = slice_seed_mean_scores[indices]
-                fixed_metrics = step7.evaluate_probabilities(
-                    y_sample, fixed_score_sample, model["threshold"]
-                )
-                two_level_score_sample = slice_seed_scores[seed_indices].mean(axis=0)[indices]
-                two_level_metrics = step7.evaluate_probabilities(
-                    y_sample, two_level_score_sample, model["threshold"]
-                )
-                sampled_prevalence = float(y_sample.mean())
-                for metric_name in ("roc_auc", "average_precision", "pr_auc"):
-                    fixed_value = fixed_metrics.get(metric_name)
-                    if fixed_value is not None:
-                        component_only_distributions[metric_name].append(float(fixed_value))
-                    two_level_value = two_level_metrics.get(metric_name)
-                    if two_level_value is not None:
-                        two_level_distributions[metric_name].append(float(two_level_value))
-                fixed_ap = fixed_metrics.get("average_precision")
-                if fixed_ap is not None and sampled_prevalence > 0.0:
-                    component_only_distributions[
-                        "average_precision_prevalence_lift"
-                    ].append(float(fixed_ap) / sampled_prevalence)
-                two_level_ap = two_level_metrics.get("average_precision")
-                if two_level_ap is not None and sampled_prevalence > 0.0:
-                    two_level_distributions["average_precision_prevalence_lift"].append(
-                        float(two_level_ap) / sampled_prevalence
-                    )
-            interval_fields = {}
-            for metric_name, values in component_only_distributions.items():
-                low, high = percentile_interval(values, confidence)
-                interval_fields[f"{metric_name}_ci_low"] = None if low is None else round(low, 8)
-                interval_fields[f"{metric_name}_ci_high"] = None if high is None else round(high, 8)
-                two_level_low, two_level_high = percentile_interval(
-                    two_level_distributions[metric_name], confidence
-                )
-                interval_fields[f"{metric_name}_two_level_ci_low"] = (
-                    None if two_level_low is None else round(two_level_low, 8)
-                )
-                interval_fields[f"{metric_name}_two_level_ci_high"] = (
-                    None if two_level_high is None else round(two_level_high, 8)
-                )
-            rows.append(
-                {
-                    "slice_name": slice_name,
-                    "model_id": model_id,
-                    "row_count": len(y_slice),
-                    "positive_count": int(y_slice.sum()),
-                    "negative_count": int(len(y_slice) - y_slice.sum()),
-                    "prevalence": round(prevalence, 8),
-                    "unstable_slice": int(y_slice.sum()) < 10,
-                    "bootstrap_mode": (
-                        "primary_split_component_fixed_seed_mean_with_"
-                        "supplemental_two_level_seed_and_component"
-                    ),
-                    "valid_bootstrap_resamples": len(
-                        component_only_distributions["average_precision"]
-                    ),
-                    "valid_two_level_bootstrap_resamples": len(
-                        two_level_distributions["average_precision"]
-                    ),
-                    "metric_semantics_version": policy["metrics"]["metric_semantics_version"],
-                    "pr_auc_definition": PR_AUC_DEFINITION,
-                    "roc_auc": metrics["roc_auc"],
-                    "average_precision": metrics["average_precision"],
-                    "average_precision_prevalence_lift": None
-                    if metrics["average_precision"] is None or prevalence <= 0.0
-                    else round(float(metrics["average_precision"]) / prevalence, 8),
-                    "pr_auc": metrics["pr_auc"],
-                    "accuracy": metrics["accuracy"],
-                    "balanced_accuracy": metrics["balanced_accuracy"],
-                    "f1": metrics["f1"],
-                    "precision": metrics["precision"],
-                    "recall": metrics["recall"],
-                    **interval_fields,
-                }
-            )
-    return rows
+    tasks = [
+        (
+            slice_offset,
+            slice_name,
+            mask,
+            model_id,
+            model,
+            test_rows,
+            y_test,
+            policy,
+            resamples,
+        )
+        for slice_offset, (slice_name, mask) in enumerate(masks.items())
+        for model_id, model in models.items()
+    ]
+    return ordered_process_map(_evidence_slice_row_task, tasks, worker_count)
 
 
 def two_level_comparison(
@@ -1382,15 +1475,29 @@ def two_level_comparison(
             )
         candidate_scores = candidate_seed_scores[candidate_seed_indices].mean(axis=0)[indices]
         baseline_scores = baseline_seed_scores[baseline_seed_indices].mean(axis=0)[indices]
+        candidate_values = step7.evaluate_probabilities(
+            y_sample, candidate_scores, candidate["threshold"]
+        )
+        baseline_values = step7.evaluate_probabilities(
+            y_sample, baseline_scores, baseline["threshold"]
+        )
         for metric in metrics:
-            cand_value = metric_value(metric, y_sample, candidate_scores, candidate["threshold"])
-            base_value = metric_value(metric, y_sample, baseline_scores, baseline["threshold"])
+            cand_value = evaluation_metric_value(candidate_values, metric)
+            base_value = evaluation_metric_value(baseline_values, metric)
             if cand_value is not None and base_value is not None:
-                distributions[metric].append(cand_value - base_value)
+                distributions[metric].append(float(cand_value) - float(base_value))
+    candidate_point_values = step7.evaluate_probabilities(
+        y_test, candidate["scores"], candidate["threshold"]
+    )
+    baseline_point_values = step7.evaluate_probabilities(
+        y_test, baseline["scores"], baseline["threshold"]
+    )
     rows = []
     for metric in metrics:
-        candidate_point = metric_value(metric, y_test, candidate["scores"], candidate["threshold"])
-        baseline_point = metric_value(metric, y_test, baseline["scores"], baseline["threshold"])
+        candidate_point_raw = evaluation_metric_value(candidate_point_values, metric)
+        baseline_point_raw = evaluation_metric_value(baseline_point_values, metric)
+        candidate_point = None if candidate_point_raw is None else float(candidate_point_raw)
+        baseline_point = None if baseline_point_raw is None else float(baseline_point_raw)
         values = distributions[metric]
         low, high = percentile_interval(values, confidence)
         positive_seed_count = 0
@@ -1467,15 +1574,17 @@ def paired_grouped_comparison(
             continue
         candidate_scores = candidate["scores"][indices]
         baseline_scores = baseline["scores"][indices]
+        candidate_values = step7.evaluate_probabilities(
+            y_sample, candidate_scores, candidate["threshold"]
+        )
+        baseline_values = step7.evaluate_probabilities(
+            y_sample, baseline_scores, baseline["threshold"]
+        )
         for metric in metrics:
-            candidate_value = metric_value(
-                metric, y_sample, candidate_scores, candidate["threshold"]
-            )
-            baseline_value = metric_value(
-                metric, y_sample, baseline_scores, baseline["threshold"]
-            )
+            candidate_value = evaluation_metric_value(candidate_values, metric)
+            baseline_value = evaluation_metric_value(baseline_values, metric)
             if candidate_value is not None and baseline_value is not None:
-                distributions[metric].append(candidate_value - baseline_value)
+                distributions[metric].append(float(candidate_value) - float(baseline_value))
 
     candidate_seed_ids = [int(value) for value in candidate["seed_ids"]]
     baseline_seed_ids = [int(value) for value in baseline["seed_ids"]]
@@ -1510,9 +1619,17 @@ def paired_grouped_comparison(
     rows = []
     permutation_count = resamples if num_permutations is None else int(num_permutations)
     permutation_seed = seed + 7000003 if randomization_seed is None else int(randomization_seed)
+    candidate_point_values = step7.evaluate_probabilities(
+        y_test, candidate["scores"], candidate["threshold"]
+    )
+    baseline_point_values = step7.evaluate_probabilities(
+        y_test, baseline["scores"], baseline["threshold"]
+    )
     for metric_offset, metric in enumerate(metrics):
-        candidate_point = metric_value(metric, y_test, candidate["scores"], candidate["threshold"])
-        baseline_point = metric_value(metric, y_test, baseline["scores"], baseline["threshold"])
+        candidate_point_raw = evaluation_metric_value(candidate_point_values, metric)
+        baseline_point_raw = evaluation_metric_value(baseline_point_values, metric)
+        candidate_point = None if candidate_point_raw is None else float(candidate_point_raw)
+        baseline_point = None if baseline_point_raw is None else float(baseline_point_raw)
         values = distributions[metric]
         low, high = percentile_interval(values, confidence)
         randomization = paired_component_randomization_test(
@@ -1555,6 +1672,59 @@ def paired_grouped_comparison(
                 else "",
                 "analysis_mode": PRIMARY_ANALYSIS_MODE,
                 "bootstrap_mode": "paired_split_component_fixed_seed_mean",
+            }
+        )
+    return rows
+
+
+def _comparison_scope_task(task: tuple) -> list[dict]:
+    (
+        comparison,
+        evaluation_scope,
+        candidate,
+        baseline,
+        scope_y,
+        scope_groups,
+        comparison_metrics,
+        resamples,
+        comparison_seed,
+        confidence,
+        permutation_count,
+        randomization_seed,
+    ) = task
+    primary_rows = paired_grouped_comparison(
+        candidate,
+        baseline,
+        scope_y,
+        scope_groups,
+        comparison_metrics,
+        resamples,
+        comparison_seed,
+        confidence,
+        num_permutations=permutation_count,
+        randomization_seed=randomization_seed,
+    )
+    supplemental_rows = two_level_comparison(
+        candidate,
+        baseline,
+        scope_y,
+        scope_groups,
+        comparison_metrics,
+        resamples,
+        comparison_seed + 500003,
+        confidence,
+    )
+    rows = [*primary_rows, *supplemental_rows]
+    for row in rows:
+        row.update(
+            {
+                "comparison_id": comparison["comparison_id"],
+                "candidate_model_id": comparison["candidate"],
+                "baseline_model_id": comparison["baseline"],
+                "evaluation_scope": evaluation_scope,
+                "evaluation_row_count": int(len(scope_y)),
+                "evaluation_positive_count": int(scope_y.sum()),
+                "evaluation_negative_count": int(len(scope_y) - scope_y.sum()),
             }
         )
     return rows
@@ -1773,6 +1943,16 @@ def main() -> None:
             raise SystemExit("Step12-v6 randomization and fixed-test grouping units disagree")
         if int(randomization.get("num_permutations", 0)) <= 0:
             raise SystemExit("Step12-v6 randomization permutation count must be positive")
+        parallel_execution = policy.get("parallel_execution") or {}
+        if parallel_execution.get("backend") != "process_pool":
+            raise SystemExit("Step12-v6 parallel backend must be process_pool")
+        if int(parallel_execution.get("max_workers", 0)) <= 0:
+            raise SystemExit("Step12-v6 parallel max_workers must be positive")
+        if not bool(parallel_execution.get("deterministic_task_order", False)):
+            raise SystemExit("Step12-v6 parallel task collection must preserve deterministic order")
+        if int(parallel_execution.get("native_threads_per_worker", 0)) != 1:
+            raise SystemExit("Step12-v6 worker native thread count must be one")
+        resolved_workers = resolve_worker_count(policy, args.workers)
         expected_seeds = list(range(20260320, 20260330))
         for spec in policy["models"]:
             if spec.get("step9_experiment") and list(spec.get("seeds", [])) != expected_seeds:
@@ -1874,6 +2054,7 @@ def main() -> None:
                     "policy_version": policy["version"],
                     "model_count": len(model_ids),
                     "comparison_count": len(policy["paired_comparisons"]),
+                    "worker_count": resolved_workers,
                 },
                 indent=2,
             )
@@ -2039,14 +2220,40 @@ def main() -> None:
     if canonical_resamples <= 0:
         raise ValueError("Step12-v6 bootstrap resamples must be positive")
     resamples = canonical_resamples
+    worker_count = resolve_worker_count(policy, args.workers)
+    native_threads = int(policy["parallel_execution"]["native_threads_per_worker"])
+    for variable in NATIVE_THREAD_ENV_VARS:
+        os.environ[variable] = str(native_threads)
+    print(
+        "Step12-v6 execution: "
+        f"workers={worker_count}, native_threads_per_worker={native_threads}, "
+        f"bootstrap={resamples}, permutations={policy['randomization_test']['num_permutations']}",
+        flush=True,
+    )
     groups = component_groups(test_rows)
-    model_rows = model_metric_rows(models, test_rows, y_test, groups, policy, resamples)
-    slice_rows = evidence_slice_rows(models, test_rows, y_test, masks, policy, resamples)
-    comparison_rows = []
+    stage_started = time.perf_counter()
+    model_rows = model_metric_rows(
+        models, test_rows, y_test, groups, policy, resamples, worker_count
+    )
+    print(
+        f"Step12-v6 model bootstrap complete: {len(model_rows)} models, "
+        f"{time.perf_counter() - stage_started:.1f}s",
+        flush=True,
+    )
+    stage_started = time.perf_counter()
+    slice_rows = evidence_slice_rows(
+        models, test_rows, y_test, masks, policy, resamples, worker_count
+    )
+    print(
+        f"Step12-v6 slice bootstrap complete: {len(slice_rows)} model-slice rows, "
+        f"{time.perf_counter() - stage_started:.1f}s",
+        flush=True,
+    )
     comparison_metrics = list(
         dict.fromkeys([policy["metrics"]["primary"], *policy["metrics"]["secondary"]])
     )
     randomization_cfg = policy["randomization_test"]
+    comparison_tasks = []
     for offset, comparison in enumerate(policy["paired_comparisons"]):
         candidate_id = comparison["candidate"]
         baseline_id = comparison["baseline"]
@@ -2069,46 +2276,34 @@ def main() -> None:
                 + offset * 1009
                 + scope_offset * 100003
             )
-            primary_rows = paired_grouped_comparison(
-                candidate,
-                baseline,
-                scope_y,
-                scope_groups,
-                comparison_metrics,
-                resamples,
-                comparison_seed,
-                float(policy["bootstrap"]["confidence_level"]),
-                num_permutations=int(randomization_cfg["num_permutations"]),
-                randomization_seed=(
+            comparison_tasks.append(
+                (
+                    comparison,
+                    evaluation_scope,
+                    candidate,
+                    baseline,
+                    scope_y,
+                    scope_groups,
+                    comparison_metrics,
+                    resamples,
+                    comparison_seed,
+                    float(policy["bootstrap"]["confidence_level"]),
+                    int(randomization_cfg["num_permutations"]),
                     int(randomization_cfg["random_seed"])
                     + offset * 1009
-                    + scope_offset * 100003
-                ),
-            )
-            supplemental_rows = two_level_comparison(
-                candidate,
-                baseline,
-                scope_y,
-                scope_groups,
-                comparison_metrics,
-                resamples,
-                comparison_seed + 500003,
-                float(policy["bootstrap"]["confidence_level"]),
-            )
-            rows = [*primary_rows, *supplemental_rows]
-            for row in rows:
-                row.update(
-                    {
-                        "comparison_id": comparison["comparison_id"],
-                        "candidate_model_id": candidate_id,
-                        "baseline_model_id": baseline_id,
-                        "evaluation_scope": evaluation_scope,
-                        "evaluation_row_count": int(mask.sum()),
-                        "evaluation_positive_count": int(scope_y.sum()),
-                        "evaluation_negative_count": int(len(scope_y) - scope_y.sum()),
-                    }
+                    + scope_offset * 100003,
                 )
-            comparison_rows.extend(rows)
+            )
+    stage_started = time.perf_counter()
+    comparison_task_rows = ordered_process_map(
+        _comparison_scope_task, comparison_tasks, worker_count
+    )
+    comparison_rows = [row for task_rows in comparison_task_rows for row in task_rows]
+    print(
+        f"Step12-v6 paired comparisons complete: {len(comparison_tasks)} scopes, "
+        f"{time.perf_counter() - stage_started:.1f}s",
+        flush=True,
+    )
     holm_adjust(comparison_rows)
 
     promotion = evaluate_promotion(comparison_rows, policy)
@@ -2153,6 +2348,13 @@ def main() -> None:
         "method_claims": method_claims,
         "bootstrap_resamples": resamples,
         "randomization_test": policy["randomization_test"],
+        "parallel_execution": {
+            "backend": policy["parallel_execution"]["backend"],
+            "worker_count": worker_count,
+            "native_threads_per_worker": native_threads,
+            "deterministic_task_order": True,
+            "random_streams_are_task_local_and_schedule_independent": True,
+        },
         "input_manifest": input_manifest,
         "outputs": {
             "summary_json": str(summary_path.relative_to(ROOT)),

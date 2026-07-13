@@ -151,6 +151,7 @@ echo "[11/11] Validate and run Step12-v6 grouped/permutation/two-level audit"
   --policy "$STEP12_POLICY" \
   --validate-inputs-only
 "$PYTHON_BIN" scripts/step12_v6_statistical_robustness_audit.py \
-  --policy "$STEP12_POLICY"
+  --policy "$STEP12_POLICY" \
+  --workers 24
 
 echo "Step15-v6 core rerun complete. Inspect Step12 promotion before Step11-v6; final Step13 is generated only after the explicit Step11 audit."

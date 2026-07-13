@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-12-step12-v6-preregistered-v4-valid-selection-randomization",
+  "version": "2026-07-13-step12-v6-preregistered-v5-deterministic-cpu-parallel",
   "objective": "Preregistered robustness audit for Step15 v6 on the fixed internal-development Chinese test boundary. AP is primary, ROC-AUC and true trapezoidal PR-AUC are secondary, and threshold metrics use thresholds frozen on validation data.",
   "inputs": {
     "labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
@@ -331,6 +331,15 @@
     "require_paired_seed_ids_against_strongest_step9": true,
     "minimum_positive_seed_count": 8,
     "total_seed_count": 10
+  },
+  "parallel_execution": {
+    "backend": "process_pool",
+    "max_workers": 24,
+    "worker_selection": "min(configured_max_workers, available_logical_cpus)",
+    "native_threads_per_worker": 1,
+    "deterministic_task_order": true,
+    "random_stream_contract": "Each model, evidence-slice/model, and comparison-scope task reconstructs the original preregistered NumPy RNG stream from the unchanged seed formula. Process scheduling never supplies or advances random state.",
+    "scientific_equivalence_contract": "Parallelism and cached metric extraction are execution-only optimizations. Statistical definitions, draws, thresholds, metric rounding, confidence intervals, permutation tests, Holm correction, scientific CSV columns, values, and row order remain unchanged; the JSON summary only gains explicit execution metadata."
   },
   "outputs": {
     "summary_json": "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_statistical_robustness.json",
