@@ -387,7 +387,7 @@ v6 全部结果位于：
 - `reports/step12_v6/`
 - `reports/step11_v6/`
 
-Step4、Step7 和 Step15 evidence labels 都作为只读冻结输入，不由 v6 runner 重建。Step7 不重新训练或覆盖 canonical summary；`step15_v6_refresh_step7_control.py` 只读旧预测并把 metric-v2 control 写入 `reports/step15_v6/baselines/`。Step9 使用 `--output-root reports/step15_v6/baselines/step9`，并显式读取 v6 归纳式 EN/ZH pair features；所有模型、预测和 summary 均写入隔离目录。Step15 的 intermediate phases 只写 artifact 与 `zh_valid` prediction；部分 warm-start phase prefix 永远不能被当作 endpoint。除 M5 valid-selected 特例外，每个实验只有完整预注册 endpoint phase 才能读取并输出 `zh_test` prediction/metrics。核心 runner 共 11 个阶段，第一阶段在训练前编译脚本并运行全部 79 项契约测试，最终终止于 Step12；Step13 只存在于 promotion 后的 Step11 runner 最后阶段。
+Step4、Step7 和 Step15 evidence labels 都作为只读冻结输入，不由 v6 runner 重建。Step7 不重新训练或覆盖 canonical summary；`step15_v6_refresh_step7_control.py` 只读旧预测并把 metric-v2 control 写入 `reports/step15_v6/baselines/`。Step9 使用 `--output-root reports/step15_v6/baselines/step9`，并显式读取 v6 归纳式 EN/ZH pair features；所有模型、预测和 summary 均写入隔离目录。Step15 的 intermediate phases 只写 artifact 与 `zh_valid` prediction；部分 warm-start phase prefix 永远不能被当作 endpoint。除 M5 valid-selected 特例外，每个实验只有完整预注册 endpoint phase 才能读取并输出 `zh_test` prediction/metrics。核心 runner 共 11 个阶段，第一阶段在训练前编译脚本并运行全部 80 项契约测试，最终终止于 Step12；Step13 只存在于 promotion 后的 Step11 runner 最后阶段。
 
 Step15 v6 summary 的写入模式是：
 
@@ -402,6 +402,8 @@ Step15 v6 summary 的写入模式是：
 第一次 Linux v6 执行到 Step12 输入校验时，`step15_v6_m0/seed=20260325/valid` 的 summary ROC-AUC 为 `0.766667`，但 Step12 从 prediction CSV 复算得到 `0.766852`。原因不是统计实现不同，而是训练脚本用全精度内存概率计算 summary，却把 CSV 分数舍入到六位小数；接近分数被量化为并列后，ROC-AUC、AP 和 PR-AUC 的排序关系可能改变。
 
 修复后，Step15 主模型、source-only 对照以及被 Step9 复用的 Step7 prediction writer 均输出 Python 可往返的完整浮点表示。Step12 的严格复算容差不放宽；新增测试专门验证小于 `1e-6` 的正负分数差不会在落盘时消失。由于 producer-script 和预测文件均受活动 manifest 哈希约束，修复前的未完成 Linux bundle 必须归档，不能与修复后的结果混用或作为论文指标来源。
+
+第一次修复后的 Linux resume 又在 M5 test 物化处发现一个旧消费者契约：代码仍对 artifact threshold 先做六位舍入，再与全精度 CSV threshold 比较。现在物化前会严格绑定 artifact、run record 和所有 validation prediction rows 的完整精度 threshold，检查数值有限且位于 `[0,1]`，并逐行验证 `pred_positive == (prob_positive >= threshold)`。端到端 M5 测试使用 `0.5000003456789012`，另有负测试确认 threshold drift 和 prediction drift 都会 fail closed。Step15-v6/Step12-v6 相关路径已不存在旧式 rounded-threshold equality check。
 
 ## 18. 当前允许与禁止的论文结论
 
@@ -426,7 +428,7 @@ Windows 本地已通过：
 - Python compile；
 - 两份 Bash runner 已通过 Git Bash `bash -n`；
 - Step15、source-only、Step12 config-only；
-- 全量本地测试为 `79/79` 通过，覆盖特征参考、M5 frozen-artifact test 物化、sub-micro prediction score 序列化、paired component randomization、Holm family、strict+soft promotion gate、manifest/hash、raw-BGE threshold provenance、publication scorer allow-list、空主图拒收、不可变写入、cluster-audit CSV 完整性、Step13 provenance 和图验证合同；
+- 全量本地测试为 `80/80` 通过，覆盖特征参考、M5 frozen-artifact test 物化、exact frozen-threshold binding、sub-micro prediction score 序列化、paired component randomization、Holm family、strict+soft promotion gate、manifest/hash、raw-BGE threshold provenance、publication scorer allow-list、空主图拒收、不可变写入、cluster-audit CSV 完整性、Step13 provenance 和图验证合同；
 - Step4 candidate universe：EN `6683`、ZH strict `3857`、ZH aux `580`，修改前后 pair hash 完全一致。
 
 整个仓库同步到 Linux 后，从仓库根目录运行：

@@ -171,12 +171,13 @@ class Step15V6ContractTests(unittest.TestCase):
                 "global_stds": [1.0],
                 "sha256": "fixture",
             }
+            frozen_threshold = 0.5000003456789012
             step15.atomic_write_json(
                 artifact_path,
                 {
                     "feature_names": ["x"],
                     "standardizer_bundle": bundle,
-                    "frozen_zh_valid_threshold": 0.5,
+                    "frozen_zh_valid_threshold": frozen_threshold,
                     "params": {
                         "w1": [[1.0]],
                         "b1": [0.0],
@@ -189,13 +190,21 @@ class Step15V6ContractTests(unittest.TestCase):
             )
             step15.atomic_write_csv(
                 valid_path,
-                [{"pair_uid": "valid", "threshold": 0.5}],
-                ["pair_uid", "threshold"],
+                [
+                    {
+                        "pair_uid": "valid",
+                        "prob_positive": 0.75,
+                        "threshold": frozen_threshold,
+                        "pred_positive": 1,
+                    }
+                ],
+                ["pair_uid", "prob_positive", "threshold", "pred_positive"],
             )
             run = {
                 "experiment_name": "m5a",
                 "phase_id": "phase3",
                 "seed": 1,
+                "frozen_zh_valid_threshold": frozen_threshold,
                 "output_paths": {
                     "artifact": str(artifact_path.relative_to(ROOT)),
                     "zh_valid_predictions": str(valid_path.relative_to(ROOT)),
@@ -247,6 +256,45 @@ class Step15V6ContractTests(unittest.TestCase):
             self.assertFalse(updated["test_materialization"]["training_reused"])
             self.assertTrue(step15.resolve_path(updated["output_paths"]["zh_test_predictions"]).exists())
             self.assertEqual(updated["zh_test_metrics"]["accuracy"], 1.0)
+
+    def test_m5_materialization_rejects_threshold_or_prediction_drift(self) -> None:
+        artifact = {"frozen_zh_valid_threshold": 0.5000003456789012}
+        run = {"frozen_zh_valid_threshold": 0.5000003456789012}
+        rows = [
+            {
+                "pair_uid": "pair",
+                "prob_positive": 0.75,
+                "threshold": 0.5000003456789012,
+                "pred_positive": 1,
+            }
+        ]
+        threshold = step15.validate_frozen_prediction_threshold(
+            artifact,
+            run,
+            rows,
+            Path("artifact.json"),
+            Path("valid.csv"),
+        )
+        self.assertEqual(threshold, 0.5000003456789012)
+
+        with self.assertRaisesRegex(ValueError, "thresholds disagree"):
+            step15.validate_frozen_prediction_threshold(
+                artifact,
+                {"frozen_zh_valid_threshold": 0.5000003},
+                rows,
+                Path("artifact.json"),
+                Path("valid.csv"),
+            )
+
+        inconsistent_rows = [{**rows[0], "pred_positive": 0}]
+        with self.assertRaisesRegex(ValueError, "inconsistent"):
+            step15.validate_frozen_prediction_threshold(
+                artifact,
+                run,
+                inconsistent_rows,
+                Path("artifact.json"),
+                Path("valid.csv"),
+            )
     def test_inductive_reference_uses_only_training_sellers(self) -> None:
         profiles = {
             "train_a": {

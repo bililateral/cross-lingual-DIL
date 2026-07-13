@@ -1725,6 +1725,64 @@ def params_from_artifact(artifact: dict) -> dict[str, np.ndarray]:
     return {key: np.asarray(params[key], dtype=float) for key in sorted(required)}
 
 
+def validate_frozen_prediction_threshold(
+    artifact: dict,
+    run: dict,
+    valid_predictions: list[dict],
+    artifact_path: Path,
+    valid_path: Path,
+) -> float:
+    """Bind the artifact, run record, and persisted predictions to one exact threshold."""
+    if not valid_predictions:
+        raise ValueError(f"Validation prediction file is empty: {valid_path}")
+
+    persisted_thresholds: set[float] = set()
+    for row in valid_predictions:
+        raw_threshold = str(row.get("threshold", "")).strip()
+        if not raw_threshold:
+            raise ValueError(f"Validation prediction row has no frozen threshold: {valid_path}")
+        persisted_threshold = float(raw_threshold)
+        if not math.isfinite(persisted_threshold) or not 0.0 <= persisted_threshold <= 1.0:
+            raise ValueError(
+                f"Validation prediction row has an invalid frozen threshold: "
+                f"{valid_path} -> {raw_threshold!r}"
+            )
+        persisted_thresholds.add(persisted_threshold)
+
+    if len(persisted_thresholds) != 1:
+        raise ValueError(
+            f"Validation predictions do not bind one frozen threshold: "
+            f"{valid_path} -> {sorted(persisted_thresholds)}"
+        )
+    persisted_threshold = next(iter(persisted_thresholds))
+
+    artifact_threshold = float(artifact["frozen_zh_valid_threshold"])
+    run_threshold = float(run["frozen_zh_valid_threshold"])
+    for source_name, value in (
+        ("artifact", artifact_threshold),
+        ("run_record", run_threshold),
+    ):
+        if not math.isfinite(value) or value != persisted_threshold:
+            raise ValueError(
+                "Artifact, run record, and validation prediction thresholds disagree: "
+                f"source={source_name} value={value!r} "
+                f"persisted={persisted_threshold!r} artifact={artifact_path} "
+                f"predictions={valid_path}"
+            )
+
+    for row in valid_predictions:
+        score = float(row["prob_positive"])
+        if not math.isfinite(score):
+            raise ValueError(f"Validation prediction contains a non-finite score: {valid_path}")
+        expected_prediction = int(score >= persisted_threshold)
+        if int(row["pred_positive"]) != expected_prediction:
+            raise ValueError(
+                "Validation prediction is inconsistent with its persisted score and threshold: "
+                f"pair_uid={row.get('pair_uid')} predictions={valid_path}"
+            )
+    return persisted_threshold
+
+
 def materialize_validation_selected_test_predictions(
     runs: list[dict],
     selections: dict[str, dict],
@@ -1763,12 +1821,13 @@ def materialize_validation_selected_test_predictions(
         valid_path = resolve_path(run["output_paths"]["zh_valid_predictions"])
         artifact = step7.load_json(artifact_path)
         valid_predictions = step7.load_csv(valid_path)
-        rounded_thresholds = {float(row["threshold"]) for row in valid_predictions}
-        if len(rounded_thresholds) != 1:
-            raise ValueError(f"Validation predictions do not bind one frozen threshold: {valid_path}")
-        threshold = float(artifact["frozen_zh_valid_threshold"])
-        if round(threshold, 6) != next(iter(rounded_thresholds)):
-            raise ValueError(f"Artifact and validation prediction thresholds disagree: {artifact_path}")
+        threshold = validate_frozen_prediction_threshold(
+            artifact,
+            run,
+            valid_predictions,
+            artifact_path,
+            valid_path,
+        )
         feature_names = list(artifact["feature_names"])
         x_test = apply_standardizer_bundle(test_rows, feature_names, artifact["standardizer_bundle"])
         _, test_prob, _ = forward(params_from_artifact(artifact), x_test)

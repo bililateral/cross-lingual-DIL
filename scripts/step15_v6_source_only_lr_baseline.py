@@ -220,7 +220,7 @@ def main() -> None:
                 "seed": int(seed),
                 "source_train_row_count": len(train_rows),
                 "threshold_selection_scope": cfg["threshold_selection_domain"],
-                "threshold": round(float(threshold), 8),
+                "threshold": float(threshold),
                 "source_valid_metrics": step7.evaluate_probabilities(y_source_valid, source_valid_prob, threshold),
                 "source_test_metrics": step7.evaluate_probabilities(y_source_test, source_test_prob, threshold),
                 "target_test_metrics": step7.evaluate_probabilities(y_target_test, target_test_prob, threshold),
