@@ -20,6 +20,7 @@ import step9_run_few_shot_adaptation as step9  # noqa: E402
 import step20_build_representative_validation as validation  # noqa: E402
 import step20_evaluate_prospective_holdout as prospective_eval  # noqa: E402
 import step20_freeze_prospective_holdout as prospective_freeze  # noqa: E402
+import step20_prepare_prospective_holdout as prospective_prepare  # noqa: E402
 
 
 class Step15V7TwoStageContractTests(unittest.TestCase):
@@ -371,6 +372,31 @@ class Step15V7TwoStageContractTests(unittest.TestCase):
         for source in sources:
             if source["prospective_final_eligible"]:
                 self.assertIs(source["requires_collection_after_model_freeze"], True)
+
+    def test_prospective_preparation_fails_closed_until_all_candidate_quotas_are_met(self) -> None:
+        complete = {
+            key: {"required": int(value), "selected": int(value), "met": True}
+            for key, value in self.step20_policy["candidate_quotas"].items()
+        }
+        incomplete = {key: dict(value) for key, value in complete.items()}
+        first = next(iter(incomplete))
+        incomplete[first]["selected"] -= 1
+        incomplete[first]["met"] = False
+        self.assertTrue(
+            prospective_prepare.preparation_ready(
+                self.step20_policy["queue_size"], True, True, complete
+            )
+        )
+        self.assertFalse(
+            prospective_prepare.preparation_ready(
+                self.step20_policy["queue_size"] - 1, True, False, complete
+            )
+        )
+        self.assertFalse(
+            prospective_prepare.preparation_ready(
+                self.step20_policy["queue_size"], True, True, incomplete
+            )
+        )
 
     def test_prospective_candidate_schema_requires_post_freeze_provenance(self) -> None:
         schema = json.loads(

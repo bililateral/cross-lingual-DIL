@@ -113,6 +113,21 @@ def candidate_category(row: dict, reliability: dict) -> str:
     return "ordinary_candidate"
 
 
+def preparation_ready(
+    selected_pair_count: int,
+    selected_all_prospective_final_eligible: bool,
+    queue_size_met: bool,
+    quota_status: dict[str, dict],
+) -> bool:
+    return (
+        selected_pair_count > 0
+        and selected_all_prospective_final_eligible
+        and queue_size_met
+        and bool(quota_status)
+        and all(item.get("met") is True for item in quota_status.values())
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy", default=str(DEFAULT_POLICY))
@@ -370,6 +385,15 @@ def main() -> None:
     selected_all_prospective_final_eligible = bool(selected) and all(
         row.get("prospective_final_eligible") == "1" for row in selected
     )
+    candidate_quota_coverage_ready = queue_size_met and all(
+        item["met"] for item in quota_status.values()
+    )
+    holdout_freeze_ready = preparation_ready(
+        len(selected),
+        selected_all_prospective_final_eligible,
+        queue_size_met,
+        quota_status,
+    )
 
     mapping_rows = []
     blind_rows = []
@@ -447,9 +471,8 @@ def main() -> None:
         "all_candidate_quotas_met": all(item["met"] for item in quota_status.values()),
         "queue_size_met": queue_size_met,
         "selected_all_prospective_final_eligible": selected_all_prospective_final_eligible,
-        "candidate_quota_coverage_ready": queue_size_met
-        and all(item["met"] for item in quota_status.values()),
-        "holdout_freeze_ready": bool(selected) and selected_all_prospective_final_eligible,
+        "candidate_quota_coverage_ready": candidate_quota_coverage_ready,
+        "holdout_freeze_ready": holdout_freeze_ready,
         "skip_counts": dict(sorted(skip_counts.items())),
         "candidate_sources": source_records,
         "blind_mapping_sha256": hashlib.sha256(mapping_payload).hexdigest(),
@@ -488,10 +511,12 @@ def main() -> None:
     if args.validate_only:
         print(json.dumps({"status": "pass", "manifest": manifest}, indent=2, ensure_ascii=False))
         return
-    if not selected or not selected_all_prospective_final_eligible:
+    if not holdout_freeze_ready:
         raise ValueError(
-            "No post-freeze, seller-disjoint prospective candidates are available; "
-            "no empty formal review queue was published"
+            "Post-freeze prospective candidates do not satisfy the preregistered, "
+            "seller-disjoint review-queue size and category quotas; no incomplete "
+            f"formal review queue was published. quota_status={quota_status} "
+            f"selected_pair_count={len(selected)}"
         )
     preparation_root = outputs["preparation_manifest"].parent
     managed_outputs = [

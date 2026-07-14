@@ -10,6 +10,8 @@
 
 当前不能宣称 v7 有性能提升。v7 的效果只能由 Linux 生成的 Step9-v7、Step15-v7、Step12-v7 结果，以及未来一次性的 Step20 前瞻性留出集结果决定。
 
+Step20 的盲审队列同样 fail-closed：只有达到预注册的 `400` 条 seller-disjoint 候选总量，并同时满足 direct identifier、public-contact noise、template clone、semantic topic 和 ordinary 五类候选配额，才会发布正式双人盲审队列。少量新候选不会被包装成一个统计上不足的 prospective holdout。
+
 ## 2. 为什么冻结 Step15-v6
 
 Step15-v6 已完成严格方法审计，但 Step12-v6 的论文晋级条件为 `eligible=false`。这意味着：
