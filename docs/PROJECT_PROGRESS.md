@@ -4,6 +4,27 @@ Updated: 2026-07-14
 
 ## Current Stage
 
+`2026-07-14` Step15-v8 contextual-evidence-fusion implementation has started on branch `method/step15-v8-contextual-evidence-fusion`. It is an isolated successor to the frozen v7 result, not an in-place v7 retune:
+
+- the formal goal is to explain the same-boundary AP gap between v7 clean (`0.463904`) and the historical v6 M3/normalized-retrieval diagnostics (`0.594897/0.597533`) without restoring identifier-contaminated semantics or using the current internal test for selection;
+- `schema/step15_v8_contextual_evidence_policy.json` preregisters B0-B3, ten seeds, five seller-component folds, train-OOF-only representation/model-family selection, an LR/L2 versus linear-pairwise-RankNet comparison, occurrence-level evidence fusion, validation promotion gates and Step20/Step11/17 fail-closed rules;
+- B0 rebuilds the v7 20d plus E5-latent-64d representation under the v8 fold-train protocol (it is not a bitwise replay of old v7 scores); B1 removes the random latent; B2 uses identifier-redacted E5/BGE/LaBSE cosine consensus; B3 additionally restores only an explicit four-rule nonidentifier retrieval count, fold-train/domain-normalized lexical/structural support and a forward/reverse-mean identifier-redacted reranker;
+- historical aggregate candidate-rule counts are not trusted. V8 recomputes `candidate_rule_count_non_identifier_v8` from `profile_lexical_neighbor`, `shared_title_clone`, `shared_description_clone` and `structural_support` only; contact, PGP, supplemental-contact and component-closure rules cannot enter it;
+- every OOF fold now refits IDF, OOV, market percentiles, domain lexical/structural normalization, imputation and standardization from fold-train sellers/rows only. Representative valid and internal test receive a reference fitted only on the complete train boundary;
+- representation and model-family selection use mean ten-seed macro-domain train-OOF AP. Representative valid is opened only after this selection for one promotion/threshold check; the 200-row Chinese internal test remains diagnostic and satisfies no gate;
+- the v7 token-wide `score * 0.1` veto is removed. The v8 compact offset LR/L2 expert receives clean component-OOF probability plus occurrence-context features. Pure direct evidence may only increase a logit, risky/support/high-frequency evidence may only decrease it, while mixed, ambiguous and no-identifier states must leave the clean score unchanged;
+- a score-blind Step16-v8 queue builder separately emits risky-only, mixed-context and verified-direct candidates. Rule hits leave review labels empty and cannot update Step5 without blind evidence review and component-safe split adjudication. Candidate split eligibility is assigned per shared-identifier seller component, components touching multiple frozen splits are blocked, and high-frequency identifiers use deterministic hash sampling rather than a lexicographic prefix;
+- Step12-v8 requires clean AP gain `>=0.03`, public-noise FPR reduction `>=0.20`, direct/component recall drop `<=0.05`, no template FPR increase, no fusion AP loss, grouped-bootstrap noninferiority for both clean-minus-B0 and fusion-minus-clean, and no test selection. It additionally requires valid slice counts of at least `20` public-noise, `20` direct and `15` component positives;
+- current known valid counts (`6` public-noise, `18` direct, `16` component) mean the first run is expected to remain promotion-blocked unless reviewed v8 candidates legitimately fill the missing slices. The gate must not be relaxed to manufacture promotion;
+- all v8 outputs are isolated under `reports/step15_v8/<run_id>/`; existing run IDs refuse overwrite, and a content-addressed return-sync manifest binds every artifact;
+- the Step20 one-time lock is isolated by v8 run ID and must bind the exact Step15-v8 model-freeze SHA-256 plus one-time/frozen-before-unseal declarations. A stale lock cannot release Step11/17;
+- Windows validation was limited to syntax compilation, config-only entry points and eleven pure synthetic contract tests (`11/11` pass). No data pipeline, model encoding or numerical experiment was run on Windows;
+- Linux runner: `scripts/run_step15_v8_linux_20260714.sh`; detailed design: `docs/STEP15_V8_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md`.
+
+The immediate next evidence is the complete Linux v8 run. If B0-B3 and contextual fusion miss the preregistered gates, v8 is frozen as a negative result and the project pivots to an evidence-drift/dataset/negative-results paper rather than tuning on the seen valid/test boundaries.
+
+### Frozen v7 predecessor
+
 `2026-07-14` Step15-v7 v2 identifier-redacted two-stage/prospective code path and source-level static audit are complete; Python syntax checks, contract tests, data preflight and all numerical runs remain reserved for Linux:
 
 - active branch: `method/step15-v7-two-stage-prospective`;

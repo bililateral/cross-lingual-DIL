@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""Read-only Linux data/model preflight before any Step15-v8 GPU work."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from collections import Counter
+from pathlib import Path
+
+import step15_v7_common as v7
+import step15_v8_common as common
+
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--policy", default=str(common.DEFAULT_POLICY))
+    parser.add_argument("--run-id", default=None)
+    args = parser.parse_args()
+    policy_path, policy, v7_policy = common.load_policy(args.policy)
+    validation = common.validate_policy_contract(policy, v7_policy)
+    run_id = args.run_id or policy["default_run_id"]
+    root = common.run_root(policy, run_id)
+    if root.exists():
+        raise FileExistsError(
+            f"Step15-v8 run-id already exists; choose a new V8_RUN_ID instead of overwriting: {root}"
+        )
+    required_paths = [
+        policy_path,
+        common.resolve(policy["frozen_dependencies"]["v7_policy"]),
+        common.resolve(policy["frozen_dependencies"]["v6_negative_freeze"]),
+        common.resolve(policy["frozen_dependencies"]["representative_validation_assignments"]),
+        common.resolve(policy["frozen_dependencies"]["representative_validation_manifest"]),
+    ]
+    for pool in policy["pools"].values():
+        required_paths.extend(
+            common.resolve(pool[key])
+            for key in (
+                "frozen_labels",
+                "evidence_labels",
+                "seller_profiles",
+                "item_identity_signals",
+                "step4_candidates",
+                "v7_pair_features",
+                "v7_clean_e5_metadata",
+                "v7_clean_e5_matrix",
+            )
+        )
+    for path in required_paths:
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing Step15-v8 input: {path}")
+    semantic_policy = common.load_json(
+        common.resolve(policy["clean_semantics"]["semantic_model_policy"])
+    )
+    model_paths = []
+    for model_key in policy["clean_semantics"]["embedding_model_keys"]:
+        model_paths.append(common.resolve(semantic_policy["embedding_models"][model_key]["local_path"]))
+    reranker_key = policy["clean_semantics"]["reranker_model_key"]
+    model_paths.append(
+        common.resolve(semantic_policy["reranker_models"][reranker_key]["local_path"])
+    )
+    for path in model_paths:
+        if not path.is_dir() or not any(path.iterdir()):
+            raise FileNotFoundError(f"Missing or empty local Step15-v8 model directory: {path}")
+
+    rows_by_pool = v7.load_joined_rows(v7_policy)
+    splits = common.split_rows(rows_by_pool)
+    assignment_path = common.resolve(
+        policy["frozen_dependencies"]["representative_validation_assignments"]
+    )
+    split_manifest = common.load_json(
+        common.resolve(policy["frozen_dependencies"]["representative_validation_manifest"])
+    )
+    if common.sha256(assignment_path) != split_manifest["assignment_csv_sha256"]:
+        raise ValueError("Representative validation assignment hash differs from its manifest")
+    if common.sha256(common.resolve(policy["frozen_dependencies"]["v7_policy"])) != split_manifest[
+        "policy_sha256"
+    ]:
+        raise ValueError("Frozen v7 policy hash differs from the representative split manifest")
+    for relative_path, expected_hash in split_manifest["inputs"].items():
+        if common.sha256(common.resolve(relative_path)) != expected_hash:
+            raise ValueError(f"Representative split input hash changed: {relative_path}")
+    observed_split_counts = {name: len(rows) for name, rows in splits.items()}
+    if observed_split_counts != split_manifest["row_counts"]:
+        raise ValueError(
+            f"Representative split counts changed: {observed_split_counts} != "
+            f"{split_manifest['row_counts']}"
+        )
+    if len(splits["internal_development_test"]) != int(
+        policy["evaluation"]["current_internal_test_row_count_expected"]
+    ):
+        raise ValueError("Step15-v8 internal-test boundary differs from preregistration")
+    train_rows = splits["train"]
+    fold_counts = []
+    for seed in policy["bridge_audit"]["seeds"]:
+        folds = common.seeded_component_group_folds(
+            train_rows, int(policy["bridge_audit"]["group_folds"]), int(seed)
+        )
+        fold_counts.append([len(held) for _, held in folds])
+    corpus_context = common.load_corpus_reference_context(policy, v7_policy)
+    reference = common.fit_corpus_reference(train_rows, corpus_context)
+    transformed = common.apply_corpus_reference(train_rows, reference, corpus_context)
+    required_v7_fields = set(
+        common.feature_names("B1_v7_20d_e5_cosine_only", policy, v7_policy)
+    ) | {
+        "sparse_lexical_similarity_raw",
+        "structural_support_score_raw",
+    }
+    missing_fields = sorted(
+        field
+        for field in required_v7_fields
+        if any(str(row.get(field, "")).strip() == "" for row in transformed)
+    )
+    if missing_fields:
+        raise ValueError(f"Step15-v8 required v7 fields are missing: {missing_fields}")
+    occurrence_required = {
+        "seller_uid",
+        "contact_type",
+        "normalized_value",
+        "seller_facing_context",
+        "product_data_risk_context",
+        "direct_identity_eligible",
+        "support_only",
+        "context",
+    }
+    occurrence_counts = {}
+    for pool_name, pool in policy["pools"].items():
+        rows = common.load_csv(common.resolve(pool["item_identity_signals"]))
+        if rows and not occurrence_required.issubset(rows[0]):
+            raise ValueError(
+                f"Step15-v8 occurrence schema missing fields for {pool_name}: "
+                f"{sorted(occurrence_required - set(rows[0]))}"
+            )
+        occurrence_counts[pool_name] = len(rows)
+        pair_uids = {
+            row["pair_uid"] for row in common.load_csv(common.resolve(pool["v7_pair_features"]))
+        }
+        step4_uids = {
+            row["pair_uid"] for row in common.load_csv(common.resolve(pool["step4_candidates"]))
+        }
+        if pair_uids != step4_uids:
+            raise ValueError(f"Step4/v7 pair universe differs for {pool_name}")
+    valid_counts = Counter(row["evidence_type"] for row in splits["valid"])
+    print(
+        json.dumps(
+            {
+                **validation,
+                "run_id": run_id,
+                "run_root_absent": True,
+                "model_directories": [str(path.relative_to(ROOT)).replace("\\", "/") for path in model_paths],
+                "split_counts": {
+                    split: {
+                        "total": len(rows),
+                        "positive": sum(row["review_label"] == "positive" for row in rows),
+                        "negative": sum(row["review_label"] == "negative" for row in rows),
+                    }
+                    for split, rows in splits.items()
+                },
+                "oof_held_fold_counts_by_seed": fold_counts,
+                "occurrence_counts": occurrence_counts,
+                "representative_valid_evidence_counts": dict(sorted(valid_counts.items())),
+                "all_checks_read_only": True,
+            },
+            indent=2,
+        )
+    )
+
+
+if __name__ == "__main__":
+    main()
