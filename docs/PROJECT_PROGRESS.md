@@ -4,7 +4,7 @@ Updated: 2026-07-14
 
 ## Current Stage
 
-`2026-07-14` Step15-v7 v2 identifier-redacted two-stage/prospective code path is implemented and under final static audit; all executable verification and model runs are reserved for Linux:
+`2026-07-14` Step15-v7 v2 identifier-redacted two-stage/prospective code path and source-level static audit are complete; Python syntax checks, contract tests, data preflight and all numerical runs remain reserved for Linux:
 
 - active branch: `method/step15-v7-two-stage-prospective`;
 - Step15-v6 is frozen as a strict negative result through `schema/step15_v6_negative_freeze.json`; its selected M4 result and Step12 `promotion.eligible=false` artifacts are hash-bound and cannot be overwritten by v7;
