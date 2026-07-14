@@ -26,7 +26,8 @@ Updated: 2026-07-14
 - all v2 outputs are path-isolated under `v2_identifier_redacted_20260714` or Step20 `*_v2` stage directories, so no v1/v6/v5 artifact can be overwritten or interpreted under a different feature dimension;
 - Linux core runner: `scripts/run_step15_v7_linux_20260714.sh`; Step20 staged runner: `scripts/run_step20_prospective_holdout_linux_20260714.sh`;
 - detailed design and interpretation rules: `docs/STEP15_V7_TWO_STAGE_PROSPECTIVE_DESIGN_20260714.zh.md`.
-- conservative workspace cleanup inventory: `docs/WORKSPACE_CLEANUP_AUDIT_20260714.md`; no historical/frozen artifact was deleted as part of the v7 method commit.
+- completed workspace cleanup record: `docs/WORKSPACE_CLEANUP_AUDIT_20260714.md`; a separate cleanup removed `95` obsolete temporary/rejected-probe files (`126,239,312` bytes, about `120.4 MiB`) without deleting any active v7 input, frozen result, manifest-bound artifact or publication control.
+- the cleanup also retired the two tracked Step11 archive dry-run inventories after removing their active documentation reference. Current Step11 auditing remains manifest/explicit-allow-list only and continues to resolve model CSVs from each summary's `output_paths`.
 
 The next evidence is the clean Linux v7 run. Its internal-development metrics must be reported as diagnostics regardless of direction. A publication-level final claim remains blocked until genuinely new post-freeze data meets Step20 evidence quotas and is evaluated once.
 
@@ -158,7 +159,8 @@ Interpretation rule before Linux results return:
   - new Step 12 outputs use the `step16g_imbalance_20260710` boundary identifier.
 - Step 5 summary was refreshed non-destructively with `scripts/step5_refresh_frozen_summary.py`; the script rewrites only summary metadata and never regenerates frozen labels.
 - Linux rerun completeness:
-  - `reports/step16g_full_rerun_20260710.log` reached `[10/10]` with no traceback or runtime error;
+  - durable completion evidence is the formal Step16G summary plus the synchronized Step9/15/12/13 result bundles described below; the disposable full console log was removed on `2026-07-14` after its documentation reference was retired;
+  - `reports/step16g_hard_negative_imbalance_summary.json` records the before/after split counts, all safety checks, input hashes and the expanded-freeze SHA-256 (`63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee`);
   - Step 9 contains `19 experiments x 4 ratios x 3 seeds = 228` complete runs and all referenced artifacts are present;
   - Step 15 contains `2 experiments x 5 phases x 3 seeds = 30` complete runs and all referenced artifacts are present;
   - Step 12 and Step 13 recorded input hashes for `69` files; every synchronized file exists and every SHA-256 matches;

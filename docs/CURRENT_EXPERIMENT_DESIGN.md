@@ -651,7 +651,7 @@ Step 11 的输出不是 ground truth。它是 candidate-cluster triage。
 - referenced CSV count: `75`
 - unreferenced Step 11 model-output CSV: `0`
 
-说明：root `reports/` 中仍有 `step11_current_manifest_20260517.csv` 和 `step11_archive_dry_run_20260517.csv` 这类管理 CSV；它们不是 Step 11 scored-pair / cluster model outputs，不参与 manifest-only cluster audit。
+说明：root `reports/` 中保留 `step11_current_manifest_20260517.csv` 作为历史管理清单；`step11_archive_dry_run_20260517.csv/json` 已于 `2026-07-14` 在确认不参与当前 manifest-only audit 后删除。管理清单不是 Step 11 scored-pair / cluster model output，不能作为模型结果输入。
 
 规则：后续审计必须读取 manifest 中每个 summary 的 `output_paths`，不能 glob 整个 `reports/`。
 
