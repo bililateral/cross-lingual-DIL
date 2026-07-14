@@ -135,6 +135,9 @@ def main() -> None:
             raise ValueError(f"Invalid target support ratio: {ratio}")
         for seed in seeds:
             sampled_zh = common.stratified_support_sample(zh_train, ratio, seed)
+            sampled_zh_strata = Counter(
+                f"{row['review_label']}::{row['evidence_type']}" for row in sampled_zh
+            )
             real_rows = en_train + sampled_zh
             real_clean_raw = select_rows(en_clean, en_index, en_train)
             real_latent = select_rows(en_latent, en_index, en_train)
@@ -261,6 +264,16 @@ def main() -> None:
                     "training_scope": {
                         "english_train_count": len(en_train),
                         "sampled_chinese_train_count": len(sampled_zh),
+                        "sampled_chinese_pair_uids_sha256": common.canonical_hash(
+                            sorted(row["pair_uid"] for row in sampled_zh)
+                        ),
+                        "sampled_chinese_label_evidence_stratum_counts": dict(
+                            sorted(sampled_zh_strata.items())
+                        ),
+                        "support_sampling_policy": (
+                            "deterministic_nested_label_x_evidence_type_stratified_"
+                            "minimum_one_per_nonempty_stratum_for_positive_ratios"
+                        ),
                         "real_train_count": len(real_rows),
                         "real_positive_count": int(np.sum(common.labels_array(real_rows))),
                         "real_negative_count": int(
@@ -295,6 +308,12 @@ def main() -> None:
                         "real_train_count": len(real_rows),
                         "english_train_count": len(en_train),
                         "sampled_chinese_train_count": len(sampled_zh),
+                        "sampled_chinese_pair_uids_sha256": common.canonical_hash(
+                            sorted(row["pair_uid"] for row in sampled_zh)
+                        ),
+                        "sampled_chinese_label_evidence_stratum_counts": dict(
+                            sorted(sampled_zh_strata.items())
+                        ),
                         "synthetic_train_count": 0 if experiment == "no_augmentation" else len(schedule),
                         "valid_metrics": valid_metrics,
                         "internal_development_test_metrics": test_metrics,

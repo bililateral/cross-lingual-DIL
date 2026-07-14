@@ -305,6 +305,36 @@ class Step15V7TwoStageContractTests(unittest.TestCase):
             self.step20_policy["evaluation"]["models"],
         )
 
+    def test_positive_support_ratios_are_nested_and_keep_each_nonempty_stratum(self) -> None:
+        rows = []
+        for label, evidence_type, count in (
+            ("positive", "same_controller_direct_identifier", 3),
+            ("positive", "same_controller_style_structural_soft", 7),
+            ("negative", "ordinary_negative", 11),
+            ("negative", "template_clone_not_controller", 5),
+        ):
+            rows.extend(
+                {
+                    "pair_uid": f"{label}::{evidence_type}::{index:02d}",
+                    "review_label": label,
+                    "evidence_type": evidence_type,
+                }
+                for index in range(count)
+            )
+        seed = 20260320
+        sampled_10 = common.stratified_support_sample(rows, 0.1, seed)
+        sampled_20 = common.stratified_support_sample(rows, 0.2, seed)
+        sampled_50 = common.stratified_support_sample(rows, 0.5, seed)
+        strata = {(row["review_label"], row["evidence_type"]) for row in rows}
+        self.assertEqual(
+            {(row["review_label"], row["evidence_type"]) for row in sampled_10}, strata
+        )
+        self.assertTrue(
+            {row["pair_uid"] for row in sampled_10}
+            <= {row["pair_uid"] for row in sampled_20}
+            <= {row["pair_uid"] for row in sampled_50}
+        )
+
     def test_augmented_controls_can_share_a_fixed_real_train_weight_total(self) -> None:
         base = np.ones(5, dtype=float)
         multipliers = np.asarray([1.0, 0.8, 1.2, 0.7, 1.5], dtype=float)

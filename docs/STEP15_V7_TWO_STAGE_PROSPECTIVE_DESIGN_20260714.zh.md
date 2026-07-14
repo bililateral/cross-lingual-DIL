@@ -200,6 +200,8 @@ w = clip(
 
 三组使用完全相同的真实 EN train 和抽样 ZH train。`0.0` 是同一 84 维 feature view、只使用英文监督标签的 source-only clean fusion；它是目标域适配的匹配排序对照。support ratio 越高，加入的中文训练支持越多；英文训练集不变。0% 下三组理论上应完全相同，Step12 会检查十个 seed 的 source-only 分数一致性；若不一致说明实现引入了隐藏随机性。需要严格区分：该模型的 ROC-AUC/AP 是 source-label-only ranking；其 threshold-based 指标仍统一使用代表性中文 valid 冻结阈值，因此不能称作“完全不接触目标域验证信息的 strict zero-shot classification”。
 
+中文 support 不是对整个 train 做一次不分层的精确百分比截断，而是在 `review_label × evidence_type` 内使用同一 deterministic rank 分层截取。任意正比例对每个非空层至少保留 1 条，因此小比例下实际总行数可能略高于 `ratio × |ZH train|`；相同 seed 的 `10% ⊆ 20% ⊆ 50% ⊆ 100%`。每个 artifact 必须记录实际中文行数、分层计数及 sampled pair UID 哈希，论文表格使用实际行数，不能把 `10%` 误写成严格等于总训练集的 10%。
+
 ### 8.1 正例父样本约束
 
 合成父样本必须：
