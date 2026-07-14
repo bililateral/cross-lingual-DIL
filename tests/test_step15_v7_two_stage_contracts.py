@@ -77,6 +77,14 @@ class Step15V7TwoStageContractTests(unittest.TestCase):
         self.assertNotIn("example.com", redacted.casefold())
         self.assertGreater(diagnostics["generic_identifier_match_count"], 0)
 
+    def test_identifier_redaction_reaches_fixed_point_after_whitespace_normalization(self) -> None:
+        source = "Telegram" + (" " * 20) + "seller_demo"
+        redacted, diagnostics = clean_embeddings.redact_identifiers(source, [])
+        self.assertEqual(redacted, "")
+        self.assertGreater(diagnostics["generic_identifier_match_count"], 0)
+        self.assertGreaterEqual(diagnostics["redaction_pass_count"], 3)
+        clean_embeddings.assert_no_known_identifier_residue(redacted, [], "fixture")
+
     def test_clean_model_directory_fingerprint_is_content_addressed(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temporary:
             directory = Path(temporary)

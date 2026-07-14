@@ -34,7 +34,7 @@ Step15-v6 已完成严格方法审计，但 Step12-v6 的论文晋级条件为 `
 
 代码复核确认，canonical Step7 的 seller `profile_text` 明确拼接了 `[SELLER]`、`[CONTACTS]` 和结构快照；商品标题或描述中也可能出现 Telegram、邮箱、钱包和卖家别名。因此旧的 E5、BGE-M3、LaBSE、GTE、MPNet 与 reranker 分数虽然未显式读取 pair-level identifier 列，却可能通过文本编码间接携带身份信号。若 Stage A 使用这些分数，再声称 Stage A 与 identifier veto 信息隔离，在方法上不成立。
 
-v2 新建 identifier-redacted Multilingual-E5 cache：只读取类别、标题和描述正文，排除 seller alias、market、contact、structured snapshot 和完整 `profile_text`，再利用 Step3 occurrence literals、高精度联系方式正则以及 seller alias literals 做空格替换。替换不插入 `[CONTACT_REMOVED]` 等标记，避免模型反向利用“存在联系方式”这一事实。旧 semantic scores 保留在 canonical 表中供历史诊断，但不进入 v7 clean feature list。cache manifest 还对本地 E5 模型目录逐文件记录内容指纹；未来 Step20 编码若模型权重、producer 脚本或 v7 policy 任一变化，prospective feature 构建会拒绝运行。
+v2 新建 identifier-redacted Multilingual-E5 cache：只读取类别、标题和描述正文，排除 seller alias、market、contact、structured snapshot 和完整 `profile_text`，再利用 Step3 occurrence literals、高精度联系方式正则以及 seller alias literals 做空格替换。脱敏采用有界固定点闭包：每轮执行所有规则和 seller literals 替换、规范化空白，然后重新扫描，直到文本不再变化；这样可以移除因空白压缩才暴露出来的 cue-handle 模式。闭包最多允许 8 轮，未收敛或二次断言仍发现残留时 fail-closed。替换不插入 `[CONTACT_REMOVED]` 等标记，避免模型反向利用“存在联系方式”这一事实。旧 semantic scores 保留在 canonical 表中供历史诊断，但不进入 v7 clean feature list。cache manifest 还对本地 E5 模型目录逐文件记录内容指纹；未来 Step20 编码若模型权重、producer 脚本或 v7 policy 任一变化，prospective feature 构建会拒绝运行。
 
 ### 3.2 原验证集缺少关键证据切片
 

@@ -22,24 +22,27 @@ DEFAULT_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
 DEFAULT_PROSPECTIVE_POLICY = ROOT / "schema" / "step20_prospective_holdout_policy.json"
 
 
-GENERIC_IDENTIFIER_PATTERNS = (
-    step3.PGP_BLOCK_RE,
-    step3.PGP_FINGERPRINT_RE,
-    step3.EMAIL_RE,
-    step3.JABBER_RE,
-    step3.URL_RE,
-    step3.BARE_DOMAIN_RE,
-    step3.CRYPTO_WALLET_RE,
-    step3.PHONE_CONTEXT_RE,
-    step3.TELEGRAM_RE,
-    step3.WICKR_RE,
-    step3.WECHAT_RE,
-    step3.QQ_RE,
-    step3.WECHAT_ITEM_RE,
-    step3.QQ_ITEM_RE,
-    step3.BAT_RE,
-    *(pattern for _, pattern in step3.TELEGRAM_ITEM_PATTERNS),
+GENERIC_IDENTIFIER_RULES = (
+    ("pgp_block", step3.PGP_BLOCK_RE),
+    ("pgp_fingerprint", step3.PGP_FINGERPRINT_RE),
+    ("email", step3.EMAIL_RE),
+    ("jabber", step3.JABBER_RE),
+    ("url", step3.URL_RE),
+    ("bare_domain", step3.BARE_DOMAIN_RE),
+    ("crypto_wallet", step3.CRYPTO_WALLET_RE),
+    ("phone_context", step3.PHONE_CONTEXT_RE),
+    ("telegram_profile", step3.TELEGRAM_RE),
+    ("wickr", step3.WICKR_RE),
+    ("wechat_profile", step3.WECHAT_RE),
+    ("qq_profile", step3.QQ_RE),
+    ("wechat_item", step3.WECHAT_ITEM_RE),
+    ("qq_item", step3.QQ_ITEM_RE),
+    ("bat", step3.BAT_RE),
+) + tuple(
+    (f"telegram_item_{rule_name}", pattern)
+    for rule_name, pattern in step3.TELEGRAM_ITEM_PATTERNS
 )
+MAX_REDACTION_PASSES = 8
 
 
 def resolve(value: str | Path) -> Path:
@@ -140,22 +143,36 @@ def build_content_text(profile: dict, cfg: dict) -> str:
     return "\n".join(sections)
 
 
+def normalize_redacted_text(text: str) -> str:
+    output = re.sub(r"[ \t]+", " ", text)
+    return re.sub(r"\s*\n\s*", "\n", output).strip()
+
+
 def redact_identifiers(text: str, literals: list[str]) -> tuple[str, dict]:
     output = str(text or "")
     generic_matches = 0
-    for pattern in GENERIC_IDENTIFIER_PATTERNS:
-        output, count = pattern.subn(" ", output)
-        generic_matches += int(count)
     literal_matches = 0
-    for literal in literals:
-        pattern = re.compile(re.escape(literal), re.IGNORECASE)
-        output, count = pattern.subn(" ", output)
-        literal_matches += int(count)
-    output = re.sub(r"[ \t]+", " ", output)
-    output = re.sub(r"\s*\n\s*", "\n", output).strip()
+    redaction_pass_count = 0
+    for redaction_pass_count in range(1, MAX_REDACTION_PASSES + 1):
+        before = output
+        for _, pattern in GENERIC_IDENTIFIER_RULES:
+            output, count = pattern.subn(" ", output)
+            generic_matches += int(count)
+        for literal in literals:
+            pattern = re.compile(re.escape(literal), re.IGNORECASE)
+            output, count = pattern.subn(" ", output)
+            literal_matches += int(count)
+        output = normalize_redacted_text(output)
+        if output == before:
+            break
+    else:
+        raise ValueError(
+            f"Identifier redaction did not reach a fixed point after {MAX_REDACTION_PASSES} passes"
+        )
     return output, {
         "generic_identifier_match_count": generic_matches,
         "signal_literal_match_count": literal_matches,
+        "redaction_pass_count": redaction_pass_count,
     }
 
 
@@ -167,10 +184,14 @@ def assert_no_known_identifier_residue(text: str, literals: list[str], seller_ui
             f"Identifier redaction left a known Step3 signal in clean text for {seller_uid}: "
             f"{residual[0][:40]}"
         )
-    for pattern in GENERIC_IDENTIFIER_PATTERNS:
-        if pattern.search(text):
+    for rule_name, pattern in GENERIC_IDENTIFIER_RULES:
+        match = pattern.search(text)
+        if match:
+            residue = match.group(0)
+            residue_sha256 = hashlib.sha256(residue.encode("utf-8")).hexdigest()[:16]
             raise ValueError(
-                f"Identifier redaction left a high-precision identifier pattern for {seller_uid}"
+                f"Identifier redaction left high-precision rule={rule_name} for {seller_uid}; "
+                f"residue_length={len(residue)} residue_sha256={residue_sha256}"
             )
 
 
@@ -304,6 +325,12 @@ def main() -> None:
             clean_text, diagnostics = redact_identifiers(source_text, seller_literals)
             assert_no_known_identifier_residue(clean_text, seller_literals, seller_uid)
             redaction_counts.update(diagnostics)
+            if diagnostics["redaction_pass_count"] > 2:
+                redaction_counts["fixed_point_extra_pass_seller_count"] += 1
+            redaction_counts["max_redaction_pass_count"] = max(
+                redaction_counts["max_redaction_pass_count"],
+                diagnostics["redaction_pass_count"],
+            )
             if not clean_text:
                 clean_text = "content unavailable"
                 empty_after_redaction += 1
@@ -323,6 +350,11 @@ def main() -> None:
                     "generic_identifier_match_count"
                 ],
                 "signal_literal_match_count": redaction_counts["signal_literal_match_count"],
+                "redaction_pass_count_total": redaction_counts["redaction_pass_count"],
+                "fixed_point_extra_pass_seller_count": redaction_counts[
+                    "fixed_point_extra_pass_seller_count"
+                ],
+                "max_redaction_pass_count": redaction_counts["max_redaction_pass_count"],
                 "empty_after_redaction_count": empty_after_redaction,
                 "clean_text_corpus_sha256": canonical_hash(
                     list(zip(seller_uids, clean_texts, strict=True))
