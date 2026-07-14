@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-V8_POLICY="schema/step15_v8_contextual_evidence_policy.json"
+V8_POLICY="${V8_POLICY:-schema/step15_v8_contextual_evidence_policy.json}"
 V8_RUN_ID="${V8_RUN_ID:-bridge_v1_20260714}"
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-1}"

@@ -74,15 +74,30 @@ def main() -> None:
     split_manifest = common.load_json(
         common.resolve(policy["frozen_dependencies"]["representative_validation_manifest"])
     )
+    expected_manifest_hash = split_manifest.get("manifest_sha256")
+    unsigned_manifest = dict(split_manifest)
+    unsigned_manifest.pop("manifest_sha256", None)
+    current_hash_valid = expected_manifest_hash == common.canonical_hash(unsigned_manifest)
+    legacy_unsigned_manifest = dict(unsigned_manifest)
+    legacy_unsigned_manifest.pop("assignment_csv_sha256", None)
+    legacy_hash_valid = (
+        "manifest_hash_scope" not in split_manifest
+        and expected_manifest_hash == common.canonical_hash(legacy_unsigned_manifest)
+    )
+    if not current_hash_valid and not legacy_hash_valid:
+        raise ValueError("Representative validation manifest self-hash is invalid")
     if common.sha256(assignment_path) != split_manifest["assignment_csv_sha256"]:
         raise ValueError("Representative validation assignment hash differs from its manifest")
     if common.sha256(common.resolve(policy["frozen_dependencies"]["v7_policy"])) != split_manifest[
         "policy_sha256"
     ]:
         raise ValueError("Frozen v7 policy hash differs from the representative split manifest")
-    for relative_path, expected_hash in split_manifest["inputs"].items():
-        if common.sha256(common.resolve(relative_path)) != expected_hash:
-            raise ValueError(f"Representative split input hash changed: {relative_path}")
+    for input_group in ("inputs", "effective_inputs"):
+        for relative_path, expected_hash in split_manifest.get(input_group, {}).items():
+            if common.sha256(common.resolve(relative_path)) != expected_hash:
+                raise ValueError(
+                    f"Representative split {input_group} hash changed: {relative_path}"
+                )
     observed_split_counts = {name: len(rows) for name, rows in splits.items()}
     if observed_split_counts != split_manifest["row_counts"]:
         raise ValueError(
@@ -144,6 +159,46 @@ def main() -> None:
         if pair_uids != step4_uids:
             raise ValueError(f"Step4/v7 pair universe differs for {pool_name}")
     valid_counts = Counter(row["evidence_type"] for row in splits["valid"])
+    zh_rows = rows_by_pool["zh_target_strict"]
+    zh_train_sellers = {
+        str(row[key])
+        for row in zh_rows
+        if row["v7_split_name"] == "train"
+        for key in ("seller_uid_left", "seller_uid_right")
+    }
+    zh_occurrence_index, zh_token_df = common.item_signal_index(
+        common.resolve(policy["pools"]["zh_target_strict"]["item_identity_signals"]),
+        zh_train_sellers,
+    )
+    frequency_threshold = int(
+        policy["occurrence_evidence_expert"][
+            "public_identifier_train_seller_frequency_threshold"
+        ]
+    )
+    valid_states = [
+        common.occurrence_evidence(
+            row, zh_occurrence_index, zh_token_df, frequency_threshold
+        )["evidence_state"]
+        for row in splits["valid"]
+    ]
+    slice_masks = common.validation_slice_masks(splits["valid"], valid_states)
+    readiness = {
+        key: {
+            "observed": int(sum(slice_masks[key])),
+            "required": int(required),
+            "met": int(sum(slice_masks[key])) >= int(required),
+        }
+        for key, required in policy["promotion_gates"][
+            "minimum_valid_slice_counts"
+        ].items()
+    }
+    unmet_readiness = {key: item for key, item in readiness.items() if not item["met"]}
+    if unmet_readiness:
+        raise ValueError(
+            "Step15-v8 representative validation lacks occurrence-state-backed evidence. "
+            "Run the Step16-v8 blind review/refreeze workflow; thresholds must not be lowered. "
+            f"unmet={json.dumps(unmet_readiness, ensure_ascii=False, sort_keys=True)}"
+        )
     print(
         json.dumps(
             {
@@ -162,6 +217,13 @@ def main() -> None:
                 "oof_held_fold_counts_by_seed": fold_counts,
                 "occurrence_counts": occurrence_counts,
                 "representative_valid_evidence_counts": dict(sorted(valid_counts.items())),
+                "representative_valid_occurrence_state_readiness": readiness,
+                "legacy_evidence_type_only_public_count_used_for_readiness": False,
+                "representative_manifest_hash_mode": (
+                    "all_fields_except_self_hash"
+                    if current_hash_valid
+                    else "legacy_pre_assignment_hash_with_independent_assignment_check"
+                ),
                 "all_checks_read_only": True,
             },
             indent=2,

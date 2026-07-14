@@ -27,6 +27,14 @@ def load_score_column(path: Path, rows: list[dict], column: str) -> np.ndarray:
     return np.asarray([float(indexed[row["pair_uid"]][column]) for row in rows], dtype=float)
 
 
+def load_prediction_index(path: Path, rows: list[dict]) -> dict[str, dict]:
+    indexed = {row["pair_uid"]: row for row in common.load_csv(path)}
+    expected = {row["pair_uid"] for row in rows}
+    if set(indexed) != expected:
+        raise ValueError(f"Step12-v8 prediction universe mismatch: {path}")
+    return indexed
+
+
 def grouped_bootstrap_delta(
     rows: list[dict],
     candidate: np.ndarray,
@@ -69,19 +77,20 @@ def grouped_bootstrap_delta(
 
 
 def subset_metric(
-    rows: list[dict],
+    labels: np.ndarray,
     scores: np.ndarray,
     threshold: float,
-    evidence_types: set[str],
+    mask: np.ndarray,
     metric: str,
 ) -> tuple[float | None, int]:
-    mask = np.asarray([row["evidence_type"] in evidence_types for row in rows], dtype=bool)
-    subset_rows = [row for row in rows if row["evidence_type"] in evidence_types]
-    y_true = v7.labels_array(subset_rows)
+    mask = np.asarray(mask, dtype=bool)
+    if len(mask) != len(labels):
+        raise ValueError("Step12-v8 slice mask length differs from labels")
+    y_true = labels[mask]
     if metric == "fpr":
-        return common.false_positive_rate(y_true, scores[mask], threshold), len(subset_rows)
+        return common.false_positive_rate(y_true, scores[mask], threshold), int(np.sum(mask))
     if metric == "recall":
-        return common.recall_at_threshold(y_true, scores[mask], threshold), len(subset_rows)
+        return common.recall_at_threshold(y_true, scores[mask], threshold), int(np.sum(mask))
     raise ValueError(metric)
 
 
@@ -132,13 +141,27 @@ def main() -> None:
     )
     b0_valid = load_score_column(b0_valid_path, valid_rows, "prob_positive")
     b0_test = load_score_column(b0_test_path, test_rows, "prob_positive")
-    clean_valid = load_score_column(expert_valid_path, valid_rows, "clean_prob_positive")
-    fused_valid = load_score_column(
-        expert_valid_path, valid_rows, "contextual_evidence_prob_positive"
+    expert_valid_index = load_prediction_index(expert_valid_path, valid_rows)
+    expert_test_index = load_prediction_index(expert_test_path, test_rows)
+    clean_valid = np.asarray(
+        [float(expert_valid_index[row["pair_uid"]]["clean_prob_positive"]) for row in valid_rows]
     )
-    clean_test = load_score_column(expert_test_path, test_rows, "clean_prob_positive")
-    fused_test = load_score_column(
-        expert_test_path, test_rows, "contextual_evidence_prob_positive"
+    fused_valid = np.asarray(
+        [
+            float(
+                expert_valid_index[row["pair_uid"]]["contextual_evidence_prob_positive"]
+            )
+            for row in valid_rows
+        ]
+    )
+    clean_test = np.asarray(
+        [float(expert_test_index[row["pair_uid"]]["clean_prob_positive"]) for row in test_rows]
+    )
+    fused_test = np.asarray(
+        [
+            float(expert_test_index[row["pair_uid"]]["contextual_evidence_prob_positive"])
+            for row in test_rows
+        ]
     )
     threshold = float(expert["clean_threshold_from_representative_valid"])
     y_valid = v7.labels_array(valid_rows)
@@ -147,29 +170,85 @@ def main() -> None:
     clean_valid_ap = float(step7.average_precision_score(y_valid, clean_valid))
     fused_valid_ap = float(step7.average_precision_score(y_valid, fused_valid))
 
-    public_type = {"public_contact_or_url_noise"}
-    direct_types = {
-        "same_controller_direct_identifier",
-        "same_controller_component_anchor",
+    persisted_valid_states = [
+        expert_valid_index[row["pair_uid"]]["evidence_state"] for row in valid_rows
+    ]
+    zh_train_sellers = {
+        str(row[key])
+        for row in rows_by_pool["zh_target_strict"]
+        if row["v7_split_name"] == "train"
+        for key in ("seller_uid_left", "seller_uid_right")
     }
-    template_type = {"template_clone_not_controller"}
+    occurrence_index, token_df = common.item_signal_index(
+        common.resolve(policy["pools"]["zh_target_strict"]["item_identity_signals"]),
+        zh_train_sellers,
+    )
+    frequency_threshold = int(
+        policy["occurrence_evidence_expert"][
+            "public_identifier_train_seller_frequency_threshold"
+        ]
+    )
+    valid_states = [
+        common.occurrence_evidence(
+            row, occurrence_index, token_df, frequency_threshold
+        )["evidence_state"]
+        for row in valid_rows
+    ]
+    if persisted_valid_states != valid_states:
+        first = next(
+            index
+            for index, (persisted, recomputed) in enumerate(
+                zip(persisted_valid_states, valid_states, strict=True)
+            )
+            if persisted != recomputed
+        )
+        raise ValueError(
+            "Step12-v8 recomputed occurrence state differs from the evidence prediction; "
+            f"pair_uid={valid_rows[first]['pair_uid']} "
+            f"persisted={persisted_valid_states[first]} recomputed={valid_states[first]}"
+        )
+    slice_masks = common.validation_slice_masks(valid_rows, valid_states)
     clean_public_fpr, public_count = subset_metric(
-        valid_rows, clean_valid, threshold, public_type, "fpr"
+        y_valid,
+        clean_valid,
+        threshold,
+        slice_masks["state_backed_public_noise_negative"],
+        "fpr",
     )
     fused_public_fpr, _ = subset_metric(
-        valid_rows, fused_valid, threshold, public_type, "fpr"
+        y_valid,
+        fused_valid,
+        threshold,
+        slice_masks["state_backed_public_noise_negative"],
+        "fpr",
     )
     clean_direct_recall, direct_count = subset_metric(
-        valid_rows, clean_valid, threshold, direct_types, "recall"
+        y_valid,
+        clean_valid,
+        threshold,
+        slice_masks["direct_or_component_positive"],
+        "recall",
     )
     fused_direct_recall, _ = subset_metric(
-        valid_rows, fused_valid, threshold, direct_types, "recall"
+        y_valid,
+        fused_valid,
+        threshold,
+        slice_masks["direct_or_component_positive"],
+        "recall",
     )
     clean_template_fpr, template_count = subset_metric(
-        valid_rows, clean_valid, threshold, template_type, "fpr"
+        y_valid,
+        clean_valid,
+        threshold,
+        slice_masks["template_clone_negative"],
+        "fpr",
     )
     fused_template_fpr, _ = subset_metric(
-        valid_rows, fused_valid, threshold, template_type, "fpr"
+        y_valid,
+        fused_valid,
+        threshold,
+        slice_masks["template_clone_negative"],
+        "fpr",
     )
     bootstrap_clean_vs_b0 = grouped_bootstrap_delta(
         valid_rows, clean_valid, b0_valid, args.resamples, args.seed
@@ -178,7 +257,12 @@ def main() -> None:
         valid_rows, fused_valid, clean_valid, args.resamples, args.seed
     )
     gates_cfg = policy["promotion_gates"]
-    valid_counts = Counter(row["evidence_type"] for row in valid_rows)
+    valid_counts = Counter(
+        {
+            key: int(np.sum(slice_masks[key]))
+            for key in gates_cfg["minimum_valid_slice_counts"]
+        }
+    )
     data_readiness = {
         evidence_type: {
             "observed": int(valid_counts[evidence_type]),
@@ -188,17 +272,6 @@ def main() -> None:
         for evidence_type, required in gates_cfg["minimum_valid_slice_counts"].items()
     }
 
-    def require_number(value: float | None, name: str) -> float:
-        if value is None:
-            raise ValueError(f"Step12-v8 gate slice has no defined {name}")
-        return float(value)
-
-    clean_public_fpr = require_number(clean_public_fpr, "clean public-noise FPR")
-    fused_public_fpr = require_number(fused_public_fpr, "fused public-noise FPR")
-    clean_direct_recall = require_number(clean_direct_recall, "clean direct/component recall")
-    fused_direct_recall = require_number(fused_direct_recall, "fused direct/component recall")
-    clean_template_fpr = require_number(clean_template_fpr, "clean template FPR")
-    fused_template_fpr = require_number(fused_template_fpr, "fused template FPR")
     gates = {
         "clean_ap_gain_over_B0": {
             "observed": clean_valid_ap - b0_valid_ap,
@@ -207,19 +280,31 @@ def main() -> None:
             ),
         },
         "public_noise_fpr_reduction": {
-            "observed": clean_public_fpr - fused_public_fpr,
+            "observed": (
+                None
+                if clean_public_fpr is None or fused_public_fpr is None
+                else float(clean_public_fpr - fused_public_fpr)
+            ),
             "required_minimum": float(
                 gates_cfg["public_noise_valid_fpr_reduction_minimum"]
             ),
         },
         "direct_component_recall_drop": {
-            "observed": clean_direct_recall - fused_direct_recall,
+            "observed": (
+                None
+                if clean_direct_recall is None or fused_direct_recall is None
+                else float(clean_direct_recall - fused_direct_recall)
+            ),
             "allowed_maximum": float(
                 gates_cfg["direct_or_component_valid_recall_drop_maximum"]
             ),
         },
         "template_fpr_increase": {
-            "observed": fused_template_fpr - clean_template_fpr,
+            "observed": (
+                None
+                if clean_template_fpr is None or fused_template_fpr is None
+                else float(fused_template_fpr - clean_template_fpr)
+            ),
             "allowed_maximum": float(
                 gates_cfg["template_clone_valid_fpr_increase_maximum"]
             ),
@@ -252,15 +337,18 @@ def main() -> None:
         >= gates["clean_ap_gain_over_B0"]["required_minimum"]
     )
     gates["public_noise_fpr_reduction"]["met"] = (
-        gates["public_noise_fpr_reduction"]["observed"]
+        gates["public_noise_fpr_reduction"]["observed"] is not None
+        and gates["public_noise_fpr_reduction"]["observed"]
         >= gates["public_noise_fpr_reduction"]["required_minimum"]
     )
     gates["direct_component_recall_drop"]["met"] = (
-        gates["direct_component_recall_drop"]["observed"]
+        gates["direct_component_recall_drop"]["observed"] is not None
+        and gates["direct_component_recall_drop"]["observed"]
         <= gates["direct_component_recall_drop"]["allowed_maximum"]
     )
     gates["template_fpr_increase"]["met"] = (
-        gates["template_fpr_increase"]["observed"]
+        gates["template_fpr_increase"]["observed"] is not None
+        and gates["template_fpr_increase"]["observed"]
         <= gates["template_fpr_increase"]["allowed_maximum"]
     )
     gates["fusion_ap_drop"]["met"] = (
@@ -329,6 +417,14 @@ def main() -> None:
             "public_noise_count": public_count,
             "direct_component_count": direct_count,
             "template_clone_count": template_count,
+            "state_backed_verified_direct_positive_count": int(
+                np.sum(slice_masks["state_backed_verified_direct_positive"])
+            ),
+            "component_anchor_positive_count": int(
+                np.sum(slice_masks["same_controller_component_anchor_positive"])
+            ),
+            "slice_definition": gates_cfg["validation_slice_definition"],
+            "legacy_evidence_type_only_public_slice_used": False,
             "clean_public_noise_fpr": clean_public_fpr,
             "contextual_public_noise_fpr": fused_public_fpr,
             "clean_direct_component_recall": clean_direct_recall,

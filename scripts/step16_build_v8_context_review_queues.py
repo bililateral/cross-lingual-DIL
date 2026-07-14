@@ -20,6 +20,8 @@ QUEUE_FIELDS = [
     "review_candidate_uid",
     "queue_kind",
     "pair_uid_if_in_step4",
+    "existing_v7_pair_feature_ready",
+    "supervision_materialization_status",
     "seller_uid_left",
     "seller_uid_right",
     "candidate_component_id",
@@ -39,10 +41,22 @@ QUEUE_FIELDS = [
     "right_context_preview",
     "rule_generated_candidate_only",
     "identity_label_from_rule_forbidden",
-    "blind_review_label",
-    "blind_review_evidence_type",
-    "blind_review_notes",
+]
+
+
+BLIND_REVIEW_PACKET_FIELDS = [
+    "review_candidate_uid",
+    "seller_uid_left",
+    "seller_uid_right",
+    "shared_identifier_types",
+    "shared_identifier_values",
+    "left_context_preview",
+    "right_context_preview",
     "reviewer_id",
+    "identity_label",
+    "evidence_type",
+    "confidence",
+    "notes",
 ]
 
 
@@ -174,6 +188,12 @@ def main() -> None:
         pair_uid_key(row["seller_uid_left"], row["seller_uid_right"]): row["pair_uid"]
         for row in step4
     }
+    v7_pair_feature_uids = {
+        row["pair_uid"]
+        for row in common.load_csv(common.resolve(pool["v7_pair_features"]))
+    }
+    clean_e5_metadata = common.load_json(common.resolve(pool["v7_clean_e5_metadata"]))
+    clean_e5_sellers = set(clean_e5_metadata.get("seller_uids", []))
 
     max_sellers = int(cfg["maximum_sellers_per_token_for_pair_enumeration"])
     candidate_pairs = set()
@@ -245,11 +265,23 @@ def main() -> None:
         else:
             split_eligibility = deterministic_unseen_component_split(component)
         shared_values = [f"{token[0]}:{token[1]}" for token in shared]
+        pair_uid = step4_uid.get(key, "")
+        pair_feature_ready = bool(pair_uid and pair_uid in v7_pair_feature_uids)
+        embedding_ready = left in clean_e5_sellers and right in clean_e5_sellers
+        feature_ready = pair_feature_ready and embedding_ready
+        if feature_ready:
+            materialization_status = "ready_for_reviewed_overlay"
+        elif not pair_feature_ready:
+            materialization_status = "requires_step4_and_v7_feature_expansion"
+        else:
+            materialization_status = "requires_identifier_redacted_e5_cache_expansion"
         queue_rows[queue_kind].append(
             {
                 "review_candidate_uid": common.canonical_hash([queue_kind, left, right])[:24],
                 "queue_kind": queue_kind,
-                "pair_uid_if_in_step4": step4_uid.get(key, ""),
+                "pair_uid_if_in_step4": pair_uid,
+                "existing_v7_pair_feature_ready": "1" if feature_ready else "0",
+                "supervision_materialization_status": materialization_status,
                 "seller_uid_left": left,
                 "seller_uid_right": right,
                 "candidate_component_id": seller_component_ids[left],
@@ -271,19 +303,26 @@ def main() -> None:
                 "right_context_preview": occurrence_preview(right_occ),
                 "rule_generated_candidate_only": "1",
                 "identity_label_from_rule_forbidden": "1",
-                "blind_review_label": "",
-                "blind_review_evidence_type": "",
-                "blind_review_notes": "",
-                "reviewer_id": "",
             }
         )
 
     staging_root.mkdir(parents=True, exist_ok=False)
     output_records = {}
+    selected_master_rows = []
+    split_priority = {
+        "valid_only": 0,
+        "valid_candidate": 0,
+        "train_only": 1,
+        "train_candidate": 1,
+        "diagnostic_test_only": 2,
+        "blocked_cross_split_seller_overlap": 3,
+    }
     for queue_kind, limit in cfg["queue_limits"].items():
         rows = queue_rows.get(queue_kind, [])
         rows.sort(
             key=lambda row: (
+                row["existing_v7_pair_feature_ready"] != "1",
+                split_priority.get(row["split_eligibility"], 4),
                 row["split_eligibility"].startswith("blocked"),
                 -int(row["verified_direct_token_count"]),
                 -int(row["mixed_context_token_count"]),
@@ -293,6 +332,13 @@ def main() -> None:
             )
         )
         selected = rows[: int(limit)]
+        selected_master_rows.extend(
+            row
+            for row in selected
+            if row["existing_v7_pair_feature_ready"] == "1"
+            and row["split_eligibility"]
+            in {"train_only", "train_candidate", "valid_only", "valid_candidate"}
+        )
         path = staging_root / f"{queue_kind}_blind_review_queue.csv"
         path.write_bytes(common.render_csv(selected, QUEUE_FIELDS))
         output_records[queue_kind] = {
@@ -301,8 +347,69 @@ def main() -> None:
             "split_eligibility_counts": dict(
                 sorted(Counter(row["split_eligibility"] for row in selected).items())
             ),
+            "feature_ready_count": sum(
+                row["existing_v7_pair_feature_ready"] == "1" for row in selected
+            ),
+            "feature_ready_split_eligibility_counts": dict(
+                sorted(
+                    Counter(
+                        row["split_eligibility"]
+                        for row in selected
+                        if row["existing_v7_pair_feature_ready"] == "1"
+                    ).items()
+                )
+            ),
             "path": str((final_root / path.name).relative_to(ROOT)).replace("\\", "/"),
             "sha256": common.sha256(path),
+        }
+    blind_template_records = {}
+    for reviewer_role in ("a", "b", "adjudicator"):
+        ordered = sorted(
+            selected_master_rows,
+            key=lambda row: hashlib.sha256(
+                f"20260714|reviewer-{reviewer_role}|{row['review_candidate_uid']}".encode(
+                    "utf-8"
+                )
+            ).hexdigest(),
+        )
+        packet_rows = [
+            {
+                "review_candidate_uid": row["review_candidate_uid"],
+                "seller_uid_left": row["seller_uid_left"],
+                "seller_uid_right": row["seller_uid_right"],
+                "shared_identifier_types": row["shared_identifier_types"],
+                "shared_identifier_values": row["shared_identifier_values"],
+                "left_context_preview": row["left_context_preview"],
+                "right_context_preview": row["right_context_preview"],
+                "reviewer_id": "",
+                "identity_label": "",
+                "evidence_type": "",
+                "confidence": "",
+                "notes": "",
+            }
+            for row in ordered
+        ]
+        packet_path = staging_root / f"reviewer_{reviewer_role}_blind_packet.template.csv"
+        packet_path.write_bytes(common.render_csv(packet_rows, BLIND_REVIEW_PACKET_FIELDS))
+        blind_template_records[f"reviewer_{reviewer_role}"] = {
+            "path": str((final_root / packet_path.name).relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "sha256": common.sha256(packet_path),
+            "row_count": len(packet_rows),
+            "concealed_fields": [
+                "queue_kind",
+                "evidence_state",
+                "split_eligibility",
+                "feature_ready",
+                "model_scores",
+            ],
+            "completed_review_file_must_be_separate": True,
+            "usage": (
+                "fill_all_candidates_independently"
+                if reviewer_role in {"a", "b"}
+                else "fill_only_candidates_reported_as_requires_adjudication"
+            ),
         }
     targets = cfg["review_targets"]
     summary = {
@@ -317,7 +424,24 @@ def main() -> None:
         "skipped_or_truncated_high_frequency_token_count": skipped_high_frequency_tokens,
         "high_frequency_token_sampling": "deterministic_sha256_not_lexicographic_prefix",
         "outputs": output_records,
+        "blind_review_templates": blind_template_records,
+        "blind_review_packet_candidate_count": len(selected_master_rows),
+        "blind_review_packet_inclusion_rule": (
+            "existing_v7_pair_feature_ready=1 AND split_eligibility in "
+            "{train_only,train_candidate,valid_only,valid_candidate}"
+        ),
         "review_targets": targets,
+        "review_protocol": {
+            "independent_reviewer_count": 2,
+            "reviewer_ids_must_differ": True,
+            "accepted_without_adjudication": "matching_identity_evidence_and_high_confidence",
+            "disagreement_requires_independent_adjudicator": True,
+            "valid_or_train_supervision_requires_high_confidence_final_decision": True,
+            "allowed_identity_labels": ["positive", "negative", "uncertain"],
+            "model_scores_visible_to_reviewers": False,
+            "queue_kind_and_evidence_state_visible_to_reviewers": False,
+            "reviewer_packets_have_independent_deterministic_order": True,
+        },
         "candidate_rules_assign_identity_labels": False,
         "model_scores_read": False,
         "review_required_before_any_step5_update": True,
@@ -329,6 +453,12 @@ def main() -> None:
             "frozen_labels_sha256": common.sha256(common.resolve(pool["frozen_labels"])),
             "step4_candidates_sha256": common.sha256(
                 common.resolve(pool["step4_candidates"])
+            ),
+            "v7_pair_features_sha256": common.sha256(
+                common.resolve(pool["v7_pair_features"])
+            ),
+            "v7_clean_e5_metadata_sha256": common.sha256(
+                common.resolve(pool["v7_clean_e5_metadata"])
             ),
         },
     }

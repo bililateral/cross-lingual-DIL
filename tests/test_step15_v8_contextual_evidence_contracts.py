@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -15,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import step15_v8_common as common  # noqa: E402
 import step15_v8_downstream_gate as downstream_gate  # noqa: E402
 import step16_build_v8_context_review_queues as review_queues  # noqa: E402
+import step16_apply_v8_context_reviews as review_apply  # noqa: E402
 
 
 class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
@@ -111,6 +113,148 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             review_queues.deterministic_unseen_component_split(components["seller_a"]),
             review_queues.deterministic_unseen_component_split(components["seller_c"]),
         )
+
+    def test_review_queue_keeps_candidate_evidence_immutable_and_decisions_separate(self) -> None:
+        self.assertNotIn("reviewer_a_identity_label", review_queues.QUEUE_FIELDS)
+        self.assertIn("existing_v7_pair_feature_ready", review_queues.QUEUE_FIELDS)
+        self.assertIn("identity_label", review_queues.BLIND_REVIEW_PACKET_FIELDS)
+        self.assertNotIn("queue_kind", review_queues.BLIND_REVIEW_PACKET_FIELDS)
+        self.assertNotIn("evidence_state", review_queues.BLIND_REVIEW_PACKET_FIELDS)
+        self.assertEqual(
+            set(review_queues.BLIND_REVIEW_PACKET_FIELDS),
+            review_apply.BLIND_PACKET_FIELDS,
+        )
+        self.assertFalse(
+            any("model_score" in field for field in review_queues.BLIND_REVIEW_PACKET_FIELDS)
+        )
+
+    def test_dual_review_requires_independence_and_high_confidence(self) -> None:
+        cfg = json.loads(
+            (ROOT / "schema" / "step16_v8_validation_refreeze_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )["review_protocol"]
+        row = {
+            "review_candidate_uid": "candidate-1",
+            "queue_kind": "risky_only_public_noise",
+            "reviewer_a_id": "reviewer-a",
+            "reviewer_a_identity_label": "negative",
+            "reviewer_a_evidence_type": "public_contact_or_url_noise",
+            "reviewer_a_confidence": "high",
+            "reviewer_b_id": "reviewer-b",
+            "reviewer_b_identity_label": "negative",
+            "reviewer_b_evidence_type": "public_contact_or_url_noise",
+            "reviewer_b_confidence": "high",
+        }
+        resolved = review_apply.resolve_review_decision(row, cfg)
+        self.assertEqual(resolved["status"], "resolved_high_confidence")
+        self.assertEqual(resolved["decision_source"], "matching_independent_reviews")
+        row["reviewer_b_id"] = "reviewer-a"
+        with self.assertRaises(ValueError):
+            review_apply.resolve_review_decision(row, cfg)
+
+    def test_dual_review_disagreement_requires_distinct_adjudication(self) -> None:
+        cfg = json.loads(
+            (ROOT / "schema" / "step16_v8_validation_refreeze_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )["review_protocol"]
+        row = {
+            "review_candidate_uid": "candidate-2",
+            "queue_kind": "mixed_context_identifier",
+            "reviewer_a_id": "reviewer-a",
+            "reviewer_a_identity_label": "positive",
+            "reviewer_a_evidence_type": "same_controller_direct_identifier",
+            "reviewer_a_confidence": "high",
+            "reviewer_b_id": "reviewer-b",
+            "reviewer_b_identity_label": "negative",
+            "reviewer_b_evidence_type": "public_contact_or_url_noise",
+            "reviewer_b_confidence": "high",
+        }
+        self.assertEqual(
+            review_apply.resolve_review_decision(row, cfg)["status"],
+            "requires_adjudication",
+        )
+        row.update(
+            {
+                "adjudicator_id": "reviewer-c",
+                "adjudicated_identity_label": "positive",
+                "adjudicated_evidence_type": "same_controller_direct_identifier",
+                "adjudication_confidence": "high",
+            }
+        )
+        resolved = review_apply.resolve_review_decision(row, cfg)
+        self.assertEqual(resolved["status"], "resolved_high_confidence")
+        self.assertEqual(resolved["decision_source"], "independent_adjudication")
+
+    def test_completed_blind_packet_cannot_change_candidate_evidence(self) -> None:
+        candidate = {
+            "review_candidate_uid": "candidate-3",
+            "seller_uid_left": "seller-left",
+            "seller_uid_right": "seller-right",
+            "shared_identifier_types": "telegram",
+            "shared_identifier_values": "telegram:shared",
+            "left_context_preview": "left evidence",
+            "right_context_preview": "right evidence",
+        }
+        row = {
+            **candidate,
+            "reviewer_id": "reviewer-a",
+            "identity_label": "negative",
+            "evidence_type": "public_contact_or_url_noise",
+            "confidence": "high",
+            "notes": "public support account",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "review.csv"
+            path.write_bytes(
+                common.render_csv([row], review_queues.BLIND_REVIEW_PACKET_FIELDS)
+            )
+            loaded = review_apply.load_completed_blind_packet(
+                path, {"candidate-3": candidate}, "a", True
+            )
+            self.assertEqual(loaded["candidate-3"]["identity_label"], "negative")
+            tampered = dict(row)
+            tampered["left_context_preview"] = "changed evidence"
+            path.write_bytes(
+                common.render_csv([tampered], review_queues.BLIND_REVIEW_PACKET_FIELDS)
+            )
+            with self.assertRaises(ValueError):
+                review_apply.load_completed_blind_packet(
+                    path, {"candidate-3": candidate}, "a", True
+                )
+
+    def test_effective_v7_policy_uses_reviewed_overlay_bindings(self) -> None:
+        policy = json.loads(json.dumps(self.policy))
+        policy["pools"]["zh_target_strict"]["frozen_labels"] = "reports/new-labels.csv"
+        policy["pools"]["zh_target_strict"]["evidence_labels"] = "reports/new-evidence.csv"
+        policy["frozen_dependencies"][
+            "representative_validation_assignments"
+        ] = "reports/new-assignments.csv"
+        effective = common.materialize_effective_v7_policy(policy, self.v7_policy)
+        self.assertEqual(
+            effective["pools"]["zh_target_strict"]["frozen_labels"],
+            "reports/new-labels.csv",
+        )
+        self.assertEqual(
+            effective["representative_validation"]["split_assignment_output"],
+            "reports/new-assignments.csv",
+        )
+
+    def test_frozen_representative_manifest_uses_documented_legacy_hash_order(self) -> None:
+        path = (
+            ROOT
+            / "reports"
+            / "step15_v7"
+            / "v2_identifier_redacted_20260714"
+            / "splits"
+            / "representative_validation_manifest.json"
+        )
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        expected = manifest.pop("manifest_sha256")
+        assignment_hash = manifest.pop("assignment_csv_sha256")
+        self.assertEqual(expected, common.canonical_hash(manifest))
+        self.assertEqual(len(assignment_hash), 64)
 
     def test_step20_lock_is_bound_to_exact_v8_freeze(self) -> None:
         lock = {
@@ -236,6 +380,44 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         self.assertIn(
             "grouped_bootstrap_fusion_vs_clean_noninferiority_margin",
             self.policy["promotion_gates"],
+        )
+
+    def test_validation_readiness_uses_occurrence_states_not_legacy_type_alone(self) -> None:
+        rows = [
+            {
+                "review_label": "negative",
+                "evidence_type": "public_contact_or_url_noise",
+            },
+            {"review_label": "negative", "evidence_type": "ordinary_negative"},
+            {
+                "review_label": "positive",
+                "evidence_type": "same_controller_direct_identifier",
+            },
+            {
+                "review_label": "positive",
+                "evidence_type": "same_controller_component_anchor",
+            },
+        ]
+        states = [
+            "no_shared_identifier",
+            "risky_only_shared",
+            "verified_direct_both_sides",
+            "no_shared_identifier",
+        ]
+        masks = common.validation_slice_masks(rows, states)
+        self.assertEqual(
+            masks["state_backed_public_noise_negative"].tolist(),
+            [False, True, False, False],
+        )
+        self.assertEqual(int(np.sum(masks["state_backed_verified_direct_positive"])), 1)
+        self.assertEqual(int(np.sum(masks["same_controller_component_anchor_positive"])), 1)
+        self.assertEqual(
+            self.policy["promotion_gates"]["minimum_valid_slice_counts"],
+            {
+                "state_backed_public_noise_negative": 20,
+                "state_backed_verified_direct_positive": 20,
+                "same_controller_component_anchor_positive": 15,
+            },
         )
 
 

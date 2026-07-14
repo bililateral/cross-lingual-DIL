@@ -187,7 +187,7 @@ x_negative - x_positive -> 0
 
 同 token 在两侧都有 clean seller-facing direct occurrence，且不属于 train-seller 高频公共 token。
 
-队列文件包含原始 normalized identifier 和两侧 context preview，供 blind review 使用；不包含任何模型分数。脚本不会写 `positive` 或 `negative`，review label/evidence type 字段保持空白。规则命中不能写回 Step5，只有完成盲审、证据判定和 component-safe split adjudication 后才允许更新监督集。
+不可变内部队列保存完整规则诊断，但 reviewer 不读取这些内部队列。只有已经存在 Step4/v7 pair feature、redacted E5 cache 完整且不触及 test/cross-split component 的候选会进入 blind packet，避免浪费审查。系统为这批候选生成两个顺序独立打乱的 `reviewer_a/reviewer_b_blind_packet.template.csv`，只展示原始 normalized identifier、seller UID 和两侧 context preview；`queue_kind`、occurrence state、split 资格、feature-ready 状态及模型分数全部隐藏。规则命中不能写回 Step5，只有两个不同 reviewer 给出高置信一致的 identity/evidence 结论，或由不同于两人的第三 reviewer 完成高置信裁决后，才具备进入监督 overlay 的资格。
 
 候选 split 资格按共享标识符形成的 seller connected component 整体分配，而不是逐 pair 分配。同一候选 component 只能进入一个 split；若 component 已触及多个既有 split，则整组标为 `blocked_cross_split_seller_overlap`。超高频 token 的卖家截断使用固定 SHA-256 抽样，不取字典序前缀，避免来源命名顺序造成系统偏差。
 
@@ -200,7 +200,32 @@ x_negative - x_positive -> 0
 | verified direct both sides | 60 | 20 |
 | component-anchor positive | 25 | 15 |
 
-如果候选或复核结果达不到目标，应报告证据稀缺，不能用规则自动补标签。
+如果候选或复核结果达不到目标，应报告证据稀缺，不能用规则自动补标签。审查通过的 pair 还必须已经存在于 Step4 与 v7 pair-feature universe；否则只能列入“需要上游 Step4/feature expansion”，不能直接塞入训练。
+
+### 5.4 独立 refreeze，而不是原地修改 Step5
+
+`scripts/step16_apply_v8_context_reviews.py` 读取不可变队列、单独的 completed review 文件和既有冻结边界。它执行：
+
+1. 校验两个 reviewer 身份不同；
+2. 一致结论必须两人都是 `high` confidence；
+3. 不一致结论必须由第三人裁决，且裁决者不能是前两人；
+4. `diagnostic_test_only` 与跨 split component 候选一律不能进入新监督；
+5. 对所有既有与新增监督 pair 重新闭合 seller connected components；
+6. 保证一个 component 只属于 train、valid 或 internal development test 中的一个；
+7. 校验 200 条 internal development test 的 pair UID 集合逐条不变；
+8. 只在独立目录输出 Step5 labels overlay、evidence labels overlay、assignment、manifest 和生成后的 v8 policy。
+
+原始 Step5、旧 evidence labels 与旧 representative-validation 文件都不修改。输出路径相同但内容不同会 fail closed，不能静默覆盖。
+
+Reviewer packet 只允许填写以下值：
+
+| 字段 | 允许值 |
+|---|---|
+| `identity_label` | `positive` / `negative` / `uncertain` |
+| `evidence_type` | `same_controller_direct_identifier` / `public_contact_or_url_noise` / `uncertain_insufficient_evidence` |
+| `confidence` | `high` / `medium` / `low` |
+
+Reviewer 必须按看到的原始证据判断，不能迎合候选生成规则。若最终 review 与 occurrence state 冲突，例如 risky-only 候选被判为 positive，或 verified-direct 候选被判为 negative，系统保留该审查诊断但不直接写入监督；必须先修正 parser/context 或补充外部锚点后再进入下一版 freeze。这避免 evidence expert 在训练时接收与其推理状态相矛盾的标签。
 
 ## 6. Occurrence-level evidence expert
 
@@ -263,7 +288,15 @@ logit(P_final) = logit(P_clean_OOF) + delta(context)
 6. grouped component bootstrap 的 clean-B0 与 fusion-clean AP delta 95% CI 下界都不得低于 `-0.03`；
 7. model selection 从未读取 internal test。
 
-另有数据充分性门槛：representative valid 至少包含 `20` public-noise、`20` direct positive、`15` component positive。当前已知 valid 大约只有 `6/18/16`，因此第一轮即使模型指标方向较好，也很可能因 public-noise slice 不足而保持 `promotion.eligible=false`。这是设计要求，不是运行错误。
+另有数据充分性门槛：representative valid 至少包含 `20` state-backed public-noise negatives、`20` state-backed verified-direct positives、`15` component-anchor positives。
+
+这里不能再按旧 `evidence_type` 名称直接计数：旧 `public_contact_or_url_noise` 中存在“没有共享 identifier、实质是模板/数据包复用”的历史负例。三个正式切片都先要求 `benchmark_eligible=1` 且不是 `silver_train_only`，再定义为：
+
+- public-noise：`review_label=negative`，且 occurrence state 属于 `risky_only_shared / support_only_shared / high_frequency_public`；
+- direct positive：`review_label=positive`，且 occurrence state 为 `verified_direct_both_sides`；
+- component positive：`review_label=positive`，且 evidence type 为 `same_controller_component_anchor`。
+
+当前旧 valid 的 `6/18/16` 只是 legacy evidence-type 计数，不再视为正式门槛计数。Preflight 会重新按 occurrence state 计算并在 GPU 运行前列出真实缺口。门槛未满足时应先完成 Step16-v8 review/refreeze；不得降低门槛，也不得先浪费一次完整 v8 训练。
 
 ## 8. Step20 与图谱阶段
 
@@ -285,12 +318,16 @@ Step20 lock 按 v8 `run_id` 隔离，并必须写入对应 `step15_v8_model_free
 
 ```text
 schema/step15_v8_contextual_evidence_policy.json
+schema/step16_v8_validation_refreeze_policy.json
 scripts/run_step15_v8_linux_20260714.sh
+scripts/run_step16_v8_validation_queue_linux_20260714.sh
+scripts/run_step16_v8_validation_refreeze_linux_20260714.sh
 scripts/step15_v8_common.py
 scripts/step15_v8_preflight.py
 scripts/step15_build_v8_clean_semantics.py
 scripts/step15_run_v8_bridge_audit.py
 scripts/step16_build_v8_context_review_queues.py
+scripts/step16_apply_v8_context_reviews.py
 scripts/step15_train_v8_contextual_evidence.py
 scripts/step12_v8_statistical_robustness_audit.py
 scripts/step15_v8_downstream_gate.py
@@ -307,13 +344,47 @@ docs/PROJECT_PROGRESS.md
 
 Linux 工作区还必须保留 policy 引用的 v6/v7 冻结 schema、既有 Step3/4/5/15-v7 artifacts、Step7 semantic model policy，以及本地 BGE-M3、LaBSE、GTE reranker 模型目录。runner 的第一阶段会只读校验这些文件、冻结 manifest/assignment/input hashes、Step4/feature pair universe 和本地模型目录；任一不匹配都会在 GPU 编码前停止。
 
-完整运行：
+第一阶段只生成审查队列，不训练模型、不占用 GPU：
+
+```bash
+cd /home/yongpeng/cross-lingual
+
+export REVIEW_RUN_ID=validation_expansion_queue_v1_20260714
+bash scripts/run_step16_v8_validation_queue_linux_20260714.sh
+```
+
+同步回 `reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/`。保持三个内部 `*_blind_review_queue.csv` 和三个 `.template.csv` 不变。Reviewer A 与 B 分别只接收自己的 packet，并另存为：
+
+```text
+reviewer_a_blind_packet.completed.csv
+reviewer_b_blind_packet.completed.csv
+```
+
+先运行 refreeze runner 的 `--check-only` 阶段查看 disagreement；第三 reviewer 只填写这些 disagreement，并保存为 `reviewer_adjudicator_blind_packet.completed.csv`。把 completed review 文件同步回 Linux 后执行隔离 refreeze：
+
+```bash
+cd /home/yongpeng/cross-lingual
+
+export REVIEWER_A_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_a_blind_packet.completed.csv
+export REVIEWER_B_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_b_blind_packet.completed.csv
+export ADJUDICATION_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_adjudicator_blind_packet.completed.csv
+bash scripts/run_step16_v8_validation_refreeze_linux_20260714.sh
+```
+
+如果输出 `blocked_insufficient_reviewed_context_evidence`，按报告中的 train/valid 真实缺口继续审查候选；不能降低 `20/20/15`。达到门槛后，refreeze 会生成：
+
+```text
+reports/step16_v8_validation_refreeze/context_reviewed_v1_20260714/step15_v8_context_reviewed_policy.json
+```
+
+此后才运行完整 v8：
 
 ```bash
 cd /home/yongpeng/cross-lingual
 
 export CUDA_VISIBLE_DEVICES=0
-export V8_RUN_ID=bridge_v1_20260714
+export V8_POLICY=reports/step16_v8_validation_refreeze/context_reviewed_v1_20260714/step15_v8_context_reviewed_policy.json
+export V8_RUN_ID=bridge_v2_context_reviewed_20260714
 export STEP12_RESAMPLES=5000
 
 bash scripts/run_step15_v8_linux_20260714.sh

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import csv
+import copy
 import hashlib
 import json
 import math
@@ -71,11 +72,49 @@ def run_root(policy: dict, run_id: str) -> Path:
     return resolve(policy["outputs_root_template"].format(run_id=run_id))
 
 
+def materialize_effective_v7_policy(policy: dict, base_v7_policy: dict) -> dict:
+    """Overlay v8-bound data freezes without mutating the historical v7 policy."""
+    effective = copy.deepcopy(base_v7_policy)
+    pool_key_map = {
+        "frozen_labels": "frozen_labels",
+        "evidence_labels": "evidence_labels",
+        "seller_profiles": "seller_profiles",
+        "item_identity_signals": "item_identity_signals",
+        "step4_candidates": "step4_candidates",
+        "v7_pair_features": "v7_pair_features",
+        "v7_clean_e5_metadata": "clean_e5_cache_metadata",
+        "v7_clean_e5_matrix": "clean_e5_cache_matrix",
+    }
+    for pool_name, pool in policy["pools"].items():
+        if pool_name not in effective["pools"]:
+            raise ValueError(f"Step15-v8 pool is absent from the frozen v7 policy: {pool_name}")
+        for v8_key, v7_key in pool_key_map.items():
+            if v8_key not in pool:
+                raise ValueError(f"Step15-v8 pool lacks required binding: {pool_name}:{v8_key}")
+            effective["pools"][pool_name][v7_key] = pool[v8_key]
+    effective["representative_validation"]["split_assignment_output"] = policy[
+        "frozen_dependencies"
+    ]["representative_validation_assignments"]
+    effective["representative_validation"]["manifest_output"] = policy[
+        "frozen_dependencies"
+    ]["representative_validation_manifest"]
+    effective["_step15_v8_effective_overlay"] = {
+        "base_v7_policy": policy["frozen_dependencies"]["v7_policy"],
+        "representative_validation_assignments": policy["frozen_dependencies"][
+            "representative_validation_assignments"
+        ],
+        "representative_validation_manifest": policy["frozen_dependencies"][
+            "representative_validation_manifest"
+        ],
+    }
+    return effective
+
+
 def load_policy(path: str | Path) -> tuple[Path, dict, dict]:
     policy_path = resolve(path)
     policy = load_json(policy_path)
-    v7_policy = load_json(resolve(policy["frozen_dependencies"]["v7_policy"]))
-    return policy_path, policy, v7_policy
+    base_v7_policy = load_json(resolve(policy["frozen_dependencies"]["v7_policy"]))
+    return policy_path, policy, materialize_effective_v7_policy(policy, base_v7_policy)
 
 
 def validate_policy_contract(policy: dict, v7_policy: dict) -> dict:
@@ -843,6 +882,63 @@ def apply_constrained_expert(
 
 def evidence_slice(rows: list[dict], evidence_type: str) -> np.ndarray:
     return np.asarray([row["evidence_type"] == evidence_type for row in rows], dtype=bool)
+
+
+def validation_slice_masks(rows: list[dict], evidence_states: list[str]) -> dict[str, np.ndarray]:
+    """Define v8 gate slices from labels plus inference-visible occurrence states."""
+    if len(rows) != len(evidence_states):
+        raise ValueError("Validation rows and occurrence states have different lengths")
+    public_states = {"risky_only_shared", "support_only_shared", "high_frequency_public"}
+    benchmark_ok = [
+        row.get("benchmark_eligible", "1") == "1"
+        and row.get("silver_train_only", "0") != "1"
+        for row in rows
+    ]
+    public_noise = np.asarray(
+        [
+            eligible and row["review_label"] == "negative" and state in public_states
+            for row, state, eligible in zip(
+                rows, evidence_states, benchmark_ok, strict=True
+            )
+        ],
+        dtype=bool,
+    )
+    verified_direct = np.asarray(
+        [
+            eligible
+            and row["review_label"] == "positive"
+            and state == "verified_direct_both_sides"
+            for row, state, eligible in zip(
+                rows, evidence_states, benchmark_ok, strict=True
+            )
+        ],
+        dtype=bool,
+    )
+    component_anchor = np.asarray(
+        [
+            eligible
+            and row["review_label"] == "positive"
+            and row["evidence_type"] == "same_controller_component_anchor"
+            for row, eligible in zip(rows, benchmark_ok, strict=True)
+        ],
+        dtype=bool,
+    )
+    template_clone = np.asarray(
+        [
+            eligible
+            and row["review_label"] == "negative"
+            and row["evidence_type"] == "template_clone_not_controller"
+            for row, eligible in zip(rows, benchmark_ok, strict=True)
+        ],
+        dtype=bool,
+    )
+    return {
+        "state_backed_public_noise_negative": public_noise,
+        "state_backed_verified_direct_positive": verified_direct,
+        "same_controller_component_anchor_positive": component_anchor,
+        "direct_or_component_positive": verified_direct | component_anchor,
+        "template_clone_negative": template_clone,
+    }
 
 
 def false_positive_rate(y_true: np.ndarray, scores: np.ndarray, threshold: float) -> float | None:

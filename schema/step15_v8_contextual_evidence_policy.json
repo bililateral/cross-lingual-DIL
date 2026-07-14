@@ -294,10 +294,16 @@
     "grouped_bootstrap_clean_vs_B0_noninferiority_margin": -0.03,
     "grouped_bootstrap_fusion_vs_clean_noninferiority_margin": -0.03,
     "minimum_valid_slice_counts": {
-      "public_contact_or_url_noise": 20,
-      "same_controller_direct_identifier": 20,
-      "same_controller_component_anchor": 15
+      "state_backed_public_noise_negative": 20,
+      "state_backed_verified_direct_positive": 20,
+      "same_controller_component_anchor_positive": 15
     },
+    "validation_slice_definition": {
+      "state_backed_public_noise_negative": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=negative AND occurrence evidence state in {risky_only_shared,support_only_shared,high_frequency_public}",
+      "state_backed_verified_direct_positive": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=positive AND occurrence evidence state=verified_direct_both_sides",
+      "same_controller_component_anchor_positive": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=positive AND evidence_type=same_controller_component_anchor"
+    },
+    "legacy_public_contact_or_url_noise_evidence_type_alone_is_not_a_gate_slice": true,
     "internal_test_may_satisfy_no_gate": true,
     "step20_prospective_holdout_required_for_publication": true
   },
