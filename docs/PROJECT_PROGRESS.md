@@ -1,8 +1,36 @@
 # Project Progress
 
-Updated: 2026-07-13
+Updated: 2026-07-14
 
 ## Current Stage
+
+`2026-07-14` Step15-v7 v2 identifier-redacted two-stage/prospective code path is implemented and under final static audit; all executable verification and model runs are reserved for Linux:
+
+- active branch: `method/step15-v7-two-stage-prospective`;
+- Step15-v6 is frozen as a strict negative result through `schema/step15_v6_negative_freeze.json`; its selected M4 result and Step12 `promotion.eligible=false` artifacts are hash-bound and cannot be overwritten by v7;
+- the legacy Chinese test is permanently downgraded to `internal_development_test`. No v7 model, augmentation mode, threshold or reliability rule may be selected from its metrics;
+- a score-blind representative validation overlay recomputes seller connected components over all eligible Chinese supervision. Development preflight expects 12 complete train components to move, producing `train 523 = 183 positive / 340 negative`, `valid 170 = 76 positive / 94 negative`, and `internal development test 200 = 50 positive / 150 negative`, with seller/component overlap `0`; Linux must reproduce these counts in the formal manifest;
+- representative valid now contains `18` direct-identifier positives across `10` components, `16` component-anchor positives across `5` components, and `6` public-contact/URL negatives across `2` components. It also retains soft positives, ordinary negatives, semantic-topic negatives and template-clone negatives;
+- static code audit found that canonical Step7 semantic caches encode `profile_text`, which contains seller aliases, contacts and structural sections. v7 v2 therefore builds a separate identifier-redacted Multilingual-E5 cache from category/title/description content only, removes known Step3 identifiers and seller aliases without leaving presence markers, and treats all legacy profile-text semantic scores as diagnostic-only. Core/prospective caches must also match on the content-addressed local model-directory fingerprint, producer hash and frozen v7 policy hash;
+- v7 strict-clean uses 20 configured features: one identifier-redacted E5 cosine plus 19 structural/style/corpus-relative fields. It removes five unstable/OOV-only corpus features, `candidate_rule_count_raw`, uppercase-specific/raw retrieval-only fields, and six identifier-contaminated legacy semantic/reranker scores from the main view. Train-only IDF uses `effective_df >= 2`, and unknown signatures remain OOV diagnostics rather than train-supported rare evidence;
+- the clean scorer adds a symmetric 64d projected identifier-redacted E5 seller-pair latent representation to the 20d strict view, for 84 total dimensions. Pair endpoint order cannot change this representation;
+- evidence weights are factorized as `domain x evidence_type x confidence x inverse-sqrt component`, clipped to `[0.1, 2.5]`; component factors are normalized within each `domain x evidence_type` stratum so rare evidence classes are not globally suppressed, and the old global 8x pattern is forbidden;
+- Step9-v7 preregisters no augmentation, equal-effective-weight duplication and true latent pair-embedding mixup for five support ratios (`0/10/20/50/100%`) and ten seeds. The 0% support run is a matched English-label-only source-fusion control; Step12 checks its deterministic seed repetitions are identical. Mixup is ZH-train-only, same-domain, same-evidence-type and nearest-neighbor constrained. Clean features are anchor-copied; only latent coordinates interpolate. Duplication and mixup must have exactly equal synthetic effective weight;
+- the mixup budget is computed only from the sampled Chinese support set's negative-minus-positive effective-weight gap; English source-domain class counts cannot inflate the Chinese synthesis budget. The last synthetic row is weight-capped to the exact remaining budget, and the 100% support main comparison fails closed unless its fixed 50% gap-closure budget is satisfied;
+- v7 uses uniform class weights so the duplication control isolates added minority mass from latent interpolation geometry. All three controls share a scaler fitted on real rows only and a total optimizer weight fixed to the real-row count, preventing synthetic row count from changing preprocessing or relative L2 strength;
+- Step15-v7 removes the non-identifiable auxiliary evidence head. Stage A is the validation-selected clean ranker; Stage B uses only inference-visible raw Step3 occurrence context to veto public/product/support identifiers by a fixed 0.1 multiplier. Review labels and evidence types never enter Stage B inference;
+- Step12-v7 uses representative-valid selection only, grouped component bootstrap, paired component score-swap permutation and paired seed/component two-level intervals. The old 200-row test remains diagnostic, publication promotion is hard-coded `false`, and the complete statistics plus model/threshold freeze are atomically published in one directory;
+- Step20 requires per-row collection timestamps strictly after the model freeze, validates a prospective candidate schema, hides candidate-category hints from reviewers, publishes a label-free pair universe, performs dual independent review plus third-reviewer adjudication, and keeps scoring physically isolated from labels until an atomic one-time evaluation lock is created;
+- development lineage inspection found `0` eligible prospective candidates: `1,016` current rows were already reviewed and all remaining `2,841` candidates predate v7 freeze. They cannot be repackaged as a new final holdout. Linux must reproduce this diagnosis, and new post-freeze Chinese raw data is required;
+- Windows is used only for source edits, static inspection and Git/sync management. No v7 script or model is to be executed on Windows; syntax, contracts, data lineage and all numerical results are verified by the Linux runners;
+- all v2 outputs are path-isolated under `v2_identifier_redacted_20260714` or Step20 `*_v2` stage directories, so no v1/v6/v5 artifact can be overwritten or interpreted under a different feature dimension;
+- Linux core runner: `scripts/run_step15_v7_linux_20260714.sh`; Step20 staged runner: `scripts/run_step20_prospective_holdout_linux_20260714.sh`;
+- detailed design and interpretation rules: `docs/STEP15_V7_TWO_STAGE_PROSPECTIVE_DESIGN_20260714.zh.md`.
+- conservative workspace cleanup inventory: `docs/WORKSPACE_CLEANUP_AUDIT_20260714.md`; no historical/frozen artifact was deleted as part of the v7 method commit.
+
+The next evidence is the clean Linux v7 run. Its internal-development metrics must be reported as diagnostics regardless of direction. A publication-level final claim remains blocked until genuinely new post-freeze data meets Step20 evidence quotas and is evaluated once.
+
+## Frozen Step15-v6 Negative Result (Historical Baseline)
 
 `2026-07-13` Step15 v6.4 inductive paper-hardening implementation is complete; the corrected Linux run has completed Stages 1-10 and Step12 input validation, while the first canonical Step12 statistics process was stopped for an execution-only deterministic CPU optimization:
 

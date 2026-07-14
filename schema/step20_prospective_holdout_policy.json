@@ -1,0 +1,164 @@
+{
+  "version": "2026-07-14-step20-prospective-holdout-v2-identifier-redacted",
+  "objective": "Prepare, independently review, freeze, and evaluate a score-blind prospective Chinese holdout after Step15-v7 model freeze.",
+  "candidate_schema": "schema/step20_prospective_candidate_schema.json",
+  "candidate_sources": [
+    {
+      "path": "reports/step5_zh_target_strict_balanced_review_queue.csv",
+      "required": true,
+      "role": "current_unreviewed_strict_candidates",
+      "prospective_final_eligible": false,
+      "requires_collection_after_model_freeze": false
+    },
+    {
+      "path": "reports/step20_prospective_holdout/new_data_candidate_queue.csv",
+      "required": false,
+      "role": "future_post_v7_freeze_candidate_source",
+      "prospective_final_eligible": true,
+      "requires_collection_after_model_freeze": true,
+      "collection_timestamp_field": "collection_timestamp_utc"
+    }
+  ],
+  "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+  "item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+  "existing_supervision": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+  "prospective_upstream": {
+    "seller_profiles": "reports/step20_prospective_holdout/source/step3_seller_profiles.zh_prospective.jsonl",
+    "item_identity_signals": "reports/step20_prospective_holdout/source/step3_item_identity_signals.zh_prospective.csv",
+    "step4_candidates": "reports/step20_prospective_holdout/source/step4_zh_prospective_candidate_pairs.csv",
+    "canonical_pair_features": "reports/step20_prospective_holdout/source/step7_pair_features.zh_prospective.csv",
+    "clean_e5_cache_metadata": "reports/step20_prospective_holdout/source/clean_e5_v2/multilingual_e5_large_identifier_redacted.zh_prospective.json",
+    "clean_e5_cache_matrix": "reports/step20_prospective_holdout/source/clean_e5_v2/multilingual_e5_large_identifier_redacted.zh_prospective.npy",
+    "clean_e5_manifest": "reports/step20_prospective_holdout/source/clean_e5_v2/clean_embedding_manifest.json",
+    "discovery_required_before_blind_review": [
+      "seller_profiles",
+      "item_identity_signals",
+      "step4_candidates"
+    ],
+    "scoring_required_after_label_freeze": [
+      "canonical_pair_features",
+      "clean_e5_cache_metadata",
+      "clean_e5_cache_matrix",
+      "clean_e5_manifest"
+    ]
+  },
+  "queue_size": 400,
+  "selection_seed": 2026071302,
+  "candidate_quotas": {
+    "direct_identifier_candidate": 140,
+    "public_contact_noise_candidate": 80,
+    "template_clone_candidate": 80,
+    "semantic_topic_candidate": 60,
+    "ordinary_candidate": 40
+  },
+  "final_holdout_minimums": {
+    "positive_total": 30,
+    "same_controller_direct_or_component": 20,
+    "public_contact_or_url_noise": 20,
+    "template_clone_not_controller": 30,
+    "semantic_topic_not_controller": 30,
+    "ordinary_negative": 30
+  },
+  "review_decisions": ["positive", "negative", "uncertain"],
+  "review_evidence_types": [
+    "same_controller_direct_identifier",
+    "same_controller_component_anchor",
+    "template_clone_not_controller",
+    "semantic_topic_not_controller",
+    "public_contact_or_url_noise",
+    "ordinary_negative",
+    "uncertain_insufficient_evidence"
+  ],
+  "reviewers": ["reviewer_a", "reviewer_b"],
+  "require_independent_agreement_or_adjudication": true,
+  "forbidden_reviewer_fields": [
+    "prior_review_label",
+    "model_score",
+    "step9_score",
+    "step15_score",
+    "step17_score",
+    "graph_membership",
+    "candidate_rank_score"
+  ],
+  "component_isolation": {
+    "exclude_any_seller_seen_in_existing_train_valid_or_internal_test": true,
+    "selected_pairs_must_be_seller_disjoint": true
+  },
+  "outputs": {
+    "blind_mapping": "reports/step20_prospective_holdout/preparation_v2/blind_mapping.csv",
+    "reviewer_a_queue": "reports/step20_prospective_holdout/preparation_v2/reviewer_a_queue.csv",
+    "reviewer_b_queue": "reports/step20_prospective_holdout/preparation_v2/reviewer_b_queue.csv",
+    "preparation_manifest": "reports/step20_prospective_holdout/preparation_v2/preparation_manifest.json",
+    "adjudication_queue": "reports/step20_prospective_holdout/preparation_v2/adjudication_queue.csv",
+    "frozen_pair_universe": "reports/step20_prospective_holdout/freeze_v2/frozen_pair_universe.csv",
+    "frozen_labels": "reports/step20_prospective_holdout/freeze_v2/frozen_holdout_labels.csv",
+    "freeze_manifest": "reports/step20_prospective_holdout/freeze_v2/freeze_manifest.json",
+    "prospective_pair_features": "reports/step20_prospective_holdout/features_v2/prospective_pair_features.v7_frozen_reference.csv",
+    "prospective_feature_manifest": "reports/step20_prospective_holdout/features_v2/prospective_feature_manifest.json",
+    "frozen_model_scores": "reports/step20_prospective_holdout/scores_v2/frozen_model_scores.csv",
+    "frozen_score_manifest": "reports/step20_prospective_holdout/scores_v2/frozen_score_manifest.json",
+    "metrics": "reports/step20_prospective_holdout/evaluation_v2/final_metrics.json",
+    "predictions": "reports/step20_prospective_holdout/evaluation_v2/final_predictions.csv",
+    "evaluation_lock": "reports/step20_prospective_holdout/evaluation_v2/EVALUATED_ONCE.lock.json"
+  },
+  "evaluation": {
+    "bootstrap_resamples": 5000,
+    "bootstrap_seed": 2026071303,
+    "confidence_level": 0.95,
+    "permutation_count": 5000,
+    "permutation_seed": 2026071306,
+    "models": [
+      "raw_clean_e5_cosine",
+      "step9_v7_source_only_clean_fusion",
+      "step9_v7_no_augmentation",
+      "step9_v7_equal_effective_weight_duplication",
+      "step9_v7_latent_pair_embedding_mixup",
+      "step15_v7_clean_selected",
+      "step15_v7_two_stage_veto"
+    ],
+    "paired_comparisons": [
+      {
+        "comparison_id": "source_only_clean_fusion_vs_raw_clean_e5",
+        "candidate": "step9_v7_source_only_clean_fusion",
+        "baseline": "raw_clean_e5_cosine"
+      },
+      {
+        "comparison_id": "selected_clean_vs_source_only_clean_fusion",
+        "candidate": "step15_v7_clean_selected",
+        "baseline": "step9_v7_source_only_clean_fusion"
+      },
+      {
+        "comparison_id": "mixup_vs_equal_weight_duplication",
+        "candidate": "step9_v7_latent_pair_embedding_mixup",
+        "baseline": "step9_v7_equal_effective_weight_duplication"
+      },
+      {
+        "comparison_id": "mixup_vs_no_augmentation",
+        "candidate": "step9_v7_latent_pair_embedding_mixup",
+        "baseline": "step9_v7_no_augmentation"
+      },
+      {
+        "comparison_id": "selected_clean_vs_raw_e5",
+        "candidate": "step15_v7_clean_selected",
+        "baseline": "raw_clean_e5_cosine"
+      },
+      {
+        "comparison_id": "two_stage_veto_vs_selected_clean",
+        "candidate": "step15_v7_two_stage_veto",
+        "baseline": "step15_v7_clean_selected"
+      }
+    ],
+    "selection_on_holdout_forbidden": true,
+    "thresholds_must_come_from_representative_validation": true
+  },
+  "model_freeze_manifest": "reports/step12_v7/v2_identifier_redacted_20260714/step15_v7_model_freeze_manifest.json",
+  "hard_rules": [
+    "Candidate discovery does not create labels.",
+    "Reviewers never see model scores or prior labels.",
+    "Uncertain rows never enter binary evaluation.",
+    "No seller may overlap any prior supervised split or another prospective component.",
+    "Freeze fails closed when evidence quotas are unmet.",
+    "Every final-holdout row must originate after the v7 method freeze and have a complete frozen-reference scoring bundle.",
+    "Evaluation is allowed once only after the v7 model-selection manifest is frozen."
+  ]
+}

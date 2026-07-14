@@ -1,0 +1,23 @@
+{
+  "version": "2026-07-13-step15-v6-strict-negative-freeze",
+  "status": "frozen_strict_negative_result",
+  "frozen_branch_origin": "method/step15-v6-paper-hardening",
+  "selection_rule": "zh_valid_average_precision_only_never_zh_test",
+  "selected_model": "step15_v6_m4",
+  "evaluation_role": "internal_development_test_not_prospective_final_holdout",
+  "promotion_eligible": false,
+  "frozen_outputs": [
+    "reports/step15_v6/step15_v6_training_summary.json",
+    "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_statistical_robustness.json",
+    "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_model_metrics.csv",
+    "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_evidence_slice_metrics.csv",
+    "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_paired_comparisons.csv",
+    "reports/step12_v6/method_audit_v4_inductive_20260712/step12_v6_completion_manifest.json"
+  ],
+  "prohibited_actions": [
+    "Do not tune v6 features, loss weights, epochs, thresholds, or model selection using the current 200-row internal development test.",
+    "Do not overwrite any reports/step15_v6 or reports/step12_v6 artifact from the v7 runner.",
+    "Do not promote v6 to a publication claim; retain it as a preregistered negative result."
+  ],
+  "scientific_conclusion": "The preregistered v6 endpoint did not pass its promotion gate. The result is retained as negative evidence about the tested clean curriculum, global evidence weighting, auxiliary evidence head, and engineered-feature mixup design."
+}

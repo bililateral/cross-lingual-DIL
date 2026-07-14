@@ -1,0 +1,113 @@
+{
+  "version": "2026-07-14-step12-v7-two-stage-diagnostic-v2-identifier-redacted",
+  "objective": "Test-independent statistical audit of the preregistered Step9-v7 augmentation controls and Step15-v7 reliability veto. Representative validation governs selection; the legacy 200-row Chinese test is diagnostic only and cannot support publication promotion.",
+  "v7_policy": "schema/step15_v7_two_stage_policy.json",
+  "prospective_holdout_policy": "schema/step20_prospective_holdout_policy.json",
+  "step9_run_id": "v2_identifier_redacted_20260714",
+  "step15_run_id": "v2_identifier_redacted_20260714",
+  "support_ratio": 1.0,
+  "evaluation_splits": [
+    "representative_validation",
+    "internal_development_test"
+  ],
+  "models": [
+    "raw_clean_e5_cosine",
+    "step9_v7_source_only_clean_fusion",
+    "no_augmentation",
+    "equal_effective_weight_duplication",
+    "latent_pair_embedding_mixup",
+    "step15_v7_clean_selected",
+    "step15_v7_two_stage_veto"
+  ],
+  "paired_comparisons": [
+    {
+      "comparison_id": "source_only_clean_fusion_vs_raw_clean_e5",
+      "candidate": "step9_v7_source_only_clean_fusion",
+      "baseline": "raw_clean_e5_cosine",
+      "primary_interpretation": "Does English-label-only clean fusion improve on the frozen multilingual semantic encoder before target-domain supervision is added?"
+    },
+    {
+      "comparison_id": "selected_clean_vs_source_only_clean_fusion",
+      "candidate": "step15_v7_clean_selected",
+      "baseline": "step9_v7_source_only_clean_fusion",
+      "primary_interpretation": "Does target-domain support improve the matched clean fusion model over English-label-only transfer?"
+    },
+    {
+      "comparison_id": "latent_mixup_vs_equal_weight_duplication",
+      "candidate": "latent_pair_embedding_mixup",
+      "baseline": "equal_effective_weight_duplication",
+      "primary_interpretation": "Does interpolation improve ranking beyond merely adding identical positive effective weight?"
+    },
+    {
+      "comparison_id": "latent_mixup_vs_no_augmentation",
+      "candidate": "latent_pair_embedding_mixup",
+      "baseline": "no_augmentation",
+      "primary_interpretation": "Does the complete latent-mixup treatment improve the unaugmented clean ranker?"
+    },
+    {
+      "comparison_id": "duplication_vs_no_augmentation",
+      "candidate": "equal_effective_weight_duplication",
+      "baseline": "no_augmentation",
+      "primary_interpretation": "How much benefit comes from positive effective weight alone?"
+    },
+    {
+      "comparison_id": "selected_clean_vs_raw_clean_e5",
+      "candidate": "step15_v7_clean_selected",
+      "baseline": "raw_clean_e5_cosine",
+      "primary_interpretation": "Does the validation-selected clean fusion improve on the same identifier-redacted E5 cosine used to construct its latent representation?"
+    },
+    {
+      "comparison_id": "two_stage_veto_vs_selected_clean",
+      "candidate": "step15_v7_two_stage_veto",
+      "baseline": "step15_v7_clean_selected",
+      "primary_interpretation": "Does inference-visible identifier reliability reduce public-contact noise without degrading clean ranking?"
+    }
+  ],
+  "metrics": {
+    "primary": "average_precision",
+    "secondary": ["roc_auc", "pr_auc"],
+    "threshold": ["accuracy", "balanced_accuracy", "f1", "precision", "recall", "specificity"],
+    "map_mrr_status": "not_applicable_without_preregistered_query_groups"
+  },
+  "bootstrap": {
+    "num_resamples": 5000,
+    "confidence_level": 0.95,
+    "random_seed": 2026071304,
+    "grouping_unit": "v7_component_id",
+    "two_level_seed_and_component": true
+  },
+  "randomization_test": {
+    "num_permutations": 5000,
+    "random_seed": 2026071305,
+    "method": "paired_component_score_swap",
+    "alternative": "two_sided"
+  },
+  "selection": {
+    "split": "representative_validation",
+    "metric": "average_precision",
+    "support_ratio_fixed_before_evaluation": 1.0,
+    "test_metrics_used_for_selection": false,
+    "simplicity_tie_break_order": [
+      "no_augmentation",
+      "equal_effective_weight_duplication",
+      "latent_pair_embedding_mixup"
+    ],
+    "tie_tolerance": 0.0
+  },
+  "publication_promotion": {
+    "eligible": false,
+    "reason": "No publication promotion is permitted on the legacy internal-development test. A one-time prospective Step20 holdout is mandatory."
+  },
+  "outputs_root": "reports/step12_v7/v2_identifier_redacted_20260714",
+  "summary_output": "reports/step12_v7/v2_identifier_redacted_20260714/step12_v7_statistical_robustness.json",
+  "model_metrics_output": "reports/step12_v7/v2_identifier_redacted_20260714/step12_v7_model_metrics.csv",
+  "comparisons_output": "reports/step12_v7/v2_identifier_redacted_20260714/step12_v7_paired_comparisons.csv",
+  "model_freeze_manifest_output": "reports/step12_v7/v2_identifier_redacted_20260714/step15_v7_model_freeze_manifest.json",
+  "hard_rules": [
+    "All model and threshold selection uses representative validation only.",
+    "Internal-development test metrics are diagnostic and never alter model selection.",
+    "Mixup and duplication must have identical synthetic effective weight for every seed.",
+    "The model-freeze manifest is written before any prospective holdout label is unsealed.",
+    "No v7 result is publication-promoted until Step20 one-time evaluation succeeds."
+  ]
+}

@@ -1,0 +1,273 @@
+{
+  "version": "2026-07-14-step15-v7-two-stage-prospective-v2-identifier-redacted",
+  "objective": "A test-independent repair of Step15-v6: stable strict-clean ranking features, representative validation, factorized evidence weights, true latent seller-pair mixup controls, and an inference-visible identifier reliability veto. The current 200-row Chinese test is internal development only; publication claims require a separately frozen prospective holdout.",
+  "frozen_v6_negative_manifest": "schema/step15_v6_negative_freeze.json",
+  "outputs_root": "reports/step15_v7/v2_identifier_redacted_20260714",
+  "pools": {
+    "en_content_train_pool": {
+      "domain": "en",
+      "frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
+      "evidence_labels": "reports/step15_evidence_type_labels.en_content_train_pool.csv",
+      "seller_profiles": "reports/step3_seller_profiles.en_content_train_pool.jsonl",
+      "item_identity_signals": "reports/step3_item_identity_signals.en_content_train_pool.csv",
+      "canonical_pair_features": "reports/step7_pair_features.en_content_train_pool.csv",
+      "step4_candidates": "reports/step4_en_silver_candidate_pairs.csv",
+      "clean_e5_cache_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.json",
+      "clean_e5_cache_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.npy",
+      "v7_pair_features": "reports/step15_v7/v2_identifier_redacted_20260714/features/step7_pair_features.en_content_train_pool.v7_train_reference.csv"
+    },
+    "zh_target_strict": {
+      "domain": "zh",
+      "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+      "evidence_labels": "reports/step15_evidence_type_labels.zh_target_strict.csv",
+      "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+      "item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+      "canonical_pair_features": "reports/step7_pair_features.zh_target_strict.csv",
+      "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+      "clean_e5_cache_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.json",
+      "clean_e5_cache_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.npy",
+      "v7_pair_features": "reports/step15_v7/v2_identifier_redacted_20260714/features/step7_pair_features.zh_target_strict.v7_train_reference.csv"
+    }
+  },
+  "representative_validation": {
+    "source_pool": "zh_target_strict",
+    "seed": 20260713,
+    "retain_original_valid": true,
+    "never_read_model_scores": true,
+    "move_complete_train_components_only": true,
+    "minimum_total_evidence_counts": {
+      "same_controller_direct_identifier": 16,
+      "same_controller_component_anchor": 8,
+      "public_contact_or_url_noise": 6
+    },
+    "minimum_distinct_component_counts": {
+      "same_controller_direct_identifier": 8,
+      "same_controller_component_anchor": 3,
+      "public_contact_or_url_noise": 2
+    },
+    "minimum_remaining_train_counts": {
+      "same_controller_direct_identifier": 20,
+      "same_controller_component_anchor": 10,
+      "same_controller_style_structural_soft": 100,
+      "public_contact_or_url_noise": 3,
+      "ordinary_negative": 100,
+      "semantic_topic_not_controller": 50,
+      "template_clone_not_controller": 50
+    },
+    "split_assignment_output": "reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_assignments.csv",
+    "manifest_output": "reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_manifest.json"
+  },
+  "clean_semantic_encoder": {
+    "semantic_model_policy": "schema/step7_semantic_model_policy.json",
+    "model_key": "multilingual_e5_large",
+    "text_fields": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "excluded_profile_fields": [
+      "source_seller_raw",
+      "alias_normalized",
+      "source_market_raw",
+      "source_seller_id_raw",
+      "contact_concat_top",
+      "structured_snapshot_concat_top",
+      "profile_text"
+    ],
+    "redaction_sources": "step3_item_identity_occurrences_plus_high_precision_identifier_regexes",
+    "replacement": "single_space_no_identifier_presence_marker",
+    "output_feature": "embedding_cosine_multilingual_e5_large_identifier_redacted",
+    "outputs_root": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings",
+    "manifest_output": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/clean_embedding_manifest.json"
+  },
+  "inductive_features": {
+    "reference_scope": "v7_train_sellers_only_after_validation_overlay",
+    "step7_feature_schema": "schema/step7_transfer_safe_pair_feature_schema.json",
+    "oov_policy": {
+      "shared_signature_effective_df_floor": 2,
+      "unknown_signature_is_rare": false,
+      "description": "A signature shared by two evaluation sellers cannot be assigned df=0. IDF uses max(train_df,2); OOV signatures are not counted as train-supported rare evidence."
+    },
+    "removed_from_strict_clean": [
+      "boilerplate_ratio_max",
+      "boilerplate_ratio_gap_abs",
+      "shared_boilerplate_count",
+      "shared_low_df_sentence_count",
+      "shared_rare_ngram_count",
+      "embedding_cosine_multilingual_e5_large",
+      "embedding_cosine_bge_m3",
+      "embedding_cosine_labse",
+      "embedding_cosine_gte_multilingual_base",
+      "embedding_cosine_paraphrase_multilingual_mpnet",
+      "reranker_score_gte_multilingual_reranker_base"
+    ],
+    "missing_value_imputation": "train_median_per_feature",
+    "stable_strict_clean_feature_count": 20,
+    "stable_strict_clean_features": [
+      "embedding_cosine_multilingual_e5_large_identifier_redacted",
+      "profile_category_jaccard",
+      "has_shared_title_clone",
+      "has_shared_description_clone",
+      "shared_title_count_capped",
+      "shared_description_count_capped",
+      "shared_category_count_capped",
+      "shared_title_idf_sum",
+      "shared_description_idf_sum",
+      "shared_title_idf_mean",
+      "shared_description_idf_mean",
+      "item_count_percentile_gap_abs",
+      "price_median_percentile_gap_abs",
+      "title_length_median_percentile_gap_abs",
+      "description_length_median_percentile_gap_abs",
+      "digit_ratio_mean_percentile_gap_abs",
+      "punct_ratio_mean_percentile_gap_abs",
+      "repeated_title_share_percentile_gap_abs",
+      "repeated_description_share_percentile_gap_abs",
+      "max_category_share_percentile_gap_abs"
+    ],
+    "reference_bundle_output": "reports/step15_v7/v2_identifier_redacted_20260714/features/v7_train_only_corpus_reference.json",
+    "manifest_output": "reports/step15_v7/v2_identifier_redacted_20260714/features/step15_v7_inductive_feature_manifest.json"
+  },
+  "latent_pair_representation": {
+    "encoder": "multilingual_e5_large_identifier_redacted_frozen_v7_cache",
+    "symmetric_operator": ["abs_left_minus_right", "elementwise_product"],
+    "projection": "fixed_gaussian_johnson_lindenstrauss",
+    "projection_seed": 2026071301,
+    "projection_dimensions": 64,
+    "projection_scale": "one_over_sqrt_output_dimensions",
+    "raw_embeddings_are_never_mixed_across_domains": true
+  },
+  "step9_latent_mixup": {
+    "default_run_id": "v2_identifier_redacted_20260714",
+    "support_ratios": [0.0, 0.1, 0.2, 0.5, 1.0],
+    "seeds": [20260320, 20260321, 20260322, 20260323, 20260324, 20260325, 20260326, 20260327, 20260328, 20260329],
+    "experiments": [
+      "no_augmentation",
+      "equal_effective_weight_duplication",
+      "latent_pair_embedding_mixup"
+    ],
+    "mixup": {
+      "beta_alpha": 0.4,
+      "same_domain_only": true,
+      "target_domain_only": true,
+      "same_evidence_type_only": true,
+      "minimum_parent_confidence": 0.55,
+      "nearest_neighbor_k": 5,
+      "gap_reference_scope": "target_domain_support_only",
+      "synthetic_positive_target": "close_50pct_of_real_negative_minus_positive_effective_weight_gap",
+      "target_effective_weight_gap_closure_fraction": 0.5,
+      "max_synthetic_rows_per_eligible_parent": 5,
+      "clean_feature_policy": "copy_anchor_parent",
+      "latent_feature_policy": "convex_interpolation",
+      "synthetic_weight_policy": "minimum_parent_factorized_weight_capped_to_remaining_budget"
+    },
+    "duplication_control": {
+      "same_parent_schedule_and_weights_as_mixup": true,
+      "latent_feature_policy": "copy_anchor_parent",
+      "required_total_synthetic_effective_weight_tolerance": 1e-10
+    },
+    "logistic": {
+      "l2_penalty": 10.0,
+      "max_iter": 200,
+      "tolerance": 1e-8,
+      "class_weight": "none",
+      "standardize_features": true,
+      "standardization_reference": "real_train_rows_only_shared_across_all_three_controls",
+      "sample_weight_total_normalization": "real_train_row_count_shared_across_all_three_controls"
+    },
+    "outputs_root": "reports/step9_v7_latent_mixup"
+  },
+  "factorized_evidence_weighting": {
+    "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+    "domain_factor": {"en": 1.0, "zh": 1.0},
+    "evidence_type_factor": {
+      "en": {
+        "same_controller_direct_identifier": 1.0,
+        "same_controller_component_anchor": 1.0,
+        "same_controller_style_structural_soft": 0.8,
+        "ordinary_negative": 1.0,
+        "semantic_topic_not_controller": 1.1,
+        "template_clone_not_controller": 1.1,
+        "public_contact_or_url_noise": 0.75
+      },
+      "zh": {
+        "same_controller_direct_identifier": 1.25,
+        "same_controller_component_anchor": 1.15,
+        "same_controller_style_structural_soft": 0.7,
+        "ordinary_negative": 1.0,
+        "semantic_topic_not_controller": 1.15,
+        "template_clone_not_controller": 1.15,
+        "public_contact_or_url_noise": 1.5
+      }
+    },
+    "confidence_factor": {
+      "source": "training_sample_weight",
+      "minimum": 0.18,
+      "maximum": 1.0
+    },
+    "component_factor": "inverse_pairs_per_split_component_sqrt_normalized_within_domain_and_evidence_type",
+    "min_weight": 0.1,
+    "max_weight": 2.5,
+    "forbid_global_eight_x_multiplier": true
+  },
+  "two_stage_method": {
+    "default_run_id": "v2_identifier_redacted_20260714",
+    "step9_run_id": "v2_identifier_redacted_20260714",
+    "stage_a": {
+      "name": "clean_cross_lingual_ranker",
+      "features": "stable_strict_clean_20d_plus_identifier_redacted_e5_pair_latent_64d",
+      "auxiliary_evidence_head": false,
+      "selection_split": "representative_zh_validation",
+      "selection_metric": "average_precision",
+      "test_metrics_used_for_selection": false
+    },
+    "stage_b": {
+      "name": "identifier_reliability_veto",
+      "uses_inference_visible_raw_step3_occurrences_only": true,
+      "forbidden_inputs": ["review_label", "evidence_type", "model_error", "zh_test_membership"],
+      "seller_facing_direct_required_on_both_sides": true,
+      "public_or_product_data_overlap_veto": true,
+      "support_only_overlap_veto": true,
+      "unknown_or_mixed_context_action": "no_score_change_and_emit_ambiguous_flag",
+      "public_identifier_seller_frequency_threshold": 3,
+      "public_noise_score_multiplier": 0.1,
+      "direct_identifier_score_multiplier": 1.0,
+      "no_identifier_score_multiplier": 1.0,
+      "hard_keep_direct_identifier": false
+    }
+  },
+  "threshold_selection": {
+    "metric": "balanced_accuracy",
+    "tie_break_order": ["f1", "precision", "recall", "higher_threshold"],
+    "degenerate_prediction_guard": {
+      "enabled": true,
+      "min_predicted_positive": 1,
+      "min_predicted_negative": 1,
+      "max_primary_metric_drop": 0.03,
+      "tie_break_order": ["f1", "recall", "precision", "specificity", "lower_threshold"]
+    }
+  },
+  "evaluation": {
+    "current_zh_test_role": "internal_development_test_only",
+    "current_zh_test_row_count_expected": 200,
+    "selection_uses_current_zh_test": false,
+    "metrics": ["roc_auc", "average_precision", "pr_auc_trapezoid", "accuracy", "balanced_accuracy", "f1", "precision", "recall"],
+    "prospective_holdout_required": true
+  },
+  "outputs": {
+    "two_stage_outputs_root": "reports/step15_v7/two_stage"
+  },
+  "hard_rules": [
+    "V6 code and artifacts are immutable negative-result records.",
+    "No v7 choice may use the current 200-row internal development test.",
+    "Evidence types may define train weights and validation strata but are never inference features.",
+    "The clean ranker has no auxiliary evidence-type prediction head.",
+    "Stage-B reliability uses only raw evidence available at inference time.",
+    "All synthetic rows are train-only; no cross-domain parent mixing is allowed.",
+    "The duplication control must match mixup effective synthetic weight exactly.",
+    "Class weights remain uniform so the duplication control isolates added minority weight from latent interpolation geometry.",
+    "Prospective holdout labels and metrics remain sealed until all model artifacts and thresholds are frozen."
+  ]
+}

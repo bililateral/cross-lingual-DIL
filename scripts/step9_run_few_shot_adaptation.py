@@ -669,26 +669,37 @@ def logistic_sample_weights(y_true: np.ndarray, cfg: dict) -> np.ndarray:
     raise ValueError(f"Unsupported Step 9 logistic class_weight: {class_weight}")
 
 
-def apply_logistic_row_sample_weights(weights: np.ndarray, multipliers: np.ndarray | None) -> tuple[np.ndarray, dict]:
+def apply_logistic_row_sample_weights(
+    weights: np.ndarray,
+    multipliers: np.ndarray | None,
+    target_total: float | None = None,
+) -> tuple[np.ndarray, dict]:
     if multipliers is None:
         return weights, {
             "enabled": False,
             "min_multiplier": 1.0,
             "mean_multiplier": 1.0,
             "max_multiplier": 1.0,
+            "target_total": None,
         }
     if len(multipliers) != len(weights):
         raise ValueError("Step 9 logistic sample-weight multiplier length mismatch")
     adjusted = weights.astype(float, copy=True) * multipliers.astype(float)
-    before_mean = float(np.mean(weights)) if len(weights) else 0.0
-    after_mean = float(np.mean(adjusted)) if len(adjusted) else 0.0
-    if before_mean > 0.0 and after_mean > 0.0:
-        adjusted *= before_mean / after_mean
+    before_total = float(np.sum(weights))
+    after_total = float(np.sum(adjusted))
+    desired_total = before_total if target_total is None else float(target_total)
+    if desired_total <= 0.0:
+        raise ValueError("Step 9 logistic sample-weight target total must be positive")
+    if after_total <= 0.0:
+        raise ValueError("Step 9 logistic adjusted sample weights have zero total")
+    adjusted *= desired_total / after_total
     return adjusted, {
         "enabled": bool(np.any(np.abs(multipliers - 1.0) > 1e-12)),
         "min_multiplier": round(float(np.min(multipliers)), 6) if len(multipliers) else 1.0,
         "mean_multiplier": round(float(np.mean(multipliers)), 6) if len(multipliers) else 1.0,
         "max_multiplier": round(float(np.max(multipliers)), 6) if len(multipliers) else 1.0,
+        "target_total": round(desired_total, 12),
+        "normalized_total": round(float(np.sum(adjusted)), 12),
     }
 
 
@@ -702,6 +713,8 @@ def fit_regularized_logistic(
     cfg: dict,
     offset: np.ndarray | None = None,
     sample_weight_multipliers: np.ndarray | None = None,
+    sample_weight_target_total: float | None = None,
+    precomputed_standardization: dict | None = None,
 ) -> tuple[dict, np.ndarray]:
     if len(y_train) == 0:
         raise ValueError("Step 9 logistic fitting requires a non-empty training split")
@@ -711,10 +724,22 @@ def fit_regularized_logistic(
         raise ValueError("Step 9 logistic fitting requires both positive and negative labels")
 
     standardize = bool(cfg.get("standardize_features", True))
-    x_scaled, standardization = fit_standardization(x_train, standardize)
+    if precomputed_standardization is None:
+        x_scaled, standardization = fit_standardization(x_train, standardize)
+        standardization_reference = "current_training_matrix"
+    else:
+        if not standardize or precomputed_standardization.get("enabled") is not True:
+            raise ValueError("Precomputed Step 9 standardization requires standardize_features=true")
+        x_scaled = apply_standardization(x_train, precomputed_standardization)
+        standardization = precomputed_standardization
+        standardization_reference = "precomputed_real_train_rows_only"
     y = np.array(y_train, dtype=float)
     weights = logistic_sample_weights(y, cfg)
-    weights, row_sample_weight_summary = apply_logistic_row_sample_weights(weights, sample_weight_multipliers)
+    weights, row_sample_weight_summary = apply_logistic_row_sample_weights(
+        weights,
+        sample_weight_multipliers,
+        target_total=sample_weight_target_total,
+    )
     offset_vector = np.zeros(len(y), dtype=float) if offset is None else np.array(offset, dtype=float)
     if len(offset_vector) != len(y):
         raise ValueError("Step 9 residual logistic offset length does not match y_train")
@@ -766,6 +791,7 @@ def fit_regularized_logistic(
     probabilities = safe_sigmoid(logits)
     artifact = {
         "standardization": standardization,
+        "standardization_reference": standardization_reference,
         "parameter_intercept": round(float(params[0]), 12),
         "parameter_coefficients": [round(float(value), 12) for value in params[1:]],
         "l2_penalty": round(float(l2_penalty), 12),
