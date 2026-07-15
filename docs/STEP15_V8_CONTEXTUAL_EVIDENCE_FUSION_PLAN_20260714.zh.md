@@ -396,7 +396,7 @@ export STEP12_RESAMPLES=5000
 bash scripts/run_step15_v8_readiness_linux_20260715.sh
 ```
 
-runner 的执行顺序固定为：freeze/check-only 与 33 项契约测试；检查 formal runtime 是完全不存在还是完整且哈希一致；首次运行仅重建中文 identifier-redacted E5 cache，并原子重建中英文 v7 feature tables；随后验证完整 runtime chain，再执行 v8 preflight、score-blind context queue snapshot、BGE/LaBSE/reranker 去标识特征、B0–B3 OOF bridge、evidence expert、Step12、return-sync manifest 与 Step20 gate。GPU 只用于 embedding/reranker；LR/linear ranker、evidence expert 和 Step12 主要使用 CPU。
+runner 的执行顺序固定为：freeze/check-only 与 36 项契约测试；检查 formal runtime 是完全不存在还是完整且哈希一致；首次运行仅重建中文 identifier-redacted E5 cache，并原子重建中英文 v7 feature tables；随后验证完整 runtime chain，再执行 v8 preflight、score-blind context queue snapshot、BGE/LaBSE/reranker 去标识特征、B0–B3 OOF bridge、evidence expert、Step12、return-sync manifest 与 Step20 gate。GPU 只用于 embedding/reranker；LR/linear ranker、evidence expert 和 Step12 主要使用 CPU。V8 preflight 将“CSV 列不存在”“整列在 train 上无可用值”和“可由预注册 fold-train median 插补的局部空值”分开处理；只有最后一种允许继续，且会输出逐特征缺失计数。
 
 如果同一 `run_id` 已存在，不得删除后覆盖。应使用新路径；已经完整并通过哈希校验的 shared readiness runtime 会复用，不会重复编码：
 

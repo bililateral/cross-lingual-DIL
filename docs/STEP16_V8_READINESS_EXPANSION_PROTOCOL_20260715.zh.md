@@ -139,7 +139,7 @@ reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
 - public-noise negative 的证据足以支持“共享标识符处于公共/商品/支持上下文”，但不足以把不同操作者身份当作 gold truth，因此固定为 `high_confidence_silver_agent_reviewed_public_noise_control`；
 - 所有 115 条扩充行均设置 `usable_for_supervision=0`、`usable_for_core_transfer=0`、`primary_identity_model_eligible=0`、`benchmark_eligible=0`，只通过显式 v8 evidence-control 路径进入专家训练或充分性审计；
 - manifest 中 `thresholds_lowered=false`、`model_scores_read=false`；11 个正式输出、23 个直接/传递输入哈希及三个 JSON 自哈希均已复核闭合；
-- `python -m unittest tests.test_step15_v8_contextual_evidence_contracts` 为 `33/33` 通过；再次运行 materializer `--check-only` 得到相同 readiness。测试还独立约束 summary 的 train 计数只能使用英文 `train`，不能误计英文 `valid/test`。
+- `python -m unittest tests.test_step15_v8_contextual_evidence_contracts` 为 `36/36` 通过；再次运行 materializer `--check-only` 得到相同 readiness。测试还独立约束 summary 的 train 计数只能使用英文 `train`，不能误计英文 `valid/test`，并验证 v7 局部缺失只可按照预注册的 fold-train median 插补，真实缺列或全 train 缺失必须 fail closed。
 
 Windows 仅完成数据物化、无模型契约检查和 identifier redaction 检查。模型编码、v7 feature 数值重建与 v8 方法评估仍必须在 Linux 运行。Linux runner 会在首轮生成 runtime；后续更换 `V8_RUN_ID` 时只复用通过完整哈希链验证的 runtime，任何部分存在或哈希不一致都会 fail closed。当前 Linux 一键入口为：
 

@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import step15_v8_common as common  # noqa: E402
 import step15_v8_downstream_gate as downstream_gate  # noqa: E402
+import step15_v8_preflight as preflight  # noqa: E402
 import step16_build_v8_context_review_queues as review_queues  # noqa: E402
 import step16_build_v8_identity_control_queues as identity_control_queues  # noqa: E402
 import step16_apply_v8_context_reviews as review_apply  # noqa: E402
@@ -68,6 +69,51 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             len(common.feature_names("B1_v7_20d_e5_cosine_only", self.policy, self.v7_policy)),
             20,
         )
+
+    def _preflight_feature_rows(self) -> list[dict]:
+        feature_names = common.feature_names(
+            "B1_v7_20d_e5_cosine_only", self.policy, self.v7_policy
+        )
+        rows = []
+        for index, domain in enumerate(("en", "zh")):
+            row = {
+                "pair_uid": f"preflight-{domain}",
+                "domain": domain,
+                "sparse_lexical_similarity_raw": str(0.2 + index),
+                "structural_support_score_raw": str(0.4 + index),
+            }
+            row.update({name: str(index + 1.0) for name in feature_names})
+            rows.append(row)
+        return rows
+
+    def test_preflight_allows_cells_covered_by_train_median_imputation(self) -> None:
+        rows = self._preflight_feature_rows()
+        rows[1]["price_median_percentile_gap_abs"] = ""
+        diagnostics = preflight.validate_v7_feature_availability(
+            rows, self.policy, self.v7_policy
+        )
+        self.assertEqual(
+            diagnostics["nonfinite_cell_counts"]["price_median_percentile_gap_abs"],
+            1,
+        )
+        self.assertEqual(diagnostics["imputation_mode"], "train_median_per_feature")
+
+    def test_preflight_rejects_a_v7_column_absent_from_any_row(self) -> None:
+        rows = self._preflight_feature_rows()
+        del rows[1]["price_median_percentile_gap_abs"]
+        with self.assertRaisesRegex(ValueError, "required v7 columns are absent"):
+            preflight.validate_v7_feature_availability(
+                rows, self.policy, self.v7_policy
+            )
+
+    def test_preflight_rejects_a_v7_feature_missing_on_all_train_rows(self) -> None:
+        rows = self._preflight_feature_rows()
+        for row in rows:
+            row["price_median_percentile_gap_abs"] = ""
+        with self.assertRaisesRegex(ValueError, "entirely missing"):
+            preflight.validate_v7_feature_availability(
+                rows, self.policy, self.v7_policy
+            )
 
     def test_nonidentifier_candidate_rules_are_allowlist_not_subtraction(self) -> None:
         self.assertEqual(

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -13,6 +14,79 @@ import step15_v8_common as common
 
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def validate_v7_feature_availability(
+    rows: list[dict], policy: dict, v7_policy: dict
+) -> dict:
+    """Validate the v7 feature contract without rejecting imputable cells."""
+    b1_fields = common.feature_names(
+        "B1_v7_20d_e5_cosine_only", policy, v7_policy
+    )
+    retrieval_fields = [
+        "sparse_lexical_similarity_raw",
+        "structural_support_score_raw",
+    ]
+    required_fields = sorted(set(b1_fields) | set(retrieval_fields))
+    absent_fields = sorted(
+        field for field in required_fields if any(field not in row for row in rows)
+    )
+    if absent_fields:
+        raise ValueError(
+            f"Step15-v8 required v7 columns are absent: {absent_fields}"
+        )
+
+    nonfinite_counts = {
+        field: sum(
+            not math.isfinite(common._float_or_nan(row.get(field)))
+            for row in rows
+        )
+        for field in required_fields
+    }
+    entirely_missing_fields = sorted(
+        field for field, count in nonfinite_counts.items() if count == len(rows)
+    )
+    if entirely_missing_fields:
+        raise ValueError(
+            "Step15-v8 v7 features are entirely missing on train: "
+            f"{entirely_missing_fields}"
+        )
+    imputation_mode = v7_policy["inductive_features"]["missing_value_imputation"]
+    if imputation_mode != "train_median_per_feature":
+        fields_requiring_imputation = sorted(
+            field for field, count in nonfinite_counts.items() if count
+        )
+        if fields_requiring_imputation:
+            raise ValueError(
+                "Step15-v8 v7 features contain non-finite cells without the "
+                f"preregistered train-median imputation contract: {fields_requiring_imputation}"
+            )
+
+    # This is the same fold-train transform used by the bridge. It fails closed
+    # when a configured B1 feature is entirely missing and records only train
+    # medians, never representative-valid or internal-test statistics.
+    _, transform = common.fit_feature_transform(
+        rows,
+        "B1_v7_20d_e5_cosine_only",
+        policy,
+        v7_policy,
+        latent=None,
+    )
+    retrieval_domain_stats = {
+        field: common._fit_domain_stats(rows, field) for field in retrieval_fields
+    }
+    return {
+        "required_field_count": len(required_fields),
+        "absent_fields": [],
+        "nonfinite_cell_counts": {
+            field: count for field, count in sorted(nonfinite_counts.items()) if count
+        },
+        "imputation_mode": imputation_mode,
+        "b1_train_median_count": len(transform["median_imputation"]),
+        "retrieval_domains": {
+            field: sorted(stats) for field, stats in sorted(retrieval_domain_stats.items())
+        },
+    }
 
 
 def main() -> None:
@@ -118,19 +192,9 @@ def main() -> None:
     corpus_context = common.load_corpus_reference_context(policy, v7_policy)
     reference = common.fit_corpus_reference(train_rows, corpus_context)
     transformed = common.apply_corpus_reference(train_rows, reference, corpus_context)
-    required_v7_fields = set(
-        common.feature_names("B1_v7_20d_e5_cosine_only", policy, v7_policy)
-    ) | {
-        "sparse_lexical_similarity_raw",
-        "structural_support_score_raw",
-    }
-    missing_fields = sorted(
-        field
-        for field in required_v7_fields
-        if any(str(row.get(field, "")).strip() == "" for row in transformed)
+    v7_feature_availability = validate_v7_feature_availability(
+        transformed, policy, v7_policy
     )
-    if missing_fields:
-        raise ValueError(f"Step15-v8 required v7 fields are missing: {missing_fields}")
     occurrence_required = {
         "seller_uid",
         "contact_type",
@@ -222,6 +286,7 @@ def main() -> None:
                     for split, rows in splits.items()
                 },
                 "oof_held_fold_counts_by_seed": fold_counts,
+                "v7_feature_availability": v7_feature_availability,
                 "occurrence_counts": occurrence_counts,
                 "representative_valid_evidence_counts": dict(sorted(valid_counts.items())),
                 "evidence_expert_valid_control_counts": dict(
