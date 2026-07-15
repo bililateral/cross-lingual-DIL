@@ -94,6 +94,23 @@ def subset_metric(
     raise ValueError(metric)
 
 
+def validation_slice_readiness(
+    slice_masks: dict[str, np.ndarray], minimum_counts: dict[str, int]
+) -> dict[str, dict]:
+    counts = {
+        key: int(np.sum(np.asarray(slice_masks[key], dtype=bool)))
+        for key in minimum_counts
+    }
+    return {
+        key: {
+            "observed": counts[key],
+            "required": int(required),
+            "met": counts[key] >= int(required),
+        }
+        for key, required in minimum_counts.items()
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy", default=str(common.DEFAULT_POLICY))
@@ -311,20 +328,9 @@ def main() -> None:
         valid_rows, fused_valid, clean_valid, args.resamples, args.seed
     )
     gates_cfg = policy["promotion_gates"]
-    valid_counts = Counter(
-        {
-            key: int(np.sum(slice_masks[key]))
-            for key in gates_cfg["minimum_valid_slice_counts"]
-        }
+    data_readiness = validation_slice_readiness(
+        slice_masks, gates_cfg["minimum_valid_slice_counts"]
     )
-    data_readiness = {
-        evidence_type: {
-            "observed": int(valid_counts[evidence_type]),
-            "required": int(required),
-            "met": int(valid_counts[evidence_type]) >= int(required),
-        }
-        for evidence_type, required in gates_cfg["minimum_valid_slice_counts"].items()
-    }
 
     gates = {
         "clean_ap_gain_over_B0": {

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import builtins
 import csv
+import dis
 import json
 import sys
 import tempfile
+import types
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -15,9 +18,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import step15_v8_common as common  # noqa: E402
+import step15_v8_build_sync_manifest as sync_manifest  # noqa: E402
 import step15_v8_downstream_gate as downstream_gate  # noqa: E402
 import step15_v8_preflight as preflight  # noqa: E402
 import step15_train_v8_contextual_evidence as contextual_evidence  # noqa: E402
+import step12_v8_statistical_robustness_audit as step12_v8  # noqa: E402
 import step16_build_v8_context_review_queues as review_queues  # noqa: E402
 import step16_build_v8_identity_control_queues as identity_control_queues  # noqa: E402
 import step16_apply_v8_context_reviews as review_apply  # noqa: E402
@@ -143,6 +148,50 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             contextual_evidence.validate_bridge_threshold_contract(
                 final_record, rows, artifact
             )
+
+    def test_step12_validation_readiness_counts_masks_without_counter_dependency(self) -> None:
+        readiness = step12_v8.validation_slice_readiness(
+            {
+                "public": np.asarray([True, False, True]),
+                "direct": np.asarray([False, True, False]),
+            },
+            {"public": 2, "direct": 2},
+        )
+        self.assertEqual(
+            readiness,
+            {
+                "public": {"observed": 2, "required": 2, "met": True},
+                "direct": {"observed": 1, "required": 2, "met": False},
+            },
+        )
+
+    def test_stage8_to_stage10_scripts_have_no_unbound_global_loads(self) -> None:
+        available_builtins = set(dir(builtins))
+
+        def code_global_loads(code: types.CodeType) -> set[str]:
+            names = {
+                str(instruction.argval)
+                for instruction in dis.get_instructions(code)
+                if instruction.opname in {"LOAD_GLOBAL", "LOAD_NAME"}
+            }
+            for constant in code.co_consts:
+                if isinstance(constant, types.CodeType):
+                    names.update(code_global_loads(constant))
+            return names
+
+        modules = (
+            contextual_evidence,
+            step12_v8,
+            sync_manifest,
+            downstream_gate,
+        )
+        for module in modules:
+            available = set(vars(module)) | available_builtins
+            missing = set()
+            for value in vars(module).values():
+                if isinstance(value, types.FunctionType):
+                    missing.update(code_global_loads(value.__code__) - available)
+            self.assertFalse(missing, f"{module.__name__}: {sorted(missing)}")
 
     def _preflight_feature_rows(self) -> list[dict]:
         feature_names = common.feature_names(
