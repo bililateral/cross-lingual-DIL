@@ -66,6 +66,7 @@ def main() -> None:
         ROOT / "scripts" / "step16_build_v8_identity_control_queues.py",
         ROOT / "scripts" / "step16_reconcile_v8_dual_reviews.py",
         ROOT / "scripts" / "step16_reconcile_v8_identity_control_reviews.py",
+        ROOT / "scripts" / "step16_reconcile_v8_profile_url_reviews.py",
         ROOT / "scripts" / "step16_materialize_v8_reviewed_readiness_freeze.py",
         ROOT / "scripts" / "step7_build_semantic_pair_features.py",
         ROOT / "scripts" / "step7_train_baseline_models.py",

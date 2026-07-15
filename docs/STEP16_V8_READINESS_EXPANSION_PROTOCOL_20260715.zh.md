@@ -1,5 +1,7 @@
 # Step16-v8 证据切片扩充与隔离 Refreeze 协议
 
+> **2026-07-15 修正通知**：首次 Linux V2 运行完成后，审计发现旧 representative-validation assignment 将 45 条 `silver_train_only` 行错误保留在 primary valid。V2 数值结果已失效。当前只认尚待 Linux 生成的 V3 canonical-split freeze；完整根因与修正见 `docs/STEP15_V8_V2_POSTRUN_AUDIT_AND_V3_CORRECTION_20260715.zh.md`。
+
 ## 1. 目的
 
 Step15-v8 的预注册验证门槛要求：
@@ -91,7 +93,7 @@ benchmark_eligible = 0
 
 ## 6. Refreeze 与特征物化
 
-隔离物化已经完成，执行内容为：
+V2 隔离物化曾成功运行，但其 primary split 继承了旧 V7 promotion assignment，因此不得继续使用。V3 物化代码已完成，必须在 Linux 重新执行以下内容：
 
 1. 选择至少 20/20 个 valid/train public negatives；
 2. 选择至少 20/30 个 valid/train direct controls；
@@ -104,13 +106,15 @@ benchmark_eligible = 0
 9. 在完整 seller/component graph 上重算 split component，并核验固定内部测试哈希；
 10. 输出 manifest、producer SHA、输入输出哈希、候选 UID 列表和 readiness check。
 
-正式冻结目录为：
+V3 正式冻结目录为：
 
 ```text
-reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
+reports/step16_v8_validation_refreeze/readiness_expansion_v3_20260715/
 ```
 
-其中 `v2` 修复了首版生成 policy 中英文/中文 v7 feature 输出不在同一原子发布目录的问题。首版未用于模型训练或结果选择；正式运行只认 `v2` 的 policy、manifest 和输出路径。
+V3 不覆盖 V2。它继续保留 V2 的原子英文/中文 feature 发布修复，同时新增 canonical split 恢复、primary eval fail-closed、动态 component-safe control 分配、补充 URL 控制双审链和逐字节 identical-replay 验证。
+
+补充 URL 审查的 V3 派生目录为 `reports/step15_v8/profile_url_control_review_v3_20260715/`。输入 reviewer lane 与输出 summary/CSV 物理分离，避免旧轮次产物因候选域变化而被覆盖。
 
 物化后的选入配额为：
 
@@ -120,28 +124,31 @@ reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
 | cross-snapshot direct control | 30 | 20 | 否，仅 evidence expert |
 | component-closure control | 10 | 15 | 否，仅 evidence expert |
 
-与原有 occurrence-state-backed 行合并后，正式 readiness 为：
+与 canonical valid/train 中原有 occurrence-state-backed 行合并后，V3 预期 readiness 为：
 
 | Split | Public-noise negative | Verified-direct positive | Component-anchor positive |
 |---|---:|---:|---:|
 | `valid` | 24 | 23 | 15 |
 | `train` | 20 | 30 | 10 |
 
-其他冻结结果：
+V3 必须在 Linux 重现并由 manifest 绑定以下边界，否则运行失败：
 
-- primary `train` 为 924 行，即英文 source `train=401` 加中文 primary `train=523`；primary `valid` 为 170 行；英文 `valid/test` 不进入 v8 训练；
+- primary `train` 为 974 行，即英文 source `train=401` 加中文 canonical `train=573`；primary `valid` 为 120 行；英文 `valid/test` 不进入 v8 训练；
 - evidence-expert-only controls 为 `train=60`、`valid=55`，由 public `20/20`、direct `30/20`、component `10/15` 组成；
 - 固定内部开发测试仍为 200 行，pair UID 哈希为 `ea9e5f46b742cb017e3122b00536e7741208adebb5d293ff31237e634d226ef5`；
 - seller 跨 split 重叠为 0；
-- Step3 profiles 为 5,197，item identity signals 为 4,530；
-- Step4 与 canonical Step7 pair universe 均为 3,964，原有 3,857 行逐字段保持不变；
-- 仅 6 条原 `uncertain + unusable_for_supervision` 行在隔离控制 overlay 中获得 public-noise negative 审查结论；没有覆盖任何原有可用 binary supervision，也没有把这些行提升为 primary benchmark；
+- 所有 371 条 `silver_train_only` 行仍在 train，primary valid/test 中该字段计数必须为 0；
+- Step3、Step4 与 canonical Step7 扩展后的精确行数由 V3 freeze manifest 重新记录，不能引用 V2 行数代替；
+- 真实冻结输入测试确认，原 context 队列只有 12 条 canonical-valid-compatible public controls；两轮 score/split-blind URL 审查的最终候选域为 10 条，其中 8 条获两位不同 reviewer 的 high-confidence 一致 negative 结论，二者合并后恰好达到固定 valid 配额 20；另有 2 条不确定或分歧候选被排除，1 个更早的 DeepMix 提案因两侧 `.onion` 域名不同而在进入最终候选域前被 source-literal contract 拒绝；
+- 没有覆盖任何原有可用 binary supervision，也没有把 evidence controls 提升为 primary benchmark；
 - public-noise negative 的证据足以支持“共享标识符处于公共/商品/支持上下文”，但不足以把不同操作者身份当作 gold truth，因此固定为 `high_confidence_silver_agent_reviewed_public_noise_control`；
 - 所有 115 条扩充行均设置 `usable_for_supervision=0`、`usable_for_core_transfer=0`、`primary_identity_model_eligible=0`、`benchmark_eligible=0`，只通过显式 v8 evidence-control 路径进入专家训练或充分性审计；
-- manifest 中 `thresholds_lowered=false`、`model_scores_read=false`；11 个正式输出、23 个直接/传递输入哈希及三个 JSON 自哈希均已复核闭合；
-- `python -m unittest tests.test_step15_v8_contextual_evidence_contracts` 为 `36/36` 通过；再次运行 materializer `--check-only` 得到相同 readiness。测试还独立约束 summary 的 train 计数只能使用英文 `train`，不能误计英文 `valid/test`，并验证 v7 局部缺失只可按照预注册的 fold-train median 插补，真实缺列或全 train 缺失必须 fail closed。
+- manifest 必须记录 `thresholds_lowered=false`、`model_scores_read=false`，并闭合 supplemental candidate/reviewer/profile 传递哈希；
+- 每条 supplemental URL control 必须在 pair 两侧物化相同的 `external_url` 风险 occurrence，并复算为 `risky_only_shared`、`support_only_shared` 或 `high_frequency_public`；只选中行数但 occurrence state 不成立时必须失败；
+- Step20 新 manifest 的 self-hash 必须覆盖 assignment CSV hash；新建 evidence controls 的 scope 必须为 `evidence_expert_control`；
+- 本地 Step15-v8 共发现 50 项契约测试，43 项静态/真实冻结输入测试通过，7 项 V3 artifact 测试因 Linux 尚未物化而明确跳过；Step15-v6/v7/v8 合并为 99 项、92 项通过、同 7 项延后。其中真实冻结输入配额测试已验证 public `valid/train=20/20`、direct `20/30`、component `15/10`，且 seller/component 隔离成立。Linux runner 在物化后设置 `STEP15_V8_READINESS_ROOT` 并重跑全部 50 项；V3 数值产物、行数和哈希尚待 Linux 生成，文档不预先宣称其已完成。
 
-Windows 仅完成数据物化、无模型契约检查和 identifier redaction 检查。模型编码、v7 feature 数值重建与 v8 方法评估仍必须在 Linux 运行。Linux runner 会在首轮生成 runtime；后续更换 `V8_RUN_ID` 时只复用通过完整哈希链验证的 runtime，任何部分存在或哈希不一致都会 fail closed。当前 Linux 一键入口为：
+Windows 仅完成源记录静态核对、审查决定落盘、Python 语法检查和不执行模型的单元契约测试；没有运行 V3 数据物化、模型编码、特征数值重建、训练或评估。上述科研流水线仍必须在 Linux 运行。Linux runner 会在首轮生成 runtime；后续更换 `V8_RUN_ID` 时只复用通过完整哈希链验证的 runtime，任何部分存在或哈希不一致都会 fail closed。当前 Linux 一键入口为：
 
 ```bash
 bash scripts/run_step15_v8_readiness_linux_20260715.sh
@@ -161,4 +168,4 @@ bash scripts/run_step15_v8_readiness_linux_20260715.sh
 
 ## 8. 当前状态
 
-候选生成、双人独立审查、第三人分歧裁决、审查对账、隔离 refreeze、Step4/canonical Step7 扩展、manifest、自哈希、固定测试集和 component-disjoint 检查均已完成。数据充分性门槛已经通过，但这只表示 Step15-v8 可以开始正式 Linux 实验，不表示方法已通过 promotion gate。只有 Linux 完成 B0–B3、contextual evidence expert 与 Step12-v8 后，才能根据预注册门槛决定是否进入 Step20；内部 200 条测试集仍不能用于模型选择。
+V2 结果已因 primary-valid silver 污染而失效；V3 源码、补充双审输入和本地契约检查已完成，但 V3 freeze 和数值结果尚未在 Linux 生成。下一步只能运行 V3 一键 runner。只有 V3 完成 B0-B3、contextual evidence expert 与 Step12-v8 后，才能根据预注册门槛决定是否进入 Step20；内部 200 条测试集仍不能用于模型选择。

@@ -51,6 +51,16 @@ def render_csv(rows: list[dict], fields: list[str]) -> bytes:
     return ("\ufeff" + buffer.getvalue()).encode("utf-8")
 
 
+def finalize_manifest(manifest: dict, assignment_csv_payload: bytes) -> dict:
+    """Bind the assignment bytes before calculating the manifest self-hash."""
+    finalized = dict(manifest)
+    finalized["assignment_csv_sha256"] = hashlib.sha256(
+        assignment_csv_payload
+    ).hexdigest()
+    finalized["manifest_sha256"] = canonical_hash(finalized)
+    return finalized
+
+
 def write_fail_closed(path: Path, payload: bytes, allow_identical_replay: bool) -> str:
     expected = hashlib.sha256(payload).hexdigest()
     if path.exists():
@@ -66,12 +76,22 @@ def write_fail_closed(path: Path, payload: bytes, allow_identical_replay: bool) 
 
 
 def eligible(row: dict) -> bool:
+    """Return whether a row may enter validation or test metrics."""
     return (
         row.get("review_label") in {"positive", "negative"}
         and row.get("usable_for_supervision") == "1"
         and row.get("usable_for_core_transfer") == "1"
         and row.get("benchmark_eligible") == "1"
         and row.get("silver_train_only", "0") != "1"
+    )
+
+
+def primary_supervision_eligible(row: dict) -> bool:
+    """Keep the complete primary train universe while isolating train-only silver."""
+    return (
+        row.get("review_label") in {"positive", "negative"}
+        and row.get("usable_for_supervision") == "1"
+        and row.get("usable_for_core_transfer") == "1"
     )
 
 
@@ -228,7 +248,7 @@ def main() -> None:
     pool_cfg = policy["pools"][cfg["source_pool"]]
     labels_path = resolve(pool_cfg["frozen_labels"])
     evidence_path = resolve(pool_cfg["evidence_labels"])
-    label_rows = [row for row in load_csv(labels_path) if eligible(row)]
+    label_rows = [row for row in load_csv(labels_path) if primary_supervision_eligible(row)]
     evidence_index = {row["pair_uid"]: row for row in load_csv(evidence_path)}
     missing = [row["pair_uid"] for row in label_rows if row["pair_uid"] not in evidence_index]
     if missing:
@@ -253,8 +273,25 @@ def main() -> None:
     train_rows = [row for row in rows if row["split_name"] == "train"]
     valid_rows = [row for row in rows if row["split_name"] == "valid"]
     test_rows = [row for row in rows if row["split_name"] == "test"]
+    invalid_eval = [row for row in valid_rows + test_rows if not eligible(row)]
+    if invalid_eval:
+        raise ValueError(
+            "Frozen validation/test contains a non-benchmark or train-only row; "
+            f"first={invalid_eval[0]['pair_uid']}"
+        )
+    train_by_component: dict[str, list[dict]] = defaultdict(list)
+    for row in train_rows:
+        train_by_component[row["v7_component_id"]].append(row)
+    movable_components = {
+        component
+        for component, component_rows in train_by_component.items()
+        if all(eligible(row) for row in component_rows)
+    }
+    movable_train_rows = [
+        row for row in train_rows if row["v7_component_id"] in movable_components
+    ]
     selected_components, diagnostics = select_components(
-        train_rows,
+        movable_train_rows,
         valid_rows,
         {key: int(value) for key, value in cfg["minimum_total_evidence_counts"].items()},
         {
@@ -365,10 +402,9 @@ def main() -> None:
         "policy_sha256": sha256(policy_path),
         "pair_uid_sha256": canonical_hash(sorted(row["pair_uid"] for row in output_rows)),
     }
-    manifest["manifest_sha256"] = canonical_hash(manifest)
     fields = list(output_rows[0])
     csv_payload = render_csv(output_rows, fields)
-    manifest["assignment_csv_sha256"] = hashlib.sha256(csv_payload).hexdigest()
+    manifest = finalize_manifest(manifest, csv_payload)
     manifest_payload = (json.dumps(manifest, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
     if args.validate_only:
         print(json.dumps({"status": "pass", "manifest": manifest}, indent=2, ensure_ascii=False))

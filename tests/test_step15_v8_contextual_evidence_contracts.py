@@ -4,6 +4,7 @@ import builtins
 import csv
 import dis
 import json
+import os
 import sys
 import tempfile
 import types
@@ -26,6 +27,8 @@ import step12_v8_statistical_robustness_audit as step12_v8  # noqa: E402
 import step16_build_v8_context_review_queues as review_queues  # noqa: E402
 import step16_build_v8_identity_control_queues as identity_control_queues  # noqa: E402
 import step16_apply_v8_context_reviews as review_apply  # noqa: E402
+import step16_materialize_v8_reviewed_readiness_freeze as readiness_freeze  # noqa: E402
+import step16_reconcile_v8_profile_url_reviews as profile_url_reviews  # noqa: E402
 import step20_build_representative_validation as representative_validation  # noqa: E402
 
 
@@ -42,17 +45,26 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
+        requested_readiness_root = os.environ.get("STEP15_V8_READINESS_ROOT", "").strip()
         cls.readiness_root = (
-            ROOT
-            / "reports"
-            / "step16_v8_validation_refreeze"
-            / "readiness_expansion_v2_20260715"
+            (Path(requested_readiness_root) if Path(requested_readiness_root).is_absolute()
+             else ROOT / requested_readiness_root).resolve()
+            if requested_readiness_root
+            else None
         )
 
     @staticmethod
     def _csv_rows(path: Path) -> list[dict]:
         with path.open("r", encoding="utf-8-sig", newline="") as handle:
             return list(csv.DictReader(handle))
+
+    def _require_materialized_readiness(self) -> Path:
+        if self.readiness_root is None:
+            self.skipTest(
+                "Set STEP15_V8_READINESS_ROOT after materialization to run artifact tests"
+            )
+        self.assertTrue(self.readiness_root.is_dir())
+        return self.readiness_root
 
     def test_preregistered_B0_B3_contract_and_forbidden_features(self) -> None:
         validation = common.validate_policy_contract(self.policy, self.v7_policy)
@@ -75,6 +87,379 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             len(common.feature_names("B1_v7_20d_e5_cosine_only", self.policy, self.v7_policy)),
             20,
         )
+
+    def test_supplemental_profile_url_controls_are_blind_independent_and_isolated(self) -> None:
+        self.assertNotEqual(
+            profile_url_reviews.DEFAULT_REVIEW_INPUT_ROOT,
+            profile_url_reviews.DEFAULT_OUTPUT_ROOT,
+        )
+        self.assertEqual(
+            profile_url_reviews.DEFAULT_OUTPUT_ROOT.name,
+            "profile_url_control_review_v3_20260715",
+        )
+        review_root = (
+            ROOT / "reports" / "step15_v8" / "profile_url_control_review_20260715"
+        )
+        spec = json.loads(
+            (
+                ROOT / "schema" / "step16_v8_profile_url_control_candidates.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertIs(spec["candidate_selection_used_model_scores"], False)
+        self.assertIs(spec["split_assignments_exposed_to_reviewers"], False)
+        self.assertEqual(
+            spec["accepted_control_scope"],
+            "evidence_expert_only_not_step5_ground_truth_or_primary_identity_model",
+        )
+        candidate_ids = {row["candidate_id"] for row in spec["candidates"]}
+        reviewer_a, decisions_a = profile_url_reviews.load_decisions(
+            review_root / "reviewer_lane_a.json",
+            candidate_ids,
+            "blind_evidence_reviewer_a",
+        )
+        reviewer_b, decisions_b = profile_url_reviews.load_decisions(
+            review_root / "reviewer_lane_b.json",
+            candidate_ids,
+            "blind_evidence_reviewer_b",
+        )
+        self.assertNotEqual(
+            reviewer_a["review_lane_id"].casefold(),
+            reviewer_b["review_lane_id"].casefold(),
+        )
+        for candidate_id in candidate_ids:
+            self.assertNotEqual(
+                decisions_a[candidate_id]["reviewer_id"].casefold(),
+                decisions_b[candidate_id]["reviewer_id"].casefold(),
+            )
+        accepted = {
+            candidate_id
+            for candidate_id in candidate_ids
+            if (
+                decisions_a[candidate_id]["identity_label"],
+                decisions_a[candidate_id]["evidence_type"],
+                decisions_a[candidate_id]["confidence"],
+            )
+            == (
+                decisions_b[candidate_id]["identity_label"],
+                decisions_b[candidate_id]["evidence_type"],
+                decisions_b[candidate_id]["confidence"],
+            )
+            == ("negative", "public_contact_or_url_noise", "high")
+        }
+        self.assertEqual(
+            accepted,
+            {
+                *(f"profile_url_public_noise_{index:03d}" for index in range(1, 6)),
+                *(f"profile_url_public_noise_{index:03d}" for index in range(9, 12)),
+            },
+        )
+
+        assignments = self._csv_rows(
+            ROOT
+            / "reports"
+            / "step15_v7"
+            / "v2_identifier_redacted_20260714"
+            / "splits"
+            / "representative_validation_assignments.csv"
+        )
+        assigned_sellers = {
+            seller
+            for row in assignments
+            for seller in (row["seller_uid_left"], row["seller_uid_right"])
+        }
+        accepted_sellers = {
+            seller
+            for row in spec["candidates"]
+            if row["candidate_id"] in accepted
+            for seller in (row["seller_uid_left"], row["seller_uid_right"])
+        }
+        self.assertFalse(accepted_sellers & assigned_sellers)
+
+        profile_path = ROOT / spec["source_profiles"]
+        self.assertTrue(profile_path.is_file())
+        profiles = {
+            row["seller_uid"]: row
+            for row in profile_url_reviews.load_jsonl(profile_path)
+        }
+        for row in spec["candidates"]:
+            literal = row["shared_url_literal"].casefold()
+            self.assertIn(literal, profiles[row["seller_uid_left"]]["profile_text"].casefold())
+            self.assertIn(literal, profiles[row["seller_uid_right"]]["profile_text"].casefold())
+
+    def test_actual_reviewed_control_pools_meet_v3_component_safe_quotas(self) -> None:
+        assignments = self._csv_rows(
+            ROOT
+            / "reports"
+            / "step15_v7"
+            / "v2_identifier_redacted_20260714"
+            / "splits"
+            / "representative_validation_assignments.csv"
+        )
+        reserved = {}
+        for row in assignments:
+            split = readiness_freeze.canonical_assignment_split(row["original_split_name"])
+            for seller in (row["seller_uid_left"], row["seller_uid_right"]):
+                prior = reserved.get(seller)
+                self.assertIn(prior, {None, split})
+                reserved[seller] = split
+
+        context_root = (
+            ROOT
+            / "reports"
+            / "step15_v8"
+            / "validation_expansion_queue_v2_20260714"
+            / "context_review"
+        )
+        context_summary, context_candidates = readiness_freeze.validate_context_summary(
+            context_root / "step16_v8_context_review_summary.json", self.policy
+        )
+        context_resolved = readiness_freeze.resolve_context_reviews(
+            context_summary,
+            context_candidates,
+            context_root / "reviewer_a_blind_packet.completed.csv",
+            context_root / "reviewer_b_blind_packet.completed.csv",
+            context_root / "reviewer_adjudicator_blind_packet.completed.csv",
+        )
+        public_candidates = [
+            {**row, "selection_uid": row["review_candidate_uid"]}
+            for row in context_resolved
+            if row["status"] == "resolved_high_confidence"
+            and row.get("identity_label") == "negative"
+            and row.get("evidence_type") == "public_contact_or_url_noise"
+        ]
+
+        review_root = (
+            ROOT / "reports" / "step15_v8" / "profile_url_control_review_20260715"
+        )
+        spec = json.loads(
+            (
+                ROOT / "schema" / "step16_v8_profile_url_control_candidates.json"
+            ).read_text(encoding="utf-8")
+        )
+        candidate_ids = {row["candidate_id"] for row in spec["candidates"]}
+        _, decisions_a = profile_url_reviews.load_decisions(
+            review_root / "reviewer_lane_a.json",
+            candidate_ids,
+            "blind_evidence_reviewer_a",
+        )
+        _, decisions_b = profile_url_reviews.load_decisions(
+            review_root / "reviewer_lane_b.json",
+            candidate_ids,
+            "blind_evidence_reviewer_b",
+        )
+        for row in spec["candidates"]:
+            uid = row["candidate_id"]
+            a = decisions_a[uid]
+            b = decisions_b[uid]
+            if (
+                a["identity_label"],
+                a["evidence_type"],
+                a["confidence"],
+            ) != (
+                b["identity_label"],
+                b["evidence_type"],
+                b["confidence"],
+            ) or (
+                a["identity_label"],
+                a["evidence_type"],
+                a["confidence"],
+            ) != ("negative", "public_contact_or_url_noise", "high"):
+                continue
+            public_candidates.append(
+                {
+                    "review_candidate_uid": uid,
+                    "selection_uid": uid,
+                    "seller_uid_left": row["seller_uid_left"],
+                    "seller_uid_right": row["seller_uid_right"],
+                }
+            )
+
+        selected_uids = set()
+        selected_public = []
+        for split in ("valid", "train"):
+            selected_public.extend(
+                readiness_freeze.select_quota_component_safe(
+                    public_candidates,
+                    "readiness_expansion_v3_20260715",
+                    f"public_noise_{split}",
+                    readiness_freeze.READINESS_REQUIREMENTS[split][
+                        "state_backed_public_noise_negative"
+                    ],
+                    split,
+                    reserved,
+                    lambda row: (row["seller_uid_left"], row["seller_uid_right"]),
+                    selected_uids,
+                )
+            )
+        self.assertEqual(Counter(row["assigned_split"] for row in selected_public), {"valid": 20, "train": 20})
+        self.assertEqual(
+            {
+                row["selection_uid"]
+                for row in selected_public
+                if row["selection_uid"].startswith("profile_url_public_noise_")
+            },
+            {
+                *(f"profile_url_public_noise_{index:03d}" for index in range(1, 6)),
+                *(f"profile_url_public_noise_{index:03d}" for index in range(9, 12)),
+            },
+        )
+        profiles = {
+            row["seller_uid"]: row
+            for row in profile_url_reviews.load_jsonl(ROOT / spec["source_profiles"])
+        }
+        signals = common.load_csv(
+            ROOT / "reports" / "step3_item_identity_signals.zh_target_strict.csv"
+        )
+        supplemental_ids = {
+            f"profile_url_public_noise_{index:03d}" for index in range(1, 6)
+        } | {
+            f"profile_url_public_noise_{index:03d}" for index in range(9, 12)
+        }
+        for row in selected_public:
+            if row["selection_uid"] not in supplemental_ids:
+                continue
+            candidate = next(
+                item
+                for item in spec["candidates"]
+                if item["candidate_id"] == row["selection_uid"]
+            )
+            for seller_uid in (row["seller_uid_left"], row["seller_uid_right"]):
+                signals.append(
+                    readiness_freeze.build_public_url_risk_signal(
+                        seller_uid,
+                        candidate["shared_url_literal"],
+                        candidate["candidate_id"],
+                        profiles[seller_uid],
+                    )
+                )
+        by_seller = {}
+        sellers_by_token = {}
+        for signal in signals:
+            seller_uid = signal.get("seller_uid", "")
+            token = (
+                signal.get("contact_type", "").strip().lower(),
+                signal.get("normalized_value", "").strip().lower(),
+            )
+            if not seller_uid or not all(token):
+                continue
+            by_seller.setdefault(seller_uid, {}).setdefault(token, []).append(signal)
+            sellers_by_token.setdefault(token, set()).add(seller_uid)
+        train_sellers = {seller for seller, split in reserved.items() if split == "train"}
+        token_df = Counter(
+            {
+                token: len(sellers & train_sellers)
+                for token, sellers in sellers_by_token.items()
+            }
+        )
+        frequency_threshold = int(
+            self.policy["occurrence_evidence_expert"][
+                "public_identifier_train_seller_frequency_threshold"
+            ]
+        )
+        for row in selected_public:
+            state = common.occurrence_evidence(
+                row, by_seller, token_df, frequency_threshold
+            )["evidence_state"]
+            self.assertIn(
+                state,
+                {"risky_only_shared", "support_only_shared", "high_frequency_public"},
+                row["selection_uid"],
+            )
+
+        identity_root = (
+            ROOT
+            / "reports"
+            / "step15_v8"
+            / "identity_control_review_20260715"
+            / "identity_control_review"
+        )
+        identity_summary, identity_master = readiness_freeze.validate_identity_summary(
+            identity_root / "identity_control_review_summary.json"
+        )
+        identity_rows = readiness_freeze.resolve_identity_reviews(
+            identity_summary,
+            identity_master,
+            identity_root / "reviewer_a_blind_packet.completed.csv",
+            identity_root / "reviewer_b_blind_packet.completed.csv",
+        )
+        selected_identity = []
+        specifications = (
+            (
+                "component",
+                "evidence_expert_component_closure_control",
+                "same_controller_component_anchor_positive",
+            ),
+            (
+                "direct",
+                "evidence_expert_direct_persistence_control",
+                "state_backed_verified_direct_positive",
+            ),
+        )
+        for short_name, kind, readiness_key in specifications:
+            rows = [row for row in identity_rows if row["candidate_kind"] == kind]
+            for split in ("valid", "train"):
+                selected_identity.extend(
+                    readiness_freeze.select_quota_component_safe(
+                        rows,
+                        "readiness_expansion_v3_20260715",
+                        f"{short_name}_{split}",
+                        readiness_freeze.READINESS_REQUIREMENTS[split][readiness_key],
+                        split,
+                        reserved,
+                        readiness_freeze.identity_control_partition_keys,
+                        selected_uids,
+                    )
+                )
+        direct = [
+            row
+            for row in selected_identity
+            if row["candidate_kind"] == "evidence_expert_direct_persistence_control"
+        ]
+        component = [
+            row
+            for row in selected_identity
+            if row["candidate_kind"] == "evidence_expert_component_closure_control"
+        ]
+        self.assertEqual(Counter(row["assigned_split"] for row in direct), {"valid": 20, "train": 30})
+        self.assertEqual(Counter(row["assigned_split"] for row in component), {"valid": 15, "train": 10})
+        self.assertFalse(
+            {row["platform_vendor_id"] for row in direct}
+            & {row["platform_vendor_id"] for row in component}
+        )
+
+    def test_supplemental_public_url_signal_is_occurrence_backed_risky_noise(self) -> None:
+        left_uid = "seller-left"
+        right_uid = "seller-right"
+        literal = "victim.example"
+        profile = {
+            "source_dataset": "market_item.xlsx",
+            "source_market_raw": "fixture-market",
+        }
+        signals = [
+            readiness_freeze.build_public_url_risk_signal(
+                seller_uid, literal, "candidate-1", profile
+            )
+            for seller_uid in (left_uid, right_uid)
+        ]
+        by_seller = {}
+        for signal in signals:
+            token = (signal["contact_type"], signal["normalized_value"])
+            by_seller.setdefault(signal["seller_uid"], {}).setdefault(token, []).append(
+                signal
+            )
+            self.assertEqual(signal["product_data_risk_context"], "1")
+            self.assertEqual(signal["direct_identity_eligible"], "0")
+            self.assertEqual(signal["seller_facing_context"], "0")
+        evidence = common.occurrence_evidence(
+            {
+                "seller_uid_left": left_uid,
+                "seller_uid_right": right_uid,
+            },
+            by_seller,
+            Counter(),
+            3,
+        )
+        self.assertEqual(evidence["evidence_state"], "risky_only_shared")
 
     def test_bridge_threshold_contract_accepts_legacy_precision_layers(self) -> None:
         raw_threshold = 0.5000004999996
@@ -333,6 +718,99 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         self.assertFalse(representative_validation.eligible(silver))
         nonbenchmark = dict(base, benchmark_eligible="0")
         self.assertFalse(representative_validation.eligible(nonbenchmark))
+        self.assertTrue(representative_validation.primary_supervision_eligible(silver))
+
+    def test_canonical_assignment_never_promotes_train_only_silver(self) -> None:
+        self.assertEqual(readiness_freeze.canonical_assignment_split("train"), "train")
+        self.assertEqual(readiness_freeze.canonical_assignment_split("valid"), "valid")
+        self.assertEqual(
+            readiness_freeze.canonical_assignment_split("test"),
+            "internal_development_test",
+        )
+
+    def test_candidate_split_compatibility_is_bound_to_canonical_sellers(self) -> None:
+        reserved = {
+            "train-seller": "train",
+            "valid-seller": "valid",
+            "test-seller": "internal_development_test",
+        }
+        self.assertEqual(
+            readiness_freeze.candidate_allowed_splits({"new-a", "new-b"}, reserved),
+            {"train", "valid"},
+        )
+        self.assertEqual(
+            readiness_freeze.candidate_allowed_splits(
+                {"train-seller", "new-a"}, reserved
+            ),
+            {"train"},
+        )
+        self.assertEqual(
+            readiness_freeze.candidate_allowed_splits(
+                {"train-seller", "valid-seller"}, reserved
+            ),
+            set(),
+        )
+        self.assertEqual(
+            readiness_freeze.candidate_allowed_splits({"test-seller"}, reserved),
+            set(),
+        )
+
+    def test_readiness_freeze_keeps_silver_train_only_out_of_evaluation(self) -> None:
+        base = {
+            "pair_uid": "silver-row",
+            "review_label": "positive",
+            "usable_for_supervision": "1",
+            "usable_for_core_transfer": "1",
+            "benchmark_eligible": "0",
+            "silver_train_only": "1",
+            "primary_identity_model_eligible": "1",
+        }
+        self.assertTrue(
+            readiness_freeze.readiness_row_eligible(dict(base, split_name="train"))
+        )
+        self.assertFalse(
+            readiness_freeze.readiness_row_eligible(dict(base, split_name="valid"))
+        )
+        self.assertFalse(
+            readiness_freeze.readiness_row_eligible(dict(base, split_name="test"))
+        )
+
+    def test_control_selection_reassigns_unseen_rows_without_crossing_splits(self) -> None:
+        rows = [
+            {"selection_uid": "train", "left": "train-seller", "right": "new-1"},
+            {"selection_uid": "valid", "left": "valid-seller", "right": "new-2"},
+            {"selection_uid": "unseen", "left": "new-3", "right": "new-4"},
+            {"selection_uid": "test", "left": "test-seller", "right": "new-5"},
+        ]
+        reserved = {
+            "train-seller": "train",
+            "valid-seller": "valid",
+            "test-seller": "internal_development_test",
+        }
+        selected_uids: set[str] = set()
+        selected_valid = readiness_freeze.select_quota_component_safe(
+            rows,
+            "fixture",
+            "valid",
+            2,
+            "valid",
+            reserved,
+            lambda row: (row["left"], row["right"]),
+            selected_uids,
+        )
+        self.assertEqual({row["assigned_split"] for row in selected_valid}, {"valid"})
+        self.assertNotIn("test", selected_uids)
+        selected_train = readiness_freeze.select_quota_component_safe(
+            rows,
+            "fixture",
+            "train",
+            1,
+            "train",
+            reserved,
+            lambda row: (row["left"], row["right"]),
+            selected_uids,
+        )
+        self.assertEqual(selected_train[0]["selection_uid"], "train")
 
     def test_v7_e5_corpus_hash_is_nested_under_redaction_diagnostics(self) -> None:
         metadata = json.loads(
@@ -531,6 +1009,17 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         self.assertEqual(expected, common.canonical_hash(manifest))
         self.assertEqual(len(assignment_hash), 64)
 
+    def test_new_step20_manifest_self_hash_covers_assignment_hash(self) -> None:
+        finalized = representative_validation.finalize_manifest(
+            {"step": "fixture", "row_counts": {"valid": 2}}, b"pair_uid\nfixture\n"
+        )
+        expected = finalized["manifest_sha256"]
+        unsigned = dict(finalized)
+        unsigned.pop("manifest_sha256")
+        self.assertEqual(expected, representative_validation.canonical_hash(unsigned))
+        unsigned["assignment_csv_sha256"] = "0" * 64
+        self.assertNotEqual(expected, representative_validation.canonical_hash(unsigned))
+
     def test_step20_lock_is_bound_to_exact_v8_freeze(self) -> None:
         lock = {
             "step15_v8_run_id": "run-a",
@@ -673,6 +1162,16 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 "evidence_type": "same_controller_component_anchor",
             },
         ]
+        for row in rows:
+            row.update(
+                {
+                    "usable_for_supervision": "1",
+                    "usable_for_core_transfer": "1",
+                    "benchmark_eligible": "1",
+                    "silver_train_only": "0",
+                    "primary_identity_model_eligible": "1",
+                }
+            )
         states = [
             "no_shared_identifier",
             "risky_only_shared",
@@ -764,6 +1263,10 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 "pair_uid": uid,
                 "v7_split_name": split,
                 "review_label": label,
+                "usable_for_supervision": "1",
+                "usable_for_core_transfer": "1",
+                "benchmark_eligible": "1",
+                "silver_train_only": "0",
                 "primary_identity_model_eligible": "0" if control else "1",
                 "evidence_expert_eligible": "1",
             }
@@ -796,9 +1299,41 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             ["expert-valid"],
         )
 
+    def test_primary_split_rejects_train_only_silver_in_validation(self) -> None:
+        def row(uid: str, split: str, label: str) -> dict:
+            return {
+                "pair_uid": uid,
+                "v7_split_name": split,
+                "review_label": label,
+                "usable_for_supervision": "1",
+                "usable_for_core_transfer": "1",
+                "benchmark_eligible": "1",
+                "silver_train_only": "0",
+                "primary_identity_model_eligible": "1",
+            }
+
+        rows_by_pool = {
+            "en_content_train_pool": [
+                row("en-pos", "train", "positive"),
+                row("en-neg", "train", "negative"),
+            ],
+            "zh_target_strict": [
+                row("zh-train-pos", "train", "positive"),
+                row("zh-train-neg", "train", "negative"),
+                row("zh-valid-pos", "valid", "positive"),
+                row("zh-valid-neg", "valid", "negative"),
+                row("zh-test-pos", "internal_development_test", "positive"),
+                row("zh-test-neg", "internal_development_test", "negative"),
+            ],
+        }
+        contaminated = rows_by_pool["zh_target_strict"][2]
+        contaminated["benchmark_eligible"] = "0"
+        contaminated["silver_train_only"] = "1"
+        with self.assertRaisesRegex(ValueError, "train-only"):
+            common.split_rows(rows_by_pool)
+
     def test_materialized_readiness_freeze_hash_chain_is_closed(self) -> None:
-        root = self.readiness_root
-        self.assertTrue(root.is_dir())
+        root = self._require_materialized_readiness()
         specifications = [
             ("step16_v8_readiness_freeze_manifest.json", "manifest_sha256"),
             ("representative_validation_manifest.v8_readiness.json", "manifest_sha256"),
@@ -822,8 +1357,9 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             )
 
     def test_generated_readiness_policy_has_atomic_linux_output_layout(self) -> None:
+        root = self._require_materialized_readiness()
         policy = json.loads(
-            (self.readiness_root / "step15_v7_readiness_policy.json").read_text(
+            (root / "step15_v7_readiness_policy.json").read_text(
                 encoding="utf-8"
             )
         )
@@ -845,26 +1381,36 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             )
         )
         v8_policy = json.loads(
-            (self.readiness_root / "step15_v8_readiness_policy.json").read_text(
+            (root / "step15_v8_readiness_policy.json").read_text(
                 encoding="utf-8"
             )
         )
-        self.assertEqual(v8_policy["default_run_id"], "bridge_v8_readiness_20260715")
+        freeze_manifest = json.loads(
+            (root / "step16_v8_readiness_freeze_manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            v8_policy["default_run_id"],
+            "bridge_v8_readiness_"
+            + freeze_manifest["run_id"].removeprefix("readiness_expansion_"),
+        )
         self.assertEqual(
             common.resolve(v8_policy["validation_context_refreeze"]["freeze_manifest"]),
-            self.readiness_root / "step16_v8_readiness_freeze_manifest.json",
+            root / "step16_v8_readiness_freeze_manifest.json",
         )
 
     def test_materialized_readiness_freeze_preserves_upstream_pair_rows(self) -> None:
+        root = self._require_materialized_readiness()
         comparisons = [
             (
                 ROOT / "reports" / "step4_zh_target_strict_silver_candidate_pairs.csv",
-                self.readiness_root
+                root
                 / "step4_zh_target_strict_candidates.v8_readiness.csv",
             ),
             (
                 ROOT / "reports" / "step7_pair_features.zh_target_strict.csv",
-                self.readiness_root
+                root
                 / "step7_pair_features.zh_target_strict.canonical.v8_readiness.csv",
             ),
         ]
@@ -881,6 +1427,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 )
 
     def test_materialized_readiness_refreeze_only_supersedes_non_supervision(self) -> None:
+        root = self._require_materialized_readiness()
         original = {
             row["pair_uid"]: row
             for row in self._csv_rows(
@@ -890,7 +1437,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         frozen = {
             row["pair_uid"]: row
             for row in self._csv_rows(
-                self.readiness_root / "step5_zh_target_strict_labels.v8_readiness.csv"
+                root / "step5_zh_target_strict_labels.v8_readiness.csv"
             )
         }
         allowed_component_fields = {"split_component_id", "split_component_size"}
@@ -910,7 +1457,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         self.assertEqual(len(superseded), 6)
 
     def test_materialized_readiness_isolated_controls_and_fixed_test(self) -> None:
-        root = self.readiness_root
+        root = self._require_materialized_readiness()
         labels = self._csv_rows(root / "step5_zh_target_strict_labels.v8_readiness.csv")
         assignments = self._csv_rows(
             root / "representative_validation_assignments.v8_readiness.csv"
@@ -945,6 +1492,9 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 and row.get("split_name") in {"train", "valid"}
                 for row in controls
             )
+        )
+        self.assertTrue(
+            all(row.get("candidate_scope") == "evidence_expert_control" for row in controls)
         )
         public_controls = [
             row for row in controls if row["identity_control_role"] == "public_noise_control"
@@ -987,7 +1537,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         )
 
     def test_readiness_manifest_train_count_uses_only_english_train_split(self) -> None:
-        root = self.readiness_root
+        root = self._require_materialized_readiness()
         manifest = json.loads(
             (root / "representative_validation_manifest.v8_readiness.json").read_text(
                 encoding="utf-8"
@@ -1028,17 +1578,26 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         )
         expected = en_train_count + zh_primary_train_count
         self.assertEqual(en_train_count, 401)
-        self.assertEqual(zh_primary_train_count, 523)
+        canonical_zh_train_count = sum(
+            row.get("split_name") == "train"
+            and row.get("review_label") in {"positive", "negative"}
+            and row.get("usable_for_supervision") == "1"
+            and row.get("usable_for_core_transfer") == "1"
+            for row in self._csv_rows(
+                ROOT / "reports" / "step5_zh_target_strict_frozen_silver_labels.csv"
+            )
+        )
+        self.assertEqual(canonical_zh_train_count, 573)
+        self.assertEqual(zh_primary_train_count, canonical_zh_train_count)
         self.assertEqual(manifest["row_counts"]["train"], expected)
-        self.assertEqual(expected, 924)
+        self.assertEqual(expected, 974)
         self.assertLess(expected, len(eligible_en) + zh_primary_train_count)
 
     def test_materialized_identity_controls_have_occurrence_level_backing(self) -> None:
-        root = self.readiness_root
+        root = self._require_materialized_readiness()
         labels = self._csv_rows(root / "step5_zh_target_strict_labels.v8_readiness.csv")
-        signals = self._csv_rows(
-            root / "step3_item_identity_signals.zh_target_strict.v8_readiness.csv"
-        )
+        signals_path = root / "step3_item_identity_signals.zh_target_strict.v8_readiness.csv"
+        signals = self._csv_rows(signals_path)
         platform_signals: dict[str, set[str]] = {}
         for row in signals:
             if row.get("contact_type") != "platform_vendor_id":
@@ -1063,6 +1622,38 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             else:
                 self.assertEqual(row["identity_control_role"], "public_noise_control")
                 self.assertEqual(row["review_label"], "negative")
+
+        assignments = self._csv_rows(
+            root / "representative_validation_assignments.v8_readiness.csv"
+        )
+        train_sellers = {
+            seller
+            for row in assignments
+            if row["v7_split_name"] == "train"
+            for seller in (row["seller_uid_left"], row["seller_uid_right"])
+        }
+        occurrence_index, token_df = common.item_signal_index(
+            signals_path, train_sellers
+        )
+        generated_policy = json.loads(
+            (root / "step15_v8_readiness_policy.json").read_text(encoding="utf-8")
+        )
+        frequency_threshold = int(
+            generated_policy["occurrence_evidence_expert"][
+                "public_identifier_train_seller_frequency_threshold"
+            ]
+        )
+        for row in controls:
+            if row["identity_control_role"] != "public_noise_control":
+                continue
+            evidence = common.occurrence_evidence(
+                row, occurrence_index, token_df, frequency_threshold
+            )
+            self.assertIn(
+                evidence["evidence_state"],
+                {"risky_only_shared", "support_only_shared", "high_frequency_public"},
+                row["pair_uid"],
+            )
 
 
 if __name__ == "__main__":

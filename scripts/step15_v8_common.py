@@ -312,6 +312,18 @@ def load_joined_rows(policy: dict, v7_policy: dict, root: Path) -> dict[str, lis
     return joined
 
 
+def primary_benchmark_evaluation_eligible(row: dict) -> bool:
+    """Return whether a row may contribute to primary validation/test metrics."""
+    return (
+        row.get("review_label") in {"positive", "negative"}
+        and row.get("usable_for_supervision") == "1"
+        and row.get("usable_for_core_transfer") == "1"
+        and str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+        and str(row.get("benchmark_eligible", "")).strip() == "1"
+        and str(row.get("silver_train_only", "0")).strip() != "1"
+    )
+
+
 def split_rows(rows_by_pool: dict[str, list[dict]]) -> dict[str, list[dict]]:
     en = rows_by_pool["en_content_train_pool"]
     zh = rows_by_pool["zh_target_strict"]
@@ -325,6 +337,21 @@ def split_rows(rows_by_pool: dict[str, list[dict]]) -> dict[str, list[dict]]:
         for row in zh
         if str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
     ]
+    invalid_primary_eval = [
+        row
+        for row in primary_zh
+        if row.get("v7_split_name") in {"valid", "internal_development_test"}
+        and not primary_benchmark_evaluation_eligible(row)
+    ]
+    if invalid_primary_eval:
+        first = invalid_primary_eval[0]
+        raise ValueError(
+            "Step15-v8 primary evaluation contains a non-benchmark or train-only "
+            "row; regenerate the representative assignment before training: "
+            f"split={first.get('v7_split_name')} pair_uid={first.get('pair_uid')} "
+            f"benchmark_eligible={first.get('benchmark_eligible')} "
+            f"silver_train_only={first.get('silver_train_only')}"
+        )
     expert_controls = [
         row
         for row in zh
@@ -1069,12 +1096,7 @@ def validation_slice_masks(rows: list[dict], evidence_states: list[str]) -> dict
     public_states = {"risky_only_shared", "support_only_shared", "high_frequency_public"}
     benchmark_ok = []
     for row in rows:
-        primary_benchmark = (
-            row.get("benchmark_eligible", "1") == "1"
-            and row.get("silver_train_only", "0") != "1"
-            and str(row.get("primary_identity_model_eligible", "1")).strip()
-            != "0"
-        )
+        primary_benchmark = primary_benchmark_evaluation_eligible(row)
         evidence_control = (
             str(row.get("evidence_expert_validation_eligible", "0")).strip()
             == "1"

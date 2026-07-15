@@ -39,6 +39,13 @@ DEFAULT_IDENTITY_SUMMARY = (
     / "identity_control_review"
     / "identity_control_review_summary.json"
 )
+DEFAULT_SUPPLEMENTAL_PUBLIC_SUMMARY = (
+    ROOT
+    / "reports"
+    / "step15_v8"
+    / "profile_url_control_review_v3_20260715"
+    / "profile_url_review_summary.json"
+)
 
 READINESS_REQUIREMENTS = {
     "valid": {
@@ -70,11 +77,59 @@ def readiness_row_eligible(row: dict) -> bool:
         and row.get("usable_for_core_transfer") == "1"
         and str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
     )
+    if primary:
+        split = str(row.get("split_name", "")).strip()
+        if split == "train":
+            return True
+        if split in {"valid", "test", "internal_development_test"}:
+            return common.primary_benchmark_evaluation_eligible(row)
+        raise ValueError(
+            f"Unsupported canonical primary split for {row.get('pair_uid')}: {split}"
+        )
     evidence_control = (
         str(row.get("primary_identity_model_eligible", "1")).strip() == "0"
         and str(row.get("evidence_expert_eligible", "0")).strip() == "1"
     )
-    return primary or evidence_control
+    return evidence_control
+
+
+def canonical_assignment_split(split_name: str) -> str:
+    split = str(split_name).strip()
+    mapping = {
+        "train": "train",
+        "valid": "valid",
+        "test": "internal_development_test",
+        "internal_development_test": "internal_development_test",
+    }
+    if split not in mapping:
+        raise ValueError(f"Unsupported canonical split name: {split}")
+    return mapping[split]
+
+
+def candidate_allowed_splits(
+    sellers: set[str], reserved_split: dict[str, str]
+) -> set[str]:
+    observed = {reserved_split[seller] for seller in sellers if seller in reserved_split}
+    if "internal_development_test" in observed or len(observed) > 1:
+        return set()
+    if observed:
+        return observed
+    return {"train", "valid"}
+
+
+def identity_control_partition_keys(row: dict) -> tuple[str, ...]:
+    vendor_id = str(row.get("platform_vendor_id", "")).strip()
+    if not vendor_id:
+        raise ValueError(
+            f"Identity control lacks platform_vendor_id: {row.get('candidate_uid')}"
+        )
+    return (
+        row["seller_uid_left"],
+        row["seller_uid_right"],
+        row["strict_profile_seller_uid"],
+        row["aux_profile_seller_uid"],
+        f"platform_vendor_id:{vendor_id}",
+    )
 
 
 def resolve(value: str | Path) -> Path:
@@ -147,8 +202,10 @@ def select_quota_component_safe(
     run_id: str,
     slice_name: str,
     count: int,
+    target_split: str,
     reserved_split: dict[str, str],
     seller_keys,
+    selected_uids: set[str],
 ) -> list[dict]:
     ordered = sorted(
         rows,
@@ -159,16 +216,18 @@ def select_quota_component_safe(
     )
     selected = []
     for row in ordered:
-        split = row["assigned_split"]
-        sellers = {seller for seller in seller_keys(row) if seller}
-        if any(
-            seller in reserved_split and reserved_split[seller] != split
-            for seller in sellers
-        ):
+        selection_uid = row["selection_uid"]
+        if selection_uid in selected_uids:
             continue
-        selected.append(row)
+        sellers = {seller for seller in seller_keys(row) if seller}
+        if target_split not in candidate_allowed_splits(sellers, reserved_split):
+            continue
+        selected_row = dict(row)
+        selected_row["assigned_split"] = target_split
+        selected.append(selected_row)
+        selected_uids.add(selection_uid)
         for seller in sellers:
-            reserved_split[seller] = split
+            reserved_split[seller] = target_split
         if len(selected) == count:
             break
     if len(selected) < count:
@@ -310,6 +369,70 @@ def validate_identity_summary(summary_path: Path) -> tuple[dict, list[dict]]:
     if sha256(master_path) != master_record["sha256"]:
         raise ValueError("Identity-control candidate master changed")
     return summary, common.load_csv(master_path)
+
+
+def validate_supplemental_public_summary(
+    summary_path: Path,
+) -> tuple[dict, list[dict], list[Path]]:
+    summary = common.load_json(summary_path)
+    expected = summary.get("summary_sha256")
+    unsigned = dict(summary)
+    unsigned.pop("summary_sha256", None)
+    if expected != canonical_hash(unsigned):
+        raise ValueError("Supplemental profile-URL review summary self-hash is invalid")
+    if summary.get("model_scores_read") is not False:
+        raise ValueError("Supplemental profile-URL controls were not score blind")
+    if summary.get("split_assignments_read") is not False:
+        raise ValueError("Supplemental profile-URL controls were not split blind")
+    producer = resolve(summary["producer"])
+    if sha256(producer) != summary["producer_sha256"]:
+        raise ValueError("Supplemental profile-URL review producer changed")
+    transitive_inputs = []
+    for input_path, expected_hash in summary.get("inputs", {}).items():
+        path = resolve(input_path)
+        if sha256(path) != expected_hash:
+            raise ValueError(f"Supplemental profile-URL review input changed: {path}")
+        transitive_inputs.append(path)
+    evidence_record = summary["outputs"]["candidate_evidence"]
+    evidence_path = resolve(evidence_record["path"])
+    if sha256(evidence_path) != evidence_record["sha256"]:
+        raise ValueError("Supplemental profile-URL candidate evidence changed")
+    record = summary["outputs"]["resolved_controls"]
+    resolved_path = resolve(record["path"])
+    if sha256(resolved_path) != record["sha256"]:
+        raise ValueError("Supplemental profile-URL resolved controls changed")
+    rows = common.load_csv(resolved_path)
+    if len(rows) != int(summary.get("accepted_count", -1)):
+        raise ValueError("Supplemental profile-URL accepted count is inconsistent")
+    normalized = []
+    seen = set()
+    for row in rows:
+        uid = row.get("review_candidate_uid", "")
+        if not uid or uid in seen:
+            raise ValueError(f"Duplicate supplemental profile-URL control: {uid}")
+        seen.add(uid)
+        if (
+            row.get("status") != "resolved_high_confidence"
+            or row.get("identity_label") != "negative"
+            or row.get("evidence_type") != "public_contact_or_url_noise"
+            or row.get("review_confidence") != "high"
+        ):
+            raise ValueError(f"Invalid supplemental profile-URL control: {uid}")
+        reviewer_ids = [
+            value.strip() for value in row.get("reviewer_ids", "").split("+") if value.strip()
+        ]
+        if len(reviewer_ids) != 2 or reviewer_ids[0].casefold() == reviewer_ids[1].casefold():
+            raise ValueError(f"Supplemental control lacks two independent reviewers: {uid}")
+        normalized.append(
+            {
+                **row,
+                "reviewer_ids": reviewer_ids,
+                "review_notes": row.get("review_reason", ""),
+                "selection_uid": uid,
+                "supplemental_profile_url_control": "1",
+            }
+        )
+    return summary, normalized, [producer, *transitive_inputs, evidence_path, resolved_path]
 
 
 def resolve_identity_reviews(
@@ -499,6 +622,46 @@ def build_platform_signal(
     }
 
 
+def build_public_url_risk_signal(
+    seller_uid: str,
+    shared_url_literal: str,
+    candidate_uid: str,
+    profile: dict,
+) -> dict:
+    normalized = str(shared_url_literal).strip().casefold()
+    if not normalized:
+        raise ValueError(f"Supplemental public-URL control lacks a URL: {candidate_uid}")
+    signal_uid = canonical_hash(
+        ["step16_v8_reviewed_public_url_risk", candidate_uid, seller_uid, normalized]
+    )
+    return {
+        "signal_uid": signal_uid,
+        "data_bucket": "zh_target_strict_identity_control",
+        "source_dataset": str(profile.get("source_dataset", "")).strip(),
+        "source_row_number": "",
+        "seller_uid": seller_uid,
+        "source_market_raw": str(profile.get("source_market_raw", "")).strip(),
+        "source_seller_raw": "",
+        "source_seller_id_raw": "",
+        "alias_normalized": "",
+        "source_field": "reviewed_public_or_victim_data_url",
+        "contact_type": "external_url",
+        "normalized_value": normalized,
+        "raw_value": normalized,
+        "evidence_level": "reviewed_public_or_victim_data_url",
+        "seller_facing_context": "0",
+        "product_data_risk_context": "1",
+        "direct_identity_eligible": "0",
+        "support_only": "0",
+        "context": (
+            "Independently reviewed public, product-data, or victim-source URL; "
+            f"candidate={candidate_uid}"
+        ),
+        "title_snippet": "",
+        "description_snippet": "",
+    }
+
+
 def lexical_cosine(left: step4.SellerProfile, right: step4.SellerProfile) -> float:
     if not left.retrieval_norm or not right.retrieval_norm:
         return 0.0
@@ -594,9 +757,7 @@ def make_step4_candidate(
         "pair_uid": pair_uid(left.seller_uid, right.seller_uid),
         "candidate_language": "zh",
         "data_bucket": "zh_target_strict",
-        "candidate_scope": (
-            "sockpuppet_primary" if role == "public_noise" else "evidence_expert_control"
-        ),
+        "candidate_scope": "evidence_expert_control",
         "seller_uid_left": left.seller_uid,
         "seller_uid_right": right.seller_uid,
         "source_market_raw_left": left.source_market_raw,
@@ -798,6 +959,10 @@ def main() -> None:
     parser.add_argument("--identity-summary", default=str(DEFAULT_IDENTITY_SUMMARY))
     parser.add_argument("--identity-reviewer-a", default=None)
     parser.add_argument("--identity-reviewer-b", default=None)
+    parser.add_argument(
+        "--supplemental-public-summary",
+        default=str(DEFAULT_SUPPLEMENTAL_PUBLIC_SUMMARY),
+    )
     parser.add_argument("--run-id", default="readiness_expansion_20260715")
     parser.add_argument(
         "--output-root",
@@ -816,12 +981,13 @@ def main() -> None:
     pre_assignment_rows = common.load_csv(pre_assignment_path)
     reserved_split: dict[str, str] = {}
     for row in pre_assignment_rows:
-        split = row["v7_split_name"]
+        split = canonical_assignment_split(row["original_split_name"])
         for seller in (row["seller_uid_left"], row["seller_uid_right"]):
             prior = reserved_split.get(seller)
             if prior is not None and prior != split:
                 raise ValueError(
-                    f"Frozen assignment already places one seller across splits: {seller}"
+                    "Canonical Step5 splits already place one seller across splits: "
+                    f"{seller}"
                 )
             reserved_split[seller] = split
     context_summary_path = resolve(args.context_summary)
@@ -848,6 +1014,7 @@ def main() -> None:
         args.identity_reviewer_b
         or identity_root / "reviewer_b_blind_packet.completed.csv"
     )
+    supplemental_public_summary_path = resolve(args.supplemental_public_summary)
 
     context_summary, context_candidates = validate_context_summary(
         context_summary_path, policy
@@ -859,27 +1026,37 @@ def main() -> None:
         context_reviewer_b,
         context_adjudication,
     )
-    allowed_public_splits = {
-        "valid": {"valid_only", "valid_candidate"},
-        "train": {"train_only", "train_candidate"},
+    public_candidates = [
+        {**row, "selection_uid": row["review_candidate_uid"]}
+        for row in context_resolved
+        if row["status"] == "resolved_high_confidence"
+        and row.get("identity_label") == "negative"
+        and row.get("evidence_type") == "public_contact_or_url_noise"
+    ]
+    (
+        supplemental_public_summary,
+        supplemental_public_candidates,
+        supplemental_public_transitive_input_paths,
+    ) = validate_supplemental_public_summary(supplemental_public_summary_path)
+    duplicate_public_uids = {
+        row["selection_uid"] for row in public_candidates
+    } & {row["selection_uid"] for row in supplemental_public_candidates}
+    if duplicate_public_uids:
+        raise ValueError(
+            "Supplemental profile-URL controls duplicate the existing context review: "
+            f"{sorted(duplicate_public_uids)[0]}"
+        )
+    public_candidates.extend(supplemental_public_candidates)
+    public_available = {
+        split: sum(
+            split
+            in candidate_allowed_splits(
+                {row["seller_uid_left"], row["seller_uid_right"]}, reserved_split
+            )
+            for row in public_candidates
+        )
+        for split in ("valid", "train")
     }
-    public_candidate_pools = {}
-    public_available = {}
-    for split, eligibility in allowed_public_splits.items():
-        rows = [
-            {
-                **row,
-                "assigned_split": split,
-                "selection_uid": row["review_candidate_uid"],
-            }
-            for row in context_resolved
-            if row["status"] == "resolved_high_confidence"
-            and row.get("identity_label") == "negative"
-            and row.get("evidence_type") == "public_contact_or_url_noise"
-            and row["split_eligibility"] in eligibility
-        ]
-        public_available[split] = len(rows)
-        public_candidate_pools[split] = rows
 
     identity_summary, identity_master = validate_identity_summary(
         identity_summary_path
@@ -890,7 +1067,6 @@ def main() -> None:
         identity_reviewer_a,
         identity_reviewer_b,
     )
-    identity_available = {}
     identity_specs = {
         "component": (
             "evidence_expert_component_closure_control",
@@ -903,48 +1079,52 @@ def main() -> None:
     }
     identity_candidate_pools = {}
     for short_name, (kind, readiness_key) in identity_specs.items():
+        identity_candidate_pools[short_name] = (
+            [row for row in identity_resolved if row["candidate_kind"] == kind],
+            readiness_key,
+        )
+    identity_available = {}
+    for short_name, (rows, _) in identity_candidate_pools.items():
         for split in ("valid", "train"):
-            rows = [
-                row
-                for row in identity_resolved
-                if row["candidate_kind"] == kind and row["assigned_split"] == split
-            ]
-            identity_available[f"{short_name}:{split}"] = len(rows)
-            identity_candidate_pools[(short_name, split)] = (
-                rows,
-                readiness_key,
+            identity_available[f"{short_name}:{split}"] = sum(
+                split
+                in candidate_allowed_splits(
+                    set(identity_control_partition_keys(row)),
+                    reserved_split,
+                )
+                for row in rows
             )
+    selected_uids: set[str] = set()
     selected_public = []
     for split in ("valid", "train"):
         selected_public.extend(
             select_quota_component_safe(
-                public_candidate_pools[split],
+                public_candidates,
                 args.run_id,
                 f"public_noise_{split}",
                 READINESS_REQUIREMENTS[split][
                     "state_backed_public_noise_negative"
                 ],
+                split,
                 reserved_split,
                 lambda item: (item["seller_uid_left"], item["seller_uid_right"]),
+                selected_uids,
             )
         )
     selected_identity = []
     for short_name in ("component", "direct"):
+        rows, readiness_key = identity_candidate_pools[short_name]
         for split in ("valid", "train"):
-            rows, readiness_key = identity_candidate_pools[(short_name, split)]
             selected_identity.extend(
                 select_quota_component_safe(
                     rows,
                     args.run_id,
                     f"{short_name}_{split}",
                     READINESS_REQUIREMENTS[split][readiness_key],
+                    split,
                     reserved_split,
-                    lambda item: (
-                        item["seller_uid_left"],
-                        item["seller_uid_right"],
-                        item["strict_profile_seller_uid"],
-                        item["aux_profile_seller_uid"],
-                    ),
+                    identity_control_partition_keys,
+                    selected_uids,
                 )
             )
     selected_direct = [
@@ -1069,6 +1249,29 @@ def main() -> None:
                     market,
                 )
             )
+    supplemental_public_signal_count = 0
+    for row in selected_public:
+        if row.get("supplemental_profile_url_control") != "1":
+            continue
+        for seller_uid in (row["seller_uid_left"], row["seller_uid_right"]):
+            if seller_uid not in profile_index_raw:
+                raise ValueError(
+                    f"Supplemental public-URL seller lacks a profile: {seller_uid}"
+                )
+            augmented_signals.append(
+                build_public_url_risk_signal(
+                    seller_uid,
+                    row["shared_identifier_values"],
+                    row["review_candidate_uid"],
+                    profile_index_raw[seller_uid],
+                )
+            )
+            supplemental_public_signal_count += 1
+    expected_supplemental_public_signal_count = 2 * sum(
+        row.get("supplemental_profile_url_control") == "1" for row in selected_public
+    )
+    if supplemental_public_signal_count != expected_supplemental_public_signal_count:
+        raise AssertionError("Supplemental public-URL signals were not materialized twice")
     signal_uids = [row["signal_uid"] for row in augmented_signals]
     if len(signal_uids) != len(set(signal_uids)):
         raise ValueError("Augmented item signals contain duplicate signal_uid")
@@ -1239,6 +1442,23 @@ def main() -> None:
         labels_index[record["pair_uid"]] = label
         evidence_index[record["pair_uid"]] = evidence
 
+    invalid_primary_eval = [
+        row
+        for row in labels_index.values()
+        if row.get("review_label") in {"positive", "negative"}
+        and row.get("usable_for_supervision") == "1"
+        and row.get("usable_for_core_transfer") == "1"
+        and str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+        and str(row.get("split_name", "")).strip()
+        in {"valid", "test", "internal_development_test"}
+        and not common.primary_benchmark_evaluation_eligible(row)
+    ]
+    if invalid_primary_eval:
+        first = invalid_primary_eval[0]
+        raise ValueError(
+            "Canonical primary evaluation contains a non-benchmark or train-only row: "
+            f"{first['pair_uid']}"
+        )
     eligible_labels = [row for row in labels_index.values() if readiness_row_eligible(row)]
     old_assignments = {row["pair_uid"]: row for row in assignments_original}
     new_split_by_uid = {
@@ -1271,10 +1491,24 @@ def main() -> None:
     split_reason_by_uid = {}
     for row in eligible_labels:
         uid = row["pair_uid"]
-        if uid in old_assignments:
-            desired_split_by_uid[uid] = old_assignments[uid]["v7_split_name"]
-            split_reason_by_uid[uid] = "retained_frozen_v7_assignment"
+        primary = str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+        if primary:
+            if uid not in old_assignments:
+                raise ValueError(f"Primary row lacks the frozen source assignment: {uid}")
+            source_assignment = old_assignments[uid]
+            if str(source_assignment.get("original_split_name", "")).strip() != str(
+                row.get("split_name", "")
+            ).strip():
+                raise ValueError(
+                    "Canonical Step5 split and source assignment disagree for "
+                    f"{uid}: label={row.get('split_name')} "
+                    f"assignment={source_assignment.get('original_split_name')}"
+                )
+            desired_split_by_uid[uid] = canonical_assignment_split(row["split_name"])
+            split_reason_by_uid[uid] = "restored_canonical_step5_split"
         else:
+            if uid not in new_split_by_uid:
+                raise ValueError(f"Evidence-expert control lacks a new split assignment: {uid}")
             desired_split_by_uid[uid] = new_split_by_uid[uid]
             split_reason_by_uid[uid] = "step16_v8_score_blind_reviewed_expansion"
     splits_by_component: dict[str, set[str]] = defaultdict(set)
@@ -1370,6 +1604,31 @@ def main() -> None:
             "public_identifier_train_seller_frequency_threshold"
         ]
     )
+    public_states = {
+        "risky_only_shared",
+        "support_only_shared",
+        "high_frequency_public",
+    }
+    for record in selected_records:
+        if record["role"] != "public_noise":
+            continue
+        uid = record["pair_uid"]
+        label = labels_index[uid]
+        state = common.occurrence_evidence(
+            {
+                **label,
+                "evidence_type": evidence_index[uid]["evidence_type"],
+                "domain": "zh",
+            },
+            occurrence_by_seller,
+            token_df,
+            frequency_threshold,
+        )["evidence_state"]
+        if state not in public_states:
+            raise ValueError(
+                "Selected public-noise control lacks occurrence-level risky/public "
+                f"backing: pair_uid={uid} state={state}"
+            )
     readiness = {}
     readiness_states = {}
     for split in ("valid", "train"):
@@ -1650,8 +1909,10 @@ def main() -> None:
                     assignment_path,
                     context_summary_path,
                     identity_summary_path,
+                    supplemental_public_summary_path,
                     *schema_input_paths,
                     *identity_transitive_input_paths,
+                    *supplemental_public_transitive_input_paths,
                 ]
             )
         },
@@ -1691,6 +1952,15 @@ def main() -> None:
         "available_reviewed_counts": {
             "public": public_available,
             "identity": identity_available,
+            "supplemental_profile_url_public": len(supplemental_public_candidates),
+        },
+        "supplemental_profile_url_materialization": {
+            "selected_control_count": sum(
+                row.get("supplemental_profile_url_control") == "1"
+                for row in selected_public
+            ),
+            "two_sided_risk_signal_count": supplemental_public_signal_count,
+            "required_occurrence_states": sorted(public_states),
         },
         "selected_records": selected_records,
         "identity_control_scope": "evidence_expert_only_not_primary_alias_benchmark",
@@ -1732,6 +2002,7 @@ def main() -> None:
                 identity_summary_path,
                 identity_reviewer_a,
                 identity_reviewer_b,
+                supplemental_public_summary_path,
                 label_path,
                 evidence_path,
                 profile_path,
@@ -1743,6 +2014,7 @@ def main() -> None:
                 cohort_manifest_path,
                 *schema_input_paths,
                 *identity_transitive_input_paths,
+                *supplemental_public_transitive_input_paths,
                 ]
             )
         },
@@ -1778,6 +2050,22 @@ def main() -> None:
         "model_scores_read": False,
     }
     if args.check_only:
+        if output_root.exists():
+            mismatches = []
+            for key, payload in payloads.items():
+                existing = output_root / output_names[key]
+                if not existing.is_file():
+                    mismatches.append(f"missing:{existing}")
+                elif existing.read_bytes() != payload:
+                    mismatches.append(f"content:{existing}")
+            if mismatches:
+                raise ValueError(
+                    "Existing Step16-v8 readiness freeze is not an identical replay: "
+                    + " | ".join(mismatches[:3])
+                )
+            diagnostics["existing_output_verified_identical"] = True
+        else:
+            diagnostics["existing_output_verified_identical"] = False
         print(json.dumps(diagnostics, indent=2, ensure_ascii=False))
         return
     staging_root = output_root.with_name(f".{output_root.name}.incomplete")
