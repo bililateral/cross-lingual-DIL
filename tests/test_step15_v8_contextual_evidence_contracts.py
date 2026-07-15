@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import step15_v8_common as common  # noqa: E402
 import step15_v8_downstream_gate as downstream_gate  # noqa: E402
 import step15_v8_preflight as preflight  # noqa: E402
+import step15_train_v8_contextual_evidence as contextual_evidence  # noqa: E402
 import step16_build_v8_context_review_queues as review_queues  # noqa: E402
 import step16_build_v8_identity_control_queues as identity_control_queues  # noqa: E402
 import step16_apply_v8_context_reviews as review_apply  # noqa: E402
@@ -69,6 +70,79 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             len(common.feature_names("B1_v7_20d_e5_cosine_only", self.policy, self.v7_policy)),
             20,
         )
+
+    def test_bridge_threshold_contract_accepts_legacy_precision_layers(self) -> None:
+        raw_threshold = 0.5000004999996
+        persisted = contextual_evidence.persisted_threshold_token(raw_threshold)
+        summary_threshold = round(
+            raw_threshold, contextual_evidence.SUMMARY_THRESHOLD_DECIMALS
+        )
+        rows = [
+            {
+                "selected_threshold": persisted,
+                "review_label": "positive",
+                "predicted_label": "1",
+            },
+            {
+                "selected_threshold": persisted,
+                "review_label": "negative",
+                "predicted_label": "0",
+            },
+        ]
+        final_record = {
+            "valid_metrics": {
+                "threshold": summary_threshold,
+                "confusion": {"tp": 1, "tn": 1, "fp": 0, "fn": 0},
+            }
+        }
+        artifact = {"threshold_from_representative_valid": raw_threshold}
+        self.assertEqual(
+            contextual_evidence.validate_bridge_threshold_contract(
+                final_record, rows, artifact
+            ),
+            raw_threshold,
+        )
+
+    def test_bridge_threshold_contract_rejects_artifact_drift(self) -> None:
+        rows = [
+            {
+                "selected_threshold": "0.500000499999",
+                "review_label": "positive",
+                "predicted_label": "1",
+            }
+        ]
+        final_record = {
+            "valid_metrics": {
+                "threshold": 0.5,
+                "confusion": {"tp": 1, "tn": 0, "fp": 0, "fn": 0},
+            }
+        }
+        artifact = {"threshold_from_representative_valid": 0.500001499999}
+        with self.assertRaisesRegex(ValueError, "artifact and persisted"):
+            contextual_evidence.validate_bridge_threshold_contract(
+                final_record, rows, artifact
+            )
+
+    def test_bridge_threshold_contract_rejects_decision_drift(self) -> None:
+        rows = [
+            {
+                "selected_threshold": "0.500000000000",
+                "review_label": "positive",
+                "predicted_label": "0",
+            }
+        ]
+        final_record = {
+            "threshold_from_representative_valid": 0.5,
+            "valid_metrics": {
+                "threshold": 0.5,
+                "confusion": {"tp": 1, "tn": 0, "fp": 0, "fn": 0},
+            },
+        }
+        artifact = {"threshold_from_representative_valid": 0.5}
+        with self.assertRaisesRegex(ValueError, "do not reproduce"):
+            contextual_evidence.validate_bridge_threshold_contract(
+                final_record, rows, artifact
+            )
 
     def _preflight_feature_rows(self) -> list[dict]:
         feature_names = common.feature_names(

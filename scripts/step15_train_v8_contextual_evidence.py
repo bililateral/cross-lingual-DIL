@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -16,6 +17,76 @@ import step15_v8_common as common
 
 
 ROOT = Path(__file__).resolve().parent.parent
+PERSISTED_THRESHOLD_DECIMALS = 12
+SUMMARY_THRESHOLD_DECIMALS = 6
+
+
+def persisted_threshold_token(value: float) -> str:
+    threshold = float(value)
+    if not math.isfinite(threshold) or not 0.0 <= threshold <= 1.0:
+        raise ValueError(f"Invalid probability threshold: {value!r}")
+    return f"{threshold:.{PERSISTED_THRESHOLD_DECIMALS}f}"
+
+
+def validate_bridge_threshold_contract(
+    final_record: dict,
+    prediction_rows: list[dict],
+    artifact: dict,
+) -> float:
+    """Bind raw artifact threshold, 12-decimal CSV, and 6-decimal summary."""
+    if not prediction_rows:
+        raise ValueError("Clean bridge validation prediction is empty")
+
+    persisted_tokens = set()
+    for row in prediction_rows:
+        raw = str(row.get("selected_threshold", "")).strip()
+        if not raw:
+            raise ValueError("Clean bridge prediction has a blank valid threshold")
+        try:
+            persisted_tokens.add(persisted_threshold_token(float(raw)))
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"Clean bridge prediction has an invalid valid threshold: {raw!r}"
+            ) from exc
+    if len(persisted_tokens) != 1:
+        raise ValueError("Clean bridge prediction has no unique valid threshold")
+    persisted_token = next(iter(persisted_tokens))
+
+    if "threshold_from_representative_valid" not in artifact:
+        raise ValueError("Clean bridge artifact has no authoritative valid threshold")
+    authoritative_threshold = float(artifact["threshold_from_representative_valid"])
+    if persisted_threshold_token(authoritative_threshold) != persisted_token:
+        raise ValueError("Bridge artifact and persisted valid threshold disagree")
+
+    valid_metrics = final_record.get("valid_metrics", {})
+    if "threshold" not in valid_metrics:
+        raise ValueError("Bridge summary has no displayed valid threshold")
+    displayed_threshold = float(valid_metrics["threshold"])
+    expected_display = round(authoritative_threshold, SUMMARY_THRESHOLD_DECIMALS)
+    if abs(displayed_threshold - expected_display) > 1e-12:
+        raise ValueError("Bridge summary and artifact valid threshold disagree")
+
+    expected_confusion = valid_metrics.get("confusion")
+    if not isinstance(expected_confusion, dict):
+        raise ValueError("Bridge summary has no validation confusion matrix")
+    observed_confusion = {"tp": 0, "tn": 0, "fp": 0, "fn": 0}
+    for row in prediction_rows:
+        label = str(row.get("review_label", "")).strip().lower()
+        prediction = str(row.get("predicted_label", "")).strip()
+        if label not in {"positive", "negative"} or prediction not in {"0", "1"}:
+            raise ValueError("Bridge validation prediction has invalid label fields")
+        if label == "positive":
+            observed_confusion["tp" if prediction == "1" else "fn"] += 1
+        else:
+            observed_confusion["fp" if prediction == "1" else "tn"] += 1
+    normalized_expected = {
+        name: int(expected_confusion.get(name, -1)) for name in observed_confusion
+    }
+    if observed_confusion != normalized_expected:
+        raise ValueError(
+            "Bridge persisted validation decisions do not reproduce summary confusion"
+        )
+    return authoritative_threshold
 
 
 OUTPUT_FIELDS = [
@@ -300,15 +371,12 @@ def main() -> None:
         prediction_rows_source = common.load_csv(
             common.resolve(final_record["valid_prediction_path"])
         )
-        thresholds = {
-            float(row["selected_threshold"]) for row in prediction_rows_source
-        }
-        if len(thresholds) != 1:
-            raise ValueError("Clean bridge prediction has no unique valid threshold")
-        threshold = next(iter(thresholds))
-        reported_threshold = float(final_record["valid_metrics"]["threshold"])
-        if abs(round(threshold, 6) - reported_threshold) > 1e-12:
-            raise ValueError("Bridge summary and persisted valid threshold disagree")
+        bridge_artifact = common.load_json(common.resolve(final_record["artifact_path"]))
+        threshold = validate_bridge_threshold_contract(
+            final_record,
+            prediction_rows_source,
+            bridge_artifact,
+        )
         valid_path = staging_root / "predictions" / f"contextual_evidence__seed_{seed}.zh_valid.csv"
         test_path = staging_root / "predictions" / f"contextual_evidence__seed_{seed}.internal_dev_test.csv"
         expert_valid_control_path = (
@@ -369,6 +437,7 @@ def main() -> None:
                     "seed": seed,
                     "selected_clean_feature_set": selected_feature_set,
                     "selected_clean_model_family": selected_family,
+                    "clean_threshold_from_bridge": threshold,
                     "clean_train_probability_source": (
                         "primary_component_grouped_oof_plus_controls_scored_by_"
                         "primary_only_full_train_model"
