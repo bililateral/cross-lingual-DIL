@@ -20,6 +20,7 @@ def main() -> None:
     args = parser.parse_args()
     _, policy, v7_policy = common.load_policy(args.policy)
     common.validate_policy_contract(policy, v7_policy)
+    runtime_chain = common.verify_readiness_runtime_chain(policy, v7_policy)
     run_id = args.run_id or policy["default_run_id"]
     root = common.run_root(policy, run_id)
     required = [
@@ -46,7 +47,7 @@ def main() -> None:
         )
     producer_paths = [
         common.resolve(args.policy),
-        ROOT / "scripts" / "run_step15_v8_linux_20260714.sh",
+        ROOT / "scripts" / "run_step15_v8_readiness_linux_20260715.sh",
         ROOT / "scripts" / "step15_v8_common.py",
         ROOT / "scripts" / "step15_v8_preflight.py",
         ROOT / "scripts" / "step15_build_v8_clean_semantics.py",
@@ -56,10 +57,16 @@ def main() -> None:
         ROOT / "scripts" / "step12_v8_statistical_robustness_audit.py",
         ROOT / "scripts" / "step15_v8_downstream_gate.py",
         ROOT / "scripts" / "step15_v8_build_sync_manifest.py",
+        ROOT / "scripts" / "step15_v8_verify_readiness_runtime.py",
         ROOT / "scripts" / "step15_v7_common.py",
-        ROOT / "scripts" / "step15_build_v6_inductive_pair_features.py",
         ROOT / "scripts" / "step15_build_v7_inductive_pair_features.py",
         ROOT / "scripts" / "step15_build_v7_clean_embedding_cache.py",
+        ROOT / "scripts" / "step16_apply_v8_context_reviews.py",
+        ROOT / "scripts" / "step16_build_v8_context_review_queues.py",
+        ROOT / "scripts" / "step16_build_v8_identity_control_queues.py",
+        ROOT / "scripts" / "step16_reconcile_v8_dual_reviews.py",
+        ROOT / "scripts" / "step16_reconcile_v8_identity_control_reviews.py",
+        ROOT / "scripts" / "step16_materialize_v8_reviewed_readiness_freeze.py",
         ROOT / "scripts" / "step7_build_semantic_pair_features.py",
         ROOT / "scripts" / "step7_train_baseline_models.py",
         ROOT / "scripts" / "step9_run_few_shot_adaptation.py",
@@ -83,6 +90,7 @@ def main() -> None:
             str(path.relative_to(ROOT)).replace("\\", "/") for path in required
         ],
         "producer_sources": producers,
+        "readiness_runtime_chain": runtime_chain,
         "files": files,
     }
     manifest["manifest_sha256"] = common.canonical_hash(manifest)

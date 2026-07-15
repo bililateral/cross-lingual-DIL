@@ -158,7 +158,14 @@ def main() -> None:
         }
         if pair_uids != step4_uids:
             raise ValueError(f"Step4/v7 pair universe differs for {pool_name}")
+    readiness_valid_rows = (
+        splits["valid"] + splits["evidence_expert_valid_controls"]
+    )
     valid_counts = Counter(row["evidence_type"] for row in splits["valid"])
+    control_valid_counts = Counter(
+        row["evidence_type"]
+        for row in splits["evidence_expert_valid_controls"]
+    )
     zh_rows = rows_by_pool["zh_target_strict"]
     zh_train_sellers = {
         str(row[key])
@@ -179,9 +186,9 @@ def main() -> None:
         common.occurrence_evidence(
             row, zh_occurrence_index, zh_token_df, frequency_threshold
         )["evidence_state"]
-        for row in splits["valid"]
+        for row in readiness_valid_rows
     ]
-    slice_masks = common.validation_slice_masks(splits["valid"], valid_states)
+    slice_masks = common.validation_slice_masks(readiness_valid_rows, valid_states)
     readiness = {
         key: {
             "observed": int(sum(slice_masks[key])),
@@ -217,6 +224,14 @@ def main() -> None:
                 "oof_held_fold_counts_by_seed": fold_counts,
                 "occurrence_counts": occurrence_counts,
                 "representative_valid_evidence_counts": dict(sorted(valid_counts.items())),
+                "evidence_expert_valid_control_counts": dict(
+                    sorted(control_valid_counts.items())
+                ),
+                "readiness_valid_scope": (
+                    "primary_representative_valid_plus_isolated_evidence_expert_"
+                    "validation_controls"
+                ),
+                "evidence_expert_controls_used_for_primary_model_selection": False,
                 "representative_valid_occurrence_state_readiness": readiness,
                 "legacy_evidence_type_only_public_count_used_for_readiness": False,
                 "representative_manifest_hash_mode": (

@@ -1,8 +1,8 @@
 # Step15-v8：表征桥接审计与上下文证据融合实施方案
 
-更新日期：2026-07-14
-代码分支：`method/step15-v8-contextual-evidence-fusion`
-当前状态：代码、policy、Linux runner 与纯合成 contract tests 已实现；真实数据计算尚未在 Linux 执行。
+更新日期：2026-07-15
+代码分支：`method/step15-v8-validation-slice-expansion`
+当前状态：正式 Step16-v8 双审、隔离 refreeze 与 readiness 检查已完成，valid `24/23/15`、train `20/30/10` 均达到预注册门槛；32 项 contract tests 通过。identifier-redacted embedding、v7 数值特征、B0–B3、evidence expert 和 Step12-v8 尚未在 Linux 正式运行，因此不能宣称方法已晋级。
 
 ## 1. 为什么启动 v8
 
@@ -28,8 +28,9 @@ v8 不以当前内部测试高分为目标。方法选择只允许读取 train �
 
 v8 继承并冻结 v7 的以下边界：
 
-- 英文与中文监督标签文件不改变；
-- v7 representative validation assignment 不改变；
+- canonical 英文与中文监督标签文件不原地改变；Step16-v8 只生成独立、hash-bound 的 readiness overlay；
+- 旧 v7 assignment 对已有可用监督的 split 归属保持不变；新增 reviewed rows 只写入新 assignment，component ID 在隔离 refreeze 中重算；
+- 固定 200 条 internal-development-test pair UID 集合和哈希完全不变；
 - train、valid、internal development test 的 seller component 仍然物理隔离；
 - factorized sample weights 的公式和参数完全继承 v7；
 - LR/L2 的 `L2=10`、无自动 class weight、最大迭代和收敛容差保持一致；
@@ -227,6 +228,29 @@ Reviewer packet 只允许填写以下值：
 
 Reviewer 必须按看到的原始证据判断，不能迎合候选生成规则。若最终 review 与 occurrence state 冲突，例如 risky-only 候选被判为 positive，或 verified-direct 候选被判为 negative，系统保留该审查诊断但不直接写入监督；必须先修正 parser/context 或补充外部锚点后再进入下一版 freeze。这避免 evidence expert 在训练时接收与其推理状态相矛盾的标签。
 
+### 5.5 Windows 双代理内部审查试运行（历史 pilot）
+
+候选审查本身不依赖 Linux 模型环境，可以在 Windows 对已经生成的 blind packet 执行。正式试运行前修正了一个盲审缺口：早期 `context_preview` 仍带有 `direct/seller_facing/risky/support` parser flags。当前 blind packet 只保留 identifier type/value 与原始 context；带状态标志的预览只保存在 reviewer 不读取的 immutable diagnostic queue，并由契约测试保证这些标志不会再次进入 blind packet。
+
+本次使用两个上下文隔离的代理分别审查 reviewer-A 与 reviewer-B packet。两者不能读取内部队列、模型结果、split 信息或对方输出；发生分歧时只把 candidate UID 和独立 adjudicator packet 交给第三个代理，不透露前两者的答案。该流程必须在论文中披露为 `agent-assisted independent review`，不能表述为人工双人标注，也不能据此报告 human inter-annotator agreement。
+
+实际队列共有 `143` risky-only、`2` mixed-context 和 `1` verified-direct 候选，但经过 Step4/v7 feature readiness 与 component-safe split 过滤后，blind packet 只有 `7` 条，且全部是 train-side risky-only。双代理对 `6/7` 条 identity/evidence 结论完全一致；第三代理将唯一分歧裁决为 uncertain。最终只有五条高置信 public-noise negative 可以物化为 train overlay；一条 uncertain 不进入二分类监督；一条被两代理一致判为 direct-contact positive，但由于与 risky-only parser state 冲突而被 fail-closed 保留为 parser 修复案例。
+
+因此该历史试运行证明审查机制可执行，但当时没有解决 validation 数据不足；pilot readiness 为 valid `4/3/0`、train `5/0/0`，低于 valid `20/20/15` 和 train `20/30/10`。这一诊断随后触发了 5.6 节的 upstream 扩展，不能再当作当前状态。
+
+### 5.6 正式 upstream 扩展、双审与隔离 refreeze
+
+pilot 的结论促使项目向上游扩展，而不是降低门槛：
+
+1. 修复 public URL 候选在审查前被全局并入巨型 component 的错误，允许 feature-unready 候选先接受证据审查，再在正式物化时扩展 Step4/canonical Step7 universe；
+2. 对 120 条 score-blind public context 候选执行两名隔离代理独立审查，116 条一致 negative、3 条一致 positive/parser-conflict、1 条经第三审查者裁决为 negative；
+3. 从 `market_item.xlsx` 与 `products_data.csv` 中构建 exact platform vendor ID 加 exact inventory overlap 的 cross-snapshot same-account controls；两名独立代理对 361 条 direct persistence 与 36 条 component closure 候选全部给出一致 high-confidence positive；
+4. public-noise、cross-snapshot direct 和 component controls 全部被强制标记为 evidence-expert-only，不进入 primary alias benchmark、clean AP、threshold 或内部测试指标；public-noise 是高置信银级上下文噪声控制，不是不同操作者 gold truth；
+5. 以固定 SHA256 排名和全局 component-safe 约束选择 public `20/20`、direct `30/20`、component `10/15` 的 train/valid 配额；
+6. 生成独立冻结目录 `reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/`，不覆盖 canonical Step3–Step7 文件。
+
+最终 occurrence-state-backed readiness 为 valid `24/23/15`、train `20/30/10`。固定测试仍为 200 条，seller 跨 split 重叠为 0，未降低门槛、未读取模型分数。详细证据边界与哈希结果见 `docs/STEP16_V8_READINESS_EXPANSION_PROTOCOL_20260715.zh.md`。
+
 ## 6. Occurrence-level evidence expert
 
 ### 6.1 为什么不用旧 hard veto
@@ -278,7 +302,7 @@ logit(P_final) = logit(P_clean_OOF) + delta(context)
 
 ## 7. 晋级门槛
 
-所有门槛只在 representative valid 上计算：
+primary AP、threshold、template FPR 与模型晋级指标只在 primary representative valid 上计算。数据充分性和 evidence-direction 指标使用 `primary representative valid + isolated evidence-expert valid controls`，controls 的结果单独报告，不能混入 primary AP：
 
 1. selected clean AP 相对 B0 至少 `+0.03`；
 2. public-noise FPR 至少降低 `0.20`；
@@ -290,13 +314,13 @@ logit(P_final) = logit(P_clean_OOF) + delta(context)
 
 另有数据充分性门槛：representative valid 至少包含 `20` state-backed public-noise negatives、`20` state-backed verified-direct positives、`15` component-anchor positives。
 
-这里不能再按旧 `evidence_type` 名称直接计数：旧 `public_contact_or_url_noise` 中存在“没有共享 identifier、实质是模板/数据包复用”的历史负例。三个正式切片都先要求 `benchmark_eligible=1` 且不是 `silver_train_only`，再定义为：
+这里不能再按旧 `evidence_type` 名称直接计数：旧 `public_contact_or_url_noise` 中存在“没有共享 identifier、实质是模板/数据包复用”的历史负例。primary rows 必须为明确 benchmark eligible 且不是 `silver_train_only`；额外 controls 必须同时满足 `primary_identity_model_eligible=0`、`evidence_expert_eligible=1`、`evidence_expert_validation_eligible=1`。在此隔离条件下定义：
 
 - public-noise：`review_label=negative`，且 occurrence state 属于 `risky_only_shared / support_only_shared / high_frequency_public`；
 - direct positive：`review_label=positive`，且 occurrence state 为 `verified_direct_both_sides`；
 - component positive：`review_label=positive`，且 evidence type 为 `same_controller_component_anchor`。
 
-当前旧 valid 的 `6/18/16` 只是 legacy evidence-type 计数，不再视为正式门槛计数。Preflight 会重新按 occurrence state 计算并在 GPU 运行前列出真实缺口。门槛未满足时应先完成 Step16-v8 review/refreeze；不得降低门槛，也不得先浪费一次完整 v8 训练。
+旧 valid 的 `6/18/16` 只是 legacy evidence-type 计数，不视为正式门槛计数。当前隔离 refreeze 的正式计数为 `24/23/15`，Preflight 会在 GPU 方法计算前从 frozen occurrence 与 assignment 重新得到同一结果；任何不一致都应停止，不能降低门槛。
 
 ## 8. Step20 与图谱阶段
 
@@ -314,89 +338,71 @@ Step20 lock 按 v8 `run_id` 隔离，并必须写入对应 `step15_v8_model_free
 
 ## 9. Linux 同步与执行
 
-从 Windows 同步到 Linux 的 v8 必需源码清单：
+当前正式运行只认 `readiness_expansion_v2_20260715`，不再执行历史 queue-v1/refreeze-v1 命令。至少同步：
 
 ```text
-schema/step15_v8_contextual_evidence_policy.json
-schema/step16_v8_validation_refreeze_policy.json
-scripts/run_step15_v8_linux_20260714.sh
-scripts/run_step16_v8_validation_queue_linux_20260714.sh
-scripts/run_step16_v8_validation_refreeze_linux_20260714.sh
+reports/step15_v8/validation_expansion_queue_v2_20260714/
+reports/step15_v8/identity_control_review_20260715/
+reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
+reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_assignments.csv
+reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_manifest.json
+reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.json
+reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.npy
+reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/clean_embedding_manifest.json
+reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.json
+reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.npy
+
+scripts/run_step15_v8_readiness_linux_20260715.sh
+scripts/step15_build_v7_clean_embedding_cache.py
+scripts/step15_build_v7_inductive_pair_features.py
 scripts/step15_v8_common.py
 scripts/step15_v8_preflight.py
 scripts/step15_build_v8_clean_semantics.py
 scripts/step15_run_v8_bridge_audit.py
-scripts/step16_build_v8_context_review_queues.py
-scripts/step16_apply_v8_context_reviews.py
 scripts/step15_train_v8_contextual_evidence.py
 scripts/step12_v8_statistical_robustness_audit.py
 scripts/step15_v8_downstream_gate.py
 scripts/step15_v8_build_sync_manifest.py
+scripts/step15_v8_verify_readiness_runtime.py
+scripts/step15_v7_common.py
+scripts/step16_materialize_v8_reviewed_readiness_freeze.py
+scripts/step16_build_v8_context_review_queues.py
+scripts/step16_build_v8_identity_control_queues.py
+scripts/step16_apply_v8_context_reviews.py
+scripts/step16_reconcile_v8_dual_reviews.py
+scripts/step16_reconcile_v8_identity_control_reviews.py
 tests/test_step15_v8_contextual_evidence_contracts.py
 ```
 
-文档同步项：
+同时同步本分支修改过的 policy/schema 和下列文档；若 Linux 状态已经混乱，直接同步整个 `scripts/`、`schema/`、`tests/` 和上述两个 report 根目录更稳妥：
 
 ```text
 docs/STEP15_V8_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md
+docs/STEP16_V8_READINESS_EXPANSION_PROTOCOL_20260715.zh.md
 docs/PROJECT_PROGRESS.md
 ```
 
-Linux 工作区还必须保留 policy 引用的 v6/v7 冻结 schema、既有 Step3/4/5/15-v7 artifacts、Step7 semantic model policy，以及本地 BGE-M3、LaBSE、GTE reranker 模型目录。runner 的第一阶段会只读校验这些文件、冻结 manifest/assignment/input hashes、Step4/feature pair universe 和本地模型目录；任一不匹配都会在 GPU 编码前停止。
+Linux 工作区还必须保留 generated policy 引用的 v6/v7 冻结依赖、原始 Step3/4/5 artifacts、Step7 semantic model policy，以及本地 Multilingual-E5、BGE-M3、LaBSE、GTE reranker 模型目录。正式一键命令为：
 
-第一阶段只生成审查队列，不训练模型、不占用 GPU：
-
-```bash
-cd /home/yongpeng/cross-lingual
-
-export REVIEW_RUN_ID=validation_expansion_queue_v1_20260714
-bash scripts/run_step16_v8_validation_queue_linux_20260714.sh
-```
-
-同步回 `reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/`。保持三个内部 `*_blind_review_queue.csv` 和三个 `.template.csv` 不变。Reviewer A 与 B 分别只接收自己的 packet，并另存为：
-
-```text
-reviewer_a_blind_packet.completed.csv
-reviewer_b_blind_packet.completed.csv
-```
-
-先运行 refreeze runner 的 `--check-only` 阶段查看 disagreement；第三 reviewer 只填写这些 disagreement，并保存为 `reviewer_adjudicator_blind_packet.completed.csv`。把 completed review 文件同步回 Linux 后执行隔离 refreeze：
-
-```bash
-cd /home/yongpeng/cross-lingual
-
-export REVIEWER_A_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_a_blind_packet.completed.csv
-export REVIEWER_B_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_b_blind_packet.completed.csv
-export ADJUDICATION_FILE=reports/step15_v8/validation_expansion_queue_v1_20260714/context_review/reviewer_adjudicator_blind_packet.completed.csv
-bash scripts/run_step16_v8_validation_refreeze_linux_20260714.sh
-```
-
-如果输出 `blocked_insufficient_reviewed_context_evidence`，按报告中的 train/valid 真实缺口继续审查候选；不能降低 `20/20/15`。达到门槛后，refreeze 会生成：
-
-```text
-reports/step16_v8_validation_refreeze/context_reviewed_v1_20260714/step15_v8_context_reviewed_policy.json
-```
-
-此后才运行完整 v8：
+其中 transitive identity-control 输入必须同步原文件而不是只同步 review summary，至少包括 `products_data.csv`、`reports/step3_seller_profiles.zh_target_aux.jsonl`、`reports/step5_zh_target_aux_frozen_silver_labels.csv`、原 strict Step3/4/5 文件、原 representative assignment，以及 `schema/step4_silver_candidate_schema.json` 和 `schema/step7_transfer_safe_pair_feature_schema.json`。正式 freeze manifest 会逐一核验这些 SHA-256。
 
 ```bash
 cd /home/yongpeng/cross-lingual
 
 export CUDA_VISIBLE_DEVICES=0
-export V8_POLICY=reports/step16_v8_validation_refreeze/context_reviewed_v1_20260714/step15_v8_context_reviewed_policy.json
-export V8_RUN_ID=bridge_v2_context_reviewed_20260714
+export V8_RUN_ID=bridge_v8_readiness_20260715
 export STEP12_RESAMPLES=5000
 
-bash scripts/run_step15_v8_linux_20260714.sh
+bash scripts/run_step15_v8_readiness_linux_20260715.sh
 ```
 
-GPU 只用于 identifier-redacted BGE/LaBSE encoding 和 GTE reranker。Bridge LR/RankNet、evidence expert 和 Step12 主要使用 CPU。
+runner 的执行顺序固定为：freeze/check-only 与 33 项契约测试；检查 formal runtime 是完全不存在还是完整且哈希一致；首次运行仅重建中文 identifier-redacted E5 cache，并原子重建中英文 v7 feature tables；随后验证完整 runtime chain，再执行 v8 preflight、score-blind context queue snapshot、BGE/LaBSE/reranker 去标识特征、B0–B3 OOF bridge、evidence expert、Step12、return-sync manifest 与 Step20 gate。GPU 只用于 embedding/reranker；LR/linear ranker、evidence expert 和 Step12 主要使用 CPU。
 
-如果同一 `run_id` 已存在，不得删除后覆盖。应使用新路径：
+如果同一 `run_id` 已存在，不得删除后覆盖。应使用新路径；已经完整并通过哈希校验的 shared readiness runtime 会复用，不会重复编码：
 
 ```bash
-export V8_RUN_ID=bridge_v1_20260714_rerun1
-bash scripts/run_step15_v8_linux_20260714.sh
+export V8_RUN_ID=bridge_v8_readiness_20260715_rerun1
+bash scripts/run_step15_v8_readiness_linux_20260715.sh
 ```
 
 ## 10. Windows 同步回传
@@ -404,8 +410,11 @@ bash scripts/run_step15_v8_linux_20260714.sh
 运行结束后同步整个目录：
 
 ```text
+reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
 reports/step15_v8/<run_id>/
 ```
+
+前者会新增 Linux 生成的中文 clean-E5 cache、中英文 v7 feature tables、corpus reference 和 v7 manifest；后者包含本次 v8 的全部模型与统计输出。两者缺一不可。
 
 重点文件：
 

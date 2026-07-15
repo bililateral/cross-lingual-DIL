@@ -183,11 +183,7 @@ def write_fail_closed(path: Path, payload: bytes, allow_identical_replay: bool) 
 
 
 def eligible(row: dict) -> bool:
-    return (
-        row.get("review_label") in {"positive", "negative"}
-        and row.get("usable_for_supervision") == "1"
-        and row.get("usable_for_core_transfer") == "1"
-    )
+    return common.supervised_eligible(row)
 
 
 def numeric_feature_stats(rows: list[dict], feature_names: list[str]) -> dict:
@@ -284,7 +280,25 @@ def main() -> None:
                 split_by_uid[row["pair_uid"]] = assignment["v7_split_name"]
             else:
                 split_by_uid[row["pair_uid"]] = row["split_name"]
-        train_rows = [row for row in supervised if split_by_uid[row["pair_uid"]] == "train"]
+        all_train_rows = [
+            row for row in supervised if split_by_uid[row["pair_uid"]] == "train"
+        ]
+        train_rows = [
+            row
+            for row in all_train_rows
+            if str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+        ]
+        excluded_reference_controls = [
+            row for row in all_train_rows if row not in train_rows
+        ]
+        if any(
+            str(row.get("evidence_expert_eligible", "0")).strip() != "1"
+            for row in excluded_reference_controls
+        ):
+            raise ValueError(
+                f"{pool_name}: a row excluded from the primary corpus reference is not "
+                "an explicitly eligible evidence-expert control"
+            )
         train_sellers = {
             str(row[key])
             for row in train_rows
@@ -367,6 +381,10 @@ def main() -> None:
         records[pool_name] = {
             "pair_count": len(output_rows),
             "train_pair_count": len(train_rows),
+            "all_supervised_train_pair_count": len(all_train_rows),
+            "evidence_expert_control_excluded_from_reference_count": len(
+                excluded_reference_controls
+            ),
             "train_seller_count": len(train_sellers),
             "output_path": str(output_path.relative_to(ROOT)).replace("\\", "/"),
             "output_sha256": hashlib.sha256(payload).hexdigest(),

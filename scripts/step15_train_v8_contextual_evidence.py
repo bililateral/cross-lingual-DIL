@@ -167,6 +167,10 @@ def main() -> None:
     train_rows = splits["train"]
     valid_rows = splits["valid"]
     test_rows = splits["internal_development_test"]
+    expert_train_control_rows = splits["evidence_expert_train_controls"]
+    expert_valid_control_rows = splits["evidence_expert_valid_controls"]
+    expert_train_rows = train_rows + expert_train_control_rows
+    expert_valid_rows = valid_rows + expert_valid_control_rows
     train_sellers_by_pool = {
         pool_name: {
             str(row[key])
@@ -188,11 +192,17 @@ def main() -> None:
             "public_identifier_train_seller_frequency_threshold"
         ]
     )
-    train_evidence = occurrence_for_rows(train_rows, indexes, frequency_threshold)
+    train_evidence = occurrence_for_rows(expert_train_rows, indexes, frequency_threshold)
     valid_evidence = occurrence_for_rows(valid_rows, indexes, frequency_threshold)
+    expert_valid_control_evidence = occurrence_for_rows(
+        expert_valid_control_rows, indexes, frequency_threshold
+    )
     test_evidence = occurrence_for_rows(test_rows, indexes, frequency_threshold)
-    train_x = common.evidence_feature_matrix(train_rows, train_evidence, policy)
+    train_x = common.evidence_feature_matrix(expert_train_rows, train_evidence, policy)
     valid_x = common.evidence_feature_matrix(valid_rows, valid_evidence, policy)
+    expert_valid_control_x = common.evidence_feature_matrix(
+        expert_valid_control_rows, expert_valid_control_evidence, policy
+    )
     test_x = common.evidence_feature_matrix(test_rows, test_evidence, policy)
     actionable_states = {
         "verified_direct_both_sides",
@@ -203,13 +213,13 @@ def main() -> None:
     actionable = np.asarray(
         [item["evidence_state"] in actionable_states for item in train_evidence], dtype=bool
     )
-    if set(v7.labels_array([row for row, keep in zip(train_rows, actionable, strict=True) if keep])) != {
+    if set(v7.labels_array([row for row, keep in zip(expert_train_rows, actionable, strict=True) if keep])) != {
         0.0,
         1.0,
     }:
         raise ValueError("Occurrence evidence expert actionable train rows lack both labels")
     base_weights, weight_diagnostics = v7.factorized_evidence_weights(
-        train_rows, v7_policy["factorized_evidence_weighting"]
+        expert_train_rows, v7_policy["factorized_evidence_weighting"]
     )
     seeds = [int(value) for value in policy["bridge_audit"]["seeds"]]
     selected_feature_set = bridge["selection"]["feature_representation"][
@@ -218,8 +228,16 @@ def main() -> None:
     selected_family = bridge["selection"]["model_family"]["selected_model_family"]
     staging_root.mkdir(parents=True, exist_ok=False)
     seed_records = []
-    clean_matrices = {"valid": [], "internal_development_test": []}
-    fused_matrices = {"valid": [], "internal_development_test": []}
+    clean_matrices = {
+        "valid": [],
+        "internal_development_test": [],
+        "evidence_expert_valid_controls": [],
+    }
+    fused_matrices = {
+        "valid": [],
+        "internal_development_test": [],
+        "evidence_expert_valid_controls": [],
+    }
 
     for seed in seeds:
         oof_record = next(
@@ -234,27 +252,50 @@ def main() -> None:
             for row in bridge["final_seed_records"]
             if row["output_id"] == "selected_clean" and int(row["seed"]) == seed
         )
-        clean_train = load_aligned_scores(common.resolve(oof_record["prediction_path"]), train_rows)
+        clean_primary_train = load_aligned_scores(
+            common.resolve(oof_record["prediction_path"]), train_rows
+        )
+        clean_expert_train_controls = load_aligned_scores(
+            common.resolve(final_record["evidence_expert_train_control_prediction_path"]),
+            expert_train_control_rows,
+        )
+        clean_train = np.concatenate(
+            [clean_primary_train, clean_expert_train_controls]
+        )
         clean_valid = load_aligned_scores(
             common.resolve(final_record["valid_prediction_path"]), valid_rows
         )
         clean_test = load_aligned_scores(
             common.resolve(final_record["internal_test_prediction_path"]), test_rows
         )
+        clean_expert_valid_controls = load_aligned_scores(
+            common.resolve(final_record["evidence_expert_valid_control_prediction_path"]),
+            expert_valid_control_rows,
+        )
         expert = common.fit_offset_logistic_expert(
             train_x[actionable],
-            v7.labels_array(train_rows)[actionable],
+            v7.labels_array(expert_train_rows)[actionable],
             clean_train[actionable],
             base_weights[actionable],
             policy,
         )
         valid_correction = common.expert_logit_correction(valid_x, expert)
+        expert_valid_control_correction = common.expert_logit_correction(
+            expert_valid_control_x, expert
+        )
         test_correction = common.expert_logit_correction(test_x, expert)
         fused_valid, valid_decisions = common.apply_constrained_expert(
             clean_valid, valid_evidence, valid_correction
         )
         fused_test, test_decisions = common.apply_constrained_expert(
             clean_test, test_evidence, test_correction
+        )
+        fused_expert_valid_controls, expert_valid_control_decisions = (
+            common.apply_constrained_expert(
+                clean_expert_valid_controls,
+                expert_valid_control_evidence,
+                expert_valid_control_correction,
+            )
         )
         prediction_rows_source = common.load_csv(
             common.resolve(final_record["valid_prediction_path"])
@@ -270,6 +311,11 @@ def main() -> None:
             raise ValueError("Bridge summary and persisted valid threshold disagree")
         valid_path = staging_root / "predictions" / f"contextual_evidence__seed_{seed}.zh_valid.csv"
         test_path = staging_root / "predictions" / f"contextual_evidence__seed_{seed}.internal_dev_test.csv"
+        expert_valid_control_path = (
+            staging_root
+            / "predictions"
+            / f"contextual_evidence__seed_{seed}.evidence_expert_valid_controls.csv"
+        )
         valid_path.parent.mkdir(parents=True, exist_ok=True)
         valid_path.write_bytes(
             common.render_csv(
@@ -299,6 +345,20 @@ def main() -> None:
                 OUTPUT_FIELDS,
             )
         )
+        expert_valid_control_path.write_bytes(
+            common.render_csv(
+                output_rows(
+                    expert_valid_control_rows,
+                    clean_expert_valid_controls,
+                    fused_expert_valid_controls,
+                    expert_valid_control_evidence,
+                    expert_valid_control_decisions,
+                    threshold,
+                    "evidence_expert_valid_controls",
+                ),
+                OUTPUT_FIELDS,
+            )
+        )
         artifact_path = staging_root / "artifacts" / f"contextual_evidence__seed_{seed}.json"
         artifact_path.parent.mkdir(parents=True, exist_ok=True)
         artifact_path.write_text(
@@ -309,7 +369,14 @@ def main() -> None:
                     "seed": seed,
                     "selected_clean_feature_set": selected_feature_set,
                     "selected_clean_model_family": selected_family,
-                    "clean_train_probability_source": "component_grouped_oof",
+                    "clean_train_probability_source": (
+                        "primary_component_grouped_oof_plus_controls_scored_by_"
+                        "primary_only_full_train_model"
+                    ),
+                    "primary_train_count": len(train_rows),
+                    "evidence_expert_train_control_count": len(
+                        expert_train_control_rows
+                    ),
                     "actionable_train_count": int(np.sum(actionable)),
                     "actionable_state_counts": dict(
                         sorted(
@@ -336,6 +403,12 @@ def main() -> None:
         clean_matrices["internal_development_test"].append(clean_test)
         fused_matrices["valid"].append(fused_valid)
         fused_matrices["internal_development_test"].append(fused_test)
+        clean_matrices["evidence_expert_valid_controls"].append(
+            clean_expert_valid_controls
+        )
+        fused_matrices["evidence_expert_valid_controls"].append(
+            fused_expert_valid_controls
+        )
         seed_records.append(
             {
                 "seed": seed,
@@ -357,6 +430,12 @@ def main() -> None:
                 "internal_test_prediction_path": str(
                     (final_root / test_path.relative_to(staging_root)).relative_to(ROOT)
                 ).replace("\\", "/"),
+                "evidence_expert_valid_control_prediction_path": str(
+                    (
+                        final_root
+                        / expert_valid_control_path.relative_to(staging_root)
+                    ).relative_to(ROOT)
+                ).replace("\\", "/"),
                 "artifact_path": str(
                     (final_root / artifact_path.relative_to(staging_root)).relative_to(ROOT)
                 ).replace("\\", "/"),
@@ -367,6 +446,12 @@ def main() -> None:
     clean_test_mean = np.mean(np.vstack(clean_matrices["internal_development_test"]), axis=0)
     fused_valid_mean = np.mean(np.vstack(fused_matrices["valid"]), axis=0)
     fused_test_mean = np.mean(np.vstack(fused_matrices["internal_development_test"]), axis=0)
+    clean_expert_valid_control_mean = np.mean(
+        np.vstack(clean_matrices["evidence_expert_valid_controls"]), axis=0
+    )
+    fused_expert_valid_control_mean = np.mean(
+        np.vstack(fused_matrices["evidence_expert_valid_controls"]), axis=0
+    )
     clean_threshold = step7.choose_threshold(
         v7.labels_array(valid_rows),
         clean_valid_mean,
@@ -396,6 +481,21 @@ def main() -> None:
         }
         for clean, fused in zip(clean_test_mean, fused_test_mean, strict=True)
     ]
+    neutral_decisions_expert_valid_controls = [
+        {
+            "expert_action": "seed_mean_aggregated",
+            "raw_logit_correction": 0.0,
+            "applied_logit_correction": float(
+                np.log(np.clip(fused, 1e-6, 1 - 1e-6) / np.clip(1 - fused, 1e-6, 1))
+                - np.log(np.clip(clean, 1e-6, 1 - 1e-6) / np.clip(1 - clean, 1e-6, 1))
+            ),
+        }
+        for clean, fused in zip(
+            clean_expert_valid_control_mean,
+            fused_expert_valid_control_mean,
+            strict=True,
+        )
+    ]
     for split_name, rows, clean, fused, evidence, decisions in (
         (
             "zh_valid",
@@ -413,6 +513,14 @@ def main() -> None:
             test_evidence,
             neutral_decisions_test,
         ),
+        (
+            "evidence_expert_valid_controls",
+            expert_valid_control_rows,
+            clean_expert_valid_control_mean,
+            fused_expert_valid_control_mean,
+            expert_valid_control_evidence,
+            neutral_decisions_expert_valid_controls,
+        ),
     ):
         path = staging_root / "predictions" / f"contextual_evidence__seed_mean.{split_name}.csv"
         path.write_bytes(
@@ -426,7 +534,11 @@ def main() -> None:
                     clean_threshold,
                     "representative_valid"
                     if split_name == "zh_valid"
-                    else "internal_development_test",
+                    else (
+                        "internal_development_test"
+                        if split_name == "internal_dev_test"
+                        else "evidence_expert_valid_controls"
+                    ),
                 ),
                 OUTPUT_FIELDS,
             )
@@ -446,8 +558,19 @@ def main() -> None:
         "train_evidence_state_counts": dict(
             sorted(Counter(item["evidence_state"] for item in train_evidence).items())
         ),
+        "primary_train_count": len(train_rows),
+        "evidence_expert_train_control_count": len(expert_train_control_rows),
+        "evidence_expert_valid_control_count": len(expert_valid_control_rows),
         "valid_evidence_state_counts": dict(
             sorted(Counter(item["evidence_state"] for item in valid_evidence).items())
+        ),
+        "evidence_expert_valid_control_state_counts": dict(
+            sorted(
+                Counter(
+                    item["evidence_state"]
+                    for item in expert_valid_control_evidence
+                ).items()
+            )
         ),
         "internal_test_evidence_state_counts": dict(
             sorted(Counter(item["evidence_state"] for item in test_evidence).items())
@@ -473,6 +596,8 @@ def main() -> None:
             "prediction_paths": mean_paths,
         },
         "representative_valid_used_for_expert_model_fitting": False,
+        "evidence_expert_controls_used_for_clean_model_fitting_or_selection": False,
+        "evidence_expert_control_metrics_mixed_into_primary_valid_metrics": False,
         "internal_test_used_for_model_fitting_selection_or_threshold": False,
         "mixed_context_hard_veto_applied": False,
         "ambiguous_hard_veto_applied": False,

@@ -51,6 +51,119 @@ def canonical_hash(value: object) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def verify_self_hashed_json(path: str | Path, hash_field: str = "manifest_sha256") -> dict:
+    resolved = resolve(path)
+    payload = load_json(resolved)
+    expected = str(payload.get(hash_field, "")).strip()
+    unsigned = dict(payload)
+    unsigned.pop(hash_field, None)
+    observed = canonical_hash(unsigned)
+    if not expected or observed != expected:
+        raise ValueError(
+            f"Self-hash mismatch for {resolved}: expected={expected} observed={observed}"
+        )
+    return payload
+
+
+def verify_readiness_runtime_chain(policy: dict, v7_policy: dict) -> dict:
+    refreeze = policy.get("validation_context_refreeze", {})
+    freeze_path = resolve(refreeze["freeze_manifest"])
+    freeze = verify_self_hashed_json(freeze_path)
+    freeze_producer = resolve(freeze["producer"])
+    if sha256(freeze_producer) != freeze["producer_sha256"]:
+        raise ValueError(f"Readiness freeze producer changed: {freeze_producer}")
+    verified_freeze_inputs = {}
+    for input_path, expected in freeze.get("inputs", {}).items():
+        path = resolve(input_path)
+        observed = sha256(path)
+        if observed != expected:
+            raise ValueError(f"Readiness freeze input changed: {path}")
+        verified_freeze_inputs[str(path.relative_to(ROOT)).replace("\\", "/")] = observed
+    verified_freeze_outputs = {}
+    for record in freeze.get("outputs", {}).values():
+        path = resolve(record["path"])
+        observed = sha256(path)
+        if observed != record["sha256"]:
+            raise ValueError(f"Readiness freeze output changed: {path}")
+        verified_freeze_outputs[str(path.relative_to(ROOT)).replace("\\", "/")] = observed
+
+    clean_manifest_path = resolve(v7_policy["clean_semantic_encoder"]["manifest_output"])
+    clean_manifest = verify_self_hashed_json(clean_manifest_path)
+    clean_producer = ROOT / "scripts" / "step15_build_v7_clean_embedding_cache.py"
+    if sha256(clean_producer) != clean_manifest["producer_sha256"]:
+        raise ValueError(f"Identifier-redacted E5 producer changed: {clean_producer}")
+    generated_v7_policy_path = resolve(policy["frozen_dependencies"]["v7_policy"])
+    if sha256(generated_v7_policy_path) != clean_manifest["v7_policy_sha256"]:
+        raise ValueError("Identifier-redacted E5 manifest policy hash mismatch")
+    verified_clean_records = {}
+    for pool_name, record in clean_manifest.get("records", {}).items():
+        metadata_path = resolve(record["metadata_path"])
+        matrix_path = resolve(record["matrix_path"])
+        if sha256(metadata_path) != record["metadata_sha256"]:
+            raise ValueError(f"Identifier-redacted E5 metadata changed: {pool_name}")
+        if sha256(matrix_path) != record["matrix_sha256"]:
+            raise ValueError(f"Identifier-redacted E5 matrix changed: {pool_name}")
+        verified_clean_records[pool_name] = {
+            "metadata_path": str(metadata_path.relative_to(ROOT)).replace("\\", "/"),
+            "metadata_sha256": record["metadata_sha256"],
+            "matrix_path": str(matrix_path.relative_to(ROOT)).replace("\\", "/"),
+            "matrix_sha256": record["matrix_sha256"],
+        }
+
+    feature_manifest_path = resolve(v7_policy["inductive_features"]["manifest_output"])
+    feature_manifest = verify_self_hashed_json(feature_manifest_path)
+    feature_producer = ROOT / "scripts" / "step15_build_v7_inductive_pair_features.py"
+    if sha256(feature_producer) != feature_manifest["producer_sha256"]:
+        raise ValueError(f"V7 feature producer changed: {feature_producer}")
+    if sha256(resolve(feature_manifest["policy"])) != feature_manifest["policy_sha256"]:
+        raise ValueError("V7 feature manifest policy hash mismatch")
+    reference_path = resolve(feature_manifest["reference_bundle"])
+    if sha256(reference_path) != feature_manifest["reference_bundle_sha256"]:
+        raise ValueError("V7 feature reference bundle changed")
+    verified_outputs = {}
+    verified_feature_inputs = {}
+    for pool_name, record in feature_manifest["domains"].items():
+        output_path = resolve(record["output_path"])
+        if sha256(output_path) != record["output_sha256"]:
+            raise ValueError(f"V7 feature output changed: {pool_name}:{output_path}")
+        for input_path, expected in record.get("inputs", {}).items():
+            resolved_input = resolve(input_path)
+            if sha256(resolved_input) != expected:
+                raise ValueError(
+                    f"V7 feature input changed: {pool_name}:{resolved_input}"
+                )
+            verified_feature_inputs[
+                str(resolved_input.relative_to(ROOT)).replace("\\", "/")
+            ] = expected
+        verified_outputs[pool_name] = {
+            "path": str(output_path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": record["output_sha256"],
+        }
+    return {
+        "readiness_freeze_manifest": str(freeze_path.relative_to(ROOT)).replace(
+            "\\", "/"
+        ),
+        "readiness_freeze_manifest_sha256": sha256(freeze_path),
+        "readiness_freeze_inputs": dict(sorted(verified_freeze_inputs.items())),
+        "readiness_freeze_outputs": dict(sorted(verified_freeze_outputs.items())),
+        "clean_embedding_manifest": str(clean_manifest_path.relative_to(ROOT)).replace(
+            "\\", "/"
+        ),
+        "clean_embedding_manifest_sha256": sha256(clean_manifest_path),
+        "clean_embedding_records": verified_clean_records,
+        "v7_feature_manifest": str(feature_manifest_path.relative_to(ROOT)).replace(
+            "\\", "/"
+        ),
+        "v7_feature_manifest_sha256": sha256(feature_manifest_path),
+        "v7_reference_bundle": {
+            "path": str(reference_path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": feature_manifest["reference_bundle_sha256"],
+        },
+        "v7_feature_inputs": dict(sorted(verified_feature_inputs.items())),
+        "v7_feature_outputs": verified_outputs,
+    }
+
+
 def render_csv(rows: list[dict], fields: list[str]) -> bytes:
     import io
 
@@ -202,18 +315,83 @@ def load_joined_rows(policy: dict, v7_policy: dict, root: Path) -> dict[str, lis
 def split_rows(rows_by_pool: dict[str, list[dict]]) -> dict[str, list[dict]]:
     en = rows_by_pool["en_content_train_pool"]
     zh = rows_by_pool["zh_target_strict"]
+    primary_en = [
+        row
+        for row in en
+        if str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+    ]
+    primary_zh = [
+        row
+        for row in zh
+        if str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
+    ]
+    expert_controls = [
+        row
+        for row in zh
+        if str(row.get("primary_identity_model_eligible", "1")).strip() == "0"
+        and str(row.get("evidence_expert_eligible", "0")).strip() == "1"
+    ]
+    invalid_controls = [
+        row
+        for row in zh
+        if str(row.get("primary_identity_model_eligible", "1")).strip() == "0"
+        and str(row.get("evidence_expert_eligible", "0")).strip() != "1"
+    ]
+    if invalid_controls:
+        raise ValueError(
+            "Rows excluded from the primary identity model must be explicitly scoped to "
+            f"the evidence expert: {invalid_controls[0]['pair_uid']}"
+        )
+    test_controls = [
+        row
+        for row in expert_controls
+        if row["v7_split_name"] == "internal_development_test"
+    ]
+    if test_controls:
+        raise ValueError(
+            "Evidence-expert controls may not enter the frozen internal development test: "
+            f"{test_controls[0]['pair_uid']}"
+        )
     result = {
-        "train": [row for row in en if row["v7_split_name"] == "train"]
-        + [row for row in zh if row["v7_split_name"] == "train"],
-        "valid": [row for row in zh if row["v7_split_name"] == "valid"],
+        "train": [row for row in primary_en if row["v7_split_name"] == "train"]
+        + [row for row in primary_zh if row["v7_split_name"] == "train"],
+        "valid": [row for row in primary_zh if row["v7_split_name"] == "valid"],
         "internal_development_test": [
-            row for row in zh if row["v7_split_name"] == "internal_development_test"
+            row
+            for row in primary_zh
+            if row["v7_split_name"] == "internal_development_test"
+        ],
+        "evidence_expert_train_controls": [
+            row for row in expert_controls if row["v7_split_name"] == "train"
+        ],
+        "evidence_expert_valid_controls": [
+            row for row in expert_controls if row["v7_split_name"] == "valid"
         ],
     }
-    for split_name, rows in result.items():
+    for split_name in ("train", "valid", "internal_development_test"):
+        rows = result[split_name]
         labels = {row["review_label"] for row in rows}
         if labels != {"positive", "negative"}:
             raise ValueError(f"Step15-v8 split lacks both labels: {split_name}:{labels}")
+    primary_uids = {
+        row["pair_uid"]
+        for split_name in ("train", "valid", "internal_development_test")
+        for row in result[split_name]
+    }
+    control_uids = {
+        row["pair_uid"]
+        for split_name in (
+            "evidence_expert_train_controls",
+            "evidence_expert_valid_controls",
+        )
+        for row in result[split_name]
+    }
+    overlap = primary_uids & control_uids
+    if overlap:
+        raise ValueError(
+            "Primary identity rows and evidence-expert controls overlap: "
+            f"{sorted(overlap)[0]}"
+        )
     return result
 
 
@@ -889,11 +1067,22 @@ def validation_slice_masks(rows: list[dict], evidence_states: list[str]) -> dict
     if len(rows) != len(evidence_states):
         raise ValueError("Validation rows and occurrence states have different lengths")
     public_states = {"risky_only_shared", "support_only_shared", "high_frequency_public"}
-    benchmark_ok = [
-        row.get("benchmark_eligible", "1") == "1"
-        and row.get("silver_train_only", "0") != "1"
-        for row in rows
-    ]
+    benchmark_ok = []
+    for row in rows:
+        primary_benchmark = (
+            row.get("benchmark_eligible", "1") == "1"
+            and row.get("silver_train_only", "0") != "1"
+            and str(row.get("primary_identity_model_eligible", "1")).strip()
+            != "0"
+        )
+        evidence_control = (
+            str(row.get("evidence_expert_validation_eligible", "0")).strip()
+            == "1"
+            and str(row.get("primary_identity_model_eligible", "1")).strip()
+            == "0"
+            and str(row.get("evidence_expert_eligible", "0")).strip() == "1"
+        )
+        benchmark_ok.append(primary_benchmark or evidence_control)
     public_noise = np.asarray(
         [
             eligible and row["review_label"] == "negative" and state in public_states
@@ -919,7 +1108,10 @@ def validation_slice_masks(rows: list[dict], evidence_states: list[str]) -> dict
             eligible
             and row["review_label"] == "positive"
             and row["evidence_type"] == "same_controller_component_anchor"
-            for row, eligible in zip(rows, benchmark_ok, strict=True)
+            and state != "verified_direct_both_sides"
+            for row, state, eligible in zip(
+                rows, evidence_states, benchmark_ok, strict=True
+            )
         ],
         dtype=bool,
     )

@@ -39,6 +39,8 @@ QUEUE_FIELDS = [
     "maximum_train_seller_token_frequency",
     "left_context_preview",
     "right_context_preview",
+    "left_context_diagnostic_preview",
+    "right_context_diagnostic_preview",
     "rule_generated_candidate_only",
     "identity_label_from_rule_forbidden",
 ]
@@ -60,7 +62,18 @@ BLIND_REVIEW_PACKET_FIELDS = [
 ]
 
 
-def occurrence_preview(rows: list[dict], limit: int = 800) -> str:
+def blind_occurrence_preview(rows: list[dict], limit: int = 800) -> str:
+    """Render only source evidence; do not expose parser-state hints to reviewers."""
+    parts = []
+    for row in rows:
+        context = str(row.get("context") or row.get("description_snippet") or row.get("title_snippet") or "")
+        context = " ".join(context.split())
+        parts.append(f"[{row.get('contact_type','')}] {context[:300]}")
+    return " || ".join(parts)[:limit]
+
+
+def diagnostic_occurrence_preview(rows: list[dict], limit: int = 800) -> str:
+    """Render parser diagnostics for the immutable internal queue only."""
     parts = []
     for row in rows:
         context = str(row.get("context") or row.get("description_snippet") or row.get("title_snippet") or "")
@@ -84,6 +97,42 @@ def deterministic_unseen_component_split(sellers: tuple[str, ...]) -> str:
         ("20260714|" + "|".join(sellers)).encode("utf-8")
     ).hexdigest()
     return "valid_candidate" if int(digest[:8], 16) % 5 == 0 else "train_candidate"
+
+
+def pair_review_component(left: str, right: str) -> tuple[tuple[str, ...], str]:
+    """Return a provisional pair component used only for blind-review ordering.
+
+    Unreviewed candidates must not be unioned before identity adjudication. Doing so lets a
+    common public URL connect unrelated sellers and falsely marks almost every candidate as a
+    cross-split component. The accepted-review graph is closed again during refreeze.
+    """
+    members = tuple(sorted((left, right)))
+    component_id = common.canonical_hash(
+        ["step15_v8_provisional_review_pair", *members]
+    )[:24]
+    return members, component_id
+
+
+def pair_split_eligibility(
+    left: str,
+    right: str,
+    seller_splits: dict[str, set[str]],
+) -> tuple[str, tuple[str, ...]]:
+    """Classify a candidate without exposing the split to blind reviewers.
+
+    Train and valid components may be refrozen together after review. Any candidate touching
+    the immutable internal-development test is diagnostic only and can never enter supervision.
+    """
+    membership = tuple(sorted(set(seller_splits.get(left, set())) | set(seller_splits.get(right, set()))))
+    if "internal_development_test" in membership:
+        return "diagnostic_test_only", membership
+    if set(membership) == {"train", "valid"}:
+        return "train_valid_refreeze_candidate", membership
+    if membership:
+        split = membership[0]
+        return f"{split}_only", membership
+    provisional, _ = pair_review_component(left, right)
+    return deterministic_unseen_component_split(provisional), membership
 
 
 def candidate_component_index(
@@ -214,8 +263,6 @@ def main() -> None:
         candidate_pairs.update(
             pair_uid_key(left, right) for left, right in itertools.combinations(ordered, 2)
         )
-    seller_components, seller_component_ids = candidate_component_index(candidate_pairs)
-
     queue_rows = defaultdict(list)
     for left, right in sorted(candidate_pairs):
         key = pair_uid_key(left, right)
@@ -245,25 +292,10 @@ def main() -> None:
         shared = sorted(set(by_seller[left]) & set(by_seller[right]))
         left_occ = [item for token in shared for item in by_seller[left][token]]
         right_occ = [item for token in shared for item in by_seller[right][token]]
-        component = seller_components[left]
-        if seller_components[right] != component:
-            raise ValueError("Candidate pair endpoints were assigned to different components")
-        membership = sorted(
-            {
-                split
-                for seller in component
-                for split in seller_splits.get(seller, set())
-            }
+        component, component_id = pair_review_component(left, right)
+        split_eligibility, membership = pair_split_eligibility(
+            left, right, seller_splits
         )
-        if len(membership) > 1:
-            split_eligibility = "blocked_cross_split_seller_overlap"
-        elif membership:
-            split = membership[0]
-            split_eligibility = (
-                f"{split}_only" if split != "internal_development_test" else "diagnostic_test_only"
-            )
-        else:
-            split_eligibility = deterministic_unseen_component_split(component)
         shared_values = [f"{token[0]}:{token[1]}" for token in shared]
         pair_uid = step4_uid.get(key, "")
         pair_feature_ready = bool(pair_uid and pair_uid in v7_pair_feature_uids)
@@ -284,7 +316,7 @@ def main() -> None:
                 "supervision_materialization_status": materialization_status,
                 "seller_uid_left": left,
                 "seller_uid_right": right,
-                "candidate_component_id": seller_component_ids[left],
+                "candidate_component_id": component_id,
                 "candidate_component_size": len(component),
                 "split_eligibility": split_eligibility,
                 "existing_seller_split_membership": "|".join(membership),
@@ -299,8 +331,10 @@ def main() -> None:
                 "maximum_train_seller_token_frequency": evidence[
                     "maximum_train_seller_token_frequency"
                 ],
-                "left_context_preview": occurrence_preview(left_occ),
-                "right_context_preview": occurrence_preview(right_occ),
+                "left_context_preview": blind_occurrence_preview(left_occ),
+                "right_context_preview": blind_occurrence_preview(right_occ),
+                "left_context_diagnostic_preview": diagnostic_occurrence_preview(left_occ),
+                "right_context_diagnostic_preview": diagnostic_occurrence_preview(right_occ),
                 "rule_generated_candidate_only": "1",
                 "identity_label_from_rule_forbidden": "1",
             }
@@ -315,7 +349,8 @@ def main() -> None:
         "train_only": 1,
         "train_candidate": 1,
         "diagnostic_test_only": 2,
-        "blocked_cross_split_seller_overlap": 3,
+        "train_valid_refreeze_candidate": 2,
+        "diagnostic_test_only": 3,
     }
     for queue_kind, limit in cfg["queue_limits"].items():
         rows = queue_rows.get(queue_kind, [])
@@ -335,9 +370,14 @@ def main() -> None:
         selected_master_rows.extend(
             row
             for row in selected
-            if row["existing_v7_pair_feature_ready"] == "1"
-            and row["split_eligibility"]
-            in {"train_only", "train_candidate", "valid_only", "valid_candidate"}
+            if row["split_eligibility"]
+            in {
+                "train_only",
+                "train_candidate",
+                "valid_only",
+                "valid_candidate",
+                "train_valid_refreeze_candidate",
+            }
         )
         path = staging_root / f"{queue_kind}_blind_review_queue.csv"
         path.write_bytes(common.render_csv(selected, QUEUE_FIELDS))
@@ -419,16 +459,17 @@ def main() -> None:
         "source_occurrence_count": len(signals),
         "distinct_identifier_token_count": len(sellers_by_token),
         "candidate_pair_count_before_supervision_exclusion": len(candidate_pairs),
-        "candidate_component_count": len(set(seller_component_ids.values())),
-        "candidate_split_assignment_unit": "shared_identifier_seller_component",
+        "candidate_component_count": len(candidate_pairs),
+        "candidate_split_assignment_unit": "provisional_pair_only_before_review",
+        "accepted_review_refreeze_assignment_unit": "full_seller_connected_component",
         "skipped_or_truncated_high_frequency_token_count": skipped_high_frequency_tokens,
         "high_frequency_token_sampling": "deterministic_sha256_not_lexicographic_prefix",
         "outputs": output_records,
         "blind_review_templates": blind_template_records,
         "blind_review_packet_candidate_count": len(selected_master_rows),
         "blind_review_packet_inclusion_rule": (
-            "existing_v7_pair_feature_ready=1 AND split_eligibility in "
-            "{train_only,train_candidate,valid_only,valid_candidate}"
+            "split_eligibility in {train_only,train_candidate,valid_only,valid_candidate,"
+            "train_valid_refreeze_candidate}; feature readiness is intentionally not a review filter"
         ),
         "review_targets": targets,
         "review_protocol": {
@@ -446,6 +487,7 @@ def main() -> None:
         "model_scores_read": False,
         "review_required_before_any_step5_update": True,
         "policy_sha256": common.sha256(policy_path),
+        "producer_sha256": common.sha256(Path(__file__).resolve()),
         "inputs": {
             "item_identity_signals_sha256": common.sha256(
                 common.resolve(pool["item_identity_signals"])

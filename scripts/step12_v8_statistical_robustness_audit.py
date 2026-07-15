@@ -131,18 +131,37 @@ def main() -> None:
     splits = common.split_rows(rows_by_pool)
     valid_rows = splits["valid"]
     test_rows = splits["internal_development_test"]
+    expert_valid_control_rows = splits["evidence_expert_valid_controls"]
     b0_valid_path = common.resolve(bridge["seed_mean"]["B0_lr_l2"]["valid_prediction_path"])
     b0_test_path = common.resolve(
         bridge["seed_mean"]["B0_lr_l2"]["internal_test_prediction_path"]
+    )
+    b0_expert_valid_control_path = common.resolve(
+        bridge["seed_mean"]["B0_lr_l2"][
+            "evidence_expert_valid_control_prediction_path"
+        ]
     )
     expert_valid_path = common.resolve(expert["seed_mean"]["prediction_paths"]["zh_valid"])
     expert_test_path = common.resolve(
         expert["seed_mean"]["prediction_paths"]["internal_dev_test"]
     )
+    expert_valid_control_path = common.resolve(
+        expert["seed_mean"]["prediction_paths"][
+            "evidence_expert_valid_controls"
+        ]
+    )
     b0_valid = load_score_column(b0_valid_path, valid_rows, "prob_positive")
     b0_test = load_score_column(b0_test_path, test_rows, "prob_positive")
+    b0_expert_valid_controls = load_score_column(
+        b0_expert_valid_control_path,
+        expert_valid_control_rows,
+        "prob_positive",
+    )
     expert_valid_index = load_prediction_index(expert_valid_path, valid_rows)
     expert_test_index = load_prediction_index(expert_test_path, test_rows)
+    expert_valid_control_index = load_prediction_index(
+        expert_valid_control_path, expert_valid_control_rows
+    )
     clean_valid = np.asarray(
         [float(expert_valid_index[row["pair_uid"]]["clean_prob_positive"]) for row in valid_rows]
     )
@@ -163,6 +182,26 @@ def main() -> None:
             for row in test_rows
         ]
     )
+    clean_expert_valid_controls = np.asarray(
+        [
+            float(
+                expert_valid_control_index[row["pair_uid"]][
+                    "clean_prob_positive"
+                ]
+            )
+            for row in expert_valid_control_rows
+        ]
+    )
+    fused_expert_valid_controls = np.asarray(
+        [
+            float(
+                expert_valid_control_index[row["pair_uid"]][
+                    "contextual_evidence_prob_positive"
+                ]
+            )
+            for row in expert_valid_control_rows
+        ]
+    )
     threshold = float(expert["clean_threshold_from_representative_valid"])
     y_valid = v7.labels_array(valid_rows)
     y_test = v7.labels_array(test_rows)
@@ -172,6 +211,10 @@ def main() -> None:
 
     persisted_valid_states = [
         expert_valid_index[row["pair_uid"]]["evidence_state"] for row in valid_rows
+    ]
+    persisted_expert_valid_control_states = [
+        expert_valid_control_index[row["pair_uid"]]["evidence_state"]
+        for row in expert_valid_control_rows
     ]
     zh_train_sellers = {
         str(row[key])
@@ -188,64 +231,75 @@ def main() -> None:
             "public_identifier_train_seller_frequency_threshold"
         ]
     )
+    readiness_rows = valid_rows + expert_valid_control_rows
     valid_states = [
         common.occurrence_evidence(
             row, occurrence_index, token_df, frequency_threshold
         )["evidence_state"]
-        for row in valid_rows
+        for row in readiness_rows
     ]
-    if persisted_valid_states != valid_states:
+    persisted_readiness_states = (
+        persisted_valid_states + persisted_expert_valid_control_states
+    )
+    if persisted_readiness_states != valid_states:
         first = next(
             index
             for index, (persisted, recomputed) in enumerate(
-                zip(persisted_valid_states, valid_states, strict=True)
+                zip(persisted_readiness_states, valid_states, strict=True)
             )
             if persisted != recomputed
         )
         raise ValueError(
             "Step12-v8 recomputed occurrence state differs from the evidence prediction; "
-            f"pair_uid={valid_rows[first]['pair_uid']} "
-            f"persisted={persisted_valid_states[first]} recomputed={valid_states[first]}"
+            f"pair_uid={readiness_rows[first]['pair_uid']} "
+            f"persisted={persisted_readiness_states[first]} recomputed={valid_states[first]}"
         )
-    slice_masks = common.validation_slice_masks(valid_rows, valid_states)
+    slice_masks = common.validation_slice_masks(readiness_rows, valid_states)
+    y_readiness = v7.labels_array(readiness_rows)
+    clean_readiness = np.concatenate(
+        [clean_valid, clean_expert_valid_controls]
+    )
+    fused_readiness = np.concatenate(
+        [fused_valid, fused_expert_valid_controls]
+    )
     clean_public_fpr, public_count = subset_metric(
-        y_valid,
-        clean_valid,
+        y_readiness,
+        clean_readiness,
         threshold,
         slice_masks["state_backed_public_noise_negative"],
         "fpr",
     )
     fused_public_fpr, _ = subset_metric(
-        y_valid,
-        fused_valid,
+        y_readiness,
+        fused_readiness,
         threshold,
         slice_masks["state_backed_public_noise_negative"],
         "fpr",
     )
     clean_direct_recall, direct_count = subset_metric(
-        y_valid,
-        clean_valid,
+        y_readiness,
+        clean_readiness,
         threshold,
         slice_masks["direct_or_component_positive"],
         "recall",
     )
     fused_direct_recall, _ = subset_metric(
-        y_valid,
-        fused_valid,
+        y_readiness,
+        fused_readiness,
         threshold,
         slice_masks["direct_or_component_positive"],
         "recall",
     )
     clean_template_fpr, template_count = subset_metric(
-        y_valid,
-        clean_valid,
+        y_readiness,
+        clean_readiness,
         threshold,
         slice_masks["template_clone_negative"],
         "fpr",
     )
     fused_template_fpr, _ = subset_metric(
-        y_valid,
-        fused_valid,
+        y_readiness,
+        fused_readiness,
         threshold,
         slice_masks["template_clone_negative"],
         "fpr",
@@ -414,6 +468,14 @@ def main() -> None:
             "B0_average_precision": b0_valid_ap,
             "selected_clean_average_precision": clean_valid_ap,
             "contextual_evidence_average_precision": fused_valid_ap,
+            "primary_metric_scope_excludes_evidence_expert_controls": True,
+            "evidence_expert_valid_control_count": len(
+                expert_valid_control_rows
+            ),
+            "evidence_expert_valid_control_B0_score_count": len(
+                b0_expert_valid_controls
+            ),
+            "readiness_slice_row_count": len(readiness_rows),
             "public_noise_count": public_count,
             "direct_component_count": direct_count,
             "template_clone_count": template_count,
@@ -424,6 +486,10 @@ def main() -> None:
                 np.sum(slice_masks["same_controller_component_anchor_positive"])
             ),
             "slice_definition": gates_cfg["validation_slice_definition"],
+            "readiness_slice_scope": (
+                "primary_representative_valid_plus_isolated_evidence_expert_"
+                "validation_controls"
+            ),
             "legacy_evidence_type_only_public_slice_used": False,
             "clean_public_noise_fpr": clean_public_fpr,
             "contextual_public_noise_fpr": fused_public_fpr,

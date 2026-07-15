@@ -40,11 +40,18 @@ def canonical_hash(value: object) -> str:
 
 
 def supervised_eligible(row: dict) -> bool:
-    return (
-        row.get("review_label") in {"positive", "negative"}
-        and row.get("usable_for_supervision") == "1"
+    if row.get("review_label") not in {"positive", "negative"}:
+        return False
+    primary = (
+        row.get("usable_for_supervision") == "1"
         and row.get("usable_for_core_transfer") == "1"
+        and str(row.get("primary_identity_model_eligible", "1")).strip() != "0"
     )
+    evidence_control = (
+        str(row.get("primary_identity_model_eligible", "1")).strip() == "0"
+        and str(row.get("evidence_expert_eligible", "0")).strip() == "1"
+    )
+    return primary or evidence_control
 
 
 def load_joined_rows(policy: dict) -> dict[str, list[dict]]:

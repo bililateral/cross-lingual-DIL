@@ -70,6 +70,8 @@ def eligible(row: dict) -> bool:
         row.get("review_label") in {"positive", "negative"}
         and row.get("usable_for_supervision") == "1"
         and row.get("usable_for_core_transfer") == "1"
+        and row.get("benchmark_eligible") == "1"
+        and row.get("silver_train_only", "0") != "1"
     )
 
 

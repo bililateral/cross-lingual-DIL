@@ -79,12 +79,15 @@ def main() -> None:
         )
     if not (root / policy["clean_semantics"]["output_subdirectory"] / "clean_semantics_manifest.json").is_file():
         raise FileNotFoundError("Step15-v8 clean semantics must be built before the bridge audit")
+    runtime_chain = common.verify_readiness_runtime_chain(policy, v7_policy)
 
     rows_by_pool = common.load_joined_rows(policy, v7_policy, root)
     splits = common.split_rows(rows_by_pool)
     train_rows = splits["train"]
     valid_rows = splits["valid"]
     test_rows = splits["internal_development_test"]
+    expert_train_control_rows = splits["evidence_expert_train_controls"]
+    expert_valid_control_rows = splits["evidence_expert_valid_controls"]
     expected_test = int(policy["evaluation"]["current_internal_test_row_count_expected"])
     if len(test_rows) != expected_test:
         raise ValueError(f"Internal test changed: expected={expected_test} observed={len(test_rows)}")
@@ -102,6 +105,10 @@ def main() -> None:
             latent_by_pair[(pool_name, row["pair_uid"])] = np.asarray(vector, dtype=float)
 
     def latents(rows: list[dict]) -> np.ndarray:
+        if not rows:
+            return np.empty(
+                (0, int(latent_cfg["projection_dimensions"])), dtype=float
+            )
         return np.asarray(
             [latent_by_pair[(row["step15_pool"], row["pair_uid"])] for row in rows],
             dtype=float,
@@ -110,6 +117,8 @@ def main() -> None:
     train_latent = latents(train_rows)
     valid_latent = latents(valid_rows)
     test_latent = latents(test_rows)
+    expert_train_control_latent = latents(expert_train_control_rows)
+    expert_valid_control_latent = latents(expert_valid_control_rows)
     corpus_context = common.load_corpus_reference_context(policy, v7_policy)
     bridge_cfg = policy["bridge_audit"]
     seeds = [int(value) for value in bridge_cfg["seeds"]]
@@ -325,14 +334,30 @@ def main() -> None:
     test_feature_rows = common.apply_corpus_reference(
         test_rows, full_train_corpus_reference, corpus_context
     )
+    expert_train_control_feature_rows = common.apply_corpus_reference(
+        expert_train_control_rows, full_train_corpus_reference, corpus_context
+    )
+    expert_valid_control_feature_rows = common.apply_corpus_reference(
+        expert_valid_control_rows, full_train_corpus_reference, corpus_context
+    )
     corpus_reference_path = staging_root / "full_train_corpus_reference.json"
     corpus_reference_path.write_text(
         json.dumps(full_train_corpus_reference, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     final_score_matrices: dict[str, dict[str, list[np.ndarray]]] = {
-        "B0_lr_l2": {"valid": [], "internal_development_test": []},
-        "selected_clean": {"valid": [], "internal_development_test": []},
+        "B0_lr_l2": {
+            "valid": [],
+            "internal_development_test": [],
+            "evidence_expert_train_controls": [],
+            "evidence_expert_valid_controls": [],
+        },
+        "selected_clean": {
+            "valid": [],
+            "internal_development_test": [],
+            "evidence_expert_train_controls": [],
+            "evidence_expert_valid_controls": [],
+        },
     }
     for output_id, feature_set_id, family in (
         ("B0_lr_l2", "B0_v7_20d_plus_e5_latent64", "lr_l2"),
@@ -348,6 +373,28 @@ def main() -> None:
             x_test = common.apply_feature_transform(
                 test_feature_rows, policy, v7_policy, transform, test_latent
             )
+            x_expert_train_controls = (
+                common.apply_feature_transform(
+                    expert_train_control_feature_rows,
+                    policy,
+                    v7_policy,
+                    transform,
+                    expert_train_control_latent,
+                )
+                if expert_train_control_rows
+                else np.empty((0, x_train.shape[1]), dtype=float)
+            )
+            x_expert_valid_controls = (
+                common.apply_feature_transform(
+                    expert_valid_control_feature_rows,
+                    policy,
+                    v7_policy,
+                    transform,
+                    expert_valid_control_latent,
+                )
+                if expert_valid_control_rows
+                else np.empty((0, x_train.shape[1]), dtype=float)
+            )
             if family == "lr_l2":
                 model = common.fit_lr(x_train, train_rows, policy, v7_policy)
             else:
@@ -356,6 +403,12 @@ def main() -> None:
                 )
             valid_scores = common.apply_model(x_valid, model)
             test_scores = common.apply_model(x_test, model)
+            expert_train_control_scores = common.apply_model(
+                x_expert_train_controls, model
+            )
+            expert_valid_control_scores = common.apply_model(
+                x_expert_valid_controls, model
+            )
             threshold = step7.choose_threshold(
                 y_valid,
                 valid_scores,
@@ -364,6 +417,16 @@ def main() -> None:
             )
             valid_path = staging_root / "predictions" / f"{output_id}__seed_{seed}.zh_valid.csv"
             test_path = staging_root / "predictions" / f"{output_id}__seed_{seed}.internal_dev_test.csv"
+            expert_train_control_path = (
+                staging_root
+                / "predictions"
+                / f"{output_id}__seed_{seed}.evidence_expert_train_controls.csv"
+            )
+            expert_valid_control_path = (
+                staging_root
+                / "predictions"
+                / f"{output_id}__seed_{seed}.evidence_expert_valid_controls.csv"
+            )
             valid_path.parent.mkdir(parents=True, exist_ok=True)
             valid_path.write_bytes(
                 common.render_csv(
@@ -374,6 +437,28 @@ def main() -> None:
             test_path.write_bytes(
                 common.render_csv(
                     prediction_rows(test_rows, test_scores, threshold, "internal_development_test"),
+                    PREDICTION_FIELDS,
+                )
+            )
+            expert_train_control_path.write_bytes(
+                common.render_csv(
+                    prediction_rows(
+                        expert_train_control_rows,
+                        expert_train_control_scores,
+                        threshold,
+                        "evidence_expert_train_controls",
+                    ),
+                    PREDICTION_FIELDS,
+                )
+            )
+            expert_valid_control_path.write_bytes(
+                common.render_csv(
+                    prediction_rows(
+                        expert_valid_control_rows,
+                        expert_valid_control_scores,
+                        threshold,
+                        "evidence_expert_valid_controls",
+                    ),
                     PREDICTION_FIELDS,
                 )
             )
@@ -404,6 +489,12 @@ def main() -> None:
             )
             final_score_matrices[output_id]["valid"].append(valid_scores)
             final_score_matrices[output_id]["internal_development_test"].append(test_scores)
+            final_score_matrices[output_id]["evidence_expert_train_controls"].append(
+                expert_train_control_scores
+            )
+            final_score_matrices[output_id]["evidence_expert_valid_controls"].append(
+                expert_valid_control_scores
+            )
             final_records.append(
                 {
                     "output_id": output_id,
@@ -423,6 +514,18 @@ def main() -> None:
                     "internal_test_prediction_path": str(
                         (final_root / test_path.relative_to(staging_root)).relative_to(ROOT)
                     ).replace("\\", "/"),
+                    "evidence_expert_train_control_prediction_path": str(
+                        (
+                            final_root
+                            / expert_train_control_path.relative_to(staging_root)
+                        ).relative_to(ROOT)
+                    ).replace("\\", "/"),
+                    "evidence_expert_valid_control_prediction_path": str(
+                        (
+                            final_root
+                            / expert_valid_control_path.relative_to(staging_root)
+                        ).relative_to(ROOT)
+                    ).replace("\\", "/"),
                 }
             )
 
@@ -430,6 +533,12 @@ def main() -> None:
     for output_id, matrices in final_score_matrices.items():
         valid_mean = np.mean(np.vstack(matrices["valid"]), axis=0)
         test_mean = np.mean(np.vstack(matrices["internal_development_test"]), axis=0)
+        expert_train_control_mean = np.mean(
+            np.vstack(matrices["evidence_expert_train_controls"]), axis=0
+        )
+        expert_valid_control_mean = np.mean(
+            np.vstack(matrices["evidence_expert_valid_controls"]), axis=0
+        )
         threshold = step7.choose_threshold(
             y_valid,
             valid_mean,
@@ -438,6 +547,16 @@ def main() -> None:
         )
         valid_path = staging_root / "predictions" / f"{output_id}__seed_mean.zh_valid.csv"
         test_path = staging_root / "predictions" / f"{output_id}__seed_mean.internal_dev_test.csv"
+        expert_train_control_path = (
+            staging_root
+            / "predictions"
+            / f"{output_id}__seed_mean.evidence_expert_train_controls.csv"
+        )
+        expert_valid_control_path = (
+            staging_root
+            / "predictions"
+            / f"{output_id}__seed_mean.evidence_expert_valid_controls.csv"
+        )
         valid_path.write_bytes(
             common.render_csv(
                 prediction_rows(valid_rows, valid_mean, threshold, "representative_valid"),
@@ -447,6 +566,28 @@ def main() -> None:
         test_path.write_bytes(
             common.render_csv(
                 prediction_rows(test_rows, test_mean, threshold, "internal_development_test"),
+                PREDICTION_FIELDS,
+            )
+        )
+        expert_train_control_path.write_bytes(
+            common.render_csv(
+                prediction_rows(
+                    expert_train_control_rows,
+                    expert_train_control_mean,
+                    threshold,
+                    "evidence_expert_train_controls",
+                ),
+                PREDICTION_FIELDS,
+            )
+        )
+        expert_valid_control_path.write_bytes(
+            common.render_csv(
+                prediction_rows(
+                    expert_valid_control_rows,
+                    expert_valid_control_mean,
+                    threshold,
+                    "evidence_expert_valid_controls",
+                ),
                 PREDICTION_FIELDS,
             )
         )
@@ -461,6 +602,16 @@ def main() -> None:
             ).replace("\\", "/"),
             "internal_test_prediction_path": str(
                 (final_root / test_path.relative_to(staging_root)).relative_to(ROOT)
+            ).replace("\\", "/"),
+            "evidence_expert_train_control_prediction_path": str(
+                (
+                    final_root / expert_train_control_path.relative_to(staging_root)
+                ).relative_to(ROOT)
+            ).replace("\\", "/"),
+            "evidence_expert_valid_control_prediction_path": str(
+                (
+                    final_root / expert_valid_control_path.relative_to(staging_root)
+                ).relative_to(ROOT)
             ).replace("\\", "/"),
         }
 
@@ -510,6 +661,7 @@ def main() -> None:
             "representative_validation_assignments_sha256": common.sha256(
                 common.resolve(policy["frozen_dependencies"]["representative_validation_assignments"])
             ),
+            "readiness_runtime_chain": runtime_chain,
         },
         "preprocessing_scope": {
             "oof_corpus_statistics": "fold_train_sellers_only",

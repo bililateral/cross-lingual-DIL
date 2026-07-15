@@ -298,10 +298,13 @@
       "state_backed_verified_direct_positive": 20,
       "same_controller_component_anchor_positive": 15
     },
+    "readiness_slice_scope": "primary_representative_validation_plus_isolated_evidence_expert_validation_controls",
+    "readiness_eligibility": "(benchmark_eligible=1 AND silver_train_only!=1 AND primary_identity_model_eligible!=0) OR (evidence_expert_validation_eligible=1 AND primary_identity_model_eligible=0 AND evidence_expert_eligible=1)",
+    "evidence_expert_controls_used_for_primary_model_selection": false,
     "validation_slice_definition": {
-      "state_backed_public_noise_negative": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=negative AND occurrence evidence state in {risky_only_shared,support_only_shared,high_frequency_public}",
-      "state_backed_verified_direct_positive": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=positive AND occurrence evidence state=verified_direct_both_sides",
-      "same_controller_component_anchor_positive": "benchmark_eligible=1 AND silver_train_only!=1 AND review_label=positive AND evidence_type=same_controller_component_anchor"
+      "state_backed_public_noise_negative": "readiness_eligibility AND review_label=negative AND occurrence evidence state in {risky_only_shared,support_only_shared,high_frequency_public}",
+      "state_backed_verified_direct_positive": "readiness_eligibility AND review_label=positive AND occurrence evidence state=verified_direct_both_sides",
+      "same_controller_component_anchor_positive": "readiness_eligibility AND review_label=positive AND evidence_type=same_controller_component_anchor"
     },
     "legacy_public_contact_or_url_noise_evidence_type_alone_is_not_a_gate_slice": true,
     "internal_test_may_satisfy_no_gate": true,

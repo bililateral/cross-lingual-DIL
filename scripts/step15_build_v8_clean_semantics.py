@@ -196,9 +196,10 @@ def main() -> None:
     for pool_name, item in prepared.items():
         pool_cfg = policy["pools"][pool_name]
         e5_matrix, e5_metadata = load_v7_e5(pool_cfg, item["seller_uids"])
-        if e5_metadata.get("clean_text_corpus_sha256") != item["diagnostics"][
-            "clean_text_corpus_sha256"
-        ]:
+        frozen_e5_corpus_hash = e5_metadata.get("clean_text_corpus_sha256") or (
+            e5_metadata.get("redaction_diagnostics", {}).get("clean_text_corpus_sha256")
+        )
+        if frozen_e5_corpus_hash != item["diagnostics"]["clean_text_corpus_sha256"]:
             raise ValueError(
                 f"V8 redacted text corpus differs from the frozen v7 E5 corpus: {pool_name}"
             )
