@@ -1,0 +1,100 @@
+{
+  "step": "step16i_reconcile_ai_sensitivity_reviews",
+  "version": "2026-07-16-step16i-ai-sensitivity-reconciliation-v1",
+  "status": "completed_ai_sensitivity_reconciliation",
+  "scope": "ai_sensitivity_only_not_human_gold",
+  "automatic_labels_created": false,
+  "step5_modified": false,
+  "prospective_claim_allowed": false,
+  "join_key": "blind_id_only",
+  "validation_contract": {
+    "original_queue_hashes_verified_against_preparation_manifest": true,
+    "completed_schema_row_count_and_blind_id_order_verified": true,
+    "all_non_decision_cell_values_verified_unchanged": true,
+    "blind_mapping_read": false,
+    "label_inference_performed": false
+  },
+  "reviewed_row_count": 160,
+  "counts": {
+    "reviewed": 160,
+    "exact_identity_agreement": 117,
+    "exact_evidence_agreement": 92,
+    "exact_identity_and_evidence_agreement": 91,
+    "high_confidence_exact_agreement": 47,
+    "needs_human_adjudication": 113
+  },
+  "agreement_rates": {
+    "exact_identity_agreement": 0.73125,
+    "exact_evidence_agreement": 0.575,
+    "exact_identity_and_evidence_agreement": 0.56875,
+    "high_confidence_exact_agreement": 0.29375,
+    "needs_human_adjudication": 0.70625
+  },
+  "decision_counts": {
+    "reviewer_a_identity": {
+      "different_controller": 109,
+      "same_controller": 27,
+      "uncertain": 24
+    },
+    "reviewer_a_evidence": {
+      "ordinary_negative": 33,
+      "same_controller_component_anchor": 26,
+      "same_controller_direct_identifier": 1,
+      "same_controller_style_structural_soft": 23,
+      "semantic_topic_not_controller": 65,
+      "template_clone_not_controller": 11,
+      "uncertain_insufficient_evidence": 1
+    },
+    "reviewer_b_identity": {
+      "different_controller": 100,
+      "same_controller": 1,
+      "uncertain": 59
+    },
+    "reviewer_b_evidence": {
+      "ordinary_negative": 41,
+      "same_controller_direct_identifier": 1,
+      "same_controller_style_structural_soft": 29,
+      "semantic_topic_not_controller": 53,
+      "template_clone_not_controller": 35,
+      "uncertain_insufficient_evidence": 1
+    }
+  },
+  "input_artifacts": {
+    "reviewer_a_queue": {
+      "path": "reports/step16i_retrospective_dev2/preparation_v1_20260716/reviewer_a_queue.csv",
+      "sha256": "c7a5ab82bc480f11bee17705f3853dd7c6c48edd7597c4a6c9c150a63be3237e",
+      "row_count": 160
+    },
+    "reviewer_b_queue": {
+      "path": "reports/step16i_retrospective_dev2/preparation_v1_20260716/reviewer_b_queue.csv",
+      "sha256": "a77f25b767a39002e6cd25cc53fad96b196ba5a2b94655c1f0f47650e09dd26e",
+      "row_count": 160
+    },
+    "preparation_manifest": {
+      "path": "reports/step16i_retrospective_dev2/preparation_v1_20260716/preparation_manifest.json",
+      "sha256": "9779506d6b22883b7348d140cb92da1a1f34ea820e66caf41bc329c82f620363"
+    },
+    "policy": {
+      "path": "schema/step16i_retrospective_dev2_policy.json",
+      "sha256": "94dee2cb74f6f6fea95ba59779a74da8b99c7e3bc8aa872e16faf41baaac75c8"
+    },
+    "reviewer_a_completed": {
+      "path": "reports/step16i_retrospective_dev2/agent_review_sensitivity_20260716/reviewer_a_completed.csv",
+      "sha256": "47295e08829ff8943d5563f573eb3dd378e8a63c3d8561f2b0b36c2f577f95a7",
+      "row_count": 160
+    },
+    "reviewer_b_completed": {
+      "path": "reports/step16i_retrospective_dev2/agent_review_sensitivity_20260716/reviewer_b_completed.csv",
+      "sha256": "fca84edb16a121cf6c2d9af71a4e0a1bcdb094fdefbf455ebff63dec9b9d312b",
+      "row_count": 160
+    }
+  },
+  "output_artifacts": {
+    "agreement_by_blind_id": {
+      "path": "reports/step16i_retrospective_dev2/ai_review_reconciliation_v1_20260716/agreement_by_blind_id.csv",
+      "sha256": "9c9451906212171db12ffc24a04b3fcea1b4587b92ac50d2d7ea51e624efcb7c",
+      "row_count": 160
+    }
+  },
+  "summary_payload_sha256": "77de637ce96406687d64fa26cc0ee6790d8e6f0052ed673b3f6a1e7680f3777d"
+}

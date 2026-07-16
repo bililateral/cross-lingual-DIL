@@ -1,7 +1,7 @@
 # Step16I 数据完整性审计与回顾性 Dev2 建设计划
 
 日期：2026-07-16
-状态：v1 完整性审计已完成；保守 component 合并规则已纠正，等待 v2 重跑并生成 Dev2
+状态：v2 完整性审计、Dev2 preparation、双路 AI sensitivity 审查和 owner-authorized Codex 裁决均已完成
 适用分支：`data/step16i-integrity-dev2`
 
 ## 1. 文档目的
@@ -177,6 +177,36 @@ split 的 seller 子图。原契约错误地要求持久化分区与 seller 图�
 保守合并记 warning；真实连通组件被拆到多个持久化 ID、跨 split seller/alias/component、
 重复 pair 或未知 split 仍然 fail closed。v1 失败记录永久保留，修正后必须使用新 run ID。
 
+### 2.9 Step16I v2 与 Dev2 双路 AI sensitivity 审查
+
+v2 在修正后的安全规则下通过，只保留 3 个同 split 保守合并 warning。Dev2 从 353 个合格
+候选组件中选出 160 个互不重叠组件，覆盖完整组件内 473 个 seller。队列包含 120 条语义
+相似、35 条高优先级软候选和 5 条模板候选；160 条全部没有 occurrence context、共享 contact、
+PGP 或 same-alias，因此它是困难负例/不确定性压力集，不是 proof-positive 扩充集。
+
+两名隔离 AI reviewer 的 same/different/uncertain 分布分别为 `27/109/24` 和 `1/100/59`。
+identity 一致率为 `117/160`，identity 与 evidence type 同时一致为 `91/160`，两路均 high
+confidence 且完全一致仅 `47/160`：其中 46 条 negative、1 条 same-controller 候选。唯一
+same 候选的两侧可见商品文本都明确以罕见自称 `独孤信` 署名。项目负责人随后授权 Codex
+执行第三方裁决，最终冻结为 `1 same / 108 different / 51 uncertain`。裁决结果标记为
+`two_ai_blind_reviews_plus_codex_adjudication_owner_authorized`，不写回 Step5。
+
+### 2.10 裁决与受控解盲结果
+
+Codex 裁决先按 blind ID 完成并冻结哈希，之后才读取 `blind_mapping.csv` 进行受控解盲。
+唯一 positive 对应 seller `26064` 与 `27020`；两侧商品标题/正文都使用罕见自称“独孤信”。
+另一个棋牌后台候选虽然有独特的第一人称控制叙述，但没有共同账号、迁移声明或独立 component
+anchor，因此保留 uncertain，没有为了增加正例强行确认。
+
+解盲后的独立 Dev2 有 160 个唯一 pair 和 160 个唯一候选 component，与永久排除 pair 的重叠
+为 0。去除 51 条 uncertain 后，二分类压力集为 `1 positive / 108 negative`，正例率约
+`0.917%`。它可以用于 false-positive/hard-negative 压力分析，但不能作为平衡的论文主 benchmark，
+也没有解决中文 proof-positive 稀缺问题。
+
+准确 provenance 为 owner-authorized AI adjudication，不是逐条 human verification。项目负责人
+采纳结果不等于两名人类 reviewer 独立标注；论文不得把它写成人类双标 gold。详细记录见
+`docs/STEP16I_CODEX_ADJUDICATION_REPORT_20260716.zh.md`。
+
 ## 3. Step16I 的科研边界
 
 ### 3.1 可以做的事
@@ -332,7 +362,7 @@ reports/step16i_retrospective_dev2/preparation_v1_20260716/
 
 ### 5.4 当前工具二之后的人工流程
 
-当前实现到 review queue preparation 为止。后续必须由单独、经过审查的 reconciliation/materialization 工具或受控人工流程完成，且必须满足：
+当前实现已经包含独立 reconciliation、blind-ID 裁决冻结和受控 materialization，且必须满足：
 
 - A/B reviewer 独立完成，不能看到对方决定；
 - 不一致或任一方为 `uncertain` 时必须进入第三方 adjudication；
@@ -417,6 +447,20 @@ tests/test_step16i_data_integrity_contracts.py
 docs/STEP16I_DATA_INTEGRITY_AND_RETROSPECTIVE_DEV2_PLAN_20260716.zh.md
 ```
 
+裁决阶段还需同步：
+
+```text
+scripts/step16i_reconcile_ai_sensitivity_reviews.py
+scripts/step16i_finalize_codex_adjudication.py
+scripts/step16i_materialize_codex_adjudicated_dev2.py
+scripts/run_step16i_ai_sensitivity_reconciliation_linux_20260716.sh
+tests/test_step16i_ai_review_reconciliation_contracts.py
+tests/test_step16i_codex_adjudication_contracts.py
+docs/STEP16I_CODEX_ADJUDICATION_REPORT_20260716.zh.md
+reports/step16i_data_integrity/step16i_integrity_20260716_v2/
+reports/step16i_retrospective_dev2/
+```
+
 同时补同步最新 V8 readiness root，保证复现链完整：
 
 ```text
@@ -479,7 +523,7 @@ python3 scripts/step16i_prepare_retrospective_dev2.py \
     "reports/step16i_data_integrity/$INTEGRITY_RUN_ID/permanent_exclusion_manifest.csv"
 ```
 
-随后只把 `reviewer_a_queue.csv` 和 `reviewer_b_queue.csv` 分别交给两名独立 reviewer。不得把 `blind_mapping.csv`、两个 queue 或参考标签一起交给同一 reviewer。当前两个工具到此结束，不执行尚未实现的 reconcile/materialize 命令。
+随后只把 `reviewer_a_queue.csv` 和 `reviewer_b_queue.csv` 分别交给两名独立 reviewer。不得把 `blind_mapping.csv`、两个 queue 或参考标签一起交给同一 reviewer。当前双路 AI sensitivity 审查、reconciliation、owner-authorized Codex 裁决和受控 materialization 已完成；它们的结果仍是 retrospective/internal-development only。
 
 ## 8. Prospective final holdout 的启动条件
 
@@ -510,7 +554,7 @@ Step16I 只有同时满足以下条件才算完成：
 - 预测辅助标注风险行已显式标记；
 - Step16F/Step16H 已有 evidence-tier 结果被保留为审计依据；当前 Step16I 工具没有自动改写或重新裁决这些标签；
 - permanent exclusion manifest 已生成；
-- retrospective dev2 双盲队列已生成；双审、仲裁和 materialization 是后续人工阶段，当前工具不伪造已完成；
+- retrospective dev2 双盲队列、双路 AI sensitivity 审查、Codex 裁决和受控 materialization 已完成；provenance 明确声明不是人类双标 gold；
 - dev2 与现有监督及 controls component-disjoint；
 - dev2 明确标记 `prospective_final_eligible=false`；
 - 本地 proof direct 和独立 prospective public-noise 为 0 时，报告 evidence scarcity，不降低标准；
