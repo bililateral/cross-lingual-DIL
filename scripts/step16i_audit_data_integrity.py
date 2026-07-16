@@ -585,10 +585,11 @@ def audit_v8_readiness(
     leaking_pairs = [key for key, value in pair_splits.items() if len(value) > 1]
     duplicate_pairs = [key for key, value in duplicate_pair_counts.items() if value > 1]
     non_primary_splits = sorted({row["_audit_split"] for row in normalized_rows} - primary_splits)
+    partition_equivalent = not persisted_overmerged and not recomputed_fragmented
+    conservative_coarsening = bool(persisted_overmerged) and not recomputed_fragmented
     passed = not any(
         (
             endpoint_mismatch_count,
-            len(persisted_overmerged),
             len(recomputed_fragmented),
             len(leaking_components),
             len(leaking_sellers),
@@ -598,8 +599,9 @@ def audit_v8_readiness(
             len(non_primary_splits),
         )
     )
+    status = "warning" if passed and conservative_coarsening else ("pass" if passed else "fail")
     summary = {
-        "status": "pass" if passed else "fail",
+        "status": status,
         "passed": passed,
         "assignment_path": relative_path(path),
         "assignment_sha256": file_sha256(path),
@@ -607,8 +609,12 @@ def audit_v8_readiness(
         "seller_count": len(seller_to_component),
         "recomputed_component_count": len(components),
         "persisted_component_count": len(persisted_to_recomputed),
-        "partition_equivalent_to_recomputed_components": not persisted_overmerged
-        and not recomputed_fragmented,
+        "partition_equivalent_to_recomputed_components": partition_equivalent,
+        "partition_is_safe_conservative_coarsening": conservative_coarsening,
+        "partition_safety_rule": (
+            "Persisted components may merge disconnected recomputed components within one split, "
+            "but a recomputed seller-connected component may not be fragmented across persisted IDs."
+        ),
         "persisted_components_overmerging_recomputed_count": len(persisted_overmerged),
         "recomputed_components_split_across_persisted_count": len(recomputed_fragmented),
         "cross_split_component_count": len(leaking_components),

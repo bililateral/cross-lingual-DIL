@@ -114,6 +114,65 @@ class Step16IDataIntegrityContractTests(unittest.TestCase):
         self.assertEqual(summary["leakage"]["seller_alias_cross_split_count"], 1)
         self.assertIs(summary["leakage"]["detected"], True)
 
+    def _audit_synthetic_readiness(self, rows: list[dict[str, str]]) -> dict:
+        with tempfile.TemporaryDirectory(dir=ROOT) as temporary:
+            path = Path(temporary) / "readiness.csv"
+            with path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            summary, _, _, _ = integrity.audit_v8_readiness(
+                path,
+                self.integrity_policy["v8_readiness_assignment_check"],
+                {"train", "valid", "test"},
+            )
+        return summary
+
+    def test_readiness_conservative_component_merge_is_warning_not_failure(self) -> None:
+        rows = [
+            {
+                "pair_uid": "pair-ab",
+                "seller_uid_left": "market|seller_raw:alpha",
+                "seller_uid_right": "market|seller_raw:beta",
+                "v7_split_name": "train",
+                "split_component_id": "coarse-component",
+            },
+            {
+                "pair_uid": "pair-cd",
+                "seller_uid_left": "market|seller_raw:charlie",
+                "seller_uid_right": "market|seller_raw:delta",
+                "v7_split_name": "train",
+                "split_component_id": "coarse-component",
+            },
+        ]
+        summary = self._audit_synthetic_readiness(rows)
+        self.assertIs(summary["passed"], True)
+        self.assertEqual(summary["status"], "warning")
+        self.assertEqual(summary["persisted_components_overmerging_recomputed_count"], 1)
+        self.assertIs(summary["partition_is_safe_conservative_coarsening"], True)
+
+    def test_readiness_connected_component_fragmentation_still_fails(self) -> None:
+        rows = [
+            {
+                "pair_uid": "pair-ab",
+                "seller_uid_left": "market|seller_raw:alpha",
+                "seller_uid_right": "market|seller_raw:beta",
+                "v7_split_name": "train",
+                "split_component_id": "component-one",
+            },
+            {
+                "pair_uid": "pair-bc",
+                "seller_uid_left": "market|seller_raw:beta",
+                "seller_uid_right": "market|seller_raw:charlie",
+                "v7_split_name": "train",
+                "split_component_id": "component-two",
+            },
+        ]
+        summary = self._audit_synthetic_readiness(rows)
+        self.assertIs(summary["passed"], False)
+        self.assertEqual(summary["status"], "fail")
+        self.assertEqual(summary["recomputed_components_split_across_persisted_count"], 1)
+
     def test_reviewer_queue_contract_hides_selection_and_model_fields(self) -> None:
         row = {
             "source_market_raw_left": "market-a",

@@ -1,7 +1,7 @@
 # Step16I 数据完整性审计与回顾性 Dev2 建设计划
 
 日期：2026-07-16
-状态：实施计划，尚未执行 Step16I 工具
+状态：v1 完整性审计已完成；保守 component 合并规则已纠正，等待 v2 重跑并生成 Dev2
 适用分支：`data/step16i-integrity-dev2`
 
 ## 1. 文档目的
@@ -163,6 +163,20 @@ Step16H-v3 的独立 AI-assisted sensitivity review 对同一批 80 条当前 po
 
 当前本地旧池仍可提供有限的 template、semantic-topic 和 uncertain candidates，用于 retrospective dev2。它不能产生新的 prospective proof-positive 或独立 public-noise benchmark。
 
+### 2.8 Step16I v1 实际审计结果
+
+Linux v1 审计读取了中文 `893` 条 primary rows 和英文 `734` 条 primary rows，生成
+`1,627` 条 component assignment 与 `7,991` 条永久排除记录。EN、ZH 和跨语言范围的
+pair、完整 seller UID、portable seller alias、重算 seller component 均为零跨 split
+重叠。中文旧 component 字段把 `595` 个旧 ID 映射到 `383` 个真实连通组件，英文旧字段
+则有 9 个 ID 过度合并互不连接的子图；它们是历史字段质量警告，不是当前 split 泄漏。
+
+v1 唯一阻断项来自 V8 readiness：3 个持久化 component 各合并两个互不连接、但处于同一
+split 的 seller 子图。原契约错误地要求持久化分区与 seller 图连通分区完全等价。该要求
+过强，因为保守合并只会减少有效独立组数，不会把同一 seller 带入不同 split。修正规则为：
+保守合并记 warning；真实连通组件被拆到多个持久化 ID、跨 split seller/alias/component、
+重复 pair 或未知 split 仍然 fail closed。v1 失败记录永久保留，修正后必须使用新 run ID。
+
 ## 3. Step16I 的科研边界
 
 ### 3.1 可以做的事
@@ -260,7 +274,7 @@ case-fold 标准化的可携带跨市场 seller alias，以及重算的 seller c
 - 每个输出带 `run_id`、policy version 和输入哈希；
 - 已存在的 run root直接拒绝运行，不能静默覆盖，也不提供 identical replay 模式；
 - summary 必须同时报告 pair count 和 independent component count；
-- `summary.json` 中的 `v8_readiness_assignment_check` 必须由实际 archive 验证结果计算，预期为通过；
+- `summary.json` 中的 `v8_readiness_assignment_check` 必须由实际 archive 验证结果计算。持久化 component 在同一 split 内保守合并多个不连通子图只记 warning；真实 seller-connected component 被拆到多个持久化 ID、任何跨 split 重叠或重复 pair 才 fail closed；
 - 若发现真实跨 split seller/component overlap，工具必须 fail closed；
 - 历史 component stale 本身应被报告并生成 overlay，不应通过覆盖 Step5 来隐藏。
 
