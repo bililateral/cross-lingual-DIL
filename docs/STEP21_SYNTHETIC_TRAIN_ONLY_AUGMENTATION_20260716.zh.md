@@ -163,3 +163,91 @@ STEP21_DEVICE=cpu bash scripts/run_step21_synthetic_train_only_linux_20260716.sh
 > We collected 152 new Chinese sockpuppet positives.
 
 48/170 是生成行数，不是独立真实正例数。Step21 只能缓解有限样本下的表示方差，不能解决 ground-truth scarcity、标签可信度或 prospective evaluation 缺失。
+
+## 12. Linux v2 同步与数值结果
+
+### 12.1 同步完整性
+
+有效结果根目录为：
+
+```text
+reports/step21_synthetic_train_only/v2_balanced_grouped_oof_20260716/
+```
+
+`step21_sync_manifest.json` 声明 `21` 个 payload 文件、总计 `9,139,042` bytes。Windows 回传审计重新计算了每个文件的大小和 SHA-256，结果为：
+
+- missing files：`0`；
+- size mismatches：`0`；
+- SHA-256 mismatches：`0`。
+
+因此本节数值不是由漏传、截断或混入 v1 文件造成的。
+
+### 12.2 生成结果
+
+主轨 `primary_non_silver` 使用 `16` 个真实中文 train parent pairs、`13` 个 seller components，生成 `48` 个 synthetic pairs 和 `96` 个 synthetic seller profiles。父样本由 `1` 个 direct-identifier positive 和 `15` 个 style/structural soft positives 构成。父样本总权重与 synthetic 总权重均为 `16.0`。文本变化审计为 `41` 个 both-changed 和 `7` 个 one-side-changed，没有 no-op synthetic pair。
+
+敏感性轨 `sensitivity_silver_anchor` 使用 `85` 个 silver parent pairs、`19` 个 seller components，生成 `170` 个 synthetic pairs 和 `340` 个 profiles。父样本包含 `56` 个 direct-identifier positives 和 `29` 个 component-anchor positives；父样本与 synthetic 总权重均约为 `38.05`。文本变化审计为 `156` 个 both-changed 和 `14` 个 one-side-changed，同样没有 no-op。
+
+两轨都明确记录：
+
+```text
+new_real_positive_count = 0
+new_independent_identity_count = 0
+may_be_used_for_validation_or_test = false
+```
+
+### 12.3 分组折外边界
+
+OOF 评估包含 `573` 条中文 train rows、`229` positives、`344` negatives 和 `222` 个重算 seller components。五个 held-out folds 为：
+
+| Fold | Rows | Positive | Negative |
+|---:|---:|---:|---:|
+| 0 | 194 | 30 | 164 |
+| 1 | 95 | 50 | 45 |
+| 2 | 95 | 50 | 45 |
+| 3 | 94 | 49 | 45 |
+| 4 | 95 | 50 | 45 |
+
+每折均有正负标签。Fold 0 的不平衡来自一个不可拆分的 `175` 行 seller component，不是随机拆分失败。与 v1 相比，v2 已修复单类 fold 和极端 base-rate 漂移问题，因此只有 v2 可以用于 Step21 方法判断。
+
+### 12.4 主轨结果
+
+| Method | ROC-AUC | AP |
+|---|---:|---:|
+| No augmentation | 0.765195 | 0.654591 |
+| Equal-effective-weight duplication | 0.765220 | 0.653481 |
+| Identifier-redacted text augmentation | 0.763075 | 0.652302 |
+
+差值为：
+
+- text augmentation minus no augmentation AP：`-0.002289`；
+- text augmentation minus equal-weight duplication AP：`-0.001179`。
+
+文本增强没有超过任一必要对照。差异虽小，但方向为负，不能声称 augmentation gain。
+
+### 12.5 Silver-anchor 敏感性结果
+
+| Method | ROC-AUC | AP |
+|---|---:|---:|
+| No augmentation | 0.765195 | 0.654591 |
+| Equal-effective-weight duplication | 0.770044 | 0.654724 |
+| Identifier-redacted text augmentation | 0.764471 | 0.648531 |
+
+差值为：
+
+- text augmentation minus no augmentation AP：`-0.006060`；
+- text augmentation minus equal-weight duplication AP：`-0.006192`。
+
+即使允许更多 direct/component silver parents，文本变换仍没有获得 representation gain。复制对照的 ROC-AUC 略升，但 AP 几乎不变，说明增加少数类有效权重最多轻微改变全局排序，并未改善正例优先检索质量。
+
+### 12.6 科研结论与后续处置
+
+Step21-v2 是协议有效、文件完整、结果为负的消融实验。它支持以下结论：
+
+1. 失败不是由 v1 分折缺陷、文件漏传或文本变换 no-op 造成的；这些问题在 v2 均已修复。
+2. 对现有少量 parent identities 做确定性、identifier-redacted 文本扰动，没有创造新的操作者证据，也没有提高 grouped OOF AP。
+3. 主轨只有 `13` 个独立 parent components，且 `15/16` parents 是 soft positives；生成 `48` 行不能把有效独立样本量变成 `48`。
+4. Silver sensitivity 也失败，表明问题不只是主轨 parent 数量小，而是当前变换没有增加可泛化的 identity information。
+5. Step21 不进入 Step7/9/15 主训练，不进入 Step11/17 图谱验证，也不触发 prospective holdout。它保留为论文中的 negative augmentation ablation，或作为“样本行数增加不能替代独立身份锚点”的实证证据。
+
+后续不应继续围绕同一 OOF 边界调 section rotation、segment ratio 或权重。真正能改变结论的输入是新的、独立的真实 controller identities 和模型冻结后的 prospective evaluation，而不是继续派生同一批父样本。
