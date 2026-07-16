@@ -46,24 +46,55 @@ def grouped_folds(rows: list[dict], fold_count: int, seed: int) -> dict[str, int
     if len(grouped) < fold_count:
         raise ValueError("Step21 grouped OOF has fewer components than folds")
     records = []
+    total_rows = len(rows)
+    total_positives = sum(row["review_label"] == "positive" for row in rows)
+    total_negatives = total_rows - total_positives
+    targets = np.asarray(
+        [total_rows / fold_count, total_positives / fold_count, total_negatives / fold_count],
+        dtype=float,
+    )
     for component, component_rows in grouped.items():
         positives = sum(row["review_label"] == "positive" for row in component_rows)
+        negatives = len(component_rows) - positives
         digest = hashlib.sha256(f"{seed}|{component}".encode("utf-8")).hexdigest()
-        records.append((component, len(component_rows), positives, digest))
-    records.sort(key=lambda item: (-item[1], -item[2], item[3]))
-    fold_total = [0] * fold_count
-    fold_positive = [0] * fold_count
-    assignment = {}
-    for component, count, positives, _ in records:
-        fold = min(
-            range(fold_count),
-            key=lambda index: (fold_positive[index], fold_total[index], index),
+        normalized_mass = max(
+            len(component_rows) / max(targets[0], 1.0),
+            positives / max(targets[1], 1.0),
+            negatives / max(targets[2], 1.0),
         )
+        records.append(
+            (component, len(component_rows), positives, negatives, normalized_mass, digest)
+        )
+    records.sort(key=lambda item: (-item[4], -item[1], -item[2], item[5]))
+    fold_counts = np.zeros((fold_count, 3), dtype=float)
+    assignment = {}
+    for component, count, positives, negatives, _, _ in records:
+        addition = np.asarray([count, positives, negatives], dtype=float)
+        candidates = []
+        for index in range(fold_count):
+            proposed = fold_counts.copy()
+            proposed[index] += addition
+            normalized_error = (proposed - targets[None, :]) / np.maximum(
+                targets[None, :], 1.0
+            )
+            loss = float(np.sum(normalized_error**2))
+            candidates.append(
+                (
+                    loss,
+                    float(fold_counts[index, 0]),
+                    float(fold_counts[index, 1]),
+                    index,
+                )
+            )
+        fold = min(candidates)[-1]
         assignment[component] = fold
-        fold_total[fold] += count
-        fold_positive[fold] += positives
-    if any(total == 0 for total in fold_total):
+        fold_counts[fold] += addition
+    if any(total == 0 for total in fold_counts[:, 0]):
         raise ValueError("Step21 grouped OOF emitted an empty fold")
+    if any(positive == 0 for positive in fold_counts[:, 1]) or any(
+        negative == 0 for negative in fold_counts[:, 2]
+    ):
+        raise ValueError("Step21 grouped OOF emitted a single-class held-out fold")
     return assignment
 
 

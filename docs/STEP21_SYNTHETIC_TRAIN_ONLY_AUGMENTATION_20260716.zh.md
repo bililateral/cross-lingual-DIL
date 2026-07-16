@@ -86,7 +86,7 @@ canonical 中文冻结集当前为：
 - E5 embedding cache、五折 OOF predictions 和 evaluation summary。
 - `step21_sync_manifest.json`：覆盖最终目录中全部生成、缓存和评估文件的大小与 SHA-256，用于回传完整性核验。
 
-所有 synthetic UID 以 `synthetic://step21/v1/` 开头，market 标记为 `SYNTHETIC_TRAIN_ONLY`。synthetic label 强制设置：
+所有 active-v2 synthetic UID 以 `synthetic://step21/v2/` 开头，market 标记为 `SYNTHETIC_TRAIN_ONLY`。synthetic label 强制设置：
 
 - `split_name=train`；
 - `benchmark_eligible=0`；
@@ -129,6 +129,12 @@ Step21 不读取当前 valid/test 选择方法。它在最终 v7 中文 train se
 6. valid/test、Step16I Dev2 和 Step20 完全不参与方法选择。
 
 Step21 的正面结果仍不能替代 Step20。论文最终有效性必须在真实、前瞻性、模型冻结后收集的数据上评估一次。
+
+### 9.1 v1 分折缺陷及 v2 修正
+
+首次 Linux v1 运行完整同步，但 OOF fold 数量为 `326/46/54/74/73`，其中一个 46 行 fold 全为正例。根因不是同步或模型，而是旧贪心分组器优先平衡累计正例，未联合约束负例和总行数。该 OOF 拼接会引入严重的 fold-specific probability-base-rate drift，因此 v1 数值仅保留为无效诊断。
+
+中文 train 存在一个不可拆分的 175 行 seller component（11 positive / 164 negative），完全等大的五折在数学上不可实现。v2 按 component 的总数、positive 和 negative 三维归一化误差做确定性贪心分配，预期 fold 总数约为 `194/95/95/94/95`，positive 约为 `30/50/50/49/50`，且每折必须同时含正负标签。v2 写入独立路径，不覆盖 v1。
 
 ## 10. Linux 执行
 

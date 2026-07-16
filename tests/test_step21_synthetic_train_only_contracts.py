@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import step21_build_synthetic_zh_train as step21  # noqa: E402
+import step21_evaluate_synthetic_augmentation as step21_eval  # noqa: E402
 
 
 def load_csv(path: Path) -> list[dict]:
@@ -163,6 +164,39 @@ class Step21SyntheticTrainOnlyContractTests(unittest.TestCase):
             observed,
             {"primary_non_silver": 16, "sensitivity_silver_anchor": 85},
         )
+
+    def test_grouped_oof_balances_labels_despite_the_large_train_component(self) -> None:
+        labels = [
+            row
+            for row in load_csv(ROOT / self.policy["inputs"]["frozen_labels"])
+            if row["split_name"] == "train"
+            and row["review_label"] in {"positive", "negative"}
+        ]
+        assignments = {
+            row["pair_uid"]: row
+            for row in load_csv(ROOT / self.policy["inputs"]["component_assignments"])
+        }
+        rows = [
+            {
+                "pair_uid": row["pair_uid"],
+                "review_label": row["review_label"],
+                "v7_component_id": assignments[row["pair_uid"]]["recomputed_component_id"],
+            }
+            for row in labels
+        ]
+        folds = step21_eval.grouped_folds(rows, 5, 20260716)
+        counts = {fold: {"positive": 0, "negative": 0} for fold in range(5)}
+        for row in rows:
+            counts[folds[row["v7_component_id"]]][row["review_label"]] += 1
+        positives = [count["positive"] for count in counts.values()]
+        totals = [count["positive"] + count["negative"] for count in counts.values()]
+        # One immutable component contains 175 rows (11 positive / 164 negative),
+        # so perfect five-fold balance is mathematically impossible.
+        self.assertGreaterEqual(min(positives), 30)
+        self.assertLessEqual(max(positives), 50)
+        self.assertGreaterEqual(min(totals), 90)
+        self.assertLessEqual(max(totals), 200)
+        self.assertTrue(all(count["negative"] > 0 for count in counts.values()))
 
 
 if __name__ == "__main__":

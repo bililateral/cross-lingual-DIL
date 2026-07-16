@@ -26,10 +26,10 @@ echo "[4/6] Run five-fold seller-component grouped train-OOF controls"
   --seed 20260716
 
 echo "[5/6] Verify that no synthetic row was promoted to benchmark data"
-"$PYTHON_BIN" -c 'import json, pathlib; p=pathlib.Path("reports/step21_synthetic_train_only/v1_20260716/step21_synthetic_augmentation_evaluation_summary.json"); d=json.loads(p.read_text(encoding="utf-8")); assert d["publication_holdout_untouched"] is True; print(json.dumps({"status": d["status"], "tracks": list(d["tracks"])}, ensure_ascii=False, indent=2))'
+"$PYTHON_BIN" -c 'import json, pathlib; p=pathlib.Path("reports/step21_synthetic_train_only/v2_balanced_grouped_oof_20260716/step21_synthetic_augmentation_evaluation_summary.json"); d=json.loads(p.read_text(encoding="utf-8")); assert d["publication_holdout_untouched"] is True; print(json.dumps({"status": d["status"], "tracks": list(d["tracks"])}, ensure_ascii=False, indent=2))'
 
 echo "[6/6] Build the complete content-addressed sync manifest"
 "$PYTHON_BIN" scripts/step21_build_sync_manifest.py \
   --policy "$POLICY"
 
-echo "Step21 completed. Outputs: reports/step21_synthetic_train_only/v1_20260716/"
+echo "Step21 completed. Outputs: reports/step21_synthetic_train_only/v2_balanced_grouped_oof_20260716/"
