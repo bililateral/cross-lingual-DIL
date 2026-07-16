@@ -58,7 +58,7 @@ V3 将恢复 canonical split，因此预期主边界为：
 - 总训练行：974；
 - Chinese representative valid：120；
 - Chinese internal development test：200，pair UID 集合保持不变；
-- evidence-expert controls：train 60、valid 55，始终与主身份验证指标隔离。
+- evidence-expert controls：train 60、valid 48，始终与主身份验证指标隔离。Valid 的 canonical benchmark 本身已有 4 条 occurrence-backed public-noise negative 和 3 条 verified-direct positive，因此只新增 public 16、direct 17、component 15；门槛仍为总计 20/20/15，没有降低。
 
 ## 4. V3 代码修正
 
@@ -71,6 +71,8 @@ V3 将恢复 canonical split，因此预期主边界为：
 7. 每条补充 public/victim-data URL control 会在两侧 seller 上物化 `external_url` occurrence，固定 `product_data_risk_context=1`、`direct_identity_eligible=0`。物化器逐 pair 复算 occurrence state；任何选中 public control 落入 `no_shared_identifier`、`ambiguous` 或 direct 状态都会阻断 freeze。
 8. V3 artifact tests 不再默认读取失效的 V2 freeze。runner 先运行静态测试，V3 物化后再以 `STEP15_V8_READINESS_ROOT` 指向新 freeze 重跑全部 artifact/hash/count/state tests。
 9. Step20 新 manifest 先写入 assignment CSV SHA-256，再计算 manifest self-hash；新建 evidence controls 的 `candidate_scope` 统一为 `evidence_expert_control`。
+10. Supplemental profile-URL review 与旧 context review 现在按规范化 `pair_uid + URL token` 去重。`5kqp0.com` 与 `jnqp.com` 各有两轮独立审查但只对应一个训练/验证 pair；同证据重复会合并 reviewer provenance，不同 URL、标签或 evidence type 会继续 fail closed。配额按唯一 pair 计算。
+11. Control 选择改为补足 canonical baseline 的差额，而不是机械地再添加一整套门槛数量：`control_count=max(0, required-canonical_observed)`。这避免把已有 benchmark slice 和重复审查再次当成新增样本。
 
 ## 5. 公共网址噪声补齐
 
@@ -85,7 +87,7 @@ V3 将恢复 canonical split，因此预期主边界为：
 - 最终候选域为 10 条，8 条获得两位不同 reviewer 完全一致的 high-confidence public/victim-data URL negative 结论；
 - 两条不确定或审查分歧候选不进入任何训练、验证或测试。
 
-这 8 条样本均设置为 evidence-expert-only controls：不写为 Step5 gold，不进入 primary identity scorer，不计入主 benchmark，只用于验证 occurrence-level evidence expert 能否识别公共网址噪声。它们与 12 条原有 valid-compatible controls 合并后恰好达到固定 valid 配额 20。
+这 8 条审查结论中，`5kqp0.com` 与 `jnqp.com` 已在原 context 双审池中对应相同 seller pair，因此不能再次计作两个新样本。按规范化 pair 去重后，supplemental 池提供 6 个唯一新增 pair；原池与补充池合计有 18 个可选的新 valid control。Canonical valid 自身已有 4 条 occurrence-backed public-noise negative，所以 V3 只需选择 16 个新 public control，最终仍达到固定总门槛 20，并保留 2 个未选候选作为余量。
 
 ## 6. 当前状态
 

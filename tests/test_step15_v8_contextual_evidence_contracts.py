@@ -186,6 +186,66 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             self.assertIn(literal, profiles[row["seller_uid_left"]]["profile_text"].casefold())
             self.assertIn(literal, profiles[row["seller_uid_right"]]["profile_text"].casefold())
 
+    def test_public_review_pair_deduplication_is_fail_closed(self) -> None:
+        base = {
+            "seller_uid_left": "seller:a",
+            "seller_uid_right": "seller:b",
+            "identity_label": "negative",
+            "evidence_type": "public_contact_or_url_noise",
+            "reviewer_ids": ["reviewer:a", "reviewer:b"],
+            "review_notes": "public target URL",
+        }
+        context = {
+            **base,
+            "selection_uid": "context:1",
+            "shared_identifier_values": "external_url:example.test",
+        }
+        supplemental = {
+            **base,
+            "selection_uid": "supplemental:1",
+            "shared_identifier_values": "example.test",
+            "supplemental_profile_url_control": "1",
+        }
+        merged, audit = readiness_freeze.merge_duplicate_public_candidates(
+            [context], [supplemental]
+        )
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(len(audit), 1)
+        self.assertEqual(audit[0]["identifier_tokens"], ["example.test"])
+        conflicting = {
+            **supplemental,
+            "shared_identifier_values": "different.test",
+        }
+        with self.assertRaisesRegex(ValueError, "different URL evidence"):
+            readiness_freeze.merge_duplicate_public_candidates(
+                [context], [conflicting]
+            )
+
+    def test_component_safe_selection_deduplicates_canonical_pair_uid(self) -> None:
+        rows = [
+            {
+                "selection_uid": "review:a",
+                "seller_uid_left": "seller:a",
+                "seller_uid_right": "seller:b",
+            },
+            {
+                "selection_uid": "review:b",
+                "seller_uid_left": "seller:b",
+                "seller_uid_right": "seller:a",
+            },
+        ]
+        with self.assertRaisesRegex(ValueError, "required=2 observed=1"):
+            readiness_freeze.select_quota_component_safe(
+                rows,
+                "test-run",
+                "duplicate-pair",
+                2,
+                "valid",
+                {},
+                lambda row: (row["seller_uid_left"], row["seller_uid_right"]),
+                set(),
+            )
+
     def test_actual_reviewed_control_pools_meet_v3_component_safe_quotas(self) -> None:
         assignments = self._csv_rows(
             ROOT
@@ -271,8 +331,81 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                     "selection_uid": uid,
                     "seller_uid_left": row["seller_uid_left"],
                     "seller_uid_right": row["seller_uid_right"],
+                    "shared_identifier_types": "external_url",
+                    "shared_identifier_values": row["shared_url_literal"],
+                    "identity_label": "negative",
+                    "evidence_type": "public_contact_or_url_noise",
+                    "reviewer_ids": [a["reviewer_id"], b["reviewer_id"]],
+                    "review_notes": f"{a['notes']} | {b['notes']}",
+                    "supplemental_profile_url_control": "1",
                 }
             )
+
+        context_public_count = sum(
+            row.get("supplemental_profile_url_control") != "1"
+            for row in public_candidates
+        )
+        public_candidates, duplicate_audit = (
+            readiness_freeze.merge_duplicate_public_candidates(
+                public_candidates[:context_public_count],
+                public_candidates[context_public_count:],
+            )
+        )
+        self.assertEqual(
+            {row["identifier_tokens"][0] for row in duplicate_audit},
+            {"5kqp0.com", "jnqp.com"},
+        )
+        self.assertEqual(
+            len(public_candidates),
+            len(
+                {
+                    readiness_freeze.pair_uid(
+                        row["seller_uid_left"], row["seller_uid_right"]
+                    )
+                    for row in public_candidates
+                }
+            ),
+        )
+
+        baseline_counts = readiness_freeze.canonical_baseline_readiness_counts(
+            self._csv_rows(
+                ROOT / "reports" / "step5_zh_target_strict_frozen_silver_labels.csv"
+            ),
+            self._csv_rows(
+                ROOT / "reports" / "step15_evidence_type_labels.zh_target_strict.csv"
+            ),
+            self._csv_rows(
+                ROOT / "reports" / "step3_item_identity_signals.zh_target_strict.csv"
+            ),
+            assignments,
+            int(
+                self.policy["occurrence_evidence_expert"][
+                    "public_identifier_train_seller_frequency_threshold"
+                ]
+            ),
+        )
+        self.assertEqual(
+            baseline_counts,
+            {
+                "valid": {
+                    "state_backed_public_noise_negative": 4,
+                    "state_backed_verified_direct_positive": 3,
+                    "same_controller_component_anchor_positive": 0,
+                },
+                "train": {
+                    "state_backed_public_noise_negative": 0,
+                    "state_backed_verified_direct_positive": 0,
+                    "same_controller_component_anchor_positive": 0,
+                },
+            },
+        )
+        control_requirements = {
+            split: {
+                key: max(0, required - baseline_counts[split][key])
+                for key, required in readiness_freeze.READINESS_REQUIREMENTS[split].items()
+            }
+            for split in ("valid", "train")
+        }
 
         selected_uids = set()
         selected_public = []
@@ -282,7 +415,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                     public_candidates,
                     "readiness_expansion_v3_20260715",
                     f"public_noise_{split}",
-                    readiness_freeze.READINESS_REQUIREMENTS[split][
+                    control_requirements[split][
                         "state_backed_public_noise_negative"
                     ],
                     split,
@@ -291,17 +424,38 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                     selected_uids,
                 )
             )
-        self.assertEqual(Counter(row["assigned_split"] for row in selected_public), {"valid": 20, "train": 20})
         self.assertEqual(
-            {
-                row["selection_uid"]
-                for row in selected_public
-                if row["selection_uid"].startswith("profile_url_public_noise_")
-            },
-            {
-                *(f"profile_url_public_noise_{index:03d}" for index in range(1, 6)),
+            Counter(row["assigned_split"] for row in selected_public),
+            {"valid": 16, "train": 20},
+        )
+        selected_supplemental_ids = {
+            row["selection_uid"]
+            for row in selected_public
+            if row["selection_uid"].startswith("profile_url_public_noise_")
+        }
+        self.assertTrue(
+            selected_supplemental_ids
+            <= {
+                "profile_url_public_noise_001",
+                "profile_url_public_noise_003",
+                "profile_url_public_noise_005",
                 *(f"profile_url_public_noise_{index:03d}" for index in range(9, 12)),
-            },
+            }
+        )
+        self.assertFalse(
+            selected_supplemental_ids
+            & {"profile_url_public_noise_002", "profile_url_public_noise_004"}
+        )
+        self.assertEqual(
+            len(selected_public),
+            len(
+                {
+                    readiness_freeze.pair_uid(
+                        row["seller_uid_left"], row["seller_uid_right"]
+                    )
+                    for row in selected_public
+                }
+            ),
         )
         profiles = {
             row["seller_uid"]: row
@@ -310,13 +464,8 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         signals = common.load_csv(
             ROOT / "reports" / "step3_item_identity_signals.zh_target_strict.csv"
         )
-        supplemental_ids = {
-            f"profile_url_public_noise_{index:03d}" for index in range(1, 6)
-        } | {
-            f"profile_url_public_noise_{index:03d}" for index in range(9, 12)
-        }
         for row in selected_public:
-            if row["selection_uid"] not in supplemental_ids:
+            if row.get("supplemental_profile_url_control") != "1":
                 continue
             candidate = next(
                 item
@@ -787,7 +936,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             "valid-seller": "valid",
             "test-seller": "internal_development_test",
         }
-        selected_uids: set[str] = set()
+        selected_pair_uids: set[str] = set()
         selected_valid = readiness_freeze.select_quota_component_safe(
             rows,
             "fixture",
@@ -796,10 +945,10 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             "valid",
             reserved,
             lambda row: (row["left"], row["right"]),
-            selected_uids,
+            selected_pair_uids,
         )
         self.assertEqual({row["assigned_split"] for row in selected_valid}, {"valid"})
-        self.assertNotIn("test", selected_uids)
+        self.assertNotIn("new-5||test-seller", selected_pair_uids)
         selected_train = readiness_freeze.select_quota_component_safe(
             rows,
             "fixture",
@@ -808,7 +957,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             "train",
             reserved,
             lambda row: (row["left"], row["right"]),
-            selected_uids,
+            selected_pair_uids,
         )
         self.assertEqual(selected_train[0]["selection_uid"], "train")
 
@@ -1474,9 +1623,9 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             Counter(
                 {
                     ("train", "public_noise_control", "negative"): 20,
-                    ("valid", "public_noise_control", "negative"): 20,
+                    ("valid", "public_noise_control", "negative"): 16,
                     ("train", "direct_control", "positive"): 30,
-                    ("valid", "direct_control", "positive"): 20,
+                    ("valid", "direct_control", "positive"): 17,
                     ("train", "component_control", "positive"): 10,
                     ("valid", "component_control", "positive"): 15,
                 }
@@ -1499,7 +1648,7 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
         public_controls = [
             row for row in controls if row["identity_control_role"] == "public_noise_control"
         ]
-        self.assertEqual(len(public_controls), 40)
+        self.assertEqual(len(public_controls), 36)
         self.assertTrue(
             all(
                 row.get("label_tier")

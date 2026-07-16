@@ -134,15 +134,15 @@ V3 不覆盖 V2。它继续保留 V2 的原子英文/中文 feature 发布修复
 V3 必须在 Linux 重现并由 manifest 绑定以下边界，否则运行失败：
 
 - primary `train` 为 974 行，即英文 source `train=401` 加中文 canonical `train=573`；primary `valid` 为 120 行；英文 `valid/test` 不进入 v8 训练；
-- evidence-expert-only controls 为 `train=60`、`valid=55`，由 public `20/20`、direct `30/20`、component `10/15` 组成；
+- evidence-expert-only controls 为 `train=60`、`valid=48`。Train canonical baseline 为零，因此新增 public/direct/component `20/30/10`；valid canonical baseline 已有 public `4`、direct `3`、component `0`，因此只新增 `16/17/15`，与 baseline 合计后仍严格达到预注册的 `20/20/15`。
 - 固定内部开发测试仍为 200 行，pair UID 哈希为 `ea9e5f46b742cb017e3122b00536e7741208adebb5d293ff31237e634d226ef5`；
 - seller 跨 split 重叠为 0；
 - 所有 371 条 `silver_train_only` 行仍在 train，primary valid/test 中该字段计数必须为 0；
 - Step3、Step4 与 canonical Step7 扩展后的精确行数由 V3 freeze manifest 重新记录，不能引用 V2 行数代替；
-- 真实冻结输入测试确认，原 context 队列只有 12 条 canonical-valid-compatible public controls；两轮 score/split-blind URL 审查的最终候选域为 10 条，其中 8 条获两位不同 reviewer 的 high-confidence 一致 negative 结论，二者合并后恰好达到固定 valid 配额 20；另有 2 条不确定或分歧候选被排除，1 个更早的 DeepMix 提案因两侧 `.onion` 域名不同而在进入最终候选域前被 source-literal contract 拒绝；
+- 真实冻结输入测试确认，原 context 队列有 12 条 canonical-valid-compatible public controls；两轮 score/split-blind URL 审查的最终候选域为 10 条，其中 8 条获两位不同 reviewer 的 high-confidence 一致 negative 结论，但 `5kqp0.com` 与 `jnqp.com` 各自重复了 context 队列中的同一 seller pair。按 canonical `pair_uid + URL token` 合并后，补充池只新增 6 个唯一 pair，两个池合计 18 个唯一候选；canonical valid 已自带 4 条 occurrence-backed public-noise negative，因此只需从候选中确定性选择 16 条，最终达到不变的总门槛 20。另有 2 条不确定或分歧候选被排除，1 个更早的 DeepMix 提案因两侧 `.onion` 域名不同而在进入最终候选域前被 source-literal contract 拒绝；
 - 没有覆盖任何原有可用 binary supervision，也没有把 evidence controls 提升为 primary benchmark；
 - public-noise negative 的证据足以支持“共享标识符处于公共/商品/支持上下文”，但不足以把不同操作者身份当作 gold truth，因此固定为 `high_confidence_silver_agent_reviewed_public_noise_control`；
-- 所有 115 条扩充行均设置 `usable_for_supervision=0`、`usable_for_core_transfer=0`、`primary_identity_model_eligible=0`、`benchmark_eligible=0`，只通过显式 v8 evidence-control 路径进入专家训练或充分性审计；
+- 本次仅补足 canonical freeze 相对预注册门槛的缺口，共物化 108 条控制行（`train=60`、`valid=48`）；它们均设置 `usable_for_supervision=0`、`usable_for_core_transfer=0`、`primary_identity_model_eligible=0`、`benchmark_eligible=0`，只通过显式 v8 evidence-control 路径进入专家训练或充分性审计；
 - manifest 必须记录 `thresholds_lowered=false`、`model_scores_read=false`，并闭合 supplemental candidate/reviewer/profile 传递哈希；
 - 每条 supplemental URL control 必须在 pair 两侧物化相同的 `external_url` 风险 occurrence，并复算为 `risky_only_shared`、`support_only_shared` 或 `high_frequency_public`；只选中行数但 occurrence state 不成立时必须失败；
 - Step20 新 manifest 的 self-hash 必须覆盖 assignment CSV hash；新建 evidence controls 的 scope 必须为 `evidence_expert_control`；

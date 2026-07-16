@@ -176,6 +176,176 @@ def pair_uid(left: str, right: str) -> str:
     return "||".join(sorted((left, right)))
 
 
+def normalized_public_identifier_tokens(row: dict) -> tuple[str, ...]:
+    raw = str(row.get("shared_identifier_values", "")).replace(" || ", "|")
+    tokens = set()
+    for value in raw.split("|"):
+        token = value.strip().casefold()
+        if not token:
+            continue
+        if token.startswith("external_url:"):
+            token = token.removeprefix("external_url:")
+        tokens.add(token.rstrip("/"))
+    return tuple(sorted(tokens))
+
+
+def merge_duplicate_public_candidates(
+    context_rows: list[dict], supplemental_rows: list[dict]
+) -> tuple[list[dict], list[dict]]:
+    """Merge independently reviewed duplicates only when their evidence is identical."""
+
+    tagged = [
+        {**row, "public_review_source": "context_review"} for row in context_rows
+    ] + [
+        {**row, "public_review_source": "supplemental_profile_url_review"}
+        for row in supplemental_rows
+    ]
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for row in tagged:
+        uid = pair_uid(row["seller_uid_left"], row["seller_uid_right"])
+        grouped[uid].append(row)
+
+    merged = []
+    duplicate_audit = []
+    for uid in sorted(grouped):
+        rows = sorted(
+            grouped[uid],
+            key=lambda row: (
+                row["public_review_source"] != "context_review",
+                row["selection_uid"],
+            ),
+        )
+        token_sets = {normalized_public_identifier_tokens(row) for row in rows}
+        if () in token_sets or len(token_sets) != 1:
+            raise ValueError(
+                "Public-noise reviews reuse one seller pair with different URL evidence: "
+                f"{uid}"
+            )
+        for row in rows:
+            if (
+                row.get("identity_label") != "negative"
+                or row.get("evidence_type") != "public_contact_or_url_noise"
+            ):
+                raise ValueError(
+                    "Public-noise duplicate merge received incompatible review labels: "
+                    f"{uid}"
+                )
+
+        primary = dict(rows[0])
+        reviewer_ids = []
+        review_notes = []
+        for row in rows:
+            raw_reviewers = row.get("reviewer_ids", [])
+            if isinstance(raw_reviewers, str):
+                raw_reviewers = raw_reviewers.split("+")
+            for reviewer_id in raw_reviewers:
+                reviewer_id = str(reviewer_id).strip()
+                if reviewer_id and reviewer_id.casefold() not in {
+                    value.casefold() for value in reviewer_ids
+                }:
+                    reviewer_ids.append(reviewer_id)
+            note = str(row.get("review_notes", "")).strip()
+            if note and note not in review_notes:
+                review_notes.append(note)
+        primary["reviewer_ids"] = reviewer_ids
+        primary["review_notes"] = " | ".join(review_notes)
+        primary["merged_selection_uids"] = "|".join(
+            row["selection_uid"] for row in rows
+        )
+        primary["merged_review_sources"] = "|".join(
+            sorted({row["public_review_source"] for row in rows})
+        )
+        merged.append(primary)
+        if len(rows) > 1:
+            duplicate_audit.append(
+                {
+                    "pair_uid": uid,
+                    "identifier_tokens": list(next(iter(token_sets))),
+                    "retained_selection_uid": primary["selection_uid"],
+                    "merged_selection_uids": [row["selection_uid"] for row in rows],
+                    "review_sources": sorted(
+                        {row["public_review_source"] for row in rows}
+                    ),
+                    "reviewer_ids": reviewer_ids,
+                }
+            )
+    return merged, duplicate_audit
+
+
+def canonical_baseline_readiness_counts(
+    labels: list[dict],
+    evidence_rows: list[dict],
+    signals: list[dict],
+    assignments: list[dict],
+    frequency_threshold: int,
+) -> dict[str, dict[str, int]]:
+    evidence_by_uid = {row["pair_uid"]: row for row in evidence_rows}
+    split_by_uid = {
+        row["pair_uid"]: canonical_assignment_split(row["original_split_name"])
+        for row in assignments
+    }
+    train_sellers = {
+        seller
+        for row in assignments
+        if canonical_assignment_split(row["original_split_name"]) == "train"
+        for seller in (row["seller_uid_left"], row["seller_uid_right"])
+    }
+    occurrence_by_seller: dict[str, dict[tuple[str, str], list[dict]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    sellers_by_token: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for row in signals:
+        seller = str(row.get("seller_uid", "")).strip()
+        token = (
+            str(row.get("contact_type", "")).strip().lower(),
+            str(row.get("normalized_value", "")).strip().lower(),
+        )
+        if seller and all(token):
+            occurrence_by_seller[seller][token].append(row)
+            sellers_by_token[token].add(seller)
+    token_df = Counter(
+        {token: len(sellers & train_sellers) for token, sellers in sellers_by_token.items()}
+    )
+
+    rows_by_split: dict[str, list[dict]] = defaultdict(list)
+    states_by_split: dict[str, list[str]] = defaultdict(list)
+    for source in labels:
+        row = dict(source)
+        row.setdefault("primary_identity_model_eligible", "1")
+        row.setdefault("evidence_expert_eligible", "1")
+        row.setdefault("evidence_expert_validation_eligible", "0")
+        row.setdefault("identity_control_role", "")
+        if not readiness_row_eligible(row):
+            continue
+        uid = row["pair_uid"]
+        if uid not in split_by_uid or uid not in evidence_by_uid:
+            raise ValueError(f"Canonical readiness baseline lacks an assignment/evidence row: {uid}")
+        split = split_by_uid[uid]
+        if split not in {"train", "valid"}:
+            continue
+        joined = {
+            **row,
+            "evidence_type": evidence_by_uid[uid]["evidence_type"],
+            "domain": "zh",
+        }
+        rows_by_split[split].append(joined)
+        states_by_split[split].append(
+            common.occurrence_evidence(
+                joined, occurrence_by_seller, token_df, frequency_threshold
+            )["evidence_state"]
+        )
+
+    counts = {}
+    for split in ("valid", "train"):
+        masks = common.validation_slice_masks(
+            rows_by_split[split], states_by_split[split]
+        )
+        counts[split] = {
+            key: int(sum(masks[key])) for key in READINESS_REQUIREMENTS[split]
+        }
+    return counts
+
+
 def deterministic_rank(run_id: str, slice_name: str, uid: str) -> str:
     return hashlib.sha256(f"{run_id}|{slice_name}|{uid}".encode("utf-8")).hexdigest()
 
@@ -205,8 +375,12 @@ def select_quota_component_safe(
     target_split: str,
     reserved_split: dict[str, str],
     seller_keys,
-    selected_uids: set[str],
+    selected_pair_uids: set[str],
 ) -> list[dict]:
+    if count < 0:
+        raise ValueError(f"Negative reviewed-row quota for {slice_name}: {count}")
+    if count == 0:
+        return []
     ordered = sorted(
         rows,
         key=lambda row: (
@@ -216,16 +390,21 @@ def select_quota_component_safe(
     )
     selected = []
     for row in ordered:
-        selection_uid = row["selection_uid"]
-        if selection_uid in selected_uids:
+        partition_keys = tuple(seller for seller in seller_keys(row) if seller)
+        if len(partition_keys) < 2:
+            raise ValueError(
+                f"Reviewed row lacks two seller partition keys: {row['selection_uid']}"
+            )
+        candidate_pair_uid = pair_uid(partition_keys[0], partition_keys[1])
+        if candidate_pair_uid in selected_pair_uids:
             continue
-        sellers = {seller for seller in seller_keys(row) if seller}
+        sellers = set(partition_keys)
         if target_split not in candidate_allowed_splits(sellers, reserved_split):
             continue
         selected_row = dict(row)
         selected_row["assigned_split"] = target_split
         selected.append(selected_row)
-        selected_uids.add(selection_uid)
+        selected_pair_uids.add(candidate_pair_uid)
         for seller in sellers:
             reserved_split[seller] = target_split
         if len(selected) == count:
@@ -1038,15 +1217,11 @@ def main() -> None:
         supplemental_public_candidates,
         supplemental_public_transitive_input_paths,
     ) = validate_supplemental_public_summary(supplemental_public_summary_path)
-    duplicate_public_uids = {
-        row["selection_uid"] for row in public_candidates
-    } & {row["selection_uid"] for row in supplemental_public_candidates}
-    if duplicate_public_uids:
-        raise ValueError(
-            "Supplemental profile-URL controls duplicate the existing context review: "
-            f"{sorted(duplicate_public_uids)[0]}"
+    public_candidates, duplicate_public_review_audit = (
+        merge_duplicate_public_candidates(
+            public_candidates, supplemental_public_candidates
         )
-    public_candidates.extend(supplemental_public_candidates)
+    )
     public_available = {
         split: sum(
             split
@@ -1094,7 +1269,33 @@ def main() -> None:
                 )
                 for row in rows
             )
-    selected_uids: set[str] = set()
+
+    zh_pool_for_baseline = policy["pools"]["zh_target_strict"]
+    canonical_labels = common.load_csv(resolve(zh_pool_for_baseline["frozen_labels"]))
+    baseline_counts = canonical_baseline_readiness_counts(
+        canonical_labels,
+        common.load_csv(resolve(zh_pool_for_baseline["evidence_labels"])),
+        common.load_csv(resolve(zh_pool_for_baseline["item_identity_signals"])),
+        pre_assignment_rows,
+        int(
+            policy["occurrence_evidence_expert"][
+                "public_identifier_train_seller_frequency_threshold"
+            ]
+        ),
+    )
+    control_requirements = {
+        split: {
+            key: max(0, int(required) - int(baseline_counts[split][key]))
+            for key, required in READINESS_REQUIREMENTS[split].items()
+        }
+        for split in ("valid", "train")
+    }
+    selected_pair_uids = {
+        row["pair_uid"]
+        for row in canonical_labels
+        if row.get("review_label") in {"positive", "negative"}
+        and row.get("usable_for_supervision") == "1"
+    }
     selected_public = []
     for split in ("valid", "train"):
         selected_public.extend(
@@ -1102,13 +1303,13 @@ def main() -> None:
                 public_candidates,
                 args.run_id,
                 f"public_noise_{split}",
-                READINESS_REQUIREMENTS[split][
+                control_requirements[split][
                     "state_backed_public_noise_negative"
                 ],
                 split,
                 reserved_split,
                 lambda item: (item["seller_uid_left"], item["seller_uid_right"]),
-                selected_uids,
+                selected_pair_uids,
             )
         )
     selected_identity = []
@@ -1120,11 +1321,11 @@ def main() -> None:
                     rows,
                     args.run_id,
                     f"{short_name}_{split}",
-                    READINESS_REQUIREMENTS[split][readiness_key],
+                    control_requirements[split][readiness_key],
                     split,
                     reserved_split,
                     identity_control_partition_keys,
-                    selected_uids,
+                    selected_pair_uids,
                 )
             )
     selected_direct = [
@@ -1933,6 +2134,9 @@ def main() -> None:
         "status": "ready",
         "readiness": readiness,
         "readiness_state_counts": readiness_states,
+        "canonical_baseline_readiness_counts": baseline_counts,
+        "reviewed_control_deficit_targets": control_requirements,
+        "control_selection_rule": "max(0, preregistered_required - canonical_baseline_observed)",
         "thresholds_lowered": False,
         "internal_development_test_unchanged": True,
         "internal_development_test_count": len(new_test),
@@ -1953,7 +2157,9 @@ def main() -> None:
             "public": public_available,
             "identity": identity_available,
             "supplemental_profile_url_public": len(supplemental_public_candidates),
+            "unique_public_after_pair_deduplication": len(public_candidates),
         },
+        "duplicate_public_review_audit": duplicate_public_review_audit,
         "supplemental_profile_url_materialization": {
             "selected_control_count": sum(
                 row.get("supplemental_profile_url_control") == "1"
