@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import step22_build_same_seller_split_augmentation as step22  # noqa: E402
 import step22_evaluate_same_seller_split as step22_eval  # noqa: E402
+import step22_grouped_bootstrap_audit as step22_bootstrap  # noqa: E402
 
 
 def load_csv(path: Path) -> list[dict]:
@@ -38,6 +39,15 @@ def item(index: int, category: str = "cat", title: str | None = None) -> dict:
 
 
 class Step22SameSellerSplitContractTests(unittest.TestCase):
+    def test_grouped_bootstrap_metric_helpers(self):
+        self.assertAlmostEqual(
+            step22_bootstrap.average_precision([1, 0, 1], [0.9, 0.8, 0.7]),
+            (1.0 + (2.0 / 3.0)) / 2.0,
+        )
+        self.assertEqual(step22_bootstrap.percentile([0.0, 1.0], 0.5), 0.5)
+        with self.assertRaises(ValueError):
+            step22_bootstrap.average_precision([0, 0], [0.2, 0.1])
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.policy = json.loads(

@@ -1,0 +1,633 @@
+{
+  "step": "step22_same_seller_split_grouped_oof_evaluation",
+  "policy_version": "2026-07-16-step22-v1-same-seller-item-split",
+  "status": "train_grouped_oof_only",
+  "publication_holdout_untouched": true,
+  "valid_or_test_scores_used": false,
+  "representation": "identifier_redacted_e5_cosine_plus_fixed_64d_symmetric_pair_projection",
+  "real_chinese_train_rows": 573,
+  "real_chinese_train_components": 222,
+  "pseudo_positive_source_units": 617,
+  "reviewed_negative_source_units": 54,
+  "metrics": {
+    "no_augmentation": {
+      "row_count": 573,
+      "positive_count": 229,
+      "negative_count": 344,
+      "roc_auc": 0.689143901695948,
+      "average_precision": 0.5384667729455463
+    },
+    "equal_weight_duplication_positive_budget": {
+      "row_count": 573,
+      "positive_count": 229,
+      "negative_count": 344,
+      "roc_auc": 0.692622118411699,
+      "average_precision": 0.5411638250641805
+    },
+    "same_seller_split_positive_only": {
+      "row_count": 573,
+      "positive_count": 229,
+      "negative_count": 344,
+      "roc_auc": 0.6823271047019397,
+      "average_precision": 0.5339497807317465
+    },
+    "equal_weight_duplication_full_budget": {
+      "row_count": 573,
+      "positive_count": 229,
+      "negative_count": 344,
+      "roc_auc": 0.6956306489286077,
+      "average_precision": 0.5450810532050994
+    },
+    "same_seller_split_plus_reviewed_negative_views": {
+      "row_count": 573,
+      "positive_count": 229,
+      "negative_count": 344,
+      "roc_auc": 0.6809815172133645,
+      "average_precision": 0.527419004647409
+    }
+  },
+  "comparisons": {
+    "same_seller_positive_minus_no_augmentation_ap": -0.004516992213799864,
+    "same_seller_positive_minus_matched_duplication_ap": -0.007214044332434,
+    "full_method_minus_no_augmentation_ap": -0.011047768298137361,
+    "full_method_minus_matched_duplication_ap": -0.01766204855769038,
+    "full_method_minus_positive_only_ap": -0.006530776084337497,
+    "positive_representation_gain_supported": false,
+    "full_representation_gain_supported": false,
+    "promotion_eligible": false
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "held_out_rows": 194,
+      "held_out_positives": 30,
+      "eligible_pseudo_positives": 601,
+      "eligible_pseudo_negatives": 50,
+      "positive_synthetic_effective_weight": 37.84335248530193,
+      "negative_synthetic_effective_weight": 21.472097183725182,
+      "real_weight_summary": {
+        "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+        "component_normalization_scales": {
+          "en:ordinary_negative": 1.3211561304757244,
+          "en:public_contact_or_url_noise": 1.6597720998146557,
+          "en:same_controller_direct_identifier": 3.589582669211708,
+          "en:same_controller_style_structural_soft": 1.0305664858321302,
+          "en:semantic_topic_not_controller": 1.2787871460242304,
+          "en:template_clone_not_controller": 1.235409713263906,
+          "zh:ordinary_negative": 1.0894364624639117,
+          "zh:public_contact_or_url_noise": 2.0,
+          "zh:same_controller_component_anchor": 3.7194490158347473,
+          "zh:same_controller_direct_identifier": 3.131120253993031,
+          "zh:same_controller_style_structural_soft": 1.3821716363001706,
+          "zh:semantic_topic_not_controller": 1.1152692379158509,
+          "zh:template_clone_not_controller": 1.4286222418483143
+        },
+        "min": 0.1,
+        "mean": 0.6813356038437403,
+        "max": 2.5,
+        "by_domain_evidence": {
+          "en:ordinary_negative": {
+            "count": 179,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "en:public_contact_or_url_noise": {
+            "count": 50,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.75
+          },
+          "en:same_controller_direct_identifier": {
+            "count": 82,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.7873985035684473
+          },
+          "en:same_controller_style_structural_soft": {
+            "count": 34,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.8
+          },
+          "en:semantic_topic_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.1
+          },
+          "en:template_clone_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 1.1000000000000003
+          },
+          "zh:ordinary_negative": {
+            "count": 21,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "zh:public_contact_or_url_noise": {
+            "count": 3,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.5
+          },
+          "zh:same_controller_component_anchor": {
+            "count": 29,
+            "mean_confidence_factor": 0.25,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.28750000000000003
+          },
+          "zh:same_controller_direct_identifier": {
+            "count": 53,
+            "mean_confidence_factor": 0.55,
+            "mean_component_factor": 1.0000000000000002,
+            "mean_final_weight": 0.6875000000000001
+          },
+          "zh:same_controller_style_structural_soft": {
+            "count": 117,
+            "mean_confidence_factor": 0.3844444444444446,
+            "mean_component_factor": 1.0000000000000002,
+            "mean_final_weight": 0.2642026065863578
+          },
+          "zh:semantic_topic_not_controller": {
+            "count": 64,
+            "mean_confidence_factor": 0.3593750000000001,
+            "mean_component_factor": 0.9999999999999998,
+            "mean_final_weight": 0.43011381602563203
+          },
+          "zh:template_clone_not_controller": {
+            "count": 92,
+            "mean_confidence_factor": 0.2958695652173914,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.357185918578916
+          }
+        }
+      }
+    },
+    {
+      "fold": 1,
+      "held_out_rows": 95,
+      "held_out_positives": 50,
+      "eligible_pseudo_positives": 585,
+      "eligible_pseudo_negatives": 37,
+      "positive_synthetic_effective_weight": 32.78491503010664,
+      "negative_synthetic_effective_weight": 40.35874905184259,
+      "real_weight_summary": {
+        "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+        "component_normalization_scales": {
+          "en:ordinary_negative": 1.3211561304757244,
+          "en:public_contact_or_url_noise": 1.6597720998146557,
+          "en:same_controller_direct_identifier": 3.589582669211708,
+          "en:same_controller_style_structural_soft": 1.0305664858321302,
+          "en:semantic_topic_not_controller": 1.2787871460242304,
+          "en:template_clone_not_controller": 1.235409713263906,
+          "zh:ordinary_negative": 5.884354098857688,
+          "zh:public_contact_or_url_noise": 13.228756555322953,
+          "zh:same_controller_component_anchor": 3.222758610598167,
+          "zh:same_controller_direct_identifier": 2.417413879834756,
+          "zh:same_controller_style_structural_soft": 1.4151830097323073,
+          "zh:semantic_topic_not_controller": 1.7644846762009352,
+          "zh:template_clone_not_controller": 1.7548607488430719
+        },
+        "min": 0.1,
+        "mean": 0.6790347025713268,
+        "max": 2.5,
+        "by_domain_evidence": {
+          "en:ordinary_negative": {
+            "count": 179,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "en:public_contact_or_url_noise": {
+            "count": 50,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.75
+          },
+          "en:same_controller_direct_identifier": {
+            "count": 82,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.7873985035684473
+          },
+          "en:same_controller_style_structural_soft": {
+            "count": 34,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.8
+          },
+          "en:semantic_topic_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.1
+          },
+          "en:template_clone_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 1.1000000000000003
+          },
+          "zh:ordinary_negative": {
+            "count": 122,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.6806562196151456
+          },
+          "zh:public_contact_or_url_noise": {
+            "count": 5,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 0.9999999999999998,
+            "mean_final_weight": 1.4999999999999998
+          },
+          "zh:same_controller_component_anchor": {
+            "count": 20,
+            "mean_confidence_factor": 0.25,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.2875
+          },
+          "zh:same_controller_direct_identifier": {
+            "count": 38,
+            "mean_confidence_factor": 0.561842105263158,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.6902050227198133
+          },
+          "zh:same_controller_style_structural_soft": {
+            "count": 121,
+            "mean_confidence_factor": 0.4018181818181819,
+            "mean_component_factor": 0.9999999999999997,
+            "mean_final_weight": 0.27762015865173845
+          },
+          "zh:semantic_topic_not_controller": {
+            "count": 85,
+            "mean_confidence_factor": 0.4404705882352941,
+            "mean_component_factor": 0.9999999999999997,
+            "mean_final_weight": 0.43326272770572777
+          },
+          "zh:template_clone_not_controller": {
+            "count": 87,
+            "mean_confidence_factor": 0.3308045977011495,
+            "mean_component_factor": 1.0000000000000002,
+            "mean_final_weight": 0.3915816730958131
+          }
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "held_out_rows": 95,
+      "held_out_positives": 50,
+      "eligible_pseudo_positives": 577,
+      "eligible_pseudo_negatives": 39,
+      "positive_synthetic_effective_weight": 32.73566752144431,
+      "negative_synthetic_effective_weight": 42.346813094747304,
+      "real_weight_summary": {
+        "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+        "component_normalization_scales": {
+          "en:ordinary_negative": 1.3211561304757244,
+          "en:public_contact_or_url_noise": 1.6597720998146557,
+          "en:same_controller_direct_identifier": 3.589582669211708,
+          "en:same_controller_style_structural_soft": 1.0305664858321302,
+          "en:semantic_topic_not_controller": 1.2787871460242304,
+          "en:template_clone_not_controller": 1.235409713263906,
+          "zh:ordinary_negative": 4.992127866606123,
+          "zh:public_contact_or_url_noise": 4.25993149230395,
+          "zh:same_controller_component_anchor": 3.7815333093505985,
+          "zh:same_controller_direct_identifier": 2.9183518536316546,
+          "zh:same_controller_style_structural_soft": 1.443983430190887,
+          "zh:semantic_topic_not_controller": 1.8120808197250884,
+          "zh:template_clone_not_controller": 1.776373645496
+        },
+        "min": 0.1,
+        "mean": 0.6879695844305922,
+        "max": 2.5,
+        "by_domain_evidence": {
+          "en:ordinary_negative": {
+            "count": 179,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "en:public_contact_or_url_noise": {
+            "count": 50,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.75
+          },
+          "en:same_controller_direct_identifier": {
+            "count": 82,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.7873985035684473
+          },
+          "en:same_controller_style_structural_soft": {
+            "count": 34,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.8
+          },
+          "en:semantic_topic_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.1
+          },
+          "en:template_clone_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 1.1000000000000003
+          },
+          "zh:ordinary_negative": {
+            "count": 127,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 0.9999999999999996,
+            "mean_final_weight": 0.6949283049701063
+          },
+          "zh:public_contact_or_url_noise": {
+            "count": 8,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.2393942677895138
+          },
+          "zh:same_controller_component_anchor": {
+            "count": 24,
+            "mean_confidence_factor": 0.25,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.2874999999999999
+          },
+          "zh:same_controller_direct_identifier": {
+            "count": 35,
+            "mean_confidence_factor": 0.562857142857143,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.691045464244186
+          },
+          "zh:same_controller_style_structural_soft": {
+            "count": 120,
+            "mean_confidence_factor": 0.4098333333333334,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.2865395316195176
+          },
+          "zh:semantic_topic_not_controller": {
+            "count": 80,
+            "mean_confidence_factor": 0.46699999999999997,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.4747093489937937
+          },
+          "zh:template_clone_not_controller": {
+            "count": 84,
+            "mean_confidence_factor": 0.3264285714285715,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.395707804594834
+          }
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "held_out_rows": 94,
+      "held_out_positives": 49,
+      "eligible_pseudo_positives": 591,
+      "eligible_pseudo_negatives": 49,
+      "positive_synthetic_effective_weight": 36.43904766294643,
+      "negative_synthetic_effective_weight": 38.98883571661527,
+      "real_weight_summary": {
+        "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+        "component_normalization_scales": {
+          "en:ordinary_negative": 1.3211561304757244,
+          "en:public_contact_or_url_noise": 1.6597720998146557,
+          "en:same_controller_direct_identifier": 3.589582669211708,
+          "en:same_controller_style_structural_soft": 1.0305664858321302,
+          "en:semantic_topic_not_controller": 1.2787871460242304,
+          "en:template_clone_not_controller": 1.235409713263906,
+          "zh:ordinary_negative": 5.3550769152267055,
+          "zh:public_contact_or_url_noise": 4.25993149230395,
+          "zh:same_controller_component_anchor": 3.6542603829799423,
+          "zh:same_controller_direct_identifier": 3.0554393465042877,
+          "zh:same_controller_style_structural_soft": 1.3513659641743392,
+          "zh:semantic_topic_not_controller": 1.7527200904199534,
+          "zh:template_clone_not_controller": 1.7761734183738669
+        },
+        "min": 0.1,
+        "mean": 0.6803410403238257,
+        "max": 2.5,
+        "by_domain_evidence": {
+          "en:ordinary_negative": {
+            "count": 179,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "en:public_contact_or_url_noise": {
+            "count": 50,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.75
+          },
+          "en:same_controller_direct_identifier": {
+            "count": 82,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.7873985035684473
+          },
+          "en:same_controller_style_structural_soft": {
+            "count": 34,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.8
+          },
+          "en:semantic_topic_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.1
+          },
+          "en:template_clone_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 1.1000000000000003
+          },
+          "zh:ordinary_negative": {
+            "count": 124,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000002,
+            "mean_final_weight": 0.675153408084281
+          },
+          "zh:public_contact_or_url_noise": {
+            "count": 8,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.2393942677895138
+          },
+          "zh:same_controller_component_anchor": {
+            "count": 20,
+            "mean_confidence_factor": 0.25,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.2875
+          },
+          "zh:same_controller_direct_identifier": {
+            "count": 55,
+            "mean_confidence_factor": 0.5581818181818182,
+            "mean_component_factor": 0.9999999999999997,
+            "mean_final_weight": 0.6898621881140266
+          },
+          "zh:same_controller_style_structural_soft": {
+            "count": 105,
+            "mean_confidence_factor": 0.3977142857142857,
+            "mean_component_factor": 0.9999999999999998,
+            "mean_final_weight": 0.2779588093297275
+          },
+          "zh:semantic_topic_not_controller": {
+            "count": 78,
+            "mean_confidence_factor": 0.47435897435897434,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.47325108313800396
+          },
+          "zh:template_clone_not_controller": {
+            "count": 89,
+            "mean_confidence_factor": 0.27213483146067424,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.28547844535876143
+          }
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "held_out_rows": 95,
+      "held_out_positives": 50,
+      "eligible_pseudo_positives": 584,
+      "eligible_pseudo_negatives": 41,
+      "positive_synthetic_effective_weight": 34.90846979239282,
+      "negative_synthetic_effective_weight": 41.29728292993455,
+      "real_weight_summary": {
+        "formula": "clip(domain_factor * evidence_type_factor[domain] * confidence_factor * component_factor, min_weight, max_weight)",
+        "component_normalization_scales": {
+          "en:ordinary_negative": 1.3211561304757244,
+          "en:public_contact_or_url_noise": 1.6597720998146557,
+          "en:same_controller_direct_identifier": 3.589582669211708,
+          "en:same_controller_style_structural_soft": 1.0305664858321302,
+          "en:semantic_topic_not_controller": 1.2787871460242304,
+          "en:template_clone_not_controller": 1.235409713263906,
+          "zh:ordinary_negative": 5.766795575659247,
+          "zh:public_contact_or_url_noise": 4.25993149230395,
+          "zh:same_controller_component_anchor": 4.287043991869568,
+          "zh:same_controller_direct_identifier": 3.4376181164506106,
+          "zh:same_controller_style_structural_soft": 1.3909159039504682,
+          "zh:semantic_topic_not_controller": 1.7876494160870406,
+          "zh:template_clone_not_controller": 1.703308282841732
+        },
+        "min": 0.1,
+        "mean": 0.6881373704176753,
+        "max": 2.5,
+        "by_domain_evidence": {
+          "en:ordinary_negative": {
+            "count": 179,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.0
+          },
+          "en:public_contact_or_url_noise": {
+            "count": 50,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 0.75
+          },
+          "en:same_controller_direct_identifier": {
+            "count": 82,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.7873985035684473
+          },
+          "en:same_controller_style_structural_soft": {
+            "count": 34,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.8
+          },
+          "en:semantic_topic_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.1
+          },
+          "en:template_clone_not_controller": {
+            "count": 28,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0000000000000004,
+            "mean_final_weight": 1.1000000000000003
+          },
+          "zh:ordinary_negative": {
+            "count": 122,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.6727894030758146
+          },
+          "zh:public_contact_or_url_noise": {
+            "count": 8,
+            "mean_confidence_factor": 1.0,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 1.2393942677895138
+          },
+          "zh:same_controller_component_anchor": {
+            "count": 23,
+            "mean_confidence_factor": 0.25,
+            "mean_component_factor": 0.9999999999999999,
+            "mean_final_weight": 0.2875
+          },
+          "zh:same_controller_direct_identifier": {
+            "count": 47,
+            "mean_confidence_factor": 0.5595744680851065,
+            "mean_component_factor": 0.9999999999999997,
+            "mean_final_weight": 0.6906100206590747
+          },
+          "zh:same_controller_style_structural_soft": {
+            "count": 109,
+            "mean_confidence_factor": 0.4016513761467891,
+            "mean_component_factor": 1.0000000000000002,
+            "mean_final_weight": 0.28207127168632223
+          },
+          "zh:semantic_topic_not_controller": {
+            "count": 81,
+            "mean_confidence_factor": 0.4533333333333333,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.45609010091920177
+          },
+          "zh:template_clone_not_controller": {
+            "count": 88,
+            "mean_confidence_factor": 0.34772727272727283,
+            "mean_component_factor": 1.0,
+            "mean_final_weight": 0.41193604804224326
+          }
+        }
+      }
+    }
+  ],
+  "oof_score_hashes": {
+    "no_augmentation": "a26bba77e5e531fd631113322a84e989e7a675ebd458f0ef247fde5b71a53f23",
+    "equal_weight_duplication_positive_budget": "17834c82b64c675ea0ed7dc951c2c3f7846cb9edf046f3538b56e73b6050608a",
+    "same_seller_split_positive_only": "d049ff7e2b27084d441c63bd93f8ad30ed7739e2bc5dac72333a096d264d1c81",
+    "equal_weight_duplication_full_budget": "9d9e29578f6bfb894135abfa674571b59b1925625412ebab923adf7110034172",
+    "same_seller_split_plus_reviewed_negative_views": "2cbcdd6f895014699cc1f0c72cc65ecf243b3b6d128a403d8944a2f33d842a63"
+  },
+  "input_hashes": {
+    "policy": "ee6054bd46eb7e0662b20ab2ad1f082798ff7e4a8c4fb1be0e9fcb8867586fe4",
+    "producer": "36721feceb336560f3ffa750c7fcc70bfaeb25b7cfa5759cd145edac4d237b1a",
+    "step7_dependency": "0a3195f663af7da214f37e25975e2061ce5d26195eafe3789b7c171781de8d34",
+    "step9_dependency": "a052eb3dbd23c59ab0811a705279a6ed4611526f319fe9da2974ad15323cefce",
+    "step15_v7_common_dependency": "b49e8517b7ae38e3bc5f50bcbd31c98818ddfa164f6596deb2d78675565ae93d",
+    "v7_policy": "9e34f845fd124d160366cdc3ec49bda6b20462aaa13d65c83c3d23dbac465814",
+    "component_assignments": "abbb9e2dc92b4ecc599e0d5995550e616e526da6b81f4d4a881a945c81d34a23",
+    "generation_summary": "b7eea50511bdb7117d96323a1e798bbdbf06f3df9cd07df169574a31f2d63080",
+    "pseudo_pair_labels": "9809cdbea2bbd22ca5f176fb0c76b2491a43d057307a91ec710a52ab1af272f6",
+    "pseudo_pair_lineage": "47e77423b849f19d76156827ff140ae0f3a9b9f03f70dae981d705306a2c52fc",
+    "pseudo_embedding_matrix": "a70aee0fff912bd4765451a2e5d25b23c95fe03e5d1c28a26b239ed97eae7e9d",
+    "pseudo_embedding_metadata": "bc7bf368d62a6a85202bf579242fa7075a16bd213cb165b19bc1cf2dda3feff3"
+  },
+  "prediction_sha256": "69348c45e239ad74b88d64f5cd0880bce279e579f4efe34875067e150ba573d3"
+}

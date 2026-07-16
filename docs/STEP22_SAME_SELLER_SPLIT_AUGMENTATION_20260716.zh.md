@@ -1,5 +1,25 @@
 # Step22 同源 Seller 互斥 Item 切分增强
 
+## Linux 完成结果与冻结结论
+
+`2026-07-16` Linux 正式运行已完成，完整输出位于 `reports/step22_same_seller_split/v1_20260716/`。同步 manifest 绑定十个 payload 文件，共 `17,689,109` bytes；本地逐文件复算得到零缺失、零大小不一致和零 SHA-256 不一致。
+
+生成阶段获得 `617` 个同一真实 seller 的互斥商品视图正例和 `54` 个继承已审核 canonical-train negative 的负例视图，共 `671` 个 synthetic pair、`1,342` 个 pseudo profile 和 `6,689` 条 item lineage。它们全部是 `train-only`、`benchmark_eligible=0`、`usable_for_core_transfer=0`；与当前中文 valid/test 的 `439` 个 seller UID 没有交集，正例左右两侧没有跨侧 content signature 重合。新增真实跨账号马甲关系仍为 `0`。
+
+五折 seller-component grouped OOF 只评估 `573 = 229 positive / 344 negative` 条真实中文 train pair：
+
+| 实验 | ROC-AUC | AP |
+|---|---:|---:|
+| no augmentation | 0.689144 | 0.538467 |
+| equal-weight duplication, positive budget | 0.692622 | 0.541164 |
+| same-seller split positive only | 0.682327 | 0.533950 |
+| equal-weight duplication, full budget | 0.695631 | 0.545081 |
+| same-seller split plus reviewed-negative views | 0.680982 | 0.527419 |
+
+同 seller 切分正例相对无增强降低 `0.004517 AP`，相对匹配复制对照降低 `0.007214 AP`；完整方法相对无增强降低 `0.011048 AP`，相对完整预算复制对照降低 `0.017662 AP`。因此 `positive_representation_gain_supported=false`、`full_representation_gain_supported=false`、`promotion_eligible=false`。
+
+分数方向诊断显示，same-seller positive augmentation 对真实 positive 的平均分增量为 `+0.0528`，对真实 negative 的增量却为 `+0.0556`；完整方法分别为 `+0.0261/+0.0384`。该增强主要提高了“库存主题或模板相似”的总体得分，没有学习到跨账号身份不变性。Step22 自此冻结为负消融，不进入 Step11/17 或 Step20，也不再围绕当前 OOF 边界调整生成阈值和权重。
+
 ## 1. 研究问题
 
 Step21 已证明：围绕少量已标注正例 pair 对聚合文本做 section rotation、segment subsample 和标点归一化，不能超过无增强或等有效权重复制。主轨实际上只有 13 个独立 parent components，生成 48 行并没有增加身份来源。
