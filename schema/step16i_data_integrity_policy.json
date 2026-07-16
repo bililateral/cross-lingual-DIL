@@ -1,0 +1,70 @@
+{
+  "version": "2026-07-16-step16i-data-integrity-v1",
+  "objective": "Audit the frozen English and Chinese Step5 boundaries by recomputing seller-connected components, detecting split leakage and review-assistance traces, and freezing a permanent exclusion manifest without modifying any upstream artifact.",
+  "inputs": {
+    "zh_target_strict": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "en_content_train_pool": "reports/step5_en_frozen_silver_labels.csv"
+  },
+  "primary_splits": [
+    "train",
+    "valid",
+    "test"
+  ],
+  "required_columns": [
+    "pair_uid",
+    "split_name",
+    "split_component_id",
+    "seller_uid_left",
+    "seller_uid_right",
+    "source_seller_raw_left",
+    "source_seller_raw_right",
+    "review_label",
+    "review_notes"
+  ],
+  "review_assistance_patterns": [
+    {
+      "id": "step11",
+      "pattern": "\\bstep\\s*11\\b|\\bstep11\\b"
+    },
+    {
+      "id": "graph",
+      "pattern": "\\bgraph(?:ical)?\\b|graph[ -]support|graph[ -]prun|retained by (?:the )?graph|not retained by (?:the )?graph|图谱|图结构|图支持|成图|图修剪"
+    },
+    {
+      "id": "cluster_or_component",
+      "pattern": "\\bcluster(?:ing|ed|s)?\\b|positive component|same-controller component|reviewed component|聚类|簇"
+    }
+  ],
+  "v8_readiness_assignment_check": {
+    "enabled": true,
+    "assignment_path": "reports/step16_v8_validation_refreeze/readiness_expansion_v3_reprofix_20260716_112833_31791/representative_validation_assignments.v8_readiness.csv",
+    "split_field_precedence": [
+      "v7_split_name",
+      "assigned_split",
+      "split_name",
+      "original_split_name"
+    ],
+    "component_field": "split_component_id",
+    "split_aliases": {
+      "train": "train",
+      "valid": "valid",
+      "representative_valid": "valid",
+      "test": "test",
+      "internal_development_test": "test"
+    }
+  },
+  "outputs": {
+    "root_template": "reports/step16i_data_integrity/{run_id}",
+    "component_assignments": "component_assignments.csv",
+    "permanent_exclusion_manifest": "permanent_exclusion_manifest.csv",
+    "summary": "summary.json"
+  },
+  "hard_rules": [
+    "The Step5 inputs are read-only and are never rewritten.",
+    "Connected components are recomputed from seller_uid_left and seller_uid_right, not trusted from split_component_id; normalized seller aliases are additionally audited across splits and language pools.",
+    "All train, valid, and test pair, seller, normalized seller-alias, and recomputed component identifiers enter the permanent exclusion manifest.",
+    "All historically reviewed Step5 pairs and sellers are excluded from a future prospective holdout, including uncertain_holdout and audit_only rows.",
+    "A missing latest V8 readiness assignment is reported as archive_missing and is never represented as a successful check.",
+    "An existing output directory is never overwritten."
+  ]
+}

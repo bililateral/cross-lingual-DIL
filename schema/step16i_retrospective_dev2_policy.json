@@ -1,0 +1,127 @@
+{
+  "version": "2026-07-16-step16i-retrospective-dev2-v1",
+  "objective": "Prepare a score-blind, component-disjoint review queue from historical Chinese Step4 candidates that remain outside the permanent pair/seller exclusion universe. This is an internal retrospective development extension only; it is not a prospective holdout and it does not create labels.",
+  "prospective_claim_allowed": false,
+  "inputs": {
+    "step4_candidates": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "permanent_exclusion_manifest": "reports/step16i_data_integrity/step16i_integrity_20260716_v1/permanent_exclusion_manifest.csv",
+    "step3_occurrences": "reports/step3_item_identity_signals.zh_target_strict.csv"
+  },
+  "permanent_exclusion": {
+    "pair_uid_keys": [
+      "excluded_pair_uids",
+      "pair_uids",
+      "pair_uid"
+    ],
+    "seller_uid_keys": [
+      "excluded_seller_uids",
+      "seller_uids",
+      "seller_uid",
+      "seller_uid_left",
+      "seller_uid_right"
+    ],
+    "component_id_keys": [
+      "excluded_component_ids",
+      "component_ids",
+      "component_id",
+      "split_component_id"
+    ],
+    "candidate_component_fields": [
+      "component_id",
+      "split_component_id"
+    ],
+    "require_nonempty_seller_uids": true
+  },
+  "selection": {
+    "allowed_review_statuses": [
+      "",
+      "pending",
+      "unreviewed"
+    ],
+    "one_pair_per_candidate_component": true,
+    "minimum_selected_components": 1,
+    "maximum_selected_components": 160,
+    "selection_seed": "step16i-retrospective-dev2-component-selection-20260716",
+    "stratum_order": [
+      "high_priority",
+      "template_clone",
+      "semantic_similarity",
+      "other"
+    ],
+    "stratum_component_targets": {
+      "high_priority": 72,
+      "template_clone": 40,
+      "semantic_similarity": 36,
+      "other": 12
+    },
+    "high_priority_values": [
+      "high",
+      "critical"
+    ],
+    "template_rule_tokens": [
+      "shared_description_clone",
+      "shared_title_clone",
+      "text_clone_primary",
+      "template_clone"
+    ],
+    "semantic_rule_tokens": [
+      "profile_lexical_neighbor",
+      "semantic_neighbor",
+      "semantic_structural",
+      "semantic_only"
+    ],
+    "semantic_min_lexical_similarity": 0.35,
+    "scientific_note": "Priority strata are candidate-sampling strata only. They are concealed from reviewers and never become identity or evidence labels. Selection uses one deterministic representative pair per full eligible seller connected component."
+  },
+  "occurrence_context": {
+    "optional": true,
+    "maximum_occurrences_per_side": 6,
+    "public_noise_rule": "A shared contact with missing per-side Step3 occurrences remains a candidate only. Even complete occurrence context never creates an automatic positive or negative label.",
+    "parser_diagnostic_flags_exposed_to_reviewers": false
+  },
+  "blinding": {
+    "blind_id_seed": "step16i-retrospective-dev2-blind-id-20260716",
+    "reviewer_a_order_seed": "step16i-reviewer-a-order-20260716",
+    "reviewer_b_order_seed": "step16i-reviewer-b-order-20260716",
+    "forbidden_field_fragments": [
+      "pair_uid",
+      "seller_uid",
+      "candidate_rank",
+      "candidate_rule",
+      "review_priority",
+      "review_status",
+      "review_label",
+      "model",
+      "probability",
+      "prob_positive",
+      "step11",
+      "cluster",
+      "graph",
+      "threshold"
+    ],
+    "allowed_identity_decisions": [
+      "same_controller",
+      "different_controller",
+      "uncertain"
+    ],
+    "allowed_evidence_type_decisions": [
+      "same_controller_direct_identifier",
+      "same_controller_component_anchor",
+      "same_controller_style_structural_soft",
+      "template_clone_not_controller",
+      "semantic_topic_not_controller",
+      "public_contact_or_url_noise",
+      "ordinary_negative",
+      "uncertain_insufficient_evidence"
+    ],
+    "review_instruction": "Review raw pair and optional occurrence evidence independently. Do not infer a label from queue inclusion. Public/shared-contact rows remain candidates until both contexts and alternative explanations are reviewed."
+  },
+  "outputs": {
+    "output_directory": "reports/step16i_retrospective_dev2/preparation_v1_20260716",
+    "blind_mapping_filename": "blind_mapping.csv",
+    "reviewer_a_filename": "reviewer_a_queue.csv",
+    "reviewer_b_filename": "reviewer_b_queue.csv",
+    "preparation_manifest_filename": "preparation_manifest.json",
+    "overwrite_policy": "refuse_if_output_directory_exists"
+  }
+}
