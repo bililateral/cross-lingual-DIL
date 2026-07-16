@@ -46,6 +46,7 @@ DEFAULT_SUPPLEMENTAL_PUBLIC_SUMMARY = (
     / "profile_url_control_review_v3_20260715"
     / "profile_url_review_summary.json"
 )
+DEFAULT_SELECTION_SEED = "readiness_expansion_v3_20260715"
 
 READINESS_REQUIREMENTS = {
     "valid": {
@@ -1144,6 +1145,11 @@ def main() -> None:
     )
     parser.add_argument("--run-id", default="readiness_expansion_20260715")
     parser.add_argument(
+        "--selection-seed",
+        default=DEFAULT_SELECTION_SEED,
+        help="Frozen seed for control selection; intentionally independent of run/output naming.",
+    )
+    parser.add_argument(
         "--output-root",
         default="reports/step16_v8_validation_refreeze/readiness_expansion_20260715",
     )
@@ -1301,7 +1307,7 @@ def main() -> None:
         selected_public.extend(
             select_quota_component_safe(
                 public_candidates,
-                args.run_id,
+                args.selection_seed,
                 f"public_noise_{split}",
                 control_requirements[split][
                     "state_backed_public_noise_negative"
@@ -1319,7 +1325,7 @@ def main() -> None:
             selected_identity.extend(
                 select_quota_component_safe(
                     rows,
-                    args.run_id,
+                    args.selection_seed,
                     f"{short_name}_{split}",
                     control_requirements[split][readiness_key],
                     split,
@@ -2132,6 +2138,8 @@ def main() -> None:
         "step": "step16_materialize_v8_reviewed_readiness_freeze",
         "run_id": args.run_id,
         "status": "ready",
+        "selection_seed": args.selection_seed,
+        "selection_is_independent_of_run_id": True,
         "readiness": readiness,
         "readiness_state_counts": readiness_states,
         "canonical_baseline_readiness_counts": baseline_counts,
@@ -2188,6 +2196,8 @@ def main() -> None:
     freeze_manifest = {
         "step": "step16_v8_readiness_freeze_manifest",
         "run_id": args.run_id,
+        "selection_seed": args.selection_seed,
+        "selection_is_independent_of_run_id": True,
         "producer": rel(Path(__file__).resolve()),
         "producer_sha256": sha256(Path(__file__).resolve()),
         "model_scores_read": False,

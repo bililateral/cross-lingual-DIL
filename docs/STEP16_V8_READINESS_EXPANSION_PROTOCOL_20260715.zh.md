@@ -144,6 +144,7 @@ V3 必须在 Linux 重现并由 manifest 绑定以下边界，否则运行失败
 - public-noise negative 的证据足以支持“共享标识符处于公共/商品/支持上下文”，但不足以把不同操作者身份当作 gold truth，因此固定为 `high_confidence_silver_agent_reviewed_public_noise_control`；
 - 本次仅补足 canonical freeze 相对预注册门槛的缺口，共物化 108 条控制行（`train=60`、`valid=48`）；它们均设置 `usable_for_supervision=0`、`usable_for_core_transfer=0`、`primary_identity_model_eligible=0`、`benchmark_eligible=0`，只通过显式 v8 evidence-control 路径进入专家训练或充分性审计；
 - manifest 必须记录 `thresholds_lowered=false`、`model_scores_read=false`，并闭合 supplemental candidate/reviewer/profile 传递哈希；
+- 控制样本排序固定使用 `selection_seed=readiness_expansion_v3_20260715`；`run_id` 和输出目录时间戳只承担 provenance 命名，不能改变被选中的 pair。测试按 summary 中声明的 `supersedes_non_supervision_row` 集合逐条核对，不再硬编码某一次旧运行恰好覆盖的 uncertain 行数；
 - 每条 supplemental URL control 必须在 pair 两侧物化相同的 `external_url` 风险 occurrence，并复算为 `risky_only_shared`、`support_only_shared` 或 `high_frequency_public`；只选中行数但 occurrence state 不成立时必须失败；
 - Step20 新 manifest 的 self-hash 必须覆盖 assignment CSV hash；新建 evidence controls 的 scope 必须为 `evidence_expert_control`；
 - 本地 Step15-v8 共发现 50 项契约测试，43 项静态/真实冻结输入测试通过，7 项 V3 artifact 测试因 Linux 尚未物化而明确跳过；Step15-v6/v7/v8 合并为 99 项、92 项通过、同 7 项延后。其中真实冻结输入配额测试已验证 public `valid/train=20/20`、direct `20/30`、component `15/10`，且 seller/component 隔离成立。Linux runner 在物化后设置 `STEP15_V8_READINESS_ROOT` 并重跑全部 50 项；V3 数值产物、行数和哈希尚待 Linux 生成，文档不预先宣称其已完成。

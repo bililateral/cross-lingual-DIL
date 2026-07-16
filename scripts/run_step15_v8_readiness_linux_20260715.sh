@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 READINESS_RUN_ID="${READINESS_RUN_ID:-readiness_expansion_v3_20260715}"
 READINESS_ROOT="${READINESS_ROOT:-reports/step16_v8_validation_refreeze/readiness_expansion_v3_20260715}"
+READINESS_SELECTION_SEED="${READINESS_SELECTION_SEED:-readiness_expansion_v3_20260715}"
 V7_POLICY="$READINESS_ROOT/step15_v7_readiness_policy.json"
 V8_POLICY="$READINESS_ROOT/step15_v8_readiness_policy.json"
 V8_RUN_ID="${V8_RUN_ID:-bridge_v8_readiness_v3_20260715}"
@@ -41,11 +42,13 @@ echo "[2b/11] Materialize or verify the corrected canonical-split readiness free
 if [[ ! -e "$READINESS_ROOT" ]]; then
   "$PYTHON_BIN" scripts/step16_materialize_v8_reviewed_readiness_freeze.py \
     --run-id "$READINESS_RUN_ID" \
+    --selection-seed "$READINESS_SELECTION_SEED" \
     --output-root "$READINESS_ROOT"
 else
   echo "Readiness root already exists; validating deterministic inputs before reuse."
   "$PYTHON_BIN" scripts/step16_materialize_v8_reviewed_readiness_freeze.py \
     --run-id "$READINESS_RUN_ID" \
+    --selection-seed "$READINESS_SELECTION_SEED" \
     --output-root "$READINESS_ROOT" \
     --check-only
 fi

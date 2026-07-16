@@ -246,6 +246,19 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
                 set(),
             )
 
+    def test_readiness_runner_freezes_selection_seed_independently_of_run_id(self) -> None:
+        runner = (
+            ROOT / "scripts" / "run_step15_v8_readiness_linux_20260715.sh"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            'READINESS_SELECTION_SEED="${READINESS_SELECTION_SEED:-readiness_expansion_v3_20260715}"',
+            runner,
+        )
+        self.assertEqual(
+            runner.count('--selection-seed "$READINESS_SELECTION_SEED"'), 2
+        )
+        self.assertNotIn('--selection-seed "$READINESS_RUN_ID"', runner)
+
     def test_actual_reviewed_control_pools_meet_v3_component_safe_quotas(self) -> None:
         assignments = self._csv_rows(
             ROOT
@@ -1577,6 +1590,15 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
 
     def test_materialized_readiness_refreeze_only_supersedes_non_supervision(self) -> None:
         root = self._require_materialized_readiness()
+        summary = json.loads(
+            (root / "step16_v8_readiness_expansion_summary.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            summary["selection_seed"], readiness_freeze.DEFAULT_SELECTION_SEED
+        )
+        self.assertTrue(summary["selection_is_independent_of_run_id"])
         original = {
             row["pair_uid"]: row
             for row in self._csv_rows(
@@ -1603,7 +1625,19 @@ class Step15V8ContextualEvidenceContractTests(unittest.TestCase):
             self.assertEqual(row.get("usable_for_supervision"), "0", pair_uid)
             self.assertEqual(row.get("usable_for_core_transfer"), "0", pair_uid)
             superseded.append(pair_uid)
-        self.assertEqual(len(superseded), 6)
+        declared_superseded = {
+            row["pair_uid"]
+            for row in summary["selected_records"]
+            if row["supersedes_non_supervision_row"]
+        }
+        self.assertEqual(set(superseded), declared_superseded)
+        self.assertEqual(
+            len(declared_superseded),
+            sum(
+                bool(row["supersedes_non_supervision_row"])
+                for row in summary["selected_records"]
+            ),
+        )
 
     def test_materialized_readiness_isolated_controls_and_fixed_test(self) -> None:
         root = self._require_materialized_readiness()
