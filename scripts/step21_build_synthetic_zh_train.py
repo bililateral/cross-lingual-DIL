@@ -159,6 +159,31 @@ def render_profile_text(fields: dict[str, str]) -> str:
     return "\n".join(sections)
 
 
+def ensure_pair_text_change(
+    left_clean: dict[str, str],
+    right_clean: dict[str, str],
+    left_fields: dict[str, str],
+    right_fields: dict[str, str],
+    rng_left: random.Random,
+    rng_right: random.Random,
+    transform_name: str,
+) -> tuple[dict[str, str], dict[str, str], str, bool, bool]:
+    left_changed = render_profile_text(left_fields) != render_profile_text(left_clean)
+    right_changed = render_profile_text(right_fields) != render_profile_text(right_clean)
+    effective_transform = transform_name
+    if not left_changed and not right_changed:
+        left_fields = transform_sections(left_clean, "section_rotation", rng_left)
+        right_fields = transform_sections(right_clean, "section_rotation", rng_right)
+        left_changed = render_profile_text(left_fields) != render_profile_text(left_clean)
+        right_changed = render_profile_text(right_fields) != render_profile_text(right_clean)
+        effective_transform = f"{transform_name}+fallback_section_rotation"
+    if not left_changed and not right_changed:
+        raise ValueError(
+            "Step21 transform remained a two-sided no-op after deterministic fallback"
+        )
+    return left_fields, right_fields, effective_transform, left_changed, right_changed
+
+
 def synthetic_profile(
     parent: dict,
     synthetic_uid: str,
@@ -476,11 +501,20 @@ def main() -> None:
                 )
                 left_fields = transform_sections(left_clean, transform_name, rng_left)
                 right_fields = transform_sections(right_clean, transform_name, rng_right)
-                left_text_changed = render_profile_text(left_fields) != render_profile_text(
-                    left_clean
-                )
-                right_text_changed = render_profile_text(right_fields) != render_profile_text(
-                    right_clean
+                (
+                    left_fields,
+                    right_fields,
+                    effective_transform,
+                    left_text_changed,
+                    right_text_changed,
+                ) = ensure_pair_text_change(
+                    left_clean,
+                    right_clean,
+                    left_fields,
+                    right_fields,
+                    rng_left,
+                    rng_right,
+                    transform_name,
                 )
                 left_uid = f"{uid_prefix}/{track_name}/{variant_key}/left"
                 right_uid = f"{uid_prefix}/{track_name}/{variant_key}/right"
@@ -504,7 +538,7 @@ def main() -> None:
                         right_uid,
                         marker,
                         child_weight,
-                        transform_name,
+                        effective_transform,
                     )
                 )
                 duplicate = label_row(
@@ -534,7 +568,7 @@ def main() -> None:
                         "parent_training_sample_weight": f"{parent_weight:.12f}",
                         "synthetic_training_sample_weight": f"{child_weight:.12f}",
                         "track": track_name,
-                        "transform": transform_name,
+                        "transform": effective_transform,
                         "left_text_changed": "1" if left_text_changed else "0",
                         "right_text_changed": "1" if right_text_changed else "0",
                         "variant_index": variant_index,
@@ -561,7 +595,7 @@ def main() -> None:
                             "parent_pair_uid": parent["pair_uid"],
                             "parent_split_component_id": parent["split_component_id"],
                             "track": track_name,
-                            "transform": transform_name,
+                            "transform": effective_transform,
                             "synthetic_train_only": "1",
                         }
                     )

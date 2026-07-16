@@ -74,6 +74,8 @@ canonical 中文冻结集当前为：
 
 所有变换由 `global_seed=20260716`、track、parent pair、variant 和 side 共同派生确定性随机流。同一输入和 policy 必须生成相同内容。
 
+V1 generation audit 发现主轨 48 条中有 12 条在原定变换后两侧文本均未变化。V2 对这种 no-op 使用确定性的双侧 section rotation fallback；若 fallback 后仍然两侧都不变，生成过程直接失败。该修正只使用 train 文本结构，不读取任何 valid/test 分数。
+
 ## 6. 输出格式与 provenance
 
 每条轨道输出：

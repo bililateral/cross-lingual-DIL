@@ -84,6 +84,27 @@ class Step21SyntheticTrainOnlyContractTests(unittest.TestCase):
         self.assertNotIn("real_handle", output["profile_text"])
         self.assertTrue(output["synthetic_train_only"])
 
+    def test_two_sided_no_op_uses_deterministic_section_rotation(self) -> None:
+        fields = {
+            "category_concat_top": "category",
+            "title_concat_top": "title",
+            "description_concat_top": "description",
+        }
+        left, right, transform, left_changed, right_changed = step21.ensure_pair_text_change(
+            fields,
+            fields,
+            dict(fields),
+            dict(fields),
+            random.Random(11),
+            random.Random(12),
+            "segment_subsample",
+        )
+        self.assertIn("fallback_section_rotation", transform)
+        self.assertTrue(left_changed or right_changed)
+        self.assertEqual(left, fields)
+        self.assertEqual(right, fields)
+        self.assertNotEqual(list(left), list(fields))
+
     def test_step5_compatible_label_is_train_only_and_not_benchmark_eligible(self) -> None:
         fields = [
             "pair_uid",
