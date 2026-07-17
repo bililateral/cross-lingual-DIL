@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import step24_common as common
@@ -44,6 +45,12 @@ def main() -> None:
         print(json.dumps({"status": "pass", "planned_models": planned}, indent=2))
         return
 
+    # The Windows research host reaches the Hub through a mirror/proxy. Serial
+    # metadata requests avoid intermittent HEAD failures from concurrent range
+    # requests without changing the pinned snapshot or its final fingerprint.
+    os.environ.setdefault("HF_HUB_ETAG_TIMEOUT", "120")
+    os.environ.setdefault("HF_HUB_DOWNLOAD_TIMEOUT", "120")
+    os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
     try:
         from huggingface_hub import HfApi, snapshot_download
     except ImportError as exc:
@@ -66,6 +73,7 @@ def main() -> None:
             repo_id=cfg["repo_id"],
             revision=cfg["revision"],
             local_dir=str(model_path),
+            max_workers=1,
         )
         for required_name in ("config.json", "modules.json"):
             if not (model_path / required_name).is_file():
