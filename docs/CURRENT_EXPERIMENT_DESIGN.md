@@ -4,9 +4,9 @@
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
-> 当前主线更新：下文关于 Step15-v5r 的内容仅保留为历史实现背景。Step15-v6/v7/v8、Step21-Step23 与 Step24 均已按各自协议冻结为负结果或诊断基线。当前唯一待 Linux 数值验证的方法是 Step25；完整预注册协议见 `docs/STEP25_TEMPLATE_DECONTAMINATED_AUTHORSHIP_PLAN_20260717.zh.md`。
+> 当前主线更新：下文关于 Step15-v5r 的内容仅保留为历史实现背景。Step15-v6/v7/v8、Step21-Step25 均已按各自协议完成并冻结为负结果或诊断基线。Step25 已完成 Linux 数值验证且未通过 D0 continuation gate，当前没有获准进入 Step11/17 的新模型；完整协议与结果边界见 `docs/STEP25_TEMPLATE_DECONTAMINATED_AUTHORSHIP_PLAN_20260717.zh.md` 和 `docs/PROJECT_PROGRESS.md`。
 
-## 0. 当前活动方法：Step25
+## 0. 最新完成方法：Step25
 
 Step24 已证明冻结多语言作者/风格表示提供明显跨语言增量，但同时把复制模板和公共页面排版嵌入为作者风格。其 source-only primary 在中文 D0 上达到 `AP=0.802718`，相对 redacted-E5 提升 `0.158336`，但 template-clone negative 的 mean/q95/top-decile 分数分别增加 `0.028287/0.067389/0.064517`，target grouped-bootstrap CI 也略跨零。Step24 因此 `promotion_eligible=false` 并冻结。
 
@@ -14,7 +14,7 @@ Step25 仍只读取相同 canonical train：English `401 = 116/285`，Chinese `5
 
 主比较固定为 raw style-only LR/L2 对 decontaminated style-only LR/L2；E5+clean-style 只作 secondary，raw/clean/delta/coverage 只作 exploratory。source-only 仍是主迁移路径，target grouped OOF 是次级适配证据。正式模板门槛使用 rank percentile、top-decile exposure 和模板负例排在 direct/component 正例之上的 violation rate，避免 LR 截距变化伪造概率下降。identifier occurrence 仅进入独立 direction-constrained reliability post-scorer，不进入 clean scorer。
 
-当前 D0 已被 Step24 错误分析消耗，即使 Step25 D0 全部通过也只能设置 `d1_candidate_eligible=true`；`publication_promotion_eligible` 永远为 false。确认性方法开发必须使用新的 score-blind、D0-component-disjoint D1，最终结论只认模型冻结后收集且只评估一次的 F1 prospective holdout。任何 Step21-Step23 合成/派生行仍不得写入 Step5 或冒充真实中文马甲标签。
+当前 D0 已被 Step24 错误分析消耗，即使 Step25 D0 全部通过也只能设置 `d1_candidate_eligible=true`；`publication_promotion_eligible` 永远为 false。实际 Linux 结果中，source-only raw/decontaminated style AP 为 `0.801847/0.799675`，target grouped-OOF raw/decontaminated style AP 为 `0.789848/0.784333`；`d1_candidate_eligible=false`，因此 Step25 已冻结为负结果，不能进入 Step11/17。该结果说明当前跨组件 shingle 规则没有可靠去除真正造成错误的中文模板信号，且去污染未带来排序收益。确认性方法开发仍必须使用新的 score-blind、D0-component-disjoint D1，最终结论只认模型冻结后收集且只评估一次的 F1 prospective holdout。任何 Step21-Step23 合成/派生行仍不得写入 Step5 或冒充真实中文马甲标签。
 
 ## 1. 研究问题定义
 

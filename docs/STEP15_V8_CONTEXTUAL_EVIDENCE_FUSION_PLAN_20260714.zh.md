@@ -247,7 +247,7 @@ pilot 的结论促使项目向上游扩展，而不是降低门槛：
 3. 从 `market_item.xlsx` 与 `products_data.csv` 中构建 exact platform vendor ID 加 exact inventory overlap 的 cross-snapshot same-account controls；两名独立代理对 361 条 direct persistence 与 36 条 component closure 候选全部给出一致 high-confidence positive；
 4. public-noise、cross-snapshot direct 和 component controls 全部被强制标记为 evidence-expert-only，不进入 primary alias benchmark、clean AP、threshold 或内部测试指标；public-noise 是高置信银级上下文噪声控制，不是不同操作者 gold truth；
 5. 以固定 SHA256 排名和全局 component-safe 约束选择 public `20/20`、direct `30/20`、component `10/15` 的 train/valid 配额；
-6. 生成独立冻结目录 `reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/`，不覆盖 canonical Step3–Step7 文件。
+6. 生成独立冻结目录。V2 首次冻结后来因 canonical split/materialization 缺陷失效；当前正式证据只认 V3 freeze manifest 绑定的 `reports/step16_v8_validation_refreeze/readiness_expansion_v3_<run_id>/`，不覆盖 canonical Step3–Step7 文件。
 
 最终 occurrence-state-backed readiness 为 valid `24/23/15`、train `20/30/10`。固定测试仍为 200 条，seller 跨 split 重叠为 0，未降低门槛、未读取模型分数。详细证据边界与哈希结果见 `docs/STEP16_V8_READINESS_EXPANSION_PROTOCOL_20260715.zh.md`。
 
@@ -338,12 +338,12 @@ Step20 lock 按 v8 `run_id` 隔离，并必须写入对应 `step15_v8_model_free
 
 ## 9. Linux 同步与执行
 
-当前正式运行只认 `readiness_expansion_v2_20260715`，不再执行历史 queue-v1/refreeze-v1 命令。至少同步：
+当前正式运行只认 V3 readiness run；V2、queue-v1 和 refreeze-v1 均已退役。默认 runner 使用 `readiness_expansion_v3_20260715`，实际结果必须以对应 V3 freeze manifest 中的路径与 SHA-256 为准。至少同步：
 
 ```text
 reports/step15_v8/validation_expansion_queue_v2_20260714/
 reports/step15_v8/identity_control_review_20260715/
-reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
+reports/step16_v8_validation_refreeze/<V3 readiness run id>/
 reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_assignments.csv
 reports/step15_v7/v2_identifier_redacted_20260714/splits/representative_validation_manifest.json
 reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.json
@@ -410,7 +410,7 @@ bash scripts/run_step15_v8_readiness_linux_20260715.sh
 运行结束后同步整个目录：
 
 ```text
-reports/step16_v8_validation_refreeze/readiness_expansion_v2_20260715/
+reports/step16_v8_validation_refreeze/<V3 readiness run id>/
 reports/step15_v8/<run_id>/
 ```
 
