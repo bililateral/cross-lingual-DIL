@@ -223,7 +223,14 @@ OOF 评估包含 `573` 条中文 train rows、`229` positives、`344` negatives 
 - text augmentation minus no augmentation AP：`-0.002289`；
 - text augmentation minus equal-weight duplication AP：`-0.001179`。
 
-文本增强没有超过任一必要对照。差异虽小，但方向为负，不能声称 augmentation gain。
+文本增强没有超过任一必要对照。差异虽小且方向为负，因此不能声称 augmentation gain；但点估计本身也不能证明 augmentation 显著有害。
+
+对冻结 OOF predictions 做的事后、只读 component-grouped paired bootstrap（10,000 次，seed `20260716`）得到：
+
+- text minus no augmentation：95% CI `[-0.009853, 0.006840]`，`P(delta>0)=0.3262`；
+- text minus equal-weight duplication：95% CI `[-0.006903, 0.006381]`，`P(delta>0)=0.4027`。
+
+两个区间都跨过 0，因此本轨应解释为“未检测到可测 representation gain”，而不是“统计显著下降”。该 bootstrap 是事后诊断，不是预注册晋级证据，而且只反映固定训练结果上的 evaluation-component 不确定性，不覆盖 augmentation seed、fold seed 和训练随机性的完整方差。
 
 ### 12.5 Silver-anchor 敏感性结果
 
@@ -238,16 +245,16 @@ OOF 评估包含 `573` 条中文 train rows、`229` positives、`344` negatives 
 - text augmentation minus no augmentation AP：`-0.006060`；
 - text augmentation minus equal-weight duplication AP：`-0.006192`。
 
-即使允许更多 direct/component silver parents，文本变换仍没有获得 representation gain。复制对照的 ROC-AUC 略升，但 AP 几乎不变，说明增加少数类有效权重最多轻微改变全局排序，并未改善正例优先检索质量。
+即使允许更多 direct/component silver parents，文本变换仍没有获得可测 representation gain。事后 component-grouped paired bootstrap 对 text minus duplication 给出 95% CI `[-0.017002, 0.007658]`，`P(delta>0)=0.1920`，同样跨过 0。复制对照的 ROC-AUC 略升，但 AP 几乎不变，说明增加少数类有效权重最多轻微改变全局排序，并未观察到正例优先检索质量改善。
 
 ### 12.6 科研结论与后续处置
 
-Step21-v2 是协议有效、文件完整、结果为负的消融实验。它支持以下结论：
+Step21-v2 是协议有效、文件完整、结果与必要对照统计不可区分的零结果消融。它支持以下结论：
 
 1. 失败不是由 v1 分折缺陷、文件漏传或文本变换 no-op 造成的；这些问题在 v2 均已修复。
 2. 对现有少量 parent identities 做确定性、identifier-redacted 文本扰动，没有创造新的操作者证据，也没有提高 grouped OOF AP。
 3. 主轨只有 `13` 个独立 parent components，且 `15/16` parents 是 soft positives；生成 `48` 行不能把有效独立样本量变成 `48`。
-4. Silver sensitivity 也失败，表明问题不只是主轨 parent 数量小，而是当前变换没有增加可泛化的 identity information。
-5. Step21 不进入 Step7/9/15 主训练，不进入 Step11/17 图谱验证，也不触发 prospective holdout。它保留为论文中的 negative augmentation ablation，或作为“样本行数增加不能替代独立身份锚点”的实证证据。
+4. Silver sensitivity 同样没有观察到增益，但置信区间跨 0；因此不能声称变换显著有害，只能说当前证据不支持可泛化 identity-information gain。
+5. Step21 不进入 Step7/9/15 主训练，不进入 Step11/17 图谱验证，也不触发 prospective holdout。它保留为论文中的 controlled null augmentation ablation，或作为“样本行数增加没有被证明优于等权复制、也不能替代独立身份锚点”的实证证据。
 
 后续不应继续围绕同一 OOF 边界调 section rotation、segment ratio 或权重。真正能改变结论的输入是新的、独立的真实 controller identities 和模型冻结后的 prospective evaluation，而不是继续派生同一批父样本。
