@@ -1,8 +1,18 @@
 # 当前实验设计说明
 
-更新日期：`2026-07-11`
+更新日期：`2026-07-17`
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
+
+> 当前主线更新：下文关于 Step15-v5r 的内容仅保留为历史实现背景，不再是活动方法。Step15-v6/v7/v8 与 Step21-Step23 均已按各自协议冻结为负结果或诊断基线。当前唯一待 Linux 数值验证的方法是 Step24；完整预注册协议见 `docs/STEP24_CONTENT_INDEPENDENT_AUTHORSHIP_PLAN_20260717.zh.md`。
+
+## 0. 当前活动方法：Step24
+
+Step24 解决的不是“凭空增加中文真实马甲”，而是当前已经被多轮负结果定位的表示问题：E5、商品聚合和 item-distribution 特征容易把主题、模板和商品库存相似误当成控制者相似。它引入两个冻结的外部多语言作者/风格表示，只在严格去标识符的同一文本上推理，并与 E5 形成固定的三特征低维比较。
+
+活动方法只读取 canonical train：English `401 = 116/285`，Chinese `573 = 229/344`。主比较使用五折 seller-component grouped OOF，所有中文 held-out component 均不进入对应折训练；另做 English-only source transfer。模型固定为 E5-only LR/L2、style-only LR/L2 和 semantic-plus-style LR/L2，不做超参数搜索，也不读取当前 valid/test。中文 `213/229` train positives 为 silver，因此 aggregate OOF 只能作为内部开发证据，必须同时披露 non-silver、direct/component positive 与 template/topic negative-tail 切片。
+
+Step24 通过严格门槛后，才允许一次 representative-valid 检查和全新的 Step20 prospective holdout；未通过则停止当前数据上的性能调优，论文方向转为数据集、证据型概念漂移、shortcut 与受控负结果。任何 Step21-Step23 合成/派生行仍不得写入 Step5 或冒充真实中文马甲标签。
 
 ## 1. 研究问题定义
 

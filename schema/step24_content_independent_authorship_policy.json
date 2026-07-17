@@ -1,0 +1,183 @@
+{
+  "version": "2026-07-17-step24-v1-preregistered-content-independent-authorship",
+  "objective": "Test whether frozen multilingual authorship/style representations add content-independent identity signal beyond identifier-redacted E5 semantics for cross-lingual underground-market seller-pair verification, without creating local synthetic labels or tuning on valid/test.",
+  "outputs_root": "reports/step24_content_independent_authorship/v1_20260717",
+  "inputs": {
+    "v7_policy": "schema/step15_v7_two_stage_policy.json",
+    "component_assignments": "reports/step16i_data_integrity/step16i_integrity_20260716_v2/component_assignments.csv"
+  },
+  "pools": {
+    "en_content_train_pool": {
+      "domain": "en",
+      "frozen_labels": "reports/step5_en_frozen_silver_labels.csv",
+      "evidence_labels": "reports/step15_evidence_type_labels.en_content_train_pool.csv",
+      "seller_profiles": "reports/step3_seller_profiles.en_content_train_pool.jsonl",
+      "item_identity_signals": "reports/step3_item_identity_signals.en_content_train_pool.csv",
+      "identifier_redacted_e5_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.json",
+      "identifier_redacted_e5_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.en_content_train_pool.npy"
+    },
+    "zh_target_strict": {
+      "domain": "zh",
+      "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+      "evidence_labels": "reports/step15_evidence_type_labels.zh_target_strict.csv",
+      "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+      "item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+      "identifier_redacted_e5_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.json",
+      "identifier_redacted_e5_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.npy"
+    }
+  },
+  "clean_text_contract": {
+    "source": "step15_v7_identifier_redacted_clean_text_exact_replay",
+    "text_fields": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "excluded_profile_fields": [
+      "source_seller_raw",
+      "alias_normalized",
+      "source_market_raw",
+      "source_seller_id_raw",
+      "contact_concat_top",
+      "structured_snapshot_concat_top",
+      "profile_text"
+    ],
+    "redaction_sources": "step3_item_identity_occurrences_plus_high_precision_identifier_regexes",
+    "require_exact_v7_corpus_hash_replay": true,
+    "encode_split": "train",
+    "encode_valid_or_test": false,
+    "empty_text_fallback": "content unavailable"
+  },
+  "frozen_style_encoders": {
+    "pcm_multilingual_authorship": {
+      "repo_id": "Blablablab/multilingual-style-representation",
+      "revision": "b0147bbf450424fe72c8525fcc02e2e39e3a4024",
+      "local_path": "models/step24/authorship/multilingual_style_representation",
+      "paper": "Kim, Zhang, and Jurgens, EMNLP 2025",
+      "role": "primary_pretrained_authorship_representation",
+      "loader": "sentence_transformers",
+      "expected_dimension": 1024,
+      "maximum_sequence_length": 512,
+      "batch_size": 8,
+      "normalize_embeddings": true,
+      "local_finetuning_forbidden": true,
+      "inference_time_content_masking_forbidden": true,
+      "license_note": "The Hugging Face model card did not expose a license tag during preregistration; do not redistribute weights and verify upstream terms before publication."
+    },
+    "mstyledistance": {
+      "repo_id": "StyleDistance/mstyledistance",
+      "revision": "d66ed25e48225a503b21a65bc804caf06c886f96",
+      "local_path": "models/step24/authorship/mstyledistance",
+      "paper": "Qiu et al., Findings of ACL 2025",
+      "role": "content_independence_control",
+      "loader": "sentence_transformers",
+      "expected_dimension": 768,
+      "maximum_sequence_length": 512,
+      "batch_size": 16,
+      "normalize_embeddings": true,
+      "local_finetuning_forbidden": true,
+      "inference_time_content_masking_forbidden": true,
+      "license_note": "MIT"
+    }
+  },
+  "pair_features": {
+    "identifier_redacted_e5_cosine": "identifier_redacted_e5_cosine",
+    "pcm_multilingual_authorship_cosine": "pcm_multilingual_authorship_cosine",
+    "mstyledistance_cosine": "mstyledistance_cosine",
+    "identifiers_forbidden": true,
+    "candidate_rule_features_forbidden": true,
+    "random_projection_forbidden": true,
+    "item_distribution_features_forbidden": true,
+    "valid_or_test_fitted_statistics_forbidden": true
+  },
+  "evaluation": {
+    "canonical_split": "train",
+    "require_usable_for_supervision": true,
+    "require_usable_for_core_transfer": true,
+    "require_identity_training_eligible": true,
+    "fold_count": 5,
+    "fold_seed": 20260717,
+    "target_oof_training": "all_english_train_plus_four_fifths_chinese_train",
+    "source_only_training": "english_train_only",
+    "model_feature_sets": {
+      "e5_lr_l2_control": [
+        "identifier_redacted_e5_cosine"
+      ],
+      "style_only_lr_l2_control": [
+        "pcm_multilingual_authorship_cosine",
+        "mstyledistance_cosine"
+      ],
+      "semantic_style_lr_l2_primary": [
+        "identifier_redacted_e5_cosine",
+        "pcm_multilingual_authorship_cosine",
+        "mstyledistance_cosine"
+      ]
+    },
+    "raw_score_controls": [
+      "identifier_redacted_e5_cosine",
+      "pcm_multilingual_authorship_cosine",
+      "mstyledistance_cosine"
+    ],
+    "primary_model": "semantic_style_lr_l2_primary",
+    "matched_baseline_model": "e5_lr_l2_control",
+    "candidate_selection_forbidden": true,
+    "valid_or_test_selection_forbidden": true,
+    "logistic": {
+      "l2_penalty": 10.0,
+      "max_iter": 400,
+      "tolerance": 1e-8,
+      "class_weight": "none",
+      "standardize_features": true,
+      "sample_weight_total_normalization": "real_train_row_count"
+    },
+    "grouped_bootstrap_resamples": 5000,
+    "grouped_bootstrap_seed": 20260717,
+    "development_metric": "average_precision",
+    "primary_development_scope": "seller_component_grouped_oof_on_canonical_chinese_train",
+    "all_label_interpretation": "silver_supported_internal_development_only",
+    "non_silver_and_direct_component_slices_required": true,
+    "template_and_semantic_topic_negative_tail_audit_required": true,
+    "current_valid_test_role": "untouched_by_step24_v1_selection",
+    "publication_holdout": "Step20 genuinely prospective real data only"
+  },
+  "promotion_gates": {
+    "minimum_target_oof_ap_gain_over_e5_control": 0.03,
+    "minimum_target_oof_grouped_bootstrap_lower_bound": 0.0,
+    "minimum_source_only_ap_gain_over_e5_control": 0.02,
+    "minimum_source_only_grouped_bootstrap_lower_bound": 0.0,
+    "minimum_source_only_non_silver_ap_delta": -0.01,
+    "minimum_source_only_direct_component_plus_all_negatives_ap_delta": 0.0,
+    "minimum_non_silver_ap_delta": -0.01,
+    "minimum_direct_component_plus_all_negatives_ap_delta": 0.0,
+    "minimum_direct_component_positive_mean_score_delta": -0.03,
+    "maximum_template_or_topic_mean_score_increase": 0.02,
+    "maximum_template_or_topic_q95_score_increase": 0.02,
+    "maximum_template_or_topic_top_decile_mean_score_increase": 0.02,
+    "promotion_scope": "internal_train_oof_only_requires_later_step20_confirmation"
+  },
+  "outputs": {
+    "clean_text_manifest": "clean_text_manifest.json",
+    "embedding_manifest": "style_embedding_manifest.json",
+    "pair_features_en": "pair_features.en_content_train_pool.csv",
+    "pair_features_zh": "pair_features.zh_target_strict.csv",
+    "pair_feature_summary": "pair_feature_summary.json",
+    "oof_predictions": "step24_grouped_oof_predictions.csv",
+    "evaluation_summary": "step24_grouped_oof_evaluation.json",
+    "model_artifacts": "step24_model_artifacts.json",
+    "sync_manifest": "step24_sync_manifest.json"
+  },
+  "scientific_constraints": [
+    "Step24 creates no local synthetic seller, pair, item or identity label.",
+    "The two new encoders remain frozen; no project label may update their parameters.",
+    "Exactly the identifier-redacted v7 clean text is replayed for all three representation views.",
+    "Only canonical train sellers are encoded and scored in Step24-v1; valid/test labels, scores and pair features are never used for selection.",
+    "English rows provide source supervision and Chinese held-out seller components never enter their fold training data.",
+    "All imputation, standardization, weighting and LR/L2 coefficients are fitted inside each grouped fold.",
+    "The primary three-feature fusion is fixed before Linux execution and is compared with a one-feature E5 control under the same training protocol.",
+    "Silver-supported all-label OOF is internal development evidence only; non-silver and direct/component slices must be disclosed.",
+    "Template/topic negative score tails must not worsen in exchange for aggregate AP.",
+    "Promotion permits one later representative-valid check and then requires a genuinely prospective Step20 holdout; it is not itself a publication claim."
+  ]
+}
