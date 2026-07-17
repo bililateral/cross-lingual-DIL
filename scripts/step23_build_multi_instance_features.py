@@ -61,6 +61,15 @@ def pair_features(
     left_matrix = np.asarray([embeddings[embedding_index[item["item_uid"]]] for item in left_items], dtype=np.float64)
     right_matrix = np.asarray([embeddings[embedding_index[item["item_uid"]]] for item in right_items], dtype=np.float64)
     similarities = np.asarray(left_matrix @ right_matrix.T, dtype=np.float64)
+    left_mean = np.mean(left_matrix, axis=0)
+    right_mean = np.mean(right_matrix, axis=0)
+    left_mean_norm = float(np.linalg.norm(left_mean))
+    right_mean_norm = float(np.linalg.norm(right_mean))
+    if left_mean_norm <= 1e-12 or right_mean_norm <= 1e-12:
+        raise ValueError("Step23 mean-pooled seller embedding has zero norm")
+    mean_pool_cosine = float(
+        np.dot(left_mean / left_mean_norm, right_mean / right_mean_norm)
+    )
     flat = similarities.ravel()
     left_nearest = np.max(similarities, axis=1)
     right_nearest = np.max(similarities, axis=0)
@@ -70,6 +79,7 @@ def pair_features(
     mutual_count = sum(right_argmax[right_index] == left_index for left_index, right_index in enumerate(left_argmax))
 
     output = {
+        "mi_mean_pool_cosine": mean_pool_cosine,
         "mi_item_count_min": float(min(len(left_items), len(right_items))),
         "mi_item_count_max": float(max(len(left_items), len(right_items))),
         "mi_item_count_log_gap": abs(math.log1p(len(left_items)) - math.log1p(len(right_items))),
@@ -175,6 +185,12 @@ def main() -> None:
     for item in items:
         if item["item_uid"] not in embedding_index:
             raise ValueError(f"Step23 item missing embedding: {item['item_uid']}")
+        if not bool_value(item.get("exact_overlap_eligible", True)) and (
+            item.get("title_hash") or item.get("description_hash")
+        ):
+            raise ValueError(
+                f"Step23 cross-field-redacted item retained an exact-overlap hash: {item['item_uid']}"
+            )
         items_by_pool_seller[(item["pool"], item["seller_uid"])].append(item)
     for values in items_by_pool_seller.values():
         values.sort(key=lambda row: (int(row["seller_item_rank"]), row["item_uid"]))
@@ -245,6 +261,16 @@ def main() -> None:
             },
         },
     }
+    declared_feature_sets = policy["evaluation"]["model_feature_sets"]
+    produced_feature_names = set(summary["feature_names"])
+    for model_name, names in declared_feature_sets.items():
+        if not names or len(names) != len(set(names)):
+            raise ValueError(f"Step23 model feature set is empty or duplicated: {model_name}")
+        missing = sorted(set(names) - produced_feature_names)
+        if missing:
+            raise ValueError(
+                f"Step23 model feature set references missing features for {model_name}: {missing}"
+            )
     rendered = json.dumps(summary, ensure_ascii=False, indent=2) + "\n"
     if summary_path.exists() and summary_path.read_text(encoding="utf-8") != rendered:
         raise ValueError("Refusing to overwrite a different Step23 feature summary")

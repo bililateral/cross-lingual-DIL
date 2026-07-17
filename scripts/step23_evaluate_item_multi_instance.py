@@ -137,6 +137,22 @@ def grouped_bootstrap(
     }
 
 
+def negative_tail_metrics(scores: np.ndarray) -> dict:
+    values = np.asarray(scores, dtype=float)
+    if values.size == 0:
+        raise ValueError("Step23 negative-tail metrics require at least one score")
+    top_count = max(1, int(math.ceil(values.size * 0.10)))
+    ordered = np.sort(values)
+    return {
+        "mean": float(np.mean(values)),
+        "q90": float(np.quantile(values, 0.90)),
+        "q95": float(np.quantile(values, 0.95)),
+        "top_decile_mean": float(np.mean(ordered[-top_count:])),
+        "maximum": float(np.max(values)),
+        "row_count": int(values.size),
+    }
+
+
 def matrix_for_rows(rows: list[dict], feature_index: dict[str, dict], feature_names: list[str]) -> np.ndarray:
     matrix = []
     for row in rows:
@@ -153,7 +169,8 @@ def fit_and_score(
     score_matrix_raw: np.ndarray,
     logistic_cfg: dict,
     weighting_cfg: dict,
-) -> tuple[np.ndarray, dict]:
+    feature_names: list[str],
+) -> tuple[np.ndarray, dict, dict]:
     imputation = common.fit_train_median_imputation(train_matrix_raw)
     train_matrix = common.apply_imputation(train_matrix_raw, imputation)
     score_matrix = common.apply_imputation(score_matrix_raw, imputation)
@@ -168,7 +185,46 @@ def fit_and_score(
         sample_weight_target_total=float(len(train_rows)),
         precomputed_standardization=standardization,
     )
-    return step9.apply_logistic_artifact_to_matrix(score_matrix, artifact), weight_summary
+    model_artifact = {
+        "feature_names": list(feature_names),
+        "imputation": imputation,
+        "logistic_artifact": artifact,
+        "weight_summary": weight_summary,
+        "train_row_count": len(train_rows),
+        "train_pair_uid_sha256": hashlib.sha256(
+            "\n".join(sorted(row["pair_uid"] for row in train_rows)).encode("utf-8")
+        ).hexdigest(),
+    }
+    return (
+        step9.apply_logistic_artifact_to_matrix(score_matrix, artifact),
+        weight_summary,
+        model_artifact,
+    )
+
+
+def assert_domain_component_isolation(en_rows: list[dict], zh_rows: list[dict]) -> dict:
+    en_components = {row["step23_component_id"] for row in en_rows}
+    zh_components = {row["step23_component_id"] for row in zh_rows}
+    component_overlap = sorted(en_components & zh_components)
+    if component_overlap:
+        raise ValueError(f"Step23 source/target component overlap: {component_overlap[0]}")
+    en_sellers = {
+        row[key]
+        for row in en_rows
+        for key in ("seller_uid_left", "seller_uid_right")
+    }
+    zh_sellers = {
+        row[key]
+        for row in zh_rows
+        for key in ("seller_uid_left", "seller_uid_right")
+    }
+    seller_overlap = sorted(en_sellers & zh_sellers)
+    if seller_overlap:
+        raise ValueError(f"Step23 source/target seller overlap: {seller_overlap[0]}")
+    return {
+        "source_target_component_overlap": 0,
+        "source_target_seller_overlap": 0,
+    }
 
 
 def write_csv(path: Path, rows: list[dict]) -> None:
@@ -183,6 +239,13 @@ def write_csv(path: Path, rows: list[dict]) -> None:
     if path.exists() and path.read_bytes() != rendered:
         raise ValueError(f"Refusing to overwrite different Step23 predictions: {path}")
     path.write_bytes(rendered)
+
+
+def write_json_immutable(path: Path, payload: dict) -> None:
+    rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    if path.exists() and path.read_text(encoding="utf-8") != rendered:
+        raise ValueError(f"Refusing to overwrite a different Step23 JSON artifact: {path}")
+    path.write_text(rendered, encoding="utf-8")
 
 
 def main() -> None:
@@ -220,40 +283,58 @@ def main() -> None:
     if len(en_train) != len(en_feature_index) or len(zh_train) != len(zh_feature_index):
         raise ValueError("Step23 feature rows do not exactly match canonical train rows")
 
-    cosine_name = v7_policy["clean_semantic_encoder"]["output_feature"]
-    en_aggregate = np.asarray([[float(row[cosine_name])] for row in en_train], dtype=np.float64)
-    zh_aggregate = np.asarray([[float(row[cosine_name])] for row in zh_train], dtype=np.float64)
-    en_item = matrix_for_rows(en_train, en_feature_index, feature_names)
-    zh_item = matrix_for_rows(zh_train, zh_feature_index, feature_names)
-    matrices = {
-        "aggregate_redacted_e5_cosine": (en_aggregate, zh_aggregate),
-        "item_multi_instance_only": (en_item, zh_item),
-        "aggregate_plus_item_multi_instance": (
-            np.concatenate([en_aggregate, en_item], axis=1),
-            np.concatenate([zh_aggregate, zh_item], axis=1),
-        ),
-    }
-    if list(matrices) != policy["evaluation"]["models"]:
-        raise ValueError("Step23 model order/configuration drift")
-
     evaluation_cfg = policy["evaluation"]
     if not evaluation_cfg["valid_or_test_selection_forbidden"]:
         raise ValueError("Step23 valid/test selection prohibition was relaxed")
-    expected_source_controls = [f"source_only_{name}" for name in matrices]
-    if expected_source_controls != evaluation_cfg["source_only_controls"]:
-        raise ValueError("Step23 source-only control order/configuration drift")
+    if not evaluation_cfg["primary_model_preregistered"] or not evaluation_cfg["candidate_selection_forbidden"]:
+        raise ValueError("Step23 v2 requires a preregistered primary without candidate selection")
+    isolation = assert_domain_component_isolation(en_train, zh_train)
+    model_feature_sets = {
+        name: list(names) for name, names in evaluation_cfg["model_feature_sets"].items()
+    }
+    produced_feature_names = set(feature_names)
+    for model_name, names in model_feature_sets.items():
+        if not names or len(names) != len(set(names)):
+            raise ValueError(f"Step23 model feature set is empty or duplicated: {model_name}")
+        missing = sorted(set(names) - produced_feature_names)
+        if missing:
+            raise ValueError(f"Step23 model feature set has missing features for {model_name}: {missing}")
+    primary_name = evaluation_cfg["primary_model"]
+    baseline_name = evaluation_cfg["matched_baseline_model"]
+    if primary_name not in model_feature_sets or baseline_name not in model_feature_sets:
+        raise ValueError("Step23 primary or matched baseline is absent from model_feature_sets")
+    if not set(model_feature_sets[baseline_name]).issubset(model_feature_sets[primary_name]):
+        raise ValueError("Step23 primary must contain every matched aggregate control feature")
+    matrices = {
+        model_name: (
+            matrix_for_rows(en_train, en_feature_index, names),
+            matrix_for_rows(zh_train, zh_feature_index, names),
+        )
+        for model_name, names in model_feature_sets.items()
+    }
     fold_assignment = grouped_folds(zh_train, int(evaluation_cfg["fold_count"]), int(evaluation_cfg["fold_seed"]))
     logistic_cfg = dict(v7_policy["step9_latent_mixup"]["logistic"])
     weighting_cfg = v7_policy["factorized_evidence_weighting"]
     oof_scores = {name: np.full(len(zh_train), np.nan, dtype=float) for name in matrices}
     source_scores = {}
     source_weight_summaries = {}
+    source_artifacts = {}
     for model_name, (en_matrix, zh_matrix) in matrices.items():
-        source_scores[model_name], source_weight_summaries[model_name] = fit_and_score(
-            en_train, en_matrix, zh_matrix, logistic_cfg, weighting_cfg
+        (
+            source_scores[model_name],
+            source_weight_summaries[model_name],
+            source_artifacts[model_name],
+        ) = fit_and_score(
+            en_train,
+            en_matrix,
+            zh_matrix,
+            logistic_cfg,
+            weighting_cfg,
+            model_feature_sets[model_name],
         )
 
     fold_records = []
+    oof_fold_artifacts = {name: [] for name in matrices}
     for fold in range(int(evaluation_cfg["fold_count"])):
         held = np.asarray([
             index for index, row in enumerate(zh_train)
@@ -264,9 +345,20 @@ def main() -> None:
         train_rows = en_train + [zh_train[index] for index in train]
         for model_name, (en_matrix, zh_matrix) in matrices.items():
             train_matrix = np.concatenate([en_matrix, zh_matrix[train]], axis=0)
-            oof_scores[model_name][held], _ = fit_and_score(
-                train_rows, train_matrix, zh_matrix[held], logistic_cfg, weighting_cfg
+            scores, _weight_summary, artifact = fit_and_score(
+                train_rows,
+                train_matrix,
+                zh_matrix[held],
+                logistic_cfg,
+                weighting_cfg,
+                model_feature_sets[model_name],
             )
+            oof_scores[model_name][held] = scores
+            artifact["fold"] = fold
+            artifact["held_out_component_ids"] = sorted(
+                {zh_train[index]["step23_component_id"] for index in held}
+            )
+            oof_fold_artifacts[model_name].append(artifact)
         fold_records.append({
             "fold": fold,
             "held_out_rows": len(held),
@@ -282,7 +374,6 @@ def main() -> None:
     source_metrics = {
         f"source_only_{name}": metrics(labels, scores) for name, scores in source_scores.items()
     }
-    baseline_name = "aggregate_redacted_e5_cosine"
     bootstrap = {
         name: grouped_bootstrap(
             zh_train,
@@ -294,41 +385,39 @@ def main() -> None:
         for name, scores in oof_scores.items()
         if name != baseline_name
     }
-    candidate_names = [name for name in matrices if name != baseline_name]
-    best_candidate_ap = max(float(oof_metrics[name]["average_precision"]) for name in candidate_names)
-    tie_tolerance = float(evaluation_cfg["selection_tie_tolerance"])
-    tied_candidates = {
-        name for name in candidate_names
-        if best_candidate_ap - float(oof_metrics[name]["average_precision"]) <= tie_tolerance
-    }
-    simplicity_order = list(evaluation_cfg["simplicity_tie_break_order"])
-    if set(simplicity_order) != set(candidate_names):
-        raise ValueError("Step23 simplicity tie-break order does not match candidate models")
-    selected_name = next(name for name in simplicity_order if name in tied_candidates)
     baseline_ap = float(oof_metrics[baseline_name]["average_precision"])
-    selected_ap = float(oof_metrics[selected_name]["average_precision"])
+    primary_ap = float(oof_metrics[primary_name]["average_precision"])
 
-    slice_score_means = {}
-    negative_slice_increases = []
+    negative_slice_tail_metrics = {}
+    negative_mean_increases = []
+    negative_q95_increases = []
+    negative_top_decile_increases = []
     for evidence_type in ("template_clone_not_controller", "semantic_topic_not_controller"):
         indices = [index for index, row in enumerate(zh_train) if row.get("evidence_type") == evidence_type]
         if not indices:
             raise ValueError(f"Step23 expected target-train evidence slice is empty: {evidence_type}")
-        baseline_mean = float(np.mean(oof_scores[baseline_name][indices]))
-        selected_mean = float(np.mean(oof_scores[selected_name][indices]))
-        increase = selected_mean - baseline_mean
-        negative_slice_increases.append(increase)
-        slice_score_means[evidence_type] = {
-            "row_count": len(indices),
-            "baseline_mean_score": baseline_mean,
-            "selected_mean_score": selected_mean,
-            "selected_minus_baseline": increase,
+        baseline_tail = negative_tail_metrics(oof_scores[baseline_name][indices])
+        primary_tail = negative_tail_metrics(oof_scores[primary_name][indices])
+        deltas = {
+            key: primary_tail[key] - baseline_tail[key]
+            for key in ("mean", "q90", "q95", "top_decile_mean", "maximum")
+        }
+        negative_mean_increases.append(deltas["mean"])
+        negative_q95_increases.append(deltas["q95"])
+        negative_top_decile_increases.append(deltas["top_decile_mean"])
+        negative_slice_tail_metrics[evidence_type] = {
+            "baseline": baseline_tail,
+            "primary": primary_tail,
+            "primary_minus_baseline": deltas,
         }
 
-    selected_bootstrap = bootstrap[selected_name]
-    ap_gain = selected_ap - baseline_ap
+    primary_bootstrap = bootstrap[primary_name]
+    ap_gain = primary_ap - baseline_ap
     non_silver_indices = np.asarray([
         index for index, row in enumerate(zh_train) if not bool_value(row.get("silver_train_only"))
+    ], dtype=int)
+    silver_indices = np.asarray([
+        index for index, row in enumerate(zh_train) if bool_value(row.get("silver_train_only"))
     ], dtype=int)
     strong_evidence_indices = np.asarray([
         index for index, row in enumerate(zh_train)
@@ -341,28 +430,76 @@ def main() -> None:
     sensitivity_metrics = {}
     for slice_name, indices in {
         "canonical_non_silver": non_silver_indices,
+        "silver_train_only_secondary": silver_indices,
         "direct_component_positive_plus_all_negatives": strong_evidence_indices,
     }.items():
         slice_labels = labels[indices]
         if len(set(slice_labels.tolist())) < 2:
             raise ValueError(f"Step23 sensitivity slice is single-class: {slice_name}")
         baseline_metrics = metrics(slice_labels, oof_scores[baseline_name][indices])
-        selected_metrics = metrics(slice_labels, oof_scores[selected_name][indices])
+        primary_metrics = metrics(slice_labels, oof_scores[primary_name][indices])
         sensitivity_metrics[slice_name] = {
             "baseline": baseline_metrics,
-            "selected": selected_metrics,
-            "selected_minus_baseline_ap": (
-                selected_metrics["average_precision"] - baseline_metrics["average_precision"]
+            "primary": primary_metrics,
+            "primary_minus_baseline_ap": (
+                primary_metrics["average_precision"] - baseline_metrics["average_precision"]
             ),
         }
-    non_silver_ap_delta = sensitivity_metrics["canonical_non_silver"]["selected_minus_baseline_ap"]
+    non_silver_ap_delta = sensitivity_metrics["canonical_non_silver"]["primary_minus_baseline_ap"]
+    strong_evidence_ap_delta = sensitivity_metrics[
+        "direct_component_positive_plus_all_negatives"
+    ]["primary_minus_baseline_ap"]
+    direct_component_positive_indices = np.asarray([
+        index for index, row in enumerate(zh_train)
+        if row["review_label"] == "positive"
+        and row.get("evidence_type") in {
+            "same_controller_direct_identifier",
+            "same_controller_component_anchor",
+        }
+    ], dtype=int)
+    if direct_component_positive_indices.size == 0:
+        raise ValueError("Step23 has no direct/component positive sensitivity rows")
+    direct_component_positive_mean_delta = float(
+        np.mean(oof_scores[primary_name][direct_component_positive_indices])
+        - np.mean(oof_scores[baseline_name][direct_component_positive_indices])
+    )
+    non_silver_rows = [zh_train[index] for index in non_silver_indices]
+    non_silver_bootstrap = grouped_bootstrap(
+        non_silver_rows,
+        oof_scores[baseline_name][non_silver_indices],
+        oof_scores[primary_name][non_silver_indices],
+        int(evaluation_cfg["grouped_bootstrap_resamples"]),
+        int(evaluation_cfg["grouped_bootstrap_seed"]) + 1,
+    )
+    label_quality = {
+        "all_train": metrics(labels, oof_scores[baseline_name]),
+        "canonical_non_silver": {
+            "row_count": int(non_silver_indices.size),
+            "positive_count": int(np.sum(labels[non_silver_indices] == 1.0)),
+            "negative_count": int(np.sum(labels[non_silver_indices] == 0.0)),
+        },
+        "silver_train_only": {
+            "row_count": int(silver_indices.size),
+            "positive_count": int(np.sum(labels[silver_indices] == 1.0)),
+            "negative_count": int(np.sum(labels[silver_indices] == 0.0)),
+        },
+        "direct_component_positive_count": int(direct_component_positive_indices.size),
+        "all_label_oof_interpretation": "silver_supported_internal_development_only",
+    }
     promotion = (
-        ap_gain >= float(evaluation_cfg["minimum_ap_gain_over_aggregate"])
-        and selected_bootstrap["grouped_bootstrap_95_ci"][0]
+        ap_gain >= float(evaluation_cfg["minimum_ap_gain_over_matched_aggregate"])
+        and primary_bootstrap["grouped_bootstrap_95_ci"][0]
         >= float(evaluation_cfg["minimum_bootstrap_lower_bound"])
         and non_silver_ap_delta >= float(evaluation_cfg["minimum_non_silver_ap_delta"])
-        and max(negative_slice_increases)
+        and strong_evidence_ap_delta >= float(evaluation_cfg["minimum_strong_evidence_ap_delta"])
+        and direct_component_positive_mean_delta
+        >= float(evaluation_cfg["minimum_direct_component_positive_mean_score_delta"])
+        and max(negative_mean_increases)
         <= float(evaluation_cfg["maximum_template_or_topic_mean_score_increase"])
+        and max(negative_q95_increases)
+        <= float(evaluation_cfg["maximum_template_or_topic_q95_score_increase"])
+        and max(negative_top_decile_increases)
+        <= float(evaluation_cfg["maximum_template_or_topic_top_decile_mean_score_increase"])
     )
 
     prediction_rows = []
@@ -399,6 +536,37 @@ def main() -> None:
     for pool_name, pool_cfg in v7_policy["pools"].items():
         for key in ("frozen_labels", "evidence_labels", "v7_pair_features"):
             input_hashes[f"{pool_name}:{key}"] = sha256_file(resolve(pool_cfg[key]))
+
+    final_train_rows = en_train + zh_train
+    final_train_artifacts = {}
+    for model_name, (en_matrix, zh_matrix) in matrices.items():
+        final_matrix = np.concatenate([en_matrix, zh_matrix], axis=0)
+        _scores, _weight_summary, artifact = fit_and_score(
+            final_train_rows,
+            final_matrix,
+            final_matrix,
+            logistic_cfg,
+            weighting_cfg,
+            model_feature_sets[model_name],
+        )
+        final_train_artifacts[model_name] = artifact
+    artifact_payload = {
+        "step": "step23_v2_frozen_model_artifacts",
+        "policy_version": policy["version"],
+        "primary_model": primary_name,
+        "matched_baseline_model": baseline_name,
+        "valid_or_test_scores_used": False,
+        "publication_holdout_untouched": True,
+        "model_feature_sets": model_feature_sets,
+        "source_only_artifacts": source_artifacts,
+        "target_oof_fold_artifacts": oof_fold_artifacts,
+        "final_all_train_artifacts": final_train_artifacts,
+        "fold_assignment": dict(sorted(fold_assignment.items())),
+        "input_hashes": input_hashes,
+        "promotion_eligible": promotion,
+    }
+    artifact_path = output_root / output_cfg["model_artifacts"]
+    write_json_immutable(artifact_path, artifact_payload)
     summary = {
         "step": "step23_item_multi_instance_grouped_oof_evaluation",
         "policy_version": policy["version"],
@@ -408,36 +576,55 @@ def main() -> None:
         "english_train_rows": len(en_train),
         "chinese_train_rows": len(zh_train),
         "chinese_train_components": len({row["step23_component_id"] for row in zh_train}),
+        "domain_isolation": isolation,
         "feature_count": len(feature_names),
-        "models": list(matrices),
+        "models": {
+            name: {"feature_count": len(model_feature_sets[name]), "feature_names": model_feature_sets[name]}
+            for name in matrices
+        },
         "source_only_metrics": source_metrics,
         "target_grouped_oof_metrics": oof_metrics,
-        "grouped_bootstrap_vs_aggregate": bootstrap,
-        "selection": {
-            "selected_model": selected_name,
-            "candidate_oof_average_precision": {
-                name: oof_metrics[name]["average_precision"] for name in candidate_names
-            },
-            "best_candidate_oof_average_precision": best_candidate_ap,
-            "tied_within_tolerance": [name for name in simplicity_order if name in tied_candidates],
-            "tie_tolerance": tie_tolerance,
-            "simplicity_tie_break_order": simplicity_order,
-            "selection_scope": evaluation_cfg["selection_scope"],
-            "selection_metric": evaluation_cfg["selection_metric"],
+        "grouped_bootstrap_vs_matched_aggregate": bootstrap,
+        "preregistration": {
+            "primary_model": primary_name,
+            "matched_baseline_model": baseline_name,
+            "candidate_selection_performed": False,
+            "development_scope": evaluation_cfg["development_scope"],
+            "development_metric": evaluation_cfg["development_metric"],
             "test_metrics_used": False,
         },
-        "negative_slice_score_means": slice_score_means,
+        "negative_slice_tail_metrics": negative_slice_tail_metrics,
+        "label_quality": label_quality,
         "sensitivity_metrics": sensitivity_metrics,
+        "non_silver_grouped_bootstrap": non_silver_bootstrap,
+        "direct_component_positive_mean_score_delta": direct_component_positive_mean_delta,
         "promotion": {
-            "selected_minus_aggregate_ap": ap_gain,
-            "minimum_ap_gain_required": evaluation_cfg["minimum_ap_gain_over_aggregate"],
-            "bootstrap_lower_bound": selected_bootstrap["grouped_bootstrap_95_ci"][0],
+            "scope": evaluation_cfg["promotion_scope"],
+            "primary_minus_matched_aggregate_ap": ap_gain,
+            "minimum_ap_gain_required": evaluation_cfg["minimum_ap_gain_over_matched_aggregate"],
+            "bootstrap_lower_bound": primary_bootstrap["grouped_bootstrap_95_ci"][0],
             "minimum_bootstrap_lower_bound": evaluation_cfg["minimum_bootstrap_lower_bound"],
-            "non_silver_selected_minus_baseline_ap": non_silver_ap_delta,
+            "non_silver_primary_minus_baseline_ap": non_silver_ap_delta,
             "minimum_non_silver_ap_delta": evaluation_cfg["minimum_non_silver_ap_delta"],
-            "maximum_observed_template_or_topic_mean_score_increase": max(negative_slice_increases),
+            "strong_evidence_primary_minus_baseline_ap": strong_evidence_ap_delta,
+            "minimum_strong_evidence_ap_delta": evaluation_cfg["minimum_strong_evidence_ap_delta"],
+            "direct_component_positive_mean_score_delta": direct_component_positive_mean_delta,
+            "minimum_direct_component_positive_mean_score_delta": evaluation_cfg[
+                "minimum_direct_component_positive_mean_score_delta"
+            ],
+            "maximum_observed_template_or_topic_mean_score_increase": max(negative_mean_increases),
             "maximum_allowed_template_or_topic_mean_score_increase": evaluation_cfg[
                 "maximum_template_or_topic_mean_score_increase"
+            ],
+            "maximum_observed_template_or_topic_q95_score_increase": max(negative_q95_increases),
+            "maximum_allowed_template_or_topic_q95_score_increase": evaluation_cfg[
+                "maximum_template_or_topic_q95_score_increase"
+            ],
+            "maximum_observed_template_or_topic_top_decile_mean_score_increase": max(
+                negative_top_decile_increases
+            ),
+            "maximum_allowed_template_or_topic_top_decile_mean_score_increase": evaluation_cfg[
+                "maximum_template_or_topic_top_decile_mean_score_increase"
             ],
             "eligible": promotion,
         },
@@ -445,6 +632,7 @@ def main() -> None:
         "source_only_weight_summaries": source_weight_summaries,
         "input_hashes": input_hashes,
         "prediction_sha256": sha256_file(prediction_path),
+        "model_artifacts_sha256": sha256_file(artifact_path),
     }
     summary_path = output_root / output_cfg["evaluation_summary"]
     rendered = json.dumps(summary, ensure_ascii=False, indent=2) + "\n"
@@ -453,8 +641,8 @@ def main() -> None:
     summary_path.write_text(rendered, encoding="utf-8")
     print(json.dumps({
         "status": summary["status"],
-        "selected_model": selected_name,
-        "selected_minus_aggregate_ap": ap_gain,
+        "primary_model": primary_name,
+        "primary_minus_matched_aggregate_ap": ap_gain,
         "promotion_eligible": promotion,
     }, indent=2))
 

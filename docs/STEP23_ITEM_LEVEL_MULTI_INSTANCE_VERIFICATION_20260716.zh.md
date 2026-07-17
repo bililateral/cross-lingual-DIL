@@ -1,5 +1,7 @@
 # Step23 Item-Level Multi-Instance Seller-Pair Verification
 
+> **状态：已被 Step23-v2 取代，禁止按本文运行正式实验。** 二次审查发现 v1 的跨字段清洗会影响 seller 内去重，且旧 aggregate baseline 与多实例方法不是同一商品输入。修复后的唯一有效协议见 `docs/STEP23_ITEM_LEVEL_MULTI_INSTANCE_V2_20260717.zh.md`。本文仅保留为设计演化记录。
+
 ## 1. 当前问题
 
 Step21 和 Step22 已经连续证明两种直接扩充策略无效：

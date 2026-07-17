@@ -147,6 +147,9 @@ def build_item(meta: dict, title: object, description: object, category: object,
     if not text:
         text = cfg["empty_text_fallback"]
         diagnostics["empty_text_fallback_count"] += 1
+    # Exact-content deduplication uses the complete redacted text. Truncation is
+    # an encoder/style budget and must not merge items with a shared long prefix.
+    content_signature = sha256_text(text.casefold())
     text = text[: int(cfg["maximum_clean_text_characters"])]
     normalized_category = clean_category.casefold() or "__uncategorized__"
     title_hash = sha256_text(clean_title.casefold()) if clean_title and not cross_field_changed else ""
@@ -155,7 +158,10 @@ def build_item(meta: dict, title: object, description: object, category: object,
         if clean_description and not cross_field_changed
         else ""
     )
-    content_signature = sha256_text("\n".join((normalized_category, title_hash, description_hash)))
+    # Deduplication must retain the final redacted content even when exact field
+    # overlap is disabled after a cross-field identifier match.
+    if cross_field_changed:
+        diagnostics["exact_overlap_disabled_item_count"] += 1
     return {
         "item_uid": meta["item_uid"],
         "pool": meta["pool"],
@@ -168,6 +174,8 @@ def build_item(meta: dict, title: object, description: object, category: object,
         "title_hash": title_hash,
         "description_hash": description_hash,
         "content_signature": content_signature,
+        "exact_overlap_eligible": not cross_field_changed,
+        "cross_field_redaction_applied": cross_field_changed,
         "clean_text": text,
         **style_features(text),
         "identifier_redacted": True,
@@ -197,6 +205,18 @@ def category_round_robin(items: list[dict], maximum: int) -> list[dict]:
             if queues[category_key] and len(selected) < maximum:
                 selected.append(queues[category_key].popleft())
     return selected
+
+
+def assert_disjoint_pool_sellers(pool_sellers: dict[str, set[str]]) -> None:
+    pool_names = sorted(pool_sellers)
+    for left_index, left_name in enumerate(pool_names):
+        for right_name in pool_names[left_index + 1 :]:
+            overlap = sorted(pool_sellers[left_name] & pool_sellers[right_name])
+            if overlap:
+                raise ValueError(
+                    f"Step23 cross-domain train seller overlap between {left_name} and "
+                    f"{right_name}: {overlap[0]}"
+                )
 
 
 def immutable_write(path: Path, content: bytes) -> None:
@@ -241,6 +261,7 @@ def main() -> None:
         pool_sellers[pool_name] = sellers
         pool_diagnostics[pool_name] = diagnostics
         literals_by_pool[pool_name], signal_diagnostics[pool_name] = seller_literals(pool_cfg, sellers)
+    assert_disjoint_pool_sellers(pool_sellers)
 
     manifest_path_input = resolve(policy["inputs"]["item_manifest"])
     relevant_by_dataset: dict[str, dict[int, dict]] = defaultdict(dict)
@@ -372,6 +393,7 @@ def main() -> None:
         "selected_item_count": len(selected_items),
         "pool_scope": pool_diagnostics,
         "selection_stats": selection_stats,
+        "cross_pool_train_seller_overlap": 0,
         "signal_diagnostics": signal_diagnostics,
         "redaction_diagnostics": dict(sorted(redaction_counts.items())),
         "valid_test_items_encoded": False,
