@@ -1,4 +1,6 @@
-# Step23-v2 同商品匹配对照的多实例 Seller-Pair 验证
+# Step23-v2.1 同商品匹配对照的多实例 Seller-Pair 验证
+
+> `v2_20260717` 首次 Linux 结果已作废：跨字段检测把换行规范化误判为 identifier 命中，导致全部商品的 exact-overlap hash 被禁用。v2.1 只修复该实现错误；模型集合、划分、权重、预注册主模型和晋级门槛均保持不变。
 
 ## 1. 实验定位
 
@@ -15,7 +17,7 @@ V1 没有执行正式数值实验，但代码审查发现两个不可忽略的�
 1. 跨字段 identifier redaction 触发后，标题和描述 exact-overlap hash 被置空；旧去重 signature 同时依赖这两个 hash，导致同一 seller 同一类别的不同商品可能被错误合并。
 2. V1 aggregate baseline 使用旧 seller-profile 文本的 E5 cosine，而多实例模型使用新选择的真实商品。输入语料和表示容量同时变化，无法把提升归因于 multi-instance distribution。
 
-V2 使用新的输出根目录，不覆盖任何 V1 artifact。
+V2 使用新的输出根目录，不覆盖任何 V1 artifact；v2.1 再使用独立目录，不覆盖已作废的 v2 数值结果。
 
 ## 3. 数据边界
 
@@ -41,10 +43,12 @@ V2 使用新的输出根目录，不覆盖任何 V1 artifact。
 
 每条商品从 category、title、description 构建文本，并使用 Step3 occurrence literals、seller alias 和高精度 identifier regex 做固定点清洗。
 
-V2 将两个概念物理分离：
+V2.1 将两个概念物理分离：
 
-- `content_signature`：最终清洗并截断后的完整 `clean_text` hash，只负责 seller 内真实内容去重。
+- `content_signature`：最终清洗、但在编码截断前的完整文本 hash，只负责 seller 内真实内容去重。
 - `title_hash/description_hash`：只负责跨 seller exact-overlap。当跨字段清洗触发时置空，并记录 `exact_overlap_eligible=false`。
+
+跨字段清洗是否触发只依据第二遍 redaction 的实际 regex/literal 命中数，不再依据规范化前后文本是否逐字符相等。普通多字段商品必须保留已分别脱敏后的 title/description hash；只有跨字段拼接后确实形成完整 identifier 的商品才禁用 exact-overlap。
 
 因此禁用可能受 identifier 影响的 exact-overlap，不再导致不同商品错误折叠。
 
@@ -170,7 +174,7 @@ python3 scripts/step23_score_frozen_pair_features.py \
 ## 12. 输出隔离
 
 ```text
-reports/step23_item_multi_instance/v2_20260717/
+reports/step23_item_multi_instance/v2_1_20260717/
 ```
 
 所有已存在但内容不同的输出都会 fail closed；同步 manifest 必须覆盖 policy 声明的全部 artifact，且拒绝未声明文件。
@@ -180,7 +184,7 @@ reports/step23_item_multi_instance/v2_20260717/
 ```bash
 cd /home/yongpeng/cross-lingual
 export STEP23_DEVICE=cuda
-bash scripts/run_step23_item_multi_instance_v2_linux_20260717.sh
+bash scripts/run_step23_item_multi_instance_v2_1_linux_20260717.sh
 ```
 
 Windows 只执行源码编辑、编译、契约测试、Bash 语法和 Git 管理，不生成正式数据或数值结果。

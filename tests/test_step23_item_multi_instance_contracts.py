@@ -106,6 +106,29 @@ class Step23ItemMultiInstanceContractTests(unittest.TestCase):
         self.assertNotIn("identifier", row["clean_text"].casefold())
         self.assertGreaterEqual(diagnostics["signal_literal_match_count"], 1)
 
+    def test_plain_multifield_item_keeps_redacted_exact_overlap_hashes(self):
+        meta = {
+            "item_uid": "item-plain-multifield",
+            "pool": "zh_target_strict",
+            "domain": "zh",
+            "seller_uid": "seller",
+            "source_dataset": "market_item.xlsx",
+            "source_row_number": 7,
+        }
+        row, diagnostics = item_builder.build_item(
+            meta,
+            "普通标题",
+            "普通商品描述",
+            "服务",
+            [],
+            self.policy["item_selection"],
+        )
+        self.assertTrue(row["title_hash"])
+        self.assertTrue(row["description_hash"])
+        self.assertTrue(row["exact_overlap_eligible"])
+        self.assertFalse(row["cross_field_redaction_applied"])
+        self.assertEqual(diagnostics["cross_field_redaction_item_count"], 0)
+
     def test_cross_field_redaction_disables_overlap_but_preserves_content_dedup(self):
         meta = {
             "item_uid": "item-cross-field",

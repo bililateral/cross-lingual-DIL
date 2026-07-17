@@ -139,9 +139,17 @@ def build_item(meta: dict, title: object, description: object, category: object,
     for diag in (category_diag, title_diag, description_diag):
         diagnostics.update(diag)
     field_text = "\n".join(value for value in (clean_category, clean_title, clean_description) if value)
-    text, cross_field_diag = redact_field(field_text, literals, meta["seller_uid"])
+    # The individual fields are already normalized and redacted. Preserve their
+    # separators here: redact_field() performs scalar whitespace normalization,
+    # which would turn every newline into a space and make an unchanged item
+    # look like a cross-field identifier match.
+    text, cross_field_diag = redaction.redact_identifiers(field_text, literals)
+    redaction.assert_no_known_identifier_residue(text, literals, meta["seller_uid"])
     diagnostics.update(cross_field_diag)
-    cross_field_changed = text != field_text
+    cross_field_changed = bool(
+        int(cross_field_diag["generic_identifier_match_count"])
+        + int(cross_field_diag["signal_literal_match_count"])
+    )
     if cross_field_changed:
         diagnostics["cross_field_redaction_item_count"] += 1
     if not text:
