@@ -195,3 +195,21 @@ Windows 只执行源码编辑、编译、契约测试、Bash 语法和 Git 管�
 - 若晋级：冻结全部配置，只打开一次 representative valid。
 - Representative valid 通过后仍不能形成论文最终结论；最终只认独立收集并冻结的 Step20 prospective holdout。
 - 不得把 silver-dominated train OOF 写成中文 benchmark 性能。
+
+## 15. v2.1 Linux 结果与冻结结论
+
+同步 manifest 覆盖 `11` 个 payload（`37,877,331` bytes），本地复核没有缺失、大小差异或 SHA-256 差异。校正后的跨字段逻辑只对 `65,514` 条原始商品中的 `1` 条触发；`6,410` 条选中商品全部来自 train，`synthetic_item_count=0`，valid/test 商品编码数为零，英中 seller/component 交集均为零。
+
+中文 train seller-component grouped OOF 结果：
+
+| 固定方法 | ROC-AUC | AP |
+|---|---:|---:|
+| same-item mean-pool cosine | 0.694818 | 0.598696 |
+| item structure only | 0.611519 | 0.572055 |
+| same-item matched aggregate | 0.658754 | 0.593218 |
+| semantic distribution no-count | 0.495100 | 0.403124 |
+| aggregate plus distribution primary | 0.545775 | 0.458483 |
+
+预注册主模型相对 matched aggregate 的 AP 差为 `-0.134735`，component-grouped bootstrap 95% CI 为 `[-0.193967, 0.001614]`，`P(delta>0)=0.0284`。它在 canonical non-silver 切片上从 `0.177815` 降到 `0.128322`，在 direct/component-positive-plus-all-negatives 切片上从 `0.224848` 降到 `0.217211`。同时，它将 template/topic negatives 的 q95 最多抬高 `0.199726`，top-decile mean 最多抬高 `0.244383`。
+
+因此 `promotion_eligible=false`。该结果不能写成正式中文 benchmark 性能，因为 OOF 标签仍由 silver positives 主导；但它足以在当前开发边界上否定“增加 item-to-item 分布统计会稳定改善身份排序”这一方法假设。Step23-v2.1 冻结为负消融，不进入 Step11/17 或 Step20。后续不再针对同一 OOF 边界挑选分布特征，也不通过生成更多软正例挽救该方法；identifier-redacted mean-pool cosine 只保留为后续真实独立数据上的诊断控制。
