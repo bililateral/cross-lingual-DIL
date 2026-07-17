@@ -1338,3 +1338,43 @@ The active evidence does not yet support:
 3. Keep Step 15 v5 frozen. Do not tune Step 15 further against the fixed `zh_test`; any new method branch should be separated from this frozen validation branch.
 4. Current paper wording should frame Step 15 v5 as hard-negative concept-drift mitigation and graph triage/noise compression. It can cautiously claim a Step12-supported ROC-AUC improvement over Step9 mixup100, but not a proof-level same-controller cluster discovery result.
 5. If publication requires stronger identity-discovery claims, the next evidence source must be new raw/OCR/source fields or external corroborating evidence; the current Chinese item-level text extraction has exhausted unreviewed direct-token pairs under the conservative seller-facing direct-identity standard.
+
+## Step25-v2 Pair-Local Copy and Missingness Diagnostic (2026-07-17)
+
+Implementation status:
+
+- branch: `method/step25-v2-pair-local-copy-diagnostic`
+- policy: `schema/step25_v2_pair_local_copy_diagnostic_policy.json`
+- Linux runner: `scripts/run_step25_v2_pair_local_copy_linux_20260717.sh`
+- detailed design: `docs/STEP25_V2_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`
+- code and pure contract tests are implemented locally; numerical/model execution remains pending on Linux
+
+Scientific purpose:
+
+- keep the frozen Step25-v1 negative result unchanged
+- test whether the v1 global template catalog missed copied text supported only by the current seller pair
+- test whether the v1 fixed-zero treatment of insufficient cleaned style confused missingness with genuine style dissimilarity
+- isolate detector effects with matched P0/P2 reliability masks and fold-train-only median imputation
+
+Preregistered controls:
+
+- `P0`: raw authorship style under the pair-local reliability mask
+- `P1`: frozen Step25-v1 global-clean style under the global/local reliability intersection
+- `P2`: pair-local-clean style under the same reliability mask as P0
+- `P3`: pair-local-clean style with explicit raw-style fallback
+- `P4`: reliable-pair-only P0/P2 sensitivity without refitting
+
+Boundary and claim discipline:
+
+- only canonical English/Chinese `train` is read; valid/test access is forbidden
+- detector thresholds are fixed before numerical execution and cannot be searched on D0
+- no labels, evidence types, model errors or prediction scores enter copy detection or feature construction
+- no missing style value is encoded as cosine zero
+- Step25-v2 is hypothesis-informed and retrospective, so `d1_candidate_eligible`, `publication_promotion_eligible`, and `step11_or_step17_entry_allowed` are hard false regardless of results
+- even a complete mechanism-gate pass only justifies a future preregistered D1 replication
+
+Expected Linux output root:
+
+- `reports/step25_template_decontaminated_authorship/v2_pair_local_diagnostic_20260717/`
+
+The project must not interpret Step25-v2 before the returned directory passes its closed `step25_v2_sync_manifest.json` hash audit.

@@ -1050,6 +1050,22 @@ Step16G 已让 E5 mixup 100pct 真正生成 `115` 条 synthetic rows，但相对
 - Step 7/9/11 这类依赖模型、LightGBM 或 Linux runtime 的重跑应在 Linux 服务器执行。
 - 每次 Linux 重跑同步回 Windows 后，应先核查 summary、manifest、output_paths 和 fixed test container，再解释结果。
 
+### 14.1 Step25-v2 配对局部复制机制诊断
+
+Step25-v1 的全局模板清洗已经冻结为负结果。Step25-v2 不修改该结论，而是独立检查两个可能的实现瓶颈：只在当前 seller pair 内出现的复制文本是否被全局目录漏检，以及清洗后短文本是否被错误写成余弦 `0`。
+
+Step25-v2 固定使用四个全量模型和一个可靠切片敏感性分析：
+
+- `P0`: raw style + pair-local reliability mask + fold-train median imputation + reliability indicator
+- `P1`: Step25-v1 global-clean style + global/local reliability intersection
+- `P2`: pair-local-clean style + 与 P0 完全相同的 reliability mask 和 missingness transform
+- `P3`: pair-local-clean style，缺失时显式回退 raw style
+- `P4`: 在 pair-local reliable rows 上比较已拟合的 P0/P2，不重新训练
+
+复制检测仅使用 identifier-redacted canonical-train pair text，以固定 12-character shingles 和 24-character minimum contiguous run 对左右文本对称去复制；不读取 label、evidence type、score、valid 或 test。模型仍是固定强正则 LR/L2，评估包括 English grouped OOF、source-only Chinese scoring、English+Chinese target grouped OOF 和 component-grouped bootstrap。
+
+这是一个 D0 retrospective mechanism diagnostic。无论结果如何，它都不能选择论文主模型、不能进入 Step11/17，也不能撤销 Step25-v1。完整实现和解释边界见 `docs/STEP25_V2_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`。
+
 ## 15. 当前实验设计评价
 
 当前设计总体是合理且严谨的，原因是：
