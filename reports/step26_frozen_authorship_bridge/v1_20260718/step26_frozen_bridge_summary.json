@@ -1,0 +1,94 @@
+{
+  "step": "step26_frozen_authorship_bridge",
+  "version": "2026-07-18-step26-v1-frozen-authorship-cross-boundary",
+  "status": "pass",
+  "scientific_question": "Evaluate the already frozen Step24 authorship representations and English source-only LR/L2 artifacts on the exact corrected Step15-v8 representative-valid and internal-development-test pairs without fitting, selecting, calibrating, or tuning on Chinese valid/test.",
+  "split_counts": {
+    "representative_valid": {
+      "rows": 120,
+      "positive": 30,
+      "negative": 90
+    },
+    "internal_development_test_diagnostic_only": {
+      "rows": 200,
+      "positive": 50,
+      "negative": 150
+    }
+  },
+  "primary_bridge_model": "source_only_semantic_style_lr_l2_primary",
+  "matched_gate_baseline": "step15_v8_clean",
+  "model_refit_performed": false,
+  "encoder_parameters_updated": false,
+  "chinese_valid_test_used_for_model_or_threshold_selection": false,
+  "internal_test_metrics_used_for_promotion": false,
+  "representative_valid_gate": {
+    "eligible_for_one_step26b_experiment": false,
+    "gates": {
+      "primary_valid_ap_gain": {
+        "observed": -0.06635961218942132,
+        "required_minimum": 0.03,
+        "passed": false
+      },
+      "paired_bootstrap_ci_lower": {
+        "observed": -0.3226416979724349,
+        "required_minimum": 0.0,
+        "passed": false
+      },
+      "direct_component_ap_delta": {
+        "observed": 0.030348895422236136,
+        "required_minimum": -0.03,
+        "passed": true
+      },
+      "soft_positive_ap_delta": {
+        "observed": -0.08100229898722322,
+        "required_minimum": -0.03,
+        "passed": false
+      },
+      "template_top_budget_intrusion_increase": {
+        "observed": -4,
+        "required_maximum": 0.0,
+        "passed": true
+      },
+      "public_noise_top_budget_intrusion_increase": {
+        "observed": 0,
+        "required_maximum": 0.0,
+        "passed": true
+      }
+    },
+    "paired_bootstrap": {
+      "resamples_requested": 5000,
+      "resamples_completed": 5000,
+      "single_class_resamples_skipped": 0,
+      "component_count": 35,
+      "point_delta": -0.06635961218942132,
+      "mean_delta": -0.057595038229922194,
+      "ci95_lower": -0.3226416979724349,
+      "ci95_upper": 0.14918074409700596,
+      "probability_delta_gt_zero": 0.3478
+    }
+  },
+  "publication_claim_allowed": false,
+  "publication_claim_requires": "Step20 genuinely prospective holdout after configuration freeze",
+  "source_hashes": {
+    "step24_policy": "398eabb519ea6ff00d543f2050837859af429b021b5c1e134132c5308724635b",
+    "step24_clean_text_manifest": "2107c2f11102180d1c31758c213fc5e929ff8883624cf1359e3ca831ed84acab",
+    "step24_evaluation_summary": "cb8cf8583ff480943b921d0dc8c217c35a10f0abb1dfb6aee3ad3d3e68403df9",
+    "step24_model_artifacts": "1338bb26cf6daab949919d8c1c4e6d526d4967133cc72c173e7d734ef30bd489",
+    "step15_v8_step12_summary": "bbe4db824f9ae648290e3cd9196fbdf00055053b0883b44bc6269dcd405c8905",
+    "step15_v8_freeze_manifest": "80dae1cc24dcff953889d8de3c69fb1915436daf6c6a79236b632c646f3a2d5e"
+  },
+  "output_paths": {
+    "evaluation_pair_manifest": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_evaluation_pair_manifest.csv",
+    "clean_text_manifest": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_clean_text_manifest.json",
+    "embedding_manifest": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_style_embedding_manifest.json",
+    "pair_features": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_pair_features.csv",
+    "predictions": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_frozen_bridge_predictions.csv",
+    "model_metrics": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_model_metrics.csv",
+    "slice_metrics": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_slice_metrics.csv",
+    "bootstrap_comparisons": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_bootstrap_comparisons.csv",
+    "evaluation_summary": "reports/step26_frozen_authorship_bridge/v1_20260718/step26_frozen_bridge_summary.json"
+  },
+  "policy_sha256": "152ec3444afffdc0e42970ae5087bc104c759d6a1a9087e58a5016de4d13e572",
+  "producer_sha256": "9ac4a1d77ab3b08f229e06b03f14258beaae572a1d4a13d756d8c43c4e5ff6f0",
+  "summary_payload_sha256": "1b65a244fc2c72455dac604d73468fbe266dc3d93c883b8d9c02aa6ff1ee3386"
+}
