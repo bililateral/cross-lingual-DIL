@@ -1,0 +1,112 @@
+{
+  "version": "2026-07-18-step26-v1-frozen-authorship-cross-boundary",
+  "objective": "Evaluate the already frozen Step24 authorship representations and English source-only LR/L2 artifacts on the exact corrected Step15-v8 representative-valid and internal-development-test pairs without fitting, selecting, calibrating, or tuning on Chinese valid/test.",
+  "outputs_root": "reports/step26_frozen_authorship_bridge/v1_20260718",
+  "frozen_sources": {
+    "step24_policy": "schema/step24_content_independent_authorship_policy.json",
+    "step24_clean_text_manifest": "reports/step24_content_independent_authorship/v1_20260717/clean_text_manifest.json",
+    "step24_evaluation_summary": "reports/step24_content_independent_authorship/v1_20260717/step24_grouped_oof_evaluation.json",
+    "step24_model_artifacts": "reports/step24_content_independent_authorship/v1_20260717/step24_model_artifacts.json",
+    "step15_v8_step12_summary": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/step12/step12_v8_statistical_robustness.json",
+    "step15_v8_freeze_manifest": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/step12/step15_v8_model_freeze_manifest.json"
+  },
+  "evaluation_data": {
+    "frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "evidence_labels": "reports/step15_evidence_type_labels.zh_target_strict.csv",
+    "seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "identifier_redacted_e5_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.json",
+    "identifier_redacted_e5_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.npy",
+    "split_allowlists": {
+      "representative_valid": {
+        "label_split_name": "valid",
+        "expected_rows": 120,
+        "expected_positive": 30,
+        "expected_negative": 90,
+        "v8_b0_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/bridge_audit/predictions/B0_lr_l2__seed_mean.zh_valid.csv",
+        "v8_clean_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/bridge_audit/predictions/selected_clean__seed_mean.zh_valid.csv",
+        "v8_contextual_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/contextual_evidence/predictions/contextual_evidence__seed_mean.zh_valid.csv"
+      },
+      "internal_development_test_diagnostic_only": {
+        "label_split_name": "test",
+        "expected_rows": 200,
+        "expected_positive": 50,
+        "expected_negative": 150,
+        "v8_b0_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/bridge_audit/predictions/B0_lr_l2__seed_mean.internal_dev_test.csv",
+        "v8_clean_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/bridge_audit/predictions/selected_clean__seed_mean.internal_dev_test.csv",
+        "v8_contextual_predictions": "reports/step15_v8/bridge_v8_readiness_v3_reprofix_20260716_112833_31791/contextual_evidence/predictions/contextual_evidence__seed_mean.internal_dev_test.csv"
+      }
+    }
+  },
+  "frozen_models": {
+    "encoder_keys": [
+      "pcm_multilingual_authorship",
+      "mstyledistance"
+    ],
+    "source_artifact_keys": [
+      "e5_lr_l2_control",
+      "style_only_lr_l2_control",
+      "semantic_style_lr_l2_primary"
+    ],
+    "primary_bridge_model": "source_only_semantic_style_lr_l2_primary",
+    "authorship_control_model": "source_only_style_only_lr_l2_control",
+    "matched_semantic_control_model": "source_only_e5_lr_l2_control",
+    "encoder_parameters_updated": false,
+    "source_artifact_refit_forbidden": true,
+    "valid_test_threshold_selection_forbidden": true
+  },
+  "evaluation": {
+    "primary_metric": "average_precision",
+    "secondary_metrics": [
+      "roc_auc",
+      "pr_auc"
+    ],
+    "threshold_metrics_status": "not_reported_for_step24_source_models_because_no_authorized_source_validation_threshold_was_frozen",
+    "ranking_scope": "global_pair_ranking_with_preregistered_evidence_slices",
+    "component_grouped_bootstrap_resamples": 5000,
+    "component_grouped_bootstrap_seed": 2026071801,
+    "top_positive_budget_definition": "top_k_pairs_where_k_equals_positive_count_in_the_evaluation_split",
+    "slice_names": [
+      "direct_component_positive_plus_all_negatives",
+      "soft_positive_plus_all_negatives",
+      "ordinary_negative",
+      "public_contact_or_url_noise",
+      "semantic_topic_not_controller",
+      "template_clone_not_controller"
+    ],
+    "representative_valid_is_only_internal_bridge_gate": true,
+    "internal_test_satisfies_no_promotion_gate": true,
+    "publication_claim_requires_step20": true
+  },
+  "promotion_gates": {
+    "primary_valid_ap_gain_over_v8_clean_minimum": 0.03,
+    "primary_valid_ap_delta_bootstrap_ci_lower_minimum": 0.0,
+    "direct_component_valid_ap_delta_minimum": -0.03,
+    "soft_positive_valid_ap_delta_minimum": -0.03,
+    "template_top_budget_intrusion_increase_maximum": 0.0,
+    "public_noise_top_budget_intrusion_increase_maximum": 0.0,
+    "all_gates_required": true,
+    "gate_scope": "internal_mechanism_promotion_to_step26b_only_not_publication"
+  },
+  "outputs": {
+    "evaluation_pair_manifest": "step26_evaluation_pair_manifest.csv",
+    "clean_text_manifest": "step26_clean_text_manifest.json",
+    "embedding_manifest": "step26_style_embedding_manifest.json",
+    "pair_features": "step26_pair_features.csv",
+    "predictions": "step26_frozen_bridge_predictions.csv",
+    "model_metrics": "step26_model_metrics.csv",
+    "slice_metrics": "step26_slice_metrics.csv",
+    "bootstrap_comparisons": "step26_bootstrap_comparisons.csv",
+    "evaluation_summary": "step26_frozen_bridge_summary.json",
+    "sync_manifest": "step26_sync_manifest.json"
+  },
+  "hard_rules": [
+    "The Step24 encoders and English source-only LR/L2 artifacts are immutable and may not be refit.",
+    "The exact 120-row corrected representative-valid and 200-row internal-test pair UID allowlists are inherited from frozen Step15-v8 prediction artifacts.",
+    "Chinese valid/test labels are read only after all frozen scores exist and never determine an encoder, feature set, coefficient, calibration parameter, or threshold.",
+    "Only identifier-redacted seller content may enter PCM, mStyleDistance, or E5 features.",
+    "No candidate-rule, direct identifier, evidence type, split membership, or model-error field may enter a Step24 source scorer.",
+    "The isolated Step15-v8 evidence-expert controls never enter primary Step26 metrics.",
+    "Step26A can authorize only one Step26B conditional-reliability experiment and cannot support a publication claim without Step20."
+  ]
+}

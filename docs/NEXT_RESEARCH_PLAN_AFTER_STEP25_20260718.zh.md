@@ -19,20 +19,18 @@ Step25-v1、v2 和正确收敛的 v3.1 已共同回答同一个问题：依赖�
 
 当前主要瓶颈不是优化器、模型容量或阈值，而是独立高置信中文身份证据不足，以及 silver positive 与 copy/template risk 的混杂。
 
-## 3. 第一阶段：Step26 论文级证据审计，不训练
+## 3. 第一阶段：Step26A 冻结作者风格同边界桥接，不训练
 
-建立一个只读审计步骤，统一整理当前仍有效的结果，不再读取已删除的旧 v3 artifact。审计对象只保留：
+重新审计发现 Step24 的 `AP=0.802718` 来自中文 canonical train D0，而 corrected Step15-v8 的结果来自 `120` 条 representative valid 和 `200` 条 internal test。二者不是同一 evaluation boundary，不能直接比较。因此 Step26 首先不是汇总论文表，而是补做一个严格的 frozen bridge：
 
-1. Raw E5/BGE/LaBSE semantic controls；
-2. 一个冻结的 Step7 source-only baseline；
-3. Step15-v7 clean LR/L2 no-augmentation；
-4. equal-weight duplication 和 latent mixup 负消融；
-5. Step24 frozen authorship representation；
-6. Step25-v1/v2/v3.1 机制负结果；
-7. Step12 grouped bootstrap；
-8. 现有 Step11/17 explicit allow-list 图谱审计，只作为后验 operational evidence。
+1. 精确继承 corrected Step15-v8 的 `120 = 30/90` valid 和 `200 = 50/150` internal-test pair allow-list；
+2. 在不读取标签的情况下，从 `pair_uid` 解析 seller，并重放 v7 identifier-redacted clean text；
+3. 使用冻结 PCM、mStyleDistance 和已有 redacted E5 cache 生成三维 pair representation；
+4. 原样应用 Step24 的 English source-only LR/L2 standardization、intercept 和 coefficients，不做 refit；
+5. 所有 frozen source score 完成后才连接 label/evidence 与 v8 B0/clean/contextual comparator；
+6. 以 AP 为主指标，做 seller-component grouped paired bootstrap，并审计 direct/soft positive 与 template/public-noise top-budget intrusion。
 
-Step26 必须输出：每个模型的训练域、特征来源、是否含 identifier、是否使用 silver、选择边界、有效 evaluation slice、AP/ROC-AUC、component-grouped CI、hard-negative tail 和当前科学状态。它的目标是形成论文主表和消融表，而不是选新模型。
+Step26A 的全部 valid gate 通过后，只允许一个 conditional direct-support/public-noise evidence gate 实验；未通过则停止 D0 模型搜索，直接转入 D1/Step20 数据建设或 evidence-type concept-drift 负结果论文。internal test 不参与晋级，最终论文结论仍只认 Step20 prospective holdout。完整预注册协议见 `docs/STEP26_FROZEN_AUTHORSHIP_BRIDGE_PLAN_20260718.zh.md`。
 
 ## 4. 第二阶段：建设新的 D1 复制集
 
