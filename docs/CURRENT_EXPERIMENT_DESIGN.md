@@ -22,6 +22,8 @@ Step25-v3 直接针对这一结果，保留 raw authorship style，同时把 pai
 
 原 v3 数值包同步完整，且逐 pair 分数可精确复现 summary。其 C2 target grouped-OOF AP 为 `0.761758`，低于 C0 的 `0.789338`；template-negative mean rank、top-decile exposure 和 violation rate 分别恶化 `0.026907/0.036364/0.047780`，只有 `2/11` gates 通过。但这些分数来自提前停止解：artifact 的 projected-gradient residual 最高为 `0.52`，策略 tolerance 为 `1e-8`。因此不能把它当作最终方法负结果。
 
+旧 v3 输出只保留到 v3.1 完成 feature byte-parity 与新旧分数对照审计，随后已从工作区删除。旧 v3 代码和 policy 仍作为 v3.1 冻结科学矩阵的实现依赖保留；旧的无效预测、artifact 和 summary 不再作为当前结果输入。
+
 Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtracking，relative loss 不参与收敛，最终 KKT residual 必须 `<=1e-8`，否则 fail closed。输出写入独立 `v3_1_solverfix_20260718`，旧 v3 不覆盖。实际重跑中最大 residual 为 `2.10e-9`，全部 `44` 个 fit 合格；但 C2 的 target OOF AP 为 `0.761755`，低于 C0 的 `0.789848`，template-clone rank tail 也恶化。原 `11` 个 gate 只有 `2` 个通过，因此该方向正式冻结为负结果，不允许选择 C3、修改阈值或使用 valid/test 继续优化。
 
 ## 1. 研究问题定义

@@ -6,7 +6,7 @@
 
 Step25-v3.1 的 Linux 返回包同步完整，求解器修复有效，但预注册的 C2 copy-aware dual-channel 方法没有获得支持。v3.1 应冻结为严格负结果，不能进入 D1、Step11 或 Step17，也不能继续在当前 D0 上调 copy penalty、方向约束或阈值。
 
-旧 v3 仍保留为 `solver-termination-invalidated diagnostic`。v3.1 是唯一可用于解释该方法的正式结果。
+旧 v3 在完成 v3.1 feature byte-parity 和结果对照审计后已从工作区删除；其无效指标仅保留在进度记录中，不再作为可消费 artifact。v3.1 是唯一可用于解释该方法的正式结果。
 
 ## 2. 完整性与数值正确性
 
@@ -63,6 +63,8 @@ Target grouped OOF 中：
 ## 7. C3 与 operational control
 
 C3 redacted-E5 sensitivity 在三个边界上均高于 C0：English AP `0.495430`、source-only Chinese AP `0.811496`、target OOF AP `0.795782`。但 C3 是预注册 sensitivity，不是 primary，也没有经过 C2 的完整晋级门槛，不能事后改成主模型。它只能支持一个未来独立假设：identifier-redacted semantic signal 可能比显式 copy penalty 更有价值。
+
+删除旧 v3 前完成的只读 grouped-bootstrap 进一步表明，C3-C0 的 source-only AP CI 为 `[-0.025570, 0.046289]`，target OOF CI 为 `[-0.038852, 0.047708]`，均明显跨零。Non-silver target slice 虽有 `+0.053387` 点估计，但只有 `16` 个正例，CI 为 `[-0.092597, 0.226176]`。因此 C3 也不足以直接启动新模型主线。
 
 Operational identifier control 将 Chinese AP 从 `0.771609` 提升至 `0.778196`，但只提升了 `3` 条 verified-direct positive，`8` 条 public-noise negative 没有发生分数变化。它是窄覆盖 sensitivity，不是 public-noise 问题的解决方案。
 
