@@ -1091,7 +1091,7 @@ Step25-v3 修复了两个归因问题。第一，不可靠 pair-local-clean styl
 
 Clean scorer 明确禁止 direct identifier、candidate-rule、review label 和 evidence type。Identifier occurrence 只进入单独 operational control：用 English actionable occurrence rows 和 English C2 component-OOF probability 训练小型方向约束 offset expert，再对 Chinese source-only C2 做敏感性报告；中文标签不参与 expert 拟合，结果不能改变 clean model 晋级资格。
 
-原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能冻结为正式负结果。v3.1 修复代码、8 项契约测试、四个 config-only preflight 和 Linux runner 语法检查均已完成，真正数值重跑仍只允许在 Linux 执行。v3.1 输出写入 `v3_1_solverfix_20260718`；完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
+原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能冻结为正式负结果。v3.1 修复代码、11 项契约测试、四个 config-only preflight 和 Linux runner 语法检查均已完成；manifest 还会强制 `44` 个 repaired fit 全部满足 KKT，并要求两个 pair-feature CSV 与 v3 逐字节相同。真正数值重跑仍只允许在 Linux 执行。v3.1 输出写入 `v3_1_solverfix_20260718`；完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
 
 ## 15. 当前实验设计评价
 

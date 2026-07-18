@@ -34,6 +34,8 @@ v3.1 只修改 constrained LR/L2 的数值求解与终止判据，不改变其�
 - line search 停滞、达到最大迭代但 KKT 未达标时必须 fail closed；
 - artifact 新增 termination reason、final objective、gradient infinity norm、projected-gradient residual、relative loss 和 accepted step size；
 - sync manifest 遍历全部 repaired solver artifact，任何非 KKT 解都会阻断返回包。
+- sync manifest 必须找到固定 C0-C3 矩阵产生的全部 `44` 个 repaired artifact，缺少任意 source-only、English OOF 或 Chinese OOF fit 都会阻断返回包；
+- 新旧 English/Chinese pair-feature CSV 必须逐字节相同，防止“只修求解器”重跑意外改变科学输入。
 
 ## 4. 禁止修改的内容
 
@@ -77,9 +79,11 @@ Linux runner 必须依次完成：
 最终 manifest 必须报告：
 
 - 所有 repaired artifact 的 `solver_converged=true`；
+- repaired artifact 数量必须精确等于 `44`；
 - termination reason 只能是 `projected_gradient_kkt_tolerance`；
 - maximum final projected gradient `<=1e-8`；
-- relative loss used for convergence 为 `false`。
+- relative loss used for convergence 为 `false`；
+- 两个 pair-feature payload 均与旧 v3 byte-identical。
 
 ## 7. 结果解释
 

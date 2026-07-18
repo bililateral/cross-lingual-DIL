@@ -67,8 +67,14 @@ def iter_solver_artifacts(value):
 def validate_solver_artifacts(policy: dict, payload: dict) -> dict:
     tolerance = float(policy["evaluation"]["logistic"]["projected_gradient_tolerance"])
     records = list(iter_solver_artifacts(payload))
-    if not records:
-        raise ValueError("Step25-v3.1 manifest found no repaired solver artifacts")
+    expected_count = len(policy["evaluation"]["model_specs"]) * (
+        1 + 2 * int(policy["evaluation"]["fold_count"])
+    )
+    if len(records) != expected_count:
+        raise ValueError(
+            "Step25-v3.1 repaired solver artifact count mismatch: "
+            f"expected={expected_count} observed={len(records)}"
+        )
     failures = [
         record
         for record in records
@@ -83,6 +89,7 @@ def validate_solver_artifacts(policy: dict, payload: dict) -> dict:
         raise ValueError("Step25-v3.1 return bundle contains a non-KKT solver artifact")
     return {
         "artifact_count": len(records),
+        "expected_artifact_count": expected_count,
         "projected_gradient_tolerance": tolerance,
         "maximum_final_projected_gradient": max(
             float(record["solver_final_projected_gradient"]) for record in records
@@ -94,6 +101,45 @@ def validate_solver_artifacts(policy: dict, payload: dict) -> dict:
     }
 
 
+def validate_feature_parity(policy_path: Path, policy: dict) -> dict:
+    overlay = common.load_json(policy_path)
+    base_policy = common.load_json(common.resolve(overlay["base_policy"]))
+    repaired_root = common.resolve(policy["outputs_root"])
+    base_root = common.resolve(base_policy["outputs_root"])
+    records = []
+    for output_key in ("pair_features_en", "pair_features_zh"):
+        repaired = repaired_root / policy["outputs"][output_key]
+        base = base_root / base_policy["outputs"][output_key]
+        if not repaired.is_file() or not base.is_file():
+            raise FileNotFoundError(
+                f"Step25-v3.1 feature parity input is missing: {output_key}"
+            )
+        repaired_sha256 = step24.sha256_file(repaired)
+        base_sha256 = step24.sha256_file(base)
+        if repaired_sha256 != base_sha256:
+            raise ValueError(
+                "Step25-v3.1 changed a frozen pair-feature payload: "
+                f"{output_key}"
+            )
+        records.append(
+            {
+                "output_key": output_key,
+                "repaired_path": str(repaired.relative_to(common.ROOT)).replace(
+                    "\\", "/"
+                ),
+                "base_v3_path": str(base.relative_to(common.ROOT)).replace("\\", "/"),
+                "sha256": repaired_sha256,
+                "byte_identical": True,
+            }
+        )
+    return {
+        "status": "pass",
+        "pair_feature_payload_count": len(records),
+        "all_pair_features_byte_identical_to_v3": True,
+        "files": records,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--policy", default=str(common.DEFAULT_POLICY))
@@ -102,13 +148,18 @@ def main() -> None:
     policy_path, policy, *_ = common.load_policy(args.policy)
     paths = expected_paths(policy)
     if args.validate_config_only:
+        expected_solver_artifact_count = len(policy["evaluation"]["model_specs"]) * (
+            1 + 2 * int(policy["evaluation"]["fold_count"])
+        )
         print(
             json.dumps(
                 {
                     "status": "pass",
                     "expected_payload_count": len(paths),
+                    "expected_repaired_solver_artifact_count": expected_solver_artifact_count,
                     "output_root": policy["outputs_root"],
                     "solver_convergence_contract": "projected_gradient_kkt_only_fail_closed",
+                    "base_v3_pair_feature_byte_parity_required": True,
                     "numerical_execution_performed": False,
                 },
                 indent=2,
@@ -135,6 +186,7 @@ def main() -> None:
     if evaluation.get("valid_or_test_rows_read_or_scored") != 0:
         raise ValueError("Step25-v3.1 evaluation read valid/test")
     solver_audit = validate_solver_artifacts(policy, artifacts)
+    feature_parity_audit = validate_feature_parity(policy_path, policy)
 
     records = [
         {
@@ -162,6 +214,7 @@ def main() -> None:
         "publication_promotion_eligible": False,
         "step11_or_step17_entry_allowed": False,
         "solver_audit": solver_audit,
+        "feature_parity_audit": feature_parity_audit,
         "parent_manifests": parent_manifests,
         "payload_count": len(records),
         "total_size_bytes": sum(record["size_bytes"] for record in records),

@@ -39,6 +39,7 @@ print(json.dumps({
     "status": summary["status"],
     "repair_scope": manifest["repair_scope"],
     "solver_audit": manifest["solver_audit"],
+    "feature_parity_audit": manifest["feature_parity_audit"],
     "d1_replication_candidate_eligible": summary["d1_replication_candidate_eligible"],
     "publication_promotion_eligible": summary["publication_promotion_eligible"],
     "step11_or_step17_entry_allowed": summary["step11_or_step17_entry_allowed"],

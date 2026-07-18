@@ -165,14 +165,25 @@ class Step25V31SolverConvergenceContracts(unittest.TestCase):
         self.assertAlmostEqual(artifact["parameter_coefficients_raw"][0], 0.0)
 
     def test_manifest_rejects_non_kkt_artifact(self) -> None:
+        expected_count = len(self.policy["evaluation"]["model_specs"]) * (
+            1 + 2 * int(self.policy["evaluation"]["fold_count"])
+        )
+        valid = {
+            "model_family": "step25_v3_1_direction_constrained_logistic_l2",
+            "solver_converged": True,
+            "solver_termination_reason": "projected_gradient_kkt_tolerance",
+            "solver_final_projected_gradient": 0.0,
+            "relative_loss_used_for_convergence": False,
+        }
         payload = {
-            "artifact": {
+            "artifacts": [copy.deepcopy(valid) for _ in range(expected_count)]
+        }
+        payload["artifacts"][0] = {
                 "model_family": "step25_v3_1_direction_constrained_logistic_l2",
                 "solver_converged": True,
                 "solver_termination_reason": "relative_loss_stagnation",
                 "solver_final_projected_gradient": 0.1,
                 "relative_loss_used_for_convergence": True,
-            }
         }
         with self.assertRaises(ValueError):
             sync_manifest.validate_solver_artifacts(self.policy, payload)
@@ -181,18 +192,38 @@ class Step25V31SolverConvergenceContracts(unittest.TestCase):
         tolerance = self.policy["evaluation"]["logistic"][
             "projected_gradient_tolerance"
         ]
+        expected_count = len(self.policy["evaluation"]["model_specs"]) * (
+            1 + 2 * int(self.policy["evaluation"]["fold_count"])
+        )
+        payload = {
+            "artifacts": [
+                {
+                    "model_family": "step25_v3_1_direction_constrained_logistic_l2",
+                    "solver_converged": True,
+                    "solver_termination_reason": "projected_gradient_kkt_tolerance",
+                    "solver_final_projected_gradient": tolerance / 2.0,
+                    "relative_loss_used_for_convergence": False,
+                }
+                for _ in range(expected_count)
+            ]
+        }
+        audit = sync_manifest.validate_solver_artifacts(self.policy, payload)
+        self.assertEqual(audit["artifact_count"], expected_count)
+        self.assertEqual(audit["expected_artifact_count"], expected_count)
+        self.assertLessEqual(audit["maximum_final_projected_gradient"], tolerance)
+
+    def test_manifest_rejects_an_incomplete_kkt_artifact_set(self) -> None:
         payload = {
             "artifact": {
                 "model_family": "step25_v3_1_direction_constrained_logistic_l2",
                 "solver_converged": True,
                 "solver_termination_reason": "projected_gradient_kkt_tolerance",
-                "solver_final_projected_gradient": tolerance / 2.0,
+                "solver_final_projected_gradient": 0.0,
                 "relative_loss_used_for_convergence": False,
             }
         }
-        audit = sync_manifest.validate_solver_artifacts(self.policy, payload)
-        self.assertEqual(audit["artifact_count"], 1)
-        self.assertLessEqual(audit["maximum_final_projected_gradient"], tolerance)
+        with self.assertRaises(ValueError):
+            sync_manifest.validate_solver_artifacts(self.policy, payload)
 
     def test_old_v3_results_are_not_overwritten(self) -> None:
         self.assertIn("v3_1_solverfix_20260718", self.policy["outputs_root"])
