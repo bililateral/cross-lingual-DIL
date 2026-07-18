@@ -4,9 +4,9 @@
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
-> 当前主线更新：Step25-v3 已完成 Linux 运行且同步完整，但因 constrained LR/L2 允许 relative-loss stagnation 替代 KKT 收敛而降级为 `solver-termination-invalidated diagnostic`。当前等待 Linux 数值验证的是只修复求解器的 Step25-v3.1；它不改变 v3 特征、模型、权重、fold 或 gates，也没有获准进入 Step11/17。完整修复协议见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
+> 当前主线更新：Step25-v3.1 已完成 Linux 数值重跑和封闭审计。求解器修复有效，`44/44` artifact 均满足 KKT，但 C2 在 English/source-only Chinese/target OOF 的 AP 分别比 C0 低 `0.058346/0.030238/0.028093`，只有 `2/11` gates 通过。Step25-v3.1 已冻结为严格负结果，不进入 D1、Step11 或 Step17。完整结果见 `docs/STEP25_V3_1_RESULT_AUDIT_20260718.zh.md`。
 
-## 0. 当前方法状态：Step25-v1/v2 已冻结，v3 终止无效，v3.1 待 Linux 验证
+## 0. 当前方法状态：Step25-v1/v2/v3.1 均已冻结，v3.1 为最终严格负结果
 
 Step24 已证明冻结多语言作者/风格表示提供明显跨语言增量，但同时把复制模板和公共页面排版嵌入为作者风格。其 source-only primary 在中文 D0 上达到 `AP=0.802718`，相对 redacted-E5 提升 `0.158336`，但 template-clone negative 的 mean/q95/top-decile 分数分别增加 `0.028287/0.067389/0.064517`，target grouped-bootstrap CI 也略跨零。Step24 因此 `promotion_eligible=false` 并冻结。
 
@@ -22,7 +22,7 @@ Step25-v3 直接针对这一结果，保留 raw authorship style，同时把 pai
 
 原 v3 数值包同步完整，且逐 pair 分数可精确复现 summary。其 C2 target grouped-OOF AP 为 `0.761758`，低于 C0 的 `0.789338`；template-negative mean rank、top-decile exposure 和 violation rate 分别恶化 `0.026907/0.036364/0.047780`，只有 `2/11` gates 通过。但这些分数来自提前停止解：artifact 的 projected-gradient residual 最高为 `0.52`，策略 tolerance 为 `1e-8`。因此不能把它当作最终方法负结果。
 
-Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtracking，relative loss 不参与收敛，最终 KKT residual 必须 `<=1e-8`，否则 fail closed。输出写入独立 `v3_1_solverfix_20260718`，旧 v3 不覆盖。修复后仍按原 `11` 个 gate 解释，不允许选择 C3、修改阈值或使用 valid/test。
+Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtracking，relative loss 不参与收敛，最终 KKT residual 必须 `<=1e-8`，否则 fail closed。输出写入独立 `v3_1_solverfix_20260718`，旧 v3 不覆盖。实际重跑中最大 residual 为 `2.10e-9`，全部 `44` 个 fit 合格；但 C2 的 target OOF AP 为 `0.761755`，低于 C0 的 `0.789848`，template-clone rank tail 也恶化。原 `11` 个 gate 只有 `2` 个通过，因此该方向正式冻结为负结果，不允许选择 C3、修改阈值或使用 valid/test 继续优化。
 
 ## 1. 研究问题定义
 
@@ -1091,7 +1091,7 @@ Step25-v3 修复了两个归因问题。第一，不可靠 pair-local-clean styl
 
 Clean scorer 明确禁止 direct identifier、candidate-rule、review label 和 evidence type。Identifier occurrence 只进入单独 operational control：用 English actionable occurrence rows 和 English C2 component-OOF probability 训练小型方向约束 offset expert，再对 Chinese source-only C2 做敏感性报告；中文标签不参与 expert 拟合，结果不能改变 clean model 晋级资格。
 
-原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能冻结为正式负结果。v3.1 修复代码、11 项契约测试、四个 config-only preflight 和 Linux runner 语法检查均已完成；manifest 还会强制 `44` 个 repaired fit 全部满足 KKT，并要求两个 pair-feature CSV 与 v3 逐字节相同。真正数值重跑仍只允许在 Linux 执行。v3.1 输出写入 `v3_1_solverfix_20260718`；完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
+原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能用于最终解释。v3.1 的 11 项契约测试、四个 config-only preflight、Linux runner、`44/44` KKT audit 和两份 feature byte-parity audit 均已通过。正确收敛后的得分仅发生微小变化，gate 仍为 `2/11`，从而把旧 v3 的定性失败转化为可正式冻结的严格负结果。完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`，结果审计见 `docs/STEP25_V3_1_RESULT_AUDIT_20260718.zh.md`。
 
 ## 15. 当前实验设计评价
 
