@@ -1,0 +1,486 @@
+{
+  "version": "2026-07-18-step27-v1-preregistered-english-frozen-source-synthetic-adaptation",
+  "objective": "Test whether strictly train-only, parent-preserving Chinese semi-synthetic views improve target-domain residual adaptation beyond an equal-effective-weight duplication control while the English-trained Step24 identifier-redacted E5 LR/L2 source scorer remains frozen.",
+  "scientific_position": {
+    "mainline": "english_source_training_to_chinese_target_adaptation",
+    "primary_question": "Does M2 synthetic-view adaptation outperform M1 equal-effective-weight duplication under the same frozen English source scorer, real Chinese training boundary, parent set, fold assignment and effective-weight budget?",
+    "required_secondary_question": "Does M2 also outperform M0 real-Chinese-only residual adaptation?",
+    "synthetic_rows_are_new_identities": false,
+    "synthetic_rows_increase_independent_sample_size": false,
+    "current_valid_test_are_confirmatory": false,
+    "only_confirmatory_evaluation": "future Step27-specific genuinely prospective frozen holdout after a dedicated freeze",
+    "step20_current_authorization": "prepare_step27_specific_prospective_freeze_only",
+    "step20_evaluation_currently_authorized": false
+  },
+  "outputs_root": "reports/step27_english_pretrained_synthetic_adaptation/v1_20260718",
+  "immutable_outputs": true,
+  "refuse_cross_manifest_overwrite": true,
+  "inputs": {
+    "step24_policy": "schema/step24_content_independent_authorship_policy.json",
+    "step24_model_artifacts": "reports/step24_content_independent_authorship/v1_20260717/step24_model_artifacts.json",
+    "step24_model_artifacts_sha256": "1338bb26cf6daab949919d8c1c4e6d526d4967133cc72c173e7d734ef30bd489",
+    "zh_frozen_labels": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "zh_frozen_labels_sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee",
+    "zh_evidence_labels": "reports/step15_evidence_type_labels.zh_target_strict.csv",
+    "zh_evidence_labels_sha256": "00502a4d1b39c0c4c82e8ff5840e395b14ac3cbf23050a5008d34925464ae8b5",
+    "zh_seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "zh_item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "seller_component_assignments": "reports/step16i_data_integrity/step16i_integrity_20260716_v2/component_assignments.csv",
+    "seller_component_assignments_sha256": "abbb9e2dc92b4ecc599e0d5995550e616e526da6b81f4d4a881a945c81d34a23",
+    "semantic_model_policy": "schema/step7_semantic_model_policy.json",
+    "identifier_redaction_policy": "schema/step15_v7_two_stage_policy.json"
+  },
+  "frozen_english_source_scorer": {
+    "artifact_json_path": "reports/step24_content_independent_authorship/v1_20260717/step24_model_artifacts.json",
+    "artifact_json_key": "artifacts.source_only.e5_lr_l2_control",
+    "artifact_role": "primary_frozen_source_offset",
+    "training_domain": "en",
+    "training_split": "train",
+    "train_row_count": 401,
+    "train_positive_count": 116,
+    "train_negative_count": 285,
+    "train_pair_uid_sha256": "be7f1f322fa8ed293117857a832b89f0c3604784d1f6fa3b16c07cc116bc21c3",
+    "feature_names": [
+      "identifier_redacted_e5_cosine"
+    ],
+    "standardization_mean": [
+      0.911651490484
+    ],
+    "standardization_scale": [
+      0.036735755047
+    ],
+    "parameter_intercept": -1.243557552951,
+    "parameter_coefficients": [
+      0.862429363864
+    ],
+    "l2_penalty": 10.0,
+    "class_weight": "none",
+    "parameters_frozen": true,
+    "refitting_or_finetuning_forbidden": true,
+    "source_logit_coefficient_in_primary_models": 1.0,
+    "source_logit_coefficient_learned_in_primary_models": false
+  },
+  "canonical_chinese_boundary": {
+    "pool": "zh_target_strict",
+    "must_match_exactly": true,
+    "split_counts": {
+      "train": {
+        "rows": 573,
+        "positive": 229,
+        "negative": 344
+      },
+      "valid": {
+        "rows": 120,
+        "positive": 30,
+        "negative": 90
+      },
+      "test": {
+        "rows": 200,
+        "positive": 50,
+        "negative": 150
+      }
+    },
+    "split_seller_overlap_must_be_zero": true,
+    "split_component_overlap_must_be_zero": true,
+    "repartition_forbidden": true,
+    "raw_text_and_identifier_redacted_features_may_be_precomputed_before_gate": true,
+    "frozen_manifests_or_feature_tables_may_carry_split_and_label_metadata": true,
+    "real_pair_features_are_physically_split_by_canonical_split": true,
+    "combined_real_pair_feature_file_role": "cross_split_build_and_integrity_audit_only",
+    "initial_training_process_loads_only_train_labels_and_features": true,
+    "valid_scoring_opens_valid_labels_and_features_in_a_separate_process_after_oof_gate": true,
+    "test_scoring_opens_test_labels_and_features_in_a_separate_process_after_valid_gate": true,
+    "valid_label_or_score_consumption_before_train_oof_gate": "forbidden_in_model_fit_threshold_selection_metric_and_statistical_evaluation_paths",
+    "test_label_or_score_consumption_before_valid_gate": "forbidden_in_model_fit_threshold_selection_metric_and_statistical_evaluation_paths",
+    "unopened_language_refers_to_delayed_evaluation_not_physical_precomputation": true,
+    "valid_role": "single_open_retrospective_development_label_and_score_evaluation_after_train_oof_freeze",
+    "test_role": "single_open_internal_diagnostic_label_and_score_evaluation_after_valid_gate_only",
+    "step20_role": "preparation_only_until_a_step27_specific_prospective_freeze_is_complete"
+  },
+  "parent_cohorts": {
+    "primary_non_silver": {
+      "role": "primary_train_only_semi_synthetic_pilot",
+      "required_split_name": "train",
+      "required_review_label_for_positive_parent": "positive",
+      "required_silver_train_only": false,
+      "required_usable_for_supervision": true,
+      "required_usable_for_core_transfer": true,
+      "required_identity_training_eligible": true,
+      "expected_positive_parent_pairs": 16,
+      "expected_positive_parent_components": 13,
+      "expected_positive_review_strata": {
+        "identifier_plus_text": 1,
+        "semantic_structural": 6,
+        "semantic_only": 9
+      },
+      "positive_variants_per_parent": 2,
+      "matched_negative_parent_pairs": 16,
+      "negative_variants_per_parent": 2,
+      "maximum_synthetic_rows_per_seed": 64,
+      "negative_parent_selection": {
+        "required_split_name": "train",
+        "required_review_label": "negative",
+        "required_silver_train_only": false,
+        "required_usable_for_supervision": true,
+        "required_usable_for_core_transfer": true,
+        "required_identity_training_eligible": true,
+        "score_blind": true,
+        "one_parent_pair_per_component_preferred": true,
+        "forbid_positive_parent_components": false,
+        "component_relation_policy": "distinct_component_preferred_with_same_component_reviewed_negative_fallback",
+        "same_component_fallback_allowed_when_same_fold_distinct_component_capacity_is_exhausted": true,
+        "same_component_fallback_requires_existing_reviewed_negative_label": true,
+        "matched_component_relation_field": "matched_component_relation",
+        "matched_component_relation_values": [
+          "distinct_component_preferred",
+          "same_component_fallback"
+        ],
+        "matched_component_relation_counts_must_be_reported_per_track": true,
+        "same_component_fallback_reduces_independent_component_effective_sample_size": true,
+        "matched_negative_must_share_positive_parent_fold": true,
+        "matching_variables": [
+          "review_stratum_family",
+          "clean_text_length_bin",
+          "clean_segment_count_bin",
+          "clean_field_missingness_pattern"
+        ]
+      }
+    },
+    "silver_sensitivity": {
+      "role": "physically_isolated_sensitivity_only_never_primary",
+      "required_split_name": "train",
+      "required_review_label_for_positive_parent": "positive",
+      "required_silver_train_only": true,
+      "allowed_positive_review_strata": [
+        "silver_direct_or_contact"
+      ],
+      "maximum_positive_parent_pairs": 56,
+      "positive_variants_per_parent": 1,
+      "maximum_matched_negative_parent_pairs": 56,
+      "negative_variants_per_parent": 1,
+      "maximum_synthetic_rows_per_seed": 112,
+      "output_namespace": "sensitivity_silver_direct_contact",
+      "may_be_merged_into_primary": false,
+      "may_satisfy_primary_promotion_gate": false
+    }
+  },
+  "generation": {
+    "scope": "fold_train_parents_only_after_component_fold_assignment",
+    "identifier_redaction_required_before_transformation": true,
+    "source_text_fields": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "forbidden_profile_fields": [
+      "source_seller_raw",
+      "alias_normalized",
+      "source_market_raw",
+      "source_seller_id_raw",
+      "contact_concat_top",
+      "structured_snapshot_concat_top",
+      "profile_text"
+    ],
+    "matched_recipe_schedule_for_positive_and_negative": [
+      "section_order_rotation",
+      "segment_order_permutation_with_layout_normalization"
+    ],
+    "recipe_contract": {
+      "preserve_all_clean_content_tokens_except_whitespace_and_punctuation_normalization": true,
+      "preserve_field_membership": true,
+      "preserve_parent_pair_label": true,
+      "require_at_least_one_changed_side": true,
+      "fail_closed_on_no_op": true,
+      "same_recipe_family_and_frequency_for_both_labels": true,
+      "seed_specific_left_and_right_transform_parameters": true
+    },
+    "synthetic_uid_prefix": "synthetic://step27/v1",
+    "synthetic_market_marker": "SYNTHETIC_TRAIN_ONLY_PARENT_PRESERVING_VIEW",
+    "inherit_parent_split": true,
+    "inherit_parent_component": true,
+    "inherit_parent_review_label": true,
+    "inherit_parent_training_eligibility": true,
+    "fabricate_contact_or_identifier": false,
+    "fabricate_market_or_source_provenance": false,
+    "cross_parent_or_cross_component_content_splicing": false,
+    "same_seller_split_as_cross_account_positive": false,
+    "uncertain_or_prediction_derived_labels": false,
+    "different_component_implies_negative": false,
+    "copy_parent_pair_features": false,
+    "recompute_all_pair_features_from_transformed_views": true
+  },
+  "pair_representation": {
+    "semantic_encoder": "frozen multilingual-e5-large from schema/step7_semantic_model_policy.json",
+    "semantic_text_contract": "step15_v7_identifier_redacted_clean_text_exact_replay",
+    "semantic_feature": "identifier_redacted_e5_cosine",
+    "residual_feature_names": [
+      "clean_token_jaccard",
+      "clean_char3_jaccard",
+      "clean_title_token_jaccard",
+      "clean_description_token_jaccard",
+      "clean_category_token_jaccard",
+      "clean_text_length_gap_ratio",
+      "clean_segment_count_gap_ratio",
+      "clean_field_presence_match_fraction"
+    ],
+    "residual_feature_contract": {
+      "computed_from_identifier_redacted_views": true,
+      "all_statistics_fit_inside_fold_train": true,
+      "no_test_fitted_idf_or_oov_statistics": true,
+      "no_raw_candidate_rule_count": true,
+      "no_contact_or_pgp_feature": true,
+      "no_uppercase_language_shortcut": true,
+      "no_unredacted_embedding": true,
+      "no_parent_feature_copy_for_synthetic_rows": true
+    }
+  },
+  "cross_validation": {
+    "fold_count": 4,
+    "fold_seed": 20260718,
+    "group_key": "recomputed_seller_component_id",
+    "fold_manifest_is_frozen_before_generation": true,
+    "parent_and_all_descendants_share_fold": true,
+    "matched_positive_and_negative_parents_share_fold": true,
+    "synthetic_views_generated_only_for_current_fold_train_parents": true,
+    "synthetic_views_from_held_fold_forbidden": true,
+    "fold_train_only_imputation": true,
+    "fold_train_only_standardization": true,
+    "fold_train_only_weight_normalization": true,
+    "selection_metric": "average_precision",
+    "selection_scope": "four_fold_seller_component_grouped_oof_on_canonical_chinese_train_only",
+    "valid_or_test_used_for_model_selection": false
+  },
+  "replication": {
+    "seeds": [
+      20260320,
+      20260321,
+      20260322,
+      20260323,
+      20260324,
+      20260325,
+      20260326,
+      20260327,
+      20260328,
+      20260329
+    ],
+    "seed_role": "generation_and_optimization_stability_only",
+    "best_seed_selection_forbidden": true,
+    "seed_is_inferential_unit": false,
+    "evaluation_aggregation": "mean_score_per_real_pair_across_all_ten_seeds",
+    "independent_unit": "real_seller_component"
+  },
+  "models": {
+    "common_formula": "logit(P_final)=logit(P_step24_frozen_english_e5)+beta+gamma^T*x_residual",
+    "common_logistic": {
+      "l2_penalty": 10.0,
+      "max_iter": 400,
+      "tolerance": 1e-8,
+      "class_weight": "none",
+      "standardize_residual_features": true,
+      "source_logit_is_fixed_offset": true
+    },
+    "M0_real_only_residual": {
+      "role": "no_augmentation_baseline",
+      "training_rows": "all canonical real Chinese train rows only"
+    },
+    "M1_equal_effective_weight_duplication": {
+      "role": "mandatory exposure_and_weight_control",
+      "training_rows": "M0 plus exact duplicates of the same selected primary parent rows",
+      "duplicate_budget_must_equal_M2_synthetic_budget": true,
+      "duplicate_parent_set_must_equal_M2_parent_set": true
+    },
+    "M2_parent_preserving_synthetic_views": {
+      "role": "primary_step27_method",
+      "training_rows": "M0 plus primary non-silver transformed positive and matched-negative views",
+      "primary_comparator": "M1_equal_effective_weight_duplication",
+      "required_secondary_comparator": "M0_real_only_residual"
+    },
+    "exploratory_controls": {
+      "learned_source_logit_coefficient": {
+        "enabled": true,
+        "model_id": "step27_m2_learned_source_alpha",
+        "training_rows": "M2 primary rows with the frozen English logit learned as one additional standardized linear feature",
+        "publication_role": "diagnostic_only",
+        "descriptive_near_zero_absolute_alpha_maximum": 0.1,
+        "descriptive_near_zero_rule": "abs(unstandardized learned_source_alpha) <= 0.1",
+        "threshold_role": "exploratory_descriptive_only_never_a_promotion_gate",
+        "interpretation": "An absolute unstandardized source-logit coefficient at or below 0.1 descriptively weakens any English-transfer claim."
+      },
+      "target_only_alpha_zero": {
+        "enabled": true,
+        "model_id": "step27_m2_target_only_alpha_zero",
+        "training_rows": "M2 primary rows with the frozen English source logit removed",
+        "publication_role": "diagnostic_only",
+        "descriptive_ap_equivalence_margin": 0.01,
+        "descriptive_equivalence_rule": "abs(AP(step27_m2_target_only_alpha_zero)-AP(step27_m2_synthetic)) <= 0.01 on the same separately reported split",
+        "score_aggregation": "per_real_pair_mean_across_all_ten_seeds",
+        "threshold_role": "exploratory_descriptive_only_never_a_promotion_gate",
+        "interpretation": "If the absolute target-only versus fixed-alpha-one M2 AP difference is at most 0.01, synthetic adaptation has not descriptively demonstrated dependence on English source knowledge."
+      },
+      "silver_sensitivity_M2": {
+        "enabled": true,
+        "model_id": "step27_m2_silver_sensitivity",
+        "publication_role": "isolated_sensitivity_only"
+      }
+    }
+  },
+  "weighting": {
+    "real_row_weight_field": "training_sample_weight",
+    "default_real_row_weight_if_missing": 1.0,
+    "maximum_child_total_weight_relative_to_parent": 0.5,
+    "primary_child_weight_formula": "parent_real_weight * 0.5 / variants_per_parent",
+    "matched_negative_child_weight_formula": "parent_real_weight * 0.5 / variants_per_parent",
+    "maximum_total_primary_synthetic_effective_weight_fraction_of_real_chinese_train": 0.25,
+    "M1_and_M2_effective_weight_must_match_exactly": true,
+    "parent_weight_inheritance_required": true,
+    "cross_language_parent_interpolation_forbidden": true,
+    "synthetic_rows_may_not_receive_default_unit_weight": true,
+    "all_weight_totals_audited_per_parent_per_label_per_seed_per_fold": true,
+    "fit_weight_normalization_formula": "all_combined_row_weights *= real_fit_rows_effective_weight / raw_combined_effective_weight",
+    "fit_weight_normalization_scope": "current fold-train real rows for OOF fits and all real train rows for frozen full-train artifacts",
+    "normalized_combined_effective_weight_must_equal_real_only_effective_weight": true,
+    "weight_normalization_preserves_relative_M1_M2_parent_and_child_weights": true,
+    "regularization_weight_scale_matched_to_real_only": true
+  },
+  "shortcut_and_leakage_audits": {
+    "required_before_training": [
+      "input_hash_match",
+      "canonical_split_count_match",
+      "zero_pair_uid_overlap_across_train_valid_test",
+      "zero_seller_overlap_across_train_valid_test",
+      "zero_component_overlap_across_train_valid_test",
+      "parent_eligibility_and_expected_count_match",
+      "parent_and_descendant_fold_match",
+      "no_valid_or_test_parent_or_content_usage",
+      "no_identifier_residue_in_clean_text",
+      "no_cross_parent_content_splicing",
+      "no_parent_pair_feature_copy",
+      "M1_M2_parent_and_effective_weight_parity"
+    ],
+    "recipe_label_predictability_auc_maximum": 0.6,
+    "synthetic_vs_real_predictability_auc_maximum": 0.7,
+    "synthetic_identifier_residue_count_maximum": 0,
+    "valid_or_test_rows_in_generation_count_maximum": 0,
+    "step11_or_model_prediction_used_as_label_count_maximum": 0,
+    "fail_closed": true
+  },
+  "development_promotion_gates": {
+    "train_oof": {
+      "M2_minus_M1_average_precision_minimum": 0.02,
+      "M2_minus_M0_average_precision_must_be_positive": true,
+      "positive_seed_delta_count_minimum": 8,
+      "seed_count": 10,
+      "seller_component_grouped_bootstrap_lower_bound_minimum": -0.01,
+      "direct_or_component_positive_recall_drop_maximum": 0.05,
+      "template_clone_negative_fpr_increase_maximum": 0.0,
+      "public_contact_or_url_negative_fpr_increase_maximum": 0.0,
+      "threshold_selection_source": "train_oof_seed_mean_predictions_only",
+      "threshold_selection_metric": "balanced_accuracy",
+      "recipe_label_auc_maximum": 0.6,
+      "synthetic_vs_real_auc_maximum": 0.7
+    },
+    "single_open_valid": {
+      "requires_all_train_oof_gates": true,
+      "M2_minus_M1_average_precision_minimum": 0.03,
+      "M2_minus_M0_average_precision_minimum": 0.03,
+      "direct_or_component_positive_recall_drop_maximum": 0.05,
+      "template_clone_negative_fpr_increase_maximum": 0.0,
+      "public_contact_or_url_negative_fpr_increase_maximum": 0.0,
+      "frozen_train_oof_threshold_required": true,
+      "valid_threshold_reselection_forbidden": true
+    },
+    "single_open_internal_test": {
+      "requires_valid_gate": true,
+      "role": "diagnostic_only_satisfies_no_publication_gate",
+      "threshold_reselection_forbidden": true
+    },
+    "step20": {
+      "required_for_publication_claim": true,
+      "current_authorization": "prepare_step27_specific_prospective_freeze_only",
+      "evaluation_currently_authorized": false,
+      "requires_new_step27_specific_policy_and_model_freeze_manifest": true,
+      "existing_non_step27_step20_freeze_cannot_authorize_evaluation": true,
+      "evaluation_count": 1,
+      "requires_frozen_code_policy_model_and_manifest_hashes": true,
+      "threshold_reselection_forbidden": true
+    }
+  },
+  "statistics": {
+    "primary_metric": "average_precision",
+    "secondary_metrics": [
+      "roc_auc",
+      "pr_auc_trapezoidal",
+      "balanced_accuracy",
+      "f1",
+      "precision",
+      "recall"
+    ],
+    "primary_comparison": "M2_parent_preserving_synthetic_views_vs_M1_equal_effective_weight_duplication",
+    "required_secondary_comparison": "M2_parent_preserving_synthetic_views_vs_M0_real_only_residual",
+    "multiple_comparison_policy": "one_preregistered_primary_comparison_plus_sequential_required_secondary_gate; exploratory controls are not promoted",
+    "resampling_unit": "seller_component",
+    "grouped_bootstrap_resamples": 5000,
+    "grouped_bootstrap_seed": 20260718,
+    "paired_permutation_resamples": 10000,
+    "paired_permutation_seed": 20260719,
+    "bootstrap_and_permutation_rng_streams_are_separate": true,
+    "resampling_base_seeds_must_not_be_reused": true,
+    "report_seed_mean_pair_scores": true,
+    "report_all_seed_deltas": true,
+    "report_parent_component_effective_sample_size": true,
+    "report_matched_component_relation_counts": true,
+    "same_component_fallback_pairs_must_not_increase_independent_component_count": true
+  },
+  "outputs": {
+    "parent_manifest_root": "parent_manifest/",
+    "input_manifest": "parent_manifest/manifest.json",
+    "canonical_pair_manifest": "parent_manifest/canonical_pairs.csv",
+    "fold_manifest": "parent_manifest/fixed_four_fold_components.csv",
+    "parent_manifest_primary": "parent_manifest/primary_matched_parents.csv",
+    "parent_manifest_silver_sensitivity": "parent_manifest/silver_sensitivity_matched_parents.csv",
+    "generation_manifest_template": "seed_{seed}/generation_manifest.json",
+    "synthetic_profile_views_template": "seed_{seed}/{track}/synthetic_profiles.jsonl",
+    "synthetic_pair_rows_template": "seed_{seed}/{track}/synthetic_pairs.csv",
+    "equal_weight_duplication_template": "seed_{seed}/{track}/equal_weight_duplication_pairs.csv",
+    "real_embedding_cache": "embeddings/real/identifier_redacted_e5.npy",
+    "synthetic_embedding_cache_template": "seed_{seed}/{track}/embeddings/identifier_redacted_e5.npy",
+    "real_pair_features": "pair_features/real/real_pair_features.csv",
+    "real_pair_features_combined_audit": "pair_features/real/real_pair_features.csv",
+    "real_pair_features_train": "pair_features/real/real_pair_features.train.csv",
+    "real_pair_features_valid": "pair_features/real/real_pair_features.valid.csv",
+    "real_pair_features_test": "pair_features/real/real_pair_features.test.csv",
+    "synthetic_pair_features_template": "seed_{seed}/{track}/pair_features/synthetic_pair_features.csv",
+    "synthetic_data_audit": "synthetic_audit/step27_synthetic_data_audit.json",
+    "training_input_manifest": "training/step27_training_input_manifest.json",
+    "oof_seed_predictions": "training/step27_seed_predictions.csv",
+    "oof_seed_mean_predictions": "training/step27_seed_mean_predictions.csv",
+    "model_artifacts": "training/step27_model_artifacts.json",
+    "model_summary": "training/step27_training_summary.json",
+    "oof_gate_audit": "statistical_audit/oof_gate/step12_step27_statistical_audit.json",
+    "valid_seed_predictions": "valid_diagnostic/step27_valid_seed_predictions.csv",
+    "valid_seed_mean_predictions": "valid_diagnostic/step27_valid_seed_mean_predictions.csv",
+    "valid_gate_audit": "statistical_audit/valid_gate/step12_step27_statistical_audit.json",
+    "internal_test_seed_predictions": "internal_test_diagnostic/step27_test_seed_predictions.csv",
+    "internal_test_seed_mean_predictions": "internal_test_diagnostic/step27_test_seed_mean_predictions.csv",
+    "final_diagnostic_audit": "statistical_audit/final_diagnostic/step12_step27_statistical_audit.json",
+    "sync_manifest": "manifests/step27_sync_manifest.json"
+  },
+  "hard_rules": [
+    "The Step24 English source scorer is loaded by exact artifact key and hash and is never refitted, recalibrated or fine-tuned in Step27.",
+    "The canonical Chinese 573/120/200 boundary and its seller-component isolation remain unchanged.",
+    "Primary generation uses exactly 16 eligible non-silver positive parent pairs and 16 score-blind matched non-silver negative parent pairs, with two variants per parent and no more than 64 synthetic rows per seed.",
+    "The silver direct/contact sensitivity track is physically isolated and can never satisfy a primary promotion gate.",
+    "Every synthetic view is created from one real parent pair only, carries that parent component and fold, and never becomes a Step5 label or an independent identity.",
+    "Synthetic generation is fold-local; no held-fold, valid, test, Step11 prediction, uncertain label or prospective holdout content may influence a fold model.",
+    "Every matched positive/negative parent set is contained within one OOF fold. A distinct negative component is preferred, but when the giant-component fold has no distinct-component reviewed-negative capacity, a same-component reviewed-negative fallback is allowed and recorded in matched_component_relation.",
+    "Same-component fallback is not split leakage because component-grouped OOF holds the entire component out together, but it does not add an independent component and its count must be reported when calculating parent-component effective sample size.",
+    "All E5 and residual pair features are recomputed from identifier-redacted transformed views; copying a parent feature row is forbidden.",
+    "The feature builder may precompute identifier-redacted train, valid and test features and emits one combined audit file plus three physical split files; initial training loads only the train labels/features, while valid and test labels/features are opened by separate scoring processes only after their sequential gates.",
+    "Each OOF fit normalizes combined real and added row weights back to the effective weight of that fold's real training rows, preserving relative M1/M2 weights while keeping the L2 regularization scale comparable to M0.",
+    "M2 must beat the equal-effective-weight M1 control, not merely M0, before any augmentation benefit is claimed.",
+    "Ten seeds quantify implementation and generation stability; they are not ten independent datasets and the best seed may not be selected.",
+    "The current valid and 200-row test are retrospective development data. Step20 currently authorizes only preparation of a new Step27-specific prospective freeze; no Step27 prospective evaluation is authorized until that policy, code, model, threshold and manifest freeze is complete."
+  ]
+}
