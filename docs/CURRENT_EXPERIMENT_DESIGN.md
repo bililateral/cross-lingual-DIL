@@ -4,9 +4,9 @@
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
-> 当前主线更新：下文关于 Step15-v5r 的内容仅保留为历史实现背景。Step15-v6/v7/v8、Step21-Step24、Step25-v1/v2 均已按各自协议完成并冻结为负结果或诊断基线。当前正在独立分支实现并等待 Linux 数值验证的是 Step25-v3 复制感知双通道延续方法；它没有获准进入 Step11/17，也不能撤销 v1/v2 的负面或混合结论。完整 v3 协议见 `docs/STEP25_V3_COPY_AWARE_DUAL_CHANNEL_PLAN_20260718.zh.md`。
+> 当前主线更新：Step25-v3 已完成 Linux 运行且同步完整，但因 constrained LR/L2 允许 relative-loss stagnation 替代 KKT 收敛而降级为 `solver-termination-invalidated diagnostic`。当前等待 Linux 数值验证的是只修复求解器的 Step25-v3.1；它不改变 v3 特征、模型、权重、fold 或 gates，也没有获准进入 Step11/17。完整修复协议见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
 
-## 0. 当前方法状态：Step25-v1/v2 已冻结，v3 待 Linux 验证
+## 0. 当前方法状态：Step25-v1/v2 已冻结，v3 终止无效，v3.1 待 Linux 验证
 
 Step24 已证明冻结多语言作者/风格表示提供明显跨语言增量，但同时把复制模板和公共页面排版嵌入为作者风格。其 source-only primary 在中文 D0 上达到 `AP=0.802718`，相对 redacted-E5 提升 `0.158336`，但 template-clone negative 的 mean/q95/top-decile 分数分别增加 `0.028287/0.067389/0.064517`，target grouped-bootstrap CI 也略跨零。Step24 因此 `promotion_eligible=false` 并冻结。
 
@@ -18,7 +18,11 @@ Step25 仍只读取相同 canonical train：English `401 = 116/285`，Chinese `5
 
 Step25-v2 随后改为 pair-local copy detector，并修复短文本清洗失败时把 style cosine 写成固定零值的问题。同步回来的 19 文件结果包完整通过哈希审计。它在 `109/110` 条模板负例中检测到局部复制，但将 pair-local-clean style 统一替换 raw style 后，中文 target grouped-OOF AP 从 P0 的 `0.704847` 降至 P2 的 `0.670692`，英文 AP 从 `0.468210` 降至 `0.251926`。P2 虽把模板负例相对强正例的 violation rate 降低 `0.092812`，却提高模板 mean rank percentile `0.001637` 和 top-decile exposure `0.036364`；只有 `3/8` 机制门槛通过。P3 raw fallback 的中文 AP 回升到 `0.737365`。因此 v2 的结论不是“局部复制检测无效”，而是“把清洗表示统一替代原始作者信号会损失过多信息”。
 
-Step25-v3 直接针对这一结果，保留 raw authorship style，同时把 pair-local-clean style、raw-minus-clean residual 和 copy-risk statistics 分成独立低维通道。固定主模型 C2 使用方向约束 LR/L2：raw/clean similarity 只能提供非负身份支持；raw-clean residual 和 copy-risk 只能保持零或降低同控制分数，不能把“复制很多”学成正身份信号。不可靠局部风格使用 raw fallback、残差固定为零并显式记录 reliability。C0、C1、C3 是预注册对照，不允许依据 D0 选择候选；纯 global-clean missingness closure 和英文训练的 operational identifier control 均单独报告，不能影响 C2 或晋级门槛。当前 v3 仅完成代码、策略、15 项契约测试、配置预检和 Linux runner 验证，尚无数值结果，不能提前宣称改善。
+Step25-v3 直接针对这一结果，保留 raw authorship style，同时把 pair-local-clean style、raw-minus-clean residual 和 copy-risk statistics 分成独立低维通道。固定主模型 C2 使用方向约束 LR/L2：raw/clean similarity 只能提供非负身份支持；raw-clean residual 和 copy-risk 只能保持零或降低同控制分数，不能把“复制很多”学成正身份信号。不可靠局部风格使用 raw fallback、残差固定为零并显式记录 reliability。C0、C1、C3 是预注册对照，不允许依据 D0 选择候选；纯 global-clean missingness closure 和英文训练的 operational identifier control 均单独报告，不能影响 C2 或晋级门槛。
+
+原 v3 数值包同步完整，且逐 pair 分数可精确复现 summary。其 C2 target grouped-OOF AP 为 `0.761758`，低于 C0 的 `0.789338`；template-negative mean rank、top-decile exposure 和 violation rate 分别恶化 `0.026907/0.036364/0.047780`，只有 `2/11` gates 通过。但这些分数来自提前停止解：artifact 的 projected-gradient residual 最高为 `0.52`，策略 tolerance 为 `1e-8`。因此不能把它当作最终方法负结果。
+
+Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtracking，relative loss 不参与收敛，最终 KKT residual 必须 `<=1e-8`，否则 fail closed。输出写入独立 `v3_1_solverfix_20260718`，旧 v3 不覆盖。修复后仍按原 `11` 个 gate 解释，不允许选择 C3、修改阈值或使用 valid/test。
 
 ## 1. 研究问题定义
 
@@ -1087,7 +1091,7 @@ Step25-v3 修复了两个归因问题。第一，不可靠 pair-local-clean styl
 
 Clean scorer 明确禁止 direct identifier、candidate-rule、review label 和 evidence type。Identifier occurrence 只进入单独 operational control：用 English actionable occurrence rows 和 English C2 component-OOF probability 训练小型方向约束 offset expert，再对 Chinese source-only C2 做敏感性报告；中文标签不参与 expert 拟合，结果不能改变 clean model 晋级资格。
 
-当前状态是实现完成、Linux 数值待运行。所有输出写入新的 `v3_copy_aware_dual_channel_20260718` 根目录并采用 immutable write；v1/v2 manifest、summary 路径、哈希和冻结指标进入 v3 summary。完整门槛、停止条件和 D1/F1 规则见 `docs/STEP25_V3_COPY_AWARE_DUAL_CHANNEL_PLAN_20260718.zh.md`。
+原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能冻结为正式负结果。v3.1 修复代码、8 项契约测试、四个 config-only preflight 和 Linux runner 语法检查均已完成，真正数值重跑仍只允许在 Linux 执行。v3.1 输出写入 `v3_1_solverfix_20260718`；完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`。
 
 ## 15. 当前实验设计评价
 
