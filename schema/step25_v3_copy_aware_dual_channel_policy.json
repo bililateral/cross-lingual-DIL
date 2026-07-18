@@ -1,0 +1,263 @@
+{
+  "version": "2026-07-18-step25-v3-preregistered-copy-aware-dual-channel",
+  "objective": "Test whether pair-local copy evidence is useful as a direction-constrained auxiliary channel when raw authorship style is retained, rather than replacing raw style with a universally decontaminated representation.",
+  "outputs_root": "reports/step25_template_decontaminated_authorship/v3_copy_aware_dual_channel_20260718",
+  "inputs": {
+    "step15_v7_policy": "schema/step15_v7_two_stage_policy.json",
+    "step24_policy": "schema/step24_content_independent_authorship_policy.json",
+    "step24_outputs_root": "reports/step24_content_independent_authorship/v1_20260717",
+    "step25_v1_policy": "schema/step25_template_decontaminated_authorship_policy.json",
+    "step25_v1_outputs_root": "reports/step25_template_decontaminated_authorship/v1_20260717",
+    "step25_v1_evaluation_summary": "reports/step25_template_decontaminated_authorship/v1_20260717/step25_evaluation_summary.json",
+    "step25_v2_policy": "schema/step25_v2_pair_local_copy_diagnostic_policy.json",
+    "step25_v2_outputs_root": "reports/step25_template_decontaminated_authorship/v2_pair_local_diagnostic_20260717",
+    "step25_v2_evaluation_summary": "reports/step25_template_decontaminated_authorship/v2_pair_local_diagnostic_20260717/step25_v2_evaluation_summary.json"
+  },
+  "boundary": {
+    "name": "d0_current_canonical_train",
+    "role": "hypothesis_informed_retrospective_step25_continuation",
+    "hypothesis_informed_by_step25_v1_v2": true,
+    "labels_may_be_used_for_grouped_oof_fitting": true,
+    "valid_or_test_read_forbidden": true,
+    "parameter_or_threshold_search_on_d0_forbidden": true,
+    "publication_promotion_hard_false": true,
+    "step11_or_step17_entry_forbidden": true,
+    "d1_replication_candidate_may_be_set_only_by_all_preregistered_gates": true
+  },
+  "immutable_parent_contract": {
+    "step25_v1_conclusion_reversal_forbidden": true,
+    "step25_v2_conclusion_reversal_forbidden": true,
+    "parent_outputs_overwrite_forbidden": true,
+    "require_step25_v1_sync_manifest": true,
+    "require_step25_v2_sync_manifest": true,
+    "require_exact_pair_uid_alignment": true,
+    "require_exact_component_fold_alignment": true,
+    "require_zero_valid_or_test_rows": true
+  },
+  "feature_contract": {
+    "clean_scorer_identifier_features_forbidden": true,
+    "candidate_rule_features_forbidden": true,
+    "review_label_or_evidence_type_as_feature_forbidden": true,
+    "valid_or_test_fitted_statistics_forbidden": true,
+    "unreliable_pair_local_clean_value": "raw_style_fallback",
+    "unreliable_pair_local_delta_value": 0.0,
+    "missing_clean_style_encoded_as_zero_forbidden": true,
+    "raw_channel": [
+      "raw_pcm_multilingual_authorship_cosine",
+      "raw_mstyledistance_cosine"
+    ],
+    "clean_channel": [
+      "pair_local_or_raw_pcm_multilingual_authorship_cosine",
+      "pair_local_or_raw_mstyledistance_cosine"
+    ],
+    "copy_residual_channel": [
+      "pcm_raw_minus_pair_local_or_raw",
+      "mstyledistance_raw_minus_pair_local_or_raw"
+    ],
+    "copy_risk_channel": [
+      "pair_local_maximum_mask_fraction",
+      "pair_local_mean_mask_fraction",
+      "pair_local_shared_shingle_count_log1p",
+      "pair_local_masked_span_count_log1p",
+      "pair_local_style_reliable",
+      "global_pair_maximum_boilerplate_fraction",
+      "global_pair_mean_boilerplate_fraction",
+      "global_style_reliable"
+    ],
+    "semantic_sensitivity_channel": [
+      "identifier_redacted_e5_cosine"
+    ]
+  },
+  "evaluation": {
+    "canonical_split": "train",
+    "fold_count": 5,
+    "fold_seed": 20260717,
+    "source_only_training": "english_labels_only",
+    "target_grouped_oof_training": "all_english_train_plus_four_fifths_chinese_train",
+    "development_metric": "average_precision",
+    "model_specs": {
+      "C0_matched_raw_style": {
+        "role": "matched_baseline",
+        "feature_groups": [
+          "raw_channel"
+        ],
+        "coefficient_directions": {
+          "raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "raw_mstyledistance_cosine": "nonnegative"
+        }
+      },
+      "C1_raw_plus_clean_no_copy_penalty": {
+        "role": "ablation_control",
+        "feature_groups": [
+          "raw_channel",
+          "clean_channel",
+          "copy_residual_channel",
+          "pair_local_reliability_only"
+        ],
+        "coefficient_directions": {
+          "raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "raw_mstyledistance_cosine": "nonnegative",
+          "pair_local_or_raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "pair_local_or_raw_mstyledistance_cosine": "nonnegative",
+          "pcm_raw_minus_pair_local_or_raw": "unconstrained",
+          "mstyledistance_raw_minus_pair_local_or_raw": "unconstrained",
+          "pair_local_style_reliable": "unconstrained"
+        }
+      },
+      "C2_copy_aware_dual_channel_primary": {
+        "role": "preregistered_primary",
+        "feature_groups": [
+          "raw_channel",
+          "clean_channel",
+          "copy_residual_channel",
+          "copy_risk_channel"
+        ],
+        "coefficient_directions": {
+          "raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "raw_mstyledistance_cosine": "nonnegative",
+          "pair_local_or_raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "pair_local_or_raw_mstyledistance_cosine": "nonnegative",
+          "pcm_raw_minus_pair_local_or_raw": "nonpositive",
+          "mstyledistance_raw_minus_pair_local_or_raw": "nonpositive",
+          "pair_local_maximum_mask_fraction": "nonpositive",
+          "pair_local_mean_mask_fraction": "nonpositive",
+          "pair_local_shared_shingle_count_log1p": "nonpositive",
+          "pair_local_masked_span_count_log1p": "nonpositive",
+          "pair_local_style_reliable": "unconstrained",
+          "global_pair_maximum_boilerplate_fraction": "nonpositive",
+          "global_pair_mean_boilerplate_fraction": "nonpositive",
+          "global_style_reliable": "unconstrained"
+        }
+      },
+      "C3_semantic_plus_copy_aware_sensitivity": {
+        "role": "sensitivity_only",
+        "feature_groups": [
+          "raw_channel",
+          "clean_channel",
+          "copy_residual_channel",
+          "copy_risk_channel",
+          "semantic_sensitivity_channel"
+        ],
+        "coefficient_directions": {
+          "raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "raw_mstyledistance_cosine": "nonnegative",
+          "pair_local_or_raw_pcm_multilingual_authorship_cosine": "nonnegative",
+          "pair_local_or_raw_mstyledistance_cosine": "nonnegative",
+          "pcm_raw_minus_pair_local_or_raw": "nonpositive",
+          "mstyledistance_raw_minus_pair_local_or_raw": "nonpositive",
+          "pair_local_maximum_mask_fraction": "nonpositive",
+          "pair_local_mean_mask_fraction": "nonpositive",
+          "pair_local_shared_shingle_count_log1p": "nonpositive",
+          "pair_local_masked_span_count_log1p": "nonpositive",
+          "pair_local_style_reliable": "unconstrained",
+          "global_pair_maximum_boilerplate_fraction": "nonpositive",
+          "global_pair_mean_boilerplate_fraction": "nonpositive",
+          "global_style_reliable": "unconstrained",
+          "identifier_redacted_e5_cosine": "nonnegative"
+        }
+      }
+    },
+    "primary_model": "C2_copy_aware_dual_channel_primary",
+    "matched_baseline_model": "C0_matched_raw_style",
+    "candidate_selection_forbidden": true,
+    "sensitivity_model_selection_forbidden": true,
+    "valid_or_test_selection_forbidden": true,
+    "logistic": {
+      "solver": "projected_gradient_logistic_l2_with_backtracking",
+      "l2_penalty": 10.0,
+      "max_iter": 10000,
+      "tolerance": 1e-8,
+      "minimum_step_size": 1e-12,
+      "backtracking_factor": 0.5,
+      "armijo_constant": 0.0001,
+      "class_weight": "none",
+      "standardize_features": true,
+      "sample_weight_total_normalization": "real_train_row_count"
+    },
+    "grouped_bootstrap_resamples": 5000,
+    "grouped_bootstrap_seed": 20260718,
+    "required_slices": [
+      "canonical_non_silver",
+      "direct_component_positive_plus_all_negatives",
+      "soft_positive_plus_all_negatives",
+      "pair_local_reliable_only",
+      "pair_local_unreliable_only"
+    ],
+    "all_label_metrics_secondary_due_to_silver_positive_dominance": true
+  },
+  "missingness_closure_control": {
+    "role": "diagnostic_only",
+    "representation": "frozen_step25_v1_global_clean_style",
+    "reliability_feature": "global_style_reliable",
+    "fixed_zero_reference": "frozen_step25_v1_global_clean_predictions",
+    "corrected_transform": "fold_train_global_reliable_median_plus_indicator",
+    "pair_local_reliability_intersection_forbidden": true,
+    "selection_or_promotion_use_forbidden": true
+  },
+  "operational_identifier_control": {
+    "role": "separate_operational_control_not_a_clean_feature",
+    "training_domain": "en_only",
+    "base_probability_source": "english_component_grouped_oof_C2",
+    "target_application": "chinese_source_only_C2_scores",
+    "reuse_step25_v1_occurrence_state_contract": true,
+    "verified_direct_both_sides_action": "nonnegative_logit_correction_only",
+    "risky_support_or_public_action": "nonpositive_logit_correction_only",
+    "mixed_ambiguous_or_no_identifier_action": "no_score_change",
+    "chinese_labels_for_expert_training_forbidden": true,
+    "clean_model_selection_use_forbidden": true
+  },
+  "d0_to_d1_replication_gates": {
+    "minimum_source_only_ap_delta_over_C0": -0.01,
+    "minimum_target_oof_ap_delta_over_C0": 0.02,
+    "minimum_target_oof_grouped_bootstrap_lower_bound": 0.0,
+    "minimum_target_non_silver_ap_delta": -0.02,
+    "minimum_target_direct_component_ap_delta": -0.02,
+    "minimum_target_soft_positive_ap_delta": -0.03,
+    "maximum_target_template_clone_violation_rate_delta": -0.05,
+    "maximum_target_template_clone_mean_rank_percentile_delta": 0.0,
+    "maximum_target_semantic_topic_mean_rank_percentile_delta": 0.02,
+    "maximum_target_public_noise_mean_rank_percentile_delta": 0.0,
+    "minimum_source_only_english_ap_delta_over_C0": -0.02,
+    "all_gates_required": true,
+    "interpretation": "Passing only authorizes an unchanged preregistered replication on a future score-blind component-disjoint D1. It is not publication promotion and cannot unlock Step11 or Step17."
+  },
+  "future_boundaries": {
+    "d1_independent_replication": {
+      "seller_component_overlap_with_d0_forbidden": true,
+      "score_blind_review_required": true,
+      "minimum_non_silver_direct_or_component_positive": 30,
+      "minimum_template_clone_negative": 30,
+      "minimum_public_contact_or_url_negative": 20,
+      "minimum_semantic_topic_negative": 30,
+      "method_or_threshold_refit_on_d1_forbidden": true
+    },
+    "f1_prospective_final": {
+      "collection_after_model_and_threshold_freeze_required": true,
+      "seller_component_overlap_with_d0_or_d1_forbidden": true,
+      "model_score_blind_review_required": true,
+      "single_evaluation_only": true
+    }
+  },
+  "outputs": {
+    "pair_features_en": "step25_v3_pair_features.en_content_train_pool.csv",
+    "pair_features_zh": "step25_v3_pair_features.zh_target_strict.csv",
+    "pair_feature_summary": "step25_v3_pair_feature_summary.json",
+    "predictions_en": "step25_v3_grouped_oof_predictions.en.csv",
+    "predictions_zh": "step25_v3_grouped_oof_predictions.zh.csv",
+    "model_artifacts": "step25_v3_model_artifacts.json",
+    "evaluation_summary": "step25_v3_evaluation_summary.json",
+    "operational_predictions_zh": "step25_v3_operational_identifier_control.zh.csv",
+    "operational_summary": "step25_v3_operational_identifier_control_summary.json",
+    "sync_manifest": "step25_v3_sync_manifest.json"
+  },
+  "scientific_constraints": [
+    "Step25-v1 and Step25-v2 are immutable negative or diagnostic parents and are never overwritten.",
+    "Pair-local cleaned style never universally replaces raw style; unreliable cleaned style explicitly falls back to raw style with zero residual and a reliability indicator.",
+    "Copy-risk and raw-minus-clean coefficients are constrained to be nonpositive, so copied content cannot become positive identity evidence in the clean primary model.",
+    "Review labels and evidence types may define training weights and evaluation slices but may never be model features.",
+    "The operational identifier expert is trained on English occurrence evidence only and is reported separately from the clean scorer.",
+    "D0 is retrospective and cannot produce a publication claim or unlock Step11 or Step17.",
+    "No valid or test pair, label, score, threshold or fitted statistic is read by the Step25-v3 D0 runner.",
+    "No synthetic text, seller, pair or identity label is generated."
+  ]
+}

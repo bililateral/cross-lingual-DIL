@@ -1,8 +1,12 @@
 # Project Progress
 
-Updated: 2026-07-17
+Updated: 2026-07-18
 
 ## Current Stage
+
+`2026-07-18` work moved to isolated branch `method/step25-v3-copy-aware-dual-channel`. Step25-v3 is a direct, preregistered continuation of the Step25 copy-decontamination line, not a replacement for the frozen v1/v2 results. It retains raw authorship style and adds pair-local-clean style, raw-minus-clean residuals and label-free copy-risk statistics as separate low-dimensional channels. The fixed primary `C2_copy_aware_dual_channel_primary` uses a direction-constrained LR/L2: raw/clean similarities cannot receive negative coefficients, while raw-clean residual and copy-risk features cannot become positive identity evidence. C0 raw-style, C1 raw-plus-clean without copy penalties and C3 redacted-E5 sensitivity are fixed controls; no candidate search is permitted. Unreliable pair-local style now falls back to raw style with a zero residual and explicit reliability flag. A pure Step25-v1 global-clean missingness closure is reported separately and cannot affect any gate. The operational identifier expert remains physically separate, trains only on English occurrence evidence and cannot influence clean-model selection. D0 reads canonical train only, never valid/test, and can at most nominate a future D1 replication; publication promotion and Step11/17 entry are hard false. The isolated output root is `reports/step25_template_decontaminated_authorship/v3_copy_aware_dual_channel_20260718/`. Policy, feature builder, constrained evaluator, operational control, closed manifest builder, Linux runner, Chinese protocol and 15 contract tests are implemented; Python compilation, all tests, four config-only preflights, frozen-parent manifest/summary checks and Git-Bash runner syntax validation pass on Windows without numerical execution. Linux numerical execution is pending.
+
+`2026-07-17` Step25-v2 completed on Linux and synchronized as a closed 19-file (`44,963,636` bytes) bundle with 17 producer hashes. Pair-local detection found masked spans in `299/573` Chinese train pairs and retained reliable local-clean style for `454/573`; the template audit found local copied content in `109/110` template-negative rows. This established that the v1 global catalog missed pair-local copying, but uniform replacement with pair-local-clean style failed as a model. Chinese target grouped-OOF AP was `0.704847` for matched raw P0, `0.670692` for pair-local-clean P2 and `0.737365` for raw-fallback P3; English P0/P2 AP was `0.468210/0.251926`. P2 reduced the template-negative-versus-strong-positive violation rate by `0.092812`, but raised template mean rank percentile by `0.001637` and top-decile exposure by `0.036364`. Direct/component sensitivity improved by `0.119421 AP`, yet `85/86` rows in that positive slice were silver, while the soft-positive slice regressed. Only `3/8` mechanism gates passed, both grouped-bootstrap intervals crossed zero, and `d1_candidate_eligible=false`. Step25-v2 is frozen as a mixed/negative mechanism result and cannot enter Step11/17. It motivates v3's copy-risk auxiliary channel but does not justify reversing either parent conclusion.
 
 `2026-07-17` Step25-v1 completed on Linux and was synchronized as a complete SHA-256-bound result bundle. The decontamination hypothesis did not survive its preregistered D0 gates. Source-only raw-style versus decontaminated-style AP was `0.801847` versus `0.799675`; Chinese target grouped-OOF raw-style versus decontaminated-style AP was `0.789848` versus `0.784333`. Only `5/17` continuation conditions passed, both grouped-bootstrap lower-bound conditions failed, target non-silver/direct-component sensitivity regressed, and the required template/public-noise rank reductions were not obtained. The occurrence-level reliability expert changed only a very small number of actionable rows and did not establish public-noise correction coverage. Therefore `d1_candidate_eligible=false` and `publication_promotion_eligible=false`. Step25 is frozen as a negative method result and is not allowed into Step11/17; its formal bundle remains under `reports/step25_template_decontaminated_authorship/v1_20260717/`.
 
@@ -1347,7 +1351,7 @@ Implementation status:
 - policy: `schema/step25_v2_pair_local_copy_diagnostic_policy.json`
 - Linux runner: `scripts/run_step25_v2_pair_local_copy_linux_20260717.sh`
 - detailed design: `docs/STEP25_V2_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`
-- code and pure contract tests are implemented locally; numerical/model execution remains pending on Linux
+- Linux execution and synchronization are complete; the closed manifest binds `19` payloads (`44,963,636` bytes) and `17` producer files
 
 Scientific purpose:
 
@@ -1377,4 +1381,40 @@ Expected Linux output root:
 
 - `reports/step25_template_decontaminated_authorship/v2_pair_local_diagnostic_20260717/`
 
-The project must not interpret Step25-v2 before the returned directory passes its closed `step25_v2_sync_manifest.json` hash audit.
+Completed result:
+
+- Chinese target grouped-OOF P0/P2/P3 AP: `0.704847 / 0.670692 / 0.737365`
+- English grouped-OOF P0/P2 AP: `0.468210 / 0.251926`
+- P2 minus P0 target AP: `-0.034155`; grouped-bootstrap confidence interval crosses zero
+- pair-local detector found copied spans in `299/573` Chinese rows and retained `454/573` reliable local-style rows
+- only `3/8` mechanism gates passed; `d1_candidate_eligible=false`
+
+The synchronized directory passed its closed `step25_v2_sync_manifest.json` audit. Step25-v2 is frozen as a mixed/negative mechanism result and cannot enter Step11/17. Its useful finding is narrower: pair-local copy detection has diagnostic value, but replacing raw style with cleaned style destroys too much information. Step25-v3 therefore preserves raw style and constrains copy evidence to an auxiliary penalty channel.
+
+## Step25-v3 Copy-Aware Dual-Channel Continuation (2026-07-18)
+
+Implementation status:
+
+- branch: `method/step25-v3-copy-aware-dual-channel`
+- policy: `schema/step25_v3_copy_aware_dual_channel_policy.json`
+- Linux runner: `scripts/run_step25_v3_copy_aware_dual_channel_linux_20260718.sh`
+- detailed protocol: `docs/STEP25_V3_COPY_AWARE_DUAL_CHANNEL_PLAN_20260718.zh.md`
+- Windows static validation: Python compilation pass, `15/15` contract tests pass, four config-only entry points pass and Linux shell syntax passes under Git Bash
+- numerical execution: pending on Linux; Windows has not trained or evaluated any v3 model
+
+Fixed scientific comparison:
+
+- `C0`: matched raw-style constrained LR/L2 baseline
+- `C1`: raw plus pair-local-clean channels without copy penalties
+- `C2`: preregistered primary, raw/clean channels plus direction-constrained raw-clean residual and copy-risk penalties
+- `C3`: identifier-redacted E5 sensitivity control, not a selectable primary
+
+Boundary and promotion discipline:
+
+- canonical train only: English `401 = 116/285`, Chinese `573 = 229/344`
+- five seller-component grouped folds with the exact Step25-v2 assignments
+- no valid/test row, threshold, score or fitted statistic is read
+- no identifier, candidate-rule, review label or evidence type enters the clean scorer
+- D0 can set only `d1_replication_candidate_eligible`; publication promotion and Step11/17 entry remain hard false
+- every preregistered gate must pass before a new component-disjoint, score-blind D1 replication is justified
+- frozen v1/v2 metrics, summary hashes and manifest hashes are carried into the v3 result summary for provenance, without reinterpreting the parent conclusions
