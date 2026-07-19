@@ -15,9 +15,13 @@ import step27_train_residual_models as step27
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
 PRIMARY = ("step27_m2_synthetic", "step27_m1_equal_effective_weight_duplication")
 SECONDARY = ("step27_m2_synthetic", "step27_m0_real_only")
+SOURCE_NONINFERIORITY = (
+    "step27_m2_synthetic",
+    step27.SOURCE_ONLY_MODEL_ID,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -59,17 +63,33 @@ def statistical_config(policy: dict, requested_resamples: int | None) -> dict:
         )
     if bootstrap_resamples < 1000 or permutation_resamples < 1000:
         raise ValueError("Step27 publication audit requires at least 1000 bootstrap/permutation resamples")
+    source_score_tolerance = float(
+        stat_cfg.get("source_only_score_reproduction_absolute_tolerance", 1e-12)
+    )
+    source_metric_tolerance = float(
+        stat_cfg.get("source_only_metric_reproduction_absolute_tolerance", 1e-12)
+    )
+    if not 0.0 <= source_score_tolerance <= 1e-10:
+        raise ValueError("Step27 source-only score reproduction tolerance is too permissive")
+    if not 0.0 <= source_metric_tolerance <= 1e-10:
+        raise ValueError("Step27 source-only metric reproduction tolerance is too permissive")
     return {
         "bootstrap_resamples": bootstrap_resamples,
         "permutation_resamples": permutation_resamples,
         "bootstrap_seed": int(stat_cfg["grouped_bootstrap_seed"]),
         "permutation_seed": int(stat_cfg["paired_permutation_seed"]),
+        "source_score_tolerance": source_score_tolerance,
+        "source_metric_tolerance": source_metric_tolerance,
     }
 
 
 def promotion_gate_config(policy: dict) -> dict:
     development = dict(policy.get("development_promotion_gates") or {})
-    oof = dict(development.get("train_oof") or {})
+    oof = dict(
+        development.get("oof_before_valid")
+        or development.get("train_oof")
+        or {}
+    )
     valid = dict(development.get("single_open_valid") or {})
     required = {
         "train_oof": (
@@ -79,6 +99,7 @@ def promotion_gate_config(policy: dict) -> dict:
             "direct_or_component_positive_recall_drop_maximum",
             "template_clone_negative_fpr_increase_maximum",
             "public_contact_or_url_negative_fpr_increase_maximum",
+            "M2_minus_source_only_average_precision_minimum",
         ),
         "single_open_valid": (
             "M2_minus_M1_average_precision_minimum",
@@ -93,6 +114,13 @@ def promotion_gate_config(policy: dict) -> dict:
         missing = [key for key in keys if key not in section]
         if missing:
             raise ValueError(f"Step27 {section_name} gate configuration is missing: {missing}")
+    source_noninferiority_delta = float(
+        oof["M2_minus_source_only_average_precision_minimum"]
+    )
+    if not math.isclose(source_noninferiority_delta, -0.01, rel_tol=0.0, abs_tol=1e-12):
+        raise ValueError(
+            "Step27 M2-vs-S0 noninferiority margin must remain preregistered at -0.01"
+        )
     return {
         "minimum_oof_primary_ap_delta": float(oof["M2_minus_M1_average_precision_minimum"]),
         "minimum_positive_seed_count": int(oof["positive_seed_delta_count_minimum"]),
@@ -108,6 +136,7 @@ def promotion_gate_config(policy: dict) -> dict:
         "maximum_oof_public_noise_fpr_increase": float(
             oof["public_contact_or_url_negative_fpr_increase_maximum"]
         ),
+        "minimum_oof_source_noninferiority_delta": source_noninferiority_delta,
         "minimum_valid_primary_ap_delta": float(
             valid["M2_minus_M1_average_precision_minimum"]
         ),
@@ -123,6 +152,170 @@ def promotion_gate_config(policy: dict) -> dict:
         "maximum_valid_public_noise_fpr_increase": float(
             valid["public_contact_or_url_negative_fpr_increase_maximum"]
         ),
+    }
+
+
+def source_only_noninferiority_passes(
+    *,
+    m2_average_precision: float,
+    source_only_average_precision: float,
+    minimum_delta: float,
+) -> bool:
+    values = (m2_average_precision, source_only_average_precision, minimum_delta)
+    if not all(math.isfinite(float(value)) for value in values):
+        raise ValueError("Step27 source-only noninferiority inputs must be finite")
+    return bool(
+        float(m2_average_precision) - float(source_only_average_precision)
+        >= float(minimum_delta)
+    )
+
+
+def source_only_reproduction_audit(
+    *,
+    policy: dict,
+    cfg: dict,
+    source: dict,
+    source_name: str,
+    seed_rows: list[dict],
+    mean_rows: list[dict],
+    metric_index: dict[tuple[str, str], dict],
+    splits: tuple[str, ...],
+    score_tolerance: float,
+    metric_tolerance: float,
+) -> dict:
+    if score_tolerance < 0.0 or metric_tolerance < 0.0:
+        raise ValueError("Step27 source-only reproduction tolerances must be non-negative")
+    model_id = step27.SOURCE_ONLY_MODEL_ID
+    stat_cfg = dict(policy.get("statistics") or {})
+    historical_expected = {
+        "roc_auc": stat_cfg.get("source_only_expected_train_oof_roc_auc"),
+        "average_precision": stat_cfg.get(
+            "source_only_expected_train_oof_average_precision"
+        ),
+    }
+    if any(value is None for value in historical_expected.values()):
+        historical_expected = {}
+    by_split = {}
+    for split in splits:
+        real_split = "train" if split == "train_oof" else split
+        feature_rows, _, _ = step27.materialize_feature_tables(
+            policy, cfg, real_split=real_split
+        )
+        expected_scores = step27.predict_frozen_source_only(
+            feature_rows, source, source_name
+        )
+        expected_by_uid = {
+            step27.row_uid(row): (row, float(score))
+            for row, score in zip(feature_rows, expected_scores, strict=True)
+        }
+        if len(expected_by_uid) != len(feature_rows):
+            raise ValueError(
+                f"Step27 source-only feature rows contain duplicate pair UIDs: {split}"
+            )
+        persisted_mean = {
+            row["pair_uid"]: row
+            for row in mean_rows
+            if row["model_id"] == model_id and row["split_name"] == split
+        }
+        if set(persisted_mean) != set(expected_by_uid):
+            raise ValueError(
+                f"Step27 source-only reproduction universe differs for {split}"
+            )
+        maximum_score_error = 0.0
+        for uid, (feature_row, expected_score) in expected_by_uid.items():
+            persisted = persisted_mean[uid]
+            if (
+                int(persisted["label"]) != step27.row_label(feature_row)
+                or persisted["component_id"] != step27.row_component(feature_row)
+            ):
+                raise ValueError(
+                    f"Step27 source-only reproduction metadata differs: {split}/{uid}"
+                )
+            maximum_score_error = max(
+                maximum_score_error,
+                abs(float(persisted["prob_positive"]) - expected_score),
+            )
+        persisted_seed = [
+            row
+            for row in seed_rows
+            if row["model_id"] == model_id and row["split_name"] == split
+        ]
+        if len(persisted_seed) != len(expected_by_uid) * len(step27.DEFAULT_SEEDS):
+            raise ValueError(f"Step27 source-only seed coverage differs for {split}")
+        seed_score_error = 0.0
+        for row in persisted_seed:
+            seed_score_error = max(
+                seed_score_error,
+                abs(
+                    float(row["prob_positive"])
+                    - expected_by_uid[row["pair_uid"]][1]
+                ),
+            )
+        maximum_score_error = max(maximum_score_error, seed_score_error)
+        if maximum_score_error > score_tolerance:
+            raise ValueError(
+                "Step27 persisted source-only scores do not reproduce the frozen "
+                f"English scorer: split={split} maximum_error={maximum_score_error} "
+                f"tolerance={score_tolerance}"
+            )
+        ordered_uids = sorted(expected_by_uid)
+        labels = np.asarray(
+            [step27.row_label(expected_by_uid[uid][0]) for uid in ordered_uids],
+            dtype=int,
+        )
+        scores = np.asarray(
+            [expected_by_uid[uid][1] for uid in ordered_uids], dtype=float
+        )
+        expected_roc = step27.roc_auc(labels, scores)
+        expected_ap = step27.average_precision(labels, scores)
+        persisted_metrics = metric_index[(model_id, split)]
+        roc_error = abs(float(persisted_metrics["roc_auc"]) - expected_roc)
+        ap_error = abs(float(persisted_metrics["average_precision"]) - expected_ap)
+        if max(roc_error, ap_error) > metric_tolerance:
+            raise ValueError(
+                "Step27 persisted source-only AP/ROC do not reproduce the frozen "
+                f"English scorer: split={split} roc_error={roc_error} ap_error={ap_error} "
+                f"tolerance={metric_tolerance}"
+            )
+        historical_errors = {}
+        if split == "train_oof" and historical_expected:
+            historical_errors = {
+                "roc_auc_absolute_error": abs(
+                    expected_roc - float(historical_expected["roc_auc"])
+                ),
+                "average_precision_absolute_error": abs(
+                    expected_ap - float(historical_expected["average_precision"])
+                ),
+            }
+            if max(historical_errors.values()) > metric_tolerance:
+                raise ValueError(
+                    "Step27 frozen source-only metric no longer reproduces the "
+                    "historical Step24 train-universe contract: "
+                    f"errors={historical_errors} tolerance={metric_tolerance}"
+                )
+        by_split[split] = {
+            "row_count": len(ordered_uids),
+            "roc_auc": expected_roc,
+            "average_precision": expected_ap,
+            "maximum_absolute_score_error": maximum_score_error,
+            "roc_auc_absolute_error": roc_error,
+            "average_precision_absolute_error": ap_error,
+            "all_ten_seed_scores_equal_frozen_source_score": True,
+            "target_residual_trained": False,
+            "historical_step24_expected_metrics": (
+                historical_expected if split == "train_oof" else {}
+            ),
+            "historical_step24_absolute_errors": historical_errors,
+            "threshold_metrics_role": (
+                "target_thresholded_diagnostic_only_not_source_model_fitting"
+            ),
+        }
+    return {
+        "status": "pass",
+        "model_id": model_id,
+        "score_absolute_tolerance": score_tolerance,
+        "metric_absolute_tolerance": metric_tolerance,
+        "splits": by_split,
     }
 
 
@@ -298,7 +491,23 @@ def model_metric_rows(predictions: list[dict], splits: tuple[str, ...]) -> list[
             y = np.asarray([int(row["label"]) for row in selected], dtype=int)
             scores = np.asarray([float(row["prob_positive"]) for row in selected], dtype=float)
             result = step27.metrics(y, scores, threshold_values.pop())
-            output.append({"model_id": model_id, "split_name": split, **result})
+            output.append(
+                {
+                    "model_id": model_id,
+                    "split_name": split,
+                    "ranking_metric_role": (
+                        "pure_frozen_english_source_ranking"
+                        if model_id == step27.SOURCE_ONLY_MODEL_ID
+                        else "target_adaptation_ranking"
+                    ),
+                    "threshold_metrics_role": (
+                        "target_thresholded_diagnostic_only"
+                        if model_id == step27.SOURCE_ONLY_MODEL_ID
+                        else "frozen_oof_threshold_diagnostic"
+                    ),
+                    **result,
+                }
+            )
     return output
 
 
@@ -615,6 +824,9 @@ def main() -> None:
                     "status": "pass",
                     "primary": f"{PRIMARY[0]}_vs_{PRIMARY[1]}",
                     "secondary": f"{SECONDARY[0]}_vs_{SECONDARY[1]}",
+                    "source_noninferiority": (
+                        f"{SOURCE_NONINFERIORITY[0]}_vs_{SOURCE_NONINFERIORITY[1]}"
+                    ),
                     "bootstrap_resamples": resamples,
                     "permutation_resamples": permutation_resamples,
                     "bootstrap_seed": bootstrap_seed,
@@ -625,6 +837,13 @@ def main() -> None:
             )
         )
         return
+
+    repair_cfg = dict(policy.get("posthoc_source_contract_repair") or {})
+    if repair_cfg and args.mode != "oof_gate":
+        raise ValueError(
+            "Step27 post-hoc repair policy permits only train OOF statistics; "
+            "existing valid/test audit modes are forbidden"
+        )
 
     root = step27.outputs_root(policy)
     training_dir = root / "training"
@@ -866,12 +1085,32 @@ def main() -> None:
 
     metric_rows = model_metric_rows(mean_rows, available_splits)
     metric_index = {(row["model_id"], row["split_name"]): row for row in metric_rows}
+    source = step27.source_artifact(cfg["source_artifact_path"])
+    step27.validate_frozen_source_contract(
+        policy, cfg["source_artifact_path"], source
+    )
+    source_reproduction = source_only_reproduction_audit(
+        policy=policy,
+        cfg=cfg,
+        source=source,
+        source_name=step27.source_feature_name(policy),
+        seed_rows=seed_rows,
+        mean_rows=mean_rows,
+        metric_index=metric_index,
+        splits=available_splits,
+        score_tolerance=statistics["source_score_tolerance"],
+        metric_tolerance=statistics["source_metric_tolerance"],
+    )
     exploratory_diagnostics = exploratory_source_diagnostics(
         artifact_bundle, metric_index, available_splits, policy
     )
     comparisons = []
     comparison_details = {}
-    for comparison_name, (left, right) in (("primary", PRIMARY), ("required_secondary", SECONDARY)):
+    for comparison_name, (left, right) in (
+        ("primary", PRIMARY),
+        ("required_secondary", SECONDARY),
+        ("source_noninferiority", SOURCE_NONINFERIORITY),
+    ):
         comparison_details[comparison_name] = {}
         for split in available_splits:
             rows = paired_rows(mean_rows, left, right, split)
@@ -904,11 +1143,30 @@ def main() -> None:
 
     primary_oof = comparison_details["primary"]["train_oof"]["bootstrap"]
     secondary_oof = comparison_details["required_secondary"]["train_oof"]["bootstrap"]
+    source_oof = comparison_details["source_noninferiority"]["train_oof"]["bootstrap"]
     seed_directions = comparison_details["primary"]["seed_direction_train_oof"]
     oof_slices = paired_slice_audit(mean_rows, metric_index, "train_oof")
     oof_gate_results = {
         "oof_primary_ap_delta": primary_oof["observed_ap_delta"] >= gates["minimum_oof_primary_ap_delta"],
         "oof_secondary_ap_delta_positive": secondary_oof["observed_ap_delta"] > 0.0,
+        "oof_source_noninferiority_observed_delta": (
+            source_only_noninferiority_passes(
+                m2_average_precision=metric_index[(SOURCE_NONINFERIORITY[0], "train_oof")][
+                    "average_precision"
+                ],
+                source_only_average_precision=metric_index[
+                    (SOURCE_NONINFERIORITY[1], "train_oof")
+                ]["average_precision"],
+                minimum_delta=gates["minimum_oof_source_noninferiority_delta"],
+            )
+        ),
+        "oof_source_noninferiority_bootstrap_lower_bound": (
+            source_oof["ci_95_lower"]
+            >= gates["minimum_oof_source_noninferiority_delta"]
+        ),
+        "source_only_score_and_metric_reproduction_pass": (
+            source_reproduction["status"] == "pass"
+        ),
         "positive_seed_count": seed_directions["positive_seed_count"] >= gates["minimum_positive_seed_count"],
         "oof_primary_bootstrap_non_degradation": primary_oof["ci_95_lower"] >= gates["minimum_oof_primary_bootstrap_lower"],
         "oof_direct_component_recall_non_degradation": bool(
@@ -928,7 +1186,12 @@ def main() -> None:
         ),
         "synthetic_data_and_shortcut_audit_pass": synthetic_audit.get("status") == "pass",
     }
-    eligible_for_valid = all(oof_gate_results.values())
+    technical_oof_gate_pass = all(oof_gate_results.values())
+    valid_open_authorized = bool(repair_cfg.get("existing_valid_open_authorized", True))
+    test_open_authorized = bool(
+        repair_cfg.get("existing_internal_test_open_authorized", True)
+    )
+    eligible_for_valid = technical_oof_gate_pass and valid_open_authorized
     valid_slices = None
     valid_gate_results = None
     eligible_for_internal_test = False
@@ -960,7 +1223,7 @@ def main() -> None:
                 <= gates["maximum_valid_public_noise_fpr_increase"]
             ),
         }
-        eligible_for_internal_test = all(valid_gate_results.values())
+        eligible_for_internal_test = all(valid_gate_results.values()) and test_open_authorized
     gate_results = (
         oof_gate_results if args.mode == "oof_gate" else {**oof_gate_results, **valid_gate_results}
     )
@@ -971,6 +1234,12 @@ def main() -> None:
         "analysis_contract": {
             "primary_comparison": f"{PRIMARY[0]}_vs_{PRIMARY[1]}",
             "required_secondary_comparison": f"{SECONDARY[0]}_vs_{SECONDARY[1]}",
+            "required_source_noninferiority_comparison": (
+                f"{SOURCE_NONINFERIORITY[0]}_vs_{SOURCE_NONINFERIORITY[1]}"
+            ),
+            "source_noninferiority_margin": gates[
+                "minimum_oof_source_noninferiority_delta"
+            ],
             "score_aggregation": "per_real_pair_mean_across_ten_preregistered_seeds",
             "seeds_are_independent_inferential_units": False,
             "bootstrap_unit": "seller_component",
@@ -983,6 +1252,9 @@ def main() -> None:
             "test_metrics_used_for_selection_or_promotion": False,
             "audit_mode": args.mode,
             "available_splits": list(available_splits),
+            "posthoc_source_contract_repair": bool(repair_cfg),
+            "existing_valid_open_authorized": valid_open_authorized,
+            "existing_internal_test_open_authorized": test_open_authorized,
             "confirmatory_evaluation": (
                 "Step20 remains blocked until a separate Step27-specific prospective freeze"
             ),
@@ -990,10 +1262,12 @@ def main() -> None:
         },
         "model_metrics": metric_rows,
         "comparisons": comparison_details,
+        "source_only_reproduction_audit": source_reproduction,
         "exploratory_source_diagnostics": exploratory_diagnostics,
         "slice_audit_train_oof": oof_slices,
         "slice_audit_valid": valid_slices,
         "promotion": {
+            "technical_oof_gate_pass": technical_oof_gate_pass,
             "eligible_for_valid": eligible_for_valid,
             "eligible_for_internal_test": eligible_for_internal_test,
             "eligible_for_step20_freeze_preparation": eligible_for_internal_test,
@@ -1002,6 +1276,12 @@ def main() -> None:
             "test_metrics_used_for_gate": False,
             "internal_test_scored": args.mode == "final_diagnostic",
             "not_a_publication_claim": True,
+            "passing_repair_gate_only_authorizes_new_batch_replication": bool(
+                repair_cfg.get(
+                    "a_passing_technical_gate_only_authorizes_replication_on_a_new_frozen_development_batch",
+                    False,
+                )
+            ),
             "gates": gates,
             "gate_results": gate_results,
             "oof_gate_results": oof_gate_results,
@@ -1012,19 +1292,45 @@ def main() -> None:
 
     output_dir = root / "statistical_audit" / args.mode
     audit_manifest_path = output_dir / "step12_step27_input_manifest.json"
+    metrics_path = output_dir / "step12_step27_model_metrics.csv"
+    comparisons_path = output_dir / "step12_step27_paired_comparisons.csv"
+    summary_path = output_dir / "step12_step27_statistical_audit.json"
+    completion_path = output_dir / "step12_step27_completion_manifest.json"
+    summary["output_paths"] = {
+        "input_manifest": str(audit_manifest_path.relative_to(step27.ROOT)).replace(
+            "\\", "/"
+        ),
+        "model_metrics": str(metrics_path.relative_to(step27.ROOT)).replace("\\", "/"),
+        "paired_comparisons": str(comparisons_path.relative_to(step27.ROOT)).replace(
+            "\\", "/"
+        ),
+        "statistical_audit": str(summary_path.relative_to(step27.ROOT)).replace(
+            "\\", "/"
+        ),
+    }
     if output_dir.exists() and audit_manifest_path.is_file():
         old = step27.load_json(audit_manifest_path)
         if old.get("manifest_sha256") != manifest["manifest_sha256"]:
             raise ValueError("Refusing to overwrite Step27 statistics across a different manifest")
     step27.write_json_immutable(audit_manifest_path, manifest)
-    step27.write_csv_immutable(output_dir / "step12_step27_model_metrics.csv", metric_rows)
-    step27.write_csv_immutable(output_dir / "step12_step27_paired_comparisons.csv", comparisons)
-    step27.write_json_immutable(output_dir / "step12_step27_statistical_audit.json", summary)
+    step27.write_csv_immutable(metrics_path, metric_rows)
+    step27.write_csv_immutable(comparisons_path, comparisons)
+    step27.write_json_immutable(summary_path, summary)
+    expected_completion = step27.completion_manifest(
+        cfg["run_id"],
+        manifest["manifest_sha256"],
+        [audit_manifest_path, metrics_path, comparisons_path, summary_path],
+    )
+    if completion_path.is_file():
+        step27.validate_completion_manifest(completion_path, expected_completion)
+    else:
+        step27.write_json_immutable(completion_path, expected_completion)
     print(
         json.dumps(
             {
                 "status": "complete",
                 "mode": args.mode,
+                "technical_oof_gate_pass": technical_oof_gate_pass,
                 "eligible_for_valid": eligible_for_valid,
                 "eligible_for_internal_test": eligible_for_internal_test,
                 "eligible_for_step20_freeze_preparation": eligible_for_internal_test,

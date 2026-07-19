@@ -3,6 +3,8 @@
 版本：2026-07-18，v1 预注册方案
 对应配置：`schema/step27_english_pretrained_synthetic_adaptation_policy.json`
 
+> 2026-07-19 状态说明：本文件保留原始 v1 预注册设计，不得改写为 v1.1。v1 数值运行因真实中文 E5 输入没有逐字重放 Step15-v7/Step24 文本契约而被判定为工程无效，不能解释为数据增强的科学负结果。修复版使用独立 policy、runner 和输出目录，仅允许 train OOF 工程诊断；详见 `docs/STEP27_V1_1_SOURCE_CONTRACT_REPAIR_20260719.zh.md`。
+
 ## 1. 实验定位
 
 Step27 不改变论文主线。论文主线仍然是：

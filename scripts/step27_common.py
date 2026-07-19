@@ -21,7 +21,7 @@ import step24_common
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
 DEFAULT_OUTPUT_ROOT = ROOT / "reports" / "step27_english_pretrained_synthetic_adaptation"
 DEFAULT_TEXT_FIELDS = [
     "category_concat_top",
@@ -90,6 +90,72 @@ def canonical_hash(value: object) -> str:
         allow_nan=False,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def assert_exact_real_text_replay(
+    reference_by_uid: dict[str, str], observed_by_uid: dict[str, str]
+) -> None:
+    if set(reference_by_uid) != set(observed_by_uid):
+        missing = sorted(set(reference_by_uid) - set(observed_by_uid))
+        extra = sorted(set(observed_by_uid) - set(reference_by_uid))
+        detail = (missing or extra or ["unknown"])[0]
+        raise ValueError(f"Step27 real text replay UID mismatch: {detail}")
+    for uid in sorted(reference_by_uid):
+        if reference_by_uid[uid] != observed_by_uid[uid]:
+            raise ValueError(f"Step27 real text replay content mismatch: {uid}")
+
+
+def assert_exact_real_embedding_replay(
+    reference_uids: list[str],
+    reference_matrix: np.ndarray,
+    observed_uids: list[str],
+    observed_matrix: np.ndarray,
+    *,
+    atol: float = 1e-7,
+) -> None:
+    if list(reference_uids) != list(observed_uids):
+        raise ValueError("Step27 real embedding replay UID order mismatch")
+    reference = np.asarray(reference_matrix)
+    observed = np.asarray(observed_matrix)
+    if reference.shape != observed.shape:
+        raise ValueError("Step27 real embedding replay shape mismatch")
+    if not np.allclose(reference, observed, rtol=0.0, atol=atol):
+        maximum = float(np.max(np.abs(reference - observed)))
+        raise ValueError(
+            f"Step27 real embedding replay value mismatch: max_abs_delta={maximum:.12g}"
+        )
+
+
+def assert_exact_real_pair_feature_replay(
+    reference_rows: list[dict],
+    observed_rows: list[dict],
+    feature_names: list[str],
+    *,
+    atol: float = 1e-7,
+) -> None:
+    reference = {str(row.get("pair_uid", "")): row for row in reference_rows}
+    observed = {str(row.get("pair_uid", "")): row for row in observed_rows}
+    if "" in reference or "" in observed or len(reference) != len(reference_rows) or len(
+        observed
+    ) != len(observed_rows):
+        raise ValueError("Step27 real pair feature replay has missing or duplicate pair UIDs")
+    if set(reference) != set(observed):
+        detail = sorted(set(reference) ^ set(observed))[0]
+        raise ValueError(f"Step27 real pair feature replay UID mismatch: {detail}")
+    for pair_uid in sorted(reference):
+        for name in feature_names:
+            try:
+                expected = float(reference[pair_uid][name])
+                actual = float(observed[pair_uid][name])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"Step27 real pair feature replay field is invalid: {pair_uid}:{name}"
+                ) from exc
+            if not math.isclose(expected, actual, rel_tol=0.0, abs_tol=atol):
+                raise ValueError(
+                    "Step27 real pair feature replay value mismatch: "
+                    f"{pair_uid}:{name}:expected={expected:.12g}:observed={actual:.12g}"
+                )
 
 
 def load_json(path: Path) -> dict:
@@ -227,7 +293,16 @@ def write_manifest_immutable(
 def load_policy(path: str | Path) -> tuple[Path, dict]:
     policy_path = resolve(path)
     policy = load_json(policy_path)
+    ensure_current_runtime_policy(policy)
     return policy_path, policy
+
+
+def ensure_current_runtime_policy(policy: dict) -> None:
+    if policy.get("version") == "2026-07-18-step27-v1-preregistered-english-frozen-source-synthetic-adaptation":
+        raise ValueError(
+            "Step27-v1 is frozen as an invalid engineering run and current shared modules "
+            "must not execute it; use its original Git commit only for historical replay"
+        )
 
 
 def policy_input(policy: dict, name: str, *aliases: str) -> Path:
@@ -244,6 +319,124 @@ def policy_input(policy: dict, name: str, *aliases: str) -> Path:
         if value:
             return resolve(value)
     raise KeyError(f"Step27 policy is missing inputs.{name}")
+
+
+def frozen_step24_bundle(policy: dict) -> dict:
+    """Load Step24 replay references only through the frozen sync-manifest chain."""
+    inputs = dict(policy.get("inputs") or {})
+    required = (
+        "step24_policy",
+        "step24_policy_sha256",
+        "step24_sync_manifest",
+        "step24_sync_manifest_sha256",
+        "step24_sync_manifest_content_sha256",
+        "step24_pair_feature_summary",
+        "step24_pair_feature_summary_sha256",
+        "step24_clean_text_manifest",
+        "step24_clean_text_manifest_sha256",
+        "step24_zh_pair_features",
+        "step24_zh_pair_features_sha256",
+        "step24_model_artifacts",
+        "step24_model_artifacts_sha256",
+    )
+    missing = [name for name in required if not inputs.get(name)]
+    if missing:
+        raise ValueError(f"Step27 frozen Step24 bundle contract is missing: {missing}")
+    paths = {
+        "policy": resolve(inputs["step24_policy"]),
+        "sync_manifest": resolve(inputs["step24_sync_manifest"]),
+        "pair_feature_summary": resolve(inputs["step24_pair_feature_summary"]),
+        "clean_text_manifest": resolve(inputs["step24_clean_text_manifest"]),
+        "zh_pair_features": resolve(inputs["step24_zh_pair_features"]),
+        "model_artifacts": resolve(inputs["step24_model_artifacts"]),
+    }
+    expected_hashes = {
+        "policy": inputs["step24_policy_sha256"],
+        "sync_manifest": inputs["step24_sync_manifest_sha256"],
+        "pair_feature_summary": inputs["step24_pair_feature_summary_sha256"],
+        "clean_text_manifest": inputs["step24_clean_text_manifest_sha256"],
+        "zh_pair_features": inputs["step24_zh_pair_features_sha256"],
+        "model_artifacts": inputs["step24_model_artifacts_sha256"],
+    }
+    for name, path in paths.items():
+        if not path.is_file() or sha256_file(path) != expected_hashes[name]:
+            raise ValueError(f"Step27 frozen Step24 {name} hash mismatch: {path}")
+    sync_manifest = load_json(paths["sync_manifest"])
+    if (
+        sync_manifest.get("manifest_sha256")
+        != inputs["step24_sync_manifest_content_sha256"]
+    ):
+        raise ValueError("Step27 frozen Step24 sync-manifest content hash mismatch")
+    sync_records = {
+        str(record.get("path", "")).replace("\\", "/"): record
+        for record in sync_manifest.get("files", [])
+    }
+    if len(sync_records) != len(sync_manifest.get("files", [])):
+        raise ValueError("Step27 frozen Step24 sync manifest has duplicate paths")
+    for name in (
+        "pair_feature_summary",
+        "clean_text_manifest",
+        "zh_pair_features",
+        "model_artifacts",
+    ):
+        path = paths[name]
+        record = sync_records.get(relative(path))
+        if record is None or record.get("sha256") != expected_hashes[name]:
+            raise ValueError(f"Step27 Step24 sync manifest does not anchor {name}")
+    pair_summary = load_json(paths["pair_feature_summary"])
+    zh_record = dict(pair_summary.get("records", {}).get("zh_target_strict") or {})
+    if (
+        zh_record.get("output_sha256") != expected_hashes["zh_pair_features"]
+        or resolve(zh_record.get("output_path", "")) != paths["zh_pair_features"]
+    ):
+        raise ValueError("Step27 Step24 pair summary does not anchor the Chinese pair table")
+    return {
+        "paths": paths,
+        "hashes": expected_hashes,
+        "sync_manifest": sync_manifest,
+        "pair_feature_summary": pair_summary,
+        "clean_text_manifest": load_json(paths["clean_text_manifest"]),
+    }
+
+
+def assert_manifest_contract(
+    path: Path,
+    *,
+    expected_identity_fields: dict,
+    required_outputs: Iterable[Path],
+) -> dict:
+    """Validate a stage manifest against current code/policy, not against itself."""
+    manifest = load_json(path)
+    identity = manifest.get("identity")
+    if not isinstance(identity, dict) or manifest.get("identity_sha256") != canonical_hash(
+        identity
+    ):
+        raise ValueError(f"Step27 manifest identity hash is invalid: {path}")
+    for name, expected in expected_identity_fields.items():
+        if identity.get(name) != expected:
+            raise ValueError(f"Step27 manifest identity field mismatch: {path}:{name}")
+    for field in ("inputs", "outputs"):
+        records = manifest.get(field)
+        if not isinstance(records, list):
+            raise ValueError(f"Step27 manifest is missing {field}: {path}")
+        seen: set[str] = set()
+        for record in records:
+            record_path = str(record.get("path", ""))
+            if not record_path or record_path in seen:
+                raise ValueError(f"Step27 manifest has invalid/duplicate {field}: {path}")
+            seen.add(record_path)
+            artifact = resolve(record_path)
+            if not artifact.is_file() or sha256_file(artifact) != record.get("sha256"):
+                raise ValueError(f"Step27 manifest {field} changed: {path}->{artifact}")
+    output_index = {record["path"] for record in manifest["outputs"]}
+    for output in required_outputs:
+        if relative(output) not in output_index:
+            raise ValueError(f"Step27 manifest does not bind required output: {path}->{output}")
+    content = dict(manifest)
+    expected_content_hash = content.pop("manifest_content_sha256", None)
+    if not expected_content_hash or expected_content_hash != canonical_hash(content):
+        raise ValueError(f"Step27 manifest content hash is invalid: {path}")
+    return manifest
 
 
 def output_root(policy: dict) -> Path:
@@ -427,19 +620,14 @@ def transform_fields(
 
 
 def render_profile_text(fields: dict[str, str]) -> str:
-    labels = {
-        "category_concat_top": "CATEGORIES",
-        "signature_title_concat": "SIGNATURE_TITLES",
-        "title_concat_top": "TITLES",
-        "signature_description_concat": "SIGNATURE_DESCRIPTIONS",
-        "description_concat_top": "DESCRIPTIONS",
-    }
-    sections = [
-        f"[{labels.get(field, field.upper())}] {value}"
-        for field, value in fields.items()
-        if str(value).strip()
-    ]
-    return "\n".join(sections)
+    """Replay the Step15-v7 values-only clean-text serialization.
+
+    Dict insertion order is intentional: synthetic section-order transforms change
+    that order, while canonical real profiles pass fields in the frozen v7 order.
+    Public section markers are forbidden because they were absent from the source
+    encoder input and measurably shifted every real E5 pair score in Step27-v1.
+    """
+    return "\n".join(str(value).strip() for value in fields.values() if str(value).strip())
 
 
 def make_synthetic_profile(

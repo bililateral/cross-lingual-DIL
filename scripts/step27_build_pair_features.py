@@ -72,7 +72,24 @@ def build_real(policy_path: Path, policy: dict, fields: list[str]) -> tuple[Path
     matrix_path, metadata_path = common.profile_cache_paths(policy, None, "real")
     clean_path = matrix_path.parent / "clean_profiles.jsonl"
     cache_manifest = matrix_path.parent / "manifest.json"
-    inputs = [policy_path, parent_manifest, canonical_path, clean_path, matrix_path, metadata_path, cache_manifest]
+    step24_bundle = common.frozen_step24_bundle(policy)
+    step24_policy_path = step24_bundle["paths"]["policy"]
+    step24_pair_features = step24_bundle["paths"]["zh_pair_features"]
+    inputs = [
+        policy_path,
+        parent_manifest,
+        canonical_path,
+        clean_path,
+        matrix_path,
+        metadata_path,
+        cache_manifest,
+        step24_policy_path,
+        step24_bundle["paths"]["sync_manifest"],
+        step24_bundle["paths"]["pair_feature_summary"],
+        step24_bundle["paths"]["clean_text_manifest"],
+        step24_bundle["paths"]["model_artifacts"],
+        step24_pair_features,
+    ]
     root = common.output_root(policy) / "pair_features" / "real"
     output_path = root / "real_pair_features.csv"
     split_output_paths = {
@@ -114,6 +131,21 @@ def build_real(policy_path: Path, policy: dict, fields: list[str]) -> tuple[Path
     ]
     if len({row["pair_uid"] for row in rows}) != len(rows):
         raise ValueError("Step27 real pair feature UIDs are duplicated")
+    train_rows = [row for row in rows if row["split_name"] == "train"]
+    step24_reference_rows = common.load_csv(step24_pair_features)
+    replay_tolerance = float(
+        policy.get("statistics", {}).get(
+            "real_pair_feature_replay_absolute_tolerance", 5e-13
+        )
+    )
+    if not 0.0 <= replay_tolerance <= 5e-13:
+        raise ValueError("Step27 real pair feature replay tolerance is too permissive")
+    common.assert_exact_real_pair_feature_replay(
+        step24_reference_rows,
+        train_rows,
+        ["identifier_redacted_e5_cosine"],
+        atol=replay_tolerance,
+    )
     common.write_csv_immutable(output_path, rows)
     split_counts = Counter(row["split_name"] for row in rows)
     for split, split_path in split_output_paths.items():
@@ -132,6 +164,8 @@ def build_real(policy_path: Path, policy: dict, fields: list[str]) -> tuple[Path
         "identifier_features_included": False,
         "parent_pair_features_copied": False,
         "all_features_recomputed_from_clean_profiles": True,
+        "step24_real_e5_pair_feature_replay_verified": True,
+        "step24_real_e5_pair_feature_replay_tolerance": replay_tolerance,
         "valid_or_test_fitted_statistics_used": False,
         "output": common.relative(output_path),
         "split_outputs": {

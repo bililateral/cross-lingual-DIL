@@ -81,6 +81,7 @@ def transformed_parent_pair(
     transform_name: str,
     seed: int,
     variant_index: int,
+    synthetic_uid_prefix: str,
 ) -> tuple[dict[str, str], dict[str, str], dict, dict] | None:
     pair_uid = parent["parent_pair_uid"]
     sides = []
@@ -92,7 +93,7 @@ def transformed_parent_pair(
         rng = common.deterministic_rng(seed, parent["matched_set_id"], pair_uid, str(variant_index), side)
         transformed = common.transform_fields(clean_fields, transform_name, rng)
         synthetic_uid = (
-            f"synthetic://step27/{parent['track']}/seed_{seed}/"
+            f"{synthetic_uid_prefix}/{parent['track']}/seed_{seed}/"
             f"{parent['matched_set_id']}/{parent['parent_role']}/v{variant_index:02d}/{side}"
         )
         transformed, post_diagnostics = common.redact_transformed_fields(
@@ -112,6 +113,7 @@ def choose_matched_transform(
     schedule: list[str],
     seed: int,
     variant_index: int,
+    synthetic_uid_prefix: str,
 ) -> tuple[str, dict[str, tuple[dict[str, str], dict[str, str], dict, dict]]] | None:
     """Use one recipe for both labels or skip the entire matched variant."""
     for offset in range(len(schedule)):
@@ -119,7 +121,13 @@ def choose_matched_transform(
         results = {}
         for parent in parents:
             result = transformed_parent_pair(
-                parent, profiles, clean_cache, transform, seed, variant_index
+                parent,
+                profiles,
+                clean_cache,
+                transform,
+                seed,
+                variant_index,
+                synthetic_uid_prefix,
             )
             if result is None:
                 break
@@ -166,10 +174,16 @@ def generate_track(
     profiles: dict[str, dict],
     signal_literals: dict[str, list[str]],
     fields: list[str],
+    clean_cfg: dict,
     variants: int,
     child_cap: int,
 ) -> tuple[list[Path], dict]:
     schedule = common.transform_schedule(policy, variants)
+    synthetic_uid_prefix = str(
+        policy.get("generation", {}).get("synthetic_uid_prefix", "")
+    ).rstrip("/")
+    if not synthetic_uid_prefix.startswith("synthetic://step27/"):
+        raise ValueError("Step27 synthetic_uid_prefix must be a versioned synthetic://step27 URI")
     clean_cache: dict[str, tuple[dict[str, str], list[str], dict]] = {}
     for parent in parent_rows:
         for field in ("seller_uid_left", "seller_uid_right"):
@@ -183,6 +197,15 @@ def generate_track(
             if not common.render_profile_text(cleaned):
                 raise ValueError(f"Step27 redaction removed all parent content: {seller_uid}")
             literals = common.profile_literals(profile, signal_literals)
+            source_text = redaction.build_content_text(profile, clean_cfg)
+            exact_text, _ = redaction.redact_identifiers(source_text, literals)
+            redaction.assert_no_known_identifier_residue(exact_text, literals, seller_uid)
+            if not exact_text:
+                exact_text = "content unavailable"
+            common.assert_exact_real_text_replay(
+                {seller_uid: exact_text},
+                {seller_uid: common.render_profile_text(cleaned)},
+            )
             clean_cache[seller_uid] = (cleaned, literals, diagnostics)
 
     by_match: dict[str, list[dict]] = defaultdict(list)
@@ -211,8 +234,18 @@ def generate_track(
                 schedule,
                 seed,
                 variant_index,
+                synthetic_uid_prefix,
             )
             if chosen is None:
+                if bool(
+                    policy.get("generation", {})
+                    .get("recipe_contract", {})
+                    .get("fail_closed_on_no_op", False)
+                ):
+                    raise ValueError(
+                        "Step27 fail-closed no-op contract could not generate every "
+                        f"matched variant: {track}/{matched_set_id}/v{variant_index:02d}"
+                    )
                 skipped.append(
                     {
                         "track": track,
@@ -231,7 +264,7 @@ def generate_track(
                 redaction_totals.update(left_diag)
                 redaction_totals.update(right_diag)
                 base = (
-                    f"synthetic://step27/{track}/seed_{seed}/{matched_set_id}/"
+                    f"{synthetic_uid_prefix}/{track}/seed_{seed}/{matched_set_id}/"
                     f"{parent['parent_role']}/v{variant_index:02d}"
                 )
                 left_uid = f"{base}/left"
@@ -284,7 +317,7 @@ def generate_track(
                 duplication_pairs.append(
                     duplication_row(
                         parent,
-                        pair_uid=f"synthetic://step27/duplication/{track}/seed_{seed}/"
+                        pair_uid=f"{synthetic_uid_prefix}/duplication/{track}/seed_{seed}/"
                         f"{matched_set_id}/{parent['parent_role']}/v{variant_index:02d}",
                         child_weight=child_weight,
                         seed=seed,
@@ -317,6 +350,16 @@ def generate_track(
 
     if len(synthetic_pairs) > child_cap:
         raise ValueError(f"Step27 {track} exceeded its per-seed child cap")
+    if (
+        policy.get("generation", {})
+        .get("recipe_contract", {})
+        .get("fail_closed_on_no_op", False)
+        and len(synthetic_pairs) != child_cap
+    ):
+        raise ValueError(
+            f"Step27 {track} did not materialize its complete fail-closed child budget: "
+            f"observed={len(synthetic_pairs)} expected={child_cap}"
+        )
     if len(synthetic_pairs) != len(duplication_pairs) or len(synthetic_profiles) != 2 * len(
         synthetic_pairs
     ):
@@ -369,6 +412,8 @@ def generate_track(
         "fabricated_market_or_provenance_count": 0,
         "valid_or_test_child_count": 0,
         "effective_independent_sample_count": len({row["component_id"] for row in parent_rows}),
+        "synthetic_uid_prefix": synthetic_uid_prefix,
+        "parent_clean_text_exactly_replays_step15_v7": True,
     }
     return outputs, summary
 
@@ -406,6 +451,11 @@ def main() -> None:
     profiles = common.load_profiles_index(profiles_path)
     signal_literals, signal_summary = redaction.signal_literals_by_seller(signals_path)
     fields = common.text_fields(policy)
+    v7_policy_path = common.policy_input(policy, "identifier_redaction_policy")
+    v7_policy = common.load_json(v7_policy_path)
+    clean_cfg = dict(v7_policy["clean_semantic_encoder"])
+    if list(clean_cfg.get("text_fields", [])) != fields:
+        raise ValueError("Step27 generation fields do not exactly replay Step15-v7")
     parent_paths = {
         "primary": parent_root / "primary_matched_parents.csv",
         "silver_sensitivity": parent_root / "silver_sensitivity_matched_parents.csv",
@@ -425,6 +475,7 @@ def main() -> None:
             "parent_manifest_sha256": common.sha256_file(parent_manifest_path),
             "profiles_sha256": common.sha256_file(profiles_path),
             "signals_sha256": common.sha256_file(signals_path),
+            "identifier_redaction_policy_sha256": common.sha256_file(v7_policy_path),
         }
         existing = common.assert_existing_manifest_identity(manifest_path, identity)
         if existing is not None:
@@ -444,6 +495,7 @@ def main() -> None:
                 profiles=profiles,
                 signal_literals=signal_literals,
                 fields=fields,
+                clean_cfg=clean_cfg,
                 variants=limits["primary_variants"] if track == "primary" else limits["silver_variants"],
                 child_cap=limits["primary_child_cap"] if track == "primary" else limits["silver_child_cap"],
             )
@@ -469,7 +521,7 @@ def main() -> None:
             manifest_path,
             stage="step27_generate_train_only_views",
             identity=identity,
-            inputs=[policy_path, parent_manifest_path, profiles_path, signals_path, *[parent_paths[t] for t in tracks]],
+            inputs=[policy_path, parent_manifest_path, profiles_path, signals_path, v7_policy_path, *[parent_paths[t] for t in tracks]],
             outputs=outputs,
             extra={"summary_sha256": common.sha256_file(summary_path)},
         )

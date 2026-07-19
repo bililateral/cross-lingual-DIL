@@ -27,7 +27,7 @@ import step27_common as common
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
 FIXED_SOURCE_ARTIFACT = (
     ROOT
     / "reports"
@@ -36,6 +36,8 @@ FIXED_SOURCE_ARTIFACT = (
     / "step24_model_artifacts.json"
 )
 FIXED_SOURCE_KEY = ("artifacts", "source_only", "e5_lr_l2_control")
+FIXED_SOURCE_FEATURE_NAME = "identifier_redacted_e5_cosine"
+SOURCE_ONLY_MODEL_ID = "step27_s0_frozen_english_source_only"
 MODEL_IDS = (
     "step27_m0_real_only",
     "step27_m1_equal_effective_weight_duplication",
@@ -46,7 +48,12 @@ EXPLORATORY_MODEL_IDS = (
     "step27_m2_target_only_alpha_zero",
 )
 SENSITIVITY_MODEL_ID = "step27_m2_silver_sensitivity"
-REPORTING_MODEL_IDS = (*MODEL_IDS, *EXPLORATORY_MODEL_IDS, SENSITIVITY_MODEL_ID)
+REPORTING_MODEL_IDS = (
+    SOURCE_ONLY_MODEL_ID,
+    *MODEL_IDS,
+    *EXPLORATORY_MODEL_IDS,
+    SENSITIVITY_MODEL_ID,
+)
 DEFAULT_SEEDS = tuple(range(20260320, 20260330))
 
 
@@ -291,12 +298,13 @@ def source_feature_name(policy: dict) -> str:
         first_value(
             policy,
             (("training", "source_feature_name"), ("source_model", "feature_name")),
-            "identifier_redacted_e5_cosine",
+            FIXED_SOURCE_FEATURE_NAME,
         )
     )
 
 
 def validate_policy(policy: dict, policy_path_value: Path) -> dict:
+    common.ensure_current_runtime_policy(policy)
     fold_count = int(
         first_value(
             policy,
@@ -335,6 +343,11 @@ def validate_policy(policy: dict, policy_path_value: Path) -> dict:
     source_path = resolve(str(source_value))
     if source_path.resolve() != FIXED_SOURCE_ARTIFACT.resolve():
         raise ValueError(f"Step27 source artifact must remain fixed at {FIXED_SOURCE_ARTIFACT}")
+    if source_feature_name(policy) != FIXED_SOURCE_FEATURE_NAME:
+        raise ValueError(
+            "Step27 frozen English source feature must remain "
+            f"{FIXED_SOURCE_FEATURE_NAME!r}"
+        )
     if fold_count != 4:
         raise ValueError("Step27 requires exactly four seller-component OOF folds")
     if seeds != DEFAULT_SEEDS:
@@ -387,7 +400,7 @@ def source_artifact(path: Path) -> dict:
         value = value[key]
     if not isinstance(value, dict):
         raise ValueError("Fixed Step24 E5 source artifact is malformed")
-    if value.get("feature_names") != ["identifier_redacted_e5_cosine"]:
+    if value.get("feature_names") != [FIXED_SOURCE_FEATURE_NAME]:
         raise ValueError("Step27 fixed source scorer must be the Step24 E5-only LR/L2 control")
     logistic = value.get("logistic_artifact") or {}
     if float(logistic.get("l2_penalty", math.nan)) != 10.0:
@@ -441,6 +454,48 @@ def source_logit(row: dict, artifact: dict, source_name: str) -> float:
     if scale <= 0.0:
         raise ValueError("Step24 source standardization scale is invalid")
     return float(logistic["parameter_intercept"]) + coefficient * ((value - mean) / scale)
+
+
+def predict_frozen_source_only(
+    rows: list[dict], source: dict, source_name: str
+) -> np.ndarray:
+    """Score rows with the frozen English model without fitting target parameters."""
+    logits = np.asarray(
+        [source_logit(row, source, source_name) for row in rows], dtype=float
+    )
+    return sigmoid(logits)
+
+
+def frozen_source_only_artifact(
+    *,
+    model_id: str,
+    seed: int,
+    names: list[str],
+    source_name: str,
+    source_path: Path,
+    manifest_sha256: str,
+) -> dict:
+    if model_id != SOURCE_ONLY_MODEL_ID:
+        raise ValueError(f"Unexpected Step27 frozen source-only model id: {model_id}")
+    return {
+        "artifact_type": "frozen_english_source_reference_no_target_fit",
+        "model_id": model_id,
+        "seed": int(seed),
+        "source_mode": "frozen_source_only",
+        "artifact_feature_names": [source_name],
+        "residual_feature_names": list(names),
+        "source_feature_name": source_name,
+        "source_artifact_path": str(source_path.relative_to(ROOT)).replace("\\", "/"),
+        "source_artifact_key": ".".join(FIXED_SOURCE_KEY),
+        "source_offset_coefficient": 1.0,
+        "target_residual_trained": False,
+        "target_labels_used_for_parameter_fitting": False,
+        "target_labels_used_for_step27_threshold_selection": True,
+        "ranking_scores_are_pure_frozen_english_source_outputs": True,
+        "threshold_metrics_role": "target_thresholded_diagnostic_only",
+        "seed_changes_model_parameters": False,
+        "input_manifest_sha256": manifest_sha256,
+    }
 
 
 def sigmoid(values: np.ndarray) -> np.ndarray:
@@ -828,7 +883,20 @@ def materialize_feature_tables(
     for path in (real_path, real_manifest):
         if not path.is_file():
             raise FileNotFoundError(f"Run step27_build_pair_features.py first: {path}")
-    common.assert_existing_manifest_identity(real_manifest, common.load_json(real_manifest)["identity"])
+    feature_producer = ROOT / "scripts" / "step27_build_pair_features.py"
+    common.assert_manifest_contract(
+        real_manifest,
+        expected_identity_fields={
+            "stage": "step27_build_pair_features:real",
+            "policy_sha256": sha256_file(cfg["policy_path"]),
+            "producer_sha256": sha256_file(feature_producer),
+            "common_sha256": sha256_file(Path(common.__file__).resolve()),
+            "shared_dependency_sha256": common.shared_dependency_hashes(),
+            "feature_names": list(common.FEATURE_NAMES),
+            "parent_pair_features_copied": False,
+        },
+        required_outputs=[real_path],
+    )
     real_features = common.load_csv(real_path)
     synthetic_all = []
     feature_paths = [real_path, real_manifest]
@@ -839,8 +907,20 @@ def materialize_feature_tables(
         for path in (feature_path, feature_manifest):
             if not path.is_file():
                 raise FileNotFoundError(f"Run step27_build_pair_features.py first: {path}")
-        common.assert_existing_manifest_identity(
-            feature_manifest, common.load_json(feature_manifest)["identity"]
+        common.assert_manifest_contract(
+            feature_manifest,
+            expected_identity_fields={
+                "stage": "step27_build_pair_features:synthetic",
+                "seed": seed,
+                "track": "primary",
+                "policy_sha256": sha256_file(cfg["policy_path"]),
+                "producer_sha256": sha256_file(feature_producer),
+                "common_sha256": sha256_file(Path(common.__file__).resolve()),
+                "shared_dependency_sha256": common.shared_dependency_hashes(),
+                "feature_names": list(common.FEATURE_NAMES),
+                "parent_pair_features_copied": False,
+            },
+            required_outputs=[feature_path],
         )
         synthetic = common.load_csv(feature_path)
         if any(int(row.get("seed", -1)) != seed for row in synthetic):
@@ -853,6 +933,7 @@ def materialize_feature_tables(
 def load_sensitivity_feature_tables(policy: dict, cfg: dict) -> tuple[list[dict], list[Path]]:
     rows: list[dict] = []
     paths: list[Path] = []
+    feature_producer = ROOT / "scripts" / "step27_build_pair_features.py"
     for seed in cfg["seeds"]:
         feature_root = common.track_root(policy, seed, "silver_sensitivity") / "pair_features"
         feature_path = feature_root / "synthetic_pair_features.csv"
@@ -860,8 +941,20 @@ def load_sensitivity_feature_tables(policy: dict, cfg: dict) -> tuple[list[dict]
         for path in (feature_path, feature_manifest):
             if not path.is_file():
                 raise FileNotFoundError(f"Run the Step27 silver sensitivity feature stage first: {path}")
-        common.assert_existing_manifest_identity(
-            feature_manifest, common.load_json(feature_manifest)["identity"]
+        common.assert_manifest_contract(
+            feature_manifest,
+            expected_identity_fields={
+                "stage": "step27_build_pair_features:synthetic",
+                "seed": seed,
+                "track": "silver_sensitivity",
+                "policy_sha256": sha256_file(cfg["policy_path"]),
+                "producer_sha256": sha256_file(feature_producer),
+                "common_sha256": sha256_file(Path(common.__file__).resolve()),
+                "shared_dependency_sha256": common.shared_dependency_hashes(),
+                "feature_names": list(common.FEATURE_NAMES),
+                "parent_pair_features_copied": False,
+            },
+            required_outputs=[feature_path],
         )
         seed_rows = common.load_csv(feature_path)
         if any(int(row.get("seed", -1)) != seed for row in seed_rows):
@@ -999,11 +1092,13 @@ def train_one(
 
 
 def predict_rows(rows: list[dict], artifact: dict, names: list[str], source: dict, source_name: str) -> np.ndarray:
+    source_mode = str(artifact.get("source_mode", "fixed_unit_offset"))
+    if source_mode == "frozen_source_only":
+        return predict_frozen_source_only(rows, source, source_name)
     residual_x = matrix(rows, names)
     source_logits = np.asarray(
         [source_logit(row, source, source_name) for row in rows], dtype=float
     )
-    source_mode = str(artifact.get("source_mode", "fixed_unit_offset"))
     if source_mode == "fixed_unit_offset":
         x = residual_x
         offsets = source_logits
@@ -1023,6 +1118,8 @@ def predict_rows(rows: list[dict], artifact: dict, names: list[str], source: dic
 
 
 def source_mode_for_model(model_id: str) -> str:
+    if model_id == SOURCE_ONLY_MODEL_ID:
+        return "frozen_source_only"
     if model_id == EXPLORATORY_MODEL_IDS[0]:
         return "learned_source_alpha"
     if model_id == EXPLORATORY_MODEL_IDS[1]:
@@ -1031,6 +1128,8 @@ def source_mode_for_model(model_id: str) -> str:
 
 
 def training_model_id_for(model_id: str) -> str:
+    if model_id == SOURCE_ONLY_MODEL_ID:
+        raise ValueError("The frozen English source-only control must not train a target residual")
     if model_id in EXPLORATORY_MODEL_IDS or model_id == SENSITIVITY_MODEL_ID:
         return MODEL_IDS[2]
     return model_id
@@ -1040,6 +1139,35 @@ def validate_persisted_artifact_contract(
     artifact: dict, model_id: str, seed: int, names: list[str], manifest_sha256: str
 ) -> None:
     expected_mode = source_mode_for_model(model_id)
+    if model_id == SOURCE_ONLY_MODEL_ID:
+        required = {
+            "artifact_type": "frozen_english_source_reference_no_target_fit",
+            "model_id": model_id,
+            "seed": seed,
+            "source_mode": "frozen_source_only",
+            "artifact_feature_names": [FIXED_SOURCE_FEATURE_NAME],
+            "residual_feature_names": list(names),
+            "source_feature_name": FIXED_SOURCE_FEATURE_NAME,
+            "source_artifact_path": str(FIXED_SOURCE_ARTIFACT.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "source_artifact_key": ".".join(FIXED_SOURCE_KEY),
+            "source_offset_coefficient": 1.0,
+            "target_residual_trained": False,
+            "target_labels_used_for_parameter_fitting": False,
+            "target_labels_used_for_step27_threshold_selection": True,
+            "ranking_scores_are_pure_frozen_english_source_outputs": True,
+            "threshold_metrics_role": "target_thresholded_diagnostic_only",
+            "seed_changes_model_parameters": False,
+            "input_manifest_sha256": manifest_sha256,
+        }
+        mismatched = [key for key, value in required.items() if artifact.get(key) != value]
+        if mismatched:
+            raise ValueError(
+                "Step27 frozen source-only artifact contract changed: "
+                f"seed={seed} fields={mismatched}"
+            )
+        return
     expected_features = (
         ["frozen_english_source_logit", *names]
         if expected_mode == "learned_source_alpha"
@@ -1155,7 +1283,27 @@ def score_frozen_split_after_gate(
 ) -> None:
     if split_name not in {"valid", "test"}:
         raise ValueError(f"Unsupported Step27 delayed evaluation split: {split_name}")
+    repair_cfg = dict(policy.get("posthoc_source_contract_repair") or {})
+    authorization_key = (
+        "existing_valid_open_authorized"
+        if split_name == "valid"
+        else "existing_internal_test_open_authorized"
+    )
+    if repair_cfg and not bool(repair_cfg.get(authorization_key, False)):
+        raise ValueError(
+            f"Step27 post-hoc repair policy forbids opening existing {split_name}"
+        )
     root = outputs_root(policy)
+    expected_gate_summary_path = (
+        root
+        / "statistical_audit"
+        / ("oof_gate" if split_name == "valid" else "valid_gate")
+        / "step12_step27_statistical_audit.json"
+    )
+    if gate_summary_path.resolve() != expected_gate_summary_path.resolve():
+        raise ValueError(
+            f"Step27 {split_name} requires its canonical run-scoped gate summary"
+        )
     training_dir = root / "training"
     summary_path = training_dir / "step27_training_summary.json"
     artifacts_path = training_dir / "step27_model_artifacts.json"
@@ -1294,6 +1442,48 @@ def score_frozen_split_after_gate(
     )
 
 
+def preflight_delayed_scoring_request(
+    *,
+    args: argparse.Namespace,
+    policy: dict,
+    root: Path,
+) -> str:
+    """Authorize and bind a delayed split before any split feature is loaded."""
+    if args.score_valid and args.score_internal_test:
+        raise ValueError("Step27 permits only one delayed evaluation split per invocation")
+    if not args.score_valid and not args.score_internal_test:
+        return "train"
+
+    split_name = "valid" if args.score_valid else "test"
+    repair_cfg = dict(policy.get("posthoc_source_contract_repair") or {})
+    authorization_key = (
+        "existing_valid_open_authorized"
+        if split_name == "valid"
+        else "existing_internal_test_open_authorized"
+    )
+    if repair_cfg and not bool(repair_cfg.get(authorization_key, False)):
+        raise ValueError(
+            f"Step27 post-hoc repair policy forbids opening existing {split_name}"
+        )
+
+    gate_value = args.oof_gate_summary if split_name == "valid" else args.valid_gate_summary
+    if not gate_value:
+        required = "--oof-gate-summary" if split_name == "valid" else "--valid-gate-summary"
+        flag = "--score-valid" if split_name == "valid" else "--score-internal-test"
+        raise ValueError(f"{flag} requires {required}")
+    expected_gate = (
+        root
+        / "statistical_audit"
+        / ("oof_gate" if split_name == "valid" else "valid_gate")
+        / "step12_step27_statistical_audit.json"
+    )
+    if resolve(gate_value).resolve() != expected_gate.resolve():
+        raise ValueError(
+            f"Step27 {split_name} requires its canonical run-scoped gate summary"
+        )
+    return split_name
+
+
 def main() -> None:
     args = parse_args()
     policy_path_value = resolve(args.policy)
@@ -1306,6 +1496,7 @@ def main() -> None:
                     "status": "pass",
                     "run_id": cfg["run_id"],
                     "primary_models": list(MODEL_IDS),
+                    "mandatory_source_only_control": SOURCE_ONLY_MODEL_ID,
                     "diagnostic_models": [*EXPLORATORY_MODEL_IDS, SENSITIVITY_MODEL_ID],
                 },
                 indent=2,
@@ -1315,9 +1506,11 @@ def main() -> None:
 
     root = outputs_root(policy)
     source_path = cfg["source_artifact_path"]
-    if args.score_valid and args.score_internal_test:
-        raise ValueError("Step27 permits only one delayed evaluation split per invocation")
-    active_split = "valid" if args.score_valid else "test" if args.score_internal_test else "train"
+    active_split = preflight_delayed_scoring_request(
+        args=args,
+        policy=policy,
+        root=root,
+    )
     real_rows, synthetic_rows, feature_paths = materialize_feature_tables(
         policy, cfg, real_split=active_split
     )
@@ -1476,6 +1669,11 @@ def main() -> None:
     oof_y = np.asarray([row_label(row) for row in train_rows], dtype=int)
     for model_id in all_model_ids:
         for seed in cfg["seeds"]:
+            if model_id == SOURCE_ONLY_MODEL_ID:
+                oof_seed_scores[model_id][seed] = predict_frozen_source_only(
+                    train_rows, source, source_name
+                )
+                continue
             seed_children = (
                 sensitivity_by_seed[seed]
                 if model_id == SENSITIVITY_MODEL_ID
@@ -1527,6 +1725,16 @@ def main() -> None:
     for model_id in all_model_ids:
         artifacts[model_id] = {}
         for seed in cfg["seeds"]:
+            if model_id == SOURCE_ONLY_MODEL_ID:
+                artifacts[model_id][str(seed)] = frozen_source_only_artifact(
+                    model_id=model_id,
+                    seed=seed,
+                    names=names,
+                    source_name=source_name,
+                    source_path=source_path,
+                    manifest_sha256=manifest["manifest_sha256"],
+                )
+                continue
             seed_children = (
                 sensitivity_by_seed[seed]
                 if model_id == SENSITIVITY_MODEL_ID
@@ -1576,6 +1784,11 @@ def main() -> None:
         "pair_feature_bundle_sha256": file_bundle_sha256(all_feature_paths),
         "scientific_contract": {
             "source_model": "Step24 identifier-redacted E5 source-only LR/L2",
+            "source_only_reporting_model": SOURCE_ONLY_MODEL_ID,
+            "source_only_target_residual_trained": False,
+            "source_only_target_labels_used_for_step27_threshold_selection": True,
+            "source_only_ranking_scores_are_pure_frozen_english_outputs": True,
+            "source_only_threshold_metrics_role": "target_thresholded_diagnostic_only",
             "source_artifact_key": ".".join(FIXED_SOURCE_KEY),
             "source_offset_coefficient": 1.0,
             "fold_count": cfg["fold_count"],
@@ -1591,6 +1804,9 @@ def main() -> None:
             "internal_test_requires_separate_passing_valid_gate": True,
             "primary_comparison": "step27_m2_synthetic_vs_step27_m1_equal_effective_weight_duplication",
             "required_secondary_comparison": "step27_m2_synthetic_vs_step27_m0_real_only",
+            "required_source_noninferiority_comparison": (
+                "step27_m2_synthetic_vs_step27_s0_frozen_english_source_only"
+            ),
             "silver_sensitivity_model": SENSITIVITY_MODEL_ID,
             "silver_sensitivity_can_satisfy_primary_gate": False,
             "exploratory_controls": list(EXPLORATORY_MODEL_IDS),

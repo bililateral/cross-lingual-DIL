@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import argparse
 import inspect
 import json
 import sys
@@ -8,6 +9,7 @@ import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 
@@ -16,12 +18,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import step27_common as common  # noqa: E402
+import step12_step27_statistical_audit as statistical_audit  # noqa: E402
+import step15_build_v7_clean_embedding_cache as v7_encoding  # noqa: E402
+import step27_audit_synthetic_data as synthetic_audit  # noqa: E402
 import step27_build_parent_manifest as parent_builder  # noqa: E402
+import step27_build_sync_manifest as sync_manifest  # noqa: E402
 import step27_encode_profiles as encoding  # noqa: E402
+import step27_generate_train_only_views as generation  # noqa: E402
 import step27_train_residual_models as training  # noqa: E402
 
 
-POLICY_PATH = ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+POLICY_PATH = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
 
 
 class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
@@ -44,6 +51,35 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         self.assertEqual(artifact["feature_names"], ["identifier_redacted_e5_cosine"])
         self.assertEqual(expected["source_logit_coefficient_in_primary_models"], 1.0)
         training.validate_frozen_source_contract(self.policy, source_path, artifact)
+
+    def test_step24_replay_references_are_anchored_by_frozen_sync_manifest(self) -> None:
+        bundle = common.frozen_step24_bundle(self.policy)
+        self.assertEqual(
+            bundle["hashes"]["zh_pair_features"],
+            bundle["pair_feature_summary"]["records"]["zh_target_strict"][
+                "output_sha256"
+            ],
+        )
+        self.assertEqual(
+            bundle["sync_manifest"]["manifest_sha256"],
+            self.policy["inputs"]["step24_sync_manifest_content_sha256"],
+        )
+
+    def test_v11_policy_is_runtime_valid_and_physically_isolated(self) -> None:
+        cfg = training.validate_policy(self.policy, POLICY_PATH)
+        self.assertTrue(cfg["run_id"])
+        self.assertIn("v1_1_20260719", str(common.output_root(self.policy)))
+        self.assertEqual(
+            self.policy["implementation_runner"],
+            "scripts/run_step27_v1_1_exact_replay_linux_20260719.sh",
+        )
+        legacy = json.loads(
+            (ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(legacy["outputs_root"].split("/")[-1], "v1_20260718")
+        self.assertNotEqual(legacy["outputs_root"], self.policy["outputs_root"])
 
     def test_canonical_chinese_boundary_is_unchanged(self) -> None:
         rows = common.canonical_rows(self.policy, {"train", "valid", "test"})
@@ -402,6 +438,207 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
             )
         self.assertEqual(cleaned[0]["profile_text"], profile["profile_text"])
 
+    def test_values_only_serializer_exactly_replays_step15_v7(self) -> None:
+        fields = {
+            "category_concat_top": "分类甲 || 分类乙",
+            "signature_title_concat": "签名标题",
+            "title_concat_top": "商品标题",
+            "signature_description_concat": "签名描述",
+            "description_concat_top": "商品描述",
+        }
+        v7_cfg = {"text_fields": list(fields)}
+        expected = v7_encoding.build_content_text(fields, v7_cfg)
+        observed = common.render_profile_text(fields)
+        self.assertEqual(observed, expected)
+        self.assertEqual(observed.splitlines(), list(fields.values()))
+
+    def test_values_only_serializer_never_inserts_public_section_headers(self) -> None:
+        fields = {
+            "category_concat_top": "分类文本",
+            "title_concat_top": "标题文本",
+            "description_concat_top": "描述文本",
+        }
+        rendered = common.render_profile_text(fields)
+        for forbidden in (
+            "[CATEGORIES]",
+            "[SIGNATURE_TITLES]",
+            "[TITLES]",
+            "[SIGNATURE_DESCRIPTIONS]",
+            "[DESCRIPTIONS]",
+        ):
+            self.assertNotIn(forbidden, rendered)
+        self.assertEqual(rendered, "分类文本\n标题文本\n描述文本")
+
+    def test_real_text_replay_mismatch_fails_closed(self) -> None:
+        reference = {
+            "seller::a": "分类甲\n标题甲\n描述甲",
+            "seller::b": "分类乙\n标题乙\n描述乙",
+        }
+        common.assert_exact_real_text_replay(reference, dict(reference))
+        with self.assertRaisesRegex(ValueError, "text replay"):
+            common.assert_exact_real_text_replay(
+                reference,
+                {**reference, "seller::b": "分类乙\n标题乙\n改变后的描述"},
+            )
+        with self.assertRaisesRegex(ValueError, "text replay"):
+            common.assert_exact_real_text_replay(
+                reference,
+                {"seller::a": reference["seller::a"]},
+            )
+
+    def test_real_embedding_replay_mismatch_fails_closed(self) -> None:
+        seller_uids = ["seller::a", "seller::b"]
+        reference = np.asarray([[0.1, 0.2], [0.3, 0.4]], dtype=np.float64)
+        common.assert_exact_real_embedding_replay(
+            seller_uids,
+            reference,
+            seller_uids,
+            reference.copy(),
+            atol=1e-12,
+        )
+        changed = reference.copy()
+        changed[1, 0] += 1e-4
+        with self.assertRaisesRegex(ValueError, "embedding replay"):
+            common.assert_exact_real_embedding_replay(
+                seller_uids,
+                reference,
+                seller_uids,
+                changed,
+                atol=1e-12,
+            )
+        with self.assertRaisesRegex(ValueError, "embedding replay"):
+            common.assert_exact_real_embedding_replay(
+                seller_uids,
+                reference,
+                list(reversed(seller_uids)),
+                reference,
+                atol=1e-12,
+            )
+
+    def test_real_pair_feature_replay_mismatch_fails_closed(self) -> None:
+        feature_names = [
+            "identifier_redacted_e5_cosine",
+            "clean_token_jaccard",
+        ]
+        reference = [
+            {
+                "pair_uid": "pair::a",
+                "identifier_redacted_e5_cosine": "0.91",
+                "clean_token_jaccard": "0.21",
+            },
+            {
+                "pair_uid": "pair::b",
+                "identifier_redacted_e5_cosine": "0.83",
+                "clean_token_jaccard": "0.34",
+            },
+        ]
+        common.assert_exact_real_pair_feature_replay(
+            reference,
+            [dict(row) for row in reference],
+            feature_names,
+            atol=1e-12,
+        )
+        changed = [dict(row) for row in reference]
+        changed[0]["identifier_redacted_e5_cosine"] = "0.90"
+        with self.assertRaisesRegex(ValueError, "pair feature replay"):
+            common.assert_exact_real_pair_feature_replay(
+                reference,
+                changed,
+                feature_names,
+                atol=1e-12,
+            )
+        with self.assertRaisesRegex(ValueError, "pair feature replay"):
+            common.assert_exact_real_pair_feature_replay(
+                reference,
+                reference[:1],
+                feature_names,
+                atol=1e-12,
+            )
+
+    def test_exact_replay_guards_are_wired_into_runtime_paths(self) -> None:
+        runtime_source = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in (
+                ROOT / "scripts" / "step27_encode_profiles.py",
+                ROOT / "scripts" / "step27_build_pair_features.py",
+                ROOT / "scripts" / "step27_train_residual_models.py",
+            )
+        )
+        for guard_name in (
+            "assert_exact_real_text_replay",
+            "assert_exact_real_embedding_replay",
+            "assert_exact_real_pair_feature_replay",
+        ):
+            self.assertIn(
+                f"{guard_name}(",
+                runtime_source,
+                f"{guard_name} must be invoked by a Step27 runtime path, not left as dead code",
+            )
+
+    def test_source_only_comparator_and_noninferiority_gate_are_structural(self) -> None:
+        self.assertEqual(
+            training.SOURCE_ONLY_MODEL_ID,
+            "step27_s0_frozen_english_source_only",
+        )
+        self.assertIn(training.SOURCE_ONLY_MODEL_ID, training.REPORTING_MODEL_IDS)
+        self.assertEqual(
+            statistical_audit.SOURCE_NONINFERIORITY,
+            (training.MODEL_IDS[2], training.SOURCE_ONLY_MODEL_ID),
+        )
+        gate = self.policy["development_promotion_gates"]["oof_before_valid"]
+        self.assertEqual(
+            gate["M2_minus_source_only_average_precision_minimum"],
+            -0.01,
+        )
+        self.assertTrue(
+            statistical_audit.source_only_noninferiority_passes(
+                m2_average_precision=0.615,
+                source_only_average_precision=0.620,
+                minimum_delta=-0.01,
+            )
+        )
+        self.assertFalse(
+            statistical_audit.source_only_noninferiority_passes(
+                m2_average_precision=0.600,
+                source_only_average_precision=0.620,
+                minimum_delta=-0.01,
+            )
+        )
+
+    def test_synthetic_feature_displacement_cannot_be_all_zero(self) -> None:
+        feature_names = ["semantic", "lexical"]
+        parents = {
+            "pair::a": {"semantic": "0.8", "lexical": "0.2"},
+            "pair::b": {"semantic": "0.6", "lexical": "0.4"},
+        }
+        unchanged = [
+            {"parent_pair_uid": pair_uid, **features}
+            for pair_uid, features in parents.items()
+        ]
+        with self.assertRaisesRegex(ValueError, "feature displacement"):
+            synthetic_audit.assert_nonzero_synthetic_feature_displacement(
+                parents,
+                unchanged,
+                feature_names,
+                atol=1e-12,
+            )
+
+        changed = [dict(row) for row in unchanged]
+        changed[1]["semantic"] = "0.6001"
+        report = synthetic_audit.assert_nonzero_synthetic_feature_displacement(
+            parents,
+            changed,
+            feature_names,
+            atol=1e-12,
+        )
+        self.assertGreater(report["changed_value_count"], 0)
+        self.assertGreater(report["maximum_absolute_displacement"], 0.0)
+        self.assertIn(
+            "assert_nonzero_synthetic_feature_displacement(",
+            inspect.getsource(synthetic_audit.main),
+            "the displacement guard must fail the actual synthetic audit, not only unit calls",
+        )
+
     def test_training_validate_rows_rejects_exposed_valid_or_test_rows(self) -> None:
         training_path = ROOT / "scripts" / "step27_train_residual_models.py"
         tree = ast.parse(
@@ -502,6 +739,74 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         )
         self.assertIn("M1_M2_parent_component_fold_label_weight_parity", audit_source)
         self.assertIn("distinguishability_not_estimable", audit_source)
+
+    def test_v11_synthetic_uid_namespace_is_policy_driven(self) -> None:
+        prefix = self.policy["generation"]["synthetic_uid_prefix"]
+        self.assertEqual(prefix, "synthetic://step27/v1_1")
+        source = inspect.getsource(generation)
+        self.assertIn('policy.get("generation", {}).get("synthetic_uid_prefix"', source)
+        self.assertIn('f"{synthetic_uid_prefix}/{track}/seed_{seed}', source)
+        self.assertNotIn('f"synthetic://step27/{track}/seed_{seed}', source)
+
+    def test_generation_fails_closed_unless_parent_text_replays_v7(self) -> None:
+        source = inspect.getsource(generation.generate_track)
+        self.assertIn("redaction.build_content_text", source)
+        self.assertIn("common.assert_exact_real_text_replay", source)
+        self.assertIn("complete fail-closed child budget", source)
+
+    def test_synthetic_encoder_must_match_frozen_real_model_fingerprint(self) -> None:
+        helper = inspect.getsource(encoding.validate_encoder_model_fingerprint)
+        source = inspect.getsource(encoding.main)
+        self.assertIn("model_fingerprint != frozen_model_fingerprint", helper)
+        self.assertIn("synthetic and real embeddings cannot be mixed", helper)
+        self.assertIn("persisted_real_matrix", source)
+        runner = (
+            ROOT / "scripts" / "run_step27_v1_1_exact_replay_linux_20260719.sh"
+        ).read_text(encoding="utf-8")
+        self.assertIn("--validate-model-contract-only", runner)
+        self.assertLess(
+            runner.index("--validate-model-contract-only"),
+            runner.index("[3/13]"),
+        )
+
+    def test_tokenizer_truncation_audit_is_reporting_only(self) -> None:
+        class FakeTokenizer:
+            def __call__(self, texts, **kwargs):
+                self.kwargs = kwargs
+                return {
+                    "input_ids": [
+                        list(range(len(text.split()) + 2)) for text in texts
+                    ]
+                }
+
+        tokenizer = FakeTokenizer()
+        result = encoding.tokenizer_truncation_audit(
+            tokenizer,
+            ["one two", "one two three four five"],
+            {"max_length": 5, "batch_size": 2, "text_prefix": "passage: "},
+        )
+        self.assertFalse(tokenizer.kwargs["truncation"])
+        self.assertEqual(result["profile_count"], 2)
+        self.assertEqual(result["truncated_profile_count"], 1)
+        self.assertEqual(result["tokens_removed_total"], 3)
+        self.assertTrue(result["audit_only_encoding_parameters_unchanged"])
+
+    def test_source_only_historical_metric_contract_is_frozen(self) -> None:
+        statistics = self.policy["statistics"]
+        self.assertAlmostEqual(
+            statistics["source_only_expected_train_oof_roc_auc"],
+            0.7550015233065909,
+            places=15,
+        )
+        self.assertAlmostEqual(
+            statistics["source_only_expected_train_oof_average_precision"],
+            0.6443826343928266,
+            places=15,
+        )
+        self.assertIn(
+            "diagnostic_only",
+            statistics["source_only_threshold_metric_role"],
+        )
 
     def test_shared_real_fold_standardization_is_supported(self) -> None:
         signature = inspect.signature(training.fit_offset_logistic)
@@ -623,21 +928,165 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         self.assertIsInstance(permutation_seed, int)
         self.assertNotEqual(bootstrap_seed, permutation_seed)
 
-    def test_oof_gate_precedes_valid_and_internal_test_in_runner(self) -> None:
+    def test_posthoc_v11_runner_cannot_open_valid_or_internal_test(self) -> None:
         runner = (
-            ROOT / "scripts" / "run_step27_english_pretrained_synthetic_linux_20260718.sh"
+            ROOT / "scripts" / "run_step27_v1_1_exact_replay_linux_20260719.sh"
         ).read_text(encoding="utf-8")
-        oof_gate = runner.index("--mode oof_gate")
-        score_valid = runner.index("--score-valid")
-        valid_gate = runner.index("--mode valid_gate")
-        score_test = runner.index("--score-internal-test")
-        final = runner.index("--mode final_diagnostic")
-        self.assertLess(oof_gate, score_valid)
-        self.assertLess(score_valid, valid_gate)
-        self.assertLess(valid_gate, score_test)
-        self.assertLess(score_test, final)
+        self.assertIn("--mode oof_gate", runner)
+        self.assertNotIn("--score-valid", runner)
+        self.assertNotIn("--mode valid_gate", runner)
+        self.assertNotIn("--score-internal-test", runner)
+        self.assertNotIn("--mode final_diagnostic", runner)
         self.assertIn("eligible_for_valid", runner)
-        self.assertIn("eligible_for_internal_test", runner)
+        self.assertIn("technical_oof_gate_pass", runner)
+        self.assertIn('if [[ "$OOF_ELIGIBLE" != "false" ]]', runner)
+
+    def test_posthoc_cli_blocks_delayed_splits_before_feature_loading(self) -> None:
+        cases = (
+            ("--score-valid", "--oof-gate-summary", "valid"),
+            ("--score-internal-test", "--valid-gate-summary", "test"),
+        )
+        for score_flag, gate_flag, split_name in cases:
+            with self.subTest(split=split_name):
+                argv = [
+                    "step27_train_residual_models.py",
+                    "--policy",
+                    str(POLICY_PATH),
+                    score_flag,
+                    gate_flag,
+                    "forged_gate.json",
+                ]
+                with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                    training,
+                    "materialize_feature_tables",
+                    side_effect=AssertionError("forbidden split was loaded"),
+                ):
+                    with self.assertRaisesRegex(
+                        ValueError,
+                        rf"forbids opening existing {split_name}",
+                    ):
+                        training.main()
+
+    def test_authorized_delayed_split_requires_canonical_gate_before_io(self) -> None:
+        policy = json.loads(json.dumps(self.policy))
+        policy["posthoc_source_contract_repair"][
+            "existing_valid_open_authorized"
+        ] = True
+        args = argparse.Namespace(
+            score_valid=True,
+            score_internal_test=False,
+            oof_gate_summary="forged_gate.json",
+            valid_gate_summary=None,
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "requires its canonical run-scoped gate summary",
+        ):
+            training.preflight_delayed_scoring_request(
+                args=args,
+                policy=policy,
+                root=training.outputs_root(policy),
+            )
+        main_source = inspect.getsource(training.main)
+        self.assertLess(
+            main_source.index("preflight_delayed_scoring_request"),
+            main_source.index("materialize_feature_tables"),
+        )
+
+    def test_step12_posthoc_modes_fail_before_any_artifact_manifest_io(self) -> None:
+        for mode in ("valid_gate", "final_diagnostic"):
+            with self.subTest(mode=mode):
+                argv = [
+                    "step12_step27_statistical_audit.py",
+                    "--policy",
+                    str(POLICY_PATH),
+                    "--mode",
+                    mode,
+                ]
+                with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                    statistical_audit.step27,
+                    "input_manifest",
+                    side_effect=AssertionError("posthoc split artifacts were opened"),
+                ) as manifest_mock:
+                    with self.assertRaisesRegex(
+                        ValueError,
+                        "existing valid/test audit modes are forbidden",
+                    ):
+                        statistical_audit.main()
+                    manifest_mock.assert_not_called()
+
+    def test_posthoc_sync_manifest_rejects_delayed_split_artifacts(self) -> None:
+        source = (
+            ROOT / "scripts" / "step27_build_sync_manifest.py"
+        ).read_text(encoding="utf-8")
+        for namespace in (
+            'root / "valid_diagnostic"',
+            'root / "internal_test_diagnostic"',
+            'root / "statistical_audit" / "valid_gate"',
+            'root / "statistical_audit" / "final_diagnostic"',
+        ):
+            self.assertIn(namespace, source)
+        self.assertIn("post-hoc repair output illegally contains valid/test", source)
+
+    def test_sync_output_path_walker_reaches_nested_string_leaves(self) -> None:
+        self.assertEqual(
+            sync_manifest.referenced_paths(
+                {
+                    "predictions": "reports/predictions.csv",
+                    "nested": {"summary": "reports/summary.json"},
+                }
+            ),
+            ["reports/predictions.csv", "reports/summary.json"],
+        )
+
+    def test_feature_loaders_validate_current_manifest_contract(self) -> None:
+        source = inspect.getsource(training.materialize_feature_tables)
+        self.assertIn("common.assert_manifest_contract", source)
+        self.assertIn('"producer_sha256": sha256_file(feature_producer)', source)
+        self.assertIn(
+            '"shared_dependency_sha256": common.shared_dependency_hashes()',
+            source,
+        )
+        self.assertNotIn(
+            'common.load_json(real_manifest)["identity"]',
+            source,
+        )
+
+    def test_encoder_policies_and_producers_are_hash_pinned(self) -> None:
+        inputs = self.policy["inputs"]
+        contracts = (
+            ("semantic_model_policy", "semantic_model_policy_sha256"),
+            ("semantic_encoder_producer", "semantic_encoder_producer_sha256"),
+            ("identifier_redaction_policy", "identifier_redaction_policy_sha256"),
+            ("identifier_redaction_producer", "identifier_redaction_producer_sha256"),
+        )
+        for path_key, hash_key in contracts:
+            with self.subTest(path=path_key):
+                path = common.resolve(inputs[path_key])
+                self.assertEqual(common.sha256_file(path), inputs[hash_key])
+                self.assertEqual(
+                    encoding.verified_contract_input(self.policy, path_key, hash_key),
+                    path,
+                )
+
+    def test_current_step27_modules_reject_legacy_v1_policy(self) -> None:
+        legacy = common.load_json(
+            ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+        )
+        self.assertEqual(common.DEFAULT_POLICY, POLICY_PATH)
+        with self.assertRaisesRegex(ValueError, "original Git commit"):
+            common.ensure_current_runtime_policy(legacy)
+
+    def test_step12_outputs_have_a_completion_manifest(self) -> None:
+        source = (
+            ROOT / "scripts" / "step12_step27_statistical_audit.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("step12_step27_completion_manifest.json", source)
+        self.assertIn('summary["output_paths"]', source)
+        sync_source = (
+            ROOT / "scripts" / "step27_build_sync_manifest.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("expected_statistical_completion", sync_source)
 
     def test_source_dependence_controls_are_implemented_and_diagnostic_only(self) -> None:
         controls = self.policy["models"]["exploratory_controls"]

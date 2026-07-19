@@ -103,6 +103,48 @@ def grouped_oof_distinguishability(
     }
 
 
+def assert_nonzero_synthetic_feature_displacement(
+    parents_by_uid: dict[str, dict],
+    synthetic_rows: list[dict],
+    feature_names: list[str],
+    *,
+    atol: float = 1e-12,
+) -> dict:
+    changed_value_count = 0
+    changed_feature_names: set[str] = set()
+    maximum_absolute_displacement = 0.0
+    compared_value_count = 0
+    for row in synthetic_rows:
+        parent_uid = str(row.get("parent_pair_uid") or row.get("source_pair_uid") or "")
+        parent = parents_by_uid.get(parent_uid)
+        if parent is None:
+            raise ValueError(f"Step27 feature displacement parent is missing: {parent_uid}")
+        for name in feature_names:
+            try:
+                delta = abs(float(row[name]) - float(parent[name]))
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"Step27 feature displacement value is invalid: {parent_uid}:{name}"
+                ) from exc
+            compared_value_count += 1
+            maximum_absolute_displacement = max(maximum_absolute_displacement, delta)
+            if delta > atol:
+                changed_value_count += 1
+                changed_feature_names.add(name)
+    if changed_value_count == 0:
+        raise ValueError("Step27 synthetic feature displacement is zero for every input feature")
+    return {
+        "row_count": len(synthetic_rows),
+        "feature_count": len(feature_names),
+        "compared_value_count": compared_value_count,
+        "changed_value_count": changed_value_count,
+        "changed_feature_count": len(changed_feature_names),
+        "changed_feature_names": sorted(changed_feature_names),
+        "maximum_absolute_displacement": maximum_absolute_displacement,
+        "atol": atol,
+    }
+
+
 def main() -> None:
     args = parse_args()
     policy_path = step27.resolve(args.policy)
@@ -322,6 +364,22 @@ def main() -> None:
                     "maximum": max_count,
                 }
             )
+        elif (
+            policy.get("generation", {})
+            .get("recipe_contract", {})
+            .get("fail_closed_on_no_op", False)
+            and len(rows) != max_count
+        ):
+            violations.append(
+                {
+                    "audit": "complete_fail_closed_child_budget",
+                    "severity": "fatal",
+                    "seed": seed,
+                    "track": track,
+                    "observed": len(rows),
+                    "expected": max_count,
+                }
+            )
 
         parent_weights: dict[str, float] = defaultdict(float)
         recipe_by_label: dict[int, Counter[str]] = {0: Counter(), 1: Counter()}
@@ -424,6 +482,32 @@ def main() -> None:
                 }
             )
 
+        displacement_names = [source_name, *names]
+        try:
+            displacement_report = assert_nonzero_synthetic_feature_displacement(
+                real_index,
+                rows,
+                displacement_names,
+                atol=float(audit_cfg.get("minimum_feature_displacement_tolerance", 1e-12)),
+            )
+        except ValueError as exc:
+            displacement_report = {
+                "status": "fail",
+                "detail": str(exc),
+                "row_count": len(rows),
+            }
+            violations.append(
+                {
+                    "audit": "synthetic_feature_displacement",
+                    "severity": "fatal",
+                    "seed": seed,
+                    "track": track,
+                    "detail": str(exc),
+                }
+            )
+        else:
+            displacement_report["status"] = "pass"
+
         recipe_x, recipe_fields = one_hot_recipe(rows)
         recipe_report = grouped_oof_distinguishability(
             recipe_x, labels, components, fold_by_component, cfg["fold_count"]
@@ -507,6 +591,7 @@ def main() -> None:
                 "recipe_fields": recipe_fields,
                 "recipe_label_distinguishability": recipe_report,
                 "synthetic_real_distinguishability": distinguish_report,
+                "synthetic_feature_displacement": displacement_report,
             }
         )
 
@@ -526,6 +611,7 @@ def main() -> None:
             "per_parent_effective_weight_cap": parent_cap,
             "total_effective_weight_cap": total_cap,
             "distinguishability_is_component_grouped_oof": True,
+            "nonzero_synthetic_feature_displacement_required": True,
         },
         "real_train_effective_weight": real_train_weight,
         "independently_redaction_checked_synthetic_profile_count": redaction_profile_count,

@@ -11,7 +11,7 @@ import step27_train_residual_models as step27
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,11 +29,8 @@ def relative(path: Path) -> str:
 def referenced_paths(value: object) -> list[str]:
     found: list[str] = []
     if isinstance(value, dict):
-        for key, child in value.items():
-            if key == "output_paths":
-                found.extend(referenced_paths(child))
-            elif isinstance(child, (dict, list)):
-                found.extend(referenced_paths(child))
+        for child in value.values():
+            found.extend(referenced_paths(child))
     elif isinstance(value, list):
         for child in value:
             found.extend(referenced_paths(child))
@@ -55,6 +52,27 @@ def main() -> None:
     if not root.is_dir():
         raise FileNotFoundError(f"Step27 output root is missing: {root}")
 
+    repair_cfg = dict(policy.get("posthoc_source_contract_repair") or {})
+    if repair_cfg:
+        forbidden_roots = (
+            root / "valid_diagnostic",
+            root / "internal_test_diagnostic",
+            root / "statistical_audit" / "valid_gate",
+            root / "statistical_audit" / "final_diagnostic",
+        )
+        forbidden_files = [
+            path
+            for directory in forbidden_roots
+            if directory.exists()
+            for path in directory.rglob("*")
+            if path.is_file()
+        ]
+        if forbidden_files:
+            raise ValueError(
+                "Step27 post-hoc repair output illegally contains valid/test artifacts: "
+                f"{forbidden_files[0]}"
+            )
+
     final_audit = (
         root
         / "statistical_audit"
@@ -74,7 +92,9 @@ def main() -> None:
         / "step12_step27_statistical_audit.json"
     )
     selected_audit = (
-        final_audit
+        oof_audit
+        if repair_cfg
+        else final_audit
         if final_audit.is_file()
         else valid_audit
         if valid_audit.is_file()
@@ -93,6 +113,29 @@ def main() -> None:
         if payload.get("status") != expected_status or payload.get("run_id") != cfg["run_id"]:
             raise ValueError(f"Step27 stage summary status/run_id mismatch: {path}")
         loaded_summaries[path] = payload
+
+    statistical_completion_path = (
+        selected_audit.parent / "step12_step27_completion_manifest.json"
+    )
+    statistical_payloads = [
+        selected_audit.parent / "step12_step27_input_manifest.json",
+        selected_audit.parent / "step12_step27_model_metrics.csv",
+        selected_audit.parent / "step12_step27_paired_comparisons.csv",
+        selected_audit,
+    ]
+    if not statistical_completion_path.is_file():
+        raise FileNotFoundError(
+            f"Step27 statistical completion manifest is missing: {statistical_completion_path}"
+        )
+    statistical_input_manifest = step27.load_json(statistical_payloads[0])
+    expected_statistical_completion = step27.completion_manifest(
+        cfg["run_id"],
+        statistical_input_manifest["manifest_sha256"],
+        statistical_payloads,
+    )
+    step27.validate_completion_manifest(
+        statistical_completion_path, expected_statistical_completion
+    )
 
     training_manifest = step27.load_json(root / "training" / "step27_training_input_manifest.json")
     training_sha = training_manifest.get("manifest_sha256")
@@ -184,6 +227,12 @@ def main() -> None:
         "size_bytes": policy_path.stat().st_size,
         "sha256": step27.sha256_file(policy_path),
     }
+    runner_path = step27.resolve(
+        policy.get(
+            "implementation_runner",
+            "scripts/run_step27_english_pretrained_synthetic_linux_20260718.sh",
+        )
+    )
     code_paths = [
         ROOT / "scripts" / "step27_common.py",
         ROOT / "scripts" / "step27_build_parent_manifest.py",
@@ -194,7 +243,7 @@ def main() -> None:
         ROOT / "scripts" / "step27_audit_synthetic_data.py",
         ROOT / "scripts" / "step12_step27_statistical_audit.py",
         ROOT / "scripts" / "step27_build_sync_manifest.py",
-        ROOT / "scripts" / "run_step27_english_pretrained_synthetic_linux_20260718.sh",
+        runner_path,
         ROOT / "tests" / "test_step27_english_pretrained_synthetic_contracts.py",
         ROOT / "scripts" / "step15_build_v7_clean_embedding_cache.py",
         ROOT / "scripts" / "step24_common.py",
