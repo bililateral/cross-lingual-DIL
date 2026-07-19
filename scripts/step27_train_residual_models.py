@@ -1076,6 +1076,11 @@ def prediction_rows(
 ) -> list[dict]:
     output = []
     for row, score in zip(rows, scores, strict=True):
+        # Keep Python's shortest round-trip float representation. Rounding the
+        # score and threshold independently can reverse an at-threshold
+        # decision when the persisted CSV is audited later.
+        persisted_score = float(score)
+        persisted_threshold = float(threshold)
         output.append(
             {
                 "pair_uid": row_uid(row),
@@ -1086,9 +1091,9 @@ def prediction_rows(
                 "evidence_type": row.get("evidence_type", ""),
                 "model_id": model_id,
                 "seed": seed,
-                "prob_positive": round(float(score), 12),
-                "frozen_oof_threshold": round(float(threshold), 12),
-                "predicted_label": int(score >= threshold),
+                "prob_positive": persisted_score,
+                "frozen_oof_threshold": persisted_threshold,
+                "predicted_label": int(persisted_score >= persisted_threshold),
             }
         )
     return output
@@ -1128,8 +1133,8 @@ def aggregate_seed_predictions(rows: list[dict]) -> list[dict]:
                 "seed_aggregation": "per_real_pair_arithmetic_mean_across_ten_preregistered_seeds",
                 "seed_count": len(seeds),
                 "seeds_are_independent_inferential_units": "0",
-                "prob_positive": round(score, 12),
-                "frozen_oof_threshold": round(threshold, 12),
+                "prob_positive": score,
+                "frozen_oof_threshold": threshold,
                 "predicted_label": int(score >= threshold),
             }
         )

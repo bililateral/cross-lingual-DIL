@@ -565,6 +565,56 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         self.assertGreaterEqual(result["pr_auc_trapezoidal"], 0.0)
         self.assertLessEqual(result["pr_auc_trapezoidal"], 1.0)
 
+    def test_prediction_serialization_preserves_near_threshold_decisions(self) -> None:
+        threshold = 0.5000000000004
+        source_rows = [
+            {
+                "pair_uid": "unit::below",
+                "review_label": "negative",
+                "component_id": "component::below",
+                "evidence_type": "ordinary_negative",
+            },
+            {
+                "pair_uid": "unit::above",
+                "review_label": "positive",
+                "component_id": "component::above",
+                "evidence_type": "same_controller_component_anchor",
+            },
+        ]
+        records = training.prediction_rows(
+            source_rows,
+            np.asarray([0.5000000000003, 0.5000000000005]),
+            "unit_model",
+            "train_oof",
+            20260320,
+            threshold,
+        )
+        for record in records:
+            self.assertEqual(
+                int(record["predicted_label"]),
+                int(
+                    float(record["prob_positive"])
+                    >= float(record["frozen_oof_threshold"])
+                ),
+            )
+        self.assertEqual([row["predicted_label"] for row in records], [0, 1])
+        self.assertNotEqual(
+            float(records[0]["prob_positive"]),
+            float(records[0]["frozen_oof_threshold"]),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "near_threshold_predictions.csv"
+            training.write_csv_immutable(path, records)
+            persisted = training.load_csv(path)
+        for record in persisted:
+            self.assertEqual(
+                int(record["predicted_label"]),
+                int(
+                    float(record["prob_positive"])
+                    >= float(record["frozen_oof_threshold"])
+                ),
+            )
+
     def test_bootstrap_and_permutation_seeds_are_distinct(self) -> None:
         statistics = self.policy["statistics"]
         bootstrap_seed = statistics["grouped_bootstrap_seed"]
