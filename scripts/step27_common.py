@@ -620,8 +620,26 @@ def balanced_parent_select(
 
 
 def ensure_track_isolation(primary: list[dict], silver: list[dict]) -> None:
-    primary_uids = {row["pair_uid"] for row in primary}
-    silver_uids = {row["pair_uid"] for row in silver}
+    def parent_uids(rows: list[dict], track: str) -> set[str]:
+        values = [str(row.get("parent_pair_uid") or "").strip() for row in rows]
+        missing = [index for index, value in enumerate(values) if not value]
+        if missing:
+            raise ValueError(
+                f"Step27 {track} parent manifest row is missing parent_pair_uid: "
+                f"row_index={missing[0]}"
+            )
+        unique = set(values)
+        if len(unique) != len(values):
+            duplicates = sorted(
+                uid for uid, count in Counter(values).items() if count > 1
+            )
+            raise ValueError(
+                f"Step27 {track} parent track repeats a parent pair: {duplicates[0]}"
+            )
+        return unique
+
+    primary_uids = parent_uids(primary, "primary")
+    silver_uids = parent_uids(silver, "silver-sensitivity")
     overlap = sorted(primary_uids & silver_uids)
     if overlap:
         raise ValueError(f"Step27 primary/silver tracks overlap: {overlap[0]}")

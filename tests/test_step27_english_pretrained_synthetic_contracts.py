@@ -219,8 +219,10 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
                 shapes=shapes,
             ),
         )
+        selected_tracks = {}
         for arguments in tracks:
             selected = parent_builder.select_matched_track(rows, **arguments)
+            selected_tracks[arguments["track"]] = selected
             self.assertEqual(len(selected), 2 * arguments["positive_cap"])
             by_match = {}
             for row in selected:
@@ -241,6 +243,33 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
                     for matched_rows in by_match.values()
                 ),
                 0,
+            )
+        common.ensure_track_isolation(
+            selected_tracks["primary"], selected_tracks["silver_sensitivity"]
+        )
+
+    def test_parent_track_isolation_uses_parent_manifest_identity(self) -> None:
+        common.ensure_track_isolation(
+            [{"parent_pair_uid": "primary::pair"}],
+            [{"parent_pair_uid": "silver::pair"}],
+        )
+        with self.assertRaisesRegex(ValueError, "primary/silver tracks overlap"):
+            common.ensure_track_isolation(
+                [{"parent_pair_uid": "shared::pair"}],
+                [{"parent_pair_uid": "shared::pair"}],
+            )
+        with self.assertRaisesRegex(ValueError, "missing parent_pair_uid"):
+            common.ensure_track_isolation(
+                [{"pair_uid": "wrong-schema::pair"}],
+                [{"parent_pair_uid": "silver::pair"}],
+            )
+        with self.assertRaisesRegex(ValueError, "repeats a parent pair"):
+            common.ensure_track_isolation(
+                [
+                    {"parent_pair_uid": "duplicate::pair"},
+                    {"parent_pair_uid": "duplicate::pair"},
+                ],
+                [{"parent_pair_uid": "silver::pair"}],
             )
 
     def test_m1_and_m2_additions_preserve_parent_budget_metadata(self) -> None:
