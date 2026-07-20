@@ -1,0 +1,26 @@
+{
+  "_extends": "schema/step28_transferable_identity_history_v10_policy.json",
+  "version": "2026-07-20-step28-v10-guarded-unreviewed-blind-application",
+  "run_id": "step28_transferable_identity_history_v10_guarded_application_20260720",
+  "objective": "Apply the frozen v10 synthetic model only after removing every known reviewed pair UID, requiring repeated positive-only observable-state support in both synthetic train and development, and separating the internal ranking from a score-free blind evidence packet.",
+  "outputs_root": "reports/step28_transferable_identity_history/v10_guarded_application_20260720",
+  "inputs": {
+    "frozen_synthetic_model_artifacts": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_model_artifacts.json",
+    "frozen_synthetic_model_artifacts_sha256": "613680d78f23863cf29f3d97ec47556f30ac50c6e5c656bfc2c493d5ff8203af",
+    "frozen_synthetic_model_inputs": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_model_inputs.csv",
+    "frozen_synthetic_model_inputs_sha256": "a414287e0c2095f6bd101a9fb94bdbd236815fa49b4de9b7765b0fee8cc6d902",
+    "frozen_synthetic_training_summary": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_training_summary.json",
+    "frozen_synthetic_training_summary_sha256": "d67052dd160994760a5cb60ba7ea69de8d58d9a7cca11cae3ef43ae00af709db",
+    "frozen_synthetic_generation_summary": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_generation_summary.json",
+    "frozen_synthetic_generation_summary_sha256": "e17bed8390bcc1b5e7c7f0396465c300925f6b9c0cf1170301f9c5db284fe303"
+  },
+  "outputs": {
+    "real_candidate_scores": "step28_v10_guarded_real_candidate_scores.csv",
+    "prospective_review_queue": "step28_v10_guarded_internal_ranked_review_queue.csv",
+    "blind_evidence_packet": "step28_v10_guarded_blind_evidence_packet.csv",
+    "blind_adjudication_template": "step28_v10_guarded_blind_adjudication_template.csv",
+    "real_scoring_summary": "step28_v10_guarded_real_scoring_summary.json",
+    "self_audit": "step28_v10_guarded_self_audit.json",
+    "sync_manifest": "step28_v10_guarded_sync_manifest.json"
+  }
+}

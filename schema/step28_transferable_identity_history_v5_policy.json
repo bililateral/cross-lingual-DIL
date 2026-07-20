@@ -1,0 +1,42 @@
+{
+  "_extends": "schema/step28_transferable_identity_history_v4_2_policy.json",
+  "version": "2026-07-20-step28-v5-english-source-transferable-identity-history",
+  "run_id": "step28_transferable_identity_history_v5_20260720",
+  "objective": "Train identity-history residual supervision entirely from new synthetic controllers while reusing only the frozen source model's original 401 English training pairs as source-score nuisance carriers; do not open Chinese train/valid/test labels.",
+  "outputs_root": "reports/step28_transferable_identity_history/v5_20260720",
+  "inputs": {
+    "real_train_source_carriers": "reports/step24_content_independent_authorship/v1_20260717/pair_features.en_content_train_pool.csv",
+    "real_train_source_carriers_sha256": "945879433b929f04b27aaf69a91b55be8b193d4092d1a83dd8698c742f04b388",
+    "source_carrier_labels": "reports/step5_en_frozen_silver_labels.csv",
+    "source_carrier_labels_sha256": "97d2985956e463e89df23acf5c854facc3cb8f61eb0365618a5c9db478a230dd"
+  },
+  "generation": {
+    "seed": 20260724,
+    "source_carrier_partition_salt": "step28-v5-english-source-fresh-audit",
+    "source_carrier_domain": "frozen_english_source_train_401",
+    "source_carrier_expected_label_counts": {
+      "positive": 116,
+      "negative": 285
+    },
+    "source_carrier_partition_minimum_per_label": 10
+  },
+  "model": {
+    "chinese_real_identity_history_rows_used_for_fitting_or_selection": false,
+    "english_source_pairs_are_frozen_nuisance_carriers_only": true
+  },
+  "outputs": {
+    "world_truth": "step28_v5_world_truth.jsonl",
+    "synthetic_items": "step28_v5_synthetic_items.jsonl",
+    "parsed_occurrences": "step28_v5_parsed_occurrences.csv",
+    "model_inputs": "step28_v5_model_inputs.csv",
+    "generation_summary": "step28_v5_generation_summary.json",
+    "model_artifacts": "step28_v5_model_artifacts.json",
+    "synthetic_predictions": "step28_v5_synthetic_predictions.csv",
+    "training_summary": "step28_v5_training_summary.json",
+    "real_candidate_scores": "step28_v5_real_candidate_scores.csv",
+    "prospective_review_queue": "step28_v5_prospective_review_queue.csv",
+    "real_scoring_summary": "step28_v5_real_scoring_summary.json",
+    "self_audit": "step28_v5_self_audit.json",
+    "sync_manifest": "step28_v5_sync_manifest.json"
+  }
+}

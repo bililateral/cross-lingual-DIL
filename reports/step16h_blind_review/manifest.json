@@ -1,0 +1,50 @@
+{
+  "step": "step16h_prepare_blind_positive_reaudit",
+  "policy": "schema\\step16h_blind_positive_reaudit_policy.json",
+  "policy_version": "2026-07-12-step16h-label-concealed-review-v2",
+  "inputs": [
+    {
+      "path": "reports\\step16f_valid_test_positive_reaudit.csv",
+      "sha256": "39f2d8663aceaeb4a2079b23e079295c2f8d64eb2e5a9f7d0e4390c8feef4519"
+    },
+    {
+      "path": "reports\\step5_zh_target_strict_frozen_silver_labels.csv",
+      "sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee"
+    },
+    {
+      "path": "reports\\step4_zh_target_strict_silver_candidate_pairs.csv",
+      "sha256": "bafcdf0a24f4e19832858972898534ead2da05d89ec6d3f94b8cca18d0c385b8"
+    }
+  ],
+  "row_count": 160,
+  "concealed_reference_counts": {
+    "positive_candidates": 80,
+    "negative_controls": 80
+  },
+  "concealed_pair_universe_sha256": "dfb5ec11a5cc9b1e8751ff15bd57082268bf0a1368aa8d5e282c80679e0b76aa",
+  "old_decision_fields_removed": [
+    "review_label",
+    "evidence_type",
+    "paper_evidence_tier",
+    "recommended_use",
+    "confidence",
+    "needs_manual_recheck",
+    "risk_flags",
+    "rationale",
+    "reviewer_id",
+    "review_notes"
+  ],
+  "model_or_graph_score_fields_present": false,
+  "prior_label_or_conclusion_fields_present": false,
+  "raw_step4_previews_present": true,
+  "queues": {
+    "reviewer_a": {
+      "path": "reports\\step16h_blind_review\\reviewer_a_queue.csv",
+      "sha256": "dac5a77596e4f19f3aeba92e87703c7ab80188eeab50e3181300cb9eb261035a"
+    },
+    "reviewer_b": {
+      "path": "reports\\step16h_blind_review\\reviewer_b_queue.csv",
+      "sha256": "93c4fb3f6ea65bea94a90229d7d9544939e05624a257da39802a9cdc4c0a44ac"
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "generated_at_utc": "2026-07-04T04:12:29.113116+00:00",
+  "script": "scripts/step16_mine_review_candidates.py",
+  "candidate_only": true,
+  "step5_frozen_labels_modified": false,
+  "pools": [
+    "zh_target_strict",
+    "zh_target_aux"
+  ],
+  "input_files": {
+    "signals": [
+      "reports/step3_item_identity_signals.zh_target_strict.csv",
+      "reports/step3_item_identity_signals.zh_target_aux.csv"
+    ],
+    "profiles": [
+      "reports/step3_seller_profiles.zh_target_strict.jsonl",
+      "reports/step3_seller_profiles.zh_target_aux.jsonl"
+    ],
+    "pending_review_queues": [
+      "reports/step5_zh_target_strict_balanced_review_queue.csv",
+      "reports/step5_zh_target_aux_balanced_review_queue.csv"
+    ],
+    "pair_features": [
+      "reports/step7_pair_features.zh_target_strict.csv",
+      "reports/step7_pair_features.zh_target_aux.csv"
+    ]
+  },
+  "outputs": {
+    "proof_positive_candidates": "reports\\step16_proof_positive_candidate_queue.csv",
+    "positive_salvage_rereview_candidates": "reports\\step16_positive_salvage_rereview_queue.csv",
+    "hard_negative_candidates": "reports\\step16_hard_negative_candidate_queue.csv",
+    "combined_review_queue": "reports\\step16_candidate_review_queue.csv"
+  },
+  "selection_rules": {
+    "proof_positive": "shared low-frequency seller-facing direct identifier; excludes support-only, product/victim-data risk, external URL, and already reviewed pairs",
+    "hard_negative": "pending Step 5 hard cases plus shared support-only/product-data/non-seller identity-like signals; requires manual review before any label use"
+  },
+  "proof_positive": {
+    "row_count": 0,
+    "candidate_subtype_counts": {},
+    "data_bucket_counts": {}
+  },
+  "proof_positive_diagnostics": {
+    "direct_eligible_signal_count": 1979,
+    "direct_eligible_group_count": 1264,
+    "shared_direct_identifier_group_count": 44,
+    "skipped_high_frequency_group_count": 0,
+    "candidate_pair_count_before_review_filter": 50,
+    "skipped_reviewed_pair_count": 50,
+    "candidate_pair_count_after_review_filter": 0,
+    "max_proof_frequency": 8
+  },
+  "positive_salvage": {
+    "row_count": 0,
+    "candidate_subtype_counts": {},
+    "data_bucket_counts": {}
+  },
+  "positive_salvage_diagnostics": {
+    "candidate_pair_count_from_shared_direct_identifier_groups": 50,
+    "existing_positive_pair_count": 40,
+    "positive_salvage_candidate_count": 0,
+    "existing_label_counts": {},
+    "skipped_high_frequency_group_count": 0,
+    "max_frequency": 8
+  },
+  "hard_negative": {
+    "row_count": 816,
+    "candidate_subtype_counts": {
+      "public_or_support_identifier_noise_candidate": 122,
+      "semantic_topic_not_controller_candidate": 166,
+      "template_clone_not_controller_candidate": 528
+    },
+    "data_bucket_counts": {
+      "zh_target_aux": 62,
+      "zh_target_strict": 754
+    }
+  },
+  "combined": {
+    "row_count": 816,
+    "candidate_subtype_counts": {
+      "public_or_support_identifier_noise_candidate": 122,
+      "semantic_topic_not_controller_candidate": 166,
+      "template_clone_not_controller_candidate": 528
+    },
+    "data_bucket_counts": {
+      "zh_target_aux": 62,
+      "zh_target_strict": 754
+    }
+  }
+}

@@ -33,7 +33,7 @@
     "primary_threshold_diagnostics": null
   },
   "selected_scorer": {
-    "default_scorer_family": "auto",
+    "default_scorer_family": "step15",
     "default_step7_experiment_name": "core_zero_shot_bge_m3",
     "default_step9_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
     "default_step9_calibration_experiment_name": "core_calibrated_default",
@@ -153,6 +153,7 @@
       "step7": {
         "config": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "exclude_experiment_prefixes": [
             "identifier_augmented_",
             "en_only_"
@@ -177,10 +178,10 @@
             "source_ratio_token": null,
             "source_seed": null,
             "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.623529,
+            "primary_metric": 0.7688,
             "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.287652,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.572269,
+              "zh_zero_shot_test_metrics.average_precision": 0.514122,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.603333,
               "trained_iteration_count": 54.0
             },
             "best_iteration": 54,
@@ -196,34 +197,15 @@
             "source_ratio_token": null,
             "source_seed": null,
             "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.604482,
+            "primary_metric": 0.662133,
             "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.366364,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.52465,
+              "zh_zero_shot_test_metrics.average_precision": 0.461304,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.573333,
               "trained_iteration_count": 47.0
             },
             "best_iteration": 47,
             "trained_iteration_count": 47,
             "selected_threshold": 0.304893
-          },
-          {
-            "scorer_family": "step7",
-            "scorer_token": "core_zero_shot_paraphrase_multilingual_mpnet",
-            "source_experiment_name": "core_zero_shot_paraphrase_multilingual_mpnet",
-            "source_run_key": null,
-            "source_ratio": null,
-            "source_ratio_token": null,
-            "source_seed": null,
-            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.557983,
-            "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.387651,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.596359,
-              "trained_iteration_count": 69.0
-            },
-            "best_iteration": 69,
-            "trained_iteration_count": 69,
-            "selected_threshold": 0.127958
           },
           {
             "scorer_family": "step7",
@@ -234,34 +216,15 @@
             "source_ratio_token": null,
             "source_seed": null,
             "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.54958,
+            "primary_metric": 0.6222,
             "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.384533,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.578711,
+              "zh_zero_shot_test_metrics.average_precision": 0.459369,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.593333,
               "trained_iteration_count": 65.0
             },
             "best_iteration": 65,
             "trained_iteration_count": 65,
             "selected_threshold": 0.086316
-          },
-          {
-            "scorer_family": "step7",
-            "scorer_token": "core_zero_shot_default_no_semantics",
-            "source_experiment_name": "core_zero_shot_default_no_semantics",
-            "source_run_key": null,
-            "source_ratio": null,
-            "source_ratio_token": null,
-            "source_seed": null,
-            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.535574,
-            "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.365896,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.527731,
-              "trained_iteration_count": 11.0
-            },
-            "best_iteration": 11,
-            "trained_iteration_count": 11,
-            "selected_threshold": 0.301678
           },
           {
             "scorer_family": "step7",
@@ -272,21 +235,60 @@
             "source_ratio_token": null,
             "source_seed": null,
             "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
-            "primary_metric": 0.503641,
+            "primary_metric": 0.617467,
             "secondary_metrics": {
-              "zh_zero_shot_test_metrics.average_precision": 0.325214,
-              "zh_zero_shot_test_metrics.balanced_accuracy": 0.513165,
+              "zh_zero_shot_test_metrics.average_precision": 0.439527,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.576667,
               "trained_iteration_count": 57.0
             },
             "best_iteration": 57,
             "trained_iteration_count": 57,
             "selected_threshold": 0.07812
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_paraphrase_multilingual_mpnet",
+            "source_experiment_name": "core_zero_shot_paraphrase_multilingual_mpnet",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.6092,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.465088,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.606667,
+              "trained_iteration_count": 69.0
+            },
+            "best_iteration": 69,
+            "trained_iteration_count": 69,
+            "selected_threshold": 0.127958
+          },
+          {
+            "scorer_family": "step7",
+            "scorer_token": "core_zero_shot_default_no_semantics",
+            "source_experiment_name": "core_zero_shot_default_no_semantics",
+            "source_run_key": null,
+            "source_ratio": null,
+            "source_ratio_token": null,
+            "source_seed": null,
+            "primary_metric_path": "zh_zero_shot_test_metrics.roc_auc",
+            "primary_metric": 0.572933,
+            "secondary_metrics": {
+              "zh_zero_shot_test_metrics.average_precision": 0.438842,
+              "zh_zero_shot_test_metrics.balanced_accuracy": 0.556667,
+              "trained_iteration_count": 11.0
+            },
+            "best_iteration": 11,
+            "trained_iteration_count": 11,
+            "selected_threshold": 0.301678
           }
         ]
       },
       "step9": {
         "config": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "include_experiment_prefixes": [
             "core_few_shot_multilingual_e5_large_lr_l2",
             "core_few_shot_bge_m3_residual_lr",
@@ -344,97 +346,29 @@
         "candidates": [
           {
             "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-            "source_run_key": "100pct_seed_20260320",
-            "source_ratio": 1.0,
-            "source_ratio_token": "100pct",
-            "source_seed": 20260320,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.844818,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.593742,
-              "zh_test_metrics.balanced_accuracy": 0.62521,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.720543,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.84183,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.587521,
-              "zh_test_metrics.balanced_accuracy.mean": 0.615219
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-            "source_run_key": "100pct_seed_20260321",
-            "source_ratio": 1.0,
-            "source_ratio_token": "100pct",
-            "source_seed": 20260321,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.841457,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.589403,
-              "zh_test_metrics.balanced_accuracy": 0.613165,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.792627,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.84183,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.587521,
-              "zh_test_metrics.balanced_accuracy.mean": 0.615219
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
             "source_run_key": "100pct_seed_20260322",
             "source_ratio": 1.0,
             "source_ratio_token": "100pct",
             "source_seed": 20260322,
             "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.839216,
+            "primary_metric": 0.817067,
             "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.579418,
-              "zh_test_metrics.balanced_accuracy": 0.607283,
+              "zh_test_metrics.average_precision": 0.599046,
+              "zh_test_metrics.balanced_accuracy": 0.706667,
               "best_iteration": 8.0
             },
             "best_iteration": 8,
             "trained_iteration_count": 8,
-            "selected_threshold": 0.720528,
+            "selected_threshold": 0.385634,
             "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.84183,
+            "ratio_aggregate_primary_metric_mean": 0.817067,
             "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.587521,
-              "zh_test_metrics.balanced_accuracy.mean": 0.615219
+              "zh_test_metrics.average_precision.mean": 0.599046,
+              "zh_test_metrics.balanced_accuracy.mean": 0.7
             },
-            "zh_test_row_count": 106,
+            "zh_test_row_count": 200,
             "suspicious_perfect_small_test": false,
             "training_backend": "logistic_regression_l2",
             "scoring_backend": "logistic_regression_l2",
@@ -446,29 +380,29 @@
           },
           {
             "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260320",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-            "source_run_key": "50pct_seed_20260320",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "100pct_seed_20260320",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
             "source_seed": 20260320,
             "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.831373,
+            "primary_metric": 0.817067,
             "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.558135,
-              "zh_test_metrics.balanced_accuracy": 0.607283,
+              "zh_test_metrics.average_precision": 0.599046,
+              "zh_test_metrics.balanced_accuracy": 0.696667,
               "best_iteration": 8.0
             },
             "best_iteration": 8,
             "trained_iteration_count": 8,
-            "selected_threshold": 0.663659,
+            "selected_threshold": 0.381627,
             "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.824276,
+            "ratio_aggregate_primary_metric_mean": 0.817067,
             "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.548972,
-              "zh_test_metrics.balanced_accuracy.mean": 0.59944
+              "zh_test_metrics.average_precision.mean": 0.599046,
+              "zh_test_metrics.balanced_accuracy.mean": 0.7
             },
-            "zh_test_row_count": 106,
+            "zh_test_row_count": 200,
             "suspicious_perfect_small_test": false,
             "training_backend": "logistic_regression_l2",
             "scoring_backend": "logistic_regression_l2",
@@ -480,202 +414,32 @@
           },
           {
             "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260321",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-            "source_run_key": "50pct_seed_20260321",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
-            "source_seed": 20260321,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.82521,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.557788,
-              "zh_test_metrics.balanced_accuracy": 0.595518,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.666773,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.824276,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.548972,
-              "zh_test_metrics.balanced_accuracy.mean": 0.59944
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_50pct_seed_20260322",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
-            "source_run_key": "50pct_seed_20260322",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
-            "source_seed": 20260322,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.816246,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.530994,
-              "zh_test_metrics.balanced_accuracy": 0.595518,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.62038,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.824276,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.548972,
-              "zh_test_metrics.balanced_accuracy.mean": 0.59944
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260321",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
-            "source_run_key": "50pct_seed_20260321",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
-            "source_seed": 20260321,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.82465,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.541473,
-              "zh_test_metrics.balanced_accuracy": 0.583473,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.566787,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.818488,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.538712,
-              "zh_test_metrics.balanced_accuracy.mean": 0.587395
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260320",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
-            "source_run_key": "50pct_seed_20260320",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
-            "source_seed": 20260320,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.819048,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.540482,
-              "zh_test_metrics.balanced_accuracy": 0.589356,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.586845,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.818488,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.538712,
-              "zh_test_metrics.balanced_accuracy.mean": 0.587395
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct_seed_20260322",
-            "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2",
-            "source_run_key": "50pct_seed_20260322",
-            "source_ratio": 0.5,
-            "source_ratio_token": "50pct",
-            "source_seed": 20260322,
-            "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.811765,
-            "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.53418,
-              "zh_test_metrics.balanced_accuracy": 0.589356,
-              "best_iteration": 8.0
-            },
-            "best_iteration": 8,
-            "trained_iteration_count": 8,
-            "selected_threshold": 0.584435,
-            "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.818488,
-            "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.538712,
-              "zh_test_metrics.balanced_accuracy.mean": 0.587395
-            },
-            "zh_test_row_count": 106,
-            "suspicious_perfect_small_test": false,
-            "training_backend": "logistic_regression_l2",
-            "scoring_backend": "logistic_regression_l2",
-            "iteration_filter": {
-              "min_best_iteration": 0,
-              "min_trained_iteration_count": 0,
-              "iteration_role": "logistic_solver_iteration"
-            }
-          },
-          {
-            "scorer_family": "step9",
-            "scorer_token": "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260321",
-            "source_experiment_name": "core_few_shot_bge_m3_residual_lr",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
             "source_run_key": "100pct_seed_20260321",
             "source_ratio": 1.0,
             "source_ratio_token": "100pct",
             "source_seed": 20260321,
             "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.817367,
+            "primary_metric": 0.817067,
             "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.515857,
-              "zh_test_metrics.balanced_accuracy": 0.595798,
-              "best_iteration": 7.0
+              "zh_test_metrics.average_precision": 0.599046,
+              "zh_test_metrics.balanced_accuracy": 0.696667,
+              "best_iteration": 8.0
             },
-            "best_iteration": 7,
-            "trained_iteration_count": 7,
-            "selected_threshold": 0.759046,
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.382055,
             "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_primary_metric_mean": 0.817067,
             "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.515857,
-              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+              "zh_test_metrics.average_precision.mean": 0.599046,
+              "zh_test_metrics.balanced_accuracy.mean": 0.7
             },
-            "zh_test_row_count": 106,
+            "zh_test_row_count": 200,
             "suspicious_perfect_small_test": false,
-            "training_backend": "residual_logistic",
-            "scoring_backend": "residual_logistic",
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
             "iteration_filter": {
               "min_best_iteration": 0,
               "min_trained_iteration_count": 0,
@@ -691,22 +455,56 @@
             "source_ratio_token": "100pct",
             "source_seed": 20260320,
             "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.817367,
+            "primary_metric": 0.8136,
             "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.515857,
-              "zh_test_metrics.balanced_accuracy": 0.589916,
+              "zh_test_metrics.average_precision": 0.580426,
+              "zh_test_metrics.balanced_accuracy": 0.7,
               "best_iteration": 7.0
             },
             "best_iteration": 7,
             "trained_iteration_count": 7,
-            "selected_threshold": 0.735461,
+            "selected_threshold": 0.518096,
             "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_primary_metric_mean": 0.8136,
             "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.515857,
-              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+              "zh_test_metrics.average_precision.mean": 0.580426,
+              "zh_test_metrics.balanced_accuracy.mean": 0.697778
             },
-            "zh_test_row_count": 106,
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "residual_logistic",
+            "scoring_backend": "residual_logistic",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_bge_m3_residual_lr_ratio_100pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_bge_m3_residual_lr",
+            "source_run_key": "100pct_seed_20260321",
+            "source_ratio": 1.0,
+            "source_ratio_token": "100pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.8136,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.580426,
+              "zh_test_metrics.balanced_accuracy": 0.7,
+              "best_iteration": 7.0
+            },
+            "best_iteration": 7,
+            "trained_iteration_count": 7,
+            "selected_threshold": 0.523354,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.8136,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.580426,
+              "zh_test_metrics.balanced_accuracy.mean": 0.697778
+            },
+            "zh_test_row_count": 200,
             "suspicious_perfect_small_test": false,
             "training_backend": "residual_logistic",
             "scoring_backend": "residual_logistic",
@@ -725,25 +523,229 @@
             "source_ratio_token": "100pct",
             "source_seed": 20260322,
             "primary_metric_path": "zh_test_metrics.roc_auc",
-            "primary_metric": 0.817367,
+            "primary_metric": 0.8136,
             "secondary_metrics": {
-              "zh_test_metrics.average_precision": 0.515857,
-              "zh_test_metrics.balanced_accuracy": 0.589916,
+              "zh_test_metrics.average_precision": 0.580426,
+              "zh_test_metrics.balanced_accuracy": 0.693333,
               "best_iteration": 7.0
             },
             "best_iteration": 7,
             "trained_iteration_count": 7,
-            "selected_threshold": 0.735461,
+            "selected_threshold": 0.534196,
             "low_ratio_guard_triggered": false,
-            "ratio_aggregate_primary_metric_mean": 0.817367,
+            "ratio_aggregate_primary_metric_mean": 0.8136,
             "ratio_aggregate_secondary_metrics": {
-              "zh_test_metrics.average_precision.mean": 0.515857,
-              "zh_test_metrics.balanced_accuracy.mean": 0.591877
+              "zh_test_metrics.average_precision.mean": 0.580426,
+              "zh_test_metrics.balanced_accuracy.mean": 0.697778
             },
-            "zh_test_row_count": 106,
+            "zh_test_row_count": 200,
             "suspicious_perfect_small_test": false,
             "training_backend": "residual_logistic",
             "scoring_backend": "residual_logistic",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_50pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "50pct_seed_20260321",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.7948,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.607544,
+              "zh_test_metrics.balanced_accuracy": 0.72,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.339529,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.7908,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.603365,
+              "zh_test_metrics.balanced_accuracy.mean": 0.712222
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_50pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "50pct_seed_20260322",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.790667,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.604515,
+              "zh_test_metrics.balanced_accuracy": 0.71,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.358769,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.7908,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.603365,
+              "zh_test_metrics.balanced_accuracy.mean": 0.712222
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_50pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "50pct_seed_20260320",
+            "source_ratio": 0.5,
+            "source_ratio_token": "50pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.786933,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.598035,
+              "zh_test_metrics.balanced_accuracy": 0.706667,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.347181,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.7908,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.603365,
+              "zh_test_metrics.balanced_accuracy.mean": 0.712222
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_20pct_seed_20260321",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "20pct_seed_20260321",
+            "source_ratio": 0.2,
+            "source_ratio_token": "20pct",
+            "source_seed": 20260321,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.792267,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.571258,
+              "zh_test_metrics.balanced_accuracy": 0.683333,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.351089,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.776222,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.551225,
+              "zh_test_metrics.balanced_accuracy.mean": 0.683333
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_20pct_seed_20260320",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "20pct_seed_20260320",
+            "source_ratio": 0.2,
+            "source_ratio_token": "20pct",
+            "source_seed": 20260320,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.78,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.544333,
+              "zh_test_metrics.balanced_accuracy": 0.68,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.331322,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.776222,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.551225,
+              "zh_test_metrics.balanced_accuracy.mean": 0.683333
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
+            "iteration_filter": {
+              "min_best_iteration": 0,
+              "min_trained_iteration_count": 0,
+              "iteration_role": "logistic_solver_iteration"
+            }
+          },
+          {
+            "scorer_family": "step9",
+            "scorer_token": "core_few_shot_labse_lr_l2_ratio_20pct_seed_20260322",
+            "source_experiment_name": "core_few_shot_labse_lr_l2",
+            "source_run_key": "20pct_seed_20260322",
+            "source_ratio": 0.2,
+            "source_ratio_token": "20pct",
+            "source_seed": 20260322,
+            "primary_metric_path": "zh_test_metrics.roc_auc",
+            "primary_metric": 0.7564,
+            "secondary_metrics": {
+              "zh_test_metrics.average_precision": 0.538083,
+              "zh_test_metrics.balanced_accuracy": 0.686667,
+              "best_iteration": 8.0
+            },
+            "best_iteration": 8,
+            "trained_iteration_count": 8,
+            "selected_threshold": 0.233118,
+            "low_ratio_guard_triggered": false,
+            "ratio_aggregate_primary_metric_mean": 0.776222,
+            "ratio_aggregate_secondary_metrics": {
+              "zh_test_metrics.average_precision.mean": 0.551225,
+              "zh_test_metrics.balanced_accuracy.mean": 0.683333
+            },
+            "zh_test_row_count": 200,
+            "suspicious_perfect_small_test": false,
+            "training_backend": "logistic_regression_l2",
+            "scoring_backend": "logistic_regression_l2",
             "iteration_filter": {
               "min_best_iteration": 0,
               "min_trained_iteration_count": 0,
@@ -755,6 +757,7 @@
       "step9_calibration": {
         "config": {
           "clean_only": true,
+          "metric_role": "held_out_test_diagnostic_not_model_selection",
           "include_experiment_prefixes": [
             "__disabled_for_current_mainline__"
           ],
@@ -774,29 +777,29 @@
     },
     "best_overall": {
       "scorer_family": "step9",
-      "scorer_token": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320",
-      "source_experiment_name": "core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup",
+      "scorer_token": "core_few_shot_labse_lr_l2_ratio_100pct_seed_20260320",
+      "source_experiment_name": "core_few_shot_labse_lr_l2",
       "source_run_key": "100pct_seed_20260320",
       "source_ratio": 1.0,
       "source_ratio_token": "100pct",
       "source_seed": 20260320,
       "primary_metric_path": "zh_test_metrics.roc_auc",
-      "primary_metric": 0.844818,
+      "primary_metric": 0.817067,
       "secondary_metrics": {
-        "zh_test_metrics.average_precision": 0.593742,
-        "zh_test_metrics.balanced_accuracy": 0.62521,
+        "zh_test_metrics.average_precision": 0.599046,
+        "zh_test_metrics.balanced_accuracy": 0.696667,
         "best_iteration": 8.0
       },
       "best_iteration": 8,
       "trained_iteration_count": 8,
-      "selected_threshold": 0.720543,
+      "selected_threshold": 0.381627,
       "low_ratio_guard_triggered": false,
-      "ratio_aggregate_primary_metric_mean": 0.84183,
+      "ratio_aggregate_primary_metric_mean": 0.817067,
       "ratio_aggregate_secondary_metrics": {
-        "zh_test_metrics.average_precision.mean": 0.587521,
-        "zh_test_metrics.balanced_accuracy.mean": 0.615219
+        "zh_test_metrics.average_precision.mean": 0.599046,
+        "zh_test_metrics.balanced_accuracy.mean": 0.7
       },
-      "zh_test_row_count": 106,
+      "zh_test_row_count": 200,
       "suspicious_perfect_small_test": false,
       "training_backend": "logistic_regression_l2",
       "scoring_backend": "logistic_regression_l2",

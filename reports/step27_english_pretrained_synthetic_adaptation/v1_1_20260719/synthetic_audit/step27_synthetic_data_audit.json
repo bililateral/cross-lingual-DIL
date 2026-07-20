@@ -1,0 +1,952 @@
+{
+  "status": "pass",
+  "run_id": "v1_1_20260719",
+  "input_manifest_sha256": "fa2f129f70140adc1c95e90688c529c09a4f40a22240a76e25e7915d995db384",
+  "pair_feature_bundle_sha256": "32d26c209ea84e825f6eef6c7ea1bd03fd40b3058d5e1b5e7f808c8da5c5de08",
+  "scientific_contract": {
+    "synthetic_rows_are_train_only": true,
+    "children_inherit_parent_component_and_fold": true,
+    "recipe_label_roc_auc_maximum": 0.6,
+    "synthetic_real_roc_auc_maximum": 0.7,
+    "per_parent_effective_weight_cap": 0.5,
+    "total_effective_weight_cap": 0.25,
+    "distinguishability_is_component_grouped_oof": true,
+    "nonzero_synthetic_feature_displacement_required": true
+  },
+  "real_train_effective_weight": 303.8699999999999,
+  "independently_redaction_checked_synthetic_profile_count": 3520,
+  "group_reports": [
+    {
+      "seed": 20260320,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.48974609375,
+        "average_precision": 0.538008259831242
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 90,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.031524360180000044,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260320,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5682397959183674,
+        "average_precision": 0.5541737811965474
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.04330861568399991,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260321,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.51708984375,
+        "average_precision": 0.5517040007504557
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 92,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.034181177616000036,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260321,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5574776785714286,
+        "average_precision": 0.5792921125093048
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.037019789218999954,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260322,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.4990234375,
+        "average_precision": 0.5435224308090797
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 92,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.06153434515,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260322,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5378667091836735,
+        "average_precision": 0.5490942423531139
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.05235433578499993,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260323,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.5146484375,
+        "average_precision": 0.5494139784917847
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 93,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.035944819450000054,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260323,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5314891581632653,
+        "average_precision": 0.5572392378954655
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.05235433578499993,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260324,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.4951171875,
+        "average_precision": 0.5394689087296022
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 92,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.03821462392800001,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260324,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.49880420918367346,
+        "average_precision": 0.5163004551916621
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.06034791469599998,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260325,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.50439453125,
+        "average_precision": 0.5151471210513401
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 92,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.031524360180000044,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260325,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5313297193877551,
+        "average_precision": 0.5445924582731414
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.05204820632999996,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260326,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.50634765625,
+        "average_precision": 0.523546891181401
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 91,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.031524360180000044,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260326,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5500637755102041,
+        "average_precision": 0.5692346334291274
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.05204820632999996,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260327,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.46728515625,
+        "average_precision": 0.5250947872071052
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 91,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.03623688220999999,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260327,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5133928571428571,
+        "average_precision": 0.515488049849425
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.049737930298,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260328,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.51025390625,
+        "average_precision": 0.5448381155373975
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 93,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.031524360180000044,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260328,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5511001275510204,
+        "average_precision": 0.5881434184826714
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.04690086841600005,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260329,
+      "track": "primary",
+      "row_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "parent_count": 32,
+      "duplication_row_count": 64,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 16.0,
+      "effective_weight_relative_to_real_train": 0.05265409550136573,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "recipe=segment_order_permutation_with_layout_normalization",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 64,
+        "component_count": 20,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 128,
+        "component_count": 20,
+        "roc_auc": 0.4873046875,
+        "average_precision": 0.5057474133506792
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 64,
+        "feature_count": 9,
+        "compared_value_count": 576,
+        "changed_value_count": 92,
+        "changed_feature_count": 3,
+        "changed_feature_names": [
+          "clean_char3_jaccard",
+          "clean_text_length_gap_ratio",
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.031524360180000044,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    },
+    {
+      "seed": 20260329,
+      "track": "silver_sensitivity",
+      "row_count": 112,
+      "positive_count": 56,
+      "negative_count": 56,
+      "parent_count": 112,
+      "duplication_row_count": 112,
+      "M1_M2_budget_multiset_equal": true,
+      "effective_weight": 19.274999999999988,
+      "effective_weight_relative_to_real_train": 0.0634317306743015,
+      "recipe_fields": [
+        "recipe=section_order_rotation",
+        "changed_side_count",
+        "synthetic_segment_count",
+        "synthetic_text_length"
+      ],
+      "recipe_label_distinguishability": {
+        "status": "estimated",
+        "row_count": 112,
+        "component_count": 64,
+        "roc_auc": 0.5,
+        "average_precision": 0.5
+      },
+      "synthetic_real_distinguishability": {
+        "status": "estimated",
+        "row_count": 224,
+        "component_count": 64,
+        "roc_auc": 0.5546077806122449,
+        "average_precision": 0.5630252220194758
+      },
+      "synthetic_feature_displacement": {
+        "row_count": 112,
+        "feature_count": 9,
+        "compared_value_count": 1008,
+        "changed_value_count": 112,
+        "changed_feature_count": 1,
+        "changed_feature_names": [
+          "identifier_redacted_e5_cosine"
+        ],
+        "maximum_absolute_displacement": 0.04523223638500007,
+        "atol": 1e-12,
+        "status": "pass"
+      }
+    }
+  ],
+  "fatal_violation_count": 0,
+  "violations": []
+}

@@ -1,0 +1,172 @@
+{
+  "step": "step27_build_pair_features:synthetic",
+  "identity": {
+    "stage": "step27_build_pair_features:synthetic",
+    "seed": 20260328,
+    "track": "silver_sensitivity",
+    "policy_sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74",
+    "producer_sha256": "a683184a0a1359baecf11450fc00ae32e2de9c64ba2bd12827658ad7d3cf6890",
+    "common_sha256": "7c734c9eb9f42edd6ae67073b0fa2b8dbfe08a8e7800099de95f54fb4f19947d",
+    "shared_dependency_sha256": {
+      "scripts/step15_build_v7_clean_embedding_cache.py": "eec19e6f0569be419a7fec0ed78b9cceb0ee26bb71856e54bcb8baec7e7e5469",
+      "scripts/step24_common.py": "edf8f1e393fe1ea2fb2cb8211b1113ec6e882781146af7f06715610db3f5a825"
+    },
+    "inputs": [
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/clean_profiles.jsonl",
+        "size_bytes": 5881037,
+        "sha256": "c4ce6aed1a76e59a20b536ded3049a58e0d8dc27b9f61eaf344d962f30cd44e3"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.json",
+        "size_bytes": 73906,
+        "sha256": "fab3d29e1219e0797973613f39d0ed214d930361e1e5862d25e3dd9c663851ae"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.npy",
+        "size_bytes": 4567168,
+        "sha256": "67775341c3139d85ec7ab4c8e799f9ef36fadbd21f7f923d1c3a78ea5ee47365"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/manifest.json",
+        "size_bytes": 10338,
+        "sha256": "8623e2f2bdae8434334828317f2996b6dba08a1299e71594d5253b936806827a"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/generation_manifest.json",
+        "size_bytes": 5814,
+        "sha256": "4aab814fe8e778c0f6941b5d6230e6774268bd8715d3f9886e267ba76ba14f1d"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/clean_profiles.jsonl",
+        "size_bytes": 2416914,
+        "sha256": "9c8690a25c28b71c2391581b0c0aacea8bf4bc83ab6239a7b44b5fe2b063f8f3"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/identifier_redacted_e5.json",
+        "size_bytes": 27320,
+        "sha256": "6d9b7f290ef6e97348232ea5740f7a3067dbfb2be035a7f5b7414a00b0fd9a37"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/identifier_redacted_e5.npy",
+        "size_bytes": 917632,
+        "sha256": "e3c90895382ef8b7706e2a311e5d5c13d680971bb9e18d13dc79dc8d4d1a8d30"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/manifest.json",
+        "size_bytes": 5403,
+        "sha256": "3cbe60288c18051a2921faa72a50dea26f57cce380a286a5ba25e978795c5cc5"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/equal_weight_duplication_pairs.csv",
+        "size_bytes": 62376,
+        "sha256": "2b6e798584001251954317dd3a10309d433f5c185bf88ff5da1b87e0d36d0bf1"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/synthetic_pairs.csv",
+        "size_bytes": 83266,
+        "sha256": "7e1b10633a4faeb296ad7cc68f5b11a67d1e80f3ef4af2b8d3f54c19b773e6ea"
+      },
+      {
+        "path": "schema/step27_v1_1_exact_replay_policy.json",
+        "size_bytes": 29767,
+        "sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74"
+      }
+    ],
+    "feature_names": [
+      "identifier_redacted_e5_cosine",
+      "clean_token_jaccard",
+      "clean_char3_jaccard",
+      "clean_title_token_jaccard",
+      "clean_description_token_jaccard",
+      "clean_category_token_jaccard",
+      "clean_text_length_gap_ratio",
+      "clean_segment_count_gap_ratio",
+      "clean_field_presence_match_fraction"
+    ],
+    "parent_pair_features_copied": false
+  },
+  "identity_sha256": "689a3e383726d143df4ac03f029e5bf6fc9a7190ef7210de485b873bf99eda8a",
+  "inputs": [
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/clean_profiles.jsonl",
+      "size_bytes": 5881037,
+      "sha256": "c4ce6aed1a76e59a20b536ded3049a58e0d8dc27b9f61eaf344d962f30cd44e3"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.json",
+      "size_bytes": 73906,
+      "sha256": "fab3d29e1219e0797973613f39d0ed214d930361e1e5862d25e3dd9c663851ae"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.npy",
+      "size_bytes": 4567168,
+      "sha256": "67775341c3139d85ec7ab4c8e799f9ef36fadbd21f7f923d1c3a78ea5ee47365"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/manifest.json",
+      "size_bytes": 10338,
+      "sha256": "8623e2f2bdae8434334828317f2996b6dba08a1299e71594d5253b936806827a"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/generation_manifest.json",
+      "size_bytes": 5814,
+      "sha256": "4aab814fe8e778c0f6941b5d6230e6774268bd8715d3f9886e267ba76ba14f1d"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/clean_profiles.jsonl",
+      "size_bytes": 2416914,
+      "sha256": "9c8690a25c28b71c2391581b0c0aacea8bf4bc83ab6239a7b44b5fe2b063f8f3"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/identifier_redacted_e5.json",
+      "size_bytes": 27320,
+      "sha256": "6d9b7f290ef6e97348232ea5740f7a3067dbfb2be035a7f5b7414a00b0fd9a37"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/identifier_redacted_e5.npy",
+      "size_bytes": 917632,
+      "sha256": "e3c90895382ef8b7706e2a311e5d5c13d680971bb9e18d13dc79dc8d4d1a8d30"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/embeddings/manifest.json",
+      "size_bytes": 5403,
+      "sha256": "3cbe60288c18051a2921faa72a50dea26f57cce380a286a5ba25e978795c5cc5"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/equal_weight_duplication_pairs.csv",
+      "size_bytes": 62376,
+      "sha256": "2b6e798584001251954317dd3a10309d433f5c185bf88ff5da1b87e0d36d0bf1"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/synthetic_pairs.csv",
+      "size_bytes": 83266,
+      "sha256": "7e1b10633a4faeb296ad7cc68f5b11a67d1e80f3ef4af2b8d3f54c19b773e6ea"
+    },
+    {
+      "path": "schema/step27_v1_1_exact_replay_policy.json",
+      "size_bytes": 29767,
+      "sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/pair_features/equal_weight_duplication_pair_features.csv",
+      "size_bytes": 77323,
+      "sha256": "27bc697a93fb12b6f2434603fa5f7a402f99e9198706f81d2f88f3e10ec1961f"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/pair_features/summary.json",
+      "size_bytes": 1461,
+      "sha256": "99db30e61554c99fea5b5e6e46f72715e4e3067b62646791442b2f103efef85d"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260328/silver_sensitivity/pair_features/synthetic_pair_features.csv",
+      "size_bytes": 98997,
+      "sha256": "b3f4ed05da956c7016031b05344a5705ef7cebb5bc1cb9ad1f8ffae99e5b4787"
+    }
+  ],
+  "row_count": 112,
+  "summary_sha256": "99db30e61554c99fea5b5e6e46f72715e4e3067b62646791442b2f103efef85d",
+  "manifest_content_sha256": "69006614d41d50d63cb29b06c75703f65c6297af3716cdd81990b509098c3c2b"
+}

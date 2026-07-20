@@ -2,6 +2,8 @@
 
 更新时间：2026-07-19
 
+> **2026-07-20 后续事实更新**：Step28 最终复核已撤销 v5、v6/v6.1 和 v11。v11 的阻断问题是使用 audit 标签删除 49 个冲突状态、把模型识别与后置保护层弃权混为一种“通过”，并保留 3 个全零特征。当前有效阶段必须分开表述：v12 是同一预定义合成生成器家族内的修正复现实验；v12.1 只是冻结 v12 后的独立现有数据应用。v12 主审计保留全部 1,280 行并让 842 个状态各占总权重 1，完整历史 AUC/AP 为 `0.749634/0.767197`，相对直接历史 AP 增益 `+0.073928`，199 次分块置乱均值 `0.498092`、经验 `p=0.005`。它不证明真实准确率或所有未见状态泛化。v12.1 排除全部 `1,259` 个历史已审核 pair UID 后评分 `2,689` 条未审核候选；`101` 条非零修正全部为负，正修正和盲审队列均为 `0`。该空结果与 v12 合成通过互不混淆。当前结论为 `PASS_SYNTHETIC_REPLICATION_REAL_APPLICATION_ABSTENTION`。详见 `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`。本轮用户明确授权无 GPU 的 Step28 CPU 实验在 Windows 执行，因此下文 Windows/Linux常规职责边界对本轮被该明确授权覆盖；其他需要模型编码或 GPU 的实验仍遵守原边界。
+
 当前分支：`method/step27-english-pretrained-synthetic-adaptation`
 
 Step27-v1.1 实现基线提交：`ff4bc04 Repair Step27 frozen-source replay contracts`

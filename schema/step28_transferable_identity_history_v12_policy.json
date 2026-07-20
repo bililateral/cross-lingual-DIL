@@ -1,0 +1,500 @@
+{
+  "version": "2026-07-20-step28-v12-audit-label-safe-state-weighted-layered-gates",
+  "step": 28,
+  "run_id": "step28_transferable_identity_history_v12_20260720",
+  "objective": "Post-audit corrected synthetic replication: retain every audit row, give each observable state total weight one, separate model-discrimination gates from production-guard abstention gates, remove dead features, and make no claim of real-world accuracy or universal unseen-state generalization.",
+  "outputs_root": "reports/step28_transferable_identity_history/v12_20260720",
+  "scientific_position": {
+    "synthetic_controllers_are_real_identities": false,
+    "synthetic_labels_are_real_world_benchmark_gold": false,
+    "synthetic_component_count_is_real_world_effective_sample_size": false,
+    "allowed_claim": "within this predeclared synthetic generator family, the full parser-observable history model ranks the complete equal-state-weighted audit distribution and the predeclared discriminative mechanism cohort above frozen gates, while the production-identical guard abstains on predeclared observationally unreliable mechanisms; this is a corrected synthetic replication, not real-world performance or universal unseen-state confirmation",
+    "real_world_performance_claim_requires_new_prospective_holdout": true,
+    "old_valid_test_access_forbidden": true,
+    "real_candidate_labels_must_be_blank": true,
+    "real_candidate_scores_are_calibrated_probabilities": false
+  },
+  "inputs": {
+    "real_train_source_carriers": "reports/step24_content_independent_authorship/v1_20260717/pair_features.en_content_train_pool.csv",
+    "real_train_source_carriers_sha256": "945879433b929f04b27aaf69a91b55be8b193d4092d1a83dd8698c742f04b388",
+    "frozen_e5_metadata": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.json",
+    "frozen_e5_metadata_sha256": "6f249b8f70488421d6696073be48128492169401668af2bb7a998131bd891027",
+    "frozen_e5_matrix": "reports/step15_v7/v2_identifier_redacted_20260714/clean_embeddings/multilingual_e5_large_identifier_redacted.zh_target_strict.npy",
+    "frozen_e5_matrix_sha256": "9ab3b966c54c7b16eb19013a7c11509192381b624aee5d6d1c7a8ae46d51ace2",
+    "frozen_step24_model_artifacts": "reports/step24_content_independent_authorship/v1_20260717/step24_model_artifacts.json",
+    "frozen_step24_model_artifacts_sha256": "1338bb26cf6daab949919d8c1c4e6d526d4967133cc72c173e7d734ef30bd489",
+    "real_item_identity_signals": "reports/step3_item_identity_signals.zh_target_strict.csv",
+    "real_item_identity_signals_sha256": "189197bbfa5f859e38db02d8c00244b054c570de5609edb80b61f4b47bc9b76c",
+    "real_seller_profiles": "reports/step3_seller_profiles.zh_target_strict.jsonl",
+    "real_seller_profiles_sha256": "b6f9a6b99e689dbd7e4450a8f545aad646a074ab148158aa44f05a978c02a3dc",
+    "real_unlabeled_candidate_pool": "reports/step4_zh_target_strict_silver_candidate_pairs.csv",
+    "real_unlabeled_candidate_pool_sha256": "bafcdf0a24f4e19832858972898534ead2da05d89ec6d3f94b8cca18d0c385b8",
+    "known_reviewed_pair_uid_exclusions": "reports/step28_review_exclusions/known_reviewed_pair_uids.zh_target_strict_20260720.csv",
+    "known_reviewed_pair_uid_exclusions_sha256": "3ae06f400082f849c8011447e11fe158fbd0c0dffc4d6a4d89ddcf7006682204",
+    "known_reviewed_pair_uid_exclusions_summary": "reports/step28_review_exclusions/known_reviewed_pair_uids.zh_target_strict_20260720.summary.json",
+    "known_reviewed_pair_uid_exclusions_summary_sha256": "5e2e210f77d3dfc34e95e79d41a87ad25a3dcb33a7e694cf1a1ab705e49e2b93",
+    "prior_v6_world_truth": "reports/step28_transferable_identity_history/v6_20260720/step28_v6_world_truth.jsonl",
+    "prior_v6_world_truth_sha256": "3d2f8073e9160a60cf53def55edd823690f70aa974771fae523350046d0da0dd",
+    "production_item_parser": "scripts/step3_build_seller_profiles.py",
+    "production_item_parser_sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+    "prior_v7_world_truth": "reports/step28_transferable_identity_history/v7_20260720/step28_v7_world_truth.jsonl",
+    "prior_v7_world_truth_sha256": "df685c8294f7a8443af7efe3e2534990d1b6ffdd807f38a9bcf0a647ac61d8ff",
+    "prior_v8_world_truth": "reports/step28_transferable_identity_history/v8_20260720/step28_v8_world_truth.jsonl",
+    "prior_v8_world_truth_sha256": "c29593c56ef3c23ed947da732e936a18bcca75d911dc1a662c830c0181ecf7e0",
+    "prior_v9_world_truth": "reports/step28_transferable_identity_history/v9_20260720/step28_v9_world_truth.jsonl",
+    "prior_v9_world_truth_sha256": "109baf5a3a2edd627ebb3cafa431e1eb88d9a49cd378b3ff3a80bd1695967857",
+    "prior_v10_world_truth": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_world_truth.jsonl",
+    "prior_v10_world_truth_sha256": "7acaba9fcac138749a0b56fd677c0044b38d9b62f83d43ce5193df9eb2b8fe37",
+    "prior_v11_world_truth": "reports/step28_transferable_identity_history/v11_20260720/step28_v11_world_truth.jsonl",
+    "prior_v11_world_truth_sha256": "d505e01208bf7b93dc70c718ed32df8a955fd00062a035572306a29bc442c03c",
+    "prior_v7_model_inputs": "reports/step28_transferable_identity_history/v7_20260720/step28_v7_model_inputs.csv",
+    "prior_v7_model_inputs_sha256": "2e8582bd6c53e74826bf647437ab7a183b81e71fc1c87d1d128d2cb91cbdc1de",
+    "prior_v8_model_inputs": "reports/step28_transferable_identity_history/v8_20260720/step28_v8_model_inputs.csv",
+    "prior_v8_model_inputs_sha256": "6270f50aff9243b9780dee83acda52727836bb4ed5342fdbd77ab5eab5b939c5",
+    "prior_v9_model_inputs": "reports/step28_transferable_identity_history/v9_20260720/step28_v9_model_inputs.csv",
+    "prior_v9_model_inputs_sha256": "91bd487ef72b80491575d5bb51f16a048bb04813e1b0e40264e1ea9d28e970a6",
+    "prior_v10_model_inputs": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_model_inputs.csv",
+    "prior_v10_model_inputs_sha256": "a414287e0c2095f6bd101a9fb94bdbd236815fa49b4de9b7765b0fee8cc6d902",
+    "prior_v11_model_inputs": "reports/step28_transferable_identity_history/v11_20260720/step28_v11_model_inputs.csv",
+    "prior_v11_model_inputs_sha256": "9d2f514e37e6aadbddc1c7d21fe1edf4c0566fe3fec7320520becd27339d5313",
+    "known_reviewed_pair_uid_exclusions_source": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+    "known_reviewed_pair_uid_exclusions_source_sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee"
+  },
+  "frozen_source_scorer": {
+    "artifact_key": [
+      "artifacts",
+      "source_only",
+      "e5_lr_l2_control"
+    ],
+    "feature_name": "identifier_redacted_e5_cosine",
+    "standardization_mean": 0.911651490484,
+    "standardization_scale": 0.036735755047,
+    "parameter_intercept": -1.243557552951,
+    "parameter_coefficient": 0.862429363864,
+    "refit_forbidden": true,
+    "source_logit_coefficient": 1
+  },
+  "generation": {
+    "seed": 20260823,
+    "synthetic_namespace": "step28-v12-20260720-audit-safe",
+    "synthetic_token_prefix": "s28v12",
+    "synthetic_numeric_namespace": "927",
+    "history_variation_version": "v7_diverse",
+    "synthetic_identifier_types": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "synthetic_direct_identifier_types": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet"
+    ],
+    "synthetic_risk_identifier_types": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "synthetic_support_identifier_types": [
+      "email",
+      "external_url"
+    ],
+    "cross_version_reference_world_truth_keys": [
+      "prior_v6_world_truth",
+      "prior_v7_world_truth",
+      "prior_v8_world_truth",
+      "prior_v9_world_truth",
+      "prior_v10_world_truth",
+      "prior_v11_world_truth"
+    ],
+    "cross_version_synthetic_overlap_maximum": 0,
+    "source_carrier_partition_salt": "step28-v12-connected-carrier-components",
+    "source_carrier_partition_unit": "seller_connected_component",
+    "source_carrier_domain": "frozen_english_source_train_401_label_blind",
+    "source_carrier_assignment": "label_blind_exact_pairing",
+    "source_carrier_expected_count": 401,
+    "source_carrier_partition_minimum": 10,
+    "direct_token_seller_frequency_maximum": 3,
+    "weak_graph_token_seller_frequency_maximum": 12,
+    "splits": {
+      "synthetic_train": {
+        "rows_per_recipe": 150,
+        "template_bank": "train_v12",
+        "recipes": [
+          "positive_stable_reuse",
+          "positive_multi_token_reuse",
+          "positive_rotation_chain",
+          "positive_sparse_rotation",
+          "positive_noisy_reuse",
+          "positive_support_noise",
+          "positive_sparse_multitoken",
+          "positive_source_only",
+          "negative_private_collision",
+          "negative_repeated_collision",
+          "negative_public_hub",
+          "negative_product_leakage",
+          "negative_support_leakage",
+          "negative_graph_hub",
+          "negative_clean_graph_collision",
+          "negative_source_only"
+        ]
+      },
+      "synthetic_development": {
+        "rows_per_recipe": 60,
+        "template_bank": "development_v12",
+        "recipes": [
+          "positive_stable_reuse",
+          "positive_multi_token_reuse",
+          "positive_rotation_chain",
+          "positive_sparse_rotation",
+          "positive_noisy_reuse",
+          "positive_support_noise",
+          "positive_sparse_multitoken",
+          "positive_source_only",
+          "negative_private_collision",
+          "negative_repeated_collision",
+          "negative_public_hub",
+          "negative_product_leakage",
+          "negative_support_leakage",
+          "negative_graph_hub",
+          "negative_clean_graph_collision",
+          "negative_source_only"
+        ]
+      },
+      "synthetic_audit": {
+        "rows_per_recipe": 80,
+        "template_bank": "audit_v12",
+        "recipes": [
+          "positive_stable_reuse_holdout",
+          "positive_multitype_reuse_holdout",
+          "positive_rotation_chain_holdout",
+          "positive_sparse_rotation_holdout",
+          "positive_noisy_reuse_holdout",
+          "positive_support_noise_holdout",
+          "positive_sparse_multitoken_holdout",
+          "positive_source_only_holdout",
+          "negative_private_collision_holdout",
+          "negative_repeated_collision_holdout",
+          "negative_public_hub_holdout",
+          "negative_product_leakage_holdout",
+          "negative_support_leakage_holdout",
+          "negative_graph_hub_holdout",
+          "negative_clean_graph_collision_holdout",
+          "negative_source_only_holdout"
+        ]
+      }
+    },
+    "split_overlap_maximum": {
+      "world_uid": 0,
+      "synthetic_seller_uid": 0,
+      "identifier_value": 0,
+      "source_carrier_pair_uid": 0,
+      "source_carrier_seller_uid": 0,
+      "template_text_sha256": 0
+    },
+    "raw_item_text_must_pass_production_parser": true,
+    "parser_context_flags_must_match_planned_role": true,
+    "oracle_metadata_excluded_from_model_features": true,
+    "real_identifier_copy_forbidden": true,
+    "cross_version_reference_model_input_keys": [
+      "prior_v7_model_inputs",
+      "prior_v8_model_inputs",
+      "prior_v9_model_inputs",
+      "prior_v10_model_inputs",
+      "prior_v11_model_inputs"
+    ]
+  },
+  "model": {
+    "family": "fixed_source_logit_plus_unique_train_state_residual_with_all_audit_states_equal_weight",
+    "training_protocol_version": "v12_all_audit_states_equal_weight",
+    "feature_names": [
+      "verified_direct_token_count_log1p",
+      "repeated_verified_token_count_log1p",
+      "bilateral_direct_item_count_log1p",
+      "shared_identifier_type_count_log1p",
+      "risky_token_count_log1p",
+      "support_token_count_log1p",
+      "high_frequency_token_count_log1p",
+      "risky_without_verified",
+      "support_without_verified",
+      "verified_x_risky",
+      "verified_x_support",
+      "shared_telegram_token_count_log1p",
+      "shared_email_token_count_log1p",
+      "shared_bat_token_count_log1p",
+      "shared_qq_token_count_log1p",
+      "shared_wechat_token_count_log1p",
+      "shared_phone_token_count_log1p",
+      "shared_crypto_wallet_token_count_log1p",
+      "shared_external_url_token_count_log1p",
+      "strong_rotation_path_count_log1p",
+      "corroborated_rotation_path_count_log1p",
+      "uncorroborated_rotation_path_count_log1p",
+      "weak_path_count_log1p",
+      "maximum_strong_middle_degree_log1p",
+      "rotation_telegram_edge_token_count_log1p",
+      "rotation_email_edge_token_count_log1p",
+      "rotation_bat_edge_token_count_log1p",
+      "rotation_qq_edge_token_count_log1p",
+      "rotation_wechat_edge_token_count_log1p",
+      "rotation_phone_edge_token_count_log1p",
+      "rotation_crypto_wallet_edge_token_count_log1p",
+      "verified_x_repeat",
+      "rotation_x_corroboration"
+    ],
+    "direct_history_feature_count": 19,
+    "scale_only_standardization": true,
+    "intercept_forbidden": true,
+    "source_coefficient_fixed": 1,
+    "identity_fit_source_probability": 0.5,
+    "l2_penalty": 2,
+    "maximum_iterations": 200,
+    "tolerance": 1e-9,
+    "permutation_repetitions": 199,
+    "permutation_unit": "balanced_unique_train_state_within_mechanism_block_evaluated_on_all_audit_rows_equal_state_weight",
+    "threshold_selection_split": "synthetic_development",
+    "threshold_selection_metric": "balanced_accuracy",
+    "real_rows_used_for_fitting_or_selection": false,
+    "controls": [
+      "s0_no_history",
+      "m1_unique_state_direct_history_only",
+      "m2_unique_state_full_history",
+      "n0_199_block_permuted_unique_state_labels"
+    ],
+    "audit_evaluation_unit": "all_rows_equal_observable_state_weight",
+    "threshold_selection_unit": "all_development_rows_equal_observable_state_weight_excluding_train_development_ambiguous_support"
+  },
+  "feature_boundary": {
+    "model_input_metadata_columns": [
+      "pair_uid",
+      "synthetic_split",
+      "recipe_id",
+      "review_label",
+      "source_carrier_pair_uid",
+      "source_probability"
+    ],
+    "forbidden_feature_name_fragments": [
+      "label",
+      "controller",
+      "world",
+      "carrier",
+      "recipe",
+      "seed",
+      "template",
+      "identifier_value",
+      "identifier_hash",
+      "token_value",
+      "seller_uid"
+    ]
+  },
+  "audit_gates": {
+    "source_only_auc_max_abs_deviation_from_chance": 1e-12,
+    "parser_recovery_minimum": 1,
+    "split_overlap_maximum": 0,
+    "cross_version_synthetic_overlap_maximum": 0,
+    "feature_oracle_leak_count_maximum": 0,
+    "train_unique_feature_state_minimum": 120,
+    "development_unique_feature_state_minimum": 80,
+    "audit_unique_feature_state_minimum": 100,
+    "train_feature_matrix_rank_minimum": 30,
+    "audit_feature_matrix_rank_minimum": 30,
+    "audit_train_exact_state_overlap_fraction_maximum": 0.5,
+    "audit_roc_auc_minimum": 0.72,
+    "audit_average_precision_minimum": 0.72,
+    "audit_ap_gain_over_direct_model_minimum": 0.02,
+    "model_discrimination_cohort_roc_auc_minimum": 0.9,
+    "model_discrimination_cohort_average_precision_minimum": 0.9,
+    "unseen_current_discrimination_state_minimum": 30,
+    "unseen_current_discrimination_roc_auc_minimum": 0.8,
+    "unseen_current_discrimination_average_precision_minimum": 0.8,
+    "permutation_empirical_p_value_maximum": 0.05,
+    "permutation_auc_mean_max_abs_deviation_from_chance": 0.1,
+    "zero_history_source_fallback_max_abs_error": 1e-12,
+    "audit_recipe_rule_unit": "unique_observable_state",
+    "audit_recipe_guard_contract": "scripts.step28_history_common.positive_review_eligible",
+    "audit_recipe_groups": {
+      "model_discrimination": [
+        "positive_multitype_reuse_holdout",
+        "positive_rotation_chain_holdout",
+        "positive_sparse_multitoken_holdout",
+        "negative_public_hub_holdout",
+        "negative_graph_hub_holdout"
+      ],
+      "guard_abstention": [
+        "positive_stable_reuse_holdout",
+        "positive_sparse_rotation_holdout",
+        "positive_noisy_reuse_holdout",
+        "positive_support_noise_holdout",
+        "positive_source_only_holdout",
+        "negative_private_collision_holdout",
+        "negative_repeated_collision_holdout",
+        "negative_product_leakage_holdout",
+        "negative_support_leakage_holdout",
+        "negative_clean_graph_collision_holdout",
+        "negative_source_only_holdout"
+      ]
+    },
+    "audit_recipe_rules": {
+      "positive_multitype_reuse_holdout": {
+        "layer": "identity_model",
+        "interpretation": "tests model discrimination on one vote per unique observable state",
+        "metric": "identity_model_positive_state_rate",
+        "comparison": "minimum",
+        "threshold": 0.7
+      },
+      "positive_rotation_chain_holdout": {
+        "layer": "identity_model",
+        "interpretation": "tests model discrimination on one vote per unique observable state",
+        "metric": "identity_model_positive_state_rate",
+        "comparison": "minimum",
+        "threshold": 0.7
+      },
+      "positive_sparse_multitoken_holdout": {
+        "layer": "identity_model",
+        "interpretation": "tests model discrimination on one vote per unique observable state",
+        "metric": "identity_model_positive_state_rate",
+        "comparison": "minimum",
+        "threshold": 0.7
+      },
+      "negative_public_hub_holdout": {
+        "layer": "identity_model",
+        "interpretation": "tests model discrimination on one vote per unique observable state",
+        "metric": "identity_model_positive_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.1
+      },
+      "negative_graph_hub_holdout": {
+        "layer": "identity_model",
+        "interpretation": "tests model discrimination on one vote per unique observable state",
+        "metric": "identity_model_positive_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.1
+      },
+      "positive_stable_reuse_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "positive_sparse_rotation_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "positive_noisy_reuse_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "positive_support_noise_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "positive_source_only_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0
+      },
+      "negative_private_collision_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "negative_repeated_collision_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "negative_product_leakage_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "negative_support_leakage_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "negative_clean_graph_collision_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0.05
+      },
+      "negative_source_only_holdout": {
+        "layer": "production_guard",
+        "interpretation": "tests production-identical abstention only; passing does not mean the model classified the latent label correctly",
+        "metric": "production_review_eligible_state_rate",
+        "comparison": "maximum",
+        "threshold": 0
+      }
+    }
+  },
+  "real_scoring": {
+    "candidate_labels_must_be_blank": true,
+    "candidate_status_must_equal": "pending",
+    "exclude_known_reviewed_pair_uids_before_scoring": true,
+    "add_direct_identity_graph_edges": true,
+    "add_two_hop_rotation_edges": true,
+    "require_frozen_e5_for_both_sellers": true,
+    "review_queue_size": 250,
+    "review_queue_requires_positive_identity_correction": true,
+    "review_queue_requires_positive_only_observable_state_support": true,
+    "review_queue_requires_in_support": true,
+    "model_score_is_probability": false,
+    "prospective_review_required": true,
+    "blind_packet_must_hide_model_outputs": true,
+    "minimum_positive_observable_state_support_count": 3,
+    "review_queue_requires_support_in_both_train_and_development": true
+  },
+  "outputs": {
+    "world_truth": "step28_v12_world_truth.jsonl",
+    "synthetic_items": "step28_v12_synthetic_items.jsonl",
+    "parsed_occurrences": "step28_v12_parsed_occurrences.csv",
+    "model_inputs": "step28_v12_model_inputs.csv",
+    "generation_summary": "step28_v12_generation_summary.json",
+    "model_artifacts": "step28_v12_model_artifacts.json",
+    "synthetic_predictions": "step28_v12_synthetic_predictions.csv",
+    "training_summary": "step28_v12_training_summary.json",
+    "real_candidate_scores": "step28_v12_real_candidate_scores.csv",
+    "prospective_review_queue": "step28_v12_internal_ranked_review_queue.csv",
+    "blind_evidence_packet": "step28_v12_blind_evidence_packet.csv",
+    "blind_adjudication_template": "step28_v12_blind_adjudication_template.csv",
+    "real_scoring_summary": "step28_v12_real_scoring_summary.json",
+    "self_audit": "step28_v12_self_audit.json",
+    "sync_manifest": "step28_v12_sync_manifest.json"
+  }
+}

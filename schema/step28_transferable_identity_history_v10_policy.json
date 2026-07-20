@@ -1,0 +1,63 @@
+{
+  "_extends": "schema/step28_transferable_identity_history_v9_policy.json",
+  "version": "2026-07-20-step28-v10-conservative-support-fresh-audit",
+  "run_id": "step28_transferable_identity_history_v10_20260720",
+  "objective": "Confirm on a new namespace that only multitype reuse, corroborated rotation, and sparse multitype mechanisms are discriminative, while stable/noisy/support-contaminated histories abstain unless conservative positive support is repeated across train and development.",
+  "outputs_root": "reports/step28_transferable_identity_history/v10_20260720",
+  "inputs": {
+    "prior_v9_world_truth": "reports/step28_transferable_identity_history/v9_20260720/step28_v9_world_truth.jsonl",
+    "prior_v9_world_truth_sha256": "109baf5a3a2edd627ebb3cafa431e1eb88d9a49cd378b3ff3a80bd1695967857"
+  },
+  "generation": {
+    "seed": 20260811,
+    "synthetic_namespace": "step28-v10-20260720-fresh",
+    "synthetic_token_prefix": "s28v10",
+    "source_carrier_partition_salt": "step28-v10-connected-carrier-components",
+    "cross_version_reference_world_truth_keys": [
+      "prior_v6_world_truth",
+      "prior_v7_world_truth",
+      "prior_v8_world_truth",
+      "prior_v9_world_truth"
+    ],
+    "splits": {
+      "synthetic_train": {"template_bank": "train_v10"},
+      "synthetic_development": {"template_bank": "development_v10"},
+      "synthetic_audit": {"template_bank": "audit_v10"}
+    }
+  },
+  "audit_gates": {
+    "audit_recipe_rules": {
+      "positive_noisy_reuse_holdout": {
+        "comparison": "maximum",
+        "metric": "supported_positive_review_call_rate",
+        "maximum_supported_positive_call_rate": 0.10
+      },
+      "positive_support_noise_holdout": {
+        "comparison": "maximum",
+        "metric": "supported_positive_review_call_rate",
+        "maximum_supported_positive_call_rate": 0.10
+      }
+    }
+  },
+  "real_scoring": {
+    "minimum_positive_observable_state_support_count": 3,
+    "review_queue_requires_support_in_both_train_and_development": true
+  },
+  "outputs": {
+    "world_truth": "step28_v10_world_truth.jsonl",
+    "synthetic_items": "step28_v10_synthetic_items.jsonl",
+    "parsed_occurrences": "step28_v10_parsed_occurrences.csv",
+    "model_inputs": "step28_v10_model_inputs.csv",
+    "generation_summary": "step28_v10_generation_summary.json",
+    "model_artifacts": "step28_v10_model_artifacts.json",
+    "synthetic_predictions": "step28_v10_synthetic_predictions.csv",
+    "training_summary": "step28_v10_training_summary.json",
+    "real_candidate_scores": "step28_v10_real_candidate_scores.csv",
+    "prospective_review_queue": "step28_v10_internal_ranked_review_queue.csv",
+    "blind_evidence_packet": "step28_v10_blind_evidence_packet.csv",
+    "blind_adjudication_template": "step28_v10_blind_adjudication_template.csv",
+    "real_scoring_summary": "step28_v10_real_scoring_summary.json",
+    "self_audit": "step28_v10_self_audit.json",
+    "sync_manifest": "step28_v10_sync_manifest.json"
+  }
+}

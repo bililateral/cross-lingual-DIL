@@ -1,0 +1,172 @@
+{
+  "step": "step27_build_pair_features:synthetic",
+  "identity": {
+    "stage": "step27_build_pair_features:synthetic",
+    "seed": 20260323,
+    "track": "primary",
+    "policy_sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74",
+    "producer_sha256": "a683184a0a1359baecf11450fc00ae32e2de9c64ba2bd12827658ad7d3cf6890",
+    "common_sha256": "7c734c9eb9f42edd6ae67073b0fa2b8dbfe08a8e7800099de95f54fb4f19947d",
+    "shared_dependency_sha256": {
+      "scripts/step15_build_v7_clean_embedding_cache.py": "eec19e6f0569be419a7fec0ed78b9cceb0ee26bb71856e54bcb8baec7e7e5469",
+      "scripts/step24_common.py": "edf8f1e393fe1ea2fb2cb8211b1113ec6e882781146af7f06715610db3f5a825"
+    },
+    "inputs": [
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/clean_profiles.jsonl",
+        "size_bytes": 5881037,
+        "sha256": "c4ce6aed1a76e59a20b536ded3049a58e0d8dc27b9f61eaf344d962f30cd44e3"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.json",
+        "size_bytes": 73906,
+        "sha256": "fab3d29e1219e0797973613f39d0ed214d930361e1e5862d25e3dd9c663851ae"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.npy",
+        "size_bytes": 4567168,
+        "sha256": "67775341c3139d85ec7ab4c8e799f9ef36fadbd21f7f923d1c3a78ea5ee47365"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/manifest.json",
+        "size_bytes": 10338,
+        "sha256": "8623e2f2bdae8434334828317f2996b6dba08a1299e71594d5253b936806827a"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/generation_manifest.json",
+        "size_bytes": 5814,
+        "sha256": "8097940618713829d7db65269b32e923c358aae3ec4d631eb855271c83bd3772"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/clean_profiles.jsonl",
+        "size_bytes": 558718,
+        "sha256": "825b361e63bed0ca04d1ffe986019d9f2ef81822e7b51c42b164c4b3949242a9"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/identifier_redacted_e5.json",
+        "size_bytes": 13584,
+        "sha256": "b852da97433a655fdf3c4e78caef035d91e35f535a82abf8d3419a06eec62af0"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/identifier_redacted_e5.npy",
+        "size_bytes": 524416,
+        "sha256": "44f7295375e7dc3daff23017d33ade4ea8d09bc7ef9bbab8ab716f152b3fbe1a"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/manifest.json",
+        "size_bytes": 5334,
+        "sha256": "def984b59e1adeb94615fcba99e2c6d92e8a6f80732b9fe53aaf8b96258a1aa9"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/equal_weight_duplication_pairs.csv",
+        "size_bytes": 32768,
+        "sha256": "73dd9c117976c166c46ca8accd10248241c5acef1da2df1629c802f8301df21d"
+      },
+      {
+        "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/synthetic_pairs.csv",
+        "size_bytes": 41124,
+        "sha256": "ac2d4ed1f08f60e7e262cdfb83f2c2695446e171252d41dc6ed2759e6aaa102e"
+      },
+      {
+        "path": "schema/step27_v1_1_exact_replay_policy.json",
+        "size_bytes": 29767,
+        "sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74"
+      }
+    ],
+    "feature_names": [
+      "identifier_redacted_e5_cosine",
+      "clean_token_jaccard",
+      "clean_char3_jaccard",
+      "clean_title_token_jaccard",
+      "clean_description_token_jaccard",
+      "clean_category_token_jaccard",
+      "clean_text_length_gap_ratio",
+      "clean_segment_count_gap_ratio",
+      "clean_field_presence_match_fraction"
+    ],
+    "parent_pair_features_copied": false
+  },
+  "identity_sha256": "cf2259a36d0e52644c22e99edbc1a5e2223d99db126881f35f526c58dfe5e7f8",
+  "inputs": [
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/clean_profiles.jsonl",
+      "size_bytes": 5881037,
+      "sha256": "c4ce6aed1a76e59a20b536ded3049a58e0d8dc27b9f61eaf344d962f30cd44e3"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.json",
+      "size_bytes": 73906,
+      "sha256": "fab3d29e1219e0797973613f39d0ed214d930361e1e5862d25e3dd9c663851ae"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/identifier_redacted_e5.npy",
+      "size_bytes": 4567168,
+      "sha256": "67775341c3139d85ec7ab4c8e799f9ef36fadbd21f7f923d1c3a78ea5ee47365"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/embeddings/real/manifest.json",
+      "size_bytes": 10338,
+      "sha256": "8623e2f2bdae8434334828317f2996b6dba08a1299e71594d5253b936806827a"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/generation_manifest.json",
+      "size_bytes": 5814,
+      "sha256": "8097940618713829d7db65269b32e923c358aae3ec4d631eb855271c83bd3772"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/clean_profiles.jsonl",
+      "size_bytes": 558718,
+      "sha256": "825b361e63bed0ca04d1ffe986019d9f2ef81822e7b51c42b164c4b3949242a9"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/identifier_redacted_e5.json",
+      "size_bytes": 13584,
+      "sha256": "b852da97433a655fdf3c4e78caef035d91e35f535a82abf8d3419a06eec62af0"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/identifier_redacted_e5.npy",
+      "size_bytes": 524416,
+      "sha256": "44f7295375e7dc3daff23017d33ade4ea8d09bc7ef9bbab8ab716f152b3fbe1a"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/embeddings/manifest.json",
+      "size_bytes": 5334,
+      "sha256": "def984b59e1adeb94615fcba99e2c6d92e8a6f80732b9fe53aaf8b96258a1aa9"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/equal_weight_duplication_pairs.csv",
+      "size_bytes": 32768,
+      "sha256": "73dd9c117976c166c46ca8accd10248241c5acef1da2df1629c802f8301df21d"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/synthetic_pairs.csv",
+      "size_bytes": 41124,
+      "sha256": "ac2d4ed1f08f60e7e262cdfb83f2c2695446e171252d41dc6ed2759e6aaa102e"
+    },
+    {
+      "path": "schema/step27_v1_1_exact_replay_policy.json",
+      "size_bytes": 29767,
+      "sha256": "2956aa822411a81d11de879760f65c5574d2a7004944d5b3c7bfa1445ac58e74"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/pair_features/equal_weight_duplication_pair_features.csv",
+      "size_bytes": 42083,
+      "sha256": "75c2083e36d57f05b1763992d34cd122e66132c23df28a6bf413f93523876ab7"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/pair_features/summary.json",
+      "size_bytes": 1397,
+      "sha256": "85aab98b9c542da0d5e253713064614e59bee63566b2fd0ca201463a8892a2ae"
+    },
+    {
+      "path": "reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/seed_20260323/primary/pair_features/synthetic_pair_features.csv",
+      "size_bytes": 50887,
+      "sha256": "37078643acff7760ccdb5b528fc4b6dfe6933607535abea5e7a064518e8d8a4e"
+    }
+  ],
+  "row_count": 64,
+  "summary_sha256": "85aab98b9c542da0d5e253713064614e59bee63566b2fd0ca201463a8892a2ae",
+  "manifest_content_sha256": "fcaaa40c6db589fbb3b3ff30e39e8be7b93d9228235be8d46c980b61a7068f9e"
+}
