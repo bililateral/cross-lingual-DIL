@@ -1,0 +1,44 @@
+{
+  "step": "step7_v2_prepare_historical_test_labels",
+  "version": "2026-07-21-step7-v2-clean-english-source-selection-v1",
+  "policy_sha256": "d94150debafab0cde6126a08a2128158d48eef069425d5fa4b370bffe5a69f16",
+  "generator_script_path": "scripts/step7_v2_prepare_clean_data.py",
+  "generator_script_sha256": "910bf5904cbe5ffd95ffc69f32f0d450e2ccdc8af725327d6a4e10fc6fd3fd1f",
+  "common_script_sha256": "044269f7666fa02ff4ebe040d3f7dfac8957d991029d8b530c205c356f2c220a",
+  "redaction_dependency_script_path": "scripts/step3_build_seller_profiles.py",
+  "redaction_dependency_script_sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+  "public_preparation_manifest_sha256": "6b352b54c71d3a9573a5933b19fe3794cc19beff976bdc3b563e801a0af7f7e1",
+  "input_manifest": {
+    "frozen_labels": {
+      "path": "reports/step5_en_frozen_silver_labels.csv",
+      "sha256": "97d2985956e463e89df23acf5c854facc3cb8f61eb0365618a5c9db478a230dd",
+      "size_bytes": 1825701
+    },
+    "evidence_labels": {
+      "path": "reports/step15_evidence_type_labels.en_content_train_pool.csv",
+      "sha256": "890531c9100e697c5c5268dc2e0584943bf55e55ecf34254debdd6da2bbfc41f",
+      "size_bytes": 462266
+    }
+  },
+  "label_counts": {
+    "test": {
+      "positive": 51,
+      "negative": 130,
+      "total": 181
+    }
+  },
+  "splits_written": [
+    "test"
+  ],
+  "historical_test_metrics_must_wait_for_frozen_selection": true,
+  "other_split_label_values_used_during_materialization": false,
+  "split_projection_applied_before_label_or_evidence_access": true,
+  "prospective_claim_allowed": false,
+  "output_files": {
+    "private_labels_test": {
+      "path": "reports/step7_v2_clean_source_selection/v1_20260721/private_labels.test.historical_development_only.csv",
+      "sha256": "cc8f6550c690589d44b50097a8fe5a50450b9c4bd44eb753e54107dc37b23fd8",
+      "size_bytes": 33328
+    }
+  }
+}
