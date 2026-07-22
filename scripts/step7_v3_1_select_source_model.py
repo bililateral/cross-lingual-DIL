@@ -19,6 +19,16 @@ import step7_v3_1_selection_core as core
 
 
 SELECTOR_SCRIPT = Path(__file__).resolve()
+DEFAULT_SELECTION_REVISION = (
+    common.ROOT
+    / "schema"
+    / "step7_v3_1_fold_local_selection_revision_policy.json"
+)
+FOLD_REFERENCE_DEPENDENT_FEATURES = frozenset(
+    name
+    for name in source.SAFE_FEATURE_NAMES
+    if "_idf_" in name or name.endswith("_train_percentile_gap_abs")
+)
 
 
 def candidate_specs(policy: dict) -> list[dict]:
@@ -94,6 +104,270 @@ def index_unique(rows: list[dict], role: str) -> dict[str, dict]:
     if len(output) != len(rows):
         raise ValueError(f"Step7-v3.1 duplicate pair UID in {role}")
     return output
+
+
+def load_selection_revision(
+    revision_path: Path, parent_policy: dict, parent_policy_path: Path
+) -> dict:
+    revision = common.load_json(revision_path)
+    parent = revision.get("parent_experiment_policy", {})
+    expected_grid = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    training = revision.get("training_override", {})
+    reference = revision.get("fold_feature_reference", {})
+    outputs = revision.get("outputs", {})
+    expected_output_names = {
+        "root",
+        "selection_summary",
+        "frozen_selection_manifest",
+        "train_oof_predictions",
+        "valid_predictions",
+    }
+    if (
+        revision.get("version")
+        != "2026-07-22-step7-v3.1-fold-local-selection-v3"
+        or parent.get("path") != common.relative(parent_policy_path)
+        or parent.get("sha256") != common.sha256_file(parent_policy_path)
+        or parent.get("contract_sha256") != common.canonical_hash(parent_policy)
+        or training.get("l2_grid") != expected_grid
+        or training.get("l2_grid_boundary_action")
+        != "extend_on_strict_train_oof_improvement_then_complete_and_report"
+        or float(training.get("l2_grid_upper_extension_factor", 0.0)) != 10.0
+        or float(training.get("l2_grid_upper_extension_maximum", 0.0))
+        != 1000000.0
+        or training.get("validation_metrics_allowed_to_control_grid_extension")
+        is not False
+        or reference.get("oof_reference_scope")
+        != "fold_training_sellers_only"
+        or reference.get("final_fit_reference_scope") != "all_train_sellers_only"
+        or reference.get("validation_transform_reference_scope")
+        != "all_train_sellers_only"
+        or reference.get("labels_used_to_fit_reference_statistics") is not False
+        or reference.get(
+            "heldout_seller_text_or_numeric_profiles_allowed_in_reference"
+        )
+        is not False
+        or set(reference.get("reference_dependent_features", []))
+        != FOLD_REFERENCE_DEPENDENT_FEATURES
+        or set(outputs) != expected_output_names
+    ):
+        raise ValueError("Step7-v3.1 fold-local selection revision contract drift")
+    root = str(outputs["root"]).rstrip("/")
+    parent_root = str(parent_policy["outputs"]["root"]).rstrip("/")
+    if (
+        not root.startswith(parent_root + "/selection_v3_")
+        or root == str(parent_policy["outputs"]["selection_summary"]).rsplit("/", 1)[0]
+        or any(
+            name != "root" and not str(value).startswith(root + "/")
+            for name, value in outputs.items()
+        )
+    ):
+        raise ValueError("Step7-v3.1 revised selection outputs are not isolated")
+    return revision
+
+
+def effective_training_config(parent_policy: dict, revision: dict) -> dict:
+    config = dict(parent_policy["training"])
+    override = revision["training_override"]
+    config["l2_grid"] = list(override["l2_grid"])
+    config["l2_grid_boundary_action"] = override["l2_grid_boundary_action"]
+    config["l2_grid_upper_extension_factor"] = float(
+        override["l2_grid_upper_extension_factor"]
+    )
+    config["l2_grid_upper_extension_maximum"] = float(
+        override["l2_grid_upper_extension_maximum"]
+    )
+    config["validation_metrics_allowed_to_control_grid_extension"] = override[
+        "validation_metrics_allowed_to_control_grid_extension"
+    ]
+    config["fold_feature_reference_scope"] = revision["fold_feature_reference"][
+        "oof_reference_scope"
+    ]
+    return config
+
+
+def replay_clean_seller_records_for_fold_features(
+    policy: dict, pair_rows: list[dict], frozen_safe_rows: list[dict]
+) -> tuple[dict[str, dict], dict]:
+    """Rebuild feature primitives without labels and prove full-train replay."""
+
+    source_policy = common.source_policy(policy)
+    input_manifest = source.validate_input_hashes(
+        source_policy,
+        ("seller_profiles", "item_identity_signals", "component_assignments"),
+    )
+    profiles_path = common.resolve(source_policy["inputs"]["seller_profiles"]["path"])
+    signals_path = common.resolve(
+        source_policy["inputs"]["item_identity_signals"]["path"]
+    )
+    profiles_list = source.load_jsonl(profiles_path)
+    profiles = {str(row["seller_uid"]): row for row in profiles_list}
+    if len(profiles) != len(profiles_list):
+        raise ValueError("Step7-v3.1 seller-profile replay has duplicate seller UID")
+    seller_uids = {
+        row[endpoint]
+        for row in pair_rows
+        for endpoint in ("seller_uid_left", "seller_uid_right")
+    }
+    missing = sorted(seller_uids - set(profiles))
+    if missing:
+        raise ValueError(f"Step7-v3.1 fold feature seller profile missing: {missing[0]}")
+
+    literals, _signal_summary = source.signal_literals_by_seller(signals_path)
+    global_tokens = source.global_identity_tokens(literals, profiles_list)
+    contextual_aliases = source.contextual_global_alias_tokens(profiles_list, literals)
+    contextual_alias_deletions = source.contextual_alias_deletion_tokens(
+        contextual_aliases
+    )
+    audited_global_phrases = source.AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
+    seller_records: dict[str, dict] = {}
+    for seller_uid in sorted(seller_uids):
+        record, _diagnostics = source.build_clean_seller_record(
+            profiles[seller_uid],
+            source_policy["clean_text_contract"],
+            global_tokens,
+            contextual_aliases,
+            contextual_alias_deletions,
+            audited_global_phrases,
+        )
+        seller_records[seller_uid] = record
+
+    field_rows = common.load_jsonl(common.resolve(policy["outputs"]["field_corpus"]))
+    field_index = {row["seller_uid"]: row for row in field_rows}
+    if len(field_index) != len(field_rows) or set(field_index) != seller_uids:
+        raise ValueError("Step7-v3.1 fold feature/corpus seller universe drift")
+    for seller_uid in sorted(seller_uids):
+        if (
+            seller_records[seller_uid]["model_text"]
+            != field_index[seller_uid]["model_text"]
+        ):
+            raise ValueError("Step7-v3.1 fold feature clean-text replay drift")
+
+    train_sellers = {
+        row[endpoint]
+        for row in pair_rows
+        if row["split_name"] == "train"
+        for endpoint in ("seller_uid_left", "seller_uid_right")
+    }
+    full_reference = source.train_reference(seller_records, train_sellers)
+    frozen_reference = common.load_json(
+        common.resolve(policy["outputs"]["train_feature_reference"])
+    )
+    if full_reference != frozen_reference:
+        raise ValueError("Step7-v3.1 full-train feature reference does not replay")
+    replayed_safe_rows = source.build_safe_pair_rows(
+        pair_rows, seller_records, full_reference
+    )
+    if len(replayed_safe_rows) != len(frozen_safe_rows):
+        raise ValueError("Step7-v3.1 safe feature replay row-count drift")
+    maximum_difference = 0.0
+    for replayed, frozen in zip(replayed_safe_rows, frozen_safe_rows, strict=True):
+        if replayed["pair_uid"] != frozen["pair_uid"]:
+            raise ValueError("Step7-v3.1 safe feature replay order drift")
+        for name in source.SAFE_FEATURE_NAMES:
+            difference = abs(float(replayed[name]) - float(frozen[name]))
+            maximum_difference = max(maximum_difference, difference)
+            if not math.isfinite(difference) or difference > 1e-15:
+                raise ValueError(
+                    f"Step7-v3.1 safe feature replay mismatch: "
+                    f"{replayed['pair_uid']}/{name}"
+                )
+    return seller_records, {
+        "status": "pass",
+        "label_values_read": False,
+        "seller_count": len(seller_records),
+        "train_reference_seller_count": len(train_sellers),
+        "train_reference_sha256": common.canonical_hash(full_reference),
+        "safe_pair_row_count": len(replayed_safe_rows),
+        "safe_feature_maximum_absolute_replay_difference": maximum_difference,
+        "public_input_sha256": {
+            name: record["sha256"] for name, record in sorted(input_manifest.items())
+        },
+    }
+
+
+def build_fold_local_feature_views(
+    train_rows: list[dict],
+    seller_records: dict[str, dict],
+    base_features: dict[str, dict],
+    training_config: dict,
+) -> tuple[dict[int, dict[str, dict]], list[dict], dict[str, int]]:
+    """Fit each OOF feature reference on that fold's training sellers only."""
+
+    fold_count = int(training_config["fold_count"])
+    assignments = core.balanced_component_folds(
+        train_rows, fold_count, int(training_config["fold_seed"])
+    )
+    views: dict[int, dict[str, dict]] = {}
+    audits = []
+    for fold in range(fold_count):
+        fit_rows = [
+            row for row in train_rows if assignments[row["component_id"]] != fold
+        ]
+        holdout_rows = [
+            row for row in train_rows if assignments[row["component_id"]] == fold
+        ]
+        fit_sellers = {
+            row[endpoint]
+            for row in fit_rows
+            for endpoint in ("seller_uid_left", "seller_uid_right")
+        }
+        holdout_sellers = {
+            row[endpoint]
+            for row in holdout_rows
+            for endpoint in ("seller_uid_left", "seller_uid_right")
+        }
+        overlap = fit_sellers & holdout_sellers
+        if overlap:
+            raise ValueError(
+                "Step7-v3.1 seller crosses a grouped OOF fold: " + sorted(overlap)[0]
+            )
+        reference = source.train_reference(seller_records, fit_sellers)
+        local_safe_rows = source.build_safe_pair_rows(
+            train_rows, seller_records, reference
+        )
+        view = {
+            row["pair_uid"]: dict(base_features[row["pair_uid"]]) for row in train_rows
+        }
+        for local in local_safe_rows:
+            pair_uid = local["pair_uid"]
+            for name in source.SAFE_FEATURE_NAMES:
+                local_value = float(local[name])
+                if name not in FOLD_REFERENCE_DEPENDENT_FEATURES and not math.isclose(
+                    local_value,
+                    float(base_features[pair_uid][name]),
+                    rel_tol=0.0,
+                    abs_tol=1e-15,
+                ):
+                    raise ValueError(
+                        f"Step7-v3.1 reference-independent feature drift: {name}"
+                    )
+                view[pair_uid][name] = local_value
+        views[fold] = view
+        audits.append(
+            {
+                "fold": fold,
+                "fit_row_count": len(fit_rows),
+                "holdout_row_count": len(holdout_rows),
+                "fit_component_count": len(
+                    {row["component_id"] for row in fit_rows}
+                ),
+                "holdout_component_count": len(
+                    {row["component_id"] for row in holdout_rows}
+                ),
+                "reference_train_seller_count": len(fit_sellers),
+                "holdout_seller_count": len(holdout_sellers),
+                "fit_holdout_seller_overlap_count": 0,
+                "fit_seller_uid_sha256": common.canonical_hash(sorted(fit_sellers)),
+                "holdout_seller_uid_sha256": common.canonical_hash(
+                    sorted(holdout_sellers)
+                ),
+                "feature_reference_sha256": common.canonical_hash(reference),
+                "reference_dependent_feature_names": sorted(
+                    FOLD_REFERENCE_DEPENDENT_FEATURES
+                ),
+            }
+        )
+    return views, audits, assignments
 
 
 def expected_gpu_paths(policy: dict) -> set[str]:
@@ -198,7 +472,9 @@ def replay_model_scores(
     }, matrix
 
 
-def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict]:
+def load_feature_bundle(
+    policy: dict,
+) -> tuple[list[dict], dict[str, dict], dict, dict[str, dict]]:
     provenance = verify_runtime_provenance(policy)
     source_policy = common.source_policy(policy)
     pair_path = common.resolve(policy["outputs"]["pair_manifest"])
@@ -217,6 +493,9 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         }
         for pair_uid in pair_uids
     }
+    seller_records, fold_feature_source_replay = (
+        replay_clean_seller_records_for_fold_features(policy, pair_rows, safe_rows)
+    )
     outputs = policy["outputs"]
     chunk_rows = common.load_jsonl(common.resolve(outputs["shared_chunks"]))
     chunk_audit = common.validate_shared_chunk_rows(
@@ -267,7 +546,11 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
     for key, value in chunk_audit.items():
         if chunk_manifest.get("chunk_audit", {}).get(key) != value:
             raise ValueError(f"Step7-v3.1 shared chunk audit replay drift: {key}")
-    runtime = {"shared_chunks": chunk_manifest, "embedding_models": {}}
+    runtime = {
+        "shared_chunks": chunk_manifest,
+        "embedding_models": {},
+        "fold_feature_source_replay": fold_feature_source_replay,
+    }
     expected_schema = ["pair_uid"]
     for model_key, cfg in policy["embedding_models"].items():
         score_path = common.resolve(
@@ -370,7 +653,7 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
                     raise ValueError(f"Step7-v3.1 non-finite aggregate: {model_key}/{name}")
                 features[pair_uid][name] = value
         runtime["embedding_models"][model_key] = {**manifest, "numeric_replay": replay}
-    return pair_rows, features, runtime
+    return pair_rows, features, runtime, seller_records
 
 
 def load_split_rows(policy: dict, split: str, pair_rows: list[dict]) -> list[dict]:
@@ -464,9 +747,12 @@ def raw_encoder_results(
     return public, internal
 
 
-def runtime_input_fingerprints(policy: dict) -> dict[str, dict]:
+def runtime_input_fingerprints(
+    policy: dict, selection_revision_path: Path
+) -> dict[str, dict]:
     paths = {
         "policy": common.DEFAULT_POLICY,
+        "selection_revision_policy": selection_revision_path,
         "source_data_policy": common.resolve(
             policy["source_data_policy"]["path"]
         ),
@@ -516,8 +802,10 @@ def runtime_input_fingerprints(policy: dict) -> dict[str, dict]:
     }
 
 
-def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
-    pair_rows, features, runtime_manifests = load_feature_bundle(policy)
+def run_selection(
+    policy: dict, selection_revision: dict, selection_revision_path: Path
+) -> tuple[dict, list[dict], list[dict], dict]:
+    pair_rows, features, runtime_manifests, seller_records = load_feature_bundle(policy)
     train_rows = load_split_rows(policy, "train", pair_rows)
     valid_rows = load_split_rows(policy, "valid", pair_rows)
     core.attach_shortcut_control_strata(train_rows, features)
@@ -528,18 +816,46 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         valid_rows, "component_equal_normalized_to_row_count"
     )
     specs = candidate_specs(policy)
-    primary_mode = policy["training"]["primary_sample_weight"]
-    sensitivity_mode = policy["training"]["sensitivity_sample_weight"]
+    training_config = effective_training_config(policy, selection_revision)
+    primary_mode = training_config["primary_sample_weight"]
+    sensitivity_mode = training_config["sensitivity_sample_weight"]
+    fold_feature_views, fold_reference_audit, fold_assignments = (
+        build_fold_local_feature_views(
+            train_rows, seller_records, features, training_config
+        )
+    )
     internal, public = {}, {}
     train_predictions, valid_predictions = [], []
     for spec in specs:
         train_matrix = core.matrix_for_rows(train_rows, features, spec["feature_names"])
         valid_matrix = core.matrix_for_rows(valid_rows, features, spec["feature_names"])
+        fold_matrices = {
+            fold: core.matrix_for_rows(
+                train_rows, fold_features, spec["feature_names"]
+            )
+            for fold, fold_features in fold_feature_views.items()
+        }
         primary = core.tune_and_fit(
-            train_rows, train_matrix, spec["feature_names"], policy, primary_mode
+            train_rows,
+            train_matrix,
+            spec["feature_names"],
+            policy,
+            primary_mode,
+            training_config=training_config,
+            fold_matrices=fold_matrices,
+            fold_reference_audit=fold_reference_audit,
+            expected_fold_assignments=fold_assignments,
         )
         sensitivity = core.tune_and_fit(
-            train_rows, train_matrix, spec["feature_names"], policy, sensitivity_mode
+            train_rows,
+            train_matrix,
+            spec["feature_names"],
+            policy,
+            sensitivity_mode,
+            training_config=training_config,
+            fold_matrices=fold_matrices,
+            fold_reference_audit=fold_reference_audit,
+            expected_fold_assignments=fold_assignments,
         )
         primary_valid = core.apply_logistic(valid_matrix, primary["final_train_artifact"])
         sensitivity_valid = core.apply_logistic(
@@ -739,8 +1055,17 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         [float(row["identity_rule_control_score"]) for row in valid_rows], dtype=np.float64
     )
     summary = {
-        "step": "step7_v3_1_select_full_text_source_model",
-        "version": policy["version"],
+        "step": "step7_v3_1_select_full_text_source_model_fold_local_v3",
+        "version": selection_revision["version"],
+        "parent_experiment_version": policy["version"],
+        "selection_revision_policy_sha256": common.sha256_file(
+            selection_revision_path
+        ),
+        "effective_training_config": training_config,
+        "fold_feature_reference_contract": selection_revision[
+            "fold_feature_reference"
+        ],
+        "fold_feature_reference_audit": fold_reference_audit,
         "scope": policy["result_scope"],
         "train_counts": dict(Counter(row["review_label"] for row in train_rows)),
         "valid_counts": dict(Counter(row["review_label"] for row in valid_rows)),
@@ -787,9 +1112,22 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         "prospective_claim_allowed": False,
     }
     freeze = {
-        "step": "step7_v3_1_frozen_full_text_source_selection",
-        "version": policy["version"],
+        "step": "step7_v3_1_frozen_full_text_source_selection_fold_local_v3",
+        "version": selection_revision["version"],
+        "parent_experiment_version": policy["version"],
         "policy_contract_sha256": common.canonical_hash(policy),
+        "selection_revision_contract_sha256": common.canonical_hash(
+            selection_revision
+        ),
+        "selection_revision_policy_sha256": common.sha256_file(
+            selection_revision_path
+        ),
+        "effective_training_config_sha256": common.canonical_hash(
+            training_config
+        ),
+        "fold_feature_reference_audit_sha256": common.canonical_hash(
+            fold_reference_audit
+        ),
         "candidate_specs_sha256": common.canonical_hash(specs),
         "selection_outcome": outcome,
         "carry_forward_to_step28": carry,
@@ -802,7 +1140,9 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         "raw_encoder_comparison_results_sha256": common.canonical_hash(raw_public),
         "m0_pipeline_selection_sha256": common.canonical_hash(pipeline_selection),
         "e5_continuity_changes_selection": False,
-        "runtime_inputs": runtime_input_fingerprints(policy),
+        "runtime_inputs": runtime_input_fingerprints(
+            policy, selection_revision_path
+        ),
         "historical_test_label_values_parsed_during_selection": False,
         "historical_test_label_file_hashed_during_selection": False,
         "historical_test_execution_implemented": False,
@@ -813,11 +1153,20 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy", default=str(common.DEFAULT_POLICY))
+    parser.add_argument(
+        "--selection-revision", default=str(DEFAULT_SELECTION_REVISION)
+    )
     parser.add_argument("--stage", choices=("select",), default="select")
     parser.add_argument("--validate-config-only", action="store_true")
     args = parser.parse_args()
-    policy = common.load_json(common.resolve(args.policy))
+    policy_path = common.resolve(args.policy)
+    revision_path = common.resolve(args.selection_revision)
+    policy = common.load_json(policy_path)
     common.validate_policy(policy)
+    selection_revision = load_selection_revision(
+        revision_path, policy, policy_path
+    )
+    training_config = effective_training_config(policy, selection_revision)
     specs = candidate_specs(policy)
     common.validate_source_development_artifacts(policy)
     if args.validate_config_only:
@@ -835,14 +1184,32 @@ def main() -> None:
                     "valid_rows": 152,
                     "historical_test_supported_in_this_round": False,
                     "gpu_required_after_scores_exist": False,
+                    "fold_feature_reference_scope": training_config[
+                        "fold_feature_reference_scope"
+                    ],
+                    "l2_grid": training_config["l2_grid"],
+                    "l2_grid_boundary_action": training_config[
+                        "l2_grid_boundary_action"
+                    ],
+                    "l2_grid_upper_extension_factor": training_config[
+                        "l2_grid_upper_extension_factor"
+                    ],
+                    "l2_grid_upper_extension_maximum": training_config[
+                        "l2_grid_upper_extension_maximum"
+                    ],
+                    "selection_output_root": selection_revision["outputs"][
+                        "root"
+                    ],
                 },
                 ensure_ascii=False,
                 indent=2,
             )
         )
         return
-    summary, valid_predictions, train_predictions, freeze = run_selection(policy)
-    outputs = policy["outputs"]
+    summary, valid_predictions, train_predictions, freeze = run_selection(
+        policy, selection_revision, revision_path
+    )
+    outputs = selection_revision["outputs"]
     summary_path = common.resolve(outputs["selection_summary"])
     valid_path = common.resolve(outputs["valid_predictions"])
     train_path = common.resolve(outputs["train_oof_predictions"])

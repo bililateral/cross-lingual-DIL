@@ -536,8 +536,13 @@ def tune_and_fit(
     feature_names: list[str],
     policy: dict,
     weighting_mode: str,
+    *,
+    training_config: dict | None = None,
+    fold_matrices: dict[int, np.ndarray] | None = None,
+    fold_reference_audit: list[dict] | None = None,
+    expected_fold_assignments: dict[str, int] | None = None,
 ) -> dict:
-    cfg = policy["training"]
+    cfg = policy["training"] if training_config is None else training_config
     labels = np.asarray(
         [1 if row["review_label"] == "positive" else 0 for row in train_rows],
         dtype=np.int8,
@@ -545,13 +550,40 @@ def tune_and_fit(
     folds = balanced_component_folds(
         train_rows, int(cfg["fold_count"]), int(cfg["fold_seed"])
     )
+    if expected_fold_assignments is not None and folds != expected_fold_assignments:
+        raise ValueError("Step7-v3 fold-local feature assignment drift")
+    if fold_matrices is not None:
+        expected_folds = set(range(int(cfg["fold_count"])))
+        if set(fold_matrices) != expected_folds:
+            raise ValueError("Step7-v3 fold-local matrix universe drift")
+        for fold, matrix in fold_matrices.items():
+            candidate = np.asarray(matrix, dtype=np.float64)
+            if candidate.shape != train_matrix.shape or not np.all(np.isfinite(candidate)):
+                raise ValueError(
+                    f"Step7-v3 fold-local matrix is invalid for fold {fold}"
+                )
+    if fold_reference_audit is not None:
+        if [int(record.get("fold", -1)) for record in fold_reference_audit] != list(
+            range(int(cfg["fold_count"]))
+        ):
+            raise ValueError("Step7-v3 fold-local reference audit universe drift")
     fold_diagnostics = component_fold_diagnostics(
         train_rows, folds, int(cfg["fold_count"])
     )
     oof_selection_weights = component_weights(train_rows, weighting_mode)
     grid_results = []
-    best = None
-    for l2_penalty in [float(value) for value in cfg["l2_grid"]]:
+    l2_grid_initial = [float(value) for value in cfg["l2_grid"]]
+    if (
+        not l2_grid_initial
+        or any(
+            not math.isfinite(value) or value <= 0.0
+            for value in l2_grid_initial
+        )
+        or l2_grid_initial != sorted(set(l2_grid_initial))
+    ):
+        raise ValueError("Step7-v3 L2 grid must be positive, unique, and increasing")
+
+    def evaluate_l2(l2_penalty: float) -> dict:
         oof = np.full(len(train_rows), np.nan, dtype=np.float64)
         fold_artifacts = []
         for fold in range(int(cfg["fold_count"])):
@@ -573,8 +605,13 @@ def tune_and_fit(
             )
             fit_rows = [train_rows[index] for index in fit_indices]
             weights = component_weights(fit_rows, weighting_mode)
+            fold_matrix = (
+                train_matrix
+                if fold_matrices is None
+                else np.asarray(fold_matrices[fold], dtype=np.float64)
+            )
             artifact = fit_logistic(
-                train_matrix[fit_indices],
+                fold_matrix[fit_indices],
                 labels[fit_indices],
                 weights,
                 l2_penalty,
@@ -583,7 +620,7 @@ def tune_and_fit(
                 float(cfg["armijo_c1"]),
                 float(cfg["minimum_line_search_step"]),
             )
-            oof[hold_indices] = apply_logistic(train_matrix[hold_indices], artifact)
+            oof[hold_indices] = apply_logistic(fold_matrix[hold_indices], artifact)
             fold_artifacts.append(
                 {
                     "fold": fold,
@@ -604,7 +641,7 @@ def tune_and_fit(
         weighted_ap = weighted_average_precision(labels, oof, oof_selection_weights)
         row_ap = average_precision(labels, oof)
         auc = roc_auc(labels, oof)
-        result = {
+        return {
             "l2_penalty": l2_penalty,
             "oof_shortcut_conditioned_macro_component_equal_average_precision": (
                 shortcut_conditioned["macro_average_precision"]
@@ -616,18 +653,79 @@ def tune_and_fit(
             "folds": fold_artifacts,
             "oof_scores": oof,
         }
-        grid_results.append(result)
-        # Shortcut-conditioned AP selects regularization.  Global component-equal
-        # AP is the first tie-breaker; exact ties prefer the stronger L2.
+
+    def selection_key(result: dict, include_l2_tie_break: bool) -> tuple:
         key = (
-            shortcut_conditioned["macro_average_precision"],
-            weighted_ap,
-            l2_penalty,
+            result[
+                "oof_shortcut_conditioned_macro_component_equal_average_precision"
+            ],
+            result["oof_selection_weighted_average_precision"],
         )
-        if best is None or key > best[0]:
-            best = (key, result)
-    assert best is not None
-    selected = best[1]
+        return (*key, result["l2_penalty"]) if include_l2_tie_break else key
+
+    for l2_penalty in l2_grid_initial:
+        grid_results.append(evaluate_l2(l2_penalty))
+
+    extension_factor = float(cfg.get("l2_grid_upper_extension_factor", 1.0))
+    extension_maximum = float(cfg.get("l2_grid_upper_extension_maximum", l2_grid_initial[-1]))
+    if (
+        not math.isfinite(extension_factor)
+        or extension_factor < 1.0
+        or not math.isfinite(extension_maximum)
+        or extension_maximum < l2_grid_initial[-1]
+    ):
+        raise ValueError("Step7-v3 L2 upper-extension contract is invalid")
+    extension_count = 0
+    search_stop_reason = "selected_interior_or_lower_boundary"
+    while True:
+        grid_results.sort(key=lambda result: float(result["l2_penalty"]))
+        selected = max(
+            grid_results,
+            key=lambda result: selection_key(result, include_l2_tie_break=True),
+        )
+        upper = grid_results[-1]
+        if selected is not upper or not feature_names:
+            if not feature_names:
+                search_stop_reason = "no_penalized_features"
+            break
+        earlier = grid_results[:-1]
+        strict_upper_improvement = not earlier or selection_key(
+            upper, include_l2_tie_break=False
+        ) > max(
+            selection_key(result, include_l2_tie_break=False)
+            for result in earlier
+        )
+        if not strict_upper_improvement:
+            search_stop_reason = "upper_boundary_without_strict_oof_improvement"
+            break
+        next_penalty = float(upper["l2_penalty"]) * extension_factor
+        if extension_factor <= 1.0:
+            search_stop_reason = "upper_extension_disabled"
+            break
+        if next_penalty > extension_maximum * (1.0 + 1e-12):
+            search_stop_reason = "upper_extension_maximum_reached"
+            break
+        if any(
+            math.isclose(next_penalty, float(result["l2_penalty"]))
+            for result in grid_results
+        ):
+            raise ValueError("Step7-v3 L2 extension did not produce a new value")
+        grid_results.append(evaluate_l2(next_penalty))
+        extension_count += 1
+
+    l2_grid = [float(result["l2_penalty"]) for result in grid_results]
+    if not feature_names:
+        l2_boundary_position = "not_applicable_no_penalized_features"
+        selected_l2_at_grid_boundary = False
+    elif math.isclose(float(selected["l2_penalty"]), l2_grid[0]):
+        l2_boundary_position = "lower"
+        selected_l2_at_grid_boundary = True
+    elif math.isclose(float(selected["l2_penalty"]), l2_grid[-1]):
+        l2_boundary_position = "upper"
+        selected_l2_at_grid_boundary = True
+    else:
+        l2_boundary_position = "interior"
+        selected_l2_at_grid_boundary = False
     threshold, threshold_summary = choose_threshold(
         labels, selected["oof_scores"], oof_selection_weights
     )
@@ -646,6 +744,16 @@ def tune_and_fit(
     return {
         "weighting_mode": weighting_mode,
         "selected_l2_penalty": float(selected["l2_penalty"]),
+        "selected_l2_at_grid_boundary": selected_l2_at_grid_boundary,
+        "selected_l2_grid_boundary_position": l2_boundary_position,
+        "l2_grid_boundary_action": cfg.get(
+            "l2_grid_boundary_action", "complete_and_report"
+        ),
+        "l2_grid_initial": l2_grid_initial,
+        "l2_grid_upper_extension_factor": extension_factor,
+        "l2_grid_upper_extension_maximum": extension_maximum,
+        "l2_grid_upper_extension_count": extension_count,
+        "l2_grid_search_stop_reason": search_stop_reason,
         "l2_grid": [
             {
                 key: value
@@ -671,6 +779,12 @@ def tune_and_fit(
         "final_train_artifact": final_artifact,
         "component_fold_assignment_sha256": common.canonical_hash(folds),
         "component_fold_diagnostics": fold_diagnostics,
+        "fold_feature_reference_scope": (
+            "fixed_precomputed_matrix"
+            if fold_matrices is None
+            else "each_holdout_transformed_from_its_fold_training_sellers_only"
+        ),
+        "fold_feature_reference_audit": fold_reference_audit or [],
     }
 
 def verify_model_fingerprint(model_key: str, fingerprint: dict, cfg: dict) -> None:

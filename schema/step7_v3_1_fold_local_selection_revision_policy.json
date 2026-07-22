@@ -1,0 +1,51 @@
+{
+  "version": "2026-07-22-step7-v3.1-fold-local-selection-v3",
+  "objective": "Reuse the frozen label-free Step7-v3.1 GPU encodings while correcting OOF feature-reference isolation and deterministically extending the CPU logistic-regression L2 search using training OOF results only.",
+  "parent_experiment_policy": {
+    "path": "schema/step7_v3_1_full_text_chunked_selection_policy.json",
+    "sha256": "8b319ff9d8335f36338d40a52f8dd4f06285af57033c2656ec3fc90dddf63c15",
+    "contract_sha256": "b12bdc17cf73139539390fbc76e01b11e0dbec775ec9198a5b306b9e4613a3c9"
+  },
+  "fold_feature_reference": {
+    "oof_reference_scope": "fold_training_sellers_only",
+    "final_fit_reference_scope": "all_train_sellers_only",
+    "validation_transform_reference_scope": "all_train_sellers_only",
+    "labels_used_to_fit_reference_statistics": false,
+    "heldout_seller_text_or_numeric_profiles_allowed_in_reference": false,
+    "reference_dependent_features": [
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ]
+  },
+  "training_override": {
+    "l2_grid": [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+    "l2_grid_boundary_action": "extend_on_strict_train_oof_improvement_then_complete_and_report",
+    "l2_grid_upper_extension_factor": 10.0,
+    "l2_grid_upper_extension_maximum": 1000000.0,
+    "validation_metrics_allowed_to_control_grid_extension": false
+  },
+  "outputs": {
+    "root": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection_v3_fold_local_reference_adaptive_l2",
+    "selection_summary": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection_v3_fold_local_reference_adaptive_l2/selection_summary.json",
+    "frozen_selection_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection_v3_fold_local_reference_adaptive_l2/frozen_selection_manifest.json",
+    "train_oof_predictions": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection_v3_fold_local_reference_adaptive_l2/train_oof_predictions.csv",
+    "valid_predictions": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection_v3_fold_local_reference_adaptive_l2/valid_predictions.csv"
+  },
+  "hard_rules": [
+    "No OOF heldout seller may contribute titles, descriptions, or numeric values to that fold's reference statistics.",
+    "The final classifier may fit references on all 401 training-pair sellers and must transform validation with that frozen training reference.",
+    "An L2 upper-bound winner is extended by a factor of ten only while its train-OOF selection metrics strictly improve, up to the fixed maximum; validation metrics never control extension.",
+    "An L2 optimum remaining on the final boundary is reported and does not abort the run.",
+    "Existing GPU embeddings and the original selection outputs are immutable and are not regenerated or overwritten by this CPU-only revision."
+  ]
+}

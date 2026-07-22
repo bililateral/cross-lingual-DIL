@@ -85,6 +85,11 @@ class Step7V31Contracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.policy = json.loads(common.DEFAULT_POLICY.read_text(encoding="utf-8"))
+        cls.selection_revision = selector.load_selection_revision(
+            selector.DEFAULT_SELECTION_REVISION,
+            cls.policy,
+            common.DEFAULT_POLICY,
+        )
 
     def test_policy_and_standalone_source_contract_are_frozen_and_valid(self):
         common.validate_policy(self.policy)
@@ -119,6 +124,31 @@ class Step7V31Contracts(unittest.TestCase):
         self.assertEqual(chunk["token_budget_including_model_prefix_and_special_tokens"], 480)
         self.assertNotIn("shared_reranker", self.policy)
         self.assertNotIn("reranker", " ".join(self.policy["candidate_tiers"]))
+
+    def test_selection_revision_is_fold_local_and_expands_l2_without_aborting(self):
+        training = selector.effective_training_config(
+            self.policy, self.selection_revision
+        )
+        self.assertEqual(
+            training["l2_grid"], [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+        )
+        self.assertEqual(
+            training["l2_grid_boundary_action"],
+            "extend_on_strict_train_oof_improvement_then_complete_and_report",
+        )
+        self.assertEqual(training["l2_grid_upper_extension_factor"], 10.0)
+        self.assertEqual(training["l2_grid_upper_extension_maximum"], 1000000.0)
+        self.assertFalse(
+            training["validation_metrics_allowed_to_control_grid_extension"]
+        )
+        self.assertEqual(
+            training["fold_feature_reference_scope"],
+            "fold_training_sellers_only",
+        )
+        self.assertNotEqual(
+            self.selection_revision["outputs"]["root"],
+            self.policy["outputs"]["selection_summary"].rsplit("/", 1)[0],
+        )
 
     def test_candidate_matrix_is_ten_encoder_pipelines_plus_three_controls(self):
         specs = selector.candidate_specs(self.policy)
@@ -514,6 +544,201 @@ class Step7V31Contracts(unittest.TestCase):
         self.assertTrue(math.isfinite(result["selected_threshold"]))
         self.assertEqual(len(result["train_oof_scores"]), len(rows))
         self.assertGreater(result["train_oof_metrics"]["average_precision"], 0.95)
+
+    def test_fold_reference_excludes_heldout_seller_statistics(self):
+        rows = []
+        seller_records = {}
+        for component_index in range(20):
+            left_uid = f"left-{component_index}"
+            right_uid = f"right-{component_index}"
+            rows.append(
+                {
+                    "pair_uid": f"pair-{component_index}",
+                    "split_name": "train",
+                    "component_id": f"component-{component_index}",
+                    "review_label": (
+                        "positive" if component_index % 2 == 0 else "negative"
+                    ),
+                    "seller_uid_left": left_uid,
+                    "seller_uid_right": right_uid,
+                }
+            )
+            for side_index, seller_uid in enumerate((left_uid, right_uid)):
+                numeric = {
+                    name: float(component_index * 2 + side_index + 1)
+                    for name in source.NUMERIC_PROFILE_FIELDS
+                }
+                seller_records[seller_uid] = {
+                    "seller_uid": seller_uid,
+                    "model_text": f"seller {component_index} {side_index}",
+                    "clean_categories": [f"category-{component_index % 3}"],
+                    "clean_titles": [f"title-{component_index}"],
+                    "clean_descriptions": [f"description-{component_index}"],
+                    "source_dataset": "dataset",
+                    "source_market_raw": "market",
+                    "numeric_profile": numeric,
+                }
+        all_sellers = set(seller_records)
+        full_reference = source.train_reference(seller_records, all_sellers)
+        base_safe = source.build_safe_pair_rows(rows, seller_records, full_reference)
+        base_features = {
+            row["pair_uid"]: {
+                **{name: float(row[name]) for name in source.SAFE_FEATURE_NAMES},
+                "synthetic_encoder_feature": 0.25,
+            }
+            for row in base_safe
+        }
+        training = selector.effective_training_config(
+            self.policy, self.selection_revision
+        )
+        views, audits, assignments = selector.build_fold_local_feature_views(
+            rows, seller_records, base_features, training
+        )
+        self.assertEqual(set(views), set(range(training["fold_count"])))
+        self.assertEqual([record["fold"] for record in audits], list(range(5)))
+        self.assertTrue(all(record["fit_holdout_seller_overlap_count"] == 0 for record in audits))
+
+        target_fold = 0
+        heldout_sellers = {
+            row[endpoint]
+            for row in rows
+            if assignments[row["component_id"]] == target_fold
+            for endpoint in ("seller_uid_left", "seller_uid_right")
+        }
+        mutated_records = copy.deepcopy(seller_records)
+        for seller_uid in heldout_sellers:
+            for name in source.NUMERIC_PROFILE_FIELDS:
+                mutated_records[seller_uid]["numeric_profile"][name] += 10000.0
+        _mutated_views, mutated_audits, _mutated_assignments = (
+            selector.build_fold_local_feature_views(
+                rows, mutated_records, base_features, training
+            )
+        )
+        self.assertEqual(
+            audits[target_fold]["feature_reference_sha256"],
+            mutated_audits[target_fold]["feature_reference_sha256"],
+        )
+
+    def test_l2_boundary_is_reported_without_rejecting_output(self):
+        policy = copy.deepcopy(self.policy)
+        policy["training"]["l2_grid"] = [0.1, 1.0]
+        policy["training"]["l2_grid_boundary_action"] = "complete_and_report"
+        rows = []
+        for component_index in range(10):
+            for label in ("negative", "positive"):
+                rows.append(
+                    {
+                        "pair_uid": f"{component_index}-{label}",
+                        "split_name": "train",
+                        "component_id": f"component-{component_index}",
+                        "review_label": label,
+                        "seller_uid_left": f"left-{component_index}-{label}",
+                        "seller_uid_right": f"right-{component_index}-{label}",
+                        core.SHORTCUT_CONTROL_STRATUM_FIELD: (
+                            "same_market=0|same_source=1"
+                            if component_index % 2 == 0
+                            else "same_market=1|same_source=1"
+                        ),
+                    }
+                )
+        result = core.tune_and_fit(
+            rows,
+            np.zeros((len(rows), 0), dtype=np.float64),
+            [],
+            policy,
+            "component_equal_normalized_to_row_count",
+        )
+        self.assertEqual(result["selected_l2_penalty"], 1.0)
+        self.assertFalse(result["selected_l2_at_grid_boundary"])
+        self.assertEqual(
+            result["selected_l2_grid_boundary_position"],
+            "not_applicable_no_penalized_features",
+        )
+        self.assertEqual(result["l2_grid_boundary_action"], "complete_and_report")
+
+    def test_l2_upper_grid_extends_using_oof_metrics_and_finds_interior_peak(self):
+        policy = copy.deepcopy(self.policy)
+        policy["training"].update(
+            {
+                "l2_grid": [0.1, 1.0],
+                "l2_grid_boundary_action": (
+                    "extend_on_strict_train_oof_improvement_then_complete_and_report"
+                ),
+                "l2_grid_upper_extension_factor": 10.0,
+                "l2_grid_upper_extension_maximum": 100.0,
+            }
+        )
+        rows = []
+        for component_index in range(10):
+            for label in ("negative", "positive"):
+                rows.append(
+                    {
+                        "pair_uid": f"adaptive-{component_index}-{label}",
+                        "split_name": "train",
+                        "component_id": f"adaptive-component-{component_index}",
+                        "review_label": label,
+                        "seller_uid_left": f"adaptive-left-{component_index}-{label}",
+                        "seller_uid_right": f"adaptive-right-{component_index}-{label}",
+                        core.SHORTCUT_CONTROL_STRATUM_FIELD: (
+                            "same_market=0|same_source=1"
+                            if component_index % 2 == 0
+                            else "same_market=1|same_source=1"
+                        ),
+                    }
+                )
+
+        def fake_fit(matrix, labels, weights, l2_penalty, *_args):
+            width = matrix.shape[1]
+            return {
+                "mean": [0.0] * width,
+                "scale": [1.0] * width,
+                "intercept": 0.0,
+                "coefficients": [0.0] * width,
+                "l2_penalty": float(l2_penalty),
+                "solver_iterations": 1,
+                "solver_converged": True,
+            }
+
+        def fake_apply(matrix, artifact):
+            penalty = float(artifact["l2_penalty"])
+            return np.full(len(matrix), penalty / (1.0 + penalty), dtype=np.float64)
+
+        def fake_conditioned(_rows, _labels, scores, _policy, **_kwargs):
+            encoded = float(scores[0])
+            penalty = encoded / (1.0 - encoded)
+            metric = min(
+                ((0.1, 0.5), (1.0, 0.8), (10.0, 0.6)),
+                key=lambda item: abs(item[0] - penalty),
+            )[1]
+            return {"macro_average_precision": metric}
+
+        with (
+            mock.patch.object(core, "fit_logistic", side_effect=fake_fit),
+            mock.patch.object(core, "apply_logistic", side_effect=fake_apply),
+            mock.patch.object(
+                core,
+                "shortcut_conditioned_component_equal_average_precision",
+                side_effect=fake_conditioned,
+            ),
+        ):
+            result = core.tune_and_fit(
+                rows,
+                np.zeros((len(rows), 1), dtype=np.float64),
+                ["synthetic_feature"],
+                policy,
+                "component_equal_normalized_to_row_count",
+            )
+        self.assertEqual(result["selected_l2_penalty"], 1.0)
+        self.assertEqual(result["l2_grid_upper_extension_count"], 1)
+        self.assertEqual(
+            [record["l2_penalty"] for record in result["l2_grid"]],
+            [0.1, 1.0, 10.0],
+        )
+        self.assertEqual(result["selected_l2_grid_boundary_position"], "interior")
+        self.assertEqual(
+            result["l2_grid_search_stop_reason"],
+            "selected_interior_or_lower_boundary",
+        )
 
     def test_development_label_projection_never_reads_test_values(self):
         source_policy = common.source_policy(self.policy)
