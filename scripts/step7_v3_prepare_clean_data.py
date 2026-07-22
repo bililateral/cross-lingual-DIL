@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare label-isolated clean English inputs and train-referenced safe features for Step7-v2."""
+"""Prepare label-isolated clean English inputs and train-referenced safe features for Step7-v3."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import step7_v2_common as common
+import step7_v3_common as common
 
 
 PREPARATION_SCRIPT = Path(__file__).resolve()
@@ -49,17 +49,17 @@ def validate_supervision_counts(
         }
         if observed[split] != expected[split]:
             raise ValueError(
-                f"Step7-v2 supervision boundary drift for {split}: "
+                f"Step7-v3 supervision boundary drift for {split}: "
                 f"expected={expected[split]} observed={observed[split]}"
             )
     expected_total = sum(int(expected[split]["total"]) for split in splits)
     if len(rows) != expected_total:
         raise ValueError(
-            f"Step7-v2 supervision total drift: expected={expected_total} observed={len(rows)}"
+            f"Step7-v3 supervision total drift: expected={expected_total} observed={len(rows)}"
         )
     pair_uids = [row["pair_uid"] for row in rows]
     if len(pair_uids) != len(set(pair_uids)):
-        raise ValueError("Step7-v2 eligible supervision has duplicate pair_uid values")
+        raise ValueError("Step7-v3 eligible supervision has duplicate pair_uid values")
     return observed
 
 
@@ -82,20 +82,20 @@ def eligible_assignment_rows(policy: dict, rows: list[dict]) -> list[dict]:
         if row.get("dataset") == dataset and row.get("split_name") in allowed_splits
     ]
     if any(not row["pair_uid"] for row in selected):
-        raise ValueError("Step7-v2 component assignments contain an empty pair_uid")
+        raise ValueError("Step7-v3 component assignments contain an empty pair_uid")
     index = {row["pair_uid"]: row for row in selected}
     if len(index) != len(selected):
-        raise ValueError("Step7-v2 component assignments have duplicate pair_uid values")
+        raise ValueError("Step7-v3 component assignments have duplicate pair_uid values")
     expected = policy["supervision_boundary"]["expected_counts"]
     observed = Counter(row["split_name"] for row in selected)
     for split in ("train", "valid", "test"):
         if observed[split] != int(expected[split]["total"]):
             raise ValueError(
-                f"Step7-v2 public pair boundary drift for {split}: "
+                f"Step7-v3 public pair boundary drift for {split}: "
                 f"expected={expected[split]['total']} observed={observed[split]}"
             )
     if len(selected) != int(expected["total"]):
-        raise ValueError("Step7-v2 public pair universe is not exactly 734 rows")
+        raise ValueError("Step7-v3 public pair universe is not exactly 734 rows")
     return selected
 
 
@@ -106,7 +106,7 @@ def build_pair_manifest(assignment_rows: list[dict], component_field: str) -> li
         pair_uid = assignment["pair_uid"]
         component_id = str(assignment.get(component_field, "") or "").strip()
         if not component_id:
-            raise ValueError(f"Step7-v2 empty recomputed component for pair={pair_uid}")
+            raise ValueError(f"Step7-v3 empty recomputed component for pair={pair_uid}")
         output.append(
             {
                 "pair_uid": pair_uid,
@@ -130,9 +130,9 @@ def validate_split_isolation(pair_rows: list[dict]) -> dict:
     bad_components = sorted(key for key, values in component_splits.items() if len(values) != 1)
     bad_sellers = sorted(key for key, values in seller_splits.items() if len(values) != 1)
     if bad_components:
-        raise ValueError(f"Step7-v2 component crosses splits: {bad_components[0]}")
+        raise ValueError(f"Step7-v3 component crosses splits: {bad_components[0]}")
     if bad_sellers:
-        raise ValueError(f"Step7-v2 seller crosses splits: {bad_sellers[0]}")
+        raise ValueError(f"Step7-v3 seller crosses splits: {bad_sellers[0]}")
     return {
         "component_count_by_split": {
             split: len(
@@ -163,7 +163,7 @@ def validate_split_isolation(pair_rows: list[dict]) -> dict:
 def evidence_index(rows: list[dict]) -> dict[str, dict]:
     index = {row["pair_uid"]: row for row in rows}
     if len(index) != len(rows):
-        raise ValueError("Step7-v2 evidence labels contain duplicate pair_uid values")
+        raise ValueError("Step7-v3 evidence labels contain duplicate pair_uid values")
     return index
 
 
@@ -171,9 +171,9 @@ def parse_count(value: object, field_name: str) -> int:
     try:
         numeric = float(str(value).strip())
     except (TypeError, ValueError) as exc:
-        raise ValueError(f"Step7-v2 invalid identity-control count: {field_name}") from exc
+        raise ValueError(f"Step7-v3 invalid identity-control count: {field_name}") from exc
     if not numeric.is_integer() or numeric < 0:
-        raise ValueError(f"Step7-v2 invalid identity-control count: {field_name}")
+        raise ValueError(f"Step7-v3 invalid identity-control count: {field_name}")
     return int(numeric)
 
 
@@ -193,15 +193,15 @@ def private_label_rows(
         for endpoint in ("seller_uid_left", "seller_uid_right"):
             if source.get(endpoint) != pair[endpoint]:
                 raise ValueError(
-                    f"Step7-v2 private label/public endpoint mismatch for pair={pair_uid}"
+                    f"Step7-v3 private label/public endpoint mismatch for pair={pair_uid}"
                 )
         evidence_row = evidence.get(pair_uid)
         if evidence_row is None:
-            raise ValueError(f"Step7-v2 evidence label missing for pair={pair_uid}")
+            raise ValueError(f"Step7-v3 evidence label missing for pair={pair_uid}")
         if evidence_row["review_label"] != source["review_label"]:
-            raise ValueError(f"Step7-v2 evidence/review label mismatch for pair={pair_uid}")
+            raise ValueError(f"Step7-v3 evidence/review label mismatch for pair={pair_uid}")
         if evidence_row["split_name"] != split:
-            raise ValueError(f"Step7-v2 evidence split mismatch for pair={pair_uid}")
+            raise ValueError(f"Step7-v3 evidence split mismatch for pair={pair_uid}")
         direct_count = parse_count(
             source.get("shared_contact_count"), "shared_contact_count"
         ) + parse_count(
@@ -231,7 +231,7 @@ def content_fidelity_summary(
         str(row["seller_uid"]): str(row["model_text"]) for row in corpus_rows
     }
     if set(profile_by_uid) != set(corpus_by_uid):
-        raise ValueError("Step7-v2 content-fidelity seller universe drift")
+        raise ValueError("Step7-v3 content-fidelity seller universe drift")
     raw_text = "\n".join(
         str(profile_by_uid[seller_uid].get(field, ""))
         for seller_uid in sorted(profile_by_uid)
@@ -243,7 +243,7 @@ def content_fidelity_summary(
     raw_character_count = len(raw_text)
     clean_character_count = len(clean_text)
     if raw_character_count <= 0:
-        raise ValueError("Step7-v2 source content is empty")
+        raise ValueError("Step7-v3 source content is empty")
     aggregate_retention = clean_character_count / raw_character_count
     fallback_count = sum(
         value == clean_cfg["empty_text_fallback"] for value in corpus_by_uid.values()
@@ -257,7 +257,7 @@ def content_fidelity_summary(
         clean_count = len(pattern.findall(clean_text))
         if raw_count <= 0:
             raise ValueError(
-                f"Step7-v2 protected content word disappeared upstream: {word}"
+                f"Step7-v3 protected content word disappeared upstream: {word}"
             )
         retention = clean_count / raw_count
         protected_words[str(word)] = {
@@ -267,7 +267,7 @@ def content_fidelity_summary(
         }
         if retention < float(quality["minimum_protected_word_retention"]):
             raise ValueError(
-                f"Step7-v2 over-redaction gate failed for protected content word: {word}"
+                f"Step7-v3 over-redaction gate failed for protected content word: {word}"
             )
     protected_collisions = {}
     for term in quality["protected_identity_collision_terms"]:
@@ -277,7 +277,7 @@ def content_fidelity_summary(
         clean_count = len(pattern.findall(clean_text))
         if raw_count <= 0:
             raise ValueError(
-                f"Step7-v2 protected identity-collision term disappeared upstream: {term}"
+                f"Step7-v3 protected identity-collision term disappeared upstream: {term}"
             )
         retention = clean_count / raw_count
         protected_collisions[str(term)] = {
@@ -289,13 +289,13 @@ def content_fidelity_summary(
             quality["minimum_protected_identity_collision_term_retention"]
         ):
             raise ValueError(
-                "Step7-v2 over-redaction gate failed for identity-collision term: "
+                "Step7-v3 over-redaction gate failed for identity-collision term: "
                 f"{term}"
             )
     if aggregate_retention < float(quality["minimum_aggregate_character_retention"]):
-        raise ValueError("Step7-v2 aggregate content-retention gate failed")
+        raise ValueError("Step7-v3 aggregate content-retention gate failed")
     if fallback_count > int(quality["maximum_empty_fallback_count"]):
-        raise ValueError("Step7-v2 empty-content fallback gate failed")
+        raise ValueError("Step7-v3 empty-content fallback gate failed")
     return {
         "raw_source_field_character_count": raw_character_count,
         "clean_model_text_character_count": clean_character_count,
@@ -328,23 +328,23 @@ def prepare_public(policy: dict) -> dict:
     if isolation["component_count_by_split"] != boundary[
         "expected_component_count_by_split"
     ]:
-        raise ValueError("Step7-v2 component-count boundary drift")
+        raise ValueError("Step7-v3 component-count boundary drift")
     if isolation["seller_count_by_split"] != boundary[
         "expected_seller_count_by_split"
     ]:
-        raise ValueError("Step7-v2 seller-count boundary drift")
+        raise ValueError("Step7-v3 seller-count boundary drift")
 
     profiles_list = common.load_jsonl(profiles_path)
     profiles = {str(row["seller_uid"]): row for row in profiles_list}
     if len(profiles) != len(profiles_list):
-        raise ValueError("Step7-v2 seller profiles contain duplicate seller_uid values")
+        raise ValueError("Step7-v3 seller profiles contain duplicate seller_uid values")
     seller_split: dict[str, str] = {}
     for pair in pairs:
         for endpoint in ("seller_uid_left", "seller_uid_right"):
             seller_split[pair[endpoint]] = pair["split_name"]
     missing_profiles = sorted(set(seller_split) - set(profiles))
     if missing_profiles:
-        raise ValueError(f"Step7-v2 seller profile missing: {missing_profiles[0]}")
+        raise ValueError(f"Step7-v3 seller profile missing: {missing_profiles[0]}")
 
     literals, signal_summary = common.signal_literals_by_seller(signals_path)
     eligible_profiles = [profiles[seller_uid] for seller_uid in sorted(seller_split)]
@@ -362,7 +362,7 @@ def prepare_public(policy: dict) -> dict:
         for compact in protected_collision_compacts
     ):
         raise ValueError(
-            "Step7-v2 audited identity phrases overlap protected content collisions"
+            "Step7-v3 audited identity phrases overlap protected content collisions"
         )
     # This is a label-free decontamination dictionary, not a learned feature.
     # Use every seller alias in the pinned English snapshot so that cloned ads
@@ -453,7 +453,7 @@ def prepare_public(policy: dict) -> dict:
     safe_rows = common.build_safe_pair_rows(pairs, seller_records, reference)
     common.validate_safe_pair_feature_rows(safe_rows)
     if [row["pair_uid"] for row in safe_rows] != [row["pair_uid"] for row in pairs]:
-        raise AssertionError("Step7-v2 safe feature row order differs from pair manifest")
+        raise AssertionError("Step7-v3 safe feature row order differs from pair manifest")
 
     corpus_rows = [
         {
@@ -549,7 +549,7 @@ def prepare_public(policy: dict) -> dict:
         )
     ):
         raise ValueError(
-            "Step7-v2 audited identity-phrase matched registry is invalid"
+            "Step7-v3 audited identity-phrase matched registry is invalid"
         )
     signal_summary["audited_global_identity_phrase_fixed_snapshot_audit"] = {
         "status": "pass_manual_seller_and_market_identity_classification_is_public_input_hash_pinned",
@@ -629,7 +629,7 @@ def prepare_private_labels(
         row["pair_uid"] for row in pair_rows if row["split_name"] in set(splits)
     }
     if {row["pair_uid"] for row in labels} != expected_pair_uids:
-        raise ValueError("Step7-v2 private labels differ from the fixed public pair universe")
+        raise ValueError("Step7-v3 private labels differ from the fixed public pair universe")
     evidence = evidence_index(
         [
             row
@@ -714,7 +714,7 @@ def main() -> None:
             "safe_pair_features": safe_path,
         }
         manifest = {
-            "step": "step7_v2_prepare_public_label_free_data",
+            "step": "step7_v3_prepare_public_label_free_data",
             "version": policy["version"],
             "policy_path": str(policy_path.relative_to(common.ROOT)).replace("\\", "/"),
             "policy_sha256": common.sha256_file(policy_path),
@@ -740,6 +740,9 @@ def main() -> None:
             "identity_residue_scan": identity_residue_scan,
             "feature_generation_uses_review_label_values": False,
             "feature_generation_uses_evidence_type_values": False,
+            "pair_feature_roles": policy["pair_feature_roles"],
+            "shortcut_features_generated_for_audit_only": True,
+            "shortcut_features_eligible_for_model_training_or_selection": False,
             "boundary_source_file_contains_review_label_column": True,
             "boundary_projection_fields": [
                 "dataset",
@@ -772,11 +775,11 @@ def main() -> None:
 
     manifest_path = common.resolve(outputs["preparation_manifest"])
     if not pair_path.is_file() or not manifest_path.is_file():
-        raise FileNotFoundError("Run the Step7-v2 public preparation stage first")
+        raise FileNotFoundError("Run the Step7-v3 public preparation stage first")
     public_manifest = common.load_json(manifest_path)
     public_pair_record = public_manifest["output_files"]["pair_manifest"]
     if common.sha256_file(pair_path) != public_pair_record["sha256"]:
-        raise ValueError("Step7-v2 public pair manifest drift before label attachment")
+        raise ValueError("Step7-v3 public pair manifest drift before label attachment")
     pair_rows = common.load_csv(pair_path)
     if args.stage == "development-labels":
         splits = ("train", "valid")
@@ -798,7 +801,7 @@ def main() -> None:
     for split, rows in prepared["private"].items():
         common.write_csv_immutable(private_paths[split], rows)
     label_manifest = {
-        "step": f"step7_v2_prepare_{args.stage.replace('-', '_')}",
+        "step": f"step7_v3_prepare_{args.stage.replace('-', '_')}",
         "version": policy["version"],
         "policy_sha256": common.sha256_file(policy_path),
         "generator_script_path": str(PREPARATION_SCRIPT.relative_to(common.ROOT)).replace("\\", "/"),

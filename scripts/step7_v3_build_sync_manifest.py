@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a strictly label-free Windows-to-Linux Step7-v2 GPU payload manifest."""
+"""Build a strictly label-free Windows-to-Linux Step7-v3 GPU payload manifest."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-import step7_v2_common as common
+import step7_v3_common as common
 
 
 SYNC_SCRIPT = Path(__file__).resolve()
@@ -15,10 +15,10 @@ SYNC_SCRIPT = Path(__file__).resolve()
 
 GPU_CODE_PATHS = [
     "scripts/step3_build_seller_profiles.py",
-    "scripts/step7_v2_common.py",
-    "scripts/step7_v2_build_sync_manifest.py",
-    "scripts/step7_v2_encode_clean_models.py",
-    "scripts/run_step7_v2_clean_source_linux_20260721.sh",
+    "scripts/step7_v3_common.py",
+    "scripts/step7_v3_build_sync_manifest.py",
+    "scripts/step7_v3_encode_clean_models.py",
+    "scripts/run_step7_v3_clean_source_linux_20260722.sh",
 ]
 
 
@@ -29,7 +29,7 @@ def relative(path) -> str:
 def file_record(path_value: str) -> dict:
     path = common.resolve(path_value)
     if not path.is_file():
-        raise FileNotFoundError(f"Step7-v2 GPU sync input is missing: {path}")
+        raise FileNotFoundError(f"Step7-v3 GPU sync input is missing: {path}")
     return {
         "path": relative(path),
         "size_bytes": path.stat().st_size,
@@ -41,18 +41,22 @@ def build_payload(policy: dict, policy_path) -> dict:
     outputs = policy["outputs"]
     public_manifest_path = common.resolve(outputs["preparation_manifest"])
     if not public_manifest_path.is_file():
-        raise FileNotFoundError("Run Step7-v2 public preparation before building GPU sync")
+        raise FileNotFoundError("Run Step7-v3 public preparation before building GPU sync")
     public_manifest = common.load_json(public_manifest_path)
-    if public_manifest.get("step") != "step7_v2_prepare_public_label_free_data":
-        raise ValueError("Step7-v2 GPU sync refuses a non-public preparation manifest")
+    if public_manifest.get("step") != "step7_v3_prepare_public_label_free_data":
+        raise ValueError("Step7-v3 GPU sync refuses a non-public preparation manifest")
     if public_manifest.get("feature_generation_uses_review_label_values") is not False:
-        raise ValueError("Step7-v2 public preparation is not label isolated")
+        raise ValueError("Step7-v3 public preparation is not label isolated")
+    if public_manifest.get("pair_feature_roles") != policy["pair_feature_roles"] or public_manifest.get(
+        "shortcut_features_eligible_for_model_training_or_selection"
+    ) is not False:
+        raise ValueError("Step7-v3 public shortcut feature roles are stale or unsafe")
     required_public_hashes = {
         "generator_script_sha256": common.sha256_file(
-            common.resolve("scripts/step7_v2_prepare_clean_data.py")
+            common.resolve("scripts/step7_v3_prepare_clean_data.py")
         ),
         "common_script_sha256": common.sha256_file(
-            common.resolve("scripts/step7_v2_common.py")
+            common.resolve("scripts/step7_v3_common.py")
         ),
         "redaction_dependency_script_sha256": common.sha256_file(
             common.resolve("scripts/step3_build_seller_profiles.py")
@@ -61,25 +65,25 @@ def build_payload(policy: dict, policy_path) -> dict:
     }
     for field, expected in required_public_hashes.items():
         if public_manifest.get(field) != expected:
-            raise ValueError(f"Step7-v2 public preparation is stale: {field}")
+            raise ValueError(f"Step7-v3 public preparation is stale: {field}")
     residue_scan = public_manifest.get("identity_residue_scan", {})
     if residue_scan.get("status") != "pass" or residue_scan.get(
         "total_residue_count"
     ) != 0:
-        raise ValueError("Step7-v2 public identity-residue audit did not pass")
+        raise ValueError("Step7-v3 public identity-residue audit did not pass")
     common.validate_content_fidelity_manifest(policy, public_manifest)
     common.validate_global_identity_audit_manifest(policy, public_manifest)
     for key in ("pair_manifest", "clean_corpus"):
         record = public_manifest.get("output_files", {}).get(key)
         if record is None:
-            raise ValueError(f"Step7-v2 public preparation omits {key}")
+            raise ValueError(f"Step7-v3 public preparation omits {key}")
         path = common.resolve(record["path"])
         if (
             not path.is_file()
             or path.stat().st_size != int(record["size_bytes"])
             or common.sha256_file(path) != record["sha256"]
         ):
-            raise ValueError(f"Step7-v2 public preparation artifact drift: {key}")
+            raise ValueError(f"Step7-v3 public preparation artifact drift: {key}")
 
     data_paths = [
         outputs["pair_manifest"],
@@ -104,7 +108,7 @@ def build_payload(policy: dict, policy_path) -> dict:
     )
     overlap = sorted(file_paths & set(forbidden_paths))
     if overlap:
-        raise ValueError(f"Step7-v2 GPU payload includes forbidden source/label file: {overlap[0]}")
+        raise ValueError(f"Step7-v3 GPU payload includes forbidden source/label file: {overlap[0]}")
 
     model_directories = {}
     for key, cfg in policy["embedding_models"].items():
@@ -137,7 +141,7 @@ def build_payload(policy: dict, policy_path) -> dict:
         ]
     )
     return {
-        "step": "step7_v2_label_free_windows_to_linux_gpu_sync",
+        "step": "step7_v3_label_free_windows_to_linux_gpu_sync",
         "version": policy["version"],
         "generator_script_path": relative(SYNC_SCRIPT),
         "generator_script_sha256": common.sha256_file(SYNC_SCRIPT),
@@ -154,9 +158,9 @@ def build_payload(policy: dict, policy_path) -> dict:
         "gpu_workspace_requires_forbidden_paths_absent": True,
         "model_payloads_must_already_exist_on_linux_or_be_synced_separately": True,
         "expected_gpu_outputs_to_sync_back": expected_gpu_outputs,
-        "formal_command": "bash scripts/run_step7_v2_clean_source_linux_20260721.sh",
+        "formal_command": "bash scripts/run_step7_v3_clean_source_linux_20260722.sh",
         "post_gpu_windows_command": (
-            "python scripts/step7_v2_select_source_model.py --stage select"
+            "python scripts/step7_v3_select_source_model.py --stage select"
         ),
     }
 
@@ -174,9 +178,9 @@ def main() -> None:
     output_path = common.resolve(policy["outputs"]["gpu_sync_manifest"])
     if args.validate_only:
         if not output_path.is_file():
-            raise FileNotFoundError("Step7-v2 GPU sync manifest has not been built")
+            raise FileNotFoundError("Step7-v3 GPU sync manifest has not been built")
         if common.load_json(output_path) != payload:
-            raise ValueError("Step7-v2 GPU sync manifest is stale; rebuild it before transfer")
+            raise ValueError("Step7-v3 GPU sync manifest is stale; rebuild it before transfer")
         print(
             json.dumps(
                 {"status": "pass", "existing_manifest_matches_current_payload": True},

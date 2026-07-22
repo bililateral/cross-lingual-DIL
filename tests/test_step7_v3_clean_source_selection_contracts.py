@@ -23,13 +23,13 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-import step7_v2_common as common  # noqa: E402
-import step7_v2_encode_clean_models as encode  # noqa: E402
-import step7_v2_prepare_clean_data as prepare  # noqa: E402
-import step7_v2_select_source_model as select  # noqa: E402
+import step7_v3_common as common  # noqa: E402
+import step7_v3_encode_clean_models as encode  # noqa: E402
+import step7_v3_prepare_clean_data as prepare  # noqa: E402
+import step7_v3_select_source_model as select  # noqa: E402
 
 
-class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
+class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.policy = common.load_json(common.DEFAULT_POLICY)
@@ -92,15 +92,15 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         outputs["gpu_output_manifest"] = str(temp_root / "gpu_output.json")
         policy_contract = common.canonical_hash(policy)
         public_path = common.resolve(outputs["preparation_manifest"])
-        encoder_path = ROOT / "scripts" / "step7_v2_encode_clean_models.py"
+        encoder_path = ROOT / "scripts" / "step7_v3_encode_clean_models.py"
         sync_files = [
             self.file_record(common.DEFAULT_POLICY),
             self.file_record(ROOT / "scripts" / "step3_build_seller_profiles.py"),
-            self.file_record(ROOT / "scripts" / "step7_v2_common.py"),
-            self.file_record(ROOT / "scripts" / "step7_v2_build_sync_manifest.py"),
+            self.file_record(ROOT / "scripts" / "step7_v3_common.py"),
+            self.file_record(ROOT / "scripts" / "step7_v3_build_sync_manifest.py"),
             self.file_record(encoder_path),
             self.file_record(
-                ROOT / "scripts" / "run_step7_v2_clean_source_linux_20260721.sh"
+                ROOT / "scripts" / "run_step7_v3_clean_source_linux_20260722.sh"
             ),
             self.file_record(common.resolve(outputs["pair_manifest"])),
             self.file_record(common.resolve(outputs["clean_corpus"])),
@@ -125,11 +125,11 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             }
         )
         sync = {
-            "step": "step7_v2_label_free_windows_to_linux_gpu_sync",
+            "step": "step7_v3_label_free_windows_to_linux_gpu_sync",
             "version": policy["version"],
-            "generator_script_path": "scripts/step7_v2_build_sync_manifest.py",
+            "generator_script_path": "scripts/step7_v3_build_sync_manifest.py",
             "generator_script_sha256": common.sha256_file(
-                ROOT / "scripts" / "step7_v2_build_sync_manifest.py"
+                ROOT / "scripts" / "step7_v3_build_sync_manifest.py"
             ),
             "policy_sha256": common.sha256_file(common.DEFAULT_POLICY),
             "policy_contract_sha256": policy_contract,
@@ -150,7 +150,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         provenance = {
             "policy_sha256": sync["policy_sha256"],
             "policy_contract_sha256": policy_contract,
-            "generator_script_path": "scripts/step7_v2_encode_clean_models.py",
+            "generator_script_path": "scripts/step7_v3_encode_clean_models.py",
             "generator_script_sha256": common.sha256_file(encoder_path),
             "gpu_sync_manifest_sha256": common.sha256_file(sync_path),
             "public_preparation_manifest_sha256": common.sha256_file(public_path),
@@ -184,7 +184,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             common.write_json_immutable(
                 manifest_path,
                 {
-                    "step": "step7_v2_encode_clean_embedding",
+                    "step": "step7_v3_encode_clean_embedding",
                     "version": policy["version"],
                     "model_key": model_key,
                     "repo_id": cfg["repo_id"],
@@ -244,7 +244,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         common.write_json_immutable(
             Path(outputs["reranker_manifest"]),
             {
-                "step": "step7_v2_encode_clean_reranker",
+                "step": "step7_v3_encode_clean_reranker",
                 "version": policy["version"],
                 "model_key": reranker_cfg["model_key"],
                 "repo_id": reranker_cfg["repo_id"],
@@ -292,7 +292,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         common.write_json_immutable(
             Path(outputs["gpu_output_manifest"]),
             {
-                "step": "step7_v2_label_free_gpu_output_bundle",
+                "step": "step7_v3_label_free_gpu_output_bundle",
                 "version": policy["version"],
                 **provenance,
                 "label_or_raw_source_files_present_in_gpu_workspace": False,
@@ -351,6 +351,10 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         manifest = common.load_json(common.resolve(outputs["preparation_manifest"]))
         self.assertFalse(manifest["feature_generation_uses_review_label_values"])
         self.assertFalse(manifest["feature_generation_uses_evidence_type_values"])
+        self.assertEqual(manifest["pair_feature_roles"], self.policy["pair_feature_roles"])
+        self.assertFalse(
+            manifest["shortcut_features_eligible_for_model_training_or_selection"]
+        )
         self.assertTrue(manifest["boundary_source_file_contains_review_label_column"])
         self.assertEqual(
             manifest["pair_universe_source"],
@@ -1634,17 +1638,46 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, source)
 
-    def test_candidate_matrix_is_fifteen_and_excludes_identity(self) -> None:
+    def test_candidate_matrix_separates_encoder_pipeline_and_shortcut_roles(self) -> None:
         specs = select.candidate_specs(self.policy)
-        self.assertEqual(len(specs), 15)
+        self.assertEqual(len(specs), 25)
         forbidden = set(self.policy["forbidden_m0_features"])
+        shortcuts = set(
+            self.policy["pair_feature_roles"]["shortcut_audit_only_features"]
+        )
         for spec in specs:
             self.assertFalse(forbidden & set(spec["feature_names"]))
-            self.assertEqual(spec["feature_names"][0], self.policy["embedding_models"][spec["model_key"]]["feature_name"])
-        full = [spec for spec in specs if spec["tier"] == "encoder_plus_safe_plus_shared_reranker"]
+            if spec["m0_pipeline_eligible"] or spec["encoder_comparison_eligible"]:
+                self.assertFalse(shortcuts & set(spec["feature_names"]))
+        encoder_only = [spec for spec in specs if spec["encoder_comparison_eligible"]]
+        self.assertEqual(len(encoder_only), 5)
+        for spec in encoder_only:
+            self.assertEqual(
+                spec["feature_names"],
+                [self.policy["embedding_models"][spec["model_key"]]["feature_name"]],
+            )
+        self.assertEqual(sum(spec["m0_pipeline_eligible"] for spec in specs), 20)
+        controls = [spec for spec in specs if spec["candidate_role"] == "no_encoder_control"]
+        self.assertEqual(len(controls), 4)
+        self.assertTrue(all(spec["attribution_control_only"] for spec in controls))
+        self.assertTrue(all(not spec["m0_pipeline_eligible"] for spec in controls))
+        audit = [spec for spec in specs if spec["shortcut_audit_only"]]
+        self.assertEqual([spec["candidate_id"] for spec in audit], ["audit__shortcut_features_only"])
+        self.assertEqual(set(audit[0]["feature_names"]), shortcuts)
+        full = [
+            spec
+            for spec in specs
+            if spec["tier"] == "encoder_plus_transfer_plus_shared_reranker"
+        ]
         self.assertEqual(len(full), 5)
         for spec in full:
             self.assertIn(self.policy["shared_reranker"]["feature_name"], spec["feature_names"])
+        for spec in specs:
+            if spec["candidate_role"] == "encoder_pipeline":
+                self.assertIn(
+                    spec["matched_no_encoder_control"],
+                    {control["candidate_id"] for control in controls},
+                )
         training = self.policy["training"]
         self.assertFalse(training["evidence_type_used_as_training_feature"])
         self.assertFalse(training["evidence_type_used_as_training_weight"])
@@ -1652,11 +1685,16 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         self.assertTrue(training["evidence_type_used_for_reporting_slices"])
         self.assertEqual(
             training["l2_selection"],
-            "five_fold_component_grouped_train_oof_weighted_average_precision_using_weighting_mode",
+            "five_fold_component_grouped_train_oof_shortcut_conditioned_macro_component_equal_average_precision",
         )
         self.assertEqual(
             training["threshold_metric"],
             "weighted_balanced_accuracy_using_weighting_mode",
+        )
+        self.assertEqual(training["solver"], "newton_with_armijo_backtracking")
+        self.assertEqual(
+            training["solver_convergence_criterion"],
+            "normalized_gradient_inf_norm_at_most_tolerance",
         )
         self.assertGreater(
             self.policy["evaluation"]["embedding_score_replay_absolute_tolerance"],
@@ -1668,7 +1706,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             (
                 "import json, sys",
                 f"sys.path.insert(0, {str(SCRIPTS)!r})",
-                "import step7_v2_common as common",
+                "import step7_v3_common as common",
                 "shared = {f'token_{index:03d}' for index in range(300)}",
                 "frequency = {f'token_{index:03d}': (index * index * 37) % 581 for index in range(300)}",
                 "print(json.dumps(common.shared_idf(shared, frequency, 582), separators=(',', ':')))",
@@ -1711,6 +1749,39 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             metrics["average_precision"],
         )
 
+    def test_shortcut_conditioned_ap_ignores_between_stratum_score_offsets(self) -> None:
+        strata = (
+            "same_market=0|same_source=1",
+            "same_market=0|same_source=1",
+            "same_market=1|same_source=1",
+            "same_market=1|same_source=1",
+        )
+        rows = [
+            {
+                "pair_uid": f"p{index}",
+                "split_name": "valid",
+                "component_id": f"c{index}",
+                "review_label": "positive" if index % 2 == 0 else "negative",
+                select.SHORTCUT_CONTROL_STRATUM_FIELD: stratum,
+            }
+            for index, stratum in enumerate(strata)
+        ]
+        labels = np.asarray([1, 0, 1, 0], dtype=np.int8)
+        original = np.asarray([0.90, 0.80, 0.40, 0.30], dtype=np.float64)
+        shifted = np.asarray([0.90, 0.80, 0.85, 0.75], dtype=np.float64)
+        original_result = select.shortcut_conditioned_component_equal_average_precision(
+            rows, labels, original, self.policy, require_expected_strata=True
+        )
+        shifted_result = select.shortcut_conditioned_component_equal_average_precision(
+            rows, labels, shifted, self.policy, require_expected_strata=True
+        )
+        self.assertEqual(original_result["macro_average_precision"], 1.0)
+        self.assertEqual(shifted_result["macro_average_precision"], 1.0)
+        self.assertNotEqual(
+            select.average_precision(labels, original),
+            select.average_precision(labels, shifted),
+        )
+
     def test_grouped_folds_never_split_components_and_hold_both_classes(self) -> None:
         rows = []
         for component_index in range(15):
@@ -1747,10 +1818,16 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
                 rows.append(
                     {
                         "pair_uid": f"p{component_index}_{label_index}",
+                        "split_name": "train",
                         "component_id": f"c{component_index}",
                         "review_label": label,
                         "seller_uid_left": f"l{component_index}_{label_index}",
                         "seller_uid_right": f"r{component_index}_{label_index}",
+                        select.SHORTCUT_CONTROL_STRATUM_FIELD: (
+                            "same_market=0|same_source=1"
+                            if component_index % 2 == 0
+                            else "same_market=1|same_source=1"
+                        ),
                     }
                 )
                 values.append([float(label_index), float(component_index % 4)])
@@ -1763,6 +1840,16 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             "component_equal_normalized_to_row_count",
         )
         self.assertTrue(result["final_train_artifact"]["solver_converged"])
+        self.assertLessEqual(
+            result["final_train_artifact"][
+                "solver_final_normalized_gradient_inf_norm"
+            ],
+            policy["training"]["tolerance"],
+        )
+        self.assertEqual(
+            result["final_train_artifact"]["solver_line_search"],
+            "armijo_backtracking",
+        )
         self.assertTrue(math.isfinite(result["selected_threshold"]))
         self.assertEqual(len(result["train_oof_scores"]), len(rows))
         self.assertGreater(result["train_oof_metrics"]["average_precision"], 0.95)
@@ -1772,6 +1859,25 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         )
         self.assertIn(
             "weighted_balanced_accuracy", result["threshold_selection"]
+        )
+        intercept_only = select.tune_and_fit(
+            rows,
+            np.empty((len(rows), 0), dtype=np.float64),
+            [],
+            policy,
+            "component_equal_normalized_to_row_count",
+        )
+        self.assertEqual(
+            intercept_only["final_train_artifact"]["coefficients"], []
+        )
+        self.assertLessEqual(
+            intercept_only["final_train_artifact"][
+                "solver_final_normalized_gradient_inf_norm"
+            ],
+            policy["training"]["tolerance"],
+        )
+        self.assertTrue(
+            np.all(np.isfinite(intercept_only["train_oof_scores"]))
         )
 
     def test_selection_code_does_not_parse_test_labels(self) -> None:
@@ -1838,7 +1944,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         )
         label_by_pair = {row["pair_uid"]: row["review_label"] for row in labels}
         with tempfile.TemporaryDirectory(
-            prefix=".step7_v2_reject_", dir=ROOT / "reports"
+            prefix=".step7_v3_reject_", dir=ROOT / "reports"
         ) as temporary:
             temp_root = Path(temporary)
             model_key, cfg = next(iter(policy["embedding_models"].items()))
@@ -1876,7 +1982,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
     def test_provenance_valid_but_numerically_inconsistent_gpu_score_is_rejected(self) -> None:
         policy = copy.deepcopy(self.policy)
         with tempfile.TemporaryDirectory(
-            prefix=".step7_v2_numeric_replay_", dir=ROOT / "reports"
+            prefix=".step7_v3_numeric_replay_", dir=ROOT / "reports"
         ) as temporary:
             self.materialize_label_free_mock_gpu_bundle(policy, Path(temporary))
             model_key, cfg = next(iter(policy["embedding_models"].items()))
@@ -1928,7 +2034,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
             common.resolve(outputs["historical_test_labels_manifest"])
         )
         with tempfile.TemporaryDirectory(
-            prefix=".step7_v2_test_label_replay_", dir=ROOT / "reports"
+            prefix=".step7_v3_test_label_replay_", dir=ROOT / "reports"
         ) as temporary:
             temp_root = Path(temporary)
             tampered_label_path = temp_root / "private_labels.test.csv"
@@ -1957,7 +2063,7 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
         policy["training"]["l2_grid"] = [1.0]
         policy["evaluation"]["bootstrap"]["resamples"] = 200
         with tempfile.TemporaryDirectory(
-            prefix=".step7_v2_contract_", dir=ROOT / "reports"
+            prefix=".step7_v3_contract_", dir=ROOT / "reports"
         ) as temporary:
             self.materialize_label_free_mock_gpu_bundle(policy, Path(temporary))
             historical_path = common.resolve(policy["outputs"]["historical_test_labels"])
@@ -1992,25 +2098,57 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
                 summary, valid_predictions, train_oof_predictions, freeze = (
                     select.run_selection(policy)
                 )
-            self.assertEqual(summary["candidate_count"], 15)
+            self.assertEqual(summary["candidate_count"], 25)
+            self.assertEqual(summary["encoder_comparison_candidate_count"], 5)
+            self.assertEqual(summary["m0_pipeline_candidate_count"], 20)
+            self.assertEqual(summary["attribution_control_candidate_count"], 4)
+            self.assertEqual(summary["shortcut_audit_candidate_count"], 1)
             self.assertFalse(
                 summary["historical_test_label_values_parsed_during_selection"]
             )
             self.assertFalse(
                 summary["historical_test_label_file_touched_during_selection"]
             )
-            self.assertEqual(len(valid_predictions), 15 * 152)
-            self.assertEqual(len(train_oof_predictions), 15 * 401)
+            self.assertEqual(len(valid_predictions), 25 * 152)
+            self.assertEqual(len(train_oof_predictions), 25 * 401)
             self.assertIn("selection_script", freeze["runtime_inputs"])
             self.assertIn("common_script", freeze["runtime_inputs"])
+            self.assertFalse(
+                summary["encoder_only_selection"]["fitted_head_used_for_ranking"]
+            )
+            self.assertFalse(
+                summary["encoder_only_selection"][
+                    "training_weight_sensitivity_applicable"
+                ]
+            )
+            self.assertIsNone(
+                summary["encoder_only_selection"][
+                    "uniform_training_shortcut_conditioned_ap_ranking"
+                ]
+            )
+            self.assertFalse(
+                any(
+                    key.startswith("uniform_training")
+                    for key in summary["encoder_only_selection"][
+                        "unique_winner_checks"
+                    ]
+                )
+            )
+            self.assertEqual(
+                summary["encoder_only_selection"]["score_source"],
+                "raw_frozen_encoder_cosine_without_fitted_head",
+            )
+            self.assertEqual(len(summary["raw_encoder_comparison_results"]), 5)
+            self.assertFalse(
+                summary["e5_continuity_control"][
+                    "changes_ranking_or_carry_forward"
+                ]
+            )
+            self.assertEqual(
+                freeze["carry_forward_to_step28"],
+                summary["m0_pipeline_selection"]["candidate_ranking"][: len(freeze["carry_forward_to_step28"])],
+            )
             json.dumps(summary)
-            if not all(item["pass"] for item in summary["unique_winner_checks"].values()):
-                carried_model_keys = {
-                    candidate_id.split("__", 1)[0]
-                    for candidate_id in freeze["carry_forward_to_step28"]
-                }
-                self.assertIn("multilingual_e5_large", carried_model_keys)
-                self.assertTrue(carried_model_keys - {"multilingual_e5_large"})
             tampered_freeze = copy.deepcopy(freeze)
             tampered_freeze["carry_forward_to_step28"] = [
                 next(
@@ -2032,6 +2170,13 @@ class Step7V2CleanSourceSelectionContracts(unittest.TestCase):
                 ]
             )
             self.assertFalse(test_summary["prospective_claim_allowed"])
+            self.assertFalse(test_summary["raw_encoder_test_metrics_used_for_selection"])
+            self.assertEqual(
+                list(test_summary["raw_encoder_candidates_selected_on_valid_only"]),
+                summary["encoder_only_selection"][
+                    "carry_forward_encoder_candidates"
+                ],
+            )
             self.assertEqual(
                 len(test_predictions),
                 len(freeze["carry_forward_to_step28"]) * 181,

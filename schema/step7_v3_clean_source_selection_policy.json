@@ -1,13 +1,15 @@
 {
-  "version": "2026-07-21-step7-v2-clean-english-source-selection-v1",
-  "objective": "Re-select the frozen English M0 under a common 512-token inference budget on the fixed current 734-pair English universe using globally identifier-redacted content, model-native embedding heads, train-only feature references, component-grouped tuning, label-isolated GPU scoring, and a delayed historical-development test evaluation.",
+  "version": "2026-07-22-step7-v3-shortcut-conditioned-encoder-attribution-v1",
+  "objective": "Separately select the strongest frozen encoder representation and the strongest attributable English M0 pipeline on the fixed current 734-pair English universe. Direct market/source shortcut features are audit-only, model selection is conditioned within market/source strata, every encoder-augmented pipeline is matched to a no-encoder control, all fitted references remain train-only, and the historical test remains development-only.",
   "result_scope": {
     "english_valid_role": "model_selection_development_validation",
     "english_test_role": "historical_internal_development_test_already_consumed_by_earlier_steps",
     "prospective_claim_allowed": false,
     "chinese_data_used_for_selection": false,
-    "source_model_claim_scope": "best_among_the_15_preregistered_candidates_under_the_common_512_token_input_contract",
-    "step28_role": "freeze_one_unique_winner_or_carry_top_ranked_e5_plus_top_ranked_non_e5_challenger"
+    "source_model_claim_scope": "two_separate_internal_development_claims_strongest_of_five_raw_encoder_cosine_representations_and_best_attributable_pipeline_among_20_encoder_pipeline_candidates_under_the_common_512_token_contract",
+    "encoder_claim_scope": "best_among_five_preregistered_frozen_encoder_raw_cosine_representations_without_a_fitted_head_auxiliary_pair_features_or_reranker",
+    "pipeline_claim_scope": "best_among_20_encoder_pipelines_with_4_no_encoder_controls_used_only_for_matched_attribution_and_never_eligible_to_be_selected_as_m0",
+    "step28_role": "freeze_a_unique_attributable_pipeline_or_carry_the_top_two_pipeline_candidates_without_e5_privilege_and_report_e5_only_as_a_separate_continuity_control"
   },
   "inputs": {
     "frozen_labels": {
@@ -472,6 +474,34 @@
     "repeated_description_share_train_percentile_gap_abs",
     "max_category_share_train_percentile_gap_abs"
   ],
+  "pair_feature_roles": {
+    "shortcut_audit_only_features": [
+      "same_market_bool",
+      "same_source_dataset_bool"
+    ],
+    "model_eligible_transfer_features": [
+      "clean_category_jaccard",
+      "clean_shared_title_bool",
+      "clean_shared_description_bool",
+      "clean_shared_title_count_capped",
+      "clean_shared_description_count_capped",
+      "clean_shared_category_count_capped",
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ],
+    "shortcut_features_must_be_absent_from_all_model_eligible_candidates": true,
+    "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0": true
+  },
   "forbidden_m0_features": [
     "seller_uid",
     "source_seller_raw",
@@ -494,14 +524,36 @@
     "encoder_only": [
       "{embedding_feature}"
     ],
-    "encoder_plus_safe": [
+    "encoder_plus_transfer": [
       "{embedding_feature}",
-      "{safe_pair_features}"
+      "{model_eligible_transfer_features}"
     ],
-    "encoder_plus_safe_plus_shared_reranker": [
+    "encoder_plus_shared_reranker": [
       "{embedding_feature}",
-      "{safe_pair_features}",
       "{shared_reranker_feature}"
+    ],
+    "encoder_plus_transfer_plus_shared_reranker": [
+      "{embedding_feature}",
+      "{model_eligible_transfer_features}",
+      "{shared_reranker_feature}"
+    ]
+  },
+  "no_encoder_controls": {
+    "intercept_only": [],
+    "transfer_features_only": [
+      "{model_eligible_transfer_features}"
+    ],
+    "shared_reranker_only": [
+      "{shared_reranker_feature}"
+    ],
+    "transfer_features_plus_shared_reranker": [
+      "{model_eligible_transfer_features}",
+      "{shared_reranker_feature}"
+    ]
+  },
+  "shortcut_audit_controls": {
+    "shortcut_features_only": [
+      "{shortcut_audit_only_features}"
     ]
   },
   "training": {
@@ -509,13 +561,17 @@
     "selection_split": "valid",
     "final_test_split": "test",
     "model_family": "standardized_logistic_regression_l2",
+    "solver": "newton_with_armijo_backtracking",
+    "solver_convergence_criterion": "normalized_gradient_inf_norm_at_most_tolerance",
+    "armijo_c1": 0.0001,
+    "minimum_line_search_step": 9.313225746154785e-10,
     "l2_grid": [
       0.1,
       1.0,
       10.0,
       100.0
     ],
-    "l2_selection": "five_fold_component_grouped_train_oof_weighted_average_precision_using_weighting_mode",
+    "l2_selection": "five_fold_component_grouped_train_oof_shortcut_conditioned_macro_component_equal_average_precision",
     "fold_count": 5,
     "fold_seed": 20260721,
     "max_iter": 300,
@@ -531,9 +587,32 @@
     "threshold_metric": "weighted_balanced_accuracy_using_weighting_mode"
   },
   "evaluation": {
-    "primary_selection_metric": "average_precision",
+    "primary_selection_metric": "shortcut_conditioned_macro_component_equal_average_precision",
+    "shortcut_conditioned_primary_metric": {
+      "stratum_fields": [
+        "same_market_bool",
+        "same_source_dataset_bool"
+      ],
+      "within_stratum_weighting": "component_equal_normalized_to_row_count",
+      "across_estimable_strata_weighting": "equal",
+      "estimable_stratum_requires_both_labels": true,
+      "minimum_estimable_strata": 2,
+      "expected_train_estimable_strata": [
+        "same_market=0|same_source=1",
+        "same_market=1|same_source=1"
+      ],
+      "expected_valid_estimable_strata": [
+        "same_market=0|same_source=1",
+        "same_market=1|same_source=1"
+      ],
+      "single_class_strata": "reported_but_excluded_from_average_precision_macro",
+      "purpose": "prevent_between_market_or_source_label_prevalence_from_selecting_an_encoder_or_pipeline"
+    },
+    "global_component_equal_average_precision_role": "mandatory_secondary_rank_consistency_and_reporting",
+    "row_average_precision_role": "mandatory_tertiary_rank_consistency_and_reporting",
     "embedding_score_replay_absolute_tolerance": 0.000002,
-    "component_equal_validation_average_precision": "sensitivity_only_unique_winner_guard",
+    "component_equal_validation_average_precision": "mandatory_secondary_rank_consistency_and_reporting",
+    "shortcut_feature_label_association_audit_required": true,
     "reported_pair_metrics": [
       "roc_auc",
       "average_precision",
@@ -572,20 +651,41 @@
   },
   "selection_rule": {
     "rank_candidates_by": [
+      "valid_shortcut_conditioned_macro_component_equal_average_precision_desc",
+      "valid_component_equal_average_precision_desc",
       "valid_average_precision_desc",
       "valid_roc_auc_desc",
       "candidate_id_asc"
     ],
     "unique_winner_requires_all": {
-      "valid_average_precision_delta_vs_runner_up_at_least": 0.02,
+      "valid_shortcut_conditioned_macro_component_equal_average_precision_delta_vs_runner_up_at_least": 0.02,
       "grouped_bootstrap_ap_delta_ci95_lower_above": 0.0,
-      "uniform_weight_sensitivity_ap_delta_above": 0.0,
-      "component_equal_validation_ap_delta_above": 0.0,
+      "global_component_equal_average_precision_delta_above": 0.0,
+      "row_average_precision_delta_above": 0.0,
+      "uniform_weight_sensitivity_shortcut_conditioned_ap_delta_above": 0.0,
       "hard_negative_fpr_increase_at_most": 0.01,
       "direct_positive_recall_drop_at_most": 0.05
     },
+    "encoder_selection": {
+      "eligible_tier": "encoder_only",
+      "score_source": "raw_frozen_encoder_cosine_without_fitted_head",
+      "fitted_head_used_for_encoder_ranking": false,
+      "tie_action": "carry_top_two_encoder_only_candidates_without_continuity_privilege"
+    },
+    "pipeline_attribution": {
+      "matched_no_encoder_control_by_tier": {
+        "encoder_only": "control__intercept_only",
+        "encoder_plus_transfer": "control__transfer_features_only",
+        "encoder_plus_shared_reranker": "control__shared_reranker_only",
+        "encoder_plus_transfer_plus_shared_reranker": "control__transfer_features_plus_shared_reranker"
+      },
+      "encoder_increment_shortcut_conditioned_ap_at_least": 0.02,
+      "encoder_increment_grouped_bootstrap_ci95_lower_above": 0.0,
+      "no_attributable_encoder_winner_action": "carry_top_two_encoder_pipeline_candidates_without_e5_privilege_and_mark_encoder_attribution_failed",
+      "no_unique_winner_action": "carry_top_two_encoder_pipeline_candidates_without_e5_privilege"
+    },
     "continuity_encoder": "multilingual_e5_large",
-    "tie_action": "carry_top_ranked_e5_candidate_and_top_ranked_non_e5_candidate_into_step28",
+    "continuity_encoder_role": "report_only_never_changes_encoder_or_pipeline_ranking_or_carry_forward",
     "identity_rule_control": {
       "eligible_for_m0": false,
       "score": "one_if_shared_contact_or_pgp_count_positive_else_zero",
@@ -593,33 +693,33 @@
     }
   },
   "outputs": {
-    "root": "reports/step7_v2_clean_source_selection/v1_20260721",
-    "pair_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/pair_manifest.no_labels.csv",
-    "clean_corpus": "reports/step7_v2_clean_source_selection/v1_20260721/clean_seller_corpus.jsonl",
-    "train_feature_reference": "reports/step7_v2_clean_source_selection/v1_20260721/train_feature_reference.no_labels.json",
-    "safe_pair_features": "reports/step7_v2_clean_source_selection/v1_20260721/safe_pair_features.no_labels.csv",
-    "train_labels": "reports/step7_v2_clean_source_selection/v1_20260721/private_labels.train.csv",
-    "valid_labels": "reports/step7_v2_clean_source_selection/v1_20260721/private_labels.valid.csv",
-    "historical_test_labels": "reports/step7_v2_clean_source_selection/v1_20260721/private_labels.test.historical_development_only.csv",
-    "preparation_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/preparation_manifest.json",
-    "development_labels_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/development_labels_manifest.json",
-    "historical_test_labels_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/historical_test_labels_manifest.json",
-    "gpu_sync_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/step7_v2_gpu_sync_manifest.json",
-    "gpu_output_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/step7_v2_gpu_output_manifest.json",
-    "embedding_matrix_template": "reports/step7_v2_clean_source_selection/v1_20260721/embeddings/{model_key}.npy",
-    "embedding_manifest_template": "reports/step7_v2_clean_source_selection/v1_20260721/embeddings/{model_key}.json",
-    "embedding_pair_scores_template": "reports/step7_v2_clean_source_selection/v1_20260721/pair_scores/{model_key}.csv",
-    "reranker_pair_scores": "reports/step7_v2_clean_source_selection/v1_20260721/pair_scores/gte_multilingual_reranker_base.bidirectional_mean.csv",
-    "reranker_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/pair_scores/gte_multilingual_reranker_base.bidirectional_mean.json",
-    "selection_summary": "reports/step7_v2_clean_source_selection/v1_20260721/selection/selection_summary.json",
-    "frozen_selection_manifest": "reports/step7_v2_clean_source_selection/v1_20260721/selection/frozen_selection_manifest.json",
-    "train_oof_predictions": "reports/step7_v2_clean_source_selection/v1_20260721/selection/train_oof_predictions.csv",
-    "valid_predictions": "reports/step7_v2_clean_source_selection/v1_20260721/selection/valid_predictions.csv",
-    "test_summary": "reports/step7_v2_clean_source_selection/v1_20260721/test/test_summary.historical_development_only.json",
-    "test_predictions": "reports/step7_v2_clean_source_selection/v1_20260721/test/test_predictions.historical_development_only.csv"
+    "root": "reports/step7_v3_clean_source_selection/v1_20260722",
+    "pair_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/pair_manifest.no_labels.csv",
+    "clean_corpus": "reports/step7_v3_clean_source_selection/v1_20260722/clean_seller_corpus.jsonl",
+    "train_feature_reference": "reports/step7_v3_clean_source_selection/v1_20260722/train_feature_reference.no_labels.json",
+    "safe_pair_features": "reports/step7_v3_clean_source_selection/v1_20260722/safe_pair_features.no_labels.csv",
+    "train_labels": "reports/step7_v3_clean_source_selection/v1_20260722/private_labels.train.csv",
+    "valid_labels": "reports/step7_v3_clean_source_selection/v1_20260722/private_labels.valid.csv",
+    "historical_test_labels": "reports/step7_v3_clean_source_selection/v1_20260722/private_labels.test.historical_development_only.csv",
+    "preparation_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/preparation_manifest.json",
+    "development_labels_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/development_labels_manifest.json",
+    "historical_test_labels_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/historical_test_labels_manifest.json",
+    "gpu_sync_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/step7_v3_gpu_sync_manifest.json",
+    "gpu_output_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/step7_v3_gpu_output_manifest.json",
+    "embedding_matrix_template": "reports/step7_v3_clean_source_selection/v1_20260722/embeddings/{model_key}.npy",
+    "embedding_manifest_template": "reports/step7_v3_clean_source_selection/v1_20260722/embeddings/{model_key}.json",
+    "embedding_pair_scores_template": "reports/step7_v3_clean_source_selection/v1_20260722/pair_scores/{model_key}.csv",
+    "reranker_pair_scores": "reports/step7_v3_clean_source_selection/v1_20260722/pair_scores/gte_multilingual_reranker_base.bidirectional_mean.csv",
+    "reranker_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/pair_scores/gte_multilingual_reranker_base.bidirectional_mean.json",
+    "selection_summary": "reports/step7_v3_clean_source_selection/v1_20260722/selection/selection_summary.json",
+    "frozen_selection_manifest": "reports/step7_v3_clean_source_selection/v1_20260722/selection/frozen_selection_manifest.json",
+    "train_oof_predictions": "reports/step7_v3_clean_source_selection/v1_20260722/selection/train_oof_predictions.csv",
+    "valid_predictions": "reports/step7_v3_clean_source_selection/v1_20260722/selection/valid_predictions.csv",
+    "test_summary": "reports/step7_v3_clean_source_selection/v1_20260722/test/test_summary.historical_development_only.json",
+    "test_predictions": "reports/step7_v3_clean_source_selection/v1_20260722/test/test_predictions.historical_development_only.csv"
   },
   "hard_rules": [
-    "No Chinese labels, Chinese metrics, or Step28 synthetic outcomes may select the Step7-v2 English M0.",
+    "No Chinese labels, Chinese metrics, or Step28 synthetic outcomes may select the Step7-v3 English M0.",
     "The five clean text fields are identical for every encoder and the shared reranker.",
     "Identifiers are removed without inserting an identifier-presence marker.",
     "Feature generation must be invariant to any permutation of review labels.",
@@ -632,7 +732,13 @@
     "The shared reranker score is averaged across both pair directions.",
     "Every serialized embedding-pair score must replay numerically from the pinned normalized seller matrix within the preregistered absolute tolerance.",
     "Historical-test execution must rehash the pinned all-split label/evidence sources and byte-replay the test projection before metrics are computed.",
-    "A unique winner requires the row-level validation winner to remain first under component-equal validation average precision.",
+    "same_market_bool and same_source_dataset_bool are audit-only and are forbidden from every encoder or M0-eligible candidate.",
+    "Encoder strength is selected only from the five raw validation cosine score vectors; no fitted classifier, auxiliary pair feature, or reranker can affect that ranking.",
+    "The primary selection metric is a macro average of component-equal AP computed separately inside each estimable market/source stratum, so between-stratum label prevalence cannot create a winner.",
+    "A complete encoder pipeline can be attributed to its encoder only if it beats the exactly matched no-encoder control in shortcut-conditioned AP and grouped bootstrap.",
+    "No-encoder controls are attribution baselines only; they cannot be selected or carried forward as M0.",
+    "Global component-equal and row-level average precision are mandatory rank-consistency sensitivities.",
+    "E5 continuity is report-only and cannot alter ranking or carry-forward.",
     "Identity-control fields can be reported but can never enter or select M0.",
     "Existing models/step7 payloads are retained; old result artifacts are deleted only after active dependency migration and verification."
   ]

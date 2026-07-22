@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared, label-isolated contracts for Step7-v2 clean English source selection."""
+"""Shared, label-isolated contracts for Step7-v3 clean English source selection."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ import step3_build_seller_profiles as step3
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step7_v2_clean_source_selection_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step7_v3_clean_source_selection_policy.json"
 STEP3_SCRIPT = Path(step3.__file__).resolve()
 MAX_REDACTION_PASSES = 8
 IDENTITY_RESIDUE_CLAIM_SCOPE = (
@@ -132,7 +132,7 @@ EXACT_CONTIGUOUS_IDENTITY_RE = re.compile(
 )
 
 # Step3 intentionally favors precision and therefore misses some marketplace
-# obfuscations.  Step7-v2 needs a stricter *removal* boundary: losing a few cue
+# obfuscations.  Step7-v3 needs a stricter *removal* boundary: losing a few cue
 # words is preferable to letting a source-model baseline read a contact handle.
 OBFUSCATED_CONTACT_RULES = (
     (
@@ -893,6 +893,17 @@ SAFE_FEATURE_NAMES = [
     "max_category_share_train_percentile_gap_abs",
 ]
 
+# These two fields are generated only so the final report can quantify the
+# dataset shortcut.  They are never legal inputs to an encoder comparison or
+# an M0-eligible pipeline.
+SHORTCUT_AUDIT_ONLY_FEATURE_NAMES = [
+    "same_market_bool",
+    "same_source_dataset_bool",
+]
+MODEL_ELIGIBLE_TRANSFER_FEATURE_NAMES = [
+    name for name in SAFE_FEATURE_NAMES if name not in SHORTCUT_AUDIT_ONLY_FEATURE_NAMES
+]
+
 NUMERIC_PROFILE_FIELDS = {
     "item_count": ("item_count",),
     "title_length_median": ("title_length_stats", "median"),
@@ -955,7 +966,7 @@ def load_jsonl(path: Path) -> list[dict]:
 
 def render_csv(rows: list[dict], fieldnames: list[str] | None = None) -> bytes:
     if not rows:
-        raise ValueError("Step7-v2 refuses to render an empty CSV")
+        raise ValueError("Step7-v3 refuses to render an empty CSV")
     fields = fieldnames or list(rows[0])
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(
@@ -973,7 +984,7 @@ def write_bytes_immutable(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         if path.read_bytes() != payload:
-            raise ValueError(f"Refusing to overwrite a different Step7-v2 artifact: {path}")
+            raise ValueError(f"Refusing to overwrite a different Step7-v3 artifact: {path}")
         return
     temporary = path.with_name(f".{path.name}.tmp")
     temporary.write_bytes(payload)
@@ -1002,7 +1013,7 @@ def write_json_atomic(path: Path, payload: dict) -> None:
 
 def write_jsonl_immutable(path: Path, rows: list[dict]) -> None:
     if not rows:
-        raise ValueError("Step7-v2 refuses to render empty JSONL")
+        raise ValueError("Step7-v3 refuses to render empty JSONL")
     rendered = "".join(
         json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
         for row in rows
@@ -1021,11 +1032,11 @@ def validate_policy(policy: dict) -> None:
     expected = boundary["expected_counts"]
     split_total = sum(int(expected[split]["total"]) for split in ("train", "valid", "test"))
     if split_total != int(expected["total"]):
-        raise ValueError("Step7-v2 expected split counts do not sum to total")
+        raise ValueError("Step7-v3 expected split counts do not sum to total")
     for split in ("train", "valid", "test"):
         counts = expected[split]
         if int(counts["positive"]) + int(counts["negative"]) != int(counts["total"]):
-            raise ValueError(f"Step7-v2 expected label counts do not sum for {split}")
+            raise ValueError(f"Step7-v3 expected label counts do not sum for {split}")
     for field in (
         "expected_component_count_by_split",
         "expected_seller_count_by_split",
@@ -1033,7 +1044,7 @@ def validate_policy(policy: dict) -> None:
         if set(boundary.get(field, {})) != {"train", "valid", "test"} or any(
             int(value) <= 0 for value in boundary[field].values()
         ):
-            raise ValueError(f"Step7-v2 {field} contract is invalid")
+            raise ValueError(f"Step7-v3 {field} contract is invalid")
 
     clean = policy["clean_text_contract"]
     expected_fields = [
@@ -1044,7 +1055,7 @@ def validate_policy(policy: dict) -> None:
         "description_concat_top",
     ]
     if clean["fields_in_order"] != expected_fields:
-        raise ValueError("Step7-v2 five-field clean text order changed")
+        raise ValueError("Step7-v3 five-field clean text order changed")
     required_excluded = {
         "source_seller_raw",
         "alias_normalized",
@@ -1055,56 +1066,56 @@ def validate_policy(policy: dict) -> None:
         "profile_text",
     }
     if not required_excluded.issubset(set(clean["excluded_profile_fields"])):
-        raise ValueError("Step7-v2 identifier-bearing exclusions were relaxed")
+        raise ValueError("Step7-v3 identifier-bearing exclusions were relaxed")
     if set(clean["fields_in_order"]) & set(clean["excluded_profile_fields"]):
-        raise ValueError("Step7-v2 clean and excluded text fields overlap")
+        raise ValueError("Step7-v3 clean and excluded text fields overlap")
     if clean["replacement"] != "single_space_no_identifier_presence_marker":
-        raise ValueError("Step7-v2 redaction must not expose identifier presence")
+        raise ValueError("Step7-v3 redaction must not expose identifier presence")
     if clean.get("redaction_sources") != (
         "fixed_snapshot_exact_contiguous_collision_prone_identities_plus_audited_fixed_snapshot_global_identity_phrases_removed_separator_invariant_before_other_rules_plus_seller_local_separator_invariant_alias_variants_minus_preregistered_separator_collisions_plus_fixed_snapshot_audited_global_mixed_alphanumeric_union_minus_content_collisions_plus_context_gated_profile_and_signal_aliases_minus_preregistered_separator_collisions_plus_high_recall_contact_and_truncation_regexes"
     ):
-        raise ValueError("Step7-v2 redaction-source contract changed")
+        raise ValueError("Step7-v3 redaction-source contract changed")
     if set(clean.get("exact_contiguous_identity_tokens", [])) != set(
         EXACT_CONTIGUOUS_IDENTITY_TOKENS
     ):
-        raise ValueError("Step7-v2 exact-contiguous identity contract changed")
+        raise ValueError("Step7-v3 exact-contiguous identity contract changed")
     if set(
         clean.get("separator_invariant_identity_content_collision_denylist", [])
     ) != set(SEPARATOR_INVARIANT_IDENTITY_CONTENT_COLLISION_DENYLIST):
-        raise ValueError("Step7-v2 separator-collision denylist changed")
+        raise ValueError("Step7-v3 separator-collision denylist changed")
     if clean.get("contextual_alias_registry_scope") != (
         "all_pinned_english_seller_profiles_plus_all_safe_pinned_identity_signal_literals_label_free_context_gated"
     ):
-        raise ValueError("Step7-v2 contextual-alias registry scope changed")
+        raise ValueError("Step7-v3 contextual-alias registry scope changed")
     if clean.get("global_mixed_alias_registry_scope") != (
         "fixed_snapshot_union_of_all_pinned_english_profile_mixed_aliases_and_identity_signal_mixed_values_minus_preregistered_content_collisions_label_free"
     ):
-        raise ValueError("Step7-v2 global mixed-alias registry scope changed")
+        raise ValueError("Step7-v3 global mixed-alias registry scope changed")
     if set(clean.get("global_mixed_alias_content_collision_denylist", [])) != set(
         GLOBAL_IDENTITY_CONTENT_COLLISION_DENYLIST
     ):
-        raise ValueError("Step7-v2 global identity collision denylist changed")
+        raise ValueError("Step7-v3 global identity collision denylist changed")
     if clean.get("audited_global_identity_phrase_tokens", []) != sorted(
         AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
     ):
-        raise ValueError("Step7-v2 audited global identity-phrase set changed")
+        raise ValueError("Step7-v3 audited global identity-phrase set changed")
     if clean.get(
         "audited_global_identity_phrase_dot_separator_tokens", []
     ) != sorted(AUDITED_GLOBAL_IDENTITY_DOT_SEPARATOR_TOKENS):
         raise ValueError(
-            "Step7-v2 audited identity dot-separator scope changed"
+            "Step7-v3 audited identity dot-separator scope changed"
         )
     if not AUDITED_GLOBAL_IDENTITY_DOT_SEPARATOR_TOKENS.issubset(
         AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
     ):
         raise ValueError(
-            "Step7-v2 dot-separator identity is outside the audited registry"
+            "Step7-v3 dot-separator identity is outside the audited registry"
         )
     if set(AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS) & set(
         SEPARATOR_INVARIANT_IDENTITY_CONTENT_COLLISION_DENYLIST
     ):
         raise ValueError(
-            "Step7-v2 separator-collision identity entered the phrase registry"
+            "Step7-v3 separator-collision identity entered the phrase registry"
         )
     protected_collision_compacts = {
         compact_identifier(term) for term in PROTECTED_IDENTITY_COLLISION_TERMS
@@ -1117,16 +1128,16 @@ def validate_policy(policy: dict) -> None:
         for compact in protected_collision_compacts
     ):
         raise ValueError(
-            "Step7-v2 audited identity phrases overlap protected content collisions"
+            "Step7-v3 audited identity phrases overlap protected content collisions"
         )
     if clean.get("audited_global_identity_phrase_selection_contract") != (
         "manual_seller_and_market_identity_classification_uses_only_fixed_snapshot_model_text_market_inventory_and_alias_semantics_never_review_labels_or_evidence_types_protected_content_collisions_are_excluded"
     ):
-        raise ValueError("Step7-v2 audited identity-phrase selection changed")
+        raise ValueError("Step7-v3 audited identity-phrase selection changed")
     if clean.get("audited_global_identity_phrase_audit_contract") != (
         "confirmed_seller_or_market_identity_phrases_and_pinned_source_market_preventive_forms_are_removed_separator_invariant_before_other_rules_and_manifested_against_all_public_input_hashes_any_input_hash_change_requires_full_reaudit"
     ):
-        raise ValueError("Step7-v2 audited identity-phrase audit contract changed")
+        raise ValueError("Step7-v3 audited identity-phrase audit contract changed")
     if clean.get("audited_global_identity_phrase_expected_audit") != {
         "registry_token_count": 137,
         "registry_tokens_canonical_sha256": (
@@ -1143,11 +1154,11 @@ def validate_policy(policy: dict) -> None:
             "457a3647f91f32bb7c88d9d3ab626009f228125e7c28ee2c7f10df988d5d66bc"
         ),
     }:
-        raise ValueError("Step7-v2 audited identity-phrase expected audit changed")
+        raise ValueError("Step7-v3 audited identity-phrase expected audit changed")
     if clean.get("global_mixed_alias_audit_contract") != (
         "observed_global_matches_in_the_fixed_855_seller_five_field_corpus_are_reaudited_and_manifested_input_hash_change_invalidates_the_audit"
     ):
-        raise ValueError("Step7-v2 global mixed-alias audit contract changed")
+        raise ValueError("Step7-v3 global mixed-alias audit contract changed")
     expected_global_audit = clean.get("global_mixed_alias_expected_audit", {})
     if expected_global_audit != {
         "registry_token_count_after_denylist": 5605,
@@ -1157,19 +1168,19 @@ def validate_policy(policy: dict) -> None:
             "03b76cad3b587917d818dc2aaa7a3b5178505e92dfb627da73b674aaf15f3527"
         ),
     }:
-        raise ValueError("Step7-v2 global mixed-alias expected audit changed")
+        raise ValueError("Step7-v3 global mixed-alias expected audit changed")
     if clean.get("direct_signal_usage_contract") != (
         "noisy_or_pure_signal_values_are_never_unconditional_seller_local_literals_high_confidence_mixed_signal_values_may_enter_the_fixed_snapshot_global_mixed_union_minus_collisions_other_signal_values_are_context_gated"
     ):
-        raise ValueError("Step7-v2 direct-signal usage contract changed")
+        raise ValueError("Step7-v3 direct-signal usage contract changed")
     if clean.get("contextual_alias_variant_contract") != (
         "compact_separator_invariant_exact_aliases_plus_trailing_one_to_four_digit_removal_plus_registry_anchored_plural_and_separator_tolerant_identity_suffixes_plus_long_alpha_one_character_omissions_under_explicit_identity_cues"
     ):
-        raise ValueError("Step7-v2 contextual alias-variant contract changed")
+        raise ValueError("Step7-v3 contextual alias-variant contract changed")
     if clean.get("full_known_alias_residual_census_contract") != (
         "independent_longest_first_scan_of_every_final_seller_row_newline_field_and_double_pipe_value_against_the_full_fixed_snapshot_contextual_alias_registry_exact_plural_and_identity_suffix_forms_without_reusing_redaction_matchers"
     ):
-        raise ValueError("Step7-v2 full known-alias census contract changed")
+        raise ValueError("Step7-v3 full known-alias census contract changed")
     if clean.get("full_known_alias_residual_expected_audit") != {
         "registry_token_count": 16761,
         "scanned_seller_row_count": 855,
@@ -1198,11 +1209,11 @@ def validate_policy(policy: dict) -> None:
             "6d05d9feafadc7ecc040bdb5544ca0add3458ddc45ab7fb36b7a08d85f4487de"
         ),
     }:
-        raise ValueError("Step7-v2 full known-alias expected audit changed")
+        raise ValueError("Step7-v3 full known-alias expected audit changed")
     if clean.get("audited_identity_embedded_residual_census_contract") != (
         "scan_every_final_ascii_alphanumeric_word_for_a_strict_substring_of_any_audited_identity_token_after_exact_plural_and_registered_suffix_forms_have_been_excluded"
     ):
-        raise ValueError("Step7-v2 embedded identity census contract changed")
+        raise ValueError("Step7-v3 embedded identity census contract changed")
     if clean.get("audited_identity_embedded_residual_expected_audit") != {
         "registry_token_count": 137,
         "scanned_seller_row_count": 855,
@@ -1222,53 +1233,96 @@ def validate_policy(policy: dict) -> None:
         "confirmed_identity_residual_count": 0,
         "retained_content_collision_occurrence_count": 5,
     }:
-        raise ValueError("Step7-v2 embedded identity expected audit changed")
+        raise ValueError("Step7-v3 embedded identity expected audit changed")
     if clean.get("identity_residue_claim_scope") != IDENTITY_RESIDUE_CLAIM_SCOPE:
-        raise ValueError("Step7-v2 identity-residue claim scope changed")
+        raise ValueError("Step7-v3 identity-residue claim scope changed")
     quality = clean["quality_gates"]
     minimum_character_retention = float(
         quality["minimum_aggregate_character_retention"]
     )
     if not 0.0 < minimum_character_retention <= 1.0:
-        raise ValueError("Step7-v2 aggregate character-retention gate is invalid")
+        raise ValueError("Step7-v3 aggregate character-retention gate is invalid")
     if int(quality["maximum_empty_fallback_count"]) < 0:
-        raise ValueError("Step7-v2 empty-fallback gate is invalid")
+        raise ValueError("Step7-v3 empty-fallback gate is invalid")
     if set(quality["protected_content_words"]) != set(
         CONTEXTUAL_ALIAS_CONTENT_WORD_DENYLIST
     ):
-        raise ValueError("Step7-v2 protected content-word contract changed")
+        raise ValueError("Step7-v3 protected content-word contract changed")
     minimum_word_retention = float(quality["minimum_protected_word_retention"])
     if not 0.0 < minimum_word_retention <= 1.0:
-        raise ValueError("Step7-v2 protected-word retention gate is invalid")
+        raise ValueError("Step7-v3 protected-word retention gate is invalid")
     if set(quality.get("protected_identity_collision_terms", [])) != set(
         PROTECTED_IDENTITY_COLLISION_TERMS
     ):
-        raise ValueError("Step7-v2 protected identity-collision contract changed")
+        raise ValueError("Step7-v3 protected identity-collision contract changed")
     if quality.get("expected_protected_identity_collision_raw_counts") != (
         PROTECTED_IDENTITY_COLLISION_RAW_COUNTS
     ):
-        raise ValueError("Step7-v2 identity-collision raw-count boundary changed")
+        raise ValueError("Step7-v3 identity-collision raw-count boundary changed")
     minimum_collision_retention = float(
         quality["minimum_protected_identity_collision_term_retention"]
     )
     if not 0.0 < minimum_collision_retention <= 1.0:
-        raise ValueError("Step7-v2 identity-collision retention gate is invalid")
+        raise ValueError("Step7-v3 identity-collision retention gate is invalid")
     if policy["safe_pair_features"] != SAFE_FEATURE_NAMES:
-        raise ValueError("Step7-v2 safe pair feature contract changed")
+        raise ValueError("Step7-v3 safe pair feature contract changed")
+    roles = policy.get("pair_feature_roles", {})
+    if roles.get("shortcut_audit_only_features") != SHORTCUT_AUDIT_ONLY_FEATURE_NAMES:
+        raise ValueError("Step7-v3 shortcut-audit feature contract changed")
+    if roles.get("model_eligible_transfer_features") != (
+        MODEL_ELIGIBLE_TRANSFER_FEATURE_NAMES
+    ):
+        raise ValueError("Step7-v3 model-eligible transfer feature contract changed")
+    if set(roles["shortcut_audit_only_features"]) & set(
+        roles["model_eligible_transfer_features"]
+    ):
+        raise ValueError("Step7-v3 shortcut and model-eligible feature roles overlap")
+    if set(roles["shortcut_audit_only_features"]) | set(
+        roles["model_eligible_transfer_features"]
+    ) != set(SAFE_FEATURE_NAMES):
+        raise ValueError("Step7-v3 feature roles do not partition generated features")
+    if roles.get(
+        "shortcut_features_must_be_absent_from_all_model_eligible_candidates"
+    ) is not True or roles.get(
+        "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0"
+    ) is not True:
+        raise ValueError("Step7-v3 shortcut feature exclusion is not fail-closed")
     forbidden = set(policy["forbidden_m0_features"])
     if forbidden & set(policy["safe_pair_features"]):
-        raise ValueError("Step7-v2 safe feature list includes a forbidden M0 feature")
+        raise ValueError("Step7-v3 safe feature list includes a forbidden M0 feature")
     expected_tiers = {
         "encoder_only": ["{embedding_feature}"],
-        "encoder_plus_safe": ["{embedding_feature}", "{safe_pair_features}"],
-        "encoder_plus_safe_plus_shared_reranker": [
+        "encoder_plus_transfer": [
             "{embedding_feature}",
-            "{safe_pair_features}",
+            "{model_eligible_transfer_features}",
+        ],
+        "encoder_plus_shared_reranker": [
+            "{embedding_feature}",
+            "{shared_reranker_feature}",
+        ],
+        "encoder_plus_transfer_plus_shared_reranker": [
+            "{embedding_feature}",
+            "{model_eligible_transfer_features}",
             "{shared_reranker_feature}",
         ],
     }
     if policy["candidate_tiers"] != expected_tiers:
-        raise ValueError("Step7-v2 candidate-tier contract changed")
+        raise ValueError("Step7-v3 candidate-tier contract changed")
+    expected_no_encoder_controls = {
+        "intercept_only": [],
+        "transfer_features_only": ["{model_eligible_transfer_features}"],
+        "shared_reranker_only": ["{shared_reranker_feature}"],
+        "transfer_features_plus_shared_reranker": [
+            "{model_eligible_transfer_features}",
+            "{shared_reranker_feature}",
+        ],
+    }
+    if policy.get("no_encoder_controls") != expected_no_encoder_controls:
+        raise ValueError("Step7-v3 no-encoder control contract changed")
+    if policy.get("shortcut_audit_controls") != {
+        "shortcut_features_only": ["{shortcut_audit_only_features}"]
+    }:
+        raise ValueError("Step7-v3 shortcut audit-control contract changed")
 
     required_models = {
         "gte_multilingual_base",
@@ -1278,63 +1332,73 @@ def validate_policy(policy: dict) -> None:
         "paraphrase_multilingual_mpnet_base_v2",
     }
     if set(policy["embedding_models"]) != required_models:
-        raise ValueError("Step7-v2 must compare exactly the five preregistered encoders")
+        raise ValueError("Step7-v3 must compare exactly the five preregistered encoders")
     for model_key, cfg in policy["embedding_models"].items():
         if cfg["pooling_contract"] != "sentence_transformers_modules":
-            raise ValueError(f"Step7-v2 model-native pooling disabled for {model_key}")
+            raise ValueError(f"Step7-v3 model-native pooling disabled for {model_key}")
         if cfg["expected_pooling"] not in {"cls", "mean"}:
-            raise ValueError(f"Unsupported Step7-v2 pooling for {model_key}")
+            raise ValueError(f"Unsupported Step7-v3 pooling for {model_key}")
         if int(cfg["max_length"]) != 512:
-            raise ValueError(f"Step7-v2 max length drift for {model_key}")
+            raise ValueError(f"Step7-v3 max length drift for {model_key}")
         validate_expected_model_pin(model_key, cfg)
     if policy["embedding_models"]["multilingual_e5_large"]["text_prefix"] != "query: ":
-        raise ValueError("Step7-v2 symmetric E5 similarity requires query prefixes on both sides")
+        raise ValueError("Step7-v3 symmetric E5 similarity requires query prefixes on both sides")
     reranker = policy["shared_reranker"]
     if reranker["pair_symmetrization"] != "mean_left_right_and_right_left":
-        raise ValueError("Step7-v2 reranker must be symmetric")
+        raise ValueError("Step7-v3 reranker must be symmetric")
     validate_expected_model_pin(reranker["model_key"], reranker)
     training = policy["training"]
     if training["fit_split"] != "train" or training["selection_split"] != "valid":
-        raise ValueError("Step7-v2 train/selection split contract changed")
+        raise ValueError("Step7-v3 train/selection split contract changed")
     if training["final_test_split"] != "test":
-        raise ValueError("Step7-v2 historical-test split contract changed")
+        raise ValueError("Step7-v3 historical-test split contract changed")
     if training["model_family"] != "standardized_logistic_regression_l2":
-        raise ValueError("Step7-v2 model-family contract changed")
+        raise ValueError("Step7-v3 model-family contract changed")
+    if training.get("solver") != "newton_with_armijo_backtracking" or training.get(
+        "solver_convergence_criterion"
+    ) != "normalized_gradient_inf_norm_at_most_tolerance":
+        raise ValueError("Step7-v3 logistic solver contract changed")
+    if not 0.0 < float(training.get("armijo_c1", 0.0)) < 1.0:
+        raise ValueError("Step7-v3 Armijo constant is invalid")
+    minimum_step = float(training.get("minimum_line_search_step", 0.0))
+    if not math.isfinite(minimum_step) or not 0.0 < minimum_step < 1.0:
+        raise ValueError("Step7-v3 minimum line-search step is invalid")
     if training["l2_selection"] != (
-        "five_fold_component_grouped_train_oof_weighted_average_precision_using_weighting_mode"
+        "five_fold_component_grouped_train_oof_shortcut_conditioned_macro_"
+        "component_equal_average_precision"
     ):
-        raise ValueError("Step7-v2 grouped OOF L2-selection contract changed")
+        raise ValueError("Step7-v3 grouped OOF L2-selection contract changed")
     l2_grid = [float(value) for value in training["l2_grid"]]
     if not l2_grid or len(l2_grid) != len(set(l2_grid)) or any(
         not math.isfinite(value) or value <= 0.0 for value in l2_grid
     ):
-        raise ValueError("Step7-v2 L2 grid is invalid")
+        raise ValueError("Step7-v3 L2 grid is invalid")
     if int(training["fold_count"]) < 2 or int(training["max_iter"]) <= 0 or float(
         training["tolerance"]
     ) <= 0.0:
-        raise ValueError("Step7-v2 optimizer/fold contract is invalid")
+        raise ValueError("Step7-v3 optimizer/fold contract is invalid")
     if training["primary_sample_weight"] != "component_equal_normalized_to_row_count":
-        raise ValueError("Step7-v2 primary component-weighting contract changed")
+        raise ValueError("Step7-v3 primary component-weighting contract changed")
     if training["sensitivity_sample_weight"] != "uniform":
-        raise ValueError("Step7-v2 sensitivity-weighting contract changed")
+        raise ValueError("Step7-v3 sensitivity-weighting contract changed")
     if training["threshold_reference"] != "train_oof_predictions_only":
-        raise ValueError("Step7-v2 threshold must be selected from train OOF only")
+        raise ValueError("Step7-v3 threshold must be selected from train OOF only")
     if training["threshold_metric"] != (
         "weighted_balanced_accuracy_using_weighting_mode"
     ):
-        raise ValueError("Step7-v2 weighted OOF threshold contract changed")
+        raise ValueError("Step7-v3 weighted OOF threshold contract changed")
     if training["evidence_type_used_as_training_feature"]:
-        raise ValueError("Step7-v2 evidence type cannot be a model feature")
+        raise ValueError("Step7-v3 evidence type cannot be a model feature")
     if training["evidence_type_used_as_training_weight"]:
-        raise ValueError("Step7-v2 evidence type cannot weight training")
+        raise ValueError("Step7-v3 evidence type cannot weight training")
     if training.get("evidence_type_used_for_validation_safety_guards") is not True:
         raise ValueError(
-            "Step7-v2 evidence-type validation safety guards must remain explicit"
+            "Step7-v3 evidence-type validation safety guards must remain explicit"
         )
     if training.get("evidence_type_used_for_reporting_slices") is not True:
-        raise ValueError("Step7-v2 evidence-type reporting slices must remain explicit")
+        raise ValueError("Step7-v3 evidence-type reporting slices must remain explicit")
     if policy["result_scope"]["prospective_claim_allowed"]:
-        raise ValueError("Step7-v2 historical test cannot support a prospective claim")
+        raise ValueError("Step7-v3 historical test cannot support a prospective claim")
     evaluation = policy["evaluation"]
     replay_tolerance = evaluation.get("embedding_score_replay_absolute_tolerance")
     if (
@@ -1342,25 +1406,96 @@ def validate_policy(policy: dict) -> None:
         or not math.isfinite(float(replay_tolerance))
         or not 0.0 < float(replay_tolerance) <= 1e-5
     ):
-        raise ValueError("Step7-v2 embedding-score replay tolerance is invalid")
-    if evaluation.get("component_equal_validation_average_precision") != (
-        "sensitivity_only_unique_winner_guard"
+        raise ValueError("Step7-v3 embedding-score replay tolerance is invalid")
+    if evaluation.get("primary_selection_metric") != (
+        "shortcut_conditioned_macro_component_equal_average_precision"
     ):
-        raise ValueError("Step7-v2 component-equal validation sensitivity changed")
+        raise ValueError("Step7-v3 shortcut-conditioned primary selection changed")
+    shortcut_metric = evaluation.get("shortcut_conditioned_primary_metric", {})
+    expected_estimable_strata = [
+        "same_market=0|same_source=1",
+        "same_market=1|same_source=1",
+    ]
+    if shortcut_metric != {
+        "stratum_fields": ["same_market_bool", "same_source_dataset_bool"],
+        "within_stratum_weighting": "component_equal_normalized_to_row_count",
+        "across_estimable_strata_weighting": "equal",
+        "estimable_stratum_requires_both_labels": True,
+        "minimum_estimable_strata": 2,
+        "expected_train_estimable_strata": expected_estimable_strata,
+        "expected_valid_estimable_strata": expected_estimable_strata,
+        "single_class_strata": "reported_but_excluded_from_average_precision_macro",
+        "purpose": (
+            "prevent_between_market_or_source_label_prevalence_from_selecting_"
+            "an_encoder_or_pipeline"
+        ),
+    }:
+        raise ValueError("Step7-v3 shortcut-conditioned metric contract changed")
+    if evaluation.get("component_equal_validation_average_precision") != (
+        "mandatory_secondary_rank_consistency_and_reporting"
+    ) or evaluation.get("global_component_equal_average_precision_role") != (
+        "mandatory_secondary_rank_consistency_and_reporting"
+    ):
+        raise ValueError("Step7-v3 global component-equal sensitivity changed")
+    if evaluation.get("row_average_precision_role") != (
+        "mandatory_tertiary_rank_consistency_and_reporting"
+    ):
+        raise ValueError("Step7-v3 row-AP sensitivity contract changed")
+    if evaluation.get("shortcut_feature_label_association_audit_required") is not True:
+        raise ValueError("Step7-v3 shortcut label-association audit is required")
     unique_rule = policy["selection_rule"]["unique_winner_requires_all"]
-    if float(unique_rule.get("component_equal_validation_ap_delta_above", -1.0)) < 0.0:
-        raise ValueError("Step7-v2 component-equal validation winner guard is invalid")
+    if float(
+        unique_rule.get(
+            "valid_shortcut_conditioned_macro_component_equal_average_precision_"
+            "delta_vs_runner_up_at_least",
+            -1.0,
+        )
+    ) < 0.0:
+        raise ValueError("Step7-v3 component-equal winner margin is invalid")
     bootstrap = evaluation["bootstrap"]
     if (
         bootstrap["group"] != "recomputed_component_id"
         or int(bootstrap["resamples"]) < 100
         or not 0.0 < float(bootstrap["confidence"]) < 1.0
     ):
-        raise ValueError("Step7-v2 grouped-bootstrap contract is invalid")
-    if policy["selection_rule"]["tie_action"] != (
-        "carry_top_ranked_e5_candidate_and_top_ranked_non_e5_candidate_into_step28"
+        raise ValueError("Step7-v3 grouped-bootstrap contract is invalid")
+    selection = policy["selection_rule"]
+    encoder_selection = selection.get("encoder_selection", {})
+    if encoder_selection != {
+        "eligible_tier": "encoder_only",
+        "score_source": "raw_frozen_encoder_cosine_without_fitted_head",
+        "fitted_head_used_for_encoder_ranking": False,
+        "tie_action": "carry_top_two_encoder_only_candidates_without_continuity_privilege",
+    }:
+        raise ValueError("Step7-v3 encoder-only selection contract changed")
+    attribution = selection.get("pipeline_attribution", {})
+    expected_matched = {
+        "encoder_only": "control__intercept_only",
+        "encoder_plus_transfer": "control__transfer_features_only",
+        "encoder_plus_shared_reranker": "control__shared_reranker_only",
+        "encoder_plus_transfer_plus_shared_reranker": (
+            "control__transfer_features_plus_shared_reranker"
+        ),
+    }
+    if attribution.get("matched_no_encoder_control_by_tier") != expected_matched:
+        raise ValueError("Step7-v3 matched no-encoder attribution contract changed")
+    if float(
+        attribution.get("encoder_increment_shortcut_conditioned_ap_at_least", -1.0)
+    ) < 0.0:
+        raise ValueError("Step7-v3 encoder-increment margin is invalid")
+    if attribution.get("no_unique_winner_action") != (
+        "carry_top_two_encoder_pipeline_candidates_without_e5_privilege"
     ):
-        raise ValueError("Step7-v2 no-winner carry-forward rule changed")
+        raise ValueError("Step7-v3 pipeline carry-forward contract changed")
+    if attribution.get("no_attributable_encoder_winner_action") != (
+        "carry_top_two_encoder_pipeline_candidates_without_e5_privilege_"
+        "and_mark_encoder_attribution_failed"
+    ):
+        raise ValueError("Step7-v3 encoder-attribution failure action changed")
+    if selection.get("continuity_encoder_role") != (
+        "report_only_never_changes_encoder_or_pipeline_ranking_or_carry_forward"
+    ):
+        raise ValueError("Step7-v3 E5 continuity control may affect selection")
 
 
 def validate_input_hashes(
@@ -1372,12 +1507,12 @@ def validate_input_hashes(
         spec = policy["inputs"][input_name]
         path = resolve(spec["path"])
         if not path.is_file():
-            raise FileNotFoundError(f"Missing Step7-v2 input {input_name}: {path}")
+            raise FileNotFoundError(f"Missing Step7-v3 input {input_name}: {path}")
         observed = sha256_file(path)
         expected = str(spec["sha256"]).casefold()
         if observed != expected:
             raise ValueError(
-                f"Step7-v2 input hash drift for {input_name}: expected={expected} observed={observed}"
+                f"Step7-v3 input hash drift for {input_name}: expected={expected} observed={observed}"
             )
         output[input_name] = {
             "path": str(path.relative_to(ROOT)).replace("\\", "/"),
@@ -1404,15 +1539,15 @@ def validate_content_fidelity_manifest(policy: dict, manifest: dict) -> None:
         or not math.isclose(float(retention), clean_count / raw_count, abs_tol=1e-12)
         or float(retention) < float(quality["minimum_aggregate_character_retention"])
     ):
-        raise ValueError("Step7-v2 public content-fidelity gate is invalid")
+        raise ValueError("Step7-v3 public content-fidelity gate is invalid")
     fallback_count = fidelity.get("empty_text_fallback_count")
     if not isinstance(fallback_count, int) or fallback_count > int(
         quality["maximum_empty_fallback_count"]
     ):
-        raise ValueError("Step7-v2 public empty-content gate is invalid")
+        raise ValueError("Step7-v3 public empty-content gate is invalid")
     protected = fidelity.get("protected_content_word_retention", {})
     if set(protected) != set(quality["protected_content_words"]):
-        raise ValueError("Step7-v2 public protected-word audit universe mismatch")
+        raise ValueError("Step7-v3 public protected-word audit universe mismatch")
     for word, record in protected.items():
         raw_word_count = record.get("raw_count")
         clean_word_count = record.get("clean_count")
@@ -1429,7 +1564,7 @@ def validate_content_fidelity_manifest(policy: dict, manifest: dict) -> None:
             or float(word_retention) < float(quality["minimum_protected_word_retention"])
         ):
             raise ValueError(
-                f"Step7-v2 public protected-word retention is invalid: {word}"
+                f"Step7-v3 public protected-word retention is invalid: {word}"
             )
     protected_collisions = fidelity.get(
         "protected_identity_collision_term_retention", {}
@@ -1437,7 +1572,7 @@ def validate_content_fidelity_manifest(policy: dict, manifest: dict) -> None:
     if set(protected_collisions) != set(
         quality["protected_identity_collision_terms"]
     ):
-        raise ValueError("Step7-v2 identity-collision fidelity universe mismatch")
+        raise ValueError("Step7-v3 identity-collision fidelity universe mismatch")
     for term, record in protected_collisions.items():
         raw_count = record.get("raw_count")
         clean_count = record.get("clean_count")
@@ -1461,7 +1596,7 @@ def validate_content_fidelity_manifest(policy: dict, manifest: dict) -> None:
             )
         ):
             raise ValueError(
-                f"Step7-v2 identity-collision fidelity gate is invalid: {term}"
+                f"Step7-v3 identity-collision fidelity gate is invalid: {term}"
             )
 
 
@@ -1476,11 +1611,11 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
     if audit.get("status") != (
         "pass_registry_is_input_hash_pinned_and_content_collisions_are_preregistered"
     ):
-        raise ValueError("Step7-v2 global-identity audit status is invalid")
+        raise ValueError("Step7-v3 global-identity audit status is invalid")
     if audit.get("scan_scope") != (
         "actual_post_audited_phrase_post_generic_post_local_alias_global_redactions_in_855_seller_five_field_corpus"
     ):
-        raise ValueError("Step7-v2 global-identity audit scope is invalid")
+        raise ValueError("Step7-v3 global-identity audit scope is invalid")
     hashed_counts = audit.get("removed_token_sha256_counts", {})
     distinct_count = audit.get("removed_distinct_token_count")
     occurrence_count = audit.get("removed_occurrence_count")
@@ -1503,19 +1638,19 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         or canonical_hash(hashed_counts)
         != expected["removed_token_sha256_counts_canonical_sha256"]
     ):
-        raise ValueError("Step7-v2 global-identity hashed audit counts are invalid")
+        raise ValueError("Step7-v3 global-identity hashed audit counts are invalid")
     if set(audit.get("content_collision_denylist", [])) != set(
         GLOBAL_IDENTITY_CONTENT_COLLISION_DENYLIST
     ):
-        raise ValueError("Step7-v2 global-identity audit denylist drift")
+        raise ValueError("Step7-v3 global-identity audit denylist drift")
     if audit.get("input_hash_change_requires_full_reaudit") is not True:
-        raise ValueError("Step7-v2 global-identity audit is not input-hash scoped")
+        raise ValueError("Step7-v3 global-identity audit is not input-hash scoped")
     if occurrence_count != int(
         manifest.get("redaction_summary", {}).get(
             "global_identifier_token_match_count", -1
         )
     ):
-        raise ValueError("Step7-v2 global-identity audit/redaction count mismatch")
+        raise ValueError("Step7-v3 global-identity audit/redaction count mismatch")
 
     phrase_expected = policy["clean_text_contract"][
         "audited_global_identity_phrase_expected_audit"
@@ -1529,11 +1664,11 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
     if phrase_audit.get("status") != (
         "pass_manual_seller_and_market_identity_classification_is_public_input_hash_pinned"
     ):
-        raise ValueError("Step7-v2 audited identity-phrase status is invalid")
+        raise ValueError("Step7-v3 audited identity-phrase status is invalid")
     if phrase_audit.get("scan_scope") != (
         "actual_first_stage_separator_invariant_phrase_redactions_in_855_seller_five_field_corpus"
     ):
-        raise ValueError("Step7-v2 audited identity-phrase scope is invalid")
+        raise ValueError("Step7-v3 audited identity-phrase scope is invalid")
     phrase_hashed_counts = phrase_audit.get(
         "removed_surface_sha256_counts", {}
     )
@@ -1582,7 +1717,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         ]
     ):
         raise ValueError(
-            "Step7-v2 audited identity-phrase hashed counts are invalid"
+            "Step7-v3 audited identity-phrase hashed counts are invalid"
         )
     expected_public_input_hashes = {
         name: str(policy["inputs"][name]["sha256"]).casefold()
@@ -1596,7 +1731,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         expected_public_input_hashes
     ):
         raise ValueError(
-            "Step7-v2 audited identity-phrase input hashes are invalid"
+            "Step7-v3 audited identity-phrase input hashes are invalid"
         )
     expected_collision_compacts = sorted(
         compact_identifier(term) for term in PROTECTED_IDENTITY_COLLISION_TERMS
@@ -1611,7 +1746,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         or phrase_audit.get("input_hash_change_requires_full_reaudit") is not True
     ):
         raise ValueError(
-            "Step7-v2 audited identity-phrase collision/hash scope is invalid"
+            "Step7-v3 audited identity-phrase collision/hash scope is invalid"
         )
     if phrase_occurrence_count != int(
         manifest.get("redaction_summary", {}).get(
@@ -1619,7 +1754,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         )
     ):
         raise ValueError(
-            "Step7-v2 audited identity-phrase audit/redaction count mismatch"
+            "Step7-v3 audited identity-phrase audit/redaction count mismatch"
         )
 
     def valid_hashed_count_map(
@@ -1751,7 +1886,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
             "matched_anchor_sha256_seller_counts_canonical_sha256"
         ]
     ):
-        raise ValueError("Step7-v2 full known-alias census is invalid")
+        raise ValueError("Step7-v3 full known-alias census is invalid")
     if (
         full_census.get("manual_review_contract")
         != (
@@ -1770,7 +1905,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         or full_census.get("unknown_or_ambiguous_identifier_absence_proven")
         is not False
     ):
-        raise ValueError("Step7-v2 full known-alias audit scope is invalid")
+        raise ValueError("Step7-v3 full known-alias audit scope is invalid")
 
     embedded_expected = policy["clean_text_contract"][
         "audited_identity_embedded_residual_expected_audit"
@@ -1863,7 +1998,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
             "matched_alias_surface_pair_sha256_counts_canonical_sha256"
         ]
     ):
-        raise ValueError("Step7-v2 embedded identity census is invalid")
+        raise ValueError("Step7-v3 embedded identity census is invalid")
     if (
         embedded_census.get("manual_review_contract")
         != (
@@ -1888,7 +2023,7 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         or embedded_census.get("unknown_or_ambiguous_identifier_absence_proven")
         is not False
     ):
-        raise ValueError("Step7-v2 embedded identity audit scope is invalid")
+        raise ValueError("Step7-v3 embedded identity audit scope is invalid")
 
     residue_scan = manifest.get("identity_residue_scan", {})
     residue_count_fields = (
@@ -1930,17 +2065,17 @@ def validate_global_identity_audit_manifest(policy: dict, manifest: dict) -> Non
         != residue_scan.get("total_residue_count")
         or residue_scan.get("total_residue_count") != 0
     ):
-        raise ValueError("Step7-v2 final identity-residue scan is invalid")
+        raise ValueError("Step7-v3 final identity-residue scan is invalid")
 
 
 def validate_expected_model_pin(model_key: str, cfg: dict) -> None:
     expected_hash = str(cfg.get("expected_content_sha256", "")).casefold()
     if not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
-        raise ValueError(f"Step7-v2 model content hash is not pinned for {model_key}")
+        raise ValueError(f"Step7-v3 model content hash is not pinned for {model_key}")
     if int(cfg.get("expected_file_count", 0)) <= 0:
-        raise ValueError(f"Step7-v2 model file count is not pinned for {model_key}")
+        raise ValueError(f"Step7-v3 model file count is not pinned for {model_key}")
     if int(cfg.get("expected_total_size_bytes", 0)) <= 1024 * 1024:
-        raise ValueError(f"Step7-v2 model payload size is not pinned for {model_key}")
+        raise ValueError(f"Step7-v3 model payload size is not pinned for {model_key}")
 
 
 def safe_signal_literal(contact_type: str, value: str) -> str | None:
@@ -2196,7 +2331,7 @@ def full_known_alias_residual_census(
     if not token_registry or any(
         not re.fullmatch(r"[a-z0-9]{1,96}", token) for token in token_registry
     ):
-        raise ValueError("Step7-v2 full known-alias census registry is invalid")
+        raise ValueError("Step7-v3 full known-alias census registry is invalid")
 
     maximum_form_length = max(
         len(token) + max(1, *(len(suffix) for suffix in IDENTITY_HANDLE_SUFFIXES))
@@ -2225,7 +2360,7 @@ def full_known_alias_residual_census(
         scanned_rows += 1
         seller_uid = str(row.get("seller_uid", ""))
         if not seller_uid:
-            raise ValueError("Step7-v2 full alias census row lacks seller_uid")
+            raise ValueError("Step7-v3 full alias census row lacks seller_uid")
         model_text = str(row.get("model_text", ""))
         for segment in re.split(r"\|\||\r?\n", model_text):
             scanned_segments += 1
@@ -2319,7 +2454,7 @@ def audited_identity_embedded_residual_census(
     if not token_registry or any(
         not re.fullmatch(r"[a-z0-9]{1,96}", token) for token in token_registry
     ):
-        raise ValueError("Step7-v2 embedded identity census registry is invalid")
+        raise ValueError("Step7-v3 embedded identity census registry is invalid")
 
     aliases_by_first_character: dict[str, list[str]] = defaultdict(list)
     for alias in token_registry:
@@ -2334,7 +2469,7 @@ def audited_identity_embedded_residual_census(
     for row in corpus_rows:
         scanned_rows += 1
         if not str(row.get("seller_uid", "")):
-            raise ValueError("Step7-v2 embedded identity census row lacks seller_uid")
+            raise ValueError("Step7-v3 embedded identity census row lacks seller_uid")
         model_text = str(row.get("model_text", ""))
         for word_match in re.finditer(r"(?i)[a-z0-9]+", model_text):
             surface = word_match.group(0).casefold()
@@ -2492,7 +2627,7 @@ def unconditional_alias_spans(
         re.fullmatch(r"[a-z0-9]{1,96}", token) is None
         for token in token_registry
     ):
-        raise ValueError("Step7-v2 unconditional alias registry is invalid")
+        raise ValueError("Step7-v3 unconditional alias registry is invalid")
     maximum_form_length = max(
         len(token) + max(1, *(len(suffix) for suffix in IDENTITY_HANDLE_SUFFIXES))
         for token in token_registry
@@ -2630,7 +2765,7 @@ def identity_literal_pattern(literal: str) -> re.Pattern[str]:
     """Match a known literal exactly, never as a substring of a larger token."""
     value = str(literal)
     if not value:
-        raise ValueError("Step7-v2 identity literal cannot be empty")
+        raise ValueError("Step7-v3 identity literal cannot be empty")
     prefix = r"(?<!\w)" if value[0].isalnum() or value[0] == "_" else ""
     suffix = r"(?!\w)" if value[-1].isalnum() or value[-1] == "_" else ""
     return re.compile(prefix + re.escape(value) + suffix, flags=re.IGNORECASE)
@@ -2705,7 +2840,7 @@ def redact_identifiers(
             break
     else:
         raise ValueError(
-            f"Step7-v2 redaction did not reach a fixed point in {MAX_REDACTION_PASSES} passes"
+            f"Step7-v3 redaction did not reach a fixed point in {MAX_REDACTION_PASSES} passes"
         )
     return output, {
         "generic_identifier_match_count": generic_matches,
@@ -2733,13 +2868,13 @@ def assert_no_identifier_residue(
     for literal in literals:
         if identity_literal_pattern(literal).search(text):
             raise ValueError(
-                f"Step7-v2 left a seller-local alias for seller hash="
+                f"Step7-v3 left a seller-local alias for seller hash="
                 f"{hashlib.sha256(seller_uid.encode('utf-8')).hexdigest()[:16]}"
             )
     for rule_name, pattern in (*GENERIC_IDENTIFIER_RULES, *OBFUSCATED_CONTACT_RULES):
         if pattern.search(text):
             raise ValueError(
-                f"Step7-v2 left a high-precision identifier pattern: rule={rule_name} "
+                f"Step7-v3 left a high-precision identifier pattern: rule={rule_name} "
                 f"seller_hash={hashlib.sha256(seller_uid.encode('utf-8')).hexdigest()[:16]}"
             )
     token_registry = global_tokens or frozenset()
@@ -2752,21 +2887,21 @@ def assert_no_identifier_residue(
     )
     if residues:
         raise ValueError(
-            "Step7-v2 left a globally known identity token for seller hash="
+            "Step7-v3 left a globally known identity token for seller hash="
             f"{hashlib.sha256(seller_uid.encode('utf-8')).hexdigest()[:16]}"
         )
     if unconditional_alias_spans(
         text, seller_local_phrase_tokens or frozenset()
     ):
         raise ValueError(
-            "Step7-v2 left a separator-variant seller-local alias for seller hash="
+            "Step7-v3 left a separator-variant seller-local alias for seller hash="
             f"{hashlib.sha256(seller_uid.encode('utf-8')).hexdigest()[:16]}"
         )
     if unconditional_alias_spans(
         text, audited_global_phrase_tokens or frozenset()
     ):
         raise ValueError(
-            "Step7-v2 left an audited fixed-snapshot identity phrase for seller hash="
+            "Step7-v3 left an audited fixed-snapshot identity phrase for seller hash="
             f"{hashlib.sha256(seller_uid.encode('utf-8')).hexdigest()[:16]}"
         )
 
@@ -2868,7 +3003,7 @@ def scan_final_corpus_identity_residues(
     }
     if total:
         raise ValueError(
-            "Step7-v2 final serialized corpus identity scan failed: "
+            "Step7-v3 final serialized corpus identity scan failed: "
             f"pattern={pattern_residue_count} "
             f"local={local_literal_residue_count} global={global_token_residue_count} "
             f"local_phrase={local_phrase_residue_count} "
@@ -3012,10 +3147,10 @@ def build_clean_seller_record(
 
 def train_reference(seller_records: dict[str, dict], train_seller_uids: set[str]) -> dict:
     if not train_seller_uids:
-        raise ValueError("Step7-v2 train reference has no sellers")
+        raise ValueError("Step7-v3 train reference has no sellers")
     missing = sorted(train_seller_uids - set(seller_records))
     if missing:
-        raise ValueError(f"Step7-v2 train reference seller missing: {missing[0]}")
+        raise ValueError(f"Step7-v3 train reference seller missing: {missing[0]}")
 
     title_df: Counter[str] = Counter()
     description_df: Counter[str] = Counter()
@@ -3032,7 +3167,7 @@ def train_reference(seller_records: dict[str, dict], train_seller_uids: set[str]
             if math.isfinite(float(seller_records[seller_uid]["numeric_profile"][name]))
         )
         if not values:
-            raise ValueError(f"Step7-v2 train reference has no finite values for {name}")
+            raise ValueError(f"Step7-v3 train reference has no finite values for {name}")
         numeric_references[name] = values
     return {
         "train_seller_count": len(train_seller_uids),
@@ -3123,7 +3258,7 @@ def build_safe_pair_rows(
             )
             row[f"{name}_train_percentile_gap_abs"] = abs(left_percentile - right_percentile)
         if list(row)[1:] != SAFE_FEATURE_NAMES:
-            raise AssertionError("Step7-v2 safe feature output order drift")
+            raise AssertionError("Step7-v3 safe feature output order drift")
         output.append(row)
     return output
 
@@ -3137,7 +3272,7 @@ def validate_public_pair_rows(policy: dict, rows: list[dict]) -> None:
         "seller_uid_right",
     ]
     if not rows or list(rows[0]) != expected_schema:
-        raise ValueError("Step7-v2 public pair manifest schema drift")
+        raise ValueError("Step7-v3 public pair manifest schema drift")
     expected_counts = policy["supervision_boundary"]["expected_counts"]
     observed_counts = Counter(row["split_name"] for row in rows)
     expected_by_split = {
@@ -3146,22 +3281,22 @@ def validate_public_pair_rows(policy: dict, rows: list[dict]) -> None:
     }
     if observed_counts != Counter(expected_by_split):
         raise ValueError(
-            f"Step7-v2 public pair split-count drift: {dict(observed_counts)}"
+            f"Step7-v3 public pair split-count drift: {dict(observed_counts)}"
         )
     pair_uids = [row["pair_uid"] for row in rows]
     if len(pair_uids) != len(set(pair_uids)):
-        raise ValueError("Step7-v2 public pair manifest has duplicate pair_uid values")
+        raise ValueError("Step7-v3 public pair manifest has duplicate pair_uid values")
     unordered_pairs = []
     for row in rows:
         left = str(row["seller_uid_left"] or "").strip()
         right = str(row["seller_uid_right"] or "").strip()
         if not left or not right or left == right:
-            raise ValueError("Step7-v2 public pair has an empty or self endpoint")
+            raise ValueError("Step7-v3 public pair has an empty or self endpoint")
         if not str(row["component_id"] or "").strip():
-            raise ValueError("Step7-v2 public pair has an empty component")
+            raise ValueError("Step7-v3 public pair has an empty component")
         unordered_pairs.append(tuple(sorted((left, right))))
     if len(unordered_pairs) != len(set(unordered_pairs)):
-        raise ValueError("Step7-v2 public pair manifest has reversed/duplicate pairs")
+        raise ValueError("Step7-v3 public pair manifest has reversed/duplicate pairs")
     component_splits: dict[str, set[str]] = defaultdict(set)
     seller_splits: dict[str, set[str]] = defaultdict(set)
     for row in rows:
@@ -3169,9 +3304,9 @@ def validate_public_pair_rows(policy: dict, rows: list[dict]) -> None:
         seller_splits[row["seller_uid_left"]].add(row["split_name"])
         seller_splits[row["seller_uid_right"]].add(row["split_name"])
     if any(len(splits) != 1 for splits in component_splits.values()):
-        raise ValueError("Step7-v2 public pair component crosses splits")
+        raise ValueError("Step7-v3 public pair component crosses splits")
     if any(len(splits) != 1 for splits in seller_splits.values()):
-        raise ValueError("Step7-v2 public pair seller crosses splits")
+        raise ValueError("Step7-v3 public pair seller crosses splits")
     observed_components = {
         split: sum(splits == {split} for splits in component_splits.values())
         for split in ("train", "valid", "test")
@@ -3182,9 +3317,9 @@ def validate_public_pair_rows(policy: dict, rows: list[dict]) -> None:
     }
     boundary = policy["supervision_boundary"]
     if observed_components != boundary["expected_component_count_by_split"]:
-        raise ValueError("Step7-v2 public pair component-count contract drift")
+        raise ValueError("Step7-v3 public pair component-count contract drift")
     if observed_sellers != boundary["expected_seller_count_by_split"]:
-        raise ValueError("Step7-v2 public pair seller-count contract drift")
+        raise ValueError("Step7-v3 public pair seller-count contract drift")
 
 
 def validate_clean_corpus_rows(rows: list[dict]) -> None:
@@ -3195,24 +3330,24 @@ def validate_clean_corpus_rows(rows: list[dict]) -> None:
         "model_text_sha256",
     ]
     if not rows or list(rows[0]) != expected_schema:
-        raise ValueError("Step7-v2 clean corpus schema drift")
+        raise ValueError("Step7-v3 clean corpus schema drift")
     seller_uids = [row["seller_uid"] for row in rows]
     if seller_uids != sorted(seller_uids) or len(seller_uids) != len(set(seller_uids)):
-        raise ValueError("Step7-v2 clean corpus seller index must be sorted and unique")
+        raise ValueError("Step7-v3 clean corpus seller index must be sorted and unique")
     for row in rows:
         text = str(row["model_text"])
         if not text.strip():
-            raise ValueError("Step7-v2 clean corpus contains empty model text")
+            raise ValueError("Step7-v3 clean corpus contains empty model text")
         if row["split_name"] not in {"train", "valid", "test"}:
-            raise ValueError("Step7-v2 clean corpus contains an invalid split")
+            raise ValueError("Step7-v3 clean corpus contains an invalid split")
         if row["model_text_sha256"] != sha256_text(text):
-            raise ValueError("Step7-v2 clean corpus per-seller text hash drift")
+            raise ValueError("Step7-v3 clean corpus per-seller text hash drift")
 
 
 def validate_safe_pair_feature_rows(rows: list[dict]) -> None:
     expected_schema = ["pair_uid", *SAFE_FEATURE_NAMES]
     if not rows or list(rows[0]) != expected_schema:
-        raise ValueError("Step7-v2 safe pair feature schema drift")
+        raise ValueError("Step7-v3 safe pair feature schema drift")
     boolean_names = {"same_market_bool", "same_source_dataset_bool", "clean_shared_title_bool", "clean_shared_description_bool"}
     capped_names = {
         "clean_shared_title_count_capped",
@@ -3228,38 +3363,38 @@ def validate_safe_pair_feature_rows(rows: list[dict]) -> None:
             try:
                 value = float(row[name])
             except (TypeError, ValueError) as exc:
-                raise ValueError(f"Step7-v2 safe feature is not numeric: {name}") from exc
+                raise ValueError(f"Step7-v3 safe feature is not numeric: {name}") from exc
             if not math.isfinite(value):
-                raise ValueError(f"Step7-v2 safe feature is non-finite: {name}")
+                raise ValueError(f"Step7-v3 safe feature is non-finite: {name}")
             if name in boolean_names and value not in {0.0, 1.0}:
-                raise ValueError(f"Step7-v2 safe boolean feature is out of range: {name}")
+                raise ValueError(f"Step7-v3 safe boolean feature is out of range: {name}")
             if name in capped_names and (
                 value < 0.0 or value > 5.0 or value != float(int(value))
             ):
-                raise ValueError(f"Step7-v2 capped feature is out of range: {name}")
+                raise ValueError(f"Step7-v3 capped feature is out of range: {name}")
             if name in unit_interval_names and not 0.0 <= value <= 1.0:
-                raise ValueError(f"Step7-v2 unit-interval feature is out of range: {name}")
+                raise ValueError(f"Step7-v3 unit-interval feature is out of range: {name}")
             if name not in boolean_names | capped_names | unit_interval_names and value < 0.0:
-                raise ValueError(f"Step7-v2 nonnegative feature is below zero: {name}")
+                raise ValueError(f"Step7-v3 nonnegative feature is below zero: {name}")
 
 
 def validate_weight_payload(path: Path) -> None:
     if path.name != "model.safetensors":
         if path.stat().st_size <= 1024 * 1024:
-            raise ValueError(f"Step7-v2 model weight file is implausibly small: {path}")
+            raise ValueError(f"Step7-v3 model weight file is implausibly small: {path}")
         return
     with path.open("rb") as handle:
         prefix = handle.read(8)
         if len(prefix) != 8:
-            raise ValueError(f"Step7-v2 safetensors header is truncated: {path}")
+            raise ValueError(f"Step7-v3 safetensors header is truncated: {path}")
         header_length = struct.unpack("<Q", prefix)[0]
         if header_length <= 2 or header_length > 100 * 1024 * 1024:
-            raise ValueError(f"Step7-v2 safetensors header length is invalid: {path}")
+            raise ValueError(f"Step7-v3 safetensors header length is invalid: {path}")
         header_bytes = handle.read(header_length)
     try:
         header = json.loads(header_bytes.decode("utf-8").rstrip())
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ValueError(f"Step7-v2 safetensors header is invalid JSON: {path}") from exc
+        raise ValueError(f"Step7-v3 safetensors header is invalid JSON: {path}") from exc
     offsets = [
         value.get("data_offsets")
         for key, value in header.items()
@@ -3273,11 +3408,11 @@ def validate_weight_payload(path: Path) -> None:
         or offset[1] < offset[0]
         for offset in offsets
     ):
-        raise ValueError(f"Step7-v2 safetensors data offsets are invalid: {path}")
+        raise ValueError(f"Step7-v3 safetensors data offsets are invalid: {path}")
     expected_size = 8 + header_length + max(offset[1] for offset in offsets)
     if expected_size != path.stat().st_size:
         raise ValueError(
-            f"Step7-v2 safetensors payload is truncated or has trailing bytes: {path}; "
+            f"Step7-v3 safetensors payload is truncated or has trailing bytes: {path}; "
             f"expected={expected_size} observed={path.stat().st_size}"
         )
 
@@ -3289,7 +3424,7 @@ def validate_sentence_transformer_layout(model_key: str, cfg: dict) -> dict:
     config_path = model_dir / "config.json"
     for path in (modules_path, pooling_path, config_path):
         if not path.is_file():
-            raise FileNotFoundError(f"Step7-v2 local model file missing for {model_key}: {path}")
+            raise FileNotFoundError(f"Step7-v3 local model file missing for {model_key}: {path}")
     weight_files = [
         path
         for name in ("model.safetensors", "pytorch_model.bin")
@@ -3298,7 +3433,7 @@ def validate_sentence_transformer_layout(model_key: str, cfg: dict) -> dict:
     ]
     if not weight_files:
         raise FileNotFoundError(
-            f"Step7-v2 local model weights are missing for {model_key}: {model_dir}. "
+            f"Step7-v3 local model weights are missing for {model_key}: {model_dir}. "
             "A tokenizer/config-only directory is not executable."
         )
     for weight_file in weight_files:
@@ -3316,13 +3451,13 @@ def validate_sentence_transformer_layout(model_key: str, cfg: dict) -> dict:
         observed_pooling = "mean"
     if observed_pooling != cfg["expected_pooling"]:
         raise ValueError(
-            f"Step7-v2 pooling mismatch for {model_key}: "
+            f"Step7-v3 pooling mismatch for {model_key}: "
             f"expected={cfg['expected_pooling']} observed={observed_pooling}"
         )
     has_dense = any(str(module.get("type", "")).endswith(".Dense") for module in modules)
     if has_dense != bool(cfg["expected_dense_module"]):
         raise ValueError(
-            f"Step7-v2 dense-head mismatch for {model_key}: "
+            f"Step7-v3 dense-head mismatch for {model_key}: "
             f"expected={cfg['expected_dense_module']} observed={has_dense}"
         )
     return {
@@ -3340,15 +3475,15 @@ def validate_reranker_layout(model_key: str, cfg: dict) -> dict:
     model_dir = resolve(cfg["local_path"])
     config_path = model_dir / "config.json"
     if not config_path.is_file():
-        raise FileNotFoundError(f"Step7-v2 reranker config is missing: {model_dir}")
+        raise FileNotFoundError(f"Step7-v3 reranker config is missing: {model_dir}")
     config = load_json(config_path)
     auto_map = config.get("auto_map", {})
     if int(config.get("num_labels", 0)) != 1:
-        raise ValueError("Step7-v2 reranker must expose one relevance logit")
+        raise ValueError("Step7-v3 reranker must expose one relevance logit")
     if not str(auto_map.get("AutoModelForSequenceClassification", "")).strip():
-        raise ValueError("Step7-v2 reranker custom sequence-classification mapping is missing")
+        raise ValueError("Step7-v3 reranker custom sequence-classification mapping is missing")
     if not bool(cfg.get("trust_remote_code")):
-        raise ValueError("Step7-v2 pinned custom reranker requires trusted local model code")
+        raise ValueError("Step7-v3 pinned custom reranker requires trusted local model code")
     weight_files = [
         path
         for name in ("model.safetensors", "pytorch_model.bin")
@@ -3356,7 +3491,7 @@ def validate_reranker_layout(model_key: str, cfg: dict) -> dict:
         if path.is_file() and path.stat().st_size > 1024 * 1024
     ]
     if not weight_files:
-        raise FileNotFoundError(f"Step7-v2 reranker weights are missing: {model_dir}")
+        raise FileNotFoundError(f"Step7-v3 reranker weights are missing: {model_dir}")
     for weight_file in weight_files:
         validate_weight_payload(weight_file)
     return {
@@ -3373,7 +3508,7 @@ def validate_reranker_layout(model_key: str, cfg: dict) -> dict:
 
 def directory_inventory_fingerprint(path: Path) -> dict:
     if not path.is_dir():
-        raise FileNotFoundError(f"Step7-v2 model directory is missing: {path}")
+        raise FileNotFoundError(f"Step7-v3 model directory is missing: {path}")
     records = []
     candidates = [candidate for candidate in path.rglob("*") if candidate.is_file()]
     for item in sorted(
@@ -3384,7 +3519,7 @@ def directory_inventory_fingerprint(path: Path) -> dict:
             continue
         records.append({"path": relative, "size_bytes": item.stat().st_size})
     if not records:
-        raise ValueError(f"Step7-v2 model directory is empty: {path}")
+        raise ValueError(f"Step7-v3 model directory is empty: {path}")
     return {
         "file_count": len(records),
         "total_size_bytes": sum(record["size_bytes"] for record in records),
@@ -3395,7 +3530,7 @@ def directory_inventory_fingerprint(path: Path) -> dict:
 def model_content_fingerprint(path: Path) -> dict:
     """Hash every runtime model file, excluding downloader/cache metadata."""
     if not path.is_dir():
-        raise FileNotFoundError(f"Step7-v2 model directory is missing: {path}")
+        raise FileNotFoundError(f"Step7-v3 model directory is missing: {path}")
     records = []
     candidates = [candidate for candidate in path.rglob("*") if candidate.is_file()]
     for item in sorted(
@@ -3411,7 +3546,7 @@ def model_content_fingerprint(path: Path) -> dict:
             }
         )
     if not records:
-        raise ValueError(f"Step7-v2 model directory is empty: {path}")
+        raise ValueError(f"Step7-v3 model directory is empty: {path}")
     return {
         "file_count": len(records),
         "total_size_bytes": sum(record["size_bytes"] for record in records),
@@ -3431,7 +3566,7 @@ def validate_model_content_pin(model_key: str, cfg: dict) -> dict:
     for key, expected in checks.items():
         if observed[key] != expected:
             raise ValueError(
-                f"Step7-v2 model payload drift for {model_key}: "
+                f"Step7-v3 model payload drift for {model_key}: "
                 f"field={key} expected={expected} observed={observed[key]}"
             )
     return observed

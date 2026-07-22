@@ -1,11 +1,11 @@
 {
-  "step": "step7_v2_prepare_public_label_free_data",
-  "version": "2026-07-21-step7-v2-clean-english-source-selection-v1",
-  "policy_path": "schema/step7_v2_clean_source_selection_policy.json",
-  "policy_sha256": "d94150debafab0cde6126a08a2128158d48eef069425d5fa4b370bffe5a69f16",
-  "generator_script_path": "scripts/step7_v2_prepare_clean_data.py",
-  "generator_script_sha256": "910bf5904cbe5ffd95ffc69f32f0d450e2ccdc8af725327d6a4e10fc6fd3fd1f",
-  "common_script_sha256": "044269f7666fa02ff4ebe040d3f7dfac8957d991029d8b530c205c356f2c220a",
+  "step": "step7_v3_prepare_public_label_free_data",
+  "version": "2026-07-22-step7-v3-shortcut-conditioned-encoder-attribution-v1",
+  "policy_path": "schema/step7_v3_clean_source_selection_policy.json",
+  "policy_sha256": "3fe56f45481dff99f7b78b1a82f6397283a439629b47bc3557651c007c3ac03a",
+  "generator_script_path": "scripts/step7_v3_prepare_clean_data.py",
+  "generator_script_sha256": "91cb2624a56258a5df5888216a592f92a7739bc128f079b0e9314ad35f5b6256",
+  "common_script_sha256": "fe18804aa015787f0990270dabdcf003f9fd768d4c5cd577be2ac266565038da",
   "redaction_dependency_script_path": "scripts/step3_build_seller_profiles.py",
   "redaction_dependency_script_sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
   "input_manifest": {
@@ -1961,6 +1961,36 @@
   },
   "feature_generation_uses_review_label_values": false,
   "feature_generation_uses_evidence_type_values": false,
+  "pair_feature_roles": {
+    "shortcut_audit_only_features": [
+      "same_market_bool",
+      "same_source_dataset_bool"
+    ],
+    "model_eligible_transfer_features": [
+      "clean_category_jaccard",
+      "clean_shared_title_bool",
+      "clean_shared_description_bool",
+      "clean_shared_title_count_capped",
+      "clean_shared_description_count_capped",
+      "clean_shared_category_count_capped",
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ],
+    "shortcut_features_must_be_absent_from_all_model_eligible_candidates": true,
+    "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0": true
+  },
+  "shortcut_features_generated_for_audit_only": true,
+  "shortcut_features_eligible_for_model_training_or_selection": false,
   "boundary_source_file_contains_review_label_column": true,
   "boundary_projection_fields": [
     "dataset",
@@ -1974,22 +2004,22 @@
   "label_permutation_invariance_required": true,
   "output_files": {
     "pair_manifest": {
-      "path": "reports/step7_v2_clean_source_selection/v1_20260721/pair_manifest.no_labels.csv",
+      "path": "reports/step7_v3_clean_source_selection/v1_20260722/pair_manifest.no_labels.csv",
       "sha256": "15659adf5df594d7fa2bedabf16d25c14b7317eb809f3ac2ba1a595d96c58ddd",
       "size_bytes": 192468
     },
     "clean_corpus": {
-      "path": "reports/step7_v2_clean_source_selection/v1_20260721/clean_seller_corpus.jsonl",
+      "path": "reports/step7_v3_clean_source_selection/v1_20260722/clean_seller_corpus.jsonl",
       "sha256": "876e41e723e3052b8d965bd34e3a7ec1cbbbfd5db1a7619d3efbce9b9344d8a7",
       "size_bytes": 3768191
     },
     "train_feature_reference": {
-      "path": "reports/step7_v2_clean_source_selection/v1_20260721/train_feature_reference.no_labels.json",
+      "path": "reports/step7_v3_clean_source_selection/v1_20260722/train_feature_reference.no_labels.json",
       "sha256": "31744f342636246567fe78d83a1d21de60d253aab65f3df962d5ae12ac5d1aef",
       "size_bytes": 1793751
     },
     "safe_pair_features": {
-      "path": "reports/step7_v2_clean_source_selection/v1_20260721/safe_pair_features.no_labels.csv",
+      "path": "reports/step7_v3_clean_source_selection/v1_20260722/safe_pair_features.no_labels.csv",
       "sha256": "0185f9a5a877a59aa9e204a5469fb11cd879f2a556df53fe33ca6051ad64fe22",
       "size_bytes": 211313
     }

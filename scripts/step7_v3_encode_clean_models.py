@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Encode the Step7-v2 clean corpus with five model-native encoders and one symmetric reranker."""
+"""Encode the Step7-v3 clean corpus with five model-native encoders and one symmetric reranker."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-import step7_v2_common as common
+import step7_v3_common as common
 
 
 ENCODER_SCRIPT = Path(__file__).resolve()
@@ -26,11 +26,11 @@ def require_gpu_stack():
         from transformers import AutoModelForSequenceClassification, AutoTokenizer  # type: ignore
     except ModuleNotFoundError as exc:  # pragma: no cover - runtime dependent
         raise SystemExit(
-            "Step7-v2 formal encoding requires torch, transformers, and sentence-transformers."
+            "Step7-v3 formal encoding requires torch, transformers, and sentence-transformers."
         ) from exc
     if not torch.cuda.is_available():
         raise SystemExit(
-            "Step7-v2 formal encoding requires a CUDA GPU. Prepare and test contracts on Windows, "
+            "Step7-v3 formal encoding requires a CUDA GPU. Prepare and test contracts on Windows, "
             "then run this command on the Linux GPU host."
         )
     return torch, transformers, SentenceTransformer, AutoTokenizer, AutoModelForSequenceClassification
@@ -41,28 +41,32 @@ def verify_public_preparation(policy: dict) -> dict:
     manifest_path = common.resolve(outputs["preparation_manifest"])
     if not manifest_path.is_file():
         raise FileNotFoundError(
-            "Step7-v2 public preparation manifest is missing; run the public stage first"
+            "Step7-v3 public preparation manifest is missing; run the public stage first"
         )
     manifest = common.load_json(manifest_path)
     if manifest.get("version") != policy["version"]:
-        raise ValueError("Step7-v2 preparation manifest version mismatch")
-    if manifest.get("step") != "step7_v2_prepare_public_label_free_data":
-        raise ValueError("Step7-v2 encoder requires the label-free public preparation")
+        raise ValueError("Step7-v3 preparation manifest version mismatch")
+    if manifest.get("step") != "step7_v3_prepare_public_label_free_data":
+        raise ValueError("Step7-v3 encoder requires the label-free public preparation")
     if manifest.get("feature_generation_uses_review_label_values") is not False:
-        raise ValueError("Step7-v2 public preparation is not label isolated")
+        raise ValueError("Step7-v3 public preparation is not label isolated")
+    if manifest.get("pair_feature_roles") != policy["pair_feature_roles"] or manifest.get(
+        "shortcut_features_eligible_for_model_training_or_selection"
+    ) is not False:
+        raise ValueError("Step7-v3 shortcut feature roles are not audit-only")
     if manifest.get("common_script_sha256") != common.sha256_file(
-        common.resolve("scripts/step7_v2_common.py")
+        common.resolve("scripts/step7_v3_common.py")
     ):
-        raise ValueError("Step7-v2 public preparation/common script drift")
+        raise ValueError("Step7-v3 public preparation/common script drift")
     if manifest.get("redaction_dependency_script_sha256") != common.sha256_file(
         common.resolve("scripts/step3_build_seller_profiles.py")
     ):
-        raise ValueError("Step7-v2 public preparation/Step3 dependency drift")
+        raise ValueError("Step7-v3 public preparation/Step3 dependency drift")
     residue_scan = manifest.get("identity_residue_scan", {})
     if residue_scan.get("status") != "pass" or residue_scan.get(
         "total_residue_count"
     ) != 0:
-        raise ValueError("Step7-v2 public corpus identity-residue audit did not pass")
+        raise ValueError("Step7-v3 public corpus identity-residue audit did not pass")
     common.validate_content_fidelity_manifest(policy, manifest)
     common.validate_global_identity_audit_manifest(policy, manifest)
     checks = {
@@ -72,7 +76,7 @@ def verify_public_preparation(policy: dict) -> dict:
     for key, path in checks.items():
         record = manifest["output_files"][key]
         if common.sha256_file(path) != record["sha256"]:
-            raise ValueError(f"Step7-v2 prepared artifact drift: {key}")
+            raise ValueError(f"Step7-v3 prepared artifact drift: {key}")
     return manifest
 
 
@@ -80,28 +84,28 @@ def verify_label_free_gpu_sync(policy: dict, policy_path: Path) -> tuple[dict, d
     outputs = policy["outputs"]
     sync_path = common.resolve(outputs["gpu_sync_manifest"])
     if not sync_path.is_file():
-        raise FileNotFoundError("Build and transfer the Step7-v2 GPU sync manifest first")
+        raise FileNotFoundError("Build and transfer the Step7-v3 GPU sync manifest first")
     manifest = common.load_json(sync_path)
-    if manifest.get("step") != "step7_v2_label_free_windows_to_linux_gpu_sync":
-        raise ValueError("Step7-v2 GPU sync manifest has the wrong role")
+    if manifest.get("step") != "step7_v3_label_free_windows_to_linux_gpu_sync":
+        raise ValueError("Step7-v3 GPU sync manifest has the wrong role")
     if manifest.get("version") != policy["version"]:
-        raise ValueError("Step7-v2 GPU sync manifest version mismatch")
+        raise ValueError("Step7-v3 GPU sync manifest version mismatch")
     if manifest.get("policy_sha256") != common.sha256_file(policy_path):
-        raise ValueError("Step7-v2 GPU sync policy hash drift")
+        raise ValueError("Step7-v3 GPU sync policy hash drift")
     if manifest.get("policy_contract_sha256") != common.canonical_hash(policy):
-        raise ValueError("Step7-v2 GPU sync policy contract drift")
+        raise ValueError("Step7-v3 GPU sync policy contract drift")
     if manifest.get("label_files_included") is not False:
-        raise ValueError("Step7-v2 GPU sync manifest includes labels")
+        raise ValueError("Step7-v3 GPU sync manifest includes labels")
     if manifest.get("raw_source_files_included") is not False:
-        raise ValueError("Step7-v2 GPU sync manifest includes raw source inputs")
+        raise ValueError("Step7-v3 GPU sync manifest includes raw source inputs")
     for record in manifest.get("files", []):
         path = common.resolve(record["path"])
         if not path.is_file():
-            raise FileNotFoundError(f"Step7-v2 transferred GPU file missing: {path}")
+            raise FileNotFoundError(f"Step7-v3 transferred GPU file missing: {path}")
         if path.stat().st_size != int(record["size_bytes"]):
-            raise ValueError(f"Step7-v2 transferred GPU file size drift: {record['path']}")
+            raise ValueError(f"Step7-v3 transferred GPU file size drift: {record['path']}")
         if common.sha256_file(path) != record["sha256"]:
-            raise ValueError(f"Step7-v2 transferred GPU file hash drift: {record['path']}")
+            raise ValueError(f"Step7-v3 transferred GPU file hash drift: {record['path']}")
     present_forbidden = [
         path_value
         for path_value in manifest.get("forbidden_workspace_paths", [])
@@ -109,7 +113,7 @@ def verify_label_free_gpu_sync(policy: dict, policy_path: Path) -> tuple[dict, d
     ]
     if present_forbidden:
         raise ValueError(
-            "Step7-v2 formal GPU workspace is not label/raw-source isolated: "
+            "Step7-v3 formal GPU workspace is not label/raw-source isolated: "
             f"{present_forbidden[0]}"
         )
     model_fingerprints = {}
@@ -120,7 +124,7 @@ def verify_label_free_gpu_sync(policy: dict, policy_path: Path) -> tuple[dict, d
         observed = common.validate_model_content_pin(model_key, cfg)
         registered = manifest["model_directories"].get(model_key)
         if registered is None or registered != {"path": cfg["local_path"], **observed}:
-            raise ValueError(f"Step7-v2 GPU model fingerprint drift: {model_key}")
+            raise ValueError(f"Step7-v3 GPU model fingerprint drift: {model_key}")
         model_fingerprints[model_key] = observed
     return manifest, model_fingerprints
 
@@ -141,9 +145,9 @@ def corpus_and_pairs(policy: dict) -> tuple[list[dict], list[dict]]:
         - seller_set
     )
     if missing:
-        raise ValueError(f"Step7-v2 pair endpoint missing from clean corpus: {missing[0]}")
+        raise ValueError(f"Step7-v3 pair endpoint missing from clean corpus: {missing[0]}")
     if len(pairs) != int(policy["supervision_boundary"]["expected_counts"]["total"]):
-        raise ValueError("Step7-v2 pair manifest row count drift")
+        raise ValueError("Step7-v3 pair manifest row count drift")
     return corpus, pairs
 
 
@@ -183,7 +187,7 @@ def token_length_diagnostics(
         lengths.extend(len(ids) for ids in encoded["input_ids"])
     values = np.asarray(lengths, dtype=np.int64)
     if len(values) != len(first_texts) or np.any(values <= 0):
-        raise ValueError("Step7-v2 tokenizer length audit is incomplete")
+        raise ValueError("Step7-v3 tokenizer length audit is incomplete")
     return {
         "row_count": len(lengths),
         "max_length_contract": int(max_length),
@@ -232,12 +236,12 @@ def encode_embedding_model(
     )
     embeddings = np.asarray(embeddings, dtype=np.float32)
     if embeddings.ndim != 2 or embeddings.shape[0] != len(corpus):
-        raise ValueError(f"Step7-v2 invalid embedding shape for {model_key}: {embeddings.shape}")
+        raise ValueError(f"Step7-v3 invalid embedding shape for {model_key}: {embeddings.shape}")
     if not np.all(np.isfinite(embeddings)):
-        raise ValueError(f"Step7-v2 non-finite embeddings for {model_key}")
+        raise ValueError(f"Step7-v3 non-finite embeddings for {model_key}")
     norms = np.linalg.norm(embeddings, axis=1)
     if float(np.max(np.abs(norms - 1.0))) > 1e-3:
-        raise ValueError(f"Step7-v2 embeddings are not normalized for {model_key}")
+        raise ValueError(f"Step7-v3 embeddings are not normalized for {model_key}")
 
     index = {seller_uid: idx for idx, seller_uid in enumerate(seller_uids)}
     pair_scores = []
@@ -246,7 +250,7 @@ def encode_embedding_model(
         right = embeddings[index[pair["seller_uid_right"]]]
         score = float(np.dot(left, right))
         if not math.isfinite(score):
-            raise ValueError(f"Step7-v2 non-finite cosine for {model_key}")
+            raise ValueError(f"Step7-v3 non-finite cosine for {model_key}")
         pair_scores.append(
             {
                 "pair_uid": pair["pair_uid"],
@@ -267,7 +271,7 @@ def encode_embedding_model(
     common.write_npy_immutable(matrix_path, embeddings)
     common.write_csv_immutable(score_path, pair_scores)
     manifest = {
-        "step": "step7_v2_encode_clean_embedding",
+        "step": "step7_v3_encode_clean_embedding",
         "version": policy["version"],
         "model_key": model_key,
         "repo_id": cfg["repo_id"],
@@ -378,7 +382,7 @@ def encode_reranker(
                 target[start:stop] = values.detach().float().cpu().numpy()
     scores = (forward_scores + reverse_scores) / 2.0
     if not np.all(np.isfinite(scores)):
-        raise ValueError("Step7-v2 reranker produced non-finite scores")
+        raise ValueError("Step7-v3 reranker produced non-finite scores")
     rows = [
         {
             "pair_uid": pair["pair_uid"],
@@ -389,7 +393,7 @@ def encode_reranker(
     score_path = common.resolve(policy["outputs"]["reranker_pair_scores"])
     common.write_csv_immutable(score_path, rows)
     manifest = {
-        "step": "step7_v2_encode_clean_reranker",
+        "step": "step7_v3_encode_clean_reranker",
         "version": policy["version"],
         "model_key": cfg["model_key"],
         "repo_id": cfg["repo_id"],
@@ -430,7 +434,7 @@ def encode_reranker(
 def gpu_output_record(path_value: str) -> dict:
     path = common.resolve(path_value)
     if not path.is_file():
-        raise FileNotFoundError(f"Step7-v2 expected GPU output is missing: {path}")
+        raise FileNotFoundError(f"Step7-v3 expected GPU output is missing: {path}")
     return {
         "path": str(path.relative_to(common.ROOT)).replace("\\", "/"),
         "size_bytes": path.stat().st_size,
@@ -452,7 +456,7 @@ def write_gpu_output_manifest(policy: dict, provenance: dict) -> dict:
     paths.extend([outputs["reranker_pair_scores"], outputs["reranker_manifest"]])
     records = [gpu_output_record(path) for path in paths]
     payload = {
-        "step": "step7_v2_label_free_gpu_output_bundle",
+        "step": "step7_v3_label_free_gpu_output_bundle",
         "version": policy["version"],
         **provenance,
         "label_or_raw_source_files_present_in_gpu_workspace": False,
@@ -478,7 +482,7 @@ def main() -> None:
     selected_models = args.embedding_models or list(policy["embedding_models"])
     unknown = sorted(set(selected_models) - set(policy["embedding_models"]))
     if unknown:
-        raise ValueError(f"Unknown Step7-v2 embedding model keys: {unknown}")
+        raise ValueError(f"Unknown Step7-v3 embedding model keys: {unknown}")
     preparation = verify_public_preparation(policy)
     layouts = {
         key: common.validate_sentence_transformer_layout(key, policy["embedding_models"][key])
@@ -520,7 +524,7 @@ def main() -> None:
     if gpu_sync["public_preparation_manifest_sha256"] != provenance[
         "public_preparation_manifest_sha256"
     ]:
-        raise ValueError("Step7-v2 GPU sync/public preparation provenance drift")
+        raise ValueError("Step7-v3 GPU sync/public preparation provenance drift")
     (
         torch_module,
         transformers_module,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Select Step7-v2 English M0 on validation, then run a delayed historical test."""
+"""Select Step7-v3 English M0 on validation, then run a delayed historical test."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-import step7_v2_common as common
+import step7_v3_common as common
 
 
 EPS = 1e-12
@@ -290,7 +290,7 @@ def component_weights(rows: list[dict], mode: str) -> np.ndarray:
     if mode == "uniform":
         return np.ones(len(rows), dtype=np.float64)
     if mode != "component_equal_normalized_to_row_count":
-        raise ValueError(f"Unsupported Step7-v2 weighting mode: {mode}")
+        raise ValueError(f"Unsupported Step7-v3 weighting mode: {mode}")
     counts = Counter(row["component_id"] for row in rows)
     weights = np.asarray([1.0 / counts[row["component_id"]] for row in rows], dtype=np.float64)
     return weights * (len(rows) / float(np.sum(weights)))
@@ -303,18 +303,20 @@ def fit_logistic(
     l2_penalty: float,
     max_iter: int,
     tolerance: float,
+    armijo_c1: float,
+    minimum_line_search_step: float,
 ) -> dict:
     x = np.asarray(matrix, dtype=np.float64)
     y = np.asarray(labels, dtype=np.float64)
     w = np.asarray(weights, dtype=np.float64)
     if x.ndim != 2 or len(x) != len(y) or len(w) != len(y):
-        raise ValueError("Step7-v2 logistic input shape mismatch")
+        raise ValueError("Step7-v3 logistic input shape mismatch")
     if not np.all(np.isfinite(x)) or not np.all(np.isfinite(w)):
-        raise ValueError("Step7-v2 logistic input contains non-finite values")
+        raise ValueError("Step7-v3 logistic input contains non-finite values")
     if set(np.unique(y)) != {0.0, 1.0}:
-        raise ValueError("Step7-v2 logistic training requires both binary classes")
+        raise ValueError("Step7-v3 logistic training requires both binary classes")
     if np.any(w <= 0.0):
-        raise ValueError("Step7-v2 logistic weights must be positive")
+        raise ValueError("Step7-v3 logistic weights must be positive")
     weight_total = float(np.sum(w))
     mean = np.sum(x * w[:, None], axis=0) / weight_total
     variance = np.sum(((x - mean) ** 2) * w[:, None], axis=0) / weight_total
@@ -324,13 +326,34 @@ def fit_logistic(
     params = np.zeros(z.shape[1] + 1, dtype=np.float64)
     converged = False
     final_delta = math.inf
-    for iteration in range(1, int(max_iter) + 1):
-        probabilities = safe_sigmoid(params[0] + z @ params[1:])
+    final_normalized_gradient_inf_norm = math.inf
+    final_objective = math.inf
+
+    def state(current: np.ndarray) -> tuple[float, np.ndarray, np.ndarray]:
+        logits = current[0] + z @ current[1:]
+        probabilities = safe_sigmoid(logits)
+        objective = float(
+            np.sum(w * (np.logaddexp(0.0, logits) - y * logits))
+            + 0.5 * float(l2_penalty) * np.dot(current[1:], current[1:])
+        )
         residual = (probabilities - y) * w
-        gradient = np.empty_like(params)
+        gradient = np.empty_like(current)
         gradient[0] = np.sum(residual)
-        gradient[1:] = z.T @ residual + float(l2_penalty) * params[1:]
+        gradient[1:] = z.T @ residual + float(l2_penalty) * current[1:]
         curvature = probabilities * (1.0 - probabilities) * w
+        return objective, gradient, curvature
+
+    for iteration in range(1, int(max_iter) + 1):
+        objective, gradient, curvature = state(params)
+        normalized_gradient_inf_norm = float(
+            np.max(np.abs(gradient)) / weight_total
+        )
+        if normalized_gradient_inf_norm <= float(tolerance):
+            converged = True
+            final_delta = 0.0
+            final_normalized_gradient_inf_norm = normalized_gradient_inf_norm
+            final_objective = objective
+            break
         weighted_z = z * curvature[:, None]
         hessian = np.empty((len(params), len(params)), dtype=np.float64)
         hessian[0, 0] = np.sum(curvature)
@@ -339,18 +362,47 @@ def fit_logistic(
         hessian[1:, 1:] = z.T @ weighted_z
         hessian[1:, 1:] += np.eye(z.shape[1]) * float(l2_penalty)
         try:
-            delta = np.linalg.solve(hessian, gradient)
+            newton_delta = np.linalg.solve(hessian, gradient)
         except np.linalg.LinAlgError:
-            delta = np.linalg.pinv(hessian) @ gradient
-        delta = np.clip(delta, -5.0, 5.0)
-        params -= delta
-        final_delta = float(np.linalg.norm(delta))
-        if final_delta <= float(tolerance):
+            newton_delta = np.linalg.pinv(hessian) @ gradient
+        direction = -newton_delta
+        directional_derivative = float(np.dot(gradient, direction))
+        if not np.all(np.isfinite(direction)) or directional_derivative >= 0.0:
+            direction = -gradient / max(float(np.linalg.norm(gradient)), 1.0)
+            directional_derivative = float(np.dot(gradient, direction))
+        step_size = 1.0
+        accepted = False
+        while step_size >= float(minimum_line_search_step):
+            proposed = params + step_size * direction
+            proposed_objective, _proposed_gradient, _proposed_curvature = state(
+                proposed
+            )
+            if proposed_objective <= (
+                objective + float(armijo_c1) * step_size * directional_derivative
+            ):
+                accepted = True
+                break
+            step_size *= 0.5
+        if not accepted:
+            raise ValueError(
+                "Step7-v3 logistic Armijo line search failed before convergence: "
+                f"l2={l2_penalty} gradient={normalized_gradient_inf_norm}"
+            )
+        applied_delta = step_size * direction
+        params = proposed
+        final_delta = float(np.linalg.norm(applied_delta))
+        final_objective, final_gradient, _final_curvature = state(params)
+        final_normalized_gradient_inf_norm = float(
+            np.max(np.abs(final_gradient)) / weight_total
+        )
+        if final_normalized_gradient_inf_norm <= float(tolerance):
             converged = True
             break
     if not converged:
         raise ValueError(
-            f"Step7-v2 logistic solver did not converge: l2={l2_penalty} delta={final_delta}"
+            "Step7-v3 logistic solver did not converge: "
+            f"l2={l2_penalty} delta={final_delta} "
+            f"normalized_gradient={final_normalized_gradient_inf_norm}"
         )
     return {
         "mean": [float(value) for value in mean],
@@ -360,6 +412,12 @@ def fit_logistic(
         "l2_penalty": float(l2_penalty),
         "solver_iterations": iteration,
         "solver_final_delta_norm": final_delta,
+        "solver_final_normalized_gradient_inf_norm": (
+            final_normalized_gradient_inf_norm
+        ),
+        "solver_final_objective": final_objective,
+        "solver_convergence_criterion": "normalized_gradient_inf_norm_at_most_tolerance",
+        "solver_line_search": "armijo_backtracking",
         "solver_converged": converged,
         "sample_weight_total": weight_total,
     }
@@ -371,7 +429,7 @@ def apply_logistic(matrix: np.ndarray, artifact: dict) -> np.ndarray:
     scale = np.asarray(artifact["scale"], dtype=np.float64)
     coefficients = np.asarray(artifact["coefficients"], dtype=np.float64)
     if x.shape[1] != len(coefficients):
-        raise ValueError("Step7-v2 logistic artifact feature dimension mismatch")
+        raise ValueError("Step7-v3 logistic artifact feature dimension mismatch")
     return safe_sigmoid(
         float(artifact["intercept"]) + ((x - mean) / scale) @ coefficients
     )
@@ -382,7 +440,7 @@ def balanced_component_folds(rows: list[dict], fold_count: int, seed: int) -> di
     for row in rows:
         grouped[row["component_id"]].append(row)
     if len(grouped) < fold_count:
-        raise ValueError("Step7-v2 has fewer training components than folds")
+        raise ValueError("Step7-v3 has fewer training components than folds")
     totals = (
         len(rows) / fold_count,
         sum(row["review_label"] == "positive" for row in rows) / fold_count,
@@ -401,9 +459,9 @@ def balanced_component_folds(rows: list[dict], fold_count: int, seed: int) -> di
         records.append((component_id, len(component_rows), positives, negatives, mass, tie))
     records.sort(key=lambda item: (-item[4], item[5], item[0]))
     if sum(record[2] > 0 for record in records) < fold_count:
-        raise ValueError("Step7-v2 has too few positive components for grouped folds")
+        raise ValueError("Step7-v3 has too few positive components for grouped folds")
     if sum(record[3] > 0 for record in records) < fold_count:
-        raise ValueError("Step7-v2 has too few negative components for grouped folds")
+        raise ValueError("Step7-v3 has too few negative components for grouped folds")
 
     assignments: dict[str, int] = {}
     fold_totals = [[0, 0, 0] for _ in range(fold_count)]
@@ -438,7 +496,7 @@ def balanced_component_folds(rows: list[dict], fold_count: int, seed: int) -> di
         assign(record, best_fold)
     for fold, (_count, positives, negatives) in enumerate(fold_totals):
         if positives == 0 or negatives == 0:
-            raise ValueError(f"Step7-v2 grouped fold {fold} is single-class")
+            raise ValueError(f"Step7-v3 grouped fold {fold} is single-class")
     return assignments
 
 
@@ -529,6 +587,8 @@ def tune_and_fit(
                 l2_penalty,
                 int(cfg["max_iter"]),
                 float(cfg["tolerance"]),
+                float(cfg["armijo_c1"]),
+                float(cfg["minimum_line_search_step"]),
             )
             oof[hold_indices] = apply_logistic(train_matrix[hold_indices], artifact)
             fold_artifacts.append(
@@ -540,12 +600,23 @@ def tune_and_fit(
                 }
             )
         if not np.all(np.isfinite(oof)):
-            raise ValueError("Step7-v2 OOF predictions are incomplete")
+            raise ValueError("Step7-v3 OOF predictions are incomplete")
+        shortcut_conditioned = shortcut_conditioned_component_equal_average_precision(
+            train_rows,
+            labels,
+            oof,
+            policy,
+            require_expected_strata=True,
+        )
         weighted_ap = weighted_average_precision(labels, oof, oof_selection_weights)
         row_ap = average_precision(labels, oof)
         auc = roc_auc(labels, oof)
         result = {
             "l2_penalty": l2_penalty,
+            "oof_shortcut_conditioned_macro_component_equal_average_precision": (
+                shortcut_conditioned["macro_average_precision"]
+            ),
+            "oof_shortcut_conditioned_details": shortcut_conditioned,
             "oof_selection_weighted_average_precision": weighted_ap,
             "oof_row_average_precision": row_ap,
             "oof_roc_auc": auc,
@@ -553,9 +624,13 @@ def tune_and_fit(
             "oof_scores": oof,
         }
         grid_results.append(result)
-        # AP alone selects regularization; exact AP ties prefer the stronger L2.
-        # AUC is reported but cannot silently change the preregistered choice.
-        key = (weighted_ap, l2_penalty)
+        # Shortcut-conditioned AP selects regularization.  Global component-equal
+        # AP is the first tie-breaker; exact ties prefer the stronger L2.
+        key = (
+            shortcut_conditioned["macro_average_precision"],
+            weighted_ap,
+            l2_penalty,
+        )
         if best is None or key > best[0]:
             best = (key, result)
     assert best is not None
@@ -571,6 +646,8 @@ def tune_and_fit(
         float(selected["l2_penalty"]),
         int(cfg["max_iter"]),
         float(cfg["tolerance"]),
+        float(cfg["armijo_c1"]),
+        float(cfg["minimum_line_search_step"]),
     )
     final_artifact["feature_names"] = feature_names
     return {
@@ -591,6 +668,11 @@ def tune_and_fit(
         "train_oof_selection_weighted_average_precision": float(
             selected["oof_selection_weighted_average_precision"]
         ),
+        "train_oof_shortcut_conditioned_macro_component_equal_average_precision": float(
+            selected[
+                "oof_shortcut_conditioned_macro_component_equal_average_precision"
+            ]
+        ),
         "selected_threshold": threshold,
         "threshold_selection": threshold_summary,
         "final_train_artifact": final_artifact,
@@ -599,53 +681,126 @@ def tune_and_fit(
     }
 
 
-def candidate_specs(policy: dict) -> list[dict]:
-    safe_features = list(policy["safe_pair_features"])
+def expand_candidate_feature_template(
+    template: list[str], policy: dict, embedding_feature: str | None
+) -> list[str]:
+    transfer_features = list(
+        policy["pair_feature_roles"]["model_eligible_transfer_features"]
+    )
+    shortcut_features = list(
+        policy["pair_feature_roles"]["shortcut_audit_only_features"]
+    )
     reranker_feature = policy["shared_reranker"]["feature_name"]
+    feature_names = []
+    for entry in template:
+        if entry == "{embedding_feature}":
+            if embedding_feature is None:
+                raise ValueError("Step7-v3 control cannot request an embedding feature")
+            feature_names.append(embedding_feature)
+        elif entry == "{model_eligible_transfer_features}":
+            feature_names.extend(transfer_features)
+        elif entry == "{shortcut_audit_only_features}":
+            feature_names.extend(shortcut_features)
+        elif entry == "{shared_reranker_feature}":
+            feature_names.append(reranker_feature)
+        else:
+            raise ValueError(f"Unknown Step7-v3 candidate feature placeholder: {entry}")
+    if len(feature_names) != len(set(feature_names)):
+        raise ValueError("Step7-v3 candidate has duplicate features")
+    return feature_names
+
+
+def candidate_specs(policy: dict) -> list[dict]:
+    shortcut_features = set(
+        policy["pair_feature_roles"]["shortcut_audit_only_features"]
+    )
+    matched_controls = policy["selection_rule"]["pipeline_attribution"][
+        "matched_no_encoder_control_by_tier"
+    ]
     output = []
     for model_key, model_cfg in policy["embedding_models"].items():
         embedding_feature = model_cfg["feature_name"]
         for tier_name, template in policy["candidate_tiers"].items():
-            feature_names = []
-            for entry in template:
-                if entry == "{embedding_feature}":
-                    feature_names.append(embedding_feature)
-                elif entry == "{safe_pair_features}":
-                    feature_names.extend(safe_features)
-                elif entry == "{shared_reranker_feature}":
-                    feature_names.append(reranker_feature)
-                else:
-                    raise ValueError(f"Unknown Step7-v2 candidate feature placeholder: {entry}")
-            if len(feature_names) != len(set(feature_names)):
-                raise ValueError(f"Step7-v2 candidate has duplicate features: {model_key}/{tier_name}")
+            feature_names = expand_candidate_feature_template(
+                template, policy, embedding_feature
+            )
+            if shortcut_features & set(feature_names):
+                raise ValueError(
+                    f"Step7-v3 model-eligible candidate uses a shortcut: {model_key}/{tier_name}"
+                )
             output.append(
                 {
                     "candidate_id": f"{model_key}__{tier_name}",
                     "model_key": model_key,
                     "tier": tier_name,
                     "feature_names": feature_names,
+                    "candidate_role": "encoder_pipeline",
+                    "encoder_comparison_eligible": tier_name == "encoder_only",
+                    "m0_pipeline_eligible": True,
+                    "attribution_control_only": False,
+                    "shortcut_audit_only": False,
+                    "matched_no_encoder_control": matched_controls[tier_name],
                 }
             )
-    if len(output) != 15:
-        raise ValueError(f"Step7-v2 expected 15 candidates, observed {len(output)}")
+    for control_name, template in policy["no_encoder_controls"].items():
+        feature_names = expand_candidate_feature_template(template, policy, None)
+        if shortcut_features & set(feature_names):
+            raise ValueError(f"Step7-v3 no-encoder control uses a shortcut: {control_name}")
+        output.append(
+            {
+                "candidate_id": f"control__{control_name}",
+                "model_key": None,
+                "tier": control_name,
+                "feature_names": feature_names,
+                "candidate_role": "no_encoder_control",
+                "encoder_comparison_eligible": False,
+                "m0_pipeline_eligible": False,
+                "attribution_control_only": True,
+                "shortcut_audit_only": False,
+                "matched_no_encoder_control": None,
+            }
+        )
+    for control_name, template in policy["shortcut_audit_controls"].items():
+        feature_names = expand_candidate_feature_template(template, policy, None)
+        if not feature_names or not set(feature_names).issubset(shortcut_features):
+            raise ValueError("Step7-v3 shortcut audit control contains a non-shortcut feature")
+        output.append(
+            {
+                "candidate_id": f"audit__{control_name}",
+                "model_key": None,
+                "tier": control_name,
+                "feature_names": feature_names,
+                "candidate_role": "shortcut_audit_control",
+                "encoder_comparison_eligible": False,
+                "m0_pipeline_eligible": False,
+                "attribution_control_only": False,
+                "shortcut_audit_only": True,
+                "matched_no_encoder_control": None,
+            }
+        )
+    if len(output) != 25:
+        raise ValueError(f"Step7-v3 expected 25 candidates, observed {len(output)}")
+    ids = [spec["candidate_id"] for spec in output]
+    if len(ids) != len(set(ids)):
+        raise ValueError("Step7-v3 candidate IDs are not unique")
     return output
 
 
 def index_unique(rows: list[dict], name: str) -> dict[str, dict]:
     index = {row["pair_uid"]: row for row in rows}
     if len(index) != len(rows):
-        raise ValueError(f"Step7-v2 duplicate pair_uid in {name}")
+        raise ValueError(f"Step7-v3 duplicate pair_uid in {name}")
     return index
 
 
 def verify_file_record(record: dict, role: str) -> Path:
     path = common.resolve(record["path"])
     if not path.is_file():
-        raise FileNotFoundError(f"Step7-v2 {role} file is missing: {path}")
+        raise FileNotFoundError(f"Step7-v3 {role} file is missing: {path}")
     if path.stat().st_size != int(record["size_bytes"]):
-        raise ValueError(f"Step7-v2 {role} file size drift: {record['path']}")
+        raise ValueError(f"Step7-v3 {role} file size drift: {record['path']}")
     if common.sha256_file(path) != record["sha256"]:
-        raise ValueError(f"Step7-v2 {role} file hash drift: {record['path']}")
+        raise ValueError(f"Step7-v3 {role} file hash drift: {record['path']}")
     return path
 
 
@@ -654,14 +809,14 @@ def verify_policy_input_records(
 ) -> None:
     records = manifest.get("input_manifest", {})
     if set(records) != set(input_names):
-        raise ValueError(f"Step7-v2 {role} input-manifest universe mismatch")
+        raise ValueError(f"Step7-v3 {role} input-manifest universe mismatch")
     for input_name in input_names:
         record = records[input_name]
         spec = policy["inputs"][input_name]
         if record.get("path") != spec["path"] or record.get("sha256") != spec["sha256"]:
-            raise ValueError(f"Step7-v2 {role} input pin mismatch: {input_name}")
+            raise ValueError(f"Step7-v3 {role} input pin mismatch: {input_name}")
         if int(record.get("size_bytes", 0)) <= 0:
-            raise ValueError(f"Step7-v2 {role} input size is invalid: {input_name}")
+            raise ValueError(f"Step7-v3 {role} input size is invalid: {input_name}")
 
 
 def expected_gpu_output_paths(policy: dict) -> set[str]:
@@ -690,9 +845,9 @@ def expected_gpu_output_paths(policy: dict) -> set[str]:
 def verify_model_fingerprint(model_key: str, fingerprint: dict, cfg: dict) -> None:
     files = fingerprint.get("files")
     if not isinstance(files, list) or not files:
-        raise ValueError(f"Step7-v2 model fingerprint lacks per-file hashes: {model_key}")
+        raise ValueError(f"Step7-v3 model fingerprint lacks per-file hashes: {model_key}")
     if common.canonical_hash(files) != fingerprint.get("content_sha256"):
-        raise ValueError(f"Step7-v2 model per-file fingerprint is inconsistent: {model_key}")
+        raise ValueError(f"Step7-v3 model per-file fingerprint is inconsistent: {model_key}")
     expected = {
         "content_sha256": cfg["expected_content_sha256"],
         "file_count": int(cfg["expected_file_count"]),
@@ -701,7 +856,7 @@ def verify_model_fingerprint(model_key: str, fingerprint: dict, cfg: dict) -> No
     for field, value in expected.items():
         if fingerprint.get(field) != value:
             raise ValueError(
-                f"Step7-v2 preregistered model fingerprint mismatch: {model_key}/{field}"
+                f"Step7-v3 preregistered model fingerprint mismatch: {model_key}/{field}"
             )
 
 
@@ -711,69 +866,73 @@ def verify_runtime_provenance(policy: dict) -> dict:
     development_path = common.resolve(outputs["development_labels_manifest"])
     for path in (public_path, development_path):
         if not path.is_file():
-            raise FileNotFoundError(f"Step7-v2 required Windows manifest is missing: {path}")
+            raise FileNotFoundError(f"Step7-v3 required Windows manifest is missing: {path}")
     public = common.load_json(public_path)
     development = common.load_json(development_path)
-    if public.get("step") != "step7_v2_prepare_public_label_free_data":
-        raise ValueError("Step7-v2 public preparation role mismatch")
+    if public.get("step") != "step7_v3_prepare_public_label_free_data":
+        raise ValueError("Step7-v3 public preparation role mismatch")
     if public.get("version") != policy["version"]:
-        raise ValueError("Step7-v2 public preparation version mismatch")
+        raise ValueError("Step7-v3 public preparation version mismatch")
     public_policy_path = common.resolve(public.get("policy_path", ""))
     if not public_policy_path.is_file() or public.get("policy_sha256") != common.sha256_file(
         public_policy_path
     ):
-        raise ValueError("Step7-v2 public preparation policy hash drift")
+        raise ValueError("Step7-v3 public preparation policy hash drift")
     if public.get("feature_generation_uses_review_label_values") is not False:
-        raise ValueError("Step7-v2 public features are not label isolated")
+        raise ValueError("Step7-v3 public features are not label isolated")
+    if public.get("pair_feature_roles") != policy["pair_feature_roles"] or public.get(
+        "shortcut_features_eligible_for_model_training_or_selection"
+    ) is not False:
+        raise ValueError("Step7-v3 public shortcut feature roles are not isolated")
     residue_scan = public.get("identity_residue_scan", {})
     if residue_scan.get("status") != "pass" or residue_scan.get(
         "total_residue_count"
     ) != 0:
-        raise ValueError("Step7-v2 public corpus identity-residue audit did not pass")
+        raise ValueError("Step7-v3 public corpus identity-residue audit did not pass")
     if residue_scan.get("claim_scope") != policy["clean_text_contract"].get(
         "identity_residue_claim_scope"
     ) or residue_scan.get("unknown_identifier_absence_proven") is not False:
-        raise ValueError("Step7-v2 identity-residue claim boundary is overstated")
+        raise ValueError("Step7-v3 identity-residue claim boundary is overstated")
     common.validate_content_fidelity_manifest(policy, public)
     common.validate_global_identity_audit_manifest(policy, public)
-    preparation_script = common.resolve("scripts/step7_v2_prepare_clean_data.py")
-    common_script = common.resolve("scripts/step7_v2_common.py")
+    preparation_script = common.resolve("scripts/step7_v3_prepare_clean_data.py")
+    common_script = common.resolve("scripts/step7_v3_common.py")
     step3_script = common.resolve("scripts/step3_build_seller_profiles.py")
     for manifest, role in ((public, "public"), (development, "development-label")):
         if manifest.get("generator_script_sha256") != common.sha256_file(
             preparation_script
         ):
-            raise ValueError(f"Step7-v2 {role} preparation script drift")
+            raise ValueError(f"Step7-v3 {role} preparation script drift")
         if manifest.get("common_script_sha256") != common.sha256_file(common_script):
-            raise ValueError(f"Step7-v2 {role} common script drift")
+            raise ValueError(f"Step7-v3 {role} common script drift")
         if manifest.get("redaction_dependency_script_sha256") != common.sha256_file(
             step3_script
         ):
-            raise ValueError(f"Step7-v2 {role} Step3 redaction dependency drift")
+            raise ValueError(f"Step7-v3 {role} Step3 redaction dependency drift")
     if development.get("splits_written") != ["train", "valid"]:
-        raise ValueError("Step7-v2 development labels must contain train and valid only")
+        raise ValueError("Step7-v3 development labels must contain train and valid only")
     if development.get("other_split_label_values_used_during_materialization") is not False:
-        raise ValueError("Step7-v2 development materialization used another split's labels")
+        raise ValueError("Step7-v3 development materialization used another split's labels")
     if development.get("split_projection_applied_before_label_or_evidence_access") is not True:
-        raise ValueError("Step7-v2 development label projection contract is missing")
+        raise ValueError("Step7-v3 development label projection contract is missing")
     if development.get("version") != policy["version"]:
-        raise ValueError("Step7-v2 development-label version mismatch")
+        raise ValueError("Step7-v3 development-label version mismatch")
     if development.get("policy_sha256") != public.get("policy_sha256"):
-        raise ValueError("Step7-v2 development-label policy hash drift")
+        raise ValueError("Step7-v3 development-label policy hash drift")
     if development.get("public_preparation_manifest_sha256") != common.sha256_file(public_path):
-        raise ValueError("Step7-v2 development/public preparation provenance drift")
+        raise ValueError("Step7-v3 development/public preparation provenance drift")
     if set(public.get("output_files", {})) != {
         "pair_manifest",
         "clean_corpus",
         "train_feature_reference",
         "safe_pair_features",
     }:
-        raise ValueError("Step7-v2 public preparation output universe mismatch")
+        raise ValueError("Step7-v3 public preparation output universe mismatch")
     if set(development.get("output_files", {})) != {
         "private_labels_train",
         "private_labels_valid",
     }:
-        raise ValueError("Step7-v2 development-label output universe mismatch")
+        raise ValueError("Step7-v3 development-label output universe mismatch")
     for record in public["output_files"].values():
         verify_file_record(record, "public-preparation")
     for record in development["output_files"].values():
@@ -794,83 +953,83 @@ def verify_runtime_provenance(policy: dict) -> dict:
     sync_path = common.resolve(outputs["gpu_sync_manifest"])
     bundle_path = common.resolve(outputs["gpu_output_manifest"])
     if not sync_path.is_file() or not bundle_path.is_file():
-        raise FileNotFoundError("Step7-v2 GPU provenance bundle is incomplete")
+        raise FileNotFoundError("Step7-v3 GPU provenance bundle is incomplete")
     sync = common.load_json(sync_path)
     bundle = common.load_json(bundle_path)
-    if sync.get("step") != "step7_v2_label_free_windows_to_linux_gpu_sync":
-        raise ValueError("Step7-v2 GPU sync role mismatch")
+    if sync.get("step") != "step7_v3_label_free_windows_to_linux_gpu_sync":
+        raise ValueError("Step7-v3 GPU sync role mismatch")
     if sync.get("label_files_included") is not False or sync.get(
         "raw_source_files_included"
     ) is not False:
-        raise ValueError("Step7-v2 GPU sync was not label/raw-source isolated")
+        raise ValueError("Step7-v3 GPU sync was not label/raw-source isolated")
     if sync.get("policy_contract_sha256") != common.canonical_hash(policy):
-        raise ValueError("Step7-v2 GPU sync policy contract mismatch")
+        raise ValueError("Step7-v3 GPU sync policy contract mismatch")
     if sync.get("policy_sha256") != public.get("policy_sha256"):
-        raise ValueError("Step7-v2 GPU sync policy file hash mismatch")
+        raise ValueError("Step7-v3 GPU sync policy file hash mismatch")
     if sync.get("public_preparation_manifest_sha256") != common.sha256_file(public_path):
-        raise ValueError("Step7-v2 GPU sync/public preparation drift")
-    sync_builder_path = common.resolve("scripts/step7_v2_build_sync_manifest.py")
-    if sync.get("generator_script_path") != "scripts/step7_v2_build_sync_manifest.py":
-        raise ValueError("Step7-v2 GPU sync builder path drift")
+        raise ValueError("Step7-v3 GPU sync/public preparation drift")
+    sync_builder_path = common.resolve("scripts/step7_v3_build_sync_manifest.py")
+    if sync.get("generator_script_path") != "scripts/step7_v3_build_sync_manifest.py":
+        raise ValueError("Step7-v3 GPU sync builder path drift")
     if sync.get("generator_script_sha256") != common.sha256_file(sync_builder_path):
-        raise ValueError("Step7-v2 GPU sync builder script drift")
+        raise ValueError("Step7-v3 GPU sync builder script drift")
     for record in sync.get("files", []):
         verify_file_record(record, "GPU-sync")
     required_sync_paths = {
         str(public_policy_path.relative_to(common.ROOT)).replace("\\", "/"),
         "scripts/step3_build_seller_profiles.py",
-        "scripts/step7_v2_common.py",
-        "scripts/step7_v2_build_sync_manifest.py",
-        "scripts/run_step7_v2_clean_source_linux_20260721.sh",
+        "scripts/step7_v3_common.py",
+        "scripts/step7_v3_build_sync_manifest.py",
+        "scripts/run_step7_v3_clean_source_linux_20260722.sh",
         outputs["pair_manifest"],
         outputs["clean_corpus"],
         outputs["preparation_manifest"],
-        "scripts/step7_v2_encode_clean_models.py",
+        "scripts/step7_v3_encode_clean_models.py",
     }
     observed_sync_paths = {record["path"] for record in sync.get("files", [])}
     if observed_sync_paths != required_sync_paths or len(sync.get("files", [])) != len(
         required_sync_paths
     ):
-        raise ValueError("Step7-v2 GPU sync file universe mismatch")
+        raise ValueError("Step7-v3 GPU sync file universe mismatch")
     if sync.get("file_count") != len(required_sync_paths) or sync.get(
         "total_file_bytes"
     ) != sum(int(record["size_bytes"]) for record in sync["files"]):
-        raise ValueError("Step7-v2 GPU sync file totals mismatch")
+        raise ValueError("Step7-v3 GPU sync file totals mismatch")
     forbidden = set(sync.get("forbidden_workspace_paths", []))
     if forbidden & observed_sync_paths:
-        raise ValueError("Step7-v2 GPU sync includes a forbidden source/label path")
+        raise ValueError("Step7-v3 GPU sync includes a forbidden source/label path")
     for model_key, cfg in {
         **policy["embedding_models"],
         policy["shared_reranker"]["model_key"]: policy["shared_reranker"],
     }.items():
         registered = sync.get("model_directories", {}).get(model_key)
         if registered is None or registered.get("path") != cfg["local_path"]:
-            raise ValueError(f"Step7-v2 GPU sync model registration missing: {model_key}")
+            raise ValueError(f"Step7-v3 GPU sync model registration missing: {model_key}")
         verify_model_fingerprint(model_key, registered, cfg)
 
-    if bundle.get("step") != "step7_v2_label_free_gpu_output_bundle":
-        raise ValueError("Step7-v2 GPU output bundle role mismatch")
+    if bundle.get("step") != "step7_v3_label_free_gpu_output_bundle":
+        raise ValueError("Step7-v3 GPU output bundle role mismatch")
     if bundle.get("gpu_sync_manifest_sha256") != common.sha256_file(sync_path):
-        raise ValueError("Step7-v2 GPU output/sync provenance drift")
+        raise ValueError("Step7-v3 GPU output/sync provenance drift")
     if bundle.get("policy_contract_sha256") != common.canonical_hash(policy):
-        raise ValueError("Step7-v2 GPU output policy contract mismatch")
+        raise ValueError("Step7-v3 GPU output policy contract mismatch")
     if bundle.get("public_preparation_manifest_sha256") != common.sha256_file(public_path):
-        raise ValueError("Step7-v2 GPU output/public preparation drift")
-    encoder_path = common.resolve("scripts/step7_v2_encode_clean_models.py")
+        raise ValueError("Step7-v3 GPU output/public preparation drift")
+    encoder_path = common.resolve("scripts/step7_v3_encode_clean_models.py")
     if bundle.get("generator_script_sha256") != common.sha256_file(encoder_path):
-        raise ValueError("Step7-v2 GPU output generator script drift")
+        raise ValueError("Step7-v3 GPU output generator script drift")
     if bundle.get("label_or_raw_source_files_present_in_gpu_workspace") is not False:
-        raise ValueError("Step7-v2 GPU output reports label/raw-source access")
+        raise ValueError("Step7-v3 GPU output reports label/raw-source access")
     bundle_records = bundle.get("files", [])
     expected_bundle_paths = expected_gpu_output_paths(policy)
     if {record["path"] for record in bundle_records} != expected_bundle_paths or len(
         bundle_records
     ) != len(expected_bundle_paths):
-        raise ValueError("Step7-v2 GPU output bundle file universe mismatch")
+        raise ValueError("Step7-v3 GPU output bundle file universe mismatch")
     if bundle.get("file_count") != len(expected_bundle_paths) or bundle.get(
         "total_file_bytes"
     ) != sum(int(record["size_bytes"]) for record in bundle_records):
-        raise ValueError("Step7-v2 GPU output bundle totals mismatch")
+        raise ValueError("Step7-v3 GPU output bundle totals mismatch")
     for record in bundle_records:
         verify_file_record(record, "GPU-output")
     return {
@@ -887,7 +1046,7 @@ def verify_runtime_provenance(policy: dict) -> dict:
 def require_manifest_fields(manifest: dict, expected: dict, role: str) -> None:
     for field, value in expected.items():
         if manifest.get(field) != value:
-            raise ValueError(f"Step7-v2 {role} manifest mismatch: {field}")
+            raise ValueError(f"Step7-v3 {role} manifest mismatch: {field}")
 
 
 def validate_token_length_diagnostics(
@@ -897,7 +1056,7 @@ def validate_token_length_diagnostics(
     if diagnostics.get("row_count") != expected_rows or diagnostics.get(
         "max_length_contract"
     ) != expected_max_length:
-        raise ValueError(f"Step7-v2 {role} token-length audit boundary mismatch")
+        raise ValueError(f"Step7-v3 {role} token-length audit boundary mismatch")
     truncated = diagnostics.get("truncated_row_count")
     fraction = diagnostics.get("truncated_row_fraction")
     if (
@@ -909,7 +1068,7 @@ def validate_token_length_diagnostics(
             float(fraction), truncated / expected_rows, abs_tol=1e-12
         )
     ):
-        raise ValueError(f"Step7-v2 {role} token-length audit values are invalid")
+        raise ValueError(f"Step7-v3 {role} token-length audit values are invalid")
     statistic_fields = (
         "token_length_min",
         "token_length_median",
@@ -920,13 +1079,13 @@ def validate_token_length_diagnostics(
     for field in statistic_fields:
         value = diagnostics.get(field)
         if not isinstance(value, (int, float)) or not math.isfinite(float(value)) or value <= 0:
-            raise ValueError(f"Step7-v2 {role} token-length statistic is invalid: {field}")
+            raise ValueError(f"Step7-v3 {role} token-length statistic is invalid: {field}")
     statistics = [float(diagnostics[field]) for field in statistic_fields]
     if statistics != sorted(statistics):
-        raise ValueError(f"Step7-v2 {role} token-length statistics are not monotonic")
+        raise ValueError(f"Step7-v3 {role} token-length statistics are not monotonic")
     for field in ("torch_version", "transformers_version"):
         if not str(manifest.get(field, "")).strip():
-            raise ValueError(f"Step7-v2 {role} runtime version is missing: {field}")
+            raise ValueError(f"Step7-v3 {role} runtime version is missing: {field}")
 
 
 def replay_embedding_pair_scores(
@@ -943,24 +1102,24 @@ def replay_embedding_pair_scores(
         matrix = np.load(matrix_path, allow_pickle=False)
     except (OSError, ValueError) as exc:
         raise ValueError(
-            f"Step7-v2 cannot safely load embedding matrix for {model_key}"
+            f"Step7-v3 cannot safely load embedding matrix for {model_key}"
         ) from exc
     expected_shape = tuple(manifest["shape"])
     if matrix.dtype != np.float32 or matrix.shape != expected_shape:
         raise ValueError(
-            f"Step7-v2 embedding matrix dtype/shape drift for {model_key}: "
+            f"Step7-v3 embedding matrix dtype/shape drift for {model_key}: "
             f"dtype={matrix.dtype} shape={matrix.shape}"
         )
     if not np.all(np.isfinite(matrix)):
-        raise ValueError(f"Step7-v2 embedding matrix is non-finite for {model_key}")
+        raise ValueError(f"Step7-v3 embedding matrix is non-finite for {model_key}")
     norms = np.linalg.norm(matrix, axis=1)
     observed_norm_error = float(np.max(np.abs(norms - 1.0)))
     if not math.isfinite(observed_norm_error) or observed_norm_error > 1e-3:
-        raise ValueError(f"Step7-v2 stored embedding matrix is not normalized: {model_key}")
+        raise ValueError(f"Step7-v3 stored embedding matrix is not normalized: {model_key}")
     seller_uids = manifest["seller_uids"]
     seller_index = {seller_uid: index for index, seller_uid in enumerate(seller_uids)}
     if len(seller_index) != len(seller_uids):
-        raise ValueError(f"Step7-v2 embedding seller UID list is not unique: {model_key}")
+        raise ValueError(f"Step7-v3 embedding seller UID list is not unique: {model_key}")
     tolerance = float(
         policy["evaluation"]["embedding_score_replay_absolute_tolerance"]
     )
@@ -971,7 +1130,7 @@ def replay_embedding_pair_scores(
             right = matrix[seller_index[pair["seller_uid_right"]]]
         except KeyError as exc:
             raise ValueError(
-                f"Step7-v2 embedding matrix lacks pair endpoint for {model_key}"
+                f"Step7-v3 embedding matrix lacks pair endpoint for {model_key}"
             ) from exc
         replayed = float(np.dot(left, right))
         serialized = float(score_index[pair["pair_uid"]][feature_name])
@@ -979,7 +1138,7 @@ def replay_embedding_pair_scores(
         maximum_difference = max(maximum_difference, difference)
         if not math.isfinite(replayed) or difference > tolerance:
             raise ValueError(
-                f"Step7-v2 embedding score does not replay from matrix for "
+                f"Step7-v3 embedding score does not replay from matrix for "
                 f"{model_key}:{pair['pair_uid']}; difference={difference:.9g} "
                 f"tolerance={tolerance:.9g}"
             )
@@ -1007,12 +1166,12 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
     seller_uids = [row["seller_uid"] for row in corpus_rows]
     expected_pair_uids = [row["pair_uid"] for row in pair_rows]
     if len(expected_pair_uids) != len(set(expected_pair_uids)):
-        raise ValueError("Step7-v2 pair manifest has duplicate pair_uid values")
+        raise ValueError("Step7-v3 pair manifest has duplicate pair_uid values")
     safe_rows = common.load_csv(safe_path)
     common.validate_safe_pair_feature_rows(safe_rows)
     safe_index = index_unique(safe_rows, "safe pair features")
     if set(safe_index) != set(expected_pair_uids):
-        raise ValueError("Step7-v2 safe feature pair universe mismatch")
+        raise ValueError("Step7-v3 safe feature pair universe mismatch")
     features: dict[str, dict] = {
         pair_uid: {name: float(safe_index[pair_uid][name]) for name in common.SAFE_FEATURE_NAMES}
         for pair_uid in expected_pair_uids
@@ -1027,13 +1186,13 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         )
         if not score_path.is_file() or not manifest_path.is_file():
             raise FileNotFoundError(
-                f"Step7-v2 GPU score missing for {model_key}; run the Linux encoding stage"
+                f"Step7-v3 GPU score missing for {model_key}; run the Linux encoding stage"
             )
         manifest = common.load_json(manifest_path)
         require_manifest_fields(
             manifest,
             {
-                "step": "step7_v2_encode_clean_embedding",
+                "step": "step7_v3_encode_clean_embedding",
                 "version": policy["version"],
                 "model_key": model_key,
                 "repo_id": cfg["repo_id"],
@@ -1066,17 +1225,17 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
             or not isinstance(shape[1], int)
             or shape[1] <= 0
         ):
-            raise ValueError(f"Step7-v2 embedding seller matrix shape drift: {model_key}")
+            raise ValueError(f"Step7-v3 embedding seller matrix shape drift: {model_key}")
         norm_error = manifest.get("maximum_unit_norm_error")
         if (
             not isinstance(norm_error, (int, float))
             or not math.isfinite(float(norm_error))
             or not 0.0 <= float(norm_error) <= 1e-3
         ):
-            raise ValueError(f"Step7-v2 embedding norm audit failed: {model_key}")
+            raise ValueError(f"Step7-v3 embedding norm audit failed: {model_key}")
         if not str(manifest.get("sentence_transformers_version", "")).strip():
             raise ValueError(
-                f"Step7-v2 embedding runtime version is missing: {model_key}"
+                f"Step7-v3 embedding runtime version is missing: {model_key}"
             )
         validate_token_length_diagnostics(
             manifest, len(seller_uids), int(cfg["max_length"]), f"embedding/{model_key}"
@@ -1085,25 +1244,25 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         if layout.get("pooling") != cfg["expected_pooling"] or layout.get(
             "has_dense_module"
         ) is not bool(cfg["expected_dense_module"]):
-            raise ValueError(f"Step7-v2 model-native pooling/dense drift: {model_key}")
+            raise ValueError(f"Step7-v3 model-native pooling/dense drift: {model_key}")
         verify_model_fingerprint(model_key, manifest.get("model_fingerprint", {}), cfg)
         registered = dict(provenance["gpu_sync"]["model_directories"][model_key])
         registered.pop("path", None)
         if manifest["model_fingerprint"] != registered:
-            raise ValueError(f"Step7-v2 embedding/sync model fingerprint drift: {model_key}")
+            raise ValueError(f"Step7-v3 embedding/sync model fingerprint drift: {model_key}")
         if manifest.get("pair_scores_sha256") != common.sha256_file(score_path):
-            raise ValueError(f"Step7-v2 embedding score hash drift for {model_key}")
+            raise ValueError(f"Step7-v3 embedding score hash drift for {model_key}")
         matrix_path = common.resolve(
             outputs["embedding_matrix_template"].format(model_key=model_key)
         )
         if manifest.get("embedding_matrix_sha256") != common.sha256_file(matrix_path):
-            raise ValueError(f"Step7-v2 embedding matrix hash drift for {model_key}")
+            raise ValueError(f"Step7-v3 embedding matrix hash drift for {model_key}")
         score_rows = common.load_csv(score_path)
         if not score_rows or list(score_rows[0]) != ["pair_uid", cfg["feature_name"]]:
-            raise ValueError(f"Step7-v2 embedding score schema drift for {model_key}")
+            raise ValueError(f"Step7-v3 embedding score schema drift for {model_key}")
         score_index = index_unique(score_rows, f"embedding scores {model_key}")
         if set(score_index) != set(expected_pair_uids):
-            raise ValueError(f"Step7-v2 embedding score pair universe mismatch for {model_key}")
+            raise ValueError(f"Step7-v3 embedding score pair universe mismatch for {model_key}")
         feature_name = cfg["feature_name"]
         numeric_replay = replay_embedding_pair_scores(
             policy,
@@ -1117,7 +1276,7 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         for pair_uid in expected_pair_uids:
             value = float(score_index[pair_uid][feature_name])
             if not math.isfinite(value) or value < -1.000001 or value > 1.000001:
-                raise ValueError(f"Step7-v2 non-finite score for {model_key}:{pair_uid}")
+                raise ValueError(f"Step7-v3 non-finite score for {model_key}:{pair_uid}")
             features[pair_uid][feature_name] = value
         runtime_manifests[model_key] = {
             **manifest,
@@ -1127,13 +1286,13 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
     reranker_path = common.resolve(outputs["reranker_pair_scores"])
     reranker_manifest_path = common.resolve(outputs["reranker_manifest"])
     if not reranker_path.is_file() or not reranker_manifest_path.is_file():
-        raise FileNotFoundError("Step7-v2 shared reranker score is missing")
+        raise FileNotFoundError("Step7-v3 shared reranker score is missing")
     reranker_manifest = common.load_json(reranker_manifest_path)
     reranker_cfg = policy["shared_reranker"]
     require_manifest_fields(
         reranker_manifest,
         {
-            "step": "step7_v2_encode_clean_reranker",
+            "step": "step7_v3_encode_clean_reranker",
             "version": policy["version"],
             "model_key": reranker_cfg["model_key"],
             "repo_id": reranker_cfg["repo_id"],
@@ -1164,7 +1323,7 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         reranker_cfg["model_key"], reranker_cfg
     )
     if reranker_manifest.get("layout_validation") != expected_reranker_layout:
-        raise ValueError("Step7-v2 reranker architecture/logit contract drift")
+        raise ValueError("Step7-v3 reranker architecture/logit contract drift")
     validate_token_length_diagnostics(
         reranker_manifest,
         len(pair_rows),
@@ -1177,29 +1336,29 @@ def load_feature_bundle(policy: dict) -> tuple[list[dict], dict[str, dict], dict
         or not math.isfinite(float(direction_gap))
         or not 0.0 <= float(direction_gap) <= 1.0
     ):
-        raise ValueError("Step7-v2 reranker direction-gap audit is invalid")
+        raise ValueError("Step7-v3 reranker direction-gap audit is invalid")
     registered_reranker = dict(
         provenance["gpu_sync"]["model_directories"][reranker_cfg["model_key"]]
     )
     registered_reranker.pop("path", None)
     if reranker_manifest["model_fingerprint"] != registered_reranker:
-        raise ValueError("Step7-v2 reranker/sync model fingerprint drift")
+        raise ValueError("Step7-v3 reranker/sync model fingerprint drift")
     if reranker_manifest.get("pair_scores_sha256") != common.sha256_file(reranker_path):
-        raise ValueError("Step7-v2 reranker score hash drift")
+        raise ValueError("Step7-v3 reranker score hash drift")
     reranker_rows = common.load_csv(reranker_path)
     if not reranker_rows or list(reranker_rows[0]) != [
         "pair_uid",
         reranker_cfg["feature_name"],
     ]:
-        raise ValueError("Step7-v2 reranker score schema drift")
+        raise ValueError("Step7-v3 reranker score schema drift")
     reranker_index = index_unique(reranker_rows, "reranker scores")
     if set(reranker_index) != set(expected_pair_uids):
-        raise ValueError("Step7-v2 reranker score pair universe mismatch")
+        raise ValueError("Step7-v3 reranker score pair universe mismatch")
     reranker_feature = reranker_cfg["feature_name"]
     for pair_uid in expected_pair_uids:
         value = float(reranker_index[pair_uid][reranker_feature])
         if not math.isfinite(value) or value < 0.0 or value > 1.0:
-            raise ValueError(f"Step7-v2 non-finite reranker score for {pair_uid}")
+            raise ValueError(f"Step7-v3 non-finite reranker score for {pair_uid}")
         features[pair_uid][reranker_feature] = value
     runtime_manifests["shared_reranker"] = reranker_manifest
     return pair_rows, features, runtime_manifests
@@ -1218,24 +1377,24 @@ def load_split_rows(policy: dict, split: str, pair_rows: list[dict]) -> list[dic
     for label in labels:
         pair = pair_index.get(label["pair_uid"])
         if pair is None or pair["split_name"] != split:
-            raise ValueError(f"Step7-v2 private label/pair mismatch for {split}:{label['pair_uid']}")
+            raise ValueError(f"Step7-v3 private label/pair mismatch for {split}:{label['pair_uid']}")
         if label["component_id"] != pair["component_id"]:
-            raise ValueError(f"Step7-v2 private label/component mismatch for {label['pair_uid']}")
+            raise ValueError(f"Step7-v3 private label/component mismatch for {label['pair_uid']}")
         joined.append({**pair, **label})
     expected_total = int(policy["supervision_boundary"]["expected_counts"][split]["total"])
     if len(joined) != expected_total or len({row["pair_uid"] for row in joined}) != len(joined):
-        raise ValueError(f"Step7-v2 private {split} label boundary drift")
+        raise ValueError(f"Step7-v3 private {split} label boundary drift")
     expected = policy["supervision_boundary"]["expected_counts"][split]
     observed = Counter(row["review_label"] for row in joined)
     if set(observed) != {"positive", "negative"} or observed != Counter(
         {"positive": int(expected["positive"]), "negative": int(expected["negative"])}
     ):
-        raise ValueError(f"Step7-v2 private {split} label-count drift")
+        raise ValueError(f"Step7-v3 private {split} label-count drift")
     expected_pair_uids = {
         row["pair_uid"] for row in pair_rows if row["split_name"] == split
     }
     if {row["pair_uid"] for row in joined} != expected_pair_uids:
-        raise ValueError(f"Step7-v2 private {split} label universe mismatch")
+        raise ValueError(f"Step7-v3 private {split} label universe mismatch")
     return joined
 
 
@@ -1247,7 +1406,7 @@ def matrix_for_rows(
         dtype=np.float64,
     )
     if matrix.shape != (len(rows), len(feature_names)) or not np.all(np.isfinite(matrix)):
-        raise ValueError("Step7-v2 candidate feature matrix is invalid")
+        raise ValueError("Step7-v3 candidate feature matrix is invalid")
     return matrix
 
 
@@ -1255,6 +1414,40 @@ def labels_array(rows: list[dict]) -> np.ndarray:
     return np.asarray(
         [1 if row["review_label"] == "positive" else 0 for row in rows], dtype=np.int8
     )
+
+
+SHORTCUT_CONTROL_STRATUM_FIELD = "_shortcut_control_stratum"
+
+
+def shortcut_control_stratum(feature_row: dict) -> str:
+    def normalized_binary(name: str) -> str:
+        try:
+            value = float(feature_row[name])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                f"Step7-v3 shortcut-control field is not numeric: {name}"
+            ) from exc
+        if not math.isfinite(value) or value not in {0.0, 1.0}:
+            raise ValueError(
+                f"Step7-v3 shortcut-control field must be exactly zero or one: {name}"
+            )
+        return str(int(value))
+
+    same_market = normalized_binary("same_market_bool")
+    same_source = normalized_binary("same_source_dataset_bool")
+    return f"same_market={same_market}|same_source={same_source}"
+
+
+def attach_shortcut_control_strata(
+    rows: list[dict], features: dict[str, dict]
+) -> None:
+    for row in rows:
+        feature_row = features.get(row["pair_uid"])
+        if feature_row is None:
+            raise ValueError(
+                f"Step7-v3 shortcut-control feature row is missing: {row['pair_uid']}"
+            )
+        row[SHORTCUT_CONTROL_STRATUM_FIELD] = shortcut_control_stratum(feature_row)
 
 
 def evidence_slice_rates(rows: list[dict], scores: np.ndarray, threshold: float, policy: dict) -> dict:
@@ -1285,9 +1478,108 @@ def evidence_slice_rates(rows: list[dict], scores: np.ndarray, threshold: float,
     }
 
 
+def component_equal_average_precision(
+    rows: list[dict], labels: np.ndarray, scores: np.ndarray
+) -> float:
+    return weighted_average_precision(
+        labels,
+        scores,
+        component_weights(rows, "component_equal_normalized_to_row_count"),
+    )
+
+
+def shortcut_conditioned_component_equal_average_precision(
+    rows: list[dict],
+    labels: np.ndarray,
+    scores: np.ndarray,
+    policy: dict,
+    *,
+    require_expected_strata: bool,
+) -> dict:
+    """Macro-average component-equal AP inside market/source strata.
+
+    Computing AP separately prevents a model from winning merely by assigning
+    different baseline scores to strata with different positive prevalence.
+    Single-class strata cannot define AP and are retained as explicit audit
+    rows rather than silently mixed into the primary metric.
+    """
+    y = np.asarray(labels, dtype=np.int8)
+    s = np.asarray(scores, dtype=np.float64)
+    if len(rows) != len(y) or s.shape != y.shape:
+        raise ValueError("Step7-v3 shortcut-conditioned metric shape mismatch")
+    grouped: dict[str, list[int]] = defaultdict(list)
+    for index, row in enumerate(rows):
+        stratum = row.get(SHORTCUT_CONTROL_STRATUM_FIELD)
+        if not isinstance(stratum, str) or not stratum:
+            raise ValueError("Step7-v3 row lacks shortcut-control stratum metadata")
+        grouped[stratum].append(index)
+
+    per_stratum = {}
+    estimable = []
+    for stratum, indices_list in sorted(grouped.items()):
+        indices = np.asarray(indices_list, dtype=int)
+        selected_labels = y[indices]
+        selected_rows = [rows[index] for index in indices]
+        label_counts = {
+            "positive": int(np.sum(selected_labels == 1)),
+            "negative": int(np.sum(selected_labels == 0)),
+        }
+        record = {
+            "row_count": len(indices),
+            "component_count": len({row["component_id"] for row in selected_rows}),
+            "label_counts": label_counts,
+            "estimable": len(np.unique(selected_labels)) == 2,
+            "component_equal_average_precision": None,
+        }
+        if record["estimable"]:
+            value = component_equal_average_precision(
+                selected_rows, selected_labels, s[indices]
+            )
+            record["component_equal_average_precision"] = value
+            estimable.append((stratum, value))
+        per_stratum[stratum] = record
+
+    cfg = policy["evaluation"]["shortcut_conditioned_primary_metric"]
+    minimum = int(cfg["minimum_estimable_strata"])
+    observed_estimable = [stratum for stratum, _value in estimable]
+    if len(estimable) < minimum:
+        raise ValueError(
+            "Step7-v3 shortcut-conditioned AP has too few two-class strata: "
+            f"observed={observed_estimable} minimum={minimum}"
+        )
+    if require_expected_strata:
+        split_names = {row["split_name"] for row in rows}
+        if len(split_names) != 1:
+            raise ValueError("Step7-v3 conditioned metric rows mix split names")
+        split_name = next(iter(split_names))
+        expected_key = f"expected_{split_name}_estimable_strata"
+        expected = cfg.get(expected_key)
+        if expected is not None and observed_estimable != expected:
+            raise ValueError(
+                "Step7-v3 shortcut-conditioned estimable stratum drift: "
+                f"split={split_name} expected={expected} observed={observed_estimable}"
+            )
+    return {
+        "metric": "shortcut_conditioned_macro_component_equal_average_precision",
+        "macro_average_precision": float(np.mean([value for _stratum, value in estimable])),
+        "estimable_strata": observed_estimable,
+        "excluded_single_class_strata": [
+            stratum for stratum, record in per_stratum.items() if not record["estimable"]
+        ],
+        "per_stratum": per_stratum,
+    }
+
+
 def grouped_bootstrap_ap_delta(
     rows: list[dict], top_scores: np.ndarray, runner_scores: np.ndarray, policy: dict
 ) -> dict:
+    """Component bootstrap for shortcut-conditioned component-equal AP.
+
+    Every sampled component draw has total mass one.  If the same component is
+    drawn multiple times, its mass is repeated; it is not collapsed back to a
+    single original component.  This is the cluster-bootstrap analogue of the
+    primary validation metric.
+    """
     cfg = policy["evaluation"]["bootstrap"]
     labels = labels_array(rows)
     grouped: dict[str, list[int]] = defaultdict(list)
@@ -1299,20 +1591,47 @@ def grouped_bootstrap_ap_delta(
     skipped = 0
     for _ in range(int(cfg["resamples"])):
         sampled_indices = []
-        for _component in components:
+        sampled_rows = []
+        for draw_index, _component in enumerate(components):
             sampled = components[int(rng.integers(0, len(components)))]
-            sampled_indices.extend(grouped[sampled])
+            component_indices = grouped[sampled]
+            sampled_indices.extend(component_indices)
+            for index in component_indices:
+                sampled_rows.append(
+                    {
+                        **rows[index],
+                        # A repeated cluster draw must retain repeated mass.
+                        "component_id": f"bootstrap_draw_{draw_index:06d}",
+                    }
+                )
         indices = np.asarray(sampled_indices, dtype=int)
         sampled_labels = labels[indices]
         if len(np.unique(sampled_labels)) < 2:
             skipped += 1
             continue
-        deltas.append(
-            average_precision(sampled_labels, top_scores[indices])
-            - average_precision(sampled_labels, runner_scores[indices])
-        )
+        # Repeated component draws are represented by repeated rows.  Their
+        # component-equal weights therefore repeat the sampled cluster mass.
+        try:
+            top_metric = shortcut_conditioned_component_equal_average_precision(
+                sampled_rows,
+                sampled_labels,
+                top_scores[indices],
+                policy,
+                require_expected_strata=False,
+            )["macro_average_precision"]
+            runner_metric = shortcut_conditioned_component_equal_average_precision(
+                sampled_rows,
+                sampled_labels,
+                runner_scores[indices],
+                policy,
+                require_expected_strata=False,
+            )["macro_average_precision"]
+        except ValueError:
+            skipped += 1
+            continue
+        deltas.append(top_metric - runner_metric)
     if len(deltas) < max(100, int(int(cfg["resamples"]) * 0.90)):
-        raise ValueError("Step7-v2 grouped bootstrap produced too few two-class resamples")
+        raise ValueError("Step7-v3 grouped bootstrap produced too few two-class resamples")
     values = np.asarray(deltas, dtype=np.float64)
     alpha = 1.0 - float(cfg["confidence"])
     return {
@@ -1320,8 +1639,22 @@ def grouped_bootstrap_ap_delta(
         "resamples_completed": len(deltas),
         "single_class_resamples_skipped": skipped,
         "component_count": len(components),
+        "metric": "shortcut_conditioned_macro_component_equal_average_precision",
         "point_delta_average_precision": float(
-            average_precision(labels, top_scores) - average_precision(labels, runner_scores)
+            shortcut_conditioned_component_equal_average_precision(
+                rows,
+                labels,
+                top_scores,
+                policy,
+                require_expected_strata=True,
+            )["macro_average_precision"]
+            - shortcut_conditioned_component_equal_average_precision(
+                rows,
+                labels,
+                runner_scores,
+                policy,
+                require_expected_strata=True,
+            )["macro_average_precision"]
         ),
         "mean_delta_average_precision": float(np.mean(values)),
         "ci95_lower": float(np.quantile(values, alpha / 2.0)),
@@ -1366,7 +1699,7 @@ def runtime_input_fingerprints(policy: dict) -> dict[str, dict]:
     records = {}
     for key, path in paths.items():
         if not path.is_file():
-            raise FileNotFoundError(f"Step7-v2 runtime input missing: {key}={path}")
+            raise FileNotFoundError(f"Step7-v3 runtime input missing: {key}={path}")
         records[key] = {
             "path": str(path.relative_to(common.ROOT)).replace("\\", "/"),
             "sha256": common.sha256_file(path),
@@ -1375,10 +1708,366 @@ def runtime_input_fingerprints(policy: dict) -> dict[str, dict]:
     return records
 
 
+def shortcut_feature_label_association_audit(
+    rows: list[dict], features: dict[str, dict], policy: dict
+) -> dict:
+    """Report shortcut/label association without making it selectable."""
+    labels = labels_array(rows)
+    output = {}
+    for feature_name in policy["pair_feature_roles"][
+        "shortcut_audit_only_features"
+    ]:
+        values = np.asarray(
+            [float(features[row["pair_uid"]][feature_name]) for row in rows],
+            dtype=np.float64,
+        )
+        by_label = {}
+        for label_name, label_value in (("negative", 0), ("positive", 1)):
+            selected = values[labels == label_value]
+            by_label[label_name] = {
+                "row_count": len(selected),
+                "mean": float(np.mean(selected)),
+                "zero_count": int(np.sum(selected == 0.0)),
+                "one_count": int(np.sum(selected == 1.0)),
+            }
+        auc = roc_auc(labels, values)
+        output[feature_name] = {
+            "by_label": by_label,
+            "roc_auc_positive_direction": auc,
+            "direction_free_separation_auc": max(auc, 1.0 - auc),
+            "used_for_candidate_training": False,
+            "used_for_encoder_selection": False,
+            "used_for_m0_selection": False,
+        }
+    return {
+        "status": "report_only_not_used_for_selection",
+        "features": output,
+    }
+
+
+def rank_candidate_ids(
+    candidate_ids: list[str],
+    public_results: dict[str, dict],
+    primary_field: str,
+    global_component_equal_field: str,
+    metrics_field: str,
+) -> list[str]:
+    if len(candidate_ids) < 2 or len(candidate_ids) != len(set(candidate_ids)):
+        raise ValueError("Step7-v3 selection group must contain distinct candidates")
+    return sorted(
+        candidate_ids,
+        key=lambda candidate_id: (
+            -float(public_results[candidate_id][primary_field]),
+            -float(public_results[candidate_id][global_component_equal_field]),
+            -float(public_results[candidate_id][metrics_field]["average_precision"]),
+            -float(public_results[candidate_id][metrics_field]["roc_auc"]),
+            candidate_id,
+        ),
+    )
+
+
+def assess_candidate_group(
+    candidate_ids: list[str],
+    public_results: dict[str, dict],
+    internal_results: dict[str, dict],
+    valid_rows: list[dict],
+    policy: dict,
+    *,
+    training_weight_sensitivity_applicable: bool,
+) -> dict:
+    ranked = rank_candidate_ids(
+        candidate_ids,
+        public_results,
+        "primary_valid_shortcut_conditioned_macro_component_equal_average_precision",
+        "primary_valid_component_equal_average_precision",
+        "primary_valid_metrics",
+    )
+    top_id, runner_id = ranked[:2]
+    top_public = public_results[top_id]
+    runner_public = public_results[runner_id]
+    top_internal = internal_results[top_id]
+    runner_internal = internal_results[runner_id]
+    bootstrap = grouped_bootstrap_ap_delta(
+        valid_rows,
+        top_internal["primary_valid_scores"],
+        runner_internal["primary_valid_scores"],
+        policy,
+    )
+    primary_delta = float(
+        top_public[
+            "primary_valid_shortcut_conditioned_macro_component_equal_average_precision"
+        ]
+        - runner_public[
+            "primary_valid_shortcut_conditioned_macro_component_equal_average_precision"
+        ]
+    )
+
+    global_component_ranked = sorted(
+        candidate_ids,
+        key=lambda candidate_id: (
+            -float(
+                public_results[candidate_id][
+                    "primary_valid_component_equal_average_precision"
+                ]
+            ),
+            -float(
+                public_results[candidate_id]["primary_valid_metrics"][
+                    "average_precision"
+                ]
+            ),
+            candidate_id,
+        ),
+    )
+    global_component_best_other = next(
+        candidate_id for candidate_id in global_component_ranked if candidate_id != top_id
+    )
+    global_component_delta = float(
+        top_public["primary_valid_component_equal_average_precision"]
+        - public_results[global_component_best_other][
+            "primary_valid_component_equal_average_precision"
+        ]
+    )
+
+    row_ranked = sorted(
+        candidate_ids,
+        key=lambda candidate_id: (
+            -float(
+                public_results[candidate_id]["primary_valid_metrics"][
+                    "average_precision"
+                ]
+            ),
+            -float(public_results[candidate_id]["primary_valid_metrics"]["roc_auc"]),
+            candidate_id,
+        ),
+    )
+    row_best_other = next(candidate_id for candidate_id in row_ranked if candidate_id != top_id)
+    row_delta = float(
+        top_public["primary_valid_metrics"]["average_precision"]
+        - public_results[row_best_other]["primary_valid_metrics"]["average_precision"]
+    )
+
+    uniform_ranked = None
+    uniform_delta = None
+    if training_weight_sensitivity_applicable:
+        uniform_ranked = rank_candidate_ids(
+            candidate_ids,
+            public_results,
+            "uniform_weight_sensitivity_valid_shortcut_conditioned_macro_"
+            "component_equal_average_precision",
+            "uniform_weight_sensitivity_valid_component_equal_average_precision",
+            "uniform_weight_sensitivity_valid_metrics",
+        )
+        uniform_best_other = next(
+            candidate_id for candidate_id in uniform_ranked if candidate_id != top_id
+        )
+        uniform_delta = float(
+            top_public[
+                "uniform_weight_sensitivity_valid_shortcut_conditioned_macro_"
+                "component_equal_average_precision"
+            ]
+            - public_results[uniform_best_other][
+                "uniform_weight_sensitivity_valid_shortcut_conditioned_macro_"
+                "component_equal_average_precision"
+            ]
+        )
+
+    top_hard_fpr = top_public["valid_evidence_slices"]["hard_negative"][
+        "false_positive_rate"
+    ]
+    runner_hard_fpr = runner_public["valid_evidence_slices"]["hard_negative"][
+        "false_positive_rate"
+    ]
+    top_direct_recall = top_public["valid_evidence_slices"]["direct_positive"][
+        "recall"
+    ]
+    runner_direct_recall = runner_public["valid_evidence_slices"]["direct_positive"][
+        "recall"
+    ]
+    if None in (top_hard_fpr, runner_hard_fpr, top_direct_recall, runner_direct_recall):
+        raise ValueError("Step7-v3 winner guard evidence slices are not estimable")
+
+    rule = policy["selection_rule"]["unique_winner_requires_all"]
+    checks = {
+        "shortcut_conditioned_valid_ap_delta": {
+            "observed": primary_delta,
+            "required_minimum": float(
+                rule[
+                    "valid_shortcut_conditioned_macro_component_equal_average_"
+                    "precision_delta_vs_runner_up_at_least"
+                ]
+            ),
+            "pass": primary_delta
+            >= float(
+                rule[
+                    "valid_shortcut_conditioned_macro_component_equal_average_"
+                    "precision_delta_vs_runner_up_at_least"
+                ]
+            ),
+        },
+        "shortcut_conditioned_grouped_bootstrap_ci_lower": {
+            "observed": bootstrap["ci95_lower"],
+            "required_above": float(
+                rule["grouped_bootstrap_ap_delta_ci95_lower_above"]
+            ),
+            "pass": bootstrap["ci95_lower"]
+            > float(rule["grouped_bootstrap_ap_delta_ci95_lower_above"]),
+        },
+        "global_component_equal_ap_delta": {
+            "observed": global_component_delta,
+            "required_above": float(
+                rule["global_component_equal_average_precision_delta_above"]
+            ),
+            "pass": global_component_delta
+            > float(rule["global_component_equal_average_precision_delta_above"]),
+        },
+        "global_component_equal_ap_top_rank_consistent": {
+            "observed_top_candidate": global_component_ranked[0],
+            "required_top_candidate": top_id,
+            "pass": global_component_ranked[0] == top_id,
+        },
+        "row_ap_delta": {
+            "observed": row_delta,
+            "required_above": float(rule["row_average_precision_delta_above"]),
+            "pass": row_delta > float(rule["row_average_precision_delta_above"]),
+        },
+        "row_ap_top_rank_consistent": {
+            "observed_top_candidate": row_ranked[0],
+            "required_top_candidate": top_id,
+            "pass": row_ranked[0] == top_id,
+        },
+        "hard_negative_fpr_increase": {
+            "observed": float(top_hard_fpr - runner_hard_fpr),
+            "allowed_maximum": float(rule["hard_negative_fpr_increase_at_most"]),
+            "pass": top_hard_fpr - runner_hard_fpr
+            <= float(rule["hard_negative_fpr_increase_at_most"]),
+        },
+        "direct_positive_recall_drop": {
+            "observed": float(runner_direct_recall - top_direct_recall),
+            "allowed_maximum": float(rule["direct_positive_recall_drop_at_most"]),
+            "pass": runner_direct_recall - top_direct_recall
+            <= float(rule["direct_positive_recall_drop_at_most"]),
+        },
+    }
+    if training_weight_sensitivity_applicable:
+        assert uniform_ranked is not None and uniform_delta is not None
+        checks["uniform_training_shortcut_conditioned_ap_delta"] = {
+            "observed": uniform_delta,
+            "required_above": float(
+                rule[
+                    "uniform_weight_sensitivity_shortcut_conditioned_ap_delta_above"
+                ]
+            ),
+            "pass": uniform_delta
+            > float(
+                rule[
+                    "uniform_weight_sensitivity_shortcut_conditioned_ap_delta_above"
+                ]
+            ),
+        }
+        checks["uniform_training_top_rank_consistent"] = {
+            "observed_top_candidate": uniform_ranked[0],
+            "required_top_candidate": top_id,
+            "pass": uniform_ranked[0] == top_id,
+        }
+    return {
+        "candidate_ids": list(candidate_ids),
+        "candidate_ranking": ranked,
+        "global_component_equal_ap_sensitivity_ranking": global_component_ranked,
+        "row_ap_sensitivity_ranking": row_ranked,
+        "uniform_training_shortcut_conditioned_ap_ranking": uniform_ranked,
+        "training_weight_sensitivity_applicable": (
+            training_weight_sensitivity_applicable
+        ),
+        "top_candidate": top_id,
+        "runner_up_candidate": runner_id,
+        "top_vs_runner_up_shortcut_conditioned_ap_delta": primary_delta,
+        "top_vs_runner_up_grouped_bootstrap": bootstrap,
+        "unique_winner_checks": checks,
+        "unique_winner": all(item["pass"] for item in checks.values()),
+    }
+
+
+def raw_encoder_comparison_results(
+    policy: dict,
+    train_rows: list[dict],
+    valid_rows: list[dict],
+    features: dict[str, dict],
+) -> tuple[dict[str, dict], dict[str, dict]]:
+    """Build comparable raw-cosine results without fitting an encoder head."""
+    train_labels = labels_array(train_rows)
+    valid_labels = labels_array(valid_rows)
+    train_weights = component_weights(
+        train_rows, "component_equal_normalized_to_row_count"
+    )
+    public_results = {}
+    internal_results = {}
+    for model_key, model_cfg in policy["embedding_models"].items():
+        candidate_id = f"{model_key}__encoder_only"
+        feature_name = model_cfg["feature_name"]
+        train_scores = np.asarray(
+            [float(features[row["pair_uid"]][feature_name]) for row in train_rows],
+            dtype=np.float64,
+        )
+        valid_scores = np.asarray(
+            [float(features[row["pair_uid"]][feature_name]) for row in valid_rows],
+            dtype=np.float64,
+        )
+        if not np.all(np.isfinite(train_scores)) or not np.all(np.isfinite(valid_scores)):
+            raise ValueError(f"Step7-v3 raw encoder scores are non-finite: {model_key}")
+        threshold, threshold_selection = choose_threshold(
+            train_labels, train_scores, train_weights
+        )
+        conditioned = shortcut_conditioned_component_equal_average_precision(
+            valid_rows,
+            valid_labels,
+            valid_scores,
+            policy,
+            require_expected_strata=True,
+        )
+        global_component_ap = component_equal_average_precision(
+            valid_rows, valid_labels, valid_scores
+        )
+        valid_metrics = {
+            "score_role": "raw_frozen_encoder_cosine_not_probability",
+            "roc_auc": roc_auc(valid_labels, valid_scores),
+            "average_precision": average_precision(valid_labels, valid_scores),
+            "threshold_selected_on_raw_train_cosine": threshold,
+            "threshold_metrics": threshold_metrics(
+                valid_labels, valid_scores, threshold
+            ),
+            "labelled_pair_ranking": labelled_pair_ranking_metrics(
+                valid_rows, valid_labels, valid_scores
+            ),
+        }
+        slices = evidence_slice_rates(valid_rows, valid_scores, threshold, policy)
+        public_results[candidate_id] = {
+            "candidate_id": candidate_id,
+            "model_key": model_key,
+            "feature_name": feature_name,
+            "score_source": "raw_frozen_encoder_cosine_without_fitted_head",
+            "fitted_head_used_for_encoder_ranking": False,
+            "train_threshold_selection": threshold_selection,
+            "primary_valid_metrics": valid_metrics,
+            "primary_valid_shortcut_conditioned_macro_component_equal_average_precision": conditioned[
+                "macro_average_precision"
+            ],
+            "primary_valid_shortcut_conditioned_details": conditioned,
+            "primary_valid_component_equal_average_precision": global_component_ap,
+            "valid_evidence_slices": slices,
+        }
+        internal_results[candidate_id] = {
+            "primary_valid_scores": valid_scores,
+            "sensitivity_valid_scores": valid_scores,
+        }
+    return public_results, internal_results
+
+
 def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
     pair_rows, features, runtime_manifests = load_feature_bundle(policy)
     train_rows = load_split_rows(policy, "train", pair_rows)
     valid_rows = load_split_rows(policy, "valid", pair_rows)
+    attach_shortcut_control_strata(train_rows, features)
+    attach_shortcut_control_strata(valid_rows, features)
     train_labels = labels_array(train_rows)
     valid_labels = labels_array(valid_rows)
     valid_component_equal_weights = component_weights(
@@ -1421,6 +2110,25 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         component_equal_valid_ap = weighted_average_precision(
             valid_labels, primary_valid_scores, valid_component_equal_weights
         )
+        sensitivity_component_equal_valid_ap = weighted_average_precision(
+            valid_labels, sensitivity_valid_scores, valid_component_equal_weights
+        )
+        primary_conditioned = shortcut_conditioned_component_equal_average_precision(
+            valid_rows,
+            valid_labels,
+            primary_valid_scores,
+            policy,
+            require_expected_strata=True,
+        )
+        sensitivity_conditioned = (
+            shortcut_conditioned_component_equal_average_precision(
+                valid_rows,
+                valid_labels,
+                sensitivity_valid_scores,
+                policy,
+                require_expected_strata=True,
+            )
+        )
         slices = evidence_slice_rates(
             valid_rows, primary_valid_scores, primary["selected_threshold"], policy
         )
@@ -1436,9 +2144,22 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
             **spec,
             "primary_training": without_score_arrays(primary),
             "primary_valid_metrics": primary_metrics,
+            "primary_valid_shortcut_conditioned_macro_component_equal_average_precision": (
+                primary_conditioned["macro_average_precision"]
+            ),
+            "primary_valid_shortcut_conditioned_details": primary_conditioned,
             "primary_valid_component_equal_average_precision": component_equal_valid_ap,
             "uniform_weight_sensitivity_training": without_score_arrays(sensitivity),
             "uniform_weight_sensitivity_valid_metrics": sensitivity_metrics,
+            "uniform_weight_sensitivity_valid_shortcut_conditioned_macro_component_equal_average_precision": (
+                sensitivity_conditioned["macro_average_precision"]
+            ),
+            "uniform_weight_sensitivity_valid_shortcut_conditioned_details": (
+                sensitivity_conditioned
+            ),
+            "uniform_weight_sensitivity_valid_component_equal_average_precision": (
+                sensitivity_component_equal_valid_ap
+            ),
             "valid_evidence_slices": slices,
         }
         for row, probability in zip(
@@ -1472,157 +2193,176 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
                 }
             )
 
-    ranked = sorted(
-        candidates,
-        key=lambda spec: (
-            -public_results[spec["candidate_id"]]["primary_valid_metrics"][
-                "average_precision"
-            ],
-            -public_results[spec["candidate_id"]]["primary_valid_metrics"]["roc_auc"],
-            spec["candidate_id"],
-        ),
+    candidate_by_id = {spec["candidate_id"]: spec for spec in candidates}
+    encoder_candidate_ids = [
+        spec["candidate_id"]
+        for spec in candidates
+        if spec["encoder_comparison_eligible"]
+    ]
+    m0_candidate_ids = [
+        spec["candidate_id"] for spec in candidates if spec["m0_pipeline_eligible"]
+    ]
+    shortcut_audit_candidate_ids = [
+        spec["candidate_id"] for spec in candidates if spec["shortcut_audit_only"]
+    ]
+    attribution_control_ids = [
+        spec["candidate_id"] for spec in candidates if spec["attribution_control_only"]
+    ]
+    if (
+        len(encoder_candidate_ids) != 5
+        or len(m0_candidate_ids) != 20
+        or len(attribution_control_ids) != 4
+        or shortcut_audit_candidate_ids != ["audit__shortcut_features_only"]
+    ):
+        raise ValueError("Step7-v3 candidate role counts changed")
+
+    raw_encoder_public, raw_encoder_internal = raw_encoder_comparison_results(
+        policy, train_rows, valid_rows, features
     )
-    top_id = ranked[0]["candidate_id"]
-    runner_id = ranked[1]["candidate_id"]
-    top_internal = internal_results[top_id]
-    runner_internal = internal_results[runner_id]
-    bootstrap = grouped_bootstrap_ap_delta(
+    if set(raw_encoder_public) != set(encoder_candidate_ids):
+        raise ValueError("Step7-v3 raw encoder comparison universe changed")
+    encoder_selection = assess_candidate_group(
+        encoder_candidate_ids,
+        raw_encoder_public,
+        raw_encoder_internal,
         valid_rows,
-        top_internal["primary_valid_scores"],
-        runner_internal["primary_valid_scores"],
         policy,
+        training_weight_sensitivity_applicable=False,
     )
-    top_public = public_results[top_id]
-    runner_public = public_results[runner_id]
-    primary_delta = (
-        top_public["primary_valid_metrics"]["average_precision"]
-        - runner_public["primary_valid_metrics"]["average_precision"]
+    encoder_selection["score_source"] = (
+        "raw_frozen_encoder_cosine_without_fitted_head"
     )
-    uniform_ranked = sorted(
-        candidates,
-        key=lambda spec: (
-            -public_results[spec["candidate_id"]][
-                "uniform_weight_sensitivity_valid_metrics"
-            ]["average_precision"],
-            -public_results[spec["candidate_id"]][
-                "uniform_weight_sensitivity_valid_metrics"
-            ]["roc_auc"],
-            spec["candidate_id"],
-        ),
-    )
-    uniform_top_id = uniform_ranked[0]["candidate_id"]
-    uniform_best_other_id = next(
-        spec["candidate_id"]
-        for spec in uniform_ranked
-        if spec["candidate_id"] != top_id
-    )
-    sensitivity_delta = (
-        top_public["uniform_weight_sensitivity_valid_metrics"]["average_precision"]
-        - public_results[uniform_best_other_id][
-            "uniform_weight_sensitivity_valid_metrics"
-        ]["average_precision"]
-    )
-    component_equal_ranked = sorted(
-        candidates,
-        key=lambda spec: (
-            -public_results[spec["candidate_id"]][
-                "primary_valid_component_equal_average_precision"
-            ],
-            spec["candidate_id"],
-        ),
-    )
-    component_equal_top_id = component_equal_ranked[0]["candidate_id"]
-    component_equal_best_other_id = next(
-        spec["candidate_id"]
-        for spec in component_equal_ranked
-        if spec["candidate_id"] != top_id
-    )
-    component_equal_delta = float(
-        top_public["primary_valid_component_equal_average_precision"]
-        - public_results[component_equal_best_other_id][
-            "primary_valid_component_equal_average_precision"
+    encoder_selection["fitted_head_used_for_ranking"] = False
+    if encoder_selection["unique_winner"]:
+        encoder_selection["selection_outcome"] = "unique_encoder_only_winner"
+        encoder_selection["carry_forward_encoder_candidates"] = [
+            encoder_selection["top_candidate"]
         ]
-    )
-    top_hard_fpr = top_public["valid_evidence_slices"]["hard_negative"][
-        "false_positive_rate"
-    ]
-    runner_hard_fpr = runner_public["valid_evidence_slices"]["hard_negative"][
-        "false_positive_rate"
-    ]
-    top_direct_recall = top_public["valid_evidence_slices"]["direct_positive"]["recall"]
-    runner_direct_recall = runner_public["valid_evidence_slices"]["direct_positive"]["recall"]
-    if None in (top_hard_fpr, runner_hard_fpr, top_direct_recall, runner_direct_recall):
-        raise ValueError("Step7-v2 winner guard evidence slices are not estimable")
-    rule = policy["selection_rule"]["unique_winner_requires_all"]
-    checks = {
-        "valid_ap_delta": {
-            "observed": primary_delta,
-            "required_minimum": float(
-                rule["valid_average_precision_delta_vs_runner_up_at_least"]
-            ),
-            "pass": primary_delta
-            >= float(rule["valid_average_precision_delta_vs_runner_up_at_least"]),
-        },
-        "bootstrap_ci_lower": {
-            "observed": bootstrap["ci95_lower"],
-            "required_above": float(rule["grouped_bootstrap_ap_delta_ci95_lower_above"]),
-            "pass": bootstrap["ci95_lower"]
-            > float(rule["grouped_bootstrap_ap_delta_ci95_lower_above"]),
-        },
-        "uniform_weight_ap_delta": {
-            "observed": sensitivity_delta,
-            "required_above": float(rule["uniform_weight_sensitivity_ap_delta_above"]),
-            "pass": sensitivity_delta
-            > float(rule["uniform_weight_sensitivity_ap_delta_above"]),
-        },
-        "uniform_weight_top_rank_consistent": {
-            "observed_top_candidate": uniform_top_id,
-            "required_top_candidate": top_id,
-            "pass": uniform_top_id == top_id,
-        },
-        "component_equal_validation_ap_delta": {
-            "observed": component_equal_delta,
-            "required_above": float(
-                rule["component_equal_validation_ap_delta_above"]
-            ),
-            "pass": component_equal_delta
-            > float(rule["component_equal_validation_ap_delta_above"]),
-        },
-        "component_equal_validation_top_rank_consistent": {
-            "observed_top_candidate": component_equal_top_id,
-            "required_top_candidate": top_id,
-            "pass": component_equal_top_id == top_id,
-        },
-        "hard_negative_fpr_increase": {
-            "observed": float(top_hard_fpr - runner_hard_fpr),
-            "allowed_maximum": float(rule["hard_negative_fpr_increase_at_most"]),
-            "pass": top_hard_fpr - runner_hard_fpr
-            <= float(rule["hard_negative_fpr_increase_at_most"]),
-        },
-        "direct_positive_recall_drop": {
-            "observed": float(runner_direct_recall - top_direct_recall),
-            "allowed_maximum": float(rule["direct_positive_recall_drop_at_most"]),
-            "pass": runner_direct_recall - top_direct_recall
-            <= float(rule["direct_positive_recall_drop_at_most"]),
-        },
-    }
-    unique_winner = all(item["pass"] for item in checks.values())
-    if unique_winner:
-        carry_forward = [top_id]
-        outcome = "unique_validation_winner"
     else:
-        e5_candidate = next(
-            spec["candidate_id"]
-            for spec in ranked
-            if spec["model_key"] == "multilingual_e5_large"
+        encoder_selection["selection_outcome"] = (
+            "no_unique_encoder_winner_carry_top_two_without_e5_privilege"
         )
-        challenger = next(
-            spec["candidate_id"]
-            for spec in ranked
-            if spec["model_key"] != "multilingual_e5_large"
+        encoder_selection["carry_forward_encoder_candidates"] = encoder_selection[
+            "candidate_ranking"
+        ][:2]
+
+    pipeline_selection = assess_candidate_group(
+        m0_candidate_ids,
+        public_results,
+        internal_results,
+        valid_rows,
+        policy,
+        training_weight_sensitivity_applicable=True,
+    )
+    top_id = pipeline_selection["top_candidate"]
+    runner_id = pipeline_selection["runner_up_candidate"]
+    top_spec = candidate_by_id[top_id]
+    attribution_cfg = policy["selection_rule"]["pipeline_attribution"]
+    attribution_checks = {
+        "top_pipeline_contains_encoder": {
+            "observed_candidate_role": top_spec["candidate_role"],
+            "required_candidate_role": "encoder_pipeline",
+            "pass": top_spec["candidate_role"] == "encoder_pipeline",
+        }
+    }
+    matched_control_id = top_spec["matched_no_encoder_control"]
+    matched_bootstrap = None
+    if matched_control_id is not None:
+        if matched_control_id not in public_results:
+            raise ValueError("Step7-v3 matched no-encoder control is missing")
+        encoder_increment = float(
+            public_results[top_id][
+                "primary_valid_shortcut_conditioned_macro_component_equal_average_precision"
+            ]
+            - public_results[matched_control_id][
+                "primary_valid_shortcut_conditioned_macro_component_equal_average_precision"
+            ]
         )
-        carry_forward = [e5_candidate, challenger]
-        outcome = "no_unique_winner_carry_top_e5_and_top_non_e5_candidates"
+        matched_bootstrap = grouped_bootstrap_ap_delta(
+            valid_rows,
+            internal_results[top_id]["primary_valid_scores"],
+            internal_results[matched_control_id]["primary_valid_scores"],
+            policy,
+        )
+        attribution_checks["encoder_increment_shortcut_conditioned_ap"] = {
+            "matched_control": matched_control_id,
+            "observed": encoder_increment,
+            "required_minimum": float(
+                attribution_cfg[
+                    "encoder_increment_shortcut_conditioned_ap_at_least"
+                ]
+            ),
+            "pass": encoder_increment
+            >= float(
+                attribution_cfg[
+                    "encoder_increment_shortcut_conditioned_ap_at_least"
+                ]
+            ),
+        }
+        attribution_checks["encoder_increment_grouped_bootstrap_ci_lower"] = {
+            "matched_control": matched_control_id,
+            "observed": matched_bootstrap["ci95_lower"],
+            "required_above": float(
+                attribution_cfg[
+                    "encoder_increment_grouped_bootstrap_ci95_lower_above"
+                ]
+            ),
+            "pass": matched_bootstrap["ci95_lower"]
+            > float(
+                attribution_cfg[
+                    "encoder_increment_grouped_bootstrap_ci95_lower_above"
+                ]
+            ),
+        }
+    encoder_attribution_pass = all(
+        item["pass"] for item in attribution_checks.values()
+    )
+    pipeline_selection["encoder_attribution"] = {
+        "matched_no_encoder_control": matched_control_id,
+        "matched_control_grouped_bootstrap": matched_bootstrap,
+        "checks": attribution_checks,
+        "pass": encoder_attribution_pass,
+    }
+    if pipeline_selection["unique_winner"] and encoder_attribution_pass:
+        pipeline_selection["selection_outcome"] = (
+            "unique_attributable_encoder_pipeline_winner"
+        )
+        carry_forward = [top_id]
+    elif not encoder_attribution_pass:
+        pipeline_selection["selection_outcome"] = (
+            "no_attributable_encoder_pipeline_winner_carry_top_two_encoder_pipelines_"
+            "without_e5_privilege"
+        )
+        carry_forward = pipeline_selection["candidate_ranking"][:2]
+    else:
+        pipeline_selection["selection_outcome"] = (
+            "no_unique_pipeline_winner_carry_top_two_encoder_pipelines_"
+            "without_e5_privilege"
+        )
+        carry_forward = pipeline_selection["candidate_ranking"][:2]
+    pipeline_selection["carry_forward_to_step28"] = carry_forward
+    outcome = pipeline_selection["selection_outcome"]
+
+    e5_continuity_candidate = "multilingual_e5_large__encoder_only"
+    e5_continuity = {
+        "candidate_id": e5_continuity_candidate,
+        "encoder_only_rank": encoder_selection["candidate_ranking"].index(
+            e5_continuity_candidate
+        )
+        + 1,
+        "changes_ranking_or_carry_forward": False,
+    }
+    shortcut_feature_audit = {
+        "train": shortcut_feature_label_association_audit(
+            train_rows, features, policy
+        ),
+        "valid": shortcut_feature_label_association_audit(
+            valid_rows, features, policy
+        ),
+        "audit_control_candidate": shortcut_audit_candidate_ids[0],
+        "audit_control_eligible_for_encoder_selection": False,
+        "audit_control_eligible_for_m0_selection": False,
+    }
 
     identity_scores = np.asarray(
         [float(row["identity_rule_control_score"]) for row in valid_rows], dtype=np.float64
@@ -1631,25 +2371,36 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         valid_rows, valid_labels, identity_scores, threshold=0.5
     )
     summary = {
-        "step": "step7_v2_select_source_model",
+        "step": "step7_v3_select_source_model",
         "version": policy["version"],
         "scope": policy["result_scope"],
         "train_counts": dict(Counter(row["review_label"] for row in train_rows)),
         "valid_counts": dict(Counter(row["review_label"] for row in valid_rows)),
         "candidate_count": len(candidates),
-        "candidate_ranking": [spec["candidate_id"] for spec in ranked],
-        "uniform_weight_sensitivity_candidate_ranking": [
-            spec["candidate_id"] for spec in uniform_ranked
-        ],
-        "component_equal_validation_ap_candidate_ranking": [
-            spec["candidate_id"] for spec in component_equal_ranked
-        ],
+        "encoder_comparison_candidate_count": len(encoder_candidate_ids),
+        "m0_pipeline_candidate_count": len(m0_candidate_ids),
+        "attribution_control_candidate_count": len(attribution_control_ids),
+        "shortcut_audit_candidate_count": len(shortcut_audit_candidate_ids),
+        "candidate_ranking": pipeline_selection["candidate_ranking"],
         "top_candidate": top_id,
         "runner_up_candidate": runner_id,
-        "top_vs_runner_up_grouped_bootstrap": bootstrap,
-        "unique_winner_checks": checks,
+        "top_vs_runner_up_grouped_bootstrap": pipeline_selection[
+            "top_vs_runner_up_grouped_bootstrap"
+        ],
+        "unique_winner_checks": {
+            **pipeline_selection["unique_winner_checks"],
+            **{
+                f"encoder_attribution::{key}": value
+                for key, value in attribution_checks.items()
+            },
+        },
         "selection_outcome": outcome,
         "carry_forward_to_step28": carry_forward,
+        "encoder_only_selection": encoder_selection,
+        "raw_encoder_comparison_results": raw_encoder_public,
+        "m0_pipeline_selection": pipeline_selection,
+        "e5_continuity_control": e5_continuity,
+        "shortcut_feature_audit": shortcut_feature_audit,
         "identity_rule_control": {
             "eligible_for_m0": False,
             "valid_metrics": identity_control_metrics,
@@ -1662,7 +2413,7 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         "prospective_claim_allowed": False,
     }
     freeze = {
-        "step": "step7_v2_frozen_source_selection",
+        "step": "step7_v3_frozen_source_selection",
         "version": policy["version"],
         "policy_contract_sha256": common.canonical_hash(policy),
         "candidate_specs_sha256": common.canonical_hash(candidates),
@@ -1670,6 +2421,15 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
         "carry_forward_to_step28": carry_forward,
         "top_candidate": top_id,
         "runner_up_candidate": runner_id,
+        "encoder_selection_outcome": encoder_selection["selection_outcome"],
+        "encoder_top_candidate": encoder_selection["top_candidate"],
+        "encoder_runner_up_candidate": encoder_selection["runner_up_candidate"],
+        "encoder_selection_sha256": common.canonical_hash(encoder_selection),
+        "raw_encoder_comparison_results_sha256": common.canonical_hash(
+            raw_encoder_public
+        ),
+        "m0_pipeline_selection_sha256": common.canonical_hash(pipeline_selection),
+        "e5_continuity_changes_selection": False,
         "runtime_inputs": runtime_input_fingerprints(policy),
         "historical_test_label_values_parsed_during_selection": False,
         "historical_test_label_file_hashed_during_selection": False,
@@ -1681,20 +2441,20 @@ def run_selection(policy: dict) -> tuple[dict, list[dict], list[dict], dict]:
 def verify_frozen_selection_consistency(
     policy: dict, freeze: dict, selection_summary: dict
 ) -> None:
-    if freeze.get("step") != "step7_v2_frozen_source_selection":
-        raise ValueError("Step7-v2 frozen selection role mismatch")
+    if freeze.get("step") != "step7_v3_frozen_source_selection":
+        raise ValueError("Step7-v3 frozen selection role mismatch")
     if freeze.get("version") != policy["version"] or selection_summary.get(
         "version"
     ) != policy["version"]:
-        raise ValueError("Step7-v2 frozen selection version mismatch")
-    if selection_summary.get("step") != "step7_v2_select_source_model":
-        raise ValueError("Step7-v2 selection summary role mismatch")
+        raise ValueError("Step7-v3 frozen selection version mismatch")
+    if selection_summary.get("step") != "step7_v3_select_source_model":
+        raise ValueError("Step7-v3 selection summary role mismatch")
     if freeze.get("policy_contract_sha256") != common.canonical_hash(policy):
-        raise ValueError("Step7-v2 frozen selection policy contract drift")
+        raise ValueError("Step7-v3 frozen selection policy contract drift")
     if freeze.get("candidate_specs_sha256") != common.canonical_hash(
         candidate_specs(policy)
     ):
-        raise ValueError("Step7-v2 frozen candidate contract drift")
+        raise ValueError("Step7-v3 frozen candidate contract drift")
     for field in (
         "selection_outcome",
         "carry_forward_to_step28",
@@ -1702,21 +2462,41 @@ def verify_frozen_selection_consistency(
         "runner_up_candidate",
     ):
         if freeze.get(field) != selection_summary.get(field):
-            raise ValueError(f"Step7-v2 frozen selection/summary mismatch: {field}")
+            raise ValueError(f"Step7-v3 frozen selection/summary mismatch: {field}")
+    encoder_selection = selection_summary.get("encoder_only_selection", {})
+    for freeze_field, summary_field in (
+        ("encoder_selection_outcome", "selection_outcome"),
+        ("encoder_top_candidate", "top_candidate"),
+        ("encoder_runner_up_candidate", "runner_up_candidate"),
+    ):
+        if freeze.get(freeze_field) != encoder_selection.get(summary_field):
+            raise ValueError(
+                f"Step7-v3 frozen encoder selection mismatch: {freeze_field}"
+            )
+    if freeze.get("encoder_selection_sha256") != common.canonical_hash(
+        encoder_selection
+    ) or freeze.get("raw_encoder_comparison_results_sha256") != common.canonical_hash(
+        selection_summary.get("raw_encoder_comparison_results", {})
+    ) or freeze.get("m0_pipeline_selection_sha256") != common.canonical_hash(
+        selection_summary.get("m0_pipeline_selection", {})
+    ):
+        raise ValueError("Step7-v3 frozen separated selection hash drift")
+    if freeze.get("e5_continuity_changes_selection") is not False:
+        raise ValueError("Step7-v3 E5 continuity control changed selection")
     carried = freeze.get("carry_forward_to_step28")
     if not isinstance(carried, list) or not carried or len(carried) != len(set(carried)):
-        raise ValueError("Step7-v2 frozen carry-forward candidate list is invalid")
+        raise ValueError("Step7-v3 frozen carry-forward candidate list is invalid")
 
 
 def verify_frozen_inputs(freeze: dict) -> None:
     for key, record in freeze["runtime_inputs"].items():
         path = common.resolve(record["path"])
         if not path.is_file():
-            raise FileNotFoundError(f"Frozen Step7-v2 input is missing: {key}={path}")
+            raise FileNotFoundError(f"Frozen Step7-v3 input is missing: {key}={path}")
         observed = common.sha256_file(path)
         if observed != record["sha256"]:
             raise ValueError(
-                f"Frozen Step7-v2 input changed after selection: {key} "
+                f"Frozen Step7-v3 input changed after selection: {key} "
                 f"expected={record['sha256']} observed={observed}"
             )
 
@@ -1726,41 +2506,41 @@ def verify_historical_test_labels(policy: dict) -> dict:
     manifest_path = common.resolve(outputs["historical_test_labels_manifest"])
     label_path = common.resolve(outputs["historical_test_labels"])
     if not manifest_path.is_file() or not label_path.is_file():
-        raise FileNotFoundError("Step7-v2 historical-development labels are not materialized")
+        raise FileNotFoundError("Step7-v3 historical-development labels are not materialized")
     manifest = common.load_json(manifest_path)
     if manifest.get("version") != policy["version"] or manifest.get("splits_written") != [
         "test"
     ]:
-        raise ValueError("Step7-v2 historical-test label manifest mismatch")
+        raise ValueError("Step7-v3 historical-test label manifest mismatch")
     if manifest.get("other_split_label_values_used_during_materialization") is not False:
-        raise ValueError("Step7-v2 historical-test materialization used another split")
+        raise ValueError("Step7-v3 historical-test materialization used another split")
     if manifest.get("split_projection_applied_before_label_or_evidence_access") is not True:
-        raise ValueError("Step7-v2 historical-test split projection contract is missing")
+        raise ValueError("Step7-v3 historical-test split projection contract is missing")
     public_manifest = common.load_json(
         common.resolve(policy["outputs"]["preparation_manifest"])
     )
     if manifest.get("policy_sha256") != public_manifest.get("policy_sha256"):
-        raise ValueError("Step7-v2 historical-test policy hash drift")
+        raise ValueError("Step7-v3 historical-test policy hash drift")
     if manifest.get("generator_script_sha256") != common.sha256_file(
-        common.resolve("scripts/step7_v2_prepare_clean_data.py")
+        common.resolve("scripts/step7_v3_prepare_clean_data.py")
     ):
-        raise ValueError("Step7-v2 historical-test preparation script drift")
+        raise ValueError("Step7-v3 historical-test preparation script drift")
     if manifest.get("common_script_sha256") != common.sha256_file(
-        common.resolve("scripts/step7_v2_common.py")
+        common.resolve("scripts/step7_v3_common.py")
     ):
-        raise ValueError("Step7-v2 historical-test common script drift")
+        raise ValueError("Step7-v3 historical-test common script drift")
     if manifest.get("redaction_dependency_script_sha256") != common.sha256_file(
         common.resolve("scripts/step3_build_seller_profiles.py")
     ):
-        raise ValueError("Step7-v2 historical-test Step3 dependency drift")
+        raise ValueError("Step7-v3 historical-test Step3 dependency drift")
     public_path = common.resolve(outputs["preparation_manifest"])
     if manifest.get("public_preparation_manifest_sha256") != common.sha256_file(public_path):
-        raise ValueError("Step7-v2 historical-test/public preparation drift")
+        raise ValueError("Step7-v3 historical-test/public preparation drift")
     if set(manifest.get("output_files", {})) != {"private_labels_test"}:
-        raise ValueError("Step7-v2 historical-test output universe mismatch")
+        raise ValueError("Step7-v3 historical-test output universe mismatch")
     record = manifest["output_files"].get("private_labels_test")
     if record is None or common.resolve(record["path"]) != label_path:
-        raise ValueError("Step7-v2 historical-test label path mismatch")
+        raise ValueError("Step7-v3 historical-test label path mismatch")
     verify_file_record(record, "historical-test-label")
     verify_policy_input_records(
         policy,
@@ -1772,26 +2552,26 @@ def verify_historical_test_labels(policy: dict) -> dict:
         policy, ("frozen_labels", "evidence_labels")
     )
     if observed_inputs != manifest.get("input_manifest"):
-        raise ValueError("Step7-v2 historical-test source inputs no longer replay")
+        raise ValueError("Step7-v3 historical-test source inputs no longer replay")
     pair_path = common.resolve(outputs["pair_manifest"])
     pair_record = public_manifest.get("output_files", {}).get("pair_manifest")
     if pair_record is None or verify_file_record(
         pair_record, "historical-test-public-pair"
     ) != pair_path:
-        raise ValueError("Step7-v2 historical-test public pair provenance mismatch")
+        raise ValueError("Step7-v3 historical-test public pair provenance mismatch")
     pair_rows = common.load_csv(pair_path)
     common.validate_public_pair_rows(policy, pair_rows)
-    import step7_v2_prepare_clean_data as preparation
+    import step7_v3_prepare_clean_data as preparation
 
     replayed = preparation.prepare_private_labels(policy, pair_rows, ("test",))
     if replayed["input_manifest"] != observed_inputs:
-        raise ValueError("Step7-v2 historical-test replay input manifest mismatch")
+        raise ValueError("Step7-v3 historical-test replay input manifest mismatch")
     if replayed["label_counts"] != manifest.get("label_counts"):
-        raise ValueError("Step7-v2 historical-test replay label counts mismatch")
+        raise ValueError("Step7-v3 historical-test replay label counts mismatch")
     replayed_bytes = common.render_csv(replayed["private"]["test"])
     if replayed_bytes != label_path.read_bytes():
         raise ValueError(
-            "Step7-v2 historical-test labels do not byte-replay from pinned sources"
+            "Step7-v3 historical-test labels do not byte-replay from pinned sources"
         )
     return {
         **manifest,
@@ -1809,21 +2589,86 @@ def run_historical_test(policy: dict, freeze: dict, selection_summary: dict) -> 
     historical_label_verification = verify_historical_test_labels(policy)
     pair_rows, features, _runtime_manifests = load_feature_bundle(policy)
     test_rows = load_split_rows(policy, "test", pair_rows)
+    attach_shortcut_control_strata(test_rows, features)
     test_labels = labels_array(test_rows)
     candidate_by_id = {spec["candidate_id"]: spec for spec in candidate_specs(policy)}
+    encoder_selection = selection_summary.get("encoder_only_selection", {})
+    frozen_encoder_candidates = encoder_selection.get(
+        "carry_forward_encoder_candidates", []
+    )
+    if (
+        not isinstance(frozen_encoder_candidates, list)
+        or not frozen_encoder_candidates
+        or frozen_encoder_candidates
+        != encoder_selection.get("candidate_ranking", [])[
+            : len(frozen_encoder_candidates)
+        ]
+    ):
+        raise ValueError("Step7-v3 frozen raw-encoder candidate list is invalid")
+    raw_encoder_test_results = {}
+    for candidate_id in frozen_encoder_candidates:
+        valid_record = selection_summary.get("raw_encoder_comparison_results", {}).get(
+            candidate_id
+        )
+        spec = candidate_by_id.get(candidate_id)
+        if (
+            valid_record is None
+            or spec is None
+            or not spec["encoder_comparison_eligible"]
+            or len(spec["feature_names"]) != 1
+        ):
+            raise ValueError(
+                f"Step7-v3 frozen raw-encoder artifact is invalid: {candidate_id}"
+            )
+        feature_name = spec["feature_names"][0]
+        scores = np.asarray(
+            [float(features[row["pair_uid"]][feature_name]) for row in test_rows],
+            dtype=np.float64,
+        )
+        threshold = float(
+            valid_record["primary_valid_metrics"][
+                "threshold_selected_on_raw_train_cosine"
+            ]
+        )
+        raw_encoder_test_results[candidate_id] = {
+            "candidate_id": candidate_id,
+            "score_source": "raw_frozen_encoder_cosine_without_fitted_head",
+            "threshold_selected_on_raw_train_cosine": threshold,
+            "roc_auc": roc_auc(test_labels, scores),
+            "average_precision": average_precision(test_labels, scores),
+            "threshold_metrics": threshold_metrics(test_labels, scores, threshold),
+            "labelled_pair_ranking": labelled_pair_ranking_metrics(
+                test_rows, test_labels, scores
+            ),
+            "shortcut_conditioned_component_equal_average_precision": (
+                shortcut_conditioned_component_equal_average_precision(
+                    test_rows,
+                    test_labels,
+                    scores,
+                    policy,
+                    require_expected_strata=True,
+                )
+            ),
+            "global_component_equal_average_precision": (
+                component_equal_average_precision(test_rows, test_labels, scores)
+            ),
+            "evidence_slices": evidence_slice_rates(
+                test_rows, scores, threshold, policy
+            ),
+        }
     results = {}
     predictions = []
     for candidate_id in freeze["carry_forward_to_step28"]:
         spec = candidate_by_id.get(candidate_id)
         if spec is None:
-            raise ValueError(f"Frozen Step7-v2 candidate no longer exists: {candidate_id}")
+            raise ValueError(f"Frozen Step7-v3 candidate no longer exists: {candidate_id}")
         public_candidate = selection_summary["candidates"].get(candidate_id)
         if public_candidate is None:
-            raise ValueError(f"Frozen Step7-v2 candidate artifact missing: {candidate_id}")
+            raise ValueError(f"Frozen Step7-v3 candidate artifact missing: {candidate_id}")
         training = public_candidate["primary_training"]
         artifact = training["final_train_artifact"]
         if artifact["feature_names"] != spec["feature_names"]:
-            raise ValueError(f"Frozen Step7-v2 feature contract drift: {candidate_id}")
+            raise ValueError(f"Frozen Step7-v3 feature contract drift: {candidate_id}")
         matrix = matrix_for_rows(test_rows, features, spec["feature_names"])
         scores = apply_logistic(matrix, artifact)
         threshold = float(training["selected_threshold"])
@@ -1834,6 +2679,18 @@ def run_historical_test(policy: dict, freeze: dict, selection_summary: dict) -> 
             "threshold_from_train_oof": threshold,
             "historical_development_test_metrics": full_metrics(
                 test_rows, test_labels, scores, threshold
+            ),
+            "historical_development_test_shortcut_conditioned_component_equal_average_precision": (
+                shortcut_conditioned_component_equal_average_precision(
+                    test_rows,
+                    test_labels,
+                    scores,
+                    policy,
+                    require_expected_strata=True,
+                )
+            ),
+            "historical_development_test_global_component_equal_average_precision": (
+                component_equal_average_precision(test_rows, test_labels, scores)
             ),
             "historical_development_test_evidence_slices": evidence_slice_rates(
                 test_rows, scores, threshold, policy
@@ -1856,7 +2713,7 @@ def run_historical_test(policy: dict, freeze: dict, selection_summary: dict) -> 
         [float(row["identity_rule_control_score"]) for row in test_rows], dtype=np.float64
     )
     summary = {
-        "step": "step7_v2_historical_internal_development_test",
+        "step": "step7_v3_historical_internal_development_test",
         "version": policy["version"],
         "test_role": policy["result_scope"]["english_test_role"],
         "prospective_claim_allowed": False,
@@ -1864,6 +2721,8 @@ def run_historical_test(policy: dict, freeze: dict, selection_summary: dict) -> 
         "evaluated_frozen_candidates_only": list(freeze["carry_forward_to_step28"]),
         "test_counts": dict(Counter(row["review_label"] for row in test_rows)),
         "candidates": results,
+        "raw_encoder_candidates_selected_on_valid_only": raw_encoder_test_results,
+        "raw_encoder_test_metrics_used_for_selection": False,
         "identity_rule_control": {
             "eligible_for_m0": False,
             "historical_development_test_metrics": full_metrics(
@@ -1880,7 +2739,7 @@ def run_historical_test(policy: dict, freeze: dict, selection_summary: dict) -> 
         "historical_test_labels_may_exist_before_selection": True,
         "warning": (
             "This English test was consumed by earlier project iterations. It is a delayed "
-            "Step7-v2 development-metric check, not an untouched or cryptographically "
+            "Step7-v3 development-metric check, not an untouched or cryptographically "
             "hidden prospective confirmation set."
         ),
     }
@@ -1908,6 +2767,18 @@ def main() -> None:
                     "status": "pass",
                     "stage": args.stage,
                     "candidate_count": len(specs),
+                    "encoder_comparison_candidate_count": sum(
+                        spec["encoder_comparison_eligible"] for spec in specs
+                    ),
+                    "m0_pipeline_candidate_count": sum(
+                        spec["m0_pipeline_eligible"] for spec in specs
+                    ),
+                    "attribution_control_candidate_count": sum(
+                        spec["attribution_control_only"] for spec in specs
+                    ),
+                    "shortcut_audit_candidate_count": sum(
+                        spec["shortcut_audit_only"] for spec in specs
+                    ),
                     "candidate_ids": [spec["candidate_id"] for spec in specs],
                     "train_rows": policy["supervision_boundary"]["expected_counts"]["train"],
                     "valid_rows": policy["supervision_boundary"]["expected_counts"]["valid"],
@@ -1965,7 +2836,7 @@ def main() -> None:
                     "carry_forward_to_step28": summary["carry_forward_to_step28"],
                     "historical_test_label_values_parsed": False,
                     "next_command": (
-                        "python scripts/step7_v2_select_source_model.py --stage test "
+                        "python scripts/step7_v3_select_source_model.py --stage test "
                         "--acknowledge-historical-test-is-development-only"
                     ),
                 },
@@ -1977,16 +2848,16 @@ def main() -> None:
 
     if not args.acknowledge_historical_test_is_development_only:
         raise SystemExit(
-            "Opening Step7-v2 test requires --acknowledge-historical-test-is-development-only"
+            "Opening Step7-v3 test requires --acknowledge-historical-test-is-development-only"
         )
     freeze_path = common.resolve(outputs["frozen_selection_manifest"])
     summary_path = common.resolve(outputs["selection_summary"])
     if not freeze_path.is_file() or not summary_path.is_file():
-        raise FileNotFoundError("Step7-v2 selection must be frozen before opening test")
+        raise FileNotFoundError("Step7-v3 selection must be frozen before opening test")
     freeze = common.load_json(freeze_path)
     selection_summary = common.load_json(summary_path)
     if common.sha256_file(summary_path) != freeze["selection_summary"]["sha256"]:
-        raise ValueError("Step7-v2 selection summary changed after freeze")
+        raise ValueError("Step7-v3 selection summary changed after freeze")
     for role in ("valid_predictions", "train_oof_predictions"):
         verify_file_record(freeze[role], f"frozen-selection/{role}")
     test_summary, predictions = run_historical_test(policy, freeze, selection_summary)
