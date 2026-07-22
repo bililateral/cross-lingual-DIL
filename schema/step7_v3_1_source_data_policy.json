@@ -1,0 +1,229 @@
+{
+  "version": "2026-07-22-step7-v3.1-source-data-v1",
+  "objective": "Materialize the fixed 734-pair English source boundary, label-free field-preserving clean seller corpus, train-only safe pair features, and physically separate train/validation labels required by the Step7-v3.1 full-text shared-chunk experiment.",
+  "implementation": {
+    "source_data_module": {
+      "path": "scripts/step7_v3_1_source_data.py",
+      "size_bytes": 126534,
+      "sha256": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734"
+    },
+    "preparation_script": {
+      "path": "scripts/step7_v3_1_prepare_source_data.py",
+      "size_bytes": 40494,
+      "sha256": "82c7c43974e1412e469aec25fddb8af537676b5e0675c70bef5e78d3bc9d2b9f"
+    },
+    "redaction_dependency": {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "size_bytes": 57250,
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202"
+    }
+  },
+  "inputs": {
+    "frozen_labels": {
+      "path": "reports/step5_en_frozen_silver_labels.csv",
+      "sha256": "97d2985956e463e89df23acf5c854facc3cb8f61eb0365618a5c9db478a230dd"
+    },
+    "evidence_labels": {
+      "path": "reports/step15_evidence_type_labels.en_content_train_pool.csv",
+      "sha256": "890531c9100e697c5c5268dc2e0584943bf55e55ecf34254debdd6da2bbfc41f"
+    },
+    "seller_profiles": {
+      "path": "reports/step3_seller_profiles.en_content_train_pool.jsonl",
+      "sha256": "e7b5cd7afb0a557cc7afe0b7e333bcffbc6e9a91e0ee80ef41b8be92a02550b5"
+    },
+    "item_identity_signals": {
+      "path": "reports/step3_item_identity_signals.en_content_train_pool.csv",
+      "sha256": "0fa2b79f736df047ea1a6e39285915d81f3662f6ecc8afceb70a7d8b68dfcb97"
+    },
+    "component_assignments": {
+      "path": "reports/step16i_data_integrity/step16i_integrity_20260716_v2/component_assignments.csv",
+      "sha256": "abbb9e2dc92b4ecc599e0d5995550e616e526da6b81f4d4a881a945c81d34a23",
+      "dataset": "en_content_train_pool",
+      "component_field": "recomputed_component_id"
+    }
+  },
+  "supervision_boundary": {
+    "eligible_split_names": ["train", "valid", "test"],
+    "eligible_labels": ["positive", "negative"],
+    "require_usable_for_supervision": true,
+    "expected_counts": {
+      "train": {"positive": 116, "negative": 285, "total": 401},
+      "valid": {"positive": 42, "negative": 110, "total": 152},
+      "test": {"positive": 51, "negative": 130, "total": 181},
+      "total": 734
+    },
+    "expected_component_count_by_split": {"train": 229, "valid": 28, "test": 38},
+    "expected_seller_count_by_split": {"train": 582, "valid": 105, "test": 168},
+    "expected_total_unique_sellers": 855,
+    "require_pair_uid_uniqueness": true,
+    "require_zero_seller_overlap_across_splits": true,
+    "require_component_single_split": true
+  },
+  "clean_text_contract": {
+    "fields_in_order": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "field_groups": {
+      "category": ["category_concat_top"],
+      "title": ["signature_title_concat", "title_concat_top"],
+      "description": ["signature_description_concat", "description_concat_top"]
+    },
+    "empty_text_fallback": "content unavailable",
+    "global_mixed_alias_registry_scope": "fixed_snapshot_union_of_all_pinned_english_profile_mixed_aliases_and_identity_signal_mixed_values_minus_preregistered_content_collisions_label_free",
+    "contextual_alias_registry_scope": "all_pinned_english_seller_profiles_plus_all_safe_pinned_identity_signal_literals_label_free_context_gated",
+    "replacement": "single_space_no_identifier_presence_marker",
+    "labels_must_not_change_corpus_or_pair_features": true,
+    "redaction_implementation": "step7_v3_1_source_data_fixed_snapshot_alias_contact_and_identity_redaction",
+    "identity_residue_claim_scope": "zero_detected_seller_local_aliases_preregistered_high_confidence_global_handles_audited_fixed_snapshot_seller_or_market_identity_phrases_identity_context_supported_fixed_snapshot_aliases_and_high_recall_patterns_not_proof_of_zero_unknown_or_ambiguous_content_collision_identifiers",
+    "expected_field_corpus": {
+      "seller_count": 855,
+      "sha256": "7e9d0948f9936d0f4b70987412345096d4f837fc7962e7e4fba1d501e6749655",
+      "size_bytes": 7903675,
+      "nonempty_field_seller_counts": {
+        "category_concat_top": 855,
+        "signature_title_concat": 854,
+        "title_concat_top": 854,
+        "signature_description_concat": 782,
+        "description_concat_top": 853
+      }
+    },
+    "quality_gates": {
+      "minimum_aggregate_character_retention": 0.85,
+      "maximum_empty_fallback_count": 0,
+      "protected_content_words": [
+        "premium",
+        "private",
+        "master",
+        "pfizer",
+        "however",
+        "opportunity",
+        "fedex",
+        "quality",
+        "support",
+        "microsoft",
+        "applestore",
+        "prime",
+        "digital",
+        "yahoo"
+      ],
+      "minimum_protected_word_retention": 0.8,
+      "protected_identity_collision_terms": [
+        "250mg",
+        "25i-nbome",
+        "bet365",
+        "amazon prime store",
+        "dark market",
+        "dark-market store",
+        "darkmarkets",
+        "western union store"
+      ],
+      "minimum_protected_identity_collision_term_retention": 0.8,
+      "expected_protected_identity_collision_raw_counts": {
+        "250mg": 77,
+        "25i-nbome": 3,
+        "bet365": 5,
+        "amazon prime store": 2,
+        "dark market": 56,
+        "dark-market store": 18,
+        "darkmarkets": 1,
+        "western union store": 3
+      }
+    }
+  },
+  "safe_pair_features": [
+    "same_market_bool",
+    "same_source_dataset_bool",
+    "clean_category_jaccard",
+    "clean_shared_title_bool",
+    "clean_shared_description_bool",
+    "clean_shared_title_count_capped",
+    "clean_shared_description_count_capped",
+    "clean_shared_category_count_capped",
+    "clean_shared_title_idf_sum",
+    "clean_shared_description_idf_sum",
+    "clean_shared_title_idf_mean",
+    "clean_shared_description_idf_mean",
+    "item_count_train_percentile_gap_abs",
+    "title_length_median_train_percentile_gap_abs",
+    "description_length_median_train_percentile_gap_abs",
+    "digit_ratio_mean_train_percentile_gap_abs",
+    "punct_ratio_mean_train_percentile_gap_abs",
+    "repeated_title_share_train_percentile_gap_abs",
+    "repeated_description_share_train_percentile_gap_abs",
+    "max_category_share_train_percentile_gap_abs"
+  ],
+  "pair_feature_roles": {
+    "shortcut_audit_only_features": ["same_market_bool", "same_source_dataset_bool"],
+    "model_eligible_transfer_features": [
+      "clean_category_jaccard",
+      "clean_shared_title_bool",
+      "clean_shared_description_bool",
+      "clean_shared_title_count_capped",
+      "clean_shared_description_count_capped",
+      "clean_shared_category_count_capped",
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ],
+    "shortcut_features_must_be_absent_from_all_model_eligible_candidates": true,
+    "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0": true
+  },
+  "expected_artifacts": {
+    "pair_manifest": {
+      "sha256": "15659adf5df594d7fa2bedabf16d25c14b7317eb809f3ac2ba1a595d96c58ddd",
+      "size_bytes": 192468
+    },
+    "field_corpus": {
+      "sha256": "7e9d0948f9936d0f4b70987412345096d4f837fc7962e7e4fba1d501e6749655",
+      "size_bytes": 7903675
+    },
+    "train_feature_reference": {
+      "sha256": "31744f342636246567fe78d83a1d21de60d253aab65f3df962d5ae12ac5d1aef",
+      "size_bytes": 1793751
+    },
+    "safe_pair_features": {
+      "sha256": "0185f9a5a877a59aa9e204a5469fb11cd879f2a556df53fe33ca6051ad64fe22",
+      "size_bytes": 211313
+    },
+    "train_labels": {
+      "sha256": "e7287dc5e4b50d356ba7242b208d325c890aa7a25c018eb049fc1207f174d0e8",
+      "size_bytes": 75106
+    },
+    "valid_labels": {
+      "sha256": "51714da36aad7de2aeeb61d75eb700e35a7bea29ef6e7cb67db181a239342c44",
+      "size_bytes": 28552
+    }
+  },
+  "outputs": {
+    "root": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722",
+    "pair_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/pair_manifest.no_labels.csv",
+    "field_corpus": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/clean_seller_field_corpus.jsonl",
+    "train_feature_reference": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/train_feature_reference.no_labels.json",
+    "safe_pair_features": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/safe_pair_features.no_labels.csv",
+    "train_labels": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.train.csv",
+    "valid_labels": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.valid.csv",
+    "preparation_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/source_preparation_manifest.json",
+    "development_labels_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/development_labels_manifest.json"
+  },
+  "hard_rules": [
+    "Public source preparation must never read review labels or evidence types.",
+    "The pair universe is a public-column projection of the pinned component assignments.",
+    "Every final seller field is identity-redacted without an identity-presence marker.",
+    "The field corpus, pair manifest, train-only references, safe pair features, and development label projections must replay the frozen hashes.",
+    "same_market_bool and same_source_dataset_bool are audit-only.",
+    "Historical test labels are not materialized by the Step7-v3.1 implementation round."
+  ]
+}

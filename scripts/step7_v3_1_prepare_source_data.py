@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare label-isolated clean English inputs and train-referenced safe features for Step7-v3."""
+"""Prepare the standalone, label-isolated source artifacts for Step7-v3.1."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import step7_v3_common as common
+import step7_v3_1_source_data as common
 
 
 PREPARATION_SCRIPT = Path(__file__).resolve()
@@ -307,6 +307,89 @@ def content_fidelity_summary(
     }
 
 
+def field_only_profile(profile: dict, target_field: str, fields: list[str]) -> dict:
+    """Return a shallow copy with only one clean-text source field populated."""
+    isolated = dict(profile)
+    for field in fields:
+        if field != target_field:
+            isolated[field] = ""
+    return isolated
+
+
+def build_field_corpus_rows(
+    policy: dict,
+    profiles: dict[str, dict],
+    seller_split: dict[str, str],
+    seller_records: dict[str, dict],
+    global_tokens: set[str] | frozenset[str],
+    contextual_aliases: set[str] | frozenset[str],
+    contextual_alias_deletions: set[str] | frozenset[str],
+    audited_global_phrases: set[str] | frozenset[str],
+) -> tuple[list[dict], dict[str, int]]:
+    """Replay redaction field by field without reading labels or evidence types."""
+    clean_cfg = policy["clean_text_contract"]
+    fields = clean_cfg["fields_in_order"]
+    rows = []
+    nonempty_counts = {field: 0 for field in fields}
+    for seller_uid in sorted(seller_records):
+        field_texts: dict[str, str] = {}
+        for field in fields:
+            record, diagnostics = common.build_clean_seller_record(
+                field_only_profile(profiles[seller_uid], field, fields),
+                clean_cfg,
+                global_tokens,
+                contextual_aliases,
+                contextual_alias_deletions,
+                audited_global_phrases,
+            )
+            value = "" if diagnostics["empty_after_redaction"] else record["model_text"]
+            field_texts[field] = value
+            nonempty_counts[field] += int(bool(value))
+        reconstructed = "\n".join(
+            field_texts[field] for field in fields if field_texts[field]
+        ).strip()
+        if not reconstructed:
+            reconstructed = clean_cfg["empty_text_fallback"]
+        full_text = seller_records[seller_uid]["model_text"]
+        if reconstructed != full_text:
+            raise ValueError(
+                "Step7-v3.1 field-wise clean-text replay drift: "
+                f"{common.sha256_text(seller_uid)[:16]}"
+            )
+        rows.append(
+            {
+                "seller_uid": seller_uid,
+                "split_name": seller_split[seller_uid],
+                "field_texts": field_texts,
+                "field_text_sha256": {
+                    field: common.sha256_text(field_texts[field]) for field in fields
+                },
+                "model_text": full_text,
+                "model_text_sha256": common.sha256_text(full_text),
+            }
+        )
+    return rows, nonempty_counts
+
+
+def verify_expected_artifact(policy: dict, role: str, path: Path) -> dict:
+    """Fail closed unless a frozen source artifact reproduces byte for byte."""
+    expected = policy["expected_artifacts"][role]
+    observed = {
+        "path": str(path.relative_to(common.ROOT)).replace("\\", "/"),
+        "sha256": common.sha256_file(path),
+        "size_bytes": path.stat().st_size,
+    }
+    if (
+        observed["sha256"] != expected["sha256"]
+        or observed["size_bytes"] != int(expected["size_bytes"])
+    ):
+        raise ValueError(
+            f"Step7-v3.1 frozen source artifact drift: {role}; "
+            f"expected={expected} observed={observed}"
+        )
+    return observed
+
+
 def prepare_public(policy: dict) -> dict:
     """Build every model input without opening the label or evidence files."""
     public_input_names = (
@@ -455,18 +538,28 @@ def prepare_public(policy: dict) -> dict:
     if [row["pair_uid"] for row in safe_rows] != [row["pair_uid"] for row in pairs]:
         raise AssertionError("Step7-v3 safe feature row order differs from pair manifest")
 
-    corpus_rows = [
-        {
-            "seller_uid": seller_uid,
-            "split_name": seller_split[seller_uid],
-            "model_text": seller_records[seller_uid]["model_text"],
-            "model_text_sha256": common.sha256_text(
-                seller_records[seller_uid]["model_text"]
-            ),
-        }
-        for seller_uid in sorted(seller_records)
-    ]
-    common.validate_clean_corpus_rows(corpus_rows)
+    corpus_rows, nonempty_field_counts = build_field_corpus_rows(
+        policy,
+        profiles,
+        seller_split,
+        seller_records,
+        global_tokens,
+        contextual_aliases,
+        contextual_alias_deletions,
+        audited_global_phrases,
+    )
+    common.validate_field_corpus_rows(policy, corpus_rows)
+    common.validate_clean_corpus_rows(
+        [
+            {
+                "seller_uid": row["seller_uid"],
+                "split_name": row["split_name"],
+                "model_text": row["model_text"],
+                "model_text_sha256": row["model_text_sha256"],
+            }
+            for row in corpus_rows
+        ]
+    )
     full_known_alias_census = common.full_known_alias_residual_census(
         corpus_rows, contextual_aliases
     )
@@ -603,6 +696,7 @@ def prepare_public(policy: dict) -> dict:
             key: int(value) for key, value in sorted(redaction_totals.items())
         },
         "content_fidelity": content_fidelity,
+        "nonempty_field_seller_counts": nonempty_field_counts,
     }
 
 
@@ -653,11 +747,8 @@ def main() -> None:
     parser.add_argument("--policy", default=str(common.DEFAULT_POLICY))
     parser.add_argument(
         "--stage",
-        choices=("public", "development-labels", "historical-test-labels"),
+        choices=("public", "development-labels"),
         default="public",
-    )
-    parser.add_argument(
-        "--acknowledge-historical-test-is-development-only", action="store_true"
     )
     parser.add_argument("--validate-config-only", action="store_true")
     args = parser.parse_args()
@@ -689,7 +780,7 @@ def main() -> None:
 
     outputs = policy["outputs"]
     pair_path = common.resolve(outputs["pair_manifest"])
-    corpus_path = common.resolve(outputs["clean_corpus"])
+    corpus_path = common.resolve(outputs["field_corpus"])
     reference_path = common.resolve(outputs["train_feature_reference"])
     safe_path = common.resolve(outputs["safe_pair_features"])
     if args.stage == "public":
@@ -698,6 +789,20 @@ def main() -> None:
         common.write_jsonl_immutable(corpus_path, prepared["corpus_rows"])
         common.write_json_immutable(reference_path, prepared["reference"])
         common.write_csv_immutable(safe_path, prepared["safe_rows"])
+        frozen_outputs = {
+            "pair_manifest": verify_expected_artifact(
+                policy, "pair_manifest", pair_path
+            ),
+            "field_corpus": verify_expected_artifact(
+                policy, "field_corpus", corpus_path
+            ),
+            "train_feature_reference": verify_expected_artifact(
+                policy, "train_feature_reference", reference_path
+            ),
+            "safe_pair_features": verify_expected_artifact(
+                policy, "safe_pair_features", safe_path
+            ),
+        }
         identity_residue_scan = common.scan_final_corpus_identity_residues(
             common.load_jsonl(corpus_path),
             prepared["seller_identity_literals"],
@@ -709,12 +814,12 @@ def main() -> None:
         )
         output_paths = {
             "pair_manifest": pair_path,
-            "clean_corpus": corpus_path,
+            "field_corpus": corpus_path,
             "train_feature_reference": reference_path,
             "safe_pair_features": safe_path,
         }
         manifest = {
-            "step": "step7_v3_prepare_public_label_free_data",
+            "step": "step7_v3_1_prepare_standalone_label_free_source_data",
             "version": policy["version"],
             "policy_path": str(policy_path.relative_to(common.ROOT)).replace("\\", "/"),
             "policy_sha256": common.sha256_file(policy_path),
@@ -733,6 +838,10 @@ def main() -> None:
             ),
             "split_isolation": prepared["isolation"],
             "seller_count": len(prepared["corpus_rows"]),
+            "nonempty_field_seller_counts": prepared[
+                "nonempty_field_seller_counts"
+            ],
+            "complete_field_text_replay": True,
             "train_reference_seller_count": prepared["reference"]["train_seller_count"],
             "signal_summary": prepared["signal_summary"],
             "redaction_summary": prepared["redaction_summary"],
@@ -756,18 +865,10 @@ def main() -> None:
             "label_permutation_invariance_required": policy["clean_text_contract"][
                 "labels_must_not_change_corpus_or_pair_features"
             ],
-            "output_files": {
-                key: {
-                    "path": str(path.relative_to(common.ROOT)).replace("\\", "/"),
-                    "sha256": common.sha256_file(path),
-                    "size_bytes": path.stat().st_size,
-                }
-                for key, path in output_paths.items()
-            },
+            "output_files": frozen_outputs,
             "formal_model_encoding_pending_linux_gpu": True,
         }
         common.validate_content_fidelity_manifest(policy, manifest)
-        common.validate_global_identity_audit_manifest(policy, manifest)
         manifest_path = common.resolve(outputs["preparation_manifest"])
         common.write_json_immutable(manifest_path, manifest)
         print(json.dumps(manifest, ensure_ascii=False, indent=2))
@@ -775,33 +876,24 @@ def main() -> None:
 
     manifest_path = common.resolve(outputs["preparation_manifest"])
     if not pair_path.is_file() or not manifest_path.is_file():
-        raise FileNotFoundError("Run the Step7-v3 public preparation stage first")
+        raise FileNotFoundError("Run the Step7-v3.1 public preparation stage first")
     public_manifest = common.load_json(manifest_path)
     public_pair_record = public_manifest["output_files"]["pair_manifest"]
     if common.sha256_file(pair_path) != public_pair_record["sha256"]:
         raise ValueError("Step7-v3 public pair manifest drift before label attachment")
     pair_rows = common.load_csv(pair_path)
-    if args.stage == "development-labels":
-        splits = ("train", "valid")
-        private_paths = {
-            "train": common.resolve(outputs["train_labels"]),
-            "valid": common.resolve(outputs["valid_labels"]),
-        }
-        label_manifest_path = common.resolve(outputs["development_labels_manifest"])
-    else:
-        if not args.acknowledge_historical_test_is_development_only:
-            raise SystemExit(
-                "Historical-test label materialization requires "
-                "--acknowledge-historical-test-is-development-only"
-            )
-        splits = ("test",)
-        private_paths = {"test": common.resolve(outputs["historical_test_labels"])}
-        label_manifest_path = common.resolve(outputs["historical_test_labels_manifest"])
+    splits = ("train", "valid")
+    private_paths = {
+        "train": common.resolve(outputs["train_labels"]),
+        "valid": common.resolve(outputs["valid_labels"]),
+    }
+    label_manifest_path = common.resolve(outputs["development_labels_manifest"])
     prepared = prepare_private_labels(policy, pair_rows, splits)
     for split, rows in prepared["private"].items():
         common.write_csv_immutable(private_paths[split], rows)
+        verify_expected_artifact(policy, f"{split}_labels", private_paths[split])
     label_manifest = {
-        "step": f"step7_v3_prepare_{args.stage.replace('-', '_')}",
+        "step": "step7_v3_1_prepare_development_labels",
         "version": policy["version"],
         "policy_sha256": common.sha256_file(policy_path),
         "generator_script_path": str(PREPARATION_SCRIPT.relative_to(common.ROOT)).replace("\\", "/"),

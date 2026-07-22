@@ -1,0 +1,319 @@
+{
+  "version": "2026-07-22-step7-v3.1-full-text-shared-chunks-v1",
+  "objective": "Select the strongest frozen English encoder and attributable source pipeline without single-window truncation. Every encoder receives the same label-free, field-preserving, complete seller chunks; raw encoder ranking uses one preregistered field-equal aggregate, while fitted pipelines use the same six fixed aggregates and matched no-encoder controls.",
+  "source_data_policy": {
+    "path": "schema/step7_v3_1_source_data_policy.json",
+    "size_bytes": 10229,
+    "sha256": "0b9f65b54a38c615bfc8ebe5b0b4757a87434f55535eb5fafec92148d7c55c67"
+  },
+  "result_scope": {
+    "english_valid_role": "already_consumed_internal_development_validation_used_for_a_full_text_sensitivity_analysis",
+    "english_test_role": "historical_internal_development_test_remains_sealed_for_this_implementation_round",
+    "prospective_claim_allowed": false,
+    "chinese_data_used_for_selection": false,
+    "claim_scope": "full_text_shared_chunk_sensitivity_among_five_frozen_encoders_and_ten_encoder_pipelines_on_the_fixed_734_pair_english_development_universe",
+    "comparison_to_step7_v3": "paired_representation_sensitivity_only_not_an_independent_confirmation_because_the_same_validation_labels_were_already_consumed"
+  },
+  "supervision_boundary": {
+    "expected_counts": {
+      "train": {"positive": 116, "negative": 285, "total": 401},
+      "valid": {"positive": 42, "negative": 110, "total": 152},
+      "test": {"positive": 51, "negative": 130, "total": 181},
+      "total": 734
+    },
+    "expected_component_count_by_split": {"train": 229, "valid": 28, "test": 38},
+    "expected_seller_count_by_split": {"train": 582, "valid": 105, "test": 168}
+  },
+  "clean_text_contract": {
+    "fields_in_order": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "field_groups": {
+      "category": ["category_concat_top"],
+      "title": ["signature_title_concat", "title_concat_top"],
+      "description": ["signature_description_concat", "description_concat_top"]
+    },
+    "parent_clean_model_text_must_replay_byte_exactly": true,
+    "field_extraction_must_not_read_labels_or_evidence_types": true,
+    "empty_text_fallback": "content unavailable"
+  },
+  "shared_chunking": {
+    "algorithm": "greedy_longest_nonempty_prefix_with_preferred_whitespace_or_punctuation_boundary_and_character_fallback",
+    "token_budget_including_model_prefix_and_special_tokens": 480,
+    "all_five_tokenizers_must_fit_every_shared_chunk": true,
+    "same_exact_chunk_text_and_order_for_every_encoder": true,
+    "require_exact_character_reconstruction_per_field": true,
+    "require_complete_nonoverlapping_field_coverage": true,
+    "chunk_overlap_characters": 0,
+    "maximum_chunks_per_seller": null,
+    "long_history_sampling_or_dropping_allowed": false,
+    "labels_or_evidence_types_used": false,
+    "chunk_count_length_or_missingness_allowed_as_model_features": false,
+    "preferred_boundary_characters": "whitespace_or_ascii_sentence_and_list_punctuation",
+    "expected_label_free_tokenizer_preflight": {
+      "reference_transformers_version": "4.46.3",
+      "field_corpus_sha256": "7e9d0948f9936d0f4b70987412345096d4f837fc7962e7e4fba1d501e6749655",
+      "shared_chunk_rows_canonical_sha256": "da2083494163e966f66180d201cb512f654d3e98f34f4d369f3046ac94aeca53",
+      "seller_count": 855,
+      "chunk_count": 5378,
+      "nonempty_field_count": 4198,
+      "chunk_count_min": 1,
+      "chunk_count_median": 5.0,
+      "chunk_count_p90": 9.0,
+      "chunk_count_p95": 10.0,
+      "chunk_count_max": 19,
+      "missing_group_seller_counts_audit_only": {
+        "category": 0,
+        "title": 1,
+        "description": 2
+      },
+      "token_length_maximum_by_model": {
+        "gte_multilingual_base": 477,
+        "bge_m3": 478,
+        "multilingual_e5_large": 480,
+        "labse": 480,
+        "paraphrase_multilingual_mpnet_base_v2": 477
+      },
+      "over_budget_count_by_model": {
+        "gte_multilingual_base": 0,
+        "bge_m3": 0,
+        "multilingual_e5_large": 0,
+        "labse": 0,
+        "paraphrase_multilingual_mpnet_base_v2": 0
+      }
+    }
+  },
+  "aggregation": {
+    "top_k_matches_per_chunk": 3,
+    "primary_raw_encoder_aggregate": "field_equal_mean_cosine",
+    "aggregate_order": [
+      "all_chunk_mean_cosine",
+      "field_equal_mean_cosine",
+      "symmetric_top3_block_cosine",
+      "category_mean_cosine",
+      "title_mean_cosine",
+      "description_mean_cosine"
+    ],
+    "all_chunk_mean_cosine": "cosine_between_l2_normalized_means_of_all_unit_chunk_vectors",
+    "field_equal_mean_cosine": "arithmetic_mean_of_per_field_mean_vector_cosines_over_fields_present_on_both_sellers_error_if_none",
+    "symmetric_top3_block_cosine": "for_each_left_chunk_mean_its_top_three_right_chunk_cosines_then_average_left_chunks_repeat_right_to_left_and_average_both_directions",
+    "category_mean_cosine": "cosine_between_l2_normalized_means_of_category_group_chunks_use_field_equal_score_if_either_group_is_absent",
+    "title_mean_cosine": "cosine_between_l2_normalized_means_of_title_group_chunks_use_field_equal_score_if_either_group_is_absent",
+    "description_mean_cosine": "cosine_between_l2_normalized_means_of_description_group_chunks_use_field_equal_score_if_either_group_is_absent",
+    "serialized_score_decimal_places": 12,
+    "score_replay_absolute_tolerance": 0.000002
+  },
+  "embedding_models": {
+    "gte_multilingual_base": {
+      "repo_id": "Alibaba-NLP/gte-multilingual-base",
+      "local_path": "models/step7/embeddings/gte_multilingual_base",
+      "batch_size": 24,
+      "max_length": 512,
+      "text_prefix": "",
+      "pooling_contract": "sentence_transformers_modules",
+      "expected_pooling": "cls",
+      "expected_dense_module": false,
+      "trust_remote_code": true,
+      "expected_file_count": 10,
+      "expected_total_size_bytes": 627906267,
+      "expected_content_sha256": "63918c6faa06bd91621682c115563a1c88ef0206af93949db11898ff1acaecbb",
+      "feature_prefix": "chunk_gte_multilingual_base"
+    },
+    "bge_m3": {
+      "repo_id": "BAAI/bge-m3",
+      "local_path": "models/step7/embeddings/bge_m3",
+      "batch_size": 16,
+      "max_length": 512,
+      "text_prefix": "",
+      "pooling_contract": "sentence_transformers_modules",
+      "expected_pooling": "cls",
+      "expected_dense_module": false,
+      "trust_remote_code": true,
+      "expected_file_count": 13,
+      "expected_total_size_bytes": 2295546885,
+      "expected_content_sha256": "788a0d73c4c705822d57264896046a334fa4b8e2d7e3a7276d8edf2d59e7cfbf",
+      "feature_prefix": "chunk_bge_m3"
+    },
+    "multilingual_e5_large": {
+      "repo_id": "intfloat/multilingual-e5-large",
+      "local_path": "models/step7/embeddings/multilingual_e5_large",
+      "batch_size": 16,
+      "max_length": 512,
+      "text_prefix": "query: ",
+      "pooling_contract": "sentence_transformers_modules",
+      "expected_pooling": "mean",
+      "expected_dense_module": false,
+      "trust_remote_code": false,
+      "expected_file_count": 9,
+      "expected_total_size_bytes": 2261765112,
+      "expected_content_sha256": "d1541dcd59047401678c3fa66d3793ffead9b46edacf29958e1a0848612be4f2",
+      "feature_prefix": "chunk_multilingual_e5_large"
+    },
+    "labse": {
+      "repo_id": "sentence-transformers/LaBSE",
+      "local_path": "models/step7/embeddings/labse",
+      "batch_size": 24,
+      "max_length": 512,
+      "text_prefix": "",
+      "pooling_contract": "sentence_transformers_modules",
+      "expected_pooling": "cls",
+      "expected_dense_module": true,
+      "trust_remote_code": false,
+      "expected_file_count": 12,
+      "expected_total_size_bytes": 1900941462,
+      "expected_content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+      "feature_prefix": "chunk_labse"
+    },
+    "paraphrase_multilingual_mpnet_base_v2": {
+      "repo_id": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+      "local_path": "models/step7/embeddings/paraphrase_multilingual_mpnet_base_v2",
+      "batch_size": 16,
+      "max_length": 512,
+      "text_prefix": "",
+      "pooling_contract": "sentence_transformers_modules",
+      "expected_pooling": "mean",
+      "expected_dense_module": false,
+      "trust_remote_code": false,
+      "expected_file_count": 10,
+      "expected_total_size_bytes": 1126353815,
+      "expected_content_sha256": "96baeda28f78b91831e5f062c314ad9a87f5956925b8dd6e8dcd00700c607073",
+      "feature_prefix": "chunk_paraphrase_multilingual_mpnet"
+    }
+  },
+  "pair_feature_roles": {
+    "shortcut_audit_only_features": ["same_market_bool", "same_source_dataset_bool"],
+    "model_eligible_transfer_features": [
+      "clean_category_jaccard",
+      "clean_shared_title_bool",
+      "clean_shared_description_bool",
+      "clean_shared_title_count_capped",
+      "clean_shared_description_count_capped",
+      "clean_shared_category_count_capped",
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ],
+    "shortcut_features_must_be_absent_from_all_model_eligible_candidates": true,
+    "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0": true
+  },
+  "candidate_tiers": {
+    "encoder_aggregates_only": ["{embedding_aggregate_features}"],
+    "encoder_aggregates_plus_transfer": ["{embedding_aggregate_features}", "{model_eligible_transfer_features}"]
+  },
+  "no_encoder_controls": {
+    "intercept_only": [],
+    "transfer_features_only": ["{model_eligible_transfer_features}"]
+  },
+  "shortcut_audit_controls": {
+    "shortcut_features_only": ["{shortcut_audit_only_features}"]
+  },
+  "training": {
+    "fit_split": "train",
+    "selection_split": "valid",
+    "model_family": "standardized_logistic_regression_l2",
+    "solver": "newton_with_armijo_backtracking",
+    "solver_convergence_criterion": "normalized_gradient_inf_norm_at_most_tolerance",
+    "armijo_c1": 0.0001,
+    "minimum_line_search_step": 9.313225746154785e-10,
+    "l2_grid": [0.1, 1.0, 10.0, 100.0],
+    "l2_selection": "five_fold_component_grouped_train_oof_shortcut_conditioned_macro_component_equal_average_precision",
+    "fold_count": 5,
+    "fold_seed": 20260721,
+    "max_iter": 300,
+    "tolerance": 1e-9,
+    "class_weight": "none",
+    "primary_sample_weight": "component_equal_normalized_to_row_count",
+    "sensitivity_sample_weight": "uniform",
+    "threshold_reference": "train_oof_predictions_only",
+    "threshold_metric": "weighted_balanced_accuracy_using_weighting_mode"
+  },
+  "evaluation": {
+    "primary_selection_metric": "shortcut_conditioned_macro_component_equal_average_precision",
+    "shortcut_conditioned_primary_metric": {
+      "stratum_fields": ["same_market_bool", "same_source_dataset_bool"],
+      "within_stratum_weighting": "component_equal_normalized_to_row_count",
+      "across_estimable_strata_weighting": "equal",
+      "estimable_stratum_requires_both_labels": true,
+      "minimum_estimable_strata": 2,
+      "expected_train_estimable_strata": ["same_market=0|same_source=1", "same_market=1|same_source=1"],
+      "expected_valid_estimable_strata": ["same_market=0|same_source=1", "same_market=1|same_source=1"]
+    },
+    "bootstrap": {"group": "recomputed_component_id", "resamples": 5000, "seed": 2026072101, "confidence": 0.95},
+    "hard_negative_evidence_types": ["semantic_topic_not_controller", "template_clone_not_controller", "public_contact_or_url_noise"],
+    "direct_positive_evidence_types": ["same_controller_direct_identifier", "same_controller_component_anchor"]
+  },
+  "selection_rule": {
+    "unique_winner_requires_all": {
+      "valid_shortcut_conditioned_macro_component_equal_average_precision_delta_vs_runner_up_at_least": 0.02,
+      "grouped_bootstrap_ap_delta_ci95_lower_above": 0.0,
+      "global_component_equal_average_precision_delta_above": 0.0,
+      "row_average_precision_delta_above": 0.0,
+      "uniform_weight_sensitivity_shortcut_conditioned_ap_delta_above": 0.0,
+      "hard_negative_fpr_increase_at_most": 0.01,
+      "direct_positive_recall_drop_at_most": 0.05
+    },
+    "encoder_selection": {
+      "eligible_score": "field_equal_mean_cosine",
+      "score_source": "raw_frozen_encoder_full_text_shared_chunk_field_equal_aggregate_without_fitted_head",
+      "tie_action": "carry_top_two_without_e5_privilege"
+    },
+    "pipeline_attribution": {
+      "matched_no_encoder_control_by_tier": {
+        "encoder_aggregates_only": "control__intercept_only",
+        "encoder_aggregates_plus_transfer": "control__transfer_features_only"
+      },
+      "encoder_increment_shortcut_conditioned_ap_at_least": 0.02,
+      "encoder_increment_grouped_bootstrap_ci95_lower_above": 0.0
+    },
+    "continuity_encoder": "multilingual_e5_large",
+    "continuity_encoder_role": "report_only_never_changes_ranking_or_carry_forward"
+  },
+  "outputs": {
+    "root": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722",
+    "pair_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/pair_manifest.no_labels.csv",
+    "field_corpus": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/clean_seller_field_corpus.jsonl",
+    "train_feature_reference": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/train_feature_reference.no_labels.json",
+    "safe_pair_features": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/safe_pair_features.no_labels.csv",
+    "train_labels": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.train.csv",
+    "valid_labels": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.valid.csv",
+    "preparation_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/source_preparation_manifest.json",
+    "development_labels_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/development_labels_manifest.json",
+    "gpu_sync_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/step7_v3_1_gpu_sync_manifest.json",
+    "shared_chunks": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/shared_chunks.jsonl",
+    "shared_chunks_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/shared_chunks_manifest.json",
+    "embedding_matrix_template": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/embeddings/{model_key}.chunks.npy",
+    "embedding_manifest_template": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/embeddings/{model_key}.chunks.json",
+    "embedding_pair_scores_template": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/pair_scores/{model_key}.chunk_aggregates.csv",
+    "gpu_output_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/step7_v3_1_gpu_output_manifest.json",
+    "selection_summary": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection/selection_summary.json",
+    "frozen_selection_manifest": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection/frozen_selection_manifest.json",
+    "train_oof_predictions": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection/train_oof_predictions.csv",
+    "valid_predictions": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/selection/valid_predictions.csv"
+  },
+  "hard_rules": [
+    "The 734 pairs, train/valid labels, split assignments, safe transfer features, cleaned fields, and five model payloads are regenerated from pinned sources and must replay their frozen hashes.",
+    "Every cleaned character from every nonempty field is represented in exactly one shared chunk; no beginning-middle-end sampling or chunk cap is allowed.",
+    "Every shared chunk must fit the 480-token budget under all five tokenizers including model prefix and special tokens.",
+    "The exact same chunk strings and ordering are encoded by all five models.",
+    "Chunk counts, text lengths, tokenizer lengths, and field missingness are audit-only and forbidden from every selectable model.",
+    "Raw encoder ranking uses only the preregistered field-equal aggregate without a fitted head.",
+    "Fitted pipelines use the same six aggregate definitions for each encoder and are matched against a no-encoder control.",
+    "same_market_bool and same_source_dataset_bool remain audit-only and cannot enter selectable candidates.",
+    "The shared reranker is excluded because it cannot follow the same seller-block-vector aggregation contract.",
+    "Historical test labels remain unopened in this implementation and selection round.",
+    "This is a same-validation development sensitivity, not a new prospective confirmation."
+  ]
+}

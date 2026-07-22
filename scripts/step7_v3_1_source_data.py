@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared, label-isolated contracts for Step7-v3 clean English source selection."""
+"""Frozen source-data and redaction contracts for Step7-v3.1."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ import step3_build_seller_profiles as step3
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step7_v3_clean_source_selection_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step7_v3_1_source_data_policy.json"
 STEP3_SCRIPT = Path(step3.__file__).resolve()
 MAX_REDACTION_PASSES = 8
 IDENTITY_RESIDUE_CLAIM_SCOPE = (
@@ -1027,475 +1027,116 @@ def write_npy_immutable(path: Path, matrix: np.ndarray) -> None:
     write_bytes_immutable(path, buffer.getvalue())
 
 
+
+
 def validate_policy(policy: dict) -> None:
+    """Validate only the frozen source-data contract used by Step7-v3.1."""
+    if policy.get("version") != "2026-07-22-step7-v3.1-source-data-v1":
+        raise ValueError("Step7-v3.1 source-data policy version drift")
+    implementation = policy.get("implementation", {})
+    if set(implementation) != {
+        "source_data_module",
+        "preparation_script",
+        "redaction_dependency",
+    }:
+        raise ValueError("Step7-v3.1 source implementation universe drift")
+    expected_implementation_paths = {
+        "source_data_module": "scripts/step7_v3_1_source_data.py",
+        "preparation_script": "scripts/step7_v3_1_prepare_source_data.py",
+        "redaction_dependency": "scripts/step3_build_seller_profiles.py",
+    }
+    for role, expected_path in expected_implementation_paths.items():
+        record = implementation[role]
+        if (
+            set(record) != {"path", "size_bytes", "sha256"}
+            or record["path"] != expected_path
+            or int(record["size_bytes"]) <= 0
+            or not re.fullmatch(r"[0-9a-f]{64}", str(record["sha256"]))
+        ):
+            raise ValueError(f"Step7-v3.1 source implementation pin drift: {role}")
+    required_inputs = {
+        "frozen_labels",
+        "evidence_labels",
+        "seller_profiles",
+        "item_identity_signals",
+        "component_assignments",
+    }
+    if set(policy.get("inputs", {})) != required_inputs:
+        raise ValueError("Step7-v3.1 source input universe drift")
     boundary = policy["supervision_boundary"]
     expected = boundary["expected_counts"]
-    split_total = sum(int(expected[split]["total"]) for split in ("train", "valid", "test"))
-    if split_total != int(expected["total"]):
-        raise ValueError("Step7-v3 expected split counts do not sum to total")
-    for split in ("train", "valid", "test"):
-        counts = expected[split]
-        if int(counts["positive"]) + int(counts["negative"]) != int(counts["total"]):
-            raise ValueError(f"Step7-v3 expected label counts do not sum for {split}")
-    for field in (
-        "expected_component_count_by_split",
-        "expected_seller_count_by_split",
+    if list(boundary["eligible_split_names"]) != ["train", "valid", "test"]:
+        raise ValueError("Step7-v3.1 source split order drift")
+    if list(boundary["eligible_labels"]) != ["positive", "negative"]:
+        raise ValueError("Step7-v3.1 source label universe drift")
+    if sum(int(expected[name]["total"]) for name in ("train", "valid", "test")) != int(
+        expected["total"]
     ):
-        if set(boundary.get(field, {})) != {"train", "valid", "test"} or any(
-            int(value) <= 0 for value in boundary[field].values()
-        ):
-            raise ValueError(f"Step7-v3 {field} contract is invalid")
-
-    clean = policy["clean_text_contract"]
-    expected_fields = [
+        raise ValueError("Step7-v3.1 source split counts do not sum")
+    for split in ("train", "valid", "test"):
+        row = expected[split]
+        if int(row["positive"]) + int(row["negative"]) != int(row["total"]):
+            raise ValueError(f"Step7-v3.1 source label counts drift: {split}")
+    fields = [
         "category_concat_top",
         "signature_title_concat",
         "title_concat_top",
         "signature_description_concat",
         "description_concat_top",
     ]
-    if clean["fields_in_order"] != expected_fields:
-        raise ValueError("Step7-v3 five-field clean text order changed")
-    required_excluded = {
-        "source_seller_raw",
-        "alias_normalized",
-        "source_market_raw",
-        "source_seller_id_raw",
-        "contact_concat_top",
-        "structured_snapshot_concat_top",
-        "profile_text",
-    }
-    if not required_excluded.issubset(set(clean["excluded_profile_fields"])):
-        raise ValueError("Step7-v3 identifier-bearing exclusions were relaxed")
-    if set(clean["fields_in_order"]) & set(clean["excluded_profile_fields"]):
-        raise ValueError("Step7-v3 clean and excluded text fields overlap")
+    clean = policy["clean_text_contract"]
+    if clean["fields_in_order"] != fields:
+        raise ValueError("Step7-v3.1 source field order drift")
     if clean["replacement"] != "single_space_no_identifier_presence_marker":
-        raise ValueError("Step7-v3 redaction must not expose identifier presence")
-    if clean.get("redaction_sources") != (
-        "fixed_snapshot_exact_contiguous_collision_prone_identities_plus_audited_fixed_snapshot_global_identity_phrases_removed_separator_invariant_before_other_rules_plus_seller_local_separator_invariant_alias_variants_minus_preregistered_separator_collisions_plus_fixed_snapshot_audited_global_mixed_alphanumeric_union_minus_content_collisions_plus_context_gated_profile_and_signal_aliases_minus_preregistered_separator_collisions_plus_high_recall_contact_and_truncation_regexes"
-    ):
-        raise ValueError("Step7-v3 redaction-source contract changed")
-    if set(clean.get("exact_contiguous_identity_tokens", [])) != set(
-        EXACT_CONTIGUOUS_IDENTITY_TOKENS
-    ):
-        raise ValueError("Step7-v3 exact-contiguous identity contract changed")
-    if set(
-        clean.get("separator_invariant_identity_content_collision_denylist", [])
-    ) != set(SEPARATOR_INVARIANT_IDENTITY_CONTENT_COLLISION_DENYLIST):
-        raise ValueError("Step7-v3 separator-collision denylist changed")
-    if clean.get("contextual_alias_registry_scope") != (
-        "all_pinned_english_seller_profiles_plus_all_safe_pinned_identity_signal_literals_label_free_context_gated"
-    ):
-        raise ValueError("Step7-v3 contextual-alias registry scope changed")
-    if clean.get("global_mixed_alias_registry_scope") != (
-        "fixed_snapshot_union_of_all_pinned_english_profile_mixed_aliases_and_identity_signal_mixed_values_minus_preregistered_content_collisions_label_free"
-    ):
-        raise ValueError("Step7-v3 global mixed-alias registry scope changed")
-    if set(clean.get("global_mixed_alias_content_collision_denylist", [])) != set(
-        GLOBAL_IDENTITY_CONTENT_COLLISION_DENYLIST
-    ):
-        raise ValueError("Step7-v3 global identity collision denylist changed")
-    if clean.get("audited_global_identity_phrase_tokens", []) != sorted(
-        AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
-    ):
-        raise ValueError("Step7-v3 audited global identity-phrase set changed")
-    if clean.get(
-        "audited_global_identity_phrase_dot_separator_tokens", []
-    ) != sorted(AUDITED_GLOBAL_IDENTITY_DOT_SEPARATOR_TOKENS):
-        raise ValueError(
-            "Step7-v3 audited identity dot-separator scope changed"
-        )
-    if not AUDITED_GLOBAL_IDENTITY_DOT_SEPARATOR_TOKENS.issubset(
-        AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
-    ):
-        raise ValueError(
-            "Step7-v3 dot-separator identity is outside the audited registry"
-        )
-    if set(AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS) & set(
-        SEPARATOR_INVARIANT_IDENTITY_CONTENT_COLLISION_DENYLIST
-    ):
-        raise ValueError(
-            "Step7-v3 separator-collision identity entered the phrase registry"
-        )
-    protected_collision_compacts = {
-        compact_identifier(term) for term in PROTECTED_IDENTITY_COLLISION_TERMS
-    }
-    if any(
-        anchored_alias_registry_token(
-            compact, AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS
-        )
-        is not None
-        for compact in protected_collision_compacts
-    ):
-        raise ValueError(
-            "Step7-v3 audited identity phrases overlap protected content collisions"
-        )
-    if clean.get("audited_global_identity_phrase_selection_contract") != (
-        "manual_seller_and_market_identity_classification_uses_only_fixed_snapshot_model_text_market_inventory_and_alias_semantics_never_review_labels_or_evidence_types_protected_content_collisions_are_excluded"
-    ):
-        raise ValueError("Step7-v3 audited identity-phrase selection changed")
-    if clean.get("audited_global_identity_phrase_audit_contract") != (
-        "confirmed_seller_or_market_identity_phrases_and_pinned_source_market_preventive_forms_are_removed_separator_invariant_before_other_rules_and_manifested_against_all_public_input_hashes_any_input_hash_change_requires_full_reaudit"
-    ):
-        raise ValueError("Step7-v3 audited identity-phrase audit contract changed")
-    if clean.get("audited_global_identity_phrase_expected_audit") != {
-        "registry_token_count": 137,
-        "registry_tokens_canonical_sha256": (
-            "f5d5b82abd4db4f39151e2d09e36c1595e3d1b58a7ed564dd41b156d8c602d9d"
-        ),
-        "matched_registry_token_count": 121,
-        "matched_registry_tokens_canonical_sha256": (
-            "09ccf9022d6d282268db7531c052ac062d9e78bd3fe29781876236eb8bb7dfb3"
-        ),
-        "unmatched_preventive_registry_token_count": 16,
-        "removed_distinct_surface_count": 128,
-        "removed_occurrence_count": 1136,
-        "removed_surface_sha256_counts_canonical_sha256": (
-            "457a3647f91f32bb7c88d9d3ab626009f228125e7c28ee2c7f10df988d5d66bc"
-        ),
-    }:
-        raise ValueError("Step7-v3 audited identity-phrase expected audit changed")
-    if clean.get("global_mixed_alias_audit_contract") != (
-        "observed_global_matches_in_the_fixed_855_seller_five_field_corpus_are_reaudited_and_manifested_input_hash_change_invalidates_the_audit"
-    ):
-        raise ValueError("Step7-v3 global mixed-alias audit contract changed")
-    expected_global_audit = clean.get("global_mixed_alias_expected_audit", {})
-    if expected_global_audit != {
-        "registry_token_count_after_denylist": 5605,
-        "removed_distinct_token_count": 33,
-        "removed_occurrence_count": 327,
-        "removed_token_sha256_counts_canonical_sha256": (
-            "03b76cad3b587917d818dc2aaa7a3b5178505e92dfb627da73b674aaf15f3527"
-        ),
-    }:
-        raise ValueError("Step7-v3 global mixed-alias expected audit changed")
-    if clean.get("direct_signal_usage_contract") != (
-        "noisy_or_pure_signal_values_are_never_unconditional_seller_local_literals_high_confidence_mixed_signal_values_may_enter_the_fixed_snapshot_global_mixed_union_minus_collisions_other_signal_values_are_context_gated"
-    ):
-        raise ValueError("Step7-v3 direct-signal usage contract changed")
-    if clean.get("contextual_alias_variant_contract") != (
-        "compact_separator_invariant_exact_aliases_plus_trailing_one_to_four_digit_removal_plus_registry_anchored_plural_and_separator_tolerant_identity_suffixes_plus_long_alpha_one_character_omissions_under_explicit_identity_cues"
-    ):
-        raise ValueError("Step7-v3 contextual alias-variant contract changed")
-    if clean.get("full_known_alias_residual_census_contract") != (
-        "independent_longest_first_scan_of_every_final_seller_row_newline_field_and_double_pipe_value_against_the_full_fixed_snapshot_contextual_alias_registry_exact_plural_and_identity_suffix_forms_without_reusing_redaction_matchers"
-    ):
-        raise ValueError("Step7-v3 full known-alias census contract changed")
-    if clean.get("full_known_alias_residual_expected_audit") != {
-        "registry_token_count": 16761,
-        "scanned_seller_row_count": 855,
-        "scanned_segment_count": 26984,
-        "matched_registry_token_count": 455,
-        "matched_occurrence_count": 35875,
-        "matched_surface_count": 535,
-        "confirmed_identity_residual_anchor_count": 0,
-        "retained_ambiguous_or_content_collision_anchor_count": 455,
-        "retained_ambiguous_or_content_collision_occurrence_count": 35875,
-        "match_kind_counts": {
-            "exact": 34855,
-            "known_alias_plural": 966,
-            "known_alias_plus_meds": 18,
-            "known_alias_plus_pharma": 34,
-            "known_alias_plus_plug": 1,
-            "known_alias_plus_sales": 1,
-        },
-        "matched_anchor_sha256_counts_canonical_sha256": (
-            "cf89e5e142872657b0d8e51378cf6039471c4c70255bfe54b5baf401dd4c260f"
-        ),
-        "matched_surface_sha256_counts_canonical_sha256": (
-            "c2d293552469da0337ee0d95026aff26b1813d82f024833a549c5746e2a6bb15"
-        ),
-        "matched_anchor_sha256_seller_counts_canonical_sha256": (
-            "6d05d9feafadc7ecc040bdb5544ca0add3458ddc45ab7fb36b7a08d85f4487de"
-        ),
-    }:
-        raise ValueError("Step7-v3 full known-alias expected audit changed")
-    if clean.get("audited_identity_embedded_residual_census_contract") != (
-        "scan_every_final_ascii_alphanumeric_word_for_a_strict_substring_of_any_audited_identity_token_after_exact_plural_and_registered_suffix_forms_have_been_excluded"
-    ):
-        raise ValueError("Step7-v3 embedded identity census contract changed")
-    if clean.get("audited_identity_embedded_residual_expected_audit") != {
-        "registry_token_count": 137,
-        "scanned_seller_row_count": 855,
-        "matched_registry_token_count": 4,
-        "matched_occurrence_count": 5,
-        "matched_alias_surface_pair_count": 4,
-        "matched_surface_count": 3,
-        "matched_anchor_sha256_counts_canonical_sha256": (
-            "be8bc0ece7b1cd591703517db7ae15021085289d23cad3f416f8d9cfe40fb44f"
-        ),
-        "matched_surface_sha256_counts_canonical_sha256": (
-            "e57926c3d2dab81b6771734e75f251f6d0b4f18a6a812142c08d423b0b9f1a90"
-        ),
-        "matched_alias_surface_pair_sha256_counts_canonical_sha256": (
-            "0a3eade1050e1a8013628355cff70c014e4d7aea3899caaeac94b937933cd1eb"
-        ),
-        "confirmed_identity_residual_count": 0,
-        "retained_content_collision_occurrence_count": 5,
-    }:
-        raise ValueError("Step7-v3 embedded identity expected audit changed")
-    if clean.get("identity_residue_claim_scope") != IDENTITY_RESIDUE_CLAIM_SCOPE:
-        raise ValueError("Step7-v3 identity-residue claim scope changed")
-    quality = clean["quality_gates"]
-    minimum_character_retention = float(
-        quality["minimum_aggregate_character_retention"]
-    )
-    if not 0.0 < minimum_character_retention <= 1.0:
-        raise ValueError("Step7-v3 aggregate character-retention gate is invalid")
-    if int(quality["maximum_empty_fallback_count"]) < 0:
-        raise ValueError("Step7-v3 empty-fallback gate is invalid")
-    if set(quality["protected_content_words"]) != set(
-        CONTEXTUAL_ALIAS_CONTENT_WORD_DENYLIST
-    ):
-        raise ValueError("Step7-v3 protected content-word contract changed")
-    minimum_word_retention = float(quality["minimum_protected_word_retention"])
-    if not 0.0 < minimum_word_retention <= 1.0:
-        raise ValueError("Step7-v3 protected-word retention gate is invalid")
-    if set(quality.get("protected_identity_collision_terms", [])) != set(
-        PROTECTED_IDENTITY_COLLISION_TERMS
-    ):
-        raise ValueError("Step7-v3 protected identity-collision contract changed")
-    if quality.get("expected_protected_identity_collision_raw_counts") != (
-        PROTECTED_IDENTITY_COLLISION_RAW_COUNTS
-    ):
-        raise ValueError("Step7-v3 identity-collision raw-count boundary changed")
-    minimum_collision_retention = float(
-        quality["minimum_protected_identity_collision_term_retention"]
-    )
-    if not 0.0 < minimum_collision_retention <= 1.0:
-        raise ValueError("Step7-v3 identity-collision retention gate is invalid")
+        raise ValueError("Step7-v3.1 source redaction marker drift")
+    if clean["empty_text_fallback"] != "content unavailable":
+        raise ValueError("Step7-v3.1 source empty-text fallback drift")
     if policy["safe_pair_features"] != SAFE_FEATURE_NAMES:
-        raise ValueError("Step7-v3 safe pair feature contract changed")
-    roles = policy.get("pair_feature_roles", {})
-    if roles.get("shortcut_audit_only_features") != SHORTCUT_AUDIT_ONLY_FEATURE_NAMES:
-        raise ValueError("Step7-v3 shortcut-audit feature contract changed")
-    if roles.get("model_eligible_transfer_features") != (
-        MODEL_ELIGIBLE_TRANSFER_FEATURE_NAMES
-    ):
-        raise ValueError("Step7-v3 model-eligible transfer feature contract changed")
-    if set(roles["shortcut_audit_only_features"]) & set(
-        roles["model_eligible_transfer_features"]
-    ):
-        raise ValueError("Step7-v3 shortcut and model-eligible feature roles overlap")
-    if set(roles["shortcut_audit_only_features"]) | set(
-        roles["model_eligible_transfer_features"]
-    ) != set(SAFE_FEATURE_NAMES):
-        raise ValueError("Step7-v3 feature roles do not partition generated features")
-    if roles.get(
-        "shortcut_features_must_be_absent_from_all_model_eligible_candidates"
-    ) is not True or roles.get(
-        "shortcut_features_are_report_only_and_cannot_select_encoder_or_m0"
-    ) is not True:
-        raise ValueError("Step7-v3 shortcut feature exclusion is not fail-closed")
-    forbidden = set(policy["forbidden_m0_features"])
-    if forbidden & set(policy["safe_pair_features"]):
-        raise ValueError("Step7-v3 safe feature list includes a forbidden M0 feature")
-    expected_tiers = {
-        "encoder_only": ["{embedding_feature}"],
-        "encoder_plus_transfer": [
-            "{embedding_feature}",
-            "{model_eligible_transfer_features}",
-        ],
-        "encoder_plus_shared_reranker": [
-            "{embedding_feature}",
-            "{shared_reranker_feature}",
-        ],
-        "encoder_plus_transfer_plus_shared_reranker": [
-            "{embedding_feature}",
-            "{model_eligible_transfer_features}",
-            "{shared_reranker_feature}",
-        ],
-    }
-    if policy["candidate_tiers"] != expected_tiers:
-        raise ValueError("Step7-v3 candidate-tier contract changed")
-    expected_no_encoder_controls = {
-        "intercept_only": [],
-        "transfer_features_only": ["{model_eligible_transfer_features}"],
-        "shared_reranker_only": ["{shared_reranker_feature}"],
-        "transfer_features_plus_shared_reranker": [
-            "{model_eligible_transfer_features}",
-            "{shared_reranker_feature}",
-        ],
-    }
-    if policy.get("no_encoder_controls") != expected_no_encoder_controls:
-        raise ValueError("Step7-v3 no-encoder control contract changed")
-    if policy.get("shortcut_audit_controls") != {
-        "shortcut_features_only": ["{shortcut_audit_only_features}"]
+        raise ValueError("Step7-v3.1 source safe-feature order drift")
+    roles = policy["pair_feature_roles"]
+    if roles["shortcut_audit_only_features"] != SHORTCUT_AUDIT_ONLY_FEATURE_NAMES:
+        raise ValueError("Step7-v3.1 source shortcut-feature role drift")
+    if roles["model_eligible_transfer_features"] != MODEL_ELIGIBLE_TRANSFER_FEATURE_NAMES:
+        raise ValueError("Step7-v3.1 source transfer-feature role drift")
+    outputs = policy["outputs"]
+    root = str(outputs["root"]).rstrip("/")
+    if not root.startswith("reports/step7_v3_1_full_text_chunked_selection/"):
+        raise ValueError("Step7-v3.1 source output root drift")
+    if set(outputs) != {
+        "root",
+        "pair_manifest",
+        "field_corpus",
+        "train_feature_reference",
+        "safe_pair_features",
+        "train_labels",
+        "valid_labels",
+        "preparation_manifest",
+        "development_labels_manifest",
     }:
-        raise ValueError("Step7-v3 shortcut audit-control contract changed")
-
-    required_models = {
-        "gte_multilingual_base",
-        "bge_m3",
-        "multilingual_e5_large",
-        "labse",
-        "paraphrase_multilingual_mpnet_base_v2",
-    }
-    if set(policy["embedding_models"]) != required_models:
-        raise ValueError("Step7-v3 must compare exactly the five preregistered encoders")
-    for model_key, cfg in policy["embedding_models"].items():
-        if cfg["pooling_contract"] != "sentence_transformers_modules":
-            raise ValueError(f"Step7-v3 model-native pooling disabled for {model_key}")
-        if cfg["expected_pooling"] not in {"cls", "mean"}:
-            raise ValueError(f"Unsupported Step7-v3 pooling for {model_key}")
-        if int(cfg["max_length"]) != 512:
-            raise ValueError(f"Step7-v3 max length drift for {model_key}")
-        validate_expected_model_pin(model_key, cfg)
-    if policy["embedding_models"]["multilingual_e5_large"]["text_prefix"] != "query: ":
-        raise ValueError("Step7-v3 symmetric E5 similarity requires query prefixes on both sides")
-    reranker = policy["shared_reranker"]
-    if reranker["pair_symmetrization"] != "mean_left_right_and_right_left":
-        raise ValueError("Step7-v3 reranker must be symmetric")
-    validate_expected_model_pin(reranker["model_key"], reranker)
-    training = policy["training"]
-    if training["fit_split"] != "train" or training["selection_split"] != "valid":
-        raise ValueError("Step7-v3 train/selection split contract changed")
-    if training["final_test_split"] != "test":
-        raise ValueError("Step7-v3 historical-test split contract changed")
-    if training["model_family"] != "standardized_logistic_regression_l2":
-        raise ValueError("Step7-v3 model-family contract changed")
-    if training.get("solver") != "newton_with_armijo_backtracking" or training.get(
-        "solver_convergence_criterion"
-    ) != "normalized_gradient_inf_norm_at_most_tolerance":
-        raise ValueError("Step7-v3 logistic solver contract changed")
-    if not 0.0 < float(training.get("armijo_c1", 0.0)) < 1.0:
-        raise ValueError("Step7-v3 Armijo constant is invalid")
-    minimum_step = float(training.get("minimum_line_search_step", 0.0))
-    if not math.isfinite(minimum_step) or not 0.0 < minimum_step < 1.0:
-        raise ValueError("Step7-v3 minimum line-search step is invalid")
-    if training["l2_selection"] != (
-        "five_fold_component_grouped_train_oof_shortcut_conditioned_macro_"
-        "component_equal_average_precision"
+        raise ValueError("Step7-v3.1 source output universe drift")
+    if any(
+        not str(value).startswith(root + "/")
+        for key, value in outputs.items()
+        if key != "root"
     ):
-        raise ValueError("Step7-v3 grouped OOF L2-selection contract changed")
-    l2_grid = [float(value) for value in training["l2_grid"]]
-    if not l2_grid or len(l2_grid) != len(set(l2_grid)) or any(
-        not math.isfinite(value) or value <= 0.0 for value in l2_grid
-    ):
-        raise ValueError("Step7-v3 L2 grid is invalid")
-    if int(training["fold_count"]) < 2 or int(training["max_iter"]) <= 0 or float(
-        training["tolerance"]
-    ) <= 0.0:
-        raise ValueError("Step7-v3 optimizer/fold contract is invalid")
-    if training["primary_sample_weight"] != "component_equal_normalized_to_row_count":
-        raise ValueError("Step7-v3 primary component-weighting contract changed")
-    if training["sensitivity_sample_weight"] != "uniform":
-        raise ValueError("Step7-v3 sensitivity-weighting contract changed")
-    if training["threshold_reference"] != "train_oof_predictions_only":
-        raise ValueError("Step7-v3 threshold must be selected from train OOF only")
-    if training["threshold_metric"] != (
-        "weighted_balanced_accuracy_using_weighting_mode"
-    ):
-        raise ValueError("Step7-v3 weighted OOF threshold contract changed")
-    if training["evidence_type_used_as_training_feature"]:
-        raise ValueError("Step7-v3 evidence type cannot be a model feature")
-    if training["evidence_type_used_as_training_weight"]:
-        raise ValueError("Step7-v3 evidence type cannot weight training")
-    if training.get("evidence_type_used_for_validation_safety_guards") is not True:
-        raise ValueError(
-            "Step7-v3 evidence-type validation safety guards must remain explicit"
-        )
-    if training.get("evidence_type_used_for_reporting_slices") is not True:
-        raise ValueError("Step7-v3 evidence-type reporting slices must remain explicit")
-    if policy["result_scope"]["prospective_claim_allowed"]:
-        raise ValueError("Step7-v3 historical test cannot support a prospective claim")
-    evaluation = policy["evaluation"]
-    replay_tolerance = evaluation.get("embedding_score_replay_absolute_tolerance")
-    if (
-        not isinstance(replay_tolerance, (int, float))
-        or not math.isfinite(float(replay_tolerance))
-        or not 0.0 < float(replay_tolerance) <= 1e-5
-    ):
-        raise ValueError("Step7-v3 embedding-score replay tolerance is invalid")
-    if evaluation.get("primary_selection_metric") != (
-        "shortcut_conditioned_macro_component_equal_average_precision"
-    ):
-        raise ValueError("Step7-v3 shortcut-conditioned primary selection changed")
-    shortcut_metric = evaluation.get("shortcut_conditioned_primary_metric", {})
-    expected_estimable_strata = [
-        "same_market=0|same_source=1",
-        "same_market=1|same_source=1",
-    ]
-    if shortcut_metric != {
-        "stratum_fields": ["same_market_bool", "same_source_dataset_bool"],
-        "within_stratum_weighting": "component_equal_normalized_to_row_count",
-        "across_estimable_strata_weighting": "equal",
-        "estimable_stratum_requires_both_labels": True,
-        "minimum_estimable_strata": 2,
-        "expected_train_estimable_strata": expected_estimable_strata,
-        "expected_valid_estimable_strata": expected_estimable_strata,
-        "single_class_strata": "reported_but_excluded_from_average_precision_macro",
-        "purpose": (
-            "prevent_between_market_or_source_label_prevalence_from_selecting_"
-            "an_encoder_or_pipeline"
-        ),
+        raise ValueError("Step7-v3.1 source output escapes versioned root")
+    expected_artifacts = policy["expected_artifacts"]
+    if set(expected_artifacts) != {
+        "pair_manifest",
+        "field_corpus",
+        "train_feature_reference",
+        "safe_pair_features",
+        "train_labels",
+        "valid_labels",
     }:
-        raise ValueError("Step7-v3 shortcut-conditioned metric contract changed")
-    if evaluation.get("component_equal_validation_average_precision") != (
-        "mandatory_secondary_rank_consistency_and_reporting"
-    ) or evaluation.get("global_component_equal_average_precision_role") != (
-        "mandatory_secondary_rank_consistency_and_reporting"
-    ):
-        raise ValueError("Step7-v3 global component-equal sensitivity changed")
-    if evaluation.get("row_average_precision_role") != (
-        "mandatory_tertiary_rank_consistency_and_reporting"
-    ):
-        raise ValueError("Step7-v3 row-AP sensitivity contract changed")
-    if evaluation.get("shortcut_feature_label_association_audit_required") is not True:
-        raise ValueError("Step7-v3 shortcut label-association audit is required")
-    unique_rule = policy["selection_rule"]["unique_winner_requires_all"]
-    if float(
-        unique_rule.get(
-            "valid_shortcut_conditioned_macro_component_equal_average_precision_"
-            "delta_vs_runner_up_at_least",
-            -1.0,
-        )
-    ) < 0.0:
-        raise ValueError("Step7-v3 component-equal winner margin is invalid")
-    bootstrap = evaluation["bootstrap"]
-    if (
-        bootstrap["group"] != "recomputed_component_id"
-        or int(bootstrap["resamples"]) < 100
-        or not 0.0 < float(bootstrap["confidence"]) < 1.0
-    ):
-        raise ValueError("Step7-v3 grouped-bootstrap contract is invalid")
-    selection = policy["selection_rule"]
-    encoder_selection = selection.get("encoder_selection", {})
-    if encoder_selection != {
-        "eligible_tier": "encoder_only",
-        "score_source": "raw_frozen_encoder_cosine_without_fitted_head",
-        "fitted_head_used_for_encoder_ranking": False,
-        "tie_action": "carry_top_two_encoder_only_candidates_without_continuity_privilege",
-    }:
-        raise ValueError("Step7-v3 encoder-only selection contract changed")
-    attribution = selection.get("pipeline_attribution", {})
-    expected_matched = {
-        "encoder_only": "control__intercept_only",
-        "encoder_plus_transfer": "control__transfer_features_only",
-        "encoder_plus_shared_reranker": "control__shared_reranker_only",
-        "encoder_plus_transfer_plus_shared_reranker": (
-            "control__transfer_features_plus_shared_reranker"
-        ),
-    }
-    if attribution.get("matched_no_encoder_control_by_tier") != expected_matched:
-        raise ValueError("Step7-v3 matched no-encoder attribution contract changed")
-    if float(
-        attribution.get("encoder_increment_shortcut_conditioned_ap_at_least", -1.0)
-    ) < 0.0:
-        raise ValueError("Step7-v3 encoder-increment margin is invalid")
-    if attribution.get("no_unique_winner_action") != (
-        "carry_top_two_encoder_pipeline_candidates_without_e5_privilege"
-    ):
-        raise ValueError("Step7-v3 pipeline carry-forward contract changed")
-    if attribution.get("no_attributable_encoder_winner_action") != (
-        "carry_top_two_encoder_pipeline_candidates_without_e5_privilege_"
-        "and_mark_encoder_attribution_failed"
-    ):
-        raise ValueError("Step7-v3 encoder-attribution failure action changed")
-    if selection.get("continuity_encoder_role") != (
-        "report_only_never_changes_encoder_or_pipeline_ranking_or_carry_forward"
-    ):
-        raise ValueError("Step7-v3 E5 continuity control may affect selection")
+        raise ValueError("Step7-v3.1 expected artifact universe drift")
+    for role, record in expected_artifacts.items():
+        if set(record) != {"sha256", "size_bytes"}:
+            raise ValueError(f"Step7-v3.1 expected artifact schema drift: {role}")
+        if not re.fullmatch(r"[0-9a-f]{64}", str(record["sha256"])):
+            raise ValueError(f"Step7-v3.1 expected artifact hash drift: {role}")
+        if int(record["size_bytes"]) <= 0:
+            raise ValueError(f"Step7-v3.1 expected artifact size drift: {role}")
 
 
 def validate_input_hashes(
@@ -3344,6 +2985,49 @@ def validate_clean_corpus_rows(rows: list[dict]) -> None:
             raise ValueError("Step7-v3 clean corpus per-seller text hash drift")
 
 
+def validate_field_corpus_rows(policy: dict, rows: list[dict]) -> None:
+    expected = policy["clean_text_contract"]["expected_field_corpus"]
+    fields = policy["clean_text_contract"]["fields_in_order"]
+    if len(rows) != int(expected["seller_count"]):
+        raise ValueError("Step7-v3.1 field corpus seller-count drift")
+    seller_uids = [str(row.get("seller_uid", "")) for row in rows]
+    if seller_uids != sorted(seller_uids) or len(seller_uids) != len(set(seller_uids)):
+        raise ValueError("Step7-v3.1 field corpus seller order/uniqueness drift")
+    nonempty_counts = {field: 0 for field in fields}
+    for row in rows:
+        if list(row) != [
+            "seller_uid",
+            "split_name",
+            "field_texts",
+            "field_text_sha256",
+            "model_text",
+            "model_text_sha256",
+        ]:
+            raise ValueError("Step7-v3.1 field corpus schema drift")
+        if row["split_name"] not in {"train", "valid", "test"}:
+            raise ValueError("Step7-v3.1 field corpus split drift")
+        if list(row["field_texts"]) != fields or list(row["field_text_sha256"]) != fields:
+            raise ValueError("Step7-v3.1 field corpus field order drift")
+        for field in fields:
+            value = row["field_texts"][field]
+            if not isinstance(value, str) or row["field_text_sha256"][field] != sha256_text(value):
+                raise ValueError("Step7-v3.1 field text hash drift")
+            nonempty_counts[field] += int(bool(value))
+        reconstructed = "\n".join(
+            row["field_texts"][field]
+            for field in fields
+            if row["field_texts"][field]
+        ).strip()
+        if not reconstructed:
+            reconstructed = policy["clean_text_contract"]["empty_text_fallback"]
+        if reconstructed != row["model_text"]:
+            raise ValueError("Step7-v3.1 field corpus reconstruction drift")
+        if row["model_text_sha256"] != sha256_text(row["model_text"]):
+            raise ValueError("Step7-v3.1 field corpus model-text hash drift")
+    if nonempty_counts != expected["nonempty_field_seller_counts"]:
+        raise ValueError("Step7-v3.1 field corpus nonempty-field count drift")
+
+
 def validate_safe_pair_feature_rows(rows: list[dict]) -> None:
     expected_schema = ["pair_uid", *SAFE_FEATURE_NAMES]
     if not rows or list(rows[0]) != expected_schema:
@@ -3471,39 +3155,6 @@ def validate_sentence_transformer_layout(model_key: str, cfg: dict) -> dict:
     }
 
 
-def validate_reranker_layout(model_key: str, cfg: dict) -> dict:
-    model_dir = resolve(cfg["local_path"])
-    config_path = model_dir / "config.json"
-    if not config_path.is_file():
-        raise FileNotFoundError(f"Step7-v3 reranker config is missing: {model_dir}")
-    config = load_json(config_path)
-    auto_map = config.get("auto_map", {})
-    if int(config.get("num_labels", 0)) != 1:
-        raise ValueError("Step7-v3 reranker must expose one relevance logit")
-    if not str(auto_map.get("AutoModelForSequenceClassification", "")).strip():
-        raise ValueError("Step7-v3 reranker custom sequence-classification mapping is missing")
-    if not bool(cfg.get("trust_remote_code")):
-        raise ValueError("Step7-v3 pinned custom reranker requires trusted local model code")
-    weight_files = [
-        path
-        for name in ("model.safetensors", "pytorch_model.bin")
-        for path in model_dir.rglob(name)
-        if path.is_file() and path.stat().st_size > 1024 * 1024
-    ]
-    if not weight_files:
-        raise FileNotFoundError(f"Step7-v3 reranker weights are missing: {model_dir}")
-    for weight_file in weight_files:
-        validate_weight_payload(weight_file)
-    return {
-        "model_key": model_key,
-        "local_path": str(model_dir.relative_to(ROOT)).replace("\\", "/"),
-        "architecture": list(config.get("architectures", [])),
-        "num_labels": int(config["num_labels"]),
-        "auto_sequence_classification": auto_map[
-            "AutoModelForSequenceClassification"
-        ],
-        "model_config_sha256": sha256_file(config_path),
-    }
 
 
 def directory_inventory_fingerprint(path: Path) -> dict:
