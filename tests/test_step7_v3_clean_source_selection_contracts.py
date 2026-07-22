@@ -25,6 +25,7 @@ if str(SCRIPTS) not in sys.path:
 
 import step7_v3_common as common  # noqa: E402
 import step7_v3_encode_clean_models as encode  # noqa: E402
+import step7_v3_materialize_gpu_workspace as stage_gpu  # noqa: E402
 import step7_v3_prepare_clean_data as prepare  # noqa: E402
 import step7_v3_select_source_model as select  # noqa: E402
 
@@ -98,6 +99,9 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
             self.file_record(ROOT / "scripts" / "step3_build_seller_profiles.py"),
             self.file_record(ROOT / "scripts" / "step7_v3_common.py"),
             self.file_record(ROOT / "scripts" / "step7_v3_build_sync_manifest.py"),
+            self.file_record(
+                ROOT / "scripts" / "step7_v3_materialize_gpu_workspace.py"
+            ),
             self.file_record(encoder_path),
             self.file_record(
                 ROOT / "scripts" / "run_step7_v3_clean_source_linux_20260722.sh"
@@ -1637,6 +1641,120 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
             "evidence_type",
         ):
             self.assertNotIn(forbidden, source)
+
+    def test_gpu_workspace_materializer_copies_only_allowlist_and_hardlinks_models(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix=".step7_v3_stage_contract_", dir=ROOT / "reports"
+        ) as temporary:
+            base = Path(temporary)
+            source_root = base / "source"
+            workspace = base / "workspace"
+            allowed = source_root / "scripts" / "allowed.py"
+            forbidden = source_root / "reports" / "private_labels.csv"
+            model_file = source_root / "models" / "tiny" / "model.bin"
+            for path, payload in (
+                (allowed, b"allowed\n"),
+                (forbidden, b"private\n"),
+                (model_file, b"model\n"),
+            ):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(payload)
+
+            record = {
+                "path": "scripts/allowed.py",
+                "size_bytes": allowed.stat().st_size,
+                "sha256": common.sha256_file(allowed),
+            }
+            manifest = {
+                "files": [record],
+                "model_directories": {"tiny": {"path": "models/tiny"}},
+                "forbidden_workspace_paths": ["reports/private_labels.csv"],
+            }
+            result = stage_gpu.materialize_workspace(
+                source_root, workspace, manifest
+            )
+            self.assertEqual(result["status"], "pass")
+            self.assertEqual((workspace / "scripts" / "allowed.py").read_bytes(), b"allowed\n")
+            staged_model = workspace / "models" / "tiny" / "model.bin"
+            self.assertEqual(staged_model.read_bytes(), b"model\n")
+            self.assertEqual(os.stat(model_file).st_ino, os.stat(staged_model).st_ino)
+            self.assertFalse((workspace / "reports" / "private_labels.csv").exists())
+
+    def test_gpu_workspace_collector_accepts_only_complete_verified_bundle(self) -> None:
+        with tempfile.TemporaryDirectory(
+            prefix=".step7_v3_collect_contract_", dir=ROOT / "reports"
+        ) as temporary:
+            base = Path(temporary)
+            source_root = base / "source"
+            workspace = base / "workspace"
+            sync_path = source_root / "reports" / "sync.json"
+            sync_path.parent.mkdir(parents=True, exist_ok=True)
+            sync_path.write_bytes(b"{}\n")
+            sync_record = {
+                "path": "reports/sync.json",
+                "size_bytes": sync_path.stat().st_size,
+                "sha256": common.sha256_file(sync_path),
+            }
+            manifest = {
+                "files": [sync_record],
+                "model_directories": {},
+                "forbidden_workspace_paths": ["reports/private_labels.csv"],
+                "expected_gpu_outputs_to_sync_back": [
+                    "reports/out.bin",
+                    "reports/gpu_output.json",
+                ],
+            }
+            stage_gpu.materialize_workspace(source_root, workspace, manifest)
+            output = workspace / "reports" / "out.bin"
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_bytes(b"gpu-result\n")
+            output_record = {
+                "path": "reports/out.bin",
+                "size_bytes": output.stat().st_size,
+                "sha256": common.sha256_file(output),
+            }
+            bundle_path = workspace / "reports" / "gpu_output.json"
+            bundle_path.write_text(
+                json.dumps(
+                    {
+                        "step": "step7_v3_label_free_gpu_output_bundle",
+                        "version": "test-version",
+                        "gpu_sync_manifest_sha256": common.sha256_file(
+                            workspace / "reports" / "sync.json"
+                        ),
+                        "label_or_raw_source_files_present_in_gpu_workspace": False,
+                        "file_count": 1,
+                        "total_file_bytes": output_record["size_bytes"],
+                        "files": [output_record],
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            policy = {
+                "version": "test-version",
+                "outputs": {
+                    "gpu_sync_manifest": "reports/sync.json",
+                    "gpu_output_manifest": "reports/gpu_output.json",
+                },
+            }
+            result = stage_gpu.collect_outputs(
+                source_root, workspace, policy, manifest
+            )
+            self.assertEqual(result["copied_output_file_count"], 2)
+            self.assertEqual((source_root / "reports" / "out.bin").read_bytes(), b"gpu-result\n")
+            self.assertTrue((source_root / "reports" / "gpu_output.json").is_file())
+
+    def test_linux_runner_automatically_enters_a_label_free_workspace(self) -> None:
+        runner = (ROOT / "scripts" / "run_step7_v3_clean_source_linux_20260722.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("step7_v3_materialize_gpu_workspace.py", runner)
+        self.assertIn("STEP7_V3_ISOLATED_WORKSPACE=1", runner)
+        self.assertIn("collect --workspace", runner)
 
     def test_candidate_matrix_separates_encoder_pipeline_and_shortcut_roles(self) -> None:
         specs = select.candidate_specs(self.policy)

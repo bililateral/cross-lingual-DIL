@@ -980,6 +980,7 @@ def verify_runtime_provenance(policy: dict) -> dict:
         "scripts/step3_build_seller_profiles.py",
         "scripts/step7_v3_common.py",
         "scripts/step7_v3_build_sync_manifest.py",
+        "scripts/step7_v3_materialize_gpu_workspace.py",
         "scripts/run_step7_v3_clean_source_linux_20260722.sh",
         outputs["pair_manifest"],
         outputs["clean_corpus"],

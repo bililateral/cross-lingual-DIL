@@ -114,7 +114,9 @@ def verify_label_free_gpu_sync(policy: dict, policy_path: Path) -> tuple[dict, d
     if present_forbidden:
         raise ValueError(
             "Step7-v3 formal GPU workspace is not label/raw-source isolated: "
-            f"{present_forbidden[0]}"
+            f"{present_forbidden[0]}. Run "
+            "bash scripts/run_step7_v3_clean_source_linux_20260722.sh from the "
+            "source repository; the runner creates the isolated workspace."
         )
     model_fingerprints = {}
     for model_key, cfg in {

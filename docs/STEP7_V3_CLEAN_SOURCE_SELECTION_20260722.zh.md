@@ -51,10 +51,14 @@ python scripts\step7_v3_prepare_clean_data.py --stage historical-test-labels --a
 python scripts\step7_v3_build_sync_manifest.py
 ```
 
-Linux GPU 只同步无标签清单规定的文件并运行：
+Linux 完整仓库可以保留标签和原始文件，但不得直接运行编码脚本。启动器会在仓库同一文件系统旁自动新建临时工作区，只复制无标签清单规定的文件，并用硬链接复用已经校验的模型权重；正式编码只在该隔离目录中执行。完成后，启动器只把 GPU 输出清单中逐文件校验通过的结果复制回完整仓库，隔离目录保留用于审计。
+
+因此在 Linux 完整仓库中仍然只需运行：
 
 ```bash
 bash scripts/run_step7_v3_clean_source_linux_20260722.sh
 ```
+
+不要直接执行 `step7_v3_encode_clean_models.py`；该脚本发现完整仓库中的标签或原始文件时会按设计停止。
 
 分数同步回 Windows 后，先执行 `--stage select` 冻结选择，再显式确认后执行 `--stage test`。正式结果必须同时报告原始编码器排名、20 个管线、四个归因对照、捷径审计以及所有未通过门槛。
