@@ -53,6 +53,10 @@ if [[ "${STEP7_V3_ISOLATED_WORKSPACE:-0}" != "1" ]]; then
   exit 0
 fi
 
+"${PYTHON_BIN}" scripts/step7_v3_build_sync_manifest.py \
+  --policy "${POLICY}" \
+  --validate-only
+
 "${PYTHON_BIN}" scripts/step7_v3_encode_clean_models.py \
   --policy "${POLICY}" \
   --validate-config-only

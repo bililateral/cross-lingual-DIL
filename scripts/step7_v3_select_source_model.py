@@ -12,6 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
+import step7_v3_build_sync_manifest as sync_builder
 import step7_v3_common as common
 
 
@@ -975,18 +976,9 @@ def verify_runtime_provenance(policy: dict) -> dict:
         raise ValueError("Step7-v3 GPU sync builder script drift")
     for record in sync.get("files", []):
         verify_file_record(record, "GPU-sync")
-    required_sync_paths = {
-        str(public_policy_path.relative_to(common.ROOT)).replace("\\", "/"),
-        "scripts/step3_build_seller_profiles.py",
-        "scripts/step7_v3_common.py",
-        "scripts/step7_v3_build_sync_manifest.py",
-        "scripts/step7_v3_materialize_gpu_workspace.py",
-        "scripts/run_step7_v3_clean_source_linux_20260722.sh",
-        outputs["pair_manifest"],
-        outputs["clean_corpus"],
-        outputs["preparation_manifest"],
-        "scripts/step7_v3_encode_clean_models.py",
-    }
+    required_sync_paths = set(
+        sync_builder.gpu_payload_paths(policy, public_policy_path)
+    )
     observed_sync_paths = {record["path"] for record in sync.get("files", [])}
     if observed_sync_paths != required_sync_paths or len(sync.get("files", [])) != len(
         required_sync_paths

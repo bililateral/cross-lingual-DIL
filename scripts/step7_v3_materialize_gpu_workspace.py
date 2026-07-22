@@ -90,7 +90,7 @@ def hardlink_model_tree(source: Path, destination: Path) -> int:
 
 
 def materialize_workspace(
-    source_root: Path, destination: Path, manifest: dict
+    source_root: Path, destination: Path, policy: dict, manifest: dict
 ) -> dict:
     source_root = source_root.resolve()
     destination = destination.resolve()
@@ -115,6 +115,30 @@ def materialize_workspace(
         verify_record(destination, record, "staged payload file")
         copied_files.append(record["path"])
 
+    # The sync manifest cannot list itself in ``manifest["files"]`` because
+    # doing so would make its hash recursively self-referential.  It is still
+    # a required runtime input: the isolated encoder replays this exact
+    # contract before touching any model.  Stage it explicitly and verify
+    # byte-for-byte identity with the already validated source contract.
+    sync_manifest_relative = policy["outputs"]["gpu_sync_manifest"]
+    if sync_manifest_relative in copied_files:
+        raise ValueError(
+            "Step7-v3 GPU sync manifest must be staged explicitly, not listed "
+            "inside its own payload"
+        )
+    source_sync_manifest = safe_relative_path(source_root, sync_manifest_relative)
+    if not source_sync_manifest.is_file():
+        raise FileNotFoundError(
+            f"Step7-v3 source GPU sync manifest is missing: {source_sync_manifest}"
+        )
+    if common.load_json(source_sync_manifest) != manifest:
+        raise ValueError("Step7-v3 source GPU sync manifest changed during staging")
+    staged_sync_manifest = safe_relative_path(destination, sync_manifest_relative)
+    staged_sync_manifest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source_sync_manifest, staged_sync_manifest)
+    if staged_sync_manifest.read_bytes() != source_sync_manifest.read_bytes():
+        raise ValueError("Step7-v3 staged GPU sync manifest byte drift")
+
     model_file_count = 0
     for model_key, record in manifest.get("model_directories", {}).items():
         source_path = safe_relative_path(source_root, record["path"])
@@ -131,6 +155,8 @@ def materialize_workspace(
         "source_root": str(source_root),
         "workspace": str(destination),
         "copied_payload_file_count": len(copied_files),
+        "staged_sync_manifest": sync_manifest_relative,
+        "staged_sync_manifest_sha256": common.sha256_file(staged_sync_manifest),
         "hardlinked_model_file_count": model_file_count,
         "forbidden_paths_present": False,
     }
@@ -251,7 +277,7 @@ def main() -> None:
     policy, manifest = load_current_contract()
     if args.operation == "stage":
         result = materialize_workspace(
-            common.ROOT, Path(args.destination), manifest
+            common.ROOT, Path(args.destination), policy, manifest
         )
     else:
         result = collect_outputs(

@@ -13,9 +13,17 @@ import step7_v3_common as common
 SYNC_SCRIPT = Path(__file__).resolve()
 
 
+PUBLIC_PREPARATION_CODE_HASHES = {
+    "generator_script_sha256": "scripts/step7_v3_prepare_clean_data.py",
+    "common_script_sha256": "scripts/step7_v3_common.py",
+    "redaction_dependency_script_sha256": "scripts/step3_build_seller_profiles.py",
+}
+
+
 GPU_CODE_PATHS = [
     "scripts/step3_build_seller_profiles.py",
     "scripts/step7_v3_common.py",
+    "scripts/step7_v3_prepare_clean_data.py",
     "scripts/step7_v3_build_sync_manifest.py",
     "scripts/step7_v3_materialize_gpu_workspace.py",
     "scripts/step7_v3_encode_clean_models.py",
@@ -38,6 +46,17 @@ def file_record(path_value: str) -> dict:
     }
 
 
+def gpu_payload_paths(policy: dict, policy_path: Path) -> list[str]:
+    outputs = policy["outputs"]
+    return [
+        relative(policy_path),
+        *GPU_CODE_PATHS,
+        outputs["pair_manifest"],
+        outputs["clean_corpus"],
+        outputs["preparation_manifest"],
+    ]
+
+
 def build_payload(policy: dict, policy_path) -> dict:
     outputs = policy["outputs"]
     public_manifest_path = common.resolve(outputs["preparation_manifest"])
@@ -53,15 +72,10 @@ def build_payload(policy: dict, policy_path) -> dict:
     ) is not False:
         raise ValueError("Step7-v3 public shortcut feature roles are stale or unsafe")
     required_public_hashes = {
-        "generator_script_sha256": common.sha256_file(
-            common.resolve("scripts/step7_v3_prepare_clean_data.py")
-        ),
-        "common_script_sha256": common.sha256_file(
-            common.resolve("scripts/step7_v3_common.py")
-        ),
-        "redaction_dependency_script_sha256": common.sha256_file(
-            common.resolve("scripts/step3_build_seller_profiles.py")
-        ),
+        **{
+            field: common.sha256_file(common.resolve(path))
+            for field, path in PUBLIC_PREPARATION_CODE_HASHES.items()
+        },
         "policy_sha256": common.sha256_file(policy_path),
     }
     for field, expected in required_public_hashes.items():
@@ -86,14 +100,7 @@ def build_payload(policy: dict, policy_path) -> dict:
         ):
             raise ValueError(f"Step7-v3 public preparation artifact drift: {key}")
 
-    data_paths = [
-        outputs["pair_manifest"],
-        outputs["clean_corpus"],
-        outputs["preparation_manifest"],
-    ]
-    policy_relative = relative(policy_path)
-    code_paths = [policy_relative, *GPU_CODE_PATHS]
-    files = [file_record(path) for path in [*code_paths, *data_paths]]
+    files = [file_record(path) for path in gpu_payload_paths(policy, policy_path)]
     file_paths = {record["path"] for record in files}
     forbidden_paths = sorted(
         {

@@ -24,6 +24,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 import step7_v3_common as common  # noqa: E402
+import step7_v3_build_sync_manifest as sync_builder  # noqa: E402
 import step7_v3_encode_clean_models as encode  # noqa: E402
 import step7_v3_materialize_gpu_workspace as stage_gpu  # noqa: E402
 import step7_v3_prepare_clean_data as prepare  # noqa: E402
@@ -98,6 +99,7 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
             self.file_record(common.DEFAULT_POLICY),
             self.file_record(ROOT / "scripts" / "step3_build_seller_profiles.py"),
             self.file_record(ROOT / "scripts" / "step7_v3_common.py"),
+            self.file_record(ROOT / "scripts" / "step7_v3_prepare_clean_data.py"),
             self.file_record(ROOT / "scripts" / "step7_v3_build_sync_manifest.py"),
             self.file_record(
                 ROOT / "scripts" / "step7_v3_materialize_gpu_workspace.py"
@@ -1652,6 +1654,8 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
             source_root = base / "source"
             workspace = base / "workspace"
             allowed = source_root / "scripts" / "allowed.py"
+            policy_path = source_root / "schema" / "policy.json"
+            sync_path = source_root / "reports" / "sync.json"
             forbidden = source_root / "reports" / "private_labels.csv"
             model_file = source_root / "models" / "tiny" / "model.bin"
             for path, payload in (
@@ -1662,25 +1666,83 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(payload)
 
-            record = {
-                "path": "scripts/allowed.py",
-                "size_bytes": allowed.stat().st_size,
-                "sha256": common.sha256_file(allowed),
+            policy = {
+                "version": "test-version",
+                "outputs": {"gpu_sync_manifest": "reports/sync.json"},
+                "embedding_models": {},
+                "shared_reranker": {
+                    "model_key": "tiny",
+                    "local_path": "models/tiny",
+                },
+            }
+            policy_path.parent.mkdir(parents=True, exist_ok=True)
+            policy_path.write_text(
+                json.dumps(policy, indent=2) + "\n", encoding="utf-8"
+            )
+            records = []
+            for relative_path, path in (
+                ("scripts/allowed.py", allowed),
+                ("schema/policy.json", policy_path),
+            ):
+                records.append(
+                    {
+                        "path": relative_path,
+                        "size_bytes": path.stat().st_size,
+                        "sha256": common.sha256_file(path),
+                    }
+                )
+            model_fingerprint = {
+                "file_count": 1,
+                "total_size_bytes": model_file.stat().st_size,
+                "content_sha256": "test-model-fingerprint",
+                "files": [
+                    {
+                        "path": "model.bin",
+                        "size_bytes": model_file.stat().st_size,
+                        "sha256": common.sha256_file(model_file),
+                    }
+                ],
             }
             manifest = {
-                "files": [record],
-                "model_directories": {"tiny": {"path": "models/tiny"}},
+                "step": "step7_v3_label_free_windows_to_linux_gpu_sync",
+                "version": policy["version"],
+                "policy_sha256": common.sha256_file(policy_path),
+                "policy_contract_sha256": common.canonical_hash(policy),
+                "label_files_included": False,
+                "raw_source_files_included": False,
+                "files": records,
+                "model_directories": {
+                    "tiny": {"path": "models/tiny", **model_fingerprint}
+                },
                 "forbidden_workspace_paths": ["reports/private_labels.csv"],
             }
+            sync_path.parent.mkdir(parents=True, exist_ok=True)
+            sync_path.write_text(
+                json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+            )
             result = stage_gpu.materialize_workspace(
-                source_root, workspace, manifest
+                source_root, workspace, policy, manifest
             )
             self.assertEqual(result["status"], "pass")
             self.assertEqual((workspace / "scripts" / "allowed.py").read_bytes(), b"allowed\n")
+            self.assertEqual(
+                (workspace / "reports" / "sync.json").read_bytes(),
+                sync_path.read_bytes(),
+            )
             staged_model = workspace / "models" / "tiny" / "model.bin"
             self.assertEqual(staged_model.read_bytes(), b"model\n")
             self.assertEqual(os.stat(model_file).st_ino, os.stat(staged_model).st_ino)
             self.assertFalse((workspace / "reports" / "private_labels.csv").exists())
+            with mock.patch.object(common, "ROOT", workspace), mock.patch.object(
+                common,
+                "validate_model_content_pin",
+                return_value=model_fingerprint,
+            ):
+                replayed, replayed_models = encode.verify_label_free_gpu_sync(
+                    policy, workspace / "schema" / "policy.json"
+                )
+            self.assertEqual(replayed, manifest)
+            self.assertEqual(replayed_models, {"tiny": model_fingerprint})
 
     def test_gpu_workspace_collector_accepts_only_complete_verified_bundle(self) -> None:
         with tempfile.TemporaryDirectory(
@@ -1689,16 +1751,18 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
             base = Path(temporary)
             source_root = base / "source"
             workspace = base / "workspace"
+            allowed = source_root / "scripts" / "input.py"
+            allowed.parent.mkdir(parents=True, exist_ok=True)
+            allowed.write_bytes(b"input\n")
             sync_path = source_root / "reports" / "sync.json"
             sync_path.parent.mkdir(parents=True, exist_ok=True)
-            sync_path.write_bytes(b"{}\n")
-            sync_record = {
-                "path": "reports/sync.json",
-                "size_bytes": sync_path.stat().st_size,
-                "sha256": common.sha256_file(sync_path),
+            input_record = {
+                "path": "scripts/input.py",
+                "size_bytes": allowed.stat().st_size,
+                "sha256": common.sha256_file(allowed),
             }
             manifest = {
-                "files": [sync_record],
+                "files": [input_record],
                 "model_directories": {},
                 "forbidden_workspace_paths": ["reports/private_labels.csv"],
                 "expected_gpu_outputs_to_sync_back": [
@@ -1706,7 +1770,19 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
                     "reports/gpu_output.json",
                 ],
             }
-            stage_gpu.materialize_workspace(source_root, workspace, manifest)
+            policy = {
+                "version": "test-version",
+                "outputs": {
+                    "gpu_sync_manifest": "reports/sync.json",
+                    "gpu_output_manifest": "reports/gpu_output.json",
+                },
+            }
+            sync_path.write_text(
+                json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+            )
+            stage_gpu.materialize_workspace(
+                source_root, workspace, policy, manifest
+            )
             output = workspace / "reports" / "out.bin"
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_bytes(b"gpu-result\n")
@@ -1734,13 +1810,6 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
                 + "\n",
                 encoding="utf-8",
             )
-            policy = {
-                "version": "test-version",
-                "outputs": {
-                    "gpu_sync_manifest": "reports/sync.json",
-                    "gpu_output_manifest": "reports/gpu_output.json",
-                },
-            }
             result = stage_gpu.collect_outputs(
                 source_root, workspace, policy, manifest
             )
@@ -1754,7 +1823,16 @@ class Step7V3CleanSourceSelectionContracts(unittest.TestCase):
         )
         self.assertIn("step7_v3_materialize_gpu_workspace.py", runner)
         self.assertIn("STEP7_V3_ISOLATED_WORKSPACE=1", runner)
+        self.assertIn("step7_v3_build_sync_manifest.py", runner)
+        self.assertIn("--validate-only", runner)
         self.assertIn("collect --workspace", runner)
+
+    def test_gpu_sync_builder_stages_every_public_provenance_dependency(self) -> None:
+        self.assertTrue(
+            set(sync_builder.PUBLIC_PREPARATION_CODE_HASHES.values()).issubset(
+                set(sync_builder.GPU_CODE_PATHS)
+            )
+        )
 
     def test_candidate_matrix_separates_encoder_pipeline_and_shortcut_roles(self) -> None:
         specs = select.candidate_specs(self.policy)
