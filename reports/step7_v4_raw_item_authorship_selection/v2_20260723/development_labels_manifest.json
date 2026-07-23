@@ -1,0 +1,63 @@
+{
+  "step": "step7_v4_prepare_source_data_private_labels",
+  "version": "2026-07-23-step7-v4-raw-item-authorship-selection-v2",
+  "public_preparation_manifest_sha256": "8c401c60bf665244376a92ebc9438e7c081d245857696ba5960b2086c656eb95",
+  "label_inputs": {
+    "parent_train_labels": {
+      "path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.train.csv",
+      "size_bytes": 75106,
+      "sha256": "e7287dc5e4b50d356ba7242b208d325c890aa7a25c018eb049fc1207f174d0e8"
+    },
+    "parent_valid_labels": {
+      "path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.valid.csv",
+      "size_bytes": 28552,
+      "sha256": "51714da36aad7de2aeeb61d75eb700e35a7bea29ef6e7cb67db181a239342c44"
+    }
+  },
+  "selection_label_columns": [
+    "pair_uid",
+    "review_label",
+    "component_id"
+  ],
+  "diagnostic_evidence_columns": [
+    "pair_uid",
+    "evidence_type"
+  ],
+  "identity_rule_control_score_materialized": false,
+  "evidence_is_physically_separate_from_selection_labels": true,
+  "historical_test_labels_materialized": false,
+  "parent_fragment_quarantine_projection": {
+    "decision_basis": "label_free_exact_raw_workbook_structure_review",
+    "excluded_pair_uid_sha256": "3725a865b27fae6632cc0f4d58193b744b3c43ab9c3249b9a4ba9e1ede06d355",
+    "excluded_pair_count_by_split": {
+      "train": 0,
+      "valid": 1
+    },
+    "labels_or_evidence_types_used_to_choose_exclusion": false
+  },
+  "policy_sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327",
+  "producer_sha256": "f72cf8e0008636124a6168ed7203ddc2ef4ca5eea3bc94e66371565bb09860ae",
+  "outputs": {
+    "train_labels": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.train.csv",
+      "size_bytes": 63877,
+      "sha256": "319b243156bceeaf38dcdf31c1bef9efe31ccae52b43cee705d6ba2fdec03542"
+    },
+    "valid_labels": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.valid.csv",
+      "size_bytes": 23998,
+      "sha256": "f0bf67a26ae2aa4058c58e09f589d7adb0d8559b152e540a85267f90507d9548"
+    },
+    "train_evidence": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_evidence.train.csv",
+      "size_bytes": 53796,
+      "sha256": "c8f31d04db492ff5bd17abea7944bda32615280858a3be69cf726c6b7135acb5"
+    },
+    "valid_evidence": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_evidence.valid.csv",
+      "size_bytes": 19963,
+      "sha256": "f9bbda82715a45b060fedd968cdd1480149fa0c1a96535bf5a991ad1ee0f8449"
+    }
+  },
+  "manifest_content_sha256": "910585cfc8bda6672e9ed3955e149433dbc15b1c7555ea280483dd4be1fccad9"
+}

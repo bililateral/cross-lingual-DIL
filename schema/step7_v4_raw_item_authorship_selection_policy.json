@@ -1,0 +1,504 @@
+{
+  "version": "2026-07-23-step7-v4-raw-item-authorship-selection-v2",
+  "objective": "Select a provisional English same-controller M0 from complete identity-redacted raw item titles and descriptions using frozen multilingual style encoders, matched semantic controls, multiplicity-neutral two-level aggregation, and train-only nested component-grouped model selection.",
+  "result_scope": {
+    "english_train_role": "all_model_selection_hyperparameter_selection_threshold_selection_and_nested_oof_estimation",
+    "english_valid_role": "already_consumed_one_time_development_diagnostic_after_every_choice_is_frozen",
+    "english_test_role": "labels_remain_unopened",
+    "chinese_data_used": false,
+    "maximum_claim": "provisional_m0_requires_new_real_english_confirmation_before_formal_certification"
+  },
+  "implementation": {
+    "common": {"path": "scripts/step7_v4_common.py", "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334"},
+    "preparation": {"path": "scripts/step7_v4_prepare_source_data.py", "sha256": "f72cf8e0008636124a6168ed7203ddc2ef4ca5eea3bc94e66371565bb09860ae"},
+    "sync_builder": {"path": "scripts/step7_v4_build_sync_manifest.py", "sha256": "bc452cb3643ee0476b004e9715cb0a4ecba53971e5d54780beb9f42eeeaed1f4"},
+    "workspace_materializer": {"path": "scripts/step7_v4_materialize_gpu_workspace.py", "sha256": "04dd34bd6cf37e4a3e0750aafe7721ccac7c14601da89ad6c86b52e50c189f80"},
+    "encoder": {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc"},
+    "selector": {"path": "scripts/step7_v4_select_source_model.py", "sha256": "d68c9bc14ea32723e6cfb7b7095d47c214f64d7026d7228e681eae07ee9a50c6"},
+    "runner": {"path": "scripts/run_step7_v4_raw_item_authorship_linux_20260722.sh", "sha256": "f00cd944d54f8ee57f480b374e33cdf312f1e2df65c473c816a88841b568e5b5"},
+    "redaction_module": {"path": "scripts/step7_v3_1_source_data.py", "sha256": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734"},
+    "parent_preparation": {"path": "scripts/step7_v3_1_prepare_source_data.py", "sha256": "82c7c43974e1412e469aec25fddb8af537676b5e0675c70bef5e78d3bc9d2b9f"},
+    "selection_solver": {"path": "scripts/step7_v3_1_selection_core.py", "sha256": "950edefad9e0b970e49a3db65ae9fe8a8cb441801a7bc4f2c2a2ed5960e2e86f"}
+  },
+  "inputs": {
+    "parent_source_policy": {"path": "schema/step7_v3_1_source_data_policy.json", "sha256": "0b9f65b54a38c615bfc8ebe5b0b4757a87434f55535eb5fafec92148d7c55c67"},
+    "item_manifest": {"path": "reports/step2_content_item_manifest.csv", "sha256": "89307835c82683abe53561a56a39fb28419cbf46671d34463701d73179e3869f"},
+    "market_item_snapshot": {"path": "market_item.xlsx", "sha256": "3625a226974827a0441ec87c54688f85ed0ff93a1c4c687532ef550ec1640187"},
+    "agora_snapshot": {"path": "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx", "sha256": "2f32f4334fea63b7c7716b8fe7f3e5532e2f93de2e5c969e47319ed2429356d3"},
+    "parent_pair_manifest": {"path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/pair_manifest.no_labels.csv", "sha256": "15659adf5df594d7fa2bedabf16d25c14b7317eb809f3ac2ba1a595d96c58ddd"},
+    "parent_safe_features": {"path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/safe_pair_features.no_labels.csv", "sha256": "0185f9a5a877a59aa9e204a5469fb11cd879f2a556df53fe33ca6051ad64fe22"},
+    "parent_train_labels": {"path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.train.csv", "sha256": "e7287dc5e4b50d356ba7242b208d325c890aa7a25c018eb049fc1207f174d0e8"},
+    "parent_valid_labels": {"path": "reports/step7_v3_1_full_text_chunked_selection/v1_20260722/private_labels.valid.csv", "sha256": "51714da36aad7de2aeeb61d75eb700e35a7bea29ef6e7cb67db181a239342c44"}
+  },
+  "parent_fragment_quarantine": {
+    "reason": "two_agora_description_continuation_rows_were_misparsed_as_sellers_and_then_paired_with_each_other",
+    "decision_basis": "label_free_exact_raw_workbook_structure_review",
+    "expected_parent_pair_count": 734,
+    "excluded_pair_count": 1,
+    "pair_uid_sha256": "3725a865b27fae6632cc0f4d58193b744b3c43ab9c3249b9a4ba9e1ede06d355",
+    "split_name": "valid",
+    "component_id": "en_content_train_pool_cc_ee09961ca4b3cca6",
+    "seller_uid_sha256": [
+      "25de198c2c80833097e72ef523d4ff48a6f358124362d99ac2b65b699fa2d2f4",
+      "79775bd3d0b7bc6f5b72125502763a38168599b6209635ba7c63927ec4940efe"
+    ],
+    "must_be_an_isolated_component": true,
+    "raw_source_dataset": "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+    "raw_rows": [
+      {
+        "source_row_number": 55982,
+        "seller_uid_sha256": "79775bd3d0b7bc6f5b72125502763a38168599b6209635ba7c63927ec4940efe",
+        "item_uid_sha256": "c253948a73387f5de48949f04d8eec83366419efcb568fd4b957e4b0def3d754",
+        "canonical_cell_values_sha256": "96fb66bc98c5cc160f9a8acc9d2e1f643022677519809b7ded8eb7bdd2f82db3",
+        "cell_string_lengths": [73, 17, 11, 2, 6, 0, 0, 0, 0],
+        "structural_failure": "price_origin_destination_and_rating_shifted_into_category_title_description_and_price"
+      },
+      {
+        "source_row_number": 65447,
+        "seller_uid_sha256": "25de198c2c80833097e72ef523d4ff48a6f358124362d99ac2b65b699fa2d2f4",
+        "item_uid_sha256": "a80762ccece26b7f0bb899214bb21a5e572c30680c04d7c743f6ecbf514b3abf",
+        "canonical_cell_values_sha256": "41e30ef60cf24d9242d699d102b6e3668deba8245a6ed13e6e35e700036415b7",
+        "cell_string_lengths": [193, 22, 0, 0, 9, 0, 0, 0, 0],
+        "structural_failure": "description_continuation_and_price_shifted_into_vendor_and_category_with_empty_title_description"
+      }
+    ]
+  },
+  "supervision_boundary": {
+    "expected_counts": {
+      "train": {"positive": 116, "negative": 285, "total": 401},
+      "valid": {"positive": 42, "negative": 109, "total": 151},
+      "test": {"positive": 51, "negative": 130, "total": 181},
+      "total": 733
+    },
+    "expected_component_count_by_split": {"train": 229, "valid": 27, "test": 38},
+    "expected_seller_count_by_split": {"train": 582, "valid": 103, "test": 168},
+    "expected_total_unique_sellers": 853,
+    "historical_test_labels_may_be_materialized": false
+  },
+  "raw_item_boundary": {
+    "data_bucket": "en_content_train_pool",
+    "eligibility_status": "content_train_eligible",
+    "allowed_source_datasets": [
+      "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx",
+      "market_item.xlsx"
+    ],
+    "expected_selected_item_count": 109756,
+    "expected_selected_item_count_by_source": {
+      "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx": 53,
+      "market_item.xlsx": 109703
+    },
+    "required_fields": ["title", "description"],
+    "market_item_column_order": ["vendor", "ship_from", "title", "description", "price", "category", "market"],
+    "agora_column_order": ["vendor", "category", "title", "description", "price", "origin", "destination", "rating", "remarks"],
+    "market_item_exact_header": ["vendor", "ship_from", "title", "description", "price", "category", "market"],
+    "agora_exact_header": ["Vendor", " Category", " Item", " Item Description", " Price", " Origin", " Destination", " Rating", " Remarks"]
+  },
+  "clean_text_contract": {
+    "line_endings": "crlf_and_cr_to_lf_before_redaction",
+    "mojibake_repair": "first_decode_only_complete_valid_utf8_byte_sequences_stored_as_u0000_to_u00ff_then_map_remaining_defined_u0080_to_u009f_codepoints_through_windows_1252_undefined_or_other_controls_fail",
+    "horizontal_whitespace": "audited_redactor_collapses_spaces_and_tabs_but_preserves_line_boundaries",
+    "unicode_content_normalization": "none_except_internal_nfkc_identity_matching",
+    "identity_redaction": "step7_v3_1_fixed_snapshot_alias_contact_and_identity_rules_with_v4_non_cascading_line_boundary_guard",
+    "identity_match_evaluation": "single_non_cascading_sweep_on_normalized_original_text_then_merge_spans_and_redact",
+    "post_redaction_fuzzy_alias_audit": "exact_plural_and_identity_suffix_contextual_forms_fail_closed_but_one_character_omission_forms_are_censused_as_new_adjacency_collisions_not_identity_residue",
+    "one_character_omission_content_collision_handling": {
+      "review_basis": "fixed_english_raw_snapshot_content_collision_review_before_model_training_without_pair_labels_or_evidence_types",
+      "denied_surface_tokens": ["account", "discount", "dumpstrack", "exchange", "legitdocuments", "password", "premiumaccount", "without"],
+      "denied_surface_tokens_canonical_sha256": "1dc8a66f6775fe314f7bec1a62c52e93f9e298da48d85ac2358c8ec18bc1fc15",
+      "expected_removed_token_count": 8,
+      "source_alias_anchor_sha256s": [
+        "0ccd59b8e43fae9b61845f8599f1c5af625e20cffcb118073ce81d5a57b1b5ab",
+        "12bfec38cd64cf3306f9f5851f9230ccdade4da9be08179dc12b2eca18fb5e17",
+        "222538e7d221f2b86690e032b168ec0dd173c39139a80d3a17a62ab133a50c05",
+        "27de5b2e533ac922b80542ab6541d6945d94ed79bfe41812b19d0cfaab2217f4",
+        "3c9af8353bab07de1bb5fbdd92f2079175ecbddb154045318d3e9e93a158ff4d",
+        "9b0c4bc6ed5a9af90dd3e7e144b6e3bd433f553c304c571e240b9d21fa7e211c",
+        "bc62a3c14fec277e3dc6b504bf7c6348c2e421f8acc42032deddb0a96070f078",
+        "e159f5c593ac5008e71d1e02d41e7c36a259278d9021f6f50d1712ab276254dc"
+      ],
+      "expected_retained_surface_sha256_counts": {
+        "095316e0caab69dc1dd4c25dd45a1d023e167d0f7fe619a43cce183b8f57b21a": 1,
+        "198ce5aed16acd8b636f03583897c0d191b04a6b1b9a4417c4ecc2fe2af543d3": 693,
+        "472ac7a67824436a8f2775fb0275a0190a4339cca92310505c082be783d1cdd8": 159,
+        "b148feb9e21004b2a7b3022d2e1fb3d446b1d75f17e9b1ed3200ca5ddfe02815": 3,
+        "bda654e9758221eeb0714c42698498e92395e9db30ee9e5800bfb6df57854cbd": 4,
+        "d336353a78941fdc4814c401ff799c0577732f2748a8d326768586f037b3d86c": 4,
+        "d72bef4f7d65aab352d8ca83be79d6bcd4ad7390b4a58f66431f3c82c7899496": 13,
+        "e032d33a8540a59230472e69b7668980717390aac05b850b933170d5c43b1d38": 1,
+        "eae7f19d3685721c4e79cc986ffa2800c0417358dbda340d95c01cfe0bf23e49": 14
+      },
+      "expected_retained_match_occurrence_count": 892,
+      "labels_or_evidence_types_read": false
+    },
+    "fixed_final_audit_content_collision_handling": {
+      "review_basis": "fixed_english_clean_snapshot_manual_content_review_before_model_training_without_pair_labels_or_evidence_types",
+      "expected_match_count": 1,
+      "collisions": [
+        {
+          "rule_name": "audit_contact_cued_phone",
+          "seller_uid_sha256": "92ca1ee8e92b3339fef133ff5bc922ad6ebc6ea88f110169ed46dc1230c42ccb",
+          "clean_text_sha256": "807216a98c03cc69beb75f0a4e3b54158d4e6fd58821a98c50d35bd59f9967d8",
+          "matched_surface_sha256": "28fba5887a820a848b190fe3f38d8063a5d0790572125c838b91f67f6449a4af",
+          "expected_match_count": 1,
+          "reason": "numbered_tutorial_revision_and_next_entry_are_not_a_phone_identifier"
+        }
+      ],
+      "labels_or_evidence_types_read": false
+    },
+    "identity_bridge_evaluation": "only_mask_preexisting_seller_local_identity_spans_to_detect_audited_global_aliases_no_other_cascade",
+    "non_pgp_identity_matching_scope": "single_logical_line_except_two_fixed_split_plus_phone_rules_no_other_non_pgp_lf_or_cr_crossing",
+    "multiline_identity_redaction_rule_allowlist": [
+      "contact_cued_split_plus_phone",
+      "pgp_block",
+      "pgp_block_truncated_or_complete",
+      "pgp_fingerprint",
+      "split_plus_country_area_phone"
+    ],
+    "v4_additional_identity_rule_names": [
+      "repeated_email_domain_chain",
+      "contact_service_at_mixed_handle",
+      "contact_cued_split_plus_phone",
+      "split_plus_country_area_phone",
+      "market_identity_list_before_vendor_cue",
+      "google_voice_attached_phone",
+      "concatenated_whatsapp_phone_wickr_mixed_handle"
+    ],
+    "identity_registries": "all_pinned_english_profiles_and_safe_identity_signals_without_pair_labels_or_evidence_types",
+    "empty_item_fields": "omit_without_fallback",
+    "deduplication_key": "seller_uid_field_name_exact_clean_text",
+    "global_embedding_reuse_key": "exact_clean_text_sha256",
+    "source_rows_retained_in_lineage": true,
+    "multiplicity_is_model_feature": false,
+    "labels_or_evidence_types_may_change_corpus": false,
+    "minimum_aggregate_character_retention": 0.8,
+    "protected_content_retention_uses_parent_source_policy_gates": true,
+    "protected_content_occurrence_matching": "case_insensitive_exact_surface_with_ascii_alphanumeric_boundaries_excluding_pre_redaction_high_confidence_identity_spans",
+    "protected_content_retention_aggregation": "sum_per_source_item_field_occurrence_before_corpus_aggregation_no_cross_field_cancellation",
+    "seller_local_content_collision_handling": {
+      "collision_terms_source": "union_of_parent_protected_content_words_and_protected_identity_collision_terms",
+      "collision_compact_count": 22,
+      "collision_compact_registry_canonical_sha256": "f86bd9d31eb0194a72346bfbdf464d2fb93ebb97b6e988ffb8fbec12e7dd754e",
+      "expected_removed_from_global_contextual_registry_count": 5,
+      "expected_removed_from_global_contextual_registry_canonical_sha256": "a8ebf239aa12a21aef42042b62360b115f1941b6d9bc9aa0b692e1fd584f2ea7",
+      "unconditional_local_redaction_allowed": false,
+      "identity_context_gated_redaction_enabled": true,
+      "one_character_omission_matching_allowed": false,
+      "uncued_ambiguous_occurrences_are_retained_and_audited": true,
+      "expected_affected_seller_count": 11,
+      "expected_affected_seller_uid_to_tokens_canonical_sha256": "b256f7959f048a6f95d453a925ccb836d51d472b3701e0186361607ebb17e0b0"
+    }
+  },
+  "stylometry": {
+    "fields": ["title", "description"],
+    "seller_aggregation": "median_over_unique_clean_texts_multiplicity_neutral",
+    "pair_operation": "absolute_difference",
+    "statistics": [
+      "log1p_character_count",
+      "digit_character_ratio",
+      "punctuation_character_ratio",
+      "symbol_character_ratio",
+      "space_character_ratio",
+      "newline_per_100_characters",
+      "sentence_boundary_per_100_characters",
+      "bracket_character_ratio",
+      "delimiter_character_ratio",
+      "repeated_punctuation_character_ratio",
+      "bullet_line_share"
+    ],
+    "forbidden": [
+      "seller_item_count",
+      "seller_unique_text_count",
+      "source_multiplicity",
+      "market_identity",
+      "source_dataset_identity",
+      "language_or_script_identity",
+      "lexical_words_or_character_ngrams",
+      "category_or_price",
+      "missingness_indicator"
+    ]
+  },
+  "shared_chunking": {
+    "algorithm": "greedy_longest_nonempty_prefix_with_preferred_newline_whitespace_or_punctuation_boundary_and_character_fallback",
+    "token_budget_including_model_prefix_and_special_tokens": 256,
+    "all_four_tokenizers_must_fit_every_chunk": true,
+    "same_exact_chunk_text_and_order_for_every_encoder": true,
+    "exact_character_reconstruction_per_unique_text": true,
+    "overlap_characters": 0,
+    "maximum_chunks_per_text": null,
+    "sampling_or_dropping_allowed": false,
+    "chunk_counts_or_lengths_are_model_features": false
+  },
+  "embedding_models": {
+    "pcm_multilingual_authorship": {
+      "role": "primary_frozen_authorship_style_encoder",
+      "repo_id": "Blablablab/multilingual-style-representation",
+      "revision": "b0147bbf450424fe72c8525fcc02e2e39e3a4024",
+      "local_path": "models/step24/authorship/multilingual_style_representation",
+      "expected_dimension": 1024,
+      "batch_size": 8,
+      "native_max_seq_length": 512,
+      "text_prefix": "",
+      "sentence_transformer_prompt": "",
+      "expected_file_count": 13,
+      "expected_total_size_bytes": 2261765940,
+      "expected_content_sha256": "90b7b87f49de527078c9023308eb6186685221ffe1f4a3478a75ecfda817b413",
+      "feature_prefix": "raw_pcm"
+    },
+    "mstyledistance": {
+      "role": "frozen_content_independent_style_encoder",
+      "repo_id": "StyleDistance/mstyledistance",
+      "revision": "d66ed25e48225a503b21a65bc804caf06c886f96",
+      "local_path": "models/step24/authorship/mstyledistance",
+      "expected_dimension": 768,
+      "batch_size": 16,
+      "native_max_seq_length": 512,
+      "text_prefix": "",
+      "sentence_transformer_prompt": "",
+      "expected_file_count": 15,
+      "expected_total_size_bytes": 578278864,
+      "expected_content_sha256": "6671396e1cf27009b90584869e8a7d95ed3a055192edae897b478afd256fdb27",
+      "feature_prefix": "raw_mstyle"
+    },
+    "multilingual_e5_large": {
+      "role": "frozen_semantic_control",
+      "repo_id": "intfloat/multilingual-e5-large",
+      "revision": null,
+      "local_path": "models/step7/embeddings/multilingual_e5_large",
+      "expected_dimension": 1024,
+      "batch_size": 16,
+      "native_max_seq_length": 512,
+      "text_prefix": "query: ",
+      "sentence_transformer_prompt": "",
+      "expected_file_count": 9,
+      "expected_total_size_bytes": 2261765112,
+      "expected_content_sha256": "d1541dcd59047401678c3fa66d3793ffead9b46edacf29958e1a0848612be4f2",
+      "feature_prefix": "raw_e5"
+    },
+    "labse": {
+      "role": "frozen_semantic_control",
+      "repo_id": "sentence-transformers/LaBSE",
+      "revision": null,
+      "local_path": "models/step7/embeddings/labse",
+      "expected_dimension": 768,
+      "batch_size": 24,
+      "native_max_seq_length": 256,
+      "text_prefix": "",
+      "sentence_transformer_prompt": "",
+      "expected_file_count": 12,
+      "expected_total_size_bytes": 1900941462,
+      "expected_content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+      "feature_prefix": "raw_labse"
+    }
+  },
+  "aggregation": {
+    "chunk_to_unique_text": "l2_normalized_mean_of_unit_chunk_vectors_then_l2_normalize",
+    "unique_text_weighting_primary": "equal_weight_per_unique_clean_text",
+    "source_multiplicity_weighting": "audit_only_forbidden_from_model_selection",
+    "top_k_item_matches": 3,
+    "similarity_block_rows": 256,
+    "aggregate_suffixes": [
+      "field_equal_centroid_cosine",
+      "field_equal_symmetric_top3_cosine",
+      "title_centroid_cosine",
+      "title_symmetric_top3_cosine",
+      "description_centroid_cosine",
+      "description_symmetric_top3_cosine"
+    ],
+    "missing_field_value": "empty_csv_then_fold_training_median_imputation_without_indicator",
+    "serialized_decimal_places": 12
+  },
+  "gpu_execution": {
+    "random_seed": 20260722,
+    "required_sentence_transformers_version": "5.6.0",
+    "expected_runtime": {
+      "random_seed": 20260722,
+      "cublas_workspace_config": ":4096:8",
+      "tokenizers_parallelism": "false",
+      "deterministic_algorithms_enabled": true,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": true,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false
+    }
+  },
+  "feature_blocks": {
+    "legacy18": "parent_model_eligible_transfer_features_with_all_reference_statistics_refit_inside_each_training_fold",
+    "stylometry22": "two_fields_times_eleven_preregistered_pair_absolute_differences",
+    "pcm6": "six_fixed_raw_pcm_aggregates",
+    "mstyle6": "six_fixed_raw_mstyle_aggregates",
+    "e5_6": "six_fixed_raw_e5_aggregates",
+    "labse6": "six_fixed_raw_labse_aggregates"
+  },
+  "candidates": [
+    {"id": "control__intercept", "blocks": [], "role": "null_control"},
+    {"id": "control__legacy18", "blocks": ["legacy18"], "role": "strong_incumbent_control"},
+    {"id": "control__stylometry", "blocks": ["stylometry22"], "role": "matched_simple_style_control"},
+    {"id": "control__legacy_stylometry", "blocks": ["legacy18", "stylometry22"], "role": "matched_legacy_style_control"},
+    {"id": "encoder__e5", "blocks": ["e5_6"], "role": "semantic_encoder_control"},
+    {"id": "encoder__labse", "blocks": ["labse6"], "role": "semantic_encoder_control"},
+    {"id": "style__pcm", "blocks": ["pcm6"], "role": "style_encoder_candidate"},
+    {"id": "style__mstyle", "blocks": ["mstyle6"], "role": "style_encoder_candidate"},
+    {"id": "matched__e5_stylometry", "blocks": ["e5_6", "stylometry22"], "role": "semantic_matched_stylometry_control"},
+    {"id": "matched__labse_stylometry", "blocks": ["labse6", "stylometry22"], "role": "semantic_matched_stylometry_control"},
+    {"id": "style__pcm_stylometry", "blocks": ["pcm6", "stylometry22"], "role": "style_candidate"},
+    {"id": "style__mstyle_stylometry", "blocks": ["mstyle6", "stylometry22"], "role": "style_candidate"},
+    {"id": "style__pcm_mstyle_stylometry", "blocks": ["pcm6", "mstyle6", "stylometry22"], "role": "primary_style_candidate"},
+    {"id": "fusion__style_e5", "blocks": ["pcm6", "mstyle6", "stylometry22", "e5_6"], "role": "style_semantic_candidate"},
+    {"id": "fusion__style_labse", "blocks": ["pcm6", "mstyle6", "stylometry22", "labse6"], "role": "style_semantic_candidate"},
+    {"id": "fusion__legacy_e5_stylometry", "blocks": ["legacy18", "e5_6", "stylometry22"], "role": "matched_full_transfer_candidate"},
+    {"id": "fusion__legacy_labse_stylometry", "blocks": ["legacy18", "labse6", "stylometry22"], "role": "matched_full_transfer_candidate"},
+    {"id": "fusion__legacy_pcm_stylometry", "blocks": ["legacy18", "pcm6", "stylometry22"], "role": "matched_full_transfer_candidate"},
+    {"id": "fusion__legacy_mstyle_stylometry", "blocks": ["legacy18", "mstyle6", "stylometry22"], "role": "matched_full_transfer_candidate"},
+    {"id": "fusion__legacy_pcm_mstyle_stylometry", "blocks": ["legacy18", "pcm6", "mstyle6", "stylometry22"], "role": "full_transfer_candidate"},
+    {"id": "fusion__legacy_style_e5", "blocks": ["legacy18", "pcm6", "mstyle6", "stylometry22", "e5_6"], "role": "full_style_semantic_transfer_candidate"},
+    {"id": "fusion__legacy_style_labse", "blocks": ["legacy18", "pcm6", "mstyle6", "stylometry22", "labse6"], "role": "full_style_semantic_transfer_candidate"}
+  ],
+  "training": {
+    "fit_split": "train",
+    "diagnostic_split": "valid",
+    "model_family": "standardized_logistic_regression_l2",
+    "solver": "newton_with_armijo_backtracking",
+    "l2_parameterization": "weighted_mean_logloss_plus_half_l2_squared_coefficient_norm",
+    "outer_fold_count": 5,
+    "outer_seeds": [2026072201, 2026072202, 2026072203, 2026072204, 2026072205],
+    "inner_fold_count": 4,
+    "inner_seed_derivation": "sha256_of_outer_seed_outer_fold_candidate_independent",
+    "inner_l2_selection_order": [
+      "descending_component_equal_average_precision",
+      "descending_row_average_precision",
+      "descending_component_equal_roc_auc",
+      "descending_roc_auc",
+      "descending_l2_for_exact_metric_ties"
+    ],
+    "component_field": "component_id",
+    "l2_initial_grid": [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0],
+    "l2_boundary_extension_factor": 10.0,
+    "l2_minimum": 0.000001,
+    "l2_maximum": 1000000.0,
+    "boundary_optimum_is_failure": false,
+    "max_iter": 500,
+    "tolerance": 1e-9,
+    "armijo_c1": 0.0001,
+    "minimum_line_search_step": 9.313225746154785e-10,
+    "sample_weight": "component_equal_normalized_to_row_count",
+    "class_weight": "none",
+    "evidence_type_training_weight": "forbidden",
+    "imputation": "per_feature_median_fit_inside_current_training_fold",
+    "standardization": "weighted_mean_and_scale_fit_inside_current_training_fold",
+    "threshold_selection": "repeated_nested_train_oof_component_weighted_balanced_accuracy_only",
+    "repeated_oof_pair_score": "arithmetic_mean_of_the_five_outer_seed_oof_probabilities",
+    "final_l2_aggregation": "median_of_the_twenty_five_outer_fold_inner_selected_l2_values",
+    "final_fit_reference_scope": "all_train_sellers_only"
+  },
+  "evaluation": {
+    "primary_selection_metric": "repeated_nested_oof_component_equal_average_precision",
+    "reported_metrics": [
+      "roc_auc",
+      "average_precision",
+      "trapezoidal_pr_auc",
+      "precision",
+      "recall",
+      "f1",
+      "balanced_accuracy",
+      "brier",
+      "logloss",
+      "mrr",
+      "hits_at_1",
+      "recall_at_1",
+      "recall_at_3",
+      "recall_at_5"
+    ],
+    "ranking_query_requires": "at_least_one_labelled_positive_and_one_labelled_negative_candidate",
+    "bootstrap": {"group": "component_id", "resamples": 5000, "seed": 2026072207, "confidence": 0.95},
+    "hard_negative_evidence_types": ["semantic_topic_not_controller", "template_clone_not_controller", "public_contact_or_url_noise"],
+    "direct_positive_evidence_types": ["same_controller_direct_identifier", "same_controller_component_anchor"],
+    "required_slices": [
+      "hard_negatives",
+      "direct_positives",
+      "no_exact_clean_title_or_description_overlap",
+      "same_market",
+      "cross_market",
+      "leave_one_market_stress"
+    ],
+    "leave_one_market_stress_contract": {
+      "scope": "winning_candidate_only_train_split_only_diagnostic",
+      "holdout_unit": "every_connected_component_touching_the_named_market",
+      "fit_unit": "remaining_connected_components",
+      "l2_and_threshold": "retuned_with_four_component_grouped_folds_using_only_remaining_components",
+      "minimum_holdout_classes": "at_least_one_positive_and_one_negative_pair",
+      "may_change_selection": false
+    }
+  },
+  "selection_rule": {
+    "candidate_ranking": [
+      "descending_repeated_nested_oof_component_equal_average_precision",
+      "descending_repeated_nested_oof_row_average_precision",
+      "descending_repeated_nested_oof_component_equal_roc_auc",
+      "descending_repeated_nested_oof_roc_auc",
+      "ascending_feature_count",
+      "candidate_id"
+    ],
+    "unique_provisional_m0_requires": {
+      "winner_rate_across_outer_repeats_at_least": 0.6,
+      "component_bootstrap_probability_delta_above_runner_up_at_least": 0.95,
+      "simultaneous_component_bootstrap_probability_winner_above_all_candidates_at_least": 0.95,
+      "no_exact_clone_nested_winner_rate_across_outer_repeats_at_least": 0.6,
+      "no_exact_clone_component_bootstrap_probability_winner_above_all_candidates_at_least": 0.8,
+      "all_formal_fits_converged": true
+    },
+    "style_increment_claim_requires": {
+      "preregistered_primary_style_candidate_component_bootstrap_ci_lower_above_simple_style_control": 0.0,
+      "preregistered_primary_style_candidate_component_bootstrap_ci_lower_above_best_semantic_control": 0.0
+    },
+    "valid_metrics_may_change_selection": false,
+    "new_real_english_confirmation_required": true
+  },
+  "outputs": {
+    "root": "reports/step7_v4_raw_item_authorship_selection/v2_20260723",
+    "pair_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_manifest.no_labels.csv",
+    "gpu_pair_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/gpu_pair_manifest.opaque.no_labels.csv",
+    "raw_item_lineage": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/raw_item_lineage.no_labels.csv",
+    "unique_text_corpus": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/unique_clean_texts.no_labels.jsonl",
+    "seller_text_index": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/seller_unique_text_index.no_labels.jsonl",
+    "gpu_seller_text_index": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/gpu_seller_unique_text_index.opaque.no_labels.jsonl",
+    "seller_stylometry": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/seller_stylometry.no_labels.csv",
+    "pair_stylometry": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_stylometry_features.no_labels.csv",
+    "legacy_pair_features": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/legacy18_pair_features.no_labels.csv",
+    "train_labels": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.train.csv",
+    "valid_labels": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.valid.csv",
+    "train_evidence": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_evidence.train.csv",
+    "valid_evidence": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_evidence.valid.csv",
+    "preparation_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/source_preparation_manifest.json",
+    "development_labels_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/development_labels_manifest.json",
+    "gpu_sync_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/step7_v4_gpu_sync_manifest.json",
+    "shared_chunks": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/shared_chunks.jsonl",
+    "shared_chunks_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/shared_chunks_manifest.json",
+    "model_runtime_manifest_template": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/model_runtime/{model_key}.json",
+    "pair_scores_template": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_scores/{model_key}.item_aggregates.csv",
+    "gpu_output_manifest": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/step7_v4_gpu_output_manifest.json",
+    "selection_summary": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/selection_summary.json",
+    "train_selection_lock": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/train_only_selection_lock.json",
+    "model_artifacts": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/model_artifacts.json",
+    "train_oof_predictions": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/train_nested_oof_predictions.csv",
+    "blind_valid_predictions": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/valid_development_predictions.blind.no_labels.csv",
+    "blind_scoring_lock": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/blind_scoring_lock.json",
+    "valid_predictions": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/selection/valid_development_predictions.labelled_diagnostic.csv"
+  },
+  "hard_rules": [
+    "Public preparation and GPU encoding must not read pair labels or evidence types.",
+    "The GPU workspace receives only deterministic ordinal pair/seller tokens; raw seller_uid strings, split names, component IDs, and source lineage must be absent.",
+    "Every selected raw source row is retained in audit lineage, but primary encoding and aggregation are exact-clean-text deduplicated and multiplicity-neutral.",
+    "Titles and descriptions remain separate natural item documents and are never concatenated across items.",
+    "All four encoders receive the same complete shared chunks bounded by the smallest frozen native model window; only a documented model prefix may differ, and no native max_seq_length may be increased.",
+    "SentenceTransformer encode always receives an explicit empty prompt and the loaded default_prompt_name is cleared before encoding; model-configured default prompts may never alter the audited text.",
+    "Encoder weights are frozen and embedding matrices are ephemeral; only model fingerprints, matrix content hashes, fixed pair aggregates, and audit chunks are published.",
+    "No item count, multiplicity, chunk count, text length metadata, market, source, language identity, label, or evidence type may enter a selectable model except the preregistered pairwise stylometry length gap and the separately identified legacy18 control.",
+    "All feature references, imputation, scaling, L2 choice, coefficients, and thresholds are fitted inside the applicable component-isolated training data.",
+    "L2 is parameterized against weighted mean log loss, so a fixed L2 has the same meaning in inner folds, outer folds, the full train fit, and market-stress fits despite different row counts.",
+    "Exact title/description clone robustness is a complete second nested-CV retraining after clone pairs are removed, not a post-hoc subset of predictions from models trained with clone pairs.",
+    "Selection labels contain only pair_uid, review_label, and component_id; evidence types are stored in separate files and remain unopened until candidate selection, all final fits, and unlabelled validation scoring are locked.",
+    "The train-only selection lock, final model artifacts, exact-round-trip blind validation predictions without labels, and blind-scoring lock are written and replayed immutably before train evidence or validation labels are opened; all validation metrics use only the replayed locked scores.",
+    "Validation is diagnostic only and historical test labels remain unopened.",
+    "Failure to find a stable winner or attributable style increment must be reported as such."
+  ]
+}
