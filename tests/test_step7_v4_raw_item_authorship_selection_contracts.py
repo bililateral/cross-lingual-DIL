@@ -26,7 +26,10 @@ if str(SCRIPTS) not in sys.path:
 import step7_v4_common as common  # noqa: E402
 import step7_v4_encode_item_models as encoder  # noqa: E402
 import step7_v3_1_source_data as source  # noqa: E402
+import step7_v3_1_selection_core as parent_solver  # noqa: E402
+import step7_v4_selection_core as v4_solver  # noqa: E402
 import step7_v4_select_source_model as selector  # noqa: E402
+import step7_v4_resume_selection_after_solver_fix as selection_resume  # noqa: E402
 import step7_v4_prepare_source_data as preparation  # noqa: E402
 import step7_v4_build_sync_manifest as sync_builder  # noqa: E402
 
@@ -2000,6 +2003,193 @@ class Step7V4Contracts(unittest.TestCase):
             repeated["solver_sum_loss_l2_penalty"],
             3.0 * base["solver_sum_loss_l2_penalty"],
         )
+
+    def test_v4_solver_crosses_float64_armijo_plateau_without_relaxing_gradient_gate(self):
+        row_count = 16
+        rng = np.random.default_rng(81)
+        matrix = rng.normal(size=(row_count, 1))
+        beta = rng.normal(size=1)
+        logits = matrix @ beta
+        labels = (
+            logits + rng.normal(scale=1.0, size=row_count)
+            > np.median(logits)
+        ).astype(np.int8)
+        weights = np.exp(rng.normal(scale=1.0, size=row_count))
+        weights *= row_count / float(np.sum(weights))
+        arguments = (
+            matrix,
+            labels,
+            weights,
+            0.247,
+            500,
+            1e-9,
+            1e-4,
+            2**-30,
+        )
+        with self.assertRaisesRegex(ValueError, "did not converge"):
+            parent_solver.fit_logistic(*arguments)
+        observed = v4_solver.fit_logistic(*arguments)
+        repeated = v4_solver.fit_logistic(*arguments)
+        relaxed_reference = parent_solver.fit_logistic(
+            matrix,
+            labels,
+            weights,
+            0.247,
+            500,
+            1e-8,
+            1e-4,
+            2**-30,
+        )
+        self.assertTrue(observed["solver_converged"])
+        self.assertFalse(
+            observed["solver_used_float64_stationarity_fallback"]
+        )
+        self.assertGreaterEqual(
+            observed["solver_float64_objective_resolution_step_count"], 1
+        )
+        self.assertLessEqual(
+            observed["solver_final_normalized_gradient_inf_norm"],
+            1e-9,
+        )
+        self.assertLessEqual(
+            observed["solver_final_objective"],
+            relaxed_reference["solver_final_objective"]
+            + observed["solver_float64_objective_resolution"],
+        )
+        self.assertEqual(observed, repeated)
+        self.assertLess(
+            observed["solver_final_normalized_gradient_inf_norm"],
+            relaxed_reference[
+                "solver_final_normalized_gradient_inf_norm"
+            ],
+        )
+
+    def test_v4_solver_still_rejects_genuine_nonconvergence(self):
+        matrix = np.asarray(
+            [[-3.0], [-2.0], [-1.0], [1.0], [2.0], [3.0]],
+            dtype=np.float64,
+        )
+        labels = np.asarray([0, 0, 0, 1, 1, 1], dtype=np.int8)
+        weights = np.ones(len(labels), dtype=np.float64)
+        with self.assertRaisesRegex(
+            ValueError, "did not reach certified convergence"
+        ):
+            v4_solver.fit_logistic(
+                matrix,
+                labels,
+                weights,
+                0.001,
+                1,
+                1e-12,
+                1e-4,
+                2**-30,
+            )
+
+    def test_selection_solver_patch_reuses_frozen_gpu_contract_only(self):
+        patch = selection_resume.load_patch_policy()
+        self.assertFalse(
+            patch["parent_contract"]["gpu_reencoding_required"]
+        )
+        self.assertFalse(
+            patch["parent_contract"][
+                "training_or_validation_labels_changed"
+            ]
+        )
+        run_policy = selection_resume.execution_policy(
+            self.policy, patch
+        )
+        for key, value in self.policy["outputs"].items():
+            if key in selection_resume.SELECTION_OUTPUT_KEYS:
+                self.assertEqual(
+                    run_policy["outputs"][key],
+                    patch["outputs"][key],
+                )
+            else:
+                self.assertEqual(run_policy["outputs"][key], value)
+        self.assertEqual(
+            run_policy["training"]["tolerance"],
+            self.policy["training"]["tolerance"],
+        )
+        self.assertEqual(
+            run_policy["training"]["l2_initial_grid"],
+            self.policy["training"]["l2_initial_grid"],
+        )
+        source_text = inspect.getsource(
+            selection_resume.install_verified_patch
+        )
+        self.assertIn(
+            "original_verify_gpu_outputs", source_text
+        )
+        self.assertIn(
+            "parent_policy, preparation_manifest, preparation_bundle",
+            source_text.replace("\n", " ").replace("  ", " "),
+        )
+        self.assertIn(
+            "artifact = corrected_solver.fit_logistic",
+            source_text,
+        )
+        self.assertIn(
+            "parent_selector.solver.fit_logistic = audited_fit_logistic",
+            source_text,
+        )
+
+    def test_formal_solver_patch_outputs_are_hash_closed_and_strictly_converged(self):
+        patch = selection_resume.load_patch_policy()
+        manifest = common.load_json(
+            common.resolve(patch["outputs"]["patch_manifest"])
+        )
+        common.verify_canonical_self_hash(
+            manifest,
+            "manifest_content_sha256",
+            "Step7-v4 solver patch manifest",
+        )
+        self.assertFalse(manifest["gpu_reencoding_performed"])
+        for record in manifest["outputs"].values():
+            common.verify_file_record(record, "Step7-v4 solver patch output")
+
+        audit = manifest["solver_execution_audit"]
+        self.assertEqual(audit["fit_count"], 32423)
+        self.assertEqual(
+            audit["convergence_criterion_counts"],
+            {
+                "normalized_gradient_inf_norm_at_most_requested_tolerance": (
+                    32423
+                )
+            },
+        )
+        self.assertEqual(
+            audit["float64_stationarity_fallback_fit_count"], 0
+        )
+        self.assertLessEqual(
+            audit["maximum_final_normalized_gradient_inf_norm"], 1e-9
+        )
+
+        summary = common.load_json(
+            common.resolve(patch["outputs"]["selection_summary"])
+        )
+        common.verify_canonical_self_hash(
+            summary,
+            "summary_content_sha256",
+            "Step7-v4 corrected selection summary",
+        )
+        decision = summary["selection_decision"]
+        self.assertEqual(
+            decision["selection_status"],
+            "no_stable_unique_provisional_m0",
+        )
+        self.assertFalse(decision["unique_provisional_m0_gate_passed"])
+        self.assertFalse(
+            decision["matched_single_encoder_comparison"][
+                "stable_unique_encoder_at_0_95"
+            ]
+        )
+        self.assertEqual(
+            decision["winner_no_exact_clone_robustness"][
+                "original_winner_rate_across_no_clone_outer_seeds"
+            ],
+            0.0,
+        )
+        self.assertFalse(summary["historical_test_labels_read"])
 
     def test_no_clone_gate_requires_complete_nested_retraining(self):
         selection_text = inspect.getsource(selector.run_selection)

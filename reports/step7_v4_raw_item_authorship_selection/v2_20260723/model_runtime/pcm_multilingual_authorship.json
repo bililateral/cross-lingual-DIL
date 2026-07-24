@@ -1,0 +1,166 @@
+{
+  "step": "step7_v4_encode_complete_item_shared_chunks",
+  "version": "2026-07-23-step7-v4-raw-item-authorship-selection-v2",
+  "model_key": "pcm_multilingual_authorship",
+  "role": "primary_frozen_authorship_style_encoder",
+  "repo_id": "Blablablab/multilingual-style-representation",
+  "revision": "b0147bbf450424fe72c8525fcc02e2e39e3a4024",
+  "local_path": "models/step24/authorship/multilingual_style_representation",
+  "model_fingerprint": {
+    "file_count": 13,
+    "total_size_bytes": 2261765940,
+    "content_sha256": "90b7b87f49de527078c9023308eb6186685221ffe1f4a3478a75ecfda817b413",
+    "files": [
+      {
+        "path": ".gitattributes",
+        "size_bytes": 1570,
+        "sha256": "34448b82c17d60fec9b65b1f093c115ddbaadc04beb1b0140b6bfed2e012a930"
+      },
+      {
+        "path": "1_Pooling/config.json",
+        "size_bytes": 297,
+        "sha256": "4e103b8e2a31573ea88570523c2db4f13d34e09a26333e8a889268ed907b3822"
+      },
+      {
+        "path": "README.md",
+        "size_bytes": 1968,
+        "sha256": "714bf5643174526a1e13cb9b1f084d4ed4042658b2b2487437799f6003cf72d4"
+      },
+      {
+        "path": "config.json",
+        "size_bytes": 663,
+        "sha256": "577b9078cda1f7c0ec106c741c74dc166d31501a586c64478dc0fa925754e709"
+      },
+      {
+        "path": "config_sentence_transformers.json",
+        "size_bytes": 205,
+        "sha256": "290c65077224818439a30ccb130ed95ffeed6226fcf726c727024859d1bdf36c"
+      },
+      {
+        "path": "model.safetensors",
+        "size_bytes": 2239607176,
+        "sha256": "cbb24a685c48e578eb4509ffe230b951e5eb40dac6299ef53f67ec956ff73f0a"
+      },
+      {
+        "path": "modules.json",
+        "size_bytes": 229,
+        "sha256": "8f4b264b80206c830bebbdcae377e137925650a433b689343a63bdc9b3145460"
+      },
+      {
+        "path": "sentence_bert_config.json",
+        "size_bytes": 53,
+        "sha256": "ec8e29d6dcb61b611b7d3fdd2982c4524e6ad985959fa7194eacfb655a8d0d51"
+      },
+      {
+        "path": "sentencepiece.bpe.model",
+        "size_bytes": 5069051,
+        "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+      },
+      {
+        "path": "special_tokens_map.json",
+        "size_bytes": 280,
+        "sha256": "06e405a36dfe4b9604f484f6a1e619af1a7f7d09e34a8555eb0b77b66318067f"
+      },
+      {
+        "path": "step24_model_provenance.json",
+        "size_bytes": 283,
+        "sha256": "7774ee9b52c9c80eb0497f3e88fbf28f836b731d46ab791c434fd21703dcc2fa"
+      },
+      {
+        "path": "tokenizer.json",
+        "size_bytes": 17082987,
+        "sha256": "883b037111086fd4dfebbbc9b7cee11e1517b5e0c0514879478661440f137085"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "size_bytes": 1178,
+        "sha256": "ccf223ba3d5b3cc7fa6c3bf451f3bb40557a5c92b0aa33f63d17802ff1a96fd9"
+      }
+    ]
+  },
+  "encoder_parameters_updated": false,
+  "feature_generation_reads_label_values": false,
+  "label_or_raw_source_files_present_in_gpu_workspace": false,
+  "same_exact_shared_chunks_for_all_models": true,
+  "text_prefix": "",
+  "sentence_transformer_prompt": "",
+  "explicit_sentence_transformer_prompt_argument_used": true,
+  "default_prompt_name_cleared_before_encoding": true,
+  "loaded_default_prompt_name": null,
+  "loaded_prompts": {
+    "document": "",
+    "query": ""
+  },
+  "loaded_native_max_seq_length": 512,
+  "native_max_seq_length": 512,
+  "batch_size": 8,
+  "shared_tokenizer_digest": "dfffd315eca8184bf3150c50eaf85d5f2724578479937ed3670257b4af14653c",
+  "runtime_sentence_transformer_tokenizer_digest": "dfffd315eca8184bf3150c50eaf85d5f2724578479937ed3670257b4af14653c",
+  "runtime_token_lengths_replay_shared_manifest": true,
+  "embedding_matrix_published": false,
+  "embedding_matrix_ephemeral": true,
+  "embedding_matrix_shape": [
+    41808,
+    1024
+  ],
+  "embedding_matrix_dtype": "float32",
+  "model_parameter_dtypes": [
+    "torch.float32"
+  ],
+  "embedding_matrix_content_sha256": "e0ba1b178161a9d661022d8eb3bc146f9b8b36d91b1838ad9bfdfcfd29f7df4a",
+  "maximum_unit_norm_error": 1.7881393432617188e-07,
+  "pair_count": 733,
+  "aggregate_feature_names": [
+    "raw_pcm_field_equal_centroid_cosine",
+    "raw_pcm_field_equal_symmetric_top3_cosine",
+    "raw_pcm_title_centroid_cosine",
+    "raw_pcm_title_symmetric_top3_cosine",
+    "raw_pcm_description_centroid_cosine",
+    "raw_pcm_description_symmetric_top3_cosine"
+  ],
+  "multiplicity_audit_feature_names": [
+    "raw_pcm_field_equal_centroid_cosine__multiplicity_weighted_audit",
+    "raw_pcm_field_equal_symmetric_top3_cosine__multiplicity_weighted_audit",
+    "raw_pcm_title_centroid_cosine__multiplicity_weighted_audit",
+    "raw_pcm_title_symmetric_top3_cosine__multiplicity_weighted_audit",
+    "raw_pcm_description_centroid_cosine__multiplicity_weighted_audit",
+    "raw_pcm_description_symmetric_top3_cosine__multiplicity_weighted_audit"
+  ],
+  "pair_scores": {
+    "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_scores/pcm_multilingual_authorship.item_aggregates.csv",
+    "size_bytes": 140971,
+    "sha256": "c2c5540602e2a6d2955d2060df4baa52a071650b0a2e121c943b889d762a2606"
+  },
+  "shared_chunks_sha256": "4a826893d14ca9a28deab21e01e78b1efd874e3eb8d63d4527cd6218295b57d2",
+  "gpu_sync_manifest_sha256": "abd734e2c17b364187fda0def07ee61bed2be582743c122143bb93d4b1aad3a3",
+  "source_preparation_manifest_file_sha256": "8c401c60bf665244376a92ebc9438e7c081d245857696ba5960b2086c656eb95",
+  "source_preparation_manifest_content_sha256": "bcd838667fcb4708fdb97ffdec8c689e0e8f2b3549823dbca20d22aa2ad059fa",
+  "policy_sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327",
+  "policy_contract_sha256": "be1a41fa0b5d1069f3847b07df3ef00d882afcbf45227fe61d3b52a045daea64",
+  "generator_script_sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc",
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "python_version": "3.10.19",
+  "numpy_version": "2.2.6",
+  "torch_version": "2.9.1+cu130",
+  "torch_cuda_runtime_version": "13.0",
+  "cudnn_runtime_version": 91300,
+  "gpu_compute_capability": [
+    12,
+    0
+  ],
+  "transformers_version": "4.46.3",
+  "sentence_transformers_version": "5.6.0",
+  "deterministic_gpu_runtime": {
+    "random_seed": 20260722,
+    "cublas_workspace_config": ":4096:8",
+    "tokenizers_parallelism": "false",
+    "deterministic_algorithms_enabled": true,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false
+  },
+  "sync_manifest_content_sha256": "b9d2a5718e2bb89182af3a7e9b8d4b336615ff161c269ce3f4d1e410018f4705",
+  "runtime_content_sha256": "63d52d09b7ffcc75665ed2d7b4414fe58636cbdc3e3c61af457425f2c445bab3"
+}
