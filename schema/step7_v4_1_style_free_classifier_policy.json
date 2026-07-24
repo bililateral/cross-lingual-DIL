@@ -1,0 +1,397 @@
+{
+  "version": "2026-07-24-step7-v4.1-style-free-classifier-audit-v1",
+  "objective": "Determine whether the frozen Step7-v4 E5/LaBSE aggregates support a better English same-controller pipeline than legacy18 when the downstream classifier family is no longer fixed to L2 logistic regression.",
+  "result_scope": {
+    "design_status": "post_hoc_after_step7_v4_train_and_valid_results_were_seen",
+    "english_train_role": "all_feature_set_classifier_hyperparameter_threshold_and_nested_oof_selection",
+    "english_valid_role": "already_repeatedly_viewed_diagnostic_only_after_new_train_lock_and_blind_score_lock",
+    "english_test_role": "labels_remain_unopened",
+    "chinese_data_used": false,
+    "maximum_claim": "current_best_style_free_pipeline_requires_new_real_english_confirmation_and_cannot_by_itself_certify_m0"
+  },
+  "implementation": {
+    "selector": {
+      "path": "scripts/step7_v4_1_select_style_free_m0.py",
+      "sha256": "f8651574d20ae424f62a68f34da2cdadc44a23ae547039886a5bca4b5707a472"
+    },
+    "parent_selector": {
+      "path": "scripts/step7_v4_select_source_model.py",
+      "sha256": "d68c9bc14ea32723e6cfb7b7095d47c214f64d7026d7228e681eae07ee9a50c6"
+    },
+    "parent_common": {
+      "path": "scripts/step7_v4_common.py",
+      "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334"
+    },
+    "selection_solver": {
+      "path": "scripts/step7_v3_1_selection_core.py",
+      "sha256": "950edefad9e0b970e49a3db65ae9fe8a8cb441801a7bc4f2c2a2ed5960e2e86f"
+    },
+    "corrected_float64_logistic_solver": {
+      "path": "scripts/step7_v4_selection_core.py",
+      "sha256": "0a7b674c9eaddd72c5b32f01d4d1bc38b488d78d4c58500218d46133fe4b9b13"
+    },
+    "source_feature_module": {
+      "path": "scripts/step7_v3_1_source_data.py",
+      "sha256": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734"
+    }
+  },
+  "dependencies": {
+    "python_major_minor": "3.10",
+    "numpy": "2.2.6",
+    "scikit_learn": "1.7.2",
+    "scipy": "1.15.3",
+    "lightgbm": "4.6.0"
+  },
+  "parent_contract": {
+    "policy_path": "schema/step7_v4_raw_item_authorship_selection_policy.json",
+    "policy_sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327",
+    "parent_version": "2026-07-23-step7-v4-raw-item-authorship-selection-v2",
+    "reuse": [
+      "the_same_733_pair_public_manifest",
+      "the_same_401_train_and_151_valid_private_label_projection",
+      "the_same_component_ids_and_seller_isolation",
+      "the_same_fold_local_legacy18_replay",
+      "the_same_frozen_complete_text_chunked_e5_and_labse_pair_aggregates",
+      "the_same_exact_clean_text_clone_audit"
+    ],
+    "gpu_reencoding_required": false
+  },
+  "pinned_inputs": {
+    "pair_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_manifest.no_labels.csv",
+      "size_bytes": 191526,
+      "sha256": "f9f996bdac4a69ce361fa23417ed47cf9216854ffc5558b0202539a311886cb9"
+    },
+    "legacy18_pair_features": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/legacy18_pair_features.no_labels.csv",
+      "size_bytes": 210752,
+      "sha256": "a58bb532c6cffc722b4cb9b2be2bad348abfe581a8bcf811f35a1bb383fe94e9"
+    },
+    "e5_pair_aggregates": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_scores/multilingual_e5_large.item_aggregates.csv",
+      "size_bytes": 140959,
+      "sha256": "b97f8dd0296d7525f3a4bc7e3cbcee2819ac5a9d0cc3def8ebea5b9bf220b9e7"
+    },
+    "labse_pair_aggregates": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_scores/labse.item_aggregates.csv",
+      "size_bytes": 141007,
+      "sha256": "9597497613493d04f4cc2b9dbb663341e6756677fa60c89e199fdae52937d282"
+    },
+    "train_labels": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.train.csv",
+      "size_bytes": 63877,
+      "sha256": "319b243156bceeaf38dcdf31c1bef9efe31ccae52b43cee705d6ba2fdec03542"
+    },
+    "valid_labels": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.valid.csv",
+      "size_bytes": 23998,
+      "sha256": "f0bf67a26ae2aa4058c58e09f589d7adb0d8559b152e540a85267f90507d9548"
+    },
+    "development_labels_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/development_labels_manifest.json",
+      "size_bytes": 2713,
+      "sha256": "339e9e8cc1a522db3e5cc617774bce2415725c8da13529fb7a486a305655e35f"
+    },
+    "source_preparation_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/source_preparation_manifest.json",
+      "size_bytes": 218865,
+      "sha256": "8c401c60bf665244376a92ebc9438e7c081d245857696ba5960b2086c656eb95"
+    },
+    "gpu_output_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/step7_v4_gpu_output_manifest.json",
+      "size_bytes": 3060,
+      "sha256": "f2c1ffb1294cf4ef46d364bf02d13ccb46433cc84b60b0034457fdccb6c614d1"
+    },
+    "gpu_sync_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/step7_v4_gpu_sync_manifest.json",
+      "size_bytes": 5800,
+      "sha256": "abd734e2c17b364187fda0def07ee61bed2be582743c122143bb93d4b1aad3a3"
+    }
+  },
+  "feature_blocks": {
+    "legacy18": "parent_model_eligible_transfer_features_with_all_reference_statistics_refit_inside_each_training_fold",
+    "e5_6": "six_frozen_complete_text_chunk_aggregates_from_multilingual_e5_large",
+    "labse6": "six_frozen_complete_text_chunk_aggregates_from_labse"
+  },
+  "forbidden_feature_name_prefixes": [
+    "style_",
+    "raw_pcm_",
+    "raw_mstyle_"
+  ],
+  "feature_sets": [
+    {
+      "id": "legacy18",
+      "blocks": [
+        "legacy18"
+      ],
+      "role": "non_encoder_c0_control",
+      "transfer_eligible": false
+    },
+    {
+      "id": "e5",
+      "blocks": [
+        "e5_6"
+      ],
+      "role": "multilingual_encoder_candidate",
+      "transfer_eligible": true
+    },
+    {
+      "id": "labse",
+      "blocks": [
+        "labse6"
+      ],
+      "role": "multilingual_encoder_candidate",
+      "transfer_eligible": true
+    },
+    {
+      "id": "e5_labse",
+      "blocks": [
+        "e5_6",
+        "labse6"
+      ],
+      "role": "dual_multilingual_encoder_candidate",
+      "transfer_eligible": true
+    },
+    {
+      "id": "legacy18_e5",
+      "blocks": [
+        "legacy18",
+        "e5_6"
+      ],
+      "role": "full_transfer_candidate",
+      "transfer_eligible": true
+    },
+    {
+      "id": "legacy18_labse",
+      "blocks": [
+        "legacy18",
+        "labse6"
+      ],
+      "role": "full_transfer_candidate",
+      "transfer_eligible": true
+    },
+    {
+      "id": "legacy18_e5_labse",
+      "blocks": [
+        "legacy18",
+        "e5_6",
+        "labse6"
+      ],
+      "role": "full_dual_encoder_transfer_candidate",
+      "transfer_eligible": true
+    }
+  ],
+  "classifiers": {
+    "l2_logistic": {
+      "family": "weighted_standardized_logistic_regression_l2",
+      "solver": "step7_v4_corrected_float64_newton_armijo",
+      "initial_l2_grid": [
+        0.001,
+        0.01,
+        0.1,
+        1.0,
+        10.0,
+        100.0,
+        1000.0
+      ],
+      "boundary_extension_factor": 10.0,
+      "minimum_l2": 0.000001,
+      "maximum_l2": 1000000.0,
+      "boundary_optimum_is_failure": false
+    },
+    "rbf_svm": {
+      "family": "component_weighted_standardized_rbf_support_vector_classifier",
+      "c_grid": [
+        0.1,
+        1.0,
+        10.0
+      ],
+      "gamma_multiplier_over_feature_count_grid": [
+        0.1,
+        1.0,
+        10.0
+      ],
+      "probability_calibration": "three_fold_component_isolated_oof_margin_logistic_sigmoid_calibration_inside_each_fit",
+      "calibration_fold_count": 3,
+      "calibration_l2_penalty": 0.01,
+      "tolerance": 0.0000001,
+      "maximum_iterations": 200000
+    },
+    "lightgbm": {
+      "family": "component_weighted_small_tree_gradient_boosting",
+      "fixed_parameters": {
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "max_depth": -1,
+        "max_bin": 63,
+        "subsample": 1.0,
+        "subsample_freq": 0,
+        "colsample_bytree": 1.0,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "min_split_gain": 0.0,
+        "deterministic": true,
+        "force_col_wise": true,
+        "num_threads": 1,
+        "verbosity": -1
+      },
+      "grid": [
+        {
+          "num_leaves": 3,
+          "min_child_samples": 10,
+          "learning_rate": 0.03,
+          "n_estimators": 200
+        },
+        {
+          "num_leaves": 3,
+          "min_child_samples": 25,
+          "learning_rate": 0.03,
+          "n_estimators": 200
+        },
+        {
+          "num_leaves": 7,
+          "min_child_samples": 10,
+          "learning_rate": 0.03,
+          "n_estimators": 200
+        },
+        {
+          "num_leaves": 7,
+          "min_child_samples": 25,
+          "learning_rate": 0.03,
+          "n_estimators": 200
+        },
+        {
+          "num_leaves": 3,
+          "min_child_samples": 10,
+          "learning_rate": 0.1,
+          "n_estimators": 75
+        },
+        {
+          "num_leaves": 3,
+          "min_child_samples": 25,
+          "learning_rate": 0.1,
+          "n_estimators": 75
+        },
+        {
+          "num_leaves": 7,
+          "min_child_samples": 10,
+          "learning_rate": 0.1,
+          "n_estimators": 75
+        },
+        {
+          "num_leaves": 7,
+          "min_child_samples": 25,
+          "learning_rate": 0.1,
+          "n_estimators": 75
+        }
+      ]
+    }
+  },
+  "training": {
+    "fit_split": "train",
+    "diagnostic_split": "valid",
+    "outer_fold_count": 5,
+    "outer_seeds": [
+      2026072201,
+      2026072202,
+      2026072203,
+      2026072204,
+      2026072205
+    ],
+    "inner_fold_count": 4,
+    "final_hyperparameter_fold_count": 5,
+    "final_hyperparameter_seed": 2026072411,
+    "component_field": "component_id",
+    "sample_weight": "component_equal_normalized_to_row_count",
+    "class_weight": "none",
+    "evidence_type_training_weight": "forbidden",
+    "imputation": "per_feature_median_fit_inside_current_training_fold",
+    "standardization": "weighted_training_fold_only_for_l2_logistic_and_rbf_svm",
+    "hyperparameter_selection_order": [
+      "descending_component_equal_average_precision",
+      "descending_row_average_precision",
+      "descending_component_equal_roc_auc",
+      "descending_row_roc_auc",
+      "ascending_preregistered_model_complexity"
+    ],
+    "threshold_selection": "repeated_nested_train_oof_component_weighted_balanced_accuracy_only",
+    "repeated_oof_pair_score": "arithmetic_mean_of_the_five_outer_seed_oof_probabilities",
+    "l2_parameterization": "weighted_mean_logloss_plus_half_l2_squared_coefficient_norm",
+    "max_iter": 500,
+    "tolerance": 0.000000001,
+    "armijo_c1": 0.0001,
+    "minimum_line_search_step": 0.0000000009313225746154785
+  },
+  "evaluation": {
+    "primary_selection_metric": "repeated_nested_oof_component_equal_average_precision",
+    "reported_metrics": [
+      "roc_auc",
+      "average_precision",
+      "trapezoidal_pr_auc",
+      "precision",
+      "recall",
+      "f1",
+      "balanced_accuracy",
+      "brier",
+      "logloss",
+      "mrr",
+      "hits_at_1",
+      "recall_at_1",
+      "recall_at_3",
+      "recall_at_5"
+    ],
+    "bootstrap": {
+      "group": "component_id",
+      "resamples": 5000,
+      "seed": 2026072417,
+      "confidence": 0.95
+    },
+    "robustness": {
+      "no_exact_clean_title_or_description_overlap": "remove_clone_pairs_then_repeat_the_complete_nested_selection",
+      "old_valid": "already_seen_descriptive_diagnostic_only",
+      "historical_test": "sealed"
+    }
+  },
+  "selection_rule": {
+    "overall_unique_current_best_requires": {
+      "winner_rate_across_outer_repeats_at_least": 0.6,
+      "component_bootstrap_probability_delta_above_runner_up_at_least": 0.95,
+      "simultaneous_component_bootstrap_probability_winner_above_all_candidates_at_least": 0.95,
+      "no_exact_clone_nested_winner_rate_across_outer_repeats_at_least": 0.6,
+      "no_exact_clone_component_bootstrap_probability_winner_above_all_candidates_at_least": 0.8,
+      "all_formal_fits_converged": true
+    },
+    "transfer_capable_m0_additionally_requires": {
+      "overall_winner_is_transfer_eligible": true,
+      "component_bootstrap_ci_lower_above_best_legacy18_c0": 0.0,
+      "component_bootstrap_probability_above_best_legacy18_c0_at_least": 0.95,
+      "no_exact_clone_component_bootstrap_probability_above_best_legacy18_c0_at_least": 0.8
+    },
+    "valid_metrics_may_change_selection": false,
+    "new_real_english_confirmation_required": true,
+    "post_hoc_design_can_formally_certify_m0": false
+  },
+  "outputs": {
+    "root": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724",
+    "train_selection_lock": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/train_only_selection_lock.json",
+    "blind_scoring_lock": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/blind_valid_scoring_lock.json",
+    "model_artifacts": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/final_train_model_artifacts.json",
+    "selected_model_template": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/selected_models/{candidate_id}.joblib",
+    "train_oof_predictions": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/train_nested_oof_predictions.csv",
+    "no_clone_oof_predictions": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/train_no_exact_clone_nested_oof_predictions.csv",
+    "blind_valid_predictions": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/valid_predictions.blind.no_labels.csv",
+    "valid_predictions": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/valid_predictions.labelled_diagnostic.csv",
+    "selection_summary": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/selection_summary.json"
+  },
+  "hard_rules": [
+    "PCM, mStyleDistance, stylometry22, and every feature whose name begins with style_, raw_pcm_, or raw_mstyle_ are forbidden from every candidate matrix.",
+    "Every one of the three classifier families must be evaluated on exactly the same seven feature sets, folds, rows, labels, component weights, imputation views, and primary metric.",
+    "No classifier hyperparameter grid may be expanded after any Step7-v4.1 numerical result is observed.",
+    "Every legacy18 reference statistic and every missing-value median must be fitted only from the current inner, outer, calibration, final, or stress training rows as applicable.",
+    "RBF-SVM probability calibration must use component-isolated folds entirely inside the current fit rows; legacy18 references, imputation medians, and standardization are refitted from each calibration-training fold before its held-out margin is computed.",
+    "The no-exact-clone result must retrain folds, preprocessing, hyperparameters, calibration, classifiers, and thresholds from scratch after clone pairs are removed.",
+    "The best legacy18 pipeline across all three classifier families is C0; a transfer-capable M0 must contain E5 or LaBSE and robustly exceed C0.",
+    "The already viewed valid split cannot select a feature set, classifier, hyperparameter, threshold, or conclusion; historical test labels remain sealed.",
+    "Because this classifier audit was designed after Step7-v4 results were seen, even a passed train-only gate remains post-hoc and requires a newly collected real English confirmation set."
+  ]
+}
