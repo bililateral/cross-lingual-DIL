@@ -1,0 +1,99 @@
+{
+  "version": "2026-07-27-step7-v4.2-new-seed-stability-v1",
+  "objective": "Repeat the frozen Step7-v4.1 nested English source-model comparison on Windows with five previously unused component-fold seeds, without reading old-valid or historical-test label values, to determine whether the operational M0-primary remains the aggregate train-OOF winner.",
+  "claim_boundary": {
+    "same_english_training_pairs": true,
+    "new_real_english_data": false,
+    "old_valid_label_values_may_be_read": false,
+    "historical_test_label_values_may_be_read": false,
+    "candidate_or_grid_changes_allowed": false,
+    "maximum_claim": "same-data new-fold-seed stability diagnostic; cannot independently confirm generalization or a uniquely strongest English model"
+  },
+  "operational_m0_primary": "lightgbm__legacy18_labse",
+  "frozen_parent": {
+    "policy": {
+      "path": "schema/step7_v4_1_style_free_classifier_policy.json",
+      "size_bytes": 15636,
+      "sha256": "804b78478344b1c18340a2bf657f6c5c003b701c9cc655bc5723e7e441b2678a"
+    },
+    "selector": {
+      "path": "scripts/step7_v4_1_select_style_free_m0.py",
+      "size_bytes": 119536,
+      "sha256": "f8651574d20ae424f62a68f34da2cdadc44a23ae547039886a5bca4b5707a472"
+    },
+    "formal_summary": {
+      "path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/selection_summary.json",
+      "size_bytes": 10715994,
+      "sha256": "1469ae1cc08ec92df348ef6f4b3b3e1218973e90834fa0f2e1526635136faf45"
+    },
+    "formal_train_oof": {
+      "path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/train_nested_oof_predictions.csv",
+      "size_bytes": 2655806,
+      "sha256": "f65aa522e8114f7ca2846e532133d3ba4ccc736e5bce8e4b7d864c5b7f61fbb5"
+    },
+    "formal_no_clone_oof": {
+      "path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/train_no_exact_clone_nested_oof_predictions.csv",
+      "size_bytes": 1927037,
+      "sha256": "f80c66bd860b4bc99f92e6d37171021e5a5202d5606d5d1a3aaa526ac21c36d6"
+    }
+  },
+  "repeat_design": {
+    "outer_seeds": [
+      2026072701,
+      2026072702,
+      2026072703,
+      2026072704,
+      2026072705
+    ],
+    "bootstrap_seed": 2026072717,
+    "outer_fold_count": 5,
+    "inner_fold_count": 4,
+    "repeat_complete_no_exact_clone_stress_test": true,
+    "selection_metric_and_tie_breaks": "identical_to_frozen_step7_v4_1",
+    "candidate_universe": "identical_22_candidates",
+    "classifier_and_hyperparameter_grids": "identical_to_frozen_step7_v4_1",
+    "threshold_selection": "identical_to_frozen_step7_v4_1",
+    "retrieval_metrics": [
+      "map",
+      "mrr",
+      "hits_at_1",
+      "precision_at_1",
+      "precision_at_3",
+      "precision_at_5",
+      "precision_at_10",
+      "recall_at_1",
+      "recall_at_3",
+      "recall_at_5",
+      "recall_at_10"
+    ],
+    "retrieval_role": "diagnostic_only_because_the_real_english_labelled_candidate_graph_is_incomplete"
+  },
+  "expected_data": {
+    "train_pair_count": 401,
+    "train_positive_count": 116,
+    "train_negative_count": 285,
+    "train_component_count": 229,
+    "no_clone_pair_count": 286,
+    "no_clone_positive_count": 27,
+    "no_clone_negative_count": 259,
+    "candidate_count": 22
+  },
+  "implementation": {
+    "path": "scripts/step7_v4_2_repeat_stability_audit.py",
+    "sha256": "1d741c724b6b50d4bbeb7ffecce29c11d0895f597919fef06f4d2aeb5055c992"
+  },
+  "outputs": {
+    "root": "reports/step7_v4_2_repeat_stability/v1_20260727",
+    "summary": "reports/step7_v4_2_repeat_stability/v1_20260727/repeat_stability_summary.json",
+    "train_oof": "reports/step7_v4_2_repeat_stability/v1_20260727/train_nested_oof_predictions.csv",
+    "no_clone_oof": "reports/step7_v4_2_repeat_stability/v1_20260727/train_no_exact_clone_nested_oof_predictions.csv"
+  },
+  "hard_rules": [
+    "The frozen Step7-v4.1 policy, selector, inputs, feature sets, classifier families, hyperparameter grids, weighting, metrics, and thresholds are reused without alteration except for the explicitly listed new outer seeds and bootstrap seed.",
+    "Old-valid and historical-test label values are never parsed by this repeat audit.",
+    "The operational M0-primary, repeat seeds, output paths, and comparison rule are fixed before numerical execution.",
+    "All outputs use a new immutable directory and cannot overwrite Step7-v4 or Step7-v4.1 artifacts.",
+    "MAP and MRR report the effective query count and remain diagnostic because absent English pair labels are not treated as negatives.",
+    "A same-data repeat cannot certify independent generalization or justify a uniquely strongest-model claim."
+  ]
+}

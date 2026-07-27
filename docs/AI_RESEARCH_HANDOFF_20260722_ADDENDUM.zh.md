@@ -67,3 +67,15 @@ v3.1 的历史 CPU tokenizer 预检为 `855` 个卖家、`4198` 个非空字段�
 v4.1 正式审计：`docs/STEP7_V4_1_STYLE_FREE_CLASSIFIER_AUDIT_20260724.zh.md`。
 
 下一步数据边界：在收集前冻结少量完整流水线候选，新收集互不连通、无精确文本克隆的真实英文正向身份分量，并作一次性前瞻确认。新的英文确认集直接选择最稳定的完整来源流水线；是否含编码器、以及编码器是否超过 `legacy18`，只作为并列消融报告。
+
+## 2026-07-27：v4.2 新折分种子复跑
+
+Step 7-v4.2 在 Windows CPU 上用五个从未用于 v4.1 的外层种子完整重跑相同 401 条 train、22 个候选、全部内层调参和去克隆消融。它没有读取旧 valid 或历史 test 标签，也没有改变候选、特征、网格或排序口径。
+
+原 operational primary `LightGBM + legacy18 + LaBSE` 在完整集汇总中由第 1 降至第 2；新第 1 为 `LightGBM + legacy18 + E5 + LaBSE`。两者分量 AP 差仅 `0.002655`，95% 区间跨 0，新冠军只赢 `2/5` 个种子。去克隆后原 primary 排第 10，汇总第 1 改为 `L2 + legacy18`，但后者 pair AUC 仅 `0.351780`，并且也未赢得任何单种子。结论仍是 `no_stable_unique_current_best_style_free_pipeline`，当前没有正式选定 M0。
+
+该复跑只增加同数据折分稳定性证据，不是独立数据确认。完整审计见 `docs/STEP7_V4_2_REPEAT_STABILITY_RESULT_AUDIT_20260727.zh.md`。
+
+## 2026-07-27：废弃产物清理
+
+已按显式 allow-list 删除未进入当前依赖闭包的 Step28-v10/v10.1 派生应用产物和本地 Python 缓存。v6–v11 中被 v12.1 同步清单哈希绑定的最小跨版本审计输入继续保留，不能因其历史结论失败而误删。完整清单和原因见 `docs/WORKSPACE_DEPRECATED_ARTIFACT_CLEANUP_20260727.md`。
