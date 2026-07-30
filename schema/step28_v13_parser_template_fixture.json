@@ -1,0 +1,386 @@
+{
+  "version": "2026-07-29-step28-v13-parser-template-fixture-v5-draft",
+  "status": "DRAFT_PASS_NOT_FROZEN",
+  "parser": {
+    "path": "scripts/step3_build_seller_profiles.py",
+    "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+    "function": "extract_item_identity_signals"
+  },
+  "step3_profile_contact_extractor": {
+    "path": "scripts/step3_build_seller_profiles.py",
+    "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+    "function": "extract_contacts",
+    "positional_field_order": ["title_raw", "description_raw", "structured_snapshot"],
+    "structured_snapshot": ""
+  },
+  "template_library": {
+    "path": "schema/step28_v13_synthetic_text_templates.json",
+    "sha256": "8c4db177f6594c663fcbaff23c130062aff22c0765d8dac9e98ab5b53252bfe7"
+  },
+  "history_token_key": {
+    "path": "scripts/step28_history_common.py",
+    "sha256": "39fe4e952563dcbee4b300c89f8c1c1072357b5687e7d128009c1b951f228eab",
+    "function": "token_key"
+  },
+  "step4_contact_normalizer": {
+    "path": "scripts/step4_build_silver_candidates.py",
+    "sha256": "3f15b37453184b4c1e62de14efbbfbc0fc17ea3299184b3ab1033212d237c7af",
+    "function": "normalize_contact_value",
+    "stopwords_symbol": "EN_STOPWORDS",
+    "stopwords_count": 60,
+    "sorted_stopwords_canonical_json_sha256": "eeedfc1ec60535bfcf7532b3bc77e8d6e62b354e96a1199942608caaf0b6609e"
+  },
+  "step7_v4_redactor": {
+    "path": "scripts/step7_v4_common.py",
+    "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334",
+    "function": "redact_raw_field",
+    "pinned_lazy_dependency": {
+      "path": "scripts/step7_v3_1_source_data.py",
+      "sha256": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734"
+    },
+    "call_arguments": {
+      "seller_uid": "fixture_seller_%02d where the zero-based seller index is family_ordinal mod 28",
+      "seller_literals": "fixture registry seller_identity_literals for the case seller",
+      "seller_phrase_tokens": "fixture registry seller_identity_phrase_tokens for the case seller",
+      "global_tokens": "fixture registry global_identity_tokens",
+      "contextual_aliases": "fixture registry contextual_global_alias_tokens",
+      "contextual_alias_deletions": "fixture registry v4_contextual_alias_deletion_tokens",
+      "seller_contextual_collision_tokens": "empty only after the fixture collision scan proves no registered alias collides with base/noise/guard text",
+      "audited_global_phrases": "exact scripts.step7_v3_1_source_data.AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS"
+    },
+    "assertions": [
+      "every populated must_extract raw and normalized surface is absent after production-registry redaction",
+      "every main-DGP must_ignore surface is byte-identical as one contiguous substring after redaction",
+      "the redacted nonidentity base, must_ignore clause and context guards equal an independently constructed expected string"
+    ]
+  },
+  "production_redaction_registry_fixture": {
+    "seller_count": 28,
+    "seller_uid_format": "fixture_seller_%02d for zero-based ordinal 0..27",
+    "profile_fields": "seller_uid,source_seller_raw,alias_normalized all equal the fixture seller UID",
+    "parsed_literal_assignment": "seller ordinal i receives sample identity types identity_types[i mod 8] and identity_types[(i+3) mod 8], using both raw and normalized surfaces admitted by safe_signal_literal",
+    "helper_calls": [
+      "step7_v3_1_source_data.global_identity_tokens",
+      "step7_v3_1_source_data.contextual_global_alias_tokens",
+      "step7_v3_1_source_data.seller_identity_literals",
+      "step7_v3_1_source_data.seller_identity_phrase_tokens",
+      "step7_v4_common.v4_contextual_alias_deletion_tokens",
+      "step7_v3_1_source_data.AUDITED_GLOBAL_IDENTITY_PHRASE_TOKENS"
+    ],
+    "registry_hash_rule": "SHA256 of UTF-8 canonical JSON after sorting every set by UTF-8 bytes and every seller key by UTF-8 bytes",
+    "required_registry_hash_names": [
+      "global_identity_tokens",
+      "contextual_global_alias_tokens",
+      "contextual_alias_deletion_tokens",
+      "seller_identity_literals",
+      "seller_identity_phrase_tokens",
+      "seller_contextual_collision_tokens",
+      "audited_global_identity_phrase_tokens"
+    ],
+    "expected_registry_hashes": {
+      "audited_global_identity_phrase_tokens": "f5d5b82abd4db4f39151e2d09e36c1595e3d1b58a7ed564dd41b156d8c602d9d",
+      "contextual_alias_deletion_tokens": "705632c41128a84b5cba345b8e3a59fc473ab6ff49b2339d4b3c5657123b053c",
+      "contextual_global_alias_tokens": "065cb5b86b434c1747d0f5d106740f519edd747eaa6b7a888aede174a93a675c",
+      "global_identity_tokens": "7d28b3380748638c2caa7090abdc8e503ed22161637d9ec73b531f07d09743e5",
+      "seller_contextual_collision_tokens": "5184c1da778fe943e8973cf989f46da0d49202cbbcb953ed1742055c0dd72d4b",
+      "seller_identity_literals": "ee3d4a78d1981cab6c64704827c24c514777786a082c90b3f5ccaa6ece005323",
+      "seller_identity_phrase_tokens": "2515ede18e2dac57c7fafb41739c5a76d6f6588a1655ca976831df08867bc7b6"
+    },
+    "expected_registry_hashes_must_be_materialized_before_fixture_freeze": true
+  },
+  "full_render_context_contract": {
+    "context_radius_code_points": 90,
+    "context_guard_pool_count": 12,
+    "minimum_context_guard_code_points": 92,
+    "maximum_context_guard_code_points": 103,
+    "context_guard_pool_sha256": "74265e06d9b38ba12e4993066797dcddf5ed2a1bac60b805895c8f10967e0ae8",
+    "identity_region_render_rule": "descriptions without identity clauses have no guard; otherwise a selector-UID-ranked distinct guard precedes the first clause and a different guard follows every populated clause",
+    "case_families": {
+      "single_role_full_render": {
+        "semantic_loop_order": ["split", "description_skeleton_index", "effective_style_uid", "role_type_case_index"],
+        "loops": "split in train,development,audit_a,audit_b; description index 0..7; effective styles by UID UTF-8; role/type case index 0..24",
+        "derived_indexes_from_zero_based_family_ordinal": {
+          "delivery_index": "ordinal mod 6",
+          "service_index": "floor(ordinal/6) mod 6",
+          "noise_index": "floor(ordinal/36) mod 10",
+          "product_index": "(description_skeleton_index*25+role_type_case_index) mod 12",
+          "attribute_index": "(description_skeleton_index*25+role_type_case_index) mod 10",
+          "code_index": "floor(ordinal/120) mod 16",
+          "title_skeleton_index": "floor(ordinal/360) mod 8"
+        },
+        "sample_variant_indexes": [0]
+      },
+      "adjacent_ordered_roles": {
+        "semantic_loop_order": ["left_role_type_case_index", "right_role_type_case_index"],
+        "loops": "both indexes 0..24, producing the exact 25*25 ordered Cartesian product; 544 different-type cases are production-reachable and 81 same-type cases are stress-only",
+        "derived_indexes_from_zero_based_family_ordinal": {
+          "split_index": "ordinal mod 4",
+          "description_skeleton_index": "floor(ordinal/4) mod 8",
+          "effective_style_index": "ordinal mod 176 in effective_style_uid order",
+          "delivery_index": "ordinal mod 6",
+          "service_index": "floor(ordinal/6) mod 6",
+          "noise_index": "floor(ordinal/36) mod 10",
+          "product_index": "ordinal mod 12",
+          "attribute_index": "floor(ordinal/12) mod 10",
+          "code_index": "floor(ordinal/120) mod 16",
+          "title_skeleton_index": "floor(ordinal/360) mod 8"
+        },
+        "sample_variant_indexes": [0, 1]
+      },
+      "maximum_eight_slots": {
+        "semantic_loop_order": ["split", "effective_style_uid"],
+        "loops": "split in train,development,audit_a,audit_b; effective styles by UID UTF-8",
+        "derived_indexes_from_zero_based_family_ordinal": {
+          "description_skeleton_index": "ordinal mod 8",
+          "title_skeleton_index": "floor(ordinal/8) mod 8",
+          "delivery_index": "ordinal mod 6",
+          "service_index": "floor(ordinal/6) mod 6",
+          "noise_index": "floor(ordinal/36) mod 10",
+          "product_index": "ordinal mod 12",
+          "attribute_index": "floor(ordinal/12) mod 10",
+          "code_index": "floor(ordinal/120) mod 16"
+        },
+        "sample_variant_indexes": [0]
+      },
+      "title_only": {
+        "semantic_loop_order": ["split", "title_skeleton_index", "effective_style_uid", "code_index"],
+        "loops": "split in train,development,audit_a,audit_b; title index 0..7; effective styles by UID UTF-8; code index 0..15",
+        "derived_indexes_from_zero_based_family_ordinal": {
+          "product_index": "ordinal mod 12",
+          "attribute_index": "floor(ordinal/12) mod 10"
+        },
+        "description_raw": "",
+        "expected_parser_rows": 0
+      }
+    },
+    "index_semantics": "all loop nesting is left-to-right with the final dimension varying fastest; all floor divisions are integer floor; indexes use pinned list order; no HMAC or runtime hash is used for coverage assignment",
+    "product_attribute_coverage": "the complete case manifest must show every generic product and every generic attribute in every split and reachable effective style; actual smoke/formal items are again checked row by row",
+    "all_description_skeletons_required": true,
+    "all_title_skeletons_required": true,
+    "fixture_code_values": [
+      "QABCDEFGHAA",
+      "QABCDEFGHBB",
+      "QABCDEFGHCC",
+      "QABCDEFGHDP",
+      "QABCDEFGHEA",
+      "QABCDEFGHFB",
+      "QABCDEFGHGC",
+      "QABCDEFGHHP",
+      "QABCDEFGHIA",
+      "QABCDEFGHJB",
+      "QABCDEFGHKC",
+      "QABCDEFGHLP",
+      "QABCDEFGHMA",
+      "QABCDEFGHNB",
+      "QABCDEFGHOC",
+      "QABCDEFGHPP"
+    ],
+    "fixture_code_contract": "after removing the Q prefix, every value has exactly ten A..P symbols; the penultimate symbols cover A..P exactly once in title-only cases and therefore exercise every registered title modifier",
+    "all_reachable_effective_styles_required": "derive every base prototype times every unordered two-factor perturbation from the frozen renderer domains, deduplicate by canonical style JSON, sort by effective_style_uid, and test the complete set rather than only the 12 base prototypes",
+    "effective_style_uid": "estyle_ plus full SHA256 of UTF-8 canonical JSON containing the six effective style factor values",
+    "expected_effective_style_manifest_sha256": "e97ab1e0c4313c750255277123eec45f71ea849d3b2d406229c56c38a22fb88d",
+    "all_delivery_phrases_required": true,
+    "all_service_phrases_required": true,
+    "all_title_modifiers_required": true,
+    "noise_choices": "exactly empty followed by the 3 must_ignore templates times the 3 main-DGP adversarial values in template order then value order",
+    "role_type_cases": "every dgp_allowed_role_types entry",
+    "role_type_case_order": "dgp role order direct_or_private,high_frequency_direct,public_support,risky_product; within a role use the global identity type order after filtering to its allowed types",
+    "adjacent_cases": "the exact 25 by 25 ordered Cartesian product, including every same-type stress pair; do not add a second both-orders expansion",
+    "maximum_multislot_case": "eight must_extract slots, one per identity type using maximum_multislot_roles, ordered by the global identity type order telegram,email,bat,qq,wechat,phone,crypto_wallet,external_url; this fixture-specific order is frozen because all ordered two-slot adjacencies are tested separately; strict full-set equality and all flags are checked",
+    "maximum_multislot_roles": {
+      "telegram": "direct_or_private",
+      "email": "direct_or_private",
+      "bat": "direct_or_private",
+      "qq": "direct_or_private",
+      "wechat": "direct_or_private",
+      "phone": "direct_or_private",
+      "crypto_wallet": "direct_or_private",
+      "external_url": "public_support"
+    },
+    "case_seller_assignment": "seller_index is family_ordinal mod 28 independently within each case family; seller_uid is fixture_seller_%02d; seller_index is included in the case UID canonical object so the redaction registry choice is bound",
+    "case_uid": "case_ plus full SHA256 of UTF-8 canonical JSON containing exact case_kind,split,title_skeleton_index,description_skeleton_index,effective_style_uid,product_index,attribute_index,code_index,delivery_index,service_index,noise_index,seller_index and ordered_role_type_cases; title_only must encode description_skeleton_index,delivery_index,service_index,noise_index as JSON null and ordered_role_type_cases as an empty JSON array",
+    "case_order": "case_uid UTF-8 bytes",
+    "expected_case_count_must_be_materialized_before_fixture_freeze": true,
+    "expected_reachable_effective_style_count": 176,
+    "expected_case_count_formula": "4*8*176*25 + 25*25 + 4*176 + 4*8*176*16",
+    "expected_case_count": 232241,
+    "runner": {
+      "path": "scripts/step28_v13_run_parser_template_fixture.py",
+      "sha256": "a5063c1f4d0141d336fab065b1ec454790b98fb26df0790c73f3c9115ba0dcbd",
+      "must_be_pinned_before_fixture_freeze": true
+    },
+    "output_manifest": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/preflight/parser_template_fixture_result_v3.json",
+      "required_status": "PASS",
+      "expected_case_outcome_manifest_sha256": "aa7d4d3d4558c96aad5adc9b7e4a54842a4e77c9b98b696633cf2baab3e5336b",
+      "exact_file_is_bound_by_release_manifest_not_by_fixture_to_avoid_a_hash_cycle": true
+    },
+    "assertions": [
+      "exactly one matching parser row for each populated must_extract slot",
+      "no unexpected parser row",
+      "every title-only case produces zero parser rows and is byte-identical after production-registry redaction",
+      "every full-render case supplies a rendered nonempty title selected by mixed-radix title index and produces no title-source parser row",
+      "all four flags equal expected_role_flags",
+      "all must_ignore adversarial values produce zero parser rows"
+    ]
+  },
+  "call_arguments": {
+    "title_raw": "",
+    "structured_snapshot": "",
+    "extra_fields": null
+  },
+  "sample_values": {
+    "telegram": "tgabc123def45678",
+    "email": "u0123456789abcdef@id.invalid",
+    "bat": "btabc123def45678",
+    "qq": "731245678",
+    "wechat": "wxabc123def45678",
+    "phone": "13800123456",
+    "crypto_wallet": "0x0123456789abcdef0123456789abcdef01234567",
+    "external_url": "s0123456789ab.example/path/89abcdef"
+  },
+  "sample_value_variants": {
+    "telegram": ["tgabc123def45678", "tgxyz987uvw65432"],
+    "email": ["u0123456789abcdef@id.invalid", "ufedcba9876543210@id.invalid"],
+    "bat": ["btabc123def45678", "btxyz987uvw65432"],
+    "qq": ["731245678", "864209753"],
+    "wechat": ["wxabc123def45678", "wxxyz987uvw65432"],
+    "phone": ["13800123456", "13987654321"],
+    "crypto_wallet": [
+      "0x0123456789abcdef0123456789abcdef01234567",
+      "0xfedcba9876543210fedcba9876543210fedcba98"
+    ],
+    "external_url": [
+      "s0123456789ab.example/path/89abcdef",
+      "sfedcba987654.example/path/fedcba98"
+    ]
+  },
+  "expected_step3_normalized_values": {
+    "telegram": "tgabc123def45678",
+    "email": "u0123456789abcdef@id.invalid",
+    "bat": "btabc123def45678",
+    "qq": "731245678",
+    "wechat": "wxabc123def45678",
+    "phone": "13800123456",
+    "crypto_wallet": "0x0123456789abcdef0123456789abcdef01234567",
+    "external_url": "s0123456789ab.example/path/89abcdef"
+  },
+  "expected_history_token_keys": {
+    "telegram": ["telegram", "tgabc123def45678"],
+    "email": ["email", "u0123456789abcdef@id.invalid"],
+    "bat": ["bat", "btabc123def45678"],
+    "qq": ["qq", "731245678"],
+    "wechat": ["wechat", "wxabc123def45678"],
+    "phone": ["phone", "13800123456"],
+    "crypto_wallet": ["crypto_wallet", "0x0123456789abcdef0123456789abcdef01234567"],
+    "external_url": ["external_url", "s0123456789ab.example/path/89abcdef"]
+  },
+  "expected_step3_profile_contact_projection": {
+    "telegram": ["telegram", "tgabc123def45678"],
+    "email": ["email", "u0123456789abcdef@id.invalid"],
+    "qq": ["qq", "731245678"],
+    "wechat": ["wechat", "wxabc123def45678"],
+    "phone": ["phone", "13800123456"]
+  },
+  "expected_step4_contact_keys_after_profile_projection": {
+    "telegram": ["telegram", "tgabc123def45678"],
+    "email": ["email", "u0123456789abcdef@id.invalid"],
+    "qq": ["qq", "731245678"],
+    "wechat": ["wechat", "wxabc123def45678"],
+    "phone": ["phone", "13800123456"]
+  },
+  "profile_contact_absent_types": [
+    "bat",
+    "crypto_wallet",
+    "external_url"
+  ],
+  "crypto_wallet_generation_contract": {
+    "allowed_format": "lowercase 0x plus exactly 40 lowercase hexadecimal characters",
+    "legacy_base58_and_tron_forbidden": true,
+    "reason": "Step28 history token_key lowercases values; the synthetic identity graph and history graph must have identical canonical keys."
+  },
+  "expected_role_flags": {
+    "direct": {
+      "telegram": [1, 0, 1, 0],
+      "email": [1, 0, 1, 0],
+      "bat": [1, 0, 1, 0],
+      "qq": [1, 0, 1, 0],
+      "wechat": [1, 0, 1, 0],
+      "phone": [1, 0, 1, 0],
+      "crypto_wallet": [1, 0, 1, 0],
+      "external_url": [0, 0, 0, 1]
+    },
+    "risky": {
+      "telegram": [1, 1, 0, 1],
+      "email": [1, 1, 0, 1],
+      "bat": [1, 1, 0, 1],
+      "qq": [1, 1, 0, 1],
+      "wechat": [1, 1, 0, 1],
+      "phone": [1, 1, 0, 1],
+      "crypto_wallet": [1, 1, 0, 1],
+      "external_url": [0, 1, 0, 1]
+    },
+    "support": {
+      "email": [0, 0, 0, 1],
+      "phone": [0, 0, 0, 1],
+      "external_url": [0, 0, 0, 1]
+    }
+  },
+  "flag_order": [
+    "seller_facing_context",
+    "product_data_risk_context",
+    "direct_identity_eligible",
+    "support_only"
+  ],
+  "dgp_allowed_role_types": {
+    "direct_or_private": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet"
+    ],
+    "high_frequency_direct": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet"
+    ],
+    "public_support": [
+      "email",
+      "phone",
+      "external_url"
+    ],
+    "risky_product": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet",
+      "external_url"
+    ]
+  },
+  "role_to_template_family": {
+    "direct_or_private": "direct",
+    "high_frequency_direct": "direct",
+    "public_support": "support",
+    "risky_product": "risky"
+  },
+  "must_ignore_adversarial_values": [
+    "1234",
+    "12345",
+    "A12B34"
+  ],
+  "parser_only_redactor_incompatible_stress_values": [
+    "123456789012"
+  ],
+  "parser_only_stress_values_forbidden_from_main_dgp": true,
+  "must_ignore_expected_parser_row_count_per_case": 0
+}

@@ -1,0 +1,135 @@
+{
+  "base_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729"
+  },
+  "canonical_self_hash": "3eaa4a7efbf5ad3db7ca0fd6dc25453719305748042ff394697d6abda9cdeda5",
+  "claim_boundary": {
+    "binary_success_or_failure_from_power_is_forbidden": true,
+    "confirmatory_power_certified": false,
+    "nominal_point_power_is_only_a_sensitivity_calculation": true,
+    "post_release_sample_size_change_is_forbidden": true,
+    "primary_reporting": "effect estimates and preregistered paired world-cluster bootstrap intervals"
+  },
+  "design_type": "fixed_maximal_resource_estimation_with_sensitivity_not_power_selected",
+  "formal_private_structure_key_created_or_read": false,
+  "formal_world_materialized": false,
+  "independent_analysis_unit": "world",
+  "independent_worlds_per_split": 500,
+  "m1_equivalence_sensitivity": {
+    "confidence_level": 0.9,
+    "confirmatory_tost_power_certified": false,
+    "equivalence_half_width": 0.01,
+    "formula": "maximum_sd = equivalence_half_width*sqrt(W)/z_.95",
+    "maximum_paired_world_standard_deviation_for_nominal_interval_half_width": 0.13594328035401299
+  },
+  "normal_approximation_sensitivity": {
+    "comparison_count": 7,
+    "comparisons": {
+      "audit_a_ap": {
+        "design_alternative": 0.06,
+        "grid": [
+          {
+            "minimum_detectable_true_difference": 0.03736028360339942,
+            "paired_world_standard_deviation": 0.05,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.04472056720679885,
+            "paired_world_standard_deviation": 0.1,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.052080850810198275,
+            "paired_world_standard_deviation": 0.15,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.059441134413597704,
+            "paired_world_standard_deviation": 0.2,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.06680141801699713,
+            "paired_world_standard_deviation": 0.25,
+            "registered_design_alternative_exceeds_mde": false
+          }
+        ],
+        "maximum_paired_world_standard_deviation_at_which_the_registered_alternative_reaches_nominal_point_power": 0.2037964949213654,
+        "success_margin": 0.03
+      },
+      "audit_b_ap": {
+        "design_alternative": 0.04,
+        "grid": [
+          {
+            "minimum_detectable_true_difference": 0.022360283603399426,
+            "paired_world_standard_deviation": 0.05,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.029720567206798852,
+            "paired_world_standard_deviation": 0.1,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.037080850810198275,
+            "paired_world_standard_deviation": 0.15,
+            "registered_design_alternative_exceeds_mde": true
+          },
+          {
+            "minimum_detectable_true_difference": 0.044441134413597705,
+            "paired_world_standard_deviation": 0.2,
+            "registered_design_alternative_exceeds_mde": false
+          },
+          {
+            "minimum_detectable_true_difference": 0.05180141801699713,
+            "paired_world_standard_deviation": 0.25,
+            "registered_design_alternative_exceeds_mde": false
+          }
+        ],
+        "maximum_paired_world_standard_deviation_at_which_the_registered_alternative_reaches_nominal_point_power": 0.16983041243447117,
+        "success_margin": 0.015
+      }
+    },
+    "critical_normal_quantile": 2.449997660602729,
+    "familywise_alpha": 0.05,
+    "formula": "MDE = margin + (z_(1-alpha/7)+z_power)*paired_world_sd/sqrt(W)",
+    "multiplicity_method": "Bonferroni",
+    "paired_world_standard_deviation_grid": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25
+    ],
+    "per_comparison_one_sided_alpha": 0.0071428571428571435,
+    "power_normal_quantile": 0.8416212335729144,
+    "purpose": "show how detectable AP differences depend on the unknown paired-world standard deviation; not a substitute for the future exact AP/bootstrap analysis",
+    "target_point_power": 0.8
+  },
+  "parent_confirmatory_power_contract": {
+    "old_5000_replicate_monte_carlo_claimed": false,
+    "old_grid_selected_world_count_claimed": false,
+    "reason": "No empirical pre-key distribution exists for paired world AP differences, five-M1 dependence, retrieval scores or hard-negative errors. Supplying favourable values would fabricate power.",
+    "status_for_this_training_ready_child": "EXPLICITLY_SUPERSEDED_BEFORE_ANY_PRIVATE_KEY"
+  },
+  "producer": {
+    "path": "scripts/step28_v13_build_fixed_sample_sensitivity.py",
+    "sha256": "e886e57ff37b43220c30273d1f101b0527d33a9036979efcb652bb749dc00cfe"
+  },
+  "status": "PASS_FIXED_SAMPLE_ESTIMATION_DESIGN_NOT_CONFIRMATORY_POWER_CERTIFIED",
+  "unknown_until_formal_evaluation": [
+    "paired-world AP-difference standard deviations",
+    "five-M1 cross-seed correlation",
+    "world intraclass dependence of row scores",
+    "retrieval score and relevance dependence",
+    "hard-negative error dependence"
+  ],
+  "version": "2026-07-30-step28-v13-training-ready-fixed-sample-sensitivity-v1",
+  "world_counts": {
+    "audit_a": 500,
+    "audit_b": 500,
+    "development": 500,
+    "train": 500
+  }
+}

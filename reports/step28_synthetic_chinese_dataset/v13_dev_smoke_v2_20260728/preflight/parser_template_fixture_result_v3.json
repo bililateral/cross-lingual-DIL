@@ -1,0 +1,115 @@
+{
+  "case_count": 232241,
+  "case_outcome_manifest_sha256": "aa7d4d3d4558c96aad5adc9b7e4a54842a4e77c9b98b696633cf2baab3e5336b",
+  "dependency_hashes": {
+    "fixture": "51ee96967b5f2e9882b117e3e0b8aa1cfaa4a7d2bf87e80d2e87f4166c230d9f",
+    "history_token_key": "39fe4e952563dcbee4b300c89f8c1c1072357b5687e7d128009c1b951f228eab",
+    "parser": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+    "runner": "a5063c1f4d0141d336fab065b1ec454790b98fb26df0790c73f3c9115ba0dcbd",
+    "step3_profile_contact_extractor": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+    "step4_contact_normalizer": "3f15b37453184b4c1e62de14efbbfbc0fc17ea3299184b3ab1033212d237c7af",
+    "step4_stopwords": "eeedfc1ec60535bfcf7532b3bc77e8d6e62b354e96a1199942608caaf0b6609e",
+    "step7_v4_redactor": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334",
+    "step7_v4_redactor_dependency": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734",
+    "template_library": "8c4db177f6594c663fcbaff23c130062aff22c0765d8dac9e98ab5b53252bfe7",
+    "template_path": "schema/step28_v13_synthetic_text_templates.json"
+  },
+  "effective_style_count": 176,
+  "effective_style_manifest_sha256": "e97ab1e0c4313c750255277123eec45f71ea849d3b2d406229c56c38a22fb88d",
+  "expected_full_case_count": 232241,
+  "family_counts": {
+    "adjacent_ordered_roles": 625,
+    "maximum_eight_slots": 704,
+    "single_role_full_render": 140800,
+    "title_only": 90112
+  },
+  "fixture_seller_count": 28,
+  "gates": {
+    "all_split_style_product_attribute_coverage": true,
+    "all_title_modifiers_covered": true,
+    "base_and_guard_preservation": true,
+    "exact_parser_rows_and_flags": true,
+    "must_ignore_preservation": true,
+    "production_redactor_identity_removal": true,
+    "title_only_zero_parser_rows": true,
+    "zero_unexpected_parser_rows": true
+  },
+  "parser_only_redactor_incompatible_stress": {
+    "case_count": 3,
+    "main_dgp_use_forbidden": true,
+    "step3_parser_row_count": 0,
+    "step7_v4_redaction_change_count": 3
+  },
+  "parser_row_counts": {
+    "bat": 17750,
+    "crypto_wallet": 17750,
+    "email": 23432,
+    "external_url": 12068,
+    "phone": 23432,
+    "qq": 17750,
+    "telegram": 17750,
+    "wechat": 17750
+  },
+  "profile_contact_chain": {
+    "absent_types": [
+      "bat",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "step3_profile_projection": {
+      "email": [
+        "u0123456789abcdef@id.invalid"
+      ],
+      "phone": [
+        "13800123456"
+      ],
+      "qq": [
+        "731245678"
+      ],
+      "telegram": [
+        "tgabc123def45678"
+      ],
+      "wechat": [
+        "wxabc123def45678"
+      ]
+    },
+    "step4_normalized_projection": {
+      "email": [
+        "u0123456789abcdef@id.invalid"
+      ],
+      "phone": [
+        "13800123456"
+      ],
+      "qq": [
+        "731245678"
+      ],
+      "telegram": [
+        "tgabc123def45678"
+      ],
+      "wechat": [
+        "wxabc123def45678"
+      ]
+    }
+  },
+  "redaction_diagnostics": {
+    "audited_global_identity_phrase_match_count": 0,
+    "contextual_alias_match_count": 0,
+    "generic_identifier_match_count": 336546,
+    "global_identifier_token_match_count": 70700,
+    "seller_local_alias_match_count": 0,
+    "seller_local_alias_phrase_match_count": 0
+  },
+  "registry_hashes": {
+    "audited_global_identity_phrase_tokens": "f5d5b82abd4db4f39151e2d09e36c1595e3d1b58a7ed564dd41b156d8c602d9d",
+    "contextual_alias_deletion_tokens": "705632c41128a84b5cba345b8e3a59fc473ab6ff49b2339d4b3c5657123b053c",
+    "contextual_global_alias_tokens": "065cb5b86b434c1747d0f5d106740f519edd747eaa6b7a888aede174a93a675c",
+    "global_identity_tokens": "7d28b3380748638c2caa7090abdc8e503ed22161637d9ec73b531f07d09743e5",
+    "seller_contextual_collision_tokens": "5184c1da778fe943e8973cf989f46da0d49202cbbcb953ed1742055c0dd72d4b",
+    "seller_identity_literals": "ee3d4a78d1981cab6c64704827c24c514777786a082c90b3f5ccaa6ece005323",
+    "seller_identity_phrase_tokens": "2515ede18e2dac57c7fafb41739c5a76d6f6588a1655ca976831df08867bc7b6"
+  },
+  "runner_sha256": "a5063c1f4d0141d336fab065b1ec454790b98fb26df0790c73f3c9115ba0dcbd",
+  "scientific_metrics_produced": false,
+  "status": "PASS",
+  "version": "2026-07-29-step28-v13-parser-template-fixture-result-v3"
+}

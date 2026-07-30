@@ -1,0 +1,306 @@
+{
+  "version": "2026-07-29-step28-v13-template-library-v5-draft",
+  "status": "development_smoke_candidate",
+  "language": "zh",
+  "renderer_contract": {
+    "dynamic_slots": [
+      "product",
+      "attribute",
+      "title_modifier",
+      "code",
+      "delivery",
+      "service",
+      "identity_clause",
+      "noise_clause",
+      "context_guard"
+    ],
+    "skeleton_hash_rule": "SHA256 of UTF-8 template text before slot substitution",
+    "instance_hash_rule": "SHA256 of NFKC plus whitespace-normalized rendered field",
+    "real_text_allowed": false,
+    "controller_exclusive_template_allowed": false,
+    "identity_context_isolation": {
+      "guard_slot": "context_guard",
+      "guard_pool_key": "identity_clause_templates.context_guards",
+      "guard_selection_rule": "rank every guard by SHA256(selector_uid UTF-8 + 0x1f + guard UTF-8), then use the first N distinct guards where N is populated identity clause count plus one",
+      "minimum_code_points_on_each_populated_identity_side": 91,
+      "render_rule": "Descriptions without populated identity clauses contain no context guard. Otherwise append one selected guard before the first identity clause and one different selected guard after every populated clause, ordered by slot_uid.",
+      "full_render_cross_product_fixture_required": true
+    },
+    "style_factor_order": [
+      "separator",
+      "ending",
+      "line_mode",
+      "english_tag",
+      "traditional_variant",
+      "repeat_punctuation"
+    ],
+    "style_factor_domains": {
+      "separator": ["，", "；", " / ", "｜", "、", " - "],
+      "ending": ["。", "！"],
+      "line_mode": ["single", "double", "bullet"],
+      "english_tag": ["", "V2", "PRO", "OK", "PLUS", "NEW", "S", "X", "LITE"],
+      "traditional_variant": [false, true],
+      "repeat_punctuation": [false, true]
+    },
+    "seller_perturbation_rule": "Select exactly two distinct factors in style_factor_order by the registered text-key HMAC order and move each inherited value forward by one position in its domain with wraparound.",
+    "line_rendering": {
+      "single_separator": "{separator}",
+      "double_separator": "{separator}\\n",
+      "bullet_separator": "\\n• ",
+      "bullet_description_prefix": "• ",
+      "title_modifier_rule": "map the parser-safe item code's penultimate A..P symbol bijectively to the 16 generic title modifiers; use only in the four title skeletons per split that do not expose the code",
+      "english_tag_location": "append one ASCII space plus the nonempty tag only when the parser-safe item code's final A..P symbol is A, B or C; this label-blind 3/16 visibility gate avoids a universal title suffix",
+      "repeat_punctuation_rule": "replace each base-description ending slot with ending repeated exactly twice",
+      "scope": "base title and base description only; noise, context_guard and identity clauses are immutable"
+    },
+    "traditional_substitutions": {
+      "万": "萬", "与": "與", "专": "專", "业": "業", "东": "東", "个": "個",
+      "为": "為", "买": "買", "书": "書", "产": "產", "优": "優", "会": "會",
+      "传": "傳", "价": "價", "货": "貨", "卖": "賣", "购": "購", "车": "車",
+      "软": "軟", "选": "選", "这": "這", "过": "過", "远": "遠", "连": "連",
+      "进": "進", "运": "運", "门": "門", "问": "問", "间": "間", "电": "電",
+      "头": "頭", "风": "風", "马": "馬", "鱼": "魚", "鸟": "鳥", "点": "點",
+      "龙": "龍", "确": "確", "认": "認", "号": "號", "对": "對", "应": "應",
+      "标": "標", "签": "籤", "规": "規", "组": "組", "处": "處", "发": "發",
+      "说": "說", "请": "請", "页": "頁", "单": "單", "图": "圖", "学": "學",
+      "习": "習", "务": "務", "线": "線", "后": "後", "备": "備", "录": "錄"
+    }
+  },
+  "generic_lexicon": {
+    "products": [
+      "桌面收纳套件",
+      "便携工具组合",
+      "电子配件套装",
+      "图形设计素材",
+      "设备维护服务",
+      "文件整理工具",
+      "远程配置服务",
+      "多规格标签包",
+      "学习参考手册",
+      "通用接口组件",
+      "图片处理模板",
+      "批量排版工具"
+    ],
+    "attributes": [
+      "标准版",
+      "轻量版",
+      "组合版",
+      "更新版",
+      "多规格",
+      "可选配色",
+      "分批交付",
+      "附使用说明",
+      "支持自选参数",
+      "含基础售后"
+    ],
+    "title_modifiers": [
+      "简装款",
+      "常规款",
+      "便携款",
+      "通用款",
+      "基础包装",
+      "组合包装",
+      "加固包装",
+      "轻便包装",
+      "标准尺寸",
+      "紧凑尺寸",
+      "桌面适用",
+      "出行适用",
+      "现行批次",
+      "补充批次",
+      "普通版本",
+      "备用版本"
+    ],
+    "delivery": [
+      "确认规格和数量后再安排交付，处理进度会按页面所列顺序更新",
+      "订单提交后先核对所选版本，再按页面顺序完成整理、包装和交付",
+      "清单核对完成后附上对应的使用说明，实物内容会依照确认过的选项准备",
+      "工作时段内依次处理订单，遇到规格备注不完整时会先暂停准备并等待补充",
+      "确认用途、尺寸与配色后开始准备，多个版本会分开整理并在同一清单中标明",
+      "按所选版本完成配置和基础检查，交付前会再次核对数量、包装状态及随附说明"
+    ],
+    "service": [
+      "如需调整数量、外观或包装方式，请在下单前写清具体要求，开始处理后不再临时改动",
+      "售后问题按订单顺序处理，反馈时请保留页面编号，并说明收到内容与所选清单的差异",
+      "规格不清楚时可先查看说明，确认型号、尺寸和适用范围后再选择，避免不同版本混在同一订单",
+      "收到后请先核对数量、外观、配件和使用说明，如有遗漏请按清单逐项说明",
+      "不同版本需要分别选择并单独备注，页面名称相近时请同时核对批次标记和选项说明",
+      "特殊要求请提前写入订单备注，涉及组合调整时应列出保留项与替换项，方便按同一顺序复核"
+    ],
+    "categories": [
+      "设备配件",
+      "软件工具",
+      "设计素材",
+      "维护服务",
+      "学习资料",
+      "办公用品",
+      "接口组件",
+      "排版模板"
+    ],
+    "category_products": {
+      "设备配件": ["便携工具组合", "电子配件套装"],
+      "软件工具": ["文件整理工具"],
+      "设计素材": ["图形设计素材", "图片处理模板"],
+      "维护服务": ["设备维护服务", "远程配置服务"],
+      "学习资料": ["学习参考手册"],
+      "办公用品": ["桌面收纳套件", "多规格标签包"],
+      "接口组件": ["通用接口组件"],
+      "排版模板": ["批量排版工具"]
+    },
+    "markets": [
+      "青岚集市",
+      "远山商街",
+      "星港广场"
+    ]
+  },
+  "style_prototypes": [
+    {"style_id": "style_01", "separator": "，", "ending": "。", "line_mode": "single", "english_tag": "", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_02", "separator": "；", "ending": "。", "line_mode": "double", "english_tag": "V2", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_03", "separator": " / ", "ending": "。", "line_mode": "single", "english_tag": "PRO", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_04", "separator": "｜", "ending": "！", "line_mode": "double", "english_tag": "", "traditional_variant": false, "repeat_punctuation": true},
+    {"style_id": "style_05", "separator": "、", "ending": "。", "line_mode": "bullet", "english_tag": "OK", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_06", "separator": " - ", "ending": "。", "line_mode": "single", "english_tag": "PLUS", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_07", "separator": "；", "ending": "！", "line_mode": "bullet", "english_tag": "", "traditional_variant": true, "repeat_punctuation": false},
+    {"style_id": "style_08", "separator": "，", "ending": "。", "line_mode": "double", "english_tag": "NEW", "traditional_variant": true, "repeat_punctuation": false},
+    {"style_id": "style_09", "separator": "｜", "ending": "。", "line_mode": "single", "english_tag": "S", "traditional_variant": false, "repeat_punctuation": true},
+    {"style_id": "style_10", "separator": " / ", "ending": "！", "line_mode": "bullet", "english_tag": "X", "traditional_variant": false, "repeat_punctuation": false},
+    {"style_id": "style_11", "separator": "、", "ending": "。", "line_mode": "double", "english_tag": "", "traditional_variant": true, "repeat_punctuation": true},
+    {"style_id": "style_12", "separator": " - ", "ending": "。", "line_mode": "bullet", "english_tag": "LITE", "traditional_variant": false, "repeat_punctuation": false}
+  ],
+  "split_libraries": {
+    "train": {
+      "title_skeletons": [
+        "现货{product}{attribute} 编号{code}",
+        "{product}日常组合 {attribute} {title_modifier}",
+        "可选规格的{product} 批次{code}",
+        "{product}基础套装 编码{code} {attribute}",
+        "本周整理：{product} {attribute} {title_modifier}",
+        "{attribute}{product} {title_modifier}",
+        "多用途{product} 清单号{code}",
+        "{product}组合上架 {attribute} {title_modifier}"
+      ],
+      "description_skeletons": [
+        "页面内容对应{product}{separator}当前为{attribute}{separator}{delivery}{ending}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "本条包含{product}{separator}规格标记为{attribute}{separator}{service}{ending}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}按编号{code}整理{separator}{delivery}{ending}{service}{separator}请核对页面选项{ending}{noise_clause}{context_guard}{identity_clause}",
+        "此处提供{product}{separator}版本是{attribute}{ending}{delivery}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "商品清单以{code}为准{separator}内容为{product}{separator}{attribute}{ending}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}采用常规包装{separator}{delivery}{separator}{service}{ending}页面参数可选{attribute}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "编号{code}对应{product}{separator}{attribute}{ending}{service}{separator}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "请先确认{product}的{attribute}{separator}{delivery}{ending}{service}{separator}以订单备注为准{ending}{noise_clause}{context_guard}{identity_clause}"
+      ]
+    },
+    "development": {
+      "title_skeletons": [
+        "到货批次{code}：{product}{attribute}",
+        "{attribute}可用的{product} 货号{code}",
+        "今日整理{product} 规格{attribute} {title_modifier}",
+        "{product}选配页面 序号{code} {attribute}",
+        "常规供应{product} {attribute} {title_modifier}",
+        "编号{code}的{product}组合 {attribute}",
+        "{product}补充上架 版本{attribute} {title_modifier}",
+        "可直接选择的{product} {attribute} {title_modifier}"
+      ],
+      "description_skeletons": [
+        "货号{code}对应{product}{separator}可选{attribute}{ending}{service}{separator}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "当前页面为{product}{separator}{delivery}{separator}版本说明：{attribute}{ending}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "请按{code}核对{product}{separator}{service}{ending}{attribute}{separator}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}已按{attribute}整理{separator}{delivery}{ending}页面仅对应本批次{code}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "本页说明{product}的选项{separator}{attribute}{separator}{service}{ending}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "批次{code}现提供{product}{separator}{service}{ending}{delivery}{separator}规格为{attribute}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "选择{product}前请确认{attribute}{separator}{service}{ending}{delivery}{separator}编号{code}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{attribute}的{product}已完成整理{separator}{delivery}{ending}{service}{separator}请保留编号{code}{ending}{noise_clause}{context_guard}{identity_clause}"
+      ]
+    },
+    "audit_a": {
+      "title_skeletons": [
+        "批号{code}上新 {product} {attribute}",
+        "{product}按需选择 {attribute} 识别码{code}",
+        "稳定供应的{product} {attribute} {title_modifier}",
+        "{attribute}{product} 订购号{code}",
+        "本期{product}组合 {attribute} {title_modifier}",
+        "{product}配置选项 {attribute} {title_modifier}",
+        "清单{code}：{product}{attribute}",
+        "常用{product}补充装 {attribute} {title_modifier}"
+      ],
+      "description_skeletons": [
+        "识别码{code}用于核对{product}{separator}{attribute}{ending}{delivery}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "本期内容是{product}{separator}当前选项{attribute}{separator}{service}{ending}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}按页面参数准备{separator}{delivery}{ending}{service}{separator}批号为{code}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "订购号{code}对应{attribute}{product}{separator}{service}{ending}{delivery}{separator}请勿选错{ending}{noise_clause}{context_guard}{identity_clause}",
+        "此清单含{product}{separator}{attribute}{ending}{service}{separator}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "页面展示{product}的当前批次{separator}{delivery}{separator}{service}{ending}选项为{attribute}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{attribute}{product}按{code}记录{separator}{service}{ending}{delivery}{separator}完成后核对清单{ending}{noise_clause}{context_guard}{identity_clause}",
+        "请先保存批号{code}{separator}本页为{product}{separator}{attribute}{ending}{delivery}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}"
+      ]
+    },
+    "audit_b": {
+      "title_skeletons": [
+        "序列{code}可选 {product}{attribute}",
+        "{product}组合页 {attribute} {title_modifier}",
+        "新批{code}的{product} {attribute}",
+        "{attribute}规格{product} 序列{code}",
+        "现行版本{product} {attribute} {title_modifier}",
+        "{product}备选组合 {attribute} {title_modifier}",
+        "登记号{code} {product}{attribute}",
+        "常备{product}方案 {attribute} {title_modifier}"
+      ],
+      "description_skeletons": [
+        "序列{code}对应当前{product}{separator}{service}{ending}{attribute}{separator}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}组合按标记{code}区分{separator}{attribute}{ending}{delivery}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "本次提供{attribute}{product}{separator}{service}{separator}{delivery}{ending}请核对序列{code}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "登记号{code}用于确认{product}{separator}{delivery}{ending}{attribute}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "页面为现行{product}方案{separator}{attribute}{separator}{service}{ending}{delivery}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "{product}备选内容已经整理{separator}{delivery}{ending}{service}{separator}标记为{code}{ending}{noise_clause}{context_guard}{identity_clause}",
+        "请依照{code}选择{attribute}{product}{separator}{service}{ending}{delivery}{separator}完成后核对{ending}{noise_clause}{context_guard}{identity_clause}",
+        "当前{product}使用独立登记号{code}{separator}{attribute}{ending}{delivery}{separator}{service}{ending}{noise_clause}{context_guard}{identity_clause}"
+      ]
+    }
+  },
+  "identity_clause_templates": {
+    "direct": {
+      "telegram": " 下单前可联系 Telegram: {value}。",
+      "email": " 售后联系邮箱 {value}。",
+      "bat": " 咨询请用蝙蝠号 {value}。",
+      "qq": " 客服QQ {value}。",
+      "wechat": " 拍前联系微信 {value}。",
+      "phone": " 售后联系电话 {value}。",
+      "crypto_wallet": " 付款钱包地址 {value}。",
+      "external_url": " 服务说明见 https://{value}。"
+    },
+    "context_guards": [
+      "补充说明：页面中的规格、颜色、尺寸和版本分别对应不同组合，请逐项核对所选参数；当前状态和处理顺序以页面显示为准，编号只用于区分选项，收到内容后请按清单确认数量、外观与版本，已经确认的批次请勿与其他页面混用。",
+      "选项说明：本页展示的型号、数量、包装和配色需要分别选择，页面序号仅用于核对相应组合；准备顺序按照所选批次依次安排，如需变更请在开始处理前更新订单备注，完成后请对照页面清单检查版本与配件是否一致。",
+      "页面提示：不同颜色、尺寸、批号和组合装对应独立选项，提交前请确认页面上已经选定的参数；展示图片用于帮助区分外观，实际内容以所选清单为准，同一批次的编号请连续核对，避免把其他页面的版本混在一起。",
+      "规格备注：当前页面列出的基础版、组合版和可选参数需要按照清单分别核对，批次标记只代表处理顺序；数量、外观及配件以最终选择为准，若页面状态发生变化请重新确认选项，完成后按编号逐项检查即可。",
+      "组合说明：页面把不同规格、颜色和包装方式拆分为若干选项，所见编号用于对应具体清单；请先确认版本再核对数量，准备过程按照批次顺序进行，不同页面的标记不可混用，最终内容以已经选定的组合为准。",
+      "核对提示：本页各项参数分别表示尺寸、外观、数量和版本，页面标记不包含其他用途；选择完成后请保留对应编号，并按照清单逐项确认，若要调整组合应在开始准备前修改选项，不同批次请分开核对，页面显示顺序只用于浏览。",
+      "批次说明：当前内容按照页面所列顺序分批整理，每个编号只对应一种规格组合；颜色、尺寸、包装和配件均以选定参数为准，请在提交前检查完整清单，已经进入准备阶段的批次仍按原有选项处理，页面展示位置不改变所选内容。",
+      "版本说明：页面中的不同版本可能采用不同包装、配色和配件组合，序号仅用于区分这些选项；请依次检查数量与规格是否匹配，展示顺序不代表额外含义，最终应以所选参数和对应清单为准，同类选项也应分别核对编号。",
+      "清单提示：请按照页面编号核对当前选择的规格、颜色、数量及配件，不同组合分别展示，不能仅凭图片判断版本；批次状态用于说明准备进度，确认后的内容以清单记录为准，其他页面的参数不会自动合并。",
+      "参数说明：页面展示的尺寸、颜色、包装和版本均为独立可选项，编号用于保持清单顺序；请先确认所需组合，再检查数量和配件，若选项尚未确定可以返回页面重新核对，完成选择后以当前记录为准，不同页面记录需要分开保存。",
+      "整理说明：本页内容根据规格和版本分别归入对应批次，页面序号用于区分相近组合；准备前请核对颜色、尺寸、数量与配件，处理完成后仍需按清单逐项检查，其他批次的标记不应替代当前选项，排列位置不会改变实际组合。",
+      "展示说明：图片、编号和排列顺序用于帮助区分不同规格，实际组合取决于页面中选定的颜色、尺寸、数量与版本；请保存对应清单并逐项核验，批次变化时应重新查看当前参数，避免沿用其他页面的旧选项。"
+    ],
+    "risky": {
+      "telegram": " 客户资料样例中的 Telegram: {value} 仅作字段展示。",
+      "email": " 数据样例里的电子邮箱 {value} 不是客服地址。",
+      "bat": " 账号样例字段中写有蝙蝠号 {value}，请勿联系。",
+      "qq": " 客户记录样例包含QQ {value}，不是本店客服。",
+      "wechat": " 数据格式示例含微信 {value}，请勿添加。",
+      "phone": " 样例资料中的联系电话 {value} 不是售后号码。",
+      "crypto_wallet": " 数据样例字段含钱包地址 {value}，不用于付款。",
+      "external_url": " 样例来源页为 https://{value}，仅用于格式说明。"
+    },
+    "support": {
+      "email": " 平台公共支持邮箱 {value}，多家店铺共用。",
+      "phone": " 公共服务电话 {value}，不代表店主身份。",
+      "external_url": " 公共帮助页面 https://{value}，多家店铺使用。"
+    },
+    "must_ignore": [
+      " 页面序号ZX-{value}仅作核对。",
+      " 条目代号KX-{value}仅作区分。",
+      " 包装序号REF-{value}请用于核对。"
+    ]
+  }
+}

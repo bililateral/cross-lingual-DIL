@@ -1,0 +1,710 @@
+{
+  "version": "2026-07-28-step28-v13-dataset-custody-deployment-v7-draft",
+  "status": "DRAFT_NOT_DEPLOYABLE",
+  "formal_generation_enabled": false,
+  "claim_boundary": "This file defines the required capability separation but does not attest that formal OS accounts, ACL roots, mounts, or audit hooks exist.",
+  "parent_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "sha256": null
+  },
+  "formal_readiness": {
+    "all_required_fields_non_null": false,
+    "source_closure_hashes_frozen": false,
+    "os_accounts_and_groups_verified": false,
+    "absolute_roots_verified": false,
+    "acl_and_mount_receipts_verified": false,
+    "audit_hook_access_manifests_verified": false,
+    "cross_split_non_co_mount_verified": false,
+    "capability_parent_seals_verified": false,
+    "formal_entrypoints_verified": false,
+    "ready_for_dataset_release_lock": false
+  },
+  "split_custody": {
+    "train": {
+      "os_account": null,
+      "os_group": null,
+      "generator_root": null,
+      "producer_oracle_root": null,
+      "independent_replay_root": null,
+      "comparison_root": null,
+      "structure_key_environment_variable": "STEP28_V13_TRAIN_STRUCTURE_KEY_HEX"
+    },
+    "development": {
+      "os_account": null,
+      "os_group": null,
+      "generator_root": null,
+      "producer_oracle_root": null,
+      "independent_replay_root": null,
+      "comparison_root": null,
+      "structure_key_environment_variable": "STEP28_V13_DEVELOPMENT_STRUCTURE_KEY_HEX"
+    },
+    "audit_a": {
+      "os_account": null,
+      "os_group": null,
+      "generator_root": null,
+      "producer_oracle_root": null,
+      "independent_replay_root": null,
+      "comparison_root": null,
+      "structure_key_environment_variable": "STEP28_V13_AUDIT_A_STRUCTURE_KEY_HEX"
+    },
+    "audit_b": {
+      "os_account": null,
+      "os_group": null,
+      "generator_root": null,
+      "producer_oracle_root": null,
+      "independent_replay_root": null,
+      "comparison_root": null,
+      "structure_key_environment_variable": "STEP28_V13_AUDIT_B_STRUCTURE_KEY_HEX"
+    }
+  },
+  "fixed_nonjoinable_aggregate_receipt_schemas": {
+    "common_top_level_exact_keys": [
+      "version",
+      "evidence_level",
+      "fixed_boolean_gates",
+      "fixed_counts",
+      "input_parent_hashes",
+      "aggregate_content_hashes",
+      "canonical_self_hash"
+    ],
+    "common_constraints": {
+      "version_and_evidence_level_are_release_exact_constants": true,
+      "unknown_or_dynamic_keys_forbidden_recursively": true,
+      "map_or_list_values_forbidden_below_the_four_fixed_objects": true,
+      "boolean_gate_values_are_boolean": true,
+      "count_values_are_nonnegative_integers": true,
+      "hash_values_are_lowercase_sha256": true,
+      "per_world_seller_item_pair_style_category_or_trigger_breakdowns_forbidden": true,
+      "paths_filenames_uids_text_parser_rows_and_access_events_forbidden": true,
+      "validator_recomputes_every_boolean_count_and_hash_from_sealed_inputs": true,
+      "policy_parent_sha256_is_exact_file_bytes": true,
+      "registered_split_scope_binds_policy_version_mode_split_and_exact_world_set": true
+    },
+    "canonical_multiset_hash_encoding": {
+      "version_prefix_utf8_then_nul": "step28-v13-canonical-multiset-v1",
+      "row_encoding": "RFC8259 UTF-8 JSON with ensure_ascii=false, sort_keys=true, separators comma-colon and allow_nan=false",
+      "ordering": "encoded row bytes ascending lexicographically; duplicates retained",
+      "framing": "prefix, NUL, unsigned 64-bit big-endian row count, then for every sorted row unsigned 64-bit big-endian byte length followed by exact row bytes",
+      "digest": "lowercase SHA-256 of the complete framed byte string"
+    },
+    "render_integrity": {
+      "release_exact_version": "2026-07-28-step28-v13-render-integrity-receipt-v1-draft",
+      "release_exact_evidence_level": "DEVELOPMENT_IN_PROCESS_SELF_HASH_NOT_FORMAL_CUSTODY",
+      "fixed_boolean_gates_exact_keys": [
+        "parser_rows_and_flags_exact",
+        "parser_item_universe_exact",
+        "identity_redaction_complete",
+        "base_text_exact",
+        "must_ignore_text_preserved",
+        "titles_unchanged",
+        "post_redaction_seller_minimums_pass"
+      ],
+      "fixed_counts_exact_keys": [
+        "split_world_count",
+        "split_item_count",
+        "planned_identity_slot_count",
+        "parsed_identity_occurrence_count",
+        "noise_slot_count",
+        "identity_residue_count",
+        "must_ignore_mismatch_count",
+        "base_text_mismatch_count",
+        "title_mismatch_count"
+      ],
+      "input_parent_hashes_exact_keys": [
+        "observed_parent_sha256",
+        "redacted_parent_sha256",
+        "parser_parent_sha256",
+        "renderer_audit_parent_sha256",
+        "render_ast_parent_sha256",
+        "policy_parent_sha256",
+        "registered_split_scope_sha256"
+      ],
+      "aggregate_content_hashes_exact_keys": [
+        "parser_rows_multiset_sha256",
+        "redacted_items_multiset_sha256",
+        "render_integrity_multiset_sha256"
+      ]
+    },
+    "candidate_integrity": {
+      "release_exact_version": "2026-07-28-step28-v13-candidate-integrity-receipt-v1-draft",
+      "release_exact_evidence_level": "DEVELOPMENT_IN_PROCESS_SELF_HASH_NOT_FORMAL_CUSTODY",
+      "fixed_boolean_gates_exact_keys": [
+        "complete_pair_universe_exact",
+        "candidate_schema_exact",
+        "candidate_keys_unique",
+        "sampling_lineage_exact",
+        "label_and_oracle_fields_absent_from_sealer_arguments"
+      ],
+      "fixed_counts_exact_keys": [
+        "split_world_count",
+        "split_complete_pair_count",
+        "split_candidate_pair_count",
+        "duplicate_candidate_count",
+        "foreign_key_mismatch_count"
+      ],
+      "input_parent_hashes_exact_keys": [
+        "candidate_policy_projection_sha256",
+        "candidate_key_commitment_sha256",
+        "observed_seller_parent_sha256",
+        "raw_observed_item_parent_sha256",
+        "complete_pair_parent_sha256",
+        "candidate_parent_sha256",
+        "sampling_audit_parent_sha256",
+        "policy_parent_sha256",
+        "registered_split_scope_sha256"
+      ],
+      "aggregate_content_hashes_exact_keys": [
+        "complete_pair_multiset_sha256",
+        "candidate_pair_multiset_sha256",
+        "sampling_lineage_multiset_sha256"
+      ]
+    },
+    "m1_derangement_integrity": {
+      "release_exact_version": "2026-07-28-step28-v13-m1-derangement-integrity-receipt-v1-draft",
+      "release_exact_evidence_level": "DEVELOPMENT_IN_PROCESS_SELF_HASH_NOT_FORMAL_CUSTODY",
+      "fixed_boolean_gates_exact_keys": [
+        "input_universe_exact",
+        "destination_source_bijection_exact",
+        "endpoint_disjoint_exact",
+        "joint_vector_multiset_exact",
+        "labels_controller_and_candidate_evidence_fields_absent_from_sealer_arguments",
+        "deterministic_replay_exact",
+        "support_comparability_pass"
+      ],
+      "fixed_counts_exact_keys": [
+        "split_world_count",
+        "m1_replicate_count",
+        "m2_identity33_row_count",
+        "m1_identity33_row_count",
+        "mapping_row_count",
+        "fixed_point_count",
+        "endpoint_overlap_count",
+        "multiset_mismatch_count",
+        "support_failure_count"
+      ],
+      "input_parent_hashes_exact_keys": [
+        "m2_identity33_parent_sha256",
+        "complete_pair_parent_sha256",
+        "candidate_endpoint_parent_sha256",
+        "m1_output_parent_sha256",
+        "derangement_mapping_parent_sha256",
+        "policy_parent_sha256",
+        "registered_split_scope_sha256"
+      ],
+      "aggregate_content_hashes_exact_keys": [
+        "m2_identity33_multiset_sha256",
+        "m1_identity33_multiset_sha256",
+        "derangement_mapping_multiset_sha256",
+        "support_preflight_sha256"
+      ]
+    },
+    "independent_dgp_comparison": {
+      "release_exact_version": "2026-07-28-step28-v13-independent-dgp-comparison-projection-v1-draft",
+      "release_exact_evidence_level": "DEVELOPMENT_IN_PROCESS_TYPED_REPLAY_EXACT_NOT_FORMAL_CUSTODY",
+      "fixed_boolean_gates_exact_keys": [
+        "complete_registered_world_set_exact",
+        "all_worlds_exact",
+        "independent_decision_implementation",
+        "producer_private_input_argument_used_by_replayer_absent",
+        "structure_key_serialized_in_comparison_receipt_absent",
+        "component_counts_and_hashes_exact"
+      ],
+      "fixed_counts_exact_keys": [
+        "split_world_count",
+        "component_count",
+        "producer_component_row_count",
+        "replayer_component_row_count",
+        "component_mismatch_count"
+      ],
+      "input_parent_hashes_exact_keys": [
+        "per_world_comparison_parent_sha256",
+        "producer_projection_parent_sha256",
+        "independent_replay_parent_sha256",
+        "policy_parent_sha256",
+        "registered_split_scope_sha256"
+      ],
+      "aggregate_content_hashes_exact_keys": [
+        "per_world_comparison_multiset_sha256",
+        "component_summary_multiset_sha256",
+        "observed_uid_pool_audit_multiset_sha256"
+      ]
+    },
+    "structural_audit": {
+      "release_exact_version": "2026-07-28-step28-v13-structural-audit-receipt-v1-draft",
+      "release_exact_evidence_level": "DEVELOPMENT_RECEIPT_ONLY_AUDIT_NOT_FORMAL_CUSTODY",
+      "fixed_boolean_gates_exact_keys": [
+        "receipt_role_set_exact",
+        "receipt_recursive_schemas_exact",
+        "receipt_self_hashes_exact",
+        "all_integrity_boolean_gates_pass",
+        "parent_projection_role_set_exact",
+        "parent_content_and_file_hashes_match",
+        "cross_receipt_world_counts_exact",
+        "development_non_custody_boundary_explicit"
+      ],
+      "fixed_counts_exact_keys": [
+        "split_world_count",
+        "aggregate_receipt_count",
+        "parent_projection_count",
+        "failed_integrity_gate_count",
+        "formal_custody_parent_seal_count"
+      ],
+      "input_parent_hashes_exact_keys": [
+        "aggregate_receipt_set_sha256",
+        "parent_projection_set_sha256",
+        "deployment_schema_parent_sha256",
+        "registered_split_scope_sha256"
+      ],
+      "aggregate_content_hashes_exact_keys": [
+        "receipt_boolean_vector_sha256",
+        "receipt_count_vector_sha256",
+        "receipt_content_hash_vector_sha256"
+      ]
+    }
+  },
+  "structural_auditor_parent_seal_projection_schema": {
+    "records_sorted_by_role_utf8": true,
+    "record_exact_keys": [
+      "role",
+      "file_sha256",
+      "content_sha256",
+      "source_closure_sha256",
+      "access_summary_sha256"
+    ],
+    "exact_record_count_by_split": {
+      "train": 4,
+      "development": 3,
+      "audit_a": 3,
+      "audit_b": 3
+    },
+    "role_exact_values_by_split": {
+      "train": [
+        "candidate_integrity",
+        "independent_dgp_comparison",
+        "m1_derangement_integrity",
+        "render_integrity"
+      ],
+      "development": [
+        "candidate_integrity",
+        "independent_dgp_comparison",
+        "render_integrity"
+      ],
+      "audit_a": [
+        "candidate_integrity",
+        "independent_dgp_comparison",
+        "render_integrity"
+      ],
+      "audit_b": [
+        "candidate_integrity",
+        "independent_dgp_comparison",
+        "render_integrity"
+      ]
+    },
+    "all_non_role_values_are_lowercase_sha256": true,
+    "paths_filenames_access_events_and_dynamic_objects_forbidden": true
+  },
+  "development_source_closure_contract": {
+    "algorithm": "recursively parse every registered Python entry source with Python ast, follow every repository-local absolute import plus each literal importlib.import_module/import_module/__import__ target, union registered non-Python schema dependencies, sort repository-relative paths by UTF-8 bytes, and hash every member path plus exact file SHA-256",
+    "all_discovered_repo_local_dependencies_bound": true,
+    "every_registered_member_hash_perturbation_changes_closure": true,
+    "role_local_imports_are_lazy": true,
+    "nonliteral_dynamic_imports_fail_closed": true,
+    "registered_alias_and_indirect_patterns_fail_closed": [
+      "import importlib as alias",
+      "import builtins",
+      "from importlib import import_module",
+      "non-direct importlib.import_module attribute use",
+      "getattr or vars applied directly to importlib or builtins",
+      "attribute named import_module or __import__ on another object"
+    ],
+    "direct_reflection_primitives_fail_closed": [
+      "__builtins__ name",
+      "compile direct call",
+      "eval direct call",
+      "exec direct call",
+      "globals direct call",
+      "locals direct call"
+    ],
+    "relative_imports_fail_closed": true,
+    "relative_dynamic_targets_fail_closed": true,
+    "unregistered_reflection_is_not_claimed_as_development_sandbox": true,
+    "conservative_repo_local_superset_allowed": true,
+    "third_party_environment_lock_required_for_formal": true,
+    "formal_fresh_process_loaded_module_inventory_implemented": false
+  },
+  "capabilities": {
+    "split_generator": {
+      "process_count": 4,
+      "one_process_per_split": true,
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_generate_dataset.py",
+      "read_roles": [
+        "public_policy",
+        "construction_contract",
+        "synthetic_template",
+        "parser_fixture",
+        "style_profile",
+        "one_split_structure_key"
+      ],
+      "write_roles": [
+        "one_split_observed",
+        "one_split_structural_staging",
+        "one_split_producer_oracle"
+      ],
+      "forbidden_roles": [
+        "another_split_key",
+        "another_split_root",
+        "old_labels",
+        "m0_or_model_scores"
+      ]
+    },
+    "split_private_independent_dgp_replayer": {
+      "process_count": 4,
+      "one_process_per_split": true,
+      "formal_entrypoint": null,
+      "development_entrypoint": "scripts/step28_v13_run_independent_dgp_replay.py",
+      "implementation": "scripts/step28_v13_independent_private_dgp_replay.py",
+      "read_roles": [
+        "public_policy",
+        "world_uid_pool",
+        "seller_uid_pool",
+        "all_item_uid_pool",
+        "nonempty_title_item_uid_pool",
+        "nonempty_description_item_uid_pool",
+        "one_split_structure_key"
+      ],
+      "write_roles": [
+        "one_split_private_replay_ledger",
+        "one_split_private_replay_receipt"
+      ],
+      "forbidden_roles": [
+        "producer_oracle",
+        "renderer_slots_or_asts",
+        "raw_or_redacted_text",
+        "parser_rows",
+        "labels_or_qrels",
+        "model_inputs_or_scores",
+        "another_split_key",
+        "another_split_root"
+      ],
+      "producer_decision_module_import_count": 0,
+      "key_cli_argument_allowed": false,
+      "secret_serialization_allowed": false
+    },
+    "split_private_producer_dgp_projection_sealer": {
+      "process_count": 4,
+      "one_process_per_split": true,
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_producer_dgp_projection.py",
+      "read_roles": [
+        "sealed_producer_controller_membership",
+        "sealed_producer_seller_markets",
+        "sealed_producer_controller_style_groups",
+        "sealed_producer_mechanism_assignments",
+        "sealed_producer_identity_assets",
+        "sealed_producer_positive_and_negative_targets",
+        "sealed_producer_override_audit",
+        "sealed_producer_render_asts",
+        "sealed_producer_solver_audit"
+      ],
+      "write_roles": [
+        "one_split_minimum_producer_typed_dgp_projection",
+        "one_split_producer_projection_parent_manifest"
+      ],
+      "forbidden_roles": [
+        "another_split_root",
+        "raw_observed_text",
+        "parser_rows",
+        "labels_or_qrels",
+        "model_inputs_or_scores"
+      ],
+      "projection_excludes": [
+        "raw_identity_values_and_rendered_occurrence_identity_uids",
+        "raw_or_redacted_text",
+        "slot_and_occurrence_flow",
+        "parser_outputs",
+        "noncomparison_solver_fields"
+      ],
+      "projection_retains": [
+        "synthetic_identity_asset_uid_required_for_exact_topology_comparison"
+      ]
+    },
+    "split_private_dgp_comparator": {
+      "process_count": 4,
+      "one_process_per_split": true,
+      "formal_entrypoint": null,
+      "development_entrypoint": "scripts/step28_v13_compare_independent_dgp_replay.py",
+      "implementation": "scripts/step28_v13_independent_dgp_comparator.py",
+      "read_roles": [
+        "public_policy",
+        "sealed_producer_private_projection",
+        "sealed_producer_projection_parent_manifest",
+        "sealed_independent_replay_ledger",
+        "sealed_independent_replay_receipt",
+        "immutable_capability_parent_seals"
+      ],
+      "write_roles": [
+        "private_world_comparison_receipts",
+        "fixed_aggregate_comparison_receipt"
+      ],
+      "forbidden_roles": [
+        "any_structure_key_or_key_environment",
+        "raw_text",
+        "labels_or_qrels",
+        "model_inputs_or_scores"
+      ],
+      "structure_key_input_count": 0
+    },
+    "parser_worker": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_production_chain.py:parse_observed_world",
+      "read_roles": [
+        "minimum_observed_projection",
+        "public_parser_policy",
+        "parser_template_fixture_without_expected_rows"
+      ],
+      "write_roles": [
+        "parsed_identity_occurrences_staging"
+      ],
+      "forbidden_roles": [
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "solver_audit",
+        "renderer_slot_or_ast_plan",
+        "parser_expected_rows_or_flags",
+        "independent_replay_ledger_or_receipt",
+        "classification_labels_or_qrels"
+      ]
+    },
+    "redactor_worker": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_production_chain.py:redact_observed_world",
+      "read_roles": [
+        "minimum_observed_projection",
+        "parsed_identity_occurrences",
+        "redaction_registry_minimum_projection",
+        "public_redaction_policy"
+      ],
+      "write_roles": [
+        "redacted_observed_projection_staging",
+        "fixed_redaction_diagnostics"
+      ],
+      "forbidden_roles": [
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "solver_audit",
+        "renderer_slot_or_ast_plan",
+        "parser_expected_rows_or_flags",
+        "independent_replay_ledger_or_receipt",
+        "classification_labels_or_qrels"
+      ]
+    },
+    "candidate_worker": {
+      "process_count": 4,
+      "one_process_per_split": true,
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_candidate_sampling.py",
+      "read_roles": [
+        "raw_observed_sellers_and_items_for_one_split",
+        "complete_model_pair_universe",
+        "public_candidate_policy_projection_without_structure_or_oracle_secrets",
+        "frozen_step3_and_step4_code_and_schemas",
+        "one_split_candidate_key"
+      ],
+      "write_roles": [
+        "one_split_candidate_safe_projection",
+        "one_split_candidate_sampling_audit_staging"
+      ],
+      "forbidden_roles": [
+        "full_parent_policy",
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "solver_audit",
+        "classification_labels_or_qrels",
+        "model_inputs_or_scores",
+        "another_split_candidate_key",
+        "persisted_redacted_m0_profile_as_candidate_input"
+      ],
+      "raw_profile_and_step4_evidence_in_memory_only": true,
+      "candidate_sampling_audit_not_dataset_public": true,
+      "public_candidate_projection_values_exact_not_key_only": true,
+      "public_candidate_static_contract_sha256": "56641833ffff904fce7fcc00c1cddcfbf6d4b244d37f249c4e539b1ea805061b"
+    },
+    "render_integrity_projection_sealer": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_integrity_receipts.py:build_render_integrity_receipt",
+      "read_roles": [
+        "observed_and_redacted_text",
+        "parsed_identity_occurrences",
+        "renderer_identity_and_noise_audit",
+        "sealed_raw_item_local_render_ast",
+        "private_parser_expectations",
+        "public_render_and_redaction_policy"
+      ],
+      "write_roles": [
+        "nonjoinable_aggregate_render_integrity_receipt"
+      ],
+      "output_schema_ref": "fixed_nonjoinable_aggregate_receipt_schemas.render_integrity",
+      "output_forbidden_fields": [
+        "world_uid",
+        "seller_uid",
+        "item_uid",
+        "effective_or_base_style_uid",
+        "raw_or_redacted_text",
+        "parser_rows",
+        "identity_values_or_uids"
+      ],
+      "forbidden_roles": [
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "solver_audit",
+        "classification_labels_or_qrels"
+      ]
+    },
+    "candidate_integrity_projection_sealer": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_integrity_receipts.py:build_candidate_integrity_receipt",
+      "read_roles": [
+        "raw_observed_sellers_and_items_for_one_split",
+        "complete_model_pair_universe",
+        "candidate_pair_projection",
+        "candidate_sampling_audit",
+        "frozen_step3_and_step4_code_and_schemas",
+        "one_split_candidate_key",
+        "public_candidate_policy_projection_without_structure_or_oracle_secrets"
+      ],
+      "write_roles": [
+        "nonjoinable_aggregate_candidate_integrity_receipt"
+      ],
+      "output_schema_ref": "fixed_nonjoinable_aggregate_receipt_schemas.candidate_integrity",
+      "output_forbidden_fields": [
+        "world_seller_item_or_pair_uid",
+        "candidate_trigger_or_role",
+        "sampling_lineage_rows",
+        "text",
+        "labels_or_qrels"
+      ],
+      "forbidden_roles": [
+        "full_parent_policy",
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "classification_labels_or_qrels",
+        "model_inputs_or_scores"
+      ],
+      "public_candidate_projection_values_exact_not_key_only": true,
+      "public_candidate_static_contract_sha256": "56641833ffff904fce7fcc00c1cddcfbf6d4b244d37f249c4e539b1ea805061b"
+    },
+    "m1_derangement_integrity_projection_sealer": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_integrity_receipts.py:build_m1_derangement_integrity_receipt",
+      "read_roles": [
+        "m2_identity33",
+        "complete_pair_endpoints",
+        "endpoint_only_candidate_projection",
+        "five_destination_keyed_m1_identity33_matrices",
+        "five_private_derangement_mappings",
+        "support_comparability_preflight",
+        "public_placebo_policy"
+      ],
+      "write_roles": [
+        "nonjoinable_aggregate_m1_derangement_integrity_receipt"
+      ],
+      "five_registered_replicates_are_combined_into_one_receipt": true,
+      "aggregate_count_semantics": {
+        "m1_replicate_count": "exactly five",
+        "m2_identity33_row_count": "exactly 3780",
+        "m1_identity33_row_count": "sum across all five matrices, exactly 18900",
+        "mapping_row_count": "sum across all five private mappings, exactly 18900",
+        "fixed_point_count": "sum across all five mappings, exactly zero",
+        "endpoint_overlap_count": "sum across all five mappings, exactly zero",
+        "multiset_mismatch_count": "count of world-universe-replicate multiset mismatches, exactly zero",
+        "support_failure_count": "count of registered replicates failing any primary C40 support threshold, exactly zero",
+        "m1_identity33_multiset_sha256": "one canonical multiset over rows prefixed by registered rewire_seed_id, covering all five destination-keyed matrices"
+      },
+      "output_schema_ref": "fixed_nonjoinable_aggregate_receipt_schemas.m1_derangement_integrity",
+      "output_forbidden_fields": [
+        "world_seller_item_or_pair_uid",
+        "source_to_destination_mapping_rows",
+        "candidate_trigger_or_sampling_lineage",
+        "feature_rows",
+        "labels_or_qrels"
+      ],
+      "forbidden_roles": [
+        "structure_key",
+        "controller_membership",
+        "controller_style_groups",
+        "mechanism_assignments",
+        "candidate_sampling_audit",
+        "classification_labels_or_qrels",
+        "model_inputs_or_scores"
+      ]
+    },
+    "structural_auditor": {
+      "formal_entrypoint": null,
+      "development_implementation": "scripts/step28_v13_integrity_receipts.py:build_structural_audit_receipt",
+      "read_roles": [
+        "nonjoinable_aggregate_render_integrity_receipt",
+        "nonjoinable_aggregate_candidate_integrity_receipt",
+        "nonjoinable_aggregate_m1_derangement_integrity_receipt",
+        "fixed_independent_replay_aggregate_comparison_receipt",
+        "split_exact_aggregate_parent_seal_projections_without_paths_or_access_events"
+      ],
+      "parent_seal_projection_schema_ref": "structural_auditor_parent_seal_projection_schema",
+      "receipt_schema_ref": "fixed_nonjoinable_aggregate_receipt_schemas.structural_audit",
+      "split_exact_input_role_rule": "train reads render, candidate, M1-derangement and independent-DGP receipts; development, audit_a and audit_b read render, candidate and independent-DGP receipts because M1 is train-only",
+      "write_roles": [
+        "fixed_boolean_count_and_hash_audits"
+      ],
+      "forbidden_roles": [
+        "structure_key",
+        "observed_or_redacted_text",
+        "parser_rows",
+        "world_seller_item_or_pair_join_keys",
+        "source_to_destination_derangement_mapping",
+        "controller_membership",
+        "controller_linked_base_style_or_style_group_oracle",
+        "raw_render_ast_seller_to_effective_style_linkage",
+        "mechanism_assignments",
+        "solver_audit",
+        "classification_labels_or_qrels"
+      ]
+    }
+  },
+  "required_runtime_controls": {
+    "empty_workspace_per_capability": true,
+    "read_only_exact_allowlist_mounts": true,
+    "single_writable_output_mount": true,
+    "python_audit_hook_before_worker_import": true,
+    "append_only_hash_chained_access_log": true,
+    "network_disabled": true,
+    "subprocess_shell_and_dynamic_native_load_forbidden": true,
+    "failure_receipt_immutable": true,
+    "every_child_artifact_bound_to_capability_parent_manifest": true,
+    "self_hash_without_external_custody_parent_is_formal_evidence": false,
+    "source_closure_and_access_log_hashes_bound_into_parent_manifest": true,
+    "audit_a_and_audit_b_never_co_mounted": true
+  },
+  "formal_blockers": [
+    "all split OS accounts and groups are null",
+    "all formal absolute custody roots are null",
+    "parent policy and deployment hashes are not frozen",
+    "source-closure and access-manifest hashes are not frozen",
+    "ACL, mount, audit-hook and cross-split isolation receipts do not yet exist",
+    "formal capability launchers and immutable parent seals do not yet exist",
+    "the formal producer typed-projection sealer entrypoint is null",
+    "parser, redactor and structural-auditor formal entrypoints are null",
+    "the implemented render, candidate, M1-derangement and structural receipt paths are development in-process smoke implementations, not isolated formal sealers",
+    "the development parent projections are self-hash projections and are not external immutable custody parents",
+    "formal receipt sealers, formal recursive validators and the formal structural-auditor launcher remain absent"
+  ]
+}

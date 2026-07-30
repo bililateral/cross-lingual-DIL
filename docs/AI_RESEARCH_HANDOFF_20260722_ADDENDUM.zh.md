@@ -79,3 +79,156 @@ Step 7-v4.2 在 Windows CPU 上用五个从未用于 v4.1 的外层种子完整�
 ## 2026-07-27：废弃产物清理
 
 已按显式 allow-list 删除未进入当前依赖闭包的 Step28-v10/v10.1 派生应用产物和本地 Python 缓存。v6–v11 中被 v12.1 同步清单哈希绑定的最小跨版本审计输入继续保留，不能因其历史结论失败而误删。完整清单和原因见 `docs/WORKSPACE_DEPRECATED_ARTIFACT_CLEANUP_20260727.md`。
+
+## 2026-07-29：Step 28 operational M0 与正式中文合成数据
+
+为继续 Step 28，现固定 `LightGBM + legacy18 + LaBSE` 为 operational
+M0。这里固定的是从身份脱敏的完整 seller 文本、legacy18、LaBSE 到分类
+概率的整条英文来源流水线，不是单独编码器。该选择提供可复现操作基线，
+不推翻 Step 7-v4.2 的稳定性负结果，也不得写成“已由独立新英文数据证明
+唯一最强”。权威角色定义见
+`docs/STEP7_STEP28_M0_ROLE_DEFINITION_20260724.zh.md`。
+
+`dataset_smoke_v3` 只保留为工程开发记录，禁止用于 M1/M2 训练、调参或
+正式评估。正式版本由
+`docs/STEP28_V13_TRAINING_READY_SYNTHETIC_CHINESE_RELEASE_CONTRACT_20260729.zh.md`
+约束：train、development、audit_a、audit_b 各 500 个 world，每世界 28
+个 seller、378 个完整 pair 和 40 个机制分层分类 pair。分类标签唯一公式
+是 `int(controller(left)==controller(right))`；不得读取英文标签、真实中文
+标签、M0 分数或 adapter 结果来造标签。Audit A/B 另各有每世界 4 个查询和
+每查询 27 个同世界 gallery，用同控制者公式生成 qrels。
+
+M0 在合成中文上保持冻结；M1 只用 train 内按 `(world,C40/非C40)` 分层、
+端点不重合的五份整行身份33维置乱矩阵训练同构适配器；M2 用未置乱的
+train 身份33维训练。development 只定阈值和校准，Audit A/B 是固定留出，
+不是本机人员盲法。主比较为 `M2-M0`、`M2-M1均值` 和相对最差 M1 seed。
+
+当前仍处于 `IMPLEMENTATION_LOCK_IN_PROGRESS`：正式四把私有结构密钥和
+正式四 split 数据均尚未生成。构建器已固定递归发现的 33 文件源码闭包，
+任何成员增删或字节漂移都会拒绝运行；所有使用旧构建器字节的精确预检只
+是历史诊断。
+
+截至 2026-07-30 最终审核前，历史科研实现合同
+`b85798d7d8b446f32847f90aaf9e59db14a0e181164632c3c3ea6c17822ad73b`
+下的四份 500-world 精确预检曾全部通过并登记到 training-ready overlay：
+
+| split | 最大对称 AUC | world bootstrap 95% 上界 | 身份33维秩 |
+|---|---:|---:|---:|
+| train | 0.509703 | 0.516557 | 31 |
+| development | 0.508037 | 0.515723 | 29 |
+| audit_a | 0.509954 | 0.517763 | 30 |
+| audit_b | 0.505748 | 0.513693 | 32 |
+
+四个 split 均低于预注册的 `0.52/0.53` 捷径门，33 个身份特征均有非零
+支持；train 的“不得有全零列”强制门已实际启用并通过。矩阵仍有明显共线
+和秩亏，后续 adapter 必须使用冻结正则化并报告秩与条件数，不能把单个
+系数解释成独立因果效应。Step28-v13 回归当前为 80 项通过、1 项旧
+execution-blocked lock 因精确父字节漂移按声明跳过；完整仓库回归为
+349 项通过、7 项按既有声明跳过、0 失败。7 项中 6 项来自已撤销的
+Step28-v11 测试类，1 项为上述旧 lock。
+
+上述结果不等于正式数据已经生成，也不等于 M1/M2 效果成功。
+
+## 2026-07-30：最终审核 NO-GO 与 remediation
+
+三路最终审核发现四项私钥仪式前阻断：
+
+1. 父 draft 要求的确认性功效 artifact 从未生成，路径与哈希一直为 null；
+2. 已有私钥目录的 recovery 只检查内部自洽，未完整拒绝公开、design-only
+   或已泄露 commitment，也未强制目录和 receipt 精确 schema；
+3. 精确预检摘要未强制绑定 checkpoint、OOF 分数和 bootstrap 原始统计，
+   登记器无法拒绝人工伪造但字段自洽的 PASS 摘要；
+4. target release claim 被误读成当前 bytes-ready，AP/PR-AUC 和 MAP/MAP@10
+   口径也不够明确。
+
+因此私钥仪式继续禁止，overlay 的四份精确预检登记已清空。旧四份报告和
+349/7/0 回归只保留为修复前历史证据；源码闭包改变后必须全部重跑。
+
+本 training-ready child 不会为未知的 M1 相关性、world ICC 和 score 分布
+填入有利数字来伪造 5,000 次 Monte Carlo 功效。它在任何正式私钥前改为
+固定四 split 各 500 world 的估计性设计：报告效应和 world-cluster 配对
+bootstrap 区间，禁止“确认性功效已认证”或二元成功声明。固定样本量敏感性
+artifact 为
+`training_ready_fixed_sample_sensitivity_v1_20260730.json`，SHA-256 为
+`cd8464d6efb9be16f98614a785dfefa628e35ea99f533fccc01527831f24a3bc`；
+机器科研规则由
+`schema/step28_v13_training_ready_scientific_contract.json` 冻结。
+
+C40 同时明确为使用合成 controller oracle 在正负及机制 strata 内抽样的
+case-control 设计，不再称为标签盲候选。它没有把 selection 字段暴露给
+模型，但 estimand 仅限机制分层合成总体，不支持自然 prevalence、自然校准
+或真实地下市场泛化声明。
+
+截至 2026-07-30，本轮 remediation 已完成本地实现闭环，但仍未恢复
+GO：私钥恢复会重算并拒绝正式公开流、design-only 和已泄露 commitment，
+要求四份私钥加一份 receipt 的精确成员集、精确 schema、自哈希和非
+symlink/非 Windows reparse 属性；精确预检现落盘并绑定 14 维原始投影、
+标签、fold、三模型 OOF、9,999 个 bootstrap 统计和各阶段 checkpoint，
+登记器会重算关键统计。分片/总发布清单也显式绑定机器科研合同，最终化器
+拒绝 JSONL 重复键和重解析点成员。当前科研实现合同 SHA-256 为
+`14970a98f2f9a7f37223d5b515874206063aa7b8b7102cf88c7b60748cc4dae5`；
+23 项针对性回归通过、0 失败。新的四份 500-world 精确预检、完整回归、
+三路复审、Git 基线冻结和私钥仪式均尚未完成；正式私钥、正式分片和最终
+发布清单仍全部为 0。
+
+随后第一次新 train 500-world 预检的摘要虽通过 0.52/0.53 门，登记器在
+独立重放 checkpoint 时拒绝了它：生产标签证据按既有 schema 保存为规范
+字符串 `"0"`/`"1"`，登记器却误要求 JSON 数字，导致 20,000 行类型检查
+全部失败。现已修正为先要求规范字符串，再逐行转换并与 int8 标签向量
+核对；旧 checkpoint 的其余证据已完整重放通过。由于该修复改变稳定科研
+实现合同，旧 train v5 报告仅保留为无效诊断，不能登记，所有 split 仍须
+重新运行。当前科研实现合同 SHA-256 为
+`67b8c720e7287fb5742b5417a98be6578a87b657ca58858bc3992713510f660a`；
+私钥仪式和正式数据生成继续禁止。
+
+按科研实现合同
+`67b8c720e7287fb5742b5417a98be6578a87b657ca58858bc3992713510f660a`，
+四个 split 曾各自重新完成 500-world 精确预检，并由当时的登记器核对：
+
+| split | 最大对称 AUC | world bootstrap 95% 上界 | 身份33维秩 | 全零列 | 历史报告 SHA-256 |
+|---|---:|---:|---:|---:|---|
+| train | 0.509703 | 0.516557 | 31 | 0 | `6716cbe2aac9e220f8ae17a090ebe0aa0f9059ad457bea75105d02a198ace72d` |
+| development | 0.508037 | 0.515723 | 29 | 0 | `a35373be8b01af52c93c2f726adf8e6a856b99a409f632ec81fe7d32a782b523` |
+| audit_a | 0.509954 | 0.517763 | 30 | 0 | `8c7df397df286fd37afcbc3f3727422e55f1a6aac181a2b8b56d9cc5ae62ec6a` |
+| audit_b | 0.505748 | 0.513693 | 32 | 0 | `9c856fa701d76f90c4021e1c0f3381a5112fb7899c22b59d1a69b7946c36f4bc` |
+
+四份报告均低于预注册 0.52/0.53 门；train/development 各有 5 个
+checkpoint，Audit A/B 各有 6 个，共 22 个。报告登记后
+`--validate-config-only` 曾返回通过。但最终代码复审发现，该登记器没有
+从 checkpoint 的 14 维输入和标签重新训练三个冻结审计模型，只重算了所
+提供 OOF 的 AUC；bootstrap 也只核对固定位置，而不是逐元素重算全部
+9,999 个统计量。因此内部自洽的伪造 OOF/bootstrap 仍可能通过，以上报告
+现仅为历史记录，不能证明当前实现通过。
+
+随后回归结果为：Step28-v13 专项 90 项通过、1 项旧
+execution-blocked lock 按精确父字节漂移声明跳过、0 失败；完整仓库
+359 项通过、7 项按既有声明跳过、0 失败，其中另 6 项来自已撤销的
+Step28-v11 测试类。这些计数只属于上述历史实现。
+
+当前实现已升级为 v3 科研合同
+`22e136c5bea376aedc68f784b148d4ab67b81216c69ccf34acd836a3710ce601`：
+登记器从保存的 14 维输入、标签和冻结 world folds 重新训练逻辑回归、
+梯度树、RBF-SVM，三个 OOF 数组逐元素核对；再调用同一冻结函数重算全部
+9,999 个 world bootstrap 统计并逐元素核对。split 写盘阶段新增发布前
+Windows 重解析点拒绝。非哨兵 bootstrap 篡改和连同 AUC 一起伪造 OOF
+的攻击测试均已加入。v2 四份报告保留但已从 overlay 撤销。
+
+v3 现行四份精确预检随后完成：
+
+| split | 最大对称 AUC | world bootstrap 95% 上界 | 身份33维秩 | 全零列 | checkpoint | 现行报告 SHA-256 |
+|---|---:|---:|---:|---:|---:|---|
+| train | 0.509703 | 0.516557 | 31 | 0 | 5 | `628bda9181b9063f2b9978f6d8b2e615f19c115cb0604a647f00976bed5aaec8` |
+| development | 0.508037 | 0.515723 | 29 | 0 | 5 | `518dc19d26b82111fa12782863f6a58a07089e9a7a16d2ff3142d9c8e6a54563` |
+| audit_a | 0.509954 | 0.517763 | 30 | 0 | 6 | `d9c2a03d32f7ed9316964bfbf9ac0c29bdb4b779b4816392a9699142256af2d6` |
+| audit_b | 0.505748 | 0.513693 | 32 | 0 | 6 | `3dbcc4642ca0862e551df3ec5275e9bd3cc376ea6b2db183f0b23ebae23c8700` |
+
+四份均通过 0.52/0.53 门，每份又由登记器独立重训并完整重放；登记到
+overlay 后，标准 `--validate-config-only` 新进程用 437.6 秒顺序深验
+四份及 22 个 checkpoint，返回 `PASS_CONFIG_VALIDATION`。Audit A/B
+各绑定 2,000 个 query、54,000 条 directed relation 和 54,000 条 qrel。
+第一次 v3 train v7 因运行命令漏传 checkpoint 前缀，报告明确为
+`checkpointing_enabled=false`，只保留为无效诊断，未事后补造 checkpoint；
+现行 train 为 v8。Step28-v13 专项回归为 91 项通过、1 项按既有声明跳过、
+0 失败；完整仓库回归为 360 项通过、7 项按既有声明跳过、0 失败。三路
+复审和 Git 基线冻结仍待完成。正式私钥、正式分片和最终发布清单继续全部
+为 0。

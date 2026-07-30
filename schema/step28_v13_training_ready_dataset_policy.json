@@ -1,0 +1,258 @@
+{
+  "version": "2026-07-30-step28-v13-training-ready-dataset-policy-v3-draft",
+  "status": "IMPLEMENTATION_LOCK_IN_PROGRESS",
+  "generation_enabled": false,
+  "run_id": "v13_training_ready_v1_20260729",
+  "output_root": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_20260729",
+  "target_release_claim_level": "TRAINING_AND_FIXED_HOLDOUT_BYTES_READY_NOT_BLIND_CUSTODY_ATTESTED",
+  "current_readiness_semantics": "status and generation_enabled describe current readiness; target_release_claim_level applies only to the final manifest after all split releases validate",
+  "implementation_contract": {
+    "version": "2026-07-30-step28-v13-training-ready-implementation-contract-v3",
+    "sha256": "22e136c5bea376aedc68f784b148d4ab67b81216c69ccf34acd836a3710ce601"
+  },
+  "base_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729"
+  },
+  "release_contract": {
+    "path": "docs/STEP28_V13_TRAINING_READY_SYNTHETIC_CHINESE_RELEASE_CONTRACT_20260729.zh.md",
+    "sha256": "f18f2fe200710e297aafd974b0d8e8e15511560973f2213ce463fc6ee91b4410"
+  },
+  "scientific_contract": {
+    "path": "schema/step28_v13_training_ready_scientific_contract.json",
+    "sha256": "121e1616289441aa9bc106a55f4a341c9aa4152c4d75b46c137fb026ee48b3b5"
+  },
+  "design_diagnostics": {
+    "candidate_shortcut_comparison": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/row_shortcut_review_v2_20260729/candidate_shortcut_diagnostic_500_v1_20260729.json",
+      "sha256": "569d5342a6f212ab7cf15793a858f345e2ce62dfc8ca1f3a973875b4dfd46167"
+    },
+    "mechanism_stratified_gate": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/row_shortcut_review_v2_20260729/candidate_mechanism_diagnostic_500_v1_20260729.json",
+      "sha256": "a82a6683998db11f148abc12bd981467b10b60a4d985cb63a2d391b37170185d"
+    },
+    "exact_implementation_development_250": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/exact_c40_development_250_v1_20260729.json",
+      "sha256": "cbd8d925b11e92c2ea7407eff853c630a38c5cb3744b4b9d463d7fb0d7c2adb8",
+      "status": "PASS_EXACT_IMPLEMENTATION_DESIGN_PREFLIGHT",
+      "maximum_symmetric_auc": 0.5146996,
+      "world_bootstrap_95_upper": 0.526101093333333
+    }
+  },
+  "exact_implementation_preflights": {
+    "train": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/training_ready_exact_builder_train_500_v8_20260730.json",
+      "sha256": "628bda9181b9063f2b9978f6d8b2e615f19c115cb0604a647f00976bed5aaec8"
+    },
+    "development": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/training_ready_exact_builder_development_500_v8_20260730.json",
+      "sha256": "518dc19d26b82111fa12782863f6a58a07089e9a7a16d2ff3142d9c8e6a54563"
+    },
+    "audit_a": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/training_ready_exact_builder_audit_a_500_v6_20260730.json",
+      "sha256": "d9c2a03d32f7ed9316964bfbf9ac0c29bdb4b779b4816392a9699142256af2d6"
+    },
+    "audit_b": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/training_ready_exact_builder_audit_b_500_v9_20260730.json",
+      "sha256": "3dbcc4642ca0862e551df3ec5275e9bd3cc376ea6b2db183f0b23ebae23c8700"
+    }
+  },
+  "world_counts": {
+    "train": 500,
+    "development": 500,
+    "audit_a": 500,
+    "audit_b": 500
+  },
+  "sellers_per_world": 28,
+  "complete_pairs_per_world": 378,
+  "classification_pairs_per_world": 40,
+  "classification_positive_count_per_world": {
+    "train": 16,
+    "development": 10,
+    "audit_a": 10,
+    "audit_b": 10
+  },
+  "positive_mechanism_count_per_world": 8,
+  "negative_flag_count_per_world": 7,
+  "candidate_design": {
+    "implementation": "scripts/step28_v13_mechanism_stratified_c40.py",
+    "sha256": "5752faa39cf86a51a6aaf48da74bbcdeeee8ed48e8f7aed453c52d46ed8fd562",
+    "coverage_then_fill": true,
+    "fill_order": "full HMAC-SHA256 under the registered candidate key, then canonical pair UID UTF-8",
+    "model_visible_audit_columns": false
+  },
+  "dataset_builder": {
+    "implementation": "scripts/step28_v13_build_training_ready_dataset.py",
+    "sha256": "b395e2606716625aa7c104e09979bb9d153c1e900924e523df2c1d19b49c17c3",
+    "implementation_closure": {
+      "role": "training_ready_dataset_builder",
+      "member_count": 33,
+      "members": [
+        "scripts/step28_common.py",
+        "scripts/step28_history_common.py",
+        "scripts/step28_v13_build_training_ready_dataset.py",
+        "scripts/step28_v13_candidate_sampling.py",
+        "scripts/step28_v13_common.py",
+        "scripts/step28_v13_feature_derangement.py",
+        "scripts/step28_v13_generate_dataset.py",
+        "scripts/step28_v13_history_features.py",
+        "scripts/step28_v13_identity_plan.py",
+        "scripts/step28_v13_identity_values.py",
+        "scripts/step28_v13_independent_dgp_comparator.py",
+        "scripts/step28_v13_independent_private_dgp_replay.py",
+        "scripts/step28_v13_integrity_receipts.py",
+        "scripts/step28_v13_mechanism_stratified_c40.py",
+        "scripts/step28_v13_metadata_shortcut_common.py",
+        "scripts/step28_v13_nonidentity.py",
+        "scripts/step28_v13_placebo_support.py",
+        "scripts/step28_v13_producer_dgp_projection.py",
+        "scripts/step28_v13_production_chain.py",
+        "scripts/step28_v13_profiles.py",
+        "scripts/step28_v13_project_null_nuisance.py",
+        "scripts/step28_v13_run_metadata_shortcut_audit.py",
+        "scripts/step28_v13_run_parser_template_fixture.py",
+        "scripts/step28_v13_safe_slots.py",
+        "scripts/step28_v13_seal_classification_labels.py",
+        "scripts/step28_v13_smoke_private_regeneration.py",
+        "scripts/step28_v13_structure.py",
+        "scripts/step28_v13_text_renderer.py",
+        "scripts/step28_v13_world_builder.py",
+        "scripts/step3_build_seller_profiles.py",
+        "scripts/step4_build_silver_candidates.py",
+        "scripts/step7_v3_1_source_data.py",
+        "scripts/step7_v4_common.py"
+      ],
+      "canonical_sha256": "727d97c8182676dc0815fa51f9d1b6cbd37e7e208cff65d0fc8162ae31e3a4c8"
+    }
+  },
+  "release_tools": {
+    "exact_preflight": {
+      "path": "scripts/step28_v13_exact_candidate_preflight.py",
+      "sha256": "96d81a54db7bf1b7c05ad5764a57b9d977a141baa3019c26e6eeef19f99e2e60"
+    },
+    "key_initializer": {
+      "path": "scripts/step28_v13_initialize_training_ready_keys.py",
+      "sha256": "c5a4f74eb9945738368816f09c7fdd80348814c6d51ebbe817aadf26cc9c24ed"
+    },
+    "finalizer": {
+      "path": "scripts/step28_v13_finalize_training_ready_dataset.py",
+      "sha256": "821b285e06e0e34daebca3982096fc6216c9277cf714cf2326bac818acdc12eb"
+    },
+    "model_input_validator": {
+      "path": "scripts/step28_v13_validate_model_inputs.py",
+      "sha256": "083b3a0cf2da193da6bad6bf472bce3556cb36864bcebfd85faa01f5a9c92fe1"
+    }
+  },
+  "handle_encoding": "parser_safe_hex_v2",
+  "identity_value_salts": {
+    "builder": {
+      "path": "scripts/step28_v13_build_training_ready_identity_salts.py",
+      "sha256": "a712e837a984ed925566e5502a2e379ea79828acc206e1554c594fb5e0411cbd"
+    },
+    "artifact": {
+      "path": "reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_salts.training_ready_v3_2000worlds_20260729.json",
+      "sha256": "5bd2b5b751542528f40ee8627686d367f0bcc22f1d4bf3dc194605e6389ee1fe"
+    },
+    "per_type_salt_counters": {
+      "telegram": 0,
+      "email": 0,
+      "bat": 0,
+      "qq": 31,
+      "wechat": 0,
+      "phone": 1,
+      "crypto_wallet": 0,
+      "external_url": 0
+    },
+    "real_prior_smoke_intersection_count": 0,
+    "same_release_cross_type_intersection_count": 0
+  },
+  "base_execution_mode": "training_ready",
+  "base_execution_mode_semantics": "An explicit in-memory training_ready mode reuses the audited mathematical worker functions with formal public randomness and exactly one split-private structure key. It never aliases development_smoke and never reads or merges smoke data, keys, UIDs or artifacts.",
+  "public_randomness_source": "base_policy.randomness.formal",
+  "private_structure_key_custody": {
+    "key_directory": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_20260729",
+    "key_filename_pattern": "structure_key.{split}.private.json",
+    "ceremony_receipt_path": "reports/step28_synthetic_chinese_dataset/release_inputs/structure_key_ceremony.training_ready_v1_20260729.json",
+    "one_split_key_per_file": true,
+    "generator_process_reads_exactly_one_split_key": true,
+    "key_files_must_not_be_model_mounted": true,
+    "key_files_must_not_be_committed": true,
+    "commitments": {
+      "train": null,
+      "development": null,
+      "audit_a": null,
+      "audit_b": null
+    },
+    "ceremony_receipt": null
+  },
+  "retrieval": {
+    "enabled_splits": [
+      "audit_a",
+      "audit_b"
+    ],
+    "queries_per_world": 4,
+    "gallery_per_query": 27,
+    "query_selection": "full HMAC-SHA256 under the registered query key, then seller UID UTF-8",
+    "relevance_formula": "int(controller(query)==controller(gallery))"
+  },
+  "supervision": {
+    "classification_formula": "int(controller(left)==controller(right))",
+    "open_splits": [
+      "train",
+      "development"
+    ],
+    "sealed_splits": [
+      "audit_a",
+      "audit_b"
+    ]
+  },
+  "shortcut_gate": {
+    "features": 14,
+    "maximum_symmetric_auc": 0.52,
+    "maximum_world_bootstrap_95_upper": 0.53,
+    "bootstrap_replicates": 9999,
+    "fold_count": 5,
+    "fold_seed": 2026072707,
+    "bootstrap_base_seed": 2026072711,
+    "model_order": [
+      "logistic_l2",
+      "gradient_tree",
+      "rbf_svm"
+    ],
+    "environment": {
+      "numpy_version": "2.2.6",
+      "scikit_learn_version": "1.7.2",
+      "bit_generator": "PCG64DXSM"
+    },
+    "implementation_closure": {
+      "nuisance_projector": {
+        "path": "scripts/step28_v13_project_null_nuisance.py",
+        "sha256": "dcae56e97f3c370890ee9ffa7002bc04908a86ca81eb9d86040611797f1732c6"
+      },
+      "audit_runner": {
+        "path": "scripts/step28_v13_run_metadata_shortcut_audit.py",
+        "sha256": "9fb86dc6d1a0e8388c5b7db6e2127db0f56022465e8de172574ab54d696654f3"
+      },
+      "audit_common": {
+        "path": "scripts/step28_v13_metadata_shortcut_common.py",
+        "sha256": "bbdbf5b4f2e5b344d99f4d22d995a8ea4def22ae0071546a0f0ba359ffcce4f0"
+      },
+      "label_sealer": {
+        "path": "scripts/step28_v13_seal_classification_labels.py",
+        "sha256": "89d65a5358f4b408e676c9da97186c4efab8487d45a2ce8038ffd3e06041d2ea"
+      }
+    }
+  },
+  "m1": {
+    "replicates": 5,
+    "source": "base_policy.randomness.formal.rewire_key_hexes",
+    "endpoint_disjoint": true,
+    "whole_33_vector_derangement": true,
+    "stratification": [
+      "world_uid",
+      "C40_or_complement"
+    ]
+  },
+  "release_status_required": "PASS_DATASET_ONLY_READY_FOR_M0_M1_M2",
+  "self_sha256": null
+}

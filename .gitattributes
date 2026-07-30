@@ -26,6 +26,16 @@ reports/step7_v4_1_style_free_classifier_selection/**/*.joblib -text -diff -merg
 reports/step7_v4_2_repeat_stability/** -text -eol -diff -merge
 reports/*.codexbak* filter=lfs diff=lfs merge=lfs -text
 
+# Step28 reports are hash-frozen bytes; never normalize line endings.
+reports/step28_synthetic_chinese_dataset/** -text -eol -diff -merge
+
+# Step28 large release inputs/checkpoints and future tabular release bytes.
+reports/step28_synthetic_chinese_dataset/**/*.npz filter=lfs diff=lfs merge=lfs -text
+reports/step28_synthetic_chinese_dataset/**/*.csv filter=lfs diff=lfs merge=lfs -text
+reports/step28_synthetic_chinese_dataset/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_salts*.json filter=lfs diff=lfs merge=lfs -text
+reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_deny_hashes.json filter=lfs diff=lfs merge=lfs -text
+
 # Hash-frozen experiment bundles must retain their exact synchronized bytes.
 reports/manifests/step15_internal_dev_v5r_20260711.* -text -eol -diff -merge
 reports/step15_v5r_* -text -eol -diff -merge

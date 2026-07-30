@@ -1,0 +1,126 @@
+{
+  "version": "2026-07-30-step28-v13-training-ready-scientific-contract-v1",
+  "status": "FROZEN_PRE_KEY_SCIENTIFIC_RULES",
+  "scope": "v13_training_ready_v1_20260729 child release only",
+  "precedence": {
+    "parent_policy": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "parent_build_contract": "docs/STEP28_V13_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md",
+    "rule": "For this training-ready child, this machine-readable contract and the training-ready release policy override conflicting parent draft rules. Parent bytes remain immutable historical design evidence."
+  },
+  "target_release_claim_level": "TRAINING_AND_FIXED_HOLDOUT_BYTES_READY_NOT_BLIND_CUSTODY_ATTESTED",
+  "scientific_purpose": "Estimate whether correctly aligned synthetic identity-history features add predictive value to a frozen operational English-source baseline on a mechanism-stratified synthetic Chinese case-control task.",
+  "models": {
+    "m0": "Frozen LightGBM plus legacy18 plus LaBSE operational English-source pipeline; no synthetic-Chinese fitting.",
+    "m1": "Frozen M0 plus the same 33-feature adapter trained on each of five whole-vector, endpoint-disjoint train derangements within world and C40/complement strata.",
+    "m2": "Frozen M0 plus the same adapter trained on the correctly aligned train identity33 matrix.",
+    "development_use": "Threshold selection and calibration only.",
+    "audit_use": "Fixed holdout estimation only; no model, threshold, feature, slice or analysis selection."
+  },
+  "split_design": {
+    "worlds": {
+      "train": 500,
+      "development": 500,
+      "audit_a": 500,
+      "audit_b": 500
+    },
+    "sellers_per_world": 28,
+    "complete_pairs_per_world": 378,
+    "classification_pairs_per_world": 40,
+    "positive_negative_per_world": {
+      "train": [16, 24],
+      "development": [10, 30],
+      "audit_a": [10, 30],
+      "audit_b": [10, 30]
+    },
+    "independent_analysis_unit": "world",
+    "cross_split_world_seller_item_identity_pair_and_private_key_overlap": 0
+  },
+  "truth_and_sampling": {
+    "classification_label_formula": "int(controller(left)==controller(right))",
+    "retrieval_relevance_formula": "int(controller(query)==controller(gallery))",
+    "english_labels_real_chinese_labels_m0_scores_and_adapter_scores_forbidden_in_generation": true,
+    "c40_label_blind": false,
+    "c40_design": "Oracle-stratified synthetic case-control sampling: positive and negative strata are formed from controller truth, then eight positive mechanisms and seven difficult-negative flags are covered before HMAC fill.",
+    "c40_selection_fields_model_visible": false,
+    "estimand": "The preregistered mechanism-stratified synthetic case-control population, not natural underground-market prevalence, calibration or label-blind candidate production.",
+    "post_key_resampling_row_deletion_or_threshold_relaxation_forbidden": true
+  },
+  "identity_adapter": {
+    "feature_count": 33,
+    "whole_vector_m1_derangement": true,
+    "m1_endpoint_disjoint": true,
+    "m1_controller_disjoint_claimed": false,
+    "regularization_required": true,
+    "rank_and_condition_number_reporting_required": true,
+    "individual_collinear_coefficient_causal_interpretation_forbidden": true
+  },
+  "shortcut_gate": {
+    "registered_nuisance_feature_count": 14,
+    "maximum_symmetric_auc": 0.52,
+    "world_bootstrap_95_upper_maximum": 0.53,
+    "bootstrap_replicates": 9999,
+    "claim": "Passing excludes only a registered 14-feature metadata shortcut above these thresholds; it does not prove absence of unknown shortcuts."
+  },
+  "sample_size_design": {
+    "artifact": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/training_ready_fixed_sample_sensitivity_v1_20260730.json",
+      "sha256": "cd8464d6efb9be16f98614a785dfefa628e35ea99f533fccc01527831f24a3bc"
+    },
+    "producer": {
+      "path": "scripts/step28_v13_build_fixed_sample_sensitivity.py",
+      "sha256": "e886e57ff37b43220c30273d1f101b0527d33a9036979efcb652bb749dc00cfe"
+    },
+    "design": "Fixed maximum feasible 500 worlds per split with prospective sensitivity reporting; not selected by a fabricated score-distribution Monte Carlo.",
+    "parent_5000_replicate_power_selection_contract_superseded_for_this_child": true,
+    "confirmatory_power_certified": false,
+    "binary_power_based_success_claim_forbidden": true,
+    "sample_size_change_after_private_key_forbidden": true
+  },
+  "classification_metrics": {
+    "average_precision": "World-equal weighted sklearn average_precision_score staircase integral.",
+    "trapezoidal_pr_auc": "Separately named trapezoidal area under the precision-recall curve; never aliased to average precision.",
+    "other_rank_metrics": ["ROC-AUC"],
+    "development_threshold_metrics": [
+      "precision",
+      "recall",
+      "F1",
+      "specificity",
+      "balanced_accuracy",
+      "confusion_matrix"
+    ],
+    "calibration_metrics": ["Brier", "log-loss"],
+    "threshold_source": "Each model uses its own development-frozen threshold; Audit A/B never select thresholds."
+  },
+  "retrieval_metrics": {
+    "primary_average_precision_metric": "MAP@10",
+    "other_metrics": [
+      "MRR",
+      "Recall@1",
+      "Recall@5",
+      "Recall@10",
+      "Hits@1",
+      "Hits@5",
+      "Hits@10"
+    ],
+    "tie_handling": "Deterministic descending float64 score, then gallery seller UID UTF-8 bytes.",
+    "effective_query_reporting_required": true
+  },
+  "inference": {
+    "primary_differences": [
+      "M2-M0",
+      "M2-mean_of_five_M1_metrics",
+      "minimum_over_five_seed_specific_M2-M1_differences"
+    ],
+    "resampling_unit": "world",
+    "paired_world_bootstrap_replicates": 9999,
+    "audit_a_before_audit_b": true,
+    "effect_estimates_and_intervals_required": true,
+    "confirmatory_success_or_failure_language_forbidden": true
+  },
+  "custody_claim_boundary": {
+    "fixed_holdout": true,
+    "same_windows_user_logical_sealing_only": true,
+    "person_blind_or_third_party_custody_attested": false
+  },
+  "canonical_self_hash": "003a054e39b033bee6c84e8af3c63c91d810846df2270aa4d42501592341234a"
+}

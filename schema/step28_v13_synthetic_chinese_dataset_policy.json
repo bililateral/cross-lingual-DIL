@@ -1,0 +1,3234 @@
+{
+  "version": "2026-07-29-step28-v13-synthetic-chinese-dataset-v13-draft",
+  "status": "DRAFT_SMOKE_ONLY",
+  "formal_generation_enabled": false,
+  "objective": "Build a larger, cleaner Chinese synthetic seller-identity dataset that preserves the frozen Step7-v4.1 operational M0 input semantics and isolates identity-history supervision.",
+  "claim_boundary": {
+    "dataset_acceptance_claim": "The synthetic dataset satisfies this frozen engineering and scientific construction contract.",
+    "audit_a_claim": "Synthetic identity history adds C40 classification AP value under the preregistered G_A synthetic mechanism while retrieval Recall@10 and hard-negative FPR satisfy preregistered relative non-inferiority gates.",
+    "audit_b_claim": "A positive preregistered incremental C40 classification AP value remains detectable under the compound preregistered G_B mechanism shift at the B-specific margin while the relative non-inferiority gates hold; no A-versus-B effect-size equivalence is claimed.",
+    "forbidden_claims": [
+      "synthetic labels are real Chinese marketplace ground truth",
+      "the operational M0 is independently certified as the uniquely strongest English model",
+      "passing the component or dataset gate proves real-world cross-language effectiveness",
+      "the synthetic experiment validates unregistered identity mechanisms",
+      "passing retrieval non-inferiority proves retrieval improvement"
+    ]
+  },
+  "contract": {
+    "path": "docs/STEP28_V13_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md",
+    "sha256": "c4d4bcc6a9304498faf22449744cbbdd81741bc2b4efe2f3c758a527a6c546f2",
+    "hash_binding_mode": "release_manifest_binds_exact_contract_policy_template_and_power_files",
+    "previous_contract_sha256": "e9984ee53a0572d50f3b8fe099208c1a01d71ca12dd87485f5ada802d38942e3"
+  },
+  "lifecycle": {
+    "phase_1_dataset_release_lock": "freeze dataset contract, public policy, templates, parser fixture, style reference, power design, dataset producers and dataset custody deployment before any formal world generation",
+    "phase_2_unlabeled_structural_acceptance": "run only automatic label-free gates; expose only booleans, counts required by fixed schemas and hashes; state becomes STRUCTURALLY_ACCEPTED_PENDING_SUPERVISION",
+    "phase_3_identity_experiment_lock": "freeze identity child policy, M0/GPU/adapter/statistics code, static CPU/GPU policies, identity custody deployment, diagnostic projections, blind-report schemas and all gates before any model or human diagnostic capability reads train/development supervision",
+    "phase_4_supervised_dataset_validity": "open train and development supervision only to separate formula, metadata and mechanism-coverage validators; if all pass, state becomes PASS_DATASET_ONLY and adapter training is authorized",
+    "dataset_release_is_not_pass_dataset_only": true,
+    "identity_child_may_only_transcribe_scientific_choices_already_frozen_by_dataset_release": true,
+    "using_observed_audit_covariates_to_change_identity_child_forbidden": true,
+    "audit_a_b_prelock_human_or_interactive_inspection_forbidden": true
+  },
+  "development_complete_release": {
+    "release_name": "dataset_smoke_v3",
+    "manifest_filename": "release_manifest.json",
+    "manifest_version": "2026-07-29-step28-v13-complete-release-manifest-v1-draft",
+    "required_status": "DEVELOPMENT_SMOKE_COMPLETE_NOT_SCIENTIFIC_EVIDENCE",
+    "required_split_order": ["train", "development", "audit_a", "audit_b"],
+    "parent_binds_child_direction": "the complete release manifest records each exact split manifest file SHA256 and canonical content SHA256; children do not hash the parent, avoiding a hash cycle",
+    "fixture_result_must_be_opened_and_validated_before_generation": true,
+    "fixture_result_exact_file_must_be_bound_by_parent": true,
+    "atomic_publish_semantics": "files and split directories use operating-system atomic rename with no-replace semantics; check-then-replace is forbidden",
+    "release_parent_symlink_junction_or_escape_forbidden": true,
+    "m0_exact_mount_allowlist_per_split": [
+      "observed/complete_model_pair_endpoints.csv",
+      "observed/redacted_items.jsonl",
+      "observed/seller_profiles.jsonl"
+    ],
+    "m0_observed_directory_mount_forbidden": true,
+    "supersedes_development_release": {
+      "release_name": "dataset_smoke_v2",
+      "reason": "content bytes and child manifests passed audit, but no complete parent manifest existed and publisher no-clobber/final-rename/fsync failure evidence was incomplete",
+      "scientific_conclusion_withdrawn": false,
+      "formal_or_scientific_use_remains_forbidden": true
+    }
+  },
+  "template_library": {
+    "path": "schema/step28_v13_synthetic_text_templates.json",
+    "sha256": "8c4db177f6594c663fcbaff23c130062aff22c0765d8dac9e98ab5b53252bfe7",
+    "required_version": "2026-07-29-step28-v13-template-library-v5-draft",
+    "expected_style_prototypes": 12,
+    "style_prototype_ids": [
+      "style_01",
+      "style_02",
+      "style_03",
+      "style_04",
+      "style_05",
+      "style_06",
+      "style_07",
+      "style_08",
+      "style_09",
+      "style_10",
+      "style_11",
+      "style_12"
+    ],
+    "expected_title_skeletons_per_split": 8,
+    "expected_description_skeletons_per_split": 8,
+    "real_text_allowed": false
+  },
+  "independent_replay_public_domains": {
+    "purpose": "self-contained public decision domains for the independent DGP implementation; no template or style-profile mount is needed",
+    "categories_in_registered_order": [
+      "设备配件",
+      "软件工具",
+      "设计素材",
+      "维护服务",
+      "学习资料",
+      "办公用品",
+      "接口组件",
+      "排版模板"
+    ],
+    "anonymous_category_rank_probability": [
+      0.279543120782,
+      0.19136812341,
+      0.127175533935,
+      0.05839673426,
+      0.041082852696,
+      0.04031662555,
+      0.038065064649,
+      0.224051944718
+    ],
+    "category_products": {
+      "设备配件": ["便携工具组合", "电子配件套装"],
+      "软件工具": ["文件整理工具"],
+      "设计素材": ["图形设计素材", "图片处理模板"],
+      "维护服务": ["设备维护服务", "远程配置服务"],
+      "学习资料": ["学习参考手册"],
+      "办公用品": ["桌面收纳套件", "多规格标签包"],
+      "接口组件": ["通用接口组件"],
+      "排版模板": ["批量排版工具"]
+    },
+    "attributes": [
+      "标准版",
+      "轻量版",
+      "组合版",
+      "更新版",
+      "多规格",
+      "可选配色",
+      "分批交付",
+      "附使用说明",
+      "支持自选参数",
+      "含基础售后"
+    ],
+    "title_skeleton_count_by_split": {
+      "train": 8,
+      "development": 8,
+      "audit_a": 8,
+      "audit_b": 8
+    }
+  },
+  "frozen_inputs": {
+    "protected_train_membership": {
+      "path": "reports/step5_zh_target_strict_frozen_silver_labels.csv",
+      "sha256": "63ec5de569a538b82910cd7cbb3ea9c826699742349d3ec3d7688f3b95cbcfee",
+      "allowed_stage": "materialize_style_source_boundary_only"
+    },
+    "item_manifest": {
+      "path": "reports/step2_content_item_manifest.csv",
+      "sha256": "89307835c82683abe53561a56a39fb28419cbf46671d34463701d73179e3869f"
+    },
+    "raw_chinese_items": {
+      "path": "market_item.xlsx",
+      "sha256": "3625a226974827a0441ec87c54688f85ed0ff93a1c4c687532ef550ec1640187",
+      "source_dataset": "market_item.xlsx",
+      "first_data_row": 2
+    },
+    "step3_parser_profile_code": {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202"
+    },
+    "step3_profile_schema": {
+      "path": "schema/step3_seller_profile_schema.json",
+      "sha256": "7338bf6d10a20fdf6bc5da9cbcf81a4f0014c1861178644a6acbdc07bf495c86"
+    },
+    "step4_candidate_code": {
+      "path": "scripts/step4_build_silver_candidates.py",
+      "sha256": "3f15b37453184b4c1e62de14efbbfbc0fc17ea3299184b3ab1033212d237c7af"
+    },
+    "step4_candidate_schema": {
+      "path": "schema/step4_silver_candidate_schema.json",
+      "sha256": "c5aca462daf8e0ba9557085b92bd3e6a2e53465d5a7603274c69576c617a3f7b"
+    },
+    "identity_history_code": {
+      "path": "scripts/step28_history_common.py",
+      "sha256": "39fe4e952563dcbee4b300c89f8c1c1072357b5687e7d128009c1b951f228eab"
+    },
+    "step7_v4_common_code": {
+      "path": "scripts/step7_v4_common.py",
+      "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334"
+    },
+    "step7_v4_encoder_code": {
+      "path": "scripts/step7_v4_encode_item_models.py",
+      "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc"
+    },
+    "step7_v4_sync_builder_code": {
+      "path": "scripts/step7_v4_build_sync_manifest.py",
+      "sha256": "bc452cb3643ee0476b004e9715cb0a4ecba53971e5d54780beb9f42eeeaed1f4"
+    },
+    "step7_v3_1_source_code": {
+      "path": "scripts/step7_v3_1_source_data.py",
+      "sha256": "5c4f607b5fd17dc378cc89dc93c2ac1865db8e22ca6623551db08c7014d44734"
+    },
+    "step7_v3_1_source_policy": {
+      "path": "schema/step7_v3_1_source_data_policy.json",
+      "sha256": "0b9f65b54a38c615bfc8ebe5b0b4757a87434f55535eb5fafec92148d7c55c67"
+    }
+  },
+  "modes": {
+    "development_smoke": {
+      "run_id": "v13_dev_smoke_v2_20260728",
+      "output_root": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728",
+      "world_counts": {
+        "train": 10,
+        "development": 3,
+        "audit_a": 5,
+        "audit_b": 5
+      },
+      "scientific_use_forbidden": true,
+      "formal_namespace_reuse_forbidden": true
+    },
+    "formal": {
+      "run_id": "v13_20260727",
+      "output_root": "reports/step28_synthetic_chinese_dataset/v13_20260727",
+      "world_counts": {
+        "train": 500,
+        "development": 125,
+        "audit_a": 250,
+        "audit_b": 250
+      },
+      "enabled_only_when_policy_status_frozen": true,
+      "power_design_path": null,
+      "power_design_sha256": null
+    }
+  },
+  "power_design_contract": {
+    "timing": {
+      "public_label_blind_design_keys": "the id namespace, UID, identity-value, text, candidate, query and rewire keys are preregistered design constants and may be fixed before power analysis",
+      "secret_label_bearing_structure_keys": "the four one-shot formal structure-key ceremonies and every formal world materialization must occur only after the power artifact selects W and the dataset-release contract is byte-stable",
+      "any_formal_structure_key_or_world_before_power_invalidates_release": true
+    },
+    "monte_carlo_seed": 2026072713,
+    "monte_carlo_replicates": 5000,
+    "monte_carlo_rng": {
+      "library": "numpy 2.2.6",
+      "bit_generator": "numpy.random.PCG64DXSM",
+      "scenario_uid": "scenario_ plus full SHA256 of the frozen canonical scenario JSON",
+      "scenario_order": "scenario_uid UTF-8 bytes",
+      "world_count_order": [150, 200, 250, 300, 350, 400],
+      "replicate_ordinal": "zero-based unpadded decimal 0..4999",
+      "stream_seed": "SHA256(ASCII 2026072713 + 0x1f + scenario_uid + 0x1f + unpadded decimal world_count + 0x1f + unpadded decimal replicate_ordinal + 0x1f + stream_name) first 128 bits interpreted unsigned big-endian",
+      "generator": "instantiate a fresh numpy.random.Generator(numpy.random.PCG64DXSM(seed)) for each exact stream",
+      "stream_names": [
+        "development_world_state",
+        "audit_a_world_state",
+        "audit_b_world_state",
+        "row_labels_and_flags",
+        "nuisance_features",
+        "model_scores",
+        "retrieval_and_hard_negative"
+      ],
+      "testing_randomness": "for a given W, every Monte Carlo scenario and replicate reuses the exact formal statistics seed 2026072709 audit bootstrap index matrix, metadata seed 2026072711 bootstrap matrix and SHA-based world folds; these are functions only of frozen split name/world UID order/W and never of scenario or outer replicate",
+      "randomized_test_seed_averaging_forbidden": true,
+      "shared_mutable_rng_forbidden": true,
+      "artifact_replay_fields": [
+        "scenario_uid_order",
+        "stream_seed_derivation",
+        "first_and_last_bit_generator_state_sha256_per_stream",
+        "replicate_output_digest",
+        "complete_replay_digest"
+      ]
+    },
+    "audit_world_grid": [150, 200, 250, 300, 350, 400],
+    "target_power": 0.8,
+    "target_power_wilson_95_lower_bound": 0.78,
+    "type_i_point_maximum": 0.05,
+    "type_i_wilson_95_upper_maximum": 0.06,
+    "selection_rule": "choose the smallest common A/B world count whose Audit-A-alone and sequential A-then-B joint pass probabilities both meet the point and Wilson-lower targets",
+    "required_effect_scenarios": [
+      "null calibration",
+      "minimum scientifically meaningful G_A effect with primary AP differences 0.06",
+      "minimum scientifically meaningful G_B shift effect with primary AP differences 0.04",
+      "placebo-correlation stress",
+      "hard-negative prevalence and world-ICC stress"
+    ],
+    "least_favourable_boundary_calibration": {
+      "principle": "calibrate each one-sided family at its own null boundary while setting all unrelated gates to a clearly passing alternative; a global all-zero AP null is insufficient",
+      "audit_a": [
+        "M2-M0 AP difference exactly 0.03 with the M2-mean-M1 and all seed gates set to passing alternatives",
+        "M2-mean-M1 AP difference exactly 0.03 with the M2-M0 and all seed gates set to passing alternatives",
+        "each of five M2-M1 seed AP differences exactly 0 in a separate scenario"
+      ],
+      "audit_b_after_a_pass": [
+        "M2-M0 AP difference exactly 0.015",
+        "M2-mean-M1 AP difference exactly 0.015",
+        "each of five M2-M1 seed AP differences exactly 0 in a separate scenario"
+      ],
+      "audit_b_sequential_mixed_scenarios": "for every individual Audit-B gate boundary in audit_b_after_a_pass and other_boundaries, including each TOST side and each Recall/FPR family member plus the nuisance-validity boundary, set every Audit-A gate to a fixed clearly passing alternative while preserving the shared random train model, development threshold and all A/B latent dependence; do not condition away or hold fixed a favourable shared model state",
+      "other_boundaries": [
+        "M1-mean minus M0 true difference exactly -0.01 and +0.01 in separate TOST scenarios",
+        "each of Recall@10 M2-M0 and M2-mean-M1 true difference exactly -0.01 in a separate scenario while the other member passes",
+        "each of hard-negative FPR M2-M0 and M2-mean-M1 true difference exactly +0.01 in a separate scenario while the other member passes",
+        "null-nuisance max-model AUC symmetric true value exactly 0.53 with one model at the boundary and with all three correlated at the boundary in separate false-acceptance scenarios"
+      ],
+      "required_reports": [
+        "per-boundary family point type-I and Wilson 95% interval",
+        "Audit-B conditional false-confirmation probability given Audit-A pass",
+        "Audit-B sequential unconditional false-confirmation probability",
+        "complete joint state-machine global-null result"
+      ],
+      "pass_rule": "every isolated family point type-I <=0.05 and Wilson 95% upper <=0.06; in every sequential mixed B scenario both P(B false confirmation | A pass) and P(A pass and B false confirmation) have point <=0.05 and Wilson 95% upper <=0.06"
+    },
+    "scientific_coverage_floors": {
+      "train": {"minimum_independent_worlds_per_mechanism": 20, "minimum_zero_history_rows": 20, "minimum_zero_history_worlds": 20},
+      "development": {"minimum_independent_worlds_per_mechanism": 5, "minimum_zero_history_rows": 5, "minimum_zero_history_worlds": 5},
+      "audit_a": {"minimum_independent_worlds_per_mechanism": 10, "minimum_zero_history_rows": 10, "minimum_zero_history_worlds": 10},
+      "audit_b": {"minimum_independent_worlds_per_mechanism": 10, "minimum_zero_history_rows": 10, "minimum_zero_history_worlds": 10}
+    },
+    "world_count_exhaustion_rule": "if no common A/B count through 400 satisfies every power, calibration and coverage requirement, v13 formal remains disabled; do not lower a margin, replace a seed or extrapolate beyond the grid",
+    "required_parameters_per_scenario": [
+      "world-level positive prevalence distribution induced by C40",
+      "AP differences for M2-M0 and all five M2-M1",
+      "five-M1 cross-seed correlation",
+      "world intraclass correlation",
+      "retrieval relevance and Recall@10 differences",
+      "hard-negative prevalence and FPR differences",
+      "metadata shortcut null distribution",
+      "mechanism target-pair C40 inclusion probabilities"
+    ],
+    "must_replay_complete_joint_decision": [
+      "seven-item AP simultaneous family",
+      "M1-mean versus M0 TOST",
+      "Recall@10 simultaneous family",
+      "hard-negative FPR simultaneous family",
+      "metadata validity",
+      "mechanism independent-world coverage",
+      "nonempty zero-history fallback slice",
+      "Audit A before Audit B state machine"
+    ],
+    "sesoi_rationale_required_for": [
+      "Audit A AP margin 0.03",
+      "Audit B AP margin 0.015",
+      "Recall@10 non-inferiority 0.01",
+      "hard-negative FPR non-inferiority 0.01",
+      "M1 equivalence half-width 0.01",
+      "null-nuisance AUC symmetric point 0.52 and bootstrap upper 0.53",
+      "mechanism coverage floors 20 train, 5 development and 10 each audit"
+    ],
+    "artifact_required_keys": [
+      "version",
+      "status",
+      "producer_sha256",
+      "monte_carlo_seed",
+      "monte_carlo_replicates",
+      "world_grid",
+      "scenario_parameters",
+      "per_world_count_power",
+      "selected_audit_world_count",
+      "coverage_minimum_independent_worlds_by_split_and_mechanism",
+      "minimum_zero_history_rows_and_worlds_by_split",
+      "sesoi_rationale",
+      "canonical_self_hash"
+    ],
+    "selected_world_count_must_equal_modes_formal_audit_a_and_audit_b": true,
+    "derived_count_contract": {
+      "selected_audit_world_count_symbol": "W",
+      "fixed_train_worlds": 500,
+      "fixed_development_worlds": 125,
+      "formulas": {
+        "total_worlds": "625+2*W",
+        "total_sellers": "28*(625+2*W)",
+        "classification_c40_rows": "40*(625+2*W)",
+        "audit_queries_per_split": "4*W",
+        "audit_relations_per_split": "108*W",
+        "complete_all378_pairs": "378*(625+2*W)",
+        "audit_c40_rows_per_split": "40*W"
+      },
+      "single_machine_artifact_required": true,
+      "recursive_release_validation": "every count persisted in policy projections, manifests, reports or GPU contracts must either reference this artifact field or equal its evaluated integer; independently typed derived constants are forbidden"
+    },
+    "row_level_joint_generator_required": {
+      "separate_independent_development_per_replicate": true,
+      "development_threshold_selection_must_be_replayed": true,
+      "labels_and_all_model_scores_generated_per_row": true,
+      "required_dependence_parameters": [
+        "world random effects and ICC",
+        "M0 M1-seed M2 conditional score distributions and calibration",
+        "five-M1 cross-seed correlations",
+        "C40 prevalence",
+        "retrieval relevance",
+        "hard-negative prevalence and FPR"
+      ],
+      "joint_row_state_required": [
+        "C40 row membership and world",
+        "positive designated-target mechanism flag",
+        "all applicable negative mechanism flags as a multi-label vector",
+        "exact 14 null-nuisance pair features",
+        "retrieval query/gallery membership and relevance",
+        "fixed hard-negative eligibility mask inputs",
+        "M0, five M1 and M2 classification and retrieval scores"
+      ],
+      "joint_replay_rules": [
+        "coverage is counted from the generated correlated multi-label flags, never independent mechanism Bernoulli marginals",
+        "null-nuisance validity refits the frozen three OOF models and runs its exact world bootstrap, never substitutes a target AUC draw",
+        "C40 competition, multi-label overlap, labels, nuisance, retrieval, hard-negative masks and model scores preserve the frozen within-world and cross-endpoint dependence"
+      ],
+      "AP_mean_only_simulation_forbidden": true
+    },
+    "computational_replay": {
+      "must_use_the_exact_9999_world_bootstrap_decision": true,
+      "allowed_acceleration": "only arithmetic-identical vectorization and cached deterministic intermediates; importance sampling, reduced draws, changed quantiles or any distributional approximation are forbidden",
+      "acceleration_validation": {
+        "benchmark_seed": 2026072714,
+        "replicates_per_scenario_and_world_count": 25,
+        "coverage": "every least-favourable boundary scenario, both design-effect scenarios and every world count in the frozen grid",
+        "reference": "literal scalar replay of the same exact 9999 PCG64DXSM world-index draws and frozen metric formulas",
+        "required_metric_array_comparison": "np.array_equal after canonical float64 materialization for every endpoint and bound",
+        "required_decision_disagreement_count": 0,
+        "failure_rule": "the acceleration is forbidden; use the exact reference implementation or keep formal disabled"
+      },
+      "required_artifact_fields": [
+        "algorithm_description",
+        "implementation_sha256",
+        "runtime_environment",
+        "benchmark_replicates",
+        "exact_comparison_replicates",
+        "decision_disagreement_count",
+        "wall_clock_seconds"
+      ],
+      "unregistered_runtime_shortcut_forbidden": true
+    }
+  },
+  "randomness": {
+    "algorithm": "HMAC-SHA256 counter streams with rejection sampling; no modulo bias",
+    "message_separator_hex": "1f",
+    "base_uid_contract": {
+      "key": "mode.id_key_hex decoded to exactly 32 bytes",
+      "digest": "full lowercase 64-character HMAC-SHA256 hex",
+      "message": "UTF-8 bytes of step28-v13 + 0x1f + entity_kind + 0x1f + parent_uid_or_mode + 0x1f + zero-based unpadded decimal ordinal",
+      "entities": {
+        "world": {"prefix": "w_", "parent_uid_or_mode": "the exact ASCII mode name formal or development_smoke"},
+        "controller": {"prefix": "ctl_", "parent_uid_or_mode": "world_uid"},
+        "seller": {"prefix": "sel_", "parent_uid_or_mode": "world_uid"},
+        "identity_asset": {"prefix": "ias_", "parent_uid_or_mode": "world_uid"},
+        "item": {"prefix": "itm_", "parent_uid_or_mode": "seller_uid"},
+        "identity_slot": {"prefix": "slt_", "parent_uid_or_mode": "item_uid"},
+        "noise_slot": {"prefix": "nsl_", "parent_uid_or_mode": "item_uid"}
+      },
+      "regex": "^(w|ctl|sel|ias|itm|slt|nsl)_[0-9a-f]{64}$",
+      "forbidden_characters": [
+        "|",
+        "U+001E",
+        "U+001F",
+        "all Unicode category Cc characters"
+      ],
+      "pool_before_structure_assignment": {
+        "world_pool": "create exactly sum(modes[mode].world_counts) world UIDs with mode-global ordinal 0..N-1; rank them by HMAC(id_namespace_key, ASCII world_split_assignment + 0x1f + world_uid), then world_uid UTF-8; assign consecutive slices in exact order train,development,audit_a,audit_b using the frozen counts; per-split ordinal restart is forbidden",
+        "ordinal_scopes": {
+          "world": "mode-global",
+          "controller": "0..11 within world",
+          "seller": "0..27 within world",
+          "identity_asset": "0..95 within world, always generated before any topology or mechanism assignment",
+          "item": "0..item_count-1 within seller",
+          "identity_slot": "0..identity-slot-count-1 within item",
+          "noise_slot": "0..noise-slot-count-1 within item"
+        },
+        "controller_and_seller_uid_pools_created_before_membership": true,
+        "seller_ordinal_meaning": "position only in a label-independent 28-token pool; never controller-major, mechanism-major, split-major or generation-record order",
+        "membership_assignment": "apply structure_draw_registry.controller_partition_order and seller_partition_order; the first four ranked controllers receive size 3 and the remaining eight receive size 2; consume the ranked seller list in that exact controller order as consecutive nonoverlapping slices of the assigned size",
+        "public_uid_keys_must_not_recover_membership": true,
+        "canonical_without_structure_secret_test_required": true
+      },
+      "global_uniqueness_required": true
+    },
+    "derived_uid_contract": {
+      "identity_uid": "id_ plus full SHA256 hex of downstream canonical identity JSON",
+      "template_uid": "tpl_ plus full SHA256 hex of UTF-8 skeleton bytes",
+      "layer_uid": "layer_ plus full SHA256 hex of canonical layer JSON",
+      "rewire_seed_id": "rws_ plus full SHA256 hex of the 32 raw seed bytes",
+      "rewired_bundle_uid": "bundle_ plus full SHA256 hex of canonical bundle JSON",
+      "query_uid": "qry_ plus full SHA256 hex",
+      "relation_uid": "rel_ plus full SHA256 hex",
+      "digest_truncation_forbidden": true,
+      "separator_safety_validation_required": true
+    },
+    "structure_draw_registry": {
+      "normative_status": "this registry is normative for controller membership, markets, controller styles and positive-mechanism base draws; hard-negative membership, global identity-type/slot feasibility and occurrence-to-slot flow instead use their separately named normative solver contracts below; no other free-text secret-HMAC algorithm is allowed",
+      "separately_normative_solver_contracts": [
+        "identity_design.hard_negative_generator_contract.common.membership_solver",
+        "identity_design.slot_feasibility.identity_asset_uid_pool",
+        "identity_design.slot_feasibility.type_assignment",
+        "identity_design.slot_feasibility.occurrence_to_slot_matching",
+        "nonidentity_item_dgp.registered_overrides"
+      ],
+      "key": "the exact split structure key decoded from canonical lowercase 64-hex into 32 raw bytes",
+      "rank_message": "ASCII step28-v13-structure + 0x1f + world_uid UTF-8 + 0x1f + draw_name ASCII + 0x1f + candidate_material UTF-8",
+      "rank_order": "full 32-byte HMAC-SHA256 digest interpreted as unsigned big-endian, then candidate UTF-8 bytes",
+      "candidate_material": "when a draw has candidate_prefix_atoms, expand the exact array in order, join atoms with one U+001E, append exactly one U+001E and then the candidate; otherwise candidate_material equals candidate; atom names are machine tokens defined by the calling draw, graph_name_ascii is exact G_A or G_B, controller_size_unpadded_decimal is 2 or 3, proposal_counter_unpadded_decimal has no sign/zeros except zero itself, and literal:background is exactly ASCII background",
+      "candidate_constraints": "candidate is nonempty canonical serialization and contains neither U+001E nor U+001F unless the registered serialization explicitly uses U+001E between already validated atoms",
+      "unordered_pair_serialization": "two seller UIDs sorted by UTF-8 bytes and joined by U+001E",
+      "ordered_tuple_serialization": "validated atoms in semantic order joined by U+001E",
+      "permutation": "enumerate the complete registered candidate set exactly once and sort by rank_order",
+      "choice": "take the first element of the registered candidate set after rank_order",
+      "bernoulli_message": "ASCII step28-v13-structure + 0x1f + world_uid + 0x1f + draw_name + 0x1f + subject_uid",
+      "bernoulli_rule": "interpret the first 8 HMAC digest bytes as unsigned big-endian uint64 and return true iff value < floor(Decimal(str(p))*2^64); NaN, infinity and p outside [0,1] are invalid",
+      "draws": {
+        "controller_partition_order": {"operation": "permutation", "candidates": "all 12 controller UIDs"},
+        "seller_partition_order": {"operation": "permutation", "candidates": "all 28 seller UIDs"},
+        "controller_member_role_order": {"operation": "permutation", "candidates": "the 2 or 3 sellers already assigned to one controller", "candidate_prefix_atoms": ["controller_uid"]},
+        "market_proposal": {"operation": "choice", "candidates": "the three template markets", "candidate_prefix_atoms": ["proposal_counter_unpadded_decimal", "seller_uid"]},
+        "controller_style_assignment": {"operation": "permutation", "candidates": "all 12 controller UIDs"},
+        "mechanism_cross_market_controller_order": {"operation": "permutation", "candidates": "eligible controllers of the required size having at least two seller markets", "candidate_prefix_atoms": ["graph_name_ascii", "controller_size_unpadded_decimal"]},
+        "mechanism_remaining_controller_order": {"operation": "permutation", "candidates": "unassigned controllers of one size", "candidate_prefix_atoms": ["graph_name_ascii", "controller_size_unpadded_decimal"]},
+        "mechanism_remaining_slot_order": {"operation": "permutation", "candidates": "the exact expanded mechanism slot IDs mechanism_name#zero_based_ordinal for one size after removing cross-market slots", "candidate_prefix_atoms": ["graph_name_ascii", "controller_size_unpadded_decimal"]},
+        "cross_market_seller_pair": {"operation": "choice", "candidates": "all different-market unordered seller pairs inside the assigned controller", "candidate_prefix_atoms": ["controller_uid"]},
+        "controller_member_left_middle_right": {"operation": "permutation", "candidates": "the three sellers in a rotation controller", "candidate_prefix_atoms": ["controller_uid"]},
+        "stable_identity_repeat": {"operation": "bernoulli", "subject": "identity_asset_uid", "probability": "identity_design.stable_identity_repeat_probability[graph_name]"},
+        "single_hop_path_repeat": {"operation": "bernoulli", "subject": "controller_uid", "probability": "identity_design.rotation_occurrence_probabilities[graph_name].single_hop_any_one_side_repeat_probability"},
+        "single_hop_repeat_side": {"operation": "choice", "candidates": "ASCII left_middle and middle_right", "candidate_prefix_atoms": ["controller_uid"]},
+        "background_type_offset": {"operation": "choice", "candidates": "ASCII unpadded decimal 0 through 6", "candidate_prefix_atoms": ["literal:background"]}
+      },
+      "independent_replay_gate": "a second implementation imports no producer decision module and receives only the public policy, the complete registered split world set, UID-only observed seller/item/nonempty-title/nonempty-description pools and the one split key; it must reproduce every controller membership, market, style group, mechanism, typed-membership leaf, identity type, repeat decision and registered override side/item/category/product/attribute/skeleton decision byte-for-byte; the replayer must bind its complete ledger, inputs, policy and source closure into a custody parent manifest; a producer-private projector emits only the exact minimal typed projection and its own parent manifest; a separate comparator receives no key, verifies both immutable parents and compares the two sealed minimal projections",
+      "same_producer_regeneration_evidence_boundary": "development-smoke mutation check only; it is never an independent replay and never satisfies a formal seal"
+    },
+    "formal": {
+      "id_namespace_key_hex": "ba95e649cf95f19f2fe4255a214349240c944fe68281822b53f9932b4b5dd385",
+      "id_key_hex": "2cc94a22deda6cd5489d299741e4fd7542b57a7997022c8862cabcfd20e55d57",
+      "identity_value_key_hex": "ea959e902d7f450fd927eb8819f8dac3208637c977cf63e2728aa4d7297d3b49",
+      "text_key_hex": "d10fbb910729d0cbe57fc2ffc09a7f5a7f233a80975f9dd46aa5110fbfaf97d7",
+      "candidate_key_hex": "15fbd8ed023df4e2281d033178db5b147676841848cca7b7455ca1d014859747",
+      "query_key_hex": "ce58ea62a168f1679e3388b7db192d989856ac3680e17376ab3d48df163559f3",
+      "label_bearing_structure_keys": {
+        "public_values_forbidden": true,
+        "key_bytes": 32,
+        "commitment": "SHA256 of the 32 raw secret bytes",
+        "compromised_draft_key_commitments_forbidden": [
+          "fbb754ad370d2fa0355568fe0aec2d5ce949753058df36d8a45a6c1bd285995c"
+        ],
+        "train": {"environment_variable": "STEP28_V13_TRAIN_STRUCTURE_KEY_HEX", "sha256_commitment": null},
+        "development": {"environment_variable": "STEP28_V13_DEVELOPMENT_STRUCTURE_KEY_HEX", "sha256_commitment": null},
+        "audit_a": {"environment_variable": "STEP28_V13_AUDIT_A_STRUCTURE_KEY_HEX", "sha256_commitment": null},
+        "audit_b": {"environment_variable": "STEP28_V13_AUDIT_B_STRUCTURE_KEY_HEX", "sha256_commitment": null},
+        "one_shot_generation_ceremony": {
+          "candidate_key_count_per_split": 1,
+          "generator": "the split's independent custody account calls the operating-system CSPRNG exactly once for 32 bytes",
+          "precondition": "the account and operators have not materialized, simulated, scored or inspected any formal observed covariates, topology, labels, C40 membership, coverage or shortcut statistic for that split",
+          "immediate_receipt": "append-only record containing contract release hash, split, monotonic sequence, UTC timestamp, SHA256 commitment, exact CSPRNG API, host or HSM attestation, account identity and previous receipt-chain hash",
+          "commitment_timing": "receipt and public commitment are sealed before the key is mounted into any generator",
+          "replacement_or_screening_forbidden": true,
+          "extra_generation_event_rule": "any second candidate key, discarded candidate, dry run, receipt-chain gap or precommit split preview invalidates the complete dataset version",
+          "deployment_validator_must_verify_receipt_chain": true,
+          "preferred_implementation": "HSM or externally witnessed randomness beacon when available; OS CSPRNG ceremony is the minimum accepted implementation"
+        },
+        "separate_os_custody_required": true,
+        "audit_a_and_b_never_in_same_process": true,
+        "generator_access_revoked_after_split_seal": true
+      },
+      "rewire_key_hexes": [
+        "cebb5e0b4f0b05ab9b85cfe67598711498ed0d6402c6d1675506aaf3867d5905",
+        "6ce3b5eef2068d11f20ff32727cb1a433442225350813cc6553a5131522451bf",
+        "631735b8a82074b4191cbb9ef27cc3d35c72c1486f1711e3682f512cee7e2fc6",
+        "c9c35d8d63d53b01cef6faca198b5858484f77a0f3c8014bae27a6fee83ec1a7",
+        "da20e8c79e6a5d131d26f7c6a84f10ce1c46b505f480ceabec26f9df181b4384"
+      ]
+    },
+    "development_smoke": {
+      "id_namespace_key_hex": "5e3ade80eb03d5734f68276e265434b79d97a5640870edfc4615da8a822a3537",
+      "structure_key_hex": "a08c2161db1f29b1e4cf1c24c14bc3da76967ce1dd9a085ed7e5ce2c5dfed70d",
+      "id_key_hex": "feed8ff63a642bca2b99a687f843a2cb121bf8f5a128ec7f52fb75210e0bac43",
+      "identity_value_key_hex": "2484e16bff120a060d6333ffc9e1805ec719f0dd131859d23e0eb43f62b96e2d",
+      "text_key_hex": "a34922cea1238d5796194f87a58dbe1aeef0492d03f78fad4a0c2578b5f58704",
+      "candidate_key_hex": "ab6a77bfa2972f65aa3e5f8fb57a8008ecc9234b08fb89b15aaecc953cc78584",
+      "query_key_hex": "4bc6bdc3be1680744362f734fdbad0f7e66e9019258c0b158fc90b13bedfad8a",
+      "rewire_key_hexes": [
+        "85b5fd33dfc4638310c5dd5affc698af19ff679012f7080f66d201b94369d083",
+        "4f82e98138a0e7ec41555757466a56a3b3ba9ff580e26cc85f5b000436625cd8",
+        "788124878db9f87c950c388014a42ba7f850c1d31531138c998b6366a300d5b4",
+        "59d6d22de0856c056b95cd7d5e7646fb29dda42589ef0bc9a705983638897ca3",
+        "18d1a3a4728f5a9a8c6b1b3a878e43be81132e395faf6b097b76af183bad563f"
+      ]
+    }
+  },
+  "style_reference_boundary": {
+    "eligible_data_bucket": "zh_target_strict",
+    "eligible_item_manifest_status": "target_eval_candidate",
+    "membership_output": "reference/style_source_train_sellers.csv",
+    "profile_output": "reference/chinese_train_style_profile.json",
+    "generator_release_inputs": {
+      "membership": {
+        "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/style_source_train_sellers.csv",
+        "sha256": "b57cbfc3908ae3f36983c7c9e6d4dd974b59222f6617d214cec090524c3eb6de"
+      },
+      "profile": {
+        "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json",
+        "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34"
+      },
+      "lineage_note": "these draft smoke inputs were produced before policy byte freeze but bind the same pinned membership/workbook producer and exact aggregate content; the final release manifest must either re-materialize them under the stable policy or explicitly bind this immutable lineage"
+    },
+    "membership_columns": [
+      "seller_uid"
+    ],
+    "membership_label_invariance_test": true,
+    "profile_may_read_protected_labels": false,
+    "minimum_seller_support_per_category": 20,
+    "quantiles": [
+      0.05,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9,
+      0.95
+    ],
+    "clip_item_count": [
+      2,
+      8
+    ],
+    "allowed_aggregates": [
+      "seller_equal_weight_clipped_item_count_pmf_2_to_8",
+      "title_length_quantiles",
+      "description_length_quantiles",
+      "title_missing_rate_quantiles",
+      "description_missing_rate_quantiles",
+      "anonymous_category_rank_probability_after_rare_merge",
+      "digit_ratio_quantiles",
+      "punctuation_ratio_quantiles",
+      "newline_count_quantiles",
+      "traditional_character_ratio_quantiles",
+      "latin_uppercase_ratio_quantiles"
+    ],
+    "statistical_unit": "seller",
+    "quantile_method": "Hyndman-Fan type 7 linear interpolation",
+    "within_seller_length_statistic": "median",
+    "within_seller_ratio_statistic": "mean",
+    "category_weighting": "normalize within seller then equal-weight sellers",
+    "anonymous_category_rank_count": 8,
+    "anonymous_category_tail_rule": "retain top 7 probabilities and merge all remaining mass into rank 8; pad with zeros then renormalize",
+    "category_labels_in_output_forbidden": true,
+    "consumed_by_generator": [
+      "seller_equal_weight_clipped_item_count_pmf_2_to_8",
+      "title_missing_rate_quantiles",
+      "description_missing_rate_quantiles",
+      "anonymous_category_rank_probability_after_rare_merge"
+    ],
+    "diagnostic_only_not_empirical_calibration": [
+      "title_length_quantiles",
+      "description_length_quantiles",
+      "digit_ratio_quantiles",
+      "punctuation_ratio_quantiles",
+      "newline_count_quantiles",
+      "traditional_character_ratio_quantiles",
+      "latin_uppercase_ratio_quantiles"
+    ],
+    "claim_limit": "the hand-written 12 style prototypes and their perturbations are registered synthetic authorship signals, not an empirically calibrated replica of real Chinese seller style; diagnostic-only aggregates cannot support a style-matching claim",
+    "real_contact_market_time_statistics_used": false,
+    "forbidden_outputs": [
+      "raw_text",
+      "text_fragment",
+      "identity_value",
+      "seller_label",
+      "pair_label",
+      "seller_uid_outside_membership_file",
+      "controller_or_candidate_information"
+    ]
+  },
+  "nonidentity_item_dgp": {
+    "purpose": "make every nonidentity item choice executable, byte-replayable and auditable before identity assets are assigned",
+    "ordering": [
+      "sample seller item count",
+      "sample seller title and description missing-rate parameters",
+      "accept the first label-blind seller missingness proposal satisfying the fixed nonempty constraints",
+      "sample item time bucket, category, product, attribute, delivery, service, skeleton and code",
+      "assign registered controller-linked style and two seller perturbations",
+      "apply only preregistered hard-negative category or exact-clone overrides",
+      "allocate identity and must-ignore slots only to nonempty descriptions",
+      "render immutable noise, guard and identity regions"
+    ],
+    "randomness": {
+      "key": "mode.text_key_hex",
+      "stream_context": "ASCII step28-v13-item-dgp + 0x1f + entity_uid + 0x1f + draw_name + optional 0x1f + unpadded decimal proposal_or_item_ordinal",
+      "categorical_probability_scale": 1000000000000,
+      "categorical_integerization": "round each persisted .12f probability times 10^12 using round-half-to-even, replace the final cell by 10^12 minus the preceding cells, reject a negative cell, then draw one unbiased integer in [0,10^12)",
+      "uniform_choice": "unbiased randbelow of the frozen list length",
+      "bernoulli": "compare the first unsigned big-endian uint64 HMAC block with floor(p*2^64)",
+      "all_draw_names_unique_and_tested": true
+    },
+    "item_count": {
+      "source": "frozen style profile item_count_pmf after the exact categorical integerization",
+      "range": [2, 8],
+      "one_draw_per_seller": true,
+      "independent_of": ["controller membership", "mechanism", "candidate", "label"]
+    },
+    "missingness": {
+      "seller_rate_sources": {
+        "title": "seller_equal_weight_quantiles.title_missing",
+        "description": "seller_equal_weight_quantiles.description_missing"
+      },
+      "inverse_quantile": "draw u from uint64/2^64; use the first/last frozen quantile value outside [0.05,0.95] and linear interpolation between adjacent frozen probability knots inside",
+      "proposal": "for every seller and proposal counter, independently draw nonempty iff Bernoulli(1-rate) for every item and field",
+      "acceptance": "at least one nonempty title and at least two nonempty descriptions",
+      "maximum_proposals": 10000,
+      "exhaustion_rule": "split validity failure without changing any key, UID or probability",
+      "identity_slots_only_on_nonempty_descriptions": true,
+      "same_acceptance_rule_for_every_seller": true,
+      "controller_mechanism_candidate_or_label_input_forbidden": true
+    },
+    "base_item_draws": {
+      "time_bucket": {
+        "persisted_field": "time_bucket",
+        "persisted_type": "JSON integer",
+        "values": [0, 1, 2, 3],
+        "probabilities": [0.25, 0.25, 0.25, 0.25],
+        "timestamp_or_date_field_forbidden": true
+      },
+      "category": "draw by the frozen anonymous_category_rank_probability mapped in order to template generic_lexicon.categories",
+      "product": "uniform within template generic_lexicon.category_products[category]",
+      "attribute": "uniform over generic_lexicon.attributes",
+      "delivery": "uniform over generic_lexicon.delivery",
+      "service": "uniform over generic_lexicon.service",
+      "title_skeleton": "uniform over the exact current split title_skeletons",
+      "description_skeleton": "uniform over the exact current split description_skeletons",
+      "code": "take the first 10 hexadecimal nibbles of HMAC(text_key, item_uid + 0x1f + ASCII code), map nibble 0..15 bijectively to ASCII A..P, and prefix ASCII Q; digits are forbidden because long numeric runs are parsed as QQ; any collision is a split validity failure",
+      "draws_independent_across_items_by_item_uid_domain": true
+    },
+    "style_assignment": {
+      "selected_world_styles": "rank all 12 style_id values by HMAC(text_key, world_uid + 0x1f + ASCII selected_style + 0x1f + style_id), then take the first four",
+      "controller_assignment": "apply randomness.structure_draw_registry draw controller_style_assignment; consecutive ranked groups of three inherit selected world style indexes 0,1,2,3 in selected_world_styles rank order",
+      "seller_inheritance": "seller inherits its controller style exactly before perturbation",
+      "seller_perturbation": "rank the six template renderer style_factor_order values by HMAC(text_key, seller_uid + 0x1f + ASCII style_perturbation + 0x1f + factor), choose exactly two, and advance each once in its frozen domain with wraparound",
+      "no_controller_exclusive_style": "each base style has exactly three controllers in every world and seller perturbations use no controller or mechanism input",
+      "registered_authorship_signal": true
+    },
+    "rendering": {
+      "normalization": "all literal/template strings are UTF-8 and NFC; no implicit strip, NFKC or whitespace collapse in the persisted raw item",
+      "base_title": "format the split title skeleton with product,attribute and exactly one of code or title_modifier. The modifier is the template's 16-value natural modifier at the parser-safe code's penultimate A..P symbol, so it is label-blind and shared rather than item-unique. Then apply the exact seller style transformation. Append the inherited nonempty English tag only when the final code symbol is A, B or C, a label-blind 3/16 item gate; if title mask is empty persist the empty string",
+      "base_description": "format only the skeleton prefix before {noise_clause}{context_guard}{identity_clause} with product,attribute,code,delivery,service and exact style slots; apply seller style only to this base prefix; if description mask is empty persist the empty string",
+      "nonempty_description_suffix": "append the immutable noise clause or empty string. If there is no populated identity clause, stop without any context guard. Otherwise rank the 12 immutable guards by SHA256(item_uid UTF-8 + 0x1f + guard UTF-8), append the first guard, then each populated identity clause followed by the next distinct ranked guard",
+      "identity_clause_order": "slot_uid UTF-8 bytes",
+      "style_scope_exclusion": ["noise clause", "context_guard", "identity clause", "raw identity surface"],
+      "identity_free_descriptions_receive_no_context_guard": true,
+      "context_guards_are_distinct_within_each_item": true,
+      "renderer_must_assert_skeleton_suffix": "{noise_clause}{context_guard}{identity_clause}"
+    },
+    "must_ignore_noise": {
+      "count_per_seller": 1,
+      "item": "HMAC-ranked first nonempty-description item",
+      "template": "uniform over identity_clause_templates.must_ignore",
+      "value": "uniform over parser fixture must_ignore_adversarial_values",
+      "identity_graph_membership": false,
+      "rewire_behavior": "byte-identical and never editable"
+    },
+    "registered_overrides": {
+      "exact_title_clone": {
+        "scope": "only the designated hard-negative target pair at one frozen asset_index",
+        "side_order": "rank the two endpoints by HMAC(structure_key, world_uid + 0x1f + ASCII exact_clone_side + 0x1f + decimal asset_index + 0x1f + seller_uid); first is source and second is destination",
+        "item_choice": "process high-semantic assets first by numeric asset_index and left then right, followed by exact-title-clone assets by numeric asset_index and source then destination; on each side rank currently unreserved nonempty-title item UIDs by HMAC(structure_key, world_uid + 0x1f + ASCII exact_clone_item + 0x1f + decimal asset_index + 0x1f + side_name + 0x1f + item_uid), take the first, and reserve it for the rest of the world; the observed_override_endpoint_rule guarantees each seller occurs only once, so reservation is a fail-closed invariant rather than conditioning on item count",
+        "operation": "after both base titles and seller style are fully rendered, replace the complete destination title with the source title bytes; missing masks, category, descriptions and every identity/noise slot remain unchanged"
+      },
+      "high_semantic": {
+        "scope": "only the designated hard-negative target pair at one frozen asset_index",
+        "side_order": "use the exact endpoint HMAC ordering with ASCII high_semantic_side",
+        "item_choice": "in the shared override allocation order choose the first HMAC-ranked currently unreserved nonempty-title item under ASCII high_semantic_item and the asset_index, then reserve it; endpoint disjointness plus the per-seller nonempty-title gate guarantees capacity without selecting sellers from observed item counts",
+        "common_category": "use the exact nonidentity_item_dgp .12f-to-10^12 categorical algorithm and frozen anonymous category probabilities, with the structure-key stream context world_uid + 0x1f + ASCII high_semantic_category + 0x1f + decimal asset_index",
+        "common_product": "use the same unbiased uniform law as a base item within the selected category under the structure-key high_semantic_product stream",
+        "common_attribute": "use the same unbiased uniform law as a base item under the structure-key high_semantic_attribute stream",
+        "distinct_skeletons": "enumerate every ordered pair of distinct split-local title skeleton indexes, rank by HMAC(structure_key, world_uid + 0x1f + ASCII high_semantic_skeleton_pair + 0x1f + decimal asset_index + 0x1f + left_index + 0x1f + right_index), take first and assign in side order",
+        "operation": "before any identity/noise slot is allocated, replace the two selected observed item rows' category with the common category and the two private render-AST rows' product and attribute with the common values; rerender each selected item's base title and base description using those values, its assigned distinct title skeleton, original description skeleton, original unique code, delivery, service and seller style; all other items remain unchanged",
+        "integrity_gate": "for every designated semantic asset, the two exact selected observed item rows have equal category, their private render-AST product/attribute values are equal, the product is in category_products[category], title skeleton indexes differ, codes differ, and all rendered base fields independently recompute byte-for-byte",
+        "marginal_law_gate": "across designated semantic assets, the single-endpoint category/product/attribute generator is exactly the base categorical/conditional-uniform law by construction; only equality between the two endpoints is introduced, never an absolute rare-category stress"
+      },
+      "market": "owned by identity_design.controller_size_mechanism_assignment and never altered by item rendering",
+      "all_override_target_selection_uses_structure_key_before_candidate_generation": true
+    },
+    "post_generation_gates": [
+      "item count, missing masks and time buckets are byte-identical when controller membership and all mechanisms are independently permuted while public UIDs and text key remain fixed",
+      "every category belongs to the frozen category list and every product belongs to that category's frozen product list",
+      "every seller has at least one nonempty title and two nonempty descriptions before and after identity redaction",
+      "all item codes are globally unique within a mode",
+      "all style factors belong to their frozen domains and exactly two differ by the registered perturbation operation",
+      "no style transform changes any byte of noise, guard or identity regions",
+      "all nonregistered nonidentity draws are independent of candidate and model scores"
+    ]
+  },
+  "world_design": {
+    "controllers_per_world": 12,
+    "dyad_controller_count": 8,
+    "triad_controller_count": 4,
+    "sellers_per_world": 28,
+    "markets": [
+      "青岚集市",
+      "远山商街",
+      "星港广场"
+    ],
+    "locale": "zh-CN",
+    "item_count_source": "frozen_train_style_reference_empirical_histogram",
+    "item_count_minimum": 2,
+    "item_count_maximum": 8,
+    "item_count_independent_of": [
+      "controller",
+      "mechanism",
+      "classification_label"
+    ],
+    "style_prototypes_sampled_per_world": 4,
+    "controllers_per_selected_style": 3,
+    "minimum_seller_style_factor_perturbations": 2,
+    "post_v4_redaction_minimum_nonempty_title_per_seller": 1,
+    "post_v4_redaction_minimum_nonempty_description_per_seller": 2
+  },
+  "identity_design": {
+    "identity_types": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "parser_observable_role_types": {
+      "direct_or_private": [
+        "telegram",
+        "email",
+        "bat",
+        "qq",
+        "wechat",
+        "phone",
+        "crypto_wallet"
+      ],
+      "high_frequency_direct": [
+        "telegram",
+        "email",
+        "bat",
+        "qq",
+        "wechat",
+        "phone",
+        "crypto_wallet"
+      ],
+      "public_support": [
+        "email",
+        "phone",
+        "external_url"
+      ],
+      "risky_product": [
+        "telegram",
+        "email",
+        "bat",
+        "qq",
+        "wechat",
+        "phone",
+        "crypto_wallet",
+        "external_url"
+      ]
+    },
+    "role_to_template_family": {
+      "direct_or_private": "direct",
+      "high_frequency_direct": "direct",
+      "public_support": "support",
+      "risky_product": "risky"
+    },
+    "role_template_parser_flag_fixture": {
+      "path": "schema/step28_v13_parser_template_fixture.json",
+      "sha256": "51ee96967b5f2e9882b117e3e0b8aa1cfaa4a7d2bf87e80d2e87f4166c230d9f",
+      "required_version": "2026-07-29-step28-v13-parser-template-fixture-v5-draft",
+      "required_before_dataset_release_lock": true
+    },
+    "downstream_identity_key": {
+      "canonical_object": {
+        "contact_type": "strip then lowercase",
+        "normalized_value": "Step3 normalized_value, strip then lowercase exactly as step28_history_common.token_key"
+      },
+      "identity_uid": "id_ + SHA256 of UTF-8 canonical JSON; sorted keys; ensure_ascii=false; separators comma-colon; no newline",
+      "step3_to_history_many_to_one_collision_count_maximum": 0,
+      "all_occurrences_of_one_identity_must_share_one_observed_nuisance_class": true
+    },
+    "original_bundle_uid": {
+      "serialization": "bundle0_ + SHA256 of canonical JSON containing only world_uid,seller_uid,identity_uid",
+      "canonical_json": "UTF-8, keys sorted, ensure_ascii=false, separators comma-colon, no newline",
+      "regex": "^bundle0_[0-9a-f]{64}$",
+      "controller_mechanism_role_or_generation_ordinal_forbidden": true,
+      "independent_recomputation_gate": true
+    },
+    "value_grammars": {
+      "telegram": {
+        "normalized_regex": "^tg[a-z0-9]{14}$",
+        "raw_surface": "exact normalized value",
+        "step3_profile_contact_key": "same lowercase value"
+      },
+      "email": {
+        "normalized_regex": "^u[0-9a-f]{16}@id\\.invalid$",
+        "raw_surface": "exact normalized value",
+        "step3_profile_contact_key": "same lowercase value"
+      },
+      "bat": {
+        "normalized_regex": "^bt[a-z0-9]{14}$",
+        "raw_surface": "exact normalized value",
+        "step3_profile_contact_key": null
+      },
+      "qq": {
+        "normalized_regex": "^[1-9][0-9]{8}$",
+        "raw_surface": "exact normalized value",
+        "step3_profile_contact_key": "same digits"
+      },
+      "wechat": {
+        "normalized_regex": "^wx[a-z0-9]{14}$",
+        "raw_surface": "exact normalized value",
+        "step3_profile_contact_key": "same lowercase value"
+      },
+      "phone": {
+        "normalized_regex": "^13[0-9]{9}$",
+        "raw_surface": "exact 11 digits with no plus sign, spaces or punctuation",
+        "step3_profile_contact_key": "same 11 digits"
+      },
+      "crypto_wallet": {
+        "normalized_regex": "^0x[0-9a-f]{40}$",
+        "raw_surface": "exact lowercase normalized value",
+        "step3_profile_contact_key": null,
+        "legacy_base58_and_tron_forbidden": true
+      },
+      "external_url": {
+        "normalized_regex": "^s[0-9a-f]{12}\\.example/path/[0-9a-f]{8}$",
+        "raw_surface": "https:// plus normalized value",
+        "step3_profile_contact_key": null
+      }
+    },
+    "background_private_identities_per_seller": 2,
+    "background_private_scaffold": {
+      "edge_count_per_world": 56,
+      "allowed_types": [
+        "telegram",
+        "email",
+        "bat",
+        "qq",
+        "wechat",
+        "phone",
+        "crypto_wallet"
+      ],
+      "assignment": "sort seller_uid UTF-8, expand background_slot 0 then 1, choose the one world-level offset with structure_draw_registry.background_type_offset, parse its unpadded decimal candidate, assign type=(edge_ordinal+offset) mod 7 in allowed_types order, and assign occurrence_count=1+(edge_ordinal mod 2); therefore every seller has one count=1 and one count=2 edge while every type has exactly four of each count",
+      "exact_edges_per_type": 8,
+      "exact_edges_per_type_and_occurrence_count": {
+        "1": 4,
+        "2": 4
+      },
+      "seller_two_types_must_differ": true,
+      "identity_seller_degree": 1,
+      "occurrences_per_edge": [
+        1,
+        2
+      ],
+      "repeat_exclusion_reason": "seller-private background identities add no cross-seller relation; repeating them only consumes per-type parser slots and can make high-degree hard-negative identities structurally impossible",
+      "observable_nuisance_class": "direct_or_private"
+    },
+    "parser_expectations": [
+      "must_extract",
+      "must_ignore",
+      "stress_unconstrained"
+    ],
+    "main_dataset_expectations": [
+      "must_extract",
+      "must_ignore"
+    ],
+    "mechanism_assignments": {
+      "G_A": {
+        "single_identity_stable_reuse": 2,
+        "multi_type_identity_reuse": 2,
+        "cross_market_stable_reuse": 2,
+        "single_hop_rotation": 1,
+        "corroborated_two_hop_rotation": 2,
+        "sparse_history": 1,
+        "same_controller_no_direct_share": 1,
+        "zero_visible_identity_history": 1
+      },
+      "G_B": {
+        "single_identity_stable_reuse": 1,
+        "multi_type_identity_reuse": 1,
+        "cross_market_stable_reuse": 1,
+        "single_hop_rotation": 1,
+        "corroborated_two_hop_rotation": 3,
+        "sparse_history": 2,
+        "same_controller_no_direct_share": 1,
+        "zero_visible_identity_history": 2
+      }
+    },
+    "mechanism_traversal_order": [
+      "single_identity_stable_reuse",
+      "multi_type_identity_reuse",
+      "cross_market_stable_reuse",
+      "single_hop_rotation",
+      "corroborated_two_hop_rotation",
+      "sparse_history",
+      "same_controller_no_direct_share",
+      "zero_visible_identity_history"
+    ],
+    "mechanism_by_split": {
+      "train": "G_A",
+      "development": "G_A",
+      "audit_a": "G_A",
+      "audit_b": "G_B"
+    },
+    "controller_size_mechanism_assignment": {
+      "markets_sampled_before_mechanism_assignment": true,
+      "seller_markets": {
+        "probabilities_in_template_market_order": [0.3333333333333333, 0.3333333333333333, 0.3333333333333333],
+        "proposal_message": "exactly randomness.structure_draw_registry.market_proposal",
+        "algorithm": "for proposal counters 0..9999 apply market_proposal independently to every seller UID in UTF-8 order, then accept the first whole-world proposal having at least one multi-market dyad and at least one multi-market triad",
+        "conditioning_is_uniform_across_G_A_and_G_B": true,
+        "maximum_proposals": 10000,
+        "exhaustion_rule": "world validity failure; never replace the formal secret or world UID",
+        "independent_of": ["mechanism assignment", "item count", "candidate", "model score"],
+        "conditional_exchangeability": "feasibility predicate is symmetric over controller UIDs and is applied before any mechanism assignment"
+      },
+      "G_A": {
+        "expanded_triad_slot_ids_before_hmac_permutation": [
+          "single_hop_rotation#0",
+          "corroborated_two_hop_rotation#0",
+          "corroborated_two_hop_rotation#1"
+        ],
+        "expanded_dyad_slot_ids_before_hmac_permutation": [
+          "single_identity_stable_reuse#0",
+          "single_identity_stable_reuse#1",
+          "multi_type_identity_reuse#0",
+          "multi_type_identity_reuse#1",
+          "sparse_history#0",
+          "same_controller_no_direct_share#0",
+          "zero_visible_identity_history#0"
+        ],
+        "triad_slots": {
+          "single_hop_rotation": 1,
+          "corroborated_two_hop_rotation": 2,
+          "cross_market_stable_reuse": 1
+        },
+        "dyad_slots": {
+          "single_identity_stable_reuse": 2,
+          "multi_type_identity_reuse": 2,
+          "cross_market_stable_reuse": 1,
+          "sparse_history": 1,
+          "same_controller_no_direct_share": 1,
+          "zero_visible_identity_history": 1
+        }
+      },
+      "G_B": {
+        "expanded_triad_slot_ids_before_hmac_permutation": [
+          "single_hop_rotation#0",
+          "corroborated_two_hop_rotation#0",
+          "corroborated_two_hop_rotation#1",
+          "corroborated_two_hop_rotation#2"
+        ],
+        "expanded_dyad_slot_ids_before_hmac_permutation": [
+          "single_identity_stable_reuse#0",
+          "multi_type_identity_reuse#0",
+          "sparse_history#0",
+          "sparse_history#1",
+          "same_controller_no_direct_share#0",
+          "zero_visible_identity_history#0",
+          "zero_visible_identity_history#1"
+        ],
+        "triad_slots": {
+          "single_hop_rotation": 1,
+          "corroborated_two_hop_rotation": 3
+        },
+        "dyad_slots": {
+          "single_identity_stable_reuse": 1,
+          "multi_type_identity_reuse": 1,
+          "cross_market_stable_reuse": 1,
+          "sparse_history": 2,
+          "same_controller_no_direct_share": 1,
+          "zero_visible_identity_history": 2
+        }
+      },
+      "cross_market_slot_rule": "apply structure_draw_registry.mechanism_cross_market_controller_order separately by size; assign G_A cross_market_stable_reuse#0 to the first eligible triad and #1 to the first eligible dyad, and assign G_B cross_market_stable_reuse#0 to the first eligible dyad; for each remaining size independently rank remaining controllers and the exact expanded slot-ID list with mechanism_remaining_controller_order and mechanism_remaining_slot_order and zip rank-for-rank",
+      "insufficient_eligible_controller_rule": "split generation validity failure; no market resampling and no seed replacement"
+    },
+    "mechanism_generators": {
+      "single_identity_stable_reuse": {
+        "controller_size": 2,
+        "identity_count": 1,
+        "identity_types": "one direct_or_private type chosen by deterministic globally-feasible HMAC type assignment",
+        "seller_identity_topology": "the one identity is incident to every seller in the controller",
+        "occurrences_per_edge": "apply structure_draw_registry.stable_identity_repeat to the identity asset; all seller edges have one occurrence on false or two on true; second occurrences use different items"
+      },
+      "multi_type_identity_reuse": {
+        "controller_size": 2,
+        "identity_count": 2,
+        "identity_types": "two distinct direct_or_private types chosen by deterministic globally-feasible HMAC type assignment",
+        "seller_identity_topology": "both identities are incident to every seller in the controller",
+        "occurrences_per_edge": "apply structure_draw_registry.stable_identity_repeat independently to each identity asset; every seller edge of that identity has one occurrence on false or two on true; second occurrences use different items"
+      },
+      "cross_market_stable_reuse": {
+        "controller_size": "2 in G_A and G_B plus one additional size-3 controller in G_A",
+        "identity_count": 1,
+        "identity_types": "one direct_or_private type chosen by deterministic globally-feasible HMAC type assignment",
+        "seller_pair": "apply structure_draw_registry.cross_market_seller_pair to all different-market unordered seller pairs in the controller",
+        "seller_identity_topology": "the identity is incident to exactly the selected different-market pair; a third seller, when present, is not incident",
+        "occurrences_per_edge": "apply structure_draw_registry.stable_identity_repeat to the identity asset; both selected seller edges have one occurrence on false or two on true; second occurrences use different items"
+      },
+      "single_hop_rotation": {
+        "controller_size": 3,
+        "seller_order": "apply structure_draw_registry.controller_member_left_middle_right; positions 0,1,2 are named left,middle,right",
+        "identity_count": 2,
+        "identity_types": "two distinct direct_or_private types chosen by deterministic globally-feasible HMAC type assignment",
+        "seller_identity_topology": "token A is incident to left and middle; distinct token B is incident to middle and right",
+        "occurrences_per_edge": "one mandatory; apply structure_draw_registry.single_hop_path_repeat to the controller and, when true, choose exactly one side using single_hop_repeat_side and repeat both seller occurrences on different items; each side marginal repeat probability is p/2 and both sides can never be repeated",
+        "expected_history": "exactly one strong uncorroborated rotation path between left and right before nuisance overlap"
+      },
+      "corroborated_two_hop_rotation": {
+        "controller_size": 3,
+        "seller_order": "apply structure_draw_registry.controller_member_left_middle_right; positions 0,1,2 are named left,middle,right",
+        "identity_count": 4,
+        "identity_types": "all four identity_asset_uid and identity values are globally distinct; the two assets on left-middle must use different contact types and the two assets on middle-right must use different contact types, while a contact type may be reused across the two sides",
+        "seller_identity_topology": "two tokens are each incident to left and middle; two other tokens are each incident to middle and right",
+        "occurrences_per_edge": 1,
+        "repeat_exclusion_reason": "corroboration is supplied by two distinct identity assets on each side; repeating each asset adds no relation and can make the fixed minimum slot-capacity design infeasible",
+        "expected_history": "exactly one strong corroborated rotation path between left and right before nuisance overlap"
+      },
+      "sparse_history": {
+        "controller_size": 2,
+        "identity_count": 1,
+        "identity_types": "one direct_or_private type chosen by deterministic globally-feasible HMAC type assignment",
+        "seller_identity_topology": "the identity is incident to both sellers",
+        "occurrences_per_edge": 1
+      },
+      "same_controller_no_direct_share": {
+        "controller_size": 2,
+        "mechanism_identity_count": 0,
+        "observable_definition": "the seller pair has no shared direct_or_private token with seller degree at most 3; public/risky/high-frequency nuisance may remain"
+      },
+      "zero_visible_identity_history": {
+        "controller_size": 2,
+        "mechanism_identity_count": 0,
+        "nuisance_exclusion": "both sellers are excluded from every multi-seller identity hub, collision and false-rotation assignment; seller-unique background identities remain",
+        "observable_definition": "the raw 33-feature vector of the within-controller pair is exactly all zeros",
+        "minimum_selected_rows_and_worlds": "exactly power_design_contract.scientific_coverage_floors for each split; the power artifact may increase but never decrease these values"
+      }
+    },
+    "stable_identity_repeat_probability": {
+      "G_A": 0.8,
+      "G_B": 0.55
+    },
+    "rotation_occurrence_probabilities": {
+      "G_A": {
+        "single_hop_any_one_side_repeat_probability": 0.7
+      },
+      "G_B": {
+        "single_hop_any_one_side_repeat_probability": 0.45
+      }
+    },
+    "risk_seller_count_per_world": {
+      "G_A": 6,
+      "G_B": 10
+    },
+    "hard_negative_dgp": {
+      "G_A": {
+        "support_hub_degrees": [
+          4,
+          6
+        ],
+        "high_frequency_direct_hub_degrees": [
+          4
+        ],
+        "risky_shared_token_count": 2,
+        "risky_shared_token_degree": 3,
+        "private_collision_edges": 2,
+        "false_rotation_paths": 1,
+        "cross_controller_exact_title_clone_pairs": 2,
+        "cross_controller_high_semantic_similarity_pairs": 4
+      },
+      "G_B": {
+        "support_hub_degrees": [
+          6,
+          8
+        ],
+        "high_frequency_direct_hub_degrees": [
+          8
+        ],
+        "risky_shared_token_count": 3,
+        "risky_shared_token_degree": 4,
+        "private_collision_edges": 3,
+        "false_rotation_paths": 2,
+        "cross_controller_exact_title_clone_pairs": 2,
+        "cross_controller_high_semantic_similarity_pairs": 4
+      }
+    },
+    "hard_negative_generator_contract": {
+      "negative_mechanism_flag_order": [
+        "support_hub_pair",
+        "high_frequency_direct_hub_pair",
+        "risky_shared_token_pair",
+        "private_collision_target",
+        "false_rotation_target",
+        "exact_title_clone_target",
+        "high_semantic_similarity_target",
+        "zero_raw33_negative"
+      ],
+      "pair_flag_rules": {
+        "support_hub_pair": "two distinct participating sellers sharing the same support-hub identity",
+        "high_frequency_direct_hub_pair": "two distinct participating sellers sharing the same high-frequency direct-hub identity",
+        "risky_shared_token_pair": "two distinct participating sellers sharing the same risky identity",
+        "private_collision_target": "the designated two endpoints of one private-collision identity",
+        "false_rotation_target": "only left-right of the designated three-seller path; left-middle and middle-right are supporting edges",
+        "exact_title_clone_target": "only the designated clone pair",
+        "high_semantic_similarity_target": "only the designated semantic pair",
+        "zero_raw33_negative": "classification label is 0 and all 33 raw identity features equal exact float64 zero"
+      },
+      "common": {
+        "shared_identity_sellers_must_have_distinct_controllers": true,
+        "zero_visible_controller_sellers_excluded_from_all_shared_identity_noise": true,
+        "all_occurrences_of_an_identity_use_one_role_template_and_one_observable_nuisance_class": true,
+        "assignment_order": [
+          "reserve zero-visible controller sellers",
+          "support hubs in configured degree order",
+          "high-frequency direct hubs in configured order",
+          "risky shared-token scaffold",
+          "private collisions by asset index",
+          "false rotations by asset index",
+          "exact-title-clone targets by asset index",
+          "high-semantic targets by asset index",
+          "global positive-and-negative identity type assignment",
+          "occurrence-to-slot matching"
+        ],
+        "identity_asset_kind_order": [
+          "support_hub",
+          "high_frequency_direct_hub",
+          "risky_shared_token",
+          "private_collision",
+          "false_rotation"
+        ],
+        "membership_solver": {
+          "algorithm": "deterministic depth-first backtracking first enumerates only type-bearing private-collision and false-rotation topology; for each such topology choose the first complete legal exact-clone plus high-semantic override completion in the registered HMAC order; count that topology once regardless of how many alternative override completions exist; accept the requested zero-based typed-membership topology ordinal",
+          "candidate_message": "world_uid + 0x1f + ASCII hard_negative + 0x1f + asset_kind + 0x1f + unpadded decimal asset_index + 0x1f + canonical candidate serialization",
+          "candidate_sort": "full secret-structure-key HMAC digest as big-endian integer, then candidate UTF-8 bytes",
+          "unordered_candidate_serialization": "seller UIDs UTF-8 sorted and joined with 0x1e",
+          "ordered_false_rotation_serialization": "left + 0x1e + middle + 0x1e + right",
+          "hub_enumeration": "support hubs use the first controller subset in registered HMAC order and, for each controller, the seller minimizing HMAC(structure_key, world_uid + 0x1f + ASCII hard_negative_hub_seller + 0x1f + asset_kind + 0x1f + unpadded decimal asset_index + 0x1f + controller_uid + 0x1f + seller_uid), tie seller_uid UTF-8; high-frequency direct hubs traverse controller subsets in that same order and first try the same per-controller primary sellers; if those sellers have no shared direct identity type with fixed-background demand plus hub demand one within the registered per-seller/type capacity, enumerate one seller per selected controller, retain only background-capacity-feasible UTF-8-sorted seller tuples, rank them by the registered hard-negative candidate message with asset_kind high_frequency_direct_hub_capacity_fallback, and choose the first; continue to the next controller subset only when the current subset has no feasible tuple, and fail closed when no subset is feasible",
+          "pair_enumeration": "all structurally eligible cross-controller unordered seller pairs",
+          "false_rotation_enumeration": "enumerate every three-controller subset in controller_uid UTF-8 order; choose one seller per controller with the exact hub seller rule; choose each of the three sellers once as middle in middle-seller UID UTF-8 order, and assign the remaining two as left/right by seller_uid UTF-8 order",
+          "risky_controller_index_order": "eligible controller UIDs are ranked by the same candidate_message with asset_kind risky_shared_scaffold, the configured asset index and canonical controller UID candidate; G_A/G_B membership index rules consume this exact rank order",
+          "conflict_rule": "skip candidates violating zero-visible exclusion, distinct-controller requirements or designated-pair uniqueness; incidental hub overlap is not a conflict",
+          "observed_override_endpoint_rule": "the two exact-title-clone and four high-semantic target pairs jointly use exactly 12 distinct seller endpoints; while traversing those six assets, reject any candidate containing a seller already used by either override kind",
+          "maximum_search_nodes": 1000000,
+          "downstream_separation": "each distinct type-bearing membership topology with its first legal override completion may be tested only once by identity type feasibility under the registered constant capacity 2; text-only override alternatives never cause repeated testing of the same identity topology; actual item counts and occurrence-slot flow never choose a membership topology; after the first fixed-capacity type-feasible topology is accepted, occurrence-slot flow runs exactly once and any failure is a world validity failure",
+          "failure_rule": "world validity failure after budget exhaustion or post-selection flow failure; no key, seed, public UID, market, positive mechanism or missingness replacement"
+        },
+        "type_assignment": "domain-separated HMAC order over the role-allowed types under fixed per-seller/type capacity 2; an infeasible hard-negative typed-membership topology advances to the next distinct type-bearing DFS topology, not another text-only override completion, without reading actual item counts",
+        "identity_slot_field": "description",
+        "target_pair_overlap": "private-collision, false-rotation endpoint, exact-title-clone and high-semantic designated unordered pairs are unique within their own and one another's designated lists; seller reuse and incidental overlap with hub-induced pairs are allowed and every negative mechanism is multi-label"
+      },
+      "support_hub": {
+        "unit": "one identity with the configured seller degree",
+        "allowed_types": ["email", "phone", "external_url"],
+        "role": "public_support",
+        "occurrences_per_seller_edge": 1
+      },
+      "high_frequency_direct_hub": {
+        "unit": "one identity with the configured seller degree",
+        "allowed_types": ["telegram", "email", "bat", "qq", "wechat", "phone", "crypto_wallet"],
+        "role": "high_frequency_direct",
+        "occurrences_per_seller_edge": 1
+      },
+      "risky_shared_token": {
+        "unit": "one identity with the configured seller degree",
+        "allowed_types": ["telegram", "email", "bat", "qq", "wechat", "phone", "crypto_wallet", "external_url"],
+        "role": "risky_product",
+        "occurrences_per_seller_edge": 1,
+        "G_A_membership": "choose one seller from each of six eligible controllers; token 1 uses indices 0..2 and token 2 uses 3..5",
+        "G_B_membership": "choose one seller from each of ten eligible controllers; token sets use indices 0..3, 3..6 and 6..9, yielding exactly ten union sellers"
+      },
+      "private_collision": {
+        "count_unit": "one distinct identity and its one designated cross-controller unordered seller pair",
+        "identity_seller_degree": 2,
+        "role": "direct_or_private",
+        "occurrences_per_seller_edge": 1
+      },
+      "false_rotation": {
+        "count_unit": "one ordered triple of sellers from three controllers and two distinct identities",
+        "topology": "token A on left-middle and token B on middle-right; tokens are disjoint, one occurrence per seller edge and no repeats",
+        "role": "direct_or_private"
+      },
+      "exact_title_clone": {
+        "count_unit": "one designated cross-controller unordered seller pair",
+        "construction": "copy one complete already-rendered title from the HMAC-left seller to one HMAC-selected item of the right seller; descriptions and identity slots are unchanged",
+        "pairwise_exact_title_overlap_required": true
+      },
+      "high_semantic_similarity": {
+        "count_unit": "one designated cross-controller unordered seller pair not in exact_title_clone",
+        "construction": "use the same generic category, product and attribute and two distinct split-local title skeletons; codes remain different and complete normalized text must not clone",
+        "step4_world_local_lexical_similarity_minimum": 0.2,
+        "one_shot_gate": "below-threshold is validity failure; no rerendering, pair replacement or seed replacement"
+      }
+    },
+    "slot_feasibility": {
+      "slot_key": ["seller_uid", "item_uid", "description", "identity_type"],
+      "maximum_must_extract_slots_per_item_field_type": 1,
+      "same_seller_identity_repeats_require_distinct_items": true,
+      "identity_asset_uid_pool": {
+        "count_per_world": 96,
+        "expected_used_count_by_graph": {
+          "G_A": 84,
+          "G_B": 89
+        },
+        "expected_used_count_derivation": {
+          "G_A": "56 background + 19 positive-mechanism assets + 9 hard-negative identity assets",
+          "G_B": "56 background + 20 positive-mechanism assets + 13 hard-negative identity assets"
+        },
+        "creation": "generate ias_ UIDs at ordinals 0..95 from the public base UID contract before controller membership, mechanisms, roles or types exist",
+        "positive_mechanism_order": [
+          "single_identity_stable_reuse",
+          "multi_type_identity_reuse",
+          "cross_market_stable_reuse",
+          "single_hop_rotation",
+          "corroborated_two_hop_rotation",
+          "sparse_history"
+        ],
+        "structural_asset_descriptor_order": "background assets by seller_uid UTF-8 then background_slot 0,1; positive assets by positive_mechanism_order then controller_uid UTF-8 then within-mechanism asset index; negative assets by hard_negative_generator_contract.common.assignment_order then numeric asset_index then within-asset token index",
+        "assignment": "rank all 96 ias_ UIDs by HMAC(structure_key, world_uid + 0x1f + ASCII identity_asset_assignment + 0x1f + identity_asset_uid), take the required count, and assign rank-for-rank to the structural asset descriptor order",
+        "pool_exhaustion_rule": "world validity failure; the count may not be increased after release"
+      },
+      "type_assignment": {
+        "asset_traversal": "dynamic deterministic minimum-remaining-values after propagation: fewest feasible types, then descending maximum seller-edge occurrence demand, then descending seller degree, then identity_asset_uid UTF-8 bytes",
+        "candidate_types": "the role-allowed identity types in global identity_types policy order",
+        "candidate_message": "world_uid + 0x1f + ASCII identity_type + 0x1f + identity_asset_uid + 0x1f + identity_type",
+        "candidate_order": "full structure-key HMAC digest then global identity-type policy order",
+        "algorithm": "repository integer depth-first CSP; at every state compute exact feasible domains, reject zero domains, run propagation_checks in their frozen order, choose asset_traversal, try candidate_order, memoize every proven-failed exact state, and accept the first complete assignment",
+        "incremental_constraints": [
+          "the two background assets of one seller have distinct types",
+          "multi_type_identity_reuse assets within one controller have distinct types",
+          "the two single-hop identities use different types; within corroborated rotation the left two use different types and the right two use different types, while cross-side type reuse is allowed because identity assets and values remain distinct",
+          "for every seller and type, planned occurrences do not exceed the fixed capacity 2"
+        ],
+        "fixed_per_seller_type_capacity": 2,
+        "observed_description_count_use": "the actual seller count is used only for the fail-closed assertion count>=2 and never enters candidate domains, MRV ordering, type choice, membership choice or HMAC messages; because occurrence-to-slot matching has one slot per item/type, any assignment feasible at fixed capacity 2 remains feasible for every permitted observed missingness realization",
+        "propagation_checks": [
+          "zero-domain rejection in identity_asset_uid UTF-8 order",
+          "for each distinct_group in group UID UTF-8 order, enumerate every nonempty subset of remaining group assets in subset-size then asset-UID order and require the union of current type domains to contain at least the subset size",
+          "for each seller_uid UTF-8, enforce the weighted Hall inequality for every nonempty global-type bitmask 1..255; the implementation may enumerate only the union-closure of current incident domain masks because any violating bitmask has the same forced-asset set and no larger capacity at the union of those forced domains, making this an exact equivalence rather than a relaxed check"
+        ],
+        "failed_state_key": "remaining identity_asset_uids in UTF-8 order, followed by the complete seller_uid-by-global-type integer demand vector, followed by each distinct_group used-type bitmask in group UID order",
+        "propagation_checks_do_not_consume_search_nodes": true,
+        "search_node": "one attempted asset-type assignment after propagation",
+        "maximum_search_nodes": 1000000,
+        "maximum_memoized_states": 1000000,
+        "maximum_membership_complete_assignments": 10000,
+        "search_budget_scope": "the search-node budget is shared cumulatively across structurally complete hard-negative membership leaves in their exact DFS order; the membership solver retains its own independent candidate-node budget",
+        "membership_leaf_backtracking": "try distinct type-bearing hard-negative membership topologies in exact DFS order; attach only the first legal registered override completion to each topology and run the type solver once against fixed_per_seller_type_capacity, never actual item counts; accept the first type-feasible topology, and exhaust or fail without changing keys, public UIDs, markets, positive mechanisms or missingness",
+        "third_party_solver_forbidden": true,
+        "final_exact_integer_replay_required": true,
+        "label_candidate_model_or_parser_input_forbidden": true
+      },
+      "occurrence_to_slot_matching": {
+        "occurrence_uid": "occ_ + SHA256 canonical JSON containing only identity_asset_uid,seller_uid,zero-based occurrence_index",
+        "source_node_uid": "src_ + SHA256 of UTF-8 world_uid + 0x1f + ASCII occurrence_slot_matching + 0x1f + ASCII source",
+        "sink_node_uid": "snk_ + SHA256 of UTF-8 world_uid + 0x1f + ASCII occurrence_slot_matching + 0x1f + ASCII sink",
+        "occurrence_node_uid": "exact occurrence_uid",
+        "slot_node_uid": "isl_ + SHA256 of canonical JSON containing only item_uid,identity_type; only nonempty-description items are eligible",
+        "graph": "source to each occurrence capacity 1; occurrence to every eligible same-seller item/type slot capacity 1; slot to sink capacity 1",
+        "forward_edge_kind_order": ["source_occurrence", "occurrence_slot", "slot_sink"],
+        "edge_message": "world_uid + 0x1f + ASCII occurrence_slot_matching + 0x1f + edge_kind + 0x1f + directed endpoint UIDs joined by exactly one 0x1f",
+        "edge_order": "edge-kind order, full structure-key HMAC digest, then complete directed-edge UTF-8 serialization left_node_uid + exactly one 0x1f + right_node_uid",
+        "solver": "repository integer Dinic; insert each reverse edge immediately after its sorted forward edge; BFS and DFS traverse stored adjacency order",
+        "success": "maximum flow equals the number of planned occurrences",
+        "identity_slot_ordinal": "within each item sort matched occurrences by identity_type policy order, identity_asset_uid UTF-8 and occurrence_uid UTF-8; use zero-based position in the base UID contract",
+        "third_party_solver_forbidden": true
+      },
+      "preflight_before_render": true,
+      "failure_rule": "validity failure without resampling"
+    },
+    "mechanism_coverage": {
+      "unit": "count unique world_uid having at least one selected C40 pair with the required label and mechanism flag",
+      "positive_pair_attribution": "oracle stores designated_target_pair_uid for each controller mechanism; only those pairs receive the positive mechanism flag",
+      "triad_target_rules": {
+        "cross_market_stable_reuse": "only the selected different-market pair",
+        "single_hop_rotation": "only left-right; left-middle and middle-right are supporting edges",
+        "corroborated_two_hop_rotation": "only left-right; left-middle and middle-right are supporting edges"
+      },
+      "supporting_positive_pairs_do_not_count_as_mechanism_coverage": true,
+      "negative_pair_attribution": "all applicable hard-negative flags; multi-label",
+      "classification_c40_only": true,
+      "retrieval_excluded": true,
+      "minimum_independent_worlds_by_split_and_mechanism": "exactly power_design_contract.scientific_coverage_floors[*].minimum_independent_worlds_per_mechanism; the frozen power artifact may only increase a value",
+      "owned_by_power_design_artifact_above_fixed_floor": true,
+      "failure_semantics": "dataset validity failure; Audit A becomes INVALID and Audit B becomes B_INVALID"
+    },
+    "identity_value_generation": {
+      "handle_encoding_by_mode": {
+        "development_smoke": "legacy_base36_v1",
+        "formal": "parser_safe_hex_v2"
+      },
+      "formal_handle_parser_safety": {
+        "alphabet": "0123456789abcdef",
+        "width": 14,
+        "applies_to": ["telegram", "bat", "wechat"],
+        "reason": "The frozen Step3 product-risk regex scans the identity literal itself; unrestricted base36 can generate substrings such as cvv and silently change direct-identity flags.",
+        "full_candidate_pool_must_have_zero_product_risk_matches": true
+      },
+      "public_pool_before_structure": {
+        "global_asset_index": "world mode-global ordinal times 96 plus identity-asset ordinal 0..95",
+        "asset_uid_and_global_index_exist_before_structure_assignment": true,
+        "topology_mechanism_role_controller_or_label_input_forbidden": true
+      },
+      "affine_permutation": {
+        "key": "mode.identity_value_key_hex",
+        "hmac_integer_conversion": "interpret the complete 32-byte HMAC-SHA256 digest as one unsigned big-endian integer before modulo N",
+        "salt_serialization": "zero-based salt counter as unpadded ASCII decimal with no sign or whitespace",
+        "base36_alphabet": "0123456789abcdefghijklmnopqrstuvwxyz in exactly this digit order",
+        "per_type_domain_size_by_mode": {
+          "development_smoke.telegram": "36^14",
+          "formal.telegram": "16^14",
+          "email": "16^16",
+          "development_smoke.bat": "36^14",
+          "formal.bat": "16^14",
+          "qq": "9*10^8",
+          "development_smoke.wechat": "36^14",
+          "formal.wechat": "16^14",
+          "phone": "10^9",
+          "crypto_wallet": "16^40",
+          "external_url": "16^20"
+        },
+        "coefficient": "for a frozen per-mode/type salt counter, take the registered unsigned-big-endian HMAC(value_key, ASCII affine_a + 0x1f + type + 0x1f + unpadded decimal salt) modulo N; increment this coefficient modulo N until gcd(a,N)=1",
+        "offset": "take the registered unsigned-big-endian HMAC(value_key, ASCII affine_b + 0x1f + type + 0x1f + unpadded decimal salt) modulo N",
+        "permutation": "y=(a*global_asset_index+b) mod N",
+        "encoding": {
+          "development_smoke.telegram": "tg plus y as exactly 14 lowercase base36 digits",
+          "formal.telegram": "tg plus y as exactly 14 lowercase hexadecimal digits",
+          "email": "u plus y as exactly 16 lowercase hex digits plus @id.invalid",
+          "development_smoke.bat": "bt plus y as exactly 14 lowercase base36 digits",
+          "formal.bat": "bt plus y as exactly 14 lowercase hexadecimal digits",
+          "qq": "first digit 1+floor(y/10^8), followed by y mod 10^8 as exactly 8 decimal digits",
+          "development_smoke.wechat": "wx plus y as exactly 14 lowercase base36 digits",
+          "formal.wechat": "wx plus y as exactly 14 lowercase hexadecimal digits",
+          "phone": "13 plus y as exactly 9 decimal digits",
+          "crypto_wallet": "0x plus y as exactly 40 lowercase hex digits",
+          "external_url": "y as exactly 20 lowercase hex digits split 12/8 into s<12>.example/path/<8>"
+        },
+        "bijection_gate": "all 96*mode_world_count candidate values per type are unique before any asset is assigned a type"
+      },
+      "salt_selection": {
+        "formal_per_type_salt_counters": null,
+        "development_smoke_per_type_salt_counters": {
+          "telegram": 0,
+          "email": 0,
+          "bat": 0,
+          "qq": 0,
+          "wechat": 0,
+          "phone": 0,
+          "crypto_wallet": 0,
+          "external_url": 0
+        },
+        "salt_artifacts": {
+          "development_smoke": {
+            "path": "reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_salts.development_smoke.json",
+            "sha256": "5f251bfcaab63f5444fa3d6612729483d8eda01d40a06e4c102dfaa58e2dadc7"
+          },
+          "formal": {
+            "path": "reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_salts.formal.json",
+            "sha256": null
+          }
+        },
+        "deny_hash_artifact": {
+          "path": "reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_deny_hashes.json",
+          "sha256": "61023dcfd200242114b46dd7c59ec952f73c372a4c9dbe402f402c98828b92b1",
+          "comparison_key": "SHA256 of UTF-8 NFC(casefold(strip(value))) with empty values forbidden; type is deliberately excluded so any cross-type literal reuse is rejected",
+          "real_source_projection": "read only nonempty normalized_value from each CSV; duplicate values collapse after comparison-key hashing",
+          "prior_source_projection": "read only every nonempty string in each JSONL row identifier_values array; duplicate values collapse after comparison-key hashing",
+          "exact_sources": [
+            {"source_class": "real", "path": "reports/step3_item_identity_signals.zh_target_strict.csv", "sha256": "189197bbfa5f859e38db02d8c00244b054c570de5609edb80b61f4b47bc9b76c"},
+            {"source_class": "real", "path": "reports/step3_item_identity_signals.zh_target_aux.csv", "sha256": "5cfc27d44ce3d541ff43115ed464ae9ea30362574a1abaf95e465e571135fe07"},
+            {"source_class": "real", "path": "reports/step3_item_identity_signals.en_content_train_pool.csv", "sha256": "0fa2b79f736df047ea1a6e39285915d81f3662f6ecc8afceb70a7d8b68dfcb97"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v6_20260720/step28_v6_world_truth.jsonl", "sha256": "3d2f8073e9160a60cf53def55edd823690f70aa974771fae523350046d0da0dd"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v7_20260720/step28_v7_world_truth.jsonl", "sha256": "df685c8294f7a8443af7efe3e2534990d1b6ffdd807f38a9bcf0a647ac61d8ff"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v8_20260720/step28_v8_world_truth.jsonl", "sha256": "c29593c56ef3c23ed947da732e936a18bcca75d911dc1a662c830c0181ecf7e0"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v9_20260720/step28_v9_world_truth.jsonl", "sha256": "109baf5a3a2edd627ebb3cafa431e1eb88d9a49cd378b3ff3a80bd1695967857"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v10_20260720/step28_v10_world_truth.jsonl", "sha256": "7acaba9fcac138749a0b56fd677c0044b38d9b62f83d43ce5193df9eb2b8fe37"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v11_20260720/step28_v11_world_truth.jsonl", "sha256": "d505e01208bf7b93dc70c718ed32df8a955fd00062a035572306a29bc442c03c"},
+            {"source_class": "prior_synthetic", "path": "reports/step28_transferable_identity_history/v12_20260720/step28_v12_world_truth.jsonl", "sha256": "6ee0919e2c9191ccc80acaf1a20d808b16e5813bf5a6b32abf193acb5a92e771"}
+          ],
+          "source_order": "source_class then path UTF-8 bytes; row order never affects output",
+          "artifact_schema": "version,status,normalization,source_records,value_hashes,unique_value_hash_count,canonical_self_hash; value_hashes are unique lowercase SHA256 values sorted by UTF-8 bytes and no raw value is persisted",
+          "exact_sources_and_hashes_required": true
+        },
+        "algorithm": "starting at salt 0, choose the first per-type salt whose complete mode candidate pool has zero intersection with the frozen real-value deny set, prior Step28-v6-v12 values, and the other mode's already frozen candidate pool",
+        "selection_order": "iterate identity types in the exact identity_types policy order; materialize and freeze all development_smoke salts first, then all formal salts while treating the complete frozen smoke pool as forbidden",
+        "maximum_salt": 10000,
+        "selection_is_label_and_structure_blind": true,
+        "formal_salts_required_before_dataset_release_lock": true,
+        "smoke_salts_materialized_before_smoke_generation": true,
+        "exhaustion_rule": "release validity failure"
+      },
+      "identity_uid_is_derived_only_after_type_assignment": true,
+      "identity_uid_contains_only_downstream_type_and_value": true,
+      "normalized_value_prefix_in_uid_forbidden": true,
+      "maximum_worlds_per_normalized_value": 1,
+      "split_intersection_must_be_zero": true,
+      "smoke_formal_intersection_must_be_zero": true,
+      "prior_step28_v6_v12_intersection_must_be_zero": true,
+      "all_generated_values_must_match_value_grammars": true,
+      "same_identity_fixed_raw_surface_required": true,
+      "public_key_recovery_test": "given every public UID/key/value but no split structure secret, membership, controller, role and mechanism recovery must remain unavailable by construction"
+    }
+  },
+  "text_generation": {
+    "real_anticopy_boundary": {
+      "source": "frozen_inputs.raw_chinese_items",
+      "workbook_sheet": "first sheet only",
+      "workbook_row_range": "all physical rows from row 2 through worksheet.max_row inclusive",
+      "workbook_schema": "exactly seven cells per row; zero-based indexes 2 and 3 are title and description",
+      "normalization": "convert None to empty; otherwise str(value), Unicode NFKC, replace every maximal Unicode whitespace run with one ASCII space, strip, then casefold",
+      "empty_fields_excluded": true,
+      "field_scope": "normalized title and description pooled; field identity is not part of matching",
+      "deduplication": "unique normalized strings sorted by UTF-8 bytes for comparisons; a separate multiplicity vector in the same order is hashed and reported",
+      "manifest": {
+        "path": "reports/step28_synthetic_chinese_dataset/release_inputs/real_text_anticopy_boundary.json",
+        "sha256": "1d87e157a16f85762eba013f1e4d3dd2bac888937be397b7873979662c9cb9db",
+        "raw_text_persistence_forbidden": true,
+        "required_fields": [
+          "version",
+          "status",
+          "source_path",
+          "source_sha256",
+          "normalization",
+          "nonempty_field_count",
+          "unique_field_count",
+          "ordered_normalized_field_sha256_digest",
+          "ordered_multiplicity_sha256_digest",
+          "canonical_self_hash"
+        ]
+      },
+      "comparison_normalization": "apply this exact same normalization pure function independently to reconstructed real fields and temporary synthetic complete fields before every exact, substring, rare-ngram and MinHash comparison; this comparison never changes persisted synthetic NFC bytes",
+      "audit_reconstruction": "the anti-copy worker rebuilds the exact in-memory normalized strings directly from the pinned workbook, verifies both manifest digests and counts before comparison, and writes no real string",
+      "required_before_smoke_or_formal_generation": true
+    },
+    "real_text_in_templates_forbidden": true,
+    "renderer_order": {
+      "base_style_transform_scope": "base skeleton product/attribute/code/delivery/service segments only",
+      "append_order": "styled base, noise segment; stop if there is no identity clause, otherwise append one item-ranked immutable context guard, then each identity clause followed by the next distinct ranked guard",
+      "traditional_line_or_repeat_punctuation_transform_on_noise_guard_or_identity_forbidden": true,
+      "guard_bytes_must_equal_distinct_ranked_template_library_values_in_every_style": true
+    },
+    "full_normalized_title_description_cross_split_overlap_maximum": 0,
+    "cross_split_overlap_universe": "all nonempty normalized complete title and description field values pooled together within each split; the empty string and missing sentinels are excluded and checked only by missingness gates",
+    "template_skeleton_cross_split_overlap_maximum": 0,
+    "rendered_template_instance_cross_split_overlap_maximum": 0,
+    "rendered_template_instance_universe": "nonempty actually rendered base title and base description instances only; no empty-field hash or missing sentinel",
+    "real_contiguous_substring_length_minimum": 24,
+    "real_contiguous_substring_hits_maximum": 0,
+    "rare_real_ngram_minimum_length": 12,
+    "rare_real_ngram_maximum_length": 23,
+    "rare_real_ngram_hits_maximum": 0,
+    "minhash_ngram_size": 5,
+    "minhash_signature_size": 128,
+    "minhash_near_duplicate_jaccard_threshold": 0.85,
+    "minhash_near_duplicate_rate_maximum": 0.001,
+    "minhash_cross_corpus_contract": {
+      "comparison": "synthetic nonempty normalized complete fields versus frozen real nonempty normalized complete fields only; synthetic-to-synthetic comparisons are excluded",
+      "field_scope": "title and description values are pooled on both sides",
+      "ngram": "set of Unicode code-point 5-grams; fields shorter than five code points use their one complete field token",
+      "signature": "for permutation index 0..127 take the minimum unsigned big-endian SHA256(index as unpadded ASCII + 0x1f + ngram UTF-8); no Python hash",
+      "candidate_generation": "32 consecutive bands of four uint256 values; a real field is a candidate iff at least one exact band tuple matches",
+      "final_test": "compute exact set Jaccard for every candidate and mark the synthetic field once if any real candidate is >=0.85",
+      "rate_denominator": "number of nonempty synthetic complete fields; an empty denominator is invalid",
+      "registered_exact_title_clones": "included as ordinary synthetic fields against real data but never compared to their synthetic clone mate; clone prevalence is audited separately"
+    },
+    "exact_clean_text_clone_slice_required": true
+  },
+  "parser_contract": {
+    "function": "scripts.step3_build_seller_profiles.extract_item_identity_signals",
+    "formal_identity_and_noise_field": "description",
+    "title_identity_slots_forbidden": true,
+    "call_arguments": {
+      "structured_snapshot": "",
+      "extra_fields": null
+    },
+    "must_extract_match_key": [
+      "item_uid",
+      "source_field",
+      "contact_type",
+      "normalized_value"
+    ],
+    "must_extract_recall": 1.0,
+    "must_ignore_false_positive_count": 0,
+    "parsed_set_must_equal_planned_must_extract_set": true,
+    "unexpected_parser_row_count": 0,
+    "lineage_contract": {
+      "source_dataset": "exact constant step28_v13_<mode>_<split>",
+      "source_row_number": "exact item_uid",
+      "source_dataset_source_row_number_to_item_uid_cardinality": "one-to-one",
+      "duplicate_or_missing_lineage_key_count": 0
+    },
+    "exact_meta_projection": {
+      "data_bucket": "step28_v13_<mode>_<split>",
+      "seller_uid": "opaque seller UID",
+      "source_market_raw": "the independently sampled observed seller market",
+      "source_seller_raw": "exact seller_uid",
+      "source_seller_id_raw": "exact seller_uid",
+      "alias_normalized": "exact seller_uid",
+      "source_dataset": "from lineage_contract",
+      "source_row_number": "from lineage_contract",
+      "additional_meta_keys_forbidden": true,
+      "cross_seller_alias_sharing_forbidden": true,
+      "controller_or_mechanism_input_forbidden": true,
+      "controller_permutation_invariance_required": true
+    },
+    "canonical_join_value": "step28_history_common.token_key normalized_value component, not raw Step3 case-sensitive normalized_value",
+    "redactor_must_remove_every_parsed_identity_surface": true,
+    "must_ignore_must_remain_byte_identical_after_redaction": true,
+    "parser_expectation_provenance": "private generator plan produced from the pre-frozen full-render fixture and structural template rule before production parser execution; production parser output is forbidden as the expectation source",
+    "step3_profile_step4_contact_chain_fixture_required": true
+  },
+  "relational_integrity": {
+    "observed_core_schemas": {
+      "worlds.csv": ["world_uid"],
+      "sellers.csv": ["world_uid", "seller_uid", "market"],
+      "items.jsonl": ["world_uid", "seller_uid", "item_uid", "time_bucket", "category", "title", "description"],
+      "redacted_items.jsonl": ["world_uid", "seller_uid", "item_uid", "title", "description"],
+      "parsed_identity_occurrences.structural_audit_private.csv": [
+        "world_uid",
+        "item_uid",
+        "signal_uid",
+        "data_bucket",
+        "source_dataset",
+        "source_row_number",
+        "seller_uid",
+        "source_market_raw",
+        "source_seller_raw",
+        "source_seller_id_raw",
+        "alias_normalized",
+        "source_field",
+        "contact_type",
+        "normalized_value",
+        "raw_value",
+        "evidence_level",
+        "seller_facing_context",
+        "product_data_risk_context",
+        "direct_identity_eligible",
+        "support_only",
+        "context",
+        "title_snippet",
+        "description_snippet"
+      ],
+      "history_safe_occurrences.csv": [
+        "world_uid",
+        "seller_uid",
+        "item_uid",
+        "source_dataset",
+        "source_row_number",
+        "source_field",
+        "contact_type",
+        "normalized_value",
+        "seller_facing_context",
+        "product_data_risk_context",
+        "direct_identity_eligible",
+        "support_only",
+        "time_bucket"
+      ],
+      "history_item_index.csv": [
+        "world_uid",
+        "seller_uid",
+        "item_uid",
+        "time_bucket"
+      ],
+      "render_asts.jsonl_private": [
+        "world_uid",
+        "seller_uid",
+        "item_uid",
+        "time_bucket",
+        "category",
+        "product",
+        "attribute",
+        "delivery",
+        "service",
+        "code",
+        "title_skeleton_index",
+        "description_skeleton_index",
+        "effective_style_uid",
+        "title_nonempty",
+        "description_nonempty",
+        "identity_slot_uids",
+        "noise_slot_uid"
+      ],
+      "unknown_columns_forbidden": true
+    },
+    "history_safe_occurrence_projection": {
+      "source": "parsed_identity_occurrences.structural_audit_private.csv joined one-to-one to observed item_uid/time_bucket through source_dataset,source_row_number,seller_uid",
+      "normalized_value": "exact downstream canonical lowercased value returned by step28_history_common.token_key; raw_value is forbidden",
+      "row_universe": "every and only actual production Step3 parser row after exact parser-expectation equality has passed",
+      "unknown_columns_forbidden": true,
+      "forbidden_columns": [
+        "raw_value",
+        "evidence_level",
+        "context",
+        "title_snippet",
+        "description_snippet",
+        "source_market_raw",
+        "source_seller_raw",
+        "source_seller_id_raw",
+        "alias_normalized",
+        "controller",
+        "mechanism",
+        "planned_role",
+        "label"
+      ],
+      "M1_and_M2_only_parser_input": true,
+      "full_structural_parser_output_open_count_in_history_workers": 0,
+      "projection_recompute_and_exact_schema_gate": true
+    },
+    "public_serialization_order": {
+      "worlds": ["world_uid UTF-8"],
+      "sellers": ["world_uid UTF-8", "seller_uid UTF-8"],
+      "items_and_redacted_items": ["world_uid UTF-8", "seller_uid UTF-8", "item_uid UTF-8"],
+      "parser_occurrences": ["world_uid UTF-8", "seller_uid UTF-8", "item_uid UTF-8", "source-field fixed order title then description", "identity-type policy order", "downstream canonical value UTF-8"],
+      "renderer_edit_and_safe_slots": ["world_uid UTF-8", "seller_uid UTF-8", "item_uid UTF-8", "field-name fixed order title then description", "numeric start", "numeric end", "slot_uid UTF-8"],
+      "candidate_pairs": ["world_uid UTF-8", "numeric selected_rank"],
+      "retrieval_manifest_and_qrels": ["world_uid UTF-8", "query_uid UTF-8", "gallery_seller_uid UTF-8"],
+      "profiles": ["world_uid UTF-8", "seller_uid UTF-8"],
+      "private_oracle_may_use_a_different_order_but_may_not_supply_input_order_to_any_public_worker": true,
+      "input_order_dependency_forbidden": true,
+      "step3_item_sequence": "items are fed to Step3 only in the frozen public item order; first_seen and item_sequence may not inherit controller, mechanism, asset or solver traversal order",
+      "permutation_invariance_gate": "independently permuting every private controller/member/mechanism/asset list before the final public sort must leave all observed bytes, parser bytes, redacted bytes, profiles, C40 and public manifests identical"
+    },
+    "supervision_formula_contract": {
+      "endpoint_preconditions": [
+        "both seller endpoints exist exactly once in the same world observed membership",
+        "each seller maps to exactly one controller in the split oracle",
+        "controller membership is recomputed from the committed split structure key and never inferred from a UID or observed supervision"
+      ],
+      "classification": {
+        "row_universe": "every candidate_pairs canonical_pair_uid exactly once",
+        "formula": "integer 1 iff controller_uid(seller_uid_left) equals controller_uid(seller_uid_right), otherwise integer 0",
+        "bool_to_int": {"false": 0, "true": 1}
+      },
+      "retrieval": {
+        "row_universe": "every retrieval relation_uid in the frozen four-query by 27-gallery manifest exactly once",
+        "formula": "integer 1 iff controller_uid(query_seller_uid) equals controller_uid(gallery_seller_uid), otherwise integer 0",
+        "bool_to_int": {"false": 0, "true": 1}
+      },
+      "independent_validator": "recompute both outputs from membership plus safe endpoint manifests without reading any materialized classification label or qrels value, then compare exact keysets and every integer",
+      "formula_equality_required": true,
+      "any_missing_extra_duplicate_or_mismatch_is_split_validity_failure": true
+    },
+    "renderer_identity_slots_audit_schema": [
+      "slot_uid",
+      "bundle_uid",
+      "item_uid",
+      "seller_uid",
+      "field_name",
+      "start",
+      "end",
+      "identity_uid",
+      "identity_type",
+      "downstream_canonical_value",
+      "raw_surface",
+      "parser_expectation",
+      "expected_seller_facing_context",
+      "expected_product_data_risk_context",
+      "expected_direct_identity_eligible",
+      "expected_support_only",
+      "planned_role",
+      "time_bucket"
+    ],
+    "renderer_identity_slots_row_universe": "must_extract slots only",
+    "renderer_identity_slots_edit_schema": [
+      "slot_uid",
+      "item_uid",
+      "seller_uid",
+      "field_name",
+      "start",
+      "end",
+      "identity_type",
+      "downstream_canonical_value",
+      "raw_surface",
+      "time_bucket"
+    ],
+    "renderer_identity_slots_edit_row_universe": "exact one-to-one projection of must_extract audit slots with bundle_uid, identity_uid, planned role, expectation and expected flags removed; the projector must independently recompute the removed derived UIDs",
+    "renderer_noise_slots_audit_schema": [
+      "noise_slot_uid",
+      "item_uid",
+      "seller_uid",
+      "field_name",
+      "start",
+      "end",
+      "raw_surface",
+      "parser_expectation"
+    ],
+    "renderer_noise_slots_row_universe": "must_ignore slots only; identity UID, type and normalized value columns do not exist",
+    "classification_labels_schema": [
+      "canonical_pair_uid",
+      "label"
+    ],
+    "classification_labels_keyset": "exactly candidate_pairs canonical_pair_uid set, one row each",
+    "classification_label_values": [0, 1],
+    "retrieval_qrels_schema": [
+      "relation_uid",
+      "relevance"
+    ],
+    "retrieval_qrels_keyset": "exactly all 27 relation rows per frozen query, including relevance=0 rows",
+    "retrieval_relevance_values": [0, 1],
+    "pair_projection_contract": {
+      "complete_model_pair_endpoints_filename": "complete_model_pair_endpoints.csv",
+      "complete_model_pair_endpoints_schema": [
+        "canonical_pair_uid",
+        "world_uid",
+        "seller_uid_left",
+        "seller_uid_right"
+      ],
+      "complete_model_pair_endpoints_row_universe": "all 378 unordered pairs per world; this is the only pair table readable by M0 and identity-history workers",
+      "p0_all_pairs_filename": "p0_all_pairs.csv",
+      "p0_all_pairs_schema": ["canonical_pair_uid", "world_uid", "p0"],
+      "p0_all_pairs_serialization": "one finite float64 p0 in [0,1] formatted .12f per complete endpoint row in identical key order",
+      "identity33_all_pairs_filename": "identity33_all_pairs.csv",
+      "identity33_all_pairs_schema": "canonical_pair_uid,world_uid followed by exactly history_features.feature_names in frozen order",
+      "all_pair_keyset_gate": "complete_model_pair_endpoints, p0_all_pairs and identity33_all_pairs have identical unique canonical_pair_uid/world_uid keysets and exactly 378 rows per world; unknown columns fail",
+      "evaluation_pair_endpoints_schema": [
+        "canonical_pair_uid",
+        "world_uid",
+        "seller_uid_left",
+        "seller_uid_right"
+      ],
+      "evaluation_pair_endpoints_row_universe": "set union of C40 and retrieval canonical pairs, with no role columns",
+      "private_pair_role_map_schema": [
+        "canonical_pair_uid",
+        "classification_bool",
+        "retrieval_bool"
+      ],
+      "private_pair_role_map_readers": ["evaluation_projector", "audit_evaluator"],
+      "role_columns_forbidden_from": ["M0", "identity_history", "M1_history", "adapter_train", "CUDA"],
+      "role_column_open_count_required": 0
+    },
+    "foreign_key_gates": [
+      "world_uid is unique in worlds",
+      "every seller maps many-to-one to exactly one existing world",
+      "every item maps many-to-one to exactly one seller and the same world",
+      "source_dataset plus source_row_number maps one-to-one to item_uid",
+      "every identity or noise slot maps to exactly one item and its same seller",
+      "every parser row maps many-to-one to exactly one item and its same seller through the lineage key",
+      "every candidate endpoint exists, belongs to candidate world and reconstructs canonical_pair_uid",
+      "every audit query seller and gallery seller exists in the same world and every relation reconstructs canonical_pair_uid",
+      "complete_model_pair_endpoints contains exactly 378 pairs per world",
+      "evaluation_pair_endpoints keyset equals the set union of C40 and retrieval canonical pairs",
+      "private pair-role map reconstructs evaluation_pair_endpoints exactly",
+      "keys of frozen all-pair p0 and identity33 each equal complete_model_pair_endpoints exactly",
+      "classification label keyset equals C40 exactly",
+      "qrels keyset equals retrieval relation_uid exactly"
+    ],
+    "oracle_integrity_gates": [
+      "controller_membership seller keyset equals the split seller keyset exactly",
+      "every seller maps to exactly one controller in the same world",
+      "every world has exactly eight controller groups of size two and four groups of size three",
+      "mechanism_assignments controller keyset equals controller_membership controller keyset exactly",
+      "controller_style_groups controller keyset equals controller_membership controller keyset exactly and each world has four selected styles with exactly three controllers per style",
+      "every controller has exactly one mechanism and its controller size is allowed by controller_size_mechanism_assignment",
+      "every designated target pair has two existing same-world sellers and matches its mechanism topology"
+    ],
+    "implicit_many_to_many_join_forbidden": true,
+    "all_join_cardinalities_asserted_before_projection": true
+  },
+  "candidate_design": {
+    "pairs_per_world": 40,
+    "all_unordered_pairs_per_world": 378,
+    "statistics_fit_scope": "per_world",
+    "input_boundary": {
+      "items": "raw observed items before identity redaction; the candidate worker rebuilds an ephemeral Step3 profile independently inside each world",
+      "persisted_m0_profile_reuse_forbidden": true,
+      "profile_safe_or_redacted_item_input_forbidden": true,
+      "ephemeral_raw_profile_or_step4_evidence_persistence_forbidden": true
+    },
+    "step4_derived_config": {
+      "min_df": 2,
+      "max_df_ratio": 1.0,
+      "max_df_cap": 8,
+      "top_terms_per_profile": 140,
+      "top_neighbors_per_profile": 15,
+      "min_cosine_similarity": 0.14,
+      "strong_cosine_similarity": 0.2,
+      "pgp_alias_map": {}
+    },
+    "supported_exact_contact_triggers": [
+      "email",
+      "telegram",
+      "wickr",
+      "wechat",
+      "qq",
+      "phone"
+    ],
+    "history_only_identity_types": [
+      "bat",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "primary_trigger_priority": [
+      "shared_contact_exact",
+      "shared_description_clone",
+      "shared_title_clone",
+      "profile_lexical_neighbor",
+      "fallback_hash"
+    ],
+    "structural_support_role": "audit_flag_only_not_an_independently_reachable_primary_stratum",
+    "zero_size_stratum": {
+      "participates_in_hamilton": false,
+      "quota": 0,
+      "design_inclusion_probability": null
+    },
+    "allocation": "Hamilton largest remainder",
+    "within_stratum_order": "full HMAC-SHA256 digest then canonical pair UID UTF-8 bytes",
+    "selected_global_rank": {
+      "message": "world_uid + 0x1f + ASCII selected_global_rank + 0x1f + canonical_pair_uid",
+      "order": "full HMAC-SHA256 digest under candidate_key, then canonical_pair_uid UTF-8 bytes",
+      "scope": "the final 40 selected pairs after all primary-stratum Hamilton allocation and fallback filling",
+      "serialization": "one-based unpadded decimal 1..40; unselected rows use the empty string"
+    },
+    "canonical_pair_uid": "UTF8-byte-sort endpoints then concatenate left_uid + ASCII || + right_uid; endpoint UIDs may not contain |",
+    "public_safe_projection_columns": [
+      "canonical_pair_uid",
+      "world_uid",
+      "seller_uid_left",
+      "seller_uid_right"
+    ],
+    "sampling_audit_projection_columns": [
+      "canonical_pair_uid",
+      "world_uid",
+      "primary_trigger",
+      "trigger_flags",
+      "lexical_similarity",
+      "structural_support_flag",
+      "layer_size",
+      "layer_quota",
+      "hmac_digest_hex",
+      "design_inclusion_probability",
+      "selected_bool",
+      "selected_rank"
+    ],
+    "sampling_audit_rows_per_world": 378,
+    "sampling_audit_row_order": [
+      "world_uid UTF-8",
+      "canonical_pair_uid UTF-8"
+    ],
+    "trigger_flags_exact_members_and_order": "the reachable subset of shared_contact_exact,shared_description_clone,shared_title_clone,profile_lexical_neighbor in primary_trigger_priority order; structural_support is excluded and is serialized only in structural_support_flag",
+    "sampling_audit_serialization": {
+      "trigger_flag_delimiter": "|",
+      "missing_lexical_similarity": "0.000000",
+      "lexical_similarity_decimal_places": 6,
+      "probability_decimal_places": 12,
+      "null_probability": "",
+      "boolean_literals": [
+        "true",
+        "false"
+      ],
+      "digest": "64 lowercase hex",
+      "unselected_rank": ""
+    },
+    "step4_raw_evidence_must_not_be_persisted": true,
+    "sampling_audit_forbidden_from_all_model_and_feature_workers": true,
+    "candidate_may_read_oracle": false,
+    "candidate_may_read_model_scores": false
+  },
+  "retrieval_design": {
+    "audit_splits": [
+      "audit_a",
+      "audit_b"
+    ],
+    "queries_per_world": 4,
+    "gallery_sellers_per_query": 27,
+    "directed_relation_primary_key": "relation_uid",
+    "query_uid": "qry_ + full SHA256 UTF8 hex of world_uid + 0x1f + query_seller_uid",
+    "relation_uid": "rel_ + full SHA256 UTF8 hex of query_uid + 0x1f + gallery_seller_uid",
+    "canonical_pair_uid": "reuse candidate ASCII || rule without truncation",
+    "query_order": "full HMAC-SHA256 digest then seller UID UTF-8 bytes",
+    "gallery_order": "seller UID UTF-8 bytes",
+    "query_may_read_oracle": false,
+    "qrels_created_only_after_query_gallery_manifest_freeze": true
+  },
+  "history_features": {
+    "direct_token_seller_frequency_maximum": 3,
+    "weak_graph_token_seller_frequency_maximum": 12,
+    "all_world_occurrences_required": true,
+    "feature_names": [
+      "verified_direct_token_count_log1p",
+      "repeated_verified_token_count_log1p",
+      "bilateral_direct_item_count_log1p",
+      "shared_identifier_type_count_log1p",
+      "risky_token_count_log1p",
+      "support_token_count_log1p",
+      "high_frequency_token_count_log1p",
+      "risky_without_verified",
+      "support_without_verified",
+      "verified_x_risky",
+      "verified_x_support",
+      "shared_telegram_token_count_log1p",
+      "shared_email_token_count_log1p",
+      "shared_bat_token_count_log1p",
+      "shared_qq_token_count_log1p",
+      "shared_wechat_token_count_log1p",
+      "shared_phone_token_count_log1p",
+      "shared_crypto_wallet_token_count_log1p",
+      "shared_external_url_token_count_log1p",
+      "strong_rotation_path_count_log1p",
+      "corroborated_rotation_path_count_log1p",
+      "uncorroborated_rotation_path_count_log1p",
+      "weak_path_count_log1p",
+      "maximum_strong_middle_degree_log1p",
+      "rotation_telegram_edge_token_count_log1p",
+      "rotation_email_edge_token_count_log1p",
+      "rotation_bat_edge_token_count_log1p",
+      "rotation_qq_edge_token_count_log1p",
+      "rotation_wechat_edge_token_count_log1p",
+      "rotation_phone_edge_token_count_log1p",
+      "rotation_crypto_wallet_edge_token_count_log1p",
+      "verified_x_repeat",
+      "rotation_x_corroboration"
+    ],
+    "excluded_history_feature_names": [
+      "mixed_context_token_count_log1p",
+      "same_token_path_count_log1p",
+      "verified_x_high_frequency",
+      "rotation_external_url_edge_token_count_log1p"
+    ]
+  },
+  "placebo": {
+    "train_only": true,
+    "replicates": 5,
+    "development_implementation_formal_forbidden": true,
+    "primary_m1_control": {
+      "name": "within_world_endpoint_disjoint_identity33_derangement",
+      "scientific_role": "preserve the exact joint 33-feature vector multiset while breaking its correspondence to the destination seller pair without reading supervision",
+      "allowed_inputs": [
+        "train M2 identity33 all-pair matrix",
+        "train complete pair endpoint projection",
+        "train endpoint-only frozen C40 projection",
+        "public placebo policy",
+        "one of the five already registered seed byte strings"
+      ],
+      "forbidden_inputs": [
+        "classification labels or qrels",
+        "controller membership",
+        "mechanism truth",
+        "candidate trigger or sampling audit columns",
+        "M0 inputs or scores",
+        "rewire lineage"
+      ],
+      "universe_partition": "independently within each train world, primary_c40 contains the exact 40 frozen endpoint-only C40 keys and secondary_complement contains the other 338 complete pairs",
+      "matching": "for each world and universe, construct one deterministic perfect bipartite matching from destination pairs to source feature rows; a source is legal only when its two seller endpoints are disjoint from both destination endpoints",
+      "destination_order": "full HMAC-SHA256(seed, world_uid + 0x1f + ASCII m1_derangement_destination_order + 0x1f + universe + 0x1f + destination_pair_uid), then destination_pair_uid UTF-8",
+      "source_candidate_order": "full HMAC-SHA256(seed, world_uid + 0x1f + ASCII m1_derangement_source_candidate + 0x1f + universe + 0x1f + destination_pair_uid + 0x1f + source_pair_uid), then source_pair_uid UTF-8",
+      "matching_algorithm": "deterministic repository augmenting-path bipartite matching in destination_order and source_candidate_order; every recursive reassignment follows the same frozen orders; third-party matching solvers are forbidden",
+      "required_invariants": [
+        "destination and source pair keysets are each the exact universe keyset",
+        "every mapping is endpoint-disjoint and therefore has no fixed point",
+        "the complete 33-column vector is copied as one indivisible row",
+        "the joint 33-vector multiset is exact separately within every world and universe",
+        "M1 and M2 pair UID, later label, p0 and world weight remain joined by destination pair UID"
+      ],
+      "failure_rule": "no perfect endpoint-disjoint matching, any multiset drift or any forbidden input invalidates the dataset version; no seed replacement"
+    },
+    "feature_derangement_mapping_schema": [
+      "rewire_seed_id",
+      "world_uid",
+      "universe",
+      "destination_pair_uid",
+      "source_pair_uid",
+      "endpoint_disjoint_bool",
+      "feature_vector_sha256"
+    ],
+    "text_edge_rewire_status": "DEVELOPMENT_STRESS_DIAGNOSTIC_NOT_PRIMARY_M1: the v7 count-stratified text rewire remains useful for parser/render replay testing but failed the preregistered 33-feature support gate because independent edge swaps destroy cross-identity motifs; it must not train or certify M1",
+    "input_boundary": {
+      "allowed": [
+        "train raw observed sellers and items",
+        "train parser-validated rewire safe slots",
+        "identity_uid,nuisance_class ledger",
+        "item-local render AST without controller or planned role",
+        "public rewire policy",
+        "one registered rewire seed"
+      ],
+      "raw_observed_item_use": "AST-validated replacement of only the registered safe-slot spans; every byte outside those spans and every title must remain exact",
+      "candidate_pairs_reused_without_regeneration": true,
+      "forbidden": [
+        "controller membership",
+        "classification labels or qrels",
+        "mechanism truth",
+        "planned role or private parser expectation",
+        "complete renderer slot audit",
+        "M0 inputs or scores"
+      ]
+    },
+    "swap_acceptance_multiplier_per_stratum_edge": 20,
+    "maximum_attempt_multiplier_per_stratum_edge": 10000,
+    "direct_or_private_original_edge_retention_rate_maximum": 0.01,
+    "stop_rule": "for each four-key stratum, direct_or_private stops immediately when accepted>=20*E and original-edge retention<=0.01; other observable nuisance strata stop at accepted>=20*E; fail when attempts reach 10000*max(E,1)",
+    "structurally_fixed_stratum_rule": "allow unchanged only for an unswappable non-direct_or_private observable nuisance stratum; an unswappable direct_or_private stratum fails",
+    "rewirable_parser_expectation": "must_extract_only",
+    "must_ignore_slots_rewired": false,
+    "maximum_must_extract_slots_per_item_field_type": 1,
+    "rewirable_slot_identification": "one-to-one inner join of observed parser rows to the safe identity-slot projection on item_uid,field_name,identity_type,downstream_canonical_value; no private expectation or planned-role access",
+    "rewire_safe_slot_schema": [
+      "slot_uid",
+      "bundle_uid",
+      "world_uid",
+      "item_uid",
+      "seller_uid",
+      "field_name",
+      "start",
+      "end",
+      "identity_uid",
+      "identity_type",
+      "downstream_canonical_value",
+      "raw_surface",
+      "time_bucket",
+      "observed_seller_facing_context",
+      "observed_product_data_risk_context",
+      "observed_direct_identity_eligible",
+      "observed_support_only",
+      "observed_nuisance_class"
+    ],
+    "rewire_manifest_schema": [
+      "rewire_seed_id",
+      "layer_uid",
+      "iteration",
+      "attempt_count_at_accept",
+      "seller_uid_left",
+      "identity_uid_left",
+      "seller_uid_right",
+      "identity_uid_right",
+      "new_identity_uid_left",
+      "new_identity_uid_right",
+      "hmac_digest_hex"
+    ],
+    "rewire_stratum_audit_schema": [
+      "rewire_seed_id",
+      "layer_uid",
+      "world_uid",
+      "identity_type",
+      "nuisance_class",
+      "edge_occurrence_count",
+      "original_edge_count",
+      "attempt_count",
+      "accepted_swap_count",
+      "original_edge_retention_count",
+      "original_edge_retention_rate",
+      "structurally_fixed_bool",
+      "final_edge_multiset_sha256"
+    ],
+    "rewired_slot_assignment_schema": [
+      "rewire_seed_id",
+      "layer_uid",
+      "slot_uid",
+      "original_bundle_uid",
+      "rewired_bundle_uid",
+      "world_uid",
+      "item_uid",
+      "seller_uid",
+      "field_name",
+      "start",
+      "end",
+      "original_identity_uid",
+      "rewired_identity_uid",
+      "identity_type",
+      "downstream_canonical_value",
+      "raw_surface",
+      "time_bucket",
+      "observed_seller_facing_context",
+      "observed_product_data_risk_context",
+      "observed_direct_identity_eligible",
+      "observed_support_only",
+      "observed_nuisance_class"
+    ],
+    "rewired_ast_schema": [
+      "rewire_seed_id",
+      "world_uid",
+      "seller_uid",
+      "item_uid",
+      "time_bucket",
+      "category",
+      "product",
+      "attribute",
+      "delivery",
+      "service",
+      "code",
+      "title_skeleton_index",
+      "description_skeleton_index",
+      "effective_style_uid",
+      "title_nonempty",
+      "description_nonempty",
+      "identity_slot_uids",
+      "noise_slot_uid"
+    ],
+    "rewire_output_order": {
+      "manifest": [
+        "rewire_seed_id UTF-8",
+        "layer_uid UTF-8",
+        "numeric iteration"
+      ],
+      "stratum_audit": [
+        "rewire_seed_id UTF-8",
+        "world_uid UTF-8",
+        "identity type policy order",
+        "nuisance priority order",
+        "numeric edge occurrence count"
+      ],
+      "slot_assignments": [
+        "rewire_seed_id UTF-8",
+        "world_uid UTF-8",
+        "seller_uid UTF-8",
+        "item_uid UTF-8",
+        "numeric start",
+        "slot_uid UTF-8"
+      ],
+      "rewired_items_and_asts": [
+        "rewire_seed_id UTF-8",
+        "world_uid UTF-8",
+        "seller_uid UTF-8",
+        "item_uid UTF-8"
+      ],
+      "rewired_parser_and_history": [
+        "rewire_seed_id UTF-8",
+        "world_uid UTF-8",
+        "seller_uid UTF-8",
+        "item_uid UTF-8",
+        "source field fixed order",
+        "identity type policy order",
+        "normalized value UTF-8"
+      ]
+    },
+    "safe_slot_forbidden_columns": [
+      "planned_role",
+      "parser_expectation",
+      "mechanism",
+      "controller_uid",
+      "private_context_class"
+    ],
+    "safe_slot_projection_integrity": {
+      "world_uid_source": "independently FK-validated item_uid to seller_uid to world_uid observed membership, never decoded from a UID",
+      "one_to_one_parser_join_required": true,
+      "exact_keyset_equal_to_all_rewirable_must_extract_slots": true,
+      "nuisance_ledger_keyset_equal_to_unique_identity_uids": true,
+      "nuisance_ledger_one_class_per_identity_required": true,
+      "nuisance_class_recomputation": "derive from actual parser flags and complete-world observed token seller degree only; independently recomputed ledger class must equal every safe-slot observed_nuisance_class row for that identity",
+      "world_uid_or_seller_uid_mismatch_is_fatal": true
+    },
+    "flow_scope": "independent per world_uid,identity_type,nuisance_class,edge_occurrence_count stratum",
+    "layer_identity_supply": "original occurrence count within that exact layer",
+    "layer_seller_demand": "original observed-parser-joined slot count within that exact layer",
+    "cross_nuisance_slot_demand_forbidden": true,
+    "count_stratified_swap_and_slot_matching": {
+      "swap_stratum": "world_uid,identity_type,nuisance_class,edge_occurrence_count",
+      "stratum_scheduler": "world_uid UTF-8, identity type policy order, nuisance_priority order, numeric edge_occurrence_count",
+      "identity_belongs_to_exactly_one_occurrence_count_stratum": true,
+      "duplicate_edge_check_scope": "the complete world identity-type graph after every proposed swap",
+      "equal_count_swap_only": true,
+      "count_transport": "(s1,i1,c),(s2,i2,c) becomes (s1,i2,c),(s2,i1,c)",
+      "invariants_by_construction": [
+        "seller identity-edge degree",
+        "identity seller degree",
+        "seller occurrence-slot demand",
+        "identity total occurrence supply",
+        "per-edge occurrence-count multiset for every seller and identity"
+      ],
+      "slot_matching_per_seller_layer": {
+        "source_to_identity_capacity": "the transported edge occurrence count",
+        "identity_to_identity_item_capacity": 1,
+        "identity_item_to_compatible_slot_capacity": 1,
+        "slot_to_sink_capacity": 1,
+        "must_saturate_every_identity_count_and_every_slot": true
+      },
+      "feasibility_argument": "each seller receives exactly the same multiset of per-edge occurrence counts as before; identities are only relabeled within one type/nuisance/count stratum, so the original feasible item pattern exists after relabeling",
+      "unequal_count_swap_forbidden": true,
+      "occurrence_redistribution_across_edges_forbidden": true
+    },
+    "direct_or_private_mixability_preflight": {
+      "maximum_non_background_identity_seller_degree": 2,
+      "minimum_background_degree_one_edges_per_type_and_count": 4,
+      "proof_obligation": "before any seed run, construct without labels at least one legal count-stratified swap sequence whose final direct_or_private original-edge retention is zero and whose slot matching saturates",
+      "failure_rule": "dataset version invalid; no seed replacement or threshold relaxation"
+    },
+    "identity_uid_serialization": "id_ + SHA256 of UTF-8 canonical JSON object with only contact_type and normalized_value; sorted keys; ensure_ascii=false; separators comma-colon; no newline",
+    "layer_uid_serialization": "layer_ + SHA256 of UTF-8 canonical JSON object with only world_uid, identity_type, nuisance_class and edge_occurrence_count; same canonical JSON rules",
+    "rewire_seed_bytes": "decode the selected policy hex to exactly 32 raw bytes; no UTF-8 re-encoding",
+    "rewire_seed_id_serialization": "rws_ + SHA256 of the exact 32 raw seed bytes",
+    "edge_uid_serialization": "seller_uid + 0x1f + identity_uid",
+    "canonical_edge_pair_serialization": "UTF8-byte-sort two edge UIDs then concatenate with ASCII 0x1e",
+    "swap_hmac_message": "layer_uid + 0x1f + unpadded decimal iteration + 0x1f + canonical_edge_pair",
+    "swap_iteration_semantics": {
+      "iteration": "zero-based accepted-swap count within the current stratum",
+      "snapshot": "at the start of every iteration enumerate all unordered pairs of distinct current seller-identity edges exactly once",
+      "candidate_order": "sort the complete snapshot candidate set by swap_hmac_message digest, then canonical_edge_pair UTF-8 bytes",
+      "attempt": "checking one candidate from that ordered snapshot increments the stratum attempt count whether accepted or rejected",
+      "acceptance": "apply the first legal candidate swap, increment iteration by one, discard the remaining snapshot candidates and enumerate a fresh current-state snapshot",
+      "no_legal_candidate": "if a complete snapshot scan has no legal candidate, the stratum fails immediately unless it is explicitly eligible for the frozen structurally-fixed non-direct exception",
+      "attempt_limit_check": "fail before checking the next candidate once attempts equals 10000*max(E,1)",
+      "candidate_pair_reuse_across_iterations": "allowed because every iteration is a new current-state snapshot"
+    },
+    "slot_flow_edge_order": {
+      "edge_kind_order": [
+        "source_identity",
+        "identity_identity_item",
+        "identity_item_slot",
+        "slot_sink"
+      ],
+      "slotflow_uid": "sf_ + SHA256 canonical JSON containing only layer_uid and seller_uid",
+      "source_node_uid": "src_ + SHA256 UTF-8(slotflow_uid + 0x1f + ASCII source)",
+      "sink_node_uid": "snk_ + SHA256 UTF-8(slotflow_uid + 0x1f + ASCII sink)",
+      "composite_identity_item_uid": "ii_ + SHA256 canonical JSON containing only layer_uid,seller_uid,identity_uid,item_uid",
+      "message": "layer_uid + 0x1f + ASCII slotflow + 0x1f + edge_kind + 0x1f + every endpoint UID in directed order joined by 0x1f",
+      "sort_key": "edge_kind_order, full HMAC-SHA256 digest as 32-byte big-endian integer, then complete directed edge serialization in UTF-8 bytes",
+      "dinic_insertion": "insert sorted forward edges and each reverse edge immediately after its forward edge; BFS and DFS traverse stored adjacency order",
+      "third_party_solver_forbidden": true
+    },
+    "rewired_bundle_uid_serialization": "bundle_ + SHA256 canonical JSON with only rewire_seed_id,layer_uid,seller_uid,identity_uid",
+    "rewired_expectation_source": "independent structural audit from persisted rewired AST and slot assignment plus original slot-local independently validated parser flags; parser cannot read it and output cannot define expectation",
+    "preserve_exact": [
+      "seller_identity_slot_count_by_type",
+      "identity_seller_degree",
+      "identity_total_occurrence_count",
+      "seller_item_field_context_time_slots",
+      "global_type_field_context_time_marginals"
+    ],
+    "nuisance_priority": [
+      "risky_product",
+      "public_support",
+      "high_frequency_direct",
+      "direct_or_private"
+    ],
+    "support_comparability_thresholds": {
+      "primary_row_universe": "the exact frozen train C40 safe canonical_pair_uid set used to fit every adapter; labels and candidate trigger/audit columns are forbidden",
+      "secondary_row_universe": "all 378 unordered pairs per train world, reported separately and never substituted for the primary C40 gate",
+      "primary_is_validity_gate": true,
+      "secondary_is_diagnostic_only": true,
+      "range_slack_in_m2_scale_units": 0.5,
+      "maximum_absolute_standardized_mean_difference": 0.15,
+      "maximum_absolute_zero_rate_difference": 0.1,
+      "quantiles": [0.05, 0.25, 0.5, 0.75, 0.95],
+      "maximum_absolute_standardized_quantile_difference": 0.25,
+      "maximum_absolute_covariance_difference": 0.2,
+      "maximum_absolute_correlation_difference": 0.2,
+      "two_sample_auc_symmetric_maximum": 0.6
+    },
+    "support_comparability_preflight": {
+      "required_on_development_smoke_before_dataset_release_lock": true,
+      "uses_labels_or_controller_membership": false,
+      "allowed_inputs": "smoke original/M2 and five M1 identity33 matrices plus endpoint-only C40 and full-378 pair sets",
+      "required_result": "all five seeds pass every primary C40 threshold; full-378 diagnostics are reported",
+      "persistence_replay_requirement": "before writing train M1 artifacts, recompute the complete preflight from M2, all five M1 matrices, endpoint-only C40 and complete pair endpoints; require exact object equality, then rebuild the complete M1 aggregate receipt from those actual placebos and inputs so every registered seed-to-mapping deterministic replay and every matrix/mapping parent hash is checked; require exact receipt equality and its support_preflight_sha256 to equal the recomputed object",
+      "independent_regression_oracle": "a separate test implementation that does not call the production support helper must recompute per-world/per-universe joint-vector multisets and every primary-C40/full-378 numerical gate for all five registered seeds",
+      "failure_rule": "revise the placebo algorithm and issue a new contract draft before formal freeze; seed replacement or threshold relaxation after formal release is forbidden"
+    },
+    "support_classifier": {
+      "family": "sklearn.linear_model.LogisticRegression",
+      "solver": "lbfgs",
+      "penalty": "l2",
+      "C": 1.0,
+      "max_iter": 10000,
+      "tol": 1e-10,
+      "class_weight": null,
+      "fit_intercept": true,
+      "world_grouped_folds": 5,
+      "fold_assignment": "within the train split sort world UIDs by full SHA256(ASCII random_seed + 0x1f + world_uid UTF-8) as unsigned big-endian, then world_uid UTF-8; assign zero-based sorted ordinal modulo 5, so the 10-world development-smoke train has exactly two worlds in every fold; M2 and all five M1 rows from one world use that one fold",
+      "random_seed": 2026072705,
+      "score": "decision_function",
+      "auc_symmetric": "max(AUC,1-AUC)",
+      "dataset_construction": "for each M1 seed and each row universe independently, stack the M2 row as source_label=0 and the same canonical pair's M1 row as source_label=1; exact order is world_uid UTF-8, canonical_pair_uid UTF-8, source_label numeric",
+      "pair_fold_lock": "both source versions of one canonical pair use the same world fold",
+      "input_features": "the exact 33 columns divided by the one shared label-free M2 C40 world-equal RMS scale; no centering and no additional StandardScaler",
+      "sample_weight": "none; every world has exactly 40 rows in primary C40 or 378 in the secondary universe and both source classes duplicate the same pair set, so row-equal is exactly world-equal and class-balanced",
+      "pair_uid_world_uid_or_source_order_as_features_forbidden": true,
+      "oof_auc": "sklearn.metrics.roc_auc_score on all finite OOF decision scores with row-equal weights",
+      "empty_fold_single_class_nonconvergence_iteration_cap_or_nonfinite_rule": "validity failure; n_iter greater than or equal to max_iter is an iteration-cap failure even if the runtime omits a warning"
+    },
+    "support_distribution_math": {
+      "input": "z divided by the shared M2 C40 RMS scale",
+      "weighting": "row-equal, which equals world-equal because every included world contributes the same frozen row count in each source",
+      "range": "per-column exact float64 minimum and maximum",
+      "range_slack_gate": "after division by the shared M2 C40 RMS scale, take the maximum over columns of max(M2_min-M1_min, M1_max-M2_max, 0); require it <= range_slack_in_m2_scale_units",
+      "standardized_mean_difference": "difference of source means divided by sqrt((population_variance_M2+population_variance_M1)/2); if pooled scale <=1e-12 require equal means else invalid",
+      "zero_rate": "exact float64-zero row proportion per column",
+      "quantiles": "numpy.quantile with frozen probabilities and method=linear on each source column",
+      "covariance": "numpy.cov(rowvar=false,ddof=0)",
+      "correlation": "population covariance divided by population standard deviations; two zero-variance equal columns use correlation 1 with themselves and 0 off-diagonal, unequal zero-variance support is invalid",
+      "comparison": "maximum absolute M1-minus-M2 difference over the named elements",
+      "separate_outputs": "compute primary C40 validity gate and full-378 diagnostic independently for every seed"
+    }
+  },
+  "m0_compatibility": {
+    "operational_primary_id": "lightgbm__legacy18_labse",
+    "c0_sensitivity_id": "lightgbm__legacy18",
+    "primary_joblib": {
+      "path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/selected_models/lightgbm__legacy18_labse.joblib",
+      "sha256": "aae7f0e520c28006471cf1e1e518d6b0d383e6d14810a2c4aca4d28aa11d91dd",
+      "feature_count": 24
+    },
+    "c0_joblib": {
+      "path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/selected_models/lightgbm__legacy18.joblib",
+      "sha256": "e6f7c3a4cb262e067b7308e298d1b850ab237cb08de66ab85fcbaf1896157e1c",
+      "feature_count": 18
+    },
+    "parent_policy": {
+      "path": "schema/step7_v4_raw_item_authorship_selection_policy.json",
+      "sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327"
+    },
+    "selection_policy": {
+      "path": "schema/step7_v4_1_style_free_classifier_policy.json",
+      "sha256": "804b78478344b1c18340a2bf657f6c5c003b701c9cc655bc5723e7e441b2678a"
+    },
+    "english_reference_sha256": "825cc0a42806388de8f4f016273ed83650082f757eea660189e97e48a57853eb",
+    "english_seller_uid_set_sha256": "b417fbe6ec1c146943657b00de973889adb0732fbe4aa996297b6462447f8c0e",
+    "labse_model_content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+    "labse_aggregation": {
+      "chunk_to_unique_text": "l2_normalized_mean_of_unit_chunk_vectors_then_l2_normalize",
+      "unique_text_weighting_primary": "equal_weight_per_unique_clean_text",
+      "top_k_item_matches": 3,
+      "serialized_decimal_places": 12,
+      "feature_names": [
+        "raw_labse_field_equal_centroid_cosine",
+        "raw_labse_field_equal_symmetric_top3_cosine",
+        "raw_labse_title_centroid_cosine",
+        "raw_labse_title_symmetric_top3_cosine",
+        "raw_labse_description_centroid_cosine",
+        "raw_labse_description_symmetric_top3_cosine"
+      ],
+      "missing_value": "empty CSV then frozen joblib training median without indicator"
+    },
+    "wrapper_reuse_contract": {
+      "chunk_functions": [
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "build_shared_chunks"},
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "validate_shared_chunks"},
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "tokenizer_digest_and_lengths"}
+      ],
+      "cuda_functions": [
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "create_sentence_transformer"},
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "sentence_transformer_tokenizer_digest_and_lengths"},
+        {"path": "scripts/step7_v4_encode_item_models.py", "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc", "module_name": "step7_v4_encode_item_models", "symbol": "configure_deterministic_gpu"}
+      ],
+      "aggregate_function": {"path": "scripts/step7_v4_common.py", "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334", "module_name": "step7_v4_common", "symbol": "compute_pair_score_rows"},
+      "import_path": "an isolated directory placed first on sys.path containing exact pinned modules",
+      "label_free_sync_import_shim": {
+        "module_name": "step7_v4_build_sync_manifest",
+        "owned_by_identity_child": true,
+        "path": null,
+        "sha256": null,
+        "required_behavior": "allow top-level import only; selected frozen helpers must not access any shim symbol",
+        "private_path_or_label_literal_forbidden": true
+      },
+      "forked_math_forbidden": true
+    },
+    "runtime": {
+      "cpu_chunker": {
+        "python": "3.10.19",
+        "numpy": "2.2.6",
+        "transformers": "4.46.3",
+        "tokenizers": "0.20.3"
+      },
+      "cuda_encoder": {
+        "python": "3.10.19",
+        "numpy": "2.2.6",
+        "torch": "2.9.1+cu130",
+        "cuda_runtime": "13.0",
+        "cudnn": 91300,
+        "transformers": "4.46.3",
+        "tokenizers": "0.20.3",
+        "sentence_transformers": "5.6.0"
+      }
+    },
+    "compatibility_fixture": {
+      "status": "not_materialized",
+      "owned_by_identity_child": true,
+      "dataset_parent_nulls_must_remain_null": true,
+      "fixture_dag": "pre-freeze label-free fixture spec -> runtime/output manifest -> identity child pins both; runtime must not reference the identity child policy",
+      "selection_rule": "copy only explicitly hash-pinned label-free public rows into a new empty workspace; mounting the parent Step7-v4 run directory is forbidden",
+      "minimum_sellers": 8,
+      "minimum_pairs": 8,
+      "minimum_unique_clean_texts": 24,
+      "required_cases": [
+        "title and description fields",
+        "at least two unique texts in both fields for at least two sellers",
+        "min(3,n) equals 1, 2 and 3 on distinct pair sides",
+        "at least four multi-chunk texts under every tokenizer",
+        "E5 query prefix changes token-ID digest versus unprefixed text",
+        "multiple pair rows exercise ordering and rename roundtrip"
+      ],
+      "source_private_files_forbidden": [
+        "private_labels.train.csv",
+        "private_labels.valid.csv",
+        "private_evidence.train.csv",
+        "private_evidence.valid.csv",
+        "development_labels_manifest.json"
+      ],
+      "forbidden_source_open_count": 0,
+      "fixture_spec_sha256": null,
+      "runtime_output_manifest_sha256": null,
+      "same_process_same_device_parity_required": true,
+      "runtime_manifest_required_fields": [
+        "gpu_name",
+        "compute_capability",
+        "nvidia_driver",
+        "cuda_runtime",
+        "cudnn",
+        "torch",
+        "numpy"
+      ],
+      "labse_float32_embedding_bytes_must_match": true,
+      "required_before_identity_experiment_lock": true
+    },
+    "opaque_gpu_join": {
+      "seller_map_schema": [
+        "opaque_seller_id",
+        "seller_uid"
+      ],
+      "pair_map_schema": [
+        "opaque_pair_id",
+        "canonical_pair_uid"
+      ],
+      "seller_order": "seller UID UTF-8 bytes across all worlds",
+      "pair_universe": "all 378 unordered seller pairs in every 28-seller world, independent of C40 and retrieval roles",
+      "pair_universe_count_formal": "exact integer derived_count_contract.complete_all378_pairs from the frozen selected W; no independent literal is allowed",
+      "pair_order": "canonical pair UID UTF-8 bytes across the complete role-independent pair universe",
+      "seller_id_format": "seller_%08d",
+      "pair_id_format": "pair_%08d",
+      "text_id_format": "text_%08d",
+      "ordinal_start": 1,
+      "maps_forbidden_from_cuda": true,
+      "gpu_pair_input_schema": [
+        "opaque_pair_id",
+        "opaque_seller_left",
+        "opaque_seller_right"
+      ],
+      "gpu_seller_text_index_schema": [
+        "opaque_seller_id",
+        "field_name",
+        "opaque_text_id"
+      ],
+      "opaque_text_id_order": "SHA256(text UTF-8 bytes), then text UTF-8 bytes",
+      "opaque_text_id_format": "text_%08d",
+      "seller_text_index_order": "opaque_seller_id UTF-8, field order title before description, opaque_text_id UTF-8",
+      "seller_text_index_unique_key": [
+        "opaque_seller_id",
+        "field_name",
+        "opaque_text_id"
+      ],
+      "unique_clean_text_schema": [
+        "opaque_text_id",
+        "text",
+        "text_sha256"
+      ],
+      "text_integrity_gates": [
+        "text ID, text and SHA are one-to-one",
+        "seller-text index contains no duplicate reference",
+        "every seller-text reference exists",
+        "unique-clean-text corpus has no orphan",
+        "every text has contiguous shared chunk indexes starting at zero",
+        "pair map is one-to-one with opaque pair input and preserves its order",
+        "every pair endpoint exists in seller map and reverse mapping reconstructs canonical pair UID",
+        "seller map universe equals pair endpoint universe and seller-text seller universe",
+        "field_name is exactly title or description",
+        "every seller has at least one nonempty unique title and one nonempty unique description"
+      ],
+      "multiplicity_forbidden_from_gpu_index": true,
+      "frozen_helper_adapter": {
+        "in_memory_multiplicity": 1,
+        "in_memory_renames": {
+          "opaque_pair_id": "pair_uid",
+          "opaque_seller_left": "seller_uid_left",
+          "opaque_seller_right": "seller_uid_right",
+          "opaque_seller_id": "seller_uid",
+          "opaque_text_id": "text_uid"
+        },
+        "identifier_values_remain_opaque_ordinals": true,
+        "persisted_shared_chunk_text_id_column": "text_uid",
+        "roundtrip_schema_and_value_assertion_required": true,
+        "weighted_audit_columns_must_equal_primary_after_12_decimal_serialization": true,
+        "weighted_audit_columns_must_equal_primary_bitwise": false,
+        "primary_columns_are_the_only_model_projection": true,
+        "weighted_audit_columns_persisted": false
+      },
+      "gpu_output_schema": [
+        "opaque_pair_id",
+        "raw_labse_field_equal_centroid_cosine",
+        "raw_labse_field_equal_symmetric_top3_cosine",
+        "raw_labse_title_centroid_cosine",
+        "raw_labse_title_symmetric_top3_cosine",
+        "raw_labse_description_centroid_cosine",
+        "raw_labse_description_symmetric_top3_cosine"
+      ],
+      "collector_rejects_duplicate_missing_extra_or_reordered_rows": true,
+      "collector_preserves_complete_all378_pair_universe_after_canonical_cpu_join": true,
+      "evaluation_filtering_occurs_only_in_a_separate_cpu_projection_with_the_private_role_map": true,
+      "collector_trust_anchor": "identity-lock receipt with frozen hashes of static policies, wrappers, shim, old helpers, LaBSE payload and M0 artifacts",
+      "collector_chain_validation": [
+        "runtime parent equals sync file and canonical content hashes",
+        "runtime fingerprints equal identity-lock receipt",
+        "bundle exact members and hashes validate before parsing",
+        "bundle canonical self hash validates",
+        "sync map commitment equals projector parent-manifest commitment",
+        "collector manifest has returned bundle seal and CPU projector map seal as two ordered parents"
+      ],
+      "bundle_path_safety": {
+        "members_are_regular_files": true,
+        "members_are_single_level_fixed_basenames": true,
+        "absolute_drive_parent_separator_variants_forbidden": true,
+        "symlink_and_hardlink_forbidden": true,
+        "unicode_or_case_normalized_duplicate_forbidden": true,
+        "duplicate_archive_entry_forbidden": true,
+        "size_and_sha_verified_before_csv_or_json_parse": true
+      }
+    },
+    "opaque_public_input_projection": {
+      "projector_reads": [
+        "observed world-to-seller membership without controller membership",
+        "redacted unique clean title and description rows"
+      ],
+      "projector_must_not_read": [
+        "C40 membership",
+        "candidate trigger",
+        "retrieval query or role",
+        "supervision",
+        "oracle",
+        "identity features"
+      ],
+      "projector_writes": [
+        "opaque_seller_map.csv",
+        "opaque_pair_map.csv",
+        "opaque_pair_input.csv",
+        "opaque_seller_text_index.csv",
+        "unique_clean_texts.jsonl",
+        "projector_manifest.json"
+      ],
+      "chunker_reads": [
+        "unique_clean_texts.jsonl",
+        "static CPU chunk policy",
+        "four tokenizer payloads"
+      ],
+      "chunker_forbidden": [
+        "canonical UID maps",
+        "canonical pair universe",
+        "full dataset policy",
+        "static GPU policy"
+      ],
+      "gpu_visible_map_commitment": {
+        "role": "cpu_uid_maps_content_commitment",
+        "value": "canonical content hash from sealed projector manifest",
+        "path_forbidden": true,
+        "uid_forbidden": true,
+        "not_a_workspace_member": true
+      },
+      "sync_builder_reads_projector_manifest_not_maps": true,
+      "gpu_workspace_file_paths": "fixed CUDA-workspace-relative destinations only; CPU, reports, host and split path fragments forbidden",
+      "collector_parents": [
+        "returned_bundle_seal",
+        "cpu_projector_map_seal"
+      ]
+    },
+    "blind_replay": {
+      "pair_manifest_path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_manifest.no_labels.csv",
+      "pair_manifest_sha256": "f9f996bdac4a69ce361fa23417ed47cf9216854ffc5558b0202539a311886cb9",
+      "blind_predictions_path": "reports/step7_v4_1_style_free_classifier_selection/v1_20260724/valid_predictions.blind.no_labels.csv",
+      "blind_predictions_sha256": "b0bd6c89f8542fb7eaa158b0d8f1a4b1dc7aaa347d6ec1deaad2ac9e914a90aa",
+      "primary_matrix_shape": [
+        151,
+        24
+      ],
+      "primary_matrix_float64_bytes_sha256": "37ecfd7671335a1d377a62983062f524ae92afa9ef99c920f58aef9450c04133",
+      "primary_probability_float64_bytes_sha256": "14a1b6f0c579b857818510b5d6c9847b21baa09c4241f0ac9efdaa2afe74a5a7",
+      "c0_matrix_shape": [
+        151,
+        18
+      ],
+      "c0_matrix_float64_bytes_sha256": "9404e755bfdccc3b8a624cddd6380f6ebac8455a4a19877f0909008ea5c729f4",
+      "c0_probability_float64_bytes_sha256": "4a9d5ac7bb3fe3edcd03d83596228c9a9c9fbc86901d4a45727feecb68dc54b2"
+    }
+  },
+  "metadata_shortcut_audit": {
+    "upstream": {
+      "text": "post-Step7-v4 redacted_items.jsonl only; raw identity-bearing text and planned slots are forbidden",
+      "non_text": "observed seller item_count, generic category, market and four fixed item time buckets",
+      "purpose": "detect unintended nuisance shortcuts after excluding every preregistered nonidentity signal that the frozen M0 or a registered stress mechanism is explicitly meant to use",
+      "estimand_boundary": "only item count, title/description missingness and the four item-time buckets are null nuisance; redacted text style is registered authorship evidence, same-category/product/attribute is a registered high-semantic hard-negative mechanism, and market difference is a registered cross-market positive mechanism",
+      "registered_style_signal_is_not_evidence_of_identity_adapter_value": true,
+      "registered_category_and_market_mechanisms_are_reported_descriptively_but_not_subject_to_the_random_auc_gate": true,
+      "raw_identity_clause_or_identity_slot_statistics_forbidden": true
+    },
+    "seller_vector_order": [
+      "item_count",
+      "title_missing_rate",
+      "description_missing_rate",
+      "time_bucket_probability_00",
+      "time_bucket_probability_01",
+      "time_bucket_probability_02",
+      "time_bucket_probability_03"
+    ],
+    "seller_vector_math": {
+      "missing_rate": "empty-field item count divided by seller item count",
+      "time_bucket_order": [0, 1, 2, 3]
+    },
+    "pair_operations": [
+      "absdiff__<seller_feature>",
+      "sum__<seller_feature>"
+    ],
+    "pair_feature_order": "all absdiff columns in seller_vector_order, then all sum columns in seller_vector_order",
+    "pair_feature_count": 14,
+    "float_serialization": ".12f",
+    "missing_or_nonfinite_rule": "split validity failure",
+    "forbidden_columns": [
+      "uid",
+      "split",
+      "controller",
+      "mechanism",
+      "template",
+      "hash",
+      "random_key",
+      "candidate_trigger",
+      "identity_feature",
+      "m0_score",
+      "lineage"
+    ],
+    "models": {
+      "logistic_l2": {
+        "class": "sklearn.linear_model.LogisticRegression",
+        "solver": "lbfgs",
+        "penalty": "l2",
+        "C": 1.0,
+        "fit_intercept": true,
+        "class_weight": null,
+        "max_iter": 10000,
+        "tol": 1e-10,
+        "score": "decision_function",
+        "fold_train_standardization": true
+      },
+      "gradient_tree": {
+        "class": "sklearn.ensemble.HistGradientBoostingClassifier",
+        "max_depth": 2,
+        "max_iter": 200,
+        "learning_rate": 0.03,
+        "l2_regularization": 1.0,
+        "early_stopping": false,
+        "random_state": 2026072707,
+        "class_weight": null,
+        "score": "decision_function",
+        "fold_train_standardization": false
+      },
+      "rbf_svm": {
+        "class": "sklearn.svm.SVC",
+        "kernel": "rbf",
+        "C": 1.0,
+        "gamma": "scale",
+        "probability": false,
+        "class_weight": null,
+        "score": "decision_function",
+        "fold_train_standardization": true
+      }
+    },
+    "world_grouped_folds": 5,
+    "fold_assignment": "within each split sort world UIDs by full SHA256(ASCII random_seed + 0x1f + world_uid UTF-8) as unsigned big-endian, then world_uid UTF-8; assign zero-based sorted ordinal modulo 5; every row from one world uses that one fold",
+    "standardizer": {
+      "class": "sklearn.preprocessing.StandardScaler",
+      "with_mean": true,
+      "with_std": true,
+      "fit_scope": "fold-train only",
+      "zero_variance_scale": 1.0
+    },
+    "empty_fold_or_single_class_fold_rule": "split validity failure",
+    "evaluation_splits": [
+      "train",
+      "development",
+      "audit_a_at_unseal",
+      "audit_b_at_unseal"
+    ],
+    "train_development_combination_forbidden": true,
+    "oof_convergence_failure_rule": "split validity failure",
+    "random_seed": 2026072707,
+    "sklearn_version": "1.7.1",
+    "numpy_version": "2.2.6",
+    "point_statistic": "maximum across three models of max(ROC_AUC,1-ROC_AUC) on frozen OOF scores using only the exact 14 null-nuisance pair features; registered authorship, category-semantic and market mechanisms are excluded",
+    "bootstrap": {
+      "replicates": 9999,
+      "base_seed": 2026072711,
+      "bit_generator": "numpy.random.PCG64DXSM",
+      "world_order": "world_uid UTF-8 byte order",
+      "draw_shape": "[9999, number_of_worlds]",
+      "split_seed": "SHA256(ASCII base_seed + 0x1f + split_name) first 128 bits as unsigned big-endian",
+      "unit": "world",
+      "refit_models": false,
+      "statistic": "resample worlds, recompute each model AUC_sym on frozen OOF scores, then take max across models",
+      "upper_quantile": 0.95,
+      "quantile_method": "higher",
+      "single_class_replicate_rule": "split validity failure"
+    },
+    "auc_symmetric_point_maximum": 0.52,
+    "auc_symmetric_world_bootstrap_95_upper_maximum": 0.53
+  },
+  "statistics_preregistration": {
+    "bootstrap_seed": 2026072709,
+    "bootstrap_replicates": 9999,
+    "numpy_version": "2.2.6",
+    "scikit_learn_version": "1.7.1",
+    "bit_generator": "numpy.random.PCG64DXSM",
+    "world_order": "world_uid UTF-8 byte order",
+    "draw_shape": "[9999, number_of_worlds] integer world ordinals with replacement",
+    "audit_seed_domain_separation": {
+      "audit_a": "SHA256(ASCII 2026072709 + 0x1f + ASCII audit_a) first 128 bits as unsigned big-endian seed",
+      "audit_b": "SHA256(ASCII 2026072709 + 0x1f + ASCII audit_b) first 128 bits as unsigned big-endian seed"
+    },
+    "shared_indices": "all models and endpoints within one audit reuse the same world draw matrix",
+    "cluster_unit": "world",
+    "average_precision": {
+      "function": "sklearn.metrics.average_precision_score",
+      "weight": "each row in world w has weight 1/(W*n_w)",
+      "tie_semantics": "pinned sklearn implementation",
+      "single_class_rule": "audit validity failure"
+    },
+    "simultaneous_lower_bound_error": "quantile_0.95_of_max_over_family(difference_bootstrap_minus_observed)",
+    "simultaneous_upper_bound_error": "q_upper=Q_0.95(max_j(d_j-d_j_bootstrap),method=higher); UB_j=d_j+q_upper",
+    "m1_mean_contract": "for every endpoint and bootstrap replicate, compute each of five seed-specific metrics using its own frozen model and threshold, then take their arithmetic mean; never average probabilities",
+    "bootstrap_refit_or_threshold_reselection_forbidden": true,
+    "m1_equivalence_tost": {
+      "statistic": "arithmetic_mean_r(AP(M1_r)) - AP(M0)",
+      "replicate": "within each resampled world set compute five seed-specific AP values, average metrics, then subtract M0 AP",
+      "interval": "90% percentile interval Q_0.05 method lower through Q_0.95 method higher",
+      "pass_rule": "strict TOST: the lower endpoint must be > -0.01 and the upper endpoint must be < +0.01; equality to either margin fails and the point estimate alone never passes"
+    },
+    "threshold_selection": {
+      "finite_scores_in_closed_unit_interval_required": true,
+      "candidates": "sorted unique float64 development scores plus nextafter(min,-inf) and nextafter(max,+inf)",
+      "objective": "pooled weighted F1 from world-equal confusion totals; each row weight is 1/(W*n_w)",
+      "zero_denominator_f1": 0.0,
+      "tie_break": "numerically highest threshold",
+      "independent_for_every_model": "M0, each M1 seed and M2, separately for primary and C0",
+      "train_plus_development_refit_forbidden": true
+    },
+    "prediction_rule": "score >= threshold",
+    "retrieval": {
+      "ranking": "descending finite score, then gallery_seller_uid UTF-8 bytes ascending",
+      "nan_or_infinity_rule": "audit validity failure",
+      "query_metrics_then_world_mean": true,
+      "map_at_10_denominator": "minimum of 10 and number of relevant gallery sellers",
+      "recall_at_k": "relevant sellers among first k divided by all relevant gallery sellers",
+      "hits_at_k": "one iff at least one relevant seller occurs in first k",
+      "mrr": "reciprocal rank of first relevant seller"
+    },
+    "hard_negative_slice": {
+      "history_source": "one fixed mask built from the correct, unrewired original/M2 observed parser graph and its raw history details; reused unchanged for M0, all five M1 and M2",
+      "model_specific_or_placebo_specific_slice_forbidden": true,
+      "shared_token_key": "exact downstream canonical identity key used by step28_history_common.token_key",
+      "two_hop_rule": "raw history details has strong_common_middle_count>0 or weak_common_middle_count>0",
+      "lexical_score_source": "selected C40 row's frozen candidate_sampling_audit lexical_similarity serialized .6f; missing is exactly 0.000000; nonfinite is invalid",
+      "per_world_top_10_rule": "after audit unseal filter C40 to label=0, then order by negative lexical_similarity and canonical_pair_uid UTF-8 bytes and take first 10",
+      "eligibility": "label=0 and (shared token or any two-hop path or membership in per-world top-10 negative lexical rows)",
+      "minimum_rows_per_world": 10,
+      "fpr_estimand": "compute FP/eligible negatives within every world using each model's own frozen development threshold, then arithmetic mean across worlds",
+      "empty_world_rule": "audit validity failure",
+      "mean_m1": "arithmetic mean of five seed-specific FPR metrics, never probability ensembling",
+      "interpretation": "relative non-inferiority only; not an absolute safety guarantee"
+    },
+    "metric_families": {
+      "average_precision": [
+        "M2-M0",
+        "M2-mean_metric_M1",
+        "M2-M1_seed_01",
+        "M2-M1_seed_02",
+        "M2-M1_seed_03",
+        "M2-M1_seed_04",
+        "M2-M1_seed_05"
+      ],
+      "recall_at_10": [
+        "M2-M0",
+        "M2-mean_metric_M1"
+      ],
+      "hard_negative_fpr": [
+        "M2-M0",
+        "M2-mean_metric_M1"
+      ]
+    },
+    "quantile_methods": {
+      "simultaneous_one_sided": "higher",
+      "tost_lower_0.05": "lower",
+      "tost_upper_0.95": "higher"
+    },
+    "success_gates": {
+      "audit_a_ap_simultaneous_lower_bound_m2_m0_minimum_exclusive": 0.03,
+      "audit_a_ap_simultaneous_lower_bound_m2_mean_m1_minimum_exclusive": 0.03,
+      "audit_b_ap_simultaneous_lower_bound_m2_m0_minimum_exclusive": 0.015,
+      "audit_b_ap_simultaneous_lower_bound_m2_mean_m1_minimum_exclusive": 0.015,
+      "each_m2_m1_seed_ap_simultaneous_lower_bound_minimum_exclusive": 0.0,
+      "m1_mean_minus_m0_tost_interval": [-0.01, 0.01],
+      "recall_at_10_simultaneous_lower_bound_minimum": -0.01,
+      "hard_negative_fpr_simultaneous_upper_bound_maximum": 0.01,
+      "zero_history_exact_fallback_required": true,
+      "c0_is_sensitivity_not_primary_veto": true
+    },
+    "state_machine": {
+      "structurally_accepted": "STRUCTURALLY_ACCEPTED_PENDING_SUPERVISION",
+      "supervised_dataset_validity_pass": "PASS_DATASET_ONLY",
+      "audit_a_validity_failure": "INVALID",
+      "audit_a_gate_failure": "NO_GO",
+      "audit_a_pass": "PASS_A_ONLY",
+      "audit_b_validity_failure_after_a_pass": "B_INVALID",
+      "audit_b_gate_failure_after_a_pass": "B_NO_GO",
+      "audit_b_pass_after_a_pass": "PASS_A_AND_B"
+    }
+  },
+  "sealed_diagnostic_projections": {
+    "created_before_identity_experiment_lock": true,
+    "audit_a_b_only_exposed_to_corresponding_evaluator_at_unseal": true,
+    "hard_negative_inputs": {
+      "schema": [
+        "canonical_pair_uid",
+        "world_uid",
+        "shared_downstream_token_bool",
+        "any_two_hop_bool",
+        "lexical_similarity"
+      ],
+      "row_universe": "all selected C40 pairs exactly once",
+      "lexical_serialization": ".6f",
+      "final_eligibility_requires_label_at_evaluator": true
+    },
+    "metadata_shortcut_features": {
+      "schema": "canonical_pair_uid,world_uid plus the exact 14 null-nuisance pair features",
+      "row_universe": "all selected C40 pairs exactly once",
+      "float_serialization": ".12f"
+    },
+    "mechanism_coverage": {
+      "custody": "same split-specific oracle custody as controller membership",
+      "schema": [
+        "canonical_pair_uid",
+        "world_uid",
+        "positive_designated_target_mechanism",
+        "negative_mechanism_flags"
+      ],
+      "row_universe": "all selected C40 pairs exactly once",
+      "flag_order": "policy mechanism order joined by ASCII vertical bar",
+      "may_reveal_label_or_mechanism": true
+    },
+    "forbidden_readers": [
+      "M0",
+      "identity_history",
+      "adapter_train",
+      "development_threshold",
+      "blind_predictor",
+      "CUDA"
+    ]
+  },
+  "adapter": {
+    "formula": "logit(p)=logit(p0)+beta^T(z/scale)",
+    "feature_count": 33,
+    "intercept": false,
+    "m0_coefficient": 1.0,
+    "p0_clip_epsilon": 1e-09,
+    "zero_history_exact_fallback": {
+      "mask_source": "one fixed mask computed once from the correct unrewired original/M2 inference z matrix and reused unchanged for both bases, all five M1-trained betas and M2",
+      "mask_rule": "true iff all 33 raw float64 z elements are numerically equal to 0.0; +0.0 and -0.0 both count as zero",
+      "nonfinite_rule": "any NaN or infinity in p0, raw z, scale or beta is an immediate validity failure before mask evaluation",
+      "true_branch": "copy the selected base model's original unmodified float64 p0 value directly; do not clip, logit, add beta, expit or round before the raw-byte equality gate",
+      "false_branch": "only nonzero-history rows apply p0 clipping and the registered adapter formula",
+      "serialization": "after the raw-byte gate, serialize both branches with .12f for prediction tables",
+      "gates": [
+        "fallback output float64 bytes equal original p0 bytes for every masked row",
+        "the exact same mask bytes and row-key hash are bound by every adapter job",
+        "masked row count and independent-world count meet the power-owned floor"
+      ]
+    },
+    "loss_primitive": "numpy.logaddexp",
+    "probability_primitive": "stable_expit",
+    "l2_penalty": 2.0,
+    "scale_centering": false,
+    "scale_floor": 1e-12,
+    "scale_formula": "for each feature j, sqrt((1/W)*sum_w((1/n_w)*sum_i z_wij^2)) over the sealed correct unrewired M2 train C40 matrix; if the result is <=1e-12 set it to 1.0",
+    "scale_source": "correct unrewired M2 train identity33 only, without labels or p0",
+    "one_shared_scale_for_m2_and_all_five_m1": true,
+    "m1_specific_or_label_aware_scale_forbidden": true,
+    "job_cartesian_product": {
+      "base_models": ["operational_primary", "c0_sensitivity"],
+      "history_training_sources": ["M2", "M1_seed_01", "M1_seed_02", "M1_seed_03", "M1_seed_04", "M1_seed_05"],
+      "independent_beta_job_count": 12,
+      "rule": "each job uses that base model's own frozen train p0, the one shared M2-derived scale and the selected history source z; primary and C0 beta artifacts or hashes may never be reused across bases",
+      "evaluation": "development, Audit A and Audit B inference for every trained job uses the same base's p0 and the correct observed M2 z; M1 destination-keyed deranged z is train-only",
+      "m0_has_no_beta": true
+    },
+    "solver": "scipy.optimize.minimize(method='L-BFGS-B')",
+    "scipy_version": "1.15.3",
+    "input_dtype_layout": "C-contiguous little-endian float64; 33 columns in history_features.feature_names order",
+    "objective": "sum over train C40 rows of world-equal weight*(numpy.logaddexp(0,eta)-y*eta) + 0.5*l2_penalty*dot(beta,beta), where each row in world w has weight 1/(W*n_w)",
+    "analytic_gradient": "X.T @ (weight*(stable_expit(eta)-y)) + l2_penalty*beta, returned as contiguous float64 in the same 33-column order",
+    "minimize_call": {
+      "jac": "analytic_gradient callable",
+      "bounds": null,
+      "options": {
+        "maxiter": 10000,
+        "maxfun": 1000000,
+        "maxls": 100,
+        "ftol": 1e-12,
+        "gtol": 1e-08
+      }
+    },
+    "beta_initialization": "zeros(33)",
+    "maxiter": 10000,
+    "maxls": 100,
+    "ftol": 1e-12,
+    "gtol": 1e-08,
+    "final_gradient_infinity_norm_maximum": 1e-07,
+    "success": "result.success is true, status is 0, beta/objective/gradient are finite, and final gradient infinity norm <=1e-7",
+    "artifact_serialization": "JSON decimal values formatted with Python .17g plus SHA256 of the exact contiguous little-endian float64 beta bytes and shared-scale bytes",
+    "prediction_replay": "recompute from persisted float64 beta/scale and require exact .12f probability serialization plus raw float64-byte SHA256 equality"
+  },
+  "security": {
+    "split_visibility_contract": {
+      "train_observed": "available only to the preregistered structural, public-input, M0, history and adapter-stage capabilities according to the lifecycle; human inspection is permitted only after dataset release lock and must be logged",
+      "development_observed": "same capability boundary as train, but labels remain closed until threshold/validity stage and any human open is logged",
+      "audit_a_observed": "stored in a distinct blind_observed_custody/audit_a ACL root; before models, thresholds, statistics code, blind predictor outputs and identity lock are sealed it is unavailable to humans, general workspace and interactive tools",
+      "audit_b_observed": "stored in a distinct blind_observed_custody/audit_b ACL root that is never co-mounted with Audit A; same prelock human/general-workspace prohibition",
+      "audit_allowed_prelock_capabilities": [
+        "noninteractive structural validator emitting only fixed booleans/counts/hashes",
+        "public-input projector",
+        "m0_public_scorer",
+        "identity_history_m2_worker",
+        "blind_predictor"
+      ],
+      "candidate_sampling_audit": "readable only by the split candidate-integrity sealer; the structural auditor receives only the recursively exact nonjoinable aggregate candidate receipt and its fixed parent-seal projection; humans receive only fixed aggregate booleans, counts and hashes",
+      "audit_diagnostic_projection": "created byte-for-byte by the fixed projection capability, hashed and sealed before identity_experiment_lock; the corresponding sequential unseal only releases those immutable bytes to the evaluator and may not recreate, filter or modify the projection",
+      "raw_or_redacted_text_parser_rows_safe_slots_c40_and_query_manifest_are_not_dataset_public_for_audit_splits": true,
+      "human_or_interactive_successful_open_count_before_lock": 0,
+      "general_workspace_mount_count_before_lock": 0,
+      "acl_mount_and_access_log_validation_required": true
+    },
+    "cpu_capability_launcher_required": true,
+    "python_audit_hook_required": true,
+    "access_log": "O_APPEND hash chain",
+    "audit_a_b_distinct_os_acl_or_mount_required_for_formal": true,
+    "manifest_contract": {
+      "parent_manifests": "UTF-8 role-sorted array of objects with exact role,file_sha256,content_sha256; zero, one or multiple parents allowed",
+      "files_paths": "stage-output-relative paths only",
+      "canonical_self_hash": "SHA256 of UTF-8 canonical JSON of the manifest after removing the canonical_self_hash field; sorted keys, ensure_ascii=false, separators comma-colon, no newline",
+      "parent_content_sha256": "the parent's validated canonical_self_hash",
+      "manifest_file_sha256": "SHA256 of exact persisted manifest bytes including canonical_self_hash",
+      "manifest_must_not_list_itself_in_files": true
+    },
+    "oracle_forbidden_from": [
+      "parser",
+      "redactor",
+      "candidate",
+      "query",
+      "legacy18",
+      "labse",
+      "m0",
+      "placebo",
+      "adapter_train",
+      "development_threshold",
+      "blind_predictor"
+    ],
+    "controller_mechanism_and_structure_secret_forbidden_from": [
+      "parser",
+      "redactor",
+      "candidate",
+      "query",
+      "structural_audit",
+      "legacy18",
+      "labse",
+      "m0",
+      "placebo",
+      "adapter_train",
+      "development_threshold",
+      "blind_predictor"
+    ],
+    "independent_dgp_replayer_forbidden_inputs": [
+      "producer controller_membership",
+      "producer controller_style_groups",
+      "producer mechanism_assignments",
+      "producer identity_assets",
+      "producer positive_targets",
+      "producer negative_flags",
+      "producer override_audit",
+      "producer solver_audit",
+      "renderer slots or AST",
+      "raw or redacted text",
+      "parser rows",
+      "labels or qrels",
+      "model inputs or scores",
+      "another split key or custody root"
+    ],
+    "renderer_slots_and_asts_allowed_only_for": [
+      "generator",
+      "safe_slot_projector",
+      "text_rewire_diagnostic",
+      "structural_audit"
+    ],
+    "renderer_slots_and_asts_forbidden_from": [
+      "parser",
+      "redactor",
+      "legacy18",
+      "labse",
+      "m0",
+      "candidate",
+      "query",
+      "identity_history",
+      "adapter_train",
+      "development_threshold",
+      "blind_predictor"
+    ],
+    "candidate_sampling_audit_forbidden_from": [
+      "legacy18",
+      "labse",
+      "m0",
+      "identity_history",
+      "metadata_shortcut",
+      "m1_support_comparator",
+      "adapter_train",
+      "development_threshold",
+      "blind_predictor"
+    ],
+    "worker_forbidden_events": [
+      "subprocess.Popen",
+      "os.system",
+      "shell",
+      "network_connect",
+      "unlisted_ctypes_dynamic_load",
+      "unlisted_native_executable"
+    ],
+    "dataset_custody_deployment": {
+      "path": "schema/step28_v13_dataset_custody_deployment.json",
+      "sha256": null,
+      "required_before_dataset_release_lock": true,
+      "scope": "split-specific generator, producer-private minimal DGP projection sealer, independent DGP replayer, no-key parent-verifying DGP comparator, oracle, separately isolated parser, redactor, parser expectation, sealer and label-free structural audit capabilities only"
+    },
+    "identity_custody_deployment": {
+      "owned_by_identity_child": true,
+      "dataset_parent_path_and_hash_must_remain_absent": true,
+      "required_at": "identity_experiment_lock"
+    },
+    "minimal_gpu_policy_projection": {
+      "owned_by_identity_child": true,
+      "dataset_parent_path_and_hash_must_remain_absent": true,
+      "required_at": "identity_experiment_lock",
+      "static_policy_must_not_contain_run_specific_input_paths_or_hashes": true,
+      "sync_manifest_binds_dynamic_input_and_cpu_map_hashes": true,
+      "full_dataset_experiment_and_parent_policies_forbidden_from_cuda": true
+    },
+    "minimal_cpu_chunk_policy_projection": {
+      "owned_by_identity_child": true,
+      "dataset_parent_path_and_hash_must_remain_absent": true,
+      "required_at": "identity_experiment_lock",
+      "contains_four_tokenizer_specs_and_shared_chunking_only": true,
+      "full_parent_policy_forbidden_from_cpu_chunk_workspace": true,
+      "forbidden_from_cuda": true
+    },
+    "capability_statements_are_required_future_formal_behavior": true,
+    "capabilities": {
+      "formal_split_generators": "four separate processes/accounts; each reads one committed secret structure key and writes only its split observed data plus its split oracle custody; A and B secrets/roots never coexist",
+      "split_private_independent_dgp_replayer": "runs from an empty allow-listed workspace and imports only its independent standard-library implementation; reads the public policy, UID-only world/seller/all-item/nonempty-title/nonempty-description pools and exactly one committed split key; producer oracle, renderer/parser artifacts, raw text, labels, model files, another split root and another split key are absent; writes a private expected-decision ledger and key-free receipt, then loses key access",
+      "split_private_producer_dgp_projection_sealer": "required future formal behavior: inside producer-private custody, read only the exact producer tables needed for comparison and emit an exact-schema minimal typed projection plus an externally sealed parent manifest; raw identity values and rendered occurrence identity UIDs are excluded, while the synthetic identity_asset_uid required for exact topology comparison is retained; text, slot flow, parser rows and noncomparison solver fields are excluded",
+      "split_private_dgp_comparator": "required future formal behavior: hold no structure key and read only the sealed minimal producer decision projection with its external custody parent plus the independently sealed replay ledger and receipt; verify the exact policy file bytes, mode, split, complete registered world set, ledger envelope/self-hash, typed table/component counts and hashes, file/content hashes, source closure and external custody parent links before comparing membership, markets, controller style groups, mechanism slots, positive/negative targets, identity asset topology/types, all repeat decisions and registered override decisions exactly; publish only fixed counts, hashes and booleans",
+      "parser_worker": "reads only the minimum observed projection and public parser contract; parser expectations, slot/AST plan, replay artifacts, oracle and labels are absent",
+      "redactor_worker": "reads only minimum observed rows, parser output, minimum redaction registry and public redaction contract; private expectations, slot/AST plan, replay artifacts, oracle and labels are absent",
+      "render_integrity_projection_sealer": "required future formal behavior: inside generator-private custody, read observed/redacted text, parser output, private expectations, renderer slot/noise audit and raw render AST; exact-schema validate every input table and prove every row is consumed by exactly the registered split world set; write only a non-joinable aggregate receipt containing fixed booleans, counts and hashes, with no world/seller/item/style UID or text; controller membership, controller style groups, mechanism, solver, structure key and labels are absent",
+      "candidate_integrity_projection_sealer": "required future formal behavior: a separate projector first emits an exact-schema public candidate policy projection containing only the four frozen Step3/Step4 pins, observed/pair schemas and candidate design; every nested value and type must match the frozen candidate static-contract SHA-256, not merely an allowed key name, and the projector/context builder requires canonical-byte equality with the exact projection derived from the registered full policy. Randomness, structure/id/text/identity/query/rewire keys, controller/mechanism/solver/labels/qrels and the full policy are absent. For one split the sealer reads that externally sealed projection, raw observed sellers/items, complete pair universe, candidate projection and sampling audit, frozen Step3/Step4 bytes, an exact registered-world receipt context and exactly one separately mounted candidate key; rerun the complete 378-to-C40 pipeline and separately rerun frozen Step3/Step4 then project trigger flags, primary layer, lexical serialization and structural support without calling the C40 producer; both paths must match the sealed input exactly. Labels, oracle, structure key and model inputs/scores are absent; emit only a fixed nonjoinable aggregate receipt",
+      "structural_auditor": "required future formal behavior: for train read only externally sealed, non-joinable aggregate receipts from render integrity, candidate integrity, M1 derangement integrity and independent DGP comparison; for development, audit_a and audit_b read the same exact role set without M1 because M1 is train-only; read the matching split-exact minimal parent-seal projections; observed/redacted text, parser rows, seller/item/pair join keys, derangement mapping, raw render AST, controller-linked base style/group oracle, structure key, mechanism, solver and labels are absent",
+      "development_same_producer_regeneration": "development-smoke only; at the publication boundary deep-copy and validate the caller snapshot, reload all registered inputs, regenerate the complete split, require canonical-byte equality, and persist only the fresh result; reports independent_replay=false and is forbidden as formal evidence",
+      "public_input_projector": "reads observed world/seller membership and v4-redacted text, writes full-378-per-world opaque inputs and CPU-only maps; forbids candidates, retrieval roles, labels, oracle and identity features",
+      "m0_public_scorer": "reads only exact-schema complete_model_pair_endpoints.csv, v4-redacted seller text, the frozen operational LightGBM+legacy18+LaBSE payload and allowed label-free runtime policies; scores exactly all 378 pairs per world before any private evaluation filtering; C40, query/gallery roles, private pair-role map, candidate audit, identity occurrences/features, oracle, labels and qrels are forbidden and every successful forbidden open count is zero",
+      "cpu_chunker": "reads only opaque unique text, static CPU chunk projection and four tokenizers; writes shared chunks; forbids maps, full parent and GPU policy",
+      "sync_builder": "reads projector/chunk seals, static GPU policy and LaBSE fingerprint; writes CPU-side immutable sync manifest; reads map commitments but not map files",
+      "cuda_materializer": "creates an empty CUDA root from sync destination-relative exact members and writes a materialization receipt outside the CUDA input root",
+      "cuda_encoder": "reads only materialized CUDA root and writes exact-member output bundle",
+      "collector": "reads bundle, materialization/sync/identity-lock receipts and CPU map seal; performs two-parent merge",
+      "evaluation_projector": "reads sealed all-378 p0/identity33 plus the private pair-role map, writes endpoint-only task matrices and directed retrieval joins; model fitting, labels, candidate audit and oracle are forbidden",
+      "label_formula_validator": "independently recomputes classification and retrieval integer supervision from split controller membership plus safe endpoint manifests without reading materialized values, then compares exact keysets and every row; writes row-count and exact-formula-equality booleans; model inputs and adapter artifacts forbidden",
+      "nuisance_shortcut_validator": "reads one split labels plus its sealed exact 14-column null-nuisance projection; registered style/category/market signals, mechanism coverage, parser rows, raw text, identity33, M0 scores and adapter artifacts forbidden",
+      "mechanism_coverage_validator": "reads one split labels plus its sealed designated-target projection and frozen power minima; nuisance projection, model scores, identity33 and adapter artifacts forbidden",
+      "safe_slot_projector": "label-free capability reads observed item/seller/world membership, actual parser rows and the exact edit schema containing coordinates, type, downstream value and raw surface but no derived UID or planned field; independently derives identity/bundle UIDs and nuisance classes, writes only the exact safe-slot schema plus identity_uid,nuisance_class ledger; oracle, labels, controller, mechanism, planned role, private expectation and supervision are forbidden",
+      "m1_derangement_worker": "for one registered seed reads only sealed M2 identity33, public complete pair endpoints, the four-column endpoint-only frozen C40 and public placebo policy; writes one destination-keyed identity33 matrix plus a private mapping for its integrity sealer; every other seed, candidate trigger/sampling audit, controller, mechanism, oracle, labels, supervision, M0 and text-rewire lineage are forbidden; unknown columns fail and access-hook counts for every forbidden input must be zero",
+      "identity_history_m2_worker": "reads only the sealed exact-schema original history_safe_occurrences.csv plus the public complete pair universe; full structural parser output, rewire lineage, oracle, labels and supervision are forbidden; unknown columns fail and forbidden open counts must be zero",
+      "m1_support_comparator": "reads sealed M2 and five M1 train identity33 matrices plus endpoint-only frozen C40 and full-378 pair sets; candidate trigger/audit fields, labels, supervision, oracle, parser rows, text-rewire lineage and private source-to-destination mappings are forbidden; C40 is the primary validity gate and full-378 is a separate diagnostic",
+      "development_source_closure": "development parent projections recursively discover and hash repository-local Python imports plus registered schema dependencies; role-only imports are lazy and every discovered member is perturbation-tested. Relative imports, relative dynamic targets and nonliteral direct dynamic imports fail closed. The exact registered alias/indirect patterns rejected are limited to importlib aliases, any import builtins statement, from-import of import_module, non-direct importlib.import_module attribute use, direct getattr/vars on importlib or builtins, and import_module/__import__ attributes on another object. Direct use of the __builtins__ name and direct calls to compile/eval/exec/globals/locals also fail closed; only direct absolute string-literal dynamic targets are accepted. This development AST check does not claim to sandbox reflection hidden behind aliases, custom dispatch or other unregistered syntax. A conservative repo-local superset is allowed. Formal evidence additionally requires frozen source review, a third-party environment lock and exact fresh-process loaded-module inventory, which are not yet implemented",
+      "identity_scale_fitter": "reads only the sealed correct unrewired M2 train identity33 matrix without p0 or labels; writes the one world-equal RMS scale artifact shared by M2 and all five M1 jobs",
+      "adapter_train": "reads only frozen shared scale, sealed train p0, one selected destination-keyed identity33 matrix and train labels; derangement mappings, text-rewire manifests, parser occurrences, safe slots, ASTs and ledgers are forbidden; writes beta only and binds the shared scale hash",
+      "development_threshold": "reads frozen beta/scale and development p0/identity33/labels; beta or scale writes forbidden; writes thresholds only",
+      "blind_predictor": "reads frozen models/thresholds and observed A/B model inputs; all supervision, qrels, mechanism projections, derangement mappings, text-rewire lineage and oracle are forbidden"
+    },
+    "cuda_os_sandbox": {
+      "required": true,
+      "independent_uid_or_rootless_container": true,
+      "read_only_exact_allowlist_mounts": true,
+      "single_writable_output_mount": true,
+      "repo_and_cpu_uid_maps_not_mounted": true,
+      "network_namespace_and_egress_disabled": true,
+      "runner_image_mount_and_acl_manifest_hashes_frozen_by_identity_child": true,
+      "python_audit_hook_alone_is_insufficient": true
+    },
+    "gpu_forbidden_payloads": [
+      "raw_items",
+      "non_opaque_identifiers",
+      "split",
+      "candidate_trigger",
+      "retrieval_role",
+      "identity_features",
+      "rewire_ledger",
+      "parsed_identity_occurrences",
+      "identity_values",
+      "identity_graph",
+      "identity_registry",
+      "renderer_slots",
+      "render_asts",
+      "english_reference",
+      "joblib",
+      "controller",
+      "mechanism",
+      "labels",
+      "qrels"
+    ],
+    "gpu_allowed_outputs": [
+      "transport_bundle_exact_members_only"
+    ],
+    "gpu_transport_bundle_exact_members": [
+      "labse.item_aggregates.csv",
+      "runtime_manifest.json",
+      "bundle_manifest.json"
+    ],
+    "gpu_manifest_exact_schemas": {
+      "runtime_manifest": {
+        "maximum_bytes": 65536,
+        "unknown_keys_forbidden": true,
+        "only_fixed_scalar_fields_and_fixed_small_runtime_or_count_objects": true,
+        "pair_chunk_text_or_embedding_length_arrays_forbidden": true
+      },
+      "bundle_manifest": {
+        "maximum_bytes": 16384,
+        "unknown_keys_forbidden": true,
+        "members": "exactly two regular-file records for labse.item_aggregates.csv and runtime_manifest.json, each with basename,size_bytes,sha256",
+        "canonical_self_hash_required": true
+      },
+      "aggregate_csv": {
+        "exact_schema": "opaque_pair_id plus six LaBSE columns",
+        "row_universe": "all 378 unordered pairs per world",
+        "float_serialization": ".12f"
+      }
+    },
+    "gpu_embedding_matrix_persistence_forbidden": true
+  },
+  "prior_synthetic_namespace_sources": [
+    "reports/step28_transferable_identity_history/v6_20260720",
+    "reports/step28_transferable_identity_history/v7_20260720",
+    "reports/step28_transferable_identity_history/v8_20260720",
+    "reports/step28_transferable_identity_history/v9_20260720",
+    "reports/step28_transferable_identity_history/v10_20260720",
+    "reports/step28_transferable_identity_history/v11_20260720",
+    "reports/step28_transferable_identity_history/v12_20260720"
+  ],
+  "formal_freeze_requirements": [
+    "all dataset-release-owned referenced paths and SHA-256 values validate; identity-child-owned absent references are explicitly excluded and remain absent forever",
+    "four formal secret structure-key commitments are non-null, pairwise distinct, differ from every compromised draft commitment, and each injected secret is verified inside its own custody account",
+    "style source boundary and style profile are materialized and hashed",
+    "power design is materialized and hashed",
+    "dataset custody deployment is fully specified and hashed",
+    "separate parser, redactor and structural-auditor formal launchers enforce their exact read/write allow-lists",
+    "render, candidate and M1-derangement sealers each emit the recursively exact-schema, nonjoinable split-aggregate receipt registered in the custody deployment; the independent-DGP aggregate receipt validates the actual replay ledgers rather than only comparison claims; every receipt binds the exact policy file bytes plus mode, split and complete registered world set; world/seller/item/pair/style/trigger keys, text, paths and dynamic nested objects are forbidden",
+    "the structural auditor reads exactly four fixed aggregate receipts and four fixed parent-seal projections for train, but exactly three of each for development, audit_a and audit_b because M1 is train-only; every projection contains only role plus file/content/source/access-summary hashes, never full manifests or access events",
+    "each aggregate validator requires release-exact version and evidence constants and independently recomputes every fixed boolean, count and hash from sealed inputs",
+    "support-comparability thresholds are finalized before formal generation",
+    "all dataset-release scripts through step28_v13_audit_dataset.py and dataset contract tests pass",
+    "development smoke passes without producing scientific metrics",
+    "contract, policy, template, producers and power design are bound by one release manifest",
+    "status is changed to FROZEN in a new immutable policy version"
+  ]
+}

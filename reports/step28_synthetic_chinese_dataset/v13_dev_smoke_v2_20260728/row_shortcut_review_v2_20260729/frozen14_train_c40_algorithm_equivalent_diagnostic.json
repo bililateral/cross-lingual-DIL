@@ -1,0 +1,82 @@
+{
+  "version": "2026-07-29-step28-v13-smoke-frozen14-algorithm-equivalent-diagnostic-v1",
+  "status": "FAIL_DEVELOPMENT_DIAGNOSTIC_NOT_FORMAL_EXECUTION",
+  "boundary": {
+    "purpose": "User-directed row-by-row shortcut review of the existing development smoke dataset",
+    "supervised_split_opened": "train",
+    "audit_a_b_oracle_opened": false,
+    "formal_status_granted": false,
+    "formal_environment_match": false
+  },
+  "dataset_root": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/dataset_smoke_v3",
+  "environment": {
+    "scikit_learn_observed": "1.7.2",
+    "scikit_learn_frozen": "1.7.1"
+  },
+  "input_snapshots": [
+    {
+      "path": "train/observed/candidate_pairs.csv",
+      "sha256": "3c3d158cfe99c3fedc36a88a0e99a331b5831db00c31f75c6021d68f2d12da09",
+      "size_bytes": 137662
+    },
+    {
+      "path": "train/observed/redacted_items.jsonl",
+      "sha256": "6c7b7db58645b1790d3333c1097e0266b8c6029bc32d1ee87c6587d06b360dbc",
+      "size_bytes": 613313
+    },
+    {
+      "path": "train/observed/history_item_index.csv",
+      "sha256": "97f04e659eb066d2c7f939f9b6d460932fd673a27a9bf35bacc09b74712b65f2",
+      "size_bytes": 207249
+    },
+    {
+      "path": "train/oracle/controller_membership.csv",
+      "sha256": "b74b09cf69886645d6011c52517cf7295b79f0fad4e64a36ce1b1089d635e60d",
+      "size_bytes": 57436
+    }
+  ],
+  "row_count": 400,
+  "world_count": 10,
+  "rows_per_world": 40,
+  "fold_count": 5,
+  "fold_seed": 2026072707,
+  "feature_order": [
+    "absdiff__item_count",
+    "absdiff__title_missing_rate",
+    "absdiff__description_missing_rate",
+    "absdiff__time_bucket_probability_00",
+    "absdiff__time_bucket_probability_01",
+    "absdiff__time_bucket_probability_02",
+    "absdiff__time_bucket_probability_03",
+    "sum__item_count",
+    "sum__title_missing_rate",
+    "sum__description_missing_rate",
+    "sum__time_bucket_probability_00",
+    "sum__time_bucket_probability_01",
+    "sum__time_bucket_probability_02",
+    "sum__time_bucket_probability_03"
+  ],
+  "model_metrics": {
+    "logistic_l2": {
+      "roc_auc": 0.5580314867424243,
+      "roc_auc_symmetric": 0.5580314867424243
+    },
+    "gradient_tree": {
+      "roc_auc": 0.579782196969697,
+      "roc_auc_symmetric": 0.579782196969697
+    },
+    "rbf_svm": {
+      "roc_auc": 0.5282019412878788,
+      "roc_auc_symmetric": 0.5282019412878788
+    }
+  },
+  "point_statistic_max_auc_symmetric": 0.579782196969697,
+  "point_maximum": 0.52,
+  "point_gate_pass": false,
+  "bootstrap_replicates": 9999,
+  "bootstrap_base_seed": 2026072711,
+  "bootstrap_draw_matrix_sha256": "dc74d09a93d54992ecb89508b668e5d543b5825829155b420f9c77cff0176330",
+  "bootstrap_95_upper": 0.6498063727155377,
+  "bootstrap_95_upper_maximum": 0.53,
+  "bootstrap_upper_gate_pass": false
+}

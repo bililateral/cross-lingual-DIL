@@ -1,0 +1,362 @@
+{
+  "audit_runner": {
+    "audit_a_b_only_at_sequential_unseal": true,
+    "dataset_parent_mount_forbidden": true,
+    "input_basenames": {
+      "label_formula_receipt": "label_formula_validation.json",
+      "labels": "classification_labels.csv",
+      "projection": "null_nuisance_pairs.csv"
+    },
+    "oracle_text_identity_m0_adapter_mount_forbidden": true,
+    "train_development_combination_forbidden": true
+  },
+  "bootstrap_draw_hash_dtype": ">u8",
+  "canonical_self_hash": "116457ccc109fed20e9d1eacb8133a0a968ef336d2bde9cb08e952613a4abc91",
+  "claim_boundary": {
+    "absence_of_all_unknown_shortcuts_proven": false,
+    "mechanism_coverage_validator_included": false,
+    "pass_dataset_only_granted": false,
+    "pass_scope": "PASS_METADATA_SHORTCUT_ONLY"
+  },
+  "dependency_closure_sha256": {
+    "scripts/step28_v13_common.py": "2293a479dc28fe95b50b0c0c997a2a60343cea71cc3eaac5ff8249e0ba51d863"
+  },
+  "engineering_smoke_release": {
+    "content_sha256": "1515e98eda652ba06c3f5a29ea9695df358256da2d527d727813a715a0b54141",
+    "numeric_shortcut_execution_forbidden": true,
+    "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/dataset_smoke_v3/release_manifest.json",
+    "reason": "The parent contract forbids feature-by-label and AUC outputs for smoke; development has only three worlds and cannot satisfy fixed five-fold OOF.",
+    "sha256": "c093313c3a68f601a29e52dc7f2d8a99eb0ffcb8d9a5d7c2d50b09dcb7a621aa",
+    "status": "DEVELOPMENT_SMOKE_COMPLETE_NOT_SCIENTIFIC_EVIDENCE"
+  },
+  "float_serialization": ".12f",
+  "formal_execution": {
+    "custody_access_manifest_content_sha256": null,
+    "enabled": false,
+    "enablement_rule": "Create a new versioned execution lock after every prerequisite is independently verified; never edit this blocked lock in place.",
+    "exact_input_bindings": null,
+    "execution_environment_content_sha256": null,
+    "formal_release_content_sha256": null,
+    "missing_prerequisites": [
+      "parent policy status FROZEN and formal_generation_enabled true",
+      "frozen power artifact and selected audit world count",
+      "one-shot formal structure-key ceremonies and formal dataset release",
+      "frozen Identity experiment child policy and custody deployment",
+      "separate read-only projection, supervision, and validation capabilities",
+      "exact formal root/child/world-set and input-file SHA bindings",
+      "externally generated custody deployment and access-log receipts",
+      "split-specific train/development/A/B authorization receipts",
+      "exact NumPy 2.2.6 and scikit-learn 1.7.1 execution environment"
+    ],
+    "split_authorizations": {
+      "audit_a": {
+        "allowed_operations": [
+          "label_sealing",
+          "label_formula_validation",
+          "metadata_shortcut_audit"
+        ],
+        "authorization_receipts": {
+          "label_formula_validation": null,
+          "label_sealing": null,
+          "metadata_shortcut_audit": null
+        },
+        "authorized": false,
+        "required_prior_receipts": [],
+        "required_prior_statuses": [
+          {
+            "operation": "metadata_shortcut_audit",
+            "role": "train_metadata_shortcut_pass",
+            "split": "train",
+            "status": "PASS_METADATA_SHORTCUT_ONLY"
+          },
+          {
+            "operation": "metadata_shortcut_audit",
+            "role": "development_metadata_shortcut_pass",
+            "split": "development",
+            "status": "PASS_METADATA_SHORTCUT_ONLY"
+          },
+          {
+            "operation": "blind_prediction_freeze",
+            "role": "audit_a_blind_predictions_frozen",
+            "split": "audit_a",
+            "status": "BLIND_PREDICTIONS_FROZEN"
+          },
+          {
+            "operation": "sequential_unseal",
+            "role": "audit_a_unseal_authorized",
+            "split": "audit_a",
+            "status": "AUDIT_A_SEQUENTIAL_RELEASE_AUTHORIZED"
+          }
+        ]
+      },
+      "audit_b": {
+        "allowed_operations": [
+          "label_sealing",
+          "label_formula_validation",
+          "metadata_shortcut_audit"
+        ],
+        "authorization_receipts": {
+          "label_formula_validation": null,
+          "label_sealing": null,
+          "metadata_shortcut_audit": null
+        },
+        "authorized": false,
+        "required_prior_receipts": [],
+        "required_prior_statuses": [
+          {
+            "operation": "metadata_shortcut_audit",
+            "role": "train_metadata_shortcut_pass",
+            "split": "train",
+            "status": "PASS_METADATA_SHORTCUT_ONLY"
+          },
+          {
+            "operation": "metadata_shortcut_audit",
+            "role": "development_metadata_shortcut_pass",
+            "split": "development",
+            "status": "PASS_METADATA_SHORTCUT_ONLY"
+          },
+          {
+            "operation": "blind_prediction_freeze",
+            "role": "audit_b_blind_predictions_frozen",
+            "split": "audit_b",
+            "status": "BLIND_PREDICTIONS_FROZEN"
+          },
+          {
+            "operation": "overall_dataset_gate",
+            "role": "audit_a_overall_pass",
+            "split": "audit_a",
+            "status": "PASS_A_ONLY"
+          },
+          {
+            "operation": "sequential_unseal",
+            "role": "audit_b_unseal_authorized",
+            "split": "audit_b",
+            "status": "AUDIT_B_SEQUENTIAL_RELEASE_AUTHORIZED"
+          }
+        ]
+      },
+      "development": {
+        "allowed_operations": [
+          "label_sealing",
+          "label_formula_validation",
+          "metadata_shortcut_audit"
+        ],
+        "authorization_receipts": {
+          "label_formula_validation": null,
+          "label_sealing": null,
+          "metadata_shortcut_audit": null
+        },
+        "authorized": false,
+        "required_prior_receipts": [],
+        "required_prior_statuses": [
+          {
+            "operation": "metadata_shortcut_audit",
+            "role": "train_metadata_shortcut_pass",
+            "split": "train",
+            "status": "PASS_METADATA_SHORTCUT_ONLY"
+          }
+        ]
+      },
+      "train": {
+        "allowed_operations": [
+          "label_sealing",
+          "label_formula_validation",
+          "metadata_shortcut_audit"
+        ],
+        "authorization_receipts": {
+          "label_formula_validation": null,
+          "label_sealing": null,
+          "metadata_shortcut_audit": null
+        },
+        "authorized": false,
+        "required_prior_receipts": [],
+        "required_prior_statuses": []
+      }
+    }
+  },
+  "formal_run_id": "v13_20260727",
+  "formal_world_counts": {
+    "audit_a": 250,
+    "audit_b": 250,
+    "development": 125,
+    "train": 500
+  },
+  "implementation_document": {
+    "path": "docs/STEP28_V13_METADATA_SHORTCUT_AUDIT_LOCK_20260729.zh.md",
+    "sha256": "e9dea83c3cb03934ed94cd6bf1f9a6bfd14476a3d4b978dc72a3d85db431d710"
+  },
+  "label_formula_validator": {
+    "alternative_derivation_required": true,
+    "class_counts_withheld": true,
+    "input_basenames": {
+      "candidate_pairs": "candidate_pairs.csv",
+      "controller_membership": "controller_membership.csv",
+      "label_manifest": "label_manifest.json",
+      "labels": "classification_labels.csv"
+    }
+  },
+  "label_schema": [
+    "canonical_pair_uid",
+    "label"
+  ],
+  "label_sealer": {
+    "all_other_successful_opens_forbidden": true,
+    "formula": "int(controller(left)==controller(right))",
+    "input_basenames": {
+      "candidate_pairs": "candidate_pairs.csv",
+      "controller_membership": "controller_membership.csv"
+    },
+    "nuisance_projection_access_forbidden": true
+  },
+  "objective": "Freeze an exact, label-isolated implementation of the pre-registered 14-feature metadata-shortcut audit without executing it on development smoke data.",
+  "pair_feature_order": [
+    "absdiff__item_count",
+    "absdiff__title_missing_rate",
+    "absdiff__description_missing_rate",
+    "absdiff__time_bucket_probability_00",
+    "absdiff__time_bucket_probability_01",
+    "absdiff__time_bucket_probability_02",
+    "absdiff__time_bucket_probability_03",
+    "sum__item_count",
+    "sum__title_missing_rate",
+    "sum__description_missing_rate",
+    "sum__time_bucket_probability_00",
+    "sum__time_bucket_probability_01",
+    "sum__time_bucket_probability_02",
+    "sum__time_bucket_probability_03"
+  ],
+  "parent_contract": {
+    "path": "docs/STEP28_V13_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md",
+    "sha256": "e9984ee53a0572d50f3b8fe099208c1a01d71ca12dd87485f5ada802d38942e3"
+  },
+  "parent_metadata_contract_sha256": "116926d5de8923d82e1e758d1ba198a86e4663dec6d77360a853d03100e0fbf7",
+  "parent_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "sha256": "3239a36b052323950d9e9fe8b6e14ca56107f9e4369f26bf88d0d74ff1557e17"
+  },
+  "pretrain_audit_splits": [
+    "train",
+    "development"
+  ],
+  "private_oof_schema": [
+    "canonical_pair_uid",
+    "world_uid",
+    "label",
+    "fold",
+    "score_logistic_l2",
+    "score_gradient_tree",
+    "score_rbf_svm"
+  ],
+  "projection_schema": [
+    "canonical_pair_uid",
+    "world_uid",
+    "absdiff__item_count",
+    "absdiff__title_missing_rate",
+    "absdiff__description_missing_rate",
+    "absdiff__time_bucket_probability_00",
+    "absdiff__time_bucket_probability_01",
+    "absdiff__time_bucket_probability_02",
+    "absdiff__time_bucket_probability_03",
+    "sum__item_count",
+    "sum__title_missing_rate",
+    "sum__description_missing_rate",
+    "sum__time_bucket_probability_00",
+    "sum__time_bucket_probability_01",
+    "sum__time_bucket_probability_02",
+    "sum__time_bucket_probability_03"
+  ],
+  "projector": {
+    "all_other_successful_opens_forbidden": true,
+    "input_basenames": {
+      "candidate_pairs": "candidate_pairs.csv",
+      "history_item_index": "history_item_index.csv",
+      "redacted_items": "redacted_items.jsonl"
+    },
+    "label_access_forbidden": true
+  },
+  "seller_feature_order": [
+    "item_count",
+    "title_missing_rate",
+    "description_missing_rate",
+    "time_bucket_probability_00",
+    "time_bucket_probability_01",
+    "time_bucket_probability_02",
+    "time_bucket_probability_03"
+  ],
+  "source_closure_sha256": "9763f6e7c39c612c4ea71c76fd10d35ebb90f7d144ad808dcb4758a9584fd446",
+  "source_files_sha256": {
+    "scripts/step28_v13_build_metadata_shortcut_lock.py": "4a42ed5412adc5a0e1d5f253f294c4a55b77edf4f07b60800e4cc338d3ed56ba",
+    "scripts/step28_v13_metadata_shortcut_common.py": "bbdbf5b4f2e5b344d99f4d22d995a8ea4def22ae0071546a0f0ba359ffcce4f0",
+    "scripts/step28_v13_project_null_nuisance.py": "dcae56e97f3c370890ee9ffa7002bc04908a86ca81eb9d86040611797f1732c6",
+    "scripts/step28_v13_run_metadata_shortcut_audit.py": "ad1968b93f3566cb6c7add7832a5757d274d00d429ea3a802d1c3694a8ac54ed",
+    "scripts/step28_v13_seal_classification_labels.py": "89d65a5358f4b408e676c9da97186c4efab8487d45a2ce8038ffd3e06041d2ea",
+    "scripts/step28_v13_validate_label_formula.py": "13cd2f100f0f38e8d557c1c273398c1a83c043fb37b236db60d1ec88a691d761",
+    "tests/test_step28_v13_metadata_shortcut_audit_contracts.py": "e63f3ee3ba3d676668d7f5572928da3eede6db40dab15664d87fd6a99dfcb06e"
+  },
+  "splits": [
+    "train",
+    "development",
+    "audit_a",
+    "audit_b"
+  ],
+  "statistics": {
+    "bootstrap": {
+      "base_seed": 2026072711,
+      "bit_generator": "numpy.random.PCG64DXSM",
+      "draw_shape": "[9999, number_of_worlds]",
+      "quantile_method": "higher",
+      "refit_models": false,
+      "replicates": 9999,
+      "single_class_replicate_rule": "split validity failure",
+      "split_seed": "SHA256(ASCII base_seed + 0x1f + split_name) first 128 bits as unsigned big-endian",
+      "statistic": "resample worlds, recompute each model AUC_sym on frozen OOF scores, then take max across models",
+      "unit": "world",
+      "upper_quantile": 0.95,
+      "world_order": "world_uid UTF-8 byte order"
+    },
+    "bootstrap_95_upper_maximum": 0.53,
+    "fold_random_seed": 2026072707,
+    "models": {
+      "gradient_tree": {
+        "class": "sklearn.ensemble.HistGradientBoostingClassifier",
+        "class_weight": null,
+        "early_stopping": false,
+        "fold_train_standardization": false,
+        "l2_regularization": 1.0,
+        "learning_rate": 0.03,
+        "max_depth": 2,
+        "max_iter": 200,
+        "random_state": 2026072707,
+        "score": "decision_function"
+      },
+      "logistic_l2": {
+        "C": 1.0,
+        "class": "sklearn.linear_model.LogisticRegression",
+        "class_weight": null,
+        "fit_intercept": true,
+        "fold_train_standardization": true,
+        "max_iter": 10000,
+        "penalty": "l2",
+        "score": "decision_function",
+        "solver": "lbfgs",
+        "tol": 1e-10
+      },
+      "rbf_svm": {
+        "C": 1.0,
+        "class": "sklearn.svm.SVC",
+        "class_weight": null,
+        "fold_train_standardization": true,
+        "gamma": "scale",
+        "kernel": "rbf",
+        "probability": false,
+        "score": "decision_function"
+      }
+    },
+    "numpy_version": "2.2.6",
+    "point_maximum": 0.52,
+    "scikit_learn_version": "1.7.1",
+    "world_grouped_folds": 5
+  },
+  "status": "CORE_IMPLEMENTATION_LOCKED_FORMAL_EXECUTION_BLOCKED",
+  "version": "2026-07-29-step28-v13-metadata-shortcut-core-implementation-lock-v3"
+}
