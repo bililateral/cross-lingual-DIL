@@ -1,7 +1,7 @@
 # Step 28-v13 正式训练与固定留出中文合成数据集发布合同
 
 更新日期：2026-07-30  
-当前状态：`IMPLEMENTATION_LOCK_IN_PROGRESS / FINAL_AUDIT_REMEDIATION`  
+当前状态：`READY_FOR_KEY_CEREMONY / GIT_BASELINE_FROZEN`  
 目标版本：`v13_training_ready_v1_20260729`
 
 ## 1. 权威范围
@@ -388,3 +388,18 @@ Recall@1/5/10、Hits@1/5/10；同分按 gallery seller UID 的 UTF-8 字节升�
   既有声明跳过、0 失败。新增的一项是 split writer 发布前拒绝重解析成员
   的回归测试；非哨兵 bootstrap 和伪造 OOF 攻击测试也通过。当前进入三路
   最终复审，复审和 Git 基线冻结完成前仍禁止正式私钥仪式。
+- 2026-07-30 v16：三路只读终审均同意进入 Git 基线冻结；文档/指标审核、
+  发布代码审核均无 blocker/high/medium/low，科研审核无
+  blocker/high/medium，唯一 low 是必须在冻结记录中写明实跑命令、计数和
+  环境，本条完成该记录。冻结前实跑
+  `python -m unittest discover -s tests -p "test_step28_v13*.py"`：
+  91 项通过、1 项既有声明跳过、0 失败；实跑
+  `python -m unittest discover -s tests`：360 项通过、7 项既有声明跳过、
+  0 失败。环境为 CPython 3.10.11、NumPy 2.2.6、
+  scikit-learn 1.7.2、Windows AMD64。生成前基线以 576 个显式白名单文件
+  提交为 Git `1a420b309ed269c84bb1c0a9874b3d884ce20469`；提交中无正式
+  私钥、正式数据、`AGENTS.md`、论文 docx 或 Step7/Step24 结果。随后从
+  已提交字节重新执行标准 `--validate-config-only`，590.5 秒后返回
+  `PASS_CONFIG_VALIDATION`，四 split 均为 500 worlds。overlay 现只推进到
+  `READY_FOR_KEY_CEREMONY`，仍保持 `generation_enabled=false`、四个私钥
+  承诺和仪式回执为空；这允许下一步一次性私钥仪式，但尚不允许正式生成。

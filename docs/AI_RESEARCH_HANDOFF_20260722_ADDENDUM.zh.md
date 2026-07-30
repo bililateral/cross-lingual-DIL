@@ -230,5 +230,13 @@ overlay 后，标准 `--validate-config-only` 新进程用 437.6 秒顺序深验
 `checkpointing_enabled=false`，只保留为无效诊断，未事后补造 checkpoint；
 现行 train 为 v8。Step28-v13 专项回归为 91 项通过、1 项按既有声明跳过、
 0 失败；完整仓库回归为 360 项通过、7 项按既有声明跳过、0 失败。三路
-复审和 Git 基线冻结仍待完成。正式私钥、正式分片和最终发布清单继续全部
-为 0。
+只读终审随后均同意进入 Git 基线冻结：文档/指标审核和发布代码审核均无
+blocker/high/medium/low，科研审核无 blocker/high/medium，唯一 low 是在
+冻结记录中写明实跑命令、计数和环境，现已记录到正式发布合同 v16。576 个
+显式白名单文件已提交为 Git
+`1a420b309ed269c84bb1c0a9874b3d884ce20469`；其中没有正式私钥、正式
+数据、`AGENTS.md`、论文 docx 或 Step7/Step24 结果。从该提交字节重新执行
+标准 `--validate-config-only`，590.5 秒后返回
+`PASS_CONFIG_VALIDATION`，四 split 均为 500 worlds。当前 overlay 只推进
+到 `READY_FOR_KEY_CEREMONY`，仍为 `generation_enabled=false`，四个私钥
+承诺、正式分片和最终发布清单继续全部为 0。
