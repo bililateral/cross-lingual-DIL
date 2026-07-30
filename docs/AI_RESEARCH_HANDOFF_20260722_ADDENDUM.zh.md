@@ -237,6 +237,12 @@ blocker/high/medium/low，科研审核无 blocker/high/medium，唯一 low 是�
 `1a420b309ed269c84bb1c0a9874b3d884ce20469`；其中没有正式私钥、正式
 数据、`AGENTS.md`、论文 docx 或 Step7/Step24 结果。从该提交字节重新执行
 标准 `--validate-config-only`，590.5 秒后返回
-`PASS_CONFIG_VALIDATION`，四 split 均为 500 worlds。当前 overlay 只推进
-到 `READY_FOR_KEY_CEREMONY`，仍为 `generation_enabled=false`，四个私钥
-承诺、正式分片和最终发布清单继续全部为 0。
+`PASS_CONFIG_VALIDATION`，四 split 均为 500 worlds。overlay 随后以独立
+Git `46d145d94026021e8184e9db4a341e85e9d3871b` 推进到
+`READY_FOR_KEY_CEREMONY`，仍为 `generation_enabled=false`。一次性四分片
+私钥仪式已在该提交上完成；公开回执 SHA-256 为
+`b421d905e15644d70b92fee9eaea3b653053b25899f8f0ea7b33279523d970d9`，
+四个承诺两两不同、与禁用承诺交集为 0，原始密钥没有返回且私钥目录 Git
+跟踪数为 0。现将公开承诺和回执写回 overlay，并推进到
+`FROZEN_READY_FOR_GENERATION / generation_enabled=true`。这仍只是本地
+逻辑保管，不是 OS custody 或人员盲法；正式分片和最终发布清单继续为 0。

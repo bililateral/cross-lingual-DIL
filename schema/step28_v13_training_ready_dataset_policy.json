@@ -1,7 +1,7 @@
 {
   "version": "2026-07-30-step28-v13-training-ready-dataset-policy-v3-draft",
-  "status": "READY_FOR_KEY_CEREMONY",
-  "generation_enabled": false,
+  "status": "FROZEN_READY_FOR_GENERATION",
+  "generation_enabled": true,
   "run_id": "v13_training_ready_v1_20260729",
   "output_root": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_20260729",
   "target_release_claim_level": "TRAINING_AND_FIXED_HOLDOUT_BYTES_READY_NOT_BLIND_CUSTODY_ATTESTED",
@@ -16,7 +16,7 @@
   },
   "release_contract": {
     "path": "docs/STEP28_V13_TRAINING_READY_SYNTHETIC_CHINESE_RELEASE_CONTRACT_20260729.zh.md",
-    "sha256": "e86394969ab35afd5953684cc216348c512233fa0adceae6dc44e1b815913afb"
+    "sha256": "0530c9799ef31ec0491acbc6c7363cda40805c989eaf0b9ecf8aa862e288d6b1"
   },
   "scientific_contract": {
     "path": "schema/step28_v13_training_ready_scientific_contract.json",
@@ -178,12 +178,15 @@
     "key_files_must_not_be_model_mounted": true,
     "key_files_must_not_be_committed": true,
     "commitments": {
-      "train": null,
-      "development": null,
-      "audit_a": null,
-      "audit_b": null
+      "train": "662b26949f7a9881b8f40e4cc017dd707d6491e5793fdadb8c750918d55e63d9",
+      "development": "a7858e052ab8af87650448e6c705684da214af9ee16caadd099fc5f6282be402",
+      "audit_a": "affe82076493558d9eb07d0618a6916955ad19f0da437692074f22f2080607cc",
+      "audit_b": "b3d15eb5429c389b5747ba2652cdd23634b85e311f6e88a9dc34eaa97fd27264"
     },
-    "ceremony_receipt": null
+    "ceremony_receipt": {
+      "path": "reports/step28_synthetic_chinese_dataset/release_inputs/structure_key_ceremony.training_ready_v1_20260729.json",
+      "sha256": "b421d905e15644d70b92fee9eaea3b653053b25899f8f0ea7b33279523d970d9"
+    }
   },
   "retrieval": {
     "enabled_splits": [
@@ -254,5 +257,5 @@
     ]
   },
   "release_status_required": "PASS_DATASET_ONLY_READY_FOR_M0_M1_M2",
-  "self_sha256": "8295418fc9dd4236a8f6dba52858e268e1ee55719c83f989060970f096873a08"
+  "self_sha256": "36eef7be99352c46375666d8d4e6edb708d0d7d65cdee69873dbadf42ea7332b"
 }

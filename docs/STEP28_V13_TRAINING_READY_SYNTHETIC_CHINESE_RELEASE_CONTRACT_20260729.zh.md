@@ -1,7 +1,7 @@
 # Step 28-v13 正式训练与固定留出中文合成数据集发布合同
 
 更新日期：2026-07-30  
-当前状态：`READY_FOR_KEY_CEREMONY / GIT_BASELINE_FROZEN`  
+当前状态：`FROZEN_READY_FOR_GENERATION / PRIVATE_KEY_CEREMONY_COMPLETE`  
 目标版本：`v13_training_ready_v1_20260729`
 
 ## 1. 权威范围
@@ -403,3 +403,12 @@ Recall@1/5/10、Hits@1/5/10；同分按 gallery seller UID 的 UTF-8 字节升�
   `PASS_CONFIG_VALIDATION`，四 split 均为 500 worlds。overlay 现只推进到
   `READY_FOR_KEY_CEREMONY`，仍保持 `generation_enabled=false`、四个私钥
   承诺和仪式回执为空；这允许下一步一次性私钥仪式，但尚不允许正式生成。
+- 2026-07-30 v17：一次性四分片私钥仪式在 Git `46d145d` 的
+  `READY_FOR_KEY_CEREMONY` overlay 上完成，公开回执 SHA-256 为
+  `b421d905e15644d70b92fee9eaea3b653053b25899f8f0ea7b33279523d970d9`。
+  回执状态为 `PASS_SPLIT_PRIVATE_KEY_CEREMONY`，四个承诺两两不同且与禁用
+  承诺交集为 0，命令未返回原始密钥。私钥目录精确包含四个 split 密钥文件
+  和一个回执副本，全部受 `.gitignore` 排除且 Git 跟踪数为 0；这只证明
+  本地逻辑保管，不构成 OS custody 或人员盲法。公开承诺和回执现写回
+  overlay，状态推进为 `FROZEN_READY_FOR_GENERATION` 且
+  `generation_enabled=true`；正式四分片和最终发布清单仍为 0。
