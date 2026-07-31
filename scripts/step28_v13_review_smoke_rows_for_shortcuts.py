@@ -239,17 +239,20 @@ def load_split(
     dataset: Path,
     split: str,
     style_to_base: Mapping[str, set[str]],
+    *,
+    oracle_directory_name: str = "oracle",
+    audit_directory_name: str = "structural_audit",
 ) -> dict[str, Any]:
     if split not in SPLITS:
         raise ValueError("Only train/development supervision is allowed")
     root = dataset / split
     observed = root / "observed"
-    oracle = root / "oracle"
+    oracle = root / oracle_directory_name
     sellers = read_csv(observed / "sellers.csv")
     items = read_jsonl(observed / "redacted_items.jsonl")
     profiles = read_jsonl(observed / "seller_profiles.jsonl")
     history = read_csv(observed / "history_item_index.csv")
-    asts = read_jsonl(root / "structural_audit" / "render_asts.jsonl")
+    asts = read_jsonl(root / audit_directory_name / "render_asts.jsonl")
     membership_rows = read_csv(oracle / "controller_membership.csv")
     membership = {
         (row["world_uid"], row["seller_uid"]): row["controller_uid"]

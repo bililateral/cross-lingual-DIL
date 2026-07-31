@@ -20,10 +20,11 @@ from typing import Any
 
 import step28_v13_build_training_ready_dataset as builder
 import step28_v13_common as common
+import step28_v13_validate_order_repair_equivalence as repair_equivalence
 
 
 FINAL_MANIFEST_VERSION = (
-    "2026-07-30-step28-v13-training-ready-release-manifest-v3"
+    "2026-07-31-step28-v13-training-ready-order-repair-release-manifest-v5"
 )
 
 
@@ -139,6 +140,67 @@ def _pairwise_disjoint(
     }
 
 
+def _replay_candidate_output_order_independently(
+    *,
+    policy: Mapping[str, Any],
+    candidates: Sequence[Mapping[str, Any]],
+    expected_world_uids: Sequence[str],
+) -> dict[str, Any]:
+    """Recompute disk row order without trusting the producer's receipt."""
+
+    key_hex = str(
+        policy["randomness"][builder.MODE]["candidate_key_hex"]
+    )
+    rows_by_world: dict[str, list[str]] = {}
+    observed_world_order: list[str] = []
+    closed_worlds: set[str] = set()
+    previous_world: str | None = None
+    for row in candidates:
+        world_uid = str(row["world_uid"])
+        pair_uid = str(row["canonical_pair_uid"])
+        if world_uid != previous_world:
+            if world_uid in closed_worlds:
+                raise common.ContractError(
+                    "Persisted C40 world blocks are interleaved"
+                )
+            if previous_world is not None:
+                closed_worlds.add(previous_world)
+            observed_world_order.append(world_uid)
+            previous_world = world_uid
+        rows_by_world.setdefault(world_uid, []).append(pair_uid)
+    if observed_world_order != list(expected_world_uids):
+        raise common.ContractError("Persisted C40 world order drift")
+    for world_uid in expected_world_uids:
+        observed = rows_by_world.get(world_uid, [])
+        expected = sorted(
+            observed,
+            key=lambda pair_uid: (
+                common.hmac_digest(
+                    key_hex,
+                    world_uid,
+                    "selected_global_rank",
+                    pair_uid,
+                ),
+                pair_uid.encode("utf-8"),
+            ),
+        )
+        if (
+            len(observed) != 40
+            or len(set(observed)) != 40
+            or observed != expected
+        ):
+            raise common.ContractError(
+                "Persisted C40 independent output-order replay failed"
+            )
+    return {
+        "world_count": len(expected_world_uids),
+        "candidate_pair_count": len(candidates),
+        "world_blocks_contiguous_and_exact": True,
+        "independent_selected_global_rank_exact": True,
+        "labels_or_controller_membership_read": False,
+    }
+
+
 def _validate_one_split(
     *,
     policy: Mapping[str, Any],
@@ -161,6 +223,9 @@ def _validate_one_split(
         manifest.get("version") != builder.MANIFEST_VERSION
         or manifest.get("status") != "PASS_SPLIT_DATASET_READY"
         or manifest.get("run_id") != overlay["run_id"]
+        or manifest.get("data_generation_run_id")
+        != overlay["data_generation_run_id"]
+        or manifest.get("repair_lineage") != overlay["repair_lineage"]
         or manifest.get("split") != split
         or manifest.get("claim_level")
         != overlay["target_release_claim_level"]
@@ -235,6 +300,15 @@ def _validate_one_split(
             "seller_uid_right",
         ),
     )
+    output_order = _replay_candidate_output_order_independently(
+        policy=policy,
+        candidates=candidates,
+        expected_world_uids=[str(row["world_uid"]) for row in worlds],
+    )
+    if manifest.get("candidate_output_order_audit") != output_order:
+        raise common.ContractError(
+            f"Persisted C40 output-order receipt drift: {split}"
+        )
     memberships = builder._read_csv_exact(
         directory / "private_oracle/controller_membership.csv",
         fields=("world_uid", "controller_uid", "seller_uid"),
@@ -451,6 +525,7 @@ def _validate_one_split(
         ),
         "manifest_self_sha256": manifest["canonical_self_hash"],
         "label_formula_replay": formula,
+        "candidate_output_order_replay": output_order,
         "retrieval_replay": retrieval_audit,
         "m1_replay": m1_audit,
         "model_mount_contract_exact": True,
@@ -504,6 +579,31 @@ def finalize(overlay_path: Path) -> Path:
         for values_by_split in identifiers_by_kind.values()
     ):
         raise common.ContractError("Cross-split identifier audit is incomplete")
+    equivalence_report = repair_equivalence.compare_release(
+        overlay=overlay,
+        repaired_root=release_root,
+    )
+    equivalence_target = release_root / "repair_equivalence_report.json"
+    if equivalence_target.exists():
+        if common.load_json(equivalence_target) != equivalence_report:
+            raise common.ContractError(
+                "Existing repair-equivalence report has different bytes"
+            )
+    else:
+        equivalence_temporary = (
+            release_root / ".repair-equivalence-report.tmp"
+        )
+        if equivalence_temporary.exists():
+            raise common.ContractError(
+                "Stale repair-equivalence staging file exists"
+            )
+        common.write_json(equivalence_temporary, equivalence_report)
+        common.atomic_rename_no_replace(
+            equivalence_temporary,
+            equivalence_target,
+        )
+    if common.load_json(equivalence_target) != equivalence_report:
+        raise common.ContractError("Repair-equivalence report write drift")
     finalizer_path = (
         common.ROOT
         / "scripts"
@@ -516,6 +616,8 @@ def finalize(overlay_path: Path) -> Path:
         "version": FINAL_MANIFEST_VERSION,
         "status": overlay["release_status_required"],
         "run_id": overlay["run_id"],
+        "data_generation_run_id": overlay["data_generation_run_id"],
+        "repair_lineage": dict(overlay["repair_lineage"]),
         "claim_level": overlay["target_release_claim_level"],
         "blind_custody_attested": False,
         "fixed_holdout_bytes_ready": True,
@@ -536,10 +638,23 @@ def finalize(overlay_path: Path) -> Path:
         "base_policy": dict(overlay["base_policy"]),
         "release_contract": dict(overlay["release_contract"]),
         "key_ceremony_receipt": dict(ceremony),
+        "repair_equivalence_report": {
+            "path": str(
+                Path(str(overlay["output_root"]))
+                / "repair_equivalence_report.json"
+            ).replace("\\", "/"),
+            "sha256": common.sha256_file(equivalence_target),
+            "canonical_self_hash": equivalence_report[
+                "canonical_self_hash"
+            ],
+            "status": equivalence_report["status"],
+        },
         "split_receipts": split_receipts,
         "cross_split_disjointness": cross_split,
         "all_split_manifests_exact": True,
         "all_label_formula_replays_exact": True,
+        "all_candidate_output_order_replays_exact": True,
+        "parent_order_only_repair_equivalence_exact": True,
         "all_retrieval_formula_replays_exact": True,
         "all_model_mount_contracts_exact": True,
         "train_m1_persisted_replays_exact": True,

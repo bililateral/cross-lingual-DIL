@@ -109,6 +109,7 @@ class TrainingReadyBuilderContracts(unittest.TestCase):
             require_generation_frozen=False,
         )
         mini = copy.deepcopy(overlay)
+        mini["generation_enabled"] = False
         mini["world_counts"][split] = 5
         mini["shortcut_gate"]["bootstrap_replicates"] = 19
         mini["shortcut_gate"]["maximum_symmetric_auc"] = 1.0
@@ -213,22 +214,22 @@ class TrainingReadyBuilderContracts(unittest.TestCase):
         expected = {
             "train": {
                 "payload": (
-                    "38a55e903d9de32590888672973da59d9428ad221e613792d6"
-                    "fc91cb96bc0465"
+                    "16571a0f09f3045efbb0911933a2c05dc9fee39f56363faed"
+                    "57b6c1c3b233cfa"
                 ),
                 "world_generation_audit": (
-                    "2f9a4887e278eb7f2d24c98d798bd2e30e80367e66426c43"
-                    "be4dea3bde66204c"
+                    "66772d5a821d0af2ef9b39816fb08406fe238219b526173a8"
+                    "2121fd0f3283afc"
                 ),
             },
             "audit_a": {
                 "payload": (
-                    "9aaf4f15c2f8f0c48edda02daadbd2fba0ad1fa0c018bfb1e"
-                    "13a90d966c50e30"
+                    "7c3779cc4d5ea08ea8c9558daa03b7894f5685a3c9ee0653"
+                    "620da05013cf229a"
                 ),
                 "world_generation_audit": (
-                    "3b36c22e661f58a10f2981c85bac385d415e691c54c362a26"
-                    "06a5b7472b75ddb"
+                    "e4279114bd532e6efc4c5be5ca13cec7b3ad399e6460e9573"
+                    "90384598131c2a1"
                 ),
             },
         }

@@ -1,0 +1,71 @@
+{
+  "adapter_evaluation_exact_allowlist": [],
+  "adapter_forbidden_fields": [
+    "market",
+    "controller_uid",
+    "mechanism",
+    "label_stratum",
+    "hmac_digest_hex",
+    "selected_rank"
+  ],
+  "adapter_non_feature_join_keys": [
+    "canonical_pair_uid",
+    "world_uid"
+  ],
+  "adapter_required_external_input": {
+    "must_be_hash_pinned_before_adapter_use": true,
+    "pair_keyset": "exact C40 candidate keyset for this split",
+    "producer": "operational M0 run with this split's exact M0 allowlist",
+    "role": "frozen_m0_p0",
+    "schema": [
+      "canonical_pair_uid",
+      "p0"
+    ],
+    "validated_by_dataset_mount_checker": false
+  },
+  "evaluation_supervision_must_not_be_model_mounted": false,
+  "evaluation_supervision_path": null,
+  "join_keys_must_not_enter_feature_matrix": true,
+  "m0_exact_allowlist": [
+    "observed/complete_model_pair_endpoints.csv",
+    "observed/redacted_items.jsonl",
+    "observed/seller_profiles.jsonl"
+  ],
+  "m0_output_contract": "one frozen probability p0 per canonical_pair_uid",
+  "m1_training_exact_allowlist_by_replicate": {
+    "r01": [
+      "observed/candidate_pairs.csv",
+      "m1/r01/identity33.csv",
+      "supervision/classification_labels.csv"
+    ],
+    "r02": [
+      "observed/candidate_pairs.csv",
+      "m1/r02/identity33.csv",
+      "supervision/classification_labels.csv"
+    ],
+    "r03": [
+      "observed/candidate_pairs.csv",
+      "m1/r03/identity33.csv",
+      "supervision/classification_labels.csv"
+    ],
+    "r04": [
+      "observed/candidate_pairs.csv",
+      "m1/r04/identity33.csv",
+      "supervision/classification_labels.csv"
+    ],
+    "r05": [
+      "observed/candidate_pairs.csv",
+      "m1/r05/identity33.csv",
+      "supervision/classification_labels.csv"
+    ]
+  },
+  "m2_training_exact_allowlist": [
+    "observed/candidate_pairs.csv",
+    "observed/identity33_all_pairs.csv",
+    "supervision/classification_labels.csv"
+  ],
+  "mount_observed_directory_as_a_whole": false,
+  "scope": "dataset_file_allowlists_only; frozen M0 p0 is an external lineage-bound input",
+  "split": "train",
+  "version": "2026-07-29-step28-v13-model-input-contract-v1"
+}

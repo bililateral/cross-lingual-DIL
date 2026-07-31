@@ -1,12 +1,31 @@
 # 当前实验设计说明
 
-更新日期：`2026-07-18`
+更新日期：`2026-07-31`
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
-> 当前主线更新：Step25-v3.1 已完成 Linux 数值重跑和封闭审计。求解器修复有效，`44/44` artifact 均满足 KKT，但 C2 在 English/source-only Chinese/target OOF 的 AP 分别比 C0 低 `0.058346/0.030238/0.028093`，只有 `2/11` gates 通过。Step25-v3.1 已冻结为严格负结果，不进入 D1、Step11 或 Step17。完整结果见 `docs/STEP25_V3_1_RESULT_AUDIT_20260718.zh.md`。
+> 当前主线更新：Step 28 使用 operational M0
+> `LightGBM + legacy18 + LaBSE`，但不声称它已由独立新英文数据证明为
+> 唯一最强。正式中文合成数据集
+> `v13_training_ready_v1_2_order_repair_20260731` 已通过发布、父子等价、
+> 逐行残留审计和独立全树/行序加固审计，状态仅为
+> `PASS_DATASET_ONLY_READY_FOR_M0_M1_M2`。M0/M1/M2 尚未在该正式数据上
+> 训练或评分，不能声称适配成功。当前权威事实见
+> `docs/AI_RESEARCH_HANDOFF_20260722_ADDENDUM.zh.md` 和
+> `docs/STEP28_V13_TRAINING_READY_ORDER_REPAIR_RESULT_AUDIT_20260731.zh.md`。
 
-## 0. 当前方法状态：Step25-v1/v2/v3.1 均已冻结，v3.1 为最终严格负结果
+## 0. 当前方法状态：Step 28-v13 数据就绪，模型实验尚未开始
+
+当前比较固定为同一 operational M0：M0 不适配；五个 M1 使用整 33 维、
+端点不重合的分层置乱训练对照，但不声称 controller-disjoint；M2 使用对齐
+身份33维。仅 train 拟合，development 只做阈值/校准，Audit A/B 是固定
+逻辑封存评估。当前只完成数据字节和审计，不存在正式模型指标。
+
+以下 Step24/Step25 主体保留为 2026-07-18 前一条方法线的完整设计和负结果
+背景；凡与上面的 Step7→Step28 角色、数据版本或当前状态冲突，以上述
+2026-07-31 交接补充和专项审计为准。
+
+## 0A. 历史方法状态：Step25-v1/v2/v3.1 均已冻结，v3.1 为最终严格负结果
 
 Step24 已证明冻结多语言作者/风格表示提供明显跨语言增量，但同时把复制模板和公共页面排版嵌入为作者风格。其 source-only primary 在中文 D0 上达到 `AP=0.802718`，相对 redacted-E5 提升 `0.158336`，但 template-clone negative 的 mean/q95/top-decile 分数分别增加 `0.028287/0.067389/0.064517`，target grouped-bootstrap CI 也略跨零。Step24 因此 `promotion_eligible=false` 并冻结。
 

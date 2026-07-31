@@ -109,6 +109,38 @@ class Step28V13MechanismStratifiedC40Contracts(unittest.TestCase):
         )
         self.assertEqual(observed, expected)
 
+    def test_selected_rows_use_independent_global_output_order(self) -> None:
+        rows, audit, _summary = self.build("train")
+        expected = sorted(
+            (row["canonical_pair_uid"] for row in rows),
+            key=lambda pair_uid: (
+                common.hmac_digest(
+                    self.key,
+                    self.world_uid,
+                    "selected_global_rank",
+                    pair_uid,
+                ),
+                pair_uid.encode("utf-8"),
+            ),
+        )
+        self.assertEqual(
+            expected,
+            [row["canonical_pair_uid"] for row in rows],
+        )
+        self.assertEqual(
+            list(range(1, 41)),
+            [int(row["selected_rank"]) for row in audit],
+        )
+        for row in audit:
+            self.assertEqual(
+                row["hmac_digest_hex"],
+                c40._rank_key(
+                    key_hex=self.key,
+                    world_uid=self.world_uid,
+                    pair_uid=row["canonical_pair_uid"],
+                )[0].hex(),
+            )
+
     def test_tampered_target_label_fails_closed(self) -> None:
         targets = copy.deepcopy(self.world["private"]["positive_targets"])
         negative_pair = self.world["private"]["negative_flags"][0][

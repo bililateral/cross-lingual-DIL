@@ -1,8 +1,11 @@
-# AI 科研交接补充：Step 7-v4 / v4.1
+# AI 科研交接补充：Step 7-v4+ / Step 28-v13
 
-更新时间：2026-07-24
+更新时间：2026-07-31
 
 本文件只记录 `docs/AI_RESEARCH_HANDOFF_20260719.zh.md` 之后的新事实。原交接文档和 `docs/PROJECT_PROGRESS.md` 已被 Step28-v12 冻结同步清单按字节哈希绑定，不得为更新叙述而改写。
+因此 `PROJECT_PROGRESS.md` 顶部仍写 v12 是当时“current line”只属于冻结
+历史快照；2026-07-31 的当前事实以本补充和本补充列出的专项合同/结果审计
+为准。
 
 ## 当前活动阶段
 
@@ -18,7 +21,12 @@ Step 7-v4 已完成并冻结。它不再把 Step 3 卖家摘要误称为完整�
 
 当前 Step 7 → Step 28 主线中的 M0 是“只用真实英文马甲标签训练和选择，随后冻结并给 Step 28 提供基础分数的完整英文来源分类流水线”。它不是编码器名称，也不要求编码器必须显著超过 `legacy18`。只要完整流水线能按冻结的同一输入合同在 Step 28 数据上产生分数，`legacy18`、编码器特征及其融合都可以参加 M0 选择。
 
-Step 28 固定比较同一个冻结来源模型：`M0` 不适配，`M1` 加不含新增身份因果信息的匹配对照模块，`M2` 加只用合成中文身份训练集拟合的身份迁移模块。主要方法价值由 `M2-M1` 和 `M2-M0` 判断。编码器相对无编码器对照的增量属于独立消融，只限制“编码器贡献”表述，不是 M0 资格门。
+Step 28 固定比较同一个冻结来源模型：`M0` 不适配；`M1` 加五份按
+world/C40 分层、整 33 维向量置乱且 pair 端点不重合的保守匹配对照模块；
+`M2` 加只用合成中文身份训练集拟合的身份迁移模块。M1 不声称
+controller-disjoint，不能描述成严格无身份关联的因果 null。主要方法价值
+由 `M2-M1` 和 `M2-M0` 判断。编码器相对无编码器对照的增量属于独立消融，
+只限制“编码器贡献”表述，不是 M0 资格门。
 
 旧 Step27 文档中 `M0=真实中文 residual baseline` 只属于旧实验角色；Step 7 历史产物中的 `no_transfer_capable_m0` 只表示编码器没有通过额外归因门，不能解释为当前定义下不存在 M0。完整覆盖说明见 `docs/STEP7_STEP28_M0_ROLE_DEFINITION_20260724.zh.md`，其定义优先于早期文档中的同名符号。
 
@@ -246,3 +254,92 @@ Git `46d145d94026021e8184e9db4a341e85e9d3871b` 推进到
 跟踪数为 0。现将公开承诺和回执写回 overlay，并推进到
 `FROZEN_READY_FOR_GENERATION / generation_enabled=true`。这仍只是本地
 逻辑保管，不是 OS custody 或人员盲法；正式分片和最终发布清单继续为 0。
+
+## 2026-07-31：C40 行序失效、v1.2 修复与正式发布
+
+`v13_training_ready_v1_20260729` 生成后，发布后逐行审查发现 C40 最终文件
+行序错误复用了选择/补齐 HMAC 排名。由于正负分层池大小不同，文件位置可
+预测标签；原 v1 虽有发布清单，也不得用于 M1/M2。第一次行序修复 v1.1
+生成了四个 split，但最终比较器把 train/development 的公开统计审计路径
+套到 Audit A/B，忽略后者按合同使用 `sealed_supervision/`，因此在 Audit A
+拒绝封版，且没有生成发布清单。修正后的只读比较证明 v1.1 数据内容确实仅
+改变三个行序相关文件，但旧产物绑定旧封版工具哈希，禁止事后补签。
+
+正式修复版本为
+`v13_training_ready_v1_2_order_repair_20260731`，实现合同 SHA-256 是
+`ee4d249aaf421d4e6a6603e9e0ae779d9b3c384cef266e5234b0b0918800a831`。
+它复用原四把结构 key，保持原 world、文本、C40 成员集合、identity33 和
+`pair_uid -> label` 映射，不换 key、不重抽、不删行。新一轮四个 500-world
+精确预检及 checkpoint 全量重放均通过：
+
+| split | 最大对称 AUC | 95% 上界 | 身份33维秩 | 报告 SHA-256 |
+|---|---:|---:|---:|---|
+| train | 0.509703 | 0.516557 | 31 | `aecac7e846a49b30053e06e057c7c66bd0bfc72ccc4ed0aaa2e2dd7a1b0551f6` |
+| development | 0.508037 | 0.515723 | 29 | `9e51567bacd0dc0a4b471a3a8a4562e03cda73f508d98de3d07ee4e36d2fea53` |
+| audit_a | 0.509954 | 0.517763 | 30 | `222835593b6f4f01076eb88556f2c41f29ffb49b7df1eada449bce9d6bf7f4b3` |
+| audit_b | 0.505748 | 0.513693 | 32 | `ac810bf8999cec28da6ad0a3503dc9f0200800640b32cc9f60c35915b3faec43` |
+
+四个正式 split 共 2,000 worlds、56,000 sellers、756,000 完整 pair 和
+80,000 C40，磁盘约 4.824 GiB；Audit A/B 各有 2,000 query 和 54,000
+relation/qrel。最终发布状态为
+`PASS_DATASET_ONLY_READY_FOR_M0_M1_M2`。发布清单文件 SHA-256 为
+`81ca7d9d2040d500b3bcb2ffc9af6aeb72c581754dbd075b94dd6cf8904b8275`，
+父子等价报告文件 SHA-256 为
+`3b0d1e29a713ce0402a14170d68936bd9a5b25f745321a5b988b1071817d2998`。
+四个 split 都只有
+`candidate_pairs.csv`、`candidate_sampling_audit.csv` 和
+`world_generation_audit.jsonl` 三个文件字节改变，按主键语义一致，越界
+变化为 0；全部跨 split UID、controller 和身份值交集为 0。
+
+发布后逐行审计打开四个 split 共 202,071 条可见商品、56,000 份卖家档案
+和 335,016 个计划身份槽，内部生成标记、原始身份 surface、规范身份值残留
+及行序错误 world 均为 0。UID/文件位置组最大对称 AUC 为 train `0.508649`、
+development `0.512257`；无关元数据组为 `0.505178/0.502243`。正式报告的
+24 项 `visible_m0_proxy`（含 5 项 nuisance）在 train 的
+gradient tree/logistic AUC 为 `0.570414/0.572021`，development 为
+`0.572561/0.577379`；这是允许 M0 使用的共享文本/作者风格基线诊断，不是
+真实迁移成绩。私有 AST/oracle 风格禁止模型挂载。逐行报告文件 SHA-256 为
+`62bcc36cdfaadc5a257f7bfaaf0915b50b09b3e7902cc14efd349cf47c22390e`。
+
+终审发现原逐行审计没有把整个正式文件树、500-world 精确集合和跨 world
+连续块自身绑定成一个门。新增的独立发布树加固审计不导入生成器、预检器、
+封版器或原逐行审计，哈希核对全部 160 个正式文件，并用标准库 HMAC
+独立重放四 split 共 2,000 worlds、80,000 条 C40 的完整顺序；未解析
+Audit 标签、qrel、controller、身份资产或 M1。状态为
+`PASS_INDEPENDENT_FORMAL_RELEASE_TREE_HARDENING_AUDIT`，报告文件
+SHA-256 为
+`a053f71101b320868c8a52658bf78ae18bc3d67e84f71064f536a28d594fa3bd`，
+自哈希为
+`fbfe00737077f6422d24030e65840c447f9e1f314597ba3664171515f16580a7`。
+
+v3 精确预检中的 `candidate_output_order_audit` 来自构建器返回收据，预检器
+只核对固定字典，不是第三套独立 HMAC 重算；“预检通过”不得扩大解释为
+“预检器独立验证”。正式 release 的独立顺序证据来自封版器磁盘重算和上述
+独立发布树加固审计。冻结修复合同已被 release 哈希固定，不作事后改写，
+本段用于收紧其解释边界。
+
+完整结果与结论边界见
+`docs/STEP28_V13_TRAINING_READY_ORDER_REPAIR_RESULT_AUDIT_20260731.zh.md`。
+当前只证明数据字节可供冻结 M0、五个 M1 和 M2 使用；M0/M1/M2 尚未在该
+正式数据上训练/评分，不能声称适配效果成功。Audit A/B 仍只是同一 Windows
+用户下逻辑封存，人员盲法为 false。
+
+父子等价证明完成后，已按显式路径清单删除失效 v1、未发布 v1.1 及绑定旧
+实现的 order_repair_v1/v2 预检，共释放约 9.68 GiB。删除前把 v1 发布清单、
+v1 四份 split manifest 和 v1.1 四份 split manifest 共 9 个文件原字节归档
+并逐一验证 SHA-256。正式 v1.2、v3 预检、四份发布后审计、私钥保管目录、
+release inputs、跟踪中的 development smoke 和全部历史文档均保留。清理
+审计见 `docs/WORKSPACE_DEPRECATED_ARTIFACT_CLEANUP_20260731.md`。
+
+由于失效 v1 完整数据已按合同在等价证明后删除，当前工作区可核验等价报告
+和九份父 manifest 的哈希，但不能在不恢复 v1 全部原字节的前提下重新执行
+父子语义比较；必须称为清理前完成并哈希封存的历史仪式。当前 v1.2 自身的
+全部 160 文件、2,000 worlds 和 80,000 C40 已由上述独立加固审计重验。
+
+提交前静态检查通过。首次全仓回归发现测试夹具把 5-world 设计期迷你构造
+误留为 `generation_enabled=true`，生产门因此按预期拒绝；修复只把该测试
+夹具显式标为非正式生成，没有修改正式数据、正式生成门或实现合同。针对性
+18 项随后全部通过。最终 `python -m unittest discover -s tests` 共发现
+381 项：374 项通过、7 项按既有声明跳过、0 失败，用时 798.904 秒。7 项
+跳过由已撤销 Step28-v11 测试类的 6 项，以及已被 training-ready 测试替代
+的 `dataset_smoke_v3` 不可执行旧锁 1 项组成。

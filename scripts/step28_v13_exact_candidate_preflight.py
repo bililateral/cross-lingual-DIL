@@ -36,8 +36,8 @@ CHECKPOINT_MANIFEST_VERSION = (
     "2026-07-30-step28-v13-exact-preflight-checkpoint-manifest-v1"
 )
 REPORT_VERSION = (
-    "2026-07-30-step28-v13-training-ready-"
-    "exact-builder-preflight-v4"
+    "2026-07-31-step28-v13-training-ready-"
+    "order-repair-exact-builder-preflight-v5"
 )
 
 
@@ -735,6 +735,14 @@ def run(
             for row in world_audits
         )
         or result["formula_audit"]["exact_rowwise_equal"] is not True
+        or result["candidate_output_order_audit"]
+        != {
+            "world_count": world_count,
+            "candidate_pair_count": world_count * 40,
+            "world_blocks_contiguous_and_exact": True,
+            "independent_selected_global_rank_exact": True,
+            "labels_or_controller_membership_read": False,
+        }
         or result["aggregate_audit"][
             "all_keysets_and_foreign_keys_exact"
         ]
@@ -762,6 +770,9 @@ def run(
         "all_worlds_independent_dgp_replay_exact": True,
         "all_worlds_mechanism_coverage_exact": True,
         "label_formula_rowwise_exact": True,
+        "candidate_output_order_audit": result[
+            "candidate_output_order_audit"
+        ],
         "aggregate_lineage_exact": True,
         "builder_implementation": (
             "scripts/step28_v13_build_training_ready_dataset.py"

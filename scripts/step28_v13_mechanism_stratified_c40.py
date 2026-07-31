@@ -109,6 +109,25 @@ def _rank_key(
     )
 
 
+def _global_output_order_key(
+    *,
+    key_hex: str,
+    world_uid: str,
+    pair_uid: str,
+) -> tuple[bytes, bytes]:
+    """Return the contractually independent order for the selected C40."""
+
+    return (
+        common.hmac_digest(
+            key_hex,
+            world_uid,
+            "selected_global_rank",
+            pair_uid,
+        ),
+        _utf8(pair_uid),
+    )
+
+
 def build_world_c40(
     *,
     split: str,
@@ -296,7 +315,14 @@ def build_world_c40(
     ):
         raise common.ContractError("C40 class fill or mechanism coverage failed")
 
-    selected_order = sorted(selected_uids, key=rank_key_by_uid.__getitem__)
+    selected_order = sorted(
+        selected_uids,
+        key=lambda pair_uid: _global_output_order_key(
+            key_hex=candidate_key_hex,
+            world_uid=world_uid,
+            pair_uid=pair_uid,
+        ),
+    )
     safe_rows = [pair_by_uid[pair_uid] for pair_uid in selected_order]
     audit_rows: list[dict[str, Any]] = []
     for selected_rank, pair_uid in enumerate(selected_order, start=1):

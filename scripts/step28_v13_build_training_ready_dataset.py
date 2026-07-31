@@ -64,13 +64,43 @@ PUBLIC_RANDOM_FIELDS = (
     "rewire_key_hexes",
 )
 DEFAULT_OVERLAY = (
-    common.ROOT / "schema" / "step28_v13_training_ready_dataset_policy.json"
+    common.ROOT
+    / "schema"
+    / "step28_v13_training_ready_order_repair_policy.json"
 )
+REPAIR_RUN_ID = "v13_training_ready_v1_2_order_repair_20260731"
+PARENT_DATA_GENERATION_RUN_ID = "v13_training_ready_v1_20260729"
+REPAIR_OUTPUT_ROOT = (
+    "reports/step28_synthetic_chinese_dataset/"
+    "v13_training_ready_v1_2_order_repair_20260731"
+)
+PARENT_DATA_GENERATION_OUTPUT_ROOT = (
+    "reports/step28_synthetic_chinese_dataset/"
+    "v13_training_ready_v1_20260729"
+)
+EXPECTED_REPAIR_LINEAGE = {
+    "repair_type": "C40_OUTPUT_ORDER_ONLY",
+    "parent_run_id": PARENT_DATA_GENERATION_RUN_ID,
+    "parent_release_manifest_sha256": (
+        "6924dadb669bf056302418ac012e2f027b1bd3e9e00cf0c0e5e515258a3d3ce0"
+    ),
+    "parent_release_manifest_self_sha256": (
+        "f3e0b9a2de4b89613d008b7bc8ee11e4a87c0475fdd572ddea832ef543ead7aa"
+    ),
+    "source_key_ceremony_run_id": PARENT_DATA_GENERATION_RUN_ID,
+    "structure_keys_reused": True,
+    "post_outcome_resampling_performed": False,
+    "underlying_world_text_candidate_membership_identity33_and_labels_must_match_parent": True,
+    "allowed_change": (
+        "independent selected_global_rank serialization order and "
+        "order-bound derived files, receipts, and manifests only"
+    ),
+}
 MANIFEST_VERSION = (
-    "2026-07-30-step28-v13-training-ready-split-manifest-v3"
+    "2026-07-31-step28-v13-training-ready-order-repair-split-manifest-v5"
 )
 IMPLEMENTATION_CONTRACT_VERSION = (
-    "2026-07-30-step28-v13-training-ready-implementation-contract-v3"
+    "2026-07-31-step28-v13-training-ready-order-repair-implementation-contract-v5"
 )
 BUILDER_SOURCE_CLOSURE_ROLE = "training_ready_dataset_builder"
 _EXACT_PREFLIGHT_FULL_REPLAY_CACHE: set[str] = set()
@@ -94,6 +124,11 @@ def _implementation_contract_payload(
         "version": IMPLEMENTATION_CONTRACT_VERSION,
         "run_id": overlay["run_id"],
         "output_root": overlay["output_root"],
+        "data_generation_run_id": overlay["data_generation_run_id"],
+        "data_generation_output_root": overlay[
+            "data_generation_output_root"
+        ],
+        "repair_lineage": copy.deepcopy(overlay["repair_lineage"]),
         "target_release_claim_level": overlay[
             "target_release_claim_level"
         ],
@@ -249,11 +284,15 @@ def _validate_scientific_contract(
     if (
         document.get("version")
         != (
-            "2026-07-30-step28-v13-training-ready-"
-            "scientific-contract-v1"
+            "2026-07-31-step28-v13-training-ready-"
+            "order-repair-scientific-contract-v3"
         )
         or document.get("status")
-        != "FROZEN_PRE_KEY_SCIENTIFIC_RULES"
+        != "FROZEN_ORDER_ONLY_REPAIR_SCIENTIFIC_RULES"
+        or document.get("scope")
+        != f"{overlay['run_id']} child release only"
+        or document.get("repair_lineage")
+        != overlay["repair_lineage"]
         or document.get("target_release_claim_level")
         != overlay["target_release_claim_level"]
         or document.get("split_design", {}).get("worlds")
@@ -274,6 +313,20 @@ def _validate_scientific_contract(
             "c40_label_blind"
         )
         is not False
+        or document.get("truth_and_sampling", {}).get(
+            "c40_output_order"
+        )
+        != (
+            "Within each world, sort the selected C40 by full "
+            "HMAC-SHA256(candidate_key, world_uid, "
+            "selected_global_rank, canonical_pair_uid), then "
+            "canonical_pair_uid UTF-8; this stream is independent "
+            "of selection/fill ranking."
+        )
+        or document.get("truth_and_sampling", {}).get(
+            "c40_output_order_must_be_independently_replayed"
+        )
+        is not True
         or sample_size.get("confirmatory_power_certified") is not False
         or sample_size.get(
             "binary_power_based_success_claim_forbidden"
@@ -1080,12 +1133,18 @@ def _validate_exact_preflight_registry(
         )
         shortcut = report.get("metadata_shortcut_audit", {})
         identity33 = report.get("identity33_matrix_audit", {})
+        candidate_order = report.get("candidate_output_order_audit", {})
         world_count = int(overlay["world_counts"][split])
         positive_count = world_count * int(
             overlay["classification_positive_count_per_world"][split]
         )
         if (
-            report.get("status")
+            report.get("version")
+            != (
+                "2026-07-31-step28-v13-training-ready-"
+                "order-repair-exact-builder-preflight-v5"
+            )
+            or report.get("status")
             != "PASS_EXACT_IMPLEMENTATION_DESIGN_PREFLIGHT"
             or report.get("mode") != MODE
             or report.get("split") != split
@@ -1105,6 +1164,14 @@ def _validate_exact_preflight_registry(
             or report.get("all_worlds_mechanism_coverage_exact")
             is not True
             or report.get("label_formula_rowwise_exact") is not True
+            or candidate_order
+            != {
+                "world_count": world_count,
+                "candidate_pair_count": world_count * 40,
+                "world_blocks_contiguous_and_exact": True,
+                "independent_selected_global_rank_exact": True,
+                "labels_or_controller_membership_read": False,
+            }
             or report.get("aggregate_lineage_exact") is not True
             or report.get("builder_implementation_sha256")
             != expected_builder_hash
@@ -1174,12 +1241,14 @@ def load_overlay(
         "audit_b": 10,
     }
     if (
-        overlay.get("run_id") != "v13_training_ready_v1_20260729"
+        overlay.get("run_id") != REPAIR_RUN_ID
         or overlay.get("output_root")
-        != (
-            "reports/step28_synthetic_chinese_dataset/"
-            "v13_training_ready_v1_20260729"
-        )
+        != REPAIR_OUTPUT_ROOT
+        or overlay.get("data_generation_run_id")
+        != PARENT_DATA_GENERATION_RUN_ID
+        or overlay.get("data_generation_output_root")
+        != PARENT_DATA_GENERATION_OUTPUT_ROOT
+        or overlay.get("repair_lineage") != EXPECTED_REPAIR_LINEAGE
         or tuple(overlay.get("world_counts", {})) != SPLITS
         or overlay.get("world_counts") != expected_world_counts
         or int(overlay.get("sellers_per_world", -1)) != 28
@@ -1262,6 +1331,10 @@ def load_overlay(
             "whole_33_vector_derangement": True,
             "stratification": ["world_uid", "C40_or_complement"],
         }
+        or overlay.get("private_structure_key_custody", {}).get(
+            "source_key_ceremony_run_id"
+        )
+        != PARENT_DATA_GENERATION_RUN_ID
     ):
         raise common.ContractError(
             "Training-ready scientific release semantics drift"
@@ -1352,6 +1425,8 @@ def load_overlay(
         "key_initializer",
         "finalizer",
         "model_input_validator",
+        "order_repair_equivalence",
+        "post_release_row_audit",
     }:
         raise common.ContractError(
             "Training-ready release-tool closure drift"
@@ -1400,7 +1475,8 @@ def load_overlay(
         if (
             ceremony.get("status")
             != "PASS_SPLIT_PRIVATE_KEY_CEREMONY"
-            or ceremony.get("run_id") != overlay["run_id"]
+            or ceremony.get("run_id")
+            != custody["source_key_ceremony_run_id"]
             or ceremony.get("commitments") != commitments
             or ceremony.get("commitments_unique") is not True
             or int(
@@ -1469,8 +1545,12 @@ def _execution_policy(
         for split in SPLITS
     }
     policy["modes"][MODE] = copy.deepcopy(policy["modes"]["formal"])
-    policy["modes"][MODE]["run_id"] = str(overlay["run_id"])
-    policy["modes"][MODE]["output_root"] = str(overlay["output_root"])
+    policy["modes"][MODE]["run_id"] = str(
+        overlay["data_generation_run_id"]
+    )
+    policy["modes"][MODE]["output_root"] = str(
+        overlay["data_generation_output_root"]
+    )
     policy["modes"][MODE]["world_counts"] = counts
     policy["modes"][MODE][
         "source_dataset_prefix"
@@ -1511,7 +1591,8 @@ def _load_split_key(
     if (
         set(document)
         != {"version", "run_id", "split", "key_hex", "sha256_commitment"}
-        or document["run_id"] != overlay["run_id"]
+        or document["run_id"]
+        != custody["source_key_ceremony_run_id"]
         or document["split"] != split
     ):
         raise common.ContractError("Split-private key file schema drift")
@@ -1530,6 +1611,63 @@ def _load_split_key(
     ):
         raise common.ContractError("Split-private key commitment mismatch")
     return key_hex
+
+
+def _validate_candidate_output_order(
+    policy: Mapping[str, Any],
+    *,
+    candidate_rows: Sequence[Mapping[str, Any]],
+    expected_world_uids: Sequence[str],
+) -> dict[str, Any]:
+    """Fail unless persisted C40 blocks use the independent order stream."""
+
+    key_hex = str(policy["randomness"][MODE]["candidate_key_hex"])
+    rows_by_world: dict[str, list[str]] = {}
+    observed_world_order: list[str] = []
+    closed_worlds: set[str] = set()
+    previous_world: str | None = None
+    for row in candidate_rows:
+        if set(row) != set(mechanism_c40.SAFE_FIELDS):
+            raise common.ContractError("C40 public row schema drift")
+        world_uid = str(row["world_uid"])
+        pair_uid = str(row["canonical_pair_uid"])
+        if world_uid != previous_world:
+            if world_uid in closed_worlds:
+                raise common.ContractError("C40 world blocks are interleaved")
+            if previous_world is not None:
+                closed_worlds.add(previous_world)
+            observed_world_order.append(world_uid)
+            previous_world = world_uid
+        rows_by_world.setdefault(world_uid, []).append(pair_uid)
+    if observed_world_order != list(expected_world_uids):
+        raise common.ContractError("C40 world block order drift")
+    for world_uid in expected_world_uids:
+        observed = rows_by_world.get(world_uid, [])
+        expected = sorted(
+            observed,
+            key=lambda pair_uid: (
+                common.hmac_digest(
+                    key_hex,
+                    world_uid,
+                    "selected_global_rank",
+                    pair_uid,
+                ),
+                pair_uid.encode("utf-8"),
+            ),
+        )
+        if len(observed) != 40 or len(set(observed)) != 40:
+            raise common.ContractError("C40 world cardinality/order drift")
+        if observed != expected:
+            raise common.ContractError(
+                "C40 independent selected_global_rank order failed"
+            )
+    return {
+        "world_count": len(expected_world_uids),
+        "candidate_pair_count": len(candidate_rows),
+        "world_blocks_contiguous_and_exact": True,
+        "independent_selected_global_rank_exact": True,
+        "labels_or_controller_membership_read": False,
+    }
 
 
 def _extend_world(
@@ -2755,6 +2893,13 @@ def build_split_in_memory(
                 flush=True,
             )
 
+    candidate_output_order_audit = _validate_candidate_output_order(
+        policy,
+        candidate_rows=payload["candidate_pairs"],
+        expected_world_uids=[
+            str(record["world_uid"]) for record in records
+        ],
+    )
     labels = label_sealer.build_labels(
         candidate_rows=payload["candidate_pairs"],
         membership_rows=payload["controller_membership"],
@@ -2839,6 +2984,7 @@ def build_split_in_memory(
     return {
         "payload": payload,
         "formula_audit": formula_audit,
+        "candidate_output_order_audit": candidate_output_order_audit,
         "shortcut_report": shortcut_report,
         "identity33_audit": identity33_audit,
         "aggregate_audit": aggregate_audit,
@@ -3674,6 +3820,10 @@ def write_split_release(
             "version": MANIFEST_VERSION,
             "status": "PASS_SPLIT_DATASET_READY",
             "run_id": overlay["run_id"],
+            "data_generation_run_id": overlay[
+                "data_generation_run_id"
+            ],
+            "repair_lineage": copy.deepcopy(overlay["repair_lineage"]),
             "split": split,
             "claim_level": overlay["target_release_claim_level"],
             "overlay_canonical_sha256": common.canonical_sha256(
@@ -3733,6 +3883,9 @@ def write_split_release(
             "label_formula_exact": result["formula_audit"][
                 "exact_rowwise_equal"
             ],
+            "candidate_output_order_audit": copy.deepcopy(
+                result["candidate_output_order_audit"]
+            ),
             "identity33_no_all_zero_columns": not result[
                 "identity33_audit"
             ]["all_zero_columns"],
