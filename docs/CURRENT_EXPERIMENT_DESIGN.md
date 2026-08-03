@@ -1,29 +1,33 @@
 # 当前实验设计说明
 
-更新日期：`2026-07-31`
+更新日期：`2026-08-01`
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
-> 当前主线更新：Step 28 使用 operational M0
-> `LightGBM + legacy18 + LaBSE`，但不声称它已由独立新英文数据证明为
-> 唯一最强。正式中文合成数据集
-> `v13_training_ready_v1_2_order_repair_20260731` 已通过发布、父子等价、
-> 逐行残留审计和独立全树/行序加固审计，状态仅为
-> `PASS_DATASET_ONLY_READY_FOR_M0_M1_M2`。M0/M1/M2 尚未在该正式数据上
-> 训练或评分，不能声称适配成功。当前权威事实见
-> `docs/AI_RESEARCH_HANDOFF_20260722_ADDENDUM.zh.md` 和
-> `docs/STEP28_V13_TRAINING_READY_ORDER_REPAIR_RESULT_AUDIT_20260731.zh.md`。
+> **2026-08-01 训练前复核更新：当前正式状态重新降为 NO-GO。**
+> `v13_training_ready_v1_2_order_repair_20260731` 保留冻结字节，但已撤销
+> M0/M1/M2/M3 训练资格。原因是：公开 candidate key 可重构 C40 分层成员
+> （train/development 攻击 AUC 约 `0.89/0.86`）；C40 候选图度数本身在
+> development 可取得约 `0.63` AUC；旧 Audit A/B controller/oracle 已进入
+> Git 历史，无法通过重新命名“密封”。v2 执行链因此也只能作为未执行的
+> 历史实现，禁止启动。后继主边界改为四 split 全量重生，并以每 world 全部
+> 378 对作为主分类总体；C40 退出训练与主评估。完整冻结方向见
+> `docs/STEP28_V13_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`。
 
-## 0. 当前方法状态：Step 28-v13 数据就绪，模型实验尚未开始
+## 0. 当前方法状态：full-378 fresh release 实现中，正式训练禁止启动
 
-当前比较固定为同一 operational M0：M0 不适配；五个 M1 使用整 33 维、
-端点不重合的分层置乱训练对照，但不声称 controller-disjoint；M2 使用对齐
-身份33维。仅 train 拟合，development 只做阈值/校准，Audit A/B 是固定
-逻辑封存评估。当前只完成数据字节和审计，不存在正式模型指标。
+新边界固定为每 split 500 worlds、每 world 28 sellers 和完整 378 pairs，
+即每 split 189,000 pair、10,000 正例和 179,000 负例。四个 split 都必须用
+新的版本化随机流全量重生；Audit oracle/labels/qrels 只可进入 Git 忽略的
+private custody。M0 仍是冻结英文来源模型；五个 M1 改为完整 378-pair
+universe 内的整 33 维端点不重合双射；M2 使用正确对齐 identity33；M3 按
+5.291% 自然先验重新设计。旧 C40 的阈值、正则、class weight、M1 分层和
+所有 20,000-row 配置均失效。新数据与新执行链通过全部门槛前，不得开始
+Linux M0 编码、adapter/M3 训练或 Audit 开封。
 
 以下 Step24/Step25 主体保留为 2026-07-18 前一条方法线的完整设计和负结果
 背景；凡与上面的 Step7→Step28 角色、数据版本或当前状态冲突，以上述
-2026-07-31 交接补充和专项审计为准。
+2026-08-01 交接补充、训练就绪状态和专项审计为准。
 
 ## 0A. 历史方法状态：Step25-v1/v2/v3.1 均已冻结，v3.1 为最终严格负结果
 
@@ -1141,3 +1145,88 @@ Clean scorer 明确禁止 direct identifier、candidate-rule、review label 和 
 - minority regularization under imbalanced target supervision
 - graph candidate triage with strict evidence audit
 - distinction between semantic similarity and identity reliability in darknet seller linkage
+
+## 16. Step28-v13 full-378 当前主线（2026-08-01）
+
+本节覆盖本文更早的 Step28 同名角色和旧 v1.2/v2 启动状态。当前主线不是在
+旧中文真实小样本或旧 C40 上继续调模型，而是先生成一套 fresh、完整图、
+标签机制已知且 Audit 真值保持私有的中文合成身份数据，再检验冻结英文 M0
+与身份迁移模块的差异。
+
+当前 M0 是只用真实英文标签训练并冻结的
+`LightGBM + legacy18 + LaBSE` 完整流水线；C0 是
+`LightGBM + legacy18` 敏感性对照。M1 是五个使用错配 identity33 训练的
+无信息对照，M2 使用正确 identity33；M1/M2 的 p0、样本、变换、L2、权重和
+求解器完全相同。M3-base/M3-joint 是直接使用 synthetic Chinese train
+标签的 LightGBM 强对照，用于回答迁移模块相对直接中文训练是否仍有价值。
+
+新数据版本固定为
+`v13_training_ready_v1_3_full378_fresh_20260801`：四个 split 各 500 个 K28
+world，使用每个 world 全部 378 个 pair，固定 20 正/358 负；Audit 检索使用
+全部 28 个 query。旧 v1.2 因公开 candidate/C40 图捷径与 Audit custody 泄漏
+仅保留历史，不再具备正式训练资格。
+
+当前实现和回归已经完成，正式仪式已经开始。identity design 正式
+self-hash 为
+`0b2ae09ed17cd68e313f4add60960f8e9fa192c0bd56ccb1a7702db7687ba5c1`，
+正式 prelock self-hash 为
+`23faeeda89cae653af8f1a2d363f436341bb826d9502bf676aa73a051130ccac`；
+正式 Windows `Validate` 入口实际运行 472 项：465 通过、7 既有声明跳过、
+0 失败（792.518 秒）。正式 policy/prelock 和四份一次性 seed 承诺已经冻结；
+split、模型和结果仍为 0，因此当前状态是 NO-GO，不得写成数据或模型已经
+成功。
+
+分类报告 ROC-AUC、AP、梯形 PR-AUC、Precision、Recall、F1、Specificity、
+Balanced Accuracy、MCC、Brier、Log Loss、Recall@FPR=1% 和混淆矩阵；检索
+报告 MRR、MAP、Recall@1/3/5/10、NDCG@1/3/5/10。统计单位为 world。
+development、Audit 盲预测和 Audit 指标必须分别通过从冻结输入开始的深度
+重放，文件哈希相同不能替代计算重放。
+
+权威细节见：
+
+- `docs/STEP28_V13_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`
+- `docs/STEP28_V13_MODEL_TRAINING_READINESS_20260801.zh.md`
+
+## 17. Step28-v13 full-378 v1.4 修复状态（2026-08-02）
+
+本节覆盖第 16 节的执行状态。v1.3 在正式 train 构造完 500/500 world 后，
+因最终校验器错误地要求机制模板槽名跨 world 全局唯一而失败；没有正式 split
+发布，且按 one-shot/no-retry 纪律不得修补后重跑。
+
+v1.4 将机制槽唯一性限定在 `(world_uid, mechanism_slot_uid)`，同时继续要求
+seller、item、controller、identity asset/value 等真实实体全局唯一。冻结前
+已实际生成两个完整 K28 world、756 pair 并通过最终聚合校验和二次特征重放；
+全仓 476 项测试为 469 通过、7 声明跳过、0 失败。新正式目标是
+`v13_training_ready_v1_4_full378_scope_repair_20260802`，但其正式 policy、
+prelock 和四份 seed 承诺已经冻结；split、模型和结果尚未产生，当前仍为
+NO-GO。
+
+## 18. Step28-v13 full-378 v1.5 持久化合同修复（2026-08-02）
+
+第 17 节现为历史状态。v1.4 的 train 已完成 500/500 world 内存构造，但未发布：写入函数支持 Windows 长路径，紧随其后的直接 `Path.read_bytes()` 却在 264 字符路径上误报文件不存在。继续审计还发现生成器声明 split manifest v2、后续消费者硬编码要求 v1。v1.4 因此永久失败，development/Audit 未启动，四份 seed 禁止重用。
+
+当前后继为 `v13_training_ready_v1_5_20260802`。v1.5 使用长路径安全的读取、遍历和 stat，并让 build manifest 与 execution lock 各自只有一个权威版本常量。失败 v1.4 train 的 42,000 个身份值仅以哈希进入新排除库；它们与原 283,496 个禁用哈希零交集，新总数为 325,496。v1.3/v1.4 共八个 master commitment 同时禁用。
+
+新增回归不再止于内存生成：两个完整 K28 world 被真实写入临时 public/private stage，再由正式 manifest 消费者逐文件重读和哈希验证；另有超过 260 字符的 Windows 文件路径回归。正式 `Validate` 运行 480 项，473 通过、7 声明跳过、0 失败。
+
+v1.5 identity design self-hash 为 `d3515e7791f164b7a6a2ac55345c0306cec2fc82dcce2800a7649c0d58c67be5`，prelock self-hash 为 `04636dcf45bf295111d434aadf240425af451c268501073bee9eea094b21c589`。四份 seed 已按 train、development、Audit A、Audit B 固定顺序一次性提交且原始密钥未公开；split 仍为 0，状态仍是 NO-GO。下一步是 train/development 正式生成。
+
+## 19. Step28-v13 full-378 当前关闭状态（2026-08-03）
+
+第 16–18 节均为不可改写的历史过程，不再代表当前待执行版本。v1.3–v1.11
+已全部永久关闭；没有 fresh full-378 发布集，没有 M0/M1/M2/M3 正式结果，
+不得从任何失败运行的开放 split 或通过的局部 gate 提炼科研效果结论。
+
+最后一次 v1.11 在四 split 生成后、正式发布前失败。跨版本审计器错误地要求
+`mechanism_slot_uid` 跨 world 全局唯一；正确键是
+`(world_uid, mechanism_slot_uid)`。四份 split 的 world 内重复均为 0，所以
+这是审计合同错误，不是数据碰撞；但冻结 one-shot 合同使整次运行仍不可发布。
+Audit 真值/qrels 未为模型评估解封，M0 投影/评分和任何模型拟合均未启动。
+
+历代失败身份值只保留 915,996 个不可逆排除哈希，归档 SHA-256 为
+`f70611a4b5df7ddbded6784820026352c92952a0245fcb184b4e7c282c1447a0`。
+失败 payload、临时 workspace 和版本专用代码/配置已清理；完整失败表和未来
+处置纪律见 `docs/STEP28_V13_FAILED_RUN_CLEANUP_20260803.zh.md`。旧 v1.2
+成功发布字节保留为历史证据，但不恢复训练资格。下一步如继续主线，必须从
+新的版本合同、四个新 seed 和压缩禁用哈希归档开始，不能把 v1.11 原地修成
+“成功”。

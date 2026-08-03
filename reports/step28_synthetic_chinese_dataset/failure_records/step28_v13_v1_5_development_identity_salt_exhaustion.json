@@ -1,0 +1,83 @@
+{
+  "version": "2026-08-02-step28-v13-full378-v1-5-development-failure-v1",
+  "status": "FAILED_UNRELEASABLE_GLOBAL_SALT_SEARCH_EXHAUSTED",
+  "run_id": "v13_training_ready_v1_5_20260802",
+  "failed_split": "development",
+  "failure_stage": "identity_value_plan_initialization_before_generation",
+  "observed_exception": {
+    "exception_type": "ContractError",
+    "message": "No admissible full-378 identity salt: qq",
+    "identity_type": "qq",
+    "global_salt_search_first": 0,
+    "global_salt_search_last_inclusive": 10000,
+    "candidate_count_per_identity_type": 192000
+  },
+  "frozen_evidence": {
+    "development_ceremony_receipt": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_5_20260802/ceremony_receipts/development.json",
+      "sha256": "90c5952e0c46f23688817bc14abf094eef8ce97e306d017f65cb98f7cd89efdb",
+      "canonical_self_hash": "8de64637ed0aefcd6740b7756c914a9ca16f71978d993dcf18de8b3023613a6b"
+    },
+    "train_ceremony_receipt": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_5_20260802/ceremony_receipts/train.json",
+      "sha256": "94be3d0683b6659eaf2205c2c1b62d3a55a877e64fe53b317c843e3c99f0ba38",
+      "canonical_self_hash": "9304d6af63aabb4b3552bdb00aaf68bba712adb47c0fec70155a5ab1aaf0a7b6"
+    },
+    "train_generation_completed": {
+      "private_path": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_5_20260802/executions/train/generation_completed.private.json",
+      "sha256": "efb87b784317dbfdd7e62ae95b29cbc39830bc712cd87e2c93c0393fb1f8ebde",
+      "canonical_self_hash": "7025f8d225e07ec5cf7ff12d3c77e074e07c6a1889689c017696ec7fca9e622f"
+    },
+    "train_identity_registry_extension": {
+      "private_path": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_5_20260802/builds/train/private_stage/audit/identity_value_registry_extension.private.json",
+      "sha256": "66737df112434c9190c1b1de9abfd3ca748fb18ed741d8a3afea5dd8f82cc3ca",
+      "canonical_self_hash": "03ae627bacdf40a6d0862cc7f16f684ae46e570f6c17beb27ba8827f3cb31ce1"
+    }
+  },
+  "post_failure_boundary": {
+    "development_identity_value_plan_persisted": false,
+    "development_execution_lock_persisted": false,
+    "development_generation_started": false,
+    "development_build_directory_persisted": false,
+    "formal_release_manifest_persisted": false,
+    "train_component_completed_but_release_qualified": false,
+    "run_releasable": false
+  },
+  "label_free_64_salt_diagnostic": {
+    "scope": "qq_only_first_64_candidate_global_salts",
+    "candidate_count_per_salt": 192000,
+    "base_forbidden_intersection_count": {
+      "mean": 8.59375,
+      "minimum": 3,
+      "maximum": 15,
+      "zero_count": 0
+    },
+    "completed_train_extension_intersection_count": {
+      "mean": 1.5625,
+      "minimum": 0,
+      "maximum": 5
+    },
+    "combined_forbidden_intersection_count": {
+      "mean": 10.15625,
+      "minimum": 4,
+      "maximum": 19,
+      "zero_count": 0
+    },
+    "labels_or_qrels_read": false,
+    "raw_identity_values_persisted": false,
+    "diagnostic_is_not_exhaustive_replay": true
+  },
+  "root_cause": {
+    "class": "global_superset_salt_feasibility_design_error",
+    "description": "One global salt was required to make all 192000 possible QQ asset values avoid every historical and prior-split value simultaneously.",
+    "random_seed_or_floating_point_failure": false,
+    "retry_with_more_master_seeds_authorized": false
+  },
+  "scientific_claim_boundary": {
+    "dataset_release_granted": false,
+    "model_metrics_produced": false,
+    "failed_run_may_not_support_m0_m1_m2_claims": true,
+    "record_is_operator_observation_plus_post_failure_boundary_not_independent_exhaustive_replay": true
+  },
+  "canonical_self_hash": "3b354b9ab6189a77dbd2d27823500d9fb520b152f56efdef182c18b2df48f313"
+}

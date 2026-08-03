@@ -1,10 +1,10 @@
 # AI 科研交接补充：Step 7-v4+ / Step 28-v13
 
-更新时间：2026-07-31
+更新时间：2026-08-01
 
 本文件只记录 `docs/AI_RESEARCH_HANDOFF_20260719.zh.md` 之后的新事实。原交接文档和 `docs/PROJECT_PROGRESS.md` 已被 Step28-v12 冻结同步清单按字节哈希绑定，不得为更新叙述而改写。
 因此 `PROJECT_PROGRESS.md` 顶部仍写 v12 是当时“current line”只属于冻结
-历史快照；2026-07-31 的当前事实以本补充和本补充列出的专项合同/结果审计
+历史快照；2026-08-01 的当前事实以本补充和本补充列出的专项合同/结果审计
 为准。
 
 ## 当前活动阶段
@@ -343,3 +343,240 @@ release inputs、跟踪中的 development smoke 和全部历史文档均保留�
 381 项：374 项通过、7 项按既有声明跳过、0 失败，用时 798.904 秒。7 项
 跳过由已撤销 Step28-v11 测试类的 6 项，以及已被 training-ready 测试替代
 的 `dataset_smoke_v3` 不可执行旧锁 1 项组成。
+
+## 2026-07-31：Step28 身份实验执行前锁与可见文本捷径控制
+
+发布后攻击性复核确认，原 24 项 `visible_m0_proxy` 的 development AUC
+约 `0.577` 低估了可见文本可学习性。现已把字符三元组 T_text 固定为只用
+train 拟合、只在 development 报告的描述性探针；它不读取 UID、
+`profile_text`、原始身份 surface 或 Audit A/B。正式结果为 train
+`AUC=0.663437/AP=0.559696`，development
+`AUC=0.627569/AP=0.346028`。一次性旧探针的
+`0.628126/0.347326` 已原样披露，未据此调参。
+
+该探针使用合成中文标签拟合，不能冒充冻结英文 M0，也不能把分数解释为
+身份历史价值。生成器私有基础风格约 `AUC=0.91` 是模型不可见 oracle，不能
+称作可见文本泄漏。当前处理不是重生成或抹掉作者风格，而是强制 M0、五个
+M1 和 M2 在相同 `canonical_pair_uid` 上使用逐行完全相同的冻结 `p0`；
+M1/M2 仅可在错配或正确对齐的 33 维身份矩阵上不同。科研结论只认
+`M2-M0`、`M2-mean(M1)` 和最差 `M2-M1`，同时要求 M1 平均与 M0 的
+90% TOST 区间完整落入 `[-0.01,+0.01]`。
+
+新的执行前锁是
+`schema/step28_v13_identity_transfer_experiment_policy.json`，状态为
+`FROZEN_PREEXECUTION_CONTROLS_FORMAL_EXECUTION_BLOCKED`。它不改变 v1.2
+任何正式数据字节或发布合同；正式 M0 评分、adapter 训练与 Audit 解封仍为
+false。控制实现、剩余阻塞项和正式探针哈希见
+`docs/STEP28_V13_IDENTITY_EXPERIMENT_PREEXECUTION_LOCK_20260731.zh.md`。
+新增控制的 7 项针对性测试全部通过；最终全仓回归共 388 项，381 项通过、
+7 项按既有声明跳过、0 失败，用时 819.420 秒。独立发布树加固审计重跑仍
+得到原 self-hash，确认本次没有改写 v1.2 正式数据字节。
+
+## 2026-08-01：模型训练就绪判定与直接中文训练基线
+
+当前状态必须写成“数据就绪、正式训练未授权”。正式 v1.2 数据根目录、
+160 文件发布树和 2,000-world/C40 顺序已通过发布与独立加固审计，可以作为
+模型阶段冻结输入；数据集不需要重新生成。但现行身份实验锁仍为
+`FROZEN_PREEXECUTION_CONTROLS_FORMAL_EXECUTION_BLOCKED`，其中 M0 正式
+评分、adapter 正式训练、Audit A/B 解封均为 false。因此可以继续实现和
+审核训练链，不能直接把一次训练称为正式 Step28 结果。
+
+为正面回答“为什么不直接在合成中文标签上训练”，后继版本化策略必须在
+Audit 解封前加入两个强基线：M3-base 复用相同公开预处理、legacy18 和冻结
+LaBSE 表示，只用 synthetic train 标签训练目标域分类器；M3-joint 使用
+同一 base 特征与正确对齐 identity33 联合训练单体分类器。两者只能在 train
+内进行 world-grouped 选择，development 只冻结阈值和校准。若要声称模块
+优于直接训练，必须预先冻结 M2 对 M3 的配对 world-bootstrap 比较；否则
+只能并列报告数值。
+
+现有 M0 是冻结表示加 LightGBM，不能把它描述成可端到端反向传播的 LaBSE
+模型。真正微调 LaBSE 需要另立 M4-encoder，并先冻结可微 pair head、损失、
+分块聚合和 GPU 搜索预算；当前未进入正式矩阵。正式训练前仍须完成
+label-free 兼容夹具、CPU/GPU 策略、冻结 M0/C0 打分、M1/M2 求解器与完整
+指标/bootstrap、M3 实现、Audit 授权链和提交后重验证。完整最新启动门见
+`docs/STEP28_V13_MODEL_TRAINING_READINESS_20260801.zh.md`。
+
+## 2026-08-02：full-378 v1.4 写盘失败，v1.5 合同已冻结
+
+本节覆盖上面的 v1.3/v1.4 执行状态。v1.4 train 已完成 500/500 world 内存构造，但在写盘复核时失败：目标 JSONL 的绝对路径为 264 字符，原子写入使用长路径接口而直接 `Path.read_bytes()` 没有，因此文件实际存在却被误报缺失。只读复核又发现 split manifest 生产者写 v2、消费者仍要求 v1。train 未发布，development/Audit 未启动；v1.4 四份 seed、失败 stage 和 invalid marker 原样保留且禁止重试。
+
+后继 `v13_training_ready_v1_5_20260802` 已修复长路径读/遍历/stat，并把 build manifest 和 execution lock 的版本分别收敛为单一权威常量。v1.4 失败 train 的 42,000 个身份值以哈希进入 `base_exclusions.v5`；与既有 283,496 个禁用哈希交集为 0，总计 325,496。v1.3/v1.4 共八个 master commitment 均进入禁用集合。
+
+v1.5 两-world 预检、完整临时 public/private 写盘、manifest 消费、超 260 字符 Windows 路径和全部 Step28 后半段回归均通过。正式 Windows `Validate` 为 480 项：473 通过、7 声明跳过、0 失败。identity design self-hash 为 `d3515e7791f164b7a6a2ac55345c0306cec2fc82dcce2800a7649c0d58c67be5`；prelock self-hash 为 `04636dcf45bf295111d434aadf240425af451c268501073bee9eea094b21c589`。四份 seed 已按固定顺序一次性提交，原始密钥未公开；split、模型和结果仍全部为 0，下一步是 train/development 正式生成。
+
+## 2026-08-02：v1.3 正式生成失败，v1.4 修复完成冻结前验证
+
+本节覆盖上节“合同与随机性边界已冻结”的当前性。v1.3 四份一次性 seed
+承诺已按序产生，但正式 train 在完成 500/500 world 的内存构造后被最终
+聚合校验器以 `Mechanism assignment lineage collision` 拒绝。没有 split
+发布；development 与 Audit A/B 未生成。私有失败标记与公开 seed 回执保留，
+v1.3 按 one-shot/no-retry 合同永久 fail closed。
+
+根因是 `mechanism_slot_uid` 表示每个 world 复用的模板槽名，旧校验器却要求
+它跨完整 split 全局唯一。v1.4 只把该唯一键改为
+`(world_uid, mechanism_slot_uid)`，并保留所有真实实体的全局唯一约束。新增
+同 world 重复槽负测，以及两个真实 K28 world、756 pair 的端到端生成和
+二次字节重放硬门；回执 self-hash 为
+`ce77646a2b9314c55096434829e38f5f72a79bcbd1ff939b040585ee0f4622e0`。
+
+新目标为 `v13_training_ready_v1_4_full378_scope_repair_20260802`。候选 identity
+design self-hash 为 `6b629f139b34c464bc907cbe77f91488b4a39f82f1a5ae1f2a9bf7a83256f31f`，
+draft prelock self-hash 为 `1ba6770eb09c65a4b150899fdd7e5885010fefae1027d8ec435ebf1978385944`。
+冻结前全仓回归为 476 项：469 通过、7 声明跳过、0 失败。v1.4 正式
+identity policy 与 prelock 已正式冻结；四份 seed 承诺已按固定顺序完成且原始
+密钥未公开。v1.4 split、模型和效果目前仍为 0。
+
+## 2026-08-01：训练前攻击复核撤销 v1.2/v2 启动资格
+
+在任何正式 M0/M1/M2/M3 数值产生前，三路独立攻击复核发现三项足以阻断
+训练的问题。第一，base policy 公开的 candidate key 可从可见 world/pair
+UID 重算 C40 分层抽样；攻击在 train/development 的 AUC 约为
+`0.89/0.86`。第二，即使候选 key 改为私有，40 条 C40 边形成的子图仍泄漏
+类别；仅使用端点度数在 development 的 AUC 约为 `0.63`。第三，v1.2
+Audit A/B 的 controller membership、机制、身份资产和候选审计已被 Git
+跟踪，旧真值可以连接回任何复用 UID/文本/卖家历史的后继版本。目录名
+`sealed_supervision` 不构成真实密封。
+
+因此 v1.2 冻结字节和历史文档不改，但状态降为
+`BLOCKED_PUBLIC_CANDIDATE_AND_AUDIT_CUSTODY_COMPROMISE`；v2 训练链从未执行，
+现已禁止启动。后继版本固定为四 split 全量重生，并把每 world 的全部
+`C(28,2)=378` 对作为主分类总体。每 split 为 500 worlds、189,000 pairs、
+10,000 positives 和 179,000 negatives，随机 AP 基线为 `20/378`。完整图使
+每 seller 度数恒为 27，从结构上删除 C40 选择与候选图捷径。C40 只能在所有
+预测冻结后作为私有机制诊断，不能参与训练、阈值或主指标。
+
+新 Audit A/B 必须使用全新 structure/UID/text/identity 随机域，从零生成且
+相对 v1/v1.2 的 UID、身份值、卖家文档/profile/history 指纹不可连接；
+labels、qrels、oracle 和逐行私有审计只进入 Git 忽略的 private custody。
+五个 M1 改为完整 378-pair universe 内、不读标签的整 33 维端点不重合双射；
+旧 C40 截距、L2、阈值、class weight、M1 分层及 20,000-row M3 配置全部失效。
+正式修正案见
+`docs/STEP28_V13_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`。
+完成新数据、逐行捷径审计和 full-378 执行闭包前，当前状态始终为 NO-GO。
+
+## 2026-08-01：Step28-v13 v2 执行实现完成，可以开始计算
+
+上节“正式训练未授权”是 v1 锁当时的准确历史状态；不得删除或改写。其
+后继 v2 已把全部登记 blocker 实际实现并另立新锁：
+`schema/step28_v13_identity_transfer_experiment_policy_v2.json`，状态为
+`FROZEN_PREEXECUTION_IMPLEMENTATION_COMPLETE`，canonical self-hash 为
+`dc5be1258f5379864fb55eeb6493ce3f495760db05a245650fa0eb5c9dbd0c92`。
+v1 文件仍保持 blocked 原字节，v2 只继承并关闭 blocker，不修改正式 v1.2
+数据或历史结论。
+
+已冻结并验证的执行链包括：
+
+1. 英文 M0/C0 joblib、真实英文盲回放参考和 756,000 完整中文 pair 的
+   label-free 公共投影；
+2. 同时适配四个冻结 tokenizer 的完整文本分块，以及只接收匿名文本、匿名
+   pair 和 LaBSE 的 Linux CUDA 工作区；
+3. Step7 历史 LaBSE 兼容夹具。分块、重复 embedding 和历史六项聚合的
+   12 位小数必须全部相等，任何一项不等立即失败；返回 bundle 同时绑定
+   当前 GPU 策略和编码脚本哈希，禁止混入旧版本结果；
+4. 冻结 M0/C0 前向评分；两个 base ×（五个 M1＋一个 M2）的 12 个
+   train-only 33 维加法适配器；M1 只在 train 使用错配历史，推断时与 M2
+   读取同一份正确目标 identity33，防止测试阶段人为压低 M1；
+5. 四个 train-only 直接目标域 M3 LightGBM 对照，每个在 36 个候选中做
+   5 折 world-grouped OOF 选择；M3 只持久化 JSON 兼容元数据和 LightGBM
+   原生模型字符串，写盘前验证其预测与训练封装器 float64 字节完全相同，
+   审计环境不反序列化 sklearn `1.7.2` estimator；
+6. development-only 阈值（不拟合概率校准变换），AP/AUC/PR-AUC/F1/Recall/Precision 等分类指标、
+   MRR/MAP@10/Recall@K/Hits@K 检索指标、hard-negative FPR 和 9,999 次
+   配对 world bootstrap；
+7. 在 Audit A 标签打开前共同冻结 A/B 盲预测；A 不通过则 B 保持封存，
+   只有 A 通过才生成一次性 B 授权。
+
+为补足原 release 中未公开的 hard-negative 诊断输入，已在不开分类标签、
+qrel、controller 或机制标签的条件下从冻结观测数据重放，并把 A/B 各
+20,000 行投影保存在 Git 忽略的 private custody。公开 v2 承诺 self-hash 为
+`fede8eab3411e8cf61c03da29669efaa2cff32c2dd4630c05321dd66ac510675`；A/B
+CSV SHA-256 分别为
+`27a6f6127c4659c5f89d172a193fce7839aebcf249a08d604dbdee2fa0204530` 和
+`f1df37a96c45353c76e59b1e6da3a906ea792905e0d2492648c976d546557538`。
+
+执行前总验证器
+`scripts/step28_v13_validate_identity_experiment_v2.py` 已逐文件核对正式
+release、公共投影、夹具、英文模型依赖、诊断承诺和 25 项双向源码/传输
+闭包，返回 `PASS_STEP28_V13_IDENTITY_V2_PREEXECUTION_CONTRACT`。其中
+`.gitattributes` 也进入闭包，唯一 PowerShell runner 固定 LF，避免提交后
+CRLF 转换造成跨 Windows/Linux 假漂移。
+
+最终冻结实现上，40 项 Step28-v13 专项合同测试全部通过；全仓回归共 421
+项，414 项通过、7 项按既有合同跳过、0 失败，用时 1103.765 秒。另用训练
+环境生成仅含原生 LightGBM 字符串的 M3 夹具，再在 sklearn `1.7.1` 审计
+环境以 warning-as-error 方式加载和预测，跨版本持久化检查通过。
+
+当前科研状态必须准确表述为：**可以开始正式计算，但尚未计算。** Linux
+LaBSE bundle、冻结中文 M0/C0 分数、M1/M2/M3 模型和 Audit 结果均尚未
+产生。当前同一 Windows 用户逻辑封存仍令
+`independent_blind_confirmatory_claim_authorized=false`；即使合成 Audit
+通过，也不能替代新收集的真实中文 ground truth 或宣称真实市场外部有效性。
+执行命令、环境和同步范围见
+`docs/STEP28_V13_MODEL_TRAINING_READINESS_20260801.zh.md`。
+
+## 2026-08-01：full-378 v1.3 实现终审完成，正式仪式尚未开始
+
+本节是当前最新事实，优先于上节旧 v2“可以开始计算”的历史表述。旧
+`schema/step28_v13_identity_transfer_experiment_policy_v2.json` 已因 v1.2
+数据资格撤销和运行器源码漂移而 fail closed；旧私有诊断投影与过期 v2
+执行树已清理，不得恢复为当前输入。v1.2 冻结字节和历史文档继续保留，
+但没有 M0/M1/M2/M3 正式训练资格。
+
+fresh 后继版本固定为
+`v13_training_ready_v1_3_full378_fresh_20260801`。数据生成、完整 378-pair
+主分类、全 28-query 检索、五份 train-only M1、M2、M3-base/M3-joint、
+development M1 等价门、Audit A/B 顺序解封及全部指标/bootstrap 执行链
+已经实现。Audit 数据生成另有一次性授权：必须先完成 train/development、
+五份 M1、M1 独立性和公开捷径门，且 B 文本只能在 A 文本完成后生成。
+
+终审新增三层深度重放回执。development 必须从冻结模型重算逐行预测、阈值、
+指标和 9,999 次等价 bootstrap；Audit A/B 盲预测必须在真值打开前重算全部
+分类与检索概率；每个 Audit 评估必须重算分类、检索、私有诊断和所有
+bootstrap 数组。只验证文件哈希而不重算已不满足合同。Audit B 授权还必须
+绑定 Audit A 的深度重放回执。
+
+正式 identity design self-hash 为
+`0b2ae09ed17cd68e313f4add60960f8e9fa192c0bd56ccb1a7702db7687ba5c1`，
+75 项模型源码闭包已经冻结；正式 prelock self-hash 为
+`23faeeda89cae653af8f1a2d363f436341bb826d9502bf676aa73a051130ccac`，
+50 项数据源码闭包通过 config-only。正式 Windows `Validate` 入口实际运行
+472 项，结果为 465 项通过、7 项既有声明跳过、0 项失败，用时 792.518 秒。最初 7 项失败/错误全部是
+清理后仍要求旧结果、旧私有诊断或旧 v2 runner 的过期测试，现已改为验证
+旧链 fail closed，没有恢复任何废弃产物。
+
+最重要的当前边界：正式 identity policy 与 preceremony lock 已落盘；四份
+master seed 承诺已按 train、development、Audit A、Audit B 固定顺序完成且
+禁止重抽，原始密钥未公开。四个 v1.3 split、M0 分数、模型和效果报告仍为
+0。当前只能称为“正式合同与随机性边界已冻结”，状态仍为 **NO-GO**。下一步
+严格执行 train/development 生成与审计、Audit 文本单独授权、Audit A/B 生成、
+M0 Linux 编码、Windows 训练和分阶段 Audit。最新启动说明见
+`docs/STEP28_V13_MODEL_TRAINING_READINESS_20260801.zh.md`。
+
+## 2026-08-03：full-378 v1.3–v1.11 全部关闭并清理
+
+本节是当前最新事实，覆盖上文仍把 v1.5 或其他后继写成待执行版本的历史
+状态。v1.3 至 v1.11 均已永久失败，当前不存在可用于 M0/M1/M2/M3 的 fresh
+full-378 正式数据集，也没有任何正式模型结果。v1.11 虽生成四个 500-world
+split，仍在发布前跨版本精确审计失败：审计器把 world 内模板槽
+`mechanism_slot_uid` 错当成 split 全局唯一键。每个 split 的正确复合键
+`(world_uid, mechanism_slot_uid)` 均为 6,000/6,000 唯一，world 内重复为 0；
+这证明根因是审计合同作用域错误，但 one-shot 纪律仍禁止原地修补或发布。
+
+删除前已把历代及 v1.11 实际生成的身份值压缩成 915,996 个不可逆禁用哈希；
+文件 SHA-256 为
+`f70611a4b5df7ddbded6784820026352c92952a0245fcb184b4e7c282c1447a0`，
+self-hash 为
+`6f60e294bdbcae1d1da3802acdf4095d605c8e633755fe689d4a71b67fece4d3`。
+其中 v1.11 实际新增 170,500 个，不是先前估算的 168,000：Audit B 为
+44,500，另外三份各 42,000。归档不含原始身份值或私钥。
+
+失败 private custody、stage、失败版本专用代码和配置已按
+`docs/STEP28_V13_FAILED_RUN_CLEANUP_20260803.zh.md` 的边界清理。成功 v1.2
+发布树继续作为历史证据保留，但训练资格仍被撤销。后续不得通过恢复失败
+payload 重建排除库；新版本只能读取并校验压缩哈希归档。当前主线在清理后
+自主暂停，下一次 fresh 设计必须另立版本、四份新 seed 和新的冻结闭包。
+实际删除约 20.11 GiB private custody，并按哈希清单删除 223 个失败版本专用
+脚本、配置和测试；清单 SHA-256 为
+`c6fbe552a67e533165e43d991ce5f2b2bee312ebf9455139ed61928159dccf19`。
+清理重放通过；全仓回归为 381 项、374 通过、7 声明跳过、0 失败，用时
+848.857 秒。

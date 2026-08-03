@@ -1,0 +1,76 @@
+{
+  "version": "2026-08-02-step28-v13-full378-v1-6-label-receipt-failure-v1",
+  "status": "FAILED_UNRELEASABLE_LABEL_FORMULA_RECEIPT_SELF_HASH_DRIFT",
+  "run_id": "v13_training_ready_v1_6_20260802",
+  "failure_stage": "m1_label_independence_label_boundary_load_before_metrics",
+  "observed_exception": {
+    "exception_type": "ContractError",
+    "message": "Formal train label formula receipt self hash drift"
+  },
+  "root_cause": {
+    "class": "canonical_self_hash_computed_before_post_validation_field_append",
+    "field_appended_after_hash": "persisted_rowwise_replay_exact",
+    "field_value": true,
+    "claimed_self_hash": "93971ca0551f6388838c3510cf19eec878bbd778d3122fc17053b5c6f0567ca6",
+    "claimed_hash_matches_body_before_appended_field": true,
+    "correct_self_hash_for_complete_persisted_body": "62f92923cde4d42ad811c1c0f35acd1e8f946a1e04a81f7e12b9c2cec02eb14e",
+    "label_generation_formula_or_rows_wrong": false,
+    "identity_value_collision_resolution_wrong": false,
+    "random_seed_or_floating_point_failure": false
+  },
+  "independent_label_replay": {
+    "formula": "int(controller(left)==controller(right))",
+    "row_count": 189000,
+    "positive_count": 10000,
+    "negative_count": 179000,
+    "world_count": 500,
+    "persisted_rows_equal_independent_formula_rows": true,
+    "scientific_metrics_produced": false
+  },
+  "frozen_evidence": {
+    "train_build_manifest": {
+      "private_path": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_6_20260802/builds/train/build_manifest.private.json",
+      "sha256": "796e74a9dc383d3335ead7d0e07250b7058beed64ab662a944c97992f0c9997a",
+      "canonical_self_hash": "872f8cc1a1bea853d5cf1fae1e356c55da97a1b25ebc0b61cc5ad3f971044fd0"
+    },
+    "development_build_manifest": {
+      "private_path": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_6_20260802/builds/development/build_manifest.private.json",
+      "sha256": "1587596eb810cacc2d0d3f04e49ad4cc41b07e8e456b29a2c0a5847ec5f37431",
+      "canonical_self_hash": "20b24b39e5a9b629cc8c1cf8088ee2e0de502500d16f0233e22f84caf96c2f2a"
+    },
+    "faulty_public_and_private_receipt_bytes": {
+      "relative_public_member": "audit/label_formula_validation.json",
+      "relative_private_member": "audit/label_formula_validation.private.json",
+      "sha256": "b55901cf1c79762908af6b4e0de27ea8822ef8c313ba79c95551db9c2819d153",
+      "size_bytes": 906,
+      "public_private_bytes_equal": true
+    },
+    "m1_set_receipt": {
+      "path": "reports/step28_v13_identity_transfer/full378_v1_6_preexecution/m1_set_receipt/manifest.json",
+      "sha256": "118fb2defbccfb9bb446b52a2e97356d8f757763533d1c54723e5b97a5b0b596",
+      "canonical_self_hash": "f17a40c9ad0ef4701c9b4751c06a2fabd0c012daec38872662217977e21bd076"
+    }
+  },
+  "post_failure_boundary": {
+    "train_generation_completed": true,
+    "development_generation_completed": true,
+    "five_m1_matrices_materialized": true,
+    "m1_independence_metrics_persisted": false,
+    "shortcut_audit_persisted": false,
+    "audit_generation_authorization_persisted": false,
+    "audit_a_generation_started": false,
+    "audit_b_generation_started": false,
+    "formal_release_manifest_persisted": false,
+    "run_releasable": false,
+    "same_seed_retry_or_receipt_patch_authorized": false
+  },
+  "scientific_claim_boundary": {
+    "dataset_release_granted": false,
+    "model_training_authorized": false,
+    "model_metrics_produced": false,
+    "failed_run_may_not_support_m0_m1_m2_m3_claims": true,
+    "train_and_development_identity_values_must_be_excluded_from_successor": true,
+    "all_four_master_commitments_must_be_forbidden_in_successor": true
+  },
+  "canonical_self_hash": "c95441364755ae9897f98192e91f00d70c3267fe9f1dcee7f0127cb4a66faec5"
+}
