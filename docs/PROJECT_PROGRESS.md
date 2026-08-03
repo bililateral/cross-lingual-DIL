@@ -1450,3 +1450,11 @@ Returned v3 diagnostic:
 - invalidation trigger: reported convergence with final projected-gradient residual up to `0.52` versus required `1e-8`
 
 The isolated v3.1 repair is now the only authorized rerun. It uses `schema/step25_v3_1_solver_convergence_policy.json`, `scripts/run_step25_v3_1_solverfix_linux_20260718.sh` and output root `v3_1_solverfix_20260718`. No scientific setting is changed; the repaired manifest must fail unless every constrained artifact reaches the original KKT tolerance.
+
+## Step28-v13 v1.12 Clean-Room Preceremony Baseline (2026-08-03)
+
+The current Step28 mainline has restarted as v1.12 without restoring any deleted v1.3–v1.11 payload. A design-only two-world replay passed with 756 complete pairs (40 positive, 716 negative), 168 identity assets, 756 identity33 rows, and ten M1 mappings. It validates all 915,996 forbidden historical identity hashes and 90 forbidden master commitments, and exercises the fixed per-asset collision counter, world-scoped mechanism keys, Windows long paths, final-body self-hashing, suffix-only identity projection, join-only UID separation, and the single current member contract.
+
+The receipt SHA-256 is `d21964a248e1138e65a654262e026c8c1457f8500e4915dbf5b83cdaba09d243`; its status is `PASS_DESIGN_ONLY_NO_FORMAL_AUTHORIZATION`. The repository suite now reports 396 tests: 389 passed, 7 declared skips, and 0 failures in 809.034 seconds.
+
+This is not a released synthetic dataset. Formal seed/key access, formal rows, scientific metrics, and model training remain zero. The formal seed ceremony, four-split generator, release/custody path, and full-input numerical optimizer preflight must still be implemented and frozen before a one-shot formal run can be authorized. See `docs/STEP28_V13_V1_12_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`.

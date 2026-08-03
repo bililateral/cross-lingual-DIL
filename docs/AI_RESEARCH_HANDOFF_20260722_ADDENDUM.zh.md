@@ -580,3 +580,26 @@ payload 重建排除库；新版本只能读取并校验压缩哈希归档。当
 `c6fbe552a67e533165e43d991ce5f2b2bee312ebf9455139ed61928159dccf19`。
 清理重放通过；全仓回归为 381 项、374 通过、7 声明跳过、0 失败，用时
 848.857 秒。
+
+## 2026-08-03：v1.12 干净重启仅通过预仪式设计基线
+
+本节是当前最新事实。v1.12 已从压缩失败历史重新起步，不恢复 v1.3–v1.11
+已删除 payload，也不沿用其 seed。策略
+`schema/step28_v13_v1_12_cleanroom_preceremony_policy.json` 的正式 seed、
+正式数据、模型训练和 Audit 解封授权仍全部为 false；实现本身也明确不包含
+正式 seed ceremony 或四 split 正式生成器。
+
+非正式两世界预检共重放 756 条完整 pair、40 正/716 负、168 个身份资产、
+756 行 identity33 和 10 张 M1 映射。915,996 个失败身份哈希、90 个禁用
+master commitment、逐资产碰撞推进、Windows 长路径、world-scoped 机制槽、
+最终 self-hash、登记后缀投影、join UID 分域和单一成员合同均通过。回执
+SHA-256 为
+`d21964a248e1138e65a654262e026c8c1457f8500e4915dbf5b83cdaba09d243`，
+状态为 `PASS_DESIGN_ONLY_NO_FORMAL_AUTHORIZATION`。
+
+全仓回归现为 396 项：389 通过、7 项既有声明跳过、0 失败，用时 809.034 秒。
+当前正式数据行、正式密钥访问、科学指标和模型训练均为 0。下一步必须实现并
+验证正式 custody/seed 流程、四 split 生成与发布审计，以及基于完整输入的真实
+优化器收敛预检，再另行冻结正式授权；在此之前不得开始正式中文合成数据生成。
+完整审计见
+`docs/STEP28_V13_V1_12_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`。
