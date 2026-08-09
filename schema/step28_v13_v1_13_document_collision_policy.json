@@ -1,0 +1,251 @@
+{
+  "version": "2026-08-09-step28-v13-v1-13-document-collision-policy-v1",
+  "status": "DESIGN_ONLY_IMPLEMENTATION_IN_PROGRESS_NO_FORMAL_AUTHORIZATION",
+  "claim_boundary": "Pure document hashing, frozen historical exclusion loading, title-missing attestation verification, and candidate-key derivation only. This policy cannot create formal seeds, capabilities, rows, models, or metrics.",
+  "formal_authorizations": {
+    "audit_truth_access": false,
+    "candidate_generation": false,
+    "formal_capability_derivation": false,
+    "formal_dataset_generation": false,
+    "formal_model_training": false,
+    "formal_seed_ceremony": false
+  },
+  "split_order": [
+    "train",
+    "development",
+    "audit_a",
+    "audit_b"
+  ],
+  "document_contract": {
+    "contract": {
+      "path": "docs/STEP28_V13_V1_13_VISIBLE_DOCUMENT_COLLISION_CONTRACT_20260809.zh.md",
+      "sha256": "0f1906a8be46be3d3cdf16738814e0c83192e97299d162857b71ca585208eca6",
+      "size_bytes": 17811
+    },
+    "hash_algorithm": "sha256",
+    "item_document": {
+      "encoding": "utf-8",
+      "fields_in_canonical_json": [
+        "description",
+        "title"
+      ],
+      "json_allow_nan": false,
+      "json_ensure_ascii": false,
+      "json_separators": [
+        ",",
+        ":"
+      ],
+      "json_sort_keys": true,
+      "postprocess_production_redactor_output": false
+    },
+    "seller_document": {
+      "drop_empty_after_strip": true,
+      "encoding": "utf-8",
+      "field_order": [
+        "category_concat_top",
+        "signature_title_concat",
+        "title_concat_top",
+        "signature_description_concat",
+        "description_concat_top"
+      ],
+      "field_strip": true,
+      "separator_hex": "0a"
+    }
+  },
+  "candidate_key_contract": {
+    "candidate_index_max_inclusive": 31,
+    "candidate_index_min_inclusive": 0,
+    "capability_key_bytes": 32,
+    "domain_utf8": "step28-v13-v1.13-document-candidate",
+    "field_separator_hex": "1f",
+    "mac": "hmac-sha256",
+    "message_fields": [
+      "domain_utf8",
+      "split_utf8",
+      "world_uid_utf8",
+      "candidate_index_uint64_be"
+    ],
+    "must_not_replace_text_key_hex": true
+  },
+  "style_title_missing_attestation": {
+    "attestation": {
+      "canonical_self_hash": "be951a3e6ee1c4cca58f26ca4b1a5658c0105adabcf66706c492a21f5f2bdaa8",
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/v1_13_collision_contract_20260809/style_profile_title_missing_attestation.json",
+      "sha256": "ee3e84ac0ed111027c41ff1760db29935f6473b1b244445b51085fd7a4daf326",
+      "size_bytes": 1149,
+      "status": "PASS_PINNED_INPUT_FACT_ONLY_NO_SEED_OR_DATA_AUTHORIZATION",
+      "version": "2026-08-09-step28-v13-v1-13-style-profile-title-missing-attestation-v1"
+    },
+    "expected_quantile_keys": [
+      "0.05",
+      "0.10",
+      "0.25",
+      "0.50",
+      "0.75",
+      "0.90",
+      "0.95"
+    ],
+    "source": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json",
+      "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34",
+      "size_bytes": 3185
+    }
+  },
+  "historical_sources": {
+    "successful_v1_2": {
+      "all_item_document_hashes_sha256": "a3a0d9e37b18eb7363eb0dd9958dbb2d49a87f2f2cfb2d53a6cb27bcabc61ef5",
+      "all_item_document_unique_count": 202043,
+      "all_item_row_count": 202071,
+      "all_seller_document_hashes_sha256": "b04dc00bfc7886c88e002eb73ca09c7107121f54ee31019cd4b7e5d28f91afd8",
+      "all_seller_document_unique_count": 56000,
+      "all_seller_row_count": 56000,
+      "release_manifest": {
+        "canonical_self_hash": "59001459bc9b3a908ab0efa1f9f46a6c821bf6078ba3dc5f3308f910d0c5e00b",
+        "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/release_manifest.json",
+        "run_id": "v13_training_ready_v1_2_order_repair_20260731",
+        "sha256": "81ca7d9d2040d500b3bcb2ffc9af6aeb72c581754dbd075b94dd6cf8904b8275",
+        "size_bytes": 21536,
+        "status": "PASS_DATASET_ONLY_READY_FOR_M0_M1_M2",
+        "version": "2026-07-31-step28-v13-training-ready-order-repair-release-manifest-v5"
+      },
+      "splits": {
+        "audit_a": {
+          "item_document_hashes_sha256": "39e46c8eb208ca31bbc92ae1a4ff1dd234fe7dc9c5afea0a7a1eca2e66e0ec4e",
+          "item_document_unique_count": 50595,
+          "item_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_a/observed/redacted_items.jsonl",
+            "sha256": "41e9f83b0027047b98e6492e057e1d744133ccd46b6cf72fc4478556296c90bb",
+            "size_bytes": 31856501
+          },
+          "item_row_count": 50603,
+          "manifest": {
+            "canonical_self_hash": "7f7d599c5712be907cfc13f2cab7359ba04c0b9afa68f2d16a3eced1f02bc80e",
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_a/split_manifest.json",
+            "sha256": "ebcd400fa07aa3cfe4a6d3270ff791e57fc69825c6e1d857f56035db8e503d02",
+            "size_bytes": 13608
+          },
+          "seller_document_hashes_sha256": "3ab4b8f7c31d5e854581966b8492e58ca78d3d456d3ef7f090c5e064ef62a31b",
+          "seller_document_unique_count": 14000,
+          "seller_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_a/observed/seller_profiles.jsonl",
+            "sha256": "b6283c21e3775c2f4e9e7c3f6b16c7fd4cbd564b94233b996966e0335fec3e25",
+            "size_bytes": 144971819
+          },
+          "seller_row_count": 14000
+        },
+        "audit_b": {
+          "item_document_hashes_sha256": "fcb637f947397249675d781a3a6cdf3b8ed8aa1cb7ae223b2f349f2474a41984",
+          "item_document_unique_count": 50439,
+          "item_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_b/observed/redacted_items.jsonl",
+            "sha256": "65fad552613dd6f5b087e4f77f76bbb0fdb23bee56fd8999f33c35fa64275ca1",
+            "size_bytes": 31680959
+          },
+          "item_row_count": 50445,
+          "manifest": {
+            "canonical_self_hash": "1916923e85c6a18d34fc1fbbe3153d1d366bdcc3fd8d1b87f99e999bb577e919",
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_b/split_manifest.json",
+            "sha256": "a166567ea2b41ddd69d83df17be6799e3a73236653af333614e64f7383cffe3f",
+            "size_bytes": 13610
+          },
+          "seller_document_hashes_sha256": "f10e5858cb7e7d0e22dca6e537b21980b72abd61c98eacd198b938d0956b857e",
+          "seller_document_unique_count": 14000,
+          "seller_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/audit_b/observed/seller_profiles.jsonl",
+            "sha256": "4525c6149f8596c442b7fd787d0e3a896a73666d99ebe892e87561209230d6f7",
+            "size_bytes": 143861050
+          },
+          "seller_row_count": 14000
+        },
+        "development": {
+          "item_document_hashes_sha256": "91e025238904fc304d5b6e4a10e9aee6905deed39d6a7edd6518f294eae14d8c",
+          "item_document_unique_count": 50744,
+          "item_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/development/observed/redacted_items.jsonl",
+            "sha256": "20cacddd43b2434a95c00103db45086612c68d8191146b454e813f6854e4416e",
+            "size_bytes": 32158249
+          },
+          "item_row_count": 50750,
+          "manifest": {
+            "canonical_self_hash": "9233cd33ab7ee0918ca84fd1a805e6b73dc4a7a0d925e7f2eaf916302766ebef",
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/development/split_manifest.json",
+            "sha256": "902307ab9a8bc17cbf4e8564d14c4c8b4bc2bb17c70e48ba8de13696160da088",
+            "size_bytes": 12766
+          },
+          "seller_document_hashes_sha256": "f28eafb7fc074d5f70bc3ce7feae62fa3cc51df69292fa04d31642ac605fadec",
+          "seller_document_unique_count": 14000,
+          "seller_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/development/observed/seller_profiles.jsonl",
+            "sha256": "e556f751581e4b4c18c646cefcca1adad50300857c48e298cd33a19ca2ac7378",
+            "size_bytes": 145675285
+          },
+          "seller_row_count": 14000
+        },
+        "train": {
+          "item_document_hashes_sha256": "3e6fdc3521749d3570b759fdcdce08d71c7f90996765ee8b042704b7d93d3d14",
+          "item_document_unique_count": 50265,
+          "item_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/train/observed/redacted_items.jsonl",
+            "sha256": "355d053fc31983f36b18e7711fbee04b6e0af5995c84ac9fd65e49108c041e7a",
+            "size_bytes": 30840665
+          },
+          "item_row_count": 50273,
+          "manifest": {
+            "canonical_self_hash": "56b750d33f835688d08ae4485b30c947e76638b01ae2a6a571f302fea8683779",
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/train/split_manifest.json",
+            "sha256": "b178f7869014be6ba7130cd5294e31aa232d6a52ad589547217810b0caaa9f9c",
+            "size_bytes": 14832
+          },
+          "seller_document_hashes_sha256": "4ad5a9f0d86211e6dcb623fb3bef8d6e4130d08b9a3d65e21364d36f859da59f",
+          "seller_document_unique_count": 14000,
+          "seller_rows": {
+            "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/train/observed/seller_profiles.jsonl",
+            "sha256": "9c4693d02817527da3cf965632c01c7fb504041246918023d5d7a62aed3e4df3",
+            "size_bytes": 139034260
+          },
+          "seller_row_count": 14000
+        }
+      }
+    },
+    "failed_v1_12": {
+      "archive": {
+        "canonical_self_hash": "ab793f61a82664755dd85de5a5163e420218f72ec31a034f1acefeb72118b211",
+        "path": "reports/step28_synthetic_chinese_dataset/failure_records/step28_v13_v1_12_failed_exclusions.private.json",
+        "sha256": "b29e2e7dc46921aa3f9d1f7e03d9e75baabde5093dd3fb63b93fd3bc9c19eb01",
+        "size_bytes": 50991342,
+        "status": "PASS_V1_12_FAILED_RUN_HASH_ONLY_EXCLUSION_ARCHIVE",
+        "version": "2026-08-09-step28-v13-v1-12-failed-exclusion-archive-v2"
+      },
+      "base_identity_archive": {
+        "canonical_self_hash": "6f60e294bdbcae1d1da3802acdf4095d605c8e633755fe689d4a71b67fece4d3",
+        "combined_unique_value_hash_count": 915996,
+        "path": "reports/step28_synthetic_chinese_dataset/failure_records/step28_v13_failed_identity_exclusions_through_v1_11.private.json",
+        "sha256": "f70611a4b5df7ddbded6784820026352c92952a0245fcb184b4e7c282c1447a0",
+        "size_bytes": 61389347,
+        "status": "PASS_FAILED_RUN_HASH_ONLY_EXCLUSION_ARCHIVE",
+        "version": "2026-08-03-step28-v13-failed-identity-exclusion-archive-v1"
+      },
+      "combined_identity_value_hash_count_through_v1_12": 999996,
+      "combined_identity_value_hashes_sha256_through_v1_12": "c82e86aa72c205d62ed4a03bd5166a32c8d98fde9bb5961ec1a0048b64ee1346",
+      "commitment_counts": {
+        "consumed_generator_capability_commitments": 28,
+        "consumed_m1_capability_commitments": 5,
+        "forbidden_master_seed_commitments": 4
+      },
+      "consumed_commitment_count": 37,
+      "uid_hash_method": "sha256_utf8_exact_uid",
+      "uid_hash_counts": {
+        "canonical_pair_uid": 378000,
+        "controller_uid": 12000,
+        "item_uid": 100946,
+        "query_uid": 28000,
+        "seller_uid": 28000,
+        "world_uid": 1000
+      },
+      "v1_12_identity_value_hash_count": 84000,
+      "v1_12_item_document_hash_count": 100936,
+      "v1_12_seller_document_hash_count": 28000
+    }
+  },
+  "canonical_self_hash": "d993ad7252789eee341f8875b6a11cd757234c9e07da1ec71fe620bec3a740a9"
+}
