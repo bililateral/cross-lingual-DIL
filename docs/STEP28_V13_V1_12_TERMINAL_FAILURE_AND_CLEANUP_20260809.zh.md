@@ -52,7 +52,9 @@ FormalQualityError: Fresh/historical exact-intersection gate failed
 
 ## 四、清理边界
 
-三份归档提交并复核后，删除 Git 忽略的 v1.12 `_staging/`、`seed_custody/`、浏览器上传缓存和 Python 缓存。已提交的正式测试回执、预锁、种子启动/公开回执、执行锁，以及七份小型核心/M1 启动回执作为不可逆历史证据保留。成功 v1.2 历史发布树不得删除。
+三份归档已在提交 `48bca5c6208130a5a266bb55a9d9898b1e4ba6ab` 中落盘并完成提交后复核。随后删除 Git 忽略的 v1.12 `_staging/`、`seed_custody/`、浏览器上传缓存和空运行目录，共删除 111 个文件、1,887,149,059 字节。已提交的正式测试回执、预锁、种子启动/公开回执、执行锁，以及七份小型核心/M1 启动回执作为不可逆历史证据保留；成功 v1.2 历史发布树未删除。
+
+清理回执位于 `reports/step28_synthetic_chinese_dataset/failure_records/step28_v13_v1_12_cleanup_receipt_20260809.json`，文件哈希为 `06fe76bf1fe93f913439b6aebd68f469912e832a4c597814010f7ccbfff253e2`，规范自哈希为 `1eff3fe8db684594e4e93eb4ef3be8157ec1ccf0900c965c72457b5d4643eab8`。清理后不得再调用 v1.12 正式执行器；旧执行锁因私有能力已销毁而不再需要、也不应继续通过活体校验。
 
 ## 五、v1.13 后继纪律
 
