@@ -504,11 +504,8 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
             [
                 {
                     "id": (
-                        "setUpClass (tests.test_step28_v13_v1_12_"
-                        "authorization_overlay_contracts."
-                        "Step28V13V112AuthorizationOverlayContracts."
-                        "test_runner_separates_nonstarted_fixture_skip."
-                        "<locals>.FixtureSkipped)"
+                        f"setUpClass ({FixtureSkipped.__module__}."
+                        f"{FixtureSkipped.__qualname__})"
                     ),
                     "reason": "fixture unavailable",
                 }
