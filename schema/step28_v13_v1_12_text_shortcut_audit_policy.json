@@ -1,0 +1,588 @@
+{
+  "version": "2026-08-08-step28-v13-v1-12-text-shortcut-audit-policy-v1",
+  "status": "DESIGN_ONLY_NO_FORMAL_SEED_DATA_OR_MODEL_AUTHORIZATION",
+  "contract": {
+    "path": "docs/STEP28_V13_V1_12_TEXT_SHORTCUT_AUDIT_CONTRACT_20260808.zh.md",
+    "sha256": "7e17220f7dea073640ad810a48070a8321bd75bba1c95c7f8018df69780af126",
+    "size_bytes": 13647
+  },
+  "authorizations": {
+    "formal_seed_ceremony": false,
+    "formal_train_generation": false,
+    "formal_development_generation": false,
+    "formal_audit_a_generation": false,
+    "formal_audit_b_generation": false,
+    "model_training": false,
+    "audit_truth_unsealing": false
+  },
+  "runtime_requirements": {
+    "python": "3.10.11",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "scikit_learn": "1.7.2",
+    "unicodedata_unidata_version": "13.0.0"
+  },
+  "style_source_derangement": {
+    "scope": "one_mapping_per_world",
+    "seller_count": 28,
+    "mapping_replicates_per_world": 1,
+    "domain_ascii": "step28-v13-v1.12-visible-style-counterfactual-derangement-v1",
+    "separator_hex": "1f",
+    "constructor_inputs_in_order": [
+      "split_ascii",
+      "world_uid_utf8",
+      "seller_uid_set"
+    ],
+    "seller_uid_order": "utf8_bytes_ascending",
+    "seller_uid_serialization": "uint32_big_endian_byte_length_then_utf8_bytes",
+    "seller_set_blob": "concatenate_serialized_seller_uids_in_frozen_order_with_no_extra_bytes",
+    "attempt_counter": {
+      "start": 0,
+      "maximum_attempts": 1024,
+      "serialization": "uint32_big_endian"
+    },
+    "attempt_seed": "SHA256(domain || 0x1f || split || 0x1f || world_uid || 0x1f || seller_set_blob || 0x1f || attempt_uint32_be)",
+    "attempt_seed_encoding": "raw_32_byte_sha256_digest",
+    "stream_block": "SHA256(attempt_seed || block_counter_uint64_be)",
+    "stream_block_counter_start": 0,
+    "stream_block_counter_step": 1,
+    "every_generated_block_consumes_counter": true,
+    "rejected_randbelow_block_consumes_counter": true,
+    "digest_integer": "unsigned_big_endian_256_bit",
+    "randbelow": "limit=2^256-(2^256 mod m); reject x>=limit; return x mod m",
+    "fisher_yates_indices": "27_down_to_1_inclusive",
+    "candidate_rejection_reasons": [
+      "fixed_point_present"
+    ],
+    "forbidden_constructor_inputs": [
+      "controller_membership",
+      "controller_style_groups",
+      "pair_uid",
+      "classification_label",
+      "mechanism",
+      "identity33",
+      "effective_style_uid",
+      "effective_style_values"
+    ],
+    "required_output": {
+      "bijection": true,
+      "fixed_point_count": 0,
+      "source_multiset_equals_target_multiset": true,
+      "byte_equal_replay": true
+    }
+  },
+  "assignment_null_audit": {
+    "seller_descriptive_relations_in_order": [
+      "source_controller_equals_target_controller",
+      "source_base_style_equals_target_original_base_style",
+      "source_effective_style_equals_target_original_effective_style"
+    ],
+    "pair_gate_relations_in_order": [
+      "same_source_controller",
+      "same_source_base_style",
+      "same_source_effective_style",
+      "same_source_factor__separator",
+      "same_source_factor__ending",
+      "same_source_factor__line_mode",
+      "same_source_factor__english_tag",
+      "same_source_factor__traditional_variant",
+      "same_source_factor__repeat_punctuation",
+      "same_source_factor_proportion"
+    ],
+    "analytic_null": {
+      "distribution": "uniform_derangement_conditioned_on_each_actual_world",
+      "completion_count": "sum_k_0_to_m((-1)^k * choose(m,k) * factorial(26-k))",
+      "conditions": [
+        "actual_28_seller_set",
+        "actual_controller_membership",
+        "actual_controller_base_style_assignment",
+        "actual_28_effective_style_six_tuples"
+      ],
+      "pooled_or_factor_independence_approximation_allowed": false
+    },
+    "fit_classifier": false,
+    "development_maximum_direct_symmetric_auc": 0.52,
+    "development_bootstrap_95_upper_family_max_symmetric_auc": 0.53
+  },
+  "mechanism_neutral_eligibility": {
+    "mask_source": "oracle/negative_flags.csv_before_any_label_read",
+    "excluded_flag_order": [
+      "exact_title_clone_target",
+      "high_semantic_similarity_target"
+    ],
+    "override_kind_by_flag": {
+      "exact_title_clone_target": "exact_title_clone",
+      "high_semantic_similarity_target": "high_semantic_similarity"
+    },
+    "per_world_flag_counts": {
+      "exact_title_clone_target": 2,
+      "high_semantic_similarity_target": 4
+    },
+    "replay_join_fields_in_order": [
+      "mapped_mechanism_kind",
+      "asset_index",
+      "canonical_pair_uid"
+    ],
+    "classification_label_used_to_construct_mask": false,
+    "post_mask_expected_labels": [
+      0
+    ],
+    "per_world_eligible_rows": 372,
+    "per_world_eligible_positive_rows": 20,
+    "per_world_eligible_negative_rows": 352,
+    "point_average_precision_baseline": "5/93",
+    "c40_used": false,
+    "all_other_negative_flags_included": true,
+    "noise_included": true
+  },
+  "counterfactual_rerender": {
+    "only_intervention": "effective_style_six_tuple_from_mapped_source_seller",
+    "high_semantic_values_are_post_override_ast_values": true,
+    "high_semantic_selection_or_gate_replayed": false,
+    "exact_title_clone_order": "after_all_counterfactual_base_titles_using_original_registered_direction",
+    "noise_surface_preserved": true,
+    "identity_value_role_slot_membership_uid_and_order_preserved": true,
+    "character_offsets_recomputed": true,
+    "production_steps_in_order": [
+      "counterfactual_raw_observed_items",
+      "parse_observed_world",
+      "validate_parser_against_private_plan",
+      "build_redaction_registry",
+      "redact_observed_world",
+      "validate_redaction_against_private_plan",
+      "build_profile_safe_items",
+      "build_world_profiles_all_28_sellers"
+    ],
+    "identity_mapping_allowed_only_as_rerender_unit_fixture": true,
+    "identity_mapping_attack_rows_allowed": false
+  },
+  "visible_attack": {
+    "m0_fields_in_order": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "endpoint_uids_used_only_for_join": true,
+    "endpoint_uid_strings_in_matrix": false,
+    "json_null_means_python_none": true,
+    "combined_field_separator_utf8_hex": "0ae2909e0a",
+    "combined_documents": {
+      "all_fields_source_fields_in_order": [
+        "category_concat_top",
+        "signature_title_concat",
+        "title_concat_top",
+        "signature_description_concat",
+        "description_concat_top"
+      ],
+      "all_text_fields_source_fields_in_order": [
+        "signature_title_concat",
+        "title_concat_top",
+        "signature_description_concat",
+        "description_concat_top"
+      ],
+      "join_rule": "join_every_listed_field_in_order_including_empty_strings_with_exact_decoded_separator_between_each_adjacent_pair"
+    },
+    "vectorizers": {
+      "char3": {
+        "implementation": "sklearn.feature_extraction.text.HashingVectorizer",
+        "constructor_kwargs": {
+          "input": "content",
+          "encoding": "utf-8",
+          "decode_error": "strict",
+          "strip_accents": null,
+          "lowercase": false,
+          "preprocessor": null,
+          "tokenizer": null,
+          "stop_words": null,
+          "token_pattern": null,
+          "ngram_range": [
+            3,
+            3
+          ],
+          "analyzer": "char",
+          "n_features": 65536,
+          "binary": false,
+          "norm": "l2",
+          "alternate_sign": false,
+          "dtype": "float64"
+        },
+        "zero_vector_cosine": 0
+      },
+      "word12": {
+        "implementation": "sklearn.feature_extraction.text.HashingVectorizer_with_frozen_custom_tokenizer",
+        "tokenizer_symbol": "step28_v13_v1_12_text_shortcut_preflight.word12_tokens",
+        "constructor_kwargs": {
+          "input": "content",
+          "encoding": "utf-8",
+          "decode_error": "strict",
+          "strip_accents": null,
+          "lowercase": false,
+          "preprocessor": null,
+          "tokenizer": "frozen_tokenizer_symbol",
+          "stop_words": null,
+          "token_pattern": null,
+          "ngram_range": [
+            1,
+            2
+          ],
+          "analyzer": "word",
+          "n_features": 65536,
+          "binary": false,
+          "norm": "l2",
+          "alternate_sign": false,
+          "dtype": "float64"
+        },
+        "zero_vector_cosine": 0
+      }
+    },
+    "word12_tokenizer": {
+      "scan_order": "left_to_right_unicode_codepoint_order",
+      "ascii_alnum_run_regex": "[A-Za-z0-9]+",
+      "ascii_run_action": "emit_one_ascii_lowercase_token",
+      "han_ranges_inclusive": [
+        ["3400", "4DBF"],
+        ["4E00", "9FFF"],
+        ["F900", "FAFF"]
+      ],
+      "han_action": "emit_each_codepoint_as_one_token",
+      "all_other_codepoints": "discard_as_token_delimiters",
+      "ngrams": "formed_by_HashingVectorizer_over_resulting_token_sequence_after_discard"
+    },
+    "template_mask": {
+      "normalization_before_mask": "none_input_is_production_normalized",
+      "letter_general_categories": [
+        "Lu",
+        "Ll",
+        "Lt",
+        "Lm",
+        "Lo"
+      ],
+      "letter_replacement": "字",
+      "decimal_digit_general_category": "Nd",
+      "decimal_digit_replacement": "数",
+      "all_other_codepoints": "preserve",
+      "expected_unicodedata_unidata_version": "13.0.0"
+    },
+    "surface_metrics_in_order": [
+      "codepoint_length_absdiff",
+      "codepoint_length_sum",
+      "newline_count_absdiff",
+      "newline_count_sum",
+      "unicode_punctuation_count_absdiff",
+      "unicode_punctuation_count_sum",
+      "ascii_whitespace_count_absdiff",
+      "ascii_whitespace_count_sum",
+      "unicode_decimal_digit_count_absdiff",
+      "unicode_decimal_digit_count_sum",
+      "empty_both",
+      "empty_xor"
+    ],
+    "surface_metric_definitions": {
+      "codepoint_length": "number_of_unicode_codepoints_in_python_str",
+      "newline_count": "count_exact_codepoint_U+000A",
+      "unicode_punctuation_categories": ["Pc", "Pd", "Pe", "Pf", "Pi", "Po", "Ps"],
+      "unicode_punctuation_count": "count_codepoints_in_frozen_punctuation_categories",
+      "ascii_whitespace_codepoints_hex": ["09", "0A", "0B", "0C", "0D", "20"],
+      "ascii_whitespace_count": "count_only_frozen_ascii_whitespace_codepoints",
+      "unicode_decimal_digit_count": "count_codepoints_with_general_category_Nd",
+      "empty": "exact_string_codepoint_length_equals_zero",
+      "empty_both": "int(left_empty_and_right_empty)",
+      "empty_xor": "int(left_empty_xor_right_empty)",
+      "absdiff": "abs(left_integer_count_minus_right_integer_count)_cast_float64",
+      "sum": "left_integer_count_plus_right_integer_count_cast_float64"
+    },
+    "similarity_summaries": {
+      "cf_full_sources_in_order": [
+        "char3_cosine__category_concat_top",
+        "word12_cosine__category_concat_top",
+        "char3_cosine__signature_title_concat",
+        "word12_cosine__signature_title_concat",
+        "char3_cosine__title_concat_top",
+        "word12_cosine__title_concat_top",
+        "char3_cosine__signature_description_concat",
+        "word12_cosine__signature_description_concat",
+        "char3_cosine__description_concat_top",
+        "word12_cosine__description_concat_top"
+      ],
+      "cf_template_sources_in_order": [
+        "masked_char3_cosine__signature_title_concat",
+        "masked_char3_cosine__title_concat_top",
+        "masked_char3_cosine__signature_description_concat",
+        "masked_char3_cosine__description_concat_top"
+      ],
+      "maximum": "maximum_of_all_source_float64_values",
+      "mean": "float64_arithmetic_mean_of_all_source_values",
+      "top2_mean": "float64_arithmetic_mean_of_two_numerically_largest_source_values",
+      "nonfinite_source_allowed": false
+    },
+    "cosine_rule": {
+      "nonzero_formula": "dot_of_already_l2_normalized_rows_without_renormalization",
+      "accumulation_dtype": "float64",
+      "accumulation_order": "ascending_hashed_feature_index",
+      "if_either_vector_is_zero": 0.0
+    },
+    "views": {
+      "cf_full": {
+        "feature_names_in_order": [
+          "char3_cosine__category_concat_top",
+          "word12_cosine__category_concat_top",
+          "char3_cosine__signature_title_concat",
+          "word12_cosine__signature_title_concat",
+          "char3_cosine__title_concat_top",
+          "word12_cosine__title_concat_top",
+          "char3_cosine__signature_description_concat",
+          "word12_cosine__signature_description_concat",
+          "char3_cosine__description_concat_top",
+          "word12_cosine__description_concat_top",
+          "char3_cosine__all_fields",
+          "word12_cosine__all_fields",
+          "codepoint_length_absdiff__category_concat_top",
+          "codepoint_length_sum__category_concat_top",
+          "newline_count_absdiff__category_concat_top",
+          "newline_count_sum__category_concat_top",
+          "unicode_punctuation_count_absdiff__category_concat_top",
+          "unicode_punctuation_count_sum__category_concat_top",
+          "ascii_whitespace_count_absdiff__category_concat_top",
+          "ascii_whitespace_count_sum__category_concat_top",
+          "unicode_decimal_digit_count_absdiff__category_concat_top",
+          "unicode_decimal_digit_count_sum__category_concat_top",
+          "empty_both__category_concat_top",
+          "empty_xor__category_concat_top",
+          "codepoint_length_absdiff__signature_title_concat",
+          "codepoint_length_sum__signature_title_concat",
+          "newline_count_absdiff__signature_title_concat",
+          "newline_count_sum__signature_title_concat",
+          "unicode_punctuation_count_absdiff__signature_title_concat",
+          "unicode_punctuation_count_sum__signature_title_concat",
+          "ascii_whitespace_count_absdiff__signature_title_concat",
+          "ascii_whitespace_count_sum__signature_title_concat",
+          "unicode_decimal_digit_count_absdiff__signature_title_concat",
+          "unicode_decimal_digit_count_sum__signature_title_concat",
+          "empty_both__signature_title_concat",
+          "empty_xor__signature_title_concat",
+          "codepoint_length_absdiff__title_concat_top",
+          "codepoint_length_sum__title_concat_top",
+          "newline_count_absdiff__title_concat_top",
+          "newline_count_sum__title_concat_top",
+          "unicode_punctuation_count_absdiff__title_concat_top",
+          "unicode_punctuation_count_sum__title_concat_top",
+          "ascii_whitespace_count_absdiff__title_concat_top",
+          "ascii_whitespace_count_sum__title_concat_top",
+          "unicode_decimal_digit_count_absdiff__title_concat_top",
+          "unicode_decimal_digit_count_sum__title_concat_top",
+          "empty_both__title_concat_top",
+          "empty_xor__title_concat_top",
+          "codepoint_length_absdiff__signature_description_concat",
+          "codepoint_length_sum__signature_description_concat",
+          "newline_count_absdiff__signature_description_concat",
+          "newline_count_sum__signature_description_concat",
+          "unicode_punctuation_count_absdiff__signature_description_concat",
+          "unicode_punctuation_count_sum__signature_description_concat",
+          "ascii_whitespace_count_absdiff__signature_description_concat",
+          "ascii_whitespace_count_sum__signature_description_concat",
+          "unicode_decimal_digit_count_absdiff__signature_description_concat",
+          "unicode_decimal_digit_count_sum__signature_description_concat",
+          "empty_both__signature_description_concat",
+          "empty_xor__signature_description_concat",
+          "codepoint_length_absdiff__description_concat_top",
+          "codepoint_length_sum__description_concat_top",
+          "newline_count_absdiff__description_concat_top",
+          "newline_count_sum__description_concat_top",
+          "unicode_punctuation_count_absdiff__description_concat_top",
+          "unicode_punctuation_count_sum__description_concat_top",
+          "ascii_whitespace_count_absdiff__description_concat_top",
+          "ascii_whitespace_count_sum__description_concat_top",
+          "unicode_decimal_digit_count_absdiff__description_concat_top",
+          "unicode_decimal_digit_count_sum__description_concat_top",
+          "empty_both__description_concat_top",
+          "empty_xor__description_concat_top",
+          "similarity_max__field_char_word",
+          "similarity_mean__field_char_word",
+          "similarity_top2_mean__field_char_word"
+        ]
+      },
+      "cf_topic": {
+        "feature_names_in_order": [
+          "char3_cosine__category_concat_top",
+          "word12_cosine__category_concat_top",
+          "codepoint_length_absdiff__category_concat_top",
+          "codepoint_length_sum__category_concat_top",
+          "newline_count_absdiff__category_concat_top",
+          "newline_count_sum__category_concat_top",
+          "unicode_punctuation_count_absdiff__category_concat_top",
+          "unicode_punctuation_count_sum__category_concat_top",
+          "ascii_whitespace_count_absdiff__category_concat_top",
+          "ascii_whitespace_count_sum__category_concat_top",
+          "unicode_decimal_digit_count_absdiff__category_concat_top",
+          "unicode_decimal_digit_count_sum__category_concat_top",
+          "empty_both__category_concat_top",
+          "empty_xor__category_concat_top"
+        ]
+      },
+      "cf_template_surface": {
+        "feature_names_in_order": [
+          "masked_char3_cosine__signature_title_concat",
+          "masked_char3_cosine__title_concat_top",
+          "masked_char3_cosine__signature_description_concat",
+          "masked_char3_cosine__description_concat_top",
+          "masked_char3_cosine__all_text_fields",
+          "codepoint_length_absdiff__signature_title_concat",
+          "codepoint_length_sum__signature_title_concat",
+          "newline_count_absdiff__signature_title_concat",
+          "newline_count_sum__signature_title_concat",
+          "unicode_punctuation_count_absdiff__signature_title_concat",
+          "unicode_punctuation_count_sum__signature_title_concat",
+          "ascii_whitespace_count_absdiff__signature_title_concat",
+          "ascii_whitespace_count_sum__signature_title_concat",
+          "unicode_decimal_digit_count_absdiff__signature_title_concat",
+          "unicode_decimal_digit_count_sum__signature_title_concat",
+          "empty_both__signature_title_concat",
+          "empty_xor__signature_title_concat",
+          "codepoint_length_absdiff__title_concat_top",
+          "codepoint_length_sum__title_concat_top",
+          "newline_count_absdiff__title_concat_top",
+          "newline_count_sum__title_concat_top",
+          "unicode_punctuation_count_absdiff__title_concat_top",
+          "unicode_punctuation_count_sum__title_concat_top",
+          "ascii_whitespace_count_absdiff__title_concat_top",
+          "ascii_whitespace_count_sum__title_concat_top",
+          "unicode_decimal_digit_count_absdiff__title_concat_top",
+          "unicode_decimal_digit_count_sum__title_concat_top",
+          "empty_both__title_concat_top",
+          "empty_xor__title_concat_top",
+          "codepoint_length_absdiff__signature_description_concat",
+          "codepoint_length_sum__signature_description_concat",
+          "newline_count_absdiff__signature_description_concat",
+          "newline_count_sum__signature_description_concat",
+          "unicode_punctuation_count_absdiff__signature_description_concat",
+          "unicode_punctuation_count_sum__signature_description_concat",
+          "ascii_whitespace_count_absdiff__signature_description_concat",
+          "ascii_whitespace_count_sum__signature_description_concat",
+          "unicode_decimal_digit_count_absdiff__signature_description_concat",
+          "unicode_decimal_digit_count_sum__signature_description_concat",
+          "empty_both__signature_description_concat",
+          "empty_xor__signature_description_concat",
+          "codepoint_length_absdiff__description_concat_top",
+          "codepoint_length_sum__description_concat_top",
+          "newline_count_absdiff__description_concat_top",
+          "newline_count_sum__description_concat_top",
+          "unicode_punctuation_count_absdiff__description_concat_top",
+          "unicode_punctuation_count_sum__description_concat_top",
+          "ascii_whitespace_count_absdiff__description_concat_top",
+          "ascii_whitespace_count_sum__description_concat_top",
+          "unicode_decimal_digit_count_absdiff__description_concat_top",
+          "unicode_decimal_digit_count_sum__description_concat_top",
+          "empty_both__description_concat_top",
+          "empty_xor__description_concat_top",
+          "masked_similarity_max__text_fields",
+          "masked_similarity_mean__text_fields",
+          "masked_similarity_top2_mean__text_fields"
+        ]
+      }
+    },
+    "models_in_order": [
+      "logistic_l2",
+      "gradient_tree"
+    ],
+    "logistic_l2": {
+      "implementation": "step28_v13_v1_12_exact_shortcut_preflight.fit_exact_logistic",
+      "l2": 1,
+      "maximum_iterations": 100,
+      "normalized_gradient_tolerance": 1e-9,
+      "implicit_defaults_allowed": false
+    },
+    "gradient_tree": {
+      "implementation": "sklearn.ensemble.HistGradientBoostingClassifier",
+      "loss": "log_loss",
+      "learning_rate": 0.03,
+      "max_iter": 200,
+      "max_leaf_nodes": 31,
+      "max_depth": 2,
+      "min_samples_leaf": 20,
+      "l2_regularization": 1,
+      "max_features": 1.0,
+      "max_bins": 255,
+      "categorical_features": "from_dtype",
+      "monotonic_cst": null,
+      "interaction_cst": null,
+      "warm_start": false,
+      "early_stopping": false,
+      "scoring": "loss",
+      "validation_fraction": 0.1,
+      "n_iter_no_change": 10,
+      "tol": 1e-7,
+      "verbose": 0,
+      "random_state": 2026080819,
+      "class_weight": null,
+      "implicit_defaults_allowed": false
+    },
+    "train_fit_only": true,
+    "train_world_oof_for_diagnostics_only": true,
+    "development_only_for_hard_gate": true,
+    "fold_count": 5,
+    "fold_seed": 2026080811,
+    "fold_assignment": {
+      "world_set_order": "unique_world_uid_utf8_ascending",
+      "rank_digest": "SHA256(decimal_fold_seed_ascii || 0x1f || world_uid_utf8)",
+      "rank_tiebreak": "world_uid_utf8",
+      "fold": "zero_based_rank_mod_fold_count",
+      "expected_worlds_per_fold": 100
+    }
+  },
+  "bootstrap": {
+    "replicates": 9999,
+    "assignment_seed": 2026080813,
+    "text_attack_seed": 2026080817,
+    "generator": "numpy.random.Generator(PCG64DXSM)",
+    "split_seed": "first_16_bytes_unsigned_big_endian_of_SHA256(decimal_seed_ascii || 0x1f || split_ascii)",
+    "bootstrap_world_order": "unique_world_uid_utf8_ascending",
+    "worlds_per_replicate": 500,
+    "sampling": "world_indices_with_replacement",
+    "draw_shape": [9999, 500],
+    "draw_low_inclusive": 0,
+    "draw_high_exclusive": 500,
+    "draw_dtype": "int16",
+    "draw_call": "Generator(PCG64DXSM(split_seed)).integers(low=0,high=500,size=(9999,500),dtype=int16)",
+    "same_world_multiplicity_vector_for_whole_family": true,
+    "refit_models_inside_bootstrap": false,
+    "quantile": 0.95,
+    "quantile_method": "higher",
+    "replicate_prevalence_recomputed": true,
+    "replicate_prevalence_required_exact": "5/93",
+    "point_metrics": {
+      "roc_auc": {
+        "implementation": "sklearn.metrics.roc_auc_score",
+        "kwargs": {
+          "average": "macro",
+          "sample_weight": null,
+          "max_fpr": null,
+          "multi_class": "raise",
+          "labels": null
+        }
+      },
+      "average_precision": {
+        "implementation": "sklearn.metrics.average_precision_score",
+        "kwargs": {
+          "average": "macro",
+          "pos_label": 1,
+          "sample_weight": null
+        }
+      }
+    },
+    "weighted_metric_symbol": "step28_v13_v1_12_text_shortcut_preflight.bootstrap_rank_metrics",
+    "bootstrap_row_weight": "world_multiplicity_of_row_world",
+    "equal_score_tie_rule": "exact_float64_score_groups_roc_half_credit_average_precision_group_end_precision",
+    "nonfinite_score_allowed": false
+  },
+  "hard_gates": {
+    "development_maximum_single_feature_symmetric_auc": 0.52,
+    "development_maximum_family_model_symmetric_auc": 0.53,
+    "development_maximum_family_model_average_precision_uplift": 0.01,
+    "development_bootstrap_95_upper_family_max_symmetric_auc": 0.53,
+    "development_bootstrap_95_upper_family_max_average_precision_uplift": 0.015
+  },
+  "original_visible_text_attacks_formal_gate": false,
+  "canonical_self_hash": "21e918e3106d817fa866594188e389815f899066671f59318e38283183c5dd9b"
+}

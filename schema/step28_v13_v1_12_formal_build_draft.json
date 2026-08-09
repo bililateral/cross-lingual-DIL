@@ -1,0 +1,295 @@
+{
+  "version": "2026-08-03-step28-v13-v1-12-formal-build-draft-v1",
+  "status": "DRAFT_IMPLEMENTATION_NO_SEED_OR_DATA_AUTHORIZATION",
+  "run_id": "v13_training_ready_v1_12_cleanroom_20260803",
+  "authorizations": {
+    "formal_seed_ceremony": false,
+    "formal_train_generation": false,
+    "formal_development_generation": false,
+    "formal_audit_a_generation": false,
+    "formal_audit_b_generation": false,
+    "model_training": false,
+    "audit_truth_unsealing": false
+  },
+  "contract": {
+    "path": "docs/STEP28_V13_V1_12_FORMAL_DATASET_BUILD_PLAN_20260803.zh.md",
+    "sha256": "d57d36eae97b4771ab1b9f10961dfd522468b84a0e9f4980c4cc315aa89be375",
+    "size_bytes": 11174
+  },
+  "preceremony_baseline": {
+    "policy_path": "schema/step28_v13_v1_12_cleanroom_preceremony_policy.json",
+    "policy_sha256": "ad4bfc710cfda3e61c67c76da20d47a94c07a7e6484b78a6893100976d777112",
+    "policy_canonical_self_hash": "1f748568d766a23f9b2ee1022d779fc1afa51f64ae513c49cd6fab10de897755",
+    "receipt_path": "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/two_world_preceremony_receipt.json",
+    "receipt_sha256": "d21964a248e1138e65a654262e026c8c1457f8500e4915dbf5b83cdaba09d243",
+    "receipt_canonical_self_hash": "4f7763d838959c463c7c430f018367d8566707b2e18b4cee7894a5f87aef7f4d"
+  },
+  "base_generation_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729",
+    "size_bytes": 193942,
+    "role": "pinned_dgp_specification_not_formal_release_policy"
+  },
+  "base_generation_support_inputs": {
+    "dataset_custody_deployment": {
+      "path": "schema/step28_v13_dataset_custody_deployment.json",
+      "sha256": "477b088df46961ffa7af12e0443f7947794566751200f9a815297651ee075c7e",
+      "size_bytes": 27823
+    }
+  },
+  "historical_success_release": {
+    "path": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731/release_manifest.json",
+    "sha256": "81ca7d9d2040d500b3bcb2ffc9af6aeb72c581754dbd075b94dd6cf8904b8275",
+    "size_bytes": 21536,
+    "canonical_self_hash": "59001459bc9b3a908ab0efa1f9f46a6c821bf6078ba3dc5f3308f910d0c5e00b",
+    "allowed_use": "observed_uid_and_exact_visible_document_intersection_plus_privileged_identity_value_hash_derivation_only_no_c40_or_labels"
+  },
+  "historical_identity_exclusion_coverage": {
+    "path": "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/historical_identity_exclusion_coverage_receipt.json",
+    "sha256": "7b3d18045923621af009ef5fddef839f3f7cb706fad24c93fa034d5f6939ae5a",
+    "size_bytes": 6618,
+    "canonical_self_hash": "946d09a942484605ddef40535592a3e5171fbf930adea6f1c0c340df55acbb85",
+    "historical_v1_2_unique_value_hash_count": 170500,
+    "historical_v1_2_ordered_value_hash_digest": "3e1ca70f28993632d7e8a2f380410d40d484ff7214f06e5547fac1b4169912a9",
+    "original_deny_unique_value_hash_count": 112996,
+    "original_deny_ordered_value_hash_digest": "c128e2a5d4460d1695196012ba818db2ed578465b21d8397ea8438891a61de06",
+    "old_boundary_unique_value_hash_count": 283496,
+    "old_boundary_ordered_value_hash_digest": "585067ab47093ee621d7cadd81da3ee0a36326924b4b15b8fd9643b730eb4c52"
+  },
+  "dataset_shape": {
+    "split_order": [
+      "train",
+      "development",
+      "audit_a",
+      "audit_b"
+    ],
+    "worlds_per_split": 500,
+    "sellers_per_world": 28,
+    "controllers_per_world": 12,
+    "complete_pairs_per_world": 378,
+    "positive_pairs_per_world": 20,
+    "negative_pairs_per_world": 358,
+    "pairs_per_split": 189000,
+    "positive_pairs_per_split": 10000,
+    "negative_pairs_per_split": 179000,
+    "identity_assets_per_world_by_split": {
+      "train": 84,
+      "development": 84,
+      "audit_a": 84,
+      "audit_b": 89
+    },
+    "identity_assets_per_split": {
+      "train": 42000,
+      "development": 42000,
+      "audit_a": 42000,
+      "audit_b": 44500
+    },
+    "retrieval_queries_per_world": 28,
+    "retrieval_gallery_per_query": 27,
+    "retrieval_relevant_relations_per_world": 40,
+    "c40_in_any_premodel_member": false
+  },
+  "randomness": {
+    "master_seed_bytes": 32,
+    "ceremony_split_order": [
+      "train",
+      "development",
+      "audit_a",
+      "audit_b"
+    ],
+    "master_draws_per_split": 1,
+    "derivation": "HMAC-SHA256",
+    "derivation_prefix": "step28-v13-v1.12",
+    "separator_hex": "1f",
+    "generator_capability_roles": [
+      "structure",
+      "id_namespace",
+      "id",
+      "identity_bootstrap",
+      "identity_remap",
+      "text",
+      "query"
+    ],
+    "train_m1_roles": [
+      "m1_r01",
+      "m1_r02",
+      "m1_r03",
+      "m1_r04",
+      "m1_r05"
+    ],
+    "master_mounted_to_generator": false,
+    "master_mounted_to_model": false,
+    "one_m1_key_per_fit_process": true,
+    "seed_replacement_or_screening": false,
+    "design_only_master_hex": "a91202d054c6b17577bcc1052a66388fc8510965be5879f04dd61a7dd1423ee2"
+  },
+  "identity_collision_resolution": {
+    "maximum_counter": 1024,
+    "asset_order": "identity_asset_uid_utf8",
+    "strategy": "first_admissible_per_asset_counter",
+    "historical_forbidden_identity_hash_count": 915996,
+    "forbidden_master_commitment_count": 90,
+    "same_run_hash_set_monotonic": true,
+    "visible_identity_free_text_collision_forbidden": true,
+    "temporary_bootstrap_salt_counter_per_type": 0,
+    "temporary_bootstrap_values_persisted": false,
+    "final_per_asset_remap_required": true,
+    "master_retry_forbidden": true
+  },
+  "release": {
+    "public_root": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_12_cleanroom_20260803",
+    "private_root": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_12_cleanroom_20260803",
+    "staging_under_private_root": true,
+    "no_replace_publish": true,
+    "audit_generation_ladder": {
+      "audit_a_lock": "reports/step28_synthetic_chinese_dataset/release_inputs/v1_12_cleanroom_20260803/audit_a_generation_lock.json",
+      "audit_a_authorized_before_audit_b": true,
+      "audit_b_lock": "reports/step28_synthetic_chinese_dataset/release_inputs/v1_12_cleanroom_20260803/audit_b_generation_lock.json",
+      "audit_b_requires_published_audit_a": true,
+      "both_audits_authorized_by_one_lock": false
+    },
+    "split_manifest_version": "2026-08-03-step28-v13-v1-12-full378-split-manifest-v1",
+    "release_manifest_version": "2026-08-03-step28-v13-v1-12-full378-release-manifest-v1",
+    "public_common_members": [
+      "observed/worlds.csv",
+      "observed/sellers.csv",
+      "observed/redacted_items.jsonl",
+      "observed/seller_profiles.jsonl",
+      "observed/complete_model_pair_endpoints.csv",
+      "features/identity33_all_pairs.csv",
+      "retrieval/queries.csv",
+      "audit/generation_integrity_receipt.json",
+      "audit/mount_contract.json",
+      "split_manifest.json"
+    ],
+    "public_supervision_members": {
+      "train": [
+        "supervision/classification_labels.csv"
+      ],
+      "development": [
+        "supervision/classification_labels.csv"
+      ],
+      "audit_a": [],
+      "audit_b": []
+    },
+    "private_common_members": [
+      "oracle/controller_membership.csv",
+      "oracle/controller_style_groups.csv",
+      "oracle/mechanism_assignments.csv",
+      "oracle/identity_assets.jsonl",
+      "oracle/positive_targets.csv",
+      "oracle/negative_flags.csv",
+      "oracle/classification_labels.csv",
+      "oracle/retrieval_qrels.csv",
+      "audit/raw_identity_bearing_items.jsonl",
+      "audit/history_safe_occurrences.csv",
+      "audit/history_item_index.csv",
+      "audit/history_projection_attestations.jsonl",
+      "audit/parsed_identity_occurrences.csv",
+      "audit/renderer_identity_slots.jsonl",
+      "audit/renderer_identity_slot_edits.jsonl",
+      "audit/renderer_noise_slots.jsonl",
+      "audit/registered_override_audit.jsonl",
+      "audit/render_asts.jsonl",
+      "audit/solver_audit.jsonl",
+      "audit/identity_allocation_receipts.jsonl",
+      "audit/identity_value_hashes.json",
+      "private_manifest.json"
+    ],
+    "train_private_additional_members": [
+      "m1/r01/structural_receipt.json",
+      "m1/r02/structural_receipt.json",
+      "m1/r03/structural_receipt.json",
+      "m1/r04/structural_receipt.json",
+      "m1/r05/structural_receipt.json"
+    ],
+    "raw_master_or_capability_in_public_release": false,
+    "audit_truth_in_public_release": false
+  },
+  "model_mounts": {
+    "m0": [
+      "observed/seller_profiles.jsonl",
+      "observed/complete_model_pair_endpoints.csv"
+    ],
+    "m0_text_fields_in_order": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "profile_text_and_all_other_profile_fields_model_forbidden": true,
+    "identity_adapter_inputs": [
+      "features/identity33_all_pairs.csv",
+      "observed/complete_model_pair_endpoints.csv",
+      "external_frozen_p0_scores"
+    ],
+    "fit_columns": [
+      "p0",
+      "identity33_numeric_only"
+    ],
+    "join_columns_removed_before_fit": true
+  },
+  "shortcut_preflight": {
+    "design_only_train_worlds": 500,
+    "design_only_development_worlds": 500,
+    "rows_per_world": 378,
+    "fold_count": 5,
+    "fold_seed": 2026080307,
+    "bootstrap_replicates": 9999,
+    "bootstrap_seed": 2026080311,
+    "logistic_l2": 1.0,
+    "logistic_maximum_iterations": 100,
+    "logistic_gradient_tolerance": 1e-9,
+    "tree_max_depth": 2,
+    "tree_max_iterations": 200,
+    "single_feature_maximum_symmetric_auc": 0.52,
+    "combined_maximum_symmetric_auc": 0.53,
+    "combined_bootstrap_95_upper_symmetric_auc": 0.53,
+    "random_ap_baseline": "20/378",
+    "combined_maximum_ap_uplift": 0.01,
+    "combined_bootstrap_95_upper_ap_uplift": 0.015,
+    "null_nuisance_feature_count": 14,
+    "join_nuisance_features": [
+      "world_hash_01",
+      "left_hash_01",
+      "right_hash_01",
+      "pair_hash_01",
+      "pair_hash_02",
+      "left_rank_01",
+      "right_rank_01",
+      "pair_rank_01",
+      "absdiff_seller_hash_01",
+      "sum_seller_hash_01"
+    ],
+    "intended_market_style_or_identity_features_in_null_gate": false,
+    "exact_numeric_preflight_required_before_seed": true
+  },
+  "visible_text_diagnostic": {
+    "probe": "fixed_hashing_char_trigram_cosine",
+    "ngram_range": [
+      3,
+      3
+    ],
+    "feature_dimension": 65536,
+    "alternate_sign": false,
+    "normalization": "l2",
+    "formal_gate": false,
+    "reason_not_a_gate": "legitimate authorship and style are intended frozen-M0 inputs; M1/M2 share the same p0 control"
+  },
+  "implementation_freeze": {
+    "source_closure_frozen": false,
+    "dependency_versions_frozen": false,
+    "two_world_persisted_replay_pass": false,
+    "exact_500_world_shortcut_preflight_pass": false,
+    "full_repository_tests_pass": false,
+    "formal_prelock_may_be_issued": false
+  },
+  "dependency_candidate": {
+    "python": "3.10",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "scikit_learn": "1.7.2"
+  },
+  "canonical_self_hash": "e5cc5303453f3b42cc82c9d7609c38887e4dbf368f95aa719e52f0c42932e138"
+}

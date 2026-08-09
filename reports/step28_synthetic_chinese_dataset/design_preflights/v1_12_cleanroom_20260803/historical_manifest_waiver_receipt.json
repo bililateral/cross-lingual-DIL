@@ -1,0 +1,78 @@
+{
+  "version": "2026-08-08-step28-v13-v1-12-historical-manifest-waiver-v1",
+  "status": "PASS_EXACT_HISTORICAL_MANIFEST_FAILURE_WAIVER_NO_FORMAL_AUTHORIZATION",
+  "design_only": true,
+  "waiver_scope": {
+    "exact_test": "test_step28_v12_application_contracts.Step28V12ApplicationContracts.test_sync_manifest_is_closed_and_hashes_match",
+    "allowed_failure_count": 1,
+    "additional_failure_invalidates_waiver": true
+  },
+  "full_suite_observation": {
+    "command": "python -m unittest discover -s tests",
+    "tests_run": 464,
+    "passed": 456,
+    "skipped": 7,
+    "failed": 1,
+    "sole_failure_matches_waiver_scope": true
+  },
+  "current_step28_v13_v1_12_targeted_tests": {
+    "command": "python -m unittest tests.test_step28_v13_v1_12_text_shortcut_contracts",
+    "tests_run": 39,
+    "passed": 39,
+    "skipped": 0,
+    "failed": 0
+  },
+  "historical_manifest": {
+    "run_id": "step28_transferable_identity_history_v12_1_guarded_application_20260720",
+    "path": "reports/step28_transferable_identity_history/v12_1_guarded_application_20260720/step28_v12_1_guarded_sync_manifest.json",
+    "size_bytes": 13748,
+    "sha256": "0d555154df1ceac151cdf91ab91d09695630cc8e1c5fa511ba6b498f286b0555"
+  },
+  "historical_expected_record": {
+    "path": "docs/PROJECT_PROGRESS.md",
+    "size_bytes": 199490,
+    "sha256": "f45096c9ebbd5d2b4a627b980094871ccc160514667278738b94b101091a50d2"
+  },
+  "current_committed_document": {
+    "path": "docs/PROJECT_PROGRESS.md",
+    "size_bytes": 200802,
+    "sha256": "4c5fee9ae1807292a115cd167a72e8c997a0af4b28c7db4a3e51ab3341b6ae22",
+    "last_commit": "60a61e54c779c9bb6b882c93e1072c5beb557910",
+    "worktree_clean_for_path": true
+  },
+  "historical_test_current_bytes": {
+    "path": "tests/test_step28_v12_application_contracts.py",
+    "size_bytes": 8738,
+    "sha256": "643aaa50ec492db7cfed40752e616dbe727c7af1437235e9e207ad94c3991700",
+    "worktree_clean_for_path": true
+  },
+  "classification": "historical_live_path_manifest_contract_defect_not_step28_v13_v1_12_regression",
+  "waiver_conditions": [
+    "this is the sole non-skipped full-suite failure",
+    "no Step28-v13 v1.12 targeted test is waived",
+    "no current v1.12 policy contract or source hash is waived",
+    "no formal authorization is changed",
+    "any additional test failure invalidates this waiver",
+    "any change to an exact old or current size or hash invalidates this waiver",
+    "historical manifest and historical test bytes remain untouched",
+    "current PROJECT_PROGRESS.md is not rolled back"
+  ],
+  "current_freeze": {
+    "text_shortcut_contract_sha256": "7e17220f7dea073640ad810a48070a8321bd75bba1c95c7f8018df69780af126",
+    "text_shortcut_policy_canonical_self_hash": "21e918e3106d817fa866594188e389815f899066671f59318e38283183c5dd9b"
+  },
+  "formal_authorizations_after_waiver": {
+    "formal_seed_ceremony": false,
+    "formal_train_generation": false,
+    "formal_development_generation": false,
+    "formal_audit_a_generation": false,
+    "formal_audit_b_generation": false,
+    "model_training": false,
+    "audit_truth_unsealing": false
+  },
+  "formal_seed_or_key_access": false,
+  "formal_dataset_rows_produced": 0,
+  "formal_dataset_rows_audited": 0,
+  "model_training_authorized": false,
+  "canonical_self_hash": "56da4c9174c348a5f8f2b9e0f0adbc030271d107d3ea1456d235b5f72a9ec05f"
+}
