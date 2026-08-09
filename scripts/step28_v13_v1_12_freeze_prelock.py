@@ -34,7 +34,7 @@ TWO_WORLD_RECEIPT_PATH = (
     / "step28_synthetic_chinese_dataset"
     / "design_preflights"
     / "v1_12_cleanroom_20260803"
-    / "two_world_persisted_stage_receipt.json"
+    / "two_world_persisted_stage_receipt.postclosure_20260809.json"
 )
 SHORTCUT_RECEIPT_PATH = (
     ROOT
@@ -42,18 +42,18 @@ SHORTCUT_RECEIPT_PATH = (
     / "step28_synthetic_chinese_dataset"
     / "design_preflights"
     / "v1_12_cleanroom_20260803"
-    / "exact_shortcut_preflight_receipt.json"
+    / "exact_shortcut_preflight_receipt.postclosure_20260809.json"
 )
 NEW_SOURCE_PATHS = (
     ".gitignore",
     "docs/STEP28_V13_V1_12_FORMAL_AUTHORIZATION_OVERLAY_20260809.zh.md",
     "docs/STEP28_V13_V1_12_FORMAL_DATASET_BUILD_PLAN_20260803.zh.md",
     "docs/STEP28_V13_V1_12_TEXT_SHORTCUT_AUDIT_CONTRACT_20260808.zh.md",
-    "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/exact_shortcut_preflight_receipt.json",
+    "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/exact_shortcut_preflight_receipt.postclosure_20260809.json",
     "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/external_interruption_receipt.json",
     "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/historical_manifest_waiver_receipt.json",
     "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/text_shortcut_preflight_receipt.json",
-    "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/two_world_persisted_stage_receipt.json",
+    "reports/step28_synthetic_chinese_dataset/design_preflights/v1_12_cleanroom_20260803/two_world_persisted_stage_receipt.postclosure_20260809.json",
     "schema/step28_v13_v1_12_cleanroom_preceremony_policy.json",
     "schema/step28_v13_v1_12_formal_build_draft.json",
     "schema/step28_v13_v1_12_text_shortcut_audit_policy.json",
@@ -437,13 +437,17 @@ def validate_evidence_source_pins(
     )
     versions = formal.runtime_versions()
     if (
-        two_world.get("producer_sha256")
+        two_world.get("producer_path")
+        != "scripts/step28_v13_v1_12_generate_split.py"
+        or two_world.get("producer_sha256")
         != preceremony.sha256_file(
             ROOT / "scripts/step28_v13_v1_12_generate_split.py"
         )
         or two_world.get("formal_common_sha256") != common_sha256
         or two_world.get("formal_build_draft_sha256") != draft_sha256
         or two_world.get("runtime_versions") != versions
+        or shortcut.get("producer_path")
+        != "scripts/step28_v13_v1_12_exact_shortcut_preflight.py"
         or shortcut.get("producer_sha256")
         != preceremony.sha256_file(
             ROOT / "scripts/step28_v13_v1_12_exact_shortcut_preflight.py"

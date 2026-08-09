@@ -296,6 +296,9 @@ class Step28V13V112FormalBuildContracts(unittest.TestCase):
         )
         draft_sha = preceremony.sha256_file(formal.DEFAULT_DRAFT_PATH)
         two_world = {
+            "producer_path": (
+                "scripts/step28_v13_v1_12_generate_split.py"
+            ),
             "producer_sha256": preceremony.sha256_file(
                 ROOT / "scripts/step28_v13_v1_12_generate_split.py"
             ),
@@ -304,6 +307,9 @@ class Step28V13V112FormalBuildContracts(unittest.TestCase):
             "runtime_versions": versions,
         }
         exact = {
+            "producer_path": (
+                "scripts/step28_v13_v1_12_exact_shortcut_preflight.py"
+            ),
             "producer_sha256": preceremony.sha256_file(
                 ROOT
                 / "scripts/step28_v13_v1_12_exact_shortcut_preflight.py"
@@ -331,6 +337,137 @@ class Step28V13V112FormalBuildContracts(unittest.TestCase):
                 tests=tests,
                 closure=closure,
             )
+        two_world["formal_build_draft_sha256"] = draft_sha
+        mutations = (
+            (two_world, "producer_path", "scripts/not-the-producer.py"),
+            (two_world, "producer_sha256", "0" * 64),
+            (two_world, "formal_common_sha256", "0" * 64),
+            (two_world, "runtime_versions", {}),
+            (exact, "producer_path", "scripts/not-the-producer.py"),
+            (exact, "producer_sha256", "0" * 64),
+            (exact, "formal_common_sha256", "0" * 64),
+            (exact, "formal_build_draft_sha256", "0" * 64),
+            (exact, "runtime_versions", {}),
+        )
+        for document, field, bad_value in mutations:
+            with self.subTest(field=field, receipt=id(document)):
+                original = document[field]
+                document[field] = bad_value
+                with self.assertRaises(freezer.FreezeError):
+                    freezer.validate_evidence_source_pins(
+                        two_world=two_world,
+                        shortcut=exact,
+                        tests=tests,
+                        closure=closure,
+                    )
+                document[field] = original
+
+    def test_authorizing_design_receipts_are_postclosure_files(self) -> None:
+        expected_two_world = (
+            "reports/step28_synthetic_chinese_dataset/design_preflights/"
+            "v1_12_cleanroom_20260803/"
+            "two_world_persisted_stage_receipt.postclosure_20260809.json"
+        )
+        expected_shortcut = (
+            "reports/step28_synthetic_chinese_dataset/design_preflights/"
+            "v1_12_cleanroom_20260803/"
+            "exact_shortcut_preflight_receipt.postclosure_20260809.json"
+        )
+        self.assertEqual(
+            freezer.TWO_WORLD_RECEIPT_PATH.relative_to(ROOT).as_posix(),
+            expected_two_world,
+        )
+        self.assertEqual(
+            freezer.SHORTCUT_RECEIPT_PATH.relative_to(ROOT).as_posix(),
+            expected_shortcut,
+        )
+        self.assertIn(expected_two_world, freezer.NEW_SOURCE_PATHS)
+        self.assertIn(expected_shortcut, freezer.NEW_SOURCE_PATHS)
+        self.assertNotIn(
+            expected_two_world.replace(".postclosure_20260809", ""),
+            freezer.NEW_SOURCE_PATHS,
+        )
+        self.assertNotIn(
+            expected_shortcut.replace(".postclosure_20260809", ""),
+            freezer.NEW_SOURCE_PATHS,
+        )
+
+    def test_postclosure_design_receipts_bind_current_sources(self) -> None:
+        two_world = preceremony.load_json_strict(
+            freezer.TWO_WORLD_RECEIPT_PATH
+        )
+        exact = preceremony.load_json_strict(freezer.SHORTCUT_RECEIPT_PATH)
+        preceremony.validate_canonical_self_hash(
+            two_world, label="postclosure two-world receipt"
+        )
+        preceremony.validate_canonical_self_hash(
+            exact, label="postclosure exact shortcut receipt"
+        )
+        closure = {"canonical_sha256": "c" * 64}
+        tests = {
+            "source_closure_canonical_sha256": closure["canonical_sha256"],
+            "runtime_versions": formal.runtime_versions(),
+        }
+        freezer.validate_evidence_source_pins(
+            two_world=two_world,
+            shortcut=exact,
+            tests=tests,
+            closure=closure,
+        )
+
+    def test_real_legacy_design_receipts_are_not_authorizing(self) -> None:
+        receipt_root = freezer.TWO_WORLD_RECEIPT_PATH.parent
+        two_world = preceremony.load_json_strict(
+            receipt_root / "two_world_persisted_stage_receipt.json"
+        )
+        exact = preceremony.load_json_strict(
+            receipt_root / "exact_shortcut_preflight_receipt.json"
+        )
+        required = {
+            "producer_path",
+            "producer_sha256",
+            "formal_common_sha256",
+            "formal_build_draft_sha256",
+            "runtime_versions",
+        }
+        self.assertEqual(required - set(two_world), required)
+        self.assertEqual(required - set(exact), required)
+        closure = {"canonical_sha256": "c" * 64}
+        tests = {
+            "source_closure_canonical_sha256": closure["canonical_sha256"],
+            "runtime_versions": formal.runtime_versions(),
+        }
+        with self.assertRaisesRegex(
+            freezer.FreezeError,
+            "Prelock evidence/source closure pin drift",
+        ):
+            freezer.validate_evidence_source_pins(
+                two_world=two_world,
+                shortcut=exact,
+                tests=tests,
+                closure=closure,
+            )
+
+    def test_source_closure_uses_only_postclosure_design_receipts(self) -> None:
+        closure = freezer.source_closure()
+        paths = {record["path"] for record in closure["members"]}
+        two_world = freezer.TWO_WORLD_RECEIPT_PATH.relative_to(ROOT).as_posix()
+        exact = freezer.SHORTCUT_RECEIPT_PATH.relative_to(ROOT).as_posix()
+        self.assertIn(two_world, paths)
+        self.assertIn(exact, paths)
+        self.assertIn(
+            "scripts/step28_v13_v1_12_generate_split.py", paths
+        )
+        self.assertIn(
+            "scripts/step28_v13_v1_12_exact_shortcut_preflight.py", paths
+        )
+        self.assertNotIn(
+            two_world.replace(".postclosure_20260809", ""), paths
+        )
+        self.assertNotIn(
+            exact.replace(".postclosure_20260809", ""), paths
+        )
+        freezer.require_source_closure_members_tracked(closure)
 
 
 if __name__ == "__main__":
