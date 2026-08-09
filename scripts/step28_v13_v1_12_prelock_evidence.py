@@ -39,8 +39,8 @@ WAIVER_RECEIPT_PATH = DESIGN_ROOT / "historical_manifest_waiver_receipt.json"
 
 OVERLAY_PIN = {
     "path": "docs/STEP28_V13_V1_12_FORMAL_AUTHORIZATION_OVERLAY_20260809.zh.md",
-    "size_bytes": 5364,
-    "sha256": "7dcca5b35e970515275cce8e2ab9adbc4535efebb47284dfa369164ad1d6efa7",
+    "size_bytes": 6167,
+    "sha256": "a45a0488b91b5819bbf47090cd70a89674fe0dfdb15452a0309b65b73790245d",
 }
 TEXT_RECEIPT_PIN = {
     "path": (
@@ -82,6 +82,64 @@ WAIVED_TEST_ID = (
     "test_step28_v12_application_contracts.Step28V12ApplicationContracts."
     "test_sync_manifest_is_closed_and_hashes_match"
 )
+EXPECTED_STARTED_SKIPPED = [
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_blind_packet_has_no_model_outputs_or_pair_uid"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_current_outcome_is_zero_queue_abstention"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_observable_state_support_recomputes_from_train_and_development"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_reviewed_registry_is_uid_only_and_excluded_everywhere"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_sync_manifest_is_closed_and_hashes_match"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+    {
+        "id": (
+            "test_step28_v11_application_contracts.Step28V11ApplicationContracts."
+            "test_threshold_selection_excludes_train_ambiguous_states"
+        ),
+        "reason": "v11 was withdrawn after final audit; v12 owns the current contracts",
+    },
+]
+EXPECTED_FIXTURE_SKIPPED = [
+    {
+        "id": (
+            "setUpClass (test_step28_v13_metadata_shortcut_audit_contracts."
+            "Step28V13MetadataShortcutContracts)"
+        ),
+        "reason": (
+            "The immutable, execution-blocked metadata-shortcut lock belongs to the "
+            "superseded dataset_smoke_v3 parent contract and policy. Current "
+            "training_ready shortcut execution is covered by "
+            "test_step28_v13_training_ready_builder_contracts.py."
+        ),
+    }
+]
 FALSE_AUTHORIZATIONS = {
     "formal_seed_ceremony": False,
     "formal_train_generation": False,
@@ -167,6 +225,7 @@ STRUCTURED_RESULT_KEYS = {
     "failure_ids",
     "error_ids",
     "skipped",
+    "fixture_skipped",
     "expected_failure_ids",
     "unexpected_success_ids",
     "failed_subtest_ids",
@@ -192,11 +251,13 @@ FULL_TEST_RECEIPT_KEYS = {
     "raw_test_count",
     "raw_passed_count",
     "raw_skipped_count",
+    "raw_fixture_skipped_count",
     "raw_failed_count",
     "raw_error_count",
     "raw_failure_ids",
     "raw_error_ids",
     "raw_skipped_ids",
+    "raw_fixture_skipped_ids",
     "raw_expected_failure_ids",
     "raw_unexpected_success_ids",
     "raw_failed_subtest_ids",
@@ -767,31 +828,44 @@ def validate_full_test_receipt(tests: Mapping[str, Any], waiver: Mapping[str, An
     unexpected_success_ids = strict_ids("unexpected_success_ids")
     failed_subtest_ids = strict_ids("failed_subtest_ids")
     skipped_subtest_ids = strict_ids("skipped_subtest_ids")
-    skipped_rows = structured.get("skipped")
-    _require(isinstance(skipped_rows, list), "structured unittest skipped rows drift")
-    skipped_pairs: list[tuple[str, str]] = []
-    for index, row in enumerate(skipped_rows):
-        record = _exact_keys(
-            row, {"id", "reason"}, label=f"structured skipped row {index}"
-        )
+
+    def strict_skip_rows(field: str) -> list[tuple[str, str]]:
+        rows = structured.get(field)
         _require(
-            isinstance(record["id"], str)
-            and bool(record["id"])
-            and isinstance(record["reason"], str),
-            "structured skipped row value drift",
+            isinstance(rows, list),
+            f"structured unittest {field} rows drift",
         )
-        skipped_pairs.append((record["id"], record["reason"]))
-    _require(
-        skipped_pairs == sorted(skipped_pairs)
-        and len({test_id for test_id, _reason in skipped_pairs})
-        == len(skipped_pairs),
-        "structured skipped rows are not sorted and unique by test",
-    )
+        pairs: list[tuple[str, str]] = []
+        for index, row in enumerate(rows):
+            record = _exact_keys(
+                row,
+                {"id", "reason"},
+                label=f"structured {field} row {index}",
+            )
+            _require(
+                isinstance(record["id"], str)
+                and bool(record["id"])
+                and isinstance(record["reason"], str),
+                f"structured {field} row value drift",
+            )
+            pairs.append((record["id"], record["reason"]))
+        _require(
+            pairs == sorted(pairs)
+            and len({test_id for test_id, _reason in pairs}) == len(pairs),
+            f"structured {field} rows are not sorted and unique by test",
+        )
+        return pairs
+
+    skipped_pairs = strict_skip_rows("skipped")
+    fixture_skipped_pairs = strict_skip_rows("fixture_skipped")
     skipped_ids = [test_id for test_id, _reason in skipped_pairs]
+    fixture_skipped_ids = [
+        test_id for test_id, _reason in fixture_skipped_pairs
+    ]
     test_count = structured.get("tests_run")
     _require(
         structured.get("version")
-        == "2026-08-09-step28-v13-v1-12-unittest-json-v1"
+        == "2026-08-09-step28-v13-v1-12-unittest-json-v2"
         and type(test_count) is int
         and test_count > 0
         and len(started_ids) == test_count
@@ -805,18 +879,29 @@ def validate_full_test_receipt(tests: Mapping[str, Any], waiver: Mapping[str, An
     partitions = [set(success_ids), set(skipped_ids), set(failure_ids)]
     _require(
         failure_ids == [WAIVED_TEST_ID]
+        and structured["skipped"] == EXPECTED_STARTED_SKIPPED
+        and structured["fixture_skipped"] == EXPECTED_FIXTURE_SKIPPED
         and error_ids == []
         and expected_failure_ids == []
         and unexpected_success_ids == []
         and failed_subtest_ids == []
         and skipped_subtest_ids == []
-        and all(not left.intersection(right) for index, left in enumerate(partitions) for right in partitions[index + 1 :])
-        and set().union(*partitions) == set(started_ids),
+        and all(
+            not left.intersection(right)
+            for index, left in enumerate(partitions)
+            for right in partitions[index + 1 :]
+        )
+        and set().union(*partitions) == set(started_ids)
+        and not set(fixture_skipped_ids).intersection(started_ids)
+        and not set(fixture_skipped_ids).intersection(
+            set().union(*partitions, set(error_ids))
+        ),
         "structured unittest exact outcome partition drift",
     )
     raw_tests = test_count
     raw_passed = len(success_ids)
     raw_skipped = len(skipped_ids)
+    raw_fixture_skipped = len(fixture_skipped_ids)
     raw_failed = len(failure_ids)
     raw_errors = len(error_ids)
     count_fields = (
@@ -828,6 +913,7 @@ def validate_full_test_receipt(tests: Mapping[str, Any], waiver: Mapping[str, An
         "raw_test_count",
         "raw_passed_count",
         "raw_skipped_count",
+        "raw_fixture_skipped_count",
         "raw_failed_count",
         "raw_error_count",
         "accepted_waived_failure_count",
@@ -847,15 +933,21 @@ def validate_full_test_receipt(tests: Mapping[str, Any], waiver: Mapping[str, An
     )
     _validate_test_suite_closure_record(tests.get("test_suite_source_closure"))
     _require(
-        tests.get("version") == "2026-08-09-step28-v13-v1-12-full-tests-v2"
+        tests.get("version") == "2026-08-09-step28-v13-v1-12-full-tests-v3"
         and tests.get("status") == "PASS_FULL_REPOSITORY_TESTS"
         and tests.get("status_semantics") == "PASS_WITH_ONE_EXACT_HISTORICAL_MANIFEST_FAILURE_WAIVER"
-        and tests.get("count_semantics") == "raw_counts_are_authoritative; compatibility_skipped_count_includes_one_accepted_waiver"
+        and tests.get("count_semantics")
+        == (
+            "raw_tests_use_unittest_testsRun; raw_skips_cover_started_tests; "
+            "raw_fixture_skips_are_nonstarted_events; compatibility_skipped_"
+            "count_includes_one_accepted_waiver"
+        )
         and tests.get("accepted_waived_failure_count") == 1
         and tests.get("accepted_waived_failure_ids") == [WAIVED_TEST_ID]
         and tests.get("raw_failure_ids") == failure_ids
         and tests.get("raw_error_ids") == error_ids
         and tests.get("raw_skipped_ids") == skipped_ids
+        and tests.get("raw_fixture_skipped_ids") == fixture_skipped_ids
         and tests.get("raw_failed_subtest_ids") == failed_subtest_ids
         and tests.get("raw_skipped_subtest_ids") == skipped_subtest_ids
         and tests.get("raw_expected_failure_ids") == expected_failure_ids
@@ -863,6 +955,7 @@ def validate_full_test_receipt(tests: Mapping[str, Any], waiver: Mapping[str, An
         and tests.get("raw_test_count") == raw_tests
         and tests.get("raw_passed_count") == raw_passed
         and tests.get("raw_skipped_count") == raw_skipped
+        and tests.get("raw_fixture_skipped_count") == raw_fixture_skipped
         and tests.get("raw_failed_count") == raw_failed == 1
         and tests.get("raw_error_count") == raw_errors == 0
         and int(tests.get("raw_subprocess_return_code", -1)) == 1

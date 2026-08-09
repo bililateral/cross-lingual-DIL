@@ -50,7 +50,9 @@
 
 它必须由 `historical_manifest_waiver_receipt.json` 精确绑定，且同时满足：原始失败数恰为 1、错误数为 0、失败完整名称唯一匹配、历史清单/历史测试/当前 `PROJECT_PROGRESS.md` 字节未漂移、当前 Step28-v13 v1.12 定向测试全部通过。任何第二失败、解析歧义、非预期成功、错误、子测试歧义或固定字节漂移都拒绝写入测试通过回执。
 
-兼容投影必须保留原始计数和返回码为权威事实。`skipped_count` 可以等于原始跳过数加 1 个已接受豁免，但必须同时保存 `raw_*` 字段、豁免完整名称、`count_semantics` 和 `status_semantics`，不得把该失败冒充原生跳过或普通通过。
+兼容投影必须保留原始计数和返回码为权威事实。`skipped_count` 可以等于 `raw_skipped_count`（仅已启动测试中的普通跳过）加 1 个已接受豁免，但必须同时保存 `raw_*` 字段、豁免完整名称、`count_semantics` 和 `status_semantics`，不得把该失败冒充原生跳过或普通通过。
+
+Python `unittest` 在 `setUpClass` 或 `setUpModule` 阶段发生声明跳过时，会把它登记为跳过事件，但不会调用 `startTest`，也不会把它计入 `testsRun`。正式结构化结果必须因此分别保存“已启动测试中的普通跳过”和“未启动的夹具级跳过”，不得把二者相加后伪装成测试总数。当前只允许六个完整名称和原因均固定的 Step28-v11 普通跳过，以及一个完整名称和原因均固定的旧 metadata-shortcut 类级跳过；任何新增、缺失、改名、改原因或跨类别重分类都关闭授权。兼容口径的 `skipped_count` 只等于六个普通跳过加一个历史失败豁免；类级跳过另列，不进入 `testsRun` 或兼容计数恒等式。
 
 ## 5. 不可逆执行前验证
 

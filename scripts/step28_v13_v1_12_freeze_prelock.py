@@ -240,6 +240,7 @@ def record_full_repository_tests(output: Path = TEST_RECEIPT_PATH) -> dict[str, 
     failures = list(structured.get("failure_ids", []))
     errors = list(structured.get("error_ids", []))
     skipped_rows = list(structured.get("skipped", []))
+    fixture_skipped_rows = list(structured.get("fixture_skipped", []))
     expected_failures = list(structured.get("expected_failure_ids", []))
     unexpected_successes = list(structured.get("unexpected_success_ids", []))
     failed_subtests = list(structured.get("failed_subtest_ids", []))
@@ -248,6 +249,9 @@ def record_full_repository_tests(output: Path = TEST_RECEIPT_PATH) -> dict[str, 
     success_ids = list(structured.get("success_ids", []))
     test_count = int(structured.get("tests_run", -1))
     skipped_ids = [str(row.get("id", "")) for row in skipped_rows]
+    fixture_skipped_ids = [
+        str(row.get("id", "")) for row in fixture_skipped_rows
+    ]
     if (
         result.returncode != 1
         or structured.get("was_successful") is not False
@@ -257,13 +261,33 @@ def record_full_repository_tests(output: Path = TEST_RECEIPT_PATH) -> dict[str, 
         or unexpected_successes
         or failed_subtests
         or skipped_subtests
+        or skipped_rows != authorization.EXPECTED_STARTED_SKIPPED
+        or fixture_skipped_rows != authorization.EXPECTED_FIXTURE_SKIPPED
         or test_count < 1
         or len(started_ids) != test_count
         or len(set(started_ids)) != test_count
         or len(success_ids) + len(skipped_ids) + 1 != test_count
     ):
         raise FreezeError(
-            "Full repository tests do not match the one exact historical waiver"
+            "Full repository tests do not match the exact historical boundary: "
+            + json.dumps(
+                {
+                    "return_code": result.returncode,
+                    "tests_run": test_count,
+                    "failure_ids": failures,
+                    "error_ids": errors,
+                    "skipped_ids": skipped_ids,
+                    "fixture_skipped_ids": fixture_skipped_ids,
+                    "expected_failure_ids": expected_failures,
+                    "unexpected_success_ids": unexpected_successes,
+                    "failed_subtest_ids": failed_subtests,
+                    "skipped_subtest_ids": skipped_subtests,
+                    "started_count": len(started_ids),
+                    "success_count": len(success_ids),
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+            )
         )
     targeted_ids = sorted(
         test_id
@@ -309,17 +333,19 @@ def record_full_repository_tests(output: Path = TEST_RECEIPT_PATH) -> dict[str, 
         dereference_waiver_state=True
     )
     raw_skipped = len(skipped_ids)
+    raw_fixture_skipped = len(fixture_skipped_ids)
     raw_passed = len(success_ids)
     receipt = preceremony.with_canonical_self_hash(
         {
-            "version": "2026-08-09-step28-v13-v1-12-full-tests-v2",
+            "version": "2026-08-09-step28-v13-v1-12-full-tests-v3",
             "status": "PASS_FULL_REPOSITORY_TESTS",
             "status_semantics": (
                 "PASS_WITH_ONE_EXACT_HISTORICAL_MANIFEST_FAILURE_WAIVER"
             ),
             "count_semantics": (
-                "raw_counts_are_authoritative; compatibility_skipped_count_"
-                "includes_one_accepted_waiver"
+                "raw_tests_use_unittest_testsRun; raw_skips_cover_started_tests; "
+                "raw_fixture_skips_are_nonstarted_events; compatibility_skipped_"
+                "count_includes_one_accepted_waiver"
             ),
             "command": " ".join(command),
             "git_head": git_head_before,
@@ -334,11 +360,13 @@ def record_full_repository_tests(output: Path = TEST_RECEIPT_PATH) -> dict[str, 
             "raw_test_count": test_count,
             "raw_passed_count": raw_passed,
             "raw_skipped_count": raw_skipped,
+            "raw_fixture_skipped_count": raw_fixture_skipped,
             "raw_failed_count": 1,
             "raw_error_count": 0,
             "raw_failure_ids": failures,
             "raw_error_ids": errors,
             "raw_skipped_ids": skipped_ids,
+            "raw_fixture_skipped_ids": fixture_skipped_ids,
             "raw_expected_failure_ids": expected_failures,
             "raw_unexpected_success_ids": unexpected_successes,
             "raw_failed_subtest_ids": failed_subtests,

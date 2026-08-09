@@ -35,18 +35,22 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
         ]
         generic = [f"test_generic.Case.test_{index}" for index in range(7)]
         success_ids = sorted(targeted + generic)
-        skipped = [{"id": "test_old.Case.test_skip", "reason": "known skip"}]
+        skipped = copy.deepcopy(evidence.EXPECTED_STARTED_SKIPPED)
+        fixture_skipped = copy.deepcopy(evidence.EXPECTED_FIXTURE_SKIPPED)
         started_ids = sorted(
-            success_ids + [skipped[0]["id"], evidence.WAIVED_TEST_ID]
+            success_ids
+            + [row["id"] for row in skipped]
+            + [evidence.WAIVED_TEST_ID]
         )
         structured = {
-            "version": "2026-08-09-step28-v13-v1-12-unittest-json-v1",
+            "version": "2026-08-09-step28-v13-v1-12-unittest-json-v2",
             "tests_run": len(started_ids),
             "started_test_ids": started_ids,
             "success_ids": success_ids,
             "failure_ids": [evidence.WAIVED_TEST_ID],
             "error_ids": [],
             "skipped": skipped,
+            "fixture_skipped": fixture_skipped,
             "expected_failure_ids": [],
             "unexpected_success_ids": [],
             "failed_subtest_ids": [],
@@ -62,14 +66,15 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
             }
         ]
         return {
-            "version": "2026-08-09-step28-v13-v1-12-full-tests-v2",
+            "version": "2026-08-09-step28-v13-v1-12-full-tests-v3",
             "status": "PASS_FULL_REPOSITORY_TESTS",
             "status_semantics": (
                 "PASS_WITH_ONE_EXACT_HISTORICAL_MANIFEST_FAILURE_WAIVER"
             ),
             "count_semantics": (
-                "raw_counts_are_authoritative; compatibility_skipped_count_"
-                "includes_one_accepted_waiver"
+                "raw_tests_use_unittest_testsRun; raw_skips_cover_started_tests; "
+                "raw_fixture_skips_are_nonstarted_events; compatibility_skipped_"
+                "count_includes_one_accepted_waiver"
             ),
             "command": "synthetic",
             "git_head": "a" * 40,
@@ -82,17 +87,21 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
             },
             "test_count": len(started_ids),
             "passed_count": len(success_ids),
-            "skipped_count": 2,
+            "skipped_count": len(skipped) + 1,
             "failed_count": 0,
             "error_count": 0,
             "raw_test_count": len(started_ids),
             "raw_passed_count": len(success_ids),
-            "raw_skipped_count": 1,
+            "raw_skipped_count": len(skipped),
+            "raw_fixture_skipped_count": len(fixture_skipped),
             "raw_failed_count": 1,
             "raw_error_count": 0,
             "raw_failure_ids": [evidence.WAIVED_TEST_ID],
             "raw_error_ids": [],
-            "raw_skipped_ids": [skipped[0]["id"]],
+            "raw_skipped_ids": [row["id"] for row in skipped],
+            "raw_fixture_skipped_ids": [
+                row["id"] for row in fixture_skipped
+            ],
             "raw_expected_failure_ids": [],
             "raw_unexpected_success_ids": [],
             "raw_failed_subtest_ids": [],
@@ -130,6 +139,16 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
         self.assertEqual(set(receipts), {
             "text_receipt", "interruption_receipt", "waiver_receipt"
         })
+
+    def test_current_authorization_overlay_pin_matches_exact_bytes(self) -> None:
+        self.assertEqual(
+            evidence._verify_exact_pin(
+                evidence.OVERLAY_PIN,
+                evidence.OVERLAY_PIN,
+                label="current authorization overlay",
+            ),
+            evidence.OVERLAY_PATH,
+        )
 
     def test_producer_and_validator_exact_receipt_keysets_match(self) -> None:
         tree = ast.parse(
@@ -425,6 +444,32 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
                 with self.assertRaises(evidence.AuthorizationEvidenceError):
                     evidence.validate_full_test_receipt(receipt, waiver)
 
+    def test_full_test_receipt_rejects_fixture_skip_reclassification(
+        self,
+    ) -> None:
+        waiver = preceremony.load_json_strict(evidence.WAIVER_RECEIPT_PATH)
+        receipt = self._valid_full_test_receipt()
+        structured = receipt["raw_structured_result"]
+        fixture = structured["fixture_skipped"].pop()
+        structured["skipped"].append(fixture)
+        structured["skipped"].sort(key=lambda row: (row["id"], row["reason"]))
+        structured["started_test_ids"].append(fixture["id"])
+        structured["started_test_ids"].sort()
+        structured["tests_run"] += 1
+        receipt["raw_fixture_skipped_count"] = 0
+        receipt["raw_fixture_skipped_ids"] = []
+        receipt["raw_skipped_count"] += 1
+        receipt["raw_skipped_ids"].append(fixture["id"])
+        receipt["raw_skipped_ids"].sort()
+        receipt["test_count"] += 1
+        receipt["raw_test_count"] += 1
+        receipt["skipped_count"] += 1
+        receipt["structured_result_sha256"] = preceremony.canonical_sha256(
+            structured
+        )
+        with self.assertRaises(evidence.AuthorizationEvidenceError):
+            evidence.validate_full_test_receipt(receipt, waiver)
+
     def test_runner_identifies_skipped_subtest(self) -> None:
         class SkippedSubtest(unittest.TestCase):
             def runTest(self) -> None:
@@ -436,6 +481,39 @@ class Step28V13V112AuthorizationOverlayContracts(unittest.TestCase):
             resultclass=json_runner.StructuredResult,
         ).run(unittest.TestSuite([SkippedSubtest()]))
         self.assertEqual(len(result.skipped_subtest_ids), 1)
+
+    def test_runner_separates_nonstarted_fixture_skip(self) -> None:
+        class FixtureSkipped(unittest.TestCase):
+            @classmethod
+            def setUpClass(cls) -> None:
+                raise unittest.SkipTest("fixture unavailable")
+
+            def test_never_started(self) -> None:
+                self.fail("fixture skip must prevent test start")
+
+        result = unittest.TextTestRunner(
+            stream=io.StringIO(),
+            resultclass=json_runner.StructuredResult,
+        ).run(unittest.defaultTestLoader.loadTestsFromTestCase(FixtureSkipped))
+        skipped, fixture_skipped = json_runner._split_skipped(result)
+        self.assertEqual(result.testsRun, 0)
+        self.assertEqual(result.started_ids, [])
+        self.assertEqual(skipped, [])
+        self.assertEqual(
+            fixture_skipped,
+            [
+                {
+                    "id": (
+                        "setUpClass (tests.test_step28_v13_v1_12_"
+                        "authorization_overlay_contracts."
+                        "Step28V13V112AuthorizationOverlayContracts."
+                        "test_runner_separates_nonstarted_fixture_skip."
+                        "<locals>.FixtureSkipped)"
+                    ),
+                    "reason": "fixture unavailable",
+                }
+            ],
+        )
 
     def test_text_semantic_mutations_fail_closed(self) -> None:
         original = preceremony.load_json_strict(evidence.TEXT_RECEIPT_PATH)

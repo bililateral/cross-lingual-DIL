@@ -51,6 +51,22 @@ def _ids(records: list[tuple[Any, str]]) -> list[str]:
     return sorted({test.id() for test, _detail in records})
 
 
+def _split_skipped(
+    result: StructuredResult,
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Separate started-test skips from class/module fixture skip events."""
+
+    started = set(result.started_ids)
+    rows = sorted(
+        ({"id": test.id(), "reason": reason} for test, reason in result.skipped),
+        key=lambda row: (row["id"], row["reason"]),
+    )
+    return (
+        [row for row in rows if row["id"] in started],
+        [row for row in rows if row["id"] not in started],
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start-directory", default="tests")
@@ -77,20 +93,18 @@ def main() -> None:
     elapsed = time.perf_counter() - started
     failures = _ids(result.failures)
     errors = _ids(result.errors)
-    skipped = sorted(
-        ({"id": test.id(), "reason": reason} for test, reason in result.skipped),
-        key=lambda row: (row["id"], row["reason"]),
-    )
+    skipped, fixture_skipped = _split_skipped(result)
     expected_failures = _ids(result.expectedFailures)
     unexpected_successes = sorted(test.id() for test in result.unexpectedSuccesses)
     payload = {
-        "version": "2026-08-09-step28-v13-v1-12-unittest-json-v1",
+        "version": "2026-08-09-step28-v13-v1-12-unittest-json-v2",
         "tests_run": int(result.testsRun),
         "started_test_ids": sorted(result.started_ids),
         "success_ids": sorted(result.success_ids),
         "failure_ids": failures,
         "error_ids": errors,
         "skipped": skipped,
+        "fixture_skipped": fixture_skipped,
         "expected_failure_ids": expected_failures,
         "unexpected_success_ids": unexpected_successes,
         "failed_subtest_ids": sorted(set(result.failed_subtest_ids)),
