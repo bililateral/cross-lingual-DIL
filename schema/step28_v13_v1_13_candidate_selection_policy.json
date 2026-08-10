@@ -1,0 +1,134 @@
+{
+  "version": "2026-08-10-step28-v13-v1-13-candidate-selection-policy-v1",
+  "status": "DESIGN_SMOKE_ONLY_CANDIDATE_SELECTION_NO_FORMAL_AUTHORIZATION",
+  "claim_boundary": "One pinned development-smoke world may search exact document-collision candidates in memory. No formal seed, capability, candidate, row, transaction, split state, dataset, model, metric, or release is authorized.",
+  "formal_authorizations": {
+    "audit_truth_access": false,
+    "formal_capability_derivation": false,
+    "formal_candidate_generation": false,
+    "formal_dataset_generation": false,
+    "formal_model_training": false,
+    "formal_seed_ceremony": false
+  },
+  "allowed_mode": "development_smoke",
+  "allowed_split": "audit_a",
+  "candidate_limit": 32,
+  "collision_categories": [
+    "same_world_item_document",
+    "same_world_seller_document",
+    "historical_item_document",
+    "historical_seller_document",
+    "current_split_item_document",
+    "current_split_seller_document",
+    "predecessor_item_document",
+    "predecessor_seller_document"
+  ],
+  "frozen_inputs": {
+    "collision_contract": {
+      "path": "docs/STEP28_V13_V1_13_VISIBLE_DOCUMENT_COLLISION_CONTRACT_20260809.zh.md",
+      "sha256": "0f1906a8be46be3d3cdf16738814e0c83192e97299d162857b71ca585208eca6",
+      "size_bytes": 17811
+    },
+    "collision_policy": {
+      "path": "schema/step28_v13_v1_13_document_collision_policy.json",
+      "sha256": "2331ccbcf4c08171204f86fbe44a430780d11967b944e72996b707de2c9cca99",
+      "size_bytes": 12084
+    },
+    "candidate_parent_policy": {
+      "path": "schema/step28_v13_v1_13_candidate_parent_policy.json",
+      "sha256": "b550fbb0579e84a46f896b9f39fb29edeec64021d32d61eff94c42b63f768b26",
+      "size_bytes": 8158
+    },
+    "natural_variation_policy": {
+      "path": "schema/step28_v13_v1_13_natural_variation_policy.json",
+      "sha256": "eb24f5ac99ffadb278ff6ec0ccad1a25d44d74818bf242d27f277fe6449e6fb0",
+      "size_bytes": 8227
+    },
+    "base_dataset_policy": {
+      "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+      "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729",
+      "size_bytes": 193942
+    },
+    "common_contract": {
+      "path": "scripts/step28_v13_common.py",
+      "sha256": "bf1fcf7d4cf6b5e91fa069f20bf6b94681b2e0f1f53884bfdc8212e72232f640",
+      "size_bytes": 36483
+    },
+    "collision_primitives": {
+      "path": "scripts/step28_v13_v1_13_document_collision.py",
+      "sha256": "5cb1907ed6d15ea52cdc0b35069fdff1cc651dca2b570debbb53ee77a8f9d4d4",
+      "size_bytes": 34480
+    },
+    "candidate_parent": {
+      "path": "scripts/step28_v13_v1_13_candidate_parent.py",
+      "sha256": "b700265b7791866587f685cdda24d1f299849a0397209dc14fec27c754831e84",
+      "size_bytes": 57236
+    },
+    "natural_variation": {
+      "path": "scripts/step28_v13_v1_13_natural_variation.py",
+      "sha256": "6f49f3c9e1ed322195a9a541a2960d25bd64f50a6d823c0c0c3a9f44fdae9e5b",
+      "size_bytes": 82103
+    },
+    "production_chain": {
+      "path": "scripts/step28_v13_production_chain.py",
+      "sha256": "536c4fac2b4843d6f948723f2d0b8a49a4f37ec3db0945d8d24372971d529fd0",
+      "size_bytes": 78219
+    },
+    "profiles": {
+      "path": "scripts/step28_v13_profiles.py",
+      "sha256": "59820b94ea83133c0b0e99db7308722f481f9b326874881c7059fc2d83424e0b",
+      "size_bytes": 6520
+    },
+    "step3_profiles": {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+      "size_bytes": 57250
+    },
+    "candidate_selection": {
+      "path": "scripts/step28_v13_v1_13_candidate_selection.py",
+      "sha256": "73888224e44b606c6204d002397c2cec986c9d61d60222fdada56e5d1d048a55",
+      "size_bytes": 49420
+    },
+    "candidate_selection_tests": {
+      "path": "tests/test_step28_v13_v1_13_candidate_selection_contracts.py",
+      "sha256": "1c8d4f51b6f6075586a49d7c516b961c3d944a45e8f13ec45349f44bdbac16e8",
+      "size_bytes": 32424
+    }
+  },
+  "smoke_collision_context": {
+    "world_ordinal": 0,
+    "historical_item_count": 302944,
+    "historical_item_hashes_sha256": "7097431024dc9d8894ddc497745f983a7f442140e6ef90d6b47bdd1d77b624cb",
+    "historical_seller_count": 84000,
+    "historical_seller_hashes_sha256": "08c18e97423502d2f6452ce0b7f319463028de148ee50955197896777cce3117",
+    "current_item_count": 0,
+    "current_item_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "current_seller_count": 0,
+    "current_seller_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "predecessor_item_count": 0,
+    "predecessor_item_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "predecessor_seller_count": 0,
+    "predecessor_seller_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "previous_world_marker_sha256": "043279cb8a4bcbb52793dc04e0379b845d898c4d3c8e82670026e96db6280135",
+    "predecessor_seal_pin_count": 0,
+    "predecessor_seal_pins_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "expected_smoke_selection": {
+    "world_uid": "w_003497845547650a980473b05e249937bf825ad0eaefa424baec74f2bd2210f3",
+    "accepted_candidate_index": 0,
+    "candidates_examined": 1,
+    "rejected_candidate_count": 0,
+    "item_count": 105,
+    "seller_count": 28,
+    "selection_context_sha256": "b0aef4fe60d1b2a117b30be9788a42bd6cba2a40123dfb82f8946640b199428d",
+    "exact_title_clone_qualification_sha256": "145c94bfd1ad0ffe5639d9c62e3c5a7c7c8531923e7723aa34e5bb803857b9fe",
+    "redacted_items_sha256": "ab6554799a64af300345f531f0e6aa76bbb02853deb517abf2ed662aaf5a58c5",
+    "profiles_sha256": "65a37892f9febff8eb4c00aa5f172d04277a72c3f4e3f8d328e1bc4f52c3972d",
+    "item_registry_delta_sha256": "ff7e793f43612d7a47e5111d24cc6d0179b060c2d8b8e113b1a221e84263ea1f",
+    "seller_registry_delta_sha256": "0be77cf5c95b79cd5f291fca280fc289e3deb35f3264b3eaf5edb1e159b8fb25",
+    "allocation_delta_count": 84,
+    "allocation_delta_sha256": "cb963844c3337afeca0aac7b36307f9fac88744591bc44e2a5e745301679caf7",
+    "accepted_state_sha256": "6f14e23acbb0b7adbfda3e7044c9d5389338db30fd5692dee2a2aaff3802343f"
+  },
+  "canonical_self_hash": "32f8a431311eba03e97068dc3b4597a24e4befe8867dd8311dde755c580a783d"
+}

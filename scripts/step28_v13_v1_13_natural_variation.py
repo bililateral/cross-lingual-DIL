@@ -55,7 +55,10 @@ FORMAL_AUTHORIZATION_KEYS = frozenset(
 )
 VIEW_VERSION = pure_renderer.VIEW_VERSION
 OUTPUT_VERSION = pure_renderer.OUTPUT_VERSION
-BINDING_VERSION = "2026-08-10-step28-v13-v1-13-private-handle-binding-v1"
+BINDING_VERSION = "2026-08-10-step28-v13-v1-13-private-handle-binding-v2"
+TITLE_CLONE_QUALIFICATION_VERSION = (
+    "2026-08-10-step28-v13-v1-13-title-clone-qualification-v1"
+)
 ALLOWED_MODE = "development_smoke"
 HANDLE_DOMAIN = b"step28-v13-v1.13-development-smoke-anonymous-handle"
 ITEM_VIEW_FIELDS = pure_renderer.ITEM_VIEW_FIELDS
@@ -388,6 +391,24 @@ class AssembledDevelopmentCandidate:
         if _sha256_bytes(self.world_bytes) != self.world_sha256:
             raise NaturalVariationError("Assembled candidate-world hash drift")
         return value
+
+
+@dataclass(frozen=True)
+class TrustedDevelopmentSelectionMaterial:
+    """Hash-only trusted state needed by the design-smoke selector."""
+
+    mode: str
+    split: str
+    world_uid: str
+    candidate_parent_full_state_sha256: str
+    frozen_trial_identity_full_state_sha256: str
+    candidate_invariant_sha256: str
+    identity_parent_sha256: str
+    identity33_sha256: str
+    profile_provenance_sha256: str
+    allocation_delta: tuple[str, ...]
+    exact_title_clone_qualification_bytes: bytes
+    exact_title_clone_qualification_sha256: str
 
 
 def _anonymous_handle(*, key: bytes, kind: str, value: str) -> str:
@@ -849,12 +870,8 @@ def _build_restricted_view_and_binding(
     safe_items.sort(key=lambda row: row["item_handle"].encode("utf-8"))
 
     registered_overrides: list[dict[str, Any]] = []
-    for row in sorted(
-        world["private"]["override_audit"],
-        key=lambda value: (
-            str(value["override_kind"]).encode("utf-8"),
-            int(value["asset_index"]),
-        ),
+    for registration_ordinal, row in enumerate(
+        world["private"]["override_audit"]
     ):
         if row["override_kind"] not in {
             "high_semantic_similarity",
@@ -863,9 +880,12 @@ def _build_restricted_view_and_binding(
             raise NaturalVariationError("Unknown registered override in safe projection")
         registered_overrides.append(
             {
+                "registration_ordinal": registration_ordinal,
                 "override_kind": str(row["override_kind"]),
                 "asset_index": int(row["asset_index"]),
                 "canonical_pair_uid": str(row["canonical_pair_uid"]),
+                "seller_uid_left": str(row["seller_uid_left"]),
+                "seller_uid_right": str(row["seller_uid_right"]),
                 "item_uid_left": str(row["item_uid_left"]),
                 "item_uid_right": str(row["item_uid_right"]),
             }
@@ -987,11 +1007,19 @@ def _build_restricted_view_and_binding(
     view_sha256 = _sha256_bytes(view_bytes)
     view = RestrictedCandidateView(view_bytes=view_bytes, view_sha256=view_sha256)
 
+    _qualification_bytes, qualification_sha256 = (
+        _build_exact_title_clone_qualification(
+            parent=expected_parent,
+            frozen=frozen,
+        )
+    )
+
     binding_value = {
         "version": BINDING_VERSION,
         "view_sha256": view_sha256,
         "candidate_invariant_sha256": expected_parent.invariant_sha256,
         "identity_parent_sha256": frozen.identity_parent_sha256,
+        "exact_title_clone_qualification_sha256": qualification_sha256,
         "item_handle_to_item_uid": {
             handle: uid
             for uid, handle in sorted(
@@ -1142,6 +1170,163 @@ def _frozen_identity_full_state_sha256(
     return common.canonical_sha256(state)
 
 
+def _build_exact_title_clone_qualification(
+    *,
+    parent: candidate_parent.CandidateIndependentParent,
+    frozen: candidate_parent.FrozenTrialIdentityParent,
+) -> tuple[bytes, str]:
+    """Freeze title-clone eligibility before candidate zero is observable."""
+
+    parent_root = _candidate_parent_full_state_sha256(parent)
+    frozen_root = _frozen_identity_full_state_sha256(frozen, parent=parent)
+    smoke = load_policy()["expected_smoke_world"]
+    if (
+        parent_root != smoke["candidate_parent_full_state_sha256"]
+        or frozen_root != smoke["frozen_trial_identity_full_state_sha256"]
+    ):
+        raise NaturalVariationError("Title-clone qualification parent drift")
+    world = frozen.thaw_world()
+    public_items = {
+        str(row["item_uid"]): dict(row) for row in world["public"]["items"]
+    }
+    render_asts = {
+        str(row["item_uid"]): dict(row)
+        for row in world["private"]["render_asts"]
+    }
+    if (
+        len(public_items) != len(world["public"]["items"])
+        or len(render_asts) != len(world["private"]["render_asts"])
+        or set(public_items) != set(render_asts)
+    ):
+        raise NaturalVariationError("Title-clone item universe drift")
+    clone_flags: dict[tuple[int, str], list[dict[str, Any]]] = defaultdict(list)
+    for source_flag in world["private"]["negative_flags"]:
+        if source_flag.get("flag") != "exact_title_clone_target":
+            continue
+        _require_exact_keys(
+            source_flag,
+            ("asset_index", "canonical_pair_uid", "flag"),
+            label="exact-title negative flag",
+        )
+        asset_index = source_flag["asset_index"]
+        if type(asset_index) is not int or asset_index < 0:
+            raise NaturalVariationError("Exact-title negative flag index drift")
+        clone_flags[(asset_index, str(source_flag["canonical_pair_uid"]))].append(
+            dict(source_flag)
+        )
+
+    rows: list[dict[str, Any]] = []
+    used_endpoints: set[str] = set()
+    seen_override_keys: set[tuple[str, int]] = set()
+    override_fields = (
+        "asset_index",
+        "canonical_pair_uid",
+        "item_uid_left",
+        "item_uid_right",
+        "override_kind",
+        "seller_uid_left",
+        "seller_uid_right",
+    )
+    for registration_ordinal, source_override in enumerate(
+        world["private"]["override_audit"]
+    ):
+        _require_exact_keys(
+            source_override, override_fields, label="registered override"
+        )
+        kind = source_override["override_kind"]
+        asset_index = source_override["asset_index"]
+        left_uid = str(source_override["item_uid_left"])
+        right_uid = str(source_override["item_uid_right"])
+        override_key = (str(kind), asset_index)
+        if (
+            kind not in {"high_semantic_similarity", "exact_title_clone"}
+            or type(asset_index) is not int
+            or asset_index < 0
+            or override_key in seen_override_keys
+            or left_uid == right_uid
+            or left_uid not in public_items
+            or right_uid not in public_items
+        ):
+            raise NaturalVariationError("Registered override qualification drift")
+        seen_override_keys.add(override_key)
+        left_item = public_items[left_uid]
+        right_item = public_items[right_uid]
+        left_ast = render_asts[left_uid]
+        right_ast = render_asts[right_uid]
+        if (
+            str(left_item["seller_uid"])
+            != str(source_override["seller_uid_left"])
+            or str(right_item["seller_uid"])
+            != str(source_override["seller_uid_right"])
+            or type(left_ast["title_nonempty"]) is not bool
+            or type(left_ast["description_nonempty"]) is not bool
+            or type(right_ast["title_nonempty"]) is not bool
+            or type(right_ast["description_nonempty"]) is not bool
+        ):
+            raise NaturalVariationError("Registered override endpoint drift")
+        source_unused = left_uid not in used_endpoints
+        target_unused = right_uid not in used_endpoints
+        if not source_unused or not target_unused:
+            raise NaturalVariationError("Registered override reuses an earlier endpoint")
+        used_endpoints.update((left_uid, right_uid))
+        if kind != "exact_title_clone":
+            continue
+        flag_key = (asset_index, str(source_override["canonical_pair_uid"]))
+        matching_flags = clone_flags.get(flag_key, [])
+        if len(matching_flags) != 1:
+            raise NaturalVariationError(
+                "Exact-title override lacks one matching negative flag"
+            )
+        source_title_nonempty = bool(left_item["title"])
+        target_title_nonempty = bool(right_item["title"])
+        target_description_nonempty = bool(right_item["description"])
+        if (
+            source_title_nonempty is not True
+            or target_title_nonempty is not True
+            or target_description_nonempty is not True
+            or left_ast["title_nonempty"] is not True
+            or right_ast["title_nonempty"] is not True
+            or right_ast["description_nonempty"] is not True
+        ):
+            raise NaturalVariationError("Exact-title clone eligibility is not satisfied")
+        rows.append(
+            {
+                "registration_ordinal": registration_ordinal,
+                "override_kind": "exact_title_clone",
+                "asset_index": asset_index,
+                "canonical_pair_uid": str(source_override["canonical_pair_uid"]),
+                "source_seller_uid": str(source_override["seller_uid_left"]),
+                "target_seller_uid": str(source_override["seller_uid_right"]),
+                "source_item_uid": left_uid,
+                "target_item_uid": right_uid,
+                "source_title_nonempty": source_title_nonempty,
+                "target_title_nonempty": target_title_nonempty,
+                "target_description_nonempty": target_description_nonempty,
+                "source_unused_before_registration": source_unused,
+                "target_unused_before_registration": target_unused,
+                "matching_negative_flag_sha256": common.canonical_sha256(
+                    matching_flags[0]
+                ),
+                "candidate_parent_full_state_sha256": parent_root,
+            }
+        )
+    if len(rows) != 2 or len(clone_flags) != 2:
+        raise NaturalVariationError("Exact-title clone qualification count drift")
+    value = {
+        "version": TITLE_CLONE_QUALIFICATION_VERSION,
+        "mode": frozen.mode,
+        "split": frozen.split,
+        "world_uid": frozen.world_uid,
+        "row_count": len(rows),
+        "rows": rows,
+        "rows_sha256": common.canonical_sha256(rows),
+        "candidate_parent_full_state_sha256": parent_root,
+        "frozen_trial_identity_full_state_sha256": frozen_root,
+    }
+    payload = _canonical_bytes(value)
+    return payload, _sha256_bytes(payload)
+
+
 def _assemble_and_validate(
     *,
     candidate_index: int,
@@ -1193,6 +1378,7 @@ def _assemble_and_validate(
             "view_sha256",
             "candidate_invariant_sha256",
             "identity_parent_sha256",
+            "exact_title_clone_qualification_sha256",
             "item_handle_to_item_uid",
             "noise_handle_to_noise_slot_uid",
             "registered_overrides",
@@ -1224,6 +1410,25 @@ def _assemble_and_validate(
     if len(candidate_rows) != len(natural_value["items"]):
         raise NaturalVariationError("Natural candidate contains duplicate item handles")
 
+    world = frozen.thaw_world()
+    public_item_by_uid = {
+        str(row["item_uid"]): row for row in world["public"]["items"]
+    }
+    ast_by_uid = {
+        str(row["item_uid"]): row for row in world["private"]["render_asts"]
+    }
+    _qualification_bytes, qualification_sha256 = (
+        _build_exact_title_clone_qualification(
+            parent=expected_parent,
+            frozen=frozen,
+        )
+    )
+    if (
+        binding_value["exact_title_clone_qualification_sha256"]
+        != qualification_sha256
+    ):
+        raise NaturalVariationError("Title-clone qualification binding drift")
+
     uid_to_item_handle = {
         str(uid): str(handle) for handle, uid in item_handle_to_uid.items()
     }
@@ -1234,15 +1439,19 @@ def _assemble_and_validate(
         raise NaturalVariationError("Private registered overrides are malformed")
     seen_override_assets: set[tuple[str, int]] = set()
     used_override_items: set[str] = set()
-    for override in registered_overrides:
+    clone_target_base_descriptions: dict[str, str] = {}
+    for expected_ordinal, override in enumerate(registered_overrides):
         if not isinstance(override, dict):
             raise NaturalVariationError("Private registered override is not an object")
         _require_exact_keys(
             override,
             (
+                "registration_ordinal",
                 "override_kind",
                 "asset_index",
                 "canonical_pair_uid",
+                "seller_uid_left",
+                "seller_uid_right",
                 "item_uid_left",
                 "item_uid_right",
             ),
@@ -1255,6 +1464,8 @@ def _assemble_and_validate(
         override_key = (str(kind), int(asset_index)) if type(asset_index) is int else None
         if (
             kind not in {"high_semantic_similarity", "exact_title_clone"}
+            or type(override["registration_ordinal"]) is not int
+            or override["registration_ordinal"] != expected_ordinal
             or type(asset_index) is not int
             or asset_index < 0
             or not isinstance(override["canonical_pair_uid"], str)
@@ -1263,6 +1474,12 @@ def _assemble_and_validate(
             or left_uid == right_uid
             or left_uid not in uid_to_item_handle
             or right_uid not in uid_to_item_handle
+            or left_uid not in public_item_by_uid
+            or right_uid not in public_item_by_uid
+            or str(public_item_by_uid[left_uid]["seller_uid"])
+            != override["seller_uid_left"]
+            or str(public_item_by_uid[right_uid]["seller_uid"])
+            != override["seller_uid_right"]
             or override_key in seen_override_assets
             or left_uid in used_override_items
             or right_uid in used_override_items
@@ -1283,9 +1500,25 @@ def _assemble_and_validate(
                     "Bijection changed a registered high-semantic relation"
                 )
         else:
-            if not left["title"] or not right["title"]:
-                raise NaturalVariationError("Exact-title clone endpoint lacks a title")
+            if (
+                not left["title"]
+                or not right["title"]
+                or not right["base_description"]
+                or ast_by_uid[right_uid]["description_nonempty"] is not True
+            ):
+                raise NaturalVariationError(
+                    "Exact-title clone endpoint lacks its qualified visible fields"
+                )
+            clone_target_base_descriptions[right_uid] = str(
+                right["base_description"]
+            )
             right["title"] = left["title"]
+            if (
+                right["title"] != left["title"]
+                or right["base_description"]
+                != clone_target_base_descriptions[right_uid]
+            ):
+                raise NaturalVariationError("Exact-title clone changed its description")
 
     trusted_natural_value = {
         "version": OUTPUT_VERSION,
@@ -1300,13 +1533,6 @@ def _assemble_and_validate(
     trusted_natural_sha256 = _sha256_bytes(trusted_natural_bytes)
 
     base_policy, template, fixture, _style_profile = candidate_parent._load_validated_base_inputs()
-    world = frozen.thaw_world()
-    public_item_by_uid = {
-        str(row["item_uid"]): row for row in world["public"]["items"]
-    }
-    ast_by_uid = {
-        str(row["item_uid"]): row for row in world["private"]["render_asts"]
-    }
     identity_by_item: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in world["private"]["identity_slots_audit"]:
         identity_by_item[str(row["item_uid"])].append(dict(row))
@@ -1418,6 +1644,14 @@ def _assemble_and_validate(
         raise NaturalVariationError("Candidate descriptions did not cover every item")
     for item_uid, description in rendered_description_by_uid.items():
         public_item_by_uid[item_uid]["description"] = description
+    if any(
+        not rendered_description_by_uid.get(item_uid)
+        or not clone_target_base_descriptions[item_uid]
+        for item_uid in clone_target_base_descriptions
+    ):
+        raise NaturalVariationError(
+            "Exact-title clone target description changed its nonempty status"
+        )
     world["private"]["identity_slots_audit"] = new_identity_audit
     world["private"]["identity_slots_edit"] = new_identity_edit
     world["private"]["noise_slots_audit"] = new_noise_audit
@@ -1593,6 +1827,13 @@ class DevelopmentSmokeVariationSession:
             frozen=self._frozen,
             expected_parent=self._parent,
         )
+        (
+            self._title_clone_qualification_bytes,
+            self._title_clone_qualification_sha256,
+        ) = _build_exact_title_clone_qualification(
+            parent=self._parent,
+            frozen=self._frozen,
+        )
         self._rendered_indices: set[int] = set()
         self._failed = False
 
@@ -1603,6 +1844,50 @@ class DevelopmentSmokeVariationSession:
     @property
     def identity_parent_sha256(self) -> str:
         return self._frozen.identity_parent_sha256
+
+    def trusted_selection_material(self) -> TrustedDevelopmentSelectionMaterial:
+        """Return immutable hash-only authority for the design-smoke selector."""
+
+        allocation_delta = self._frozen.allocation_delta
+        if (
+            not isinstance(allocation_delta, tuple)
+            or allocation_delta != tuple(common.utf8_sort(allocation_delta))
+            or len(allocation_delta) != len(set(allocation_delta))
+            or any(_require_sha256(value, label="allocation delta") != value for value in allocation_delta)
+        ):
+            raise NaturalVariationError("Trusted selection allocation delta drift")
+        qualification_bytes, qualification_sha256 = (
+            _build_exact_title_clone_qualification(
+                parent=self._parent,
+                frozen=self._frozen,
+            )
+        )
+        if (
+            qualification_bytes != self._title_clone_qualification_bytes
+            or qualification_sha256 != self._title_clone_qualification_sha256
+        ):
+            raise NaturalVariationError("Trusted title-clone qualification drift")
+        return TrustedDevelopmentSelectionMaterial(
+            mode=self._frozen.mode,
+            split=self._frozen.split,
+            world_uid=self._frozen.world_uid,
+            candidate_parent_full_state_sha256=(
+                _candidate_parent_full_state_sha256(self._parent)
+            ),
+            frozen_trial_identity_full_state_sha256=(
+                _frozen_identity_full_state_sha256(
+                    self._frozen,
+                    parent=self._parent,
+                )
+            ),
+            candidate_invariant_sha256=self._parent.invariant_sha256,
+            identity_parent_sha256=self._frozen.identity_parent_sha256,
+            identity33_sha256=self._frozen.identity33_sha256,
+            profile_provenance_sha256=self._frozen.profile_provenance_sha256,
+            allocation_delta=allocation_delta,
+            exact_title_clone_qualification_bytes=qualification_bytes,
+            exact_title_clone_qualification_sha256=qualification_sha256,
+        )
 
     def render(self, candidate_index: int) -> AssembledDevelopmentCandidate:
         if self._failed:
