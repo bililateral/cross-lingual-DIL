@@ -1,0 +1,198 @@
+{
+  "version": "2026-08-10-step28-v13-v1-13-split-transaction-policy-v1",
+  "status": "DESIGN_SMOKE_ONLY_SPLIT_TRANSACTION_NO_FORMAL_AUTHORIZATION",
+  "claim_boundary": "One pinned development-smoke world may exercise the transaction, recovery, smoke-finalization, seal, and cleanup state machine only inside an ephemeral workspace. This is not a formal split, formal canonical member set, formal durability certification, dataset, model, metric, or release.",
+  "formal_authorizations": {
+    "audit_truth_access": false,
+    "formal_capability_derivation": false,
+    "formal_candidate_generation": false,
+    "formal_dataset_generation": false,
+    "formal_model_training": false,
+    "formal_seed_ceremony": false
+  },
+  "allowed_mode": "development_smoke",
+  "allowed_split": "audit_a",
+  "expected_world_count": 1,
+  "smoke_projection_only": true,
+  "formal_canonical_member_set_claimed": false,
+  "formal_split_semantics": false,
+  "linux_formal_directory_durability_certified": false,
+  "stable_lock": {
+    "domain": "step28-v13-v1.13-split-transaction-lock-v1",
+    "identity_fields": [
+      "canonical_repository_realpath",
+      "transaction_policy_version",
+      "allowed_mode",
+      "allowed_split"
+    ],
+    "nonblocking": true,
+    "lock_before_ephemeral_workspace_creation": true,
+    "busy_is_research_failure": false,
+    "windows_scope": "same_logon_session_only",
+    "posix_lock_object": "canonical_repository_directory_inode",
+    "repository_root_inode_must_remain_stable": true,
+    "hostile_cross_session_or_repository_root_swap_protected": false,
+    "formal_lock_upgrade_required": true
+  },
+  "frozen_candidate_selection_trust": {
+    "policy_path": "schema/step28_v13_v1_13_candidate_selection_policy.json",
+    "policy_raw_sha256": "ddce84eeaf8c5e74067efacf497426c682acd14b62c13e87deb5ab8e53ebe6a0",
+    "policy_canonical_self_hash": "32f8a431311eba03e97068dc3b4597a24e4befe8867dd8311dde755c580a783d",
+    "source_path": "scripts/step28_v13_v1_13_candidate_selection.py",
+    "source_sha256": "73888224e44b606c6204d002397c2cec986c9d61d60222fdada56e5d1d048a55",
+    "expected_accepted_state_sha256": "6f14e23acbb0b7adbfda3e7044c9d5389338db30fd5692dee2a2aaff3802343f",
+    "expected_world_uid": "w_003497845547650a980473b05e249937bf825ad0eaefa424baec74f2bd2210f3",
+    "expected_candidate_index": 0,
+    "expected_candidates_examined": 1,
+    "expected_rejected_candidate_count": 0,
+    "expected_item_count": 105,
+    "expected_seller_count": 28,
+    "expected_allocation_delta_count": 84
+  },
+  "implementation_bundle_pins": {
+    "trust_status": "INTERNAL_CLOSURE_ONLY_PENDING_EXTERNAL_GIT_PARENT",
+    "external_parent_receipt_required": true,
+    "source_guard": {
+      "path": "scripts/step28_v13_v1_13_source_guard.py",
+      "size_bytes": 12339,
+      "sha256": "00b3b24ef5ad099175142e36545fea98acf1e142636385c68159c272fcf42136"
+    },
+    "source": {
+      "path": "scripts/step28_v13_v1_13_split_transaction.py",
+      "size_bytes": 97248,
+      "sha256": "58ce5d52e1dfb97090acc9c3f1a3499822050fd99612362742fe8a1b4b049fcf"
+    },
+    "contract_test": {
+      "path": "tests/step28_v13_v1_13_split_transaction_contracts.py",
+      "size_bytes": 56832,
+      "sha256": "63792333f78a3f1692af0a5fb8cd3914a747d630879d652d01e10af30c93641f"
+    }
+  },
+  "source_execution_boundary": {
+    "entrypoint": "scripts/step28_v13_v1_13_source_guard.py",
+    "required_python_flags": ["-I", "-S", "-B"],
+    "environment_isolation_required": true,
+    "site_initialization_forbidden": true,
+    "site_module_preloaded_forbidden": true,
+    "third_party_paths_derived_from_interpreter_only": false,
+    "user_site_reintroduced": true,
+    "user_site_path_may_depend_on_os_environment": true,
+    "pth_execution_forbidden": true,
+    "interpreter_standard_library_before_scripts": true,
+    "third_party_before_canonical_scripts": true,
+    "third_party_dependency_bytes_pinned": false,
+    "hostile_third_party_payload_protected": false,
+    "hostile_or_environment_redirected_third_party_protected": false,
+    "formal_environment_attestation_required": true,
+    "main_script_source_only": true,
+    "project_bytecode_cache_forbidden": true,
+    "project_module_preload_forbidden": true,
+    "canonical_scripts_path_unique": true,
+    "ordinary_unittest_discovery_includes_focused_contracts": false,
+    "ordinary_unittest_discovery_authoritative_for_stage4b": false,
+    "focused_contracts_authoritative_entrypoint_only": true
+  },
+  "allocation_delta_semantics": {
+    "element_type": "lowercase_sha256_of_normalized_identity_value",
+    "derivation": "sorted unique trial_allocated minus committed_identity_hashes",
+    "must_equal_all_private_identity_asset_value_hashes": true,
+    "sufficient_to_reconstruct_live_identity_exclusion_set": true,
+    "raw_identity_values_persisted_in_marker": false
+  },
+  "transaction_layout": {
+    "transactions_directory": "transactions",
+    "final_directory": "smoke_final_projection",
+    "world_directory_format": "world_000000",
+    "world_marker": "WORLD_ACCEPTED.json",
+    "split_seal": "SPLIT_SEAL_COMPLETE.json",
+    "cleanup_receipt": "WORLD_CLEANUP_COMPLETE.json",
+    "workspace_boundary": "DEVELOPMENT_SMOKE_ONLY.json",
+    "world_members": {
+      "allocation_delta": "allocation_delta.json",
+      "exact_title_clone_qualification": "exact_title_clone_qualification.json",
+      "identity33": "identity33.json",
+      "item_document_hashes": "item_document_hashes.json",
+      "private_world": "private_world.json",
+      "profile_provenance": "profile_provenance.json",
+      "redacted_items": "redacted_items.json",
+      "rejection_counts": "rejection_counts.json",
+      "selection_context": "selection_context.json",
+      "seller_document_hashes": "seller_document_hashes.json",
+      "seller_profiles": "seller_profiles.json"
+    }
+  },
+  "smoke_final_member_plan": {
+    "worlds.jsonl": {
+      "source": "private_world.public.world",
+      "order": ["world_uid"],
+      "allowed_fields": ["world_uid"],
+      "private_world_forbidden": true
+    },
+    "redacted_items.jsonl": {
+      "source": "redacted_items",
+      "order": ["world_uid", "seller_uid", "item_uid"]
+    },
+    "seller_profiles.jsonl": {
+      "source": "seller_profiles",
+      "order": ["seller_uid"]
+    },
+    "identity33.jsonl": {
+      "source": "identity33",
+      "order": ["world_uid", "canonical_pair_uid"]
+    },
+    "document_collision_attempts.jsonl": {
+      "source": "accepted_marker_private_audit_projection",
+      "order": ["world_ordinal"]
+    },
+    "document_collision_registry.json": {
+      "source": "accepted_marker_registry_deltas",
+      "canonical_json_object": true
+    },
+    "split_manifest.json": {
+      "source": "all_other_smoke_final_member_commitments",
+      "canonical_json_object": true
+    }
+  },
+  "jsonl_serialization": {
+    "row_serialization": "canonical_json_bytes(single_row)",
+    "row_separator_hex": "0a",
+    "final_newline_required": true,
+    "empty_file_bytes": "",
+    "sorting": "listed fields by UTF-8 bytes; numeric values remain exact JSON numbers",
+    "bom_forbidden": true
+  },
+  "state_machine": [
+    "UNCOMMITTED_SAFE_DIRECTORY",
+    "COMMITTED_PRE_SEAL_FULL_MEMBERS",
+    "PARTIAL_FINAL_PRE_SEAL",
+    "SEALED_CLEANUP_IN_PROGRESS",
+    "SEALED_CLEANUP_COMPLETE"
+  ],
+  "publish_protocol": {
+    "temporary_create": "same-directory O_CREAT|O_EXCL",
+    "file_sync_before_publish": true,
+    "publish": "atomic destination-exists-fails no-replace rename",
+    "replace_calls_forbidden": true,
+    "parent_directory_sync_after_publish": true,
+    "cooperating_writers_must_honor_split_lock": true,
+    "hostile_concurrent_parent_swap_protected": false,
+    "formal_handle_relative_upgrade_required": true,
+    "windows_boundary": "development smoke proves file fsync and atomic visibility only; no formal directory-durability claim",
+    "linux_boundary": "formal use remains forbidden; a future formal policy must require supported renameat2 RENAME_NOREPLACE and directory fsync"
+  },
+  "recovery_trust": {
+    "pre_seal_verifier": "all marker members present; reconstruct accepted candidate; replay production documents; match frozen candidate golden",
+    "post_seal_verifier": "fixed render(0) replay from exact-pinned candidate sources derives expected marker, final bytes, seal, cleanup plan, and receipt without trusting disk outputs",
+    "valid_marker_never_researches_candidates": true,
+    "fixed_post_seal_render_is_not_candidate_search": true,
+    "formal_500_world_authenticity_proven": false
+  },
+  "synthetic_architecture_tests": {
+    "minimum_marker_chain_length": 3,
+    "formal_split_order": ["train", "development", "audit_a", "audit_b"],
+    "predecessor_fixture_domain": "step28-v13-v1.13-synthetic-predecessor-fixture-v1",
+    "real_production_chain_world_count": 1,
+    "synthetic_markers_are_scientific_results": false
+  },
+  "canonical_self_hash": "2ea3c38e2f0b1a10feaad50ef751406c7a67f18dfb23d88efdbb80e4d667128e"
+}
