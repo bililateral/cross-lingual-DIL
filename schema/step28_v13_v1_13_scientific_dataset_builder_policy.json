@@ -1,0 +1,208 @@
+{
+  "version": "2026-08-11-step28-v13-v1-13-scientific-dataset-builder-v2",
+  "status": "DESIGN_PREFLIGHT_ONLY",
+  "claim_boundary": "This policy authorizes implementation tests and design preflights only. It creates no formal seed, training-qualified row, model, or scientific metric.",
+  "scientific_contract": {
+    "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
+    "size_bytes": 19037,
+    "sha256": "936ba6d52fa983307c3be654d9996814e740aea154c290c86411064d35e480f6"
+  },
+  "base_dataset_policy": {
+    "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+    "size_bytes": 193942,
+    "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729"
+  },
+  "historical_collision_policy": {
+    "path": "schema/step28_v13_v1_13_document_collision_policy.json",
+    "size_bytes": 12084,
+    "sha256": "2331ccbcf4c08171204f86fbe44a430780d11967b944e72996b707de2c9cca99"
+  },
+  "implementation": {
+    "scientific_common": {
+      "path": "scripts/step28_v13_v1_13_scientific_common.py",
+      "size_bytes": 17390,
+      "sha256": "99aaaef84766eb4dd57a7adcbf7f70a0b7ba04bcf153697883980145c8163385"
+    },
+    "scientific_world": {
+      "path": "scripts/step28_v13_v1_13_scientific_world.py",
+      "size_bytes": 47252,
+      "sha256": "9a3a3101a01f1cd671e381b9bc86b7d3b664eaec533e9f9e80914ac1cd40550a"
+    },
+    "dataset_builder": {
+      "path": "scripts/step28_v13_v1_13_scientific_dataset_builder.py",
+      "size_bytes": 41124,
+      "sha256": "e15e4e1125f782e069d1d4c123003d8562a4dc2a4024faa7c2b30c6ba5a05028"
+    }
+  },
+  "split_order": [
+    "train",
+    "development",
+    "audit_a",
+    "audit_b"
+  ],
+  "world_contract": {
+    "sellers_per_world": 28,
+    "controllers_per_world": 12,
+    "dyad_controllers": 8,
+    "triad_controllers": 4,
+    "all_unordered_pairs_per_world": 378,
+    "positive_pairs_per_world": 20,
+    "negative_pairs_per_world": 358,
+    "identity_feature_count": 33
+  },
+  "exact_title_clone_endpoint_qualification": {
+    "version": "2026-08-11-step28-v13-v1-13-exact-clone-endpoints-v1",
+    "selection_stage": "after_base_world_before_identity_remap_and_candidate_rendering",
+    "selection_authority": "existing_split_structure_key",
+    "source_requirements": [
+      "title_nonempty"
+    ],
+    "target_requirements": [
+      "title_nonempty",
+      "description_nonempty"
+    ],
+    "seller_pair_and_direction_frozen": true,
+    "item_endpoint_reselection_only": true,
+    "unregistered_clone_residue_forbidden": true,
+    "labels_or_model_scores_read": false,
+    "shortcut_probe_results_read": false,
+    "expected_exact_title_clone_count_per_world": 2
+  },
+  "model_mount_contract": {
+    "model_seller_profile_path": "observed/model_seller_profiles.jsonl",
+    "seller_profile_join_only_fields": [
+      "seller_uid"
+    ],
+    "seller_profile_text_feature_source_fields": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "seller_profile_numeric_feature_source_fields": [
+      "item_count",
+      "title_length_stats",
+      "description_length_stats",
+      "style_stats"
+    ],
+    "seller_profile_length_stat_fields": [
+      "median"
+    ],
+    "seller_profile_style_stat_fields": [
+      "digit_ratio_mean",
+      "punct_ratio_mean",
+      "repeated_title_share",
+      "repeated_description_share",
+      "max_category_share"
+    ],
+    "redacted_item_path": "observed/redacted_items.jsonl",
+    "redacted_item_join_only_fields": [
+      "item_uid",
+      "seller_uid",
+      "world_uid"
+    ],
+    "redacted_item_text_feature_source_fields": [
+      "title",
+      "description"
+    ],
+    "automatic_feature_discovery_forbidden": true,
+    "full_seller_profile_mount_forbidden": true
+  },
+  "execution_modes": {
+    "small_smoke": {
+      "scientific_use_forbidden": true,
+      "world_counts": {
+        "train": 1,
+        "development": 1,
+        "audit_a": 1,
+        "audit_b": 1
+      },
+      "output_root": "reports/step28_v13_v1_13_scientific_builder/small_smoke_v2_20260811"
+    },
+    "design_preflight": {
+      "scientific_use_forbidden": true,
+      "world_counts": {
+        "train": 50,
+        "development": 50,
+        "audit_a": 2,
+        "audit_b": 2
+      },
+      "output_root": "reports/step28_v13_v1_13_scientific_builder/design_preflight_v2_20260811"
+    },
+    "formal": {
+      "scientific_use_forbidden_until_root_quality_pass": true,
+      "world_counts": {
+        "train": 500,
+        "development": 500,
+        "audit_a": 500,
+        "audit_b": 500
+      },
+      "output_root": "reports/step28_v13_v1_13_scientific_dataset/formal_v2_20260811"
+    }
+  },
+  "candidate_selection": {
+    "candidate_limit": 32,
+    "identity_value_maximum_counter": 128,
+    "advance_reason_allowlist": [
+      "same_world_item_document",
+      "same_world_seller_document",
+      "historical_item_document",
+      "historical_seller_document",
+      "current_dataset_item_document",
+      "current_dataset_seller_document"
+    ],
+    "labels_or_model_scores_read": false,
+    "shortcut_probe_results_read": false
+  },
+  "public_preflight_keys": {
+    "small_smoke": {
+      "id_namespace_key_hex": "0165fe7ba9d44d0c1aa895a65ed5ce02c8c3e85e52ae0b60f2eeaeaaa6ba5774",
+      "structure_key_hex": "524fc8ab2d2ad1e350412e94d2d63df4ad98b9aa63bf9343e260f5cfd1551af9",
+      "id_key_hex": "bf747e10aa5842b1d49a854e09e0fd3fd57fddff5c38fe0915ab6afc3a768251",
+      "identity_value_key_hex": "feb0421051541d003f9dd9945ec5a6734bcf309ea1ba89c1fa29a6228d5f176c",
+      "text_key_hex": "d956c1a032e0e96afd4b931ce4dd0e438fd929040b33e965a6e760462292aa8b",
+      "candidate_key_hex": "f7cd9f35604ca4707b227f5c8966e1e80b2f096b05f3086e02d836619882898d",
+      "query_key_hex": "cb464cba67aadaf7caad25d670f9fe359ff6e118ef9df5e41e44d322e391cbba",
+      "document_variation_key_hex": "1320bfa7e397b663616a456231e12f962130e2917496b1392b35cac70112f01e",
+      "anonymous_handle_key_hex": "a5250ce575b1d4202b3ea133bc4bc0c5ed192315e5584b1ed67e7d475c3daeaa",
+      "rewire_key_hexes": [
+        "717dbd277bd11a370c89adb3622c8038f2dfab38ad9c152b23d37d179bc7d52d",
+        "ff487621729d2eba779252c1c4c5dce99e93d23b86e116d3abd6b92359cd8875",
+        "dd012846485c21c9f70242bb2b95b3f401f54a9e9e5ede876a4c67349238705b",
+        "51d16a44a6008ad045453e16e0ca5a1712f7d91efc55e29f6142ab0b1e9179cb",
+        "ff3d46965c70a6d252015583399ee9e5e72e82e18c4b9e3a54b3de589c92d1b9"
+      ]
+    },
+    "design_preflight": {
+      "id_namespace_key_hex": "2000a3785337edb97c5d220bdec059fb388f45d87c7f0e5e1c39096c8c45df76",
+      "structure_key_hex": "fdec79069589dd8d9c4fa47082614cbb2edd220b7649d7711b505681bdf02dc1",
+      "id_key_hex": "5658f15380dab0ccf69586f8b482ee03607d607a8e687292ba8354be12e745ba",
+      "identity_value_key_hex": "6066945fe233bff11a68b87201610945d548752a1ed83d082cb858c8164a429f",
+      "text_key_hex": "4c456f322a9d7d5675ca1b68a08038cbd1e781c9516a451bbeecda7abcf8586e",
+      "candidate_key_hex": "07252342ee2d4784a6baddb21b8880a2e22f31d2e407c92da457412148a86160",
+      "query_key_hex": "2c7d10aa00478473833ae7d5702ecd98ae34e7b8da68e178d4bcb8251eea89c6",
+      "document_variation_key_hex": "bd728f88090dd0ae10a2015cc94dfb948411cf7a11a81cbc63ce181ecedbd295",
+      "anonymous_handle_key_hex": "f96b536cacc9f4dbdd02cb15173cf0a7de852afd1ca85ed0263fe151da19da09",
+      "rewire_key_hexes": [
+        "9fa78ce0f049a4d86446ec8ccf41d4acfcbe67b8514fd2ddc4096fe45fdb0c6d",
+        "88415a4cea65bacdf44664a9e70136380d6d942dbc6994089126edd228a7799c",
+        "5acd599370e22fd0d12eb3def9fb1fad5f233c44f545ac7132074563950e91b9",
+        "9678b2d1b800455827765db04da0350954277ab30a6d103308a4c9c4b1cdd704",
+        "82137ff42853e28aeebeb4e844641a34e612bb4432a0afbfc5f5e6ee43260291"
+      ]
+    }
+  },
+  "formal_authorization": {
+    "enabled": false,
+    "formal_seed_receipt_path": null,
+    "formal_seed_receipt_sha256": null,
+    "formal_structure_key_commitments": {
+      "train": null,
+      "development": null,
+      "audit_a": null,
+      "audit_b": null
+    }
+  },
+  "canonical_self_hash": "8f40cc0b008e6447e5ace55b59159545346c6527a91d2129677e59ce087a7a47"
+}

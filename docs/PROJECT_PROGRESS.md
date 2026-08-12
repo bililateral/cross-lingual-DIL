@@ -1528,3 +1528,129 @@ The official entry is `python -I -S -B scripts/step28_v13_v1_13_source_guard.py 
 The final authoritative focused run passed 60 tests in 370.870 seconds with one declared Windows symlink-permission skip; the latest 114 Stage 1–4A regression passed in 244.212 seconds. A real isolated smoke reached `SEALED_CLEANUP_COMPLETE` and left zero project `.pyc` files and zero smoke temporary directories. Nine browser review rounds finally closed discovery-wrapper bytecode takeover, discovery-time cache conflicts, platform-specific skip parsing, and direct heavy-contract execution. The final verdict was `Blocker 0 / High 0 / Medium 0 / Low 0` and `IMPLEMENTATION CODE GO, EXTERNAL ANCHOR PENDING`. Ordinary repository discovery intentionally excludes the 60 authoritative contracts; it ran 602 tests in 1681.523 seconds, with 594 passing, 7 existing skips, 1 failure, and no errors. The sole failure remained the frozen Step28-v12.1 manifest requiring the 219,186-byte progress document seen at run start to equal its 199,490-byte historical snapshot; there was no new v1.13 failure.
 
 The implementation bundle is fixed by parent commit `dbafb62f91a51b057b5a4846b8028de4076c7c1c` and tree `c7ea90eafe62b0682722e87bf780bf2adab95358`. Its successor commit carries `docs/STEP28_V13_V1_13_SPLIT_TRANSACTION_IMPLEMENTATION_REVIEW_20260810.zh.md`, which independently pins that parent identity and the four exact artifacts without being read by the policy, guard, implementation, or tests. This closes implementation provenance only. Formal seeds, capabilities, candidates, rows, quality receipts, models, and metrics remain zero. This stage does not authorize a formal 500-world run, seed ceremony, dataset generation, or training.
+
+## Step28-v13 v1.13 Scientific Multi-World Builder (2026-08-11)
+
+The scientific four-split builder is implementation-review final. Its policy is 7,493 bytes (raw SHA-256 `061b6308b2b85446b08526e32580e7919f0a232624bcb10f9e9460f4f37f806e`; canonical self-hash `35d925d98a12203bb580015992dfdd047e87299887b6a3d1127b64a273bafd36`) and pins all three runtime sources. Candidate selection remains label-free; six UID universes and document/identity registries are atomic; world ordinals are exact; the model-facing seller projection uses a positive allowlist; and the completed tree is reread and hash/row-count verified before publication.
+
+All 16 focused contracts passed in 77.388 seconds. They include two deterministic real four-split builds, all six UID collision paths, output-byte tampering, ordinal closure, and independent full-profile versus strict-projection `legacy18` equivalence over 378 pairs × 18 eligible features. The canonical 4×1 smoke root manifest is 2,638 bytes (raw SHA-256 `08832aea24e7937050a8e28ab5a90f0668cdcf2ce3109914de9e3de705a0d6bf`; canonical self-hash `698be3c55233c72a6708f2dfae2621d0626cc0185f12f9ef1994ed67b5ba1277`) and records 4 worlds, 112 sellers, 423 items, 1,512 pairs, 80 positives, 48 controllers, 112 queries, and 341 identity values. This is reproducible smoke evidence, not a quality-qualified dataset.
+
+The final GPT-5.6 Sol xhigh review reported 0 Blocker, 0 High, 0 Medium, and 0 Low findings and authorized only the 104-world design preflight (50 train, 50 development, 2 audit A, 2 audit B). Formal mode remains disabled. No formal seed, formal row, M0/M1/M2/M3 model, or metric exists. The next step is the 104-world build followed by statistical, text-shortcut, and row-level quality audits; formal 500×4 generation and training remain unauthorized.
+
+## Step28-v13 v1.13 First 104-World Preflight Failure (2026-08-11)
+
+Run `design_preflight_v1_20260811` permanently failed closed at train world ordinal 3, candidate 0, after three worlds had been staged. No final output directory was published and the temporary build tree was automatically deleted. Deterministic replay showed that exact-title-clone asset 0 had nonempty source/target titles but a structurally empty target description; asset 1 was qualified. The shared override picker required only nonempty titles and therefore did not guarantee the scientific builder's stricter target-description requirement. The fixed 4×1 smoke had not covered this state. The v1 output root and old implementation bytes are non-reusable. The successor must qualify source-title and target-title/description endpoints before candidate rendering without reading labels, scores, or shortcut results, and must add both the train-ordinal-3 regression and a full 104-world qualification preflight before a clean versioned rerun.
+
+## Step28-v13 v1.13 Endpoint Qualification v2 (2026-08-11)
+
+The failed v1 implementation has been replaced by v2. The policy is 8,189 bytes (raw SHA-256 `5c4ba22cbbd001efab521384a9a988410f30703bf2657a1d425bd8eba4d2629a`; canonical self-hash `8f40cc0b008e6447e5ace55b59159545346c6527a91d2129677e59ce087a7a47`). Current source pins are: common 17,390 bytes / `99aaaef84766eb4dd57a7adcbf7f70a0b7ba04bcf153697883980145c8163385`; world 47,252 bytes / `9a3a3101a01f1cd671e381b9bc86b7d3b664eaec533e9f9e80914ac1cd40550a`; builder 41,124 bytes / `e15e4e1125f782e069d1d4c123003d8562a4dc2a4024faa7c2b30c6ba5a05028`. The 29,561-byte test file has SHA-256 `368c08dc439b21ea21f0b1aa3de61c5b07c42304a7f8db3481134a91b240bd9c`.
+
+Before identity remapping or candidate rendering, v2 deterministically reselects only item endpoints inside the already-fixed source/target sellers. Source title and target title/description must be structurally nonempty. Seller pairs, direction, canonical pair IDs, controller membership, negative flags, and final label projection are unchanged. The old clones are replayed and undone before the two updated registered clones are applied; the four semantic-override items remain reserved. Qualification receipts and updated overrides are part of the structural commitment and private audit.
+
+All 19 focused contracts passed in 87.272 seconds. New tests reproduce the original train-ordinal-3 `[false, true]` target-description state, traverse all 104 design worlds and 208 clone rows, and reject a target seller with no described item. The final GPT-5.6 Sol xhigh review independently verified current bytes/pins and reported 0 Blocker, 0 High, 0 Medium, and 0 Low. It authorized only a clean `design_preflight_v2_20260811` run (50 train, 50 development, 2 audit A, 2 audit B). Formal seeds, rows, models, and metrics remain zero; formal 500×4 generation and training remain unauthorized.
+
+## Step28-v13 v1.13 104-World v2 Design Build (2026-08-11)
+
+`design_preflight_v2_20260811` completed in 298 seconds on Windows CPU. Its 2,663-byte root manifest has raw SHA-256 `c7b323d9d3b76a0795ce45452b4989926cae51fca7101bc6d04acf6fdf4a93f3` and canonical self-hash `9baa90828cf459bcee3cc6101c166f6c1084353dd2997e40e5d3d85d29f49d48`. The 49-file tree is about 89.59 MiB and was independently reread through `_verify_output_tree()` after publication.
+
+The build contains 104 worlds, 2,912 sellers, 10,561 items, 39,312 pairs, 2,080 positives, and 37,232 negatives. Every world has 378 pairs and 20 positives. All six UID universes and the item/seller/identity registries close without reuse. Public item/profile schemas, nested schemas, types, and forbidden top-level fields have zero observed violations. Of 104 worlds, 103 accepted candidate 0; development ordinal 45 advanced to candidate 1 solely because of one historical item-document collision. All 208 endpoint-qualification rows close; 130 sources and 116 targets were relocated without changing seller pairs, directions, controller membership, or negative flags.
+
+The root status is `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`, with `scientific_use_forbidden=true`, `training_started=false`, and zero formal seeds/rows. The tree is retained only as input to the preregistered row-level, split-isolation, metadata-shortcut, and controller-blind text-counterfactual audits. It is not formal data and cannot be used for M0/M1/M2/M3.
+
+## Step28-v13 v1.13 质量审计第一版运行前否决（2026-08-11）
+
+质量审计第一版没有启动 104 世界审计，也没有创建质量输出。网页端 GPT-5.6 Sol Pro 的完整调用链审查报告 5 个阻断级、5 个高级、3 个中级和 1 个低级问题，最终结论为“不允许运行”。阻断项覆盖非法的 64 位 scikit-learn 模型随机种子、审核集甲乙在盲预测前物化控制者／标签／检索相关性、重抽样世界顺序错误、私有身份字面及反事实输入扫描不全，以及商品数和字段缺失率的数据来源错误。
+
+被否决边界为：质量策略原始 SHA-256 `9f5a6b973acf84d6a0efd57272a449a0bca258af0a7eaa5c685ec4f720cae2a2`、规范自哈希 `d14712a774eb609a686a689a5aa32063805bfd566c1a4dd20bcae3d3c97cc57f`；质量脚本 62,770 字节／`166ac614ab35fed1a45fa2acc749433fc1cb1b8ad4b85ba86f1b7555c8148dc8`；测试 9,031 字节／`b5726175b17591d5191d0a75bc68af7bcb2fe9f56368b4242c6d1171f1e5df3c`。这些旧字节永久不可运行，旧实现已由第二版替换，且没有失败实验载荷或临时目录。
+
+这不是设计数据质量失败结论。104 世界 v2 数据仍仅作为待审输入保留，继续禁止训练。第二版质量实现必须完成行为测试和同一网页模型复审；未得到明确放行前，不得运行质量审计、正式 500×4 生成或 M0/M1/M2/M3。
+
+## Step28-v13 v1.13 质量审计 v2 方法学关闭与 v3 三路径实现（2026-08-11）
+
+质量审计 v2 没有运行 104 世界审计。新增行为测试发现，首个固定训练世界的原始 Step3 画像贡献血缘为 576 行，风格反事实后为 574 行；91 个按卖家、输出字段和排名对齐的槽位发生变化，全部位于 `signature_description_concat`，覆盖 25/28 个卖家。三十三维身份历史、商品非文本结构和语义抽象语法树、身份值、噪声、机制及标签仍保持不变。原实现错误地要求原始与反事实 Step3 血缘逐字节相等；该要求会把重新分段、跨卖家文档频率和 top/signature 选择这些合法下游中介误判为污染，因此 v2 方法学永久关闭，不得运行。
+
+网页端 GPT-5.6 Sol Pro 明确裁定采用同一固定无固定点置换、同一反事实商品和三条审计路径。固定商品支持文本路径 F 锁定 `(world_uid,seller_uid,item_uid,field)` 槽位，逐商品向量化后作顺序不变的卖家聚合；真实 Step3 生产路径 P 要求原始生产输入精确重放、反事实生产输入与第二次独立重放逐字节相同，并保存不可用于筛选的原—反事实血缘差异回执；联合路径 U 拼接 P 的 75 维全视图、F 的 33 维全视图和 16 项模型可见数值差异，共 124 维。生产 3 视图、固定支持 3 视图和联合 1 视图分别使用固定 L2 逻辑回归与深度 2 浅树，共形成 14 个探针；单特征、14 模型点估计及 9,999 次世界重抽样都在完整探针家族内取最大值。
+
+当前针对性合同测试为 22 项全部通过，覆盖固定支持删槽、重复槽、跨卖家移动、空值模式变化、输入行重排、商品编号一一改名、反事实血缘确定性重放、错误来源商品归属以及第 14 个高分模型不得漏出重抽样家族。包含候选父对象、文档碰撞、候选选择、自然变化、科学构建器和质量审计的完整 v1.13 合同组共 155 项，也在 296.996 秒内全部通过。质量策略为 17,003 字节、SHA-256 `bdb6178d1b87b766ab14706c5e97e24087dcda16729ee92d9c86130a97991d62`、规范自哈希 `76d942244d2d8c71a7019879eea13867073c01a8a90213d382c822e52c234f99`；反事实源码、质量审计源码和质量测试的 SHA-256 依次为 `1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`、`717fbed3d29dbca831420b852863586bcea4d1e658c8d372fae57ff7bcdf6c2d` 和 `2f4b24bf16fa738eaa582c1f9b11e29dc7c41af864947f470ae2c047ea7a4e70`。网页实现终审仍未完成；本节不构成质量通过或运行授权。只有网页端明确给出“允许清洁运行104-world质量审计”后，才可启动设计级质量审计。正式种子、正式数据行、正式 M0/M1/M2/M3 模型和指标仍全部为零。
+
+## Step28-v13 v1.13 质量审计 v3 运行前终审否决（2026-08-11）
+
+v3 没有运行 104 世界审计，也没有产生质量结果、模型或指标。网页端 GPT-5.6 Sol Pro 独立复算本轮附件字节并追踪调用链后，给出阻断级 4、高级 3、中级 2、低级 0，最终为“不允许运行”。永久关闭的 v3 边界为：策略 SHA-256 `bdb6178d1b87b766ab14706c5e97e24087dcda16729ee92d9c86130a97991d62`、规范自哈希 `76d942244d2d8c71a7019879eea13867073c01a8a90213d382c822e52c234f99`，反事实／质量／测试 SHA-256 依次为 `1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`、`717fbed3d29dbca831420b852863586bcea4d1e658c8d372fae57ff7bcdf6c2d`、`2f4b24bf16fa738eaa582c1f9b11e29dc7c41af864947f470ae2c047ea7a4e70`。
+
+阻断根因是 F 空槽率特征左右不对称、7 视图／14 模型没有机器合同修订件、审核甲乙真实私有字面精确扫描不闭合，以及 P 血缘行字段验证不完整。另须补审核私有文件的纯字节完整性、真实的失败分类和数据处置、对应行为测试、外部启动锚及三路径逐世界对齐回执。已新增 `STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md` 作为 v4 待实现权威；它不授权运行。当前固定置换不得重抽，104 世界设计数据仍仅作待审输入，正式种子、正式数据、模型和指标仍全部为零。
+
+## Step28-v13 v1.13 质量审计 v4 运行前终审否决（2026-08-11）
+
+v4 没有运行 104 世界审计，也没有产生质量输出、模型或指标。34 项质量合同和六组共 167 项 v1.13 合同全部通过，但网页端 GPT-5.6 Sol Pro 最终仍给出阻断级 0、高级 1、中级 2、低级 0，最后一行是“不允许运行”。高级问题是同仓库启动锚缺少独立发布清单／外部来源记录；中级问题是封存扫描器仍按固定身份类别维护，以及剂量证据缺少更强的完整表留存与变异测试。
+
+永久关闭的 v4 字节为：修订件 8,694／`c930d9f8c9d29ba796556d590603cc48a7ca05c898c174933d9fdf07234f6e46`；策略 18,390／`884006ba248e602b06832292eb8039ce59d4feab0cf846794f9f243991649c2e`，自哈希 `c7e9a05504602e64bfdeb4bacd94a3d2b9cfc8e90a0e4066529433b812a56ebd`；启动锚 2,159／`1d300e7c893ce1231816bb9ecfad77d06f7529fa9b92256a3e9ccf9754ac5e08`，自哈希 `595cefbb44b41294be5e3df1a725ce3f8285a5b92ef22b202abdd5e26ed970d4`；守卫 3,389／`b2e162f06c5064ed1ad7e9195b59ebd7f4b128a5e09ac0c5e087b8fff9aea47a`；质量源码 176,379／`ab60c45d0faed9307d4a4d1859739d89fee585d3321c1fa351856d539269092a`；扫描器 8,805／`e68f8e25dda43e127dda956805066f4a5fae4bb3e27689f4f0c3b2186ebfbe19`；反事实源码 19,230／`1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`；测试 59,233／`d238f0cbf3aa14fa54fbaa1fb94d4e28b97e4ae5c00e8ae9537e4fa98f7f8d8e`。这些字节不得运行，固定置换不得重抽。
+
+## Step28-v13 v1.13 质量审计 v5 本地候选（2026-08-11）
+
+v5 仅修复质量审计器，没有运行数据审计。新增候选发布清单；扫描器枚举全部非空私有字符串叶和编号型映射键，并覆盖网址／账号／数字派生字面及未来身份类型；完整剂量行分别绑定三路径；卖家文档频率与卖家摘要由原始／反事实模型可见商品独立重建；F/P/U 分别返回并核对卖家对、世界和掩码；数据失效决定回执不再提前声称已经删除载荷。新增相应变异测试。
+
+当前候选边界为：修订件 9,557／`4761ac6ae282a2a8f0e1c6379122be80a2fc10f6a26d1cb51d6e2bd68516451f`；策略 18,542／`cb1900e9812305a876c3fd302e15bb660af3e99a4242e8146b202ee5f3bebffc`，自哈希 `3c91bfe7e870d58d6495d465ab632f64dc2c9cf4f6f3b6f757a12c43cf171e56`；启动锚 2,380／`8a69323c19e0cc3950597f0ed011f9d9e08acbb91912e683b6bdfdd72bdb42c4`，自哈希 `46f43c8fd659d7214a1200d2d4c28e4e93b7b919d53da58c0b818243c50187a3`；发布清单 2,254／`c51892a1933f5f0d71bbfb81fb629a975ca0c7aa62abf0b1ec501d27f0f338c1`，自哈希 `bc0d23e3676f65e0d77ef48e30536036549df15725a3d487563aa8e53454519e`；守卫 6,639／`7dcf193f8a98166f9079356e76240952cfe1576f7b89d8d37fdaea5a4387abbd`；扫描器 11,242／`ab0b5c8b37f708f5c9ed9511c2d332a4fb1f6ce310e2b510577f272908ef309d`；反事实源码 19,230／`1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`；质量源码 187,569／`aa4fbc28065e424c55da5609abc64ab2a5b594eb69cf5c19c2bd51f934760bbc`；测试 76,382／`f46f995cdf0afb70c1f0ea64fb0aff421658d43a36fdab648607a47e1a9d0173`。四份自哈希和全部钉住关系独立复算一致。质量合同 38 项在 34.623 秒内通过，六组 v1.13 合同 171 项在 416.309 秒内通过。没有质量输出、失败目录或构建中目录，缓存已删除。
+
+当前状态仍是 `EXTERNAL_REVIEW_CANDIDATE_NOT_FORMAL_AUTHORIZATION`。必须先由同一网页端 GPT-5.6 Sol Pro 对本轮准确字节终审；只有最后一行明确为“允许清洁运行104-world质量审计”才可启动一次设计级审计。正式 500×4 数据、正式种子、审核真值解封、M0/M1/M2/M3 模型和正式指标仍全部为零。
+
+## Step28-v13 v1.13 质量审计 v5 外部终审否决（2026-08-11）
+
+网页端 GPT-5.6 Sol Pro 用时 47 分 29 秒完成十个 v5 附件的终审，核对字节、自哈希和钉住链一致，但最终为阻断级 2、高级 3、中级 4、低级 1，并明确“不允许运行”。v5 从未运行 104 世界审计、从未创建质量输出，上一节候选字节永久关闭。
+
+阻断项是：反事实实现错误仍可被误分成数据失效并删除有效设计数据；封存及训练／开发私有字面扫描对少于四字符、数字异形、未来映射键和混合大小写存在确定性假阴性。高级项是候选发布清单没有独立外部 GO 回执，审核身份／控制者／查询编号跨拆分隔离未由封存检查器独立闭合，以及审核侧模型可见 `item_count` 等数值未与脱敏商品独立重算。中级项覆盖启动失败回执、调用帧文件名伪造、发布清单变异测试假绿和删除后回执事务窗口；低级项是失败输出与异常消息过宽。
+
+审查确认 F/P/U、独立 seller_df、16 项数值、三路径实际数组和完整剂量、7 视图 14 模型、9,999 次重抽样及审核盲边界主体仍正确。v6 只准修复上述剩余质量门问题，固定置换、候选、世界、阈值和探针定义不得改变；修复后必须使用新字节和新输出根重新终审。正式种子、正式 500×4 数据、审核真值解封、模型和正式指标继续全部为零。
+
+## Step28-v13 v1.13 质量审计 v6 运行前候选（2026-08-11）
+
+v6 已关闭 v5 的两个阻断级、三个高级、四个中级和一个低级问题：双向字面规范化与短标识边界、未来映射键、反事实错误分类、四拆分身份／控制者／查询编号封存隔离、审核侧可见数值独立重算、外部后置放行证明、真实入口核对、安全启动失败回执、发布清单语义变异测试、清理意图与恢复、以及异常／结果最小输出。最大类别占比因脱敏商品不含逐商品类别，明确不声称独立重算。
+
+准确候选为：修订件 12,180／`1ca1e8b8cea551902cf39f42f5ea33be056c47d80c3693f5bf531c843aa94832`；策略 19,848／`88eddd48eababf595ce095390e195e8991fe60430412bc3737d535ea61c5d2f3`，自哈希 `d0edff3b54b407c87d0400c40c25455c5c5e30cd662cd1660add08252faf8c7c`；启动锚 2,404／`8f23706eb407818e95984a46a20a7096e2754cbecb3b2e40b024771ed76d6d79`，自哈希 `afc4061c61c0b9032345cd2972fe2ab899e70dde62a2f0fdf2bd78d42d6cbbd1`；发布清单 2,257／`cb7c75792a19cbf3950cc3014e17dbcc8c2d43989e927d9de9032add4f62f606`，自哈希 `88caac222a519954afa8d2ab15232d2111c6deda66dfb6eec31266e8a3e31f30`；守卫／扫描器／反事实／质量源码／测试哈希依次为 `8f3221800261cdd646fb8a9ac5c41ce98edd4750effac2406388ab5c57bc331d`、`e25105d10c4f7a3dd4c51e5be35c71e22935804005d4b1cb05e63cb17144a68f`、`1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`、`62c3d89264b826e9159e63aba74e300c451eeeb3a33934b5cf03e2778902361a`、`6899f19768496f6e79f1add7fdc80047849c8de813bca6bf16514768d9518cd9`。47 项质量合同和六组共 180 项合同全部通过；没有质量输出、失败目录、构建中目录或缓存。
+
+当前外部审查证明不存在，守卫只能拒绝运行。下一步仅能提交这些准确字节给同一网页端 GPT-5.6 Sol Pro 终审；外部最后一行没有精确放行前，104 世界质量审计、正式 500×4 生成、审核真值解封及 M0/M1/M2/M3 训练继续禁止。
+
+## Step28-v13 v1.13 质量审计 v6 外部终审否决（2026-08-12）
+
+网页端 GPT-5.6 Sol Pro 用时 33 分 18 秒终审 v6 十个精确附件，结论为阻断级 2、高级 1、中级 2、低级 1，最后一行明确“不允许运行”。v6 没有运行 104 世界审计，没有外部放行证明、质量输出、模型或指标，当前字节永久关闭。
+
+两项阻断分别是：盲边界最终闭包漏掉已经实际增加到 1 的 `sealed_registry_isolation_calls`，使正确运行必然失败；审核封存扫描输入只覆盖三份私有文件，遗漏 `noise_slot_uid` 和另外两份私有回执中的内部字符串。高级项是守卫没有核对被钉住审查原文的实际最后一行。中级项是 Git 提交／树只验格式，以及清理恢复逻辑没有官方可达入口。低级项是运行异常仍可能输出原始 traceback。外部同时确认扫描规范化、四拆分身份／控制者／查询注册表隔离、F/P/U、7 视图 14 模型和 9,999 次世界重抽样主体正确。
+
+本地还发现重复描述比例的审核重算漏了生产 Step3 固定的“清洗后截取 280 字”规则，可能误拒绝有效数据；已建立专门反例，纳入 v7 修复。v7 只能修复这些运行与质量证据问题，不得修改固定置换、候选、世界、标签、阈值或探针定义。104 世界质量审计、正式 500×4 生成、审核真值解封和 M0/M1/M2/M3 训练继续禁止。
+
+## Step28-v13 v1.13 v7 密封禁止字面登记器运行前审查（2026-08-12）
+
+为修复 v6 遗漏审核噪声编号及两类私有回执字符串的问题，新增只面向设计数据的密封禁止字面登记器。首轮网页审查曾对旧字节给出一次仅限登记器的许可，但随后按审查建议修改了源码，因此该许可随字节变化自动作废，旧字节从未运行。
+
+第二轮精确审查给出阻断级 1、高级 1、中级 1、低级 1，最终为“不允许生成密封字面登记器”。问题为运行时源码闭包遗漏三个实际依赖、原子改名成功后的目录同步异常窗口、恢复路径公开回执验证不完整，以及构建器策略原始字节未固定。被拒绝边界为：packer 45,789 字节／`9ba672b6e2bb8ed4fb7e51815d5bc7ae0716f6b7986b30620666097a60378f42`；扫描器 36,574 字节／`db479dae3cf071f376acf0d64cfdbabc7691417a1459f438fd7a91486020f426`；质量源码 216,106 字节／`0df97a9693a304ae8489f0f4fa6e4b03603707dad5ae8eeaf7e4af5c0af931a6`；测试 145,097 字节／`f0620eb0cc0182c05b364a87f5e63634b3265898cccd012841b59e416f5b91b8`。这些字节永久不运行。
+
+第三轮候选关闭了第二轮四项问题，但网页端用时 17 分 37 秒复审后仍给出阻断级 0、高级 1、中级 0、低级 0，最后一行“不允许生成密封字面登记器”。被拒绝边界为：packer 53,004／`45a250d21a52b38fcdbb5b388f49b603bfaf057fa18edda7b04e0f2c7c30904e`；扫描器 43,492／`723d53235f140064327a96108ac037e69eb3dbd8651082c8c8d446d41d9243d6`；质量源码 216,147／`37a0ef84b4ed7c88a2375f4a7a4b8f7bfa236db9143463d05a49abc73875a0a1`；测试 160,610／`10677e52876cb1912c5c7393db481d3bf344701d962eb1c2375e236f4c10b1f2`；25 文件闭包压缩包 236,930／`8eba7e549bf2e7c409c6eb45188dac51d0f59c89c4dd0e09560072f1ccf157f1`。这些字节永久不运行。
+
+唯一高级问题是 `KeyboardInterrupt`／`SystemExit` 可能发生在原子改名后、目标加入 `created_paths` 前，留下无事务意图的私有 sidecar，或留下孤立的 `PASS_SEALED_LITERAL_REGISTRY_BUILD_NOT_AUDIT_GO` 公开回执。当前未审候选已改为发布前预登记所有权，并在 `_write_once` 捕获 `BaseException`、只清理本次精确目标后重新抛出。新增两项测试覆盖三个发布阶段的三类目录同步中断和写入返回后的两类中断，共 15 种场景，用时 21.426 秒全部通过，且事务外哨兵文件保持不变。仍须扩大回归和新字节终审；当前不得执行登记器或质量审计，私有 sidecar、公开回执、事务意图、质量输出、正式数据、模型和指标仍全部不存在。
+
+修复后登记器专属 13 项回归用时 30.586 秒全部通过。扩大到整个质量单元合同类后为 45 项中 40 项通过、5 项错误：4 项来自旧质量策略对第六版扫描器的字节钉，1 项来自旧发布清单对第六版质量源码的字节钉。它们是登记器生成后必须封闭的 v7 策略／启动锚／发布清单待办，不是 packer 专属测试失败；禁止修改旧历史钉来刷绿。即使第四轮允许一次 packer，也仍须在实际 sidecar／公开回执产生后封闭 v7 合同、恢复完整测试并另取质量审计许可。
+
+第四轮网页终审用时 14 分 1 秒，仍为阻断级 0、高级 1、中级 0、低级 0，最后一行“不允许生成密封字面登记器”。被拒绝边界为：packer 53,528／`5a3985a453b452b73f40d9c453e34bf1d72b575b0a2f41a5366ab47a4406ffc6`；测试 165,595／`85788d244afb8d23618391bf3f805125c43516d96b97d55ae56212300852e2b2`；25 文件闭包压缩包 238,984／`613fa3143872a33ee290471cfbb02fc3e0943f8688840abf6d344d0feca9285d`。这些字节永久不运行。
+
+唯一高级问题是目标路径在真正取得所有权以前就进入清理清单；长时间重放期间第二次普通启动若创建同一精确事务文件，失败调用可能删除它，`Path.replace` 还可能覆盖检查后出现的目标。下一候选须在重放前原子排他取得单执行者锁，采用原子不覆盖发布，并且只清理由本调用原子创建的文件实体；相应三阶段竞态、并发事务、外部 `.building` 和锁恢复测试必须补齐。该修复不得改变世界、候选、标签、字面、门槛或探针，当前仍无任何登记器或质量输出。
+
+## Step28-v13 v1.13 第五轮登记器候选未运行（2026-08-12）
+
+第五轮候选精确边界为 packer 62,037／`5de4bd0a0b1303801c97b7045eb3995fc4aea834869cbd27e96a2b8af3ece45a`，测试 182,438／`6d1aba19f0a1540d3ab4649ce9411420e4ea909f566c0e5361af4b38aa17df84`，25 文件闭包压缩包 238,257／`143060c2bd89b1edd8cd93da2c0fe6440c0ec50d1f6d2d64ef3356c5b2cec164`。网页端流式审查混入了附件中不存在的旧版预登记代码，已主动停止，不能充当有效结论；本地反例又证明运行中恢复会删除尚无 intent 的活锁。上述字节永久不运行，大型无效页面快照不保留。
+
+当前最小修复仅延长锁 `.building` 标记的生命周期：构建全程保留，自动恢复看到它即失败关闭；正常完成或可捕获失败由本调用清理。没有增加进程号、操作系统锁或网络相关机制，也没有改变任何数据、标签、候选、置换、门槛或探针。登记器专属 16 项合同在 119.120 秒内全部通过；仍须冻结新字节并取得同一网页模型的有效终审许可。正式 sidecar、公开回执、质量结果、正式数据、模型和指标仍全部不存在。
+
+第六轮精确候选也没有运行。边界为 packer 62,926／`1884a5814d5a20c37c1025518beeb27f7bf4a702847eddd5eb091e1b2606c677`，测试 183,547／`3ac3e07ac1ab4db9dd9787f9e0ba62845e0c07cfa5b0664fe9f82f7bb6659154`，25 文件闭包压缩包 238,492／`fb6a6a79a0d47acbff600bd3a206f2b2ebc8b1a55b561d81b56ec8bb4c565a07`；有效网页审查原文 14,739／`56108c44b77b0e9db4e561d210e0716c5d7cfeebab6a4d97e220b28298ff9fd0`，结论为阻断级 0、高级 1、中级 0、低级 0，最后一行“不允许生成密封字面登记器”。唯一问题是恢复入口在 marker 首检与 final-lock 枚举之间可能接管一个随后才启动的新活事务。
+
+当前修复在恢复入口先固定“调用开始时 final lock 是否存在”。开始时没有旧锁就永远不处理随后出现的新锁；开始时已有锁则活构建必有先行 marker，仍会拒绝。新增两种同步交错测试证明新 lock／marker／intent 均不会被恢复删除；登记器专属 17 项合同在 115.746 秒内全绿。修复仍不改变数据、标签、候选、置换、阈值或探针，也未引入系统锁、进程号或网络机制。当前仍无正式登记器或质量输出，须再次网页复审。
+
+第七轮差异复审继续拒绝：packer 63,464／`7ef87d4f48f80a1a7acbe3a10d2af619d5bbc320e5460775ecff603b05c80018`，测试 187,784／`cb031886d9c28c283fa1e944fccac66ac59fae644df1e9440b51c72d6212202f`，25 文件闭包压缩包 238,613／`9fcde7ba1b6cb4d4a598f42e4121c8db7cc347b0998729aa6565a615ef2cb97b`；审查原文 9,026／`50deefd7e2fed7e9527c4bb712596fc700706adc165dd729d65ae4a3c3ad49b6`，最后一行“不允许生成密封字面登记器”。剩余边界是两个恢复调用与新构建交错时，旧锁删除后内容相同的新锁可能被早先的恢复调用误接管。
+
+当前实现不再继续堆叠锁机制，而是删除自动恢复能力：命令行无恢复选项，兼容恢复函数只抛错，对任意残留布局均不读、不删、不改。强制终止必须暂停并保留证据，人工核验后再处理。正常 run_build 的 intent／sidecar／receipt 严格提交和可捕获失败清理保持不变。逐步填充八个事务路径的不可变性合同及正常一次提交合同均通过；当前精确 17 项登记器合同在 110.915 秒内全绿。仍无正式登记器或质量结果，必须重新网页复审。
+
+第八轮网页端精确终审已经放行一次正常登记器构建。精确边界为 packer 58,157／`c789f235c978393701afa4866696a1d947a2dc6678368a3730ee755874970a49`，测试 176,901／`18da2de1203973d18648d676cd8154bbb64221af422952e4a73221be4fa2875d`，25 文件源码闭包压缩包 237,711／`6b6cf37390327f637cbe5571b5c545fcad9331a8f06bb2ed884feb5df501839c`；审查原文 9,605／`ab709ea458985efcd69d222b7bfc24d7dff3721e8e199875a10d4843d5807917`，最后一行“允许生成密封字面登记器”。运行必须从所有事务路径为空的清洁状态开始且只执行一次；任何异常或强制终止都必须暂停，不能恢复、拼接回执或重跑。唯一成功状态为 `PASS_SEALED_LITERAL_REGISTRY_BUILD_NOT_AUDIT_GO`。本许可只生成后续质量审计所需的密封禁止字面证据，不是质量通过、正式数据生成或模型训练许可。
+
+唯一一次构建已成功完成：104／104 个冻结世界重放，用时 381.3 秒，退出码 0。公开回执为 10,935／`38b8757f3fcb98ae5587b85f213f0b6b801f03e0f11faf6c2470abb4f272a9f5`，规范自哈希 `3e13806a027b2fd7def156df76ace7c27326787848eb03a4d4638e0275461ecd`；私有登记表为 1,211,990／`f00018e302061d2f3f9e4b0b095ceab09661482ec7c619624fdd5332ea031d2a`，规范自哈希 `75a8eee10f298d9333af8aa4dd1ec2282b8db1031431eafa968bcaeae05d57ec`。所有事务残留为 0，公开返回私值、关系、标签和排序真值均为 0。审计甲／乙各含 2 个投影世界，禁止字面数为 3,099／3,249。该结果仅为质量审计补齐密封参照，不能解释为数据质量通过；下一阶段必须封闭 v7 质量策略、启动锚和发布清单，使完整合同全绿并获得独立网页许可后，才可运行 104 世界逐条质量审计。
+
+第七版质量候选已经本地封闭，但仍未获运行许可。它只新增登记器构建器、私有登记表三元承诺、公开回执和 25 文件来源闭包的机器绑定，并把独立输出根改为 `quality_audit_design_v7_20260812`；数据行、候选、置换、七视图、十四探针、阈值和重抽样均未改变。来源闭包规范哈希为 `ad68911cb50144972c9927fffc01085875e7b054abe739e1206e3383da0e72d1`。精确候选为策略 20,838／`93e3a87302399b17dde85a1ab72fe8be0a8821ef9fc5de79d1e78fd635e0e858`，启动锚 2,913／`2ed2ff80669b3b8e734c219216d4c33b4519e77b2137d139c8ef64dda110eeba`，发布清单 2,766／`c926949646caebea00609b6939493ab24439e680099a8fd064a79d6ca019d2ea`，质量源码 217,189／`97ec6b3e8612053df885b1fa9e335548811973381ca0f2be9186ead2058c0897`，守卫 23,413／`885fa283b5a6e1ff5e1246ff8ab9dc66afd4f5e1cf5b2bbbff1a0f40f09aa292`，测试 178,431／`8869f5c505f528c0effec9e541e531f9c6d029e69d0b32476c35192354e0e6b2`。完整质量合同 71／71 通过，用时 193.997 秒；无质量输出产生。下一步是全仓回归、候选 Git 提交和网页端精确审查，不是运行质量审计。
+
+标准全仓发现共运行 692 项，用时 1,775.780 秒，结果为 682 通过、7 跳过、1 失败、1 错误。两项均属于关闭历史的活路径快照漂移：Step28-v12.1 旧同步清单继续钉住 2026-07-20 的 `PROJECT_PROGRESS.md`，v1.12 正式预锁继续钉住当前已为 v1.13 私有保管目录更新的 `.gitignore`。旧豁免只允许前者作为唯一失败，因此本次不能宣称全仓通过；也不能回退当前文档/忽略规则或改旧预锁、清单、测试、豁免来刷绿。v1.12 预锁由此保持历史证据身份且不再具备运行资格。当前 v7 专属 71／71 仍全部通过，测试误删的已跟踪数据组成文档已恢复，v7 质量结果目录仍不存在。外审必须同时看到此历史回归边界。
