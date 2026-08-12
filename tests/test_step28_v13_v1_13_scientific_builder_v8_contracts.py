@@ -20,6 +20,7 @@ import step28_v13_common as common
 import step28_v13_v1_13_scientific_common_v8 as scientific
 import step28_v13_v1_13_scientific_dataset_builder_v8 as dataset_builder
 import step28_v13_v1_13_scientific_world_v8 as world_module
+import step28_v13_v1_13_pure_natural_renderer_v8 as pure_renderer_v8
 import step7_v3_1_source_data as step7_source
 
 
@@ -82,6 +83,27 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             with self.assertRaises(scientific.ScientificBuilderError):
                 scientific.validate_policy(policy)
 
+    def test_claim_boundary_and_v8_renderer_binding_are_exact(self) -> None:
+        policy = scientific.load_policy()
+        self.assertEqual(
+            policy["claim_boundary"], scientific.EXPECTED_CLAIM_BOUNDARY
+        )
+        self.assertIs(world_module.pure_renderer, pure_renderer_v8)
+        renderer_pin = policy["implementation"]["pure_natural_renderer"]
+        self.assertEqual(
+            common.repo_path(renderer_pin["path"]).resolve(),
+            Path(pure_renderer_v8.__file__).resolve(),
+        )
+
+        mutated = copy.deepcopy(policy)
+        mutated["claim_boundary"] += " Drift."
+        mutated.pop("canonical_self_hash")
+        mutated["canonical_self_hash"] = common.canonical_sha256(mutated)
+        with self.assertRaisesRegex(
+            scientific.ScientificBuilderError, "claim boundary"
+        ):
+            scientific.validate_policy(mutated)
+
     def test_v8_authorities_do_not_reuse_v7_authorities(self) -> None:
         current = scientific.load_policy()
         retired = common.load_json(
@@ -143,6 +165,108 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             scientific.ScientificBuilderError, "reuses a pinned base authority"
         ):
             scientific.validate_policy(policy)
+
+    def test_v8_renderer_maps_are_complete_bijections_and_response_closed(self) -> None:
+        policy = scientific.load_policy()
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        translation = str.maketrans(
+            template["renderer_contract"]["traditional_substitutions"]
+        )
+
+        def response(value: object) -> bool:
+            text = str(value)
+            return text.translate(translation) != text
+
+        for split in scientific.SPLITS:
+            with self.subTest(split=split):
+                library = world_module.stage_variation._safe_library(
+                    base_policy=context.effective_policy,
+                    template=template,
+                    fixture=fixture,
+                    split=split,
+                )
+                maps = pure_renderer_v8._build_v8_permutation_maps(
+                    candidate_key=b"\x19" * 32,
+                    library=library,
+                )
+
+                domains = {
+                    "category": list(library["categories"]),
+                    "attribute": list(library["attributes"]),
+                    "delivery": list(library["delivery"]),
+                    "service": list(library["service"]),
+                    "title_skeleton": list(range(len(library["title_skeletons"]))),
+                    "description_skeleton": list(
+                        range(len(library["description_skeletons"]))
+                    ),
+                    "noise_template": list(
+                        range(len(library["must_ignore_templates"]))
+                    ),
+                    "noise_value": list(library["must_ignore_values"]),
+                }
+                for name, domain in domains.items():
+                    self.assertEqual(set(maps[name]), set(domain))
+                    self.assertEqual(set(maps[name].values()), set(domain))
+
+                for source, target in maps["category"].items():
+                    self.assertEqual(response(source), response(target))
+                    self.assertEqual(
+                        tuple(
+                            response(value)
+                            for value in library["category_products"][source]
+                        ),
+                        tuple(
+                            response(value)
+                            for value in library["category_products"][target]
+                        ),
+                    )
+                for name in ("attribute", "delivery", "service", "noise_value"):
+                    for source, target in maps[name].items():
+                        self.assertEqual(response(source), response(target))
+                for name, values_field in (
+                    ("title_skeleton", "title_skeletons"),
+                    ("description_skeleton", "description_skeletons"),
+                    ("noise_template", "must_ignore_templates"),
+                ):
+                    for source, target in maps[name].items():
+                        source_text = library[values_field][source]
+                        target_text = library[values_field][target]
+                        self.assertEqual(response(source_text), response(target_text))
+                        self.assertEqual(
+                            pure_renderer_v8._placeholder_signature(source_text),
+                            pure_renderer_v8._placeholder_signature(target_text),
+                        )
+                for size, mapping in maps["product_index"].items():
+                    self.assertEqual(set(mapping), set(range(size)))
+                    self.assertEqual(set(mapping.values()), set(range(size)))
+                    categories = sorted(
+                        (
+                            category
+                            for category, products in library[
+                                "category_products"
+                            ].items()
+                            if len(products) == size
+                        ),
+                        key=lambda value: value.encode("utf-8"),
+                    )
+                    for source, target in mapping.items():
+                        self.assertEqual(
+                            tuple(
+                                response(
+                                    library["category_products"][category][source]
+                                )
+                                for category in categories
+                            ),
+                            tuple(
+                                response(
+                                    library["category_products"][category][target]
+                                )
+                                for category in categories
+                            ),
+                        )
 
 
 class ScientificWorldTests(unittest.TestCase):
@@ -293,6 +417,96 @@ class ScientificWorldTests(unittest.TestCase):
         ):
             world_module._profile_provenance_source_multiset_sha256(invalid_rank)
 
+        for label, mutate_rank in (
+            (
+                "duplicate",
+                lambda changed: changed["rows"][left].__setitem__(
+                    "output_rank", changed["rows"][right]["output_rank"]
+                ),
+            ),
+            (
+                "gap",
+                lambda changed: changed["rows"][right].__setitem__(
+                    "output_rank", len(first_group) + 1
+                ),
+            ),
+            (
+                "bool",
+                lambda changed: changed["rows"][left].__setitem__(
+                    "output_rank", True
+                ),
+            ),
+        ):
+            with self.subTest(rank_failure=label):
+                changed = copy.deepcopy(provenance)
+                mutate_rank(changed)
+                changed["rows_sha256"] = common.canonical_sha256(changed["rows"])
+                with self.assertRaisesRegex(
+                    world_module.ScientificWorldError, "output rank"
+                ):
+                    world_module._profile_provenance_source_multiset_sha256(
+                        changed
+                    )
+
+    def test_lineage_failure_precedes_collision_and_registry_commit(self) -> None:
+        items: set[str] = set()
+        sellers: set[str] = set()
+        identities: set[str] = set()
+        real_digest = world_module._profile_provenance_source_multiset_sha256
+        calls = 0
+
+        def force_candidate_drift(provenance: dict) -> str:
+            nonlocal calls
+            calls += 1
+            digest = real_digest(provenance)
+            return digest if calls == 1 else ("0" * 64)
+
+        with (
+            mock.patch.object(
+                world_module,
+                "_profile_provenance_source_multiset_sha256",
+                side_effect=force_candidate_drift,
+            ),
+            mock.patch.object(
+                world_module,
+                "_collision_categories",
+                wraps=world_module._collision_categories,
+            ) as collision_probe,
+        ):
+            with self.assertRaisesRegex(
+                world_module.ScientificWorldError,
+                "changed frozen profile contribution lineage",
+            ):
+                world_module.build_scientific_world(
+                    policy=self.context.effective_policy,
+                    template=self.template,
+                    fixture=self.fixture,
+                    style_profile=self.style_profile,
+                    mode=self.context.base_mode,
+                    world_record=self.record,
+                    structure_key_hex=self.structure_key,
+                    document_variation_key=self.context.document_variation_key,
+                    anonymous_handle_key=self.context.anonymous_handle_key,
+                    historical_item_hashes=frozenset(),
+                    historical_seller_hashes=frozenset(),
+                    historical_identity_hashes=frozenset(),
+                    current_item_hashes=items,
+                    current_seller_hashes=sellers,
+                    current_identity_hashes=identities,
+                )
+        collision_probe.assert_not_called()
+        self.assertEqual(items, set())
+        self.assertEqual(sellers, set())
+        self.assertEqual(identities, set())
+
+    def test_full_candidate_provenance_hash_enters_private_world_audit(self) -> None:
+        row = dataset_builder._private_world_audit_row(self.accepted)
+        self.assertEqual(
+            row["profile_provenance_sha256"],
+            self.accepted.profile_provenance_sha256,
+        )
+        self.assertRegex(row["profile_provenance_sha256"], r"^[0-9a-f]{64}$")
+
     def test_model_text_fields_do_not_contain_internal_uids(self) -> None:
         world = self.accepted.world
         forbidden = {
@@ -411,17 +625,57 @@ class ScientificWorldTests(unittest.TestCase):
             self.assertEqual(registries, before)
 
     def test_exact_document_collision_alone_advances_candidate(self) -> None:
+        observations: list[dict] = []
+
+        def expose_first_two_candidates(**kwargs: object) -> tuple[str, ...]:
+            observations.append(copy.deepcopy(kwargs))
+            return (
+                ("historical_item_document",)
+                if len(observations) == 1
+                else ()
+            )
+
+        with mock.patch.object(
+            world_module,
+            "_collision_categories",
+            side_effect=expose_first_two_candidates,
+        ):
+            exposed = self._build()
+        self.assertEqual(exposed.candidate_index, 1)
+        self.assertEqual(len(observations), 2)
+        first_items = set(observations[0]["item_hashes"])
+        second_items = set(observations[1]["item_hashes"])
+        candidate_zero_only = first_items - second_items
+        self.assertTrue(candidate_zero_only)
+        historical_collision = min(
+            candidate_zero_only, key=lambda value: value.encode("utf-8")
+        )
+
+        self.assertEqual(
+            world_module._collision_categories(
+                **{
+                    **observations[0],
+                    "historical_item_hashes": frozenset({historical_collision}),
+                }
+            ),
+            ("historical_item_document",),
+        )
+        self.assertEqual(
+            world_module._collision_categories(
+                **{
+                    **observations[1],
+                    "historical_item_hashes": frozenset({historical_collision}),
+                }
+            ),
+            (),
+        )
         replay = self._build(
-            historical_items=frozenset(self.accepted.item_registry_delta),
-            historical_sellers=frozenset(self.accepted.seller_registry_delta),
+            historical_items=frozenset({historical_collision}),
         )
-        self.assertGreater(replay.candidate_index, 0)
+        self.assertEqual(replay.candidate_index, 1)
         self.assertEqual(replay.candidates_examined, replay.candidate_index + 1)
-        self.assertGreaterEqual(
-            replay.rejection_counts["historical_item_document"]
-            + replay.rejection_counts["historical_seller_document"],
-            replay.candidate_index,
-        )
+        self.assertEqual(replay.rejection_counts["historical_item_document"], 1)
+        self.assertEqual(replay.rejection_counts["historical_seller_document"], 0)
 
     def test_failed_candidate_exhaustion_does_not_mutate_registries(self) -> None:
         items: set[str] = set()
@@ -561,6 +815,47 @@ class ScientificExactTitleEndpointTests(unittest.TestCase):
         )
         self.assertFalse(receipt["seller_pairs_or_direction_changed"])
         self.assertFalse(receipt["labels_or_model_scores_read"])
+
+    def test_train_world_69_preserves_frozen_profile_lineage_at_candidate_zero(
+        self,
+    ) -> None:
+        """Regression for the first v8 execution failure, not a result preview."""
+
+        record = next(
+            row
+            for row in self.context.world_records
+            if row["split"] == "train" and row["split_ordinal"] == 69
+        )
+        historical = dataset_builder.collision.load_historical_exclusion_registries()
+        accepted = world_module.build_scientific_world(
+            policy=self.context.effective_policy,
+            template=self.template,
+            fixture=self.fixture,
+            style_profile=self.style_profile,
+            mode=self.context.base_mode,
+            world_record=record,
+            structure_key_hex=common.structure_key_for_split(
+                self.context.effective_policy,
+                mode=self.context.base_mode,
+                split="train",
+            ),
+            document_variation_key=self.context.document_variation_key,
+            anonymous_handle_key=self.context.anonymous_handle_key,
+            historical_item_hashes=historical.item_document_hashes,
+            historical_seller_hashes=historical.seller_document_hashes,
+            historical_identity_hashes=historical.identity_value_hashes,
+            current_item_hashes=set(),
+            current_seller_hashes=set(),
+            current_identity_hashes=set(),
+        )
+        self.assertEqual(accepted.split_ordinal, 69)
+        self.assertEqual(accepted.candidate_index, 0)
+        self.assertEqual(accepted.candidates_examined, 1)
+        self.assertEqual(sum(accepted.rejection_counts.values()), 0)
+        self.assertEqual(len(accepted.seller_profiles), 28)
+        self.assertEqual(len(accepted.identity33), 378)
+        self.assertEqual(len(accepted.pair_labels), 378)
+        self.assertEqual(sum(row["label"] for row in accepted.pair_labels), 20)
 
     def test_all_1004_preflight_worlds_have_qualified_clone_endpoints(self) -> None:
         relocated = 0

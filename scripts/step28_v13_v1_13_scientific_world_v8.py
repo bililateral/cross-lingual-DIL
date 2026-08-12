@@ -27,7 +27,7 @@ import step28_v13_v1_13_candidate_parent as stage_parent
 import step28_v13_v1_13_document_collision as collision
 import step28_v13_v1_13_identity_remap as identity_remap
 import step28_v13_v1_13_natural_variation as stage_variation
-import step28_v13_v1_13_pure_natural_renderer as pure_renderer
+import step28_v13_v1_13_pure_natural_renderer_v8 as pure_renderer
 import step28_v13_world_builder as world_builder
 
 
@@ -56,7 +56,6 @@ class CandidateBinding:
     noise_handle_to_slot_uid: dict[str, str]
     registered_overrides: tuple[dict[str, Any], ...]
     structural_parent_sha256: str
-    baseline_provenance_sha256: str
     baseline_provenance_source_multiset_sha256: str
     baseline_identity33_sha256: str
 
@@ -609,7 +608,6 @@ def _build_restricted_view(
     world: Mapping[str, Any],
     anonymous_handle_key: bytes,
     structural_parent_sha256: str,
-    baseline_provenance_sha256: str,
     baseline_provenance_source_multiset_sha256: str,
     baseline_identity33_sha256: str,
 ) -> tuple[pure_renderer.RestrictedCandidateView, CandidateBinding]:
@@ -767,7 +765,6 @@ def _build_restricted_view(
         },
         registered_overrides=tuple(overrides),
         structural_parent_sha256=structural_parent_sha256,
-        baseline_provenance_sha256=baseline_provenance_sha256,
         baseline_provenance_source_multiset_sha256=(
             baseline_provenance_source_multiset_sha256
         ),
@@ -1200,7 +1197,6 @@ def build_scientific_world(
         world=remapped,
         anonymous_handle_key=anonymous_handle_key,
         structural_parent_sha256=structural_sha,
-        baseline_provenance_sha256=provenance_sha,
         baseline_provenance_source_multiset_sha256=(
             provenance_source_multiset_sha
         ),

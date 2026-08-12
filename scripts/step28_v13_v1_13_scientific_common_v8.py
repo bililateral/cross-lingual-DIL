@@ -22,6 +22,10 @@ DEFAULT_POLICY_PATH = (
 )
 POLICY_VERSION = "2026-08-12-step28-v13-v1-13-scientific-dataset-builder-v8"
 POLICY_STATUS = "DESIGN_PREFLIGHT_ONLY"
+EXPECTED_CLAIM_BOUNDARY = (
+    "This policy authorizes implementation tests and design preflights only. "
+    "It creates no formal seed, training-qualified row, model, or scientific metric."
+)
 SPLITS = ("train", "development", "audit_a", "audit_b")
 DESIGN_MODES = ("small_smoke", "design_preflight")
 EXECUTION_MODES = (*DESIGN_MODES, "formal")
@@ -145,6 +149,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "claim_boundary",
         "scientific_contract",
         "quality_audit_v8_design_scale_amendment",
+        "v8_build_execution_failure_record",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -165,12 +170,18 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     _verify_self_hash(policy)
     if policy.get("version") != POLICY_VERSION or policy.get("status") != POLICY_STATUS:
         raise ScientificBuilderError("Scientific builder policy version/status drift")
+    if policy.get("claim_boundary") != EXPECTED_CLAIM_BOUNDARY:
+        raise ScientificBuilderError("Scientific claim boundary drift")
     if tuple(policy.get("split_order", ())) != SPLITS:
         raise ScientificBuilderError("Scientific split order drift")
     _verify_pin(policy["scientific_contract"], label="scientific contract")
     _verify_pin(
         policy["quality_audit_v8_design_scale_amendment"],
         label="quality audit v8 design-scale amendment",
+    )
+    _verify_pin(
+        policy["v8_build_execution_failure_record"],
+        label="v8 build execution failure record",
     )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
@@ -181,6 +192,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     implementation = policy["implementation"]
     if not isinstance(implementation, Mapping) or tuple(implementation) != (
         "scientific_common",
+        "pure_natural_renderer",
         "scientific_world",
         "dataset_builder",
     ):
