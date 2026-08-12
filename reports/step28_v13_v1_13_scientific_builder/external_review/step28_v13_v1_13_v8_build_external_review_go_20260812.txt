@@ -1,0 +1,454 @@
+Step28-v13 v1.13 v8 构建阶段外部终审
+
+我完整阅读了本轮 6 个附件，并独立复算了当前字节边界：
+
+文件	大小	SHA-256
+v8 设计规模修订件	8,144	fd45ecbcff6602d11011545a9cbca49298cff4f1986bf2351aed869344dd3117
+v8 builder policy	9,184	219707e4ed53effd42127a8d800e9dd5c8801a3229bcadaf79a7bd00d319ff52
+scientific_common_v8.py	20,897	097c7548754cb441e5ef6b1f9aa19850039b7c3fa008055dee7cc9040a6d4f10
+scientific_world_v8.py	51,151	39ca5cf82456be5bed80bbe69c0112e5915c21753b4eb33334d356fb7de7657e
+scientific_dataset_builder_v8.py	41,129	23b23e6ad694f4a98ba48438b344058d866466bb28523104cdf0b169cf26ae94
+v8 builder tests	36,176	c8ca3ed66a90dad20002ae7bb9e216651e1796f6062daaeef5f284b2feb32fcf
+
+策略规范自哈希独立重算为：
+
+3c265332397cd3d5d5ed3661259d72f7806715c75fdd1d730f40826787537676
+
+与策略声明一致。策略中对修订件和三个 v8 实现文件的大小、SHA-256 也均与附件一致。四个 Python 文件独立通过 py_compile。
+
+本轮分级：
+
+等级	数量
+Blocker	0
+High	0
+Medium	0
+Low	2
+
+没有发现会导致错误构建成功、结果驱动换盐、标签参与候选选择、真实来源变化被静默接受，或正式模式意外开放的 Blocker、High 或影响本次构建正确性的 Medium。
+
+Low
+Low 1：claim_boundary 当前字节正确，但没有被 validate_policy()按字面值单独验证
+定位
+
+step28_v13_v1_13_scientific_common_v8.py
+
+validate_policy()：第 141–399 行
+
+claim_boundary 只出现在顶层允许键集合中，第 145 行附近
+
+具体因果
+
+当前策略中的：
+
+This policy authorizes implementation tests and design preflights only.
+It creates no formal seed, training-qualified row, model, or scientific metric.
+
+是正确的。
+
+但 validate_policy() 没有像 world_contract、execution_modes、single_attempt_random_authority 和 formal_authorization 那样，把该字符串与冻结常量精确比较。
+
+这不会影响当前精确字节运行，因为：
+
+本次裁决明确绑定当前 policy SHA-256；
+
+design 模式的 scientific_use_forbidden 被机器验证为 true；
+
+formal authorization 被机器验证为关闭；
+
+root manifest 又硬编码正式种子、正式行和训练均为零。
+
+因此它是机器合同完整性的 Low，而不是当前执行错误。
+
+后续最小修复
+Python
+运行
+if policy["claim_boundary"] != EXPECTED_CLAIM_BOUNDARY:
+    raise ScientificBuilderError("Scientific claim boundary drift")
+缺失测试
+
+修改 claim_boundary、重算 policy self-hash 后，validate_policy() 必须失败。
+
+Low 2：保留了一个不再参与候选相等门的旧字段，rank 负测还可更完整
+定位
+
+step28_v13_v1_13_scientific_world_v8.py
+
+CandidateBinding.baseline_provenance_sha256：第 54–61 行
+
+_build_restricted_view()：第 602–776 行
+
+_profile_provenance_source_multiset_sha256()：第 210–279 行
+
+测试：
+
+test_provenance_invariant_ignores_only_valid_rank_permutations()：第 216–294 行
+
+具体因果
+
+baseline_provenance_sha256 仍被装入 CandidateBinding，但候选相等门现在正确地只比较：
+
+baseline_provenance_source_multiset_sha256
+
+旧的完整 baseline provenance hash 不再被读取。
+
+这不会放宽当前科学门：
+
+候选完整 provenance hash 仍计算并进入 AcceptedScientificWorld.profile_provenance_sha256；
+
+builder 仍把该完整 hash 写进私有世界审计；
+
+后续质量审计可根据同一随机权威精确重放；
+
+来源多重集门仍绑定全部来源字段。
+
+测试已经覆盖 rank 交换、rank=0，以及 12 个其他来源字段的恶意变化，但没有直接覆盖：
+
+同组重复 rank；
+
+同组 rank 缺口；
+
+rank 类型为布尔值；
+
+完整候选 provenance hash 确实写入私有世界审计。
+
+代码本身已拒绝前三类，因此这是测试覆盖 Low。
+
+后续最小修复
+
+二选一：
+
+从 CandidateBinding 删除不用的 baseline_provenance_sha256；或
+
+明确注释它仅为诊断字段，不参与 baseline—candidate 相等门。
+
+新增重复／缺口／布尔 rank 和私有审计完整 hash 测试。
+
+A. output_rank 排除是否过宽
+
+没有过宽。
+
+_profile_provenance_source_multiset_sha256() 对 provenance 做了以下约束：
+
+容器 keyset 精确；
+
+row count 与 rows_sha256 自洽；
+
+每行 keyset 必须精确等于 stage_parent.PROVENANCE_FIELDS；
+
+每行 world_uid 必须与容器世界一致；
+
+只移除 output_rank；
+
+每个 (seller_uid, output_field) 组内 rank 必须恰好为 1..n；
+
+剩余行按规范字节排序；
+
+使用列表而不是集合，因此重复来源的多重性仍被保留。
+
+step28_v13_v1_13_scientific_wor…
+
+继续被绑定的字段包括：
+
+world_uid
+seller_uid
+output_field
+aggregation_role
+source_item_uids
+source_item_uids_sha256
+source_item_count
+first_seen_position
+item_uid
+extracted_segment_ordinal
+seller_df
+seller_df_seller_count
+seller_df_seller_uids_sha256
+
+因此：
+
+来源商品替换会改变摘要；
+
+来源集合增删会改变摘要；
+
+来源从一个卖家／字段／聚合角色转到另一个会改变摘要；
+
+片段序号、首次位置或 seller_df 变化会改变摘要；
+
+top 贡献成员发生变化会改变摘要；
+
+两条来源仅交换展示名次则摘要不变。
+
+这与修订件冻结的“贡献来源多重集”定义一致。完整候选 provenance 摘要仍被单独保存，未被源多重集摘要替代。
+
+STEP28_V13_V1_13_QUALITY_AUDIT_…
+
+B. 唯一随机权威、单次尝试和旧 v7 排除
+
+当前实现闭合：
+
+design_preflight 精确固定为 14 个随机权威值；
+
+同一 block 内没有重复；
+
+与 small_smoke 的 14 个测试权威完全不相交；
+
+与 pinned base policy 的 randomness 树不相交；
+
+与硬冻结的 28 个 v7 preflight 权威不相交；
+
+这 28 个历史值的排序规范哈希独立重算与策略声明一致；
+
+attempt_index=1；
+
+total_world_count=1004；
+
+禁止 alternate authority 和 alternate output root；
+
+构建执行错误只允许同一权威确定性重建；
+
+数据质量失败永久关闭 v8；
+
+formal authorization 全部关闭。
+
+step28_v13_v1_13_scientific_dat…
+
+策略固定输出根为：
+
+reports/step28_v13_v1_13_scientific_builder/
+design_preflight_v8_20260812
+
+已有完整输出根会导致构建拒绝，不能正常发布第二份同名根。
+
+small_smoke 是固定实现测试流，不是一个可供质量结果选择的第二套 1,004-world 候选数据。
+
+C. 1,004 世界与审核拆分边界
+
+机器策略和执行上下文精确生成：
+
+train        500
+development  500
+audit_a        2
+audit_b        2
+total       1004
+
+build_execution_context() 还要求实际 world pool 行数等于策略总数。builder 对每个拆分验证：
+
+ordinal 范围；
+
+ordinal 唯一性；
+
+完整连续集合 0..world_count-1；
+
+每世界 28 卖家；
+
+每世界 378 对；
+
+每世界 20 正例；
+
+训练／开发及审核拆分的实际行数都从策略 world count 推导，不再硬编码 50。
+
+step28_v13_v1_13_scientific_com…
+
+ 
+
+step28_v13_v1_13_scientific_dat…
+
+审核甲乙的私有标签和 qrels 会由生成器写入 private custody 文件，这是未来盲评所需真值的生成，不是本轮读取或使用它们作为性能证据。
+
+本轮 builder 不运行任何监督 probe。审核甲乙是否只进入结构审计，是下一阶段 v8 质量策略必须继续机器封闭的事项；当前构建没有把它们解释为性能样本。
+
+D. 标签或模型分数是否进入候选选择
+
+没有发现该路径。
+
+真实顺序为：
+
+构建冻结父世界
+→ 固定精确标题克隆的商品端点
+→ 身份值重映射
+→ 建立匿名 restricted candidate view
+→ 生成候选自然表达
+→ 验证结构、来源多重集和 identity33
+→ 仅检查六种精确文档碰撞
+→ 接受候选
+→ 最后才调用 _build_private_truth()
+
+候选循环唯一的 continue 原因来自 _collision_categories() 的六种精确文档碰撞。所有其他异常均关闭整个构建，不会用来推进到另一个候选。标签、控制者关系和 qrels 只在候选已经不可逆接受后才投影。
+
+step28_v13_v1_13_scientific_wor…
+
+精确标题克隆端点重选也只读取：
+
+固定卖家对和方向；
+
+商品归属；
+
+title/description 非空结构；
+
+item UID；
+
+已冻结 split structure key。
+
+它不读取 pair label、模型分数或 shortcut probe 结果。
+
+builder 后续对 labels 的使用仅为：
+
+写入 private pair_labels.csv；
+
+验证每世界／每拆分正例数恰好为 20。
+
+该使用发生在候选接受后，不参与候选、世界、盐或编号选择。
+
+E. 失败事务和正式模式
+
+builder 使用新的临时根：
+
+.design_preflight_v8_20260812.building
+
+并在发布前：
+
+以 exclusive create 写所有文件；
+
+flush 和 fsync；
+
+关闭全部 writer；
+
+生成 split manifests；
+
+生成 root manifest；
+
+从磁盘重新检查文件大小、SHA-256、物理行数、文件全集和 manifest 自哈希；
+
+最后将临时根改名为正式设计根。
+
+任何正常 Python 异常都会关闭仍打开的 writer 并删除精确临时根，不会留下被代码宣布为成功的半构建根。
+
+step28_v13_v1_13_scientific_dat…
+
+正式模式在 build_execution_context() 内、创建临时根之前失败，原因是：
+
+formal_authorization.enabled = false
+
+且正式 seed receipt 与四个 structure commitment 全部为 null。
+
+成功 root 的状态只能是：
+
+PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED
+
+并同时写入：
+
+scientific_use_forbidden = true
+formal_seed_created = false
+formal_rows_created = 0
+training_started = false
+F. 测试能否拦截关键错误
+
+23 项测试是真实行为测试，不只是检查状态字符串。
+
+已覆盖：
+
+精确 500/500/2/2 和 attempt 1；
+
+200-world fallback 与 attempt 2 被拒绝；
+
+v8 与 v7 权威不相交；
+
+v8 内部权威互不复用；
+
+与 base randomness 重用时失败；
+
+provenance rank 合法交换；
+
+12 类其他来源字段变化；
+
+identity33／endpoint／label keyset；
+
+模型投影精确 allowlist；
+
+legacy18 来源重放；
+
+六类 UID 的原子注册表冲突；
+
+精确文档碰撞才推进候选；
+
+32 个候选耗尽不污染三类 registry；
+
+确定性世界重放；
+
+development ordinal 429；
+
+全部 1,004 世界的 exact-title endpoint 资格；
+
+固定卖家对、方向和私有真值不变；
+
+两次四拆分小型构建字节一致；
+
+observed/private 文件路由与行数；
+
+单字节落盘篡改被 _verify_output_tree() 拒绝。
+
+test_step28_v13_v1_13_scientifi…
+
+我未在当前隔离附件环境重跑完整 23 项测试，因为六个附件不包含它们所钉住的全部基础策略、模板、历史 collision registries 和共享模块；但我逐个追踪了测试实际调用对象，没有发现通过 mock 绕过核心候选循环、来源多重集验证或根清单提交的假绿路径。
+
+独立认可的设计事实
+
+v8 规模、权威和输出根在生成前已经固定。
+
+没有从多个真实规模或盐中按结果选一个。
+
+旧 v7 权威被排除，v7 数据和质量结果不进入 v8。
+
+output_rank 的排除只允许相同来源贡献改变展示位置。
+
+来源商品、来源集合、角色、字段、片段、首次位置和 seller_df 仍全部被绑定。
+
+候选完整 provenance 摘要仍被单独保存。
+
+候选推进的唯一原因是六种精确文档碰撞。
+
+标签只在候选接受后生成。
+
+全局和跨拆分 UID、文档、身份值注册表均有闭包检查。
+
+正式模式在 seed ceremony 前关闭。
+
+成功构建仍只有设计级状态，不取得训练资格。
+
+本次构建不会运行 67 项元数据门、F/P/U、14 模型或 9,999 次 bootstrap。
+
+最终裁决边界
+
+允许执行的动作仅为：
+
+step28_v13_v1_13_scientific_dataset_builder_v8.py
+--mode design_preflight
+
+且执行前必须再次确认上述六个精确 SHA-256、策略自哈希和 v8 正式输出根／临时根均不存在。
+
+本裁决只允许第一次 v8 设计级构建。若构建发生执行错误：
+
+不得换盐；
+
+不得改 UID 以追求未来探针分数；
+
+不得切换规模或输出根；
+
+实现若需修改，必须用同一权威重新提交运行前审查。
+
+构建成功只表示：
+
+PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED
+
+不表示数据质量已经通过，也不授权：
+
+v8 质量审计；
+
+正式随机种子；
+
+正式 500×4 数据生成；
+
+审核集甲乙真值、控制者关系或 qrels 解封；
+
+M0、M1、M2、M3 的训练、调参、评分或指标发布。
+
+允许唯一一次v8设计级构建
