@@ -1,0 +1,229 @@
+纯科研实现复审裁定
+
+按照项目负责人明确设定的审查边界：
+
+候选合同中的 GPT-5.6 Sol Pro 作为本次网页审查的既定模型标识；
+
+网页 transcript、attestation、Git commit/tree 和逐文件哈希只承担普通科研可追溯性与防误操作职责，不要求密码学不可伪造性；
+
+上一轮提出的两项意见不再计入本轮科研实现缺陷，也不再重复讨论。
+
+分级结论
+等级	数量
+Blocker	0
+High	0
+
+在限定为“是否会实质破坏数据质量判断、捷径审计统计有效性、审核盲化隔离或实验可复现性”的范围内，没有发现仍然存在的科学实现层面 Blocker 或 High。
+
+已确认没有阻断的关键科学事实
+1. 当前输入仍严格处于设计级边界
+
+冻结根清单仍记录：
+
+104 worlds；
+
+2,912 sellers；
+
+10,561 items；
+
+39,312 pairs；
+
+2,080 positives；
+
+scientific_use_forbidden=true；
+
+training_started=false；
+
+状态为 PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED。
+
+因此，本次运行许可不会被解释成训练资格或正式数据发布。
+
+root_manifest
+
+2. 审核甲乙不进入监督探针
+
+质量实现对审核甲、乙只执行无标签 observed 结构、逐行、字节完整性、可见数值重放和密封字面扫描；审核拆分不进入 train/development 标签矩阵，不参与 F/P/U 模型拟合、开发门或监督统计量。
+
+主质量进程不会取得审核标签、控制者映射、qrels 或 query relevance；封存子进程仅返回计数、commitment、overlap 和自哈希，不向主进程返回原始值或关系。当前盲计数器同时要求字面扫描和 registry-isolation 各执行一次，而所有真值、关系和世界重建计数保持为零。
+
+step28_v13_v1_13_blind_literal_…
+
+ 
+
+step28_v13_v1_13_scientific_qua…
+
+3. 密封登记器消费边界闭合
+
+公开登记器回执的结构要求：
+
+private_values_returned=0；
+
+private_relations_returned=0；
+
+labels_returned=0；
+
+qrels_returned=0；
+
+标签只用于精确重放，不用于候选或字面选择；
+
+quality_probe_run=false；
+
+正式生成、正式种子、训练、真值解封和训练资格字段全部为 false。
+
+质量运行会核对私有登记器路径、大小、原始 SHA-256、自哈希、transaction ID、split/category commitments、公开回执以及实际 25-file source closure，而不是只接受一个自报摘要。
+
+step28_v13_v1_13_build_sealed_l…
+
+ 
+
+step28_v13_v1_13_blind_literal_…
+
+4. F/P/U 三路径仍符合冻结 C 方案
+
+当前方法保持：
+
+F 固定商品支持：33/14/30 维；
+
+P 真实 Step3：75/14/56 维；
+
+U 联合输入：124 维；
+
+七视图分别进入 L2 逻辑回归和深度 2 浅树，共 14 模型。
+
+F 继续只使用生产脱敏商品，按固定商品槽独立向量化，不产生跨商品 n-gram；空槽使用对称的 empty_rate_absdiff/empty_rate_sum。P 保留真实生产聚合及合法下游中介变化，并独立重建 provenance 与 seller_df。U 只联合 P full、F full 和八个模型可见数值的绝对差／和。
+
+STEP28_V13_V1_13_QUALITY_AUDIT_…
+
+ 
+
+step28_v13_v1_13_scientific_qua…
+
+三条路径分别生成并核对：
+
+pair order；
+
+world order；
+
+eligibility mask；
+
+derangement mapping；
+
+F slot commitment；
+
+P profile/provenance commitment；
+
+numeric projection；
+
+完整 counterfactual dose row。
+
+没有发现审核真值、控制者、机制或私有 AST 字段进入模型特征。
+
+5. 统计门保持冻结且实现一致
+
+已确认的统计规则包括：
+
+文本每世界 372 对、20 正例；
+
+AP 基线 20/372；
+
+元数据完整 378 对、20 正例；
+
+AP 基线 20/378；
+
+单特征在完整冻结特征家族取最大；
+
+14 模型点估计共同取最大；
+
+每次 bootstrap 先计算 14 模型指标，再在该次取最大；
+
+9,999 次 NumPy PCG64 世界有放回抽样；
+
+世界顺序使用冻结的 split_ordinal；
+
+quantile(method="linear")；
+
+bootstrap 内不重新拟合；
+
+AUC/AP 使用并列感知的加权规则；
+
+模型随机种子为合法 uint32 793820367。
+
+这些规则与 C 修订合同中的两个估计目标和三路径全家族门一致。
+
+STEP28_V13_V1_13_QUALITY_AUDIT_…
+
+ 
+
+test_step28_v13_v1_13_scientifi…
+
+6. 失败分类不会把审计器错误冒充数据失败
+
+合同与实现均区分：
+
+DATASET_INVALIDATED：持久化逐行数据硬门或冻结统计质量门明确失败；
+
+AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION：代码、依赖、内存、运行时、模型拟合、反事实实现或 scanner 执行失败。
+
+后一类不得删除或宣布设计数据无效；反事实渲染、扫描、映射守恒等实现错误也属于后一类。只有实现正确而预注册实际干预剂量不足，才属于数据质量失败。
+
+STEP28_V13_V1_13_QUALITY_AUDIT_…
+
+ 
+
+step28_v13_v1_13_scientific_qua…
+
+7. 测试不是仅依赖自哈希的形式检查
+
+专项测试实际覆盖：
+
+策略叶字段 mutation；
+
+登记器与 source-closure 漂移；
+
+审核真值读取和世界重建 canary；
+
+F 左右对称、行序、UID 改名和跨商品 n-gram；
+
+provenance 字段篡改；
+
+三路径 pair/world/mask/mapping 错位；
+
+第 14 个模型；
+
+bootstrap 每次全家族最大值；
+
+并列指标字面对照；
+
+低剂量与实现错误的分类；
+
+数据失效清理与执行失败保留。
+
+这些测试与当前实现函数直接相连，没有发现会让上述核心科学错误系统性假绿的 fixture 或 mock 路径。
+
+test_step28_v13_v1_13_scientifi…
+
+裁决含义
+
+本裁决仅表示：
+
+当前冻结候选具备执行一次 104-world 设计级质量审计的科学实现资格。
+
+它不表示：
+
+设计数据已经通过质量门；
+
+私有字面实际命中为零；
+
+元数据或文本探针已经过门；
+
+数据已经取得训练资格；
+
+可以生成正式种子或正式 500×4；
+
+可以解封审核真值；
+
+可以训练、调参或评分 M0/M1/M2/M3。
+
+运行后必须根据实际质量结果和失败分类形成 PASS、DATASET_INVALIDATED 或 AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION，不得在运行前预判数据通过。
+
+允许清洁运行104-world质量审计
