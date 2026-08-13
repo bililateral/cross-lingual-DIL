@@ -151,6 +151,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "quality_audit_v8_design_scale_amendment",
         "v8_build_execution_failure_record",
         "v8_second_build_execution_failure_record",
+        "v8_third_build_execution_failure_record",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -187,6 +188,10 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     _verify_pin(
         policy["v8_second_build_execution_failure_record"],
         label="v8 second build execution failure record",
+    )
+    _verify_pin(
+        policy["v8_third_build_execution_failure_record"],
+        label="v8 third build execution failure record",
     )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
@@ -319,11 +324,15 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
                 "step28-v13-v1.13-v8.attribute.semantic-orbit."
                 "keyed-rotation-v2"
             ),
-            "mapping": "frozen_semantic_orbit_keyed_cyclic_rotation",
+            "mapping": "frozen_content_slot_keyed_cyclic_rotation",
+            "semantic_slot_id": "product_version_or_specification_attribute",
+            "strict_synonymy_required": False,
+            "candidate_semantics": (
+                "admissible_alternative_realizations_within_one_content_slot"
+            ),
             "semantic_orbits": [
-                ["标准版", "组合版"],
+                ["标准版", "组合版", "多规格"],
                 ["轻量版", "更新版"],
-                ["多规格"],
                 ["可选配色"],
                 ["分批交付"],
                 ["附使用说明"],

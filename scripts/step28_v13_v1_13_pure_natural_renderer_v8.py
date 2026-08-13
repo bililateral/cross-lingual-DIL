@@ -22,16 +22,16 @@ FIELD_SEPARATOR = b"\x1f"
 RNG_DOMAIN = "step28-v13-v1.13-natural-variation"
 VIEW_VERSION = "2026-08-10-step28-v13-v1-13-restricted-candidate-view-v1"
 OUTPUT_VERSION = (
-    "2026-08-13-step28-v13-v1-13-natural-candidate-v8-attribute-repair-v2"
+    "2026-08-13-step28-v13-v1-13-natural-candidate-v8-attribute-repair-v3"
 )
 DESCRIPTION_SUFFIX = "{noise_clause}{context_guard}{identity_clause}"
 ATTRIBUTE_ROTATION_DOMAIN = (
     "step28-v13-v1.13-v8.attribute.semantic-orbit.keyed-rotation-v2"
 )
+# These are admissible alternative states of one content slot, not synonym sets.
 ATTRIBUTE_SEMANTIC_ORBITS = (
-    ("标准版", "组合版"),
+    ("标准版", "组合版", "多规格"),
     ("轻量版", "更新版"),
-    ("多规格",),
     ("可选配色",),
     ("分批交付",),
     ("附使用说明",),

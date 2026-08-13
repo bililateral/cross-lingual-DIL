@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import csv
 import hashlib
+import inspect
 import json
 import sys
 import tempfile
@@ -241,7 +242,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
                 )
                 self.assertIn(
                     maps["attribute"]["标准版"],
-                    {"标准版", "组合版"},
+                    {"标准版", "组合版", "多规格"},
                 )
                 self.assertNotEqual(
                     maps["attribute"]["标准版"],
@@ -329,6 +330,66 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             }
             self.assertEqual(common.canonical_sha256(serializable), expected[split])
 
+    def test_three_state_repair_does_not_perturb_old_domains_for_target_keys(
+        self,
+    ) -> None:
+        policy = scientific.load_policy()
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        library = world_module.stage_variation._safe_library(
+            base_policy=context.effective_policy,
+            template=template,
+            fixture=fixture,
+            split="train",
+        )
+        record = next(
+            row
+            for row in context.world_records
+            if row["split"] == "train" and row["split_ordinal"] == 159
+        )
+        old_orbits = (
+            ("标准版", "组合版"),
+            ("轻量版", "更新版"),
+            ("多规格",),
+            *pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[2:],
+        )
+        for candidate_index in range(32):
+            key = dataset_builder.collision.derive_candidate_key(
+                context.document_variation_key,
+                split="train",
+                world_uid=record["world_uid"],
+                candidate_index=candidate_index,
+            )
+            current = pure_renderer_v8._build_v8_permutation_maps(
+                candidate_key=key,
+                library=library,
+            )
+            with mock.patch.object(
+                pure_renderer_v8, "ATTRIBUTE_SEMANTIC_ORBITS", old_orbits
+            ):
+                old = pure_renderer_v8._build_v8_permutation_maps(
+                    candidate_key=key,
+                    library=library,
+                )
+            self.assertEqual(
+                {name: value for name, value in current.items() if name != "attribute"},
+                {name: value for name, value in old.items() if name != "attribute"},
+            )
+            for attribute in (
+                "轻量版",
+                "更新版",
+                "可选配色",
+                "分批交付",
+                "附使用说明",
+                "支持自选参数",
+                "含基础售后",
+            ):
+                self.assertEqual(
+                    current["attribute"][attribute], old["attribute"][attribute]
+                )
+
     def test_attribute_map_rejects_cross_semantic_orbit(self) -> None:
         policy = scientific.load_policy()
         context = scientific.build_execution_context(
@@ -385,11 +446,149 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
         ]
         self.assertEqual(
             {mapping["标准版"] for mapping in mappings},
-            {"标准版", "组合版"},
+            {"标准版", "组合版", "多规格"},
         )
         self.assertEqual(
             {mapping["轻量版"] for mapping in mappings},
             {"轻量版", "更新版"},
+        )
+
+    def test_three_state_content_slot_all_directions_and_contexts_close(self) -> None:
+        policy = scientific.load_policy()
+        spec = policy["candidate_selection"]["attribute_variation_repair"]
+        self.assertEqual(
+            spec["semantic_slot_id"],
+            "product_version_or_specification_attribute",
+        )
+        self.assertFalse(spec["strict_synonymy_required"])
+        self.assertEqual(
+            spec["candidate_semantics"],
+            "admissible_alternative_realizations_within_one_content_slot",
+        )
+        self.assertEqual(
+            pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[0],
+            ("标准版", "组合版", "多规格"),
+        )
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        translation = str.maketrans(
+            template["renderer_contract"]["traditional_substitutions"]
+        )
+        for split in scientific.SPLITS:
+            library = world_module.stage_variation._safe_library(
+                base_policy=context.effective_policy,
+                template=template,
+                fixture=fixture,
+                split=split,
+            )
+            values = tuple(library["attributes"])
+            for shift in range(3):
+                mapping = {value: value for value in values}
+                orbit = pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[0]
+                mapping.update(
+                    {
+                        value: orbit[(index + shift) % len(orbit)]
+                        for index, value in enumerate(orbit)
+                    }
+                )
+                pure_renderer_v8._validate_attribute_map(mapping, library=library)
+
+            products = [
+                product
+                for category in library["categories"]
+                for product in library["category_products"][category]
+            ]
+            for traditional in (False, True):
+                style = {
+                    "separator": "，",
+                    "ending": "。",
+                    "line_mode": "single",
+                    "english_tag": "",
+                    "traditional_variant": traditional,
+                    "repeat_punctuation": False,
+                }
+                reachable_attributes = []
+                rendered_by_attribute: dict[
+                    str, tuple[list[str], list[str]]
+                ] = {}
+                for attribute in pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[0]:
+                    reachable = (
+                        attribute.translate(translation)
+                        if traditional
+                        else attribute
+                    )
+                    reachable_attributes.append(reachable)
+                    title_outputs: list[str] = []
+                    description_outputs: list[str] = []
+                    for product in products:
+                        for skeleton in library["title_skeletons"]:
+                            rendered = pure_renderer_v8._render_base_title(
+                                skeleton=skeleton,
+                                product=product,
+                                attribute=attribute,
+                                code="QABCDEFGHIJ",
+                                style=style,
+                                library=library,
+                            )
+                            title_outputs.append(rendered)
+                            if "{attribute}" in skeleton:
+                                self.assertIn(reachable, rendered)
+                        for skeleton in library["description_skeletons"]:
+                            rendered = pure_renderer_v8._render_base_description(
+                                skeleton=skeleton,
+                                product=product,
+                                attribute=attribute,
+                                code="QABCDEFGHIJ",
+                                delivery=library["delivery"][0],
+                                service=library["service"][0],
+                                style=style,
+                                library=library,
+                            )
+                            description_outputs.append(rendered)
+                            if "{attribute}" in skeleton:
+                                self.assertIn(reachable, rendered)
+                    rendered_by_attribute[attribute] = (
+                        title_outputs,
+                        description_outputs,
+                    )
+                self.assertEqual(len(set(reachable_attributes)), 3)
+                baseline_titles, baseline_descriptions = rendered_by_attribute[
+                    pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[0][0]
+                ]
+                for title_outputs, description_outputs in rendered_by_attribute.values():
+                    offset = 0
+                    for _product in products:
+                        for skeleton in library["title_skeletons"]:
+                            if "{attribute}" not in skeleton:
+                                self.assertEqual(
+                                    title_outputs[offset], baseline_titles[offset]
+                                )
+                            offset += 1
+                    offset = 0
+                    for _product in products:
+                        for skeleton in library["description_skeletons"]:
+                            if "{attribute}" not in skeleton:
+                                self.assertEqual(
+                                    description_outputs[offset],
+                                    baseline_descriptions[offset],
+                                )
+                            offset += 1
+
+    def test_attribute_repair_source_has_no_exposed_failure_special_case(self) -> None:
+        source = inspect.getsource(pure_renderer_v8)
+        for forbidden in (
+            "d926e73bee174bc26ddbe2f563b2c679c2908fdf60b685916d1b71e59dd74a01",
+            "ec9ba637bdb97d31083a89df00ea1f8004b97ae299a10ac75b51deffd5869943",
+            "文件整理工具",
+            "ordinal == 159",
+            "candidate_index == 5",
+        ):
+            self.assertNotIn(forbidden, source)
+        self.assertEqual(
+            tuple(inspect.signature(pure_renderer_v8._attribute_rotation_map).parameters),
+            ("candidate_key", "library"),
         )
 
 
@@ -1143,66 +1342,261 @@ class ScientificSequentialCollisionRegressionTests(unittest.TestCase):
             current_identity_hashes=current_identities,
         )
 
-    def test_train_worlds_zero_through_29_close_with_real_cumulative_registries(
-        self,
+    def _replay_old_two_state_prefix_and_target(
+        self, records: list[dict]
     ) -> None:
+        old_orbits = (
+            ("标准版", "组合版"),
+            ("轻量版", "更新版"),
+            ("多规格",),
+            ("可选配色",),
+            ("分批交付",),
+            ("附使用说明",),
+            ("支持自选参数",),
+            ("含基础售后",),
+        )
         current_items: set[str] = set()
         current_sellers: set[str] = set()
         current_identities: set[str] = set()
-        accepted = []
-        records = sorted(
-            (
-                row
-                for row in self.context.world_records
-                if row["split"] == "train" and row["split_ordinal"] <= 29
-            ),
-            key=lambda row: row["split_ordinal"],
-        )
-        self.assertEqual([row["split_ordinal"] for row in records], list(range(30)))
-        for record in records:
-            accepted.append(
-                self._build_world(
+        accepted_indices: list[int] = []
+        with mock.patch.object(
+            pure_renderer_v8, "ATTRIBUTE_SEMANTIC_ORBITS", old_orbits
+        ):
+            for record in records[:-1]:
+                accepted = self._build_world(
                     record,
                     current_items=current_items,
                     current_sellers=current_sellers,
                     current_identities=current_identities,
                 )
+                accepted_indices.append(accepted.candidate_index)
+
+            self.assertEqual(
+                {
+                    index: accepted_indices.count(index)
+                    for index in set(accepted_indices)
+                },
+                {0: 144, 1: 6, 2: 5, 3: 2, 4: 1, 7: 1},
+            )
+            self.assertEqual(
+                (len(current_items), len(current_sellers), len(current_identities)),
+                (16034, 4452, 13356),
+            )
+            self.assertEqual(
+                common.canonical_sha256(sorted(current_items)),
+                "c3a3ffe3187837c3984205d8c2a4d2e67820d43b598efb9a2db16de80c2f2162",
+            )
+            self.assertEqual(
+                common.canonical_sha256(sorted(current_sellers)),
+                "4d7c6daac239a6b28813f58ac142cae4ca974033af98db0c9fc717c6d72f549c",
+            )
+            self.assertEqual(
+                common.canonical_sha256(sorted(current_identities)),
+                "ddfecefdf1157678a5b4136ec04944ba8faba14c8a840c730d08c4b3983484af",
             )
 
-        target = accepted[-1]
-        self.assertEqual(target.split_ordinal, 29)
-        self.assertEqual(target.candidate_index, 2)
-        self.assertEqual(target.candidates_examined, 3)
+            collision_categories: list[tuple[str, ...]] = []
+            historical_hits: list[frozenset[str]] = []
+            target_standard_mappings: list[str] = []
+            natural_outputs: list[str] = []
+            original_categories = world_module._collision_categories
+            original_attribute_map = pure_renderer_v8._attribute_rotation_map
+            original_assemble = world_module._assemble_candidate
+
+            def capture_categories(**kwargs: object) -> tuple[str, ...]:
+                categories = original_categories(**kwargs)
+                collision_categories.append(categories)
+                historical_hits.append(
+                    frozenset(
+                        set(kwargs["item_hashes"])
+                        & set(kwargs["historical_item_hashes"])
+                    )
+                )
+                return categories
+
+            def capture_attribute_map(**kwargs: object) -> dict[str, str]:
+                mapping = original_attribute_map(**kwargs)
+                target_standard_mappings.append(mapping["标准版"])
+                return mapping
+
+            def capture_assemble(**kwargs: object) -> world_module.CandidateObservation:
+                observation = original_assemble(**kwargs)
+                natural_outputs.append(observation.natural_output_sha256)
+                return observation
+
+            with (
+                mock.patch.object(
+                    world_module,
+                    "_collision_categories",
+                    side_effect=capture_categories,
+                ),
+                mock.patch.object(
+                    pure_renderer_v8,
+                    "_attribute_rotation_map",
+                    side_effect=capture_attribute_map,
+                ),
+                mock.patch.object(
+                    world_module,
+                    "_assemble_candidate",
+                    side_effect=capture_assemble,
+                ),
+            ):
+                with self.assertRaisesRegex(
+                    world_module.ScientificWorldError,
+                    "All 32 exact-document candidates collided",
+                ):
+                    self._build_world(
+                        records[-1],
+                        current_items=current_items,
+                        current_sellers=current_sellers,
+                        current_identities=current_identities,
+                    )
+
+        self.assertEqual(
+            collision_categories,
+            [("historical_item_document",)] * 32,
+        )
+        historical_union = set().union(*historical_hits)
+        historical_intersection = set.intersection(
+            *(set(values) for values in historical_hits)
+        )
+        self.assertEqual(len(historical_union), 2)
+        self.assertEqual(historical_intersection, set())
+        self.assertEqual(
+            common.canonical_sha256(sorted(historical_union)),
+            "ec9ba637bdb97d31083a89df00ea1f8004b97ae299a10ac75b51deffd5869943",
+        )
+        self.assertEqual(set(target_standard_mappings), {"标准版", "组合版"})
+        self.assertEqual(len(set(natural_outputs)), 29)
+        self.assertEqual(
+            (len(current_items), len(current_sellers), len(current_identities)),
+            (16034, 4452, 13356),
+        )
+
+    def test_train_worlds_zero_through_159_close_with_real_cumulative_registries(
+        self,
+    ) -> None:
+        current_items: set[str] = set()
+        current_sellers: set[str] = set()
+        current_identities: set[str] = set()
+        records = sorted(
+            (
+                row
+                for row in self.context.world_records
+                if row["split"] == "train" and row["split_ordinal"] <= 159
+            ),
+            key=lambda row: row["split_ordinal"],
+        )
+        self.assertEqual([row["split_ordinal"] for row in records], list(range(160)))
+        self._replay_old_two_state_prefix_and_target(records)
+        accepted = [
+            self._build_world(
+                record,
+                current_items=current_items,
+                current_sellers=current_sellers,
+                current_identities=current_identities,
+            )
+            for record in records[:-1]
+        ]
+        self.assertEqual(len(current_items), 16034)
+        self.assertEqual(len(current_sellers), 4452)
+        self.assertEqual(len(current_identities), 13356)
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_items)),
+            "c4d7fd0ec524824144f3e1e99cb5120bbb10bab50673e1d322379787f6e704ab",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_sellers)),
+            "ebe213a24c5fbf4b18261eb3e99d1278dda4b82a9afa611d571e938a12f3ebc5",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_identities)),
+            "ddfecefdf1157678a5b4136ec04944ba8faba14c8a840c730d08c4b3983484af",
+        )
+
+        candidate_categories: list[tuple[str, ...]] = []
+        target_standard_mappings: list[str] = []
+        original_categories = world_module._collision_categories
+        original_attribute_map = pure_renderer_v8._attribute_rotation_map
+
+        def capture_categories(**kwargs: object) -> tuple[str, ...]:
+            categories = original_categories(**kwargs)
+            candidate_categories.append(categories)
+            return categories
+
+        def capture_attribute_map(**kwargs: object) -> dict[str, str]:
+            mapping = original_attribute_map(**kwargs)
+            target_standard_mappings.append(mapping["标准版"])
+            return mapping
+
+        with (
+            mock.patch.object(
+                world_module,
+                "_collision_categories",
+                side_effect=capture_categories,
+            ),
+            mock.patch.object(
+                pure_renderer_v8,
+                "_attribute_rotation_map",
+                side_effect=capture_attribute_map,
+            ),
+        ):
+            target = self._build_world(
+                records[-1],
+                current_items=current_items,
+                current_sellers=current_sellers,
+                current_identities=current_identities,
+            )
+        accepted.append(target)
+
+        self.assertEqual(target.split_ordinal, 159)
+        self.assertEqual(target.candidate_index, 5)
+        self.assertEqual(target.candidates_examined, 6)
         self.assertEqual(
             target.rejection_counts,
             {
                 "same_world_item_document": 0,
                 "same_world_seller_document": 0,
-                "historical_item_document": 2,
+                "historical_item_document": 5,
                 "historical_seller_document": 0,
-                "current_dataset_item_document": 0,
+                "current_dataset_item_document": 2,
                 "current_dataset_seller_document": 0,
             },
         )
         self.assertEqual(
+            candidate_categories,
+            [
+                ("historical_item_document",),
+                ("historical_item_document", "current_dataset_item_document"),
+                ("historical_item_document", "current_dataset_item_document"),
+                ("historical_item_document",),
+                ("historical_item_document",),
+                (),
+            ],
+        )
+        self.assertEqual(
+            target_standard_mappings,
+            ["标准版", "组合版", "组合版", "组合版", "多规格", "多规格"],
+        )
+        self.assertEqual(
             {index: sum(row.candidate_index == index for row in accepted)
              for index in {row.candidate_index for row in accepted}},
-            {0: 27, 1: 2, 2: 1},
+            {0: 147, 1: 6, 2: 4, 3: 1, 5: 1, 7: 1},
         )
-        self.assertEqual(len(current_items), 2913)
-        self.assertEqual(len(current_sellers), 840)
-        self.assertEqual(len(current_identities), 2520)
+        self.assertEqual(len(current_items), 16138)
+        self.assertEqual(len(current_sellers), 4480)
+        self.assertEqual(len(current_identities), 13440)
         self.assertEqual(
             common.canonical_sha256(sorted(current_items)),
-            "fd489cad9dbdcdb88e0c577692f3a92f9ac60f542cfea56069f8eebf0f6a8ba7",
+            "ba90909a83566e1b31d5d49fcd8df28e881d2b2686f1a8b9861cb7486fdb3af2",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_sellers)),
-            "977ca04d8a7c0dbf5ce63a6a6ac6d2bc001ad27c5ebba096228ea2c2ae09c369",
+            "e4a6a0818162c9fa6f83343a34a07043098fdba9af24e90894b9d669744c285d",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_identities)),
-            "d6836c92f3be3b6cd99bdc039bdef102378afb778365a25096878b287f0902c1",
+            "e00b11e464e4638401353cc2a9e8bd240f1ebca75d21df38fe5d05f47424428a",
         )
 
     def test_world_29_old_singleton_attribute_domain_reproduces_known_collision(

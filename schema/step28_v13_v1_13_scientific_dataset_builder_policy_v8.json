@@ -22,6 +22,11 @@
     "size_bytes": 5673,
     "sha256": "69f11fa653e61861ce66ed52527a725b2438f9a2c9729be91eef0fb944374079"
   },
+  "v8_third_build_execution_failure_record": {
+    "path": "docs/STEP28_V13_V1_13_V8_THIRD_BUILD_EXECUTION_FAILURE_20260813.zh.md",
+    "size_bytes": 6218,
+    "sha256": "9ff5ed645248ba5e9b9d1545791afdf59603c464e9c3e1154a39bcd7d4ff46dc"
+  },
   "base_dataset_policy": {
     "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
     "size_bytes": 193942,
@@ -35,13 +40,13 @@
   "implementation": {
     "scientific_common": {
       "path": "scripts/step28_v13_v1_13_scientific_common_v8.py",
-      "size_bytes": 22591,
-      "sha256": "2dddb7833d9ed2a69d680bfa9f8e8dc07927c99936babddf1aa126821dbb2464"
+      "size_bytes": 23016,
+      "sha256": "5f8a130595b00e92cbf677a16bafcd0b9e04a9420e0a8af03fb1c0afa8c9014c"
     },
     "pure_natural_renderer": {
       "path": "scripts/step28_v13_v1_13_pure_natural_renderer_v8.py",
-      "size_bytes": 36899,
-      "sha256": "f648f70ada3d9bc65c97c5ed941124b0c223d39c6e9d0de34837f613952eaad3"
+      "size_bytes": 36973,
+      "sha256": "900c2183b1bf5a3bde675276ba406a48644e6c7582e572497c13b441279f4d09"
     },
     "scientific_world": {
       "path": "scripts/step28_v13_v1_13_scientific_world_v8.py",
@@ -177,11 +182,13 @@
     "attribute_variation_repair": {
       "authority": "existing_derived_candidate_key_only",
       "domain": "step28-v13-v1.13-v8.attribute.semantic-orbit.keyed-rotation-v2",
-      "mapping": "frozen_semantic_orbit_keyed_cyclic_rotation",
+      "mapping": "frozen_content_slot_keyed_cyclic_rotation",
+      "semantic_slot_id": "product_version_or_specification_attribute",
+      "strict_synonymy_required": false,
+      "candidate_semantics": "admissible_alternative_realizations_within_one_content_slot",
       "semantic_orbits": [
-        ["标准版", "组合版"],
+        ["标准版", "组合版", "多规格"],
         ["轻量版", "更新版"],
-        ["多规格"],
         ["可选配色"],
         ["分批交付"],
         ["附使用说明"],
@@ -256,5 +263,5 @@
       "audit_b": null
     }
   },
-  "canonical_self_hash": "225b589f896bb3d7497cb583290901a0bdac52d9825c156dd79f4131d2d03af6"
+  "canonical_self_hash": "dd7a5b0ebe3790b42b88b3d459af725cb14e217699eaa3c0ef5d5dd87b49d1e4"
 }
