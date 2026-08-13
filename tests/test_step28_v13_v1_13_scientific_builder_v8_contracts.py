@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import hashlib
 import json
 import sys
 import tempfile
@@ -226,6 +227,26 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
                 for name in ("attribute", "delivery", "service", "noise_value"):
                     for source, target in maps[name].items():
                         self.assertEqual(response(source), response(target))
+                self.assertEqual(
+                    tuple(
+                        tuple(orbit)
+                        for orbit in policy["candidate_selection"][
+                            "attribute_variation_repair"
+                        ]["semantic_orbits"]
+                    ),
+                    pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS,
+                )
+                pure_renderer_v8._validate_attribute_map(
+                    maps["attribute"], library=library
+                )
+                self.assertIn(
+                    maps["attribute"]["标准版"],
+                    {"标准版", "组合版"},
+                )
+                self.assertNotEqual(
+                    maps["attribute"]["标准版"],
+                    maps["attribute"]["组合版"],
+                )
                 for name, values_field in (
                     ("title_skeleton", "title_skeletons"),
                     ("description_skeleton", "description_skeletons"),
@@ -267,6 +288,109 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
                                 for category in categories
                             ),
                         )
+
+    def test_attribute_repair_does_not_perturb_existing_map_domains(self) -> None:
+        expected = {
+            "train": "d8f40430a275265429a5ba111b7146846b6f234deedb55b7b355d7c40bf75869",
+            "development": "ae4bf4e6078cf8fd3a099f87742fbe57f625133c9035d649bfbbaecc49a9d378",
+            "audit_a": "1422d84397aaa51f8051ce8f8a4d200086f174e2684d7408afab57b01b75ab47",
+            "audit_b": "caf20426797d42d42bfb1e0781ed4c490528103afdc24ab68138f9364c8051ad",
+        }
+        policy = scientific.load_policy()
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        for split in scientific.SPLITS:
+            library = world_module.stage_variation._safe_library(
+                base_policy=context.effective_policy,
+                template=template,
+                fixture=fixture,
+                split=split,
+            )
+            maps = pure_renderer_v8._build_v8_permutation_maps(
+                candidate_key=b"\x19" * 32,
+                library=library,
+            )
+            maps.pop("attribute")
+            serializable = {
+                name: (
+                    {
+                        str(size): {
+                            str(source): target
+                            for source, target in mapping.items()
+                        }
+                        for size, mapping in value.items()
+                    }
+                    if name == "product_index"
+                    else {str(source): target for source, target in value.items()}
+                )
+                for name, value in maps.items()
+            }
+            self.assertEqual(common.canonical_sha256(serializable), expected[split])
+
+    def test_attribute_map_rejects_cross_semantic_orbit(self) -> None:
+        policy = scientific.load_policy()
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        library = world_module.stage_variation._safe_library(
+            base_policy=context.effective_policy,
+            template=template,
+            fixture=fixture,
+            split="train",
+        )
+        mapping = {value: value for value in library["attributes"]}
+        mapping["标准版"] = "轻量版"
+        mapping["轻量版"] = "标准版"
+        with self.assertRaisesRegex(
+            pure_renderer_v8.PureNaturalVariationError,
+            "semantic orbit",
+        ):
+            pure_renderer_v8._validate_attribute_map(mapping, library=library)
+
+    def test_attribute_rotation_is_deterministic_and_registry_blind(self) -> None:
+        policy = scientific.load_policy()
+        spec = policy["candidate_selection"]["attribute_variation_repair"]
+        self.assertEqual(spec["shared_sequential_rng_reads"], 0)
+        self.assertFalse(spec["historical_or_current_registry_reads"])
+        self.assertFalse(spec["labels_or_model_scores_read"])
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        library = world_module.stage_variation._safe_library(
+            base_policy=context.effective_policy,
+            template=template,
+            fixture=fixture,
+            split="train",
+        )
+        key = hashlib.sha256(b"fixed-attribute-test-key").digest()
+        first = pure_renderer_v8._attribute_rotation_map(
+            candidate_key=key, library=library
+        )
+        second = pure_renderer_v8._attribute_rotation_map(
+            candidate_key=key, library=copy.deepcopy(library)
+        )
+        self.assertEqual(first, second)
+        mappings = [
+            pure_renderer_v8._attribute_rotation_map(
+                candidate_key=hashlib.sha256(
+                    f"fixed-attribute-test-key-{index}".encode("ascii")
+                ).digest(),
+                library=library,
+            )
+            for index in range(32)
+        ]
+        self.assertEqual(
+            {mapping["标准版"] for mapping in mappings},
+            {"标准版", "组合版"},
+        )
+        self.assertEqual(
+            {mapping["轻量版"] for mapping in mappings},
+            {"轻量版", "更新版"},
+        )
 
 
 class ScientificWorldTests(unittest.TestCase):
@@ -973,6 +1097,160 @@ class ScientificExactTitleEndpointTests(unittest.TestCase):
                 structure_key_hex=structure_key,
                 world=world,
             )
+
+
+class ScientificSequentialCollisionRegressionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.policy = scientific.load_policy()
+        cls.context = scientific.build_execution_context(
+            cls.policy, execution_mode="design_preflight"
+        )
+        cls.template, cls.fixture, cls.style_profile = scientific.load_release_inputs(
+            cls.context
+        )
+        cls.historical = (
+            dataset_builder.collision.load_historical_exclusion_registries()
+        )
+
+    def _build_world(
+        self,
+        record: dict,
+        *,
+        current_items: set[str],
+        current_sellers: set[str],
+        current_identities: set[str],
+    ) -> world_module.AcceptedScientificWorld:
+        return world_module.build_scientific_world(
+            policy=self.context.effective_policy,
+            template=self.template,
+            fixture=self.fixture,
+            style_profile=self.style_profile,
+            mode=self.context.base_mode,
+            world_record=record,
+            structure_key_hex=common.structure_key_for_split(
+                self.context.effective_policy,
+                mode=self.context.base_mode,
+                split="train",
+            ),
+            document_variation_key=self.context.document_variation_key,
+            anonymous_handle_key=self.context.anonymous_handle_key,
+            historical_item_hashes=self.historical.item_document_hashes,
+            historical_seller_hashes=self.historical.seller_document_hashes,
+            historical_identity_hashes=self.historical.identity_value_hashes,
+            current_item_hashes=current_items,
+            current_seller_hashes=current_sellers,
+            current_identity_hashes=current_identities,
+        )
+
+    def test_train_worlds_zero_through_29_close_with_real_cumulative_registries(
+        self,
+    ) -> None:
+        current_items: set[str] = set()
+        current_sellers: set[str] = set()
+        current_identities: set[str] = set()
+        accepted = []
+        records = sorted(
+            (
+                row
+                for row in self.context.world_records
+                if row["split"] == "train" and row["split_ordinal"] <= 29
+            ),
+            key=lambda row: row["split_ordinal"],
+        )
+        self.assertEqual([row["split_ordinal"] for row in records], list(range(30)))
+        for record in records:
+            accepted.append(
+                self._build_world(
+                    record,
+                    current_items=current_items,
+                    current_sellers=current_sellers,
+                    current_identities=current_identities,
+                )
+            )
+
+        target = accepted[-1]
+        self.assertEqual(target.split_ordinal, 29)
+        self.assertEqual(target.candidate_index, 2)
+        self.assertEqual(target.candidates_examined, 3)
+        self.assertEqual(
+            target.rejection_counts,
+            {
+                "same_world_item_document": 0,
+                "same_world_seller_document": 0,
+                "historical_item_document": 2,
+                "historical_seller_document": 0,
+                "current_dataset_item_document": 0,
+                "current_dataset_seller_document": 0,
+            },
+        )
+        self.assertEqual(
+            {index: sum(row.candidate_index == index for row in accepted)
+             for index in {row.candidate_index for row in accepted}},
+            {0: 27, 1: 2, 2: 1},
+        )
+        self.assertEqual(len(current_items), 2913)
+        self.assertEqual(len(current_sellers), 840)
+        self.assertEqual(len(current_identities), 2520)
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_items)),
+            "fd489cad9dbdcdb88e0c577692f3a92f9ac60f542cfea56069f8eebf0f6a8ba7",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_sellers)),
+            "977ca04d8a7c0dbf5ce63a6a6ac6d2bc001ad27c5ebba096228ea2c2ae09c369",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(current_identities)),
+            "d6836c92f3be3b6cd99bdc039bdef102378afb778365a25096878b287f0902c1",
+        )
+
+    def test_world_29_old_singleton_attribute_domain_reproduces_known_collision(
+        self,
+    ) -> None:
+        target = next(
+            row
+            for row in self.context.world_records
+            if row["split"] == "train" and row["split_ordinal"] == 29
+        )
+        observed_item_hashes: list[tuple[str, ...]] = []
+
+        def identity_attributes(*, candidate_key: bytes, library: dict) -> dict:
+            del candidate_key
+            return {value: value for value in library["attributes"]}
+
+        def capture_first_candidate(**kwargs: object) -> tuple[str, ...]:
+            observed_item_hashes.append(tuple(kwargs["item_hashes"]))
+            return ()
+
+        with (
+            mock.patch.object(
+                pure_renderer_v8,
+                "_attribute_rotation_map",
+                side_effect=identity_attributes,
+            ),
+            mock.patch.object(
+                world_module,
+                "_collision_categories",
+                side_effect=capture_first_candidate,
+            ),
+        ):
+            accepted = self._build_world(
+                target,
+                current_items=set(),
+                current_sellers=set(),
+                current_identities=set(),
+            )
+        self.assertEqual(accepted.candidate_index, 0)
+        self.assertEqual(len(observed_item_hashes), 1)
+        self.assertIn(
+            "1b27758b380e57e90baf967db68a319540ea7909581d96aab7b4c4953ac03082",
+            observed_item_hashes[0],
+        )
+        self.assertIn(
+            "1b27758b380e57e90baf967db68a319540ea7909581d96aab7b4c4953ac03082",
+            self.historical.item_document_hashes,
+        )
 
 
 class ScientificDatasetEndToEndTests(unittest.TestCase):

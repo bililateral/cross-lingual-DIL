@@ -21,8 +21,23 @@ from typing import Any
 FIELD_SEPARATOR = b"\x1f"
 RNG_DOMAIN = "step28-v13-v1.13-natural-variation"
 VIEW_VERSION = "2026-08-10-step28-v13-v1-13-restricted-candidate-view-v1"
-OUTPUT_VERSION = "2026-08-12-step28-v13-v1-13-natural-candidate-v8"
+OUTPUT_VERSION = (
+    "2026-08-13-step28-v13-v1-13-natural-candidate-v8-attribute-repair-v2"
+)
 DESCRIPTION_SUFFIX = "{noise_clause}{context_guard}{identity_clause}"
+ATTRIBUTE_ROTATION_DOMAIN = (
+    "step28-v13-v1.13-v8.attribute.semantic-orbit.keyed-rotation-v2"
+)
+ATTRIBUTE_SEMANTIC_ORBITS = (
+    ("标准版", "组合版"),
+    ("轻量版", "更新版"),
+    ("多规格",),
+    ("可选配色",),
+    ("分批交付",),
+    ("附使用说明",),
+    ("支持自选参数",),
+    ("含基础售后",),
+)
 
 ITEM_VIEW_FIELDS = (
     "item_handle",
@@ -227,6 +242,16 @@ def validate_safe_library(library: Mapping[str, Any]) -> None:
             )
         ):
             raise PureNaturalVariationError(f"Safe whitelist is malformed: {name}")
+    attribute_values = [
+        value for orbit in ATTRIBUTE_SEMANTIC_ORBITS for value in orbit
+    ]
+    if (
+        len(attribute_values) != len(set(attribute_values))
+        or set(attribute_values) != set(library["attributes"])
+    ):
+        raise PureNaturalVariationError(
+            "Frozen attribute semantic orbits do not cover the safe library"
+        )
     if len(library["title_modifiers"]) != 16:
         raise PureNaturalVariationError("Title-modifier domain must contain 16 values")
     for category in categories:
@@ -501,6 +526,101 @@ def _traditional_response(value: str, table: Mapping[int, str]) -> bool:
     return value.translate(table) != value
 
 
+def _visible_shape(value: str) -> tuple[tuple[str, int], ...]:
+    output: list[tuple[str, int]] = []
+    for character in unicodedata.normalize("NFC", value):
+        if character.isspace():
+            kind = "space"
+        elif character.isdigit():
+            kind = "digit"
+        elif character.isalpha():
+            kind = "alpha"
+        else:
+            kind = "punctuation"
+        output.append((kind, ord(character) if kind in {"space", "punctuation"} else 0))
+    return tuple(output)
+
+
+def _validate_attribute_map(
+    mapping: Mapping[str, str], *, library: Mapping[str, Any]
+) -> None:
+    """Prove semantic, visible-shape, and cross-style equality closure."""
+
+    values = tuple(str(value) for value in library["attributes"])
+    if set(mapping) != set(values) or set(mapping.values()) != set(values):
+        raise PureNaturalVariationError("Attribute map is not a full bijection")
+    orbit_by_value = {
+        value: orbit_index
+        for orbit_index, orbit in enumerate(ATTRIBUTE_SEMANTIC_ORBITS)
+        for value in orbit
+    }
+    substitutions = str.maketrans(library["traditional_substitutions"])
+    visible = {
+        value: (
+            unicodedata.normalize("NFC", value),
+            unicodedata.normalize("NFC", value.translate(substitutions)),
+        )
+        for value in values
+    }
+    for source, target in mapping.items():
+        if orbit_by_value[source] != orbit_by_value[target]:
+            raise PureNaturalVariationError("Attribute crossed its frozen semantic orbit")
+        if tuple(_visible_shape(value) for value in visible[source]) != tuple(
+            _visible_shape(value) for value in visible[target]
+        ):
+            raise PureNaturalVariationError(
+                "Attribute changed its reachable visible structure"
+            )
+    states = tuple((value, style) for value in values for style in (0, 1))
+    for left_value, left_style in states:
+        for right_value, right_style in states:
+            before_equal = visible[left_value][left_style] == visible[right_value][right_style]
+            after_equal = (
+                visible[mapping[left_value]][left_style]
+                == visible[mapping[right_value]][right_style]
+            )
+            if before_equal != after_equal:
+                raise PureNaturalVariationError(
+                    "Attribute changed cross-style visible equality"
+                )
+
+
+def _attribute_rotation_map(
+    *, candidate_key: bytes, library: Mapping[str, Any]
+) -> dict[str, str]:
+    """Key each semantic-orbit rotation on a separate, registry-blind domain."""
+
+    output: dict[str, str] = {}
+    for orbit_index, orbit in enumerate(ATTRIBUTE_SEMANTIC_ORBITS):
+        values = tuple(orbit)
+        if len(values) == 1:
+            output[values[0]] = values[0]
+            continue
+        digest = hmac.new(
+            candidate_key,
+            FIELD_SEPARATOR.join(
+                (
+                    RNG_DOMAIN.encode("ascii"),
+                    ATTRIBUTE_ROTATION_DOMAIN.encode("ascii"),
+                    str(orbit_index).encode("ascii"),
+                )
+            ),
+            hashlib.sha256,
+        ).digest()
+        # Identity is deliberately one legal orbit state.  Excluding it would
+        # make every two-value orbit a constant swap for all candidate keys,
+        # eliminating the candidate-to-candidate variation this repair needs.
+        shift = int.from_bytes(digest[:8], "big") % len(values)
+        output.update(
+            {
+                source: values[(source_index + shift) % len(values)]
+                for source_index, source in enumerate(values)
+            }
+        )
+    _validate_attribute_map(output, library=library)
+    return output
+
+
 def _refined_permutation_map(
     *,
     candidate_key: bytes,
@@ -634,7 +754,9 @@ def _build_v8_permutation_maps(
 
     return {
         "category": category_map,
-        "attribute": text_maps["attribute_permutation_classes"],
+        "attribute": _attribute_rotation_map(
+            candidate_key=candidate_key, library=library
+        ),
         "delivery": text_maps["delivery_permutation_classes"],
         "service": text_maps["service_permutation_classes"],
         "title_skeleton": index_maps["title_skeleton_permutation_classes"],

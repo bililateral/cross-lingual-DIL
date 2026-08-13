@@ -150,6 +150,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "scientific_contract",
         "quality_audit_v8_design_scale_amendment",
         "v8_build_execution_failure_record",
+        "v8_second_build_execution_failure_record",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -182,6 +183,10 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     _verify_pin(
         policy["v8_build_execution_failure_record"],
         label="v8 build execution failure record",
+    )
+    _verify_pin(
+        policy["v8_second_build_execution_failure_record"],
+        label="v8 second build execution failure record",
     )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
@@ -301,11 +306,35 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         output_roots.add(relative)
 
     selection = policy["candidate_selection"]
+    attribute_variation = selection.get("attribute_variation_repair")
     if (
         selection.get("candidate_limit") != 32
         or selection.get("identity_value_maximum_counter") != 128
         or selection.get("labels_or_model_scores_read") is not False
         or selection.get("shortcut_probe_results_read") is not False
+        or attribute_variation
+        != {
+            "authority": "existing_derived_candidate_key_only",
+            "domain": (
+                "step28-v13-v1.13-v8.attribute.semantic-orbit."
+                "keyed-rotation-v2"
+            ),
+            "mapping": "frozen_semantic_orbit_keyed_cyclic_rotation",
+            "semantic_orbits": [
+                ["标准版", "组合版"],
+                ["轻量版", "更新版"],
+                ["多规格"],
+                ["可选配色"],
+                ["分批交付"],
+                ["附使用说明"],
+                ["支持自选参数"],
+                ["含基础售后"],
+            ],
+            "full_cross_style_visible_equality_required": True,
+            "shared_sequential_rng_reads": 0,
+            "historical_or_current_registry_reads": False,
+            "labels_or_model_scores_read": False,
+        }
         or selection.get("advance_reason_allowlist")
         != [
             "same_world_item_document",
