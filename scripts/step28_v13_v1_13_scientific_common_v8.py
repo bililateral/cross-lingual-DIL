@@ -152,6 +152,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "v8_build_execution_failure_record",
         "v8_second_build_execution_failure_record",
         "v8_third_build_execution_failure_record",
+        "v8_fourth_build_execution_failure_record",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -193,6 +194,10 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         policy["v8_third_build_execution_failure_record"],
         label="v8 third build execution failure record",
     )
+    _verify_pin(
+        policy["v8_fourth_build_execution_failure_record"],
+        label="v8 fourth build execution failure record",
+    )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
     )
@@ -202,9 +207,11 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     implementation = policy["implementation"]
     if not isinstance(implementation, Mapping) or tuple(implementation) != (
         "scientific_common",
+        "candidate_text_templates",
         "pure_natural_renderer",
         "scientific_world",
         "dataset_builder",
+        "scientific_contract_tests",
     ):
         raise ScientificBuilderError("Scientific implementation universe drift")
     for role, spec in implementation.items():
@@ -332,13 +339,20 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
             ),
             "semantic_orbits": [
                 ["标准版", "组合版", "多规格"],
-                ["轻量版", "更新版"],
+                ["轻量版", "更新版", "通用版"],
                 ["可选配色"],
                 ["分批交付"],
                 ["附使用说明"],
                 ["支持自选参数"],
                 ["含基础售后"],
             ],
+            "candidate_only_extension": {
+                "values": ["通用版"],
+                "base_attribute_sampling_forbidden": True,
+                "restricted_candidate_view_only": True,
+                "existing_candidate_authority_only": True,
+                "baseline_projection_bytes_must_match_previous_v8": True,
+            },
             "full_cross_style_visible_equality_required": True,
             "shared_sequential_rng_reads": 0,
             "historical_or_current_registry_reads": False,

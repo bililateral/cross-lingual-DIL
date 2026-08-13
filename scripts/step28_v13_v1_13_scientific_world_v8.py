@@ -22,6 +22,7 @@ import step28_v13_common as common
 import step28_v13_history_features as history_features
 import step28_v13_identity_values as identity_values
 import step28_v13_production_chain as production
+import step28_v13_profiles as profiles_module
 import step28_v13_text_renderer as text_renderer
 import step28_v13_v1_13_candidate_parent as stage_parent
 import step28_v13_v1_13_document_collision as collision
@@ -36,6 +37,13 @@ EXACT_CLONE_ENDPOINT_DOMAIN = (
     b"step28-v13-v1.13-scientific-exact-clone-endpoint-v1"
 )
 CANDIDATE_LIMIT = 32
+CANDIDATE_ONLY_ATTRIBUTES = ("通用版",)
+CANDIDATE_TEMPLATE_RELATIVE_PATH = (
+    "schema/step28_v13_v1_13_candidate_text_templates_v8.json"
+)
+CANDIDATE_TEMPLATE_SHA256 = (
+    "ff97b59f0d66d7a9d18a3b1e7d7db684e6bdcc1a7ae60ba0e6b7294528c8766a"
+)
 COLLISION_CATEGORIES = (
     "same_world_item_document",
     "same_world_seller_document",
@@ -99,6 +107,32 @@ class AcceptedScientificWorld:
 
 def _canonical_clone(value: Any) -> Any:
     return json.loads(common.canonical_json_bytes(value).decode("utf-8"))
+
+
+def _candidate_safe_library(
+    *,
+    policy: Mapping[str, Any],
+    template: Mapping[str, Any],
+    fixture: Mapping[str, Any],
+    split: str,
+) -> dict[str, Any]:
+    """Build the old safe view, then add the sole candidate-only realization."""
+
+    output = stage_variation._safe_library(
+        base_policy=policy,
+        template=template,
+        fixture=fixture,
+        split=split,
+    )
+    if (
+        tuple(CANDIDATE_ONLY_ATTRIBUTES) != ("通用版",)
+        or "通用版" in output["attributes"]
+    ):
+        raise ScientificWorldError("Candidate-only attribute baseline drift")
+    output["attributes"].append("通用版")
+    output["attribute_permutation_classes"].append(["通用版"])
+    pure_renderer.validate_safe_library(output)
+    return output
 
 
 def _anonymous_handle(*, key: bytes, kind: str, value: str) -> str:
@@ -528,26 +562,64 @@ def _build_profiles_and_identity33(
     split: str,
     template: Mapping[str, Any],
     world: Mapping[str, Any],
+    candidate_only_attributes: Sequence[str] = (),
 ) -> tuple[
     tuple[dict[str, Any], ...],
     dict[str, Any],
     tuple[dict[str, Any], ...],
     tuple[dict[str, Any], ...],
 ]:
-    profiles, provenance, context = stage_parent._build_profiles_and_provenance(
-        base_policy=policy,
+    if tuple(candidate_only_attributes) == ():
+        processing_policy = policy
+        processing_template = template
+    elif tuple(candidate_only_attributes) == CANDIDATE_ONLY_ATTRIBUTES:
+        candidate_template_path = common.repo_path(CANDIDATE_TEMPLATE_RELATIVE_PATH)
+        if common.sha256_file(candidate_template_path) != CANDIDATE_TEMPLATE_SHA256:
+            raise ScientificWorldError("Candidate-only template hash drift")
+        processing_template = common.load_json(candidate_template_path)
+        without_extension = _canonical_clone(processing_template)
+        attributes = without_extension["generic_lexicon"]["attributes"]
+        if (
+            not isinstance(attributes, list)
+            or not attributes
+            or attributes.pop() != CANDIDATE_ONLY_ATTRIBUTES[0]
+            or common.canonical_json_bytes(without_extension)
+            != common.canonical_json_bytes(template)
+        ):
+            raise ScientificWorldError("Candidate-only template boundary drift")
+        processing_policy = _canonical_clone(policy)
+        processing_policy["template_library"]["path"] = (
+            CANDIDATE_TEMPLATE_RELATIVE_PATH
+        )
+        processing_policy["template_library"]["sha256"] = (
+            CANDIDATE_TEMPLATE_SHA256
+        )
+    else:
+        raise ScientificWorldError("Candidate-only production domain drift")
+    processed = production.process_world(
+        processing_policy,
         mode=mode,
         split=split,
+        template=processing_template,
         world=world,
-        template=template,
     )
-    profile_audit = context["audit"]
+    profiles, profile_audit = profiles_module.build_world_profiles(
+        policy,
+        mode=mode,
+        split=split,
+        sellers=world["public"]["sellers"],
+        items=processed["public"]["profile_safe_items"],
+    )
+    provenance = stage_parent.build_profile_contribution_provenance(
+        world_uid=str(world["public"]["world"]["world_uid"]),
+        profiles=profiles,
+        profile_safe_items=processed["public"]["profile_safe_items"],
+    )
     if (
         profile_audit.get("labels_or_private_structure_read") is not False
         or profile_audit.get("seller_count") != 28
     ):
         raise ScientificWorldError("Seller-profile label-free audit did not close")
-    processed = context["processed"]
     item_index = stage_parent._history_item_index(world)
     history_rows = processed["public"]["history_safe_occurrences"]
     parsed = processed["private"]["parsed_identity_occurrences"]
@@ -665,8 +737,8 @@ def _build_restricted_view(
         safe_items.append(row)
     safe_items.sort(key=lambda row: row["item_handle"].encode("utf-8"))
 
-    safe_library = stage_variation._safe_library(
-        base_policy=policy,
+    safe_library = _candidate_safe_library(
+        policy=policy,
         template=template,
         fixture=fixture,
         split=split,
@@ -984,6 +1056,7 @@ def _assemble_candidate(
         split=split,
         template=template,
         world=world,
+        candidate_only_attributes=CANDIDATE_ONLY_ATTRIBUTES,
     )
     provenance_sha = common.canonical_sha256(provenance)
     identity33_sha = common.canonical_sha256(identity33)

@@ -8,6 +8,7 @@ import json
 import sys
 import tempfile
 import unittest
+from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 from unittest import mock
@@ -24,6 +25,17 @@ import step28_v13_v1_13_scientific_dataset_builder_v8 as dataset_builder
 import step28_v13_v1_13_scientific_world_v8 as world_module
 import step28_v13_v1_13_pure_natural_renderer_v8 as pure_renderer_v8
 import step7_v3_1_source_data as step7_source
+
+
+def _v8_candidate_safe_library(
+    *, base_policy: dict, template: dict, fixture: dict, split: str
+) -> dict:
+    return world_module._candidate_safe_library(
+        policy=base_policy,
+        template=template,
+        fixture=fixture,
+        split=split,
+    )
 
 
 class ScientificBuilderPolicyTests(unittest.TestCase):
@@ -184,7 +196,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
 
         for split in scientific.SPLITS:
             with self.subTest(split=split):
-                library = world_module.stage_variation._safe_library(
+                library = _v8_candidate_safe_library(
                     base_policy=context.effective_policy,
                     template=template,
                     fixture=fixture,
@@ -303,7 +315,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
         )
         template, fixture, _style_profile = scientific.load_release_inputs(context)
         for split in scientific.SPLITS:
-            library = world_module.stage_variation._safe_library(
+            library = _v8_candidate_safe_library(
                 base_policy=context.effective_policy,
                 template=template,
                 fixture=fixture,
@@ -330,7 +342,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             }
             self.assertEqual(common.canonical_sha256(serializable), expected[split])
 
-    def test_three_state_repair_does_not_perturb_old_domains_for_target_keys(
+    def test_candidate_extension_does_not_perturb_other_domains_for_target_keys(
         self,
     ) -> None:
         policy = scientific.load_policy()
@@ -338,7 +350,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             policy, execution_mode="design_preflight"
         )
         template, fixture, _style_profile = scientific.load_release_inputs(context)
-        library = world_module.stage_variation._safe_library(
+        library = _v8_candidate_safe_library(
             base_policy=context.effective_policy,
             template=template,
             fixture=fixture,
@@ -350,9 +362,9 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             if row["split"] == "train" and row["split_ordinal"] == 159
         )
         old_orbits = (
-            ("标准版", "组合版"),
+            ("标准版", "组合版", "多规格"),
             ("轻量版", "更新版"),
-            ("多规格",),
+            ("通用版",),
             *pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[2:],
         )
         for candidate_index in range(32):
@@ -378,8 +390,9 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
                 {name: value for name, value in old.items() if name != "attribute"},
             )
             for attribute in (
-                "轻量版",
-                "更新版",
+                "标准版",
+                "组合版",
+                "多规格",
                 "可选配色",
                 "分批交付",
                 "附使用说明",
@@ -396,7 +409,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             policy, execution_mode="design_preflight"
         )
         template, fixture, _style_profile = scientific.load_release_inputs(context)
-        library = world_module.stage_variation._safe_library(
+        library = _v8_candidate_safe_library(
             base_policy=context.effective_policy,
             template=template,
             fixture=fixture,
@@ -421,7 +434,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             policy, execution_mode="design_preflight"
         )
         template, fixture, _style_profile = scientific.load_release_inputs(context)
-        library = world_module.stage_variation._safe_library(
+        library = _v8_candidate_safe_library(
             base_policy=context.effective_policy,
             template=template,
             fixture=fixture,
@@ -450,8 +463,85 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
         )
         self.assertEqual(
             {mapping["轻量版"] for mapping in mappings},
-            {"轻量版", "更新版"},
+            {"轻量版", "更新版", "通用版"},
         )
+
+    def test_candidate_only_attribute_never_enters_base_sampling_library(self) -> None:
+        policy = scientific.load_policy()
+        spec = policy["candidate_selection"]["attribute_variation_repair"]
+        self.assertEqual(
+            spec["candidate_only_extension"],
+            {
+                "values": ["通用版"],
+                "base_attribute_sampling_forbidden": True,
+                "restricted_candidate_view_only": True,
+                "existing_candidate_authority_only": True,
+                "baseline_projection_bytes_must_match_previous_v8": True,
+            },
+        )
+        context = scientific.build_execution_context(
+            policy, execution_mode="design_preflight"
+        )
+        template, fixture, _style_profile = scientific.load_release_inputs(context)
+        self.assertNotIn("通用版", template["generic_lexicon"]["attributes"])
+        candidate_template = common.load_json(
+            common.repo_path(
+                policy["implementation"]["candidate_text_templates"]["path"]
+            )
+        )
+        self.assertEqual(
+            policy["implementation"]["candidate_text_templates"]["path"],
+            world_module.CANDIDATE_TEMPLATE_RELATIVE_PATH,
+        )
+        self.assertEqual(
+            policy["implementation"]["candidate_text_templates"]["sha256"],
+            world_module.CANDIDATE_TEMPLATE_SHA256,
+        )
+        candidate_attributes = candidate_template["generic_lexicon"]["attributes"]
+        self.assertEqual(candidate_attributes[-1], "通用版")
+        self.assertEqual(candidate_attributes.count("通用版"), 1)
+        candidate_without_extension = copy.deepcopy(candidate_template)
+        candidate_without_extension["generic_lexicon"]["attributes"].pop()
+        self.assertEqual(
+            common.canonical_json_bytes(candidate_without_extension),
+            common.canonical_json_bytes(template),
+        )
+        for split in scientific.SPLITS:
+            base = world_module.stage_variation._safe_library(
+                base_policy=context.effective_policy,
+                template=template,
+                fixture=fixture,
+                split=split,
+            )
+            baseline_bytes = common.canonical_json_bytes(base)
+            extended = _v8_candidate_safe_library(
+                base_policy=context.effective_policy,
+                template=template,
+                fixture=fixture,
+                split=split,
+            )
+            self.assertEqual(common.canonical_json_bytes(base), baseline_bytes)
+            self.assertNotIn("通用版", base["attributes"])
+            self.assertEqual(extended["attributes"], [*base["attributes"], "通用版"])
+            self.assertEqual(
+                extended["attribute_permutation_classes"],
+                [*base["attribute_permutation_classes"], ["通用版"]],
+            )
+        with mock.patch.object(
+            world_module,
+            "CANDIDATE_ONLY_ATTRIBUTES",
+            ("更新版",),
+        ):
+            with self.assertRaisesRegex(
+                world_module.ScientificWorldError,
+                "baseline drift",
+            ):
+                _v8_candidate_safe_library(
+                    base_policy=context.effective_policy,
+                    template=template,
+                    fixture=fixture,
+                    split="train",
+                )
 
     def test_three_state_content_slot_all_directions_and_contexts_close(self) -> None:
         policy = scientific.load_policy()
@@ -477,7 +567,7 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             template["renderer_contract"]["traditional_substitutions"]
         )
         for split in scientific.SPLITS:
-            library = world_module.stage_variation._safe_library(
+            library = _v8_candidate_safe_library(
                 base_policy=context.effective_policy,
                 template=template,
                 fixture=fixture,
@@ -582,7 +672,9 @@ class ScientificBuilderPolicyTests(unittest.TestCase):
             "d926e73bee174bc26ddbe2f563b2c679c2908fdf60b685916d1b71e59dd74a01",
             "ec9ba637bdb97d31083a89df00ea1f8004b97ae299a10ac75b51deffd5869943",
             "文件整理工具",
+            "批量排版工具",
             "ordinal == 159",
+            "ordinal == 224",
             "candidate_index == 5",
         ):
             self.assertNotIn(forbidden, source)
@@ -668,6 +760,7 @@ class ScientificWorldTests(unittest.TestCase):
                 split=str(self.record["split"]),
                 template=self.template,
                 world=self.accepted.world,
+                candidate_only_attributes=world_module.CANDIDATE_ONLY_ATTRIBUTES,
             )
         )
         baseline_exact = common.canonical_sha256(provenance)
@@ -1349,6 +1442,7 @@ class ScientificSequentialCollisionRegressionTests(unittest.TestCase):
             ("标准版", "组合版"),
             ("轻量版", "更新版"),
             ("多规格",),
+            ("通用版",),
             ("可选配色",),
             ("分批交付",),
             ("附使用说明",),
@@ -1503,11 +1597,11 @@ class ScientificSequentialCollisionRegressionTests(unittest.TestCase):
         self.assertEqual(len(current_identities), 13356)
         self.assertEqual(
             common.canonical_sha256(sorted(current_items)),
-            "c4d7fd0ec524824144f3e1e99cb5120bbb10bab50673e1d322379787f6e704ab",
+            "25c8d0ed1ab9ae0dd5ac78d07d5108eafdeb0b6ce5188c653554002b4cb74044",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_sellers)),
-            "ebe213a24c5fbf4b18261eb3e99d1278dda4b82a9afa611d571e938a12f3ebc5",
+            "3e019f1c0e29adfb7137e27a3f2d927f8ad5c8d32b827e47727ff8040c3462c7",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_identities)),
@@ -1581,22 +1675,163 @@ class ScientificSequentialCollisionRegressionTests(unittest.TestCase):
         self.assertEqual(
             {index: sum(row.candidate_index == index for row in accepted)
              for index in {row.candidate_index for row in accepted}},
-            {0: 147, 1: 6, 2: 4, 3: 1, 5: 1, 7: 1},
+            {0: 152, 1: 5, 2: 1, 5: 1, 7: 1},
         )
         self.assertEqual(len(current_items), 16138)
         self.assertEqual(len(current_sellers), 4480)
         self.assertEqual(len(current_identities), 13440)
         self.assertEqual(
             common.canonical_sha256(sorted(current_items)),
-            "ba90909a83566e1b31d5d49fcd8df28e881d2b2686f1a8b9861cb7486fdb3af2",
+            "6224d561b4af9c746ba6a4bed5121b7aa6d628a6393809112a532dd4ef02435a",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_sellers)),
-            "e4a6a0818162c9fa6f83343a34a07043098fdba9af24e90894b9d669744c285d",
+            "a33c26a23a46436e1d0753b24ee1ba42c92319eba3c7ac488956552cbcd9afd7",
         )
         self.assertEqual(
             common.canonical_sha256(sorted(current_identities)),
             "e00b11e464e4638401353cc2a9e8bd240f1ebca75d21df38fe5d05f47424428a",
+        )
+
+    def test_train_worlds_zero_through_224_close_only_with_candidate_extension(
+        self,
+    ) -> None:
+        records = sorted(
+            (
+                row
+                for row in self.context.world_records
+                if row["split"] == "train" and row["split_ordinal"] <= 224
+            ),
+            key=lambda row: row["split_ordinal"],
+        )
+        self.assertEqual([row["split_ordinal"] for row in records], list(range(225)))
+
+        previous_orbits = (
+            ("标准版", "组合版", "多规格"),
+            ("轻量版", "更新版"),
+            ("通用版",),
+            *pure_renderer_v8.ATTRIBUTE_SEMANTIC_ORBITS[2:],
+        )
+        previous_items: set[str] = set()
+        previous_sellers: set[str] = set()
+        previous_identities: set[str] = set()
+        previous_structural: list[str] = []
+        previous_identity33: list[str] = []
+        previous_indices: list[int] = []
+        with mock.patch.object(
+            pure_renderer_v8, "ATTRIBUTE_SEMANTIC_ORBITS", previous_orbits
+        ):
+            for record in records[:-1]:
+                accepted = self._build_world(
+                    record,
+                    current_items=previous_items,
+                    current_sellers=previous_sellers,
+                    current_identities=previous_identities,
+                )
+                previous_indices.append(accepted.candidate_index)
+                previous_structural.append(accepted.structural_parent_sha256)
+                previous_identity33.append(accepted.identity33_sha256)
+            with self.assertRaisesRegex(
+                world_module.ScientificWorldError,
+                "All 32 exact-document candidates collided",
+            ):
+                self._build_world(
+                    records[-1],
+                    current_items=previous_items,
+                    current_sellers=previous_sellers,
+                    current_identities=previous_identities,
+                )
+
+        self.assertEqual(
+            dict(sorted(Counter(previous_indices).items())),
+            {0: 202, 1: 13, 2: 4, 3: 3, 5: 1, 7: 1},
+        )
+        self.assertEqual(
+            (len(previous_items), len(previous_sellers), len(previous_identities)),
+            (22534, 6272, 18816),
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(previous_items)),
+            "cc4497b79883a0a9bb6a75d4f30b4a61f235d66ed2682073f20b9323b1ff4856",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(previous_sellers)),
+            "7d63c810ce028554a23e146175af2393a908b84632f6fe866457d955515fbff6",
+        )
+        self.assertEqual(
+            common.canonical_sha256(sorted(previous_identities)),
+            "80ebb15d2b9730b3f71c5bcf8f26b90630dfd607a0ab11eed5824b4d22bc69f9",
+        )
+        self.assertEqual(
+            common.canonical_sha256(previous_structural),
+            "50637a80196d123ca330154ae4e4bd73f20e5f2fe1a13bd241478c875d5a2cef",
+        )
+        self.assertEqual(
+            common.canonical_sha256(previous_identity33),
+            "984a3f54b00e46c40e96e77a32c23a3c4718fcfed93261643156448f6a113167",
+        )
+
+        current_items: set[str] = set()
+        current_sellers: set[str] = set()
+        current_identities: set[str] = set()
+        current_structural: list[str] = []
+        current_identity33: list[str] = []
+        current_indices: list[int] = []
+        accepted_worlds = []
+        for record in records:
+            accepted = self._build_world(
+                record,
+                current_items=current_items,
+                current_sellers=current_sellers,
+                current_identities=current_identities,
+            )
+            accepted_worlds.append(accepted)
+            current_indices.append(accepted.candidate_index)
+            current_structural.append(accepted.structural_parent_sha256)
+            current_identity33.append(accepted.identity33_sha256)
+
+        target = accepted_worlds[-1]
+        self.assertEqual(target.candidate_index, 0)
+        self.assertEqual(target.candidates_examined, 1)
+        self.assertEqual(sum(target.rejection_counts.values()), 0)
+        self.assertEqual(
+            sum(
+                "通用版" in (str(row["title"]) + str(row["description"]))
+                for row in target.redacted_items
+            ),
+            8,
+        )
+        self.assertEqual(
+            sum(
+                row["attribute"] == "通用版"
+                for row in target.world["private"]["render_asts"]
+            ),
+            8,
+        )
+        self.assertEqual(
+            target.natural_output_sha256,
+            "f9f5b412d0e734637710fe0bbe884082c15ce51017b2a4ece1bfdc80047dfbb9",
+        )
+        self.assertEqual(
+            dict(sorted(Counter(current_indices).items())),
+            {0: 208, 1: 12, 2: 1, 3: 2, 5: 1, 7: 1},
+        )
+        self.assertEqual(
+            current_structural[:-1],
+            previous_structural,
+        )
+        self.assertEqual(current_identity33[:-1], previous_identity33)
+        self.assertEqual(
+            common.canonical_sha256(current_structural),
+            "4e15356e34231ba8f50fbd5f7de8888c778b8ed1ce99453add5e24fd9dc9e3e8",
+        )
+        self.assertEqual(
+            common.canonical_sha256(current_identity33),
+            "badcd5cba7096014d317c08a75e4e24f15d7ab4666222ba7d205bd7da97f5ecc",
+        )
+        self.assertEqual(
+            (len(current_items), len(current_sellers), len(current_identities)),
+            (22650, 6300, 18900),
         )
 
     def test_world_29_old_singleton_attribute_domain_reproduces_known_collision(
