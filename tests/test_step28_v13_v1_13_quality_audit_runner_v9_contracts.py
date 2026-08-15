@@ -97,6 +97,58 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
         ):
             runner._root_pin_from_policy(policy)
 
+    def test_builder_policy_binding_precedes_label_free_split_loading(self) -> None:
+        builder_policy = runner.scientific.load_policy()
+        policy_path = runner.scientific.DEFAULT_POLICY_PATH.resolve()
+        root_manifest = {
+            "execution_mode": "design_preflight",
+            "scientific_use_forbidden": True,
+            "formal_rows_created": 0,
+            "training_started": False,
+            "builder_policy_canonical_self_hash": builder_policy[
+                "canonical_self_hash"
+            ],
+            "builder_policy_file": {
+                "path": policy_path.relative_to(ROOT).as_posix(),
+                "size_bytes": policy_path.stat().st_size,
+                "sha256": runner._sha256_file(policy_path),
+            },
+        }
+        self.assertEqual(
+            runner._validate_builder_policy_binding(root_manifest),
+            builder_policy,
+        )
+        mutated = copy.deepcopy(root_manifest)
+        mutated["builder_policy_file"]["sha256"] = "0" * 64
+        root_pin = runner.truth_capability.RootManifestPin(
+            path="root_manifest.json",
+            size_bytes=1,
+            sha256="1" * 64,
+            canonical_self_hash="2" * 64,
+        )
+        with (
+            patch.object(
+                runner,
+                "_root_pin_from_policy",
+                return_value=(ROOT / "unused-design-root", root_pin),
+            ),
+            patch.object(
+                runner,
+                "_load_root_manifests",
+                return_value=(mutated, {}),
+            ),
+            patch.object(runner, "_load_split_label_free") as load_split,
+        ):
+            state = {"stage": "authorized_entry"}
+            with self.assertRaisesRegex(
+                runner.DatasetGateFailure, "builder policy binding"
+            ):
+                runner._run_authorized_formal_quality_audit(
+                    policy={}, state=state
+                )
+        load_split.assert_not_called()
+        self.assertEqual(state["stage"], "builder_policy_binding")
+
     def test_public_uid_registries_close_per_split_and_globally(self) -> None:
         loaded: dict[str, dict[str, object]] = {}
         manifests: dict[str, dict[str, object]] = {}

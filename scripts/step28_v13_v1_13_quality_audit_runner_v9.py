@@ -323,6 +323,33 @@ def _load_root_manifests(
     return root_manifest, manifests
 
 
+def _validate_builder_policy_binding(
+    root_manifest: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Bind the persisted design root to the exact current builder policy."""
+
+    try:
+        builder_policy = scientific.load_policy()
+        policy_path = scientific.DEFAULT_POLICY_PATH.resolve()
+        relative_path = policy_path.relative_to(ROOT.resolve()).as_posix()
+        policy_file = {
+            "path": relative_path,
+            "size_bytes": policy_path.stat().st_size,
+            "sha256": _sha256_file(policy_path),
+        }
+    except (OSError, ValueError) as exc:
+        raise AuditorExecutionFailure(
+            "Current builder policy cannot be verified"
+        ) from exc
+    if (
+        root_manifest.get("builder_policy_canonical_self_hash")
+        != builder_policy["canonical_self_hash"]
+        or root_manifest.get("builder_policy_file") != policy_file
+    ):
+        raise DatasetGateFailure("Design root/builder policy binding drift")
+    return builder_policy
+
+
 def _registry_sha256(values: set[str]) -> str:
     return hashlib.sha256(
         _canonical_json_bytes(sorted(values, key=lambda value: value.encode("utf-8")))
@@ -806,6 +833,8 @@ def _run_authorized_formal_quality_audit(
         or root_manifest.get("training_started") is not False
     ):
         raise QualityAuditRunnerError("Design-only root claim boundary drift")
+    state["stage"] = "builder_policy_binding"
+    builder_policy = _validate_builder_policy_binding(root_manifest)
     state["stage"] = "label_free_split_loading"
     loaded = {
         split: _load_split_label_free(
@@ -818,7 +847,6 @@ def _run_authorized_formal_quality_audit(
         root_manifest=root_manifest, manifests=manifests, loaded=loaded
     )
     state["stage"] = "builder_authority_replay"
-    builder_policy = scientific.load_policy()
     context = scientific.build_execution_context(
         builder_policy, execution_mode="design_preflight"
     )

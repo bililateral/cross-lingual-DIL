@@ -1080,6 +1080,13 @@ def _run_build_unreachable_until_fresh_review(*, execution_mode: str) -> dict[st
             "training_started": False,
             "scientific_contract": policy["scientific_contract"],
             "builder_policy_canonical_self_hash": policy["canonical_self_hash"],
+            "builder_policy_file": {
+                "path": scientific.DEFAULT_POLICY_PATH.resolve()
+                .relative_to(ROOT.resolve())
+                .as_posix(),
+                "size_bytes": scientific.DEFAULT_POLICY_PATH.stat().st_size,
+                "sha256": common.sha256_file(scientific.DEFAULT_POLICY_PATH),
+            },
             "split_order": list(SPLITS),
             "world_count": expected_total,
             "seller_count": expected_total * 28,
