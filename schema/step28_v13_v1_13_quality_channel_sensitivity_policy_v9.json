@@ -1,0 +1,554 @@
+{
+  "version": "2026-08-14-step28-v13-v1-13-quality-channel-sensitivity-v9",
+  "status": "IMPLEMENTATION_ONLY_NO_1004_REBUILD_NO_FORMAL_GENERATION_NO_TRAINING",
+  "canonical_self_hash": "02ae9c36ee84304053c5dcea9f2113ad1bfebfbc2cf0bb21242f0c45e2f83cf9",
+  "authorization": {
+    "implementation_and_fixture_tests": true,
+    "design_1004_rebuild": false,
+    "quality_audit_run": false,
+    "formal_seed": false,
+    "formal_500_by_4": false,
+    "audit_truth_open": false,
+    "model_training": false,
+    "metric_generation": false
+  },
+  "pins": {
+    "scientific_contract": {
+      "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
+      "size_bytes": 19037,
+      "sha256": "936ba6d52fa983307c3be654d9996814e740aea154c290c86411064d35e480f6"
+    },
+    "quality_audit_c_amendment": {
+      "path": "docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md",
+      "size_bytes": 12180,
+      "sha256": "1ca1e8b8cea551902cf39f42f5ea33be056c47d80c3693f5bf531c843aa94832"
+    },
+    "quality_audit_v8_scale_amendment": {
+      "path": "docs/STEP28_V13_V1_13_QUALITY_AUDIT_V8_DESIGN_SCALE_AMENDMENT_20260812.zh.md",
+      "size_bytes": 12614,
+      "sha256": "0463b978b971cdac990100636571a62fbb093d49b121017c9dd3a3c440be773a"
+    },
+    "v9_channel_contract": {
+      "path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "size_bytes": 29580,
+      "sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5"
+    },
+    "channel_views_source": {
+      "path": "scripts/step28_v13_v1_13_quality_channel_views_v9.py",
+      "size_bytes": 26034,
+      "sha256": "8a30e76ac0866dc98a1860e5b4820f1eba859abaa139d71b0cf2bf4447dff691"
+    },
+    "channel_views_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_channel_views_v9_contracts.py",
+      "size_bytes": 17340,
+      "sha256": "2bcb32954bd0ce8347a68ef96fdbe838cf5bf5fe995dfa8556cddb5d001461fc"
+    },
+    "channel_materializer_source": {
+      "path": "scripts/step28_v13_v1_13_quality_channel_materializer_v9.py",
+      "size_bytes": 62813,
+      "sha256": "90d5b33f814b9c51565d0e41be2938f230eac0e223f10318c4fd6315adc977d4"
+    },
+    "channel_materializer_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_channel_materializer_v9_contracts.py",
+      "size_bytes": 29505,
+      "sha256": "2d96865f2fdd3db8935243a61fd236cf0485b4ed87d261d7957b835185d97733"
+    },
+    "text_probe_views_source": {
+      "path": "scripts/step28_v13_v1_13_quality_text_probe_views_v9.py",
+      "size_bytes": 27915,
+      "sha256": "d9a6a92bb5a4df5632d9e7c95d1f566cdd05f39c07876463046d76a1928ef126"
+    },
+    "text_probe_views_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_text_probe_views_v9_contracts.py",
+      "size_bytes": 13427,
+      "sha256": "42a0221d9ccb9a1dca1321cd97fc9b7aaffe6a95909b075a4c02178175e66e17"
+    },
+    "probe_preparer_source": {
+      "path": "scripts/step28_v13_v1_13_quality_probe_preparer_v9.py",
+      "size_bytes": 38784,
+      "sha256": "d0c136b712e0aa7c5feba0aa23430c2457efd1e05975a5f5c4245377bc658900"
+    },
+    "probe_preparer_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_probe_preparer_v9_contracts.py",
+      "size_bytes": 21239,
+      "sha256": "051b14d45d786ee8d242e5a6f55280d7c945f8e749349fff9a869ffae576805c"
+    },
+    "probe_validator_source": {
+      "path": "scripts/step28_v13_v1_13_quality_probe_validator_v9.py",
+      "size_bytes": 55557,
+      "sha256": "cf4dab29b26a2bc39543419782d2632082b9137b3355c2ea4ef10a8e7357258c"
+    },
+    "probe_validator_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_probe_validator_v9_contracts.py",
+      "size_bytes": 36772,
+      "sha256": "5f8a6faf797de972e8e5c7f54a937bbaab05cba5c5715e7c10e23a6dd4a6e408"
+    },
+    "truth_capability_source": {
+      "path": "scripts/step28_v13_v1_13_quality_truth_capability_v9.py",
+      "size_bytes": 16461,
+      "sha256": "529dbb41f64a05f7cd9decc66fedc21b0f266b51e1822f86a1743a05fb7b7812"
+    },
+    "truth_capability_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_truth_capability_v9_contracts.py",
+      "size_bytes": 12482,
+      "sha256": "a9308c9d46f922306982c601d244288e98a5c80d3c0e0006db2d3b3fc433bced"
+    },
+    "structure_aggregator_source": {
+      "path": "scripts/step28_v13_v1_13_quality_structure_aggregator_v9.py",
+      "size_bytes": 23911,
+      "sha256": "1b91d00b61e4583258ac5bdbc8cbd689f6e6c1170356e581c3e14ddef9c66692"
+    },
+    "structure_aggregator_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_structure_aggregator_v9_contracts.py",
+      "size_bytes": 11769,
+      "sha256": "df36956bb4d3d232badaecd3b57a7114bf3d4fa6748a56927c902b8f587f66df"
+    },
+    "audit_runner_source": {
+      "path": "scripts/step28_v13_v1_13_quality_audit_runner_v9.py",
+      "size_bytes": 46024,
+      "sha256": "edd347a0eee4510143e6d8db3ff570ca6de2c993e8ad9828f371ebfef2fc90b6"
+    },
+    "audit_runner_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_audit_runner_v9_contracts.py",
+      "size_bytes": 21754,
+      "sha256": "2cc3f3b50fc0e871014fc6e48129cdbdf2e887a87c6c123e6c875e630ca89d3a"
+    }
+  },
+  "design_scale": {
+    "split_order": ["train", "development", "audit_a", "audit_b"],
+    "world_counts": {
+      "train": 500,
+      "development": 500,
+      "audit_a": 2,
+      "audit_b": 2
+    },
+    "seller_count_per_world": 28,
+    "pair_count_per_world": 378,
+    "positive_pair_count_per_world": 20,
+    "attempt_index": 1,
+    "replacement_authority_forbidden": true
+  },
+  "model_views": {
+    "order": [
+      "surface_full",
+      "surface_code_masked",
+      "surface_code_neutralized"
+    ],
+    "mask_token": "QXXXXXXXXXX",
+    "mask_token_code_point_length": 11,
+    "neutral_render_code_ordinal_zero": "QAAAAAAAABA",
+    "neutral_render_code_family": "Q_plus_item_uid_utf8_sorted_zero_based_ordinal_as_eight_base16_A_to_P_digits_plus_BA",
+    "neutral_render_code_family_values_persisted": false,
+    "neutral_render_title_modifier": "常规款",
+    "neutral_render_english_tag_rule": "retain_nonempty_original_tag_and_force_visibility_independent_of_original_code_else_remain_empty",
+    "neutral_capacity_mapping": "strict_inverse_of_frozen_capacity_index_map_to_original_0_through_7_base_skeleton",
+    "neutral_original_code_bearing_base_skeleton": "retain_original_carrier_words_and_replace_neutral_render_code_after_production",
+    "neutral_original_non_code_base_skeleton": "remove_v9_capacity_twin_clause_and_add_no_placeholder",
+    "exact_clone_order": "render_both_neutral_native_titles_then_copy_registered_source_neutral_title_to_target",
+    "registered_code_masking_only": true,
+    "unregistered_code_shaped_token_maximum": 0,
+    "materialization_stage": "after_candidate_irreversible_acceptance_before_build_private_truth",
+    "materialized_split_files": [
+      "observed/redacted_items.jsonl",
+      "observed/redacted_items.code_masked.jsonl",
+      "observed/redacted_items.code_neutralized.jsonl",
+      "observed/model_seller_profiles.jsonl",
+      "observed/model_seller_profiles.code_masked.jsonl",
+      "observed/model_seller_profiles.code_neutralized.jsonl",
+      "private/public_code_probe_input.jsonl",
+      "private/text_probe_eligibility_input.jsonl",
+      "private/channel_structure_audit.jsonl"
+    ],
+    "recompute_profiles_from_each_item_view": true,
+    "neutral_profile_recompute_order": "collapse_all_ephemeral_codes_in_items_then_rebuild_profile_safe_items_then_rebuild_complete_profiles",
+    "recompute_all_allowed_numeric_profile_fields": true,
+    "quality_time_world_rebuild_forbidden": true,
+    "quality_time_view_transform_forbidden": true,
+    "neutralized_legal_code_permutation_byte_difference_maximum": 0,
+    "non_code_projection_commitment_required": true,
+    "registered_ast_span_masking_required": true,
+    "free_string_replacement_forbidden": true,
+    "neutralizer_original_code_read_set_maximum": 0,
+    "neutralizer_input_capability": "NeutralItemProjection[NeutralItemMetadata]",
+    "neutralizer_input_fields": [
+      "world_uid",
+      "seller_uid",
+      "item_uid",
+      "time_bucket",
+      "category"
+    ],
+    "neutralizer_complete_public_item_argument_forbidden": true,
+    "neutralizer_original_text_value_tripwire_required": true,
+    "neutralizer_runtime_field_read_guard_required": true,
+    "neutralizer_receipt_read_counts_must_be_runtime_derived": true,
+    "non_code_projection_structural_equality_required": true,
+    "non_code_projection_relative_ast_boundaries_required": true,
+    "non_code_projection_absolute_offsets_compared": false,
+    "derived_symbol_exhaustive_state_count": 256,
+    "derived_symbol_actual_neutral_mount_integration_required": true
+  },
+  "text_probe_family": {
+    "view_names": [
+      "fs_full",
+      "fs_title",
+      "fs_template_surface",
+      "p_full",
+      "p_topic",
+      "p_template_surface",
+      "u_joint_full"
+    ],
+    "surface_view_count": 3,
+    "model_count_per_view": 2,
+    "total_model_count": 42,
+    "excluded_negative_pairs_per_world": 6,
+    "model_pair_keyspace_per_world": 378,
+    "eligible_pairs_per_world": 372,
+    "positive_pairs_per_world": 20,
+    "average_precision_baseline": 0.053763440860215055,
+    "feature_widths": [33, 14, 30, 75, 14, 56, 124],
+    "single_feature_count": 1038,
+    "row_weight": 1.0,
+    "sample_weight_argument_forbidden": true
+  },
+  "public_code_probe": {
+    "feature_width": 2992,
+    "feature_names_generator": "step28_v13_v1_13_quality_channel_views_v9.public_feature_names",
+    "feature_names_canonical_json_sha256": "da9495f8231a01f721d75540335bfd2a1a12275b1dfe89e0efe9b6d13c8981a8",
+    "feature_group_widths": {
+      "relation_summaries": 40,
+      "owned_absolute_character_composition": 320,
+      "all_visible_absolute_character_composition": 320,
+      "seven_field_absolute_character_composition": 2240,
+      "profile_field_summaries": 60,
+      "full_minus_neutral_numeric_deltas": 12
+    },
+    "allowed_inputs": [
+      "registered_code",
+      "visible_field",
+      "own_or_foreign",
+      "five_materialized_profile_code_occurrences",
+      "six_full_minus_neutral_numeric_profile_deltas"
+    ],
+    "materialized_top_level_fields": [
+      "world_uid",
+      "seller_uid",
+      "owned_codes",
+      "item_occurrences",
+      "profile_occurrences",
+      "numeric_profile_deltas"
+    ],
+    "nested_occurrence_fields": [
+      "field",
+      "code",
+      "is_own"
+    ],
+    "nested_ast_node_or_span_or_hash_fields_maximum": 0,
+    "forbidden_inputs": [
+      "product_semantics",
+      "identity_text",
+      "world_uid_feature",
+      "seller_uid_feature",
+      "item_uid_feature",
+      "pair_uid_feature",
+      "controller",
+      "label",
+      "qrels",
+      "private_code_key",
+      "decoded_slot",
+      "override_kind",
+      "clone_direction_or_source",
+      "foreign_code_legal_cause",
+      "capacity_or_template_role",
+      "code_derived_surface_cause"
+    ],
+    "pair_exchange_invariant": true
+  },
+  "decoded_slot_probe": {
+    "private_only": true,
+    "feature_width": 388,
+    "seller_slot_pair_one_hot_width": 378,
+    "scalar_width": 10,
+    "feature_names_generator": "step28_v13_v1_13_quality_channel_views_v9.decoded_feature_names",
+    "feature_names_canonical_json_sha256": "f5ddc444c640d704054c2121f530dd1eca4d9385f9e9a10bc153b24df0862bd0",
+    "average_precision_baseline": 0.05291005291005291,
+    "mode_global_ordinal_as_feature": false,
+    "seller_slot_range": [0, 27],
+    "item_slot_range": [0, 7],
+    "item_slots_nonempty_unique_contiguous_from_zero": true,
+    "decoded_values_or_matrix_persisted": false,
+    "pair_exchange_invariant": true
+  },
+  "probe_models": {
+    "standardization": {
+      "logistic_l2": "StandardScaler_fit_on_train_only_then_transform_train_and_development",
+      "hist_gradient_boosting_depth2": "raw_unstandardized_values"
+    },
+    "logistic_l2": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": null,
+      "max_iter": 10000,
+      "n_jobs": null,
+      "penalty": "l2",
+      "random_state": 793820367,
+      "solver": "lbfgs",
+      "tol": 1e-10,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "hist_gradient_boosting_depth2": {
+      "class": "sklearn.ensemble.HistGradientBoostingClassifier",
+      "categorical_features": "from_dtype",
+      "class_weight": null,
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 1.0,
+      "learning_rate": 0.03,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": 2,
+      "max_features": 1.0,
+      "max_iter": 200,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 793820367,
+      "scoring": "loss",
+      "tol": 1e-7,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "logistic_iteration_reaching_maximum_is_failure": true,
+    "class_reweighting_forbidden": true,
+    "resampling_forbidden": true,
+    "development_fit_forbidden": true,
+    "runtime": {
+      "python": "3.10.11",
+      "numpy": "2.2.6",
+      "scikit_learn": "1.7.2",
+      "float_dtype": "float64",
+      "threads": 1,
+      "positive_label": 1,
+      "negative_label": 0,
+      "score_column": "predict_proba[:,1]",
+      "nonfinite_maximum": 0,
+      "sample_weight_argument_forbidden": true
+    }
+  },
+  "quality_gates": {
+    "text_and_code_families_evaluated_separately": true,
+    "maximum_single_feature_symmetric_auc": 0.52,
+    "maximum_family_symmetric_auc": 0.53,
+    "maximum_family_average_precision_uplift": 0.01,
+    "bootstrap_95_upper_symmetric_auc": 0.53,
+    "bootstrap_95_upper_average_precision_uplift": 0.015,
+    "code_character_position_maximum_absolute_deviation_from_one_sixteenth": 0.01,
+    "literal_code_hits_in_masked": 0,
+    "literal_code_hits_in_neutralized": 0,
+    "unregistered_code_hits": 0,
+    "prior_world_code_hits": 0,
+    "unregistered_clone_foreign_code_hits": 0,
+    "view_keyset_difference_count": 0,
+    "neutralized_legal_code_permutation_byte_difference_count": 0,
+    "audit_truth_open_count": 0,
+    "audit_truth_read_count": 0,
+    "audit_truth_materialized_row_count": 0,
+    "generator_quality_result_read_count": 0,
+    "candidate_quality_result_read_count": 0,
+    "view_builder_quality_result_read_count": 0,
+    "text_single_feature_count": 1038,
+    "code_and_slot_single_feature_count": 3380
+  },
+  "bootstrap": {
+    "replicates": 9999,
+    "generator": "numpy.random.Generator(numpy.random.PCG64)",
+    "development_world_count": 500,
+    "sampling": "world_indices_with_replacement",
+    "generated_shape": [9999, 500],
+    "dtype": "int64",
+    "endpoint": false,
+    "order": "C",
+    "streaming_batch_size": 16,
+    "quantile": 0.95,
+    "quantile_method": "linear",
+    "metadata_design_seed": 281320260810,
+    "text_design_seed": 281320260810,
+    "probe_model_seed": 793820367,
+    "world_order": "development_world_ordinal_0_through_499_ascending",
+    "raw_index_dtype": "<i8",
+    "raw_index_byte_length": 39996000,
+    "raw_index_matrix_sha256": "111b1338cc607c6bd78bad88efe47606ffa2230e9cc764eec940e84f86e56661",
+    "duplicate_world_rows_in_original_pair_order": true,
+    "prediction_vector_dtype": "<f8",
+    "prediction_vector_hash_required": true,
+    "family_maxima_vector_hash_required": true,
+    "refit_models_inside_bootstrap": false,
+    "maximum_taken_inside_each_replicate_before_quantile": true
+  },
+  "read_order": {
+    "stage_1": "builder_materializes_three_item_views_three_profile_views_public_code_probe_input_text_probe_eligibility_input_and_channel_structure_audit_before_private_truth_projection",
+    "stage_2": "quality_preparer_validates_immutable_root_and_materialized_view_hashes_without_labels",
+    "stage_3": "quality_preparer_builds_and_freezes_feature_schema_row_order_and_matrix_commitments",
+    "stage_4": "pinned_supervised_validator_opens_train_and_development_truth_once",
+    "audit_a_b_truth_read_before_prediction_freeze": false,
+    "feature_rebuild_after_truth_read": false,
+    "generator_or_candidate_reentry_after_truth_read": false,
+    "full_private_world_passed_to_view_builder": false,
+    "audit_truth_open_count": 0,
+    "audit_truth_read_count": 0,
+    "audit_truth_materialized_row_count": 0,
+    "uid_or_split_feature_derivation_forbidden": true,
+    "freeze_float_values_missing_bitmap_sparse_indices_shape_rows_columns_sources_before_truth": true
+  },
+  "failure_rules": {
+    "pre_data_implementation_failure": "new_bytes_new_hashes_new_review_no_dataset_conclusion",
+    "auditor_execution_failure": "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+    "preregistered_data_gate_failure": "DATASET_INVALIDATED",
+    "threshold_change_after_data_forbidden": true,
+    "feature_or_model_change_after_data_forbidden": true,
+    "code_or_template_change_after_data_forbidden": true,
+    "salt_or_authority_change_after_data_forbidden": true,
+    "world_seller_item_pair_filtering_forbidden": true,
+    "failed_split_only_rerun_forbidden": true,
+    "audit_truth_diagnosis_forbidden": true,
+    "failed_payload_cleanup_required": true,
+    "freeze_point": "before_first_byte_of_future_1004_world_root",
+    "same_root_retry_mechanical_only": true,
+    "semantic_change_requires_new_root": true,
+    "preserve_git_commit_tree_hashes_docs_and_small_receipts": true,
+    "delete_failed_large_payload_cache_temp_and_run_specific_worktree_code": true
+  },
+  "authority_fields": {
+    "quality_gate_thresholds": {
+      "value": {
+        "maximum_single_feature_symmetric_auc": 0.52,
+        "maximum_family_symmetric_auc": 0.53,
+        "maximum_family_average_precision_uplift": 0.01,
+        "bootstrap_95_upper_symmetric_auc": 0.53,
+        "bootstrap_95_upper_average_precision_uplift": 0.015,
+        "code_character_position_maximum_absolute_deviation_from_one_sixteenth": 0.01
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第7节",
+      "local_policy_key": "quality_gates"
+    },
+    "average_precision_baselines": {
+      "value": {
+        "text": 0.053763440860215055,
+        "code_and_slot": 0.05291005291005291
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第4节与第7节",
+      "local_policy_key": "text_probe_family.average_precision_baseline_and_decoded_slot_probe.average_precision_baseline"
+    },
+    "text_feature_widths": {
+      "value": [33, 14, 30, 75, 14, 56, 124],
+      "authority_path": "docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md",
+      "authority_sha256": "1ca1e8b8cea551902cf39f42f5ea33be056c47d80c3693f5bf531c843aa94832",
+      "authority_section": "第2节",
+      "local_policy_key": "text_probe_family.feature_widths"
+    },
+    "public_and_private_code_widths": {
+      "value": {
+        "public": 2992,
+        "decoded": 388,
+        "combined": 3380
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第5至7节",
+      "local_policy_key": "public_code_probe.feature_width_and_decoded_slot_probe.feature_width"
+    },
+    "bootstrap_constants": {
+      "value": {
+        "replicates": 9999,
+        "generator": "numpy.random.Generator(numpy.random.PCG64)",
+        "development_world_count": 500,
+        "sampling": "world_indices_with_replacement",
+        "generated_shape": [9999, 500],
+        "dtype": "int64",
+        "endpoint": false,
+        "order": "C",
+        "streaming_batch_size": 16,
+        "quantile": 0.95,
+        "quantile_method": "linear",
+        "metadata_design_seed": 281320260810,
+        "text_design_seed": 281320260810,
+        "probe_model_seed": 793820367,
+        "world_order": "development_world_ordinal_0_through_499_ascending",
+        "raw_index_dtype": "<i8",
+        "raw_index_byte_length": 39996000,
+        "raw_index_matrix_sha256": "111b1338cc607c6bd78bad88efe47606ffa2230e9cc764eec940e84f86e56661",
+        "duplicate_world_rows_in_original_pair_order": true,
+        "prediction_vector_dtype": "<f8",
+        "prediction_vector_hash_required": true,
+        "family_maxima_vector_hash_required": true,
+        "refit_models_inside_bootstrap": false,
+        "maximum_taken_inside_each_replicate_before_quantile": true
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第7节",
+      "local_policy_key": "bootstrap"
+    },
+    "logistic_l2_parameters": {
+      "value": {
+        "C": 1.0,
+        "class_weight": null,
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": null,
+        "max_iter": 10000,
+        "n_jobs": null,
+        "penalty": "l2",
+        "random_state": 793820367,
+        "solver": "lbfgs",
+        "tol": 1e-10,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第7节",
+      "local_policy_key": "probe_models.logistic_l2"
+    },
+    "hist_gradient_boosting_parameters": {
+      "value": {
+        "class": "sklearn.ensemble.HistGradientBoostingClassifier",
+        "categorical_features": "from_dtype",
+        "class_weight": null,
+        "early_stopping": false,
+        "interaction_cst": null,
+        "l2_regularization": 1.0,
+        "learning_rate": 0.03,
+        "loss": "log_loss",
+        "max_bins": 255,
+        "max_depth": 2,
+        "max_features": 1.0,
+        "max_iter": 200,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 20,
+        "monotonic_cst": null,
+        "n_iter_no_change": 10,
+        "random_state": 793820367,
+        "scoring": "loss",
+        "tol": 1e-7,
+        "validation_fraction": 0.1,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "authority_path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "authority_sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5",
+      "authority_section": "第7节",
+      "local_policy_key": "probe_models.hist_gradient_boosting_depth2"
+    }
+  }
+}

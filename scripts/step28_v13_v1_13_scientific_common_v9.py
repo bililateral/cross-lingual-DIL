@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared contracts for the Step28-v13 v1.13 v8 design-scale builder."""
+"""Shared contracts for the Step28-v13 v1.13 v9 implementation-only builder."""
 
 from __future__ import annotations
 
@@ -18,13 +18,14 @@ import step28_v13_structure as structure
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_POLICY_PATH = (
-    ROOT / "schema" / "step28_v13_v1_13_scientific_dataset_builder_policy_v8.json"
+    ROOT / "schema" / "step28_v13_v1_13_scientific_dataset_builder_policy_v9.json"
 )
-POLICY_VERSION = "2026-08-12-step28-v13-v1-13-scientific-dataset-builder-v8"
-POLICY_STATUS = "DESIGN_PREFLIGHT_ONLY"
+POLICY_VERSION = "2026-08-14-step28-v13-v1-13-scientific-dataset-builder-v9"
+POLICY_STATUS = "DESIGN_IMPLEMENTATION_ONLY_NO_REBUILD_OR_TRAINING"
 EXPECTED_CLAIM_BOUNDARY = (
-    "This policy authorizes implementation tests and design preflights only. "
-    "It creates no formal seed, training-qualified row, model, or scientific metric."
+    "This policy authorizes implementation tests and in-memory causal replay through "
+    "the already exposed train ordinal 283 only. It creates no dataset publication, "
+    "formal seed, training-qualified row, model, or scientific metric."
 )
 SPLITS = ("train", "development", "audit_a", "audit_b")
 DESIGN_MODES = ("small_smoke", "design_preflight")
@@ -153,6 +154,8 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "v8_second_build_execution_failure_record",
         "v8_third_build_execution_failure_record",
         "v8_fourth_build_execution_failure_record",
+        "v8_fifth_build_execution_failure_record",
+        "v9_document_capacity_repair_contract",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -198,6 +201,14 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         policy["v8_fourth_build_execution_failure_record"],
         label="v8 fourth build execution failure record",
     )
+    _verify_pin(
+        policy["v8_fifth_build_execution_failure_record"],
+        label="v8 fifth build execution failure record",
+    )
+    _verify_pin(
+        policy["v9_document_capacity_repair_contract"],
+        label="v9 document-capacity repair contract",
+    )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
     )
@@ -208,10 +219,20 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     if not isinstance(implementation, Mapping) or tuple(implementation) != (
         "scientific_common",
         "candidate_text_templates",
+        "document_capacity",
         "pure_natural_renderer",
         "scientific_world",
         "dataset_builder",
+        "causal_replay_0_283",
         "scientific_contract_tests",
+        "production_chain",
+        "quality_channel_contract",
+        "quality_channel_policy",
+        "quality_channel_views",
+        "quality_channel_policy_validator",
+        "quality_channel_materializer",
+        "quality_channel_tests",
+        "quality_channel_materializer_tests",
     ):
         raise ScientificBuilderError("Scientific implementation universe drift")
     for role, spec in implementation.items():
@@ -251,6 +272,11 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     mount = policy["model_mount_contract"]
     if mount != {
         "model_seller_profile_path": "observed/model_seller_profiles.jsonl",
+        "seller_profile_surface_paths": {
+            "surface_full": "observed/model_seller_profiles.jsonl",
+            "surface_code_masked": "observed/model_seller_profiles.code_masked.jsonl",
+            "surface_code_neutralized": "observed/model_seller_profiles.code_neutralized.jsonl",
+        },
         "seller_profile_join_only_fields": ["seller_uid"],
         "seller_profile_text_feature_source_fields": [
             "category_concat_top",
@@ -274,6 +300,14 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
             "max_category_share",
         ],
         "redacted_item_path": "observed/redacted_items.jsonl",
+        "redacted_item_surface_paths": {
+            "surface_full": "observed/redacted_items.jsonl",
+            "surface_code_masked": "observed/redacted_items.code_masked.jsonl",
+            "surface_code_neutralized": "observed/redacted_items.code_neutralized.jsonl",
+        },
+        "public_code_probe_input_path": "private/public_code_probe_input.jsonl",
+        "text_probe_eligibility_input_path": "private/text_probe_eligibility_input.jsonl",
+        "channel_structure_audit_path": "private/channel_structure_audit.jsonl",
         "redacted_item_join_only_fields": [
             "item_uid",
             "seller_uid",
@@ -319,11 +353,31 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
 
     selection = policy["candidate_selection"]
     attribute_variation = selection.get("attribute_variation_repair")
+    capacity_repair = selection.get("document_capacity_repair")
     if (
         selection.get("candidate_limit") != 32
         or selection.get("identity_value_maximum_counter") != 128
         or selection.get("labels_or_model_scores_read") is not False
         or selection.get("shortcut_probe_results_read") is not False
+        or capacity_repair
+        != {
+            "version": "2026-08-14-step28-v13-v1-13-document-capacity-v9",
+            "execution_stage": "after_baseline_identity33_before_candidate_view",
+            "changed_render_fields": [
+                "code",
+                "title_nonempty",
+                "description_nonempty",
+            ],
+            "seller_slot_source": "base_uid_creation_ordinal",
+            "item_slot_source": "base_uid_creation_ordinal",
+            "world_stride": 256,
+            "seller_stride": 8,
+            "feistel_rounds": 6,
+            "feistel_half_bits": 20,
+            "code_format": "Q[A-P]{10}",
+            "candidate_zero_lineage_reference_before_collision": True,
+            "labels_controllers_candidates_or_registries_read": False,
+        }
         or attribute_variation
         != {
             "authority": "existing_derived_candidate_key_only",

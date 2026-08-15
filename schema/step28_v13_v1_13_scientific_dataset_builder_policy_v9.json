@@ -1,7 +1,7 @@
 {
-  "version": "2026-08-12-step28-v13-v1-13-scientific-dataset-builder-v8",
-  "status": "DESIGN_PREFLIGHT_ONLY",
-  "claim_boundary": "This policy authorizes implementation tests and design preflights only. It creates no formal seed, training-qualified row, model, or scientific metric.",
+  "version": "2026-08-14-step28-v13-v1-13-scientific-dataset-builder-v9",
+  "status": "DESIGN_IMPLEMENTATION_ONLY_NO_REBUILD_OR_TRAINING",
+  "claim_boundary": "This policy authorizes implementation tests and in-memory causal replay through the already exposed train ordinal 283 only. It creates no dataset publication, formal seed, training-qualified row, model, or scientific metric.",
   "scientific_contract": {
     "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
     "size_bytes": 19037,
@@ -32,6 +32,16 @@
     "size_bytes": 3006,
     "sha256": "82682afde6349e98b5341fb50f818e18651c44a3f478a241f57b97df45f77042"
   },
+  "v8_fifth_build_execution_failure_record": {
+    "path": "docs/STEP28_V13_V1_13_V8_FIFTH_BUILD_EXECUTION_FAILURE_20260814.zh.md",
+    "size_bytes": 3459,
+    "sha256": "e611081c56b23d3e9a2e6580fef8166700813f18dd981b0247b1f2844737fc49"
+  },
+  "v9_document_capacity_repair_contract": {
+    "path": "docs/STEP28_V13_V1_13_V9_DOCUMENT_CAPACITY_REPAIR_CONTRACT_20260814.zh.md",
+    "size_bytes": 12946,
+    "sha256": "b40538b325a538aa54465e28cfb885428783f18d43f518022adbeb3215cccbba"
+  },
   "base_dataset_policy": {
     "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
     "size_bytes": 193942,
@@ -44,34 +54,84 @@
   },
   "implementation": {
     "scientific_common": {
-      "path": "scripts/step28_v13_v1_13_scientific_common_v8.py",
-      "size_bytes": 23641,
-      "sha256": "870bd0ff248ca966b8c9c2a149dd778b0e35d6ee52e9a6731a701d191b580732"
+      "path": "scripts/step28_v13_v1_13_scientific_common_v9.py",
+      "size_bytes": 26187,
+      "sha256": "049e527d58c704664450ce61f6260bb6f8e783e589902e2f1e2c40b94fd5487b"
     },
     "candidate_text_templates": {
-      "path": "schema/step28_v13_v1_13_candidate_text_templates_v8.json",
-      "size_bytes": 21879,
-      "sha256": "ff97b59f0d66d7a9d18a3b1e7d7db684e6bdcc1a7ae60ba0e6b7294528c8766a"
+      "path": "schema/step28_v13_v1_13_candidate_text_templates_v9.json",
+      "size_bytes": 25210,
+      "sha256": "9a868644f76ad23be2e16973567a5b3c69d70bcbb23690453093dad3658e7a2a"
+    },
+    "document_capacity": {
+      "path": "scripts/step28_v13_v1_13_document_capacity_v9.py",
+      "size_bytes": 14599,
+      "sha256": "bc0673f52eaaf82948deee572a326396824945b3c0b6dd31f8cf18e6f4d8c7e0"
     },
     "pure_natural_renderer": {
-      "path": "scripts/step28_v13_v1_13_pure_natural_renderer_v8.py",
-      "size_bytes": 36986,
-      "sha256": "634ab5a878466186cf6603fa02aa4a145ac3bd7f495015e55d24a2812289e145"
+      "path": "scripts/step28_v13_v1_13_pure_natural_renderer_v9.py",
+      "size_bytes": 39846,
+      "sha256": "274b16b1ec962ffda71461615485d1cdb4e3b6fe36aa667bbe15b57daa4d8b81"
     },
     "scientific_world": {
-      "path": "scripts/step28_v13_v1_13_scientific_world_v8.py",
-      "size_bytes": 53875,
-      "sha256": "81baac93a4f07d072188c187fa301391f88fd1dc7f1513c629cf2a4e8ee3b5bd"
+      "path": "scripts/step28_v13_v1_13_scientific_world_v9.py",
+      "size_bytes": 68485,
+      "sha256": "10c9d6d703ffc8b1c16054add065d8820258c608ad12aaa486bf747717c03849"
     },
     "dataset_builder": {
-      "path": "scripts/step28_v13_v1_13_scientific_dataset_builder_v8.py",
-      "size_bytes": 41129,
-      "sha256": "23b23e6ad694f4a98ba48438b344058d866466bb28523104cdf0b169cf26ae94"
+      "path": "scripts/step28_v13_v1_13_scientific_dataset_builder_v9.py",
+      "size_bytes": 48142,
+      "sha256": "2c0769f68699ba10bcfd91b8b0426c853f3a34364c4b45dcca1744e24721eace"
+    },
+    "causal_replay_0_283": {
+      "path": "scripts/step28_v13_v1_13_v9_causal_replay_0_283.py",
+      "size_bytes": 7259,
+      "sha256": "f983a98684a9ebf855a0a863315e8876a9774ba5f62f9c432694f3a8af1dd6b3"
     },
     "scientific_contract_tests": {
-      "path": "tests/test_step28_v13_v1_13_scientific_builder_v8_contracts.py",
-      "size_bytes": 86254,
-      "sha256": "5b87862b70e3e3e3c774ce5270d512f9cbf79bd80e9c36654d8b53c7236093bb"
+      "path": "tests/test_step28_v13_v1_13_scientific_builder_v9_contracts.py",
+      "size_bytes": 27679,
+      "sha256": "e40deed69e36f519bafd7e27e6316ebd58364d95f2c2757f3bfd1c4a8a202ab6"
+    },
+    "production_chain": {
+      "path": "scripts/step28_v13_production_chain.py",
+      "size_bytes": 78219,
+      "sha256": "536c4fac2b4843d6f948723f2d0b8a49a4f37ec3db0945d8d24372971d529fd0"
+    },
+    "quality_channel_contract": {
+      "path": "docs/STEP28_V13_V1_13_V9_QUALITY_AND_CHANNEL_SENSITIVITY_CONTRACT_20260814.zh.md",
+      "size_bytes": 29580,
+      "sha256": "bdb093a33e9cb19d12f24e4f6636dd2269609ee73481260dba67d2069ef19bb5"
+    },
+    "quality_channel_policy": {
+      "path": "schema/step28_v13_v1_13_quality_channel_sensitivity_policy_v9.json",
+      "size_bytes": 22931,
+      "sha256": "a03f840d082816094b9463e95d0246a5d5190a9b80530874830578e8edfd35f1"
+    },
+    "quality_channel_views": {
+      "path": "scripts/step28_v13_v1_13_quality_channel_views_v9.py",
+      "size_bytes": 26034,
+      "sha256": "8a30e76ac0866dc98a1860e5b4820f1eba859abaa139d71b0cf2bf4447dff691"
+    },
+    "quality_channel_policy_validator": {
+      "path": "scripts/step28_v13_v1_13_quality_channel_policy_v9.py",
+      "size_bytes": 27387,
+      "sha256": "d1c1266cb5d3fc1cd721ea7578a87f94397e98a232445189775bc4617f87e454"
+    },
+    "quality_channel_materializer": {
+      "path": "scripts/step28_v13_v1_13_quality_channel_materializer_v9.py",
+      "size_bytes": 62813,
+      "sha256": "90d5b33f814b9c51565d0e41be2938f230eac0e223f10318c4fd6315adc977d4"
+    },
+    "quality_channel_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_channel_views_v9_contracts.py",
+      "size_bytes": 17340,
+      "sha256": "2bcb32954bd0ce8347a68ef96fdbe838cf5bf5fe995dfa8556cddb5d001461fc"
+    },
+    "quality_channel_materializer_tests": {
+      "path": "tests/test_step28_v13_v1_13_quality_channel_materializer_v9_contracts.py",
+      "size_bytes": 29505,
+      "sha256": "2d96865f2fdd3db8935243a61fd236cf0485b4ed87d261d7957b835185d97733"
     }
   },
   "split_order": [
@@ -110,6 +170,11 @@
   },
   "model_mount_contract": {
     "model_seller_profile_path": "observed/model_seller_profiles.jsonl",
+    "seller_profile_surface_paths": {
+      "surface_full": "observed/model_seller_profiles.jsonl",
+      "surface_code_masked": "observed/model_seller_profiles.code_masked.jsonl",
+      "surface_code_neutralized": "observed/model_seller_profiles.code_neutralized.jsonl"
+    },
     "seller_profile_join_only_fields": [
       "seller_uid"
     ],
@@ -137,6 +202,14 @@
       "max_category_share"
     ],
     "redacted_item_path": "observed/redacted_items.jsonl",
+    "redacted_item_surface_paths": {
+      "surface_full": "observed/redacted_items.jsonl",
+      "surface_code_masked": "observed/redacted_items.code_masked.jsonl",
+      "surface_code_neutralized": "observed/redacted_items.code_neutralized.jsonl"
+    },
+    "public_code_probe_input_path": "private/public_code_probe_input.jsonl",
+    "text_probe_eligibility_input_path": "private/text_probe_eligibility_input.jsonl",
+    "channel_structure_audit_path": "private/channel_structure_audit.jsonl",
     "redacted_item_join_only_fields": [
       "item_uid",
       "seller_uid",
@@ -158,7 +231,7 @@
         "audit_a": 1,
         "audit_b": 1
       },
-      "output_root": "reports/step28_v13_v1_13_scientific_builder/small_smoke_v8_20260812"
+      "output_root": "reports/step28_v13_v1_13_scientific_builder/small_smoke_v9_20260814"
     },
     "design_preflight": {
       "scientific_use_forbidden": true,
@@ -168,7 +241,7 @@
         "audit_a": 2,
         "audit_b": 2
       },
-      "output_root": "reports/step28_v13_v1_13_scientific_builder/design_preflight_v8_20260812"
+      "output_root": "reports/step28_v13_v1_13_scientific_builder/design_preflight_v9_20260814"
     },
     "formal": {
       "scientific_use_forbidden_until_root_quality_pass": true,
@@ -178,7 +251,7 @@
         "audit_a": 500,
         "audit_b": 500
       },
-      "output_root": "reports/step28_v13_v1_13_scientific_dataset/formal_v8_20260812"
+      "output_root": "reports/step28_v13_v1_13_scientific_dataset/formal_v9_20260814"
     }
   },
   "candidate_selection": {
@@ -221,6 +294,24 @@
       "shared_sequential_rng_reads": 0,
       "historical_or_current_registry_reads": false,
       "labels_or_model_scores_read": false
+    },
+    "document_capacity_repair": {
+      "version": "2026-08-14-step28-v13-v1-13-document-capacity-v9",
+      "execution_stage": "after_baseline_identity33_before_candidate_view",
+      "changed_render_fields": [
+        "code",
+        "title_nonempty",
+        "description_nonempty"
+      ],
+      "seller_slot_source": "base_uid_creation_ordinal",
+      "item_slot_source": "base_uid_creation_ordinal",
+      "world_stride": 256,
+      "seller_stride": 8,
+      "feistel_rounds": 6,
+      "feistel_half_bits": 20,
+      "code_format": "Q[A-P]{10}",
+      "candidate_zero_lineage_reference_before_collision": true,
+      "labels_controllers_candidates_or_registries_read": false
     }
   },
   "public_preflight_keys": {
@@ -285,5 +376,5 @@
       "audit_b": null
     }
   },
-  "canonical_self_hash": "bea0c078bafe0e0796d7e6008ea05164cb2190c1e9b3af13c7309e1b847570fa"
+  "canonical_self_hash": "ffc8b276a835b8c2168ab55cc1054a5eb602ffd5c3543ded6733847030f5f7c5"
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V8 multi-world scientific generator for Step28-v13 v1.13.
+"""V9 multi-world scientific generator for Step28-v13 v1.13.
 
 The candidate loop can observe only anonymous text material and exact document
 hash collisions.  Pair truth is projected only after a candidate is accepted.
@@ -28,7 +28,9 @@ import step28_v13_v1_13_candidate_parent as stage_parent
 import step28_v13_v1_13_document_collision as collision
 import step28_v13_v1_13_identity_remap as identity_remap
 import step28_v13_v1_13_natural_variation as stage_variation
-import step28_v13_v1_13_pure_natural_renderer_v8 as pure_renderer
+import step28_v13_v1_13_document_capacity_v9 as document_capacity
+import step28_v13_v1_13_pure_natural_renderer_v9 as pure_renderer
+import step28_v13_v1_13_quality_channel_materializer_v9 as channel_materializer
 import step28_v13_world_builder as world_builder
 
 
@@ -39,10 +41,10 @@ EXACT_CLONE_ENDPOINT_DOMAIN = (
 CANDIDATE_LIMIT = 32
 CANDIDATE_ONLY_ATTRIBUTES = ("通用版",)
 CANDIDATE_TEMPLATE_RELATIVE_PATH = (
-    "schema/step28_v13_v1_13_candidate_text_templates_v8.json"
+    "schema/step28_v13_v1_13_candidate_text_templates_v9.json"
 )
 CANDIDATE_TEMPLATE_SHA256 = (
-    "ff97b59f0d66d7a9d18a3b1e7d7db684e6bdcc1a7ae60ba0e6b7294528c8766a"
+    "9a868644f76ad23be2e16973567a5b3c69d70bcbb23690453093dad3658e7a2a"
 )
 COLLISION_CATEGORIES = (
     "same_world_item_document",
@@ -64,8 +66,8 @@ class CandidateBinding:
     noise_handle_to_slot_uid: dict[str, str]
     registered_overrides: tuple[dict[str, Any], ...]
     structural_parent_sha256: str
-    baseline_provenance_source_multiset_sha256: str
     baseline_identity33_sha256: str
+    capacity_receipt: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -75,8 +77,11 @@ class CandidateObservation:
     seller_profiles: tuple[dict[str, Any], ...]
     identity33: tuple[dict[str, Any], ...]
     profile_provenance_sha256: str
+    profile_provenance_source_multiset_sha256: str
     item_document_hashes: tuple[str, ...]
     seller_document_hashes: tuple[str, ...]
+    item_codes: tuple[str, ...]
+    document_capacity_audit: dict[str, Any]
     natural_output_sha256: str
 
 
@@ -91,15 +96,26 @@ class AcceptedScientificWorld:
     world: dict[str, Any]
     redacted_items: tuple[dict[str, Any], ...]
     seller_profiles: tuple[dict[str, Any], ...]
+    masked_redacted_items: tuple[dict[str, Any], ...]
+    neutral_redacted_items: tuple[dict[str, Any], ...]
+    masked_seller_profiles: tuple[dict[str, Any], ...]
+    neutral_seller_profiles: tuple[dict[str, Any], ...]
+    public_code_probe_input: tuple[dict[str, Any], ...]
+    text_probe_eligibility_input: tuple[dict[str, Any], ...]
+    channel_structure_audit: dict[str, Any]
     identity33: tuple[dict[str, Any], ...]
     controller_membership: tuple[dict[str, Any], ...]
     pair_labels: tuple[dict[str, Any], ...]
     qrels: tuple[dict[str, Any], ...]
     identity_allocation_receipt: dict[str, Any]
     identity_registry_delta: tuple[str, ...]
+    code_registry_delta: tuple[str, ...]
     item_registry_delta: tuple[str, ...]
     seller_registry_delta: tuple[str, ...]
     structural_parent_sha256: str
+    candidate_zero_lineage_reference_sha256: str
+    document_capacity_receipt: dict[str, Any]
+    document_capacity_audit: dict[str, Any]
     profile_provenance_sha256: str
     identity33_sha256: str
     natural_output_sha256: str
@@ -116,7 +132,7 @@ def _candidate_safe_library(
     fixture: Mapping[str, Any],
     split: str,
 ) -> dict[str, Any]:
-    """Build the old safe view, then add the sole candidate-only realization."""
+    """Extend the base whitelist by one attribute and code-bearing twins."""
 
     output = stage_variation._safe_library(
         base_policy=policy,
@@ -124,6 +140,26 @@ def _candidate_safe_library(
         fixture=fixture,
         split=split,
     )
+    candidate_path = common.repo_path(CANDIDATE_TEMPLATE_RELATIVE_PATH)
+    if common.sha256_file(candidate_path) != CANDIDATE_TEMPLATE_SHA256:
+        raise ScientificWorldError("V9 candidate-template payload drift")
+    candidate_template = common.load_json(candidate_path)
+    normalized_candidate = _canonical_clone(candidate_template)
+    candidate_attributes = normalized_candidate["generic_lexicon"]["attributes"]
+    if candidate_attributes[-1:] != list(CANDIDATE_ONLY_ATTRIBUTES):
+        raise ScientificWorldError("Candidate-only attribute extension drift")
+    normalized_candidate["generic_lexicon"]["attributes"] = candidate_attributes[:-1]
+    for split_name, split_library in normalized_candidate["split_libraries"].items():
+        if split_name not in {"train", "development", "audit_a", "audit_b"}:
+            raise ScientificWorldError("Candidate-template split drift")
+        split_library["title_skeletons"] = split_library["title_skeletons"][:8]
+        split_library["description_skeletons"] = split_library[
+            "description_skeletons"
+        ][:8]
+    if common.canonical_json_bytes(normalized_candidate) != common.canonical_json_bytes(
+        template
+    ):
+        raise ScientificWorldError("Candidate template changes a forbidden base field")
     if (
         tuple(CANDIDATE_ONLY_ATTRIBUTES) != ("通用版",)
         or "通用版" in output["attributes"]
@@ -131,6 +167,19 @@ def _candidate_safe_library(
         raise ScientificWorldError("Candidate-only attribute baseline drift")
     output["attributes"].append("通用版")
     output["attribute_permutation_classes"].append(["通用版"])
+    candidate_split = candidate_template["split_libraries"][split]
+    for values_field, classes_field in (
+        ("title_skeletons", "title_skeleton_permutation_classes"),
+        ("description_skeletons", "description_skeleton_permutation_classes"),
+    ):
+        base_count = len(output[values_field])
+        candidate_values = [str(value) for value in candidate_split[values_field]]
+        if base_count != 8 or candidate_values[:base_count] != output[values_field]:
+            raise ScientificWorldError("Candidate skeleton base domain drift")
+        output[values_field] = candidate_values
+        output[classes_field].extend(
+            [[index] for index in range(base_count, len(candidate_values))]
+        )
     pure_renderer.validate_safe_library(output)
     return output
 
@@ -583,8 +632,17 @@ def _build_profiles_and_identity33(
             not isinstance(attributes, list)
             or not attributes
             or attributes.pop() != CANDIDATE_ONLY_ATTRIBUTES[0]
-            or common.canonical_json_bytes(without_extension)
-            != common.canonical_json_bytes(template)
+        ):
+            raise ScientificWorldError("Candidate-only template boundary drift")
+        for split_library in without_extension["split_libraries"].values():
+            split_library["title_skeletons"] = split_library[
+                "title_skeletons"
+            ][:8]
+            split_library["description_skeletons"] = split_library[
+                "description_skeletons"
+            ][:8]
+        if common.canonical_json_bytes(without_extension) != common.canonical_json_bytes(
+            template
         ):
             raise ScientificWorldError("Candidate-only template boundary drift")
         processing_policy = _canonical_clone(policy)
@@ -680,8 +738,8 @@ def _build_restricted_view(
     world: Mapping[str, Any],
     anonymous_handle_key: bytes,
     structural_parent_sha256: str,
-    baseline_provenance_source_multiset_sha256: str,
     baseline_identity33_sha256: str,
+    capacity_receipt: Mapping[str, Any],
 ) -> tuple[pure_renderer.RestrictedCandidateView, CandidateBinding]:
     item_rows = _sorted_rows(world["public"]["items"], "item_uid")
     ast_by_item = {
@@ -837,12 +895,163 @@ def _build_restricted_view(
         },
         registered_overrides=tuple(overrides),
         structural_parent_sha256=structural_parent_sha256,
-        baseline_provenance_source_multiset_sha256=(
-            baseline_provenance_source_multiset_sha256
-        ),
         baseline_identity33_sha256=baseline_identity33_sha256,
+        capacity_receipt=_canonical_clone(dict(capacity_receipt)),
     )
     return view, binding
+
+
+def _audit_document_capacity(
+    *,
+    world: Mapping[str, Any],
+    redacted_items: Sequence[Mapping[str, Any]],
+    seller_profiles: Sequence[Mapping[str, Any]],
+) -> tuple[tuple[str, ...], dict[str, Any]]:
+    ast_by_item = {
+        str(row["item_uid"]): row for row in world["private"]["render_asts"]
+    }
+    redacted_by_item = {
+        str(row["item_uid"]): row for row in redacted_items
+    }
+    if (
+        len(ast_by_item) != len(world["private"]["render_asts"])
+        or len(redacted_by_item) != len(redacted_items)
+        or set(ast_by_item) != set(redacted_by_item)
+    ):
+        raise ScientificWorldError("Capacity audit item universe drift")
+    code_by_item = {item_uid: str(row["code"]) for item_uid, row in ast_by_item.items()}
+    if (
+        any(document_capacity.CODE_RE.fullmatch(code) is None for code in code_by_item.values())
+        or len(set(code_by_item.values())) != len(code_by_item)
+    ):
+        raise ScientificWorldError("Capacity audit item codes are malformed or duplicated")
+    seller_by_item = {
+        str(row["item_uid"]): str(row["seller_uid"])
+        for row in world["public"]["items"]
+    }
+    if set(seller_by_item) != set(code_by_item):
+        raise ScientificWorldError("Capacity audit item ownership drift")
+    all_codes = set(code_by_item.values())
+    allowed_foreign_by_item: defaultdict[str, set[str]] = defaultdict(set)
+    clone_targets: dict[str, str] = {}
+    for row in world["private"]["override_audit"]:
+        if row["override_kind"] != "exact_title_clone":
+            continue
+        source_uid = str(row["item_uid_left"])
+        target_uid = str(row["item_uid_right"])
+        allowed_foreign_by_item[target_uid].add(code_by_item[source_uid])
+        clone_targets[target_uid] = source_uid
+
+    item_rows: list[dict[str, Any]] = []
+    for item_uid in sorted(redacted_by_item, key=lambda value: value.encode("utf-8")):
+        row = redacted_by_item[item_uid]
+        title = str(row["title"])
+        description = str(row["description"])
+        own_code = code_by_item[item_uid]
+        if own_code not in title + description:
+            raise ScientificWorldError("An item lost its own capacity code")
+        visible_codes = set(document_capacity.CODE_TOKEN_RE.findall(title + description))
+        if not visible_codes <= all_codes:
+            raise ScientificWorldError("An unregistered code-shaped token became visible")
+        foreign_codes = visible_codes - {own_code}
+        if not foreign_codes <= allowed_foreign_by_item[item_uid]:
+            raise ScientificWorldError("An unregistered foreign item code became visible")
+        if foreign_codes & set(document_capacity.CODE_TOKEN_RE.findall(description)):
+            raise ScientificWorldError("A clone foreign code escaped into description")
+        if any(code not in title for code in foreign_codes):
+            raise ScientificWorldError("A clone foreign code is outside copied title")
+        if item_uid in clone_targets:
+            source_uid = clone_targets[item_uid]
+            source_title = str(redacted_by_item[source_uid]["title"])
+            if title != source_title or own_code not in description:
+                raise ScientificWorldError("Exact-title clone capacity closure failed")
+        item_rows.append(
+            {
+                "item_uid": item_uid,
+                "seller_uid": seller_by_item[item_uid],
+                "own_code_visible": True,
+                "foreign_code_count": len(foreign_codes),
+                "registered_clone_foreign_only": bool(foreign_codes),
+            }
+        )
+
+    profile_by_seller = {
+        str(row["seller_uid"]): row for row in seller_profiles
+    }
+    seller_uids = {str(row["seller_uid"]) for row in world["public"]["sellers"]}
+    if len(profile_by_seller) != len(seller_profiles) or set(profile_by_seller) != seller_uids:
+        raise ScientificWorldError("Capacity audit seller-profile universe drift")
+    seller_rows: list[dict[str, Any]] = []
+    for seller_uid in sorted(seller_uids, key=lambda value: value.encode("utf-8")):
+        owned_codes = {
+            code_by_item[item_uid]
+            for item_uid, owner in seller_by_item.items()
+            if owner == seller_uid
+        }
+        description_concat = str(profile_by_seller[seller_uid]["description_concat_top"])
+        visible_codes = set(
+            document_capacity.CODE_TOKEN_RE.findall(description_concat)
+        )
+        if not visible_codes <= all_codes:
+            raise ScientificWorldError(
+                "Seller description contains an unregistered code-shaped token"
+            )
+        owned_visible = visible_codes & owned_codes
+        foreign_visible = visible_codes - owned_codes
+        if not owned_visible or foreign_visible:
+            raise ScientificWorldError(
+                "Seller description profile lacks an exclusive owned code"
+            )
+        seller_rows.append(
+            {
+                "seller_uid": seller_uid,
+                "owned_description_code_count": len(owned_visible),
+                "foreign_description_code_count": 0,
+            }
+        )
+    audit = {
+        "version": document_capacity.VERSION,
+        "item_count": len(item_rows),
+        "unique_code_count": len(all_codes),
+        "seller_count": len(seller_rows),
+        "all_items_retain_own_code": True,
+        "foreign_codes_are_registered_clone_titles_only": True,
+        "all_seller_descriptions_retain_exclusive_owned_code": True,
+        "item_rows_sha256": common.canonical_sha256(item_rows),
+        "seller_rows_sha256": common.canonical_sha256(seller_rows),
+        "labels_controllers_or_collision_registries_read": False,
+    }
+    return tuple(sorted(all_codes)), audit
+
+
+def _assert_prior_item_codes_absent(
+    *, observation: CandidateObservation, prior_item_codes: set[str]
+) -> None:
+    if not prior_item_codes:
+        return
+    visible_texts = [
+        str(row[field])
+        for row in observation.redacted_items
+        for field in ("title", "description")
+    ]
+    visible_texts.extend(
+        str(row[field])
+        for row in observation.seller_profiles
+        for field in (
+            "category_concat_top",
+            "signature_title_concat",
+            "title_concat_top",
+            "signature_description_concat",
+            "description_concat_top",
+        )
+    )
+    visible_codes = {
+        code
+        for text in visible_texts
+        for code in document_capacity.CODE_TOKEN_RE.findall(text)
+    }
+    if visible_codes & prior_item_codes:
+        raise ScientificWorldError("A prior-world item code leaked into candidate text")
 
 
 def _assemble_candidate(
@@ -1064,13 +1273,6 @@ def _assemble_candidate(
         provenance
     )
     if (
-        provenance_source_multiset_sha
-        != binding.baseline_provenance_source_multiset_sha256
-    ):
-        raise ScientificWorldError(
-            "Natural candidate changed frozen profile contribution lineage"
-        )
-    if (
         identity33_sha != binding.baseline_identity33_sha256
         or common.canonical_json_bytes(identity33)
         != common.canonical_json_bytes(baseline_identity33)
@@ -1083,14 +1285,24 @@ def _assemble_candidate(
         for row in redacted
     )
     seller_hashes = tuple(collision.seller_document_hash(row) for row in profiles)
+    item_codes, capacity_audit = _audit_document_capacity(
+        world=world,
+        redacted_items=redacted,
+        seller_profiles=profiles,
+    )
     return CandidateObservation(
         world=_canonical_clone(world),
         redacted_items=redacted,
         seller_profiles=profiles,
         identity33=identity33,
         profile_provenance_sha256=provenance_sha,
+        profile_provenance_source_multiset_sha256=(
+            provenance_source_multiset_sha
+        ),
         item_document_hashes=item_hashes,
         seller_document_hashes=seller_hashes,
+        item_codes=item_codes,
+        document_capacity_audit=capacity_audit,
         natural_output_sha256=natural.output_sha256,
     )
 
@@ -1193,6 +1405,7 @@ def build_scientific_world(
     current_item_hashes: set[str],
     current_seller_hashes: set[str],
     current_identity_hashes: set[str],
+    current_item_codes: set[str],
     candidate_limit: int = CANDIDATE_LIMIT,
     identity_maximum_counter: int = 128,
 ) -> AcceptedScientificWorld:
@@ -1200,12 +1413,10 @@ def build_scientific_world(
 
     if candidate_limit != CANDIDATE_LIMIT:
         raise ScientificWorldError("Candidate limit must remain frozen at 32")
-    if (
-        current_item_hashes & set(historical_item_hashes)
-        or current_seller_hashes & set(historical_seller_hashes)
-        or current_identity_hashes & set(historical_identity_hashes)
-    ):
-        raise ScientificWorldError("Current registries intersect historical exclusions")
+    if current_identity_hashes & set(historical_identity_hashes):
+        raise ScientificWorldError(
+            "Current identity registry intersects historical exclusions"
+        )
     split = str(world_record["split"])
     baseline = world_builder.build_world(
         policy=_canonical_clone(policy),
@@ -1248,36 +1459,45 @@ def build_scientific_world(
     ):
         raise ScientificWorldError("Identity allocation delta did not close")
 
-    profiles, provenance, identity33, _redacted = _build_profiles_and_identity33(
+    _profiles, _provenance, identity33, _redacted = _build_profiles_and_identity33(
         policy=policy,
         mode=mode,
         split=split,
         template=template,
         world=remapped,
     )
-    structural_sha = common.canonical_sha256(_structural_parent_projection(remapped))
-    provenance_sha = common.canonical_sha256(provenance)
-    provenance_source_multiset_sha = _profile_provenance_source_multiset_sha256(
-        provenance
+    capacity_parent, capacity_receipt = document_capacity.apply_capacity_parent(
+        policy=policy,
+        mode=mode,
+        world_record=world_record,
+        document_variation_key=document_variation_key,
+        world=remapped,
+    )
+    structural_sha = common.canonical_sha256(
+        _structural_parent_projection(capacity_parent)
     )
     identity33_sha = common.canonical_sha256(identity33)
+    parent_codes = {
+        str(row["code"]) for row in capacity_parent["private"]["render_asts"]
+    }
+    if len(parent_codes) != len(capacity_parent["private"]["render_asts"]):
+        raise ScientificWorldError("V9 parent contains duplicate item codes")
     view, binding = _build_restricted_view(
         policy=policy,
         mode=mode,
         split=split,
         template=template,
         fixture=fixture,
-        world=remapped,
+        world=capacity_parent,
         anonymous_handle_key=anonymous_handle_key,
         structural_parent_sha256=structural_sha,
-        baseline_provenance_source_multiset_sha256=(
-            provenance_source_multiset_sha
-        ),
         baseline_identity33_sha256=identity33_sha,
+        capacity_receipt=capacity_receipt,
     )
     rejection_counts = {name: 0 for name in COLLISION_CATEGORIES}
     accepted: CandidateObservation | None = None
     accepted_index: int | None = None
+    candidate_zero_lineage_reference: str | None = None
     world_uid = str(world_record["world_uid"])
     for candidate_index in range(candidate_limit):
         candidate_key = collision.derive_candidate_key(
@@ -1296,11 +1516,38 @@ def build_scientific_world(
             split=split,
             template=template,
             fixture=fixture,
-            baseline_world=remapped,
+            baseline_world=capacity_parent,
             baseline_identity33=identity33,
             view=view,
             binding=binding,
             natural=natural,
+        )
+        if tuple(observation.item_codes) != tuple(sorted(parent_codes)):
+            raise ScientificWorldError("Candidate item-code registry drift")
+        if candidate_index == 0:
+            candidate_zero_lineage_reference = (
+                observation.profile_provenance_source_multiset_sha256
+            )
+            if (
+                current_item_hashes & set(historical_item_hashes)
+                or current_seller_hashes & set(historical_seller_hashes)
+            ):
+                raise ScientificWorldError(
+                    "Current document registries intersect historical exclusions"
+                )
+            if parent_codes & current_item_codes:
+                raise ScientificWorldError("V9 item-code registry collision")
+        elif (
+            candidate_zero_lineage_reference is None
+            or observation.profile_provenance_source_multiset_sha256
+            != candidate_zero_lineage_reference
+        ):
+            raise ScientificWorldError(
+                "Candidate changed the candidate-zero lineage reference"
+            )
+        _assert_prior_item_codes_absent(
+            observation=observation,
+            prior_item_codes=current_item_codes,
         )
         categories = _collision_categories(
             item_hashes=observation.item_document_hashes,
@@ -1317,7 +1564,11 @@ def build_scientific_world(
         accepted = observation
         accepted_index = candidate_index
         break
-    if accepted is None or accepted_index is None:
+    if (
+        accepted is None
+        or accepted_index is None
+        or candidate_zero_lineage_reference is None
+    ):
         raise ScientificWorldError("All 32 exact-document candidates collided")
 
     if (
@@ -1327,8 +1578,55 @@ def build_scientific_world(
         != len(set(accepted.seller_document_hashes))
     ):
         raise ScientificWorldError("Accepted document multiplicity drift")
+    candidate_template_path = common.repo_path(CANDIDATE_TEMPLATE_RELATIVE_PATH)
+    if common.sha256_file(candidate_template_path) != CANDIDATE_TEMPLATE_SHA256:
+        raise ScientificWorldError("Candidate-only template hash drift before views")
+    processing_template = common.load_json(candidate_template_path)
+    processing_policy = _canonical_clone(policy)
+    processing_policy["template_library"]["path"] = CANDIDATE_TEMPLATE_RELATIVE_PATH
+    processing_policy["template_library"]["sha256"] = CANDIDATE_TEMPLATE_SHA256
+    safe_library = _candidate_safe_library(
+        policy=policy,
+        template=template,
+        fixture=fixture,
+        split=split,
+    )
+    effective_style_rows = stage_parent._effective_style_rows(
+        policy=policy,
+        template=template,
+        mode=mode,
+        world=accepted.world,
+    )
+    effective_styles = {
+        str(row["seller_uid"]): dict(row["style_factors"])
+        for row in effective_style_rows
+    }
+    private_projection = accepted.world["private"]
+    materialized_views = channel_materializer.materialize_label_free_channel_views(
+        processing_policy=processing_policy,
+        profile_policy=policy,
+        mode=mode,
+        split=split,
+        processing_template=processing_template,
+        safe_library=safe_library,
+        fixture=fixture,
+        world_uid=world_uid,
+        public_sellers=accepted.world["public"]["sellers"],
+        public_items=accepted.world["public"]["items"],
+        complete_model_pair_endpoints=accepted.world["public"][
+            "complete_model_pair_endpoints"
+        ],
+        render_asts=private_projection["render_asts"],
+        identity_slots_audit=private_projection["identity_slots_audit"],
+        noise_slots_audit=private_projection["noise_slots_audit"],
+        override_audit=private_projection["override_audit"],
+        effective_styles=effective_styles,
+        full_redacted_items=accepted.redacted_items,
+        full_seller_profiles=accepted.seller_profiles,
+    )
     controller_membership, pair_labels, qrels = _build_private_truth(accepted.world)
     current_identity_hashes.update(identity_delta)
+    current_item_codes.update(accepted.item_codes)
     current_item_hashes.update(accepted.item_document_hashes)
     current_seller_hashes.update(accepted.seller_document_hashes)
     return AcceptedScientificWorld(
@@ -1341,15 +1639,35 @@ def build_scientific_world(
         world=accepted.world,
         redacted_items=accepted.redacted_items,
         seller_profiles=accepted.seller_profiles,
+        masked_redacted_items=materialized_views.masked_redacted_items,
+        neutral_redacted_items=materialized_views.neutral_redacted_items,
+        masked_seller_profiles=materialized_views.masked_seller_profiles,
+        neutral_seller_profiles=materialized_views.neutral_seller_profiles,
+        public_code_probe_input=materialized_views.public_code_probe_input,
+        text_probe_eligibility_input=(
+            materialized_views.text_probe_eligibility_input
+        ),
+        channel_structure_audit=materialized_views.channel_structure_audit,
         identity33=accepted.identity33,
         controller_membership=controller_membership,
         pair_labels=pair_labels,
         qrels=qrels,
         identity_allocation_receipt=_canonical_clone(allocation_receipt),
         identity_registry_delta=identity_delta,
+        code_registry_delta=accepted.item_codes,
         item_registry_delta=tuple(sorted(accepted.item_document_hashes)),
         seller_registry_delta=tuple(sorted(accepted.seller_document_hashes)),
         structural_parent_sha256=structural_sha,
+        candidate_zero_lineage_reference_sha256=(
+            candidate_zero_lineage_reference
+        ),
+        document_capacity_receipt=_canonical_clone(capacity_receipt),
+        document_capacity_audit={
+            **_canonical_clone(accepted.document_capacity_audit),
+            "prior_item_code_registry_count": len(current_item_codes)
+            - len(accepted.item_codes),
+            "prior_item_code_intersection_zero": True,
+        },
         profile_provenance_sha256=accepted.profile_provenance_sha256,
         identity33_sha256=common.canonical_sha256(accepted.identity33),
         natural_output_sha256=accepted.natural_output_sha256,

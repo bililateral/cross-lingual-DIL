@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V8 capability-minimal natural-expression renderer for Step28-v13 v1.13.
+"""V9 capability-minimal natural-expression renderer for Step28-v13 v1.13.
 
 This module is intentionally self-contained.  It performs no filesystem or
 policy access and imports no project module.  Its only runtime authorities are
@@ -20,11 +20,14 @@ from typing import Any
 
 FIELD_SEPARATOR = b"\x1f"
 RNG_DOMAIN = "step28-v13-v1.13-natural-variation"
-VIEW_VERSION = "2026-08-10-step28-v13-v1-13-restricted-candidate-view-v1"
+VIEW_VERSION = "2026-08-14-step28-v13-v1-13-restricted-candidate-view-v9"
 OUTPUT_VERSION = (
-    "2026-08-13-step28-v13-v1-13-natural-candidate-v8-attribute-repair-v4"
+    "2026-08-14-step28-v13-v1-13-natural-candidate-v9-document-capacity-v1"
 )
 DESCRIPTION_SUFFIX = "{noise_clause}{context_guard}{identity_clause}"
+BASE_SKELETON_COUNT = 8
+TITLE_CODE_TWIN_SUFFIX = " 编号{code}"
+DESCRIPTION_CODE_TWIN_INSERTION = "{separator}编号{code}{ending}"
 ATTRIBUTE_ROTATION_DOMAIN = (
     "step28-v13-v1.13-v8.attribute.semantic-orbit.keyed-rotation-v2"
 )
@@ -206,6 +209,51 @@ def _scan_for_forbidden_view_content(value: Any) -> None:
             _scan_for_forbidden_view_content(child)
 
 
+def _capacity_twin(skeleton: str, *, description: bool) -> str:
+    if "{code}" in skeleton:
+        raise PureNaturalVariationError("A code-bearing skeleton has no capacity twin")
+    if description:
+        if not skeleton.endswith(DESCRIPTION_SUFFIX):
+            raise PureNaturalVariationError("Description skeleton suffix drift")
+        return (
+            skeleton[: -len(DESCRIPTION_SUFFIX)]
+            + DESCRIPTION_CODE_TWIN_INSERTION
+            + DESCRIPTION_SUFFIX
+        )
+    return skeleton + TITLE_CODE_TWIN_SUFFIX
+
+
+def _capacity_index_map(
+    skeletons: Sequence[str], *, description: bool
+) -> dict[int, int]:
+    values = list(skeletons)
+    if len(values) < BASE_SKELETON_COUNT:
+        raise PureNaturalVariationError("Base skeleton domain is incomplete")
+    base = values[:BASE_SKELETON_COUNT]
+    expected_extras = [
+        _capacity_twin(value, description=description)
+        for value in base
+        if "{code}" not in value
+    ]
+    if values[BASE_SKELETON_COUNT:] != expected_extras:
+        raise PureNaturalVariationError("Capacity-twin skeleton extension drift")
+    mapping: dict[int, int] = {}
+    extra_index = BASE_SKELETON_COUNT
+    for base_index, skeleton in enumerate(base):
+        if "{code}" in skeleton:
+            mapping[base_index] = base_index
+        else:
+            mapping[base_index] = extra_index
+            extra_index += 1
+    if (
+        len(mapping) != BASE_SKELETON_COUNT
+        or len(set(mapping.values())) != BASE_SKELETON_COUNT
+        or any("{code}" not in values[target] for target in mapping.values())
+    ):
+        raise PureNaturalVariationError("Capacity-twin mapping is not injective")
+    return mapping
+
+
 def validate_safe_library(library: Mapping[str, Any]) -> None:
     _require_exact_keys(library, SAFE_LIBRARY_FIELDS, label="safe library")
     categories = library["categories"]
@@ -285,6 +333,8 @@ def validate_safe_library(library: Mapping[str, Any]) -> None:
         for value in library["description_skeletons"]
     ):
         raise PureNaturalVariationError("Safe description skeleton suffix drift")
+    _capacity_index_map(library["title_skeletons"], description=False)
+    _capacity_index_map(library["description_skeletons"], description=True)
 
     category_classes = library["category_permutation_classes"]
     flattened_categories = [value for group in category_classes for value in group]
@@ -433,11 +483,11 @@ def validate_restricted_view(value: Mapping[str, Any]) -> None:
             or type(item["baseline_title_skeleton_index"]) is not int
             or not 0
             <= item["baseline_title_skeleton_index"]
-            < len(library["title_skeletons"])
+            < BASE_SKELETON_COUNT
             or type(item["baseline_description_skeleton_index"]) is not int
             or not 0
             <= item["baseline_description_skeleton_index"]
-            < len(library["description_skeletons"])
+            < BASE_SKELETON_COUNT
         ):
             raise PureNaturalVariationError("Restricted item content drift")
         handles.add(handle)
@@ -662,7 +712,7 @@ def _refined_permutation_map(
     return output
 
 
-def _build_v8_permutation_maps(
+def _build_v9_permutation_maps(
     *, candidate_key: bytes, library: Mapping[str, Any]
 ) -> dict[str, dict[Any, Any]]:
     """Build deterministic label-free maps that preserve rendering responses."""
@@ -888,7 +938,7 @@ def render_candidate_natural_expressions(
     validate_restricted_view(view)
     library = view["safe_library"]
 
-    maps = _build_v8_permutation_maps(
+    maps = _build_v9_permutation_maps(
         candidate_key=candidate_key, library=library
     )
     category_map = maps["category"]
@@ -928,10 +978,28 @@ def render_candidate_natural_expressions(
             "noise_clause": "",
         }
 
+    title_capacity_map = _capacity_index_map(
+        library["title_skeletons"], description=False
+    )
+    description_capacity_map = _capacity_index_map(
+        library["description_skeletons"], description=True
+    )
     view_items = {str(row["item_handle"]): row for row in view["items"]}
     for handle, row in rows.items():
         item = view_items[handle]
         style = dict(item["effective_style"])
+        if item["description_nonempty"]:
+            row["description_skeleton_index"] = description_capacity_map[
+                row["description_skeleton_index"]
+            ]
+        elif item["title_nonempty"]:
+            row["title_skeleton_index"] = title_capacity_map[
+                row["title_skeleton_index"]
+            ]
+        else:
+            raise PureNaturalVariationError(
+                "V9 capacity parent contains a joint-empty item"
+            )
         row["title"] = (
             _render_base_title(
                 skeleton=library["title_skeletons"][row["title_skeleton_index"]],
@@ -960,6 +1028,9 @@ def render_candidate_natural_expressions(
             if item["description_nonempty"]
             else ""
         )
+        visible_carrier = str(row["title"]) + str(row["base_description"])
+        if visible_carrier.count(str(item["code"])) < 1:
+            raise PureNaturalVariationError("Item code did not survive its carrier")
 
     noise_template_map = {
         int(source): int(target)

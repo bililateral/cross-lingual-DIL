@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the four-split Step28-v13 v1.13 v8 design Chinese dataset."""
+"""Build the four-split Step28-v13 v1.13 v9 design Chinese dataset."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from typing import Any, TextIO
 
 import step28_v13_common as common
 import step28_v13_v1_13_document_collision as collision
-import step28_v13_v1_13_scientific_common_v8 as scientific
-import step28_v13_v1_13_scientific_world_v8 as world_module
+import step28_v13_v1_13_scientific_common_v9 as scientific
+import step28_v13_v1_13_scientific_world_v9 as world_module
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,7 +80,11 @@ GLOBAL_UID_KINDS = (
 EXPECTED_SPLIT_DATA_PATHS = (
     "observed/worlds.jsonl",
     "observed/redacted_items.jsonl",
+    "observed/redacted_items.code_masked.jsonl",
+    "observed/redacted_items.code_neutralized.jsonl",
     "observed/model_seller_profiles.jsonl",
+    "observed/model_seller_profiles.code_masked.jsonl",
+    "observed/model_seller_profiles.code_neutralized.jsonl",
     "observed/complete_model_pair_endpoints.csv",
     "observed/identity33_all_pairs.csv",
     "private/controller_membership.jsonl",
@@ -89,6 +93,9 @@ EXPECTED_SPLIT_DATA_PATHS = (
     "private/world_generation_audit.jsonl",
     "private/document_collision_attempts.jsonl",
     "private/identity_allocation_receipts.jsonl",
+    "private/public_code_probe_input.jsonl",
+    "private/text_probe_eligibility_input.jsonl",
+    "private/channel_structure_audit.jsonl",
 )
 
 
@@ -99,7 +106,25 @@ class DatasetBuildError(scientific.ScientificBuilderError):
 def _validate_model_mount_contract(policy: Mapping[str, Any]) -> None:
     mount = policy["model_mount_contract"]
     if (
-        tuple(mount["seller_profile_join_only_fields"])
+        mount["seller_profile_surface_paths"]
+        != {
+            "surface_full": "observed/model_seller_profiles.jsonl",
+            "surface_code_masked": "observed/model_seller_profiles.code_masked.jsonl",
+            "surface_code_neutralized": "observed/model_seller_profiles.code_neutralized.jsonl",
+        }
+        or mount["redacted_item_surface_paths"]
+        != {
+            "surface_full": "observed/redacted_items.jsonl",
+            "surface_code_masked": "observed/redacted_items.code_masked.jsonl",
+            "surface_code_neutralized": "observed/redacted_items.code_neutralized.jsonl",
+        }
+        or mount["public_code_probe_input_path"]
+        != "private/public_code_probe_input.jsonl"
+        or mount["text_probe_eligibility_input_path"]
+        != "private/text_probe_eligibility_input.jsonl"
+        or mount["channel_structure_audit_path"]
+        != "private/channel_structure_audit.jsonl"
+        or tuple(mount["seller_profile_join_only_fields"])
         != MODEL_PROFILE_JOIN_ONLY_FIELDS
         or tuple(mount["seller_profile_text_feature_source_fields"])
         != MODEL_PROFILE_TEXT_FIELDS
@@ -184,7 +209,11 @@ class _CsvWriter:
 class _SplitWriters:
     worlds: _JsonlWriter
     redacted_items: _JsonlWriter
+    masked_redacted_items: _JsonlWriter
+    neutral_redacted_items: _JsonlWriter
     model_seller_profiles: _JsonlWriter
+    masked_model_seller_profiles: _JsonlWriter
+    neutral_model_seller_profiles: _JsonlWriter
     endpoints: _CsvWriter
     identity33: _CsvWriter
     controller_membership: _JsonlWriter
@@ -193,6 +222,9 @@ class _SplitWriters:
     private_world_audit: _JsonlWriter
     collision_attempts: _JsonlWriter
     identity_allocation: _JsonlWriter
+    public_code_probe_input: _JsonlWriter
+    text_probe_eligibility_input: _JsonlWriter
+    channel_structure_audit: _JsonlWriter
 
     @classmethod
     def open(
@@ -207,8 +239,20 @@ class _SplitWriters:
             redacted_items=_JsonlWriter.open(
                 root / "observed" / "redacted_items.jsonl"
             ),
+            masked_redacted_items=_JsonlWriter.open(
+                root / "observed" / "redacted_items.code_masked.jsonl"
+            ),
+            neutral_redacted_items=_JsonlWriter.open(
+                root / "observed" / "redacted_items.code_neutralized.jsonl"
+            ),
             model_seller_profiles=_JsonlWriter.open(
                 root / "observed" / "model_seller_profiles.jsonl"
+            ),
+            masked_model_seller_profiles=_JsonlWriter.open(
+                root / "observed" / "model_seller_profiles.code_masked.jsonl"
+            ),
+            neutral_model_seller_profiles=_JsonlWriter.open(
+                root / "observed" / "model_seller_profiles.code_neutralized.jsonl"
             ),
             endpoints=_CsvWriter.open(
                 root / "observed" / "complete_model_pair_endpoints.csv",
@@ -234,13 +278,26 @@ class _SplitWriters:
             identity_allocation=_JsonlWriter.open(
                 root / "private" / "identity_allocation_receipts.jsonl"
             ),
+            public_code_probe_input=_JsonlWriter.open(
+                root / "private" / "public_code_probe_input.jsonl"
+            ),
+            text_probe_eligibility_input=_JsonlWriter.open(
+                root / "private" / "text_probe_eligibility_input.jsonl"
+            ),
+            channel_structure_audit=_JsonlWriter.open(
+                root / "private" / "channel_structure_audit.jsonl"
+            ),
         )
 
     def all_writers(self) -> tuple[_JsonlWriter | _CsvWriter, ...]:
         return (
             self.worlds,
             self.redacted_items,
+            self.masked_redacted_items,
+            self.neutral_redacted_items,
             self.model_seller_profiles,
+            self.masked_model_seller_profiles,
+            self.neutral_model_seller_profiles,
             self.endpoints,
             self.identity33,
             self.controller_membership,
@@ -249,6 +306,9 @@ class _SplitWriters:
             self.private_world_audit,
             self.collision_attempts,
             self.identity_allocation,
+            self.public_code_probe_input,
+            self.text_probe_eligibility_input,
+            self.channel_structure_audit,
         )
 
     def close(self) -> None:
@@ -507,6 +567,11 @@ def _private_world_audit_row(
         "split": accepted.split,
         "split_ordinal": accepted.split_ordinal,
         "structural_parent_sha256": accepted.structural_parent_sha256,
+        "candidate_zero_lineage_reference_sha256": (
+            accepted.candidate_zero_lineage_reference_sha256
+        ),
+        "document_capacity_receipt": accepted.document_capacity_receipt,
+        "document_capacity_audit": accepted.document_capacity_audit,
         "profile_provenance_sha256": accepted.profile_provenance_sha256,
         "identity33_sha256": accepted.identity33_sha256,
         "controller_style_groups": private["controller_style_groups"],
@@ -539,10 +604,34 @@ def _write_world(
     ):
         writers.redacted_items.write(_project_model_redacted_item(row))
     for row in sorted(
+        accepted.masked_redacted_items,
+        key=lambda value: str(value["item_uid"]).encode("utf-8"),
+    ):
+        writers.masked_redacted_items.write(_project_model_redacted_item(row))
+    for row in sorted(
+        accepted.neutral_redacted_items,
+        key=lambda value: str(value["item_uid"]).encode("utf-8"),
+    ):
+        writers.neutral_redacted_items.write(_project_model_redacted_item(row))
+    for row in sorted(
         accepted.seller_profiles,
         key=lambda value: str(value["seller_uid"]).encode("utf-8"),
     ):
         writers.model_seller_profiles.write(_project_model_seller_profile(row))
+    for row in sorted(
+        accepted.masked_seller_profiles,
+        key=lambda value: str(value["seller_uid"]).encode("utf-8"),
+    ):
+        writers.masked_model_seller_profiles.write(
+            _project_model_seller_profile(row)
+        )
+    for row in sorted(
+        accepted.neutral_seller_profiles,
+        key=lambda value: str(value["seller_uid"]).encode("utf-8"),
+    ):
+        writers.neutral_model_seller_profiles.write(
+            _project_model_seller_profile(row)
+        )
     for row in sorted(
         accepted.world["public"]["complete_model_pair_endpoints"],
         key=lambda value: (
@@ -568,6 +657,10 @@ def _write_world(
             "accepted_candidate_index": accepted.candidate_index,
             "candidates_examined": accepted.candidates_examined,
             "rejection_counts": accepted.rejection_counts,
+            "code_registry_delta_count": len(accepted.code_registry_delta),
+            "code_registry_delta_sha256": common.canonical_sha256(
+                accepted.code_registry_delta
+            ),
             "item_registry_delta_count": len(accepted.item_registry_delta),
             "item_registry_delta_sha256": common.canonical_sha256(
                 accepted.item_registry_delta
@@ -591,6 +684,11 @@ def _write_world(
             "receipt": accepted.identity_allocation_receipt,
         }
     )
+    for row in accepted.public_code_probe_input:
+        writers.public_code_probe_input.write(row)
+    for row in accepted.text_probe_eligibility_input:
+        writers.text_probe_eligibility_input.write(row)
+    writers.channel_structure_audit.write(accepted.channel_structure_audit)
 
 
 def _validate_split_counts(
@@ -612,7 +710,23 @@ def _validate_split_counts(
             writers.model_seller_profiles.row_count,
             expected_sellers,
         ),
+        "masked_model_seller_profiles": (
+            writers.masked_model_seller_profiles.row_count,
+            expected_sellers,
+        ),
+        "neutral_model_seller_profiles": (
+            writers.neutral_model_seller_profiles.row_count,
+            expected_sellers,
+        ),
         "redacted_items": (writers.redacted_items.row_count, expected_item_count),
+        "masked_redacted_items": (
+            writers.masked_redacted_items.row_count,
+            expected_item_count,
+        ),
+        "neutral_redacted_items": (
+            writers.neutral_redacted_items.row_count,
+            expected_item_count,
+        ),
         "endpoints": (writers.endpoints.row_count, expected_pairs),
         "identity33": (writers.identity33.row_count, expected_pairs),
         "controller_membership": (
@@ -624,6 +738,18 @@ def _validate_split_counts(
         "private_world_audit": (writers.private_world_audit.row_count, world_count),
         "collision_attempts": (writers.collision_attempts.row_count, world_count),
         "identity_allocation": (writers.identity_allocation.row_count, world_count),
+        "public_code_probe_input": (
+            writers.public_code_probe_input.row_count,
+            expected_sellers,
+        ),
+        "text_probe_eligibility_input": (
+            writers.text_probe_eligibility_input.row_count,
+            expected_pairs,
+        ),
+        "channel_structure_audit": (
+            writers.channel_structure_audit.row_count,
+            world_count,
+        ),
     }
     failures = {
         name: {"observed": observed, "expected": expected}
@@ -654,6 +780,21 @@ def _safe_remove_temp(temp_root: Path, *, expected_output: Path) -> None:
 
 
 def run_build(*, execution_mode: str) -> dict[str, Any]:
+    raise DatasetBuildError(
+        "V9 is implementation-only: dataset rebuild remains unauthorized; "
+        "use the in-memory causal replay contract through train ordinal 283"
+    )
+
+
+def _run_build_unreachable_until_fresh_review(*, execution_mode: str) -> dict[str, Any]:
+    """Retain the reviewed writer transaction without making it executable."""
+
+    raise DatasetBuildError(
+        "V9 writer transaction is sealed until a fresh review changes the policy"
+    )
+
+    # The unreachable transaction below remains a static implementation target;
+    # no Python entry point can cross the fail-closed guard above in this release.
     policy = scientific.load_policy()
     _validate_model_mount_contract(policy)
     context = scientific.build_execution_context(policy, execution_mode=execution_mode)
@@ -690,6 +831,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
         current_item_hashes: set[str] = set()
         current_seller_hashes: set[str] = set()
         current_identity_hashes: set[str] = set()
+        current_item_codes: set[str] = set()
         seen_uids: dict[str, set[str]] = {
             kind: set() for kind in GLOBAL_UID_KINDS
         }
@@ -705,6 +847,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
         split_identity_value_hashes: dict[str, set[str]] = {
             split: set() for split in SPLITS
         }
+        split_item_codes: dict[str, set[str]] = {split: set() for split in SPLITS}
         positive_counts: Counter[str] = Counter()
         candidate_histograms: dict[str, Counter[int]] = defaultdict(Counter)
         rejection_totals: dict[str, Counter[str]] = defaultdict(Counter)
@@ -752,6 +895,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
                 current_item_hashes=current_item_hashes,
                 current_seller_hashes=current_seller_hashes,
                 current_identity_hashes=current_identity_hashes,
+                current_item_codes=current_item_codes,
                 candidate_limit=int(policy["candidate_selection"]["candidate_limit"]),
                 identity_maximum_counter=int(
                     policy["candidate_selection"][
@@ -769,6 +913,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
                 & set(accepted.seller_registry_delta)
                 or split_identity_value_hashes[split]
                 & set(accepted.identity_registry_delta)
+                or split_item_codes[split] & set(accepted.code_registry_delta)
             ):
                 raise DatasetBuildError("Within-split registry delta reuse")
             split_item_document_hashes[split].update(accepted.item_registry_delta)
@@ -778,6 +923,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
             split_identity_value_hashes[split].update(
                 accepted.identity_registry_delta
             )
+            split_item_codes[split].update(accepted.code_registry_delta)
             _write_world(writers_by_split[split], accepted)
             split_world_counts[split] += 1
             positive_counts[split] += sum(row["label"] for row in accepted.pair_labels)
@@ -841,6 +987,10 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
                 "positive_pair_count": expected_worlds * 20,
                 "negative_pair_count": expected_worlds * 358,
                 "item_count": len(split_item_document_hashes[split]),
+                "item_code_registry_count": len(split_item_codes[split]),
+                "item_code_registry_sha256": common.canonical_sha256(
+                    sorted(split_item_codes[split])
+                ),
                 "item_document_registry_count": len(
                     split_item_document_hashes[split]
                 ),
@@ -914,6 +1064,7 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
                 current_identity_hashes,
                 split_identity_value_hashes,
             ),
+            ("item code", current_item_codes, split_item_codes),
         ):
             if len(global_values) != sum(
                 len(split_values[split]) for split in SPLITS
@@ -949,6 +1100,10 @@ def run_build(*, execution_mode: str) -> dict[str, Any]:
             "seller_document_registry_count": len(current_seller_hashes),
             "seller_document_registry_sha256": common.canonical_sha256(
                 sorted(current_seller_hashes)
+            ),
+            "item_code_registry_count": len(current_item_codes),
+            "item_code_registry_sha256": common.canonical_sha256(
+                sorted(current_item_codes)
             ),
             "identity_value_registry_count": len(current_identity_hashes),
             "identity_value_registry_sha256": common.canonical_sha256(
