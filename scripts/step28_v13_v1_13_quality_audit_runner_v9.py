@@ -326,10 +326,11 @@ def _load_root_manifests(
 def _validate_builder_policy_binding(
     root_manifest: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Bind the persisted design root to the exact current builder policy."""
+    """Bind the design root to current policies, builder bytes, and run receipt."""
 
     try:
         builder_policy = scientific.load_policy()
+        quality_policy = quality_policy_module.load_policy()
         policy_path = scientific.DEFAULT_POLICY_PATH.resolve()
         relative_path = policy_path.relative_to(ROOT.resolve()).as_posix()
         policy_file = {
@@ -337,16 +338,114 @@ def _validate_builder_policy_binding(
             "size_bytes": policy_path.stat().st_size,
             "sha256": _sha256_file(policy_path),
         }
+        quality_path = quality_policy_module.DEFAULT_POLICY.resolve()
+        quality_file = {
+            "path": quality_path.relative_to(ROOT.resolve()).as_posix(),
+            "size_bytes": quality_path.stat().st_size,
+            "sha256": _sha256_file(quality_path),
+        }
+        builder_source_value = _repo_source(Path(dataset_builder.__file__))
+        builder_source = {
+            "path": builder_source_value.path,
+            "size_bytes": builder_source_value.size_bytes,
+            "sha256": builder_source_value.sha256,
+        }
     except (OSError, ValueError) as exc:
-        raise AuditorExecutionFailure(
-            "Current builder policy cannot be verified"
-        ) from exc
+        raise AuditorExecutionFailure("Current build lineage cannot be verified") from exc
+    authorization = root_manifest.get("design_build_authorization")
+    expected_authorization = {
+        "status": "CONSUMED_ONE_TIME_DESIGN_PREFLIGHT_RECEIPT",
+        "review_final_line": builder_policy["design_build_authorization_overlay"][
+            "required_review_final_line"
+        ],
+        "execution_mode": "design_preflight",
+        "attempt_index": builder_policy["single_attempt_random_authority"][
+            "attempt_index"
+        ],
+        "world_counts": builder_policy["execution_modes"]["design_preflight"][
+            "world_counts"
+        ],
+        "output_root": builder_policy["execution_modes"]["design_preflight"][
+            "output_root"
+        ],
+        "random_authority_commitment_sha256": common.canonical_sha256(
+            builder_policy["public_preflight_keys"]["design_preflight"]
+        ),
+        "base_policy_alone_authorized_run": False,
+    }
+    if not isinstance(authorization, Mapping) or set(authorization) != {
+        *expected_authorization,
+        "receipt_id",
+        "receipt_file",
+        "review_response_sha256",
+        "git_commit",
+        "git_tree",
+    }:
+        raise DatasetGateFailure("Design root/build authorization binding drift")
+    receipt_file = authorization.get("receipt_file")
+    if not isinstance(receipt_file, Mapping) or set(receipt_file) != {
+        "path",
+        "size_bytes",
+        "sha256",
+    }:
+        raise DatasetGateFailure("Design root/build authorization binding drift")
+    receipt_sha256 = receipt_file.get("sha256")
+    receipt_path = receipt_file.get("path")
+    expected_receipt_path = builder_policy["design_build_authorization_overlay"][
+        "receipt_path"
+    ]
+    expected_receipt_stem = Path(expected_receipt_path).stem
+    git_values = (authorization.get("git_commit"), authorization.get("git_tree"))
+    if (
+        any(authorization.get(key) != value for key, value in expected_authorization.items())
+        or not isinstance(authorization.get("receipt_id"), str)
+        or len(authorization["receipt_id"]) != 64
+        or any(
+            character not in "0123456789abcdef"
+            for character in authorization["receipt_id"]
+        )
+        or not isinstance(authorization.get("review_response_sha256"), str)
+        or len(authorization["review_response_sha256"]) != 64
+        or any(
+            character not in "0123456789abcdef"
+            for character in authorization["review_response_sha256"]
+        )
+        or not isinstance(receipt_path, str)
+        or isinstance(receipt_file.get("size_bytes"), bool)
+        or not isinstance(receipt_file.get("size_bytes"), int)
+        or receipt_file["size_bytes"] <= 0
+        or not isinstance(receipt_sha256, str)
+        or len(receipt_sha256) != 64
+        or any(character not in "0123456789abcdef" for character in receipt_sha256)
+        or receipt_path
+        != f"private_custody/{expected_receipt_stem}.consumed.{receipt_sha256}.json"
+        or any(
+            not isinstance(value, str)
+            or len(value) not in (40, 64)
+            or any(character not in "0123456789abcdef" for character in value)
+            for value in git_values
+        )
+    ):
+        raise DatasetGateFailure("Design root/build authorization binding drift")
     if (
         root_manifest.get("builder_policy_canonical_self_hash")
         != builder_policy["canonical_self_hash"]
         or root_manifest.get("builder_policy_file") != policy_file
+        or root_manifest.get("quality_policy_canonical_self_hash")
+        != quality_policy["canonical_self_hash"]
+        or root_manifest.get("quality_policy_file") != quality_file
+        or root_manifest.get("builder_source_file") != builder_source
+        or root_manifest.get("world_count")
+        != builder_policy["single_attempt_random_authority"]["total_world_count"]
+        or quality_policy["authorization"].get("implementation_and_fixture_tests")
+        is not True
+        or any(
+            value is not False
+            for key, value in quality_policy["authorization"].items()
+            if key != "implementation_and_fixture_tests"
+        )
     ):
-        raise DatasetGateFailure("Design root/builder policy binding drift")
+        raise DatasetGateFailure("Design root/build lineage binding drift")
     return builder_policy
 
 
@@ -827,8 +926,11 @@ def _run_authorized_formal_quality_audit(
         dataset_root=dataset_root, root_pin=root_pin
     )
     if (
-        root_manifest.get("execution_mode") != "design_preflight"
+        root_manifest.get("status")
+        != "PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED"
+        or root_manifest.get("execution_mode") != "design_preflight"
         or root_manifest.get("scientific_use_forbidden") is not True
+        or root_manifest.get("formal_seed_created") is not False
         or root_manifest.get("formal_rows_created") != 0
         or root_manifest.get("training_started") is not False
     ):

@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
+import re
 import shutil
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
@@ -18,12 +21,22 @@ from typing import Any, TextIO
 
 import step28_v13_common as common
 import step28_v13_v1_13_document_collision as collision
+import step28_v13_v1_13_quality_channel_policy_v9 as quality_policy_module
 import step28_v13_v1_13_scientific_common_v9 as scientific
 import step28_v13_v1_13_scientific_world_v9 as world_module
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SPLITS = scientific.SPLITS
+DESIGN_EXECUTION_MODE = "design_preflight"
+AUTHORIZATION_STATUS = "ALLOW_ONE_DESIGN_PREFLIGHT_BUILD"
+AUTHORIZATION_CLAIM_BOUNDARY = (
+    "This receipt authorizes exactly one design_preflight build and no quality "
+    "audit, formal generation, truth opening, training, or metric generation."
+)
+HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+GIT_OBJECT_RE = re.compile(r"^[0-9a-f]{40,64}$")
+REVIEWED_AT_RE = re.compile(r"^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
 
 # These are the only seller-profile fields that the frozen M0/M3 base-feature
 # adapter may mount.  ``seller_uid`` is a join key, never a feature.  The five
@@ -101,6 +114,35 @@ EXPECTED_SPLIT_DATA_PATHS = (
 
 class DatasetBuildError(scientific.ScientificBuilderError):
     """Raised when a multi-world dataset build fails closed."""
+
+
+@dataclass(frozen=True)
+class _VerifiedDesignBuildReceipt:
+    path: Path
+    size_bytes: int
+    sha256: str
+    receipt_id: str
+    review_response_sha256: str
+    git_commit: str
+    git_tree: str
+    random_authority_commitment_sha256: str
+    builder_policy_binding: dict[str, Any]
+    quality_policy_binding: dict[str, Any]
+    builder_source_file: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class AuthorizedDesignPreflightContext:
+    execution_context: scientific.ExecutionContext
+    builder_policy: dict[str, Any]
+    quality_policy_binding: dict[str, Any]
+    builder_source_file: dict[str, Any]
+    git_commit: str
+    git_tree: str
+    random_authority_commitment_sha256: str
+    receipt_id: str
+    review_response_sha256: str
+    receipt_file: dict[str, Any]
 
 
 def _validate_model_mount_contract(policy: Mapping[str, Any]) -> None:
@@ -779,32 +821,388 @@ def _safe_remove_temp(temp_root: Path, *, expected_output: Path) -> None:
         shutil.rmtree(temp_root)
 
 
-def run_build(*, execution_mode: str) -> dict[str, Any]:
-    raise DatasetBuildError(
-        "V9 is implementation-only: dataset rebuild remains unauthorized; "
-        "use the in-memory causal replay contract through train ordinal 283"
+def _repo_file_binding(path: Path) -> dict[str, Any]:
+    resolved = path.resolve()
+    try:
+        relative = resolved.relative_to(ROOT.resolve()).as_posix()
+        size_bytes = resolved.stat().st_size
+    except (OSError, ValueError) as exc:
+        raise DatasetBuildError("Pinned authorization source is unavailable") from exc
+    return {
+        "path": relative,
+        "size_bytes": size_bytes,
+        "sha256": common.sha256_file(resolved),
+    }
+
+
+def _policy_binding(path: Path, policy: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        **_repo_file_binding(path),
+        "canonical_self_hash": str(policy["canonical_self_hash"]),
+    }
+
+
+def _git_identity() -> tuple[str, str]:
+    try:
+        status = subprocess.run(
+            ["git", "status", "--porcelain=v1", "--untracked-files=no"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if status.stdout:
+            raise DatasetBuildError(
+                "Tracked Git worktree is not clean for the reviewed build"
+            )
+        values = []
+        for revision in ("HEAD", "HEAD^{tree}"):
+            result = subprocess.run(
+                ["git", "rev-parse", revision],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            values.append(result.stdout.strip())
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise DatasetBuildError("Reviewed Git identity cannot be verified") from exc
+    if any(GIT_OBJECT_RE.fullmatch(value) is None for value in values):
+        raise DatasetBuildError("Reviewed Git identity is malformed")
+    return values[0], values[1]
+
+
+def _authorization_receipt_path(policy: Mapping[str, Any]) -> Path:
+    overlay = policy["design_build_authorization_overlay"]
+    path = common.repo_path(str(overlay["receipt_path"]))
+    private_root = (ROOT / "private_custody").resolve()
+    if private_root not in path.parents or path.parent != private_root:
+        raise DatasetBuildError("Design-build receipt path escaped private custody")
+    return path
+
+
+def _load_strict_json_object(raw: bytes) -> dict[str, Any]:
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        output: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in output:
+                raise DatasetBuildError("Design-build receipt has duplicate keys")
+            output[key] = value
+        return output
+
+    def reject_constant(_value: str) -> None:
+        raise DatasetBuildError("Design-build receipt has a non-finite value")
+
+    try:
+        value = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=reject_duplicates,
+            parse_constant=reject_constant,
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise DatasetBuildError("Design-build receipt is not strict UTF-8 JSON") from exc
+    if not isinstance(value, dict):
+        raise DatasetBuildError("Design-build receipt must be a JSON object")
+    return value
+
+
+def _load_and_validate_design_build_receipt(
+    policy: Mapping[str, Any],
+) -> tuple[_VerifiedDesignBuildReceipt, dict[str, Any]]:
+    path = _authorization_receipt_path(policy)
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise DatasetBuildError(
+            "Design build remains unauthorized: exact one-time receipt is absent"
+        ) from exc
+    receipt_sha256 = hashlib.sha256(raw).hexdigest()
+    receipt = _load_strict_json_object(raw)
+    expected_keys = {
+        "version",
+        "status",
+        "claim_boundary",
+        "review_final_line",
+        "review_conversation_url",
+        "review_response_sha256",
+        "reviewed_at_utc",
+        "execution_mode",
+        "attempt_index",
+        "world_counts",
+        "output_root",
+        "random_authority_commitment_sha256",
+        "builder_policy",
+        "quality_policy",
+        "builder_source",
+        "git_commit",
+        "git_tree",
+        "canonical_self_hash",
+    }
+    if set(receipt) != expected_keys:
+        raise DatasetBuildError("Design-build receipt schema drift")
+    unsigned = dict(receipt)
+    receipt_id = unsigned.pop("canonical_self_hash")
+    if (
+        not isinstance(receipt_id, str)
+        or HEX_SHA256_RE.fullmatch(receipt_id) is None
+        or common.canonical_sha256(unsigned) != receipt_id
+    ):
+        raise DatasetBuildError("Design-build receipt self-hash drift")
+
+    overlay = policy["design_build_authorization_overlay"]
+    quality_policy = quality_policy_module.load_policy()
+    quality_authorization = quality_policy["authorization"]
+    if quality_authorization.get("implementation_and_fixture_tests") is not True or any(
+        value is not False
+        for key, value in quality_authorization.items()
+        if key != "implementation_and_fixture_tests"
+    ):
+        raise DatasetBuildError("Quality or training authorization unexpectedly opened")
+    git_commit, git_tree = _git_identity()
+    builder_policy_binding = _policy_binding(scientific.DEFAULT_POLICY_PATH, policy)
+    quality_policy_binding = _policy_binding(
+        quality_policy_module.DEFAULT_POLICY, quality_policy
+    )
+    builder_source = _repo_file_binding(Path(__file__))
+    mode_spec = policy["execution_modes"][DESIGN_EXECUTION_MODE]
+    random_authority_commitment = common.canonical_sha256(
+        policy["public_preflight_keys"][DESIGN_EXECUTION_MODE]
+    )
+    fixed_expected = {
+        "version": overlay["receipt_version"],
+        "status": AUTHORIZATION_STATUS,
+        "claim_boundary": AUTHORIZATION_CLAIM_BOUNDARY,
+        "review_final_line": overlay["required_review_final_line"],
+        "execution_mode": DESIGN_EXECUTION_MODE,
+        "attempt_index": policy["single_attempt_random_authority"]["attempt_index"],
+        "world_counts": mode_spec["world_counts"],
+        "output_root": mode_spec["output_root"],
+        "random_authority_commitment_sha256": random_authority_commitment,
+        "builder_policy": builder_policy_binding,
+        "quality_policy": quality_policy_binding,
+        "builder_source": builder_source,
+        "git_commit": git_commit,
+        "git_tree": git_tree,
+    }
+    for key, expected in fixed_expected.items():
+        if receipt.get(key) != expected:
+            raise DatasetBuildError("Design-build receipt binding drift")
+    if (
+        not isinstance(receipt["review_conversation_url"], str)
+        or not receipt["review_conversation_url"].startswith(
+            "https://chatgpt.com/c/"
+        )
+        or not isinstance(receipt["review_response_sha256"], str)
+        or HEX_SHA256_RE.fullmatch(receipt["review_response_sha256"]) is None
+        or not isinstance(receipt["reviewed_at_utc"], str)
+        or REVIEWED_AT_RE.fullmatch(receipt["reviewed_at_utc"]) is None
+    ):
+        raise DatasetBuildError("Design-build review metadata drift")
+    return (
+        _VerifiedDesignBuildReceipt(
+            path=path,
+            size_bytes=len(raw),
+            sha256=receipt_sha256,
+            receipt_id=receipt_id,
+            review_response_sha256=receipt["review_response_sha256"],
+            git_commit=git_commit,
+            git_tree=git_tree,
+            random_authority_commitment_sha256=random_authority_commitment,
+            builder_policy_binding=builder_policy_binding,
+            quality_policy_binding=quality_policy_binding,
+            builder_source_file=builder_source,
+        ),
+        dict(quality_policy),
     )
 
 
-def _run_build_unreachable_until_fresh_review(*, execution_mode: str) -> dict[str, Any]:
-    """Retain the reviewed writer transaction without making it executable."""
+def _expected_receipt_relative_path(
+    policy: Mapping[str, Any], *, receipt_sha256: str, consumed: bool
+) -> str:
+    source = Path(policy["design_build_authorization_overlay"]["receipt_path"])
+    if not consumed:
+        return source.as_posix()
+    return source.with_name(
+        f"{source.stem}.consumed.{receipt_sha256}.json"
+    ).as_posix()
 
-    raise DatasetBuildError(
-        "V9 writer transaction is sealed until a fresh review changes the policy"
+
+def _validate_design_preflight_context_lineage(
+    context: AuthorizedDesignPreflightContext,
+    *,
+    receipt_consumed: bool,
+) -> None:
+    scientific.validate_policy(context.builder_policy)
+    execution = context.execution_context
+    mode_spec = context.builder_policy["execution_modes"][DESIGN_EXECUTION_MODE]
+    observed_counts = Counter(str(row["split"]) for row in execution.world_records)
+    if (
+        execution.execution_mode != DESIGN_EXECUTION_MODE
+        or execution.base_mode != "development_smoke"
+        or execution.scientific_use_forbidden is not True
+        or execution.output_root
+        != common.repo_path(str(mode_spec["output_root"]))
+        or dict(observed_counts) != mode_spec["world_counts"]
+        or len(execution.world_records)
+        != context.builder_policy["single_attempt_random_authority"][
+            "total_world_count"
+        ]
+    ):
+        raise DatasetBuildError("Authorized design-preflight context drift")
+    current_builder_policy = scientific.load_policy()
+    current_quality_policy = quality_policy_module.load_policy()
+    current_commit, current_tree = _git_identity()
+    receipt_file = context.receipt_file
+    if not isinstance(receipt_file, Mapping):
+        raise DatasetBuildError("Authorized design-preflight lineage drift")
+    receipt_sha256 = receipt_file.get("sha256")
+    receipt_path = receipt_file.get("path")
+    if (
+        current_builder_policy != context.builder_policy
+        or _policy_binding(scientific.DEFAULT_POLICY_PATH, current_builder_policy)
+        != {
+            **_repo_file_binding(scientific.DEFAULT_POLICY_PATH),
+            "canonical_self_hash": context.builder_policy["canonical_self_hash"],
+        }
+        or _policy_binding(
+            quality_policy_module.DEFAULT_POLICY, current_quality_policy
+        )
+        != context.quality_policy_binding
+        or _repo_file_binding(Path(__file__)) != context.builder_source_file
+        or (current_commit, current_tree) != (context.git_commit, context.git_tree)
+        or context.random_authority_commitment_sha256
+        != common.canonical_sha256(
+            context.builder_policy["public_preflight_keys"][DESIGN_EXECUTION_MODE]
+        )
+        or not isinstance(context.receipt_id, str)
+        or HEX_SHA256_RE.fullmatch(context.receipt_id) is None
+        or not isinstance(context.review_response_sha256, str)
+        or HEX_SHA256_RE.fullmatch(context.review_response_sha256) is None
+        or set(receipt_file) != {"path", "size_bytes", "sha256"}
+        or type(receipt_file["size_bytes"]) is not int
+        or receipt_file["size_bytes"] <= 0
+        or not isinstance(receipt_sha256, str)
+        or HEX_SHA256_RE.fullmatch(receipt_sha256) is None
+        or receipt_path
+        != _expected_receipt_relative_path(
+            context.builder_policy,
+            receipt_sha256=receipt_sha256,
+            consumed=receipt_consumed,
+        )
+    ):
+        raise DatasetBuildError("Authorized design-preflight lineage drift")
+
+
+def _validate_pending_design_preflight_context(
+    context: AuthorizedDesignPreflightContext,
+) -> None:
+    _validate_design_preflight_context_lineage(
+        context, receipt_consumed=False
     )
 
-    # The unreachable transaction below remains a static implementation target;
-    # no Python entry point can cross the fail-closed guard above in this release.
+
+def _validate_authorized_design_preflight_context(
+    context: AuthorizedDesignPreflightContext,
+) -> None:
+    _validate_design_preflight_context_lineage(
+        context, receipt_consumed=True
+    )
+
+
+def _consume_design_build_receipt(
+    receipt: _VerifiedDesignBuildReceipt,
+) -> dict[str, Any]:
+    consumed = receipt.path.with_name(
+        f"{receipt.path.stem}.consumed.{receipt.sha256}.json"
+    )
+    if consumed.exists():
+        raise DatasetBuildError("Design-build receipt was already consumed")
+    try:
+        if common.sha256_file(receipt.path) != receipt.sha256:
+            raise DatasetBuildError("Design-build receipt changed before consumption")
+        receipt.path.replace(consumed)
+        if common.sha256_file(consumed) != receipt.sha256:
+            raise DatasetBuildError("Consumed design-build receipt bytes drift")
+    except OSError as exc:
+        raise DatasetBuildError("Design-build receipt could not be consumed") from exc
+    return {
+        "path": consumed.relative_to(ROOT.resolve()).as_posix(),
+        "size_bytes": receipt.size_bytes,
+        "sha256": receipt.sha256,
+    }
+
+
+def run_design_preflight_once() -> dict[str, Any]:
+    """Run the sole write-capable mode after consuming an exact external receipt."""
+
     policy = scientific.load_policy()
     _validate_model_mount_contract(policy)
-    context = scientific.build_execution_context(policy, execution_mode=execution_mode)
+    receipt, _quality_policy = _load_and_validate_design_build_receipt(policy)
+    execution = scientific.build_execution_context(
+        policy, execution_mode=DESIGN_EXECUTION_MODE
+    )
+    original_receipt_file = {
+        "path": receipt.path.relative_to(ROOT.resolve()).as_posix(),
+        "size_bytes": receipt.size_bytes,
+        "sha256": receipt.sha256,
+    }
+    pending = AuthorizedDesignPreflightContext(
+        execution_context=execution,
+        builder_policy=dict(policy),
+        quality_policy_binding=receipt.quality_policy_binding,
+        builder_source_file=receipt.builder_source_file,
+        git_commit=receipt.git_commit,
+        git_tree=receipt.git_tree,
+        random_authority_commitment_sha256=(
+            receipt.random_authority_commitment_sha256
+        ),
+        receipt_id=receipt.receipt_id,
+        review_response_sha256=receipt.review_response_sha256,
+        receipt_file=original_receipt_file,
+    )
+    _validate_pending_design_preflight_context(pending)
+    output_root = execution.output_root
+    temp_root = output_root.parent / f".{output_root.name}.building"
+    if output_root.exists() or temp_root.exists():
+        raise DatasetBuildError(
+            "Design output or temporary root already exists; resume is forbidden"
+        )
+    consumed_receipt_file = _consume_design_build_receipt(receipt)
+    authorized = AuthorizedDesignPreflightContext(
+        execution_context=execution,
+        builder_policy=dict(policy),
+        quality_policy_binding=receipt.quality_policy_binding,
+        builder_source_file=receipt.builder_source_file,
+        git_commit=receipt.git_commit,
+        git_tree=receipt.git_tree,
+        random_authority_commitment_sha256=(
+            receipt.random_authority_commitment_sha256
+        ),
+        receipt_id=receipt.receipt_id,
+        review_response_sha256=receipt.review_response_sha256,
+        receipt_file=consumed_receipt_file,
+    )
+    return _run_design_preflight_transaction(context=authorized)
+
+
+def _run_design_preflight_transaction(
+    *, context: AuthorizedDesignPreflightContext
+) -> dict[str, Any]:
+    """Write one complete design root from a previously authorized context."""
+
+    _validate_authorized_design_preflight_context(context)
+    authorization = context
+    policy = authorization.builder_policy
+    context = authorization.execution_context
+    execution_mode = context.execution_mode
     output_root = context.output_root
     temp_root = output_root.parent / f".{output_root.name}.building"
-    if output_root.exists():
+    if output_root.exists() or temp_root.exists():
         raise DatasetBuildError(
-            f"Immutable output already exists; remove only if documented as failed: {output_root}"
+            "Immutable output or temporary root already exists; resume is forbidden"
         )
-    _safe_remove_temp(temp_root, expected_output=output_root)
     temp_root.mkdir(parents=True, exist_ok=False)
     completed = False
     writers_by_split: dict[str, _SplitWriters] = {}
@@ -1080,12 +1478,43 @@ def _run_build_unreachable_until_fresh_review(*, execution_mode: str) -> dict[st
             "training_started": False,
             "scientific_contract": policy["scientific_contract"],
             "builder_policy_canonical_self_hash": policy["canonical_self_hash"],
-            "builder_policy_file": {
-                "path": scientific.DEFAULT_POLICY_PATH.resolve()
-                .relative_to(ROOT.resolve())
-                .as_posix(),
-                "size_bytes": scientific.DEFAULT_POLICY_PATH.stat().st_size,
-                "sha256": common.sha256_file(scientific.DEFAULT_POLICY_PATH),
+            "builder_policy_file": _repo_file_binding(
+                scientific.DEFAULT_POLICY_PATH
+            ),
+            "quality_policy_canonical_self_hash": authorization.quality_policy_binding[
+                "canonical_self_hash"
+            ],
+            "quality_policy_file": {
+                key: authorization.quality_policy_binding[key]
+                for key in ("path", "size_bytes", "sha256")
+            },
+            "builder_source_file": authorization.builder_source_file,
+            "design_build_authorization": {
+                "status": "CONSUMED_ONE_TIME_DESIGN_PREFLIGHT_RECEIPT",
+                "receipt_id": authorization.receipt_id,
+                "receipt_file": authorization.receipt_file,
+                "review_response_sha256": (
+                    authorization.review_response_sha256
+                ),
+                "review_final_line": policy[
+                    "design_build_authorization_overlay"
+                ]["required_review_final_line"],
+                "git_commit": authorization.git_commit,
+                "git_tree": authorization.git_tree,
+                "execution_mode": DESIGN_EXECUTION_MODE,
+                "attempt_index": policy["single_attempt_random_authority"][
+                    "attempt_index"
+                ],
+                "world_counts": policy["execution_modes"][
+                    DESIGN_EXECUTION_MODE
+                ]["world_counts"],
+                "output_root": policy["execution_modes"][
+                    DESIGN_EXECUTION_MODE
+                ]["output_root"],
+                "random_authority_commitment_sha256": (
+                    authorization.random_authority_commitment_sha256
+                ),
+                "base_policy_alone_authorized_run": False,
             },
             "split_order": list(SPLITS),
             "world_count": expected_total,
@@ -1144,43 +1573,35 @@ def _run_build_unreachable_until_fresh_review(*, execution_mode: str) -> dict[st
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--mode",
-        choices=scientific.EXECUTION_MODES,
-        default="small_smoke",
-    )
-    parser.add_argument(
         "--validate-policy-only",
         action="store_true",
-        help="Validate frozen design inputs without generating rows.",
+        help=(
+            "Validate the fixed design_preflight policy and formal closure "
+            "without generating rows."
+        ),
     )
     args = parser.parse_args()
     if args.validate_policy_only:
         policy = scientific.load_policy()
-        if args.mode == "formal":
-            try:
-                scientific.build_execution_context(policy, execution_mode=args.mode)
-            except scientific.ScientificBuilderError as exc:
-                output = {
-                    "status": "PASS_FORMAL_FAIL_CLOSED",
-                    "reason": str(exc),
-                    "formal_seed_created": False,
-                    "formal_rows_created": 0,
-                }
-            else:
-                raise DatasetBuildError("Formal mode unexpectedly became available")
+        context = scientific.build_execution_context(
+            policy, execution_mode=DESIGN_EXECUTION_MODE
+        )
+        try:
+            scientific.build_execution_context(policy, execution_mode="formal")
+        except scientific.ScientificBuilderError:
+            formal_closed = True
         else:
-            context = scientific.build_execution_context(
-                policy, execution_mode=args.mode
-            )
-            output = {
-                "status": "PASS_DESIGN_POLICY_ONLY",
-                "execution_mode": args.mode,
-                "world_count": len(context.world_records),
-                "formal_seed_created": False,
-                "formal_rows_created": 0,
-            }
+            raise DatasetBuildError("Formal mode unexpectedly became available")
+        output = {
+            "status": "PASS_FIXED_DESIGN_POLICY_ONLY_NO_BUILD_AUTHORIZATION",
+            "execution_mode": DESIGN_EXECUTION_MODE,
+            "world_count": len(context.world_records),
+            "formal_generation_closed": formal_closed,
+            "formal_seed_created": False,
+            "formal_rows_created": 0,
+        }
     else:
-        output = run_build(execution_mode=args.mode)
+        output = run_design_preflight_once()
     print(json.dumps(output, ensure_ascii=False, sort_keys=True, indent=2))
 
 

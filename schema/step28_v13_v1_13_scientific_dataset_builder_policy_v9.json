@@ -1,7 +1,7 @@
 {
   "version": "2026-08-14-step28-v13-v1-13-scientific-dataset-builder-v9",
-  "status": "DESIGN_IMPLEMENTATION_ONLY_NO_REBUILD_OR_TRAINING",
-  "claim_boundary": "This policy authorizes implementation tests and in-memory causal replay through the already exposed train ordinal 283 only. It creates no dataset publication, formal seed, training-qualified row, model, or scientific metric.",
+  "status": "DESIGN_ENTRY_IMPLEMENTED_NO_RUN_WITHOUT_EXTERNAL_ONE_TIME_RECEIPT",
+  "claim_boundary": "This policy authorizes implementation and fixture tests for a parameterless design_preflight entry while requiring a separate exact one-time external run receipt before any dataset byte. It creates no dataset publication, formal seed, training-qualified row, model, or scientific metric.",
   "scientific_contract": {
     "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
     "size_bytes": 19037,
@@ -55,8 +55,8 @@
   "implementation": {
     "scientific_common": {
       "path": "scripts/step28_v13_v1_13_scientific_common_v9.py",
-      "size_bytes": 26187,
-      "sha256": "049e527d58c704664450ce61f6260bb6f8e783e589902e2f1e2c40b94fd5487b"
+      "size_bytes": 27163,
+      "sha256": "35695a7e686dff8b07a09a339611a9a41e145bb0662bf6c4e293f243417e49e9"
     },
     "candidate_text_templates": {
       "path": "schema/step28_v13_v1_13_candidate_text_templates_v9.json",
@@ -80,8 +80,8 @@
     },
     "dataset_builder": {
       "path": "scripts/step28_v13_v1_13_scientific_dataset_builder_v9.py",
-      "size_bytes": 48488,
-      "sha256": "ca292e4b4bf5c059b2295943c9cb0dfb97733a5b612405956843163ce5a06d16"
+      "size_bytes": 65070,
+      "sha256": "b7c6ffaa57969c531da5ad56ad0395c43244222fea59d8f0608684f6129e4be0"
     },
     "causal_replay_0_283": {
       "path": "scripts/step28_v13_v1_13_v9_causal_replay_0_283.py",
@@ -90,8 +90,8 @@
     },
     "scientific_contract_tests": {
       "path": "tests/test_step28_v13_v1_13_scientific_builder_v9_contracts.py",
-      "size_bytes": 27679,
-      "sha256": "e40deed69e36f519bafd7e27e6316ebd58364d95f2c2757f3bfd1c4a8a202ab6"
+      "size_bytes": 39596,
+      "sha256": "c9e34f5aee835e878e4f856b2f6a51ead27bbe42d0d19f39d31b89f98e640176"
     },
     "production_chain": {
       "path": "scripts/step28_v13_production_chain.py",
@@ -106,7 +106,7 @@
     "quality_channel_policy": {
       "path": "schema/step28_v13_v1_13_quality_channel_sensitivity_policy_v9.json",
       "size_bytes": 22931,
-      "sha256": "b631cbd80dc04c2f3d9d549b19b12b575fe6dafc7e7205e84668ccb167cc1eb3"
+      "sha256": "30a0171b4dbc52f01609e9d6129749c2c818a50bf5b58c226fa223ad0b505325"
     },
     "quality_channel_views": {
       "path": "scripts/step28_v13_v1_13_quality_channel_views_v9.py",
@@ -116,7 +116,7 @@
     "quality_channel_policy_validator": {
       "path": "scripts/step28_v13_v1_13_quality_channel_policy_v9.py",
       "size_bytes": 27387,
-      "sha256": "8e901547d1a6d30c4eacf48641cca5ad2467aad48b99cbc9665773e40274155e"
+      "sha256": "90a61d6c7fdd569e7de9a2a39f206e12c1c2a6b92f175d0871448240cdc4d827"
     },
     "quality_channel_materializer": {
       "path": "scripts/step28_v13_v1_13_quality_channel_materializer_v9.py",
@@ -361,6 +361,17 @@
     "audit_execution_failure_reuses_same_dataset_root": true,
     "data_quality_failure_closes_v8_permanently": true
   },
+  "design_build_authorization_overlay": {
+    "status": "DISABLED_PENDING_EXACT_WEB_RUN_REVIEW",
+    "receipt_path": "private_custody/step28_v13_v1_13_v9_design_build_authorization.json",
+    "receipt_version": "2026-08-15-step28-v13-v1-13-v9-design-build-authorization-v1",
+    "required_review_final_line": "允许运行一次同一权威1004世界设计构建",
+    "execution_mode": "design_preflight",
+    "base_policy_alone_authorizes_run": false,
+    "receipt_generation_by_repository_code_forbidden": true,
+    "atomic_consumption_before_temp_root_required": true,
+    "receipt_reuse_forbidden": true
+  },
   "retired_public_preflight_authorities": {
     "count": 28,
     "sorted_values_sha256": "c2774d5ee66f05fca9fa7dcc4624b994b57be2d7ea414964bce32cb4e1dc6e81"
@@ -376,5 +387,5 @@
       "audit_b": null
     }
   },
-  "canonical_self_hash": "219a74bef933deaf9dadfc230c8372abdc71d9d2b86cdb19917ef75e99a2f13a"
+  "canonical_self_hash": "cf8a53153887b54e45d40b29bce33214203e2792097dd31d1964ad8bf6a373d3"
 }

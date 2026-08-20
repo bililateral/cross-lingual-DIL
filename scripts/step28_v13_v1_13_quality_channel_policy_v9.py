@@ -17,7 +17,7 @@ DEFAULT_POLICY = (
     ROOT / "schema" / "step28_v13_v1_13_quality_channel_sensitivity_policy_v9.json"
 )
 EXPECTED_POLICY_SELF_HASH = (
-    "8833ffab07051684bf0ce997ef603b9d2a2fd5d54660f2ff129f6f1c49489c10"
+    "3147c01032aed44f6465ac9db654c944c538fb326d0ee0234773a36eae32c9f9"
 )
 EXPECTED_PIN_NAMES = {
     "scientific_contract",

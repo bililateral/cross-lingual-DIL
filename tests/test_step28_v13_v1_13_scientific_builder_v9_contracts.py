@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import re
 import sys
@@ -630,35 +631,318 @@ class AuthorizationContracts(unittest.TestCase):
             (),
         )
 
-    def test_dataset_rebuild_and_formal_generation_remain_closed(self) -> None:
-        watched = (
-            mock.patch.object(dataset_builder.scientific, "load_policy"),
-            mock.patch.object(
-                dataset_builder.scientific, "build_execution_context"
+    def test_parameterless_design_entry_remains_closed_before_any_build_io(self) -> None:
+        self.assertEqual(
+            tuple(
+                dataset_builder.run_design_preflight_once.__code__.co_varnames[
+                    : dataset_builder.run_design_preflight_once.__code__.co_argcount
+                ]
             ),
-            mock.patch.object(
-                dataset_builder.collision,
-                "load_historical_exclusion_registries",
-            ),
-            mock.patch.object(dataset_builder.world_module, "build_scientific_world"),
-            mock.patch.object(dataset_builder.Path, "mkdir"),
-            mock.patch.object(dataset_builder.Path, "rename"),
+            (),
         )
-        with ExitStack() as stack:
-            entered = [stack.enter_context(patcher) for patcher in watched]
-            with self.assertRaisesRegex(
-                dataset_builder.DatasetBuildError, "unauthorized"
-            ):
-                dataset_builder.run_build(execution_mode="small_smoke")
-            with self.assertRaisesRegex(dataset_builder.DatasetBuildError, "sealed"):
-                dataset_builder._run_build_unreachable_until_fresh_review(
-                    execution_mode="small_smoke"
+        self.assertFalse(hasattr(dataset_builder, "run_build"))
+        self.assertFalse(
+            hasattr(dataset_builder, "_run_build_unreachable_until_fresh_review")
+        )
+        transaction = dataset_builder._run_design_preflight_transaction
+        self.assertEqual(transaction.__code__.co_argcount, 0)
+        self.assertEqual(transaction.__code__.co_kwonlyargcount, 1)
+        self.assertEqual(transaction.__code__.co_varnames[0], "context")
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            missing_receipt = Path(temp) / "receipt-that-does-not-exist.json"
+            watched = (
+                mock.patch.object(
+                    dataset_builder.scientific, "build_execution_context"
+                ),
+                mock.patch.object(
+                    dataset_builder.collision,
+                    "load_historical_exclusion_registries",
+                ),
+                mock.patch.object(dataset_builder.world_module, "build_scientific_world"),
+                mock.patch.object(dataset_builder.Path, "mkdir"),
+                mock.patch.object(dataset_builder.Path, "rename"),
+            )
+            with ExitStack() as stack:
+                stack.enter_context(
+                    mock.patch.object(
+                        dataset_builder,
+                        "_authorization_receipt_path",
+                        return_value=missing_receipt,
+                    )
                 )
-            for probe in entered:
-                probe.assert_not_called()
+                entered = [stack.enter_context(patcher) for patcher in watched]
+                with self.assertRaisesRegex(
+                    dataset_builder.DatasetBuildError, "receipt is absent"
+                ):
+                    dataset_builder.run_design_preflight_once()
+                for probe in entered:
+                    probe.assert_not_called()
         policy = scientific.load_policy()
         with self.assertRaises(scientific.ScientificBuilderError):
             scientific.build_execution_context(policy, execution_mode="formal")
+
+    def test_design_receipt_is_consumed_once_before_transaction(self) -> None:
+        payload = b'{"receipt":"fixture-only"}\n'
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            receipt_path = Path(temp) / "authorization.json"
+            receipt_path.write_bytes(payload)
+            sha256 = hashlib.sha256(payload).hexdigest()
+            receipt = dataset_builder._VerifiedDesignBuildReceipt(
+                path=receipt_path,
+                size_bytes=len(payload),
+                sha256=sha256,
+                receipt_id="1" * 64,
+                review_response_sha256="2" * 64,
+                git_commit="3" * 40,
+                git_tree="4" * 40,
+                random_authority_commitment_sha256="5" * 64,
+                builder_policy_binding={},
+                quality_policy_binding={},
+                builder_source_file={},
+            )
+            consumed = dataset_builder._consume_design_build_receipt(receipt)
+            self.assertFalse(receipt_path.exists())
+            consumed_path = ROOT / consumed["path"]
+            self.assertTrue(consumed_path.is_file())
+            self.assertEqual(consumed_path.read_bytes(), payload)
+            self.assertEqual(consumed["sha256"], sha256)
+            receipt_path.write_bytes(payload)
+            with self.assertRaisesRegex(
+                dataset_builder.DatasetBuildError, "already consumed"
+            ):
+                dataset_builder._consume_design_build_receipt(receipt)
+
+    def test_receipt_path_state_distinguishes_pending_from_consumed(self) -> None:
+        policy = scientific.load_policy()
+        sha256 = "5" * 64
+        pending = dataset_builder._expected_receipt_relative_path(
+            policy, receipt_sha256=sha256, consumed=False
+        )
+        consumed = dataset_builder._expected_receipt_relative_path(
+            policy, receipt_sha256=sha256, consumed=True
+        )
+        self.assertEqual(
+            pending,
+            "private_custody/"
+            "step28_v13_v1_13_v9_design_build_authorization.json",
+        )
+        self.assertEqual(
+            consumed,
+            "private_custody/"
+            "step28_v13_v1_13_v9_design_build_authorization."
+            f"consumed.{sha256}.json",
+        )
+        self.assertNotEqual(pending, consumed)
+
+    def test_public_entry_consumes_receipt_before_private_transaction(self) -> None:
+        policy = scientific.load_policy()
+        quality_policy = dataset_builder.quality_policy_module.load_policy()
+        receipt_path = ROOT / policy["design_build_authorization_overlay"][
+            "receipt_path"
+        ]
+        receipt_sha256 = "5" * 64
+        receipt = dataset_builder._VerifiedDesignBuildReceipt(
+            path=receipt_path,
+            size_bytes=123,
+            sha256=receipt_sha256,
+            receipt_id="6" * 64,
+            review_response_sha256="7" * 64,
+            git_commit="8" * 40,
+            git_tree="9" * 40,
+            random_authority_commitment_sha256="a" * 64,
+            builder_policy_binding={},
+            quality_policy_binding={"canonical_self_hash": "b" * 64},
+            builder_source_file={},
+        )
+        events: list[str] = []
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            execution = mock.Mock()
+            execution.output_root = Path(temp) / "design-root"
+
+            def validate_pending(_context: object) -> None:
+                events.append("pending_validated")
+
+            def consume(_receipt: object) -> dict[str, object]:
+                events.append("receipt_consumed")
+                return {
+                    "path": dataset_builder._expected_receipt_relative_path(
+                        policy,
+                        receipt_sha256=receipt_sha256,
+                        consumed=True,
+                    ),
+                    "size_bytes": 123,
+                    "sha256": receipt_sha256,
+                }
+
+            def run_transaction(*, context: object) -> dict[str, str]:
+                self.assertEqual(
+                    events, ["pending_validated", "receipt_consumed"]
+                )
+                events.append("transaction_called")
+                self.assertIn(".consumed.", context.receipt_file["path"])
+                return {"status": "FIXTURE_ONLY"}
+
+            with (
+                mock.patch.object(
+                    dataset_builder.scientific,
+                    "load_policy",
+                    return_value=policy,
+                ),
+                mock.patch.object(dataset_builder, "_validate_model_mount_contract"),
+                mock.patch.object(
+                    dataset_builder,
+                    "_load_and_validate_design_build_receipt",
+                    return_value=(receipt, quality_policy),
+                ),
+                mock.patch.object(
+                    dataset_builder.scientific,
+                    "build_execution_context",
+                    return_value=execution,
+                ),
+                mock.patch.object(
+                    dataset_builder,
+                    "_validate_pending_design_preflight_context",
+                    side_effect=validate_pending,
+                ),
+                mock.patch.object(
+                    dataset_builder,
+                    "_consume_design_build_receipt",
+                    side_effect=consume,
+                ),
+                mock.patch.object(
+                    dataset_builder,
+                    "_run_design_preflight_transaction",
+                    side_effect=run_transaction,
+                ),
+            ):
+                result = dataset_builder.run_design_preflight_once()
+        self.assertEqual(result, {"status": "FIXTURE_ONLY"})
+        self.assertEqual(
+            events,
+            ["pending_validated", "receipt_consumed", "transaction_called"],
+        )
+
+    def test_private_transaction_validates_authorization_before_mkdir(self) -> None:
+        with (
+            mock.patch.object(
+                dataset_builder,
+                "_validate_authorized_design_preflight_context",
+                side_effect=dataset_builder.DatasetBuildError(
+                    "fixture authorization rejected"
+                ),
+            ) as validate,
+            mock.patch.object(dataset_builder.Path, "mkdir") as mkdir,
+            self.assertRaisesRegex(
+                dataset_builder.DatasetBuildError,
+                "fixture authorization rejected",
+            ),
+        ):
+            dataset_builder._run_design_preflight_transaction(
+                context=mock.Mock()
+            )
+        validate.assert_called_once()
+        mkdir.assert_not_called()
+
+    def test_exact_design_receipt_binding_accepts_current_files_and_rejects_drift(
+        self,
+    ) -> None:
+        policy = scientific.load_policy()
+        quality_policy = dataset_builder.quality_policy_module.load_policy()
+        overlay = policy["design_build_authorization_overlay"]
+        fake_commit = "a" * 40
+        fake_tree = "b" * 40
+        receipt = {
+            "version": overlay["receipt_version"],
+            "status": dataset_builder.AUTHORIZATION_STATUS,
+            "claim_boundary": dataset_builder.AUTHORIZATION_CLAIM_BOUNDARY,
+            "review_final_line": overlay["required_review_final_line"],
+            "review_conversation_url": "https://chatgpt.com/c/fixture-review",
+            "review_response_sha256": "c" * 64,
+            "reviewed_at_utc": "2026-08-15T00:00:00Z",
+            "execution_mode": dataset_builder.DESIGN_EXECUTION_MODE,
+            "attempt_index": policy["single_attempt_random_authority"][
+                "attempt_index"
+            ],
+            "world_counts": policy["execution_modes"]["design_preflight"][
+                "world_counts"
+            ],
+            "output_root": policy["execution_modes"]["design_preflight"][
+                "output_root"
+            ],
+            "random_authority_commitment_sha256": common.canonical_sha256(
+                policy["public_preflight_keys"]["design_preflight"]
+            ),
+            "builder_policy": dataset_builder._policy_binding(
+                scientific.DEFAULT_POLICY_PATH, policy
+            ),
+            "quality_policy": dataset_builder._policy_binding(
+                dataset_builder.quality_policy_module.DEFAULT_POLICY,
+                quality_policy,
+            ),
+            "builder_source": dataset_builder._repo_file_binding(
+                Path(dataset_builder.__file__)
+            ),
+            "git_commit": fake_commit,
+            "git_tree": fake_tree,
+        }
+        receipt["canonical_self_hash"] = common.canonical_sha256(receipt)
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            path = Path(temp) / "authorization.json"
+            path.write_text(
+                json.dumps(receipt, ensure_ascii=False, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            with (
+                mock.patch.object(
+                    dataset_builder,
+                    "_authorization_receipt_path",
+                    return_value=path,
+                ),
+                mock.patch.object(
+                    dataset_builder,
+                    "_git_identity",
+                    return_value=(fake_commit, fake_tree),
+                ),
+            ):
+                verified, observed_quality = (
+                    dataset_builder._load_and_validate_design_build_receipt(policy)
+                )
+                self.assertEqual(verified.receipt_id, receipt["canonical_self_hash"])
+                self.assertEqual(observed_quality, quality_policy)
+
+                mutated = copy.deepcopy(receipt)
+                mutated["output_root"] = "reports/alternate-root-forbidden"
+                mutated["canonical_self_hash"] = common.canonical_sha256(
+                    {
+                        key: value
+                        for key, value in mutated.items()
+                        if key != "canonical_self_hash"
+                    }
+                )
+                path.write_text(
+                    json.dumps(mutated, ensure_ascii=False, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(
+                    dataset_builder.DatasetBuildError, "binding drift"
+                ):
+                    dataset_builder._load_and_validate_design_build_receipt(policy)
+
+    def test_cli_rejects_legacy_write_mode_selector(self) -> None:
+        with (
+            mock.patch.object(
+                sys,
+                "argv",
+                ["builder", "--mode", "small_smoke"],
+            ),
+            mock.patch.object(
+                dataset_builder, "run_design_preflight_once"
+            ) as run_design,
+            self.assertRaises(SystemExit) as raised,
+        ):
+            dataset_builder.main()
+        self.assertEqual(raised.exception.code, 2)
+        run_design.assert_not_called()
 
 
 if __name__ == "__main__":

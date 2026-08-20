@@ -99,12 +99,21 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
 
     def test_builder_policy_binding_precedes_label_free_split_loading(self) -> None:
         builder_policy = runner.scientific.load_policy()
+        quality_policy = runner.quality_policy_module.load_policy()
         policy_path = runner.scientific.DEFAULT_POLICY_PATH.resolve()
+        quality_path = runner.quality_policy_module.DEFAULT_POLICY.resolve()
+        builder_source_value = runner._repo_source(
+            Path(runner.dataset_builder.__file__)
+        )
+        receipt_sha256 = "5" * 64
         root_manifest = {
+            "status": "PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED",
             "execution_mode": "design_preflight",
             "scientific_use_forbidden": True,
+            "formal_seed_created": False,
             "formal_rows_created": 0,
             "training_started": False,
+            "world_count": 1004,
             "builder_policy_canonical_self_hash": builder_policy[
                 "canonical_self_hash"
             ],
@@ -113,41 +122,106 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
                 "size_bytes": policy_path.stat().st_size,
                 "sha256": runner._sha256_file(policy_path),
             },
+            "quality_policy_canonical_self_hash": quality_policy[
+                "canonical_self_hash"
+            ],
+            "quality_policy_file": {
+                "path": quality_path.relative_to(ROOT).as_posix(),
+                "size_bytes": quality_path.stat().st_size,
+                "sha256": runner._sha256_file(quality_path),
+            },
+            "builder_source_file": {
+                "path": builder_source_value.path,
+                "size_bytes": builder_source_value.size_bytes,
+                "sha256": builder_source_value.sha256,
+            },
+            "design_build_authorization": {
+                "status": "CONSUMED_ONE_TIME_DESIGN_PREFLIGHT_RECEIPT",
+                "receipt_id": "6" * 64,
+                "receipt_file": {
+                    "path": (
+                        "private_custody/"
+                        "step28_v13_v1_13_v9_design_build_authorization."
+                        "consumed."
+                        f"{receipt_sha256}.json"
+                    ),
+                    "size_bytes": 1,
+                    "sha256": receipt_sha256,
+                },
+                "review_response_sha256": "7" * 64,
+                "review_final_line": builder_policy[
+                    "design_build_authorization_overlay"
+                ]["required_review_final_line"],
+                "git_commit": "8" * 40,
+                "git_tree": "9" * 40,
+                "execution_mode": "design_preflight",
+                "attempt_index": 1,
+                "world_counts": builder_policy["execution_modes"][
+                    "design_preflight"
+                ]["world_counts"],
+                "output_root": builder_policy["execution_modes"][
+                    "design_preflight"
+                ]["output_root"],
+                "random_authority_commitment_sha256": (
+                    runner.common.canonical_sha256(
+                        builder_policy["public_preflight_keys"][
+                            "design_preflight"
+                        ]
+                    )
+                ),
+                "base_policy_alone_authorized_run": False,
+            },
         }
         self.assertEqual(
             runner._validate_builder_policy_binding(root_manifest),
             builder_policy,
         )
-        mutated = copy.deepcopy(root_manifest)
-        mutated["builder_policy_file"]["sha256"] = "0" * 64
         root_pin = runner.truth_capability.RootManifestPin(
             path="root_manifest.json",
             size_bytes=1,
             sha256="1" * 64,
             canonical_self_hash="2" * 64,
         )
-        with (
-            patch.object(
-                runner,
-                "_root_pin_from_policy",
-                return_value=(ROOT / "unused-design-root", root_pin),
+        mutations = {
+            "builder_policy": lambda value: value["builder_policy_file"].__setitem__(
+                "sha256", "0" * 64
             ),
-            patch.object(
-                runner,
-                "_load_root_manifests",
-                return_value=(mutated, {}),
+            "quality_policy": lambda value: value["quality_policy_file"].__setitem__(
+                "sha256", "0" * 64
             ),
-            patch.object(runner, "_load_split_label_free") as load_split,
-        ):
-            state = {"stage": "authorized_entry"}
-            with self.assertRaisesRegex(
-                runner.DatasetGateFailure, "builder policy binding"
-            ):
-                runner._run_authorized_formal_quality_audit(
-                    policy={}, state=state
-                )
-        load_split.assert_not_called()
-        self.assertEqual(state["stage"], "builder_policy_binding")
+            "builder_source": lambda value: value["builder_source_file"].__setitem__(
+                "sha256", "0" * 64
+            ),
+            "authorization": lambda value: value[
+                "design_build_authorization"
+            ].__setitem__("random_authority_commitment_sha256", "0" * 64),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name):
+                mutated = copy.deepcopy(root_manifest)
+                mutate(mutated)
+                with (
+                    patch.object(
+                        runner,
+                        "_root_pin_from_policy",
+                        return_value=(ROOT / "unused-design-root", root_pin),
+                    ),
+                    patch.object(
+                        runner,
+                        "_load_root_manifests",
+                        return_value=(mutated, {}),
+                    ),
+                    patch.object(runner, "_load_split_label_free") as load_split,
+                ):
+                    state = {"stage": "authorized_entry"}
+                    with self.assertRaisesRegex(
+                        runner.DatasetGateFailure, "binding drift"
+                    ):
+                        runner._run_authorized_formal_quality_audit(
+                            policy={}, state=state
+                        )
+                load_split.assert_not_called()
+                self.assertEqual(state["stage"], "builder_policy_binding")
 
     def test_public_uid_registries_close_per_split_and_globally(self) -> None:
         loaded: dict[str, dict[str, object]] = {}

@@ -21,11 +21,14 @@ DEFAULT_POLICY_PATH = (
     ROOT / "schema" / "step28_v13_v1_13_scientific_dataset_builder_policy_v9.json"
 )
 POLICY_VERSION = "2026-08-14-step28-v13-v1-13-scientific-dataset-builder-v9"
-POLICY_STATUS = "DESIGN_IMPLEMENTATION_ONLY_NO_REBUILD_OR_TRAINING"
+POLICY_STATUS = (
+    "DESIGN_ENTRY_IMPLEMENTED_NO_RUN_WITHOUT_EXTERNAL_ONE_TIME_RECEIPT"
+)
 EXPECTED_CLAIM_BOUNDARY = (
-    "This policy authorizes implementation tests and in-memory causal replay through "
-    "the already exposed train ordinal 283 only. It creates no dataset publication, "
-    "formal seed, training-qualified row, model, or scientific metric."
+    "This policy authorizes implementation and fixture tests for a parameterless "
+    "design_preflight entry while requiring a separate exact one-time external run "
+    "receipt before any dataset byte. It creates no dataset publication, formal seed, "
+    "training-qualified row, model, or scientific metric."
 )
 SPLITS = ("train", "development", "audit_a", "audit_b")
 DESIGN_MODES = ("small_smoke", "design_preflight")
@@ -167,6 +170,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "candidate_selection",
         "public_preflight_keys",
         "single_attempt_random_authority",
+        "design_build_authorization_overlay",
         "retired_public_preflight_authorities",
         "formal_authorization",
         "canonical_self_hash",
@@ -455,6 +459,25 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "data_quality_failure_closes_v8_permanently": True,
     }:
         raise ScientificBuilderError("Single-attempt authority contract drift")
+    if policy["design_build_authorization_overlay"] != {
+        "status": "DISABLED_PENDING_EXACT_WEB_RUN_REVIEW",
+        "receipt_path": (
+            "private_custody/"
+            "step28_v13_v1_13_v9_design_build_authorization.json"
+        ),
+        "receipt_version": (
+            "2026-08-15-step28-v13-v1-13-v9-design-build-authorization-v1"
+        ),
+        "required_review_final_line": (
+            "允许运行一次同一权威1004世界设计构建"
+        ),
+        "execution_mode": "design_preflight",
+        "base_policy_alone_authorizes_run": False,
+        "receipt_generation_by_repository_code_forbidden": True,
+        "atomic_consumption_before_temp_root_required": True,
+        "receipt_reuse_forbidden": True,
+    }:
+        raise ScientificBuilderError("Design-build authorization overlay drift")
     retired = policy["retired_public_preflight_authorities"]
     if (
         not isinstance(retired, Mapping)
