@@ -17,6 +17,7 @@ import sys
 from typing import Any
 
 import step28_v13_v1_13_quality_audit_runner_v9 as audit_runner
+import step28_v13_v1_13_quality_audit_execution_adapter_v9 as execution_adapter
 import step28_v13_v1_13_quality_channel_policy_v9 as quality_policy_module
 
 
@@ -26,12 +27,12 @@ OVERLAY_POLICY_PATH = (
     / "schema"
     / "step28_v13_v1_13_quality_audit_authorization_overlay_v9.json"
 )
-OVERLAY_POLICY_SIZE_BYTES = 5736
+OVERLAY_POLICY_SIZE_BYTES = 6201
 OVERLAY_POLICY_SHA256 = (
-    "c73d85c09ff37cf4e2876ee017751bfd483dc6ed638ed2e594988cd2ffc5d266"
+    "83f13a95b53fb8d52c77edf3299e634b33bf95e4d727225d13251eebc07d52c8"
 )
 OVERLAY_POLICY_CANONICAL_SELF_HASH = (
-    "9947f02b789045ea99920dbe08996a16f1b4223da0da7cd7f065000a91e021c7"
+    "0b3df1dac378aa770e67f609800113825fc4ab022e47edb8aa966d780bb1c86d"
 )
 HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 GIT_OBJECT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
@@ -222,6 +223,7 @@ def _validate_static_inputs(policy: Mapping[str, Any]) -> dict[str, Any]:
         "policy",
         "runner",
         "validator",
+        "execution_adapter",
         "base_authorization",
         "mutation_forbidden",
     } or frozen.get("mutation_forbidden") is not True:
@@ -231,6 +233,9 @@ def _validate_static_inputs(policy: Mapping[str, Any]) -> dict[str, Any]:
     )
     _verify_file_spec(frozen["runner"], label="frozen quality runner")
     _verify_file_spec(frozen["validator"], label="frozen quality validator")
+    _verify_file_spec(
+        frozen["execution_adapter"], label="quality-audit execution adapter"
+    )
     quality_policy = quality_policy_module.load_policy(quality_policy_path)
     if (
         quality_policy.get("canonical_self_hash")
@@ -305,6 +310,7 @@ def _validate_static_inputs(policy: Mapping[str, Any]) -> dict[str, Any]:
         split_bindings[split] = binding
     return {
         "quality_policy": dict(quality_policy),
+        "design_root": design_root,
         "root_manifest": root_binding,
         "split_manifests": split_bindings,
     }
@@ -418,6 +424,11 @@ def _expected_receipt_bindings(
         ),
         "frozen_quality_validator": _file_binding(
             _repo_path(policy["frozen_quality_contract"]["validator"]["path"])
+        ),
+        "quality_audit_execution_adapter": _file_binding(
+            _repo_path(
+                policy["frozen_quality_contract"]["execution_adapter"]["path"]
+            )
         ),
         "root_manifest": copy.deepcopy(static["root_manifest"]),
         "split_manifests": copy.deepcopy(static["split_manifests"]),
@@ -618,11 +629,16 @@ def _classified_frozen_body_failure(
     }
 
 
-def _execute_frozen_body(quality_policy: Mapping[str, Any]) -> dict[str, Any]:
+def _execute_frozen_body(
+    quality_policy: Mapping[str, Any],
+    execution: execution_adapter.ConsumedQualityAuditExecution,
+) -> dict[str, Any]:
     state = {"stage": "authorized_overlay_entry"}
     try:
-        result = audit_runner._run_authorized_formal_quality_audit(
-            policy=quality_policy, state=state
+        result = execution_adapter.run_authorized_formal_quality_audit(
+            policy=quality_policy,
+            execution=execution,
+            state=state,
         )
     except Exception as exc:
         result = _classified_frozen_body_failure(state=state, exc=exc)
@@ -709,6 +725,11 @@ def _build_result_artifact(
             "frozen_quality_validator": _file_binding(
                 _repo_path(policy["frozen_quality_contract"]["validator"]["path"])
             ),
+            "quality_audit_execution_adapter": _file_binding(
+                _repo_path(
+                    policy["frozen_quality_contract"]["execution_adapter"]["path"]
+                )
+            ),
             "root_manifest": static["root_manifest"],
             "split_manifests": static["split_manifests"],
         },
@@ -751,6 +772,89 @@ def _publish_result(
             temporary_path.unlink()
 
 
+def _wrapper_terminal_failure_artifact(
+    *,
+    policy: Mapping[str, Any],
+    static: Mapping[str, Any],
+    receipt: VerifiedQualityAuditReceipt,
+    consumed_file: Mapping[str, Any],
+    stage: str,
+    exc: BaseException,
+) -> dict[str, Any]:
+    """Create the only hash-only terminal state after receipt consumption."""
+
+    artifact: dict[str, Any] = {
+        "version": policy["version"],
+        "status": "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+        "claim_boundary": policy["claim_boundary"],
+        "failure_stage": stage,
+        "exception_type": type(exc).__name__,
+        "exception_message_sha256": hashlib.sha256(
+            str(exc).encode("utf-8")
+        ).hexdigest(),
+        "authorization": {
+            "status": "CONSUMED_ONE_TIME_V9_DESIGN_QUALITY_AUDIT_RECEIPT",
+            "receipt_id": receipt.receipt_id,
+            "receipt_file": dict(consumed_file),
+            "attempt_index": receipt.payload["attempt_index"],
+            "capabilities": copy.deepcopy(receipt.payload["capabilities"]),
+            "git_commit": receipt.payload["git_commit"],
+            "git_tree": receipt.payload["git_tree"],
+        },
+        "inputs": {
+            "overlay_policy": _overlay_policy_binding(policy),
+            "authorization_entry_source": _file_binding(Path(__file__)),
+            "frozen_quality_policy": _quality_policy_binding(policy),
+            "frozen_quality_runner": _file_binding(
+                _repo_path(policy["frozen_quality_contract"]["runner"]["path"])
+            ),
+            "frozen_quality_validator": _file_binding(
+                _repo_path(policy["frozen_quality_contract"]["validator"]["path"])
+            ),
+            "quality_audit_execution_adapter": _file_binding(
+                _repo_path(
+                    policy["frozen_quality_contract"]["execution_adapter"]["path"]
+                )
+            ),
+            "root_manifest": copy.deepcopy(static["root_manifest"]),
+            "split_manifests": copy.deepcopy(static["split_manifests"]),
+        },
+        "row_level_labels_returned": 0,
+        "row_level_predictions_returned": 0,
+        "audit_a_b_truth_authorized": False,
+        "audit_a_b_truth_open_count": 0,
+        "formal_seed_created": False,
+        "formal_500_by_4_generated": False,
+        "training_started": False,
+        "model_metric_generation_started": False,
+        "retry_authorized": False,
+    }
+    artifact["canonical_self_hash"] = _canonical_self_hash(artifact)
+    return artifact
+
+
+def _publish_wrapper_terminal_failure(
+    *,
+    artifact: Mapping[str, Any],
+    result_directory: Path,
+    result_path: Path,
+    temporary_path: Path,
+) -> None:
+    if result_path.exists():
+        return
+    try:
+        result_directory.mkdir(parents=True, exist_ok=True)
+        _publish_result(
+            artifact=artifact,
+            result_path=result_path,
+            temporary_path=temporary_path,
+        )
+    except Exception as publish_exc:
+        raise QualityAuditAuthorizationError(
+            "Consumed receipt has no publishable terminal failure artifact"
+        ) from publish_exc
+
+
 def run_quality_audit_once() -> dict[str, Any]:
     """Consume one exact external receipt, then run the frozen audit body once."""
 
@@ -762,33 +866,82 @@ def run_quality_audit_once() -> dict[str, Any]:
             "Quality-audit result or temporary path already exists; resume is forbidden"
         )
     receipt = _load_and_validate_pending_receipt(policy=policy, static=static)
-    consumed_file = _consume_receipt(receipt)
-    _validate_consumed_receipt(
-        receipt=receipt,
-        consumed_file=consumed_file,
-        policy=policy,
-        static=static,
+    anticipated_consumed = receipt.path.with_name(
+        f"{receipt.path.stem}.consumed.{receipt.sha256}.json"
     )
+    consumed_file = {
+        "path": anticipated_consumed.relative_to(ROOT.resolve()).as_posix(),
+        "size_bytes": receipt.size_bytes,
+        "sha256": receipt.sha256,
+    }
+    stage = "atomic_receipt_consumption"
     try:
-        result_directory.mkdir(parents=True, exist_ok=False)
-    except OSError as exc:
-        raise QualityAuditAuthorizationError(
-            "Quality-audit result directory could not be created"
-        ) from exc
-    audit_result = _execute_frozen_body(static["quality_policy"])
-    artifact = _build_result_artifact(
-        policy=policy,
-        static=static,
-        receipt=receipt,
-        consumed_file=consumed_file,
-        audit_result=audit_result,
-    )
-    _publish_result(
-        artifact=artifact,
-        result_path=result_path,
-        temporary_path=temporary_path,
-    )
-    return artifact
+        observed_consumed_file = _consume_receipt(receipt)
+        if observed_consumed_file != consumed_file:
+            raise QualityAuditAuthorizationError(
+                "Consumed quality-audit receipt binding drift"
+            )
+        stage = "consumed_receipt_revalidation"
+        _validate_consumed_receipt(
+            receipt=receipt,
+            consumed_file=consumed_file,
+            policy=policy,
+            static=static,
+        )
+        stage = "result_directory_creation"
+        try:
+            result_directory.mkdir(parents=True, exist_ok=False)
+        except OSError as exc:
+            raise QualityAuditAuthorizationError(
+                "Quality-audit result directory could not be created"
+            ) from exc
+        stage = "consumed_execution_context_build"
+        execution = execution_adapter.build_consumed_execution(
+            receipt_id=receipt.receipt_id,
+            overlay_policy_canonical_self_hash=policy["canonical_self_hash"],
+            base_policy=static["quality_policy"],
+            capabilities=receipt.payload["capabilities"],
+            dataset_root=static["design_root"],
+            root_manifest_binding=static["root_manifest"],
+        )
+        stage = "quality_audit_body"
+        audit_result = _execute_frozen_body(
+            static["quality_policy"], execution
+        )
+        stage = "quality_audit_result_validation"
+        artifact = _build_result_artifact(
+            policy=policy,
+            static=static,
+            receipt=receipt,
+            consumed_file=consumed_file,
+            audit_result=audit_result,
+        )
+        stage = "exclusive_result_publication"
+        _publish_result(
+            artifact=artifact,
+            result_path=result_path,
+            temporary_path=temporary_path,
+        )
+        return artifact
+    except BaseException as exc:
+        if anticipated_consumed.exists() and not receipt.path.exists():
+            terminal = _wrapper_terminal_failure_artifact(
+                policy=policy,
+                static=static,
+                receipt=receipt,
+                consumed_file=consumed_file,
+                stage=stage,
+                exc=exc,
+            )
+            _publish_wrapper_terminal_failure(
+                artifact=terminal,
+                result_directory=result_directory,
+                result_path=result_path,
+                temporary_path=temporary_path,
+            )
+            if isinstance(exc, Exception):
+                return terminal
+        raise
 
 
 def main() -> None:

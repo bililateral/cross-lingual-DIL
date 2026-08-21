@@ -1,12 +1,12 @@
 {
   "version": "2026-08-20-step28-v13-v1-13-v9-quality-audit-authorization-overlay",
   "status": "IMPLEMENTATION_ONLY_AWAITING_EXTERNAL_ONE_TIME_RECEIPT",
-  "canonical_self_hash": "9947f02b789045ea99920dbe08996a16f1b4223da0da7cd7f065000a91e021c7",
+  "canonical_self_hash": "0b3df1dac378aa770e67f609800113825fc4ab022e47edb8aa966d780bb1c86d",
   "claim_boundary": "ONE_DESIGN_QUALITY_AUDIT_ONLY_NO_FORMAL_DATA_NO_AUDIT_AB_TRUTH_NO_TRAINING_NO_MODEL_METRICS",
   "contract": {
     "path": "docs/STEP28_V13_V1_13_V9_QUALITY_AUDIT_AUTHORIZATION_OVERLAY_20260820.zh.md",
-    "size_bytes": 5071,
-    "sha256": "faacaa1a3d17b6f8d2a9a00d24ffd3bf6b25aa76ff8cfae80bb23e847597b7d9"
+    "size_bytes": 6875,
+    "sha256": "cd1736a809fc88e523ef2a8e8a4abc088a4118c5300ddb9690d1be3f8abad3b4"
   },
   "frozen_quality_contract": {
     "policy": {
@@ -24,6 +24,11 @@
       "path": "scripts/step28_v13_v1_13_quality_channel_policy_v9.py",
       "size_bytes": 27387,
       "sha256": "90a61d6c7fdd569e7de9a2a39f206e12c1c2a6b92f175d0871448240cdc4d827"
+    },
+    "execution_adapter": {
+      "path": "scripts/step28_v13_v1_13_quality_audit_execution_adapter_v9.py",
+      "size_bytes": 38994,
+      "sha256": "f2c434f9ac611708075cc75b5485abce84e604b2b1c0c5035ad055f52c84a35f"
     },
     "base_authorization": {
       "implementation_and_fixture_tests": true,
@@ -108,8 +113,11 @@
   "execution": {
     "public_entry": "run_quality_audit_once",
     "public_entry_parameter_count": 0,
-    "frozen_body": "scripts.step28_v13_v1_13_quality_audit_runner_v9._run_authorized_formal_quality_audit",
+    "frozen_body": "scripts.step28_v13_v1_13_quality_audit_execution_adapter_v9.run_authorized_formal_quality_audit",
     "base_policy_passed_unchanged": true,
+    "root_pin_source": "validated_overlay_design_root_then_consumed_execution_context",
+    "execution_authorization_source": "consumed_external_receipt_not_base_policy_mutation",
+    "frozen_scientific_parameters_mutated": false,
     "result_directory": "reports/step28_v13_v1_13_quality_audit/v9_design_preflight_20260820",
     "result_path": "reports/step28_v13_v1_13_quality_audit/v9_design_preflight_20260820/quality_audit_receipt.json",
     "temporary_result_path": "reports/step28_v13_v1_13_quality_audit/.v9_design_preflight_20260820.quality_audit_receipt.tmp",

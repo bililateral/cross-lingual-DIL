@@ -5,14 +5,19 @@ from __future__ import annotations
 
 import ast
 import copy
+from dataclasses import replace
 import hashlib
 import inspect
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 from unittest import mock
+
+
+os.environ.setdefault("LOKY_MAX_CPU_COUNT", "1")
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +26,8 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 import step28_v13_v1_13_quality_audit_runner_v9 as frozen_runner
+import step28_v13_v1_13_quality_audit_execution_adapter_v9 as execution_adapter
+import step28_v13_v1_13_quality_probe_validator_v9 as frozen_probe_validator
 import step28_v13_v1_13_run_quality_audit_once_v9 as overlay
 
 
@@ -48,6 +55,20 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
             overlay._canonical_json_bytes(payload)
         ).hexdigest()
         return payload
+
+    def _execution(self) -> execution_adapter.ConsumedQualityAuditExecution:
+        return execution_adapter.build_consumed_execution(
+            receipt_id="d" * 64,
+            overlay_policy_canonical_self_hash=self.policy[
+                "canonical_self_hash"
+            ],
+            base_policy=self.static["quality_policy"],
+            capabilities=self.policy["external_receipt"][
+                "required_capabilities"
+            ],
+            dataset_root=self.static["design_root"],
+            root_manifest_binding=self.static["root_manifest"],
+        )
 
     @staticmethod
     def _write_receipt(path: Path, payload: dict[str, object]) -> bytes:
@@ -107,6 +128,241 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
             frozen_runner.QualityAuditRunnerError, "unauthorized"
         ):
             frozen_runner.run_formal_quality_audit()
+
+    def test_execution_context_keeps_base_policy_closed_and_binds_exact_root(
+        self,
+    ) -> None:
+        execution = self._execution()
+        execution_adapter.validate_consumed_execution(
+            execution, base_policy=self.static["quality_policy"]
+        )
+        self.assertEqual(
+            execution.root_binding(), self.static["root_manifest"]
+        )
+        authorization = self.static["quality_policy"]["authorization"]
+        self.assertFalse(authorization["quality_audit_run"])
+        self.assertFalse(authorization["metric_generation"])
+        widened = dict(
+            self.policy["external_receipt"]["required_capabilities"]
+        )
+        widened["model_training"] = True
+        with self.assertRaisesRegex(
+            execution_adapter.QualityAuditExecutionAdapterError, "widened"
+        ):
+            execution_adapter.build_consumed_execution(
+                receipt_id="d" * 64,
+                overlay_policy_canonical_self_hash=self.policy[
+                    "canonical_self_hash"
+                ],
+                base_policy=self.static["quality_policy"],
+                capabilities=widened,
+                dataset_root=self.static["design_root"],
+                root_manifest_binding=self.static["root_manifest"],
+            )
+        changed = replace(execution, root_manifest_sha256="e" * 64)
+        with self.assertRaisesRegex(
+            execution_adapter.QualityAuditExecutionAdapterError, "root pin"
+        ):
+            execution_adapter.validate_consumed_execution(
+                changed, base_policy=self.static["quality_policy"]
+            )
+
+    def test_real_adapter_reaches_root_manifest_without_mocking_body(self) -> None:
+        class ReachedBuilderBinding(RuntimeError):
+            pass
+
+        class StageStop(dict[str, str]):
+            def __setitem__(self, key: str, value: str) -> None:
+                super().__setitem__(key, value)
+                if value == "builder_policy_binding":
+                    raise ReachedBuilderBinding(value)
+
+        policy_before = overlay._canonical_json_bytes(
+            self.static["quality_policy"]
+        )
+        state: dict[str, str] = StageStop()
+        with self.assertRaisesRegex(
+            ReachedBuilderBinding, "builder_policy_binding"
+        ):
+            execution_adapter.run_authorized_formal_quality_audit(
+                policy=self.static["quality_policy"],
+                execution=self._execution(),
+                state=state,
+            )
+        self.assertEqual(state["stage"], "builder_policy_binding")
+        self.assertEqual(
+            overlay._canonical_json_bytes(self.static["quality_policy"]),
+            policy_before,
+        )
+
+    def test_adapter_preserves_frozen_runner_stage_order(self) -> None:
+        def stages(function: object) -> list[str]:
+            tree = ast.parse(inspect.getsource(function))
+            return [
+                node.value.value
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Assign)
+                and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Subscript)
+                and isinstance(node.targets[0].value, ast.Name)
+                and node.targets[0].value.id == "state"
+                and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str)
+            ]
+
+        frozen_stages = stages(
+            frozen_runner._run_authorized_formal_quality_audit
+        )
+        adapted_stages = stages(
+            execution_adapter.run_authorized_formal_quality_audit
+        )
+        self.assertEqual(
+            adapted_stages,
+            ["consumed_execution_and_root_binding", *frozen_stages],
+        )
+        source = inspect.getsource(
+            execution_adapter.run_authorized_formal_quality_audit
+        )
+        self.assertNotIn("_root_pin_from_policy", source)
+        self.assertNotIn("mock.patch", source)
+        self.assertNotIn("monkeypatch", source)
+        self.assertIn("execution.root_pin()", source)
+        self.assertIn("evaluate_authorized_formal_probe_families", source)
+
+    def test_real_supervised_adapter_crosses_old_auth_and_root_deadlocks(self) -> None:
+        with self.assertRaisesRegex(
+            frozen_probe_validator.QualityProbeValidationError,
+            "matrix view cardinality",
+        ):
+            execution_adapter.evaluate_authorized_formal_probe_families(
+                text_train_matrices=(),
+                text_development_matrices=(),
+                code_train_matrices=(),
+                code_development_matrices=(),
+                policy=self.static["quality_policy"],
+                train_text_eligibility=None,
+                development_text_eligibility=None,
+                execution=self._execution(),
+            )
+
+    def test_authorized_numeric_core_matches_frozen_core_on_bounded_fixture(
+        self,
+    ) -> None:
+        preparer = frozen_probe_validator.preparer
+        np = frozen_probe_validator.np
+        source = (
+            preparer.SourceCommitment(
+                path="fixture/label_free.jsonl",
+                size_bytes=10,
+                sha256="2" * 64,
+            ),
+        )
+
+        def matrix_pair(split: str) -> tuple[object, object]:
+            keys = tuple(
+                (
+                    f"{split}_world_{world}",
+                    f"{split}_world_{world}_pair_{pair}",
+                )
+                for world in range(3)
+                for pair in range(6)
+            )
+            first = np.asarray(
+                [
+                    [((index * 7) % 13) / 13.0, ((index * 5) % 17) / 17.0]
+                    for index in range(len(keys))
+                ],
+                dtype=np.float64,
+            )
+            second = np.asarray(
+                [[((index * 11) % 19) / 19.0] for index in range(len(keys))],
+                dtype=np.float64,
+            )
+            return (
+                preparer.freeze_feature_matrix(
+                    family="fixture",
+                    view="view_a",
+                    values=first,
+                    row_keys=keys,
+                    column_names=("a", "b"),
+                    sources=source,
+                ),
+                preparer.freeze_feature_matrix(
+                    family="fixture",
+                    view="view_b",
+                    values=second,
+                    row_keys=keys,
+                    column_names=("c",),
+                    sources=source,
+                ),
+            )
+
+        train = matrix_pair("train")
+        development = matrix_pair("development")
+        truth = {
+            split: [
+                {
+                    "canonical_pair_uid": pair_uid,
+                    "world_uid": world_uid,
+                    "label": int(pair_uid.endswith("_0") or pair_uid.endswith("_1")),
+                }
+                for world_uid, pair_uid in values[0].row_keys
+            ]
+            for split, values in (
+                ("train", train),
+                ("development", development),
+            )
+        }
+        design = frozen_probe_validator.ProbeFamilyDesign(
+            family="fixture",
+            view_widths=(("view_a", 2), ("view_b", 1)),
+            expected_views=2,
+            expected_total_features=3,
+            expected_column_name_hashes=None,
+            expected_worlds=3,
+            pairs_per_world=6,
+            positives_per_world=2,
+            excluded_pairs_per_world=0,
+            average_precision_baseline=2 / 6,
+            bootstrap_replicates=31,
+            bootstrap_seed=12345,
+            require_formal_bootstrap_binding=False,
+            claim_boundary=(
+                "V9_DESIGN_QUALITY_ONLY_NOT_FORMAL_DATA_OR_TRAINING"
+            ),
+        )
+        authorized_policy = copy.deepcopy(self.static["quality_policy"])
+        authorized_policy["authorization"]["quality_audit_run"] = True
+        authorized_policy["authorization"]["metric_generation"] = True
+        with mock.patch.object(
+            frozen_probe_validator.channel_policy,
+            "validate_policy",
+            return_value=None,
+        ):
+            frozen = frozen_probe_validator._evaluate(
+                train_matrices=train,
+                development_matrices=development,
+                truth_loader=None,
+                preloaded_truth=truth,
+                design=replace(design),
+                policy=authorized_policy,
+                train_eligibility=None,
+                development_eligibility=None,
+            )
+        adapted = execution_adapter._evaluate_authorized_formal_family(
+            train_matrices=train,
+            development_matrices=development,
+            preloaded_truth=truth,
+            design=replace(design),
+            policy=self.static["quality_policy"],
+            train_eligibility=None,
+            development_eligibility=None,
+            execution=self._execution(),
+        )
+        frozen.pop("canonical_self_hash")
+        adapted.pop("canonical_self_hash")
+        adapted.pop("execution_context")
+        self.assertEqual(adapted, frozen)
 
     def test_public_entry_is_parameterless_and_cli_rejects_arguments(self) -> None:
         self.assertEqual(len(inspect.signature(overlay.run_quality_audit_once).parameters), 0)
@@ -373,6 +629,61 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
                     overlay.run_quality_audit_once()
             load_receipt.assert_not_called()
 
+    def test_post_consumption_wrapper_failure_publishes_terminal_receipt(self) -> None:
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            base = Path(temp)
+            pending = base / "quality_authorization.json"
+            payload = self._receipt_payload()
+            raw = self._write_receipt(pending, payload)
+            receipt = overlay.VerifiedQualityAuditReceipt(
+                path=pending,
+                raw=raw,
+                size_bytes=len(raw),
+                sha256=hashlib.sha256(raw).hexdigest(),
+                receipt_id=str(payload["canonical_self_hash"]),
+                payload=payload,
+            )
+            result_directory = base / "result"
+            result_path = result_directory / "quality_audit_receipt.json"
+            temporary = base / ".result.tmp"
+            secret = "consumed-wrapper-secret"
+            with mock.patch.object(
+                overlay, "_load_overlay_policy", return_value=self.policy
+            ), mock.patch.object(
+                overlay, "_validate_static_inputs", return_value=self.static
+            ), mock.patch.object(
+                overlay,
+                "_result_paths",
+                return_value=(result_directory, result_path, temporary),
+            ), mock.patch.object(
+                overlay,
+                "_load_and_validate_pending_receipt",
+                return_value=receipt,
+            ), mock.patch.object(
+                overlay,
+                "_validate_consumed_receipt",
+                side_effect=RuntimeError(secret),
+            ):
+                terminal = overlay.run_quality_audit_once()
+            self.assertEqual(
+                terminal["status"],
+                "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+            )
+            self.assertEqual(
+                terminal["failure_stage"], "consumed_receipt_revalidation"
+            )
+            self.assertEqual(
+                terminal["exception_message_sha256"],
+                hashlib.sha256(secret.encode("utf-8")).hexdigest(),
+            )
+            self.assertNotIn(secret, json.dumps(terminal, ensure_ascii=False))
+            self.assertTrue(result_path.is_file())
+            self.assertFalse(pending.exists())
+            self.assertEqual(
+                len(list(base.glob("quality_authorization.consumed.*.json"))),
+                1,
+            )
+
     def test_public_sequence_consumes_before_frozen_body(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temp:
             base = Path(temp)
@@ -397,7 +708,7 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
                 self.assertFalse(pending.exists())
                 self.assertFalse(result_directory.exists())
 
-            def execute(_policy: object) -> dict[str, object]:
+            def execute(_policy: object, _execution: object) -> dict[str, object]:
                 events.append("body_called")
                 self.assertFalse(pending.exists())
                 self.assertTrue(any(base.glob("quality_authorization.consumed.*.json")))
@@ -441,8 +752,16 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
     def test_frozen_body_is_called_with_unchanged_base_policy(self) -> None:
         quality_policy = self.static["quality_policy"]
 
-        def body(*, policy: object, state: dict[str, str]) -> dict[str, object]:
+        execution = self._execution()
+
+        def body(
+            *,
+            policy: object,
+            execution: object,
+            state: dict[str, str],
+        ) -> dict[str, object]:
             self.assertIs(policy, quality_policy)
+            self.assertIs(execution, execution_context)
             self.assertEqual(state["stage"], "authorized_overlay_entry")
             return {
                 "status": "PASS",
@@ -450,22 +769,30 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
                 "training_started": False,
             }
 
+        execution_context = execution
         with mock.patch.object(
-            frozen_runner, "_run_authorized_formal_quality_audit", side_effect=body
+            execution_adapter,
+            "run_authorized_formal_quality_audit",
+            side_effect=body,
         ):
-            result = overlay._execute_frozen_body(quality_policy)
+            result = overlay._execute_frozen_body(
+                quality_policy, execution_context
+            )
         self.assertEqual(result["status"], "PASS")
         self.assertFalse(quality_policy["authorization"]["quality_audit_run"])
         self.assertFalse(quality_policy["authorization"]["metric_generation"])
 
     def test_frozen_body_exception_is_hash_only_and_classified(self) -> None:
         secret = "row-label-secret"
+        execution = self._execution()
         with mock.patch.object(
-            frozen_runner,
-            "_run_authorized_formal_quality_audit",
+            execution_adapter,
+            "run_authorized_formal_quality_audit",
             side_effect=frozen_runner.DatasetGateFailure(secret),
         ):
-            result = overlay._execute_frozen_body(self.static["quality_policy"])
+            result = overlay._execute_frozen_body(
+                self.static["quality_policy"], execution
+            )
         self.assertEqual(result["status"], "DATASET_INVALIDATED")
         self.assertEqual(result["row_level_labels_returned"], 0)
         self.assertNotIn(secret, json.dumps(result, ensure_ascii=False))
@@ -475,11 +802,13 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         )
 
         with mock.patch.object(
-            frozen_runner,
-            "_run_authorized_formal_quality_audit",
+            execution_adapter,
+            "run_authorized_formal_quality_audit",
             side_effect=frozen_runner.AuditorExecutionFailure(secret),
         ):
-            result = overlay._execute_frozen_body(self.static["quality_policy"])
+            result = overlay._execute_frozen_body(
+                self.static["quality_policy"], execution
+            )
         self.assertEqual(
             result["status"], "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION"
         )
