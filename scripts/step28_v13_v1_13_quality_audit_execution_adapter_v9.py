@@ -29,6 +29,17 @@ import step28_v13_v1_13_quality_probe_validator_v9 as frozen_validator
 
 ROOT = Path(__file__).resolve().parents[1]
 HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+ROOT_MANIFEST_PIN_PATH = "root_manifest.json"
+PENDING_RECEIPT_RELATIVE_PATH = (
+    "private_custody/"
+    "step28_v13_v1_13_v9_quality_audit_authorization.json"
+)
+EXPECTED_RECEIPT_STATUS = "ALLOW_ONE_V9_DESIGN_QUALITY_AUDIT"
+EXPECTED_CLAIM_BOUNDARY = (
+    "ONE_DESIGN_QUALITY_AUDIT_ONLY_NO_FORMAL_DATA_"
+    "NO_AUDIT_AB_TRUTH_NO_TRAINING_NO_MODEL_METRICS"
+)
+EXPECTED_REVIEW_FINAL_LINE = "允许运行一次冻结质量审计"
 EXPECTED_CAPABILITIES = {
     "quality_audit_run": True,
     "quality_metric_generation": True,
@@ -58,15 +69,20 @@ class ConsumedQualityAuditExecution:
     overlay_policy_canonical_self_hash: str
     base_policy_canonical_self_hash: str
     capabilities_canonical_sha256: str
+    pending_receipt_path: Path
+    consumed_receipt_path: Path
+    consumed_receipt_size_bytes: int
+    consumed_receipt_sha256: str
+    result_path: Path
     dataset_root: Path
-    root_manifest_path: str
+    root_manifest_repository_path: str
     root_manifest_size_bytes: int
     root_manifest_sha256: str
     root_manifest_canonical_self_hash: str
 
     def root_pin(self) -> truth_capability.RootManifestPin:
         return truth_capability.RootManifestPin(
-            path=self.root_manifest_path,
+            path=ROOT_MANIFEST_PIN_PATH,
             size_bytes=self.root_manifest_size_bytes,
             sha256=self.root_manifest_sha256,
             canonical_self_hash=self.root_manifest_canonical_self_hash,
@@ -74,7 +90,7 @@ class ConsumedQualityAuditExecution:
 
     def root_binding(self) -> dict[str, Any]:
         return {
-            "path": self.root_manifest_path,
+            "path": self.root_manifest_repository_path,
             "size_bytes": self.root_manifest_size_bytes,
             "sha256": self.root_manifest_sha256,
             "canonical_self_hash": self.root_manifest_canonical_self_hash,
@@ -99,12 +115,123 @@ def capabilities_canonical_sha256(capabilities: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical_json_bytes(dict(capabilities))).hexdigest()
 
 
+def _strict_json_object(raw: bytes) -> dict[str, Any]:
+    def reject_constant(value: str) -> object:
+        raise ValueError(f"Non-finite JSON constant: {value}")
+
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        value: dict[str, Any] = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError(f"Duplicate JSON key: {key}")
+            value[key] = item
+        return value
+
+    try:
+        value = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=unique_object,
+            parse_constant=reject_constant,
+        )
+    except (UnicodeError, ValueError) as exc:
+        raise QualityAuditExecutionAdapterError(
+            "Consumed quality-audit receipt is not strict JSON"
+        ) from exc
+    if not isinstance(value, dict):
+        raise QualityAuditExecutionAdapterError(
+            "Consumed quality-audit receipt root is not an object"
+        )
+    return value
+
+
+def _file_binding(path: Path) -> dict[str, Any]:
+    resolved = path.resolve()
+    try:
+        relative = resolved.relative_to(ROOT).as_posix()
+    except ValueError as exc:
+        raise QualityAuditExecutionAdapterError(
+            "Quality-audit source escaped the repository"
+        ) from exc
+    if not resolved.is_file():
+        raise QualityAuditExecutionAdapterError(
+            "Quality-audit source is unavailable"
+        )
+    return {
+        "path": relative,
+        "size_bytes": resolved.stat().st_size,
+        "sha256": frozen_runner._sha256_file(resolved),
+    }
+
+
+def _validate_consumed_receipt_evidence(
+    execution: ConsumedQualityAuditExecution,
+    *,
+    base_policy: Mapping[str, Any],
+) -> None:
+    expected_pending = (ROOT / PENDING_RECEIPT_RELATIVE_PATH).resolve()
+    expected_consumed = expected_pending.with_name(
+        f"{expected_pending.stem}.consumed."
+        f"{execution.consumed_receipt_sha256}.json"
+    )
+    if (
+        execution.pending_receipt_path != expected_pending
+        or execution.consumed_receipt_path != expected_consumed
+        or execution.pending_receipt_path.exists()
+        or not execution.consumed_receipt_path.is_file()
+        or execution.consumed_receipt_path.stat().st_size
+        != execution.consumed_receipt_size_bytes
+        or frozen_runner._sha256_file(execution.consumed_receipt_path)
+        != execution.consumed_receipt_sha256
+    ):
+        raise QualityAuditExecutionAdapterError(
+            "Consumed quality-audit receipt file binding drift"
+        )
+    try:
+        raw = execution.consumed_receipt_path.read_bytes()
+    except OSError as exc:
+        raise QualityAuditExecutionAdapterError(
+            "Consumed quality-audit receipt cannot be read"
+        ) from exc
+    payload = _strict_json_object(raw)
+    unsigned = dict(payload)
+    receipt_id = unsigned.pop("canonical_self_hash", None)
+    if (
+        receipt_id != execution.receipt_id
+        or hashlib.sha256(_canonical_json_bytes(unsigned)).hexdigest()
+        != execution.receipt_id
+        or payload.get("status") != EXPECTED_RECEIPT_STATUS
+        or payload.get("claim_boundary") != EXPECTED_CLAIM_BOUNDARY
+        or payload.get("review_final_line") != EXPECTED_REVIEW_FINAL_LINE
+        or payload.get("attempt_index") != 1
+        or payload.get("capabilities") != EXPECTED_CAPABILITIES
+        or payload.get("input_design_root")
+        != execution.dataset_root.relative_to(ROOT).as_posix()
+        or payload.get("result_path")
+        != execution.result_path.relative_to(ROOT).as_posix()
+        or payload.get("root_manifest") != execution.root_binding()
+        or not isinstance(payload.get("overlay_policy"), Mapping)
+        or payload["overlay_policy"].get("canonical_self_hash")
+        != execution.overlay_policy_canonical_self_hash
+        or not isinstance(payload.get("frozen_quality_policy"), Mapping)
+        or payload["frozen_quality_policy"].get("canonical_self_hash")
+        != base_policy["canonical_self_hash"]
+        or payload.get("quality_audit_execution_adapter")
+        != _file_binding(Path(__file__))
+    ):
+        raise QualityAuditExecutionAdapterError(
+            "Consumed quality-audit receipt payload binding drift"
+        )
+
+
 def build_consumed_execution(
     *,
     receipt_id: str,
     overlay_policy_canonical_self_hash: str,
     base_policy: Mapping[str, Any],
     capabilities: Mapping[str, Any],
+    pending_receipt_path: Path,
+    consumed_receipt_binding: Mapping[str, Any],
+    result_path: Path,
     dataset_root: Path,
     root_manifest_binding: Mapping[str, Any],
 ) -> ConsumedQualityAuditExecution:
@@ -123,6 +250,13 @@ def build_consumed_execution(
         or not isinstance(root_manifest_binding["size_bytes"], int)
         or isinstance(root_manifest_binding["size_bytes"], bool)
         or root_manifest_binding["size_bytes"] <= 0
+        or set(consumed_receipt_binding) != {"path", "size_bytes", "sha256"}
+        or not isinstance(consumed_receipt_binding["size_bytes"], int)
+        or isinstance(consumed_receipt_binding["size_bytes"], bool)
+        or consumed_receipt_binding["size_bytes"] <= 0
+        or not HEX_SHA256_RE.fullmatch(
+            str(consumed_receipt_binding["sha256"])
+        )
     ):
         raise QualityAuditExecutionAdapterError(
             "Quality-audit execution context schema drift"
@@ -140,19 +274,31 @@ def build_consumed_execution(
         raise QualityAuditExecutionAdapterError(
             "Quality-audit root manifest path drift"
         )
-    return ConsumedQualityAuditExecution(
+    consumed_path = (ROOT / str(consumed_receipt_binding["path"])).resolve()
+    pending_path = pending_receipt_path.resolve()
+    resolved_result_path = result_path.resolve()
+    execution = ConsumedQualityAuditExecution(
         receipt_id=receipt_id,
         overlay_policy_canonical_self_hash=overlay_policy_canonical_self_hash,
         base_policy_canonical_self_hash=str(base_policy["canonical_self_hash"]),
         capabilities_canonical_sha256=capabilities_canonical_sha256(capabilities),
+        pending_receipt_path=pending_path,
+        consumed_receipt_path=consumed_path,
+        consumed_receipt_size_bytes=int(
+            consumed_receipt_binding["size_bytes"]
+        ),
+        consumed_receipt_sha256=str(consumed_receipt_binding["sha256"]),
+        result_path=resolved_result_path,
         dataset_root=resolved_root,
-        root_manifest_path=expected_path,
+        root_manifest_repository_path=expected_path,
         root_manifest_size_bytes=int(root_manifest_binding["size_bytes"]),
         root_manifest_sha256=str(root_manifest_binding["sha256"]),
         root_manifest_canonical_self_hash=str(
             root_manifest_binding["canonical_self_hash"]
         ),
     )
+    validate_consumed_execution(execution, base_policy=base_policy)
+    return execution
 
 
 def validate_consumed_execution(
@@ -171,6 +317,13 @@ def validate_consumed_execution(
         )
         or execution.capabilities_canonical_sha256
         != capabilities_canonical_sha256(EXPECTED_CAPABILITIES)
+        or not HEX_SHA256_RE.fullmatch(execution.consumed_receipt_sha256)
+        or execution.pending_receipt_path
+        != execution.pending_receipt_path.resolve()
+        or execution.consumed_receipt_path
+        != execution.consumed_receipt_path.resolve()
+        or execution.result_path != execution.result_path.resolve()
+        or execution.result_path.exists()
         or execution.dataset_root != execution.dataset_root.resolve()
         or not execution.dataset_root.is_dir()
     ):
@@ -181,13 +334,17 @@ def validate_consumed_execution(
     try:
         expected_path = manifest_path.relative_to(ROOT).as_posix()
         execution.dataset_root.relative_to(ROOT)
+        execution.pending_receipt_path.relative_to(ROOT)
+        execution.consumed_receipt_path.relative_to(ROOT)
+        execution.result_path.relative_to(ROOT)
     except ValueError as exc:
         raise QualityAuditExecutionAdapterError(
-            "Consumed quality-audit root escaped the repository"
+            "Consumed quality-audit path escaped the repository"
         ) from exc
     pin = execution.root_pin()
     if (
-        expected_path != execution.root_manifest_path
+        pin.path != ROOT_MANIFEST_PIN_PATH
+        or expected_path != execution.root_manifest_repository_path
         or not manifest_path.is_file()
         or manifest_path.stat().st_size != pin.size_bytes
         or frozen_runner._sha256_file(manifest_path) != pin.sha256
@@ -195,6 +352,29 @@ def validate_consumed_execution(
         raise QualityAuditExecutionAdapterError(
             "Consumed quality-audit root pin drift"
         )
+    _validate_consumed_receipt_evidence(execution, base_policy=base_policy)
+
+
+def _build_bound_truth_capability(
+    *,
+    execution: ConsumedQualityAuditExecution,
+    policy: Mapping[str, Any],
+) -> truth_capability.FormalTrainDevelopmentTruthCapability:
+    """Compose the repository lineage binding with the root-local truth pin."""
+
+    validate_consumed_execution(execution, base_policy=policy)
+    value = (
+        truth_capability.FormalTrainDevelopmentTruthCapability
+        .from_pinned_design_root(
+            dataset_root=execution.dataset_root,
+            root_manifest_pin=execution.root_pin(),
+        )
+    )
+    if value.root_binding() != execution.root_binding():
+        raise frozen_validator.QualityProbeValidationError(
+            "Formal truth capability does not match consumed execution root pin"
+        )
+    return value
 
 
 def _evaluate_authorized_formal_family(
@@ -652,17 +832,10 @@ def evaluate_authorized_formal_probe_families(
         ),
     )
     policy_bytes = _canonical_json_bytes(policy)
-    truth = (
-        truth_capability.FormalTrainDevelopmentTruthCapability
-        .from_pinned_design_root(
-            dataset_root=dataset_root,
-            root_manifest_pin=root_manifest_pin,
-        )
+    truth = _build_bound_truth_capability(
+        execution=execution,
+        policy=policy,
     )
-    if truth.root_binding() != expected_root_binding:
-        raise frozen_validator.QualityProbeValidationError(
-            "Formal truth capability does not match consumed execution root pin"
-        )
     truth_pins = truth._begin_bound_transaction(
         expected_root_binding=expected_root_binding
     )
@@ -756,6 +929,112 @@ def evaluate_authorized_formal_probe_families(
         _canonical_json_bytes(receipt)
     )
     return receipt
+
+
+def _input_file_verification_scope(
+    *,
+    manifests: Mapping[str, Mapping[str, Any]],
+    loaded: Mapping[str, Mapping[str, Any]],
+    supervised_receipt: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Report byte-verified inputs separately from deliberately unopened files."""
+
+    declared: dict[str, dict[str, Any]] = {}
+    for split in frozen_runner.SPLITS:
+        records = frozen_runner._manifest_records(manifests[split])
+        for relative, record in records.items():
+            path = f"{split}/{relative}"
+            declared[path] = {
+                "path": path,
+                "size_bytes": int(record["size_bytes"]),
+                "sha256": str(record["sha256"]),
+            }
+    label_free_paths = {
+        source.path
+        for split in frozen_runner.SPLITS
+        for source in loaded[split]["sources"].values()
+    }
+    actual_paths = set(label_free_paths)
+    truth_paths: set[str] = set()
+    if supervised_receipt is not None:
+        access = supervised_receipt.get("truth_file_access")
+        if not isinstance(access, Mapping):
+            raise frozen_validator.QualityProbeValidationError(
+                "Truth file verification receipt is absent"
+            )
+        for split in truth_capability.SUPERVISED_SPLITS:
+            split_receipt = access.get(split)
+            path = f"{split}/{truth_capability.TRUTH_RELATIVE_PATH}"
+            if (
+                not isinstance(split_receipt, Mapping)
+                or split_receipt.get("file_open_count") != 1
+                or split_receipt.get("sha256") != declared[path]["sha256"]
+            ):
+                raise frozen_validator.QualityProbeValidationError(
+                    "Supervised truth byte-verification receipt drift"
+                )
+            truth_paths.add(path)
+        for split in ("audit_a", "audit_b"):
+            split_receipt = access.get(split)
+            if (
+                not isinstance(split_receipt, Mapping)
+                or any(
+                    split_receipt.get(field) != 0
+                    for field in (
+                        "file_open_count",
+                        "byte_read_count",
+                        "materialized_row_count",
+                    )
+                )
+            ):
+                raise frozen_validator.QualityProbeValidationError(
+                    "Audit truth seal receipt drift"
+                )
+        actual_paths.update(truth_paths)
+    if not actual_paths <= set(declared):
+        raise frozen_runner.QualityAuditRunnerError(
+            "Byte-verified file registry escaped the declared manifest universe"
+        )
+    manifest_pin_only_paths = set(declared) - actual_paths
+    audit_truth_paths = {
+        f"{split}/{truth_capability.TRUTH_RELATIVE_PATH}"
+        for split in ("audit_a", "audit_b")
+    }
+    if not audit_truth_paths <= manifest_pin_only_paths:
+        raise frozen_validator.QualityProbeValidationError(
+            "Audit truth entered the byte-verified input registry"
+        )
+
+    def commitment(paths: set[str]) -> str:
+        bindings = [declared[path] for path in sorted(paths, key=str.encode)]
+        return hashlib.sha256(_canonical_json_bytes(bindings)).hexdigest()
+
+    actual_ordered = sorted(actual_paths, key=str.encode)
+    manifest_only_ordered = sorted(manifest_pin_only_paths, key=str.encode)
+    return {
+        "declared_data_file_count": len(declared),
+        "label_free_actual_byte_verified_count": len(label_free_paths),
+        "supervised_truth_actual_byte_verified_count": len(truth_paths),
+        "actual_byte_verified_count": len(actual_paths),
+        "actual_byte_verified_paths": actual_ordered,
+        "actual_byte_verified_binding_sha256": commitment(actual_paths),
+        "manifest_pin_only_count": len(manifest_pin_only_paths),
+        "manifest_pin_only_paths": manifest_only_ordered,
+        "manifest_pin_only_binding_sha256": commitment(
+            manifest_pin_only_paths
+        ),
+        "audit_a_b_truth_manifest_pin_only_paths": sorted(
+            audit_truth_paths, key=str.encode
+        ),
+        "audit_a_b_truth_actual_byte_read_count": 0,
+        "declared_unclassified_count": len(declared)
+        - len(actual_paths)
+        - len(manifest_pin_only_paths),
+        "scope_claim": (
+            "ACTUAL_BYTES_VERIFIED_ONLY_FOR_LISTED_PATHS_"
+            "OTHER_PATHS_MANIFEST_PIN_ONLY"
+        ),
+    }
 
 
 def run_authorized_formal_quality_audit(
@@ -868,6 +1147,11 @@ def run_authorized_formal_quality_audit(
             "status": "DATASET_INVALIDATED",
             "claim_boundary": "V9_DESIGN_QUALITY_ONLY_NOT_FORMAL_DATA_OR_TRAINING",
             "structure": structure_receipt,
+            "input_file_verification_scope": _input_file_verification_scope(
+                manifests=manifests,
+                loaded=loaded,
+                supervised_receipt=None,
+            ),
             "supervised_truth_opened": False,
             "audit_a_b_truth_open_count": 0,
             "formal_500_by_4_generated": False,
@@ -996,6 +1280,11 @@ def run_authorized_formal_quality_audit(
         "root_manifest": execution.root_binding(),
         "structure": structure_receipt,
         "supervised": supervised_receipt,
+        "input_file_verification_scope": _input_file_verification_scope(
+            manifests=manifests,
+            loaded=loaded,
+            supervised_receipt=supervised_receipt,
+        ),
         "audit_a_b_truth_remained_sealed": True,
         "formal_500_by_4_generated": False,
         "training_started": False,

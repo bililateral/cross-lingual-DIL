@@ -38,6 +38,27 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         cls.static = overlay._validate_static_inputs(cls.policy)
         cls.git_commit = "a" * 40
         cls.git_tree = "b" * 40
+        private_root = ROOT / "private_custody"
+        private_root.mkdir(parents=True, exist_ok=True)
+        cls.execution_receipt_directory = tempfile.TemporaryDirectory(
+            prefix="quality-audit-execution-fixture-",
+            dir=private_root,
+        )
+        pending = Path(cls.execution_receipt_directory.name) / (
+            "step28_v13_v1_13_v9_quality_audit_authorization.json"
+        )
+        relative = pending.relative_to(ROOT).as_posix()
+        cls.execution_receipt_path_patch = mock.patch.object(
+            execution_adapter,
+            "PENDING_RECEIPT_RELATIVE_PATH",
+            relative,
+        )
+        cls.execution_receipt_path_patch.start()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.execution_receipt_path_patch.stop()
+        cls.execution_receipt_directory.cleanup()
 
     def _receipt_payload(self) -> dict[str, object]:
         payload: dict[str, object] = {
@@ -56,9 +77,35 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         ).hexdigest()
         return payload
 
+    def _execution_receipt(
+        self,
+    ) -> tuple[dict[str, object], Path, dict[str, object]]:
+        payload = self._receipt_payload()
+        raw = (
+            json.dumps(payload, ensure_ascii=False, sort_keys=True) + "\n"
+        ).encode("utf-8")
+        receipt_sha256 = hashlib.sha256(raw).hexdigest()
+        pending = (
+            ROOT / execution_adapter.PENDING_RECEIPT_RELATIVE_PATH
+        ).resolve()
+        consumed = pending.with_name(
+            f"{pending.stem}.consumed.{receipt_sha256}.json"
+        )
+        if consumed.exists():
+            self.assertEqual(consumed.read_bytes(), raw)
+        else:
+            pending.write_bytes(raw)
+            pending.replace(consumed)
+        return payload, pending, {
+            "path": consumed.relative_to(ROOT).as_posix(),
+            "size_bytes": len(raw),
+            "sha256": receipt_sha256,
+        }
+
     def _execution(self) -> execution_adapter.ConsumedQualityAuditExecution:
+        payload, pending, consumed = self._execution_receipt()
         return execution_adapter.build_consumed_execution(
-            receipt_id="d" * 64,
+            receipt_id=str(payload["canonical_self_hash"]),
             overlay_policy_canonical_self_hash=self.policy[
                 "canonical_self_hash"
             ],
@@ -66,6 +113,9 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
             capabilities=self.policy["external_receipt"][
                 "required_capabilities"
             ],
+            pending_receipt_path=pending,
+            consumed_receipt_binding=consumed,
+            result_path=ROOT / self.policy["execution"]["result_path"],
             dataset_root=self.static["design_root"],
             root_manifest_binding=self.static["root_manifest"],
         )
@@ -139,6 +189,11 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         self.assertEqual(
             execution.root_binding(), self.static["root_manifest"]
         )
+        self.assertEqual(
+            execution.root_pin().path,
+            execution_adapter.ROOT_MANIFEST_PIN_PATH,
+        )
+        self.assertEqual(execution.root_pin().path, "root_manifest.json")
         authorization = self.static["quality_policy"]["authorization"]
         self.assertFalse(authorization["quality_audit_run"])
         self.assertFalse(authorization["metric_generation"])
@@ -146,16 +201,20 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
             self.policy["external_receipt"]["required_capabilities"]
         )
         widened["model_training"] = True
+        payload, pending, consumed = self._execution_receipt()
         with self.assertRaisesRegex(
             execution_adapter.QualityAuditExecutionAdapterError, "widened"
         ):
             execution_adapter.build_consumed_execution(
-                receipt_id="d" * 64,
+                receipt_id=str(payload["canonical_self_hash"]),
                 overlay_policy_canonical_self_hash=self.policy[
                     "canonical_self_hash"
                 ],
                 base_policy=self.static["quality_policy"],
                 capabilities=widened,
+                pending_receipt_path=pending,
+                consumed_receipt_binding=consumed,
+                result_path=ROOT / self.policy["execution"]["result_path"],
                 dataset_root=self.static["design_root"],
                 root_manifest_binding=self.static["root_manifest"],
             )
@@ -166,6 +225,112 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
             execution_adapter.validate_consumed_execution(
                 changed, base_policy=self.static["quality_policy"]
             )
+
+    def test_real_truth_capability_composition_accepts_root_local_pin(self) -> None:
+        execution = self._execution()
+        truth = execution_adapter._build_bound_truth_capability(
+            execution=execution,
+            policy=self.static["quality_policy"],
+        )
+        self.assertEqual(truth.root_binding(), execution.root_binding())
+        self.assertEqual(execution.root_pin().path, "root_manifest.json")
+
+    def test_direct_adapter_without_consumed_receipt_fails_before_root_read(
+        self,
+    ) -> None:
+        execution = self._execution()
+        consumed = execution.consumed_receipt_path
+        pending = execution.pending_receipt_path
+        consumed.replace(pending)
+        try:
+            with mock.patch.object(
+                frozen_runner, "_load_root_manifests"
+            ) as load_root:
+                with self.assertRaisesRegex(
+                    execution_adapter.QualityAuditExecutionAdapterError,
+                    "receipt file binding",
+                ):
+                    execution_adapter.run_authorized_formal_quality_audit(
+                        policy=self.static["quality_policy"],
+                        execution=execution,
+                        state={},
+                    )
+            load_root.assert_not_called()
+        finally:
+            pending.replace(consumed)
+
+    def test_file_verification_scope_is_explicit_for_all_72_records(self) -> None:
+        root = self.static["design_root"]
+        manifests = {
+            split: json.loads(
+                (root / split / "split_manifest.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            for split in frozen_runner.SPLITS
+        }
+        loaded: dict[str, dict[str, object]] = {}
+        truth_access: dict[str, dict[str, object]] = {}
+        for split in frozen_runner.SPLITS:
+            records = frozen_runner._manifest_records(manifests[split])
+            required = {
+                frozen_runner.WORLDS_PATH,
+                frozen_runner.ENDPOINT_PATH,
+                frozen_runner.PUBLIC_CODE_PATH,
+                frozen_runner.ELIGIBILITY_PATH,
+                frozen_runner.STRUCTURE_AUDIT_PATH,
+                *(
+                    path
+                    for pair in frozen_runner.SURFACE_FILES.values()
+                    for path in pair
+                ),
+            }
+            loaded[split] = {
+                "sources": {
+                    relative: execution_adapter.preparer.SourceCommitment(
+                        path=f"{split}/{relative}",
+                        size_bytes=int(records[relative]["size_bytes"]),
+                        sha256=str(records[relative]["sha256"]),
+                    )
+                    for relative in required
+                }
+            }
+            if split in execution_adapter.truth_capability.SUPERVISED_SPLITS:
+                truth_record = records[
+                    execution_adapter.truth_capability.TRUTH_RELATIVE_PATH
+                ]
+                truth_access[split] = {
+                    "file_open_count": 1,
+                    "byte_read_count": int(truth_record["size_bytes"]),
+                    "materialized_row_count": int(truth_record["row_count"]),
+                    "sha256": str(truth_record["sha256"]),
+                }
+            else:
+                truth_access[split] = {
+                    "file_open_count": 0,
+                    "byte_read_count": 0,
+                    "materialized_row_count": 0,
+                }
+        scope = execution_adapter._input_file_verification_scope(
+            manifests=manifests,
+            loaded=loaded,
+            supervised_receipt={"truth_file_access": truth_access},
+        )
+        self.assertEqual(scope["declared_data_file_count"], 72)
+        self.assertEqual(scope["label_free_actual_byte_verified_count"], 44)
+        self.assertEqual(
+            scope["supervised_truth_actual_byte_verified_count"], 2
+        )
+        self.assertEqual(scope["actual_byte_verified_count"], 46)
+        self.assertEqual(scope["manifest_pin_only_count"], 26)
+        self.assertEqual(scope["declared_unclassified_count"], 0)
+        self.assertEqual(
+            scope["audit_a_b_truth_manifest_pin_only_paths"],
+            [
+                "audit_a/private/pair_labels.csv",
+                "audit_b/private/pair_labels.csv",
+            ],
+        )
 
     def test_real_adapter_reaches_root_manifest_without_mocking_body(self) -> None:
         class ReachedBuilderBinding(RuntimeError):
@@ -684,6 +849,41 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
                 1,
             )
 
+    def test_terminal_publisher_never_accepts_a_different_existing_result(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+            base = Path(temp)
+            result_directory = base / "result"
+            result_directory.mkdir()
+            result_path = result_directory / "quality_audit_receipt.json"
+            temporary = base / ".result.tmp"
+            artifact = {
+                "status": "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+                "canonical_self_hash": "e" * 64,
+            }
+            result_path.write_bytes(b"different\n")
+            with self.assertRaisesRegex(
+                overlay.QualityAuditAuthorizationError,
+                "differs from terminal failure",
+            ):
+                overlay._publish_wrapper_terminal_failure(
+                    artifact=artifact,
+                    result_directory=result_directory,
+                    result_path=result_path,
+                    temporary_path=temporary,
+                )
+            result_path.write_bytes(overlay._result_payload(artifact))
+            overlay._publish_wrapper_terminal_failure(
+                artifact=artifact,
+                result_directory=result_directory,
+                result_path=result_path,
+                temporary_path=temporary,
+            )
+            self.assertEqual(
+                result_path.read_bytes(), overlay._result_payload(artifact)
+            )
+
     def test_public_sequence_consumes_before_frozen_body(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temp:
             base = Path(temp)
@@ -738,6 +938,10 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
                 overlay,
                 "_validate_consumed_receipt",
                 side_effect=validate_consumed,
+            ), mock.patch.object(
+                execution_adapter,
+                "build_consumed_execution",
+                return_value=self._execution(),
             ), mock.patch.object(
                 overlay, "_execute_frozen_body", side_effect=execute
             ), mock.patch.object(

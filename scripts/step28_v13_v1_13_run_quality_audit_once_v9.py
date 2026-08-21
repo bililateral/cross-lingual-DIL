@@ -29,10 +29,10 @@ OVERLAY_POLICY_PATH = (
 )
 OVERLAY_POLICY_SIZE_BYTES = 6201
 OVERLAY_POLICY_SHA256 = (
-    "83f13a95b53fb8d52c77edf3299e634b33bf95e4d727225d13251eebc07d52c8"
+    "495bf993dab3aa9896b39feec018ce0049c58b58367d23c226193c3f8af4de12"
 )
 OVERLAY_POLICY_CANONICAL_SELF_HASH = (
-    "0b3df1dac378aa770e67f609800113825fc4ab022e47edb8aa966d780bb1c86d"
+    "1c0c73d55019680c1a151e323850c901693e7b113fab2569609e7f058d62dbba"
 )
 HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 GIT_OBJECT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
@@ -744,14 +744,18 @@ def _build_result_artifact(
     return artifact
 
 
+def _result_payload(artifact: Mapping[str, Any]) -> bytes:
+    return json.dumps(
+        artifact, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False
+    ).encode("utf-8") + b"\n"
+
+
 def _publish_result(
     *, artifact: Mapping[str, Any], result_path: Path, temporary_path: Path
 ) -> None:
     if result_path.exists() or temporary_path.exists():
         raise QualityAuditAuthorizationError("Quality-audit result already exists")
-    payload = json.dumps(
-        artifact, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False
-    ).encode("utf-8") + b"\n"
+    payload = _result_payload(artifact)
     try:
         with temporary_path.open("xb") as handle:
             handle.write(payload)
@@ -841,7 +845,16 @@ def _publish_wrapper_terminal_failure(
     temporary_path: Path,
 ) -> None:
     if result_path.exists():
-        return
+        try:
+            if result_path.read_bytes() == _result_payload(artifact):
+                return
+        except OSError as exc:
+            raise QualityAuditAuthorizationError(
+                "Existing quality-audit terminal result cannot be verified"
+            ) from exc
+        raise QualityAuditAuthorizationError(
+            "Existing quality-audit result differs from terminal failure"
+        )
     try:
         result_directory.mkdir(parents=True, exist_ok=True)
         _publish_result(
@@ -901,6 +914,9 @@ def run_quality_audit_once() -> dict[str, Any]:
             overlay_policy_canonical_self_hash=policy["canonical_self_hash"],
             base_policy=static["quality_policy"],
             capabilities=receipt.payload["capabilities"],
+            pending_receipt_path=receipt.path,
+            consumed_receipt_binding=consumed_file,
+            result_path=result_path,
             dataset_root=static["design_root"],
             root_manifest_binding=static["root_manifest"],
         )
