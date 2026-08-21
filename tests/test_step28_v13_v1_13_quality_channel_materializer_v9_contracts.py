@@ -586,6 +586,48 @@ class QualityChannelMaterializerV9Contracts(unittest.TestCase):
         )
         self.assertGreater(hits, 0)
 
+    def test_structure_profile_hashes_bind_exact_persisted_projection(self) -> None:
+        receipt = self.materialized.channel_structure_audit
+        cases = (
+            (
+                self.accepted.seller_profiles,
+                "full_profile_sha256",
+            ),
+            (
+                self.materialized.masked_seller_profiles,
+                "masked_profile_sha256",
+            ),
+            (
+                self.materialized.neutral_seller_profiles,
+                "neutral_profile_sha256",
+            ),
+        )
+        for profiles, field in cases:
+            with self.subTest(field=field):
+                projected = scientific.project_model_seller_profiles(profiles)
+                self.assertEqual(
+                    receipt[field],
+                    common.canonical_sha256(projected),
+                )
+                self.assertNotEqual(
+                    receipt[field],
+                    common.canonical_sha256(profiles),
+                    "regression fixture must retain wider internal Step3 fields",
+                )
+
+        augmented = copy.deepcopy(self.accepted.seller_profiles[0])
+        augmented["private_audit_marker"] = "must-not-enter-model-view"
+        self.assertEqual(
+            scientific.project_model_seller_profile(
+                self.accepted.seller_profiles[0]
+            ),
+            scientific.project_model_seller_profile(augmented),
+        )
+        self.assertNotEqual(
+            common.canonical_sha256(self.accepted.seller_profiles[0]),
+            common.canonical_sha256(augmented),
+        )
+
     def test_persisted_real_structure_receipt_closes_in_aggregator(self) -> None:
         def code_for_ordinal(value: int) -> str:
             return "Q" + "".join(

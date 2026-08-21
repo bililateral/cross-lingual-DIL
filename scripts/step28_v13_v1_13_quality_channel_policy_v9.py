@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the implementation-only v9 quality-channel machine policy."""
+"""Validate the implementation-only V9.1 quality-channel machine policy."""
 
 from __future__ import annotations
 
@@ -17,13 +17,24 @@ DEFAULT_POLICY = (
     ROOT / "schema" / "step28_v13_v1_13_quality_channel_sensitivity_policy_v9.json"
 )
 EXPECTED_POLICY_SELF_HASH = (
-    "3147c01032aed44f6465ac9db654c944c538fb326d0ee0234773a36eae32c9f9"
+    "5c01b18ccd6388d55c7bad09717295ff40abfeda3f6dd17d96a77ce40c150988"
+)
+EXPECTED_POLICY_VERSION = (
+    "2026-08-21-step28-v13-v1-13-quality-channel-sensitivity-v9-1"
+)
+EXPECTED_POLICY_STATUS = (
+    "V9_1_IMPLEMENTATION_ONLY_NO_1004_REBUILD_NO_FORMAL_GENERATION_NO_TRAINING"
 )
 EXPECTED_PIN_NAMES = {
     "scientific_contract",
     "quality_audit_c_amendment",
     "quality_audit_v8_scale_amendment",
     "v9_channel_contract",
+    "v9_quality_attempt2_invalidation_record",
+    "v9_1_model_view_commitment_repair_contract",
+    "v9_invalidated_equivalence_commitment",
+    "scientific_common_source",
+    "scientific_builder_source",
     "channel_views_source",
     "channel_views_tests",
     "channel_materializer_source",
@@ -178,6 +189,11 @@ def validate_policy(policy: Mapping[str, Any], *, check_pins: bool = True) -> No
         raise QualityChannelPolicyError(
             "Quality-channel policy is not the frozen semantic commitment"
         )
+    if (
+        policy["version"] != EXPECTED_POLICY_VERSION
+        or policy["status"] != EXPECTED_POLICY_STATUS
+    ):
+        raise QualityChannelPolicyError("Quality-channel policy version/status drift")
 
     authorization = policy["authorization"]
     if authorization != {
@@ -205,7 +221,7 @@ def validate_policy(policy: Mapping[str, Any], *, check_pins: bool = True) -> No
         or scale["seller_count_per_world"] != 28
         or scale["pair_count_per_world"] != 378
         or scale["positive_pair_count_per_world"] != 20
-        or scale["attempt_index"] != 1
+        or scale["attempt_index"] != 2
         or scale["replacement_authority_forbidden"] is not True
     ):
         raise QualityChannelPolicyError("Design-scale contract drift")

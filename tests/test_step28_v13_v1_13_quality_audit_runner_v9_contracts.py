@@ -106,6 +106,9 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
             Path(runner.dataset_builder.__file__)
         )
         receipt_sha256 = "5" * 64
+        expected_receipt_stem = Path(
+            builder_policy["design_build_authorization_overlay"]["receipt_path"]
+        ).stem
         root_manifest = {
             "status": "PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED",
             "execution_mode": "design_preflight",
@@ -141,8 +144,7 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
                 "receipt_file": {
                     "path": (
                         "private_custody/"
-                        "step28_v13_v1_13_v9_design_build_authorization."
-                        "consumed."
+                        f"{expected_receipt_stem}.consumed."
                         f"{receipt_sha256}.json"
                     ),
                     "size_bytes": 1,
@@ -155,7 +157,9 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
                 "git_commit": "8" * 40,
                 "git_tree": "9" * 40,
                 "execution_mode": "design_preflight",
-                "attempt_index": 1,
+                "attempt_index": builder_policy["single_attempt_random_authority"][
+                    "attempt_index"
+                ],
                 "world_counts": builder_policy["execution_modes"][
                     "design_preflight"
                 ]["world_counts"],
@@ -563,6 +567,21 @@ class QualityAuditRunnerV9Contracts(unittest.TestCase):
         ):
             runner._validate_loaded_structure_bindings(
                 loaded=changed, expected_clone_count_per_world=1
+            )
+        changed_profile = copy.deepcopy(loaded)
+        items, profiles = changed_profile["development"]["surface_rows"][
+            "surface_code_neutralized"
+        ]
+        altered_profile = dict(profiles[0])
+        altered_profile["item_count"] = 2
+        changed_profile["development"]["surface_rows"][
+            "surface_code_neutralized"
+        ] = (items, (altered_profile, *profiles[1:]))
+        with self.assertRaisesRegex(
+            runner.QualityAuditRunnerError, "model-view structure hash"
+        ):
+            runner._validate_loaded_structure_bindings(
+                loaded=changed_profile, expected_clone_count_per_world=1
             )
 
     def test_builder_seller_authority_covers_all_four_splits(self) -> None:

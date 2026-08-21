@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the four-split Step28-v13 v1.13 v9 design Chinese dataset."""
+"""Build the four-split Step28-v13 v1.13 V9.1 repaired design dataset."""
 
 from __future__ import annotations
 
@@ -43,32 +43,11 @@ REVIEWED_AT_RE = re.compile(r"^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0
 # text fields feed the frozen LaBSE path; the remaining values are exactly the
 # source statistics required to reconstruct legacy18 without exposing market,
 # split, candidate, raw-source, or audit metadata.
-MODEL_PROFILE_JOIN_ONLY_FIELDS = ("seller_uid",)
-MODEL_PROFILE_TEXT_FIELDS = (
-    "category_concat_top",
-    "signature_title_concat",
-    "title_concat_top",
-    "signature_description_concat",
-    "description_concat_top",
-)
-MODEL_PROFILE_NUMERIC_FIELDS = (
-    "item_count",
-    "title_length_stats",
-    "description_length_stats",
-    "style_stats",
-)
-MODEL_PROFILE_FIELDS = (
-    *MODEL_PROFILE_JOIN_ONLY_FIELDS,
-    *MODEL_PROFILE_TEXT_FIELDS,
-    *MODEL_PROFILE_NUMERIC_FIELDS,
-)
-MODEL_PROFILE_STYLE_FIELDS = (
-    "digit_ratio_mean",
-    "punct_ratio_mean",
-    "repeated_title_share",
-    "repeated_description_share",
-    "max_category_share",
-)
+MODEL_PROFILE_JOIN_ONLY_FIELDS = scientific.MODEL_PROFILE_JOIN_ONLY_FIELDS
+MODEL_PROFILE_TEXT_FIELDS = scientific.MODEL_PROFILE_TEXT_FIELDS
+MODEL_PROFILE_NUMERIC_FIELDS = scientific.MODEL_PROFILE_NUMERIC_FIELDS
+MODEL_PROFILE_FIELDS = scientific.MODEL_PROFILE_FIELDS
+MODEL_PROFILE_STYLE_FIELDS = scientific.MODEL_PROFILE_STYLE_FIELDS
 MODEL_REDACTED_ITEM_JOIN_ONLY_FIELDS = (
     "item_uid",
     "seller_uid",
@@ -389,6 +368,230 @@ def _count_file_rows(path: Path) -> int:
     return count
 
 
+V9_1_ALLOWED_STRUCTURE_HASH_FIELDS = (
+    "full_profile_sha256",
+    "masked_profile_sha256",
+    "neutral_profile_sha256",
+)
+V9_1_STRUCTURE_AUDIT_PATH = "private/channel_structure_audit.jsonl"
+
+
+def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise DatasetBuildError(
+                    f"Invalid JSONL in V9.1 equivalence replay: {path.name}"
+                ) from exc
+            if not isinstance(row, dict):
+                raise DatasetBuildError(
+                    f"Non-object JSONL in V9.1 equivalence replay: {path.name}"
+                )
+            rows.append(row)
+    return rows
+
+
+def _load_v9_invalidated_equivalence_commitment(
+    policy: Mapping[str, Any],
+) -> dict[str, Any]:
+    spec = policy["v9_invalidated_equivalence_commitment"]
+    path = common.verify_file_pin(
+        spec, label="V9 invalidated equivalence commitment"
+    )
+    payload = common.load_json(path)
+    unsigned = dict(payload)
+    claimed = unsigned.pop("canonical_self_hash", None)
+    if (
+        payload.get("version")
+        != "2026-08-21-step28-v13-v1-13-v9-invalidated-equivalence-commitment-v1"
+        or payload.get("status")
+        != "V9_DATASET_INVALIDATED_REFERENCE_HASHES_ONLY"
+        or payload.get("claim_boundary")
+        != "V9_1_MAY_CHANGE_ONLY_THREE_PROFILE_HASH_FIELDS_PER_STRUCTURE_ROW"
+        or payload.get("unchanged_file_count") != 68
+        or payload.get("changed_structure_file_count") != 4
+        or claimed != common.canonical_sha256(unsigned)
+        or set(payload.get("splits", {})) != set(SPLITS)
+        or payload.get("invalidated_root", {}).get(
+            "random_authority_commitment_sha256"
+        )
+        != common.canonical_sha256(
+            policy["public_preflight_keys"][DESIGN_EXECUTION_MODE]
+        )
+    ):
+        raise DatasetBuildError("V9 invalidated equivalence commitment drift")
+    return payload
+
+
+def _canonical_jsonl_projection_sha256(
+    rows: Sequence[Mapping[str, Any]],
+) -> str:
+    digest = hashlib.sha256()
+    for row in rows:
+        digest.update(common.canonical_json_bytes(row))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def _validate_v9_1_persisted_equivalence(
+    *,
+    temp_root: Path,
+    split_manifests: Mapping[str, Mapping[str, Any]],
+    policy: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Prove the repair changes only three profile hashes per structure row."""
+
+    reference = _load_v9_invalidated_equivalence_commitment(policy)
+    split_receipts: dict[str, dict[str, Any]] = {}
+    unchanged_count = 0
+    changed_count = 0
+    surface_contract = (
+        (
+            "observed/model_seller_profiles.jsonl",
+            "full_profile_sha256",
+        ),
+        (
+            "observed/model_seller_profiles.code_masked.jsonl",
+            "masked_profile_sha256",
+        ),
+        (
+            "observed/model_seller_profiles.code_neutralized.jsonl",
+            "neutral_profile_sha256",
+        ),
+    )
+    for split in SPLITS:
+        split_root = temp_root / split
+        current_files = {
+            str(row["path"]): dict(row)
+            for row in split_manifests[split]["files"]
+        }
+        expected = reference["splits"][split]
+        old_unchanged = expected["unchanged_files"]
+        if set(current_files) != set(EXPECTED_SPLIT_DATA_PATHS):
+            raise DatasetBuildError(
+                f"V9.1 persisted equivalence file universe drift: {split}"
+            )
+        for relative, old_record in old_unchanged.items():
+            if current_files.get(relative) != old_record:
+                raise DatasetBuildError(
+                    f"V9.1 changed a forbidden persisted file: {split}/{relative}"
+                )
+            unchanged_count += 1
+
+        structure_reference = expected["structure_audit"]
+        structure_record = current_files[V9_1_STRUCTURE_AUDIT_PATH]
+        if (
+            structure_reference.get("path") != V9_1_STRUCTURE_AUDIT_PATH
+            or structure_reference.get("allowed_changed_fields")
+            != list(V9_1_ALLOWED_STRUCTURE_HASH_FIELDS)
+            or structure_record.get("row_count")
+            != structure_reference["old_record"].get("row_count")
+            or structure_record.get("sha256")
+            == structure_reference["old_record"].get("sha256")
+        ):
+            raise DatasetBuildError(
+                f"V9.1 structure-audit change boundary drift: {split}"
+            )
+        structure_rows = _read_jsonl_objects(
+            split_root / V9_1_STRUCTURE_AUDIT_PATH
+        )
+        invariant_rows: list[dict[str, Any]] = []
+        profile_commitments: list[dict[str, Any]] = []
+        for row in structure_rows:
+            invariant = dict(row)
+            profile_commitments.append(
+                {
+                    "world_uid": str(row["world_uid"]),
+                    **{
+                        field: row[field]
+                        for field in V9_1_ALLOWED_STRUCTURE_HASH_FIELDS
+                    },
+                }
+            )
+            for field in V9_1_ALLOWED_STRUCTURE_HASH_FIELDS:
+                invariant.pop(field)
+            invariant_rows.append(invariant)
+        world_uid_lines = hashlib.sha256(
+            b"".join(
+                str(row["world_uid"]).encode("utf-8") + b"\n"
+                for row in structure_rows
+            )
+        ).hexdigest()
+        if (
+            _canonical_jsonl_projection_sha256(invariant_rows)
+            != structure_reference["invariant_canonical_jsonl_sha256"]
+            or world_uid_lines
+            != structure_reference["world_uid_utf8_lines_sha256"]
+            or _canonical_jsonl_projection_sha256(profile_commitments)
+            == structure_reference[
+                "old_profile_commitment_canonical_jsonl_sha256"
+            ]
+        ):
+            raise DatasetBuildError(
+                f"V9.1 structure-audit invariant replay drift: {split}"
+            )
+
+        full_items = _read_jsonl_objects(
+            split_root / "observed/redacted_items.jsonl"
+        )
+        seller_world = {
+            str(row["seller_uid"]): str(row["world_uid"])
+            for row in full_items
+        }
+        structure_by_world = {
+            str(row["world_uid"]): row for row in structure_rows
+        }
+        for relative, hash_field in surface_contract:
+            grouped = {world_uid: [] for world_uid in structure_by_world}
+            for profile in _read_jsonl_objects(split_root / relative):
+                try:
+                    world_uid = seller_world[str(profile["seller_uid"])]
+                except KeyError as exc:
+                    raise DatasetBuildError(
+                        f"V9.1 seller/profile world join drift: {split}"
+                    ) from exc
+                grouped[world_uid].append(profile)
+            if any(
+                common.canonical_sha256(grouped[world_uid])
+                != structure_by_world[world_uid][hash_field]
+                for world_uid in structure_by_world
+            ):
+                raise DatasetBuildError(
+                    f"V9.1 persisted profile commitment drift: {split}/{hash_field}"
+                )
+        changed_count += 1
+        split_receipts[split] = {
+            "unchanged_file_count": len(old_unchanged),
+            "changed_structure_file_count": 1,
+            "structure_row_count": len(structure_rows),
+            "structure_invariant_canonical_jsonl_sha256": (
+                _canonical_jsonl_projection_sha256(invariant_rows)
+            ),
+            "new_profile_commitment_canonical_jsonl_sha256": (
+                _canonical_jsonl_projection_sha256(profile_commitments)
+            ),
+        }
+    if unchanged_count != 68 or changed_count != 4:
+        raise DatasetBuildError("V9.1 persisted equivalence aggregate drift")
+    receipt = {
+        "version": "2026-08-21-step28-v13-v1-13-v9-1-equivalence-replay-v1",
+        "status": "PASS_EXACT_MECHANICAL_PROFILE_COMMITMENT_REPAIR",
+        "invalidated_reference_canonical_self_hash": reference[
+            "canonical_self_hash"
+        ],
+        "same_random_authority": True,
+        "unchanged_file_count": unchanged_count,
+        "changed_structure_file_count": changed_count,
+        "allowed_changed_fields": list(V9_1_ALLOWED_STRUCTURE_HASH_FIELDS),
+        "splits": split_receipts,
+    }
+    receipt["canonical_self_hash"] = common.canonical_sha256(receipt)
+    return receipt
+
+
 def _verify_output_tree(root: Path, root_manifest: Mapping[str, Any]) -> None:
     """Re-read all persisted bytes before the temporary tree may be published."""
 
@@ -430,63 +633,10 @@ def _verify_output_tree(root: Path, root_manifest: Mapping[str, Any]) -> None:
 def _project_model_seller_profile(profile: Mapping[str, Any]) -> dict[str, Any]:
     """Return the exact model-facing seller projection, with no audit columns."""
 
-    missing = [name for name in MODEL_PROFILE_FIELDS if name not in profile]
-    if missing:
-        raise DatasetBuildError(
-            f"Seller profile lacks frozen M0 source field: {missing[0]}"
-        )
-    title_stats = profile["title_length_stats"]
-    description_stats = profile["description_length_stats"]
-    style_stats = profile["style_stats"]
-    if not isinstance(title_stats, Mapping) or "median" not in title_stats:
-        raise DatasetBuildError("Seller title-length statistics are incomplete")
-    if not isinstance(description_stats, Mapping) or "median" not in description_stats:
-        raise DatasetBuildError("Seller description-length statistics are incomplete")
-    if not isinstance(style_stats, Mapping) or any(
-        name not in style_stats for name in MODEL_PROFILE_STYLE_FIELDS
-    ):
-        raise DatasetBuildError("Seller style statistics are incomplete")
-    seller_uid = profile["seller_uid"]
-    if not isinstance(seller_uid, str) or not seller_uid:
-        raise DatasetBuildError("Seller join key must be a non-empty string")
-    if any(not isinstance(profile[name], str) for name in MODEL_PROFILE_TEXT_FIELDS):
-        raise DatasetBuildError("Seller model text field type drift")
-    item_count = profile["item_count"]
-    if isinstance(item_count, bool) or not isinstance(item_count, int) or item_count <= 0:
-        raise DatasetBuildError("Seller item count must be a positive integer")
-    for label, value in (
-        ("title median", title_stats["median"]),
-        ("description median", description_stats["median"]),
-    ):
-        if (
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not math.isfinite(float(value))
-            or float(value) < 0.0
-        ):
-            raise DatasetBuildError(f"Seller {label} is not finite and non-negative")
-    for name in MODEL_PROFILE_STYLE_FIELDS:
-        value = style_stats[name]
-        if (
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not math.isfinite(float(value))
-            or not 0.0 <= float(value) <= 1.0
-        ):
-            raise DatasetBuildError(f"Seller style statistic out of range: {name}")
-    projected = {
-        "seller_uid": seller_uid,
-        **{name: str(profile[name]) for name in MODEL_PROFILE_TEXT_FIELDS},
-        "item_count": profile["item_count"],
-        "title_length_stats": {"median": title_stats["median"]},
-        "description_length_stats": {"median": description_stats["median"]},
-        "style_stats": {
-            name: style_stats[name] for name in MODEL_PROFILE_STYLE_FIELDS
-        },
-    }
-    if tuple(projected) != MODEL_PROFILE_FIELDS:
-        raise DatasetBuildError("Model seller-profile projection order drift")
-    return projected
+    try:
+        return scientific.project_model_seller_profile(profile)
+    except scientific.ScientificBuilderError as exc:
+        raise DatasetBuildError(str(exc)) from exc
 
 
 def _project_model_redacted_item(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -1431,6 +1581,12 @@ def _run_design_preflight_transaction(
             split_manifests[split] = manifest
         writers_by_split.clear()
 
+        v9_1_equivalence_replay = _validate_v9_1_persisted_equivalence(
+            temp_root=temp_root,
+            split_manifests=split_manifests,
+            policy=policy,
+        )
+
         expected_total = sum(
             int(value)
             for value in policy["execution_modes"][execution_mode][
@@ -1550,6 +1706,7 @@ def _run_design_preflight_transaction(
                 "seller_documents": len(historical.seller_document_hashes),
                 "identity_values": len(historical.identity_value_hashes),
             },
+            "v9_1_equivalence_replay": v9_1_equivalence_replay,
             "split_manifest_self_hashes": {
                 split: split_manifests[split]["canonical_self_hash"]
                 for split in SPLITS

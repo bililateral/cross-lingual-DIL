@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Shared contracts for the Step28-v13 v1.13 v9 implementation-only builder."""
+"""Shared contracts for the Step28-v13 v1.13 V9.1 repair builder."""
 
 from __future__ import annotations
 
 import copy
 import hashlib
 import json
+import math
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -20,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_POLICY_PATH = (
     ROOT / "schema" / "step28_v13_v1_13_scientific_dataset_builder_policy_v9.json"
 )
-POLICY_VERSION = "2026-08-14-step28-v13-v1-13-scientific-dataset-builder-v9"
+POLICY_VERSION = "2026-08-21-step28-v13-v1-13-scientific-dataset-builder-v9-1"
 POLICY_STATUS = (
     "DESIGN_ENTRY_IMPLEMENTED_NO_RUN_WITHOUT_EXTERNAL_ONE_TIME_RECEIPT"
 )
@@ -38,6 +39,129 @@ HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 class ScientificBuilderError(common.ContractError):
     """Fail-closed error for the scientific dataset construction layer."""
+
+
+# This is the only seller-profile projection that may be persisted as a model
+# view.  Both the materialized structure commitment and the dataset writer must
+# call these functions so that a commitment can never bind a wider internal
+# Step3 profile than the bytes later mounted by a model.
+MODEL_PROFILE_JOIN_ONLY_FIELDS = ("seller_uid",)
+MODEL_PROFILE_TEXT_FIELDS = (
+    "category_concat_top",
+    "signature_title_concat",
+    "title_concat_top",
+    "signature_description_concat",
+    "description_concat_top",
+)
+MODEL_PROFILE_NUMERIC_FIELDS = (
+    "item_count",
+    "title_length_stats",
+    "description_length_stats",
+    "style_stats",
+)
+MODEL_PROFILE_FIELDS = (
+    *MODEL_PROFILE_JOIN_ONLY_FIELDS,
+    *MODEL_PROFILE_TEXT_FIELDS,
+    *MODEL_PROFILE_NUMERIC_FIELDS,
+)
+MODEL_PROFILE_STYLE_FIELDS = (
+    "digit_ratio_mean",
+    "punct_ratio_mean",
+    "repeated_title_share",
+    "repeated_description_share",
+    "max_category_share",
+)
+
+
+def project_model_seller_profile(profile: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the exact persisted model view, excluding internal audit fields."""
+
+    missing = [name for name in MODEL_PROFILE_FIELDS if name not in profile]
+    if missing:
+        raise ScientificBuilderError(
+            f"Seller profile lacks frozen M0 source field: {missing[0]}"
+        )
+    title_stats = profile["title_length_stats"]
+    description_stats = profile["description_length_stats"]
+    style_stats = profile["style_stats"]
+    if not isinstance(title_stats, Mapping) or "median" not in title_stats:
+        raise ScientificBuilderError("Seller title-length statistics are incomplete")
+    if not isinstance(description_stats, Mapping) or "median" not in description_stats:
+        raise ScientificBuilderError(
+            "Seller description-length statistics are incomplete"
+        )
+    if not isinstance(style_stats, Mapping) or any(
+        name not in style_stats for name in MODEL_PROFILE_STYLE_FIELDS
+    ):
+        raise ScientificBuilderError("Seller style statistics are incomplete")
+    seller_uid = profile["seller_uid"]
+    if not isinstance(seller_uid, str) or not seller_uid:
+        raise ScientificBuilderError("Seller join key must be a non-empty string")
+    if any(not isinstance(profile[name], str) for name in MODEL_PROFILE_TEXT_FIELDS):
+        raise ScientificBuilderError("Seller model text field type drift")
+    item_count = profile["item_count"]
+    if isinstance(item_count, bool) or not isinstance(item_count, int) or item_count <= 0:
+        raise ScientificBuilderError("Seller item count must be a positive integer")
+    for label, value in (
+        ("title median", title_stats["median"]),
+        ("description median", description_stats["median"]),
+    ):
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(float(value))
+            or float(value) < 0.0
+        ):
+            raise ScientificBuilderError(
+                f"Seller {label} is not finite and non-negative"
+            )
+    for name in MODEL_PROFILE_STYLE_FIELDS:
+        value = style_stats[name]
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(float(value))
+            or not 0.0 <= float(value) <= 1.0
+        ):
+            raise ScientificBuilderError(
+                f"Seller style statistic out of range: {name}"
+            )
+    projected = {
+        "seller_uid": seller_uid,
+        **{name: str(profile[name]) for name in MODEL_PROFILE_TEXT_FIELDS},
+        "item_count": item_count,
+        "title_length_stats": {"median": title_stats["median"]},
+        "description_length_stats": {"median": description_stats["median"]},
+        "style_stats": {
+            name: style_stats[name] for name in MODEL_PROFILE_STYLE_FIELDS
+        },
+    }
+    if tuple(projected) != MODEL_PROFILE_FIELDS:
+        raise ScientificBuilderError("Model seller-profile projection order drift")
+    return projected
+
+
+def project_model_seller_profiles(
+    profiles: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Any], ...]:
+    """Project and UTF-8-sort one world's exact persisted seller-profile rows."""
+
+    projected = tuple(
+        project_model_seller_profile(profile)
+        for profile in sorted(
+            profiles,
+            key=lambda value: str(value["seller_uid"]).encode("utf-8"),
+        )
+    )
+    seller_uids = tuple(str(row["seller_uid"]) for row in projected)
+    if (
+        not projected
+        or len(seller_uids) != len(set(seller_uids))
+        or tuple(seller_uids)
+        != tuple(sorted(seller_uids, key=lambda value: value.encode("utf-8")))
+    ):
+        raise ScientificBuilderError("Model seller-profile projection universe drift")
+    return projected
 
 
 @dataclass(frozen=True)
@@ -159,6 +283,9 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "v8_fourth_build_execution_failure_record",
         "v8_fifth_build_execution_failure_record",
         "v9_document_capacity_repair_contract",
+        "v9_quality_attempt2_invalidation_record",
+        "v9_1_model_view_commitment_repair_contract",
+        "v9_invalidated_equivalence_commitment",
         "base_dataset_policy",
         "historical_collision_policy",
         "implementation",
@@ -212,6 +339,18 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     _verify_pin(
         policy["v9_document_capacity_repair_contract"],
         label="v9 document-capacity repair contract",
+    )
+    _verify_pin(
+        policy["v9_quality_attempt2_invalidation_record"],
+        label="v9 quality-attempt-2 invalidation record",
+    )
+    _verify_pin(
+        policy["v9_1_model_view_commitment_repair_contract"],
+        label="v9.1 model-view commitment repair contract",
+    )
+    _verify_pin(
+        policy["v9_invalidated_equivalence_commitment"],
+        label="v9 invalidated equivalence commitment",
     )
     base_policy_path = _verify_pin(
         policy["base_dataset_policy"], label="base dataset policy"
@@ -450,26 +589,27 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
 
     attempt = policy["single_attempt_random_authority"]
     if attempt != {
-        "attempt_index": 1,
+        "attempt_index": 2,
         "total_world_count": 1004,
         "alternate_authority_forbidden": True,
         "alternate_output_root_forbidden": True,
-        "build_execution_failure_reuses_same_authority": True,
-        "audit_execution_failure_reuses_same_dataset_root": True,
-        "data_quality_failure_closes_v8_permanently": True,
+        "same_random_authority_as_invalidated_v9_required": True,
+        "invalidated_v9_root_reuse_forbidden": True,
+        "unchanged_persisted_file_count": 68,
+        "changed_structure_audit_file_count": 4,
     }:
         raise ScientificBuilderError("Single-attempt authority contract drift")
     if policy["design_build_authorization_overlay"] != {
         "status": "DISABLED_PENDING_EXACT_WEB_RUN_REVIEW",
         "receipt_path": (
             "private_custody/"
-            "step28_v13_v1_13_v9_design_build_authorization.json"
+            "step28_v13_v1_13_v9_1_design_build_authorization.json"
         ),
         "receipt_version": (
-            "2026-08-15-step28-v13-v1-13-v9-design-build-authorization-v1"
+            "2026-08-21-step28-v13-v1-13-v9-1-design-build-authorization-v1"
         ),
         "required_review_final_line": (
-            "允许运行一次同一权威1004世界设计构建"
+            "允许运行一次V9.1同一权威1004世界设计构建"
         ),
         "execution_mode": "design_preflight",
         "base_policy_alone_authorizes_run": False,

@@ -562,6 +562,73 @@ class ScientificWorldCapacityContracts(unittest.TestCase):
                 sum(bool(row["text_probe_eligible"]) for row in eligibility_rows),
                 372,
             )
+            structure_rows = [
+                json.loads(line)
+                for line in (
+                    root / "private" / "channel_structure_audit.jsonl"
+                ).read_text(encoding="utf-8").splitlines()
+            ]
+            self.assertEqual(len(structure_rows), 1)
+            structure_receipt = structure_rows[0]
+            profile_cases = (
+                (
+                    "observed/model_seller_profiles.jsonl",
+                    "full_profile_sha256",
+                ),
+                (
+                    "observed/model_seller_profiles.code_masked.jsonl",
+                    "masked_profile_sha256",
+                ),
+                (
+                    "observed/model_seller_profiles.code_neutralized.jsonl",
+                    "neutral_profile_sha256",
+                ),
+            )
+            for relative, field in profile_cases:
+                with self.subTest(relative=relative, field=field):
+                    persisted = [
+                        json.loads(line)
+                        for line in (root / relative)
+                        .read_text(encoding="utf-8")
+                        .splitlines()
+                    ]
+                    self.assertEqual(
+                        structure_receipt[field],
+                        common.canonical_sha256(persisted),
+                    )
+                    self.assertTrue(
+                        all(
+                            set(row) == set(dataset_builder.MODEL_PROFILE_FIELDS)
+                            for row in persisted
+                        )
+                    )
+
+    def test_v9_1_equivalence_reference_pins_same_random_authority(self) -> None:
+        policy = scientific.load_policy()
+        reference = dataset_builder._load_v9_invalidated_equivalence_commitment(
+            policy
+        )
+        self.assertEqual(reference["unchanged_file_count"], 68)
+        self.assertEqual(reference["changed_structure_file_count"], 4)
+        self.assertEqual(
+            reference["invalidated_root"][
+                "random_authority_commitment_sha256"
+            ],
+            common.canonical_sha256(
+                policy["public_preflight_keys"]["design_preflight"]
+            ),
+        )
+        mutated = copy.deepcopy(policy)
+        mutated["public_preflight_keys"]["design_preflight"][
+            "candidate_key_hex"
+        ] = "0" * 64
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "equivalence commitment drift",
+        ):
+            dataset_builder._load_v9_invalidated_equivalence_commitment(
+                mutated
+            )
 
     def test_document_registries_are_unread_until_candidate_zero_lineage_exists(
         self,
@@ -724,12 +791,12 @@ class AuthorizationContracts(unittest.TestCase):
         self.assertEqual(
             pending,
             "private_custody/"
-            "step28_v13_v1_13_v9_design_build_authorization.json",
+            "step28_v13_v1_13_v9_1_design_build_authorization.json",
         )
         self.assertEqual(
             consumed,
             "private_custody/"
-            "step28_v13_v1_13_v9_design_build_authorization."
+            "step28_v13_v1_13_v9_1_design_build_authorization."
             f"consumed.{sha256}.json",
         )
         self.assertNotEqual(pending, consumed)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Materialize v9 full/masked/neutral model views before private pair truth.
+"""Materialize V9.1 full/masked/neutral model views before private pair truth.
 
 The public entry accepts explicit label-free projections.  It has no pair,
 controller, qrels, positive-target, negative-flag, or quality-result argument.
@@ -23,14 +23,15 @@ import step28_v13_production_chain as production
 import step28_v13_profiles as profiles_module
 import step28_v13_v1_13_pure_natural_renderer_v9 as pure_renderer
 import step28_v13_v1_13_quality_channel_views_v9 as channel
+import step28_v13_v1_13_scientific_common_v9 as scientific
 import step28_v13_world_builder as world_builder
 
 
-VERSION = "2026-08-14-step28-v13-v1-13-quality-channel-materializer-v9"
+VERSION = "2026-08-21-step28-v13-v1-13-quality-channel-materializer-v9-1"
 NEUTRAL_RENDER_CODE = "QAAAAAAAABA"
 NEUTRAL_CODE_ORDINAL_DIGITS = 8
 NEUTRAL_CODE_DERIVED_SUFFIX = "BA"
-MODEL_PROFILE_TEXT_FIELDS = channel.PROFILE_FIELDS
+MODEL_PROFILE_TEXT_FIELDS = scientific.MODEL_PROFILE_TEXT_FIELDS
 NEUTRAL_ITEM_METADATA_FIELDS = (
     "world_uid",
     "seller_uid",
@@ -522,6 +523,27 @@ def _build_profiles(
     ) != 28:
         raise QualityChannelMaterializationError("Seller-profile rebuild did not close")
     return _sorted_rows(profiles, "seller_uid")
+
+
+def _persisted_profile_rows(
+    profiles: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Any], ...]:
+    """Return the exact rows later written and mounted as a model view."""
+
+    if MODEL_PROFILE_TEXT_FIELDS != channel.PROFILE_FIELDS:
+        raise QualityChannelMaterializationError(
+            "Model seller-profile text projection drift"
+        )
+    try:
+        return scientific.project_model_seller_profiles(profiles)
+    except scientific.ScientificBuilderError as exc:
+        raise QualityChannelMaterializationError(str(exc)) from exc
+
+
+def _persisted_profile_sha256(
+    profiles: Sequence[Mapping[str, Any]],
+) -> str:
+    return common.canonical_sha256(_persisted_profile_rows(profiles))
 
 
 def _replace_neutral_code(
@@ -1079,7 +1101,7 @@ def _neutralize_without_original_code_values(
             for row in non_code_projection_nodes
         ],
         "neutral_item_sha256": common.canonical_sha256(neutral_items),
-        "neutral_profile_sha256": common.canonical_sha256(neutral_profiles),
+        "neutral_profile_sha256": _persisted_profile_sha256(neutral_profiles),
     }
     return neutral_items, neutral_profiles, receipt
 
@@ -1557,9 +1579,9 @@ def materialize_label_free_channel_views(
         "full_item_sha256": common.canonical_sha256(full_redacted_items),
         "masked_item_sha256": common.canonical_sha256(masked_items_tuple),
         "neutral_item_sha256": common.canonical_sha256(neutral_items),
-        "full_profile_sha256": common.canonical_sha256(full_seller_profiles),
-        "masked_profile_sha256": common.canonical_sha256(masked_profiles),
-        "neutral_profile_sha256": common.canonical_sha256(neutral_profiles),
+        "full_profile_sha256": _persisted_profile_sha256(full_seller_profiles),
+        "masked_profile_sha256": _persisted_profile_sha256(masked_profiles),
+        "neutral_profile_sha256": _persisted_profile_sha256(neutral_profiles),
         "forbidden_capability_mounted": forbidden_capability_mounted,
         "audit_truth_open_count": forbidden_read_counts["audit_truth"],
         "audit_truth_read_count": forbidden_read_counts["audit_truth"],
