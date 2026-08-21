@@ -32,8 +32,9 @@ HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 ROOT_MANIFEST_PIN_PATH = "root_manifest.json"
 PENDING_RECEIPT_RELATIVE_PATH = (
     "private_custody/"
-    "step28_v13_v1_13_v9_quality_audit_authorization.json"
+    "step28_v13_v1_13_v9_quality_audit_attempt2_authorization.json"
 )
+EXPECTED_ATTEMPT_INDEX = 2
 EXPECTED_RECEIPT_STATUS = "ALLOW_ONE_V9_DESIGN_QUALITY_AUDIT"
 EXPECTED_CLAIM_BOUNDARY = (
     "ONE_DESIGN_QUALITY_AUDIT_ONLY_NO_FORMAL_DATA_"
@@ -202,7 +203,7 @@ def _validate_consumed_receipt_evidence(
         or payload.get("status") != EXPECTED_RECEIPT_STATUS
         or payload.get("claim_boundary") != EXPECTED_CLAIM_BOUNDARY
         or payload.get("review_final_line") != EXPECTED_REVIEW_FINAL_LINE
-        or payload.get("attempt_index") != 1
+        or payload.get("attempt_index") != EXPECTED_ATTEMPT_INDEX
         or payload.get("capabilities") != EXPECTED_CAPABILITIES
         or payload.get("input_design_root")
         != execution.dataset_root.relative_to(ROOT).as_posix()
@@ -375,6 +376,49 @@ def _build_bound_truth_capability(
             "Formal truth capability does not match consumed execution root pin"
         )
     return value
+
+
+def aggregate_authorized_formal_structure(
+    *,
+    public_rows_by_split: Mapping[str, Sequence[Mapping[str, Any]]],
+    structure_rows_by_split: Mapping[str, Sequence[Mapping[str, Any]]],
+    policy: Mapping[str, Any],
+    execution: ConsumedQualityAuditExecution,
+) -> dict[str, Any]:
+    """Run the frozen formal structure core under the consumed capability.
+
+    The frozen policy deliberately keeps ``quality_audit_run`` false, so its
+    original public wrapper cannot represent a post-build one-shot grant.  The
+    consumed execution context supplies only that grant; every scientific
+    parameter still comes from the byte-pinned frozen policy.
+    """
+
+    validate_consumed_execution(execution, base_policy=policy)
+    execution_snapshot = copy.deepcopy(execution)
+    policy_bytes = _canonical_json_bytes(policy)
+    receipt = frozen_runner.structure_aggregator._aggregate(
+        public_rows_by_split=public_rows_by_split,
+        structure_rows_by_split=structure_rows_by_split,
+        expected_world_counts=policy["design_scale"]["world_counts"],
+        expected_sellers_per_world=policy["design_scale"][
+            "seller_count_per_world"
+        ],
+        maximum_position_deviation=policy["quality_gates"][
+            "code_character_position_maximum_absolute_deviation_from_one_sixteenth"
+        ],
+        enforce_position_margin=True,
+        claim_boundary="V9_DESIGN_QUALITY_ONLY_NOT_FORMAL_DATA_OR_TRAINING",
+    )
+    validate_consumed_execution(execution, base_policy=policy)
+    if execution != execution_snapshot:
+        raise QualityAuditExecutionAdapterError(
+            "Consumed execution context changed during structure aggregation"
+        )
+    if _canonical_json_bytes(policy) != policy_bytes:
+        raise QualityAuditExecutionAdapterError(
+            "Frozen quality policy changed during structure aggregation"
+        )
+    return receipt
 
 
 def _evaluate_authorized_formal_family(
@@ -1130,7 +1174,7 @@ def run_authorized_formal_quality_audit(
         ],
     )
     state["stage"] = "label_free_structure_schema_and_zero_gates"
-    structure_receipt = frozen_runner.structure_aggregator.aggregate_formal_structure(
+    structure_receipt = aggregate_authorized_formal_structure(
         public_rows_by_split={
             split: loaded[split]["public_code"]
             for split in frozen_runner.SPLITS
@@ -1140,6 +1184,7 @@ def run_authorized_formal_quality_audit(
             for split in frozen_runner.SPLITS
         },
         policy=policy,
+        execution=execution,
     )
     if structure_receipt["status"] != "PASS":
         receipt: dict[str, Any] = {

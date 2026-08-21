@@ -179,6 +179,18 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         ):
             frozen_runner.run_formal_quality_audit()
 
+    def test_attempt_two_paths_cannot_reuse_attempt_one_artifacts(self) -> None:
+        self.assertEqual(self.policy["external_receipt"]["attempt_index"], 2)
+        self.assertIn(
+            "attempt2",
+            self.policy["external_receipt"]["pending_path"],
+        )
+        self.assertIn(
+            "attempt2",
+            self.policy["execution"]["result_path"],
+        )
+        self.assertEqual(execution_adapter.EXPECTED_ATTEMPT_INDEX, 2)
+
     def test_execution_context_keeps_base_policy_closed_and_binds_exact_root(
         self,
     ) -> None:
@@ -358,6 +370,94 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         self.assertEqual(
             overlay._canonical_json_bytes(self.static["quality_policy"]),
             policy_before,
+        )
+
+    def test_consumed_capability_crosses_structure_authorization_gate(self) -> None:
+        empty = {split: () for split in frozen_runner.SPLITS}
+        with self.assertRaisesRegex(
+            frozen_runner.structure_aggregator.QualityStructureAggregationError,
+            "Structural world universe drift",
+        ):
+            execution_adapter.aggregate_authorized_formal_structure(
+                public_rows_by_split=empty,
+                structure_rows_by_split=empty,
+                policy=self.static["quality_policy"],
+                execution=self._execution(),
+            )
+
+    def test_production_adapter_uses_consumed_structure_bridge(self) -> None:
+        source = inspect.getsource(
+            execution_adapter.run_authorized_formal_quality_audit
+        )
+        self.assertIn("aggregate_authorized_formal_structure(", source)
+        self.assertNotIn("aggregate_formal_structure(", source)
+
+    def test_structure_bridge_revalidates_consumed_receipt_after_core(self) -> None:
+        execution = self._execution()
+        original = execution.consumed_receipt_path.read_bytes()
+
+        def drift_receipt(**_kwargs: object) -> dict[str, object]:
+            execution.consumed_receipt_path.write_bytes(original + b" ")
+            return {"status": "PASS"}
+
+        try:
+            with mock.patch.object(
+                frozen_runner.structure_aggregator,
+                "_aggregate",
+                side_effect=drift_receipt,
+            ), self.assertRaisesRegex(
+                execution_adapter.QualityAuditExecutionAdapterError,
+                "receipt file binding drift",
+            ):
+                execution_adapter.aggregate_authorized_formal_structure(
+                    public_rows_by_split={
+                        split: () for split in frozen_runner.SPLITS
+                    },
+                    structure_rows_by_split={
+                        split: () for split in frozen_runner.SPLITS
+                    },
+                    policy=self.static["quality_policy"],
+                    execution=execution,
+                )
+        finally:
+            execution.consumed_receipt_path.write_bytes(original)
+
+    def test_structure_bridge_forwards_exact_frozen_formal_parameters(self) -> None:
+        empty = {split: () for split in frozen_runner.SPLITS}
+        expected = {"status": "PASS"}
+        with mock.patch.object(
+            frozen_runner.structure_aggregator,
+            "_aggregate",
+            return_value=expected,
+        ) as core:
+            observed = execution_adapter.aggregate_authorized_formal_structure(
+                public_rows_by_split=empty,
+                structure_rows_by_split=empty,
+                policy=self.static["quality_policy"],
+                execution=self._execution(),
+            )
+        self.assertIs(observed, expected)
+        self.assertEqual(
+            core.call_args.kwargs,
+            {
+                "public_rows_by_split": empty,
+                "structure_rows_by_split": empty,
+                "expected_world_counts": self.static["quality_policy"][
+                    "design_scale"
+                ]["world_counts"],
+                "expected_sellers_per_world": self.static["quality_policy"][
+                    "design_scale"
+                ]["seller_count_per_world"],
+                "maximum_position_deviation": self.static["quality_policy"][
+                    "quality_gates"
+                ][
+                    "code_character_position_maximum_absolute_deviation_from_one_sixteenth"
+                ],
+                "enforce_position_margin": True,
+                "claim_boundary": (
+                    "V9_DESIGN_QUALITY_ONLY_NOT_FORMAL_DATA_OR_TRAINING"
+                ),
+            },
         )
 
     def test_adapter_preserves_frozen_runner_stage_order(self) -> None:
@@ -1018,6 +1118,41 @@ class QualityAuditAuthorizationOverlayV9Contracts(unittest.TestCase):
         )
         self.assertFalse(result["cleanup_required"])
         self.assertNotIn(secret, json.dumps(result, ensure_ascii=False))
+
+        authorization_error = (
+            frozen_runner.structure_aggregator.QualityStructureAggregationError(
+                "Formal quality audit remains unauthorized"
+            )
+        )
+        with mock.patch.object(
+            execution_adapter,
+            "run_authorized_formal_quality_audit",
+            side_effect=authorization_error,
+        ):
+            result = overlay._execute_frozen_body(
+                self.static["quality_policy"], execution
+            )
+        self.assertEqual(
+            result["status"],
+            "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+        )
+        self.assertFalse(result["cleanup_required"])
+
+        dataset_error = (
+            frozen_runner.structure_aggregator.QualityStructureAggregationError(
+                "Structural world universe drift"
+            )
+        )
+        with mock.patch.object(
+            execution_adapter,
+            "run_authorized_formal_quality_audit",
+            side_effect=dataset_error,
+        ):
+            result = overlay._execute_frozen_body(
+                self.static["quality_policy"], execution
+            )
+        self.assertEqual(result["status"], "DATASET_INVALIDATED")
+        self.assertTrue(result["cleanup_required"])
 
     def test_result_artifact_rejects_formal_or_training_claim_drift(self) -> None:
         payload = self._receipt_payload()

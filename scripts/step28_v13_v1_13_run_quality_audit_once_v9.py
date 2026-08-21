@@ -27,12 +27,12 @@ OVERLAY_POLICY_PATH = (
     / "schema"
     / "step28_v13_v1_13_quality_audit_authorization_overlay_v9.json"
 )
-OVERLAY_POLICY_SIZE_BYTES = 6201
+OVERLAY_POLICY_SIZE_BYTES = 6256
 OVERLAY_POLICY_SHA256 = (
-    "495bf993dab3aa9896b39feec018ce0049c58b58367d23c226193c3f8af4de12"
+    "bc18616467cf64571e90e2bedb574c836653bacc5491d06dd9cc62d1ade21cc8"
 )
 OVERLAY_POLICY_CANONICAL_SELF_HASH = (
-    "1c0c73d55019680c1a151e323850c901693e7b113fab2569609e7f058d62dbba"
+    "24b99910b1004da144a249817047d39684425c0bcebf505f03b64bbed0aee9b3"
 )
 HEX_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 GIT_OBJECT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
@@ -368,7 +368,9 @@ def _result_paths(policy: Mapping[str, Any]) -> tuple[Path, Path, Path]:
         result_path.parent != result_directory
         or temporary_path.parent != result_directory.parent
         or result_path.name != "quality_audit_receipt.json"
-        or not temporary_path.name.startswith(".v9_design_preflight_20260820.")
+        or not temporary_path.name.startswith(
+            ".v9_design_preflight_attempt2_20260821."
+        )
     ):
         raise QualityAuditAuthorizationError("Quality-audit result path drift")
     return result_directory, result_path, temporary_path
@@ -590,6 +592,11 @@ def _validate_consumed_receipt(
 def _classified_frozen_body_failure(
     *, state: Mapping[str, str], exc: Exception
 ) -> dict[str, Any]:
+    structure_authorization_bridge_failure = (
+        type(exc)
+        is audit_runner.structure_aggregator.QualityStructureAggregationError
+        and str(exc) == "Formal quality audit remains unauthorized"
+    )
     dataset_gate_types = (
         audit_runner.DatasetGateFailure,
         audit_runner.QualityAuditRunnerError,
@@ -603,8 +610,11 @@ def _classified_frozen_body_failure(
     auditor_failure_types = (
         audit_runner.AuditorExecutionFailure,
         audit_runner.truth_capability.QualityTruthAuditorExecutionError,
+        execution_adapter.QualityAuditExecutionAdapterError,
     )
-    if isinstance(exc, auditor_failure_types):
+    if structure_authorization_bridge_failure or isinstance(
+        exc, auditor_failure_types
+    ):
         status = "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION"
     elif isinstance(exc, dataset_gate_types):
         status = "DATASET_INVALIDATED"
