@@ -18,7 +18,7 @@
 
 ## 3. V9.1 机械修复闭合
 
-等价重放状态为 `PASS_EXACT_MECHANICAL_PROFILE_COMMITMENT_REPAIR`，规范自哈希为 `b5a19ae5c2f5c3694368ad1eacb01e559a6819727a48b2f64ca227910ae30c92b`。同一随机权威核验为真；68 个文件与失效 V9 承诺逐字节一致。四个结构文件只在下列四个已登记位置变化：
+等价重放状态为 `PASS_EXACT_MECHANICAL_PROFILE_COMMITMENT_REPAIR`，规范自哈希为 `b5a19ae5c2f5c3694368ad1eacb01e559a6819727a48b2f64ca27910ae30c92b`。同一随机权威核验为真；68 个文件与失效 V9 承诺逐字节一致。四个结构文件只在下列四个已登记位置变化：
 
 - `/full_profile_sha256`
 - `/masked_profile_sha256`
