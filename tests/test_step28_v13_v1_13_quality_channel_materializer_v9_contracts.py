@@ -588,6 +588,22 @@ class QualityChannelMaterializerV9Contracts(unittest.TestCase):
 
     def test_structure_profile_hashes_bind_exact_persisted_projection(self) -> None:
         receipt = self.materialized.channel_structure_audit
+        self.assertNotEqual(
+            materializer.VERSION,
+            scientific.PERSISTED_STRUCTURE_VERSION,
+        )
+        self.assertEqual(
+            receipt["version"],
+            scientific.PERSISTED_STRUCTURE_VERSION,
+        )
+        self.assertEqual(
+            receipt["neutral_receipt"]["version"],
+            scientific.PERSISTED_STRUCTURE_VERSION,
+        )
+        self.assertEqual(
+            receipt["neutral_receipt"]["neutral_profile_sha256"],
+            receipt["neutral_profile_sha256"],
+        )
         cases = (
             (
                 self.accepted.seller_profiles,

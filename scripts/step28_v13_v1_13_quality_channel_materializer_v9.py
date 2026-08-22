@@ -1061,7 +1061,7 @@ def _neutralize_without_original_code_values(
             "Post-collapse neutral profile still contains a legal item code"
         )
     receipt = {
-        "version": VERSION,
+        "version": scientific.PERSISTED_STRUCTURE_VERSION,
         "neutral_render_code_ordinal_zero": NEUTRAL_RENDER_CODE,
         "neutral_code_family_rule": (
             "Q_plus_item_ordinal_as_eight_base16_A_to_P_digits_plus_BA"
@@ -1541,7 +1541,7 @@ def materialize_label_free_channel_views(
         )
     )
     structure_audit = {
-        "version": VERSION,
+        "version": scientific.PERSISTED_STRUCTURE_VERSION,
         "world_uid": world_uid,
         "item_count": len(public_by_item),
         "seller_count": len(public_sellers),

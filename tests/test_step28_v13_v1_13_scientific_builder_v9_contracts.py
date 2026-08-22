@@ -688,6 +688,342 @@ class ScientificWorldCapacityContracts(unittest.TestCase):
         self.assertGreaterEqual(accepted.candidates_examined, 1)
 
 
+class PersistedEquivalenceGateContracts(unittest.TestCase):
+    @staticmethod
+    def _write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(
+            b"".join(common.canonical_json_bytes(row) + b"\n" for row in rows)
+        )
+
+    @staticmethod
+    def _record(
+        root: Path,
+        relative: str,
+        *,
+        row_count: int,
+    ) -> dict[str, object]:
+        return dataset_builder._file_record(
+            root / relative,
+            root=root,
+            row_count=row_count,
+        )
+
+    def _build_fixture(self) -> tuple[
+        Path,
+        dict[str, dict[str, object]],
+        dict[str, object],
+    ]:
+        temporary = tempfile.TemporaryDirectory(prefix="step28-v9-1-equivalence-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        manifests: dict[str, dict[str, object]] = {}
+        reference: dict[str, object] = {
+            "canonical_self_hash": "a" * 64,
+            "splits": {},
+        }
+        for split in dataset_builder.SPLITS:
+            split_root = root / split
+            worlds = [f"{split}-world-{index}" for index in range(2)]
+            items: list[dict[str, object]] = []
+            profiles_by_surface: dict[str, list[dict[str, object]]] = {
+                "full_profile_sha256": [],
+                "masked_profile_sha256": [],
+                "neutral_profile_sha256": [],
+            }
+            structure_rows: list[dict[str, object]] = []
+            for index, world_uid in enumerate(worlds):
+                seller_uid = f"{split}-seller-{index}"
+                items.append(
+                    {
+                        "world_uid": world_uid,
+                        "seller_uid": seller_uid,
+                        "item_uid": f"{split}-item-{index}",
+                    }
+                )
+                for field, surface in (
+                    ("full_profile_sha256", "full"),
+                    ("masked_profile_sha256", "masked"),
+                    ("neutral_profile_sha256", "neutral"),
+                ):
+                    profiles_by_surface[field].append(
+                        {
+                            "seller_uid": seller_uid,
+                            "visible_text": f"{surface}-{split}-{index}",
+                        }
+                    )
+                hashes = {
+                    field: common.canonical_sha256([profiles[index]])
+                    for field, profiles in profiles_by_surface.items()
+                }
+                structure_rows.append(
+                    {
+                        "version": scientific.PERSISTED_STRUCTURE_VERSION,
+                        "world_uid": world_uid,
+                        "stable_marker": {"ordinal": index, "tags": ["a", "b"]},
+                        "neutral_receipt": {
+                            "version": scientific.PERSISTED_STRUCTURE_VERSION,
+                            "stable_inner_marker": index,
+                            "neutral_profile_sha256": hashes[
+                                "neutral_profile_sha256"
+                            ],
+                        },
+                        **hashes,
+                    }
+                )
+            paths = {
+                "observed/redacted_items.jsonl": items,
+                "observed/model_seller_profiles.jsonl": profiles_by_surface[
+                    "full_profile_sha256"
+                ],
+                "observed/model_seller_profiles.code_masked.jsonl": (
+                    profiles_by_surface["masked_profile_sha256"]
+                ),
+                "observed/model_seller_profiles.code_neutralized.jsonl": (
+                    profiles_by_surface["neutral_profile_sha256"]
+                ),
+                dataset_builder.V9_1_STRUCTURE_AUDIT_PATH: structure_rows,
+            }
+            for relative in dataset_builder.EXPECTED_SPLIT_DATA_PATHS:
+                path = split_root / relative
+                if relative in paths:
+                    self._write_jsonl(path, paths[relative])
+                else:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(b"")
+            records = [
+                self._record(
+                    split_root,
+                    relative,
+                    row_count=len(paths.get(relative, [])),
+                )
+                for relative in dataset_builder.EXPECTED_SPLIT_DATA_PATHS
+            ]
+            manifests[split] = {"files": records}
+            current = {str(row["path"]): row for row in records}
+            old_rows = copy.deepcopy(structure_rows)
+            for row_index, row in enumerate(old_rows):
+                old_hashes = {
+                    field: hashlib.sha256(
+                        f"old-{split}-{row_index}-{field}".encode("utf-8")
+                    ).hexdigest()
+                    for field in dataset_builder.V9_1_OUTER_PROFILE_HASH_FIELDS
+                }
+                row.update(old_hashes)
+                row["neutral_receipt"]["neutral_profile_sha256"] = old_hashes[
+                    "neutral_profile_sha256"
+                ]
+            old_rows = [
+                json.loads(common.canonical_json_bytes(row)) for row in old_rows
+            ]
+            world_uid_hash = hashlib.sha256(
+                b"".join(value.encode("utf-8") + b"\n" for value in worlds)
+            ).hexdigest()
+            old_record = dict(current[dataset_builder.V9_1_STRUCTURE_AUDIT_PATH])
+            old_record["sha256"] = "0" * 64
+            reference["splits"][split] = {
+                "unchanged_files": {
+                    relative: dict(record)
+                    for relative, record in current.items()
+                    if relative != dataset_builder.V9_1_STRUCTURE_AUDIT_PATH
+                },
+                "structure_audit": {
+                    "path": dataset_builder.V9_1_STRUCTURE_AUDIT_PATH,
+                    "allowed_changed_json_paths": list(
+                        dataset_builder.V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS
+                    ),
+                    "old_record": old_record,
+                    "invariant_canonical_jsonl_sha256": (
+                        dataset_builder._canonical_jsonl_projection_sha256(
+                            [
+                                dataset_builder._structure_invariant_projection(row)
+                                for row in old_rows
+                            ]
+                        )
+                    ),
+                    "world_uid_utf8_lines_sha256": world_uid_hash,
+                    "ordered_mapping_key_schema_canonical_jsonl_sha256": (
+                        dataset_builder._canonical_jsonl_projection_sha256(
+                            [
+                                dataset_builder._ordered_mapping_key_schema_projection(
+                                    row
+                                )
+                                for row in old_rows
+                            ]
+                        )
+                    ),
+                    "old_allowed_path_commitment_canonical_jsonl_sha256": (
+                        dataset_builder._canonical_jsonl_projection_sha256(
+                            [
+                                dataset_builder._structure_allowed_path_projection(
+                                    row
+                                )
+                                for row in old_rows
+                            ]
+                        )
+                    ),
+                },
+            }
+        return root, manifests, reference
+
+    def _structure_rows(self, root: Path, split: str = "train") -> list[dict]:
+        return dataset_builder._read_jsonl_objects(
+            root / split / dataset_builder.V9_1_STRUCTURE_AUDIT_PATH
+        )
+
+    def _replace_structure_rows(
+        self,
+        root: Path,
+        manifests: dict[str, dict[str, object]],
+        rows: list[dict],
+        split: str = "train",
+    ) -> None:
+        split_root = root / split
+        relative = dataset_builder.V9_1_STRUCTURE_AUDIT_PATH
+        self._write_jsonl(split_root / relative, rows)
+        replacement = self._record(
+            split_root, relative, row_count=len(rows)
+        )
+        files = manifests[split]["files"]
+        for index, record in enumerate(files):
+            if record["path"] == relative:
+                files[index] = replacement
+                return
+        self.fail("structure record missing from fixture")
+
+    def _run_gate(
+        self,
+        root: Path,
+        manifests: dict[str, dict[str, object]],
+        reference: dict[str, object],
+    ) -> dict[str, object]:
+        with mock.patch.object(
+            dataset_builder,
+            "_load_v9_invalidated_equivalence_commitment",
+            return_value=reference,
+        ):
+            return dataset_builder._validate_v9_1_persisted_equivalence(
+                temp_root=root,
+                split_manifests=manifests,
+                policy={},
+            )
+
+    def test_exact_four_path_repair_passes(self) -> None:
+        root, manifests, reference = self._build_fixture()
+        receipt = self._run_gate(root, manifests, reference)
+        self.assertEqual(
+            receipt["allowed_changed_json_paths"],
+            list(dataset_builder.V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS),
+        )
+        self.assertEqual(receipt["unchanged_file_count"], 68)
+
+    def test_inner_outer_neutral_mismatch_fails(self) -> None:
+        root, manifests, reference = self._build_fixture()
+        rows = self._structure_rows(root)
+        rows[0]["neutral_receipt"]["neutral_profile_sha256"] = "f" * 64
+        self._replace_structure_rows(root, manifests, rows)
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "version/neutral binding drift",
+        ):
+            self._run_gate(root, manifests, reference)
+
+    def test_fifth_path_or_version_change_fails(self) -> None:
+        for case in ("fifth_path", "version"):
+            with self.subTest(case=case):
+                root, manifests, reference = self._build_fixture()
+                rows = self._structure_rows(root)
+                if case == "fifth_path":
+                    rows[0]["stable_marker"]["ordinal"] = 999
+                else:
+                    rows[0]["version"] = channel_materializer.VERSION
+                    rows[0]["neutral_receipt"]["version"] = (
+                        channel_materializer.VERSION
+                    )
+                self._replace_structure_rows(root, manifests, rows)
+                with self.assertRaises(dataset_builder.DatasetBuildError):
+                    self._run_gate(root, manifests, reference)
+
+    def test_world_order_and_unchanged_file_drift_fail(self) -> None:
+        root, manifests, reference = self._build_fixture()
+        rows = list(reversed(self._structure_rows(root)))
+        self._replace_structure_rows(root, manifests, rows)
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "invariant replay drift",
+        ):
+            self._run_gate(root, manifests, reference)
+
+        root, manifests, reference = self._build_fixture()
+        for record in manifests["train"]["files"]:
+            if record["path"] == "observed/worlds.jsonl":
+                record["sha256"] = "e" * 64
+                break
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "changed a forbidden persisted file",
+        ):
+            self._run_gate(root, manifests, reference)
+
+    def test_visible_profile_and_recursive_key_schema_drift_fail(self) -> None:
+        root, manifests, reference = self._build_fixture()
+        path = root / "train" / "observed/model_seller_profiles.jsonl"
+        profiles = dataset_builder._read_jsonl_objects(path)
+        profiles[0]["visible_text"] = "changed-visible-value"
+        self._write_jsonl(path, profiles)
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "persisted profile commitment drift",
+        ):
+            self._run_gate(root, manifests, reference)
+
+        root, manifests, reference = self._build_fixture()
+        rows = self._structure_rows(root)
+        rows[0]["stable_marker"]["new_nested_key"] = 1
+        self._replace_structure_rows(root, manifests, rows)
+        reference["splits"]["train"]["structure_audit"][
+            "invariant_canonical_jsonl_sha256"
+        ] = dataset_builder._canonical_jsonl_projection_sha256(
+            [dataset_builder._structure_invariant_projection(row) for row in rows]
+        )
+        with self.assertRaisesRegex(
+            dataset_builder.DatasetBuildError,
+            "invariant replay drift",
+        ):
+            self._run_gate(root, manifests, reference)
+
+    def test_commitment_rejects_allowed_path_broadening_removal_or_rename(
+        self,
+    ) -> None:
+        policy = scientific.load_policy()
+        path = common.verify_file_pin(
+            policy["v9_invalidated_equivalence_commitment"],
+            label="V9 invalidated equivalence commitment",
+        )
+        baseline = common.load_json(path)
+        for case in ("broaden", "remove", "rename"):
+            with self.subTest(case=case):
+                payload = copy.deepcopy(baseline)
+                paths = payload["splits"]["train"]["structure_audit"][
+                    "allowed_changed_json_paths"
+                ]
+                if case == "broaden":
+                    paths.append("/fifth_path")
+                elif case == "remove":
+                    paths.pop()
+                else:
+                    paths[-1] = "/neutral_receipt/renamed"
+                payload.pop("canonical_self_hash")
+                payload["canonical_self_hash"] = common.canonical_sha256(payload)
+                with self.assertRaisesRegex(
+                    dataset_builder.DatasetBuildError,
+                    "equivalence commitment drift",
+                ):
+                    dataset_builder._validate_v9_invalidated_equivalence_commitment_payload(
+                        payload, policy
+                    )
+
+
 class AuthorizationContracts(unittest.TestCase):
     def test_causal_replay_boundary_is_exact_and_has_no_output_argument(self) -> None:
         self.assertEqual(causal_replay.AUTHORIZED_SPLIT, "train")

@@ -17,7 +17,7 @@ DEFAULT_POLICY = (
     ROOT / "schema" / "step28_v13_v1_13_quality_channel_sensitivity_policy_v9.json"
 )
 EXPECTED_POLICY_SELF_HASH = (
-    "5c01b18ccd6388d55c7bad09717295ff40abfeda3f6dd17d96a77ce40c150988"
+    "aec508b71a8df9da7f65dcd9eb39798d4858dc92316b694fa404292819ca4f3f"
 )
 EXPECTED_POLICY_VERSION = (
     "2026-08-21-step28-v13-v1-13-quality-channel-sensitivity-v9-1"
@@ -32,6 +32,7 @@ EXPECTED_PIN_NAMES = {
     "v9_channel_contract",
     "v9_quality_attempt2_invalidation_record",
     "v9_1_model_view_commitment_repair_contract",
+    "v9_1_post_commit_review_denial_and_equivalence_amendment",
     "v9_invalidated_equivalence_commitment",
     "scientific_common_source",
     "scientific_builder_source",

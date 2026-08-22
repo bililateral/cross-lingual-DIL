@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import hashlib
 import json
@@ -368,10 +369,16 @@ def _count_file_rows(path: Path) -> int:
     return count
 
 
-V9_1_ALLOWED_STRUCTURE_HASH_FIELDS = (
+V9_1_OUTER_PROFILE_HASH_FIELDS = (
     "full_profile_sha256",
     "masked_profile_sha256",
     "neutral_profile_sha256",
+)
+V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS = (
+    "/full_profile_sha256",
+    "/masked_profile_sha256",
+    "/neutral_profile_sha256",
+    "/neutral_receipt/neutral_profile_sha256",
 )
 V9_1_STRUCTURE_AUDIT_PATH = "private/channel_structure_audit.jsonl"
 
@@ -394,23 +401,103 @@ def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _load_v9_invalidated_equivalence_commitment(
+def _json_pointer_parts(pointer: str) -> tuple[str, ...]:
+    if not pointer.startswith("/") or pointer == "/":
+        raise DatasetBuildError(f"Invalid V9.1 JSON pointer: {pointer!r}")
+    parts = tuple(pointer[1:].split("/"))
+    if any(not part or "~" in part for part in parts):
+        raise DatasetBuildError(f"Unsupported V9.1 JSON pointer: {pointer!r}")
+    return parts
+
+
+def _json_pointer_value(value: Mapping[str, Any], pointer: str) -> Any:
+    node: Any = value
+    for part in _json_pointer_parts(pointer):
+        if not isinstance(node, Mapping) or part not in node:
+            raise DatasetBuildError(f"Missing V9.1 JSON pointer: {pointer}")
+        node = node[part]
+    return node
+
+
+def _structure_invariant_projection(row: Mapping[str, Any]) -> dict[str, Any]:
+    projected = copy.deepcopy(dict(row))
+    for pointer in V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS:
+        node: Any = projected
+        parts = _json_pointer_parts(pointer)
+        for part in parts[:-1]:
+            if not isinstance(node, dict) or part not in node:
+                raise DatasetBuildError(f"Missing V9.1 JSON pointer: {pointer}")
+            node = node[part]
+        if not isinstance(node, dict) or parts[-1] not in node:
+            raise DatasetBuildError(f"Missing V9.1 JSON pointer: {pointer}")
+        del node[parts[-1]]
+    return projected
+
+
+def _structure_allowed_path_projection(
+    row: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "world_uid": str(row["world_uid"]),
+        "values": [
+            {
+                "json_pointer": pointer,
+                "value": _json_pointer_value(row, pointer),
+            }
+            for pointer in V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS
+        ],
+    }
+
+
+def _ordered_mapping_key_schema_projection(
+    row: Mapping[str, Any],
+) -> dict[str, Any]:
+    mappings: list[dict[str, Any]] = []
+
+    def visit(node: Any, pointer: str) -> None:
+        if isinstance(node, Mapping):
+            keys = [str(key) for key in node]
+            mappings.append({"json_pointer": pointer, "keys": keys})
+            for key, child in node.items():
+                escaped = str(key).replace("~", "~0").replace("/", "~1")
+                visit(child, f"{pointer}/{escaped}")
+        elif isinstance(node, list):
+            for index, child in enumerate(node):
+                visit(child, f"{pointer}/{index}")
+
+    visit(row, "")
+    return {"world_uid": str(row["world_uid"]), "mappings": mappings}
+
+
+def _validate_v9_invalidated_equivalence_commitment_payload(
+    payload: Mapping[str, Any],
     policy: Mapping[str, Any],
 ) -> dict[str, Any]:
-    spec = policy["v9_invalidated_equivalence_commitment"]
-    path = common.verify_file_pin(
-        spec, label="V9 invalidated equivalence commitment"
-    )
-    payload = common.load_json(path)
+    expected_payload_keys = {
+        "version",
+        "status",
+        "claim_boundary",
+        "historical_structure_source_commit",
+        "invalidated_root",
+        "allowed_changed_json_path_count",
+        "semantic_profile_hash_count",
+        "unchanged_file_count",
+        "changed_structure_file_count",
+        "splits",
+        "canonical_self_hash",
+    }
     unsigned = dict(payload)
     claimed = unsigned.pop("canonical_self_hash", None)
     if (
-        payload.get("version")
-        != "2026-08-21-step28-v13-v1-13-v9-invalidated-equivalence-commitment-v1"
+        set(payload) != expected_payload_keys
+        or payload.get("version")
+        != "2026-08-21-step28-v13-v1-13-v9-invalidated-equivalence-commitment-v2"
         or payload.get("status")
         != "V9_DATASET_INVALIDATED_REFERENCE_HASHES_ONLY"
         or payload.get("claim_boundary")
-        != "V9_1_MAY_CHANGE_ONLY_THREE_PROFILE_HASH_FIELDS_PER_STRUCTURE_ROW"
+        != "V9_1_MAY_CHANGE_ONLY_FOUR_EXACT_PROFILE_HASH_JSON_PATHS_PER_STRUCTURE_ROW"
+        or payload.get("allowed_changed_json_path_count") != 4
+        or payload.get("semantic_profile_hash_count") != 3
         or payload.get("unchanged_file_count") != 68
         or payload.get("changed_structure_file_count") != 4
         or claimed != common.canonical_sha256(unsigned)
@@ -421,9 +508,148 @@ def _load_v9_invalidated_equivalence_commitment(
         != common.canonical_sha256(
             policy["public_preflight_keys"][DESIGN_EXECUTION_MODE]
         )
+        or payload.get("historical_structure_source_commit")
+        != "8bb3276de6d84c0aad8d7475af5ca0b41a86b959"
     ):
         raise DatasetBuildError("V9 invalidated equivalence commitment drift")
-    return payload
+    invalidated_root = payload.get("invalidated_root")
+    if (
+        not isinstance(invalidated_root, Mapping)
+        or set(invalidated_root)
+        != {
+            "path",
+            "size_bytes",
+            "sha256",
+            "canonical_self_hash",
+            "quality_attempt2_result_sha256",
+            "random_authority_commitment_sha256",
+        }
+        or invalidated_root.get("path")
+        != "reports/step28_v13_v1_13_scientific_builder/design_preflight_v9_20260814"
+        or isinstance(invalidated_root.get("size_bytes"), bool)
+        or not isinstance(invalidated_root.get("size_bytes"), int)
+        or int(invalidated_root["size_bytes"]) <= 0
+        or any(
+            not HEX_SHA256_RE.fullmatch(str(invalidated_root.get(field, "")))
+            for field in (
+                "sha256",
+                "canonical_self_hash",
+                "quality_attempt2_result_sha256",
+                "random_authority_commitment_sha256",
+            )
+        )
+    ):
+        raise DatasetBuildError("V9 invalidated equivalence commitment drift")
+    expected_unchanged = set(EXPECTED_SPLIT_DATA_PATHS) - {
+        V9_1_STRUCTURE_AUDIT_PATH
+    }
+    expected_world_counts = policy["execution_modes"][DESIGN_EXECUTION_MODE][
+        "world_counts"
+    ]
+    for split in SPLITS:
+        split_reference = payload["splits"].get(split)
+        if (
+            not isinstance(split_reference, Mapping)
+            or set(split_reference)
+            != {"split_manifest", "structure_audit", "unchanged_files"}
+        ):
+            raise DatasetBuildError("V9 invalidated equivalence commitment drift")
+        split_manifest = split_reference.get("split_manifest")
+        unchanged = split_reference.get("unchanged_files")
+        structure = split_reference.get("structure_audit")
+        if (
+            not isinstance(split_manifest, Mapping)
+            or set(split_manifest)
+            != {"size_bytes", "sha256", "canonical_self_hash"}
+            or isinstance(split_manifest.get("size_bytes"), bool)
+            or not isinstance(split_manifest.get("size_bytes"), int)
+            or int(split_manifest["size_bytes"]) <= 0
+            or any(
+                not HEX_SHA256_RE.fullmatch(str(split_manifest.get(field, "")))
+                for field in ("sha256", "canonical_self_hash")
+            )
+            or not isinstance(unchanged, Mapping)
+            or set(unchanged) != expected_unchanged
+            or not isinstance(structure, Mapping)
+            or set(structure)
+            != {
+                "path",
+                "old_record",
+                "allowed_changed_json_paths",
+                "persisted_structure_version",
+                "neutral_receipt_persisted_version",
+                "invariant_canonical_jsonl_sha256",
+                "world_uid_utf8_lines_sha256",
+                "ordered_mapping_key_schema_canonical_jsonl_sha256",
+                "old_allowed_path_commitment_canonical_jsonl_sha256",
+                "old_outer_profile_commitment_canonical_jsonl_sha256",
+                "old_inner_neutral_profile_commitment_canonical_jsonl_sha256",
+            }
+            or structure.get("path") != V9_1_STRUCTURE_AUDIT_PATH
+            or structure.get("allowed_changed_json_paths")
+            != list(V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS)
+            or structure.get("persisted_structure_version")
+            != scientific.PERSISTED_STRUCTURE_VERSION
+            or structure.get("neutral_receipt_persisted_version")
+            != scientific.PERSISTED_STRUCTURE_VERSION
+        ):
+            raise DatasetBuildError("V9 invalidated equivalence commitment drift")
+        for relative, record in unchanged.items():
+            if (
+                not isinstance(record, Mapping)
+                or set(record) != {"path", "size_bytes", "sha256", "row_count"}
+                or record.get("path") != relative
+                or any(
+                    isinstance(record.get(field), bool)
+                    or not isinstance(record.get(field), int)
+                    or int(record[field]) < 0
+                    for field in ("size_bytes", "row_count")
+                )
+                or not HEX_SHA256_RE.fullmatch(str(record.get("sha256", "")))
+            ):
+                raise DatasetBuildError(
+                    "V9 invalidated equivalence commitment drift"
+                )
+        old_record = structure.get("old_record")
+        hash_fields = (
+            "invariant_canonical_jsonl_sha256",
+            "world_uid_utf8_lines_sha256",
+            "ordered_mapping_key_schema_canonical_jsonl_sha256",
+            "old_allowed_path_commitment_canonical_jsonl_sha256",
+            "old_outer_profile_commitment_canonical_jsonl_sha256",
+            "old_inner_neutral_profile_commitment_canonical_jsonl_sha256",
+        )
+        if (
+            not isinstance(old_record, Mapping)
+            or set(old_record) != {"path", "size_bytes", "sha256", "row_count"}
+            or old_record.get("path") != V9_1_STRUCTURE_AUDIT_PATH
+            or old_record.get("row_count") != expected_world_counts[split]
+            or any(
+                isinstance(old_record.get(field), bool)
+                or not isinstance(old_record.get(field), int)
+                or int(old_record[field]) < 0
+                for field in ("size_bytes", "row_count")
+            )
+            or not HEX_SHA256_RE.fullmatch(str(old_record.get("sha256", "")))
+            or any(
+                not HEX_SHA256_RE.fullmatch(str(structure.get(field, "")))
+                for field in hash_fields
+            )
+        ):
+            raise DatasetBuildError("V9 invalidated equivalence commitment drift")
+    return dict(payload)
+
+
+def _load_v9_invalidated_equivalence_commitment(
+    policy: Mapping[str, Any],
+) -> dict[str, Any]:
+    spec = policy["v9_invalidated_equivalence_commitment"]
+    path = common.verify_file_pin(
+        spec, label="V9 invalidated equivalence commitment"
+    )
+    return _validate_v9_invalidated_equivalence_commitment_payload(
+        common.load_json(path), policy
+    )
 
 
 def _canonical_jsonl_projection_sha256(
@@ -442,7 +668,7 @@ def _validate_v9_1_persisted_equivalence(
     split_manifests: Mapping[str, Mapping[str, Any]],
     policy: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Prove the repair changes only three profile hashes per structure row."""
+    """Prove the repair changes only four exact persisted JSON paths."""
 
     reference = _load_v9_invalidated_equivalence_commitment(policy)
     split_receipts: dict[str, dict[str, Any]] = {}
@@ -485,8 +711,8 @@ def _validate_v9_1_persisted_equivalence(
         structure_record = current_files[V9_1_STRUCTURE_AUDIT_PATH]
         if (
             structure_reference.get("path") != V9_1_STRUCTURE_AUDIT_PATH
-            or structure_reference.get("allowed_changed_fields")
-            != list(V9_1_ALLOWED_STRUCTURE_HASH_FIELDS)
+            or structure_reference.get("allowed_changed_json_paths")
+            != list(V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS)
             or structure_record.get("row_count")
             != structure_reference["old_record"].get("row_count")
             or structure_record.get("sha256")
@@ -498,22 +724,30 @@ def _validate_v9_1_persisted_equivalence(
         structure_rows = _read_jsonl_objects(
             split_root / V9_1_STRUCTURE_AUDIT_PATH
         )
+        if len(structure_rows) != structure_record.get("row_count"):
+            raise DatasetBuildError(
+                f"V9.1 structure-audit row count drift: {split}"
+            )
         invariant_rows: list[dict[str, Any]] = []
         profile_commitments: list[dict[str, Any]] = []
+        mapping_key_schemas: list[dict[str, Any]] = []
         for row in structure_rows:
-            invariant = dict(row)
-            profile_commitments.append(
-                {
-                    "world_uid": str(row["world_uid"]),
-                    **{
-                        field: row[field]
-                        for field in V9_1_ALLOWED_STRUCTURE_HASH_FIELDS
-                    },
-                }
+            if (
+                row.get("version") != scientific.PERSISTED_STRUCTURE_VERSION
+                or not isinstance(row.get("neutral_receipt"), Mapping)
+                or row["neutral_receipt"].get("version")
+                != scientific.PERSISTED_STRUCTURE_VERSION
+                or row["neutral_receipt"].get("neutral_profile_sha256")
+                != row.get("neutral_profile_sha256")
+            ):
+                raise DatasetBuildError(
+                    f"V9.1 persisted version/neutral binding drift: {split}"
+                )
+            invariant_rows.append(_structure_invariant_projection(row))
+            profile_commitments.append(_structure_allowed_path_projection(row))
+            mapping_key_schemas.append(
+                _ordered_mapping_key_schema_projection(row)
             )
-            for field in V9_1_ALLOWED_STRUCTURE_HASH_FIELDS:
-                invariant.pop(field)
-            invariant_rows.append(invariant)
         world_uid_lines = hashlib.sha256(
             b"".join(
                 str(row["world_uid"]).encode("utf-8") + b"\n"
@@ -525,9 +759,13 @@ def _validate_v9_1_persisted_equivalence(
             != structure_reference["invariant_canonical_jsonl_sha256"]
             or world_uid_lines
             != structure_reference["world_uid_utf8_lines_sha256"]
+            or _canonical_jsonl_projection_sha256(mapping_key_schemas)
+            != structure_reference[
+                "ordered_mapping_key_schema_canonical_jsonl_sha256"
+            ]
             or _canonical_jsonl_projection_sha256(profile_commitments)
             == structure_reference[
-                "old_profile_commitment_canonical_jsonl_sha256"
+                "old_allowed_path_commitment_canonical_jsonl_sha256"
             ]
         ):
             raise DatasetBuildError(
@@ -537,13 +775,20 @@ def _validate_v9_1_persisted_equivalence(
         full_items = _read_jsonl_objects(
             split_root / "observed/redacted_items.jsonl"
         )
-        seller_world = {
-            str(row["seller_uid"]): str(row["world_uid"])
-            for row in full_items
-        }
+        seller_world: dict[str, str] = {}
+        for row in full_items:
+            seller_uid = str(row["seller_uid"])
+            world_uid = str(row["world_uid"])
+            if seller_uid in seller_world and seller_world[seller_uid] != world_uid:
+                raise DatasetBuildError(
+                    f"V9.1 seller/world ownership drift: {split}"
+                )
+            seller_world[seller_uid] = world_uid
         structure_by_world = {
             str(row["world_uid"]): row for row in structure_rows
         }
+        if len(structure_by_world) != len(structure_rows):
+            raise DatasetBuildError(f"V9.1 duplicate world UID: {split}")
         for relative, hash_field in surface_contract:
             grouped = {world_uid: [] for world_uid in structure_by_world}
             for profile in _read_jsonl_objects(split_root / relative):
@@ -561,6 +806,16 @@ def _validate_v9_1_persisted_equivalence(
             ):
                 raise DatasetBuildError(
                     f"V9.1 persisted profile commitment drift: {split}/{hash_field}"
+                )
+            if hash_field == "neutral_profile_sha256" and any(
+                structure_by_world[world_uid]["neutral_receipt"][
+                    "neutral_profile_sha256"
+                ]
+                != structure_by_world[world_uid][hash_field]
+                for world_uid in structure_by_world
+            ):
+                raise DatasetBuildError(
+                    f"V9.1 inner/outer neutral commitment drift: {split}"
                 )
         changed_count += 1
         split_receipts[split] = {
@@ -585,7 +840,9 @@ def _validate_v9_1_persisted_equivalence(
         "same_random_authority": True,
         "unchanged_file_count": unchanged_count,
         "changed_structure_file_count": changed_count,
-        "allowed_changed_fields": list(V9_1_ALLOWED_STRUCTURE_HASH_FIELDS),
+        "allowed_changed_json_paths": list(
+            V9_1_ALLOWED_STRUCTURE_HASH_JSON_PATHS
+        ),
         "splits": split_receipts,
     }
     receipt["canonical_self_hash"] = common.canonical_sha256(receipt)

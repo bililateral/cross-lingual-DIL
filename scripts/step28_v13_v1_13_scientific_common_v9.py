@@ -25,6 +25,9 @@ POLICY_VERSION = "2026-08-21-step28-v13-v1-13-scientific-dataset-builder-v9-1"
 POLICY_STATUS = (
     "DESIGN_ENTRY_IMPLEMENTED_NO_RUN_WITHOUT_EXTERNAL_ONE_TIME_RECEIPT"
 )
+PERSISTED_STRUCTURE_VERSION = (
+    "2026-08-14-step28-v13-v1-13-quality-channel-materializer-v9"
+)
 EXPECTED_CLAIM_BOUNDARY = (
     "This policy authorizes implementation and fixture tests for a parameterless "
     "design_preflight entry while requiring a separate exact one-time external run "
@@ -285,6 +288,7 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
         "v9_document_capacity_repair_contract",
         "v9_quality_attempt2_invalidation_record",
         "v9_1_model_view_commitment_repair_contract",
+        "v9_1_post_commit_review_denial_and_equivalence_amendment",
         "v9_invalidated_equivalence_commitment",
         "base_dataset_policy",
         "historical_collision_policy",
@@ -347,6 +351,10 @@ def validate_policy(policy: Mapping[str, Any]) -> None:
     _verify_pin(
         policy["v9_1_model_view_commitment_repair_contract"],
         label="v9.1 model-view commitment repair contract",
+    )
+    _verify_pin(
+        policy["v9_1_post_commit_review_denial_and_equivalence_amendment"],
+        label="v9.1 post-commit review denial and equivalence amendment",
     )
     _verify_pin(
         policy["v9_invalidated_equivalence_commitment"],
