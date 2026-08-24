@@ -174,12 +174,17 @@ class QualityAuditRunnerV92Contracts(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="step28-v9-2-lineage-") as temp:
             consumed = Path(temp) / "quality.consumed.json"
             consumed.write_bytes(common.canonical_json_bytes(authorization) + b"\n")
-            capability = (
-                truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
-                    authorization=authorization,
-                    consumed_path=consumed,
+            with mock.patch.object(
+                truth_v9_2,
+                "EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH",
+                consumed.resolve(),
+            ):
+                capability = (
+                    truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
+                        authorization=authorization,
+                        consumed_path=consumed,
+                    )
                 )
-            )
             runner._validate_root_claim_and_bindings(
                 root_manifest=root_manifest,
                 policy=self.policy,
@@ -274,6 +279,14 @@ class QualityAuditRunnerV92Contracts(unittest.TestCase):
         self.assertEqual(len(runner.EXPECTED_SPLIT_DATA_PATHS), 20)
         self.assertEqual(len(set(runner.EXPECTED_SPLIT_DATA_PATHS)), 20)
 
+    def test_formal_capability_uses_only_canonical_consumed_authorization(self) -> None:
+        self.assertEqual(
+            truth_v9_2.EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH.resolve(),
+            runner.AUTHORIZATION_PATH.with_name(
+                runner.AUTHORIZATION_PATH.stem + ".consumed.json"
+            ).resolve(),
+        )
+
     def test_every_manifest_payload_is_physically_rehashed_and_row_counted(self) -> None:
         with tempfile.TemporaryDirectory(prefix="step28-v9-2-all-payloads-") as temp:
             root = Path(temp)
@@ -326,12 +339,17 @@ class QualityAuditRunnerV92Contracts(unittest.TestCase):
             consumed = runner._consume_authorization(path, value)
             self.assertFalse(path.exists())
             self.assertTrue(consumed.is_file())
-            capability = (
-                truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
-                    authorization=value,
-                    consumed_path=consumed,
+            with mock.patch.object(
+                truth_v9_2,
+                "EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH",
+                consumed.resolve(),
+            ):
+                capability = (
+                    truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
+                        authorization=value,
+                        consumed_path=consumed,
+                    )
                 )
-            )
             self.assertEqual(
                 capability.design_root_binding(), value["design_root_manifest"]
             )
@@ -341,10 +359,10 @@ class QualityAuditRunnerV92Contracts(unittest.TestCase):
                 path.write_bytes(common.canonical_json_bytes(value) + b"\n")
                 runner._consume_authorization(path, value)
 
-    def test_unconsumed_quality_receipt_cannot_issue_formal_capability(self) -> None:
+    def test_arbitrary_consumed_receipt_cannot_issue_formal_capability(self) -> None:
         value = self.authorization()
         with tempfile.TemporaryDirectory(prefix="step28-v9-2-unconsumed-") as temp:
-            path = Path(temp) / "authorization.json"
+            path = Path(temp) / "forged.consumed.json"
             path.write_bytes(common.canonical_json_bytes(value) + b"\n")
             with self.assertRaisesRegex(
                 truth_v9_2.QualityTruthCapabilityError,

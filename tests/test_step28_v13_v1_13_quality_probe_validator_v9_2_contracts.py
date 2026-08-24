@@ -472,12 +472,17 @@ class QualityProbeValidatorV92Contracts(unittest.TestCase):
             consumed_path.write_bytes(
                 common.canonical_json_bytes(run_authorization) + b"\n"
             )
-            run_capability = (
-                truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
-                    authorization=run_authorization,
-                    consumed_path=consumed_path,
+            with mock.patch.object(
+                truth_v9_2,
+                "EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH",
+                consumed_path.resolve(),
+            ):
+                run_capability = (
+                    truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
+                        authorization=run_authorization,
+                        consumed_path=consumed_path,
+                    )
                 )
-            )
             reverification_calls = 0
 
             def reverify() -> None:

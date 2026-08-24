@@ -16,6 +16,11 @@ import step28_v13_v1_13_quality_truth_capability_v9 as v9
 
 VERSION = "2026-08-23-step28-v13-v1-13-quality-truth-capability-v9-2"
 ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH = (
+    ROOT
+    / "private_custody"
+    / "step28_v13_v1_13_v9_2_quality_run_authorization.consumed.json"
+)
 BUILDER_VERSION = "2026-08-23-step28-v13-v1-13-scientific-dataset-builder-v9-2"
 EXECUTION_MODE = "method_qualification_1004"
 SPLITS = v9.SPLITS
@@ -90,7 +95,7 @@ class ConsumedQualityRunCapabilityV92:
             "canonical_self_hash", None
         )
         if (
-            not path.name.endswith(".consumed.json")
+            path != EXPECTED_CONSUMED_QUALITY_AUTHORIZATION_PATH.resolve()
             or raw != normalized + b"\n"
             or set(authorization) != QUALITY_RUN_AUTHORIZATION_FIELDS
             or authorization.get("version") != QUALITY_RUN_AUTHORIZATION_VERSION
