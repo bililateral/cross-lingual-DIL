@@ -1964,4 +1964,6 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 
 加入真实方法资格根后的提交前全仓回归运行 811 项、用时 1,890.671 秒：802 项实际通过、9 项历史既定跳过、0 失败、0 错误。回归后未发现测试夹具、`.building`、字节码、测试缓存或浏览器临时目录，根清单摘要仍保持不变。
 
-这仍不是质量通过或训练结果。根明确为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`、`scientific_use_forbidden=true`、正式种子未创建、正式行数 0、训练未开始。下一步先提交推送本根和同步文档，再对提交后精确字节取得独立质量运行前复核和一次性质量审计放行。没有该新许可前不得运行质量审计、正式 500×4 生成、审核真值监督评估或 M0／M1／M2／M3。完整记录见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+方法资格根及同步文档已以提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d`、树 `b8135277752f7468624015984dae85ad9a957c06` 推送。80／80 个 Git LFS 对象上传完成；远端分支头与本地提交一致，工作区和 LFS 状态干净。
+
+这仍不是质量通过或训练结果。根明确为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`、`scientific_use_forbidden=true`、正式种子未创建、正式行数 0、训练未开始。下一步对提交后的精确字节取得独立质量运行前复核和一次性质量审计放行。没有该新许可前不得运行质量审计、正式 500×4 生成、审核真值监督评估或 M0／M1／M2／M3。完整记录见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。

@@ -117,7 +117,9 @@ V9.2 初版实现以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `02c
 
 加入真实方法资格根后的提交前全仓回归运行 811 项、用时 1,890.671 秒：802 项实际通过、9 项历史既定跳过、0 失败、0 错误。回归后未发现测试夹具、`.building`、字节码、测试缓存或浏览器临时目录，根清单摘要保持不变。
 
-根仍固定为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED` 且 `scientific_use_forbidden=true`；正式种子未创建、正式行数为 0、训练未开始。本结果没有质量指标、正式数据、审核甲乙监督评估、模型或模型指标。下一步只允许提交推送本根与同步文档，再申请独立质量运行前复核和一次性质量审计放行。完整结果见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+方法资格根和同步文档已以提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d`、树 `b8135277752f7468624015984dae85ad9a957c06` 推送；80／80 个 Git LFS 对象上传完成，远端分支头与本地提交一致，工作区和 LFS 状态干净。
+
+根仍固定为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED` 且 `scientific_use_forbidden=true`；正式种子未创建、正式行数为 0、训练未开始。本结果没有质量指标、正式数据、审核甲乙监督评估、模型或模型指标。下一步只允许申请独立质量运行前复核和一次性质量审计放行。完整结果见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
 
 ## 6. 固定评估指标
 
