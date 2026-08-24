@@ -1967,3 +1967,15 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 方法资格根及同步文档已以提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d`、树 `b8135277752f7468624015984dae85ad9a957c06` 推送。80／80 个 Git LFS 对象上传完成；远端分支头与本地提交一致，工作区和 LFS 状态干净。
 
 这仍不是质量通过或训练结果。根明确为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`、`scientific_use_forbidden=true`、正式种子未创建、正式行数 0、训练未开始。下一步对提交后的精确字节取得独立质量运行前复核和一次性质量审计放行。没有该新许可前不得运行质量审计、正式 500×4 生成、审核真值监督评估或 M0／M1／M2／M3。完整记录见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+
+## Step28-v13 v1.13 V9.2 质量审计尝试 1 执行失败（2026-08-24）
+
+方法资格根已在提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d` 发布，并以纯文档提交 `22f5c0df60a8d8208670c354fafad0f55765d8ad`、树 `b845db65534981afe0217454f24b1756c4b1ecbf` 闭合。提交后网页端 GPT-5.6 Sol Pro 审查正文为 12,735 个 UTF-8 字节／`439ca71b92be3abd78fda75b9a6ec6fd15384336d05869bd84e7493b35dab882`，338 行，四级问题 0／0／0／0，最后一行“允许运行一次V9.2方法资格根质量审计”；会话为 `https://chatgpt.com/c/6a8c05e4-7c28-83ed-8c89-39a9c8ecc6c6`。审查明确区分附件可证事实、本地 1.62 GB 重读记录和未知质量结论。
+
+1,695 字节外部一次性质量回执的文件 SHA-256 为 `2df0585a081d3cb37b59792919bc30003d30f3cfb0aa300eb8febfbacfd91b3c`，规范自哈希 `ffe54ceb7f1cc36e321d265b008cdf1307781e72cf16ec774cdb084f8e6b6908`。生产验证器在不消费回执的条件下确认 14 个字段、Git、策略、根清单、网页摘要、私有密钥承诺和唯一输出路径全部闭合。运行前旧质量输出、`.building`、字节码缓存和待推送大文件均为 0。
+
+唯一命令 `python -B scripts/step28_v13_v1_13_quality_audit_runner_v9_2.py` 在约 10.6 秒后正常返回机器失败终态。回执已在首个审计动作前消费且永久不得复用。终态为 699 字节／`b3b8abea330a76e781c2e1f1066b730f35e65bbb57d5b880cff21c11f8905526`，规范自哈希 `404f979309b3b39cb8c50371e4c287f8fbd2f2dd5c09555aeb079eb6b94e7b8c`，状态 `AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION`，阶段 `public_uid_and_structure_closure`，异常类型 `TypeError`，消息摘要 `d2d9ccddff1db2e3081b7154eb119b335c261a8a2f09160250140693bca47496`。
+
+根因是正式 `_validate_public_closure()` 调用冻结 `_validate_endpoints()` 时漏传必需的 `expected_pairs_per_world`。确切 Python 异常文本的 SHA-256 与终态消息摘要一致。故障发生在任何监督真值打开之前；训练、开发真值均未读取，审核甲乙监督能力未挂载。没有生成 `complete_quality_evidence.json`、矩阵、预测、正式数据、模型或指标。811 项全绿回归没有覆盖真实根进入该生产调用点，故未拦住这个低级接口接线错误。
+
+本次没有数据质量通过或失效结论。方法资格根仍为成功构建但禁止科研使用的只读输入，不属于失败载荷；尝试 1 的提交、网页许可、已消费回执和结果路径永久不得重跑或复用。网页快照、控制台日志等 56 个中间文件共 1,286,571 字节已删除；只保留小型终态和已消费回执。后续只能先建立新尝试合同、真实生产调用路径反例、新版本入口和新结果路径，再经全仓回归、提交后网页复审和独立单次许可；此前正式 500×4、审核真值监督读取和 M0／M1／M2／M3 继续禁止。详细记录见 `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`。

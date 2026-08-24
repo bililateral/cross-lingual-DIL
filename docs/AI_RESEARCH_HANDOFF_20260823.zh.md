@@ -119,7 +119,19 @@ V9.2 初版实现以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `02c
 
 方法资格根和同步文档已以提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d`、树 `b8135277752f7468624015984dae85ad9a957c06` 推送；80／80 个 Git LFS 对象上传完成，远端分支头与本地提交一致，工作区和 LFS 状态干净。
 
-根仍固定为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED` 且 `scientific_use_forbidden=true`；正式种子未创建、正式行数为 0、训练未开始。本结果没有质量指标、正式数据、审核甲乙监督评估、模型或模型指标。下一步只允许申请独立质量运行前复核和一次性质量审计放行。完整结果见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+根仍固定为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED` 且 `scientific_use_forbidden=true`；正式种子未创建、正式行数为 0、训练未开始。本结果没有质量指标、正式数据、审核甲乙监督评估、模型或模型指标。完整构建结果见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+
+### V9.2 质量审计尝试 1 执行失败（2026-08-24）
+
+方法资格根提交后的网页审查正文为 12,735 个 UTF-8 字节／`439ca71b92be3abd78fda75b9a6ec6fd15384336d05869bd84e7493b35dab882`，338 行，四级问题 0／0／0／0，最后一行精确为“允许运行一次V9.2方法资格根质量审计”；会话为 `https://chatgpt.com/c/6a8c05e4-7c28-83ed-8c89-39a9c8ecc6c6`。审查没有冒充逐行读取未上传的 1.62 GB 数据，也没有把构建成功解释为质量成功。
+
+外部一次性质量回执为 1,695 字节／`2df0585a081d3cb37b59792919bc30003d30f3cfb0aa300eb8febfbacfd91b3c`，规范自哈希 `ffe54ceb7f1cc36e321d265b008cdf1307781e72cf16ec774cdb084f8e6b6908`。它绑定提交 `22f5c0df60a8d8208670c354fafad0f55765d8ad`、树 `b845db65534981afe0217454f24b1756c4b1ecbf`、质量策略、根清单、网页回复和唯一输出路径；回执在首个审计动作前消费，永久不得复用。
+
+唯一质量审计运行约 10.6 秒后在 `public_uid_and_structure_closure` 阶段发布 `AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION`。699 字节终态的文件 SHA-256 为 `b3b8abea330a76e781c2e1f1066b730f35e65bbb57d5b880cff21c11f8905526`，规范自哈希 `404f979309b3b39cb8c50371e4c287f8fbd2f2dd5c09555aeb079eb6b94e7b8c`。没有形成 `complete_quality_evidence.json`，没有返回逐行标签或预测，没有生成正式数据或启动训练。
+
+根因已经精确闭合：V9.2 运行器的 `_validate_public_closure()` 调用冻结的 `_validate_endpoints()` 时漏传必需的仅关键字参数 `expected_pairs_per_world`。确切 `TypeError` 文本摘要为 `d2d9ccddff1db2e3081b7154eb119b335c261a8a2f09160250140693bca47496`，与终态一致。失败发生在任何监督真值打开之前；训练、开发真值均未读取，审核甲乙监督能力未挂载。811 项回归没有让真实根经过该生产调用路径，因此没有拦住这个低级接线错误。
+
+本次是审计器机械失败，不是数据质量失效。成功方法资格根仍是只读科研输入，但继续禁止科研使用和训练；本次提交、网页许可、已消费回执和结果路径永久不得重跑或复用。详细边界见 `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`。
 
 ## 6. 固定评估指标
 
@@ -143,10 +155,11 @@ V9.2 初版实现以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `02c
 6. 可选接口闭合提交 `c3449a3b334a95beb83652c309afd0e85ef5af73`、最终全仓回归和精确网页复审均已通过；纯文档闭合提交 `70397a1a53d539cba4d8b36fe7c863f451f71ffa` 为本次运行基线；
 7. 随机权威仪式和 1,004 世界构建分别取得独立单次放行并已各执行一次；随机权威和构建回执均已消费，不得重试、重抽或复用；
 8. V9.2 方法资格根已经成功发布并完成独立全量持久化核验，但仍禁止科研使用和训练；
-9. 下一步先提交推送该根和同步文档，再对精确提交申请质量运行前复核与独立一次性质量审计放行；不得恢复或重跑 V9.1，也不得把同一根再计算称为确认性审计；
-10. 只有 V9.2 质量审计取得可认证通过终态后，才能申请正式 500×4 数据生成。
+9. V9.2 质量审计尝试 1 已取得独立许可并唯一运行，但因 `_validate_endpoints()` 必需参数漏传而机械失败；完整质量计算、监督真值读取和数据结论均未形成，本次许可、回执、提交和结果路径永久不得复用；
+10. 当前只能记录并清理尝试 1，再冻结新尝试合同和真实生产调用路径反例；没有新版本、新网页许可、新回执和新结果路径不得再次运行质量审计；
+11. 只有后续质量审计取得可认证通过终态后，才能申请正式 500×4 数据生成。
 
-当前允许：提交推送精确 V9.2 方法资格根、五份清单和同步文档，并进行提交后质量运行前复核。当前禁止：重建或补跑该根、创建或复用随机权威、运行质量审计、生成正式中文数据、打开审核甲乙真值做监督评估、训练或评估 M0／M1／M2／M3。
+当前允许：记录并清理 V9.2 质量审计尝试 1，提交推送小型终态和同步文档，并设计一个具有新版本、新调用路径反例和新独立许可边界的后续尝试。当前禁止：重跑尝试 1、复用其网页许可或已消费回执、覆盖其输出路径、重建方法资格根、创建或复用随机权威、运行任何新质量审计、生成正式中文数据、打开审核甲乙真值做监督评估、训练或评估 M0／M1／M2／M3。
 
 ## 9. 接手优先阅读文件
 
@@ -155,8 +168,8 @@ V9.2 初版实现以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `02c
 3. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
 4. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
 5. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
-6. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
-7. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
-8. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_IMPLEMENTATION_CONTRACT_20260822.zh.md`；
-9. 小型质量终态；
+6. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
+7. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
+8. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
+9. V9.2 尝试 1 小型质量终态；
 10. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落。
