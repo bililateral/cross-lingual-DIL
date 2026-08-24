@@ -284,23 +284,31 @@ def validate_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         "descriptive_passed_field_forbidden": True,
         "dataset_invalidation_survives_wrapper_failure": True,
         "pass_requires_wrapper_success": True,
+        "persist_machine_terminal_exclusively": True,
+        "preserve_in_memory_dataset_invalidation_if_primary_publication_fails": True,
+        "cleanup_requires_documented_failure_boundary": True,
     }:
         raise QualityPolicyV92Error("V9.2 complete-evidence contract drift")
     if normalized["read_order"] != [
+        "verify_all_20_split_payloads_by_raw_hash_and_physical_row_count",
         "freeze_eight_persisted_model_input_commitments",
         "freeze_28_text_matrices_2_code_slot_matrices_and_two_eligibility_masks",
         "open_train_truth_once",
         "open_development_truth_once",
         "reverify_every_label_free_byte",
         "calculate_all_42_descriptive_14_text_hard_4_code_slot_models",
+        "reverify_all_frozen_state_after_last_model_family",
         "publish_complete_evidence_exclusively",
         "validate_outer_wrapper",
+        "persist_machine_terminal_exclusively",
     ]:
         raise QualityPolicyV92Error("V9.2 read-order drift")
     if normalized["failure_rules"] != {
         "no_early_return_after_hard_gate_failure": True,
         "data_gate_failure": "DATASET_INVALIDATED",
         "mechanical_failure_before_complete_calculation": "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+        "uncalculable_precondition_failure": "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+        "calculable_gate_failure_must_continue_to_all_registry_entries": True,
         "wrapper_failure_after_complete_dataset_invalidation": "DATASET_INVALIDATED_WITH_OUTER_WRAPPER_FAILURE",
         "wrapper_failure_after_complete_pass": "AUDITOR_EXECUTION_FAILED_PASS_NOT_CERTIFIED",
         "v9_v9_1_reuse_forbidden": True,

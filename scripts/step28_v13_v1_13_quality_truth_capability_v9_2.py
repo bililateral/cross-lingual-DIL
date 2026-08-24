@@ -3,8 +3,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+import hashlib
+import json
+import re
 from pathlib import Path
+from typing import Any
 
+import step28_v13_common as common
 import step28_v13_v1_13_quality_truth_capability_v9 as v9
 
 
@@ -21,6 +27,123 @@ QualityTruthCapabilityError = v9.QualityTruthCapabilityError
 QualityTruthDatasetGateError = v9.QualityTruthDatasetGateError
 QualityTruthAuditorExecutionError = v9.QualityTruthAuditorExecutionError
 _read_pinned_truth_csv = v9._read_pinned_truth_csv
+QUALITY_RUN_AUTHORIZATION_VERSION = (
+    "2026-08-23-step28-v13-v1-13-quality-run-authorization-v9-2"
+)
+QUALITY_RUN_REVIEW_FINAL_LINE = "允许运行一次V9.2方法资格根质量审计"
+QUALITY_RUN_CAPABILITIES = {
+    "quality_audit_run": True,
+    "metric_generation": True,
+    "audit_a_b_truth_open": False,
+    "formal_500_by_4": False,
+    "model_training": False,
+    "model_metric_generation": False,
+}
+QUALITY_RUN_AUTHORIZATION_FIELDS = {
+    "version",
+    "status",
+    "canonical_self_hash",
+    "single_use",
+    "receipt_generation_by_repository_code_forbidden",
+    "quality_policy",
+    "design_root_manifest",
+    "complete_evidence_output_path",
+    "capabilities",
+    "private_key_material",
+    "git_commit",
+    "git_tree",
+    "review_response_sha256",
+    "review_final_line",
+}
+HEX_64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+class ConsumedQualityRunCapabilityV92:
+    """Narrow value issued only from the canonical consumed one-shot receipt."""
+
+    __slots__ = ("__authorization", "__consumed_receipt_sha256")
+
+    def __init__(self) -> None:
+        raise QualityTruthCapabilityError(
+            "Use _from_consumed_authorization after validation and consumption"
+        )
+
+    @classmethod
+    def _from_consumed_authorization(
+        cls,
+        *,
+        authorization: Mapping[str, Any],
+        consumed_path: Path,
+    ) -> "ConsumedQualityRunCapabilityV92":
+        normalized = common.canonical_json_bytes(authorization)
+        path = consumed_path.resolve()
+        try:
+            raw = path.read_bytes()
+        except OSError as exc:
+            raise QualityTruthAuditorExecutionError(
+                "Consumed V9.2 quality receipt could not be reread"
+            ) from exc
+        root_binding = authorization.get("design_root_manifest")
+        key_material = authorization.get("private_key_material")
+        payload_without_self_hash = dict(authorization)
+        supplied_self_hash = payload_without_self_hash.pop(
+            "canonical_self_hash", None
+        )
+        if (
+            not path.name.endswith(".consumed.json")
+            or raw != normalized + b"\n"
+            or set(authorization) != QUALITY_RUN_AUTHORIZATION_FIELDS
+            or authorization.get("version") != QUALITY_RUN_AUTHORIZATION_VERSION
+            or authorization.get("status")
+            != "ONE_SHOT_V9_2_METHOD_ROOT_QUALITY_AUDIT_AUTHORIZED"
+            or supplied_self_hash
+            != common.canonical_sha256(payload_without_self_hash)
+            or authorization.get("single_use") is not True
+            or authorization.get("receipt_generation_by_repository_code_forbidden")
+            is not True
+            or authorization.get("capabilities") != QUALITY_RUN_CAPABILITIES
+            or authorization.get("review_final_line")
+            != QUALITY_RUN_REVIEW_FINAL_LINE
+            or not isinstance(root_binding, Mapping)
+            or set(root_binding)
+            != {"path", "size_bytes", "sha256", "canonical_self_hash"}
+            or not isinstance(key_material, Mapping)
+            or set(key_material) != {"id_key_hex", "document_variation_key_hex"}
+            or any(
+                not isinstance(value, str) or HEX_64.fullmatch(value) is None
+                for value in key_material.values()
+            )
+        ):
+            raise QualityTruthCapabilityError(
+                "Consumed V9.2 quality receipt identity drift"
+            )
+        value = object.__new__(cls)
+        # Round-trip through canonical JSON so callers cannot mutate the source
+        # mapping after this capability has been issued.
+        value.__authorization = json.loads(normalized.decode("utf-8"))
+        value.__consumed_receipt_sha256 = hashlib.sha256(raw).hexdigest()
+        return value
+
+    def require_metric_generation(self) -> None:
+        if self.__authorization["capabilities"] != QUALITY_RUN_CAPABILITIES:
+            raise QualityTruthCapabilityError("V9.2 metric capability drift")
+
+    def design_root_binding(self) -> dict[str, Any]:
+        self.require_metric_generation()
+        return dict(self.__authorization["design_root_manifest"])
+
+    def private_key_hex(self, name: str) -> str:
+        self.require_metric_generation()
+        if name not in {"id_key_hex", "document_variation_key_hex"}:
+            raise QualityTruthCapabilityError("Unscoped V9.2 private key request")
+        return str(self.__authorization["private_key_material"][name])
+
+    def complete_evidence_output_path(self) -> str:
+        self.require_metric_generation()
+        return str(self.__authorization["complete_evidence_output_path"])
+
+    def consumed_receipt_sha256(self) -> str:
+        return self.__consumed_receipt_sha256
 
 
 class FormalTrainDevelopmentTruthCapabilityV92(

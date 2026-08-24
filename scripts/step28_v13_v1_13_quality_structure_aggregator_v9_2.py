@@ -11,6 +11,7 @@ from typing import Any
 import step28_v13_common as common
 import step28_v13_v1_13_quality_gate_registry_v9_2 as registry
 import step28_v13_v1_13_quality_structure_aggregator_v9 as v9
+import step28_v13_v1_13_quality_truth_capability_v9_2 as quality_capability
 import step28_v13_v1_13_scientific_world_v9_2 as scientific_world
 from step28_v13_v1_13_style_derangement import build_style_source_derangement
 
@@ -139,11 +140,7 @@ def _validate_equal_commitment(value: object, *, name: str) -> int:
         value["counterfactual_sha256"], name=f"{name} counterfactual"
     )
     expected = source == counterfactual
-    if value["equal"] is not expected:
-        raise QualityStructureAggregationV92Error(
-            f"{name} equality boolean disagrees with its hashes"
-        )
-    return int(not expected)
+    return int(not expected or value["equal"] is not expected)
 
 
 def _validate_counterfactual_replay(
@@ -161,10 +158,9 @@ def _validate_counterfactual_replay(
         )
     replay_without_hash = dict(replay)
     supplied_self_hash = replay_without_hash.pop("canonical_self_hash", None)
-    if supplied_self_hash != common.canonical_sha256(replay_without_hash):
-        raise QualityStructureAggregationV92Error(
-            "Counterfactual replay self-hash drift"
-        )
+    replay_self_hash_mismatch = int(
+        supplied_self_hash != common.canonical_sha256(replay_without_hash)
+    )
     if str(replay.get("world_uid", "")) != world_uid:
         raise QualityStructureAggregationV92Error(
             "Counterfactual replay world binding drift"
@@ -193,10 +189,7 @@ def _validate_counterfactual_replay(
         "target_source_pairs": [list(row) for row in expected_mapping.target_source_pairs],
         "fixed_point_count": 0,
     }
-    if dict(mapping) != expected_mapping_payload:
-        raise QualityStructureAggregationV92Error(
-            "Persisted style mapping is not the public-ID-only frozen mapping"
-        )
+    mapping_count_mismatch = int(dict(mapping) != expected_mapping_payload)
     forbidden = replay.get("forbidden_capability_mounted")
     if (
         not isinstance(forbidden, Mapping)
@@ -299,12 +292,15 @@ def _validate_counterfactual_replay(
             "Counterfactual truth-read receipt type drift"
         )
     return {
-        "mapping_count_mismatch": 0,
+        "mapping_count_mismatch": mapping_count_mismatch,
         "fixed_point_count": int(mapping["fixed_point_count"]),
         "replay_count_mismatch": int(
             double_replay["independent_production_replay_count"] != 2
         ),
-        "replay_byte_mismatch": int(double_replay["byte_identical"] is not True),
+        "replay_byte_mismatch": int(
+            double_replay["byte_identical"] is not True
+            or replay_self_hash_mismatch
+        ),
         "invariant_mismatch_count": invariant_mismatches,
         "minimum_distinct_style_factor_tuple_count": integer_style[
             "observed_distinct_style_factor_tuple_count"
@@ -371,9 +367,33 @@ def _aggregate(
             "V9.2 persisted model/eligibility split universe drift"
         )
     base_rows_by_split: dict[str, tuple[dict[str, Any], ...]] = {}
+    base_forbidden_capability_mounted_count = 0
     for split in v9.SPLITS:
         rows = tuple(structure_rows_by_split.get(split, ()))
-        base_rows_by_split[split] = tuple(_base_v9_row(row) for row in rows)
+        base_rows: list[dict[str, Any]] = []
+        for row in rows:
+            base_row = _base_v9_row(row)
+            forbidden = base_row.get("forbidden_capability_mounted")
+            if (
+                not isinstance(forbidden, Mapping)
+                or set(forbidden) != set(v9.FORBIDDEN_CAPABILITY_FIELDS)
+                or any(type(value) is not bool for value in forbidden.values())
+            ):
+                raise QualityStructureAggregationV92Error(
+                    "Base structure capability receipt schema drift"
+                )
+            base_forbidden_capability_mounted_count += sum(
+                int(value) for value in forbidden.values()
+            )
+            # The frozen V9 aggregator rejects mounted capabilities before it
+            # can return its other calculable counters.  V9.2 records that
+            # breach in its own hard metric and passes a sanitized projection
+            # solely to finish the remaining registered calculations.
+            base_row["forbidden_capability_mounted"] = {
+                name: False for name in v9.FORBIDDEN_CAPABILITY_FIELDS
+            }
+            base_rows.append(base_row)
+        base_rows_by_split[split] = tuple(base_rows)
     base = v9._aggregate(
         public_rows_by_split=public_rows_by_split,
         structure_rows_by_split=base_rows_by_split,
@@ -413,7 +433,9 @@ def _aggregate(
         "shared_text_eligibility_commitment_mismatch_world_count": 0,
         "m1_mapping_commitment_count_mismatch_world_count": 0,
         "m1_distinct_mapping_commitment_count_mismatch_world_count": 0,
-        "counterfactual_forbidden_capability_mounted_count": 0,
+        "counterfactual_forbidden_capability_mounted_count": (
+            base_forbidden_capability_mounted_count
+        ),
         "counterfactual_truth_or_retrieval_read_count": 0,
         "counterfactual_quality_result_read_count": 0,
         "persisted_model_input_hash_mismatch_count": 0,
@@ -480,10 +502,10 @@ def _aggregate(
             extension_sha256 = row_without_extension_hash.pop(
                 "v9_2_extension_sha256", None
             )
-            if extension_sha256 != common.canonical_sha256(row_without_extension_hash):
-                raise QualityStructureAggregationV92Error(
-                    "V9.2 structure extension self-hash drift"
-                )
+            extension_hash_mismatch = int(
+                extension_sha256
+                != common.canonical_sha256(row_without_extension_hash)
+            )
             world_uid = str(row["world_uid"])
             public_rows = public_by_world.get(world_uid, [])
             seller_uids = tuple(str(value["seller_uid"]) for value in public_rows)
@@ -545,21 +567,22 @@ def _aggregate(
                 name="shared text eligibility",
             )
             actual_eligibility_rows = eligibility_by_world.get(world_uid)
-            if actual_eligibility_rows is None:
-                raise QualityStructureAggregationV92Error(
-                    "Persisted text eligibility world is absent"
-                )
             aggregate[
                 "shared_text_eligibility_commitment_mismatch_world_count"
             ] += int(
-                eligibility_sha
-                != common.canonical_sha256(actual_eligibility_rows)
+                actual_eligibility_rows is None
+                or eligibility_sha
+                != common.canonical_sha256(actual_eligibility_rows or [])
             )
-            commitments = row.get("m1_mapping_commitments")
-            if not isinstance(commitments, list):
-                raise QualityStructureAggregationV92Error(
-                    "M1 mapping commitments must be a list"
-                )
+            supplied_commitments = row.get("m1_mapping_commitments")
+            commitment_shape_mismatch = int(
+                not isinstance(supplied_commitments, list)
+            )
+            commitments = (
+                list(supplied_commitments)
+                if isinstance(supplied_commitments, list)
+                else []
+            )
             repeat_ids = [
                 value.get("repeat_id") if isinstance(value, Mapping) else None
                 for value in commitments
@@ -568,9 +591,6 @@ def _aggregate(
                 value.get("mapping_sha256") if isinstance(value, Mapping) else None
                 for value in commitments
             ]
-            aggregate["m1_mapping_commitment_count_mismatch_world_count"] += int(
-                repeat_ids != ["r01", "r02", "r03", "r04", "r05"]
-            )
             valid_hashes = all(
                 isinstance(value, str)
                 and len(value) == 64
@@ -603,20 +623,23 @@ def _aggregate(
                 ],
                 world_uid=world_uid,
             )
-            if commitments != list(expected_commitments):
-                raise QualityStructureAggregationV92Error(
-                    "M1 mapping commitments do not match public endpoint IDs"
-                )
-            if row.get("m1_mapping_commitment_bundle_sha256") != common.canonical_sha256(
-                commitments
-            ):
-                raise QualityStructureAggregationV92Error(
-                    "M1 mapping commitment bundle hash drift"
-                )
-            if row.get("labels_or_retrieval_truth_materialized_before_audit") is not False:
-                raise QualityStructureAggregationV92Error(
-                    "Truth was materialized before V9.2 structure receipt"
-                )
+            exact_commitment_mismatch = int(
+                commitments != list(expected_commitments)
+            )
+            bundle_commitment_mismatch = int(
+                row.get("m1_mapping_commitment_bundle_sha256")
+                != common.canonical_sha256(commitments)
+            )
+            aggregate["m1_mapping_commitment_count_mismatch_world_count"] += int(
+                commitment_shape_mismatch
+                or repeat_ids != ["r01", "r02", "r03", "r04", "r05"]
+                or exact_commitment_mismatch
+                or bundle_commitment_mismatch
+            )
+            aggregate["counterfactual_truth_or_retrieval_read_count"] += int(
+                row.get("labels_or_retrieval_truth_materialized_before_audit")
+                is not False
+            )
             persisted_internal_mismatch = sum(
                 (
                     row["full_item_sha256"]
@@ -642,7 +665,9 @@ def _aggregate(
                     common.canonical_sha256(actual_profiles) != row[profile_field]
                 )
             aggregate["persisted_model_input_hash_mismatch_count"] += int(
-                persisted_internal_mismatch + persisted_actual_mismatch
+                extension_hash_mismatch
+                + persisted_internal_mismatch
+                + persisted_actual_mismatch
             )
             world_receipts.append(
                 {
@@ -733,21 +758,15 @@ def aggregate_formal_structure(
         ],
     ],
     policy: Mapping[str, Any],
-    run_authorization: Mapping[str, Any],
+    run_capability: quality_capability.ConsumedQualityRunCapabilityV92,
 ) -> dict[str, Any]:
     """Aggregate all label-free gates under a separate one-shot authority."""
 
-    capabilities = run_authorization.get("capabilities", {})
-    if (
-        capabilities.get("quality_audit_run") is not True
-        or capabilities.get("metric_generation") is not True
-        or capabilities.get("audit_a_b_truth_open") is not False
-        or capabilities.get("formal_500_by_4") is not False
-        or capabilities.get("model_training") is not False
-    ):
+    if type(run_capability) is not quality_capability.ConsumedQualityRunCapabilityV92:
         raise QualityStructureAggregationV92Error(
-            "V9.2 formal structure authority is absent or over-broad"
+            "V9.2 consumed formal structure capability is absent"
         )
+    run_capability.require_metric_generation()
     return _aggregate(
         public_rows_by_split=public_rows_by_split,
         structure_rows_by_split=structure_rows_by_split,

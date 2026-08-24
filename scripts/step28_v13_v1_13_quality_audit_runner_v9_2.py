@@ -37,7 +37,7 @@ AUTHORIZATION_PATH = (
     / "private_custody"
     / "step28_v13_v1_13_v9_2_quality_run_authorization.json"
 )
-REQUIRED_REVIEW_FINAL_LINE = "允许运行一次V9.2方法资格根质量审计"
+REQUIRED_REVIEW_FINAL_LINE = truth_capability.QUALITY_RUN_REVIEW_FINAL_LINE
 SPLITS = ("train", "development", "audit_a", "audit_b")
 SURFACE_FILES = {
     "surface_full": (
@@ -70,20 +70,40 @@ EXPECTED_SPLIT_DATA_PATHS = tuple(
 )
 HEX_64 = re.compile(r"^[0-9a-f]{64}$")
 GIT_OBJECT = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
-CAPABILITIES = {
-    "quality_audit_run": True,
-    "metric_generation": True,
-    "audit_a_b_truth_open": False,
-    "formal_500_by_4": False,
-    "model_training": False,
-    "model_metric_generation": False,
-}
-DATASET_GATE_STAGES = {
-    "root_manifest_and_physical_universe",
-    "eight_input_label_free_loading",
-    "public_uid_and_structure_closure",
-    "freeze_28_text_2_code_slot_and_2_masks",
-    "single_train_and_development_truth_open",
+CAPABILITIES = dict(truth_capability.QUALITY_RUN_CAPABILITIES)
+ROOT_MANIFEST_FIELDS = {
+    "version",
+    "status",
+    "execution_mode",
+    "scientific_use_forbidden",
+    "formal_seed_created",
+    "formal_rows_created",
+    "training_started",
+    "quality_policy_canonical_self_hash",
+    "quality_policy_file",
+    "builder_source_file",
+    "design_build_authorization",
+    "random_authority",
+    "quality_required_key_commitments",
+    "model_input_file_count",
+    "split_order",
+    "world_count",
+    "seller_count",
+    "pair_count",
+    "positive_pair_count",
+    "negative_pair_count",
+    "uid_registries",
+    "item_document_registry_count",
+    "item_document_registry_sha256",
+    "seller_document_registry_count",
+    "seller_document_registry_sha256",
+    "item_code_registry_count",
+    "item_code_registry_sha256",
+    "identity_value_registry_count",
+    "identity_value_registry_sha256",
+    "historical_exclusion_counts",
+    "split_manifest_self_hashes",
+    "canonical_self_hash",
 }
 AUTHORIZATION_FIELDS = {
     "version",
@@ -335,10 +355,85 @@ def _load_root_manifests(
     return root_manifest, manifests
 
 
+def _physical_row_count(path: Path) -> int:
+    """Count framing only; never parse or materialize private truth rows."""
+
+    line_count = 0
+    size_bytes = 0
+    last_byte = b""
+    try:
+        with path.open("rb") as handle:
+            while chunk := handle.read(8 * 1024 * 1024):
+                size_bytes += len(chunk)
+                line_count += chunk.count(b"\n")
+                last_byte = chunk[-1:]
+    except OSError as exc:
+        raise AuditorExecutionV92Error(
+            f"Physical payload scan failed: {path.name}"
+        ) from exc
+    if size_bytes and last_byte != b"\n":
+        line_count += 1
+    if path.suffix == ".csv":
+        if line_count == 0:
+            raise QualityAuditRunnerV92Error(
+                f"Physical CSV framing is empty: {path.name}"
+            )
+        return line_count - 1
+    return line_count
+
+
+def _verify_all_manifest_payloads(
+    *,
+    dataset_root: Path,
+    manifests: Mapping[str, Mapping[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Re-hash and row-count every one of the 20 files in every split."""
+
+    output: dict[str, dict[str, Any]] = {}
+    for split in SPLITS:
+        records = _manifest_records(manifests[split])
+        if set(records) != set(EXPECTED_SPLIT_DATA_PATHS):
+            raise QualityAuditRunnerV92Error(
+                "V9.2 complete split payload registry drift"
+            )
+        paths: dict[str, Path] = {}
+        sources: dict[str, preparer_v9.SourceCommitment] = {}
+        for relative in EXPECTED_SPLIT_DATA_PATHS:
+            record = records[relative]
+            row_count = record.get("row_count")
+            if isinstance(row_count, bool) or not isinstance(row_count, int) or row_count < 0:
+                raise QualityAuditRunnerV92Error(
+                    "V9.2 split payload row-count pin drift"
+                )
+            try:
+                path, source = v9_runner._verified_source(
+                    dataset_root=dataset_root,
+                    split=split,
+                    relative=relative,
+                    record=record,
+                )
+            except v9_runner.QualityAuditRunnerError as exc:
+                raise QualityAuditRunnerV92Error(str(exc)) from exc
+            if _physical_row_count(path) != row_count:
+                raise QualityAuditRunnerV92Error(
+                    "V9.2 split payload physical row count drift"
+                )
+            paths[relative] = path
+            sources[relative] = source
+        output[split] = {
+            "records": records,
+            "paths": paths,
+            "sources": sources,
+        }
+    return output
+
+
 def _load_split_label_free(
-    *, dataset_root: Path, split: str, manifest: Mapping[str, Any]
+    *,
+    split: str,
+    verified_payload: Mapping[str, Any],
 ) -> dict[str, Any]:
-    records = _manifest_records(manifest)
+    records = verified_payload["records"]
     required = {
         WORLDS_PATH,
         ENDPOINT_PATH,
@@ -347,20 +442,10 @@ def _load_split_label_free(
         STRUCTURE_AUDIT_PATH,
         *(path for pair in SURFACE_FILES.values() for path in pair),
     }
-    if not required <= set(records):
+    if set(records) != set(EXPECTED_SPLIT_DATA_PATHS) or not required <= set(records):
         raise QualityAuditRunnerV92Error("Required label-free V9.2 input is absent")
-    paths: dict[str, Path] = {}
-    sources: dict[str, preparer_v9.SourceCommitment] = {}
-    for relative in sorted(required, key=lambda value: value.encode("utf-8")):
-        try:
-            paths[relative], sources[relative] = v9_runner._verified_source(
-                dataset_root=dataset_root,
-                split=split,
-                relative=relative,
-                record=records[relative],
-            )
-        except v9_runner.QualityAuditRunnerError as exc:
-            raise QualityAuditRunnerV92Error(str(exc)) from exc
+    paths = dict(verified_payload["paths"])
+    sources = dict(verified_payload["sources"])
     worlds = v9_runner._load_jsonl(
         paths[WORLDS_PATH], expected_rows=int(records[WORLDS_PATH]["row_count"])
     )
@@ -564,7 +649,7 @@ def _freeze_train_development(
     *,
     loaded: Mapping[str, Mapping[str, Any]],
     policy: Mapping[str, Any],
-    run_authorization: Mapping[str, Any],
+    run_capability: truth_capability.ConsumedQualityRunCapabilityV92,
 ) -> tuple[
     dict[str, preparer_v9_2.FrozenTextBundleV92],
     dict[str, tuple[preparer_v9.FrozenFeatureMatrix, ...]],
@@ -574,10 +659,10 @@ def _freeze_train_development(
     code: dict[str, tuple[preparer_v9.FrozenFeatureMatrix, ...]] = {}
     eligibility: dict[str, preparer_v9.FrozenTextEligibility] = {}
     document_key = bytes.fromhex(
-        run_authorization["private_key_material"]["document_variation_key_hex"]
+        run_capability.private_key_hex("document_variation_key_hex")
     )
     code_key = document_capacity.derive_code_key(document_key)
-    id_key = str(run_authorization["private_key_material"]["id_key_hex"])
+    id_key = run_capability.private_key_hex("id_key_hex")
     policy_source = preparer_v9.SourceCommitment(
         path=policy_module.DEFAULT_POLICY_PATH.relative_to(ROOT).as_posix(),
         size_bytes=policy_module.DEFAULT_POLICY_PATH.stat().st_size,
@@ -649,17 +734,41 @@ def _validate_root_claim_and_bindings(
     *,
     root_manifest: Mapping[str, Any],
     policy: Mapping[str, Any],
-    run_authorization: Mapping[str, Any],
+    run_capability: truth_capability.ConsumedQualityRunCapabilityV92,
 ) -> None:
-    key_material = run_authorization["private_key_material"]
+    def validate_consumption_receipt(value: object, *, name: str) -> bool:
+        return bool(
+            isinstance(value, Mapping)
+            and set(value)
+            == {"path_sha256", "size_bytes", "sha256", "canonical_self_hash"}
+            and isinstance(value.get("size_bytes"), int)
+            and not isinstance(value.get("size_bytes"), bool)
+            and int(value["size_bytes"]) > 0
+            and all(
+                isinstance(value.get(field), str)
+                and HEX_64.fullmatch(str(value[field])) is not None
+                for field in ("path_sha256", "sha256", "canonical_self_hash")
+            )
+        )
+
+    build_lineage = root_manifest.get("design_build_authorization")
+    random_lineage = root_manifest.get("random_authority")
+    builder_source_path = Path(builder_v9_2.__file__).resolve()
+    expected_builder_pin = _sha256_pin(builder_source_path)
+    policy_builder_pins = [
+        dict(value)
+        for value in policy["source_pins"]
+        if value.get("path") == expected_builder_pin["path"]
+    ]
     expected_commitments = {
         name.removesuffix("_hex") + "_sha256": hashlib.sha256(
-            bytes.fromhex(value)
+            bytes.fromhex(run_capability.private_key_hex(name))
         ).hexdigest()
-        for name, value in key_material.items()
+        for name in ("id_key_hex", "document_variation_key_hex")
     }
     if (
-        root_manifest.get("version") != builder_v9_2.VERSION
+        set(root_manifest) != ROOT_MANIFEST_FIELDS
+        or root_manifest.get("version") != builder_v9_2.VERSION
         or root_manifest.get("status")
         != "PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED"
         or root_manifest.get("execution_mode") != "method_qualification_1004"
@@ -671,15 +780,48 @@ def _validate_root_claim_and_bindings(
         != policy["canonical_self_hash"]
         or root_manifest.get("quality_policy_file")
         != _sha256_pin(policy_module.DEFAULT_POLICY_PATH)
+        or root_manifest.get("builder_source_file") != expected_builder_pin
+        or policy_builder_pins != [expected_builder_pin]
         or root_manifest.get("quality_required_key_commitments")
         != expected_commitments
         or root_manifest.get("model_input_file_count") != 8
+        or root_manifest.get("split_order") != list(SPLITS)
+        or root_manifest.get("world_count") != 1004
+        or root_manifest.get("seller_count") != 1004 * 28
+        or root_manifest.get("pair_count") != 1004 * 378
+        or root_manifest.get("positive_pair_count") != 1004 * 20
+        or root_manifest.get("negative_pair_count") != 1004 * 358
+        or not isinstance(build_lineage, Mapping)
+        or set(build_lineage)
+        != {"status", "receipt", "review_response_sha256", "git_commit", "git_tree"}
+        or build_lineage.get("status")
+        != "CONSUMED_ONE_SHOT_BUILD_AUTHORIZATION"
+        or not validate_consumption_receipt(
+            build_lineage.get("receipt"), name="build"
+        )
+        or HEX_64.fullmatch(str(build_lineage.get("review_response_sha256", "")))
+        is None
+        or GIT_OBJECT.fullmatch(str(build_lineage.get("git_commit", ""))) is None
+        or GIT_OBJECT.fullmatch(str(build_lineage.get("git_tree", ""))) is None
+        or not isinstance(random_lineage, Mapping)
+        or set(random_lineage) != {"status", "receipt", "authority_bundle_sha256"}
+        or random_lineage.get("status")
+        != "CONSUMED_FRESH_V9_2_RANDOM_AUTHORITY"
+        or not validate_consumption_receipt(
+            random_lineage.get("receipt"), name="random"
+        )
+        or HEX_64.fullmatch(str(random_lineage.get("authority_bundle_sha256", "")))
+        is None
+        or random_lineage.get("authority_bundle_sha256")
+        in builder_v9_2.RETIRED_PREFLIGHT_AUTHORITIES
     ):
         raise QualityAuditRunnerV92Error("V9.2 root claim/policy/key binding drift")
 
 
-def _root_pin(authorization: Mapping[str, Any]) -> tuple[Path, truth_capability.RootManifestPin]:
-    spec = authorization["design_root_manifest"]
+def _root_pin(
+    run_capability: truth_capability.ConsumedQualityRunCapabilityV92,
+) -> tuple[Path, truth_capability.RootManifestPin]:
+    spec = run_capability.design_root_binding()
     path = _safe_repo_file(spec["path"], expected_name="root_manifest.json")
     return path.parent, truth_capability.RootManifestPin(
         path="root_manifest.json",
@@ -757,23 +899,28 @@ def _reverify_label_free_bytes(
 def _calculate_complete_evidence(
     *,
     policy: Mapping[str, Any],
-    run_authorization: Mapping[str, Any],
+    run_capability: truth_capability.ConsumedQualityRunCapabilityV92,
     state: dict[str, str],
 ) -> dict[str, Any]:
     state["stage"] = "root_manifest_and_physical_universe"
-    dataset_root, root_pin = _root_pin(run_authorization)
+    dataset_root, root_pin = _root_pin(run_capability)
     root_manifest, manifests = _load_root_manifests(
         dataset_root=dataset_root, root_pin=root_pin
     )
     _validate_root_claim_and_bindings(
         root_manifest=root_manifest,
         policy=policy,
-        run_authorization=run_authorization,
+        run_capability=run_capability,
+    )
+    verified_payloads = _verify_all_manifest_payloads(
+        dataset_root=dataset_root,
+        manifests=manifests,
     )
     state["stage"] = "eight_input_label_free_loading"
     loaded = {
         split: _load_split_label_free(
-            dataset_root=dataset_root, split=split, manifest=manifests[split]
+            split=split,
+            verified_payload=verified_payloads[split],
         )
         for split in SPLITS
     }
@@ -787,11 +934,11 @@ def _calculate_complete_evidence(
         eligibility_rows_by_split={split: loaded[split]["eligibility"] for split in SPLITS},
         model_surface_rows_by_split={split: loaded[split]["surface_rows"] for split in SPLITS},
         policy=policy,
-        run_authorization=run_authorization,
+        run_capability=run_capability,
     )
     state["stage"] = "freeze_28_text_2_code_slot_and_2_masks"
     text, code, eligibility = _freeze_train_development(
-        loaded=loaded, policy=policy, run_authorization=run_authorization
+        loaded=loaded, policy=policy, run_capability=run_capability
     )
     label_free_snapshots = _snapshot_label_free_bytes(
         dataset_root=dataset_root, loaded=loaded
@@ -807,7 +954,7 @@ def _calculate_complete_evidence(
         dataset_root=dataset_root,
         root_manifest_pin=root_pin,
         policy=policy,
-        run_authorization=run_authorization,
+        run_capability=run_capability,
         verify_label_free_bytes=lambda: _reverify_label_free_bytes(
             dataset_root=dataset_root,
             snapshots=label_free_snapshots,
@@ -846,9 +993,77 @@ def _classified_failure(
         "row_level_predictions_returned": 0,
         "formal_500_by_4_generated": False,
         "training_started": False,
+        "cleanup_required": False,
+        "cleanup_requires_documented_failure_boundary": True,
     }
     receipt["canonical_self_hash"] = common.canonical_sha256(receipt)
     return receipt
+
+
+def _publish_terminal_exclusive(
+    path: Path, result: Mapping[str, Any]
+) -> dict[str, Any]:
+    normalized = json.loads(common.canonical_json_bytes(result).decode("utf-8"))
+    if normalized.get("canonical_self_hash") != common.canonical_sha256(
+        {key: value for key, value in normalized.items() if key != "canonical_self_hash"}
+    ):
+        raise QualityAuditRunnerV92Error("Terminal result self-hash drift")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = common.canonical_json_bytes(normalized) + b"\n"
+    try:
+        with path.open("xb") as handle:
+            handle.write(payload)
+            handle.flush()
+    except OSError as exc:
+        raise AuditorExecutionV92Error(
+            "V9.2 terminal result could not be persisted exclusively"
+        ) from exc
+    if path.read_bytes() != payload:
+        raise AuditorExecutionV92Error("V9.2 terminal result replay drift")
+    return normalized
+
+
+def _complete_run_result(
+    *,
+    evidence: Mapping[str, Any],
+    publication: Mapping[str, Any] | None,
+    publication_error: BaseException | None,
+    consumed: Path,
+) -> dict[str, Any]:
+    terminal = complete_evidence.wrapper_terminal_after_complete_evidence(
+        evidence=evidence,
+        wrapper_error=publication_error,
+    )
+    invalidated = bool(terminal["dataset_invalidation_preserved"])
+    result: dict[str, Any] = {
+        "version": VERSION,
+        "status": terminal["status"],
+        "complete_evidence_publication": (
+            None if publication is None else dict(publication)
+        ),
+        "complete_evidence_publication_error": (
+            None
+            if publication_error is None
+            else {
+                "exception_type": type(publication_error).__name__,
+                "exception_message_sha256": hashlib.sha256(
+                    str(publication_error).encode("utf-8")
+                ).hexdigest(),
+            }
+        ),
+        "terminal_wrapper": terminal,
+        "authorization_consumed_path_sha256": hashlib.sha256(
+            consumed.relative_to(ROOT).as_posix().encode("utf-8")
+        ).hexdigest(),
+        "cleanup_required": invalidated,
+        "cleanup_requires_documented_failure_boundary": True,
+        "row_level_labels_returned": 0,
+        "row_level_predictions_returned": 0,
+        "formal_500_by_4_generated": False,
+        "training_started": False,
+    }
+    result["canonical_self_hash"] = common.canonical_sha256(result)
+    return result
 
 
 def _validate_outer_wrapper(
@@ -870,64 +1085,66 @@ def run_formal_quality_audit() -> dict[str, Any]:
 
     policy, authorization = load_run_authorization()
     consumed = _consume_authorization(AUTHORIZATION_PATH, authorization)
+    output_path = _safe_repo_file(authorization["complete_evidence_output_path"])
+    terminal_path = output_path.with_name("quality_audit_terminal.json")
+
+    def persist(result: dict[str, Any]) -> dict[str, Any]:
+        return _publish_terminal_exclusive(terminal_path, result)
+
     state = {"stage": "authorization_consumed"}
     try:
         authorization = validate_run_authorization(
             authorization, policy=policy, verify_bound_files=True
         )
+        run_capability = (
+            truth_capability.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
+                authorization=authorization,
+                consumed_path=consumed,
+            )
+        )
         evidence = _calculate_complete_evidence(
-            policy=policy, run_authorization=authorization, state=state
+            policy=policy, run_capability=run_capability, state=state
         )
     except Exception as exc:
-        mechanical = isinstance(
-            exc,
-            (
-                AuditorExecutionV92Error,
-                v9_runner.AuditorExecutionFailure,
-                truth_capability.QualityTruthAuditorExecutionError,
-            ),
+        # A dataset conclusion is valid only after every registered observation
+        # has been assembled.  Parse, schema, I/O, and uncomputable precondition
+        # failures therefore never masquerade as dataset invalidation.
+        return persist(
+            _classified_failure(
+                status="AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
+                stage=state["stage"],
+                exc=exc,
+            )
         )
-        status = (
-            "DATASET_INVALIDATED"
-            if not mechanical and state["stage"] in DATASET_GATE_STAGES
-            else "AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION"
-        )
-        return _classified_failure(status=status, stage=state["stage"], exc=exc)
-    output_path = _safe_repo_file(authorization["complete_evidence_output_path"])
+    if output_path != _safe_repo_file(run_capability.complete_evidence_output_path()):
+        raise QualityAuditRunnerV92Error("Capability/output path binding drift")
     state["stage"] = "exclusive_complete_evidence_publication"
     try:
         publication = complete_evidence.publish_complete_evidence_exclusive(
             output_path, evidence
         )
     except Exception as exc:
-        return _classified_failure(
-            status="AUDITOR_EXECUTION_FAILED_NO_DATASET_CONCLUSION",
-            stage=state["stage"],
-            exc=exc,
+        return persist(
+            _complete_run_result(
+                evidence=evidence,
+                publication=None,
+                publication_error=exc,
+                consumed=consumed,
+            )
         )
     wrapper_error: BaseException | None = None
     try:
         _validate_outer_wrapper(evidence_path=output_path, publication=publication)
     except Exception as exc:
         wrapper_error = exc
-    terminal = complete_evidence.wrapper_terminal_after_complete_evidence(
-        evidence=evidence, wrapper_error=wrapper_error
+    return persist(
+        _complete_run_result(
+            evidence=evidence,
+            publication=publication,
+            publication_error=wrapper_error,
+            consumed=consumed,
+        )
     )
-    result = {
-        "version": VERSION,
-        "status": terminal["status"],
-        "complete_evidence_publication": publication,
-        "terminal_wrapper": terminal,
-        "authorization_consumed_path_sha256": hashlib.sha256(
-            consumed.relative_to(ROOT).as_posix().encode("utf-8")
-        ).hexdigest(),
-        "row_level_labels_returned": 0,
-        "row_level_predictions_returned": 0,
-        "formal_500_by_4_generated": False,
-        "training_started": False,
-    }
-    result["canonical_self_hash"] = common.canonical_sha256(result)
-    return result
 
 
 def main() -> None:

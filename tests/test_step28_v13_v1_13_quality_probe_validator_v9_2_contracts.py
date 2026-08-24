@@ -19,11 +19,13 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 import step28_v13_common as common
+import step28_v13_v1_13_quality_complete_evidence_v9_2 as complete_evidence
 import step28_v13_v1_13_quality_gate_registry_v9_2 as gate_registry
 import step28_v13_v1_13_quality_probe_preparer_v9 as preparer
 import step28_v13_v1_13_quality_probe_preparer_v9_2 as preparer_v9_2
 import step28_v13_v1_13_quality_probe_validator_v9 as validator_v9
 import step28_v13_v1_13_quality_probe_validator_v9_2 as validator
+import step28_v13_v1_13_quality_result_assembler_v9_2 as result_assembler
 import step28_v13_v1_13_quality_truth_capability_v9_2 as truth_v9_2
 
 
@@ -291,6 +293,34 @@ class QualityProbeValidatorV92Contracts(unittest.TestCase):
             target[0, 0] = original
             target.setflags(write=False)
 
+    def test_code_slot_mutation_is_detected_after_the_last_family(self) -> None:
+        target = self.train_code[0].values
+        original_value = float(target[0, 0])
+        original_receipt = validator._hard_family_receipt
+
+        def mutate_after_code_slot(*args, **kwargs):
+            receipt = original_receipt(*args, **kwargs)
+            if kwargs.get("family") == "public_code_private_slot":
+                target.setflags(write=True)
+                target[0, 0] = original_value + 1.0
+                target.setflags(write=False)
+            return receipt
+
+        try:
+            with mock.patch.object(
+                validator,
+                "_hard_family_receipt",
+                side_effect=mutate_after_code_slot,
+            ), self.assertRaisesRegex(
+                validator_v9.QualityProbeValidationError,
+                "after the code/slot family",
+            ):
+                self.evaluate()
+        finally:
+            target.setflags(write=True)
+            target[0, 0] = original_value
+            target.setflags(write=False)
+
     def test_descriptive_extreme_results_never_enter_failed_hard_gate_ids(self) -> None:
         receipt = self.evaluate()
         observations = receipt["numerical_gate_observations"]
@@ -313,6 +343,54 @@ class QualityProbeValidatorV92Contracts(unittest.TestCase):
                 and "passed" not in observations[gate_id]
                 for gate_id in descriptive_ids
             )
+        )
+
+    def test_calculable_truth_gate_failure_does_not_abort_all_model_families(self) -> None:
+        def drifted_truth(split: str):
+            rows = [dict(row) for row in _truth(split)]
+            for world_index in range(2):
+                rows[world_index * 6 + 4]["label"] = 1
+            return tuple(rows)
+
+        receipt = self.evaluate(drifted_truth)
+        metrics = receipt["structure_metric_values"]
+        self.assertEqual(metrics["positive_pair_count_mismatch_world_count"], 4)
+        self.assertEqual(metrics["excluded_positive_pair_count"], 4)
+        self.assertEqual(
+            len(receipt["numerical_gate_observations"]),
+            42 + 5 + 5,
+        )
+        self.assertEqual(
+            receipt["truth_loader_call_counts"],
+            {"train": 1, "development": 1, "audit_a": 0, "audit_b": 0},
+        )
+        structure_metrics = {
+            str(spec["metric"]): spec["threshold"]
+            for spec in gate_registry.GATE_REGISTRY
+            if spec["family"] == "structure"
+        }
+        structure_metrics.update(metrics)
+        observations = result_assembler.merge_complete_observations(
+            structure_metric_values=structure_metrics,
+            numerical_observations=receipt["numerical_gate_observations"],
+        )
+        bindings = {
+            field: common.sha256_bytes(field.encode("utf-8"))
+            for field in complete_evidence.BINDING_FIELDS
+        }
+        complete = complete_evidence.assemble_complete_quality_evidence(
+            observations=observations,
+            bindings=bindings,
+        )
+        self.assertEqual(complete["gate_entry_count"], 97)
+        self.assertEqual(complete["status"], "DATASET_INVALIDATED")
+        self.assertIn(
+            "hard.structure.positive_pair_count_mismatch_world_count",
+            complete["failed_gate_ids"],
+        )
+        self.assertIn(
+            "hard.structure.excluded_positive_pair_count",
+            complete["failed_gate_ids"],
         )
 
     def test_formal_call_layer_uses_one_root_bound_truth_read_per_split(self) -> None:
@@ -353,15 +431,53 @@ class QualityProbeValidatorV92Contracts(unittest.TestCase):
                 )
             )
             run_authorization = {
+                "version": truth_v9_2.QUALITY_RUN_AUTHORIZATION_VERSION,
+                "status": "ONE_SHOT_V9_2_METHOD_ROOT_QUALITY_AUDIT_AUTHORIZED",
+                "canonical_self_hash": "",
+                "single_use": True,
+                "receipt_generation_by_repository_code_forbidden": True,
+                "quality_policy": {
+                    "path": "schema/fixture.json",
+                    "size_bytes": 1,
+                    "sha256": "4" * 64,
+                    "canonical_self_hash": "5" * 64,
+                },
                 "capabilities": {
                     "quality_audit_run": True,
                     "metric_generation": True,
                     "audit_a_b_truth_open": False,
                     "formal_500_by_4": False,
                     "model_training": False,
+                    "model_metric_generation": False,
                 },
                 "design_root_manifest": root_binding,
+                "private_key_material": {
+                    "id_key_hex": "1" * 64,
+                    "document_variation_key_hex": "2" * 64,
+                },
+                "complete_evidence_output_path": "reports/fixture/evidence.json",
+                "git_commit": "6" * 40,
+                "git_tree": "7" * 40,
+                "review_response_sha256": "8" * 64,
+                "review_final_line": truth_v9_2.QUALITY_RUN_REVIEW_FINAL_LINE,
             }
+            run_authorization["canonical_self_hash"] = common.canonical_sha256(
+                {
+                    key: value
+                    for key, value in run_authorization.items()
+                    if key != "canonical_self_hash"
+                }
+            )
+            consumed_path = root / "quality_authorization.consumed.json"
+            consumed_path.write_bytes(
+                common.canonical_json_bytes(run_authorization) + b"\n"
+            )
+            run_capability = (
+                truth_v9_2.ConsumedQualityRunCapabilityV92._from_consumed_authorization(
+                    authorization=run_authorization,
+                    consumed_path=consumed_path,
+                )
+            )
             reverification_calls = 0
 
             def reverify() -> None:
@@ -392,11 +508,11 @@ class QualityProbeValidatorV92Contracts(unittest.TestCase):
                         canonical_self_hash="b" * 64,
                     ),
                     policy=policy,
-                    run_authorization=run_authorization,
+                    run_capability=run_capability,
                     verify_label_free_bytes=reverify,
                 )
-        self.assertEqual(reverification_calls, 1)
-        self.assertEqual(receipt["label_free_byte_reverification_call_count"], 1)
+        self.assertEqual(reverification_calls, 2)
+        self.assertEqual(receipt["label_free_byte_reverification_call_count"], 2)
         self.assertEqual(receipt["truth_file_access"]["train"]["file_open_count"], 1)
         self.assertEqual(
             receipt["truth_file_access"]["development"]["file_open_count"], 1

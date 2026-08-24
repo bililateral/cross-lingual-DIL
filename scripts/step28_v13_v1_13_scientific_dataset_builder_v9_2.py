@@ -554,6 +554,26 @@ def _verify_output_tree(root: Path, root_manifest: Mapping[str, Any]) -> None:
         raise DatasetBuilderV92Error("V9.2 physical output universe drift")
 
 
+def _publish_verified_output(
+    *,
+    temp_root: Path,
+    output_root: Path,
+    root_manifest: Mapping[str, Any],
+) -> None:
+    """Publish once and replay the same verification at the final path."""
+
+    _verify_output_tree(temp_root, root_manifest)
+    temp_root.rename(output_root)
+    try:
+        _verify_output_tree(output_root, root_manifest)
+    except Exception:
+        # Put the failed publication back under the transaction-owned temporary
+        # path so the existing finally block can remove it precisely.
+        if output_root.exists() and not temp_root.exists():
+            output_root.rename(temp_root)
+        raise
+
+
 def _run_transaction(
     *,
     context: scientific.ExecutionContext,
@@ -887,8 +907,11 @@ def _run_transaction(
         }
         root_manifest["canonical_self_hash"] = _self_hash(root_manifest)
         common.write_json(temp_root / "root_manifest.json", root_manifest)
-        _verify_output_tree(temp_root, root_manifest)
-        temp_root.rename(output_root)
+        _publish_verified_output(
+            temp_root=temp_root,
+            output_root=output_root,
+            root_manifest=root_manifest,
+        )
         completed = True
         return root_manifest
     finally:

@@ -18,6 +18,7 @@ if str(SCRIPTS) not in sys.path:
 
 import step28_v13_v1_13_quality_complete_evidence_v9_2 as evidence
 import step28_v13_v1_13_quality_gate_registry_v9_2 as registry
+import step28_v13_v1_13_quality_audit_runner_v9_2 as runner
 import step28_v13_v1_13_quality_result_assembler_v9_2 as assembler
 
 
@@ -183,6 +184,35 @@ class CompleteEvidenceV92Contracts(unittest.TestCase):
         )
         self.assertTrue(terminal["dataset_invalidation_preserved"])
         self.assertFalse(terminal["pass_certified"])
+
+    def test_primary_publication_failure_preserves_computed_invalidation(self) -> None:
+        first_hard = next(
+            gate_id
+            for gate_id in registry.GATE_IDS
+            if gate_id.startswith("hard.structure.")
+        )
+        receipt = evidence.assemble_complete_quality_evidence(
+            observations=_observations(failures={first_hard}),
+            bindings=_bindings(),
+        )
+        result = runner._complete_run_result(
+            evidence=receipt,
+            publication=None,
+            publication_error=OSError("fixture exclusive publication failure"),
+            consumed=(
+                ROOT
+                / "private_custody"
+                / "fixture_quality_authorization.consumed.json"
+            ),
+        )
+        self.assertEqual(
+            result["status"],
+            "DATASET_INVALIDATED_WITH_OUTER_WRAPPER_FAILURE",
+        )
+        self.assertTrue(result["cleanup_required"])
+        self.assertTrue(
+            result["terminal_wrapper"]["dataset_invalidation_preserved"]
+        )
 
     def test_complete_evidence_is_exclusive_and_survives_later_wrapper_error(
         self,

@@ -155,6 +155,86 @@ def _verify_all_state(
     )
 
 
+def _load_truth_and_gate_metrics(
+    *,
+    rows: Sequence[Mapping[str, Any]],
+    row_keys: Sequence[tuple[str, str]],
+    design: validator_v9.ProbeFamilyDesign,
+    eligibility: np.ndarray,
+) -> tuple[np.ndarray, dict[str, int]]:
+    """Separate calculable truth-cardinality gates from malformed truth."""
+
+    values = tuple(rows)
+    if len(values) != len(row_keys):
+        raise QualityProbeValidationV92Error(
+            "Truth row count prevents aligned numerical calculation"
+        )
+    labels = np.empty(len(values), dtype=np.int64)
+    for index, (row, (world_uid, pair_uid)) in enumerate(
+        zip(values, row_keys, strict=True)
+    ):
+        if (
+            not isinstance(row, Mapping)
+            or tuple(row) != validator_v9.TRUTH_FIELDS
+            or type(row.get("world_uid")) is not str
+            or row["world_uid"] != world_uid
+            or type(row.get("canonical_pair_uid")) is not str
+            or row["canonical_pair_uid"] != pair_uid
+            or type(row.get("label")) is not int
+            or row["label"] not in {0, 1}
+        ):
+            raise QualityProbeValidationV92Error(
+                "Truth schema/order/label prevents aligned numerical calculation"
+            )
+        labels[index] = int(row["label"])
+    if eligibility.shape != labels.shape:
+        raise QualityProbeValidationV92Error(
+            "Truth/eligibility shape prevents aligned numerical calculation"
+        )
+    worlds = validator_v9._ordered_worlds(row_keys)
+    pair_counts = Counter(world_uid for world_uid, _pair_uid in row_keys)
+    positive_counts = Counter(
+        world_uid
+        for (world_uid, _pair_uid), label in zip(row_keys, labels, strict=True)
+        if label == 1
+    )
+    eligible_counts = Counter(
+        world_uid
+        for (world_uid, _pair_uid), keep in zip(row_keys, eligibility, strict=True)
+        if keep
+    )
+    expected_eligible = design.pairs_per_world - design.excluded_pairs_per_world
+    metrics = {
+        "full_pair_count_mismatch_world_count": sum(
+            pair_counts[world_uid] != design.pairs_per_world
+            for world_uid in worlds
+        ),
+        "eligible_pair_count_mismatch_world_count": sum(
+            eligible_counts[world_uid] != expected_eligible
+            for world_uid in worlds
+        ),
+        "positive_pair_count_mismatch_world_count": sum(
+            positive_counts[world_uid] != design.positives_per_world
+            for world_uid in worlds
+        ),
+        "excluded_positive_pair_count": int(np.sum(labels[~eligibility])),
+    }
+    labels.setflags(write=False)
+    return labels, metrics
+
+
+def _merge_truth_gate_metrics(*values: Mapping[str, int]) -> dict[str, int]:
+    fields = {
+        "full_pair_count_mismatch_world_count",
+        "eligible_pair_count_mismatch_world_count",
+        "positive_pair_count_mismatch_world_count",
+        "excluded_positive_pair_count",
+    }
+    if any(set(value) != fields for value in values):
+        raise QualityProbeValidationV92Error("Truth gate metric keyset drift")
+    return {field: sum(int(value[field]) for value in values) for field in fields}
+
+
 def _fit_matrix_models(
     *,
     train: Sequence[preparer_v9.FrozenFeatureMatrix],
@@ -692,6 +772,9 @@ def _calculate_all_families(
         policy=policy,
         design=designs.code_and_slot,
     )
+    verify_between_families(
+        "V9.2 state changed after the code/slot family"
+    )
     family_receipts = {
         "original_author_descriptive": descriptive,
         "counterfactual_text": hard_text,
@@ -813,16 +896,14 @@ def evaluate_fixture_probe_families(
     )
     if gate_registry.canonical_json_bytes(policy) != policy_snapshot:
         raise QualityProbeValidationV92Error("V9.2 policy changed after truth open")
-    train_labels_full = validator_v9._load_and_validate_truth(
-        split="train",
-        truth_loader=lambda _split: train_truth,
+    train_labels_full, train_truth_metrics = _load_truth_and_gate_metrics(
+        rows=train_truth,
         row_keys=hard_train[0].row_keys,
         design=designs.counterfactual_text,
         eligibility=train_mask,
     )
-    development_labels_full = validator_v9._load_and_validate_truth(
-        split="development",
-        truth_loader=lambda _split: development_truth,
+    development_labels_full, development_truth_metrics = _load_truth_and_gate_metrics(
+        rows=development_truth,
         row_keys=hard_dev[0].row_keys,
         design=designs.counterfactual_text,
         eligibility=development_mask,
@@ -853,6 +934,10 @@ def evaluate_fixture_probe_families(
         designs=designs,
         verify_between_families=verify_between,
     )
+    truth_gate_metrics = _merge_truth_gate_metrics(
+        train_truth_metrics,
+        development_truth_metrics,
+    )
     receipt: dict[str, Any] = {
         "version": VERSION,
         "status": "FIXTURE_COMPLETE_NO_DATASET_CONCLUSION",
@@ -860,6 +945,12 @@ def evaluate_fixture_probe_families(
         "gate_registry_sha256": gate_registry.GATE_REGISTRY_SHA256,
         "family_receipts": family_receipts,
         "numerical_gate_observations": observations,
+        "structure_metric_values": {
+            **truth_gate_metrics,
+            "cross_branch_label_vector_mismatch_count": 0,
+            "train_truth_open_count": loader_calls["train"],
+            "development_truth_open_count": loader_calls["development"],
+        },
         "truth_loader_call_counts": {
             "train": loader_calls["train"],
             "development": loader_calls["development"],
@@ -884,27 +975,17 @@ def evaluate_formal_probe_families(
     dataset_root: Path,
     root_manifest_pin: truth_capability.RootManifestPin,
     policy: Mapping[str, Any],
-    run_authorization: Mapping[str, Any],
+    run_capability: truth_capability.ConsumedQualityRunCapabilityV92,
     verify_label_free_bytes: Callable[[], None],
 ) -> dict[str, Any]:
     """Open train/development truth once after all 30 matrices are frozen."""
 
     validator_v9._validate_runtime()
-    # The immutable scientific/quality policy deliberately authorizes no
-    # execution.  A future, separately reviewed one-shot run receipt owns the
-    # design-root pin and the narrowly scoped truth-read capability.  Keeping
-    # those bytes out of ``policy`` prevents a post-freeze policy rewrite.
-    authorization = run_authorization.get("capabilities", {})
-    if (
-        authorization.get("quality_audit_run") is not True
-        or authorization.get("metric_generation") is not True
-        or authorization.get("audit_a_b_truth_open") is not False
-        or authorization.get("model_training") is not False
-        or authorization.get("formal_500_by_4") is not False
-    ):
+    if type(run_capability) is not truth_capability.ConsumedQualityRunCapabilityV92:
         raise QualityProbeValidationV92Error(
-            "V9.2 formal quality capability is absent or over-broad"
+            "V9.2 consumed formal quality capability is absent"
         )
+    run_capability.require_metric_generation()
     designs = formal_designs(policy)
     descriptive_train_source, hard_train_source = preparer_v9_2.split_text_matrix_roles(
         text_train_matrices
@@ -964,11 +1045,7 @@ def evaluate_formal_probe_families(
         for value in eligibilities
     )
     policy_snapshot = gate_registry.canonical_json_bytes(policy)
-    expected_root_binding = run_authorization.get("design_root_manifest")
-    if not isinstance(expected_root_binding, Mapping) or set(
-        expected_root_binding
-    ) != {"path", "size_bytes", "sha256", "canonical_self_hash"}:
-        raise QualityProbeValidationV92Error("Formal root binding is absent")
+    expected_root_binding = run_capability.design_root_binding()
     truth = truth_capability.FormalTrainDevelopmentTruthCapability.from_pinned_design_root(
         dataset_root=dataset_root,
         root_manifest_pin=root_manifest_pin,
@@ -989,7 +1066,14 @@ def evaluate_formal_probe_families(
         raise QualityProbeValidationV92Error(
             "Formal label-free byte re-verifier is absent"
         )
-    verify_label_free_bytes()
+    label_free_reverification_call_count = 0
+
+    def reverify_label_free() -> None:
+        nonlocal label_free_reverification_call_count
+        verify_label_free_bytes()
+        label_free_reverification_call_count += 1
+
+    reverify_label_free()
     _verify_all_state(
         all_matrices,
         matrix_snapshots,
@@ -999,16 +1083,14 @@ def evaluate_formal_probe_families(
     )
     if gate_registry.canonical_json_bytes(policy) != policy_snapshot:
         raise QualityProbeValidationV92Error("Formal V9.2 policy changed after truth open")
-    train_labels_full = validator_v9._load_and_validate_truth(
-        split="train",
-        truth_loader=lambda _split: truth_rows["train"],
+    train_labels_full, train_truth_metrics = _load_truth_and_gate_metrics(
+        rows=truth_rows["train"],
         row_keys=hard_train[0].row_keys,
         design=designs.counterfactual_text,
         eligibility=train_mask,
     )
-    development_labels_full = validator_v9._load_and_validate_truth(
-        split="development",
-        truth_loader=lambda _split: truth_rows["development"],
+    development_labels_full, development_truth_metrics = _load_truth_and_gate_metrics(
+        rows=truth_rows["development"],
         row_keys=hard_dev[0].row_keys,
         design=designs.counterfactual_text,
         eligibility=development_mask,
@@ -1027,6 +1109,8 @@ def evaluate_formal_probe_families(
             raise QualityProbeValidationV92Error(
                 "Formal policy changed between probe families"
             )
+        if message == "V9.2 state changed after the code/slot family":
+            reverify_label_free()
 
     family_receipts, observations = _calculate_all_families(
         descriptive_train=descriptive_train,
@@ -1057,15 +1141,29 @@ def evaluate_formal_probe_families(
         for gate_id, value in observations.items()
         if gate_id.startswith("hard.") and value.get("passed") is False
     ]
+    truth_gate_metrics = _merge_truth_gate_metrics(
+        train_truth_metrics,
+        development_truth_metrics,
+    )
+    truth_structure_failed = any(truth_gate_metrics.values()) or (
+        truth_receipt["train"]["file_open_count"] != 1
+        or truth_receipt["development"]["file_open_count"] != 1
+    )
     receipt: dict[str, Any] = {
         "version": VERSION,
-        "status": "PASS" if not hard_failures else "DATASET_INVALIDATED",
+        "status": (
+            "PASS"
+            if not hard_failures and not truth_structure_failed
+            else "DATASET_INVALIDATED"
+        ),
         "claim_boundary": "V9_2_DESIGN_QUALITY_ONLY_NOT_FORMAL_DATA_OR_TRAINING",
         "gate_registry_sha256": gate_registry.GATE_REGISTRY_SHA256,
         "family_receipts": family_receipts,
         "numerical_gate_observations": observations,
         "truth_file_access": truth_receipt,
-        "label_free_byte_reverification_call_count": 1,
+        "label_free_byte_reverification_call_count": (
+            label_free_reverification_call_count
+        ),
         "truth_and_order_bindings": {
             "train_label_vector_sha256": common.sha256_bytes(
                 np.ascontiguousarray(train_labels_full, dtype=np.dtype("<i8")).tobytes(
@@ -1111,10 +1209,7 @@ def evaluate_formal_probe_families(
             ),
         },
         "structure_metric_values": {
-            "full_pair_count_mismatch_world_count": 0,
-            "eligible_pair_count_mismatch_world_count": 0,
-            "positive_pair_count_mismatch_world_count": 0,
-            "excluded_positive_pair_count": 0,
+            **truth_gate_metrics,
             "cross_branch_label_vector_mismatch_count": 0,
             "train_truth_open_count": int(
                 truth_receipt["train"]["file_open_count"]

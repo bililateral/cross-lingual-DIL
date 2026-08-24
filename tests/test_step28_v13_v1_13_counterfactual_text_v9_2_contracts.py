@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import inspect
 import json
 import sys
@@ -170,6 +171,10 @@ class CounterfactualTextV92Contracts(unittest.TestCase):
         self.assertEqual(
             first.audit["mapping"]["target_source_pairs"],
             second.audit["mapping"]["target_source_pairs"],
+        )
+        self.assertEqual(
+            set(inspect.signature(structure_v9_2.build_style_source_derangement).parameters),
+            {"split", "world_uid", "seller_uids"},
         )
 
     def test_five_m1_commitments_are_public_id_only_and_distinct(self) -> None:
@@ -347,6 +352,90 @@ class CounterfactualTextV92Contracts(unittest.TestCase):
         self.assertIn(
             "pretruth_counterfactual_text_matrix_count_mismatch_split_count",
             structure_receipt["pending_structure_metrics"],
+        )
+
+        def rehash_structure_row(row: dict) -> None:
+            replay = row["counterfactual_replay"]
+            replay_payload = dict(replay)
+            replay_payload.pop("canonical_self_hash", None)
+            replay["canonical_self_hash"] = common.canonical_sha256(replay_payload)
+            row_payload = dict(row)
+            row_payload.pop("v9_2_extension_sha256", None)
+            row["v9_2_extension_sha256"] = common.canonical_sha256(row_payload)
+
+        def aggregate_mutation(mutate) -> dict:
+            mutated = copy.deepcopy(structure_by_split)
+            row = mutated["train"][0]
+            mutate(row)
+            rehash_structure_row(row)
+            return structure_v9_2.aggregate_fixture_structure(
+                public_rows_by_split=public_by_split,
+                structure_rows_by_split=mutated,
+                eligibility_rows_by_split=eligibility_by_split,
+                model_surface_rows_by_split=model_surfaces_by_split,
+                expected_world_counts={
+                    "train": 1,
+                    "development": 0,
+                    "audit_a": 0,
+                    "audit_b": 0,
+                },
+                expected_sellers_per_world=28,
+            )
+
+        mapping_failure = aggregate_mutation(
+            lambda row: row["counterfactual_replay"]["mapping"].__setitem__(
+                "mapping_sha256", "0" * 64
+            )
+        )
+        self.assertEqual(
+            mapping_failure["metric_values"][
+                "style_derangement_mapping_count_mismatch_world_count"
+            ],
+            1,
+        )
+
+        def mutate_m1(row: dict) -> None:
+            row["m1_mapping_commitments"][0]["mapping_sha256"] = "1" * 64
+            row["m1_mapping_commitment_bundle_sha256"] = common.canonical_sha256(
+                row["m1_mapping_commitments"]
+            )
+
+        m1_failure = aggregate_mutation(mutate_m1)
+        self.assertEqual(
+            m1_failure["metric_values"][
+                "m1_mapping_commitment_count_mismatch_world_count"
+            ],
+            1,
+        )
+
+        def mutate_multiple(row: dict) -> None:
+            row["full_item_sha256"] = "9" * 64
+            row["counterfactual_replay"]["invariants"]["identity33"][
+                "equal"
+            ] = False
+            first_forbidden = next(
+                iter(row["forbidden_capability_mounted"])
+            )
+            row["forbidden_capability_mounted"][first_forbidden] = True
+
+        multiple_failure = aggregate_mutation(mutate_multiple)
+        self.assertGreater(
+            multiple_failure["metric_values"][
+                "persisted_model_input_hash_mismatch_count"
+            ],
+            0,
+        )
+        self.assertEqual(
+            multiple_failure["metric_values"][
+                "cross_branch_invariant_mismatch_count"
+            ],
+            1,
+        )
+        self.assertEqual(
+            multiple_failure["metric_values"][
+                "counterfactual_forbidden_capability_mounted_count"
+            ],
+            1,
         )
         endpoint = accepted.world["public"]["complete_model_pair_endpoints"][0]
         with tempfile.TemporaryDirectory(prefix="step28-v9-2-writer-") as temp:
