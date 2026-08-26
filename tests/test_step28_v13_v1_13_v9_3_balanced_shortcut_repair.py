@@ -39,7 +39,7 @@ NEGATIVE_PREFLIGHT = (
     ROOT
     / "reports"
     / "step28_v13_v1_13_balanced_schedule_v9_3"
-    / "registered_negative_preflight_v10_20260826"
+    / "registered_negative_preflight_v11_20260826"
 )
 
 
@@ -440,8 +440,24 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
         self.assertFalse(audit["complete_global_relabel"])
         self.assertGreater(audit["mapping_conflict_count"], 0)
 
-    def test_original_endpoint_cp_sat_solves_toy_global_counts(self) -> None:
-        result = negative_constructor._solve_original_endpoint_incidence_cp_sat(
+    def test_residual_upper_pruning_is_exact_and_fail_closed(self) -> None:
+        bounds = [(0, 0), (1, 2)]
+        self.assertFalse(
+            negative_constructor._option_respects_residual_uppers({0: 1}, bounds)
+        )
+        self.assertTrue(
+            negative_constructor._option_respects_residual_uppers({1: 1}, bounds)
+        )
+        with self.assertRaises(
+            negative_constructor.RegisteredNegativeConstructionError
+        ):
+            negative_constructor._option_respects_residual_uppers({2: 1}, bounds)
+        self.assertNotIn(
+            500, negative_constructor.RESIDUAL_WORLD_BATCH_TARGETS
+        )
+
+    def test_pruned_endpoint_cp_sat_solves_toy_global_counts(self) -> None:
+        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
             selected_worlds=(0, 1),
             pair_count=1,
             seller_count=3,
@@ -460,8 +476,8 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
             set(result["selected_option_indices"].values()), {0, 1}
         )
 
-    def test_original_endpoint_cp_sat_enforces_twelve_endpoint_analogue(self) -> None:
-        result = negative_constructor._solve_original_endpoint_incidence_cp_sat(
+    def test_pruned_endpoint_cp_sat_enforces_twelve_endpoint_analogue(self) -> None:
+        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
             selected_worlds=(0,),
             pair_count=2,
             seller_count=4,
@@ -540,7 +556,7 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
                 0, pair_index, *current_pair
             ).items():
                 current_counts[cell_index[key]] += count
-        result = negative_constructor._solve_original_endpoint_incidence_cp_sat(
+        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
             selected_worlds=(0,),
             pair_count=6,
             seller_count=28,
@@ -583,12 +599,12 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
         )
         self.assertEqual(len(ordered_worlds), 500)
         self.assertEqual(len(set(ordered_worlds)), 500)
-        self.assertEqual(audit["minimum_selected_world_count"], 9)
+        self.assertEqual(audit["minimum_selected_world_count"], 8)
         self.assertEqual(
             audit["selection_order_sha256"],
-            "99465e1e7c80c821b23b705bdbf6d800d56bcab09e33966300592ab345f6b0e9",
+            "18b3606076378a5b51a095543500aeb56332e22484d4f1bb3849a6af79b581b2",
         )
-        mandatory_prefix = set(
+        selected_prefix = set(
             ordered_worlds[: audit["minimum_selected_world_count"]]
         )
         family, index, _lower, upper = overfull
@@ -605,7 +621,10 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
                     int(row[right_position]),
                 ):
                     contributing_worlds.add(world)
-        self.assertTrue(contributing_worlds.issubset(mandatory_prefix))
+        self.assertGreaterEqual(len(contributing_worlds & selected_prefix), 4)
+        self.assertLess(
+            len(contributing_worlds & selected_prefix), len(contributing_worlds)
+        )
 
     def test_coarse_milp_candidate_solver_closes_toy_bounds(self) -> None:
         result = negative_constructor._solve_sparse_candidate_milp(

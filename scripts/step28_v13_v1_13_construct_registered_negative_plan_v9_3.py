@@ -20,7 +20,7 @@ import step28_v13_v1_13_build_joint_noise_signatures_v9_3 as noise_signatures
 import step28_v13_v1_13_registered_negative_plan_v9_3 as plan_contract
 
 
-VERSION = "2026-08-26-step28-v13-v1-13-construct-registered-negative-plan-v9-3-solver-v8-original-residual"
+VERSION = "2026-08-26-step28-v13-v1-13-construct-registered-negative-plan-v9-3-solver-v9-pruned-residual"
 PUBLIC_DESIGN_SEEDS = {
     "train": 281320260826,
     "development": 281320260828,
@@ -61,9 +61,10 @@ LOCAL_REPAIR_COARSE_MILP_TIME_LIMIT_SECONDS = 300
 LOCAL_REPAIR_COARSE_MILP_SLACK_COST = 10_000.0
 LOCAL_REPAIR_MAX_POSITIVE_DELTA = 4
 LOCAL_REPAIR_TARGETED_MAX_POSITIVE_DELTA = 12
-RESIDUAL_WORLD_BATCH_TARGETS = (24, 48, 96, 192, 320, 500)
+RESIDUAL_WORLD_BATCH_TARGETS = (24, 48, 72, 96, 128, 192)
 RESIDUAL_WORLD_BATCH_TIME_LIMIT_SECONDS = (300, 450, 600, 900, 1_200, 1_800)
 RESIDUAL_MIN_SUPPORT_WORLDS_PER_UNDERFULL_CELL = 4
+RESIDUAL_MIN_CONTRIBUTOR_WORLDS_PER_OVERFULL_CELL = 4
 ROLE_BY_POSITION = np.asarray(
     [0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3], dtype=np.int8
 )
@@ -86,7 +87,28 @@ class RegisteredNegativeConstructionError(RuntimeError):
     """Raised when the abstract joint construction cannot be published."""
 
 
-def _solve_original_endpoint_incidence_cp_sat(
+def _option_respects_residual_uppers(
+    contributions: Mapping[int, int],
+    residual_bounds: list[tuple[int, int]],
+) -> bool:
+    """Safely reject an option that alone exceeds a residual upper bound."""
+
+    for cell_ordinal, contribution in contributions.items():
+        if (
+            type(cell_ordinal) is not int
+            or not 0 <= cell_ordinal < len(residual_bounds)
+            or type(contribution) is not int
+            or contribution <= 0
+        ):
+            raise RegisteredNegativeConstructionError(
+                "Residual option contribution is malformed"
+            )
+        if contribution > residual_bounds[cell_ordinal][1]:
+            return False
+    return True
+
+
+def _solve_pruned_endpoint_incidence_cp_sat(
     *,
     selected_worlds: tuple[int, ...],
     pair_count: int,
@@ -100,7 +122,7 @@ def _solve_original_endpoint_incidence_cp_sat(
     time_limit_seconds: int,
     progress_label: str | None = None,
 ) -> dict[str, Any]:
-    """Solve selected worlds directly over their ordered endpoint-pair choices."""
+    """Solve a safely pruned residual neighborhood over endpoint-pair choices."""
     import ortools
     from ortools.sat.python import cp_model
 
@@ -180,7 +202,7 @@ def _solve_original_endpoint_incidence_cp_sat(
             print(
                 json.dumps(
                     {
-                        "event": "original_endpoint_model_build_progress",
+                        "event": "pruned_endpoint_model_build_progress",
                         "progress_label": progress_label,
                         "completed_pair_groups": group_ordinal,
                         "total_pair_groups": len(sorted_groups),
@@ -215,7 +237,7 @@ def _solve_original_endpoint_incidence_cp_sat(
         print(
             json.dumps(
                 {
-                    "event": "original_endpoint_model_ready",
+                    "event": "pruned_endpoint_model_ready",
                     "progress_label": progress_label,
                     "option_variable_count": option_variable_count,
                     "residual_cell_count": len(residual_bounds),
@@ -915,21 +937,24 @@ class JointSearch:
     ) -> tuple[list[int], dict[str, Any]]:
         """Freeze a nested, result-blind order of worlds for residual diagnosis."""
 
-        overfull_keys: set[tuple[str, tuple[int, ...]]] = set()
+        overfull: dict[tuple[str, tuple[int, ...]], int] = {}
         underfull: dict[tuple[str, tuple[int, ...]], int] = {}
         for family, index, lower, upper in violated_cells:
             current = int(self.arrays[family][index])
             key = (family, index)
             if current > upper:
-                overfull_keys.add(key)
+                overfull[key] = current - upper
             if current < lower:
                 underfull[key] = lower - current
+        overfull_keys = set(overfull)
         underfull_keys = set(underfull)
 
-        mandatory_worlds: set[int] = set()
         possible_underfull_by_world: list[set[tuple[str, tuple[int, ...]]]] = [
             set() for _world in range(balanced.WORLD_COUNT)
         ]
+        contributor_worlds: dict[
+            tuple[str, tuple[int, ...]], list[int]
+        ] = {key: [] for key in overfull}
         support_worlds: dict[
             tuple[str, tuple[int, ...]], list[int]
         ] = {key: [] for key in underfull}
@@ -946,8 +971,8 @@ class JointSearch:
                         int(self.assignments[world, right_position]),
                     )
                 )
-            if current_keys & overfull_keys:
-                mandatory_worlds.add(world)
+            for key in current_keys & overfull_keys:
+                contributor_worlds[key].append(world)
 
             possible = possible_underfull_by_world[world]
             for pair_index in range(len(PAIR_POSITIONS)):
@@ -979,13 +1004,14 @@ class JointSearch:
         ).encode("utf-8")
         violation_sha256 = hashlib.sha256(violation_key_bytes).hexdigest()
 
-        def ranked_support_worlds(
-            key: tuple[str, tuple[int, ...]], worlds: list[int]
+        def ranked_worlds(
+            key: tuple[str, tuple[int, ...]], worlds: list[int], *, purpose: str
         ) -> list[int]:
             family, index = key
             return sorted(
                 worlds,
                 key=lambda world: (
+                    -len(possible_underfull_by_world[world]),
                     hashlib.sha256(
                         json.dumps(
                             [
@@ -994,6 +1020,7 @@ class JointSearch:
                                 violation_sha256,
                                 family,
                                 list(index),
+                                purpose,
                                 world,
                             ],
                             ensure_ascii=False,
@@ -1004,7 +1031,27 @@ class JointSearch:
                 ),
             )
 
-        base_worlds = set(mandatory_worlds)
+        base_worlds: set[int] = set()
+        contributor_counts: dict[str, int] = {}
+        for key in sorted(overfull):
+            worlds = contributor_worlds[key]
+            required = max(
+                RESIDUAL_MIN_CONTRIBUTOR_WORLDS_PER_OVERFULL_CELL,
+                2 * int(overfull[key]),
+            )
+            if len(worlds) < required:
+                raise RegisteredNegativeConstructionError(
+                    "Insufficient current contributors for an overfull residual cell: "
+                    f"{key}"
+                )
+            selected_contributors = ranked_worlds(
+                key, worlds, purpose="overfull-contributor"
+            )[:required]
+            base_worlds.update(selected_contributors)
+            contributor_counts[f"{key[0]}:{','.join(map(str, key[1]))}"] = len(
+                selected_contributors
+            )
+
         support_counts: dict[str, int] = {}
         for key in sorted(underfull):
             worlds = support_worlds[key]
@@ -1017,7 +1064,9 @@ class JointSearch:
                 RESIDUAL_MIN_SUPPORT_WORLDS_PER_UNDERFULL_CELL,
                 2 * int(underfull[key]),
             )
-            selected_support = ranked_support_worlds(key, worlds)[:required]
+            selected_support = ranked_worlds(
+                key, worlds, purpose="underfull-support"
+            )[:required]
             base_worlds.update(selected_support)
             support_counts[f"{key[0]}:{','.join(map(str, key[1]))}"] = len(
                 selected_support
@@ -1056,7 +1105,12 @@ class JointSearch:
             )
         return ordered_worlds, {
             "violation_sha256": violation_sha256,
-            "mandatory_overfull_contributor_world_count": len(mandatory_worlds),
+            "selected_overfull_contributor_world_count": sum(
+                contributor_counts.values()
+            ),
+            "overfull_contributor_world_counts": dict(
+                sorted(contributor_counts.items())
+            ),
             "minimum_selected_world_count": len(base_worlds),
             "support_world_counts": dict(sorted(support_counts.items())),
             "selection_order_sha256": hashlib.sha256(
@@ -1127,10 +1181,46 @@ class JointSearch:
                     )
                 residual_bounds.append((lower - outside, upper - outside))
 
+            if any(upper < 0 for _lower, upper in residual_bounds):
+                batch_receipt = {
+                    "selected_world_count": selected_count,
+                    "selected_worlds_sha256": hashlib.sha256(
+                        json.dumps(
+                            selected_worlds, separators=(",", ":")
+                        ).encode("ascii")
+                    ).hexdigest(),
+                    "time_limit_seconds": time_limit_seconds,
+                    "feasible": False,
+                    "solver_status": -1,
+                    "solver_status_name": "STATIC_INFEASIBLE_SELECTED_SUBSET",
+                    "solver_wall_time_seconds": 0.0,
+                    "solver_conflict_count": 0,
+                    "solver_branch_count": 0,
+                    "option_variable_count": 0,
+                    "unpruned_option_count": 0,
+                    "residual_cell_count": len(cells),
+                    "ortools_version": __import__("ortools").__version__,
+                }
+                batch_receipts.append(batch_receipt)
+                print(
+                    json.dumps(
+                        {
+                            "event": "pruned_endpoint_residual_solver_complete",
+                            **batch_receipt,
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    ),
+                    flush=True,
+                )
+                continue
+
             allowed_options: dict[
                 tuple[int, int], list[tuple[int, int, dict[int, int]]]
             ] = {}
             preferred_option_indices: dict[tuple[int, int], int] = {}
+            unpruned_option_count = 0
+            empty_group: tuple[int, int] | None = None
             for world in selected_worlds:
                 row = self.assignments[world]
                 for pair_index, (left_position, right_position) in enumerate(
@@ -1144,38 +1234,75 @@ class JointSearch:
                     for left_seller, right_seller in self._allowed_pair_options(
                         world, pair_index
                     ):
-                        if (left_seller, right_seller) == current_pair:
-                            preferred_option_indices[(world, pair_index)] = len(options)
-                        options.append(
-                            (
+                        unpruned_option_count += 1
+                        contributions = {
+                            cell_index[key]: contribution
+                            for key, contribution in self._option_contributions(
+                                world,
+                                pair_index,
                                 left_seller,
                                 right_seller,
-                                {
-                                    cell_index[key]: contribution
-                                    for key, contribution in self._option_contributions(
-                                        world,
-                                        pair_index,
-                                        left_seller,
-                                        right_seller,
-                                    ).items()
-                                },
-                            )
-                        )
-                    if (world, pair_index) not in preferred_option_indices:
-                        raise RegisteredNegativeConstructionError(
-                            "Current residual row is absent from the full legal domain"
-                        )
+                            ).items()
+                        }
+                        if not _option_respects_residual_uppers(
+                            contributions, residual_bounds
+                        ):
+                            continue
+                        if (left_seller, right_seller) == current_pair:
+                            preferred_option_indices[(world, pair_index)] = len(options)
+                        options.append((left_seller, right_seller, contributions))
+                    if not options:
+                        empty_group = (world, pair_index)
+                        break
                     allowed_options[(world, pair_index)] = options
+                if empty_group is not None:
+                    break
+
+            if empty_group is not None:
+                batch_receipt = {
+                    "selected_world_count": selected_count,
+                    "selected_worlds_sha256": hashlib.sha256(
+                        json.dumps(
+                            selected_worlds, separators=(",", ":")
+                        ).encode("ascii")
+                    ).hexdigest(),
+                    "time_limit_seconds": time_limit_seconds,
+                    "feasible": False,
+                    "solver_status": -2,
+                    "solver_status_name": "STATIC_EMPTY_PRUNED_OPTION_GROUP",
+                    "solver_wall_time_seconds": 0.0,
+                    "solver_conflict_count": 0,
+                    "solver_branch_count": 0,
+                    "option_variable_count": sum(map(len, allowed_options.values())),
+                    "unpruned_option_count": unpruned_option_count,
+                    "residual_cell_count": len(cells),
+                    "ortools_version": __import__("ortools").__version__,
+                    "empty_group": list(empty_group),
+                }
+                batch_receipts.append(batch_receipt)
+                print(
+                    json.dumps(
+                        {
+                            "event": "pruned_endpoint_residual_solver_complete",
+                            **batch_receipt,
+                        },
+                        ensure_ascii=False,
+                        sort_keys=True,
+                    ),
+                    flush=True,
+                )
+                continue
 
             print(
                 json.dumps(
                     {
-                        "event": "original_endpoint_residual_solver_start",
+                        "event": "pruned_endpoint_residual_solver_start",
                         "selected_world_count": selected_count,
                         "time_limit_seconds": time_limit_seconds,
                         "before_objective": self.objective,
                         "violated_cell_count": len(violated_cells),
                         "option_count": sum(map(len, allowed_options.values())),
+                        "unpruned_option_count": unpruned_option_count,
                         **selection_audit,
                     },
                     ensure_ascii=False,
@@ -1183,7 +1310,7 @@ class JointSearch:
                 ),
                 flush=True,
             )
-            result = _solve_original_endpoint_incidence_cp_sat(
+            result = _solve_pruned_endpoint_incidence_cp_sat(
                 selected_worlds=selected_worlds,
                 pair_count=len(PAIR_POSITIONS),
                 seller_count=28,
@@ -1202,6 +1329,7 @@ class JointSearch:
                     ).encode("ascii")
                 ).hexdigest(),
                 "time_limit_seconds": time_limit_seconds,
+                "unpruned_option_count": unpruned_option_count,
                 **{
                     key: value
                     for key, value in result.items()
@@ -1212,7 +1340,7 @@ class JointSearch:
             print(
                 json.dumps(
                     {
-                        "event": "original_endpoint_residual_solver_complete",
+                        "event": "pruned_endpoint_residual_solver_complete",
                         **batch_receipt,
                     },
                     ensure_ascii=False,
@@ -1225,6 +1353,8 @@ class JointSearch:
                 "FEASIBLE",
                 "INFEASIBLE",
                 "UNKNOWN",
+                "STATIC_INFEASIBLE_SELECTED_SUBSET",
+                "STATIC_EMPTY_PRUNED_OPTION_GROUP",
             }:
                 raise RegisteredNegativeConstructionError(
                     "Original-endpoint solver returned an invalid execution status: "
@@ -1272,7 +1402,7 @@ class JointSearch:
                 "rounds": prior_round_receipts
                 + [
                     {
-                        "repair_mode": "original_endpoint_residual_cp_sat",
+                        "repair_mode": "pruned_endpoint_residual_cp_sat",
                         "before_objective": before_residual_objective,
                         "after_objective": 0,
                         "before_l1_bound_violation": before_residual_l1,
@@ -1293,7 +1423,7 @@ class JointSearch:
         ):
             reason = "full 500-world original-variable model is infeasible"
         else:
-            reason = "original-variable residual diagnosis ended without a solution"
+            reason = "pruned residual diagnosis ended without a solution"
         raise RegisteredNegativeConstructionError(
             f"{reason}: statuses={statuses} selection_audit={selection_audit}"
         )
@@ -2156,7 +2286,7 @@ class JointSearch:
             print(
                 json.dumps(
                     {
-                        "event": "starting_coarse_then_original_endpoint_repair",
+                        "event": "starting_coarse_then_pruned_endpoint_repair",
                         "pre_repair_objective": self.objective,
                         "objective_breakdown": self._objective_breakdown(),
                     },
@@ -2167,7 +2297,7 @@ class JointSearch:
             )
             exact_local_repair = self._exact_local_repair()
             solution_stage = (
-                "coarse_candidate_repair_then_original_endpoint_residual_cp_sat"
+                "coarse_candidate_repair_then_pruned_endpoint_residual_cp_sat"
             )
         if self._full_objective() != 0:
             raise RegisteredNegativeConstructionError(
