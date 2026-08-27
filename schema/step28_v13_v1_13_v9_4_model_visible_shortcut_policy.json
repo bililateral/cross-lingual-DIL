@@ -1,0 +1,130 @@
+{
+  "version": "2026-08-27-step28-v13-v1-13-v9-4-model-visible-shortcut-policy",
+  "status": "FROZEN_IMPLEMENTATION_POLICY_NO_RUN_NO_DATA_NO_TRAINING",
+  "authorization": {
+    "prebuild_shortcut_gate": false,
+    "method_root_build": false,
+    "truth_unsealing": false,
+    "m0_m1_m2_m3": false
+  },
+  "runtime_contract": {
+    "python_implementation": "CPython",
+    "python_version": "3.10.11",
+    "numpy_version": "2.2.6",
+    "scipy_version": "1.15.3",
+    "scikit_learn_version": "1.7.2",
+    "threadpoolctl_version": "3.6.0",
+    "thread_limit": 1
+  },
+  "dataset_contract": {
+    "train_world_count": 500,
+    "development_world_count": 500,
+    "audit_a_world_count": 2,
+    "audit_b_world_count": 2,
+    "seller_count_per_world": 28,
+    "pair_count_per_world": 378,
+    "positive_pair_count_per_world": 20,
+    "negative_pair_count_per_world": 358,
+    "train_registered_residual": [20, 20, 20],
+    "development_registered_residual": [22, 22, 22]
+  },
+  "upstream_contract": {
+    "balanced_schedule_version": "2026-08-27-step28-v13-v1-13-balanced-world-schedule-v9-4",
+    "train_public_design_seed": 281320260825,
+    "development_public_design_seed": 281320260827,
+    "balanced_schedule_maximum_iterations": 12000000,
+    "direct_r2_plan_read": false,
+    "noise_signature_version": "2026-08-27-step28-v13-v1-13-joint-noise-signatures-v9-4",
+    "noise_signature_source_role": "label_free_real_chinese_training_side",
+    "noise_signature_rows_sha256": "9c8a5d27adf0ac4e5f65d241f1e7c83ee80f1c4caa03eae9e7a0b7f0fd74e763",
+    "noise_signature_set_commitment_sha256": "15da977c89f620383f14805566ca54a1901a8323416310344609db8003f0eb39",
+    "time_key_commitment_sha256": null
+  },
+  "matrix_contract": {
+    "view": "model_visible_14",
+    "seller_feature_count": 7,
+    "pair_feature_count": 14,
+    "dtype": "little-endian float64",
+    "row_order": "world_uid_utf8_then_canonical_pair_uid_utf8",
+    "label_join": "exact_world_uid_and_canonical_pair_uid_after_matrix_freeze",
+    "prebuild_source": "truth_free_noise_signature_and_public_world_schedule_only",
+    "time_bucket_derivation": "HMAC-SHA256-first-u64-big-endian-modulo-4",
+    "final_replay": "actual_public_title_description_and_time_index_exact_bytes"
+  },
+  "average_precision_baseline": {
+    "numerator": 20,
+    "denominator": 378
+  },
+  "probe_models": {
+    "logistic_l2": {
+      "preprocessing": "StandardScaler_fit_on_train_only_then_transform_train_and_development",
+      "standard_scaler": {
+        "copy": true,
+        "with_mean": true,
+        "with_std": true
+      },
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": null,
+      "max_iter": 10000,
+      "multi_class": "deprecated",
+      "n_jobs": null,
+      "penalty": "l2",
+      "random_state": 793820367,
+      "solver": "lbfgs",
+      "tol": 1e-10,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "hist_gradient_boosting_depth2": {
+      "class": "sklearn.ensemble.HistGradientBoostingClassifier",
+      "preprocessing": "raw_unstandardized_float64",
+      "categorical_features": "from_dtype",
+      "class_weight": null,
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 1.0,
+      "learning_rate": 0.03,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": 2,
+      "max_features": 1.0,
+      "max_iter": 200,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 793820367,
+      "scoring": "loss",
+      "tol": 1e-7,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "bootstrap": {
+    "generator": "numpy.random.Generator(PCG64)",
+    "replicates": 9999,
+    "development_world_count": 500,
+    "seed": 281320260810,
+    "draws_dtype": "little-endian int64",
+    "draws_shape": [9999, 500],
+    "draws_raw_i8_c_sha256": "111b1338cc607c6bd78bad88efe47606ffa2230e9cc764eec940e84f86e56661",
+    "streaming_batch_size": 16,
+    "quantile": "0.950000000000",
+    "quantile_method": "linear",
+    "refit_within_replicate": false,
+    "family_maximum_within_replicate": true
+  },
+  "gates": {
+    "maximum_single_feature_symmetric_auc": "0.520000000000",
+    "maximum_family_symmetric_auc": "0.530000000000",
+    "maximum_family_average_precision_uplift": "0.010000000000",
+    "bootstrap_95_upper_symmetric_auc": "0.530000000000",
+    "bootstrap_95_upper_average_precision_uplift": "0.015000000000"
+  },
+  "pass_claim": "未检出14项已登记模型可见无关变量超过冻结阈值的捷径"
+}
