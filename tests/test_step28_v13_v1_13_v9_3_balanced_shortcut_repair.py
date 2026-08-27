@@ -33,13 +33,13 @@ JOINT_SIGNATURE = (
     ROOT
     / "reports"
     / "step28_v13_v1_13_balanced_schedule_v9_3"
-    / "joint_noise_signature_preflight_v1_20260825.json"
+    / "joint_noise_signature_preflight_v2_20260826.json"
 )
 NEGATIVE_PREFLIGHT = (
     ROOT
     / "reports"
     / "step28_v13_v1_13_balanced_schedule_v9_3"
-    / "registered_negative_preflight_v11_20260826"
+    / "__successor_registered_negative_plan_unassigned__"
 )
 
 
@@ -164,15 +164,18 @@ class JointNoiseSignatureContracts(unittest.TestCase):
 
     def test_aggregate_preflight_replays_and_has_expected_role_capacity(self) -> None:
         audit = signatures.validate_payload(self.payload)
-        self.assertEqual(audit["seller_count"], 676)
-        self.assertEqual(audit["selected_item_row_count"], 3439)
-        self.assertEqual(audit["observed_signature_count"], 40)
+        self.assertEqual(audit["seller_count"], 648)
+        self.assertEqual(audit["selected_item_row_count"], 3354)
+        self.assertEqual(audit["observed_signature_count"], 33)
         self.assertEqual(audit["noise_slot_count"], 28)
         self.assertEqual(audit["title_eligible_noise_slot_count"], 28)
         self.assertEqual(
-            audit["title_and_description_eligible_noise_slot_count"], 27
+            audit["title_and_description_eligible_noise_slot_count"], 28
         )
-        self.assertEqual(self.payload["raw_item_count_histogram"]["1"], 273)
+        self.assertEqual(self.payload["source_seller_count"], 676)
+        self.assertEqual(self.payload["excluded_seller_count"], 28)
+        self.assertEqual(self.payload["source_selected_item_row_count"], 3439)
+        self.assertEqual(self.payload["excluded_selected_item_row_count"], 85)
 
     def test_integerization_and_forbidden_output_flags_fail_closed(self) -> None:
         for mutation in ("allocation", "forbidden"):
@@ -215,9 +218,9 @@ class JointNoiseSignatureContracts(unittest.TestCase):
         encoded = {signatures._signature_key(row): row for row in rows}
         ordered = sorted(encoded)
         counts = {
-            ordered[0]: 226,
-            ordered[1]: 226,
-            ordered[2]: 224,
+            ordered[0]: 216,
+            ordered[1]: 216,
+            ordered[2]: 216,
         }
         integerized, slots = signatures._largest_remainder(
             signatures.Counter(counts), encoded
@@ -258,8 +261,12 @@ class JointNoiseSignatureContracts(unittest.TestCase):
 
     def test_independent_raw_source_replay_closes_derived_tables(self) -> None:
         audit = signature_replay.replay(self.payload)
-        self.assertEqual(audit["seller_count"], 676)
-        self.assertEqual(audit["selected_item_row_count"], 3439)
+        self.assertEqual(audit["source_seller_count"], 676)
+        self.assertEqual(audit["seller_count"], 648)
+        self.assertEqual(audit["excluded_seller_count"], 28)
+        self.assertEqual(audit["source_selected_item_row_count"], 3439)
+        self.assertEqual(audit["selected_item_row_count"], 3354)
+        self.assertEqual(audit["excluded_selected_item_row_count"], 85)
         self.assertEqual(
             audit["status"],
             "PASS_INDEPENDENT_RAW_SOURCE_REPLAY_ONLY_NOT_METHOD_OR_TRAINING_QUALIFIED",
@@ -304,6 +311,39 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
             )
             accepted += 1
         self.assertGreater(accepted, 100)
+
+    def test_terminal_v17_formal_entry_is_unassigned_and_fails_closed(self) -> None:
+        expected_output = ROOT / negative_constructor.FORMAL_OUTPUT_RELATIVE
+        self.assertEqual(
+            expected_output.name,
+            "__successor_registered_negative_plan_unassigned__",
+        )
+        supplied = {
+            "train_schedule": PREFLIGHT / "train_balanced_schedule.json",
+            "development_schedule": (
+                PREFLIGHT / "development_balanced_schedule.json"
+            ),
+            "joint_signatures": JOINT_SIGNATURE,
+        }
+        for name, path in supplied.items():
+            expected_relative, expected_sha256 = (
+                negative_constructor.FORMAL_INPUT_PINS[name]
+            )
+            self.assertEqual(path.resolve(), (ROOT / expected_relative).resolve())
+            self.assertEqual(
+                negative_constructor.hashlib.sha256(path.read_bytes()).hexdigest(),
+                expected_sha256,
+            )
+        with self.assertRaisesRegex(
+            negative_constructor.RegisteredNegativeConstructionError,
+            "successor is unassigned",
+        ):
+            negative_constructor.validate_formal_invocation(
+                output_directory=expected_output,
+                train_schedule_path=supplied["train_schedule"],
+                development_schedule_path=supplied["development_schedule"],
+                joint_signature_path=supplied["joint_signatures"],
+            )
 
     def test_development_initialization_is_independent_and_valid(self) -> None:
         train_search = negative_constructor.JointSearch(
@@ -400,6 +440,83 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
         self.assertLess(after, before)
         self.assertEqual(after - before, declared_delta)
 
+    def test_same_position_cross_world_swap_preserves_seller_marginals(self) -> None:
+        search = negative_constructor.JointSearch(
+            self.train, self.joint_signatures, split="train"
+        )
+        proposal = None
+        for position in range(12):
+            for first_world in range(40):
+                for second_world in range(first_world + 1, 40):
+                    first = int(search.assignments[first_world, position])
+                    second = int(search.assignments[second_world, position])
+                    if first == second:
+                        continue
+                    proposal = search._change_delta(
+                        [
+                            (first_world, position, second),
+                            (second_world, position, first),
+                        ]
+                    )
+                    if proposal is not None:
+                        break
+                if proposal is not None:
+                    break
+            if proposal is not None:
+                break
+        self.assertIsNotNone(proposal)
+        _objective_delta, changes, _new_rows = proposal
+        self.assertFalse(
+            any(
+                family in {"role_seller", "endpoint_seller"}
+                for family, _index in changes
+            )
+        )
+
+    def test_same_role_within_world_swap_preserves_role_endpoint_marginals(self) -> None:
+        search = negative_constructor.JointSearch(
+            self.train, self.joint_signatures, split="train"
+        )
+        proposal = None
+        for world in range(50):
+            row = search.assignments[world]
+            for first_position in range(12):
+                for second_position in range(first_position + 1, 12):
+                    if (
+                        negative_constructor.ROLE_BY_POSITION[first_position]
+                        != negative_constructor.ROLE_BY_POSITION[second_position]
+                    ):
+                        continue
+                    proposal = search._change_delta(
+                        [
+                            (world, first_position, int(row[second_position])),
+                            (world, second_position, int(row[first_position])),
+                        ]
+                    )
+                    if proposal is not None:
+                        break
+                if proposal is not None:
+                    break
+            if proposal is not None:
+                break
+        self.assertIsNotNone(proposal)
+        _objective_delta, changes, _new_rows = proposal
+        self.assertFalse(
+            any(
+                family
+                in {
+                    "role_seller",
+                    "role_noise",
+                    "endpoint_seller",
+                    "endpoint_noise",
+                    "role_triad",
+                    "role_size_seller",
+                    "role_size_noise",
+                }
+                for family, _index in changes
+            )
+        )
+
     def test_semantic_domain_is_replayed_from_the_pinned_policy(self) -> None:
         audit = negative_plan.replay_semantic_public_domain()
         self.assertEqual(
@@ -440,59 +557,6 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
         self.assertFalse(audit["complete_global_relabel"])
         self.assertGreater(audit["mapping_conflict_count"], 0)
 
-    def test_residual_upper_pruning_is_exact_and_fail_closed(self) -> None:
-        bounds = [(0, 0), (1, 2)]
-        self.assertFalse(
-            negative_constructor._option_respects_residual_uppers({0: 1}, bounds)
-        )
-        self.assertTrue(
-            negative_constructor._option_respects_residual_uppers({1: 1}, bounds)
-        )
-        with self.assertRaises(
-            negative_constructor.RegisteredNegativeConstructionError
-        ):
-            negative_constructor._option_respects_residual_uppers({2: 1}, bounds)
-        self.assertNotIn(
-            500, negative_constructor.RESIDUAL_WORLD_BATCH_TARGETS
-        )
-
-    def test_pruned_endpoint_cp_sat_solves_toy_global_counts(self) -> None:
-        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
-            selected_worlds=(0, 1),
-            pair_count=1,
-            seller_count=3,
-            allowed_options={
-                (0, 0): [(0, 1, {0: 1}), (1, 2, {1: 1})],
-                (1, 0): [(0, 1, {0: 1}), (1, 2, {1: 1})],
-            },
-            residual_bounds=[(1, 1), (1, 1)],
-            preferred_option_indices={(0, 0): 0, (1, 0): 0},
-            random_seed=17,
-            time_limit_seconds=10,
-        )
-        self.assertTrue(result["feasible"])
-        self.assertIn(result["solver_status_name"], {"FEASIBLE", "OPTIMAL"})
-        self.assertEqual(
-            set(result["selected_option_indices"].values()), {0, 1}
-        )
-
-    def test_pruned_endpoint_cp_sat_enforces_twelve_endpoint_analogue(self) -> None:
-        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
-            selected_worlds=(0,),
-            pair_count=2,
-            seller_count=4,
-            allowed_options={
-                (0, 0): [(0, 1, {0: 1})],
-                (0, 1): [(0, 2, {1: 1}), (2, 3, {1: 1})],
-            },
-            residual_bounds=[(1, 1), (1, 1)],
-            preferred_option_indices={(0, 0): 0, (0, 1): 0},
-            random_seed=19,
-            time_limit_seconds=10,
-        )
-        self.assertTrue(result["feasible"])
-        self.assertEqual(result["selected_option_indices"]["0:1"], 1)
-
     def test_option_incidence_exactly_replays_all_global_count_arrays(self) -> None:
         search = negative_constructor.JointSearch(
             self.train, self.joint_signatures, split="train"
@@ -516,116 +580,6 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
                 msg=f"incidence drift for {family}{index}",
             )
 
-    def test_one_world_full_domain_model_reproduces_exact_incidence(self) -> None:
-        search = negative_constructor.JointSearch(
-            self.train, self.joint_signatures, split="train"
-        )
-        cells = search._constraint_cells()
-        self.assertEqual(len(cells), 5324)
-        self.assertEqual(
-            len(negative_constructor.RESIDUAL_WORLD_BATCH_TARGETS),
-            len(negative_constructor.RESIDUAL_WORLD_BATCH_TIME_LIMIT_SECONDS),
-        )
-        cell_index = {
-            (family, index): ordinal
-            for ordinal, (family, index, _lower, _upper) in enumerate(cells)
-        }
-        current_counts = [0] * len(cells)
-        allowed_options = {}
-        preferred = {}
-        row = search.assignments[0]
-        for pair_index, (left_position, right_position) in enumerate(
-            negative_constructor.PAIR_POSITIONS
-        ):
-            current_pair = (int(row[left_position]), int(row[right_position]))
-            options = []
-            for left_seller, right_seller in search._allowed_pair_options(
-                0, pair_index
-            ):
-                if (left_seller, right_seller) == current_pair:
-                    preferred[(0, pair_index)] = len(options)
-                contributions = {
-                    cell_index[key]: count
-                    for key, count in search._option_contributions(
-                        0, pair_index, left_seller, right_seller
-                    ).items()
-                }
-                options.append((left_seller, right_seller, contributions))
-            allowed_options[(0, pair_index)] = options
-            for key, count in search._option_contributions(
-                0, pair_index, *current_pair
-            ).items():
-                current_counts[cell_index[key]] += count
-        result = negative_constructor._solve_pruned_endpoint_incidence_cp_sat(
-            selected_worlds=(0,),
-            pair_count=6,
-            seller_count=28,
-            allowed_options=allowed_options,
-            residual_bounds=[(count, count) for count in current_counts],
-            preferred_option_indices=preferred,
-            random_seed=23,
-            time_limit_seconds=20,
-        )
-        self.assertTrue(result["feasible"])
-        solved_row = [None] * 12
-        for pair_index, (left_position, right_position) in enumerate(
-            negative_constructor.PAIR_POSITIONS
-        ):
-            option_index = result["selected_option_indices"][f"0:{pair_index}"]
-            left_seller, right_seller, _counts = allowed_options[(0, pair_index)][
-                option_index
-            ]
-            solved_row[left_position] = left_seller
-            solved_row[right_position] = right_seller
-        self.assertTrue(search._valid_row(0, solved_row))
-
-    def test_residual_world_selection_is_nested_and_pinned(self) -> None:
-        search = negative_constructor.JointSearch(
-            self.train, self.joint_signatures, split="train"
-        )
-        cells = search._constraint_cells()
-        underfull = next(
-            cell
-            for cell in cells
-            if int(search.arrays[cell[0]][cell[1]]) < cell[2]
-        )
-        overfull = next(
-            cell
-            for cell in cells
-            if int(search.arrays[cell[0]][cell[1]]) > cell[3]
-        )
-        ordered_worlds, audit = search._residual_world_selection_order(
-            [underfull, overfull]
-        )
-        self.assertEqual(len(ordered_worlds), 500)
-        self.assertEqual(len(set(ordered_worlds)), 500)
-        self.assertEqual(audit["minimum_selected_world_count"], 8)
-        self.assertEqual(
-            audit["selection_order_sha256"],
-            "18b3606076378a5b51a095543500aeb56332e22484d4f1bb3849a6af79b581b2",
-        )
-        selected_prefix = set(
-            ordered_worlds[: audit["minimum_selected_world_count"]]
-        )
-        family, index, _lower, upper = overfull
-        self.assertGreater(int(search.arrays[family][index]), upper)
-        contributing_worlds = set()
-        for world, row in enumerate(search.assignments):
-            for pair_index, (left_position, right_position) in enumerate(
-                negative_constructor.PAIR_POSITIONS
-            ):
-                if (family, index) in search._option_contributions(
-                    world,
-                    pair_index,
-                    int(row[left_position]),
-                    int(row[right_position]),
-                ):
-                    contributing_worlds.add(world)
-        self.assertGreaterEqual(len(contributing_worlds & selected_prefix), 4)
-        self.assertLess(
-            len(contributing_worlds & selected_prefix), len(contributing_worlds)
-        )
-
     def test_coarse_milp_candidate_solver_closes_toy_bounds(self) -> None:
         result = negative_constructor._solve_sparse_candidate_milp(
             current_bounds=[(0, 1, 1), (2, 1, 1)],
@@ -636,7 +590,54 @@ class RegisteredNegativeConstructorPrimitiveContracts(unittest.TestCase):
         )
         self.assertTrue(result["feasible"])
         self.assertEqual(result["selected_candidate_indices"], [0, 1])
+        self.assertEqual(result["total_slack"], 0)
 
+    def test_candidate_solver_slack_objective_is_lexicographic(self) -> None:
+        result = negative_constructor._solve_sparse_candidate_milp(
+            current_bounds=[(0, 1, 1)],
+            candidate_cell_changes=[{0: 1}, {}],
+            candidate_worlds=[(0,), (1,)],
+            candidate_costs=[100_000.0, 1.0],
+            time_limit_seconds=10,
+        )
+        self.assertTrue(result["feasible"])
+        self.assertEqual(result["total_slack"], 0)
+        self.assertEqual(result["selected_candidate_indices"], [0])
+    def test_targeted_column_collection_is_full_delta_deduplicated(self) -> None:
+        search = negative_constructor.JointSearch(
+            self.train, self.joint_signatures, split="train"
+        )
+        cells = search._constraint_cells()
+        cell_index = {
+            (family, index): ordinal
+            for ordinal, (family, index, _lower, _upper) in enumerate(cells)
+        }
+        violated = [
+            cell
+            for cell in cells
+            if negative_constructor.JointSearch._cell_violation(
+                int(search.arrays[cell[0]][cell[1]]), cell[2], cell[3]
+            )
+        ]
+        candidates, audit = search._collect_targeted_candidate_columns(
+            target_cells=violated[:2],
+            cells=cells,
+            cell_index=cell_index,
+        )
+        self.assertGreater(audit["enumerated_proposal_count"], 0)
+        self.assertGreater(len(candidates), 0)
+        self.assertEqual(audit["omitted_by_search_budget_count"], 0)
+        equivalence_keys = [
+            search._candidate_equivalence_key(candidate, cell_index)
+            for candidate in candidates
+        ]
+        self.assertEqual(len(equivalence_keys), len(set(equivalence_keys)))
+        for changes, _new_rows, objective_delta, _kind in candidates:
+            self.assertTrue(set(changes).issubset(cell_index))
+            self.assertEqual(
+                objective_delta,
+                search._objective_delta_for_changes(changes),
+            )
 
 @unittest.skipUnless(
     NEGATIVE_PREFLIGHT.is_dir(),

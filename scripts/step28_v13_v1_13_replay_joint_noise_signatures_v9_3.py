@@ -21,8 +21,14 @@ from typing import Any, Mapping
 from openpyxl import load_workbook
 
 
-VERSION = "2026-08-25-step28-v13-v1-13-independent-signature-replay-v9-3"
-PAYLOAD_VERSION = "2026-08-25-step28-v13-v1-13-joint-noise-signatures-v9-3"
+VERSION = (
+    "2026-08-26-step28-v13-v1-13-independent-signature-replay-"
+    "v9-3-training-ready"
+)
+PAYLOAD_VERSION = (
+    "2026-08-26-step28-v13-v1-13-joint-noise-signatures-"
+    "v9-3-training-ready"
+)
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK_PATH = ROOT / "market_item.xlsx"
 WORKBOOK_SHA256 = "3625a226974827a0441ec87c54688f85ed0ff93a1c4c687532ef550ec1640187"
@@ -37,8 +43,14 @@ ALLOWLIST_PATH = (
     / "style_source_train_sellers.csv"
 )
 ALLOWLIST_SHA256 = "b57cbfc3908ae3f36983c7c9e6d4dd974b59222f6617d214cec090524c3eb6de"
-EXPECTED_SELLERS = 676
-EXPECTED_ROWS = 3439
+SOURCE_SELLERS = 676
+SOURCE_ROWS = 3439
+EXPECTED_SELLERS = 648
+EXPECTED_EXCLUDED_SELLERS = 28
+EXPECTED_ROWS = 3354
+EXPECTED_EXCLUDED_ROWS = 85
+MINIMUM_NONEMPTY_TITLE_COUNT = 1
+MINIMUM_NONEMPTY_DESCRIPTION_COUNT = 2
 SLOT_COUNT = 28
 WHITESPACE_RE = re.compile(r"\s+")
 
@@ -84,7 +96,7 @@ def _read_allowlist() -> list[str]:
             raise IndependentReplayError("Allow-list schema drift")
         sellers = [row["seller_uid"].strip() for row in reader]
     if (
-        len(sellers) != EXPECTED_SELLERS
+        len(sellers) != SOURCE_SELLERS
         or sellers != sorted(set(sellers), key=lambda value: value.encode("utf-8"))
     ):
         raise IndependentReplayError("Allow-list order/cardinality drift")
@@ -116,7 +128,7 @@ def _read_manifest(allowed: set[str]) -> dict[int, str]:
             if source_row < 2 or source_row in selected:
                 raise IndependentReplayError("Manifest selected-row drift")
             selected[source_row] = row["seller_uid"]
-    if len(selected) != EXPECTED_ROWS or set(selected.values()) != allowed:
+    if len(selected) != SOURCE_ROWS or set(selected.values()) != allowed:
         raise IndependentReplayError("Manifest coverage/cardinality drift")
     return selected
 
@@ -139,7 +151,7 @@ def _read_presence(selected: Mapping[int, str]) -> dict[str, list[tuple[int, boo
             )
     finally:
         workbook.close()
-    if sum(map(len, observed.values())) != EXPECTED_ROWS:
+    if sum(map(len, observed.values())) != SOURCE_ROWS:
         raise IndependentReplayError("Workbook selected-row count drift")
     return dict(observed)
 
@@ -227,12 +239,30 @@ def replay(payload: Mapping[str, Any]) -> dict[str, Any]:
     counts: Counter[bytes] = Counter()
     signatures: dict[bytes, dict[str, Any]] = {}
     raw_histogram: Counter[int] = Counter()
+    eligible_sellers: list[str] = []
+    excluded_rows = 0
     for seller in sellers:
-        raw_histogram[len(presence[seller])] += 1
         signature = _signature(presence[seller])
+        if (
+            signature["title_present_mask"].count("1")
+            < MINIMUM_NONEMPTY_TITLE_COUNT
+            or signature["description_present_mask"].count("1")
+            < MINIMUM_NONEMPTY_DESCRIPTION_COUNT
+        ):
+            excluded_rows += len(presence[seller])
+            continue
+        eligible_sellers.append(seller)
+        raw_histogram[len(presence[seller])] += 1
         key = canonical_json_bytes(signature)
         signatures.setdefault(key, signature)
         counts[key] += 1
+    if (
+        len(eligible_sellers) != EXPECTED_SELLERS
+        or len(sellers) - len(eligible_sellers) != EXPECTED_EXCLUDED_SELLERS
+        or sum(len(presence[seller]) for seller in eligible_sellers) != EXPECTED_ROWS
+        or excluded_rows != EXPECTED_EXCLUDED_ROWS
+    ):
+        raise IndependentReplayError("Training-ready source filter drift")
     frequency, slots = _integerize(counts, signatures)
     eligibility = []
     for slot, signature in enumerate(slots):
@@ -266,12 +296,29 @@ def replay(payload: Mapping[str, Any]) -> dict[str, Any]:
     for field, value in expected.items():
         if payload.get(field) != value:
             raise IndependentReplayError(f"Raw-source replay drift: {field}")
+    expected_counts = {
+        "source_seller_count": SOURCE_SELLERS,
+        "seller_count": EXPECTED_SELLERS,
+        "excluded_seller_count": EXPECTED_EXCLUDED_SELLERS,
+        "source_selected_item_row_count": SOURCE_ROWS,
+        "selected_item_row_count": EXPECTED_ROWS,
+        "excluded_selected_item_row_count": EXPECTED_EXCLUDED_ROWS,
+    }
+    for field, value in expected_counts.items():
+        if payload.get(field) != value:
+            raise IndependentReplayError(f"Training-ready count drift: {field}")
     return {
         "version": VERSION,
         "payload_canonical_self_sha256": supplied_self,
         "replayed_derived_tables_sha256": canonical_sha256(expected),
-        "seller_count": len(sellers),
-        "selected_item_row_count": len(selected),
+        "source_seller_count": len(sellers),
+        "seller_count": len(eligible_sellers),
+        "excluded_seller_count": len(sellers) - len(eligible_sellers),
+        "source_selected_item_row_count": len(selected),
+        "selected_item_row_count": sum(
+            len(presence[seller]) for seller in eligible_sellers
+        ),
+        "excluded_selected_item_row_count": excluded_rows,
         "status": "PASS_INDEPENDENT_RAW_SOURCE_REPLAY_ONLY_NOT_METHOD_OR_TRAINING_QUALIFIED",
     }
 

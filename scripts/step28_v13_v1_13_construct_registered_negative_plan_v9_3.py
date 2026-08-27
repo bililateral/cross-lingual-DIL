@@ -20,10 +20,40 @@ import step28_v13_v1_13_build_joint_noise_signatures_v9_3 as noise_signatures
 import step28_v13_v1_13_registered_negative_plan_v9_3 as plan_contract
 
 
-VERSION = "2026-08-26-step28-v13-v1-13-construct-registered-negative-plan-v9-3-solver-v9-pruned-residual"
+VERSION = (
+    "2026-08-26-step28-v13-v1-13-construct-registered-negative-plan-"
+    "v9-3-successor-unassigned-stop-guard"
+)
 PUBLIC_DESIGN_SEEDS = {
     "train": 281320260826,
     "development": 281320260828,
+}
+FORMAL_OUTPUT_RELATIVE = Path(
+    "reports/step28_v13_v1_13_balanced_schedule_v9_3/"
+    "__successor_registered_negative_plan_unassigned__"
+)
+FORMAL_INPUT_PINS = {
+    "train_schedule": (
+        Path(
+            "reports/step28_v13_v1_13_balanced_schedule_v9_3/"
+            "design_preflight_v2_20260825/train_balanced_schedule.json"
+        ),
+        "c4a058fb97e351b033d2f4c595985251cf790b1693123bdec01fc64bcc18a4c2",
+    ),
+    "development_schedule": (
+        Path(
+            "reports/step28_v13_v1_13_balanced_schedule_v9_3/"
+            "design_preflight_v2_20260825/development_balanced_schedule.json"
+        ),
+        "d29197a5c052e6a450ea838291f740fbc39e434dd754d2bd3c91dd2bf5ba4087",
+    ),
+    "joint_signatures": (
+        Path(
+            "reports/step28_v13_v1_13_balanced_schedule_v9_3/"
+            "joint_noise_signature_preflight_v2_20260826.json"
+        ),
+        "05caa6a2b19591fdbf042384b1d31dccfde4a3f1096275ec44671f9f4b3c4d37",
+    ),
 }
 ITEM_SELECTOR_VERSION = "2026-08-25-step28-v13-v1-13-item-selector-v9-3"
 SEMANTIC_POLICY_PATH = "schema/step28_v13_synthetic_chinese_dataset_policy.json"
@@ -54,17 +84,13 @@ LOCAL_REPAIR_MAX_PROPOSALS_PER_ROUND = 500_000
 LOCAL_REPAIR_MAX_CANDIDATES_PER_ROUND = 20_000
 LOCAL_REPAIR_MAX_TARGETED_CANDIDATES_PER_CELL = 180
 LOCAL_REPAIR_MAX_COMPENSATING_CANDIDATES_PER_ROUND = 4_000
-LOCAL_REPAIR_COARSE_MILP_THRESHOLD = 20
+LOCAL_REPAIR_COARSE_MILP_THRESHOLD = 22
 LOCAL_REPAIR_COARSE_MILP_MAX_HELPFUL_CANDIDATES = 1_500
 LOCAL_REPAIR_COARSE_MILP_MAX_COMPENSATING_CANDIDATES = 500
 LOCAL_REPAIR_COARSE_MILP_TIME_LIMIT_SECONDS = 300
 LOCAL_REPAIR_COARSE_MILP_SLACK_COST = 10_000.0
 LOCAL_REPAIR_MAX_POSITIVE_DELTA = 4
 LOCAL_REPAIR_TARGETED_MAX_POSITIVE_DELTA = 12
-RESIDUAL_WORLD_BATCH_TARGETS = (24, 48, 72, 96, 128, 192)
-RESIDUAL_WORLD_BATCH_TIME_LIMIT_SECONDS = (300, 450, 600, 900, 1_200, 1_800)
-RESIDUAL_MIN_SUPPORT_WORLDS_PER_UNDERFULL_CELL = 4
-RESIDUAL_MIN_CONTRIBUTOR_WORLDS_PER_OVERFULL_CELL = 4
 ROLE_BY_POSITION = np.asarray(
     [0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3], dtype=np.int8
 )
@@ -81,200 +107,24 @@ ROLE_NAMES = (
     ("high_semantic_similarity", "left"),
     ("high_semantic_similarity", "right"),
 )
+ROLE_ELIGIBILITY_PREDICATE_NAMES = (
+    "clone_source_eligible",
+    "clone_target_eligible",
+    "semantic_left_eligible",
+    "semantic_right_eligible",
+)
 
 
 class RegisteredNegativeConstructionError(RuntimeError):
     """Raised when the abstract joint construction cannot be published."""
 
 
-def _option_respects_residual_uppers(
-    contributions: Mapping[int, int],
-    residual_bounds: list[tuple[int, int]],
-) -> bool:
-    """Safely reject an option that alone exceeds a residual upper bound."""
-
-    for cell_ordinal, contribution in contributions.items():
-        if (
-            type(cell_ordinal) is not int
-            or not 0 <= cell_ordinal < len(residual_bounds)
-            or type(contribution) is not int
-            or contribution <= 0
-        ):
-            raise RegisteredNegativeConstructionError(
-                "Residual option contribution is malformed"
-            )
-        if contribution > residual_bounds[cell_ordinal][1]:
-            return False
-    return True
-
-
-def _solve_pruned_endpoint_incidence_cp_sat(
-    *,
-    selected_worlds: tuple[int, ...],
-    pair_count: int,
-    seller_count: int,
-    allowed_options: Mapping[
-        tuple[int, int], list[tuple[int, int, dict[int, int]]]
-    ],
-    residual_bounds: list[tuple[int, int]],
-    preferred_option_indices: Mapping[tuple[int, int], int],
-    random_seed: int,
-    time_limit_seconds: int,
-    progress_label: str | None = None,
-) -> dict[str, Any]:
-    """Solve a safely pruned residual neighborhood over endpoint-pair choices."""
-    import ortools
-    from ortools.sat.python import cp_model
-
-    if (
-        not selected_worlds
-        or len(selected_worlds) != len(set(selected_worlds))
-        or pair_count <= 0
-        or seller_count <= 1
-        or not residual_bounds
-    ):
-        raise RegisteredNegativeConstructionError(
-            "Original-endpoint CP-SAT input drift"
-        )
-    expected_groups = {
-        (world, pair_index)
-        for world in selected_worlds
-        for pair_index in range(pair_count)
-    }
-    if set(allowed_options) != expected_groups:
-        raise RegisteredNegativeConstructionError(
-            "Original-endpoint CP-SAT group set drift"
-        )
-    if not set(preferred_option_indices).issubset(expected_groups):
-        raise RegisteredNegativeConstructionError(
-            "Original-endpoint CP-SAT preferred-option group drift"
-        )
-
-    model = cp_model.CpModel()
-    by_cell: list[list[tuple[Any, int]]] = [[] for _cell in residual_bounds]
-    by_world_seller: defaultdict[tuple[int, int], list[Any]] = defaultdict(list)
-    variables_by_group: dict[tuple[int, int], list[Any]] = {}
-    option_variable_count = 0
-    sorted_groups = sorted(expected_groups)
-    for group_ordinal, group in enumerate(sorted_groups, start=1):
-        world, pair_index = group
-        options = allowed_options[group]
-        if not options:
-            raise RegisteredNegativeConstructionError(
-                "Original-endpoint CP-SAT found an empty option group"
-            )
-        seen_pairs: set[tuple[int, int]] = set()
-        variables: list[Any] = []
-        for option_index, (left, right, contributions) in enumerate(options):
-            if (
-                not 0 <= left < seller_count
-                or not 0 <= right < seller_count
-                or left == right
-                or (left, right) in seen_pairs
-            ):
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint CP-SAT option drift"
-                )
-            seen_pairs.add((left, right))
-            variable = model.new_bool_var(
-                f"w{world}_p{pair_index}_o{option_index}"
-            )
-            variables.append(variable)
-            by_world_seller[(world, left)].append(variable)
-            by_world_seller[(world, right)].append(variable)
-            for cell_index, coefficient in contributions.items():
-                if not 0 <= cell_index < len(residual_bounds) or coefficient <= 0:
-                    raise RegisteredNegativeConstructionError(
-                        "Original-endpoint CP-SAT contribution drift"
-                    )
-                by_cell[cell_index].append((variable, int(coefficient)))
-            option_variable_count += 1
-        model.add_exactly_one(variables)
-        variables_by_group[group] = variables
-        if group in preferred_option_indices:
-            preferred = int(preferred_option_indices[group])
-            if not 0 <= preferred < len(variables):
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint CP-SAT preferred option drift"
-                )
-            model.add_hint(variables[preferred], 1)
-        if progress_label and group_ordinal % max(1, pair_count * 8) == 0:
-            print(
-                json.dumps(
-                    {
-                        "event": "pruned_endpoint_model_build_progress",
-                        "progress_label": progress_label,
-                        "completed_pair_groups": group_ordinal,
-                        "total_pair_groups": len(sorted_groups),
-                        "option_variable_count": option_variable_count,
-                    },
-                    ensure_ascii=False,
-                    sort_keys=True,
-                ),
-                flush=True,
-            )
-
-    for variables in by_world_seller.values():
-        model.add_at_most_one(variables)
-    for cell_index, (lower, upper) in enumerate(residual_bounds):
-        if lower > upper:
-            raise RegisteredNegativeConstructionError(
-                "Original-endpoint residual bound inversion"
-            )
-        expression = sum(
-            coefficient * variable for variable, coefficient in by_cell[cell_index]
-        )
-        model.add(expression >= int(lower))
-        model.add(expression <= int(upper))
-
-    solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = float(time_limit_seconds)
-    solver.parameters.num_search_workers = 1
-    solver.parameters.random_seed = int(random_seed % 2_147_483_647)
-    solver.parameters.cp_model_presolve = True
-    solver.parameters.stop_after_first_solution = True
-    if progress_label:
-        print(
-            json.dumps(
-                {
-                    "event": "pruned_endpoint_model_ready",
-                    "progress_label": progress_label,
-                    "option_variable_count": option_variable_count,
-                    "residual_cell_count": len(residual_bounds),
-                },
-                ensure_ascii=False,
-                sort_keys=True,
-            ),
-            flush=True,
-        )
-    status = solver.solve(model)
-    status_name = solver.status_name(status)
-    feasible = status in (cp_model.FEASIBLE, cp_model.OPTIMAL)
-    selected_option_indices: dict[str, int] = {}
-    if feasible:
-        for group in sorted(expected_groups):
-            values = [
-                index
-                for index, variable in enumerate(variables_by_group[group])
-                if solver.boolean_value(variable)
-            ]
-            if len(values) != 1:
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint CP-SAT solution is not one-hot"
-                )
-            selected_option_indices[f"{group[0]}:{group[1]}"] = values[0]
-    return {
-        "feasible": feasible,
-        "selected_option_indices": selected_option_indices,
-        "solver_status": int(status),
-        "solver_status_name": status_name,
-        "solver_wall_time_seconds": float(solver.wall_time),
-        "solver_conflict_count": int(solver.num_conflicts),
-        "solver_branch_count": int(solver.num_branches),
-        "option_variable_count": option_variable_count,
-        "residual_cell_count": len(residual_bounds),
-        "ortools_version": ortools.__version__,
-    }
+RepairCandidate = tuple[
+    dict[tuple[str, tuple[int, ...]], int],
+    dict[int, np.ndarray],
+    int,
+    str,
+]
 
 
 def _solve_sparse_candidate_milp(
@@ -284,8 +134,9 @@ def _solve_sparse_candidate_milp(
     candidate_worlds: list[tuple[int, ...]],
     candidate_costs: list[float],
     time_limit_seconds: int,
+    slack_unit_cost_override: float | None = None,
 ) -> dict[str, Any]:
-    """Coarsely minimize total slack over a deterministic reduced candidate pool."""
+    """Lexicographically minimize total slack then deterministic move cost."""
     from scipy.optimize import Bounds, LinearConstraint, milp
     from scipy.sparse import coo_matrix
 
@@ -347,7 +198,32 @@ def _solve_sparse_candidate_milp(
     ).tocsc()
     costs = np.empty(variable_count, dtype=np.float64)
     costs[:candidate_count] = np.asarray(candidate_costs, dtype=np.float64)
-    costs[candidate_count:] = LOCAL_REPAIR_COARSE_MILP_SLACK_COST
+    if np.any(costs[:candidate_count] <= 0.0) or not np.all(
+        np.isfinite(costs[:candidate_count])
+    ):
+        raise RegisteredNegativeConstructionError(
+            "MILP candidate costs must be finite and strictly positive"
+        )
+    if slack_unit_cost_override is not None:
+        if (
+            not math.isfinite(float(slack_unit_cost_override))
+            or float(slack_unit_cost_override) <= 0.0
+        ):
+            raise RegisteredNegativeConstructionError(
+                "MILP slack cost override must be finite and positive"
+            )
+        slack_cost = float(slack_unit_cost_override)
+    else:
+        # World mutual exclusion allows at most 500 selected columns. One
+        # extra slack unit therefore dominates the largest possible secondary
+        # move cost without scaling by every unselected column in the pool.
+        maximum_secondary_cost = sum(
+            sorted(map(float, costs[:candidate_count]), reverse=True)[
+                : balanced.WORLD_COUNT
+            ]
+        )
+        slack_cost = float(maximum_secondary_cost + 1.0)
+    costs[candidate_count:] = slack_cost
     lower_variable_bounds = np.zeros(variable_count, dtype=np.float64)
     upper_variable_bounds = np.full(variable_count, np.inf, dtype=np.float64)
     upper_variable_bounds[:candidate_count] = 1.0
@@ -365,17 +241,46 @@ def _solve_sparse_candidate_milp(
         },
     )
     feasible = result.x is not None
+    if feasible and any(
+        not math.isclose(
+            float(value),
+            float(round(float(value))),
+            rel_tol=0.0,
+            abs_tol=1e-7,
+        )
+        for value in result.x[:candidate_count]
+    ):
+        raise RegisteredNegativeConstructionError(
+            "MILP returned a nonintegral candidate incumbent"
+        )
+    selected_candidate_indices = (
+        [
+            index
+            for index, value in enumerate(result.x[:candidate_count])
+            if float(value) > 0.5
+        ]
+        if feasible
+        else []
+    )
+    total_slack = (
+        None
+        if not feasible
+        else int(round(float(np.sum(result.x[candidate_count:]))))
+    )
+    if feasible and not math.isclose(
+        float(np.sum(result.x[candidate_count:])),
+        float(total_slack),
+        rel_tol=0.0,
+        abs_tol=1e-7,
+    ):
+        raise RegisteredNegativeConstructionError(
+            "MILP returned nonintegral residual slack"
+        )
     return {
         "feasible": feasible,
-        "selected_candidate_indices": (
-            [
-                index
-                for index, value in enumerate(result.x[:candidate_count])
-                if float(value) > 0.5
-            ]
-            if feasible
-            else []
-        ),
+        "selected_candidate_indices": selected_candidate_indices,
+        "total_slack": total_slack,
+        "slack_cost": slack_cost,
         "solver_status": int(result.status),
         "solver_status_name": str(result.message),
         "solver_objective": None if result.fun is None else float(result.fun),
@@ -385,7 +290,6 @@ def _solve_sparse_candidate_milp(
         "solver_branch_count": None,
         "scipy_version": __import__("scipy").__version__,
     }
-
 
 def _penalty(value: int, lower: int, upper: int) -> int:
     if value < lower:
@@ -431,6 +335,25 @@ def _eligible_logical_item_ordinals(
         if signature["description_present_mask"][index] == "1"
     ]
     return title_and_description or title_eligible
+
+
+def _role_eligible_logical_item_ordinals(
+    *,
+    treatment: str,
+    role: str,
+    signature: Mapping[str, Any],
+) -> list[int]:
+    """Return the endpoint-role-specific logical-item eligibility authority."""
+
+    role_key = (treatment, role)
+    if role_key not in ROLE_NAMES:
+        raise RegisteredNegativeConstructionError(
+            f"Unknown registered-negative endpoint role: {role_key}"
+        )
+    return _eligible_logical_item_ordinals(
+        treatment=treatment,
+        signature=signature,
+    )
 
 
 def _logical_item_cycle_start(
@@ -603,18 +526,6 @@ class JointSearch:
             int(row["noise_slot"]): row["signature"]
             for row in joint_signatures["noise_slot_multiset"]
         }
-        self.title_eligible = np.asarray(
-            [
-                bool(
-                    _eligible_logical_item_ordinals(
-                        treatment="high_semantic_similarity",
-                        signature=self.noise_slot_signatures[noise_slot],
-                    )
-                )
-                for noise_slot in range(28)
-            ],
-            dtype=np.bool_,
-        )
         self.clone_description_capable = np.asarray(
             [
                 any(
@@ -628,6 +539,24 @@ class JointSearch:
             ],
             dtype=np.bool_,
         )
+        self.role_eligible = np.zeros(
+            (balanced.WORLD_COUNT, len(ROLE_BY_POSITION), 28),
+            dtype=np.bool_,
+        )
+        for world in range(balanced.WORLD_COUNT):
+            for position in range(12):
+                role_index = int(ROLE_BY_POSITION[position])
+                treatment, role = ROLE_NAMES[role_index]
+                for seller_slot in range(28):
+                    noise_slot = int(self.noise[world, seller_slot])
+                    signature = self.noise_slot_signatures[noise_slot]
+                    self.role_eligible[world, position, seller_slot] = bool(
+                        _role_eligible_logical_item_ordinals(
+                            treatment=treatment,
+                            role=role,
+                            signature=signature,
+                        )
+                    )
         self.assignments = np.zeros((balanced.WORLD_COUNT, 12), dtype=np.int8)
         for world in range(balanced.WORLD_COUNT):
             while True:
@@ -899,535 +828,6 @@ class JointSearch:
             add("role_size_noise", (role, noise, size_index))
         return dict(contributions)
 
-    def _allowed_pair_options(
-        self, world: int, pair_index: int
-    ) -> list[tuple[int, int]]:
-        """Enumerate the full legal ordered seller domain for one registered pair."""
-
-        options: list[tuple[int, int]] = []
-        for left_seller in range(28):
-            left_noise = int(self.noise[world, left_seller])
-            if not self.title_eligible[left_noise]:
-                continue
-            for right_seller in range(28):
-                if left_seller == right_seller:
-                    continue
-                right_noise = int(self.noise[world, right_seller])
-                if (
-                    not self.title_eligible[right_noise]
-                    or self.controllers[world, left_seller]
-                    == self.controllers[world, right_seller]
-                ):
-                    continue
-                if pair_index < 2 and not (
-                    self.clone_description_capable[left_noise]
-                    or self.clone_description_capable[right_noise]
-                ):
-                    continue
-                options.append((left_seller, right_seller))
-        if not options:
-            raise RegisteredNegativeConstructionError(
-                "Original-endpoint residual domain is empty"
-            )
-        return options
-
-    def _residual_world_selection_order(
-        self,
-        violated_cells: list[tuple[str, tuple[int, ...], int, int]],
-    ) -> tuple[list[int], dict[str, Any]]:
-        """Freeze a nested, result-blind order of worlds for residual diagnosis."""
-
-        overfull: dict[tuple[str, tuple[int, ...]], int] = {}
-        underfull: dict[tuple[str, tuple[int, ...]], int] = {}
-        for family, index, lower, upper in violated_cells:
-            current = int(self.arrays[family][index])
-            key = (family, index)
-            if current > upper:
-                overfull[key] = current - upper
-            if current < lower:
-                underfull[key] = lower - current
-        overfull_keys = set(overfull)
-        underfull_keys = set(underfull)
-
-        possible_underfull_by_world: list[set[tuple[str, tuple[int, ...]]]] = [
-            set() for _world in range(balanced.WORLD_COUNT)
-        ]
-        contributor_worlds: dict[
-            tuple[str, tuple[int, ...]], list[int]
-        ] = {key: [] for key in overfull}
-        support_worlds: dict[
-            tuple[str, tuple[int, ...]], list[int]
-        ] = {key: [] for key in underfull}
-        for world in range(balanced.WORLD_COUNT):
-            current_keys: set[tuple[str, tuple[int, ...]]] = set()
-            for pair_index, (left_position, right_position) in enumerate(
-                PAIR_POSITIONS
-            ):
-                current_keys.update(
-                    self._option_contributions(
-                        world,
-                        pair_index,
-                        int(self.assignments[world, left_position]),
-                        int(self.assignments[world, right_position]),
-                    )
-                )
-            for key in current_keys & overfull_keys:
-                contributor_worlds[key].append(world)
-
-            possible = possible_underfull_by_world[world]
-            for pair_index in range(len(PAIR_POSITIONS)):
-                for left_seller, right_seller in self._allowed_pair_options(
-                    world, pair_index
-                ):
-                    possible.update(
-                        set(
-                            self._option_contributions(
-                                world, pair_index, left_seller, right_seller
-                            )
-                        )
-                        & underfull_keys
-                    )
-                    if len(possible) == len(underfull):
-                        break
-                if len(possible) == len(underfull):
-                    break
-            for key in possible:
-                support_worlds[key].append(world)
-
-        violation_key_bytes = json.dumps(
-            [
-                [family, list(index), int(self.arrays[family][index]), lower, upper]
-                for family, index, lower, upper in violated_cells
-            ],
-            ensure_ascii=False,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        violation_sha256 = hashlib.sha256(violation_key_bytes).hexdigest()
-
-        def ranked_worlds(
-            key: tuple[str, tuple[int, ...]], worlds: list[int], *, purpose: str
-        ) -> list[int]:
-            family, index = key
-            return sorted(
-                worlds,
-                key=lambda world: (
-                    -len(possible_underfull_by_world[world]),
-                    hashlib.sha256(
-                        json.dumps(
-                            [
-                                self.split,
-                                self.public_design_seed,
-                                violation_sha256,
-                                family,
-                                list(index),
-                                purpose,
-                                world,
-                            ],
-                            ensure_ascii=False,
-                            separators=(",", ":"),
-                        ).encode("utf-8")
-                    ).digest(),
-                    world,
-                ),
-            )
-
-        base_worlds: set[int] = set()
-        contributor_counts: dict[str, int] = {}
-        for key in sorted(overfull):
-            worlds = contributor_worlds[key]
-            required = max(
-                RESIDUAL_MIN_CONTRIBUTOR_WORLDS_PER_OVERFULL_CELL,
-                2 * int(overfull[key]),
-            )
-            if len(worlds) < required:
-                raise RegisteredNegativeConstructionError(
-                    "Insufficient current contributors for an overfull residual cell: "
-                    f"{key}"
-                )
-            selected_contributors = ranked_worlds(
-                key, worlds, purpose="overfull-contributor"
-            )[:required]
-            base_worlds.update(selected_contributors)
-            contributor_counts[f"{key[0]}:{','.join(map(str, key[1]))}"] = len(
-                selected_contributors
-            )
-
-        support_counts: dict[str, int] = {}
-        for key in sorted(underfull):
-            worlds = support_worlds[key]
-            if not worlds:
-                raise RegisteredNegativeConstructionError(
-                    "No world can contribute to an underfull residual cell: "
-                    f"{key}"
-                )
-            required = max(
-                RESIDUAL_MIN_SUPPORT_WORLDS_PER_UNDERFULL_CELL,
-                2 * int(underfull[key]),
-            )
-            selected_support = ranked_worlds(
-                key, worlds, purpose="underfull-support"
-            )[:required]
-            base_worlds.update(selected_support)
-            support_counts[f"{key[0]}:{','.join(map(str, key[1]))}"] = len(
-                selected_support
-            )
-
-        remaining = [
-            world
-            for world in range(balanced.WORLD_COUNT)
-            if world not in base_worlds
-        ]
-        remaining.sort(
-            key=lambda world: (
-                -len(possible_underfull_by_world[world]),
-                hashlib.sha256(
-                    json.dumps(
-                        [
-                            self.split,
-                            self.public_design_seed,
-                            violation_sha256,
-                            "residual-world",
-                            world,
-                        ],
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ).encode("utf-8")
-                ).digest(),
-                world,
-            )
-        )
-        ordered_worlds = sorted(base_worlds) + remaining
-        if len(ordered_worlds) != balanced.WORLD_COUNT or len(
-            set(ordered_worlds)
-        ) != balanced.WORLD_COUNT:
-            raise RegisteredNegativeConstructionError(
-                "Residual world order is not a complete permutation"
-            )
-        return ordered_worlds, {
-            "violation_sha256": violation_sha256,
-            "selected_overfull_contributor_world_count": sum(
-                contributor_counts.values()
-            ),
-            "overfull_contributor_world_counts": dict(
-                sorted(contributor_counts.items())
-            ),
-            "minimum_selected_world_count": len(base_worlds),
-            "support_world_counts": dict(sorted(support_counts.items())),
-            "selection_order_sha256": hashlib.sha256(
-                json.dumps(ordered_worlds, separators=(",", ":")).encode("ascii")
-            ).hexdigest(),
-        }
-
-    def _exact_original_residual_repair(
-        self,
-        *,
-        violated_cells: list[tuple[str, tuple[int, ...], int, int]],
-        prior_round_receipts: list[dict[str, Any]],
-    ) -> dict[str, Any]:
-        """Solve the remaining contract over endpoint variables, not move columns."""
-
-        cells = self._constraint_cells()
-        before_residual_objective = self.objective
-        before_residual_l1 = sum(
-            max(lower - int(self.arrays[family][index]), 0)
-            + max(int(self.arrays[family][index]) - upper, 0)
-            for family, index, lower, upper in cells
-        )
-        cell_index = {
-            (family, index): ordinal
-            for ordinal, (family, index, _lower, _upper) in enumerate(cells)
-        }
-        ordered_worlds, selection_audit = self._residual_world_selection_order(
-            violated_cells
-        )
-        minimum_worlds = int(selection_audit["minimum_selected_world_count"])
-        batch_receipts: list[dict[str, Any]] = []
-        attempted_counts: set[int] = set()
-
-        for target_count, time_limit_seconds in zip(
-            RESIDUAL_WORLD_BATCH_TARGETS,
-            RESIDUAL_WORLD_BATCH_TIME_LIMIT_SECONDS,
-        ):
-            selected_count = min(
-                balanced.WORLD_COUNT, max(int(target_count), minimum_worlds)
-            )
-            if selected_count in attempted_counts:
-                continue
-            attempted_counts.add(selected_count)
-            selected_worlds = tuple(ordered_worlds[:selected_count])
-            selected_current_counts = [0] * len(cells)
-            for world in selected_worlds:
-                row = self.assignments[world]
-                for pair_index, (left_position, right_position) in enumerate(
-                    PAIR_POSITIONS
-                ):
-                    for key, contribution in self._option_contributions(
-                        world,
-                        pair_index,
-                        int(row[left_position]),
-                        int(row[right_position]),
-                    ).items():
-                        selected_current_counts[cell_index[key]] += contribution
-
-            residual_bounds: list[tuple[int, int]] = []
-            for ordinal, (family, index, lower, upper) in enumerate(cells):
-                outside = (
-                    int(self.arrays[family][index])
-                    - selected_current_counts[ordinal]
-                )
-                if outside < 0:
-                    raise RegisteredNegativeConstructionError(
-                        "Selected-world contribution exceeds the audited global count"
-                    )
-                residual_bounds.append((lower - outside, upper - outside))
-
-            if any(upper < 0 for _lower, upper in residual_bounds):
-                batch_receipt = {
-                    "selected_world_count": selected_count,
-                    "selected_worlds_sha256": hashlib.sha256(
-                        json.dumps(
-                            selected_worlds, separators=(",", ":")
-                        ).encode("ascii")
-                    ).hexdigest(),
-                    "time_limit_seconds": time_limit_seconds,
-                    "feasible": False,
-                    "solver_status": -1,
-                    "solver_status_name": "STATIC_INFEASIBLE_SELECTED_SUBSET",
-                    "solver_wall_time_seconds": 0.0,
-                    "solver_conflict_count": 0,
-                    "solver_branch_count": 0,
-                    "option_variable_count": 0,
-                    "unpruned_option_count": 0,
-                    "residual_cell_count": len(cells),
-                    "ortools_version": __import__("ortools").__version__,
-                }
-                batch_receipts.append(batch_receipt)
-                print(
-                    json.dumps(
-                        {
-                            "event": "pruned_endpoint_residual_solver_complete",
-                            **batch_receipt,
-                        },
-                        ensure_ascii=False,
-                        sort_keys=True,
-                    ),
-                    flush=True,
-                )
-                continue
-
-            allowed_options: dict[
-                tuple[int, int], list[tuple[int, int, dict[int, int]]]
-            ] = {}
-            preferred_option_indices: dict[tuple[int, int], int] = {}
-            unpruned_option_count = 0
-            empty_group: tuple[int, int] | None = None
-            for world in selected_worlds:
-                row = self.assignments[world]
-                for pair_index, (left_position, right_position) in enumerate(
-                    PAIR_POSITIONS
-                ):
-                    options: list[tuple[int, int, dict[int, int]]] = []
-                    current_pair = (
-                        int(row[left_position]),
-                        int(row[right_position]),
-                    )
-                    for left_seller, right_seller in self._allowed_pair_options(
-                        world, pair_index
-                    ):
-                        unpruned_option_count += 1
-                        contributions = {
-                            cell_index[key]: contribution
-                            for key, contribution in self._option_contributions(
-                                world,
-                                pair_index,
-                                left_seller,
-                                right_seller,
-                            ).items()
-                        }
-                        if not _option_respects_residual_uppers(
-                            contributions, residual_bounds
-                        ):
-                            continue
-                        if (left_seller, right_seller) == current_pair:
-                            preferred_option_indices[(world, pair_index)] = len(options)
-                        options.append((left_seller, right_seller, contributions))
-                    if not options:
-                        empty_group = (world, pair_index)
-                        break
-                    allowed_options[(world, pair_index)] = options
-                if empty_group is not None:
-                    break
-
-            if empty_group is not None:
-                batch_receipt = {
-                    "selected_world_count": selected_count,
-                    "selected_worlds_sha256": hashlib.sha256(
-                        json.dumps(
-                            selected_worlds, separators=(",", ":")
-                        ).encode("ascii")
-                    ).hexdigest(),
-                    "time_limit_seconds": time_limit_seconds,
-                    "feasible": False,
-                    "solver_status": -2,
-                    "solver_status_name": "STATIC_EMPTY_PRUNED_OPTION_GROUP",
-                    "solver_wall_time_seconds": 0.0,
-                    "solver_conflict_count": 0,
-                    "solver_branch_count": 0,
-                    "option_variable_count": sum(map(len, allowed_options.values())),
-                    "unpruned_option_count": unpruned_option_count,
-                    "residual_cell_count": len(cells),
-                    "ortools_version": __import__("ortools").__version__,
-                    "empty_group": list(empty_group),
-                }
-                batch_receipts.append(batch_receipt)
-                print(
-                    json.dumps(
-                        {
-                            "event": "pruned_endpoint_residual_solver_complete",
-                            **batch_receipt,
-                        },
-                        ensure_ascii=False,
-                        sort_keys=True,
-                    ),
-                    flush=True,
-                )
-                continue
-
-            print(
-                json.dumps(
-                    {
-                        "event": "pruned_endpoint_residual_solver_start",
-                        "selected_world_count": selected_count,
-                        "time_limit_seconds": time_limit_seconds,
-                        "before_objective": self.objective,
-                        "violated_cell_count": len(violated_cells),
-                        "option_count": sum(map(len, allowed_options.values())),
-                        "unpruned_option_count": unpruned_option_count,
-                        **selection_audit,
-                    },
-                    ensure_ascii=False,
-                    sort_keys=True,
-                ),
-                flush=True,
-            )
-            result = _solve_pruned_endpoint_incidence_cp_sat(
-                selected_worlds=selected_worlds,
-                pair_count=len(PAIR_POSITIONS),
-                seller_count=28,
-                allowed_options=allowed_options,
-                residual_bounds=residual_bounds,
-                preferred_option_indices=preferred_option_indices,
-                random_seed=self.public_design_seed + selected_count,
-                time_limit_seconds=time_limit_seconds,
-                progress_label=f"{self.split}:{selected_count}",
-            )
-            batch_receipt = {
-                "selected_world_count": selected_count,
-                "selected_worlds_sha256": hashlib.sha256(
-                    json.dumps(
-                        selected_worlds, separators=(",", ":")
-                    ).encode("ascii")
-                ).hexdigest(),
-                "time_limit_seconds": time_limit_seconds,
-                "unpruned_option_count": unpruned_option_count,
-                **{
-                    key: value
-                    for key, value in result.items()
-                    if key != "selected_option_indices"
-                },
-            }
-            batch_receipts.append(batch_receipt)
-            print(
-                json.dumps(
-                    {
-                        "event": "pruned_endpoint_residual_solver_complete",
-                        **batch_receipt,
-                    },
-                    ensure_ascii=False,
-                    sort_keys=True,
-                ),
-                flush=True,
-            )
-            if result["solver_status_name"] not in {
-                "OPTIMAL",
-                "FEASIBLE",
-                "INFEASIBLE",
-                "UNKNOWN",
-                "STATIC_INFEASIBLE_SELECTED_SUBSET",
-                "STATIC_EMPTY_PRUNED_OPTION_GROUP",
-            }:
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint solver returned an invalid execution status: "
-                    f"{result['solver_status_name']}"
-                )
-            if not result["feasible"]:
-                continue
-
-            new_rows: dict[int, np.ndarray] = {
-                world: np.empty(12, dtype=np.int8) for world in selected_worlds
-            }
-            for world in selected_worlds:
-                for pair_index, (left_position, right_position) in enumerate(
-                    PAIR_POSITIONS
-                ):
-                    option_index = result["selected_option_indices"][
-                        f"{world}:{pair_index}"
-                    ]
-                    left_seller, right_seller, _contributions = allowed_options[
-                        (world, pair_index)
-                    ][option_index]
-                    new_rows[world][left_position] = left_seller
-                    new_rows[world][right_position] = right_seller
-            if any(
-                not self._valid_row(world, row) for world, row in new_rows.items()
-            ):
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint solver returned an invalid world row"
-                )
-            for world, row in new_rows.items():
-                self.assignments[world] = row
-            for array in self.arrays.values():
-                array.fill(0)
-            for world, row in enumerate(self.assignments):
-                self._accumulate_world(world, row, 1)
-            self.objective = self._full_objective()
-            if self.objective != 0:
-                raise RegisteredNegativeConstructionError(
-                    "Original-endpoint feasible solution failed independent zero-"
-                    f"violation rebuild: objective={self.objective}"
-                )
-            return {
-                "attempted": True,
-                "round_count": len(prior_round_receipts) + 1,
-                "rounds": prior_round_receipts
-                + [
-                    {
-                        "repair_mode": "pruned_endpoint_residual_cp_sat",
-                        "before_objective": before_residual_objective,
-                        "after_objective": 0,
-                        "before_l1_bound_violation": before_residual_l1,
-                        "after_l1_bound_violation": 0,
-                        "selection_audit": selection_audit,
-                        "batches": batch_receipts,
-                    }
-                ],
-                "final_l1_bound_violation": 0,
-                "final_objective": 0,
-            }
-
-        statuses = [batch["solver_status_name"] for batch in batch_receipts]
-        if (
-            batch_receipts
-            and batch_receipts[-1]["selected_world_count"] == balanced.WORLD_COUNT
-            and batch_receipts[-1]["solver_status_name"] == "INFEASIBLE"
-        ):
-            reason = "full 500-world original-variable model is infeasible"
-        else:
-            reason = "pruned residual diagnosis ended without a solution"
-        raise RegisteredNegativeConstructionError(
-            f"{reason}: statuses={statuses} selection_audit={selection_audit}"
-        )
-
     @staticmethod
     def _row_replacements_for_targets(
         world: int, row: np.ndarray, targets: Mapping[int, int]
@@ -1621,8 +1021,192 @@ class JointSearch:
                         if replacements:
                             yield source_key, "targeted_marginal", replacements
 
-    def _exact_local_repair(self) -> dict[str, Any]:
-        """Iteratively reduce slack with greedy moves and deterministic CP-SAT."""
+    @staticmethod
+    def _cell_violation(value: int, lower: int, upper: int) -> int:
+        return max(lower - value, 0) + max(value - upper, 0)
+
+    def _l1_bound_violation(
+        self, cells: list[tuple[str, tuple[int, ...], int, int]]
+    ) -> int:
+        return sum(
+            self._cell_violation(
+                int(self.arrays[family][index]), lower, upper
+            )
+            for family, index, lower, upper in cells
+        )
+
+    def _l1_delta_for_changes(
+        self,
+        changes: Mapping[tuple[str, tuple[int, ...]], int],
+        cell_bounds: Mapping[tuple[str, tuple[int, ...]], tuple[int, int]],
+    ) -> int:
+        delta = 0
+        for key, count_delta in changes.items():
+            lower, upper = cell_bounds[key]
+            family, index = key
+            current = int(self.arrays[family][index])
+            delta += self._cell_violation(
+                current + int(count_delta), lower, upper
+            ) - self._cell_violation(current, lower, upper)
+        return int(delta)
+
+    def _objective_delta_for_changes(
+        self,
+        changes: Mapping[tuple[str, tuple[int, ...]], int],
+    ) -> int:
+        delta = 0
+        for (family, index), count_delta in changes.items():
+            current = int(self.arrays[family][index])
+            lower, upper = self._bounds(family, index)
+            delta += _penalty(
+                current + int(count_delta), lower, upper
+            ) - _penalty(current, lower, upper)
+        return int(delta)
+
+    def _rebuild_all_counts(self) -> None:
+        for array in self.arrays.values():
+            array.fill(0)
+        for world, row in enumerate(self.assignments):
+            self._accumulate_world(world, row, 1)
+        self.objective = self._full_objective()
+
+    @staticmethod
+    def _candidate_equivalence_key(
+        candidate: RepairCandidate,
+        cell_index: Mapping[tuple[str, tuple[int, ...]], int],
+    ) -> tuple[Any, ...]:
+        changes, new_rows, _objective_delta, _kind = candidate
+        return (
+            tuple(sorted(new_rows)),
+            tuple(
+                sorted(
+                    (cell_index[key], int(value))
+                    for key, value in changes.items()
+                    if value
+                )
+            ),
+        )
+
+    @staticmethod
+    def _candidate_row_key(candidate: RepairCandidate) -> tuple[Any, ...]:
+        _changes, new_rows, objective_delta, kind = candidate
+        return (
+            int(objective_delta),
+            len(new_rows),
+            kind,
+            tuple(
+                (world, new_rows[world].tobytes())
+                for world in sorted(new_rows)
+            ),
+        )
+
+    def _collect_targeted_candidate_columns(
+        self,
+        *,
+        target_cells: list[tuple[str, tuple[int, ...], int, int]],
+        cells: list[tuple[str, tuple[int, ...], int, int]],
+        cell_index: Mapping[tuple[str, tuple[int, ...]], int],
+        excluded_worlds: frozenset[int] = frozenset(),
+    ) -> tuple[list[RepairCandidate], dict[str, int]]:
+        """Collect all exact-delta columns for the explicit target cells.
+
+        Equivalent columns with the same touched worlds and the same full
+        5,324-cell delta are compressed canonically. Nothing else is truncated.
+        """
+
+        cell_bounds = {
+            (family, index): (lower, upper)
+            for family, index, lower, upper in cells
+        }
+        selected: list[RepairCandidate] = []
+        enumerated_count = 0
+        valid_count = 0
+        equivalent_count = 0
+        for target_cell in target_cells:
+            family, index, lower, upper = target_cell
+            source_key = (family, index)
+            source_current = int(self.arrays[family][index])
+            retained: dict[tuple[Any, ...], RepairCandidate] = {}
+            for yielded_source, kind, replacements in self._targeted_repair_proposals(
+                [target_cell]
+            ):
+                enumerated_count += 1
+                if yielded_source != source_key:
+                    raise RegisteredNegativeConstructionError(
+                        "Targeted candidate source-key drift"
+                    )
+                proposal = self._change_delta(replacements)
+                if proposal is None:
+                    continue
+                objective_delta, changes, new_rows = proposal
+                if excluded_worlds.intersection(new_rows):
+                    continue
+                source_delta = int(changes.get(source_key, 0))
+                source_after = source_current + source_delta
+                if self._cell_violation(
+                    source_after, lower, upper
+                ) >= self._cell_violation(source_current, lower, upper):
+                    continue
+                candidate: RepairCandidate = (
+                    dict(changes),
+                    {world: row.copy() for world, row in new_rows.items()},
+                    int(objective_delta),
+                    kind,
+                )
+                valid_count += 1
+                equivalence = self._candidate_equivalence_key(
+                    candidate, cell_index
+                )
+                existing = retained.get(equivalence)
+                if existing is None or self._candidate_row_key(
+                    candidate
+                ) < self._candidate_row_key(existing):
+                    if existing is not None:
+                        equivalent_count += 1
+                    retained[equivalence] = candidate
+                else:
+                    equivalent_count += 1
+
+            def rank(candidate: RepairCandidate) -> tuple[Any, ...]:
+                changes, _new_rows, objective_delta, _kind = candidate
+                source_after = source_current + int(changes.get(source_key, 0))
+                return (
+                    self._cell_violation(source_after, lower, upper),
+                    self._l1_delta_for_changes(changes, cell_bounds),
+                    int(objective_delta),
+                    self._candidate_row_key(candidate),
+                )
+
+            ranked = sorted(retained.values(), key=rank)
+            selected.extend(ranked)
+
+        globally_retained: dict[tuple[Any, ...], RepairCandidate] = {}
+        for candidate in selected:
+            equivalence = self._candidate_equivalence_key(candidate, cell_index)
+            existing = globally_retained.get(equivalence)
+            if existing is None or self._candidate_row_key(
+                candidate
+            ) < self._candidate_row_key(existing):
+                if existing is not None:
+                    equivalent_count += 1
+                globally_retained[equivalence] = candidate
+            else:
+                equivalent_count += 1
+        columns = sorted(
+            globally_retained.values(), key=self._candidate_row_key
+        )
+        return columns, {
+            "target_cell_count": len(target_cells),
+            "enumerated_proposal_count": enumerated_count,
+            "valid_proposal_count": valid_count,
+            "equivalent_proposal_count": equivalent_count,
+            "omitted_by_search_budget_count": 0,
+            "retained_column_count": len(columns),
+        }
+    def _exact_local_repair(
+        self, *, stop_at_residual_checkpoint: bool = False
+    ) -> dict[str, Any]:
+        """Iteratively reduce slack with audited greedy and sparse MILP moves."""
 
         cells = self._constraint_cells()
         cell_index = {
@@ -1653,9 +1237,18 @@ class JointSearch:
                     "final_objective": 0,
                 }
             if l1_bound_violation() <= LOCAL_REPAIR_COARSE_MILP_THRESHOLD:
-                return self._exact_original_residual_repair(
-                    violated_cells=violated_cells,
-                    prior_round_receipts=round_receipts,
+                if stop_at_residual_checkpoint:
+                    return {
+                        "attempted": bool(round_receipts),
+                        "checkpoint_only": True,
+                        "round_count": len(round_receipts),
+                        "rounds": round_receipts,
+                        "final_l1_bound_violation": l1_bound_violation(),
+                        "final_objective": self.objective,
+                    }
+                raise RegisteredNegativeConstructionError(
+                    "Terminal V17 residual pricing is disabled; build and use "
+                    "the version-neutral residual checkpoint"
                 )
 
             candidates: list[
@@ -1936,6 +1529,7 @@ class JointSearch:
                     for _changes, _new_rows, objective_delta, _kind in candidates
                 ],
                 time_limit_seconds=time_limit_seconds,
+                slack_unit_cost_override=LOCAL_REPAIR_COARSE_MILP_SLACK_COST,
             )
             if not result["feasible"]:
                 raise RegisteredNegativeConstructionError(
@@ -2025,7 +1619,11 @@ class JointSearch:
         for pair_index, (left_position, right_position) in enumerate(PAIR_POSITIONS):
             left_noise = int(self.noise[world, int(row[left_position])])
             right_noise = int(self.noise[world, int(row[right_position])])
-            if not self.title_eligible[left_noise] or not self.title_eligible[right_noise]:
+            if not self.role_eligible[
+                world, left_position, int(row[left_position])
+            ] or not self.role_eligible[
+                world, right_position, int(row[right_position])
+            ]:
                 return False
             if pair_index < 2 and not (
                 self.clone_description_capable[left_noise]
@@ -2233,7 +1831,7 @@ class JointSearch:
             for index in range(3)
         ]
 
-    def run(self) -> dict[str, Any]:
+    def run(self, *, stop_at_residual_checkpoint: bool = False) -> dict[str, Any]:
         initial_objective = self.objective
         accepted_moves = 0
         accepted_by_proposal_kind: defaultdict[str, int] = defaultdict(int)
@@ -2285,8 +1883,8 @@ class JointSearch:
         if solved_iteration is None:
             print(
                 json.dumps(
-                    {
-                        "event": "starting_coarse_then_pruned_endpoint_repair",
+                        {
+                            "event": "starting_coarse_then_residual_checkpoint",
                         "pre_repair_objective": self.objective,
                         "objective_breakdown": self._objective_breakdown(),
                     },
@@ -2295,13 +1893,27 @@ class JointSearch:
                 ),
                 flush=True,
             )
-            exact_local_repair = self._exact_local_repair()
-            solution_stage = (
-                "coarse_candidate_repair_then_pruned_endpoint_residual_cp_sat"
+            exact_local_repair = self._exact_local_repair(
+                stop_at_residual_checkpoint=stop_at_residual_checkpoint
             )
-        if self._full_objective() != 0:
+            solution_stage = (
+                "coarse_candidate_repair_then_residual_checkpoint"
+                if stop_at_residual_checkpoint
+                else "residual_successor_unassigned_stop_guard"
+            )
+        full_objective = self._full_objective()
+        if full_objective != self.objective:
             raise RegisteredNegativeConstructionError(
                 "Incremental objective and independent full objective disagree"
+            )
+        if stop_at_residual_checkpoint:
+            if not 0 < full_objective <= LOCAL_REPAIR_COARSE_MILP_THRESHOLD:
+                raise RegisteredNegativeConstructionError(
+                    "Residual checkpoint did not stop inside its frozen boundary"
+                )
+        elif full_objective != 0:
+            raise RegisteredNegativeConstructionError(
+                "Terminal V17 exact-zero control flow must not be reused"
             )
         return {
             "initial_objective": initial_objective,
@@ -2325,6 +1937,7 @@ def materialize_plan(
     assignments: np.ndarray,
     schedule: Mapping[str, Any],
     joint_signatures: Mapping[str, Any],
+    plan_version: str = plan_contract.VERSION,
 ) -> dict[str, Any]:
     noise_slot_signatures = {
         int(row["noise_slot"]): row["signature"]
@@ -2355,8 +1968,10 @@ def materialize_plan(
                 stratum = (treatment, role, signature_text)
                 occurrence_index = occurrence_counts[stratum]
                 occurrence_counts[stratum] += 1
-                eligible = _eligible_logical_item_ordinals(
-                    treatment=treatment, signature=signature
+                eligible = _role_eligible_logical_item_ordinals(
+                    treatment=treatment,
+                    role=role,
+                    signature=signature,
                 )
                 start = _logical_item_cycle_start(
                     split=split,
@@ -2394,7 +2009,7 @@ def materialize_plan(
             {"world_ordinal": world_ordinal, "assignments": world_assignments}
         )
     plan: dict[str, Any] = {
-        "version": plan_contract.VERSION,
+        "version": plan_version,
         "split": split,
         "world_count": balanced.WORLD_COUNT,
         "balanced_schedule_sha256": schedule["canonical_self_sha256"],
@@ -2434,6 +2049,27 @@ def _write_new_json(path: Path, value: object) -> None:
         stream.write(b"\n")
 
 
+def validate_formal_invocation(
+    *,
+    output_directory: Path,
+    train_schedule_path: Path,
+    development_schedule_path: Path,
+    joint_signature_path: Path,
+) -> dict[str, Any]:
+    """Fail closed until a successor to terminal V17 is frozen."""
+
+    del (
+        output_directory,
+        train_schedule_path,
+        development_schedule_path,
+        joint_signature_path,
+    )
+    raise RegisteredNegativeConstructionError(
+        "The V9.3 registered-negative successor is unassigned; terminal V17 "
+        "must not be rerun"
+    )
+
+
 def publish(
     *,
     output_directory: Path,
@@ -2441,6 +2077,12 @@ def publish(
     development_schedule_path: Path,
     joint_signature_path: Path,
 ) -> dict[str, Any]:
+    validate_formal_invocation(
+        output_directory=output_directory,
+        train_schedule_path=train_schedule_path,
+        development_schedule_path=development_schedule_path,
+        joint_signature_path=joint_signature_path,
+    )
     if output_directory.exists():
         raise RegisteredNegativeConstructionError("Output directory already exists")
     building = output_directory.with_name(output_directory.name + ".building")

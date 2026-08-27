@@ -21,7 +21,10 @@ from typing import Any, Mapping
 from openpyxl import load_workbook
 
 
-VERSION = "2026-08-25-step28-v13-v1-13-joint-noise-signatures-v9-3"
+VERSION = (
+    "2026-08-26-step28-v13-v1-13-joint-noise-signatures-"
+    "v9-3-training-ready"
+)
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK_PATH = ROOT / "market_item.xlsx"
 WORKBOOK_SHA256 = "3625a226974827a0441ec87c54688f85ed0ff93a1c4c687532ef550ec1640187"
@@ -36,11 +39,17 @@ ALLOWLIST_PATH = (
     / "style_source_train_sellers.csv"
 )
 ALLOWLIST_SHA256 = "b57cbfc3908ae3f36983c7c9e6d4dd974b59222f6617d214cec090524c3eb6de"
-EXPECTED_SELLER_COUNT = 676
-EXPECTED_SELECTED_ITEM_ROWS = 3439
+SOURCE_SELLER_COUNT = 676
+SOURCE_SELECTED_ITEM_ROWS = 3439
+EXPECTED_SELLER_COUNT = 648
+EXPECTED_EXCLUDED_SELLER_COUNT = 28
+EXPECTED_SELECTED_ITEM_ROWS = 3354
+EXPECTED_EXCLUDED_ITEM_ROWS = 85
 SLOT_COUNT = 28
 MINIMUM_ITEM_COUNT = 2
 MAXIMUM_ITEM_COUNT = 8
+MINIMUM_NONEMPTY_TITLE_COUNT = 1
+MINIMUM_NONEMPTY_DESCRIPTION_COUNT = 2
 SOURCE_DATASET = "market_item.xlsx"
 DATA_BUCKET = "zh_target_strict"
 ELIGIBILITY_STATUS = "target_eval_candidate"
@@ -120,7 +129,7 @@ def _read_allowlist() -> list[str]:
         if list(reader.fieldnames or []) != ["seller_uid"]:
             raise JointNoiseSignatureError("Pinned seller allow-list schema drift")
         sellers = [row["seller_uid"].strip() for row in reader]
-    if len(sellers) != EXPECTED_SELLER_COUNT or any(not value for value in sellers):
+    if len(sellers) != SOURCE_SELLER_COUNT or any(not value for value in sellers):
         raise JointNoiseSignatureError("Pinned seller allow-list cardinality drift")
     if sellers != sorted(set(sellers), key=lambda value: value.encode("utf-8")):
         raise JointNoiseSignatureError(
@@ -158,7 +167,7 @@ def _read_selected_rows(allowed: set[str]) -> dict[int, str]:
                 )
             selected[source_row] = row["seller_uid"]
             counts[row["seller_uid"]] += 1
-    if len(selected) != EXPECTED_SELECTED_ITEM_ROWS:
+    if len(selected) != SOURCE_SELECTED_ITEM_ROWS:
         raise JointNoiseSignatureError("Selected item-row cardinality drift")
     if set(counts) != allowed:
         raise JointNoiseSignatureError("Selected rows do not cover every allowed seller")
@@ -190,7 +199,7 @@ def _read_presence_by_seller(
         workbook.close()
     if set(presence) != set(allowed_sellers):
         raise JointNoiseSignatureError("Workbook did not reconstruct every allowed seller")
-    if sum(map(len, presence.values())) != EXPECTED_SELECTED_ITEM_ROWS:
+    if sum(map(len, presence.values())) != SOURCE_SELECTED_ITEM_ROWS:
         raise JointNoiseSignatureError("Workbook selected-row cardinality drift")
     for seller_uid in allowed_sellers:
         rows = presence[seller_uid]
@@ -325,8 +334,12 @@ def validate_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "version",
         "status",
         "statistical_unit",
+        "source_seller_count",
         "seller_count",
+        "excluded_seller_count",
+        "source_selected_item_row_count",
         "selected_item_row_count",
+        "excluded_selected_item_row_count",
         "source_pins",
         "selection_boundary",
         "signature_definition",
@@ -350,10 +363,26 @@ def validate_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         raise JointNoiseSignatureError("Joint-signature status drift")
     if payload["statistical_unit"] != EXPECTED_STATISTICAL_UNIT:
         raise JointNoiseSignatureError("Joint-signature statistical unit drift")
+    if payload["source_seller_count"] != SOURCE_SELLER_COUNT:
+        raise JointNoiseSignatureError("Joint-signature source seller count drift")
     if payload["seller_count"] != EXPECTED_SELLER_COUNT:
         raise JointNoiseSignatureError("Joint-signature seller count drift")
+    if payload["excluded_seller_count"] != EXPECTED_EXCLUDED_SELLER_COUNT:
+        raise JointNoiseSignatureError("Joint-signature excluded seller count drift")
+    if payload["source_selected_item_row_count"] != SOURCE_SELECTED_ITEM_ROWS:
+        raise JointNoiseSignatureError("Joint-signature source item-row count drift")
     if payload["selected_item_row_count"] != EXPECTED_SELECTED_ITEM_ROWS:
         raise JointNoiseSignatureError("Joint-signature item-row count drift")
+    if payload["excluded_selected_item_row_count"] != EXPECTED_EXCLUDED_ITEM_ROWS:
+        raise JointNoiseSignatureError("Joint-signature excluded item-row count drift")
+    if (
+        payload["source_seller_count"]
+        != payload["seller_count"] + payload["excluded_seller_count"]
+        or payload["source_selected_item_row_count"]
+        != payload["selected_item_row_count"]
+        + payload["excluded_selected_item_row_count"]
+    ):
+        raise JointNoiseSignatureError("Joint-signature eligibility accounting drift")
     supplied_self = payload["canonical_self_sha256"]
     if (
         not isinstance(supplied_self, str)
@@ -394,6 +423,10 @@ def validate_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "effective_item_count": "clip_raw_count_to_2_through_8",
         "singleton_padding": "repeat_the_only_items_presence_state_once",
         "over_eight_truncation": "retain_first_eight_selected_source_rows",
+        "training_ready_filter": (
+            "after_clipping_or_padding_require_at_least_1_nonempty_title_"
+            "and_2_nonempty_descriptions"
+        ),
     }
     if payload["selection_boundary"] != expected_selection_boundary:
         raise JointNoiseSignatureError("Joint-signature selection boundary drift")
@@ -543,12 +576,31 @@ def build_payload() -> dict[str, Any]:
     counts: Counter[bytes] = Counter()
     signatures: dict[bytes, dict[str, Any]] = {}
     raw_item_count_histogram: Counter[int] = Counter()
+    eligible_sellers: list[str] = []
+    excluded_item_rows = 0
     for seller_uid in sellers:
-        raw_item_count_histogram[len(presence[seller_uid])] += 1
         signature = _signature(presence[seller_uid])
+        if (
+            signature["title_present_mask"].count("1")
+            < MINIMUM_NONEMPTY_TITLE_COUNT
+            or signature["description_present_mask"].count("1")
+            < MINIMUM_NONEMPTY_DESCRIPTION_COUNT
+        ):
+            excluded_item_rows += len(presence[seller_uid])
+            continue
+        eligible_sellers.append(seller_uid)
+        raw_item_count_histogram[len(presence[seller_uid])] += 1
         key = _signature_key(signature)
         signatures.setdefault(key, signature)
         counts[key] += 1
+    if (
+        len(eligible_sellers) != EXPECTED_SELLER_COUNT
+        or len(sellers) - len(eligible_sellers) != EXPECTED_EXCLUDED_SELLER_COUNT
+        or sum(len(presence[seller]) for seller in eligible_sellers)
+        != EXPECTED_SELECTED_ITEM_ROWS
+        or excluded_item_rows != EXPECTED_EXCLUDED_ITEM_ROWS
+    ):
+        raise JointNoiseSignatureError("Training-ready source filter drift")
     frequency, slots = _largest_remainder(counts, signatures)
 
     slot_eligibility = []
@@ -573,8 +625,12 @@ def build_payload() -> dict[str, Any]:
         "version": VERSION,
         "status": EXPECTED_STATUS,
         "statistical_unit": EXPECTED_STATISTICAL_UNIT,
+        "source_seller_count": SOURCE_SELLER_COUNT,
         "seller_count": EXPECTED_SELLER_COUNT,
+        "excluded_seller_count": EXPECTED_EXCLUDED_SELLER_COUNT,
+        "source_selected_item_row_count": SOURCE_SELECTED_ITEM_ROWS,
         "selected_item_row_count": EXPECTED_SELECTED_ITEM_ROWS,
+        "excluded_selected_item_row_count": EXPECTED_EXCLUDED_ITEM_ROWS,
         "source_pins": {
             "raw_chinese_items": {
                 "path": WORKBOOK_PATH.relative_to(ROOT).as_posix(),
@@ -597,6 +653,10 @@ def build_payload() -> dict[str, Any]:
             "effective_item_count": "clip_raw_count_to_2_through_8",
             "singleton_padding": "repeat_the_only_items_presence_state_once",
             "over_eight_truncation": "retain_first_eight_selected_source_rows",
+            "training_ready_filter": (
+                "after_clipping_or_padding_require_at_least_1_nonempty_title_"
+                "and_2_nonempty_descriptions"
+            ),
         },
         "signature_definition": {
             "fields": [

@@ -16,7 +16,17 @@ import step28_v13_v1_13_balanced_schedule_v9_3 as balanced
 import step28_v13_v1_13_build_joint_noise_signatures_v9_3 as noise_signatures
 
 
-VERSION = "2026-08-25-step28-v13-v1-13-registered-negative-plan-v9-3"
+VERSION = (
+    "2026-08-26-step28-v13-v1-13-registered-negative-plan-"
+    "v9-3-training-ready-noise"
+)
+BOUNDED_RESIDUAL_VERSION = (
+    "2026-08-27-step28-v13-v1-13-registered-negative-plan-"
+    "v9-3-r2-user-accepted-residual-22"
+)
+BOUNDED_RESIDUAL_STATUS = (
+    "PASS_DETERMINISTIC_USER_ACCEPTED_RESIDUAL_22_PENDING_STRUCTURE_GATE"
+)
 ITEM_SELECTOR_VERSION = "2026-08-25-step28-v13-v1-13-item-selector-v9-3"
 SEMANTIC_POLICY_PATH = "schema/step28_v13_synthetic_chinese_dataset_policy.json"
 SEMANTIC_POLICY_SHA256 = "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729"
@@ -54,6 +64,12 @@ ROLE_ORDER = (
     ("exact_title_clone", "target"),
     ("high_semantic_similarity", "left"),
     ("high_semantic_similarity", "right"),
+)
+ROLE_ELIGIBILITY_PREDICATE_NAMES = (
+    "clone_source_eligible",
+    "clone_target_eligible",
+    "semantic_left_eligible",
+    "semantic_right_eligible",
 )
 PAIR_HISTOGRAMS = {
     "exact_title_clone": {2: 134, 3: 244},
@@ -158,6 +174,23 @@ def _eligible_logical_item_ordinals(
         if signature["description_present_mask"][index] == "1"
     ]
     return title_and_description or title_eligible
+
+
+def _role_eligible_logical_item_ordinals(
+    *,
+    treatment: str,
+    role: str,
+    signature: Mapping[str, Any],
+) -> list[int]:
+    role_key = (treatment, role)
+    if role_key not in ROLE_ORDER:
+        raise RegisteredNegativePlanError(
+            f"Unknown registered-negative endpoint role: {role_key}"
+        )
+    return _eligible_logical_item_ordinals(
+        treatment=treatment,
+        signature=signature,
+    )
 
 
 def _logical_item_cycle_start(
@@ -423,6 +456,12 @@ def validate_plan(
     plan: Mapping[str, Any],
     schedule: Mapping[str, Any],
     joint_signatures: Mapping[str, Any],
+    *,
+    expected_version: str = VERSION,
+    require_exact_balance: bool = True,
+    success_status: str = (
+        "PASS_ABSTRACT_REGISTERED_NEGATIVE_PLAN_ONLY_NOT_DATA_OR_TRAINING_QUALIFIED"
+    ),
 ) -> dict[str, Any]:
     schedule_audit = balanced.validate_schedule(schedule)
     signature_audit = noise_signatures.validate_payload(joint_signatures)
@@ -441,7 +480,7 @@ def validate_plan(
         },
         name="registered-negative plan",
     )
-    if plan["version"] != VERSION:
+    if plan["version"] != expected_version:
         raise RegisteredNegativePlanError("Registered-negative plan version drift")
     split = plan["split"]
     if split not in ("train", "development") or split != schedule_audit["split"]:
@@ -607,9 +646,14 @@ def validate_plan(
                     signature = noise_slots[noise_slot]
                     title_mask = signature["title_present_mask"]
                     description_mask = signature["description_present_mask"]
-                    if logical_ordinal >= len(title_mask) or title_mask[logical_ordinal] != "1":
+                    role_eligible = _role_eligible_logical_item_ordinals(
+                        treatment=treatment,
+                        role=role,
+                        signature=signature,
+                    )
+                    if logical_ordinal not in role_eligible:
                         raise RegisteredNegativePlanError(
-                            "Registered endpoint selected a title-ineligible logical item"
+                            "Registered endpoint selected a role-ineligible logical item"
                         )
                     descriptions_present.append(description_mask[logical_ordinal] == "1")
                     signature_key = _signature_key(signature)
@@ -644,7 +688,7 @@ def validate_plan(
             ("noise", noise_pairs),
         ):
             observed = _histogram([counters[treatment][pair] for pair in pair_order])
-            if observed != PAIR_HISTOGRAMS[treatment]:
+            if require_exact_balance and observed != PAIR_HISTOGRAMS[treatment]:
                 raise RegisteredNegativePlanError(
                     f"{coordinate_name} {treatment} pair-balance drift: {observed}"
                 )
@@ -660,7 +704,10 @@ def validate_plan(
                     if left != right
                 ]
             )
-            if observed != DIRECTED_PAIR_HISTOGRAMS[treatment]:
+            if (
+                require_exact_balance
+                and observed != DIRECTED_PAIR_HISTOGRAMS[treatment]
+            ):
                 raise RegisteredNegativePlanError(
                     f"{coordinate_name} {treatment} directed-pair balance drift: {observed}"
                 )
@@ -669,7 +716,7 @@ def validate_plan(
             ("noise", noise_endpoints[treatment]),
         ):
             observed = _histogram(values)
-            if observed != ENDPOINT_HISTOGRAMS[treatment]:
+            if require_exact_balance and observed != ENDPOINT_HISTOGRAMS[treatment]:
                 raise RegisteredNegativePlanError(
                     f"{coordinate_name} {treatment} endpoint-balance drift: {observed}"
                 )
@@ -680,11 +727,14 @@ def validate_plan(
             ("noise", noise_roles[role_key]),
         ):
             observed = _histogram(values)
-            if observed != ROLE_HISTOGRAMS[role_key]:
+            if require_exact_balance and observed != ROLE_HISTOGRAMS[role_key]:
                 raise RegisteredNegativePlanError(
                     f"{coordinate_name} {role_key} role-balance drift: {observed}"
                 )
-        if role_triads[role_key] != ROLE_TRIAD_TOTALS[role_key]:
+        if (
+            require_exact_balance
+            and role_triads[role_key] != ROLE_TRIAD_TOTALS[role_key]
+        ):
             raise RegisteredNegativePlanError(
                 f"{role_key} triad/dyad exposure drift: {role_triads[role_key]}"
             )
@@ -699,11 +749,19 @@ def validate_plan(
             ("noise", noise_size_cross),
         ):
             for slot, (dyad, triad_count) in enumerate(table[role_key]):
-                if not expected_bounds[0][0] <= dyad <= expected_bounds[0][1]:
+                if (
+                    require_exact_balance
+                    and not expected_bounds[0][0] <= dyad <= expected_bounds[0][1]
+                ):
                     raise RegisteredNegativePlanError(
                         f"{coordinate_name} {role_key} slot {slot} dyad exposure drift"
                     )
-                if not expected_bounds[1][0] <= triad_count <= expected_bounds[1][1]:
+                if (
+                    require_exact_balance
+                    and not expected_bounds[1][0]
+                    <= triad_count
+                    <= expected_bounds[1][1]
+                ):
                     raise RegisteredNegativePlanError(
                         f"{coordinate_name} {role_key} slot {slot} triad exposure drift"
                     )
@@ -721,11 +779,11 @@ def validate_plan(
         semantic_high_right = {
             slot for slot, value in enumerate(roles[("high_semantic_similarity", "right")]) if value == 72
         }
-        if clone_low_source & clone_low_target:
+        if require_exact_balance and clone_low_source & clone_low_target:
             raise RegisteredNegativePlanError(
                 f"{coordinate_name} clone low-count role sets overlap"
             )
-        if semantic_high_left & semantic_high_right:
+        if require_exact_balance and semantic_high_left & semantic_high_right:
             raise RegisteredNegativePlanError(
                 f"{coordinate_name} semantic high-count role sets overlap"
             )
@@ -830,37 +888,119 @@ def validate_plan(
 
     seller_cross_payload = cross_table_payload(seller_size_cross)
     noise_cross_payload = cross_table_payload(noise_size_cross)
+    observed_pair_histograms = {
+        coordinate_name: {
+            treatment: _histogram(
+                [counters[treatment][pair] for pair in pair_order]
+            )
+            for treatment in TREATMENTS
+        }
+        for coordinate_name, counters in (
+            ("seller", seller_pairs),
+            ("noise", noise_pairs),
+        )
+    }
+    observed_directed_pair_histograms = {
+        coordinate_name: {
+            treatment: _histogram(
+                [
+                    counters[treatment][(left, right)]
+                    for left in range(28)
+                    for right in range(28)
+                    if left != right
+                ]
+            )
+            for treatment in TREATMENTS
+        }
+        for coordinate_name, counters in (
+            ("seller", seller_directed_pairs),
+            ("noise", noise_directed_pairs),
+        )
+    }
+    observed_role_histograms = {
+        coordinate_name: {
+            role_key: _histogram(values[role_key])
+            for role_key in ROLE_ORDER
+        }
+        for coordinate_name, values in (
+            ("seller", seller_roles),
+            ("noise", noise_roles),
+        )
+    }
+    observed_endpoint_histograms = {
+        coordinate_name: {
+            treatment: _histogram(values[treatment])
+            for treatment in TREATMENTS
+        }
+        for coordinate_name, values in (
+            ("seller", seller_endpoints),
+            ("noise", noise_endpoints),
+        )
+    }
+
+    def stringify_histogram(histogram: Mapping[int, int]) -> dict[str, int]:
+        return {str(key): value for key, value in histogram.items()}
+
     return {
-        "version": VERSION,
+        "version": expected_version,
         "split": split,
         "world_count": WORLD_COUNT,
         "registered_pair_count_per_world": 6,
         "registered_endpoint_count_per_world": 12,
         "pair_histograms": {
-            treatment: {str(key): value for key, value in histogram.items()}
-            for treatment, histogram in PAIR_HISTOGRAMS.items()
+            treatment: stringify_histogram(
+                observed_pair_histograms["seller"][treatment]
+            )
+            for treatment in TREATMENTS
+        },
+        "noise_pair_histograms": {
+            treatment: stringify_histogram(
+                observed_pair_histograms["noise"][treatment]
+            )
+            for treatment in TREATMENTS
         },
         "directed_pair_histograms": {
-            treatment: {
-                str(key): value
-                for key, value in DIRECTED_PAIR_HISTOGRAMS[treatment].items()
-            }
+            treatment: stringify_histogram(
+                observed_directed_pair_histograms["seller"][treatment]
+            )
+            for treatment in TREATMENTS
+        },
+        "noise_directed_pair_histograms": {
+            treatment: stringify_histogram(
+                observed_directed_pair_histograms["noise"][treatment]
+            )
             for treatment in TREATMENTS
         },
         "role_histograms": {
-            f"{treatment}:{role}": {
-                str(key): value for key, value in ROLE_HISTOGRAMS[(treatment, role)].items()
-            }
+            f"{treatment}:{role}": stringify_histogram(
+                observed_role_histograms["seller"][(treatment, role)]
+            )
+            for treatment, role in ROLE_ORDER
+        },
+        "noise_role_histograms": {
+            f"{treatment}:{role}": stringify_histogram(
+                observed_role_histograms["noise"][(treatment, role)]
+            )
             for treatment, role in ROLE_ORDER
         },
         "endpoint_histograms": {
-            treatment: {str(key): value for key, value in histogram.items()}
-            for treatment, histogram in ENDPOINT_HISTOGRAMS.items()
+            treatment: stringify_histogram(
+                observed_endpoint_histograms["seller"][treatment]
+            )
+            for treatment in TREATMENTS
+        },
+        "noise_endpoint_histograms": {
+            treatment: stringify_histogram(
+                observed_endpoint_histograms["noise"][treatment]
+            )
+            for treatment in TREATMENTS
         },
         "role_triad_totals": {
-            f"{treatment}:{role}": ROLE_TRIAD_TOTALS[(treatment, role)]
+            f"{treatment}:{role}": role_triads[(treatment, role)]
             for treatment, role in ROLE_ORDER
         },
+        "exact_balance_required": require_exact_balance,
+        "role_eligibility_predicates": list(ROLE_ELIGIBILITY_PREDICATE_NAMES),
         "seller_role_controller_size_cross_table_sha256": canonical_sha256(
             seller_cross_payload
         ),
@@ -886,7 +1026,7 @@ def validate_plan(
         "plan_canonical_self_sha256": supplied_self,
         "balanced_schedule_sha256": plan["balanced_schedule_sha256"],
         "joint_noise_signature_sha256": signature_audit["canonical_self_sha256"],
-        "status": "PASS_ABSTRACT_REGISTERED_NEGATIVE_PLAN_ONLY_NOT_DATA_OR_TRAINING_QUALIFIED",
+        "status": success_status,
     }
 
 
@@ -959,11 +1099,32 @@ def validate_train_development_plan_pair(
     train_schedule: Mapping[str, Any],
     development_schedule: Mapping[str, Any],
     joint_signatures: Mapping[str, Any],
+    *,
+    expected_version: str = VERSION,
+    require_exact_balance: bool = True,
+    plan_success_status: str = (
+        "PASS_ABSTRACT_REGISTERED_NEGATIVE_PLAN_ONLY_NOT_DATA_OR_TRAINING_QUALIFIED"
+    ),
+    pair_success_status: str = (
+        "PASS_INDEPENDENT_SPLIT_PLAN_PAIR_ONLY_NOT_DATA_OR_TRAINING_QUALIFIED"
+    ),
 ) -> dict[str, Any]:
     """Reject exact or globally relabelled reuse across the two split plans."""
-    train_audit = validate_plan(train_plan, train_schedule, joint_signatures)
+    train_audit = validate_plan(
+        train_plan,
+        train_schedule,
+        joint_signatures,
+        expected_version=expected_version,
+        require_exact_balance=require_exact_balance,
+        success_status=plan_success_status,
+    )
     development_audit = validate_plan(
-        development_plan, development_schedule, joint_signatures
+        development_plan,
+        development_schedule,
+        joint_signatures,
+        expected_version=expected_version,
+        require_exact_balance=require_exact_balance,
+        success_status=plan_success_status,
     )
     if train_plan["split"] != "train" or development_plan["split"] != "development":
         raise RegisteredNegativePlanError("Plan-pair split order drift")
@@ -1004,7 +1165,7 @@ def validate_train_development_plan_pair(
         ),
         "train_audit_sha256": canonical_sha256(train_audit),
         "development_audit_sha256": canonical_sha256(development_audit),
-        "status": "PASS_INDEPENDENT_SPLIT_PLAN_PAIR_ONLY_NOT_DATA_OR_TRAINING_QUALIFIED",
+        "status": pair_success_status,
     }
 
 
