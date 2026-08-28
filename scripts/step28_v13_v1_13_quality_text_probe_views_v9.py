@@ -303,7 +303,11 @@ def _build_fixed_support_views(
     *,
     items: Sequence[Mapping[str, Any]],
     endpoints: Sequence[Mapping[str, Any]],
-) -> tuple[dict[str, np.ndarray], dict[str, tuple[str, ...]]]:
+) -> tuple[
+    dict[str, np.ndarray],
+    dict[str, tuple[str, ...]],
+    tuple[tuple[str, str], ...],
+]:
     item_uids: set[str] = set()
     by_seller: defaultdict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in items:
@@ -492,6 +496,10 @@ def _build_fixed_support_views(
             "fs_title": title_names,
             "fs_template_surface": template_names,
         },
+        tuple(
+            (str(row["world_uid"]), str(row["canonical_pair_uid"]))
+            for row in endpoints
+        ),
     )
 
 
@@ -505,6 +513,7 @@ def _build_production_views(
     dict[str, tuple[str, ...]],
     np.ndarray,
     tuple[str, ...],
+    tuple[tuple[str, str], ...],
 ]:
     seller_uids: list[str] = []
     for row in profiles:
@@ -722,6 +731,10 @@ def _build_production_views(
         },
         numeric,
         numeric_names,
+        tuple(
+            (str(row["world_uid"]), str(row["canonical_pair_uid"]))
+            for row in endpoints
+        ),
     )
 
 
@@ -752,15 +765,23 @@ def build_text_probe_views(
     if not pair_keys:
         raise QualityTextProbeViewError("Text endpoint input is empty")
 
-    fixed, fixed_names = _build_fixed_support_views(
+    fixed, fixed_names, fixed_row_keys = _build_fixed_support_views(
         items=items, endpoints=endpoints
     )
     item_counts_by_seller = Counter(row["seller_uid"] for row in items)
-    production, production_names, numeric, numeric_names = _build_production_views(
+    (
+        production,
+        production_names,
+        numeric,
+        numeric_names,
+        production_row_keys,
+    ) = _build_production_views(
         profiles=profiles,
         endpoints=endpoints,
         item_counts_by_seller=item_counts_by_seller,
     )
+    if fixed_row_keys != production_row_keys:
+        raise QualityTextProbeViewError("Text F/P actual row-key drift")
     views = {**fixed, **production}
     names = {**fixed_names, **production_names}
     joint_names = tuple(

@@ -1,13 +1,13 @@
 {
-  "version": "2026-08-28-step28-v13-v1-13-v9-4-method-root-quality-attempt2-policy-v1",
+  "version": "2026-08-28-step28-v13-v1-13-v9-4-method-root-quality-attempt3-policy-v2",
   "status": "FROZEN_IMPLEMENTATION_NO_FORMAL_RUN_YET",
   "claim_boundary": "METHOD_QUALIFICATION_ROOT_QUALITY_ONLY_NO_FORMAL_500X4_NO_MODEL_TRAINING",
   "dataset_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_20260828",
   "private_root": "private_custody/step28_v13_v1_13_v9_4_method_root_attempt1_20260828",
-  "output_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_quality_attempt2_20260828",
-  "temporary_root": "reports/step28_synthetic_chinese_dataset/.v9_4_method_root_quality_attempt2_20260828.building",
-  "authorization_path": "schema/step28_v13_v1_13_v9_4_method_root_quality_attempt2_authorization.json",
-  "consumption_path": "private_custody/step28_v13_v1_13_v9_4_method_root_quality_attempt2_20260828/quality_attempt2.consumed.json",
+  "output_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_quality_attempt3_20260828",
+  "temporary_root": "reports/step28_synthetic_chinese_dataset/.v9_4_method_root_quality_attempt3_20260828.building",
+  "authorization_path": "schema/step28_v13_v1_13_v9_4_method_root_quality_attempt3_authorization.json",
+  "consumption_path": "private_custody/step28_v13_v1_13_v9_4_method_root_quality_attempt3_20260828/quality_attempt3.consumed.json",
   "pins": {
     "scientific_contract": {
       "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
@@ -37,8 +37,8 @@
     },
     "text_view_builder": {
       "path": "scripts/step28_v13_v1_13_quality_text_probe_views_v9.py",
-      "size_bytes": 27915,
-      "sha256": "d9a6a92bb5a4df5632d9e7c95d1f566cdd05f39c07876463046d76a1928ef126"
+      "size_bytes": 28451,
+      "sha256": "a99c34a44e7def52f84c10e0b5bb21c232bb9ea48645ceaa181b8efc8355629f"
     },
     "probe_validator": {
       "path": "scripts/step28_v13_v1_13_quality_probe_validator_v9.py",
@@ -51,10 +51,73 @@
       "sha256": "1699faa416b4b40c4d2dee17968b26b79e4df03b58abecc9530c0a06120aeae3"
     },
     "sealed_literal_scanner": {
-      "path": "scripts/step28_v13_v1_13_method_root_sealed_literal_scan_attempt2_v9_4.py",
-      "size_bytes": 11061,
-      "sha256": "0f56003a0ff5656d53f4fe27e32acc29195649b5979faa4bb528079115b05920"
+      "path": "scripts/step28_v13_v1_13_method_root_sealed_literal_scan_attempt3_v9_4.py",
+      "size_bytes": 18099,
+      "sha256": "8a8e320dd542a31820d5568699500c9bb57571fa53f2c64b93f17a8bd5948e01"
+    },
+    "profile_provenance_builder": {
+      "path": "scripts/step28_v13_v1_13_candidate_parent.py",
+      "size_bytes": 57236,
+      "sha256": "b700265b7791866587f685cdda24d1f299849a0397209dc14fec27c754831e84"
+    },
+    "quality_attempt_contract_tests": {
+      "path": "tests/test_step28_v13_v1_13_method_root_quality_attempt3_v9_4_contracts.py",
+      "size_bytes": 30083,
+      "sha256": "1f4b936a074756473c98ea8677f8b718dd2538bad7818deb3892158306992df7"
     }
+  },
+  "model_surface_generation_audit_projection": {
+    "top_level_fields": ["world_uid", "style_assignments", "registered_negative_controls"],
+    "model_surface_world_fields": ["split", "ordinal", "world_uid", "seller_uids", "noise_slots"],
+    "style_fields": ["seller_uid", "separator", "ending", "line_mode", "english_tag", "traditional_variant", "repeat_punctuation", "base_style_id", "perturbed_fields"],
+    "discarded_style_audit_fields": ["controller_group_index"],
+    "control_fields": ["canonical_pair_uid", "control_type", "source_item_uid", "target_item_uid"],
+    "controller_membership_or_mechanism_members_visible_to_feature_chain": false
+  },
+  "identity33_pretruth_freeze": {
+    "feature_count": 33,
+    "pairs_per_world": 378,
+    "train_worlds": 500,
+    "development_worlds": 500,
+    "read_only_reopen_before_truth": true,
+    "post_truth_hash_reverification": true
+  },
+  "train_development_supervision_replay": {
+    "independently_rebuild_controller_membership": true,
+    "independently_rebuild_pair_labels": true,
+    "independently_rebuild_qrels": true,
+    "persisted_rows_must_match_in_order": true,
+    "membership_reads_per_split": 1,
+    "pair_label_reads_per_split": 1,
+    "qrels_reads_per_split": 1,
+    "audit_a_b_semantic_reads": 0
+  },
+  "world_lineage_alignment_receipt_contract": {
+    "bind_split_and_world": true,
+    "bind_derangement_mapping": true,
+    "bind_fixed_slot_key_set": true,
+    "bind_fixed_slot_field_roles_and_presence": true,
+    "bind_original_and_counterfactual_production_lineage": true,
+    "bind_seller_pair_and_world_order": true,
+    "bind_mechanism_neutral_mask": true,
+    "bind_original_and_counterfactual_numeric_projection": true,
+    "bind_full_style_intervention_dose_row": true,
+    "verify_actual_constructor_reverse_order_equivariance_once_per_split": true,
+    "diagnostic_only_must_not_select_world_mapping_or_rows": true
+  },
+  "sealed_literal_scope": {
+    "all_nonempty_private_string_leaves_enumerated_and_committed": true,
+    "identifier_index_mapping_keys_enumerated": true,
+    "forbidden_variant_sources": [
+      "parsed identity values",
+      "world seller item pair controller and query registers",
+      "mechanism control-type and base-style identifiers",
+      "identifier-indexed mapping keys"
+    ],
+    "short_ascii_identifiers": ["BAT", "QQ", "TG", "WX"],
+    "intended_visible_author_style_values_forbidden_by_value_alone": false,
+    "rationale": "V9.4 freezes author style as intended identity signal; treating its private render parameters as forbidden literals would invalidate every intended style realization rather than detect a label or identifier shortcut.",
+    "cross_split_identity_controller_query_intersections_must_be_zero": true
   },
   "splits": {
     "matrix_and_truth": ["train", "development"],
@@ -126,6 +189,12 @@
     }
   },
   "gates": {
+    "minimum_style_tuple_count_per_world": 2,
+    "minimum_base_style_count_per_world": 2,
+    "exact_style_perturbation_count_per_seller": 2,
+    "minimum_style_carrier_field_count_per_seller": 1,
+    "minimum_mapped_style_factor_change_seller_count_per_world": 1,
+    "minimum_visible_change_seller_count_per_world": 1,
     "maximum_single_feature_symmetric_roc_auc": 0.52,
     "maximum_model_family_symmetric_roc_auc": 0.53,
     "maximum_model_family_average_precision_uplift": 0.01,
@@ -160,5 +229,5 @@
     "truth_after_all_feature_matrices_frozen": true
   },
   "failure_rule": "MECHANICAL_FAILURE_RETAINS_DATASET_AND_DELETES_TEMPORARY_MATRICES;HARD_GATE_FAILURE_INVALIDATES_DATASET_ONLY_AFTER_COMPLETE_FAMILY_EVIDENCE",
-  "canonical_self_hash": "ac6d22ca032d96afc4243c5f2e6dd8205ab4c9176cec434aefd6711fbee411c1"
+  "canonical_self_hash": "1506a07b8e6130b673ab897b91402e645b534f6b83cf406a87ebaa37238150b6"
 }
