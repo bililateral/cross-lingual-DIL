@@ -225,6 +225,10 @@ R2 唯一确定性重放已经发布精确五文件计划根：训练与开发�
 
 机器政策状态仍为 `FROZEN_IMPLEMENTATION_POLICY_NO_RUN_NO_DATA_NO_TRAINING`，时间密钥承诺为空，前置门、方法根、真值解封和 M0／M1／M2／M3 四项授权均为假。当前只完成实现质量认证，不存在正式 500×4 数据、1,004 世界方法资格根、自然文本、捷径门结论或模型结果；回归通过不得解释为数据质量通过或训练授权。
 
+在上述冻结统计实现之上，单次授权第一阶段现已完成实现、反例复核和三层回归。新合同为 `docs/STEP28_V13_V1_13_V9_4_FORMAL_PREBUILD_AUTHORIZATION_CONTRACT_20260828.zh.md`，运行器为 `scripts/step28_v13_v1_13_formal_prebuild_authority_v9_4.py`，合同测试为 `tests/test_step28_v13_v1_13_formal_prebuild_authority_v9_4_contracts.py`。生产运行器摘要为 `76e43720b44422e9ff95a653fc05558d68aed6ff1728d959fe8dfcec7fb52479`，测试摘要为 `79584ad9e65a946b54bff23c163d44b4b913a868d5715c15bd720b964e7dea71`；网页端复核的合同候选摘要为 `549c1c6bcf1e27a50e5dc72048239d963a18394211c7d4a869a45adf33c4c989`。恢复通过前会先发布不可回退的私有占用标记，再移动完成回执；移动、启动声明复核或延续复核失败后，即使机械失败回执普通写也失败，后续也只能机械关闭。网页端在精确摘要一致的附件上给出阻断／高级／中级／低级 `0／0／0／0` 和“可进入后续回归”，本地核验后接受。
+
+相关组合 41／41、全部 V9.4 聚焦合同 92／92 通过；相邻 Step28-v13 回归运行 591 项、用时 2,060.867 秒，其中 589 项通过、2 项既定跳过；全仓回归运行 860 项、用时 2,053.080 秒，其中 851 项通过、9 项既定跳过。全部为 0 失败、0 错误。当前仍没有 V9.4 时间密钥、正式授权政策、启动声明、捷径门结果、1,004 世界方法资格根、正式 500×4 数据、真值解封或模型结果。下一步只能先提交并推送第一阶段实现，再由该已提交运行器创建唯一时间密钥与单文件授权政策；政策必须另行提交并经精确字节复核后，才可唯一运行 V9.4 前置门。
+
 ## 6. 固定评估指标
 
 最终每个模型必须分别报告平均精确率、梯形精确率—召回率曲线下面积、接收者操作特征曲线下面积、精确率、召回率、F1、特异度、平衡准确率、马修斯相关系数、布里尔分数、对数损失、假阳性率 1% 时召回率，以及原始和世界等权混淆矩阵。
@@ -258,19 +262,21 @@ R2 唯一确定性重放已经发布精确五文件计划根：训练与开发�
 17. V9.3-R2 前置结构门的机器五项门虽全部失败，但只读代码追踪证明探针混入标签生成机制和负例计划派生字段；科研状态为 `AUDITOR_DESIGN_INVALID_NO_DATASET_CONCLUSION`，R2 永久关闭且不得构建其 1,004 世界方法根；
 18. 提交 `9a742a1` 保存失效字节后，R2 载荷、冻结政策、实验脚本、测试和一次性随机权威已从当前工作树清理；下一步仅允许用新版本冻结真实模型可见、无真值污染的结构探针，再独立决定后继数据是否具有方法资格。
 
-当前允许：提交并推送 R2 失效关闭和清理记录，分析已发布的汇总结果，并在不复用 R2 字节、权威、计划、结果或后验获胜列的前提下设计全新后继。当前禁止：重跑或修补 V9.3-R2、恢复其已删除载荷或代码、删掉噪声可见门后继续、立即生成 1,004 世界方法资格数据、打开审核甲乙真值、训练或评估 M0／M1／M2／M3。
+当前允许：提交并推送 V9.4 单次授权第一阶段的合同、运行器、测试和同步文档；提交固定后，只能按该合同生成唯一时间密钥和独立授权政策并进行政策精确复核。当前禁止：重跑或修补 V9.3-R2、复用其字节、权威、计划、结果或路径，立即生成 1,004 世界方法资格数据，打开审核甲乙真值，或训练／评估 M0／M1／M2／M3。V9.4 正式前置门未取得独立政策复核以前也不得运行。
 
 ## 9. 接手优先阅读文件
 
 1. 本文；
 2. `docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md`；
-3. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
-4. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
-5. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
-6. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
-7. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`；
-8. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`；
-9. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
-10. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
-11. V9.2 尝试 1、尝试 2 和尝试 3 的小型终态及尝试 3 完整证据；
-12. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落。
+3. `docs/STEP28_V13_V1_13_V9_4_MODEL_VISIBLE_SHORTCUT_GATE_CONTRACT_20260827.zh.md`；
+4. `docs/STEP28_V13_V1_13_V9_4_FORMAL_PREBUILD_AUTHORIZATION_CONTRACT_20260828.zh.md`；
+5. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
+6. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
+7. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
+8. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
+9. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`；
+10. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`；
+11. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
+12. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
+13. V9.2 尝试 1、尝试 2 和尝试 3 的小型终态及尝试 3 完整证据；
+14. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落。
