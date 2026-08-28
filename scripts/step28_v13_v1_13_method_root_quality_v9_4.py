@@ -81,6 +81,11 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
+def count_nonempty_lines(path: Path) -> int:
+    with path.open("r", encoding="utf-8") as stream:
+        return sum(bool(line.strip()) for line in stream)
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=False)
     with path.open("w", encoding="utf-8", newline="\n") as stream:
@@ -200,8 +205,14 @@ def public_surface_audit(
             exact_item_collisions += int(document_hash in all_item_documents)
             all_item_documents.add(document_hash)
         for profile in profiles:
+            model_content = {
+                key: value for key, value in profile.items() if key != "seller_uid"
+            }
             document_hash = hashlib.sha256(json.dumps(
-                profile, ensure_ascii=False, separators=(",", ":"), sort_keys=True
+                model_content,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
             ).encode("utf-8")).hexdigest()
             exact_profile_collisions += int(document_hash in all_profile_documents)
             all_profile_documents.add(document_hash)
@@ -600,10 +611,12 @@ def registered_private_audit(private_root: Path, world_counts: Mapping[str, int]
     for split in ("train", "development"):
         audits = read_jsonl(private_root / split / "generation_audit.jsonl")
         plans = read_jsonl(private_root / split / "identity_plan.jsonl")
-        parser = read_jsonl(private_root / split / "parsed_identity_occurrences.jsonl")
+        parser_count = count_nonempty_lines(
+            private_root / split / "parsed_identity_occurrences.jsonl"
+        )
         if len(audits) != int(world_counts[split]):
             raise MethodRootQualityError("Generation audit world count drift")
-        parser_rows += len(parser)
+        parser_rows += parser_count
         for audit in audits:
             mechanism_counts.update(
                 row["mechanism"] for row in audit["mechanism_assignments"]
