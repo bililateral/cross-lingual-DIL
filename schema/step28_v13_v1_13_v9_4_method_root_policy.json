@@ -1,0 +1,68 @@
+{
+  "version": "2026-08-28-step28-v13-v1-13-v9-4-method-root-policy-v1",
+  "status": "IMPLEMENTATION_DRAFT_NO_FORMAL_AUTHORIZATION",
+  "scientific_contract": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
+  "build_contract": "docs/STEP28_V13_V1_13_V9_4_METHOD_ROOT_BUILD_CONTRACT_20260828.zh.md",
+  "v9_4_prebuild_result": "reports/step28_synthetic_chinese_dataset/v9_4_prebuild_gate_attempt3_20260828/prebuild_gate_result.json",
+  "base_dataset_policy": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+  "template_library": "schema/step28_v13_v1_13_candidate_text_templates_v9.json",
+  "authorization": {
+    "method_root_build": false,
+    "training_qualification": false,
+    "audit_truth_unsealing": false,
+    "model_training": false
+  },
+  "split_order": ["train", "development", "audit_a", "audit_b"],
+  "world_counts": {
+    "train": 500,
+    "development": 500,
+    "audit_a": 2,
+    "audit_b": 2
+  },
+  "world_contract": {
+    "seller_count": 28,
+    "controller_count": 12,
+    "triad_count": 4,
+    "dyad_count": 8,
+    "pair_count": 378,
+    "positive_pair_count": 20,
+    "negative_pair_count": 358
+  },
+  "model_visible_noise": {
+    "source": "scripts/step28_v13_v1_13_joint_noise_signatures_v9_4.py",
+    "signature_set_commitment_sha256": "15da977c89f620383f14805566ca54a1901a8323416310344609db8003f0eb39",
+    "train_schedule_commitment_sha256": "91664bac3f317b0afef99cffb81f8cbb56209f9537b830aa80d83be9f63a6747",
+    "development_schedule_commitment_sha256": "b50c7e2cfe7ac315c317886f54b38b52d8766cef662c481cf176e778647ddd89",
+    "exact_public_replay_required": true
+  },
+  "identity_contract": {
+    "identity_types": [
+      "telegram", "email", "bat", "qq", "wechat", "phone",
+      "crypto_wallet", "external_url"
+    ],
+    "mechanism_graph_by_split": {
+      "train": "G_A",
+      "development": "G_A",
+      "audit_a": "G_A",
+      "audit_b": "G_B"
+    },
+    "feature_count": 33,
+    "production_parser_required": true,
+    "controller_or_label_direct_feature_construction_forbidden": true
+  },
+  "text_contract": {
+    "language": "zh",
+    "real_source_text_copy_forbidden": true,
+    "artificial_item_code_regex": "Q[A-P]{10}",
+    "artificial_item_code_visible_count_required": 0,
+    "base_style_count_per_world": 4,
+    "controllers_per_base_style": 3,
+    "seller_style_perturbation_count": 2,
+    "identity_values_in_title_forbidden": true
+  },
+  "formal_output_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_20260828",
+  "formal_private_root": "private_custody/step28_v13_v1_13_v9_4_method_root_attempt1_20260828",
+  "formal_quality_output_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_quality_20260828",
+  "formal_authorization_path": "schema/step28_v13_v1_13_v9_4_method_root_authorization_attempt1.json",
+  "failure_rule": "write minimal terminal receipt, delete failed payload and temporary tree, use a new version and output path after scientific failure"
+}
