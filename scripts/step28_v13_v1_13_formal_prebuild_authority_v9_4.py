@@ -27,12 +27,12 @@ import step28_v13_v1_13_quality_probe_policy_v9_4 as implementation_v94
 
 
 VERSION = (
-    "2026-08-28-step28-v13-v1-13-formal-prebuild-authority-v9-4-attempt-2"
+    "2026-08-28-step28-v13-v1-13-formal-prebuild-authority-v9-4-attempt-3"
 )
 POLICY_VERSION = (
-    "2026-08-28-step28-v13-v1-13-v9-4-single-prebuild-authorization-attempt-2"
+    "2026-08-28-step28-v13-v1-13-v9-4-single-prebuild-authorization-attempt-3"
 )
-ATTEMPT_ID = "step28-v13-v1-13-v9-4-prebuild-gate-attempt-2-20260828"
+ATTEMPT_ID = "step28-v13-v1-13-v9-4-prebuild-gate-attempt-3-20260828"
 EXPECTED_BRANCH = "method/step27-english-pretrained-synthetic-adaptation"
 ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY_SCRIPT_RELATIVE = (
@@ -46,15 +46,15 @@ IMPLEMENTATION_POLICY_RELATIVE = (
     "schema/step28_v13_v1_13_v9_4_model_visible_shortcut_policy.json"
 )
 AUTHORIZATION_POLICY_RELATIVE = (
-    "schema/step28_v13_v1_13_v9_4_prebuild_gate_authorization_attempt2.json"
+    "schema/step28_v13_v1_13_v9_4_prebuild_gate_authorization_attempt3.json"
 )
 PRIVATE_ROOT_RELATIVE = (
     "private_custody/step28_v13_v1_13_v9_4_prebuild_gate_"
-    "attempt2_20260828"
+    "attempt3_20260828"
 )
 OUTPUT_ROOT_RELATIVE = (
     "reports/step28_synthetic_chinese_dataset/"
-    "v9_4_prebuild_gate_attempt2_20260828"
+    "v9_4_prebuild_gate_attempt3_20260828"
 )
 UNCONSUMED_KEY_NAME = "time_key.unconsumed.bin"
 CONSUMED_KEY_NAME = "time_key.consumed.bin"

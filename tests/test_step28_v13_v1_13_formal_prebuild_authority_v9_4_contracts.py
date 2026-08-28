@@ -11,6 +11,8 @@ import tempfile
 import unittest
 from unittest import mock
 
+import numpy as np
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -128,6 +130,34 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                     signatures_v94.EXPECTED_SIGNATURE_SET_COMMITMENT_SHA256
                 ),
             },
+        )
+
+    def test_real_frozen_policy_reaches_probe_model_fit(self) -> None:
+        policy = implementation_v94.load_formal_policy()
+        rng = np.random.default_rng(793820367)
+        train_x = np.ascontiguousarray(
+            rng.normal(size=(80, 14)),
+            dtype=np.dtype("<f8"),
+        )
+        train_y = np.ascontiguousarray(
+            np.tile(np.array([0, 1], dtype=np.int8), 40)
+        )
+        development_x = np.ascontiguousarray(
+            rng.normal(size=(20, 14)),
+            dtype=np.dtype("<f8"),
+        )
+        scores = authority_v94.core_v94._fit_probe_models(
+            train_x=train_x,
+            train_y=train_y,
+            development_x=development_x,
+            policy=policy,
+        )
+        self.assertEqual(
+            tuple(scores),
+            ("logistic_l2", "hist_gradient_boosting_depth2"),
+        )
+        self.assertTrue(
+            all(score.shape == (20,) for score in scores.values())
         )
 
     def _write_issuance(self, paths: authority_v94.RuntimePaths) -> None:

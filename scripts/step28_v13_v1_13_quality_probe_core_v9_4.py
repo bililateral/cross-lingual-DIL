@@ -272,7 +272,7 @@ def _fit_probe_models(
     logistic_config = dict(config["logistic_l2"])
     tree_config = dict(config["hist_gradient_boosting_depth2"])
     logistic_preprocessing = logistic_config.pop("preprocessing")
-    scaler_config = logistic_config.pop("standard_scaler")
+    scaler_config = dict(logistic_config.pop("standard_scaler"))
     tree_preprocessing = tree_config.pop("preprocessing")
     tree_class = tree_config.pop("class")
     if (
