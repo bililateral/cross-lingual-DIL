@@ -1659,6 +1659,91 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
             self.assertFalse(recovered["scientific_result_valid"])
             self.assertFalse(recovered["method_root_build_eligible"])
 
+    def test_failed_result_cannot_outlive_interrupted_failure_recovery(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = authority_v94.runtime_paths(root)
+            paths.private_root.mkdir(parents=True)
+            paths.unconsumed_key.write_bytes(self.time_key)
+            self._write_issuance(paths)
+            preflight, inputs, _ = self._stub_formal_materials()
+            failed_metrics = json.loads(json.dumps(passing_metrics()))
+            first_model = next(iter(failed_metrics["model_results"]))
+            failed_metrics["model_results"][first_model][
+                "symmetric_roc_auc"
+            ] = 0.60
+            failed_metrics["maximum_symmetric_roc_auc"] = 0.60
+            failed_metrics["bootstrap"]["symmetric_auc_95_upper"] = 0.60
+            with (
+                mock.patch.object(
+                    authority_v94,
+                    "load_authorization_policy",
+                    return_value=self.policy,
+                ),
+                mock.patch.object(authority_v94, "_validate_policy_commit"),
+                mock.patch.object(
+                    authority_v94,
+                    "_preflight_materials",
+                    return_value=preflight,
+                ),
+                mock.patch.object(
+                    implementation_v94,
+                    "_assemble_formal_inputs_after_authorization",
+                    return_value=inputs,
+                ),
+                mock.patch.object(
+                    authority_v94.core_v94,
+                    "_evaluate_family",
+                    return_value=failed_metrics,
+                ),
+            ):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    authority_v94.run_once(root=root)
+            failed_result = json.loads(paths.result.read_text(encoding="utf-8"))
+            self.assertEqual(
+                failed_result["status"],
+                "FAILED_PREBUILD_SHORTCUT_GATE",
+            )
+            paths.terminal.unlink()
+            failure_building = paths.mechanical_failure_receipt.with_name(
+                f"{paths.mechanical_failure_receipt.name}.building"
+            )
+            failure_building.write_bytes(b"interrupted failure receipt")
+
+            with mock.patch.object(
+                authority_v94,
+                "_replace_existing_building_with_json",
+                side_effect=OSError("failure receipt rewrite interrupted"),
+            ):
+                with self.assertRaisesRegex(
+                    OSError,
+                    "failure receipt rewrite interrupted",
+                ):
+                    authority_v94._recover_claimed_attempt(
+                        policy=self.policy,
+                        paths=paths,
+                    )
+
+            self.assertTrue(failure_building.is_file())
+            self.assertTrue(paths.result.is_file())
+            self.assertFalse(paths.mechanical_failure_receipt.exists())
+            self.assertFalse(paths.terminal.exists())
+
+            recovered = authority_v94._recover_claimed_attempt(
+                policy=self.policy,
+                paths=paths,
+            )
+            self.assertFalse(failure_building.exists())
+            self.assertFalse(paths.result.exists())
+            self.assertEqual(
+                recovered["status"],
+                "POST_CONSUMPTION_MECHANICAL_FAILURE_NO_DATASET_CONCLUSION",
+            )
+            self.assertFalse(recovered["scientific_result_valid"])
+            self.assertFalse(recovered["method_root_build_eligible"])
+
     def test_revalidation_move_failure_is_fenced_before_recovery(
         self,
     ) -> None:

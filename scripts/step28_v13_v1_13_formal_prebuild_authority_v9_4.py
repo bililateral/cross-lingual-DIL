@@ -26,11 +26,13 @@ import step28_v13_v1_13_quality_probe_core_v9_4 as core_v94
 import step28_v13_v1_13_quality_probe_policy_v9_4 as implementation_v94
 
 
-VERSION = "2026-08-28-step28-v13-v1-13-formal-prebuild-authority-v9-4"
-POLICY_VERSION = (
-    "2026-08-28-step28-v13-v1-13-v9-4-single-prebuild-authorization"
+VERSION = (
+    "2026-08-28-step28-v13-v1-13-formal-prebuild-authority-v9-4-attempt-2"
 )
-ATTEMPT_ID = "step28-v13-v1-13-v9-4-prebuild-gate-attempt-1-20260828"
+POLICY_VERSION = (
+    "2026-08-28-step28-v13-v1-13-v9-4-single-prebuild-authorization-attempt-2"
+)
+ATTEMPT_ID = "step28-v13-v1-13-v9-4-prebuild-gate-attempt-2-20260828"
 EXPECTED_BRANCH = "method/step27-english-pretrained-synthetic-adaptation"
 ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY_SCRIPT_RELATIVE = (
@@ -44,15 +46,15 @@ IMPLEMENTATION_POLICY_RELATIVE = (
     "schema/step28_v13_v1_13_v9_4_model_visible_shortcut_policy.json"
 )
 AUTHORIZATION_POLICY_RELATIVE = (
-    "schema/step28_v13_v1_13_v9_4_prebuild_gate_authorization.json"
+    "schema/step28_v13_v1_13_v9_4_prebuild_gate_authorization_attempt2.json"
 )
 PRIVATE_ROOT_RELATIVE = (
     "private_custody/step28_v13_v1_13_v9_4_prebuild_gate_"
-    "attempt1_20260828"
+    "attempt2_20260828"
 )
 OUTPUT_ROOT_RELATIVE = (
     "reports/step28_synthetic_chinese_dataset/"
-    "v9_4_prebuild_gate_attempt1_20260828"
+    "v9_4_prebuild_gate_attempt2_20260828"
 )
 UNCONSUMED_KEY_NAME = "time_key.unconsumed.bin"
 CONSUMED_KEY_NAME = "time_key.consumed.bin"
@@ -794,6 +796,62 @@ def _write_new_json(path: Path, payload: Mapping[str, Any]) -> None:
         + "\n"
     ).encode("utf-8")
     _write_new_bytes(path, raw)
+
+
+def _replace_existing_building_with_json(
+    path: Path,
+    payload: Mapping[str, Any],
+) -> None:
+    """Finish a publication without ever removing its durable marker first."""
+    raw = (
+        json.dumps(
+            _json_value(payload),
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+    building = path.with_name(f"{path.name}.building")
+    if path.exists() or not building.is_file() or building.is_symlink():
+        raise FormalPrebuildAuthorityV94Error(
+            f"Interrupted publication marker drift for {path}"
+        )
+    # Truncating or partially rewriting this file never removes the marker.
+    # Every interruption therefore remains recoverable only as a mechanical
+    # failure until the final atomic replace succeeds.
+    with building.open("wb") as handle:
+        handle.write(raw)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(building, path)
+
+
+def _write_durable_failure_marker(
+    path: Path,
+    payload: Mapping[str, Any],
+) -> None:
+    """Claim failure publication; partial bytes still remain a valid fence."""
+    raw = (
+        json.dumps(
+            _json_value(payload),
+            ensure_ascii=False,
+            indent=2,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        raise FormalPrebuildAuthorityV94Error(
+            f"Refusing to overwrite failure marker {path}"
+        )
+    # Do not clean this file on any exception: existence, not valid JSON, is
+    # the monotonic recovery fence.
+    with path.open("xb") as handle:
+        handle.write(raw)
+        handle.flush()
+        os.fsync(handle.fileno())
 
 
 def validate_issuance_claim(
@@ -2416,11 +2474,6 @@ def _publish_mechanical_failure(
     receipt_building = paths.mechanical_failure_receipt.with_name(
         f"{paths.mechanical_failure_receipt.name}.building"
     )
-    if (
-        not paths.mechanical_failure_receipt.exists()
-        and receipt_building.exists()
-    ):
-        _remove_path(receipt_building)
     if paths.mechanical_failure_receipt.exists():
         receipt = _load_and_validate_mechanical_failure_receipt(
             policy,
@@ -2442,7 +2495,19 @@ def _publish_mechanical_failure(
                 _sha256_file(paths.result) if paths.result.is_file() else None
             ),
         )
-        _write_new_json(paths.mechanical_failure_receipt, receipt)
+        if not receipt_building.exists():
+            _write_durable_failure_marker(
+                receipt_building,
+                _with_self_hash({
+                    "version": VERSION,
+                    "status": "MECHANICAL_FAILURE_PUBLICATION_CLAIMED",
+                    "attempt_id": ATTEMPT_ID,
+                }),
+            )
+        _replace_existing_building_with_json(
+            paths.mechanical_failure_receipt,
+            receipt,
+        )
     _finalize_mechanical_failure(
         policy=policy,
         paths=paths,
