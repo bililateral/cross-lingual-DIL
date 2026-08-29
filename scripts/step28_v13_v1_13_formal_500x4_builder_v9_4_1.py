@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the one-time V9.4 formal 500x4 Chinese synthetic dataset."""
+"""Build the one-time V9.4.1 formal 500x4 Chinese synthetic dataset."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ import csv
 from dataclasses import dataclass, field
 from functools import lru_cache
 import hashlib
+import hmac
 import json
 from pathlib import Path, PurePosixPath
 import shutil
@@ -25,21 +26,24 @@ if str(SCRIPTS) not in sys.path:
 
 import step28_v13_v1_13_balanced_world_schedule_v9_4 as schedule_v94
 import step28_v13_v1_13_document_collision as collision
-import step28_v13_v1_13_formal_identity_exclusion_validator_v9_4 as identity_exclusion
+import step28_v13_identity_values as identity_values
+import step28_v13_v1_13_formal_identity_exclusion_validator_v9_4_1 as identity_exclusion
 import step28_v13_v1_13_method_root_builder_v9_4 as engine
 
 
-VERSION = "2026-08-29-step28-v13-v1-13-formal-500x4-builder-v9-4-v1"
-POLICY_PATH = ROOT / "schema" / "step28_v13_v1_13_v9_4_formal_500x4_policy.json"
+VERSION = "2026-08-29-step28-v13-v1-13-formal-500x4-builder-v9-4-1-v1"
+POLICY_PATH = (
+    ROOT / "schema" / "step28_v13_v1_13_v9_4_1_formal_500x4_policy.json"
+)
 SPLITS = ("train", "development", "audit_a", "audit_b")
 FORMAL_WORLD_COUNTS = {split: 500 for split in SPLITS}
 SMOKE_WORLD_COUNTS = {split: 1 for split in SPLITS}
 AUTHORIZATION_STATUS = "AUTHORIZED_ONCE_NOT_CONSUMED"
 AUTHORIZATION_VERSION = (
-    "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-authority-v1"
+    "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-authority-v1"
 )
 ISSUANCE_CLAIM_VERSION = (
-    "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-"
+    "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-"
     "authority-issuance-claim-v1"
 )
 POLICY_READY_STATUS = "READY_FOR_ONE_TIME_FORMAL_AUTHORIZATION"
@@ -251,6 +255,27 @@ def validate_policy(*, formal: bool) -> dict[str, Any]:
         validate_pinned_file(policy[name], label=name)
     for name, spec in policy["reuse_sources"].items():
         validate_pinned_file(spec, label=f"reuse_sources.{name}")
+    predecessor = policy.get("predecessor_failure", {})
+    expected_predecessor_keys = {
+        "authorization_path", "authorization_sha256", "failure_record_path",
+        "failure_record_sha256", "worlds_completed_before_failure",
+        "raw_key_material_deleted", "reuse_forbidden",
+    }
+    if (
+        set(predecessor) != expected_predecessor_keys
+        or predecessor.get("worlds_completed_before_failure") != 315
+        or predecessor.get("raw_key_material_deleted") is not True
+        or predecessor.get("reuse_forbidden") is not True
+    ):
+        raise Formal500x4BuildError("Predecessor failure boundary drift")
+    for path_name, hash_name in (
+        ("authorization_path", "authorization_sha256"),
+        ("failure_record_path", "failure_record_sha256"),
+    ):
+        validate_pinned_file(
+            {"path": predecessor[path_name], "sha256": predecessor[hash_name]},
+            label=f"predecessor_failure.{path_name}",
+        )
     if policy.get("collision_contract") != {
         "historical_policy_path": (
             "schema/step28_v13_v1_13_document_collision_policy.json"
@@ -269,7 +294,8 @@ def validate_policy(*, formal: bool) -> dict[str, Any]:
         "same_world_duplicate_maximum": 0,
         "cross_world_duplicate_maximum": 0,
         "cross_split_duplicate_maximum": 0,
-        "candidate_retry_forbidden": True,
+        "world_or_document_candidate_retry_forbidden": True,
+        "identity_namespace_counter_allocation_governed_separately": True,
     }:
         raise Formal500x4BuildError("Formal collision contract drift")
     schedule_spec = policy["public_balanced_schedule"]
@@ -283,7 +309,7 @@ def validate_policy(*, formal: bool) -> dict[str, Any]:
             "audit_a": "train",
             "audit_b": "development",
         }
-        or schedule_spec.get("formal_namespace") != "v9_4_formal_500x4"
+        or schedule_spec.get("formal_namespace") != "v9_4_1_formal_500x4"
         or any(
             schedule_spec.get(name) is not True
             for name in (
@@ -298,6 +324,23 @@ def validate_policy(*, formal: bool) -> dict[str, Any]:
         )
     ):
         raise Formal500x4BuildError("Balanced schedule contract drift")
+    if policy.get("identity_allocation_contract") != {
+        "version": "v9_4_1_pre_render_global_identity_allocator_v1",
+        "hmac_domain": (
+            "step28-v13-v1.13-v9.4.1-formal-identity-candidate-v1"
+        ),
+        "counter_start": 0,
+        "counter_step": 1,
+        "maximum_counter": 4096,
+        "first_admissible_candidate_required": True,
+        "historical_identity_exclusion_required": True,
+        "method_root_sealed_exclusion_required": True,
+        "same_run_global_exclusion_required": True,
+        "runs_before_visible_text_rendering": True,
+        "post_render_string_replacement_forbidden": True,
+        "label_controller_qrels_model_score_text_quality_inputs_forbidden": True,
+    }:
+        raise Formal500x4BuildError("Formal identity allocation contract drift")
     quality_spec = policy["method_qualification"]
     manifest_path = ROOT / str(quality_spec["root_manifest_path"])
     quality_path = ROOT / str(quality_spec["quality_result_path"])
@@ -339,7 +382,8 @@ def validate_policy(*, formal: bool) -> dict[str, Any]:
     receipt_paths = []
     for name in (
         "formal_issuance_claim_path", "formal_consumption_path",
-        "formal_failure_path", "formal_completion_path",
+        "formal_failure_path", "formal_key_cleanup_path",
+        "formal_completion_path",
     ):
         path = ROOT / str(policy[name])
         receipt_paths.append(path)
@@ -365,6 +409,29 @@ def forbidden_authority_commitments(policy: Mapping[str, Any]) -> set[str]:
         for spec in method_authorization["key_files"].values()
     }
     commitments.add(str(method_authorization["time_key"]["commitment_sha256"]))
+    predecessor_authorization = read_json(
+        ROOT / str(policy["predecessor_failure"]["authorization_path"])
+    )
+    require_self_hash(
+        predecessor_authorization, label="predecessor formal authorization",
+    )
+    predecessor_keys = predecessor_authorization.get("key_files", {})
+    expected_names = set(policy["private_authority"]["key_names"])
+    if set(predecessor_keys) != expected_names:
+        raise Formal500x4BuildError(
+            "Predecessor authority commitment set drift"
+        )
+    for name in expected_names:
+        spec = predecessor_keys[name]
+        if (
+            not isinstance(spec, dict)
+            or set(spec) != {"path", "commitment_sha256"}
+            or not is_sha256(spec["commitment_sha256"])
+        ):
+            raise Formal500x4BuildError(
+                "Predecessor authority commitment schema drift"
+            )
+        commitments.add(str(spec["commitment_sha256"]))
     historical = collision.load_historical_exclusion_registries(
         ROOT / str(policy["collision_contract"]["historical_policy_path"])
     )
@@ -498,7 +565,7 @@ def build_world_schedules(
         schedules: dict[str, tuple[engine.PublicWorld, ...]] = {}
         for split in SPLITS:
             source = engine._smoke_world(split)
-            world_uid = f"v9_4_formal_500x4_smoke_{split}_world_000"
+            world_uid = f"v9_4_1_formal_500x4_smoke_{split}_world_000"
             seller_uids = tuple(
                 f"{world_uid}_seller_{slot:02d}" for slot in range(28)
             )
@@ -736,6 +803,7 @@ def load_formal_authorities(
         )
     for name in (
         "formal_consumption_path", "formal_failure_path",
+        "formal_key_cleanup_path",
         "formal_completion_path",
     ):
         if (ROOT / str(policy[name])).exists():
@@ -783,7 +851,7 @@ def consume_authorization(policy: Mapping[str, Any]) -> dict[str, Any]:
     auth = read_json(auth_path)
     marker_path = ROOT / str(policy["formal_consumption_path"])
     payload: dict[str, Any] = {
-        "version": "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-consumption-v1",
+        "version": "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-consumption-v1",
         "status": "FORMAL_500X4_BUILD_AUTHORITY_CONSUMED",
         "authorization_sha256": sha256_file(auth_path),
         "authorization_canonical_self_hash": auth["canonical_self_hash"],
@@ -794,12 +862,16 @@ def consume_authorization(policy: Mapping[str, Any]) -> dict[str, Any]:
         "rerun_authorized": False,
     }
     payload["canonical_self_hash"] = canonical_sha256(payload)
-    write_json_exclusive(marker_path, payload)
-    return {
+    marker_bytes = (
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    ).encode("utf-8")
+    receipt = {
         "path": marker_path.relative_to(ROOT).as_posix(),
-        "sha256": sha256_file(marker_path),
+        "sha256": hashlib.sha256(marker_bytes).hexdigest(),
         "canonical_self_hash": payload["canonical_self_hash"],
     }
+    write_json_exclusive(marker_path, payload)
+    return receipt
 
 
 def write_post_consumption_failure(
@@ -811,7 +883,7 @@ def write_post_consumption_failure(
     auth_path = ROOT / str(policy["formal_authorization_path"])
     payload: dict[str, Any] = {
         "version": (
-            "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-"
+            "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-"
             "build-failure-v1"
         ),
         "status": "FORMAL_500X4_BUILD_FAILED_NO_DATASET_CONCLUSION_NO_RERUN",
@@ -828,11 +900,93 @@ def write_post_consumption_failure(
         "worlds_completed": worlds_completed,
         "path_presence_before_cleanup": dict(path_presence_before_cleanup),
         "claim_boundary": "MECHANICAL_FAILURE_NO_DATASET_CONCLUSION",
+        "raw_key_material_cleanup_receipt_required": policy[
+            "formal_key_cleanup_path"
+        ],
         "rerun_authorized": False,
         "training_authorized": False,
     }
     payload["canonical_self_hash"] = canonical_sha256(payload)
     write_json_exclusive(path, payload)
+
+
+def delete_consumed_authority_keys(
+    policy: Mapping[str, Any],
+) -> dict[str, str]:
+    """Validate then delete the six already-consumed raw authority files."""
+
+    auth_path = ROOT / str(policy["formal_authorization_path"])
+    auth = read_json(auth_path)
+    require_self_hash(auth, label="formal authorization before key cleanup")
+    authority_root = ROOT / str(policy["formal_authority_root"])
+    expected_names = tuple(policy["private_authority"]["key_names"])
+    key_files = auth.get("key_files", {})
+    if set(key_files) != set(expected_names):
+        raise Formal500x4BuildError("Formal key-cleanup authority set drift")
+    validated: dict[str, tuple[Path, str]] = {}
+    for name in expected_names:
+        spec = key_files[name]
+        expected_path = authority_root / f"{name}_key.bin"
+        if (
+            not isinstance(spec, dict)
+            or set(spec) != {"path", "commitment_sha256"}
+            or ROOT / str(spec["path"]) != expected_path
+            or not is_sha256(spec["commitment_sha256"])
+        ):
+            raise Formal500x4BuildError(
+                f"Formal key-cleanup path schema drift: {name}"
+            )
+        data = expected_path.read_bytes() if expected_path.is_file() else b""
+        commitment = hashlib.sha256(data).hexdigest()
+        if len(data) != 32 or commitment != spec["commitment_sha256"]:
+            raise Formal500x4BuildError(
+                f"Formal key-cleanup authority bytes drift: {name}"
+            )
+        validated[name] = (expected_path, commitment)
+    for path, _commitment in validated.values():
+        path.unlink()
+    if any(path.exists() for path, _commitment in validated.values()):
+        raise Formal500x4BuildError("Formal raw authority cleanup failed")
+    return {
+        name: validated[name][1]
+        for name in expected_names
+    }
+
+
+def write_key_cleanup_receipt(
+    policy: Mapping[str, Any], *, commitments: Mapping[str, str],
+) -> dict[str, Any]:
+    failure_path = ROOT / str(policy["formal_failure_path"])
+    failure = read_json(failure_path)
+    require_self_hash(failure, label="formal failure before key cleanup receipt")
+    expected_names = tuple(policy["private_authority"]["key_names"])
+    if (
+        tuple(commitments) != expected_names
+        or any(not is_sha256(value) for value in commitments.values())
+    ):
+        raise Formal500x4BuildError("Formal key-cleanup commitment drift")
+    payload: dict[str, Any] = {
+        "version": (
+            "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-"
+            "raw-key-cleanup-v1"
+        ),
+        "status": "FORMAL_500X4_CONSUMED_RAW_KEYS_DELETED",
+        "authorization_sha256": failure["authorization_sha256"],
+        "failure_receipt_sha256": sha256_file(failure_path),
+        "failure_receipt_canonical_self_hash": failure["canonical_self_hash"],
+        "deleted_key_commitments": dict(commitments),
+        "deleted_key_count": len(commitments),
+        "raw_key_material_deleted": True,
+        "rerun_authorized": False,
+    }
+    payload["canonical_self_hash"] = canonical_sha256(payload)
+    path = ROOT / str(policy["formal_key_cleanup_path"])
+    write_json_exclusive(path, payload)
+    return {
+        "path": path.relative_to(ROOT).as_posix(),
+        "sha256": sha256_file(path),
+        "canonical_self_hash": payload["canonical_self_hash"],
+    }
 
 
 def publish_dual_roots(
@@ -864,7 +1018,7 @@ def write_completion_receipt(
         raise Formal500x4BuildError("Formal dual-root completion boundary drift")
     payload: dict[str, Any] = {
         "version": (
-            "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-"
+            "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-"
             "build-completion-v1"
         ),
         "status": "FORMAL_500X4_DUAL_ROOT_BUILD_COMPLETED",
@@ -925,6 +1079,181 @@ class CollisionState:
     split_seller_documents: dict[str, set[str]] = field(
         default_factory=lambda: {split: set() for split in SPLITS}
     )
+
+
+def formal_identity_candidate(
+    *, key: bytes, domain: str, identity_type: str, asset_uid: str,
+    counter: int,
+) -> str:
+    if (
+        len(key) != 32
+        or not domain
+        or identity_type not in engine.IDENTITY_TYPES
+        or not asset_uid
+        or isinstance(counter, bool)
+        or not isinstance(counter, int)
+        or counter < 0
+    ):
+        raise Formal500x4BuildError("Formal identity candidate input drift")
+    message = b"\x1f".join((
+        domain.encode("ascii"), identity_type.encode("ascii"),
+        asset_uid.encode("utf-8"), str(counter).encode("ascii"),
+    ))
+    integer = int.from_bytes(
+        hmac.new(key, message, hashlib.sha256).digest(), "big",
+    ) % identity_values.domain_size(identity_type, "parser_safe_hex_v2")
+    return identity_values.encode_identity_value(
+        identity_type, integer, handle_encoding="parser_safe_hex_v2",
+    )
+
+
+class FormalIdentityAllocator:
+    """Allocate the first globally admissible identity before rendering."""
+
+    def __init__(
+        self, *, key: bytes, domain: str, maximum_counter: int,
+        historical_forbidden: set[str],
+        sealed_method_identities: (
+            identity_exclusion.SealedMethodIdentityExclusion
+        ),
+    ) -> None:
+        if len(key) != 32 or maximum_counter < 1:
+            raise Formal500x4BuildError("Formal identity allocator setup drift")
+        self._key = key
+        self._domain = domain
+        self._maximum_counter = maximum_counter
+        self._historical_forbidden = historical_forbidden
+        self._sealed_method_identities = sealed_method_identities
+        self._allocated_hashes: set[str] = set()
+        self._allocated_asset_uids: set[str] = set()
+        self._allocation_order: list[tuple[str, str]] = []
+        self._asset_counts: Counter[str] = Counter()
+        self._selected_counter_counts: Counter[int] = Counter()
+        self._rejections: dict[str, Counter[str]] = {
+            "historical": Counter(),
+            "method_root": Counter(),
+            "same_run": Counter(),
+        }
+
+    def allocate(self, key: bytes, identity_type: str, asset_uid: str) -> str:
+        if key != self._key:
+            raise Formal500x4BuildError(
+                "Formal identity allocator received the wrong authority"
+            )
+        if asset_uid in self._allocated_asset_uids:
+            raise Formal500x4BuildError(
+                "Formal identity allocator received a duplicate asset UID"
+            )
+        for counter in range(self._maximum_counter + 1):
+            value = formal_identity_candidate(
+                key=self._key, domain=self._domain,
+                identity_type=identity_type, asset_uid=asset_uid,
+                counter=counter,
+            )
+            value_hash = hashlib.sha256(value.encode("utf-8")).hexdigest()
+            if value_hash in self._historical_forbidden:
+                self._rejections["historical"][identity_type] += 1
+                continue
+            try:
+                self._sealed_method_identities.require_disjoint(
+                    value_hashes=(value_hash,), asset_uids=(),
+                )
+            except identity_exclusion.SealedIdentityExclusionError:
+                self._rejections["method_root"][identity_type] += 1
+                continue
+            if value_hash in self._allocated_hashes:
+                self._rejections["same_run"][identity_type] += 1
+                continue
+            self._allocated_hashes.add(value_hash)
+            self._allocated_asset_uids.add(asset_uid)
+            self._allocation_order.append((asset_uid, value_hash))
+            self._asset_counts[identity_type] += 1
+            self._selected_counter_counts[counter] += 1
+            return value
+        raise Formal500x4BuildError(
+            "Formal identity candidate counter domain exhausted"
+        )
+
+    def world_start(self) -> int:
+        return len(self._allocation_order)
+
+    def require_world_projection(
+        self, start: int, identity_projection: Sequence[Mapping[str, Any]],
+    ) -> None:
+        projected = [(
+            str(row["asset_uid"]), str(row["value_sha256"]),
+        ) for row in identity_projection]
+        allocated = self._allocation_order[start:]
+        if (
+            start < 0
+            or len(projected) != len(set(projected))
+            or len(allocated) != len(projected)
+            or allocated != projected
+        ):
+            raise Formal500x4BuildError(
+                "Formal pre-render identity allocation/world projection drift"
+            )
+
+    def require_final_registry(self, registered: set[str]) -> None:
+        if self._allocated_hashes != registered:
+            raise Formal500x4BuildError(
+                "Formal identity allocation/final registry drift"
+            )
+
+    def public_audit(self) -> dict[str, Any]:
+        selected_total = sum(self._selected_counter_counts.values())
+        return {
+            "version": "v9_4_1_pre_render_global_identity_allocator_audit_v1",
+            "asset_count": selected_total,
+            "asset_counts_by_identity_type": dict(sorted(
+                self._asset_counts.items()
+            )),
+            "candidate_rejections": {
+                source: {
+                    "total": sum(counts.values()),
+                    "by_identity_type": dict(sorted(counts.items())),
+                }
+                for source, counts in sorted(self._rejections.items())
+            },
+            "nonzero_selected_counter_count": sum(
+                count for counter, count in self._selected_counter_counts.items()
+                if counter > 0
+            ),
+            "maximum_selected_counter": max(
+                self._selected_counter_counts, default=0
+            ),
+            "maximum_counter": self._maximum_counter,
+            "allocated_value_hashes_sha256": canonical_sha256(
+                sorted(self._allocated_hashes)
+            ),
+            "label_controller_qrels_model_score_text_quality_inputs": 0,
+            "post_render_replacements": 0,
+        }
+
+
+def build_one_world_with_identity_allocator(
+    *, world: engine.PublicWorld, authorities: engine.Authorities,
+    base_policy: Mapping[str, Any], template: Mapping[str, Any],
+    signatures: Sequence[Mapping[str, Any]],
+    allocator: FormalIdentityAllocator,
+) -> dict[str, Any]:
+    start = allocator.world_start()
+    original = engine.identity_value_for_asset
+    engine.identity_value_for_asset = allocator.allocate
+    try:
+        value = engine.build_one_world(
+            world=world, auth=authorities, base_policy=base_policy,
+            template=template, signatures=signatures,
+        )
+    finally:
+        engine.identity_value_for_asset = original
+    projection = tuple({
+        "asset_uid": row["asset_uid"],
+        "value_sha256": row["value_sha256"],
+    } for row in value["identity_plan"])
+    allocator.require_world_projection(start, projection)
+    value["formal_identity_projection"] = projection
+    return value
 
 
 def load_collision_state(policy: Mapping[str, Any]) -> CollisionState:
@@ -1221,7 +1550,7 @@ def public_collision_registry(
             "Formal public collision registry contains an exclusion hit"
         )
     value: dict[str, Any] = {
-        "version": "2026-08-29-step28-v13-v1-13-v9-4-formal-public-collision-registry-v1",
+        "version": "2026-08-29-step28-v13-v1-13-v9-4-1-formal-public-collision-registry-v1",
         "hash_list": dict(hash_list),
         "counts": {
             "item_documents": len(state.formal_item_documents),
@@ -1275,7 +1604,7 @@ def private_identity_collision_registry(state: CollisionState) -> dict[str, Any]
             "Formal private collision registry contains an identity hit"
         )
     value: dict[str, Any] = {
-        "version": "2026-08-29-step28-v13-v1-13-v9-4-formal-private-identity-collision-registry-v1",
+        "version": "2026-08-29-step28-v13-v1-13-v9-4-1-formal-private-identity-collision-registry-v1",
         "identity_value_hashes": sorted(state.formal_identity_values),
         "identity_asset_uids": sorted(state.formal_asset_uids),
         "counts": {
@@ -1315,7 +1644,7 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
         }
         root = output_root or (
             ROOT / "reports" / "step28_synthetic_chinese_dataset"
-            / "_v9_4_formal_500x4_smoke"
+            / "_v9_4_1_formal_500x4_smoke"
         )
         private = root.parent / f".{root.name}.private"
     temporary = root.parent / f".{root.name}.building"
@@ -1331,6 +1660,14 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
             ROOT / str(policy["method_qualification"]["private_root"])
         ),
         root_manifest=method_manifest,
+    )
+    allocation_contract = policy["identity_allocation_contract"]
+    identity_allocator = FormalIdentityAllocator(
+        key=authorities.identity,
+        domain=str(allocation_contract["hmac_domain"]),
+        maximum_counter=int(allocation_contract["maximum_counter"]),
+        historical_forbidden=collision_state.blocked_identity_values,
+        sealed_method_identities=sealed_method_identities,
     )
     schedules, schedule_commitments = build_world_schedules(
         formal=formal, authorities=authorities, policy=policy,
@@ -1364,12 +1701,13 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
         for split in SPLITS:
             for world in schedules[split]:
                 stage = f"generating_{split}_world_{world.ordinal:03d}"
-                value = engine.build_one_world(
+                value = build_one_world_with_identity_allocator(
                     world=world,
-                    auth=authorities,
+                    authorities=authorities,
                     base_policy=base_policy,
                     template=template,
                     signatures=signatures,
+                    allocator=identity_allocator,
                 )
                 register_world(
                     split=split,
@@ -1378,10 +1716,7 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
                     redacted_items=value["redacted_items"],
                     model_profiles=value["model_profiles"],
                     endpoints=value["endpoints"],
-                    identity_projection=tuple({
-                        "asset_uid": row["asset_uid"],
-                        "value_sha256": row["value_sha256"],
-                    } for row in value["identity_plan"]),
+                    identity_projection=value["formal_identity_projection"],
                     state=collision_state,
                     sealed_method_identities=sealed_method_identities,
                 )
@@ -1399,6 +1734,11 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
         for writer in writers.values():
             writer.close()
         writers.clear()
+        stage = "closing_global_identity_allocation"
+        identity_allocator.require_final_registry(
+            collision_state.formal_identity_values
+        )
+        identity_allocation_audit = identity_allocator.public_audit()
         stage = "writing_collision_registries"
         collision_hash_list = write_public_collision_hashes(
             temporary / "document_collision_hashes.jsonl",
@@ -1463,6 +1803,7 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
             "sealed_method_identity_exclusion_audit": (
                 sealed_method_identities.public_audit()
             ),
+            "identity_allocation_audit": identity_allocation_audit,
             "public_files": public_files,
             "private_file_commitments": private_files,
             "audit_truth_read_counts": {"audit_a": 0, "audit_b": 0},
@@ -1512,6 +1853,10 @@ def build_dataset(*, formal: bool, output_root: Path | None = None) -> dict[str,
                         "public_final": root.exists(),
                         "private_final": private.exists(),
                     },
+                )
+                deleted_commitments = delete_consumed_authority_keys(policy)
+                write_key_cleanup_receipt(
+                    policy, commitments=deleted_commitments,
                 )
             except BaseException as failure_exc:
                 receipt_error = failure_exc

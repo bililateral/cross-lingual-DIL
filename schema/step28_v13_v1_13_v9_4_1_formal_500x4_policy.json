@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-policy-v1",
+  "version": "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-policy-v1",
   "status": "READY_FOR_ONE_TIME_FORMAL_AUTHORIZATION",
   "scientific_contract": {
     "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
@@ -10,8 +10,17 @@
     "sha256": "bb1a98044f91e3a9d915b842b231fd4822d305cc3121852a8f889130cc54edfe"
   },
   "formal_build_contract": {
-    "path": "docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md",
-    "sha256": "1a054150a3bcac2c62ef46d5535af9651f3043e4b3ea9bbc0cb56b24d7e898c5"
+    "path": "docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md",
+    "sha256": "fab010f9945fceb7b19a4ec445178a8498778e5bfe02728a7e5b670e984769ce"
+  },
+  "predecessor_failure": {
+    "authorization_path": "schema/step28_v13_v1_13_v9_4_formal_500x4_authorization_attempt1.json",
+    "authorization_sha256": "a2a0546b1470650665187605bcdfb80b8e1bc4dfd48632739d2570daf1d6d874",
+    "failure_record_path": "docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_ATTEMPT1_FAILURE_20260829.zh.md",
+    "failure_record_sha256": "902b2c067f9534bcf2c222a904943cd67044b5766957544cb797692ca4351929",
+    "worlds_completed_before_failure": 315,
+    "raw_key_material_deleted": true,
+    "reuse_forbidden": true
   },
   "method_qualification": {
     "public_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_20260828",
@@ -57,7 +66,7 @@
       "audit_a": "train",
       "audit_b": "development"
     },
-    "formal_namespace": "v9_4_formal_500x4",
+    "formal_namespace": "v9_4_1_formal_500x4",
     "private_transform_authority_required": true,
     "split_specific_world_order": true,
     "split_specific_seller_slot_permutation": true,
@@ -76,8 +85,8 @@
       "sha256": "5cb1907ed6d15ea52cdc0b35069fdff1cc651dca2b570debbb53ee77a8f9d4d4"
     },
     "formal_identity_exclusion_validator": {
-      "path": "scripts/step28_v13_v1_13_formal_identity_exclusion_validator_v9_4.py",
-      "sha256": "e257b16c7b130b2ce9b946251cea872a2936d6f866533b0a9f3a4cd979ca63b5"
+      "path": "scripts/step28_v13_v1_13_formal_identity_exclusion_validator_v9_4_1.py",
+      "sha256": "cd2b2a5c11c754879a164a808fbcc4a97dbf08c2a2ab50ebb5cd58fed78ce1b0"
     },
     "base_dataset_policy": {
       "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
@@ -115,7 +124,8 @@
     "same_world_duplicate_maximum": 0,
     "cross_world_duplicate_maximum": 0,
     "cross_split_duplicate_maximum": 0,
-    "candidate_retry_forbidden": true
+    "world_or_document_candidate_retry_forbidden": true,
+    "identity_namespace_counter_allocation_governed_separately": true
   },
   "identity_contract": {
     "identity_types": [
@@ -140,6 +150,20 @@
     "cross_world_identity_value_reuse_forbidden": true,
     "method_root_identity_value_reuse_forbidden": true
   },
+  "identity_allocation_contract": {
+    "version": "v9_4_1_pre_render_global_identity_allocator_v1",
+    "hmac_domain": "step28-v13-v1.13-v9.4.1-formal-identity-candidate-v1",
+    "counter_start": 0,
+    "counter_step": 1,
+    "maximum_counter": 4096,
+    "first_admissible_candidate_required": true,
+    "historical_identity_exclusion_required": true,
+    "method_root_sealed_exclusion_required": true,
+    "same_run_global_exclusion_required": true,
+    "runs_before_visible_text_rendering": true,
+    "post_render_string_replacement_forbidden": true,
+    "label_controller_qrels_model_score_text_quality_inputs_forbidden": true
+  },
   "truth_access": {
     "build_time_audit_a_semantic_reads": 0,
     "build_time_audit_b_semantic_reads": 0,
@@ -157,15 +181,16 @@
     "row_level_truth_in_public_result_forbidden": true,
     "audit_truth_unsealing_before_blind_predictions_forbidden": true
   },
-  "formal_output_root": "reports/step28_synthetic_chinese_dataset/v9_4_formal_500x4_attempt1_20260829",
-  "formal_private_root": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_attempt1_20260829",
-  "formal_authority_root": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829",
-  "formal_authorization_path": "schema/step28_v13_v1_13_v9_4_formal_500x4_authorization_attempt1.json",
-  "formal_issuance_claim_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_issuance.claimed.json",
-  "formal_consumption_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.consumed.json",
-  "formal_failure_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.failed.json",
-  "formal_completion_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.completed.json",
+  "formal_output_root": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829",
+  "formal_private_root": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829",
+  "formal_authority_root": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829",
+  "formal_authorization_path": "schema/step28_v13_v1_13_v9_4_1_formal_500x4_authorization_attempt1.json",
+  "formal_issuance_claim_path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829/formal_500x4_issuance.claimed.json",
+  "formal_consumption_path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829/formal_500x4_build.consumed.json",
+  "formal_failure_path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829/formal_500x4_build.failed.json",
+  "formal_key_cleanup_path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829/formal_500x4_keys.cleaned.json",
+  "formal_completion_path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_authority_attempt1_20260829/formal_500x4_build.completed.json",
   "publication_status": "BUILT_NOT_TRAINING_QUALIFIED",
   "failure_rule": "write a minimal failure boundary, delete failed payload and temporary roots, and use a new version, authorization, authority and output path after an irrecoverable scientific failure",
-  "canonical_self_hash": "226576a825223932c84530b7554e9642caa16153863df33fd9772bd41bd7101b"
+  "canonical_self_hash": "6026f83f2741610678d00674010aed2d919d503c927b06e53aba3f0839ec7500"
 }

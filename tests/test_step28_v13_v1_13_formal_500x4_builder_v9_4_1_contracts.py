@@ -19,14 +19,14 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 formal = importlib.import_module(
-    "step28_v13_v1_13_formal_500x4_builder_v9_4"
+    "step28_v13_v1_13_formal_500x4_builder_v9_4_1"
 )
 authority = importlib.import_module(
-    "step28_v13_v1_13_formal_500x4_authority_v9_4"
+    "step28_v13_v1_13_formal_500x4_authority_v9_4_1"
 )
 
 
-class Formal500x4BuilderV94Contracts(unittest.TestCase):
+class Formal500x4BuilderV941Contracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.policy = json.loads(formal.POLICY_PATH.read_text(encoding="utf-8"))
@@ -64,6 +64,32 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
         self.assertFalse(quality["m0_m1_m2_m3_training_authorized"])
         self.assertEqual(quality["truth_access"]["audit_a_semantic_reads"], 0)
         self.assertEqual(quality["truth_access"]["audit_b_semantic_reads"], 0)
+
+    def test_policy_binds_failed_predecessor_and_forbids_its_authorities(
+        self,
+    ) -> None:
+        predecessor = self.policy["predecessor_failure"]
+        authorization_path = ROOT / predecessor["authorization_path"]
+        failure_path = ROOT / predecessor["failure_record_path"]
+        self.assertEqual(
+            formal.sha256_file(authorization_path),
+            predecessor["authorization_sha256"],
+        )
+        self.assertEqual(
+            formal.sha256_file(failure_path),
+            predecessor["failure_record_sha256"],
+        )
+        authorization = json.loads(
+            authorization_path.read_text(encoding="utf-8")
+        )
+        predecessor_commitments = {
+            row["commitment_sha256"]
+            for row in authorization["key_files"].values()
+        }
+        self.assertEqual(len(predecessor_commitments), 6)
+        self.assertTrue(predecessor_commitments.issubset(
+            formal.forbidden_authority_commitments(self.policy)
+        ))
 
     def test_formal_mode_accepts_frozen_self_hashed_policy(self) -> None:
         observed = formal.validate_policy(formal=True)
@@ -116,7 +142,7 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
                 self.assertEqual(len(worlds), 500)
                 self.assertTrue(all(
                     world.world_uid.startswith(
-                        f"v9_4_formal_500x4_{split}_world_"
+                        f"v9_4_1_formal_500x4_{split}_world_"
                     )
                     for world in worlds
                 ))
@@ -415,6 +441,125 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
         self.assertNotIn("identity_value_hashes", audit)
         self.assertNotIn("identity_asset_uids", audit)
 
+    def test_pre_render_allocator_skips_historical_candidate_deterministically(
+        self,
+    ) -> None:
+        first = "13000000000"
+        second = "13000000001"
+        first_hash = hashlib.sha256(first.encode("utf-8")).hexdigest()
+        sealed = mock.Mock()
+        allocator = formal.FormalIdentityAllocator(
+            key=b"i" * 32,
+            domain=self.policy["identity_allocation_contract"]["hmac_domain"],
+            maximum_counter=4,
+            historical_forbidden={first_hash},
+            sealed_method_identities=sealed,
+        )
+        with mock.patch.object(
+            formal, "formal_identity_candidate", side_effect=[first, second],
+        ) as candidate:
+            selected = allocator.allocate(b"i" * 32, "phone", "asset_one")
+        self.assertEqual(selected, second)
+        self.assertEqual(candidate.call_count, 2)
+        audit = allocator.public_audit()
+        self.assertEqual(audit["candidate_rejections"]["historical"]["total"], 1)
+        self.assertEqual(audit["nonzero_selected_counter_count"], 1)
+        self.assertEqual(
+            audit["label_controller_qrels_model_score_text_quality_inputs"], 0,
+        )
+        allocator.require_world_projection(0, [{
+            "asset_uid": "asset_one",
+            "value_sha256": hashlib.sha256(second.encode("utf-8")).hexdigest(),
+        }])
+
+    def test_pre_render_allocator_skips_method_and_same_run_candidates(self) -> None:
+        values = ["13000000000", "13000000001", "13000000002"]
+        sealed = mock.Mock()
+        sealed.require_disjoint.side_effect = [
+            formal.identity_exclusion.SealedIdentityExclusionError("collision"),
+            None,
+            None,
+            None,
+        ]
+        allocator = formal.FormalIdentityAllocator(
+            key=b"i" * 32,
+            domain=self.policy["identity_allocation_contract"]["hmac_domain"],
+            maximum_counter=4,
+            historical_forbidden=set(),
+            sealed_method_identities=sealed,
+        )
+        with mock.patch.object(
+            formal,
+            "formal_identity_candidate",
+            side_effect=[values[0], values[1], values[1], values[2]],
+        ):
+            self.assertEqual(
+                allocator.allocate(b"i" * 32, "phone", "asset_one"),
+                values[1],
+            )
+            self.assertEqual(
+                allocator.allocate(b"i" * 32, "phone", "asset_two"),
+                values[2],
+            )
+        audit = allocator.public_audit()
+        self.assertEqual(audit["candidate_rejections"]["method_root"]["total"], 1)
+        self.assertEqual(audit["candidate_rejections"]["same_run"]["total"], 1)
+        self.assertEqual(audit["asset_count"], 2)
+
+    def test_pre_render_allocator_binds_each_value_to_its_exact_asset(self) -> None:
+        values = ["13000000000", "13000000001"]
+        hashes = [
+            hashlib.sha256(value.encode("utf-8")).hexdigest()
+            for value in values
+        ]
+        allocator = formal.FormalIdentityAllocator(
+            key=b"i" * 32,
+            domain=self.policy["identity_allocation_contract"]["hmac_domain"],
+            maximum_counter=4,
+            historical_forbidden=set(),
+            sealed_method_identities=mock.Mock(),
+        )
+        with mock.patch.object(
+            formal, "formal_identity_candidate", side_effect=values,
+        ):
+            allocator.allocate(b"i" * 32, "phone", "asset_one")
+            allocator.allocate(b"i" * 32, "phone", "asset_two")
+        with self.assertRaisesRegex(
+            formal.Formal500x4BuildError,
+            "allocation/world projection drift",
+        ):
+            allocator.require_world_projection(0, [
+                {"asset_uid": "asset_one", "value_sha256": hashes[1]},
+                {"asset_uid": "asset_two", "value_sha256": hashes[0]},
+            ])
+        with self.assertRaisesRegex(
+            formal.Formal500x4BuildError, "duplicate asset UID",
+        ):
+            allocator.allocate(b"i" * 32, "phone", "asset_one")
+
+    def test_identity_allocator_patch_is_restored_after_generation_failure(
+        self,
+    ) -> None:
+        allocator = formal.FormalIdentityAllocator(
+            key=b"i" * 32,
+            domain=self.policy["identity_allocation_contract"]["hmac_domain"],
+            maximum_counter=4,
+            historical_forbidden=set(),
+            sealed_method_identities=mock.Mock(),
+        )
+        original = formal.engine.identity_value_for_asset
+        with mock.patch.object(
+            formal.engine, "build_one_world", side_effect=RuntimeError("injected"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "injected"):
+                formal.build_one_world_with_identity_allocator(
+                    world=mock.Mock(),
+                    authorities=formal.smoke_authorities(),
+                    base_policy={}, template={}, signatures=(),
+                    allocator=allocator,
+                )
+        self.assertIs(formal.engine.identity_value_for_asset, original)
+
     def test_manifest_payload_validation_rejects_byte_drift_and_extra_file(
         self,
     ) -> None:
@@ -446,7 +591,7 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
 
     def test_authority_issues_six_distinct_commitments_without_key_material(self) -> None:
         policy = json.loads(json.dumps(self.policy))
-        suffix = "_test_v9_4_formal_500x4_authority"
+        suffix = "_test_v9_4_1_formal_500x4_authority"
         policy["formal_authorization_path"] = f"schema/{suffix}.json"
         policy["formal_authority_root"] = f"private_custody/{suffix}"
         policy["formal_output_root"] = (
@@ -566,11 +711,54 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
                 elif path.exists():
                     path.unlink()
 
+    def test_consumption_reference_requires_no_fallible_post_write_read(
+        self,
+    ) -> None:
+        policy = json.loads(json.dumps(self.policy))
+        with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+            parent = Path(directory)
+            auth_path = parent / "authorization.json"
+            marker_path = parent / "consumed.json"
+            policy["formal_authorization_path"] = (
+                auth_path.relative_to(ROOT).as_posix()
+            )
+            policy["formal_consumption_path"] = (
+                marker_path.relative_to(ROOT).as_posix()
+            )
+            authorization = {
+                "canonical_self_hash": "a" * 64,
+                "implementation_commit": "b" * 40,
+                "implementation_tree": "c" * 40,
+                "output_root": "reports/test-public",
+                "private_root": "private_custody/test-private",
+            }
+            formal.engine.write_json(auth_path, authorization)
+            original_sha256_file = formal.sha256_file
+
+            def reject_post_write_read(path: Path) -> str:
+                if Path(path) == marker_path:
+                    raise AssertionError("consumption marker was read after publication")
+                return original_sha256_file(Path(path))
+
+            with mock.patch.object(
+                formal,
+                "sha256_file",
+                side_effect=reject_post_write_read,
+            ):
+                receipt = formal.consume_authorization(policy)
+            self.assertTrue(marker_path.is_file())
+            self.assertEqual(
+                receipt["sha256"],
+                hashlib.sha256(marker_path.read_bytes()).hexdigest(),
+            )
+            consumed = json.loads(marker_path.read_text(encoding="utf-8"))
+            formal.require_self_hash(consumed, label="test formal consumption")
+
     def test_authority_failure_after_random_draw_is_permanently_occupied(
         self,
     ) -> None:
         policy = json.loads(json.dumps(self.policy))
-        suffix = "_test_v9_4_formal_500x4_failed_issuance"
+        suffix = "_test_v9_4_1_formal_500x4_failed_issuance"
         policy["formal_authorization_path"] = f"schema/{suffix}.json"
         policy["formal_authority_root"] = f"private_custody/{suffix}"
         policy["formal_output_root"] = f"reports/{suffix}_output"
@@ -640,7 +828,7 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
 
     def test_forbidden_authority_draw_fails_without_redraw(self) -> None:
         policy = json.loads(json.dumps(self.policy))
-        suffix = "_test_v9_4_formal_500x4_forbidden_draw"
+        suffix = "_test_v9_4_1_formal_500x4_forbidden_draw"
         policy["formal_authorization_path"] = f"schema/{suffix}.json"
         policy["formal_authority_root"] = f"private_custody/{suffix}"
         policy["formal_output_root"] = f"reports/{suffix}_output"
@@ -748,7 +936,7 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
         self,
     ) -> None:
         policy = json.loads(json.dumps(self.policy))
-        suffix = "_test_v9_4_formal_500x4_failure_receipt"
+        suffix = "_test_v9_4_1_formal_500x4_failure_receipt"
         auth_path = ROOT / "schema" / f"{suffix}.json"
         authority_root = ROOT / "private_custody" / suffix
         failure_path = authority_root / "formal_500x4_build.failed.json"
@@ -807,6 +995,79 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
             if authority_root.exists():
                 shutil.rmtree(authority_root)
 
+    def test_post_consumption_failure_deletes_all_six_raw_keys_and_receipts_it(
+        self,
+    ) -> None:
+        policy = json.loads(json.dumps(self.policy))
+        with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+            parent = Path(directory)
+            authority_root = parent / "authority"
+            authority_root.mkdir()
+            auth_path = parent / "authorization.json"
+            failure_path = authority_root / "build.failed.json"
+            cleanup_path = authority_root / "keys.cleaned.json"
+            policy["formal_authority_root"] = (
+                authority_root.relative_to(ROOT).as_posix()
+            )
+            policy["formal_authorization_path"] = (
+                auth_path.relative_to(ROOT).as_posix()
+            )
+            policy["formal_failure_path"] = (
+                failure_path.relative_to(ROOT).as_posix()
+            )
+            policy["formal_key_cleanup_path"] = (
+                cleanup_path.relative_to(ROOT).as_posix()
+            )
+            key_files = {}
+            for index, name in enumerate(
+                policy["private_authority"]["key_names"], 1,
+            ):
+                key = bytes([index]) * 32
+                path = authority_root / f"{name}_key.bin"
+                path.write_bytes(key)
+                key_files[name] = {
+                    "path": path.relative_to(ROOT).as_posix(),
+                    "commitment_sha256": hashlib.sha256(key).hexdigest(),
+                }
+            authorization = {"key_files": key_files}
+            authorization["canonical_self_hash"] = formal.canonical_sha256(
+                authorization
+            )
+            formal.engine.write_json(auth_path, authorization)
+            with (
+                mock.patch.object(formal, "git_head", return_value="a" * 40),
+                mock.patch.object(formal, "git_tree", return_value="b" * 40),
+            ):
+                formal.write_post_consumption_failure(
+                    policy,
+                    consumption={
+                        "path": "private/consumed.json",
+                        "sha256": "c" * 64,
+                        "canonical_self_hash": "d" * 64,
+                    },
+                    stage="injected_generation_failure",
+                    exc=RuntimeError("injected"),
+                    worlds_completed=9,
+                    path_presence_before_cleanup={},
+                )
+            deleted = formal.delete_consumed_authority_keys(policy)
+            receipt = formal.write_key_cleanup_receipt(
+                policy, commitments=deleted,
+            )
+            self.assertEqual(set(deleted), set(key_files))
+            self.assertTrue(failure_path.is_file())
+            self.assertTrue(cleanup_path.is_file())
+            self.assertEqual(receipt["path"], cleanup_path.relative_to(ROOT).as_posix())
+            self.assertTrue(all(
+                not (authority_root / f"{name}_key.bin").exists()
+                for name in key_files
+            ))
+            cleanup = json.loads(cleanup_path.read_text(encoding="utf-8"))
+            formal.require_self_hash(cleanup, label="test key cleanup")
+            self.assertEqual(cleanup["deleted_key_count"], 6)
+            self.assertTrue(cleanup["raw_key_material_deleted"])
+            self.assertFalse(cleanup["rerun_authorized"])
+
     def test_completion_receipt_accepts_canonical_json_integer_key_roundtrip(
         self,
     ) -> None:
@@ -847,7 +1108,7 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
     def test_four_world_smoke_build_closes_without_persistent_fixture(self) -> None:
         output = (
             ROOT / "reports" / "step28_synthetic_chinese_dataset"
-            / "_test_v9_4_formal_500x4_smoke"
+            / "_test_v9_4_1_formal_500x4_smoke"
         )
         private = output.parent / f".{output.name}.private"
         temporary = output.parent / f".{output.name}.building"
@@ -910,6 +1171,23 @@ class Formal500x4BuilderV94Contracts(unittest.TestCase):
             self.assertTrue(
                 (private / "identity_collision_registry.json").is_file()
             )
+            private_registry = json.loads(
+                (private / "identity_collision_registry.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            allocation_audit = result["identity_allocation_audit"]
+            self.assertEqual(
+                allocation_audit["asset_count"],
+                private_registry["counts"]["identity_values"],
+            )
+            self.assertEqual(
+                allocation_audit[
+                    "label_controller_qrels_model_score_text_quality_inputs"
+                ],
+                0,
+            )
+            self.assertEqual(allocation_audit["post_render_replacements"], 0)
         finally:
             for path in (output, private, temporary, private_temporary):
                 if path.exists():

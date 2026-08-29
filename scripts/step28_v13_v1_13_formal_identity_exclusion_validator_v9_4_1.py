@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 
-VERSION = "2026-08-29-step28-v13-v1-13-v9-4-formal-identity-exclusion-v1"
+VERSION = "2026-08-29-step28-v13-v1-13-v9-4-1-formal-identity-exclusion-v1"
 SPLITS = ("train", "development", "audit_a", "audit_b")
 ROW_FIELDS = {
     "world_uid", "asset_uid", "identity_type", "value_sha256", "role",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Issue the one-time private authority for the V9.4 formal 500x4 build."""
+"""Issue the one-time private authority for the V9.4.1 formal 500x4 build."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-import step28_v13_v1_13_formal_500x4_builder_v9_4 as builder
+import step28_v13_v1_13_formal_500x4_builder_v9_4_1 as builder
 
 
 VERSION = builder.AUTHORIZATION_VERSION
@@ -70,10 +70,11 @@ def issue() -> dict[str, Any]:
     private_root = ROOT / str(policy["formal_private_root"])
     consumption_path = ROOT / str(policy["formal_consumption_path"])
     failure_path = ROOT / str(policy["formal_failure_path"])
+    key_cleanup_path = ROOT / str(policy["formal_key_cleanup_path"])
     completion_path = ROOT / str(policy["formal_completion_path"])
     if any(path.exists() for path in (
         auth_path, authority_root, claim_path, output_root, private_root,
-        consumption_path, failure_path, completion_path,
+        consumption_path, failure_path, key_cleanup_path, completion_path,
     )):
         raise Formal500x4AuthorityError(
             "Authorization, authority, output, private or consumption path exists"
@@ -166,7 +167,7 @@ def issue() -> dict[str, Any]:
         if claim_written:
             failure: dict[str, Any] = {
                 "version": (
-                    "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-"
+                    "2026-08-29-step28-v13-v1-13-v9-4-1-formal-500x4-"
                     "authority-issuance-failure-v1"
                 ),
                 "status": "FORMAL_500X4_AUTHORITY_ISSUANCE_FAILED_NO_RERUN",
