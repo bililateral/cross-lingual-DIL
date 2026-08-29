@@ -1052,7 +1052,9 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 paths=paths,
             )
             paths.unconsumed_key.replace(paths.consumed_key)
-            original_write = authority_v94._write_new_json
+            original_write = (
+                authority_v94._replace_existing_building_with_json
+            )
 
             def fail_fact_write(
                 path: Path, payload: dict[str, object]
@@ -1063,7 +1065,7 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
 
             with mock.patch.object(
                 authority_v94,
-                "_write_new_json",
+                "_replace_existing_building_with_json",
                 side_effect=fail_fact_write,
             ):
                 with self.assertRaisesRegex(
@@ -1281,7 +1283,9 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
             original_validate = (
                 authority_v94._validate_method_root_continuation
             )
-            original_write = authority_v94._write_new_json
+            original_write = (
+                authority_v94._replace_existing_building_with_json
+            )
             validation_calls = 0
 
             def fail_third_validation(*args: object, **kwargs: object) -> None:
@@ -1327,7 +1331,7 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 ),
                 mock.patch.object(
                     authority_v94,
-                    "_write_new_json",
+                    "_replace_existing_building_with_json",
                     side_effect=fail_failure_receipt,
                 ),
             ):
@@ -1538,7 +1542,9 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 with contextlib.redirect_stdout(io.StringIO()):
                     authority_v94.run_once(root=root)
             paths.terminal.unlink()
-            original_write = authority_v94._write_new_json
+            original_write = (
+                authority_v94._replace_existing_building_with_json
+            )
 
             def fail_failure_receipt(path: Path, payload: object) -> None:
                 if path == paths.mechanical_failure_receipt:
@@ -1560,7 +1566,7 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 ),
                 mock.patch.object(
                     authority_v94,
-                    "_write_new_json",
+                    "_replace_existing_building_with_json",
                     side_effect=fail_failure_receipt,
                 ),
             ):
@@ -1634,7 +1640,9 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 with contextlib.redirect_stdout(io.StringIO()):
                     authority_v94.run_once(root=root)
             paths.terminal.unlink()
-            original_write = authority_v94._write_new_json
+            original_write = (
+                authority_v94._replace_existing_building_with_json
+            )
 
             def fail_failure_receipt(path: Path, payload: object) -> None:
                 if path == paths.mechanical_failure_receipt:
@@ -1651,7 +1659,7 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 ),
                 mock.patch.object(
                     authority_v94,
-                    "_write_new_json",
+                    "_replace_existing_building_with_json",
                     side_effect=fail_failure_receipt,
                 ),
             ):
@@ -1810,7 +1818,9 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 with contextlib.redirect_stdout(io.StringIO()):
                     authority_v94.run_once(root=root)
             paths.terminal.unlink()
-            original_write = authority_v94._write_new_json
+            original_write = (
+                authority_v94._replace_existing_building_with_json
+            )
             original_replace = authority_v94.os.replace
 
             def fail_failure_receipt(path: Path, payload: object) -> None:
@@ -1835,7 +1845,7 @@ class FormalPrebuildAuthorityV94Contracts(unittest.TestCase):
                 ),
                 mock.patch.object(
                     authority_v94,
-                    "_write_new_json",
+                    "_replace_existing_building_with_json",
                     side_effect=fail_failure_receipt,
                 ),
             ):
