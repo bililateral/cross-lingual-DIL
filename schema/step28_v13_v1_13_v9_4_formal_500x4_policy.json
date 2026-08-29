@@ -1,0 +1,171 @@
+{
+  "version": "2026-08-29-step28-v13-v1-13-v9-4-formal-500x4-policy-v1",
+  "status": "READY_FOR_ONE_TIME_FORMAL_AUTHORIZATION",
+  "scientific_contract": {
+    "path": "docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md",
+    "sha256": "936ba6d52fa983307c3be654d9996814e740aea154c290c86411064d35e480f6"
+  },
+  "reconciliation_contract": {
+    "path": "docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md",
+    "sha256": "bb1a98044f91e3a9d915b842b231fd4822d305cc3121852a8f889130cc54edfe"
+  },
+  "formal_build_contract": {
+    "path": "docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md",
+    "sha256": "1a054150a3bcac2c62ef46d5535af9651f3043e4b3ea9bbc0cb56b24d7e898c5"
+  },
+  "method_qualification": {
+    "public_root": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_20260828",
+    "private_root": "private_custody/step28_v13_v1_13_v9_4_method_root_attempt1_20260828",
+    "root_manifest_path": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_attempt1_20260828/root_manifest.json",
+    "root_manifest_sha256": "af23ab492e792ab38aff06d4f9afaf15f200a7e6a9d725dc7e131718a9dbc223",
+    "root_manifest_canonical_self_hash": "558b8e80f3af2911a1d79334a416a7083b287df929c7241aca9fb84fe2eb7a37",
+    "method_root_authorization_path": "schema/step28_v13_v1_13_v9_4_method_root_authorization_attempt1.json",
+    "method_root_authorization_sha256": "645b42356905947d3a22ca50b53953a0201cbfac202f235ed443efbf92552623",
+    "quality_result_path": "reports/step28_synthetic_chinese_dataset/v9_4_method_root_quality_attempt3_20260828/quality_result.json",
+    "quality_result_sha256": "e7902667d1243221a3ff0ab8e30742ba52393acc8fd9dd4a3944d4e7dddfcf5e",
+    "quality_result_canonical_self_hash": "886f86fffee6435977156c1f0a2d6520c79b934192332cfeffa1df2320036b98",
+    "required_status": "PASSED_METHOD_ROOT_QUALITY_ELIGIBLE_FOR_FORMAL_500X4_APPLICATION"
+  },
+  "authorization": {
+    "formal_build": false,
+    "training_qualification": false,
+    "audit_truth_unsealing": false,
+    "model_training": false
+  },
+  "split_order": ["train", "development", "audit_a", "audit_b"],
+  "world_counts": {
+    "train": 500,
+    "development": 500,
+    "audit_a": 500,
+    "audit_b": 500
+  },
+  "world_contract": {
+    "seller_count": 28,
+    "controller_count": 12,
+    "triad_count": 4,
+    "dyad_count": 8,
+    "pair_count": 378,
+    "positive_pair_count": 20,
+    "negative_pair_count": 358
+  },
+  "public_balanced_schedule": {
+    "source_path": "scripts/step28_v13_v1_13_balanced_world_schedule_v9_4.py",
+    "source_sha256": "d09f0bf1775139a50a7d24696879a5ba7c3d59a8489902013967ebf85e66432f",
+    "basis_by_split": {
+      "train": "train",
+      "development": "development",
+      "audit_a": "train",
+      "audit_b": "development"
+    },
+    "formal_namespace": "v9_4_formal_500x4",
+    "private_transform_authority_required": true,
+    "split_specific_world_order": true,
+    "split_specific_seller_slot_permutation": true,
+    "split_specific_noise_slot_permutation": true,
+    "noise_permutation_preserves_market_equivalence": true,
+    "model_visible_identifiers_forbidden": true,
+    "method_root_identifier_reuse_forbidden": true
+  },
+  "reuse_sources": {
+    "method_root_engine": {
+      "path": "scripts/step28_v13_v1_13_method_root_builder_v9_4.py",
+      "sha256": "1699faa416b4b40c4d2dee17968b26b79e4df03b58abecc9530c0a06120aeae3"
+    },
+    "document_collision": {
+      "path": "scripts/step28_v13_v1_13_document_collision.py",
+      "sha256": "5cb1907ed6d15ea52cdc0b35069fdff1cc651dca2b570debbb53ee77a8f9d4d4"
+    },
+    "formal_identity_exclusion_validator": {
+      "path": "scripts/step28_v13_v1_13_formal_identity_exclusion_validator_v9_4.py",
+      "sha256": "e257b16c7b130b2ce9b946251cea872a2936d6f866533b0a9f3a4cd979ca63b5"
+    },
+    "base_dataset_policy": {
+      "path": "schema/step28_v13_synthetic_chinese_dataset_policy.json",
+      "sha256": "ce18015199c864df0f76a240df782c331020e5e76d483c5440cea6a673c74729"
+    },
+    "template_library": {
+      "path": "schema/step28_v13_v1_13_candidate_text_templates_v9.json",
+      "sha256": "9a868644f76ad23be2e16973567a5b3c69d70bcbb23690453093dad3658e7a2a"
+    }
+  },
+  "private_authority": {
+    "key_names": ["text", "identity", "style", "schedule", "uid", "time"],
+    "key_size_bytes": 32,
+    "all_commitments_distinct": true,
+    "derivation_from_method_root_forbidden": true,
+    "print_key_material_forbidden": true
+  },
+  "collision_contract": {
+    "historical_policy_path": "schema/step28_v13_v1_13_document_collision_policy.json",
+    "item_surface": "production_redacted_title_description",
+    "seller_surface": "frozen_five_field_model_profile",
+    "exclude_successful_v1_2": true,
+    "exclude_failed_v1_12": true,
+    "exclude_v9_4_method_root": true,
+    "historical_uid_hash_method": "sha256_utf8_exact_uid",
+    "historical_uid_hash_types_required": [
+      "canonical_pair_uid",
+      "controller_uid",
+      "item_uid",
+      "query_uid",
+      "seller_uid",
+      "world_uid"
+    ],
+    "method_root_pair_uid_exclusion_required": true,
+    "same_world_duplicate_maximum": 0,
+    "cross_world_duplicate_maximum": 0,
+    "cross_split_duplicate_maximum": 0,
+    "candidate_retry_forbidden": true
+  },
+  "identity_contract": {
+    "identity_types": [
+      "telegram",
+      "email",
+      "bat",
+      "qq",
+      "wechat",
+      "phone",
+      "crypto_wallet",
+      "external_url"
+    ],
+    "mechanism_graph_by_split": {
+      "train": "G_A",
+      "development": "G_A",
+      "audit_a": "G_A",
+      "audit_b": "G_B"
+    },
+    "feature_count": 33,
+    "production_parser_required": true,
+    "controller_or_label_direct_feature_construction_forbidden": true,
+    "cross_world_identity_value_reuse_forbidden": true,
+    "method_root_identity_value_reuse_forbidden": true
+  },
+  "truth_access": {
+    "build_time_audit_a_semantic_reads": 0,
+    "build_time_audit_b_semantic_reads": 0,
+    "method_root_identity_exclusion_validator": {
+      "allowed_private_files": [
+        "train/identity_plan.jsonl",
+        "development/identity_plan.jsonl",
+        "audit_a/identity_plan.jsonl",
+        "audit_b/identity_plan.jsonl"
+      ],
+      "allowed_projected_fields": ["asset_uid", "value_sha256"],
+      "private_rows_or_values_returned": 0,
+      "controller_membership_pair_labels_qrels_forbidden": true
+    },
+    "row_level_truth_in_public_result_forbidden": true,
+    "audit_truth_unsealing_before_blind_predictions_forbidden": true
+  },
+  "formal_output_root": "reports/step28_synthetic_chinese_dataset/v9_4_formal_500x4_attempt1_20260829",
+  "formal_private_root": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_attempt1_20260829",
+  "formal_authority_root": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829",
+  "formal_authorization_path": "schema/step28_v13_v1_13_v9_4_formal_500x4_authorization_attempt1.json",
+  "formal_issuance_claim_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_issuance.claimed.json",
+  "formal_consumption_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.consumed.json",
+  "formal_failure_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.failed.json",
+  "formal_completion_path": "private_custody/step28_v13_v1_13_v9_4_formal_500x4_authority_attempt1_20260829/formal_500x4_build.completed.json",
+  "publication_status": "BUILT_NOT_TRAINING_QUALIFIED",
+  "failure_rule": "write a minimal failure boundary, delete failed payload and temporary roots, and use a new version, authorization, authority and output path after an irrecoverable scientific failure",
+  "canonical_self_hash": "226576a825223932c84530b7554e9642caa16153863df33fd9772bd41bd7101b"
+}
