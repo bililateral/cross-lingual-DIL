@@ -1,0 +1,135 @@
+{
+  "version": "2026-08-30-step28-v13-v1.13-v9.4.1-full-english-compatibility-v2",
+  "status": "IMPLEMENTATION_ONLY_NO_GPU_REPLAY_NO_MODEL_TRAINING",
+  "authority": {
+    "base_model_experiment_policy": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_experiment_policy_v1.json",
+      "size_bytes": 25685,
+      "sha256": "11b57da9c98385a254d9d6f435d7e9fbba2c0730a765742a53008c00e95fb5af"
+    },
+    "superseded_implementation_contract": {
+      "path": "docs/STEP28_V13_V1_13_V9_4_1_MODEL_EXPERIMENT_IMPLEMENTATION_CONTRACT_20260830.zh.md",
+      "size_bytes": 29312,
+      "sha256": "bebbfdaba5bf7c1a847daf9ae047d694941131bef4411bd39e05469a67535448"
+    },
+    "v1_invalidation_record": {
+      "path": "docs/STEP28_V13_V1_13_V9_4_1_COMPATIBILITY_FIXTURE_V1_INVALIDATION_20260830.zh.md",
+      "size_bytes": 2962,
+      "sha256": "ebd87d80e85a4759c15136a755e8cf296013835dc9affa6f8ada977482d0dbbb"
+    },
+    "v2_amendment_contract": {
+      "path": "docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_AMENDMENT_20260830.zh.md",
+      "size_bytes": 3978,
+      "sha256": "954f959b1829724a32fbc789c84e80f927aa7b38c2ed9db780328cea7caf115b"
+    }
+  },
+  "frozen_label_free_inputs": {
+    "step7_policy": {
+      "path": "schema/step7_v4_raw_item_authorship_selection_policy.json",
+      "size_bytes": 32652,
+      "sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327"
+    },
+    "step7_common": {
+      "path": "scripts/step7_v4_common.py",
+      "size_bytes": 158047,
+      "sha256": "8acdac12a579314ddf3e863e3b1c19a026fc252fe520a4ded3f53fda6e765334"
+    },
+    "step7_encoder": {
+      "path": "scripts/step7_v4_encode_item_models.py",
+      "size_bytes": 46165,
+      "sha256": "7f7018f55e543ad809152d786d6d0e34722f18141ace89b21d7d1eb660f548dc"
+    },
+    "opaque_pairs": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/gpu_pair_manifest.opaque.no_labels.csv",
+      "size_bytes": 29362,
+      "sha256": "2f714956e7cde9744dfd32b29372b8ce01acb0d0f2e54215256db382de327b00"
+    },
+    "opaque_seller_text_index": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/gpu_seller_unique_text_index.opaque.no_labels.jsonl",
+      "size_bytes": 5767462,
+      "sha256": "46ee5be2a235acc1788821b84f2e270a5147dbbc1b7de2065b01746a853200b4"
+    },
+    "unique_texts": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/unique_clean_texts.no_labels.jsonl",
+      "size_bytes": 19611585,
+      "sha256": "540ba3a36ffe23d0fda63b823ee2216ff65147713e61b8d34b9f5374715eb101"
+    },
+    "shared_chunks": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/shared_chunks.jsonl",
+      "size_bytes": 30884014,
+      "sha256": "4a826893d14ca9a28deab21e01e78b1efd874e3eb8d63d4527cd6218295b57d2"
+    },
+    "shared_chunks_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/shared_chunks_manifest.json",
+      "size_bytes": 13422,
+      "sha256": "da26d4e9b21b791605ecff4afbf07391a1952b95032181f7865a3d70c274fd34"
+    },
+    "expected_labse_scores": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_scores/labse.item_aggregates.csv",
+      "size_bytes": 141007,
+      "sha256": "9597497613493d04f4cc2b9dbb663341e6756677fa60c89e199fdae52937d282"
+    },
+    "original_labse_runtime": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/model_runtime/labse.json",
+      "size_bytes": 6411,
+      "sha256": "0c1ce092a6c4be8d671de5fa0469c12b5ee9ea89d8dbe7900d7fba42118362c8"
+    }
+  },
+  "exact_runtime": {
+    "python": "3.10.19",
+    "numpy": "2.2.6",
+    "torch": "2.9.1+cu130",
+    "torch_cuda_runtime": "13.0",
+    "cudnn_runtime": 91300,
+    "transformers": "4.46.3",
+    "sentence_transformers": "5.6.0",
+    "gpu_name": "NVIDIA GeForce RTX 5090",
+    "gpu_compute_capability": [12, 0],
+    "cublas_workspace_config": ":4096:8",
+    "tokenizers_parallelism": "false",
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false,
+    "deterministic_algorithms_enabled": true,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true
+  },
+  "full_replay": {
+    "unique_text_count": 33434,
+    "shared_chunk_count": 41808,
+    "opaque_seller_count": 853,
+    "seller_text_row_count": 38618,
+    "opaque_pair_count": 733,
+    "labse_batch_size": 24,
+    "labse_dimension": 768,
+    "embedding_dtype": "float32",
+    "embedding_matrix_sha256": "635b932cb6e50e9d2e917f627ecb89222f20a6f62fc31c0bfed13bf158fae978",
+    "labse_token_id_stream_sha256": "d2a35c151094acfe9fdd6079681c520f8d956e5fa57047fd532e38bc3b22c116",
+    "score_serialized_decimal_places": 12,
+    "score_file_exact_byte_match_required": true,
+    "embedding_matrix_exact_byte_match_required": true,
+    "numeric_tolerance_or_fixture_reselection_allowed": false,
+    "complete_workload_must_be_rebuilt_from_unique_texts": true
+  },
+  "outputs": {
+    "success_root": "reports/step28_model_experiment/v9_4_1_implementation_v2_20260830/full_english_compatibility_linux_replay",
+    "observed_score_file": "observed_labse.item_aggregates.csv",
+    "success_manifest": "full_english_compatibility_manifest.json"
+  },
+  "permissions": {
+    "supervised_labels_or_evidence_allowed": false,
+    "identity33_allowed": false,
+    "controller_or_membership_allowed": false,
+    "qrels_or_retrieval_truth_allowed": false,
+    "audit_truth_allowed": false,
+    "model_parameter_update_allowed": false,
+    "model_training_or_threshold_selection_allowed": false,
+    "m0_m1_m2_m3_training_authorized": false
+  },
+  "failure_semantics": {
+    "runtime_or_input_drift": "MECHANICAL_PREFLIGHT_FAILURE_NO_COMPATIBILITY_CONCLUSION",
+    "chunk_matrix_or_score_drift": "FULL_WORKLOAD_COMPATIBILITY_REPLAY_FAILED_NO_TRAINING_AUTHORIZATION",
+    "failed_observed_scores_or_embedding_matrices_retained": false,
+    "v1_fixture_may_authorize_training": false
+  },
+  "canonical_self_hash": "b269b6654f34f4bf1717c8dc38cc9011ec0b3c1db4e3ff3f2e294666cbb531f1"
+}
