@@ -1,5 +1,7 @@
 # Step28-v13 v1.12 正式中文合成数据集构建方案
 
+> **历史关闭声明（2026-08-30）**：V1.12 已永久质量失败，本方案不再可执行。其专属策略、脚本和测试已从当前工作树清理，精确字节仅由 Git 历史保留；失败结论和保留边界以 `docs/STEP28_V13_V1_12_TERMINAL_FAILURE_AND_CLEANUP_20260809.zh.md` 为准。
+
 日期：2026-08-03
 
 状态：`DRAFT_IMPLEMENTATION_NO_SEED_OR_DATA_AUTHORIZATION`

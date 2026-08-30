@@ -1,8 +1,14 @@
 # Project Progress
 
-Updated: 2026-08-23
+Updated: 2026-08-30
 
 ## Current Stage
+
+`2026-08-30` 当前主线已经不是下方 7 月 20 日的 Step28-v12 组件复现。V9.4.1 正式中文合成数据集已生成并通过独立质量审计：训练、开发、审核甲、审核乙各 500 个世界，共 2,000 个世界、56,000 个卖家、198,000 件商品、756,000 个完整卖家对；质量状态为 `PASSED_FORMAL_500X4_ROOT_QUALITY_TRAINING_QUALIFIED`。当前 `training_qualified=true`，但 `m0_m1_m2_m3_training_authorized=false`，所以还不能直接拟合模型或打开审核真值。当前正在冻结训练前实现：先在 Linux 对冻结 M0 做无标签兼容性重放，再生成四拆分公开投影，随后冻结 M0、五个 M1、M2、M3-base、M3-joint 的训练、盲预测、分类指标、检索指标和配对世界重抽样合同，最后才可签发一次性训练授权。
+
+`2026-08-30` 工作区清理复核确认 V1.12 仍残留一套已永久封闭的 4 份策略、18 份脚本和 5 份测试；终止文档早已规定不得再次调用，该 27 文件运行簇现已删除。曾尝试同时删除 21 个早期设计预检矩阵，但完整回归证明当前 `training_ready` 活体合同仍按摘要读取它们；误删在提交前已全部精确恢复，最终保留。失败结论、关键摘要、Git 历史、V1.12 哈希排除归档和所有当前主线依赖继续保留。完整边界见 `docs/WORKSPACE_CLEANUP_AUDIT_20260830.zh.md`。
+
+以下按日期保存的旧段落是历史流水记录；出现冲突时，以本节最上方的 2026-08-30 状态和 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 为准。
 
 `2026-07-20` Step28-v5, v6/v6.1 and v11 are withdrawn. V5 coupled English labels to synthetic labels; v6 reused v5 identities and collapsed to 14 states; v11 then used audit labels to remove 49 conflicting audit states, mixed model-discrimination gates with production-guard abstention, retained three all-zero features, and overstated cross-version state novelty. The current line is the post-audit corrected v12 synthetic replication plus the fully separate v12.1 existing-data application. V12 retains all 1,280 audit rows and gives each of 842 observable states total weight one; no audit label selects audit rows. Train/development/audit contain 1,453/658/842 states and all 33 retained features have rank 33. Full-history AUC/AP is 0.749634/0.767197 versus direct-history 0.693435/0.693269, AP gain +0.073928. The 199 block-permutation null is 0.498092 ± 0.054469 with plus-one p=0.005. Recipe checks now use one vote per unique state and explicitly separate five model-discrimination mechanisms from eleven production-guard abstention mechanisms; passing the latter is not called model classification success. This is only a corrected replication inside the fixed synthetic generator family, not universal unseen-state or real-world validation. V12.1 independently excludes all 1,259 reviewed pair UIDs and scores 2,689 existing unlabeled candidates; 101 corrections are nonzero and all are negative, so positive correction, internal queue and blind packet counts are zero. Dry full replay passes 37/37 checks, including complete model/199-permutation replay; current Windows CPU contract checks pass 22/22 before final manifest closure. Current report: `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`.
 
