@@ -4,6 +4,20 @@
 
 当前分支：`method/step27-english-pretrained-synthetic-adaptation`
 
+> **2026-08-30 完整英文兼容性重放 v2 正式通过**：Linux 唯一运行完整处理
+> 33,434 个去重英文文本、41,808 个共享块和 733 个无标签卖家对。LaBSE
+> `41808×768` 单精度矩阵摘要精确为
+> `635b932cb6e50e9d2e917f627ecb89222f20a6f62fc31c0bfed13bf158fae978`，完整
+> 聚合分数文件逐字节等于冻结 Step7 文件，摘要为
+> `9597497613493d04f4cc2b9dbb663341e6756677fa60c89e199fdae52937d282`；没有
+> 使用数值容差或重选夹具。成功清单 8,498 字节／
+> `12df46e3df520f6371dc596cd7b64a0b2b0b58a4ae55f3e99d920e75bed88a8d`，规范
+> 自哈希 `49370a4732b2cbfba9ff36d04780f053361ef9d5783a7c5976fd2149e94c80e1`。
+> Windows 只读归档校验通过，相关合同 17／17 通过。该结果只关闭完整英文
+> LaBSE 数值兼容性门，不是模型性能或迁移结果；当前仍为
+> `m0_m1_m2_m3_training_authorized=false`，审核甲乙真值未打开。下一步回到主线，
+> 另起后继版本冻结和实现 M0／五个 M1／M2／M3-base／M3-joint 训练与盲评。
+
 > **2026-08-30 模型兼容性前置门修订**：最小兼容性夹具 v1 在 Linux 到达
 > LaBSE 聚合分数比较后因第 0 对十二位字符串漂移停止。该夹具从原 41,808 块中
 > 只抽取 49 块，改变了 `SentenceTransformer` 的长度排序、批次组成和补齐上下文，
@@ -341,32 +355,34 @@ R2 唯一确定性重放已经发布精确五文件计划根：训练与开发�
 25. V9.4.1 一次性授权已消费，正式四组各 500 世界构建正常退出；公开／私有双根、根清单和完成回执经独立全量重读闭合。该状态只为 `BUILT_NOT_TRAINING_QUALIFIED`，下一步必须先完成正式根独立质量审计。
 26. V9.4.1 正式根质量审计尝试一已唯一运行并通过二十六项硬门；正式根现有 `training_qualified=true`。本轮没有训练任何模型，`m0_m1_m2_m3_training_authorized=false`，审核甲乙真值读取为零。本次授权、消费回执、实现提交和结果路径永久不得重跑或复用。
 27. V9.1 冻结实时字节测试已经从当前活跃回归精确分离：历史隔离工作树 34／34 通过。V1.12 清理后的第二版当前回归实际启动 865 项、0 失败、0 错误；该结果现为第三版兼容性清理回归的前代证据，不得回退为直接全仓发现后把 V9.1 硬拒绝误报成当前失败。
-28. 最小英文兼容性夹具 v1 的跨工作负载十二位比较无效，相关入口、测试和载荷已删除。完整英文重放 v2 的实现和 13 项合同测试已冻结；第三版当前回归实际启动 864 项、857 项通过、8 条既有跳过事件、0 失败、0 错误。Linux 完整重放结果仍未生成，不能把本地合同通过说成数值兼容性通过，也不能据此授权训练。
+28. 最小英文兼容性夹具 v1 的跨工作负载十二位比较无效，相关入口、测试和载荷已删除。完整英文重放 v2 的实现和 13 项合同测试已冻结；第三版当前回归实际启动 864 项、857 项通过、8 条既有跳过事件、0 失败、0 错误。该项末尾的“等待 Linux”状态现已由下一项正式结果取代。
+29. 完整英文兼容性重放 v2 已在 Linux 唯一运行并逐字节复现 `41808×768` LaBSE 矩阵和 733 对完整聚合分数；Windows 归档复核及相关合同 17／17 通过。该结果只关闭兼容性门，不授权训练或审核真值解封。
 
-当前允许：提交并推送兼容性 v1 失效清理、完整英文重放 v2 和第三版回归结果；随后只在 Linux 运行一次 v2 完整英文数值重放并同步其两份成功产物。结果独立复核通过后，才可继续冻结并一次性授权 M0／五个 M1／M2／M3-base／M3-joint 的训练比较。当前禁止：重跑 V9.4.1 正式构建或正式质量审计尝试一，复用已消费授权，重跑方法根或任一旧质量尝试，拼接旧 315 世界，打开审核甲乙真值，或在后继训练授权冻结前训练／评估任何模型。
+当前允许：提交并推送完整英文兼容性 v2 的两份成功产物和结果记录；随后另起后继版本，冻结并实现 M0／五个 M1／M2／M3-base／M3-joint 的训练、盲预测和指标合同，在当前回归、提交、独立复核和一次性授权闭合后运行。当前禁止：重跑兼容性 v2，重跑 V9.4.1 正式构建或正式质量审计尝试一，复用已消费授权，重跑方法根或任一旧质量尝试，拼接旧 315 世界，打开审核甲乙真值，或在后继训练授权冻结前训练／评估任何模型。
 
 ## 9. 接手优先阅读文件
 
 1. 本文；
-2. `docs/STEP28_V13_V1_13_CURRENT_AND_V9_1_HISTORICAL_REGRESSION_RESULT_20260830.zh.md`；
-3. `docs/STEP28_V13_V1_13_V9_4_1_COMPATIBILITY_FIXTURE_V1_INVALIDATION_20260830.zh.md`；
-4. `docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_AMENDMENT_20260830.zh.md`；
-5. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`；
-6. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_CONTRACT_20260829.zh.md`；
-7. `docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md`；
-8. `docs/STEP28_V13_V1_13_V9_4_MODEL_VISIBLE_SHORTCUT_GATE_CONTRACT_20260827.zh.md`；
-9. `docs/STEP28_V13_V1_13_V9_4_FORMAL_PREBUILD_AUTHORIZATION_CONTRACT_20260828.zh.md`；
-10. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
-11. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
-12. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
-13. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
-14. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`；
-15. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`；
-16. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
-17. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
-18. V9.2 尝试 1、尝试 2 和尝试 3 的小型终态及尝试 3 完整证据；
-19. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落；
-20. `docs/STEP28_V13_V1_13_V9_4_METHOD_ROOT_QUALITY_ATTEMPT3_RESULT_20260829.zh.md`；
-21. `docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_ATTEMPT1_FAILURE_20260829.zh.md`；
-22. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md`；
-23. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_RESULT_20260829.zh.md`。
+2. `docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_RESULT_20260830.zh.md`；
+3. `docs/STEP28_V13_V1_13_CURRENT_AND_V9_1_HISTORICAL_REGRESSION_RESULT_20260830.zh.md`；
+4. `docs/STEP28_V13_V1_13_V9_4_1_COMPATIBILITY_FIXTURE_V1_INVALIDATION_20260830.zh.md`；
+5. `docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_AMENDMENT_20260830.zh.md`；
+6. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`；
+7. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_CONTRACT_20260829.zh.md`；
+8. `docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md`；
+9. `docs/STEP28_V13_V1_13_V9_4_MODEL_VISIBLE_SHORTCUT_GATE_CONTRACT_20260827.zh.md`；
+10. `docs/STEP28_V13_V1_13_V9_4_FORMAL_PREBUILD_AUTHORIZATION_CONTRACT_20260828.zh.md`；
+11. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
+12. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
+13. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
+14. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
+15. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`；
+16. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`；
+17. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
+18. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
+19. V9.2 尝试 1、尝试 2 和尝试 3 的小型终态及尝试 3 完整证据；
+20. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落；
+21. `docs/STEP28_V13_V1_13_V9_4_METHOD_ROOT_QUALITY_ATTEMPT3_RESULT_20260829.zh.md`；
+22. `docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_ATTEMPT1_FAILURE_20260829.zh.md`；
+23. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md`；
+24. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_RESULT_20260829.zh.md`。
