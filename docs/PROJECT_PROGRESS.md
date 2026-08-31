@@ -1,8 +1,10 @@
 # Project Progress
 
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 ## Current Stage
+
+`2026-08-31` 英文 151 对 M0/C0 严格重放已正式通过：后继共享构建器从冻结无标签原料重新构造完整公共链，M0 的 24 项输入、C0 的 18 项输入及两者概率四个摘要全部精确匹配冻结期望；未读取标签、身份关系或审核真值，也未训练模型。正式清单 SHA-256 为 `18d6c8066404fe82437eb07a2d6fa3394867e7e786e87b40f690b60164ab922d`，规范自哈希为 `6536c11f38dd6552490a4b720aa95c55db61040c8147daab5ee98c21c8037008`。后继 V4 当前回归发现 948 项，精确分出 34 项 V9.1 历史测试和 2 项已在前代通过的旧发现集元测试后计划 912 项；实际运行 892 项，885 项通过、8 条既有跳过事件、0 失败、0 错误。结果 SHA-256 为 `67c779447c897c9bc39a294aa7213df2a7417148371f2e84b9fa0ecd3d13a81b`。下一步仅实现和测试正式中文四拆分公开投影；`m0_m1_m2_m3_training_authorized=false`，公开投影执行、训练／开发监督、模型训练和审核甲乙真值均未授权。
 
 `2026-08-30` 当前主线已经不是下方 7 月 20 日的 Step28-v12 组件复现。V9.4.1 正式中文合成数据集已生成并通过独立质量审计：训练、开发、审核甲、审核乙各 500 个世界，共 2,000 个世界、56,000 个卖家、198,000 件商品、756,000 个完整卖家对；质量状态为 `PASSED_FORMAL_500X4_ROOT_QUALITY_TRAINING_QUALIFIED`。当前 `training_qualified=true`，但 `m0_m1_m2_m3_training_authorized=false`，所以还不能直接拟合模型或打开审核真值。当前正在冻结训练前实现：先在 Linux 对冻结 M0 做无标签兼容性重放，再生成四拆分公开投影，随后冻结 M0、五个 M1、M2、M3-base、M3-joint 的训练、盲预测、分类指标、检索指标和配对世界重抽样合同，最后才可签发一次性训练授权。
 
@@ -10,7 +12,7 @@ Updated: 2026-08-30
 
 `2026-08-30` 清理后第二版当前回归已在提交 `cabcf106579d64b8ca6020bf0678ac8285e9a13e` 上闭合：发现 919 项，移出 34 项 V9.1 历史冻结测试后计划 885 项；20 项由既有类级封闭边界逐标识登记为未启动，实际启动 865 项，858 项正常通过、7 项逐测试跳过，另有 1 条类级准备跳过事件，失败／错误为 0／0。结果 SHA-256 为 `e05ebc8a318c83d255c243543eeea56074f77e8fd02190b7e01929a63abebf80`。该结果只证明清理后的当前合同没有破坏，不授权训练或审核真值解封。
 
-以下按日期保存的旧段落是历史流水记录；出现冲突时，以本节最上方的 2026-08-30 状态和 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 为准。
+以下按日期保存的旧段落是历史流水记录；出现冲突时，以本节最上方的 2026-08-31 状态和 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 为准。
 
 `2026-07-20` Step28-v5, v6/v6.1 and v11 are withdrawn. V5 coupled English labels to synthetic labels; v6 reused v5 identities and collapsed to 14 states; v11 then used audit labels to remove 49 conflicting audit states, mixed model-discrimination gates with production-guard abstention, retained three all-zero features, and overstated cross-version state novelty. The current line is the post-audit corrected v12 synthetic replication plus the fully separate v12.1 existing-data application. V12 retains all 1,280 audit rows and gives each of 842 observable states total weight one; no audit label selects audit rows. Train/development/audit contain 1,453/658/842 states and all 33 retained features have rank 33. Full-history AUC/AP is 0.749634/0.767197 versus direct-history 0.693435/0.693269, AP gain +0.073928. The 199 block-permutation null is 0.498092 ± 0.054469 with plus-one p=0.005. Recipe checks now use one vote per unique state and explicitly separate five model-discrimination mechanisms from eleven production-guard abstention mechanisms; passing the latter is not called model classification success. This is only a corrected replication inside the fixed synthetic generator family, not universal unseen-state or real-world validation. V12.1 independently excludes all 1,259 reviewed pair UIDs and scores 2,689 existing unlabeled candidates; 101 corrections are nonzero and all are negative, so positive correction, internal queue and blind packet counts are zero. Dry full replay passes 37/37 checks, including complete model/199-permutation replay; current Windows CPU contract checks pass 22/22 before final manifest closure. Current report: `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`.
 
