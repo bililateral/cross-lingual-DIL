@@ -2,7 +2,7 @@
 
 日期：2026-08-31
 
-状态：`IMPLEMENTATION_NOT_YET_EXECUTED`
+状态：`FROZEN_LABEL_FREE_FOUR_SPLIT_PUBLIC_PROJECTION_TRAINING_INPUT_READY`
 
 ## 目的
 
@@ -24,3 +24,9 @@ Windows 生成无标签公开投影包，用户将包直接复制到 Linux；Lin
 - Windows：`python -B scripts/step28_v13_v1_13_v9_4_1_public_projection_portable_v2.py finalize-windows`
 
 本合同只允许无标签公开投影，不授权模型训练、阈值选择、审核预测或任何真值读取。
+
+## 正式执行结果
+
+三阶段流程已于 2026-08-31 完成并通过独立 `validate-output`。训练、开发、审核甲、审核乙各有 `189000` 对，共 `756000` 对；正式输出含 36 个文件，共 736,034,647 字节。发布清单规范自哈希为 `1614e70bd84b76c292098d41f8b8aa0a51666c26f73631b943bf42576b9bba28`，Linux 返回清单规范自哈希为 `d1c81b4612c31eb0a58dae584a7257eb380750d14183f883dc7be40964ac2c9b`。
+
+正式输出位于 `reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/`。中央处理器阶段、复制包、图形处理器返回和临时块／向量均已清理，只保留正式输出及小型图形处理器回执。全程没有读取监督或审核真值，没有更新模型参数或选择阈值。该结果只使无标签公共训练输入就绪；`m0_m1_m2_m3_training_authorized=false`，下一阶段仍须单独闭合训练授权。
