@@ -1,0 +1,233 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-model-training-v3",
+  "status": "FROZEN_IMPLEMENTATION_POLICY_NO_PUBLIC_PROJECTION_EXECUTION_NO_SUPERVISION_NO_TRAINING_NO_AUDIT_TRUTH",
+  "claim_boundary": "CONTRACT_AND_IMPLEMENTATION_ONLY_NO_FORMAL_MODEL_OR_METRIC_RESULT",
+  "canonical_self_hash": "5e26b6c5fd6fea068c5a766ddb94302248f4db4d3ec3ea8d180f60334fa8b4bb",
+  "authority_registry": {
+    "v3_contract": {
+      "path": "docs/STEP28_V13_V1_13_V9_4_1_MODEL_TRAINING_V3_CONTRACT_20260831.zh.md",
+      "size_bytes": 6480,
+      "sha256": "4d1a34dd19c145add2a63e01c76596d142d2538c3bc1ec5f9f1ce69dc3fa8934"
+    },
+    "model_experiment_policy_v1": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_experiment_policy_v1.json",
+      "size_bytes": 25685,
+      "sha256": "11b57da9c98385a254d9d6f435d7e9fbba2c0730a765742a53008c00e95fb5af",
+      "canonical_self_hash": "9b555d59a934dd7263e4811f5b907d530f253400d27de2b9d411e0cecdcd94d8"
+    },
+    "model_training_policy_v2": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_training_policy_v2.json",
+      "size_bytes": 19011,
+      "sha256": "75805035a937f3ca1b588feaf47afc18814a1fcffb3c0bcea010a1a840749d30",
+      "canonical_self_hash": "0ff8acb323ffca44016a5fe2deae98353c7f9af9664ff72aa3938b29d186524d"
+    },
+    "model_experiment_common_v1": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_model_experiment_common_v1.py",
+      "size_bytes": 31093,
+      "sha256": "e26ea23bbfe33795d5e2889b469bd9bce87941b942ec3b6ef4c0a7a3d273ef38"
+    },
+    "model_training_common_v2": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_model_training_common_v2.py",
+      "size_bytes": 28649,
+      "sha256": "dc85ac58ebcb6b164e7abf9970eb786c77ce91bd63f833432ba452df49ad1a0a"
+    }
+  },
+  "implementation_scope": {
+    "frozen_models": [
+      "c0",
+      "m0"
+    ],
+    "trained_models": [
+      "m1_r01",
+      "m1_r02",
+      "m1_r03",
+      "m1_r04",
+      "m1_r05",
+      "m2",
+      "m3_base",
+      "m3_joint"
+    ],
+    "formal_report_models": [
+      "c0",
+      "m0",
+      "m1_r01",
+      "m1_r02",
+      "m1_r03",
+      "m1_r04",
+      "m1_r05",
+      "m2",
+      "m3_base",
+      "m3_joint"
+    ],
+    "m1_repeat_ids": [
+      "r01",
+      "r02",
+      "r03",
+      "r04",
+      "r05"
+    ],
+    "primary_estimand": "pooled_ap_m2_minus_mean_five_individual_pooled_ap_m1",
+    "five_m1_probability_averaging_allowed": false,
+    "future_exact_commit_authorization_must_pin": [
+      "schema/step28_v13_v1_13_v9_4_1_model_training_policy_v3.json",
+      "scripts/step28_v13_v1_13_v9_4_1_model_training_core_v3.py",
+      "scripts/step28_v13_v1_13_v9_4_1_confirmatory_evaluator_v3.py",
+      "scripts/step28_v13_v1_13_v9_4_1_blind_stage_protocol_v3.py",
+      "tests/test_step28_v13_v1_13_v9_4_1_model_training_v3_contracts.py"
+    ]
+  },
+  "formal_input_contract": {
+    "split_order": [
+      "train",
+      "development",
+      "audit_a",
+      "audit_b"
+    ],
+    "worlds_per_split": 500,
+    "sellers_per_world": 28,
+    "pairs_per_world": 378,
+    "positive_pairs_per_world": 20,
+    "negative_pairs_per_world": 358,
+    "rows_per_split": 189000,
+    "base_feature_count": 24,
+    "identity_feature_count": 33,
+    "joint_feature_count": 57,
+    "alignment": "exact_frozen_row_key_digest_only",
+    "training_process_may_reopen_text_or_profiles": false,
+    "audit_blind_process_may_open_truth": false
+  },
+  "training_contract": {
+    "fold_count": 5,
+    "worlds_per_fold": 100,
+    "fold_rule": "sha256_world_uid_utf8_then_world_uid_utf8_sorted_ordinal_mod_5",
+    "m1_m2_row_weight": "1/(current_world_count*378)",
+    "m3_row_weight": 1.0,
+    "m1_training_only_derangement": true,
+    "m1_validation_development_audit_use_correct_identity33": true,
+    "m1_m2_shared_transform_from_correct_training_fold_without_labels": true,
+    "m1_m2_shared_l2_grid": [
+      0.01,
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0,
+      30.0,
+      100.0
+    ],
+    "m1_m2_l2_tie_rule": "largest_within_min_plus_1e-12",
+    "m2_probability_offset": "raw_logit_without_clipping",
+    "m2_exact_zero_or_inactive_output": "exact_original_p0_float64_bytes",
+    "m3_grid_source": "model_experiment_policy_v1.m3.grid_order",
+    "m3_selection_metric": "pooled_oof_average_precision",
+    "m3_grid_tie_rule": "first_grid_entry",
+    "development_threshold_rule": "maximize_world_equal_confusion_f1_then_higher_threshold"
+  },
+  "metric_contract": {
+    "pooled_classification_metrics": [
+      "average_precision",
+      "trapezoidal_pr_auc",
+      "roc_auc",
+      "brier",
+      "log_loss",
+      "recall_at_fpr_1pct"
+    ],
+    "threshold_metrics": [
+      "precision",
+      "recall",
+      "f1",
+      "specificity",
+      "balanced_accuracy",
+      "mcc"
+    ],
+    "retrieval_metrics": [
+      "map",
+      "mrr",
+      "recall_at_1",
+      "recall_at_3",
+      "recall_at_5",
+      "recall_at_10",
+      "ndcg_at_1",
+      "ndcg_at_3",
+      "ndcg_at_5",
+      "ndcg_at_10"
+    ],
+    "confusion_objects": [
+      "raw_confusion_matrix",
+      "world_equal_confusion_matrix"
+    ],
+    "score_ties": "group_equal_float64_probabilities",
+    "retrieval_ties": "candidate_seller_uid_utf8_ascending",
+    "ap_and_trapezoidal_pr_auc_are_distinct": true,
+    "log_loss_only_clip": [
+      1e-15,
+      0.999999999999999
+    ],
+    "recall_at_fpr_1pct_interpolation": false
+  },
+  "bootstrap_contract": {
+    "replicates": 9999,
+    "world_count": 500,
+    "draw_size": 500,
+    "dtype": "<i8",
+    "order": "C",
+    "quantile_method": "linear",
+    "formal_evaluator_accepts_precomputed_metric_series": false,
+    "formal_evaluator_rehashes_actual_index_matrix": true,
+    "splits": {
+      "development": {
+        "seed": 281320260810,
+        "index_bytes_sha256": "111b1338cc607c6bd78bad88efe47606ffa2230e9cc764eec940e84f86e56661"
+      },
+      "audit_a": {
+        "seed": 281320260811,
+        "index_bytes_sha256": "617be9200ad55b45eda8b1800989d7e0b50579bb53ecee675713f8ba2cd4c3e4"
+      },
+      "audit_b": {
+        "seed": 281320260812,
+        "index_bytes_sha256": "12565157b109301070a3648989e74a1faab05d015b5ac0dbcd772c38a5a91a87"
+      }
+    }
+  },
+  "confirmatory_contract": {
+    "development_m1_m0_equivalence_open_interval": [
+      -0.01,
+      0.01
+    ],
+    "audit_a_primary_simultaneous_lower_bound_gt": 0.03,
+    "audit_b_primary_simultaneous_lower_bound_gt": 0.015,
+    "each_m2_minus_m1_simultaneous_lower_bound_gt": 0.0,
+    "audit_b_requires_pinned_revalidated_audit_a_pass": true,
+    "audit_b_cannot_rescue_audit_a_failure": true,
+    "formal_entrypoint_must_consume_predictions_rows_truth_and_actual_indices_together": true
+  },
+  "stage_order": [
+    "freeze_v3_contract_policy_implementation_tests",
+    "current_regression_commit_push_independent_review",
+    "one_time_public_projection_authorization_and_freeze",
+    "one_time_train_development_truth_and_training_authorization",
+    "freeze_train_models_development_thresholds_and_development_gate",
+    "freeze_audit_a_blind_predictions_without_truth",
+    "one_time_audit_a_truth_authorization_and_evaluation",
+    "freeze_audit_b_blind_predictions_only_after_pinned_audit_a_pass",
+    "one_time_audit_b_truth_authorization_and_evaluation"
+  ],
+  "authorization_state": {
+    "public_projection_authorized": false,
+    "train_development_truth_authorized": false,
+    "model_training_authorized": false,
+    "audit_a_blind_prediction_authorized": false,
+    "audit_a_truth_authorized": false,
+    "audit_b_blind_prediction_authorized": false,
+    "audit_b_truth_authorized": false
+  },
+  "formal_outputs": {
+    "root": "reports/step28_model_experiment/v9_4_1_training_v3_20260831",
+    "overwrite_existing_artifact_allowed": false,
+    "failed_formal_attempt_payload_retention_allowed": false
+  },
+  "m0_m1_m2_m3_training_authorized": false,
+  "audit_a_truth_authorized": false,
+  "audit_b_truth_authorized": false
+}
