@@ -1,0 +1,95 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-public-projection-gpu-v1",
+  "status": "OPAQUE_FOUR_PART_ENCODING_IMPLEMENTATION_ONLY",
+  "canonical_self_hash": "c9d45ec1b5781c4cce3f7209aa6adb8072f82e676b96db2d7a0439d56606831f",
+  "parent_training_core_commit": "49ffff89e01818e4f1de58a641195a0d8ef95c3e",
+  "permissions": {
+    "formal_execution_authorized": false,
+    "supervision_read_authorized": false,
+    "identity_feature_read_authorized": false,
+    "model_parameter_update_authorized": false
+  },
+  "step7_policy": {
+    "path": "schema/step7_v4_raw_item_authorship_selection_policy.json",
+    "size_bytes": 32652,
+    "sha256": "41193c9957fb80024a0e376c76ebcfe0851fe9fee8c15f597c436824fc3b2327"
+  },
+  "part_contract": {
+    "part_ids": ["part_000", "part_001", "part_002", "part_003"],
+    "seller_count_per_part": 14000,
+    "pair_count_per_part": 189000,
+    "allowed_root_files": ["transfer_manifest.json"],
+    "allowed_part_files": [
+      "opaque_unique_texts.jsonl",
+      "opaque_seller_text_index.jsonl",
+      "opaque_pair_endpoints.csv"
+    ],
+    "return_root_files": ["gpu_return_manifest.json"],
+    "return_part_files": ["labse6.npy", "labse6_manifest.json"]
+  },
+  "labse_contract": {
+    "feature_names": [
+      "raw_labse_field_equal_centroid_cosine",
+      "raw_labse_field_equal_symmetric_top3_cosine",
+      "raw_labse_title_centroid_cosine",
+      "raw_labse_title_symmetric_top3_cosine",
+      "raw_labse_description_centroid_cosine",
+      "raw_labse_description_symmetric_top3_cosine"
+    ],
+    "feature_name_canonical_sha256": "b3787367c3559ee1d16ed23eb478783007ff87e9fc6c022a69ef5fb6d090426e",
+    "output_shape_per_part": [189000, 6],
+    "output_dtype": "<f8",
+    "serialized_decimal_places": 12,
+    "temporary_chunks_retained": false,
+    "temporary_embeddings_retained": false
+  },
+  "model_payloads": {
+    "pcm_multilingual_authorship": {
+      "path": "models/step24/authorship/multilingual_style_representation",
+      "file_count": 13,
+      "total_size_bytes": 2261765940,
+      "content_sha256": "90b7b87f49de527078c9023308eb6186685221ffe1f4a3478a75ecfda817b413"
+    },
+    "mstyledistance": {
+      "path": "models/step24/authorship/mstyledistance",
+      "file_count": 15,
+      "total_size_bytes": 578278864,
+      "content_sha256": "6671396e1cf27009b90584869e8a7d95ed3a055192edae897b478afd256fdb27"
+    },
+    "multilingual_e5_large": {
+      "path": "models/step7/embeddings/multilingual_e5_large",
+      "file_count": 9,
+      "total_size_bytes": 2261765112,
+      "content_sha256": "d1541dcd59047401678c3fa66d3793ffead9b46edacf29958e1a0848612be4f2"
+    },
+    "labse": {
+      "path": "models/step7/embeddings/labse",
+      "file_count": 12,
+      "total_size_bytes": 1900941462,
+      "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21"
+    }
+  },
+  "exact_runtime": {
+    "python": "3.10.19",
+    "numpy": "2.2.6",
+    "torch": "2.9.1+cu130",
+    "torch_cuda_runtime": "13.0",
+    "cudnn_runtime": 91300,
+    "transformers": "4.46.3",
+    "sentence_transformers": "5.6.0",
+    "gpu_name": "NVIDIA GeForce RTX 5090",
+    "gpu_compute_capability": [12, 0],
+    "cublas_workspace_config": ":4096:8",
+    "tokenizers_parallelism": "false",
+    "cuda_matmul_allow_tf32": false,
+    "cudnn_allow_tf32": false,
+    "deterministic_algorithms_enabled": true,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true
+  },
+  "loaded_model_state": {
+    "loaded_default_prompt_name": null,
+    "loaded_prompts": {"document": "", "query": ""},
+    "loaded_native_max_seq_length": 256
+  }
+}
