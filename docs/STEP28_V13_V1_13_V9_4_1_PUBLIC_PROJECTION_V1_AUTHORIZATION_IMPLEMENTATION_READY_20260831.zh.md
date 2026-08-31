@@ -2,7 +2,9 @@
 
 日期：2026-08-31
 
-状态：`AUTHORIZATION_IMPLEMENTATION_READY_NOT_ISSUED_NO_PROJECTION_NO_TRAINING_NO_TRUTH_READ`
+状态：`HISTORICAL_IMPLEMENTATION_READY_LATER_CLOSED_DEPLOYMENT_CONTRACT_INVALID`
+
+> 后继执行证明该实现错误要求 Linux 使用与 Windows 相同的 Git 提交／树，与实际只复制文件的部署边界不符。授权尝试一未进入 Linux 编码即关闭，专用实现代码已删除。本文件只保留历史审查结果，不再代表当前可执行方案；当前方案为直接复制 V2。
 
 ## 1. 本阶段结论
 

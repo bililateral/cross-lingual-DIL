@@ -10,6 +10,4 @@ env -u LD_LIBRARY_PATH -u LD_PRELOAD \
   HF_HUB_OFFLINE=1 \
   TRANSFORMERS_OFFLINE=1 \
   PYTHONDONTWRITEBYTECODE=1 \
-  python -B \
-  scripts/step28_v13_v1_13_v9_4_1_public_projection_authorized_run_v1.py \
-  encode-linux
+  python -B scripts/step28_v13_v1_13_v9_4_1_public_projection_portable_v2.py encode-linux

@@ -2,7 +2,15 @@
 
 日期：2026-08-31
 
-状态：`AUTHORIZATION_IMPLEMENTATION_ONLY_NOT_ISSUED_NO_EXECUTION`
+状态：`CLOSED_DEPLOYMENT_CONTRACT_INVALID_NO_PROJECTION_NO_MODEL_OR_DATA_CONCLUSION`
+
+## 0. 关闭结果
+
+该合同错误地假定 Linux 正式工作区能够使用与 Windows 相同的 Git 提交和树；实际批准的部署边界是用户只从 Windows 复制文件到 Linux，不在 Linux 操作 Git。授权尝试一在 Windows 已消费并完成无标签准备，但在 Linux 写入执行声明、加载模型或编码以前即暴露此不兼容。
+
+尝试一按机械失败关闭：未执行 Linux 编码、未发布公开投影、未训练、未读取监督或审核真值，不形成模型或数据结论。36 个准备文件共 954,060,779 字节已经删除；只保留公开授权、消费／清理／准备／终态小回执和本文档。终态 SHA-256 为 `1fddc8c4715fd3c9af7fb18f9003a3142ac75359fc763978e33d525d17d5088b`。私有签发声明删除前为 1,568 字节／`e8cc81b01f4ecf5f9d20d63caa029162f629a551b7262ac7d6082381bd58d2b3`，现已删除，私有保管目录为空。V1 专用授权政策、签发器、状态机、隔离运行器和测试已经删除，不得再次调用。
+
+后继为可直接复制文件的 V2。V2 不使用 Git、历史回归钉、私钥、签发／消费状态机、隔离工作区或重复回执。
 
 ## 1. 授权目的
 
