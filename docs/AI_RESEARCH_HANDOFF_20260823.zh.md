@@ -514,32 +514,23 @@ R2 唯一确定性重放已经发布精确五文件计划根：训练与开发�
 27. V9.1 冻结实时字节测试已经从当前活跃回归精确分离：历史隔离工作树 34／34 通过。V1.12 清理后的第二版当前回归实际启动 865 项、0 失败、0 错误；该结果现为第三版兼容性清理回归的前代证据，不得回退为直接全仓发现后把 V9.1 硬拒绝误报成当前失败。
 28. 最小英文兼容性夹具 v1 的跨工作负载十二位比较无效，相关入口、测试和载荷已删除。完整英文重放 v2 的实现和 13 项合同测试已冻结；第三版当前回归实际启动 864 项、857 项通过、8 条既有跳过事件、0 失败、0 错误。该项末尾的“等待 Linux”状态现已由下一项正式结果取代。
 29. 完整英文兼容性重放 v2 已在 Linux 唯一运行并逐字节复现 `41808×768` LaBSE 矩阵和 733 对完整聚合分数；Windows 归档复核及相关合同 17／17 通过。该结果只关闭兼容性门，不授权训练或审核真值解封。
+30. 便携公开投影 V2 已完成四拆分各 189,000 对；训练与开发 V2 已实际训练 M0、五个 M1、M2、M3-base、M3-joint，审核甲盲预测 V1 也已冻结，但真值仍未打开。
+31. 后继 V4 来源消融证明旧 M2 的强结果不能归因于英文能力：I0 平均精确率 `0.811532`，T1 为 `0.746970`，T1−I0 的百分之九十五区间完全低于零；五档训练量也都未观察到英文 M0 的低资源优势。
+32. 旧审核甲真值评价合同因此暂停。当前只允许先完成 LaBSE 直接中文微调的无正式监督图形处理器冒烟，再执行训练／开发五档预算比较；审核甲乙预测扩展和真值读取仍禁止。
 
-当前允许：提交并推送完整英文兼容性 v2 的两份成功产物和结果记录；随后另起后继版本，冻结并实现 M0／五个 M1／M2／M3-base／M3-joint 的训练、盲预测和指标合同，在当前回归、提交、独立复核和一次性授权闭合后运行。当前禁止：重跑兼容性 v2，重跑 V9.4.1 正式构建或正式质量审计尝试一，复用已消费授权，重跑方法根或任一旧质量尝试，拼接旧 315 世界，打开审核甲乙真值，或在后继训练授权冻结前训练／评估任何模型。
+当前允许：把提交 `95234f9` 的直接微调实现复制到 Linux，先运行不读正式监督的 `smoke`，通过后按最小执行授权运行一次训练／开发比较。当前禁止：执行已冻结的旧审核甲真值评价、生成任何新增审核预测、读取审核甲乙真值、重跑兼容性／数据生成／质量审计、复用失败路径，或把 I0/T1 开发结果写成真实中文市场结论。
 
 ## 9. 接手优先阅读文件
 
-1. 本文；
-2. `docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_RESULT_20260830.zh.md`；
-3. `docs/STEP28_V13_V1_13_CURRENT_AND_V9_1_HISTORICAL_REGRESSION_RESULT_20260830.zh.md`；
-4. `docs/STEP28_V13_V1_13_V9_4_1_COMPATIBILITY_FIXTURE_V1_INVALIDATION_20260830.zh.md`；
-5. `docs/STEP28_V13_V1_13_V9_4_1_FULL_ENGLISH_COMPATIBILITY_V2_AMENDMENT_20260830.zh.md`；
-6. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`；
-7. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_CONTRACT_20260829.zh.md`；
-8. `docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md`；
-9. `docs/STEP28_V13_V1_13_V9_4_MODEL_VISIBLE_SHORTCUT_GATE_CONTRACT_20260827.zh.md`；
-10. `docs/STEP28_V13_V1_13_V9_4_FORMAL_PREBUILD_AUTHORIZATION_CONTRACT_20260828.zh.md`；
-11. `docs/STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md`；
-12. `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md`；
-13. `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`；
-14. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`；
-15. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`；
-16. `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`；
-17. `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`；
-18. `docs/STEP28_V13_V1_13_V9_1_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260823.zh.md`；
-19. V9.2 尝试 1、尝试 2 和尝试 3 的小型终态及尝试 3 完整证据；
-20. `docs/PROJECT_PROGRESS.md` 最后一个 Step28-v13 段落；
-21. `docs/STEP28_V13_V1_13_V9_4_METHOD_ROOT_QUALITY_ATTEMPT3_RESULT_20260829.zh.md`；
-22. `docs/STEP28_V13_V1_13_V9_4_FORMAL_500X4_ATTEMPT1_FAILURE_20260829.zh.md`；
-23. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_CONTRACT_20260829.zh.md`；
-24. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_BUILD_RESULT_20260829.zh.md`。
+1. 本文顶部和第 1 节；
+2. `docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_REPAIR_V4_CONTRACT_20260901.zh.md`；
+3. `docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_CONTROLS_V4_RESULT_20260901.zh.md`；
+4. `docs/STEP28_V13_V1_13_V9_4_1_TRAIN_DEVELOPMENT_V2_RESULT_20260901.zh.md`；
+5. `docs/STEP28_V13_V1_13_V9_4_1_AUDIT_A_BLIND_PREDICTION_V1_RESULT_20260901.zh.md`，但只按其冻结预测事实阅读，不执行其中旧“下一步真值评价”；
+6. `docs/CURRENT_EXPERIMENT_DESIGN.md` 顶部 2026-09-01 覆盖说明；
+7. `docs/PROJECT_PROGRESS.md` 顶部当前阶段；
+8. `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`；
+9. `docs/STEP28_V13_V1_13_SCIENTIFIC_EXPERIMENT_CONTRACT_20260810.zh.md`，只作为原始设计历史，迁移归因以 V4 为准；
+10. 更早 V9.1／V9.2／V9.3／V9.4 失败文档仅在追溯失败边界时阅读，不再决定当前下一步。
+
+`docs/RESEARCH_PLAN.md` 的版本仍为 2026-05-14，属于旧总纲历史；不得用其“当前执行状态”覆盖本文。旧交接、旧合同和冻结结果中的当时性“下一步”均由本节覆盖，但原始历史结论不删除。
