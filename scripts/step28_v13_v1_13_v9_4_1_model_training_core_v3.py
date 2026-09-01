@@ -469,15 +469,43 @@ def select_development_threshold(
     worlds = _world_ordinals(world_ordinals, len(y))
     if len(p) != len(y):
         raise ModelTrainingV3Error("Threshold selection inputs do not align")
-    candidates = np.r_[-np.inf, np.unique(p), np.inf]
-    best_threshold = -np.inf
-    best_f1 = -np.inf
-    for threshold in candidates:
-        confusion = world_equal_confusion(y, p, worlds, float(threshold))
-        f1 = _threshold_metrics_from_confusion(confusion)["f1"]
-        if f1 > best_f1 or (f1 == best_f1 and threshold > best_threshold):
+    if len(y) == 0:
+        raise ModelTrainingV3Error("Threshold selection requires at least one row")
+
+    # Each row contributes 1 / rows_in_its_world to the world-equal
+    # confusion matrix.  Sorting once and updating cumulative weighted counts
+    # is exactly the same decision rule as rescanning every row for every
+    # unique threshold, but changes the runtime from quadratic to O(n log n).
+    _, inverse, rows_per_world = np.unique(
+        worlds, return_inverse=True, return_counts=True
+    )
+    row_weights = 1.0 / rows_per_world[inverse].astype(np.float64)
+    order = np.argsort(-p, kind="stable")
+    ordered_scores = p[order]
+    ordered_labels = y[order].astype(np.float64)
+    ordered_weights = row_weights[order]
+    cumulative_tp = np.cumsum(ordered_weights * ordered_labels, dtype=np.float64)
+    cumulative_fp = np.cumsum(
+        ordered_weights * (1.0 - ordered_labels), dtype=np.float64
+    )
+    group_end = np.flatnonzero(
+        np.r_[ordered_scores[1:] != ordered_scores[:-1], True]
+    )
+    positive_total = float(np.sum(row_weights * y))
+
+    # +inf predicts no positives.  Visiting score groups in descending order
+    # means an exact F1 tie automatically retains the higher threshold.
+    best_threshold = np.inf
+    best_f1 = 0.0
+    for index in group_end:
+        tp = float(cumulative_tp[index])
+        fp = float(cumulative_fp[index])
+        fn = positive_total - tp
+        denominator = 2.0 * tp + fp + fn
+        f1 = 2.0 * tp / denominator if denominator else 0.0
+        if f1 > best_f1:
             best_f1 = f1
-            best_threshold = float(threshold)
+            best_threshold = float(ordered_scores[index])
     return best_threshold
 
 

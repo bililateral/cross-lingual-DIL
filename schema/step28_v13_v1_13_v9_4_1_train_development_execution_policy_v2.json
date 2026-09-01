@@ -1,0 +1,107 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-train-development-execution-v2",
+  "status": "TRAIN_DEVELOPMENT_AUTHORIZED_AUDIT_TRUTH_SEALED",
+  "claim_boundary": "TRAIN_AND_DEVELOPMENT_ONLY_NO_AUDIT_PREDICTION_OR_TRUTH",
+  "canonical_self_hash": "52c41288b62388f1a7d4b2704a8fd6a13dd1e3c9683c8b385cc8cf314dee72a4",
+  "frozen_public_inputs": {
+    "v3_training_policy": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_training_policy_v3.json",
+      "size_bytes": 7878,
+      "sha256": "5ae871ec70b80429bf20e7d3c2bf90ed42e75e8285bebdbf2f7fdac62e6a58da",
+      "canonical_self_hash": "5e26b6c5fd6fea068c5a766ddb94302248f4db4d3ec3ea8d180f60334fa8b4bb"
+    },
+    "public_projection_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+      "size_bytes": 2594,
+      "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2",
+      "canonical_self_hash": "1614e70bd84b76c292098d41f8b8aa0a51666c26f73631b943bf42576b9bba28"
+    },
+    "formal_root_manifest": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/root_manifest.json",
+      "size_bytes": 19346,
+      "sha256": "9190ecdead719ace3bdf74f635c1c23e0a0d19482cb4a9d4d2f6fc1f31dbbbe3",
+      "canonical_self_hash": "3cc7505488c9f47558e9756254ef4c77cccb2a9ccc0c2ba70c9c3531383e1fe6"
+    },
+    "formal_quality_result": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_quality_attempt1_20260829/quality_result.json",
+      "size_bytes": 15835327,
+      "sha256": "6b3ffe53e5404b918890bcc9bd433932fda91aa9e7a7ac2ee6b7529f310a5780",
+      "canonical_self_hash": "5bdf2c2792a3dd6295980c52f4fbb83973bf2ccedca9a6dac6d7ebb0dfcc279c"
+    }
+  },
+  "frozen_code_inputs": {
+    "model_training_core_v3": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_model_training_core_v3.py",
+      "size_bytes": 52018,
+      "sha256": "498aced27e00bc482964f39d75899546c1e27d8346381459069606b1119e01f0"
+    },
+    "confirmatory_evaluator_v3": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_confirmatory_evaluator_v3.py",
+      "size_bytes": 18845,
+      "sha256": "5d6075a81dd6593622fded88eff3b4ae932df8df006912636155aabffabf7556"
+    }
+  },
+  "public_projection_root": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831",
+  "private_supervision_root": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829",
+  "authorized_private_inputs": {
+    "train_labels": {
+      "path": "train/pair_labels.csv",
+      "size_bytes": 24759035,
+      "sha256": "1a7e7c544b86dc67fe96426b6c9eced7c7ac889350e6f793bf0d9e9ff4e7fa82"
+    },
+    "development_labels": {
+      "path": "development/pair_labels.csv",
+      "size_bytes": 28161035,
+      "sha256": "96ab368eede0f15a58368684eeba6037083d5b0c3cb14a06ece8d8627a4ee45a"
+    },
+    "development_qrels": {
+      "path": "development/qrels.jsonl",
+      "size_bytes": 3264000,
+      "sha256": "620cc36cca5f8f12c47debbaefa457136282cf047920af20f20968734623577b"
+    }
+  },
+  "expected_layout": {
+    "splits_used": [
+      "train",
+      "development"
+    ],
+    "worlds_per_split": 500,
+    "rows_per_split": 189000,
+    "rows_per_world": 378,
+    "positive_rows_per_world": 20,
+    "negative_rows_per_world": 358,
+    "base_feature_count": 24,
+    "identity_feature_count": 33,
+    "m1_repeat_ids": [
+      "r01",
+      "r02",
+      "r03",
+      "r04",
+      "r05"
+    ]
+  },
+  "frozen_thresholds": {
+    "c0": 0.32706942161832925,
+    "m0": 0.2324060118538871
+  },
+  "truth_read_budget": {
+    "train_labels": 1,
+    "development_labels": 1,
+    "development_qrels": 1,
+    "train_qrels": 0,
+    "audit_a_labels_or_qrels": 0,
+    "audit_b_labels_or_qrels": 0
+  },
+  "authorization": {
+    "train_development_truth_authorized": true,
+    "model_training_authorized": true,
+    "audit_a_blind_prediction_authorized": false,
+    "audit_a_truth_authorized": false,
+    "audit_b_blind_prediction_authorized": false,
+    "audit_b_truth_authorized": false
+  },
+  "formal_output_root": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901",
+  "overwrite_existing_output_allowed": false,
+  "mechanical_failure_rule": "delete the incomplete .building directory, record the actual failure boundary, and repair with a new version only when code or scientific semantics change",
+  "scientific_gate_failure_rule": "publish the valid negative development result and keep both audit truths sealed"
+}
