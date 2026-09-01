@@ -1,0 +1,81 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-transfer-claim-controls-v4",
+  "status": "DEVELOPMENT_CONTROL_AUTHORIZED_AUDIT_TRUTH_SEALED",
+  "claim_boundary": "POSTHOC_DEVELOPMENT_DIAGNOSTIC_AND_PRE_AUDIT_CONTROL_FREEZE",
+  "canonical_self_hash": "2d31a01d0b0ed0900c2bc3c9744402ef93d840db907d20cfff39c7f722822f30",
+  "contract": "docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_REPAIR_V4_CONTRACT_20260901.zh.md",
+  "frozen_inputs": {
+    "train_development_execution_policy_v2": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_train_development_execution_policy_v2.json",
+      "size_bytes": 4474,
+      "sha256": "2e73edbe28ae9c001b1aa3a72b16dd90bd342897bcf17782c3e87720a10d249d"
+    },
+    "model_training_policy_v3": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_training_policy_v3.json",
+      "size_bytes": 7878,
+      "sha256": "5ae871ec70b80429bf20e7d3c2bf90ed42e75e8285bebdbf2f7fdac62e6a58da"
+    },
+    "model_training_core_v3": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_model_training_core_v3.py",
+      "size_bytes": 52018,
+      "sha256": "498aced27e00bc482964f39d75899546c1e27d8346381459069606b1119e01f0"
+    },
+    "train_development_runner_v2": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_train_development_v2.py",
+      "size_bytes": 33601,
+      "sha256": "0832806152a42d22d92dc1d641f1bb17513f8b861b8b54237b45329cdeaa9d61"
+    },
+    "train_development_v2_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/manifest.json",
+      "size_bytes": 9441,
+      "sha256": "d86266e8abd405494ef409d32d2a5528e95c9cedd348594d063daf6306b033bc"
+    }
+  },
+  "models": {
+    "identity_only": {
+      "id": "i0_identity_only",
+      "linear_predictor": "intercept_plus_identity33_beta",
+      "m0_offset": false
+    },
+    "m0_plus_identity": {
+      "id": "t1_m0_plus_identity",
+      "linear_predictor": "intercept_plus_raw_m0_logit_plus_identity33_beta",
+      "m0_offset": true,
+      "m0_logit_coefficient": 1.0
+    },
+    "reference": {
+      "id": "m2_v3_reference",
+      "source": "frozen_train_development_v2_prediction"
+    }
+  },
+  "fit": {
+    "identity_feature_count": 33,
+    "l2": 0.01,
+    "intercept_penalized": false,
+    "identity_coefficients_penalized": true,
+    "optimizer": "scipy_lbfgsb_exact_gradient",
+    "gradient_infinity_norm_max": 1e-7,
+    "training_rows": 189000,
+    "development_rows": 189000,
+    "worlds_per_split": 500,
+    "pairs_per_world": 378,
+    "positive_pairs_per_world": 20
+  },
+  "primary_development_diagnostic": {
+    "estimand": "pooled_average_precision_t1_minus_i0",
+    "bootstrap_replicates": 9999,
+    "bootstrap_unit": "world",
+    "practical_delta_strictly_greater_than": 0.01,
+    "percentile_interval": [0.025, 0.975],
+    "interval_lower_bound_strictly_greater_than": 0.0
+  },
+  "truth_boundary": {
+    "train_labels_allowed": true,
+    "development_labels_allowed": true,
+    "development_qrels_allowed": true,
+    "audit_a_labels_or_qrels_allowed": false,
+    "audit_b_labels_or_qrels_allowed": false
+  },
+  "output_root": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901",
+  "overwrite_existing_output_allowed": false
+}

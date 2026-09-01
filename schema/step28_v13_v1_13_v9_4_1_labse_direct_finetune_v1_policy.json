@@ -1,0 +1,146 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-labse-direct-finetune-v1",
+  "status": "IMPLEMENTATION_ONLY_NO_FORMAL_GPU_TRAINING_NO_AUDIT_TRUTH",
+  "claim_boundary": "DEVELOPMENT_STRATEGY_COMPARISON_BEFORE_ANY_NEW_AUDIT_PREDICTION",
+  "canonical_self_hash": "63ec4719e9080cbcd2b1df6e6b100eee3c8e3e90245ca69a204cda1b27b8aec7",
+  "scientific_contract": "docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_REPAIR_V4_CONTRACT_20260901.zh.md",
+  "frozen_inputs": {
+    "formal_root_manifest": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/root_manifest.json",
+      "size_bytes": 19346,
+      "sha256": "9190ecdead719ace3bdf74f635c1c23e0a0d19482cb4a9d4d2f6fc1f31dbbbe3"
+    },
+    "public_projection_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+      "size_bytes": 2594,
+      "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2"
+    },
+    "train_development_execution_policy_v2": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_train_development_execution_policy_v2.json",
+      "size_bytes": 4474,
+      "sha256": "2e73edbe28ae9c001b1aa3a72b16dd90bd342897bcf17782c3e87720a10d249d"
+    },
+    "transfer_control_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/manifest.json",
+      "size_bytes": 2907,
+      "sha256": "4b0229e58bbec0b6c29b73fea93d18230910e713c1ab232f114dc62c77cb1c72"
+    },
+    "transfer_control_evaluation": {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/development_evaluation.json",
+      "size_bytes": 7362,
+      "sha256": "acdb18df770e4c360f4f4e40c9facfdd4f96000489a2f08083e9da209e4028c0"
+    }
+  },
+  "public_dataset_root": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829",
+  "public_projection_root": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831",
+  "private_supervision_root": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829",
+  "allowed_splits": ["train", "development"],
+  "forbidden_splits": ["audit_a", "audit_b"],
+  "text_input": {
+    "file_role": "redacted_items.jsonl",
+    "fields": ["title", "description"],
+    "all_nonempty_unique_text_per_seller_field_used": true,
+    "identifier_redacted_text_only": true,
+    "whole_document_truncation_allowed": false,
+    "chunk_overlap_characters": 0,
+    "maximum_chunks_per_text": null,
+    "exact_character_reconstruction_required": true,
+    "token_budget_including_special_tokens": 256,
+    "preferred_boundaries": "newline_whitespace_or_punctuation_then_character_fallback"
+  },
+  "labse_model": {
+    "path": "models/step7/embeddings/labse",
+    "file_count": 12,
+    "total_size_bytes": 1900941462,
+    "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+    "embedding_dimension": 768,
+    "native_max_sequence_length": 256,
+    "prompt": ""
+  },
+  "pair_aggregation": {
+    "chunk_to_unique_text": "l2_normalized_mean_of_unit_chunk_vectors_then_l2_normalize",
+    "unique_text_weight": "equal_per_unique_text",
+    "top_k": 3,
+    "features": [
+      "field_equal_centroid_cosine",
+      "field_equal_symmetric_top3_cosine",
+      "title_centroid_cosine",
+      "title_symmetric_top3_cosine",
+      "description_centroid_cosine",
+      "description_symmetric_top3_cosine"
+    ]
+  },
+  "models": {
+    "ft_base": {
+      "numeric_features": "legacy18",
+      "semantic_features": "six_differentiable_labse_aggregates",
+      "identity_features": false,
+      "head": "linear_logistic"
+    },
+    "ft_joint": {
+      "numeric_features": "legacy18",
+      "semantic_features": "six_differentiable_labse_aggregates",
+      "identity_features": "identity33_train_subset_transform",
+      "head": "linear_logistic"
+    }
+  },
+  "same_budget_cpu_controls": {
+    "i0_identity_only_l2": 0.01,
+    "t1_m0_plus_identity_l2": 0.01,
+    "m3_base_fixed_grid": [7, 25, 0.03, 200],
+    "m3_joint_fixed_grid": [7, 10, 0.03, 200],
+    "grid_source": "frozen_full_budget_v3_selection_no_budget_specific_retuning"
+  },
+  "training_budgets": {
+    "world_counts": [5, 25, 50, 125, 500],
+    "percent_labels": [1, 5, 10, 25, 100],
+    "nested_world_rule": "sha256_world_uid_utf8_then_world_uid_utf8_sorted_prefix",
+    "labels_or_results_used_for_world_selection": false
+  },
+  "formal_layout": {
+    "worlds_per_split": 500,
+    "sellers_per_world": 28,
+    "items_per_world": 99,
+    "pairs_per_world": 378,
+    "positive_pairs_per_world": 20,
+    "negative_pairs_per_world": 358
+  },
+  "optimization": {
+    "development_screen_seed": 20260901,
+    "epochs": 5,
+    "worlds_per_gradient_step": 4,
+    "chunk_batch_size": 24,
+    "encoder_learning_rate": 0.00002,
+    "head_learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "optimizer": "adamw",
+    "precision": "bfloat16_autocast",
+    "loss": "mean_binary_cross_entropy_over_all_378_pairs_then_equal_mean_over_worlds",
+    "positive_class_reweighting": false,
+    "epoch_selection": "fixed_last_epoch_no_development_early_stopping"
+  },
+  "runtime": {
+    "python": "3.10.19",
+    "numpy": "2.2.6",
+    "torch": "2.9.1+cu130",
+    "torch_cuda_runtime": "13.0",
+    "cudnn_runtime": 91300,
+    "transformers": "4.46.3",
+    "sentence_transformers": "5.6.0",
+    "gpu_name": "NVIDIA GeForce RTX 5090",
+    "compute_capability": [12, 0]
+  },
+  "truth_boundary": {
+    "train_labels_allowed": true,
+    "development_labels_allowed": true,
+    "development_qrels_allowed": true,
+    "audit_a_labels_or_qrels_allowed": false,
+    "audit_b_labels_or_qrels_allowed": false
+  },
+  "output_root": "reports/step28_model_experiment/v9_4_1_labse_direct_finetune_v1_20260901",
+  "formal_gpu_training_authorized": false,
+  "audit_a_prediction_authorized": false,
+  "audit_a_truth_authorized": false,
+  "audit_b_truth_authorized": false
+}
