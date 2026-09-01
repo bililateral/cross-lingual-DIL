@@ -1,0 +1,101 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-audit-a-truth-evaluation-v1",
+  "status": "AUDIT_A_TRUTH_EVALUATION_AUTHORIZED_AUDIT_B_SEALED",
+  "claim_boundary": "AUDIT_A_FROZEN_PREDICTIONS_SINGLE_TRUTH_EVALUATION_NO_MODEL_UPDATE_NO_AUDIT_B",
+  "canonical_self_hash": "29a46f14a9ea767dd46e3f7779910912eb1f5aa41dd1765b978c2482854ad17f",
+  "split": "audit_a",
+  "frozen_public_inputs": {
+    "v3_training_policy": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_model_training_policy_v3.json",
+      "size_bytes": 7878,
+      "sha256": "5ae871ec70b80429bf20e7d3c2bf90ed42e75e8285bebdbf2f7fdac62e6a58da",
+      "canonical_self_hash": "5e26b6c5fd6fea068c5a766ddb94302248f4db4d3ec3ea8d180f60334fa8b4bb"
+    },
+    "audit_a_blind_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_audit_a_blind_predictions_v1_20260901/manifest.json",
+      "size_bytes": 2887,
+      "sha256": "73a5eeaa4cd7c10c4a6593b977b14804b08ff0da2eb2effdcde12048e6787faa",
+      "canonical_self_hash": "2f4b39899f27eb1dec6ff57ab2b9ce3f7c7dffb3f50d3424c51c3f322367cc4f"
+    },
+    "training_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/manifest.json",
+      "size_bytes": 9441,
+      "sha256": "d86266e8abd405494ef409d32d2a5528e95c9cedd348594d063daf6306b033bc",
+      "canonical_self_hash": "7cab52a64081bc3871081a0f8a5bfd308813c2d80b9d433a7cbe277e9cb35364"
+    },
+    "audit_a_row_keys": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/audit_a/row_keys.csv",
+      "size_bytes": 45885502,
+      "sha256": "03d2fca592454cfb7466fdb2e2e6c00e310044541eb7bc08b800bacf61926c0d"
+    }
+  },
+  "frozen_code_inputs": {
+    "model_training_core_v3": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_model_training_core_v3.py",
+      "size_bytes": 52018,
+      "sha256": "498aced27e00bc482964f39d75899546c1e27d8346381459069606b1119e01f0"
+    },
+    "confirmatory_evaluator_v3": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_confirmatory_evaluator_v3.py",
+      "size_bytes": 18845,
+      "sha256": "5d6075a81dd6593622fded88eff3b4ae932df8df006912636155aabffabf7556"
+    },
+    "train_development_helper_v2": {
+      "path": "scripts/step28_v13_v1_13_v9_4_1_train_development_v2.py",
+      "size_bytes": 33601,
+      "sha256": "0832806152a42d22d92dc1d641f1bb17513f8b861b8b54237b45329cdeaa9d61"
+    }
+  },
+  "blind_output_root": "reports/step28_model_experiment/v9_4_1_audit_a_blind_predictions_v1_20260901",
+  "training_output_root": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901",
+  "private_supervision_root": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829",
+  "authorized_private_inputs": {
+    "audit_a_labels": {
+      "path": "audit_a/pair_labels.csv",
+      "size_bytes": 25893035,
+      "sha256": "28b45881522b1b21f2c7434fe137b04c03c3f846205ce4b504f7d3d717de5d69"
+    },
+    "audit_a_qrels": {
+      "path": "audit_a/qrels.jsonl",
+      "size_bytes": 3072000,
+      "sha256": "037a63ab4ee6325e98711730020b97def0ea7c7f254dfd2cd5138873abe5213f"
+    }
+  },
+  "expected_layout": {
+    "worlds": 500,
+    "rows": 189000,
+    "rows_per_world": 378,
+    "positive_rows_per_world": 20,
+    "model_order": [
+      "c0",
+      "m0",
+      "m1_r01",
+      "m1_r02",
+      "m1_r03",
+      "m1_r04",
+      "m1_r05",
+      "m2",
+      "m3_base",
+      "m3_joint"
+    ]
+  },
+  "truth_read_budget": {
+    "audit_a_labels_semantic_reads": 1,
+    "audit_a_qrels_semantic_reads": 1,
+    "audit_b_labels_or_qrels_semantic_reads": 0
+  },
+  "authorization": {
+    "audit_a_truth_evaluation_authorized": true,
+    "model_or_threshold_update_authorized": false,
+    "audit_b_blind_prediction_authorized": false,
+    "audit_b_truth_authorized": false
+  },
+  "bootstrap": {
+    "replicates": 9999,
+    "world_count": 500,
+    "index_bytes_sha256": "617be9200ad55b45eda8b1800989d7e0b50579bb53ecee675713f8ba2cd4c3e4"
+  },
+  "formal_output_root": "reports/step28_model_experiment/v9_4_1_audit_a_truth_evaluation_v1_20260901",
+  "overwrite_existing_output_allowed": false,
+  "failure_rule": "delete only the incomplete building directory; record an irrecoverable failure before deleting its payload; never read or predict audit B"
+}
