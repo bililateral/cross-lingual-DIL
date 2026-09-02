@@ -1,0 +1,164 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-english-initialized-labse-finetune-v1",
+  "status": "DEVELOPMENT_TRAINING_AUTHORIZED_AUDIT_TRUTH_FORBIDDEN",
+  "claim_boundary": "ENGLISH_SUPERVISED_INITIALIZATION_VERSUS_GENERIC_INITIALIZATION_ON_CHINESE_DEVELOPMENT",
+  "canonical_self_hash": "8bb68c8d2fa5c8a68273b17638bfd604d7d8d10227971fe45912c499a90cf7e7",
+  "scientific_contract": "docs/STEP28_V13_V9_4_1_ENGLISH_INITIALIZED_LABSE_FINETUNE_V1_PLAN_20260902.zh.md",
+  "english_source": {
+    "pair_manifest": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/pair_manifest.no_labels.csv",
+      "size_bytes": 191526,
+      "sha256": "f9f996bdac4a69ce361fa23417ed47cf9216854ffc5558b0202539a311886cb9"
+    },
+    "train_labels": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/private_labels.train.csv",
+      "size_bytes": 63877,
+      "sha256": "319b243156bceeaf38dcdf31c1bef9efe31ccae52b43cee705d6ba2fdec03542"
+    },
+    "seller_text_index": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/seller_unique_text_index.no_labels.jsonl",
+      "size_bytes": 12606560,
+      "sha256": "47c57d5e9031e62355007c1eb8ea4b308b853deca080690010d49ce5053b58c0"
+    },
+    "unique_texts": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/unique_clean_texts.no_labels.jsonl",
+      "size_bytes": 19611585,
+      "sha256": "540ba3a36ffe23d0fda63b823ee2216ff65147713e61b8d34b9f5374715eb101"
+    },
+    "legacy18": {
+      "path": "reports/step7_v4_raw_item_authorship_selection/v2_20260723/legacy18_pair_features.no_labels.csv",
+      "size_bytes": 210752,
+      "sha256": "a58bb532c6cffc722b4cb9b2be2bad348abfe581a8bcf811f35a1bb383fe94e9"
+    },
+    "expected_pairs": 401,
+    "expected_positive": 116,
+    "expected_negative": 285,
+    "expected_sellers": 582,
+    "expected_components": 229,
+    "expected_text_mappings": 26114,
+    "expected_global_unique_texts": 23557,
+    "allowed_split": "train",
+    "validation_or_test_labels_allowed": false,
+    "legacy18_feature_names": [
+      "clean_category_jaccard",
+      "clean_shared_title_bool",
+      "clean_shared_description_bool",
+      "clean_shared_title_count_capped",
+      "clean_shared_description_count_capped",
+      "clean_shared_category_count_capped",
+      "clean_shared_title_idf_sum",
+      "clean_shared_description_idf_sum",
+      "clean_shared_title_idf_mean",
+      "clean_shared_description_idf_mean",
+      "item_count_train_percentile_gap_abs",
+      "title_length_median_train_percentile_gap_abs",
+      "description_length_median_train_percentile_gap_abs",
+      "digit_ratio_mean_train_percentile_gap_abs",
+      "punct_ratio_mean_train_percentile_gap_abs",
+      "repeated_title_share_train_percentile_gap_abs",
+      "repeated_description_share_train_percentile_gap_abs",
+      "max_category_share_train_percentile_gap_abs"
+    ],
+    "semantic6_feature_names": [
+      "raw_labse_field_equal_centroid_cosine",
+      "raw_labse_field_equal_symmetric_top3_cosine",
+      "raw_labse_title_centroid_cosine",
+      "raw_labse_title_symmetric_top3_cosine",
+      "raw_labse_description_centroid_cosine",
+      "raw_labse_description_symmetric_top3_cosine"
+    ]
+  },
+  "chinese_target": {
+    "formal_root_manifest": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/root_manifest.json",
+      "size_bytes": 19346,
+      "sha256": "9190ecdead719ace3bdf74f635c1c23e0a0d19482cb4a9d4d2f6fc1f31dbbbe3"
+    },
+    "public_projection_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+      "size_bytes": 2594,
+      "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2"
+    },
+    "train_development_execution_policy_v2": {
+      "path": "schema/step28_v13_v1_13_v9_4_1_train_development_execution_policy_v2.json",
+      "size_bytes": 4474,
+      "sha256": "2e73edbe28ae9c001b1aa3a72b16dd90bd342897bcf17782c3e87720a10d249d"
+    },
+    "allowed_splits": ["train", "development"],
+    "forbidden_splits": ["audit_a", "audit_b"],
+    "worlds_per_split": 500,
+    "pairs_per_world": 378,
+    "positive_pairs_per_world": 20
+  },
+  "labse_model": {
+    "path": "models/step7/embeddings/labse",
+    "file_count": 12,
+    "total_size_bytes": 1900941462,
+    "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+    "embedding_dimension": 768,
+    "native_max_sequence_length": 256
+  },
+  "text_input": {
+    "fields": ["title", "description"],
+    "token_budget_including_special_tokens": 256,
+    "whole_document_truncation_allowed": false,
+    "all_seller_text_mappings_used_in_each_english_epoch": true,
+    "exact_character_reconstruction_required": true,
+    "top_k": 3
+  },
+  "models": {
+    "generic_init_base": {
+      "encoder_initialization": "generic_labse",
+      "target_features": "legacy18_plus_six_differentiable_labse_aggregates",
+      "identity33": false
+    },
+    "english_init_base": {
+      "encoder_initialization": "english_label_trained_labse_encoder_only",
+      "target_features": "legacy18_plus_six_differentiable_labse_aggregates",
+      "identity33": false
+    }
+  },
+  "source_optimization": {
+    "seed": 20260902,
+    "epochs": 8,
+    "components_per_gradient_step": 8,
+    "head_warmup_steps": 200,
+    "encoder_learning_rate": 0.00001,
+    "head_learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "chunk_batch_size": 24,
+    "loss": "component_and_class_balanced_binary_cross_entropy",
+    "dropout_during_exact_full_text_gradient": false
+  },
+  "target_optimization": {
+    "seed": 20260902,
+    "world_count": 500,
+    "epochs": 10,
+    "worlds_per_gradient_step": 4,
+    "chunk_batch_size": 24,
+    "encoder_learning_rate": 0.00002,
+    "head_learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "loss": "mean_binary_cross_entropy_per_world_then_equal_mean_over_worlds",
+    "positive_class_reweighting": false
+  },
+  "runtime": {
+    "python": "3.10.19",
+    "numpy": "2.2.6",
+    "torch": "2.9.1+cu130",
+    "torch_cuda_runtime": "13.0",
+    "cudnn_runtime": 91300,
+    "transformers": "4.46.3",
+    "sentence_transformers": "5.6.0",
+    "gpu_name": "NVIDIA GeForce RTX 5090",
+    "compute_capability": [12, 0]
+  },
+  "output_root": "reports/step28_model_experiment/v9_4_1_english_initialized_labse_finetune_v1_20260902",
+  "development_training_authorized": true,
+  "audit_a_prediction_authorized": false,
+  "audit_a_truth_authorized": false,
+  "audit_b_prediction_authorized": false,
+  "audit_b_truth_authorized": false
+}
