@@ -39,6 +39,8 @@ POLICY_PATH = (
 )
 EXPECTED_VERSION = "step28-v13-v1.13-v9.4.1-english-initialized-labse-finetune-v1"
 MODEL_IDS = ("generic_init_base", "english_init_base")
+SOURCE_FEATURE_COUNT = 6
+TARGET_FEATURE_COUNT = 24
 
 
 class EnglishInitializedFinetuneError(ValueError):
@@ -177,8 +179,16 @@ def load_english_source(policy: Mapping[str, Any]) -> dict[str, Any]:
 
     label_rows = _read_csv(_verified_file(source["train_labels"], "train_labels"))
     label_index = {row["pair_uid"]: row for row in label_rows}
+    if len(label_index) != len(label_rows):
+        raise EnglishInitializedFinetuneError("Duplicate English train label row")
     if set(label_index) != set(pair_uids):
         raise EnglishInitializedFinetuneError("English labels do not match train pairs")
+    label_values = {row["review_label"] for row in label_rows}
+    if not label_values <= {"positive", "negative"} or label_values != {
+        "positive",
+        "negative",
+    }:
+        raise EnglishInitializedFinetuneError("Unexpected English label value")
     labels = np.asarray(
         [1 if label_index[uid]["review_label"] == "positive" else 0 for uid in pair_uids],
         dtype=np.int64,
@@ -191,18 +201,6 @@ def load_english_source(policy: Mapping[str, Any]) -> dict[str, Any]:
     components = tuple(row["component_id"] for row in pairs)
     if any(label_index[uid]["component_id"] != component for uid, component in zip(pair_uids, components)):
         raise EnglishInitializedFinetuneError("English component assignment drift")
-
-    feature_rows = _read_csv(_verified_file(source["legacy18"], "legacy18"))
-    feature_index = {row["pair_uid"]: row for row in feature_rows}
-    names = tuple(source["legacy18_feature_names"])
-    legacy = np.asarray(
-        [[float(feature_index[uid][name]) for name in names] for uid in pair_uids],
-        dtype="<f8",
-    )
-    if legacy.shape != (len(pairs), 18) or not np.isfinite(legacy).all():
-        raise EnglishInitializedFinetuneError("English legacy18 matrix drift")
-    legacy_mean, legacy_scale = direct._standardizer(legacy)
-    legacy = np.ascontiguousarray((legacy - legacy_mean) / legacy_scale, dtype="<f8")
 
     sellers = {
         seller
@@ -239,6 +237,8 @@ def load_english_source(policy: Mapping[str, Any]) -> dict[str, Any]:
     for row in _iter_jsonl(_verified_file(source["unique_texts"], "unique_texts")):
         uid = str(row["text_uid"])
         if uid in required_text_uids:
+            if uid in text_lookup:
+                raise EnglishInitializedFinetuneError("Duplicate English text payload")
             text = str(row["text"])
             if hashlib.sha256(text.encode("utf-8")).hexdigest() != uid:
                 raise EnglishInitializedFinetuneError("English text hash drift")
@@ -274,9 +274,6 @@ def load_english_source(policy: Mapping[str, Any]) -> dict[str, Any]:
         "labels": labels,
         "components": components,
         "weights": _component_class_weights(labels, components),
-        "legacy18": legacy,
-        "legacy_mean": legacy_mean,
-        "legacy_scale": legacy_scale,
         "text_uids": text_uids,
         "texts": tuple(text_lookup[uid] for uid in text_uids),
         "seller_fields": frozen_fields,
@@ -346,7 +343,11 @@ def _all_text_embeddings(
     outputs = []
     group = []
     group_chunks = 0
-    limit = chunk_batch_size * 8
+    # Keep this grouping identical to _vjp_all_texts.  The English source
+    # stage recomputes the same deterministic forward pass during the VJP;
+    # changing group boundaries can change padding shapes and defeat that
+    # equality even though each individual text is unchanged.
+    limit = chunk_batch_size * 2
     for index, chunks in enumerate(chunks_by_text):
         if group and group_chunks + len(chunks) > limit:
             outputs.append(
@@ -402,16 +403,13 @@ def _source_matrix(
     torch: Any,
     text_vectors: Any,
     source: Mapping[str, Any],
-    device: Any,
 ) -> Any:
-    semantics = torch.stack(
+    return torch.stack(
         [
             _pair_semantics(torch, text_vectors, pair, source["seller_fields"])
             for pair in source["pairs"]
         ]
     )
-    legacy = torch.from_numpy(source["legacy18"]).to(device=device, dtype=torch.float32)
-    return torch.cat((legacy, semantics.float()), dim=1)
 
 
 def _weighted_bce(torch: Any, logits: Any, labels: Any, weights: Any) -> Any:
@@ -482,7 +480,10 @@ def train_english_source(
     chunk_count = sum(len(chunks) for chunks in chunks_by_text)
     labels = torch.from_numpy(source["labels"].astype(np.float32)).to(device)
     weights = torch.from_numpy(source["weights"].astype(np.float32)).to(device)
-    head = torch.nn.Linear(24, 1, bias=True).to(device)
+    # Only text-derived LaBSE features enter the English objective.  Since
+    # only the encoder is transferred, legacy18 would give the source head a
+    # dominant bypass around the representation that this experiment tests.
+    head = torch.nn.Linear(SOURCE_FEATURE_COUNT, 1, bias=True).to(device)
     torch.nn.init.zeros_(head.weight)
     torch.nn.init.zeros_(head.bias)
 
@@ -499,7 +500,7 @@ def train_english_source(
             chunk_batch_size=int(config["chunk_batch_size"]),
             device=device,
         )
-        frozen_matrix = _source_matrix(torch, frozen_texts, source, device).detach()
+        frozen_matrix = _source_matrix(torch, frozen_texts, source).detach()
         warmup_initial_loss = float(
             _weighted_bce(
                 torch, head(frozen_matrix).squeeze(1), labels, weights
@@ -521,8 +522,7 @@ def train_english_source(
                 torch, head(frozen_matrix).squeeze(1), labels, weights
             ).cpu()
         )
-        warmup_legacy_head_l2 = float(torch.linalg.vector_norm(head.weight[0, :18]).cpu())
-        warmup_semantic_head_l2 = float(torch.linalg.vector_norm(head.weight[0, 18:]).cpu())
+        warmup_semantic_head_l2 = float(torch.linalg.vector_norm(head.weight[0]).cpu())
     del frozen_texts, frozen_matrix, warmup
     torch.cuda.empty_cache()
 
@@ -542,6 +542,9 @@ def train_english_source(
     )
     training_log = []
     optimizer_update_count = 0
+    encoder_anchor_name = None
+    encoder_anchor_before = None
+    encoder_anchor_first_gradient_l2 = None
     component_ids = tuple(
         sorted(source["component_pair_indices"], key=lambda value: value.encode("utf-8"))
     )
@@ -584,7 +587,6 @@ def train_english_source(
             }
             local_source = {
                 "pairs": batch_pairs,
-                "legacy18": source["legacy18"][pair_indices],
                 "seller_fields": {
                     seller: {
                         field: tuple(
@@ -612,7 +614,7 @@ def train_english_source(
                     device=device,
                 )
             leaf = current.detach().requires_grad_(True)
-            matrix = _source_matrix(torch, leaf, local_source, device)
+            matrix = _source_matrix(torch, leaf, local_source)
             loss = _weighted_bce(
                 torch, head(matrix).squeeze(1), batch_labels, batch_weights
             )
@@ -631,6 +633,22 @@ def train_english_source(
                 chunk_batch_size=int(config["chunk_batch_size"]),
                 device=device,
             )
+            if encoder_anchor_name is None:
+                for name, parameter in reversed(tuple(encoder.named_parameters())):
+                    if parameter.grad is None:
+                        continue
+                    candidate_norm = float(
+                        torch.linalg.vector_norm(parameter.grad.detach().float()).cpu()
+                    )
+                    if math.isfinite(candidate_norm) and candidate_norm > 0.0:
+                        encoder_anchor_name = name
+                        encoder_anchor_before = parameter.detach().float().cpu().clone()
+                        encoder_anchor_first_gradient_l2 = candidate_norm
+                        break
+                if encoder_anchor_name is None:
+                    raise EnglishInitializedFinetuneError(
+                        "English loss produced no nonzero LaBSE parameter gradient"
+                    )
             gradient_norm = float(
                 torch.nn.utils.clip_grad_norm_(
                     list(encoder.parameters()) + list(head.parameters()),
@@ -680,6 +698,48 @@ def train_english_source(
             flush=True,
         )
 
+    if encoder_anchor_name is None or encoder_anchor_before is None:
+        raise EnglishInitializedFinetuneError("English encoder anchor was not established")
+    encoder_anchor_after = dict(encoder.named_parameters())[encoder_anchor_name]
+    encoder_anchor_delta_l2 = float(
+        torch.linalg.vector_norm(
+            encoder_anchor_after.detach().float().cpu() - encoder_anchor_before
+        )
+    )
+    if not math.isfinite(encoder_anchor_delta_l2) or encoder_anchor_delta_l2 <= 0.0:
+        raise EnglishInitializedFinetuneError("English training did not update LaBSE parameters")
+
+    encoder.eval()
+    head.eval()
+    with torch.no_grad():
+        final_texts = _all_text_embeddings(
+            torch,
+            encoder,
+            tokenizer,
+            chunks_by_text,
+            chunk_batch_size=int(config["chunk_batch_size"]),
+            device=device,
+        )
+        final_matrix = _source_matrix(torch, final_texts, source)
+        final_probabilities = (
+            torch.sigmoid(head(final_matrix).squeeze(1)).double().cpu().numpy()
+        )
+    source_training_fit = {
+        "scope": "english_training_fit_diagnostic_only_not_source_validation",
+        "unweighted": controls.core.score_curve_metrics(
+            source["labels"], final_probabilities
+        )
+        | controls.core.probabilistic_metrics(source["labels"], final_probabilities),
+        "component_and_class_balanced": controls.core.score_curve_metrics(
+            source["labels"], final_probabilities, source["weights"]
+        )
+        | controls.core.probabilistic_metrics(
+            source["labels"], final_probabilities, source["weights"]
+        ),
+    }
+    del final_texts, final_matrix, final_probabilities
+    torch.cuda.empty_cache()
+
     source_root = output / "english_source"
     encoder_path = source_root / "encoder"
     encoder.save_pretrained(str(encoder_path))
@@ -711,10 +771,15 @@ def train_english_source(
             "steps": int(config["head_warmup_steps"]),
             "initial_balanced_loss": warmup_initial_loss,
             "final_balanced_loss": warmup_final_loss,
-            "legacy18_weight_l2": warmup_legacy_head_l2,
             "semantic6_weight_l2": warmup_semantic_head_l2,
         },
         "trained_encoder_payload": trained_encoder_payload,
+        "encoder_update_proof": {
+            "anchor_parameter": encoder_anchor_name,
+            "first_gradient_l2": encoder_anchor_first_gradient_l2,
+            "final_parameter_delta_l2": encoder_anchor_delta_l2,
+        },
+        "training_fit_diagnostic": source_training_fit,
         "training_log": training_log,
     }
     write_json(source_root / "training.json", audit)
@@ -770,7 +835,7 @@ def train_target_model(
     development_numeric = np.ascontiguousarray(
         (development["base24"][:, :18] - legacy_mean) / legacy_scale, dtype="<f8"
     )
-    head = torch.nn.Linear(24, 1, bias=True).to(device)
+    head = torch.nn.Linear(TARGET_FEATURE_COUNT, 1, bias=True).to(device)
     torch.nn.init.zeros_(head.weight)
     torch.nn.init.constant_(head.bias, math.log(20.0 / 358.0))
     optimizer = torch.optim.AdamW(
@@ -789,6 +854,10 @@ def train_target_model(
     )
     chunk_cache: dict[str, tuple[str, ...]] = {}
     training_log = []
+    optimizer_update_count = 0
+    encoder_anchor_name = None
+    encoder_anchor_before = None
+    encoder_anchor_first_gradient_l2 = None
     encoder.train()
     head.train()
     for epoch in range(int(config["epochs"])):
@@ -824,12 +893,31 @@ def train_target_model(
                 loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, labels)
                 (loss / len(group)).backward()
                 epoch_losses.append(float(loss.detach().cpu()))
-            torch.nn.utils.clip_grad_norm_(
-                list(encoder.parameters()) + list(head.parameters()),
-                float(config["gradient_clip_norm"]),
+            if encoder_anchor_name is None:
+                for name, parameter in reversed(tuple(encoder.named_parameters())):
+                    if parameter.grad is None:
+                        continue
+                    candidate_norm = float(
+                        torch.linalg.vector_norm(parameter.grad.detach().float()).cpu()
+                    )
+                    if math.isfinite(candidate_norm) and candidate_norm > 0.0:
+                        encoder_anchor_name = name
+                        encoder_anchor_before = parameter.detach().float().cpu().clone()
+                        encoder_anchor_first_gradient_l2 = candidate_norm
+                        break
+            gradient_norm = float(
+                torch.nn.utils.clip_grad_norm_(
+                    list(encoder.parameters()) + list(head.parameters()),
+                    float(config["gradient_clip_norm"]),
+                ).detach().cpu()
             )
+            if not math.isfinite(gradient_norm):
+                raise EnglishInitializedFinetuneError(
+                    f"{model_id} Chinese gradient norm is invalid"
+                )
             optimizer.step()
-            if batch_number % 25 == 0 or batch_number == steps_per_epoch:
+            optimizer_update_count += 1
+            if batch_number % 5 == 0 or batch_number == steps_per_epoch:
                 print(
                     f"{model_id} 第 {epoch + 1} 轮：批次 "
                     f"{batch_number}/{steps_per_epoch}",
@@ -840,6 +928,21 @@ def train_target_model(
         print(
             f"{model_id} 中文微调 {epoch + 1}/{config['epochs']}：loss={mean_loss:.6f}",
             flush=True,
+        )
+
+    if encoder_anchor_name is None or encoder_anchor_before is None:
+        raise EnglishInitializedFinetuneError(
+            f"{model_id} Chinese loss produced no nonzero LaBSE parameter gradient"
+        )
+    encoder_anchor_after = dict(encoder.named_parameters())[encoder_anchor_name]
+    encoder_anchor_delta_l2 = float(
+        torch.linalg.vector_norm(
+            encoder_anchor_after.detach().float().cpu() - encoder_anchor_before
+        )
+    )
+    if not math.isfinite(encoder_anchor_delta_l2) or encoder_anchor_delta_l2 <= 0.0:
+        raise EnglishInitializedFinetuneError(
+            f"{model_id} Chinese training did not update LaBSE parameters"
         )
 
     predictions = np.empty(len(development["world_uids"]), dtype="<f8")
@@ -882,8 +985,12 @@ def train_target_model(
             "model_id": model_id,
             "world_count": len(selected_worlds),
             "epochs": int(config["epochs"]),
-            "optimizer_updates": int(config["epochs"])
-            * math.ceil(len(selected_worlds) / int(config["worlds_per_gradient_step"])),
+            "optimizer_updates": optimizer_update_count,
+            "encoder_update_proof": {
+                "anchor_parameter": encoder_anchor_name,
+                "first_gradient_l2": encoder_anchor_first_gradient_l2,
+                "final_parameter_delta_l2": encoder_anchor_delta_l2,
+            },
             "training_log": training_log,
             "whole_document_truncation_count": 0,
         },
@@ -892,6 +999,46 @@ def train_target_model(
         legacy_mean,
         legacy_scale,
     )
+
+
+def development_comparison(reports: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    generic = reports["generic_init_base"]["development"]
+    english = reports["english_init_base"]["development"]
+
+    def deltas(section: str) -> dict[str, float]:
+        return {
+            key: float(english[section][key] - generic[section][key])
+            for key in english[section]
+            if isinstance(english[section][key], (int, float))
+            and isinstance(generic[section].get(key), (int, float))
+        }
+
+    threshold_sections = ("raw_rows", "world_equal_confusion")
+    primary_delta = float(
+        english["pooled"]["average_precision"]
+        - generic["pooled"]["average_precision"]
+    )
+    return {
+        "comparison": "english_init_base_minus_generic_init_base",
+        "primary_metric": "pooled_average_precision",
+        "primary_delta": primary_delta,
+        "continue_to_confirmation": primary_delta > 0.0,
+        "single_seed_result_is_confirmatory": False,
+        "pooled_deltas": deltas("pooled"),
+        "world_equal_sensitivity_deltas": deltas("world_equal_sensitivity"),
+        "threshold_metric_deltas": {
+            section: {
+                key: float(
+                    english["threshold"][section][key]
+                    - generic["threshold"][section][key]
+                )
+                for key in english["threshold"][section]
+            }
+            for section in threshold_sections
+        },
+        "retrieval_deltas": deltas("retrieval"),
+        "lower_is_better_metrics": ["brier", "log_loss"],
+    }
 
 
 def validate_contract() -> dict[str, Any]:
@@ -945,12 +1092,10 @@ def smoke_runtime() -> dict[str, Any]:
     }
     pair = {"seller_uid_left": "left", "seller_uid_right": "right"}
     semantics = _pair_semantics(torch, leaf, pair, seller_fields)
-    head = torch.nn.Linear(24, 1, bias=True).to(device)
+    head = torch.nn.Linear(SOURCE_FEATURE_COUNT, 1, bias=True).to(device)
     torch.nn.init.constant_(head.weight, 0.01)
     torch.nn.init.zeros_(head.bias)
-    features = torch.cat(
-        (torch.zeros(18, dtype=torch.float32, device=device), semantics.float())
-    )
+    features = semantics.float()
     loss = torch.nn.functional.binary_cross_entropy_with_logits(
         head(features).squeeze(), torch.tensor(1.0, device=device)
     )
@@ -974,10 +1119,59 @@ def smoke_runtime() -> dict[str, Any]:
     )
     if not math.isfinite(encoder_gradient) or encoder_gradient <= 0.0:
         raise EnglishInitializedFinetuneError("Smoke did not update LaBSE gradient")
+    anchor_name = None
+    two_pass_gradient = None
+    for name, parameter in reversed(tuple(encoder.named_parameters())):
+        if parameter.grad is not None and float(parameter.grad.detach().abs().sum()) > 0.0:
+            anchor_name = name
+            two_pass_gradient = parameter.grad.detach().float().cpu().clone()
+            break
+    if anchor_name is None or two_pass_gradient is None:
+        raise EnglishInitializedFinetuneError("Smoke has no two-pass gradient anchor")
+
+    encoder.zero_grad(set_to_none=True)
+    head.zero_grad(set_to_none=True)
+    direct_vectors = _all_text_embeddings(
+        torch,
+        encoder,
+        tokenizer,
+        chunks_by_text,
+        chunk_batch_size=4,
+        device=device,
+    )
+    direct_semantics = _pair_semantics(
+        torch, direct_vectors, pair, seller_fields
+    ).float()
+    direct_loss = torch.nn.functional.binary_cross_entropy_with_logits(
+        head(direct_semantics).squeeze(), torch.tensor(1.0, device=device)
+    )
+    direct_loss.backward()
+    direct_gradient = dict(encoder.named_parameters())[anchor_name].grad
+    if direct_gradient is None:
+        raise EnglishInitializedFinetuneError("Direct smoke lost its gradient anchor")
+    direct_gradient = direct_gradient.detach().float().cpu()
+    maximum_gradient_difference = float(
+        torch.max(torch.abs(two_pass_gradient - direct_gradient))
+    )
+    relative_gradient_l2_difference = float(
+        torch.linalg.vector_norm(two_pass_gradient - direct_gradient)
+        / torch.clamp(torch.linalg.vector_norm(direct_gradient), min=1e-12)
+    )
+    if not torch.allclose(
+        two_pass_gradient, direct_gradient, rtol=1e-4, atol=1e-7
+    ):
+        raise EnglishInitializedFinetuneError(
+            "Two-pass English gradient does not match direct autograd"
+        )
     return {
         "status": "PASSED_TWO_PASS_LABSE_GRADIENT_SMOKE_NO_FORMAL_TRUTH",
         "loss": float(loss.detach().cpu()),
         "encoder_gradient_l1": encoder_gradient,
+        "gradient_equivalence": {
+            "anchor_parameter": anchor_name,
+            "maximum_absolute_difference": maximum_gradient_difference,
+            "relative_l2_difference": relative_gradient_l2_difference,
+        },
         "english_train_label_reads": 0,
         "chinese_train_or_development_truth_reads": 0,
         "audit_a_truth_reads": 0,
@@ -1058,6 +1252,7 @@ def run() -> dict[str, Any]:
             "policy_canonical_self_hash": policy["canonical_self_hash"],
             "english_source": source_audit,
             "models": reports,
+            "development_primary_comparison": development_comparison(reports),
             "truth_read_counts": {
                 "english_train_labels": 1,
                 "english_validation_or_test_labels": 0,

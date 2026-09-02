@@ -41,8 +41,15 @@ class EnglishInitializedLabseFinetuneV1Tests(unittest.TestCase):
         self.assertEqual(generic["target_features"], english["target_features"])
         self.assertFalse(generic["identity33"])
         self.assertFalse(english["identity33"])
+        self.assertEqual(
+            policy["development_decision"]["primary_metric"],
+            "pooled_average_precision",
+        )
+        self.assertFalse(
+            policy["development_decision"]["single_seed_result_is_confirmatory"]
+        )
 
-    def test_english_feature_order_matches_frozen_m0(self) -> None:
+    def test_english_semantic_feature_order_matches_frozen_m0(self) -> None:
         policy = transfer.load_policy()
         artifact = json.loads(
             Path(
@@ -50,14 +57,22 @@ class EnglishInitializedLabseFinetuneV1Tests(unittest.TestCase):
                 "v1_20260724/final_train_model_artifacts.json"
             ).read_text(encoding="utf-8")
         )
-        expected = (
-            policy["english_source"]["legacy18_feature_names"]
-            + policy["english_source"]["semantic6_feature_names"]
+        expected = policy["english_source"]["semantic6_feature_names"]
+        self.assertEqual(
+            policy["english_source"]["source_trainable_features"],
+            "six_differentiable_labse_aggregates_only",
         )
         self.assertEqual(
-            artifact["candidates"]["lightgbm__legacy18_labse"]["feature_names"],
+            artifact["candidates"]["lightgbm__legacy18_labse"]["feature_names"][-6:],
             expected,
         )
+
+    def test_english_objective_cannot_bypass_encoder_through_legacy18(self) -> None:
+        policy = transfer.load_policy()
+        self.assertNotIn("legacy18", policy["english_source"])
+        self.assertNotIn("legacy18", inspect.getsource(transfer._source_matrix))
+        self.assertEqual(transfer.SOURCE_FEATURE_COUNT, 6)
+        self.assertEqual(transfer.TARGET_FEATURE_COUNT, 24)
 
     def test_run_has_no_audit_truth_loader_or_audit_split(self) -> None:
         policy = transfer.load_policy()
