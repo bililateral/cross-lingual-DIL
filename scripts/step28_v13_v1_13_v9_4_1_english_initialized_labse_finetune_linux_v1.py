@@ -41,6 +41,7 @@ EXPECTED_VERSION = "step28-v13-v1.13-v9.4.1-english-initialized-labse-finetune-v
 MODEL_IDS = ("generic_init_base", "english_init_base")
 SOURCE_FEATURE_COUNT = 6
 TARGET_FEATURE_COUNT = 24
+PAIR_TOP_K = 3
 
 
 class EnglishInitializedFinetuneError(ValueError):
@@ -113,6 +114,36 @@ def load_policy() -> dict[str, Any]:
         or value["chinese_target"]["forbidden_splits"] != ["audit_a", "audit_b"]
     ):
         raise EnglishInitializedFinetuneError("Training or audit boundary drift")
+    source = value["english_source"]
+    text = value["text_input"]
+    models = value["models"]
+    decision = value["development_decision"]
+    if (
+        source["allowed_split"] != "train"
+        or source["validation_or_test_labels_allowed"] is not False
+        or source["source_trainable_features"]
+        != "six_differentiable_labse_aggregates_only"
+        or text["fields"] != ["title", "description"]
+        or int(text["token_budget_including_special_tokens"]) != 256
+        or text["whole_document_truncation_allowed"] is not False
+        or text["all_seller_text_mappings_used_in_each_english_epoch"] is not True
+        or text["exact_character_reconstruction_required"] is not True
+        or int(text["top_k"]) != PAIR_TOP_K
+        or set(models) != set(MODEL_IDS)
+        or any(model["identity33"] is not False for model in models.values())
+        or any(
+            model["target_features"]
+            != "legacy18_plus_six_differentiable_labse_aggregates"
+            for model in models.values()
+        )
+        or decision["primary_metric"] != "pooled_average_precision"
+        or decision["comparison"]
+        != "english_init_base_minus_generic_init_base"
+        or decision["continue_to_confirmation_only_if_strictly_positive"]
+        is not True
+        or decision["single_seed_result_is_confirmatory"] is not False
+    ):
+        raise EnglishInitializedFinetuneError("Scientific comparison contract drift")
     for label, spec in value["english_source"].items():
         if isinstance(spec, dict) and "path" in spec:
             _verified_file(spec, f"english_source.{label}")
@@ -396,7 +427,7 @@ def _pair_semantics(
         field: text_vectors[list(seller_fields[pair["seller_uid_right"]][field])]
         for field in ("title", "description")
     }
-    return direct.common.torch_six_pair_aggregates(left, right, top_k=3)
+    return direct.common.torch_six_pair_aggregates(left, right, top_k=PAIR_TOP_K)
 
 
 def _source_matrix(
@@ -417,6 +448,35 @@ def _weighted_bce(torch: Any, logits: Any, labels: Any, weights: Any) -> Any:
         logits, labels, reduction="none"
     )
     return torch.sum(losses * weights)
+
+
+def _full_encoder_contract(encoder: Any, label: str) -> dict[str, Any]:
+    named_parameters = tuple(encoder.named_parameters())
+    if not named_parameters or any(
+        not parameter.requires_grad for _name, parameter in named_parameters
+    ):
+        raise EnglishInitializedFinetuneError(
+            f"{label} does not expose every LaBSE parameter for fine-tuning"
+        )
+    count = sum(int(parameter.numel()) for _name, parameter in named_parameters)
+    if count <= 0:
+        raise EnglishInitializedFinetuneError(f"{label} parameter count is invalid")
+    architecture = [
+        {
+            "name": name,
+            "shape": list(parameter.shape),
+            "dtype": str(parameter.dtype),
+        }
+        for name, parameter in named_parameters
+    ]
+    return {
+        "parameter_tensor_count": len(named_parameters),
+        "parameter_count": count,
+        "architecture_sha256": hashlib.sha256(
+            canonical_json_bytes(architecture)
+        ).hexdigest(),
+        "all_parameters_trainable": True,
+    }
 
 
 def _vjp_all_texts(
@@ -469,6 +529,9 @@ def train_english_source(
     seed = int(config["seed"])
     direct.set_determinism(torch, seed)
     encoder, tokenizer = direct._load_encoder(policy, SentenceTransformer, "cuda:0")
+    encoder_contract = _full_encoder_contract(
+        encoder, "English source encoder"
+    )
     encoder.eval()  # deterministic exact two-pass gradient; gradients remain enabled
     device = torch.device("cuda:0")
     chunks_by_text = _chunk_all_texts(
@@ -762,6 +825,7 @@ def train_english_source(
         "global_unique_text_count": len(source["texts"]),
         "chunk_count": chunk_count,
         "component_count": len(component_ids),
+        "encoder_contract": encoder_contract,
         "epochs": int(config["epochs"]),
         "optimizer_update_count": optimizer_update_count,
         "all_seller_text_mappings_used_per_epoch": True,
@@ -816,6 +880,14 @@ def train_target_model(
     seed = int(config["seed"])
     direct.set_determinism(torch, seed)
     encoder, tokenizer = _load_target_encoder(policy, SentenceTransformer, initialization)
+    encoder_contract = _full_encoder_contract(
+        encoder, f"{model_id} target encoder"
+    )
+    # Loading two byte-different checkpoints may consume a different number
+    # of random values.  Reset after loading so target dropout and every later
+    # stochastic operation are matched; encoder weights remain the sole
+    # intended difference between the two target arms.
+    direct.set_determinism(torch, seed)
     device = torch.device("cuda:0")
     selected_worlds = tuple(
         sorted(
@@ -880,7 +952,9 @@ def train_target_model(
                     [train["seller_uid_left"][index] for index in indices],
                     [train["seller_uid_right"][index] for index in indices],
                     chunk_cache,
-                    token_budget=256,
+                    token_budget=int(
+                        policy["text_input"]["token_budget_including_special_tokens"]
+                    ),
                     chunk_batch_size=int(config["chunk_batch_size"]),
                     device=device,
                     use_autocast=True,
@@ -962,7 +1036,9 @@ def train_target_model(
                 [development["seller_uid_left"][index] for index in indices],
                 [development["seller_uid_right"][index] for index in indices],
                 chunk_cache,
-                token_budget=256,
+                token_budget=int(
+                    policy["text_input"]["token_budget_including_special_tokens"]
+                ),
                 chunk_batch_size=int(config["chunk_batch_size"]),
                 device=device,
                 use_autocast=True,
@@ -984,6 +1060,7 @@ def train_target_model(
         {
             "model_id": model_id,
             "world_count": len(selected_worlds),
+            "encoder_contract": encoder_contract,
             "epochs": int(config["epochs"]),
             "optimizer_updates": optimizer_update_count,
             "encoder_update_proof": {
@@ -1070,12 +1147,20 @@ def smoke_runtime() -> dict[str, Any]:
     encoder.eval()
     device = torch.device("cuda:0")
     texts = (
-        "Fast dispatch; plain packaging and clear order notes.",
+        " ".join(["Fast dispatch with plain packaging and clear order notes."] * 180),
         "Product details are listed carefully. Contact is not included.",
         "Orders are prepared daily with simple packaging.",
         "Please read the item description before placing an order.",
     )
-    chunks_by_text = _chunk_all_texts(tokenizer, texts, 256)
+    chunks_by_text = _chunk_all_texts(
+        tokenizer,
+        texts,
+        int(policy["text_input"]["token_budget_including_special_tokens"]),
+    )
+    if max(len(chunks) for chunks in chunks_by_text) <= 1:
+        raise EnglishInitializedFinetuneError(
+            "Smoke did not exercise a multi-chunk English text"
+        )
     with torch.no_grad():
         current = _all_text_embeddings(
             torch,
@@ -1247,6 +1332,21 @@ def run() -> dict[str, Any]:
             reports[model_id] = report
             del encoder, head
             torch.cuda.empty_cache()
+        generic_training = reports["generic_init_base"]["training"]
+        english_training = reports["english_init_base"]["training"]
+        if (
+            generic_training["encoder_contract"]
+            != english_training["encoder_contract"]
+            or source_audit["encoder_contract"]
+            != english_training["encoder_contract"]
+            or generic_training["world_count"] != english_training["world_count"]
+            or generic_training["epochs"] != english_training["epochs"]
+            or generic_training["optimizer_updates"]
+            != english_training["optimizer_updates"]
+        ):
+            raise EnglishInitializedFinetuneError(
+                "Chinese target arms are not capacity/schedule matched"
+            )
         summary = {
             "status": "ENGLISH_INITIALIZED_LABSE_FINETUNE_DEVELOPMENT_COMPLETE_AUDIT_TRUTH_SEALED",
             "policy_canonical_self_hash": policy["canonical_self_hash"],

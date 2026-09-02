@@ -49,6 +49,14 @@ class EnglishInitializedLabseFinetuneV1Tests(unittest.TestCase):
             policy["development_decision"]["single_seed_result_is_confirmatory"]
         )
 
+    def test_target_rng_is_reset_after_checkpoint_loading(self) -> None:
+        source = inspect.getsource(transfer.train_target_model)
+        load_position = source.index("_load_target_encoder")
+        resets_after_load = source[load_position:].count(
+            "direct.set_determinism(torch, seed)"
+        )
+        self.assertEqual(resets_after_load, 1)
+
     def test_english_semantic_feature_order_matches_frozen_m0(self) -> None:
         policy = transfer.load_policy()
         artifact = json.loads(
