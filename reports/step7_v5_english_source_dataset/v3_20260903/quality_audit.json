@@ -1,0 +1,233 @@
+{
+  "counts": {
+    "all_published_identity_conflict_components": 56,
+    "eligible_accounts_before_pair_selection": 2737,
+    "eligible_negative_candidates_before_shortlist": 1830635,
+    "full_identity_conflict_components": 2808,
+    "full_identity_graph_nodes": 2840,
+    "identity_bridge_nodes_not_text_eligible": 103,
+    "negative_pairs": 56,
+    "positive_controller_groups": 24,
+    "positive_pairs": 28,
+    "published_accounts": 82,
+    "published_items_per_view": 3458,
+    "shortlisted_negative_candidates": 4028,
+    "strong_rows_in_market": 84,
+    "unique_pgp_account_candidates_before_text_filter": 2840
+  },
+  "cross_account_exact_text_values": 0,
+  "exclusion_counts": {
+    "alias_too_short_for_safe_redaction": 3,
+    "imposter": 4,
+    "multiple_auxiliary_pgp": 7,
+    "no_auxiliary_pgp": 94,
+    "no_unique_market_registry_match": 238,
+    "source_alias_too_short_for_safe_redaction": 1,
+    "too_few_clean_items": 99,
+    "too_few_clean_tokens": 4
+  },
+  "fold_counts": {
+    "0": {
+      "accounts": 9,
+      "negatives": 12,
+      "pairs": 18,
+      "positives": 6
+    },
+    "1": {
+      "accounts": 9,
+      "negatives": 12,
+      "pairs": 18,
+      "positives": 6
+    },
+    "2": {
+      "accounts": 25,
+      "negatives": 10,
+      "pairs": 15,
+      "positives": 5
+    },
+    "3": {
+      "accounts": 27,
+      "negatives": 10,
+      "pairs": 15,
+      "positives": 5
+    },
+    "4": {
+      "accounts": 12,
+      "negatives": 12,
+      "pairs": 18,
+      "positives": 6
+    }
+  },
+  "gate_results": {
+    "cross_account_exact_text_values": true,
+    "duplicate_or_conflicting_pairs": true,
+    "identity_component_fold_overlaps": true,
+    "identity_residual_hits": true,
+    "minimum_positive_controller_groups": true,
+    "minimum_positive_pairs": true,
+    "negative_ratio": true,
+    "structural_proxy_average_precision_lift": true,
+    "structural_proxy_roc_auc": true,
+    "structural_standardized_mean_difference": true
+  },
+  "identity_component_fold_overlaps": 0,
+  "identity_residual_counts": {},
+  "label_semantics": {
+    "negative": "Different controller-evidence groups after strong, weak, auxiliary-PGP, imposter, and alias-conflict screening; high-confidence contrast, not absolute ground truth.",
+    "positive": "Cross-source-verified reuse of one full PGP fingerprint; strong-silver, not manually confirmed ground truth."
+  },
+  "limitations": [
+    "Positive labels are cross-source-verified strong-silver PGP reuse, not manual controller ground truth.",
+    "Negative labels are screened contrast pairs, not proof that key rotation or undocumented control sharing is absent.",
+    "This source dataset is small and cannot independently certify universal English performance."
+  ],
+  "maximum_absolute_structural_standardized_mean_difference": 0.1551869663762583,
+  "negative_screen_counts": {
+    "same_identity_conflict_component": 28,
+    "similar_alias": 84
+  },
+  "sql_parse_coverage": {
+    "auxiliary_pgp": {
+      "parsed_tuple_lines": 22357,
+      "unparsed_tuple_lines": 0
+    },
+    "vendor_registry": {
+      "parsed_tuple_lines": 38416,
+      "unparsed_tuple_lines": 0
+    }
+  },
+  "status": "PASSED",
+  "strong_verification_exclusions": {
+    "not_unique_pgp_account_candidate": 14
+  },
+  "structural_proxy": {
+    "average_precision": 0.3382660211880024,
+    "average_precision_lift_over_prevalence": 0.004932687854669104,
+    "bidirectional_roc_auc": 0.5503826530612246,
+    "feature_names": [
+      "log_min_items",
+      "log_max_items",
+      "absolute_log_item_ratio",
+      "log_min_tokens",
+      "log_max_tokens",
+      "absolute_log_token_ratio",
+      "absolute_title_fraction_difference",
+      "mean_description_fraction"
+    ],
+    "folds": [
+      {
+        "average_precision": 0.42957516339869284,
+        "fold_id": 0,
+        "positive_count": 6,
+        "roc_auc": 0.3611111111111111,
+        "row_count": 18
+      },
+      {
+        "average_precision": 0.3587418300653594,
+        "fold_id": 1,
+        "positive_count": 6,
+        "roc_auc": 0.375,
+        "row_count": 18
+      },
+      {
+        "average_precision": 0.48525641025641025,
+        "fold_id": 2,
+        "positive_count": 5,
+        "roc_auc": 0.5,
+        "row_count": 15
+      },
+      {
+        "average_precision": 0.3571428571428571,
+        "fold_id": 3,
+        "positive_count": 5,
+        "roc_auc": 0.45999999999999996,
+        "row_count": 15
+      },
+      {
+        "average_precision": 0.37142857142857144,
+        "fold_id": 4,
+        "positive_count": 6,
+        "roc_auc": 0.48611111111111105,
+        "row_count": 18
+      }
+    ],
+    "prevalence": 0.3333333333333333,
+    "protocol": "fixed logistic regression; identity-component-isolated five-fold out-of-fold; structural features only",
+    "roc_auc": 0.4496173469387754
+  },
+  "structural_standardized_mean_differences": {
+    "absolute_log_item_ratio": -0.1551869663762583,
+    "absolute_log_token_ratio": -0.0862353750591013,
+    "absolute_title_fraction_difference": -0.07006049159904022,
+    "log_max_items": -0.10199052732480612,
+    "log_max_tokens": -0.14234814884256275,
+    "log_min_items": 0.02172763256522697,
+    "log_min_tokens": -0.07515854325766316,
+    "mean_description_fraction": -0.1479873808132487
+  },
+  "text_cleaning": {
+    "cross_seller_exact_description_values_removed": 810,
+    "cross_seller_exact_title_values_removed": 2001,
+    "description_rows_cleared": 4990,
+    "raw_item_count": 109760,
+    "raw_seller_count": 3187,
+    "title_rows_cleared": 4732
+  },
+  "topic_lexical_diagnostics": {
+    "hard_gate": false,
+    "proxy": {
+      "average_precision": 0.6843803478004741,
+      "average_precision_lift_over_prevalence": 0.35104701446714076,
+      "bidirectional_roc_auc": 0.7694515306122448,
+      "feature_names": [
+        "category_jaccard",
+        "token_jaccard"
+      ],
+      "folds": [
+        {
+          "average_precision": 1.0,
+          "fold_id": 0,
+          "positive_count": 6,
+          "roc_auc": 1.0,
+          "row_count": 18
+        },
+        {
+          "average_precision": 0.8486111111111111,
+          "fold_id": 1,
+          "positive_count": 6,
+          "roc_auc": 0.9097222222222222,
+          "row_count": 18
+        },
+        {
+          "average_precision": 0.5914285714285714,
+          "fold_id": 2,
+          "positive_count": 5,
+          "roc_auc": 0.66,
+          "row_count": 15
+        },
+        {
+          "average_precision": 0.5833333333333333,
+          "fold_id": 3,
+          "positive_count": 5,
+          "roc_auc": 0.6599999999999999,
+          "row_count": 15
+        },
+        {
+          "average_precision": 0.7148962148962149,
+          "fold_id": 4,
+          "positive_count": 6,
+          "roc_auc": 0.6805555555555556,
+          "row_count": 18
+        }
+      ],
+      "prevalence": 0.3333333333333333,
+      "protocol": "diagnostic only: fixed logistic regression; identity-component-isolated five-fold out-of-fold; category and lexical overlap",
+      "roc_auc": 0.7694515306122448
+    },
+    "reason": "Category and lexical overlap mix product topic with potentially intended author vocabulary; causal attribution is handled by preregistered model controls.",
+    "standardized_mean_differences": {
+      "category_jaccard": 0.6573606414977273,
+      "token_jaccard": 1.1982065147953729
+    }
+  }
+}

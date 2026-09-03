@@ -1,0 +1,62 @@
+{
+  "version": "step7_v5_english_source_dataset_v3_20260903",
+  "objective": "Build a controller-isolated English source-supervision dataset for testing whether English sockpuppet learning improves Chinese identification.",
+  "source_market": {
+    "name": "agora",
+    "raw_market_id": "1"
+  },
+  "inputs": {
+    "suspected_sockpuppet_strong.csv": "b2946b519aabd31f03756ccb4189508ea5dee233481d7ce0771382c0bcaefc93",
+    "suspected_sockpuppet_weak.csv": "4730ba7cc79c748c3615394ae05a7052e8be90a7b60102d28e9db4031ffa87b1",
+    "suspected_imposter_rows.csv": "b497d261d1ed4aa94cb88f667bd395dcc6ed6229202ee462c102527967ab1412",
+    "tijkc3xx.sql": "47d2861698d3dbf78ae98b5de8f95aa7f851a964634c1b3e3f52dad08c2658fa",
+    "3z669jwe.sql": "6de5da8225052bb5492cb73c9c2e9a67d1598d9236fbcb1a9179277f6d3bf9b8",
+    "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx": "2f32f4334fea63b7c7716b8fe7f3e5532e2f93de2e5c969e47319ed2429356d3"
+  },
+  "construction": {
+    "fold_count": 5,
+    "negative_per_positive": 2,
+    "negative_shortlist_per_positive": 400,
+    "minimum_clean_items_per_account": 2,
+    "minimum_clean_tokens_per_account": 20,
+    "alias_minimum_redaction_length": 3,
+    "account_uid_namespace": "step7-v5-en-source-account-v1",
+    "item_uid_namespace": "step7-v5-en-source-item-v3",
+    "controller_uid_namespace": "step7-v5-en-source-controller-v1",
+    "pair_uid_namespace": "step7-v5-en-source-pair-v1",
+    "ordering_seed": "step7-v5-en-source-order-v1",
+    "fold_seed": "step7-v5-en-source-fold-v1"
+  },
+  "quality_gates": {
+    "minimum_positive_pairs": 25,
+    "minimum_positive_controller_groups": 20,
+    "maximum_identity_residual_hits": 0,
+    "maximum_cross_account_exact_text_values": 0,
+    "maximum_identity_component_fold_overlaps": 0,
+    "maximum_duplicate_or_conflicting_pairs": 0,
+    "maximum_absolute_structural_standardized_mean_difference": 0.35,
+    "maximum_structural_proxy_roc_auc": 0.65,
+    "maximum_structural_proxy_ap_lift_over_prevalence": 0.12
+  },
+  "model_visible_views": {
+    "full_clean": [
+      "title_clean",
+      "description_clean"
+    ],
+    "style_projection": [
+      "title_style",
+      "description_style"
+    ]
+  },
+  "metadata_only_fields": [
+    "account_uid",
+    "item_uid",
+    "pair_uid",
+    "fold_id"
+  ],
+  "label_semantics": {
+    "positive": "Cross-source-verified reuse of one full PGP fingerprint; strong-silver, not manually confirmed ground truth.",
+    "negative": "Different controller-evidence groups after strong, weak, auxiliary-PGP, imposter, and alias-conflict screening; high-confidence contrast, not absolute ground truth."
+  },
+  "output_directory": "reports/step7_v5_english_source_dataset/v3_20260903"
+}

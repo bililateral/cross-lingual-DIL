@@ -1,0 +1,95 @@
+{
+  "builder_path": "scripts/step7_v5_build_english_source_dataset.py",
+  "builder_sha256": "589137b8d1fc878958e18221b1f551608c9be6672a58b7b705163c52075a3b63",
+  "counts": {
+    "all_published_identity_conflict_components": 56,
+    "eligible_accounts_before_pair_selection": 2737,
+    "eligible_negative_candidates_before_shortlist": 1830635,
+    "full_identity_conflict_components": 2808,
+    "full_identity_graph_nodes": 2840,
+    "identity_bridge_nodes_not_text_eligible": 103,
+    "negative_pairs": 56,
+    "positive_controller_groups": 24,
+    "positive_pairs": 28,
+    "published_accounts": 82,
+    "published_items_per_view": 3458,
+    "shortlisted_negative_candidates": 4028,
+    "strong_rows_in_market": 84,
+    "unique_pgp_account_candidates_before_text_filter": 2840
+  },
+  "files": [
+    {
+      "path": "labels.csv",
+      "sha256": "9ffd9d02e1ca728e551c4b0e45c8dbf72f73e3932319a2cc7e57c204931f8b89",
+      "size_bytes": 5643
+    },
+    {
+      "path": "public_items_full_clean.jsonl",
+      "sha256": "4d4704ae2f907ea4466e669d7d70c4d06d51cd4d2a7bc7628ab2c378891a1a9c",
+      "size_bytes": 1390201
+    },
+    {
+      "path": "public_items_style_projection.jsonl",
+      "sha256": "9bc76408ec6cb55399fb6dc877448037a8605441423f2d6ccb20d2546a41f6f9",
+      "size_bytes": 1211895
+    },
+    {
+      "path": "public_pairs.csv",
+      "sha256": "ee4c9128a58e502d48be54f07ed40ae61fa8de5ca4654e90f454ac863f979251",
+      "size_bytes": 16600
+    },
+    {
+      "path": "quality_audit.json",
+      "sha256": "e2868b076efab0cfa4ed9c7e6bb108b994b49faa67a13ca18e7ff7bf8f546419",
+      "size_bytes": 7566
+    }
+  ],
+  "input_sha256": {
+    "2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx": "2f32f4334fea63b7c7716b8fe7f3e5532e2f93de2e5c969e47319ed2429356d3",
+    "3z669jwe.sql": "6de5da8225052bb5492cb73c9c2e9a67d1598d9236fbcb1a9179277f6d3bf9b8",
+    "suspected_imposter_rows.csv": "b497d261d1ed4aa94cb88f667bd395dcc6ed6229202ee462c102527967ab1412",
+    "suspected_sockpuppet_strong.csv": "b2946b519aabd31f03756ccb4189508ea5dee233481d7ce0771382c0bcaefc93",
+    "suspected_sockpuppet_weak.csv": "4730ba7cc79c748c3615394ae05a7052e8be90a7b60102d28e9db4031ffa87b1",
+    "tijkc3xx.sql": "47d2861698d3dbf78ae98b5de8f95aa7f851a964634c1b3e3f52dad08c2658fa"
+  },
+  "policy_path": "schema/step7_v5_english_source_dataset_policy.json",
+  "policy_sha256": "ac71f54e2945653ee04687d48bb006199a59716138475c4fb181ab2774ac7b4f",
+  "runtime": {
+    "implementation": "CPython",
+    "numpy": "2.2.6",
+    "openpyxl": "3.1.5",
+    "python": "3.10.11",
+    "scikit_learn": "1.7.2",
+    "scipy": "1.15.3"
+  },
+  "status": "PASSED",
+  "training_projection": {
+    "forbidden_fields": [
+      "controller_uid",
+      "conflict_component_uid",
+      "evidence_class",
+      "clean_item_count",
+      "clean_token_count",
+      "source_row_number",
+      "category_clean"
+    ],
+    "full_clean_model_fields": [
+      "title_clean",
+      "description_clean"
+    ],
+    "join_metadata_only": [
+      "pair_uid",
+      "account_left_uid",
+      "account_right_uid",
+      "account_uid",
+      "item_uid",
+      "fold_id"
+    ],
+    "label_field": "label",
+    "style_projection_model_fields": [
+      "title_style",
+      "description_style"
+    ]
+  },
+  "version": "step7_v5_english_source_dataset_v3_20260903"
+}
