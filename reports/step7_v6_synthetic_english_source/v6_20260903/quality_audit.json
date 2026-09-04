@@ -1,0 +1,894 @@
+{
+  "account_incident_degree_mismatches": 0,
+  "claim_boundary": "Style-only training augmentation. Synthetic account histories are not recovered marketplace observations; lexical full text is not published or training-authorized; this dataset cannot independently prove real English sockpuppet performance or cross-language transfer.",
+  "counts": {
+    "controller_groups": 460,
+    "negative_pairs": 1300,
+    "positive_pairs": 650,
+    "public_accounts_per_view": 1015,
+    "source_items_used": 8120,
+    "synthetic_accounts": 1015,
+    "total_pairs": 1950
+  },
+  "cross_account_exact_text_values": 0,
+  "donor_audit": {
+    "candidate_identity_components": 875,
+    "capacity_three_or_more": 826,
+    "capacity_two_or_more": 875,
+    "eligible_component_representatives": 875,
+    "exclusions": {
+      "source_identity_alias_too_short_for_safe_redaction": 3,
+      "too_few_clean_tokens": 636,
+      "too_few_copy_distinct_items": 1245,
+      "unsafe_alias": 306,
+      "v5_holdout_identity_component": 82
+    },
+    "forbidden_components": 56,
+    "required_donors": 460,
+    "text_cleaning": {
+      "cross_seller_exact_description_values_removed": 817,
+      "cross_seller_exact_title_values_removed": 2167,
+      "description_rows_cleared": 5021,
+      "raw_item_count": 109760,
+      "raw_seller_count": 3187,
+      "title_rows_cleared": 5600
+    }
+  },
+  "duplicate_or_conflicting_pairs": 0,
+  "gate_results": {
+    "account_incident_degree_balance": true,
+    "account_role_label_balance": true,
+    "cross_account_exact_style_stream_values": true,
+    "cross_account_exact_style_values": true,
+    "cross_account_exact_text_values": true,
+    "donor_topology_component_collisions": true,
+    "donor_topology_evidence_overlaps": true,
+    "donor_topology_identity_collisions": true,
+    "duplicate_or_conflicting_pairs": true,
+    "identity_residual_hits": true,
+    "local_style_copy_indicator_ap": true,
+    "local_style_copy_indicator_auc": true,
+    "minimum_controller_groups": true,
+    "near_style_indicator_ap": true,
+    "near_style_indicator_auc": true,
+    "negative_ratio": true,
+    "positive_local_style_copy_pairs": true,
+    "positive_near_style_pairs": true,
+    "positive_pair_range": true,
+    "published_pairs_with_near_duplicate_fields": true,
+    "selected_topology_component_reuse": true,
+    "selected_topology_holdout_evidence_overlaps": true,
+    "source_item_reuse": true,
+    "split_overlaps": true,
+    "style_positive_control_ap": true,
+    "style_positive_control_auc": true,
+    "style_projection_lexical_residual_hits": true,
+    "style_seam_proxy_ap": true,
+    "style_seam_proxy_auc": true,
+    "style_stream_budget": true,
+    "style_structural_proxy_ap": true,
+    "style_structural_proxy_auc": true,
+    "synthetic_account_minimum_style_tokens": true,
+    "synthetic_account_minimum_tokens": true
+  },
+  "identity_residual_counts": {},
+  "local_style_copy_indicator": {
+    "maximum_heldout_average_precision_lift_over_prevalence": 2.220446049250313e-16,
+    "maximum_heldout_bidirectional_roc_auc": 0.5,
+    "negative_with_indicator": 0,
+    "positive_with_indicator": 0,
+    "protocol": "one-bit exact normalized 40-character local-copy indicator over all four final-stream field combinations; report both score directions; frozen gates use the worst controller-equal and unweighted held-out metric",
+    "splits": {
+      "development": {
+        "controller_equal": {
+          "average_precision": 0.5000000000000002,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.5000000000000002,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 2.220446049250313e-16,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "negative_count": 278,
+        "negative_with_indicator": 0,
+        "positive_count": 139,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.3333333333333333,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      },
+      "synthetic_audit": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.5,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "negative_count": 278,
+        "negative_with_indicator": 0,
+        "positive_count": 139,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.3333333333333333,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      },
+      "train": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.5,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "negative_count": 744,
+        "negative_with_indicator": 0,
+        "positive_count": 372,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.3333333333333333,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      }
+    }
+  },
+  "model_visibility": {
+    "cross_account_exact_style_stream_values": 0,
+    "cross_account_exact_style_values": 0,
+    "fixed_style_information_budget": {
+      "derivation": "the pre-existing minimum of 100 total style placeholders is retained; an exhaustive label-free capacity audit found 634 capacity-two and 448 capacity-three donors at this total, while no separate title/description allocation summing to 100 could supply 460 distinct donors; development metrics, V5 real holdout results, and Chinese audit truth were not read",
+      "field_combination": "within item_uid order append each nonempty title_style then nonempty description_style, joining every retained fragment with one ordinary space and publishing no field or item marker",
+      "selection": "three_nonoverlapping_start_middle_end_windows",
+      "total_placeholders": 100
+    },
+    "full_clean_view_published": false,
+    "full_text_topic_proxy_status": "DIAGNOSTIC_ONLY_MODEL_INVISIBLE",
+    "item_slot_boundaries_published": false,
+    "style_projection_lexical_residual_hits": 0,
+    "style_seam_proxy_status": "MODEL_VISIBLE_HARD_GATE",
+    "style_structural_proxy_status": "MODEL_VISIBLE_HARD_GATE",
+    "training_authorized_granularity": "field_neutral_account_style_stream",
+    "training_authorized_view": "transfer_style_projection"
+  },
+  "near_style_indicator": {
+    "maximum_heldout_average_precision_lift_over_prevalence": 0.0016722408026758062,
+    "maximum_heldout_bidirectional_roc_auc": 0.5033333333333334,
+    "negative_with_indicator": 6,
+    "positive_with_indicator": 0,
+    "protocol": "one-bit whole-field near-style indicator; report both score directions; frozen gates use the worst controller-equal and unweighted held-out metric",
+    "splits": {
+      "development": {
+        "controller_equal": {
+          "average_precision": 0.5000000000000002,
+          "bidirectional_roc_auc": 0.5033333333333334,
+          "inverse_average_precision": 0.5016722408026758,
+          "inverse_roc_auc": 0.5033333333333334,
+          "maximum_average_precision_lift_over_prevalence": 0.0016722408026758062,
+          "prevalence": 0.5,
+          "roc_auc": 0.49666666666666665
+        },
+        "negative_count": 278,
+        "negative_with_indicator": 1,
+        "positive_count": 139,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5017985611510791,
+          "inverse_average_precision": 0.33413461538461536,
+          "inverse_roc_auc": 0.5017985611510791,
+          "maximum_average_precision_lift_over_prevalence": 0.0008012820512820484,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.4982014388489209
+        }
+      },
+      "synthetic_audit": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.5,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "negative_count": 278,
+        "negative_with_indicator": 0,
+        "positive_count": 139,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5,
+          "inverse_average_precision": 0.3333333333333333,
+          "inverse_roc_auc": 0.5,
+          "maximum_average_precision_lift_over_prevalence": 0.0,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      },
+      "train": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "bidirectional_roc_auc": 0.5029569892473119,
+          "inverse_average_precision": 0.5014828794823404,
+          "inverse_roc_auc": 0.5029569892473119,
+          "maximum_average_precision_lift_over_prevalence": 0.0014828794823403824,
+          "prevalence": 0.5,
+          "roc_auc": 0.4970430107526882
+        },
+        "negative_count": 744,
+        "negative_with_indicator": 5,
+        "positive_count": 372,
+        "positive_with_indicator": 0,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "bidirectional_roc_auc": 0.5033602150537635,
+          "inverse_average_precision": 0.33483348334833485,
+          "inverse_roc_auc": 0.5033602150537635,
+          "maximum_average_precision_lift_over_prevalence": 0.0015001500150015334,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.49663978494623656
+        }
+      }
+    }
+  },
+  "pairs_with_near_duplicate_style_fields": {
+    "negative": 6,
+    "positive": 0
+  },
+  "published_pairs_with_near_duplicate_fields": 0,
+  "role_pair_counts": {
+    "label_0_roles_0_1": 920,
+    "label_0_roles_0_2": 190,
+    "label_0_roles_1_2": 190,
+    "label_1_roles_0_1": 460,
+    "label_1_roles_0_2": 95,
+    "label_1_roles_1_2": 95
+  },
+  "seam_proxy": {
+    "feature_names": [
+      "minimum_title_adjacent_word_placeholder_count",
+      "maximum_title_adjacent_word_placeholder_count",
+      "absolute_title_adjacent_word_placeholder_count_difference",
+      "minimum_title_adjacent_number_placeholder_count",
+      "maximum_title_adjacent_number_placeholder_count",
+      "absolute_title_adjacent_number_placeholder_count_difference",
+      "minimum_description_adjacent_word_placeholder_count",
+      "maximum_description_adjacent_word_placeholder_count",
+      "absolute_description_adjacent_word_placeholder_count_difference",
+      "minimum_description_adjacent_number_placeholder_count",
+      "maximum_description_adjacent_number_placeholder_count",
+      "absolute_description_adjacent_number_placeholder_count_difference"
+    ],
+    "heldout_splits": {
+      "development": {
+        "controller_equal": {
+          "average_precision": 0.5000000000000002,
+          "average_precision_lift_over_prevalence": 2.220446049250313e-16,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      },
+      "synthetic_audit": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5000000000000002,
+          "prevalence": 0.5,
+          "roc_auc": 0.5000000000000002
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      }
+    },
+    "maximum_heldout_average_precision_lift_over_prevalence": 2.220446049250313e-16,
+    "maximum_heldout_bidirectional_roc_auc": 0.5000000000000002,
+    "protocol": "train-fitted adjacent-placeholder seam proxy evaluated separately on development and synthetic audit",
+    "standardized_coefficients": {
+      "absolute_description_adjacent_number_placeholder_count_difference": 0.0,
+      "absolute_description_adjacent_word_placeholder_count_difference": 0.0,
+      "absolute_title_adjacent_number_placeholder_count_difference": 0.0,
+      "absolute_title_adjacent_word_placeholder_count_difference": -0.27874668030972066,
+      "maximum_description_adjacent_number_placeholder_count": 0.0,
+      "maximum_description_adjacent_word_placeholder_count": 0.0,
+      "maximum_title_adjacent_number_placeholder_count": 0.0,
+      "maximum_title_adjacent_word_placeholder_count": -0.10356441020256836,
+      "minimum_description_adjacent_number_placeholder_count": 0.0,
+      "minimum_description_adjacent_word_placeholder_count": 0.0,
+      "minimum_title_adjacent_number_placeholder_count": 0.0,
+      "minimum_title_adjacent_word_placeholder_count": 0.20903553986988338
+    },
+    "training_row_count": 1116
+  },
+  "source_item_reuse": 0,
+  "split_counts": {
+    "development": {
+      "accounts": 182,
+      "controller_groups": 75,
+      "negative_pairs": 278,
+      "positive_pairs": 139
+    },
+    "synthetic_audit": {
+      "accounts": 182,
+      "controller_groups": 75,
+      "negative_pairs": 278,
+      "positive_pairs": 139
+    },
+    "train": {
+      "accounts": 651,
+      "controller_groups": 310,
+      "negative_pairs": 744,
+      "positive_pairs": 372
+    }
+  },
+  "split_overlaps": 0,
+  "standardized_mean_differences": {
+    "hidden_full_text_diagnostic": {
+      "all": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": -0.40061640871370713,
+        "absolute_title_fraction_difference": -0.4446199310936676,
+        "category_jaccard": 0.7286368671631431,
+        "log_max_items": 0.0,
+        "log_max_tokens": -0.19202982328913185,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.2004407523644838,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 1.2869208289795528
+      },
+      "development": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": -0.49210705433019997,
+        "absolute_title_fraction_difference": -0.48888635765339056,
+        "category_jaccard": 0.7347686030684613,
+        "log_max_items": 0.0,
+        "log_max_tokens": -0.21045358595445335,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.2302625507525218,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 1.0848011748931763
+      },
+      "synthetic_audit": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": -0.3938979039899207,
+        "absolute_title_fraction_difference": -0.2623062985614246,
+        "category_jaccard": 0.7358307559803371,
+        "log_max_items": 0.0,
+        "log_max_tokens": -0.20396978732741763,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.2217277150725285,
+        "mean_description_fraction": 9.040161725611597e-16,
+        "token_jaccard": 1.330648258657101
+      },
+      "train": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": -0.3707038037691271,
+        "absolute_title_fraction_difference": -0.4933129915469852,
+        "category_jaccard": 0.7279048292207916,
+        "log_max_items": 0.0,
+        "log_max_tokens": -0.18040364776648304,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.1812651227190216,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 1.356411831293281
+      }
+    },
+    "model_visible_style": {
+      "all": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": 0.0,
+        "absolute_title_fraction_difference": 0.0,
+        "category_jaccard": 0.0,
+        "log_max_items": 0.0,
+        "log_max_tokens": 0.0,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.0,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 0.3704710072928167
+      },
+      "development": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": 0.0,
+        "absolute_title_fraction_difference": 0.0,
+        "category_jaccard": 0.0,
+        "log_max_items": 0.0,
+        "log_max_tokens": 0.0,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.0,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 0.4060003044460656
+      },
+      "synthetic_audit": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": 0.0,
+        "absolute_title_fraction_difference": 0.0,
+        "category_jaccard": 0.0,
+        "log_max_items": 0.0,
+        "log_max_tokens": 0.0,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.0,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 0.3954043658477034
+      },
+      "train": {
+        "absolute_log_item_ratio": 0.0,
+        "absolute_log_token_ratio": 0.0,
+        "absolute_title_fraction_difference": 0.0,
+        "category_jaccard": 0.0,
+        "log_max_items": 0.0,
+        "log_max_tokens": 0.0,
+        "log_min_items": 0.0,
+        "log_min_tokens": 0.0,
+        "mean_description_fraction": 0.0,
+        "token_jaccard": 0.35044217694571295
+      }
+    }
+  },
+  "status": "PASSED",
+  "structural_proxy": {
+    "feature_names": [
+      "log_min_items",
+      "log_max_items",
+      "absolute_log_item_ratio",
+      "log_min_tokens",
+      "log_max_tokens",
+      "absolute_log_token_ratio",
+      "absolute_title_fraction_difference",
+      "mean_description_fraction",
+      "minimum_empty_title_item_count",
+      "maximum_empty_title_item_count",
+      "absolute_empty_title_item_count_difference",
+      "minimum_empty_description_item_count",
+      "maximum_empty_description_item_count",
+      "absolute_empty_description_item_count_difference"
+    ],
+    "heldout_splits": {
+      "development": {
+        "controller_equal": {
+          "average_precision": 0.5000000000000002,
+          "average_precision_lift_over_prevalence": 2.220446049250313e-16,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      },
+      "synthetic_audit": {
+        "controller_equal": {
+          "average_precision": 0.5,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.5,
+          "roc_auc": 0.5
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.3333333333333333,
+          "average_precision_lift_over_prevalence": 0.0,
+          "bidirectional_roc_auc": 0.5,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.5
+        }
+      }
+    },
+    "maximum_heldout_average_precision_lift_over_prevalence": 2.220446049250313e-16,
+    "maximum_heldout_bidirectional_roc_auc": 0.5,
+    "protocol": "train-fitted structural proxy evaluated separately on development and synthetic audit",
+    "standardized_coefficients": {
+      "absolute_empty_description_item_count_difference": 0.0,
+      "absolute_empty_title_item_count_difference": 0.0,
+      "absolute_log_item_ratio": 0.0,
+      "absolute_log_token_ratio": 0.0,
+      "absolute_title_fraction_difference": 0.0,
+      "log_max_items": 0.0,
+      "log_max_tokens": 0.0,
+      "log_min_items": 0.0,
+      "log_min_tokens": 0.0,
+      "maximum_empty_description_item_count": 0.0,
+      "maximum_empty_title_item_count": 0.0,
+      "mean_description_fraction": 0.0,
+      "minimum_empty_description_item_count": 0.0,
+      "minimum_empty_title_item_count": 0.0
+    },
+    "training_row_count": 1116
+  },
+  "style_positive_control": {
+    "average_precision": 0.8473429082603269,
+    "average_precision_lift_over_prevalence": 0.3473429082603269,
+    "feature_count": 11267,
+    "prevalence": 0.5,
+    "protocol": "deterministic character 3-5 gram TF-IDF cosine on language-neutral lexical-free style projections; frozen gate uses controller-equal sample weights",
+    "roc_auc": 0.8267401806343232,
+    "unweighted_pair_metrics": {
+      "average_precision": 0.756602241785233,
+      "average_precision_lift_over_prevalence": 0.42326890845189974,
+      "prevalence": 0.3333333333333333,
+      "roc_auc": 0.8246343195266272
+    }
+  },
+  "synthesis_audit": {
+    "allocation_rejections": {
+      "clean_token_allocation": 13,
+      "clean_tokens_after_near_cleanup": 155,
+      "style_tokens_after_near_cleanup": 87
+    },
+    "donor_assignment": "capacity-first deterministic identity derangement with cached post-cleaning feasibility",
+    "donor_topology_component_collisions": 0,
+    "donor_topology_evidence_overlaps": 0,
+    "donor_topology_identity_collisions": 0,
+    "eligible_donor_pool": 875,
+    "evaluated_donor_capacity_combinations": 721,
+    "local_copy_donor_uids": [],
+    "low_clean_token_donor_uids": [],
+    "low_style_token_accounts": 0,
+    "low_style_token_donor_uids": [],
+    "low_token_accounts": 0,
+    "negative_matching": "independent capacity-one minimum-cost two-factor matching inside each split, role-pair and controller-size cell with exact endpoint degrees; the frozen 26-feature distance only selects among feasible negative edges",
+    "negative_matching_diagnostic": {
+      "cell_count": 12,
+      "cells": [
+        {
+          "candidate_edges": 1806,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 2,
+          "positive_targets": 43,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 86,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "development"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "development"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            0,
+            2
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "development"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            1,
+            2
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "development"
+        },
+        {
+          "candidate_edges": 1806,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 2,
+          "positive_targets": 43,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 86,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "synthetic_audit"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 0.0,
+          "solve_rounds": 1,
+          "split": "synthetic_audit"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            0,
+            2
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 264.2580645161291,
+          "solve_rounds": 1,
+          "split": "synthetic_audit"
+        },
+        {
+          "candidate_edges": 992,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 32,
+          "role_pair": [
+            1,
+            2
+          ],
+          "selected_edges": 64,
+          "selected_standardized_distance": 264.2580645161291,
+          "solve_rounds": 1,
+          "split": "synthetic_audit"
+        },
+        {
+          "candidate_edges": 77562,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 2,
+          "positive_targets": 279,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 558,
+          "selected_standardized_distance": 45674.33766769957,
+          "solve_rounds": 1,
+          "split": "train"
+        },
+        {
+          "candidate_edges": 930,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 31,
+          "role_pair": [
+            0,
+            1
+          ],
+          "selected_edges": 62,
+          "selected_standardized_distance": 2025.9788729760912,
+          "solve_rounds": 1,
+          "split": "train"
+        },
+        {
+          "candidate_edges": 930,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 31,
+          "role_pair": [
+            0,
+            2
+          ],
+          "selected_edges": 62,
+          "selected_standardized_distance": 2025.9788729760912,
+          "solve_rounds": 1,
+          "split": "train"
+        },
+        {
+          "candidate_edges": 930,
+          "forbidden_near_copy_edges": 0,
+          "group_size": 3,
+          "positive_targets": 31,
+          "role_pair": [
+            1,
+            2
+          ],
+          "selected_edges": 62,
+          "selected_standardized_distance": 2025.9788729760915,
+          "solve_rounds": 1,
+          "split": "train"
+        }
+      ],
+      "distance_feature_names": [
+        "log_min_items",
+        "log_max_items",
+        "absolute_log_item_ratio",
+        "log_min_tokens",
+        "log_max_tokens",
+        "absolute_log_token_ratio",
+        "absolute_title_fraction_difference",
+        "mean_description_fraction",
+        "minimum_empty_title_item_count",
+        "maximum_empty_title_item_count",
+        "absolute_empty_title_item_count_difference",
+        "minimum_empty_description_item_count",
+        "maximum_empty_description_item_count",
+        "absolute_empty_description_item_count_difference",
+        "minimum_title_adjacent_word_placeholder_count",
+        "maximum_title_adjacent_word_placeholder_count",
+        "absolute_title_adjacent_word_placeholder_count_difference",
+        "minimum_title_adjacent_number_placeholder_count",
+        "maximum_title_adjacent_number_placeholder_count",
+        "absolute_title_adjacent_number_placeholder_count_difference",
+        "minimum_description_adjacent_word_placeholder_count",
+        "maximum_description_adjacent_word_placeholder_count",
+        "absolute_description_adjacent_word_placeholder_count_difference",
+        "minimum_description_adjacent_number_placeholder_count",
+        "maximum_description_adjacent_number_placeholder_count",
+        "absolute_description_adjacent_number_placeholder_count_difference"
+      ],
+      "protocol": "independent capacity-one minimum-cost two-factor matching inside each split, role-pair and controller-size cell; every endpoint has exactly two negative incidents per positive incident; frozen 26 model-visible pair covariates and a deterministic tie break select among feasible edges"
+    },
+    "raw_cross_account_near_cleanup": {
+      "matches_by_field": {
+        "description_clean->description_clean": 57,
+        "description_clean->title_clean": 1,
+        "title_clean->description_clean": 2,
+        "title_clean->title_clean": 284
+      },
+      "rows_cleared_by_field": {
+        "description_clean": 81,
+        "title_clean": 348
+      }
+    },
+    "selected_donors": 460,
+    "source_item_reuse": 0,
+    "source_rows_used": 8120,
+    "style_capacity_donors_excluded": 4,
+    "style_cross_account_near_cleanup": {
+      "local_copy_matches_by_field": {
+        "description_style->description_style": 94,
+        "title_style->title_style": 3
+      },
+      "matches_by_field": {
+        "description_style->description_style": 96,
+        "title_style->description_style": 1,
+        "title_style->title_style": 248
+      },
+      "rows_cleared_by_field": {
+        "description_style": 177,
+        "title_style": 278
+      }
+    },
+    "style_deduplication": {
+      "description_rows_cleared": 70,
+      "shared_style_values_removed": 72,
+      "title_rows_cleared": 157
+    },
+    "style_stream_budget": {
+      "accounts_budgeted": 1015,
+      "selected_placeholders": 101500,
+      "selection": "three_nonoverlapping_start_middle_end_windows",
+      "source_placeholders": 236524,
+      "total_placeholders_per_account": 100
+    },
+    "style_stream_budget_mismatches": 0
+  },
+  "topic_proxy": {
+    "feature_names": [
+      "category_jaccard",
+      "token_jaccard"
+    ],
+    "heldout_splits": {
+      "development": {
+        "controller_equal": {
+          "average_precision": 0.8411666532244462,
+          "average_precision_lift_over_prevalence": 0.34116665322444617,
+          "bidirectional_roc_auc": 0.7937876543209883,
+          "prevalence": 0.5,
+          "roc_auc": 0.7937876543209883
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.7567861051173327,
+          "average_precision_lift_over_prevalence": 0.42345277178399937,
+          "bidirectional_roc_auc": 0.7962838362403601,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.7962838362403601
+        }
+      },
+      "synthetic_audit": {
+        "controller_equal": {
+          "average_precision": 0.8752349207357115,
+          "average_precision_lift_over_prevalence": 0.3752349207357115,
+          "bidirectional_roc_auc": 0.8328493827160505,
+          "prevalence": 0.5,
+          "roc_auc": 0.8328493827160505
+        },
+        "positive_count": 139,
+        "row_count": 417,
+        "unweighted_pair": {
+          "average_precision": 0.8027164800270912,
+          "average_precision_lift_over_prevalence": 0.46938314669375786,
+          "bidirectional_roc_auc": 0.8288132084260651,
+          "prevalence": 0.3333333333333333,
+          "roc_auc": 0.8288132084260651
+        }
+      }
+    },
+    "maximum_heldout_average_precision_lift_over_prevalence": 0.46938314669375786,
+    "maximum_heldout_bidirectional_roc_auc": 0.8328493827160505,
+    "protocol": "train-fitted category/token-overlap proxy evaluated separately on development and synthetic audit",
+    "standardized_coefficients": {
+      "category_jaccard": 0.4244614575278021,
+      "token_jaccard": 1.9238647861163953
+    },
+    "training_row_count": 1116
+  },
+  "topology_audit": {
+    "eligible_groups_after_holdout_exclusion": 615,
+    "global_identity_accounts": 38416,
+    "global_identity_components": 27522,
+    "holdout_component_groups_excluded": 25,
+    "holdout_components_excluded": 56,
+    "holdout_evidence_tokens": 139,
+    "holdout_fingerprints_excluded": 56,
+    "multiple_groups_same_component_excluded": 0,
+    "raw_strong_rows": 1630,
+    "row_exclusions": {
+      "imposter": 35,
+      "multiple_auxiliary_fingerprints": 3
+    },
+    "selected_accounts": 1015,
+    "selected_component_reuse": 0,
+    "selected_conflict_components": 460,
+    "selected_groups": 460,
+    "selected_holdout_evidence_overlaps": 0,
+    "selected_positive_pairs": 650,
+    "valid_groups_before_holdout_exclusion": 640
+  }
+}
