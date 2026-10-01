@@ -1,0 +1,70 @@
+{
+  "status": "PUBLIC_TOKENIZATION_AUDIT_COMPLETE",
+  "tokenizer_class": "BertTokenizerFast",
+  "policy_hash": "a4fb3f18267b821437e6c687ef3ba6dc3094b4d99ce7a94a818e3e91d9a30279",
+  "splits": {
+    "v6": {
+      "accounts": 1015,
+      "windows": 1015,
+      "subchunks": 1063,
+      "maximum_native_tokens": 256,
+      "lossless": true
+    },
+    "v5": {
+      "accounts": 82,
+      "windows": 1222,
+      "subchunks": 1291,
+      "maximum_native_tokens": 256,
+      "lossless": true
+    },
+    "chinese_train": {
+      "accounts": 14000,
+      "windows": 17000,
+      "subchunks": 20343,
+      "maximum_native_tokens": 256,
+      "lossless": true
+    },
+    "chinese_development": {
+      "accounts": 14000,
+      "windows": 17002,
+      "subchunks": 20365,
+      "maximum_native_tokens": 256,
+      "lossless": true
+    }
+  },
+  "audit_a_truth_reads": 0,
+  "audit_b_truth_reads": 0,
+  "ablated_v6_accounts": 1015,
+  "whitespace_token_ids": {
+    "'W5 W4'": [
+      101,
+      160,
+      15965,
+      160,
+      16006,
+      102
+    ],
+    "'W5\\nW4'": [
+      101,
+      160,
+      15965,
+      160,
+      16006,
+      102
+    ],
+    "'W5  W4'": [
+      101,
+      160,
+      15965,
+      160,
+      16006,
+      102
+    ]
+  },
+  "unicode_projection_examples": {
+    "文字，商品。": "W2.W2.",
+    "文字；商品！": "W2.W2.",
+    "字体": "W2",
+    "字體": "W2"
+  }
+}

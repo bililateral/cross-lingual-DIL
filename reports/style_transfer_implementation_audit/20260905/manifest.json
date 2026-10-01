@@ -1,0 +1,332 @@
+{
+  "status": "GPU_SMOKE_PASSED_SOURCE_AND_TARGET_COMPLETED_AND_LOCALLY_AUDITED",
+  "files": [
+    {
+      "path": "scripts/step28_style_transfer_common.py",
+      "sha256": "b3cfa6de654e4cc2cab7877e666f8f8582f7d4ed5143ae4357a8359d3f33e59b",
+      "size_bytes": 24349,
+      "sha256_at_naming_completion": "b3cfa6de654e4cc2cab7877e666f8f8582f7d4ed5143ae4357a8359d3f33e59b"
+    },
+    {
+      "path": "scripts/step28_style_transfer_source_linux.py",
+      "sha256": "0ff9eb30c4a110069eb78f3bfa7706f18f6efb9cc5be38dccfb3fa87cd90e4c3",
+      "size_bytes": 73688,
+      "sha256_at_naming_completion": "283018f836f1e0cdbe84043e4fe593c89caf0a79b3579b2095bb516e580d5b25"
+    },
+    {
+      "path": "scripts/step28_style_transfer_target_linux.py",
+      "sha256": "fee2bdccbc713b6497aaaf5ed448fbf1c6d2cafb5421b323331cc4c50f157a32",
+      "size_bytes": 40371,
+      "sha256_at_naming_completion": "0b99b287c5ca3402ab5a7958c355cb7600baee1a9fda4a223d4a63f64749c4da"
+    },
+    {
+      "path": "scripts/step28_labse_finetune_common.py",
+      "sha256": "36ece13b687158d936c0d58569f2207f3a61638e472a9d190a3fbc1ea2617da2",
+      "size_bytes": 17279,
+      "sha256_at_naming_completion": "36ece13b687158d936c0d58569f2207f3a61638e472a9d190a3fbc1ea2617da2"
+    },
+    {
+      "path": "tests/test_step28_style_transfer.py",
+      "sha256": "92dea23d223937c3f6828a06be2b6d0121228455d34f3a22a88dbf0c9f1db6e8",
+      "size_bytes": 17069,
+      "sha256_at_naming_completion": "b8772d6a16827e277eb0aeda5fa9f01cffb2a52048ff3bc30b5eec5c46bfa71f"
+    },
+    {
+      "path": "scripts/run_step28_style_transfer_source_linux_20260904.sh",
+      "sha256": "93f226ef0d804142957160b53f305dc71a4ef6debcf785601e155efb47d03bf4",
+      "size_bytes": 1620,
+      "sha256_at_naming_completion": "a90b3e16fb9db2f92a7e8c4816d5e082f1ca596b69029f9184ba4851f9f8742f"
+    },
+    {
+      "path": "scripts/run_step28_style_transfer_target_linux_20260904.sh",
+      "sha256": "d961bded99c3788436a5868fff4709bef5cc14f3603f49ec67d71af27d02de0f",
+      "size_bytes": 1608,
+      "sha256_at_naming_completion": "b27d047b7e57a0cc768fa3930fe51007e0084d40b8a62474dd878a95b5d6b706"
+    },
+    {
+      "path": "schema/step28_style_transfer_policy.json",
+      "sha256": "17d4389fe903a29cb22563510ca96b03a03655c66a66347535318c05c10b621b",
+      "size_bytes": 9841,
+      "sha256_at_naming_completion": "17d4389fe903a29cb22563510ca96b03a03655c66a66347535318c05c10b621b"
+    }
+  ],
+  "tests": {
+    "style_transfer": {
+      "passed": 23,
+      "failed": 0
+    },
+    "launcher_failure_cases": {
+      "passed": 4,
+      "isolated_from_actual_research_roots": true
+    },
+    "python_ast_and_bash_syntax": "passed"
+  },
+  "gpu_runtime_verified": true,
+  "gpu_runtime_attempts": [
+    {
+      "run_id": "20260905_213820",
+      "root": "reports/style_transfer_implementation_audit/20260905/gpu_smoke/20260905_213820",
+      "status": "SOURCE_FIRST_ADAMW_STEP_CUDA_OOM_TARGET_NOT_STARTED",
+      "input_hashes_checked": 7,
+      "input_hashes_match_current_files": true,
+      "source_checks_completed_by_matched_control_flow": [
+        "direct_and_two_pass_losses_close",
+        "all_named_parameter_gradients_close_rtol_1e-4_atol_1e-6",
+        "head_gradient_unchanged_by_vjp",
+        "encoder_gradient_finite_nonzero",
+        "encoder_and_head_nonzero_gradient_probes_selected"
+      ],
+      "source_gradient_error_value_logged": false,
+      "source_optimizer_updates_verified": false,
+      "source_checkpoint_reload_verified": false,
+      "source_temporary_checkpoint_block_reached": false,
+      "target_smoke_started": false,
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "total_mib_at_start": 32607,
+        "free_mib_at_start": 8666,
+        "other_process_pid_at_failure": 3942566,
+        "other_process_memory_gib_at_failure": 22.64,
+        "smoke_process_memory_gib_at_failure": 7.88,
+        "free_mib_at_failure": 587.81,
+        "failed_allocation_gib": 1.44
+      },
+      "evidence_files": [
+        {
+          "path": "environment.log",
+          "size_bytes": 389,
+          "sha256": "f244552b2ddd5a598c55776a35f9bf9c5d65a2f7063aa1d7731264ada7c4937a"
+        },
+        {
+          "path": "files.sha256",
+          "size_bytes": 776,
+          "sha256": "b8a70dd28f7e4744a7289d58fa6beb6931fd2be429e5921453b3e890a51fb342"
+        },
+        {
+          "path": "source.log",
+          "size_bytes": 1927,
+          "sha256": "1ba61fd60afddb46f092633989878141d9b9ca9ea9252b86f4458a5e1772cf62"
+        }
+      ],
+      "partial_optimizer_state_must_not_be_reused": true,
+      "implementation_changed": false,
+      "next_action": "RETRY_UNCHANGED_STANDALONE_SMOKES_WHEN_GPU_AVAILABLE"
+    },
+    {
+      "run_id": "20260906_100427",
+      "root": "reports/style_transfer_implementation_audit/20260905/gpu_smoke/20260906_100427",
+      "status": "SOURCE_AND_TARGET_STANDALONE_SMOKES_PASSED",
+      "input_hashes_checked": 7,
+      "input_hashes_match_current_files": true,
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5090",
+        "total_mib_at_start": 32607,
+        "free_mib_at_start": 31860,
+        "other_compute_processes_at_preflight": 0
+      },
+      "source_result": {
+        "audit_a_truth_reads": 0,
+        "audit_b_truth_reads": 0,
+        "checkpoint_account_embeddings_exact": true,
+        "direct_vjp_gradient_tolerance": {
+          "atol": 1e-06,
+          "rtol": 0.0001
+        },
+        "direct_vjp_max_abs_gradient_error": 0.0,
+        "embedding_shape": [
+          4,
+          768
+        ],
+        "encoder_gradient_l1": 5815.707070240547,
+        "head_gradient_unchanged_by_vjp": true,
+        "optimizer_updates_verified": {
+          "encoder": {
+            "after": -0.007699663285166025,
+            "before": -0.007719664368778467,
+            "index": 342,
+            "parameter": "2.linear.bias"
+          },
+          "head": {
+            "after": -0.0009999998146668077,
+            "before": 0.0,
+            "index": 0,
+            "parameter": "bias"
+          }
+        },
+        "status": "PASSED_V6_STYLE_TRANSFER_GPU_SMOKE"
+      },
+      "target_result": {
+        "audit_a_truth_reads": 0,
+        "audit_b_truth_reads": 0,
+        "encoder_gradient_l1": 7343.546533676286,
+        "head_gradient_l1": 0.6864611804485321,
+        "loss": 1.19525146484375,
+        "optimizer_updates_verified": {
+          "encoder": {
+            "after": 9.182871144730598e-05,
+            "before": 0.00011182859452674165,
+            "index": 57,
+            "parameter": "2.linear.bias"
+          },
+          "head": {
+            "after": -2.883800745010376,
+            "before": -2.884800672531128,
+            "index": 0,
+            "parameter": "bias"
+          }
+        },
+        "status": "PASSED_V6_STYLE_TRANSFER_TARGET_GPU_SMOKE"
+      },
+      "shell_exit_status": 0,
+      "evidence_files": [
+        {
+          "path": "environment.log",
+          "size_bytes": 411,
+          "sha256": "6d532df155cef57188c8ebdc5d4b4d337423af1af5468e79103e2682ca13e027"
+        },
+        {
+          "path": "files.sha256",
+          "size_bytes": 776,
+          "sha256": "b8a70dd28f7e4744a7289d58fa6beb6931fd2be429e5921453b3e890a51fb342"
+        },
+        {
+          "path": "source.log",
+          "size_bytes": 728,
+          "sha256": "c6cd278cea5fd05c3eb2157e48ab6ef68e81a4fbb7c12bc4a48a5b96db34b529"
+        },
+        {
+          "path": "target.log",
+          "size_bytes": 560,
+          "sha256": "8a67544fdf143f82e5857648b4af48beffe596e55aee5961186f2168dedb35d5"
+        }
+      ],
+      "scp_download_hashes_match": true,
+      "implementation_changed": false,
+      "partial_failed_state_reused": false,
+      "next_action": "RUN_FROZEN_SOURCE_AND_ZERO_SHOT_STAGE"
+    }
+  ],
+  "formal_training_started": true,
+  "audit_a_truth_reads": 0,
+  "audit_b_truth_reads": 0,
+  "review": {
+    "url": "https://chatgpt.com/c/6a9be662-b954-83eb-acb9-61d0fd2377b2",
+    "model": "web GPT 6 Pro",
+    "first_attachment_sha256": "02d4099cb69b3fabe880ad9dabafd9fd6d50b4c3fba7b8785cd5fe7e79f88b64",
+    "first_response_saved_text_sha256": "cf57bfc8f9990693a6f8430cb867e80e2aa100479425e6368853ffebc17b2e69",
+    "changes_attachment_sha256": "caaf138cf1011292f43186146ab07e34ac9a23f2285cf1b0eabfc2f428fac90d",
+    "changes_review_pending": false,
+    "changes_attachment_size_bytes": 35887,
+    "changes_response_saved_text_sha256": "a02001cfefce10978a26c3c997c08f55cd85899c2ad3cfcc4a845844d8048032",
+    "changes_response_saved_text_size_bytes": 9577,
+    "changes_review_completed_date": "2026-09-05",
+    "changes_review_outcome": "NO_NEW_CONFIRMED_DEFECTS_STANDALONE_GPU_SMOKE_READY_NOT_EXECUTED",
+    "new_scientific_blockers_reported": 0,
+    "new_reproducibility_defects_reported": 0
+  },
+  "temporary_cleanup": {
+    "completed": true,
+    "removed_files": 31,
+    "removed_bytes": 1138833,
+    "browser_temporary_directory_remaining": false,
+    "external_review_copy_remaining": false
+  },
+  "gpu_runtime_verification_scope": "Unchanged source and target tiny training checks passed; formal source and all 72 target configurations completed. Nine source initializations exactly replayed all 417 source synthetic-audit scores before save and after first reload. This establishes the observed run, not a universal hardware-capacity guarantee.",
+  "formal_source_execution": {
+    "status": "COMPLETED_AND_LOCALLY_AUDITED",
+    "execution_root": "reports/style_transfer_execution/20260906/source",
+    "output_root": "reports/step28_model_experiment/v9_4_1_v6_style_transfer_source_v2_20260904",
+    "wrapper_pid": 3954913,
+    "python_pid": 3954914,
+    "standalone_smoke_run_id": "20260906_100427",
+    "remote_static_input_validation": "PASSED_V6_STYLE_TRANSFER_STATIC_INPUTS",
+    "authorized_development_labels_and_qrels_hashes_verified": true,
+    "model_payload_reused": "models/step7/embeddings/labse",
+    "scientific_implementation_changed": false,
+    "target_learning_curve_started": true,
+    "started_at_utc": "2026-09-06T02:09:20Z",
+    "finished_at_utc": "2026-09-06T02:17:58Z",
+    "exit_status": 0,
+    "manifest_sha256": "6262836f7b1b7b598e786be67ad2f36569c8d775277f814a1b848442bee7e0b8",
+    "result_audit": "reports/style_transfer_execution/20260906/source/result_audit.json",
+    "result_audit_sha256": "a7d35a55f16b087b9a0ec9c024951ce3b32c30642669b1ff199ab2c4a4740ae7",
+    "source_gate_confirmed": false
+  },
+  "formal_target_execution": {
+    "status": "COMPLETED_AND_LOCALLY_AUDITED",
+    "started_at_utc": "2026-09-06T02:24:21Z",
+    "execution_root": "reports/style_transfer_execution/20260906/target",
+    "output_root": "reports/step28_model_experiment/v9_4_1_v6_style_transfer_target_v2_20260904",
+    "wrapper_pid": 3955304,
+    "python_pid": 3955305,
+    "input_hashes_checked": 12,
+    "input_hashes_match_windows": true,
+    "authorized_train_labels_hash_verified": true,
+    "preflight_other_gpu_compute_processes": 0,
+    "scheduled_models": 72,
+    "progress_observed_at_utc": "2026-09-06T03:41:14Z",
+    "completed_models_at_observation": 72,
+    "completed_parameter_update_audits_checked": 72,
+    "current_phase": "COMPLETED_PRIMARY_ENDPOINT_NEGATIVE_STOP_TRANSFER_CLAIM",
+    "source_score_replay_checks_completed": 9,
+    "scientific_implementation_changed": false,
+    "completed_arms_at_observation": [
+      "generic",
+      "v6_correct",
+      "v6_permuted",
+      "v6_order_format_mass_ablated"
+    ],
+    "first_formal_source_replay": {
+      "model_id": "v6_correct_seed_20260911",
+      "observed_at_utc": "2026-09-06T02:48:23Z",
+      "snapshot_path": "reports/style_transfer_execution/20260906/target/source_replay_snapshot.json",
+      "snapshot_sha256": "8f52d9237f8f704b05bf0282d048c86bd0c0f97868b9a0981beb019a23e0ebb2",
+      "source_score_count": 417,
+      "source_array_sha256": "e2966ee5e33ee109570a1417d7dc588582c2caaabeea6143a7e489c8154c30d8",
+      "before_save_exact": true,
+      "after_first_reload_exact": true,
+      "max_abs_error": 0.0
+    },
+    "finished_at_utc": "2026-09-06T03:40:56Z",
+    "exit_status": 0,
+    "python_elapsed_seconds": 4580.2726418972015,
+    "manifest_sha256": "aa7decd120077731433cb922cea65e4f023062a826cbb55aa3fb7cfbea342679",
+    "result_audit": "reports/style_transfer_execution/20260906/target/result_audit.json",
+    "result_audit_sha256": "22e7260f33e33fa30657d9e34307ebb0bd17683a38a96a63afad45d402c257e4",
+    "formal_target_optimizer_updates": 24000,
+    "source_replay_optimizer_updates": 351,
+    "all_output_files": 77,
+    "all_output_files_bytes": 113478042,
+    "downloaded_execution_records_hashes_match": true,
+    "temporary_source_checkpoints_retained": 0,
+    "training_processes_exited": true,
+    "post_run_gpu_compute_processes": 0,
+    "primary_budget": "worlds_025",
+    "low_resource_development_candidate": false,
+    "primary_world_equal_ap": {
+      "generic": 0.11163396646511421,
+      "v6_correct": 0.11026939696467442,
+      "v6_order_format_mass_ablated": 0.10937536843303236,
+      "v6_permuted": 0.10840727711452318
+    },
+    "primary_bootstrap": {
+      "correct_minus_generic": {
+        "q025": -0.0027290356895874066,
+        "q975": -3.5221943106732196e-05
+      },
+      "correct_minus_permuted": {
+        "q025": 0.0005482190965017688,
+        "q975": 0.003211202340615307
+      },
+      "estimand": "mean_per_world_average_precision_delta",
+      "repetitions": 9999,
+      "seed_inference": "conditional_on_registered_fixed_runs",
+      "unit": "world",
+      "world_count": 500
+    },
+    "auxiliary_worlds_001_positive": true,
+    "auxiliary_point_does_not_replace_primary_endpoint": true,
+    "positive_candidate_full_text_baseline_triggered": false,
+    "valid_negative_artifacts_retained": true
+  }
+}

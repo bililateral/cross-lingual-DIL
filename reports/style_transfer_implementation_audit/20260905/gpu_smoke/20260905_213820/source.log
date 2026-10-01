@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_style_transfer_source_linux.py", line 1990, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_style_transfer_source_linux.py", line 1983, in main
+    result = smoke()
+  File "/home/yongpeng/cross-lingual/scripts/step28_style_transfer_source_linux.py", line 1939, in smoke
+    optimizer.step()
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/optimizer.py", line 517, in wrapper
+    out = func(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/optimizer.py", line 82, in _use_grad
+    ret = func(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/adam.py", line 247, in step
+    adam(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/optimizer.py", line 150, in maybe_fallback
+    return func(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/adam.py", line 953, in adam
+    func(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/optim/adam.py", line 777, in _multi_tensor_adam
+    exp_avg_sq_sqrt = torch._foreach_sqrt(device_exp_avg_sqs)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.44 GiB. GPU 0 has a total capacity of 31.32 GiB of which 587.81 MiB is free. Process 3942566 has 22.64 GiB memory in use. Including non-PyTorch memory, this process has 7.88 GiB memory in use. Of the allocated memory 7.09 GiB is allocated by PyTorch, and 161.09 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
