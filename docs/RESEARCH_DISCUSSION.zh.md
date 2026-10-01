@@ -1,5 +1,40 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-01 接手时区分历史正负结果与无效实验
+
+用户明确要求：“尤其是其中还有很早的历史实验结果，那些是负结果，那些是有效的正向实验结果，一定要区分清楚”；并要求：“向我最终汇报时一定要确保你能正确按照规定要求接手这个项目”。本次范围为理解项目、核对既有历史与当前证据、记录接手边界，不构成新实验、重读监督或重开关闭路线的授权。
+
+判读分开记录实验有效性、原定验收、具体比较与外推范围。有效实验可以失败；局部正向结果可以与整体验收失败并存；区间跨零的零结果不等于证明方法有害；工程无效、审计器无效、盲预测尚无真值评价不能归入科学负结果。不同数据边界、指标定义和版本不合并。
+
+### 早期结果及后续限制
+
+| 历史实验 | 可保留的结果与接手解释 | 原记录 |
+| --- | --- | --- |
+| Step7 英文来源选择 | 完整集有较高排序表现，但v4、v4.2稳定性审计未确定唯一稳定最强M0；去克隆与分量／pair口径反转限制外推。operational baseline不等于独立认证的最优来源模型。 | [v4审计](STEP7_RESULT_AUDIT_20260724.zh.md)、[新折分审计](STEP7_REPEAT_STABILITY_RESULT_AUDIT_20260727.zh.md) |
+| Step8／Step10 早期零样本与消融 | 38对旧中文test的BGE AP 0.919816、10对更早快照的AP 1.0，属于各自小样本历史信号；不能迁作后来扩充边界或当前纯标题／描述任务的证明。 | [Step8](STEP8_ZERO_SHOT_TRANSFER.md)、[Step10](STEP10_MODEL_AND_FEATURE_ABLATIONS.md) |
+| Step9／Step12／Step13 | 106对边界上少样本适配修复了弱来源融合，但相对raw E5增益有限；旧Step12把AP同时标作PR-AUC和MAP，并非梯形PR-AUC或逐查询MAP。后来v6已改正定义，不回写旧字节。 | [Step9](STEP9_FEW_SHOT_ADAPTATION.md)、[旧统计口径](STEP12_STATISTICAL_ROBUSTNESS.md)、[漂移诊断](STEP13_CONCEPT_DRIFT_AUDIT.md) |
+| Step15-v5／v5r | v5的mixup存在弱标签放大、跨域父样本和域权重混杂，不能把高分归因于干净mixup。修复后v5r域平衡整体相对raw E5在200对内部开发test上AP +0.201107，区间[0.051610,0.337688]，保留为该旧输入体系的内部正结果；但其Phase4−Phase3为+0.066345，区间[-0.005690,0.143394]，不支持独立mixup增量。旧语义输入包含身份、部分参考统计使用全池，不能称当前严格屏蔽输入的独立泛化证明。 | [缺陷审计](STEP15_EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE.md)、[已存配对统计](../reports/step12_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv)、[后续输入修正](PROJECT_PROGRESS.md) |
+| Step15-v6／v8 | v6正式晋级失败，已冻结为有效负结果。v8 V2把训练专用silver移入valid，评估无效；修正边界后contextual在内部test AP 0.620525高于clean 0.544139，是有限诊断正结果，但6条公共噪声负例仍全在top50。 | [v6负结果冻结](../schema/step15_negative_freeze.json)、[v8边界纠正](STEP15_POSTRUN_AUDIT_AND_CORRECTION_20260715.zh.md)、[修正边界实测](STEP26_FROZEN_AUTHORSHIP_BRIDGE_RESULT_AUDIT_20260718.zh.md) |
+| Step11／17与Step16I／18 | 候选图、复核流程和困难负例建设有工程／数据价值，不能把图边当同控真值。可信独立正身份不足；160条dev2只有1正、108负、51不确定，不是充分的最终准确率基准。 | [早期交接](AI_RESEARCH_HANDOFF_20260719.zh.md)、[复核记录](STEP16I_CODEX_ADJUDICATION_REPORT_20260716.zh.md) |
+| Step21／22／23 | Step21-v2增强相对等权复制AP −0.001179，区间跨零，属有效零结果；Step22完整增强相对复制−0.017662；Step23-v2.1主模型相对聚合−0.134735，原晋级失败。不得把Step23已作废v2混作修正版结果。 | [Step21](STEP21_SYNTHETIC_TRAIN_ONLY_AUGMENTATION_20260716.zh.md)、[Step22](STEP22_SAME_SELLER_SPLIT_AUGMENTATION_20260716.zh.md)、[Step23](STEP23_ITEM_LEVEL_MULTI_INSTANCE_20260717.zh.md) |
+| Step24／25／26 | Step24 train-D0 AP 0.802718不能外推。Step25-v3.1求解器正确收敛但仅2/11门通过；Step26同边界桥接valid AP 0.508495，低于v8 clean 0.574855，3/6门通过；均保留为有效负结果，Step26B不启动。局部public-noise或敏感性收益不能替换主模型。 | [Step25](STEP25_RESULT_AUDIT_20260718.zh.md)、[Step26](STEP26_FROZEN_AUTHORSHIP_BRIDGE_RESULT_AUDIT_20260718.zh.md) |
+| Step27-v1与v1.1 | v1输入契约漂移，属工程无效。**v1.1实际已完成**，不是旧准备文档中的“尚未运行”：S0重放通过；M2/M1 AP为0.509867/0.510156，差−0.000288，区间[-0.000498,0.000183]，仅2/10种子正向，技术OOF门失败。相对M0的小幅点增益不能证明增强优于等权复制；valid/test未评分。修复版属于事后工程修复后的有效开发零／负结果，不是独立确认实验。 | [修复契约](STEP27_SOURCE_CONTRACT_REPAIR_20260719.zh.md)、[实际训练摘要](../reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/training/step27_training_summary.json)、[实际审计](../reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/statistical_audit/oof_gate/step12_step27_statistical_audit.json) |
+| Step28-v12与v12.1 | v12修正后保留1280审计行／842状态，完整历史AP 0.767197，比直接历史+0.073928，是固定生成器家族内有效正结果。v12.1另在2689未审核候选上得到0正修正／0盲审队列，是应用弃权，没有证明真实识别有效，也不是有真值的准确率负结果。**二者均不同于后来Step28-v13 v1.12。** | [修正复现与应用](STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md) |
+| Step28数据资格及迁移 | v5、v6/v6.1、v11撤销；Step28-v13多轮关闭。V9.3-R2是审计器设计无效，不能下数据失败结论；V9.4.1资格通过、训练／开发V2和Audit A盲预测保留有效身份。正确历史输入的开发增益不等于英文知识迁移，盲预测未读审核真值就没有准确率正负判定。 | [现行历史边界](RESEARCH_DISCIPLINE.zh.md)、[训练／开发结果](STEP28_TRAIN_DEVELOPMENT_RESULT_20260901.zh.md)、[迁移归因对照](STEP28_TRANSFER_CLAIM_CONTROLS_RESULT_20260901.zh.md) |
+| 英文初始化与9月6日风格迁移 | 英文初始化LaBSE诊断未改善中文通用起点，另有来源捷径／历史信息接触限制。随后风格迁移25世界主端点相对通用起点AP −0.001365，区间为负，主张停止；1世界辅助预算有正向结果，必须保留但不能顶替主端点。 | [初始化诊断](STEP28_ENGLISH_INITIALIZED_LABSE_FINETUNE_RESULT_20260903.zh.md)、[风格迁移主结果](STYLE_TRANSFER_TARGET_RESULT_20260906.zh.md) |
+
+### 持续学习主线与当前接手
+
+9月7—9日固定特征、文本及经营内容变化实验未形成稳定旧域遗忘，ER未改善；这些是有效的前提诊断／方法负结果。9月10日表达变化数据上SEQ遗忘及新域学习成立，6轮联合训练相对3轮的AP增益成立；其后ER负向，旧LaBSE LOGIT虽改善保旧，却损失新域学习，两个敏感性设置仍未通过整体目标。[9月23日汇总](RESEARCH_PROGRESS_20260923.zh.md)保留各自数据、预算和结果，不能把后继新数据当作重写旧结果。
+
+中文BGE候选排序改进与低误报自动识别门失败并存；加权汇总失败；困难排序C相对A有有效排序收益，但原复合验收9/13。后续正仿射校准17/17通过，固定s0基础test有正增益但原验收8/9，用户事后接受没有改写原`passed=false`。[排序](SELLER_ALIAS_RANKING_RESULT.zh.md)、[校准](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[test](SELLER_ALIAS_TEST_RESULT.zh.md)分别保留，不以校准结果追改原训练验收。
+
+当前BGE首轮：SEQ遗忘门通过；ER−SEQ 4/23失败；LOGIT−ER 23/23通过，保留其对该ER基线的有效抗遗忘结果，同时披露相对SEQ旧域Recall@5、新域和最终最新域的下降。LOGIT是已知方法的任务适配基线，不是已确立的原创或整体成功。当前新增ER权重合同仅比较λ=0.5/0.25，对照和首状态复用；原23项全过才按O MAP/O R5/较大λ择优，无合格者保留原ER并结束比较。[首轮完整结果](SELLER_ALIAS_BGE_RESULT.zh.md)、[已确认ER合同](SELLER_ALIAS_ER_WEIGHT.zh.md)。
+
+本次个人核对包括：上述历史原报告，v5r配对CSV、v6机器冻结／晋级字段、Step27-v1.1实际摘要／统计与五份关键小文件大小SHA（均与原同步清单一致），当前BGE原evaluation端点和判定，当前ER完整外审原文、BGE首轮完整结果外审原文及ER原生CPU回传证据。源码实际阅读覆盖`step28_er_weight.py`、续训入口的配对日程／首态恢复／监督账／收集路径、配置选择及父端点／23项统计函数；这不等于重新审完全部历史实现及全部直接依赖，也未重新计算正式标签级指标。更早每轮网页外审原件没有在本次逐一重审；相关既有审计结论按原证据范围引用，不冒称本次完整独立复现实验。
+
+接手沿用当前明确授权：不重复申请ER启动、不另开训练、不因接手重读监督；继续使用已有Linux阶段的授权时先补足实际将使用路径的必要审读。新科研问题、比较、预算或最终留出仍须确认。标签一次解析、完整盲门、封存Audit A/B及owners、Windows不跑科研脚本、共享服务器边界、权重保留例外和阶段提交推送均按[现行纪律](RESEARCH_DISCIPLINE.zh.md)执行。本次未连接Linux、未运行科研脚本、未读取正式文本／标签／模型，也未改变活动源码、合同或原始结果。实际变更仅为本节及交接入口，未增加实验、核验流程或另建报告。
+
 ## 2026-10-01 批准ER具体修改和审查后直接Linux执行
 
 用户原话：“那现在先修改ER吧，你确认修改完成后提交给网页端模型审核，通过后直接在linux上运行”。执行者据此先写完整合同，明确此前未定的具体λ、筛选、预算和新监督；用户回答：**“按这份完整设置推进（推荐）”**。完整问题与原话见[决定](../reports/documentation/20261001/er_weight/decision.json)。
