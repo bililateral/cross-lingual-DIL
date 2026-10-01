@@ -1,4 +1,86 @@
-# Project Progress
+# 项目进展与文档入口
+
+截至2026-10-01，**首轮有限历史持续学习训练、唯一valid评价、完整回传和本地独立核查均已完成；结果网页外审已于10月1日10:12:21提交Pro并开始回应，待实际回复与主审。** 作业从9月30日14:40:21运行至10月1日06:06:13（Asia/Shanghai），退出0、6048次更新、9504次群梯度呈现、21个终点及64份指标矩阵完整。实际总耗时15小时25分51秒，剩余0；原预计18—26小时／10月1日08:40—16:40完成，实际提前，36小时／64GiB是强制上限。09:24:59核对作业进程已退出。[本轮完整报告](SELLER_ALIAS_BGE_RESULT.zh.md)、[当前状态](../reports/seller_alias_continual/20261001/bge_continual_result/current_status.json)。
+
+本轮困难排序BGE、s0、ABC／BCA／CAB、冻结／SEQ／ER／LOGIT、6群且全部历史及附属状态≤1MiB及O／N／Z判据未改。train=1、valid=1、heldout／owners=0；326份小结果16,241,505字节回传匹配，18份冻结来源未变。Linux保存结果独立核查1,061,316数值、最大差7.11e−15通过，新标签与模型加载均0。[原始评价](../reports/seller_alias_continual/20261001/bge_continual_result/returned/job/evaluation/evaluation.json)、[独立核查](../reports/seller_alias_continual/20261001/bge_continual_result/audit/audit.json)。
+
+SEQ首域MAP遗忘0.063393、条件95%[0.041809,0.085423]，三个顺序同时有新域学习，预定遗忘观察门通过。ER−SEQ仅4/23通过，旧域MAP下降0.039873；LOGIT−ER为23/23通过，旧域MAP增加0.046887。但LOGIT相对SEQ旧域Recall@5及新域、最终最新域性能仍下降，不能称整体优于普通续训或抗遗忘已解决。单种子／已开发valid结论不等于创新或论文最终验收。历史18权重例外保持；本轮必要共享状态／对照仍保留Linux，未回传大权重或历史文本标签。
+
+## 已完成与正在进行
+
+| 阶段 | 实际状态 |
+|---|---|
+| 中文BGE基础比较、加权汇总、困难排序及校准 | 均已形成结果和审查记录；各自正负结果及原判据保留 |
+| 固定s0基础test | 已闭环；原8/9，用户事后接受实际增益，现有120群不再是未开发最终留出 |
+| 首轮持续学习方案与实现 | 具体设置、双方批准、实际网页外审／主审和Linux CPU核验完成 |
+| 首轮持续学习正式作业 | 已完成并核查；遗忘门通过，ER−SEQ失败，LOGIT−ER通过但仍有相对SEQ的新学习代价；结果外审已提交并开始回应，待实际回复与主审 |
+| 两端文件清理 | 已完成；保留必要科研证据、历史权重例外与活动状态 |
+
+当前下一步是完成本轮结果网页外审并核对实际回复，再围绕少量历史样本的代表性／重复强度以及排序保持与新域学习的平衡制定新方法合同。当前尚无新算法、种子、训练预算、标签或最终留出许可；不自动追加训练，不重复基础test。LOGIT相对ER的收益保留，不能替代相对SEQ的新旧能力保护或三种子方法资格。
+
+基础test已完成结果外审与主审：原合同仍为8/9、`passed=false`，仅ΔMAP≥0.01未过（实际+0.007484203），ΔRecall@5=+0.014434524，原定AP／AUC／Brier／log_loss观察值保护通过。用户事后明确接受实际增益作为后续基础；不追认原合同全过，不宣称总体非劣效。现有120群不再是持续学习的未开发最终留出。[完整结果](SELLER_ALIAS_TEST_RESULT.zh.md)。
+
+两端文件清理已完成：Windows删除58份原有冗余文件112,594,084字节，Linux删除1份中转包18,784字节；必要科研记录、原始外审证据、18份历史权重和活动训练状态保留。临时扫描／辅助脚本已收尾，Git／LFS未改。[清理完成回执](../reports/maintenance/20260930/project_cleanup/completion.json)、[存储与恢复](STORAGE.zh.md)。
+
+## 当前入口
+
+| 内容 | 文档 |
+|---|---|
+| 当前状态、监督账、授权与证据 | [交接](AI_RESEARCH_HANDOFF.zh.md)、[实查状态](../reports/documentation/20260930/status_reconciliation/current_status.json) |
+| 已确认设计及后续流程 | [当前设计](CURRENT_EXPERIMENT_DESIGN.md)、[计划](RESEARCH_PLAN.md)、[冻结首轮合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md) |
+| 实现、外审与CPU证据 | [实现说明](SELLER_ALIAS_BGE_IMPLEMENTATION.zh.md) |
+| 纪律及用户原话 | [纪律](RESEARCH_DISCIPLINE.zh.md)、[讨论](RESEARCH_DISCUSSION.zh.md)、[执行摘要](../AGENTS.md) |
+| 文件保留、清理、恢复 | [存储](STORAGE.zh.md) |
+
+## 历史阶段状态
+
+以下全部正文按各自原时点保留；旧“当前／下一步／尚待test／权重为0”不是现行状态。历史表格的模型字母与本轮方法不可混用。页首为当前入口。
+
+更新日期：2026-09-27。本轮网页GPT6 Pro外审与主执行者处置已完成，无必须修复的新科研阻断或复现缺陷；37项网页手工／微型测试通过，18份当前CPU来源保持原字节。用户随后明确“核验完毕后，无需向我申请，直接开始正式训练”，已恢复九运行／7776更新、单GPU单CPU、24小时／32GiB及新train／valid各一次，test／owners仍未授权。预计总耗时14—18小时，实际启动及标签消费以本轮运行回执为准。 15项项目CPU合同和4次实际BGE手工更新通过，完整6分54.34秒、11:01:44 CST退出0；13份130,994字节证据回传核对完成。正式作业已于2026-09-27 11:50:06 CST在GPU0 RTX5090启动，单CPU核0；11:53:30实查s0_d至少24更新，训练PID3052330、启动PID3052316均属yongpeng，无失败记录。九个监督前预检完成，新train解析一次已消费，valid尚未开始，test／owners为0。预计总14—18小时，此观测时剩余约13小时57分—17小时57分，北京时间9月28日01:50—05:50完成；24小时截止9月28日11:50是强制上限，非预计耗时。依据历史BGE每模型约90—94分钟及本轮首24步，尚无完整臂／困难项／保存恢复耗时。 [实际启动证据](../reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/training_started.json)。见[合同](SELLER_ALIAS_RANKING.zh.md)、[实现与外审](SELLER_ALIAS_RANKING_IMPLEMENTATION.zh.md)及[交接](AI_RESEARCH_HANDOFF.zh.md)。
+
+推进顺序保持：保留D配置与结果基线，先在valid开发比较中改善候选排序、保护基础识别，再经另行授权的独立合成test验收，之后才设计持续学习。上一轮加权汇总已经完成结果外审及Linux保存证据复核，结果有效、改进判据未通过；Linux全部训练权重（包括D）依用户要求删除，记录保留。见[加权汇总结果](SELLER_ALIAS_POOLING_RESULT.zh.md)和[下一步计划](RESEARCH_PLAN.md#已确认的下一步保留d基线先做针对性改进)。
+
+## 历史基础比较结果（中文BGE四配置）
+
+中文BGE四配置于20:18:48正式训练完成，3456更新、exit0；20:26:21完成一次valid评价。本地主审、回传、实际GPT6 Pro结果外审及其独立脚本的Linux复核已完成；16,475数值检查通过，未新增正式标签读取。
+
+预定主候选D的AP=.344234、MAP=.491119、MRR=.544789、Recall@5=.626786、Recall@10=.773512；相对历史LaBSE排序和检索有改善。全四臂未达预设严格自动判定门，保留负结果，但不能将其泛化为候选检索没有价值。主执行者判断D已足以作为后续持续学习研究的候选排序基础。候选K及应用合格线尚未确认；这不妨碍制定研究方案，也不构成新训练授权。
+
+| 需要了解的内容 | 入口 |
+|---|---|
+| 完整结果、22指标、七比较、门槛范围及资源 | [中文结果](SELLER_ALIAS_CHINESE_RESULT.zh.md) |
+| 最新状态、授权、监督账及下一步 | [科研交接](AI_RESEARCH_HANDOFF.zh.md) |
+| 当前纪律与执行规则 | [科研纪律](RESEARCH_DISCIPLINE.zh.md)、[执行摘要](../AGENTS.md) |
+| 四配置对象、输入和冻结计算 | [当前设计](CURRENT_EXPERIMENT_DESIGN.md)、[中文合同](SELLER_ALIAS_CHINESE_BASE.zh.md) |
+| 实现、原生核验、历史外审及修复 | [实现记录](SELLER_ALIAS_CHINESE_IMPLEMENTATION.zh.md) |
+| 后续计划及尚待确认范围 | [研究计划](RESEARCH_PLAN.md) |
+| Linux模型与Windows小型证据 | [存储](STORAGE.zh.md) |
+
+## 已完成研究
+
+| 研究 | 保留结论 | 依据 |
+|---|---|---|
+| 随机完整群ER | 既定三项缓解条件未通过 | [随机ER结果](SELLER_ALIAS_REPLAY_RESULT.zh.md) |
+| 旧分数保持 | 首域保持改善、新域能力门失败 | [蒸馏结果](SELLER_ALIAS_DISTILLATION_RESULT.zh.md) |
+| 两点权重敏感性 | 均未达新域要求；(.5,.5)仅首域AP点估计最高 | [敏感性结果](SELLER_ALIAS_SENSITIVITY_RESULT.zh.md) |
+| LaBSE／E5／BGE-M3 | 原严格自动判定门均失败 | [原三模型结果](SELLER_ALIAS_BASE_RESULT.zh.md) |
+| 中文BGE四配置 | 排序/候选检索改善，原自动判定门未达；结果外审与主审闭环 | [中文结果](SELLER_ALIAS_CHINESE_RESULT.zh.md) |
+
+train/valid本阶段各一次均已消费，test/owners保持未读。实测本地LFS对象缓存为空，prune释放0字节；HEAD/index未改。用户随后取消LFS清理，工单草稿已删除，GitHub远端未改。上述结果均有固定合成数据、单种子和反复使用valid的限制。
+
+## 历史原文（以下均为当时状态）
+
+> 以下保留整理前正文、历史结论和来源散列。旧“当前／下一步／待恢复”只指其原记录时点，不是本阶段执行指令。
+
+2026-09-15入口校正：本文下方为历史计划或进展，旧“当前／下一步”仅指原记录阶段，不能作为现行执行授权。现行主线是有限历史记忆下的中文暗网卖家马甲持续识别；第一路联合诊断已完成，第二路随机ER已于9月15日12:38正常结束并完成一次valid评价，本地三项缓解判据失败，实际结果外审及本地复核已完成，有效负基线闭环。当前状态、授权及最新实测时间以[科研交接](AI_RESEARCH_HANDOFF.zh.md)为准，执行合同见[随机ER方案](SELLER_ALIAS_MITIGATION_PLAN.zh.md)，大型载荷归档位置见[存储与恢复](STORAGE.zh.md)。历史结论和哈希原义不变。
+
+`2026-09-06` [固定输入的专门训练比较](SELLER_ALIAS_SPECIALIST.zh.md)完成并停止该候选。两臂在 Windows CPU 原参数一次拟合，全体臂精确重现旧 M3-joint，完整模型和分数重载通过；规则外逐世界 AP 从 `0.048738` 到 `0.046071`，配对差 `-0.002666640`，条件探索性区间 `[-0.005843154, 0.000428989]`，未满足预先固定的继续条件。经验 FPR≤1% 的召回略升伴随更多假阳性，不能代替主要端点。8 项针对性测试与实际手算树更新、拟合前网页 GPT 6 Pro 实现外审、17 项输入核验和结果独立复核通过。结果 SHA-256 `e5f73e60c1b1be2eefbb179329b0cd14cef4ae53f59dcb949f50e76264756a1b`；七文件约 6.46 MB 保留为有效负结果，不重训补救或撤销原数据资格。训练／开发标签各解析一次，qrels 和 Audit A/B 未读，Linux 未使用。
+
+`2026-09-06` 后继[方法构造筛选](SELLER_ALIAS_FEASIBILITY.zh.md)与[字符基线诊断](SELLER_ALIAS_CHARACTER_BASELINE.zh.md)完成，两阶段均已取得并回读网页 GPT 6 Pro 实际审查。三个手算例仅限制具体候选，不禁止简单基线。实际 TF-IDF 只拟合 14,000 个训练账号的既有中文去词义风格流；2,298 项词表、189,000 个开发分数、6 项新测试及 15 项输入核验通过。规则外 pooled AP `0.018444`，但逐世界 AP `0.045745` 低于 M3-joint 的 `0.048738`，没有稳定增量或新方法结论。保留基线，不调参或恢复旧迁移。首次摘要序列化错误在发布前修复，最终回执 SHA-256 `09b02ab2b34bebc6cf3736bdd089bf1c87dd9bcce3cbc4ab77c6d2a905e2dce5`；Linux 未用、Audit A/B 未读。
+
+`2026-09-06` 按用户最新指令开始 Windows 本地方法工作；使用 Linux 前须先汇报并暂停，当前没有远程连接。已完成保存 M3 模型诊断：30 项输入核验、189,000 个开发概率精确重放及 8 项针对性测试通过。M3-joint 在这份开发集的原冻结阈值下与强共享规则的阳性集合逐行相同，规则外 2,000 正／179,000 负上 pooled AP `0.017883`、TP=0；这些是事后解释，不是新确认性结果。用户所列两份网页 GPT 6 Pro 会话的最新实现答复均已全文回读并归档，未发现需重跑的计算缺陷；已明确 Step23 重复点、冻结阈值措辞与审查节选来源。完整监督和公开账号记录是当前方法起点，尚无成立的新算法；旧迁移负结果与 Audit A/B 封存不变。见 [方法核验](SELLER_ALIAS_METHOD.zh.md) 和 [实际审查记录](../reports/saved_model_audit/20260906/review.json)。
+
+`2026-09-05` 文件名去版本号维护已经实施，实验目录和科研版本字段保留；当前交接入口为 `docs/AI_RESEARCH_HANDOFF.zh.md`。后续阶段使用网页端 **GPT 6 Pro** 外审，意见仍须本地核实并拒绝过度设计，见 `docs/RESEARCH_DISCIPLINE.zh.md`。清理了过时的开发烟雾事务工具、旧 Step16 暂存引用及无用 Git 缓存；原始科研提交、正式数据与模型结果保留，`models/` 不动。命名清单和清理审计分别见 `reports/file_naming_migration/20260905/filename_map.json` 与 `docs/WORKSPACE_CLEANUP_AUDIT_20260905.zh.md`。旧文档所列源码／政策哈希仍指原始提交字节，不能用改名后的文件冒充旧字节；已发布结果载荷的哈希不变。
 
 `2026-09-04` Step 28 V6 风格来源迁移 V2 已完成正式运行前实现，科研问题已明确收紧为“正确英文身份监督能否提高低资源中文马甲识别的标注效率”，不是要求迁移模块在 500 世界充分监督下必然最强。四个初始化臂为通用 LaBSE、V6 正确监督、V6 置乱监督和联合风格消融；中文固定 1／5／10／25／100／500 世界学习曲线，三个目标种子形成不同但种子内嵌套的训练子集，臂间严格配对。前五档各 200 次单世界更新，25 世界逐世界等权平均精确率为主要低资源端点，500 世界 1,000 次更新为饱和对照。已修复分量重抽样中排序后标签／权重错位、中文汇总平均精确率点估计与逐世界置信区间错配、百分之一假阳性率召回删点、单精度概率饱和改变排序以及目标来源模型血缘未验证五个结果级问题；阶段 C 的排序、检索、主要端点和区间只使用原始余弦，概率只进入概率及固定阈值指标；来源重放模型在临时保存前和首次重新加载后都必须逐元素复现阶段 A 的 V6 合成审计分数。两遍向量回传、置乱残留率、跨分量负例一次／两次前向及累计原始权重均显式审计。20／20 项专项测试、编译和训练／开发静态输入检查通过；正式 GPU 结果尚未生成，两个输出根均不存在，审核甲乙真值读取仍为 0。下一步先运行来源选轮、V6/V5 支持和中文开发零样本阶段，再运行六档中文同预算端到端微调。若 25 世界正确臂不能同时显著超过通用和置乱臂，停止迁移主张；若成立，再补相同日程的完整中文文本直接微调强基线。
 
@@ -38,7 +120,7 @@ Updated: 2026-09-03
 
 `2026-09-02` 已返回的 LaBSE 直接中文微调 V1 是真实的端到端更新，不是冻结向量后只训练逻辑回归；完整 500 世界开发结果中 FT-base 平均精确率为 `0.113548`，FT-joint 为 `0.853724`。但它从通用 LaBSE 开始，不包含 401 条真实英文马甲标签学到的神经任务表示，因此只能作为中文目标监督诊断，不能回答英文能力迁移。固定五轮还使低数据档只有 10／35／65／160 次更新。约 3.825 GB 的同步结果已按用户要求删除，代码和上述结论边界保留。
 
-`2026-09-02` 英文初始化微调 V1 后来已在 Linux 完成。旧 401 对训练拟合平均精确率 `0.967273`；中文开发通用初始化／英文初始化平均精确率为 `0.117627／0.117037`，主差值 `-0.000590`，没有来源增益。随后旧英文源数据又确认存在克隆和身份串污染，因此这轮只能记录为旧边界阴性诊断，不能作为干净迁移的正证据或最终负证据。其 53 个同步文件共 5,717,936,008 字节已在关键散列和结论边界落盘后删除，不得恢复或用于后继训练。完整记录见 `docs/STEP28_V13_V9_4_1_ENGLISH_INITIALIZED_LABSE_FINETUNE_V1_RESULT_20260903.zh.md`。
+`2026-09-02` 英文初始化微调 V1 后来已在 Linux 完成。旧 401 对训练拟合平均精确率 `0.967273`；中文开发通用初始化／英文初始化平均精确率为 `0.117627／0.117037`，主差值 `-0.000590`，没有来源增益。随后旧英文源数据又确认存在克隆和身份串污染，因此这轮只能记录为旧边界阴性诊断，不能作为干净迁移的正证据或最终负证据。其 53 个同步文件共 5,717,936,008 字节已在关键散列和结论边界落盘后删除，不得恢复或用于后继训练。完整记录见 `docs/STEP28_ENGLISH_INITIALIZED_LABSE_FINETUNE_RESULT_20260903.zh.md`。
 
 `2026-09-01` 迁移主张修复 V4 已完成第一阶段。旧 V3 的 M2 与五个 M1 共用冻结英文 M0，因此原比较只证明正确中文身份历史优于错配身份历史。新增同容量 I0/T1 对照显示：仅使用33项中文身份历史的 I0 开发平均精确率 `0.811532`，加入英文 M0 的 T1 为 `0.746970`；T1−I0 为 `-0.064562`，9,999次按世界重抽样的百分之九十五区间为 `[-0.068876,-0.060245]`。在 5／25／50／125／500 个训练世界上差值始终为负，当前没有英文来源能力带来主要排序收益或低资源优势的证据。审核甲乙真值读取仍为零，旧审核甲真值评价暂停。
 
@@ -52,13 +134,13 @@ Updated: 2026-09-03
 
 `2026-08-30` 清理后第二版当前回归已在提交 `cabcf106579d64b8ca6020bf0678ac8285e9a13e` 上闭合：发现 919 项，移出 34 项 V9.1 历史冻结测试后计划 885 项；20 项由既有类级封闭边界逐标识登记为未启动，实际启动 865 项，858 项正常通过、7 项逐测试跳过，另有 1 条类级准备跳过事件，失败／错误为 0／0。结果 SHA-256 为 `e05ebc8a318c83d255c243543eeea56074f77e8fd02190b7e01929a63abebf80`。该结果只证明清理后的当前合同没有破坏，不授权训练或审核真值解封。
 
-以下按日期保存的旧段落是历史流水记录；出现冲突时，以本节最上方的 2026-08-31 状态和 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 为准。
+以下按日期保存的旧段落是历史流水记录；出现冲突时，以本节最上方的 2026-08-31 状态和 `docs/AI_RESEARCH_HANDOFF.zh.md` 为准。
 
-`2026-07-20` Step28-v5, v6/v6.1 and v11 are withdrawn. V5 coupled English labels to synthetic labels; v6 reused v5 identities and collapsed to 14 states; v11 then used audit labels to remove 49 conflicting audit states, mixed model-discrimination gates with production-guard abstention, retained three all-zero features, and overstated cross-version state novelty. The current line is the post-audit corrected v12 synthetic replication plus the fully separate v12.1 existing-data application. V12 retains all 1,280 audit rows and gives each of 842 observable states total weight one; no audit label selects audit rows. Train/development/audit contain 1,453/658/842 states and all 33 retained features have rank 33. Full-history AUC/AP is 0.749634/0.767197 versus direct-history 0.693435/0.693269, AP gain +0.073928. The 199 block-permutation null is 0.498092 ± 0.054469 with plus-one p=0.005. Recipe checks now use one vote per unique state and explicitly separate five model-discrimination mechanisms from eleven production-guard abstention mechanisms; passing the latter is not called model classification success. This is only a corrected replication inside the fixed synthetic generator family, not universal unseen-state or real-world validation. V12.1 independently excludes all 1,259 reviewed pair UIDs and scores 2,689 existing unlabeled candidates; 101 corrections are nonzero and all are negative, so positive correction, internal queue and blind packet counts are zero. Dry full replay passes 37/37 checks, including complete model/199-permutation replay; current Windows CPU contract checks pass 22/22 before final manifest closure. Current report: `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`.
+`2026-07-20` Step28-v5, v6/v6.1 and v11 are withdrawn. V5 coupled English labels to synthetic labels; v6 reused v5 identities and collapsed to 14 states; v11 then used audit labels to remove 49 conflicting audit states, mixed model-discrimination gates with production-guard abstention, retained three all-zero features, and overstated cross-version state novelty. The current line is the post-audit corrected v12 synthetic replication plus the fully separate v12.1 existing-data application. V12 retains all 1,280 audit rows and gives each of 842 observable states total weight one; no audit label selects audit rows. Train/development/audit contain 1,453/658/842 states and all 33 retained features have rank 33. Full-history AUC/AP is 0.749634/0.767197 versus direct-history 0.693435/0.693269, AP gain +0.073928. The 199 block-permutation null is 0.498092 ± 0.054469 with plus-one p=0.005. Recipe checks now use one vote per unique state and explicitly separate five model-discrimination mechanisms from eleven production-guard abstention mechanisms; passing the latter is not called model classification success. This is only a corrected replication inside the fixed synthetic generator family, not universal unseen-state or real-world validation. V12.1 independently excludes all 1,259 reviewed pair UIDs and scores 2,689 existing unlabeled candidates; 101 corrections are nonzero and all are negative, so positive correction, internal queue and blind packet counts are zero. Dry full replay passes 37/37 checks, including complete model/199-permutation replay; current Windows CPU contract checks pass 22/22 before final manifest closure. Current report: `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md`.
 
-`2026-07-19` Step27-v1 is frozen as an invalid engineering run rather than a scientific negative result. A source-contract audit found that v1 serialized seller fields with artificial section headers and re-encoded the canonical real Chinese profiles, whereas Step15-v7/Step24 used a values-only newline serialization and the already frozen identifier-redacted E5 cache. The resulting source feature was therefore not an exact replay of the frozen English Step24 scorer, so the observed Step27 failure could not distinguish an ineffective augmentation method from a shifted input representation. The isolated repair is Step27-v1.1 under `schema/step27_v1_1_exact_replay_policy.json`, `scripts/run_step27_v1_1_exact_replay_linux_20260719.sh`, and output root `reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/`. The original v1 policy, runner and output namespace remain unchanged as historical audit evidence, but the current shared Step27/Step12 Python modules implement v1.1 contracts and therefore do not directly re-execute v1; numerical v1 reproduction requires its original Git commit.
+`2026-07-19` Step27-v1 is frozen as an invalid engineering run rather than a scientific negative result. A source-contract audit found that v1 serialized seller fields with artificial section headers and re-encoded the canonical real Chinese profiles, whereas Step15-v7/Step24 used a values-only newline serialization and the already frozen identifier-redacted E5 cache. The resulting source feature was therefore not an exact replay of the frozen English Step24 scorer, so the observed Step27 failure could not distinguish an ineffective augmentation method from a shifted input representation. The isolated repair is Step27-v1.1 under `schema/step27_exact_replay_policy.json`, `scripts/run_step27_exact_replay_linux_20260719.sh`, and output root `reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/`. The original v1 policy, runner and output namespace remain unchanged as historical audit evidence, but the current shared Step27/Step12 Python modules implement v1.1 contracts and therefore do not directly re-execute v1; numerical v1 reproduction requires its original Git commit.
 
-Step27-v1.1 is deliberately a post-hoc engineering-integrity diagnostic, not a new confirmatory experiment. Canonical real seller embeddings are now selected byte-for-byte from the frozen Step15-v7 cache, reconstructed real clean text must reproduce the Step24 train-corpus hash, and real E5 pair cosine must reproduce the frozen Step24 feature within `5e-13`. The Step24 sync manifest, policy, clean-text manifest, pair-feature summary, Chinese pair CSV and source artifact are pinned by independent SHA-256 values, so a mutually drifted reference bundle cannot self-certify. Before parent generation, the Linux runner performs a hash-only preflight requiring the local E5 directory fingerprint to equal the fingerprint that produced the frozen real cache; mismatch requires restoration of that exact model snapshot and cannot be bypassed. The semantic policy, v7 redaction policy and both encoder producers are independently SHA-256 pinned, and feature manifests must match current shared-dependency hashes. A mandatory S0 control scores every row directly with the frozen English source artifact and fits no Chinese parameters; its train-universe ROC-AUC/AP must reproduce `0.7550015233065909 / 0.6443826343928266`. M2 must also meet the `-0.01 AP` component-bootstrap non-inferiority margin against S0 that was frozen before the v1.1 repair replay, in addition to beating M1 duplication and M0 real-only controls; this margin was not preregistered in v1. Synthetic UIDs are versioned from policy, transformed rows must show nonzero recomputed feature displacement, all configured variants must materialize under the no-op fail-closed contract, parent clean text must replay the v7 contract before transformation, and each synthetic cache now reports tokenizer truncation prevalence. Because the defect was diagnosed after prior development results were seen, v1.1 may score only seller-component-grouped train OOF. Even a passing technical gate cannot reopen the existing valid/test: the scoring CLI checks authorization and canonical gate path before split I/O, Step12 rejects non-OOF post-hoc modes before input-manifest construction, and the sync manifest rejects any such artifact. Current shared modules also refuse the invalid legacy v1 policy; historical numerical v1 replay requires its original Git commit. Step12 metrics/comparisons/summary are closed by a completion manifest. A passing replay can only authorize replication on a new frozen development batch. Windows checks currently pass: Python compilation and `47/47` Step27 contract tests. Full repair rationale: `docs/STEP27_V1_1_SOURCE_CONTRACT_REPAIR_20260719.zh.md`. Numerical encoding/training remains Linux-only.
+Step27-v1.1 is deliberately a post-hoc engineering-integrity diagnostic, not a new confirmatory experiment. Canonical real seller embeddings are now selected byte-for-byte from the frozen Step15-v7 cache, reconstructed real clean text must reproduce the Step24 train-corpus hash, and real E5 pair cosine must reproduce the frozen Step24 feature within `5e-13`. The Step24 sync manifest, policy, clean-text manifest, pair-feature summary, Chinese pair CSV and source artifact are pinned by independent SHA-256 values, so a mutually drifted reference bundle cannot self-certify. Before parent generation, the Linux runner performs a hash-only preflight requiring the local E5 directory fingerprint to equal the fingerprint that produced the frozen real cache; mismatch requires restoration of that exact model snapshot and cannot be bypassed. The semantic policy, v7 redaction policy and both encoder producers are independently SHA-256 pinned, and feature manifests must match current shared-dependency hashes. A mandatory S0 control scores every row directly with the frozen English source artifact and fits no Chinese parameters; its train-universe ROC-AUC/AP must reproduce `0.7550015233065909 / 0.6443826343928266`. M2 must also meet the `-0.01 AP` component-bootstrap non-inferiority margin against S0 that was frozen before the v1.1 repair replay, in addition to beating M1 duplication and M0 real-only controls; this margin was not preregistered in v1. Synthetic UIDs are versioned from policy, transformed rows must show nonzero recomputed feature displacement, all configured variants must materialize under the no-op fail-closed contract, parent clean text must replay the v7 contract before transformation, and each synthetic cache now reports tokenizer truncation prevalence. Because the defect was diagnosed after prior development results were seen, v1.1 may score only seller-component-grouped train OOF. Even a passing technical gate cannot reopen the existing valid/test: the scoring CLI checks authorization and canonical gate path before split I/O, Step12 rejects non-OOF post-hoc modes before input-manifest construction, and the sync manifest rejects any such artifact. Current shared modules also refuse the invalid legacy v1 policy; historical numerical v1 replay requires its original Git commit. Step12 metrics/comparisons/summary are closed by a completion manifest. A passing replay can only authorize replication on a new frozen development batch. Windows checks currently pass: Python compilation and `47/47` Step27 contract tests. Full repair rationale: `docs/STEP27_SOURCE_CONTRACT_REPAIR_20260719.zh.md`. Numerical encoding/training remains Linux-only.
 
 Step27 的关键中文证据切片仍然欠充分：`valid` 只有 `4` 条 direct positive、`0` 条 component-anchor positive 和 `3` 条 public-noise negative；回顾性 internal test 相应为 `21/1/6`。这些 slice gates 只能作为 fail-closed 开发检查，不能作为具有充分统计功效的论文证据。若 Step27 通过内部晋级，Step20 必须在冻结配置后建设并一次性评估扩大上述切片的 Step27-specific prospective holdout。
 
@@ -68,13 +150,13 @@ Step27 的关键中文证据切片仍然欠充分：`valid` 只有 `4` 条 direc
 
 `2026-07-18` work moved to isolated branch `method/step26-frozen-authorship-bridge`. A full re-audit found that the strongest Step24 number (`source-only semantic+style AP=0.802718`) was measured only on Chinese canonical train D0, while corrected Step15-v8 was measured on a separate `120`-row representative-valid and `200`-row internal-test boundary. The values were therefore not directly comparable. Step26A now fills that missing experiment without fitting a new model: it blindly replays v7 identifier redaction, encodes exactly the corrected valid/test sellers with the two frozen Step24 authorship encoders, applies the immutable English-only LR/L2 standardization and coefficients, and only then joins Chinese labels and the exact frozen v8 B0/clean/contextual pair scores. The primary gate uses representative-valid AP, component-grouped paired bootstrap and scale-invariant template/public-noise top-budget intrusion; internal test is diagnostic only and Step20 remains mandatory. Eight contract tests, Python compilation and all three config-only entry points pass on Windows; no numerical encoding or real evaluation was run locally. Protocol: `docs/STEP26_FROZEN_AUTHORSHIP_BRIDGE_PLAN_20260718.zh.md`; Linux entry point: `scripts/run_step26_frozen_authorship_bridge_linux_20260718.sh`.
 
-`2026-07-18` Step25-v3.1 completed on Linux and synchronized as a valid closed solver-repair bundle. The manifest binds `9` payloads (`1,527,262` bytes) and `26` producers; all local SHA-256, aggregate hashes and the manifest hash reproduce. All `44/44` constrained C0-C3 fits terminate only at KKT tolerance, with maximum projected-gradient residual `2.10e-9`, and both pair-feature CSVs are byte-identical to old v3. Independent CSV replay reproduces all twelve ROC-AUC/AP rows, with no duplicate pair, component-fold conflict or direction violation. The correctly converged result confirms the method failure: C2-minus-C0 AP is `-0.058346` on English grouped OOF, `-0.030238` on source-only Chinese and `-0.028093` on Chinese target grouped OOF; target bootstrap CI is `[-0.092698, 0.020856]`. Template-clone mean-rank/top-decile/violation deltas worsen by `+0.026923/+0.036364/+0.048097`; only `2/11` gates pass. C2 is now frozen as a strict negative result, with no D1, publication or Step11/17 promotion. Detailed audit: `docs/STEP25_V3_1_RESULT_AUDIT_20260718.zh.md`.
+`2026-07-18` Step25-v3.1 completed on Linux and synchronized as a valid closed solver-repair bundle. The manifest binds `9` payloads (`1,527,262` bytes) and `26` producers; all local SHA-256, aggregate hashes and the manifest hash reproduce. All `44/44` constrained C0-C3 fits terminate only at KKT tolerance, with maximum projected-gradient residual `2.10e-9`, and both pair-feature CSVs are byte-identical to old v3. Independent CSV replay reproduces all twelve ROC-AUC/AP rows, with no duplicate pair, component-fold conflict or direction violation. The correctly converged result confirms the method failure: C2-minus-C0 AP is `-0.058346` on English grouped OOF, `-0.030238` on source-only Chinese and `-0.028093` on Chinese target grouped OOF; target bootstrap CI is `[-0.092698, 0.020856]`. Template-clone mean-rank/top-decile/violation deltas worsen by `+0.026923/+0.036364/+0.048097`; only `2/11` gates pass. C2 is now frozen as a strict negative result, with no D1, publication or Step11/17 promotion. Detailed audit: `docs/STEP25_RESULT_AUDIT_20260718.zh.md`.
 
 `2026-07-18` the post-Step25 plan freezes further D0 model search. A read-only Step26 paper-evidence audit comes first, followed by a new score-blind, seller-component-disjoint D1 only if at least `30` direct/component positives and the preregistered hard-negative slices can be independently reviewed. If D1 readiness cannot be reached, the project pivots to an evidence-type concept-drift dataset/negative-results paper rather than weakening positive labels or tuning another model on D0. Plan: `docs/NEXT_RESEARCH_PLAN_AFTER_STEP25_20260718.zh.md`.
 
 `2026-07-18` the returned Step25-v3 bundle passed synchronization and score-replay checks but was invalidated as a final scientific result by a solver-termination defect. All `9/9` payloads (`1,499,625` bytes) and `21/21` producer hashes matched, all twelve ROC-AUC/AP rows reproduced exactly from the `401` English and `573` Chinese predictions, and there was no duplicate pair, component-fold conflict, valid/test access or supervision leakage. The produced C2 scores failed the method gates: source-only/target-OOF/English-OOF AP deltas versus C0 were `-0.030203/-0.027580/-0.058026`; target bootstrap CI was `[-0.092019, 0.021403]`; template-negative mean-rank/top-decile/violation deltas were `+0.026907/+0.036364/+0.047780`; only `2/11` gates passed. However, artifacts marked every fit converged even though final projected-gradient residuals reached `0.52` against the frozen `1e-8` tolerance. Root cause: the v3 solver accepted relative-loss stagnation as an alternative convergence condition. After v3.1 reproduced byte-identical features and established the correctly converged result, the invalid `v3_copy_aware_dual_channel_20260718` output directory was deleted; only the historical diagnostic record remains.
 
-`2026-07-18` repair work moved to isolated branch `fix/step25-v3-1-solver-convergence`. Step25-v3.1 changes only numerical solution and termination for the identical convex constrained LR/L2 objective. Feature sets, C0-C3 matrix, directions, `L2=10`, factorized weights, component folds, bootstrap, gates, missingness closure and operational control remain byte-level or value-level frozen. Relative loss is diagnostic only. A low-dimensional active-set projected Newton direction with Armijo backtracking is used because plain projected gradient stalled at `2.3e-6` after 10,000 iterations on a collinear regression test. `solver_converged=true` requires final KKT/projected-gradient residual `<=1e-8`; maximum-iteration or line-search stagnation fails closed. Artifacts persist termination reason, objective, gradient norm, KKT residual, relative loss and accepted step; the sync manifest independently requires all `44` repaired C0-C3 fits to satisfy KKT and requires both English/Chinese pair-feature CSVs to be byte-identical to v3. Eleven repair tests, Python compilation, four config-only preflights and Git-Bash runner syntax passed before Linux execution. Linux execution is now complete under `reports/step25_template_decontaminated_authorship/v3_1_solverfix_20260718/`, with the frozen negative result recorded above; detailed contract: `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`.
+`2026-07-18` repair work moved to isolated branch `fix/step25-v3-1-solver-convergence`. Step25-v3.1 changes only numerical solution and termination for the identical convex constrained LR/L2 objective. Feature sets, C0-C3 matrix, directions, `L2=10`, factorized weights, component folds, bootstrap, gates, missingness closure and operational control remain byte-level or value-level frozen. Relative loss is diagnostic only. A low-dimensional active-set projected Newton direction with Armijo backtracking is used because plain projected gradient stalled at `2.3e-6` after 10,000 iterations on a collinear regression test. `solver_converged=true` requires final KKT/projected-gradient residual `<=1e-8`; maximum-iteration or line-search stagnation fails closed. Artifacts persist termination reason, objective, gradient norm, KKT residual, relative loss and accepted step; the sync manifest independently requires all `44` repaired C0-C3 fits to satisfy KKT and requires both English/Chinese pair-feature CSVs to be byte-identical to v3. Eleven repair tests, Python compilation, four config-only preflights and Git-Bash runner syntax passed before Linux execution. Linux execution is now complete under `reports/step25_template_decontaminated_authorship/v3_1_solverfix_20260718/`, with the frozen negative result recorded above; detailed contract: `docs/STEP25_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`.
 
 `2026-07-18` the original Step25-v3 scientific design remains a direct, preregistered continuation of the Step25 copy-decontamination line, not a replacement for frozen v1/v2. It retains raw authorship style and adds pair-local-clean style, raw-minus-clean residuals and label-free copy-risk statistics as separate low-dimensional channels. The fixed primary C2 constrains raw/clean similarities nonnegative and copy residual/risk nonpositive; C0/C1/C3 remain fixed controls and no candidate search is permitted. D0 reads canonical train only, never valid/test, and can at most nominate a future D1 replication; publication promotion and Step11/17 entry remain hard false.
 
@@ -100,7 +182,7 @@ Step24 implementation remains frozen in `schema/step24_content_independent_autho
 
 `2026-07-17` the first Linux Step23-v2 run synchronized completely (`11` manifest-bound payloads, `37,068,947` bytes; all local size/SHA-256 checks passed), but its numerical result is invalidated by an implementation defect discovered during result audit. All `65,514/65,514` raw train items were marked `cross_field_redaction_applied=true`, so every selected item lost its title/description exact-overlap hashes. Root cause: the second-pass wrapper collapsed field-separating newlines before comparing text, and ordinary whitespace normalization was mistaken for an identifier match. The invalid run's preregistered primary also failed strongly (`OOF AP 0.394450` versus matched aggregate `0.582612`; delta `-0.188162`), but it cannot be used as the final representation conclusion until the feature defect is corrected. Step23-v2.1 fixes only trigger detection by requiring an actual regex/literal match, adds a regression contract, and writes to `reports/step23_item_multi_instance/v2_1_20260717/`; model sets, grouped folds, weights, primary model and gates remain frozen. No synthetic data are introduced. Linux entry point: `scripts/run_step23_item_multi_instance_v2_1_linux_20260717.sh`.
 
-`2026-07-17` a second code/scientific audit superseded the unexecuted Step23-v1 draft and created `method/step23-v2-matched-controls`. V1 had two attribution defects: cross-field identifier redaction blanked title/description hashes that were also used for seller-local deduplication, collapsing distinct items in the same category; and its aggregate baseline came from the older seller-profile corpus rather than the exact Step23 item set. V2 separates final-redacted-text deduplication from exact-overlap eligibility and compares a preregistered `aggregate_plus_distribution_primary` only against a `same_item_aggregate_control` built from the identical selected items. Fixed diagnostics include mean-pool-only, structure-only and semantic-distribution-without-count controls; every model has an English source-only counterpart. There is no candidate selection. Promotion is internal-development-only and requires `>=0.02 AP`, grouped-bootstrap lower bound `>=0`, no AP regression on non-silver or direct/component sensitivity slices, no material direct/component positive score loss, and bounded mean/q95/top-decile score increases on template/topic negatives. The primary all-train LR/L2 artifact, imputation, standardization, feature order and every OOF fold artifact are persisted; a label-blind frozen-feature scorer is provided for later representative-valid/Step20 use. Current Chinese train still contains `213/229` silver positives, so all-label OOF remains secondary development evidence and cannot replace a prospective holdout. Numerical execution remains Linux-only; current protocol: `docs/STEP23_ITEM_LEVEL_MULTI_INSTANCE_V2_20260717.zh.md`.
+`2026-07-17` a second code/scientific audit superseded the unexecuted Step23-v1 draft and created `method/step23-v2-matched-controls`. V1 had two attribution defects: cross-field identifier redaction blanked title/description hashes that were also used for seller-local deduplication, collapsing distinct items in the same category; and its aggregate baseline came from the older seller-profile corpus rather than the exact Step23 item set. V2 separates final-redacted-text deduplication from exact-overlap eligibility and compares a preregistered `aggregate_plus_distribution_primary` only against a `same_item_aggregate_control` built from the identical selected items. Fixed diagnostics include mean-pool-only, structure-only and semantic-distribution-without-count controls; every model has an English source-only counterpart. There is no candidate selection. Promotion is internal-development-only and requires `>=0.02 AP`, grouped-bootstrap lower bound `>=0`, no AP regression on non-silver or direct/component sensitivity slices, no material direct/component positive score loss, and bounded mean/q95/top-decile score increases on template/topic negatives. The primary all-train LR/L2 artifact, imputation, standardization, feature order and every OOF fold artifact are persisted; a label-blind frozen-feature scorer is provided for later representative-valid/Step20 use. Current Chinese train still contains `213/229` silver positives, so all-label OOF remains secondary development evidence and cannot replace a prospective holdout. Numerical execution remains Linux-only; current protocol: `docs/STEP23_ITEM_LEVEL_MULTI_INSTANCE_20260717.zh.md`.
 
 `2026-07-16` Step23-v1 item-level multi-instance verification was implemented on `method/step23-item-level-multi-instance` but was not numerically executed. It is retained only in Git history as the superseded implementation draft described above; its old runner and v1 output contract are not active on the v2 branch.
 
@@ -143,7 +225,7 @@ Step24 implementation remains frozen in `schema/step24_content_independent_autho
 - independent code review found and the implementation now fixes four additional integrity defects: supplemental URL controls materialize two-sided risk occurrences and must pass pair-level occurrence-state checks; V3 artifact tests run only against the newly materialized root rather than silently reading V2; Step20 self-hash covers the assignment CSV hash; and new control candidates use `evidence_expert_control` scope. Platform vendor IDs are also reservation keys, preventing a repeated vendor from crossing control splits in future expansion;
 - corrected local verification discovers `50` Step15-v8 tests: `43` static/real-input contracts pass and `7` V3 artifact tests are explicitly deferred until Linux materialization. The combined v6/v7/v8 suite discovers `99`, executes `92` successfully and defers the same `7`. The real frozen-input contract reaches public `valid/train=20/20`, direct `20/30` and component `15/10` without seller/component overlap. The Linux runner re-executes all V8 tests with `STEP15_V8_READINESS_ROOT` bound to V3 after publication. No model encoding, feature generation, training, threshold selection or numerical experiment was run on Windows;
 - the current Linux entry point is still `scripts/run_step15_v8_readiness_linux_20260715.sh`, but it now publishes isolated roots `readiness_expansion_v3_20260715` and `bridge_v8_readiness_v3_20260715`. V2 is never overwritten or silently reused;
-- detailed correction audit: `docs/STEP15_V8_V2_POSTRUN_AUDIT_AND_V3_CORRECTION_20260715.zh.md`; readiness protocol: `docs/STEP16_V8_READINESS_EXPANSION_PROTOCOL_20260715.zh.md`; method design: `docs/STEP15_V8_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md`.
+- detailed correction audit: `docs/STEP15_POSTRUN_AUDIT_AND_CORRECTION_20260715.zh.md`; readiness protocol: `docs/STEP16_READINESS_EXPANSION_PROTOCOL_20260715.zh.md`; method design: `docs/STEP15_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md`.
 
 The clean Linux v3 run described above is complete and failed promotion. Step16I integrity, retrospective Dev2 preparation, two isolated AI reviews and owner-authorized Codex adjudication are now complete. The resulting Dev2 is suitable only for retrospective hard-negative stress analysis. Step20 and Step11/17 publication promotion remain blocked; the next valid evaluation advance requires a frozen model followed by new prospective raw data and per-row human verification.
 
@@ -168,7 +250,7 @@ The following records the initial blocked pilot that motivated the completed ups
 - all v8 outputs are isolated under `reports/step15_v8/<run_id>/`; existing run IDs refuse overwrite, and a content-addressed return-sync manifest binds every artifact;
 - the Step20 one-time lock is isolated by v8 run ID and must bind the exact Step15-v8 model-freeze SHA-256 plus one-time/frozen-before-unseal declarations. A stale lock cannot release Step11/17;
 - Windows validation now includes Python syntax compilation, Git-Bash runner syntax checks, config-only entry points, nineteen pure synthetic contract tests (`19/19` pass), the score-blind queue-only build and the explicitly disclosed agent-assisted pilot above. No model encoding, model training or numerical performance experiment was run on Windows;
-- Linux queue-only runner: `scripts/run_step16_v8_validation_queue_linux_20260714.sh`; reviewed-refreeze runner: `scripts/run_step16_v8_validation_refreeze_linux_20260714.sh`; full model runner: `scripts/run_step15_v8_linux_20260714.sh`; detailed design: `docs/STEP15_V8_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md`.
+- Linux queue-only runner: `scripts/run_step16_v8_validation_queue_linux_20260714.sh`; reviewed-refreeze runner: `scripts/run_step16_v8_validation_refreeze_linux_20260714.sh`; full model runner: `scripts/run_step15_v8_linux_20260714.sh`; detailed design: `docs/STEP15_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md`.
 
 This pilot found readiness valid `4/3/0` and train `5/0/0`, so the original run was correctly blocked. That conclusion is superseded by the 2026-07-15 Step4/v7 expansion and isolated freeze above; it remains useful as provenance showing that additional reviews alone did not manufacture the later coverage.
 
@@ -177,7 +259,7 @@ This pilot found readiness valid `4/3/0` and train `5/0/0`, so the original run 
 `2026-07-14` Step15-v7 v2 identifier-redacted two-stage/prospective code path and source-level static audit are complete; Python syntax checks, contract tests, data preflight and all numerical runs remain reserved for Linux:
 
 - active branch: `method/step15-v7-two-stage-prospective`;
-- Step15-v6 is frozen as a strict negative result through `schema/step15_v6_negative_freeze.json`; its selected M4 result and Step12 `promotion.eligible=false` artifacts are hash-bound and cannot be overwritten by v7;
+- Step15-v6 is frozen as a strict negative result through `schema/step15_negative_freeze.json`; its selected M4 result and Step12 `promotion.eligible=false` artifacts are hash-bound and cannot be overwritten by v7;
 - the legacy Chinese test is permanently downgraded to `internal_development_test`. No v7 model, augmentation mode, threshold or reliability rule may be selected from its metrics;
 - a score-blind representative validation overlay recomputes seller connected components over all eligible Chinese supervision. Development preflight expects 12 complete train components to move, producing `train 523 = 183 positive / 340 negative`, `valid 170 = 76 positive / 94 negative`, and `internal development test 200 = 50 positive / 150 negative`, with seller/component overlap `0`; Linux must reproduce these counts in the formal manifest;
 - representative valid now contains `18` direct-identifier positives across `10` components, `16` component-anchor positives across `5` components, and `6` public-contact/URL negatives across `2` components. It also retains soft positives, ordinary negatives, semantic-topic negatives and template-clone negatives;
@@ -194,8 +276,8 @@ This pilot found readiness valid `4/3/0` and train `5/0/0`, so the original run 
 - development lineage inspection found `0` eligible prospective candidates: `1,016` current rows were already reviewed and all remaining `2,841` candidates predate v7 freeze. They cannot be repackaged as a new final holdout. Linux must reproduce this diagnosis, and new post-freeze Chinese raw data is required;
 - Windows is used only for source edits, static inspection and Git/sync management. No v7 script or model is to be executed on Windows; syntax, contracts, data lineage and all numerical results are verified by the Linux runners;
 - all v2 outputs are path-isolated under `v2_identifier_redacted_20260714` or Step20 `*_v2` stage directories, so no v1/v6/v5 artifact can be overwritten or interpreted under a different feature dimension;
-- Linux core runner: `scripts/run_step15_v7_linux_20260714.sh`; Step20 staged runner: `scripts/run_step20_prospective_holdout_linux_20260714.sh`;
-- detailed design and interpretation rules: `docs/STEP15_V7_TWO_STAGE_PROSPECTIVE_DESIGN_20260714.zh.md`.
+- Linux core runner: `scripts/run_step15_linux_20260714.sh`; Step20 staged runner: `scripts/run_step20_prospective_holdout_linux_20260714.sh`;
+- detailed design and interpretation rules: `docs/STEP15_TWO_STAGE_PROSPECTIVE_DESIGN_20260714.zh.md`.
 - completed workspace cleanup record: `docs/WORKSPACE_CLEANUP_AUDIT_20260714.md`; a separate cleanup removed `95` obsolete temporary/rejected-probe files (`126,239,312` bytes, about `120.4 MiB`) without deleting any active v7 input, frozen result, manifest-bound artifact or publication control.
 - the cleanup also retired the two tracked Step11 archive dry-run inventories after removing their active documentation reference. Current Step11 auditing remains manifest/explicit-allow-list only and continues to resolve model CSVs from each summary's `output_paths`.
 - the first Linux v7 attempt stopped safely at Stage `[4/8]` before model loading or cache publication: single-pass redaction normalized whitespace only after scanning, which could expose a cue-handle pattern that had exceeded a regex spacing bound during the first scan. Seller `market_item.xlsx|Lime|seller_raw:AMAZONSHOP` triggered the post-redaction fail-closed assertion; this is a redaction-closure defect, not a bad-label or model result.
@@ -223,7 +305,7 @@ The next evidence is the clean Linux v7 run. Its internal-development metrics mu
 - Step12 remains a CPU workload. Its 150-200-row sorting, component indexing and branching tasks are too small for a CUDA rewrite to be efficient, while the server's 24 physical cores match the 24 independent worker limit;
 
 - active branch: `method/step15-v6-paper-hardening`;
-- the synchronized v5r run is frozen as `internal-dev-v5r-20260711` in `reports/manifests/step15_internal_dev_v5r_20260711.json`; all 44 referenced summary/policy/output files exist and are SHA-256 recorded;
+- the synchronized v5r run is frozen as `internal-dev-v5r-20260711` in `reports/manifests/step15_internal_dev_20260711.json`; all 44 referenced summary/policy/output files exist and are SHA-256 recorded;
 - current Chinese `test = 200 = 50 positive / 150 negative` is explicitly downgraded to a fixed internal-development test, not a prospective final holdout;
 - Step4 code defines `candidate_rule_count_non_identifier`; the v6 isolated builder materializes it from the field when present or deterministically derives it from frozen `candidate_rule_hits`. The v6 runner does not rebuild canonical Step4/Step7/evidence-label files, and the frozen universe remains EN `6683`, ZH strict `3857`, ZH aux `580`;
 - old corpus-relative IDF, boilerplate/rarity and percentile features were transductive because they used complete language pools. v6.4 recomputes all 18 such fields from frozen train sellers only (EN `582`, ZH `676`) and applies the frozen references to valid/internal-test/Step11 rows. In-memory full-data validation preserves all pair UIDs and every semantic-score hash;
@@ -251,7 +333,7 @@ The next evidence is the clean Linux v7 run. Its internal-development metrics mu
 - the 11-stage Linux core runner compiles the synchronized scripts and reruns all 80 contract tests before training. It blocks manifest creation until `step15_validate_v6_outputs.py` proves complete experiment/phase/seed coverage, all fixed update counts, exact M4/M4c Phase0-3 valid predictions and artifact parameters, M4-only Phase4 mixup, selected-only M5 test output, and complete source-only runs. It ends at Step12; the separate promotion-gated Step11 runner recompiles the graph/audit scripts, performs graph validation and only then generates Step13;
 - no Windows model training was performed. Full Linux runner: `scripts/run_step15_v6_linux_20260711.sh`; post-promotion Step11 runner: `scripts/run_step11_v6_after_promotion_20260711.sh`.
 
-Detailed implementation record: `docs/STEP15_V6_PAPER_HARDENING_IMPLEMENTATION_20260711.zh.md`.
+Detailed implementation record: `docs/STEP15_PAPER_HARDENING_IMPLEMENTATION_20260711.zh.md`.
 
 Linux synchronization requirements for the v6.4 rerun:
 
@@ -265,7 +347,7 @@ Linux synchronization requirements for the v6.4 rerun:
 
 - active repair branch: `fix/step15-weighted-same-domain-mixup`;
 - legacy v5 artifacts and the synchronized `2026-07-10` metrics remain untouched as the pre-fix comparison;
-- new experiments use distinct `step15_v5r_*` names and write `reports/step15_v5r_weighted_mixup_summary.json`, so the rerun cannot overwrite v5 results;
+- new experiments use distinct `step15_v5r_*` names and write `reports/step15_weighted_mixup_summary.json`, so the rerun cannot overwrite v5 results;
 - Phase 4 now admits only positive parents with `training_sample_weight >= 0.55`, `usable_for_core_transfer = 1`, `core_transfer_eligible = 1`, and confident evidence type;
 - parent selection is restricted to the same real language domain and same evidence type, then to one of the five nearest eligible positive neighbors;
 - synthetic rows inherit `min(parent_weight_left, parent_weight_right)` instead of defaulting to `1.0`;
@@ -274,7 +356,7 @@ Linux synchronization requirements for the v6.4 rerun:
 - domain-balanced v5r computes class, evidence-type, and row-quality weights first, then equalizes effective mass across only `en_content_train_pool` and `zh_target_strict`; unknown pseudo-domains such as `cross_domain_mixup` are rejected;
 - Step 12 now has isolated v5r Phase3-vs-Phase4, v5r-vs-v5, raw-E5, and domain-vs-non-domain paired comparisons with new `20260711` output paths;
 - four focused unit tests pass: same-domain/evidence parent enforcement and discrete-feature preservation, inherited parent weight, effective domain-mass equality, pseudo-domain rejection, and legacy-domain replay compatibility;
-- `scripts/step15_validate_v5r_outputs.py` adds a post-training fail-fast check over all six Phase-4 artifacts/manifests before Step 12 runs;
+- `scripts/step15_validate_outputs.py` adds a post-training fail-fast check over all six Phase-4 artifacts/manifests before Step 12 runs;
 - no Windows model experiment was run. The next evidence must come from the Linux three-seed rerun.
 
 Linux synchronization incident and repair:
@@ -594,9 +676,9 @@ Interpretation rule before Linux results return:
   - output token: `step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean`
 - Step 11 computes the Step 15 ensemble threshold from the three seed-aligned `zh_valid_predictions` files, rather than averaging per-seed thresholds. This keeps the graph threshold tied to the frozen validation split and avoids using `zh_test` for graph-threshold selection.
 - The Step 15 policy now defaults to a v5 public-contact/URL noise stress configuration and writes separate v5 outputs, so v2/v3/v4 artifacts are preserved and not overwritten:
-  - `reports/step15_v5_public_noise_weighted_summary.json`
-  - `reports/step15_v5_slice_level_audit.json`
-  - `reports/step15_v5_slice_level_audit.csv`
+  - `reports/step15_public_noise_weighted_summary_85d6a05f.json`
+  - `reports/step15_slice_level_audit_9f801ae1.json`
+  - `reports/step15_slice_level_audit_4bb492f9.csv`
   - Step 12 default outputs now use `reports/step12_v5_statistical_robustness_*_20260603.*`
 - Code changes:
   - `scripts/step15_train_incremental_hard_negative.py` now supports per-evidence-type identity-loss multipliers.
@@ -620,8 +702,8 @@ Interpretation rule before Linux results return:
 - Scientific interpretation before graph validation: v5 materially reduces the public-contact/URL false-positive slice compared with the dangerous v2 domain-balanced failure mode and gives the strongest current fixed-test point estimate. It can support a cautious claim of improved ROC-AUC over the Step 9 E5 mixup baseline, but it still cannot be described as a statistically robust improvement over raw E5 or v2 Step 15 across all metrics.
 - Step 11 graph validation has now been rerun on Linux and synchronized back. The validation audit was generated with explicit `--summary` allow-list inputs, not by globbing `reports/`, and the audit records `summary_selection_mode = explicit`.
 - The six accepted Step 11 validation summaries are:
-  - `step11_step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
-  - `step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
+  - `step11_step15_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
+  - `step11_step15_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json`
   - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json`
   - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321_clustering_summary.json`
   - `step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_clustering_summary.json`
@@ -635,8 +717,8 @@ Interpretation rule before Linux results return:
   - `core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322`: selected threshold `0.720528`; `345` pre-filter edges, `267` after relation reliability, `258` after reciprocal top-k, `61` after shared-neighbor pruning; `12` primary clusters, largest size `7`.
   - `core_zero_shot_bge_m3`: selected threshold `0.483444`; `1425` pre-filter edges, `1165` after relation reliability, `1005` after reciprocal top-k, `197` after shared-neighbor pruning; `43` primary clusters, largest size `7`.
 - The explicit cluster-level validation audit is:
-  - `reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv`
-  - `reports/step11_cluster_level_audit.step15_v5_validation_20260603.json`
+  - `reports/step11_cluster_level_audit.step15_validation_20260603.csv`
+  - `reports/step11_cluster_level_audit.step15_validation_20260603.json`
   - `input_summary_count = 6`, `primary_cluster_count_total = 100`, `unique_cluster_set_count = 79`.
   - decision counts: `same_controller_high_confidence = 0`, `same_controller_core_with_possible_expansion = 0`, `partial_anchor = 5`, `template_clone_not_controller = 33`, `semantic_topic_not_controller = 35`, `uncertain = 6`.
   - confidence counts: `low = 74`, `medium = 5`.
@@ -662,12 +744,12 @@ Interpretation rule before Linux results return:
   - Step 15 phase4 now documents that `use_negative_mixup` is only a phase capability flag; negative mixup is applied only when the selected experiment also enables `experiments.<name>.negative_mixup.enabled`.
 - `2026-06-06` Step 13 was regenerated against the latest explicit Step 11 v5 validation audit:
   - runner: `scripts/step13_concept_drift_audit.py`
-  - explicit Step 11 audit input: `reports/step11_cluster_level_audit.step15_v5_validation_20260603.json`
+  - explicit Step 11 audit input: `reports/step11_cluster_level_audit.step15_validation_20260603.json`
   - outputs:
-    - `reports/step13_concept_drift_audit.step15_v5_validation_20260606.json`
-    - `reports/step13_concept_drift_audit.step15_v5_validation_20260606.csv`
-    - `docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP15_V5_VALIDATION_20260606.md`
-  - integrity: the new Step 13 summary records `step11_selection_mode = explicit` and `step11_audit_path = reports\step11_cluster_level_audit.step15_v5_validation_20260603.json`; no `current_*` auto-discovery or `reports/` glob was used.
+    - `reports/step13_concept_drift_audit.step15_validation_20260606.json`
+    - `reports/step13_concept_drift_audit.step15_validation_20260606.csv`
+    - `docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP15_VALIDATION_20260606.md`
+  - integrity: the new Step 13 summary records `step11_selection_mode = explicit` and `step11_audit_path = reports\step11_cluster_level_audit.step15_validation_20260603.json`; no `current_*` auto-discovery or `reports/` glob was used.
   - Step 13 now includes synchronized Step 15 v5 prediction ensembles in the fixed `zh_test` slice audit. The current all-test readings in the Step 13 table are:
     - raw E5: ROC-AUC `0.806723`, AP `0.520573`
     - Step 9 E5 LR/L2 positive-pair mixup 100pct seed mean: ROC-AUC `0.842017`, AP `0.588995`
@@ -679,12 +761,12 @@ Interpretation rule before Linux results return:
 
 - Active branch: `method/step15-v2-curriculum-audit`.
 - The first-pass Step 15 result remains preserved under the original `step15_e5_*` experiment namespace and original `reports/step15_incremental_hard_negative_summary.json`.
-- V2 experiments now use a separate `step15_v2_*` namespace and write the main training summary to `reports/step15_v2_incremental_hard_negative_summary.json`, avoiding old/new result overwrites.
+- V2 experiments now use a separate `step15_v2_*` namespace and write the main training summary to `reports/step15_incremental_hard_negative_summary_68edc05d.json`, avoiding old/new result overwrites.
 - The Step 15 runner now refuses to run legacy `step15_e5_*` experiments by default because those names write the original first-pass artifact/prediction paths. An intentional legacy rerun must pass `--allow-legacy-output-overwrite`.
 - Step 12 v2 robustness outputs now default to:
-  - `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
-  - `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`
-  - `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
+  - `reports/step12_statistical_robustness_zh_test_20260602.json`
+  - `reports/step12_statistical_robustness_model_metrics_20260602.csv`
+  - `reports/step12_statistical_robustness_paired_comparisons_20260602.csv`
 - Linux Step 15 v2 and Step 12 v2 outputs are now synchronized back. The full Step 15 v2 matrix completed `135` runs (`9` experiments x `5` phases x `3` seeds), with all expected artifacts and fixed `zh_valid` / `zh_test` predictions present.
 - The strongest clean Step 15 v2 point estimate is `step15_v2_domain_balanced_phase4_seed_mean`: ROC-AUC `0.901401`, AP `0.714371` on the fixed `zh_test = 106` split.
 - The clean primary `step15_v2_identity_from_scratch_phase4_seed_mean` improves over raw E5 in point estimate, but Step 12 v2 paired bootstrap still does not support a statistically robust positive difference: ROC-AUC diff `+0.082913`, CI `[-0.076627, 0.250000]`; AP diff `+0.178725`, CI `[-0.176207, 0.466066]`.
@@ -1010,14 +1092,14 @@ Boundary-expansion status:
 
 The corrected V3 queue was built from the then-current calibrated-default Step 11 primary graph before the cleanup was applied:
 
-- policy: `schema/step5_v3_targeted_review_policy.json`
-- builder: `scripts/step5_build_targeted_review_queue_v3.py`
+- policy: `schema/step5_independent_targeted_review_policy.json`
+- builder: `scripts/step5_build_independent_targeted_review_queue.py`
 - Step 11 summary: `reports/step11_core_calibrated_default_clustering_summary.json`
 - scored pairs: `reports/step11_core_calibrated_default_zh_target_strict_scored_pairs.csv`
 - cluster CSV: `reports/step11_core_calibrated_default_zh_target_strict_clusters.threshold_0800000.csv`
-- review queue: `reports/step5_zh_target_strict_targeted_review_queue.step11_calibrated_default_v3.csv`
-- rereview queue: `reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_default_v3.csv`
-- summary: `reports/step5_v3_targeted_review_queue_summary.calibrated_default.json`
+- review queue: `reports/step5_zh_target_strict_independent_targeted_review_queue.step11_calibrated_default.csv`
+- rereview queue: `reports/step5_zh_target_strict_independent_targeted_rereview_queue.step11_calibrated_default.csv`
+- summary: `reports/step5_independent_targeted_review_queue_summary.calibrated_default.json`
 
 Current rebuilt V3 queue diagnostics:
 
@@ -1037,8 +1119,8 @@ After the corrected cleanup and refreshed freeze, a new Step 11 rerun no longer 
 
 Corrected calibrated-default cleanup and freeze:
 
-- cleanup policy: `schema/step5_v3_targeted_cleanup_policy.calibrated_default_20260420.json`
-- cleanup summary: `reports/step5_v3_targeted_cleanup_summary.calibrated_default_20260420.json`
+- cleanup policy: `schema/step5_independent_targeted_cleanup_policy.calibrated_default_20260420.json`
+- cleanup summary: `reports/step5_independent_targeted_cleanup_summary.calibrated_default_20260420.json`
 - reviewer id: `codex_step5_v3_calibrated_default_rereview_20260420`
 - changed rows: `65`
 - reviewed labels applied: `2 positive / 35 negative / 28 uncertain`
@@ -1380,7 +1462,7 @@ The active evidence currently supports:
 - `core_few_shot_multilingual_e5_large_lr_l2_ratio_50pct` is the current clean Step 11 discovery candidate family; `core_few_shot_bge_m3_residual_lr_ratio_100pct` and `core_few_shot_labse_lr_l2_ratio_100pct` are current clean controls
 - `core_zero_shot_bge_m3` remains the conservative zero-shot anchor/control and now falls back to its pairwise selected graph threshold `0.483444`
 - Step 11 dynamic Step 9 candidate filtering is backend-aware, so residual/logistic scorer artifacts are not rejected by LightGBM-only iteration guards
-- Step 12 fixed-test robustness audit now exists: `scripts/step12_statistical_robustness_audit.py` with policy `schema/step12_statistical_robustness_policy.json`; current outputs are `reports/step12_v2_statistical_robustness_zh_test_20260602.json`, `reports/step12_v2_statistical_robustness_model_metrics_20260602.csv`, and `reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv`
+- Step 12 fixed-test robustness audit now exists: `scripts/step12_statistical_robustness_audit.py` with policy `schema/step12_statistical_robustness_policy.json`; current outputs are `reports/step12_statistical_robustness_zh_test_20260602.json`, `reports/step12_statistical_robustness_model_metrics_20260602.csv`, and `reports/step12_statistical_robustness_paired_comparisons_20260602.csv`
 - Step 12 keeps fixed `zh_test = 106` rows (`21` positive / `85` negative) and uses grouped bootstrap over `39` Step 5 split components; it does not mix `zh_train`, `zh_valid`, and `zh_test`
 - RABot-inspired method branches are now encoded for the next rerun: Step 9 positive-pair mixup as training-only minority regularization, and Step 11 relation reliability filtering as a deterministic spurious-edge control
 - targeted Step 5 boundary-expansion and positive-anchor routes now exist for testing whether a larger Chinese support/test boundary helps few-shot adaptation
@@ -1422,7 +1504,7 @@ Implementation status:
 - branch: `method/step25-v2-pair-local-copy-diagnostic`
 - policy: `schema/step25_v2_pair_local_copy_diagnostic_policy.json`
 - Linux runner: `scripts/run_step25_v2_pair_local_copy_linux_20260717.sh`
-- detailed design: `docs/STEP25_V2_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`
+- detailed design: `docs/STEP25_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`
 - Linux execution and synchronization are complete; the closed manifest binds `19` payloads (`44,963,636` bytes) and `17` producer files
 
 Scientific purpose:
@@ -1470,7 +1552,7 @@ Implementation status:
 - branch: `method/step25-v3-copy-aware-dual-channel`
 - policy: `schema/step25_v3_copy_aware_dual_channel_policy.json`
 - Linux runner: `scripts/run_step25_v3_copy_aware_dual_channel_linux_20260718.sh`
-- detailed protocol: `docs/STEP25_V3_COPY_AWARE_DUAL_CHANNEL_PLAN_20260718.zh.md`
+- detailed protocol: `docs/STEP25_COPY_AWARE_DUAL_CHANNEL_PLAN_20260718.zh.md`
 - Windows static validation: Python compilation pass, `15/15` contract tests pass, four config-only entry points pass and Linux shell syntax passes under Git Bash
 - numerical execution: completed on Linux and synchronized; score replay passed, but the result is invalidated for final interpretation because non-KKT fits were incorrectly marked converged
 
@@ -1507,19 +1589,19 @@ The current Step28 mainline has restarted as v1.12 without restoring any deleted
 
 The receipt SHA-256 is `d21964a248e1138e65a654262e026c8c1457f8500e4915dbf5b83cdaba09d243`; its status is `PASS_DESIGN_ONLY_NO_FORMAL_AUTHORIZATION`. The repository suite now reports 396 tests: 389 passed, 7 declared skips, and 0 failures in 809.034 seconds.
 
-This is not a released synthetic dataset. Formal seed/key access, formal rows, scientific metrics, and model training remain zero. The formal seed ceremony, four-split generator, release/custody path, and full-input numerical optimizer preflight must still be implemented and frozen before a one-shot formal run can be authorized. See `docs/STEP28_V13_V1_12_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`.
+This is not a released synthetic dataset. Formal seed/key access, formal rows, scientific metrics, and model training remain zero. The formal seed ceremony, four-split generator, release/custody path, and full-input numerical optimizer preflight must still be implemented and frozen before a one-shot formal run can be authorized. See `docs/STEP28_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`.
 
 ## Step28-v13 v1.12 Terminal Quality Failure (2026-08-09)
 
 V1.12 later completed the one-shot seed ceremony and generated finalized train and development stages: 500 worlds and 189,000 complete pairs per split, plus five train M1 structural rewires. The only joint quality audit failed before writing any quality receipt, quality marker, publication, or model result. Exact localization found 22 train and 13 development `{title, description}` document hashes intersecting the successful historical v1.2 release, plus 7 and 3 within-split duplicate item-document occurrences. All train/development cross-split frozen-set intersections and failed-identity-hash intersections were zero.
 
-V1.12 is permanently terminated and cannot be waived, regenerated, or reused. Its 378,000 formal staged pair rows were never published or training-qualified. The terminal receipt, 25-entry lineage manifest, and hash-only exclusion archive have raw SHA-256 values `03aa550ec695cd21c98771edf1fb91fd105e869c318be6cff3b468900c8ca31f`, `bfaa540c3634c54c92ced2f1a01d3281ffc9bf4fb8d95f641c22e7df062b4f96`, and `b29e2e7dc46921aa3f9d1f7e03d9e75baabde5093dd3fb63b93fd3bc9c19eb01`. The successor is v1.13, which must freeze label-blind collision registries for both item documents and five-field seller documents before any new seed ceremony. See `docs/STEP28_V13_V1_12_TERMINAL_FAILURE_AND_CLEANUP_20260809.zh.md`.
+V1.12 is permanently terminated and cannot be waived, regenerated, or reused. Its 378,000 formal staged pair rows were never published or training-qualified. The terminal receipt, 25-entry lineage manifest, and hash-only exclusion archive have raw SHA-256 values `03aa550ec695cd21c98771edf1fb91fd105e869c318be6cff3b468900c8ca31f`, `bfaa540c3634c54c92ced2f1a01d3281ffc9bf4fb8d95f641c22e7df062b4f96`, and `b29e2e7dc46921aa3f9d1f7e03d9e75baabde5093dd3fb63b93fd3bc9c19eb01`. The successor is v1.13, which must freeze label-blind collision registries for both item documents and five-field seller documents before any new seed ceremony. See `docs/STEP28_TERMINAL_FAILURE_AND_CLEANUP_20260809.zh.md`.
 
 The terminal archive was committed as `48bca5c6208130a5a266bb55a9d9898b1e4ba6ab` and revalidated before cleanup. The failed private staging, consumed seed custody, browser cache, and empty run directory were then removed: 111 files and 1,887,149,059 bytes. The cleanup receipt raw SHA-256 is `06fe76bf1fe93f913439b6aebd68f469912e832a4c597814010f7ccbfff253e2`, with canonical self-hash `1eff3fe8db684594e4e93eb4ef3be8157ec1ccf0900c965c72457b5d4643eab8`. V1.12 formal execution is now permanently closed.
 
 ## Step28-v13 v1.13 Visible-Document Collision Contract (2026-08-09)
 
-The v1.13 design contract is now frozen at `docs/STEP28_V13_V1_13_VISIBLE_DOCUMENT_COLLISION_CONTRACT_20260809.zh.md` (17,811 bytes; SHA-256 `0f1906a8be46be3d3cdf16738814e0c83192e97299d162857b71ca585208eca6`). It introduces a candidate-independent structure and identity parent, exact-document-collision-only retry semantics, immutable Step3 contributor provenance, per-world no-replace commit markers, deterministic split sealing, exact historical registry pins, row-level multiplicity gates, and seller-level post-selection shortcut attacks.
+The v1.13 design contract is now frozen at `docs/STEP28_VISIBLE_DOCUMENT_COLLISION_CONTRACT_20260809.zh.md` (17,811 bytes; SHA-256 `0f1906a8be46be3d3cdf16738814e0c83192e97299d162857b71ca585208eca6`). It introduces a candidate-independent structure and identity parent, exact-document-collision-only retry semantics, immutable Step3 contributor provenance, per-world no-replace commit markers, deterministic split sealing, exact historical registry pins, row-level multiplicity gates, and seller-level post-selection shortcut attacks.
 
 The pinned style-profile attestation independently confirms that all seven `title_missing` quantiles are numeric zero; its raw SHA-256 is `ee3e84ac0ed111027c41ff1760db29935f6473b1b244445b51085fd7a4daf326` and canonical self-hash is `be951a3e6ee1c4cca58f26ca4b1a5658c0105adabcf66706c492a21f5f2bdaa8`. The browser reviewer closed the initial 2 Blocker, 3 High, and 2 Medium findings, then closed three final implementation ambiguities with `Blocker 0 / High 0 / Medium 0 / Low 0` and `V1.13 DOCUMENT COLLISION CONTRACT FINAL GO`.
 
@@ -1527,7 +1609,7 @@ This is design authorization only. No v1.13 implementation, seed, capability, fo
 
 ## Step28-v13 v1.13 Collision Primitives (2026-08-09)
 
-The first implementation stage is complete. The design-only policy is `schema/step28_v13_v1_13_document_collision_policy.json` (12,084 bytes; SHA-256 `2331ccbcf4c08171204f86fbe44a430780d11967b944e72996b707de2c9cca99`; canonical self-hash `d993ad7252789eee341f8875b6a11cd757234c9e07da1ec71fe620bec3a740a9`). All six formal authorizations remain false. The pure implementation is `scripts/step28_v13_v1_13_document_collision.py` (34,480 bytes; SHA-256 `5cb1907ed6d15ea52cdc0b35069fdff1cc651dca2b570debbb53ee77a8f9d4d4`).
+The first implementation stage is complete. The design-only policy is `schema/step28_document_collision_policy.json` (12,084 bytes; SHA-256 `2331ccbcf4c08171204f86fbe44a430780d11967b944e72996b707de2c9cca99`; canonical self-hash `d993ad7252789eee341f8875b6a11cd757234c9e07da1ec71fe620bec3a740a9`). All six formal authorizations remain false. The pure implementation is `scripts/step28_document_collision.py` (34,480 bytes; SHA-256 `5cb1907ed6d15ea52cdc0b35069fdff1cc651dca2b570debbb53ee77a8f9d4d4`).
 
 The item serializer now directly implements the frozen `json.dumps` byte contract; the seller serializer implements the exact five-field strip/drop/newline contract. The multiplicity gate rejects duplicate registry rows instead of silently collapsing them. The historical replay recomputes successful-v1.2 public rows and validates the failed-v1.12 archive, producing 302,944 forbidden item-document hashes, 84,000 seller-document hashes, 999,996 identity hashes, six exact UID-hash registries, and 37 consumed commitments. The loader is intentionally uncached.
 
@@ -1535,7 +1617,7 @@ The reviewer initially found 2 High, 3 Medium, and 1 Low issues. All implementat
 
 ## Step28-v13 v1.13 Candidate Parent and Trial Identity (2026-08-10)
 
-The second implementation stage is reviewer-final. `schema/step28_v13_v1_13_candidate_parent_policy.json` is 8,158 bytes (SHA-256 `b550fbb0579e84a46f896b9f39fb29edeec64021d32d61eff94c42b63f768b26`; canonical self-hash `2c35e235b90a38f317b194cccda66a049767c68eb40cd3c44e439268e9c732ed`). `scripts/step28_v13_v1_13_candidate_parent.py` is 57,236 bytes (SHA-256 `b700265b7791866587f685cdda24d1f299849a0397209dc14fec27c754831e84`). The v1.13-only remapper is 13,854 bytes (SHA-256 `a85ff8460c86c339489beb1ca5101e16b955e09c22b95dcc965e8662604f249b`). It is restricted to one in-memory development-smoke world and has no formal-custody, candidate-text, seed, row, model, or metric path.
+The second implementation stage is reviewer-final. `schema/step28_candidate_parent_policy.json` is 8,158 bytes (SHA-256 `b550fbb0579e84a46f896b9f39fb29edeec64021d32d61eff94c42b63f768b26`; canonical self-hash `2c35e235b90a38f317b194cccda66a049767c68eb40cd3c44e439268e9c732ed`). `scripts/step28_candidate_parent.py` is 57,236 bytes (SHA-256 `b700265b7791866587f685cdda24d1f299849a0397209dc14fec27c754831e84`). The v1.13-only remapper is 13,854 bytes (SHA-256 `a85ff8460c86c339489beb1ca5101e16b955e09c22b95dcc965e8662604f249b`). It is restricted to one in-memory development-smoke world and has no formal-custody, candidate-text, seed, row, model, or metric path.
 
 The immutable parent binds the 28-seller/378-pair structure, registered override and noise targets, structural identity plan, six effective style factors per seller, and private contributor positions for the five frozen Step3 fields. The provenance replay records support item UIDs, first position, aggregation role and output rank; description signatures additionally bind the first item, extracted-segment ordinal, seller document frequency, and the contributing-seller-set digest. It stores no contribution text and proves that public Step3 profile bytes are unchanged.
 
@@ -1543,7 +1625,7 @@ The parent builder has no caller-selected inputs and revalidates the actual temp
 
 ## Step28-v13 v1.13 Restricted View and Natural Variation (2026-08-10)
 
-The third implementation stage is reviewer-final and remains restricted to one pinned in-memory development-smoke world. `schema/step28_v13_v1_13_natural_variation_policy.json` is 8,227 bytes (SHA-256 `f66290e6d95628d133da0f1eef55f53b82a6f884b67909340a5f235b8be1186b`; canonical self-hash `23dfa4b3b489d9af4ed27a253446ee5e107cc87ef39e4fab0e5131ab5a034777`). The independent pure renderer is 27,637 bytes (SHA-256 `de61f3e83fdb6f0c67a70cd629e0c93a3b8099c0bb50e81bb117c5698c8c1cb0`); the trusted host is 69,849 bytes (SHA-256 `5ba93638765b3988e78462f962a5d29c0190df63b3bcdf0b5666983ad93c30d5`).
+The third implementation stage is reviewer-final and remains restricted to one pinned in-memory development-smoke world. `schema/step28_natural_variation_policy.json` is 8,227 bytes (SHA-256 `f66290e6d95628d133da0f1eef55f53b82a6f884b67909340a5f235b8be1186b`; canonical self-hash `23dfa4b3b489d9af4ed27a253446ee5e107cc87ef39e4fab0e5131ab5a034777`). The independent pure renderer is 27,637 bytes (SHA-256 `de61f3e83fdb6f0c67a70cd629e0c93a3b8099c0bb50e81bb117c5698c8c1cb0`); the trusted host is 69,849 bytes (SHA-256 `5ba93638765b3988e78462f962a5d29c0190df63b3bcdf0b5666983ad93c30d5`).
 
 The pure renderer accepts only a restricted anonymous view and a 32-byte candidate key, imports only the standard library, and has no policy, filesystem, world, history, label, controller, identity, override, clone, or semantic-mechanism authority. Registered overrides and exact title clones remain private to the trusted assembler. The assembler rebuilds the sole canonical view and binding, rederives the candidate key, redraws and exactly compares the candidate, and verifies full-state commitments that cover every field of both the candidate parent and the frozen trial-identity parent before any redraw. All non-completing paths, including `KeyboardInterrupt` and `SystemExit`, poison the session and prevent candidate skipping.
 
@@ -1555,7 +1637,7 @@ The browser reviewer first reported 0 Blocker, 4 High, 2 Medium, and 1 Low; afte
 
 Stage 4A is reviewer-final and remains a single-world, in-memory development smoke. The strengthened natural policy is 8,227 bytes (SHA-256 `eb24f5ac99ffadb278ff6ec0ccad1a25d44d74818bf242d27f277fe6449e6fb0`; canonical self-hash `562dce55d87f39b87b80dad8060bf16130c801213c22a89f70bf249932e665bf`), and the trusted natural host is 82,103 bytes (SHA-256 `6f49f3c9e1ed322195a9a541a2960d25bd64f50a6d823c0c0c3a9f44fdae9e5b`). It now proves exact-title-clone source/target eligibility, registration order, earlier endpoint non-use, matching negative-flag lineage, and parent roots before candidate zero is observable, without adding those private facts to the restricted renderer view.
 
-The candidate-selection policy is `schema/step28_v13_v1_13_candidate_selection_policy.json` (6,355 bytes; SHA-256 `ddce84eeaf8c5e74067efacf497426c682acd14b62c13e87deb5ab8e53ebe6a0`; canonical self-hash `32f8a431311eba03e97068dc3b4597a24e4befe8867dd8311dde755c580a783d`). The selector is 49,420 bytes (SHA-256 `73888224e44b606c6204d002397c2cec986c9d61d60222fdada56e5d1d048a55`), and its 31-test contract file is 32,424 bytes (SHA-256 `1c8d4f51b6f6075586a49d7c516b961c3d944a45e8f13ec45349f44bdbac16e8`). Each frozen-input key is bound to one canonical path as well as exact size and hash.
+The candidate-selection policy is `schema/step28_candidate_selection_policy.json` (6,355 bytes; SHA-256 `ddce84eeaf8c5e74067efacf497426c682acd14b62c13e87deb5ab8e53ebe6a0`; canonical self-hash `32f8a431311eba03e97068dc3b4597a24e4befe8867dd8311dde755c580a783d`). The selector is 49,420 bytes (SHA-256 `73888224e44b606c6204d002397c2cec986c9d61d60222fdada56e5d1d048a55`), and its 31-test contract file is 32,424 bytes (SHA-256 `1c8d4f51b6f6075586a49d7c516b961c3d944a45e8f13ec45349f44bdbac16e8`). Each frozen-input key is bound to one canonical path as well as exact size and hash.
 
 The zero-argument selector renders candidates in order under one frozen identity allocation. It independently replays production redaction and the final five-field seller profiles before hashing documents. Only exact item/seller collisions within the world, historical registries, the current split, or predecessor splits permit retry; all other closure failures poison the selector before the next candidate. Duplicate documents are classified before the accepted-level 105-item/28-seller multiplicity gates.
 
@@ -1573,11 +1655,11 @@ Stage 4B code is reviewer-final for one pinned `development_smoke / audit_a / wo
 
 The stable lock precedes temporary-root creation, recovery reads, and candidate selection. World members and marker, seven deterministic final projections, split seal, cleanup, and recovery are all no-replace and fail closed. Pre-seal recovery replays production documents against the Stage 4A golden; post-seal recovery independently derives the expected state from fixed `render(0)`. Unknown entries, link substitution, stale-pending state mismatches, marker bool/int substitutions, synchronized final/seal/receipt tampering, and cleanup-member resurrection are rejected without deleting evidence.
 
-The official entry is `python -I -S -B scripts/step28_v13_v1_13_source_guard.py --focused-tests`. It rejects startup hooks, project bytecode and preloaded project modules, verifies the policy plus guard/source/test bytes, and compiles the verified source bytes. Import order is isolated stdlib, third-party packages, then canonical project scripts; each frozen project module must still resolve to its exact pinned source before first import. User-site dependencies are explicitly reintroduced on this Windows development host, may depend on OS environment, are not byte-pinned, and require a separate formal environment attestation. Ordinary `unittest` discovery neither includes nor certifies the Stage 4B focused contracts. The heavy contract refuses execution before any import unless the guard supplies both its fixed module name and private execution sentinel.
+The official entry is `python -I -S -B scripts/step28_source_guard.py --focused-tests`. It rejects startup hooks, project bytecode and preloaded project modules, verifies the policy plus guard/source/test bytes, and compiles the verified source bytes. Import order is isolated stdlib, third-party packages, then canonical project scripts; each frozen project module must still resolve to its exact pinned source before first import. User-site dependencies are explicitly reintroduced on this Windows development host, may depend on OS environment, are not byte-pinned, and require a separate formal environment attestation. Ordinary `unittest` discovery neither includes nor certifies the Stage 4B focused contracts. The heavy contract refuses execution before any import unless the guard supplies both its fixed module name and private execution sentinel.
 
 The final authoritative focused run passed 60 tests in 370.870 seconds with one declared Windows symlink-permission skip; the latest 114 Stage 1–4A regression passed in 244.212 seconds. A real isolated smoke reached `SEALED_CLEANUP_COMPLETE` and left zero project `.pyc` files and zero smoke temporary directories. Nine browser review rounds finally closed discovery-wrapper bytecode takeover, discovery-time cache conflicts, platform-specific skip parsing, and direct heavy-contract execution. The final verdict was `Blocker 0 / High 0 / Medium 0 / Low 0` and `IMPLEMENTATION CODE GO, EXTERNAL ANCHOR PENDING`. Ordinary repository discovery intentionally excludes the 60 authoritative contracts; it ran 602 tests in 1681.523 seconds, with 594 passing, 7 existing skips, 1 failure, and no errors. The sole failure remained the frozen Step28-v12.1 manifest requiring the 219,186-byte progress document seen at run start to equal its 199,490-byte historical snapshot; there was no new v1.13 failure.
 
-The implementation bundle is fixed by parent commit `dbafb62f91a51b057b5a4846b8028de4076c7c1c` and tree `c7ea90eafe62b0682722e87bf780bf2adab95358`. Its successor commit carries `docs/STEP28_V13_V1_13_SPLIT_TRANSACTION_IMPLEMENTATION_REVIEW_20260810.zh.md`, which independently pins that parent identity and the four exact artifacts without being read by the policy, guard, implementation, or tests. This closes implementation provenance only. Formal seeds, capabilities, candidates, rows, quality receipts, models, and metrics remain zero. This stage does not authorize a formal 500-world run, seed ceremony, dataset generation, or training.
+The implementation bundle is fixed by parent commit `dbafb62f91a51b057b5a4846b8028de4076c7c1c` and tree `c7ea90eafe62b0682722e87bf780bf2adab95358`. Its successor commit carries `docs/STEP28_SPLIT_TRANSACTION_IMPLEMENTATION_REVIEW_20260810.zh.md`, which independently pins that parent identity and the four exact artifacts without being read by the policy, guard, implementation, or tests. This closes implementation provenance only. Formal seeds, capabilities, candidates, rows, quality receipts, models, and metrics remain zero. This stage does not authorize a formal 500-world run, seed ceremony, dataset generation, or training.
 
 ## Step28-v13 v1.13 Scientific Multi-World Builder (2026-08-11)
 
@@ -1627,7 +1709,7 @@ The root status is `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`, with `scientific_
 
 v3 没有运行 104 世界审计，也没有产生质量结果、模型或指标。网页端 GPT-5.6 Sol Pro 独立复算本轮附件字节并追踪调用链后，给出阻断级 4、高级 3、中级 2、低级 0，最终为“不允许运行”。永久关闭的 v3 边界为：策略 SHA-256 `bdb6178d1b87b766ab14706c5e97e24087dcda16729ee92d9c86130a97991d62`、规范自哈希 `76d942244d2d8c71a7019879eea13867073c01a8a90213d382c822e52c234f99`，反事实／质量／测试 SHA-256 依次为 `1c1756712ee3cdd9d56998825f47409a3f6a316d4fb81e6488d59f9c5877bce0`、`717fbed3d29dbca831420b852863586bcea4d1e658c8d372fae57ff7bcdf6c2d`、`2f4b24bf16fa738eaa582c1f9b11e29dc7c41af864947f470ae2c047ea7a4e70`。
 
-阻断根因是 F 空槽率特征左右不对称、7 视图／14 模型没有机器合同修订件、审核甲乙真实私有字面精确扫描不闭合，以及 P 血缘行字段验证不完整。另须补审核私有文件的纯字节完整性、真实的失败分类和数据处置、对应行为测试、外部启动锚及三路径逐世界对齐回执。已新增 `STEP28_V13_V1_13_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md` 作为 v4 待实现权威；它不授权运行。当前固定置换不得重抽，104 世界设计数据仍仅作待审输入，正式种子、正式数据、模型和指标仍全部为零。
+阻断根因是 F 空槽率特征左右不对称、7 视图／14 模型没有机器合同修订件、审核甲乙真实私有字面精确扫描不闭合，以及 P 血缘行字段验证不完整。另须补审核私有文件的纯字节完整性、真实的失败分类和数据处置、对应行为测试、外部启动锚及三路径逐世界对齐回执。已新增 `STEP28_QUALITY_AUDIT_C_AMENDMENT_20260811.zh.md` 作为 v4 待实现权威；它不授权运行。当前固定置换不得重抽，104 世界设计数据仍仅作待审输入，正式种子、正式数据、模型和指标仍全部为零。
 
 ## Step28-v13 v1.13 质量审计 v4 运行前终审否决（2026-08-11）
 
@@ -1711,7 +1793,7 @@ v6 已关闭 v5 的两个阻断级、三个高级、四个中级和一个低级�
 
 审计完成 104／104 世界逐行重放后确定失败。元数据最大单特征为卖家编号摘要端点差 `absdiff__seller_uid_digest_02`，对称曲线下面积 `0.5220111731843576`，超过冻结 `0.52` 上限；文本反事实审计整体也未通过。文本最大单特征为空白字符数端点差，数值 `0.5198248863636363`，其本身未超过单特征门，因此不能把它单独认定为文本失败原因。v7 最小失败回执没有保留其余文本硬门的诊断标量，只保留结果哈希；后继版本必须补足小型门级诊断，不得猜测或复原完整失败载荷。
 
-实现按冻结纪律报告 `DATASET_INVALIDATED`，正式种子 0、正式行 0、训练未开始。先提交失败决定与清理意图，再删除根自哈希 `9baa90828cf459bcee3cc6101c166f6c1084353dd2997e40e5d3d85d29f49d48` 的 104 世界设计数据，最后写入清理完成回执。失败目录只保留 3 份回执、共 8,529 字节；与数据绑定的私有字面登记表随后删除。v7 的数据、登记表、随机权威和结果永久不得重跑或复用。完整边界见 `docs/STEP28_V13_V1_13_QUALITY_AUDIT_V7_TERMINAL_FAILURE_AND_CLEANUP_20260812.zh.md`。
+实现按冻结纪律报告 `DATASET_INVALIDATED`，正式种子 0、正式行 0、训练未开始。先提交失败决定与清理意图，再删除根自哈希 `9baa90828cf459bcee3cc6101c166f6c1084353dd2997e40e5d3d85d29f49d48` 的 104 世界设计数据，最后写入清理完成回执。失败目录只保留 3 份回执、共 8,529 字节；与数据绑定的私有字面登记表随后删除。v7 的数据、登记表、随机权威和结果永久不得重跑或复用。完整边界见 `docs/STEP28_QUALITY_AUDIT_TERMINAL_FAILURE_AND_CLEANUP_20260812.zh.md`。
 
 后续源码审查确认卖家编号来自 `id_key`，控制者分组来自独立的 `structure_key`，没有发现按控制者顺序生成公开编号的直接错误。清理后不读取 v7 数据的简化零信号模拟又显示：复现 28 卖家／12 控制者／378 对、使用 64 个独立代理时，50 世界的 300 次模拟有 `66.3%` 出现最大单特征对称曲线下面积超过 `0.52`；200 世界的 200 次模拟没有超线。这是事后方法诊断，不是 v8 预注册，也没有完整复现 67 项元数据、十四模型和自举门。
 
@@ -1725,7 +1807,7 @@ v6 已关闭 v5 的两个阻断级、三个高级、四个中级和一个低级�
 
 当前未提交修复新增 v8 专用纯渲染器，旧冻结渲染器保持原字节；词表／模板置换在原类内进一步按繁简转换响应和占位依赖细分。宿主完整 13 字段来源多重集仍是最终权威，任何漂移发生在碰撞分类前并终止整个构建。固定训练集序号 69 已在候选 0 直接闭合；四拆分双射／响应闭包、谱系失败先于碰撞、排名重复／缺口／布尔值拒绝、完整谱系摘要持久化和策略声明／渲染器绑定测试均通过，关键定点测试为 6／6。网页端复审判定该方案可进入完整回归，但明确指出组件级繁简响应分组不能冒充所有规范化／分段碰撞的一般性证明；完整宿主谱系硬门不得放宽。
 
-下一步是运行完整 v8 构建合同、冻结新字节并重新取得运行前许可。随机权威、`attempt_index=1`、1004 世界规模和输出根不得变化，不得预览其余未见世界、换盐或以候选回退绕过谱系错误。当前 1004 世界设计根、质量结果、正式种子、正式数据、M0/M1/M2/M3 模型及指标仍全部为零。详细记录见 `docs/STEP28_V13_V1_13_V8_BUILD_EXECUTION_FAILURE_20260812.zh.md`。
+下一步是运行完整 v8 构建合同、冻结新字节并重新取得运行前许可。随机权威、`attempt_index=1`、1004 世界规模和输出根不得变化，不得预览其余未见世界、换盐或以候选回退绕过谱系错误。当前 1004 世界设计根、质量结果、正式种子、正式数据、M0/M1/M2/M3 模型及指标仍全部为零。详细记录见 `docs/STEP28_BUILD_EXECUTION_FAILURE_20260812.zh.md`。
 
 ## Step28-v13 v1.13 v8 构建修复完成本地完整回归（2026-08-12）
 
@@ -1735,7 +1817,7 @@ v8 构建修复的完整合同组首次运行 28 项，其中 27 项通过、1 �
 
 这些结果只说明修复后的准确候选可以进入冻结字节和新的运行前审查，不是 1004 世界构建、数据质量或训练结果。当前仍无 v8 发布数据、质量输出、正式种子、模型或指标；必须由网页端 GPT-5.6 Sol Pro 对最终精确字节重新给出“允许同一权威重建 v8 设计级数据”后，才可复用既定权威重建一次。
 
-网页端 GPT-5.6 Sol Pro 随后对九个最终附件独立复算哈希和策略自哈希，并完成调用链终审：Blocker 0、High 0、Medium 0、Low 1，最后一行明确为“允许同一权威重建v8设计级数据”。唯一 Low 是孤立 train/69 回归没有累计前 69 个世界的 current-dataset 登记表；审查确认这不构成错误成功路径，实际构建仍携带完整登记表并只按精确文档碰撞合法推进候选，不要求在本次重建前修改冻结字节。许可只绑定当前精确字节、attempt 1、同一公开权威、固定 500／500／2／2 和既定输出根；成功仍只能是设计级、禁止训练。外审回执见 `reports/step28_v13_v1_13_scientific_builder/external_review/step28_v13_v1_13_v8_same_authority_rebuild_external_review_go_20260812.txt`。
+网页端 GPT-5.6 Sol Pro 随后对九个最终附件独立复算哈希和策略自哈希，并完成调用链终审：Blocker 0、High 0、Medium 0、Low 1，最后一行明确为“允许同一权威重建v8设计级数据”。唯一 Low 是孤立 train/69 回归没有累计前 69 个世界的 current-dataset 登记表；审查确认这不构成错误成功路径，实际构建仍携带完整登记表并只按精确文档碰撞合法推进候选，不要求在本次重建前修改冻结字节。许可只绑定当前精确字节、attempt 1、同一公开权威、固定 500／500／2／2 和既定输出根；成功仍只能是设计级、禁止训练。外审回执见 `reports/step28_v13_v1_13_scientific_builder/external_review/step28_same_authority_rebuild_external_review_go_20260812.txt`。
 
 ## Step28-v13 v1.13 v8 同一权威重建第二次执行失败（2026-08-13）
 
@@ -1743,7 +1825,7 @@ v8 构建修复的完整合同组首次运行 28 项，其中 27 项通过、1 �
 
 只对已暴露世界进行的顺序内存重放证明，前 29 个世界累计商品／卖家／身份登记数为 2,805／812／2,436。目标世界的 32 个候选均且仅命中一个 v1.12 历史商品文档摘要 `1b27758b380e57e90baf967db68a319540ea7909581d96aab7b4c4953ac03082`；无当前数据、卖家或同世界碰撞。对应商品的全部既有自然变化字段和最终文档在 32 个候选中都只有一个取值，故增加候选次数无效。
 
-根因是标题修饰语没有进入候选键驱动的安全置换，而该商品的其他变化域全为单例。当前 `945a512` 字节永久不再运行。下一步只修复标签隔离的自然表达变化域并新增携带前序登记表的 0 至 29 顺序回归；完整合同与新外审放行前不再构建。正式 500×4 数据、M0／M1／M2／M3 模型和指标仍全部为零。详见 `docs/STEP28_V13_V1_13_V8_SECOND_BUILD_EXECUTION_FAILURE_20260813.zh.md`。
+根因是标题修饰语没有进入候选键驱动的安全置换，而该商品的其他变化域全为单例。当前 `945a512` 字节永久不再运行。下一步只修复标签隔离的自然表达变化域并新增携带前序登记表的 0 至 29 顺序回归；完整合同与新外审放行前不再构建。正式 500×4 数据、M0／M1／M2／M3 模型和指标仍全部为零。详见 `docs/STEP28_SECOND_BUILD_EXECUTION_FAILURE_20260813.zh.md`。
 
 最小修复候选已改为复用生产链原生支持的属性候选字段，不修改生产链、模板或抽象语法树模式。旧安全库把十项属性全部单例化；新候选只允许 `标准版↔组合版`、`轻量版↔更新版` 两个版本类型轨道，其余属性不变。每个二元轨道由现有候选键选择恒等态或交换态；审查时主动撤销了“强制非零轮换”，因为它会退化为所有候选都执行同一个固定交换。映射全局、标签盲、登记表盲；完整简繁结构、跨风格相等关系和 32 个固定测试键覆盖两种映射状态由机器验证。标题修饰语备选因生产抽象语法树／登记模板门正确拒绝而撤销，没有留下代码或数据。
 
@@ -1757,7 +1839,7 @@ v8 构建修复的完整合同组首次运行 28 项，其中 27 项通过、1 �
 
 正确重新启动后，构建器顺序完成训练世界 0 至 158，在训练世界 159、全局位置 160 因 32 个精确文档候选全部碰撞而关闭失败。临时根自动清理，最终根从未发布；没有设计数据、质量结果、正式种子、模型或指标。属性修复让世界 29 在候选 2 闭合，并让世界 140 使用候选 2、世界 156 使用候选 4，但仍不足以覆盖完整设计规模。
 
-当前提交字节不得再次运行。下一步只顺序重放已暴露训练世界 0 至 159，携带真实累计商品、卖家和身份登记表，区分六类精确碰撞并定位共同不变文档；不得预览世界 160 以后、换盐、加候选、删除历史排除或写已知摘要特例。完整记录见 `docs/STEP28_V13_V1_13_V8_THIRD_BUILD_EXECUTION_FAILURE_20260813.zh.md`。正式 500×4、质量审计、真值解封及 M0／M1／M2／M3 训练仍禁止。
+当前提交字节不得再次运行。下一步只顺序重放已暴露训练世界 0 至 159，携带真实累计商品、卖家和身份登记表，区分六类精确碰撞并定位共同不变文档；不得预览世界 160 以后、换盐、加候选、删除历史排除或写已知摘要特例。完整记录见 `docs/STEP28_THIRD_BUILD_EXECUTION_FAILURE_20260813.zh.md`。正式 500×4、质量审计、真值解封及 M0／M1／M2／M3 训练仍禁止。
 
 ## Step28-v13 v1.13 v8 三状态属性修复完成本地回归（2026-08-13）
 
@@ -1771,7 +1853,7 @@ v8 构建修复的完整合同组首次运行 28 项，其中 27 项通过、1 �
 
 三状态修复提交 `90b0391d80d1784f70394ba7128cb2f4a696f1c5` 经网页端终审获准一次同一权威设计构建。运行前精确检出该提交，并确认最终根／临时根不存在及入口合同 3／3 通过。构建顺序完成训练世界 0 至 223，在训练世界 224、全局位置 225 因 32 个精确文档候选全部碰撞而关闭失败；退出码 1，用时 791.8 秒。
 
-异常事务已删除临时根，最终根从未发布。外层工具返回失败后仍有一个同一启动时间的 Python 进程，已按精确进程号终止；终止前后两类输出根均不存在，最终也无残留进程。没有设计数据、质量结果、正式种子、模型或指标。`90b0391` 构建字节永久不得重跑。下一步只能携带真实累计登记表顺序重放已经暴露的训练世界 0 至 224，区分六类精确碰撞并定位目标不变状态；不得预览世界 225 以后、换盐、加候选、删除排除或写已知世界／商品／摘要特例。详细边界见 `docs/STEP28_V13_V1_13_V8_FOURTH_BUILD_EXECUTION_FAILURE_20260813.zh.md`。
+异常事务已删除临时根，最终根从未发布。外层工具返回失败后仍有一个同一启动时间的 Python 进程，已按精确进程号终止；终止前后两类输出根均不存在，最终也无残留进程。没有设计数据、质量结果、正式种子、模型或指标。`90b0391` 构建字节永久不得重跑。下一步只能携带真实累计登记表顺序重放已经暴露的训练世界 0 至 224，区分六类精确碰撞并定位目标不变状态；不得预览世界 225 以后、换盐、加候选、删除排除或写已知世界／商品／摘要特例。详细边界见 `docs/STEP28_FOURTH_BUILD_EXECUTION_FAILURE_20260813.zh.md`。
 
 ## Step28-v13 v1.13 v8 第四次失败最小修复获准重建（2026-08-14）
 
@@ -1779,20 +1861,20 @@ v8 构建修复的完整合同组首次运行 28 项，其中 27 项通过、1 �
 
 旧状态从空登记表顺序重放训练序号 0 至 224，精确复现序号 224 的 32 候选耗尽；新状态从独立空登记表重放相同 225 个世界，序号 224 在候选 0 六类碰撞全空接受，8 条可见商品文本和 8 条私有渲染语法树均实际含“通用版”。旧新共同前缀的结构父投影和 33 项身份历史特征序列逐项相等；序号 0 至 159 的上一轮因果回归仍闭合。v8 完整合同 38／38 通过，用时 2,553.143 秒，两次四拆分小型烟雾构建内容一致；没有设计发布根、正式种子、模型或指标。
 
-网页端 GPT-5.6 Sol Pro 对九个精确附件独立复算，最终判定阻断级 0、高级 0、中等级 0、低等级 3，并明确“允许在同一既有 v8 设计权威下重建 1004 世界设计级数据”。20,983 字节外审回执 SHA-256 为 `a2b0767bd5c689594e1be362d94550ad8a18378759eed3e1f5198fb847741307`。三项低等级建议只涉及测试钉住增强，为保持本次许可精确字节不在重建前修改；必须在正式 500×4 冻结前补强并重新审查。下一步只允许从空登记表、按固定 500／500／2／2 顺序完整重建一次设计级数据；成功也不代表质量通过或训练授权。详细记录见 `docs/STEP28_V13_V1_13_V8_FOURTH_BUILD_MINIMAL_REPAIR_REVIEW_20260814.zh.md`。
+网页端 GPT-5.6 Sol Pro 对九个精确附件独立复算，最终判定阻断级 0、高级 0、中等级 0、低等级 3，并明确“允许在同一既有 v8 设计权威下重建 1004 世界设计级数据”。20,983 字节外审回执 SHA-256 为 `a2b0767bd5c689594e1be362d94550ad8a18378759eed3e1f5198fb847741307`。三项低等级建议只涉及测试钉住增强，为保持本次许可精确字节不在重建前修改；必须在正式 500×4 冻结前补强并重新审查。下一步只允许从空登记表、按固定 500／500／2／2 顺序完整重建一次设计级数据；成功也不代表质量通过或训练授权。详细记录见 `docs/STEP28_FOURTH_BUILD_MINIMAL_REPAIR_REVIEW_20260814.zh.md`。
 
 ## Step28-v13 v1.13 v8 第五次设计构建执行失败（2026-08-14）
 
 获准字节冻结为提交 `5b02cd00af3d2ca2881b58349c61411973711f77` 后，从空登记表运行唯一 design-preflight 命令。训练序号 224 正常越过，说明第四次失败定点修复生效；构建随后完成训练序号 0 至 282，并在训练序号 283、全局位置 284 因 32 个预定义候选全部发生精确文档碰撞而关闭失败。退出码 1，用时 880.4 秒。
 
-事务清理后临时根与最终根均不存在，没有 Python 残留进程；未发布的 283 世界不得恢复或拼接。当前尚未查明序号 283 的具体碰撞类别，不能把它武断归因于与序号 224 相同的属性支持耗尽。提交 `5b02cd0` 的构建字节永久不得重跑。下一步最多只允许携带真实累计登记表顺序、内存重放已暴露的训练序号 0 至 283，先完成六类碰撞诊断，再决定是否存在新的全局因果修复；不得预览序号 284 以后。质量审计、正式 500×4、真值解封和 M0／M1／M2／M3 训练继续禁止。详细记录见 `docs/STEP28_V13_V1_13_V8_FIFTH_BUILD_EXECUTION_FAILURE_20260814.zh.md`。
+事务清理后临时根与最终根均不存在，没有 Python 残留进程；未发布的 283 世界不得恢复或拼接。当前尚未查明序号 283 的具体碰撞类别，不能把它武断归因于与序号 224 相同的属性支持耗尽。提交 `5b02cd0` 的构建字节永久不得重跑。下一步最多只允许携带真实累计登记表顺序、内存重放已暴露的训练序号 0 至 283，先完成六类碰撞诊断，再决定是否存在新的全局因果修复；不得预览序号 284 以后。质量审计、正式 500×4、真值解封和 M0／M1／M2／M3 训练继续禁止。详细记录见 `docs/STEP28_FIFTH_BUILD_EXECUTION_FAILURE_20260814.zh.md`。
 ## 2026-08-14：v9 训练序号 0—283 内存因果回放通过
 
 v9 可见文档容量修复已完成运行前闭包。策略校验、聚焦合同 16 项、候选父合同 25 项、文档碰撞与自然变化合同 58 项均通过；网页端 GPT-5.6 Sol Pro 对最小运行许可包复核后给出四级问题均为 0，并明确允许一次训练序号 0—283 的内存因果回放。
 
 唯一回放用时 851 秒、退出码 0，连续处理 284 个训练世界。未来训练世界、开发／审核世界、写入数据行、正式种子、模型和指标均为 0。28,692 个商品代码与 28,692 个商品文档一一闭合，7,952 个卖家文档闭合；284 个世界全部在候选 0 接受，六类精确碰撞总数均为 0。目标训练序号 283 只检查候选 0 即通过。最终规范结果对象摘要为 `ad42b965467a3cfb1e280a6ec9c36ead92507e8017ec4b9437014eca4b509a0f`。
 
-该结果只证明 v8 已暴露序号 283 的文档容量缺陷被结构性消除，不是数据质量、无捷径、正式生成或训练结果。下一步是在任何 1,004 世界重建前机器冻结 v9 质量审计和 M0／M3 敏感性合同；正式 500×4、真值解封与 M0／M1／M2／M3 训练继续禁止。完整记录见 `docs/STEP28_V13_V1_13_V9_CAUSAL_REPLAY_RESULT_20260814.zh.md`。
+该结果只证明 v8 已暴露序号 283 的文档容量缺陷被结构性消除，不是数据质量、无捷径、正式生成或训练结果。下一步是在任何 1,004 世界重建前机器冻结 v9 质量审计和 M0／M3 敏感性合同；正式 500×4、真值解封与 M0／M1／M2／M3 训练继续禁止。完整记录见 `docs/STEP28_CAUSAL_REPLAY_RESULT_20260814.zh.md`。
 
 ## 2026-08-14：v9 质量通道实现基线通过终审
 
@@ -1886,7 +1968,7 @@ v9 剩余质量调用链已经实现并补齐真实生产路径反例。训练�
 
 唯一无参数运行发布终端回执 `reports/step28_v13_v1_13_quality_audit/v9_design_preflight_20260820/quality_audit_receipt.json`，5,786 字节／`22cec5c0ad0fc9b1f076ae8b26cae3eb47bd28168787050d53a1cb6805a51e4b`，规范自哈希 `6bce931f891de75185e969d7b232f4358e29844c49030f7c06b6309de0c163bc`。虽然终端表面写为 `DATASET_INVALIDATED`，异常摘要 `b9b7f9e7eedca8afa55f513c1c9b252c362a3907f553c32b04b447e723ac8bfa` 精确对应“正式质量审计仍未授权”。适配器把运行授权位固定为假的冻结政策传给要求该位为真的结构聚合入口，审计在实际结构统计前退出；外层又错误地把基础设施异常分类为数据失效。
 
-科研结论只能是“第一次审计执行失败，数据结论无效”。V9 设计根不是失败根因，继续保留为未获训练资格的设计输入。训练／开发真值未打开，审核甲乙真值、正式数据、训练、模型和指标仍全部为 0。不存在临时或大型失败输出；仅保留终端小回执和已消费回执。完整失败与清理边界见 `docs/STEP28_V13_V1_13_V9_QUALITY_AUDIT_ATTEMPT1_INFRASTRUCTURE_FAILURE_20260821.zh.md`。当前禁止重跑；必须先修复结构能力传播和错误分类，增加真实生产结构入口测试，完成完整回归、提交和新的网页复审。
+科研结论只能是“第一次审计执行失败，数据结论无效”。V9 设计根不是失败根因，继续保留为未获训练资格的设计输入。训练／开发真值未打开，审核甲乙真值、正式数据、训练、模型和指标仍全部为 0。不存在临时或大型失败输出；仅保留终端小回执和已消费回执。完整失败与清理边界见 `docs/STEP28_QUALITY_AUDIT_ATTEMPT1_INFRASTRUCTURE_FAILURE_20260821.zh.md`。当前禁止重跑；必须先修复结构能力传播和错误分类，增加真实生产结构入口测试，完成完整回归、提交和新的网页复审。
 
 ## Step28-v13 v1.13 v9 第二次质量审计尝试运行前修复（2026-08-21）
 
@@ -1924,7 +2006,7 @@ V9.1 仅把唯一卖家画像投影提升到科学公共模块，由物化器和
 
 新根合计 1,004 世界、28,112 个卖家、379,512 对，其中正对 20,080、负对 359,432。V9.1 等价回执为 `PASS_EXACT_MECHANICAL_PROFILE_COMMITMENT_REPAIR`：同一随机权威为真，68 个文件逐字节不变，四个结构文件只改四条已登记画像摘要路径，持久化版本、世界／键顺序和其余字段不变，实际落盘画像重算闭合。
 
-这仍不是训练集或质量通过结果。根状态为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`，`scientific_use_forbidden=true`、`training_started=false`，正式种子、正式行、审核甲乙真值读取、模型和指标仍为零。下一步必须先冻结并获准运行一次只针对该根的质量审计；质量通过前不得正式生成或训练 M0／M1／M2／M3。完整记录见 `docs/STEP28_V13_V1_13_V9_1_DESIGN_BUILD_RESULT_20260822.zh.md`。
+这仍不是训练集或质量通过结果。根状态为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`，`scientific_use_forbidden=true`、`training_started=false`，正式种子、正式行、审核甲乙真值读取、模型和指标仍为零。下一步必须先冻结并获准运行一次只针对该根的质量审计；质量通过前不得正式生成或训练 M0／M1／M2／M3。完整记录见 `docs/STEP28_DESIGN_BUILD_RESULT_20260822.zh.md`。
 
 ## Step28-v13 v1.13 V9.1 冻结质量审计实现与回归（2026-08-23）
 
@@ -1932,7 +2014,7 @@ V9.1 仅把唯一卖家画像投影提升到科学公共模块，由物化器和
 
 候选实现网页复审正文为 23,362 个 UTF-8 字节／`7ea8b1d3165caefe8b4c230255cf2f538db893849d4d89d1cf14170dd868e94d`，最后一行“候选实现不能进入本地回归与提交前修正阶段”。本地独立复核接受并修正其实际科研问题：直接适配器调用改为复用入口完整回执模式并重验 Git 与全部文件；最终结果采用精确模式和逐层自哈希；真实 V9.1 标签无关四拆分实际进入冻结结构核心；伪授权数值测试改用冻结合法夹具；补充严格布尔类型、尝试编号、会话网址、72／77 文件计数、探针后再闭合和机械故障分类。未采用超出唯一科研入口所需的持久化多阶段锁状态机，避免重新扩张到系统安全支线。
 
-聚焦合同完成三轮 44／44，用时 42.380、42.942 和 40.564 秒；第三轮确认记录全仓结果后更新的覆盖政策摘要、规范自哈希和入口钉精确闭合。全仓回归运行 812 项、用时 1,587.193 秒：803 项实际通过、9 项按既有历史记录跳过、0 失败、0 错误。回归后没有待用或已消费的 V9.1 质量回执、质量结果、临时结果、测试目录或字节码缓存。新增 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 作为当前交接入口，旧 2026-07 交接只保留历史价值。
+聚焦合同完成三轮 44／44，用时 42.380、42.942 和 40.564 秒；第三轮确认记录全仓结果后更新的覆盖政策摘要、规范自哈希和入口钉精确闭合。全仓回归运行 812 项、用时 1,587.193 秒：803 项实际通过、9 项按既有历史记录跳过、0 失败、0 错误。回归后没有待用或已消费的 V9.1 质量回执、质量结果、临时结果、测试目录或字节码缓存。新增 `docs/AI_RESEARCH_HANDOFF.zh.md` 作为当前交接入口，旧 2026-07 交接只保留历史价值。
 
 提交前修订复审正文提取为 15,713 个 UTF-8 字节／`69038a2e55c05026f6d3a4e536d18d478f838cebe79c21c9802526a7060144be`，问题分级阻断 0、高 1、中 0、低 0，最后一行“修订候选不能提交并进入提交后复审”。唯一高级项是可触发的一次性事务所有权错误：两个入口近同时读到待用回执时，未取得原子改名所有权的调用可能根据“已消费目标存在、待用源消失”误认自己有权发布唯一终态。该判断成立，但不需要状态机或锁。当前入口改为在原子改名后立即返回，把完整字节重验留给已有验证器，并以调用内布尔值记录本次是否真实消费；竞争失败者只能退出，不能创建结果或发布终态。
 
@@ -1968,7 +2050,7 @@ V9.1 仅把唯一卖家画像投影提升到科学公共模块，由物化器和
 
 V9.1 质量失效关闭后重新核对上位科学实验合同、质量审计 C 修订件、V9 通道合同、V9 质量运行器和 V1.12 历史反事实结果，确认 V9 的文本硬门审计对象发生漂移：原合同允许同一控制者共享用词、标点、长度、空白和排版等作者风格，并要求近随机硬门作用于控制者盲无固定点风格错排后的反事实文本；V9 实际把保留原作者分配的完整／代码遮蔽／代码中和三表面直接送入近随机硬门。该矛盾足以要求新版本，但不能恢复 V9.1，也不能补造其未持久化的具体失败门或数值。
 
-新合同 `docs/STEP28_V13_V1_13_V9_2_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md` 为 17,420 字节／`bb1a98044f91e3a9d915b842b231fd4822d305cc3121852a8f889130cc54edfe`。它采用最小修复：控制者盲风格错排后的完整反事实表面使用七视图、两模型，共 14 个文本硬门模型；原作者三表面共 42 个模型只作描述性作者风格与编码通道诊断；公共代码和私有槽位四模型继续作为独立硬门。每世界固定八份逐商品／画像模型输入，额外的版本化结构回执不计入模型输入；标签前必须冻结原作者 21 个和反事实 7 个文本矩阵。双重独立生产重放、F／P／U 实际消费承诺、非监督式风格结构门、唯一有序门注册表、全门计算和包装前完整聚合证据均已写入合同。
+新合同 `docs/STEP28_SCIENTIFIC_RECONCILIATION_CONTRACT_20260823.zh.md` 为 17,420 字节／`bb1a98044f91e3a9d915b842b231fd4822d305cc3121852a8f889130cc54edfe`。它采用最小修复：控制者盲风格错排后的完整反事实表面使用七视图、两模型，共 14 个文本硬门模型；原作者三表面共 42 个模型只作描述性作者风格与编码通道诊断；公共代码和私有槽位四模型继续作为独立硬门。每世界固定八份逐商品／画像模型输入，额外的版本化结构回执不计入模型输入；标签前必须冻结原作者 21 个和反事实 7 个文本矩阵。双重独立生产重放、F／P／U 实际消费承诺、非监督式风格结构门、唯一有序门注册表、全门计算和包装前完整聚合证据均已写入合同。
 
 第一次上传的 13,108 字节合同经网页端审出 5 个高级、3 个中级和 1 个低级问题，已全部修正。一次同名文件重传没有随消息真正挂载，网页端正确拒绝把旧文件当成新版；该无附件复审不构成内容证据。随后使用唯一附件名 `V9_2_CONTRACT_REV2_17420_BYTES_bb1a9804.md` 重新上传，发送后的消息节点明确包含文件组。网页端实际复算 17,420 字节和目标摘要一致，最终回复按浏览器 `innerText` 提取为 7,872 个 UTF-8 字节／`e25bbe75d822dcb289d29c271e078492e66c9b90cad508b22c22d27fd9ff639d`，问题分级 0／0／0／0，最后一行“V9.2合同可进入实现”。会话为 `https://chatgpt.com/c/6a8aba2f-1618-83eb-8a3a-110cdf90d0c9`。
 
@@ -2016,7 +2098,7 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 
 方法资格根及同步文档已以提交 `1b71eaca56b492d8a6dbb2cff65e01c9ef42901d`、树 `b8135277752f7468624015984dae85ad9a957c06` 推送。80／80 个 Git LFS 对象上传完成；远端分支头与本地提交一致，工作区和 LFS 状态干净。
 
-这仍不是质量通过或训练结果。根明确为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`、`scientific_use_forbidden=true`、正式种子未创建、正式行数 0、训练未开始。下一步对提交后的精确字节取得独立质量运行前复核和一次性质量审计放行。没有该新许可前不得运行质量审计、正式 500×4 生成、审核真值监督评估或 M0／M1／M2／M3。完整记录见 `docs/STEP28_V13_V1_13_V9_2_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
+这仍不是质量通过或训练结果。根明确为 `PASS_DESIGN_BUILD_NOT_TRAINING_QUALIFIED`、`scientific_use_forbidden=true`、正式种子未创建、正式行数 0、训练未开始。下一步对提交后的精确字节取得独立质量运行前复核和一次性质量审计放行。没有该新许可前不得运行质量审计、正式 500×4 生成、审核真值监督评估或 M0／M1／M2／M3。完整记录见 `docs/STEP28_METHOD_QUALIFICATION_BUILD_RESULT_20260824.zh.md`。
 
 ## Step28-v13 v1.13 V9.2 质量审计尝试 1 执行失败（2026-08-24）
 
@@ -2028,7 +2110,7 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 
 根因是正式 `_validate_public_closure()` 调用冻结 `_validate_endpoints()` 时漏传必需的 `expected_pairs_per_world`。确切 Python 异常文本的 SHA-256 与终态消息摘要一致。故障发生在任何监督真值打开之前；训练、开发真值均未读取，审核甲乙监督能力未挂载。没有生成 `complete_quality_evidence.json`、矩阵、预测、正式数据、模型或指标。811 项全绿回归没有覆盖真实根进入该生产调用点，故未拦住这个低级接口接线错误。
 
-本次没有数据质量通过或失效结论。方法资格根仍为成功构建但禁止科研使用的只读输入，不属于失败载荷；尝试 1 的提交、网页许可、已消费回执和结果路径永久不得重跑或复用。网页快照、控制台日志等 56 个中间文件共 1,286,571 字节已删除；只保留小型终态和已消费回执。后续只能先建立新尝试合同、真实生产调用路径反例、新版本入口和新结果路径，再经全仓回归、提交后网页复审和独立单次许可；此前正式 500×4、审核真值监督读取和 M0／M1／M2／M3 继续禁止。详细记录见 `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`。
+本次没有数据质量通过或失效结论。方法资格根仍为成功构建但禁止科研使用的只读输入，不属于失败载荷；尝试 1 的提交、网页许可、已消费回执和结果路径永久不得重跑或复用。网页快照、控制台日志等 56 个中间文件共 1,286,571 字节已删除；只保留小型终态和已消费回执。后续只能先建立新尝试合同、真实生产调用路径反例、新版本入口和新结果路径，再经全仓回归、提交后网页复审和独立单次许可；此前正式 500×4、审核真值监督读取和 M0／M1／M2／M3 继续禁止。详细记录见 `docs/STEP28_QUALITY_AUDIT_ATTEMPT1_EXECUTION_FAILURE_20260824.zh.md`。
 
 ## Step28-v13 v1.13 V9.2 质量审计尝试 2 执行失败（2026-08-24）
 
@@ -2038,7 +2120,7 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 
 异常摘要精确对应“解码世界序号与冻结世界权威不一致”。商品代码按世界在拆分前的全局创建序号编码，而运行器错误地用拆分偏移加拆分内序号重建。用冻结标识密钥重建 0 至 1003 的世界标识后，根中 1,004 个世界集合严格闭合；当前运行器在训练 500、开发 500、审核甲 2、审核乙 2 个世界上全部猜错。这是标签无关接线错误，不是数据质量结论。
 
-尝试 2 专用包装器、测试和网页临时文件按失败纪律删除，只保留失败文档、小型终态、已消费回执和 Git 历史；1.62 GB 成功方法资格根继续保留但禁止科研使用。后继必须从冻结世界标识重建真实全局序号，使用新版本、新回执和新结果路径。详细记录见 `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`。
+尝试 2 专用包装器、测试和网页临时文件按失败纪律删除，只保留失败文档、小型终态、已消费回执和 Git 历史；1.62 GB 成功方法资格根继续保留但禁止科研使用。后继必须从冻结世界标识重建真实全局序号，使用新版本、新回执和新结果路径。详细记录见 `docs/STEP28_QUALITY_AUDIT_ATTEMPT2_EXECUTION_FAILURE_20260824.zh.md`。
 
 ## Step28-v13 v1.13 V9.2 质量审计尝试 3 完整失效结论（2026-08-25）
 
@@ -2052,7 +2134,7 @@ V9.2 初版实现已以提交 `6eb0655db883a2f7478e0123fa770858e54b54b9`、树 `
 
 V9.2 根永久失去训练资格，不得重跑、改门或恢复。清理前根为 85 个文件／1,616,648,450 字节；现已删除 80 个载荷／1,616,618,475 字节和 20 个 V9.2 专属策略、脚本、测试文件，仅保留五份清单／29,975 字节、完整证据、终态、已消费回执、文档和 Git 历史。载荷、缓存、临时目录及 `scripts`／`tests`／`schema` 中的 `v9_2` 活文件均为 0。删除后全仓回归运行 768 项、用时 1,696.850 秒：759 项实际通过、9 项历史跳过、0 失败、0 错误。
 
-只读源码追踪确认两条必须共同关闭的风险：精确标题克隆允许把人工商品码带到登记负例，且控制者分组／创建槽／商品数量只做概率独立而未对固定样本确定性配平；它们是后继设计必须修复的通道，但不能冒充本轮未公布的获胜列。后继固定为全新 V9.3，先移除正式模型表面的人工代码，再以 500 世界均衡分组表和均衡噪声层关闭槽位、数量和缺失模式捷径；大规模构建前先执行同族结构／统计预检。正式 500×4 和 M0／M1／M2／M3 继续禁止。详细记录见 `docs/STEP28_V13_V1_13_V9_2_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`。
+只读源码追踪确认两条必须共同关闭的风险：精确标题克隆允许把人工商品码带到登记负例，且控制者分组／创建槽／商品数量只做概率独立而未对固定样本确定性配平；它们是后继设计必须修复的通道，但不能冒充本轮未公布的获胜列。后继固定为全新 V9.3，先移除正式模型表面的人工代码，再以 500 世界均衡分组表和均衡噪声层关闭槽位、数量和缺失模式捷径；大规模构建前先执行同族结构／统计预检。正式 500×4 和 M0／M1／M2／M3 继续禁止。详细记录见 `docs/STEP28_QUALITY_AUDIT_ATTEMPT3_DATASET_INVALIDATION_20260825.zh.md`。
 
 ## Step28-v13 v1.13 V9.3 原始端点残差求解运行前闭合（2026-08-26）
 
@@ -2213,7 +2295,7 @@ V9.4.1 合同和机器政策现已冻结为 `READY_FOR_ONE_TIME_FORMAL_AUTHORIZA
 
 原始作者风格最高对称曲线下面积 `0.6550315128`、最高平均精确率 `0.1029074142`，两者来自不同探针。该结果表明设计允许的作者风格身份信号存在；控制者盲错排后未检出超过冻结门限的剩余文本捷径。它不证明所有模型都无捷径，也不证明真实中文市场外部泛化。训练／开发监督在全部矩阵冻结后各读取一次，审核甲乙真值读取均为零；封存扫描覆盖 676,000 个可见文本字段且私有字面和内部标识命中均为零。
 
-网页端 GPT-5.6 Sol Pro 对九个精确附件完成结果级复核，回复 `innerText` 为 17,379 个 UTF-8 字节／`874d1a83f9c1e514c8bfc8bab986b24f481e79213e89cea3066e3b6eb63cef28`，阻断／高级／中级／低级为 `0／0／0／0`，接受该训练资格结论；本地独立核验后接受其窄边界。当前 `training_qualified=true`，但 `m0_m1_m2_m3_training_authorized=false`。下一步只能另行冻结训练合同、实现和一次性授权；不得立即训练或打开审核甲乙真值。详细记录见 `docs/STEP28_V13_V1_13_V9_4_1_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`。
+网页端 GPT-5.6 Sol Pro 对九个精确附件完成结果级复核，回复 `innerText` 为 17,379 个 UTF-8 字节／`874d1a83f9c1e514c8bfc8bab986b24f481e79213e89cea3066e3b6eb63cef28`，阻断／高级／中级／低级为 `0／0／0／0`，接受该训练资格结论；本地独立核验后接受其窄边界。当前 `training_qualified=true`，但 `m0_m1_m2_m3_training_authorized=false`。下一步只能另行冻结训练合同、实现和一次性授权；不得立即训练或打开审核甲乙真值。详细记录见 `docs/STEP28_FORMAL_500X4_QUALITY_ATTEMPT1_RESULT_20260829.zh.md`。
 
 提交前完整测试于 2026-08-30 运行 918 项、用时 2,106.272 秒：894 项通过、9 项跳过、4 项失败、11 项错误。5 项来自 V9.4 历史异常测试仍模拟旧写函数，测试注入点修正提交 `70ac998b93afcf64417460552cdfd2fb7c9ea32c` 已定向 32／32 通过且未改生产代码；其余 10 项是已关闭 V9.1 政策按设计拒绝后继 V9.4 对共享文本视图源码的字节升级。旧 V9.1 政策和哈希不得改写，因此本轮明确不宣称全仓回归通过。当前 V9.4.1 正式质量直接合同重新运行 35／35 通过，用时 17.329 秒；历史入口回归债务不改变已冻结正式结果的二十六项质量门。
 

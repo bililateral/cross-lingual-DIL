@@ -1,6 +1,96 @@
-# 当前实验设计说明
+# 当前实验设计
 
-更新日期：`2026-09-04`
+截至2026-10-01，**首轮有限历史持续学习训练、唯一valid评价、完整回传和本地独立核查均已完成；结果网页外审已于10月1日10:12:21提交Pro并开始回应，待实际回复与主审。** 作业从9月30日14:40:21运行至10月1日06:06:13（Asia/Shanghai），退出0、6048次更新、9504次群梯度呈现、21个终点及64份指标矩阵完整。实际总耗时15小时25分51秒，剩余0；原预计18—26小时／10月1日08:40—16:40完成，实际提前，36小时／64GiB是强制上限。09:24:59核对作业进程已退出。[本轮完整报告](SELLER_ALIAS_BGE_RESULT.zh.md)、[当前状态](../reports/seller_alias_continual/20261001/bge_continual_result/current_status.json)。
+
+本轮困难排序BGE、s0、ABC／BCA／CAB、冻结／SEQ／ER／LOGIT、6群且全部历史及附属状态≤1MiB及O／N／Z判据未改。train=1、valid=1、heldout／owners=0；326份小结果16,241,505字节回传匹配，18份冻结来源未变。Linux保存结果独立核查1,061,316数值、最大差7.11e−15通过，新标签与模型加载均0。[原始评价](../reports/seller_alias_continual/20261001/bge_continual_result/returned/job/evaluation/evaluation.json)、[独立核查](../reports/seller_alias_continual/20261001/bge_continual_result/audit/audit.json)。
+
+SEQ首域MAP遗忘0.063393、条件95%[0.041809,0.085423]，三个顺序同时有新域学习，预定遗忘观察门通过。ER−SEQ仅4/23通过，旧域MAP下降0.039873；LOGIT−ER为23/23通过，旧域MAP增加0.046887。但LOGIT相对SEQ旧域Recall@5及新域、最终最新域性能仍下降，不能称整体优于普通续训或抗遗忘已解决。单种子／已开发valid结论不等于创新或论文最终验收。历史18权重例外保持；本轮必要共享状态／对照仍保留Linux，未回传大权重或历史文本标签。
+
+## 当前研究问题与已冻结首轮设计
+
+在少量历史训练数据可用时，学习不同分布的新卖家群体，并保持旧分布留出卖家的马甲候选排序及基础识别。数据为固定中文合成卖家，每查询在同群其余27账号中排序；不声称真实市场有效或同一控制者跨阶段追踪。
+
+| 项目 | 本轮已确认设置 |
+|---|---|
+| 模型与起点 | 困难排序中文BGE；每顺序从原预训练档案和同一s0随机头开始，不加载联合三域权重／映射 |
+| 输入与划分 | 屏蔽标题／描述；每域48拟合、12当前域校准、20 valid群；无身份／owners输入 |
+| 到达顺序 | ABC、BCA、CAB；不是实测时间线，不代表全部六排列 |
+| 比较 | 首域冻结参照、普通续训SEQ、随机重放ER、ER加0.5历史raw-logit MSE的LOGIT |
+| 历史供给 | 模型无关Algorithm R保留最多6个完整拟合群；全部历史／附属状态≤1MiB；ER／LOGIT成员及抽样配对，淘汰后不回读 |
+| 更新与公平性 | 每阶段6轮、288步；首阶段共享真实模型／Adam／RNG；共6048物理更新、9504群梯度呈现；Adam连续、阶段局部LR重启 |
+| 校准 | 各点仅用当前域12群拟合正斜率仿射映射；固定首映射只作诊断 |
+| 输出与评价 | 21个实际推理终点、85份盲分数、64份指标矩阵；完整门后唯一valid解析，5000次按实际域配对整群抽样 |
+| 判据 | 先观察遗忘与新域学习，再按合同检查ER−SEQ及LOGIT−ER的O／N／Z观察条件；不以新能力下降换旧能力保持 |
+| 范围限制 | 单种子、已开发valid；不证明方法创新、总体非劣效或最终论文验收；新最终留出另立合同 |
+
+[冻结合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)、[政策](../schema/step28_bge_continual_policy.json)、[实现与实际核验](SELLER_ALIAS_BGE_IMPLEMENTATION.zh.md)、[正式授权](../reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/authorization.json)。
+
+当前下一步是完成本轮结果网页外审并核对实际回复，再围绕少量历史样本的代表性／重复强度以及排序保持与新域学习的平衡制定新方法合同。当前尚无新算法、种子、训练预算、标签或最终留出许可；不自动追加训练，不重复基础test。LOGIT相对ER的收益保留，不能替代相对SEQ的新旧能力保护或三种子方法资格。
+
+## 已完成基础与历史边界
+
+基础test已完成结果外审与主审：原合同仍为8/9、`passed=false`，仅ΔMAP≥0.01未过（实际+0.007484203），ΔRecall@5=+0.014434524，原定AP／AUC／Brier／log_loss观察值保护通过。用户事后明确接受实际增益作为后续基础；不追认原合同全过，不宣称总体非劣效。现有120群不再是持续学习的未开发最终留出。[完整结果](SELLER_ALIAS_TEST_RESULT.zh.md)。
+
+## 历史设计与执行记录
+
+以下正文均为各历史阶段的设计与执行记录，包括旧四配置比较；它们不是当前持续学习实验设置。当前范围以上文及冻结首轮合同为准。
+
+2026-09-27最新：本轮网页GPT6 Pro外审与主执行者处置已完成，无必须修复的新科研阻断或复现缺陷；37项网页手工／微型测试通过，18份当前CPU来源保持原字节。用户随后明确“核验完毕后，无需向我申请，直接开始正式训练”，已恢复九运行／7776更新、单GPU单CPU、24小时／32GiB及新train／valid各一次，test／owners仍未授权。预计总耗时14—18小时，实际启动及标签消费以本轮运行回执为准。 固定原D表示与评分头，比较D／编码器学习率日程／日程加0.5×前排5个已知负例排序损失；E6 C−A为唯一主要比较。MAP提高且基础识别观察值不下降，平均及s0 Recall@5严格提高。15项项目CPU合同和4次实际BGE手工更新已通过；正式作业于11:50:06 CST启动，11:53:30确认s0_d至少24更新；train一次已消费、valid尚未开始。实际状态见[交接](AI_RESEARCH_HANDOFF.zh.md)。[完整合同](SELLER_ALIAS_RANKING.zh.md)、[实现与外审](SELLER_ALIAS_RANKING_IMPLEMENTATION.zh.md)、[正式授权](../reports/seller_alias_continual/20260927/ranking_execution/authorization.json)。数据均为合成，不声称真实市场验证。
+
+上一轮商品加权汇总为已闭环的有效负结果；五训练／4320更新及valid实际约7小时37分，13项条件8项失败。Linux全部训练权重已按用户要求删除（包括D），科学记录与预训练档案保留。持续学习设计继续暂缓。见[结果](SELLER_ALIAS_POOLING_RESULT.zh.md)与[交接](AI_RESEARCH_HANDOFF.zh.md)。
+
+以下9月25日状态为该轮启动时记录。
+
+更新日期：2026-09-25。中文BGE基础识别比较的训练、评价与回传已完成；实际GPT6 Pro结果外审及主执行者复核完成。下方四配置为已完成的冻结设计；下一轮[商品加权汇总合同](SELLER_ALIAS_POOLING.zh.md)已按用户“候选排序提升、基础识别不下降”补充二分类保护并获准推进，当前实现、CPU核验、实际网页外审和主执行者复核均完成，无必须修复项。按用户“开始训练”，五训练作业已于12:57:45 CST启动，13:02:34确认首组48更新；新train已消费一次、valid尚未开始，实际证据见[交接](AI_RESEARCH_HANDOFF.zh.md)。用户已确认valid开发后进行一次独立test验收的顺序，test仍须另行阶段授权。旧正式合同见[中文方案](SELLER_ALIAS_CHINESE_BASE.zh.md)及[机器政策](../schema/step28_chinese_base_policy.json)，完整指标见[结果](SELLER_ALIAS_CHINESE_RESULT.zh.md)；更早设计保留在本文历史区。
+
+## 科研问题与研究对象
+
+识别两个合成卖家账号是否属于同一合成控制者，为**马甲候选检索**提供排序分数。每个账号由其全部商品的屏蔽标题和描述表示；训练监督是同群378个账号对的二值关系。检索候选为同群其余27账号；新研究已固定MAP和Recall@5等前瞻条件，K=5是研究工作点，不能称为真实业务复核预算。下方保留已完成四配置的冻结设计，其原低误报门是严格自动判定目标，不单独决定检索能力。
+
+## 四配置比较
+
+| 配置 | 账号表示 | 训练目标 |
+|---|---|---|
+| A mean_bce | 标题换行描述编码后，商品向量均值归一化 | BCE |
+| B mean_rank | 同A | BCE＋配对排序损失 |
+| C split_bce | 标题／描述分别编码，均值与总体标准差拼接归一化 | BCE |
+| D split_rank | 同C | BCE＋配对排序损失 |
+
+四配置均从固定BGE-large-zh-v1.5预训练权重开始，联合更新编码器和对称分类头；排序项权重和温度均固定为1。D为预定主候选，D−A为主方法比较；其余六项为B−A、C−A、D−C、D−B、A−LaBSE和D−LaBSE，不按valid选赢家。C／D是整体表示干预，前向量和头容量增加，不能单独归因为分通道或标准差。
+
+## 数据、训练与评价边界
+
+| 项目 | 已确认设置 |
+|---|---|
+| 数据 | 固定20260910表达变化数据，三域；不重新生成 |
+| 拟合／校准／valid | 每域48／12／20群；合计144／36／60群；每群28账号 |
+| 输入 | 屏蔽标题与描述；全部商品；无身份特征、域ID、生成器潜变量或owners |
+| 训练 | 每配置6轮、864更新，总3456；第6轮主终点，第3轮轨迹；不按valid早停 |
+| 梯度 | 校准和valid均不参与；原AdamW设置、微批4、BF16、固定种子和日程 |
+| 阈值 | 每臂仅由36个训练内校准群确定一个全局阈值；不按valid或域ID调整 |
+| 主要能力门 | valid三个域各自FPR≤0.001且Recall≥0.5，即FP≤7／7160、TP≥200／400 |
+| 指标 | 全22项，包括AP、梯形PR-AUC、ROC-AUC、MRR、MAP、Recall和NDCG@1/3/5/10，及固定0／校准阈值计数 |
+| 不确定性 | 固定5000次、种子20260918的域内整群配对bootstrap；条件于已训练模型和阈值 |
+| 监督 | 本阶段train一次供四臂；全部结果及来源通过完整门后valid一次；test／owners不读 |
+| 资源 | Linux py310，单空闲GPU＋单CPU线程；预计2—5小时，训练作业上限8小时／32GiB |
+
+启动核验通过12项合同、全文分词检查；A／B最长96 token，C／D最长82，均未截断。随后四配置3456更新及完整恢复评分完成，20:18:48退出0，valid评价20:26:21退出0。本阶段train／valid各一次均已消费；test／owners未读。[结果与证据](SELLER_ALIAS_CHINESE_RESULT.zh.md)。
+
+## 能回答和不能回答的内容
+
+用户已明确下一步顺序：保留D固定基线，先做一轮针对候选排序的改进，valid开发后经另行授权进行一次独立test验收，达到预先确认的提升判据后再设计持续学习；当前不并行推进持续学习设计。具体合同已按用户委托补齐基础识别保护并恢复开发执行，见[下一步计划](RESEARCH_PLAN.md#已确认的下一步保留d基线先做针对性改进)。这不更改下方或上表的已完成实验合同。
+
+本比较衡量固定数据、固定一次训练下中文编码器及两项预定干预的表现，复用匹配LaBSE的冻结盲分数作参照。A−LaBSE反映完整编码器配置差异，不能只归因于语言属性。valid属于反复使用的开发集，不是新独立测试；不证明真实市场或跨种子效果。三域联合离线模型不能直接充当未来持续学习首域起点。
+
+## 历史原文（以下均为当时状态）
+
+> 以下保留整理前正文、历史结论和来源散列。旧“当前／下一步／待恢复”只指其原记录时点，不是本阶段执行指令。
+
+2026-09-15入口校正：本文下方为历史计划或进展，旧“当前／下一步”仅指原记录阶段，不能作为现行执行授权。现行主线是有限历史记忆下的中文暗网卖家马甲持续识别；第一路联合诊断已完成，第二路随机ER已于9月15日12:38正常结束并完成一次valid评价，本地三项缓解判据失败，实际结果外审及本地复核已完成，有效负基线闭环。当前状态、授权及最新实测时间以[科研交接](AI_RESEARCH_HANDOFF.zh.md)为准，执行合同见[随机ER方案](SELLER_ALIAS_MITIGATION_PLAN.zh.md)，大型载荷归档位置见[存储与恢复](STORAGE.zh.md)。历史结论和哈希原义不变。
+
+更新日期：`2026-09-05`
+
+> **命名与外审纪律更新：**文件名不再使用版本号，实验目录标识保留；当前交接入口为 `docs/AI_RESEARCH_HANDOFF.zh.md`。后续每阶段修改由网页端 **GPT 6 Pro** 提供建议，本地独立核实，拒绝过度设计并及时清理临时文件。详见 `docs/RESEARCH_DISCIPLINE.zh.md`。科研设计、原始历史结果和真值隔离边界不变。
 
 本文档说明当前项目的实验设计、设计目的、实现细节、有效数据边界和当前结论边界。它不是历史流水账，而是当前可以复现实验和撰写论文方法部分时应遵循的实验设计说明。
 
@@ -16,7 +106,7 @@
 > 测试与静态输入检查通过，正式图形处理器
 > 运行尚未开始，审核甲乙真值读取为 0。完整文本直接微调是候选成立后必须补充的实际
 > 强基线，不与当前用于隔离英文监督增量的同视图通用臂混淆。正式合同见
-> `docs/STEP28_V13_V9_4_1_V6_STYLE_TRANSFER_V2_PLAN_20260904.zh.md`。
+> `docs/STEP28_STYLE_TRANSFER_PLAN_20260904.zh.md`。
 
 > **2026-09-04 当前英文训练边界：Step 7 V6 已通过。**正式 V6 只发布每账号一条
 > 字段中立的统一作者风格流，严格保留 100 个占位单元；字段缺失、标题占比、商品槽位、
@@ -61,7 +151,7 @@
 > 没有结构信号。身份组等权风格正对照曲线下面积／平均精确率为
 > `0.871979／0.894200`。新增结构反查已经推翻其训练资格；不得用 V4 进入初始化比较。
 > 即使后继 V5 通过，V6 域内高分本身也不是迁移证据。
-> 正式边界见 `docs/STEP7_V6_SYNTHETIC_ENGLISH_SOURCE_AUGMENTATION_PLAN_20260903.zh.md`。
+> 正式边界见 `docs/STEP7_SYNTHETIC_ENGLISH_SOURCE_AUGMENTATION_PLAN_20260903.zh.md`。
 
 > **2026-09-03 当前英文来源边界：Step 7 V5 V3 受控源监督。**旧 Step 7
 > 的 401／152／181 配对因克隆、模型可见身份串、重复开发和测试标签汇总误读，
@@ -73,7 +163,7 @@
 > 训练或选参；V6 正确标签、V6 标签置乱和通用初始化必须使用同一风格投影与相同
 > 训练预算。主要证据是冻结真实英文和中文增量而非合成域内分数；去词义视图最多
 > 支持“非词汇规律迁移”，不能独立证明纯作者身份。审核甲乙真值继续封存。正式数据、失败边界和散列
-> 见 `docs/STEP7_V5_ENGLISH_SOURCE_DATASET_PLAN_20260903.zh.md`。
+> 见 `docs/STEP7_ENGLISH_SOURCE_DATASET_PLAN_20260903.zh.md`。
 
 > **2026-09-02 历史微调边界（已被 2026-09-03 V5 取代）：比较英文监督初始化与通用初始化。**
 > 已返回的直接微调 V1 确实更新了 LaBSE 编码器，但其起点是通用 LaBSE，
@@ -86,7 +176,7 @@
 > LaBSE 相似度进入，禁止十八项基础特征绕过待迁移编码器；中文阶段两个模型则
 > 同样使用十八项基础特征和六项可微相似度。只有英文初始化在开发集优于通用
 > 初始化，才继续身份联合和多随机种子确认。审核甲乙真值继续封存。方案见
-> `docs/STEP28_V13_V9_4_1_ENGLISH_INITIALIZED_LABSE_FINETUNE_V1_PLAN_20260902.zh.md`。
+> `docs/STEP28_ENGLISH_INITIALIZED_LABSE_FINETUNE_PLAN_20260902.zh.md`。
 
 > **2026-09-01 权威修正：当前问题已从“验证 M2”改为“验证英文来源是否真的有增量”。**
 > V9.4.1 四拆分、质量资格、公开投影、训练／开发 V2 和旧审核甲盲预测都已完成；
@@ -95,8 +185,8 @@
 > 区间完全低于零；五档训练量也没有英文低资源优势。因此旧 M2 只能证明合成身份
 > 历史可学习，不能写成英文能力迁移成功。当前先做完整中文文本的 LaBSE 端到端
 > 直接微调，与 I0、T1、M3-joint 在相同预算下比较；旧审核甲真值评价暂停。
-> 权威合同与结果见 `docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_REPAIR_V4_CONTRACT_20260901.zh.md`
-> 和 `docs/STEP28_V13_V9_4_1_TRANSFER_CLAIM_CONTROLS_V4_RESULT_20260901.zh.md`。
+> 权威合同与结果见 `docs/STEP28_TRANSFER_CLAIM_REPAIR_CONTRACT_20260901.zh.md`
+> 和 `docs/STEP28_TRANSFER_CLAIM_CONTROLS_RESULT_20260901.zh.md`。
 
 > **2026-08-30 历史覆盖状态：V9.4.1 正式四拆分已生成并通过质量门，但模型训练当时尚未授权。**
 > 当前正式根含训练、开发、审核甲、审核乙各 500 个世界，共 2,000 个世界、
@@ -106,8 +196,8 @@
 > 因此下一步是完成冻结 M0 的无标签 Linux 兼容性重放、生成四拆分公开投影、
 > 冻结完整训练／盲预测／指标合同并签发一次性训练授权，不是直接打开标签训练。
 > 当前实现合同见
-> `docs/STEP28_V13_V1_13_V9_4_1_MODEL_EXPERIMENT_IMPLEMENTATION_CONTRACT_20260830.zh.md`，
-> 最新交接以 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md` 顶部状态为准。
+> `docs/STEP28_MODEL_EXPERIMENT_IMPLEMENTATION_CONTRACT_20260830.zh.md`，
+> 最新交接以 `docs/AI_RESEARCH_HANDOFF.zh.md` 顶部状态为准。
 
 > 下方 2026-08-01 至 V1.12 的“无正式数据”段落是不可改写的历史过程，不能覆盖
 > 上述 2026-08-30 状态；更早 Step24／Step25 内容同样只提供研究背景和历史结果。
@@ -120,7 +210,7 @@
 > Git 历史，无法通过重新命名“密封”。v2 执行链因此也只能作为未执行的
 > 历史实现，禁止启动。后继主边界改为四 split 全量重生，并以每 world 全部
 > 378 对作为主分类总体；C40 退出训练与主评估。完整冻结方向见
-> `docs/STEP28_V13_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`。
+> `docs/STEP28_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`。
 
 ## 0. 历史方法状态（2026-08-01）：full-378 fresh release 实现中
 
@@ -184,9 +274,9 @@ Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtra
 | Step 7 | 英文源域训练 zero-shot pair verifier，并在中文测试 | `reports/step7_training_summary.json` |
 | Step 9 | 中文少样本适配和 calibration 控制实验 | `reports/step9_few_shot_summary.json` |
 | Step 11 | 把 scorer 投影成中文候选图和候选簇，并做 explicit allow-list audit | `reports/step11_cluster_level_audit.step16g_imbalance_validation_20260710.json` |
-| Step 12 | 固定中文测试集上的 grouped-bootstrap 稳健性审计 | 当前已审计 `step16g_imbalance_20260710`；v5r 待生成 `reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json` |
+| Step 12 | 固定中文测试集上的 grouped-bootstrap 稳健性审计 | 当前已审计 `step16g_imbalance_20260710`；v5r 待生成 `reports/step12_statistical_robustness_zh_test_weighted_mixup_20260711.json` |
 | Step 13 | 概念漂移与切片诊断 | `reports/step13_concept_drift_audit.step16g_imbalance_validation_20260710.json` |
-| Step 15 | evidence-type hard-negative curriculum 与轻量 MLP scorer | 旧 v5 已冻结；v5r 待生成 `reports/step15_v5r_weighted_mixup_summary.json` |
+| Step 15 | evidence-type hard-negative curriculum 与轻量 MLP scorer | 旧 v5 已冻结；v5r 待生成 `reports/step15_weighted_mixup_summary.json` |
 | Step 16G | train-only weak hard-negative support，用于恢复正式 mixup 消融 | `reports/step16g_hard_negative_imbalance_summary.json` |
 
 实验设计的核心原则是：
@@ -202,7 +292,7 @@ Step25-v3.1 只修复数值求解：active-set projected Newton + Armijo backtra
 
 旧 `v5` 结果保留为实现修复前的历史对照。当前待 Linux 验证的新分支是 `v5r`，其输出与旧版物理隔离：
 
-- 新 summary：`reports/step15_v5r_weighted_mixup_summary.json`；
+- 新 summary：`reports/step15_weighted_mixup_summary.json`；
 - 新 slice audit：`reports/step15_v5r_weighted_mixup_slice_level_audit.json/csv`；
 - 新 Step 12：`reports/step12_v5r_statistical_robustness_*_weighted_mixup_20260711.*`；
 - 新实验名均以 `step15_v5r_` 开头，不覆盖任何 `step15_v5_` artifact 或 prediction。
@@ -1024,7 +1114,7 @@ Bootstrap 单位是 `split_component_id`，不是单条 edge。原因是同一 s
 
 - policy: `schema/step12_statistical_robustness_policy.json`
 - runner: `scripts/step12_statistical_robustness_audit.py`
-- summary: `reports/step12_v2_statistical_robustness_zh_test_20260602.json`
+- summary: `reports/step12_statistical_robustness_zh_test_20260602.json`
 
 ## 11. Step 13 概念漂移审计设计
 
@@ -1205,7 +1295,7 @@ Step25-v2 固定使用四个全量模型和一个可靠切片敏感性分析：
 
 复制检测仅使用 identifier-redacted canonical-train pair text，以固定 12-character shingles 和 24-character minimum contiguous run 对左右文本对称去复制；不读取 label、evidence type、score、valid 或 test。模型仍是固定强正则 LR/L2，评估包括 English grouped OOF、source-only Chinese scoring、English+Chinese target grouped OOF 和 component-grouped bootstrap。
 
-这是一个 D0 retrospective mechanism diagnostic。无论结果如何，它都不能选择论文主模型、不能进入 Step11/17，也不能撤销 Step25-v1。完整实现和解释边界见 `docs/STEP25_V2_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`。
+这是一个 D0 retrospective mechanism diagnostic。无论结果如何，它都不能选择论文主模型、不能进入 Step11/17，也不能撤销 Step25-v1。完整实现和解释边界见 `docs/STEP25_PAIR_LOCAL_COPY_MISSINGNESS_DIAGNOSTIC_20260717.zh.md`。
 
 Step25-v2 已完成，不再是待运行设计。其结果为中文 P0/P2/P3 target grouped-OOF AP `0.704847/0.670692/0.737365`，英文 P0/P2 grouped-OOF AP `0.468210/0.251926`，仅 `3/8` 机制门槛通过。该实验保留为“局部复制检测有效、统一清洗替换无效”的混合机制结果。
 
@@ -1224,7 +1314,7 @@ Step25-v3 修复了两个归因问题。第一，不可靠 pair-local-clean styl
 
 Clean scorer 明确禁止 direct identifier、candidate-rule、review label 和 evidence type。Identifier occurrence 只进入单独 operational control：用 English actionable occurrence rows 和 English C2 component-OOF probability 训练小型方向约束 offset expert，再对 Chinese source-only C2 做敏感性报告；中文标签不参与 expert 拟合，结果不能改变 clean model 晋级资格。
 
-原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能用于最终解释。v3.1 的 11 项契约测试、四个 config-only preflight、Linux runner、`44/44` KKT audit 和两份 feature byte-parity audit 均已通过。正确收敛后的得分仅发生微小变化，gate 仍为 `2/11`，从而把旧 v3 的定性失败转化为可正式冻结的严格负结果。完整修复边界见 `docs/STEP25_V3_1_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`，结果审计见 `docs/STEP25_V3_1_RESULT_AUDIT_20260718.zh.md`。
+原 v3 已完成 Linux 运行和同步，产物内部一致，但求解器终止无效，不能用于最终解释。v3.1 的 11 项契约测试、四个 config-only preflight、Linux runner、`44/44` KKT audit 和两份 feature byte-parity audit 均已通过。正确收敛后的得分仅发生微小变化，gate 仍为 `2/11`，从而把旧 v3 的定性失败转化为可正式冻结的严格负结果。完整修复边界见 `docs/STEP25_SOLVER_CONVERGENCE_REPAIR_20260718.zh.md`，结果审计见 `docs/STEP25_RESULT_AUDIT_20260718.zh.md`。
 
 ## 15. 当前实验设计评价
 
@@ -1292,8 +1382,8 @@ development、Audit 盲预测和 Audit 指标必须分别通过从冻结输入�
 
 权威细节见：
 
-- `docs/STEP28_V13_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`
-- `docs/STEP28_V13_MODEL_TRAINING_READINESS_20260801.zh.md`
+- `docs/STEP28_FULL378_FRESH_RELEASE_PREEXECUTION_AMENDMENT_20260801.zh.md`
+- `docs/STEP28_MODEL_TRAINING_READINESS_20260801.zh.md`
 
 ## 17. Step28-v13 full-378 v1.4 修复状态（2026-08-02）
 
@@ -1334,7 +1424,7 @@ Audit 真值/qrels 未为模型评估解封，M0 投影/评分和任何模型拟
 历代失败身份值只保留 915,996 个不可逆排除哈希，归档 SHA-256 为
 `f70611a4b5df7ddbded6784820026352c92952a0245fcb184b4e7c282c1447a0`。
 失败 payload、临时 workspace 和版本专用代码/配置已清理；完整失败表和未来
-处置纪律见 `docs/STEP28_V13_FAILED_RUN_CLEANUP_20260803.zh.md`。旧 v1.2
+处置纪律见 `docs/STEP28_FAILED_RUN_CLEANUP_20260803.zh.md`。旧 v1.2
 成功发布字节保留为历史证据，但不恢复训练资格。下一步如继续主线，必须从
 新的版本合同、四个新 seed 和压缩禁用哈希归档开始，不能把 v1.11 原地修成
 “成功”。
@@ -1356,4 +1446,4 @@ v1.12 已另立合同和策略，但当前只通过设计阶段预检，正式�
 正式 seed ceremony、四 split 生成器、release tree/custody router 和使用完整
 输入的真实优化器收敛预检尚未实现，因此现在仍是 NO-GO。下一步是完成这些
 开跑硬门并冻结新的正式源码闭包，而不是直接生成 seed。完整边界见
-`docs/STEP28_V13_V1_12_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`。
+`docs/STEP28_PRECEREMONY_BASELINE_RESULT_20260803.zh.md`。

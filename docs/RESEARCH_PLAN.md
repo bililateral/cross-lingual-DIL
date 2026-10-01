@@ -1,4 +1,89 @@
-# 跨语言马甲账户识别科研计划
+# 科研计划与后续顺序
+
+## 当前阶段：首轮持续学习结果已回传并核查
+
+截至2026-10-01，**首轮有限历史持续学习训练、唯一valid评价、完整回传和本地独立核查均已完成；结果网页外审已于10月1日10:12:21提交Pro并开始回应，待实际回复与主审。** 作业从9月30日14:40:21运行至10月1日06:06:13（Asia/Shanghai），退出0、6048次更新、9504次群梯度呈现、21个终点及64份指标矩阵完整。实际总耗时15小时25分51秒，剩余0；原预计18—26小时／10月1日08:40—16:40完成，实际提前，36小时／64GiB是强制上限。09:24:59核对作业进程已退出。[本轮完整报告](SELLER_ALIAS_BGE_RESULT.zh.md)、[当前状态](../reports/seller_alias_continual/20261001/bge_continual_result/current_status.json)。
+
+本轮困难排序BGE、s0、ABC／BCA／CAB、冻结／SEQ／ER／LOGIT、6群且全部历史及附属状态≤1MiB及O／N／Z判据未改。train=1、valid=1、heldout／owners=0；326份小结果16,241,505字节回传匹配，18份冻结来源未变。Linux保存结果独立核查1,061,316数值、最大差7.11e−15通过，新标签与模型加载均0。[原始评价](../reports/seller_alias_continual/20261001/bge_continual_result/returned/job/evaluation/evaluation.json)、[独立核查](../reports/seller_alias_continual/20261001/bge_continual_result/audit/audit.json)。
+
+SEQ首域MAP遗忘0.063393、条件95%[0.041809,0.085423]，三个顺序同时有新域学习，预定遗忘观察门通过。ER−SEQ仅4/23通过，旧域MAP下降0.039873；LOGIT−ER为23/23通过，旧域MAP增加0.046887。但LOGIT相对SEQ旧域Recall@5及新域、最终最新域性能仍下降，不能称整体优于普通续训或抗遗忘已解决。单种子／已开发valid结论不等于创新或论文最终验收。历史18权重例外保持；本轮必要共享状态／对照仍保留Linux，未回传大权重或历史文本标签。
+
+本轮先观察困难排序BGE的新群体学习和旧域遗忘，再诊断随机重放及重放加历史分数保持。每顺序从原预训练BGE及同一s0随机头开始，不能借用已见三域的联合权重。
+
+### 已完成的准备
+
+- 首轮具体方法、6群／1MiB供给、配对预算、O／N／Z判据及6048更新已确认。
+- 合同、policy、代码、实际网页外审与主审、用户交付批准、Linux CPU核验及正式启动均已完成。
+- 正式6048更新、一次valid评价、完整回传和本地独立核查已完成；当前任务是结果外审与下一阶段决定。
+
+### 当前及随后工作
+
+当前下一步是完成本轮结果网页外审并核对实际回复，再围绕少量历史样本的代表性／重复强度以及排序保持与新域学习的平衡制定新方法合同。当前尚无新算法、种子、训练预算、标签或最终留出许可；不自动追加训练，不重复基础test。LOGIT相对ER的收益保留，不能替代相对SEQ的新旧能力保护或三种子方法资格。
+
+两端文件清理已完成：Windows删除58份原有冗余文件112,594,084字节，Linux删除1份中转包18,784字节；必要科研记录、原始外审证据、18份历史权重和活动训练状态保留。临时扫描／辅助脚本已收尾，Git／LFS未改。[清理完成回执](../reports/maintenance/20260930/project_cleanup/completion.json)、[存储与恢复](STORAGE.zh.md)。
+
+## 已完成基础验收及其历史边界
+
+2026-09-30基础验收闭环：**固定s0独立test的实际结果外审及主审已完成，结果有效性通过；原合同仍为8/9，唯一失败T1（ΔMAP≥0.01）。** ΔMAP=+0.007484203，条件95%区间[0.000050331,0.014610678]，ΔRecall@5=+0.014434524；原定AP/AUC及Brier/log_loss观察值保护通过。用户获知结果后明确“可以，这个test结果可以了，有提升就行”，接受这一实际增益作为后续研究基础；保留事后决定的性质和原机器`passed=false`。这不等于各域、所有分类工作点或总体非劣效均得到证明。详见[完整结果](SELLER_ALIAS_TEST_RESULT.zh.md)及[用户原话](../reports/seller_alias_continual/20260928/test_result/user_acceptance.json)。
+
+实际回复`1c91151a-333d-44ad-832c-aa67239abb74`、完整F1—F10、独立源码和全部原始运行／修订日志已亲自审读；118成员外审证据包完整归档。外部116份实证文件／117条校验记录、259份提交来源和34份当前冻结科学来源匹配；外审实际收到的ZIP大小／SHA与用户授权包一致。网页独立数值核验444,635项、最大差9.99e−16；主执行者核对1,138个既有JSON数值和全部判定，两个重放CSV与原Linux字节一致。已修正两个约53秒区间的报告标签：包含评分后文件／参数核对，非纯前向；原数值、源码、失败及审查参考修正均保留，不重跑。历史失败包网页覆盖17/18，本地实物18/18均已匹配。上述科学主审核对未新连Linux、启动科研运行或读取正式文本／标签／模型；随后文档与小型证据归档同步另记。[逐项主审及限制](../reports/seller_alias_continual/20260928/test_result/review/disposition.json)。
+
+正式运行仍为9月28日18:30:09—18:32:14 CST，125.20秒退出0、剩余0（原估10—30分钟，上限1小时／4GiB）；29份正式结果及9份原审计证据回传一致。heldout本阶段一次许可已消费，train/valid/owners0，不重复test或在其上调参；18份Linux权重继续按用户例外保留。**基础验收之后的首轮持续学习方案、比较、预算和评价合同现已确认并正式执行。** 当前进度见页首；不将联合三域权重当首域初态，现有120群不再当最终未开发留出，后续新最终留出另立合同。
+
+## 历史执行记录
+
+以下保留各时点的准备、失败及等待状态；“当前／下一步／未授权”均指原记录时点。现行状态以页首带观测时间的持续学习记录为准，历史许可不能移作新许可。
+
+最新下一步（2026-09-28）：**test入口及Linux手工核验已完成，完成实际网页实现外审与主审后直接执行固定s0独立test。** 用户已明确“核查test实现完毕后就开始test吧”，同一具体范围不再申请启动。校准17项valid与实际结果外审保持通过。[授权](../reports/documentation/20260928/test_plan/authorization.json)、[实现核验](SELLER_ALIAS_TEST_IMPLEMENTATION.zh.md)。
+
+用户已选择现有120群全部用于本次基础模型验收；持续学习最终留出以后另建、确认并封存，本次没有切分或生成数据。[test合同](SELLER_ALIAS_TEST.zh.md)固定A/C s0 E6及已有映射、九项同时通过条件、5000次分域整群bootstrap。最终CPU15项通过，34份科学来源一致；实现包经明确授权后16:15:33 CST提交网页Pro、16:16:01确认正在回应，待实际外审及主审。正式test尚未启动、heldout解析0。正式程序及小型核对预计10—30分钟，强制上限1小时／4GiB，单GPU单CPU；不包含外审等待，没有实际完成时刻。独立验收和结果有效性审查通过前不设计持续学习。
+
+以下校准提交状态为外审结束前历史，当前状态以以上两段及test合同为准。
+
+最新下一步（2026-09-28）：**完成概率校准结果外审与主审，再准备固定s0的独立合成test验收合同。** 已确认的六映射／12参数研究正式完成，14:08:51 CST退出0，实际1.40秒、剩余0（原估1—5分钟，上限1小时／256MiB）；17项valid开发条件全部通过。C的原排序收益保留，概率损失相对同样校准的A和原始A均满足保护；26份科学来源未改，train／valid各一次许可已消费，test／owners未读，18权重保留。新结果包已准备；自动审批以此前具体授权仅覆盖实现包为由拒绝上传，用户随后明确允许本结果包，14:39:51 CST已发送，Pro网页确认正在回应；必要收尾后暂停等待。实现审查不替代结果审查。test仍须具体合同、入口审查及单独阶段授权；在独立验收前不开始持续学习设计。[完整结果与校准解释](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[已确认合同](SELLER_ALIAS_CALIBRATION.zh.md)、[用户回答](../reports/documentation/20260928/calibration_plan/decision.json)。下方九模型结果为校准前历史，不回写其9过4败。
+
+更新日期：2026-09-28。本轮三配置九模型训练、7776更新及一次valid已完成，02:15:28 CST退出0，实际14小时25分、剩余0（原估计14—18小时，24小时上限）。C−A的MAP／R5及AP／AUC改善，但Brier／log_loss均值与固定s0退化，13项通过9项，完整验收未通过。本地保存结果独立核查、实际GPT6 Pro结果外审与主执行者逐项处置均已完成，结果有效性通过，完整验收失败保持；外审没有确认必须修复的新代码或数值缺陷。用户最新明确保留本轮全部18份权重作为后续候选，仅留Linux，未执行删除；C保留候选身份。见[结果报告](SELLER_ALIAS_RANKING_RESULT.zh.md)及[用户保留决定](../reports/seller_alias_continual/20260928/ranking_result/weight_retention.json)。原判据和监督边界保持，test与持续学习设计继续暂缓，尚未确认新训练或概率校准方案。
+
+## 已确认工作的状态
+
+| 工作 | 当前状态 |
+|---|---|
+| 旧三模型／敏感性评价与外审 | 已完成、原结论保持 |
+| 中文模型Windows下载、Linux归档、本地副本清理 | 已完成 |
+| 四配置合同、真实CPU更新、实际GPT6 Pro实现审查 | 已完成 |
+| 四配置六轮训练、3456更新、八模型恢复／评分 | 20:18:48退出0、完成 |
+| 完整门后valid一次正式评价 | 20:26:21退出0、完成 |
+| 小型结果回传、15202数值及2424盲计数核查 | 已完成、无新标签读取 |
+| 网页结果外审与候选检索用途补充 | 实际GPT6 Pro完整回复已审读，独立脚本Linux复核及处置完成 |
+| Git LFS | 本地prune释放0；用户已取消后续清理，草稿已删，远端未改 |
+
+完整分析见[中文结果](SELLER_ALIAS_CHINESE_RESULT.zh.md)。D为预定主候选；D−A、D−LaBSE的排序改善与原严格自动判定门失败同时成立。
+
+## 已确认的下一步：保留D基线，先做针对性改进
+
+2026-09-24用户明确要求：**把D保留为可用基线，再做一轮有针对性的改进；等这轮实验真正提升模型的马甲候选排序能力后，再开始设计持续学习方案。** 主执行者判断该顺序合理，现作为正式下一步；不再并行推进持续学习方案设计。[用户决定与范围](../reports/documentation/20260924/next_plan/decision.json)。
+
+1. **保留D固定结果与配置基线。** 保留完整结果、数据边界、训练配置与负面指标。2026-09-26用户明确将原D权重纳入全部训练载荷清理，此项覆盖此前“保留第6轮模型”的存储要求；后续如需新推理／重建，另行确认具体范围与监督许可。D已有候选排序能力的研究结论不因删除权重改判，不追认为通过原自动判定门。
+2. **保留C排序收益及已完成的概率校准结果。** 原九模型四项概率保护失败保持历史身份；另行确认并执行A/C三种子E6的六个正斜率／截距拟合，17项开发条件全部通过，实际结果外审及主审已闭环。当前按第3项准备固定s0独立验收。全部18权重继续保留。[校准结果](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[实现证据](SELLER_ALIAS_CALIBRATION_IMPLEMENTATION.zh.md)、[原九模型结果](SELLER_ALIAS_RANKING_RESULT.zh.md)。
+3. **先核实真实提升，再设计持续学习。** 用户于2026-09-25确认：先在valid开发比较，满足预先约定判据后，再做一次独立合成test验收。test须在具体合同和入口审查完成、另获阶段授权后读取。完成预定验收、本地主审和适用外审且达到提升判据后，才进入持续学习方案设计。若未达到，保留负结果、分析原因并重新讨论改进方向，持续学习设计继续暂缓。[本次回答与范围](../reports/documentation/20260925/retrieval_plan/decision.json)。
+
+“先改进再持续学习”是用户确认的推进顺序，不表示D没有基础能力，也不恢复原0.1%／50%自动判定门作为通用资格线。本轮主要指标、阈值、轮次、历史结果均不追溯改变。未来持续学习起点须按到达顺序建立，已联合见过三域的权重不能冒充首域模型。
+
+旧中文阶段与本轮加权汇总阶段的train／valid许可均各自消费完成。加权汇总作业于2026-09-25 12:57:45—20:35:20 CST完成，4320更新及一次valid，实际约7小时37分，剩余0；13项改进条件中8项未通过，保留有效负结果，test未授权，持续学习设计暂缓。实际GPT6 Pro结果回复、附件、主审处置及独立脚本Linux重放均完成；原自动审批拒绝、新授权和等待暂停保留为历史，不把训练前外审当作本次结果外审。Linux全部训练权重依用户要求已删除，D仅保留配置与结果。未修改冻结计算、成功线或18份正式来源。下一步讨论不能自动重开本轮、追加监督或追认成功。接手入口为[交接](AI_RESEARCH_HANDOFF.zh.md)、[纪律](RESEARCH_DISCIPLINE.zh.md)及[本轮结果](SELLER_ALIAS_POOLING_RESULT.zh.md)。
+
+## 训练期间的需求讨论
+
+2026-09-27用户明确：最终交付为投稿论文，目标CCF B或C类期刊／会议，新方法须有一定创新；先完成当前中文合成受控任务的持续学习主线，再决定是否扩大候选库或纳入无同控候选查询。用户进一步确认：**研究建立在可用历史训练数据较少的背景之下**，后续围绕该前提研究旧分布能力保持与新群体学习。此背景已确定；具体历史数据可用量、可用方式及比较预算在后续合同中量化，具体刊会和期限尚未指定。[讨论与回答原文](RESEARCH_DISCUSSION.zh.md)保留问题、实际回复、生效范围与结果报告框架，并标出首次test前须明确的数据用途问题。未变更活动合同、13项判据或监督授权；基础排序改善不自动构成论文方法创新，持续学习设计仍在基础模型独立验收之后。
+
+### 直接相关文献与论文定位
+
+按用户要求完成原始文献核查，随后取得网页GPT6 Pro完整回复与来源附件并独立处置。[文献定位](SELLER_ALIAS_LITERATURE.zh.md)已补入LUAR、DiCGRL、ERD和VeriDark，并明确CREAM的共享覆盖训练选择、L²R无兼容版本与vanilla的区别，以及QDC训练蒸馏的关联。现有工作比初稿覆盖更直接：多记录文本、未见身份评价、共享对象和关系保持均不能单独认证创新。结论仍是问题值得继续，但尚无可以作算法差异判断的完整新机制；不能据此宣称方法创新或录用资格。已处理提交呈现中的链接格式缺陷，保留原件与稳定文献目录。[主审处置](../reports/seller_alias_papers/20260927/continual_position/disposition.json)。潜在贡献只是待证问题，不冻结新的持续学习方案，不改变活动实验与先基础模型验收的顺序。
+
+## 历史原文（以下均为当时状态）
+
+> 以下保留整理前正文、历史结论和来源散列。旧“当前／下一步／待恢复”只指其原记录时点，不是本阶段执行指令。
+
+2026-09-15入口校正：本文下方为历史计划或进展，旧“当前／下一步”仅指原记录阶段，不能作为现行执行授权。现行主线是有限历史记忆下的中文暗网卖家马甲持续识别；第一路联合诊断已完成，第二路随机ER已于9月15日12:38正常结束并完成一次valid评价，本地三项缓解判据失败，实际结果外审及本地复核已完成，有效负基线闭环。当前状态、授权及最新实测时间以[科研交接](AI_RESEARCH_HANDOFF.zh.md)为准，执行合同见[随机ER方案](SELLER_ALIAS_MITIGATION_PLAN.zh.md)，大型载荷归档位置见[存储与恢复](STORAGE.zh.md)。历史结论和哈希原义不变。
 
 版本：`2026-05-14`
 
@@ -77,14 +162,14 @@
 
 当前已完成修正：
 
-- `schema/step5_v3_targeted_review_policy.json` 已改为读取 calibrated BGE graph：
+- `schema/step5_independent_targeted_review_policy.json` 已改为读取 calibrated BGE graph：
   - `reports/step11_core_calibrated_bge_m3_clustering_summary.json`
   - `reports/step11_core_calibrated_bge_m3_zh_target_strict_scored_pairs.csv`
   - `reports/step11_core_calibrated_bge_m3_zh_target_strict_clusters.threshold_0500000.csv`
 - 新 corrected queue 已生成：
-  - `reports/step5_zh_target_strict_targeted_review_queue.step11_calibrated_bge_v3.csv`
-  - `reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_bge_v3.csv`
-  - `reports/step5_v3_targeted_review_queue_summary.calibrated_bge.json`
+  - `reports/step5_zh_target_strict_independent_targeted_review_queue.step11_calibrated_bge.csv`
+  - `reports/step5_zh_target_strict_independent_targeted_rereview_queue.step11_calibrated_bge.csv`
+  - `reports/step5_independent_targeted_review_queue_summary.calibrated_bge.json`
 - corrected queue 结果：
   - net-new review rows: `0`
   - rereview rows: `37`
@@ -102,17 +187,17 @@
 
 1. 当前 Step 5 v2 boundary、fresh Step 7 / Step 9 / Step 11 结果、当前 docs，已冻结成独立里程碑快照：
    - `reports/step5_v2_milestone_snapshot_20260416`
-   - `reports/step5_v2_milestone_snapshot_summary.json`
+   - `reports/step5_milestone_snapshot_summary.json`
 2. Step 5 v3 targeted rereview queue 已生成：
-   - `schema/step5_v3_targeted_review_policy.json`
-   - `scripts/step5_build_targeted_review_queue_v3.py`
-   - `reports/step5_zh_target_strict_targeted_review_queue.step11_bge_v3.csv`
-   - `reports/step5_zh_target_strict_targeted_rereview_queue.step11_bge_v3.csv`
-   - `reports/step5_v3_targeted_review_queue_summary.json`
+   - `schema/step5_independent_targeted_review_policy.json`
+   - `scripts/step5_build_independent_targeted_review_queue.py`
+   - `reports/step5_zh_target_strict_independent_targeted_review_queue.step11_bge.csv`
+   - `reports/step5_zh_target_strict_independent_targeted_rereview_queue.step11_bge.csv`
+   - `reports/step5_independent_targeted_review_queue_summary.json`
 3. Step 5 v3 targeted cleanup 与 refreshed freeze 已完成：
-   - `schema/step5_v3_targeted_cleanup_policy.json`
+   - `schema/step5_independent_targeted_cleanup_policy.json`
    - `scripts/step5_apply_targeted_rereview_policy.py`
-   - `reports/step5_v3_targeted_cleanup_summary.json`
+   - `reports/step5_independent_targeted_cleanup_summary.json`
    - `reports/step5_frozen_silver_summary.json`
 
 当前 v3 queue 的实际状态：
