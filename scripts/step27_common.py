@@ -16,12 +16,12 @@ from typing import Iterable
 
 import numpy as np
 
-import step15_build_v7_clean_embedding_cache as redaction
+import step15_build_clean_embedding_cache as redaction
 import step24_common
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_exact_replay_policy.json"
 DEFAULT_OUTPUT_ROOT = ROOT / "reports" / "step27_english_pretrained_synthetic_adaptation"
 DEFAULT_TEXT_FIELDS = [
     "category_concat_top",

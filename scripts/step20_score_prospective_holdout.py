@@ -14,12 +14,12 @@ from pathlib import Path
 import numpy as np
 
 import step9_run_few_shot_adaptation as step9
-import step15_v7_common as common
+import step15_common as common
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POLICY = ROOT / "schema" / "step20_prospective_holdout_policy.json"
-V7_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
+V7_POLICY = ROOT / "schema" / "step15_two_stage_policy.json"
 
 
 def render_csv(rows: list[dict], fields: list[str]) -> bytes:

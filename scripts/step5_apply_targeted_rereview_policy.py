@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_POLICY_PATH = ROOT / "schema" / "step5_v3_targeted_cleanup_policy.json"
+DEFAULT_POLICY_PATH = ROOT / "schema" / "step5_independent_targeted_cleanup_policy.json"
 
 
 def parse_args() -> argparse.Namespace:

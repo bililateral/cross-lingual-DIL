@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import step24_common as common  # noqa: E402
-import step15_v7_common as v7_common  # noqa: E402
+import step15_common as v7_common  # noqa: E402
 
 
 POLICY_PATH = ROOT / "schema" / "step24_content_independent_authorship_policy.json"

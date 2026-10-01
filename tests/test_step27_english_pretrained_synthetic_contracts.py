@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import step27_common as common  # noqa: E402
 import step12_step27_statistical_audit as statistical_audit  # noqa: E402
-import step15_build_v7_clean_embedding_cache as v7_encoding  # noqa: E402
+import step15_build_clean_embedding_cache as v7_encoding  # noqa: E402
 import step27_audit_synthetic_data as synthetic_audit  # noqa: E402
 import step27_build_parent_manifest as parent_builder  # noqa: E402
 import step27_build_sync_manifest as sync_manifest  # noqa: E402
@@ -28,7 +28,7 @@ import step27_generate_train_only_views as generation  # noqa: E402
 import step27_train_residual_models as training  # noqa: E402
 
 
-POLICY_PATH = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
+POLICY_PATH = ROOT / "schema" / "step27_exact_replay_policy.json"
 
 
 class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
@@ -71,7 +71,7 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         self.assertIn("v1_1_20260719", str(common.output_root(self.policy)))
         self.assertEqual(
             self.policy["implementation_runner"],
-            "scripts/run_step27_v1_1_exact_replay_linux_20260719.sh",
+            "scripts/run_step27_exact_replay_linux_20260719.sh",
         )
         legacy = json.loads(
             (ROOT / "schema" / "step27_english_pretrained_synthetic_adaptation_policy.json").read_text(
@@ -761,7 +761,7 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
         self.assertIn("synthetic and real embeddings cannot be mixed", helper)
         self.assertIn("persisted_real_matrix", source)
         runner = (
-            ROOT / "scripts" / "run_step27_v1_1_exact_replay_linux_20260719.sh"
+            ROOT / "scripts" / "run_step27_exact_replay_linux_20260719.sh"
         ).read_text(encoding="utf-8")
         self.assertIn("--validate-model-contract-only", runner)
         self.assertLess(
@@ -930,7 +930,7 @@ class Step27EnglishPretrainedSyntheticContracts(unittest.TestCase):
 
     def test_posthoc_v11_runner_cannot_open_valid_or_internal_test(self) -> None:
         runner = (
-            ROOT / "scripts" / "run_step27_v1_1_exact_replay_linux_20260719.sh"
+            ROOT / "scripts" / "run_step27_exact_replay_linux_20260719.sh"
         ).read_text(encoding="utf-8")
         self.assertIn("--mode oof_gate", runner)
         self.assertNotIn("--score-valid", runner)

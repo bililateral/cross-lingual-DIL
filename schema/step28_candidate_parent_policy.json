@@ -1,0 +1,221 @@
+{
+  "version": "2026-08-09-step28-v13-v1-13-candidate-parent-policy-v1",
+  "status": "DESIGN_ONLY_PARENT_AND_TRIAL_IDENTITY_IMPLEMENTATION_NO_FORMAL_AUTHORIZATION",
+  "claim_boundary": "Candidate-independent parent projection, private Step3 contribution provenance, and one-shot in-memory trial identity allocation for development-smoke verification only. No candidate text, formal seed, formal capability, formal row, model, or metric can be created.",
+  "formal_authorizations": {
+    "candidate_generation": false,
+    "formal_capability_derivation": false,
+    "formal_dataset_generation": false,
+    "formal_model_training": false,
+    "formal_seed_ceremony": false
+  },
+  "allowed_mode": "development_smoke",
+  "required_split_values": [
+    "train",
+    "development",
+    "audit_a",
+    "audit_b"
+  ],
+  "frozen_inputs": {
+    "collision_policy": {
+      "path": "schema/step28_document_collision_policy.json",
+      "sha256": "a97252ade207a8af95155ac06cb48979484926ec1386bb2a737ed1f6d73b5966",
+      "size_bytes": 12054
+    },
+    "collision_primitives": {
+      "path": "scripts/step28_document_collision.py",
+      "sha256": "a21fa53c28dfe5b3ffd9d156fd141cdfab7d380f36798292504f9781f67bcc05",
+      "size_bytes": 34474
+    },
+    "base_dataset_policy": {
+      "path": "schema/step28_synthetic_chinese_dataset_policy.json",
+      "sha256": "e0c5dbba5818c7fc45d757795d923fcda3392250f4980b67f1670370050aa389",
+      "size_bytes": 197954
+    },
+    "common_contract": {
+      "path": "scripts/step28_dataset_common.py",
+      "sha256": "2d5f096b5f2781bb64a4aa6f062446eac08c2a779bc5ceeb8268fbb4a032dd63",
+      "size_bytes": 36479
+    },
+    "world_builder": {
+      "path": "scripts/step28_world_builder.py",
+      "sha256": "f472144c18e40af9502d237cf1d8ce0ca0a94848f3de5ebd1160ae48a1447b52",
+      "size_bytes": 21622
+    },
+    "production_chain": {
+      "path": "scripts/step28_production_chain.py",
+      "sha256": "d95603d77c10a98fb5bb274faad3437b749f180ff90d6ef761832ba6e02bd6f0",
+      "size_bytes": 78222
+    },
+    "profile_bridge": {
+      "path": "scripts/step28_profiles.py",
+      "sha256": "5e8cd7e938243f384ab16f6bc1eff4f09e6f80b4a939f16b0e5d6559811952c2",
+      "size_bytes": 6524
+    },
+    "redaction_common": {
+      "path": "scripts/step7_authorship_common.py",
+      "sha256": "20aa8d5c94e21a067a7a987ba72e0a1af1b4fb265b9e115f5e16e6b0952efbc6",
+      "size_bytes": 158058
+    },
+    "identity_remapper": {
+      "path": "scripts/step28_identity_remap.py",
+      "sha256": "58d4eec52be278caaddf5bb2c9649814410fcaafba023b5648b35549a566dd46",
+      "size_bytes": 13853
+    },
+    "identity_history": {
+      "path": "scripts/step28_history_features.py",
+      "sha256": "6d417060f59ff2727dd22d2fdd785dc51795d98ce3922f266e598b830fcc6af1",
+      "size_bytes": 29347
+    },
+    "history_common": {
+      "path": "scripts/step28_history_common.py",
+      "sha256": "39fe4e952563dcbee4b300c89f8c1c1072357b5687e7d128009c1b951f228eab",
+      "size_bytes": 22228
+    },
+    "identity_values": {
+      "path": "scripts/step28_identity_values.py",
+      "sha256": "b561cc55dfab35958361b12ac65508952d603692d0b6670446eec1226e9a69a4",
+      "size_bytes": 12592
+    },
+    "identity_plan": {
+      "path": "scripts/step28_identity_plan.py",
+      "sha256": "ccd637d1b19e14f5028da80e6b411264ec5731dff24f283f1b845f03d284ec31",
+      "size_bytes": 73271
+    },
+    "legacy_step28_common": {
+      "path": "scripts/step28_common.py",
+      "sha256": "91a3a545f467958666022ab07ec393a262e75baa3dce015818ddc4cd98157cc0",
+      "size_bytes": 12271
+    },
+    "nonidentity_builder": {
+      "path": "scripts/step28_nonidentity.py",
+      "sha256": "bb8e0a38f1061b7fcb5d2fd437cc265f514ee70b6a4d6953fa97387e2dc986fb",
+      "size_bytes": 25112
+    },
+    "source_data": {
+      "path": "scripts/step7_chunked_source_data.py",
+      "sha256": "6188fe5b76d601371f7096ce533edfb4f4ecb0f7d718d33408f947f17f07896c",
+      "size_bytes": 126543
+    },
+    "structure_builder": {
+      "path": "scripts/step28_structure.py",
+      "sha256": "c257cbd85d951c0a8ac1b26e7c6cbb207a55387818eb6f1dce80fcba666b4394",
+      "size_bytes": 17678
+    },
+    "step3_profile_code": {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+      "size_bytes": 57250
+    },
+    "text_renderer": {
+      "path": "scripts/step28_text_renderer.py",
+      "sha256": "c3a8c99c2c8a3669750516291bd3bd74d0f987b7d69badeba87e01e9a84a9911",
+      "size_bytes": 9820
+    }
+  },
+  "candidate_independent_parent": {
+    "seller_count": 28,
+    "pair_count": 378,
+    "full_render_ast_schema": [
+      "world_uid",
+      "seller_uid",
+      "item_uid",
+      "time_bucket",
+      "category",
+      "product",
+      "attribute",
+      "delivery",
+      "service",
+      "code",
+      "title_skeleton_index",
+      "description_skeleton_index",
+      "effective_style_uid",
+      "title_nonempty",
+      "description_nonempty",
+      "identity_slot_uids",
+      "noise_slot_uid"
+    ],
+    "candidate_invariant_render_ast_projection": [
+      "world_uid",
+      "seller_uid",
+      "item_uid",
+      "time_bucket",
+      "code",
+      "effective_style_uid",
+      "title_nonempty",
+      "description_nonempty",
+      "identity_slot_uids",
+      "noise_slot_uid"
+    ],
+    "candidate_visible_fields_excluded_from_parent_fingerprint": [
+      "title",
+      "description"
+    ],
+    "effective_style_factors_source": "template.renderer_contract.style_factor_order",
+    "registered_override_lineage_exact": true,
+    "noise_target_lineage_exact": true,
+    "identity_values_excluded_until_trial_allocation": true
+  },
+  "profile_contribution_provenance": {
+    "public_profile_algorithm_unchanged": true,
+    "public_profile_bytes_must_match_frozen_step3": true,
+    "output_fields": [
+      "category_concat_top",
+      "signature_title_concat",
+      "title_concat_top",
+      "signature_description_concat",
+      "description_concat_top"
+    ],
+    "row_fields": [
+      "world_uid",
+      "seller_uid",
+      "output_field",
+      "aggregation_role",
+      "output_rank",
+      "source_item_uids",
+      "source_item_uids_sha256",
+      "source_item_count",
+      "first_seen_position",
+      "item_uid",
+      "extracted_segment_ordinal",
+      "seller_df",
+      "seller_df_seller_count",
+      "seller_df_seller_uids_sha256"
+    ],
+    "raw_contribution_values_persisted": false,
+    "private_audit_only": true
+  },
+  "trial_identity_allocation": {
+    "allocator_calls_per_world": 1,
+    "candidate_loop_receives_live_identity_set": false,
+    "committed_hash_input_type": "frozenset",
+    "trial_set_is_private_copy": true,
+    "returned_state_serialization": "canonical-json-utf8-bytes",
+    "identity33_rows_per_world": 378,
+    "identity33_feature_count": 33,
+    "retry_after_allocator_entry_forbidden": true,
+    "formal_custody_released": false,
+    "historical_identity_hash_count": 999996,
+    "historical_identity_hashes_sha256": "c82e86aa72c205d62ed4a03bd5166a32c8d98fde9bb5961ec1a0048b64ee1346",
+    "maximum_counter": 128,
+    "identity_candidate_domain": "step28-v13-v1.13-identity-value",
+    "identity_key_source": "base_dataset_policy.randomness.development_smoke.identity_value_key_hex",
+    "identity_key_sha256": "f5be119b0945e2c355beba49f983b4fa6dfa8fa02ebc53283335e89bcc1960e0",
+    "normal_api_fault_injection": false,
+    "allocation_audit_row_fields": [
+      "identity_asset_uid",
+      "selected_counter",
+      "visible_text_candidate_rejection_count",
+      "selected_value_hash"
+    ],
+    "allocation_audit_contains_raw_identity_values": false
+  },
+  "development_smoke_parent": {
+    "world_pool_index": 0,
+    "world_uid": "w_003497845547650a980473b05e249937bf825ad0eaefa424baec74f2bd2210f3",
+    "split": "audit_a",
+    "world_record_canonical_sha256": "f147b016762dbe9aad452a58a8f937b104fe653379902cc461c1035c86f07210",
+    "structure_key_sha256": "3088ac746944c07072b309277071356af0d9dddf71cae1a86aabf331312dd1e6"
+  },
+  "canonical_self_hash": "b0ebbd5cfc07ca904d6e3c447d76b25abb2a8a0d217927e2e8dade93845a877d"
+}

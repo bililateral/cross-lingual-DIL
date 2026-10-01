@@ -1,0 +1,134 @@
+{
+  "version": "2026-08-10-step28-v13-v1-13-candidate-selection-policy-v1",
+  "status": "DESIGN_SMOKE_ONLY_CANDIDATE_SELECTION_NO_FORMAL_AUTHORIZATION",
+  "claim_boundary": "One pinned development-smoke world may search exact document-collision candidates in memory. No formal seed, capability, candidate, row, transaction, split state, dataset, model, metric, or release is authorized.",
+  "formal_authorizations": {
+    "audit_truth_access": false,
+    "formal_capability_derivation": false,
+    "formal_candidate_generation": false,
+    "formal_dataset_generation": false,
+    "formal_model_training": false,
+    "formal_seed_ceremony": false
+  },
+  "allowed_mode": "development_smoke",
+  "allowed_split": "audit_a",
+  "candidate_limit": 32,
+  "collision_categories": [
+    "same_world_item_document",
+    "same_world_seller_document",
+    "historical_item_document",
+    "historical_seller_document",
+    "current_split_item_document",
+    "current_split_seller_document",
+    "predecessor_item_document",
+    "predecessor_seller_document"
+  ],
+  "frozen_inputs": {
+    "collision_contract": {
+      "path": "docs/STEP28_VISIBLE_DOCUMENT_COLLISION_CONTRACT_20260809.zh.md",
+      "sha256": "7c43a4b652517f6c0fb3df1bfff20333d8e271f092b914909fb90438fa879b6c",
+      "size_bytes": 17834
+    },
+    "collision_policy": {
+      "path": "schema/step28_document_collision_policy.json",
+      "sha256": "a97252ade207a8af95155ac06cb48979484926ec1386bb2a737ed1f6d73b5966",
+      "size_bytes": 12054
+    },
+    "candidate_parent_policy": {
+      "path": "schema/step28_candidate_parent_policy.json",
+      "sha256": "d474d0105db91714d1e4cdcb23a170a45f41e8ec7d3d6537eb9673d383a760d9",
+      "size_bytes": 8103
+    },
+    "natural_variation_policy": {
+      "path": "schema/step28_natural_variation_policy.json",
+      "sha256": "a628733991291b6870d5dc4f23c52145e33eb7da325bfa1fc3feed6751149979",
+      "size_bytes": 8131
+    },
+    "base_dataset_policy": {
+      "path": "schema/step28_synthetic_chinese_dataset_policy.json",
+      "sha256": "e0c5dbba5818c7fc45d757795d923fcda3392250f4980b67f1670370050aa389",
+      "size_bytes": 197954
+    },
+    "common_contract": {
+      "path": "scripts/step28_dataset_common.py",
+      "sha256": "2d5f096b5f2781bb64a4aa6f062446eac08c2a779bc5ceeb8268fbb4a032dd63",
+      "size_bytes": 36479
+    },
+    "collision_primitives": {
+      "path": "scripts/step28_document_collision.py",
+      "sha256": "a21fa53c28dfe5b3ffd9d156fd141cdfab7d380f36798292504f9781f67bcc05",
+      "size_bytes": 34474
+    },
+    "candidate_parent": {
+      "path": "scripts/step28_candidate_parent.py",
+      "sha256": "969167010a3b171d517be0f3153760f848d52c09a7edf07af6c5f39e3d65c800",
+      "size_bytes": 57177
+    },
+    "natural_variation": {
+      "path": "scripts/step28_natural_variation.py",
+      "sha256": "4772835da940879b00d4acaebbc122a47a28860d59e9d2823e78c7b474e00078",
+      "size_bytes": 82055
+    },
+    "production_chain": {
+      "path": "scripts/step28_production_chain.py",
+      "sha256": "d95603d77c10a98fb5bb274faad3437b749f180ff90d6ef761832ba6e02bd6f0",
+      "size_bytes": 78222
+    },
+    "profiles": {
+      "path": "scripts/step28_profiles.py",
+      "sha256": "5e8cd7e938243f384ab16f6bc1eff4f09e6f80b4a939f16b0e5d6559811952c2",
+      "size_bytes": 6524
+    },
+    "step3_profiles": {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202",
+      "size_bytes": 57250
+    },
+    "candidate_selection": {
+      "path": "scripts/step28_candidate_selection.py",
+      "sha256": "08ab53b9953f51994d1c5bbed7978bb24d6ed5caccc7ecd9418c0b893c3f85b1",
+      "size_bytes": 49286
+    },
+    "candidate_selection_tests": {
+      "path": "tests/test_step28_candidate_selection_contracts.py",
+      "sha256": "0ee2410c10ec75baa391032155241ae3b73c9ba051950b0b9b891a19399262f1",
+      "size_bytes": 32398
+    }
+  },
+  "smoke_collision_context": {
+    "world_ordinal": 0,
+    "historical_item_count": 302944,
+    "historical_item_hashes_sha256": "7097431024dc9d8894ddc497745f983a7f442140e6ef90d6b47bdd1d77b624cb",
+    "historical_seller_count": 84000,
+    "historical_seller_hashes_sha256": "08c18e97423502d2f6452ce0b7f319463028de148ee50955197896777cce3117",
+    "current_item_count": 0,
+    "current_item_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "current_seller_count": 0,
+    "current_seller_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "predecessor_item_count": 0,
+    "predecessor_item_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "predecessor_seller_count": 0,
+    "predecessor_seller_hashes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "previous_world_marker_sha256": "043279cb8a4bcbb52793dc04e0379b845d898c4d3c8e82670026e96db6280135",
+    "predecessor_seal_pin_count": 0,
+    "predecessor_seal_pins_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "expected_smoke_selection": {
+    "world_uid": "w_003497845547650a980473b05e249937bf825ad0eaefa424baec74f2bd2210f3",
+    "accepted_candidate_index": 0,
+    "candidates_examined": 1,
+    "rejected_candidate_count": 0,
+    "item_count": 105,
+    "seller_count": 28,
+    "selection_context_sha256": "b0aef4fe60d1b2a117b30be9788a42bd6cba2a40123dfb82f8946640b199428d",
+    "exact_title_clone_qualification_sha256": "145c94bfd1ad0ffe5639d9c62e3c5a7c7c8531923e7723aa34e5bb803857b9fe",
+    "redacted_items_sha256": "ab6554799a64af300345f531f0e6aa76bbb02853deb517abf2ed662aaf5a58c5",
+    "profiles_sha256": "65a37892f9febff8eb4c00aa5f172d04277a72c3f4e3f8d328e1bc4f52c3972d",
+    "item_registry_delta_sha256": "ff7e793f43612d7a47e5111d24cc6d0179b060c2d8b8e113b1a221e84263ea1f",
+    "seller_registry_delta_sha256": "0be77cf5c95b79cd5f291fca280fc289e3deb35f3264b3eaf5edb1e159b8fb25",
+    "allocation_delta_count": 84,
+    "allocation_delta_sha256": "cb963844c3337afeca0aac7b36307f9fac88744591bc44e2a5e745301679caf7",
+    "accepted_state_sha256": "6f14e23acbb0b7adbfda3e7044c9d5389338db30fd5692dee2a2aaff3802343f"
+  },
+  "canonical_self_hash": "490258045a755d42c0566d30bbdbc875107d6765e6963ff0210f5f2ab9b3b83b"
+}

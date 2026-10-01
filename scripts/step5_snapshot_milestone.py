@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-POLICY_PATH = ROOT / "schema" / "step5_v2_milestone_snapshot_policy.json"
+POLICY_PATH = ROOT / "schema" / "step5_milestone_snapshot_policy.json"
 
 
 def load_json(path: Path) -> dict:

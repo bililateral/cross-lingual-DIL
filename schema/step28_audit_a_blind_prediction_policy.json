@@ -1,0 +1,74 @@
+{
+  "version": "step28-v13-v1.13-v9.4.1-audit-a-blind-prediction-v1",
+  "status": "AUDIT_A_BLIND_PREDICTION_AUTHORIZED_NO_TRUTH",
+  "claim_boundary": "AUDIT_A_PROBABILITIES_ONLY_NO_AUDIT_TRUTH_NO_METRICS_NO_AUDIT_B",
+  "canonical_self_hash": "661693f0d7a00df390d687af827722232bc6c740454e367debeceaae884ecd4c",
+  "split": "audit_a",
+  "frozen_public_inputs": {
+    "public_projection_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+      "size_bytes": 2594,
+      "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2",
+      "canonical_self_hash": "1614e70bd84b76c292098d41f8b8aa0a51666c26f73631b943bf42576b9bba28"
+    },
+    "training_manifest": {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/manifest.json",
+      "size_bytes": 9441,
+      "sha256": "d86266e8abd405494ef409d32d2a5528e95c9cedd348594d063daf6306b033bc",
+      "canonical_self_hash": "7cab52a64081bc3871081a0f8a5bfd308813c2d80b9d433a7cbe277e9cb35364"
+    }
+  },
+  "frozen_code_inputs": {
+    "audit_a_blind_runner_v1": {
+      "path": "scripts/step28_audit_a_blind_predict.py",
+      "size_bytes": 16896,
+      "sha256": "e7e704d63b0ddfa5a5d33641da109ae7cbea9372c56b5276bd108f8cb43f206d"
+    },
+    "train_development_runner_v2": {
+      "path": "scripts/step28_train_development.py",
+      "size_bytes": 33541,
+      "sha256": "6a755b95610f4010da6c5fecff72e5df3efd0eb4e771a96ca34726738a5dba4e"
+    },
+    "model_training_core_v3": {
+      "path": "scripts/step28_model_training_core.py",
+      "size_bytes": 51858,
+      "sha256": "6a1c1ae3f99c91e2702a50654ea8afd2c9df820ed4df42064789972cd302179e"
+    },
+    "blind_stage_protocol_v3": {
+      "path": "scripts/step28_blind_stage_protocol.py",
+      "size_bytes": 5083,
+      "sha256": "32efd00a29c0de4f0f24e5f2ee6d88f65fdd8952b176b39608e2bcbe095a3e8c"
+    }
+  },
+  "public_projection_root": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831",
+  "training_output_root": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901",
+  "expected_layout": {
+    "worlds_per_split": 500,
+    "rows_per_split": 189000,
+    "rows_per_world": 378,
+    "base_feature_count": 24,
+    "identity_feature_count": 33,
+    "m1_repeat_ids": [
+      "r01",
+      "r02",
+      "r03",
+      "r04",
+      "r05"
+    ]
+  },
+  "private_inputs": [],
+  "truth_read_budget": {
+    "audit_a_labels_or_qrels": 0,
+    "audit_b_labels_or_qrels": 0
+  },
+  "authorization": {
+    "audit_a_blind_prediction_authorized": true,
+    "audit_a_truth_authorized": false,
+    "audit_b_blind_prediction_authorized": false,
+    "audit_b_truth_authorized": false
+  },
+  "development_disk_replay_required": true,
+  "formal_output_root": "reports/step28_model_experiment/v9_4_1_audit_a_blind_predictions_v1_20260901",
+  "overwrite_existing_output_allowed": false,
+  "failure_rule": "delete only the incomplete building directory; never open audit truth; repair code in a new version if semantics change"
+}

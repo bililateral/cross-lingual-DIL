@@ -8,7 +8,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import step15_build_v7_clean_embedding_cache as redaction
+import step15_build_clean_embedding_cache as redaction
 import step27_common as common
 
 

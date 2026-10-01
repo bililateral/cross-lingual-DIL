@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-import step15_v7_common as v7_common
+import step15_common as v7_common
 import step7_train_baseline_models as step7
 import step9_run_few_shot_adaptation as step9
 import step24_common as common

@@ -10,14 +10,14 @@ from pathlib import Path
 
 import numpy as np
 
-import step15_build_v6_inductive_pair_features as v6
-import step15_build_v7_inductive_pair_features as v7
-import step15_v7_common as common
+import step15_build_train_reference_pair_features as v6
+import step15_build_oov_safe_pair_features as v7
+import step15_common as common
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POLICY = ROOT / "schema" / "step20_prospective_holdout_policy.json"
-V7_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
+V7_POLICY = ROOT / "schema" / "step15_two_stage_policy.json"
 
 
 def write_new(path: Path, payload: bytes) -> None:

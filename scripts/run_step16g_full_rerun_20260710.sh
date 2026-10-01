@@ -88,9 +88,9 @@ python3 scripts/step15_slice_level_audit.py \
 
 echo "[6/10] Run Step12 grouped-bootstrap robustness and same-ratio mixup ablation"
 python3 scripts/step12_statistical_robustness_audit.py \
-  --output-json reports/step12_v5_statistical_robustness_zh_test_step16g_imbalance_20260710.json \
-  --output-metrics reports/step12_v5_statistical_robustness_model_metrics_step16g_imbalance_20260710.csv \
-  --output-comparisons reports/step12_v5_statistical_robustness_paired_comparisons_step16g_imbalance_20260710.csv
+  --output-json reports/step12_statistical_robustness_zh_test_step16g_imbalance_20260710.json \
+  --output-metrics reports/step12_statistical_robustness_model_metrics_step16g_imbalance_20260710.csv \
+  --output-comparisons reports/step12_statistical_robustness_paired_comparisons_step16g_imbalance_20260710.csv
 
 echo "[7/10] Rerun the explicit Step11 publication candidates"
 python3 scripts/step11_cluster_chinese_graph.py \
@@ -127,8 +127,8 @@ python3 scripts/step11_cluster_chinese_graph.py \
 
 echo "[8/10] Generate the explicit six-summary Step11 cluster audit"
 python3 scripts/step11_cluster_level_audit.py \
-  --summary reports/step11_step15_v5_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json \
-  --summary reports/step11_step15_v5_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json \
+  --summary reports/step11_step15_domain_balanced_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json \
+  --summary reports/step11_step15_public_noise_weighted_strong_phase4_seed_mean_clustering_summary.json \
   --summary reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260320_clustering_summary.json \
   --summary reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260321_clustering_summary.json \
   --summary reports/step11_core_few_shot_multilingual_e5_large_lr_l2_positive_pair_mixup_ratio_100pct_seed_20260322_clustering_summary.json \
@@ -178,7 +178,7 @@ for seed in seeds:
         raise SystemExit(f"Mixup and non-mixup predictions are not a valid distinct paired control for seed {seed}")
 
 step12 = json.loads(
-    Path("reports/step12_v5_statistical_robustness_zh_test_step16g_imbalance_20260710.json").read_text(
+    Path("reports/step12_statistical_robustness_zh_test_step16g_imbalance_20260710.json").read_text(
         encoding="utf-8"
     )
 )

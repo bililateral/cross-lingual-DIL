@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
-import step15_build_v7_clean_embedding_cache as redaction
+import step15_build_clean_embedding_cache as redaction
 import step7_build_semantic_pair_features as semantic
 
 

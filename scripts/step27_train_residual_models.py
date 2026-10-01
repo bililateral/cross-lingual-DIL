@@ -27,7 +27,7 @@ import step27_common as common
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_exact_replay_policy.json"
 FIXED_SOURCE_ARTIFACT = (
     ROOT
     / "reports"

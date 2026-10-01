@@ -1,6 +1,6 @@
 # CCF 2026 A/B Venue Scope
 
-Source PDF: `中国计算机学会推荐国际学术会议和期刊目录第七版（2026年3月更新）.pdf`
+Source PDF: `CCF推荐目录.pdf`
 
 Local extracted text:
 

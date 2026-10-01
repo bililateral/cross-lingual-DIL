@@ -43,7 +43,7 @@ schema/step28_transferable_identity_history_v10_1_guarded_application_policy.jso
 
 - Step28-v12/v12.1 全部结果、policy、自审和同步清单。
 - v6–v11 的 17 个 `world_truth`、`synthetic_items`、`model_inputs` 最小历史文件。它们虽然来自失败沿革，但被 v12.1 的 61-file 同步清单逐文件哈希绑定，用于跨版本身份与状态审计，不能删除。
-- `schema/step28_transferable_identity_history_v4_1…v11_policy.json` 与 `tests/test_step28_v11_application_contracts.py`。当前 v12 自审和通用回归测试仍以它们重放历史生成合同；v11 测试已明确跳过，不会冒充当前结果。
+- `schema/step28_transferable_identity_history_v4_1…v11_policy.json` 与 `tests/test_step28_ambiguity_excluded_application_contracts.py`。当前 v12 自审和通用回归测试仍以它们重放历史生成合同；v11 测试已明确跳过，不会冒充当前结果。
 - Step7-v3.1、v4、v4.1 的正式负结果和中间 GPU 特征。v4.1/v4.2 仍逐文件依赖这些冻结输入。
 - Step15、Step24、Step27 等有效历史负结果、消融、统计审计和当前 manifest 输入。旧不等于废弃，不能只按日期删除。
 

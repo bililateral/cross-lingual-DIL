@@ -1873,7 +1873,7 @@ def build_input_manifest(
             paths.add(resolve_path(pool_cfg[key]))
     lineage_cfg = policy.get("inductive_feature_lineage", {})
     if bool(lineage_cfg.get("enabled", False)):
-        paths.add(ROOT / "scripts" / "step15_build_v6_inductive_pair_features.py")
+        paths.add(ROOT / "scripts" / "step15_build_train_reference_pair_features.py")
         paths.add(resolve_path(lineage_cfg["reference_bundle_output"]))
         paths.add(resolve_path(lineage_cfg["manifest_output"]))
     paths.update(path.resolve() for path in (extra_paths or []))
@@ -2031,7 +2031,7 @@ def main() -> None:
     if args.validate_config_only:
         v5r_experiments = [experiment for experiment in experiments if experiment.startswith("step15_v5r_")]
         if v5r_experiments:
-            expected_summary = "reports/step15_v5r_weighted_mixup_summary.json"
+            expected_summary = "reports/step15_weighted_mixup_summary.json"
             actual_summary = str(policy.get("outputs", {}).get("summary_json", ""))
             if actual_summary != expected_summary:
                 raise SystemExit(

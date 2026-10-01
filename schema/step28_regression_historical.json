@@ -1,0 +1,55 @@
+{
+  "version": "2026-08-30-step28-v13-v1-13-regression-partition-v1",
+  "status": "FROZEN_REGRESSION_PARTITION_NO_SCIENTIFIC_AUTHORIZATION",
+  "canonical_self_hash": "9e30fbc9f1fcb13dbb0504d804d3e2fc54beb2b78356bec2f6bb8dedb8e1065f",
+  "current_policy_pin": {
+    "path": "schema/step28_quality_channel_sensitivity_policy.json",
+    "size_bytes": 24278,
+    "sha256": "3bb751007d2f06bba033e87066113500a4df57f148c41b3754474796529cbd07"
+  },
+  "partition_runner_pin": {
+    "path": "scripts/step28_regression_historical.py",
+    "size_bytes": 23837,
+    "sha256": "bf6ea39cdbbfd3727aa1baa977e4dc53dbcb95f404897e3e12ca567ead400b91"
+  },
+  "partition_tests_pin": {
+    "path": "tests/test_step28_regression_historical_contracts.py",
+    "size_bytes": 4100,
+    "sha256": "406d7dcb6b1b64af7309fc35cd82389d2b613daa6b0bfbd2e3308282c038fc90"
+  },
+  "historical_snapshot": {
+    "commit": "8f935adae741dce83f505edb3ef2ef9384d998ae",
+    "tree": "108fd7fe3b31bc591458b5aa18e092c048190693",
+    "policy_path": "schema/step28_quality_channel_sensitivity_policy.json",
+    "policy_size_bytes": 24495,
+    "policy_sha256": "3bb751007d2f06bba033e87066113500a4df57f148c41b3754474796529cbd07",
+    "shared_text_source_path": "scripts/step28_quality_text_probe_views.py",
+    "shared_text_source_size_bytes": 27915,
+    "shared_text_source_sha256": "d9a6a92bb5a4df5632d9e7c95d1f566cdd05f39c07876463046d76a1928ef126"
+  },
+  "historical_test_selectors": [
+    "test_step28_quality_audit_runner_contracts.QualityAuditRunnerV9Contracts.test_builder_policy_binding_precedes_label_free_split_loading",
+    "test_step28_quality_audit_runner_contracts.QualityAuditRunnerV9Contracts.test_current_policy_refuses_before_any_dataset_lookup",
+    "test_step28_quality_audit_runner_contracts.QualityAuditRunnerV9Contracts.test_root_pin_cannot_be_supplied_outside_machine_policy",
+    "test_step28_quality_channel_views_contracts.QualityChannelPolicyV9Tests.test_canonical_policy_is_self_hashed_and_execution_closed",
+    "test_step28_quality_channel_views_contracts.QualityChannelPolicyV9Tests.test_rehashed_authorization_widening_still_fails",
+    "test_step28_quality_channel_views_contracts.QualityChannelPolicyV9Tests.test_rehashed_nested_semantic_drift_still_fails_closed",
+    "test_step28_quality_probe_validator_contracts.QualityProbeValidatorV9Tests",
+    "test_step28_quality_structure_aggregator_contracts.QualityStructureAggregatorV9Contracts.test_formal_entry_refuses_current_unauthorized_policy",
+    "test_step28_replay_builder_contracts.AuthorizationContracts.test_exact_design_receipt_binding_accepts_current_files_and_rejects_drift",
+    "test_step28_replay_builder_contracts.AuthorizationContracts.test_public_entry_consumes_receipt_before_private_transaction"
+  ],
+  "historical_expanded_test_count": 34,
+  "historical_expanded_test_ids_sha256": "04cd6bbbc60109cc3bc9688c61dcc1c821f92952f0fe88632d3a716e2357f4bd",
+  "current_expected_skip_boundary": {
+    "fixture_selector": "test_step28_metadata_shortcut_audit_contracts.Step28V13MetadataShortcutContracts",
+    "fixture_unstarted_test_count": 20,
+    "fixture_unstarted_test_ids_sha256": "93102074708938d6515966db392dc6b9b923662cb88ff9657767e9bdcf5a3b2a",
+    "skip_event_count": 9,
+    "skip_events_sha256": "3b9a901dab8600a48b5159397e1b8fa3fa36cfefa1e133e4f027dd425830460f"
+  },
+  "current_suite_rule": "discover tests/test*.py and remove exactly the expanded historical test IDs",
+  "reporting_rule": "historical removal is a partition, never a unittest skip; both partitions must be executed and reported separately",
+  "training_authorized": false,
+  "audit_truth_authorized": false
+}

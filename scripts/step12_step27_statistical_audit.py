@@ -15,7 +15,7 @@ import step27_train_residual_models as step27
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_exact_replay_policy.json"
 PRIMARY = ("step27_m2_synthetic", "step27_m1_equal_effective_weight_duplication")
 SECONDARY = ("step27_m2_synthetic", "step27_m0_real_only")
 SOURCE_NONINFERIORITY = (

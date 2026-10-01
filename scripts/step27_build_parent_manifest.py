@@ -11,7 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 import step27_common as common
-import step15_build_v7_clean_embedding_cache as redaction
+import step15_build_clean_embedding_cache as redaction
 
 
 def parent_record(

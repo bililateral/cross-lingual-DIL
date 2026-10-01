@@ -11,11 +11,11 @@
   ],
   "diagnostic_dependencies_only": [
     "reports/step11_cluster_level_audit.current_20260517.csv",
-    "reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv"
+    "reports/step11_cluster_level_audit.step15_validation_20260603.csv"
   ],
   "dependency_roles": {
     "reports/step11_cluster_level_audit.current_20260517.csv": "historical_diagnostic_source_for_evidence_type_audit_context_not_identity_training_ground_truth",
-    "reports/step11_cluster_level_audit.step15_v5_validation_20260603.csv": "posthoc_step11_validation_audit_not_step15_training_input"
+    "reports/step11_cluster_level_audit.step15_validation_20260603.csv": "posthoc_step11_validation_audit_not_step15_training_input"
   },
   "pools": {
     "en_content_train_pool": {
@@ -669,8 +669,8 @@
       "step15_v5r_domain_balanced_public_noise_weighted_strong_weighted_mixup_phase4_seed_mean"
     ],
     "outputs": {
-      "summary_json": "reports/step15_v5r_weighted_mixup_slice_level_audit.json",
-      "slice_metrics_csv": "reports/step15_v5r_weighted_mixup_slice_level_audit.csv"
+      "summary_json": "reports/step15_weighted_mixup_slice_level_audit.json",
+      "slice_metrics_csv": "reports/step15_weighted_mixup_slice_level_audit.csv"
     }
   },
   "threshold_selection": {
@@ -696,7 +696,7 @@
     }
   },
   "outputs": {
-    "summary_json": "reports/step15_v5r_weighted_mixup_summary.json",
+    "summary_json": "reports/step15_weighted_mixup_summary.json",
     "artifact_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_artifact.json",
     "zh_valid_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_valid.csv",
     "zh_test_predictions_template": "reports/{experiment_name}_{phase_id}_seed_{seed}_predictions.zh_test.csv",
@@ -706,9 +706,9 @@
     "status": "static_numeric_references_removed_for_step16g_imbalance",
     "reason": "Step15 summaries must not carry old-boundary baseline metrics. Use the current Step12 output files for raw E5, Step9 mixup, and paired comparison baselines.",
     "current_step12_outputs": {
-      "summary_json": "reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json",
-      "model_metrics_csv": "reports/step12_v5r_statistical_robustness_model_metrics_weighted_mixup_20260711.csv",
-      "paired_comparisons_csv": "reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
+      "summary_json": "reports/step12_statistical_robustness_zh_test_weighted_mixup_20260711.json",
+      "model_metrics_csv": "reports/step12_statistical_robustness_model_metrics_weighted_mixup_20260711.csv",
+      "paired_comparisons_csv": "reports/step12_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
     }
   },
   "hard_rules": [

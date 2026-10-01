@@ -19,7 +19,7 @@ STEP7_SUMMARY_PATH = ROOT / "reports" / "step7_training_summary.json"
 STEP7_POLICY_PATH = ROOT / "schema" / "step7_training_policy.json"
 STEP9_SUMMARY_PATH = ROOT / "reports" / "step9_few_shot_summary.json"
 STEP9_CALIBRATION_SUMMARY_PATH = ROOT / "reports" / "step9_calibration_summary.json"
-STEP15_SUMMARY_PATH = ROOT / "reports" / "step15_v5r_weighted_mixup_summary.json"
+STEP15_SUMMARY_PATH = ROOT / "reports" / "step15_weighted_mixup_summary.json"
 STEP15_POLICY_PATH = ROOT / "schema" / "step15_evidence_type_policy.json"
 
 

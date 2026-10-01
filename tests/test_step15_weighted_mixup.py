@@ -60,7 +60,7 @@ class Step15WeightedMixupTests(unittest.TestCase):
             "step15_v5r_identity_only_curriculum_domain_balanced_public_noise_weighted_strong_weighted_mixup",
         }
         self.assertTrue(experiment_names.issubset(policy["experiments"]))
-        self.assertEqual(policy["outputs"]["summary_json"], "reports/step15_v5r_weighted_mixup_summary.json")
+        self.assertEqual(policy["outputs"]["summary_json"], "reports/step15_weighted_mixup_summary.json")
         for experiment_name in experiment_names:
             cfg = policy["experiments"][experiment_name]
             mixup_cfg = dict(policy["training"]["positive_mixup"])

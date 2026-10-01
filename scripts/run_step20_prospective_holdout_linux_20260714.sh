@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 POLICY="schema/step20_prospective_holdout_policy.json"
-V7_POLICY="schema/step15_v7_two_stage_policy.json"
+V7_POLICY="schema/step15_two_stage_policy.json"
 ACTION="${1:-}"
 
 case "$ACTION" in
@@ -22,7 +22,7 @@ case "$ACTION" in
       --policy "$POLICY" \
       --v7-policy "$V7_POLICY"
     echo "[Step20 freeze 2/4] Build identifier-redacted prospective E5 cache without reading labels"
-    "$PYTHON_BIN" scripts/step15_build_v7_clean_embedding_cache.py \
+    "$PYTHON_BIN" scripts/step15_build_clean_embedding_cache.py \
       --policy "$V7_POLICY" \
       --prospective-policy "$POLICY" \
       --pool zh_prospective

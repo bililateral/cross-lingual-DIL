@@ -11,7 +11,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-import step15_v7_common as common
+import step15_common as common
 from step20_prepare_prospective_holdout import (
     RESPONSE_FIELDS,
     evidence_hash,
@@ -22,7 +22,7 @@ from step20_prepare_prospective_holdout import (
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POLICY = ROOT / "schema" / "step20_prospective_holdout_policy.json"
-V7_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
+V7_POLICY = ROOT / "schema" / "step15_two_stage_policy.json"
 
 
 def write_new(path: Path, payload: bytes) -> None:
@@ -262,7 +262,7 @@ def main() -> None:
     model_summary = (
         common.resolve(v7_policy["outputs"]["two_stage_outputs_root"])
         / step15_run_id
-        / "step15_v7_two_stage_summary.json"
+        / "step15_two_stage_summary.json"
     )
     if not model_summary.is_file():
         raise FileNotFoundError("Step15-v7 model must be frozen before prospective holdout freeze")

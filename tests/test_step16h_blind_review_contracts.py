@@ -65,7 +65,7 @@ class Step16HBlindReviewContractTests(unittest.TestCase):
 
     def test_v3_uses_opaque_keys_and_keeps_mapping_out_of_reviewer_queues(self) -> None:
         policy = json.loads(
-            (ROOT / "schema" / "step16h_blind_positive_reaudit_v3_policy.json").read_text(
+            (ROOT / "schema" / "step16h_blind_positive_reaudit_independent_policy.json").read_text(
                 encoding="utf-8"
             )
         )
@@ -94,7 +94,7 @@ class Step16HBlindReviewContractTests(unittest.TestCase):
 
     def test_v3_exposes_raw_occurrences_and_candidate_paths_without_old_labels(self) -> None:
         policy = json.loads(
-            (ROOT / "schema" / "step16h_blind_positive_reaudit_v3_policy.json").read_text(
+            (ROOT / "schema" / "step16h_blind_positive_reaudit_independent_policy.json").read_text(
                 encoding="utf-8"
             )
         )

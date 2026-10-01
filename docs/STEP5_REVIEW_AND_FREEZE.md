@@ -91,10 +91,10 @@ The current corrected Step 5 v3 queue source is:
 
 The active corrected policy and outputs are:
 
-- `schema/step5_v3_targeted_review_policy.json`
-- `reports/step5_zh_target_strict_targeted_review_queue.step11_calibrated_default_v3.csv`
-- `reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_default_v3.csv`
-- `reports/step5_v3_targeted_review_queue_summary.calibrated_default.json`
+- `schema/step5_independent_targeted_review_policy.json`
+- `reports/step5_zh_target_strict_independent_targeted_review_queue.step11_calibrated_default.csv`
+- `reports/step5_zh_target_strict_independent_targeted_rereview_queue.step11_calibrated_default.csv`
+- `reports/step5_independent_targeted_review_queue_summary.calibrated_default.json`
 
 The corrected queue has:
 
@@ -107,7 +107,7 @@ The corrected queue has:
 - post-filter edges `65`
 - consistency checks all true
 
-The active freeze has now consumed the corrected calibrated-default queue. The 65-row rereview queue was fully adjudicated, applied through `schema/step5_v3_targeted_cleanup_policy.calibrated_default_20260420.json`, and frozen into `reports/step5_frozen_silver_summary.json`.
+The active freeze has now consumed the corrected calibrated-default queue. The 65-row rereview queue was fully adjudicated, applied through `schema/step5_independent_targeted_cleanup_policy.calibrated_default_20260420.json`, and frozen into `reports/step5_frozen_silver_summary.json`.
 
 Step 5 is where candidate pairs become usable supervision. The main risk at this stage is not random noise. The main risk is supervision collapse: if reviewers mostly confirm identifier-heavy pairs, the later classifier learns a shortcut and stops looking at content.
 
@@ -324,16 +324,16 @@ The current targeted queue artifact is:
 
 - `schema/step5_targeted_review_policy.json`
 - `scripts/step5_build_targeted_review_queue.py`
-- `reports/step5_zh_target_strict_targeted_review_queue.step11_v1.csv`
-- `reports/step5_zh_target_strict_targeted_rereview_queue.step11_v1.csv`
+- `reports/step5_zh_target_strict_targeted_review_queue.step11.csv`
+- `reports/step5_zh_target_strict_targeted_rereview_queue.step11.csv`
 - `reports/step5_targeted_review_queue_summary.json`
 
 Before any Step 5 v3 work started, the project froze the full v2 milestone here:
 
-- `schema/step5_v2_milestone_snapshot_policy.json`
+- `schema/step5_milestone_snapshot_policy.json`
 - `scripts/step5_snapshot_milestone.py`
 - `reports/step5_v2_milestone_snapshot_20260416`
-- `reports/step5_v2_milestone_snapshot_summary.json`
+- `reports/step5_milestone_snapshot_summary.json`
 
 This queue is intentionally narrow. It currently contains:
 
@@ -362,10 +362,10 @@ For the Step 5 v2 targeted queue, use the same CLI with `--queue-path` instead o
 
 ```bash
 python3 scripts/step5_build_targeted_review_queue.py
-python3 scripts/step5_manual_review_cli.py --summary --queue-path reports/step5_zh_target_strict_targeted_review_queue.step11_v1.csv
-python3 scripts/step5_manual_review_cli.py --queue-path reports/step5_zh_target_strict_targeted_review_queue.step11_v1.csv --queue-label step5_v2_targeted_zh --reviewer-id manual_zhang_v2
-python3 scripts/step5_manual_review_cli.py --summary --queue-path reports/step5_zh_target_strict_targeted_rereview_queue.step11_v1.csv
-python3 scripts/step5_manual_review_cli.py --queue-path reports/step5_zh_target_strict_targeted_rereview_queue.step11_v1.csv --queue-label step5_v2_rereview_zh --reviewer-id manual_zhang_v2
+python3 scripts/step5_manual_review_cli.py --summary --queue-path reports/step5_zh_target_strict_targeted_review_queue.step11.csv
+python3 scripts/step5_manual_review_cli.py --queue-path reports/step5_zh_target_strict_targeted_review_queue.step11.csv --queue-label step5_v2_targeted_zh --reviewer-id manual_zhang_v2
+python3 scripts/step5_manual_review_cli.py --summary --queue-path reports/step5_zh_target_strict_targeted_rereview_queue.step11.csv
+python3 scripts/step5_manual_review_cli.py --queue-path reports/step5_zh_target_strict_targeted_rereview_queue.step11.csv --queue-label step5_v2_rereview_zh --reviewer-id manual_zhang_v2
 ```
 ```
 
@@ -391,11 +391,11 @@ Step 5 v3 is intentionally **not** a broad sample expansion. It is a targeted re
 
 The active v3 queue artifacts are:
 
-- `schema/step5_v3_targeted_review_policy.json`
-- `scripts/step5_build_targeted_review_queue_v3.py`
-- `reports/step5_zh_target_strict_targeted_review_queue.step11_calibrated_default_v3.csv`
-- `reports/step5_zh_target_strict_targeted_rereview_queue.step11_calibrated_default_v3.csv`
-- `reports/step5_v3_targeted_review_queue_summary.calibrated_default.json`
+- `schema/step5_independent_targeted_review_policy.json`
+- `scripts/step5_build_independent_targeted_review_queue.py`
+- `reports/step5_zh_target_strict_independent_targeted_review_queue.step11_calibrated_default.csv`
+- `reports/step5_zh_target_strict_independent_targeted_rereview_queue.step11_calibrated_default.csv`
+- `reports/step5_independent_targeted_review_queue_summary.calibrated_default.json`
 
 The invalidated calibrated-BGE cleanup artifacts are archived, not active:
 
@@ -408,8 +408,8 @@ Current v3 queue state:
 - rereview rows: `65`
 - requested but not retained in the current primary graph: `0`
 - cleanup-and-freeze status: complete
-- cleanup policy: `schema/step5_v3_targeted_cleanup_policy.calibrated_default_20260420.json`
-- cleanup summary: `reports/step5_v3_targeted_cleanup_summary.calibrated_default_20260420.json`
+- cleanup policy: `schema/step5_independent_targeted_cleanup_policy.calibrated_default_20260420.json`
+- cleanup summary: `reports/step5_independent_targeted_cleanup_summary.calibrated_default_20260420.json`
 - applied labels: `2 positive / 35 negative / 28 uncertain`
 - targeted rereview queue status: `65 / 65` reviewed
 

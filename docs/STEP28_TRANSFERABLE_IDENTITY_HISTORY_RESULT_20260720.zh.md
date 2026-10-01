@@ -2,7 +2,7 @@
 
 更新时间：2026-07-20
 
-> **撤销声明（2026-07-20，最终复核）**：本文记录的 v5 结论已经作废。v5 在生成阶段读取原英文标签，并以 `0.8` 概率让英文底座标签与合成标签一致，导致冻结源分数与合成答案人为相关；因此 v5 的 ROC-AUC/AP、置乱解释和 5 条真实队列均不得作为正式科研证据。后续 v6/v6.1 和 v11 也已撤回。当前有效结论见 `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`。下文所有“当前有效”“GO”和队列表述均为已撤回的历史原文，不代表当前事实。
+> **撤销声明（2026-07-20，最终复核）**：本文记录的 v5 结论已经作废。v5 在生成阶段读取原英文标签，并以 `0.8` 概率让英文底座标签与合成标签一致，导致冻结源分数与合成答案人为相关；因此 v5 的 ROC-AUC/AP、置乱解释和 5 条真实队列均不得作为正式科研证据。后续 v6/v6.1 和 v11 也已撤回。当前有效结论见 `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md`。下文所有“当前有效”“GO”和队列表述均为已撤回的历史原文，不代表当前事实。
 
 ## 已撤回的历史原文
 
@@ -12,7 +12,7 @@ Step 28 已经从旧 v3 的“手写两条规则并验证规则”改成了真�
 
 - 合成训练与留出：`reports/step28_transferable_identity_history/v5_20260720/`
 - 受限真实应用：`reports/step28_transferable_identity_history/v5_guarded_application_v2_20260720/`
-- 训练策略：`schema/step28_transferable_identity_history_v5_policy.json`
+- 训练策略：`schema/step28_identity_history_english_source_policy.json`
 - 应用策略：`schema/step28_transferable_identity_history_v5_guarded_application_v2_policy.json`
 
 v5 在全新合成审计上为 `GO`，但这只证明合成机制能够迁移到未见模板和未见虚拟身份，不证明真实准确率。真实候选分数不是概率，必须经过前瞻盲审。

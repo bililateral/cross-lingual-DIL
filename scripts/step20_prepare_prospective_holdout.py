@@ -13,12 +13,12 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import step15_v7_common as common
+import step15_common as common
 
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POLICY = ROOT / "schema" / "step20_prospective_holdout_policy.json"
-V7_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
+V7_POLICY = ROOT / "schema" / "step15_two_stage_policy.json"
 RESPONSE_FIELDS = ["independent_decision", "review_evidence_type", "review_rationale", "reviewer_id"]
 
 

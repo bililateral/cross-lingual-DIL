@@ -11,7 +11,7 @@ import step27_train_residual_models as step27
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_POLICY = ROOT / "schema" / "step27_v1_1_exact_replay_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step27_exact_replay_policy.json"
 
 
 def parse_args() -> argparse.Namespace:
@@ -245,7 +245,7 @@ def main() -> None:
         ROOT / "scripts" / "step27_build_sync_manifest.py",
         runner_path,
         ROOT / "tests" / "test_step27_english_pretrained_synthetic_contracts.py",
-        ROOT / "scripts" / "step15_build_v7_clean_embedding_cache.py",
+        ROOT / "scripts" / "step15_build_clean_embedding_cache.py",
         ROOT / "scripts" / "step24_common.py",
         ROOT / "scripts" / "step7_build_semantic_pair_features.py",
     ]

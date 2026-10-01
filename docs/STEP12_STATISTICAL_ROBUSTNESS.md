@@ -62,9 +62,9 @@ The bootstrap unit is `split_component_id`, not individual edge rows. This keeps
 
 ## Outputs
 
-- summary: `reports/step12_v5_statistical_robustness_zh_test_20260603.json`
-- model metrics: `reports/step12_v5_statistical_robustness_model_metrics_20260603.csv`
-- paired comparisons: `reports/step12_v5_statistical_robustness_paired_comparisons_20260603.csv`
+- summary: `reports/step12_statistical_robustness_zh_test_20260603.json`
+- model metrics: `reports/step12_statistical_robustness_model_metrics_20260603.csv`
+- paired comparisons: `reports/step12_statistical_robustness_paired_comparisons_20260603.csv`
 
 The filenames retain the original v5 date token because this is the same frozen Step 15 v5 evaluation boundary. The `2026-07-04` rerun extends the metric columns without changing the underlying train/test split.
 
@@ -121,7 +121,7 @@ python3 scripts/step12_statistical_robustness_audit.py \
   --features reports/step7_pair_features.zh_target_strict.csv \
   --resamples 5000 \
   --seed 20260513 \
-  --output-json reports/step12_v5_statistical_robustness_zh_test_20260603.json \
-  --output-metrics reports/step12_v5_statistical_robustness_model_metrics_20260603.csv \
-  --output-comparisons reports/step12_v5_statistical_robustness_paired_comparisons_20260603.csv
+  --output-json reports/step12_statistical_robustness_zh_test_20260603.json \
+  --output-metrics reports/step12_statistical_robustness_model_metrics_20260603.csv \
+  --output-comparisons reports/step12_statistical_robustness_paired_comparisons_20260603.csv
 ```

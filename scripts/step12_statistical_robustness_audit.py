@@ -22,10 +22,10 @@ from typing import Any
 
 DEFAULT_LABELS = Path("reports/step5_zh_target_strict_frozen_silver_labels.csv")
 DEFAULT_FEATURES = Path("reports/step7_pair_features.zh_target_strict.csv")
-DEFAULT_OUT_JSON = Path("reports/step12_v5r_statistical_robustness_zh_test_weighted_mixup_20260711.json")
-DEFAULT_OUT_METRICS = Path("reports/step12_v5r_statistical_robustness_model_metrics_weighted_mixup_20260711.csv")
+DEFAULT_OUT_JSON = Path("reports/step12_statistical_robustness_zh_test_weighted_mixup_20260711.json")
+DEFAULT_OUT_METRICS = Path("reports/step12_statistical_robustness_model_metrics_weighted_mixup_20260711.csv")
 DEFAULT_OUT_COMPARISONS = Path(
-    "reports/step12_v5r_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
+    "reports/step12_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv"
 )
 
 DEFAULT_RESAMPLES = 5000

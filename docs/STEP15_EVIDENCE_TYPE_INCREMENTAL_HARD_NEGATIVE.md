@@ -363,22 +363,22 @@ The 2026-06-02 v2 revision keeps all first-pass Step 15 artifacts intact and wri
 New v2 summary output:
 
 ```text
-reports/step15_v2_incremental_hard_negative_summary.json
+reports/step15_incremental_hard_negative_summary_68edc05d.json
 ```
 
 New v2 Step 12 outputs:
 
 ```text
-reports/step12_v2_statistical_robustness_zh_test_20260602.json
-reports/step12_v2_statistical_robustness_model_metrics_20260602.csv
-reports/step12_v2_statistical_robustness_paired_comparisons_20260602.csv
+reports/step12_statistical_robustness_zh_test_20260602.json
+reports/step12_statistical_robustness_model_metrics_20260602.csv
+reports/step12_statistical_robustness_paired_comparisons_20260602.csv
 ```
 
 New v2 slice-level audit outputs:
 
 ```text
-reports/step15_v2_slice_level_audit.json
-reports/step15_v2_slice_level_audit.csv
+reports/step15_slice_level_audit_f4296ea3.json
+reports/step15_slice_level_audit_0566fbd3.csv
 ```
 
 The legacy first-pass Step 15 experiments remain available only as controls:

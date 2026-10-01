@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_POLICY = ROOT / "schema" / "step15_v7_two_stage_policy.json"
+DEFAULT_POLICY = ROOT / "schema" / "step15_two_stage_policy.json"
 
 
 def resolve(value: str | Path) -> Path:

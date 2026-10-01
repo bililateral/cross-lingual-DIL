@@ -1,0 +1,286 @@
+{
+  "version": "2026-07-31-step28-v13-training-ready-order-repair-policy-v5-frozen",
+  "status": "FROZEN_READY_FOR_GENERATION",
+  "generation_enabled": true,
+  "run_id": "v13_training_ready_v1_2_order_repair_20260731",
+  "output_root": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_2_order_repair_20260731",
+  "target_release_claim_level": "TRAINING_AND_FIXED_HOLDOUT_BYTES_READY_NOT_BLIND_CUSTODY_ATTESTED",
+  "current_readiness_semantics": "status and generation_enabled describe current readiness; target_release_claim_level applies only to the final manifest after all split releases validate",
+  "implementation_contract": {
+    "version": "2026-07-31-step28-v13-training-ready-order-repair-implementation-contract-v5",
+    "sha256": "ee4d249aaf421d4e6a6603e9e0ae779d9b3c384cef266e5234b0b0918800a831"
+  },
+  "base_policy": {
+    "path": "schema/step28_synthetic_chinese_dataset_policy.json",
+    "sha256": "e0c5dbba5818c7fc45d757795d923fcda3392250f4980b67f1670370050aa389"
+  },
+  "release_contract": {
+    "path": "docs/STEP28_TRAINING_READY_ORDER_REPAIR_CONTRACT_20260731.zh.md",
+    "sha256": "0bee416d514b1cec89f9ec5f8b6810f90791fbe8a8c4134c8178bc5a662b3a11"
+  },
+  "scientific_contract": {
+    "path": "schema/step28_training_ready_order_repair_scientific_contract.json",
+    "sha256": "c939978601c79b2fd11e72bab1b2137e573408cef43a6defb930ecebaa0f460d"
+  },
+  "design_diagnostics": {
+    "candidate_shortcut_comparison": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/row_shortcut_review_v2_20260729/candidate_shortcut_diagnostic_500_20260729.json",
+      "sha256": "569d5342a6f212ab7cf15793a858f345e2ce62dfc8ca1f3a973875b4dfd46167"
+    },
+    "mechanism_stratified_gate": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v2_20260728/row_shortcut_review_v2_20260729/candidate_mechanism_diagnostic_500_20260729.json",
+      "sha256": "a82a6683998db11f148abc12bd981467b10b60a4d985cb63a2d391b37170185d"
+    },
+    "exact_implementation_development_250": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/exact_c40_development_250_20260729.json",
+      "sha256": "cbd8d925b11e92c2ea7407eff853c630a38c5cb3744b4b9d463d7fb0d7c2adb8",
+      "status": "PASS_EXACT_IMPLEMENTATION_DESIGN_PREFLIGHT",
+      "maximum_symmetric_auc": 0.5146996,
+      "world_bootstrap_95_upper": 0.526101093333333
+    }
+  },
+  "exact_implementation_preflights": {
+    "train": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/order_repair_v3_20260731/exact_train_500_20260731.json",
+      "sha256": "aecac7e846a49b30053e06e057c7c66bd0bfc72ccc4ed0aaa2e2dd7a1b0551f6"
+    },
+    "development": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/order_repair_v3_20260731/exact_development_500_20260731.json",
+      "sha256": "9e51567bacd0dc0a4b471a3a8a4562e03cda73f508d98de3d07ee4e36d2fea53"
+    },
+    "audit_a": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/order_repair_v3_20260731/exact_audit_a_500_20260731.json",
+      "sha256": "222835593b6f4f01076eb88556f2c41f29ffb49b7df1eada449bce9d6bf7f4b3"
+    },
+    "audit_b": {
+      "path": "reports/step28_synthetic_chinese_dataset/design_preflights/order_repair_v3_20260731/exact_audit_b_500_20260731.json",
+      "sha256": "ac810bf8999cec28da6ad0a3503dc9f0200800640b32cc9f60c35915b3faec43"
+    }
+  },
+  "world_counts": {
+    "train": 500,
+    "development": 500,
+    "audit_a": 500,
+    "audit_b": 500
+  },
+  "sellers_per_world": 28,
+  "complete_pairs_per_world": 378,
+  "classification_pairs_per_world": 40,
+  "classification_positive_count_per_world": {
+    "train": 16,
+    "development": 10,
+    "audit_a": 10,
+    "audit_b": 10
+  },
+  "positive_mechanism_count_per_world": 8,
+  "negative_flag_count_per_world": 7,
+  "candidate_design": {
+    "implementation": "scripts/step28_mechanism_stratified_c40.py",
+    "sha256": "dd9384b36a55094659966df2719a8a298ffa3b553228277840f226517f8b8f37",
+    "coverage_then_fill": true,
+    "fill_order": "full HMAC-SHA256 under the registered candidate key, then canonical pair UID UTF-8",
+    "model_visible_audit_columns": false,
+    "output_order": "full HMAC-SHA256 under selected_global_rank domain, then canonical pair UID UTF-8",
+    "output_order_independent_of_selection_fill": true
+  },
+  "dataset_builder": {
+    "implementation": "scripts/step28_build_training_ready_dataset.py",
+    "sha256": "cf3fa4fa8a5e1bd5d4b99bcdaa80f8ac8c86374f8fb81707e739feb04dbaa73c",
+    "implementation_closure": {
+      "role": "training_ready_dataset_builder",
+      "member_count": 33,
+      "members": [
+        "scripts/step28_common.py",
+        "scripts/step28_history_common.py",
+        "scripts/step28_build_training_ready_dataset.py",
+        "scripts/step28_candidate_sampling.py",
+        "scripts/step28_dataset_common.py",
+        "scripts/step28_feature_derangement.py",
+        "scripts/step28_generate_dataset.py",
+        "scripts/step28_history_features.py",
+        "scripts/step28_identity_plan.py",
+        "scripts/step28_identity_values.py",
+        "scripts/step28_independent_dgp_comparator.py",
+        "scripts/step28_independent_private_dgp_replay.py",
+        "scripts/step28_integrity_receipts.py",
+        "scripts/step28_mechanism_stratified_c40.py",
+        "scripts/step28_metadata_shortcut_common.py",
+        "scripts/step28_nonidentity.py",
+        "scripts/step28_placebo_support.py",
+        "scripts/step28_producer_dgp_projection.py",
+        "scripts/step28_production_chain.py",
+        "scripts/step28_profiles.py",
+        "scripts/step28_project_null_nuisance.py",
+        "scripts/step28_run_metadata_shortcut_audit.py",
+        "scripts/step28_run_parser_template_fixture.py",
+        "scripts/step28_safe_slots.py",
+        "scripts/step28_seal_classification_labels.py",
+        "scripts/step28_smoke_private_regeneration.py",
+        "scripts/step28_structure.py",
+        "scripts/step28_text_renderer.py",
+        "scripts/step28_world_builder.py",
+        "scripts/step3_build_seller_profiles.py",
+        "scripts/step4_build_silver_candidates.py",
+        "scripts/step7_chunked_source_data.py",
+        "scripts/step7_authorship_common.py"
+      ],
+      "canonical_sha256": "ea65ef956b81e654b56c6390fd85e15c90af12d8355cc56d386c9f1c06b3a0b4"
+    }
+  },
+  "release_tools": {
+    "exact_preflight": {
+      "path": "scripts/step28_exact_candidate_preflight.py",
+      "sha256": "5c5dc8cc8d43df81dc41da1bf29bb1ebc9508819b5ecddb39ddd347bc5306d5d"
+    },
+    "key_initializer": {
+      "path": "scripts/step28_initialize_training_ready_keys.py",
+      "sha256": "a4926064ca4dab5dc14394ff7052337d8fbb5631ee26f2b42c0d3d49826e354c"
+    },
+    "finalizer": {
+      "path": "scripts/step28_finalize_training_ready_dataset.py",
+      "sha256": "b11bd300bb3faa99bdb638d0a1d3da0723e2375a9123c29f9da7c6c1a030676d"
+    },
+    "model_input_validator": {
+      "path": "scripts/step28_validate_model_inputs.py",
+      "sha256": "e45ba0d242e3db91c0da222d52810485bcab30cdfffa27d8999352df6083a5c3"
+    },
+    "order_repair_equivalence": {
+      "path": "scripts/step28_validate_order_repair_equivalence.py",
+      "sha256": "d846f0aafe646e746181c9b5b8c5bf10ea73038842d0ffb2f7706bc86d154e02"
+    },
+    "post_release_row_audit": {
+      "path": "scripts/step28_post_release_row_shortcut_audit.py",
+      "sha256": "47b37de21cfe5d0a90087cf35c2478cf520ba5ab97011c5da532c106feaad32e"
+    }
+  },
+  "handle_encoding": "parser_safe_hex_v2",
+  "identity_value_salts": {
+    "builder": {
+      "path": "scripts/step28_build_training_ready_identity_salts.py",
+      "sha256": "9418d20310cee115c7a21b097cb6a4657385e41b700c6488084d5132f7500f27"
+    },
+    "artifact": {
+      "path": "reports/step28_synthetic_chinese_dataset/release_inputs/identity_value_salts.training_ready_2000worlds_20260729.json",
+      "sha256": "5bd2b5b751542528f40ee8627686d367f0bcc22f1d4bf3dc194605e6389ee1fe"
+    },
+    "per_type_salt_counters": {
+      "telegram": 0,
+      "email": 0,
+      "bat": 0,
+      "qq": 31,
+      "wechat": 0,
+      "phone": 1,
+      "crypto_wallet": 0,
+      "external_url": 0
+    },
+    "real_prior_smoke_intersection_count": 0,
+    "same_release_cross_type_intersection_count": 0
+  },
+  "base_execution_mode": "training_ready",
+  "base_execution_mode_semantics": "An explicit in-memory training_ready mode reuses the audited mathematical worker functions with formal public randomness and exactly one split-private structure key. It never aliases development_smoke and never reads or merges smoke data, keys, UIDs or artifacts.",
+  "public_randomness_source": "base_policy.randomness.formal",
+  "private_structure_key_custody": {
+    "key_directory": "reports/step28_synthetic_chinese_dataset/private_custody/v13_training_ready_v1_20260729",
+    "key_filename_pattern": "structure_key.{split}.private.json",
+    "ceremony_receipt_path": "reports/step28_synthetic_chinese_dataset/release_inputs/structure_key_ceremony.training_ready_20260729.json",
+    "one_split_key_per_file": true,
+    "generator_process_reads_exactly_one_split_key": true,
+    "key_files_must_not_be_model_mounted": true,
+    "key_files_must_not_be_committed": true,
+    "commitments": {
+      "train": "662b26949f7a9881b8f40e4cc017dd707d6491e5793fdadb8c750918d55e63d9",
+      "development": "a7858e052ab8af87650448e6c705684da214af9ee16caadd099fc5f6282be402",
+      "audit_a": "affe82076493558d9eb07d0618a6916955ad19f0da437692074f22f2080607cc",
+      "audit_b": "b3d15eb5429c389b5747ba2652cdd23634b85e311f6e88a9dc34eaa97fd27264"
+    },
+    "ceremony_receipt": {
+      "path": "reports/step28_synthetic_chinese_dataset/release_inputs/structure_key_ceremony.training_ready_20260729.json",
+      "sha256": "b421d905e15644d70b92fee9eaea3b653053b25899f8f0ea7b33279523d970d9"
+    },
+    "source_key_ceremony_run_id": "v13_training_ready_v1_20260729",
+    "key_reuse_reason": "Reuse is mandatory to prevent post-outcome resampling; only deterministic C40 output order is repaired."
+  },
+  "retrieval": {
+    "enabled_splits": [
+      "audit_a",
+      "audit_b"
+    ],
+    "queries_per_world": 4,
+    "gallery_per_query": 27,
+    "query_selection": "full HMAC-SHA256 under the registered query key, then seller UID UTF-8",
+    "relevance_formula": "int(controller(query)==controller(gallery))"
+  },
+  "supervision": {
+    "classification_formula": "int(controller(left)==controller(right))",
+    "open_splits": [
+      "train",
+      "development"
+    ],
+    "sealed_splits": [
+      "audit_a",
+      "audit_b"
+    ]
+  },
+  "shortcut_gate": {
+    "features": 14,
+    "maximum_symmetric_auc": 0.52,
+    "maximum_world_bootstrap_95_upper": 0.53,
+    "bootstrap_replicates": 9999,
+    "fold_count": 5,
+    "fold_seed": 2026072707,
+    "bootstrap_base_seed": 2026072711,
+    "model_order": [
+      "logistic_l2",
+      "gradient_tree",
+      "rbf_svm"
+    ],
+    "environment": {
+      "numpy_version": "2.2.6",
+      "scikit_learn_version": "1.7.2",
+      "bit_generator": "PCG64DXSM"
+    },
+    "implementation_closure": {
+      "nuisance_projector": {
+        "path": "scripts/step28_project_null_nuisance.py",
+        "sha256": "65bdc80740d0defcf05369542d7b5d21d4b545272ee09dbe1ca5d51779967fe4"
+      },
+      "audit_runner": {
+        "path": "scripts/step28_run_metadata_shortcut_audit.py",
+        "sha256": "eb4af81ad2d85d9615c06bdd729287c9292aaf66d5ccac7d0b826f3e51c7c7d9"
+      },
+      "audit_common": {
+        "path": "scripts/step28_metadata_shortcut_common.py",
+        "sha256": "bfc362bdbe0d5b55207f67eeb2cc5190038761d5e4d20d0acacce8ac68a08923"
+      },
+      "label_sealer": {
+        "path": "scripts/step28_seal_classification_labels.py",
+        "sha256": "8a3c699e2f419953c765d570610f7343f131fcf47f465236b1c46d0add889864"
+      }
+    }
+  },
+  "m1": {
+    "replicates": 5,
+    "source": "base_policy.randomness.formal.rewire_key_hexes",
+    "endpoint_disjoint": true,
+    "whole_33_vector_derangement": true,
+    "stratification": [
+      "world_uid",
+      "C40_or_complement"
+    ]
+  },
+  "release_status_required": "PASS_DATASET_ONLY_READY_FOR_M0_M1_M2",
+  "self_sha256": "7aa4ff88553c86e08c76575fd5291de9571b5f11fa8d12663736ca64d5bb7fc8",
+  "data_generation_run_id": "v13_training_ready_v1_20260729",
+  "data_generation_output_root": "reports/step28_synthetic_chinese_dataset/v13_training_ready_v1_20260729",
+  "repair_lineage": {
+    "repair_type": "C40_OUTPUT_ORDER_ONLY",
+    "parent_run_id": "v13_training_ready_v1_20260729",
+    "parent_release_manifest_sha256": "6924dadb669bf056302418ac012e2f027b1bd3e9e00cf0c0e5e515258a3d3ce0",
+    "parent_release_manifest_self_sha256": "f3e0b9a2de4b89613d008b7bc8ee11e4a87c0475fdd572ddea832ef543ead7aa",
+    "source_key_ceremony_run_id": "v13_training_ready_v1_20260729",
+    "structure_keys_reused": true,
+    "post_outcome_resampling_performed": false,
+    "underlying_world_text_candidate_membership_identity33_and_labels_must_match_parent": true,
+    "allowed_change": "independent selected_global_rank serialization order and order-bound derived files, receipts, and manifests only"
+  }
+}

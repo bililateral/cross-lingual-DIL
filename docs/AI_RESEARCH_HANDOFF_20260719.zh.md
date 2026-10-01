@@ -1,10 +1,10 @@
 # 跨语言暗网马甲识别科研项目 AI 交接文档
 
-> **2026-08-30 权威交接替代声明**：本文只保留为 2026-07-19 历史记录，不再代表当前科研状态，其中任何以“当前”描述的数据、许可或下一步均不得沿用。当前事实基础必须改读 `docs/AI_RESEARCH_HANDOFF_20260823.zh.md`；V9.4.1 正式四拆分已经生成并通过质量资格门，但 M0／M1／M2／M3 训练仍须后继合同和一次性授权。不得按本文较早的 Step27 主线恢复实验。
+> **2026-08-30 权威交接替代声明**：本文只保留为 2026-07-19 历史记录，不再代表当前科研状态，其中任何以“当前”描述的数据、许可或下一步均不得沿用。当前事实基础必须改读 `docs/AI_RESEARCH_HANDOFF.zh.md`；V9.4.1 正式四拆分已经生成并通过质量资格门，但 M0／M1／M2／M3 训练仍须后继合同和一次性授权。不得按本文较早的 Step27 主线恢复实验。
 
 更新时间：2026-07-19
 
-> **2026-07-20 后续事实更新**：Step28 最终复核已撤销 v5、v6/v6.1 和 v11。v11 的阻断问题是使用 audit 标签删除 49 个冲突状态、把模型识别与后置保护层弃权混为一种“通过”，并保留 3 个全零特征。当前有效阶段必须分开表述：v12 是同一预定义合成生成器家族内的修正复现实验；v12.1 只是冻结 v12 后的独立现有数据应用。v12 主审计保留全部 1,280 行并让 842 个状态各占总权重 1，完整历史 AUC/AP 为 `0.749634/0.767197`，相对直接历史 AP 增益 `+0.073928`，199 次分块置乱均值 `0.498092`、经验 `p=0.005`。它不证明真实准确率或所有未见状态泛化。v12.1 排除全部 `1,259` 个历史已审核 pair UID 后评分 `2,689` 条未审核候选；`101` 条非零修正全部为负，正修正和盲审队列均为 `0`。该空结果与 v12 合成通过互不混淆。当前结论为 `PASS_SYNTHETIC_REPLICATION_REAL_APPLICATION_ABSTENTION`。详见 `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_V12_CORRECTED_REPLICATION_20260720.zh.md`。本轮用户明确授权无 GPU 的 Step28 CPU 实验在 Windows 执行，因此下文 Windows/Linux常规职责边界对本轮被该明确授权覆盖；其他需要模型编码或 GPU 的实验仍遵守原边界。
+> **2026-07-20 后续事实更新**：Step28 最终复核已撤销 v5、v6/v6.1 和 v11。v11 的阻断问题是使用 audit 标签删除 49 个冲突状态、把模型识别与后置保护层弃权混为一种“通过”，并保留 3 个全零特征。当前有效阶段必须分开表述：v12 是同一预定义合成生成器家族内的修正复现实验；v12.1 只是冻结 v12 后的独立现有数据应用。v12 主审计保留全部 1,280 行并让 842 个状态各占总权重 1，完整历史 AUC/AP 为 `0.749634/0.767197`，相对直接历史 AP 增益 `+0.073928`，199 次分块置乱均值 `0.498092`、经验 `p=0.005`。它不证明真实准确率或所有未见状态泛化。v12.1 排除全部 `1,259` 个历史已审核 pair UID 后评分 `2,689` 条未审核候选；`101` 条非零修正全部为负，正修正和盲审队列均为 `0`。该空结果与 v12 合成通过互不混淆。当前结论为 `PASS_SYNTHETIC_REPLICATION_REAL_APPLICATION_ABSTENTION`。详见 `docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md`。本轮用户明确授权无 GPU 的 Step28 CPU 实验在 Windows 执行，因此下文 Windows/Linux常规职责边界对本轮被该明确授权覆盖；其他需要模型编码或 GPU 的实验仍遵守原边界。
 
 当前分支：`method/step27-english-pretrained-synthetic-adaptation`
 
@@ -370,9 +370,9 @@ Step27 implementation baseline: ff4bc04 Repair Step27 frozen-source replay contr
 ```text
 docs/PROJECT_PROGRESS.md
 docs/STEP27_ENGLISH_PRETRAINED_SYNTHETIC_ADAPTATION_PLAN_20260718.zh.md
-docs/STEP27_V1_1_SOURCE_CONTRACT_REPAIR_20260719.zh.md
-schema/step27_v1_1_exact_replay_policy.json
-scripts/run_step27_v1_1_exact_replay_linux_20260719.sh
+docs/STEP27_SOURCE_CONTRACT_REPAIR_20260719.zh.md
+schema/step27_exact_replay_policy.json
+scripts/run_step27_exact_replay_linux_20260719.sh
 scripts/step12_step27_statistical_audit.py
 scripts/step27_audit_synthetic_data.py
 scripts/step27_build_pair_features.py
@@ -406,10 +406,10 @@ docs/STEP13_CONCEPT_DRIFT_AUDIT_STEP16C_REFREEZE_VALIDATION_20260709.md
 
 1. `docs/AI_RESEARCH_HANDOFF_20260719.zh.md`
 2. `docs/PROJECT_PROGRESS.md`
-3. `docs/STEP27_V1_1_SOURCE_CONTRACT_REPAIR_20260719.zh.md`
+3. `docs/STEP27_SOURCE_CONTRACT_REPAIR_20260719.zh.md`
 4. `docs/STEP27_ENGLISH_PRETRAINED_SYNTHETIC_ADAPTATION_PLAN_20260718.zh.md`
-5. `schema/step27_v1_1_exact_replay_policy.json`
-6. `scripts/run_step27_v1_1_exact_replay_linux_20260719.sh`
+5. `schema/step27_exact_replay_policy.json`
+6. `scripts/run_step27_exact_replay_linux_20260719.sh`
 
 ### 10.2 将 `ff4bc04` 的 14 个文件同步到 Linux
 
@@ -429,7 +429,7 @@ Linux 如果不满足该指纹，必须恢复生成 Step15-v7 cache 时使用的
 
 ```bash
 cd /home/yongpeng/cross-lingual
-bash scripts/run_step27_v1_1_exact_replay_linux_20260719.sh
+bash scripts/run_step27_exact_replay_linux_20260719.sh
 ```
 
 runner 只运行 train OOF 工程诊断，不打开旧 valid/test。
