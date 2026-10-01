@@ -1,6 +1,6 @@
 # 中文BGE有限历史持续学习：本地实现与核验边界
 
-日期：2026-09-30。**完整交付已获用户与实际外审批准；项目Linux单CPU核验及主审核对完成，22项用例、6次原生BGE手工更新全部通过。** 用户进一步授权核验通过后直接正式训练，已完成必要输入及共享资源检查，并于14:40:21 CST提交持久正式作业，实际训练进度另见[交接](AI_RESEARCH_HANDOFF.zh.md)。[外审与主审](../reports/documentation/20260930/continual_plan/implementation/review/report.zh.md)、[项目CPU原始证据与限制](../reports/documentation/20260930/continual_cpu/report.zh.md)、[最新原话及范围](RESEARCH_DISCUSSION.zh.md)。2026-10-01更新：正式训练及一次valid已完成，全部21点／6048更新原生证据和保存结果独立核查通过；结果见[本轮报告](SELLER_ALIAS_BGE_RESULT.zh.md)，结果外审已于10月1日10:12:21提交Pro，待实际回复及主审。
+日期：2026-09-30。**完整交付已获用户与实际外审批准；项目Linux单CPU核验及主审核对完成，22项用例、6次原生BGE手工更新全部通过。** 用户进一步授权核验通过后直接正式训练，已完成必要输入及共享资源检查，并于14:40:21 CST提交持久正式作业，实际训练进度另见[交接](AI_RESEARCH_HANDOFF.zh.md)。[外审与主审](../reports/documentation/20260930/continual_plan/implementation/review/report.zh.md)、[项目CPU原始证据与限制](../reports/documentation/20260930/continual_cpu/report.zh.md)、[最新原话及范围](RESEARCH_DISCUSSION.zh.md)。2026-10-01更新：正式训练及一次valid已完成，全部21点／6048更新原生证据和保存结果独立核查通过；结果见[本轮报告](SELLER_ALIAS_BGE_RESULT.zh.md)，实际结果外审及主审已完成，结果有效性接受，ER失败／LOGIT对ER通过和整体目标未达成的边界保持；见[结果外审与逐项主审](../reports/seller_alias_continual/20261001/bge_continual_result/review/report.zh.md)。
 
 ## 1 交付范围
 

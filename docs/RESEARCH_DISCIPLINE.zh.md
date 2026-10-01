@@ -1,6 +1,8 @@
 # 科研纪律与接手说明
 
-截至2026-10-01，**首轮有限历史持续学习训练、唯一valid评价、完整回传和本地独立核查均已完成；结果网页外审已于10月1日10:12:21提交Pro并开始回应，待实际回复与主审。** 作业从9月30日14:40:21运行至10月1日06:06:13（Asia/Shanghai），退出0、6048次更新、9504次群梯度呈现、21个终点及64份指标矩阵完整。实际总耗时15小时25分51秒，剩余0；原预计18—26小时／10月1日08:40—16:40完成，实际提前，36小时／64GiB是强制上限。09:24:59核对作业进程已退出。[本轮完整报告](SELLER_ALIAS_BGE_RESULT.zh.md)、[当前状态](../reports/seller_alias_continual/20261001/bge_continual_result/current_status.json)。
+截至2026-10-01，**首轮有限历史持续学习训练、唯一valid评价、完整回传和本地独立核查均已完成；实际结果外审全文、独立源码与日志附件已亲自核对，结果有效性通过；ER负结果与LOGIT对ER通过均保留，整体抗遗忘目标尚未达成。** 作业从9月30日14:40:21运行至10月1日06:06:13（Asia/Shanghai），退出0、6048次更新、9504次群梯度呈现、21个终点及64份指标矩阵完整。实际总耗时15小时25分51秒，剩余0；原预计18—26小时／10月1日08:40—16:40完成，实际提前，36小时／64GiB是强制上限。09:24:59核对作业进程已退出。[本轮完整报告](SELLER_ALIAS_BGE_RESULT.zh.md)、[当前状态](../reports/seller_alias_continual/20261001/bge_continual_result/current_status.json)。
+
+外审138成员证据包、136载荷／137校验条目及实际输入495来源匹配；主审核对17,160个既有JSON数值、49项布尔判定，最大差5.55e−16。已修正漏入包的观测链接证据口径，正式18来源和原结果未改；新增裁剪线索保留因果限制。[结果外审与逐项主审](../reports/seller_alias_continual/20261001/bge_continual_result/review/report.zh.md)。
 
 本轮困难排序BGE、s0、ABC／BCA／CAB、冻结／SEQ／ER／LOGIT、6群且全部历史及附属状态≤1MiB及O／N／Z判据未改。train=1、valid=1、heldout／owners=0；326份小结果16,241,505字节回传匹配，18份冻结来源未变。Linux保存结果独立核查1,061,316数值、最大差7.11e−15通过，新标签与模型加载均0。[原始评价](../reports/seller_alias_continual/20261001/bge_continual_result/returned/job/evaluation/evaluation.json)、[独立核查](../reports/seller_alias_continual/20261001/bge_continual_result/audit/audit.json)。
 

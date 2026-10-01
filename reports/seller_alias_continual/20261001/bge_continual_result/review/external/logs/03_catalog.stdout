@@ -1,0 +1,468 @@
+
+=== execution.json ===
+keys: ['audit', 'authorization', 'cpu_affinity', 'cuda', 'gpu', 'python', 'source_files', 'torch']
+{
+  "audit": {
+    "bytes": 5089,
+    "path": "reports/seller_alias_continual/20260930/bge_continual_cpu/20260930_142608/job/audit.json",
+    "sha256": "79db8a1b2c6ba8cfabf882ab8bc08207f7b8cba285e730e2f8a2ded61615f771"
+  },
+  "authorization": {
+    "bytes": 5506,
+    "path": "reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/authorization.json",
+    "sha256": "d4efb101cd293c3ee446404a3efee32066fd7ad2ebf9e86728146bfc6c4516a8"
+  },
+  "cpu_affinity": [
+    0
+  ],
+  "cuda": "13.0",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "python": "3.10.19",
+  "source_files": [
+    {
+      "bytes": 32430,
+      "path": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "sha256": "88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485"
+    },
+    {
+      "bytes": 3489,
+      "path": "schema/step28_alias_ranking_policy.json",
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+    },
+    {
+      "bytes": 5123,
+      "path": "schema/step28_bge_continual_policy.json",
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+    },
+    {
+      "bytes": 8439,
+      "path": "schema/step28_chinese_base_policy.json",
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+    },
+    {
+      "bytes": 1243,
+      "path": "scripts/run_step28_bge_continual_linux_20260930.sh",
+      "sha256": "5536ec24cecebc9e401c819f52b05aff4b976fcef530fffe42eaff605322c979"
+    },
+    {
+      "bytes": 8818,
+      "path": "scripts/step28_alias_calibration.py",
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "bytes": 11658,
+      "path": "scripts/step28_alias_ranking.py",
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+    },
+    {
+      "bytes": 16341,
+      "path": "scripts/step28_bge_continual.py",
+      "sha256": "2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae"
+    },
+    {
+      "bytes": 12126,
+      "path": "scripts/step28_bge_continual_check.py",
+      "sha256": "d919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07"
+    },
+    {
+      "bytes": 13765,
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+    },
+    {
+      "bytes": 34789,
+      "path": "scripts/step28_bge_continual_run.py",
+      "sha256": "bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9"
+    },
+    {
+      "bytes": 51352,
+      "path": "scripts/step28_chinese_base.py",
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+    },
+    {
+      "bytes": 26322,
+      "path": "scripts/step28_continual_expression_run.py",
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+    },
+    {
+      "bytes": 9699,
+      "path": "scripts/step28_continual_population.py",
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "bytes": 11587,
+      "path": "scripts/step28_continual_population_data.py",
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "bytes": 20911,
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "bytes": 21310,
+      "path": "scripts/step28_continual_population_run.py",
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "bytes": 31625,
+      "path": "tests/test_step28_bge_continual_contracts.py",
+      "sha256": "de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a"
+    }
+  ],
+  "torch": "2.9.1+cu130"
+}
+
+=== before_valid.json ===
+keys: ['manifest', 'points', 'status', 'supervision']
+{
+  "manifest": {
+    "bytes": 25690,
+    "path": "run/manifest.json",
+    "sha256": "c55c6a069dc1d14e41883dae69bebb4d4a1934611d9a493c6047da0ff19705cc"
+  },
+  "points": 21,
+  "status": "PASS_COMPLETE_BLIND_GATE",
+  "supervision": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  }
+}
+
+=== completion.json ===
+keys: ['budget', 'evaluation', 'label_parses', 'physical_updates', 'status']
+{
+  "budget": {
+    "elapsed_seconds": 55549.224441911094,
+    "peak_observed_bytes": 41787374219
+  },
+  "evaluation": {
+    "bytes": 769370,
+    "path": "evaluation/evaluation.json",
+    "sha256": "d8ad5763c8d504cc2e57943d362463ec0ec44136cfb3ce4310e78fead6808e23"
+  },
+  "label_parses": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 1
+  },
+  "physical_updates": 6048,
+  "status": "COMPLETE_BGE_CONTINUAL_DIAGNOSTIC"
+}
+
+=== run/manifest.json ===
+keys: ['budget', 'gradient_group_presentations', 'initial', 'memories', 'partition', 'physical_updates', 'points', 'policy_sha256', 'pretrained_archive', 'public_inputs', 'source_files', 'status', 'training']
+{'status': 'COMPLETE_6048_UPDATES_21_ENDPOINTS_VALID_BLIND', 'physical_updates': 6048, 'gradient_group_presentations': 9504, 'budget': {'elapsed_seconds': 55519.057868267875, 'peak_observed_bytes': 41787374219}, 'initial': {'maximum_tokens': 82, 'model_state_sha256': 'e52523ec2f44dc7baa5dfad7ea595bbdc43f38aa3883114cdf62b5805dc6f2c7', 'scores': {'bytes': 90848, 'path': 'scores/initial_raw.npy', 'sha256': '4b3017cc50efdc838261f52447ed01553a52d57d9fd297d2d427a8f6db8e6aa5'}}}
+memory [('ABC_er_after1', {'auxiliary_serialized_bytes': 21106, 'custody': 'Linux-only training payload; contains formal texts and labels, exclude from review/small-result sync', 'draw_count': 0, 'draw_stage': 0, 'file': {'bytes': 203243, 'path': 'memory/ABC_er_after1.json', 'sha256': '2e0973624643f3731aaa7a97b97863c64dd64788159a9a38405df8c49665fef0'}, 'members': ['4493a33635ae54f36d0edb28b00917ca', '5f010eb94c3730f85698b8fa9434c21d', 'ec09d6151be95df8f486a9115f6fc209', 'd8c40a84400eada98184e752d40f286b', 'cb72702c36441d8486ea59a9497d747c', '19a7f577b51a4639a264ef63daf069aa'], 'reference_origins': {}, 'references': {}, 'retention_and_reference_seconds': 0.01045102602802217, 'seen': 48, 'serialized_bytes': 203243, 'sha256': '2e0973624643f3731aaa7a97b97863c64dd64788159a9a38405df8c49665fef0', 'with_logits': False})]
+sources [{'bytes': 32430, 'path': 'docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md', 'sha256': '88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485'}, {'bytes': 3489, 'path': 'schema/step28_alias_ranking_policy.json', 'sha256': 'b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01'}, {'bytes': 5123, 'path': 'schema/step28_bge_continual_policy.json', 'sha256': '28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534'}, {'bytes': 8439, 'path': 'schema/step28_chinese_base_policy.json', 'sha256': 'add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a'}, {'bytes': 1243, 'path': 'scripts/run_step28_bge_continual_linux_20260930.sh', 'sha256': '5536ec24cecebc9e401c819f52b05aff4b976fcef530fffe42eaff605322c979'}, {'bytes': 8818, 'path': 'scripts/step28_alias_calibration.py', 'sha256': 'd7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca'}, {'bytes': 11658, 'path': 'scripts/step28_alias_ranking.py', 'sha256': '1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274'}, {'bytes': 16341, 'path': 'scripts/step28_bge_continual.py', 'sha256': '2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae'}, {'bytes': 12126, 'path': 'scripts/step28_bge_continual_check.py', 'sha256': 'd919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07'}, {'bytes': 13765, 'path': 'scripts/step28_bge_continual_evaluate.py', 'sha256': '55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1'}, {'bytes': 34789, 'path': 'scripts/step28_bge_continual_run.py', 'sha256': 'bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9'}, {'bytes': 51352, 'path': 'scripts/step28_chinese_base.py', 'sha256': '2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc'}, {'bytes': 26322, 'path': 'scripts/step28_continual_expression_run.py', 'sha256': '3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760'}, {'bytes': 9699, 'path': 'scripts/step28_continual_population.py', 'sha256': 'f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20'}, {'bytes': 11587, 'path': 'scripts/step28_continual_population_data.py', 'sha256': '49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d'}, {'bytes': 20911, 'path': 'scripts/step28_continual_population_evaluate.py', 'sha256': '398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a'}, {'bytes': 21310, 'path': 'scripts/step28_continual_population_run.py', 'sha256': 'f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4'}, {'bytes': 31625, 'path': 'tests/test_step28_bge_continual_contracts.py', 'sha256': 'de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a'}]
+
+=== run/partition.json ===
+keys: ['calibration', 'development', 'fit']
+counts {'calibration': 36, 'development': 60, 'fit': 144}
+samples {'calibration': [{'domain': 'A', 'group_uid': '6ca043f9f2e4246c1406fc037f8e2690'}], 'development': [{'domain': 'A', 'group_uid': '7968f2595a9d32931d9d92e21bc06de4'}], 'fit': [{'domain': 'A', 'group_uid': '9117de475a68ebcb7b6c2fcc6127bfcf'}]}
+
+=== run/maps/ABC_er_stage3.json ===
+keys: ['a', 'actual_domain', 'b', 'bounds', 'calibrated_brier', 'calibration_group_ids', 'final_nll', 'group_count', 'initial_nll', 'initial_parameters', 'model_state_sha256', 'name', 'objective', 'objective_calls', 'optimizer_iterations', 'optimizer_message', 'optimizer_success', 'options', 'pair_count', 'positive_count', 'projected_gradient_max', 'raw_brier', 'role', 'score_source', 'status', 'trajectory']
+{
+  "a": 0.4812892511056405,
+  "actual_domain": "C",
+  "b": -0.2611751307660774,
+  "bounds": [
+    [
+      0.001,
+      100.0
+    ],
+    [
+      -100.0,
+      100.0
+    ]
+  ],
+  "calibrated_brier": 0.04485632113157181,
+  "calibration_group_ids": [
+    "be210eec1bfc709fbebbc07f6c6cee6b",
+    "055bab075cea10c0bef2bc576e2d1bb9",
+    "7e9bcaea0e73ef179c6b4125d40b9569",
+    "d30f1b517b5639b82d75171ddcc566fa",
+    "c84dd4a7fb0308bb4666b04150b92f1c",
+    "816b9bd82fdd9888c5c97a9702d62c30",
+    "07c9e7e6cd8d68238b90a068150ef7c7",
+    "f13dd0c7599187e1bb1592ff75e2d965",
+    "e5fcbb120591c31aec467c343e8be243",
+    "513c4ad28345a44eb533d05277a47c92",
+    "90d93ef7488192a1e6bd02fa848ee348",
+    "610dcf101bedd4c8571362d2c868986e"
+  ],
+  "final_nll": 0.18073476189038495,
+  "group_count": 12,
+  "initial_nll": 0.24443993482393733,
+  "initial_parameters": [
+    1.0,
+    0.0
+  ],
+  "model_state_sha256": "293b49e9e755c88568afa7c0294faedcfd430ce6a3082e93b783592e9e68fe26",
+  "name": "ABC_er_stage3",
+  "objective": "unweighted_unclipped_bernoulli_nll",
+  "objective_calls": 17,
+  "optimizer_iterations": 14,
+  "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+  "optimizer_success": true,
+  "options": {
+    "ftol": 1e-12,
+    "gtol": 1e-08,
+    "maxcor": 10,
+    "maxfun": 2000,
+    "maxiter": 200,
+    "maxls": 40
+  },
+  "pair_count": 4536,
+  "positive_count": 240,
+  "projected_gradient_max": 2.390886007693401e-10,
+  "raw_brier": 0.04660097845258295,
+  "role": "calibration",
+  "score_source": {
+    "bytes": 18272,
+    "path": "scores/ABC_er_stage3_calibration.npy",
+    "sha256": "319cf11b7d66b22980f483bb50ae780c862a1327fe43c1a7a60c0d77d75df881"
+  },
+  "status": "PASS_CALIBRATION_FIT",
+  "trajectory": [
+    {
+      "a": 0.8024775359771243,
+      "b": 0.0390380906105554,
+      "iteration": 1,
+      "nll": 0.20718842064463966,
+      "projected_gradient_max": 0.16004969333317826
+    },
+    {
+      "a": 0.5976976561261567,
+      "b": 0.06911568104804972,
+      "iteration": 2,
+      "nll": 0.18275782821853662,
+      "projected_gradient_max": 0.053890326134211186
+    },
+    {
+      "a": 0.5442919507112568,
+      "b": 0.0733497950501403,
+      "iteration": 3,
+      "nll": 0.18119389716547998,
+      "projected_gradient_max": 0.002435228045504588
+    },
+    {
+      "a": 0.5422601297344591,
+      "b": 0.07076587818228613,
+      "iteration": 4,
+      "nll": 0.18118552342895378,
+      "projected_gradient_max": 0.002736649186581893
+    },
+    {
+      "a": 0.5352202598412518,
+      "b": 0.053608618166866656,
+      "iteration": 5,
+      "nll": 0.18114837905388276,
+      "projected_gradient_max": 0.0043954796667290755
+    },
+    {
+      "a": 0.5215853602200198,
+      "b": 0.005740370663637841,
+      "iteration": 6,
+      "nll": 0.18106814394699364,
+      "projected_gradient_max": 0.009968576637237235
+    },
+    {
+      "a": 0.5002841689910356,
+      "b": -0.0924820679226148,
+      "iteration": 7,
+      "nll": 0.1809316711364212,
+      "projected_gradient_max": 0.013941402741799072
+    },
+    {
+      "a": 0.48107838270583375,
+      "b": -0.21340107257080249,
+      "iteration": 8,
+      "nll": 0.18079062924384984,
+      "projected_gradient_max": 0.010596399845368736
+    },
+    {
+      "a": 0.4776097936449286,
+      "b": -0.2670909034362669,
+      "iteration": 9,
+      "nll": 0.18073891430003608,
+      "projected_gradient_max": 0.0030820442478666507
+    },
+    {
+      "a": 0.48021898462271656,
+      "b": -0.265442251739353,
+      "iteration": 10,
+      "nll": 0.1807348876181794,
+      "projected_gradient_max": 0.0003499483255276368
+    },
+    {
+      "a": 0.48117767464856726,
+      "b": -0.2617907721448757,
+      "iteration": 11,
+      "nll": 0.18073476342161124,
+      "projected_gradient_max": 4.93625841549287e-06
+    },
+    {
+      "a": 0.4812867673440149,
+      "b": -0.2612004543357396,
+      "iteration": 12,
+      "nll": 0.18073476189555546,
+      "projected_gradient_max": 2.458764976735111e-06
+    },
+    {
+      "a": 0.4812892684588675,
+      "b": -0.26117514155804356,
+      "iteration": 13,
+      "nll": 0.18073476189038518,
+      "projected_gradient_max": 2.285716736126425e-08
+    },
+    {
+      "a": 0.4812892511056405,
+      "b": -0.2611751307660774,
+      "iteration": 14,
+      "nll": 0.18073476189038495,
+      "projected_gradient_max": 2.390886007693401e-10
+    }
+  ]
+}
+
+=== run/memory/ABC_er_stage3_budget.json ===
+keys: ['auxiliary_serialized_bytes', 'draw_count', 'draw_stage', 'members', 'reference_origins', 'references', 'seen', 'serialized_bytes', 'sha256', 'with_logits']
+{
+  "auxiliary_serialized_bytes": 21080,
+  "draw_count": 288,
+  "draw_stage": 3,
+  "members": [
+    "4493a33635ae54f36d0edb28b00917ca",
+    "5f010eb94c3730f85698b8fa9434c21d",
+    "ec09d6151be95df8f486a9115f6fc209",
+    "03c58b02d8c385bb2241e7b812d6309a",
+    "09f65f6264fd0ce512f0ac2ac5dc32fa",
+    "19a7f577b51a4639a264ef63daf069aa"
+  ],
+  "reference_origins": {},
+  "references": {},
+  "seen": 96,
+  "serialized_bytes": 211881,
+  "sha256": "28a91c3f7fba3c20680595ffa754b3c6fc133552f630c1e8294669054fa00ccd",
+  "with_logits": false
+}
+
+=== run/updates/ABC_er_stage3.json ===
+keys: ['actual_domain', 'adam_step', 'cuda_allocator', 'current_dropout_stream', 'current_ids', 'current_schedule_sha256', 'encoder_positive_lr_updates', 'history_ids', 'memory_after_training', 'method', 'observations', 'order', 'scalar_timing_scope', 'seed', 'stage', 'training_seconds', 'update_columns', 'update_file', 'updates']
+{'actual_domain': 'C', 'adam_step': 864, 'cuda_allocator': {'peak_allocated_bytes': 7890523136, 'peak_reserved_bytes': 9307160576, 'scope': 'This stage training interval; not whole-card or other-process use'}, 'current_dropout_stream': 541898700150120985, 'current_schedule_sha256': '9fd94feeee34c258da7ec2e0020a598f39eae155608bbc04bf5832b359aa6717', 'encoder_positive_lr_updates': 287, 'memory_after_training': {'auxiliary_serialized_bytes': 21083, 'draw_count': 288, 'draw_stage': 3, 'members': ['4493a33635ae54f36d0edb28b00917ca', '5f010eb94c3730f85698b8fa9434c21d', 'ec09d6151be95df8f486a9115f6fc209', '03c58b02d8c385bb2241e7b812d6309a', '09f65f6264fd0ce512f0ac2ac5dc32fa', '19a7f577b51a4639a264ef63daf069aa'], 'reference_origins': {}, 'references': {}, 'seen': 96, 'serialized_bytes': 211884, 'sha256': '4802d256ffc59a3dedd91b4a6ab72537760a62c1bca610ab6a714f26abf9ba0e', 'with_logits': False}, 'method': 'er', 'observations': {'1': {'encoder': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}, 'head': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}}, '288': {'encoder': {'finite_nonzero_combined_gradient': True, 'parameters_changed': False}, 'head': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}}, '29': {'encoder': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}, 'head': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}}, '30': {'encoder': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}, 'head': {'finite_nonzero_combined_gradient': True, 'parameters_changed': True}}}, 'order': 'ABC', 'scalar_timing_scope': 'Host construction/enqueue time only; backward is joint with historical supervision, not separately isolated GPU compute', 'seed': 's0', 'stage': 3, 'training_seconds': 3431.2580260068644, 'update_columns': ['current_bce', 'current_rank', 'current_hard', 'current_total', 'history_bce', 'history_rank', 'history_hard', 'history_total', 'logit_mse', 'total', 'encoder_lr', 'head_lr', 'gradient_norm', 'logit_term_host_seconds'], 'update_file': {'bytes': 32384, 'path': 'updates/ABC_er_stage3.npy', 'sha256': 'c5e48b48e0f6a790a6fdfb13d65bd864ad84bcf5539119cc8fdbcf7a4d384f58'}, 'updates': 288}
+
+=== run/points/ABC_shared.json ===
+keys: ['actual_domain', 'checkpoint_calibration_score_seconds', 'completed_updates', 'first_map_parameters', 'full_checkpoint', 'full_checkpoint_retained', 'full_model_adam_and_rng_restore_verified', 'learner_auxiliary', 'learner_auxiliary_serialized_bytes', 'mapping', 'model', 'model_state_sha256', 'name', 'order', 'scores', 'stage']
+{'actual_domain': 'A', 'checkpoint_calibration_score_seconds': 171.41185756586492, 'completed_updates': 288, 'first_map_parameters': {'a': 0.7773772839302454, 'b': 1.2060738802214435}, 'full_checkpoint': {'bytes': 3910983797, 'path': 'branches/ABC_shared.pt', 'sha256': 'a3a325704e2b34209ba490f8b9378ef14c94c2096c8f211229553e45364302e2', 'state_sha256': '0c86557e0bd8b2cd18da829bc3a39589983a6ee4d2770e54a8d50918f3834199'}, 'full_checkpoint_retained': True, 'full_model_adam_and_rng_restore_verified': True, 'learner_auxiliary_serialized_bytes': 21106, 'mapping': {'bytes': 3450, 'path': 'maps/ABC_shared.json', 'sha256': 'fd554f4899b25155ef97ee3abd7d9649f640c5c477edf989042ac524d80fd2bb'}, 'model': {'bytes': 1306474908, 'path': 'models/ABC_shared.pt', 'sha256': '8504050f24a1a4bcf65739b7bc3e0b32bc3fcd1eb3a248939992bcaf9294913c', 'state_sha256': '038977cd436b933544fc6724e7a69aa86685d1e64baed96592e2a4f1cc1edabf'}, 'model_state_sha256': 'ab5224b4bd3b9eb621070f4ae8f9bd590fffeaa663186499c225b02b7f3ef209', 'name': 'ABC_shared', 'order': 'ABC', 'scores': {'calibration': {'bytes': 18272, 'path': 'scores/ABC_shared_calibration.npy', 'sha256': '8c3b03ef2041bcd97607ba81a719690ff54ddfe5e6163ea519c80ceed9344865'}, 'development': {'bytes': 90848, 'path': 'scores/ABC_shared_development.npy', 'sha256': 'fa5abbc387f20e914fa6b2164988e4c96dabcc003eaff001ae637c0259306e2f'}, 'first-cal': {'bytes': 181568, 'path': 'scores/ABC_shared_first-cal.npy', 'sha256': '6a4f665198325965a59e52c1726573b6ae9eae0c92abd992fc9d716baa399630'}, 'stage-cal': {'bytes': 181568, 'path': 'scores/ABC_shared_stage-cal.npy', 'sha256': '6a4f665198325965a59e52c1726573b6ae9eae0c92abd992fc9d716baa399630'}}, 'stage': 1}
+
+=== evaluation/collected.json ===
+keys: ['domains', 'group_ids', 'initial', 'metric_columns', 'points', 'source_files', 'status']
+columns ['average_precision', 'trapezoidal_pr_auc', 'roc_auc', 'recall_at_fpr_1pct', 'brier', 'log_loss', 'precision', 'recall', 'f1', 'specificity', 'balanced_accuracy', 'mcc', 'map', 'mrr', 'recall_at_1', 'recall_at_3', 'recall_at_5', 'recall_at_10', 'ndcg_at_1', 'ndcg_at_3', 'ndcg_at_5', 'ndcg_at_10']
+ids/domains [('7968f2595a9d32931d9d92e21bc06de4', 'A'), ('48799b94ef408557bd86300ec0edc5fa', 'A'), ('3d1574097e3b3afed1ebc09fc310cbf7', 'A')]
+initial {'counts': {'bytes': 1982, 'path': 'initial_raw_counts.json', 'sha256': 'c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174'}, 'matrix': {'bytes': 10688, 'path': 'initial_raw.npy', 'sha256': 'a0aba9892491879a5a5b1cdc48ef439e12698d916645790d1d0cf3b602a0ed21'}}
+sample point {'first-cal': {'counts': {'bytes': 1982, 'path': 'ABC_shared_first-cal_counts.json', 'sha256': '1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5'}, 'matrix': {'bytes': 10688, 'path': 'ABC_shared_first-cal.npy', 'sha256': 'c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad'}}, 'raw': {'counts': {'bytes': 1982, 'path': 'ABC_shared_raw_counts.json', 'sha256': 'c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174'}, 'matrix': {'bytes': 10688, 'path': 'ABC_shared_raw.npy', 'sha256': '69123ec3e10de7f8676689ede9768b214ddc5795cb9b676c07f6262b5cf461c3'}}, 'stage-cal': {'counts': {'bytes': 1982, 'path': 'ABC_shared_stage-cal_counts.json', 'sha256': '1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5'}, 'matrix': {'bytes': 10688, 'path': 'ABC_shared_stage-cal.npy', 'sha256': 'c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad'}}}
+
+=== evaluation/evaluation.json ===
+keys: ['absolute_stage_results', 'analysis_sources', 'collected', 'comparisons', 'draws', 'endpoints', 'initial_to_first_learning', 'next', 'scope', 'seq_forgetting', 'source_files', 'stage_metrics', 'status']
+comparisons {
+  "er_minus_seq": {
+    "checks": {
+      "N_average_precision_non_degradation": false,
+      "N_brier_against_raw_reference": true,
+      "N_brier_non_degradation": false,
+      "N_log_loss_against_raw_reference": true,
+      "N_log_loss_non_degradation": false,
+      "N_roc_auc_non_degradation": false,
+      "O_average_precision_non_degradation": false,
+      "O_brier_against_raw_reference": true,
+      "O_brier_non_degradation": false,
+      "O_log_loss_against_raw_reference": true,
+      "O_log_loss_non_degradation": false,
+      "O_roc_auc_non_degradation": false,
+      "Z_average_precision_non_degradation": false,
+      "Z_brier_non_degradation": false,
+      "Z_log_loss_non_degradation": false,
+      "Z_map_non_degradation": false,
+      "Z_recall_at_5_non_degradation": false,
+      "Z_roc_auc_non_degradation": false,
+      "new_map_non_decrease": false,
+      "new_recall5_non_decrease": false,
+      "old_map_improves": false,
+      "old_map_interval_above_zero": false,
+      "old_recall5_improves": false
+    },
+    "failed": [
+      "old_map_improves",
+      "old_map_interval_above_zero",
+      "old_recall5_improves",
+      "new_map_non_decrease",
+      "new_recall5_non_decrease",
+      "O_average_precision_non_degradation",
+      "O_roc_auc_non_degradation",
+      "O_brier_non_degradation",
+      "O_log_loss_non_degradation",
+      "N_average_precision_non_degradation",
+      "N_roc_auc_non_degradation",
+      "N_brier_non_degradation",
+      "N_log_loss_non_degradation",
+      "Z_map_non_degradation",
+      "Z_recall_at_5_non_degradation",
+      "Z_average_precision_non_degradation",
+      "Z_roc_auc_non_degradation",
+      "Z_brier_non_degradation",
+      "Z_log_loss_non_degradation"
+    ],
+    "future_three_seed_qualification": "NOT_EVALUATED_SINGLE_SEED_PILOT",
+    "pilot_observed_checks_pass": false,
+    "positive_old_map_orders": 0,
+    "scope": "Observed mean protection, not per-domain guarantees or population noninferiority"
+  },
+  "logit_minus_er": {
+    "checks": {
+      "N_average_precision_non_degradation": true,
+      "N_brier_against_raw_reference": true,
+      "N_brier_non_degradation": true,
+      "N_log_loss_against_raw_reference": true,
+      "N_log_loss_non_degradation": true,
+      "N_roc_auc_non_degradation": true,
+      "O_average_precision_non_degradation": true,
+      "O_brier_against_raw_reference": true,
+      "O_brier_non_degradation": true,
+      "O_log_loss_against_raw_reference": true,
+      "O_log_loss_non_degradation": true,
+      "O_roc_auc_non_degradation": true,
+      "Z_average_precision_non_degradation": true,
+      "Z_brier_non_degradation": true,
+      "Z_log_loss_non_degradation": true,
+      "Z_map_non_degradation": true,
+      "Z_recall_at_5_non_degradation": true,
+      "Z_roc_auc_non_degradation": true,
+      "new_map_non_decrease": true,
+      "new_recall5_non_decrease": true,
+      "old_map_improves": true,
+      "old_map_interval_above_zero": true,
+      "old_recall5_improves": true
+    },
+    "failed": [],
+    "future_three_seed_qualification": "NOT_EVALUATED_SINGLE_SEED_PILOT",
+    "pilot_observed_checks_pass": true,
+    "positive_old_map_orders": 3,
+    "scope": "Observed mean protection, not per-domain guarantees or population noninferiority"
+  }
+}
+endpoint schema {'conditional_95pct_interval': [0.40089847876796736, 0.4315157873442785], 'mean': 0.41659694395950403, 'per_order': {'ABC': 0.404301119237254, 'BCA': 0.41627825838597876, 'CAB': 0.4292114542552795}}
+absolute schema {'first-cal': {'macro_all': {'average_precision': 0.21131221039852377, 'balanced_accuracy': 0.54737895716946, 'brier': 0.05029742247363085, 'f1': 0.15854782377686252, 'log_loss': 0.21339110176607926, 'map': 0.3652334210955236, 'mcc': 0.1716891026747959, 'mrr': 0.41542903484835614, 'ndcg_at_1': 0.26845238095238094, 'ndcg_at_10': 0.4300453886599224, 'ndcg_at_3': 0.3202822638330908, 'ndcg_at_5': 0.36686223838791465, 'precision': 0.3754725829725828, 'recall': 0.10499999999999997, 'recall_at_1': 0.19285714285714287, 'recall_at_10': 0.65, 'recall_at_3': 0.3678571428571428, 'recall_at_5': 0.4711309523809524, 'recall_at_fpr_1pct': 0.10249999999999995, 'roc_auc': 0.690649441340782, 'specificity': 0.9897579143389201, 'trapezoidal_pr_auc': 0.19764772622275692}, 'macro_by_domain': {'A': {'average_precision': 0.1961950690832606, 'balanced_accuracy': 0.5385195530726257, 'brier': 0.05061519792974214, 'f1': 0.13558077390985937, 'log_loss': 0.2205809022624708, 'map': 0.3433864411532729, 'mcc': 0.160039
+ABC_er_stage2_calibration.npy (12, 378) float32 -13.778319358825684 -0.08320176601409912
+ABC_er_stage2_development.npy (60, 378) float32 -15.112080574035645 -0.11028462648391724
+ABC_er_stage2.npy (288, 14) float64 0.0 48.328189849853516
+ABC_er_stage3.npy (288, 14) float64 0.0 62.04555130004883
+ABC_er_stage2_first-cal.npy (60, 22) float64 -0.0211406569032676 1.0
+ABC_er_stage2_raw.npy (60, 22) float64 0.0 1.0
+counts example [{'fn': 20, 'fp': 0, 'tn': 358, 'tp': 0}, {'fn': 20, 'fp': 0, 'tn': 358, 'tp': 0}]
+stage csv header and first row metric,output_role,actual_domain,arrival_index,stage,order,seed,method,source_point,group_macro
+average_precision,raw,A,1,0,ABC,s0,initial,initial,0.0676374818504952

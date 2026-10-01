@@ -1,0 +1,348 @@
+{
+  "at_utc": "2026-10-01T03:12:36.151714+00:00",
+  "status": "PASS_PRIMARY_ARTIFACT_LOG_AND_PUBLISHED_RESULT_COMPARISON",
+  "external_manifest_payloads": 136,
+  "external_checksum_entries": 137,
+  "external_zip_members": 138,
+  "submitted_sources": 495,
+  "reviewed_source_copies": 24,
+  "current_frozen_sources_unchanged": 18,
+  "original_upload_identity_matches_actual_review_input": true,
+  "command_records_checked": 14,
+  "external_packaging_record_checked": true,
+  "published_json_comparison": {
+    "numbers": 17160,
+    "bools": 49,
+    "max_abs_difference": 5.551115123125783e-16
+  },
+  "external_draws_match_original_bytes": true,
+  "external_supplied_auditor_endpoint_csv_matches_linux_bytes": true,
+  "commands": [
+    {
+      "name": "00_inventory",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/00_inventory.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:13:10.145382+00:00",
+      "ended_at_utc": "2026-10-01T02:13:10.735105+00:00",
+      "elapsed_seconds": 0.5897573400000056,
+      "exit_code": 1,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 212,
+        "sha256": "62455f010dc19334317de5663cb7f7b4e8ae2944cf6209d13801924fa16760e4"
+      }
+    },
+    {
+      "name": "01_revise_inventory",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/revise_inventory_v2.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:13:23.164737+00:00",
+      "ended_at_utc": "2026-10-01T02:13:23.704137+00:00",
+      "elapsed_seconds": 0.5394331440000002,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 293,
+        "sha256": "90cd193b40c935a1936959be80dbf3f148918e4f2d751179f6350f11db39c722"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "02_inventory_v2",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/00_inventory_v2.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:13:24.359743+00:00",
+      "ended_at_utc": "2026-10-01T02:13:25.240052+00:00",
+      "elapsed_seconds": 0.8803422910000052,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 886,
+        "sha256": "d2c8529f7640f95c0de8d5f881790f40f8be83beabd412237be68af317a48274"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "03_catalog",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/01_catalog.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:14:33.572665+00:00",
+      "ended_at_utc": "2026-10-01T02:14:34.124266+00:00",
+      "elapsed_seconds": 0.5516324639999937,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 26827,
+        "sha256": "2487cb33d05ce452cd5dfdf13fbfff897301f523dc4c73fef94a230149a1cadb"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "04_independent_results_v1",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/02_independent_results_v1.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:16:58.449919+00:00",
+      "ended_at_utc": "2026-10-01T02:17:02.247199+00:00",
+      "elapsed_seconds": 3.7973140049999756,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 3167,
+        "sha256": "e0a2e777d9873bca0d4b9308c66ef461ad17ffe5ed809edb4edaafa30c9bb635"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "05_independent_training_v1",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/03_independent_training_evidence_v1.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:22:19.120823+00:00",
+      "ended_at_utc": "2026-10-01T02:22:19.825939+00:00",
+      "elapsed_seconds": 0.7051580759999752,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 10030,
+        "sha256": "cc9f1534f304377ccf508980039f19a01fc3f9626a003cfbb7eced873bc9f6e2"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "06_supplied_auditor_reproduction",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_input/scripts/step28_bge_continual_audit.py",
+        "--project",
+        "/mnt/data/bge_input",
+        "--job",
+        "/mnt/data/bge_input/reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job",
+        "--inventory",
+        "/mnt/data/bge_input/reports/seller_alias_continual/20261001/bge_continual_result/return_inventory.json",
+        "--output",
+        "/mnt/data/bge_review_evidence/outputs/supplied_auditor_reproduction",
+        "--cpu",
+        "24"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:22:55.122264+00:00",
+      "ended_at_utc": "2026-10-01T02:22:55.667474+00:00",
+      "elapsed_seconds": 0.54524439599993,
+      "exit_code": 1,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 350,
+        "sha256": "7e328a977b095fcce3d7a65103261346b10149b65cdcdaf55813c0706a6c3fce"
+      }
+    },
+    {
+      "name": "07_supplied_auditor_correct_cpu",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/04_supplied_auditor_retry.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:23:05.936534+00:00",
+      "ended_at_utc": "2026-10-01T02:23:07.823028+00:00",
+      "elapsed_seconds": 1.8865271529999745,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 5021,
+        "sha256": "ef1e9f403258768f8fe0a89f365a065839e9b937448bcf7f1f35e78dd4e12bd9"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "08_report_crosschecks_v1",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/05_report_crosschecks_v1.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:26:17.937478+00:00",
+      "ended_at_utc": "2026-10-01T02:26:18.532733+00:00",
+      "elapsed_seconds": 0.5952857500000164,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 6512,
+        "sha256": "c5f5ec0f892c9dd0ea3f0d473b2f1c07a071fff8e1eb518a708e12bda00a115c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "09_revise_report_links",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/revise_report_links_v2.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:26:43.576252+00:00",
+      "ended_at_utc": "2026-10-01T02:26:44.143083+00:00",
+      "elapsed_seconds": 0.566863274999946,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 613,
+        "sha256": "27e0de171b714532dbe210a00fc07cde8973eaa07034df599ff12fe6cc3c4b05"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "10_report_crosschecks_v2",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/05_report_crosschecks_v2.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:26:44.754328+00:00",
+      "ended_at_utc": "2026-10-01T02:26:45.312616+00:00",
+      "elapsed_seconds": 0.5583274150000079,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 6187,
+        "sha256": "7fa658c42ca193146d6d565b6651e7b2f62e1e6bfebfc8dd3ad18a81e70f5f0c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "11_preserve_and_reverify",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/06_preserve_and_reverify.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:31:48.704138+00:00",
+      "ended_at_utc": "2026-10-01T02:31:49.301488+00:00",
+      "elapsed_seconds": 0.5973839189998671,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 425,
+        "sha256": "29abae7e7a89ae6b20b45e4e91f713bca5e0a6614f33c7e185b2e9faaa9abc47"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "12_write_report",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/07_write_report.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:36:40.228936+00:00",
+      "ended_at_utc": "2026-10-01T02:36:40.789651+00:00",
+      "elapsed_seconds": 0.5607469679998758,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 369,
+        "sha256": "d44d9780718dd9ba2b97720560227dae7eadd6c28d78769da2988c032ac8db09"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "13_delivery_checks",
+      "command": [
+        "python",
+        "/mnt/data/bge_review_evidence/scripts/08_delivery_checks.py"
+      ],
+      "cwd": "/mnt/data",
+      "started_at_utc": "2026-10-01T02:38:14.868693+00:00",
+      "ended_at_utc": "2026-10-01T02:38:15.434635+00:00",
+      "elapsed_seconds": 0.5659750540000914,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 869,
+        "sha256": "1668563d7073d26789bdd3e6555b8208113f43f95d89fddae171c11acab2ec56"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "reviewer_revisions": {
+    "00_inventory.py -> 00_inventory_v2.py": "--- 00_inventory.py\n+++ 00_inventory_v2.py\n@@ -19,7 +19,7 @@\n  result={'archive':str(p),'archive_bytes':p.stat().st_size,'archive_sha256':h(p.read_bytes()),'zip_members':len(names),'payload_files':len(rows),'payload_bytes':sum(r['bytes'] for r in rows),'uncompressed_total':sum(z.getinfo(n).file_size for n in names),'all_payload_hashes_match':True,'crc_ok':True,'member_set_exact':True,'inventory_created_at_utc':inv['created_at_utc'],'rows':rows}\n (out/'inventory_verification.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\\n')\n (out/'archive_members.txt').write_text('\\n'.join(names)+'\\n')\n- print(json.dumps({k:v for k,v in result.items() if k!='rows'},indent=2));print('Extracted to',dest)\n+print(json.dumps({k:v for k,v in result.items() if k!='rows'},indent=2));print('Extracted to',dest)\n env={'python':sys.version,'executable':sys.executable,'platform':platform.platform(),'time_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'packages':{}}\n for name in ['numpy','scipy','pandas','torch','scikit-learn','sentence-transformers','transformers']:\n  try: env['packages'][name]=importlib.metadata.version(name)\n",
+    "05_report_crosschecks_v1.py -> 05_report_crosschecks_v2.py": "--- 05_report_crosschecks_v1.py\n+++ 05_report_crosschecks_v2.py\n@@ -1,12 +1,14 @@\n \"\"\"Label-free independent narrative cross-checks and disclosure tables; no new gates.\"\"\"\n from pathlib import Path\n-import csv, hashlib, json, math, re, time\n+import csv, hashlib, json, math, re, time, os\n R=Path('/mnt/data/bge_input'); O=Path('/mnt/data/bge_review_evidence/outputs')\n J=R/'reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job'\n E=J/'evaluation'\n start=time.perf_counter()\n+REPORT_OUT=O/'report_crosscheck_v2'\n+REPORT_OUT.mkdir(exist_ok=False)\n def load(p):return json.loads(p.read_text(encoding='utf-8'))\n-def save(n,x):(O/n).write_text(json.dumps(x,ensure_ascii=False,indent=2,allow_nan=False)+'\\n',encoding='utf-8')\n+def save(n,x):(REPORT_OUT/n).write_text(json.dumps(x,ensure_ascii=False,indent=2,allow_nan=False)+'\\n',encoding='utf-8')\n ep=load(O/'independent_endpoints.json'); sc=load(O/'independent_score_and_count_summary.json'); first=load(O/'independent_first_learning.json'); updates=load(O/'independent_update_diagnostics.json')\n methods=['frozen','seq','er','logit']; metrics=list(ep['seq']['primary']['O'])\n checks=[]\n@@ -59,6 +61,13 @@\n         relative=(R/'docs'/url.split('#')[0]).resolve().relative_to(R).as_posix()\n         present=(R/relative).exists();mapped=source_to_archive.get(relative)\n         if not present and mapped and (R/mapped).exists():present=True\n+        # source_inventory is file-granular. A directory link can represent a\n+        # complete mapped subtree even when the Windows directory is not in ZIP.\n+        if not present:\n+            descendants=[v for k,v in source_to_archive.items() if k.startswith(relative.rstrip('/')+'/')]\n+            if descendants and all((R/v).is_file() for v in descendants):\n+                present=True\n+                mapped=os.path.commonpath(descendants)\n         links.append(dict(line=ln,label=label,target=url,resolved=relative,present_or_manifest_mapped=present,mapped_archive=mapped))\n unresolved=[x for x in links if not x['present_or_manifest_mapped']]\n # No attempt to query live OS/server state; the unresolved observation claim is ancillary.\n"
+  },
+  "R1": {
+    "confirmed_omitted_from_submission": true,
+    "local_original_exists": true,
+    "local_bytes": 21187,
+    "local_sha256": "7b7485b5f1cf78d67d700c2b926c616719ce8404e56453887d788aef7b7c1570",
+    "observed_at_asia_shanghai": "2026-10-01T09:24:59.113221+08:00",
+    "saved_job_files_match_returned_originals": true,
+    "scope": "Local original read, not newly queried server state; not falsely represented as included in the original external ZIP."
+  },
+  "new_clip_diagnostic": {
+    "source": "external independent training reference and its actual logs/outputs",
+    "all_clipped": 6030,
+    "all_updates": 6048,
+    "later_clipped": 5184,
+    "later_updates": 5184,
+    "verification": "Read reference and original clip/update column code; checked original output identity and the saved summary arithmetic. No local .npy scientific recomputation."
+  },
+  "review_text_read": [
+    "response.json",
+    "external/REVIEW.zh.md",
+    "external/FAILURES_AND_REVISIONS.zh.md"
+  ],
+  "research_scripts_executed_here": false,
+  "new_label_access": 0,
+  "new_model_loads": 0,
+  "new_linux_research_execution": 0,
+  "limitations": [
+    "Comparison uses previously generated JSON results, not a new metrics computation from labels.",
+    "The external reference actually ran in the web environment, not again in project py310.",
+    "Formal tensor reloads, full memory payloads and formal calibration optimality were not independently repeated."
+  ]
+}
