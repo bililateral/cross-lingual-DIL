@@ -1,0 +1,198 @@
+{
+  "date": "2026-09-27",
+  "status": "PRIMARY_SOURCE_LITERATURE_ASSESSMENT_EXTERNAL_REVIEW_IN_PROGRESS",
+  "scope": "Targeted overlap and potential-contribution assessment; not an exhaustive systematic review, novelty proof, method implementation review, or new experiment authorization.",
+  "reviewed_by": "primary_executor",
+  "formal_data_access": false,
+  "linux_access": false,
+  "model_loading": false,
+  "paper_code_implemented_or_audited": false,
+  "selected_executed_queries": [
+    "\"darknet\" vendor alias identification \"continual\"",
+    "\"VendorLink\" authorship attribution 2023",
+    "\"continual\" \"entity alignment\" replay ContEA",
+    "\"lifelong person re-identification\" \"memory\" 2025 2026",
+    "\"continual metric learning\" memory relational ranking",
+    "\"continual dense retrieval\" replay memory ranking",
+    "\"continual dense retrieval\" \"L2R\"",
+    "\"Lifelong Learning for First-stage Retrieval\" Cai pdf",
+    "\"Query Drift Compensation\" continual learning retrieval embedding models",
+    "\"CREAM: Continual Retrieval\" site:arxiv.org",
+    "\"Positive Pair Distillation Considered Harmful\" \"500\"",
+    "\"continual\" \"entity matching\" memory replay",
+    "\"darknet vendor\" \"continual\" OR \"lifelong\" OR \"incremental\"",
+    "\"暗网\" \"马甲\" \"持续学习\"",
+    "\"Towards Effective Authorship Attribution\" \"CogMI\" 2024",
+    "\"lifelong\" \"Re-identification\" \"2026\" \"Vision-Language\""
+  ],
+  "query_log_note": "Representative actually issued queries, not a complete engine-result export. Secondary discovery results were not treated as evidence for substantive claims.",
+  "sources": [
+    {
+      "id": "vendorlink",
+      "title": "VendorLink: An NLP approach for Identifying & Linking Vendor Migrants & Potential Aliases on Darknet Markets",
+      "publication": "ACL 2023",
+      "url": "https://aclanthology.org/2023.acl-long.481/",
+      "full_text": "https://aclanthology.org/2023.acl-long.481.pdf",
+      "read_scope": "Publication metadata; original PDF task and model passages, Section 9 limitations.",
+      "claim_scope": "Direct application overlap; text representations and low-resource market adaptation. No claim that transfer to new markets is absent."
+    },
+    {
+      "id": "vendor_matching",
+      "title": "Adversarial Matching of Dark Net Market Vendor Accounts",
+      "publication": "KDD 2019",
+      "url": "https://www.contrib.andrew.cmu.edu/~nicolasc/publications/Tai-KDD19.pdf",
+      "read_scope": "Original PDF Sections 5.2 and 5.3; prior local literature report consulted separately.",
+      "claim_scope": "Pair scoring followed by hierarchical clustering predates this study."
+    },
+    {
+      "id": "l2r",
+      "title": "Lifelong Learning for First-stage Retrieval with Backward-Compatible Representations",
+      "publication": "CIKM 2023",
+      "doi": "10.1145/3583780.3614947",
+      "url": "https://jiafengguo.github.io/2023/CIKM2023-L2R.pdf",
+      "read_scope": "Original PDF introduction/problem formulation, Sections 4.1-4.3 and 5.1-5.3; selected result/baseline passages.",
+      "claim_scope": "Fixed initial labeled queries/positives; new unlabeled documents; per-query old-negative memory, hardness/diversity, memory update, separate compatibility objectives. Vanilla method remains relevant. AP here is average performance across sessions."
+    },
+    {
+      "id": "contea",
+      "title": "Facing Changes: Continual Entity Alignment for Growing Knowledge Graphs",
+      "publication": "ISWC 2022",
+      "doi": "10.1007/978-3-031-19433-7_12",
+      "url": "https://arxiv.org/html/2207.11436",
+      "publisher_pdf": "https://iswc2022.semanticweb.org/wp-content/uploads/2022/11/978-3-031-19433-7_12.pdf",
+      "read_scope": "Original introduction, problem formulation, Sections 3.1-3.2.",
+      "claim_scope": "Replay of affected seed alignments and trusted new alignments; graph accessibility is not equivalent to a strict global raw-text memory budget."
+    },
+    {
+      "id": "cluda_reid",
+      "title": "Lifelong Unsupervised Domain Adaptive Person Re-Identification With Coordinated Anti-Forgetting and Adaptation",
+      "publication": "CVPR 2022",
+      "url": "https://openaccess.thecvf.com/content/CVPR2022/html/Huang_Lifelong_Unsupervised_Domain_Adaptive_Person_Re-Identification_With_Coordinated_Anti-Forgetting_and_CVPR_2022_paper.html",
+      "full_text_read": "https://arxiv.org/pdf/2112.06632",
+      "read_scope": "Official abstract, author PDF method Sections 4.2-4.3 including identity-wise reservoir and relation-consistency matrices.",
+      "access_limitation": "Direct CVF PDF and supplement returned HTTP 403 in this session. Author PDF was accessible; supplement was not reread. Earlier review scope is preserved as history.",
+      "claim_scope": "Identity-wise memory, coordinated replay and relation consistency already exist; image pseudolabel setting differs."
+    },
+    {
+      "id": "dwopp",
+      "title": "Positive Pair Distillation Considered Harmful: Continual Meta Metric Learning for Lifelong Object Re-Identification",
+      "publication": "BMVC 2022",
+      "url": "https://arxiv.org/pdf/2210.01600",
+      "publisher_pdf": "https://bmvc2022.mpi-inf.mpg.de/0038.pdf",
+      "read_scope": "Author PDF introduction and Sections 3.1-3.3; indexed publisher experimental/supplement passages.",
+      "claim_scope": "Method is exemplar-free; positive-pair removal concerns its specified distillation objective. A cited 500-example memory belongs to memory-based comparison methods, not DwoPP."
+    },
+    {
+      "id": "cream",
+      "title": "CREAM: Continual Retrieval on Dynamic Streaming Corpora with Adaptive Soft Memory",
+      "publication": "KDD 2026",
+      "doi": "10.1145/3770854.3780281",
+      "url": "https://arxiv.org/html/2601.02708v2",
+      "publication_record": "https://pure.korea.ac.kr/en/publications/cream-continual-retrieval-on-dynamic-streaming-corpora-with-adapt/",
+      "read_scope": "Author full-text abstract, introduction, Sections 3, 4.1 and 4.2, Algorithm 1; author-institution publication metadata.",
+      "claim_scope": "Dynamic query/document streams, structured soft memory and self-supervised update; explicitly defines disjoint and shared-pool evaluation. No full algorithm or repository audit."
+    },
+    {
+      "id": "mir",
+      "title": "Online Continual Learning with Maximal Interfered Retrieval",
+      "publication": "NeurIPS 2019",
+      "url": "https://proceedings.neurips.cc/paper/2019/hash/15825aee15eb335cc13f9b559f166ee8-Abstract.html",
+      "read_scope": "Official publisher abstract this session; historical original project web-review discussion personally reread.",
+      "claim_scope": "Interference-based replay retrieval; not a claim to have rederived the full method or inspected implementation this session."
+    },
+    {
+      "id": "gss",
+      "title": "Gradient based sample selection for online continual learning",
+      "publication": "NeurIPS 2019",
+      "url": "https://proceedings.neurips.cc/paper/2019/hash/e562cd9c0768d5464b64cf61da7fc6bb-Abstract.html",
+      "read_scope": "Official publisher abstract this session; historical review distinction between buffer update and replay retrieval.",
+      "claim_scope": "Gradient-informed memory diversity; not a current code audit."
+    },
+    {
+      "id": "der",
+      "title": "Dark Experience for General Continual Learning: a Strong, Simple Baseline",
+      "publication": "NeurIPS 2020",
+      "url": "https://proceedings.neurips.cc/paper/2020/hash/b704ea2c39778f07c617f6b7ce480e9e-Abstract.html",
+      "read_scope": "Official abstract, original PDF opening, and personally reread historical review on DER++ details.",
+      "claim_scope": "Replay plus historical-output preservation. No new assertion that this project's future adaptation already conforms to DER++."
+    },
+    {
+      "id": "incremental_authorship",
+      "title": "Towards Effective Authorship Attribution: Integrating Class-Incremental Learning",
+      "publication": "IEEE CogMI 2024",
+      "doi": "10.1109/CogMI62246.2024.00018",
+      "url": "https://arxiv.org/pdf/2408.08900",
+      "publication_record": "https://researchprofiles.csumb.edu/en/publications/towards-effective-authorship-attribution-integrating-class-increm/",
+      "read_scope": "Author PDF task/Figure 1, method and experimental-comparison passages; author-institution publication metadata.",
+      "claim_scope": "Growing author-class classification, distinct from held-out-controller binary relations."
+    },
+    {
+      "id": "qdc",
+      "title": "Query Drift Compensation: Enabling Compatibility in Continual Learning of Retrieval Embedding Models",
+      "publication": "PMLR volume 330 (2026); author preprint 2025",
+      "url": "https://proceedings.mlr.press/v330/goswami26a.html",
+      "full_text_read": "https://arxiv.org/html/2506.00037v2",
+      "read_scope": "Author full-text introduction, problem formulation and selected method passages; official PMLR metadata.",
+      "claim_scope": "New-query/old-document representation compatibility; not a required objective for the current same-model reencoding protocol.",
+      "metadata_note": "Use explicit PMLR volume/year rather than infer conference year from third-party references."
+    },
+    {
+      "id": "vladr",
+      "title": "Vision-Language Attribute Disentanglement and Reinforcement for Lifelong Person Re-Identification",
+      "publication": "CVPR 2026",
+      "url": "https://openaccess.thecvf.com/content/CVPR2026/html/Xu_Vision-Language_Attribute_Disentanglement_and_Reinforcement_for_Lifelong_Person_Re-Identification_CVPR_2026_paper.html",
+      "full_text_read": "https://arxiv.org/html/2603.19678v1",
+      "read_scope": "Official publication metadata and author Section 3.4, equations 9-10.",
+      "claim_scope": "Attribute relation preservation across instances already has explicit objectives; no recommendation to add visual inputs."
+    }
+  ],
+  "additional_hits_not_used_as_core_evidence": [
+    {
+      "title": "Lifelong Person Re-Identification via Adaptive Knowledge Accumulation",
+      "read_scope": "CVPR 2021 official abstract; historical project review of held-out-identity setting.",
+      "reason": "Additional setting overlap, not needed as a separate core comparison."
+    },
+    {
+      "title": "Advancing continual lifelong learning in neural information retrieval: Definition, dataset, framework, and empirical evaluation",
+      "read_scope": "Author arXiv metadata/abstract and introductory HTML; publisher record incomplete.",
+      "reason": "Avoid asserting a publication year or new method details not fully checked."
+    },
+    {
+      "title": "An Equal-Byte Non-Inferiority Protocol for Storage-Aware, Reproducible Evaluation of Replay-Based Continual Learning",
+      "read_scope": "Indexed publisher text only; direct page failed.",
+      "reason": "Not relied on for scientific conclusions or to impose noninferiority criteria."
+    }
+  ],
+  "historical_original_reviews_personally_read": [
+    {
+      "path": "reports/seller_alias_continual/20260907/review.json",
+      "fields": [
+        "reply_text",
+        "local_decisions"
+      ],
+      "scope": "Feasibility and prior method overlap; grouped edges alone need not create relational training."
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/plan_review.json",
+      "fields": [
+        "reply_text",
+        "local_decisions"
+      ],
+      "scope": "Frozen old plan, fairness and algorithm distinctions. Previously closed matters remain closed."
+    },
+    {
+      "path": "reports/seller_alias_continual/20260909/dataset_design/review.json",
+      "fields": [
+        "browser_capture.messages",
+        "local_disposition"
+      ],
+      "scope": "Actual assistant reply and local dispositions; new populations, held-out identities, synthetic domain limits."
+    }
+  ],
+  "limitations": [
+    "Targeted search cannot prove absence of an identical or more recent method.",
+    "Read scopes are per source; no claim to have read all appendices, audited all equations, or reproduced any paper.",
+    "Potential contribution is the executor's conditional inference; not established novelty.",
+    "No cross-paper score comparison, CCF acceptance prediction, real-market validation claim, or newly authorized experiment."
+  ]
+}

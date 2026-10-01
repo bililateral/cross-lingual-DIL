@@ -1,0 +1,104 @@
+{
+  "date": "2026-09-09",
+  "status": "REVIEW_COMPLETED_TWO_CANDIDATES_RETAINED_TWO_DEPRIORITIZED",
+  "scope": "Additional candidate selection with existing synthetic data and unchanged generation mechanism; no new mainline or experiment",
+  "url": "https://chatgpt.com/c/6aa0db5f-f2d4-83ed-8d0a-2b6031f9cee9",
+  "user_message_id": "b13103eb-f832-4217-bbeb-c236f68ac464",
+  "assistant_message_id": "e644b29e-ce63-4edd-97bf-c9a9aa915f55",
+  "actual_model": "gpt-6-pro",
+  "prompt": "请用网页GPT 6 Pro对这一轮新增选题做一次定点审查（约1800—2200中文字）。用户只允许继续使用现有中文合成数据，不重新生成、不调整生成机制。这里只筛选问题，不实施。此前原文成对交互、证据通道协同、多正例完整检索都只是候选；本次要找与这三者不同的问题，不把旧问题改名。\n\n项目：中文暗网卖家同控账号识别，现有合格V9.4.1 train/dev各500世界，每世界28账号/378完整账号对，每端14k账号49.5k商品记录；每账号2—8记录，每查询1或2同控候选。公开输入是脱敏标题描述与公开数值证据；当前LaBSE独立编码后6项相似度统计＋51数值特征，identity33中有世界内token频率/邻居/两跳派生量。完整训练监督存在但本轮不读。生成时间桶不是真实时间；无合格图像/行为时间线。开发多轮探索，Audit A/B/qrels/私有控制者保持封存。数据只能给受控机制结论，不能证明真实中文有效。用户已反对弱监督藏标签、人工预算、普通作者识别、群误合并、图文和轨迹等方向。旧持续学习两次ER有效负结果、旧背景删失/共享联系方式和迁移主张保持停止，不换名重跑。\n\n下面四项不是已找到新算法。请判断是否值得作为新候选，特别挑出跟旧问题实质重合、当前数据根本不支持或文献已经覆盖到没有明确剩余问题的项目。不要因通用近邻存在就要求选题时先有正结果，但不能把换成中文或拼模块当创新。\n\nA. 为什么某些账号会被大量无关账号错误排在前面？\n研究“普遍像很多人”的相似度偏置（hubness），希望区分账号普遍相似与这两个账号特有匹配证据，降低集中在少量账号的错误关联。不同于原文交互、排序loss和最终聚类，也不重新造共享联系方式或背景删除场景。固定现有账号/记录/候选集合可检验错误入选集中程度，现有数据有完整监督用于未来评价，但当前尚未证明hubness发生；不能把被检索次数高直接称错误，真实多马甲也会被正确多次找回。\n近邻：CVPR2022 Cross Modal Retrieval with Querybank Normalisation https://openaccess.thecvf.com/content/CVPR2022/html/Bogolin_Cross_Modal_Retrieval_With_Querybank_Normalisation_CVPR_2022_paper.html 。已读PDF第3—4页任务/框架，原文已有querybank、CSLS/inverted-softmax近邻，并明确不同querybank可能损伤结果，提出DIS。不能把训练参考库、双向扣偏置或选择性校正当首创。另定位TKDD2024 Diverse Structure-Aware Relation Representation in Cross-Lingual Entity Alignment，DOI10.1145/3638778，已有OT处理hubness；其一对一约束不能套马甲。后者仅摘要/相关方法定位。\n最小比较：原分数 vs CSLS/QB-Norm等简单参照，不先训练复杂模型；参考库/校正仅用训练内信息，需明确模型新旧输入。不要把跨世界账号自动当负例，也不能对固定1/2马甲强加一对一/容量配额。潜在增量仅是既保留真实多马甲又减少假hub、针对同控对称关系的校正；尚无算子。这条最贴近识别本体，但可能只有现成归一化应用。\n\nB. 一次错误马甲关联主要受哪些历史训练账号影响？\n输出不是当前两段文本的高亮，而是对训练账号/其派生训练对的影响排序；用事先定义的训练内模型诊断目标，未来以移除指定训练账号后重建相关输入并真实重训的变化检验归因可靠性。没有改标签，没有伪造错误数据：标签正确的样本也可能影响模型学到某种偏好。发现有影响不等于发现错误标签，更不等于必须删除有效训练证据；不得用开发集选删除子集后再把同开发改善当独立验证。\n近邻ICML2023 TRAK https://proceedings.mlr.press/v202/park23c.html 已读摘要、附录A.1/A.2定位（训练子集反事实、预测脆弱性/模型比较）；SIGMOD2020 Rain https://crows.land/publication/sigmod-2020-rain/ 已读作者摘要，已有对输出投诉定位训练数据；NeurIPS2025 AirRep https://neurips.cc/virtual/2025/session/128336 官方程序含原作者摘要，已有专门表示和attention聚合的group-wise影响。不能声称“按账号成组”本身新。Generalized Group Data Attribution是NeurIPS2024 workshop，不冒充主会依据。\n当前特定难点：一个账号同时参与许多正负训练对，删除账号会重建关系特征；普通把每一对贡献相加可能错估原始账号的整体作用。可能增量是针对从账号/记录到依赖训练对这条流水线的影响估计，需超过按账号汇总TRAK等简单办法，归因用真实重训验证。计算工作可能不小，不承诺快速。它是识别模型诊断论文候选，不是宣称直接提高所有识别AP。\n\nC. 某个训练账号的证据撤回后，怎样消除它的影响，保留其他马甲识别能力？\n这里是预先指定的训练账号撤回操作，直接从既有训练数据中定义保留集合，不生成/改写记录或标签。不同于旧持续学习“不要忘记”，也不同于旧推理背景删失：目标是达到仅用保留训练数据重新训练的识别模型行为。绝不真的删除科研源文件或旧负结果。本轮是否开展任何子集操作仍需用户选题确认。\n近邻ICML2020 Certified Data Removal https://proceedings.mlr.press/v119/guo20c.html 原摘要，严格保证针对线性分类器不能套LaBSE；CCS2022 Graph Unlearning(GraphEraser) https://arxiv.org/abs/2103.14991 与作者仓库已核书目/摘要；ICLR2023 GNNDelete https://arxiv.org/abs/2302.13406 已读PDF2—4页含删除定义/图1，已处理节点/关系/邻域影响；USENIXSecurity2023 GUIDE https://www.usenix.org/conference/usenixsecurity23/presentation/wang-cheng-long 原摘要已读，已有inductive graph unlearning，不能声称泛化到新图首次。\n潜在增量：账号同时影响训练对与世界内派生特征，联合处理输入重建/模型更新的依赖；仅删直接训练行不够。现有不是GNN，不为了套论文换成GNN。最强参照重建保留输入后从头重训；可比普通微调与适用的现成unlearning。去掉一个账号不等于忘掉该控制者的其他合法账号，删后同控分数仍高可能合理。不能用“删边分数降为零”或一次攻击失败当遗忘成功证明；当前只能考虑近似遗忘，没有形式保证。可能比B更清晰但与通用graph unlearning重合大，不能只做数据依赖清理就称算法贡献。\n\nD. 识别模型升级后，新表示如何继续匹配尚未重算的旧账号表示？\n任务比较old-old/new-new/new-old，不研究旧任务遗忘、不恢复缓存选择器、不人为给极小重算预算。直接复用既有文本可建立控制比较，旧checkpoint能否作科学参照须另审；不能把不同训练权限checkpoint的效果归因到兼容算法。\n近邻CVPR2020 Towards Backward-Compatible Representation Learning https://openaccess.thecvf.com/content_CVPR_2020/html/Shen_Towards_Backward-Compatible_Representation_Learning_CVPR_2020_paper.html 原摘要；CIKM2023 L2R https://jiafengguo.github.io/2023/CIKM2023-L2R.pdf 已定位4.3，已有文本检索兼容和排序对齐；ICCV2025 Towards Cross-modal Backward-compatible Representation Learning for Vision-Language Models 原CVF摘要，已有新到旧投影/PEFT。不是只在图像做过。\n比较完整重编码参照、简单线性/正交映射、现成兼容训练；报告更新成本。当前6相似度＋pair head还涉及分数尺度/对称性，不只向量旋转，可能看混合时期同控判别兼容。没有确定新方法，数据规模小、运行需求不强，可能应降为工程备选。\n\n请给明确取舍排序：哪些值得继续查，哪些排除/仅备选；每项剩余可检验问题和最大论文风险。若补近邻最多2篇，区分已读原文与线索。按SCIENTIFIC_BLOCKER（说明阻断候选还是只阻断成果宣称）、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN归类必要修正。不要改研究主线、要求新增真实标签、造新机制、打开Audit、追加实验或泛化安全流程；本次不含源码/数据/结果，不能独立验证实现。",
+  "observed_user_message": "请用网页GPT 6 Pro对这一轮新增选题做一次定点审查（约1800—2200中文字）。用户只允许继续使用现有中文合成数据，不重新生成、不调整生成机制。这里只筛选问题，不实施。此前原文成对交互、证据通道协同、多正例完整检索都只是候选；本次要找与这三者不同的问题，不把旧问题改名。\n\n项目：中文暗网卖家同控账号识别，现有合格V9.4.1 train/dev各500世界，每世界28账号/378完整账号对，每端14k账号49.5k商品记录；每账号2—8记录，每查询1或2同控候选。公开输入是脱敏标题描述与公开数值证据；当前LaBSE独立编码后6项相似度统计＋51数值特征，identity33中有世界内token频率/邻居/两跳派生量。完整训练监督存在但本轮不读。生成时间桶不是真实时间；无合格图像/行为时间线。开发多轮探索，Audit A/B/qrels/私有控制者保持封存。数据只能给受控机制结论，不能证明真实中文有效。用户已反对弱监督藏标签、人工预算、普通作者识别、群误合并、图文和轨迹等方向。旧持续学习两次ER有效负结果、旧背景删失/共享联系方式和迁移主张保持停止，不换名重跑。\n\n下面四项不是已找到新算法。请判断是否值得作为新候选，特别挑出跟旧问题实质重合、当前数据根本不支持或文献已经覆盖到没有明确剩余问题的项目。不要因通用近邻存在就要求选题时先有正结果，但不能把换成中文或拼模块当创新。\n\nA. 为什么某些账号会被大量无关账号错误排在前面？\n研究“普遍像很多人”的相似度偏置（hubness），希望区分账号普遍相似与这两个账号特有匹配证据，降低集中在少量账号的错误关联。不同于原文交互、排序loss和最终聚类，也不重新造共享联系方式或背景删除场景。固定现有账号/记录/候选集合可检验错误入选集中程度，现有数据有完整监督用于未来评价，但当前尚未证明hubness发生；不能把被检索次数高直接称错误，真实多马甲也会被正确多次找回。\n近邻：CVPR2022 Cross Modal Retrieval with Querybank Normalisation https://openaccess.thecvf.com/content/CVPR2022/html/Bogolin_Cross_Modal_Retrieval_With_Querybank_Normalisation_CVPR_2022_paper.html 。已读PDF第3—4页任务/框架，原文已有querybank、CSLS/inverted-softmax近邻，并明确不同querybank可能损伤结果，提出DIS。不能把训练参考库、双向扣偏置或选择性校正当首创。另定位TKDD2024 Diverse Structure-Aware Relation Representation in Cross-Lingual Entity Alignment，DOI10.1145/3638778，已有OT处理hubness；其一对一约束不能套马甲。后者仅摘要/相关方法定位。\n最小比较：原分数 vs CSLS/QB-Norm等简单参照，不先训练复杂模型；参考库/校正仅用训练内信息，需明确模型新旧输入。不要把跨世界账号自动当负例，也不能对固定1/2马甲强加一对一/容量配额。潜在增量仅是既保留真实多马甲又减少假hub、针对同控对称关系的校正；尚无算子。这条最贴近识别本体，但可能只有现成归一化应用。\n\nB. 一次错误马甲关联主要受哪些历史训练账号影响？\n输出不是当前两段文本的高亮，而是对训练账号/其派生训练对的影响排序；用事先定义的训练内模型诊断目标，未来以移除指定训练账号后重建相关输入并真实重训的变化检验归因可靠性。没有改标签，没有伪造错误数据：标签正确的样本也可能影响模型学到某种偏好。发现有影响不等于发现错误标签，更不等于必须删除有效训练证据；不得用开发集选删除子集后再把同开发改善当独立验证。\n近邻ICML2023 TRAK https://proceedings.mlr.press/v202/park23c.html 已读摘要、附录A.1/A.2定位（训练子集反事实、预测脆弱性/模型比较）；SIGMOD2020 Rain https://crows.land/publication/sigmod-2020-rain/ 已读作者摘要，已有对输出投诉定位训练数据；NeurIPS2025 AirRep https://neurips.cc/virtual/2025/session/128336 官方程序含原作者摘要，已有专门表示和attention聚合的group-wise影响。不能声称“按账号成组”本身新。Generalized Group Data Attribution是NeurIPS2024 workshop，不冒充主会依据。\n当前特定难点：一个账号同时参与许多正负训练对，删除账号会重建关系特征；普通把每一对贡献相加可能错估原始账号的整体作用。可能增量是针对从账号/记录到依赖训练对这条流水线的影响估计，需超过按账号汇总TRAK等简单办法，归因用真实重训验证。计算工作可能不小，不承诺快速。它是识别模型诊断论文候选，不是宣称直接提高所有识别AP。\n\nC. 某个训练账号的证据撤回后，怎样消除它的影响，保留其他马甲识别能力？\n这里是预先指定的训练账号撤回操作，直接从既有训练数据中定义保留集合，不生成/改写记录或标签。不同于旧持续学习“不要忘记”，也不同于旧推理背景删失：目标是达到仅用保留训练数据重新训练的识别模型行为。绝不真的删除科研源文件或旧负结果。本轮是否开展任何子集操作仍需用户选题确认。\n近邻ICML2020 Certified Data Removal https://proceedings.mlr.press/v119/guo20c.html 原摘要，严格保证针对线性分类器不能套LaBSE；CCS2022 Graph Unlearning(GraphEraser) https://arxiv.org/abs/2103.14991 与作者仓库已核书目/摘要；ICLR2023 GNNDelete https://arxiv.org/abs/2302.13406 已读PDF2—4页含删除定义/图1，已处理节点/关系/邻域影响；USENIXSecurity2023 GUIDE https://www.usenix.org/conference/usenixsecurity23/presentation/wang-cheng-long 原摘要已读，已有inductive graph unlearning，不能声称泛化到新图首次。\n潜在增量：账号同时影响训练对与世界内派生特征，联合处理输入重建/模型更新的依赖；仅删直接训练行不够。现有不是GNN，不为了套论文换成GNN。最强参照重建保留输入后从头重训；可比普通微调与适用的现成unlearning。去掉一个账号不等于忘掉该控制者的其他合法账号，删后同控分数仍高可能合理。不能用“删边分数降为零”或一次攻击失败当遗忘成功证明；当前只能考虑近似遗忘，没有形式保证。可能比B更清晰但与通用graph unlearning重合大，不能只做数据依赖清理就称算法贡献。\n\nD. 识别模型升级后，新表示如何继续匹配尚未重算的旧账号表示？\n任务比较old-old/new-new/new-old，不研究旧任务遗忘、不恢复缓存选择器、不人为给极小重算预算。直接复用既有文本可建立控制比较，旧checkpoint能否作科学参照须另审；不能把不同训练权限checkpoint的效果归因到兼容算法。\n近邻CVPR2020 Towards Backward-Compatible Representation Learning https://openaccess.thecvf.com/content_CVPR_2020/html/Shen_Towards_Backward-Compatible_Representation_Learning_CVPR_2020_paper.html 原摘要；CIKM2023 L2R https://jiafengguo.github.io/2023/CIKM2023-L2R.pdf 已定位4.3，已有文本检索兼容和排序对齐；ICCV2025 Towards Cross-modal Backward-compatible Representation Learning for Vision-Language Models 原CVF摘要，已有新到旧投影/PEFT。不是只在图像做过。\n比较完整重编码参照、简单线性/正交映射、现成兼容训练；报告更新成本。当前6相似度＋pair head还涉及分数尺度/对称性，不只向量旋转，可能看混合时期同控判别兼容。没有确定新方法，数据规模小、运行需求不强，可能应降为工程备选。\n\n请给明确取舍排序：哪些值得继续查，哪些排除/仅备选；每项剩余可检验问题和最大论文风险。若补近邻最多2篇，区分已读原文与线索。按SCIENTIFIC_BLOCKER（说明阻断候选还是只阻断成果宣称）、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN归类必要修正。不要改研究主线、要求新增真实标签、造新机制、打开Audit、追加实验或泛化安全流程；本次不含源码/数据/结果，不能独立验证实现。\n\n展开",
+  "response": "总体取舍\n\n排序：A＞B＞C＞D。 A保留为现象与机制候选；B只保留针对近邻的缺口核查；C不另立本轮主线；D仅作工程备选。四项均能在既有记录上定义计算问题，不因缺少真实时间线就不可研究；但目前没有一项足以确认方法创新，也不需要选题阶段先拿正结果。\n\nA：优先保留，但不能把“假hub”当已知事实\n\n剩余问题是：固定候选集合中，异控误入前列是否集中于少数账号，校正能否减少这种错误而保留真正多马甲召回？ 它研究错误分布，不等同于原文交互、通道协同或改排序损失。\n\n必须分开错误入选和正确回收，并考虑各账号异控入选机会；集中度下降也可能只是把相同数量的错误摊开。每查询只有27个候选，加上identity33已有频率和邻居量，当前最多提出“有限候选下的残余相似度偏置”，不能直接归因为经典高维hubness。现有监督足以在未来评价这一现象，但不支持事先断言其普遍存在。\n\nQB-Norm原文已涵盖CSLS、IS及DIS。尤其CSLS本来不强加一对一；同域对称扣偏置也不能凭名称成为创新。因此，“保留多马甲＋对称”尚不是独立增量。\narXiv\n\n最大论文风险是现成归一化应用。另须明确校正文本相似度还是最终分数：训练库与评估账号跨世界比较时，世界内派生特征并非自动有定义，不能暗补跨世界负例。\n\nB：值得继续查，但新增近邻明显压缩缺口\n\n这与当前文本高亮确实不同；不过AirRep已讨论简单求和遗漏组内作用，“按账号成组”不足以立题。\narxiv.org\n\n本轮只补两篇。**Canonpipe（ICLR2024）**已把数据准备、特征提取流水线纳入数据归因；本轮仅核作者摘要，具体适用边界仍是线索。\nSebastian Schelter\n **VIF（ICML2025）**本轮读到预印本§3.2—3.4并核对会议信息：它明确讨论删除节点改变其他节点对的构造，并通过删前后完整损失差估计影响。这是直接近邻，不只是泛泛影响函数。从定义看，把账号保留状态记为 b，重建输入后的目标就是 L(θ,b)。不能因当前按pair计算BCE就排除VIF：它关心原始对象层面的可分性，而不只是派生训练行。\narXiv\n+1\n\n剩余可检验问题应是：在明确的账号撤回与输入重建语义下，估计能否忠实预测实际重训变化，并在适用的现成方法之外形成精度—成本优势？只超过“按账号相加TRAK”已不足以证明新方法；但也不能倒过来断言VIF已解决当前非凸文本流水线。\n\n最大风险是“依赖追踪＋现成归因”的包装。影响大不等于标签错；必须区分模型参数变化与诊断目标自身输入重算的直接变化，否则排序解释的是不同对象。B可以是诊断研究，不必以识别AP提升作成立条件。真实重训也不是无噪声参照：目标须说明是指定训练随机性下的变化还是平均变化，不能把优化轨迹差异全部归到撤回账号。\n\nC：定义成立，但退出本轮独立主线\n\n它不是ER保持，也不是推理背景删失；从现有原始记录定义保留集合，无须改生成机制。不过，删除节点会影响关系及邻域已被GNNDelete明确处理。当前不是GNN，说明算法不能直接照搬，不说明问题首次出现。\narXiv\n\n剩余问题是相对“重建保留输入后从头训练”的行为偏差和总成本，而不是撤回账号的同控分数是否归零。其他合法账号仍可支持相似判断；近似行为接近也不等于形式化遗忘保证。\n\n最大论文风险是把正确的数据依赖清理当算法贡献。目前没有清楚超出通用近似遗忘的特定增量。B预测撤回后果，C近似实现该后果，二者并非同题；但“同一依赖重建难点”不能被重复计为两项创新。这是选题优先级判断，不是否定机器遗忘问题本身。\n\nD：仅留工程备选\n\n没有真实时间线不阻止构造新旧编码兼容比较。剩余问题是混合版本经过六项统计与分类头后，能否维持同控判别并节约全量重编码成本。\n\nL2R原文§4.3已有文本检索混合表示、向量对齐及排序分布对齐；所以“不只旋转向量，还处理分数”仍不足以形成独立创新。\narXiv\n\n最大风险是缺乏实际升级压力的小规模兼容工程。数据量小本身不是科学阻断；降级理由是当前特定需求和剩余机制问题都不足。旧checkpoint的训练信息差异必须与兼容策略作用分开；D不天然等于持续学习，但不能借它恢复已停止的ER与缓存选择。\n\n必要修正分级\n\n**SCIENTIFIC_BLOCKER：**目前主要阻断创新或成果宣称，而非四项计算问题的存在。A不能把错误集中直接称几何成因；B须撤掉“依赖传播本身未被覆盖”的暗示；C不能把AP保持或删边分数下降当遗忘证明；D不能把训练信息差异归为兼容增益。B/C若不明确撤回的是监督行还是原始证据、哪些输入重算，才会阻断反事实的可检验表述。\n\n**REPRODUCIBILITY_DEFECT：**没有源码、数据和结果，不能确认实现缺陷。参考库作用空间、撤回重建范围及训练起点、混合版本所用分类头需要消歧，但不应冒充已发现的代码错误或扩成实验合同。\n\n**OUT_OF_SCOPE_OVERDESIGN：**为制造hub改数据或加容量配额，补造时间机制，改成GNN套论文，或复活旧持续路线，均应排除。现有开发结果只能作探索，最终主张仍限于既有中文合成机制。",
+  "source_links": [
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/html/2112.12777"
+    },
+    {
+      "text": "arxiv.org",
+      "href": "https://arxiv.org/html/2505.18513v2"
+    },
+    {
+      "text": "Sebastian Schelter",
+      "href": "https://ssc.io/publication/canonpipe-data-debugging-with-shapley-importance-over-machine-learning-pipelines/"
+    },
+    {
+      "text": "arXiv\n+1",
+      "href": "https://arxiv.org/html/2412.01335"
+    },
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/html/2302.13406"
+    },
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/html/2308.11512"
+    }
+  ],
+  "local_disposition": {
+    "ranking": [
+      "A: residual similarity bias; retain as phenomenon/method candidate",
+      "B: training-account attribution; retain only for concrete gap verification",
+      "C: evidence withdrawal/unlearning; do not recommend as a separate mainline now",
+      "D: representation upgrade compatibility; engineering reserve"
+    ],
+    "confirmed_candidate_level_scientific_blockers": 0,
+    "confirmed_implementation_or_reproducibility_defects": 0,
+    "findings": [
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "scope": "Claim only",
+        "affected_claim": "High-frequency retrieval implies geometric hubness or successful correction",
+        "resolution": "Separate false from correct retrieval and account for negative opportunities. Reduced error concentration alone may redistribute errors; require fewer false matches with retained correct retrieval. Small K and current frequency features only support a residual-bias question. CSLS itself does not impose one-to-one matching, so one-to-many plus symmetry is not novel."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "scope": "Novelty and future counterfactual definition",
+        "affected_claim": "Training-account dependence or pipeline-aware attribution is uncovered",
+        "resolution": "Independently verified DataScope/Canonpipe ICLR2024 abstract, introduction, definition and canonical pipeline approximation; it covers source-to-prepared data provenance and conditional treatment of global transforms. Verified VIF ICML2025 publication and author HTML sections3.2-3.4 plus specific-case guarantee statement. It explicitly includes node removal changing other training pairs and full loss differences. B must compare applicable VIF and pipeline attribution, not just summed TRAK. No universal LaBSE accuracy guarantee inferred from these papers."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "scope": "Future B/C protocol",
+        "affected_claim": "A deletion effect is well defined without specifying the rebuilt pipeline",
+        "resolution": "Specify original evidence or supervision row deletion, affected surviving features/scaler, fixed versus recomputed target input, normalization and training randomness. The inherited text scaler is fitted on first-stage data. No claim that dependent reconstruction is inherently local, or that matched seeds erase all optimization uncertainty."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "scope": "C/D claim boundaries",
+        "affected_claim": "Unlearning from zero score or compatibility from mixed checkpoint performance",
+        "resolution": "C requires permitted-data retraining reference and retained utility/cost; a retained alias can support the same identity. D requires controlled training information and specific heads/scales; no revival of stopped ER. Neither currently has a distinct method contribution."
+      },
+      {
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "scope": "Future design questions, not existing defects",
+        "affected_claim": "Replayable experiment definition",
+        "resolution": "If selected, define reference scores, withdrawal reconstruction, training origin, and mixed-model heads in the future confirmed contract. No new contract or runtime check imposed during topic selection."
+      },
+      {
+        "classification": "OUT_OF_SCOPE_OVERDESIGN",
+        "scope": "Rejected expansion",
+        "affected_claim": "Extra work beyond candidate selection",
+        "resolution": "No modified synthetic mechanisms, manufactured hubs/noise, forced alias-count constraints, GNN replacement to fit literature, combined attribution/repair/unlearning platform, real-label acquisition, audit opening, Linux or experiments."
+      }
+    ],
+    "additional_local_sources": [
+      {
+        "title": "Data Debugging with Shapley Importance over Machine Learning Pipelines",
+        "venue": "ICLR2024",
+        "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/ccdd1961dcd0245d9dadceccead0fad1-Abstract-Conference.html",
+        "pdf": "https://pages.cs.wisc.edu/~wentaowu/papers/iclr24-datascope.pdf",
+        "read_scope": "Abstract, introduction, task definition, sections3.2/3.3; not entire proof or implementation"
+      },
+      {
+        "title": "A Versatile Influence Function for Data Attribution with Non-Decomposable Loss",
+        "venue": "ICML2025",
+        "url": "https://proceedings.mlr.press/v267/deng25h.html",
+        "author_text": "https://arxiv.org/html/2412.01335",
+        "read_scope": "Official abstract/venue; author text node-dependence example, object-presence formulation, influence assumptions and finite-difference method, approximation guarantee boundary"
+      }
+    ],
+    "authorization": "Only literature, existing evidence and documentation; no labels, model loads, experiments, data processing, original artifact deletion or Linux."
+  }
+}
+

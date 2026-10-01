@@ -1,0 +1,166 @@
+{
+  "stage": "seller_alias_research_gaps",
+  "date": "2026-09-07",
+  "status": "PROPOSAL_REVIEW_COMPLETE_NO_NEW_EXPERIMENT",
+  "user_criteria": [
+    "中文暗网卖家马甲识别相关",
+    "有一定研究缺口",
+    "有创新空间"
+  ],
+  "superseded_priority": "不再以容易实施、低成本或复用当前特征作为首要筛选限制",
+  "reviewer": {
+    "requested_model": "web ChatGPT GPT 6 Pro",
+    "observed_ui_model": "6 / Pro",
+    "identity_basis": "实际会话模型选择器可见标签；未声称独立核验服务后端模型",
+    "conversation_url": "https://chatgpt.com/c/6a9d1145-9d04-83ed-825b-71f13afc9b44",
+    "submitted_at_utc": "2026-09-07 02:27:39 UTC",
+    "completion_observed_at_utc": "2026-09-07 02:37:02 UTC",
+    "attachment": {
+      "path": "docs/SELLER_ALIAS_RESEARCH_GAPS.zh.md",
+      "sha256": "2d7d7f12d5e02f431fd7e4dabc80613288163330709024f5b1a833dd2702a6b6",
+      "bytes": 13858
+    },
+    "prompt": "请用本会话的 GPT 6 Pro，对新附件 SELLER_ALIAS_RESEARCH_GAPS.zh.md 做一次定点科研选题审查。请确认实际能阅读附件正文。本轮用户最新要求已改变：只要求与中文暗网卖家马甲（同一控制者账号）识别有关、有一定研究缺口及创新空间，不再把容易实现、低成本或沿用现有特征作为选题首要限制。请不要沿用上轮“先做成对编码强基线”的推荐作为默认排序；DeepMatcher 已覆盖条件化对齐，此项现已退回普通基线。\n\n附件是新一轮实际目录核对、原文阅读记录和三个有限候选，不是已证实创新或冻结实验：\n甲：以最终划分的错误身份关系为对象，做风险约束的结构化群合并/拆分。已承认 KDD2019 马甲聚类、ICML2022 一般集合风险控制、KDD2024 边际覆盖和后续图 FDR 已有研究。尤其必须把现成集合风险方法直接校准最终划分作为近邻和强基线，不能声称“集合层面”本身新。\n乙：记录写作来源与账号控制者分离；解决同控多写作者、异控共用写作服务两向混淆。已承认 SIGIR2018 共享账号用户识别、TKDE 角色分解、《软件学报》2026 动态用户数方法，多个向量/混合模型本身不新；需要独立公开信息支持可辨识性。不是账号接管或一般作者识别。\n丙：中文变体的条件化个人选择偏好，与社区共有替换习惯分离，保留歧义归一化。已承认 ChineseBERT 形音信息和 Findings ACL2025 鲁棒/风格敏感张力；不是简单纠错或加入拼音。\n\n请重点审查：（1）文献归属、方法描述有无具体错误；发现更直接重合论文时给可核验原始来源，区分正式发表、预印本与仅猜测；（2）每项除了组合已有术语，真正值得检验的增量是什么、最大的重合或不可辨识问题是什么；（3）甲是否仍实质等于现成风险控制/相关聚类直接应用，不能混淆 FP 数量、FDR、边际覆盖和群污染；乙/丙是否只是把未经验证的动机设为生成规则从而造出优势；（4）按“问题价值、潜在方法增量与中文卖家关联”排序，并说明是文献支持的候选，不能保证论文等级。\n\n现阶段有完整合成中文监督，真实中文金标签不作为前提，合成结果不冒充真实有效。你没有收到项目原文数据、标签、生成器或运行文件，不能声称验证其现象或效果。本轮只是选题和文档，Linux 未连接，Audit A/B 封存，旧负结果不重跑。不要求先证明所有定理才能讨论候选，不增设数据索取、大规模生成、全回归、smoke 或多轮审查门。\n\n如有需要修正文档的建议，请标明受影响科学主张、最小处理及 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 类别，区别“阻断成果宣称”与“阻断候选留存”。请约1500—2000中文字符给出完整、具体的审查意见，不泛泛罗列新方向。",
+    "reply_text": "新附件正文全部74行已完整读到。 本轮核对了关键论文段落及出版来源，未读取项目原文、标签、生成器或运行产物；两份项目目录也未独立核验。附件确实将三项限定为待检验候选，没有宣称创新或效果已经成立。\n\nSELLER_ALIAS_RESEARCH_GAPS.zh\n\n结论：三项均可留存；综合问题价值、潜在方法增量和卖家同控关联，我建议乙＞甲＞丙。 这不是成本排序，也不表示任何一项已有足够论文贡献。\n\n一、文献核验：REPRODUCIBILITY_DEFECT\n\n未发现已核对主干描述的实质错误。 Tai 的四类层次链接、KDD2024 定理3.2的边际覆盖、Fisch 的FP数量控制、TKDE中“角色不必对应真实个人”的限定均与原文相符。\nIRLab\n+3\nContrib\n+3\n健康\n+3\n\n有两处最小记录更新。第31行的 In-context Clustering-based Entity Resolution… 现可由 SIGMOD2026官方录用名单确认；原来的“未确认”是诚实范围说明，不是错误归属。\n2026 ACM SIGMOD/PODS Conference\n 第22行2026年图FDR论文宜补上：作者原稿假设缺失模式与网络独立，未知缺失模式不等于允许任意信息性缺失。这仅补全适用条件，不推翻附件已有判断。\narXiv\n\n下述新增近邻应登记，但没有必要因此重开旧审查。\n\n二、三项科学判断：SCIENTIFIC_BLOCKER仅针对越界成果宣称\n甲：问题成立，但当前方法描述仍很接近通用方法应用\n\n两个10账号群误合并新增100条错误关系，手算正确。然而，最终划分、非嵌套候选和组内依赖本身都不足以建立新颖性：Fisch明确允许非嵌套候选集合；Learn then Test（正式发表于《Annals of Applied Statistics》，2025）允许一般输出空间和非单调风险。若独立同分布的世界是校准单位，预先固定的整套合并程序也可以作为预测映射整体校准，并不要求世界内部各边独立。\nProceedings of Machine Learning Research\n+2\n欧几里得项目\n+2\n\n第39—43行应进一步收紧：令 V 为最终错误同控对数、R 为最终预测同控对数，则FP是 V，FDP是 V/(R∨1)，FDR是其期望；群污染则另以受污染群数作分子。边际覆盖不能替代这些量，Fisch的任意集合打分函数也不等于其定理直接控制任意风险。\n\nSELLER_ALIAS_RESEARCH_GAPS.zh\n\n \nProceedings of Machine Learning Research\n\n**最小处理：**把潜在增量写成“在相同最终风险预算下，通过具体结构求解提高正确关系恢复”，而非“首次控制群风险”；明确群污染分母、空输出约定，避免全单例凭零错误取胜。相关聚类＋现成最终划分校准仍是实质强对照。当前可研究，但尚未说明为何不是这种直接组合；这阻断创新宣称，不阻断候选。\n\n乙：最值得优先细化，但必须保住“控制者”这一目标\n\n新增近邻是 PoPETs2022《Towards Improving Code Stylometry Analysis in Underground Forums》：它已讨论一个账号背后多个作者，以及将样本归到账号。因此“作者与账号不一一对应”不是新发现；但它没有据此完成附件提出的写作来源关系与控制关系联合恢复。\n宠物研讨会\n+1\n\n值得检验的增量是：借助写作之外的公开关联信息，判断何时来源重叠支持同控、何时仅表示共享服务，同时保留异写作者同控正例。 必须区分来源建模的贡献与独立关联通道自身的贡献。完整同控标签能监督预测，但不能单凭预测成功证明潜在成分是真实员工或写作者。附件第55行的不可辨识限制正确。\n\nSELLER_ALIAS_RESEARCH_GAPS.zh\n\n**最小处理：**明确拟恢复的是关系还是具体写作者；“来源集合有交集”可以不传递，“同一写作者”则不能任意取消传递性。只要保留这一层次区分，乙不是一般作者识别换名；尚缺的是具体可观察关系与联合消歧算子，不是必须先取得真实中文金标签。\n\n丙：中文关联最强，但直接近邻比附件记录的更近\n\nIDIOLEX，arXiv:2604.04704，2026预印本已用同文档、同作者、同方言社区等层级监督联合建模个人与社区变异；本轮未确认其正式发表身份。因此“个人／社区语言变异共同建模”本身不能作为增量。不过，它不是中文歧义归一化下的卖家同控方法，不能据此宣布丙完全被覆盖。\narXiv\n+1\n\n剩余值得检验的是：在相同语义／上下文条件下，对可替换形式的选择概率作社区参照，并对多种规范解释保留不确定性，而不只是学习风格向量。最大问题有两个：身份与社区完全绑定时，两种效应无法分离；个人写作偏好仍不自动等于控制者身份。\n\n**最小处理：**第65行补入IDIOLEX，收窄为上述条件选择与歧义处理目标。乙／丙都不能靠给每个控制者固定来源组合或替换字典，把答案写进生成规则后宣称解决问题；合成监督可以检验声明机制，却不能证明该机制现实存在。附件目前已承认现象未验证，故这不是已发生的实验缺陷。\n\nSELLER_ALIAS_RESEARCH_GAPS.zh\n\n三、取舍与 OUT_OF_SCOPE_OVERDESIGN\n\n乙优先，因为它直接修正“写作身份＝控制身份”的任务假设；甲第二，错误对象清楚，但现成风险控制覆盖更强；丙第三，中文联系最直接，却同时面临近邻覆盖和写作者—控制者错位。\n\n无需预先证明所有定理、索取真标签或新增生成工程。本轮没有阻断候选留存的科学缺陷；有的是必须收窄的贡献边界。三项均为文献支持的研究假设，不能据此保证论文等级。",
+    "reply_links": [
+      {
+        "text": "IRLab\n+3\nContrib\n+3\n健康\n+3",
+        "href": "https://www.contrib.andrew.cmu.edu/~nicolasc/publications/Tai-KDD19.pdf"
+      },
+      {
+        "text": "2026 ACM SIGMOD/PODS Conference",
+        "href": "https://2026.sigmod.org/sigmod_papers.shtml"
+      },
+      {
+        "text": "arXiv",
+        "href": "https://arxiv.org/html/2507.07025v2"
+      },
+      {
+        "text": "Proceedings of Machine Learning Research\n+2\n欧几里得项目\n+2",
+        "href": "https://proceedings.mlr.press/v162/fisch22a/fisch22a.pdf"
+      },
+      {
+        "text": "Proceedings of Machine Learning Research",
+        "href": "https://proceedings.mlr.press/v162/fisch22a/fisch22a.pdf"
+      },
+      {
+        "text": "宠物研讨会\n+1",
+        "href": "https://petsymposium.org/popets/2022/popets-2022-0007.pdf?utm_source=chatgpt.com"
+      },
+      {
+        "text": "arXiv\n+1",
+        "href": "https://arxiv.org/abs/2604.04704"
+      }
+    ],
+    "capture_format": "完整最终答复 DOM innerText；保留网页来源标签，引用 href 另存",
+    "review_scope_limit": "目录 PDF、数据、标签、生成器、代码及运行产物未上传。本轮没有项目运行复现。"
+  },
+  "local_decisions": [
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "finding": "LLM-CER 初稿尚未确认录用身份；现在已有官方记录",
+      "affected_claim": "相关工作出版身份及近邻覆盖",
+      "verification": "SIGMOD 2026 官方名单题名与六位作者匹配；作者稿 §5.2–5.3 已有整组聚类、误聚类检查、层次合并",
+      "remedy": "更新书目状态并列为甲的直接近邻",
+      "interpretation": "初稿明确披露尚未核实，未构成错误归属；这里是补全记录，不追认科研失败",
+      "blocks_candidate_retention": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "2026 图 FDR 论文仍有缺失模式独立假设",
+      "affected_claim": "既有图风险方法的适用范围",
+      "verification": "作者稿 arXiv:2507.07025v2 假设 1.1 明确 M 与 A 独立",
+      "remedy": "补入独立假设，不将未知缺失扩为任意信息性缺失",
+      "blocks_candidate_retention": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "一般最终划分校准已可用，Fisch 集合打分不等于任意风险保证",
+      "affected_claim": "甲的潜在方法创新及风险定义",
+      "verification": "本地核对 Fisch §3–4、Learn then Test §1.1 及 §2；若独立同分布集合是校准单位，内部边依赖不自动使整个映射无法校准",
+      "remedy": "写明 V、R、FDP/FDR、非单例群污染分母与空输出约定；保留正确关系恢复效用，将增量收窄为相同最终风险预算下更好的结构求解；加入现成最终划分校准强对照",
+      "blocks_candidate_retention": false,
+      "blocks_unsupported_result_claim": true
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "共享作者或多个账号不是新现象；来源集合交集与同一写作者的传递性不同",
+      "affected_claim": "乙的目标、创新与可辨识性",
+      "verification": "PoPETs 2022 原文 §2 明述同开发者多账号及同账号多用户；SIGIR/TKDE 已有混合用户/角色。集合交集不传递不意味着同一具体作者不传递",
+      "remedy": "以来源重叠关系和同控关系为输出，不声称恢复具体员工；区分联合消歧收益与独立关联通道本身收益",
+      "blocks_candidate_retention": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "IDIOLEX 已覆盖一般个人与社区语言变异联合建模",
+      "affected_claim": "丙的潜在方法创新",
+      "verification": "独立阅读 arXiv:2604.04704v1 §2–3 层次邻近监督及语言特征辅助目标，未确认正式会议身份",
+      "remedy": "改为对歧义规范形式及上下文条件化的变体选择与同控匹配；说明身份社区完全绑定时不可分离，个人偏好不自动证明同控",
+      "blocks_candidate_retention": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "乙、丙不能靠控制者专属来源组合或字典制造通用方法优势",
+      "affected_claim": "未来合成证据能支持的结论",
+      "verification": "当前根未验证新场景；新候选尚未生成或执行，无已发生实验缺陷",
+      "remedy": "保留完整合成监督但限制机制结论；不以取得真实中文金标签为前提，不自动更改现有数据",
+      "blocks_candidate_retention": false
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "finding": "没有增加全回归、smoke、GPU、真标签索取或多轮审查门的必要",
+      "affected_claim": "本轮仅为文献与选题记录",
+      "remedy": "不新增执行门，不重审旧代码或旧负结果",
+      "blocks_candidate_retention": false
+    }
+  ],
+  "local_additional_literature": [
+    {
+      "title": "Flexible Models for Microclustering with Application to Entity Resolution",
+      "url": "https://jwmi.github.io/publications/flexible-models-for-microclustering.pdf",
+      "scope": "问题、§2–3、§4 评价定义"
+    },
+    {
+      "title": "Multifile Partitioning for Record Linkage and Duplicate Detection",
+      "url": "https://arxiv.org/pdf/2110.03839",
+      "scope": "问题与 §5.3；JASA 卷期另核对"
+    },
+    {
+      "title": "Authorship Analysis on Dark Marketplace Forums",
+      "url": "https://www.researchgate.net/publication/279848313_Authorship_Analysis_on_Dark_Marketplace_Forums",
+      "scope": "作者本人上传原文的摘要、任务和 §VI"
+    },
+    {
+      "title": "Idiosyncratic but not Arbitrary",
+      "url": "https://aclanthology.org/2021.emnlp-main.25.pdf",
+      "scope": "§1–3 与 §6.2"
+    }
+  ],
+  "final_disposition": {
+    "priority": [
+      "乙：写作者与控制者分离",
+      "甲：控制最终误合并的马甲群发现",
+      "丙：条件化中文变体选择"
+    ],
+    "rationale": "乙的任务差异更明显，甲的目标清楚但通用方法覆盖强，丙最中文化但近邻更直接。不是成本排序，也不是方法成功结论",
+    "final_document": {
+      "path": "docs/SELLER_ALIAS_RESEARCH_GAPS.zh.md",
+      "bytes": 20609,
+      "sha256": "213598f65c8a7d59d290e2ac5533e8428ca2b9ed7f98e4ec8739f3d352a57963"
+    },
+    "post_upload_changes": "补充实际核对近邻与适用条件、收窄成果边界、明确指标和来源关系、记录本地排序。正常落实本次审查，无新实验或重复审查。",
+    "new_mainline_established": false,
+    "new_experiment_frozen": false,
+    "new_label_reads": 0,
+    "linux_connections": 0,
+    "synchronization_performed": false,
+    "old_results_unchanged": true
+  },
+  "validation": {
+    "method": "本地 UTF-8/JSON 解析、当前改动相关链接存在性、最终文档及原审查字节核对；无代码或实验语义变更，不运行测试套件",
+    "prior_review": {
+      "path": "reports/seller_alias_papers/20260906/review.json",
+      "sha256": "6b178b0608f7fd0bb63b9bbede657c59eed9a180dc84c14a4fe13e3a6ef55dc2"
+    }
+  }
+}

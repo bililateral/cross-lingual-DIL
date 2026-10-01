@@ -1,0 +1,99 @@
+{
+  "stage": "topic_reselection_original_text_interaction",
+  "date": "2026-09-09",
+  "status": "REVIEW_COMPLETED_CANDIDATE_RETAINED_NOT_SELECTED",
+  "user_decisions": [
+    "重新选择能够检验的问题",
+    "可以重评尚未实施的候选",
+    "用户追问预算受限的理由；执行者承认没有已证实前提，当前候选不设人为文本/计算限制",
+    "原文交互目前只作为候选，继续寻找其他新研究问题"
+  ],
+  "reviewer": {
+    "interface": "web ChatGPT",
+    "model_slug": "gpt-6-pro",
+    "url": "https://chatgpt.com/c/6aa0d344-c224-83ed-9b66-3737263db869",
+    "user_message_id": "a94946c0-04e5-4987-b70a-86eb036ac992",
+    "assistant_message_id": "84693ca9-12c1-46ee-8aad-58f5f9609073",
+    "prompt": "请作为网页 GPT 6 Pro，对下列“重新选题建议”做一次定点外审。用户已经要求放弃在当前条件下继续直接扩展持续识别路线，重新选择现有数据能检验的问题，并明确“可以重评尚未实施的候选”。这次只审选题和最小比较思路，未获准新训练、读取标签或使用 Linux。请不要把本轮当成正式实验合同，也不要重审已完成旧结果。\n\n【确定事实与数据边界】\n核心始终是中文暗网卖家账号是否由同一控制者控制。可复用合格 V9.4.1 中文合成训练/开发数据，各 500 世界、每世界 28 账号、完整 378 对；每端 14,000 账号、49,500 商品记录，账号有 2—8 条记录。完整账号对监督已存在，但只有获准的新训练/评价阶段才能解析；本次没有读标签。开发集已多次用于探索，不是未消费测试集。Audit A/B 标签、qrels、控制者资产继续封存，不自动解封、不新造真实数据。没有足够真实中文同控标签，不能保证任意真实市场有效；不把索取作者数据作为前提。\n上一轮公开文本审计记录：按账号/字段唯一文本，共 99,000 条标题/描述文本；每账号 UTF-8 内容字节最小/中位/最大 1001/1146/4720。这是字节，不是 token，本轮尚未重新分词，所以不得预设“普遍超长”或人为压低窗口证明选择器必要。拟用现行 observed/redacted_items 的标题/描述，已去掉生成的身份子句。数值基线 legacy18+identity33 可沿用既有公开投影范围，不把 raw 身份子句悄悄加回交互输入。\n旧模型：LaBSE 分块独立编码，归一化向量按原文/字段聚合，六项文本特征是字段质心余弦和双向 top-3 等汇总，接 51 项公开数值特征和小头。最新文本四臂确实微调 LaBSE，不是冻结表示；但没有跨账号原文字词共同编码。Step23 固定商品向量多记录汇总已是负结果，Step25 去复制、原风格迁移主要主张也关闭。\n新旧两次持续比较均不支持各自冻结 ER 配置，不能据此宣称所有文本学习无用或不存在任何遗忘。最近 ER−继续 AP=-0.003249250，95%条件区间[-0.004266568,-0.002272440]；规则外 AP 约 .057/.062，固定 logit0 TP 全零。AP>0/低阈值召回等仍不能推导原文有额外信息。有效负结果全部保留。\n\n【拟推荐的一个研究问题】\n“中文暗网卖家马甲识别中的多记录原文交互：在相同可见证据与训练监督下，先比较两个账号的原文片段、再汇总关系证据，是否比先独立编码再汇总相似度，更能识别同控账号？”\n这是重新评估此前尚未实施的“多记录成对证据”候选，先去掉未经证实的必需预算限制，不把它包装成全新点子。\n输入 A、B 各自既有脱敏商品标题/描述，输出账号对同控分数及候选排名。商品文本相似不是同控标签；各商品对也不能直接继承账号对正标签。必须在账号对层级聚合输出和计算监督。\n潜在方法阶段才考虑：选择能增加本账号对判断信息的若干片段组合，同时避免反复计入同一表述。跨记录互补性及选择价值尚未证明，不能先命名为已创新算法。先采用现成成对编码/简单聚合，若没有增量不立刻堆新选择器；这不是逻辑上否定所有选择方法。\n最小比较建议：先固定公开字段、去重/分块与可见文本覆盖，比较\nA. 独立编码 + 简单聚合；\nB. 同底座的原文成对交互 + 简单聚合；\nC. 如果 B 有可复核增量、且实测确有计算/长度瓶颈，再比较均匀、TF-IDF/相似度 top-k 与待明确的选择方法。B 要覆盖所有记录时可分块后聚合，不通过截掉 B 的有用内容制造劣势。\nA/B 共用的 51 项数值证据和融合规则必须一致；可用最小文本分支对照判断收益是否真来自文本，但具体臂、训练预算、模型及主要对比仍需用户确认，不能自动开全因子矩阵。历史不同日程模型只做背景，不当配对归因基线。账号对对称性、记录排序/重复、长短文本曝光、训练及推理成本应在计划中明示；本阶段不造执行细节。\n评价保留全体候选及既有公开强规则未覆盖的全部正负对，不只挑漏掉的正例。事先确定主要 AP 对比、检索/阈值指标、种子及区间，开发集只当探索；数值门槛尚未冻结。若交互只能改善强规则简单区域，或者在相同信息/成本口径下无实际优势，不支持新主线；若普通交互有利但新选择超过不了强简单参照，只证明基线价值，不足以宣称方法论文完成。\n\n【直接近邻：不能遗漏】\n1. VendorLink, ACL 2023: https://aclanthology.org/2023.acl-long.481/ ——暗网广告、写作表示、开放集/低资源适配已有。\n2. DeepMatcher, SIGMOD 2018: https://pages.cs.wisc.edu/~anhai/papers1/deepmatcher-sigmod18.pdf ——已重新读4.3/4.4，另一记录条件化词对齐、比较、加权汇总明确存在。“条件化”“交互”不构成新颖性。\n3. Ditto, PVLDB14(1), 2020/对应VLDB2021: https://www.vldb.org/pvldb/vol14/p50-li.pdf ——联合序列输入、TF-IDF摘要等均是基线。\n4. HierMatcher, IJCAI2020: https://www.ijcai.org/proceedings/2020/0507.pdf ——词/属性/实体层次、跨属性对齐和注意去噪已有。本轮只核对摘要和方法概览，未完整审计公式。\n5. PARADE, TOIS2023: https://doi.org/10.1145/3600088 作者稿 https://eprints.gla.ac.uk/298257/2/298257.pdf ——篇章检索中多段交互和聚合是近邻，不能把分层就当创新；不是卖家控制身份标签。\n6. KeyBLD, SIGIR2021, DOI10.1145/3404835.3463083，及TOIS2023扩展 ——已从作者主页/原论文参考文献定位，正文尚未完整取得。查询条件片段选择已有，须明示未精读。\n7. PINE, VLDBJ2026: https://link.springer.com/article/10.1007/s00778-026-00995-3 ——事后跨记录词对解释，不等于预测前选择；解释独立成题目前近邻太强、也没有证据真值，不优先。\n本地排序：原文交互这一可测问题优先；证据解释作为可能附属分析；昂贵复核的计算分配依赖强弱模型互补，后置。跨模态/写作者与控制者分离/真实时间经营轨迹需要现有数据未证明的观测或新机制，不优先。弱监督不靠故意隐藏已有完整标签制造意义。普通作者识别不替代卖家同控。\n\n请给约1500—2000中文字符的具体意见：\n(1) 这个问题能否直接用现有观测和完整监督检验？是否仍有“名字可检验而实现目标错位”的漏洞；\n(2) 当前推荐是否比继续无依据增加持续记忆选择器更有实际依据，明确“可试”与“可发论文”的差距；\n(3) 是否遗漏决定性的直接近邻？给可核验原始来源，区分正文已核对和待查，勿编造新颖性；\n(4) 若有问题，以受影响主张、最小修改和 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类。科学不确定性不自动阻断一个小型合理比较，尚未冻结的实施参数不是已发生实现缺陷。\n不要求先得到真实金标签、证明所有理论、运行全回归、固定 smoke、增加重复外审。你没有收到项目数据/代码/原始结果，不可称已独立验证这些材料。请直接审以上正文，无附件依赖。",
+    "reply_text": "结论：支持把它作为优先的小型探索性比较；不支持现在认定方法创新或论文主线已经成立。 本轮只审来文与公开文献，未独立验证项目数据、代码或原始结果。\n\n一、现有数据能检验什么\n\n按给定边界，账号文本和账号对监督足以检验“在现有合成分布上，B是否优于重新训练的A”，不需要先有片段级真值或新增真实标签。监督停留在账号对层级是正确的；商品相似和不相似都不能直接等同于同控和异控。\n\n仍需防止目标扩大：全部记录进入池化，不等于证明多条记录具有互补性；B获胜也可能只依靠某个局部线索。因此首轮应定位为“原文交互相对既定独立汇总的增量检验”，而不是“互补证据发现”。合成身份可预测，也不等于识别出了现实控制者机制。\n\n相较继续增加持续记忆选择器，这个问题更有依据：它针对来文明确尚未比较的跨账号原文交互，不依赖先假设存在遗忘或普遍超长文本。但这是比较动机，不是正结果预告；旧文本四臂已经微调，不能以“终于训练文本”解释新意。\n\n二、最小比较需收紧的归因\n\nA/B可以先保留两臂，共用初始化、微调权限、公开字段、文本覆盖、数值分支及监督口径。若A仍压成六项相似度，B获胜不能独立证明联合编码必要，也可能只是减轻压缩或增强关系头。最小修改是限定“优于这个A”；只有扩大到编码机制归因时，才需要更强的独立编码参照。\n\n同监督不等于同算力。首轮可同覆盖比较并如实报告训练、推理和缓存成本，不必为等时长截短B。先实测token长度及组合计算量，再决定是否有选择问题。若要声称文本提供数值之外的增益，需同口径数值-only参照或等价诊断，排除只是修复A文本分支造成的损害；这不要求全因子矩阵。账号交换、记录顺序及重复处理也应明确，但现在没有依据把未定实现认作缺陷。\n\n保留全候选及规则外全部正负对。区间应尊重世界内账号对的依赖，采用世界层配对口径；开发集反复探索造成的选择偏差，不会因增加种子或重抽样而消失。\n\n三、近邻核对与遗漏\n\n已核对DeepMatcher §4.3–4.4和Ditto §2.3、3.2：条件对齐、联合输入和TF-IDF摘要确实已有。\n威斯康星大学计算机科学用户页面\n+1\n HierMatcher §2.1–2.3及PARADE §3.1–3.3也已核对，层次对齐、片段交互与聚合不能单独构成创新。\nIJCAI\n+1\n VendorLink的领域定位与PINE的后验解释定位基本准确；相关正文已核对。\nACL Anthology\n+1\n\n最影响当前归因的漏项是ColBERT（SIGIR 2020，§3）：独立编码仍能保留词级表示，再进行细粒度交互。所以“独立编码”不能被等同于“质心余弦”；它是机制参照，不是已有中文同控有效性的证据。\narXiv\n\n另有WYM（EDBT 2023，§3.1）：先构造跨记录决策单元、评分，再形成匹配预测，属于预测前证据建模，不只是PINE式事后解释。该架构正文已核对；不能把“先取成对证据再判断”当作研究空白。\n数字对象识别系统\n+1\n\nKeyBLD会议版正文仍未完整取得，但已读TOIS扩展作者稿§4.1、5.1，确认既有TF-IDF/BM25和学习式选块。\narXiv\n 另应补查Kwan等《You May Not Be Your Username》（TrustCom 2025）：作者主页确认其题目涉及跨市场卖家别名归因；本次未取得正文，不能判定它是否覆盖B。\n加州州立理工大学波莫纳分校\n 这些文献不是要求立即全部实现。\n\n四、问题分类与决定\n\n**SCIENTIFIC_BLOCKER：**对上述窄比较未发现阻断项。需要限制的是“联合编码必要”“多记录互补已证明”“真实市场有效”等扩大主张；最小修改是收窄结论，不是先补齐所有实验。\n\n**REPRODUCIBILITY_DEFECT：**无已证实项；模型、种子和预算尚未冻结，不属于已经发生的实现缺陷。\n\n**OUT_OF_SCOPE_OVERDESIGN：**把新增真实金标、解封Audit、全因子矩阵或重复外审作为选题前提，均不必要。\n\n建议保留该候选，先回答普通交互有没有值得付出成本的增量；没有增量不自动升级选择器，有增量也只取得基线证据。离方法论文仍需明确区别于近邻的贡献及相应验证。本意见不构成训练、读标签或Linux运行许可。",
+    "links": [
+      {
+        "text": "威斯康星大学计算机科学用户页面\n+1",
+        "href": "https://pages.cs.wisc.edu/~anhai/papers1/deepmatcher-sigmod18.pdf"
+      },
+      {
+        "text": "IJCAI\n+1",
+        "href": "https://www.ijcai.org/proceedings/2020/0507.pdf"
+      },
+      {
+        "text": "ACL Anthology\n+1",
+        "href": "https://aclanthology.org/2023.acl-long.481.pdf"
+      },
+      {
+        "text": "arXiv",
+        "href": "https://arxiv.org/pdf/2004.12832"
+      },
+      {
+        "text": "数字对象识别系统\n+1",
+        "href": "https://doi.org/10.48786/EDBT.2023.54"
+      },
+      {
+        "text": "arXiv",
+        "href": "https://arxiv.org/pdf/2111.09852"
+      },
+      {
+        "text": "加州州立理工大学波莫纳分校",
+        "href": "https://www.cpp.edu/faculty/santanamarin/publications.shtml"
+      }
+    ]
+  },
+  "scope": {
+    "code_or_data_uploaded": false,
+    "new_training": false,
+    "linux_connection": false,
+    "label_reads": 0,
+    "reviewer_independent_project_verification": false
+  },
+  "local_disposition": [
+    {
+      "category": "SCIENTIFIC_BLOCKER",
+      "scope": "Limits on expanded claims; no blocker to retaining the narrow candidate",
+      "finding": "An interaction model beating a six-statistic baseline would not alone prove joint encoding necessary, multi-record complementarity, or extra information beyond the numeric branch.",
+      "action": "Limit any initial conclusion to the specified baseline; reserve stronger independent-token and numeric-only controls for the claims actually proposed."
+    },
+    {
+      "category": "SCIENTIFIC_BLOCKER",
+      "scope": "Novelty claims only",
+      "finding": "ColBERT retains fine-grained interaction after independent encoding; WYM constructs predictive decision units before matching. Generic interaction or evidence pairing is not a literature gap.",
+      "action": "Locally read ColBERT original abstract and retrieved WYM primary PDF abstract/architecture; add both as direct neighbours without requiring immediate implementation."
+    },
+    {
+      "category": "REPRODUCIBILITY_DEFECT",
+      "scope": "No confirmed defect",
+      "finding": "No implementation or runtime artifact was submitted; unfrozen parameters are not executed defects.",
+      "action": "Keep implementation and experiments unapproved."
+    },
+    {
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "scope": "Avoid additional stage ceremony",
+      "finding": "New real gold labels, unlocking Audit, a full factorial matrix and repeated unchanged reviews are not prerequisites for a small approved comparison.",
+      "action": "Do not add these requirements."
+    }
+  ],
+  "literature_read_scope": {
+    "colbert": "Original arXiv abstract and SIGIR acceptance metadata",
+    "wym": "DOI resolved through ordinary public HTTPS to openproceedings.org PDF; abstract and architecture description read in memory",
+    "keybld": "Conference paper still not fully read locally; its author bibliography and PARADE references were checked",
+    "trustcom_2025": "Reviewer-suggested lead only; not independently verified locally and not used as substantive basis"
+  },
+  "historical_original_reviews_read": [
+    "reports/seller_alias_papers/20260906/review.json: full response",
+    "reports/seller_alias_papers/20260907/review.json: full reviewer prompt and reply"
+  ],
+  "scope_of_code_read": [
+    "scripts/step28_continual_text.py: prepare_text, aggregate_chunks, dynamic_features, numeric combination",
+    "docs/STEP15_CONTEXTUAL_EVIDENCE_FUSION_PLAN_20260714.zh.md: old reranker, RankNet and offset expert design; no execution reuse certified"
+  ],
+  "execution_note": "Documentation and existing aggregate evidence only. No new dataset processing, model load, labels, experiments, tests or server operations. Papers parsed in memory using existing pdftotext; no PDF or helper-script copies left.",
+  "prompt_sha256": "66daea005195d9aa8f011f4dcbf5fcd04384423d065cf430f079ea78e3986a3b"
+}

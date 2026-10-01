@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-27",
+  "scope": "Post-review documentation and traceability verification; no research execution",
+  "checks": {
+    "json_records": [
+      {
+        "path": "reports\\seller_alias_papers\\20260927\\continual_position\\review_reply.json",
+        "bytes": 25389,
+        "sha256": "fbfa9f4b05f3199c76bb7e7ca7830af4aba5df1f58cc18ffc9c845d714e271a1"
+      },
+      {
+        "path": "reports\\seller_alias_papers\\20260927\\continual_position\\source_register.json",
+        "bytes": 13155,
+        "sha256": "7c0bee8b730f98618f7ee1abd77600a0fb9bcbb1bf7d1772c803383c4a5006dd"
+      },
+      {
+        "path": "reports\\seller_alias_papers\\20260927\\continual_position\\rendered_prompt.json",
+        "bytes": 18589,
+        "sha256": "00ff0058d3fc82d32988f2e4b713c3d75dd39feef2eade5631809574c32d5801"
+      },
+      {
+        "path": "reports\\seller_alias_papers\\20260927\\continual_position\\review_sources.json",
+        "bytes": 15760,
+        "sha256": "95d6219407407028b7fcfd081bb0109dcd84b3cff69a6f29478e6985c140b896"
+      },
+      {
+        "path": "reports\\seller_alias_papers\\20260927\\continual_position\\disposition.json",
+        "bytes": 9708,
+        "sha256": "07850213615b141abe9de0bb87da6092c55be080102dda392cea9253dc993193"
+      }
+    ],
+    "local_links": 9,
+    "external_links": 18,
+    "bad_links": [],
+    "catalog_sources": 17,
+    "missing_ids": [],
+    "frozen_checked": 18,
+    "frozen_mismatches": [],
+    "format_files": 9,
+    "format_errors": []
+  },
+  "commands": [
+    "PowerShell ConvertFrom-Json of review_reply.json, source_register.json, rendered_prompt.json, review_sources.json and disposition.json",
+    "PowerShell Markdown link extraction, local Test-Path checks and malformed URL pattern checks in docs/SELLER_ALIAS_LITERATURE.zh.md",
+    "PowerShell match S01-S17 catalog IDs against the report",
+    "PowerShell Get-Item and Get-FileHash -Algorithm SHA256 for the 18 source_files entries in reports/seller_alias_continual/20260927/ranking_execution/authorization.json",
+    "PowerShell trailing-whitespace scan of four documentation files and five new JSON records",
+    "git diff --check -- docs/SELLER_ALIAS_LITERATURE.zh.md docs/RESEARCH_PLAN.md docs/RESEARCH_DISCUSSION.zh.md docs/AI_RESEARCH_HANDOFF.zh.md reports/seller_alias_papers/20260927/continual_position"
+  ],
+  "git_diff_check": "No errors reported; only CRLF normalization warning for RESEARCH_PLAN.md. Combined diff-check/targeted-rg shell call exited 0.",
+  "documentation_checks_result": "5 JSON records parsed; 9 local links and 18 web-link strings checked; all 17 source IDs referenced; 18 frozen files match size/SHA; 9 files have no trailing whitespace issues.",
+  "source_url_check_limit": "Web-link string check is not a blanket HTTP availability test. Original-source access and limitations are recorded separately.",
+  "cleanup": {
+    "deleted_path": ".playwright-mcp/source-register.json",
+    "verified_archive": "reports/seller_alias_papers/20260927/continual_position/source_register.json",
+    "matching_sha256": "7c0bee8b730f98618f7ee1abd77600a0fb9bcbb1bf7d1772c803383c4a5006dd",
+    "released_bytes": 13155,
+    "absence_verified": true,
+    "initial_sources_sha256": "0e671106c7e4411e36c479e9016bc6904e2e2818885608f7da553a34ef1ad617"
+  },
+  "scientific_tests_run": 0,
+  "scientific_tests_reason": "Documentation-only change, no implementation or calculations changed",
+  "new_linux_access": false,
+  "new_label_access": false,
+  "model_loading": false,
+  "training_launch_or_change": false,
+  "reviewed_conclusion": "Worth continuing conditionally; direct overlaps strengthened; no method novelty or publication acceptance certified.",
+  "no_extra_review_gate": "Completed review's confirmed corrections resolved locally; no new scientific design introduced.",
+  "completed": true
+}

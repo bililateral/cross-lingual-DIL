@@ -1,0 +1,79 @@
+{
+  "date": "2026-09-09",
+  "status": "REVIEW_COMPLETED_CANDIDATES_RETAINED_NOT_SELECTED",
+  "scope": "Evidence-channel cooperative learning and complete multiple-alias retrieval; candidate selection only",
+  "url": "https://chatgpt.com/c/6aa0d7ab-1898-83eb-af2b-fcdc64674c92",
+  "user_message_id": "c160884f-a506-42cb-a860-156b33f5ccbb",
+  "assistant_message_id": "3a933edb-5fca-4f92-a06d-3c7315e79dd8",
+  "actual_model": "gpt-6-pro",
+  "prompt": "这是独立的新选题审查会话，使用网页GPT 6 Pro。必要上下文：本项目只研究中文暗网卖家同一控制者账号识别。现有合格V9.4.1中文合成train/dev各500独立世界，每世界28账号/378完整账号对，每端14,000账号/49,500商品记录。完整账号对监督已存在，但本轮仅选题，不读任何标签/数据，不训练、不连接Linux。开发集已多次探索，Audit A/B/qrels/控制者资产封存。真实中文同控标签极少，不以索取更多数据为前提，不把合成当真实。当前可训练LaBSE对每条脱敏标题描述独立编码，按字段均值/top3余弦变成6项特征，与51项公开数值融合。新旧持续ER比较均无益，原配置停止，负证据保留。用户要求寻找新的可检验问题；原文跨账号交互只保留为另一个候选。\n\n本轮定点外审：用户最新说“你再找找别的新研究问题，这个目前作为候选”。因此刚审完的原文交互只保留为候选，不是已选主线。请本次只审下面两个不同候选；不重复审原文交互，不新增预算受限假设、不建议恢复持续学习。上述数据与授权边界适用。\n\n候选甲：中文卖家马甲识别中的异类证据协同学习。\n问题：当直接身份线索只能覆盖部分关系时，统一融合训练能否同时学好文本等间接证据；怎样利用强证据，同时保住其他可学证据的识别能力？\n事实：当前根的公开强直接/两跳规则覆盖8,000/10,000开发正例、没有命中负例；规则外有2,000正例及179,000负例，现有模型在那里仍弱。此事实只表明覆盖不同，未证明文本有独有信息或被压制。输入可用既有脱敏文本及51项数值证据；二者来自同一公开记录，不假设概率独立，也不冒称是两个独立传感模态。完整训练标签照常使用，不隐藏规则覆盖正例，不生成模态缺失/标签噪声，不再提“真实隐蔽马甲发现”。\n与旧实验区别：Step15-v8已做冻结文本特征的上下文融合、offset evidence expert及线性RankNet；近期specialist是固定57维+LightGBM，只用规则外训练，无增益(-.00266664，95%[-.00584315,.00042899])。这些不能据此重跑。新候选只可能来自可训练文本分支和证据通道共同优化方式，不能把固定特征门控/简单调权重重新包装。\n可检验起点：同数据/编码器权限下比较文本独立、数值独立、常规共同训练、分别训练后简单融合。尽量复用共同组件，完整训练监督，所有路由/校准仅训练内，报告各分支与完整系统的全体/规则外表现及成本。具体几次拟合、参照及参数仍待用户选题后确认，不自动全因子实验。联合分数弱于单支并不足以断言“梯度竞争”；若要做该机制归因，需可比的分支读出/训练分析。简单梯度非零、注意力大小或强规则高命中率都不是压制的证据。\n潜在增量仅作为待定义假设：区分“某证据通道本来无额外信息”和“有信息但联合训练没学到”，只对后一类改进学习，避免为了平均贡献一律提升弱通道。如何从训练证据可靠区分、具体算子能否超过现成方法尚未解决；不能把这个句子当作新算法。\n直接近邻：\n- ICML2022 Modality Competition https://proceedings.mlr.press/v162/huang22e.html （已读原出版方摘要，简化分布和网络假设不能直接套本项目）\n- CVPR2022 OGM-GE https://openaccess.thecvf.com/content/CVPR2022/html/Peng_Balanced_Multimodal_Learning_via_On-the-Fly_Gradient_Modulation_CVPR_2022_paper.html （原摘要已读）\n- ICCV2023 AGM https://openaccess.thecvf.com/content/ICCV2023/html/Li_Boosting_Multi-modal_Model_Performance_with_Adaptive_Gradient_Modulation_ICCV_2023_paper.html （书目定位，正文未审）\n- CVPR2024 Enhancing Multimodal Cooperation via Sample-level Modality Valuation https://openaccess.thecvf.com/content/CVPR2024/papers/Wei_Enhancing_Multimodal_Cooperation_via_Sample-level_Modality_Valuation_CVPR_2024_paper.pdf （普通HTTP取得原PDF；已读引言、3.2—3.4和算法1/2，已有Shapley样本级贡献及低贡献分支重采样。其理论remark有非负边际贡献等假设；不能不加核实移用，也不能称“按样本平衡通道”新。）\n本地判断：这个问题具体且当前输入可检验，但近邻密集，最大风险是文本本来就没有独有可学信息，最后只有常规模态平衡的应用。\n\n候选乙：一个中文卖家存在多个马甲时，怎样同时找回容易和较难的同控账号？\n问题：相同账号对分数模型下，以每个查询的完整正负候选关系训练，能否比独立BCE或普通成对排序，更好找回候选集中的全部同控账号？\n事实：当前世界每个查询有1或2个相关候选，完整二值监督足以在获准阶段构造训练内每查询正集合。本轮不读标签。原评价已经有MAP和Recall，不能谎称以前只看Top1；新问题改变训练目标与关注的查询级完整性，不靠补报指标完成论文。不能把固定“1或2”、世界配额或候选UID当模型输入，不能强制选1/2个；不能用小K28根宣称大规模或开放集发现。\n例子仅说明指标：同控候选排第1和第20，首个命中很好，但完整找回仍差。可在保留原AP/MAP/MRR/Recall/NDCG外，事先定义前k内全部相关候选被找回的比例、最后正例位置；它们不是新指标/新理论。不做全体群聚类或误合并方向。\n最小比较：同编码器/同输入/相同训练暴露下，BCE、查询内成对排序、一个现成直接排序目标。旧Step15 RankNet跨同domain正负账号对，不能称此前完全没有排序训练；它不等于当前根的每查询多正例目标，但只有换loss也不新。\n可能的方法问题：完整马甲集合中容易正例和较难正例是否需要不同学习关注，且不能以牺牲整个候选排序/增加误配来提高某项完整率。这个算子尚未确定。若常规MAP优化就解决、或新方法不优于现成排序目标，本候选没有独立方法贡献。\n近邻：\n- Smooth-AP，ECCV2020 https://www.robots.ox.ac.uk/~vgg/research/smooth-ap/ （已读作者摘要；直接优化AP已有）\n- Deep Learning for Person Re-Identification: A Survey and Outlook，TPAMI2022，DOI10.1109/TPAMI.2021.3054775，提出mINP来衡量找回全部正确匹配的成本，故“最后正例/完整找回”并不新（出版元数据已定位，公式还未核对）。\n- ComEM，COLING2025 https://aclanthology.org/2025.coling-main.8/ 已比较Match/Compare/Select；其论文的常见一对一背景不能直接强加多马甲。\n本地判断：比遗忘问题更直接可测，但创新风险比甲更高，可能只值得作为基线研究，不宜把“一对多检索”叫研究空白。\n\n请约1500—2000中文字符，分别判断：任务意义、现有数据是否能检验、与旧项目/近十年文献的实质重合、最小可检验增量以及你是否建议保留。若文献已把宽泛动机覆盖，请直说，但不要因缺先验正结果而否定合理小比较。可补最多2篇确切且直接的原始近邻，区分已读/待核；不要罗列十个泛方向。建议按SCIENTIFIC_BLOCKER（区分阻断候选或只是阻断成果宣称）、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN标出需要修改的主张和最小处理。本轮未提交源码/数据/原始结果，不宣称独立验证项目，更不授权实施。",
+  "observed_user_message": "这是独立的新选题审查会话，使用网页GPT 6 Pro。必要上下文：本项目只研究中文暗网卖家同一控制者账号识别。现有合格V9.4.1中文合成train/dev各500独立世界，每世界28账号/378完整账号对，每端14,000账号/49,500商品记录。完整账号对监督已存在，但本轮仅选题，不读任何标签/数据，不训练、不连接Linux。开发集已多次探索，Audit A/B/qrels/控制者资产封存。真实中文同控标签极少，不以索取更多数据为前提，不把合成当真实。当前可训练LaBSE对每条脱敏标题描述独立编码，按字段均值/top3余弦变成6项特征，与51项公开数值融合。新旧持续ER比较均无益，原配置停止，负证据保留。用户要求寻找新的可检验问题；原文跨账号交互只保留为另一个候选。\n\n本轮定点外审：用户最新说“你再找找别的新研究问题，这个目前作为候选”。因此刚审完的原文交互只保留为候选，不是已选主线。请本次只审下面两个不同候选；不重复审原文交互，不新增预算受限假设、不建议恢复持续学习。上述数据与授权边界适用。\n\n候选甲：中文卖家马甲识别中的异类证据协同学习。\n问题：当直接身份线索只能覆盖部分关系时，统一融合训练能否同时学好文本等间接证据；怎样利用强证据，同时保住其他可学证据的识别能力？\n事实：当前根的公开强直接/两跳规则覆盖8,000/10,000开发正例、没有命中负例；规则外有2,000正例及179,000负例，现有模型在那里仍弱。此事实只表明覆盖不同，未证明文本有独有信息或被压制。输入可用既有脱敏文本及51项数值证据；二者来自同一公开记录，不假设概率独立，也不冒称是两个独立传感模态。完整训练标签照常使用，不隐藏规则覆盖正例，不生成模态缺失/标签噪声，不再提“真实隐蔽马甲发现”。\n与旧实验区别：Step15-v8已做冻结文本特征的上下文融合、offset evidence expert及线性RankNet；近期specialist是固定57维+LightGBM，只用规则外训练，无增益(-.00266664，95%[-.00584315,.00042899])。这些不能据此重跑。新候选只可能来自可训练文本分支和证据通道共同优化方式，不能把固定特征门控/简单调权重重新包装。\n可检验起点：同数据/编码器权限下比较文本独立、数值独立、常规共同训练、分别训练后简单融合。尽量复用共同组件，完整训练监督，所有路由/校准仅训练内，报告各分支与完整系统的全体/规则外表现及成本。具体几次拟合、参照及参数仍待用户选题后确认，不自动全因子实验。联合分数弱于单支并不足以断言“梯度竞争”；若要做该机制归因，需可比的分支读出/训练分析。简单梯度非零、注意力大小或强规则高命中率都不是压制的证据。\n潜在增量仅作为待定义假设：区分“某证据通道本来无额外信息”和“有信息但联合训练没学到”，只对后一类改进学习，避免为了平均贡献一律提升弱通道。如何从训练证据可靠区分、具体算子能否超过现成方法尚未解决；不能把这个句子当作新算法。\n直接近邻：\n- ICML2022 Modality Competition https://proceedings.mlr.press/v162/huang22e.html （已读原出版方摘要，简化分布和网络假设不能直接套本项目）\n- CVPR2022 OGM-GE https://openaccess.thecvf.com/content/CVPR2022/html/Peng_Balanced_Multimodal_Learning_via_On-the-Fly_Gradient_Modulation_CVPR_2022_paper.html （原摘要已读）\n- ICCV2023 AGM https://openaccess.thecvf.com/content/ICCV2023/html/Li_Boosting_Multi-modal_Model_Performance_with_Adaptive_Gradient_Modulation_ICCV_2023_paper.html （书目定位，正文未审）\n- CVPR2024 Enhancing Multimodal Cooperation via Sample-level Modality Valuation https://openaccess.thecvf.com/content/CVPR2024/papers/Wei_Enhancing_Multimodal_Cooperation_via_Sample-level_Modality_Valuation_CVPR_2024_paper.pdf （普通HTTP取得原PDF；已读引言、3.2—3.4和算法1/2，已有Shapley样本级贡献及低贡献分支重采样。其理论remark有非负边际贡献等假设；不能不加核实移用，也不能称“按样本平衡通道”新。）\n本地判断：这个问题具体且当前输入可检验，但近邻密集，最大风险是文本本来就没有独有可学信息，最后只有常规模态平衡的应用。\n\n候选乙：一个中文卖家存在多个马甲时，怎样同时找回容易和较难的同控账号？\n问题：相同账号对分数模型下，以每个查询的完整正负候选关系训练，能否比独立BCE或普通成对排序，更好找回候选集中的全部同控账号？\n事实：当前世界每个查询有1或2个相关候选，完整二值监督足以在获准阶段构造训练内每查询正集合。本轮不读标签。原评价已经有MAP和Recall，不能谎称以前只看Top1；新问题改变训练目标与关注的查询级完整性，不靠补报指标完成论文。不能把固定“1或2”、世界配额或候选UID当模型输入，不能强制选1/2个；不能用小K28根宣称大规模或开放集发现。\n例子仅说明指标：同控候选排第1和第20，首个命中很好，但完整找回仍差。可在保留原AP/MAP/MRR/Recall/NDCG外，事先定义前k内全部相关候选被找回的比例、最后正例位置；它们不是新指标/新理论。不做全体群聚类或误合并方向。\n最小比较：同编码器/同输入/相同训练暴露下，BCE、查询内成对排序、一个现成直接排序目标。旧Step15 RankNet跨同domain正负账号对，不能称此前完全没有排序训练；它不等于当前根的每查询多正例目标，但只有换loss也不新。\n可能的方法问题：完整马甲集合中容易正例和较难正例是否需要不同学习关注，且不能以牺牲整个候选排序/增加误配来提高某项完整率。这个算子尚未确定。若常规MAP优化就解决、或新方法不优于现成排序目标，本候选没有独立方法贡献。\n近邻：\n- Smooth-AP，ECCV2020 https://www.robots.ox.ac.uk/~vgg/research/smooth-ap/ （已读作者摘要；直接优化AP已有）\n- Deep Learning for Person Re-Identification: A Survey and Outlook，TPAMI2022，DOI10.1109/TPAMI.2021.3054775，提出mINP来衡量找回全部正确匹配的成本，故“最后正例/完整找回”并不新（出版元数据已定位，公式还未核对）。\n- ComEM，COLING2025 https://aclanthology.org/2025.coling-main.8/ 已比较Match/Compare/Select；其论文的常见一对一背景不能直接强加多马甲。\n本地判断：比遗忘问题更直接可测，但创新风险比甲更高，可能只值得作为基线研究，不宜把“一对多检索”叫研究空白。\n\n请约1500—2000中文字符，分别判断：任务意义、现有数据是否能检验、与旧项目/近十年文献的实质重合、最小可检验增量以及你是否建议保留。若文献已把宽泛动机覆盖，请直说，但不要因缺先验正结果而否定合理小比较。可补最多2篇确切且直接的原始近邻，区分已读/待核；不要罗列十个泛方向。建议按SCIENTIFIC_BLOCKER（区分阻断候选或只是阻断成果宣称）、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN标出需要修改的主张和最小处理。本轮未提交源码/数据/原始结果，不宣称独立验证项目，更不授权实施。\n\n展开",
+  "response": "**结论：甲值得保留为诊断型候选；乙保留为较低优先级的排序基线问题。两者目前都没有确定的方法贡献，但不应因尚无正结果而否决合理小比较。**项目事实均据本轮陈述，不是独立结果复核。\n\n一、候选甲：意义成立，待检验的是“可用增量是否未被联合训练保留”\n\n任务意义在于：利用直接证据的同时，改善规则未覆盖关系，而非追求各通道贡献相等。现有输入和完整监督足以检验训练方式差异，无需独立传感模态假设。不过，覆盖差异和规则外低分只定位了问题区域，并未证明那里存在文本增量。旧固定特征融合和specialist负结果应保留，但不能替代可训练文本分支的比较。\n\n**文献重合比“常规模态平衡”还深。**AGM已用单模态参照及线性读出分析竞争，调制参照是历史差异而非强制相等；因此“不是一律扶弱”本身也不新。其诊断定义可以参考，却不是同源文本与数值证据的无假设因果分解。\narXiv\n CVPR2024样本级估值已经覆盖贡献识别与定向加强，其非负边际贡献假设不能替本项目保证有效。\narXiv\n\n补充近邻①：Wang等《What Makes Training Multi-Modal Classification Networks Hard?》（CVPR2020，G-Blend），已按泛化与过拟合表现分配监督，说明联合训练弱于单支也可能源于泛化差异，而不只是梯度竞争。\narXiv\n\n最小增量是保留所提四种参照，检验简单融合相对数值独立是否有可复现增量，以及共同训练是否保住它。保持现有逐记录编码与六项聚合，不夹带新的交互结构。文本单独能预测不等于提供额外信息；单支较弱也不排除互补，故不能要求文本先超过数值。\n\n若解释表示学习不足，再以同容量、同训练内拟合协议的读出比较分支，排除融合头或校准差异；这仍不能单独锁定梯度机制。各分支用完整监督，路由和校准按世界在训练内处理，报告全体、规则外表现及成本。未检出增量只能写“给定数据和模型下未检出”，不能写“文本没有信息”。建议保留，但暂不把“识别可学证据再加强”命名为新算法。\n\n二、候选乙：任务直接，但独立选题空间更窄\n\n完整找回比首次命中更贴近该候选的目标；完整账号对监督足以训练每查询多正例目标。但只能检验小候选集内排序，不能推出开放集发现或真实中文效果。旧RankNet不是本轮查询内目标，故小比较有意义；“改为排序学习”却不能算项目首次创新。\n\nSmooth-AP已直接近似优化AP。\n牛津大学机器人研究所\n mINP原文公式已核：单查询INP＝相关候选数／最后相关候选名次，再跨查询平均。因此，最后正例位置不是新概念。\narXiv\n\n补充近邻②：《Ranked List Loss for Deep Metric Learning》（CVPR2019），已用每查询正负集合并挖掘非平凡正负例；“同时关注容易与较难正例”也不足以构成新方法。\nQueen's University Belfast\n ComEM支持联合考虑候选关系这一宽泛动机，不直接证明本任务的多正例训练目标有效。\nACL Anthology\n\n最小比较仍是BCE、查询内成对排序、一个直接排序目标，不是再增加整套检索模型。固定评分结构与训练暴露，预先固定k，同时观察完整率、最后正例位置及原有排序、误配表现。不能靠拉长名单提高完整率；末位正例前移与MAP改善也未必同步，出现取舍应据实报告。\n\n尤其应分别报告单、双正例查询：单正例时完整率就是Recall@k，不能让这部分掩盖多正例问题；该分层仅供评价，不作模型输入。新算子只有在普通排序目标之外形成可解释改进，才有方法增量。建议作为基线型候选保留，当前不升为独立主线。\n\n三、分级与最小处理\n\n**SCIENTIFIC_BLOCKER：候选级未见必然阻断；成果宣称级有明确界限。**覆盖差异不等于竞争，换目标或关注困难样本不等于创新，多次探索的dev不等于独立确认。最小处理是收窄主张、保留反证，未来比较先按探索性证据解释；不为此打开Audit。若现成方法已经解决问题，可以形成基线知识，但不能据此宣称独立方法贡献。\n\n**REPRODUCIBILITY_DEFECT：未提交实现，不能判定现存缺陷。**入选后需明确分支读出、损失归一化、无向对双向复用权重、并列排名及世界级配对汇总；共享端点的账号对不能当成独立重复。现在不要求冻结拟合次数或建立完整实验合同。\n\n**OUT_OF_SCOPE_OVERDESIGN：**扩大为全因子、制造缺失或噪声、增索真实标签、恢复持续学习，均非本轮必要处理；也不需要为上述诊断另建授权流程。\n\n本轮已读AGM、样本级估值及两篇补充的相关方法，核对mINP公式；其他列举论文仅核摘要，完整理论适用性仍待核。上述判断不构成实施许可。",
+  "source_links": [
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/pdf/2308.07686"
+    },
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/html/2309.06255v4"
+    },
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/pdf/1905.12681"
+    },
+    {
+      "text": "牛津大学机器人研究所",
+      "href": "https://www.robots.ox.ac.uk/~vgg/research/smooth-ap/"
+    },
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/pdf/2001.04193v2"
+    },
+    {
+      "text": "Queen's University Belfast",
+      "href": "https://pureadmin.qub.ac.uk/ws/files/168412256/RankedNoise.pdf"
+    },
+    {
+      "text": "ACL Anthology",
+      "href": "https://aclanthology.org/2025.coling-main.8/"
+    }
+  ],
+  "failed_submission": {
+    "url": "https://chatgpt.com/c/6aa0d344-c224-83ed-9b66-3737263db869",
+    "attempt_at": "2026-09-09 11:46:30 CST",
+    "observed_at": "2026-09-09 11:49:32 CST",
+    "status": "NO_NEW_USER_MESSAGE_OR_GENERATION_PERSISTED",
+    "detail": "Composer became empty after submit, but later inspection contained only the original one user message and its completed reply; no new review claimed."
+  },
+  "local_disposition": {
+    "candidate_level_scientific_blockers": 0,
+    "confirmed_reproducibility_defects": 0,
+    "adopted": [
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "affected_claim": "Evidence competition and novelty",
+        "resolution": "Treat rule coverage only as a location for investigation. Joint versus single-branch differences do not identify a gradient mechanism. Existing AGM and G-Blend limit novelty; weaker text can still complement numeric inputs."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "affected_claim": "Multiple-alias complete retrieval as a new method",
+        "resolution": "mINP, Smooth-AP and ranked-list learning already address relevant retrieval goals. Separate one-positive and two-positive evaluation if later authorized; do not input true mate counts or improve completeness by lengthening the returned list."
+      },
+      {
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "affected_claim": "Future comparison only; not an observed implementation defect",
+        "resolution": "If selected, define readout fitting, loss normalization, undirected-pair reuse, ties and world-level uncertainty in the future contract, without freezing an unselected experiment."
+      }
+    ],
+    "out_of_scope": [
+      "Full-factorial expansion",
+      "Fabricated missing modalities or label noise",
+      "Restoring failed continual configurations",
+      "New real-label acquisition or opening audit assets"
+    ],
+    "literature_read_boundary": "Reviewer supplementary originals are not automatically claimed as locally read. Local follow-up reads and source scope are recorded in docs/SELLER_ALIAS_RESELECTION.zh.md.",
+    "authorization": "No implementation, label parse, data processing, training or Linux stage authorized."
+  }
+}
+

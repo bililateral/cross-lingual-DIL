@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-06",
+  "task": "user_catalog_literature_and_feasible_seller_alias_ideas",
+  "status": "ADVISORY_REVIEW_COMPLETED_NO_NEW_EXPERIMENT",
+  "reviewer": "web ChatGPT GPT 6 Pro",
+  "ui_model": "6 / Pro",
+  "conversation_url": "https://chatgpt.com/c/6a9d1145-9d04-83ed-825b-71f13afc9b44",
+  "submitted_at_utc": "2026-09-06 13:10:52 UTC",
+  "observed_complete_at_utc": "2026-09-06 13:17:24 UTC",
+  "attachments": [
+    {
+      "path": "docs/SELLER_ALIAS_PAPERS.zh.md",
+      "bytes": 11430,
+      "sha256": "0adb6a415b291c66c31b4f16b57c6696b10c95a00e0b4f965f671acba3e54132",
+      "actual_file_upload_confirmed": true
+    }
+  ],
+  "prompt": "本轮只审查新上传的 SELLER_ALIAS_PAPERS.zh.md 文献与选题建议，不重审旧实现或旧有效负结果。用户最新明确要求从项目 CCF 2026 目录与北大核心 2023 名录的顶刊顶会论文找更好实施的 idea，核心仍为中文暗网卖家同控识别，现阶段只有足量合成中文标签。用户拒绝把基准建设当主线，也不接受获取真实中文金标签作为前提。附件已列实际原文阅读范围、原始来源和当前数据／旧负结果边界；三候选均未声称首创或有效。请只核对：1）论文方法或来源是否有具体误述；2）推荐第一项“多记录成对证据选择＋交互匹配”是否真正有别于已失败的固定余弦分布／top-k／双向覆盖，作为有限强基线起点是否合理；3）第二第三项的近邻覆盖、成本与数据前提是否实质更差。请给 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类，若不支持主线明确区分“基线可试”与“已有足够论文创新”。不要因尚未证明成功而追加大生成器、真标签获取、全回归、GPU smoke 或新审查门。最多约1500中文字符，具体说明最小文字修订或建议取舍。你没有收到模型、原始文本、标签或运行产物，不能声称验证了它们。",
+  "response": "附件72行正文完整可读。支持先试候选一的有限强基线；不支持将三项中的任何一项认定为已有足够论文创新。 本轮只核对文献与建议，没有重审旧实现或验证项目模型、原文、标签及运行产物。\n\nSELLER_ALIAS_PAPERS.zh\n\nSCIENTIFIC_BLOCKER：0项\n\n候选一与旧算子有实质区别，但选择器仍未定义。 按附件描述，旧路径是“独立编码→固定余弦→分布／top-k／双向覆盖”；新起点允许双方原文共同编码，使词表示和交互随另一账号内容改变，再由同控标签监督打分。区别在相似度汇总之前的可学习交互，不是把覆盖率换名字。因此，旧负结果不能直接否决这项基线；同时，Ditto 已实现成对序列化及联合编码，不能把这一架构本身算作创新。\n\nSELLER_ALIAS_PAPERS.zh\n\n \nVLDB\n\n第40行可最小补充：“若解释为交互带来的差异，先共用预训练底座和选入片段；相同文本预算不代表相同计算成本。”此外，“交互模型有价值后再做选择器”可保留为实施顺序，但固定截断下的负结果不能证明所有片段选择无效；不需据此增加新实验门。\n\nSELLER_ALIAS_PAPERS.zh\n\n候选二后置合理，但不是数据前提更差。 它不必新增真实标签；真正问题是近邻直接、成本未必低。PINE 已提供跨记录词对、差异／空缺词对及归因，并进行两轮 LIME 扰动评价。“不重训”不等于便宜。建议第52行补成“训练成本可能较低，解释调用成本另计”。PINE 是事后解释器，不能反过来据此否决候选一的预测前选择器。\n斯普林格\n \n\nSELLER_ALIAS_PAPERS.zh\n\n候选三后置也合理，但 ThriftLLM 没有完整覆盖该问题。 原论文是在预算内选择、聚合多个 LLM，以提高分类正确概率；附件关注把精排计算分配到不同账号对、改善关联排序，二者并非同一优化目标。已有近邻限制宽泛新颖性，却不能直接继承其保证或断言候选已被做完。它当前更依赖强弱模型互补、训练内路由与分数可比性，故排在候选一之后有依据；不是因为缺真实金标签。\nVLDB\n \n\nSELLER_ALIAS_PAPERS.zh\n\nREPRODUCIBILITY_DEFECT：已核对范围内0项\n\n未发现关键方法或来源误述：Tai 确有随机森林成对距离及层次聚类；VendorLink 明确披露账号名称假设；Ditto 的联合输入、字段标记和 TF-IDF 摘要描述成立。\nVLDB\n+3\nContrib\n+3\nACL Anthology\n+3\n\nPINE 的 2026年7月22日、35卷文章42及 VLDB 2026 期刊报告身份均核实，不是把抓取日期当出版日期。\n斯普林格\n+1\n\nOUT_OF_SCOPE_OVERDESIGN：不增加要求\n\n保留“一先做直接交互参照、二作辅助、三待互补性明确”的取舍即可。基线可试不以预先证明成功或创新为前提；新论文贡献则仍需具体算子区别和实证支持。 不追加生成器、真标签获取或新审查门。\n\nSELLER_ALIAS_PAPERS.zh\n\n范围限制：两份项目目录未附，其页码、散列未独立核验；中文论文及 SIGIR 存档正文本轮未完整取得，只核对了可得书目／摘要，不能对未读细节作完整背书。这是本轮证据限制，不是附件已被证实的缺陷。",
+  "reported_counts": {
+    "scientific_blocker": 0,
+    "reproducibility_defect": 0
+  },
+  "local_decision": "Keep direct Chinese pair interaction as first baseline candidate; no established algorithm novelty; evidence explanation secondary; selective reranking depends on complementary predictions.",
+  "local_actions": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "scope": "未来实验归因，非当前已证实阻断",
+      "claim": "交互相对于独立表示带来的增量",
+      "action": "共同预训练底座和输入片段；区分文本预算与实际计算成本；固定截断负结果不推广到全部选择器",
+      "requires_new_run": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "scope": "成本结论范围，非当前已证实阻断",
+      "claim": "解释候选的实施成本",
+      "action": "仅说训练成本可能较低，另计扰动解释调用成本；区分事后解释和预测前选择",
+      "requires_new_run": false
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "scope": "文献覆盖与保证范围，非当前已证实阻断",
+      "claim": "选择性精排与 ThriftLLM 的关系",
+      "action": "说明跨模型预算组合不同于跨账号对计算分配，不继承近邻保证",
+      "requires_new_run": false
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "scope": "无需增加的流程",
+      "claim": null,
+      "action": "不添加生成器、真实标签获取、全回归、smoke 或第二轮审查",
+      "requires_new_run": false
+    }
+  ],
+  "review_scope_limitations": [
+    "Catalog PDFs were read and hashed locally but not uploaded to reviewer.",
+    "No code, raw records, labels, models or run artifacts uploaded.",
+    "Reviewer did not obtain all Chinese and SIGIR full text; local reading scope is documented separately.",
+    "Review does not validate implementation, runtime, novelty completeness or real Chinese effectiveness."
+  ],
+  "execution": {
+    "linux_connections": 0,
+    "new_experiments": 0,
+    "new_label_reads": 0,
+    "model_changes": false,
+    "temporary_scripts_created": 0,
+    "paper_payloads_retained": 0
+  },
+  "post_review_document_changes": "Three scope clarifications and replacement of the pending-review paragraph are documented in the final memo. The attachment hash identifies the earlier reviewed bytes retained in the web conversation; it is not the hash of the final memo. No experiment semantics changed."
+}
