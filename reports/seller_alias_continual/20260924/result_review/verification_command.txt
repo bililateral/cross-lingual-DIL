@@ -1,0 +1,127 @@
+nice -n 15 /home/yongpeng/miniconda3/envs/py310/bin/python -B - <<'PY'
+import sys
+from pathlib import Path
+import json
+import hashlib
+import math
+import platform
+from datetime import datetime, timezone
+import numpy as np
+root = Path.cwd()
+sys.path.insert(0, str(root / 'scripts'))
+import step28_sensitivity_result as finalizer
+base = root / 'reports/seller_alias_continual/20260924'
+collection = base / 'sensitivity_evaluation/20260924_115000/evaluation'
+reference_dir = root / 'reports/seller_alias_continual/20260910/expression_evaluation/20260910_171540'
+opened = []
+def audit_open(event, args):
+    if event == 'open' and isinstance(args[0], (str, bytes)):
+        name = str(args[0]).replace('\\', '/')
+        if name.endswith(('.csv', '.pt', '.safetensors')) or any(x in name for x in ('/supervision/', '/owners', '/private_custody/', '/memory/')):
+            raise RuntimeError('Out-of-scope file access rejected')
+        opened.append(name)
+sys.addaudithook(audit_open)
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+def load(folder, record):
+    path = folder / record['path']
+    payload = path.read_bytes()
+    assert len(payload) == record['bytes'] and hashlib.sha256(payload).hexdigest() == record['sha256']
+    return np.load(path, allow_pickle=False)
+record = read(collection / 'metrics.json')
+reference = read(reference_dir / 'evaluation.json')
+columns = record['columns']
+assert columns == reference['columns'] and len(columns) == 22
+differences = []
+classification_values = 0
+max_class_error = 0.
+summary = {}
+for arm, arm_record in record['arms'].items():
+    first_counts = []
+    first_matrices = []
+    for order in ('ABC', 'BCA', 'CAB'):
+        name = order + '_shared'
+        actual = load(collection, arm_record['points'][name]['file'])
+        expected = load(reference_dir, reference['points'][name]['file'])
+        assert actual.shape == expected.shape == (60, 22)
+        for row, col in zip(*np.nonzero(actual != expected)):
+            a, b = float(actual[row, col]), float(expected[row, col])
+            assert columns[col] in ('brier', 'log_loss') and a > 0 and b > 0
+            ai = int(np.asarray(a, dtype=np.float64).view(np.uint64))
+            bi = int(np.asarray(b, dtype=np.float64).view(np.uint64))
+            distance = abs(ai - bi)
+            assert distance <= 3
+            differences.append(dict(arm=arm, order=order, row=int(row), metric=columns[col],
+                                    actual=a, reference=b, adjacent_steps=distance,
+                                    reference_spacings=abs(a-b)/float(np.spacing(abs(b)))))
+        assert finalizer.reconcile(actual, expected, columns)['other_20_columns_exact']
+        point = arm_record['points'][order + '_distill_stage3']
+        matrix = load(collection, point['file'])
+        index = 'ABC'.index(order[0])
+        counts = np.array([[r[k] for k in ('tp', 'fp', 'fn', 'tn')]
+                           for r in point['confusion'][20*index:20*index+20]], dtype=np.int64)
+        first_counts.append(counts)
+        first_matrices.append(matrix[20*index:20*index+20])
+    counts = np.concatenate(first_counts)
+    matrix = np.concatenate(first_matrices)
+    tp, fp, fn, tn = counts.T
+    per_group = {
+        'precision': np.divide(tp, tp+fp, out=np.zeros(60), where=(tp+fp)>0),
+        'recall': tp/(tp+fn),
+        'f1': 2*tp/(2*tp+fp+fn)}
+    for metric, values in per_group.items():
+        error = float(np.max(np.abs(values-matrix[:, columns.index(metric)])))
+        assert error <= 1e-15
+        classification_values += len(values)
+        max_class_error = max(max_class_error, error)
+    t, p, n, z = [int(v) for v in counts.sum(0)]
+    summary[arm] = dict(counts=[t,p,n,z], macro_precision=float(per_group['precision'].mean()),
+                       micro_precision=t/(t+p), recall=t/(t+n),
+                       macro_f1=float(per_group['f1'].mean()), micro_f1=2*t/(2*t+p+n),
+                       first_domain_ap=float(matrix[:,columns.index('average_precision')].mean()))
+assert len(differences) == 20
+assert summary['weaker_replay']['counts'] == [13,4,1187,21476]
+assert summary['weaker_distillation']['counts'] == [46,28,1154,21452]
+cases = []
+for name, column, reference_value, steps, toward, accepted in [
+    ('ordinary_four_steps_accept', 'brier', .2, 4, math.inf, True),
+    ('ordinary_five_steps_reject', 'brier', .2, 5, math.inf, False),
+    ('ordinary_eight_steps_reject', 'log_loss', .2, 8, math.inf, False),
+    ('ap_one_step_reject', 'average_precision', .2, 1, math.inf, False),
+    ('nan_reject', 'brier', .2, 0, math.nan, False),
+    ('inf_reject', 'brier', .2, 0, math.inf, False),
+    ('power_boundary_eight_steps_accept', 'brier', .125, 8, -math.inf, True)]:
+    expected = np.full((1,22), .2, dtype=np.float64)
+    expected[0, columns.index(column)] = reference_value
+    actual = expected.copy()
+    value = reference_value
+    if steps:
+        for _ in range(steps):
+            value = np.nextafter(value, toward)
+    else:
+        value = toward
+    actual[0, columns.index(column)] = value
+    try:
+        observed = finalizer.reconcile(actual, expected, columns)
+        passed = True
+    except AssertionError:
+        observed, passed = None, False
+    assert passed == accepted, name
+    cases.append(dict(name=name, accepted=passed, adjacent_steps=steps if steps else None,
+                      reported_reference_spacings=None if observed is None else observed['maximum_ulps_brier_log_loss']))
+out = base / 'result_review/verification.json'
+assert not out.exists()
+result = dict(status='PASS_LIMITED_PRIMARY_REVIEW', time_utc=datetime.now(timezone.utc).isoformat(),
+              python=platform.python_version(), numpy=np.__version__, shared_values_checked=7920,
+              changed_values=len(differences), maximum_adjacent_steps=max(v['adjacent_steps'] for v in differences),
+              differences=differences, classification_values=classification_values,
+              classification_max_error=max_class_error, first_domain=summary, handmade_cases=cases,
+              actual_formal_label_parses=0, formal_label_file_byte_reads=0, model_loading=0,
+              note='Only saved JSON/NPY and handmade numbers. Published source/results unchanged. Existing 3048/10296 audits are reused, not claimed as rerun. External 31+7 test claims were not rerun here.',
+              source=dict(path='scripts/step28_sensitivity_result.py',sha256=hashlib.sha256((root/'scripts/step28_sensitivity_result.py').read_bytes()).hexdigest()))
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False)+'\n', encoding='utf-8')
+print(json.dumps({k:v for k,v in result.items() if k not in ('differences',)}, ensure_ascii=False))
+print('verification_sha256', hashlib.sha256(out.read_bytes()).hexdigest())
+PY
+

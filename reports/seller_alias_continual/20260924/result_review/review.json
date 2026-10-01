@@ -1,0 +1,118 @@
+{
+  "status": "EXTERNAL_REVIEW_AND_PRIMARY_VERIFICATION_COMPLETE",
+  "date": "2026-09-24",
+  "conversation_url": "https://chatgpt.com/c/6ab4ad15-cba8-83ea-bad8-968e658464f7",
+  "reply_id": "a954b6fb-7ede-4ba0-a32e-4e164bddd730",
+  "page_model_slug": "gpt-6-pro",
+  "selected_model_ui": "6 Pro",
+  "body_model_self_description": "GPT-6 Astra Pro",
+  "model_identity_note": "Page message attribute is gpt-6-pro; the differing body self-description is retained verbatim and does not replace the observed page metadata.",
+  "response_text": "response.txt",
+  "response_html": "response.html",
+  "package": {
+    "files": 299,
+    "bytes": 4820263,
+    "sha256": "700cc7180f4878fa8143382593cc1fff3432df230b5d40e806a2aa665ca08eb6"
+  },
+  "disposition": [
+    {
+      "id": "R1",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "new_defect": true,
+      "claim": "Sensitivity finalization had zero label file reads",
+      "evidence": "finalize -> adapter.prepare -> verify_supervision -> data.verify/data.record -> sha256 -> open(rb)",
+      "finding": "Confirmed wording error. No additional semantic CSV parse, but opaque valid file bytes were re-read for integrity hashing.",
+      "remedy": "Correct current result, handoff and discipline wording; retain immutable original audit/request and clarify them here. Base actual valid parses 1, sensitivity 2.",
+      "code_change": false
+    },
+    {
+      "id": "R2",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "new_defect": false,
+      "kind": "Precision of disclosure; current batch result not invalidated",
+      "claim": "Four ULP means at most four adjacent representable steps for arbitrary values",
+      "evidence": "reconcile divides absolute difference by np.spacing(abs(reference)); a .125 downward-eight-nextafter hand case is accepted at 4 reference spacings.",
+      "finding": "Precision of disclosed acceptance rule needed correction. Current 20 observed differences have independently verified bit-order distance <=3; no affected result acceptance or scientific gate.",
+      "remedy": "Define the rule as <=4 times reference-local spacing only in Brier/log_loss, with other columns exact. Disclose this as a post-failure reproduction acceptance-rule change. Do not change code/matrices or generalize to an arbitrary-input ULP bound.",
+      "code_change": false
+    },
+    {
+      "id": "R3",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "new_defect": false,
+      "kind": "Retained limitation of the original failed evaluation",
+      "claim": "The original failed shared value was conclusively identified",
+      "evidence": "First failed evaluation did not persist the triggering delta.",
+      "finding": "Unrecoverable first-event detail remains unavailable. The subsequent explicitly authorized collection demonstrates the reproducible small discrepancy, not the exact lost first event.",
+      "remedy": "State the evidence limitation. No retry or new label parse.",
+      "code_change": false
+    }
+  ],
+  "scientific_conclusion": {
+    "newly_confirmed_computational_blockers": 0,
+    "base": "All three fixed models fail the approved per-domain FPR/recall gate.",
+    "sensitivity": "Both configurations pass retention and same-order gates, fail new-capability gate; finite local improvements remain valid.",
+    "claim_boundary": "No deployment capability, overall mitigation success, optimal weights, unique mechanism, real-market effectiveness or new experiment approval."
+  },
+  "external_reported_checks": {
+    "environment": "Python 3.13.5; NumPy 2.3.5; Torch 2.10.0+cpu; one CPU thread",
+    "contracts": {
+      "base": 20,
+      "sensitivity": 8,
+      "linux_adapter": 3,
+      "skipped": 0
+    },
+    "additional_hand_cases": 7,
+    "base_numeric_values": 3048,
+    "base_maximum_error": 0,
+    "base_blind_counts": 540,
+    "sensitivity_contrasts": 10296,
+    "sensitivity_contrast_maximum_error": 1.1102230246251565e-16,
+    "sensitivity_additional_values": 10704,
+    "sensitivity_additional_maximum_error": 2.220446049250313e-16,
+    "sensitivity_blind_counts": 1080,
+    "caveat": "These are reported in the actual external response. No external script/log archive was supplied or executed locally; item counts are not independent scientific samples."
+  },
+  "primary_review": {
+    "full_response_personally_read": true,
+    "files_personally_checked": [
+      "docs/SELLER_ALIAS_BASE_MODEL.zh.md",
+      "docs/SELLER_ALIAS_BASE_RESULT.zh.md",
+      "docs/SELLER_ALIAS_WEIGHT_SENSITIVITY.zh.md",
+      "docs/SELLER_ALIAS_SENSITIVITY_RESULT.zh.md",
+      "docs/SELLER_ALIAS_REPLAY_DISTILLATION.zh.md",
+      "schema/step28_base_model_policy.json",
+      "schema/step28_continual_distillation_policy.json",
+      "schema/step28_continual_sensitivity_policy.json",
+      "scripts/step28_sensitivity_result.py",
+      "scripts/step28_sensitivity_evaluate.py",
+      "scripts/step28_continual_population_data.py",
+      "scripts/step28_continual_distillation.py",
+      "scripts/step28_continual_sensitivity.py",
+      "reports/seller_alias_continual/20260924/base_result/audit.json",
+      "reports/seller_alias_continual/20260924/sensitivity_result/audit.json"
+    ],
+    "prior_completed_evidence_reused": "Earlier source-to-requirement review, actual Linux 3-adapter-test evidence and 3048/10296 saved-result audits remain applicable; unchanged training checks are not rerun.",
+    "new_linux_check": "verification.json",
+    "command": "verification_command.txt",
+    "verification_sha256": "4d1ec6f0da03bf9a35afdd88dc476a88deb1b4b0fbe8081abc3fb612fe385e44",
+    "shared_values": 7920,
+    "changed_values": 20,
+    "max_adjacent_steps": 3,
+    "classification_values": 360,
+    "classification_maximum_error": 0,
+    "handmade_cases": 7,
+    "handmade_failed": 0,
+    "formal_label_parses": 0,
+    "formal_label_file_byte_reads": 0,
+    "model_loading": 0,
+    "limits": "Saved AP/probability/retrieval metrics are inputs, not rederived from truth. No new full statistical audit, training, CUDA or server-global access audit."
+  },
+  "historical_failures_preserved": [
+    "upload_rejection.json",
+    "browser_submission.json",
+    "resumption.json",
+    "submission.json"
+  ],
+  "no_new_external_round_required": "No scientific computation, success gate, training or formal result was changed. This implements the reviewer-recommended disclosure corrections and closes unchanged result review."
+}

@@ -1,0 +1,30 @@
+Command exited with non-zero status 1
+	Command being timed: "timeout --signal=TERM --kill-after=15s 20m bash -c 
+for arm in labse multilingual_e5_large bge_m3; do
+  nice -n 10 python -u -B scripts/step28_base_model_audit.py \
+    --arm "$arm" \
+    --out "reports/seller_alias_continual/20260918/base_implementation/native_audit/$arm.json" || exit "$?"
+done
+"
+	User time (seconds): 5.38
+	System time (seconds): 1.27
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:06.67
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2688728
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 753345
+	Voluntary context switches: 54
+	Involuntary context switches: 111
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 24
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

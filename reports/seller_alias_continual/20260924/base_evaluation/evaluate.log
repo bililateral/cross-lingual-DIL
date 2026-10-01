@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_base_model.py", line 727, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_base_model.py", line 720, in main
+    result = evaluate(args.out.resolve(), args.evaluation.resolve())
+  File "/home/yongpeng/cross-lingual/scripts/step28_base_model.py", line 661, in evaluate
+    labelled = public.attach_labels(groups["development"], c, "development")
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_expression_run.py", line 114, in attach_labels
+    with data.verify(root / name, dm['files'][name]).open(encoding='utf-8', newline='') as stream:
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_population_data.py", line 51, in verify
+    if path.stat().st_size != expected["bytes"] or sha256(path) != expected["sha256"]:
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 1097, in stat
+    return self._accessor.stat(self, follow_symlinks=follow_symlinks)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/development/supervision/pairs.csv'

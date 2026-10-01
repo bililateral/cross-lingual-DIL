@@ -1,0 +1,14 @@
+{
+  "execution": "Existing Linux py310; single CPU; inline NumPy handmade arrays",
+  "module": "scripts/step28_sensitivity_result.py:reconcile",
+  "input": "Two rows, 22 columns, all ones; no project supervision",
+  "checks": [
+    {"case": "Brier changed from 1.0 to nextafter(1.0,2.0)", "expected": "accept", "actual": "accept"},
+    {"case": "AP changed by spacing(1.0)", "expected": "reject AssertionError", "actual": "reject AssertionError"},
+    {"case": "Brier changed by 8*spacing(1.0)", "expected": "reject AssertionError", "actual": "reject AssertionError"}
+  ],
+  "passed": 3,
+  "skipped": 0,
+  "formal_label_parses": 0,
+  "model_loading": 0
+}

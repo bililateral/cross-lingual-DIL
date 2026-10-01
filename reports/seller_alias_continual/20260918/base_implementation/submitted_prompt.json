@@ -1,0 +1,12 @@
+{
+  "url": "https://chatgpt.com/c/6aacb169-4858-83e9-b336-b621dbf968cc",
+  "ui_model": "6 Pro",
+  "busy": true,
+  "observed_at": "2026-09-18T03:35:40.307Z",
+  "messages": [
+    {
+      "id": "e64b526f-21c0-4b81-b099-546f033de9e5",
+      "text": "review_package.zip\n压缩归档\n请使用当前网页端 GPT 6 Pro，对附件中的科研方案和实现开展正式外部审查。用户现在已明确要求提交外审；包内“准备完成、尚未提交”是此前冻结时的状态，不是禁止你现在审查。不要启动任何项目正式训练或读取正式标签。\n\n附件 review_package.zip 为247507字节，SHA-256=69ae0d1d712faddf6303da62f49f78a2edd05031d772036bf0e25b02c5a3f1da。内含37份清单文件，共588538字节，另有contents.json。请先逐项核对大小和SHA，完整阅读 reports/seller_alias_continual/20260918/base_implementation/review_request.md、docs/SELLER_ALIAS_BASE_MODEL.zh.md、docs/SELLER_ALIAS_BASE_IMPLEMENTATION.zh.md，再审读新入口、政策、测试、启动器与五份直接依赖以及相关历史外审原文。\n\n用户确认问题：当前合成中文卖家马甲数据，优先自动判断同控，重点要求低误报下召回。valid A/B/C三个域各自FPR≤0.1%且Recall≥50%；每模型一个全局阈值，只由训练内校准集确定。比较LaBSE、multilingual-E5-large、BGE-M3，每域原60 train群固定48拟合/12校准，共144拟合36校准；三模型各6轮864更新，总2592更新，固定3轮/6轮评分，以6轮为主，不事后择优；后续单GPU，训练整轮8小时/32GiB。旧敏感性自动等待保持。本轮监督合同为Linux train一次、全部三模型完整门后Linux valid一次；目前正式标签0、真实预训练模型加载0、正式训练0。Linux原py310手工夹具16通过0跳过，含两项真实CPU Torch；不能把这些当成实际模型/CUDA通过。\n\n请从上述批准的研究问题独立追踪实际输入、梯度、优化器、完整保存恢复、阈值算法和评价，不以代码/政策/测试互相一致代替需求正确性。关注校准群隔离、E5对称query前缀及各模型原生池化、float64 nextafter边界与并列分数、逐域误报/召回联合门、六点分数与阈值/模型身份绑定、完整门先于valid解析、配对群bootstrap及重复开发集限制。指标必须区分AP与梯形PR-AUC并含MRR/MAP/Recall/NDCG@1/3/5/10，不以相对AP增益替代主要自动识别要求。\n\n可以在你自己的隔离沙箱执行手工夹具、独立手算和反例，不能访问项目Linux或正式标签/模型。请给出实际模型身份、真实审读/执行范围、证据和剩余未验证行为；问题分为SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN，提出最小必要修复，不引入额外模型/种子/调参/端点或网络系统加固、签名、Linux Git和重复状态机。请以中文给出完整审查报告，并提供包含独立检查代码、日志、数字回比和来源清单的可下载ZIP证据包。\n收起"
+    }
+  ]
+}
