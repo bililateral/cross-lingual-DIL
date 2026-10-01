@@ -1,0 +1,95 @@
+{
+  "stage": "approved_windows_generation_implementation_review",
+  "conversation_url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+  "submitted_at_utc": "2026-09-09 06:30:35 UTC",
+  "completed_observed_at_utc": "2026-09-09 06:40:15 UTC",
+  "submitted_prompt": "用户已明确“按该方案生成”，批准本会话上轮的 Windows 单 CPU 生成方案。现进行生成器实现阶段外审，请审读本条 6 个原始附件的完整内容，不再重复要求用户确认已批准参数。请先说明实际读到了哪些文件；附件缺失请直说，不要用方案摘要代替代码审查。\n\n本阶段仍只生成新合成数据及必要正确性记录，不训练、不开 Linux、不读取旧封存标签/qrels/Audit A/B。在正式生成前完成本地审查及你的实现意见取舍。请不要在外审环境生成正式 360 群；若有必要，可用临时手算夹具核验核心。旧商品数公开聚合原件未附，不能声称在外审环境验证了其实际原字节；政策含完整 PMF 与来源散列，本地已验证。\n\n本地 Windows Python 3.10.11：\npython -B scripts/step28_continual_dataset.py --help\npython -B scripts/step28_continual_dataset_verify.py --help\npython -B -m unittest discover -s tests -p 'test_step28_continual_dataset_contracts.py' -v\n12 项全部通过，0 跳过，主体 0.359 秒；此后只删除了两个未用 import。\n实测涵盖手算加权抽样边界、排除首选后的无放回抽样、重抽恰好等于父偏好、完整群 378 边/20 正边/27 候选、标签与重复/缺失边反例、归属/文本/身份字段混入反例、实际全部 12×36 文本形态组合、随机流隔离与公开 ID 排列不改变归属条件下的文本、UTF-8 上界及拒绝覆盖已有目录。独立分数算术核对 66 主营组合及理论最终主题边际。尚未正式生成目录或评价任何模型。\n\n附件实现要点请逐项核对：\n1. 只域主题权重变；控制者风格独立均匀 3/3/4，账号经营/每个风格轴独立以 .75 继承，余下允许重抽碰巧相同；商品 .70 均匀抽主营两个之一，.30 同域背景。\n2. 控制者 2/3 马甲数量独立打乱；控制者/账号/群/分区/域无复用。账号商品数用完整 2–8 PMF；不依赖标签/联系方式/ID。\n3. 产品和句式来自共同人工资源，不调用旧生成链/LaBSE/身份特征。生成文本先于配对，文本只保存一份；标签仅由新控制者等价关系。\n4. 独立验证模块不导入生成器，读取导出归属重建所有无序边，恢复实际正文主题和文风轴；完整核验公共字段、固定账号内容、隔离、来源散列及字节数。主题重叠和文本重复仅报告，不重抽。\n5. 每域 train/development/heldout=60/20/40 群；每群12控制者28账号。固定 seed20260909；256MiB 合计上限和4MiB小记录限额；单进程流式写出。最多文字177.1875MiB，含元数据/监督保守总上界219.419921875MiB；正式运行后再核验包含本次审查记录的合计占用。\n6. manifest 保存构建时来源、状态 BUILT_AWAITING_INDEPENDENT_VALIDATION；后续 validation.json 才是独立核验终态，不回写 manifest。源码/政策/词表/公开PMF小快照供复现。验证脚本本身不作模型资格或泛化结论。\n7. 词表普通、风格容易识别是这套人工机制的明确边界，不以必须遗忘/重放获胜验收。请区分确实违约/逻辑错误与外部有效性限制；不要为了方法效果改参数。\n\n请分类 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN，具体定位代码与受影响主张，只给必要最小修复。科研正确性不能由12测试或冻结状态直接推断。无需增加密钥、签名、状态机、重复smoke、网络/系统加固或新基线。本阶段是否能在现参数下正式生成，请明确说明及实际审查局限。\n\n提交文件原字节：\nscripts/step28_continual_dataset.py | 17215 bytes | SHA256 7357f9d96963447b1952e35a20aa90f27a68f881c08909012071b9b6c942e28b\nscripts/step28_continual_dataset_verify.py | 19726 bytes | SHA256 27346d0267c64d995cb681527d119b3ee7bdf07b99b26a7799789610e0b4539e\ntests/test_step28_continual_dataset_contracts.py | 10712 bytes | SHA256 84b79f31d29a8c50be504c54c520cda21cd76f7115bcaf15e5e88fbff7d4d1be\nschema/step28_continual_dataset_policy.json | 2390 bytes | SHA256 a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2\nschema/step28_continual_catalog.json | 7875 bytes | SHA256 c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660\ndocs/SELLER_ALIAS_CONTINUAL_DATA.zh.md | 25536 bytes | SHA256 0b4b005574eed0d173e9d4a1dc3c8a43c5eefd6eee03c039934cfec639fc67d9",
+  "submitted_files": {
+    "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "files": [
+      {
+        "path": "scripts/step28_continual_dataset.py",
+        "bytes": 17215,
+        "sha256": "7357f9d96963447b1952e35a20aa90f27a68f881c08909012071b9b6c942e28b"
+      },
+      {
+        "path": "scripts/step28_continual_dataset_verify.py",
+        "bytes": 19726,
+        "sha256": "27346d0267c64d995cb681527d119b3ee7bdf07b99b26a7799789610e0b4539e"
+      },
+      {
+        "path": "tests/test_step28_continual_dataset_contracts.py",
+        "bytes": 10712,
+        "sha256": "84b79f31d29a8c50be504c54c520cda21cd76f7115bcaf15e5e88fbff7d4d1be"
+      },
+      {
+        "path": "schema/step28_continual_dataset_policy.json",
+        "bytes": 2390,
+        "sha256": "a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2"
+      },
+      {
+        "path": "schema/step28_continual_catalog.json",
+        "bytes": 7875,
+        "sha256": "c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660"
+      },
+      {
+        "path": "docs/SELLER_ALIAS_CONTINUAL_DATA.zh.md",
+        "bytes": 25536,
+        "sha256": "0b4b005574eed0d173e9d4a1dc3c8a43c5eefd6eee03c039934cfec639fc67d9"
+      }
+    ]
+  },
+  "captured_messages": [
+    {
+      "id": "fe12946e-8818-4d3e-ae50-6a4dd4406ddf",
+      "role": "user",
+      "model": null,
+      "text": "step28_continual_dataset.py\nPython\nstep28_continual_dataset_verify.py\nPython\ntest_step28_continual_dataset_contracts.py\nPython\nstep28_continual_dataset_policy.json\n文件\nstep28_continual_catalog.json\n文件\nSELLER_ALIAS_CONTINUAL_DATA.zh.md\n文件\n用户已明确“按该方案生成”，批准本会话上轮的 Windows 单 CPU 生成方案。现进行生成器实现阶段外审，请审读本条 6 个原始附件的完整内容，不再重复要求用户确认已批准参数。请先说明实际读到了哪些文件；附件缺失请直说，不要用方案摘要代替代码审查。\n\n本阶段仍只生成新合成数据及必要正确性记录，不训练、不开 Linux、不读取旧封存标签/qrels/Audit A/B。在正式生成前完成本地审查及你的实现意见取舍。请不要在外审环境生成正式 360 群；若有必要，可用临时手算夹具核验核心。旧商品数公开聚合原件未附，不能声称在外审环境验证了其实际原字节；政策含完整 PMF 与来源散列，本地已验证。\n\n本地 Windows Python 3.10.11：\npython -B scripts/step28_continual_dataset.py --help\npython -B scripts/step28_continual_dataset_verify.py --help\npython -B -m unittest discover -s tests -p 'test_step28_continual_dataset_contracts.py' -v\n12 项全部通过，0 跳过，主体 0.359 秒；此后只删除了两个未用 import。\n实测涵盖手算加权抽样边界、排除首选后的无放回抽样、重抽恰好等于父偏好、完整群 378 边/20 正边/27 候选、标签与重复/缺失边反例、归属/文本/身份字段混入反例、实际全部 12×36 文本形态组合、随机流隔离与公开 ID 排列不改变归属条件下的文本、UTF-8 上界及拒绝覆盖已有目录。独立分数算术核对 66 主营组合及理论最终主题边际。尚未正式生成目录或评价任何模型。\n\n附件实现要点请逐项核对：\n1. 只域主题权重变；控制者风格独立均匀 3/3/4，账号经营/每个风格轴独立以 .75 继承，余下允许重抽碰巧相同；商品 .70 均匀抽主营两个之一，.30 同域背景。\n2. 控制者 2/3 马甲数量独立打乱；控制者/账号/群/分区/域无复用。账号商品数用完整 2–8 PMF；不依赖标签/联系方式/ID。\n3. 产品和句式来自共同人工资源，不调用旧生成链/LaBSE/身份特征。生成文本先于配对，文本只保存一份；标签仅由新控制者等价关系。\n4. 独立验证模块不导入生成器，读取导出归属重建所有无序边，恢复实际正文主题和文风轴；完整核验公共字段、固定账号内容、隔离、来源散列及字节数。主题重叠和文本重复仅报告，不重抽。\n5. 每域 train/development/heldout=60/20/40 群；每群12控制者28账号。固定 seed20260909；256MiB 合计上限和4MiB小记录限额；单进程流式写出。最多文字177.1875MiB，含元数据/监督保守总上界219.419921875MiB；正式运行后再核验包含本次审查记录的合计占用。\n6. manifest 保存构建时来源、状态 BUILT_AWAITING_INDEPENDENT_VALIDATION；后续 validation.json 才是独立核验终态，不回写 manifest。源码/政策/词表/公开PMF小快照供复现。验证脚本本身不作模型资格或泛化结论。\n7. 词表普通、风格容易识别是这套人工机制的明确边界，不以必须遗忘/重放获胜验收。请区分确实违约/逻辑错误与外部有效性限制；不要为了方法效果改参数。\n\n请分类 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN，具体定位代码与受影响主张，只给必要最小修复。科研正确性不能由12测试或冻结状态直接推断。无需增加密钥、签名、状态机、重复smoke、网络/系统加固或新基线。本阶段是否能在现参数下正式生成，请明确说明及实际审查局限。\n\n提交文件原字节：\nscripts/step28_continual_dataset.py | 17215 bytes | SHA256 7357f9d96963447b1952e35a20aa90f27a68f881c08909012071b9b6c942e28b\nscripts/step28_continual_dataset_verify.py | 19726 bytes | SHA256 27346d0267c64d995cb681527d119b3ee7bdf07b99b26a7799789610e0b4539e\ntests/test_step28_continual_dataset_contracts.py | 10712 bytes | SHA256 84b79f31d29a8c50be504c54c520cda21cd76f7115bcaf15e5e88fbff7d4d1be\nschema/step28_continual_dataset_policy.json | 2390 bytes | SHA256 a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2\nschema/step28_continual_catalog.json | 7875 bytes | SHA256 c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660\ndocs/SELLER_ALIAS_CONTINUAL_DATA.zh.md | 25536 bytes | SHA256 0b4b005574eed0d173e9d4a1dc3c8a43c5eefd6eee03c039934cfec639fc67d9\n展开",
+      "math_sources": [],
+      "links": []
+    },
+    {
+      "id": "7eb788e5-ef84-46a9-843e-225693029293",
+      "role": "assistant",
+      "model": "gpt-6-pro",
+      "text": "一、实际读取范围与复核结果\n\n六个附件均已完整读到，没有缺失；我逐一重新核对了原始字节数和完整 SHA-256，全部与本条提交清单一致。\n\n实际审读文件\t字节数\t与提交清单核对\nscripts/step28_continual_dataset.py\t17,215\t字节数、SHA-256均一致\nscripts/step28_continual_dataset_verify.py\t19,726\t字节数、SHA-256均一致\ntests/test_step28_continual_dataset_contracts.py\t10,712\t字节数、SHA-256均一致\nschema/step28_continual_dataset_policy.json\t2,390\t字节数、SHA-256均一致\nschema/step28_continual_catalog.json\t7,875\t字节数、SHA-256均一致\ndocs/SELLER_ALIAS_CONTINUAL_DATA.zh.md\t25,536\t字节数、SHA-256均一致\n\n本次不是依据方案摘要推断实现。我审读了两个模块的全部函数、入口和文件读写路径，并在外审临时环境运行了原测试中不依赖旧聚合原件的10项，全部通过。外审环境为 Python 3.13.5，这不是对本地 Windows Python 3.10.11 环境的复现。\n\n另外两项测试包含原聚合文件读取，因此没有整体执行；其中预算算术已另行核算，拒绝覆盖已有目录的生产分支已静态检查。没有伪造聚合文件来补齐测试，没有调用正式 build_dataset，也没有生成正式360群。原聚合文件的实际字节、来源提取实现及本地“12项通过”记录，仍属于你提交的本地证据，而不是本次外审重新验证的事实。测试中的这两处依赖确实存在。\n\ntest_step28_continual_dataset_c… +1\n\n**局部结论：未发现必须先修复的科研逻辑或复现缺陷；当前实现可以在已批准参数下进入 Windows 正式生成。**以下说明这一判断的具体依据及限制。\n\n二、生成机制：已批准参数落实正确\n1. 主营偏好、继承与背景商品抽样一致\n\npreference()先按权重抽第一次，再将首选权重置零；第二次调用 weighted_index()使用剩余权重之和，确实实现了排除首选后的重新归一化。最终排序只把结果转成无序组合，不改变两个主营的抽取概率。inherit_preference()的重抽分支没有“碰巧等于父偏好就重试”的逻辑。\n\nstep28_continual_dataset\n\nmake_group()实际将每个主题权重均分到四个细分类；账号经营偏好使用0.75继承概率，每条商品以0.70概率从两个主营中等概率选择，否则按同域背景权重抽取。没有按标签、模型分数或统计结果改变这些分支。\n\nstep28_continual_dataset +1\n\n原测试中的分数枚举独立遍历了有序抽取再合并成无序组合，核对了66种主营组合、碰撞概率与最终商品边际；此次该测试通过。因此，文档所写的约 0.589597523 / 0.205201238 / 0.205201238 与实现相符，不是把输入的60%／20%／20%误当成最终商品理论比例。\n\ntest_step28_continual_dataset_c…\n\n2. 文风确实全域同机制，且各轴独立抽取\n\n控制者的三个文风轴分别使用独立用途的随机流，通过 randrange(n)在3／3／4种选项中均匀抽取。账号各轴也分别使用自己的随机流，以0.75继承、否则均匀重抽；重抽允许等于原值。域没有进入文风权重或选项池的选择条件。\n\nstep28_continual_dataset\n\n域名出现在随机流的命名空间中，是为了让不同域得到不同的随机实现，不等于增加了域专属文风机制。同理，控制者／账号槽位用于派生随机流，不等于将私有编号写入文本特征。当前没有发现不同随机用途意外共用同一个可变随机数状态的问题。\n\n这套代码保留了统计同控信号，但没有主动分配唯一控制者模板。文风在同账号所有记录中固定、又可被不同控制者共享，是当前已经批准的具体机制；不能把其容易识别误报成实现违约，也不能据此预言模型表现。\n\n三、账号群、文本与标签：结构和数据依赖正确\n1. 账号数量与经营／文风抽取分离\n\nalias_counts使用独立随机流打乱八个“2账号控制者”和四个“3账号控制者”的位置；公开账号ID池另外独立排列。每账号商品数从政策中的完整2—8 PMF抽取，使用独立的 item_count 随机流，不由经营偏好、文风、标签或公开ID决定。\n\nstep28_continual_dataset\n\n我重新核算政策PMF，概率和为1，均值为：\n\n3.602071005915，\n\n对应10,080账号的期望商品数为36,308.8757396232。这里验证的是附件政策中的数值及其使用方式；没有验证它们与未附真实聚合原件的实际字节关系。生产入口对此另有真实文件散列、卖家数、完整PMF及裁剪范围检查，检查发生在创建输出目录之前。\n\nstep28_continual_dataset_policy\n\n \n\nstep28_continual_dataset\n\n2. 固定账号文本先生成，标签只由新归属产生\n\nmake_group()一次生成该账号的全部商品记录；pair_rows()随后只引用账号ID，并用两端 controller_uid 是否相等产生标签。正式写出时，正文进入一份 items.jsonl，配对CSV没有复制两端全文，也没有通过正负标签反向生成或修改文本。\n\nstep28_continual_dataset +1\n\n单群临时夹具核对得到28账号、12控制者、378条无序边、20条正边；逐查询排除自身后为27候选、1或2个正例。正式循环与政策规模对应：\n\n全部三域合计\t数量\n独立账号群\t360\n控制者\t4,320\n账号\t10,080\n无序账号对\t136,080\n正例／负例\t7,200／128,880\n最多商品记录\t80,640\n\n这些是代码结构与算术的核对结果，不是已经完成正式生成后的实测计数。\n\n3. 联系方式投影没有暗中恢复身份支路\n\nrender()只接收共同词表、细分类、文风和措辞随机流；不接收联系方式、账号ID、控制者ID或标签。全部词表已逐项读过，内容为普通商品名称、用途、交付和服务表达，没有实际凭据、可用联系方式或控制者专属暗码。标题顺序、描述布局和服务措辞均来自共享资源。\n\nstep28_continual_dataset\n\n \n\nstep28_continual_catalog\n\n因此，直接生成去联系段后的文本在本实现中落实了；没有必要增加先生成再删除联系值的过程。它仍然只支持政策声明的文本条件，不支持自动真实脱敏或真实联系值共享机制的结论。\n\nstep28_continual_dataset_policy\n\n此次还核算出当前共同词表的可生成标题最长15字符、描述最长76字符。48／720是合同上限，不是实际长度目标；当前没有截断丢失正文的问题，但未来不能把这些数据描述成已经覆盖720字符长描述的实验。\n\n四、独立验证器：重建关系与正文检查有效，但不宜扩大其证明范围\n\n验证模块确实不导入生成器。其关键检查不是简单复述生成器计数：\n\n从导出的归属重新构造全部有序端点条件 left < right 下的无序边，逐条比对导出的标签和完整边集合，并检查378边／20正边及查询正例结构。\n\n从实际标题和描述反向恢复商品所属细分类、标题轴、布局轴和服务轴；要求文本完整匹配共同词表，且同一账号的文风轴跨记录一致。\n\n检查字段集合、ID格式、账号与群归属、商品ID唯一性、每账号2—8条记录，以及跨群／域／分区的控制者、账号和商品ID不复用。\n\nstep28_continual_dataset_verify +2\n\n根级验证还要求固定的15项载荷集合，逐文件核对manifest记录的散列与字节数，检查三域各分区的群编号覆盖，并拒绝意外的根内文件。主题比例、文本重复和同／异控重叠进入描述性报告，没有按结果重抽种子或设置模型胜负门。\n\nstep28_continual_dataset_verify +1\n\n这里有三个审查范围限制，而非新增缺陷：\n\n**第一，**验证器能确认导出文本属于规定资源、标签等于导出归属关系，但不能仅从最终文本证明每一次潜变量抽样都使用了0.75／0.70。后者本轮依靠生成代码审读和抽样测试核对，不能把两类证据混称为“导出文件独立证明了全部随机机制”。\n\n**第二，**验证器的来源检查是“快照与构建manifest一致”；原公开PMF与政策的关系由构建入口检查。当前固定实现的这条链条成立，没有必要再要求第二套生成链或重复审批，但不应把自记录的manifest说成外部原始资料真实性证明。\n\n第三，“只用标题／描述作模型输入”在此阶段是数据接口边界。当前没有模型加载器，因此不能声称已经验证未来训练代码不会误用元数据。文档已经明确旧57维加载器不能直接沿用，这个问题应留在未来实际训练实现范围。\n\nSELLER_ALIAS_CONTINUAL_DATA.zh\n\n五、预算、来源快照与终态：可以支持本次生成\n\n序列化使用 UTF-8、ensure_ascii=False、紧凑JSON分隔符及明确换行方式；没有六字节中文转义导致正文预算翻倍的问题。实际最大长度占位行的非正文开销为171字节；当前带换行的实际词表记录可出现173字节，均低于256字节上限。\n\nstep28_continual_dataset\n\n预算算式复算为：\n\n80,640(768×3+256)+10,080×192+136,080×128+360×256+4×1024\n2\n=230,078,464字节。\n\n即219.419921875 MiB。即便再把当前CSV表头的305字节显式加上，也仅约219.420213 MiB，仍低于256 MiB；没有需要缩减规模或扩大授权预算的问题。验证器也实际检查商品行、CSV行、目录总量和小记录量，而非只在文档里写预算。\n\nstep28_continual_dataset_verify +1\n\n构建时保存生成器、验证器、政策、词表和公开聚合快照，并记录来源载荷、Python、平台及调用参数；manifest保持 BUILT_AWAITING_INDEPENDENT_VALIDATION，随后独立验证返回结果写入 validation.json，不回写manifest。这个顺序与提交说明一致。\n\nstep28_continual_dataset +1\n\n成本口径需保持准确：首次验证返回的 directory_bytes_at_verification 发生在新 validation.json 写入之前；构建器写入后又检查目录总上限。目录外的本次审查记录不会自动计入前一个字段，因此最终仍按你已经说明的安排核对合计占用，不能把该中间字段当作包含所有审查记录的最终成本。这不需要新增流程或修改已批准参数。\n\n六、分类、必要修改与正式生成判断\n分类\t本轮已确认问题\t必要处理\nSCIENTIFIC_BLOCKER\t0项\t未发现参数落地错误、标签由文本倒推、控制者拆分复用、身份值进入正文或按边改变账号文本的缺陷。\nREPRODUCIBILITY_DEFECT\t0项必须先修复的缺陷\t当前固定字节的来源记录、导出格式、独立关系重建和预算控制足以支持本阶段生成；没有要求改代码后才能运行的具体问题。\nOUT_OF_SCOPE_OVERDESIGN\t不提出此类新增要求\t不增加联系资产、密钥／签名、状态机、重复smoke、模型训练或新基线，也不以出现遗忘或ER优势作为验收条件。\n\n词表有限、文风容易恢复、三域共享全部品类、依赖强度未由真实跨马甲统计估计，均是已披露的人工机制与外部有效性限制，不是本轮实现失败。政策和文档对此没有作出模型资格或真实泛化保证。\n\nstep28_continual_dataset_policy\n\n \n\nSELLER_ALIAS_CONTINUAL_DATA.zh\n\n**最终判断：当前六份固定附件可以在现参数下进入已批准的 Windows 单CPU正式生成，无需重新确认参数，也没有必须先修复的代码问题。**这一判断基于完整静态审读、原字节核对和有限临时夹具；不代表正式360群已经生成或通过验收。正式产物是否满足完整群覆盖、跨群隔离、实际输出散列与最终成本，仍由该次Windows运行产生的真实结果确认；本结论不扩张到训练、Linux或模型效果。",
+      "math_sources": [
+        {
+          "source": "3.602071005915，",
+          "display": true
+        },
+        {
+          "source": "80{,}640(768\\times3+256)\n+10{,}080\\times192\n+136{,}080\\times128\n+360\\times256\n+4\\times1024^2\n=230{,}078{,}464\\text{字节}。",
+          "display": true
+        }
+      ],
+      "links": []
+    }
+  ],
+  "verified_actual_model": "gpt-6-pro",
+  "full_reply_read_locally": true,
+  "local_disposition": {
+    "scientific_blockers": [],
+    "required_reproducibility_fixes": [],
+    "proceed_scope": "Approved fixed-policy Windows single-CPU formal generation followed by direct complete export validation; no training or Linux.",
+    "accepted_boundaries": [
+      "Random mechanism correctness rests on code audit and hand-checkable sampling tests, not solely exported text.",
+      "Manifest/source snapshot agreement is reproducibility evidence, not an independent authenticity certificate for the original real data.",
+      "No future model loader is implemented or verified by this dataset stage.",
+      "Current catalog maxima are 15 title and 76 description characters; 48/720 are ceilings, not actual coverage.",
+      "Include actual final validation file, generation log/receipt, and this stage's review records in final disk accounting.",
+      "Conservative bound 230078464 bytes omits 305 CSV-header bytes; adding them remains below 256 MiB.",
+      "Small common vocabularies and recoverable styles are disclosed synthetic-mechanism limits, not a reason to reroll parameters."
+    ],
+    "rejected_overdesign": [],
+    "external_runtime_scope": "Reviewer reports 10 tests passed in its Python 3.13.5 temporary environment; 2 requiring the absent aggregate original not executed. No formal build there. This is not Windows reproduction.",
+    "local_runtime_scope": "Windows Python 3.10.11: all 12 tests passed, 0 skipped. The forthcoming formal export is not yet certified by this record."
+  },
+  "qualitative_rendering_audit": {
+    "source": "12 in-memory rendered examples, one per subcategory; no formal dataset directory created.",
+    "output_utf8": "{\"subcategory\": \"企业资料\", \"title\": \"企业栏目样表，常规批量\", \"description\": \"目前供应企业栏目样表。字段按企业类型分别编排。交付内容附简要说明；具体范围先核对。有疑问的项目可以先说明。\"}\r\n{\"subcategory\": \"教育资料\", \"title\": \"按需安排｜教育栏目资料册\", \"description\": \"提供教育栏目资料册。栏目含课程方向与层次说明。不同用途分别列明；按约定清单交付。后续可说明基础使用方式。\"}\r\n{\"subcategory\": \"行业名录\", \"title\": \"服务业条目集（可分项提供）\", \"description\": \"可安排服务业条目集。条目按行业门类划分。不同用途分别列明；批量需求可分批安排。先选项目再确认交付。\"}\r\n{\"subcategory\": \"商品目录\", \"title\": \"商品分类目录，分批交付\", \"description\": \"目前供应商品分类目录。目录按商品用途划分。范围按清单列明；可先确认基础内容。有批量需求可统一列单。\"}\r\n{\"subcategory\": \"社交账号\", \"title\": \"持续补充｜社交平台账号包\", \"description\": \"供应内容：目前供应社交平台账号包。\\n交付说明：交付内容附简要说明，交付前确认所选项目。\\n补充说明：交付前核对基础功能范围；有疑问的项目可以先说明。\"}\r\n{\"subcategory\": \"内容平台账号\", \"title\": \"图文发布账号套装（项目可选）\", \"description\": \"供应内容：主要提供图文发布账号套装。\\n交付说明：可按需求拆分项目，所需项目确认后安排。\\n补充说明：交付前核对内容功能状态；交付后可补充使用说明。\"}\r\n{\"subcategory\": \"游戏账号\", \"title\": \"游戏角色账号包，持续补充\", \"description\": \"供应内容：提供游戏角色账号包。\\n交付说明：不同用途分别列明，具体范围先核对。\\n补充说明：交付前核对游戏使用状态；先选项目再确认交付。\"}\r\n{\"subcategory\": \"工具平台账号\", \"title\": \"分批交付｜工具平台账号包\", \"description\": \"供应内容：目前供应工具平台账号包。\\n交付说明：基础项与附加项分列，可先确认基础内容。\\n补充说明：账号按工具功能分别说明；需要多项时可一起整理。\"}\r\n{\"subcategory\": \"资料整理\", \"title\": \"文档分类服务（按需安排）\", \"description\": \"这批以文档分类服务为主，范围按清单列明。\\n处理范围包含条目归类。有疑问的项目可以先说明，批量需求可分批安排。\"}\r\n{\"subcategory\": \"格式转换\", \"title\": \"文件编码转换，组合供应\", \"description\": \"现有文件编码转换可供选择，可按需求拆分项目。\\n可按目标格式处理文件。后续可说明基础使用方式，交付前确认所选项目。\"}\r\n{\"subcategory\": \"检索辅助\", \"title\": \"内容见说明｜目录检索辅助\", \"description\": \"目前供应目录检索辅助，交付内容附简要说明。\\n完成后提供查询使用说明。按所需范围选择项目，所需项目确认后安排。\"}\r\n{\"subcategory\": \"维护支持\", \"title\": \"批量任务维护（组合供应）\", \"description\": \"可安排批量任务维护，基础项与附加项分列。\\n按约定项目核对基础设置。有批量需求可统一列单，批量需求可分批安排。\"}\r\n",
+    "findings": "Product topics correspond to intended categories. Common template phrasing is conspicuous and limited; no contact values or controller codes are rendered.",
+    "console_only_limitation": "First display used Windows default console encoding; readable preview repeated with -X utf8. Payload writers already explicitly use UTF-8 and were not changed."
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "status": "PROPOSAL_REVIEW_COMPLETE_PARAMETERS_AND_INPUT_AWAIT_USER_CONFIRMATION",
+  "date": "2026-09-09",
+  "timezone": "Asia/Shanghai",
+  "scope": "Unfrozen synthetic dataset and evaluation proposal only; no generator, dataset, training, or implementation approval.",
+  "user_confirmed": [
+    "重新生成一套新的合成数据",
+    "不同分布的新卖家群体分批加入",
+    "先改变经营品类与商品内容分布（推荐）"
+  ],
+  "input_question_pending": {
+    "recommended": "商品标题与描述，统一遮盖联系方式，不输入身份特征",
+    "alternative": "商品文本与身份特征一起输入",
+    "answer_received": false
+  },
+  "conversation_url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+  "reviewer_model_requested": "GPT 6 Pro",
+  "reviewer_model_slug": "gpt-6-pro",
+  "submitted_prompt": "请作为本项目的外部科研审查者，审查下面这份尚未冻结的数据/评价设计草案。用户已明确确认两点：不同分布的新中文暗网卖家群体分批加入；先只改变经营品类与商品内容分布，文风与身份线索生成机制不随域改变。重新生成数据已获用户授权，但具体参数、模型输入、规模及预算未确认，不能由你的审查代替用户确认。\n\n背景：旧数据同一生成机制下随机分五批，固定整个开发集，无法分离旧/新分布评价。旧可训练文本四臂最终世界等权 AP：冻结0.853900063、继续0.855247139、ER0.851997888、累计0.856250340；ER−继续三顺序均负。旧数据强身份规则覆盖80%正例且未覆盖负例。旧结果保留为有效负证据，不修改它、不为翻转结果挑新生成参数。现只有真实中文训练期聚合边际可作候选参照，没有真实时间流，不能承诺真实中文泛化。\n\n审查重点：\n1. 这套新群体+同控二分类+固定每域留出身份评价能否真正检验旧分布保持/新分布学习？哪些边界易表述错？\n2. 只变品类/内容的层级生成怎样避免“同品类=同控”、唯一控制者模板、训练测试泄漏？需要补的最小机制是什么？能否只改变主题混合而不声称标签后验不变？\n3. 数据机制中保留统一身份线索，模型输入采用全文+身份特征或统一遮盖联系方式的商品文本，二者哪种更适合首轮科学问题，代价是什么？目前尚未选定，给建议而不是认定实现缺陷。\n4. 区分已经可审的设计错误和后续冻结合同才需填的参数。按 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类已确认问题，写明受影响主张与最小修改。不要为了流程完整增加烟雾测试、审批、密钥、服务器硬化、重复评审或大型生成工程。无需执行代码；没有实现供审。指出尚未证明的论文创新，但别以普通换应用名认定有创新。\n请给明确的局部判断、最小补充与仍应由用户决定的真正关键项；不要要求生成有利方法排名才能算数据有效。文中引用阅读范围已披露，不把未取得全文说成已审代码。\n\n===== 草案全文 =====\n# 中文暗网卖家马甲持续识别：新合成数据方案\n\n日期：2026-09-09。状态：**场景已确认，具体生成与评价方案待确认；尚未实施。**本页接续[持续识别计划](SELLER_ALIAS_CONTINUAL.zh.md)，不改写旧两次有效负结果，也不是重跑旧实验的合同。\n\n## 已确认的研究场景\n\n用户要求重新生成合成数据，并明确选择：**“不同分布的新卖家群体分批加入”。**每阶段加入新的卖家群体；模型仍判断两个中文卖家账号是否属于同一控制者，并据此检索马甲。\n\n据此拟检验：在历史训练记忆有限时，学习新群体后，模型在已见分布的留出卖家上能否保持识别能力，同时学会新分布？不同阶段不是同一控制者陆续新开马甲的追踪任务；阶段编号不表示真实经营日期。身份分类头扩容、跨阶段连接新旧账号、不断扩大检索库均不属于本次场景。\n\n用户随后明确选择：**“先改变经营品类与商品内容分布（推荐）”。**因此本轮变化轴已确认，不另加文风或身份线索机制随域变化。下面的具体生成参数、模型输入、评价细节与训练预算仍是提案；依赖这些未决选择的数据处理、生成器实现及实验等待确认。\n\n## 分布差异的建议\n\n**按用户确认，以经营品类与商品内容分布为变化轴；生成时文风与身份线索保持同一机制。**进一步建议各域账号数量与正负关系比例一致，避免混入样本量／标签先验变化。这里的“固定”指同一概率机制，不要求不同阶段使用重复文本或相同卖家。哪些身份线索进入模型，仍须明确输入合同。\n\n候选生成结构如下，均为待确认建议：\n\n| 层次 | 拟生成内容 | 必须避免的问题 |\n| --- | --- | --- |\n| 群体／域 | 同一中文商品主题集合，不同主题混合比例；各群体仍有重叠主题 | 仅改目录／编号；为某域设置专用标签；用完全互斥的词表替代有意义的差异 |\n| 控制者 | 从该群体抽取经营组合与表达习惯；这些潜在偏好可被多个控制者共享 | 一个控制者一个专用模板、关键词或暗码，造成身份查表 |\n| 马甲账号 | 继承控制者的部分偏好，独立扰动；同一控制者的账号完整进入同一阶段和分区 | 把同一身份拆到训练与评价；强制所有正例逐字相同 |\n| 商品记录 | 按账号偏好生成多条标题和描述；存在同品类异控账号及跨账号共用表达 | 让“同品类”直接等于同控，或让所有负例都跨品类 |\n| 同控标签 | 只由生成时的控制者归属产生，定义在所有域保持一致 | 从文本相似度、模型分数或要验证的选择器倒推出标签 |\n\n上述共同潜在偏好是合成身份相关性的假设，不是从真实跨卖家关联统计中估计出的规律。主题名称、混合比例、控制者内／间变化、身份线索共享与缺失规则，都须在训练前写成明确参数。不得调大域差异或改变身份线索来追求某方法获胜；固定机制也不保证可见输入对应的标签后验完全相同。\n\n建议从三个群体起步，足以观察一次以上的后续更新；“三个”仅为控制首轮工作量的提案，尚非冻结规模。先完成可读生成例子与实现核验，再按账号数、记录长度、训练日程计算磁盘和时间需求。此时不沿用旧 500 世界、五批、512 KiB 或旧训练时长作为新预算。\n\n## 真实中文依据与合成假设分开记录\n\n已只读核对[原真实中文参考边界](STEP28_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md)第 3 节及现存聚合资料。参考来自原训练范围内 676 名卖家，包含商品数、标题／描述长度、缺失率、标点等卖家等权统计；商品数被裁剪到 2—8。它只保留匿名类别秩概率，没有真实类别名称、原文、身份值或卖家行，也没有跨群体或时间变化统计。\n\n聚合文件为 `reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json`，3,185 字节，SHA-256 `5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34`，本次实际字节吻合；[原来源清单](../reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/manifests/style_reference_manifest.json)保留提取血缘。其历史目录名不变。本次没有重跑提取器或读取原始卖家 allow-list、真实商品表及标签，也没有全面重审原统计提取实现。\n\n建议仅把这些聚合作为记录数量／文本形态的候选参照，正式复用前核对相应提取与采样语义；不能据此宣称新的商品主题、同控相关性或群体变化已经获得真实数据验证。新主题词与文案由独立、明确的合成词表与规则产生，不恢复旧被删载荷，不从封存身份资产或真实同控标签获取生成条件。\n\n## 评价怎样对应问题\n\n建议每个域分别生成控制者隔离的训练、开发、最终评价账号。域内训练和评价服从同一预定机制；不同域及各分区使用不同控制者和身份值。分区在生成前确定，不能先生成全部账号再随机拆账号对。开发用于获准的调试／选择，最终评价在合同冻结后使用；新阶段的具体监督访问另行明确，不继承旧 train／development 的一次性许可。\n\n各域评价集的商品记录、查询、候选账号及标签固定。每次模型更新后，对这些相同记录重新推理；可以改变学习到的表示，不能把旧模型缓存表示与新表示混用。训练器只看已到达训练群体和允许保留的历史状态；即使评价未来域用于记录更新前能力，也不把未来输入、分数或标签交给训练／选择流程。\n\n令 `R[t,j]` 为第 t 阶段结束后，模型在第 j 个到达域的固定评价集上的表现；保留初始模型 `R[0,j]`。换到达顺序时，j 随该顺序重新映射到具体域。\n\n| 要回答的事 | 建议记录 | 解释边界 |\n| --- | --- | --- |\n| 新域学到了多少 | `R[t,t] - R[t-1,t]` | 与更新前同一模型在同一评价集比较，不以不同域的分数差充当学习增益 |\n| 旧域保留了多少 | 对每个 `j < t` 记录 `R[t,j] - R[j,j]` | 负值为相对学完该域时的退化；若该域原先没学好，稳定不等于成功保持 |\n| 中途最佳表现后是否退化 | `max(R[k,j], k=j..t) - R[t,j]` | 与前项分列，不能把两种定义混为同一个遗忘指标 |\n| 整体识别是否改善 | 已见域等权平均及逐域结果 | 同时看新域学习、旧域变化及成本，冻结不学不能仅靠稳定胜出 |\n\n建议以域内逐候选集合等权 AP，再对域等权，作为成对识别的基础汇总；查询检索另报 MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。AP 与梯形 PR-AUC 分开；具体候选集合大小、正例数、单马甲账号是否纳入、主终点和差异阈值仍待合同明确，不能现在固定一个不存在的候选结构。\n\n不确定性应保持账号关系的依赖结构，按独立控制者群或完整候选集合配对重抽样，不能把同一账号参与的边当成独立样本；具体单位要由最终生成结构确定。报告到达顺序差异；不把少数顺序的区间解释为覆盖生成机制及全部训练随机性。\n\n## 首轮比较与判断建议\n\n先比较首批后冻结、普通继续训练、有限历史随机重放及累计历史训练。共享必要初始化、新样本顺序与输入；明确优化器状态、历史损失权重、记忆加入／淘汰时点。累计训练是可访问历史的参照，不是数学上界，不宣称等计算。\n\n历史预算按能够真实继续训练的持久状态计费，包括去重账号文本、关联、标签及必要选择状态；不能只存账号 ID，再从全量旧数据无限回查。正负比例、缓存利用率、重放频次和实际更新量必须报告，避免把这些差异错归因于关系选择器。具体模型、输入中的身份线索、字节预算、训练日程及后续强基线仍待确认。\n\n生成器资格首先检查标签与控制者的一致性、拆分隔离、模型可见分布差异、文本重复与明显配对捷径。固定生成规则是否被实现，与模型是否学会、是否遗忘、重放是否改善分开判断。没有遗忘或重放优势也保留结果，不能据此宣布生成失败并寻找有利种子。若模型没有学会，先核验输入和实际更新，不能把无学习误报为抗遗忘。\n\n首轮结果只有在确实学会旧域与新域、旧域受到后续更新影响且简单参照仍有明确改进空间时，才支持继续研究记忆选择。具体贡献还须超过随机／分层随机及适用的现有持续学习方法；重新生成数据和迁移到中文卖家题目本身不证明论文创新。\n\n## 文献与已读证据\n\n| 来源 | 本次实际阅读范围 | 可借鉴范围 |\n| --- | --- | --- |\n| [AKA，CVPR 2021](https://openaccess.thecvf.com/content/CVPR2021/html/Pu_Lifelong_Person_Re-Identification_via_Adaptive_Knowledge_Accumulation_CVPR_2021_paper.html) | 官方出版索引、原 PDF 的搜索索引正文片段：任务、身份互斥及实验数据／固定测试集设定；PDF 直接打开返回 403，未审其代码 | 不同身份群体与域依次到达，在各域留出身份上评价；不能据此证明本项目合成域真实或方法新颖 |\n| [SPRED，ICCV 2025](https://openaccess.thecvf.com/content/ICCV2025/papers/Xu_Self-Reinforcing_Prototype_Evolution_with_Dual-Knowledge_Cooperation_for_Semi-Supervised_Lifelong_Person_ICCV_2025_paper.pdf) | 原 PDF 搜索索引第 3.5、4.1—4.2 开头及补充材料数据表／顺序段；直接 PDF 返回 403 | 新近工作继续按域报告检索与总体表现；其半监督伪标签机制不照搬到本项目完整合成监督 |\n| [CLEAR，NeurIPS Datasets and Benchmarks 2021](https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html) | 官方摘要，未读完方法正文 | 真实时间演化与人为批次变化需区分；本项目明确是受控合成域，不冒称真实时间流，也不照搬其测试转训练安排 |\n\n前两项属于项目 CCF 目录 A 类会议，CLEAR 的具体发表轨道如实单列。持续学习方法与直接近邻继续参见[原计划文献表](SELLER_ALIAS_CONTINUAL.zh.md)，不把普通重放或身份级保存称作首次提出。\n\n已全文回读 2026-09-07 [可行性外审](../reports/seller_alias_continual/20260907/review.json)与[计划外审](../reports/seller_alias_continual/20260907/plan_review.json)的原 `reply_text`：沿用留出身份解释、固定评价记录、顺序映射、计算及缓存比较边界；旧审查不覆盖新生成机制。\n\n已静态阅读旧 `step28_method_root_builder.py` 的风格分配、基础文本、机制及单世界构建相关函数，和 `step28_formal_500x4_builder.py` 的日程变换及相关政策／词表。该范围显示旧商品主题主要按噪声位置采样，形式变换不自动形成新的经营分布。本次不是完整生成链审计，不据此宣布可直接复用整个生成器。\n\n本页作为未冻结设计提交网页 GPT 6 Pro 提供意见，审查与本地处置另存必要小记录。评审不能替用户确认未决需求，也不授权数据生成或 Linux 阶段。\n\r\n",
+  "submitted_draft_text": "# 中文暗网卖家马甲持续识别：新合成数据方案\n\n日期：2026-09-09。状态：**场景已确认，具体生成与评价方案待确认；尚未实施。**本页接续[持续识别计划](SELLER_ALIAS_CONTINUAL.zh.md)，不改写旧两次有效负结果，也不是重跑旧实验的合同。\n\n## 已确认的研究场景\n\n用户要求重新生成合成数据，并明确选择：**“不同分布的新卖家群体分批加入”。**每阶段加入新的卖家群体；模型仍判断两个中文卖家账号是否属于同一控制者，并据此检索马甲。\n\n据此拟检验：在历史训练记忆有限时，学习新群体后，模型在已见分布的留出卖家上能否保持识别能力，同时学会新分布？不同阶段不是同一控制者陆续新开马甲的追踪任务；阶段编号不表示真实经营日期。身份分类头扩容、跨阶段连接新旧账号、不断扩大检索库均不属于本次场景。\n\n用户随后明确选择：**“先改变经营品类与商品内容分布（推荐）”。**因此本轮变化轴已确认，不另加文风或身份线索机制随域变化。下面的具体生成参数、模型输入、评价细节与训练预算仍是提案；依赖这些未决选择的数据处理、生成器实现及实验等待确认。\n\n## 分布差异的建议\n\n**按用户确认，以经营品类与商品内容分布为变化轴；生成时文风与身份线索保持同一机制。**进一步建议各域账号数量与正负关系比例一致，避免混入样本量／标签先验变化。这里的“固定”指同一概率机制，不要求不同阶段使用重复文本或相同卖家。哪些身份线索进入模型，仍须明确输入合同。\n\n候选生成结构如下，均为待确认建议：\n\n| 层次 | 拟生成内容 | 必须避免的问题 |\n| --- | --- | --- |\n| 群体／域 | 同一中文商品主题集合，不同主题混合比例；各群体仍有重叠主题 | 仅改目录／编号；为某域设置专用标签；用完全互斥的词表替代有意义的差异 |\n| 控制者 | 从该群体抽取经营组合与表达习惯；这些潜在偏好可被多个控制者共享 | 一个控制者一个专用模板、关键词或暗码，造成身份查表 |\n| 马甲账号 | 继承控制者的部分偏好，独立扰动；同一控制者的账号完整进入同一阶段和分区 | 把同一身份拆到训练与评价；强制所有正例逐字相同 |\n| 商品记录 | 按账号偏好生成多条标题和描述；存在同品类异控账号及跨账号共用表达 | 让“同品类”直接等于同控，或让所有负例都跨品类 |\n| 同控标签 | 只由生成时的控制者归属产生，定义在所有域保持一致 | 从文本相似度、模型分数或要验证的选择器倒推出标签 |\n\n上述共同潜在偏好是合成身份相关性的假设，不是从真实跨卖家关联统计中估计出的规律。主题名称、混合比例、控制者内／间变化、身份线索共享与缺失规则，都须在训练前写成明确参数。不得调大域差异或改变身份线索来追求某方法获胜；固定机制也不保证可见输入对应的标签后验完全相同。\n\n建议从三个群体起步，足以观察一次以上的后续更新；“三个”仅为控制首轮工作量的提案，尚非冻结规模。先完成可读生成例子与实现核验，再按账号数、记录长度、训练日程计算磁盘和时间需求。此时不沿用旧 500 世界、五批、512 KiB 或旧训练时长作为新预算。\n\n## 真实中文依据与合成假设分开记录\n\n已只读核对[原真实中文参考边界](STEP28_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md)第 3 节及现存聚合资料。参考来自原训练范围内 676 名卖家，包含商品数、标题／描述长度、缺失率、标点等卖家等权统计；商品数被裁剪到 2—8。它只保留匿名类别秩概率，没有真实类别名称、原文、身份值或卖家行，也没有跨群体或时间变化统计。\n\n聚合文件为 `reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json`，3,185 字节，SHA-256 `5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34`，本次实际字节吻合；[原来源清单](../reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/manifests/style_reference_manifest.json)保留提取血缘。其历史目录名不变。本次没有重跑提取器或读取原始卖家 allow-list、真实商品表及标签，也没有全面重审原统计提取实现。\n\n建议仅把这些聚合作为记录数量／文本形态的候选参照，正式复用前核对相应提取与采样语义；不能据此宣称新的商品主题、同控相关性或群体变化已经获得真实数据验证。新主题词与文案由独立、明确的合成词表与规则产生，不恢复旧被删载荷，不从封存身份资产或真实同控标签获取生成条件。\n\n## 评价怎样对应问题\n\n建议每个域分别生成控制者隔离的训练、开发、最终评价账号。域内训练和评价服从同一预定机制；不同域及各分区使用不同控制者和身份值。分区在生成前确定，不能先生成全部账号再随机拆账号对。开发用于获准的调试／选择，最终评价在合同冻结后使用；新阶段的具体监督访问另行明确，不继承旧 train／development 的一次性许可。\n\n各域评价集的商品记录、查询、候选账号及标签固定。每次模型更新后，对这些相同记录重新推理；可以改变学习到的表示，不能把旧模型缓存表示与新表示混用。训练器只看已到达训练群体和允许保留的历史状态；即使评价未来域用于记录更新前能力，也不把未来输入、分数或标签交给训练／选择流程。\n\n令 `R[t,j]` 为第 t 阶段结束后，模型在第 j 个到达域的固定评价集上的表现；保留初始模型 `R[0,j]`。换到达顺序时，j 随该顺序重新映射到具体域。\n\n| 要回答的事 | 建议记录 | 解释边界 |\n| --- | --- | --- |\n| 新域学到了多少 | `R[t,t] - R[t-1,t]` | 与更新前同一模型在同一评价集比较，不以不同域的分数差充当学习增益 |\n| 旧域保留了多少 | 对每个 `j < t` 记录 `R[t,j] - R[j,j]` | 负值为相对学完该域时的退化；若该域原先没学好，稳定不等于成功保持 |\n| 中途最佳表现后是否退化 | `max(R[k,j], k=j..t) - R[t,j]` | 与前项分列，不能把两种定义混为同一个遗忘指标 |\n| 整体识别是否改善 | 已见域等权平均及逐域结果 | 同时看新域学习、旧域变化及成本，冻结不学不能仅靠稳定胜出 |\n\n建议以域内逐候选集合等权 AP，再对域等权，作为成对识别的基础汇总；查询检索另报 MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。AP 与梯形 PR-AUC 分开；具体候选集合大小、正例数、单马甲账号是否纳入、主终点和差异阈值仍待合同明确，不能现在固定一个不存在的候选结构。\n\n不确定性应保持账号关系的依赖结构，按独立控制者群或完整候选集合配对重抽样，不能把同一账号参与的边当成独立样本；具体单位要由最终生成结构确定。报告到达顺序差异；不把少数顺序的区间解释为覆盖生成机制及全部训练随机性。\n\n## 首轮比较与判断建议\n\n先比较首批后冻结、普通继续训练、有限历史随机重放及累计历史训练。共享必要初始化、新样本顺序与输入；明确优化器状态、历史损失权重、记忆加入／淘汰时点。累计训练是可访问历史的参照，不是数学上界，不宣称等计算。\n\n历史预算按能够真实继续训练的持久状态计费，包括去重账号文本、关联、标签及必要选择状态；不能只存账号 ID，再从全量旧数据无限回查。正负比例、缓存利用率、重放频次和实际更新量必须报告，避免把这些差异错归因于关系选择器。具体模型、输入中的身份线索、字节预算、训练日程及后续强基线仍待确认。\n\n生成器资格首先检查标签与控制者的一致性、拆分隔离、模型可见分布差异、文本重复与明显配对捷径。固定生成规则是否被实现，与模型是否学会、是否遗忘、重放是否改善分开判断。没有遗忘或重放优势也保留结果，不能据此宣布生成失败并寻找有利种子。若模型没有学会，先核验输入和实际更新，不能把无学习误报为抗遗忘。\n\n首轮结果只有在确实学会旧域与新域、旧域受到后续更新影响且简单参照仍有明确改进空间时，才支持继续研究记忆选择。具体贡献还须超过随机／分层随机及适用的现有持续学习方法；重新生成数据和迁移到中文卖家题目本身不证明论文创新。\n\n## 文献与已读证据\n\n| 来源 | 本次实际阅读范围 | 可借鉴范围 |\n| --- | --- | --- |\n| [AKA，CVPR 2021](https://openaccess.thecvf.com/content/CVPR2021/html/Pu_Lifelong_Person_Re-Identification_via_Adaptive_Knowledge_Accumulation_CVPR_2021_paper.html) | 官方出版索引、原 PDF 的搜索索引正文片段：任务、身份互斥及实验数据／固定测试集设定；PDF 直接打开返回 403，未审其代码 | 不同身份群体与域依次到达，在各域留出身份上评价；不能据此证明本项目合成域真实或方法新颖 |\n| [SPRED，ICCV 2025](https://openaccess.thecvf.com/content/ICCV2025/papers/Xu_Self-Reinforcing_Prototype_Evolution_with_Dual-Knowledge_Cooperation_for_Semi-Supervised_Lifelong_Person_ICCV_2025_paper.pdf) | 原 PDF 搜索索引第 3.5、4.1—4.2 开头及补充材料数据表／顺序段；直接 PDF 返回 403 | 新近工作继续按域报告检索与总体表现；其半监督伪标签机制不照搬到本项目完整合成监督 |\n| [CLEAR，NeurIPS Datasets and Benchmarks 2021](https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html) | 官方摘要，未读完方法正文 | 真实时间演化与人为批次变化需区分；本项目明确是受控合成域，不冒称真实时间流，也不照搬其测试转训练安排 |\n\n前两项属于项目 CCF 目录 A 类会议，CLEAR 的具体发表轨道如实单列。持续学习方法与直接近邻继续参见[原计划文献表](SELLER_ALIAS_CONTINUAL.zh.md)，不把普通重放或身份级保存称作首次提出。\n\n已全文回读 2026-09-07 [可行性外审](../reports/seller_alias_continual/20260907/review.json)与[计划外审](../reports/seller_alias_continual/20260907/plan_review.json)的原 `reply_text`：沿用留出身份解释、固定评价记录、顺序映射、计算及缓存比较边界；旧审查不覆盖新生成机制。\n\n已静态阅读旧 `step28_method_root_builder.py` 的风格分配、基础文本、机制及单世界构建相关函数，和 `step28_formal_500x4_builder.py` 的日程变换及相关政策／词表。该范围显示旧商品主题主要按噪声位置采样，形式变换不自动形成新的经营分布。本次不是完整生成链审计，不据此宣布可直接复用整个生成器。\n\n本页作为未冻结设计提交网页 GPT 6 Pro 提供意见，审查与本地处置另存必要小记录。评审不能替用户确认未决需求，也不授权数据生成或 Linux 阶段。\n\r\n",
+  "submitted_prompt_matches_display_after_crlf_trim_and_ui_suffix_removal": true,
+  "browser_capture": {
+    "url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+    "title": "审查数据评价设计",
+    "messages": [
+      {
+        "id": "f844e2f8-59a4-4d4a-b67a-393447428a3d",
+        "role": "user",
+        "model": null,
+        "text": "请作为本项目的外部科研审查者，审查下面这份尚未冻结的数据/评价设计草案。用户已明确确认两点：不同分布的新中文暗网卖家群体分批加入；先只改变经营品类与商品内容分布，文风与身份线索生成机制不随域改变。重新生成数据已获用户授权，但具体参数、模型输入、规模及预算未确认，不能由你的审查代替用户确认。\n\n背景：旧数据同一生成机制下随机分五批，固定整个开发集，无法分离旧/新分布评价。旧可训练文本四臂最终世界等权 AP：冻结0.853900063、继续0.855247139、ER0.851997888、累计0.856250340；ER−继续三顺序均负。旧数据强身份规则覆盖80%正例且未覆盖负例。旧结果保留为有效负证据，不修改它、不为翻转结果挑新生成参数。现只有真实中文训练期聚合边际可作候选参照，没有真实时间流，不能承诺真实中文泛化。\n\n审查重点：\n1. 这套新群体+同控二分类+固定每域留出身份评价能否真正检验旧分布保持/新分布学习？哪些边界易表述错？\n2. 只变品类/内容的层级生成怎样避免“同品类=同控”、唯一控制者模板、训练测试泄漏？需要补的最小机制是什么？能否只改变主题混合而不声称标签后验不变？\n3. 数据机制中保留统一身份线索，模型输入采用全文+身份特征或统一遮盖联系方式的商品文本，二者哪种更适合首轮科学问题，代价是什么？目前尚未选定，给建议而不是认定实现缺陷。\n4. 区分已经可审的设计错误和后续冻结合同才需填的参数。按 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类已确认问题，写明受影响主张与最小修改。不要为了流程完整增加烟雾测试、审批、密钥、服务器硬化、重复评审或大型生成工程。无需执行代码；没有实现供审。指出尚未证明的论文创新，但别以普通换应用名认定有创新。\n请给明确的局部判断、最小补充与仍应由用户决定的真正关键项；不要要求生成有利方法排名才能算数据有效。文中引用阅读范围已披露，不把未取得全文说成已审代码。\n\n===== 草案全文 =====\n# 中文暗网卖家马甲持续识别：新合成数据方案\n\n日期：2026-09-09。状态：**场景已确认，具体生成与评价方案待确认；尚未实施。**本页接续[持续识别计划](SELLER_ALIAS_CONTINUAL.zh.md)，不改写旧两次有效负结果，也不是重跑旧实验的合同。\n\n## 已确认的研究场景\n\n用户要求重新生成合成数据，并明确选择：**“不同分布的新卖家群体分批加入”。**每阶段加入新的卖家群体；模型仍判断两个中文卖家账号是否属于同一控制者，并据此检索马甲。\n\n据此拟检验：在历史训练记忆有限时，学习新群体后，模型在已见分布的留出卖家上能否保持识别能力，同时学会新分布？不同阶段不是同一控制者陆续新开马甲的追踪任务；阶段编号不表示真实经营日期。身份分类头扩容、跨阶段连接新旧账号、不断扩大检索库均不属于本次场景。\n\n用户随后明确选择：**“先改变经营品类与商品内容分布（推荐）”。**因此本轮变化轴已确认，不另加文风或身份线索机制随域变化。下面的具体生成参数、模型输入、评价细节与训练预算仍是提案；依赖这些未决选择的数据处理、生成器实现及实验等待确认。\n\n## 分布差异的建议\n\n**按用户确认，以经营品类与商品内容分布为变化轴；生成时文风与身份线索保持同一机制。**进一步建议各域账号数量与正负关系比例一致，避免混入样本量／标签先验变化。这里的“固定”指同一概率机制，不要求不同阶段使用重复文本或相同卖家。哪些身份线索进入模型，仍须明确输入合同。\n\n候选生成结构如下，均为待确认建议：\n\n| 层次 | 拟生成内容 | 必须避免的问题 |\n| --- | --- | --- |\n| 群体／域 | 同一中文商品主题集合，不同主题混合比例；各群体仍有重叠主题 | 仅改目录／编号；为某域设置专用标签；用完全互斥的词表替代有意义的差异 |\n| 控制者 | 从该群体抽取经营组合与表达习惯；这些潜在偏好可被多个控制者共享 | 一个控制者一个专用模板、关键词或暗码，造成身份查表 |\n| 马甲账号 | 继承控制者的部分偏好，独立扰动；同一控制者的账号完整进入同一阶段和分区 | 把同一身份拆到训练与评价；强制所有正例逐字相同 |\n| 商品记录 | 按账号偏好生成多条标题和描述；存在同品类异控账号及跨账号共用表达 | 让“同品类”直接等于同控，或让所有负例都跨品类 |\n| 同控标签 | 只由生成时的控制者归属产生，定义在所有域保持一致 | 从文本相似度、模型分数或要验证的选择器倒推出标签 |\n\n上述共同潜在偏好是合成身份相关性的假设，不是从真实跨卖家关联统计中估计出的规律。主题名称、混合比例、控制者内／间变化、身份线索共享与缺失规则，都须在训练前写成明确参数。不得调大域差异或改变身份线索来追求某方法获胜；固定机制也不保证可见输入对应的标签后验完全相同。\n\n建议从三个群体起步，足以观察一次以上的后续更新；“三个”仅为控制首轮工作量的提案，尚非冻结规模。先完成可读生成例子与实现核验，再按账号数、记录长度、训练日程计算磁盘和时间需求。此时不沿用旧 500 世界、五批、512 KiB 或旧训练时长作为新预算。\n\n## 真实中文依据与合成假设分开记录\n\n已只读核对[原真实中文参考边界](STEP28_SYNTHETIC_CHINESE_DATASET_BUILD_CONTRACT_20260727.zh.md)第 3 节及现存聚合资料。参考来自原训练范围内 676 名卖家，包含商品数、标题／描述长度、缺失率、标点等卖家等权统计；商品数被裁剪到 2—8。它只保留匿名类别秩概率，没有真实类别名称、原文、身份值或卖家行，也没有跨群体或时间变化统计。\n\n聚合文件为 `reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json`，3,185 字节，SHA-256 `5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34`，本次实际字节吻合；[原来源清单](../reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/manifests/style_reference_manifest.json)保留提取血缘。其历史目录名不变。本次没有重跑提取器或读取原始卖家 allow-list、真实商品表及标签，也没有全面重审原统计提取实现。\n\n建议仅把这些聚合作为记录数量／文本形态的候选参照，正式复用前核对相应提取与采样语义；不能据此宣称新的商品主题、同控相关性或群体变化已经获得真实数据验证。新主题词与文案由独立、明确的合成词表与规则产生，不恢复旧被删载荷，不从封存身份资产或真实同控标签获取生成条件。\n\n## 评价怎样对应问题\n\n建议每个域分别生成控制者隔离的训练、开发、最终评价账号。域内训练和评价服从同一预定机制；不同域及各分区使用不同控制者和身份值。分区在生成前确定，不能先生成全部账号再随机拆账号对。开发用于获准的调试／选择，最终评价在合同冻结后使用；新阶段的具体监督访问另行明确，不继承旧 train／development 的一次性许可。\n\n各域评价集的商品记录、查询、候选账号及标签固定。每次模型更新后，对这些相同记录重新推理；可以改变学习到的表示，不能把旧模型缓存表示与新表示混用。训练器只看已到达训练群体和允许保留的历史状态；即使评价未来域用于记录更新前能力，也不把未来输入、分数或标签交给训练／选择流程。\n\n令 `R[t,j]` 为第 t 阶段结束后，模型在第 j 个到达域的固定评价集上的表现；保留初始模型 `R[0,j]`。换到达顺序时，j 随该顺序重新映射到具体域。\n\n| 要回答的事 | 建议记录 | 解释边界 |\n| --- | --- | --- |\n| 新域学到了多少 | `R[t,t] - R[t-1,t]` | 与更新前同一模型在同一评价集比较，不以不同域的分数差充当学习增益 |\n| 旧域保留了多少 | 对每个 `j < t` 记录 `R[t,j] - R[j,j]` | 负值为相对学完该域时的退化；若该域原先没学好，稳定不等于成功保持 |\n| 中途最佳表现后是否退化 | `max(R[k,j], k=j..t) - R[t,j]` | 与前项分列，不能把两种定义混为同一个遗忘指标 |\n| 整体识别是否改善 | 已见域等权平均及逐域结果 | 同时看新域学习、旧域变化及成本，冻结不学不能仅靠稳定胜出 |\n\n建议以域内逐候选集合等权 AP，再对域等权，作为成对识别的基础汇总；查询检索另报 MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。AP 与梯形 PR-AUC 分开；具体候选集合大小、正例数、单马甲账号是否纳入、主终点和差异阈值仍待合同明确，不能现在固定一个不存在的候选结构。\n\n不确定性应保持账号关系的依赖结构，按独立控制者群或完整候选集合配对重抽样，不能把同一账号参与的边当成独立样本；具体单位要由最终生成结构确定。报告到达顺序差异；不把少数顺序的区间解释为覆盖生成机制及全部训练随机性。\n\n## 首轮比较与判断建议\n\n先比较首批后冻结、普通继续训练、有限历史随机重放及累计历史训练。共享必要初始化、新样本顺序与输入；明确优化器状态、历史损失权重、记忆加入／淘汰时点。累计训练是可访问历史的参照，不是数学上界，不宣称等计算。\n\n历史预算按能够真实继续训练的持久状态计费，包括去重账号文本、关联、标签及必要选择状态；不能只存账号 ID，再从全量旧数据无限回查。正负比例、缓存利用率、重放频次和实际更新量必须报告，避免把这些差异错归因于关系选择器。具体模型、输入中的身份线索、字节预算、训练日程及后续强基线仍待确认。\n\n生成器资格首先检查标签与控制者的一致性、拆分隔离、模型可见分布差异、文本重复与明显配对捷径。固定生成规则是否被实现，与模型是否学会、是否遗忘、重放是否改善分开判断。没有遗忘或重放优势也保留结果，不能据此宣布生成失败并寻找有利种子。若模型没有学会，先核验输入和实际更新，不能把无学习误报为抗遗忘。\n\n首轮结果只有在确实学会旧域与新域、旧域受到后续更新影响且简单参照仍有明确改进空间时，才支持继续研究记忆选择。具体贡献还须超过随机／分层随机及适用的现有持续学习方法；重新生成数据和迁移到中文卖家题目本身不证明论文创新。\n\n## 文献与已读证据\n\n| 来源 | 本次实际阅读范围 | 可借鉴范围 |\n| --- | --- | --- |\n| [AKA，CVPR 2021](https://openaccess.thecvf.com/content/CVPR2021/html/Pu_Lifelong_Person_Re-Identification_via_Adaptive_Knowledge_Accumulation_CVPR_2021_paper.html) | 官方出版索引、原 PDF 的搜索索引正文片段：任务、身份互斥及实验数据／固定测试集设定；PDF 直接打开返回 403，未审其代码 | 不同身份群体与域依次到达，在各域留出身份上评价；不能据此证明本项目合成域真实或方法新颖 |\n| [SPRED，ICCV 2025](https://openaccess.thecvf.com/content/ICCV2025/papers/Xu_Self-Reinforcing_Prototype_Evolution_with_Dual-Knowledge_Cooperation_for_Semi-Supervised_Lifelong_Person_ICCV_2025_paper.pdf) | 原 PDF 搜索索引第 3.5、4.1—4.2 开头及补充材料数据表／顺序段；直接 PDF 返回 403 | 新近工作继续按域报告检索与总体表现；其半监督伪标签机制不照搬到本项目完整合成监督 |\n| [CLEAR，NeurIPS Datasets and Benchmarks 2021](https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html) | 官方摘要，未读完方法正文 | 真实时间演化与人为批次变化需区分；本项目明确是受控合成域，不冒称真实时间流，也不照搬其测试转训练安排 |\n\n前两项属于项目 CCF 目录 A 类会议，CLEAR 的具体发表轨道如实单列。持续学习方法与直接近邻继续参见[原计划文献表](SELLER_ALIAS_CONTINUAL.zh.md)，不把普通重放或身份级保存称作首次提出。\n\n已全文回读 2026-09-07 [可行性外审](../reports/seller_alias_continual/20260907/review.json)与[计划外审](../reports/seller_alias_continual/20260907/plan_review.json)的原 `reply_text`：沿用留出身份解释、固定评价记录、顺序映射、计算及缓存比较边界；旧审查不覆盖新生成机制。\n\n已静态阅读旧 `step28_method_root_builder.py` 的风格分配、基础文本、机制及单世界构建相关函数，和 `step28_formal_500x4_builder.py` 的日程变换及相关政策／词表。该范围显示旧商品主题主要按噪声位置采样，形式变换不自动形成新的经营分布。本次不是完整生成链审计，不据此宣布可直接复用整个生成器。\n\n本页作为未冻结设计提交网页 GPT 6 Pro 提供意见，审查与本地处置另存必要小记录。评审不能替用户确认未决需求，也不授权数据生成或 Linux 阶段。\n\n收起",
+        "links": [
+          {
+            "text": "https://openaccess.thecvf.com/content/CVPR2021/html/Pu_Lifelong_Person_Re-Identification_via_Adaptive_Knowledge_Accumulation_CVPR_2021_paper.html",
+            "href": "https://openaccess.thecvf.com/content/CVPR2021/html/Pu_Lifelong_Person_Re-Identification_via_Adaptive_Knowledge_Accumulation_CVPR_2021_paper.html"
+          },
+          {
+            "text": "https://openaccess.thecvf.com/content/ICCV2025/papers/Xu_Self-Reinforcing_Prototype_Evolution_with_Dual-Knowledge_Cooperation_for_Semi-Supervised_Lifelong_Person_ICCV_2025_paper.pdf",
+            "href": "https://openaccess.thecvf.com/content/ICCV2025/papers/Xu_Self-Reinforcing_Prototype_Evolution_with_Dual-Knowledge_Cooperation_for_Semi-Supervised_Lifelong_Person_ICCV_2025_paper.pdf"
+          },
+          {
+            "text": "https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html",
+            "href": "https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html"
+          }
+        ]
+      },
+      {
+        "id": "49ec0e8c-134d-49f2-bb4d-877ba4e2107c",
+        "role": "assistant",
+        "model": "gpt-6-pro",
+        "text": "总体判断\n\n这份草案的场景与评价骨架成立，确实能够比旧设计更清楚地分离“新分布学习”与“旧分布保持”。但它尚未证明新生成数据具有合适的识别难度，也没有证明一定会发生遗忘、重放具有优势或存在论文创新。\n\n本次审查以你贴出的完整草案为对象。旧实验数值、聚合文件散列及本地阅读记录均作为提交事实使用，未独立复算或重审对应实现。我另行核对了 AKA 作者预印本的任务定义与评价设定、SPRED 作者稿的相关任务和评价章节、GEM 的评价定义，以及 CLEAR 官方摘要；没有审阅这些工作的代码。\n\n一、评价能够回答什么：方向正确，需收紧三处解释\n1. 测的是对未见控制者的识别能力，而不是记住旧身份\n\n不同域采用不同控制者，域内训练与评价也按控制者隔离，仍然可以评价旧分布保持。这里保持的是：\n\n模型在学习后续群体后，是否仍能识别来自先前分布、但从未参与训练的控制者所拥有的账号关系。\n\n它不是训练身份记忆、跨阶段马甲追踪，也不是旧账号加入不断扩大的图库后的检索。AKA 已有“训练／测试身份互斥、按域依次学习、保留各域测试集”的相近评价思路，因此这种设定本身不矛盾，也不能单独作为创新点。\narXiv\n+1\n\n虽然控制者不断增加，但输出始终是“同控／异控”，不是新增控制者类别的分类头。**建议首轮使用一个统一判别器，不把真实域编号作为测试时选择专用模型或阈值的依据。**训练阶段知道批次边界，与测试时获得域身份是两回事；后者会改变持续学习问题的设定。\nNature\n\n2. 三个差值定义基本正确，但不能互相替代\n\nR[t,t]−R[t−1,t] 是同一新域上本阶段更新带来的表现变化；R[t,j]−R[j,j] 是相对首次学完旧域时的变化；最大历史表现减当前表现则是另一种退化口径。草案把它们分开是正确的。前一个不宜直接称为“前向迁移”：经典前向迁移通常比较尚未学习该域时的表现与初始基准。\nNIPS 会议论文\n\n还需补一句：**新域更新增益接近零，不一定表示没有学会。**若更新前已经表现很好，可能是先前知识能够泛化、剩余提升空间很小。因此应同时看更新前后绝对表现，而不能要求每阶段必须出现明显正增益才承认学习有效。同理，较小退化不能掩盖一个方法首次学习时就明显较差的问题。\n\n3. “已见域平均”不能直接用于跨阶段证明整体改善\n\n这是当前最容易产生错误结论的地方。阶段 t 与 t−1 的已见域平均覆盖了不同域集合，平均值变化可能来自新增域更容易或更困难，而不只是模型改善或退化。\n\n最小修改是：**同阶段比较方法时使用同一个已见域集合；比较前后更新时，对相同旧域集合比较，并单列新域表现。**草案已经保留完整矩阵，无需增加实验，只需明确汇总解释。\n\n此外，这些结果仅适用于预定合成机制及其留出样本，不能外推为真实经营时间中的能力保持。CLEAR 的真实时间演化设定可用于说明这个区别，而不是为本项目提供真实时间有效性的背书。\nNeurIPS 数据集基准\n\n二、只改变主题混合是可行的，最小补充在于条件依赖和相关性\n1. 把“域改变什么”写到条件分布层面\n\n表格中的“从该群体抽取经营组合与表达习惯”有歧义：经营组合可以由域影响，但表达习惯是否也有域专属分布？它需要与上文“文风机制不随域改变”统一。\n\n建议改成：\n\n域参数只改变经营主题混合；控制者经营偏好围绕该混合抽取。表达习惯、账号扰动及身份线索共享／缺失使用全域统一机制，不设置域专属参数。\n\n为了更干净地隔离内容变化，首轮可进一步建议文风潜变量从不依赖域编号的共同分布抽取。**这是机制建议，不是要求各域样本的标点、长度等实测统计逐项完全相等。**有限抽样及内容组成变化本来就可能造成统计差异；不能靠反复重抽把这些差异全部“修平”。\n\n2. 共享偏好必须产生统计关联，但不能成为确定性身份编码\n\n当前层级结构是合理起点，但“偏好可由多个控制者共享”尚不足以排除所有捷径。至少需要明确以下三件事：\n\n**同控账号不是完全复制，也不是完全独立。**应保留部分共同经营或表达偏好，同时有账号层面的扰动。完全复制容易退化为查重；完全独立则可能抹掉遮盖联系方式后所需的关系信息。\n\n**主题与标签不能形成确定对应。**同品类异控必须存在；对于允许多品类经营的控制者，同控账号经营组合不完全一致也应有非零概率。不能只是加入几个象征性的难负例，同时仍让“品类不同必定异控”成为规则。\n\n**不能主动为每个控制者分配唯一表达组合。**单个词或模板被复用，不代表整个模板组合没有成为身份编码。但随机产生的稀有组合也不自动等于泄漏，不能要求所有控制者画像都必须发生碰撞。\n\n这些要求不需要引入新的事件、图像或行为机制。最小方案仍是：共同资源池、部分继承、独立扰动，以及明确的控制者内／间重叠。\n\n**账号记录应先一次生成，再由控制者关系给所有账号对标注。**不要对每个正负账号对分别生成文本，否则同一个账号可能因配对对象不同而拥有不同记录，任务就不再是固定账号的同控识别。\n\n3. 拆分隔离与词表隔离不是一回事\n\n按控制者提前划分分区是正确的，但应同时避免控制者专属身份值、专属实现文本或复制记录跨分区复用。反过来，共享预先确定的通用词表、语法和普通模板，并不自动构成泄漏；这与“同一生成机制下留出新身份”的评价目标相容。\n\n不能在共享这些资源的同时声称验证了“未见模板／未见生成机制泛化”，但也不必为了防泄漏而强制三个分区使用完全不同的语言资源。后者会额外引入一个未经用户确认的变化轴。\n\n4. 可以只改变主题混合，而不声称标签后验不变\n\n答案是明确的：可以，而且草案对此的保留是必要的。\n\n标签定义不变，只意味着始终由控制者归属决定标签；它不保证可见文本对应的标签后验不变。设正例先验为 ρ，则\n\nP\nd\n\t​\n\n(Y=1∣X=x)=\nρp\nd\n\t​\n\n(x∣Y=1)+(1−ρ)p\nd\n\t​\n\n(x∣Y=0)\nρp\nd\n\t​\n\n(x∣Y=1)\n\t​\n\n.\n\n即使 ρ 固定，主题混合改变也可能改变正负例的可见证据分布及其似然比。例如，一个品类在新域变得非常普遍后，异控卖家经营该品类的碰撞更多，相同品类的身份判别价值可能下降。\n\n因此宜称为**“主题混合变化下的受控合成域增量学习”**，不能未经证明称为严格的“仅协变量偏移”。后者通常要求 P(Y∣X) 保持不变。\n机器学习研究期刊\n\n三、首轮输入建议：倾向统一遮盖联系方式，但必须接受主张收窄\n全文＋身份特征：适合研究完整公开证据系统\n\n这个选择回答的是：当商品内容分布变化时，利用所有允许公开证据的同控识别系统，是否需要历史重放？\n\n保留强身份线索本身不是错误。你提供的旧数据事实——强规则覆盖大量正例且不覆盖负例——说明它可能形成一条几乎不依赖商品内容的判别路径，但不能据此断言新数据仍然具有同样覆盖率。\n\n代价是：总体稳定可能主要来自稳定身份线索，而不是文本表示保持良好。选择这条路线后，宜预先报告简单身份规则的覆盖情况，并区分有／无该类直接线索的结果。不能为了让持续学习方法出现优势而削弱这些线索，也不能因为它们使任务容易就自动宣布数据无效。\n\n统一遮盖联系方式的商品文本：更适合首轮定位内容变化的影响\n\n我的首轮倾向是这一输入口径，因为它更直接检验：经营内容分布变化时，商品文本中的同控判别能力能否被学习和保持。这个建议不是因为遮盖后更可能产生遗忘，而是因为它减少了强直接线索对总体指标解释的支配。\n\n它的代价也必须写进问题定义：\n\n首先，结论只覆盖联系方式不可用或被统一遮盖条件下的识别，不能代表完整公开证据系统。\n\n其次，遮盖后必须仍有明确的身份相关统计来源，例如部分共享的经营组合与表达偏好。若控制者关系只通过被遮掉的联系方式体现，剩余文本在同控与异控条件下没有差异，那么问题不是模型“不够强”，而是输入已经没有对应信息。\n\n最后，遮盖必须对所有域、分区和方法一致。稳定的一对一哈希或控制者专属占位符仍可能保留相等关系；被遮盖联系方式的匹配量也不能从数值特征支路重新进入“文本-only”模型。仅遮盖联系方式不等于删除所有身份信息，文风和经营偏好仍可以保留。\n\n**两种口径均可成立，但回答的是不同问题。**首轮不必为了完整性同时运行两套四臂；应先由用户选择主问题，再冻结输入。\n\n四、评价与记忆预算还需补哪些定义\n\nAP 的统计单位要先澄清，数值规模可以后定。“逐候选集合等权 AP”可能指完整账号群中所有无序账号对的 AP，也可能指每个查询的候选列表 AP。后者再按查询平均就是相应的 MAP，不能与“成对 AP”当作两项独立证据。AP 与梯形 PR-AUC 分开是正确的，它们的计算定义不同。\nScikit-learn\n\n同样，AP／MAP主要支持排序能力结论，不自动证明某个判定阈值下的误报率稳定。首轮不研究阈值决策也可以，但结论应相应收窄。\n\n**“完整候选集合”也不天然是独立重抽样单位。**多个查询共享同一图库时，整条查询列表仍存在跨查询依赖；负边同时涉及两个控制者，也不能随意归给一端后当作独立样本。最简可选结构是每域包含多个互不共享控制者的评价账号群，固定各群候选集合后按群配对重抽样。是否采用、采用多少群，应由最终结构和预算决定，而不是现在强行沿用旧世界规模。\n\n固定账号数量也不自动固定正例比例。完整配对时，若控制者 c 有 m\nc\n\t​\n\n 个账号，正例比例为\n\n(\n2\n∑\nc\n\t​\n\nm\nc\n\t​\n\n\t​\n\n)\n∑\nc\n\t​\n\n(\n2\nm\nc\n\t​\n\n\t​\n\n)\n\t​\n\n.\n\n因此需要一起决定控制者账号数分布、候选群规模与单账号控制者是否纳入，而不是生成后再按模型难度筛选账号对。\n\n**全文＋身份特征还有一个额外边界。**若特征包含词频、邻居或两跳等集合派生量，需要明确其计算所用的账号集合。固定评价记录但不断扩张这些特征的参考集合，仍会改变评价输入。训练／评价分区与尚未到达域也不能在特征计算中被悄悄合并。重放中保存特征快照还是保存可重算上下文，同样影响真实存储成本。\n\n四臂作为首轮比较已经够用。后续应明确累计历史训练是从共同初始化重训，还是沿上一阶段继续，以及各臂的更新量、开发反馈和持久状态。这里不需要现在追加一批强基线；但若重放比继续训练使用更多更新，其差异不能全部归因于“记忆选择更好”。\n\n五、问题分类：不能把尚未选择的参数判成已经发生的缺陷\n分类\t本轮局部判断\t受影响主张与最小处理\nSCIENTIFIC_BLOCKER\t**未发现已确认的场景级阻断。**新群体、同控二分类和固定留出身份评价相容。\t不能据此进一步声称真实时间泛化、标签后验固定，或用不同域集合的平均值变化证明模型改善。保留草案已有边界，并补上同集合比较规则即可。\nREPRODUCIBILITY_DEFECT\t**尚无证据确认实现缺陷。**生成器、输入和候选结构尚未确定，不能把未填数字当作失败。\t当前即可消除两处文档歧义：文风是否受域条件影响；“候选集合 AP”到底以什么为单位。它们影响“仅内容变化”的复现和主指标含义，但不要求现在替用户选定所有参数。\nOUT_OF_SCOPE_OVERDESIGN\t不应作为本轮修改要求。\t不需要新增烟雾测试、审批或安全流程；不需要强制所有模板跨分区隔离、穷尽全部顺序、立即复现大量方法，也不需要以出现遗忘或 ER 获胜作为生成器资格门。\n\n另有一条重要分界：**生成机制正确实现、输入包含可检验信号、某模型实际学会、随后发生遗忘、重放改善表现，是五个不同判断。**其中任何一个结果都不能替代其他判断。草案关于保留无遗忘、无重放优势结果的原则应原样保留。\n\n六、创新与仍应由用户决定的关键项\n\n目前没有充分依据宣布论文创新。AKA 已覆盖域序列与留出身份评价；SPRED 也按域及总体报告表现，其作者稿还包含完整标签条件的实验，因此不能仅凭“我们是完整监督、中文卖家文本”就排除相关近邻。它们不必都成为首轮实现负担，但必须约束未来的新颖性主张。\narXiv\n+2\narXiv\n+2\n\n真正需要用户确认的，是四组会改变科学问题或资源承诺的选择：\n\n关键项\t需要决定的实质\n主问题与输入\t完整公开证据系统，还是统一遮盖联系方式后的商品文本识别；对应哪些特征允许进入模型。\n生成关联与域差异\t主题集合及混合、控制者内／间变化、统一身份线索的共享和缺失规则；这些是合成假设，不是由现有真实边际统计估计出的关系规律。\n样本与评价结构\t域数、独立账号群及控制者规模、候选范围、正例数和无同控候选查询的处理，以及主终点。\n模型与资源预算\t可训练模型、历史状态字节预算、训练日程、累计训练方式、允许的开发反馈及顺序／训练重复范围。\n\n最终局部判断：保留这套新场景与固定每域留出身份的评价骨架；先澄清域依赖、残余同控关联和 AP 统计单位，再由用户确认输入、生成参数、规模及预算。它值得被检验，但当前不支持“数据已合格”“重放应当获胜”或“论文创新已成立”的结论，也不改变旧实验负证据的有效性。",
+        "links": [
+          {
+            "text": "arXiv\n+1",
+            "href": "https://arxiv.org/pdf/2103.12462"
+          },
+          {
+            "text": "Nature",
+            "href": "https://www.nature.com/articles/s42256-022-00568-3"
+          },
+          {
+            "text": "NIPS 会议论文",
+            "href": "https://papers.nips.cc/paper_files/paper/2017/file/f87522788a2be2d171666752f97ddebb-Paper.pdf"
+          },
+          {
+            "text": "NeurIPS 数据集基准",
+            "href": "https://datasets-benchmarks-proceedings.neurips.cc/paper_files/paper/2021/hash/2838023a778dfaecdc212708f721b788-Abstract-round2.html"
+          },
+          {
+            "text": "机器学习研究期刊",
+            "href": "https://jmlr.org/papers/v8/sugiyama07a.html"
+          },
+          {
+            "text": "Scikit-learn",
+            "href": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html"
+          },
+          {
+            "text": "arXiv\n+2\narXiv\n+2",
+            "href": "https://arxiv.org/pdf/2103.12462"
+          }
+        ]
+      }
+    ],
+    "busy": false
+  },
+  "mathematical_sources": [
+    {
+      "source": "t",
+      "display": false
+    },
+    {
+      "source": "t-1",
+      "display": false
+    },
+    {
+      "source": "\\rho",
+      "display": false
+    },
+    {
+      "source": "P_d(Y=1\\mid X=x)=\n\\frac{\\rho\\,p_d(x\\mid Y=1)}\n{\\rho\\,p_d(x\\mid Y=1)+(1-\\rho)\\,p_d(x\\mid Y=0)}.",
+      "display": true
+    },
+    {
+      "source": "\\rho",
+      "display": false
+    },
+    {
+      "source": "P(Y\\mid X)",
+      "display": false
+    },
+    {
+      "source": "c",
+      "display": false
+    },
+    {
+      "source": "m_c",
+      "display": false
+    },
+    {
+      "source": "\\frac{\\sum_c {m_c\\choose 2}}{{\\sum_c m_c\\choose 2}}.",
+      "display": true
+    }
+  ],
+  "read_scope": {
+    "complete_reply_read_locally": true,
+    "reviewer_did_not_recompute_project_results": true,
+    "original_reviews_read": [
+      "reports/seller_alias_continual/20260907/review.json: reply_text",
+      "reports/seller_alias_continual/20260907/plan_review.json: reply_text"
+    ],
+    "source_static_reads": [
+      {
+        "path": "scripts/step28_method_root_builder.py",
+        "scope": "style assignment, base-item rendering, mechanism assignment, build_one_world; selected functions, not full dependency audit"
+      },
+      {
+        "path": "scripts/step28_formal_500x4_builder.py",
+        "scope": "imports, schedule transformation and fixed formal structure; selected sections"
+      },
+      {
+        "path": "scripts/step28_build_style_reference.py",
+        "scope": "entire source; no import/execution or full upstream verification"
+      },
+      {
+        "path": "scripts/step28_continual_text_data.py",
+        "scope": "input contract and WorldArchive initialization/read; first 180 lines"
+      },
+      {
+        "path": "scripts/step28_continual_text.py",
+        "scope": "input policy, PairBatch, text preparation, dynamic aggregation and numeric concatenation; selected sections"
+      },
+      {
+        "path": "schema/step28_method_root_policy.json",
+        "scope": "public text and identity generation policy fields"
+      },
+      {
+        "path": "schema/step28_formal_500x4_policy.json",
+        "scope": "public formal generation policy fields"
+      },
+      {
+        "path": "schema/step28_candidate_text_templates.json",
+        "scope": "renderer contract and generic lexicon"
+      }
+    ],
+    "published_aggregate": {
+      "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json",
+      "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34",
+      "size_bytes": 3185,
+      "seller_count": 676,
+      "exact_byte_hash_verified": true,
+      "original_source_reparsed": false,
+      "limitation": "Seller-equal marginal summaries only; no real category names, raw text, identity values, between-controller relations or domain/time evolution."
+    }
+  },
+  "local_disposition": [
+    {
+      "id": "scene",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "KEEP_SCOPE",
+      "reason": "Disjoint new populations and per-domain unseen-controller tests are compatible. Do not assert old-identity tracking or real-market time validity. Proposed uniform model does not use domain IDs to route prediction."
+    },
+    {
+      "id": "style_domain",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "action": "CLARIFY_UNFROZEN_PROPOSAL",
+      "reason": "Original phrase could condition writing preferences on the domain. Clarified domain affects business mixture; writing latent variables, perturbation and identity-cue mechanisms are shared across domains. This was document ambiguity, not an observed implementation failure."
+    },
+    {
+      "id": "same_set_evaluation",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "CLARIFY_CLAIM_BOUNDARY",
+      "reason": "Compare methods over the same domains at a given stage. Compare model updates over the same old-domain set; changing seen-domain means alone do not show improvement. Record absolute new-domain performance as well as gain."
+    },
+    {
+      "id": "generation_signal",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "RETAIN_FOR_PARAMETER_CONTRACT",
+      "reason": "Generate account records once before labeling pairs. Preserve partially shared controller preferences and nuisance variation. Same-category negatives and nonidentical same-controller business profiles have support. No engineered unique controller code. Specific probabilities remain unconfirmed."
+    },
+    {
+      "id": "posterior",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "KEEP_EXISTING_BOUNDARY",
+      "reason": "Fixed controller-based label rule and prior do not imply constant P(Y|X). Bayes formula in captured DOM independently agrees with conditional-probability identity. No claim of pure covariate shift."
+    },
+    {
+      "id": "ap_unit",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "action": "CLARIFY_UNFROZEN_PROPOSAL",
+      "reason": "Propose AP over all unordered pairs within a fixed independent account group; MAP over per-query candidate rankings. Clarifies a pending metric choice, not an executed metric bug."
+    },
+    {
+      "id": "dependency_bootstrap",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "PROPOSE_INDEPENDENT_GROUPS",
+      "reason": "Queries sharing a gallery are dependent; negative edges involve two controllers. Proposed groups have no shared controllers and are resampled whole within domains. Group sizes and resampling parameters await the final contract."
+    },
+    {
+      "id": "positive_rate",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "action": "RETAIN_FOR_STRUCTURE_CONTRACT",
+      "reason": "Account count alone does not fix class prevalence. Positive unordered pairs sum choose(m_c,2) over controllers; total pairs choose(sum(m_c),2). Formula locally checked algebraically; alias-count distribution must be set with group size."
+    },
+    {
+      "id": "input",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "AWAIT_USER_INPUT",
+      "reason": "Text with unified masking and full evidence both define valid but different questions. Local and external recommendations favor masked text for content-shift interpretation, not to induce forgetting. Existing identity33 branch must not enter a future text-only input. No input implementation changed."
+    },
+    {
+      "id": "memory_and_features",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "action": "RETAIN_FOR_IMPLEMENTATION_CONTRACT",
+      "reason": "Specify durable replay state, loss weighting, optimizer inheritance and reference scope of any set-derived features. Do not reuse historical IDs to reload unlimited data. No new implementation exists."
+    },
+    {
+      "id": "extra_rituals",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "confirmed_defect": false,
+      "action": "DO_NOT_ADD",
+      "reason": "No forced template disjointness, repeated sampling until desired marginals/ranking, exhaustive orders, extra full-system four arms, smoke ritual, signing, hardening or ER-win qualification."
+    },
+    {
+      "id": "novelty",
+      "category": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "action": "NO_NOVELTY_OR_PUBLICATION_ASSERTION",
+      "reason": "AKA and newer lifelong Re-ID work constrain novelty. Full synthetic labels and a Chinese seller application alone do not establish novelty. Old valid negatives remain unchanged."
+    }
+  ],
+  "post_submission_local_clarifications": [
+    "Recorded static inspection of the style-reference producer and original 57-feature input concatenation.",
+    "Added the pending input alternatives already explicitly included in the review prompt.",
+    "Made within-domain candidate scope and no domain-ID prediction route explicit.",
+    "Applied the original review's same-domain comparison, residual relation signal, AP unit and dependency clarifications without executing or freezing a new experiment."
+  ],
+  "data_and_execution_boundary": {
+    "new_generator_written": false,
+    "data_payload_generated": false,
+    "raw_real_dataset_parsed": false,
+    "train_labels_parsed": false,
+    "development_labels_parsed": false,
+    "audit_truth_or_private_identity_assets_read": false,
+    "model_deserialized": false,
+    "experiments_or_tests_run": false,
+    "linux_connected": false,
+    "published_results_changed": false
+  },
+  "limitations": [
+    "Draft review is not review of a frozen generation/training contract or proof of implementation correctness.",
+    "Primary PDF direct opening failed for AKA/SPRED; local reading used their official publication/search-index sections, with scope disclosed in the plan.",
+    "Reviewer's 2007 covariate-shift definition source is preserved as part of the original reply only, not adopted as a recent methodological literature recommendation.",
+    "No guarantee of forgetting, replay benefit, paper novelty or real-Chinese-market transfer."
+  ]
+}

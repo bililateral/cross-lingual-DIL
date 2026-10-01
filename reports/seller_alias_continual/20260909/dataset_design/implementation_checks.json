@@ -1,0 +1,85 @@
+{
+  "stage": "approved_windows_generation_implementation",
+  "date": "2026-09-09",
+  "user_approval": "按该方案生成",
+  "submitted_sources": {
+    "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "files": [
+      {
+        "path": "scripts/step28_continual_dataset.py",
+        "bytes": 17215,
+        "sha256": "7357f9d96963447b1952e35a20aa90f27a68f881c08909012071b9b6c942e28b"
+      },
+      {
+        "path": "scripts/step28_continual_dataset_verify.py",
+        "bytes": 19726,
+        "sha256": "27346d0267c64d995cb681527d119b3ee7bdf07b99b26a7799789610e0b4539e"
+      },
+      {
+        "path": "tests/test_step28_continual_dataset_contracts.py",
+        "bytes": 10712,
+        "sha256": "84b79f31d29a8c50be504c54c520cda21cd76f7115bcaf15e5e88fbff7d4d1be"
+      },
+      {
+        "path": "schema/step28_continual_dataset_policy.json",
+        "bytes": 2390,
+        "sha256": "a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2"
+      },
+      {
+        "path": "schema/step28_continual_catalog.json",
+        "bytes": 7875,
+        "sha256": "c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660"
+      },
+      {
+        "path": "docs/SELLER_ALIAS_CONTINUAL_DATA.zh.md",
+        "bytes": 25536,
+        "sha256": "0b4b005574eed0d173e9d4a1dc3c8a43c5eefd6eee03c039934cfec639fc67d9"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "command": "python -B scripts/step28_continual_dataset.py --help; python -B scripts/step28_continual_dataset_verify.py --help",
+      "exit_code": 0,
+      "output": "usage: step28_continual_dataset.py [-h] {build} ...\r\n\r\nGenerate the approved Chinese seller-alias content-shift dataset (stdlib\r\nonly). Only title/description are model inputs. IDs are join metadata;\r\nownership and labels are new synthetic supervision. No legacy raw data, labels\r\nor models load.\r\n\r\npositional arguments:\r\n  {build}\r\n    build     Generate once in a new directory, then validate\r\n\r\noptions:\r\n  -h, --help  show this help message and exit\r\nusage: step28_continual_dataset_verify.py [-h] --root ROOT\r\n\r\nIndependently verify new continual-dataset exports; no generator imports.\r\nReads only this run's source snapshots, manifest, public text and new\r\nsynthetic supervision. Does not run a model or use legacy labels/qrels/Audit\r\nA/B.\r\n\r\noptions:\r\n  -h, --help   show this help message and exit\r\n  --root ROOT\r\n"
+    },
+    {
+      "command": "python -B -m unittest discover -s tests -p 'test_step28_continual_dataset_contracts.py' -v",
+      "exit_code": 0,
+      "tests_run": 12,
+      "passed": 12,
+      "skipped": 0,
+      "output": "test_all_subcategories_and_style_axes_render_from_common_pools (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_byte_budget_and_refuse_existing_output (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_catalog_contract_and_real_pmf_reference (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_deterministic_groups_and_independent_namespaces (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_exact_independent_population_marginals (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_hand_group_structure_all_pairs_and_queries (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_independent_verifier_rejects_label_and_edge_errors (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_independent_verifier_rejects_ownership_text_and_identity_injection (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_public_id_permutation_does_not_control_text_or_labels (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_redraw_may_equal_parent_without_retry (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_weighted_draw_hand_boundaries_and_zero_weight (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\ntest_weighted_without_replacement_renormalizes (test_step28_continual_dataset_contracts.DatasetContracts) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 12 tests in 0.359s\r\n\r\nOK\r\n"
+    }
+  ],
+  "post_test_changes": "Removed unused Counter and itertools imports only before external submission.",
+  "local_source_audit": {
+    "read_in_full": [
+      "scripts/step28_continual_dataset.py",
+      "scripts/step28_continual_dataset_verify.py",
+      "tests/test_step28_continual_dataset_contracts.py",
+      "schema/step28_continual_dataset_policy.json",
+      "schema/step28_continual_catalog.json"
+    ],
+    "reviewed_claims": [
+      "Domain weight enters only business preferences and item categories",
+      "Partially shared independent style draws with chance-equal redraw retained",
+      "Account count independent of content/style; public ID permutation independent of controller grouping",
+      "Items fixed before complete unordered ownership pairing",
+      "Separate verifier reconstructs labels from new owners and topics/styles from rendered text",
+      "CSV/JSONL output layout, explicit UTF-8 compact encoding, source snapshots and byte ceiling"
+    ],
+    "limits": [
+      "Focused fixtures do not establish a full formal export passed; formal output will undergo complete independent validation.",
+      "The reference PMF is an existing public aggregate; no original seller rows or old labels were read.",
+      "No model learnability, forgetting, replay benefit, novelty or real-market effectiveness test has been performed."
+    ]
+  },
+  "external_review": {
+    "url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+    "submitted_at_utc": "2026-09-09 06:30:35 UTC",
+    "status": "pending_at_this_record"
+  },
+  "temporary_files": "TemporaryDirectory contract fixture cleaned automatically; no one-off helper script created."
+}

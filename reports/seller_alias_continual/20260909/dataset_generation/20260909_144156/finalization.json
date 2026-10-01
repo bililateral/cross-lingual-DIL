@@ -1,0 +1,114 @@
+{
+  "stage": "approved_windows_generation",
+  "run_id": "20260909_144156",
+  "recorded_utc": "2026-09-09T06:50:15.519334+00:00",
+  "status": "GENERATION_COMPLETE_CLEANUP_PENDING_POLICY_REJECTION",
+  "user_scope": "按该方案生成; Windows CPU only, fixed seed and approved mechanism, no training or Linux",
+  "generation": {
+    "exit_code": 0,
+    "elapsed_seconds": 5.348043800000596,
+    "counts": {
+      "groups": 360,
+      "controllers": 4320,
+      "accounts": 10080,
+      "items": 36602,
+      "pairs": 136080,
+      "positive_pairs": 7200,
+      "negative_pairs": 128880
+    },
+    "formal_generation_count": 1,
+    "validation_status": "PASS_GENERATION_CONTRACT_NOT_MODEL_QUALIFICATION",
+    "model_evaluated": false
+  },
+  "validation_evidence": {
+    "local_contracts": {
+      "passed": 12,
+      "skipped": 0
+    },
+    "complete_export_validation": "Passed inside formal build after files were written; no second generation or repeated full validation",
+    "subsequent_saved_count_arithmetic": "PMF histogram, split/domain item totals, positive/negative pair counts all agree",
+    "source_snapshots_matching_review": [
+      "scripts/step28_continual_dataset.py",
+      "scripts/step28_continual_dataset_verify.py",
+      "schema/step28_continual_dataset_policy.json",
+      "schema/step28_continual_catalog.json"
+    ],
+    "external_model": "gpt-6-pro",
+    "external_required_fixes": 0
+  },
+  "hashes": {
+    "manifest.json": "667dd896a0848a469cf00d45f5f726460532afe5c9e21b1dba3fcffa23e0f982",
+    "validation.json": "7a6ccfd55724acf73f196819ec3e5305ae886a6100822fc9af3a2a7bd176eb75",
+    "execution.json": "ecde684c6c4a212d82fbb7ae10f3b8b16fd11d9093fd080736491f3ad7e2b128",
+    "implementation_review.json": "bb16d0ff8980469e38edd5b35bd83a68a031ac0bd604e356d788c89fd23abd31"
+  },
+  "documents": {
+    "paths": [
+      "AGENTS.md",
+      "docs/RESEARCH_DISCIPLINE.zh.md",
+      "docs/AI_RESEARCH_HANDOFF.zh.md",
+      "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+      "docs/SELLER_ALIAS_CONTINUAL_DATA.zh.md",
+      "docs/SELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md"
+    ],
+    "local_links_checked": 65,
+    "issues": [],
+    "handoff_history_sha256": "35c9c631bbfdb0c2cafb4963a10ff334c5d5cac07c43cb343b6742c708633908",
+    "initial_scene_review_unchanged": true,
+    "split_name_clarification": "train=train; development=valid; heldout=test. User did not request a directory rename."
+  },
+  "budget": {
+    "data_bytes": 28802358,
+    "data_files": 17,
+    "run_bytes_before_this_receipt": 28809970,
+    "design_review_record_bytes": 140299,
+    "retained_browser_temporary_bytes": 385646,
+    "maximum_bytes": 268435456,
+    "scope": "New data directory, its run log/receipt, dataset_design research reviews; also report still-retained browser temporary files separately. This final small receipt is excluded from before-this-receipt fields.",
+    "scientific_outputs_before_this_receipt_bytes": 28950269,
+    "including_browser_temporary_before_this_receipt_bytes": 29335915
+  },
+  "cleanup": {
+    "status": "BLOCKED_BY_AUTOMATIC_APPROVAL",
+    "action": "Native PowerShell removal of six verified browser log/snapshot files within .playwright-mcp",
+    "reason": "blocked by policy",
+    "process_created": false,
+    "deleted_files": 0,
+    "retained_files": [
+      {
+        "path": ".playwright-mcp/console-2026-09-09T05-20-05-968Z.log",
+        "bytes": 5642
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-09T05-53-45-838Z.yml",
+        "bytes": 71315
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-09T06-28-24-335Z.yml",
+        "bytes": 106575
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-09T06-28-48-155Z.yml",
+        "bytes": 0
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-09T06-29-02-314Z.yml",
+        "bytes": 107651
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-09T06-30-35-963Z.yml",
+        "bytes": 94463
+      }
+    ],
+    "contract_fixture_directory_cleaned": true,
+    "temporary_helper_script_created": false,
+    "upload_copy_created": false,
+    "historical_outside_repository_cleanup_not_attempted": true
+  },
+  "claim_boundaries": [
+    "Generation consistency and intended observed content-mixture shift only; no model learnability, forgetting, replay benefit, novelty or real-market claim.",
+    "Current text maxima 15/76 characters; fixed small shared template catalog.",
+    "18 extra item-text occurrences retained, including 12 text types across splits; no duplicate complete account corpus or reused controller.",
+    "Future model, training/replay budget and final evaluation require a confirmed contract; report and pause before any new Linux stage."
+  ]
+}

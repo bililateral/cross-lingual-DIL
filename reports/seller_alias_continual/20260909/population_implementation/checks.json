@@ -1,0 +1,164 @@
+{
+  "status": "LOCAL_CONTRACTS_PASS_REAL_TORCH_AND_LABSE_PENDING",
+  "source_files": [
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20603,
+      "sha256": "708c6ff378934311a7606d2ea1a1554276e417c14c8457762418f0e78f36e085"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "tests/test_step28_continual_population_contracts.py",
+      "bytes": 15847,
+      "sha256": "6a93d61f2ec7dee450e2faa2d41762c0170e96913d8fb95495e536c0d815f0f8"
+    },
+    {
+      "path": "schema/step28_continual_population_policy.json",
+      "bytes": 3187,
+      "sha256": "5cb842565ed42082907dd8745a8e09b698e55e6ee5ff3e7fefb20bf63f6ef9b2"
+    }
+  ],
+  "current_time_utc": "2026-09-09 07:42:14 UTC",
+  "commands": [
+    {
+      "command": "python -X utf8 -B -m unittest discover -s tests -p 'test_step28_continual_population_contracts.py' -v",
+      "chunk_id": "51da2a",
+      "wall_time_seconds": 3.7065547,
+      "exit_code": 0,
+      "original_token_count": 649,
+      "output": "test_complete_pair_identity_alignment_not_csv_order (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_current_schedule_paired_independent_of_replay_draws (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_exact_uniform_reservoir_small_enumeration (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_memory_byte_cap_includes_json_text_labels_rng (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_memory_roundtrip_next_selection_and_self_contained_text (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_real_new_train_audit_no_valid_test_owners_or_old_labels (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_reversed_edge_and_nonbinary_label_rejected (test_step28_continual_population_contracts.DataContracts) ... ok\r\ntest_ap_pr_auc_roc_ties_against_independent_sklearn (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_bootstrap_pairs_orders_and_equal_domains (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_domain_forgetting_takes_max_after_group_aggregation (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_failed_run_stops_before_truth_access (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_logit_threshold_probability_and_confusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_nan_and_wrong_pair_count_rejected (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_query_metrics_hand_ranked_graph_ties_and_self_exclusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_real_torch_save_fresh_reload_adam_next_update_and_token_limit (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\ntest_record_multiplicity_symmetric_pairs_and_encoder_gradient (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\ntest_separate_branches_match_independent_sum_and_one_adam_update (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\n\r\n----------------------------------------------------------------------\r\nRan 17 tests in 1.545s\r\n\r\nOK (skipped=3)\r\nActual train audit: 180 groups, 68040 aligned labels; memory bytes by stage: [165288, 168582, 177404, 169754, 170838, 157196, 183811, 176516, 171300] six largest: 213117\r\n"
+    },
+    {
+      "command": "AST parse all four population modules and the contract test",
+      "chunk_id": "f7eb99",
+      "wall_time_seconds": 1.8045776999999998,
+      "exit_code": 0,
+      "original_token_count": 68,
+      "output": "{'parsed': 5, 'files': ['scripts\\\\step28_continual_population.py', 'scripts\\\\step28_continual_population_data.py', 'scripts\\\\step28_continual_population_evaluate.py', 'scripts\\\\step28_continual_population_run.py', 'tests\\\\test_step28_continual_population_contracts.py']}\r\n"
+    },
+    {
+      "command": "python -X utf8 -B -m unittest discover -s tests -p 'test_step28_continual_population_contracts.py' -k MetricContracts -v",
+      "chunk_id": "815a84",
+      "wall_time_seconds": 3.1322709,
+      "exit_code": 0,
+      "original_token_count": 233,
+      "output": "test_ap_pr_auc_roc_ties_against_independent_sklearn (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_bootstrap_pairs_orders_and_equal_domains (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_domain_forgetting_takes_max_after_group_aggregation (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_failed_run_stops_before_truth_access (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_logit_threshold_probability_and_confusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_nan_and_wrong_pair_count_rejected (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_query_metrics_hand_ranked_graph_ties_and_self_exclusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 7 tests in 0.992s\r\n\r\nOK\r\n"
+    }
+  ],
+  "counts": {
+    "total": 17,
+    "passed": 14,
+    "skipped": 3
+  },
+  "new_train_audit": {
+    "groups": 180,
+    "pairs": 68040,
+    "positives": 3600,
+    "authorized_local_test_invocations": 2,
+    "valid_labels": 0,
+    "test_labels": 0,
+    "owners": 0,
+    "old_assets": 0
+  },
+  "memory_bytes_by_order_stage": [
+    165288,
+    168582,
+    177404,
+    169754,
+    170838,
+    157196,
+    183811,
+    176516,
+    171300
+  ],
+  "six_largest_training_groups_with_rng_bytes": 213117,
+  "public_tokenizer_audit": {
+    "records": {
+      "train": 18343,
+      "development": 6120,
+      "heldout": 12139
+    },
+    "max_tokens": {
+      "train": 91,
+      "development": 90,
+      "heldout": 90
+    },
+    "truncation": false,
+    "labels_read": 0
+  },
+  "original_labse": {
+    "file_count": 12,
+    "total_size_bytes": 1900941462,
+    "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+    "local_hash_verified": true
+  },
+  "reviewed_implementation_claims": [
+    "Pure item/account text pooling and symmetric pair logits; no old numeric/identity fields.",
+    "Complete fixed account graph labels align by identifiers before model use; valid/test truth excluded.",
+    "Current/replay BCE means each weight one with a single update; separate paired current and historical dropout seeds.",
+    "Shared first model/Adam; cumulative reset from common original state; 5400 formal physical updates.",
+    "Algorithm R exact small enumeration; full group text/labels and RNG in byte accounting; method has no evicted-history lookup.",
+    "Actual saved state reload and complete blind score equality precede intermediate state cleanup.",
+    "Domain-level forgetting aggregates groups before taking the best previous stage; AP is distinct from trapezoidal PR-AUC.",
+    "Valid read occurs after complete source/output/reload and remote model receipt checks; test remains blind.",
+    "Runtime cap, artifact reserve and separate training/inference/check timing."
+  ],
+  "remaining": [
+    "Three PyTorch contract cases skipped on Windows.",
+    "Actual new LaBSE GPU gradients, encoder/head updates, Adam reload and live four-arm orchestration have not run.",
+    "External GPT 6 Pro implementation review pending.",
+    "No new Linux connection, probe, synchronization or training.",
+    "Six approved local browser files remain blocked by automatic policy."
+  ],
+  "historical_reviews_read_full": [
+    "reports/seller_alias_continual/20260907/text_core/review.json: actual_final_reply and local_disposition",
+    "reports/seller_alias_continual/20260907/text_run/review.json: actual_new_reply and independent_disposition"
+  ],
+  "source_files_before_runtime_case_gate": [
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20499,
+      "sha256": "f080774a8c90dc15e9565cf7c1398e31da2a7e407bd33dafeb8c4501ce55dafc"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 20790,
+      "sha256": "ee6d543b28a9bb1638fc1321dfe8a3923424ab95c02987c0c0bb637d47a1ce3d"
+    },
+    {
+      "path": "tests/test_step28_continual_population_contracts.py",
+      "bytes": 15847,
+      "sha256": "6a93d61f2ec7dee450e2faa2d41762c0170e96913d8fb95495e536c0d815f0f8"
+    },
+    {
+      "path": "schema/step28_continual_population_policy.json",
+      "bytes": 3187,
+      "sha256": "5cb842565ed42082907dd8745a8e09b698e55e6ee5ff3e7fefb20bf63f6ef9b2"
+    }
+  ],
+  "after_full_suite_change": "Runner invokes all three real Torch contract cases before its actual LaBSE check; evaluator requires that zero-skip receipt. Added code parsed; seven affected metric/gate tests passed. The three Torch cases remain pending the authorized Linux environment."
+}

@@ -1,0 +1,92 @@
+{
+  "study": "seller_alias_continual_content_shift",
+  "root_seed": 20260909,
+  "created_utc": "2026-09-09T06:41:59.842687+00:00",
+  "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "argv": [
+    "scripts/step28_continual_dataset.py",
+    "build",
+    "--out",
+    "C:\\Users\\35734\\Downloads\\2018-10-05-grams-finalexports\\reports\\seller_alias_continual\\20260909\\dataset_generation\\20260909_144156\\data"
+  ],
+  "catalog_bounds": {
+    "maximum_title_characters": 15,
+    "maximum_description_characters": 76
+  },
+  "files": {
+    "development/items.jsonl": {
+      "bytes": 2344948,
+      "sha256": "dda0cfa4c4880955549de20b5817a85896bf511a4f541141bf9cbe1d1b08930d"
+    },
+    "development/supervision/owners.csv": {
+      "bytes": 166356,
+      "sha256": "dda3f0c60d079b9dae4db9ebc037abc23efdc31ef8eaf7f5b1b945373bc658f1"
+    },
+    "development/supervision/pairs.csv": {
+      "bytes": 2290729,
+      "sha256": "07f073f2b2e97dd74221957d77f00d10a8c7db4af0f00c8788a4db2c529b5e50"
+    },
+    "groups.csv": {
+      "bytes": 18756,
+      "sha256": "8fd4d39de0d1bf34d1f87932da2a626a0af4700f3eed8bd766516d5fab1ae6a2"
+    },
+    "heldout/items.jsonl": {
+      "bytes": 4631221,
+      "sha256": "fcac1aacbac98374b4af08fecab9c3ff544aea2b630556f9f188cb189c0e1c20"
+    },
+    "heldout/supervision/owners.csv": {
+      "bytes": 332676,
+      "sha256": "29ab281f771f32533b11394f4530800f2541fa247098d0bff6d23eb8a554d841"
+    },
+    "heldout/supervision/pairs.csv": {
+      "bytes": 4581409,
+      "sha256": "a372b5676c51836728fcd45a7776fd203745f86d862a4570c0dcbbefcd46ad32"
+    },
+    "sources/chinese_train_style_profile.json": {
+      "bytes": 3185,
+      "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34"
+    },
+    "sources/step28_continual_catalog.json": {
+      "bytes": 7875,
+      "sha256": "c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660"
+    },
+    "sources/step28_continual_dataset.py": {
+      "bytes": 17215,
+      "sha256": "7357f9d96963447b1952e35a20aa90f27a68f881c08909012071b9b6c942e28b"
+    },
+    "sources/step28_continual_dataset_policy.json": {
+      "bytes": 2390,
+      "sha256": "a95686ea46440ce1b3e7cfd005f4f59f4b5233ca363baa4125df58fdf450e2c2"
+    },
+    "sources/step28_continual_dataset_verify.py": {
+      "bytes": 19726,
+      "sha256": "27346d0267c64d995cb681527d119b3ee7bdf07b99b26a7799789610e0b4539e"
+    },
+    "train/items.jsonl": {
+      "bytes": 7004982,
+      "sha256": "2ef2823b9ec739065ce7625803a9de03d8bfc0c9a2337dccf8520c95dbb640c9"
+    },
+    "train/supervision/owners.csv": {
+      "bytes": 498996,
+      "sha256": "56f698b2048bbd3975ca435a6cf239ba6aaf894b3505bc7e4dcc38d088e53b15"
+    },
+    "train/supervision/pairs.csv": {
+      "bytes": 6872089,
+      "sha256": "fb16574e3718d4abc7145d289c084aa657bbd454566de601142c2bd69d03e2c9"
+    }
+  },
+  "model_text_fields": [
+    "title",
+    "description"
+  ],
+  "supervision_scope": "New synthetic ownership and pair labels for all three splits only.",
+  "limitations": [
+    "Artificial content and dependence mechanisms, not fitted real Chinese market distributions.",
+    "Three mixtures over shared categories, not unseen-category arrival or real chronology.",
+    "Independent heldout controllers; not new aliases of a previously seen controller.",
+    "One or two positives among 27 candidates per query; no market-wide/open-set retrieval.",
+    "No guarantee of learning, forgetting, replay benefit, novelty, or real-market effectiveness."
+  ],
+  "status": "BUILT_AWAITING_INDEPENDENT_VALIDATION"
+}

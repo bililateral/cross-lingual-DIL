@@ -1,0 +1,179 @@
+{
+  "status": "EXTERNAL_REVIEW_READ_TWO_REPRODUCIBILITY_FIXES_CLOSED_LOCALLY_REAL_RUNTIME_PENDING",
+  "conversation_url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+  "submission_record": "submission.json",
+  "actual_reply": {
+    "id": "5e20247e-43de-4f51-92b8-f3900d87feef",
+    "role": "assistant",
+    "model": "gpt-6-pro",
+    "text": "一、实际读取与原字节核对\n\n**本条十个附件均完整可读；实际字节数及重新计算的完整 SHA-256，全部与提交清单一致。**以下审查针对这十份当前附件，不以此前生成器通过代替训练实现审查。\n\n文件\t实际读取范围\t实际字节数\tSHA-256核对\nstep28_continual_population.py\t全文；13个顶层函数及内嵌模型类\t9,699\t一致\nstep28_continual_population_data.py\t全文；供数、对齐、缓存、随机流与日程\t11,587\t一致\nstep28_continual_population_run.py\t全文；检查、四臂编排、保存清理、预算及入口\t21,310\t一致\nstep28_continual_population_evaluate.py\t全文；完整性门、指标、bootstrap及入口\t20,603\t一致\ntest_step28_continual_population_contracts.py\t全文；全部17个用例及玩具编码器\t15,847\t一致\nstep28_continual_population_policy.json\t全部字段\t3,187\t一致\nSELLER_ALIAS_POPULATION_TRAIN.zh.md\t全文\t11,568\t一致\nchecks.json\t全部记录，包括修改前来源与修改后检查范围\t10,186\t一致\nSELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md\t全文\t8,584\t一致\n数据生成 manifest.json，上传名为 manifest(7).json\t全部来源、载荷记录、边界与状态\t3,627\t一致\n\nchecks.json登记的六项当前源码／政策散列也与附件实际字节一致。它如实区分了原完整测试与随后增加运行门槛的修改，没有把后者描述成已在真实PyTorch环境执行。\n\nchecks\n\n本次实际执行范围\n\n外审环境为 Python 3.13.5、PyTorch 2.10.0+cpu、NumPy 2.3.5、scikit-learn 1.8.0，没有CUDA，也没有本项目的LaBSE文件和新数据载荷。\n\n我执行了原测试中不依赖新数据载荷的16项，结果为：\n\n15项通过、1项报错、0项跳过。\ntest_real_new_train_audit_no_valid_test_owners_or_old_labels未执行，不能把本地真实train供数审计计入外审实测。\n\n另做了两个范围受限的核验：仅在临时内存副本中修正下面R1的一处调用后，三个PyTorch语义用例全部通过；使用不含真实数据的结构夹具反证了下面R2的验收漏检。没有训练LaBSE、评价真实valid、读取test标签或连接你的Linux服务器。\n\n总体结论：研究计算主路径基本落实，但当前字节存在两处必要修复。其中一处会使强制检查确定失败，当前版本不能直接正式运行。\n\n二、确认需要修复的问题\nR1．强制PyTorch用例调用了元组字段，正式入口会在检查阶段确定停止\n\n分类：REPRODUCIBILITY_DEFECT；直接阻断执行。\n\n定位：\nTorchContracts.test_separate_branches_match_independent_sum_and_one_adam_update()，第265行：\n\nPython\n运行\nfor rows in replay.items()\n\n这里的replay是data.Group，其items是元组字段，不是方法。原附件实际执行得到：\n\nTypeError: 'tuple' object is not callable\n\n错误发生在构造带有\" OLD\"文本的历史群时，尚未进入该用例要比较的梯度计算。\n\ntest_step28_continual_populatio…\n\n这不是仅影响一个可选测试。runtime_check()真实调用整个TorchContracts，并要求恰好三个用例全部成功且无跳过；该错误因此必然使运行器在正式日程前停止。它也不是CPU与GPU的数值差异：元组不可调用在目标Python环境中同样成立。\n\nstep28_continual_population_run\n\n受影响主张：“三个必要语义用例通过后可进入真实LaBSE检查及正式日程”目前无法实现；不能据此反推ER损失或编码器训练算法错误。\n\n**最小修复：**只把replay.items()改为replay.items，保留该用例、三项零跳过门槛和全部原断言。\n\n我仅在临时副本中做了这一个改动，三个PyTorch用例随即全部通过，包括两分支梯度之和、单次Adam更新，以及新对象加载模型／Adam后的下一步一致性。这支持该修复足以解决已复现的测试错误，不替代真实LaBSE／CUDA核验。\n\nR2．独立验收没有要求最后阶段ER缓存记录必须存在\n\n分类：REPRODUCIBILITY_DEFECT；评价前完整性漏检，不是已发生的错误训练。\n\n定位：\nvalidate_run()第190—200行。缓存检查受以下条件控制：\n\nPython\n运行\nif \"memory\" in record:\n\n也就是“存在就检查”，没有先规定哪些评分点必须具有缓存记录。ER第二阶段的训练轨迹会引用shared缓存，第三阶段会引用er_stage2缓存，因此前两个点受到间接约束；但er_stage3之后没有训练阶段引用它，最后一份缓存记录可直接缺席。\n\nstep28_continual_population_eva…\n\n**已执行的最小反例：**在只用于检查接受／拒绝路径的结构夹具中，删除三个顺序各自er_stage3的memory条目及对应临时文件，其余必需点、轨迹、分数和回执结构保持满足现有检查；按当前verify_models()生成与该夹具清单一致的回执后，validate_run()仍返回成功。该夹具没有真实训练或模型资格含义，只证明这项必需记录可以漏检。\n\n**受影响主张：**当前不能把验收通过解释为“九份正式缓存状态全部核验后才读取valid”。它不改变BCE、reservoir或AP公式，也不证明缓存实际丢失。正常run()路径确实会在阶段结束入库后，把er_stage3缓存传给point()保存；缺口在独立验收的必需项定义。\n\nstep28_continual_population_run\n\n**最小修复：**在每个顺序的评分点检查中，要求带缓存记录的点集合精确为：\n\nPython\n运行\nrequired_memory_points = {\"shared\", \"er_stage2\", \"er_stage3\"}\nactual_memory_points = {\n    name for name, record in order[\"points\"].items()\n    if \"memory\" in record\n}\nif actual_memory_points != required_memory_points:\n    raise ValueError(\"Missing/extra required historical memory evidence\")\n\n之后沿用已有的seen、六群数量、1 MiB、字节／散列检查即可。不需要解析快照里的训练标签，不需要重做reservoir，也不需要增加审批或状态机。\n\n三、训练主路径逐项判断\n1．纯文本输入、记录多重性、边序及梯度路径：未发现违约\n\nArchive按卖家ID排序账号、按商品ID排序记录，align_labels()再按同一卖家顺序的完整无序组合重排监督，不依赖CSV原行序。pair_logits()使用上三角边；我另行核对了28账号时，PyTorch上三角顺序与itertools.combinations(range(28), 2)逐项相同。因此，提交代码中的账号池化顺序、378个logit顺序和标签顺序相容。\n\nstep28_continual_population_data +1\n\n \n\nstep28_continual_population\n\naccount_vectors()实际提取的编码文本只有title + \"\\n\" + description。商品向量逐条归一化，按每账号真实记录数量求均值，再归一化账号向量；没有去重、截取部分商品或追加编号／域／标签特征。直接调用编码器前向，.float()没有切断梯度；inference_mode()只出现在评分函数中。\n\nstep28_continual_population +1\n\n额外玩具核验中，保持正文与记录位置不变，替换群ID、卖家ID、商品ID及标签后，账号向量完全一致；捕获的实际分词器输入也恰好是规定的正文拼接。这证明了当前调用接口的文本边界，不是对未提供真实文本的重新审计。\n\n非重入激活重算及保留随机状态已在加载路径启用。提交代码没有主动detach、缓存旧嵌入或调用无梯度的encode()来替代训练前向；真实LaBSE版本上的梯度及GPU可运行性仍需既定运行检查确认。\n\nstep28_continual_population\n\n2．两项mean BCE、一次更新及当前／历史随机流：实现一致\n\nupdate()先清梯度，分别反传当前群和历史群的平均BCE，然后联合裁剪并只调用一次optimizer.step()。没有把两项再除以二，没有额外历史更新，也没有在两次反传之间清除当前梯度。\n\nstep28_continual_population\n\ntrain_stage()对sequential和ER使用相同的current日程种子，以及相同的逐更新dropout_current种子。历史抽样使用独立Python随机对象，历史dropout另派生种子；每次当前分支都重新设定其Torch种子，所以此前历史分支消耗的随机数不会改变下一个当前分支的起点。\n\nstep28_continual_population_run\n\nR1修正后的玩具用例实际验证了：独立反传两项损失所得梯度，与独立构造的损失和反传相符；随后裁剪与单次Adam更新也相符。无需为“公平性”擅自改变已批准的损失权重。\n\n3．共享Adam、累计重置及检查后的初始化恢复：实际编排成立\n\n首阶段只物理训练一次，保存带非空Adam的共享状态。sequential与ER分别从该磁盘状态恢复模型和优化器；累计臂在第二、第三阶段各自恢复原始模型，再创建空Adam，对已到达前缀训练。并非仅在注释里说“累计重训”。\n\nstep28_continual_population_run\n\nruntime_check()在校验更新前保存原始模型，校验后恢复并分别比对编码器与头的状态摘要，丢弃检查用优化器。测试改变全局随机状态不构成此处的正式初始化污染：正式更新的dropout种子随后逐步显式设置，正式优化器也重新创建。\n\nstep28_continual_population_run\n\n真实运行检查还覆盖两分支分别具有有限非零编码器／头梯度、联合更新确实改变两个模块、Adam已执行一步，以及模型／Adam磁盘重载。修复R1后，这组必要检查的设计与当前新增接口相对应；目前仍未实测真实LaBSE，不应写成已通过。\n\n4．reservoir阶段边界与自包含预算：未发现越界回读路径\n\nMemory.add_stage()落实了容量六的Algorithm R；train_stage()开始、结束比较缓存序列化字节，阶段内不入库。正式编排只在该阶段三轮全部完成后调用一次add_stage(current)，没有按epoch重复入库。历史群仅从memory.groups抽取。\n\nstep28_continual_population_data\n\n \n\nstep28_continual_population_run +1\n\n保存内容包括保留群的正文、规范边序标签、计数和reservoir随机状态，不是只存ID再回查全历史。离线Archive确实能索引全部train，但当前模型更新函数只接收当前群及已选历史群，累计臂另接收已到达前缀；不能把这两层访问范围混为一谈。\n\n精确小规模均匀性、缓存序列化还原及下一次选择一致性的原用例，本次均通过。九个实际缓存字节数和最大六群213,117字节仍是本地报告证据；由于缺少真实train载荷，我未独立复测这些具体数值。\n\nchecks\n\n四、更新数、保存重载、资源及耗时\n数量核算成立\n项目\t每顺序\t三顺序\n共享首阶段物理更新\t180\t540\nsequential后两阶段\t360\t1,080\nER后两阶段\t360\t1,080\ncumulative后两阶段\t360＋540＝900\t2,700\n正式物理更新合计\t1,800\t5,400\n额外历史群前后向\t360\t1,080\n正式评分点\t8\t24\n长期推理模型\t4\t12\n\n对应当前群边呈现2,041,200次、额外历史边呈现408,240次。额外历史计算没有被错误加进物理优化器更新数。计数循环和最终汇总与这一算术一致。\n\nstep28_continual_population_run\n\n重载不是只比文件哈希\n\npoint()先计算完整valid/test分数，保存模型及相应Adam，再实际torch.load并装回模型／优化器，重新计算两套完整分数，要求逐元素相等。restore_state()还检查实际加载后的模型及优化器状态摘要，不是仅检查保存文件存在。初始点没有已训练Adam，这是原始状态；其他训练点按传入优化器保存恢复。\n\nstep28_continual_population_run\n\n \n\nstep28_continual_population\n\n长期推理模型另行保存、实际加载，并与已经重载评分的模型摘要比较；中间大状态在相应核验后删除。当前实现没有把“哈希存在”冒充Windows已反序列化Linux模型。\n\nstep28_continual_population_run\n\n峰值不能只算12个最终模型，但计划未出现明显数量矛盾\n\n令单份模型张量规模为 P。最后一个顺序的最终累计点附近，会同时存在约12份推理权重、1份初始权重、共享全状态和当前全状态，峰值量级约为：\n\n12P+P+3P+3P=19P，\n\n另加序列化元数据、小记录和分数。以附件给出的预训练包体量仅作数量级参考，19倍约33.64 GiB；**这不是实际state_dict大小的测量，也不是40 GiB已验收通过。**代码在写大状态前按实际张量规模预留，之后继续检查目录占用，保存计划本身没有明显超出40 GiB的算术矛盾。\n\nstep28_continual_population_run\n\n24点两套float32分数合计约6.54 MB，主要磁盘成本确实来自模型／Adam，不是分数数组。\n\n耗时字段能支持报告，但要按实际含义命名\n\n阶段training_seconds及最终formal_training_seconds记录的是正式训练段墙钟耗时，包含该段必要编排和进度记录。point()的inference_seconds_including_replay只累加保存前、重载后的两遍评分；保存、加载和摘要比对包含在total_point_seconds中，不能把前者直接写成全部保存重载耗时。长期推理模型另存的开销也应与纯评分时间区别。\n\nstep28_continual_population_run +1\n\n当前没有正式训练耗时可报告。12小时仍是阶段上限，不是实测时间或预计完成时间。\n\n五、valid-only评价与指标逻辑\n标签读取顺序基本正确，R2是其中的具体缺口\n\nevaluate()先以train_labels=False建立公开供数，再执行validate_run()，完成后才打开当前新数据的development/supervision/pairs.csv，按群及端点对齐解析一次。没有调用test标签、owners或旧资产解析器。完整test盲分数会检查尺寸、有限性及散列，但不计算test指标。\n\nstep28_continual_population_eva…\n\n验收实际检查来源、输入记录、顺序、训练日程、轨迹、24点分数映射及12模型回执，不是只相信一个COMPLETE字符串。R2补齐后，九份正式缓存的存在性也才能纳入这一必经门。\n\nstep28_continual_population_eva…\n\nAP、MAP与候选排序没有混用\n\ncurve_metrics()按并列分数组块计算AP，梯形PR-AUC使用另一公式；本次对照独立sklearn的原用例通过。查询检索从完整无序图恢复对称邻接矩阵，排除自身，并列分数按固定公开账号顺序处理；MAP、MRR、Recall与NDCG分别按查询计算再群内平均。\n\nstep28_continual_population_eva… +1\n\n主指标是每群完整378边的pair AP，再群等权、域等权；不是查询MAP，也不是pooled AP。最终汇总直接平均全部群，在本次每域恰好20个valid群的固定结构下，等价于域等权，不构成当前错误。阈值固定为logit 0，概率指标和混淆统计没有用于早停或参数选择。\n\nstep28_continual_population_eva… +1\n\n域级旧表现与配对不确定性符合当前定义\n\nold_domain_change()确实先对群求域均值，再沿既往阶段取最大。当前文档明确采用有符号的“最好既往值−当前值”，代码与此一致；不能将刷新既往最佳产生的负值误判成实现错误。\n\nstep28_continual_population_eva…\n\n \n\nSELLER_ALIAS_POPULATION_TRAIN.zh\n\npaired_interval()先对同一群的三个固定顺序差值求均值，再在每个域内抽整群，并对域等权平均。它没有将三个顺序展开成180个独立群；5000次抽样和固定种子均来自政策。本次对应的配对／不等域样本数手算用例通过。区间仍只是在当前固定训练条件下对评价群变化的条件性不确定性，不覆盖全部训练随机性。\n\nstep28_continual_population_eva…\n\n六、分类汇总与最终判断\n分类\t本轮结论\t必要处理\nSCIENTIFIC_BLOCKER\t0项已确认的研究逻辑错误\t未发现输入泄漏、损失／更新数错误、累计未重置、阶段内错误入库或主指标／bootstrap定义错配。\nREPRODUCIBILITY_DEFECT\t2项\tR1修正元组字段调用，解除必然失败的运行门；R2明确三处必需缓存点，补齐valid读取前的完整性核验。\nOUT_OF_SCOPE_OVERDESIGN\t不提出新增要求\t不改数据、四臂、种子、损失权重或缓存容量；不增加身份资产、审批、安全工程、重复smoke或新基线。\n\n真实新数据供数、LaBSE文件内容、CUDA下非重入重算／BF16、实际GPU峰值以及完整日程耗时，仍未在外审环境实测。这些合理待办本身不计为现有实验失败；但R1是已经实际复现、不能留到正式运行时碰运气的代码错误。\n\n按你给出的执行状态，六个临时文件的清理前置条件也仍未完成；它与上述代码缺陷分开，不计入科学问题数量。本次审查不改变已有执行边界。\n\n当前版本仍需修复后才可正式运行。修复范围仅为上述两处，不涉及重新选题、重新生成数据或重新确认已批准参数；修复后仍执行既定的真实PyTorch／LaBSE检查，而不是以本次CPU玩具结果替代它。",
+    "math": [
+      "P",
+      "12P+P+3P+3P=19P，"
+    ],
+    "links": []
+  },
+  "original_reviewed_files": [
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20603,
+      "sha256": "708c6ff378934311a7606d2ea1a1554276e417c14c8457762418f0e78f36e085"
+    },
+    {
+      "path": "tests/test_step28_continual_population_contracts.py",
+      "bytes": 15847,
+      "sha256": "6a93d61f2ec7dee450e2faa2d41762c0170e96913d8fb95495e536c0d815f0f8"
+    },
+    {
+      "path": "schema/step28_continual_population_policy.json",
+      "bytes": 3187,
+      "sha256": "5cb842565ed42082907dd8745a8e09b698e55e6ee5ff3e7fefb20bf63f6ef9b2"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_POPULATION_TRAIN.zh.md",
+      "bytes": 11568,
+      "sha256": "51a3e9f4a0f531c1be29c9cd1a0846e4925157946549c49323fab7abe6249e71"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260909/population_implementation/checks.json",
+      "bytes": 10186,
+      "sha256": "b2c3782904667dc328a71158decd53d6736ec83e48750674a33c58ba1ebcb8a1"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md",
+      "bytes": 8584,
+      "sha256": "eda256ff6012e9376ca72405b3676608e57704259d393a4d6fcd784484ee446a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260909/dataset_generation/20260909_144156/data/manifest.json",
+      "bytes": 3627,
+      "sha256": "667dd896a0848a469cf00d45f5f726460532afe5c9e21b1dba3fcffa23e0f982"
+    }
+  ],
+  "external_execution": {
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu",
+    "numpy": "2.3.5",
+    "sklearn": "1.8.0",
+    "original_tests_passed": 15,
+    "original_tests_error": 1,
+    "original_tests_skipped": 0,
+    "real_dataset_test_not_run": 1,
+    "three_torch_cases_passed_after_reviewer_minimal_R1_patch": true,
+    "not_local_runtime_evidence": true
+  },
+  "local_disposition": [
+    {
+      "id": "R1",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "decision": "CLOSED_LOCALLY_MINIMAL_SOURCE_FIX_REAL_TORCH_PENDING",
+      "claim": "Required Torch contract suite must be executable before LaBSE validation/formal training.",
+      "change": "In the historical toy group comprehension, replay.items() -> replay.items. Keep all three zero-skip runtime cases and original gradient/update/reload assertions.",
+      "before": {
+        "chunk_id": "3f0d4c",
+        "wall_time_seconds": 1.9441039,
+        "exit_code": 0,
+        "original_token_count": 74,
+        "output": "{\"status\": \"R1_REPRODUCED_FROM_EXACT_SOURCE_AST_WITHOUT_TORCH\", \"error\": \"'tuple' object is not callable\", \"source\": \"replay = data.Group(replay.uid, replay.sellers,\\n                            tuple(tuple((u, t + \\\" OLD\\\", d) for u, t, d in rows) for rows in replay.items()), replay.labels)\"}\r\n"
+      },
+      "after": {
+        "chunk_id": "c04d3f",
+        "wall_time_seconds": 1.9981608,
+        "exit_code": 0,
+        "original_token_count": 35,
+        "output": "{\"status\": \"R1_EXACT_SOURCE_EXPRESSION_FIXED\", \"accounts\": 28, \"labels\": 378, \"project_labels_read\": 0, \"does_not_claim_torch_pass\": true}\r\n"
+      },
+      "boundary": "Exact failing source expression was executed without Torch before/after. Reviewer's CPU Torch pass is external evidence; all three original tests still must pass on py310."
+    },
+    {
+      "id": "R2",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "decision": "CLOSED_LOCALLY",
+      "claim": "All nine formal memory snapshots must be mandatory before valid label access.",
+      "change": "Require memory-bearing point set to be exactly shared, er_stage2, er_stage3 in each order before the existing per-file checks.",
+      "verification": "New mutation regression rejects each missing required memory and extra initial memory, and exercises the actual validate_run call before label access using a minimal structural fixture; eight affected metrics/gates pass. No snapshot labels are parsed."
+    }
+  ],
+  "post_review_checks": [
+    {
+      "command": "python -X utf8 -B -m unittest discover -s tests -p 'test_step28_continual_population_contracts.py' -k MetricContracts -v",
+      "chunk_id": "624549",
+      "wall_time_seconds": 3.233759,
+      "exit_code": 0,
+      "original_token_count": 262,
+      "output": "test_all_three_required_cache_points_must_exist (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_ap_pr_auc_roc_ties_against_independent_sklearn (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_bootstrap_pairs_orders_and_equal_domains (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_domain_forgetting_takes_max_after_group_aggregation (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_failed_run_stops_before_truth_access (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_logit_threshold_probability_and_confusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_nan_and_wrong_pair_count_rejected (test_step28_continual_population_contracts.MetricContracts) ... ok\r\ntest_query_metrics_hand_ranked_graph_ties_and_self_exclusion (test_step28_continual_population_contracts.MetricContracts) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 8 tests in 1.062s\r\n\r\nOK\r\n"
+    },
+    {
+      "command": "python -X utf8 -B -m unittest discover -s tests -p 'test_step28_continual_population_contracts.py' -k TorchContracts -v",
+      "chunk_id": "8053d7",
+      "wall_time_seconds": 2.0667116,
+      "exit_code": 0,
+      "original_token_count": 188,
+      "output": "test_real_torch_save_fresh_reload_adam_next_update_and_token_limit (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\ntest_record_multiplicity_symmetric_pairs_and_encoder_gradient (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\ntest_separate_branches_match_independent_sum_and_one_adam_update (test_step28_continual_population_contracts.TorchContracts) ... skipped 'Windows environment has no PyTorch; real semantics remain pending Linux'\r\n\r\n----------------------------------------------------------------------\r\nRan 3 tests in 0.000s\r\n\r\nOK (skipped=3)\r\n"
+    }
+  ],
+  "current_source_files": [
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "tests/test_step28_continual_population_contracts.py",
+      "bytes": 18405,
+      "sha256": "18f2efc2dc09bf70e22f94fa7c3dc0775dca75640257d3997b606748dffd24ba"
+    },
+    {
+      "path": "schema/step28_continual_population_policy.json",
+      "bytes": 3187,
+      "sha256": "5cb842565ed42082907dd8745a8e09b698e55e6ee5ff3e7fefb20bf63f6ef9b2"
+    }
+  ],
+  "unique_current_cases": {
+    "total": 18,
+    "local_passed": 15,
+    "local_skipped": 3,
+    "scope": "Seven unchanged data contracts reused from checks.json; eight current metric/gate contracts passed after fixes; three Torch cases remain skipped locally."
+  },
+  "timing_note": "formal_training_seconds is wall time within training stages including necessary orchestration/logging. inference_seconds_including_replay is only both scoring passes; total_point_seconds additionally includes saving/loading/hash checks. Final reporting must separate these from synchronization and other runtime overhead.",
+  "scientific_configuration_changed": false,
+  "real_dataset_regenerated": false,
+  "new_valid_test_labels_read": 0,
+  "linux_connection_probe_copy_training": false,
+  "remaining": [
+    "Mandatory three Torch cases and actual LaBSE check on original py310.",
+    "User's reported-stage resumption before any Linux connection/probe/sync.",
+    "Approved six local browser files remain blocked by automatic policy; cleanup-before-formal-training condition not waived."
+  ],
+  "no_redundant_external_review": "Local fixes implement the two exact minimal remedies from the actual review; affected checks recorded. No unchanged evidence or research configuration resubmitted."
+}

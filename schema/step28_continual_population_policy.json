@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "study": "continual_chinese_seller_alias_new_populations",
+  "status": "USER_APPROVED_CONFIGURATION",
+  "data_root": "reports/seller_alias_continual/20260909/dataset_generation/20260909_144156/data",
+  "data_manifest_sha256": "667dd896a0848a469cf00d45f5f726460532afe5c9e21b1dba3fcffa23e0f982",
+  "data_validation_sha256": "7a6ccfd55724acf73f196819ec3e5305ae886a6100822fc9af3a2a7bd176eb75",
+  "model": {
+    "path": "models/step7/embeddings/labse",
+    "file_count": 12,
+    "total_size_bytes": 1900941462,
+    "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21",
+    "embedding_dim": 768,
+    "pair_head": [
+      1536,
+      128,
+      1
+    ],
+    "activation": "relu",
+    "input": "title + newline + description for each record",
+    "account_pooling": "L2-normalize each item embedding, mean all records with multiplicity, L2-normalize account mean",
+    "pair_input": "concatenate absolute difference and elementwise product",
+    "token_budget": 256,
+    "microbatch": 4,
+    "encoder_bf16": true,
+    "activation_checkpointing": true
+  },
+  "initialization_seed": 20260909,
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "epochs_per_stage": 3,
+  "groups_per_domain": {
+    "train": 60,
+    "development": 20,
+    "heldout": 40
+  },
+  "arms": [
+    "frozen",
+    "sequential",
+    "er",
+    "cumulative"
+  ],
+  "physical_updates": 5400,
+  "optimizer": {
+    "name": "AdamW",
+    "encoder_lr": 0.00002,
+    "encoder_weight_decay": 0.01,
+    "head_lr": 0.001,
+    "head_weight_decay": 0,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-8,
+    "foreach": false,
+    "clip_norm": 1
+  },
+  "loss": "mean unweighted BCE current + mean unweighted BCE one replay group; one optimizer step",
+  "memory": {
+    "capacity_groups": 6,
+    "maximum_bytes": 1048576,
+    "selection": "Uniform Algorithm R over unique completed groups, update only after finishing each stage",
+    "replay": "Uniform one retained complete group per current update, with replacement",
+    "self_contained": true
+  },
+  "evaluation": {
+    "split": "development",
+    "heldout_labels_allowed": false,
+    "blind_score_splits": [
+      "development",
+      "heldout"
+    ],
+    "primary_metric": "domain_equal_group_equal_pair_average_precision",
+    "primary_comparison": "final_er_minus_sequential_mean_over_three_fixed_orders",
+    "threshold_logit": 0,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260909,
+    "confidence_level": 0.95,
+    "bootstrap_unit": "independent full group, within domain, paired across methods and orders"
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 43200,
+    "maximum_output_bytes": 42949672960,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "one_gpu": true,
+    "torch_cpu_threads": 1,
+    "retain_inference_models_per_order": 4,
+    "windows_copy_large_models": false
+  },
+  "forbidden_inputs": [
+    "controller_uid",
+    "identity_features",
+    "legacy_numeric_features",
+    "domain_as_model_feature",
+    "development_labels_in_training",
+    "heldout_labels",
+    "old_labels_qrels_audit_assets"
+  ]
+}
