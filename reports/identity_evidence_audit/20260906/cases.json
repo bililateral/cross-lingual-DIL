@@ -1,0 +1,98 @@
+{
+  "status": "PASSED_HAND_CHECKABLE_OBSERVATION_AND_REPRESENTATION_CASES",
+  "scope": "contrived cases; not formal benchmark results or real-world error rates",
+  "full_four_sellers_shared_token": {
+    "parsed_occurrences": 4,
+    "nonzero_features": {
+      "shared_identifier_type_count_log1p": 0.6931471805599453,
+      "high_frequency_token_count_log1p": 0.6931471805599453,
+      "shared_telegram_token_count_log1p": 0.6931471805599453,
+      "weak_path_count_log1p": 1.0986122886681098
+    },
+    "frozen_i0_probability": 0.004454497282591305,
+    "identity33_sha256": "d234f374083ab5f3972cc370bc45dc1ba03fe382488ef773a5a96bc228d3024d"
+  },
+  "partial_two_sellers_shared_token": {
+    "parsed_occurrences": 2,
+    "nonzero_features": {
+      "verified_direct_token_count_log1p": 0.6931471805599453,
+      "bilateral_direct_item_count_log1p": 0.6931471805599453,
+      "shared_identifier_type_count_log1p": 0.6931471805599453,
+      "shared_telegram_token_count_log1p": 0.6931471805599453
+    },
+    "frozen_i0_probability": 0.40690405991700246,
+    "identity33_sha256": "3081eb83ddce955c2ab6907234fe216c28e09ef66331233912376ec42be727d9"
+  },
+  "explicit_third_party_shared_context": {
+    "parsed_occurrences": 2,
+    "nonzero_features": {
+      "verified_direct_token_count_log1p": 0.6931471805599453,
+      "bilateral_direct_item_count_log1p": 0.6931471805599453,
+      "shared_identifier_type_count_log1p": 0.6931471805599453,
+      "shared_telegram_token_count_log1p": 0.6931471805599453
+    },
+    "frozen_i0_probability": 0.40690405991700246,
+    "identity33_sha256": "3081eb83ddce955c2ab6907234fe216c28e09ef66331233912376ec42be727d9"
+  },
+  "third_party_context_same_identity33_as_ordinary": true,
+  "two_hop_distinct_tokens": {
+    "parsed_occurrences": 4,
+    "nonzero_features": {
+      "strong_rotation_path_count_log1p": 0.6931471805599453,
+      "uncorroborated_rotation_path_count_log1p": 0.6931471805599453,
+      "maximum_strong_middle_degree_log1p": 1.0986122886681098,
+      "rotation_telegram_edge_token_count_log1p": 1.0986122886681098
+    },
+    "frozen_i0_probability": 0.6882530144887494,
+    "identity33_sha256": "b17340ebf258a4d2e969bce7bc5f2f69a63db98e61f91b137a31a63b1ea2255d"
+  },
+  "latent_interpretations": "Identical observable two-account or two-hop cases may describe one controller or unrelated users of shared contacts; no claim of resolving identical observations.",
+  "frozen_development_threshold": 0.12901524800642925,
+  "full_case_decision": false,
+  "partial_case_decision": true,
+  "inputs": [
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/models/i0_identity_only/theta.npy",
+      "sha256": "c68c09c5aa1ffd04ae6bd6e7dae50d5efbe10bdc922afe0a158cca557bec104e"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/models/i0_identity_only/scale.npy",
+      "sha256": "12206862754a79451860aed69597bf5debbf518b71f5dcca59e6dfcc6af09138"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/models/i0_identity_only/mu.npy",
+      "sha256": "50945f3550161bb77716b18720b9fc861f55994465d31b4b978e810ac28a34c3"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/development_thresholds.json",
+      "sha256": "1ec62a9ff37ce4675a7c297f70bb8f41531edce78b80d78d4c812e96a4bd4eb5"
+    },
+    {
+      "path": "scripts/step3_build_seller_profiles.py",
+      "sha256": "4b531367d3f81e863d1fbae8be1e5b9de0867e59425d2270ce88d02bff69a202"
+    },
+    {
+      "path": "scripts/step28_history_common.py",
+      "sha256": "39fe4e952563dcbee4b300c89f8c1c1072357b5687e7d128009c1b951f228eab"
+    },
+    {
+      "path": "schema/step28_synthetic_chinese_dataset_policy.json",
+      "sha256": "e0c5dbba5818c7fc45d757795d923fcda3392250f4980b67f1670370050aa389"
+    }
+  ],
+  "text_cases": {
+    "ordinary_prefix": "联系电报：",
+    "shared_third_party_prefix": "多家商户共用的第三方客服，联系电报：",
+    "fake_tokens": [
+      "audit_alpha",
+      "audit_beta"
+    ]
+  },
+  "case_construction": {
+    "full_four_sellers": "a,b,c,d each expose one occurrence of audit_alpha in ordinary_prefix",
+    "partial_two_sellers": "retain exact a,b parser rows and remove only c,d",
+    "explicit_shared_context": "a,b each expose audit_alpha in shared_third_party_prefix",
+    "two_hop": "a-c share audit_alpha; c-b share audit_beta; all ordinary_prefix",
+    "latent_truth": "contrived examples may set a and b to different controllers; no real account labels"
+  }
+}

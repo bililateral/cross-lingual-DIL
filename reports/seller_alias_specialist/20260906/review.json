@@ -1,0 +1,76 @@
+{
+  "stage": "Fixed-capacity fully supervised all-pair versus no-strong training comparison",
+  "reviewer": "Web ChatGPT GPT 6 Pro",
+  "model_selector": "6\nPro",
+  "url": "https://chatgpt.com/c/6a9d1145-9d04-83ed-825b-71f13afc9b44",
+  "started_utc": {
+    "current_time": "2026-09-06 11:08:26 UTC"
+  },
+  "completed_utc": {
+    "current_time": "2026-09-06 11:13:37 UTC"
+  },
+  "before_project_fitting": true,
+  "attachments": [
+    {
+      "path": "scripts/step28_specialist.py",
+      "size_bytes": 22257,
+      "sha256": "8974d354bacbdc20021b2ecd5d3e4bd0c6bcd39b0aed0852fd9ede806baaf4f3"
+    },
+    {
+      "path": "tests/test_step28_specialist_contracts.py",
+      "size_bytes": 7885,
+      "sha256": "755d10b22f4ee15fd6dfc28191cf9e1506e1c90cf10c9bcdd571e6943cb51047"
+    },
+    {
+      "path": "schema/step28_specialist_policy.json",
+      "size_bytes": 3932,
+      "sha256": "38e0af7b9d3bdc4156596bbd9761e1dee78fc10d41f312b367fb3dc951ac973d"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_SPECIALIST.zh.md",
+      "size_bytes": 7529,
+      "sha256": "5e99d86f0448acbdf41f43f72c9c281040c4a0c92a15a0693f0814e6461920c5"
+    },
+    {
+      "path": "scripts/step28_saved_model_audit.py",
+      "size_bytes": 16088,
+      "sha256": "08a8c4fc6ebfd16ea247cf0f71b2c27982be53045818aa280b727530635c24c6"
+    }
+  ],
+  "unchanged_dependency_ui_name": "step28_saved_model_audit(1).py",
+  "original_uploaded_plan": "# 中文卖家规则未覆盖样本的专门训练对照\n\n日期：2026-09-06。用户已授权继续本地 CPU 比较；本文件在两次新拟合前记录方案。当前尚无本实验结果，外审与运行状态在完成后追加。\n\n## 问题与已有证据\n\n在完整合成监督、相同公开特征和模型容量下，只用强规则未覆盖样本拟合，是否改善该范围的中文卖家同控排序？动机来自[保存模型诊断](SELLER_ALIAS_METHOD.zh.md)：开发强直接共享／强两跳规则覆盖 8,000 正例且没有负例，规则外有 2,000 正例和 179,000 负例。已有 M3-joint 的规则外逐世界 AP 为 0.048738；这尚未证明简单线索压制学习，也未证明剩余公开信息不可学。[字符基线](SELLER_ALIAS_CHARACTER_BASELINE.zh.md)只作无监督风格投影诊断，不能替代本次训练比较。\n\n本项是简单监督基线，尚无算法创新或跨合成机制／真实中文效果主张。不重启旧英文迁移、六档预算、复制惩罚或背景删失题目，不用新增文案生成机制制造优势。\n\n## 拟合前固定方案\n\n机器方案：[step28_specialist_policy.json](../schema/step28_specialist_policy.json)。实现：[step28_specialist.py](../scripts/step28_specialist.py)。\n\n- 两臂分别使用全部训练 pair 与训练侧公开强规则未覆盖的全部 pair；筛选为两个公开列均不大于零，不读取私有机制、控制者或配额。完整训练标签可用，筛选范围内正负例都进入拟合，不人为构造未标注集合。\n- 输入固定为当前 base24 + identity33 的 57 列；两臂共同使用仅由完整训练公开矩阵计算的中位数。专门训练仍可看到未参与标签拟合的训练行对中位数的无监督贡献，该条件对两臂相同。世界／账号 ID 只作隔离、对齐、分组与检索同分排序，不作为树特征。\n- 同为 LightGBM 4.6.0、7 叶、最小叶样本数 10、学习率 0.03、200 棵树、固定原种子、单线程。参数来自旧 M3-joint 训练内五折 OOF AP 选择，两个新模型原样共用；本项不再搜索参数，不拟合开发集，不早停、不加权、不重抽样。旧参数为全体臂选择，负结果不排除所有另行调参的专门模型。\n- 这是两次新拟合，不重复旧八网格／五折选型。拟合行数与正例先验有意不同；相同树预算不等于相同 FLOPs。筛选还会改变模型拟合的直方图分箱与默认初始类别先验，因此不能将结果唯一归因于简单样本的梯度压制。\n- 全体臂必须逐元素复现旧 M3-joint 的全部 189,000 个开发概率。两个模型各自保存后重载，全部开发原始树分数和概率必须精确一致；它们与全部预测先固定落盘，随后才解析开发标签。训练与开发标签各计划解析一次，qrels 与 Audit A/B 均不读取。\n- 只接收训练／开发公开矩阵和行键，要求账号与世界跨拆分不重叠。旧标签向量散列再次核对。没有调用旧全流水线入口，旧模型和实验产物字节不变。\n\n原训练实现的参数与 fit 路径已逐行核对：step28_model_training_core.py 的 _lightgbm_classifier／fit_m3_one，以及 step28_model_experiment_common.py 的中位数函数。新入口使用受钉定旧政策中的参数与公共矩阵，直接调用 LightGBM；不导入旧训练核心及其正式授权状态机。[LightGBM 4.6.0 官方 API](https://lightgbm.readthedocs.io/en/v4.6.0/pythonapi/lightgbm.LGBMClassifier.html)核对了树预算、样本权重默认值、预测原始分数与线程参数。既有保存模型及字符基线网页审查原文沿用同一会话已回读记录；旧训练核心最初完整外审仍未恢复，本次不声称已读该原文。\n\n## 评价与停止条件\n\n主要量固定为开发集规则外 **逐世界 AP(专门臂) − AP(全体臂)**。两个模型在相同 500 个世界和相同账号对上比较。固定 PCG64 种子 20260906，按世界配对有放回抽取 9,999 次，报告线性分位数 95% 区间。区间只条件于当前两个模型与已反复消费的开发世界，不包含训练、选题或合成机制的不确定性，不作为独立确认性显著性结论。\n\n误关联检查固定为 pooled、经验 FPR 不超过 1% 时可达到的最大召回：同分整组处理、不插值。它使用评价标签形成 ROC 特征，**不是训练内选出的部署阈值，也没有独立校准保证**；不按所得阈值调参或声称真实误关联率得到控制。\n\n继续研究需主要差值区间下界大于零，并且上述规则外召回不低于全体臂。否则终止这个固定输入／固定容量的样本范围候选；不能扩大为所有专门训练或公开信息均无效。\n\n完整列出 all／no_strong／identity33 全零子集的 AP、梯形 PR-AUC、ROC-AUC、Brier、对数损失和预先固定 0.5 概率阈值的混淆矩阵、精确率、召回、F1、特异度、平衡准确率与 MCC。树没有余弦编码器，排序使用原始树加性分数，概率只用于概率损失和固定阈值；避免概率饱和新增排序并列。\n\n全体与规则外分别报告 MRR、MAP、Recall@1/3/5/10、NDCG@1/3/5/10：由已授权对标签在各自候选集内构造两个方向的查询，排除自配对，仅有至少一个相关候选的查询纳入平均，同时报告查询数；先账号查询平均再世界等权，也保留查询等权。检索同分按候选账号 UID 的 UTF-8 升序。全零子集只是补充 pair 诊断，不另立检索任务。\n\n专门臂在全体上的结果包含训练范围外外推，仅供描述。本轮不拼接两臂分数，不新增路由部署器，也不据条件 AP 与全体 AP 的数值落差解释退化。\n\n## 核验与执行\n\n新增[八项针对性测试](../tests/test_step28_specialist_contracts.py)覆盖公开筛选、训练专属中位数、逐行标签与拆分边界、同分 FPR、手算分类／检索、精确枚举的配对重抽样，以及真实 CPU 二叶树的独立 Newton 步公式。该树在初始 p=0.5 时，每叶梯度和绝对值为 2、Hessian 和为 1、L2 为 1、学习率为 0.2，预期叶分数为 ±0.2；同时验证排除行标签不影响拟合、实际损失下降及保存重载。没有神经梯度改动，不运行 GPU smoke 或旧全回归。\n\n先执行 --help、八项测试和本阶段实现外审；关闭确有科学或复现影响的缺陷后运行一次。运行中额外要求两臂实际训练损失低于各自常数先验、树数达标、完整重载及旧全体臂重放通过。这些验证不构成上游生成器的新认证。\n\n在项目根目录 PowerShell 执行：\n\n~~~powershell\n$env:PYTHONDONTWRITEBYTECODE='1'\n$env:OMP_NUM_THREADS='1'\n$env:OPENBLAS_NUM_THREADS='1'\n$env:MKL_NUM_THREADS='1'\npython -B scripts/step28_specialist.py --help\npython -B -m unittest discover -s tests -p 'test_step28_specialist_contracts.py'\npython -u -B scripts/step28_specialist.py run\n~~~\n\n结果写入 reports/seller_alias_specialist/20260906/comparison/，拒绝覆盖。只保留两个小型树模型、共同中位数、两个开发预测数组、逐世界 AP 数组与回执。异常先记录小型 failure 回执及标签读取范围；确认失败原因后按科研纪律记录并清理失败载荷，不能静默换参数重试。\n\n没有连接 Linux；需要远程检查、同步或运行时，先汇报并暂停。网页审查只接收代码、政策、手造测试与方案，不上传真实 pair 标签或 Audit 资产。\n",
+  "prompt": "请作为本阶段网页 GPT 6 Pro 外部科研审查者，定点审查本条实际上传的五个附件：step28_specialist.py、test_step28_specialist_contracts.py、step28_specialist_policy.json、SELLER_ALIAS_SPECIALIST.zh.md、未改动的 step28_saved_model_audit.py。请先确认实际读到的范围。\n\n用户已明确批准继续“完整监督下，全体训练 vs 规则未覆盖样本专门训练”的本地 CPU 对照；这是上轮之后新授权的阶段，不是上一轮字符诊断附带加头。本次不宣称创新或真实中文有效性，不重启英文迁移、六档预算、Step23/25、背景删失或弱监督。项目数据尚未用于本次拟合。Linux 未连接，Audit A/B 真值和预测保持封存。\n\n具体合同已在代码运行前固定：相同公开 base24+identity33，两个模型共用全部训练公开行的无标签中位数；固定旧 M3-joint 训练内选定 7 叶/最小叶10/学习率.03/200树及相同参数，不重新搜索或按开发调参。训练行限制的连带影响（类先验、直方图分箱）明确披露，不能直接归因于容易样本的梯度压制。全体臂要求重拟合后逐元素复现旧全部189000个开发概率；两臂模型与全开发原始分数/概率均落盘并精确重载后才解析开发标签。选定旧参数有利于全体臂的可能性明确披露。\n\n主要量是同一500开发世界上规则外AP的配对均值差，9999次固定PCG64世界重抽样。95%区间仅条件于固定模型和已消费开发世界，不当成独立确认性检验。1% FPR下召回是用评价标签形成的不插值、同分整组ROC特征，并非训练选择的部署阈值或真实错误率保证；固定.5阈值只作描述。树原始加性分数用于排序，概率用于Brier/logloss/固定阈值。全体和规则外检索由授权pair标签双向构造，各自候选集内无相关账号查询排除并报分母；全体专门臂属于拟合范围外外推，不拼接或部署。\n\n本地 --help 和8项针对性 unittest 通过。实际CPU二叶树对照独立Newton步得 +/-0.2，已验证被排除行的标签不影响拟合、损失下降和磁盘重载；这是本地执行证据，网页没有项目数据。旧训练核心最初完整外审原文仍不可得，不以现有诊断审查冒充；本地已读其实际拟合参数和中位数实现，未调用旧训练授权状态机。\n\n请只指出会改变此固定比较的 SCIENTIFIC_BLOCKER 或 REPRODUCIBILITY_DEFECT，给出代码位置、影响和最小修复。特别核对配对标签/掩码/缺失填补、真实拟合与重载、概率和排序、检索分母/同分、CI与条件筛选是否与合同一致。未变的旧审查不要重开。没有具体缺陷则说明可按此固定合同执行；不要因结果未必新颖而阻断基线。拒绝无关复杂化、扩大数据生成、额外模型/调参/回归/GPU smoke、操作系统/网络加固。请简洁列出三类结论和审查边界，不把静态阅读说成亲自重跑。",
+  "response": "实际读取范围与结论\n\n五份附件正文均完整读到：step28_specialist.py、八项测试文件、step28_specialist_policy.json、SELLER_ALIAS_SPECIALIST.zh.md，以及本次上传的 step28_saved_model_audit(1).py。最后一份与此前附件逐字节相同，复算 SHA-256 为 08a8c4fc6ebfd16ea247cf0f71b2c27982be53045818aa280b727530635c24c6，符合新政策登记值；网页上传后缀不构成代码变化。\n\nstep28_specialist_policy\n\n本轮完成静态阅读、附件字节及语法核对，另定点核对相关官方 API；没有执行八项测试、项目拟合或旧模型重放，也未连接项目 Linux。旧政策、训练汇总、完整诊断回执和项目数组未上传，不能独立确认它们的实际内容或运行门已经通过。\n\n分类\t结论\nSCIENTIFIC_BLOCKER\t0 项，未发现改变固定比较含义的具体问题。\nREPRODUCIBILITY_DEFECT\t0 项，未发现必须先修复的实现错误。\nOUT_OF_SCOPE_OVERDESIGN\t不提出新增要求；无需扩大本阶段范围。\n定点核对依据\n\n1．标签、掩码和填补没有混入评价监督。\nread_rows/read_labels 检查规范配对、重复、逐行键及世界一致、二值标签和长度；另检查训练／开发账号及世界不相交。基础与身份矩阵通过行键散列绑定。no_strong_mask 确实仅取两个公开强特征均不大于零；两臂共享完整训练公开矩阵的中位数，不使用开发值估计，并与旧保存中位数精确比较。虽然中位数计算发生在训练标签读取之后，函数没有接收或使用标签，这不是监督填补。\n\nstep28_specialist +1\n\n2．实际拟合、模型重载与开发标签时序符合合同。\nfit_model 真正调用 fit(matrix[selected], labels[selected])，没有开发评价集、早停、样本权重或续训模型参数；这是两次新拟合，不是旧模型换名。官方 API 的相应默认值与此一致。\n\nstep28_specialist\n\n \nLightGBM\n\n两臂分别检查实际树数和本臂训练损失下降，保存树后比较全部开发原始分数与概率，再保存、精确重载数组；全体臂还必须逐元素匹配旧开发概率。开发标签解析位于整个两臂循环之后，不存在先评价再补存另一臂的接线。旧 audit.run() 没有被调用。上述是运行时要求，不能提前写成已经通过。\n\nstep28_specialist\n\n3．排序、概率损失和经验 FPR 没有混用。\n排序统一使用原始树分数；Brier、裁剪后的对数损失及固定 0.5 分类使用概率，公式正确。既有曲线函数接受有限排序分数，并不要求输入必须是概率。\n\nstep28_specialist +1\n\n \n\nstep28_saved_model_audit\n\nempirical_operating_point 保留全部 ROC 阈值，只在经验 FPR≤1% 的整组同分切点中取最大召回，不插值；并列最大召回时取最先出现的可行点。全阴性端点也得到处理。它确实消耗评价标签，但文档已准确限定为评价曲线特征，没有冒充部署阈值。\n\nstep28_specialist\n\n \nGitHub\n \n\nSELLER_ALIAS_SPECIALIST.zh\n\n4．检索候选集、分母和同分规则一致。\n每条选中配对生成两个查询方向；规范端点检查排除自配对和重复配对。同分按候选 UID 的 UTF-8 字节排序，不按标签排序。相关账号数取各自候选集内的数量；没有相关候选的查询排除，并报告有候选查询数、有效查询数和有效世界数。查询等权与“先查询平均、再世界等权”两种聚合均正确；规则外检索没有偷用全集相关数作分母。\n\nstep28_specialist\n\n5．配对区间与继续研究条件实现正确。\n两臂共享同一世界顺序、规则外掩码，先计算各世界 AP 差，再对差值向量进行固定 PCG64 的 9,999 次世界重抽样；不是分别抽两臂，也不是重抽配对。线性百分位区间和“下界>0且规则外 pooled 经验召回不降低”的布尔条件，与政策一致。未定义 AP 不会被悄悄换成零或另选有利世界。区间的探索性、条件性限制已经明确，不需另设确认性门。\n\nstep28_specialist +1\n\n \n\nstep28_specialist_policy\n\n6．八项测试具有实质独立检查。\n手例中的检索 AP=7/12、重抽样区间 [0.1075, 0.2925]，以及 Newton 叶分数 ±0.2 均可由所列输入独立算得；排除行标签翻转、损失下降及磁盘重载检查也确实调用了新增生产函数。它们不覆盖整个项目入口，但文档没有将其冒充端到端大实验复现。\n\ntest_step28_specialist_contracts\n\n训练范围限制连带改变类别先验、分箱及样本量，旧参数也可能偏向全体臂；这些限制已经披露，不能据结果单独证明“容易样本梯度压制”。它们不妨碍执行当前明确限定的监督基线比较。\n\nstep28_specialist_policy\n\n可按当前固定合同执行一次已授权的本地 CPU 对照。此结论不表示运行门已通过，也不表示专门训练有效、具有创新性或对真实中文暗网有效。",
+  "links": [
+    {
+      "text": "LightGBM",
+      "href": "https://lightgbm.readthedocs.io/en/v4.6.0/pythonapi/lightgbm.LGBMClassifier.html"
+    },
+    {
+      "text": "GitHub",
+      "href": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/1.7.0/sklearn/metrics/_ranking.py"
+    }
+  ],
+  "local_disposition": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "count": 0,
+      "decision": "Execute the frozen two-arm comparison; condition all conclusions on the specified inputs, capacity, fitting strategy and reused development data. No causal gradient-suppression, novelty, deployment or real-data claim."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "count": 0,
+      "decision": "No change required. Eight new focused tests and independent actual CPU Newton-step verification passed locally. Full-size fit, source-output reproduction and disk replays remain runtime requirements."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "decision": "No extra tuning, model, full regression, GPU smoke, source re-encoding or security work."
+    }
+  ],
+  "boundaries": {
+    "linux_connected": false,
+    "audit_a_b_truth_reads": 0,
+    "web_scope": "Static files and hand calculations only; no project fitting, private label access or independent old-data reproduction by the web reviewer.",
+    "historical_initial_training_core_review_original_available": false
+  }
+}

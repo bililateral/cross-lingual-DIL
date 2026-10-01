@@ -1,0 +1,120 @@
+{
+  "status": "COMPLETED_ADVISORY_WEB_RESEARCH_QUESTION_REVIEW",
+  "date": "2026-09-06",
+  "reviewer": "web ChatGPT GPT 6 Pro",
+  "reviewer_identity_evidence": {
+    "visible_model_labels": [
+      "6\nPro"
+    ],
+    "final_response_observed": true,
+    "generation_stop_button_present": false,
+    "captured_at_utc": "2026-09-06T04:34:17.273Z"
+  },
+  "conversation_url": "https://chatgpt.com/c/6a9ce9fb-dbf4-83eb-89c1-9f66719884d3",
+  "review_scope": "Research question, provided numerical summary, implementation excerpts and public literature; no local dataset/model/source attachments and no independent reviewer execution.",
+  "sent_prompt": "你是本项目网页端 GPT 6 Pro 辅助科研审查者。本轮用户要求“继续推进，挖掘一个更好出论文的问题”。请审查下面这个已经有本地证据的选题备忘录：重点是科学价值、与旧研究/文献的区别和最低成本的证伪路线。你不替代本地决策，不授予运行权限。本轮是选题与探索性诊断审查，没有新正式训练。\n\n边界：\n- 中文真实马甲真值极少，计划只能以明确标注的中文合成数据开展受控机制研究；不得称为真实中文暗网效果。不要把向作者索要数据或大规模采集当作前提。\n- 原 V9.4.1 数据资格保留；旧实验有效负结果保留。Audit A/B 真值和 Audit B 预测继续封存。Windows CPU 做此次诊断，没有使用共享 Linux GPU。\n- 用户禁止过度设计。不得新增授权仪式、状态机、全量回归、网络/系统加固或为了复杂而复杂的模型。\n- 建议按 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类；接受的修改必须给出影响的主张与最小修改。若只是结论限制，请明确，不要升级成必须做大工程。\n\n已完成的结果：\n1. 冻结英文→中文风格迁移四臂×3配对种子×6预算共72配置完成。主要25世界逐世界AP：正确英文0.110269，通用0.111634，置乱0.108407。正确减通用 -0.001365，95%固定三次运行条件区间 [-0.002729,-0.000035]。按原合同停止该迁移主张。1世界辅助正结果不替换主终点。不跑仅为正候选预留的完整中文文本基线。\n2. 旧中文训练/开发结果 identity-only I0（带自由截距的33维逻辑回归，L2=.01）开发 pooled AP=0.8115316001734469，梯形PR-AUC=.9005323620813501，ROC=.9045582223463687；5/25/50/125/500训练世界AP分别 .81152525656/.81153167899/.81153142798/.81153153232/.81153160017。M3-joint旧开发pooled AP=.842639；注意这与风格实验world-equal指标及输入不直接可比。\n3. 本轮独立只读核对train/development各189000行、500世界；每世界28卖家、378完整对、20正例。输入矩阵/行键/授权train-dev标签都按冻结清单检查哈希，按(world_uid,canonical_pair_uid)连接，核对完整K28，不按行位置猜标签。没有读A/B真值。\n4. 独立用保存的I0 theta/scale/mu重算：train-only逐世界活跃行RMS缩放和均值最大差0；逻辑损失与L2目标最大差0，解析梯度∞范数3.3344e-9；全部189000开发预测最大差1.11e-16，AP/PR-AUC独立重算一致。没有重新拟合。\n5. 一条无训练规则 S=1[verified_direct_token_count_log1p>0 OR strong_rotation_path_count_log1p>0] 在train与development均恰好命中8000正例/0负例（每世界16/20正例，6500直接+1500仅两跳）；其余181000对含2000正/179000负。规则开发pooled AP=.8105820105820106，梯形PR-AUC=.9052910052910054，ROC=.9。AP仅比I0低.0009495895914。二值规则PR-AUC较高有大并列组和线性插值因素，不能把它当全面优胜。\n6. train/development分别仅388/380种唯一33维特征向量。开发188867/189000行的完整特征模式在训练见过（其中9872/10000正例）；这是合法可见特征模式重复，不是账号/文本/标签泄漏证明。开发163001对全零特征，含1889正例；8种跨标签混合模式覆盖全部剩余2000正例。按33维特征完全相同必须作同一二元预测的限制，开发经验最少错误2000；不是全原文/全图/所有模型的Bayes界或真实市场结论。\n\n当前正式生成链（已阅读相关函数，未声称重新审完全部数千行工程）：\nstep28_formal_500x4_builder.build_one_world_with_identity_allocator调用step28_method_root_builder.build_one_world；allocator只替换身份值分配，不改机制拓扑。\nmethod_root_builder.plan_assets:\n- 正机制有单/多类型复用、跨市场复用、单跳及有佐证两跳、稀疏、无直接共享/零身份历史；\n- 负机制：四卖家共享高频普通联系方式、带商品数据风险语境的共享标识、共享公共external_url，另有标题克隆/语义相似负例。\n- raw text经production_parse_with_uid_aliases -> step28_production_chain -> Step3 extract_item_identity_signals -> history_safe_occurrences -> step28_history_common.history_feature_details -> 33维，模型不直接读mechanism/controller。\nhistory_common._token_edge_record判verified = 两端都是seller-facing direct、无risk/support且当前世界token seller_df<=3；弱图上限12。两条strong边若token集合不交即strong_rotation；重复商品或每边多标识可视为佐证。time_bucket虽在safe occurrence中，当前33维函数没有使用时间值，rotation指图结构，不能声称已识别真实时序轮换。\nStep3 signal_flags使用seller cue和product risk正则；external_url为support。角色不是取私有生成role，而是从原文解析，但信息有损。\n\n本轮4个手算构造案例已用真实Step3和history函数执行（不是新数据集性能）：\nA. a,b,c,d四个卖家都写“联系电报：audit_alpha.”。a/b共享seller_df4，direct feature0/high_frequency log2，旧I0输出.004454497282591305。\nB. 完全保留a/b原文，仅观测a/b而未观测c/d：df2，direct log2，I0输出.40690405991700246。旧冻结I0开发阈值.12901524800642925，所以在该构造例会翻转。输出不能解释成已校准的同控真实概率。\nC. a/b明确写“多家商户共用的第三方客服，联系电报：audit_alpha.”：生产parser仍seller_facing=1/direct=1/risk=0；33维与B逐元素相同，I0同值。原文其实增加了公共共享语义，33维表示丢掉它。\nD. a-c共享audit_alpha、c-b共享audit_beta：a/b无直接共享但strong_rotation log2/middle_degree log3，I0=.6882530144887494。这个图既可能来自同控轮换，也可能来自共享中介，无法仅凭相同图保证辨别。\n\n必须继承的旧工作，不能包装成新发现：\ndocs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md早已明确：\n- v11因用audit标签删除冲突状态而撤回；\n- 修正v12保留全部1280审计行，状态等权；区分模型识别与保护层弃权；\n- private collision模型正判率仍1，不能把保护层弃权说成分类成功；\n- 真实应用0正向修正/0盲审队列；\n- 仅换UID/seed不是未见机制泛化，后继须不同机制库。\n所以“有歧义就弃权”“加碰撞负例”“多标识/两跳”本身都是旧工作。本轮新增线索是：当前合格主数据的强共享与正标签分界极易；背景观测删失可让同一对在原文未变时变得更像同控；明确共享关系语义在表示中被丢失。这不否定原数据对原合同的问题资格。\n\n候选新主问题：\n“观测不完整时，共用联系方式为何会被误当成同一控制者？保留中文关系语境能否在有区分证据时减少错误关联，在无区分证据时适当弃权？”\n暂定论文方向：观测不完整条件下中文卖家马甲关联的证据可靠性。\n把覆盖删失当核心干预；把关系语义有损作为最小可修复分支，避免同时开风格迁移、时间建模和大图模型三条线。\n\n最低成本推进草案（尚未正式冻结）：\n- 先做一个独立小型诊断协议，保留固定候选对/真值，完整与部分观测配对；背景删失与目标文本删失分开，避免候选数/正例比例变化冒充模型退化。\n- 区分三种情况：有可见区别却被33维丢掉；全可见观测确实相同而答案不同；只是同一种模式换字符串/seed。不可判别案例全部保留，不能用测试标签删掉，也不要求模型猜出不存在的证据。\n- 对照先用旧强共享规则、I0、经典频率加权匹配、最简单中文共享语境规则；若只是给parser添一个关键词就解决且不能在未见表达/机制上形成稳定结论，就不包装为新方法论文。\n- 新方法只在已确认失效点上考虑“保留引用/共用关系语义的身份边，按证据来源而非次数做佐证，并允许不确定输出”；目前是待证伪假设，没有方法优势证据。\n- 数据由潜在控制者先决定标签，公开文本/观测过程随后生成；负例要能拥有同样直接标识/类型/重复次数/局部图，不能给所有负例专属词或编号。训练与评估按生成机制或关系表达家族分开；同一底层世界所有变体留同split，保留所有例子。换表达不等于新机制。\n- 预设主要量应同时考察误关联与有效召回/覆盖，不能靠全弃权或抬阈值取胜；固定阈值迁移与固定coverage比较，不在测试重选阈值。主要指标与CI待最小协议落实再冻结，世界为配对统计单位；常规分类/检索指标完整保留。\n- 不主张不加假设就能在任意未知缺失机制上保证错误率，不把原始score称概率。可见输入完全相同者只能给出识别限制。\n- 若只有人工指定模板上的退化曲线，没有超越旧v12/已有工作的可复现差异，就停止方法主张，不堆模型；保留为边界诊断。\n\n本地已核对的一手文献（请核查差异，不要声称这些作者没研究过相关主题）：\n1. Tai/Soska/Christin, KDD2019 Adversarial Matching of Dark Net Market Vendor Accounts，明确共同PGP可复制/身份冒用、缺失及启发式真值边界：\nhttps://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf\n2. VendorLink ACL2023，已有NLP风格+低资源市场适应：\nhttps://aclanthology.org/2023.acl-long.481/\n3. BPID EMNLP Industry2024，合成个人身份去重，100万未标注profile与1万人工标注匹配对；已有缺失/同地址电话邮件不同人：\nhttps://aclanthology.org/2024.emnlp-industry.40/\n4. GraLMatch EDBT2025，已有合成公司/证券数据和图去误报、错误传递：\nhttps://openproceedings.org/2025/conf/edbt/paper-10.pdf\n5. TransClean IEEE Access2025/预印本，已有多源/分布变化条件的传递一致性查错：\nhttps://arxiv.org/abs/2506.04006\n6. Frequency-Dependent Probability Measures for Record Linkage, Census2000，频率加权本身早有：\nhttps://www.census.gov/library/working-papers/2000/adrm/rr2000-07.html\n\n请给出：\nA. 这个候选主问题是否值得做，最强反对理由和最接近的既有工作；不要恭维或保证高质量论文。\nB. 是否应该再缩到一个更强的具体问题（只能推荐一条主线，不列十个方向）。\nC. 只需哪一个最小实验就能决定继续还是停止？指出设计中最容易自证、偷换观测条件或把弃权当分类成功的问题。\nD. 对所给本地证据哪些结论成立、哪些仍未证明。附件未提供，不能声称独立复算本地大数据或审完源码。\n请用中文，尽量聚焦。",
+  "final_response_rendered_text": "A. 是否值得做：值得一次受控证伪，但尚不足以支撑新方法论文\n\n最强反对理由是：你可能只是发现了一个绝对频数阈值的脆弱性，加上一个解析器遗漏共享语义的问题，而不是新的身份关联问题。 目前最有价值的下一步，不是设计模型，而是低成本排除这个解释。\n\n以下对本地结果的判断以你提供的备忘录为依据；我核查了公开文献，但没有独立读取或复算本地数据、保存模型及生产源码。\n\n与既有工作的实际距离\n工作\t已覆盖的内容，以及对本选题的约束\nTai、Soska、Christin，KDD 2019\t明确讨论共同 PGP 可被复制、冒用，不同密钥仍可能属于同一卖家，以及不完整数据和启发式标签的局限。因此“共同标识不等于同一身份”不能作为新发现。你可能增加的是固定目标对的背景观测干预，而不是再次展示共享标识反例。\n卡内基梅隆大学\n\nVendorLink，ACL 2023\t已研究文本写作模式、监督预训练、开放集识别与低资源市场适应。新题应明确退出“换成中文继续做风格迁移”的叙事，不能以语言变化代替方法差异。\nACL Anthology\n\nBPID，EMNLP Industry 2024\t已有合成身份资料、缺失属性，以及电话、邮件、地址相同但身份不同的样例。一个可明确写出的评估差异是：BPID 最终匹配集只保留三名标注者一致作出匹配或不匹配判断的样本；你的潜在标签机制允许保留观测不可判别项。但按你提供的记录，保留歧义与区分弃权已经是内部 v12 的工作，不是本轮新增贡献。\nACL Anthology\n\nGraLMatch，EDBT 2025；TransClean，IEEE Access 2025\t前者研究非同步更新、缺失和传递匹配误报，并用图结构清理错误；后者在多源、分布变化条件下利用预测的传递一致性查错。因此“图上误报会传播”“减少误关联并保留正确关联”都不是新目标。你需要突出的是预测前的观测范围与关系表示如何改变证据，而不是再做一般图清理。\n开放会议录\n+1\n\nYancey，Census 2000\t已研究按具体匹配值的出现频率调整匹配证据。它对应本轮最重要、最便宜的反驳基线：合理的频率估计是否已经消除了所谓新失效？\nCensus.gov\n\n还应补入一项直接相关的对照文献：Heterogeneity in Entity Matching: A Survey and Experimental Analysis 的实验已经对测试属性实施 MCAR、MAR、MNAR 缺失，并考察模型退化。因此，仅有“缺失越多，效果越差”的曲线也不够。你的区别必须落在目标自身文本不变，背景观测改变却诱发错误关联这一具体效应上。这里引用的是该文自身的实验部分。\narXiv\n+1\n\n最需要正面处理的是 A→B 的分母。 若构造世界确实只有那四名卖家，那么删失前后标识的可见卖家占比是：\n\n4/4=2/2=1。\n\n下降的是绝对计数，不是占比。当前翻转首先证明 seller_df≤3 的硬分界具有观测规模依赖性，尚未证明经典频率加权也会把它变成更强身份证据。这正是最小实验应该首先尝试推翻的地方。\n\nB. 只保留一条主线：背景删失是否导致共享标识被错误地赋予更强证据\n\n我建议把问题收紧为：\n\n固定目标账号原文与候选对时，背景账号删失是否会增加共享联系方式导致的误关联；保留联系方式与账号之间的关系语境，能否在维持有效召回的条件下减少这部分新增错误？\n\n这比“观测不完整条件下中文卖家马甲关联的证据可靠性”更具体，也更容易失败。中文是受控实验的语言条件，不单独承担新颖性。\n\n这里有两个必须保留的解释边界。\n\n第一，分数上升本身不是错误。 背景信息减少后，条件证据确实发生了变化；不能要求任何合理模型的分数都逐对不升。需要检验的是固定负例上的错误关联是否增加，以及减少这些错误是否牺牲了真匹配，而不是把“删失后分数上升”直接定义成违反科学原则。\n\n第二，“共用第三方客服”不等于“不同控制者”。 同一控制者的多个账号也可以使用公共客服；不同控制者也可以没有任何共享声明。因此，关系语境首先改变的是某项标识是否具有身份区分力，不应直接充当负标签。否则只是把旧的“强共享即正例”捷径换成“出现共用词即负例”。\n\n本轮先不展开两跳、时序和证据来源独立性。它们可以保留为背景案例，不必同时成为新方法组件。\n\nC. 哪一个最小实验足以决定是否继续\n\n建议只做一个：机制留出的固定目标对、配对背景删失实验。不需要重造正式 500×4，也不需要新神经模型。\n\n1. 每个底层世界只产生三种观测\n\n先固定目标账号、目标原文、候选对和潜在控制者标签；可删除的背景账号必须与这些目标端点分开。三个版本为：\n\n完整观测；\n\n删除一定数量的同标识背景账号；\n\n删除相同数量、不共享该标识的背景账号，作为观测规模变化的对照。\n\n这样可以区分“总体变小”与“证明该联系方式被广泛使用的背景消失”。删失选择不使用标签或模型是否翻转的信息；第二种明确标为标识相关删失压力测试，不能包装成自然随机缺失。\n\n本次不删除目标文本。所有版本使用完全相同的候选对，因此候选数量、正例比例与检索空间不变。机制中既要有共享服务的同控账号，也要有不同控账号；不能只构造负例受损的世界。案例也不能全部卡在 df=4→2，否则结论仍只是复现已经知道的硬门翻转。\n\n开发与评估至少隔开一个真正的关系生成机制；同义改写可以另作表达留出，但不能替代机制留出。相同底层世界的所有版本留在同一拆分。\n\n2. 只比较现有四类方法，核心对照是一个简单消融\n\n保留旧强共享规则和冻结 I0 作为诊断参照。真正的核心比较是：\n\n带可见总体规模归一化、平滑的频率基线，对比同一基线加最简单的中文关系语境修正。\n\n后者关闭语境通道就退回前者，避免同时改变打分器、训练预算和表示。语境只能从公开文本获得，不能直接输入生成器的关系角色。无需此时实现“复杂证据图”。\n\n所有方法只能使用对应观测版本中的信息。特别是，不能把完整世界的 df、隐藏背景、真实覆盖率或缓存图交给残缺版本。完整信息可以作为另行标明的信息上界，但不能参加同信息条件下的方法比较。\n\n3. 主结果看新增误关联，并同时约束有效召回\n\n每世界至少计算：\n\n误关联率=\n固定负例数\nFP\n\t​\n\n,有效召回=\n固定正例数\nTP\n\t​\n\n。\n\n弃权的正例不能从召回分母删除。主要观察“删失相对完整观测增加了多少误关联”，以及语境修正是否减少了这个增量；同时报告残缺观测下的绝对错误率，避免一个完整观测时本来就很差的系统靠“退化较小”获胜。\n\n阈值在小开发集确定后原样迁移。固定 coverage 的辅助比较须事先定义；若采用按分数保留固定比例，那是另一种选择规则，不能同时称作“固定阈值迁移”。并列组不能依据标签拆开。常规分类、检索指标继续报告，但不取代这个主对比。\n\n提前写明一个有意义的误关联下降幅度和可接受的召回损失，按底层世界计算配对区间即可。区间只反映所采样合成世界的变异，不能把大量 UID 或措辞替换解释成大量独立机制。\n\n4. 继续与停止的判据\n\n值得继续的结果是：归一化频率基线仍在留出机制上出现明确的删失诱发误关联，而公开语境确有增量，在保持有效召回和覆盖的条件下减少这部分错误。它支持继续研究这个问题，仍不等于已经证明新方法优势。\n\n停止方法主张的结果包括：效应只存在于 I0 的硬门；归一化频率已经解决；一个普通共享关键词规则便稳定解决且没有剩余问题；或者所谓改进依赖负例专属表达、测试阈值调整或大量弃权。此时保留边界诊断即可，不必继续堆模型。\n\n若区间宽到无法区分预定效应，本轮结论是证据不足、暂不升级方法主张，而不是“缺失没有影响”，也不应换种子寻找显著结果。\n\nD. 本地证据支持什么，尚未证明什么\n\n迁移负结果成立的范围。 按所报告的冻结结果，停止原先指定预算和主终点下的迁移主张是合理的；1 世界辅助结果不能替代它。但固定三次运行条件区间不代表对所有训练随机性、来源数据和中文任务的普遍结论，更不能写成“英文监督必然有害”。\n\nI0 数值核对的意义。 参数重放、目标函数与解析梯度的一致性，是反对“模型没真正优化”“保存结果错位”这类解释的有力证据。它不能证明 I0 已提取全部可用信息，也不能使其 pooled AP 与风格实验的 world-equal AP 可直接比较。\n\n无训练规则揭示了当前任务的简单分界。 根据你给出的计数，其 AP 可直接由二值排序推出：\n\nAP=0.8×1+0.2×\n189000\n10000\n\t​\n\n=0.810582010582…\n\n这是对摘要计数的算术推导，不是本地数据复算。它说明该规则几乎复现了 I0 的开发 AP，足以质疑把高 AP 解释成复杂身份推理能力；但不能据此宣布原数据泄漏、原资格失效，或所有原模型都只使用了这条规则。\n\n模式重复与 2000 错误下界的解释是适当的。 大量合法特征模式重复说明评估主要覆盖已见表示状态，并非账号或标签泄漏证据。对“相同 33 维输入必须给出相同二元答案”的预测器，经验最少错误为\n\nx\n∑\n\t​\n\nmin(n\nx,0\n\t​\n\n,n\nx,1\n\t​\n\n)。\n\n若你的模式计数核对无误，它等于 2000；它既不是 AP 上界，也不是完整原文、图模型或真实市场的 Bayes 界。\n\nA–D 是有效的构造性证据，但证明对象不同。 A→B 支持观测范围敏感性；B→C 支持关系语义被当前表示丢失；D 支持该局部图结构不唯一决定控制关系。它们没有证明自然发生频率、总体性能损失或修复收益。C 中增加的共享语义也未直接证明目标对不同控。strong_rotation 目前只能按图结构解释，不能据此声称识别了真实时序轮换。\n\n审查分类与最小修改\n\nSCIENTIFIC_BLOCKER：当前没有足以否定这项受控探索的已证实阻断。 但“普遍缺失鲁棒性”“真实中文效果”“共享语义即可判断不同控”“弃权即分类成功”均不能成为现有结论。最小修改是收缩相应主张，并采用上述固定候选、同信息和有效召回比较，不是重做旧工程。\n\nREPRODUCIBILITY_DEFECT：尚不能仅凭备忘录认定本地实现存在缺陷。 新协议中尚未固定的删失算子、机制留出、频率分母、阈值及并列处理，属于需要补齐的实验定义；用一份短协议明确即可，不应追溯成旧结果错误。\n\nOUT_OF_SCOPE_OVERDESIGN： 此时新增时序模型、大图模型、复杂来源独立性系统，或为了新题重启旧迁移训练和全量回归，都不是必要条件。\n\n最终建议：只推进“固定目标证据下的背景删失—误关联”这一条主线，并让归一化频率基线与最简单语境规则先尝试把它解释完。解释完，就停止新方法包装；解释不完，剩下的可复现差异才是值得投入的论文问题。",
+  "rendered_text_note": "Exact message innerText; equations may have line-broken numerator/denominator order from browser rendering. The original web response is linked; local equations are stated explicitly in the research memo.",
+  "response_links": [
+    {
+      "text": "卡内基梅隆大学",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf"
+    },
+    {
+      "text": "ACL Anthology",
+      "url": "https://aclanthology.org/2023.acl-long.481/"
+    },
+    {
+      "text": "ACL Anthology",
+      "url": "https://aclanthology.org/2024.emnlp-industry.40.pdf"
+    },
+    {
+      "text": "开放会议录\n+1",
+      "url": "https://openproceedings.org/2025/conf/edbt/paper-10.pdf"
+    },
+    {
+      "text": "Census.gov",
+      "url": "https://www.census.gov/library/working-papers/2000/adrm/rr2000-07.html"
+    },
+    {
+      "text": "arXiv\n+1",
+      "url": "https://arxiv.org/html/2508.08076v1"
+    }
+  ],
+  "local_dispositions": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "A four-seller to two-seller example preserves df/N=1 and establishes absolute-threshold sensitivity only.",
+      "affected_claim": "Background observation bias beyond the old df<=3 rule.",
+      "decision": "ACCEPT_NARROW_CLAIM_AND_CONTROL",
+      "minimal_remedy": "State the ratio explicitly; compare normalized smoothed frequency and equal-count shared/non-shared background deletion; do not treat score increases alone as mistakes."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "Shared third-party service wording does not determine controller equality.",
+      "affected_claim": "Public relationship semantics provide identity-discriminating evidence.",
+      "decision": "ACCEPT",
+      "minimal_remedy": "Include same/different-controller shared-service cases and do not encode context as a negative label."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "Models must use corresponding observed inputs and the candidate universe must remain fixed.",
+      "affected_claim": "Fair attribution of differences to background deletion and visible context.",
+      "decision": "ACCEPT",
+      "minimal_remedy": "Freeze focal endpoints/text/candidates; disallow complete-world frequencies, hidden coverage, role truth and stale complete graphs; use the same frequency scorer with its context channel disabled as the core ablation."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "Lower degradation or more abstention alone can misrepresent improvement.",
+      "affected_claim": "Reduced false linkage while preserving useful matching.",
+      "decision": "ACCEPT",
+      "minimal_remedy": "Report paired changes and absolute FPR; retain all fixed positives in recall denominator, report coverage, use development-only thresholds and label-independent tie handling."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "Rewording and UID changes do not create independent relation mechanisms.",
+      "affected_claim": "Generalization beyond the development construction.",
+      "decision": "ACCEPT",
+      "minimal_remedy": "Hold out a relation-generation mechanism, group all observation variants by underlying world, and restrict uncertainty to the sampled synthetic worlds."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "finding": "Prior contact ambiguity, frequency weighting, missing-attribute tests and internal v12 ambiguity handling overlap with the proposal.",
+      "affected_claim": "Novelty and applicability of a future paper.",
+      "decision": "ACCEPT",
+      "minimal_remedy": "Limit the candidate contribution to fixed-target background interventions; cite primary sources and retain explicit stop conditions; no real-Chinese or first-ever claim."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "finding": "Numerical deletion operator, frequency smoothing, split, thresholds, effect sizes and tie handling are not yet frozen for a future experiment.",
+      "affected_claim": "Replay of a future confirmatory comparison.",
+      "decision": "FUTURE_PROTOCOL_REQUIREMENT_NOT_CONFIRMED_OLD_DEFECT",
+      "minimal_remedy": "Define them in one short protocol before implementation/formal execution; current memo remains question-selection work."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "finding": "Adding time models, large graph systems, elaborate evidence-independence machinery, rerunning transfer or full regressions now.",
+      "affected_claim": "No necessary benefit to this question-selection stage.",
+      "decision": "REJECT",
+      "minimal_remedy": "Reuse unchanged implementation/runtime evidence; no new training or formal audit-truth use."
+    }
+  ],
+  "additional_literature_independently_checked": [
+    {
+      "url": "https://aclanthology.org/2024.emnlp-industry.40.pdf",
+      "scope": "Sections 3.4-3.5: unanimous match/no-match inclusion by three annotators and 10,000 matching pairs.",
+      "verified": true
+    },
+    {
+      "url": "https://arxiv.org/html/2508.08076v1",
+      "scope": "Sections 5.1.1 and 5.2.4: their own MCAR/MAR/MNAR missing-attribute experiments, distinguished from fixed-target background deletion.",
+      "verified": true
+    }
+  ],
+  "local_conclusion": "Proceed only to a small independent paired falsification protocol. No new method advantage, real-market effectiveness, or confirmatory result has been established. Stop method packaging if normalized frequency or a simple context rule resolves the effect.",
+  "unchanged_boundaries": [
+    "Audit A/B truth remains sealed",
+    "Old qualified datasets and valid negative transfer results retained",
+    "No experiment code, frozen policies, prior endpoints or publication payloads changed"
+  ]
+}

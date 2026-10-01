@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-06",
+  "purpose": "Local exact feasibility counterexamples; not a dataset or model experiment",
+  "results": {
+    "status": "EXACT_HAND_CASES_ONLY_NO_MODEL_EXPERIMENT",
+    "python": "3.10.11",
+    "joint_relation": {
+      "means": [
+        "1/2",
+        "1/2"
+      ],
+      "covariance_a_b": "1/4",
+      "covariance_c": "-1/4",
+      "joint_tv_a_b": "0",
+      "joint_tv_a_c": "1",
+      "uniform_replication_invariant": true,
+      "different_controller_copy_is_indistinguishable": true
+    },
+    "two_by_two_alignment": {
+      "agree": {
+        "separate": "1",
+        "joint": "1",
+        "gap": "0"
+      },
+      "conflict": {
+        "separate": "1",
+        "joint": "1/2",
+        "gap": "1/2"
+      },
+      "flat_no_information": {
+        "separate": "1",
+        "joint": "1",
+        "gap": "0"
+      },
+      "early_fusion_assignment_is_exactly_joint_operator": true
+    },
+    "information_removal": {
+      "posterior_before": [
+        "0",
+        "1"
+      ],
+      "posterior_after": "1/2",
+      "minimum_expected_brier_after": "1/4",
+      "minimum_expected_log_loss_after": 0.6931471805599453
+    },
+    "project_inputs_read": [],
+    "model_runs": 0,
+    "server_connections": 0,
+    "limitations": [
+      "Constructed exact examples, not project data or vendor performance.",
+      "No new method, novelty, real-Chinese effectiveness or universal impossibility claim.",
+      "Copy-world labels are hypothetical opposite latent relations with identical public inputs.",
+      "Posterior identity holds inside one fixed joint distribution with deterministic coarsening.",
+      "Alignment uses two-by-two complete assignments only; no partial-set matching implementation."
+    ]
+  },
+  "replay_python": "from collections import Counter\nfrom fractions import Fraction as F\nfrom itertools import permutations\nimport json, math, platform\na = [(0, 0), (1, 1)]\nb = [(0, 0), (1, 1)]\nc = [(0, 1), (1, 0)]\ndef mean(rows):\n    return [sum(F(row[j]) for row in rows) / len(rows) for j in (0, 1)]\ndef table(rows):\n    counts = Counter(rows)\n    return [F(counts[(x, y)], len(rows)) for x, y in ((0, 0), (0, 1), (1, 0), (1, 1))]\ndef cov(rows):\n    m = mean(rows)\n    return sum((F(x)-m[0]) * (F(y)-m[1]) for x, y in rows) / len(rows)\ndef tv(x, y):\n    return sum(abs(v-w) for v, w in zip(table(x), table(y))) / 2\nassert mean(a) == mean(b) == mean(c) == [F(1, 2), F(1, 2)]\nassert cov(a) == cov(b) == F(1, 4) and cov(c) == F(-1, 4)\nassert tv(a, b) == 0 and tv(a, c) == 1\nassert table(a * 10) == table(a)\nsupplier_copy = list(a)\nassert supplier_copy == b and tv(a, supplier_copy) == tv(a, b)\nident = ((1, 0), (0, 1))\nflipped = ((0, 1), (1, 0))\nflat = ((1, 1), (1, 1))\ndef best(matrix):\n    return max(sum(F(matrix[i][p[i]]) for i in range(2)) / 2 for p in permutations(range(2)))\ndef align(first, second):\n    joint = tuple(tuple(F(first[i][j] + second[i][j], 2) for j in range(2)) for i in range(2))\n    independent = (best(first) + best(second)) / 2\n    return {\"separate\": independent, \"joint\": best(joint), \"gap\": independent-best(joint)}\nagree, conflict, no_information = align(ident, ident), align(ident, flipped), align(flat, flat)\nassert agree == {\"separate\": F(1), \"joint\": F(1), \"gap\": F(0)}\nassert conflict == {\"separate\": F(1), \"joint\": F(1, 2), \"gap\": F(1, 2)}\nassert no_information == agree\nlabels = (0, 1)\nq = sum(F(y) for y in labels) / len(labels)\nbrier = sum((F(y)-q)**2 for y in labels) / len(labels)\nassert q == F(1, 2) and brier == F(1, 4)\nlog_loss = -sum(y*math.log(float(q)) + (1-y)*math.log(float(1-q)) for y in labels) / len(labels)\nassert math.isclose(log_loss, math.log(2), rel_tol=0, abs_tol=1e-15)\nassert (F(0) + F(1)) / 2 == q\nresult = {\n    \"status\": \"EXACT_HAND_CASES_ONLY_NO_MODEL_EXPERIMENT\",\n    \"python\": platform.python_version(),\n    \"joint_relation\": {\"means\": mean(a), \"covariance_a_b\": cov(a), \"covariance_c\": cov(c),\n        \"joint_tv_a_b\": tv(a, b), \"joint_tv_a_c\": tv(a, c),\n        \"uniform_replication_invariant\": True, \"different_controller_copy_is_indistinguishable\": True},\n    \"two_by_two_alignment\": {\"agree\": agree, \"conflict\": conflict, \"flat_no_information\": no_information,\n        \"early_fusion_assignment_is_exactly_joint_operator\": True},\n    \"information_removal\": {\"posterior_before\": [F(0), F(1)], \"posterior_after\": q,\n        \"minimum_expected_brier_after\": brier, \"minimum_expected_log_loss_after\": log_loss},\n    \"project_inputs_read\": [], \"model_runs\": 0, \"server_connections\": 0,\n    \"limitations\": [\"Constructed exact examples, not project data or vendor performance.\",\n        \"No new method, novelty, real-Chinese effectiveness or universal impossibility claim.\",\n        \"Copy-world labels are hypothetical opposite latent relations with identical public inputs.\",\n        \"Posterior identity holds inside one fixed joint distribution with deterministic coarsening.\",\n        \"Alignment uses two-by-two complete assignments only; no partial-set matching implementation.\"]\n}\nprint(json.dumps(result, ensure_ascii=True, default=str))\n"
+}

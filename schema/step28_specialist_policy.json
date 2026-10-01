@@ -1,0 +1,84 @@
+{
+  "status": "FROZEN_BEFORE_NEW_FITS",
+  "date": "2026-09-06",
+  "question": "Does restricting complete-supervision fitting to publicly defined no-strong pairs improve conditional Chinese seller-alias ranking?",
+  "output": "reports/seller_alias_specialist/20260906/comparison",
+  "prior": "reports/saved_model_audit/20260906/diagnostic.json",
+  "pins": {
+    "scripts/step28_saved_model_audit.py": "08a8c4fc6ebfd16ea247cf0f71b2c27982be53045818aa280b727530635c24c6",
+    "schema/step28_train_development_execution_policy.json": "d392d33639567d79db7ca064945e36ddd5815b3540eb614f0ed5765673baa876",
+    "schema/step28_model_experiment_policy.json": "a473624feec04efd024a4334815fa854b6ec4023b88bf21c709a6c5dccf61a9e",
+    "reports/saved_model_audit/20260906/diagnostic.json": "42774c28500632b21c667b839f5c5652b8523cb3a6120e2379e5cbaf357045f7",
+    "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/training_summary.json": "4198849223023a11b9b2eac59fdd22163eb0e99cac71e66031fc51f6d9077b0f"
+  },
+  "allowed_splits": [
+    "train",
+    "development"
+  ],
+  "arms": [
+    "all",
+    "no_strong"
+  ],
+  "shared_feature_count": 57,
+  "shared_train_only_imputation": true,
+  "selected_grid": [
+    7,
+    10,
+    0.03,
+    200
+  ],
+  "parameters": {
+    "objective": "binary",
+    "boosting_type": "gbdt",
+    "num_leaves": 7,
+    "min_child_samples": 10,
+    "learning_rate": 0.03,
+    "n_estimators": 200,
+    "max_depth": -1,
+    "max_bin": 63,
+    "subsample": 1,
+    "subsample_freq": 0,
+    "colsample_bytree": 1,
+    "reg_alpha": 0,
+    "reg_lambda": 1,
+    "min_split_gain": 0,
+    "deterministic": true,
+    "force_col_wise": true,
+    "num_threads": 1,
+    "random_state": 20260810,
+    "bagging_seed": 20260810,
+    "feature_fraction_seed": 20260810,
+    "data_random_seed": 20260810
+  },
+  "selection": "Reuse the old M3-joint grid selected using training-only grouped OOF AP. No new tuning, validation fit, early stopping, weighting, sampling, or probability calibration.",
+  "primary": "no_strong development world-equal AP(no_strong arm)-AP(all arm)",
+  "bootstrap": {
+    "replicates": 9999,
+    "seed": 20260906,
+    "unit": "development_world",
+    "rng": "PCG64",
+    "quantile_method": "linear",
+    "interval": [
+      0.025,
+      0.975
+    ]
+  },
+  "operating_point": {
+    "maximum_empirical_fpr": 0.01,
+    "equal_scores_grouped": true,
+    "interpolation": false,
+    "role": "Evaluation-only ROC characteristic, using evaluation labels; not a deployable threshold or independent calibration guarantee."
+  },
+  "descriptive_probability_threshold": 0.5,
+  "decision": "Further investigation only if primary paired 95% lower bound > 0 and pooled no-strong recall at empirical FPR <= 1% is not lower. Otherwise stop this fixed-input fixed-capacity restriction candidate; do not infer that all public information is unlearnable.",
+  "limits": [
+    "Exploratory reused-development evidence, not an independent confirmatory test.",
+    "Both arms get the same model capacity and hyperparameters; row counts and label priors intentionally differ. Equal tree counts are not equal FLOPs.",
+    "Restriction also changes fitted bins and automatic initial class prior; it does not isolate an easy-example gradient suppression mechanism.",
+    "Old train-only hyperparameters were selected for the all arm; a negative result does not reject all tuned specialist models.",
+    "Shared imputation uses all public training rows without labels, including rows excluded from specialist fitting.",
+    "No-strong selection uses only two public feature columns. It never consumes a private mechanism, controller, positive quota or test label.",
+    "The specialist is evaluated conditionally. Its full-population output is extrapolative descriptive evidence, not a routed deployment.",
+    "No English data, raw text re-encoding, Audit A/B truth or predictions, Linux access, or changes to old experiments."
+  ]
+}

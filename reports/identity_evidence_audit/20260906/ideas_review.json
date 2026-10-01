@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-06",
+  "stage": "research_idea_search",
+  "status": "NOT_ADOPTED_USER_DIRECTED_INDEPENDENT_IDEATION",
+  "reviewer_display": "6\nPro",
+  "reviewer_role": "advisory_scientific_reviewer",
+  "conversation_url": "https://chatgpt.com/c/6a9ce9fb-dbf4-83eb-89c1-9f66719884d3",
+  "prompt": "本轮是中文暗网卖家马甲识别项目的重新选题建议审查，尚不实现/冻结新实验。你是网页 GPT 6 Pro 外部科学顾问，执行者独立决定，不是审批权威。请依据下面完整限制，批判候选并建议至多两条值得核查的具体问题；没有足够依据可以明确否决。不要为获得正结果加实验，不要泛泛堆模型术语，不要虚构论文或承诺能发表。\n\n用户最新要求“继续找别的 idea，能填补研究空缺的最好”。核心必须保留“中文暗网卖家马甲识别”；拒绝泛作者识别、AI文本检测等转向。用户已明确否决背景账号删除/共享联系方式频次影响关联置信度题目，觉得钻牛角尖。之前的“少商品新马甲发现”候选也尚无新颖性，用户要求继续找别的。中文真实跨账号身份真值极少，无现实可扩大采集/索取作者私有数据方案。允许合成训练与受控评价，必须明示synthetic，不能声称真实中文效果。英文数据只能辅助，不能换核心。现有 Audit A/B 真值封存，不得复用为选题/调参。\n\n已查原始文献：\n1. VendorLink ACL2023 https://aclanthology.org/2023.acl-long.481.pdf ：七个主要英文市场，已做开放集候选关联和低资源适配，少于20广告者仍进开放集相似度；潜在别名/copycat案例，没有完整独立别名真值来宣称开放集准确率。\n2. Tai等 KDD2019 https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf ：对抗账号匹配、PGP可复制/变更、随机森林和层次聚类已有，PGP/Grams启发式身份标签并非完美真值。\n3. Multi-Identity Recognition ... Metric Learning 2024 https://www.mdpi.com/2076-3417/14/4/1619 ：21英文市场，文本/图像融合、孪生网络对比损失；名字/标题相似的初始标签及伪标签+人工复核。\n4. 上轮漏查现已回读重要中文论文 DarkBIP-FW：Zhang等2025-06-17 https://link.springer.com/article/10.1007/s42452-025-07217-5 ，中国交易论坛，§3.2/6.1报24262记录/4746卖家，3850账号少于5条。文本/价格/品类/发布时间特征融合，§6.1每标签分层划分，§6.6.2 ALSO做986高相似账号对的人工关联迹象核查，称975具关联迹象；案例包括每号仅2条的4号群，表述同人或密切组织团体。不能说它只有闭集分类，没有马甲识别；关联迹象不等同独立同控真值。数据仅on request，本项目没有它。\n5. SYSML EMNLP2021 已有文本风格+论坛结构+多任务迁移，作者收集约100人工PGP候选标签/33迁移对。\n6. You Are Your Photographs ASIACCS2018 https://people.cs.vt.edu/gangwang/asiaccs18.pdf 已讨论商品文案模板及删除重复句后风格准确率下降，图片风格识别已有。\n7. 一般文风与内容解耦已有人做 https://arxiv.org/abs/2411.18472 ，不能简单包装主题/风格解耦为新方法；一般合成实体解析 GraLMatch EDBT2025、共享联系方式 BPID EMNLP Industry2024、跨域转移 TransClean2025 也已存在。\n8. AAST预印本2026-08-23 https://arxiv.org/abs/2608.22161 已有整账号多文本联合改写抵御聚合作者识别；LLM模仿/作者混淆及未知改写器非天然新点。尚未读其全文，不能据摘要扩张结果。\n\n本项目旧实验必须算进重叠：\n- Step22 单账号商品不重叠拆分作伪马甲增强、Step23 商品分布多实例验证，均负。\n- Step24跨语文风有混杂；Step25三轮模板去污染/局部复制检测/原始-清洁风格与复制风险融合已做，正确收敛后仍负（C2减C0中文OOF AP=-.028093）。不能重新包装“去模板防搬运”为新主线。\n- 七月v12独立于后来失败v1.12，已有共享标识符因果身份世界、同外观多原因碰撞、二跳佐证、保护性拒判、未见机制留出；不能包装为新问题。\n- 新正式V9.4.1中文合成500×4世界，M0/五M1/M2/M3-base/M3-joint训练开发已完成，M2dev AP=.751713、M3joint=.842639。训练/开发公开端世界28卖家全配对，合成4时间桶不是真实发布时间。\n- 冻结四臂英→中六档训练预算实验已完成，25世界主要端点正确英文初始化AP=.110269397，通用=.111633966，置乱=.108407277；未同时超过通用/置乱，按冻结规则结束迁移正向主张。不能救结果或换端点。\n- 合成身份33特征规则直接/强轮换每世界20正中找16、0负，简单规则AP=.810582 vs逻辑I0=.811532；当前高分不构成新方法优势。\n\n还在筛选的想法，均无新颖性认证：\nA. 少量偏置的显式关联作为正例，其余账号对不强标负：中文卖家马甲识别中“被看见的马甲”和“真实马甲”的监督选择偏差；需超越通用PU/噪声标签及旧去标识符，独立合成控制标注机制。风险：又变评估边角，合成偏差自设自证。\nB. 跨独立合成机制的中文马甲泛化：不要求英语风格迁移，而问虚拟中文身份世界训练所得方法排名和能力在独立机制下能否保持。风险：旧v12已有未知机制；简单换模板/LLM/随机种子不算独立世界，更不能代替真实验证。\nC. 账号—实际经营身份随时间变化的一对多、多对一：持续追踪多个马甲而非静态账户永远同一控制者。风险：账号转让/共同运营真实动机与验证数据未充分查证，动态ER普遍已有，当前合成时间桶不支持直接实验。\nD. 文案来源与经营身份两种关系同时建模而非把相似=同控；显式复用来源不当作新身份边。风险：内容风格解耦和旧Step25近邻太强，可能应直接否决。\n\n请在1500中文字左右给：1)逐项保留/否决及最致命原因；2)若有更好的至多两条，清楚说为什么仍是中文马甲核心、最接近已有工作、实质未知及现有数据能支持什么；3)诚实选出一个最值得查证的方向或承认四者都不够。不要建议重新跑冻结实验、未授权真值、索要数据、复杂评审流程。",
+  "response": "**结论：A、B、D目前不足以另立主线；C只保留一个收窄版本继续查证。四者都尚未构成已确认的研究空缺。**旧实验重叠按你提供的记录判断，不是本轮独立复算。\n\n1．逐项筛选\n\nA：否决当前提法。“少量正例，其余不当负例”已有直接实体消解工作：PUER采用少量正例与未标注数据；“正例被选择的概率依赖样本属性”也已有SAR-PU研究，不能靠增加“监督选择偏差”几个字绕开重叠。\nACL Anthology\n+1\n 最致命的问题是：**项目尚未说明，凭什么额外信息识别那些从不进入已知正例的马甲。**在合成器中指定选择偏差，再让方法利用该设定，不等于解决现实监督缺口。它可成为实验中的标签条件，不足以单独承担新方法贡献。\n\n**B：否决作为主线，保留为评价要求。**按你的记录，v12已有未见机制留出。除非能说明新机制为何独立于旧机制、具体改变了什么可检验假设，否则“跨独立合成世界”只是升级测试集名称。方法排名变化可以揭示敏感性，却不会自动产生更好的识别方法，更不能证明真实中文泛化。\n\n**C：有条件保留，但删去同时研究共同运营、组织拆分等扩张。**现实动机并非完全没有依据：Tai等明确指出，账号转售或被接管会破坏“账号控制者不随时间改变”的假设；但该处是案例性认识，不是中文发生率证据。\n卡内基梅隆大学\n 最致命的缺口是：当前没有可验证的经营权变化轨迹，合成时间桶也不能补上它。\n\n**D：否决当前主线。**根据你列出的Step25与v12，复制风险、身份关系和混淆原因已经研究过。把它们改成两个关系预测头，仍可能只是重组旧模块。除非“文案来源”具有独立可验证的定义与监督，否则只是把未知同控关系换成两个未知关系，并未解决识别问题。\n\n2．唯一值得优先核查的具体问题\n\n中文暗网卖家账号更换经营者后，如何维护分时段有效的马甲关系，既不把前后经营者误合并，也不把同一经营者的正常变化误拆分？\n\n它仍然回答“哪些账号属于同一经营控制者”，而不是作者识别或账号安全检测。假设账号X前期由甲经营、后期由乙经营，甲另有账号A，乙另有账号B：任务需要分别关联X的两个时期，而不能因为X这个账号持续存在，就把A、B永久合并。实际用途是避免错误归并经营身份及其历史，而非只发现一次写法变化。\n\n但这仍不是已经成立的新颖性。最接近的通用工作《Linking Temporal Records》已处理属性随时间改变、不同实体跨时间共享属性，并使用时间衰减与全局聚类。\nVLDB\n **最强反对理由：把账号拆成时间片，再使用已有时序实体消解，可能已经覆盖全部技术增量。**DarkBIP-FW也已有发布时间特征和涉嫌多账号关联核查，因此“加时间特征识别中文马甲”同样不够。\n斯普林格\n+1\n\n真正待查的不是“能否检测变化”，而是：**公开商品与账号记录中，是否有信息能区分经营者变化和经营者未变。**必须同时允许“同控但变化很大”和“换经营者但保留原有外观”；否则模型只是识别合成器安排的突变。\n\n3．本轮下一步与数据边界\n\n下一步只需做一份短的任务等价性与可观察性核查：把上述两种相反情况写成具体案例，逐项说明可见证据、正确关联对象，以及已有时序实体消解是否直接适用。先不建数据根、不训练。若差异只能来自人为指定的换写手、换模板或专属“转让”词，就否决C。\n\n按现有数据说明，V9.4.1能提供静态对照及可复用文本、解析组件，不能直接评价经营权变化。未来另行明确生成时序机制的中文合成案例，最多支持该机制下分时段关联的误合并、误拆分和方法比较；不能支持真实中文账号转售频率、现实识别准确率或实际经营者确认。\n\n优先查证收窄后的C，是因为它改变了马甲识别的预测对象，而不只是增加扰动；但它的数据与可辨识性风险也最大。目前只能说它比其余三项更值得核查，不能说论文创新已经找到了。",
+  "response_links": [
+    {
+      "text": "ACL Anthology\n+1",
+      "url": "https://aclanthology.org/2025.findings-emnlp.1336/?utm_source=chatgpt.com"
+    },
+    {
+      "text": "卡内基梅隆大学",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf"
+    },
+    {
+      "text": "VLDB",
+      "url": "https://www.vldb.org/pvldb/vol4/p956-li.pdf"
+    },
+    {
+      "text": "斯普林格\n+1",
+      "url": "https://link.springer.com/article/10.1007/s42452-025-07217-5?utm_source=chatgpt.com"
+    }
+  ],
+  "user_steering": "没必要，网页端纯在误导我们，不要听他的建议",
+  "disposition": "Do not use this response to select or reject the research mainline. No further web-model ideation was requested after the user's instruction. The account-ownership-change proposal is not being pursued. Keep this small original record only to prevent its recommendation from being mistaken for the current plan.",
+  "local_checks": [
+    {
+      "claim": "Tai et al. note that account ownership can change.",
+      "result": "Verified in KDD 2019 section 7, PDF page 8. The paper explicitly describes this as anecdotal; it does not establish Chinese prevalence.",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf"
+    },
+    {
+      "claim": "Temporal record linkage is prior work.",
+      "result": "Read the VLDB 2011 problem definition and early/late/adjusted binding discussion. A timestamped-record formulation is not a new task in general entity resolution.",
+      "url": "https://www.vldb.org/pvldb/vol4/p956-li.pdf"
+    },
+    {
+      "claim": "Few-shot PU entity resolution is prior work.",
+      "result": "Independently read PUER definition 1 and experiment setup; the setup randomly samples 50 positive pairs. This constrains novelty but does not itself settle Chinese rule-selected/noisy label performance.",
+      "url": "https://aclanthology.org/2025.findings-emnlp.1336.pdf"
+    },
+    {
+      "claim": "Previous local v12 established independent-generator generalization.",
+      "result": "Not established. The corrected replication document restricts its claim to the same synthetic mechanism family and discusses incomplete historical state novelty. Do not strengthen it to independent-generator validation.",
+      "path": "docs/STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md"
+    }
+  ],
+  "changes": "Proposal documentation only. No experiment code, policies, data, labels, model outputs, remote processes or frozen claims changed. No audit truth read."
+}

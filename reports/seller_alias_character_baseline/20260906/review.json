@@ -1,0 +1,87 @@
+{
+  "stage": "seller_alias_character_baseline",
+  "date": "2026-09-06",
+  "reviewer": "web ChatGPT GPT 6 Pro",
+  "url": "https://chatgpt.com/c/6a9d1145-9d04-83ed-825b-71f13afc9b44",
+  "model_selector": [
+    "6\nPro"
+  ],
+  "started_utc": {
+    "current_time": "2026-09-06 08:33:21 UTC"
+  },
+  "completed_utc": {
+    "current_time": "2026-09-06 08:38:36 UTC"
+  },
+  "attachments": [
+    {
+      "path": "scripts/step28_character_baseline.py",
+      "size_bytes": 12122,
+      "sha256": "504176b94cdb65843456f7839470f0849810e58ae94839f5b2f8d73579b0f939"
+    },
+    {
+      "path": "tests/test_step28_character_baseline_contracts.py",
+      "size_bytes": 4472,
+      "sha256": "ce4ada735b6134ebf431403c885f7b63a55d2f564b844a376986639aed5a43f1"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CHARACTER_BASELINE.zh.md",
+      "size_bytes": 6346,
+      "sha256": "770331f60be550ed55aa37a1b8fe1714923ad3e4155a2e254ad047632ded22f5",
+      "text": "# 中文卖家字符基线诊断\n\n日期：2026-09-06。本地运行和针对性验证已完成，网页外审待完成。继[方法可行性筛选](SELLER_ALIAS_FEASIBILITY.zh.md)后，先核查一个简单、现有输入支持的基线，不要求先发明新算法。本项只作已消费开发集上的探索性诊断，不重启四臂六预算、不触发新正式训练或 Audit 评价。\n\n问题：在已经冻结的中文去词义风格流上，简单字符模式相似度是否提供现有保存模型尚未充分利用的排序信息？不是重新声称英文监督迁移有效，也不声称这些字符一定对应真实作者风格。\n\n输入沿用公开 `redacted_items.jsonl` 经既有 NFC／字符类别风格投影与账号内商品排序、字段空格连接后的风格流；不加入新字段、私有控制者、世界正例数或模板标识。TF-IDF 只在全部训练账号上拟合词表和 IDF，随后固定预测开发账号对；开发标签只在分数全部形成后用于评价，训练标签和 Audit A/B 不读取。这里的“字符”是投影后占位串及格式字符，不是完整原文词汇。\n\n参数在查看本基线分数前固定为已有英文 V6 风格正对照的字符 3—5 gram、`min_df=2`、最多 30,000 项、次线性 TF、平滑 IDF 与 L2 归一化；不读英文数据、不搜索参数。采用 scikit-learn 默认的字符分析小写与重复空白折叠行为，不声称保留了全部原始格式。按同一开发行键计算账号向量余弦，分别报告全体、无强规则及 identity33 全零子集的 AP、梯形 PR-AUC、ROC-AUC 和含两类世界的等权均值。无阈值、无置信区间；不是新的正式分类／检索全指标结果。\n\n复用已审核的开发标签对齐、条件分母与曲线函数；本轮重新阅读旧风格投影、Unicode 映射、字段连接、公开文件验证和 V6 字符正对照的实际实现。新增代码只拟合无监督 TF-IDF 并计算稀疏点积，需用独立逐字符计数／IDF 公式和稀疏点积手例核验训练专属词表、零向量、索引边界与批次顺序。未改变神经训练语义，不运行 GPU smoke。\n\n保留一份 189,000 行 float64 分数（1,512,128 字节）及小型诊断回执；词表与 IDF 保留摘要，依赖钉定训练输入与环境可重新计算，不另存大模型或临时语料。不同于新算法比较：已有 M3 使用更丰富的不同特征，本基线使用全 500 世界无标签训练文本；所得差异不能作同预算优势、因果贡献或真实中文效果证明。\n\n## 实际结果\n\n训练／开发各 14,000 个账号，词表共 2,298 项，开发无零向量。15 项实际输入的散列核验通过，开发行键／标签／子集人数与旧保存模型诊断相同。所有 189,000 个分数保存后精确重载；只在拟合完训练词表、形成全部开发分数后打开开发标签。没有监督参数优化。\n\n无强直接共享或强两跳的子集仍为 2,000 正例／179,000 负例，以下逐世界均值使用相同的 500 个世界：\n\n| 方法 | pooled AP | 梯形 PR-AUC | ROC-AUC | 逐世界 AP 均值 |\n| --- | ---: | ---: | ---: | ---: |\n| 字符风格 TF-IDF | 0.018444 | 0.018386 | 0.631207 | 0.045745 |\n| 保存 M3-base | 0.017054 | 0.017010 | 0.611961 | 0.045336 |\n| 保存 M3-joint | 0.017883 | 0.017797 | 0.615712 | 0.048738 |\n\n字符基线 pooled AP 略高于 M3-joint，但逐世界 AP 均值更低；没有区间或显著性证据，不能宣布稳定胜出。它说明在当前已消费合成开发集上，简单公开字符模式有可测的排序关联，却没有带来足以支持新算法主张的突破。全体 pooled AP／逐世界 AP 为 `0.085352／0.111903`；identity33 全零子集 pooled AP 为 `0.019491`，ROC-AUC 为 `0.632821`。不同子集类别比例不同，不用 AP 落差解释性能退化。\n\n本结果不能替换旧四臂的主要端点，也不证明真实中文同控信息或独立机制泛化。它提供一个以后实际值得保留的简单基线。当前不调字符阶数、不增补监督头或凭这几个事后数值启动新神经模型；下一项具体方法应在相同输入和选择预算下说明相对该基线的增量。简单方法仍可先做合理的低成本探索，不要求事前保证创新成功。\n\n## 核验与留存\n\n- 实现：[step28_character_baseline.py](../scripts/step28_character_baseline.py)，SHA-256 `504176b94cdb65843456f7839470f0849810e58ae94839f5b2f8d73579b0f939`。\n- [六项针对性测试](../tests/test_step28_character_baseline_contracts.py)通过；独立逐字符计数、平滑 IDF `1+log((1+n)/(1+df))`、次线性 TF 和单位范数点积与实际实现一致。公式另对照 [scikit-learn 1.7 文档](https://scikit-learn.org/1.7/modules/generated/sklearn.feature_extraction.text.TfidfTransformer.html)。测试不读取项目真值。\n- 已执行 `python -B scripts/step28_character_baseline.py --help`、`python -B -m unittest discover -s tests -p 'test_step28_character_baseline_contracts.py'` 和 `python -u -B scripts/step28_character_baseline.py run`；本地限制数值库为单线程。执行命令拒绝覆盖当前结果。\n- [诊断回执](../reports/seller_alias_character_baseline/20260906/diagnostic.json)，14,353 字节，SHA-256 `09b02ab2b34bebc6cf3736bdd089bf1c87dd9bcce3cbc4ab77c6d2a905e2dce5`；[分数](../reports/seller_alias_character_baseline/20260906/scores.npy)，SHA-256 `53785d0a56c30f4ef90683c2b91f5ee840bf16d819c36aefdc22ce2494954c64`。回执记录环境、投影流、词表及 IDF 摘要，保存模型参照沿用旧回执，不重复运行它们。\n- 首次尝试在词表摘要 JSON 序列化处因 NumPy `int64` 失败，源码散列为 `0bda2da849984e2791330acc651d78d76b9d4a0d7cc199c6b1d72af6543f0a7e`；结果目录尚未创建，无失败载荷。索引改为 Python `int`，补入实际词表摘要检查，六项测试重新通过后原参数重跑成功。没有据失败时的指标改动方法；失败也没有输出指标。两次尝试各解析一次开发标签，成功回执的读数只描述成功那次调用，不是整轮累计；训练标签、qrels 和 Audit A/B 始终未读。\n\n本阶段新的实现与结果解释正交网页 GPT 6 Pro 审查，原文和处理结果随后登记。没有连接 Linux，没有修改旧数据或模型产物。\n"
+    },
+    {
+      "path": "scripts/step28_style_transfer_common.py",
+      "size_bytes": 24349,
+      "sha256": "b3cfa6de654e4cc2cab7877e666f8f8582f7d4ed5143ae4357a8359d3f33e59b"
+    }
+  ],
+  "prompt": "请用网页 GPT 6 Pro 定点审查本阶段新上传的字符基线实现、六项测试、结果文档和未改动的 style_transfer_common 依赖。这是前一轮构造筛选之后的一项新的实际本地诊断，核心仍是中文暗网卖家同控；不是重审旧记录或恢复旧迁移主张。\n\n固定输入是原公开中文去词义风格流，char 3—5 gram、min_df=2、max_features=30000、sublinear_tf、smooth_idf、L2，参数来自旧英文V6正对照，但不读英文数据。词表和IDF只fit全部14,000训练账号，无训练标签；先形成全部189,000开发分数，再读开发标签。当前保存模型审查的曲线/标签对齐函数沿用本会话之前实际上传的 step28_saved_model_audit.py，散列未变，不再次运行其旧模型重放。下面另附被调用的真实Unicode投影函数及常量；不是另写的替代实现。\n\n已完成：6/6针对性测试、15项输入校验、189,000分数保存精确重载。首次运行仅在词表np.int64索引摘要序列化报错，未落地结果或输出指标；int转换修复及摘要测试后原参数重跑。成功回执的开发标签读数1是每次调用，两次尝试合计2，不掩盖此前已消费开发集。\n结果：规则外2000正/179000负，字符 pooledAP=.018443582874179375、梯形PR=.018385591736705797、ROC=.6312071648044693、世界AP=.045744996319206；M3joint对应AP=.01788345532538194、世界AP=.04873762092996171。没有CI、阈值、增益或新方法成功宣称。字符全体世界AP=.11190250537536699，但不能替换旧25世界端点或当同预算优势。其输入也不等于M3更丰富的57维。\n\n请核查训练/评价边界、NFC/字段连接与TF-IDF行为、稀疏点积行对应、零向量、输出/词表摘要、复用曲线函数范围、六项独立检查是否覆盖新增语义。网页未收到原矩阵、标签、分数数组或完整回执，不可声称亲自跑过大数据。按 SCIENTIFIC_BLOCKER/REPRODUCIBILITY_DEFECT/OUT_OF_SCOPE_OVERDESIGN 分类，只报有具体影响的最小修正，约1200字；无问题就直接说明诊断可保留。不要选新超参数、加监督头、重跑旧实验、全回归、smoke或新数据集。\n\n投影源 scripts/step7_build_synthetic_english_source.py SHA256=2b27c900a387a92f9b0e09ce8dbab00a33505763813d9e3c4c475db88fd26241，实际相关片段：\n```python\ndef transferable_style_projection(value: str) -> str:\n    \"\"\"Map source categories to a frozen alphabet without compatibility expansion.\"\"\"\n\n    result = []\n    # NFC removes decomposed-mark side channels but, unlike NFKC, does not turn\n    # semantic compatibility symbols (for example TM or TEL signs) into words.\n    value = unicodedata.normalize(\"NFC\", value)\n    index = 0\n    while index < len(value):\n        character = value[index]\n        category = unicodedata.category(character)\n        if category.startswith(\"N\"):\n            end = index + 1\n            while end < len(value) and unicodedata.category(value[end]).startswith(\"N\"):\n                end += 1\n            result.append(f\"N{min(end - index, 99)}\")\n            index = end\n        elif category.startswith((\"L\", \"M\")):\n            end = index + 1\n            while end < len(value) and unicodedata.category(value[end]).startswith(\n                (\"L\", \"M\")\n            ):\n                end += 1\n            letter_count = sum(\n                unicodedata.category(value[position]).startswith(\"L\")\n                for position in range(index, end)\n            )\n            if letter_count:\n                result.append(f\"W{min(letter_count, 99)}\")\n            index = end\n        elif character.isspace():\n            result.append(\"\\n\" if character in \"\\r\\n\" else \" \")\n            index += 1\n        elif character in ASCII_STYLE_LITERALS:\n            result.append(character)\n            index += 1\n        elif category.startswith(\"P\"):\n            result.append(UNICODE_PUNCTUATION_CLASSES.get(category, \".\"))\n            index += 1\n        elif category.startswith(\"S\"):\n            result.append(UNICODE_SYMBOL_CLASSES.get(category, \"*\"))\n            index += 1\n        else:\n            index += 1\n    return \"\".join(result)\n\n\nASCII_STYLE_LITERALS = frozenset(\n    \" \\n.,;:!?\\\"'()[]{}-_/\\\\@#%&*+=<>|~^$\"\n)\nUNICODE_PUNCTUATION_CLASSES = {\n    \"Pc\": \"_\",\n    \"Pd\": \"-\",\n    \"Ps\": \"(\",\n    \"Pe\": \")\",\n    \"Pi\": \"\\\"\",\n    \"Pf\": \"\\\"\",\n    \"Po\": \".\",\n}\nUNICODE_SYMBOL_CLASSES = {\"Sc\": \"$\", \"Sk\": \"^\", \"Sm\": \"+\", \"So\": \"*\"}\n```",
+  "response": "结论：本阶段字符基线诊断可以保留；未发现必须修复后才能留存的具体错误。\n\n实现、六项测试、结果文档及 step28_style_transfer_common.py 四份正文均完整可读；投影函数依据你提供的实际片段核对。本轮仅作静态审查，没有执行测试、连接项目 Linux，或复现未上传的矩阵、标签、分数与完整回执。\n\nSCIENTIFIC_BLOCKER：0 项\n\n拟合／评价边界正确。 词表和 IDF 仅 fit(train)，开发文本只 transform；全部配对分数形成后才解析开发标签，随后读取 identity33 划分评价子集，不回流打分。旧回执提前读取不代表开发集未被消费，文档已明确其事后诊断性质。新入口没有调用旧模型重放或英文数据加载流程。\n\nstep28_character_baseline +1\n\n输入处理与描述一致。 真实投影先做 NFC，再映射字符类别；依赖按商品 ID 的 UTF-8 顺序排列，逐商品先标题后描述，分别投影、跳过空结果，再以空格连接。不是时间排序，也没有将 ID 字面值写入文本。字符 n-gram 可以跨这些连接边界。\n\nstep28_style_transfer_common\n\n核对 scikit-learn 1.7 实现后，默认行为确为小写处理，并将连续至少两个空白字符折成空格，不是删除全部换行。min_df=2 按账号文档频次；权重为 (1+log(tf))×[1+log((1+n)/(1+df))]，之后作 L2 归一化，与测试公式一致。\nGitHub\n+2\nScikit-learn\n+2\n\n结果解释没有越界。 pooled AP 略高而世界 AP 更低，不支持稳定胜出；不同输入、全部训练文本和已消费开发集，也不支持同预算优势或“给 M3 增加了独立信息”的结论。文档目前只是提出后者的问题，并未宣布已经证明。\n\nSELLER_ALIAS_CHARACTER_BASELINE… +1\n\nREPRODUCIBILITY_DEFECT：0 项\n\n行对应和曲线复用正确。 开发向量与索引共用 dev_keys，端点按 (world_uid, seller_uid) 查找；逐行稀疏乘积求和不是交叉配对。零向量明确得零分，不产生除零。基础／身份行键散列一致，再复用既有标签对齐与子集函数；原曲线函数接受一般有限排序分数，不要求它们是校准概率。\n\nstep28_character_baseline +1\n\n \n\nstep28_saved_model_audit\n\n摘要与保存路径正确。 词表按词项排序、索引转 Python int，不改变特征映射；IDF 使用 <f8 字节摘要。保存分数后精确重载，再写回执。首次摘要异常发生在内存曲线计算之后、创建输出目录之前，所以“未输出指标”不能理解为未计算；文档已如实披露两次标签解析，修复没有改变参数。\n\nstep28_character_baseline +2\n\n \n\nSELLER_ALIAS_CHARACTER_BASELINE…\n\n六测覆盖新增核心语义，但不是端到端认证。 独立计数、DF／IDF、次线性 TF、归一化、词表摘要、开发词表隔离、零向量及配对顺序／批次均有检查。字段拼接、默认空白处理没有独立手例；e\\u0301→W1 单独也不能检出移除 NFC，因为现有 L/M 计数仍会得到 W1。这是覆盖边界，不是已发现的实现错误；真实投影片段显式包含 NFC，不能据此要求重跑诊断。\n\ntest_step28_character_baseline_…\n\nOUT_OF_SCOPE_OVERDESIGN\n\n无需追加超参数、监督头、旧实验重跑或全回归。保留当前简单基线和探索性结论即可；15 项校验、6/6 通过及大数组精确重载仍应标为本地执行证据，而非网页独立复现。",
+  "links": [
+    {
+      "text": "GitHub\n+2\nScikit-learn\n+2",
+      "href": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/1.7.0/sklearn/feature_extraction/text.py"
+    }
+  ],
+  "local_disposition": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "count": 0,
+      "decision": "Retain only the post hoc development diagnostic; no stable gain, independent M3 information, budget-matched advantage, novelty, or real-Chinese claim."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "count": 0,
+      "decision": "No computational correction required. Inputs, train-only fit, row alignment, sparse scores, summaries and disk replay were executed locally. The web reviewer performed static review only."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "decision": "Do not repeat unchanged tests, old model replay, full regression, smoke or training; do not add a head or tune parameters based on these results."
+    }
+  ],
+  "coverage_notes": [
+    "Six tests are not full pipeline certification. The NFC composed-accent assertion alone cannot detect removing NFC; the implementation explicitly performs NFC and its semantics are unchanged.",
+    "Fields are joined by spaces and character grams may cross the join. Default repeated whitespace collapse preserves a single newline. These behaviours are read in source, not independently checked by the six new hand tests.",
+    "The first failed call computed metrics in memory but did not output them or publish files; only NumPy-int vocabulary serialization was corrected.",
+    "The successful receipt reports one development-label parse for that call. Two local attempts each parsed once; no train labels or audit truth read."
+  ],
+  "artifacts": [
+    {
+      "path": "reports\\seller_alias_character_baseline\\20260906\\diagnostic.json",
+      "bytes": 14353,
+      "sha256": "09b02ab2b34bebc6cf3736bdd089bf1c87dd9bcce3cbc4ab77c6d2a905e2dce5"
+    },
+    {
+      "path": "reports\\seller_alias_character_baseline\\20260906\\scores.npy",
+      "bytes": 1512128,
+      "sha256": "53785d0a56c30f4ef90683c2b91f5ee840bf16d819c36aefdc22ce2494954c64"
+    }
+  ],
+  "boundaries": {
+    "private_labels_uploaded": false,
+    "scores_uploaded": false,
+    "server_used": false,
+    "old_results_changed": false,
+    "reviewer_ran_project_data": false
+  }
+}

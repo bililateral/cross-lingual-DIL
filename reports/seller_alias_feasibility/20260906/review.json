@@ -1,0 +1,66 @@
+{
+  "stage": "seller_alias_feasibility",
+  "date": "2026-09-06",
+  "reviewer": "web ChatGPT GPT 6 Pro",
+  "url": "https://chatgpt.com/c/6a9d1145-9d04-83ed-825b-71f13afc9b44",
+  "model_selector": [
+    "6\nPro"
+  ],
+  "started_utc": {
+    "current_time": "2026-09-06 08:05:05 UTC"
+  },
+  "completed_utc": {
+    "current_time": "2026-09-06 08:10:49 UTC"
+  },
+  "attachments": [
+    {
+      "path": "docs/SELLER_ALIAS_FEASIBILITY.zh.md",
+      "bytes": 8908,
+      "sha256": "a40a28d7e3eea98a33452a8eb801744176d1133b594d79d3fc304dd9086dde98",
+      "text": "# 中文卖家马甲识别：具体算子的可行性筛选\n\n日期：2026-09-06。承接[保存模型诊断](SELLER_ALIAS_METHOD.zh.md)。本轮完成文献对照、生成器定点阅读和三个可手算构造，尚未找到足以晋级正式实验的新方法。这里记录具体排除理由，不把排除候选当作论文贡献，也不添加新的流程门。\n\n研究核心仍是中文暗网卖家同控关系，允许完整合成监督，不要求获得真实中文标签。既有四臂六预算的有效负结论、训练／开发结果和 Audit A/B 封存不变。本轮没有读取项目样本或标签、生成新数据集、训练模型或连接 Linux。\n\n## 1. 商品与交易条件的联合关系\n\n曾考虑比较账号内部“商品属性—交易约定”的对应关系，而非两个字段各自的均值。例如公开商品记录抽象成二元组 `(属性, 约定)`：\n\n| 账号 | 两条记录 | 两字段的均值 | 两字段的协方差 |\n| --- | --- | --- | --- |\n| A | `(0,0), (1,1)` | `(1/2,1/2)` | `1/4` |\n| B | `(0,0), (1,1)` | `(1/2,1/2)` | `1/4` |\n| C | `(0,1), (1,0)` | `(1/2,1/2)` | `-1/4` |\n\n联合关系确实能区别均值遗漏的输入差异。按 `(00,01,10,11)` 排列的普通联合直方图已经能做到：A、B 为 `(1/2,0,0,1/2)`，C 为 `(0,1/2,1/2,0)`；总变差距离分别是 0 和 1。因此这个例子不支持“必须增加新神经网络或新关系模块”。它也没有证明 Step23 的完整商品编码或已有非线性融合必然遗漏该关系。\n\n更重要的反例是，设 D 属于另一控制者，但从供应商取得与 B 完全相同的两条记录。在这个构造里，`(A,B)` 与 `(A,D)` 的全部规定公开输入相同，潜在同控标签相反。任何只接收这些输入的确定性打分器都必须给相同分数。该反例不证明现实账号总不可区分；它否定的是把联合关系一致直接当作充分同控依据。重复整组 A 十次仍有相同的归一化联合直方图，也不能据此把复制次数算作独立身份证据。\n\n本地重新阅读 `scripts/step28_method_root_builder.py` 的 `assign_styles`、`render_base_item` 及其构造调用：商品、属性、配送、服务来自 `content` HMAC 的逐条选择；同控信息在另行配置的风格和身份机制中。当前实现没有以控制者的经营决策函数生成这些商业关系，公开商品行也没有价格字段。因而不能拿旧根直接验证新“经营规律”假设，更不能为新模型临时造一套必然有利的规律后宣称方法可迁移。代码 SHA-256 为 `5333dfdbbdbb86566d3d2bc660ddd6fc25d11aa63561a2fc13b501a66410623b`，本轮未执行生成器。\n\n[DarkBIP-FW，2025，第 4.2.2—4.2.6 节](https://link.springer.com/article/10.1007/s42452-025-07217-5)已使用品类、价格、时间与文本行为特征。它限制了宽泛“经营行为指纹”的新颖性；不能从论文已有这些字段，进一步臆断其已实现上述条件关系算子，也不能据此认定该算子有新颖性。\n\n**处理：不以这个宽泛关系假设启动新数据生成或训练。**若以后有新关系，需要先说清可观察增量及共享供应商反例，普通联合统计属于必要的同输入对照。\n\n## 2. 两类线索是否支持同一商品对应\n\n第二个具体构造是：内容和表达两类线索，各自都能找到相似商品，但它们指向的对应是否一致？定义两张 `2×2` 相似度矩阵 `C`、`S`，以及完整二部匹配的平均权重：\n\n```text\nF(M) = max over permutations p of (M[0,p(0)] + M[1,p(1)]) / 2\nJ(C,S) = F((C+S)/2)\nG(C,S) = (F(C)+F(S))/2 - J(C,S)\n```\n\n这是本轮审查的简化算子，不是正式账号匹配器；没有引入固定真实商品一一对应的假设。实际账号记录数不同、没有相同商品时，它尚未定义，不能直接推入正式流水线。\n\n令 `I=[[1,0],[0,1]]`，`P=[[0,1],[1,0]]`：\n\n| 两张矩阵 | 分开最优后的平均 | 共同对应 J | 不一致差额 G |\n| --- | ---: | ---: | ---: |\n| `I,I` | 1 | 1 | 0 |\n| `I,P` | 1 | 1/2 | 1/2 |\n| 两张全 1 矩阵 | 1 | 1 | 0 |\n\n这个例子说明分开聚合会丢失对应关系，却也直接暴露两点：\n\n- `J` **恰好就是先逐商品融合相似度，再作普通匹配**，不能用它击败“先各自聚合再融合”后，就宣布超越了简单融合。\n- 所有商品都同样相似时，`G=0` 并不代表有明确对应，更不证明同控。完整搬用目录的异控账号同样可能支持一致匹配。\n\n这不是已经验证的新匹配方法。多模态对齐的一致性约束已有直接近邻，例如 [PMF，ACL 2024](https://aclanthology.org/2024.acl-long.190.pdf)；图与最优传输对齐亦有 [Chen 等，ICML 2020](https://proceedings.mlr.press/v119/chen20e/chen20e.pdf)。本轮只据已读摘要／引言和明确算子关系限定新颖性，没有复现两文算法，也没有宣称它们使用了本例同一公式。\n\n**处理：不把上述简单共同匹配包装成新算法，不新增图网络或最优传输实现。**若后继方法只超过弱聚合，未超过同输入的普通先融合后匹配，其算法增量仍不成立。\n\n## 3. 保持身份标签不等于保持识别信息\n\n第三个候选是用同控标签不变的多种改写，强制模型给出同样预测。这需要区分“表达变化”和“证据被删掉”，不能仅凭私有控制者没有变化，就对所有公开视图施加强概率一致性。\n\n可手算反例：两个等概率情形的标签分别是 0、1，完整公开输入 `X` 各含一个可完美区分标签的符号。确定性变换 `g` 删除这唯一符号，两个输入都变成同一个 `Z`。此时完整视图的后验分别为 0、1；残缺视图的后验只能为 `1/2`。最优期望 Brier 为 `1/4`，最优期望对数损失为 `ln(2)=0.6931471805599453`。若要求残缺输入同时精确复现两个不同的完整后验，约束不可同时满足。\n\n在**同一个固定联合分布**中，当 `Z=g(X)` 时，正确的关系是：\n\n```text\nP(Y=1 | Z) = E[P(Y=1 | X) | Z]\n```\n\n这不是任意跨域效果保证，也不是现有真实数据的数值结论。有限权重的一致性正则在别的条件下可能有用，本例不把所有增强或一致性训练一并否定。它只说明必须核查具体变换是否保留所声称的信息。完整监督下，在规定变换分布上正常计算交叉熵，本来就以相应的条件后验为总体最优解；单独重述上式或添加一个平均教师，并不足以成为新算法。\n\n[MatchDG，ICML 2021，摘要及第 1 节](https://proceedings.mlr.press/v139/mahajan21b/mahajan21b.pdf)已研究同一底层对象的跨域表示约束，其论证明确区分稳定特征与域相关变化。本轮反例不是反驳该文定理，而是禁止未经核对就把它扩大到删除任务证据的操作。作者验证中也已有[内容控制训练，RepL4NLP 2022](https://aclanthology.org/2022.repl4nlp-1.26/)和[深度 Bayes 因子评分，PAN 2020](https://arxiv.org/abs/2008.10105)，不能用“条件化”“似然”“反事实”等名称代替具体增量。\n\n**处理：保留完整监督作为基线，不实施尚未证明适用的信息删除强一致性。**这个反例只用于训练目标审查，不另立字段删失、背景删失或弃权主线。\n\n## 本轮执行与下一步\n\n三个构造使用标准库 `Fraction` 与两种排列穷举，在 Windows Python 3.10.11 中完成；精确有理数与手算一致，对数损失与 `ln(2)` 在 `1e-15` 内一致。代码在内存中执行，没有落地一次性脚本。实际计算回执及完整可重放代码保存在 [cases.json](../reports/seller_alias_feasibility/20260906/cases.json)。这不是 GPU smoke、模型性能测试或新数据集，不能报告成某方法获得了准确率优势。没有更改训练语义，所以不重跑八项旧诊断测试或全回归。\n\n本轮得到的实质结果是：**联合统计、共同匹配、无条件改写一致性，这三种具体表述都尚不足以成为新主线。**前两种不能绕过复制／共同来源解释，且存在直接的简单统计或匹配对照；第三种需要信息保留条件，已有标准监督与泛化方法必须比较。不能把这三项分别否决扩大成对所有关系学习或泛化学习的否决。\n\n接下来仍以中文卖家马甲识别为核心寻找具体证据关系。只要普通联合统计或同输入的简单融合能完全实现某个候选算子，就先承认它是基线；只有出现超出该基线的可检验机制和不同控制者的混淆解释，才值得实现训练方法。目前没有合理的新增 GPU 任务，也不为产生运行结果而修改旧合成根。需要 Linux 时仍先汇报具体用途、输入和范围，然后暂停。\n\n本阶段网页 GPT 6 Pro 定点审查待完成；尚不将本文件记成已获外审支持。\n"
+    },
+    {
+      "path": "reports/seller_alias_feasibility/20260906/cases.json",
+      "bytes": 5189,
+      "sha256": "6f12d3f349efb374cf848104c594195fbd2086655d76b25790bd0205f2628237"
+    }
+  ],
+  "prompt": "请用本会话已确认的 GPT 6 Pro，定点审查新上传的 SELLER_ALIAS_FEASIBILITY.zh.md 和 cases.json。承接上一轮保存 M3 诊断，但不重审未变代码或旧数值。\n\n用户要求继续推进以中文暗网卖家同控识别为核心的方法，完整合成标签可正常使用，不以获取真实中文标签为前置，也不能保证任意真实分布有效；需要 Linux 前先报告并暂停。本轮只做 Windows 标准库精确手算，没有模型训练。旧 Step23 跨商品分布负结果、Step25 去复制负结果和四臂六预算的有效负结论保持关闭。文中3个构造是对具体候选算子的筛选，不是新模型实验。\n\n请检查：1. 联合关系/共享供应商反例的逻辑是否正确，有无把不可区分的特例误说成现实普遍不可识别；2. 二阶共同匹配与先融合后匹配的等价、全平坦矩阵反例是否支持该处准确限定的判断；3. 标签保持但信息删除的条件后验、Brier、对数损失及交叉熵最优解是否正确，是否误否定有限权重的一致性训练或 MatchDG 原定理；4. cases.json 内完整可重放代码是否确实实现文本例子；5. 有没有把合理的简单基线因“不新颖”直接排除、把必须先证明一切造成科研停滞？若有，只给最小推进修正，勿再泛泛换题或要求构建大型新数据集。\n\n分类按 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN，每条说明受影响结论与最小处理。无需重复全文、添加模型、全回归或 smoke。请控制在约1200字，说明附件是否完整可读、哪些只是未证假设。网页没收到项目矩阵、私有标签或生成器全文，不得声称亲自复现现有大实验。",
+  "response": "可保留本阶段构造筛选记录；未发现改变三项限定结论的数学或代码错误。 两份附件均完整可读，包括 cases.json 内全部 replay_python。本轮是逐行静态核对与手算，未执行该代码、连接项目 Linux，未取得或复现项目矩阵、私有标签及现有大实验。\n\ncases\n\nSCIENTIFIC_BLOCKER：0 项\n\n1．联合关系与供应商反例成立，但不是经验效果否决。 协方差按总体口径计算为 ±1/4，联合直方图的总变差距离为 0、1，均正确。规定输入完全相同、潜在标签相反，确实使确定性评分器无法区分；这只否定“关系一致足以证明同控”，不能否定它在某个声明分布中的预测价值。文档已明确没有推出现实普遍不可识别。整组复制不改变归一化直方图，也不能因此增加独立证据。\n\nSELLER_ALIAS_FEASIBILITY.zh\n\n2．共同匹配等价关系准确。 此处 J 按定义就是逐边取均值后匹配；三个例子的 (J,G) 分别为 (1,0)、(1/2,1/2)、(1,0)。由于“最大值的平均”不小于“平均后的最大值”，G≥0。但 G=0 至多表示存在共同最优排列，不保证对应唯一；全平坦矩阵正好证明这点。等价结论仅针对这里的加性算子，不能扩大为所有含匹配边之间二阶交互的方法。\n\nSELLER_ALIAS_FEASIBILITY.zh\n\n3．后验与损失正确，没有否定所有一致性训练。 合并后 q=1/2，且\n\nR\nBrier\n\t​\n\n(q)=(q−\n2\n1\n\t​\n\n)\n2\n+\n4\n1\n\t​\n\n，\n\n所以最低值为 1/4；对数损失最低为 ln2。固定联合分布下的条件期望等式成立；交叉熵的后验最优解指总体、可表达该后验的预测函数，并非有限样本训练保证。特别是：一致性约束本身可以由常数预测满足；不能同时满足的是精确一致性与两个完整视图各自的最优后验。 文档的限定正确，有限权重正则并未被否定。\n\nSELLER_ALIAS_FEASIBILITY.zh\n\n额外核对了原文：定理1针对理想 PerfectMatch、其结构因果模型及附加条件，MatchDG 则近似对象匹配；它不是任意标签保持操作的保证。当前构造没有在那些条件全部成立时给出反证，因此不构成对原定理的否定。\narXiv\n\nREPRODUCIBILITY_DEFECT：0 项\n\n代码的均值、协方差、直方图、复制检查、两种排列穷举和损失计算与文本一致，标准库依赖自足。需要准确理解证据：第三例直接以合并后的等权标签 (0,1) 计算风险，没有实现实际文本删除器；相反控制者标签、完整后验及若干 True 字段是构造设定或逻辑声明，不是项目数据测量。这不影响手算构造成立，也不要求补大型测试。\n\ncases\n\nOUT_OF_SCOPE_OVERDESIGN：1 处推进措辞风险\n\n文档没有直接删除简单基线，但第80行“只有出现超出该基线……才值得实现训练方法”，容易把新算法主张的门槛扩大为经验探索的前置门槛。影响下一步推进，不影响本阶段记录留存。\n\nSELLER_ALIAS_FEASIBILITY.zh\n\n最小修改为：\n\n简单联合统计、先融合后匹配及完整监督均保留为合法基线；针对明确、有限且输入支持的假设，可以先做低成本核验，不要求预先证明增量或排除全部混淆。新算法主张另须与基线的实质区别及增量证据。\n\n仍未证明的是：这些关系在项目数据中的有效性、跨数据集增量及新颖性。 第21行生成器结构描述仍只是本地阅读报告，我未取得全文独立验证；不能用其散列替代内容核验。上述文字修正不要求重启旧负实验、修改旧根或启动训练。\n\nSELLER_ALIAS_FEASIBILITY.zh",
+  "links": [
+    {
+      "text": "arXiv",
+      "href": "https://arxiv.org/html/2006.07500v3"
+    }
+  ],
+  "local_disposition": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "count": 0,
+      "decision": "No mathematical contradiction in the scoped hand examples; no new empirical or novelty claim established."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "count": 0,
+      "decision": "11 exact assertions and the complete saved replay code match local outputs. The reviewer did not execute code. Several Boolean fields are logical statements, not project measurements."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "finding": "Novelty threshold could be misapplied to low-cost baseline exploration.",
+      "decision": "Accepted minimal wording clarification, independently made while review was pending: simple valid baselines can be checked before proof of novelty or success. Do not require ruling out every confound in advance."
+    }
+  ],
+  "local_clarifications": [
+    "Account IDs are indices, not scoring features, in indistinguishable-copy construction.",
+    "flat_no_information is lack of item-correspondence discrimination, not all identity information under all priors.",
+    "Binary Brier is E[(p-y)^2].",
+    "Novelty and guaranteed success are not prerequisites for a minimal valid baseline experiment."
+  ],
+  "boundaries": {
+    "project_samples_in_upload": false,
+    "private_truth_in_upload": false,
+    "server_used": false,
+    "old_results_changed": false
+  },
+  "next_action": "Inspect and implement one train-only character TF-IDF baseline on the unchanged Chinese public style projection, for exploratory development diagnosis only; no new transfer claim."
+}

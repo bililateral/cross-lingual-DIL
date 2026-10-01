@@ -1,0 +1,193 @@
+{
+  "date": "2026-09-06",
+  "stage": "two_candidate_scientific_review",
+  "status": "COMPLETED_ADVISORY_REVIEW_NO_NEW_EXPERIMENT",
+  "user_request": "把这两个都交给网页端模型审查一下，看看它给出什么意见？",
+  "reviewer": "web ChatGPT GPT 6 Pro",
+  "reviewer_display": "6\nPro",
+  "reviewer_role": "advisory_scientific_reviewer",
+  "conversation_url": "https://chatgpt.com/c/6a9cffcd-94dc-83eb-b909-2e5fdc3154ef",
+  "submitted_observed_utc": "2026-09-06T05:53:20Z",
+  "completion_observed_utc": "2026-09-06T06:10:08Z",
+  "scope": "The two independently proposed Chinese darknet seller alias research ideas, supporting public papers, aggregate frozen project results and data limitations. No code files, raw account text, private audit truth, credentials or internal identity assets were submitted. This is not an implementation audit.",
+  "prompt": "请作为独立科研审查者，公平比较下面两个尚未立项的候选问题。用户明确要求“把这两个都交给网页端模型审查一下，看看它给出什么意见”。请使用当前 GPT 6 Pro，联网核对关键相关工作；区分论文事实、你作出的推断和仍需验证的假设。你提供建议，项目执行者保留判断权。不要因为存在通用近邻就直接否定应用研究，也不要把场景改名说成新颖性。没有可靠算法增量时请直说。\n\n【共同约束与当前研究状态】\n核心必须是“中文暗网卖家马甲识别”，即不同卖家账号是否由同一控制者经营，以及候选账号的关联排序。不要转向通用作者识别、AI 文本检测、账号转让／接管、背景频率或少商品新账号等别的选题。\n真实中文同控标签极少，项目现阶段只能以明确声明的合成中文数据作为主要实验依据。不能将合成数据冒充真实数据效果，也不能把“向作者索要就能拿到大规模真值”作为可行性的前提。可以认为虚构商品、账号和公开线索能够受控生成，但“合理、可识别、生成捷径受控”仍需要具体论证。\n当前合格合成根 V9.4.1：train/development/Audit A/Audit B 各 500 世界，每世界 28 卖家、378 对、20 正例。Audit A/B 真值封存，不可为选题解封。已有 M0/五个 M1/M2/M3-base/M3-joint 的 train/development 结果；M2 development AP 0.751713，M3-joint 0.842639。身份原始规则覆盖每世界 20 个正例中的 16 个且没有假正例，这限制了“新增复杂方法明显有用”的空间。\n另一个已冻结并完成的英文风格初始化四臂六预算实验，25 世界主终点的中文 world-equal AP 为 generic 0.111634、correct-source 0.110269、permuted-source 0.108407、style-ablated-source 0.109375。正确源监督未超过 generic，按预注册规则停止迁移收益主张；这是有效负结果，不得改终点、重挑种子或换标题挽救。它与上一段模型的输入/训练方案不同，不能直接横比 AP。\n旧研究债务：Step22 同一观测卖家切成伪马甲不增加真实跨账号真值；Step23 多实例分布特征负结果；Step25 文本复制去污染及复制风险融合在正确实现后仍为负结果。七月的身份机制研究已涉及接触线索碰撞、二跳佐证、保护性拒判；有效结论仅限同一合成机制家族。当前合成器也已有不同控制者共用风格和同控账号风格扰动。不要把这些已做工作重新包装为贡献。先评问题和可能增量，不能用堆模型、庞大审查流程或无关安全加固掩盖问题不足。\n\n【候选一：有偏弱监督下的中文暗网隐蔽马甲识别】\n研究问题：已知正例主要来自容易发现的显式关联时，能否发现缺少这些显式关联、尚未被规则标出的真实马甲？\n例：同联系方式/同名账号更容易被选为已知同控正例；换联系方式的同控账号仍在未标注集合。共享服务或信息抄用又可能产生错误正例。实际同控、是否获得标签、标签是否正确是三个不同变量；未标注不等于负例。输出仍是卖家同控判别及排序。\n动机不是凭空捏造：项目旧中文训练的 229 个正例中 213 个是 silver，余下 16 个也不能自动称为 gold。但旧边界已反复用于开发，不能再充当新的无偏验证。\n最近相关工作：\n1. PUER，Findings EMNLP 2025，https://aclanthology.org/2025.findings-emnlp.1336.pdf 。已读任务定义和实验第 6 节：少量正例＋未标注实体匹配，实验随机抽 50 个正例。不能宣称首次 PU 实体匹配。\n2. Bekker & Davis 2018，Learning from Positive and Unlabeled Data under the Selected At Random Assumption，https://arxiv.org/abs/1808.08755 。依赖样本属性的正例选择早已有研究；具体实现尚未审核，不能宣称首次解决选择偏差。\n3. Wang 等，Multi-Identity Recognition of Darknet Vendors Based on Metric Learning，Applied Sciences 2024，https://www.mdpi.com/2076-3417/14/4/1619 ，第 3.3.1 节以同名作为初始正例，商品标题 Jaccard 筛选，再用伪标签/人工复核。这证明规则监督有具体近邻，不等于其全部标签错误。\n潜在方法假设：区分身份匹配过程与被标注过程，保留证据来源，处理有偏且有噪的正例，避免自训练重复放大原规则。可与普通有监督、PU、选择偏差修正、噪声鲁棒方法公平比较。但目前没有确定新算法或可识别性条件。\n请特别审查两点：A. 合成器已经掌握完整身份标签，再故意遮蔽成弱监督，是否仅是在制造一个人工困难？什么时候它值得成为主线，什么时候只算评估协议，是否必须保留完整合成监督的实用上限/对照？B. “隐蔽马甲”还剩哪些可公开观察且可学习的身份信息？如果某类样本永不获标且没有可区分公开信息，不能承诺自动恢复。\n不能将合成器内部控制者、选择概率、私有机制标签交给新方法却不交给基线；仿真机制仅可供评价端定义真值。\n\n【候选二：多类身份线索共同变化后的中文暗网卖家马甲识别】\n研究问题：同一中文卖家更换账号、改写商品文案并替换部分身份线索后，哪些公开证据仍能支持关联，如何避免把模仿者误认成该卖家？\n关注文本、公开账号/联系线索、商品与行为证据共同变化时的匹配方法；LLM 改写只是可选工具。既不能仅做字段删除测试，也不能把全部身份信息删光后要求仍然成功。业务/身份保持约束必须可检验，不能仅说“看起来真实”。\n最近相关工作：\n1. Tai 等，Adversarial Matching of Dark Net Market Vendor Accounts，KDD 2019，https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf ，已有卖家对抗匹配、复制/模仿问题。\n2. Masks and Mimicry: Generating Text to Obfuscate Authors' Styles and Impersonate Others，2025，https://arxiv.org/abs/2503.19099 ，已有语义保持的文风隐藏与模仿。\n3. Aggregation-Aware Synthetic Text Generation Against Authorship Re-Identification (AAST)，2026-08 预印本，https://arxiv.org/html/2608.22161v1 ，已把多文本账号整体用于改写与作者再识别评价，不能以“首次账号级”自居。其任务与语料不是中文暗网多类公开身份线索。\n潜在增量必须具体到：联合变化为什么使既有方法失败，什么可利用的信息/归纳假设让新匹配方法超过普通字段丢弃、通用对抗训练和简单证据融合？只做一个 LLM 改写基准或重做 Step25 去模板，不能当作新主线。训练/测试同一改写配方也不足以证明泛化。\n\n【两个候选都必须面对的直接中文近邻】\nDarkBIP-FW：Decoding the shadows: multi-modal identity profiling in darknet markets using latent behavior feature fusion，2025，https://link.springer.com/article/10.1007/s42452-025-07217-5 。它已有中文论坛行为特征融合；第 6.6.2 节还核查 986 个高相似疑似账号对，报告 975 个存在关联迹象、11 个证据不足；这些关联不自动等于独立同控金标准。其私有语料不视作本项目可用数据。不能断言中文卖家多账号识别无人研究。\nVendorLink，ACL 2023，https://aclanthology.org/2023.acl-long.481/ ，已有广告文本身份关联、跨市场/低资源适配，也应按任务重叠程度判断是否需要基线。\n\n【请给出的审查结果】\n1. 分别评价两个问题的实际意义、已被相关工作覆盖的部分、可能剩余的精确空缺、最强反对理由；支持关键事实的原始论文链接及章节。\n2. 若某候选值得保留，提出一个具体、可反驳的方法假设和一个最小决定性比较：输入、实际可用监督、公平信息边界、主要对照、成功/停止条件。不要提出庞大实验矩阵；如果尚提不出可信机制，坦率标“尚不够立项”。\n3. 明确合成数据能支持什么、不能支持什么，以及需要哪些信息假设；不要用建议采新真实金标准逃避本项目约束。\n4. 给出二者的相对优先级（或都不建议），说清是因研究价值、方法空缺还是可行性；不要预设哪一个优先，也不要承诺能发高质量论文。请用中文给有依据、可供我们讨论的意见。",
+  "prompt_dom_check": "All 3820 prompt characters matched the submitted user message; trailing UI control '\\n\\n收起' was excluded.",
+  "response": "总体判断\n\n**两个问题都值得讨论，但目前都还没有足以支持立项的可靠算法增量。我的相对建议是：候选一优先做一次低成本、可否决的可行性核查；候选二暂列其后，先明确联合变化后究竟保留哪一种可检验的身份信息。**这不是说候选一已经成立，更不是因为候选二有通用作者识别近邻就否定它。\n\n两者最关键的缺口不同：\n\n判断维度\t候选一：有偏弱监督\t候选二：多类线索共同变化\n问题价值\t直接面对“规则容易发现的正例不代表全部同控关系”\t直接面对“同控账号可以不像、不同控制者可以很像”\n最强反对理由\t项目已有完整合成真值，隐藏它究竟解决什么实际训练问题？隐藏后又凭什么可识别？\t联合变化后保留的信息可能只是人为指定的不变量，方法成功可能等于识别生成规则\n目前未成立的增量\t同时建模匹配、获标和错误标签，并不自动带来可识别性或新算法\t多模态融合、对抗训练、账号级改写都不是新贡献；尚缺具体优于它们的机制\n当前建议\t保留问题，先检查残余信息及监督覆盖；尚不够立项\t保留一个有条件的机制假设；暂不作为优先主线\n\n以下项目数值按你提供的冻结记录讨论，未做结果级复核。论文结论、我的推断和待验证假设分开表述。\n\n一、相关工作实际上覆盖到了哪里\n1. 两个候选共同面对的直接近邻\n\nDarkBIP-FW 不能绕开，但也不能把它的关联核查理解为独立同控金标准。原论文\n第 4.2 节融合文本、品类偏好、价格与发帖时间特征；第 6.6.2 节从高相似账号中筛出 986 对，人工认为其中 975 对具有关联迹象。其主要训练任务使用卖家账号标签，高相似核查又包含同一个人、组织或协同行为等解释。因此，它已经覆盖中文暗网行为融合与疑似多账号关联，但没有据此建立独立的“同一控制者”成对金标准，也没有证明隐蔽同控关系的总体召回率。\n斯普林格\n+1\n\nVendorLink 是任务相关的文本关联基线，不只是泛作者识别背景。ACL 2023 原论文\n第 4.1—4.3 节包含账号分类、开放集账号相似度和低资源适配；第 9 节也讨论账号名假设及模仿者问题。它与本项目的文本证据部分直接重叠，但其账号标签和相似度发现不能自动转换为独立同控真值。后续需要的是同输入、同监督预算的适配比较，而不是拿其分类准确率与本项目 AP 横比。\nACL Anthology\n+1\n\nTai 等 KDD 2019 同时约束两个候选的新颖性。原论文\n第 4.1 节明确讨论 PGP 等启发式标签的错误；第 5.1 节使用文本、商品及活动信息；第 5.2 节通过训练集外折预测，使模型不必机械接受每个启发式正例；第 6.3 节分析关联及模仿案例。这不是完整的有偏、有噪 PU 解法，但已经覆盖“启发式标签不可靠”和“用多类证据区分模仿者”。因此，简单的交叉预测纠错或抗复制融合不能直接算新贡献。\n卡内基梅隆大学\n+1\n\n我的推断是：中文应用研究仍有空间，但空间必须来自不同的监督困难、明确的证据条件或可复现的失效机制，而不是“中文＋多模态＋暗网”的名称组合。\n\n2. 候选一的覆盖范围比“已有 PU 实体匹配”更广\n\nPUER，Findings EMNLP 2025\n确实研究少量正例加未标注数据的实体匹配。第 6 节随机抽取 50 个正例；这不能证明它已经检验过规则驱动的选择偏差。还有一个比较细节：其若干基线获得相同正例及基准中的已标注负例，PUER 本身没有这些负例。因此，本项目不能原样搬用该实验表，声称各方法都处于同一弱监督条件。\nACL Anthology\n\nBekker 与 Davis 2018\n第 3.3 节已经指出未知获标概率下的不可识别问题；第 4 节的 SAR-EM 已经联合学习分类器和选择概率模型。其学习依赖额外条件，例如已知哪些可观察属性影响选择，并讨论各选择分层中的局部确定性条件。它不是任意偏差下的自动恢复方法，原设定也不允许已标正例其实为负。第 5.3 节使用完整标签数据模拟选择偏差，并保留完整监督参照。\narXiv\n\n还应补入 Jain 等，NIPS 2016，Estimating the class prior and posterior from noisy positives and unlabeled data\n。第 2—4 节已经研究有噪正例与未标注数据及可识别条件，但其类别条件分布假设不同于任意属性依赖选择偏差。因此，“有噪正例”本身也不是新问题；与此同时，不能因为这篇与 SAR 各有不同假设，就直接推断二者交集没有既有研究。\nNeurIPS Papers\n+1\n\nWang 等 Applied Sciences 2024\n第 3.3.1 节的直接相关性很强：同名初始化标签，商品标题 Jaccard 阈值筛选，再结合预测分歧人工复核。特别是，正文写明低于 0.2 的样本对不进入后续实验。**我的推断是：这种候选筛选本身就可能限制低文本重合马甲的覆盖；但这不是其实际漏检率的估计，也不证明其标签全部错误。**该节已通过原论文全文镜像核对，出版方页面本轮访问受限。\nResearchGate\n+1\n\n3. 候选二不能以“首次账号级改写”立题\n\n2025 年 Masks and Mimicry 原论文\n的准确标题是 Masks and Mimicry: Strategic Obfuscation and Impersonation Attacks on Authorship Verification。第 3—4 节已经研究文风隐藏与定向模仿，并评价文本意义保留。它的任务和语料不是中文暗网控制者关联，因此不是一票否决的同题论文；但“语义保持的文风改写与模仿”已被覆盖。\narXiv\n+1\n\nAAST，2026 年 8 月预印本\n第 3.3、3.7 节已经把账号的多条文本组成整体，并按整体再识别风险选择改写结果；第 4.1 节使用 Reddit、Blog 和 CROSSNEWS。它尚不是中文暗网多类公开线索匹配方法，但已经排除了“首次考虑账号级多文本改写”的主张。文本效用评价也不等于本项目所需的业务事实与身份保持验证。\narXiv\n+1\n\n二、候选一：问题更具体，但首先是可识别性与实用性的审查\n1. 实际意义与可能剩余的精确问题\n\n这个候选最有价值的部分不是“标签少”，而是：\n\n学习者看到的同控正例，是某些发现规则挑选出来的；这些规则还可能误标。学习目标却是规则未覆盖的同控关系。\n\n这会同时影响训练和评价。模型可以在规则挑出的样本上很好，却只是复现规则的发现范围。\n\n你给出的旧中文正例来源说明该担忧有项目依据，但需要严格限定：**213/229 为 silver，说明标签证据等级与来源需要认真处理；它不直接证明具体选择偏差、错误率或隐蔽马甲规模。**其余 16 个也不能默认是 gold，旧开发边界更不能被重新称为无偏验证集。\n\n可能剩余的问题应收紧为：\n\n在标签来源可观察、正例选择依赖公开证据且可能误标的条件下，能否利用规则之外、具有训练支持的公开信息，提高完全未命中显式规则的同控关系排序？\n\n这是一个值得研究的问题表述，还不是已确认无人解决的算法空缺。\n\n2. A：故意遮蔽完整合成标签，什么时候合理？\n\n遮蔽本身不是科研错误。问题在于，它究竟模拟了什么，以及结论是否超出了该模拟。\n\n合理的情况是：完整合成真值作为评价工具，用来研究不同标注机制如何改变学习结果。固定账号、文本和真实关系，只改变哪些关系被发现、记录或误标，就能够区分“身份信息不足”和“监督过程有偏”这两种原因。这种设计可以产生有价值的机制结论。\n\n但以下情况不足以成为主线：\n\n在同一个完整合成训练集上，本来所有方法都能使用真值；研究者主动把真值藏起来，再以新方法优于被迫弱监督的基线，证明其“更适合本项目”。\n\n这只能证明它较擅长被人为规定的学习条件，不能证明放弃可用真值有实际收益。\n\n因此，必须保留同输入的完整合成监督参照。它不是严格的数学性能上界，但它是项目目前真实可用的训练方案，不能被排除。它也应享有同样合理的正则化和证据处理，而不是故意设置成弱版本。\n\n候选一要成为主线，至少需要成立其中一个实质贡献：揭示此前未被认真处理、且确有后果的监督失效机制；给出明确的可识别条件；或者在这些条件下提供超过已有方法的稳定增量。只有一次“隐藏标签＋套用 PU”的实验，最多是评估协议或应用验证，不能称为新方法。\n\n3. B：“隐蔽”不等于没有信息，但不能凭模型恢复不存在的信息\n\n可以把三个过程分开：实际是否同控 Y、是否被选中标注，以及标注是否正确。若最终观测到的弱正例标记为 L，则有：\n\nP(L=1∣X)=a\n1\n\t​\n\n(X)P(Y=1∣X)+a\n0\n\t​\n\n(X)[1−P(Y=1∣X)].\n\n这里 X 是全部允许使用的公开信息；a\n1\n\t​\n\n 表示真同控被记录为正例的概率，a\n0\n\t​\n\n 表示非同控被错误记录为正例的概率。这是对问题的概率分解，不是已经解决它的算法。\n\n仅观察 X,L，通常不能唯一拆出三个未知函数。即便没有错误正例，相同的 0.1 获标概率，也可能来自“0.2 同控概率×0.5 获标概率”，或者“0.5×0.2”。加一个选择预测头，并不会自动消除这种歧义。\n\n还剩下的公开信息，可以假设包括跨多条记录的业务规格、服务约束、报价结构与活动模式等，但必须满足两件事：它们在未命中规则的同控关系上仍有区分力；这种区分关系能够从允许使用的监督中学到。商品相似、文风相似都不能直接等同于同一控制者。\n\n特别需要区分：\n\n某类正例从不获标，但有可迁移的公开判别关系：可能通过额外结构假设学习，不过需要证明该假设。\n\n某类正例从不获标，且全部可观察信息与非同控不可区分：不能承诺自动恢复；高分反而值得怀疑是否读到了生成捷径。\n\n还有一个与排序直接相关的限制：统一缩放所有分数不会改变 AP。要声称排序增量，必须纠正样本之间不同的偏差，或学到原方法没有利用的判别信息，而不只是改善概率校准。\n\n4. 一个可反驳的方法假设，而非已成立的新算法\n\n待验证假设 H1：按标签来源阻断“用产生标签的同一证据再次证明标签”的训练路径，能够改善规则外关系排序，而不必全局丢弃这些证据。\n\n一个具体原型是：来源 j 产生的弱监督，只约束预先移除该来源直接触发证据及其派生信息的视图；例如联系方式相同产生的监督，不能单凭该联系方式及其重复出现完成训练。所有正例和未标注样本都构造同样的视图，避免“只有正例被遮蔽”反而制造标签捷径。\n\n它与“把所有联系方式永久删除”不同，也不是简单再做文本去复制。但必须坦率说明：\n\n**这个机制最多尝试阻断规则自我复制，不会自动纠正所有假正例，也不会自动识别未知选择概率。**它需要其他视图包含可学习信息，且多个来源不能只是同一证据的不同编码。交叉拟合、多视图学习和来源隔离本身均不能直接宣称新颖。\n\n5. 最小决定性比较\n\n我建议最先检查的甚至不是 H1，而是：当前规则未命中的关系上，是否存在合理完整监督方法能够利用的信息。\n\n按你提供的规则覆盖情况，排除 16 个规则命中对后，每世界应剩 362 个候选对，其中 4 个正例、358 个负例。这是比总体 AP 更贴近“隐蔽马甲”的评价范围。不能只评价这四个正例，也不能把随机隐藏的一批容易正例当成隐蔽马甲。\n\n若该范围存在可用信号，再考虑一个固定数据设置下的比较：\n\n项目\t最小要求\n输入\t相同公开账号记录、候选全集和真实可观察的标签来源信息\n弱监督\t一种事先说明的规则驱动选择机制；错误正例必须来自明确的公开证据碰撞机制\n主要对照\t普通 PU、SAR-EM、一个明确的有噪 PU 方法，以及“全局去触发证据＋PU”；另保留完整监督参照\n候选方法\tH1；使用相同基座、信息和训练预算，不额外获得私有概率或机制标签\n主要评价\t规则未命中候选集的 world-equal AP；同时检查全体候选排序与固定复核名额下的误关联数量\n\n这是一种设置、一个基座，不需要展开多预算、多大模型矩阵。把未标注当负例的普通监督可以作为低门槛参考，但战胜它不能成为主要成功依据。\n\n成功条件应是：相对最强同信息对照，规则外排序有超过事先约定实际意义的增益，且没有用更多误关联换取表面召回；来源隔离的收益还应超过简单删除证据。完整监督参照不必被击败，但它与弱监督结果的差距必须如实展示。\n\n停止条件包括：合理的完整监督对照也未检出残余可用信息；监督对隐蔽群体没有可论证的覆盖或迁移关系；全局删除证据已经达到同等效果；或者收益依赖知道模拟器的选择概率、错误率及私有类型。前者是停止投入的证据，不是证明所有可能算法都无效。\n\n还有两个不能省略的边界。当前原始规则零假正例，因此原样 V9.4.1 不能检验“有噪正例纠正”这一主张；增加碰撞或误标属于新声明的合成扩展。完整 development 真值也不能被无限用于调弱监督方法，再宣称没有干净监督：应仅作预先固定方案的诊断，或者把实际使用量计入各方法相同的监督预算。\n\n三、候选二：任务价值成立，但证据保持假设比算法更缺\n1. 实际意义与最强反对理由\n\n这个候选有一个相对优势：**它可以直接使用全部合成训练真值，不需要解释为什么放弃已有监督。**研究问题也是同控识别本身，而非标签制度。\n\n真正值得研究的困难是：多类证据不是独立随机缺失，而可能相关地改变；与此同时，模仿者可能在多个字段上同时变得相似。因此，一个逐字段计算相似度再融合的方法，可能把“共同变化”理解为不同控制者，把“共同模仿”理解为同一控制者。\n\n但这是机制推断，目前不是项目中已经验证的失效事实。现有方法也不一定只会独立融合，不能用固定加权和作为唯一弱基线。\n\n其最强反对理由是：\n\n研究者先规定“同控账号保留某种结构，模仿者不保留”，再设计一个识别该结构的方法；高分证明的是模拟器把答案放在这里，而不是方法解决了身份识别。\n\n因此，不能只问“是否保留身份”，必须问：保留的究竟是什么公开关系；不同控制者为何也可能具有这种关系；同一控制者又在什么情况下会破坏这种关系。\n\n2. 一个有条件的、可检验的切口\n\n我认为可核查的切口不是“更多模态”，而是：\n\n联合变化后，单个字段的相似度可能下降，但不同公开记录之间仍可能由同一个受约束的变化关系解释；这种解释能否预测未参与拟合的其他记录？\n\n待验证假设 H2：共享变化关系的跨记录一致性，能够提供普通字段融合没有充分利用的同控判别信息。\n\n举一个具体但尚未得到项目证据支持的例子：公开报价记录包含规格、数量和价格关系。账号改名、文案改写、联系方式更换，并伴随单位转换或近似统一的价格尺度变化后，可以用部分记录估计对应关系，再检查同一对应能否解释其余记录。不能为每个字段各自挑一个最有利的匹配，最后拼成“总体很像”。\n\n这个原型的关键是在部分记录上拟合，在其他公开记录上检验，而不是重新汇总商品分布，也不是删除复制文本。它有可能不同于 Step23、Step25，但“关系匹配”或“共享变换”仍然不是天然的新算法。\n\n这里的反对理由也很直接：报价关系可能属于共同供应商、行业惯例或被整体复制的商品目录；同一卖家的价格策略也可能独立改变。**目前没有证据说明哪一种关系在同一控制者内部显著更稳定。**若找不到这样的具体关系，候选二就应停留在“尚不够立项”，而不是以通用对抗训练填补这个空白。\n\n3. “业务保持”需要怎样的可检验约束？\n\n至少应把语义保持落实为具体对象：商品规格、数量单位、服务范围、交易条件等哪些内容允许变化，哪些必须保持，哪些允许存在明确噪声。评价端可以依据生成前后的结构化事实核查；单凭 LLM 自评或文本语义相似度，不足以确认这些约束。\n\n固定内部控制者编号，只能保证模拟真值没有改变，不能单独证明改写合理。相反，模仿者必须从另一个控制者的独立账号出发，依据可见信息模仿，不能把同一账号换个私有标签就当成负例。\n\n尤其重要的是：**允许一部分不同控制者也保持完整的公开关系结构，同时允许一部分同控关系破坏候选不变量。**否则就把方法假设硬编码成了标签。对于公开信息已完全等价的关系，承认不可区分是结论边界，不需要再包装一个新的“保护性拒判”贡献。\n\n4. 最小决定性比较\n\n可以只选择一种明确的联合变化家族，以及一种未参与调参的变化组合检验，不做庞大攻击矩阵。\n\n项目\t最小要求\n输入与监督\t所有方法获得相同公开记录、完整合成训练真值、相同增强样本\n基础对照\t能学习交互关系的证据融合模型，配合普通字段丢弃\n强对照\t同一融合模型，使用同样联合变化样本进行普通对抗或增强训练\n候选方法\tH2 的共享变化关系及留出记录一致性评分\n机制对照\t取消“共同解释”约束，允许各部分独立匹配；其余输入与预算不变\n主要评价\t未见联合变化条件下的 world-equal AP，并单独观察模仿者误关联及未变化账号表现\n\n新方法使用的结构化字段、预处理和关系特征也应开放给融合基线。否则不能区分“算法增量”和“多给了更好的信息”。\n\n变换必须作用于账号整体，使这个账号在所有候选对中保持同一份观测；不能针对正负 pair 分别生成有利的改写。训练与评价的区别也不能只是随机种子或提示词换句说法，而应涉及没有用于调参的变化关系或组合。\n\n成功条件是：H2 在该留出条件下超过同预算的强融合与普通增强训练，且对包含关系相似的难模仿者仍有收益；取消共享约束后收益消失，才提供机制支持。\n\n停止条件是：收益只存在于同一改写配方；模仿者被生成为明显不一致的“坏样本”；普通融合拿到同样关系特征后追平；或者所谓不变量实际上来自内部商品对应编号、生成模板或控制者私有属性。只让所有模型下降，再证明新模型下降稍少，并不足以确立新的研究主线。\n\n四、合成数据在这两个候选中能支持什么\n\n**能够支持的，是条件明确的结论：**在所声明的控制者生成机制、公开证据分布和标注或变化规则下，某方法是否改善同控判别及排序；某种错误来自监督选择还是信息损失；某个提出的机制是否得到对照实验支持。这完全可以是有价值的应用研究，不必因为是合成实验就否定。\n\n**不能直接支持的，是现实总体结论：**真实中文暗网的标签错误率、隐蔽马甲占比、真实同控召回率，或任意未来改写与模仿下的稳健性。多个控制者共享作者、风格或业务方式，同一控制者使用不同作者或表达方式，都必须与“控制者真值”区分。\n\n两者都需要三项信息假设成立：公开证据在目标困难群体中仍有区分力；训练中存在学习这种区分关系的支持；成功不依赖生成器特有的标签标记。增加世界数量只能改善同一机制下的估计精度，不能替代这些假设。\n\n执行上的边界也很清楚：私有控制者、真实选择概率、真实误标率及变换对应关系只能用于评价或明确标注的理想条件参照。PU 方法所需的类先验不能暗中从真值读取，更不能只有新方法知道每世界恰有 20 个正例。世界内账号对相互依赖，比较的不确定性也应以世界为单位处理。\n\n本轮无须打开 Audit A/B。train/development 足以进行“是否值得继续”的诊断，但诊断不能被升级成独立确认。新标注制度或联合变化设置，也不会自动继承 V9.4.1 已有的全部质量结论。\n\n你给出的现有结果应起到约束作用，而不是被改写成新故事：原规则已经覆盖 16/20 正例，说明应直接检查剩余困难部分；M3-joint 的总体 AP 不能代替该检查。英文风格初始化的有效负结果保持结束状态；它不为这两个候选提供正面依据。Step23、Step25 以及七月机制工作的既有结论也应保留，不作为新贡献重新计算。\n\n五、最终相对优先级\n\n**候选一：优先核查，但不建议现在按“新弱监督算法”立项。**它的优势是问题来源具体，可以利用现有 train/development 快速回答两个决定性问题：规则外到底剩下多少可学习信息；规则挑出的监督是否足以学到这些信息。其最大风险是，最后只得到“已有 PU 方法在人工遮蔽数据上的应用”，或者必须依赖无法获得的选择与错误概率。\n\n**候选二：暂列第二，不建议以“多模态联合改写鲁棒匹配”这一宽题目立项。**它使用完整合成监督更自然，也有明确应用价值；但目前缺少的不是模型，而是一个既可检验、又不把真值编码进数据的证据保持机制。只有先证明这种机制确实留下了普通方法未充分利用的信息，才值得讨论专门匹配算法。\n\n因此，我的建议不是二选一立即开工，而是：先用候选一的“规则外信息与监督覆盖”问题做一次可否决诊断；候选二先停在明确不变量及强反例的层面。若项目当前必须确定一条具有可信新算法增量的主线，则两者目前都尚不够立项。",
+  "response_links": [
+    {
+      "text": "原论文",
+      "url": "https://link.springer.com/article/10.1007/s42452-025-07217-5?utm_source=chatgpt.com"
+    },
+    {
+      "text": "斯普林格\n+1",
+      "url": "https://link.springer.com/article/10.1007/s42452-025-07217-5"
+    },
+    {
+      "text": "ACL 2023 原论文",
+      "url": "https://aclanthology.org/2023.acl-long.481/?utm_source=chatgpt.com"
+    },
+    {
+      "text": "ACL Anthology\n+1",
+      "url": "https://aclanthology.org/2023.acl-long.481.pdf"
+    },
+    {
+      "text": "原论文",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf?utm_source=chatgpt.com"
+    },
+    {
+      "text": "卡内基梅隆大学\n+1",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf"
+    },
+    {
+      "text": "PUER，Findings EMNLP 2025",
+      "url": "https://aclanthology.org/2025.findings-emnlp.1336.pdf?utm_source=chatgpt.com"
+    },
+    {
+      "text": "ACL Anthology",
+      "url": "https://aclanthology.org/2025.findings-emnlp.1336.pdf"
+    },
+    {
+      "text": "Bekker 与 Davis 2018",
+      "url": "https://arxiv.org/abs/1808.08755?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arXiv",
+      "url": "https://arxiv.org/pdf/1808.08755"
+    },
+    {
+      "text": "Jain 等，NIPS 2016，Estimating the class prior and posterior from noisy positives and unlabeled data",
+      "url": "https://papers.neurips.cc/paper/6168-estimating-the-class-prior-and-posterior-from-noisy-positives-and-unlabeled-data.pdf?utm_source=chatgpt.com"
+    },
+    {
+      "text": "NeurIPS Papers\n+1",
+      "url": "https://papers.neurips.cc/paper/6168-estimating-the-class-prior-and-posterior-from-noisy-positives-and-unlabeled-data.pdf"
+    },
+    {
+      "text": "Wang 等 Applied Sciences 2024",
+      "url": "https://www.mdpi.com/2076-3417/14/4/1619?utm_source=chatgpt.com"
+    },
+    {
+      "text": "ResearchGate\n+1",
+      "url": "https://www.researchgate.net/publication/378328763_Multi-Identity_Recognition_of_Darknet_Vendors_Based_on_Metric_Learning"
+    },
+    {
+      "text": "2025 年 Masks and Mimicry 原论文",
+      "url": "https://aclanthology.org/2025.nlp4dh-1.10/?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arXiv\n+1",
+      "url": "https://arxiv.org/html/2503.19099v1"
+    },
+    {
+      "text": "AAST，2026 年 8 月预印本",
+      "url": "https://arxiv.org/html/2608.22161v1?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arXiv\n+1",
+      "url": "https://arxiv.org/html/2608.22161v1"
+    }
+  ],
+  "capture_method": "Completed rendered assistant message innerText and hyperlink targets; formula formatting reflects the webpage DOM. No reasoning trace collected.",
+  "reviewer_summary": {
+    "priority": "Candidate one before candidate two for feasibility checking only.",
+    "candidate_one": "Check residual public signal and weak-supervision coverage; retain full-supervision reference. H1 is label-source-specific evidence isolation, with no claim it automatically solves noise or identifiability.",
+    "candidate_two": "Specify a defensible public relation before modeling. H2 fits a shared change relation on some account records and checks other records; price/quantity consistency is an unverified example.",
+    "readiness": "Neither currently establishes a reliable novel algorithm or is ready to freeze as a new mainline."
+  },
+  "local_checks": [
+    {
+      "claim": "PUER covers few-shot PU entity resolution; its experiment samples 50 positive pairs randomly.",
+      "result": "Verified directly in definition 1 and section 6. Baselines also receive benchmark negative training labels while PUER does not; do not describe the original comparison as identical supervision. This does not establish the result under rule-selected noisy positives.",
+      "url": "https://aclanthology.org/2025.findings-emnlp.1336.pdf",
+      "scope": "Problem definition and experiment setup reread; no implementation audit."
+    },
+    {
+      "claim": "SAR-PU separates identity/class prediction from positive-label selection.",
+      "result": "Sections 2 and 3.3 assume labeled positives are correct and explain why unknown propensity and class probability need additional assumptions. Section 4 already jointly fits the classifier and selection model using EM. A new dual-head architecture alone is not a demonstrated contribution.",
+      "url": "https://arxiv.org/html/1808.08755",
+      "scope": "Sections 2, 3.1–3.3 and 4.1 reread; no implementation or empirical replication."
+    },
+    {
+      "claim": "Tai et al. are a close predecessor for both candidates, including imperfect heuristic supervision.",
+      "result": "Verified sections 4.1, 5.2, 6.3.2–6.3.3 and 7. They generate heuristic labels, use ten-fold out-of-fold predictions, link some accounts without common keys and discuss wrong heuristic matches. This is more than merely mentioning label noise, but is not proof that arbitrary selection bias plus unknown false-positive noise is solved.",
+      "url": "https://www.andrew.cmu.edu/user/nicolasc/publications/Tai-KDD19.pdf",
+      "scope": "Relevant labeling, learning, case-study and limitation sections reread; no code audit."
+    },
+    {
+      "claim": "The prompt's Masks and Mimicry subtitle is exact.",
+      "result": "Bibliographic correction: the submitted prompt used an approximate subtitle. The supplied arXiv identifier is correct; the official title is Masks and Mimicry: Strategic Obfuscation and Impersonation Attacks on Authorship Verification. Preserve the submitted prompt unchanged.",
+      "url": "https://arxiv.org/abs/2503.19099",
+      "scope": "Official title and abstract checked."
+    },
+    {
+      "claim": "Noisy positive-unlabeled learning predates this proposal.",
+      "result": "Verified the NIPS 2016 paper, sections 2–4. Labeled and unlabeled mixtures share class-conditional components, and equation 10 states p(x|s,y)=p(x|y). Identifiability uses additional restrictions. This is not a general solution for arbitrary attribute-dependent selection plus unknown noise, and the intersection cannot be declared novel without a further literature comparison.",
+      "url": "https://papers.neurips.cc/paper/6168-estimating-the-class-prior-and-posterior-from-noisy-positives-and-unlabeled-data.pdf",
+      "scope": "Problem formulation, identifiability statements and selection assumptions read; no proof or implementation audit."
+    },
+    {
+      "claim": "The 2024 darknet metric-learning paper excludes low title-Jaccard pairs.",
+      "result": "Independently confirmed in the publisher-hosted PDF, section 3.3.1: pairs below 0.2 are excluded from subsequent experiments; username initialization and prediction-disagreement manual relabeling are also described. This provides a selection-mechanism example, not an estimate of real hidden-alias prevalence or the paper's label error rate.",
+      "url": "https://mdpi-res.com/d_attachment/applsci/applsci-14-01619/article_deploy/applsci-14-01619-v2.pdf?version=1708313082",
+      "scope": "Publisher PDF used rather than relying on the reviewer's ResearchGate mirror."
+    },
+    {
+      "claim": "Simulating selection from complete labels and retaining a fully supervised reference are established experimental choices.",
+      "result": "SAR-PU section 5.3 generates selected labels from complete datasets and includes supervised logistic regression with all class labels. Full supervision is a practical information reference, not a guaranteed mathematical upper bound.",
+      "url": "https://arxiv.org/html/1808.08755",
+      "scope": "Section 5.3 reread."
+    },
+    {
+      "claim": "Reviewer information-boundary calculations and probability arguments.",
+      "result": "Hand-checked 378-16=362, 20-16=4 and 378-20=358, conditional on the previously recorded zero-false-positive rule. No new subset was evaluated. The mixture equation follows total probability, and 0.2*0.5=0.5*0.2=0.1 demonstrates the stated ambiguity without extra assumptions. A common positive scaling preserves ranking/AP; clipping or changed tie handling would need separate care.",
+      "scope": "Arithmetic and mathematical reasoning only, not a new data or training run."
+    }
+  ],
+  "local_dispositions": [
+    {
+      "suggestion": "Prioritize candidate one for a small feasibility diagnosis; neither candidate yet has demonstrated algorithm novelty.",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "Claiming a new mainline or algorithm advantage before stating a learnable mechanism.",
+      "decision": "RECORD_ADVISORY_PRIORITY_NO_EXPERIMENT_STARTED",
+      "minimal_remedy": "Retain candidate one as the first feasibility question and candidate two as conditional backup. No new mainline, numerical protocol or implementation is frozen."
+    },
+    {
+      "suggestion": "Test rule-uncovered relationships and account for full-supervision references and actual development-label use.",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "Discovery beyond the labeling rule and gains under genuinely matched supervision.",
+      "decision": "ACCEPT_AS_BOUNDARY_FOR_A_FUTURE_DIAGNOSIS",
+      "minimal_remedy": "If pursued, define the uncovered set from public rules, retain its negatives, disclose every method's label and prior information, and reuse existing predictions where sufficient. Current review alone does not launch this diagnosis."
+    },
+    {
+      "suggestion": "Use source-specific evidence isolation for weak-supervision training (H1).",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "H1 would improve hidden-alias ranking or handle noisy, biased positives.",
+      "decision": "HYPOTHESIS_ONLY_NOT_AN_ACCEPTED_ALGORITHM",
+      "minimal_remedy": "Specify training support in the remaining public views and compare against simple global evidence removal and applicable PU methods before any novelty claim. H1 does not by itself identify selection/noise probabilities. Current zero-false-positive rule does not test noisy-positive correction."
+    },
+    {
+      "suggestion": "Use a shared public transformation relation and held-out-record consistency (H2).",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "Cross-record consistency identifies a common controller after joint cue changes.",
+      "decision": "HYPOTHESIS_ONLY_NOT_AN_ACCEPTED_ALGORITHM",
+      "minimal_remedy": "First identify a concrete public relation with plausible same-controller variability and different-controller counterexamples. Shared supplier or copied catalog structure must be allowed. Do not assume price-scale consistency is an established seller identity signal."
+    },
+    {
+      "suggestion": "Synthetic labels, field transformations and source identifiers need equal information boundaries.",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "Synthetic validity and fair method comparison.",
+      "decision": "ACCEPT_EXISTING_BOUNDARIES_WITH_MINIMAL_DOCUMENTATION",
+      "minimal_remedy": "Keep controller truth, exact mechanism parameters and private correspondence unavailable to learners; account-wide changes must yield one observation per account, with declared label/field access shared across comparisons. Audit A/B remain sealed and frozen transfer results remain stopped."
+    },
+    {
+      "suggestion": "Smaller performance degradation alone is insufficient to establish a mainline.",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "affected_claim": "What evidence could support a robustness contribution.",
+      "decision": "DO_NOT_TURN_INTO_A_BLANKET_VETO",
+      "minimal_remedy": "Treat this as a demand for meaningful, fairly tested mechanism evidence, not a universal rule that robustness gains cannot be a contribution. No such gain is currently established."
+    }
+  ],
+  "verification_scope": "No new script, model, data root, subset metric computation, training run, full regression, smoke, audit-truth access or server operation. Existing project evidence was reused. The earlier ideas_review.json remains byte-identical.",
+  "changes": "Saved this small original review and updated proposal/handoff/discipline entry points for the latest user authorization and advisory outcome. Browser-generated task logs and snapshots are temporary and must be removed after saving.",
+  "remote_sync": "Pending with the previously listed research records after the prior pre-authentication SSH timeout; no remote attempt in this review task."
+}
