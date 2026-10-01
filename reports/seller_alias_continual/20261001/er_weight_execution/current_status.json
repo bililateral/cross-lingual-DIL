@@ -1,6 +1,6 @@
 {
   "status": "FORMAL_TRAINING_RUNNING",
-  "observed_at_utc": "2026-10-01T07:14:02.119622+00:00",
+  "observed_at_utc": "2026-10-01T08:00:57.347925+00:00",
   "execution_root": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452",
   "review_and_primary_passed": true,
   "scientific_sources_changed": 0,
@@ -43,28 +43,47 @@
   "formal_launcher_pid": 3277885,
   "formal_started_asia_shanghai": "2026-10-01T15:08:21+08:00",
   "formal_remaining_hours_estimate": [
-    10.905244549444445,
-    13.905244549444445
+    10.1232366875,
+    13.1232366875
   ],
-  "estimate_basis": "Original ER six later-stage durations total 19095.911 seconds; two weights approximately 10.61 hours of training plus checkpoint/scoring/evaluation overhead.",
+  "estimate_basis": "Original ER six later-stage durations total 19095.911 seconds; two weights approximately 10.61 hours of training plus checkpoint/scoring/evaluation overhead. At 2026-10-01 16:00:57 Asia/Shanghai, the first 288-update continuation stage took 3001.843661 seconds (about 50 minutes; recent logged speed 10.43 seconds/update), consistent with retaining the 11-14 hour total estimate. Only one training stage is complete and no complete endpoint is yet registered, so this observation does not justify narrowing the original range.",
   "cpu_check_completed": true,
   "cpu_finished_asia_shanghai": "2026-10-01T14:56:33+08:00",
   "cpu_gnu_elapsed_seconds": 380.63,
   "cpu_native_updates": 4,
   "cpu_history_gradient_scaling_verified": true,
-  "last_observation": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/observation.json",
-  "completed_new_updates_at_least": 24,
+  "last_observation": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/progress_160057.json",
+  "completed_new_updates_at_least": 288,
   "last_update_event": {
     "arm": "half",
-    "elapsed_seconds": 331.02253195107915,
+    "elapsed_seconds": 3084.321591004031,
     "event": "updates",
-    "logical_updates": 312,
+    "logical_updates": 576,
     "order": "ABC",
-    "peak_observed_bytes": 26769,
+    "peak_observed_bytes": 28577,
     "stage": 2,
-    "stage_updates": 24
+    "stage_updates": 288
   },
-  "formal_elapsed_seconds": 341.119622,
+  "formal_elapsed_seconds": 3156.347925,
   "first_arm_original_start_replay_passed": true,
-  "gpu_compute_apps": "3277900, python, 8628"
+  "gpu_compute_apps": "3277900, python, 8770 MiB",
+  "observed_at_asia_shanghai": "2026-10-01T16:00:57.347925+08:00",
+  "completed_endpoint_count": 0,
+  "checkpoint_confirmed_updates": 0,
+  "completed_stage_training": [
+    {
+      "name": "ABC_half_stage2",
+      "order": "ABC",
+      "arm": "half",
+      "stage": 2,
+      "updates": 288,
+      "history_weight": 0.5,
+      "training_seconds": 3001.843660779996
+    }
+  ],
+  "failure_record_present": false,
+  "last_observation_sha256": "88aa73329d33a62e52df9b61c20dd4770c79c61f24ea737fe135b7ea4ac5bb8f",
+  "last_observation_bytes": 5340,
+  "monitoring_user_instruction": "现在去linux服务器上查看一下训练进度",
+  "inspection_scope": "Existing process/resource metadata and small status/log records only; no research entry, model load, formal text or label parse, restart or process change."
 }

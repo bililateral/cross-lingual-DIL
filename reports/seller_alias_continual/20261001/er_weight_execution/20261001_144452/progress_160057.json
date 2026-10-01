@@ -1,0 +1,95 @@
+{
+  "observed_at_asia_shanghai": "2026-10-01T16:00:57.347925+08:00",
+  "observed_at_utc": "2026-10-01T08:00:57.347925+00:00",
+  "execution_root": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452",
+  "formal_started_asia_shanghai": "2026-10-01T15:08:21+08:00",
+  "formal_elapsed_seconds": 3156.347925,
+  "completed_new_updates_at_least": 288,
+  "total_new_updates": 3456,
+  "updates_per_stage": 288,
+  "total_new_endpoints": 12,
+  "latest_update_events_by_stage": [
+    {
+      "arm": "half",
+      "elapsed_seconds": 3084.321591004031,
+      "event": "updates",
+      "logical_updates": 576,
+      "order": "ABC",
+      "peak_observed_bytes": 28577,
+      "stage": 2,
+      "stage_updates": 288
+    }
+  ],
+  "last_update_event": {
+    "arm": "half",
+    "elapsed_seconds": 3084.321591004031,
+    "event": "updates",
+    "logical_updates": 576,
+    "order": "ABC",
+    "peak_observed_bytes": 28577,
+    "stage": 2,
+    "stage_updates": 288
+  },
+  "progress_logged_update_count": 12,
+  "completed_endpoint_count": 0,
+  "completed_endpoint_names": [],
+  "checkpoint_confirmed_updates": 0,
+  "completed_stage_training": [
+    {
+      "name": "ABC_half_stage2",
+      "order": "ABC",
+      "arm": "half",
+      "stage": 2,
+      "updates": 288,
+      "history_weight": 0.5,
+      "training_seconds": 3001.843660779996
+    }
+  ],
+  "new_label_parse_attempts": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "train_log_snapshot": {
+    "bytes": 2257,
+    "sha256": "63204ec260152b28f67bf4a0efe32aa8125a8b3f60722a435b169b548afd69ab",
+    "last_modified_asia_shanghai": "2026-10-01T15:59:47.198114+08:00"
+  },
+  "failure_record_present": false,
+  "completion_record_present": false,
+  "exit_status": null,
+  "finished_at": null,
+  "traceback_seen": false,
+  "warning_lines": [
+    "/home/yongpeng/cross-lingual/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`."
+  ],
+  "processes": {
+    "returncode": 0,
+    "stdout": "USER         PID    PPID ELAPSED     TIME %CPU %MEM PSR STAT COMMAND\nyongpeng 3277885       1    3156 00:00:00  0.0  0.0  47 S    bash scripts/run_step28_er_weight_linux_20261001.sh /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/cpu/audit.json /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/authorization.json\nyongpeng 3277898 3277885    3155 00:00:00  0.0  0.0  47 S    /usr/bin/time -v -o /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job/resource_usage.log timeout --signal=TERM --kill-after=30s 24h python -u -B scripts/step28_er_weight_run.py execute --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job --audit /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/cpu/audit.json --authorization /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/authorization.json\nyongpeng 3277899 3277898    3155 00:00:00  0.0  0.0  47 S    timeout --signal=TERM --kill-after=30s 24h python -u -B scripts/step28_er_weight_run.py execute --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job --audit /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/cpu/audit.json --authorization /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/authorization.json\nyongpeng 3277900 3277899    3155 00:52:35  100  1.8  47 Rl   python -u -B scripts/step28_er_weight_run.py execute --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job --audit /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/cpu/audit.json --authorization /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/authorization.json",
+    "stderr": ""
+  },
+  "gpu": {
+    "returncode": 0,
+    "stdout": "0, NVIDIA GeForce RTX 5090, 3 %, 8825 MiB, 32607 MiB",
+    "stderr": ""
+  },
+  "gpu_compute_apps": {
+    "returncode": 0,
+    "stdout": "3277900, python, 8770 MiB",
+    "stderr": ""
+  },
+  "host_memory": {
+    "returncode": 0,
+    "stdout": "total        used        free      shared  buff/cache   available\n内存：     257610        8405        9076          52      240128      246958\n交换：       2047           4        2043",
+    "stderr": ""
+  },
+  "disk": {
+    "returncode": 0,
+    "stdout": "文件系统        大小  已用  可用 已用% 挂载点\n/dev/nvme0n1p2  3.6T  2.9T  584G   84% /",
+    "stderr": ""
+  },
+  "recent_seconds_per_update": 10.352868816126525,
+  "current_stage_seconds_per_update_excluding_startup": 10.429163102473302,
+  "inspection_scope": "Existing process/resource metadata and small status/log records only; no research entry, model load, formal text or label parse, restart or process change."
+}
