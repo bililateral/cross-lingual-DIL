@@ -1,0 +1,38 @@
+cd /home/yongpeng/cross-lingual
+pwd
+date -Is
+nvidia-smi --query-gpu=index,name,memory.total,memory.free,utilization.gpu --format=csv
+nvidia-smi --query-compute-apps=pid,process_name,used_gpu_memory --format=csv
+free -b
+df -B1 .
+ps -eo user,pid,ppid,etime,pcpu,pmem,args --sort=-pcpu | head -n 16
+printf 'RESOURCE_CHECK_FINISHED\n'
+/home/yongpeng/cross-lingual
+2026-09-10T12:25:46+08:00
+index, name, memory.total [MiB], memory.free [MiB], utilization.gpu [%]
+0, NVIDIA GeForce RTX 5090, 32607 MiB, 31859 MiB, 0 %
+pid, process_name, used_gpu_memory [MiB]
+               total        used        free      shared  buff/cache   available
+内存：270120534016  4751532032 45523521536    20234240 219845480448 263271395328
+交换： 2147479552     9175040  2138304512
+文件系统              1B的块          已用          可用 已用% 挂载点
+/dev/nvme0n1p2 3936290357248 2598806937600 1137454231552   70% /
+[?25l[?25lUSER         PID    PPID     ELAPSED %CPU %MEM COMMAND
+zhangde+ 2202191 2202183 24-17:59:26  7.6  0.0 /usr/bin/fluidsynth -is /usr/share/sounds/sf3/default-GM.sf3
+zhangde+ 2202194 2202183 24-17:59:26  7.2  0.0 /usr/bin/pulseaudio --daemonize=n
+[23;80Hno --log-target=journal
+systemd+ 4055571       1    06:21:07  0.2  0.0 /lib/systemd/systemd-oomd        [24;73H[?25h
+root     4063130 3951761       00:22  0.2  0.0 sshd: yongpeng [priv]
+root        1343       1 46-01:12:05  0.1  0.0 /usr/bin/containerd
+root     4063018       2       07:18  0.1  0.0 [kworker/24:0-events]
+root           1       0 46-01:12:09  0.0  0.0 /lib/systemd/systemd --system --d
+[23;80Hdeserialize 54 splash
+root           2       0 46-01:12:09  0.0  0.0 [kthreadd]
+root           3       2 46-01:12:09  0.0  0.0 [pool_workqueue_release]
+root           4       2 46-01:12:09  0.0  0.0 [kworker/R-rcu_g]
+root           5       2 46-01:12:09  0.0  0.0 [kworker/R-rcu_p]
+root           6       2 46-01:12:09  0.0  0.0 [kworker/R-slub_]
+root           7       2 46-01:12:09  0.0  0.0 [kworker/R-netns]
+root           9       2 46-01:12:09  0.0  0.0 [kworker/0:0H-events_highpri]    [24;77H[?25h
+root          12       2 46-01:12:09  0.0  0.0 [kworker/R-mm_pe]
+RESOURCE_CHECK_FINISHED
