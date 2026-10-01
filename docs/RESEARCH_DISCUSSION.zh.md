@@ -6,9 +6,11 @@
 
 已确认新增λ=0.5、0.25，复用原λ=1、SEQ及三个首阶段模型/Adam/RNG/缓存；同六群/1MiB供给、s0、三个顺序、后两阶段各6轮，3456更新、6912群呈现、12新终点。相对原ER原23项全通过的候选中按O MAP、O R5、较大λ依次选择，无候选则保留原ER并结束本轮，不无限追求超过SEQ。预计11—14小时，上限24小时/32GiB；train/valid本轮各一次，test/owners/新留出不读。
 
-该确认也明确核验及实际网页审查通过后，直接使用既有Linux py310完成必要CPU证据与正式训练，不再询问同一范围启动。Windows只编辑、静态检查和小证据，当前未连接Linux、读取正式文本/标签/权重或执行科研脚本；网页请求于13:49:34（Asia/Shanghai）实际发出，等待回复与主审。原ER和LOGIT的结果、既有权重保留依赖和历史授权均保留。
+该确认也明确核验及实际网页审查通过后，直接使用既有Linux py310完成必要CPU证据与正式训练，不再询问同一范围启动。Windows只编辑、静态检查和小证据。网页请求于13:49:34（Asia/Shanghai）实际发出，现已取得完整回复及证据并完成主审，Linux执行恢复，实际运行状态另记。原ER和LOGIT的结果、既有权重保留依赖和历史授权均保留。
 
 具体包上传被自动审批要求单独授权后，用户答复“允许上传本次ER合同与代码包（推荐）”。同一226来源、1,725,753字节包已提交chatgpt.com，网页选择器Pro，已确认收到可读ZIP；后端身份未独立暴露。见[实际上传授权](../reports/documentation/20261001/er_weight/review/upload_authorization.json)和[提交记录](../reports/documentation/20261001/er_weight/review/submission.json)。
+
+用户随后明确：“外审已结束，及时审查、同步外审结果。完成后可以开始linux上的工作，若仍被自动审批阻拦再向我申请批准”。此指令恢复既定范围，只有工具实际拒绝时再就具体受阻动作申请；不增加同范围启动审批。见[外审主审](../reports/documentation/20261001/er_weight/review/report.zh.md)及[执行状态](../reports/seller_alias_continual/20261001/er_weight_execution/current_status.json)。
 
 ## 2026-10-01 LOGIT来源、抗遗忘范围与ER修改要求
 
