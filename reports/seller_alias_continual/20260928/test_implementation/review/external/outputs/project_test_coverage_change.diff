@@ -1,0 +1,26 @@
+--- before.py
++++ current.py
+@@ -117,6 +117,7 @@
+             p, *_ = fixture(root)
+             path = root / "data/heldout/items.jsonl"
+             lines = path.read_bytes().splitlines(keepends=True)
++            original_lines = list(lines)
+             row = __import__("json").loads(lines[0])
+             row["controller_uid"] = "forbidden"
+             lines[0] = data.json_bytes(row)
+@@ -128,6 +129,15 @@
+             data.write_json(manifest_path, manifest)
+             p["data"]["manifest"] = data.record(manifest_path, root)
+             with self.assertRaisesRegex(ValueError, "schema"):
++                runner.public_inputs(p, root)
++            missing_uid = __import__("json").loads(original_lines[0])["group_uid"]
++            path.write_bytes(b"".join(line for line in original_lines
++                                      if __import__("json").loads(line)["group_uid"] != missing_uid))
++            p["data"]["inputs"]["heldout/items.jsonl"] = data.record(path, root)
++            manifest["files"]["heldout/items.jsonl"] = {k: p["data"]["inputs"]["heldout/items.jsonl"][k] for k in ("bytes", "sha256")}
++            data.write_json(manifest_path, manifest)
++            p["data"]["manifest"] = data.record(manifest_path, root)
++            with self.assertRaisesRegex(ValueError, "Missing test group"):
+                 runner.public_inputs(p, root)
+ 
+     def test_reverse_supervision_alignment_and_single_parse(self):

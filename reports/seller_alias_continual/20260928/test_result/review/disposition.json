@@ -1,0 +1,259 @@
+{
+  "date": "2026-09-30",
+  "status": "PASS_TEST_RESULT_REVIEW",
+  "meaning": "Result validity and the stated limited conclusion pass; the original prospective acceptance remains failed, 8/9.",
+  "actual_review": {
+    "conversation": "https://chatgpt.com/c/6ab5f4d8-8a10-83ea-91bd-2a02558cfb07",
+    "reply_id": "1c91151a-333d-44ad-832c-aa67239abb74",
+    "reply_saved_date": "2026-09-28",
+    "requested_model": "GPT 6 Pro",
+    "visible_model_selector": "Pro",
+    "backend_model_identity": "Not separately exposed by the page",
+    "reply": "reply.zh.md",
+    "complete_report": "external/test_result_external_review.zh.md",
+    "archive": "external_evidence.zip",
+    "bytes": 2718555,
+    "sha256": "78a39d69d05615dd510fab3b88ab945abca9ae6cd32c025e75e2120cd2ddca7c",
+    "members": 118,
+    "payload_files": 116,
+    "checksum_entries": 117,
+    "authorization_and_upload": "The user explicitly authorized the exact result package and then manually uploaded it. No duplicate review request was sent.",
+    "actual_uploaded_archive": {
+      "bytes": 3171081,
+      "sha256": "de68ee8309ff6e9865a77f3fdc418b19a2eabe4cc5c896010d9a7a129733f138",
+      "sources": 259,
+      "members": 260,
+      "matches_authorized_local_archive": true,
+      "manual_upload_time": "Not independently obtained"
+    },
+    "download_history": "download.json"
+  },
+  "primary_review_scope": {
+    "basis": "Start from the approved fixed-s0 independent test and the user's post-result decision; check the actual inputs, inference, supervision order, metrics and claim boundaries, not merely agreement among executor-written artifacts.",
+    "personally_read": [
+      "Full visible actual result reply and the full attached report, including F1-F10 and all tables/limitations",
+      "scripts/step28_alias_test.py",
+      "scripts/step28_alias_test_run.py",
+      "scripts/step28_alias_test_result.py",
+      "Direct sections of step28_chinese_base.py: record_texts, pool_channels, account_vectors, score, metric_comparison",
+      "Direct sections of step28_continual_population_evaluate.py: curve, classification, retrieval and group_metrics",
+      "Direct sections of step28_continual_population.py: state_digest, save_state, restore_state",
+      "Direct sections of step28_continual_population_data.py: file identities and verification",
+      "Full independent_saved_audit_v1.py and metadata_and_report_audit_v3.py; actual v1-to-v2 and v2-to-v3 changes",
+      "External run_logged.py, verify_submission.py, final_source_check.py, diagnose_metadata_reference.py, diagnose_inventory_coverage.py and package_evidence.py",
+      "All 11 external command, stdout, stderr and exit/status log groups; original failed/successful project records",
+      "Historical test implementation response_visible.zh.md, reply 23534074-8487-4574-960c-022fb55522c0, and its primary disposition"
+    ],
+    "generated_report_code_scope": "build_report.py header and footer inspected; report body fully read as rendered Markdown. No claim to have separately read every literal line of that report generator.",
+    "inherited_evidence": "Unchanged implementation hand cases and prior implementation-review findings are reused within their original scope; no new execution is claimed.",
+    "new_project_linux_connections": 0,
+    "new_project_research_runs": 0,
+    "new_formal_text_or_label_reads": 0,
+    "new_model_loads_or_fits": 0,
+    "windows_scope": "Editing, archive/file identity checks, and comparison of small existing JSON outputs only; no project research script or statistical recomputation."
+  },
+  "verification": {
+    "primary_file_record": "primary_integrity.json",
+    "primary_output_record": "output_comparison.json",
+    "external_payload_identities_pass": 116,
+    "external_checksum_identities_pass": 117,
+    "submitted_source_identities_pass": 259,
+    "current_frozen_scientific_sources_unchanged": 34,
+    "primary_local_return_files": {
+      "failed_execution": 18,
+      "successful_execution": 29,
+      "saved_result_audit": 9
+    },
+    "exact_csv_matches": [
+      "mean_metrics.csv",
+      "paired_metrics.csv"
+    ],
+    "primary_existing_json_numbers_compared": 1138,
+    "primary_maximum_abs_difference": 9.992007221626409e-16,
+    "external_execution_environment": "Web Linux, Python 3.13.5, NumPy 2.3.5, CPU affinity [0], one thread; no dependency installation or model framework invocation",
+    "external_submitted_audit_replay": {
+      "numeric_checks": 4735,
+      "blind_count_rows": 720,
+      "exit_code": 0,
+      "elapsed_seconds": 1.054721378
+    },
+    "external_independent_numeric": {
+      "imports_project_calculation_modules": false,
+      "numeric_comparisons": 444635,
+      "exact_value_comparisons": 716240,
+      "maximum_abs_difference": 9.992007221626409e-16,
+      "affine_scores": 90720,
+      "complete_group_orders": 240,
+      "query_lists": 6720,
+      "curve_and_ranking_invariance_values": 3360,
+      "classification_values_from_saved_counts": 2880,
+      "bootstrap_numeric_crosschecks": 440000,
+      "bootstrap_draw_indices": 600000,
+      "first_execution_exit_code": 0,
+      "elapsed_seconds": 2.146960935
+    },
+    "external_metadata_final": {
+      "checks": 467,
+      "displayed_numbers": 153,
+      "exit_code": 0,
+      "elapsed_seconds": 0.95176041
+    },
+    "external_final_sources": {
+      "original_members_unchanged": 260,
+      "allowed_new_replay_outputs": 3
+    }
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER"
+      ],
+      "requirement": "Evaluate the frozen comparison and keep prospective acceptance distinct from the later user decision.",
+      "evidence": "Original policy, evaluation/completion, user_acceptance.json and independent nine-condition reconstruction.",
+      "confirmed_deviation": null,
+      "disposition": "Only T1 fails; preserve passed=false and 8/9. User acceptance authorizes progression to design, not retrospective 9/9 or another test."
+    },
+    {
+      "id": "F2",
+      "review_dimensions": [
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Document the initial failure, exact repair, explicit resumption and the one effective heldout evaluation.",
+      "evidence": "Initial stderr/stat failure, input repair receipt, resumption, source identities and heldout_access record.",
+      "confirmed_deviation": "Historical deployment omitted two frozen input files; corrected before inference/labels. External package contained 17 of 18 historical return records.",
+      "disposition": "Historical defect closed. Retain original failure and repair. Primary verified the omitted 734-byte initial_observation.json locally and all 18 historical records. No repeat upload/test required.",
+      "boundary": "Initial metadata precheck occurred; do not claim that no data of any kind was read."
+    },
+    {
+      "id": "F3",
+      "review_dimensions": [
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Bind fixed A/C s0 E6, native parameters, BGE archive and pre-existing maps to the intended systems.",
+      "evidence": "Origin, epoch, size/SHA, payload and pure-parameter records, strict restore source and original runtime records.",
+      "confirmed_deviation": null,
+      "disposition": "Binding is supported. This review did not reload or newly hash remote weights; original runtime evidence remains the basis."
+    },
+    {
+      "id": "F4",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER",
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Title/description-only input, aligned 120 groups and four complete score files before one heldout parse.",
+      "evidence": "Formal input/score/evaluation source, eval/inference_mode path and original score/access identities.",
+      "confirmed_deviation": null,
+      "disposition": "Preserve 120 groups, 3360 queries, 45360 unordered pairs and 2400 positives; train/development/owners zero.",
+      "boundary": "No new inspection of raw-text masking or controller isolation from sealed owners."
+    },
+    {
+      "id": "F5",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER",
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Positive float64 affine maps preserve actual ranking/ties; historical thresholds use raw logits.",
+      "evidence": "90720 scalar transforms, 240 complete orders and 6720 query lists; inherited handmade boundary evidence and current source.",
+      "confirmed_deviation": null,
+      "disposition": "Calibration preserves C ranking, does not create its ranking improvement. Keep the correct raw-score threshold branch."
+    },
+    {
+      "id": "F6",
+      "review_dimensions": [
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Save four matrices/counts before aggregation and reproduce existing outputs independently.",
+      "evidence": "Original save order, independent saved-result source and web replay; two CSVs match original bytes.",
+      "confirmed_deviation": null,
+      "disposition": "Saved-output reproducibility passes; no original result overwritten."
+    },
+    {
+      "id": "F7",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER"
+      ],
+      "requirement": "Report all 22 metrics, distinguish AP from trapezoidal PR-AUC, and enforce nine unrounded conditions.",
+      "evidence": "Four roles and four comparisons; independent outputs, primary 1138-number comparison and report tables.",
+      "confirmed_deviation": null,
+      "disposition": "Only T1 fails. AP/AUC and probability protections are observed guards, not population noninferiority or guarantees for every threshold."
+    },
+    {
+      "id": "F8",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER"
+      ],
+      "requirement": "Use fixed-s0 domain-stratified paired whole-group bootstrap, 5000 draws, PCG64 seed 20260928 and linear quantiles.",
+      "evidence": "Independent frequency-weighted versus indexed resampling and complete saved interval comparison.",
+      "confirmed_deviation": null,
+      "disposition": "MAP lower bound remains slightly positive; numerical last-place differences do not change T2. Keep fixed-system/generator conditionality and lack of joint multiplicity correction."
+    },
+    {
+      "id": "F9",
+      "review_dimensions": [
+        "SCIENTIFIC_BLOCKER",
+        "OUT_OF_SCOPE_OVERDESIGN"
+      ],
+      "requirement": "Preserve domain/work-point tradeoffs and the future continual-learning boundaries.",
+      "evidence": "Domain table, fixed-0.5 saved counts, old strict diagnostic and exact user decisions.",
+      "confirmed_deviation": null,
+      "disposition": "Domain A MAP declines; A/B AUC point differences decline. Fixed 0.5 adds 79 TP and 58 FP. Keep these limitations. No extra experiment or system hardening imposed."
+    },
+    {
+      "id": "F10",
+      "review_dimensions": [
+        "REPRODUCIBILITY_DEFECT"
+      ],
+      "requirement": "Describe recorded resource measurements accurately.",
+      "evidence": "step28_alias_test_run.py:344-347, original runtime records and local final directory size.",
+      "confirmed_deviation": "The two approximately 53-second intervals include post-score file SHA and model-parameter digest, so the previous inference label was imprecise.",
+      "disposition": "Corrected docs/SELLER_ALIAS_TEST_RESULT.zh.md section 2 to describe scoring plus post-score identity checks, not pure forward time; added final job size separately.",
+      "current_status": "CLOSED_DOCUMENTATION_ONLY",
+      "preserved_values": {
+        "a_seconds": 53.49829976,
+        "c_seconds": 53.381223493,
+        "gnu_total_seconds": 125.2,
+        "sampled_output_bytes": 6248212,
+        "final_job_bytes": 6254430,
+        "returned_bytes": 6276696
+      },
+      "rerun_required": false
+    }
+  ],
+  "retained_reference_failures": [
+    "External metadata v1 exit1: compared three-field file identity with a policy dictionary containing an extra explanatory field. Fixed comparison to path/bytes/SHA only.",
+    "External metadata v2 exit1: assumed an unsubmitted historical observation file was present. Final version explicitly reports 17/18 historical web coverage; current 259-source manifest remains complete.",
+    "Primary file-check command initially assumed 116 checksum entries. There are 117 because the inventory itself is also hashed; all 117 verified after correcting that assumption.",
+    "All external original source revisions, logs and precise diffs are retained. No metric, acceptance threshold, submitted source or scientific input changed."
+  ],
+  "scientific_decision": {
+    "result_validity_passed": true,
+    "original_acceptance_passed": false,
+    "original_conditions_passed": 8,
+    "original_conditions_total": 9,
+    "failed": [
+      "T1"
+    ],
+    "map_gain": 0.007484202532923026,
+    "map_conditional_95": [
+      0.00005033102788638814,
+      0.01461067782319795
+    ],
+    "recall_at_5_gain": 0.014434523809523807,
+    "user_exact": "可以，这个test结果可以了，有提升就行",
+    "user_decision_is_post_result": true,
+    "progression": "Proceed to designing the limited-history controlled Chinese synthetic continual-learning mainline.",
+    "automatic_new_experiment_authorization": false
+  },
+  "limitations_and_next_scope": [
+    "Same Chinese synthetic generator, 120 groups, 27 candidates per query and at least one positive alias; no real-market, full-corpus or no-positive-query claim.",
+    "Web checks did not recompute per-group AP/MAP/AUC/Brier/log_loss from labels or rerun native BGE/CUDA inference; actual computation is supported by source, prior hand cases and bound original execution evidence.",
+    "Statistical intervals condition on fixed s0 models/maps and the generator; they do not incorporate retraining, refitting or new-generation uncertainty.",
+    "The 120 now-evaluated groups cannot serve as an untouched final continual-learning test.",
+    "Joint-three-domain trained models/maps cannot be used as a first-domain-only continual-learning initial state.",
+    "All 18 Linux weight files remain under the user's retention exception; no deletion performed.",
+    "Concrete continual-learning algorithms, historical-data budget/access, new final-holdout generation, compute budget and evaluation criteria require a future confirmed contract."
+  ],
+  "changed_scope": "Current result timing annotation and review/status documentation only; frozen scientific sources, original metrics, acceptance, review ZIPs and raw logs remain unchanged.",
+  "primary_disposition": "Accept the valid result and reviewer limitations after personal source/evidence checks; close the one nonblocking report correction. No new scientific blocker, mandatory code change or repeat experiment."
+}

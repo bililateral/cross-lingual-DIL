@@ -1,0 +1,27 @@
+--- metadata_and_report_audit_v2.py
++++ metadata_and_report_audit_v3.py
+@@ -89,8 +89,22 @@
+ synccheck={}
+ for rel in ('test_execution/monitoring/return_sync.json','test_result/return_sync.json','test_result/analysis_return_sync.json'):
+  rr=load(b/rel);require(len(rr['files'])==rr['count'] and sum(x['bytes'] for x in rr['files'])==rr['bytes'],'sync aggregate '+rel)
+- for rec in rr['files']:verify(rec)
+- synccheck[rel]={'count':rr['count'],'bytes':rr['bytes']}
++ present, absent = [], []
++ for rec in rr['files']:
++  if (r / rec['path']).exists():
++   verify(rec); present.append(rec)
++  else:
++   # Historical transfer inventories are not the current submission manifest.
++   # This optional initial-observation JSON is not asserted provided by source_inventory.
++   require(rel == 'test_execution/monitoring/return_sync.json' and
++           rec['path'].endswith('/20260928_165355/initial_observation.json') and rec['bytes'] == 734,
++           'only explicitly disclosed historical observation is unavailable')
++   current_names={x['path'] for x in load(r/'source_inventory.json')['files']}
++   require(rec['path'] not in current_names, 'historical missing file not falsely declared in current inventory')
++   absent.append(rec)
++ synccheck[rel]={'recorded_count':rr['count'],'recorded_bytes':rr['bytes'],
++                'verified_present_count':len(present),'verified_present_bytes':sum(x['bytes'] for x in present),
++                'not_provided_not_verified':absent}
+ 
+ started=datetime.datetime.fromisoformat((run/'execution/started.txt').read_text().strip());finished=datetime.datetime.fromisoformat((run/'execution/finished.txt').read_text().strip())
+ require((finished-started).total_seconds()==125,'formal start/end125seconds')

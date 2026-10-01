@@ -1,0 +1,146 @@
+{
+  "date": "2026-09-28",
+  "status": "PASS_PRIMARY_RESULT_REVIEW_WITH_UNCHANGED_FAILED_ACCEPTANCE",
+  "response_id": "4ff3d94d-4c51-4341-98cb-a1b54c719efd",
+  "conversation": "https://chatgpt.com/c/6ab5f4d8-8a10-83ea-91bd-2a02558cfb07",
+  "reviewer_identity": "Web ChatGPT GPT6 Pro; 6 / Pro was selected at the actual resubmission. No response-specific backend model slug claimed.",
+  "actual_response": "reply.json",
+  "full_report": "external/review_report.zh.md",
+  "evidence_archive": "evidence.zip",
+  "evidence_archive_sha256": "9df96c0a145bc7ac6268a99b5bc3463ef5bfe3ae4655eba8abb6fc7630e99a99",
+  "primary_metadata_checks": "primary_check.json",
+  "requirement": "Improve Chinese synthetic alias candidate ranking while protecting prospectively fixed basic pair-identification observations. Independent test acceptance remains required before continual-learning design.",
+  "personally_checked": [
+    "Complete actual current web reply and full result report F1-F10.",
+    "Entire independent_result_audit.py, additional_saved_checks.py, check_report_and_integrity.py, verify_submission.py, run_logged.py, inspect_run_records.py, final_evidence_checks.py and package_evidence.py; report generator calculation/output sections and its complete generated report.",
+    "All seven archived execution records, their stdout/stderr/resource/exit files, source-verification log summary and full member manifest, structured results and recorded metadata-display failure limitation.",
+    "Frozen ranking contract, full ranking method, relevant runner training/checkpoint/preparse/collection/finalization sections, Chinese base input/pooling/objectives/update and population metric definitions.",
+    "Original evaluation/completion, per-seed and auxiliary intervals, fixed-s0 saved confusion counts, weight-retention chronology, previous implementation review and disposition within unchanged relevant scope.",
+    "72 external manifest files, all 253 actual submitted ZIP members against external source records, 18 current frozen source files, and four web/project output files."
+  ],
+  "external_execution": {
+    "environment": "Web Linux Python3.13.5 / NumPy2.3.5; one CPU and one numerical thread",
+    "independent_exit_code": 0,
+    "independent_wall_seconds": 2,
+    "numeric_comparisons": 161516,
+    "max_metric_difference": 4.440892098500626e-16,
+    "blind_count_rows": 5184,
+    "score_arrays": 54,
+    "metric_matrices": 54,
+    "loss_compositions": 7776,
+    "float32_loss_compositions_exact": true,
+    "formal_label_reads": 0,
+    "formal_text_reads": 0,
+    "model_loads": 0,
+    "training_updates": 0,
+    "scope": "Actual external execution supported by supplied source and raw logs; not re-executed on project Linux during this review."
+  },
+  "local_execution": {
+    "new_research_tests": 0,
+    "new_linux_connections": 0,
+    "new_formal_label_reads": 0,
+    "model_loads": 0,
+    "training_updates": 0,
+    "scope": "Source and saved-evidence review plus Windows metadata/hash checks. Existing py310 saved-result audit (0.50s, exit0) reused; no changed training semantics or unresolved numerical concern warrants repeating it."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Approved inputs, comparison and authorization",
+      "evidence": "Frozen contract and current method/base input path retain masked titles/descriptions, 144 fit/36 calibration/60 valid groups, E6 C-A. Later formal receipt authorizes actual run.",
+      "disposition": "Accept; preparation-time authorization wording remains frozen. No new raw-text/controller-isolation claim."
+    },
+    {
+      "id": "F2",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Objectives, gradients, schedule and pairing",
+      "evidence": "378-pair BCE once; same forward scores for full rank plus query-equal 0.5 hard loss; detached top5 indices and live selected logits. 864 calls, B/C final encoder lr0, paired initial/order/dropout records.",
+      "disposition": "Accept. 45 observed updates support encoder/head changes; they do not establish every parameter or loss-component gradient at every step. No code change or repeat micro-training."
+    },
+    {
+      "id": "F3",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "claim": "Save/restore and complete validation before labels",
+      "evidence": "checkpoint performs full model/Adam restore and all-role score replay; inference reload checks model-state digest. validate_run checks all required weights/scores before attach_labels.",
+      "disposition": "Accept. Retained 18 inference weights are not full Adam checkpoints; no claim of an extra forward replay after inference reload."
+    },
+    {
+      "id": "F4",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "claim": "One-time collection and recoverable saved analysis",
+      "evidence": "collect saves 18 valid matrices and collected.json before finalize comparisons/bootstrap/acceptance; per-point means/classification are still computed during collect.",
+      "disposition": "Accept precise collection boundary; no label retry or reopening historical R1/R2/R3."
+    },
+    {
+      "id": "F5",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "claim": "Independent saved-result arithmetic",
+      "evidence": "Independent script imports only standard library/NumPy, scalar float64 threshold comparisons, explicit confusion algebra, sequential per-domain group draws, all 13 guards. Main raw log exit0 and 161516 comparisons; four submitted-entry outputs byte-match prior project Linux outputs.",
+      "disposition": "Accept within saved-evidence scope. Did not rederive truth-dependent group metrics or rerun GPU/model operations."
+    },
+    {
+      "id": "F6",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Ranking gains and failed full acceptance",
+      "evidence": "Original evaluation, completion and independent result agree: MAP+.016499599, R5+.016369048; all four mean/s0 Brier/log_loss guards fail; 9/13 pass.",
+      "disposition": "Keep both observations. Do not retrospectively change criteria or select another arm, seed or epoch."
+    },
+    {
+      "id": "F7",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Seed/domain and auxiliary uncertainty",
+      "evidence": "Original s0 R5 interval[-.0053645833,.0241071429], s2[-.0071502976,.0241071429]; C-B AUC interval[-.0015068475,.0038706355].",
+      "disposition": "Add these qualifications to the result report. Positive observed seed R5 is not interval exclusion of zero. Auxiliary comparisons remain unadjusted."
+    },
+    {
+      "id": "F8",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Probability loss and fixed-threshold interpretation",
+      "evidence": "s0 A counts102TP/26FP/1098FN/21454TN, C18TP/0FP/1182FN/21480TN; 3 versus45 groups make no positive prediction. Metric code sets empty-group precision0; original saved pooled rates agree.",
+      "disposition": "Add concrete macro-versus-pooled example. Rank/probability objectives differ; calibration cause or success is unproven. Retention is not a new tolerance or calibration authorization."
+    },
+    {
+      "id": "F9",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "confirmed_defect": false,
+      "claim": "Conditional uncertainty and scientific scope",
+      "evidence": "Same-group three-seed average followed by 5000 domain-stratified whole-group resamples; synthetic27 candidates with positive aliases guaranteed.",
+      "disposition": "Accept conditional scope, not training-population noninferiority, real-market performance, continual-learning gain or method novelty. No new scenario is required for closing this review."
+    },
+    {
+      "id": "F10",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "confirmed_defect": false,
+      "claim": "Resources and weight retention",
+      "evidence": "Original start/end/exit and resource records; pre-valid and subsequent fresh hash inventory precede explicit retention receipt; later verification covers existence/size/mtime. 18 files23516221872bytes, deletion0.",
+      "disposition": "Keep all18 Linux inference weights. Clarify the chronology; no new remote inventory or weight deletion performed this review."
+    }
+  ],
+  "mandatory_code_or_numeric_fixes": [],
+  "report_clarifications": [
+    "s0/s2 Recall@5 intervals cross zero",
+    "C-B AUC interval crosses zero",
+    "Concrete fixed-s0 macro and pooled classification counts",
+    "Inference versus full-Adam restore evidence",
+    "Post-retention metadata check versus earlier fresh weight hashes"
+  ],
+  "out_of_scope_actions_not_authorized": [
+    "new calibration or threshold search",
+    "retraining or seed/epoch/arm selection",
+    "test or owners access",
+    "continual-learning design",
+    "automatic deletion of this run's retained weights"
+  ],
+  "reviewer_error_note": "One reviewer interactive metadata display TypeError was disclosed; only the error excerpt survives. Corrected archived inspect_run_records execution exits0. No scientific computation or project-source defect established.",
+  "next": "Result review closed. Preserve original acceptance and all18 weights; discuss a prospective follow-up intervention before implementation. Independent test and continual-learning design remain deferred.",
+  "storage": "This review's new evidence and documentation are retained in Windows. No Linux synchronization or remote custody recheck was performed during this turn."
+}

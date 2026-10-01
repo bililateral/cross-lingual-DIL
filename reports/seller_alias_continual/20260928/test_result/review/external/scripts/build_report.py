@@ -1,0 +1,272 @@
+from pathlib import Path
+import json,csv,shutil
+B=Path('/mnt/data/test_result_audit_20260928');E=B/'evidence';R=B/'project'
+d=json.loads((E/'outputs/independent_v1/independent_results.json').read_text());m=json.loads((E/'outputs/metadata_v3/metadata_and_report_results.json').read_text());s=json.loads((E/'outputs/source_verification.json').read_text())
+def f(x,n=9):return f'{x:.{n}f}'
+def signed(x,n=9):return f'{x:+.{n}f}'
+def interval(x,n=9):return f'[{x[0]:+.{n}f}, {x[1]:+.{n}f}]'
+p=d['comparisons']['C_cal_minus_A_cal']
+roles=('A_raw','A_cal','C_raw','C_cal')
+lines=[]
+def add(x=''):lines.append(x)
+add('''# 固定s0独立test结果与用户接受决定：独立科研外审
+
+审查日期：2026-09-28。对象：本条实际上传的 `test_result_review(1).zip`。本报告只审已完成的基础test结果、保存证据与用户事后接受决定；不是旧实施前审查的复述，也不设计或执行持续学习。
+
+## 0. 三项总判定
+
+**结果有效性：在所提供证据可验证的范围内通过。原九条件：8/9，T1失败，`passed=false`保持。用户决定：接受实际增益，在本地主执行者完成本次结果处置后可进入有限历史数据持续学习方案设计；不是新训练、重新test或改阈值的许可。**
+
+独立复算不支持把原合同改写成9/9，也不支持把T1未达到0.01解释成“没有排序收益”。两者必须同时记录。本次未发现使主要数值或上述限定结论失效的新增SCIENTIFIC_BLOCKER。
+
+存在一处轻微的**REPRODUCIBILITY_DEFECT／报告口径**：结果文档§2将两个约53秒字段标为“模型推理”，但该计时包含评分后的权重文件SHA和参数摘要核对，不能作为纯前向延迟。最小处置是给现行结果文档补注，不修改冻结代码、原日志或计时值，不重跑模型。另有一份历史观察JSON未随本包提供，见§1和F2；这是明确的未核验范围，不据此推断本地丢失或新增科学缺陷。
+
+历史首次缺件是已纠正的部署复现缺陷，不是第一次有效负结果。当前无须补训、再解析标签、重拟合或重跑test来修复科学结论。用户既有18权重保留例外继续有效。
+
+| 类别 | 结论 | 最小处置 |
+|---|---|---|
+| SCIENTIFIC_BLOCKER | 未发现使本轮结果或限定主张失效的新问题 | 保留T1失败及不确定性，不改成功线 |
+| REPRODUCIBILITY_DEFECT | 初次遗漏两原件已修复；当前一处非阻断计时表述需精确化 | 只改现行报告注释，保留全部原记录 |
+| OUT_OF_SCOPE_OVERDESIGN | 不将其他研究或系统工作加入整改 | 不追加种子、阈值搜索、重新test、系统加固或无变化重训 |
+
+## 1. 实物、来源与阅读范围
+''')
+add(f'''本次ZIP实测 **{s['zip_bytes']:,}字节、{s['members']}成员**，其中259份来源与根目录`source_inventory.json`；259份来源总计8,999,899字节。整体SHA-256：
+
+```text
+{s['zip_sha256']}
+```
+
+本条没有给出整体ZIP预期SHA，因此以上是实测身份，不冒称做了未提供的外部散列比对。根清单259项大小和SHA全部匹配，ZIP完整性通过。34份科学来源在初次授权、恢复授权、准备、采集、评价、完成与实施前原包之间一致；26份继承来源维持冻结。
+
+内嵌实施前`test_review.zip`为601,670字节、117成员，SHA `0e315b5d4d7fca4bdff71c3a4f58bd0f4236da5c8aedad5fde846e615fdb5ed7`，原清单116项也核对。该旧清单仅描述旧包，不是当前目录的完整列表。旧390成员外审附件只按本包提供的报告、源码和日志节选阅读，未声称本次提供或重跑了全部390成员。
+
+有效运行回传29份、6,276,696字节，以及本地分析9份、58,512字节，当前实物全部匹配。**首次失败历史回传清单列18份、20,056字节，本包实际提供17份、19,322字节；`20260928_165355/initial_observation.json`（734字节）未提供，也未列在当前根清单。** 当前根清单不缺件，但无法声称核对了历史18项全部实物。关键原stderr、failure.json、恢复决定及修复回执都在，足以支持下文的首错范围判断；不要求为这份非核心观察记录重复上传或重新实验。
+
+完整阅读了本轮请求、test合同／政策／结果文档、新结果分析器与纯函数依赖；追踪了正式入口的输入、恢复、score、监督门、采集、统计路径。直接相关的实施前完整回复、F1—F10报告和主审处置已读；更早排序／校准仅查与当前权重、映射、来源及用户决定直接相关的记录，没有将本次审查扩大为所有历史实验重审。未访问其他旧附件来补齐正式输入。
+
+证据：`outputs/source_verification.json`、`outputs/metadata_v3/metadata_and_report_results.json`、`outputs/inventory_coverage_diagnosis.json`。
+''')
+add('''## 2. 本次网页实际执行、独立性及数值容限
+
+环境：Linux，Python 3.13.5，NumPy 2.3.5，CPU affinity=[0]，三个BLAS环境变量均为1，实际Threads=1。只使用现有NumPy及标准库；没有安装／升级环境。查询安装元数据可见Torch CPU版与SciPy，但本次未调用它们；sentence-transformers／transformers未安装，对允许的保存结果核对无影响。
+
+先执行提交入口`--help`，再以新目录`reports/reviewer_test_result_replay`重放；原分析不覆盖。提交入口4735数值、720盲计数行通过，最大差1.1102230246251565e-16，退出0。两份CSV与原Linux输出逐字节一致。
+
+另写`independent_saved_audit_v1.py`，**不导入项目模块**。期望值通过Python标量仿射、稳定排序、显式计数公式、math.fsum、逐域整群频数、einsum和显式线性分位数实现。它首次实际运行退出0，无数值参考修订。四比较分别产生5000×22抽样数值，全部以另一路逐域索引均值交叉核对；同时核对正式保存的区间。正式文件只保存抽样索引和区间，不能称其保存了所有440,000个完整bootstrap结果。
+
+| 当前进程 | 状态 | 实质范围 |
+|---|---|---|
+| 01附件核验 | 退出0 | 根清单、ZIP、提取 |
+| 02提交入口帮助 | 退出0 | 只查看帮助 |
+| 03提交保存结果重放 | 退出0 | 4735数值、720计数，原CSV逐字节一致 |
+| 04新独立数值实现v1 | 退出0 | 444,635数值比较、716,240精确值比较；最大差9.992007221626409e-16 |
+| 05元数据／报告参考v1 | 退出1 | 将政策说明字段误当文件收据字段；未改变项目 |
+| 06差异定位 | 退出0 | 确认路径、字节、SHA相同，只有描述字段区别 |
+| 07元数据／报告参考v2 | 退出1 | 试图读取旧回传清单中未随本包提供的734字节观察JSON |
+| 08范围定位 | 退出0 | 17/18历史实物、29/29有效运行、9/9分析核对；无内容错配 |
+| 09元数据／报告参考v3 | 退出0 | 显式保留上述范围限制；467检查、153个显示数值核对 |
+
+指标和统计比对容限始终为1e-12，文件、模型身份、次数、排序及分数重放采用精确相等；**性能判据始终零容差**。表格四舍五入核对使用显示位数半单位，仅用于报告显示，不影响九判据。最大浮点差来自独立求和顺序，未改原数组、分位数或阈值。主MAP下界独立值与正式值仅差约1.2e-19，不是数值误差制造T2通过。
+
+四份120×22矩阵均核对身份／形状／有限值。由已保存混淆计数独立重算六个分类指标共2,880值；两模型raw/cal的14个曲线与检索列共3,360个对应值精确相等。**这不是从真实标签重新计算10,560个逐群指标。** 逐群AP、MAP、AUC、Brier和log_loss等真值计算未独立重算。
+
+四分数共181,440值；其中两变换数组90,720值用标量恢复后精确一致。检查240群完整分数排序／并列、6,720查询候选列表。A有41个精确并列相邻位置，C有1个，并列结构保持；14个曲线／检索指标也原样保持。
+
+本次正式文本／CSV标签／owners读取0，个体标签反解0，真实权重读取0，模型加载0，GPU执行0，训练／校准拟合0，项目Linux访问0。保存分数和指标数组是本次明确允许解析的数值证据。
+''')
+add('''## 3. F1—F10：用户要求、实际证据、偏差及最小处置
+
+缩写：R=`scripts/step28_alias_test_run.py`；M=`scripts/step28_alias_test.py`；B=`scripts/step28_chinese_base.py`；E=`scripts/step28_continual_population_evaluate.py`；D=`scripts/step28_continual_population_data.py`；P=`scripts/step28_continual_population.py`；A=`scripts/step28_alias_test_result.py`。本节行号对应未修改的当前提交源码。
+
+### F1. 用户目标、原验收和事后接受分别记录
+
+**审查维度：SCIENTIFIC_BLOCKER；已确认科学偏差：无。**
+
+要求是候选排序提高并保护基础区分和概率损失；合同将其操作化为固定两系统、九条件。M:12–23、54–68明确全体合取，R:315–320、420–427保存原判定。新结果`evaluation.json`／`completion.json`／stdout都只有T1失败，`passed=false`。`user_acceptance.json`时间为18:37:25，晚于18:32:14结束，保留用户原话及原0.01门、8/9、false。
+
+因此用户的“有提升就行”是看到结果后的研究推进决定，不是预先标准已满足，也不是统计证据变强。结果文档§4如实区分；冻结合同中“九条件通过才推进”的原要求不应回写，新的接受决定另行记录即可。当前有效性复核完成后，可按新决定设计后续持续学习，但具体算法、数据方式和训练预算仍需确认；本条未授权新训练、再test或阈值搜索。
+
+实测：独立重建九项布尔值与观察值；原机读结果和用户记录对应。未验证：后续研究方案是否具有创新或是否成功。
+
+最小处置：保留原8/9和事后决定并列。不把T1失败升级为“排序毫无收益”，也不写“原test全部通过”。
+
+### F2. 初次缺件、原样补齐与仅一次实际heldout
+
+**类别：REPRODUCIBILITY_DEFECT，历史已确认、已纠正；无当前科研计算阻断。**
+
+初次17:23:43—17:23:45、GNU1.48秒退出1。原stderr具体停在R:99→75→D:51的`items.jsonl`文件stat，早于正文open、原模型恢复、两次评分和R:230监督解析。失败目录仅`failure.json`，其中heldout_parse_attempts=0。该进程已经读取了必要历史元数据及groups公开信息，不能泛称“任何数据都没读”。
+
+两个冻结原件4,840,862与4,581,409字节（合计9,422,271）随后被复制。修复命令的原stdout记录新鲜大小／SHA，与原生成manifest及本次policy逐项一致；本网页仅核对这些收据，未访问文件实物。恢复授权只改变created_at、job和新增resumption；34源、策略及额度不变。用户明确允许新目录恢复，早于有效启动，不是自动或按效果重试。
+
+关键证据：`test_execution/20260928_165355/execution/{stderr.log,job/failure.json,resource_usage.log}`；`monitoring/{failure_analysis,input_repair_sync,repair_verification}.json`；`20260928_182700/{resumption,authorization}.json`。
+
+历史18项回传中仅17项在本包，缺`initial_observation.json`见§1；不得声称本次核对18/18，但现有原失败栈和后续收据支持“首次没有正文／推理／标签，恢复后一次实际heldout”。这些记录不是远端全进程审计，也不能证明不存在任意未记录操作。
+
+最小处置：保留原失败、修复和授权链；不重复正式标签评价。当前只需如实注明未随包提供的一项历史观察记录，无须新增上传或流程。
+
+### F3. 固定权重、payload、参数、BGE档案和映射的实际对应
+
+**审查维度：REPRODUCIBILITY_DEFECT；未发现模型／映射错配。**
+
+R:126–165核对A=s0_d、C=s0_hard、E6、原文件SHA、payload状态、纯参数摘要和映射origin。R:336–353在正式运行中调用P:193–210严格恢复，并在评分前后核对纯参数摘要。B:110–131校验原生池化和维度，空前缀与原tokenizer，超token预算拒绝，不暗中替换编码器。
+
+实际`blind.actual_inference`两文件大小均1,306,456,728字节，A文件SHA `ad794b62363554fd4530e5aa1945d8952ef91f3a5f2492e261e5ebee8d5917c4`，C为`1b2a6100917d4aac14cbf63e67067d9d055fba9527be60b13e2bfc07bbd58608`。纯参数摘要分别与对应点一致，且与payload摘要不是同一种对象；没有把三种SHA混比。
+
+映射固定为A: a=0.7963388456112388、b=0.05444864332174173；C: a=0.8478783321454962、b=0.5312823708113145。既有JSON实物与当前policy、模型点及blind origin一致。预训练12文件档案的记录行、总大小、规范摘要与配置一致；网页重算的是档案收据摘要，不是缺席的12个大模型／tokenizer原文件。
+
+正式prep记录Python3.10.19、NumPy2.2.6、Torch2.9.1+cu130、CUDA13.0、RTX5090、CPU0。原stderr有两条维度接口改名FutureWarning，但无对应执行失败，不能据此新增无关依赖升级要求。
+
+本次没有从服务器读取权重或重现CUDA；原生恢复和计算模式依赖包内原运行记录及固定源码路径，而不是把前一轮微型Torch当成此次原生实证。最小处置：无模型或映射修复；保留两份已有权重和18权重例外。
+
+### F4. 输入、完整群和一次监督的实际边界
+
+**审查维度：SCIENTIFIC_BLOCKER／REPRODUCIBILITY_DEFECT；未见对齐或权限偏差。**
+
+R:68–123只允许groups、heldout正文和heldout监督；120群按域／group_index排序，账号／商品ID只作对齐。B:134–162、194–230把标题和描述分别编码，全部商品做均值与总体标准差再归一化，对称头按上三角输出378对；没有将ID、域或群标签送入表示。评分以eval和inference_mode执行，编码微批沿用4和bf16。未调用训练更新或校准fit。
+
+独立核对当前120群与旧fit/calibration/development元数据不相交，三域各40、各域index0—39；3,360账号ID群间唯一且群内升序。alignment声明45,360对、2,400正对、3,360查询，保存计数逐群正20／负358吻合。
+
+R:398–412先两模型完整评分和四角色落盘恢复，再R:413进入parse_once；R:218–228对完整blind、群序核对并独占记录一次尝试后，才open监督CSV。有效heldout_access时间18:32:13.221499且绑定完整blind SHA；记录train/development/owners=0、heldout=1。四角色共用同一truth，不是四次解析。
+
+未提供正式正文／标签，故无法独立重证每条实际文本屏蔽、每对标签、查询正度数及控制者隔离。代码确实检查每查询1／2正例，但仅有总数不能独立重建这一真值。文件SHA读字节与CSV解析分别计账，不能说底层文件只读一次。最小处置：无；不用owners或补标签来替代当前范围。
+
+### F5. 实际float64变换、完整并列与旧阈值决策
+
+**审查维度：SCIENTIFIC_BLOCKER／REPRODUCIBILITY_DEFECT；未见实际数值语义偏差。**
+
+R:175–213保存并恢复两float32原分数及两float64校准分数；校准方法`transform/preserve_order`不止检查a>0，还检查378分数完整序和并列。独立标量变换90,720值精确一致；240群和6,720查询候选排序／并列均保持。原分数实际含并列，不是无并列的空泛测试。raw/cal14个曲线／检索列精确一致，排名使用logit而非概率。
+
+固定0.5是各角色logit≥0，校准角色原空间临界点为−b/a；因此工作点决策可以改变。历史严格阈值则在原logit升为float64后比较，R:270–276、B:269–276保持该语义，变换阈值只记录。本次实际A/C测试分数没有刚好命中原阈值，错误变换空间比较与正确比较在这份测试上恰巧0分歧，**不能把旧valid中的边界分歧数量搬来本次**。
+
+独立手工nextafter例仍展示：原x=1<t=nextafter(1,+∞)，但a=.75,b=10后两者都舍入10.75。这说明必须保留原空间语义；它是手工标量参考，不是改动正式阈值。最小处置：保持现有表达式和边界，无新阈值选择。
+
+### F6. 四矩阵采集、保存统计与本地分析器
+
+**审查维度：REPRODUCIBILITY_DEFECT；无新结果复算缺陷。**
+
+R:255–277先完成四矩阵、固定和旧阈值计数及collected；R:281–321再均值、比较、bootstrap、九判据及原诊断。逐群指标计算是采集必要部分，不把“先保存再统计”解释成禁止计算矩阵。四矩阵文件及计数在collected／evaluation中逐项一致，completed指向的evaluation大小/SHA也相符。
+
+本次正式统计顺利完成，没有实际统计错误后恢复。只读重放证明保存材料足够复算，但不能冒称本次又运行了旧故障注入或证明所有硬终止都保全；旧实施前相应实证维持原闭合范围。
+
+新A脚本只导入`step28_alias_pooling_result.py`中的读取、收据、计数及分位数辅助，未调用正式评价或标签入口。其4735值、720盲预测计数、240群保序自述与网页复跑吻合；本次另写独立实现又核对更广的逐查询顺序、求和、四比较分布和计数，未发现其造成新错误。它和本报告都不能仅凭盲分数重算TP身份或逐群AP/MAP/Brier真值；已准确披露。
+
+最小处置：无代码整改。不重读标签、不执行正式finalize覆盖原结果；所有网页产物在新目录。
+
+### F7. 全部22指标、四比较及九条件
+
+**审查维度：SCIENTIFIC_BLOCKER；未见判定偏差。**
+
+E:28–100、225–228保留群内曲线、查询检索和概率定义；B:680–726区分群宏与计数合并。AP按召回跳变的精度加权，不等于梯形PR积分；Recall@K按相关账号数归一化，不等于Hit@K。冻结概率为`exp(-logaddexp(0,-z))`，Brier不截断，log_loss截断[1e-15,1−1e-15]。本轮不重新比较旧实现的手工真值测试，也不把保存矩阵汇总当成原标签重算。
+
+独立复算四角色22均值／三域、四比较全部22点差／条件区间、固定及原严格阈值计数。M:15–23、54–68的未舍入九项再实现后仅T1为false；原用户摘要与实际结果吻合。主要概率保护及对原始A额外保护都满足。A校准自身的Brier和log_loss也改善，不是通过损害A校准来制造相对收益。
+
+最小处置：保持8/9、T1唯一失败。表现不足不是代码bug；不能将观察AP/AUC保护改写成总体或每域非劣效。
+
+### F8. 固定s0条件bootstrap与下界强度
+
+**审查维度：SCIENTIFIC_BLOCKER；未见抽样单位或算法错误。**
+
+M:33–50、B:775–785使用PCG64(20260928)，一次产生(5000,3,40)整数索引，三域分别重抽整群，域等权，四比较及指标共用。保存索引600,000个整数逐一精确核对。独立频数权重法与另一条域内索引均值法在440,000个抽样数值上一致至1e-12以内，线性2.5/97.5分位数与正式记录吻合；还对每比较7个重复做显式标量fsum对照。
+
+独立单位是群，不是3,360查询或45,360对；当前只有固定s0，没有valid三种子平均。MAP区间下界仅约0.00005033，按固定既定统计T2确实通过，但不能据此声称稳定达到0.01或对其他种子、模型重训、映射重估和再生成都稳健。AUC区间跨0，A/B域点差略负；不构成T5失败，因为它事前只要求观察值非负，但需保留在主结论。
+
+多比较／多指标描述区间未统一多重校正。test前多轮valid开发不应假装不存在；本次heldout对已选定固定系统提供另一批同源样本证据，不是重复开发valid本身。用户根据test作推进决定后，120群不再适合作后续最终从未开发的留出。
+
+最小处置：不更换bootstrap种子、次数或CI以取得更有利结论，也不加未授权复测；准确使用“当前固定系统的条件证据”。
+
+### F9. 域与固定0.5取舍、后续设计边界
+
+**审查维度：SCIENTIFIC_BLOCKER／OUT_OF_SCOPE_OVERDESIGN；报告的主要限定准确。**
+
+域A的MAP下降，域A/B的AUC点差微负；三域R5及两概率损失方向改善。固定0.5下主要合并TP从238到317、FP从129到187；recall与F1改善，precision与specificity下降。群宏precision也不是合并precision。这些都已在结果文档§3／5披露，不因用户接受而隐藏。旧严格自动判定仍失败且仅作诊断，不升格为本次资格门。
+
+Brier/log_loss改善是指定概率预测损失改善，不等于每一工作点、每类、每个群或总体无退化，也不能把两种量纲的增益简单相减为业务收益。校准只保留C既有排序，不能称校准创造新的C排序能力。当前test支持同源中文合成、群内27候选且每查询有正例的固定系统比较，不支持真实市场、全库、无匹配拒识或方法创新已成立。
+
+用户明确接受实际增益作为后续研究基础，可在主执行者完成本报告处置后进入有限历史数据持续学习方案设计。不能用见过联合三域的当前权重冒充首域-only状态；120群用于本次基础test后不能仍称后续最终未开发测试集，新最终留出须另合同。18份权重保留例外不因T1失败自动撤销；网页没有远端实物现存核验权限。
+
+最小处置：保持这些限制，不自动设计训练细节、重新test或强制扩大场景。
+
+### F10. 资源属实，但“两个53秒”计时标签须更精确
+
+**类别：REPRODUCIBILITY_DEFECT（当前轻微报告口径；非科研结果阻断）。**
+
+正式GNU总125.20秒、start/end125整数秒、内部预算123.2014秒是不同计时作用域，彼此不矛盾。当前机器配置、CPU affinity、RSS和CUDA峰值在prep／completion／resource_usage相符；输出预算采样最大6,248,212字节、最终job6,254,430字节，外围回传29文件6,276,696字节，均远小于4GiB。CUDA allocated/reserved为本进程分配器统计，不是整卡占用；旧10—30分钟只是准备时估计，实际更快不是预算或科学违例。
+
+**具体新发现：** R:344在`base.score`前开始计时，R:346–347构造`actual`字典时先调用`data.record(path)`重新读取权重做SHA，再`state_digest(model.state_dict())`，最后才计算`score_seconds`。D:37–47明确实际文件哈希。因此A=53.4983秒、C=53.3812秒含评分及随后的文件／参数身份核验，且不含之前模型加载／恢复与之后GC。不能把它作为纯前向延迟，亦不能用它推导精确每查询推理吞吐。本次AST和源码核对确认的是计时区间，不测量其中各段占比。
+
+**最小修订：** 将现行`docs/SELLER_ALIAS_TEST_RESULT.zh.md`§2“ 两次模型推理 ”改成“ 各模型评分及评分后文件／参数核对区间（非纯前向） ”，保留53.4983／53.3812原值和125.20总耗时。无需修改34冻结源、字段、日志，也不重新推理来拆出纯前向时间。除这一报告注释外无实验级修复要求。
+''')
+add('## 4. 全部22指标：主要比较的独立复算\n')
+add('均为每群先计算、三域各40群等权；以下打印9位小数，性能判定使用完整float64。precision至MCC为群宏，非合并比率。\n')
+add('| 指标 | A校准 | C校准 | C−A | 条件95%区间 |\n|---|---:|---:|---:|---|')
+for metric in d['means']['A_cal']:
+ v=p[metric];add(f"| {metric} | {f(d['means']['A_cal'][metric])} | {f(d['means']['C_cal'][metric])} | {signed(v['mean'])} | {interval(v['conditional_95pct_interval'])} |")
+add('\n## 5. 九条件、四比较和分域／工作点\n')
+add('| 编号 | 未舍入观察值 | 运算符／阈值 | 原判定 |\n|---|---:|---|---|')
+for k,v in d['decision']['observed'].items():add(f"| {k} | {v['value']!r} | {v['operator']} {v['bound']} | {'通过' if d['decision']['checks'][k] else '**未通过**'} |")
+add('\n主MAP点差比0.01低0.002515797467076974。T2独立下界为0.000050331027886388256，原正式下界0.00005033102788638814；仅数值求和末位差，不改变原T2。所有机读和报告仍只失败T1。\n')
+add('### 四比较的概率结果（全22项均在CSV／JSON）\n')
+add('| 比较 | ΔBrier | 条件95%区间 | Δlog_loss | 条件95%区间 |\n|---|---:|---|---:|---|')
+for name,c in d['comparisons'].items():add(f"| {name} | {signed(c['brier']['mean'])} | {interval(c['brier']['conditional_95pct_interval'])} | {signed(c['log_loss']['mean'])} | {interval(c['log_loss']['conditional_95pct_interval'])} |")
+add('\nCcal−Craw与Acal−Araw的14个排名／曲线指标及其差值区间均精确为0，这是保序，不是新的改善。A校准也获益，原A概率保护并未失去意义。\n')
+add('### 主比较逐域点差\n')
+add('| 域 | ΔMAP | ΔR5 | ΔAP | ΔAUC | ΔBrier | Δlog_loss |\n|---|---:|---:|---:|---:|---:|---:|')
+for domain in 'ABC':add('| '+domain+' | '+' | '.join(signed(p[x]['by_domain'][domain]) for x in ('map','recall_at_5','average_precision','roc_auc','brier','log_loss'))+' |')
+add('\n此处是域点差，不把总体区间当作逐域区间，也不把总体护栏当逐域护栏。\n')
+add('### 四角色固定概率0.5的合并计数和比率\n')
+add('| 角色 | TP | FP | FN | TN | precision | recall | F1 | FPR |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|')
+for role in roles:
+ c=d['fixed'][role]['pooled'];add(f"| {role} | {c['tp']} | {c['fp']} | {c['fn']} | {c['tn']} | {f(c['precision'])} | {f(c['recall'])} | {f(c['f1'])} | {f(c['fpr'])} |")
+add('\n### 历史严格阈值原始决策集合（只作诊断）\n')
+add('| 模型 | 原logit阈值 | TP | FP | 合并recall | 合并FPR | 全域严格门 |\n|---|---:|---:|---:|---:|---:|---|')
+for role in ('A','C'):
+ c=d['automatic'][role]['report']['pooled'];add(f"| {role} | {d['threshold_checks'][role]['original_threshold']!r} | {c['tp']} | {c['fp']} | {f(c['recall'])} | {f(c['fpr'])} | 未通过 |")
+add('''
+全部逐域严格计数和条件区间已在独立JSON。两模型严格门未过不替代九条件，用户接受决定也不等于授权部署自动同控判决。
+
+## 6. 审查者自己的失败与修订：完整保留
+
+独立统计脚本v1首次通过，没有统计参考修订。元数据／报告脚本另经历两次真实退出1：
+
+第一版把修复stdout的三字段文件收据，与包含额外`identity_source`文字的政策字典整体比较，产生AssertionError。诊断显示五文件的path、bytes、sha256逐项相等；第二版只将两处收据比较显式限定这三个身份字段，仍保持记录顺序和全部条目。
+
+第二版继续检查旧18项回传清单时尝试读取缺席的`initial_observation.json`而FileNotFoundError。诊断确认该734字节文件未列入当前259项源清单；其余17件正确，有效29件与分析9件全部正确。第三版保留并明确报告这一历史范围，不以读取不到的观察记录判当前包哈希损坏。未访问服务器或其他附件补齐，也未伪造该文件内容。
+
+保留`metadata_and_report_audit_v1/v2/v3.py`、两份精确diff、两次原始stderr／stdout／退出码、两个诊断及`history/reviewer_revision_history.json`。没有修改正式源码、结果、统计容限或接受判据。第三版通过不是“首次即全部通过”。最初列目录和显示根清单属于交互探查，非受捕获审计进程；主要核验从01日志开始均保留完整命令与原始流。
+
+项目自身的初次缺件原失败及恢复回执在`history/project_execution/`按字节复制。旧实施前参考的阈值dtype失败仅作为历史阅读，不冒称本次重跑或再次修复。
+
+## 7. 未验证范围和可支持的下一步
+
+本次只在网页执行保存结果核对。没有重跑BGE/CUDA、重新恢复正式权重、读取正式正文／标签、检查真实屏蔽效果或从owners重证控制者隔离。原模型恢复、eval/inference_mode、两完整评分及一次标签门的事实由已绑定的原运行证据与源码共同支持；不是远端全进程监控，也不是网页从原输入到指标端到端重演。
+
+没有真实标签就不能独立重算每群AP/MAP/AUC/Brier/log_loss或把保存TP解释为已逐对验证真值。能重算的是分数变换、顺序／并列、预测正例总数、保存混淆计数的代数、矩阵汇总、配对差及条件区间和机器门。这样的保存结果验证具有实质独立性，但不是所有原评价语义的全新真值审计。
+
+当前结果只支持固定s0、同源中文合成、27候选且有1／2正例的条件比较；不能推出真实中文市场或概率可靠性、全库检索、无匹配拒识、训练种子总体、统一非劣效或论文方法创新。
+
+用户接受决定是在已公开test结果后发生，合法记录这一研究推进选择不意味着确认性标准被满足。可在本地主执行者逐条核对本报告并保留微小修订后进入方案设计；不把此处自动升级为持续学习训练许可。历史可用数据的具体方式／容量、初态、对照、方法和最终留出仍属未来明确合同，不在本次强制决定。
+
+## 8. 建议归档结论
+
+> 本轮固定s0 A/C E6及既有映射的120群独立test已完成。来源、原生运行记录、完整盲分数／矩阵、一次监督、保存计数和独立统计复算支持结果有效。C校准相对A校准观察ΔMAP=0.0074842025，条件区间[0.0000503310,0.0146106778]，R5、AP/AUC观察值及相对校准A和原A的概率保护满足，但事前T1的0.01幅度未达到，原合同8/9、passed=false不变。用户在看到结果后接受实际收益作为后续研究基础；完成本次结果处置后可进入有限历史数据持续学习方案设计，不代表新训练或重新test许可。保留域A MAP及域A/B AUC局部下降、固定0.5精度／FPR取舍和条件区间边界。18权重例外保留；当前联合三域模型不是首域-only初态，120群不能再称后续最终未开发留出。报告两个53秒字段需注明包含评分后身份核对，原计时值和日志不改。
+
+## 9. 下载证据结构与再核对方式
+
+`scripts/independent_saved_audit_v1.py`为新增数值实现，`metadata_and_report_audit_v*.py`及诊断为来源／报告核对；`logs/`保存命令、cwd、线程／CPU、原stdout/stderr、退出码和UTC时间；`outputs/`保存全部四比较CSV、逐域表、计数、独立抽样产物与检查细节；`history/`保留失败、修订和原项目失败记录。`evidence_inventory.json`与`SHA256SUMS.txt`覆盖包内文件，包外回执给ZIP实测大小／SHA与完整性。
+
+原提交源只读；允许的新输出仅在`reports/reviewer_test_result_replay`，并复制到证据包。审查结束的逐成员不变检查见`outputs/final_source_verification.json`。证据包没有实际模型权重、正式正文／标签、owners或从分数反推的真值；所含bootstrap数组是本次保存证据的独立数值产物，不是新实验数据。
+''')
+report='\n'.join(lines)+'\n';dest=Path('/mnt/data/test_result_external_review.zh.md');dest.write_text(report,encoding='utf-8');(E/'test_result_external_review.zh.md').write_text(report,encoding='utf-8')
+shutil.copy2(E/'outputs/independent_v1/all22_metrics.csv','/mnt/data/test_result_external_22_metrics.csv')
+shutil.copy2(E/'outputs/independent_v1/independent_results.json','/mnt/data/test_result_external_independent_results.json')
+# Preserve submitted reader-only scripts and byte-identical replay outputs as a
+# separately labelled reproduction, not as the new independent reference.
+for rel in ('scripts/step28_alias_test_result.py','scripts/step28_alias_pooling_result.py'):
+ dest=E/'submitted_readonly_sources'/rel;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((R/rel).read_bytes())
+for p in (R/'reports/reviewer_test_result_replay').iterdir():
+ if p.is_file():
+  dest=E/'outputs/submitted_replay'/p.name;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(p.read_bytes())
+readme='''# 本次固定s0 test结果外审核验证据\n\n完整结论见 test_result_external_review.zh.md。\n原输入：test_result_review(1).zip，SHA de68ee8309ff6e9865a77f3fdc418b19a2eabe4cc5c896010d9a7a129733f138。\n\n本包不含正式标签、正文或大模型。独立数值实现只依赖NumPy及Python标准库，单CPU运行。\n\n```bash\nOPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \\\n taskset -c 0 python -B scripts/independent_saved_audit_v1.py \\\n --root /path/to/extracted/submitted/project --out /path/to/new/independent_output\n```\n\n不得把上述命令替换成项目正式execute。out必须是新目录。元数据脚本按本次实际沙箱读取，重放时用它支持的--root/--out/--reference；诊断脚本内保留当时原绝对路径便于追溯。日志中的命令是本次实际执行值，不是事后编造。\n\n数值参考v1第一次通过；两个元数据参考失败、诊断和最终v3通过都保留。没有正式重算标签或重新拟合。\n\n计时表述轻微问题仅需现行结果报告加注，不修改冻源/原值/机器false。\n'''
+(E/'README.zh.md').write_text(readme,encoding='utf-8')
+print(json.dumps({'report':str(Path('/mnt/data/test_result_external_review.zh.md')),'report_bytes':len(report.encode()),'report_characters':len(report),'numeric_reference_changed':False},ensure_ascii=False))

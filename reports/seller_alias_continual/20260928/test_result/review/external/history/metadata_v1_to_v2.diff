@@ -1,0 +1,18 @@
+--- metadata_and_report_audit_v1.py
++++ metadata_and_report_audit_v2.py
+@@ -47,11 +47,13 @@
+ repair_stdout=json.loads(repair['stdout']);require(repair_stdout['source_count']==34 and repair_stdout['sources']==snap,'fresh repair scientific snapshot')
+ require(repair_stdout['heldout_access_exists'] is False and repair_stdout['failed_output_files']==['failure.json'],'failed directory contains no label or score output')
+ inputs=[policy['data']['manifest'],policy['data']['validation'],*policy['data']['inputs'].values()]
+-require(repair_stdout['inputs']==inputs,'repair input records match frozen policy')
++require(repair_stdout['inputs']==[{k:x[k] for k in ('path','bytes','sha256')} for x in inputs],
++        'repair file identities match frozen policy (descriptive identity_source is not a file receipt)')
+ sync=load(b/'test_execution/monitoring/input_repair_sync.json')
+ require(sync['count']==2 and sync['bytes']==9422271,'exact two input restoration receipt')
+ expected=[policy['data']['inputs'][k] for k in ('heldout/items.jsonl','heldout/supervision/pairs.csv')]
+-require(sync['files']==expected,'two repaired byte identities; no actual raw input read here')
++require(sync['files']==[{k:x[k] for k in ('path','bytes','sha256')} for x in expected],
++        'two repaired byte identities; no actual raw input read here')
+ manifest=load(verify(policy['data']['manifest']))
+ for key,rec in policy['data']['inputs'].items():require({k:rec[k] for k in ('bytes','sha256')}==manifest['files'][key],'original generation identity '+key)
+ 

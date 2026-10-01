@@ -1,0 +1,36 @@
+{
+  "status": "USER_REQUESTED_BACKGROUND_GPU_LISTENER",
+  "date": "2026-09-28",
+  "user_exact": "fmwf是他的python虚拟环境名吗？既然这样，那就写一个监听GPU空闲就运行上述test的脚本，不用你一直监听了",
+  "existing_formal_authorization": "reports/documentation/20260928/test_plan/authorization.json",
+  "script": {
+    "path": "scripts/run_step28_alias_test_wait_linux_20260928.sh",
+    "bytes": 2588,
+    "sha256": "dd21ffe7a05245d656b65025766750fa2c145b5b6329ebeada0b2b109fdf5b93"
+  },
+  "interval_seconds": 60,
+  "gpu": 0,
+  "cpu": 0,
+  "conditions": [
+    "No compute process on GPU0",
+    "GPU utilization0",
+    "GPUfree>=24576MiB",
+    "RAMavailable>=16777216KiB",
+    "diskfree>=4194304KiB"
+  ],
+  "formal_directory": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution",
+  "listener_directory": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener",
+  "authorization": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/authorization.json",
+  "formal_estimated_minutes": [
+    10,
+    30
+  ],
+  "formal_limit_seconds": 3600,
+  "formal_output_limit_bytes": 4294967296,
+  "wait_time_not_predictable": true,
+  "existing_scientific_sources_unchanged": 34,
+  "scope": "Scheduling the existing reviewed command only; no method/data/criterion/budget changes, no repeat external review for this mechanical scheduler",
+  "no_labels_or_model_loads_while_waiting": true,
+  "one_formal_invocation_only": true,
+  "do_not_delete_active_listener": true
+}

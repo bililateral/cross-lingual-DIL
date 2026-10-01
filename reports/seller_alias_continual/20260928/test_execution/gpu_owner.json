@@ -1,0 +1,6 @@
+{
+  "command": "/home/yongpeng/miniconda3/envs/py310/bin/python -B -c 'import datetime,json,subprocess\ndef run(a):\n p=subprocess.run(a,text=True,capture_output=True,timeout=15)\n return dict(exit_code=p.returncode,stdout=p.stdout,stderr=p.stderr)\napps=run([\"nvidia-smi\",\"--query-compute-apps=pid,process_name,used_memory\",\"--format=csv,noheader,nounits\"])\npids=[x.split(\",\")[0].strip() for x in apps[\"stdout\"].splitlines() if x.strip()]\nprint(json.dumps(dict(time=datetime.datetime.now().astimezone().isoformat(),gpu=run([\"nvidia-smi\",\"--query-gpu=index,name,memory.free,utilization.gpu\",\"--format=csv,noheader,nounits\"]),apps=apps,owners=run([\"ps\",\"-o\",\"user:32,pid,etime,pcpu,pmem,comm\",\"-p\",\",\".join(pids)]) if pids else [])))'",
+  "stdout": "{\"time\": \"2026-09-28T16:50:57.973322+08:00\", \"gpu\": {\"exit_code\": 0, \"stdout\": \"0, NVIDIA GeForce RTX 5090, 29227, 84\\n\", \"stderr\": \"\"}, \"apps\": {\"exit_code\": 0, \"stdout\": \"3135644, /home/zhangdele/miniforge3/envs/fmwf/bin/python, 2828\\n\", \"stderr\": \"\"}, \"owners\": {\"exit_code\": 0, \"stdout\": \"USER                                 PID     ELAPSED %CPU %MEM COMMAND\\nzhangdele                        3135644       11:06  119  8.7 python\\n\", \"stderr\": \"\"}}\n",
+  "stderr": "",
+  "exit_code": 0
+}

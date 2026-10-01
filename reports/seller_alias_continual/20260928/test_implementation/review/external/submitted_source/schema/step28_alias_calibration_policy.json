@@ -1,0 +1,38 @@
+{
+  "study": "seller_alias_frozen_ranking_probability_calibration",
+  "contract": "docs/SELLER_ALIAS_CALIBRATION.zh.md",
+  "decision": "reports/documentation/20260928/calibration_plan/decision.json",
+  "historical_job": "reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job",
+  "historical_records": {
+    "run/manifest.json": {"bytes": 12475, "sha256": "bcb2dfe007eb14bf9f506e42d2179392dd7bbab7529eac36c51484d9e2f666d2"},
+    "completion.json": {"bytes": 1014, "sha256": "1bedc0f86c13fc1a61eaae69fe9d40c273e1ae6cf48e386a5dbb3df5680d7cc1"},
+    "evaluation/collected.json": {"bytes": 111389, "sha256": "227d6b513e2c26ea3eb1be109054503e3180b4c5588db813f8e5e2f69af665d1"}
+  },
+  "runs": ["s0_d", "s0_hard", "s1_d", "s1_hard", "s2_d", "s2_hard"],
+  "epoch": 6,
+  "calibration_groups": 36,
+  "development_groups": 60,
+  "fit": {
+    "objective": "unweighted_unclipped_bernoulli_nll",
+    "map": "sigmoid(a * raw_logit + b)",
+    "initial": [1.0, 0.0],
+    "bounds": [[0.001, 100.0], [-100.0, 100.0]],
+    "optimizer": "L-BFGS-B",
+    "options": {"maxiter": 200, "maxfun": 2000, "maxls": 40, "maxcor": 10, "ftol": 1e-12, "gtol": 1e-8},
+    "projected_gradient_limit": 0.000001,
+    "encoder_updates": 0,
+    "trainable_scalars": 12
+  },
+  "primary_comparison": ["hard_calibrated", "d_calibrated"],
+  "raw_reference_probability_protection": true,
+  "performance_guards": 17,
+  "minimum_map_gain": 0.01,
+  "fixed_test_seed": "s0",
+  "bootstrap_replicates": 5000,
+  "bootstrap_seed": 20260927,
+  "label_parses": {"train": 1, "development": 1, "heldout": 0, "owners": 0},
+  "model_loading": false,
+  "formal_text_access": false,
+  "runtime": {"cpu_threads": 1, "gpu": false, "maximum_seconds": 3600, "maximum_output_bytes": 268435456},
+  "cpu_verification": {"maximum_seconds": 1800, "maximum_output_bytes": 134217728}
+}

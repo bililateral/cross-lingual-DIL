@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/mnt/data/test_result_audit_20260928/evidence/scripts/metadata_and_report_audit_v2.py", line 92, in <module>
+    for rec in rr['files']:verify(rec)
+                           ~~~~~~^^^^^
+  File "/mnt/data/test_result_audit_20260928/evidence/scripts/metadata_and_report_audit_v2.py", line 18, in verify
+    pp=base/rec['path'];bb=pp.read_bytes()
+                           ~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/test_result_audit_20260928/project/reports/seller_alias_continual/20260928/test_execution/20260928_165355/initial_observation.json'

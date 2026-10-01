@@ -1,0 +1,38 @@
+--- independent_test_audit.py
++++ independent_test_audit_v2.py
+@@ -13,7 +13,7 @@
+ from unittest import mock
+ import numpy as np
+ 
+-B=Path('/mnt/data/test_pretest_audit_20260928'); R=B/'source'; OUT=B/'evidence/outputs/independent'
++B=Path('/mnt/data/test_pretest_audit_20260928'); R=B/'source'; OUT=B/'evidence/outputs/independent_v2'
+ OUT.mkdir(parents=True,exist_ok=False)
+ sys.path.insert(0,str(R/'scripts'))
+ import step28_alias_test as target
+@@ -52,7 +52,7 @@
+ def ref_counts(y,z,threshold=0.):
+  tp=fp=fn=tn=0
+  for yy,zz in zip(y,z,strict=True):
+-  if zz>=threshold:
++  if float(zz)>=float(threshold):
+    if yy:tp+=1
+    else:fp+=1
+   else:
+@@ -350,7 +350,7 @@
+  info['A']['threshold']=float(np.nextafter(np.float64(1.),np.inf));info['A']['map']=mapping
+  scores['A_raw'][0,0]=1.;scores['A_cal']=target.calibration.transform(scores['A_raw'],mapping)
+  cap=runner.collect(root,f['truth'],scores,f['blind'],info,f['snapshot'])
+- threshold=info['A']['threshold'];rawpred=scores['A_raw']>=threshold;transpred=scores['A_cal']>=cap['automatic']['A']['mapped_threshold']
++ threshold=info['A']['threshold'];rawpred=scores['A_raw'].astype(np.float64)>=threshold;transpred=scores['A_cal']>=cap['automatic']['A']['mapped_threshold']
+  assert not rawpred[0,0] and transpred[0,0]
+  expected=[ref_counts(y,z,threshold) for y,z in zip(f['truth'],scores['A_raw'])]
+  assert cap['automatic']['A']['counts']==[[c[k] for k in ('tp','fp','fn','tn')] for c in expected]
+@@ -455,7 +455,7 @@
+  try:detail=fn();RESULTS[fn.__name__]={'passed':True,'seconds':time.monotonic()-t,'details':detail};print('PASS',fn.__name__,flush=True)
+  except Exception as e:
+   RESULTS[fn.__name__]={'passed':False,'seconds':time.monotonic()-t,'error_type':type(e).__name__,'message':str(e),'traceback':traceback.format_exc()};traceback.print_exc()
+-report={'tests':RESULTS,'passed':sum(r['passed'] for r in RESULTS.values()),'failed':sum(not r['passed'] for r in RESULTS.values()),'numeric_checks':NUMERICS,'elapsed_seconds':time.monotonic()-started,'environment':{'python':sys.version,'numpy':np.__version__,'torch':torch.__version__,'platform':platform.platform(),'cpu_affinity':sorted(os.sched_getaffinity(0)),'torch_threads':torch.get_num_threads(),'torch_interop_threads':torch.get_num_interop_threads(),'process_threads':next(l.strip() for l in Path('/proc/self/status').read_text().splitlines() if l.startswith('Threads:'))},'formal_labels_read':0,'formal_text_read':0,'formal_scores_read':0,'native_model_loads':0,'formal_execute_called':False,'optimizer_steps':0,'calibration_fits':0,'reference_revisions':[]}
++report={'tests':RESULTS,'passed':sum(r['passed'] for r in RESULTS.values()),'failed':sum(not r['passed'] for r in RESULTS.values()),'numeric_checks':NUMERICS,'elapsed_seconds':time.monotonic()-started,'environment':{'python':sys.version,'numpy':np.__version__,'torch':torch.__version__,'platform':platform.platform(),'cpu_affinity':sorted(os.sched_getaffinity(0)),'torch_threads':torch.get_num_threads(),'torch_interop_threads':torch.get_num_interop_threads(),'process_threads':next(l.strip() for l in Path('/proc/self/status').read_text().splitlines() if l.startswith('Threads:'))},'formal_labels_read':0,'formal_text_read':0,'formal_scores_read':0,'native_model_loads':0,'formal_execute_called':False,'optimizer_steps':0,'calibration_fits':0,'reference_revisions':[{'version':1,'failed_test':'test_08_order_and_threshold','diagnosis':'NumPy float32 array / NumPy scalar comparison with Python float implicitly rounded the reference threshold; production explicitly casts logits to float64.','fix':'Use Python floats in scalar reference and explicit float64 raw reference comparison; no project changes or tolerance changes.','diagnostic':'outputs/threshold_reference_diagnosis.json'}]}
+ jwrite(OUT/'independent_results.json',report)
+ print(json.dumps(report,ensure_ascii=False,indent=2),flush=True)
+ sys.exit(0 if report['failed']==0 else 1)

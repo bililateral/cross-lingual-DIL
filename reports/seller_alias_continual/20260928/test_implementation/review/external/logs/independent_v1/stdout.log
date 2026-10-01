@@ -1,0 +1,204 @@
+RUN test_01_criteria
+PASS test_01_criteria
+RUN test_02_metrics_scalar
+PASS test_02_metrics_scalar
+RUN test_03_bootstrap
+PASS test_03_bootstrap
+RUN test_04_public_and_pipeline
+PASS test_04_public_and_pipeline
+RUN test_05_prelabel_rejections
+PASS test_05_prelabel_rejections
+RUN test_06_supervision_malformed_boundary
+PASS test_06_supervision_malformed_boundary
+RUN test_07_postcapture_recovery
+PASS test_07_postcapture_recovery
+RUN test_08_order_and_threshold
+RUN test_09_real_tiny_restore_full_inherited_forward
+PASS test_09_real_tiny_restore_full_inherited_forward
+RUN test_10_automatic_bootstrap_and_budget
+PASS test_10_automatic_bootstrap_and_budget
+{
+  "tests": {
+    "test_01_criteria": {
+      "passed": true,
+      "seconds": 0.0038625920000185943,
+      "details": {
+        "single_failure_cases": 9,
+        "zero_tolerance_nextafter_checked": true,
+        "bad_calibrated_control_rejected": true
+      }
+    },
+    "test_02_metrics_scalar": {
+      "passed": true,
+      "seconds": 0.03976846900002329,
+      "details": {
+        "handmade_cases": 8,
+        "metrics": 22,
+        "probability_interface": "frozen numpy float64 exp(-logaddexp), independently aggregated",
+        "r1_not_hit1": true,
+        "ap_not_trapezoid": true
+      }
+    },
+    "test_03_bootstrap": {
+      "passed": true,
+      "seconds": 1.1576933910000093,
+      "details": {
+        "replicates": 5000,
+        "seed": 20260928,
+        "shape": [
+          5000,
+          3,
+          40
+        ],
+        "comparisons": 4,
+        "metrics": 22,
+        "interleaved_domains": true,
+        "draws_equal": true
+      }
+    },
+    "test_04_public_and_pipeline": {
+      "passed": true,
+      "seconds": 3.2285094470000217,
+      "details": {
+        "matrices": 4,
+        "shape": [
+          120,
+          22
+        ],
+        "full_metrics": 10560,
+        "toy_label_parse": 1,
+        "formal_label_parse": 0,
+        "account_item_counts": "2 through 8",
+        "shuffled_rows_aligned": true
+      }
+    },
+    "test_05_prelabel_rejections": {
+      "passed": true,
+      "seconds": 0.12009028599999283,
+      "details": {
+        "cases": 10,
+        "all_rejected_before_access_record": true
+      }
+    },
+    "test_06_supervision_malformed_boundary": {
+      "passed": true,
+      "seconds": 3.1652528539999594,
+      "details": {
+        "malformed_cases": 5,
+        "exclusive_attempts_not_success_count": true,
+        "no_retry": true
+      }
+    },
+    "test_07_postcapture_recovery": {
+      "passed": true,
+      "seconds": 2.4861044269999866,
+      "details": {
+        "postcapture_failures": 4,
+        "identical_label_free_recovery": 4,
+        "incomplete_collection_saved_matrices": 1,
+        "incomplete_not_claimed_recoverable": true
+      }
+    },
+    "test_08_order_and_threshold": {
+      "passed": false,
+      "seconds": 0.35324594899998374,
+      "error_type": "AssertionError",
+      "message": "",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/test_pretest_audit_20260928/evidence/scripts/independent_test_audit.py\", line 455, in <module>\n    try:detail=fn();RESULTS[fn.__name__]={'passed':True,'seconds':time.monotonic()-t,'details':detail};print('PASS',fn.__name__,flush=True)\n               ~~^^\n  File \"/mnt/data/test_pretest_audit_20260928/evidence/scripts/independent_test_audit.py\", line 354, in test_08_order_and_threshold\n    assert not rawpred[0,0] and transpred[0,0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+    },
+    "test_09_real_tiny_restore_full_inherited_forward": {
+      "passed": true,
+      "seconds": 0.2897798480000233,
+      "details": {
+        "real_torch": true,
+        "groups": 3,
+        "pairs": 1134,
+        "constructor_replaced_only": true,
+        "native_bge": false,
+        "full_inherited_forward": true,
+        "mismatch_rejections": 4,
+        "model_updates": 0
+      }
+    },
+    "test_10_automatic_bootstrap_and_budget": {
+      "passed": true,
+      "seconds": 0.3523205889999872,
+      "details": {
+        "automatic_scopes": 8,
+        "interval_metrics": 3,
+        "original_diagnostic_not_acceptance": true,
+        "sampled_file_budget_check": true
+      }
+    }
+  },
+  "passed": 9,
+  "failed": 1,
+  "numeric_checks": {
+    "22_metrics_scalar": {
+      "values": 176,
+      "max_abs_difference": 8.881784197001252e-16,
+      "tolerance": 1e-12
+    },
+    "bootstrap_intervals": {
+      "values": 176,
+      "max_abs_difference": 9.71445146547012e-17,
+      "tolerance": 1e-12
+    },
+    "bootstrap_means": {
+      "values": 88,
+      "max_abs_difference": 1.3877787807814457e-17,
+      "tolerance": 1e-12
+    },
+    "bootstrap_domain": {
+      "values": 264,
+      "max_abs_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-12
+    },
+    "full_handmade_metrics": {
+      "values": 10560,
+      "max_abs_difference": 2.220446049250313e-16,
+      "tolerance": 1e-12
+    },
+    "pooled_counts": {
+      "values": 16,
+      "max_abs_difference": 0.0,
+      "tolerance": 1e-12
+    },
+    "tiny_full_forward": {
+      "values": 1134,
+      "max_abs_difference": 5.682637016501957e-08,
+      "tolerance": 2e-06
+    },
+    "automatic_intervals": {
+      "values": 48,
+      "max_abs_difference": 0.0,
+      "tolerance": 1e-12
+    },
+    "automatic_point": {
+      "values": 24,
+      "max_abs_difference": 0.0,
+      "tolerance": 1e-12
+    }
+  },
+  "elapsed_seconds": 11.200707851000004,
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "torch": "2.10.0+cpu",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "cpu_affinity": [
+      0
+    ],
+    "torch_threads": 1,
+    "torch_interop_threads": 1,
+    "process_threads": "Threads:\t1"
+  },
+  "formal_labels_read": 0,
+  "formal_text_read": 0,
+  "formal_scores_read": 0,
+  "native_model_loads": 0,
+  "formal_execute_called": false,
+  "optimizer_steps": 0,
+  "calibration_fits": 0,
+  "reference_revisions": []
+}

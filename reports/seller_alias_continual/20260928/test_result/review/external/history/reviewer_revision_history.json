@@ -1,0 +1,22 @@
+{
+  "event": "Current reviewer metadata-reference correction only",
+  "failed_run": "logs/05_metadata_report_v1",
+  "diagnostic_run": "logs/06_metadata_diagnosis",
+  "cause": "Reference compared entire policy dictionary including identity_source annotation against a three-field fresh file receipt. Path, byte count and SHA were equal. No numerical mismatch.",
+  "change": "Two receipt comparisons now explicitly project path/bytes/sha256; order and all records still required. No project file, statistic or tolerance changed.",
+  "failed_source_sha256": "a815b3d93957c6bd29abd28b0263f7aeb02e321d2bf1c4f64c6ce8237a0f3ad0",
+  "corrected_source_sha256": "5d91b5528c730f09fe8da0a55ba5bfae6acffb31e133d7f7cae54756fcd2e9d5",
+  "numeric_reference_revisions": 0,
+  "independent_statistics_first_run_exit": 0,
+  "formal_label_or_model_access": 0,
+  "second_event": {
+    "failed_run": "logs/07_metadata_report_v2",
+    "diagnostic_run": "logs/08_inventory_diagnosis",
+    "cause": "Reference assumed all18 entries in a historical transfer receipt were supplied now; current259-source package includes17, excluding optional734-byte initial_observation.json. It is not falsely listed in current source_inventory.",
+    "change": "Preserve and disclose absent historical record; verify the other17, all29 successful-run receipts and9 local analysis receipts. Required scientific source/prediction/matrix files still have strict checks.",
+    "missing_record_retrieved": false,
+    "numeric_reference_changed": false,
+    "failed_source_sha256": "5d91b5528c730f09fe8da0a55ba5bfae6acffb31e133d7f7cae54756fcd2e9d5",
+    "corrected_source_sha256": "e46b961a68b4547194bf1376d03c28bc2c39e261369e48601a74a9d4bf1c2ede"
+  }
+}

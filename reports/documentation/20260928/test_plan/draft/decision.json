@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-28",
+  "time": "2026-09-28T15:17:16.3730481+08:00",
+  "status": "DATA_USE_CONFIRMED_FULL_TEST_CONTRACT_PROPOSED",
+  "request": "那现在能确定完整的test合同吗？",
+  "data_question": "现有120个未评价的留出群怎样使用？建议本次全部用于基础模型验收，保持原定样本量；它们以后可用于开发分析，但不再称为持续学习的最终独立测试集，后续另行建立并封存新的同设定留出集。另一种办法是现在分成60群验收、60群留给持续学习，代价是两次评价的样本量都较小。本次只确定用途，不读取test或生成新数据。",
+  "answer_exact": "120群用于本次验收，后续另建最终留出集（推荐）",
+  "confirmed_data_use": {
+    "existing_test_groups": 120,
+    "per_domain": 40,
+    "dedicated_to": "current base-model independent acceptance",
+    "later_continual_final_unseen_test": false,
+    "new_final_holdout_to_be_separately_planned_and_sealed": true,
+    "generate_now": false,
+    "read_test_now": false
+  },
+  "inherited_confirmed": {
+    "seed": "s0",
+    "models": [
+      "s0_d E6",
+      "s0_hard E6"
+    ],
+    "calibration": "existing fitted positive affine maps, no refit",
+    "goal": "candidate ranking improvement with observed AP/AUC/Brier/log_loss protection"
+  },
+  "proposed_contract": "docs/SELLER_ALIAS_TEST.zh.md",
+  "proposed_policy": "schema/step28_alias_test_policy.json",
+  "remaining_contract_confirmation": [
+    "Single fixed-pair nine criteria adapted from the approved development protections",
+    "5000 domain-stratified group draws,seed20260928,linear95percent intervals",
+    "Handmade CPU verification1CPU/1h/256MiB",
+    "Formal test1GPU/1CPU,estimated10-30min,1h/4GiB cap"
+  ],
+  "authorization": {
+    "contract_preparation": true,
+    "dataset_use_choice": true,
+    "test_implementation_started": false,
+    "cpu_stage_resumed": false,
+    "formal_test": false,
+    "test_labels": false,
+    "new_data_generation": false,
+    "continual_design": false
+  },
+  "scope": "This file records only the actual user answer and concrete draft. It does not make proposed evaluation/resource clauses user-confirmed.",
+  "calibration_result_review": {
+    "closed": true,
+    "disposition": "reports/seller_alias_continual/20260928/calibration_result/review/disposition.json",
+    "new_test_contract_in_reviewed_package": false
+  }
+}

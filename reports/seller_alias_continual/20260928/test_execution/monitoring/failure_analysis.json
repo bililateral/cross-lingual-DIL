@@ -1,0 +1,50 @@
+{
+  "status": "PRE_INFERENCE_DEPLOYMENT_FAILURE_NO_TEST_RESULT",
+  "observed_at": "2026-09-28T18:15:14.228930+08:00",
+  "run": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/job",
+  "started_at": "2026-09-28T17:23:43+08:00",
+  "finished_at": "2026-09-28T17:23:45+08:00",
+  "exit_code": 1,
+  "gnu_wall_seconds": 1.48,
+  "maximum_rss_kib": 770284,
+  "listener_pid": 3137352,
+  "listener_alive_at_observation": false,
+  "formal_invocations": 1,
+  "label_parse_attempts": {
+    "development": 0,
+    "heldout": 0,
+    "owners": 0,
+    "train": 0
+  },
+  "formal_text_parse_started": false,
+  "native_model_loads": 0,
+  "scoring_passes": 0,
+  "optimizer_updates": 0,
+  "calibration_fits": 0,
+  "acceptance": null,
+  "classification": "REPRODUCIBILITY_DEFECT",
+  "defect_scope": "Deployment omitted two authorized heldout files; scientific code and criteria are unchanged.",
+  "root_cause": "Original heldout items.jsonl and supervision/pairs.csv were retained on Windows and absent from the Linux formal path. The 43-file deployment did not include them. Failure occurred while stat-checking items.jsonl before text open, native model restoration, inference, and gated supervision.",
+  "executor_responsibility": "Executor failed to ensure all frozen formal inputs had been synchronized before scheduling.",
+  "preserved_evidence": [
+    "status.json",
+    "return_sync.json",
+    "remote_inputs.json",
+    "local_inputs.json",
+    "local_sources.json",
+    "../20260928_165355/execution/job/failure.json",
+    "../20260928_165355/execution/stderr.log",
+    "../20260928_165355/execution/resource_usage.log"
+  ],
+  "repair_scope": "Copy only the two exact frozen files, verify fresh remote hashes, keep failed run and 34 scientific sources unchanged. No automatic retry.",
+  "claim_boundary": "No independent test result or negative model result exists. No decision among T1-T9 can be made.",
+  "restart_rule": "Test contract section 6 forbids automatically restarting the formal entry. Prepare exact-byte repair and request explicit resumption in a new run directory.",
+  "future_runtime_minutes": [
+    10,
+    30
+  ],
+  "maximum_runtime_seconds": 3600,
+  "maximum_output_bytes": 4294967296,
+  "current_remaining_seconds": 0,
+  "next_expected_completion": null
+}

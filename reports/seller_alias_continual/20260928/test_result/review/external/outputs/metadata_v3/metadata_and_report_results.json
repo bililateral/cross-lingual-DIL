@@ -1,0 +1,1496 @@
+{
+  "status": "PASS_METADATA_AND_REPORT_WITH_TIMING_LABEL_CLARIFICATION",
+  "checks": 467,
+  "verified_frozen_sources": 34,
+  "inherited_sources": 26,
+  "embedded_original_zip_members": 117,
+  "history_scope": "Original117-member implementation input verified; selected old390-member external evidence is not asserted complete.",
+  "authorization_changed_fields": {
+    "created_at": {
+      "old": "2026-09-28T16:55:41+08:00",
+      "new": "2026-09-28T18:28:33.9926808+08:00"
+    },
+    "resumption": {
+      "old": null,
+      "new": {
+        "path": "reports/seller_alias_continual/20260928/test_execution/20260928_182700/resumption.json",
+        "bytes": 1517,
+        "sha256": "5e4553ece36ef29e1ce61b463ead4d7a2c9745fc60003e3877e6ad5dfb8156fe"
+      }
+    },
+    "job": {
+      "old": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/job",
+      "new": "reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job"
+    }
+  },
+  "repaired_raw_input_bytes_receipts_only": {
+    "files": [
+      {
+        "path": "reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/heldout/items.jsonl",
+        "bytes": 4840862,
+        "sha256": "429e18853b956e30a4dee168feb31c9bc571bdc728355a14669a262a3c65a60e"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/heldout/supervision/pairs.csv",
+        "bytes": 4581409,
+        "sha256": "6b177ab316d256e23d41d2aa5d4b50e0fb70c0dc4f37c70a3fc84904ab427dc9"
+      }
+    ],
+    "count": 2,
+    "bytes": 9422271
+  },
+  "returned_artifacts": {
+    "test_execution/monitoring/return_sync.json": {
+      "recorded_count": 18,
+      "recorded_bytes": 20056,
+      "verified_present_count": 17,
+      "verified_present_bytes": 19322,
+      "not_provided_not_verified": [
+        {
+          "path": "reports/seller_alias_continual/20260928/test_execution/20260928_165355/initial_observation.json",
+          "bytes": 734,
+          "sha256": "f2e09e8e07770517390bfafc2be802f73bac4e31c0afef8d9ad5f9316448ac14",
+          "actual_remote_bytes_match": true
+        }
+      ]
+    },
+    "test_result/return_sync.json": {
+      "recorded_count": 29,
+      "recorded_bytes": 6276696,
+      "verified_present_count": 29,
+      "verified_present_bytes": 6276696,
+      "not_provided_not_verified": []
+    },
+    "test_result/analysis_return_sync.json": {
+      "recorded_count": 9,
+      "recorded_bytes": 58512,
+      "verified_present_count": 9,
+      "verified_present_bytes": 58512,
+      "not_provided_not_verified": []
+    }
+  },
+  "formal_environment": {
+    "cpu_affinity": [
+      0
+    ],
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "numpy": "2.2.6",
+    "python": "3.10.19",
+    "torch": "2.9.1+cu130"
+  },
+  "formal_start": "2026-09-28T18:30:09+08:00",
+  "formal_finish": "2026-09-28T18:32:14+08:00",
+  "gnu_seconds": 125.2,
+  "completion_budget_seconds": 123.20140398200601,
+  "final_job_bytes": 6254430,
+  "sampled_peak_output_bytes": 6248212,
+  "cuda_peak_allocated_bytes": 1939648512,
+  "cuda_peak_reserved_bytes": 1979711488,
+  "max_rss_kib": 3525724,
+  "timing_label_finding": {
+    "classification": "REPRODUCIBILITY_DEFECT",
+    "scope": "minor reporting label only, nonblocking for scientific validity",
+    "evidence": "step28_alias_test_run.py:344-347 evaluates data.record (full weight hash) and state_digest before score_seconds; population_data.py:37-47 hashes full file.",
+    "actual_interval": "From immediately before base.score through the subsequent full weight-file receipt and parameter-state digest; excludes initial load/restore and subsequent GC.",
+    "minimal_revision": "Relabel the two recorded53s intervals as scoring plus post-score identity checks, not pure forward latency. Preserve frozen code, raw log and values; do not rerun.",
+    "source_snippet": "def inference_one(p: dict, name: str, info: dict, groups: list, check: Callable) -> tuple[np.ndarray, dict]:\n    import torch\n    rec, saved = p[\"models\"][name], info[name]\n    path = data.verify(data.ROOT / rec[\"payload\"][\"path\"], rec[\"payload\"])\n    model = base.load_model(saved[\"config\"], \"split_rank\")\n    metadata = core.restore_state(path, model, None, rec[\"payload\"][\"payload_state_sha256\"])\n    if metadata != saved[\"point\"][\"metadata\"] or core.state_digest(model.state_dict()) != rec[\"payload\"][\"model_parameters_sha256\"]:\n        raise ValueError(\"Actual restored test model differs\")\n    started = time.monotonic()\n    values = base.score(model, groups, saved[\"config\"], \"split_rank\", check)\n    actual = {\"model_file\": data.record(path, data.ROOT), \"parameters_sha256\": core.state_digest(model.state_dict()),\n              \"score_seconds\": time.monotonic() - started, \"groups\": len(groups), \"training_updates\": 0}\n    if actual[\"parameters_sha256\"] != rec[\"payload\"][\"model_parameters_sha256\"]:\n        raise ValueError(\"Inference changed model parameters\")\n    del model\n    gc.collect()\n    torch.cuda.empty_cache()\n    return values, actual"
+  },
+  "human_tables_checked": 4,
+  "human_numeric_cells_checked": 153,
+  "report_rounding_checks": [
+    {
+      "label": "average_precision/Acal",
+      "displayed": "0.336332",
+      "expected": 0.33633228666569864,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "average_precision/Ccal",
+      "displayed": "0.354771",
+      "expected": 0.35477095133753966,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "average_precision/diff",
+      "displayed": "+0.018439",
+      "expected": 0.01843866467184108,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "average_precision/CI",
+      "displayed": "0.010445",
+      "expected": 0.010444624936903232,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "average_precision/CI",
+      "displayed": "0.025994",
+      "expected": 0.02599431108405659,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "trapezoidal_pr_auc/Acal",
+      "displayed": "0.323885",
+      "expected": 0.32388465790495086,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "trapezoidal_pr_auc/Ccal",
+      "displayed": "0.341116",
+      "expected": 0.3411162191302501,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "trapezoidal_pr_auc/diff",
+      "displayed": "+0.017232",
+      "expected": 0.017231561225299213,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "trapezoidal_pr_auc/CI",
+      "displayed": "0.008774",
+      "expected": 0.008773828274576413,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "trapezoidal_pr_auc/CI",
+      "displayed": "0.025177",
+      "expected": 0.025176839899435345,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "roc_auc/Acal",
+      "displayed": "0.792769",
+      "expected": 0.7927688547486034,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "roc_auc/Ccal",
+      "displayed": "0.795411",
+      "expected": 0.7954108472998139,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "roc_auc/diff",
+      "displayed": "+0.002642",
+      "expected": 0.00264199255121045,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "roc_auc/CI",
+      "displayed": "-0.002299",
+      "expected": -0.0022989263268156247,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "roc_auc/CI",
+      "displayed": "0.007586",
+      "expected": 0.007586126629422738,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_fpr_1pct/Acal",
+      "displayed": "0.195000",
+      "expected": 0.19499999999999998,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_fpr_1pct/Ccal",
+      "displayed": "0.205833",
+      "expected": 0.20583333333333334,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_fpr_1pct/diff",
+      "displayed": "+0.010833",
+      "expected": 0.010833333333333332,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_fpr_1pct/CI",
+      "displayed": "-0.002094",
+      "expected": -0.0020937500000000045,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_fpr_1pct/CI",
+      "displayed": "0.024583",
+      "expected": 0.02458333333333333,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "brier/Acal",
+      "displayed": "0.043183",
+      "expected": 0.04318267789707988,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "brier/Ccal",
+      "displayed": "0.042466",
+      "expected": 0.04246570969422755,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "brier/diff",
+      "displayed": "-0.000717",
+      "expected": -0.0007169682028523338,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "brier/CI",
+      "displayed": "-0.000962",
+      "expected": -0.0009624236716502864,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "brier/CI",
+      "displayed": "-0.000449",
+      "expected": -0.0004491564399707832,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "log_loss/Acal",
+      "displayed": "0.169724",
+      "expected": 0.1697242637615119,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "log_loss/Ccal",
+      "displayed": "0.167493",
+      "expected": 0.1674933343987402,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "log_loss/diff",
+      "displayed": "-0.002231",
+      "expected": -0.0022309293627717024,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "log_loss/CI",
+      "displayed": "-0.003282",
+      "expected": -0.003281896600330609,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "log_loss/CI",
+      "displayed": "-0.001140",
+      "expected": -0.001140049302956211,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "precision/Acal",
+      "displayed": "0.675397",
+      "expected": 0.6753968253968254,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "precision/Ccal",
+      "displayed": "0.669591",
+      "expected": 0.6695911495911495,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "precision/diff",
+      "displayed": "-0.005806",
+      "expected": -0.005805675805675809,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "precision/CI",
+      "displayed": "-0.057897",
+      "expected": -0.05789707341269842,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "precision/CI",
+      "displayed": "0.047351",
+      "expected": 0.04735098755411252,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall/Acal",
+      "displayed": "0.099167",
+      "expected": 0.09916666666666667,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall/Ccal",
+      "displayed": "0.132083",
+      "expected": 0.13208333333333333,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall/diff",
+      "displayed": "+0.032917",
+      "expected": 0.03291666666666667,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall/CI",
+      "displayed": "0.022917",
+      "expected": 0.022916666666666675,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall/CI",
+      "displayed": "0.042500",
+      "expected": 0.04249999999999999,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "f1/Acal",
+      "displayed": "0.167273",
+      "expected": 0.16727295518999666,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "f1/Ccal",
+      "displayed": "0.213288",
+      "expected": 0.21328848481595897,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "f1/diff",
+      "displayed": "+0.046016",
+      "expected": 0.04601552962596231,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "f1/CI",
+      "displayed": "0.031184",
+      "expected": 0.031184227176030668,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "f1/CI",
+      "displayed": "0.060445",
+      "expected": 0.06044516047777612,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "specificity/Acal",
+      "displayed": "0.996997",
+      "expected": 0.9969972067039107,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "specificity/Ccal",
+      "displayed": "0.995647",
+      "expected": 0.9956471135940409,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "specificity/diff",
+      "displayed": "-0.001350",
+      "expected": -0.0013500931098696452,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "specificity/CI",
+      "displayed": "-0.001909",
+      "expected": -0.0019087523277467387,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "specificity/CI",
+      "displayed": "-0.000768",
+      "expected": -0.0007681564245810097,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "balanced_accuracy/Acal",
+      "displayed": "0.548082",
+      "expected": 0.5480819366852887,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "balanced_accuracy/Ccal",
+      "displayed": "0.563865",
+      "expected": 0.5638652234636871,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "balanced_accuracy/diff",
+      "displayed": "+0.015783",
+      "expected": 0.01578328677839851,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "balanced_accuracy/CI",
+      "displayed": "0.010875",
+      "expected": 0.01087523277467412,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "balanced_accuracy/CI",
+      "displayed": "0.020597",
+      "expected": 0.020597328910614516,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mcc/Acal",
+      "displayed": "0.236929",
+      "expected": 0.23692885209681538,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mcc/Ccal",
+      "displayed": "0.273260",
+      "expected": 0.2732603606931781,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mcc/diff",
+      "displayed": "+0.036332",
+      "expected": 0.03633150859636273,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mcc/CI",
+      "displayed": "0.017820",
+      "expected": 0.017819773540579883,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mcc/CI",
+      "displayed": "0.054275",
+      "expected": 0.05427516486598405,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "map/Acal",
+      "displayed": "0.501365",
+      "expected": 0.5013651882420003,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "map/Ccal",
+      "displayed": "0.508849",
+      "expected": 0.5088493907749233,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "map/diff",
+      "displayed": "+0.007484",
+      "expected": 0.007484202532923026,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "map/CI",
+      "displayed": "0.000050",
+      "expected": 5.0331027886388256e-05,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "map/CI",
+      "displayed": "0.014611",
+      "expected": 0.014610677823197948,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mrr/Acal",
+      "displayed": "0.548907",
+      "expected": 0.5489072500436105,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mrr/Ccal",
+      "displayed": "0.558741",
+      "expected": 0.5587405532992797,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mrr/diff",
+      "displayed": "+0.009833",
+      "expected": 0.009833303255669097,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mrr/CI",
+      "displayed": "0.001718",
+      "expected": 0.0017175168244208986,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "mrr/CI",
+      "displayed": "0.017920",
+      "expected": 0.017919647580785934,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_1/Acal",
+      "displayed": "0.306845",
+      "expected": 0.30684523809523806,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_1/Ccal",
+      "displayed": "0.312946",
+      "expected": 0.31294642857142857,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_1/diff",
+      "displayed": "+0.006101",
+      "expected": 0.006101190476190473,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_1/CI",
+      "displayed": "-0.003720",
+      "expected": -0.003720238095238092,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_1/CI",
+      "displayed": "0.015629",
+      "expected": 0.015628720238095185,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_3/Acal",
+      "displayed": "0.523810",
+      "expected": 0.5238095238095238,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_3/Ccal",
+      "displayed": "0.530506",
+      "expected": 0.5305059523809523,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_3/diff",
+      "displayed": "+0.006696",
+      "expected": 0.0066964285714285745,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_3/CI",
+      "displayed": "-0.004613",
+      "expected": -0.004613095238095232,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_3/CI",
+      "displayed": "0.018006",
+      "expected": 0.018005952380952383,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_5/Acal",
+      "displayed": "0.625298",
+      "expected": 0.625297619047619,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_5/Ccal",
+      "displayed": "0.639732",
+      "expected": 0.6397321428571429,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_5/diff",
+      "displayed": "+0.014435",
+      "expected": 0.014434523809523807,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_5/CI",
+      "displayed": "0.003270",
+      "expected": 0.003270089285714283,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_5/CI",
+      "displayed": "0.025149",
+      "expected": 0.025148809523809535,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_10/Acal",
+      "displayed": "0.770387",
+      "expected": 0.7703869047619047,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_10/Ccal",
+      "displayed": "0.771577",
+      "expected": 0.7715773809523809,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_10/diff",
+      "displayed": "+0.001190",
+      "expected": 0.00119047619047619,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_10/CI",
+      "displayed": "-0.009970",
+      "expected": -0.00997023809523809,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "recall_at_10/CI",
+      "displayed": "0.012054",
+      "expected": 0.012053571428571422,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_1/Acal",
+      "displayed": "0.409524",
+      "expected": 0.4095238095238095,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_1/Ccal",
+      "displayed": "0.420536",
+      "expected": 0.4205357142857143,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_1/diff",
+      "displayed": "+0.011012",
+      "expected": 0.011011904761904763,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_1/CI",
+      "displayed": "-0.001190",
+      "expected": -0.001190476190476183,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_1/CI",
+      "displayed": "0.023512",
+      "expected": 0.023511904761904755,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_3/Acal",
+      "displayed": "0.470194",
+      "expected": 0.4701944379001676,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_3/Ccal",
+      "displayed": "0.478898",
+      "expected": 0.47889819359076885,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_3/diff",
+      "displayed": "+0.008704",
+      "expected": 0.008703755690601198,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_3/CI",
+      "displayed": "-0.000334",
+      "expected": -0.00033424256285698026,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_3/CI",
+      "displayed": "0.017524",
+      "expected": 0.017523760098069694,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_5/Acal",
+      "displayed": "0.516744",
+      "expected": 0.5167443888204233,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_5/Ccal",
+      "displayed": "0.528470",
+      "expected": 0.5284699529323157,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_5/diff",
+      "displayed": "+0.011726",
+      "expected": 0.01172556411189234,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_5/CI",
+      "displayed": "0.003837",
+      "expected": 0.0038365678261492626,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_5/CI",
+      "displayed": "0.019559",
+      "expected": 0.019559473449357545,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_10/Acal",
+      "displayed": "0.568920",
+      "expected": 0.5689197754000646,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_10/Ccal",
+      "displayed": "0.575693",
+      "expected": 0.575693010898706,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_10/diff",
+      "displayed": "+0.006773",
+      "expected": 0.006773235498641548,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_10/CI",
+      "displayed": "-0.000916",
+      "expected": -0.0009163599890351256,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "ndcg_at_10/CI",
+      "displayed": "0.014055",
+      "expected": 0.014054620317110059,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "T1",
+      "displayed": "+0.007484203",
+      "expected": 0.007484202532923026,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T2",
+      "displayed": "+0.000050331",
+      "expected": 5.0331027886388256e-05,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T3",
+      "displayed": "+0.014434524",
+      "expected": 0.014434523809523807,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T4",
+      "displayed": "+0.018438665",
+      "expected": 0.01843866467184108,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T5",
+      "displayed": "+0.002641993",
+      "expected": 0.00264199255121045,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T6",
+      "displayed": "−0.000716968",
+      "expected": -0.0007169682028523338,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T7",
+      "displayed": "−0.002230929",
+      "expected": -0.0022309293627717024,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T8",
+      "displayed": "−0.001197719",
+      "expected": -0.0011977189371862962,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "T9",
+      "displayed": "−0.010730192",
+      "expected": -0.010730192380679874,
+      "display_tolerance": 5.0002e-10
+    },
+    {
+      "label": "A/table/0",
+      "displayed": "0.505534",
+      "expected": 0.5055341388284118,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A/table/1",
+      "displayed": "0.504220",
+      "expected": 0.5042199934178977,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A/table/2",
+      "displayed": "−0.001314",
+      "expected": -0.0013141454105141059,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A/table/3",
+      "displayed": "+0.005357",
+      "expected": 0.005357142857142863,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A/table/4",
+      "displayed": "−0.000443",
+      "expected": -0.0004431599824169867,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A/table/5",
+      "displayed": "−0.001118",
+      "expected": -0.001117747951377191,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/0",
+      "displayed": "0.478343",
+      "expected": 0.47834300249321043,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/1",
+      "displayed": "0.484538",
+      "expected": 0.48453810690052,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/2",
+      "displayed": "+0.006195",
+      "expected": 0.006195104407309582,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/3",
+      "displayed": "+0.019643",
+      "expected": 0.019642857142857136,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/4",
+      "displayed": "−0.000300",
+      "expected": -0.00030010195651755027,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "B/table/5",
+      "displayed": "−0.000913",
+      "expected": -0.0009131267080239689,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/0",
+      "displayed": "0.520218",
+      "expected": 0.5202184234043785,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/1",
+      "displayed": "0.537790",
+      "expected": 0.5377900720063522,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/2",
+      "displayed": "+0.017572",
+      "expected": 0.0175716486019736,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/3",
+      "displayed": "+0.018304",
+      "expected": 0.018303571428571426,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/4",
+      "displayed": "−0.001408",
+      "expected": -0.0014076426696224642,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C/table/5",
+      "displayed": "−0.004662",
+      "expected": -0.004661913428913948,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A_cal/tp",
+      "displayed": "238",
+      "expected": 238.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "A_cal/fp",
+      "displayed": "129",
+      "expected": 129.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "A_cal/fn",
+      "displayed": "2162",
+      "expected": 2162.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "A_cal/tn",
+      "displayed": "42831",
+      "expected": 42831.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "A_cal/precision",
+      "displayed": "0.648501",
+      "expected": 0.6485013623978202,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A_cal/recall",
+      "displayed": "0.099167",
+      "expected": 0.09916666666666667,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A_cal/f1",
+      "displayed": "0.172027",
+      "expected": 0.17202746657029275,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "A_cal/fpr",
+      "displayed": "0.003003",
+      "expected": 0.0030027932960893853,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C_cal/tp",
+      "displayed": "317",
+      "expected": 317.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "C_cal/fp",
+      "displayed": "187",
+      "expected": 187.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "C_cal/fn",
+      "displayed": "2083",
+      "expected": 2083.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "C_cal/tn",
+      "displayed": "42773",
+      "expected": 42773.0,
+      "display_tolerance": 0.50000000000002
+    },
+    {
+      "label": "C_cal/precision",
+      "displayed": "0.628968",
+      "expected": 0.628968253968254,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C_cal/recall",
+      "displayed": "0.132083",
+      "expected": 0.13208333333333333,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C_cal/f1",
+      "displayed": "0.218320",
+      "expected": 0.21831955922865015,
+      "display_tolerance": 5.000000199999999e-07
+    },
+    {
+      "label": "C_cal/fpr",
+      "displayed": "0.004353",
+      "expected": 0.004352886405959031,
+      "display_tolerance": 5.000000199999999e-07
+    }
+  ],
+  "replay_csv_byte_equivalence": {
+    "mean_metrics.csv": true,
+    "paired_metrics.csv": true
+  },
+  "raw_labels_text_weights_accessed": false,
+  "external_remote_access": false,
+  "all_checks": [
+    "original implementation zip identity",
+    "embedded zip integrity",
+    "historical source AGENTS.md",
+    "historical source docs/AI_RESEARCH_HANDOFF.zh.md",
+    "historical source docs/RESEARCH_DISCIPLINE.zh.md",
+    "historical source docs/RESEARCH_DISCUSSION.zh.md",
+    "historical source docs/RESEARCH_PLAN.md",
+    "historical source docs/SELLER_ALIAS_CALIBRATION_IMPLEMENTATION.zh.md",
+    "historical source docs/SELLER_ALIAS_CALIBRATION_RESULT.zh.md",
+    "historical source docs/SELLER_ALIAS_CALIBRATION.zh.md",
+    "historical source docs/SELLER_ALIAS_RANKING_IMPLEMENTATION.zh.md",
+    "historical source docs/SELLER_ALIAS_RANKING_RESULT.zh.md",
+    "historical source docs/SELLER_ALIAS_RANKING.zh.md",
+    "historical source docs/SELLER_ALIAS_TEST_IMPLEMENTATION.zh.md",
+    "historical source docs/SELLER_ALIAS_TEST.zh.md",
+    "historical source reports/documentation/20260927/ranking_plan/decision.json",
+    "historical source reports/documentation/20260928/calibration_plan/decision.json",
+    "historical source reports/documentation/20260928/test_plan/authorization.json",
+    "historical source reports/documentation/20260928/test_plan/decision.json",
+    "historical source reports/documentation/20260928/test_plan/preparation.json",
+    "historical source reports/documentation/20260928/test_readiness/assessment.json",
+    "historical source reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/manifest.json",
+    "historical source reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/validation.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/manifest.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/partition.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_d/calibration.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_d/manifest.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_hard/calibration.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_hard/manifest.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/audit.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/contracts.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/exit_status.txt",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/finished.txt",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/hard.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/original_d.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/primary_check.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/resource_usage.log",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/return_inventory.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/schedule.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/started.txt",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/stderr.log",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/stdout.log",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/wrapped_d.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/review/disposition.json",
+    "historical source reports/seller_alias_continual/20260927/ranking_implementation/review/response.zh.md",
+    "historical source reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job/completion.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job/evaluation/evaluation.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job/s0_d/fit.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job/s0_hard/fit.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_implementation/review/disposition.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_implementation/review/external/calibration_review_report.zh.md",
+    "historical source reports/seller_alias_continual/20260928/calibration_implementation/review/response_visible.zh.md",
+    "historical source reports/seller_alias_continual/20260928/calibration_result/review/disposition.json",
+    "historical source reports/seller_alias_continual/20260928/calibration_result/review/external/review_report.zh.md",
+    "historical source reports/seller_alias_continual/20260928/calibration_result/review/response_visible.zh.md",
+    "historical source reports/seller_alias_continual/20260928/ranking_result/review/disposition.json",
+    "historical source reports/seller_alias_continual/20260928/ranking_result/review/external/review_report.zh.md",
+    "historical source reports/seller_alias_continual/20260928/ranking_result/weight_retention.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/coverage/before/test_step28_alias_test_contracts.py",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/coverage/decision.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/coverage/deployment.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/coverage/launch.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/coverage/observation.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu_launch.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu_observation.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/evidence/audit.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/evidence/handmade.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/exit_status.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/finished.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/resource_usage.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/started.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/stderr.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155700/stdout.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/evidence/audit.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/evidence/handmade.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/exit_status.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/finished.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/resource_usage.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/started.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/stderr.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/stdout.log",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/deployment.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/help_check.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/help/audit_help.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/help/run_help.txt",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/primary_check.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/resource_probe.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/return_initial.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/return_sync.json",
+    "historical source reports/seller_alias_continual/20260928/test_implementation/review/request.zh.md",
+    "historical source schema/step28_alias_calibration_policy.json",
+    "historical source schema/step28_alias_ranking_policy.json",
+    "historical source schema/step28_alias_test_policy.json",
+    "historical source schema/step28_chinese_base_policy.json",
+    "historical source scripts/run_step28_alias_calibration_linux_20260928.sh",
+    "historical source scripts/run_step28_alias_ranking_linux_20260927.sh",
+    "historical source scripts/run_step28_alias_test_linux_20260928.sh",
+    "historical source scripts/run_step28_chinese_base_linux_20260924.sh",
+    "historical source scripts/step28_alias_calibration_audit.py",
+    "historical source scripts/step28_alias_calibration_run.py",
+    "historical source scripts/step28_alias_calibration.py",
+    "historical source scripts/step28_alias_ranking_audit.py",
+    "historical source scripts/step28_alias_ranking_run.py",
+    "historical source scripts/step28_alias_ranking.py",
+    "historical source scripts/step28_alias_test_audit.py",
+    "historical source scripts/step28_alias_test_run.py",
+    "historical source scripts/step28_alias_test.py",
+    "historical source scripts/step28_chinese_base_audit.py",
+    "historical source scripts/step28_chinese_base.py",
+    "historical source scripts/step28_continual_expression_run.py",
+    "historical source scripts/step28_continual_population_data.py",
+    "historical source scripts/step28_continual_population_evaluate.py",
+    "historical source scripts/step28_continual_population_run.py",
+    "historical source scripts/step28_continual_population.py",
+    "historical source tests/test_step28_alias_calibration_contracts.py",
+    "historical source tests/test_step28_alias_ranking_contracts.py",
+    "historical source tests/test_step28_alias_test_contracts.py",
+    "historical source tests/test_step28_chinese_base_contracts.py",
+    "all34 old/current exact docs/SELLER_ALIAS_CALIBRATION.zh.md",
+    "all34 old/current exact docs/SELLER_ALIAS_RANKING.zh.md",
+    "all34 old/current exact docs/SELLER_ALIAS_TEST.zh.md",
+    "all34 old/current exact reports/documentation/20260927/ranking_plan/decision.json",
+    "all34 old/current exact reports/documentation/20260928/calibration_plan/decision.json",
+    "all34 old/current exact reports/documentation/20260928/test_plan/authorization.json",
+    "all34 old/current exact schema/step28_alias_calibration_policy.json",
+    "all34 old/current exact schema/step28_alias_ranking_policy.json",
+    "all34 old/current exact schema/step28_alias_test_policy.json",
+    "all34 old/current exact schema/step28_chinese_base_policy.json",
+    "all34 old/current exact scripts/run_step28_alias_calibration_linux_20260928.sh",
+    "all34 old/current exact scripts/run_step28_alias_ranking_linux_20260927.sh",
+    "all34 old/current exact scripts/run_step28_alias_test_linux_20260928.sh",
+    "all34 old/current exact scripts/run_step28_chinese_base_linux_20260924.sh",
+    "all34 old/current exact scripts/step28_alias_calibration.py",
+    "all34 old/current exact scripts/step28_alias_calibration_audit.py",
+    "all34 old/current exact scripts/step28_alias_calibration_run.py",
+    "all34 old/current exact scripts/step28_alias_ranking.py",
+    "all34 old/current exact scripts/step28_alias_ranking_audit.py",
+    "all34 old/current exact scripts/step28_alias_ranking_run.py",
+    "all34 old/current exact scripts/step28_alias_test.py",
+    "all34 old/current exact scripts/step28_alias_test_audit.py",
+    "all34 old/current exact scripts/step28_alias_test_run.py",
+    "all34 old/current exact scripts/step28_chinese_base.py",
+    "all34 old/current exact scripts/step28_chinese_base_audit.py",
+    "all34 old/current exact scripts/step28_continual_expression_run.py",
+    "all34 old/current exact scripts/step28_continual_population.py",
+    "all34 old/current exact scripts/step28_continual_population_data.py",
+    "all34 old/current exact scripts/step28_continual_population_evaluate.py",
+    "all34 old/current exact scripts/step28_continual_population_run.py",
+    "all34 old/current exact tests/test_step28_alias_calibration_contracts.py",
+    "all34 old/current exact tests/test_step28_alias_ranking_contracts.py",
+    "all34 old/current exact tests/test_step28_alias_test_contracts.py",
+    "all34 old/current exact tests/test_step28_chinese_base_contracts.py",
+    "34 scientific and26 inherited",
+    "record docs/SELLER_ALIAS_CALIBRATION.zh.md",
+    "record docs/SELLER_ALIAS_RANKING.zh.md",
+    "record reports/documentation/20260927/ranking_plan/decision.json",
+    "record reports/documentation/20260928/calibration_plan/decision.json",
+    "record schema/step28_alias_calibration_policy.json",
+    "record schema/step28_alias_ranking_policy.json",
+    "record schema/step28_chinese_base_policy.json",
+    "record scripts/run_step28_alias_calibration_linux_20260928.sh",
+    "record scripts/run_step28_alias_ranking_linux_20260927.sh",
+    "record scripts/run_step28_chinese_base_linux_20260924.sh",
+    "record scripts/step28_alias_calibration.py",
+    "record scripts/step28_alias_calibration_audit.py",
+    "record scripts/step28_alias_calibration_run.py",
+    "record scripts/step28_alias_ranking.py",
+    "record scripts/step28_alias_ranking_audit.py",
+    "record scripts/step28_alias_ranking_run.py",
+    "record scripts/step28_chinese_base.py",
+    "record scripts/step28_chinese_base_audit.py",
+    "record scripts/step28_continual_expression_run.py",
+    "record scripts/step28_continual_population.py",
+    "record scripts/step28_continual_population_data.py",
+    "record scripts/step28_continual_population_evaluate.py",
+    "record scripts/step28_continual_population_run.py",
+    "record tests/test_step28_alias_calibration_contracts.py",
+    "record tests/test_step28_alias_ranking_contracts.py",
+    "record tests/test_step28_chinese_base_contracts.py",
+    "resumption only time/path/new explicit receipt",
+    "authorization frozen source and allowed parse extent",
+    "record reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/evidence/audit.json",
+    "record reports/seller_alias_continual/20260928/test_implementation/review/disposition.json",
+    "record reports/documentation/20260928/test_plan/authorization.json",
+    "authorization frozen source and allowed parse extent",
+    "record reports/seller_alias_continual/20260928/test_implementation/cpu/20260928_155900/evidence/audit.json",
+    "record reports/seller_alias_continual/20260928/test_implementation/review/disposition.json",
+    "record reports/documentation/20260928/test_plan/authorization.json",
+    "current authorized run",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/authorization.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/resumption.json",
+    "explicit no automatic recovery",
+    "actual user recovery statement",
+    "original repair command exit",
+    "fresh repair scientific snapshot",
+    "failed directory contains no label or score output",
+    "repair file identities match frozen policy (descriptive identity_source is not a file receipt)",
+    "exact two input restoration receipt",
+    "two repaired byte identities; no actual raw input read here",
+    "record reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/manifest.json",
+    "original generation identity groups.csv",
+    "original generation identity heldout/items.jsonl",
+    "original generation identity heldout/supervision/pairs.csv",
+    "original failure before label attempt",
+    "original stat-before-open stack",
+    "failed original exit1",
+    "no first-run scores or heldout access in submitted job",
+    "initial1.48seconds",
+    "12 archive metadata entries and aggregate size",
+    "archive canonical receipt digest",
+    "archive vs policy file_count",
+    "archive vs policy total_size_bytes",
+    "archive vs policy content_sha256",
+    "record reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_d/manifest.json",
+    "checkpoint generation binding A",
+    "checkpoint archive binding A",
+    "record reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_hard/manifest.json",
+    "checkpoint generation binding C",
+    "checkpoint archive binding C",
+    "common original representation/tokenizer/reference configuration",
+    "record reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/manifest.json",
+    "record reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/partition.json",
+    "saved heldout IDs disjoint from old fit/cal/valid",
+    "exact public group ordering",
+    "40 complete heldout groups A",
+    "40 complete heldout groups B",
+    "40 complete heldout groups C",
+    "sync aggregate test_execution/monitoring/return_sync.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/authorization.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/exit_status.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/finished.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/job/failure.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/resource_usage.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/started.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/stderr.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/execution/stdout.log",
+    "only explicitly disclosed historical observation is unavailable",
+    "historical missing file not falsely declared in current inventory",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/launch.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/events.jsonl",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/finished.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/formal_exit_status.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/pid.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/started.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener/status.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener_stderr.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_165355/listener_stdout.log",
+    "sync aggregate test_result/return_sync.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/authorization.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/exit_status.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/finished.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/A_cal_scores.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/A_raw_scores.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/C_cal_scores.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/C_raw_scores.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/alignment.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/blind.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/blind_progress.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/completion.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/A_cal_metrics.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/A_raw_metrics.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/C_cal_metrics.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/C_raw_metrics.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/bootstrap_draws.npy",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/collected.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/evaluation/evaluation.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/heldout_access.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/job/preparation.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/resource_usage.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/started.txt",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/stderr.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/execution/stdout.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/launch.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/launcher_stderr.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/launcher_stdout.log",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/preflight.json",
+    "record reports/seller_alias_continual/20260928/test_execution/20260928_182700/resumption.json",
+    "sync aggregate test_result/analysis_return_sync.json",
+    "record reports/seller_alias_continual/20260928/test_result/analysis/audit.json",
+    "record reports/seller_alias_continual/20260928/test_result/analysis/mean_metrics.csv",
+    "record reports/seller_alias_continual/20260928/test_result/analysis/paired_metrics.csv",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/exit_status.txt",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/finished.txt",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/resource_usage.log",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/started.txt",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/stderr.log",
+    "record reports/seller_alias_continual/20260928/test_result/analysis_execution/stdout.log",
+    "formal start/end125seconds",
+    "resumption before actual start",
+    "source authorization before start",
+    "single attempt timestamp within run",
+    "both full scoring progress events",
+    "stdout final verdict",
+    "final progress equals complete blind record",
+    "formal GNU125.20s exit0",
+    "RSS matches completion",
+    "actual recorded budget satisfied",
+    "final whole job under4GiB",
+    "inference receipt dict",
+    "time is sampled after postscore receipts",
+    "average_precision/Acal display round",
+    "average_precision/Ccal display round",
+    "average_precision/diff display round",
+    "average_precision/CI display round",
+    "average_precision/CI display round",
+    "trapezoidal_pr_auc/Acal display round",
+    "trapezoidal_pr_auc/Ccal display round",
+    "trapezoidal_pr_auc/diff display round",
+    "trapezoidal_pr_auc/CI display round",
+    "trapezoidal_pr_auc/CI display round",
+    "roc_auc/Acal display round",
+    "roc_auc/Ccal display round",
+    "roc_auc/diff display round",
+    "roc_auc/CI display round",
+    "roc_auc/CI display round",
+    "recall_at_fpr_1pct/Acal display round",
+    "recall_at_fpr_1pct/Ccal display round",
+    "recall_at_fpr_1pct/diff display round",
+    "recall_at_fpr_1pct/CI display round",
+    "recall_at_fpr_1pct/CI display round",
+    "brier/Acal display round",
+    "brier/Ccal display round",
+    "brier/diff display round",
+    "brier/CI display round",
+    "brier/CI display round",
+    "log_loss/Acal display round",
+    "log_loss/Ccal display round",
+    "log_loss/diff display round",
+    "log_loss/CI display round",
+    "log_loss/CI display round",
+    "precision/Acal display round",
+    "precision/Ccal display round",
+    "precision/diff display round",
+    "precision/CI display round",
+    "precision/CI display round",
+    "recall/Acal display round",
+    "recall/Ccal display round",
+    "recall/diff display round",
+    "recall/CI display round",
+    "recall/CI display round",
+    "f1/Acal display round",
+    "f1/Ccal display round",
+    "f1/diff display round",
+    "f1/CI display round",
+    "f1/CI display round",
+    "specificity/Acal display round",
+    "specificity/Ccal display round",
+    "specificity/diff display round",
+    "specificity/CI display round",
+    "specificity/CI display round",
+    "balanced_accuracy/Acal display round",
+    "balanced_accuracy/Ccal display round",
+    "balanced_accuracy/diff display round",
+    "balanced_accuracy/CI display round",
+    "balanced_accuracy/CI display round",
+    "mcc/Acal display round",
+    "mcc/Ccal display round",
+    "mcc/diff display round",
+    "mcc/CI display round",
+    "mcc/CI display round",
+    "map/Acal display round",
+    "map/Ccal display round",
+    "map/diff display round",
+    "map/CI display round",
+    "map/CI display round",
+    "mrr/Acal display round",
+    "mrr/Ccal display round",
+    "mrr/diff display round",
+    "mrr/CI display round",
+    "mrr/CI display round",
+    "recall_at_1/Acal display round",
+    "recall_at_1/Ccal display round",
+    "recall_at_1/diff display round",
+    "recall_at_1/CI display round",
+    "recall_at_1/CI display round",
+    "recall_at_3/Acal display round",
+    "recall_at_3/Ccal display round",
+    "recall_at_3/diff display round",
+    "recall_at_3/CI display round",
+    "recall_at_3/CI display round",
+    "recall_at_5/Acal display round",
+    "recall_at_5/Ccal display round",
+    "recall_at_5/diff display round",
+    "recall_at_5/CI display round",
+    "recall_at_5/CI display round",
+    "recall_at_10/Acal display round",
+    "recall_at_10/Ccal display round",
+    "recall_at_10/diff display round",
+    "recall_at_10/CI display round",
+    "recall_at_10/CI display round",
+    "ndcg_at_1/Acal display round",
+    "ndcg_at_1/Ccal display round",
+    "ndcg_at_1/diff display round",
+    "ndcg_at_1/CI display round",
+    "ndcg_at_1/CI display round",
+    "ndcg_at_3/Acal display round",
+    "ndcg_at_3/Ccal display round",
+    "ndcg_at_3/diff display round",
+    "ndcg_at_3/CI display round",
+    "ndcg_at_3/CI display round",
+    "ndcg_at_5/Acal display round",
+    "ndcg_at_5/Ccal display round",
+    "ndcg_at_5/diff display round",
+    "ndcg_at_5/CI display round",
+    "ndcg_at_5/CI display round",
+    "ndcg_at_10/Acal display round",
+    "ndcg_at_10/Ccal display round",
+    "ndcg_at_10/diff display round",
+    "ndcg_at_10/CI display round",
+    "ndcg_at_10/CI display round",
+    "T1 display round",
+    "T1 displayed decision",
+    "T2 display round",
+    "T2 displayed decision",
+    "T3 display round",
+    "T3 displayed decision",
+    "T4 display round",
+    "T4 displayed decision",
+    "T5 display round",
+    "T5 displayed decision",
+    "T6 display round",
+    "T6 displayed decision",
+    "T7 display round",
+    "T7 displayed decision",
+    "T8 display round",
+    "T8 displayed decision",
+    "T9 display round",
+    "T9 displayed decision",
+    "A/table/0 display round",
+    "A/table/1 display round",
+    "A/table/2 display round",
+    "A/table/3 display round",
+    "A/table/4 display round",
+    "A/table/5 display round",
+    "B/table/0 display round",
+    "B/table/1 display round",
+    "B/table/2 display round",
+    "B/table/3 display round",
+    "B/table/4 display round",
+    "B/table/5 display round",
+    "C/table/0 display round",
+    "C/table/1 display round",
+    "C/table/2 display round",
+    "C/table/3 display round",
+    "C/table/4 display round",
+    "C/table/5 display round",
+    "A_cal/tp display round",
+    "A_cal/fp display round",
+    "A_cal/fn display round",
+    "A_cal/tn display round",
+    "A_cal/precision display round",
+    "A_cal/recall display round",
+    "A_cal/f1 display round",
+    "A_cal/fpr display round",
+    "C_cal/tp display round",
+    "C_cal/fp display round",
+    "C_cal/fn display round",
+    "C_cal/tn display round",
+    "C_cal/precision display round",
+    "C_cal/recall display round",
+    "C_cal/f1 display round",
+    "C_cal/fpr display round",
+    "critical statistical and postdecision disclosures present",
+    "replay CSV exact mean_metrics.csv",
+    "replay CSV exact paired_metrics.csv",
+    "user accepts after disclosed result",
+    "explicit separate user decision retained"
+  ]
+}

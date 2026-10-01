@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_test_run.py", line 448, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_test_run.py", line 443, in main
+    result = execute(args.out.resolve(), args.authorization.resolve()) if args.mode == "execute" else finalize(args.out.resolve(), sources())
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_test_run.py", line 385, in execute
+    groups, metadata = public_inputs(p)
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_test_run.py", line 99, in public_inputs
+    with allowed_input(p, "heldout/items.jsonl", root).open(encoding="utf-8") as stream:
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_test_run.py", line 75, in allowed_input
+    return data.verify(root / rec["path"], rec)
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_population_data.py", line 51, in verify
+    if path.stat().st_size != expected["bytes"] or sha256(path) != expected["sha256"]:
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 1097, in stat
+    return self._accessor.stat(self, follow_symlinks=follow_symlinks)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data/heldout/items.jsonl'

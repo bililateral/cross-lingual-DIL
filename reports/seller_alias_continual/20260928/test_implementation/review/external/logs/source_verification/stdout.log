@@ -1,0 +1,83 @@
+{
+  "upload": {
+    "path": "/mnt/data/test_review.zip",
+    "bytes": 601670,
+    "sha256": "0e315b5d4d7fca4bdff71c3a4f58bd0f4236da5c8aedad5fde846e615fdb5ed7",
+    "members": 117,
+    "source_count": 116,
+    "source_bytes": 1582040,
+    "all_match": true
+  },
+  "frozen_source_count": 34,
+  "inherited_sources": 26,
+  "history_metadata_match": true,
+  "models": {
+    "A": {
+      "run_id": "s0_d",
+      "epoch": 6,
+      "map": {
+        "a": 0.7963388456112388,
+        "b": 0.05444864332174173
+      },
+      "threshold": 0.09230793267488481,
+      "payload_state_sha256": "04ec22ddaa6a359ea90c95cb8b65aab0382a276979f8a10c80fa109b1ef90268",
+      "model_parameters_sha256": "31f3565932c46fcfff9ab877d0f507f2aea00db7fc48329804aa9ceb709b63c0"
+    },
+    "C": {
+      "run_id": "s0_hard",
+      "epoch": 6,
+      "map": {
+        "a": 0.8478783321454962,
+        "b": 0.5312823708113145
+      },
+      "threshold": -0.21419912576675412,
+      "payload_state_sha256": "093a679b9f8582e7163521ecade34a89106c076c560b1ca3af36183f94acf1ec",
+      "model_parameters_sha256": "f8defe7b2c62b9f6a3de55242f731f3426f8cf08a5bf0e7071a0cf9c15b2d1a9"
+    }
+  },
+  "coverage_changed_files": [
+    "tests/test_step28_alias_test_contracts.py"
+  ],
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "torch": "2.10.0+cpu",
+      "sentence-transformers": null,
+      "transformers": null
+    },
+    "cpu_affinity": [
+      0
+    ],
+    "threads": "Threads:\t1"
+  }
+}
+--- before.py
++++ current.py
+@@ -117,6 +117,7 @@
+             p, *_ = fixture(root)
+             path = root / "data/heldout/items.jsonl"
+             lines = path.read_bytes().splitlines(keepends=True)
++            original_lines = list(lines)
+             row = __import__("json").loads(lines[0])
+             row["controller_uid"] = "forbidden"
+             lines[0] = data.json_bytes(row)
+@@ -128,6 +129,15 @@
+             data.write_json(manifest_path, manifest)
+             p["data"]["manifest"] = data.record(manifest_path, root)
+             with self.assertRaisesRegex(ValueError, "schema"):
++                runner.public_inputs(p, root)
++            missing_uid = __import__("json").loads(original_lines[0])["group_uid"]
++            path.write_bytes(b"".join(line for line in original_lines
++                                      if __import__("json").loads(line)["group_uid"] != missing_uid))
++            p["data"]["inputs"]["heldout/items.jsonl"] = data.record(path, root)
++            manifest["files"]["heldout/items.jsonl"] = {k: p["data"]["inputs"]["heldout/items.jsonl"][k] for k in ("bytes", "sha256")}
++            data.write_json(manifest_path, manifest)
++            p["data"]["manifest"] = data.record(manifest_path, root)
++            with self.assertRaisesRegex(ValueError, "Missing test group"):
+                 runner.public_inputs(p, root)
+ 
+     def test_reverse_supervision_alignment_and_single_parse(self):
+
