@@ -31,3 +31,29 @@ Thumbs.db
 # Step28 split-private generation keys are local custody material, never Git.
 reports/step28_synthetic_chinese_dataset/private_custody/
 /private_custody/
+
+# Local transport and browser working files.
+/.tmp/
+/.playwright-mcp/
+
+# Formal payload custody remains outside new Git snapshots. Existing Git
+# history is preserved; these rules do not delete files or remote LFS objects.
+/reports/**/*.pt
+/reports/**/*.bin
+/reports/**/*.safetensors
+/reports/**/*.joblib
+/reports/**/private_custody/
+/reports/**/*.private.json
+/reports/**/identity_value_salts*.json
+/reports/**/identity_value_deny_hashes.json
+/reports/step28_synthetic_chinese_dataset/release_inputs/
+/reports/step28_transferable_identity_history/**/step28_synthetic_items.jsonl
+/reports/step28_transferable_identity_history/**/step28_world_truth.jsonl
+/reports/step28_transferable_identity_history/**/step28_parsed_occurrences.csv
+/reports/seller_alias_continual/**/data/**/items.jsonl
+/reports/seller_alias_continual/**/data/**/supervision/
+/reports/seller_alias_continual/**/data/**/owners.csv
+/reports/seller_alias_continual/**/data/**/qrels.csv
+/reports/seller_alias_continual/**/data/**/labels.csv
+/reports/seller_alias_continual/**/run/memory/*.json
+!/reports/seller_alias_continual/**/run/memory/*_budget.json

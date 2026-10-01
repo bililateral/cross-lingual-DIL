@@ -71,6 +71,15 @@ reports/step28_model_experiment/v9_4_1_labse_direct_finetune_v1_20260901/**/*.sa
 reports/step28_model_experiment/v9_4_1_labse_direct_finetune_v1_20260901/**/*.pt filter=lfs diff=lfs merge=lfs -text
 
 # Hash-frozen experiment bundles must retain their exact synchronized bytes.
-reports/manifests/step15_internal_dev_v5r_20260711.* -text -eol -diff -merge
-reports/step15_v5r_* -text -eol -diff -merge
+reports/manifests/step15_internal_dev_20260711.* -text -eol -diff -merge
+reports/step15_*weighted_mixup* -text -eol -diff -merge
+reports/step15_output_contract_validation.json -text -eol -diff -merge
 reports/step16h_blind_review/** -text -eol -diff -merge
+
+# Research snapshots bind exact bytes, including historical CRLF sources.
+# Keep existing LFS filters above; do not normalize newly recorded evidence.
+reports/** -text -eol
+scripts/** -text -eol
+schema/** -text -eol
+tests/** -text -eol
+docs/** -text -eol
