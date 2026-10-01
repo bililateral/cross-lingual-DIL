@@ -1,0 +1,128 @@
+{
+  "date": "2026-09-25",
+  "status": "PASS_DRAFT_DOCUMENT_CHECKS_CONCRETE_CONTRACT_PENDING",
+  "verification_method": "Windows PowerShell/.NET UTF-8, JSON, local reference, code-fence and SHA checks; no Python or research-script execution.",
+  "documents": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 21793,
+      "sha256": "d24985eba65f54cf18588314d6e79a2a14566d6a15a339f2375e865a434685a1",
+      "checked_scope": "complete document",
+      "utf8": "PASS",
+      "code_fences": 2
+    },
+    {
+      "path": "docs/RESEARCH_PLAN.md",
+      "bytes": 58029,
+      "sha256": "df94198eb09f1ca0a03710583b0cd70219d223446a6da8a8ce7201f0d8aebb8c",
+      "checked_scope": "current section; historical remainder matched existing snapshot exactly",
+      "utf8": "PASS",
+      "code_fences": 0
+    },
+    {
+      "path": "docs/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 18960,
+      "sha256": "e6163bf6c362b1aeea86ccab18a45d239627a26d23e512adefca4f95a6cfa357",
+      "checked_scope": "complete document",
+      "utf8": "PASS",
+      "code_fences": 0
+    },
+    {
+      "path": "docs/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 221462,
+      "sha256": "9dc2c27244a334e438874f3758d93143c1340356992f968b5514766ffd6ba803",
+      "checked_scope": "current section; historical remainder matched existing snapshot exactly",
+      "utf8": "PASS",
+      "code_fences": 0
+    },
+    {
+      "path": "docs/CURRENT_EXPERIMENT_DESIGN.md",
+      "bytes": 86632,
+      "sha256": "6b4b0ca44db85a02a5440011885751718d2e15f0fac864f078a7f781785c1eee",
+      "checked_scope": "current section; historical remainder matched existing snapshot exactly",
+      "utf8": "PASS",
+      "code_fences": 0
+    },
+    {
+      "path": "docs/PROJECT_PROGRESS.md",
+      "bytes": 416752,
+      "sha256": "85984cb94e838dce058ba8fcc4ea637460246d8cf54015c99650ea74e560a96c",
+      "checked_scope": "current section; historical remainder matched existing snapshot exactly",
+      "utf8": "PASS",
+      "code_fences": 0
+    },
+    {
+      "path": "docs/SELLER_ALIAS_POOLING.zh.md",
+      "bytes": 17392,
+      "sha256": "4ce807190bc98c9e0289309615d7705214209d51aed0656341711059e6e55087",
+      "checked_scope": "complete document",
+      "utf8": "PASS",
+      "code_fences": 4
+    }
+  ],
+  "local_link_targets_checked": 75,
+  "missing_local_links": [],
+  "link_fragments_validated": false,
+  "historical_sections_exactly_matching_existing_snapshot": [
+    "docs/RESEARCH_PLAN.md",
+    "docs/AI_RESEARCH_HANDOFF.zh.md",
+    "docs/CURRENT_EXPERIMENT_DESIGN.md",
+    "docs/PROJECT_PROGRESS.md"
+  ],
+  "decision_json": "PASS_PARSE_AND_SCOPE",
+  "unchanged_frozen_baseline": [
+    {
+      "path": "schema/step28_chinese_base_policy.json",
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/step28_chinese_base.py",
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+      "unchanged": true
+    }
+  ],
+  "original_reviews_read": [
+    {
+      "path": "reports/seller_alias_continual/20260924/chinese_implementation/review_response.zh.md",
+      "sha256": "709e9b46765c0c2b4204c1307a883dd7508e587f13b2bad1c2699a81faa96718",
+      "original_text_read": true
+    },
+    {
+      "path": "reports/seller_alias_continual/20260924/chinese_implementation/supplement_response.zh.md",
+      "sha256": "34f3c41ec8b28266536a7922fc7d78f4ede2118b785c6a68b191edf532c3ae21",
+      "original_text_read": true
+    },
+    {
+      "path": "reports/seller_alias_continual/20260924/chinese_result/review/response.zh.md",
+      "sha256": "bf320dd243655073205667c2e612a668bd3ea66493c98a499046da17dfccdbef",
+      "original_text_read": true
+    }
+  ],
+  "reviewed_implementation_scope": [
+    "D text assembly, channel moments, BCE/ranking objective and update observation in step28_chinese_base.py.",
+    "Encoder/head construction and optimizer parameter groups in step28_continual_population.py.",
+    "Allowed train/development public inputs and supervision in step28_continual_expression_run.py.",
+    "Archive constructor traverses heldout public items; unsuitable for a train/development-only stage.",
+    "Expression generator writes split-specific items and supervision; inspected code, not formal payloads."
+  ],
+  "material_findings": [
+    "D already has ranking loss; this draft changes account aggregation.",
+    "The original optimizer and update observers cover encoder/head only; the added aggregation module requires explicit coverage.",
+    "Old R1/R2/R3 are closed for unchanged historical work; the new implementation must preserve collection-first evaluation and explicit resource reporting.",
+    "The user confirmed valid then independent test sequence, with a separate future test-stage authorization."
+  ],
+  "unverified": [
+    "Specific draft approval, new implementation, real CPU/CUDA behavior and new empirical effect.",
+    "Fresh Linux input/model hashes and resource availability.",
+    "New external review; prior reviews do not certify this draft.",
+    "Any test input, formal label or heldout metric."
+  ],
+  "orchestration_note": "An initial functions.exec call had a JavaScript quoting SyntaxError before any PowerShell command ran; corrected for this check.",
+  "new_research_tests_run": 0,
+  "new_formal_label_parses": 0,
+  "new_training_updates": 0,
+  "linux_connected": false,
+  "new_external_review_submitted": false,
+  "review_requirement": "Substantive contract and code remain subject to normal web GPT 6 Pro review; recording the confirmed user decision is routine documentation."
+}

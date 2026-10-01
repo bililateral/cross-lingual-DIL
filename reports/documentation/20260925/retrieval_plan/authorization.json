@@ -1,0 +1,35 @@
+{
+  "date": "2026-09-25",
+  "status": "DELEGATED_ALIGNMENT_CORRECTION_AND_DEVELOPMENT_EXECUTION_AUTHORIZED",
+  "user_answer": "我要的是模型的候选排序能力提升，基础的识别能力不下降，你自己看看这个方法和判据符不符合我的要求，若符合的话就开始执行吧；不符合就修改",
+  "question_scope": "D plus learned item pooling; three paired seeds, reuse original D, five new runs/4320 updates; write code, Linux CPU handmade verification 1h/256MiB, GPT6 Pro external review and fixes, then directly one-GPU/one-CPU training and valid evaluation, estimated 8-10h capped at 12h/32GiB; one new train and one new valid parse; test separately authorized later.",
+  "executor_finding": "The original proposal protected retrieval but omitted an explicit basic binary-identification guard. The intervention retains BCE and the original ranking loss, so the identified mismatch is corrected by adding prospective binary-discrimination and probability-quality guards without increasing the training budget.",
+  "criterion_correction": {
+    "basic_identification": "Account-pair same-controller discrimination and probability prediction: AP and ROC-AUC must not fall; Brier and log_loss must not rise.",
+    "valid_scope": "Both the average of three paired runs and the fixed s0 pair must satisfy all four observed-value guards, in addition to the original MAP and Recall@5 conditions.",
+    "test_scope": "The prespecified s0 candidate versus original D must satisfy all four guards and the MAP/Recall@5 conditions on independently authorized heldout data.",
+    "uncertainty": "Report paired group intervals for all metrics. Observed nondegradation is not proof of strict population noninferiority, and does not guarantee every domain or operating point.",
+    "old_automatic_gate": "Reported unchanged as diagnostic; not a new absolute retrieval acceptance gate."
+  },
+  "authorized_development": {
+    "implementation_and_necessary_scoped_fixes": true,
+    "cpu_verification": {"cpu_threads": 1, "maximum_seconds": 3600, "maximum_evidence_bytes": 268435456, "formal_data": false, "formal_labels": false, "gpu": false, "retained_native_weights": false},
+    "external_review": "Web GPT 6 Pro receives contract, code, source inventory and small verification/result evidence; exclude passwords, formal label CSVs, owners, sealed truth and model weights.",
+    "formal_runs": 5,
+    "formal_updates": 4320,
+    "gpu_devices": 1,
+    "cpu_threads": 1,
+    "maximum_formal_seconds": 43200,
+    "maximum_new_output_bytes": 34359738368,
+    "new_train_parses": 1,
+    "new_development_parses": 1,
+    "launch_condition": "Necessary implementation verification and external review/disposition pass; shared resources available and frozen sources/inputs verified. Then start within this scope without redundant permission."
+  },
+  "test_read_authorized_now": false,
+  "owners_or_sealed_audit_access": false,
+  "automatic_label_reparse_or_extra_training": false,
+  "continual_learning_design": "DEFERRED_UNTIL_PROSPECTIVE_TEST_ACCEPTANCE_AND_RESULT_REVIEW_PASS",
+  "prior_sequence_record": "reports/documentation/20260925/retrieval_plan/decision.json",
+  "prior_draft_check": "reports/documentation/20260925/retrieval_plan/verification.json",
+  "contract_document": "docs/SELLER_ALIAS_POOLING.zh.md"
+}

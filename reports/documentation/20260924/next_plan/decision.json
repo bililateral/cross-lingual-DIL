@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-24",
+  "status": "NEXT_DIRECTION_AND_SEQUENCE_CONFIRMED_NO_NEW_TRAINING",
+  "user_statement": "把下一步的计划设置为把 D 保留为可用基线，再做一轮有针对性的改进；设计持续学习方案等这轮实验真的实现模型马甲候选排序能力提升再开始。你觉得合理吗？合理就把这个设置为下一步的计划",
+  "executor_assessment": "Reasonable: keep the measured candidate-ranking baseline, improve it in a controlled study, and defer continual-learning design until a prospectively defined retrieval gain is actually observed.",
+  "sequence": [
+    "Retain D epoch-six weights, configuration and full results as the fixed usable baseline.",
+    "Define the targeted improvement contract and its candidate pool, primary retrieval endpoint/K, gain and uncertainty criteria, matched comparisons, data/label scope and resource budget before formal execution.",
+    "Complete the approved improvement study, independent result verification and applicable external review.",
+    "Start continual-learning design only after the planned criterion establishes an actual held-out candidate-ranking improvement; otherwise retain negative results and revisit the improvement direction."
+  ],
+  "baseline": {
+    "role": "split_rank epoch6, completed joint three-domain Chinese BGE experiment",
+    "path": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/split_rank/models/epoch6.pt",
+    "bytes": 1306456536,
+    "sha256": "686775ad8e3fa5104902ec2780357049411284f9edb6ec82e71bcaa0f702ee05",
+    "sha_source": "Existing formal manifest and fresh actual model gate verification before the completed valid evaluation; not a new model read in this documentation update.",
+    "not_a_first_domain_only_checkpoint": true
+  },
+  "continual_design_status": "DEFERRED_UNTIL_TARGETED_IMPROVEMENT_DEMONSTRATED",
+  "unconfirmed": [
+    "specific intervention",
+    "candidate pool and primary K/metric",
+    "minimum meaningful improvement and uncertainty criterion",
+    "comparison and training budget",
+    "new stage data/label access"
+  ],
+  "training_started": false,
+  "new_label_access": false,
+  "automatic_retries_authorized": false,
+  "frozen_completed_results_changed": false,
+  "external_review_scope": "This update records the user's explicit direction/sequence and is exempt under AGENTS.md routine user-decision documentation rule. No new implementation or concrete training contract is represented as externally reviewed.",
+  "prior_result_review": "reports/seller_alias_continual/20260924/chinese_result/review/disposition.json",
+  "supersedes": "Executor's earlier suggestion that continual-learning design could proceed alongside targeted base-model improvement.",
+  "lfs_status": "Cancelled by user; Support draft deleted, no Support contact or GitHub remote change."
+}

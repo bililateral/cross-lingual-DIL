@@ -1,0 +1,156 @@
+{
+  "status": "PASS_INDEPENDENT_SAVED_EVIDENCE_AUDIT; VALID_ACCEPTANCE_FAILED",
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "cpu_affinity": [
+      0
+    ],
+    "threads_status": [
+      "Threads:\t1"
+    ],
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+    }
+  },
+  "numerical_checks": {
+    "loss_roundoff": {
+      "elements": 36,
+      "comparisons": 6,
+      "maximum_absolute_difference": 1.2728075482471013e-08,
+      "tolerance": 1e-06,
+      "largest_difference_location": "s0_weighted/saved loss sums"
+    },
+    "blind_counts": {
+      "elements": 3456,
+      "comparisons": 48,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 0.0,
+      "largest_difference_location": null
+    },
+    "group_confusion": {
+      "elements": 17280,
+      "comparisons": 216,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 1e-12,
+      "largest_difference_location": null
+    },
+    "means": {
+      "elements": 1056,
+      "comparisons": 48,
+      "maximum_absolute_difference": 4.440892098500626e-16,
+      "tolerance": 1e-12,
+      "largest_difference_location": "s1_d6B/means"
+    },
+    "pooled_confusion": {
+      "elements": 384,
+      "comparisons": 384,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 1e-12,
+      "largest_difference_location": null
+    },
+    "calibration": {
+      "elements": 78,
+      "comparisons": 24,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 0.0,
+      "largest_difference_location": null
+    },
+    "historical": {
+      "elements": 5280,
+      "comparisons": 4,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 0.0,
+      "largest_difference_location": null
+    },
+    "bootstrap_draws": {
+      "elements": 300000,
+      "comparisons": 1,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 0.0,
+      "largest_difference_location": null
+    },
+    "primary_bootstrap": {
+      "elements": 198,
+      "comparisons": 132,
+      "maximum_absolute_difference": 1.0408340855860843e-17,
+      "tolerance": 1e-12,
+      "largest_difference_location": "precision/primary/per_seed"
+    },
+    "per_seed_bootstrap": {
+      "elements": 198,
+      "comparisons": 132,
+      "maximum_absolute_difference": 1.3877787807814457e-17,
+      "tolerance": 1e-12,
+      "largest_difference_location": "s1/precision/conditional_95pct_interval"
+    },
+    "automatic_bootstrap": {
+      "elements": 336,
+      "comparisons": 264,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 1e-12,
+      "largest_difference_location": null
+    },
+    "paired_automatic_bootstrap": {
+      "elements": 108,
+      "comparisons": 72,
+      "maximum_absolute_difference": 0.0,
+      "tolerance": 1e-12,
+      "largest_difference_location": null
+    },
+    "analysis_outputs": {
+      "elements": 484,
+      "comparisons": 352,
+      "maximum_absolute_difference": 8.673617379884035e-18,
+      "tolerance": 1e-12,
+      "largest_difference_location": "Linux submitted/recall_at_5/conditional_95pct_interval"
+    },
+    "trajectory_outputs": {
+      "elements": 1584,
+      "comparisons": 1584,
+      "maximum_absolute_difference": 9.992007221626409e-16,
+      "tolerance": 1e-12,
+      "largest_difference_location": "Linux submitted/trajectory/specificity"
+    },
+    "report_six_decimals": {
+      "elements": 110,
+      "comparisons": 22,
+      "maximum_absolute_difference": 4.96788131004039e-07,
+      "tolerance": 5.00001e-07,
+      "largest_difference_location": "trapezoidal_pr_auc/report rounding"
+    }
+  },
+  "passed_checks": 5,
+  "failed_checks": 8,
+  "model_record_count_bound": 12,
+  "observed_training_milestones": {
+    "s0_weighted": 36,
+    "s1_d": 36,
+    "s1_weighted": 36,
+    "s2_d": 36,
+    "s2_weighted": 36
+  },
+  "wall_seconds": 27455.0,
+  "deletion": {
+    "first_count": 10,
+    "first_bytes": 13067720890,
+    "second_count": 105,
+    "second_bytes": 111917493162,
+    "total_count": 115,
+    "total_bytes": 124985214052,
+    "twelve_evaluated_models_match_deletion_records": true,
+    "nonweight_metadata_unchanged_reported": 676,
+    "scope": "receipt cross-check only; no access to remote payloads or full maintenance inventory"
+  },
+  "blind_threshold_count_rows": 3456,
+  "saved_matrices_read": 36,
+  "formal_label_reads": 0,
+  "formal_text_reads": 0,
+  "model_loads": 0,
+  "training_updates": 0
+}
+PRIMARY MAP {"d_mean": 0.48645312967175725, "weighted_mean": 0.4885111627056887, "mean": 0.0020580330339314604, "per_seed": [-0.0087544692626585, 0.009079615839619772, 0.005848952524833109], "by_domain": {"A": 0.003451389334449774, "B": 0.006199089454199238, "C": -0.0034763796868546313}, "conditional_95pct_interval": [-0.0031217984466988635, 0.00710481929384226]}
+ALL TRAINING LOSS MONOTONICITY {"s0_d": {"bce": true, "rank": true, "total": true}, "s0_weighted": {"bce": true, "rank": true, "total": true}, "s1_d": {"bce": true, "rank": true, "total": true}, "s1_weighted": {"bce": true, "rank": true, "total": true}, "s2_d": {"bce": true, "rank": true, "total": true}, "s2_weighted": {"bce": true, "rank": true, "total": true}}

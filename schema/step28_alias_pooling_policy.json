@@ -1,0 +1,167 @@
+{
+  "study": "seller_alias_item_pooling_improvement",
+  "base_policy_sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+  "base_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+  "new_runs": [
+    "s0_weighted",
+    "s1_d",
+    "s1_weighted",
+    "s2_d",
+    "s2_weighted"
+  ],
+  "physical_updates": 4320,
+  "epochs": 6,
+  "score_epochs": [
+    3,
+    6
+  ],
+  "primary_epoch": 6,
+  "seeds": {
+    "s0": {
+      "initialization_seed": 20260909,
+      "schedule_seed": 20260918
+    },
+    "s1": {
+      "initialization_seed": 20260925,
+      "schedule_seed": 20260925
+    },
+    "s2": {
+      "initialization_seed": 20260926,
+      "schedule_seed": 20260926
+    }
+  },
+  "data_scope": "Original expression data; unchanged partition seed 20260918, 48 fit/12 calibration/20 development groups per domain; masked title and description only, 27 within-group candidates.",
+  "aggregation": {
+    "hidden": 64,
+    "uniform_fraction": 0.5,
+    "variance_epsilon": 1E-08,
+    "learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "additional_parameters": 131200,
+    "initialization": "Xavier hidden weight; hidden bias and output weight zero; local CPU RNG seed_for(initialization_seed,item_aggregation), shared RNG preserved.",
+    "paired_item_weights": true
+  },
+  "evaluation": {
+    "primary": "map",
+    "minimum_map_gain": 0.01,
+    "guard_signs": {
+      "recall_at_5": 1,
+      "average_precision": 1,
+      "roc_auc": 1,
+      "brier": -1,
+      "log_loss": -1
+    },
+    "valid_require_each_seed_map_positive": true,
+    "valid_guards_for_average_and_s0": true,
+    "bootstrap_replicates": 5000,
+    "valid_bootstrap_seed": 20260925,
+    "test_bootstrap_seed": 20260926,
+    "confidence_level": 0.95,
+    "quantile_method": "linear",
+    "prespecified_test_candidate": "s0_weighted/epoch6",
+    "prespecified_test_reference": "s0_d/epoch6",
+    "nondegradation_scope": "Observed group-macro values; report conditional paired intervals; not population noninferiority or all domains/operating points.",
+    "automatic_gate_role": "Historical diagnostic only, never retrieval acceptance."
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 43200,
+    "maximum_output_bytes": 34359738368,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "torch_cpu_threads": 1
+  },
+  "cpu_verification": {
+    "maximum_seconds": 3600,
+    "maximum_evidence_bytes": 268435456,
+    "native_handmade_updates": 4,
+    "formal_inputs": false,
+    "formal_labels": false,
+    "gpu": false,
+    "retained_native_models": false
+  },
+  "supervision": {
+    "linux_train_parses": 1,
+    "linux_development_parses": 1,
+    "train_parent_shared_across_runs": true,
+    "full_valid_collection_before_uncertainty": true,
+    "automatic_retry": false
+  },
+  "test_access_now": false,
+  "owners_access": false,
+  "historical_d": {
+    "run_root": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run",
+    "evaluation_root": "reports/seller_alias_continual/20260924/chinese_evaluation/20260924_202700/run",
+    "files": [
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/manifest.json",
+        "bytes": 17272,
+        "sha256": "c97d4b47d9f2655e5647748ef9730a5b9ceefb56ac26c20d6148eb268af0a557"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/completion.json",
+        "bytes": 230,
+        "sha256": "100441c21e7371535ed73b821f998dae6a5dca630db7952fb0baa9c95fe2d576"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/partition.json",
+        "bytes": 14922,
+        "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/split_rank/manifest.json",
+        "bytes": 31941,
+        "sha256": "255bba7da89953d106c8318c3ba4c0ca523e9a7eba40acdded74ecae1b93e8b8"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/split_rank/calibration.json",
+        "bytes": 1275,
+        "sha256": "5b70125f48cf6e52a0c264b2967673a223a727843c90148fedf691ec930b51bc"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/split_rank/scores/epoch3_development.npy",
+        "bytes": 90848,
+        "sha256": "480755cfaa35f3a34792a02707836a151d766e1b732ac534cd4f33fa3cc2222b"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/split_rank/scores/epoch6_development.npy",
+        "bytes": 90848,
+        "sha256": "e2916a958baa63831ac35804b155ff713f1a32dbd1a752b2214f91c5a8e1c9bd"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_evaluation/20260924_202700/run/collected.json",
+        "bytes": 61840,
+        "sha256": "2f8f3c8cb1a76f0517a7669418fe78ff6017ecb46650958ad8a2415a9f98cf9b"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_evaluation/20260924_202700/run/split_rank/epoch3_metrics.npy",
+        "bytes": 10688,
+        "sha256": "d563c6fb727b1e3a5e281122bc238ea7e86307fe4e90f6dc568673c3504bec45"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260924/chinese_evaluation/20260924_202700/run/split_rank/epoch6_metrics.npy",
+        "bytes": 10688,
+        "sha256": "fc13e9a843453595c8f217bd8cd93619f6a033db5343de8215cc81ff0a0c5e29"
+      }
+    ],
+    "expected_initial_common_state_sha256": "e52523ec2f44dc7baa5dfad7ea595bbdc43f38aa3883114cdf62b5805dc6f2c7",
+    "group_schedule_sha256": "16758c902e2d370492fcfd47b059f784fcf6a8cc0cbfbb52ef73674b1e4a8e82",
+    "dropout_stream": 4668981900446735229,
+    "model_records_from_frozen_manifest": {
+      "epoch3": {
+        "actual_reload_verified": true,
+        "bytes": 1306456536,
+        "path": "models/epoch3.pt",
+        "sha256": "aa108f30a6483fe543c4742dca0b16cfdda371f0800ea37c380a3c810c094daa",
+        "state_sha256": "b6ddc8f694352073705f3621d89090ea955d76a13198bdffcfa8e383154b9683"
+      },
+      "epoch6": {
+        "actual_reload_verified": true,
+        "bytes": 1306456536,
+        "path": "models/epoch6.pt",
+        "sha256": "686775ad8e3fa5104902ec2780357049411284f9edb6ec82e71bcaa0f702ee05",
+        "state_sha256": "187b7788579e77f120e88761cf017c9aacb94ccfd78ef2bbb55603371f860ede"
+      }
+    }
+  },
+  "authorization": "reports/documentation/20260925/retrieval_plan/authorization.json"
+}

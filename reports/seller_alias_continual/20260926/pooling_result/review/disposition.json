@@ -1,0 +1,174 @@
+{
+  "status": "RESULT_VALIDITY_REVIEW_COMPLETE_METHOD_ACCEPTANCE_FAILED",
+  "review_and_linux_replay_date": "2026-09-26",
+  "documentation_finalization_date": "2026-09-27",
+  "timezone": "Asia/Shanghai",
+  "user_scope": "Read and carefully check the completed result review, finish the detailed result report, then discuss whether further base-ranking improvement is warranted. Discussion does not authorize a replacement experiment or change the confirmed research sequence.",
+  "actual_review": {
+    "conversation": "https://chatgpt.com/c/6ab5f4d8-8a10-83ea-91bd-2a02558cfb07",
+    "response_message_id": "43a26d10-3b68-4755-934b-053d9e2b2c16",
+    "requested_model": "GPT 6 Pro",
+    "observed_identity": "GPT 6 Pro selection verified at submission; Pro visible in current UI; no response model_slug exposed",
+    "response": "response.zh.md",
+    "response_format": "Complete rendered final message; mathematical accessibility duplicates preserved, not represented as raw Markdown",
+    "response_sha256": "030d67fb8dfa5f64877b50c1b417fbd38cbb4ba31512248d489e8f8067cebf42",
+    "original_report": "external/pooling_result_review_report.zh.md",
+    "evidence_archive": "external/evidence.zip",
+    "evidence_archive_sha256": "d48fa5d607a435cf8079d7e13ea6461f64b46ce0943d3d61cc0d2a5f19009e37",
+    "verified_manifest_members": 35,
+    "full_response_and_report_personally_read": true,
+    "original_success_and_failure_logs_personally_read": true
+  },
+  "input_identity": {
+    "archive": "pooling_result_review.zip",
+    "bytes": 4495283,
+    "sha256": "8c4115ce1d3ddf3c008df89fe56eb40794179b37c186984a7613080c4219b682",
+    "source_files": 165,
+    "source_bytes": 6376611,
+    "zip_members_including_inventory": 166,
+    "retention_reason": "Exact immutable submitted snapshot used by both audits. Current narrative documents have since been clarified, so this archive is necessary replay evidence, not a disposable upload copy.",
+    "formal_frozen_sources_unchanged": 18,
+    "frozen_contract_sha256": "385dfb45257cf9d40101342b11dc32529158da9ad269abc80aec16786a76676c"
+  },
+  "primary_implementation_review": {
+    "starting_requirement": "Candidate ranking must improve while basic pair-identification performance does not decline under the prospectively confirmed comparisons and guards.",
+    "scope": "Personally traced inputs, pooling, paired randomness, objectives and updates, checkpoint reload, label gates, metrics and uncertainty through the applicable implementation and direct scientific dependencies; agreement among policy, logs and tests was not treated alone as correctness.",
+    "project_paths": [
+      "scripts/step28_alias_pooling.py",
+      "scripts/step28_alias_pooling_run.py",
+      "scripts/step28_alias_pooling_result.py",
+      "scripts/step28_chinese_base.py",
+      "scripts/step28_continual_population.py",
+      "scripts/step28_continual_population_data.py",
+      "scripts/step28_continual_population_evaluate.py",
+      "scripts/step28_continual_expression_run.py",
+      "schema/step28_alias_pooling_policy.json",
+      "docs/SELLER_ALIAS_POOLING.zh.md"
+    ],
+    "external_scientific_scripts": [
+      "external/independent_result_audit.py",
+      "external/independent_result_audit_attempt1.py",
+      "external/final_scope_check.py",
+      "external/verify_submission.py",
+      "external/submitted_analysis_entry.py"
+    ],
+    "report_builder_scope": "Inspected the scientific report template; did not treat document formatting code as an independent scientific computation.",
+    "reused_prior_review": "The actual pretraining reply fd06efe3-a548-4c85-894a-9379ab8b78c6, attachment and original supplementary evidence were previously personally read. R1/R2/R3 remain closed for unchanged sources; no repeated full CPU/model tests."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "requirement": "Test the confirmed ranking improvement with identification guards.",
+      "verified_evidence": "Masked title/description inputs, learned item weights mixed equally with uniform weights, weighted channel moments, joint BGE/head/pooling updates, fixed D comparison and all 13 guards.",
+      "decision": "Comparison addresses the complete candidate configuration under this budget. It does not isolate a pure causal mechanism or establish general effectiveness of attention pooling."
+    },
+    {
+      "id": "F2",
+      "requirement": "Use a genuinely paired D control and the frozen historical s0 reference.",
+      "verified_evidence": "Historical D matrices agree, shared initialization and schedules are bound in source/run records; the added module uses local initialization randomness.",
+      "decision": "No confirmed control mismatch. Do not compare the best candidate seed against a different D seed."
+    },
+    {
+      "id": "F3",
+      "requirement": "Actually train the new module and common model with the agreed budget.",
+      "verified_evidence": "Five runs each record 864 updates, nonzero relevant probes at subsequent updates including 2 and 433, and the expected zero first hidden task gradient from zero output initialization.",
+      "decision": "No confirmed missing optimization. First-step weight decay is not evidence of task learning."
+    },
+    {
+      "id": "F4",
+      "requirement": "Saved outputs must correspond to the trained/reloaded models.",
+      "verified_evidence": "Recorded actual full model/Adam reload and complete blind-score replay at E3/E6; fresh size/SHA checks of 12 inference weights before valid.",
+      "decision": "Runtime chain is consistent. This review did not reload now-deleted models or repeat GPU execution."
+    },
+    {
+      "id": "F5",
+      "requirement": "Respect one new train and valid parse and retain results before comparisons.",
+      "verified_evidence": "Successful parse accounting, all 12 valid matrices and counts saved before later statistical assertions; no test/owners access; R1 remains closed.",
+      "decision": "No new formal inputs or supervision were needed for review."
+    },
+    {
+      "id": "F6",
+      "requirement": "Report all frozen metrics and conditional paired uncertainty correctly.",
+      "verified_evidence": "22 metrics, 36 saved matrices, fixed-seed averages, 5000 stratified whole-group bootstrap draws and 13 acceptance checks independently agree; R2 remains closed.",
+      "decision": "5 conditions pass, 8 fail. Keep the valid negative result and the original criteria."
+    },
+    {
+      "id": "F7",
+      "requirement": "Cover the result claims beyond the original primary-valid audit.",
+      "verified_evidence": "External independent audit additionally covers automatic-threshold paired intervals and fit/calibration classification, with successful project Linux replay. Full-precision threshold comparisons independently explain both s1 zero-positive results.",
+      "decision": "Additional coverage passes. The original auditor is adequate evidence for its stated scope, not a general acceptance checker for all future studies."
+    },
+    {
+      "id": "F8",
+      "requirement": "Distinguish actual runtime/resources from estimates and limits.",
+      "verified_evidence": "4320 updates, 7h37m35s timestamp wall time, exit 0, documented memory and artifact peaks; R3 remains closed.",
+      "decision": "GPU allocator peaks are not whole-card memory use; the 12h limit is not an estimated duration."
+    },
+    {
+      "id": "F9",
+      "requirement": "Respect authorized weight deletion while preserving scientific evidence.",
+      "verified_evidence": "Two cleanup receipts record 115 trained files and 124985214052 bytes, including historical D, with hashes preserved; saved outputs remain available.",
+      "decision": "D is now a configuration/result reference. External review inspected receipts, not Linux physical files; future model reconstruction requires separate scope."
+    },
+    {
+      "id": "F10",
+      "requirement": "Do not conflate ranking generalization with probability-loss trajectories.",
+      "verified_evidence": "s0 weighted valid MAP E3/E6 0.4923211793/0.4823644983; Brier 0.0470613970/0.0439477109; log_loss 0.2019372891/0.1844375440.",
+      "decision": "Accepted nonblocking reporting clarification in result section 7.2: late ranking worsens while probability losses improve. At E6 these losses can still be worse than paired D. No metric, model, threshold, endpoint or success criterion changed."
+    }
+  ],
+  "confirmed_defects": {
+    "SCIENTIFIC_BLOCKER": [],
+    "REPRODUCIBILITY_DEFECT": [],
+    "OUT_OF_SCOPE_OVERDESIGN": "Extra seeds/ablations, reconstruction of deleted models, new formal-label reads or unrelated system hardening are not prerequisites for auditing this negative result. These are scope exclusions, not claims that the reviewer demanded new experiments."
+  },
+  "reviewer_attempt_history": {
+    "first_attempt": "Preserved external first attempt failed its public group-ID partition reconstruction because canonical JSON omitted the trailing newline.",
+    "verified_fix": "The scientific script diff changes only canonical serialization to match the project: UTF-8, trailing newline and finite JSON. Corrected independent audit passes.",
+    "project_change": "None; not a project training retry, new label parse or invalidation."
+  },
+  "project_linux_replay": {
+    "execution": "local_check/execution.json",
+    "comparison": "local_check/comparison.json",
+    "return_inventory": "local_check/return_inventory.json",
+    "environment": "Existing py310; Python 3.10.19, NumPy 2.2.6; one CPU, no GPU",
+    "unchanged_script_sha256": "54df5bbee01e7be07570e59adb089996af78fdef5d38bfc15a3e054368f0336c",
+    "exit_code": 0,
+    "elapsed_seconds": 0.568315616925247,
+    "maximum_rss_kib": 60492,
+    "saved_metric_matrices": 36,
+    "blind_count_checks": 3456,
+    "per_group_confusion_ratio_checks": 17280,
+    "scientific_json_values_equal": 1416,
+    "maximum_scientific_json_difference": 0.0,
+    "byte_identical_outputs": "5 CSV files and the 5000x22 bootstrap NPY array",
+    "external_environment": "Web Linux Python 3.13.5, NumPy 2.3.5; not represented as the project environment",
+    "original_project_auditor": "Earlier successful 12420-number/3240-blind-count check reused; unchanged submitted source and matching output CSVs, not needlessly rerun.",
+    "new_formal_text_reads": 0,
+    "new_formal_label_reads": 0,
+    "model_loads": 0,
+    "training_updates": 0,
+    "temporary_input_cleanup": "local_check/temporary_cleanup.json; 169 duplicate input files, 6571840 bytes, recoverable from the retained original archives"
+  },
+  "conclusion": {
+    "mean_delta_map": 0.0020580330339314604,
+    "conditional_95_interval_rounded": [-0.003122, 0.007105],
+    "acceptance_passed": 5,
+    "acceptance_failed": 8,
+    "candidate_replaces_d": false,
+    "test_authorized_or_read": false,
+    "continual_learning_design_resumed": false,
+    "new_experiment_authorized": false,
+    "interpretation": "No sufficient, stable ranking gain with the confirmed identification guards in this complete configuration. Do not generalize this to all weighted pooling or negate the earlier Chinese BGE improvement."
+  },
+  "limitations": [
+    "Saved-result replay does not recompute all label-dependent metrics from formal ground truth.",
+    "GPU updates and earlier weight custody are supported by saved execution records, not repeated live model checks.",
+    "Intervals are conditional on fixed fitted seeds/models, synthetic groups and thresholds; they do not include retraining variation or repeated-valid selection correction.",
+    "Evaluation has 27 within-group candidates and 1 or 2 relevant aliases per query; it is not whole-corpus or open-query retrieval or real-market validation.",
+    "Observed identification guards are not population noninferiority proofs; no attention-distribution evidence identifies the cause of the negative result.",
+    "Trained weights, including D, were explicitly deleted; saved statistical evidence remains reproducible, new inference does not."
+  ],
+  "history_preserved": ["upload_rejection.json", "upload_authorization.json", "submission.json", "pause.json", "resumption.json", "capture.json"],
+  "capture_note": "capture.json records external_scripts_executed_locally=false at capture time; subsequent completed replay is documented above, without rewriting that historical capture."
+}
