@@ -1,0 +1,46 @@
+{
+  "scope": "exploratory_trainable_redacted_text_continual_chinese_seller_alias_identification",
+  "component_policy": {
+    "path": "schema/step28_continual_text_policy.json",
+    "size_bytes": 4682,
+    "sha256": "63bb8f1cf394ad8439b9acc2f79dd3584f28492d2fa99c01e981c78fba51a81f"
+  },
+  "benchmark_policy": {
+    "path": "schema/step28_continual_policy.json",
+    "size_bytes": 4966,
+    "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+  },
+  "component_runtime": {
+    "path": "reports/seller_alias_continual/20260907/text_check/20260907_181341/check/runtime.json",
+    "size_bytes": 3134,
+    "sha256": "8f6e989ef8404d0cd3bd00ec7dd83e5604a54b23aa23789ec191e4063a39b63b"
+  },
+  "arm_execution_order": [
+    "sequential",
+    "er",
+    "cumulative"
+  ],
+  "retained_inference_points": [
+    "shared",
+    "sequential_stage5",
+    "er_stage5",
+    "cumulative_stage5"
+  ],
+  "intermediate_state": "Full model/head/Adam/scaler/progress/memory state and all development scores are replayed before temporary state deletion; retain state digest, exact score arrays and small receipts. Recompute intermediate models from the recorded run if later needed.",
+  "working_state": "One GPU model; immutable original and shared temporary checkpoints. Branch-major execution; no cross-arm method inputs. Delete private memory and all temporary Adam states on exit.",
+  "historical_memory": "Only the active ER ByteMemory may supply historical training inputs; offline benchmark labels and other arm archives are not method memory. No historical embedding cache.",
+  "bootstrap_seed": 20260907,
+  "bootstrap_replicates": 2000,
+  "primary_metric": "final_development_world_equal_average_precision",
+  "primary_comparison": "er_minus_sequential",
+  "no_strong_identity_columns": [
+    0,
+    19
+  ],
+  "threshold_logit": 0,
+  "planned_physical_updates": 13800,
+  "unique_score_points": 42,
+  "retained_inference_models": 12,
+  "runtime_check": "One new CPU toy-encoder fixture exercises the production scheduler, data loader and publisher. Reuse the completed LaBSE component check; no repeated core smoke.",
+  "conclusion_boundary": "Random same-source full-world arrivals and consumed development data; no distinct-domain BWT, real chronology, established forgetting, new selector or real-market effectiveness."
+}

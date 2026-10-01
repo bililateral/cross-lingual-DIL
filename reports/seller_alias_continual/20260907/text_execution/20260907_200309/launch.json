@@ -1,0 +1,15 @@
+{
+  "status": "FORMAL_GPU_RUN_LAUNCHED_NOT_COMPLETED",
+  "launched_at": "2026-09-07T20:05:40.293846+08:00",
+  "wrapper_pid": 3997895,
+  "uid": 1014,
+  "run_id": "20260907_200309",
+  "command": "set -euo pipefail\ncd /home/yongpeng/cross-lingual\nsource /home/yongpeng/miniconda3/etc/profile.d/conda.sh\nconda activate py310\nout=\"reports/seller_alias_continual/20260907/text_execution/20260907_200309\"\ncheck=\"reports/seller_alias_continual/20260907/text_orchestration/20260907_194523/check.json\"\ntest -d \"$out\"\ntest ! -e \"$out/run\"\ntest ! -e \"$out/started.txt\"\nunset LD_LIBRARY_PATH LD_PRELOAD\nexport CUDA_VISIBLE_DEVICES=0\nexport CUBLAS_WORKSPACE_CONFIG=:4096:8\nexport PYTHONDONTWRITEBYTECODE=1 TOKENIZERS_PARALLELISM=false\nexport HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1\nexport OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1\npython -B scripts/step28_continual_text_run.py --help > \"$out/command_help.log\"\ndate -Is > \"$out/started.txt\"\nset +e\n/usr/bin/time -v -o \"$out/resource_usage.log\" nice -n 10 python -u -B scripts/step28_continual_text_run.py run \\\n  --output \"$out/run\" \\\n  --check-result \"$check\" \\\n  > \"$out/train.log\" 2>&1\nstatus=$?\nset -e\nprintf '%s\\n' \"$status\" > \"$out/exit_status.txt\"\ndate -Is > \"$out/finished.txt\"\nexit \"$status\"\n",
+  "input_manifest_sha256": "616d01928af7a47ee8b609d8c05e45ab4f01823de8ba34fa7498abfac4256579",
+  "orchestration_check": "reports/seller_alias_continual/20260907/text_orchestration/20260907_194523/check.json",
+  "expected_physical_updates": 13800,
+  "expected_score_points": 42,
+  "expected_inference_models": 12,
+  "automatic_restart": false,
+  "authorization": "User resumed the reported formal GPU stage. Monitor this process; do not relaunch an incomplete run without analyzing its failure and scientific boundary."
+}

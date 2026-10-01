@@ -1,0 +1,463 @@
+{
+  "status": "LOCAL_IMPLEMENTATION_AND_WEB_REVIEW_COMPLETE_PENDING_PROJECT_PY310_ORCHESTRATION_CHECK",
+  "date": "2026-09-07",
+  "research_mainline": "有限历史记忆下的中文暗网卖家马甲持续识别",
+  "stage": "Four-arm scheduling, stage-only data access, saved-score publication and independent evaluation implementation",
+  "conversation_url": "https://chatgpt.com/c/6a9e50ce-6084-83eb-9ef3-44f2727c69f3",
+  "reviewer": {
+    "role": "advisory scientific reviewer; local executor retains decision authority",
+    "requested_model": "GPT 6 Pro",
+    "observed_selector": "6 / Pro",
+    "identity_limit": "Visible web selector only; backend model identity was not independently verified.",
+    "submitted_at_utc": "2026-09-07 08:09:24 UTC",
+    "final_reply_observed_at_utc": "2026-09-07 08:22:25 UTC",
+    "distinct_user_turn": 4,
+    "send_verified": "Ten attached files, visible enabled send button clicked, composer emptied, new user turn persisted and Pro thinking/stop control observed; final reply read in full after stop control disappeared.",
+    "attachments": [
+      {
+        "path": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md",
+        "size_bytes": 10673,
+        "sha256": "dd82450d2d4f9c39c7d2763ab5cb6361cba0a12cdfc9ebb74879446eb77c61a8"
+      },
+      {
+        "path": "scripts/step28_continual_data.py",
+        "size_bytes": 8176,
+        "sha256": "5555c31aff43a9d363ceab6774016c4585eb731369260f55a547cb3e67eb7142"
+      },
+      {
+        "path": "scripts/step28_continual_run.py",
+        "size_bytes": 18734,
+        "sha256": "e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b"
+      },
+      {
+        "path": "scripts/step28_continual_evaluate.py",
+        "size_bytes": 17001,
+        "sha256": "de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7"
+      },
+      {
+        "path": "schema/step28_continual_policy.json",
+        "size_bytes": 4966,
+        "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+      },
+      {
+        "path": "tests/test_step28_continual_run_contracts.py",
+        "size_bytes": 11032,
+        "sha256": "61c2b81228593f948055be561e70f17b8a72163f8271afb8731f0c645da70d4e"
+      },
+      {
+        "path": "scripts/step28_continual_core.py",
+        "size_bytes": 24480,
+        "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+      },
+      {
+        "path": "scripts/step28_continual_inputs.py",
+        "size_bytes": 16926,
+        "sha256": "bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+        "size_bytes": 1784,
+        "sha256": "4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f"
+      },
+      {
+        "path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+        "size_bytes": 23185,
+        "sha256": "c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d"
+      }
+    ],
+    "attachment_total_bytes": 136957,
+    "displayed_name_note": "Web UI displayed step28_continual_core(2).py, step28_continual_inputs(2).py and arrival(2).json for duplicate uploads; original canonical filenames and bytes remained unchanged.",
+    "prompt": "请审查本轮新附件中的“持续马甲识别四臂运行器＋独立评价器”实现。主线固定为有限历史记忆下的中文暗网卖家马甲持续识别，不重新选题。本条新增实现与本会话前一轮仅核心检查不同，请按新附件，不要把旧答复当本轮审查。\n\n前序事实：你的共享首批 Adam 核验意见已落实；未变化 core 的 Linux py310 单线程 CPU 检查已通过，runtime.json 为原结果。用户随后要求继续本地主线；本轮未连接 Linux，没有读取任何新的项目训练/开发标签或 Audit A/B。新编排的真实 PyTorch check 尚未执行，不能将静态/本地测试当成它已通过。13项新增纯 NumPy/sklearn 合同本地通过。\n\n请完整阅读10份附件，先核对实际字节和SHA-256；若为运行手工测试恢复目录，请按下列原相对路径建立 scripts/、tests/、schema/。上传附件的平铺文件位置不是仓库布局，不要把你的沙箱路径差异当成源码错误。原大型公开数组、私有训练/开发CSV及Audit真值未上传；不要求重新审查旧数据生成质量，不可据缺少原载荷宣称复算过真实数据。既有输入散列/完整世界资格沿用，本次审新边界和代码。\n\n本轮语义：\n- 原合格中文训练/开发各500世界、K28、189000对、57特征；已冻结11/23/37随机五批到达，固定全部500开发世界。无独立域、真实时间或同卖家跨批新增马甲主张。\n- 离线基准包装明确允许读取一次完整训练监督并对齐，生成仅存在于TemporaryDirectory的uint8标签文件；这不是“整个设计未见未来标签”。训练调用只拿当前批/ER有限缓存，累计重训单独拿已到达前缀。无全特征/标签矩阵留在StageSource，无OS隔离需求。\n- 首批预处理固定，三个顺序分别共享自身首阶段权重/Adam。初始头→共享首阶段→三种更新臂四次后续更新；冻结引用共享记录，14独立checkpoint/顺序，共42。\n- 当前5遍、batch256，BCE当前均值+历史均值各1，尾批保留，唯一新边阶段末入库一次。512KiB按实际缓存序列化，包括两个RNG。累计每阶段从原始初始化及新Adam，对截至当期全部历史5遍；单列成本，不称同计算或上界。\n- 首轮阈值正式补清为不拟合、固定logit>=0/sigmoid>=0.5；不读开发来定阈值。排序保持logit；AP、梯形PR-AUC、ROC、概率/阈值指标、完整K28检索以及规则外分类分层都需核对。\n- 全部预测/模型重载/日志验证成功后，独立evaluator才读一次开发pair_labels；不读qrels或Audit。bootstrap对同一个开发世界先均值三个固定顺序差值，再按世界同步采样；不制造1500个独立世界。仅探索性评价。\n- 现有代码和小型核心实际核验保持不变；不要要求重跑它、全仓回归、额外模型/数据/选择器/权限仪式。新check只验证新增四臂调度/持久化，用手工5世界30条、14个checkpoint；需Linux实际运行后才能开始正式比较。\n\n重点找真正会改变结论/复现的具体实现缺陷：当前/前缀/未来数据边界、共享初态/Adam、唯一入库和真实字节、累计重置与呈现计数、保存/重载和结果映射、指标/同分/检索/区间、是否在完整预测之前误读开发真值。请定位函数和失败例或等价证据；不要仅因尚未运行就宣布现有实现失败。若你能执行手工测试或真实PyTorch小例，说明环境和实际执行范围；否则明确未执行。\n\n意见分为SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN。每条必须说明受影响科学主张和最小修复；本地执行者保留判断权。若仅结论限制而非计算缺陷，分开表述。\n\n文件清单：\ndocs/SELLER_ALIAS_CONTINUAL_RUN.zh.md | 10673 bytes | dd82450d2d4f9c39c7d2763ab5cb6361cba0a12cdfc9ebb74879446eb77c61a8\nscripts/step28_continual_data.py | 8176 bytes | 5555c31aff43a9d363ceab6774016c4585eb731369260f55a547cb3e67eb7142\nscripts/step28_continual_run.py | 18734 bytes | e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b\nscripts/step28_continual_evaluate.py | 17001 bytes | de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7\nschema/step28_continual_policy.json | 4966 bytes | f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540\ntests/test_step28_continual_run_contracts.py | 11032 bytes | 61c2b81228593f948055be561e70f17b8a72163f8271afb8731f0c645da70d4e\nscripts/step28_continual_core.py | 24480 bytes | 7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc\nscripts/step28_continual_inputs.py | 16926 bytes | bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a\nreports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json | 1784 bytes | 4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f\nreports/seller_alias_continual/20260907/inputs/arrival.json | 23185 bytes | c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d\n",
+    "reply_text": "结论与实际核验范围\n\n**本轮发现 SCIENTIFIC_BLOCKER 0 项、REPRODUCIBILITY_DEFECT 1 项。**四臂调度及主要评价公式未发现会改变比较结论的已证实计算错误；但正常的仓库内相对路径会使最终归档失败，应在正式比较前修复。\n\n十份附件均完整可读，实测合计 136,957 字节，逐文件字节数和完整 SHA-256 全部匹配清单。已按原相对路径恢复目录，没有把上传平铺布局当成源码问题。\n\n本轮在审查沙箱实际执行了13项新增合同测试，以及未修改源码的 step28_continual_run.py check，均通过。环境为 Python 3.13.5、NumPy 2.3.5、scikit-learn 1.8.0、PyTorch 2.10.0+cpu，CPU单线程。新增检查实际完成5个手工世界、30条样例、14个检查点的保存重载；最终缓存见过30条唯一到达，保留4条，实际序列化1,508字节。\n\n**这些不是你方 py310 环境的执行结果，也不是正式数据比较。**没有连接你方服务器，没有读取项目特征或监督载荷，没有重跑旧核心 runtime_check。完整散列、环境、命令和反例见\n本轮审查实测记录。\n\n一、REPRODUCIBILITY_DEFECT：相对路径在最后归档时失败\n\n定位：step28_continual_data.record() 第27—33行，以绝对路径 ROOT 为默认基准，却直接对未经规范化的 path 调用 relative_to(base)。\n\nstep28_continual_data\n\n我在恢复后的仓库根目录，对确实存在的仓库内 reports/.../runtime.json 调用：\n\nPython\n运行\ndata.record(Path(\"reports/.../runtime.json\"))\n\n实测抛出 ValueError；对同一个文件先调用 .resolve() 则成功。因此，这不是文件缺失、附件平铺或沙箱根目录不同造成的错误。\n\n两个正式调用点会受到影响：\n\nrun() 第283行：相对 --check-result 前面可以正常读取并通过检查，但在全部训练完成、构造最终 manifest 时失败。\n\nstep28_continual_run +1\n\nevaluate() 第250行：相对 --run 可以用于前面的读取和核验，却会在指标计算之后、写最终 evaluation.json 之前失败。\n\nstep28_continual_evaluate\n\n**受影响结论：**完整运行与评价证据能够正常归档、由独立评价器接续接受。它不是已算出的梯度或指标数值错误，却可能让有效计算只留下不完整结果目录。\n\n**最小修复：**在 record() 内先统一 path.resolve()、base.resolve()，再计算相对路径；用同一仓库内文件的相对／绝对两种写法验证记录完全相同即可。不需要改训练语义或重跑旧核心。\n\n新增 check 通过不覆盖这个问题：它不走上述正式运行和完整评价的最终归档调用点。\n\n二、SCIENTIFIC_BLOCKER：未发现；关键调用链核对结果\n供数边界、共享状态与累计重训\n\n离线包装完整读取训练监督，与方法训练调用只取得当前批／缓存，已经在实现中分开。StageSource.load() 根据阶段选择当前世界或已到达前缀；取行后关闭 mmap，对象不保留全量矩阵。新调用链中没有发现未来批次传入增量训练，也没有把完整开发特征用于拟合预处理或模型。这里沿用原公开输入资格，不追加“原特征生成链已重新验证”的结论。\n\nstep28_continual_data\n\n \n\nstep28_continual_run\n\n各顺序只用自身首批拟合预处理；首阶段物理训练一次，随后将模型和完整 Adam 状态回比来源后分支。累计臂确实在每阶段重建原始初始化和空 Adam，并保持首批预处理，没有误实现成累计历史微调。冻结模型在循环中也检查不变。\n\nstep28_continual_run +1\n\nER入库、损失与成本\n\n当前批的继续训练和 ER 使用相同新样本排列；ER训练结束后才入库一次，随后才可能在下一阶段被重放。代码还按累计到达行数检查 memory.seen，没有把五遍训练当五次到达。\n\nstep28_continual_run\n\n当前 BCE 均值加历史 BCE 均值、尾批不改变两项权重的语义保持不变。成本公式包含尾批：正式每阶段740次更新、189,000次当前呈现，ER第二阶段起另有189,440次历史呈现；累计臂的更新数及实际物理总计51,015次与合同测试一致。这些是代码及公式核对，不是正式运行实测成本。\n\nstep28_continual_core\n\n \n\ntest_step28_continual_run_contr…\n\n缓存计量使用实际 NPY 与包含两个 RNG 的 JSON 字节，并在保存时检查磁盘恢复及下一次抽样；没有只计算“229字节×边数”，也没有把缓存标签写入公开结果目录。\n\nstep28_continual_run\n\n保存、映射与开发真值时序\n\n每顺序“初始＋共享首阶段＋三更新臂各四阶段”的14点映射正确；冻结阶段引用共享记录，不是重新评分后混入其他状态。独立评价器逐一核对轨迹、呈现计数、缓存记录以及全部检查点和完整分数数组，之后才调用开发标签解析。\n\nstep28_continual_evaluate +1\n\n除原13项测试外，我用模拟文件核验的完整元数据夹具检查了末尾拒绝路径：最后一份分数缺失时，开发标签解析调用次数为0；全部核验通过后才到达该调用。这只补证控制顺序，不冒充42份真实项目分数的文件核验。\n\n三、评价公式与结论限制\n\n**未发现指标计算缺陷。**AP、梯形PR-AUC与ROC按完整同分组累计，固定阈值直接使用 logit>=0，概率指标单独使用稳定 sigmoid 和裁剪概率；新增独立 sklearn 对照实际通过。\n\nstep28_continual_evaluate\n\n检索重建对称完整图、排除自身，计算MAP、MRR及全部指定截断指标。其隐式候选顺序与继承的 sorted(sellers) 完整组合行序相容，不需要为此再次读取账号ID重排。另以12个手工K28世界、336个查询作独立逐查询计算，10项检索指标最大绝对误差为 8.33×10⁻¹⁷。规则外掩码只用于分类，没有缩小检索候选库。\n\nstep28_continual_inputs\n\n \n\nstep28_continual_evaluate\n\n配对区间确实先对同一世界的三个顺序差值取均值，再同步重采样500个世界；未制造1,500个独立样本。比较方向和阶段差值映射也与声明一致。\n\nstep28_continual_evaluate +1\n\n以下是覆盖条件与解释限制，不计为已证实缺陷：\n\n规则外逐世界分类要求该子集同时包含正负类；空集或单类会明确停止。本轮没有真实标签，不能独立确认所有世界满足这一条件，也不能据此宣称真实评价一定失败。当前没有静默删除这些世界或替换指标的行为。\n\nstep28_continual_evaluate +1\n\n当前配对区间只覆盖总体AP和规则外AP；其余指标有完整描述性结果，不应写成全部指标均已完成区间推断。固定开发集的阶段变化也不等于独立旧域遗忘或新域泛化；附件对此收窄得当。\n\nstep28_continual_evaluate\n\n四、OUT_OF_SCOPE_OVERDESIGN与推进判断\n\n不要求增加权限隔离、签名、审批状态机、全仓回归、旧核心重复核验或新模型／选择器矩阵。原输入生成资格、旧有效负结果与 Audit A/B 不因本次代码审查重新打开。\n\n**当前没有阻断新增编排 CPU 核验的已证实错误；但正式比较前应修复相对路径归档这一项。**本轮沙箱通过仅覆盖所上传字节与上述环境，不能替代修复后在你方 py310 中尚待执行的新编排检查，也不解除 Linux“先汇报、暂停”的要求。",
+    "reply_capture": "Full visible final assistant text; web source-card labels are retained as rendered, not substituted with the preceding review.",
+    "supporting_evidence": {
+      "name": "continual_runner_review_evidence.txt",
+      "downloaded_size_bytes": 24732,
+      "sha256": "be2179e749df3b7d8ffecc695620f5247c4323c9ace27de65a68e5cadb0530bb",
+      "text": "CURRENT-TURN REVIEW EVIDENCE (reviewer sandbox, not user py310)\nAll ten supplied files read; restored original relative layout; source bytes unchanged.\nNo project feature/label payloads or Audit truth opened. No user-server connection.\nNo repeat of the pre-existing core.runtime_check.\n\nEnvironment\n{\n  \"python\": \"3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]\",\n  \"platform\": \"Linux-6.18.35-x86_64-with-glibc2.41\",\n  \"numpy\": \"2.3.5\",\n  \"sklearn\": \"1.8.0\",\n  \"torch\": \"2.10.0+cpu\",\n  \"device\": \"cpu\",\n  \"torch_threads\": 1\n}\n\nActual attachment hashes\n[\n  {\n    \"path\": \"docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md\",\n    \"bytes\": 10673,\n    \"sha256\": \"dd82450d2d4f9c39c7d2763ab5cb6361cba0a12cdfc9ebb74879446eb77c61a8\",\n    \"matched\": true,\n    \"lines\": 64\n  },\n  {\n    \"path\": \"scripts/step28_continual_data.py\",\n    \"bytes\": 8176,\n    \"sha256\": \"5555c31aff43a9d363ceab6774016c4585eb731369260f55a547cb3e67eb7142\",\n    \"matched\": true,\n    \"lines\": 162\n  },\n  {\n    \"path\": \"scripts/step28_continual_run.py\",\n    \"bytes\": 18734,\n    \"sha256\": \"e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b\",\n    \"matched\": true,\n    \"lines\": 311\n  },\n  {\n    \"path\": \"scripts/step28_continual_evaluate.py\",\n    \"bytes\": 17001,\n    \"sha256\": \"de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7\",\n    \"matched\": true,\n    \"lines\": 274\n  },\n  {\n    \"path\": \"schema/step28_continual_policy.json\",\n    \"bytes\": 4966,\n    \"sha256\": \"f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540\",\n    \"matched\": true,\n    \"lines\": 108\n  },\n  {\n    \"path\": \"tests/test_step28_continual_run_contracts.py\",\n    \"bytes\": 11032,\n    \"sha256\": \"61c2b81228593f948055be561e70f17b8a72163f8271afb8731f0c645da70d4e\",\n    \"matched\": true,\n    \"lines\": 209\n  },\n  {\n    \"path\": \"scripts/step28_continual_core.py\",\n    \"bytes\": 24480,\n    \"sha256\": \"7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc\",\n    \"matched\": true,\n    \"lines\": 453\n  },\n  {\n    \"path\": \"scripts/step28_continual_inputs.py\",\n    \"bytes\": 16926,\n    \"sha256\": \"bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a\",\n    \"matched\": true,\n    \"lines\": 315\n  },\n  {\n    \"path\": \"reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json\",\n    \"bytes\": 1784,\n    \"sha256\": \"4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f\",\n    \"matched\": true,\n    \"lines\": 51\n  },\n  {\n    \"path\": \"reports/seller_alias_continual/20260907/inputs/arrival.json\",\n    \"bytes\": 23185,\n    \"sha256\": \"c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d\",\n    \"matched\": true,\n    \"lines\": 1558\n  }\n]\n\nCommand: python -m unittest discover -s tests -p test_step28_continual_run_contracts.py -v\ntest_arrival_and_world_selection_reject_duplicates_future_and_wrong_order (test_step28_continual_run_contracts.ContinualRunContracts.test_arrival_and_world_selection_reject_duplicates_future_and_wrong_order) ... ok\ntest_bootstrap_pairs_worlds_across_fixed_order_mean (test_step28_continual_run_contracts.ContinualRunContracts.test_bootstrap_pairs_worlds_across_fixed_order_mean) ... ok\ntest_complete_metric_columns_and_rule_subset_remain_separate (test_step28_continual_run_contracts.ContinualRunContracts.test_complete_metric_columns_and_rule_subset_remain_separate) ... ok\ntest_extreme_logits_and_curve_errors_do_not_hide_invalid_values (test_step28_continual_run_contracts.ContinualRunContracts.test_extreme_logits_and_curve_errors_do_not_hide_invalid_values) ... ok\ntest_labels_are_aligned_before_conversion_and_bad_rows_are_rejected (test_step28_continual_run_contracts.ContinualRunContracts.test_labels_are_aligned_before_conversion_and_bad_rows_are_rejected) ... ok\ntest_metric_equations_match_independent_sklearn_with_ties (test_step28_continual_run_contracts.ContinualRunContracts.test_metric_equations_match_independent_sklearn_with_ties) ... ok\ntest_partial_run_fails_before_development_labels_are_opened (test_step28_continual_run_contracts.ContinualRunContracts.test_partial_run_fails_before_development_labels_are_opened) ... ok\ntest_pin_rejects_changed_file_bytes (test_step28_continual_run_contracts.ContinualRunContracts.test_pin_rejects_changed_file_bytes) ... ok\ntest_policy_refuses_audit_path_before_opening_any_supervision (test_step28_continual_run_contracts.ContinualRunContracts.test_policy_refuses_audit_path_before_opening_any_supervision) ... ok\ntest_retrieval_uses_symmetric_edges_and_public_tie_order (test_step28_continual_run_contracts.ContinualRunContracts.test_retrieval_uses_symmetric_edges_and_public_tie_order) ... ok\ntest_stage_budgets_count_tails_and_additional_replay (test_step28_continual_run_contracts.ContinualRunContracts.test_stage_budgets_count_tails_and_additional_replay) ... ok\ntest_stage_loader_releases_mapping_and_exposes_current_or_arrived_prefix (test_step28_continual_run_contracts.ContinualRunContracts.test_stage_loader_releases_mapping_and_exposes_current_or_arrived_prefix) ... ok\ntest_tied_AP_PR_and_ROC_have_distinct_hand_values (test_step28_continual_run_contracts.ContinualRunContracts.test_tied_AP_PR_and_ROC_have_distinct_hand_values) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 0.102s\n\nOK\n\nCommand: OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python scripts/step28_continual_run.py check --output <repository>/review_orchestration_check.json\n{\n  \"status\": \"PASSED_REAL_CPU_ORCHESTRATION_CHECK\",\n  \"code\": [\n    {\n      \"path\": \"scripts/step28_continual_core.py\",\n      \"size_bytes\": 24480,\n      \"sha256\": \"7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc\"\n    },\n    {\n      \"path\": \"scripts/step28_continual_data.py\",\n      \"size_bytes\": 8176,\n      \"sha256\": \"5555c31aff43a9d363ceab6774016c4585eb731369260f55a547cb3e67eb7142\"\n    },\n    {\n      \"path\": \"scripts/step28_continual_run.py\",\n      \"size_bytes\": 18734,\n      \"sha256\": \"e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b\"\n    },\n    {\n      \"path\": \"scripts/step28_continual_evaluate.py\",\n      \"size_bytes\": 17001,\n      \"sha256\": \"de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7\"\n    },\n    {\n      \"path\": \"schema/step28_continual_policy.json\",\n      \"size_bytes\": 4966,\n      \"sha256\": \"f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540\"\n    }\n  ],\n  \"torch\": \"2.10.0+cpu\",\n  \"numpy\": \"2.3.5\",\n  \"device\": \"cpu\",\n  \"torch_threads\": 1,\n  \"project_label_reads\": 0,\n  \"verification\": {\n    \"points_reloaded\": 14,\n    \"stage_accesses\": [\n      {\n        \"stage\": 1,\n        \"scope\": \"current\",\n        \"world_ordinals\": [\n          3\n        ],\n        \"rows\": 6\n      },\n      {\n        \"stage\": 2,\n        \"scope\": \"current\",\n        \"world_ordinals\": [\n          0\n        ],\n        \"rows\": 6\n      },\n      {\n        \"stage\": 2,\n        \"scope\": \"arrived_prefix\",\n        \"world_ordinals\": [\n          3,\n          0\n        ],\n        \"rows\": 12\n      },\n      {\n        \"stage\": 3,\n        \"scope\": \"current\",\n        \"world_ordinals\": [\n          4\n        ],\n        \"rows\": 6\n      },\n      {\n        \"stage\": 3,\n        \"scope\": \"arrived_prefix\",\n        \"world_ordinals\": [\n          3,\n          0,\n          4\n        ],\n        \"rows\": 18\n      },\n      {\n        \"stage\": 4,\n        \"scope\": \"current\",\n        \"world_ordinals\": [\n          1\n        ],\n        \"rows\": 6\n      },\n      {\n        \"stage\": 4,\n        \"scope\": \"arrived_prefix\",\n        \"world_ordinals\": [\n          3,\n          0,\n          4,\n          1\n        ],\n        \"rows\": 24\n      },\n      {\n        \"stage\": 5,\n        \"scope\": \"current\",\n        \"world_ordinals\": [\n          2\n        ],\n        \"rows\": 6\n      },\n      {\n        \"stage\": 5,\n        \"scope\": \"arrived_prefix\",\n        \"world_ordinals\": [\n          3,\n          0,\n          4,\n          1,\n          2\n        ],\n        \"rows\": 30\n      }\n    ],\n    \"trajectory\": {\n      \"frozen\": [\n        \"initial\",\n        \"shared\",\n        \"shared\",\n        \"shared\",\n        \"shared\",\n        \"shared\"\n      ],\n      \"sequential\": [\n        \"initial\",\n        \"shared\",\n        \"sequential_stage2\",\n        \"sequential_stage3\",\n        \"sequential_stage4\",\n        \"sequential_stage5\"\n      ],\n      \"er\": [\n        \"initial\",\n        \"shared\",\n        \"er_stage2\",\n        \"er_stage3\",\n        \"er_stage4\",\n        \"er_stage5\"\n      ],\n      \"cumulative\": [\n        \"initial\",\n        \"shared\",\n        \"cumulative_stage2\",\n        \"cumulative_stage3\",\n        \"cumulative_stage4\",\n        \"cumulative_stage5\"\n      ]\n    },\n    \"training\": {\n      \"frozen\": [\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6297787129878998,\n          \"current_order_sha256\": \"5c9bd1d37569e09598bdcfa28fd0c6f64e31d9294513cff189e8b9e5db091412\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.45,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.641930595525514,\n            \"after_bce\": 0.5943409091961999,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.03276201999999273,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0,\n          \"shared_physical_fit\": true\n        },\n        {\n          \"updates\": 0,\n          \"current_presentations\": 0,\n          \"replay_presentations\": 0,\n          \"new_arrival_presentations\": 0,\n          \"prior_arrival_presentations\": 0,\n          \"fit_seconds\": 0.0,\n          \"input_array_bytes\": 0\n        },\n        {\n          \"updates\": 0,\n          \"current_presentations\": 0,\n          \"replay_presentations\": 0,\n          \"new_arrival_presentations\": 0,\n          \"prior_arrival_presentations\": 0,\n          \"fit_seconds\": 0.0,\n          \"input_array_bytes\": 0\n        },\n        {\n          \"updates\": 0,\n          \"current_presentations\": 0,\n          \"replay_presentations\": 0,\n          \"new_arrival_presentations\": 0,\n          \"prior_arrival_presentations\": 0,\n          \"fit_seconds\": 0.0,\n          \"input_array_bytes\": 0\n        },\n        {\n          \"updates\": 0,\n          \"current_presentations\": 0,\n          \"replay_presentations\": 0,\n          \"new_arrival_presentations\": 0,\n          \"prior_arrival_presentations\": 0,\n          \"fit_seconds\": 0.0,\n          \"input_array_bytes\": 0\n        }\n      ],\n      \"sequential\": [\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6297787129878998,\n          \"current_order_sha256\": \"5c9bd1d37569e09598bdcfa28fd0c6f64e31d9294513cff189e8b9e5db091412\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.45,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.641930595525514,\n            \"after_bce\": 0.5943409091961999,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.03276201999999273,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0,\n          \"shared_physical_fit\": true\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.7667818665504456,\n          \"current_order_sha256\": \"a4503d8a72ce4512b253b15ad2df47ef1dffd11928df212b9aed9b05d9c0b7b8\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.29166666666666663,\n            \"after_ap\": 0.6666666666666666,\n            \"before_bce\": 0.7761831099871793,\n            \"after_bce\": 0.7334971653602412,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.006365889999997876,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.7840587794780731,\n          \"current_order_sha256\": \"570ad01b509c7af6aaa2a33ecd6559e747ccf02188fead236a7c816bab46ca85\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.26666666666666666,\n            \"after_ap\": 0.26666666666666666,\n            \"before_bce\": 0.7920074681222545,\n            \"after_bce\": 0.7546694766481288,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.003712710000002062,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.5952022075653076,\n          \"current_order_sha256\": \"c6c7f7bac86f55cbd529178c6459104ad26beda7eca6901b06fe9407b7889bbc\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.75,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.6001363013421568,\n            \"after_bce\": 0.5761831065868203,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.004122006000002898,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.5822996497154236,\n          \"current_order_sha256\": \"8dd4a324f1aac9c5883894497bbf863f591ce414cb302725b2559e78646ed652\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.5833333333333333,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.5838624470444715,\n            \"after_bce\": 0.5740637383124948,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.00427518499999735,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        }\n      ],\n      \"er\": [\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6297787129878998,\n          \"current_order_sha256\": \"5c9bd1d37569e09598bdcfa28fd0c6f64e31d9294513cff189e8b9e5db091412\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.45,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.641930595525514,\n            \"after_bce\": 0.5943409091961999,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.03276201999999273,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0,\n          \"shared_physical_fit\": true\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 8,\n          \"mean_update_loss\": 1.370728850364685,\n          \"current_order_sha256\": \"a4503d8a72ce4512b253b15ad2df47ef1dffd11928df212b9aed9b05d9c0b7b8\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.29166666666666663,\n            \"after_ap\": 0.6666666666666666,\n            \"before_bce\": 0.7761831099871793,\n            \"after_bce\": 0.7439919457848779,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.00611031500000081,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 8,\n          \"mean_update_loss\": 1.432875633239746,\n          \"current_order_sha256\": \"570ad01b509c7af6aaa2a33ecd6559e747ccf02188fead236a7c816bab46ca85\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.26666666666666666,\n            \"after_ap\": 0.26666666666666666,\n            \"before_bce\": 0.7932304113880653,\n            \"after_bce\": 0.7647666272028747,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.004432248000000527,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 8,\n          \"mean_update_loss\": 1.2048957347869873,\n          \"current_order_sha256\": \"c6c7f7bac86f55cbd529178c6459104ad26beda7eca6901b06fe9407b7889bbc\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.75,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.5997068020145844,\n            \"after_bce\": 0.5791178754171855,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.0043821359999896,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        },\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 8,\n          \"mean_update_loss\": 1.133165717124939,\n          \"current_order_sha256\": \"8dd4a324f1aac9c5883894497bbf863f591ce414cb302725b2559e78646ed652\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.8333333333333333,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.5874917706092058,\n            \"after_bce\": 0.5835953990151181,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.004235053000002154,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0\n        }\n      ],\n      \"cumulative\": [\n        {\n          \"updates\": 2,\n          \"current_presentations\": 12,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6297787129878998,\n          \"current_order_sha256\": \"5c9bd1d37569e09598bdcfa28fd0c6f64e31d9294513cff189e8b9e5db091412\",\n          \"training_diagnostic\": {\n            \"population\": \"current rows\",\n            \"before_ap\": 0.45,\n            \"after_ap\": 0.8333333333333333,\n            \"before_bce\": 0.641930595525514,\n            \"after_bce\": 0.5943409091961999,\n            \"forward_presentations\": 12,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.03276201999999273,\n          \"input_array_bytes\": 1374,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 0,\n          \"shared_physical_fit\": true\n        },\n        {\n          \"updates\": 4,\n          \"current_presentations\": 24,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6909163445234299,\n          \"current_order_sha256\": \"9173ed1c9d63a1b28b8959396b495670546e3c2fc6f93835a52e2afa4cda8b3f\",\n          \"training_diagnostic\": {\n            \"population\": \"arrived prefix\",\n            \"before_ap\": 0.3325757575757575,\n            \"after_ap\": 0.5821428571428571,\n            \"before_bce\": 0.7074648398066324,\n            \"after_bce\": 0.6421324075629369,\n            \"forward_presentations\": 24,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.006706409000003077,\n          \"input_array_bytes\": 2748,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 12\n        },\n        {\n          \"updates\": 6,\n          \"current_presentations\": 36,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6914876202742258,\n          \"current_order_sha256\": \"c8ff37795423c2bec9217aa147f41fd77aa62673459f8283be27d46a04e21384\",\n          \"training_diagnostic\": {\n            \"population\": \"arrived prefix\",\n            \"before_ap\": 0.2938303526538821,\n            \"after_ap\": 0.45931192990016523,\n            \"before_bce\": 0.738674823568605,\n            \"after_bce\": 0.6628655788366841,\n            \"forward_presentations\": 36,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.008976644000000533,\n          \"input_array_bytes\": 4122,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 24\n        },\n        {\n          \"updates\": 6,\n          \"current_presentations\": 48,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.683331310749054,\n          \"current_order_sha256\": \"6cc6687d9592531aceef8917bfdd64c88091b826a8c0c80fa1340ff8a3c036c6\",\n          \"training_diagnostic\": {\n            \"population\": \"arrived prefix\",\n            \"before_ap\": 0.40814151747655586,\n            \"after_ap\": 0.5368055555555556,\n            \"before_bce\": 0.7079476383538091,\n            \"after_bce\": 0.63765047066202,\n            \"forward_presentations\": 48,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.008899213000006512,\n          \"input_array_bytes\": 5496,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 36\n        },\n        {\n          \"updates\": 8,\n          \"current_presentations\": 60,\n          \"replay_presentations\": 0,\n          \"mean_update_loss\": 0.6671433262526989,\n          \"current_order_sha256\": \"b6832c8a4580d7b087a4ec31f49bbd0c40d701eb4bec4f7dfccfe80b2f646827\",\n          \"training_diagnostic\": {\n            \"population\": \"arrived prefix\",\n            \"before_ap\": 0.423350500074638,\n            \"after_ap\": 0.5693058693698079,\n            \"before_bce\": 0.6786159456131948,\n            \"after_bce\": 0.612960704846524,\n            \"forward_presentations\": 60,\n            \"selection_or_early_stopping\": false\n          },\n          \"fit_seconds\": 0.011477533999993739,\n          \"input_array_bytes\": 6870,\n          \"new_arrival_presentations\": 12,\n          \"prior_arrival_presentations\": 48\n        }\n      ]\n    },\n    \"final_memory\": {\n      \"seen_unique_rows\": 30,\n      \"records\": 4,\n      \"positive_records\": 2,\n      \"array_bytes\": 1108,\n      \"state_bytes\": 400,\n      \"total_bytes\": 1508,\n      \"array_sha256\": \"7594b99332e9855b2f96affe636aee8743d1099a23ed3ce6d8137c27f61d1d66\",\n      \"state_sha256\": \"6e37cf25164fa70a436c0da4fe6fdf2fb6dd8e8681e6e3e968092d88152d2dbc\",\n      \"disk_and_next_draw_replayed\": true\n    }\n  }\n}\n\nSupplementary reviewer fixtures\nRetrieval: 12 handmade K28 worlds, 336 queries; independent scalar reference.\nLate-file test: producer-shaped mocked metadata/payload verification; tests call order only, NOT verification of project arrays.\nINDEPENDENT_K28_RETRIEVAL {'worlds': 12, 'queries': 336, 'metrics': 10, 'maximum_absolute_error': 8.326672684688674e-17}\nLATE_FILE_TRUTH_ORDER_CONTROL_FLOW_ONLY {'corrupt_final': False, 'outcome': 'ReachedTruth', 'project_truth_reads': 0, 'mock_truth_calls': 1, 'events': 86}\nLATE_FILE_TRUTH_ORDER_CONTROL_FLOW_ONLY {'corrupt_final': True, 'outcome': 'FileNotFoundError', 'project_truth_reads': 0, 'mock_truth_calls': 0, 'events': 84}\nDEGENERATE_SUBSET_REJECTION_ONLY Curve inputs need aligned finite scores and both classes\nSUPPLEMENTARY_FIXTURES_PASS\n\nRelative-path counterexample at the repository root\ncwd == data.ROOT: True\nfile exists: True\ndata.record(Path('reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json')) -> ValueError: 'reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json' is not in the subpath of '/mnt/data/continual_review_current'\ndata.record(Path('reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json').resolve()) -> sha256 4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f\nAffected call sites: runner.run line 283; evaluator.evaluate line 250.\nThe absolute-path orchestration fixture passes; that fixture does not exercise either final full-run/full-evaluation manifest sink.\nThis evidence is not a substitute for the requested orchestration check in the user py310 environment.\n"
+    },
+    "supporting_evidence_scope": "Downloaded from the current reply's 本轮审查实测记录 / continual_runner_review_evidence.txt, read in full; raw UTF-8 text and downloaded-byte SHA-256 retained here. Temporary download removed.",
+    "reported_findings": {
+      "SCIENTIFIC_BLOCKER": 0,
+      "REPRODUCIBILITY_DEFECT": 1
+    },
+    "reported_runtime": {
+      "python": "3.13.5",
+      "numpy": "2.3.5",
+      "scikit_learn": "1.8.0",
+      "torch": "2.10.0+cpu",
+      "device": "cpu",
+      "threads": 1,
+      "submitted_contracts_passed": 13,
+      "handmade_worlds": 5,
+      "handmade_rows": 30,
+      "checkpoints_reloaded": 14,
+      "cache_final_seen": 30,
+      "cache_final_records": 4,
+      "cache_final_serialized_bytes": 1508,
+      "label_reads": 0,
+      "user_server_access": false,
+      "limitation": "Reviewer sandbox and submitted pre-fix bytes; not execution in this project's Linux py310 environment or a project-data comparison."
+    }
+  },
+  "independent_disposition": {
+    "accepted": [
+      {
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "affected_claim": "Normal project-root relative CLI paths must complete run/evaluation artifact records without losing final publication after computation.",
+        "source": "Observed current web review progress report; independently reproduced locally before final reviewer answer.",
+        "reproduction": "absolute_record_ok 4966\r\nrelative_record_failed ValueError 'schema\\\\step28_continual_policy.json' is not in the subpath of 'C:\\\\Users\\\\35734\\\\Downloads\\\\2018-10-05-grams-finalexports' OR one path is relative and the other is absolute.\r\n",
+        "minimal_remedy": "Resolve both path and base at the start of record(); add relative/absolute-path equality regression. No training/input/metric semantics changed.",
+        "local_contracts_after_fix": 14,
+        "status": "CLOSED_BY_LOCAL_REPRODUCTION_MINIMAL_FIX_AND_FOCUSED_TEST",
+        "affected_file": "scripts/step28_continual_data.py",
+        "final_file": {
+          "path": "scripts/step28_continual_data.py",
+          "size_bytes": 8377,
+          "sha256": "7cfb8b03eaf058107bc7df4922928c0ca58515763dd3028e5777d49256e1b3b9"
+        },
+        "changed_training_semantics": false,
+        "changed_metrics": false,
+        "changed_project_inputs": false,
+        "same_file_relative_absolute_records_equal": true
+      }
+    ],
+    "interpretation_limits": [
+      {
+        "issue": "Rule-excluded per-world AP requires both classes.",
+        "classification": "SCIENTIFIC_BLOCKER if the actual population violates the declared metric domain; no such defect established here.",
+        "affected_claim": "All 500 development worlds contribute to rule-excluded world-equal AP without silent exclusions.",
+        "evidence": "Read only the existing reports/saved_model_audit/20260906/diagnostic.json aggregate: 500 eligible of 500 worlds, 181000 rows, 2000 positives and 179000 negatives under the unchanged strong-direct/rotation definition. No new label payload was opened.",
+        "disposition": "Keep the evaluator's explicit both-class rejection and existing input pins; no fallback metrics or dropped worlds."
+      },
+      {
+        "issue": "Confidence intervals cover only overall and rule-excluded AP.",
+        "affected_claim": "Scope of conditional paired uncertainty.",
+        "disposition": "Document explicitly that all other metrics are descriptive; retain world-first averaging across three fixed arrival orders and 2000 world bootstraps. No numeric change."
+      },
+      {
+        "issue": "Random batches and repeatedly consumed development data do not establish distinct domains, real timelines or confirmatory/real-market performance.",
+        "disposition": "Retain controlled same-source exploration and fixed development trajectories; domain BWT/F remain undefined. No change to arrival data, old negative results or Audit boundaries."
+      }
+    ],
+    "rejected_overdesign": {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "items": [
+        "OS or filesystem permission isolation",
+        "signatures or approval state machines",
+        "full-repository regression",
+        "unchanged core runtime repetition",
+        "new model/selector/seed matrix"
+      ],
+      "reason": "No new scientific or ordinary reproducibility defect was established that requires these additions."
+    },
+    "review_reuse": "Read prior continual review.json, plan_review.json and implementation_review.json original reply_text in full; resolved unchanged findings and the real core check are reused without rewriting their original evidence."
+  },
+  "local_verification": {
+    "scientific_files_read": [
+      "scripts/step28_continual_core.py",
+      "scripts/step28_continual_data.py",
+      "scripts/step28_continual_run.py",
+      "scripts/step28_continual_evaluate.py",
+      "scripts/step28_continual_inputs.py",
+      "schema/step28_continual_policy.json",
+      "tests/test_step28_continual_run_contracts.py"
+    ],
+    "inherited_dependency_scope": "New core/data/run/evaluator implementation read against the stage contract. Relevant inherited input dependencies, published row order, label alignment and strong-rule definition were inspected. Legacy grouped curves/probability/confusion/retrieval functions were read for comparison; no complete legacy training-chain re-audit is claimed and new evaluator does not import that chain.",
+    "command": "python -B -m unittest discover -s tests -p test_step28_continual_run_contracts.py -v",
+    "tests_passed": 14,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "test_output": "test_arrival_and_world_selection_reject_duplicates_future_and_wrong_order (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_bootstrap_pairs_worlds_across_fixed_order_mean (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_complete_metric_columns_and_rule_subset_remain_separate (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_extreme_logits_and_curve_errors_do_not_hide_invalid_values (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_labels_are_aligned_before_conversion_and_bad_rows_are_rejected (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_metric_equations_match_independent_sklearn_with_ties (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_partial_run_fails_before_development_labels_are_opened (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_pin_rejects_changed_file_bytes (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_policy_refuses_audit_path_before_opening_any_supervision (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_relative_cli_artifact_path_matches_absolute_record (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_retrieval_uses_symmetric_edges_and_public_tie_order (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_stage_budgets_count_tails_and_additional_replay (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_stage_loader_releases_mapping_and_exposes_current_or_arrived_prefix (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\ntest_tied_AP_PR_and_ROC_have_distinct_hand_values (test_step28_continual_run_contracts.ContinualRunContracts) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 14 tests in 0.071s\r\n\r\nOK\r\n",
+    "relative_path_reproduction": "absolute_record_ok 4966\r\nrelative_record_failed ValueError 'schema\\\\step28_continual_policy.json' is not in the subpath of 'C:\\\\Users\\\\35734\\\\Downloads\\\\2018-10-05-grams-finalexports' OR one path is relative and the other is absolute.\r\n",
+    "cli_help_passed": [
+      "scripts/step28_continual_run.py --help",
+      "scripts/step28_continual_evaluate.py --help"
+    ],
+    "final_python_ast_and_policy_json_parse": "PASS",
+    "numerical_references": "Hand-computable grouped AP/PR-AUC/ROC, symmetric retrieval and stage-cost cases; independent scikit-learn 1.7.2 reference for tied scores. Synthetic fixtures only; no project labels.",
+    "original_core_unchanged": {
+      "path": "scripts/step28_continual_core.py",
+      "size_bytes": 24480,
+      "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+    },
+    "reused_core_runtime": {
+      "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+      "sha256": "4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f",
+      "status": "PASSED_REAL_CPU_CORE_CHECK_NO_PROJECT_TRAINING",
+      "scope": "Existing Linux py310 CPU1 gradient/Adam/shared-state/loss/reload evidence only; not the new orchestration."
+    },
+    "no_broad_regression_or_duplicate_review": "The sole accepted path repair did not change training, evaluation or data semantics. Focused local regression is sufficient; the new py310 orchestration check remains pending."
+  },
+  "submitted_to_final_files": [
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md",
+      "submitted": {
+        "path": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md",
+        "size_bytes": 10673,
+        "sha256": "dd82450d2d4f9c39c7d2763ab5cb6361cba0a12cdfc9ebb74879446eb77c61a8"
+      },
+      "final": {
+        "path": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md",
+        "size_bytes": 14042,
+        "sha256": "9567b7e6434bb9a9ac6b16480cd0718424990ed49cd69ca9cce1ff08dbe604e7"
+      },
+      "changed": true
+    },
+    {
+      "path": "scripts/step28_continual_data.py",
+      "submitted": {
+        "path": "scripts/step28_continual_data.py",
+        "size_bytes": 8176,
+        "sha256": "5555c31aff43a9d363ceab6774016c4585eb731369260f55a547cb3e67eb7142"
+      },
+      "final": {
+        "path": "scripts/step28_continual_data.py",
+        "size_bytes": 8377,
+        "sha256": "7cfb8b03eaf058107bc7df4922928c0ca58515763dd3028e5777d49256e1b3b9"
+      },
+      "changed": true
+    },
+    {
+      "path": "scripts/step28_continual_run.py",
+      "submitted": {
+        "path": "scripts/step28_continual_run.py",
+        "size_bytes": 18734,
+        "sha256": "e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b"
+      },
+      "final": {
+        "path": "scripts/step28_continual_run.py",
+        "size_bytes": 18734,
+        "sha256": "e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b"
+      },
+      "changed": false
+    },
+    {
+      "path": "scripts/step28_continual_evaluate.py",
+      "submitted": {
+        "path": "scripts/step28_continual_evaluate.py",
+        "size_bytes": 17001,
+        "sha256": "de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7"
+      },
+      "final": {
+        "path": "scripts/step28_continual_evaluate.py",
+        "size_bytes": 17001,
+        "sha256": "de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7"
+      },
+      "changed": false
+    },
+    {
+      "path": "schema/step28_continual_policy.json",
+      "submitted": {
+        "path": "schema/step28_continual_policy.json",
+        "size_bytes": 4966,
+        "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+      },
+      "final": {
+        "path": "schema/step28_continual_policy.json",
+        "size_bytes": 4966,
+        "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+      },
+      "changed": false
+    },
+    {
+      "path": "tests/test_step28_continual_run_contracts.py",
+      "submitted": {
+        "path": "tests/test_step28_continual_run_contracts.py",
+        "size_bytes": 11032,
+        "sha256": "61c2b81228593f948055be561e70f17b8a72163f8271afb8731f0c645da70d4e"
+      },
+      "final": {
+        "path": "tests/test_step28_continual_run_contracts.py",
+        "size_bytes": 11586,
+        "sha256": "9e91beb357abf1a626664cf26dbb44feff1f1a68653148fb583894f3b31331e3"
+      },
+      "changed": true
+    },
+    {
+      "path": "scripts/step28_continual_core.py",
+      "submitted": {
+        "path": "scripts/step28_continual_core.py",
+        "size_bytes": 24480,
+        "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+      },
+      "final": {
+        "path": "scripts/step28_continual_core.py",
+        "size_bytes": 24480,
+        "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+      },
+      "changed": false
+    },
+    {
+      "path": "scripts/step28_continual_inputs.py",
+      "submitted": {
+        "path": "scripts/step28_continual_inputs.py",
+        "size_bytes": 16926,
+        "sha256": "bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a"
+      },
+      "final": {
+        "path": "scripts/step28_continual_inputs.py",
+        "size_bytes": 16926,
+        "sha256": "bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a"
+      },
+      "changed": false
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+      "submitted": {
+        "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+        "size_bytes": 1784,
+        "sha256": "4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f"
+      },
+      "final": {
+        "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+        "size_bytes": 1784,
+        "sha256": "4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f"
+      },
+      "changed": false
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+      "submitted": {
+        "path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+        "size_bytes": 23185,
+        "sha256": "c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d"
+      },
+      "final": {
+        "path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+        "size_bytes": 23185,
+        "sha256": "c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d"
+      },
+      "changed": false
+    }
+  ],
+  "final_stage_files": [
+    {
+      "path": "scripts/step28_continual_data.py",
+      "size_bytes": 8377,
+      "sha256": "7cfb8b03eaf058107bc7df4922928c0ca58515763dd3028e5777d49256e1b3b9"
+    },
+    {
+      "path": "scripts/step28_continual_run.py",
+      "size_bytes": 18734,
+      "sha256": "e92168a0433b3ea7a255cddd5ec2f91ac8765371c3f000e8a637a27b6185ea3b"
+    },
+    {
+      "path": "scripts/step28_continual_evaluate.py",
+      "size_bytes": 17001,
+      "sha256": "de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7"
+    },
+    {
+      "path": "scripts/step28_continual_core.py",
+      "size_bytes": 24480,
+      "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+    },
+    {
+      "path": "scripts/step28_continual_inputs.py",
+      "size_bytes": 16926,
+      "sha256": "bf5ffe07ca4867513bd37b8f6d2c7ebf59d8fd51446c8771641186a168ee9e7a"
+    },
+    {
+      "path": "tests/test_step28_continual_run_contracts.py",
+      "size_bytes": 11586,
+      "sha256": "9e91beb357abf1a626664cf26dbb44feff1f1a68653148fb583894f3b31331e3"
+    },
+    {
+      "path": "schema/step28_continual_policy.json",
+      "size_bytes": 4966,
+      "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md",
+      "size_bytes": 14042,
+      "sha256": "9567b7e6434bb9a9ac6b16480cd0718424990ed49cd69ca9cce1ff08dbe604e7"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+      "size_bytes": 36734,
+      "sha256": "2f257a5eef8b37806735d5fe8327927438afef810d944032059918a80e0e2714"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL_INPUTS.zh.md",
+      "size_bytes": 14534,
+      "sha256": "02fd4bfdac81d88658e855bd9829fe7cb3207431131b98f9d6cd0ea142de07c3"
+    },
+    {
+      "path": "docs/AI_RESEARCH_HANDOFF.zh.md",
+      "size_bytes": 141924,
+      "sha256": "fcf9fb74870063152faafad79723f4072592383dc844282fa011ca1bf3322c3f"
+    },
+    {
+      "path": "AGENTS.md",
+      "size_bytes": 36414,
+      "sha256": "07ba77d6c9ed9184e266655c68c2ed5e9f9838607de01da69121165be9dfb4f8"
+    }
+  ],
+  "execution_boundary": {
+    "this_turn": {
+      "linux_connections": 0,
+      "files_synced_to_linux": 0,
+      "gpu_runs": 0,
+      "project_orchestration_checks": 0,
+      "project_training_runs": 0,
+      "new_train_label_reads": 0,
+      "new_development_label_reads": 0,
+      "audit_a_truth_reads": 0,
+      "audit_b_truth_reads": 0,
+      "qrels_reads": 0,
+      "new_data_generations": 0
+    },
+    "next_stage": "Report and pause before any Linux resource check or synchronization; wait for user to resume this concrete stage.",
+    "proposed_linux_scope": "Inspect shared resources/process ownership read-only, SFTP only required current code/policy/pinned public inputs and authorized training pair labels; reuse original py310. CPU single thread with lower priority, no GPU. Run new same-code orchestration check, and only if it succeeds run the fixed four-arm comparison. Stop on failure, return all necessary scores/models/logs to Windows, verify hashes and independently evaluate development there.",
+    "development_labels_stay_windows": true,
+    "audit_truth_and_qrels_sync": false,
+    "input_transfer": "Reuse existing hash-matched Linux files; no models need copying, no Git or environment modification.",
+    "planned_arrival_seeds": [
+      11,
+      23,
+      37
+    ],
+    "stages": 5,
+    "worlds_per_stage": 100,
+    "feature_dimension": 57,
+    "historical_memory_budget_bytes": 524288,
+    "reservoir_capacity": 2284,
+    "planned_physical_updates": 51015,
+    "distinct_model_score_points": 42,
+    "planned_score_npy_bytes": 31757376,
+    "expected_return_size": "Tens of MB including scores, small checkpoints and necessary logs; actual size and CPU/memory costs will be recorded.",
+    "pending_comparison_command_document": "docs/SELLER_ALIAS_CONTINUAL_RUN.zh.md"
+  },
+  "temporary_cleanup": {
+    "deleted_files": 5,
+    "deleted_bytes": 163127,
+    "browser_directory_remains": false,
+    "method": "Explicit five-file patch deletion, followed by nonrecursive empty-directory removal; browser closed. Reviewer evidence read and retained in runner_review.json.",
+    "files": [
+      {
+        "path": ".playwright-mcp/console-2026-09-07T08-06-35-078Z.log",
+        "size_bytes": 4345
+      },
+      {
+        "path": ".playwright-mcp/continual-runner-review-evidence.txt",
+        "size_bytes": 24732
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-07T08-06-41-149Z.yml",
+        "size_bytes": 2678
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-07T08-09-24-319Z.yml",
+        "size_bytes": 56439
+      },
+      {
+        "path": ".playwright-mcp/page-2026-09-07T08-25-38-976Z.yml",
+        "size_bytes": 74933
+      }
+    ]
+  },
+  "finalized_at_utc": {
+    "current_time": "2026-09-07 08:29:40 UTC"
+  }
+}

@@ -1,0 +1,125 @@
+New CPU gradient/state contracts passed; loading existing LaBSE
+/home/yongpeng/cross-lingual/scripts/step28_continual_text.py:342: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if encoder.max_seq_length != TOKEN_BUDGET or encoder.get_sentence_embedding_dimension() != 768:
+Independent real encoder/head gradients passed; checking nonempty state replay
+Exact state/score/subsequent-update replay passed; checking one real public-world shape
+{
+  "status": "PASSED_NEW_TEXT_COMPONENT_CHECK_NO_FORMAL_EXPERIMENT",
+  "contracts_passed": 17,
+  "contracts_skipped": 0,
+  "independent_real_branch_gradients": {
+    "current": {
+      "bce": 0.6386840343475342,
+      "encoder": {
+        "l2": 0.03135163629020359,
+        "parameters_with_gradient": 470926848,
+        "parameters_without_gradient": 590592
+      },
+      "head": {
+        "l2": 0.39078903044615493,
+        "parameters_with_gradient": 1889,
+        "parameters_without_gradient": 0
+      }
+    },
+    "history": {
+      "bce": 0.8029314875602722,
+      "encoder": {
+        "l2": 0.2687908802739202,
+        "parameters_with_gradient": 470926848,
+        "parameters_without_gradient": 590592
+      },
+      "head": {
+        "l2": 0.647209143386718,
+        "parameters_with_gradient": 1889,
+        "parameters_without_gradient": 0
+      }
+    }
+  },
+  "activation_checkpoint_loss_and_all_gradients_exact": true,
+  "encoder_and_head_updated": true,
+  "initial_scaler_encoder_unchanged": true,
+  "exact_medians_means_scales_reload": true,
+  "exact_nonempty_optimizer_reload": true,
+  "exact_raw_scores_reload": true,
+  "exact_subsequent_model_and_adam_update": true,
+  "temporary_checkpoint_bytes": 5653774793,
+  "temporary_checkpoint_removed": true,
+  "capacity": {
+    "public_worlds": [
+      "v9_4_1_formal_500x4_train_world_000",
+      "v9_4_1_formal_500x4_train_world_001",
+      "v9_4_1_formal_500x4_train_world_002"
+    ],
+    "items": 297,
+    "project_binary_labels_read": 0,
+    "numeric_and_labels": "hand-created verification values only",
+    "current_edges": 378,
+    "current_accounts": 28,
+    "history_edges": 16,
+    "history_accounts": 32,
+    "current_chunks": 196,
+    "history_chunks": 224,
+    "memory_bytes": 74293,
+    "update_seconds": 7.027281173039228,
+    "peak_cuda_allocated_bytes": 12696088064,
+    "peak_cuda_reserved_bytes": 14048821248,
+    "loss_report": {
+      "current_bce": 0.6546379923820496,
+      "history_bce": 0.741350531578064,
+      "pre_clip_gradient_norm": 0.2518268823623657
+    },
+    "scope": "one public current-world shape; not worst-case or formal dataset validation"
+  },
+  "environment": {
+    "python": "3.10.19 | packaged by conda-forge | (main, Oct 22 2025, 22:29:10) [GCC 14.3.0]",
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+    "torch": "2.9.1+cu130",
+    "cuda": "13.0",
+    "cudnn": 91300,
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "initial_free_bytes": 32876134400,
+    "total_gpu_bytes": 33633402880,
+    "packages": {
+      "numpy": "2.2.6",
+      "transformers": "4.46.3",
+      "sentence-transformers": "5.6.0"
+    }
+  },
+  "files": [
+    {
+      "path": "scripts/step28_continual_text_check.py",
+      "size_bytes": 15066,
+      "sha256": "b186745498ffd59b13e9e8e04c4741e62675b5a89932df82c89020e610e95eb1"
+    },
+    {
+      "path": "scripts/step28_continual_text.py",
+      "size_bytes": 24539,
+      "sha256": "a04868c223dba51f1e18d419ef0011424b99f3c3d6cf393f16cb9f7cc24ecea2"
+    },
+    {
+      "path": "schema/step28_continual_text_policy.json",
+      "size_bytes": 4682,
+      "sha256": "63bb8f1cf394ad8439b9acc2f79dd3584f28492d2fa99c01e981c78fba51a81f"
+    },
+    {
+      "path": "scripts/step28_continual_core.py",
+      "size_bytes": 24480,
+      "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+    },
+    {
+      "path": "scripts/step28_labse_finetune_common.py",
+      "size_bytes": 17279,
+      "sha256": "36ece13b687158d936c0d58569f2207f3a61638e472a9d190a3fbc1ea2617da2"
+    },
+    {
+      "path": "scripts/step7_authorship_common.py",
+      "size_bytes": 158058,
+      "sha256": "20aa8d5c94e21a067a7a987ba72e0a1af1b4fb265b9e115f5e16e6b0952efbc6"
+    },
+    {
+      "path": "tests/test_step28_continual_text_contracts.py",
+      "size_bytes": 17510,
+      "sha256": "a74fb5a91f30a3755f842421ccd91ab27a3a57b016d1ba12809a3443ed201625"
+    }
+  ]
+}

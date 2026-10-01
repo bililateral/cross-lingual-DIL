@@ -1,0 +1,142 @@
+{
+  "date": "2026-09-07",
+  "status": "LITERATURE_AND_FEASIBILITY_REVIEW_COMPLETE_NO_EXPERIMENT",
+  "scope": "Chinese darknet seller alias identification under controlled sequential arrival; top-venue literature from 2016–2026; proposal only.",
+  "conversation_url": "https://chatgpt.com/c/6a9e50ce-6084-83eb-9ef3-44f2727c69f3",
+  "reviewer": "Web ChatGPT GPT 6 Pro",
+  "reviewer_identity_evidence": "The visible ChatGPT selector displayed 6 / Pro before submission and with the final reply; UI identity only, not an independent backend attestation.",
+  "submitted_at_utc": "2026-09-07 05:51:09 UTC",
+  "final_reply_observed_at_utc": "2026-09-07 06:01:13 UTC",
+  "recorded_at_utc": "2026-09-07 06:13:52 UTC",
+  "submitted_document": {
+    "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+    "size_bytes": 15805,
+    "sha256": "8384723a53ccbdc2ba3704f37970661d7f70005abaff8cad0a8a536bb2bb755d"
+  },
+  "prompt": "请审查唯一附件 SELLER_ALIAS_CONTINUAL.zh.md。这是中文暗网卖家同控马甲识别项目的选题与最小可行性方案，不是已冻结的实验或实现。用户希望容易实施，要求主要依据为近十年顶刊顶会论文。附件 SHA-256：8384723a53ccbdc2ba3704f37970661d7f70005abaff8cad0a8a536bb2bb755d，15805 字节。\n\n请只给一次有取舍的科学审查，约 1500—2200 中文字：\n1. 研究问题是否成立、现有同源合成世界分批能否支持所说的遗忘；随机到达与受控非同分布、训练身份与评价身份是否区分正确。\n2. 对照是否有关键缺项或不公平，尤其固定输入、小型二分类头、字节记忆预算、DER++ 适配、冻结模型与累计重训。\n3. “同一锚点正负关系成组保留”相对 MIR/GSS/DER++ 及近年持续重识别是否仅是普通方法改名；不要凭没有检索命中就断言首创，也不要仅因有近邻就否决尝试简单基线。\n4. 指出真正会使结论无效的缺陷与最小补充；剩余风险与待验证假设分开写。仅在有确切原始来源时补充遗漏的 2016—2026 顶会/顶刊近邻。\n\n边界：已有四臂六预算迁移有效负结果保持停止；不重新调旧模型、不使用 Audit A/B 真值、不需要新增真实中文标签、当前不使用 Linux。57 项特征只是第一轮可行性参照，不把小头结果直接写成真实市场有效或完整方法贡献。具体阶段分布、记忆序列化字节、优化超参数尚待本地核验，不能把草案中明确待定的实现细节伪称已实现错误。你没有源码和数据，不能宣布实现已通过。请逐条将必要修改归类为 SCIENTIFIC_BLOCKER 或 REPRODUCIBILITY_DEFECT，说明受影响结论与最小修复；无关复杂机制列 OUT_OF_SCOPE_OVERDESIGN 并拒绝。不提出网络/安全/签名/繁琐审批/重复外审/大规模基线矩阵。你是咨询审查者，最终采用与否由本地执行者独立判断。",
+  "reply_text": "已完整读取附件：15,805 字节，SHA-256 与你提供的值完全一致。我的取舍是：**保留为四臂可行性候选，暂不把“共同锚点成组记忆”立为方法贡献。**未发现足以否决首轮探索的已证实科学错误。\n\n一、问题成立，但合成分批不自动证明遗忘\n\n附件正确区分固定同控二分类与身份类增量，也正确要求训练、评价身份隔离。评价身份从未参与训练，不妨碍检验“已学分布上的泛化保持”；这里的“旧”应指已覆盖的分布，而非模型见过那些开发账号。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n同源世界随机分批可以检验顺序更新后的退化，不能仅凭五个分组及 BWT/F 命名为跨域遗忘。受控非同分布方案须保持世界完整，并核验公开划分是否对应模型实际输入或判别条件的变化；商品类别不同，不保证57维成对输入不同。开发侧采用对应规则、禁止依据未来结果挑顺序，这些边界正确。阶段差异尚未证实属于待验证假设，不是已经发生的实现错误。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n固定输入、小头适合隔离打分函数的更新干扰，但排除了编码器遗忘及新旧表示不兼容；C2R（CVPR 2024）专门涉及后一问题。因此，小头无遗忘不能否定完整系统存在困难，有遗忘也不能外推真实市场。\nCVF开放访问\n 固定候选库应保留，新增竞争者引起的排名下降不能计作遗忘。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n二、近邻不等于重复，但“关系保持”不是空白\n\nMIR（NeurIPS 2019）按预计损失增量选择当前重放样本；GSS（同年）按梯度多样性选择入库样本。共同锚点约束改变边的联合入选方式，不与二者定义等同，但换存储单位也不足以证明创新。\nNeurIPS Proceedings\n+1\n\n建议只补一篇直接近邻：Huang 等的 CLUDA-ReID，CVPR 2022，题名《Lifelong Unsupervised Domain Adaptive Person Re-Identification With Coordinated Anti-Forgetting and Adaptation》。原文已有身份级 reservoir、协调重放和实例关系一致性；其无监督视觉表示设定不同，不能据此断言你的二分类成组缓存已被解决。\nCVF开放访问\n+1\n 附件所列 VLADR 原文也已有跨实例关系矩阵蒸馏。\narXiv\n 应收窄贡献，而非仅因有近邻放弃简单基线。\n\n三、必要修改及受影响结论\n\nSCIENTIFIC_BLOCKER——共同锚点贡献的归因，仅阻断后续方法结论。\n现有“分层随机、随机成组、MIR”仍未明确排除难负例选择的作用。按附件的固定成对输入、ID不进头、独立二分类损失，两条边的损失仍相加，成组本身没有增加损失层面的关系约束。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n 最小补充是：设置取消共同锚点约束，但匹配正负比例、难度及重复次数的独立边对照，保持字节与计算口径一致。否则增益只能归于整个选择策略，不能归于共同锚点；这不阻断先做四臂。\n\nREPRODUCIBILITY_DEFECT——DER++适配尚需补清规范。\n按原文式6、算法2，采用“当前 BCE＋α历史 logit 平方误差＋β历史标签 BCE”；历史输出应保存为固定目标，并明确相对参数更新的保存时点，蒸馏与监督分别抽样。合用一个批次并非必然无效，但须标明采样变体，而非声称逐项复现。\nNeurIPS Proceedings\n 单 logit 蒸馏仍是合理参照，但保持的是标量输出，不应照搬多类别关系的解释。此项影响强基线比较是否可复现，不表示已有代码写错。\n\nREPRODUCIBILITY_DEFECT——预算与参照臂口径尚需闭合。\n附件已有按真实字节计量、报告附加计算的正确原则。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n 需要补清：“同更新次数、同新旧配比”不能覆盖冻结臂和无重放臂；重放总量须合计 DER++两次抽样，MIR选样开销也须入账。等步数不等计算，单报耗时不足以支持“等计算预算更优”。各法按真实必要状态计费，允许 ER 利用省下的 logit 或标识字节多存边；调参机会应对称，不要求正则系数相等。\n\n冻结臂应固定全部评分状态；累计重训应明确每阶段是否重置头与优化器、仅使用截至当期历史，并保持相同预处理。沿用上一模型则应说明是累计历史微调。累计重训可以作为超预算效果／成本参照，无须强压成同预算，更不是数学上界。\n\nREPRODUCIBILITY_DEFECT——到达与组操作尚需定义。\n补清阶段内重复训练是否再次触发 reservoir、组内重复边如何计数，以及只成组入库还是也成组回放。否则缓存分布、样本权重和批次相关性可能混在一起，无法复现或归因。具体阶段分布、序列化大小和超参数尚待核验，本身不计为已发生缺陷；这里要求的是使用前补齐语义。\n\n四、风险、假设与最终取舍\n\n剩余风险是强规则掩盖、反复使用开发集及三个顺序覆盖有限。应保留规则外分层，结果只作探索；世界重采样描述给定模型与顺序下的评价不确定性，并不覆盖全部训练随机性。无需因此立刻扩展种子矩阵。\n\nSELLER_ALIAS_CONTINUAL.zh +1\n\n待验证假设是头确实学会识别、存在可靠旧分布退化，以及 ER 仍有明显不足。若只有随机波动或 ER 已解决问题，不应人为制造遗忘来升级方法贡献。\n\n**OUT_OF_SCOPE_OVERDESIGN：**拒绝为本轮增加视觉语言网络、复杂图机制、大规模基线矩阵或额外审批。冻结、继续训练、ER、累计重训足够回答首轮可行性；出现可解释的不足后，再补直接强参照和归因对照。旧迁移负结果保持停止，不需新增真实中文标签，不动 Audit A/B 与 Linux 边界。建议保留候选，但不认定方法贡献，也不认定实现通过。",
+  "reply_links": [
+    {
+      "text": "CVF开放访问",
+      "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Cui_Learning_Continual_Compatible_Representation_for_Re-indexing_Free_Lifelong_Person_Re-identification_CVPR_2024_paper.html?utm_source=chatgpt.com"
+    },
+    {
+      "text": "NeurIPS Proceedings\n+1",
+      "url": "https://proceedings.neurips.cc/paper/2019/file/15825aee15eb335cc13f9b559f166ee8-Paper.pdf"
+    },
+    {
+      "text": "CVF开放访问\n+1",
+      "url": "https://openaccess.thecvf.com/content/CVPR2022/html/Huang_Lifelong_Unsupervised_Domain_Adaptive_Person_Re-Identification_With_Coordinated_Anti-Forgetting_and_CVPR_2022_paper.html?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arXiv",
+      "url": "https://arxiv.org/html/2603.19678v1"
+    },
+    {
+      "text": "NeurIPS Proceedings",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2020/file/b704ea2c39778f07c617f6b7ce480e9e-Paper.pdf"
+    }
+  ],
+  "reviewed_file_scope": "One proposal document; no code, arrays, raw account records or labels. The review does not certify implementation correctness.",
+  "local_decisions": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "status": "FUTURE_METHOD_ATTRIBUTION_ONLY_NOT_A_BLOCKER_TO_FEASIBILITY",
+      "claim": "Improvement specifically attributable to common-anchor memory selection.",
+      "finding": "Pointwise BCE is additive; grouping can also change negative difficulty, class allocation, repetition and update scheduling.",
+      "minimal_remedy": "Keep the same head/loss; compare independent edges matched on positive proportion, negative difficulty and repetitions under actual byte/compute accounting. First change joint retention only and replay independent edges. If attribution cannot be isolated, report only the complete strategy effect.",
+      "independent_check": {
+        "recorded_at_utc": "2026-09-07 05:56:42 UTC",
+        "additive_pair_loss": "For the proposed pointwise BCE head, fixing the exact replay edges and their weights gives the same full-batch objective regardless of anchor grouping. Grouping can affect which edges are retained and minibatch gradient variance/order, but does not itself add model-visible relational evidence. Before a relation-grouping contribution, compare a selected memory with the same edges replayed independently and distinguish selection from batch scheduling; no new objective is authorized by this observation.",
+        "data_hypothesis": "All worlds have the same complete 28-account pair graph. A claim about high-degree account popularity causing reservoir bias has no support here. The draft already discloses this.",
+        "budget": "Whole-history 57-feature data are small, so memory constraint is experimental, not an established operational bottleneck."
+      }
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PROPOSAL_CLARIFIED_IMPLEMENTATION_PENDING",
+      "claim": "A reproducible DER++ binary-pair baseline.",
+      "finding": "Scalar-target timing and two replay draws need explicit semantics.",
+      "minimal_remedy": "Specify current BCE + alpha scalar-logit MSE + beta old-label BCE; save the first-arrival pre-update logit as a fixed target. Sample both memory terms separately and count both. Do not inherit multiclass-logit interpretations.",
+      "verification": "Locally read NeurIPS 2020 Eq. 5–6 and Algorithms 1–2; no implementation executed."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PROPOSAL_CLARIFIED_IMPLEMENTATION_PENDING",
+      "claim": "Fair retention and update-cost comparison.",
+      "finding": "Equal replay ratios cannot cover frozen/no-replay arms; equal steps are not equal compute; ER need not store unused metadata.",
+      "minimal_remedy": "Apply matching rules only to applicable arms, count selection/replay work and allow ER additional rows with saved bytes. Freeze all score states. Reset head and optimizer for prefix-only cumulative retraining with common preprocessing, as a separately priced reference."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PROPOSAL_CLARIFIED_IMPLEMENTATION_PENDING",
+      "claim": "Defined memory probabilities, weights and arrival process.",
+      "finding": "Repeated epochs, overlapping group edges and batch grouping can confound retention.",
+      "minimal_remedy": "One arrival event per unique original pair; no epoch-based reinsertion. Count unique payloads plus group metadata, record weights/repetitions, and separate retention from replay scheduling."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "status": "CLAIM_BOUNDARY_RETAINED_NO_OBSERVED_DATASET_DEFECT",
+      "claim": "Old-distribution generalization under controlled shifts.",
+      "finding": "Different categories need not change the actual 57-feature inputs; same-generator random cohorts are not automatically domains.",
+      "minimal_remedy": "Verify model-visible distributions, preserve world completeness and identity isolation, and interpret random cohorts accordingly. Fixed-head null results do not rule out encoder forgetting."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "BIBLIOGRAPHIC_ADDITION_VERIFIED",
+      "claim": "Novelty boundary for identity/relationship-aware replay.",
+      "finding": "CLUDA-ReID, CVPR 2022, already uses identity-wise reservoir and relational consistency.",
+      "minimal_remedy": "Add the direct neighbor with its unsupervised visual/pseudo-identity setting.",
+      "verified_primary_sources": [
+        "https://openaccess.thecvf.com/content/CVPR2022/html/Huang_Lifelong_Unsupervised_Domain_Adaptive_Person_Re-Identification_With_Coordinated_Anti-Forgetting_and_CVPR_2022_paper.html",
+        "https://openaccess.thecvf.com/content/CVPR2022/supplemental/Huang_Lifelong_Unsupervised_Domain_CVPR_2022_supplemental.pdf"
+      ],
+      "reading_scope": "Official indexed abstract, main introduction, supplemental Section 1 and Algorithm 1. Direct opens returned 403; indexed primary-source text was read. No full implementation audit."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "REJECTED",
+      "claim": "No present need for visual-language architectures, graph mechanisms, broad benchmark matrices or additional approval procedures.",
+      "minimal_remedy": "Keep four initial feasibility arms; add direct controls only for later method claims."
+    }
+  ],
+  "local_disposition": "Retain the candidate for local feasibility; no novel selector or algorithm mainline is established. Next inspect whether public grouping yields model-visible variation, then define the smallest comparison.",
+  "post_submission_changes": "Expanded actual GSS/DKC reading scope; independently derived BCE additivity before reading the final review; added verified CLUDA-ReID and minimal attribution/replay/budget clarifications. No new experiment or second review.",
+  "related_original_review_read": {
+    "path": "reports/seller_alias_papers/20260907/modality_time_review.json",
+    "scope": "Full reply read to reconcile retired prior candidates; no closed finding reopened and file unchanged."
+  },
+  "final_document": {
+    "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+    "size_bytes": 20410,
+    "sha256": "fa359fadc8a394b98b04980e6bc066fa8f957a5fc402dba931be5d43fb0c5460"
+  },
+  "verification": {
+    "type": "Literature, document references and hashes only; no experiment tests or smoke needed for this documentation change.",
+    "partial_code_scope": [
+      "scripts/step28_prepare_public_projection.py: frozen English reference and legacy18 construction",
+      "scripts/step28_specialist.py: all-training median construction",
+      "scripts/step28_model_training_core.py: imputation references",
+      "scripts/step28_base24_shared.py: model-profile fields"
+    ],
+    "implementation_status": "Partial planning audit only; new continual training and direct scientific dependencies remain unaudited and unexecuted.",
+    "windows_python_metadata": {
+      "numpy": "2.2.6",
+      "scikit-learn": "1.7.2",
+      "torch": null
+    },
+    "temporary_cleanup": "Six task-created Playwright snapshot/log files and their empty directory removed; task tab closed. No helper scripts or downloaded paper payloads retained."
+  },
+  "boundaries": {
+    "new_training_label_reads": 0,
+    "new_development_label_reads": 0,
+    "audit_a_or_b_truth_reads": 0,
+    "new_experiments": false,
+    "new_data_generation": false,
+    "linux_connections": false,
+    "file_synchronization": false,
+    "old_failed_transfer_claim_stopped": true,
+    "publication_artifacts_changed": false,
+    "server_pause_retained": true
+  }
+}

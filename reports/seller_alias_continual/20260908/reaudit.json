@@ -1,0 +1,411 @@
+{
+  "user_request": "再次仔细核对当前实验设计和实际实现，避免形式一致但逻辑错误。",
+  "run_id": "20260907_200309",
+  "verdict": "NO_NEW_CONFIRMED_IMPLEMENTATION_DEFECT_WITHIN_REVIEWED_SCOPE; existing controlled same-generator comparison remains unchanged; not proof of full mainline or real-market effectiveness",
+  "scientific_changes": [],
+  "formal_result_interpretation_changed": false,
+  "source_read_scope": [
+    {
+      "path": "scripts/step28_continual_text.py",
+      "scope": "full implementation"
+    },
+    {
+      "path": "scripts/step28_continual_text_data.py",
+      "scope": "full implementation"
+    },
+    {
+      "path": "scripts/step28_continual_text_run.py",
+      "scope": "full implementation"
+    },
+    {
+      "path": "scripts/step28_continual_text_evaluate.py",
+      "scope": "full implementation"
+    },
+    {
+      "path": "scripts/step28_continual_text_check.py",
+      "scope": "full implementation and reuse of archived real runtime"
+    },
+    {
+      "path": "scripts/step28_continual_core.py",
+      "scope": "Preprocessor, torch_module, make_head, current_permutation; unused historical training not claimed fully re-audited"
+    },
+    {
+      "path": "scripts/step28_continual_data.py",
+      "scope": "JSON/file records, file verification, arrival validation, row-aligned binary-label parser and array selection"
+    },
+    {
+      "path": "scripts/step28_continual_evaluate.py",
+      "scope": "curve_metrics, confusion_metrics, classification, retrieval, point_metrics, paired_interval"
+    },
+    {
+      "path": "scripts/step28_labse_finetune_common.py",
+      "scope": "full shared file; only current label-free payload/text/chunk/aggregation dependencies reused"
+    },
+    {
+      "path": "scripts/step7_authorship_common.py",
+      "scope": "model_content_fingerprint and its file/hash helpers; not whole historical pipeline"
+    },
+    {
+      "path": "tests/test_step28_continual_text_contracts.py",
+      "scope": "full file; mathematical reference, finite difference and real gradient/state assertions read, not rerun"
+    },
+    {
+      "path": "tests/test_step28_continual_text_run_contracts.py",
+      "scope": "full file; distinguish mocked gate checks from actual CPU scheduler evidence"
+    },
+    {
+      "path": "tests/test_step28_continual_run_contracts.py",
+      "scope": "metric and paired-bootstrap independent reference cases"
+    },
+    {
+      "path": "scripts/step28_prepare_public_projection.py",
+      "scope": "reconstruct_frozen_english_reference, project_model_profile, legacy18_row"
+    },
+    {
+      "path": "scripts/step28_freeze_identity_projection_authorized.py",
+      "scope": "build_split CSV-to-raw-float64 projection and row alignment"
+    },
+    {
+      "path": "scripts/step28_history_features.py",
+      "scope": "_compute_identity33 and build_identity33_all_pairs; world-local frequency/graph inputs"
+    },
+    {
+      "path": "scripts/step28_replay_world.py",
+      "scope": "_build_profiles_and_identity33 world-local call boundary only"
+    },
+    {
+      "path": "scripts/step28_scientific_world.py",
+      "scope": "_build_profiles_and_identity33 world-local call boundary only"
+    }
+  ],
+  "original_review_records_read": [
+    {
+      "path": "reports/seller_alias_continual/20260907/text_run/review.json",
+      "fields": [
+        "actual_new_reply",
+        "supporting_evidence.visible_preview_text",
+        "independent_disposition"
+      ]
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/text_core/review.json",
+      "fields": [
+        "actual_final_reply",
+        "local_disposition"
+      ]
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/runner_review.json",
+      "fields": [
+        "reviewer.reply_text",
+        "independent_disposition"
+      ]
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/implementation_review.json",
+      "fields": [
+        "reply_text",
+        "local_decisions"
+      ]
+    }
+  ],
+  "reused_runtime_evidence": [
+    {
+      "path": "reports/seller_alias_continual/20260907/text_check/20260907_181341/check/runtime.json",
+      "sha256": "8f6e989ef8404d0cd3bd00ec7dd83e5604a54b23aa23789ec191e4063a39b63b",
+      "scope": "Real LaBSE branch-specific encoder/head data gradients, checkpointing, parameter/Adam/scaler/cache restore and next update; 17 contracts passed with no skips; one representative GPU shape"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260907/text_orchestration/20260907_194523/check.json",
+      "sha256": "d62dee077423f7df6691dc84f55c108d2cc50a73e30473bebcbb63a99ebc84fb",
+      "scope": "Production scheduler on hand-created CPU data: 46 updates, 14 complete replay points, four inference models actually reloaded; not formal LaBSE result"
+    }
+  ],
+  "existing_boundaries_reconfirmed": [
+    "Random complete-world arrivals from one qualified synthetic generator support controlled incremental generalization; no natural old/new development-domain mapping, real chronology or returning-account experiment exists in this protocol.",
+    "Fixed full-development trajectory cannot separately identify old-group retention and new-group learning. domain_BWT_or_forgetting stays null. IID arrival alone does not invalidate a continual-learning baseline.",
+    "512 KiB counts full serialized historical edge inputs/labels and sampling state. The priority-prefix cache has variable-cost-dependent inclusion, not a uniform reservoir. Python RAM, current data and model/Adam/scaler are separate costs.",
+    "The ER objective is mean(current 378 edges) + mean(history up to 16 edges). At 16 edges the historical/current per-edge coefficient ratio is 23.625 before clipping/Adam. ER outcomes cannot isolate selection quality from loss weighting, repeated replay and extra encoding cost.",
+    "ER mean_update_loss sums two branch means; it cannot be directly compared to the single current-loss mean reported by sequential training as evidence of worse fitting.",
+    "At stage t, a cumulative fit has 200*t updates, equal to all current-only updates accumulated by sequential through t; physical cost is larger because each prefix is retrained separately. It is an explicit cumulative reference, not a theoretical optimum or all-run equal-compute arm.",
+    "All candidate worlds are fixed complete K28 and every query has one or two aliases. No zero-match/open-candidate or true-Chinese-market effectiveness is established.",
+    "Overall AP must be interpreted together with the frozen no-strong-rule diagnostics. Two training epochs and finite real gradients establish neither convergence nor actual useful representation learning.",
+    "Existing development use remains exploratory. Three fixed arrival orders and paired world bootstrap do not cover arbitrary training randomness or new markets."
+  ],
+  "review_disposition": {
+    "new_confirmed_scientific_blockers": [],
+    "new_confirmed_reproducibility_defects": [],
+    "new_external_review_submitted": false,
+    "reason": "Local re-reading and checks of unchanged, already reviewed design/implementation/evaluation. No substantive policy, implementation, endpoint or effect conclusion changed; do not add a repeated review gate."
+  },
+  "execution": {
+    "command": "@'\nimport hashlib, itertools, json, math, platform, sys\nfrom datetime import datetime\nfrom pathlib import Path\nimport numpy as np\n\nsys.stdout.reconfigure(encoding=\"utf-8\")\nroot = Path.cwd()\nsys.path.insert(0, str(root / \"scripts\"))\nimport step28_continual_evaluate as metrics\nimport step28_continual_text_data as text_data\n\n# Scientific files only: no project label, score or model payload is opened.\nrun_root = root / \"reports/seller_alias_continual/20260907/text_execution/20260907_200309\"\nstartup = json.loads((run_root / \"input_files.json\").read_text(encoding=\"utf-8\"))\npins = {entry[\"path\"]: entry for entry in startup[\"files\"]}\ncode = []\nfor name in text_data.CODE_FILES:\n    payload = (root / name).read_bytes()\n    observed = {\"path\": name, \"size_bytes\": len(payload),\n                \"sha256\": hashlib.sha256(payload).hexdigest()}\n    assert observed == pins[name], name\n    code.append(observed)\n\n# Two known alias groups. A dictionary/list reference independently ranks each query.\nnames = (\"a\", \"b\", \"c\", \"d\", \"e\")\ngroups = {\"a\": 0, \"b\": 0, \"c\": 0, \"d\": 1, \"e\": 1}\nedges = list(itertools.combinations(names, 2))\nscore_values = [3., 2., 0., -1., 1., 2., 2., 0., -2., 1.]\nscore_map = dict(zip(edges, score_values))\nlabels = [int(groups[a] == groups[b]) for a, b in edges]\nreference = []\nquery_orders = {}\nfor query in names:\n    candidates = [n for n in names if n != query]\n    ranked = sorted(candidates, key=lambda n: (-score_map[tuple(sorted((query, n)))], n))\n    query_orders[query] = ranked\n    positive_ranks = [rank for rank, name in enumerate(ranked, 1)\n                      if groups[query] == groups[name]]\n    count = len(positive_ranks)\n    row = {\"map\": sum(i / rank for i, rank in enumerate(positive_ranks, 1)) / count,\n           \"mrr\": 1 / positive_ranks[0]}\n    for k in (1, 3, 5, 10):\n        row[f\"recall_at_{k}\"] = sum(rank <= k for rank in positive_ranks) / count\n        gain = sum(1 / math.log2(rank + 1) for rank in positive_ranks if rank <= k)\n        ideal = sum(1 / math.log2(rank + 1) for rank in range(1, min(k, count) + 1))\n        row[f\"ndcg_at_{k}\"] = gain / ideal\n    reference.append(row)\nexpected = {key: sum(row[key] for row in reference) / len(reference)\n            for key in metrics.RETRIEVAL_KEYS}\nactual = dict(zip(metrics.RETRIEVAL_KEYS, metrics.retrieval(\n    np.asarray([labels], dtype=np.uint8), np.asarray([score_values]), len(names))[0].tolist()))\nnp.testing.assert_allclose(list(actual.values()), list(expected.values()), rtol=0, atol=1e-14)\n\n# Sigmoid saturation must not replace the frozen logit ranking.\nextreme_y = np.array([0, 1, 1, 0], dtype=np.uint8)\nextreme_logits = np.array([1000., 999., -999., -1000.])\ndirect = metrics.classification(extreme_y, extreme_logits)\nprobabilities = np.exp(-np.logaddexp(0., -extreme_logits))\nincorrect_probability_ap = metrics.curve_metrics(extreme_y, probabilities)[\"average_precision\"]\nassert abs(direct[\"average_precision\"] - 7 / 12) < 1e-14\nassert incorrect_probability_ap == 0.5\nassert math.isfinite(direct[\"log_loss\"])\nassert direct[\"confusion\"] == {\"tp\": 1, \"fp\": 1, \"fn\": 1, \"tn\": 1}\n\n# Independent count derivation; distinguish endpoint effort from physical reruns.\ncurrent_updates_per_stage = 100 * 2\nper_order = 200 + 4 * 200 + 4 * 200 + sum(2 * (100 * t) for t in range(2, 6))\nunique_points = 3 * (2 + 3 * 4)\nmodels = 3 * (1 + 3)\nassert (3 * per_order, unique_points, models) == (13800, 42, 12)\nendpoint_updates = [2 * 100 * t for t in range(1, 6)]\nassert endpoint_updates == [sum([current_updates_per_stage] * t) for t in range(1, 6)]\n\nresult = {\n    \"status\": \"LOCAL_TARGETED_REAUDIT_CHECKS_PASSED_NOT_FORMAL_EFFECT\",\n    \"checked_at\": datetime.now().astimezone().isoformat(),\n    \"environment\": {\"python\": platform.python_version(), \"numpy\": np.__version__},\n    \"scientific_files_match_startup\": code,\n    \"checks\": [\n        {\"name\": \"mixed_one_and_two_relevant_queries_with_ties\",\n         \"pairs\": [list(edge) for edge in edges], \"labels\": labels, \"logits\": score_values,\n         \"query_ranking_reference\": query_orders, \"expected\": expected, \"actual\": actual,\n         \"status\": \"PASS\"},\n        {\"name\": \"rank_raw_logits_before_sigmoid_saturation\",\n         \"labels\": extreme_y.tolist(), \"logits\": extreme_logits.tolist(),\n         \"expected_ap\": 7 / 12, \"actual_ap\": direct[\"average_precision\"],\n         \"ap_if_probabilities_wrongly_used_for_ranking\": incorrect_probability_ap,\n         \"status\": \"PASS\"},\n        {\"name\": \"physical_and_endpoint_update_accounting\",\n         \"physical_updates_per_order\": per_order, \"physical_updates_all_orders\": 3 * per_order,\n         \"score_points\": unique_points, \"retained_inference_models\": models,\n         \"cumulative_individual_fit_updates_by_stage\": endpoint_updates,\n         \"sequential_total_updates_through_stage\": endpoint_updates,\n         \"current_batch_edges\": 378, \"full_history_batch_edges\": 16,\n         \"history_to_current_per_edge_objective_coefficient\": 378 / 16,\n         \"status\": \"PASS\"}\n    ],\n    \"project_label_payload_reads\": 0,\n    \"formal_score_payload_reads\": 0,\n    \"model_payload_reads\": 0,\n    \"linux_connected_for_this_reaudit\": False,\n    \"scope\": \"Three targeted hand-data checks and 15 startup scientific pins. No new torch runtime or formal evaluation; existing real LaBSE and scheduler evidence is reused.\"\n}\nprint(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))\n\n'@ | python -B -",
+    "exit_code": 0,
+    "targeted_hand_checks_passed": 3,
+    "targeted_hand_checks_failed": 0,
+    "targeted_hand_checks_skipped": 0,
+    "note": "These are three targeted hand-data/arithmetic checks, not a rerun of three unit-test suites or a new Torch/GPU check."
+  },
+  "checks": {
+    "status": "LOCAL_TARGETED_REAUDIT_CHECKS_PASSED_NOT_FORMAL_EFFECT",
+    "checked_at": "2026-09-08T10:11:59.365451+08:00",
+    "environment": {
+      "python": "3.10.11",
+      "numpy": "2.2.6"
+    },
+    "scientific_files_match_startup": [
+      {
+        "path": "scripts/step28_continual_text_data.py",
+        "size_bytes": 11005,
+        "sha256": "2935246620156757cb6e7549d7d21ad814f6c54b36c86f3f4c9418785831c6f3"
+      },
+      {
+        "path": "scripts/step28_continual_text_run.py",
+        "size_bytes": 21398,
+        "sha256": "992b35ca7c346306a62323d57da9df32cf4a063f04429a655c57b9cbd5946fc1"
+      },
+      {
+        "path": "scripts/step28_continual_text_evaluate.py",
+        "size_bytes": 13319,
+        "sha256": "2dc58f9cb63e32ed4e232da524647394d0b181b08b84696b8f13391c9f4f7415"
+      },
+      {
+        "path": "tests/test_step28_continual_text_run_contracts.py",
+        "size_bytes": 22379,
+        "sha256": "7e1652201d2b7278fa0709805e4125843ddff0f7b63592ae9c74d2722d5afbc3"
+      },
+      {
+        "path": "tests/test_step28_continual_text_contracts.py",
+        "size_bytes": 17510,
+        "sha256": "a74fb5a91f30a3755f842421ccd91ab27a3a57b016d1ba12809a3443ed201625"
+      },
+      {
+        "path": "scripts/step28_continual_text.py",
+        "size_bytes": 24539,
+        "sha256": "a04868c223dba51f1e18d419ef0011424b99f3c3d6cf393f16cb9f7cc24ecea2"
+      },
+      {
+        "path": "scripts/step28_continual_text_check.py",
+        "size_bytes": 15066,
+        "sha256": "b186745498ffd59b13e9e8e04c4741e62675b5a89932df82c89020e610e95eb1"
+      },
+      {
+        "path": "scripts/step28_continual_core.py",
+        "size_bytes": 24480,
+        "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+      },
+      {
+        "path": "scripts/step28_continual_data.py",
+        "size_bytes": 8377,
+        "sha256": "7cfb8b03eaf058107bc7df4922928c0ca58515763dd3028e5777d49256e1b3b9"
+      },
+      {
+        "path": "scripts/step28_continual_evaluate.py",
+        "size_bytes": 17001,
+        "sha256": "de78cbe76c0f97a44a1faa032516515992f522396df82e68b92941e8a5225ec7"
+      },
+      {
+        "path": "scripts/step28_labse_finetune_common.py",
+        "size_bytes": 17279,
+        "sha256": "36ece13b687158d936c0d58569f2207f3a61638e472a9d190a3fbc1ea2617da2"
+      },
+      {
+        "path": "scripts/step7_authorship_common.py",
+        "size_bytes": 158058,
+        "sha256": "20aa8d5c94e21a067a7a987ba72e0a1af1b4fb265b9e115f5e16e6b0952efbc6"
+      },
+      {
+        "path": "schema/step28_continual_text_policy.json",
+        "size_bytes": 4682,
+        "sha256": "63bb8f1cf394ad8439b9acc2f79dd3584f28492d2fa99c01e981c78fba51a81f"
+      },
+      {
+        "path": "schema/step28_continual_policy.json",
+        "size_bytes": 4966,
+        "sha256": "f3aa29871f3b840265d53be2ab7706e48bf9053dbbd535d2457df03553a1c540"
+      },
+      {
+        "path": "schema/step28_continual_text_run_policy.json",
+        "size_bytes": 2332,
+        "sha256": "f602abcac997d5dda115bb349c2222ccd92be78cbbbaf1f483de7d1243ac9f5e"
+      }
+    ],
+    "checks": [
+      {
+        "name": "mixed_one_and_two_relevant_queries_with_ties",
+        "pairs": [
+          [
+            "a",
+            "b"
+          ],
+          [
+            "a",
+            "c"
+          ],
+          [
+            "a",
+            "d"
+          ],
+          [
+            "a",
+            "e"
+          ],
+          [
+            "b",
+            "c"
+          ],
+          [
+            "b",
+            "d"
+          ],
+          [
+            "b",
+            "e"
+          ],
+          [
+            "c",
+            "d"
+          ],
+          [
+            "c",
+            "e"
+          ],
+          [
+            "d",
+            "e"
+          ]
+        ],
+        "labels": [
+          1,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "logits": [
+          3,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -2,
+          1
+        ],
+        "query_ranking_reference": {
+          "a": [
+            "b",
+            "c",
+            "d",
+            "e"
+          ],
+          "b": [
+            "a",
+            "d",
+            "e",
+            "c"
+          ],
+          "c": [
+            "a",
+            "b",
+            "d",
+            "e"
+          ],
+          "d": [
+            "b",
+            "e",
+            "a",
+            "c"
+          ],
+          "e": [
+            "b",
+            "d",
+            "a",
+            "c"
+          ]
+        },
+        "expected": {
+          "map": 0.75,
+          "mrr": 0.8,
+          "recall_at_1": 0.3,
+          "recall_at_3": 0.9,
+          "recall_at_5": 1,
+          "recall_at_10": 1,
+          "ndcg_at_1": 0.6,
+          "ndcg_at_3": 0.7750013399816748,
+          "ndcg_at_5": 0.827814964496193,
+          "ndcg_at_10": 0.827814964496193
+        },
+        "actual": {
+          "map": 0.75,
+          "mrr": 0.8,
+          "recall_at_1": 0.3,
+          "recall_at_3": 0.9,
+          "recall_at_5": 1,
+          "recall_at_10": 1,
+          "ndcg_at_1": 0.6,
+          "ndcg_at_3": 0.7750013399816748,
+          "ndcg_at_5": 0.827814964496193,
+          "ndcg_at_10": 0.827814964496193
+        },
+        "status": "PASS"
+      },
+      {
+        "name": "rank_raw_logits_before_sigmoid_saturation",
+        "labels": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "logits": [
+          1000,
+          999,
+          -999,
+          -1000
+        ],
+        "expected_ap": 0.5833333333333334,
+        "actual_ap": 0.5833333333333333,
+        "ap_if_probabilities_wrongly_used_for_ranking": 0.5,
+        "status": "PASS"
+      },
+      {
+        "name": "physical_and_endpoint_update_accounting",
+        "physical_updates_per_order": 4600,
+        "physical_updates_all_orders": 13800,
+        "score_points": 42,
+        "retained_inference_models": 12,
+        "cumulative_individual_fit_updates_by_stage": [
+          200,
+          400,
+          600,
+          800,
+          1000
+        ],
+        "sequential_total_updates_through_stage": [
+          200,
+          400,
+          600,
+          800,
+          1000
+        ],
+        "current_batch_edges": 378,
+        "full_history_batch_edges": 16,
+        "history_to_current_per_edge_objective_coefficient": 23.625,
+        "status": "PASS"
+      }
+    ],
+    "project_label_payload_reads": 0,
+    "formal_score_payload_reads": 0,
+    "model_payload_reads": 0,
+    "linux_connected_for_this_reaudit": false,
+    "scope": "Three targeted hand-data checks and 15 startup scientific pins. No new torch runtime or formal evaluation; existing real LaBSE and scheduler evidence is reused."
+  }
+}

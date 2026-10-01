@@ -1,0 +1,100 @@
+{
+  "status": "LOCAL_COMPONENTS_IMPLEMENTED_REAL_TRAINING_CHECK_PENDING",
+  "date": "2026-09-07",
+  "files": [
+    {
+      "path": "scripts/step28_continual_text.py",
+      "size_bytes": 24539,
+      "sha256": "a04868c223dba51f1e18d419ef0011424b99f3c3d6cf393f16cb9f7cc24ecea2"
+    },
+    {
+      "path": "scripts/step28_continual_text_check.py",
+      "size_bytes": 14693,
+      "sha256": "7d1c861197d9640457ee560971601e45d27d336a863dc000f0fb76e085fd7844"
+    },
+    {
+      "path": "tests/test_step28_continual_text_contracts.py",
+      "size_bytes": 17357,
+      "sha256": "44ea49486c131835427923c08f0dddd177c6c687b54c7f409ac76312a56293e4"
+    },
+    {
+      "path": "schema/step28_continual_text_policy.json",
+      "size_bytes": 4682,
+      "sha256": "63bb8f1cf394ad8439b9acc2f79dd3584f28492d2fa99c01e981c78fba51a81f"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_TEXT_CORE.zh.md",
+      "size_bytes": 10761,
+      "sha256": "d775030d0a953aca13d549f028cf5925e795b490a848625d0df9422b20fd77e3"
+    }
+  ],
+  "unchanged_dependencies": [
+    {
+      "path": "scripts/step28_continual_core.py",
+      "size_bytes": 24480,
+      "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+    },
+    {
+      "path": "scripts/step28_labse_finetune_common.py",
+      "size_bytes": 17279,
+      "sha256": "36ece13b687158d936c0d58569f2207f3a61638e472a9d190a3fbc1ea2617da2"
+    },
+    {
+      "path": "scripts/step7_authorship_common.py",
+      "size_bytes": 158058,
+      "sha256": "20aa8d5c94e21a067a7a987ba72e0a1af1b4fb265b9e115f5e16e6b0952efbc6"
+    }
+  ],
+  "validation": {
+    "command": "python -B -m unittest discover -s tests -p test_step28_continual_text_contracts.py -v",
+    "discovered": 17,
+    "passed": 10,
+    "skipped_torch_unavailable": 7,
+    "failures": 0,
+    "errors": 0,
+    "syntax_files": [
+      "scripts/step28_continual_text.py",
+      "scripts/step28_continual_text_check.py",
+      "tests/test_step28_continual_text_contracts.py"
+    ],
+    "help_command": "python -B scripts/step28_continual_text_check.py --help",
+    "help_exit": 0,
+    "planned_updates_independently_recomputed": 13800
+  },
+  "scientific_limits": [
+    "No new project labels parsed, model loaded, Linux connection or formal trainer execution",
+    "PyTorch contracts and actual LaBSE backward/reload/capacity checks pending",
+    "Full project world loader, four-arm orchestration and complete score publication are not implemented",
+    "Random-priority prefix has cost-dependent inclusion; not uniform reservoir",
+    "No established forgetting, method advantage or real-Chinese validation"
+  ],
+  "historical_review_reused": "reports/seller_alias_continual/20260907/text_audit/review.json",
+  "local_decisions": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "kind": "preventive new-use requirements",
+      "affected_claim": "Retained history supplies all same-checkpoint model inputs and both losses train the text encoder",
+      "minimal_change": "Self-contained sparse edges, hierarchical pooling, differentiable first-arrival scaling and separated paired stochastic branches"
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "kind": "preventive new-use requirements",
+      "affected_claim": "Byte budget and subsequent model/optimizer/replay updates reproduce",
+      "minimal_change": "Explicit random-prefix storage accounting and full encoder/head/Adam/scaler/progress/cache state, with focused independent checks"
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "affected_claim": "Only new-representation internal continual comparison is proposed",
+      "disposition": "No new data, teachers, complex relation selector, extra arm matrix, old regression or infrastructure work"
+    }
+  ],
+  "linux_connected": false,
+  "project_label_reads": {
+    "train": 0,
+    "development": 0,
+    "qrels": 0,
+    "audit_a": 0,
+    "audit_b": 0
+  },
+  "web_review_status": "PENDING_SUBMISSION"
+}

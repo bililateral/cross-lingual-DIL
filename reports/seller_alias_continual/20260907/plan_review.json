@@ -1,0 +1,162 @@
+{
+  "date": "2026-09-07",
+  "status": "MAINLINE_SELECTED_RESEARCH_PLAN_REVIEW_COMPLETE_NO_EXPERIMENT",
+  "scope": "Research problem, reuse of existing qualified Chinese synthetic train/development data, phased plan, provisional defaults and correction rules. Documentation only.",
+  "user_direction": "Proceed with this research mainline, define the problem and detailed plan, and correct issues when discovered. User then asked whether to reuse or regenerate Chinese synthetic data.",
+  "data_decision": "Reuse existing V9.4.1 train/development records, labels and world/split structure; no new synthetic generation. This is the executor's initial plan in response to the data-source question.",
+  "conversation_url": "https://chatgpt.com/c/6a9e50ce-6084-83eb-9ef3-44f2727c69f3",
+  "reviewer": "Web ChatGPT GPT 6 Pro",
+  "reviewer_identity_evidence": "Visible selector displayed 6 / Pro before submission and after the final answer. This records UI identity, not an independent backend attestation.",
+  "submitted_at_utc": "2026-09-07 06:35:33 UTC",
+  "final_reply_observed_at_utc": "2026-09-07 06:41:53 UTC",
+  "submitted_document": {
+    "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+    "size_bytes": 32548,
+    "sha256": "187168b86d55b7c78e7a63576c478c00076460fa2c90a089644ea7544bb9f910"
+  },
+  "displayed_attachment_name": "SELLER_ALIAS_CONTINUAL.zh(1).md",
+  "displayed_name_note": "ChatGPT added a duplicate-attachment suffix; local file basename did not change. Reviewer reported matching the new attachment byte count and SHA-256.",
+  "prompt": "用户现已明确决定按“有限历史记忆下的中文暗网卖家马甲持续识别”推进，要求先明确研究问题与详细计划，发现问题及时纠偏；又追问数据来源，我们决定首轮直接复用原 V9.4.1 合格中文合成训练/开发数据，不重新生成。\n\n请审查本条消息新上传的唯一附件 SELLER_ALIAS_CONTINUAL.zh.md（32548 字节，SHA-256 187168b86d55b7c78e7a63576c478c00076460fa2c90a089644ea7544bb9f910），不要混用上条旧附件。上一轮你的完整原答复已回读并独立处置，原来的 BCE 可加性、共同锚点难度匹配、DER++、唯一到达、实际预算等补充已保留，不重复审核已关闭的旧实验。\n\n本次新增：明确 RQ1/2/3；采用既有中文数据的阶段式到达；五阶段执行计划及纠偏表；一个 512 KiB 历史状态预算、57→32→1 小头、候选优化日程和三个预定到达种子。这些是运行前可据输入/正确性证据调整的默认值，具体运行合同和实现尚未形成。新方法只改变记忆边联合入选，先独立边重放；不以此宣称新颖。\n\n请只审与新增计划有关的科学问题，约 1000—1600 中文字：\n1. 复用旧数据、保留世界完整，是否给出了合理而诚实的研究边界？同分布参照及条件性分布划分是否清楚？\n2. RQ、阶段顺序、总体 AP/旧保持/新学习评价、四臂公平性是否有使后续结论无效的遗漏？请区分“实施前仍需具体化”与“方案已经矛盾/错误”，不要把待定本身判成实现失败。\n3. 默认日程、第一阶段共享模型、记忆状态计量或后续成组选择，是否有需要现在明确的最小修正？\n4. 纠偏是否会变成追着开发结果改协议？哪些小范围纠偏合法，哪些结论需收窄？\n\n分类为 SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、OUT_OF_SCOPE_OVERDESIGN，接受建议须说明受影响结论和最小修改。若无已证实阻断直接说无，不为凑问题增加机制。请勿要求先承诺论文创新才允许做简单基线，也勿引导重新生成更容易出现遗忘的数据。已有有效负实验保持停止、Audit A/B 封存、Linux 必须先汇报并暂停；没有上传代码/标签，不能宣布实现通过。无需重复文献检索、引入新模型堆栈、大型超参数矩阵、额外审批或另一轮相同证据审查。你是咨询审查者，本地执行者独立做最终取舍。",
+  "reply_text": "已完整读取新附件，实测 32,548 字节，SHA-256 与你提供的值一致。**已证实的 SCIENTIFIC_BLOCKER：0 项。**下述复现补充是实施前需消除的歧义，不是已发生的实现失败。\n\n一、研究边界与推进顺序合理\n\n复用 V9.4.1、保持世界完整和身份隔离是合理起点；原数据质量资格不自动证明新到达协议有效。随机参照与有公开输入证据才采用的分布划分已经区分清楚。结论应继续限定为固定表示下、留出身份上的分布泛化保持，不等同于验证同一卖家跨批新增马甲的发现能力。\n\nSELLER_ALIAS_CONTINUAL.zh\n\nRQ1/2/3 没有内在矛盾，“先核验、四臂探索、再决定选择器”的顺序合理，不需要预先承诺创新。四臂足以回答首轮问题：冻结提供不更新参照，累计重训提供超预算效果／成本参照，无须强造等计算。\n\nSELLER_ALIAS_CONTINUAL.zh +1\n\n总体 AP、旧保持、新学习共同判断是正确的。57→32→1、五遍和学习率 0.001 均无已证实不合理；能否学会仍是待测假设，不能把默认值尚待核验判成错误。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n二、REPRODUCIBILITY_DEFECT：三处实施前最小补清\n\n**评价映射。**每个种子明确“到达阶段—训练组—开发组”映射；R 的 j 应按该顺序的到达位次索引，或显式使用首次到达时刻，不能置换后仍沿用固定组号的对角线。补 R[0,j] 供首阶段学习前后比较。分组不等大时，最终总体 AP 按世界数加权；现稿 BWT/F 是组等权，两种汇总不能混称。这影响 RQ1 和总体效果解释，不需增加指标。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n共享起点。将“第一阶段共享”落实为每个到达顺序内部共享，不能跨顺序搬用不同首批的模型。继续训练与 ER 的优化器状态须同口径继承或重置，不能只共享权重却让一臂延续 Adam 状态、另一臂清零。第一阶段只优化当前损失，可建立后续缓存；选样随机调用不能改变共同的新样本顺序。累计重训按现稿单独重置，其累计历史训练日程在比较前明确即可。否则会混入初始化／优化状态差异，而非记忆效果。\n\nSELLER_ALIAS_CONTINUAL.zh +1\n\n**特征纠偏的固定性。**纠偏表“按到达范围重算”应补明：同一开发边的特征值和预处理在阶段间固定。若依赖修复导致评价输入随阶段改变，退化就不能仅归于打分头遗忘。最小处理是形成符合到达边界的固定派生输入，而非训练中不断刷新评价输入；目前没有证据表明此问题已经发生。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n512 KiB 按现稿计量可复用历史状态即可，固定模型／优化器另报；它不是总运行内存上限。具体字段大小待序列化核验，不构成当前方案错误。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n三、纠偏不能变成筛选有利结果\n\n修正行键、未来统计依赖或数值错误合法，只重跑受影响比较；训练侧证据支持的统一日程／容量调整也可，但低开发 AP 本身不是容量不足证据。看过开发方法排名后再换顺序、预算、学习率或主对手，属于新的探索变体，不能以“纠偏”覆盖原结果，更不能包装成独立确认。现稿要求记录是否看过结果，应保留。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n无遗忘或 ER 已足够有效，应停止当前条件下的选择器扩展；结论是该固定表示与到达条件下未证明进一步方法需求，不是否定所有持续识别问题。三个顺序也只提供所选顺序的证据。\n\nSELLER_ALIAS_CONTINUAL.zh\n\n四、OUT_OF_SCOPE_OVERDESIGN\n\n首版已统一独立边重放，再增加“同一选中缓存独立重放一次”的副本对照已属重复，删除这项机械要求即可；不必因此加入成组损失或调度。\n\nSELLER_ALIAS_CONTINUAL.zh +1\n\n 无需扩大模型与基线矩阵、重复外审或增加审批机制。\n\n**取舍：保留计划，先做公开输入核验，不重造更易遗忘的数据。**未提供源码与标签，本审查不认定实现通过；旧有效负实验保持停止，Audit A/B 封存，Linux 仍须先汇报并暂停。",
+  "reply_links": [],
+  "previous_original_review_read": {
+    "path": "reports/seller_alias_continual/20260907/review.json",
+    "scope": "Full archived reply and dispositions read; prior actual visible web reply also reread in the same conversation. Prior receipt left unchanged."
+  },
+  "reviewer_reported_confirmed_scientific_blockers": 0,
+  "local_decisions": [
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PLAN_CLARIFIED_IMPLEMENTATION_PENDING",
+      "affected_claim": "Old/new performance and arrival-order comparison",
+      "finding": "Fixed group IDs cannot be used as arrival diagonals after group permutations; unequal group means are not equal-world aggregation.",
+      "minimal_remedy": "Save each order's stage/train/development mapping, index R by arrival position, include R[0,j], and weight final group AP by development world counts. BWT/F remain group-equal. Random cohorts do not define new/old domains.",
+      "independent_check": "For a group first seen at a different arrival position, its learned-stage reference must move with that position. Overall mean world AP is sum(n_j * group_AP_j)/sum(n_j)."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PLAN_CLARIFIED_IMPLEMENTATION_PENDING",
+      "affected_claim": "Memory effects separated from initialization and optimizer effects",
+      "finding": "Sharing weights alone or reusing a different order's first stage confounds comparison; sampler RNG calls can alter the supposedly common new-data order.",
+      "minimal_remedy": "Share first-stage weights, preprocessing and Adam state within each arrival order; sequential and ER inherit state consistently. Separate new-order, retention and replay RNG streams. Cumulative retraining resets separately as already specified.",
+      "independent_check": "Optimizer moment state affects the next update even with identical weights. Additional draws from one shared RNG alter later permutations; independent streams prevent that coupling."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "PLAN_CLARIFIED_NO_OBSERVED_INPUT_DEFECT",
+      "affected_claim": "Attributing score changes to the fixed-input head",
+      "finding": "Repairing future-dependent statistics by refreshing development features every stage would mix representation/input changes with head forgetting.",
+      "minimal_remedy": "Create a causal fixed derived input and preprocessing state for each arrival order; keep each development pair's feature values fixed across stages. Any dynamic representation study needs a separately stated claim.",
+      "independent_check": "If both input x_t and head h_t change, differences in h_t(x_t) cannot be attributed solely to head parameters."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "status": "FUTURE_BOUNDARY_CLARIFIED_NOT_AN_OBSERVED_FAILURE",
+      "affected_claim": "Finite historical memory for relation selection",
+      "finding": "Retrieving discarded old positive/negative partners from historical files would bypass the buffer.",
+      "minimal_remedy": "Generate groups only from current stage data and retained history; charge required indexes and historical selection state. No archive lookups to fill missing partners."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "status": "CLAIM_BOUNDARY_CLARIFIED",
+      "affected_claim": "Scientific corrections versus result-dependent protocol changes",
+      "finding": "Low development AP alone does not prove insufficient capacity; post-ranking parameter/order/budget changes cannot inherit the original comparison status.",
+      "minimal_remedy": "Use training-side correctness/fit evidence for capacity or schedule changes; preserve consumed-result history and old outcomes. Record post-result changes as new exploratory variants. Complete the fixed scoring trajectory before development-label evaluation."
+    },
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "status": "CLAIM_LIMITATION_DISCLOSED_NO_DATA_DEFECT",
+      "affected_claim": "Meaning of continual Chinese seller alias recognition",
+      "finding": "Whole-world arrivals do not directly simulate the same real seller creating a new alias in a later batch.",
+      "minimal_remedy": "Limit initial evidence to distribution-generalization retention on held-out identities under controlled synthetic arrival; do not claim cross-batch new-alias discovery or real-market validation."
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "REDUNDANT_CONTROL_REMOVED",
+      "affected_claim": "Selection versus replay scheduling attribution",
+      "finding": "The first selector already replays all retained edges independently, so another identical independent-replay control adds no intervention.",
+      "minimal_remedy": "Remove the unconditional duplicate run. Add same-edge scheduling control only if a later method actually introduces grouped batches.",
+      "independent_check": "With identical selected edges, weights, independent replay schedule and random seed, the proposed duplicate control has no experimental difference."
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "status": "SCORING_SCOPE_CLARIFIED_NO_OLD_RESULT_CHANGE",
+      "affected_claim": "Ranking-score consistency across historical and new experiment contracts",
+      "finding": "The discipline's raw-cosine sentence described the completed transfer model; the new fixed-feature pair head outputs a logit.",
+      "minimal_remedy": "Name the original transfer scope explicitly and define the new head's logit/probability convention in its own contract. Do not alter any old scoring policy, result or source-replay requirement."
+    }
+  ],
+  "independent_checks_before_final_reply": {
+    "recorded_at_utc": "2026-09-07 06:38:29 UTC",
+    "findings": [
+      {
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "claim": "Paired new-data exposure and common first-stage initialization",
+        "finding": "Replaying extra samples can consume a shared RNG and silently change current-data order. A shared first-stage model must include preprocessing and Adam state, not weights alone.",
+        "minimal_remedy": "Before execution specify independent RNG streams for new-order, selection and replay; clone the same complete first-stage scoring/optimizer state for applicable arms. This is a future implementation requirement, not an observed code failure."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "claim": "Fixed budget relation selection",
+        "finding": "Constructing common-anchor positive/negative groups by fetching discarded old adjacency or labels would bypass the stated memory budget.",
+        "minimal_remedy": "Generate candidate groups only from current authorized stage data and retained history; missing old edges cannot be recovered from archive for training."
+      },
+      {
+        "classification": "SCIENTIFIC_BLOCKER",
+        "claim": "Interpreting corrections without result-driven protocol drift",
+        "finding": "Model or grouping choices made after consuming method comparison metrics cannot inherit the original frozen comparison status.",
+        "minimal_remedy": "Preserve the completed comparison and consumption record; corrected modeling choices are a new exploratory comparison. Save the fixed full scoring trajectory before development-label evaluation, separating trainer and evaluator."
+      },
+      {
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "claim": "Scoring meaning under the newly selected pair-head research plan",
+        "finding": "The general discipline paragraph used the old transfer raw-cosine rule without naming its experiment, while the new fixed-feature binary head has a scalar logit.",
+        "minimal_remedy": "Clarify that old raw-cosine/source-replay requirements remain binding for the original transfer experiment; define the new pair-head ranking and probability scores in its own run contract. No old scores, metrics, policies or artifact bytes changed."
+      }
+    ],
+    "experiment_executed": false
+  },
+  "final_disposition": "Proceed next with local public-input and direct-dependency assessment. The mainline is selected; method novelty, meaningful forgetting and implementation correctness remain unestablished. No new data generation, formal comparison or Linux access occurred.",
+  "final_document": {
+    "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+    "size_bytes": 36473,
+    "sha256": "96e79a257f83081f5d2710aeb1ba2a440b98ca295a85b0b1b7950124bb9bae6d"
+  },
+  "changed_documents": [
+    "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+    "docs/AI_RESEARCH_HANDOFF.zh.md",
+    "docs/SELLER_ALIAS_IDEAS.zh.md",
+    "docs/RESEARCH_DISCIPLINE.zh.md",
+    "AGENTS.md"
+  ],
+  "public_metadata_check": {
+    "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+    "size_bytes": 2594,
+    "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2",
+    "matched": "schema/step28_train_development_execution_policy.json registered metadata",
+    "limit": "Publication manifest only; no fresh payload/dependency correctness conclusion."
+  },
+  "verification_scope": "Document UTF-8, local references, stated source metadata and final plan hash. No experimental test, training runtime or smoke is justified by this documentation-only change.",
+  "code_reading_scope": "Planning-only excerpts of step28_specialist.py and searches of public projection/dependency references; no new complete experiment implementation audit.",
+  "cleanup": {
+    "browser_tab_closed": true,
+    "temporary_directory": ".playwright-mcp",
+    "removed_files": 6,
+    "removed_file_bytes": 104478,
+    "temporary_directory_removed": true,
+    "helper_scripts_created": false,
+    "downloaded_paper_payloads_created": false
+  },
+  "boundaries": {
+    "new_training_label_reads": 0,
+    "new_development_label_reads": 0,
+    "audit_a_or_b_truth_reads": 0,
+    "account_or_pair_payload_reads": 0,
+    "training_or_new_data_generation": false,
+    "linux_connections": false,
+    "remote_resource_checks": false,
+    "file_synchronization": false,
+    "old_publication_artifacts_modified": false,
+    "old_valid_negative_results_preserved": true
+  }
+}

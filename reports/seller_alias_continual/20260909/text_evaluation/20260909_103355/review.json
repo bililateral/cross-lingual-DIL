@@ -1,0 +1,58 @@
+{
+  "status": "RESULT_EXTERNAL_REVIEW_AND_LOCAL_DISPOSITION_COMPLETE",
+  "date": "2026-09-09",
+  "reviewer": {
+    "url": "https://chatgpt.com/c/6aa0c7ec-991c-83eb-87df-4c5993ec2684",
+    "assistant_message_id": "4bb55965-8107-4443-9f82-1ba8266d4ca2",
+    "actual_model_slug": "gpt-6-pro",
+    "reply_text": "外审结论\n\n同意本地结论。当前配置 ER 是有效的、条件性的负结果；本轮证据不支持直接叠加复杂记忆选择器或扩大训练，但也不能据此否定所有持续识别方法。未发现足以改变这一解释的已证实错误。\n\n更明确地说：本轮完成了可信的四臂比较，但没有建立“存在独立旧关系遗忘，因此值得继续研发记忆方法”的证据链。\n\n实际阅读与复算范围\n\n压缩包 2,613,516 字节及 SHA-256 均与提交值一致。69 项有效文件逐项大小、哈希全部匹配，合计 10,954,302 字节；另有 review_scope.json，没有缺项或额外未列文件。\n\n我实际阅读了结果文档、三份冻结政策、文本运行器和评价器、相关指标与标签对齐函数，并解析了真实 manifest、完整 evaluation.json、执行／同步／运行日志及缓存和成本记录。独立计算覆盖：\n\n42 个 500×34 数组，共 714,000 个指标值，包括完整分类与检索指标的汇总。\n\n84 组混淆汇总、42,000 条逐世界混淆记录，并由计数重新计算对应分类指标。\n\n64 项总体／规则外 AP 对比及阶段区间，重新生成冻结抽样索引，以抽样频次加权及分位数插值复算。\n\n高精度逐世界均值复算最大差约 1.02×10⁻¹⁴，对比与区间最大差约 4.44×10⁻¹⁶，均为浮点舍入量级。完整结果见\n本轮独立复算记录。\n\n**没有重新训练、加载原模型、读取原逐边 logit 或项目私有标签，也没有从原始真值重算项目 AP。**42 点完整重放、12 模型发布及121项源文件回传的原载荷核验，属于附件代码与执行回执支持的事实，不冒充本次网页再次执行的验证。\n\nA．是否存在改变解释的具体错误？\n\nSCIENTIFIC_BLOCKER：0 项。\nREPRODUCIBILITY_DEFECT：0 项已证实缺陷。\nOUT_OF_SCOPE_OVERDESIGN：不提出新增要求；重跑旧 smoke、全仓回归、解封 Audit 或追加训练均不是本轮结论成立的必要条件。\n\n关键核查结果如下。\n\n运行和评价顺序闭合。step28_continual_text_evaluate.evaluate() 先完成公开来源与 validate_run()，再调用 aligned_labels()；validate_order() 检查实际点位、访问范围、呈现次数，并将 ER 的 history_before_training 与上一阶段缓存记录逐项回绑。我另行根据种子11／23／37生成世界排列，与 manifest 的阶段访问记录核对一致；物理更新合计确为13,800，点位42、保留推理模型记录12。随包15项科学文件也与运行、评价及CPU编排记录中的哈希一致。\n\n指标定义没有发现导致此次负结果的错误。curve_metrics()按原始分数排序并合并同分阈值，分别计算阶梯 AP 和梯形 PR-AUC；classification()在原 logit 上使用固定阈值0。retrieval()构建对称完整图、排除自身，按每查询相关账号数归一化；point_metrics()只在分类分层使用规则外掩码，检索仍接收完整图。这里不存在把规则外候选缩成检索库，或将 Recall@1 与 NDCG@1 混为同一定义的问题。\n\nstep28_continual_evaluate +2\n\n配对区间口径正确。summarize()产生同世界差值，paired_interval()先平均三个固定顺序，再重采样500个世界；没有把它们当成1,500个独立世界。区间条件于这些已保存模型和固定顺序，不能推广成覆盖全部训练随机性的区间；本地报告对此限制的表述正确。\n\nstep28_continual_evaluate\n\n上述缺失原载荷、开发集已消费等均是已经声明的证据边界，不是本轮新发现、必须靠重跑修复的错误。\n\nB．本地结论是否成立？\n主要负结果成立，不只是“没有显著提升”\n\n独立复算的最终世界等权、三顺序等权结果为：\n\n方法\t总体 AP\t规则外 AP\n首阶段后冻结\t0.853900063\t0.059231352\n继续训练\t0.855247139\t0.062290422\nER\t0.851997888\t0.056963744\n累计重训\t0.856250340\t0.064801038\n\nER−继续为 −0.003249250，即约 −0.325 个 AP 百分点，条件性95%区间为 [−0.004266568，−0.002272440]，三个顺序均负。规则外对应差为 −0.005326677，区间 [−0.009166989，−0.001282211]。\n\n因此，限定于本配置、这些模型和评价对象，可以说主要终点变差，而非仅说“收益未得到证明”。MAP、MRR以及所列全部截断 Recall／NDCG 的均值也低于继续训练，但它们只能作为描述性一致证据，不另行宣称显著性。\n\n没有建立独立遗忘，也没有建立明显的历史缺失瓶颈\n\n继续训练阶段5−阶段1为 +0.001347076，三个顺序均正；ER对应变化为 −0.001902175，区间 [−0.003061293，−0.000778093]。这支持“ER在固定开发集上终末退化”，不支持把该退化直接命名为旧关系遗忘，也不证明继续训练完全没有任何遗忘。现有评价没有把旧关系保持与新数据学习分开识别。\n\n累计−继续只有 +0.001003201，区间 [+0.000007115，+0.002010358]；规则外区间跨零。这是很小的条件性总体优势，不能说完全没有空间，也不能据此认定存在足以支撑复杂选择器研究的历史缺失瓶颈。多个次要区间未作多重比较校正，更不宜据其边界作强结论。\n\n高 AP、零阈值召回与文本贡献必须分开解释\n\n最终保存计数确实显示：强线索掩码覆盖 8,000／10,000 个正例，即80%；规则外仍有2,000个正例，而四臂最终模型在固定阈值0下的规则外 TP 均为0。\n\n这说明当前阈值下的正例识别集中在强线索部分，总体约0.85的 AP 不能充当困难马甲识别或历史保持已经有效的证据。但零阈值召回不是“毫无排序信息”，更不是“模型完全不利用文本”的证明；当前输入同时含数值与文本特征，不能从这些汇总识别各自贡献。上述计数本身也不足以判定标签泄漏或推翻已合格数据。\n\n缓存与成本解释正确，但不能单独归因\n\n实际用于阶段2–5训练的是阶段1–4缓存，确为 107–115条边、1–10条正例、518,637–524,260字节；阶段5最终缓存没有参与后续训练。\n\nByteMemory与train_update()对应的是变长随机优先级前缀，以及当前、历史两项均值 BCE 各权重1。满16条历史边时，23.625倍是单边目标系数比，不是实际梯度贡献必定相差该倍数。所以负结果属于缓存、权重与日程的联合效果，不能仅凭缓存正例少或重复呈现次数就确定损害原因。\n\nER本次 fit 计时确为继续训练的 1.650倍。累计最终模型与继续最终模型均经历1,000次更新，但累计整条轨迹为3,000次，且重置和顺序不同；本地不称“等计算”或“性能上界”是正确的。\n\n本轮同样不支持真实中文暗网效果外推，不建立论文方法创新，也不能把与旧固定特征实验的差异单独归因于编码器解冻。\n\nC．最强且诚实的继续／停止判断\n\n建议停止当前配置的直接效果扩展，保留并归档这次有效负结果。\n\n理由不是“持续识别已经被否定”，而是本轮同时出现了：预定 ER 对比为负、增加了实际成本、没有独立识别旧关系遗忘、累计优势又不足以建立明确的历史缺失瓶颈。这些证据不足以支持顺势增加选择器复杂度或扩大训练投入。\n\n既定主线可以保留为尚未获得充分支持的研究方向，但“尚未被否定”不等于“已有继续投入的依据”。本轮不自动换题，也不据负结果批准改数据、改到达机制、改预算或改评价。任何新的研究问题及实验变化仍须用户先确认，建议由本地执行者独立核查。\n\n最终判断：当前 ER 负结果成立；停止当前配置的直接扩展，不否定整个主线，也不把保留主线解释为下一轮实验已经获准。",
+    "links": []
+  },
+  "submission_record": "review_reupload.json",
+  "reviewed_scope": "review_scope.json",
+  "supplemental_artifact": {
+    "path": "external_verification.json",
+    "bytes": 65313,
+    "sha256": "bd9a48f9c30f486470d664bb0b1fb680cfac5ba1feefab7914b2405733271e6b",
+    "original_name": "text_result_independent_verification.json",
+    "read_scope": "All metadata, scope, limitations, classification, cache and costs read; complete structured numeric sections independently compared with local results."
+  },
+  "confirmed_findings": {
+    "SCIENTIFIC_BLOCKER": [],
+    "REPRODUCIBILITY_DEFECT": [],
+    "OUT_OF_SCOPE_OVERDESIGN": []
+  },
+  "local_disposition": {
+    "verdict": "Accept the conditional negative ER finding and stop direct expansion of this configuration; retain existing mainline as an unestablished research direction, not an approved next experiment.",
+    "basis": "Local frozen evaluation and independent arithmetic preceded the web review; the reviewer does not replace local judgement.",
+    "clarifications": [
+      {
+        "affected_claim": "Forgetting",
+        "decision": "Keep fixed-development trajectory interpretation; explicitly state it neither isolates old-relation forgetting nor proves its universal absence.",
+        "remedy": "Clarify result prose only; no endpoint, evaluation, data or model change."
+      },
+      {
+        "affected_claim": "Replay weighting",
+        "decision": "23.625 is the per-edge objective coefficient ratio, not a measured gradient ratio.",
+        "remedy": "Clarify result prose only; unchanged mean-BCE objective remains frozen."
+      }
+    ],
+    "preserve_negative_results": true,
+    "new_experiment_authorized": false,
+    "scientific_code_changes": [],
+    "additional_training_or_label_reads": 0
+  },
+  "session_scope": "User paused after reupload and resumed with 继续吧. This completes the already authorized result review, with no new Linux stage.",
+  "local_comparison_of_external_artifact": {
+    "status": "PASSED",
+    "numeric_values_compared": 809,
+    "maximum_error": 2.964295475749168e-14,
+    "reviewed_source_inventory_entries": 69,
+    "method": "Structured comparison of external final metrics, all AP contrasts/stage changes, trajectories, cache and confusion records, totals and timing ratios with existing local evaluation and summary; no new labels or training."
+  },
+  "reviewer_claimed_runtime": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41"
+  }
+}

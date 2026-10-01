@@ -1,0 +1,72 @@
+{
+  "status": "LOCAL_COMPONENT_CONTRACT_REQUIRES_REAL_TRAINING_CHECK_AND_FORMAL_RUNNER",
+  "scope": "exploratory_continual_chinese_seller_alias_identification_with_trainable_redacted_text",
+  "formal_runner_implemented": false,
+  "project_training_started": false,
+  "world_count": 500,
+  "stage_count": 5,
+  "worlds_per_stage": 100,
+  "order_seeds": [11, 23, 37],
+  "arrival_path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+  "arrival_sha256": "c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d",
+  "initialization_seed": 20260907,
+  "input_order": ["legacy18", "dynamic_redacted_labse6", "identity33"],
+  "numeric_input": "Untransformed published legacy18 and identity33; first-arrival imputation and scaling only",
+  "head": [57, 32, 1],
+  "head_activation": "ReLU",
+  "scaler": "Common original LaBSE in eval mode, before updates, only first-arrival public inputs; median fill and population mean/std fixed thereafter; float64 affine then float32 head",
+  "text_fields": ["title", "description"],
+  "text_deduplication": "Unique text per account and field; equal original-text weight. Share exact text encoding within one branch only.",
+  "chunking": "Existing single-LaBSE chunk_text_exact; exact character reconstruction; no maximum chunk count or truncation",
+  "token_budget": 256,
+  "chunk_batch_size": 4,
+  "forward_precision": "bfloat16 autocast encoder, float32 pooling and six aggregates",
+  "activation_checkpointing": {"use_reentrant": false, "preserve_rng_state": true},
+  "optimizer": {
+    "name": "AdamW",
+    "encoder_lr": 0.00002,
+    "encoder_weight_decay": 0.01,
+    "head_lr": 0.001,
+    "head_weight_decay": 0,
+    "betas": [0.9, 0.999],
+    "epsilon": 1e-8,
+    "foreach": false,
+    "combined_clip_norm": 1.0
+  },
+  "epochs_per_stage": 2,
+  "current_batch": "One complete K28 world, all 378 edges, one mean BCE",
+  "replay_maximum_edges": 16,
+  "replay_sampling": "Uniform without replacement among retained edges per update",
+  "loss": "mean_BCE(current) + mean_BCE(history); missing history contributes zero; sequential backward then one clip/update",
+  "memory_bytes": 524288,
+  "memory_selection": "Independent 64-bit random priority, arrival ordinal breaks ties; longest fitting prefix of the global random order, stop at first nonfitting edge. Cost-dependent inclusion, not uniform reservoir.",
+  "memory_record": "51 raw float64 values, one label byte, public endpoint IDs and full per-field unique redacted texts; no cross-edge deduplication",
+  "memory_accounting": "1024 actual serialized header bytes including padding and RNG/cutoff/stage state; 20 entry-header bytes plus each complete edge payload",
+  "memory_update": "Once in unique canonical current-edge order after completing each stage; only prior-stage memory may train",
+  "randomness": "Independent memory selection/replay RNG; stateless per-order/stage/epoch/step current/history dropout seeds. Current branch shape/order paired across sequential and ER.",
+  "four_arms": ["frozen", "sequential", "er", "cumulative"],
+  "state": "One physical first-stage fit per arrival order; sequential and ER inherit identical encoder/head/nonempty optimizer. Cumulative resets original encoder/head and empty AdamW at each arrived prefix for two epochs; same first-stage scaler.",
+  "planned_physical_updates": 13800,
+  "ranking_score": "raw_logit",
+  "threshold_logit": 0,
+  "development": "Fixed original 500-world candidate set; re-encode both endpoints at each changed checkpoint, publish/reload complete scores before separate Windows binary-label evaluation. Reuse unchanged metric functions; no qrels or Audit A/B reads.",
+  "claim_boundary": "Within-new-representation comparisons only; random same-source arrivals are not domains or real chronology. No sole-unfreezing attribution, established forgetting, new selector contribution or real-market validation.",
+  "labse_model": {
+    "path": "models/step7/embeddings/labse",
+    "file_count": 12,
+    "total_size_bytes": 1900941462,
+    "content_sha256": "391b10840ba616f47c4799f23ca5a0f511c7198bebfc9ba5927345f2b5fb8a21"
+  },
+  "public_texts": {
+    "train": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/train/observed/redacted_items.jsonl",
+      "size_bytes": 38586938,
+      "sha256": "a6adf412795da1b3c9b0db1a470e0adaca65ebf4b28bed3729e3fef94cc4c819"
+    },
+    "development": {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/development/observed/redacted_items.jsonl",
+      "size_bytes": 39178859,
+      "sha256": "c8df9cc7aa7b68203da07fda85f36bb00777d2521b1bdb86aceaaa6f9fbdc406"
+    }
+  }
+}

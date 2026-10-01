@@ -1,0 +1,160 @@
+{
+  "status": "COMPLETED_COMPONENT_CHECK_RETURN_VERIFIED_NO_FORMAL_EXPERIMENT",
+  "run_id": "20260907_181341",
+  "date": "2026-09-07",
+  "authorization": "User resumed the specifically reported Linux text component check with 继续吧; this scope includes resource inspection, stage file copies, the component check, result return and finalization. No formal four-arm execution.",
+  "research_claim": "Correctness and one observed capacity shape of trainable Chinese redacted-text continual/replay components; no forgetting, replay benefit, novelty or real-market claim.",
+  "environment_source": "check/runtime.json",
+  "resources_source": "resources.json",
+  "completion_source": "completion.json",
+  "input_sync": {
+    "file_count": 18,
+    "copied_count": 14,
+    "copied_bytes": 449823,
+    "reused_count": 4,
+    "manifest": "input_files.json",
+    "before": "sync_before.json",
+    "verified": "sync.json",
+    "method": "SFTP file copies; no Linux Git; original py310 and existing Linux LaBSE reused"
+  },
+  "command": {
+    "working_directory": "/home/yongpeng/cross-lingual",
+    "environment_activation": [
+      "source /home/yongpeng/miniconda3/etc/profile.d/conda.sh",
+      "conda activate py310"
+    ],
+    "bash": "(\nset -euo pipefail\nout=\"reports/seller_alias_continual/20260907/text_check/20260907_181341\"\nunset LD_LIBRARY_PATH LD_PRELOAD\nexport CUBLAS_WORKSPACE_CONFIG=:4096:8\nexport TOKENIZERS_PARALLELISM=false HF_HUB_OFFLINE=1\nexport TRANSFORMERS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1\nexport OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1\npython -B scripts/step28_continual_text_check.py --help > \"$out/command_help.log\"\ndate -Is > \"$out/started.txt\"\nset +e\n/usr/bin/time -v -o \"$out/resource_usage.log\" nice -n 10 python -u -B scripts/step28_continual_text_check.py check --output \"$out/check\" 2>&1 | tee \"$out/run.log\"\nstatuses=(\"${PIPESTATUS[@]}\")\nset -e\nprintf '%s\\n' \"${statuses[0]}\" > \"$out/exit_status.txt\"\nprintf '%s\\n' \"${statuses[1]}\" > \"$out/log_exit_status.txt\"\ndate -Is > \"$out/finished.txt\"\nprintf 'TEXT_CHECK_EXIT=%s LOG_EXIT=%s\\n' \"${statuses[0]}\" \"${statuses[1]}\"\nexit \"${statuses[0]}\"\n)\n"
+  },
+  "local_verification": {
+    "status": "PASSED_LOCAL_RETURN_VERIFICATION",
+    "return_files_verified_including_manifest": 15,
+    "return_bytes_including_manifest": 26692,
+    "input_files_verified": 18,
+    "runtime_source_pins_verified": 7,
+    "reviewed_final_files_matching": 8,
+    "contracts_passed": 17,
+    "contracts_skipped": 0,
+    "exact_flags_verified": [
+      "activation_checkpoint_loss_and_all_gradients_exact",
+      "encoder_and_head_updated",
+      "initial_scaler_encoder_unchanged",
+      "exact_medians_means_scales_reload",
+      "exact_nonempty_optimizer_reload",
+      "exact_raw_scores_reload",
+      "exact_subsequent_model_and_adam_update",
+      "temporary_checkpoint_removed"
+    ],
+    "stdout_matches_saved_runtime": true,
+    "temporary_state_absent": true,
+    "runtime_sha256": "8f6e989ef8404d0cd3bd00ec7dd83e5604a54b23aa23789ec191e4063a39b63b",
+    "return_manifest_sha256": "191bcb11ad40b1f6bc4d59c624f4b187b97c0794f52a2449473215218c3ad806",
+    "started": "2026-09-07T18:16:08+08:00",
+    "finished": "2026-09-07T18:17:05+08:00",
+    "capacity": {
+      "current_accounts": 28,
+      "current_chunks": 196,
+      "current_edges": 378,
+      "history_accounts": 32,
+      "history_chunks": 224,
+      "history_edges": 16,
+      "items": 297,
+      "loss_report": {
+        "current_bce": 0.6546379923820496,
+        "history_bce": 0.741350531578064,
+        "pre_clip_gradient_norm": 0.2518268823623657
+      },
+      "memory_bytes": 74293,
+      "numeric_and_labels": "hand-created verification values only",
+      "peak_cuda_allocated_bytes": 12696088064,
+      "peak_cuda_reserved_bytes": 14048821248,
+      "project_binary_labels_read": 0,
+      "public_worlds": [
+        "v9_4_1_formal_500x4_train_world_000",
+        "v9_4_1_formal_500x4_train_world_001",
+        "v9_4_1_formal_500x4_train_world_002"
+      ],
+      "scope": "one public current-world shape; not worst-case or formal dataset validation",
+      "update_seconds": 7.027281173039228
+    },
+    "full_process_peak_rss_kib": 8035972,
+    "full_process_wall_seconds": 57.36,
+    "interpretation": "one checked component path and one observed capacity shape; no formal continual experiment or project truth parsed"
+  },
+  "external_review": {
+    "path": "reports/seller_alias_continual/20260907/text_core/review.json",
+    "sha256": "6a513bc4296eb6d6ea3eb5f87383fa92acdce27cacadba3526557fa6293e47e6",
+    "conversation_url": "https://chatgpt.com/c/6a9e50ce-6084-83eb-9ef3-44f2727c69f3",
+    "reused": true,
+    "repeated": false,
+    "reason": "Reviewed post-fix code/test/policy bytes matched; this turn adds execution evidence and documentation only."
+  },
+  "implementation_changes": [],
+  "scientific_scope": {
+    "project_binary_train_label_reads": 0,
+    "project_binary_development_label_reads": 0,
+    "qrels_reads": 0,
+    "audit_a_truth_reads": 0,
+    "audit_b_truth_reads": 0,
+    "public_train_text_file_hashed": true,
+    "public_text_items_in_capacity_fixture": 297,
+    "capacity_fixture_supervision": "hand-created numeric and binary values only",
+    "formal_experiment_started": false,
+    "full_runner_implemented": false,
+    "worst_case_capacity_verified": false,
+    "full_512_kib_memory_capacity_tested": false
+  },
+  "gradient_coverage_note": {
+    "observed_parameters_with_gradient_per_encoder_branch": 470926848,
+    "observed_parameters_without_gradient_per_encoder_branch": 590592,
+    "observed_head_parameters_with_gradient": 1889,
+    "observed_head_parameters_without_gradient": 0,
+    "read_only_postrun_sources": [
+      "existing Linux models/step7/embeddings/labse/config.json",
+      "existing Linux models/step7/embeddings/labse/modules.json",
+      "existing Linux models/step7/embeddings/labse/1_Pooling/config.json",
+      "installed sentence_transformers.models.Transformer.forward",
+      "installed transformers.models.bert.modeling_bert.BertPooler"
+    ],
+    "observed_cls_pooling": true,
+    "observed_hidden_size": 768,
+    "pooler_dense_parameter_count": 590592,
+    "interpretation": "The absent count matches BERT pooler size and the sentence token-embedding route; this is a structure-based inference, not a saved parameter-name gradient inventory. Do not claim every encoder parameter participates."
+  },
+  "cleanup": {
+    "temporary_checkpoint_bytes": 5653774793,
+    "temporary_checkpoint_removed": true,
+    "remote_temporary_state_scan_empty": true,
+    "local_return_temporary_state_scan_empty": true,
+    "task_specific_helper_script_files_created": 0,
+    "new_browser_or_review_upload_files": 0,
+    "shared_system_or_environment_modified": false,
+    "other_user_processes_or_files_modified": false,
+    "check_process_remaining": false,
+    "gpu_compute_processes_after_run": []
+  },
+  "next_step": "Locally implement and audit complete world loading, shared first stage / four-arm orchestration, all development score publication and independent evaluation. Reuse the passing core check. Before the next distinct Linux stage, report its concrete need and pause.",
+  "synchronization_finalization": "Current execution record and four updated research documents are copied and verified under final_files.json; final_sync.json is the independent Linux receipt returned to Windows. These receipts contain no credentials.",
+  "recorded_at": "2026-09-07T18:22:20.971681+08:00",
+  "updated_document_files": [
+    {
+      "path": "AGENTS.md",
+      "size_bytes": 44256,
+      "sha256": "d900684aeb072d4adbe64b57a09ea4113807b5e4e595700c279a36e30a8f5f92"
+    },
+    {
+      "path": "docs/AI_RESEARCH_HANDOFF.zh.md",
+      "size_bytes": 149064,
+      "sha256": "fc0e5b442cb65f9ba48e88fd03de9845e5a2caf2ff58f65fbe4f59601df25a4b"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CONTINUAL.zh.md",
+      "size_bytes": 38078,
+      "sha256": "75f215b070bd321875b8e6056253bbc530d8e090d34f302dc14917079bf7bbc5"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_TEXT_CORE.zh.md",
+      "size_bytes": 15525,
+      "sha256": "7255e5de1555799f17bf22978817cd317c4a449ab47cf39cf9b8733430af6e5a"
+    }
+  ]
+}

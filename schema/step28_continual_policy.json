@@ -1,0 +1,108 @@
+{
+  "status": "IMPLEMENTED_COMPARISON_REQUIRES_REAL_ORCHESTRATION_CHECK",
+  "research_scope": "exploratory_fixed_feature_random_whole_world_continual_alias_identification",
+  "world_count": 500,
+  "sellers_per_world": 28,
+  "positive_pairs_per_world": 20,
+  "feature_count": 57,
+  "stage_count": 5,
+  "order_seeds": [
+    11,
+    23,
+    37
+  ],
+  "epochs": 5,
+  "batch_size": 256,
+  "memory_bytes": 524288,
+  "initialization_seed": 20260907,
+  "threshold_logit": 0,
+  "threshold_rule": "Unfitted logit >= 0 (probability >= 0.5) for all stages and arms, including stage zero.",
+  "cumulative_schedule": "At each stage reset original initialization and fresh Adam, train arrived prefix for five epochs; keep first-stage preprocessing.",
+  "history_boundary": "Offline benchmark packaging may read train truth once; method worksets include current worlds only, except the explicitly unbudgeted cumulative control. ER retains only its byte-budgeted records and RNG state.",
+  "bootstrap_seed": 20260907,
+  "bootstrap_replicates": 2000,
+  "no_strong_identity_columns": [
+    0,
+    19
+  ],
+  "no_strong_definition": "Neither verified_direct_token_count_log1p nor strong_rotation_path_count_log1p is positive.",
+  "primary_metric": "final_development_world_equal_average_precision",
+  "primary_comparison": "er_minus_sequential",
+  "public_files": {
+    "train_base": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/train/base24.npy",
+      "size_bytes": 36288128,
+      "sha256": "74c5f28ab835256ca87f31b1e2f60137f5ed616ce82a49c4ae8ddf2a52f9b306"
+    },
+    "train_identity": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/train/identity33.npy",
+      "size_bytes": 49896128,
+      "sha256": "77e6b75b1d475258b0e6815d4ccf42ff01c97e2140039e20c1215b989a105052"
+    },
+    "train_rows": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/train/row_keys.csv",
+      "size_bytes": 43617502,
+      "sha256": "ced16cac64e6b3ee10387a824080aec30b785abd083bcad6a1683a500001acdc"
+    },
+    "train_identity_rows": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/train/row_keys.csv",
+      "size_bytes": 43617502,
+      "sha256": "ced16cac64e6b3ee10387a824080aec30b785abd083bcad6a1683a500001acdc"
+    },
+    "development_base": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/base24.npy",
+      "size_bytes": 36288128,
+      "sha256": "ebe23d2cc22ca4a62ab0a239e762c40d80f93ceb0600d71d62b832baaf982458"
+    },
+    "development_identity": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/identity33.npy",
+      "size_bytes": 49896128,
+      "sha256": "eb00f256a7a9cdece055df1693ccbf8f7f5ede2a231ac36fb316cb1c69040fd0"
+    },
+    "development_rows": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    "development_identity_rows": {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    "feature_policy": {
+      "path": "schema/step28_model_experiment_policy.json",
+      "size_bytes": 26380,
+      "sha256": "a473624feec04efd024a4334815fa854b6ec4023b88bf21c709a6c5dccf61a9e"
+    }
+  },
+  "arrival": {
+    "path": "reports/seller_alias_continual/20260907/inputs/arrival.json",
+    "size_bytes": 23185,
+    "sha256": "c2a3382f30bf7af1315c5581a68553dd05177dad98e6b7ccdc8faf7ae106ab1d"
+  },
+  "input_audit": {
+    "path": "reports/seller_alias_continual/20260907/inputs/inputs.json",
+    "size_bytes": 62472,
+    "sha256": "c41a97364731eae89b0afbba20276ae0ee9100f88dfa929c24547c77d832463b"
+  },
+  "core_code": {
+    "path": "scripts/step28_continual_core.py",
+    "size_bytes": 24480,
+    "sha256": "7e1a567b582eff7c65c778b7746055d7c5bd98631345c70e768aa79068f84dcc"
+  },
+  "core_runtime": {
+    "path": "reports/seller_alias_continual/20260907/cpu_check/20260907_153806/runtime.json",
+    "size_bytes": 1784,
+    "sha256": "4bfa795a5719778e2152a943770261be44de4c9667ccf58119a9f2f4e796576f"
+  },
+  "train_labels": {
+    "path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829/train/pair_labels.csv",
+    "size_bytes": 24759035,
+    "sha256": "1a7e7c544b86dc67fe96426b6c9eced7c7ac889350e6f793bf0d9e9ff4e7fa82"
+  },
+  "development_labels": {
+    "path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829/development/pair_labels.csv",
+    "size_bytes": 28161035,
+    "sha256": "96ab368eede0f15a58368684eeba6037083d5b0c3cb14a06ece8d8627a4ee45a"
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "status": "COMPLETED_CPU_TEXT_ORCHESTRATION_CHECK_AND_WINDOWS_RETURN_AUDIT",
+  "run_id": "20260907_194523",
+  "authorization": {
+    "user_resumption": "现在继续",
+    "scope": "Previously reported CPU-only py310 orchestration check, shared-resource inspection, necessary input copies, result return and final documentation synchronization.",
+    "formal_gpu_training_authorized_by_this_step": false
+  },
+  "command": {
+    "environment_activation": "source /home/yongpeng/miniconda3/etc/profile.d/conda.sh\nconda activate py310",
+    "working_directory": "/home/yongpeng/cross-lingual",
+    "bash": "(\nset -euo pipefail\nout=\"reports/seller_alias_continual/20260907/text_orchestration/20260907_194523\"\ntest -d \"$out\"\ntest ! -e \"$out/check.json\"\nunset LD_LIBRARY_PATH LD_PRELOAD\nexport CUDA_VISIBLE_DEVICES=\"\"\nexport PYTHONDONTWRITEBYTECODE=1 TOKENIZERS_PARALLELISM=false\nexport HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1\nexport OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1\npython -B scripts/step28_continual_text_run.py --help > \"$out/command_help.log\"\ndate -Is > \"$out/started.txt\"\nset +e\n/usr/bin/time -v -o \"$out/resource_usage.log\" nice -n 10 python -u -B scripts/step28_continual_text_run.py check --output \"$out/check.json\" 2>&1 | tee \"$out/run.log\"\nstatuses=(\"${PIPESTATUS[@]}\")\nset -e\nprintf '%s\\n' \"${statuses[0]}\" > \"$out/exit_status.txt\"\nprintf '%s\\n' \"${statuses[1]}\" > \"$out/log_exit_status.txt\"\ndate -Is > \"$out/finished.txt\"\nprintf 'TEXT_ORCHESTRATION_EXIT=%s LOG_EXIT=%s\\n' \"${statuses[0]}\" \"${statuses[1]}\"\nexit \"${statuses[0]}\"\n)\n"
+  },
+  "resources": {
+    "preflight": "resources.json",
+    "process_ownership_inspected": true,
+    "execution_device": "cpu",
+    "torch_threads": 1,
+    "nice": 10,
+    "wall_seconds": 21.05,
+    "user_cpu_seconds": 20.62,
+    "system_cpu_seconds": 0.42,
+    "peak_rss_kib": 816120,
+    "swaps": 0,
+    "start": "2026-09-07T19:49:41+08:00",
+    "finish": "2026-09-07T19:50:02+08:00",
+    "exit_status": 0,
+    "log_exit_status": 0,
+    "shared_environment_or_other_users_jobs_modified": false
+  },
+  "synchronization": {
+    "method": "Native OpenSSH SFTP file copies; no Linux Git",
+    "input_manifest": "input_files.json",
+    "input_manifest_sha256": "716d31fc40ad8b878172e8ef9827fc1ba221c99cfb106fb709370a25ef13e510",
+    "required_file_count": 24,
+    "required_bytes": 692744,
+    "copied_file_count": 13,
+    "copied_bytes": 397652,
+    "reused_file_count": 11,
+    "reused_bytes": 295092,
+    "before_receipt": "sync_before.json",
+    "input_match_receipt": "sync.json",
+    "return_manifest": "return_files.json",
+    "return_manifest_sha256": "7eb2c81bf973e29410c5dbd8ca20e78b9312d32e7b36a10244cc7af5d0980d99",
+    "returned_files_including_manifest": 14,
+    "returned_bytes_including_manifest": 37164,
+    "documentation_finalization_manifest": "final_files.json",
+    "documentation_finalization_receipt": "final_sync.json"
+  },
+  "result": {
+    "check": "check.json",
+    "check_sha256": "d62dee077423f7df6691dc84f55c108d2cc50a73e30473bebcbb63a99ebc84fb",
+    "status": "PASSED_REAL_CPU_TEXT_ORCHESTRATION_CHECK",
+    "hand_train_worlds": 5,
+    "hand_development_worlds": 2,
+    "train_world_order": [
+      3,
+      0,
+      4,
+      1,
+      2
+    ],
+    "physical_updates": 46,
+    "complete_state_and_full_development_reloads": 14,
+    "inference_models_saved_and_actually_loaded": 4,
+    "fixture_memory": {
+      "seen_unique_rows": 1890,
+      "last_stage": 5,
+      "records": 10,
+      "positive_records": 1,
+      "retained_accounts": 19,
+      "total_bytes": 7606,
+      "sha256": "f5bf085bc3fe1960f300e6dabea401f9ef7ddefef728907453a40d5d03ed0dbc",
+      "budget": 8192
+    },
+    "formal_memory_budget_bytes": 524288,
+    "formal_memory_budget_exercised": false,
+    "project_binary_labels_read": 0,
+    "qrels_or_audit_truth_read": 0,
+    "labse_or_other_project_model_payloads_loaded": 0,
+    "formal_training_started": false
+  },
+  "verification": {
+    "status": "PASSED_INDEPENDENT_WINDOWS_RETURN_AUDIT",
+    "checked_at": "2026-09-07T19:56:29.715358+08:00",
+    "run_id": "20260907_194523",
+    "return_manifest_sha256": "7eb2c81bf973e29410c5dbd8ca20e78b9312d32e7b36a10244cc7af5d0980d99",
+    "check_sha256": "d62dee077423f7df6691dc84f55c108d2cc50a73e30473bebcbb63a99ebc84fb",
+    "verified_return_files": 14,
+    "verified_return_bytes": 37164,
+    "input_files_verified_before_document_finalization": 24,
+    "input_bytes": 692744,
+    "code_policy_test_files_verified": 15,
+    "all_code_matches_pre_run_and_current_bytes": true,
+    "copy_count": 13,
+    "copy_bytes": 397652,
+    "reused_count": 11,
+    "reused_bytes": 295092,
+    "independent_checks": [
+      "All 13 return manifest records and the independently pinned manifest match local bytes; exactly 14 returned files.",
+      "All 24 pre-run inputs match the Linux preflight, post-copy manifest and Windows bytes before documentation finalization.",
+      "All 15 code/policy/test records match the original inputs and unchanged local files.",
+      "Hand-reconstructed stage access scopes, exact world order, update counts and trajectory mappings match.",
+      "Every progress log line matches the independent expected 46-update, 14-point, 4-model schedule.",
+      "Exit files, check/completion agreement, runtime timestamps and OS time/RSS record agree.",
+      "Fixture memory observations fit the 8192-byte hand-fixture budget; no retained model/temporary payload is returned.",
+      "Completion reports no newly created owned text_orchestration temporary directories and no GPU compute processes."
+    ],
+    "boundary": "Receipt, schedule and return-byte audit; the production check itself performed numerical full-state/score replay. No rerun or independent recovery of deleted temporary models is claimed.",
+    "current_project_label_reads": 0,
+    "current_model_payload_reads": 0,
+    "formal_training_started": false
+  },
+  "reused_evidence": {
+    "external_review": {
+      "path": "reports/seller_alias_continual/20260907/text_run/review.json",
+      "sha256": "f0e807e80ed44a16c97ffaa06c63af1dc2c05b27a9651c767e6d9c4ee9226c3c",
+      "actual_reviewer": "web ChatGPT GPT 6 Pro",
+      "original_record_unchanged": true
+    },
+    "real_labse_core_runtime": {
+      "path": "reports/seller_alias_continual/20260907/text_check/20260907_181341/check/runtime.json",
+      "sha256": "8f6e989ef8404d0cd3bd00ec7dd83e5604a54b23aa23789ec191e4063a39b63b",
+      "rerun": false
+    },
+    "previous_local_contracts": {
+      "total": 14,
+      "passed": 13,
+      "skipped_missing_torch": 1
+    },
+    "new_execution": "One real production-check CLI invocation in project py310 closes the previous orchestration-runtime gap. This is not a Linux 14/14 unittest execution.",
+    "code_policy_or_test_changes_in_this_step": false,
+    "new_external_review_required": false
+  },
+  "cleanup": {
+    "new_owned_linux_temporary_directories_remaining": [],
+    "fixture_model_optimizer_and_label_payloads_retained": false,
+    "task_scripts_created_in_project": false,
+    "prior_outside_repository_browser_temp": {
+      "directory": "C:/Users/35734/AppData/Local/Temp/seller_alias_text_review_20260907",
+      "files": 7,
+      "total_bytes": 149832,
+      "status": "PENDING_PREVIOUS_AUTOMATIC_APPROVAL_REJECTION",
+      "reason": "blocked by policy",
+      "note": "Both earlier recursive and explicit-file removal attempts were rejected before execution. No new deletion retry or alternative tool workaround in this step."
+    }
+  },
+  "scientific_boundary": "The hand-created CPU fixture verifies the new production orchestration and full-state/score replay under the original Python environment. The earlier actual LaBSE component result remains separate evidence. Neither establishes formal full-dataset success, forgetting, replay benefit or performance on real Chinese darknet aliases.",
+  "next_stage": {
+    "status": "REPORTED_AND_PAUSED_BEFORE_ANY_NEW_SERVER_USE",
+    "purpose": "Run the unchanged trainable Chinese-text frozen/sequential/ER/cumulative comparison on existing qualified train/development data.",
+    "environment": "Existing py310 and existing models/step7/embeddings/labse/",
+    "orders": [
+      11,
+      23,
+      37
+    ],
+    "stages_per_order": 5,
+    "train_worlds": 500,
+    "development_worlds": 500,
+    "physical_updates": 13800,
+    "full_development_score_points": 42,
+    "retained_inference_models": 12,
+    "gpu": "One shared BF16-capable GPU, at least 24 GiB free at startup; inspect ownership/resources after user resumes and wait if insufficient.",
+    "disk": "Estimated 22.6 GB retained inference payloads plus about 13.2 GB transient states, scores and ordinary overhead; reserve at least 40 GiB available project/scratch disk. This is a planning allowance, not measured peak.",
+    "runtime": "Long-running; no reliable duration inferred from the one previous 7.027-second ER update. Full data encoding, 84 complete development passes and state I/O add workload.",
+    "boundary": "After resumption: verify required input copies/hashes and resources, run the already reviewed command without repeated unchanged checks, monitor, copy results back, independently evaluate and finalize. Train/development binary labels each parsed once in their authorized stage; qrels and Audit A/B remain sealed. No environment changes or other-user interventions."
+  }
+}
