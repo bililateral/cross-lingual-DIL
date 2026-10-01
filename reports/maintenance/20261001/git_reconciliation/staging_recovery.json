@@ -1,0 +1,8 @@
+{
+  "scope": "02_custody",
+  "stage": "local_git_staging",
+  "first_attempt": "git add -A staged all 389 planned changes, then returned an ignored-directory warning for historical tracked deletions under release_inputs.",
+  "verification": "The index was empty before this attempt. Afterwards the 389 staged paths exactly matched this scope. The named release_inputs paths were already tracked old names, absent from the worktree; no new ignored payload was staged.",
+  "remedy": "Resume only this exact staged scope, verify all current blob/LFS identities and absent deletions, then commit. No force-add, reset, remote push or scientific execution.",
+  "scope_receipt": "commits/02_custody.json"
+}
