@@ -1,0 +1,25 @@
+{
+  "status": "VERIFIED_ISOLATED_DRIVER_FAILURE",
+  "files": {
+    "diagnosis.json": {
+      "bytes": 5656,
+      "sha256": "456369d64b01cc2c174d3cfa137238f9e80ae1a778bf5ecd9ed937e6c067e321"
+    },
+    "isolation.json": {
+      "bytes": 7717,
+      "sha256": "77d73217bbc3f7ceb7bb49530d8c2d0743a696588c6587e1e92e34e6d9a3d2ce"
+    }
+  },
+  "findings": [
+    "All three fresh-process Torch probes return available=false with Error804.",
+    "Direct CUDA driver initialization without Torch or project imports returns804.",
+    "Loaded libcuda and NVML are580.178.04; loaded kernel module is580.173.02.",
+    "Activated and launcher environments yield identical failure and mapped CUDA libraries."
+  ],
+  "limits": [
+    "No driver repair or causal repair intervention; do not identify who changed packages or when.",
+    "Initial diagnostic child-code string quoting failed before imports; corrected probe code compiled before execution; both records retained.",
+    "No training, models, formal data, labels, shared environment changes or temporary helper scripts."
+  ],
+  "ssh_closed": true
+}

@@ -1,0 +1,39 @@
+{
+  "status": "REVIEW_COMPLETE_READY_FOR_REPORTED_LINUX_STAGE_USER_RESUMPTION_REQUIRED",
+  "url": "https://chatgpt.com/c/6aa50c2a-de18-83e9-b5d5-a33a838a910b",
+  "reply_id": "8e6b1e2a-d9bd-4a9c-9d92-d335ef1af29d",
+  "actual_model_slug": "gpt-6-pro",
+  "full_reply_personally_read": true,
+  "evidence": ["review_reply.json", "external_evidence.zip", "verification.json"],
+  "scientific_blockers": [],
+  "disposition": [{
+    "id": "R1",
+    "class": "REPRODUCIBILITY_DEFECT",
+    "blocking": false,
+    "confirmed": true,
+    "affected_claim": "Budget.state alone does not cover outer Bash logs, late receipts or complete process duration.",
+    "local_evidence": "Read Budget, run finalization and full Bash launcher; actual hand fixture observes 9-byte run within 11-byte cap but 12-byte whole job, and omits a subsequent 4-byte receipt.",
+    "remedy": "Document reporting scope now; after execution, sum every final job file, separate outer logs and late receipts, use outer timestamps/resource_usage.log/exit_status.txt for complete duration, retain observed coexistence records. Never call final footprint or sampled maximum an exact transient peak.",
+    "status": "REPORTING_REQUIREMENT_DOCUMENTED_ACTUAL_RUN_RECEIPT_PENDING"
+  }],
+  "clarifications": [
+    "Torch test uses approximate parameter comparison against independent loss-sum reference (rtol=1e-6, atol=1e-7); exact model and Adam digests are against unchanged core.update.",
+    "maximum_history_bytes covers ER stage start/draws; insertion intermediate states are capped but not folded into that recorded maximum.",
+    "External 20 unique tests include the separately reported Torch test; do not count 21 or claim the original 28 local tests were all rerun.",
+    "Downloaded external logs were verified; no local Torch or production CUDA execution is claimed."
+  ],
+  "source_changes": false,
+  "new_formal_label_parses": 0,
+  "linux_connected": false,
+  "next_linux_stage": {
+    "purpose": "Run approved random complete-group ER baseline on fixed expression data and original LaBSE; independently evaluate valid on Windows after complete gate.",
+    "inputs": "Approved runner/policy/tests/launcher, existing expression train and valid public inputs, one authorized train binary parse, pinned original manifests and saved scores/metrics, existing LaBSE.",
+    "updates": 1620,
+    "orders": ["ABC", "BCA", "CAB"],
+    "memory": "6 complete groups and 1MiB total active history state",
+    "resources": "One inspected idle GPU (at least 24GiB free VRAM), one CPU compute thread, at least 16GiB available host RAM; output cap16GiB, timeout3h.",
+    "estimate": "Training55-75min; complete process75-110min; actual times must be reported.",
+    "pre_supervision_check": "One actual tiny CPU Torch case, pass1 skip0; no extra LaBSE smoke.",
+    "authorization": "Configuration approved; new Linux stage reported and paused before connection/probe/sync, awaiting user resumption."
+  }
+}

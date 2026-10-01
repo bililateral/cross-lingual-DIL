@@ -1,0 +1,100 @@
+{
+  "started_at": "2026-09-13T17:18:03.504610",
+  "python": "/home/yongpeng/miniconda3/envs/py310/bin/python",
+  "scope": "Device enumeration and library inspection only; no training, data, model, system or environment mutation",
+  "loaded_driver": "NVRM version: NVIDIA UNIX Open Kernel Module for x86_64  580.173.02  Release Build  (dvs-builder@U22-I3-AK02-24-4)  Tue Jun 23 08:17:01 UTC 2026\nGCC version:  gcc version 12.3.0 (Ubuntu 12.3.0-1ubuntu1~22.04.3) \n",
+  "gpu": {
+    "command": [
+      "nvidia-smi",
+      "--query-gpu=index,name,memory.free",
+      "--format=csv"
+    ],
+    "exit_code": 18,
+    "stdout": "Failed to initialize NVML: Driver/library version mismatch\nNVML library version: 580.178\n",
+    "stderr": ""
+  },
+  "gpu_processes": {
+    "command": [
+      "nvidia-smi",
+      "--query-compute-apps=pid,process_name,used_memory",
+      "--format=csv"
+    ],
+    "exit_code": 18,
+    "stdout": "Failed to initialize NVML: Driver/library version mismatch\nNVML library version: 580.178\n",
+    "stderr": ""
+  },
+  "own_processes": {
+    "command": [
+      "ps",
+      "-u",
+      "1014",
+      "-o",
+      "pid,comm"
+    ],
+    "exit_code": 0,
+    "stdout": "    PID COMMAND\n  77665 sshd\n  77666 bash\n  77692 python\n  77697 ps\n3375057 systemd\n3375058 (sd-pam)\n3375066 pipewire\n3375067 pipewire-media-\n3375069 user-session-he\n3375079 dbus-daemon\n3375162 xdg-document-po\n3375166 xdg-permission-\n3375460 code-08d4889f9e\n",
+    "stderr": ""
+  },
+  "relevant_environment": {
+    "LD_LIBRARY_PATH": null,
+    "LD_PRELOAD": null,
+    "CUDA_VISIBLE_DEVICES": null,
+    "CUDA_HOME": null,
+    "PYTORCH_NVML_BASED_CUDA_CHECK": null,
+    "CONDA_PREFIX": "/home/yongpeng/miniconda3/envs/py310"
+  },
+  "ldconfig": {
+    "command": [
+      "/sbin/ldconfig",
+      "-p"
+    ],
+    "exit_code": 0,
+    "stdout": "\tlibnvidia-ml.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libnvidia-ml.so.1\n\tlibnvidia-ml.so.1 (libc6) => /lib/i386-linux-gnu/libnvidia-ml.so.1\n\tlibnvidia-ml.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libnvidia-ml.so\n\tlibnvidia-ml.so (libc6) => /lib/i386-linux-gnu/libnvidia-ml.so\n\tlibcudart.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.12\n\tlibcudart.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so\n\tlibcuda.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so.1\n\tlibcuda.so.1 (libc6) => /lib/i386-linux-gnu/libcuda.so.1\n\tlibcuda.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so\n\tlibcuda.so (libc6) => /lib/i386-linux-gnu/libcuda.so",
+    "stderr": ""
+  },
+  "torch_activated": {
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-c",
+      "import json, pathlib, torch\nprint(json.dumps({'torch':torch.__version__,'cuda_build':torch.version.cuda,'available':torch.cuda.is_available()}),flush=True)\nprint('\n'.join(sorted(set(s.split()[-1] for s in pathlib.Path('/proc/self/maps').read_text().splitlines() if any(x in s for x in ('libcuda.', 'libcudart.', 'libnvidia-ml.'))))),flush=True)\n"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "  File \"<string>\", line 3\n    print('\n          ^\nSyntaxError: unterminated string literal (detected at line 3)\n"
+  },
+  "torch_launcher_environment": {
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-c",
+      "import json, pathlib, torch\nprint(json.dumps({'torch':torch.__version__,'cuda_build':torch.version.cuda,'available':torch.cuda.is_available()}),flush=True)\nprint('\n'.join(sorted(set(s.split()[-1] for s in pathlib.Path('/proc/self/maps').read_text().splitlines() if any(x in s for x in ('libcuda.', 'libcudart.', 'libnvidia-ml.'))))),flush=True)\n"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "  File \"<string>\", line 3\n    print('\n          ^\nSyntaxError: unterminated string literal (detected at line 3)\n"
+  },
+  "torch_after_project_import": {
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-c",
+      "import sys; sys.path.insert(0,'scripts'); import step28_continual_replay\nimport json, pathlib, torch\nprint(json.dumps({'torch':torch.__version__,'cuda_build':torch.version.cuda,'available':torch.cuda.is_available()}),flush=True)\nprint('\n'.join(sorted(set(s.split()[-1] for s in pathlib.Path('/proc/self/maps').read_text().splitlines() if any(x in s for x in ('libcuda.', 'libcudart.', 'libnvidia-ml.'))))),flush=True)\n"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "  File \"<string>\", line 4\n    print('\n          ^\nSyntaxError: unterminated string literal (detected at line 4)\n"
+  },
+  "direct_cuda_driver": {
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "-B",
+      "-c",
+      "import ctypes,json,pathlib\nlib=ctypes.CDLL('libcuda.so.1')\nversion=ctypes.c_int()\nvrc=lib.cuDriverGetVersion(ctypes.byref(version))\nrc=lib.cuInit(0)\nname=ctypes.c_char_p(); msg=ctypes.c_char_p()\nlib.cuGetErrorName(rc,ctypes.byref(name)); lib.cuGetErrorString(rc,ctypes.byref(msg))\nprint(json.dumps({'cuDriverGetVersion_rc':vrc,'driver_api_version':version.value,'cuInit_rc':rc,'name':name.value.decode() if name.value else None,'message':msg.value.decode() if msg.value else None}))\nprint('\n'.join(sorted(set(s.split()[-1] for s in pathlib.Path('/proc/self/maps').read_text().splitlines() if 'libcuda.' in s))))\n"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "  File \"<string>\", line 9\n    print('\n          ^\nSyntaxError: unterminated string literal (detected at line 9)\n"
+  },
+  "finished_at": "2026-09-13T17:18:03.609284"
+}

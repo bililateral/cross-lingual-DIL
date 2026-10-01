@@ -1,0 +1,10 @@
+/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/cuda/__init__.py:182: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 804: forward compatibility was attempted on non supported HW (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_replay.py", line 582, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_replay.py", line 573, in main
+    result = run(args.out.resolve())
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_replay.py", line 238, in run
+    raise RuntimeError('Requires resumed Linux stage and one eligible visible GPU')
+RuntimeError: Requires resumed Linux stage and one eligible visible GPU
