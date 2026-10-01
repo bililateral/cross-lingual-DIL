@@ -1,0 +1,11 @@
+--- submitted_initial
++++ submitted_corrected
+@@ -152,7 +152,7 @@
+                              "low": ci[0, j], "high": ci[1, j],
+                              **dict(zip(SEEDS, value["per_seed"], strict=True))})
+             for i, seed in enumerate(SEEDS):
+-                audit.mapping(evaluation["per_seed_comparisons"][name][seed]["metrics"][metric],
++                audit.mapping(evaluation["per_seed_comparisons"][name][seed][metric],
+                               {"mean": float(delta[i, :, j].mean()),
+                                "conditional_95pct_interval": interval(weights @ delta[i, :, j] / 60)}, name + seed)
+     p = summaries["hard_calibrated_minus_d_calibrated"]

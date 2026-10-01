@@ -1,0 +1,47 @@
+{
+  "project_files_modified": false,
+  "reviewer_errors": [
+    {
+      "stage": "independent_run_v1",
+      "exit_code": 1,
+      "tests_passed": 9,
+      "tests_failed": 1,
+      "failure": "Extreme handmade positive logits: direct reciprocal sigmoid used as reviewer reference gave clipped log_loss difference 3.448325486488102e-6.",
+      "diagnosis": "Probability difference at most 1 ULP; 90-digit Decimal oracle matches project probability for the six most influential examples. This is not a demonstrated project defect.",
+      "minimal_reference_fix": "Only reviewer reference probabilities at z>=8 use independent Decimal sigmoid then round to float64. Metric definitions, project code, thresholds and 1e-12 metric tolerance unchanged.",
+      "preserved": [
+        "independent_calibration_checks_v1.py",
+        "independent_run_v1/",
+        "independent_outputs_v1/",
+        "probability_rounding_diagnosis.json",
+        "reviewer_v1_to_v2.diff"
+      ]
+    },
+    {
+      "stage": "independent_run_v2",
+      "exit_code": 1,
+      "tests_passed": 9,
+      "tests_failed": 1,
+      "failure": "High-precision real sigmoid rounded once still differs from legacy intermediate float64 implementation, causing 2.2595258997171186e-12 group log_loss difference on extreme handmade case.",
+      "diagnosis": "A mathematical-probability oracle and a frozen computed-probability metric are distinct numerical targets. No formal array was loaded and no original criterion was changed.",
+      "minimal_reference_fix": "Split tests: independently aggregate exact frozen float64 probability interface at 1e-12; separately validate sigmoid against 90-digit oracle at probability scale and bound induced log-loss error by the mean-value theorem. Production source and metric tolerance unchanged.",
+      "preserved": [
+        "independent_calibration_checks_v2.py",
+        "independent_run_v2/",
+        "independent_outputs_v2/",
+        "reviewer_v2_to_v3.diff"
+      ]
+    }
+  ],
+  "final_resolution": {
+    "stage": "independent_run_v3",
+    "exit_code": 0,
+    "tests_passed": 10,
+    "tests_failed": 0,
+    "project_files_modified": false,
+    "original_metric_tolerance": 1e-12,
+    "final_metric_tolerance": 1e-12,
+    "numeric_reference_split_disclosed": true,
+    "formal_data_retry": false
+  }
+}

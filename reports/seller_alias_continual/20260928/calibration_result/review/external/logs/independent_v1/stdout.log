@@ -1,0 +1,53 @@
+VERIFIED s0_d gtol NLL 0.17885410901809293 -> 0.16963476555815526 pg 2.4190353074243303e-09
+VERIFIED s0_hard gtol NLL 0.1839536143806778 -> 0.1658712797474393 pg 8.050375262226993e-10
+VERIFIED s1_d gtol NLL 0.1783279078490406 -> 0.16826202344412317 pg 4.91942043962833e-11
+VERIFIED s1_hard ftol NLL 0.17517412603778745 -> 0.16496269342004707 pg 1.2111977795396416e-08
+VERIFIED s2_d gtol NLL 0.19622364638898682 -> 0.16943123485430592 pg 7.297840305022091e-09
+VERIFIED s2_hard ftol NLL 0.19767770806583887 -> 0.16627903677869119 pg 1.2851740684137402e-08
+BOOTSTRAP hard_calibrated_minus_d_calibrated MAP {'mean': 0.016499599269651687, 'per_seed': [0.0146080134648329, 0.020900122651831072, 0.013990661692291085], 'by_domain': {'A': 0.021518367188866867, 'B': 0.012599219196909562, 'C': 0.015381211423178632}, 'conditional_95pct_interval': [0.010473378355829658, 0.022457469322677177]} Brier {'mean': -0.0007526289373043514, 'per_seed': [-0.0008339518584276541, -0.0010285512918546322, -0.0003953836616307678], 'by_domain': {'A': -0.0010554474836589108, 'B': -0.0005335785957235461, 'C': -0.0006688607325305971}, 'conditional_95pct_interval': [-0.0009712328256902821, -0.0005239018180520354]}
+BOOTSTRAP hard_calibrated_minus_d_raw MAP {'mean': 0.016499599269651687, 'per_seed': [0.0146080134648329, 0.020900122651831072, 0.013990661692291085], 'by_domain': {'A': 0.021518367188866867, 'B': 0.012599219196909562, 'C': 0.015381211423178632}, 'conditional_95pct_interval': [0.010473378355829658, 0.022457469322677177]} Brier {'mean': -0.0015769137208705513, 'per_seed': [-0.0013557751049335417, -0.0014601863554889864, -0.0019147797021891256], 'by_domain': {'A': -0.0019134686168772717, 'B': -0.001460059065051002, 'C': -0.0013572134806833802}, 'conditional_95pct_interval': [-0.0018503727316590947, -0.0012935219285064024]}
+BOOTSTRAP hard_calibrated_minus_hard_raw MAP {'mean': 0.0, 'per_seed': [0.0, 0.0, 0.0], 'by_domain': {'A': 0.0, 'B': 0.0, 'C': 0.0}, 'conditional_95pct_interval': [0.0, 0.0]} Brier {'mean': -0.0018977896563628196, 'per_seed': [-0.0018586737094763543, -0.0009003700388967084, -0.002934325220715396], 'by_domain': {'A': -0.0020363084951310366, 'B': -0.0015843670682105734, 'C': -0.0020726934057468485}, 'conditional_95pct_interval': [-0.0021574921947222314, -0.0016275564982611572]}
+BOOTSTRAP d_calibrated_minus_d_raw MAP {'mean': 0.0, 'per_seed': [0.0, 0.0, 0.0], 'by_domain': {'A': 0.0, 'B': 0.0, 'C': 0.0}, 'conditional_95pct_interval': [0.0, 0.0]} Brier {'mean': -0.0008242847835661999, 'per_seed': [-0.0005218232465058878, -0.00043163506363435417, -0.0015193960405583578], 'by_domain': {'A': -0.000858021133218361, 'B': -0.0009264804693274557, 'C': -0.0006883527481527831}, 'conditional_95pct_interval': [-0.0009600482188891009, -0.0006789036738887766]}
+{
+  "status": "PASS",
+  "numeric_comparisons": 253390,
+  "maximum_absolute_difference": 5.551115123125783e-16,
+  "exact_mapping_scalar_values": 217728,
+  "order_preserved_groups": 576,
+  "query_rank_lists_checked": 16128,
+  "blind_count_rows": 1512,
+  "acceptance": {
+    "map_minimum_observed_gain": true,
+    "map_interval_above_zero": true,
+    "map_improves_each_seed": true,
+    "recall_at_5_mean_strictly_improves": true,
+    "recall_at_5_s0_strictly_improves": true,
+    "average_precision_mean_non_degradation": true,
+    "average_precision_s0_non_degradation": true,
+    "roc_auc_mean_non_degradation": true,
+    "roc_auc_s0_non_degradation": true,
+    "brier_mean_non_degradation": true,
+    "brier_s0_non_degradation": true,
+    "log_loss_mean_non_degradation": true,
+    "log_loss_s0_non_degradation": true,
+    "brier_mean_against_raw_a": true,
+    "brier_s0_against_raw_a": true,
+    "log_loss_mean_against_raw_a": true,
+    "log_loss_s0_against_raw_a": true
+  },
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "scipy_installed_not_used": "1.17.0",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "cpu_affinity": [
+      0
+    ],
+    "proc_threads": "Threads:\t1",
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  }
+}

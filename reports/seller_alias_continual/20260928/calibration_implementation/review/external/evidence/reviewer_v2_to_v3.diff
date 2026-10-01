@@ -1,0 +1,51 @@
+--- reviewer_v2.py
++++ reviewer_v3.py
+@@ -85,7 +85,10 @@
+     # AUC independently also checked as positive/negative comparisons including ties.
+     auc=math.fsum(float(x[i]>x[j])+.5*float(x[i]==x[j]) for i in np.flatnonzero(y) for j in np.flatnonzero(1-y))/(positives*negatives)
+     assert abs(roc-auc)<1e-12
+-    ps=[metric_probability_reference(float(z)) for z in x]
++    # The specified historical metric first rounds exp(-logaddexp(0,-z))
++    # to float64, then clips. Reproduce that numeric interface independently;
++    # probability accuracy itself is separately compared to a 90-digit oracle.
++    ps=[float(np.exp(-np.logaddexp(0.,-np.float64(z)))) for z in x]
+     brier=math.fsum((p-int(v))**2 for p,v in zip(ps,y,strict=True))/n
+     pc=[min(max(p,1e-15),1-1e-15) for p in ps]
+     logloss=-math.fsum(math.log(p) if v else math.log1p(-p) for p,v in zip(pc,y,strict=True))/n
+@@ -161,10 +164,27 @@
+ def test_probability_and_ranking_semantics():
+     y=handmade_truth(5); rng=np.random.default_rng(725)
+     x=np.stack([rng.normal(size=378),rng.integers(-2,3,378),np.zeros(378),np.linspace(80,90,378),np.where(y[4],.2,-.8)]).astype(float)
++    probability_checks=[]
+     for a,b in ((.001,-3.),(.7,40.),(100.,-100.)):
+         z=sut.transform(x,{'a':a,'b':b}); sut.preserve_order(x,z)
+         before,_=sut.metrics.group_metrics(y,x); after,counts=sut.metrics.group_metrics(y,z)
+         ref,ct=ref_matrix(y,z); close('independent_22_metrics',after,ref)
++        # Analyze ideal real sigmoid vs the frozen rounded probability separately.
++        actual_p=np.exp(-np.logaddexp(0.,-z))
++        oracle_p=np.array([[metric_probability_reference(float(t)) for t in row] for row in z])
++        # Absolute probability error, not a relaxed tolerance for group metrics.
++        probability_error=float(np.max(np.abs(actual_p-oracle_p)))
++        assert probability_error<=4*np.finfo(float).eps
++        cp=np.clip(actual_p,1e-15,1-1e-15); cq=np.clip(oracle_p,1e-15,1-1e-15)
++        ideal_metric=-np.mean(y*np.log(cq)+(1-y)*np.log1p(-cq),axis=1)
++        interface_metric=-np.mean(y*np.log(cp)+(1-y)*np.log1p(-cp),axis=1)
++        # Mean-value-theorem bound for propagating rounded p into log terms.
++        bound=np.mean(y*np.abs(cp-cq)/np.minimum(cp,cq)+(1-y)*np.abs(cp-cq)/np.minimum(1-cp,1-cq),axis=1)
++        propagated=np.abs(interface_metric-ideal_metric)
++        assert np.all(propagated<=bound+1e-13)
++        probability_checks.append({'map':[a,b],'max_probability_error_vs_independent_oracle':probability_error,
++                                   'max_rounded_vs_oracle_probability_logloss_difference':float(propagated.max()),
++                                   'max_propagated_probability_rounding_bound':float(bound.max())})
+         assert counts==ct
+         rankidx=[i for i,n in enumerate(NAMES) if n in sut.metrics.CURVE_KEYS+sut.metrics.RETRIEVAL_KEYS]
+         assert np.array_equal(before[:,rankidx],after[:,rankidx])
+@@ -182,7 +202,7 @@
+     sut.preserve_order(raw,z)
+     mapped=.001*threshold+100.
+     assert bool((raw>=threshold)[0,0]) is False and bool((z>=mapped)[0,0]) is True
+-    RESULTS['probability_rank_semantics']={'independent_metric_rows':15,'rank_columns_preserved':len(rankidx),'unclipped_nll_extreme':value,'clipped_logloss_extreme':reported['log_loss'],'new_tie_refused':True,'threshold_roundoff_example':{'raw':1.,'old_threshold':threshold,'mapped_score':z[0,0],'mapped_threshold':mapped,'old_decision':False,'rounded_mapped_decision':True},'saturated_probabilities_are_not_used_for_ranking':True}
++    RESULTS['probability_rank_semantics']={'independent_metric_rows':15,'rank_columns_preserved':len(rankidx),'unclipped_nll_extreme':value,'clipped_logloss_extreme':reported['log_loss'],'new_tie_refused':True,'threshold_roundoff_example':{'raw':1.,'old_threshold':threshold,'mapped_score':z[0,0],'mapped_threshold':mapped,'old_decision':False,'rounded_mapped_decision':True},'saturated_probabilities_are_not_used_for_ranking':True,'probability_oracle_checks':probability_checks,'metric_reference_scope':'Frozen float64 probability interface independently aggregated; high-precision sigmoid accuracy checked separately, not conflated with clipped metric.'}
+ 
+ def reference_acceptance(primary,raw):
+     m=primary['metrics']; vals=[m['map']['mean']>=.01,m['map']['conditional_95pct_interval'][0]>0,all(v>0 for v in m['map']['per_seed']),m['recall_at_5']['mean']>0,m['recall_at_5']['per_seed'][0]>0]

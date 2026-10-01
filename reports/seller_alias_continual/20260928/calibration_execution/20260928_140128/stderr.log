@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_calibration_run.py", line 452, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_calibration_run.py", line 447, in main
+    result = execute(args.out, args.authorization) if args.mode == "execute" else finalize(args.out)
+  File "/home/yongpeng/cross-lingual/scripts/step28_alias_calibration_run.py", line 403, in execute
+    "authorization": data.record(authorization_path, data.ROOT), "partition": partition,
+  File "/home/yongpeng/cross-lingual/scripts/step28_continual_population_data.py", line 46, in record
+    return {"path": path.relative_to(base).as_posix(), "bytes": path.stat().st_size,
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'reports/seller_alias_continual/20260928/calibration_execution/authorization.json' is not in the subpath of '/home/yongpeng/cross-lingual' OR one path is relative and the other is absolute.

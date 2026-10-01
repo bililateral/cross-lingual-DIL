@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "original_archive_bytes": 4717975,
+  "original_archive_sha256": "819361383e6692c16aafce16439f7a3b21e9fb439ff23795ecd063c5cb9c95c2",
+  "all_original_members_byte_identical": 291,
+  "public_report_matches": true,
+  "public_json_matches": true,
+  "public_csv_matches": true,
+  "executions": {
+    "build_report": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.5655279159545898,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/scripts/build_report.py"
+      ]
+    },
+    "extract": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.6330983638763428,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/scripts/verify_extract.py"
+      ]
+    },
+    "independent_v1": {
+      "exit_code": 0,
+      "elapsed_seconds": 1.6327295303344727,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/scripts/independent_saved_audit.py",
+        "--root",
+        "/mnt/data/calibration_result_audit_20260928/project",
+        "--out",
+        "/mnt/data/calibration_result_audit_20260928/evidence/outputs/independent_v1"
+      ]
+    },
+    "initial_inventory_probe_capture_replay": {
+      "exit_code": 1,
+      "elapsed_seconds": 0.7935287952423096,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/history/initial_inventory_probe_v1.py"
+      ]
+    },
+    "report_edge_checks": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.6917376518249512,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/scripts/report_and_edge_checks.py",
+        "--root",
+        "/mnt/data/calibration_result_audit_20260928/project",
+        "--results",
+        "/mnt/data/calibration_result_audit_20260928/evidence/outputs/independent_v1/independent_results.json",
+        "--out",
+        "/mnt/data/calibration_result_audit_20260928/evidence/outputs/report_edge_checks"
+      ]
+    },
+    "source_verification": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.709545373916626,
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/calibration_result_audit_20260928/evidence/scripts/verify_sources.py",
+        "/mnt/data/calibration_result_audit_20260928/project",
+        "/mnt/data/calibration_result_audit_20260928/evidence/outputs"
+      ]
+    },
+    "supplied_help": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.5546772480010986,
+      "command": [
+        "python",
+        "-B",
+        "scripts/step28_alias_calibration_result.py",
+        "--help"
+      ]
+    },
+    "supplied_replay": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.7683446407318115,
+      "command": [
+        "python",
+        "-B",
+        "scripts/step28_alias_calibration_result.py",
+        "--job",
+        "reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job",
+        "--out",
+        "reports/calibration_external_saved_audit"
+      ]
+    }
+  },
+  "note": "Official initial failures copied separately under history/submitted; reviewer metadata-probe capture is explicitly a replay. No labels, fitting, model loading, or project source changes."
+}

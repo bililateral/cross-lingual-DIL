@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/mnt/data/calibration_independent_review_20260928/evidence/independent_calibration_checks.py", line 348, in <module>
+    try: test(); passed.append(test.__name__); print('PASS',test.__name__,flush=True)
+         ~~~~^^
+  File "/mnt/data/calibration_independent_review_20260928/evidence/independent_calibration_checks.py", line 167, in test_probability_and_ranking_semantics
+    ref,ct=ref_matrix(y,z); close('independent_22_metrics',after,ref)
+                            ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/data/calibration_independent_review_20260928/evidence/independent_calibration_checks.py", line 29, in close
+    assert np.isfinite(a).all() and np.isfinite(b).all() and err<=atol,(name,err,atol)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('independent_22_metrics', 2.2595258997171186e-12, 1e-12)
+

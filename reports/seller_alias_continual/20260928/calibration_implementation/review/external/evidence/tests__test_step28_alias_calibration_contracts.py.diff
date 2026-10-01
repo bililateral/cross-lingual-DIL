@@ -1,0 +1,28 @@
+--- initial/tests/test_step28_alias_calibration_contracts.py
++++ current/tests/test_step28_alias_calibration_contracts.py
+@@ -169,12 +169,13 @@
+             root = Path(temp)
+             (root / "dataset").mkdir()
+             method.data.write_json(root / "dataset/manifest.json", {"files": {"train/supervision/pairs.csv": {}}})
++            config = {"data_root": "dataset", "data_manifest_sha256": method.data.sha256(root / "dataset/manifest.json")}
+             part = {"calibration": [{"group_uid": "g1"}], "fit": [{"group_uid": "g0"}]}
+             with mock.patch.object(method.data, "ROOT", root), mock.patch.object(runner, "read_labels", side_effect=ValueError("injected")) as reader:
+                 with self.assertRaises(ValueError):
+-                    runner.parse_once(root, {"data_root": "dataset"}, part, "train")
++                    runner.parse_once(root, config, part, "train")
+                 with self.assertRaises(FileExistsError):
+-                    runner.parse_once(root, {"data_root": "dataset"}, part, "train")
++                    runner.parse_once(root, config, part, "train")
+                 self.assertEqual(reader.call_count, 1)
+             self.assertEqual(method.data.read_json(root / "train_access.json")["parse_attempts"], 1)
+ 
+@@ -224,6 +225,9 @@
+             path.write_bytes(original)
+             valid = np.tile(handmade_truth(), (60, 1))
+             runner.collect(out, valid, arrays, saved, partition)
++            with mock.patch.object(runner, "sources", return_value=[]):
++                with self.assertRaises(ValueError):
++                    runner.finalize(out)
+             with mock.patch.object(method, "summarize", side_effect=RuntimeError("post-collection fault")):
+                 with self.assertRaises(RuntimeError):
+                     runner.finalize(out)

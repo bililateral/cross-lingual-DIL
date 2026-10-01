@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "-o",
+    "/mnt/data/calibration_independent_review_20260928/evidence/probability_diagnosis_run/resource_usage.log",
+    "taskset",
+    "-c",
+    "0",
+    "python",
+    "-B",
+    "/mnt/data/calibration_independent_review_20260928/evidence/diagnose_probability_rounding.py"
+  ],
+  "cwd": "/mnt/data/calibration_independent_review_20260928/submission",
+  "environment": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": "",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "packages": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "cpu_affinity": [
+    0
+  ],
+  "started_utc": "2026-09-28T05:25:31.372130+00:00"
+}

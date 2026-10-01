@@ -1,0 +1,44 @@
+--- initial/scripts/step28_alias_calibration_run.py
++++ current/scripts/step28_alias_calibration_run.py
+@@ -194,6 +194,8 @@
+                                       "time_utc": datetime.now(timezone.utc).isoformat(),
+                                       "heldout": 0, "owners": 0}).decode())
+     root = data.ROOT / config["data_root"]
++    if data.sha256(root / "manifest.json") != config["data_manifest_sha256"]:
++        raise ValueError("Dataset manifest changed before authorized label parsing")
+     manifest = data.read_json(root / "manifest.json")
+     role = "calibration" if split == "train" else "development"
+     selected = [r["group_uid"] for r in partition[role]]
+@@ -242,6 +244,12 @@
+             records[f"calibration_{variant}"] = {"file": data.record(path, out), "counts": counts}
+         result["runs"][run_id] = records
+     data.write_json(out / "fitted.json", result)
++    # Preserve all six actual fits before checking a truth-dependent reuse identity.
++    for run_id in method.RUNS:
++        record = result["runs"][run_id]["calibration_raw"]["file"]
++        raw = array(out / record["path"], record, (36, 22), np.float64)
++        if np.max(np.abs(raw - saved[run_id]["old_metrics"]["calibration"])) > 1e-12:
++            raise ValueError("Calibration relevance/order differs from the prior raw metrics; no valid parse")
+     return result
+ 
+ 
+@@ -279,7 +287,8 @@
+         raise ValueError("Twelve score matrices and valid relevance required")
+     destination = out / "evaluation"
+     destination.mkdir()
+-    result = {"status": COLLECTED, "columns": list(metrics.COLUMNS), "points": {},
++    result = {"status": COLLECTED, "policy": contract(), "source_files": sources(),
++              "columns": list(metrics.COLUMNS), "points": {},
+               "group_ids": [r["group_uid"] for r in partition["development"]],
+               "domains": [r["domain"] for r in partition["development"]], "old_raw_metrics": {}}
+     for point in sorted(expected):
+@@ -309,7 +318,8 @@
+     if (destination / "evaluation.json").exists():
+         raise FileExistsError("Published evaluation cannot be overwritten")
+     collected = data.read_json(destination / "collected.json")
+-    if collected["status"] != COLLECTED or collected["columns"] != list(metrics.COLUMNS):
++    if (collected["status"] != COLLECTED or collected["columns"] != list(metrics.COLUMNS)
++            or collected["policy"] != contract() or collected["source_files"] != sources()):
+         raise ValueError("Complete collection required before statistics")
+     matrices = {}
+     for point, record in collected["points"].items():

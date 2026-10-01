@@ -1,0 +1,39 @@
+--- reviewer_v1.py
++++ reviewer_v2.py
+@@ -5,7 +5,7 @@
+ """
+ from __future__ import annotations
+ from pathlib import Path
+-import copy,csv,hashlib,itertools,json,math,os,platform,shutil,sys,tempfile,traceback
++import copy,csv,decimal,hashlib,itertools,json,math,os,platform,shutil,sys,tempfile,traceback
+ from unittest import mock
+ import numpy as np
+ import scipy
+@@ -61,6 +61,18 @@
+        'precision','recall','f1','specificity','balanced_accuracy','mcc','map','mrr',
+        'recall_at_1','recall_at_3','recall_at_5','recall_at_10','ndcg_at_1','ndcg_at_3','ndcg_at_5','ndcg_at_10')
+ 
++def metric_probability_reference(z):
++    # High positive logits amplify 1-ULP probability differences inside log(1-p).
++    # Use an independent 90-digit oracle and then round to float64, not a
++    # reciprocal sigmoid whose intermediate rounding can be a different result.
++    if z >= 8.:
++        with decimal.localcontext() as context:
++            context.prec=90
++            value=decimal.Decimal.from_float(float(z))
++            return float(1/(1+(-value).exp()))
++    return sigmoid(float(z))
++
++
+ def ref_group(y,x):
+     y=np.asarray(y); x=np.asarray(x,dtype=float); n=len(y); positives=int(sum(y)); negatives=n-positives
+     indices=sorted(range(n),key=lambda i:(-float(x[i]),i)); tp=fp=0; oldrec=oldfpr=0.; oldprec=1.; ap=trap=roc=rfpr=0.
+@@ -73,7 +85,7 @@
+     # AUC independently also checked as positive/negative comparisons including ties.
+     auc=math.fsum(float(x[i]>x[j])+.5*float(x[i]==x[j]) for i in np.flatnonzero(y) for j in np.flatnonzero(1-y))/(positives*negatives)
+     assert abs(roc-auc)<1e-12
+-    ps=[sigmoid(float(z)) for z in x]
++    ps=[metric_probability_reference(float(z)) for z in x]
+     brier=math.fsum((p-int(v))**2 for p,v in zip(ps,y,strict=True))/n
+     pc=[min(max(p,1e-15),1-1e-15) for p in ps]
+     logloss=-math.fsum(math.log(p) if v else math.log1p(-p) for p,v in zip(pc,y,strict=True))/n

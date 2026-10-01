@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/mnt/data/calibration_result_audit_20260928/evidence/history/initial_inventory_probe_v1.py", line 8, in <module>
+    inv=json.loads(z.read('source_inventory.json')); print(type(inv));print(str(inv)[:2400])
+                   ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/zipfile/__init__.py", line 1602, in read
+    with self.open(name, "r", pwd) as fp:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/zipfile/__init__.py", line 1639, in open
+    zinfo = self.getinfo(name)
+  File "/usr/lib/python3.13/zipfile/__init__.py", line 1567, in getinfo
+    raise KeyError(
+        'There is no item named %r in the archive' % name)
+KeyError: "There is no item named 'source_inventory.json' in the archive"

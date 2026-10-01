@@ -1,0 +1,227 @@
+{
+  "status": "PASS_LOCAL_FORMAL_RESULT_REVIEW_EXTERNAL_RESULT_REVIEW_PENDING",
+  "time": "2026-09-28T14:33:48.3082761+08:00",
+  "requirement": "Retain the confirmed C ranking gain over A while protecting AP/AUC and probability losses under the approved calibration comparison.",
+  "formal_run": "reports/seller_alias_continual/20260928/calibration_execution/20260928_140752/job",
+  "implementation_review": "reports/seller_alias_continual/20260928/calibration_implementation/review/disposition.json",
+  "report": "docs/SELLER_ALIAS_CALIBRATION_RESULT.zh.md",
+  "acceptance": {
+    "checks": {
+      "average_precision_mean_non_degradation": true,
+      "average_precision_s0_non_degradation": true,
+      "brier_mean_against_raw_a": true,
+      "brier_mean_non_degradation": true,
+      "brier_s0_against_raw_a": true,
+      "brier_s0_non_degradation": true,
+      "log_loss_mean_against_raw_a": true,
+      "log_loss_mean_non_degradation": true,
+      "log_loss_s0_against_raw_a": true,
+      "log_loss_s0_non_degradation": true,
+      "map_improves_each_seed": true,
+      "map_interval_above_zero": true,
+      "map_minimum_observed_gain": true,
+      "recall_at_5_mean_strictly_improves": true,
+      "recall_at_5_s0_strictly_improves": true,
+      "roc_auc_mean_non_degradation": true,
+      "roc_auc_s0_non_degradation": true
+    },
+    "failed": [],
+    "next": "SEPARATELY_REVIEWED_AND_AUTHORIZED_TEST",
+    "passed": true,
+    "scope": "Observed-value guards and conditional uncertainty, not population noninferiority."
+  },
+  "formal_label_parses": {
+    "development": 1,
+    "heldout": 0,
+    "owners": 0,
+    "train": 1
+  },
+  "formal_seconds_internal": 1.269744616933167,
+  "formal_seconds_gnu_time": 1.4,
+  "completed_cst": "2026-09-28T14:08:51+08:00",
+  "audit": {
+    "status": "PASS_SAVED_CALIBRATION_RESULT_AUDIT",
+    "numbers_checked": 24120,
+    "maximum_difference": 1.1102230246251565E-16,
+    "blind_count_rows": 1512,
+    "order_preserved_groups": 576,
+    "new_fits": 0,
+    "new_label_reads": 0,
+    "sources": [
+      {
+        "path": "scripts/step28_alias_calibration_result.py",
+        "sha256": "5e8881a1af9c89bec8b952703f8eaa1e9a6c99ba4de42c749f5882f4bbf97400"
+      },
+      {
+        "path": "scripts/step28_alias_pooling_result.py",
+        "sha256": "16b46f388989706915f877c7e2ed29925c44e349548bc9aaa34a02f59378be4b"
+      }
+    ]
+  },
+  "preserved_failures": [
+    {
+      "stage": "Formal invocation before labels",
+      "path": "calibration_execution/20260928_140128",
+      "cause": "Relative authorization path passed to data.record with absolute ROOT",
+      "remedy": "Absolute CLI paths, fresh run, unchanged26 scientific sources",
+      "label_reads": 0,
+      "fit_calls": 0
+    },
+    {
+      "stage": "Saved-result audit",
+      "path": "calibration_result/audit_initial",
+      "cause": "Unexpected extra metrics nesting in per_seed_comparisons",
+      "remedy": "One field access correction, retain failed source/logs and write effective audit to distinct directory",
+      "label_reads": 0,
+      "fit_calls": 0
+    }
+  ],
+  "frozen_sources": [
+    {
+      "bytes": 10274,
+      "path": "docs/SELLER_ALIAS_CALIBRATION.zh.md",
+      "sha256": "6d6fd56073391b7475779ca5d5dec6c6a4b368cc3cc8a6ca8cad6d593d70e9a5"
+    },
+    {
+      "bytes": 8508,
+      "path": "docs/SELLER_ALIAS_RANKING.zh.md",
+      "sha256": "269bf5b07131865f1b3ef39e4e85d2c6e7d7937267c42fee1289fe4914c51e0e"
+    },
+    {
+      "bytes": 2423,
+      "path": "reports/documentation/20260927/ranking_plan/decision.json",
+      "sha256": "b92d9b48c69a62588e9fa65a945f05360affbe9568eca47c8742831e69fa675a"
+    },
+    {
+      "bytes": 1760,
+      "path": "reports/documentation/20260928/calibration_plan/decision.json",
+      "sha256": "863a4a5b71c1cb5d5e4c8dbabeaa7862dbb2a835b521d1e5e9d947abe1b2c8bc"
+    },
+    {
+      "bytes": 1837,
+      "path": "schema/step28_alias_calibration_policy.json",
+      "sha256": "2653fe84e6e35275f1d963b9f52e31998a37da40568addccadb0b28d68e19be5"
+    },
+    {
+      "bytes": 3489,
+      "path": "schema/step28_alias_ranking_policy.json",
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+    },
+    {
+      "bytes": 8439,
+      "path": "schema/step28_chinese_base_policy.json",
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+    },
+    {
+      "bytes": 1447,
+      "path": "scripts/run_step28_alias_calibration_linux_20260928.sh",
+      "sha256": "7e418974f5f5c6027b2f6b08381c40da55ef31abe6d38f2371c48665775045dd"
+    },
+    {
+      "bytes": 1243,
+      "path": "scripts/run_step28_alias_ranking_linux_20260927.sh",
+      "sha256": "a0268774d63a2d091bed209eac4cde584f0572ae823e96eaa1ce06434026833a"
+    },
+    {
+      "bytes": 1060,
+      "path": "scripts/run_step28_chinese_base_linux_20260924.sh",
+      "sha256": "f43e264289b685ae020cee8cd0c87a9ae12af70b028f9ead074226f9f8ec0a9e"
+    },
+    {
+      "bytes": 8818,
+      "path": "scripts/step28_alias_calibration.py",
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "bytes": 3320,
+      "path": "scripts/step28_alias_calibration_audit.py",
+      "sha256": "a3e7dd96a3a05336119ad389801a7aa6dcb00e902fa57203c8c9546a0288a291"
+    },
+    {
+      "bytes": 26815,
+      "path": "scripts/step28_alias_calibration_run.py",
+      "sha256": "c76ad58a55763f0c3c7a6e9326b490c32040344bfdad8e87e51c8ad38e7e6e4b"
+    },
+    {
+      "bytes": 11658,
+      "path": "scripts/step28_alias_ranking.py",
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+    },
+    {
+      "bytes": 12097,
+      "path": "scripts/step28_alias_ranking_audit.py",
+      "sha256": "ff6fe6d56631a12c89e7d1bf52139933d7f6d3798034d0f642264e03b77cfdbd"
+    },
+    {
+      "bytes": 33724,
+      "path": "scripts/step28_alias_ranking_run.py",
+      "sha256": "df08b16c832f8e7f7cf18cb5a5e9b63524fe5c684d99334320157ce7698f470a"
+    },
+    {
+      "bytes": 51352,
+      "path": "scripts/step28_chinese_base.py",
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+    },
+    {
+      "bytes": 9679,
+      "path": "scripts/step28_chinese_base_audit.py",
+      "sha256": "db68891804b6d834b7605408e3c0e35172f18852d7f626420fcb43bd9a7ed4dc"
+    },
+    {
+      "bytes": 26322,
+      "path": "scripts/step28_continual_expression_run.py",
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+    },
+    {
+      "bytes": 9699,
+      "path": "scripts/step28_continual_population.py",
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "bytes": 11587,
+      "path": "scripts/step28_continual_population_data.py",
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "bytes": 20911,
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "bytes": 21310,
+      "path": "scripts/step28_continual_population_run.py",
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "bytes": 15398,
+      "path": "tests/test_step28_alias_calibration_contracts.py",
+      "sha256": "47a2a4610cba59f28ef736ec7fe5df0829b92d2a857631df5c87b410cfd42815"
+    },
+    {
+      "bytes": 26216,
+      "path": "tests/test_step28_alias_ranking_contracts.py",
+      "sha256": "80b7ffd6f5aa496f18453b732b5db98403972e9dadcefef25534208aa2c1b9c3"
+    },
+    {
+      "bytes": 21423,
+      "path": "tests/test_step28_chinese_base_contracts.py",
+      "sha256": "169af1c54d6bf82373326a69b8c0cf9589c54f365e9342c5d9761341bf7d40a1"
+    }
+  ],
+  "weights": {
+    "retained": 18,
+    "location": "Linux only",
+    "bytes": 23516221872,
+    "new_weights_or_deletions": 0,
+    "authority": "reports/seller_alias_continual/20260928/ranking_result/weight_retention.json"
+  },
+  "limitations": [
+    "Repeated development valid; no independent test acceptance yet",
+    "Ranking gain is inherited from C; calibration adds no ranking gain",
+    "Fixed0.5 precision/specificity can decline despite the approved probability guards passing",
+    "Conditional intervals exclude calibration refit/retraining/generation uncertainty",
+    "Saved-result audit does not independently recompute truth-dependent group metrics",
+    "External implementation PASS is not result-review PASS"
+  ],
+  "next": "Submit result review, personally reconcile, then prepare a separately reviewed and authorized fixed-s0 synthetic test contract; no test access or continual design now"
+}

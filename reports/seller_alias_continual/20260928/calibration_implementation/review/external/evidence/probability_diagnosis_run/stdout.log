@@ -1,0 +1,110 @@
+MAP 0.001 -3.0 GROUP DIFF [0. 0. 0. 0. 0.] MAX PROB DIFF 2.0816681711721685e-17
+MAP 0.7 40.0 GROUP DIFF [0. 0. 0. 0. 0.] MAX PROB DIFF 0.0
+MAP 100.0 -100.0 GROUP DIFF [-3.44832548e-06  0.00000000e+00  0.00000000e+00  0.00000000e+00
+  0.00000000e+00] MAX PROB DIFF 1.1102230246251565e-16
+{
+  "classification": "REVIEWER_REFERENCE_NUMERICAL_SEMANTICS_MISMATCH_NOT_PROVEN_PROJECT_DEFECT",
+  "observations": [
+    {
+      "map": [
+        100.0,
+        -100.0
+      ],
+      "group_difference": [
+        -3.448325484711745e-06,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_probability_difference": 1.1102230246251565e-16,
+      "examples": [
+        {
+          "row": 0,
+          "pair": 74,
+          "logit": 29.420297778384736,
+          "handmade_label": 0,
+          "production_probability": 0.9999999999998329,
+          "reviewer_v1_probability": 0.999999999999833,
+          "high_precision_probability_rounded_to_float64": 0.9999999999998329,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": 1.0,
+          "production_probability_clipped_loss": 29.420252392494124,
+          "v1_probability_clipped_loss": 29.420917065167316,
+          "high_precision_unclipped_loss": "29.4202977783849030015357089485699990333080533486464649057058385045912891064217107957991038"
+        },
+        {
+          "row": 0,
+          "pair": 204,
+          "logit": 29.38120770390222,
+          "handmade_label": 0,
+          "production_probability": 0.9999999999998263,
+          "reviewer_v1_probability": 0.9999999999998264,
+          "high_precision_probability_rounded_to_float64": 0.9999999999998263,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": 1.0,
+          "production_probability_clipped_loss": 29.381159466702847,
+          "v1_probability_clipped_loss": 29.381798648571845,
+          "high_precision_unclipped_loss": "29.3812077039023936602680335328083636653630042958118034652903726070521219685392081171817890"
+        },
+        {
+          "row": 0,
+          "pair": 312,
+          "logit": 23.685075792747497,
+          "handmade_label": 0,
+          "production_probability": 0.9999999999482748,
+          "reviewer_v1_probability": 0.9999999999482747,
+          "high_precision_probability_rounded_to_float64": 0.9999999999482748,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": -1.0,
+          "production_probability_clipped_loss": 23.68507641825786,
+          "v1_probability_clipped_loss": 23.685074271872214,
+          "high_precision_unclipped_loss": "23.6850757927992225150740307067747558117802666586201500880948169176616594190812787074336981"
+        },
+        {
+          "row": 0,
+          "pair": 166,
+          "logit": 22.84310845634674,
+          "handmade_label": 0,
+          "production_probability": 0.9999999998799495,
+          "reviewer_v1_probability": 0.9999999998799496,
+          "high_precision_probability_rounded_to_float64": 0.9999999998799495,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": 1.0,
+          "production_probability_clipped_loss": 22.843108419456065,
+          "v1_probability_clipped_loss": 22.84310934425297,
+          "high_precision_unclipped_loss": "22.8431084564667913294804820257138998398074755684265508509264371572894377130474963261739865"
+        },
+        {
+          "row": 0,
+          "pair": 98,
+          "logit": 22.741887095935283,
+          "handmade_label": 0,
+          "production_probability": 0.9999999998671615,
+          "reviewer_v1_probability": 0.9999999998671616,
+          "high_precision_probability_rounded_to_float64": 0.9999999998671615,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": 1.0,
+          "production_probability_clipped_loss": 22.741886876036684,
+          "v1_probability_clipped_loss": 22.741887711805937,
+          "high_precision_unclipped_loss": "22.7418870960681215028577311071220240345776007086906971392204985962220368140481187646915212"
+        },
+        {
+          "row": 0,
+          "pair": 61,
+          "logit": 16.75614836113293,
+          "handmade_label": 0,
+          "production_probability": 0.9999999471679812,
+          "reviewer_v1_probability": 0.9999999471679811,
+          "high_precision_probability_rounded_to_float64": 0.9999999471679812,
+          "production_ulp_error": 0.0,
+          "v1_ulp_error": -1.0,
+          "production_probability_clipped_loss": 16.756148414124155,
+          "v1_probability_clipped_loss": 16.756148412022736,
+          "high_precision_unclipped_loss": "16.7561484139649495446531903521189699601803419259994294903270424785697790615080086141625939"
+        }
+      ]
+    }
+  ],
+  "note": "Legacy evaluation explicitly computes float64 exp(-logaddexp(0,-z)), then clips p; a direct reciprocal sigmoid is algebraically equivalent but can differ by 1 ulp near 1. Do not relax metric tolerance or modify frozen implementation. Separate the mandated float64 probability algorithm from exact Bernoulli logit NLL."
+}
