@@ -10,7 +10,7 @@ SEQ首域MAP遗忘0.063393、条件95%[0.041809,0.085423]，三个顺序同时�
 
 本轮结果外审与主审已完成；下一步围绕少量历史样本的代表性／重复强度以及排序保持与新域学习的平衡制定新方法合同。当前尚无新算法、种子、训练预算、标签或最终留出许可；不自动追加训练，不重复基础test。LOGIT相对ER的收益保留，不能替代相对SEQ的新旧能力保护或三种子方法资格。
 
-两端文件清理已完成：Windows删除58份原有冗余文件112,594,084字节，Linux删除1份中转包18,784字节；必要科研记录、原始外审证据、18份历史权重和活动训练状态保留。9月30日清理时Git／LFS未改；10月1日另已按用户要求补交26项本地Git，未推送或清理远端LFS。[清理完成回执](../reports/maintenance/20260930/project_cleanup/completion.json)、[存储与恢复](STORAGE.zh.md)。
+两端文件清理已完成：Windows删除58份原有冗余文件112,594,084字节，Linux删除1份中转包18,784字节；必要科研记录、原始外审证据、18份历史权重和活动训练状态保留。9月30日清理时Git／LFS未改；10月1日先补26项本地归档及1项结果外审收尾，随后按用户纠正全部推送至原远端科研分支，27项提交的目标2f293eac已与实际远端一致。阶段提交与推送纪律已补明确，详见[远端补交记录](../reports/maintenance/20261001/git_push/report.zh.md)；未清理远端LFS。[清理完成回执](../reports/maintenance/20260930/project_cleanup/completion.json)、[存储与恢复](STORAGE.zh.md)。
 
 用户已依次明确选择“采用预定随机保留6群（推荐）”“同时保护最终最新域（推荐）”，随后进一步选择“按修订稿确定其余设置并本地实现（推荐）”。[前两项回答](../reports/documentation/20260930/continual_plan/clarifications.json)、[整体首轮规格及本地实现确认](../reports/documentation/20260930/continual_plan/implementation_decision.json)均保留原话。[首轮合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)落实逐域当前数据、6群／1MiB、独立Z保护、完整系统概率评价、连续Adam、实际域bootstrap及已知FDR重叠；没有宣称新BGE已遗忘或方法创新成立。
 
