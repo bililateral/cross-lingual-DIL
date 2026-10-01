@@ -1,0 +1,83 @@
+{
+  "status": "PASS_INDEPENDENT_SAVED_RESULT_AUDIT",
+  "checked_numbers": 7824,
+  "maximum_absolute_difference": 1.1102230246251565e-16,
+  "scope": [
+    "all 22 metric domain means",
+    "all 66 comparisons and paired 5000-bootstrap intervals",
+    "four original 60x22 matrices",
+    "300 saved confusion tables",
+    "11 train domain summaries"
+  ],
+  "excluded": "No supervision reparse, no model loading or training; saved train AP/BCE hash and summary verified, not independently recomputed from labels. New valid ranking computation uses previously verified implementation; no claim of independent per-edge label recomputation.",
+  "execution_checks": {
+    "updates": 1080,
+    "four_original_replays": {
+      "ABC_shared": true,
+      "BCA_shared": true,
+      "CAB_shared": true,
+      "joint": true
+    },
+    "five_full_score_reloads": true,
+    "encoder_head_updates_at_1_541": [
+      {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      },
+      {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      }
+    ],
+    "adam_boundaries": [
+      [
+        1,
+        540
+      ],
+      [
+        541,
+        1080
+      ]
+    ],
+    "label_parses": {
+      "linux": {
+        "development": 0,
+        "heldout": 0,
+        "owners": 0,
+        "train": 1
+      },
+      "windows": {
+        "development": 1,
+        "heldout": 0,
+        "owners": 0,
+        "train": 0
+      }
+    }
+  },
+  "disk_reporting": {
+    "sampled_run_peak_bytes": 5656916323,
+    "known_coexisting_major_files_bytes": 7543067422,
+    "conservative_execution_payload_upper_bound_bytes": 7544582257,
+    "explanation": "Budget samples before inference save and can miss the brief coexistence of complete checkpoint and retained inference file; sampled 5.657 GB is not actual maximum. Reserve check precedes write. Bound uses max one checkpoint + all retained execution payloads; no byte cap violation, no exact filesystem high-water claim."
+  },
+  "training_seconds": 1469.353242335841,
+  "full_process_seconds": 2107.65,
+  "inference_seconds_with_replay": 451.8060791878961,
+  "same_group_improvement_counts": {
+    "average_precision": 37,
+    "map": 39
+  },
+  "observed_at": "2026-09-10T20:01:24.470105+08:00"
+}

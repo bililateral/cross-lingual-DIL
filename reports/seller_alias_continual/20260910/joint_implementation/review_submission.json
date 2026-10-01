@@ -1,0 +1,17 @@
+{
+  "status": "SUBMITTED_REVIEW_RUNNING",
+  "url": "https://chatgpt.com/c/6aa27785-514c-83eb-8280-1166b2682e55",
+  "observed_at": "2026-09-10T10:26:00.316Z",
+  "user_message_id": "ec0a3dd7-4cf0-495d-88af-93cba8a8ec04",
+  "attachment_display_name": "review_upload(3).zip",
+  "archive_bytes": 1098686,
+  "archive_sha256": "ac3b1ee3c8de521e5c35819ebccab05ed85532a6d558b0931a30f94a6961652b",
+  "manifest_files": 53,
+  "manifest_bytes": 1627849,
+  "model_selection_observed": "6 Pro",
+  "new_reply_model_slug": null,
+  "model_slug_note": "New assistant final message not yet present; do not reuse prior reply model_slug as current verification.",
+  "busy": true,
+  "status_text": "T-6 Astra Pro。我会核对附件及直接调用链，复跑可执行CPU测试，并严格区分旧结果核验、模拟证据与尚未执行的CUDA验证。\n\n规划审查流程\n规划了审查流程\nChatGPT 也可能会犯错。请核查重要信息。\n\n6\nPro\n停止回答\n⏎",
+  "user_message_text": "review_upload(3).zip\n压缩归档\n请使用网页端 GPT 6 Pro，对下面已经获用户确认的固定预算联合延长诊断做方案与实现审查。请实际审读所附代码及直接依赖，区分已经执行的CPU夹具、本地旧结果核验与尚未运行的CUDA检查。不要将历史 GPT-5.6 实现审查追认成 GPT 6 Pro，不需要重新审查未变核心的全部历史分支。\n\n研究目标始终是中文暗网卖家马甲识别。同控定义保持不变；当前只能做受控中文合成数据研究，不能宣称真实中文市场有效。原文本四臂、仅经营类别变化的population四臂均没有建立稳定的AP遗忘或ER收益；它们是有效负证据，不删除或改写。训练侧复合重分配对照支持共享表达相关训练信号的贡献，但同时损害新域能力，不是纯机制或唯一原因。\n\n用户随后批准表达习惯、描述组织和公共模板覆盖随新卖家群体批次改变的独立新数据。固定数据生成20260910_150500，三域各60/20/40 train/development/heldout群，每群28账号；模型只看商品标题与描述，保留全部记录重数，无身份或域特征。初始化20260909，LaBSE及对称成对头共同训练，每群378边未加权mean BCE，一次AdamW。首轮2160更新已完成，train/valid原权限均消费。\n\n原首域平均AP遗忘.058931998，条件95%区间[.035618891,.083159732]，MAP同向。三固定顺序均同时出现首域下降与后两阶段平均新域增益>=.02，六次新学习AP均正。但三轮联合相对单域A/B/C分别-.042448680/+.020929679/-.035076130，未满足每域>=-.02的兼顾条件，整体资格未过。B单域遗忘区间跨零，C联合概率损失改善但排序变差，F1/召回绝对值低；不能写成所有指标退化。上一轮实际GPT 6 Pro结果审查全文和原结果一并提供。\n\n上轮GPT 6 Pro建议一次有界的三轮/六轮联合诊断：单纯延长预定训练量，观察静态训练BCE/AP与valid完整22指标，不改数据、初始化、学习率、损失、评价下限或选中间最佳点。这不能唯一识别原因，也不保证通过。用户现已明确批准该具体合同：1080新物理更新；Linux本阶段train二值CSV解析一次，同时用于训练及固定模型的训练风险；Linux valid盲评分，完整结束后Windows valid二值CSV一次。test/owners不读。空闲单GPU、单CPU计算线程，预计45—75分钟，上限3小时及新增12GiB。先本地实现/核验和GPT 6 Pro外审，再单独汇报Linux启动并暂停。目前没有Linux连接、模型加载或新正式监督解析。\n\n实现重点：\n1. 原长期模型只有推理状态。必须从原初始化重建540步joint，原point/config元数据、模型、完整Adam摘要与全部valid分数完全一致后，才接后540步。新阶段预算/来源另记，不因新config污染原完整摘要。第541步承接同一Adam；六轮使用同一Python Random打乱流；dropout全局索引0..1079，不从后三轮重置。\n2. 两联合点各评分180train+60valid；三个旧单域各评分自己的60train及全部60valid；840模型×群，两遍完整重载评分1680群前向。复用旧核心score的eval/inference，下一训练步显式train。single点无Adam，必须按原推理状态验证，不能冒充其训练Adam。\n3. 静态train指标为逐群稳定BCE-with-logits和AP，保存数值供Windows用；不误用在线epoch BCE，不把截断概率log_loss当成精确BCE。train和valid原文/群对应固定，模型仅看原文。Windows只在完整门后访问valid监督，旧4点评价须复现原22指标。\n4. 同群配对、三域等权、5000bootstrap/seed20260910/95%区间、分类logit0，主要检查每域六轮AP>=对应单域-.02。新六轮结果不追认原三轮通过；失败不自动延长九轮、不证明不可兼顾。\n5. 原8项来源不修改；新脚本/政策/测试/启动器独立登记。输出峰值约一份完整Adam checkpoint加一份推理模型，12GiB上限由新Budget执行；仅精确清理本次work的已验证checkpoint，不触碰原模型。\n\n本地当前新增9项+受影响原10项CPU合同通过，零跳过。新增含手工CSV完整评价/300AP对sklearn、稳定BCE极值、独立六轮日程、模型/Adam与评分错配拒绝、valid门禁、全局dropout与Adam连续的模拟编排。原10项中有1项需要正式公开train/valid原文，审查附件不提供原文；可不执行该项并如实记录，不伪造正式数据。不把模拟编排当作GPU证据。原正式公开输入、原结果完整门和原540群序已本地核验，未解析正式监督。\n\n第二路并行仅做遗忘缓解方法的接口准备，已附文档方便了解后续边界。256KiB、378边/步、关系选择、1620步完整群ER均未获方法实验授权；本轮不实现/运行这些方法。请勿因接口候选强制扩大第一路实验，也不要默认共同锚点缓存自动具有三元交互或创新。正式方法比较仍在原因诊断后讨论。\n\n请核查有没有形式上一致但实际训练/评价逻辑不符的情况。每项意见给出具体函数/调用路径和可核对证据，分类为SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT或OUT_OF_SCOPE_OVERDESIGN，提出最小充分修复。科学选择超出用户合同须明确为候选，不自行增加监督、更新量、数据或评价标准。没有确认缺陷时可以明确接受本次固定字节实现，保留真实运行未验证范围。不要新增签名、环境加固、Linux Git、冗余授权状态机、额外smoke仪式或重复审查关卡。回复实际模型身份、实际读取与运行范围、发现及结论。不要读取或索要密码、模型大权重、train/valid原始监督、test/owners或封存真值。\n展开"
+}

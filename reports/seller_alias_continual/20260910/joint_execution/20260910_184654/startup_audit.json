@@ -1,0 +1,78 @@
+{
+  "status": "BACKGROUND_TRAINING_FIRST_60_UPDATES_VERIFIED",
+  "observed_at": "2026-09-10T18:53:39.323222+08:00",
+  "run": "reports/seller_alias_continual/20260910/joint_execution/20260910_184654",
+  "launcher_pid": 4079549,
+  "python_pid": 4079562,
+  "events": [
+    {
+      "completed": 30,
+      "elapsed_seconds": 64.9232153040357,
+      "event": "joint_updates",
+      "peak_observed_bytes": 3035,
+      "total": 1080
+    },
+    {
+      "completed": 60,
+      "elapsed_seconds": 104.79842715896666,
+      "event": "joint_updates",
+      "peak_observed_bytes": 3035,
+      "total": 1080
+    }
+  ],
+  "environment": {
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "python": "3.10.19",
+    "torch": "2.9.1+cu130"
+  },
+  "sources_and_configuration_match": true,
+  "access": {
+    "development": 0,
+    "heldout": 0,
+    "owners": 0,
+    "train_parse_attempts": 1
+  },
+  "returned_files": [
+    {
+      "path": "launch.json",
+      "bytes": 8312,
+      "sha256": "dcf1d66e63aa7afaf1db36e4154ad1f0dcd330af2dc7d0e4f7fe98de7fe30255"
+    },
+    {
+      "path": "started.txt",
+      "bytes": 26,
+      "sha256": "68fb340d15f376fd08fa9e8e15cd4f1c95620dce7ca83e752d6ff8d368908be5"
+    },
+    {
+      "path": "run/startup.json",
+      "bytes": 2969,
+      "sha256": "cdb7be454c7611e65e27b7df512e6d433143d55dccf16298faa5988c16f3b52d"
+    },
+    {
+      "path": "run/access.json",
+      "bytes": 66,
+      "sha256": "5886a0da05bfe513dcfc4edee017a171a79f2678525263f619fb7f06684612ef"
+    },
+    {
+      "path": "startup_train.log",
+      "bytes": 501,
+      "sha256": "d30cd5a0c31ecf870cfc378f7a24273b305a92879d9727f589cf5bd76b7e77ec"
+    }
+  ],
+  "boundary": "First60 updates imply original initialization and first real encoder/head gradient/parameter update/Adam step1 checks passed. Full540 model/Adam/scores replay remains pending. No valid/test/owners parse.",
+  "process_observation_at": "2026-09-10T18:51:45+08:00",
+  "python_owner": "yongpeng",
+  "python_nice": 10,
+  "python_cpu_percent": 100,
+  "gpu_used_mib": 12888,
+  "estimated_total_minutes": [
+    45,
+    75
+  ],
+  "estimated_training_minutes": [
+    25,
+    35
+  ],
+  "deadline_hours": 3
+}
