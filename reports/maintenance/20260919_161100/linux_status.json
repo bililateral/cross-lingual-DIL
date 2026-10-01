@@ -1,0 +1,67 @@
+{
+  "time": "2026-09-19T16:12:52.746023+08:00",
+  "processes": {
+    "exit": 0,
+    "output": "PID    PPID USER     STAT     ELAPSED COMMAND\n  41338   41283 zhanglu  Rsl   2-23:29:31 /home/zhanglu/miniconda3/envs/robotwin_openvla/bin/python -u vla-scripts/finetune.py --vla_path openvla/openvla-7b --data_root_dir /home/zhanglu/tensorflow_datasets --dataset_name aloha_beat_block_hammer --run_root_dir /home/zhanglu/robot/RoboTwin/policy/openvla-oft/runs --use_l1_regression True --use_diffusion False --use_film False --num_images_in_input 3 --grad_accumulation_steps 16 --use_proprio True --batch_size 1 --learning_rate 5e-4 --num_steps_before_decay 50000 --max_steps 60000 --use_val_set True --val_freq 1000 --save_freq 1000 --save_latest_checkpoint_only False --image_aug True --lora_rank 16 --run_id_override beat_block_hammer_clean_nofilm_full --run_id_note beat_block_hammer_clean_nofilm_full\n 102561       1 yongpeng Ss    1-03:58:51 /home/yongpeng/miniconda3/envs/py310/bin/python -u -B scripts/step28_wait_gpu.py /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260918/base_queue/20260918_113800",
+    "error": ""
+  },
+  "gpu": {
+    "exit": 0,
+    "output": "NVIDIA GeForce RTX 5090, 3999, 28111, 31",
+    "error": ""
+  },
+  "compute": {
+    "exit": 0,
+    "output": "41338, 28056",
+    "error": ""
+  },
+  "paths": {
+    "queue": {
+      "exists": true,
+      "children": [
+        "test_resources.log",
+        "wait_status.json",
+        "base_review_ready.json",
+        "startup_verification.json",
+        "returned.json",
+        "tests.log",
+        "original_waiter.py",
+        "native_resume.json",
+        "startup_returned.json",
+        "native_resume_verification.json",
+        "replacement.json",
+        "waiter_launch.json",
+        "queue_input.zip",
+        "deployment.json",
+        "native_resume_evidence.zip",
+        "queue_sources.json",
+        "native_resume_return_sync.json",
+        "semantic_reaudit_pause.json",
+        "base_review_ready_before_native_fix.json",
+        "startup_return_sync.json",
+        "queue.json",
+        "test_exit.txt",
+        "queue_start.json",
+        "startup_evidence.zip",
+        "waiter.log"
+      ],
+      "wait_status.json": "{\n  \"gpu_free_mib\": 3999,\n  \"compute_pids\": [\n    41338\n  ],\n  \"host_free_bytes\": 227360313344,\n  \"disk_free_bytes\": 860137005056,\n  \"required_disk_bytes\": 34359738368,\n  \"ready\": false,\n  \"review_ready\": true,\n  \"resource_ready\": false,\n  \"stage\": \"base_models\",\n  \"time\": \"2026-09-19T16:11:52.815040+08:00\",\n  \"consecutive_ready\": 0,\n  \"status\": \"WAITING_RESOURCES\"\n}\n"
+    },
+    "base": {
+      "exists": false,
+      "children": []
+    },
+    "sensitivity": {
+      "exists": true,
+      "children": [
+        "wait_status.json",
+        "waiter_launch.json",
+        "approved_sources.json",
+        "waiter.log"
+      ],
+      "wait_status.json": "{\n  \"gpu_free_mib\": 3999,\n  \"compute_pids\": [\n    41338\n  ],\n  \"host_free_bytes\": 237836500992,\n  \"disk_free_bytes\": 1021290053632,\n  \"ready\": false,\n  \"time\": \"2026-09-18T11:36:14.767958+08:00\",\n  \"consecutive_ready\": 0\n}\n"
+    }
+  },
+  "disk_free": 859559411712,
+  "protected_matches_previous": true
+}

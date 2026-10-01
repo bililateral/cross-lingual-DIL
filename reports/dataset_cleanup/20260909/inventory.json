@@ -1,0 +1,169 @@
+{
+  "date": "2026-09-09",
+  "status": "WINDOWS_INVENTORY_COMPLETE_LINUX_COPY_VERIFICATION_PENDING_NO_DELETION",
+  "user_request": "Delete the previously generated Chinese synthetic dataset on Windows to save space; user believes Linux may retain a copy.",
+  "root_relative": "reports/step28_synthetic_chinese_dataset",
+  "inventory_method": "Read-only filesystem path, type and size enumeration; no data or label records parsed; no reparse points followed.",
+  "logical_file_sizes_only": true,
+  "root_totals": {
+    "files": 446,
+    "bytes": 8013396385
+  },
+  "directory_inventory": [
+    {
+      "path": "deprecated_release_evidence",
+      "files": 9,
+      "bytes": 124325,
+      "GiB": 0.0001
+    },
+    {
+      "path": "design_preflights",
+      "files": 152,
+      "bytes": 74909987,
+      "GiB": 0.0698
+    },
+    {
+      "path": "failure_records",
+      "files": 13,
+      "bytes": 112512596,
+      "GiB": 0.1048
+    },
+    {
+      "path": "post_release_audits",
+      "files": 4,
+      "bytes": 821538,
+      "GiB": 0.0008
+    },
+    {
+      "path": "release_inputs",
+      "files": 17,
+      "bytes": 251364656,
+      "GiB": 0.2341
+    },
+    {
+      "path": "v13_dev_smoke_v1_20260727",
+      "files": 5,
+      "bytes": 48534,
+      "GiB": 0
+    },
+    {
+      "path": "v13_dev_smoke_v2_20260728",
+      "files": 11,
+      "bytes": 230655,
+      "GiB": 0.0002
+    },
+    {
+      "path": "v13_training_ready_v1_2_order_repair_20260731",
+      "files": 160,
+      "bytes": 5179549772,
+      "GiB": 4.8238
+    },
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829",
+      "files": 35,
+      "bytes": 1617649756,
+      "GiB": 1.5066
+    },
+    {
+      "path": "v9_4_1_formal_500x4_quality_attempt1_20260829",
+      "files": 1,
+      "bytes": 15835327,
+      "GiB": 0.0147
+    },
+    {
+      "path": "v9_4_method_root_attempt1_20260828",
+      "files": 33,
+      "bytes": 744407281,
+      "GiB": 0.6933
+    },
+    {
+      "path": "v9_4_method_root_quality_attempt3_20260828",
+      "files": 1,
+      "bytes": 15785893,
+      "GiB": 0.0147
+    },
+    {
+      "path": "v9_4_prebuild_gate_attempt2_20260828",
+      "files": 2,
+      "bytes": 4496,
+      "GiB": 0
+    },
+    {
+      "path": "v9_4_prebuild_gate_attempt3_20260828",
+      "files": 3,
+      "bytes": 151569,
+      "GiB": 0.0001
+    }
+  ],
+  "principal_dataset_roots": [
+    {
+      "path": "v13_training_ready_v1_2_order_repair_20260731",
+      "files": 160,
+      "bytes": 5179549772,
+      "GiB": 4.8238
+    },
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829",
+      "files": 35,
+      "bytes": 1617649756,
+      "GiB": 1.5066
+    },
+    {
+      "path": "v9_4_method_root_attempt1_20260828",
+      "files": 33,
+      "bytes": 744407281,
+      "GiB": 0.6933
+    }
+  ],
+  "formal_split_inventory": [
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829/audit_a",
+      "files": 8,
+      "bytes": 396657648,
+      "GiB": 0.3694
+    },
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829/audit_b",
+      "files": 8,
+      "bytes": 395700262,
+      "GiB": 0.3685
+    },
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829/development",
+      "files": 8,
+      "bytes": 404164293,
+      "GiB": 0.3764
+    },
+    {
+      "path": "v9_4_1_formal_500x4_attempt1_20260829/train",
+      "files": 8,
+      "bytes": 393054145,
+      "GiB": 0.3661
+    }
+  ],
+  "reparse_points": [],
+  "existing_copy_evidence": {
+    "source": "reports/seller_alias_continual/20260907/text_execution/20260907_200309/sync.json",
+    "scope": "Two formal train/development redacted_items.jsonl files plus eight derived projection arrays/row-key files were present with matching sizes and SHA-256 on 2026-09-07. This does not establish that the full dataset roots are currently mirrored.",
+    "formally_generated_root_files": 35,
+    "formal_root_files_covered_by_this_receipt": 2,
+    "full_remote_dataset_copy_confirmed": false
+  },
+  "next_stage": {
+    "purpose": "Verify Linux copies before removing Windows payloads needed to retain old research reproducibility.",
+    "remote_root": "/home/yongpeng/cross-lingual/reports/step28_synthetic_chinese_dataset",
+    "operations": "After user resumes the reported Linux stage, inspect only relevant owned paths, file metadata and necessary SHA-256 values. Return a small inventory; no dataset generation, training, GPU use, remote deletion or environment changes.",
+    "resources": "One low-priority sequential CPU process for hashing at most approximately 7.1 GiB of the three principal dataset roots; streaming memory usage and small metadata transfer; wait if shared storage is busy.",
+    "server_connection_this_turn": false,
+    "needs_user_resume_under_repository_linux_rule": true,
+    "missing_copy_disposition": "Do not delete a sole necessary research copy. Report missing coverage before any archival transfer; sealed truth is outside this verification stage."
+  },
+  "retention": {
+    "preserve": "Existing result reports, reviews, source/generation manifests and necessary reproducibility records.",
+    "excluded": "models/, real marketplace source inputs, private_custody/, sealed labels/qrels/controller assets, Git object stores and other users' server files."
+  },
+  "deleted_files": 0,
+  "freed_bytes": 0,
+  "temporary_scripts_created": 0
+}
+
