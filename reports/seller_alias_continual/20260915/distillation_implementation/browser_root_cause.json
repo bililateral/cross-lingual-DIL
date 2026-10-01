@@ -1,0 +1,77 @@
+{
+  "status": "ROOT_TRIGGER_ISOLATED_NO_PERMANENT_REPAIR_APPLIED",
+  "observed_at": "2026-09-15T17:27:07.439752+08:00",
+  "root_trigger": "Chrome restores the same completed download from History and shared_proto_db; a minimal clone retaining History id12 and its shared DownloadDB record reproduces the crash with extensions enabled and no installed IDM extension. Removing that shared record eliminates the crash.",
+  "sequence": [
+    "download event",
+    "Chrome native access violation 0xc0000005 in chrome.dll",
+    "page/context close",
+    "MCP automatic saveAs rejects",
+    "unhandled async rejection terminates Node",
+    "later MCP requests return Transport closed"
+  ],
+  "idm_evidence": {
+    "registry_registration_exists": true,
+    "extension_id": "ngpampappnmepgilojfohadhhmbhlaek",
+    "registered_version": "6.43.1",
+    "extensions_management_api": [],
+    "idm_process_or_dump_module_found": false,
+    "specific_idm_cause_supported": false
+  },
+  "disproved_or_unproved_hypotheses": [
+    "Network or ChatGPT attachment required: local data URL also reproduces",
+    "New download numeric ID collision: failing clone allocated new id29, above all previous ids",
+    "Database physical corruption: History integrity_check passed; original log structure parsed; no assertion of corrupt bytes",
+    "Exact native C++ faulty function or use-after-free: no matching symbolized stack, not claimed",
+    "Temporary extension-disable workaround is not the root repair"
+  ],
+  "minimal_controls": {
+    "history_only": "pass",
+    "shared_only": "pass",
+    "history_id12_plus_shared_id12": "crash",
+    "same_pair_remove_shared_id12": "pass",
+    "history_id12_renumber_1000": "pass",
+    "original_history_plus_shared_without_7_completed_matches": "pass"
+  },
+  "configuration": {
+    "permanent_mcp_arguments_reverted": true,
+    "temporary_config_file_removed": true,
+    "next_browser_launch_flags_restored": true,
+    "mcp_session_only_diagnostic_catch_remains": true,
+    "shared_original_database_intentionally_edited": false,
+    "ordinary_browser_and_system_IDM_changed": false
+  },
+  "evidence_files": [
+    "browser_event_sequence.json",
+    "browser_profile_bisection.json",
+    "browser_profile_pairs.json",
+    "browser_history_bisection.json",
+    "browser_download_identity_tests.json",
+    "browser_download_path_tests.json",
+    "browser_download_record_tests.json"
+  ],
+  "sources_observed_now": [
+    {
+      "name": "History",
+      "bytes": 524288,
+      "sha256": "9b5d63cfec6a0ad3fae18d3f5e939bf2c020785400e3c1f4b835260ca061c094"
+    },
+    {
+      "name": "shared_proto_db\\000003.log",
+      "bytes": 332002,
+      "sha256": "25724e392f0186f44b2dcd9202128e7fece6610439c90c7d3320bcb11f70836a"
+    },
+    {
+      "name": "shared_proto_db\\MANIFEST-000001",
+      "bytes": 41,
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "name": "shared_proto_db\\metadata\\000003.log",
+      "bytes": 2682,
+      "sha256": "9afaa69afd5b5e31f543e1f537e422bd1589e06a88e1687cefe8812fef977cea"
+    }
+  ],
+  "future_repair_candidate": "After root-cause report, back up browser download state locally and remove stale completed DownloadDB matches using a reviewed, reversible procedure; independently fix MCP per-download rejection handling. Neither applied permanently in this diagnosis.",
+  "research_scope": "No Linux connection; no research source,labels,training or conclusions changed."
+}

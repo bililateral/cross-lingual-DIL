@@ -1,0 +1,55 @@
+{
+  "status": "MCP_HTTPS_DOWNLOAD_REPAIR_VERIFIED",
+  "date": "2026-09-15",
+  "mechanism": "Before every launch of the exact MCP Chrome profile, remove DownloadDB cache records whose GUID matches completed/cancelled automation downloads in read-only History. Preserve History and other shared DB clients. Catch per-download saveAs rejection.",
+  "native_current_session": {
+    "launch_patch": true,
+    "error_guard": true,
+    "actual_attachment_saved": true,
+    "bytes": 65565,
+    "sha256": "da27aa61dd9524028b46a886cb3f46b551a6f152cf890acb27d06ab5c3cf7508",
+    "subsequent_call_passed": true
+  },
+  "validation": [
+    "Two independent MCP processes: real HTTPS browser download, exact ZIP bytes, 30-member CRC",
+    "Cancellation: failure reported, finished=false, following tool calls work",
+    "After cancellation: same MCP process closes/reopens browser twice and downloads successfully",
+    "Installed launcher: actual ChatGPT review attachment downloaded with exact bytes",
+    "Current native MCP: actual ChatGPT review attachment downloaded with exact bytes",
+    "Offline preservation: 1 expected cache key removed,164 other key/value pairs unchanged,History and Cookies SHA unchanged"
+  ],
+  "superseded_attempts": [
+    "One-time completed cache deletion: first pass, new completion recreates trigger on later start",
+    "Chrome downloads UI cleanup: not established as durable; helper withdrawn",
+    "Disable-extensions=true: actual flag present, restart still failed; not installed as solution",
+    "History-only index deletion: cache repopulates records; withdrawn",
+    "Completed-only startup cache cleanup: cancelled record still reproduced crash; include already-cancelled automation records"
+  ],
+  "idm": {
+    "user_confirmed_file": "archive-check.zip",
+    "observed_process": "IDMan PID4148",
+    "mcp_extensions_api": [],
+    "http_fixture_captured_even_when_extensions_disabled": true,
+    "https_fixture_and_actual_chatgpt_browser_downloads_passed": true,
+    "no_global_settings_modified": true,
+    "claim_boundary": "HTTP interception is distinct from native Chrome crash; general IDM HTTP interception remains, no assertion of IDM-exclusive crash cause"
+  },
+  "scope_limits": [
+    "Windows-only browser tooling repair; no Linux connection, research code,labels,training,or result change",
+    "Upstream Chrome native defect not patched or symbolized; scoped cache workaround tested on Chrome153.0.8010.37 and MCP0.0.81",
+    "Launcher reuses the examined npm cache module path; if that cache is removed or tool/browser version changes, revalidate integration",
+    "Downloaded external verification scripts not yet read/executed as research review"
+  ],
+  "permanent_files": [
+    "C:/Users/35734/.codex/playwright-mcp.cjs",
+    "C:/Users/35734/.codex/playwright-download-guard.cjs",
+    "C:/Users/35734/.codex/playwright-repair-runtime"
+  ],
+  "rollback": "C:/Users/35734/.codex/playwright-recovery/20260915_174003 contains pre-repair tool configuration,History,shared_proto_db; restore browser state only with MCP Chrome closed",
+  "cleanup": {
+    "status": "COMPLETE",
+    "files": 60,
+    "bytes": 725213,
+    "receipt": "browser_fix_cleanup.json"
+  }
+}

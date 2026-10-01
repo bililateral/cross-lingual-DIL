@@ -1,0 +1,44 @@
+--- submitted_runner.py
++++ scripts/step28_continual_distillation.py
+@@ -263,14 +263,14 @@
+         squared = {'encoder': 0., 'head': 0.}
+         handles = []
+ 
+-        def observe(gradient: Any, name: str) -> None:
++        def observe_gradient(gradient: Any, name: str) -> None:
+             squared[name] += float(gradient.detach().float().square().sum())
+ 
+         try:
+             for name, module in (('encoder', model.encoder), ('head', model.head)) if observe else ():
+                 for p in module.parameters():
+                     if p.requires_grad:
+-                        handles.append(p.register_hook(lambda g, n=name: observe(g, n)))
++                        handles.append(p.register_hook(lambda g, n=name: observe_gradient(g, n)))
+             if label == 'current':
+                 losses[label] = core.backward_group(model, group, config, stream, check)
+             else:
+--- submitted_tests.py
++++ tests/test_step28_continual_distillation_contracts.py
+@@ -243,7 +243,8 @@
+                     term.backward()
+                     torch.nn.utils.clip_grad_norm_(reference.parameters(), c['optimizer']['clip_norm'], error_if_nonfinite=True)
+                     refopt.step()
+-                    log = distill.observed_update(model, opt, current, history, c, 19 + step, 39 + step, lambda: None, targets, coefficient=coefficient)
++                    log = distill.observed_update(model, opt, current, history, c, 19 + step, 39 + step, lambda: None, targets,
++                        observe=(step == 1), coefficient=coefficient)
+                     if coefficient == 0:
+                         core.update(plain, plainopt, current, history, c, 19 + step, 39 + step)
+                         self.assertEqual(core.state_digest(model.state_dict()), core.state_digest(plain.state_dict()))
+@@ -253,7 +254,11 @@
+                     for actual, expected in zip(opt.state.values(), refopt.state.values()):
+                         for key in ('exp_avg', 'exp_avg_sq'):
+                             torch.testing.assert_close(actual[key], expected[key], rtol=1e-5, atol=1e-8)
+-                    self.assertGreater(log['branches_squared_hook_norm']['replay']['encoder'], 0)
++                    if step == 1:
++                        self.assertGreater(log['branches_squared_hook_norm']['replay']['encoder'], 0)
++                    else:
++                        self.assertTrue(all(value == 0 for branch in log['branches_squared_hook_norm'].values()
++                                            for value in branch.values()))
+                     self.assertTrue(all(float(s['step']) == step for s in opt.state.values()))
+                     if step == 1:
+                         with tempfile.TemporaryDirectory() as temp:

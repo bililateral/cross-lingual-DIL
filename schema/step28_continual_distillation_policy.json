@@ -1,0 +1,47 @@
+{
+  "study": "seller_alias_expression_boundary_logit_distillation",
+  "origin_run": "reports/seller_alias_continual/20260910/expression_execution/20260910_154137/run",
+  "origin_manifest_sha256": "004d6b619249afe7751df58babd9c25521d3466d84c64fd0a49137042ecc270f",
+  "origin_evaluation": "reports/seller_alias_continual/20260910/expression_evaluation/20260910_171540/evaluation.json",
+  "origin_evaluation_sha256": "a659c5cf8d4258719541678b539ff47a8a69f76ac604d02dcc82198e0e81f04a",
+  "physical_updates": 1620,
+  "memory": {
+    "capacity": 6,
+    "maximum_bytes": 1048576,
+    "replay_coefficient": 1
+  },
+  "evaluation": {
+    "retention_min": 0.01,
+    "new_difference_floor": -0.01,
+    "new_gain_min": 0.02,
+    "same_orders": 2,
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260910
+  },
+  "label_parses": {
+    "train": 1,
+    "development": 1,
+    "heldout": 0,
+    "owners": 0
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 10800,
+    "maximum_output_bytes": 17179869184,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "torch_cpu_threads": 1
+  },
+  "boundary": "User approved implementation. Verification and review first; report and pause before new Linux stage. No formal labels or launch during local implementation.",
+  "distillation": {
+    "coefficient": 0.5,
+    "target_dtype": "<f4",
+    "target_timing": "arrival_stage_end_after_reservoir_selection",
+    "refresh_survivors": false,
+    "history_forward": "shared_bce_mse_train_mode",
+    "maximum_target_group_forwards": 36
+  },
+  "baseline_run": "reports/seller_alias_continual/20260915/replay_execution/20260915_112424/job/run",
+  "baseline_evaluation": "reports/seller_alias_continual/20260915/replay_evaluation/20260915_125920/evaluation.json",
+  "baseline_run_sha256": "470b723c2e79e790a6984087ebefb971807e489a0ca723b2dc1e2dcf4e1cdad6",
+  "baseline_evaluation_sha256": "d88a3f9bb00513eb83ffe98dc98468d0bdd62eceb5c55795c53fa07c3241b9e4"
+}

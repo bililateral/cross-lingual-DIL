@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE_EVALUATED_EXTERNALLY_REVIEWED",
+  "started": "2026-09-15T16:44:31+08:00",
+  "finished": "2026-09-15T18:00:02+08:00",
+  "exit_status": 0,
+  "physical_updates": 1620,
+  "full_process_seconds": 4531,
+  "formal_training_seconds": 3710.917493860001,
+  "inference_seconds_including_replay": 292.3903982230113,
+  "teacher_seconds": 21.372260865999124,
+  "teacher_group_forwards": 25,
+  "sampled_run_peak_bytes": 11319124226,
+  "conservative_execution_payload_bound_bytes": 11319334525,
+  "peak_is_exact": false,
+  "returned_files": 32,
+  "returned_bytes": 2355700,
+  "retained_linux_models": 3,
+  "retained_model_bytes": 5660853090,
+  "evaluation": "reports/seller_alias_continual/20260915/distillation_evaluation/20260915_181330",
+  "evaluation_seconds": 1.7551466000004439,
+  "stage_label_permissions": {
+    "train": "consumed once on Linux",
+    "valid": "consumed once on Windows",
+    "test": 0,
+    "owners": 0
+  },
+  "local_audit": {
+    "numeric_values": 14130,
+    "max_difference": 2.220446049250313e-16,
+    "blind_checks": 540,
+    "label_parses": 0
+  },
+  "external_review": {
+    "status": "COMPLETE_PRIMARY_REVIEW_VERIFIED",
+    "reply_id": "b2af6353-cadb-4e07-a855-997d0ac1e136",
+    "model_slug": "gpt-6-pro",
+    "scientific_blockers": [],
+    "findings": [
+      {
+        "id": "R3",
+        "classification": "REPRODUCIBILITY_DEFECT",
+        "blocking": false,
+        "status": "CLOSED_DOCUMENT_ONLY",
+        "snapshot_bytes": 205128,
+        "training_complete_history_bytes": 205146
+      }
+    ],
+    "prior_D1": "closed current source/run",
+    "prior_D2": "closed current package",
+    "overall_gate_passed": false,
+    "local_retention_progress": true,
+    "new_experiment_authorized": false,
+    "primary_verification": "review_verification.json",
+    "raw_reply": "review_reply.json",
+    "archive": "external_evidence.zip"
+  },
+  "audit_script_corrections": [
+    "Fixed output-only audit root path before any evidence read",
+    "Converted numpy Boolean before JSON serialization; no formal labels or evaluation rerun"
+  ],
+  "snapshot_max_bytes": 205128,
+  "training_complete_history_max_bytes": 205146
+}
