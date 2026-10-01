@@ -1,0 +1,98 @@
+{
+  "scope": "Exact analytic enumeration of one pair of observed style tuples, no generated dataset, no model, no label file.",
+  "construction": "Product of three axis probabilities, integrating each of twelve controller styles; different controllers integrated independently.",
+  "fixed_visible_examples": {
+    "title_public_match": [
+      [
+        0,
+        0
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "description_public_match": [
+      [
+        3,
+        4
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "service_public_match": [
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  "domain_conditioned_ratios": {
+    "A": {
+      "title_public_match": {
+        "positive_negative_likelihood_ratio": 0.759041870839497,
+        "exact_fraction": "525427/692224"
+      },
+      "description_public_match": {
+        "positive_negative_likelihood_ratio": 0.215576171875,
+        "exact_fraction": "883/4096"
+      },
+      "service_public_match": {
+        "positive_negative_likelihood_ratio": 0.35215966391101106,
+        "exact_fraction": "520723/1478656"
+      }
+    },
+    "B": {
+      "title_public_match": {
+        "positive_negative_likelihood_ratio": 0.35215966391101106,
+        "exact_fraction": "520723/1478656"
+      },
+      "description_public_match": {
+        "positive_negative_likelihood_ratio": 0.759041870839497,
+        "exact_fraction": "525427/692224"
+      },
+      "service_public_match": {
+        "positive_negative_likelihood_ratio": 0.215576171875,
+        "exact_fraction": "883/4096"
+      }
+    },
+    "C": {
+      "title_public_match": {
+        "positive_negative_likelihood_ratio": 0.215576171875,
+        "exact_fraction": "883/4096"
+      },
+      "description_public_match": {
+        "positive_negative_likelihood_ratio": 0.35215966391101106,
+        "exact_fraction": "520723/1478656"
+      },
+      "service_public_match": {
+        "positive_negative_likelihood_ratio": 0.759041870839497,
+        "exact_fraction": "525427/692224"
+      }
+    }
+  },
+  "interpretation": "There are visible style evidence patterns whose optimal label likelihood ranking reverses across domains. This is controlled conditional change, not proof of network forgetting.",
+  "limitations": [
+    "Only style tuples, ignores product and records; full-text Bayes ranking not established.",
+    "All probabilities positive; labels remain uncertain. Shared rules may still suffice for this model.",
+    "Joint-training feasibility, actual domain acquisition and forgetting remain empirical questions."
+  ]
+}

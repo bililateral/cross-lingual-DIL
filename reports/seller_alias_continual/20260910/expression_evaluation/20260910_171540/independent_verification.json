@@ -1,0 +1,84 @@
+{
+  "status": "PASS_SAVED_RESULT_INDEPENDENT_RECOMPUTATION",
+  "numbers_compared": 7194,
+  "maximum_absolute_difference": 1.1102230246251565e-16,
+  "scope": "Saved group metrics, confusion counts, raw-score threshold counts, independent paired bootstrap, gates and timings. No label CSV parsing or model deserialization; formal AP/retrieval not recomputed from truth in this audit.",
+  "evaluation_sha256": "a659c5cf8d4258719541678b539ff47a8a69f76ac604d02dcc82198e0e81f04a",
+  "transfers": [
+    {
+      "order": "ABC",
+      "stage": 2,
+      "new_domain": "B",
+      "new_AP_gain": 0.08898022794018606,
+      "old_domain_AP_changes": {
+        "A": -0.10307514024430778
+      }
+    },
+    {
+      "order": "ABC",
+      "stage": 3,
+      "new_domain": "C",
+      "new_AP_gain": 0.08635034653942983,
+      "old_domain_AP_changes": {
+        "A": 0.006630280316105843,
+        "B": -0.02085983682780749
+      }
+    },
+    {
+      "order": "BCA",
+      "stage": 2,
+      "new_domain": "C",
+      "new_AP_gain": 0.09624499123271558,
+      "old_domain_AP_changes": {
+        "B": -0.021025956220953414
+      }
+    },
+    {
+      "order": "BCA",
+      "stage": 3,
+      "new_domain": "A",
+      "new_AP_gain": 0.10369201555127479,
+      "old_domain_AP_changes": {
+        "B": 0.005500518041614002,
+        "C": -0.029474397615573838
+      }
+    },
+    {
+      "order": "CAB",
+      "stage": 2,
+      "new_domain": "A",
+      "new_AP_gain": 0.12004230617474707,
+      "old_domain_AP_changes": {
+        "C": -0.10459099046605105
+      }
+    },
+    {
+      "order": "CAB",
+      "stage": 3,
+      "new_domain": "B",
+      "new_AP_gain": 0.08594329502947444,
+      "old_domain_AP_changes": {
+        "A": -0.10109494647955056,
+        "C": 0.039765295556990786
+      }
+    }
+  ],
+  "timing": {
+    "training_seconds": 3316.496731197927,
+    "two_pass_scoring_seconds": 493.2602384639904,
+    "point_state_handling_seconds": 474.42881171312183,
+    "other_runner_seconds": 242.54686081269756,
+    "runner_seconds": 4526.732642187737,
+    "full_process_seconds_reported": 4547,
+    "peak_observed_bytes": 18865857910
+  },
+  "qualification": {
+    "single_domain_gain": true,
+    "joint_compatibility": false,
+    "mean_forgetting": true,
+    "positive_forgetting_interval": true,
+    "mean_new_gain": true,
+    "same_order_joint_condition": true
+  },
+  "models_retained_linux": 7
+}
