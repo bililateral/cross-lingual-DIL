@@ -1,0 +1,86 @@
+{
+  "status": "PASS_STATIC_ONLY_RUNTIME_PENDING",
+  "environment": {
+    "python": "3.10.11",
+    "system": "Windows"
+  },
+  "files": [
+    {
+      "path": "scripts/step28_er_weight.py",
+      "bytes": 8463,
+      "sha256": "7381a03cf003c35026e74fb4a2f700124ae3cda3cbae849131bcfe15f84728c3",
+      "python_310_ast": "PASS",
+      "handmade_cases": []
+    },
+    {
+      "path": "scripts/step28_er_weight_run.py",
+      "bytes": 30913,
+      "sha256": "bb37f8f37cc88ae1a806f82f2ca3d9c8163337a2a2b31c02a00db9695fe718d3",
+      "python_310_ast": "PASS",
+      "handmade_cases": []
+    },
+    {
+      "path": "scripts/step28_er_weight_evaluate.py",
+      "bytes": 9460,
+      "sha256": "612c6df989e64e26cde2bb4953dac4b8f6d39a2afb65c193dd919c4cc354d110",
+      "python_310_ast": "PASS",
+      "handmade_cases": []
+    },
+    {
+      "path": "scripts/step28_er_weight_check.py",
+      "bytes": 11853,
+      "sha256": "bd3eaf96fca2bba9f3826505aba4156b92d28c7af80007f533a27bc8a3fd9416",
+      "python_310_ast": "PASS",
+      "handmade_cases": []
+    },
+    {
+      "path": "tests/test_step28_er_weight_contracts.py",
+      "bytes": 22469,
+      "sha256": "e33e324fc45df88a711227c308e5deb8fea05e09fb70d899f34b0ffdcb85c37f",
+      "python_310_ast": "PASS",
+      "handmade_cases": [
+        "test_confirmed_scope",
+        "test_original_er_exact_update_parity",
+        "test_weights_match_independent_derivatives_and_adam",
+        "test_only_history_weight_changes_forwards",
+        "test_unknown_coefficients_and_missing_history_rejected",
+        "test_stage_last_step_preserves_encoder_but_updates_head",
+        "test_tiny_full_restore_preserves_next_weighted_update",
+        "test_resume_supply_cannot_revisit_first_or_skip",
+        "test_real_tiny_checkpoint_replay_and_weight_metadata",
+        "test_gate_rejects_changed_start_and_calibration_domain",
+        "test_complete_blind_gate_and_missing_endpoint",
+        "test_gate_rejects_wrong_weight_and_unpaired_history",
+        "test_gate_rejects_wrong_accumulated_total",
+        "test_collect_requires_every_point_and_preserves_36_sets",
+        "test_original_23_guards_drive_selection_and_fallback",
+        "test_candidate_views_and_paired_endpoint_arithmetic"
+      ]
+    }
+  ],
+  "shell_files": [
+    {
+      "path": "scripts/run_step28_er_weight_linux_20261001.sh",
+      "bytes": 1231,
+      "sha256": "d8695b47aabca139caa624c7a89c9d970e3f8f2c1b1caef5e564611f8798201b",
+      "lf_only": true,
+      "bash_syntax_execution": "PENDING_LINUX_OR_WEB"
+    },
+    {
+      "path": "scripts/run_step28_er_check_linux_20261001.sh",
+      "bytes": 992,
+      "sha256": "5afb1acb5da6d7bd5e7f4c0ffa75801894df1ab69f0da2e300b488ca227654e8",
+      "lf_only": true,
+      "bash_syntax_execution": "PENDING_LINUX_OR_WEB"
+    }
+  ],
+  "original_sources_unchanged": 18,
+  "policy_sha256": "9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396",
+  "relative_contract_links_checked": 4,
+  "new_handmade_cases_defined": 16,
+  "tests_run": 0,
+  "native_updates_run": 0,
+  "research_script_imports_or_executions": 0,
+  "linux_connections": 0,
+  "limitations": "AST, references and existing small file identities only; native checks and test execution await approved web/Linux sequence"
+}

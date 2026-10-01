@@ -1,0 +1,186 @@
+"""Linux CPU handwritten verification; no formal texts, labels or trained states."""
+from __future__ import annotations
+
+import argparse
+import gc
+import os
+from pathlib import Path
+import platform
+import resource
+import sys
+import time
+import unittest
+from unittest import mock
+
+import numpy as np
+
+import step28_er_weight as method
+
+
+def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+    import torch
+
+    started = time.monotonic()
+    c = method.config(method.contract())
+    model = method.base.load_model(c, "split_rank", "cpu")
+    optimizer = method.core.make_optimizer(model, c)
+    old, current = fixtures.handmade_group("native_old", 1), fixtures.handmade_group("native_current", 2)
+    initial = method.core.state_digest(model.state_dict())
+    covered = [p for group in optimizer.param_groups for p in group["params"]]
+    if len({id(p) for p in covered}) != len(covered) or {id(p) for p in covered} != {id(p) for p in model.parameters()}:
+        raise ValueError("Native optimizer coverage differs")
+    warm = method.parent.update(model, optimizer, old, None, None, c, "seq", 1, 1, 81, 82,
+                                observe=True, check=check)
+    after_warm = method.core.state_digest(model.state_dict())
+    # An explicit handmade counter fixture, never a claim of 288 native warm updates.
+    for state in optimizer.state.values():
+        state["step"].fill_(288)
+    before_optimizer = method.core.state_digest(optimizer.state_dict())
+    probes = {name: parameter for name, parameter in model.named_parameters()
+              if ".attention.self.query.weight" in name or ".embeddings.word_embeddings.weight" in name
+              or name.startswith("head.")}
+    layers = model.encoder[0].auto_model.config.num_hidden_layers
+    if sum(".attention.self.query.weight" in name for name in probes) != layers:
+        raise ValueError("Native layer probes incomplete")
+    before = {name: method.core.state_digest(p) for name, p in probes.items()}
+    component_parameters = {
+        "encoder_first_query": model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,
+        "head_hidden": model.head[0].weight}
+    components = {name: [] for name in component_parameters}
+    hooks = [parameter.register_hook(lambda grad, name=name: components[name].append(grad.detach().clone()))
+             for name, parameter in component_parameters.items()]
+    captured = []
+    hooks.append(model.head.register_forward_hook(lambda _, __, output: captured.append(output.detach().flatten().numpy().copy())))
+    try:
+        update = method.update(model, optimizer, current, old, c, method.ARMS[arm], 2, 1, 107, 108,
+                               observe=True, check=check)
+    finally:
+        for hook in hooks:
+            hook.remove()
+    if len(captured) != 2 or any(len(values) != 2 for values in components.values()):
+        raise ValueError("Need separate current/history native forwards and gradient contributions")
+    independent = {}
+    for role, values, group in (("current", captured[0], current), ("history", captured[1], old)):
+        independent[role] = fixtures.scalar_losses(values, group.labels)
+        for term, value in independent[role].items():
+            if abs(update[role + "_" + term] - value) > (4e-6 if term == "total" else 2e-6):
+                raise ValueError("Native objective differs from scalar reference")
+    expected_total = independent["current"]["total"] + method.ARMS[arm] * independent["history"]["total"]
+    if abs(update["total"] - expected_total) > 6e-6:
+        raise ValueError("Native history weight does not affect the full objective")
+    rows = []
+    for name, parameter in probes.items():
+        norm = float(parameter.grad.norm()) if parameter.grad is not None else 0.
+        changed = before[name] != method.core.state_digest(parameter)
+        if not np.isfinite(norm) or norm <= 0 or not changed:
+            raise ValueError("Native parameter was not updated: " + name)
+        rows.append({"name": name, "gradient_norm_after_clip": norm, "parameters_changed": changed})
+    for name, contributions in components.items():
+        if not all(torch.isfinite(g).all() and float(g.norm()) > 0 for g in contributions):
+            raise ValueError("A native loss contribution misses " + name)
+    unused = [name for name, p in model.named_parameters() if p.grad is None]
+    if any(".pooler." not in name for name in unused) or method.parent.adam_step(optimizer) != 289:
+        raise ValueError("Unexpected native optimizer coverage or step")
+    result = {"arm": arm, "history_weight": method.ARMS[arm], "native_updates_actually_executed": 2,
+              "counter_fixture": "One real warm update, then Adam counters 1->288; no native full-stage continuity claim",
+              "initial_model_state_sha256": initial, "after_warm_model_state_sha256": after_warm,
+              "before_stage2_optimizer_sha256": before_optimizer,
+              "after_model_state_sha256": method.core.state_digest(model.state_dict()),
+              "after_optimizer_sha256": method.core.state_digest(optimizer.state_dict()),
+              "warm_update": warm, "weighted_update": update,
+              "captured_current_logits": captured[0].tolist(), "captured_history_logits": captured[1].tolist(),
+              "independent_objectives": independent, "independent_total": expected_total,
+              "gradient_components": {name: {role: {"norm": float(g.norm()), "sha256": method.core.state_digest(g)}
+                                              for role, g in zip(("current", "weighted_history"), values, strict=True)}
+                                      for name, values in components.items()},
+              "parameter_probes": rows, "unused_parameters": unused, "backbone_layers": layers,
+              "seconds": time.monotonic() - started}
+    del model, optimizer, covered, probes, component_parameters
+    gc.collect()
+    return result, components
+
+
+def run(destination: Path) -> dict:
+    import torch
+
+    if platform.system() != "Linux" or os.environ.get("CUDA_VISIBLE_DEVICES") != "" or destination.exists():
+        raise ValueError("New Linux CPU evidence only; CUDA_VISIBLE_DEVICES must be empty")
+    p, source_files = method.contract(), method.sources()
+    torch.set_num_threads(1)
+    os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
+    torch.use_deterministic_algorithms(True)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    started = time.monotonic()
+
+    def check() -> None:
+        if time.monotonic() - started >= p["cpu_verification"]["maximum_seconds"]:
+            raise RuntimeError("CPU verification time limit reached")
+        if sum(f.stat().st_size for f in destination.parent.rglob("*") if f.is_file()) > p["cpu_verification"]["maximum_evidence_bytes"]:
+            raise RuntimeError("CPU evidence budget exceeded")
+
+    sys.path.insert(0, str(method.data.ROOT / "tests"))
+    import test_step28_er_weight_contracts as tests
+    import test_step28_bge_continual_contracts as fixtures
+    try:
+        with mock.patch.object(method.base.public, "public_inputs", side_effect=AssertionError("No formal texts")), \
+             mock.patch.object(method.base.public, "attach_labels", side_effect=AssertionError("No formal labels")), \
+             mock.patch.object(method.data, "Archive", side_effect=AssertionError("No formal archive")):
+            tested = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(tests))
+            contracts = {"passed": tested.testsRun - len(tested.failures) - len(tested.errors) - len(tested.skipped),
+                         "failed": len(tested.failures) + len(tested.errors), "skipped": len(tested.skipped)}
+            method.data.write_json(destination.parent / "contracts.json", contracts)
+            if not tested.wasSuccessful() or tested.skipped:
+                raise RuntimeError("Affected contracts must pass without skips")
+            check()
+            c = method.config(p)
+            archive = method.core.model_files(method.base.model_config(c, "split_rank"))
+            if any(archive[key] != c["models"]["split_rank"][key]
+                   for key in ("file_count", "total_size_bytes", "content_sha256")):
+                raise ValueError("Pretrained archive differs")
+            reports, components = {}, {}
+            for arm in method.ARMS:
+                print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
+                reports[arm], components[arm] = native(arm, fixtures, check)
+                method.data.write_json(destination.parent / (arm + ".json"), reports[arm])
+                print(method.data.json_bytes({"event": "native_end", "arm": arm, "seconds": reports[arm]["seconds"]}).decode(), flush=True)
+            for field in ("initial_model_state_sha256", "after_warm_model_state_sha256",
+                          "before_stage2_optimizer_sha256", "captured_current_logits", "captured_history_logits"):
+                if reports["half"][field] != reports["quarter"][field]:
+                    raise ValueError("Native current/history states are not paired: " + field)
+            scaling = {}
+            for name in components["half"]:
+                half_current, half_history = components["half"][name]
+                quarter_current, quarter_history = components["quarter"][name]
+                torch.testing.assert_close(half_current, quarter_current, rtol=0, atol=0)
+                torch.testing.assert_close(half_history, 2 * quarter_history, rtol=1e-6, atol=1e-8)
+                scaling[name] = {"current_exactly_equal": True,
+                                 "half_history_equals_twice_quarter": True,
+                                 "maximum_history_difference": float((half_history - 2 * quarter_history).abs().max())}
+            if method.sources() != source_files:
+                raise ValueError("Sources changed during verification")
+            result = {"status": "PASS_ER_WEIGHT_HANDMADE_CPU", "source_files": source_files,
+                      "contracts": contracts, "native": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
+                                                         for arm in method.ARMS},
+                      "native_updates_actually_executed": 4, "native_history_gradient_scaling_verified": True,
+                      "native_component_comparison": scaling, "formal_inputs": False, "formal_labels": False,
+                      "formal_updates": 0, "gpu": False, "retained_native_weights": 0, "archive": archive,
+                      "seconds": time.monotonic() - started, "max_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                      "environment": {"python": platform.python_version(), "torch": torch.__version__, "numpy": np.__version__,
+                                      "cpu_affinity": sorted(os.sched_getaffinity(0))},
+                      "limitations": "Handwritten groups and tiny/native CPU checks; no formal training, CUDA/BF16 or native 288-step continuity claim"}
+            method.data.write_json(destination, result)
+            check()
+            return result
+    except Exception as error:
+        method.data.write_json(destination.parent / "failure.json", {
+            "status": "ER_WEIGHT_CPU_FAILED", "error": str(error), "seconds": time.monotonic() - started,
+            "formal_inputs": False, "formal_labels": False})
+        raise
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args()
+    result = run(args.out.resolve())
+    print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())
