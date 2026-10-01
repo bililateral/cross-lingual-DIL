@@ -1,0 +1,54 @@
+test_01_scalar_analytic_gradient (__main__.IndependentAudit.test_01_scalar_analytic_gradient) ... FAIL
+test_02_independent_live_three_targets (__main__.IndependentAudit.test_02_independent_live_three_targets) ... FAIL
+test_03_reservoir_independent_stream_and_budget (__main__.IndependentAudit.test_03_reservoir_independent_stream_and_budget) ... ok
+test_04_full_micro_stage_checkpoint_and_branch (__main__.IndependentAudit.test_04_full_micro_stage_checkpoint_and_branch) ... ERROR
+test_05_all_endpoint_formulas_and_bootstrap (__main__.IndependentAudit.test_05_all_endpoint_formulas_and_bootstrap) ... ok
+test_06_twenty_three_single_condition_failures (__main__.IndependentAudit.test_06_twenty_three_single_condition_failures) ... ok
+test_07_gate_file_binding_and_draw_failures (__main__.IndependentAudit.test_07_gate_file_binding_and_draw_failures) ... ok
+test_08_collection_and_multi_failure_recovery (__main__.IndependentAudit.test_08_collection_and_multi_failure_recovery) ... ok
+test_09_calibration_scalar_optimum_and_current_only (__main__.IndependentAudit.test_09_calibration_scalar_optimum_and_current_only) ... ERROR
+test_10_access_and_visibility_scope (__main__.IndependentAudit.test_10_access_and_visibility_scope) ... ok
+
+======================================================================
+ERROR: test_04_full_micro_stage_checkpoint_and_branch (__main__.IndependentAudit.test_04_full_micro_stage_checkpoint_and_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v1.py", line 222, in test_04_full_micro_stage_checkpoint_and_branch
+    with mock.patch.object(m,'update',side_effect=wrapped):training=r.train_stage(model,optimizer,current,None,c,p,'ABC',1,'seq',root,budget)
+                                                                    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/data/bge_continual_external_audit/source/scripts/step28_bge_continual_run.py", line 132, in train_stage
+    **budget.state()}).decode(), flush=True)
+      ^^^^^^^^^^^^
+AttributeError: 'HandmadeBudget' object has no attribute 'state'
+
+======================================================================
+ERROR: test_09_calibration_scalar_optimum_and_current_only (__main__.IndependentAudit.test_09_calibration_scalar_optimum_and_current_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v1.py", line 354, in test_09_calibration_scalar_optimum_and_current_only
+    val,grad=m.calibration.objective(optimum,z,y)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'step28_alias_calibration' has no attribute 'objective'
+
+======================================================================
+FAIL: test_01_scalar_analytic_gradient (__main__.IndependentAudit.test_01_scalar_analytic_gradient)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v1.py", line 139, in test_01_scalar_analytic_gradient
+    self.assertLessEqual(ld,1e-12);self.assertLessEqual(gd,1e-12);row[k]={'value':vals[k],'value_error':ld,'gradient_error':gd}
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 2.5654145474618417e-11 not less than or equal to 1e-12
+
+======================================================================
+FAIL: test_02_independent_live_three_targets (__main__.IndependentAudit.test_02_independent_live_three_targets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v1.py", line 172, in test_02_independent_live_three_targets
+    self.assertLess(err,1e-10);self.assertAlmostEqual(got['total'],float(loss.detach()),places=10)
+                               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4.568907229075679 != 4.5689072928573875 within 10 places (6.378170880338985e-08 difference)
+
+----------------------------------------------------------------------
+Ran 10 tests in 15.946s
+
+FAILED (failures=2, errors=2)

@@ -1,0 +1,22 @@
+--- independent_checks_v2.py
++++ independent_checks_v3.py
+@@ -75,10 +75,16 @@
+ def mixed_target_rounding_correction(z):
+  """Value only: actual runner makes float32 labels even for this double toy.
+  Exact Bernoulli derivative remains double (measured in diagnosis), whereas
+- BCE values are per-element float32 before reduction. Do not fake gradients.
++ BCE values have two float32 stores before reduction. Do not fake gradients.
+  """
+- term=torch.stack([torch.logaddexp(z.new_zeros(()),v)-int(y)*v for v,y in zip(z,Y)])
+- return float(term.detach().float().mean())-float(term.detach().mean())
++ # Two explicit float32 stores are necessary for mixed-target BCE values.
++ # The first rounds (1-y)*z; the second rounds its sum with softplus(-z).
++ # Measured per-element equality in diagnose_reference_v2, not a fitted offset.
++ y=torch.tensor(Y,dtype=z.dtype)
++ exact=torch.logaddexp(torch.zeros_like(z),z)-y*z
++ first_store=((1-y)*z).float().double()
++ second_store=(first_store+torch.logaddexp(torch.zeros_like(z),-z)).float()
++ return float(second_store.detach().mean())-float(exact.detach().mean())
+ 
+ class IndependentHandmadeBudget:
+  """No formal budget assertion; fake monitoring interface for actual tiny path."""

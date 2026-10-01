@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_metrics.py", line 44, in <module>
+    expected,hits,counts=ref(z);got=m.metrics.group_metrics(y,z);diff={k:float(got[i]-expected[k]) for i,k in enumerate(m.metrics.COLUMNS)}
+                                    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/bge_continual_external_audit/source/scripts/step28_continual_population_evaluate.py", line 226, in group_metrics
+    results = [classification(y, s) for y, s in zip(labels, scores, strict=True)]
+               ~~~~~~~~~~~~~~^^^^^^
+  File "/mnt/data/bge_continual_external_audit/source/scripts/step28_continual_population_evaluate.py", line 59, in classification
+    result: dict[str, Any] = curve_metrics(y, scores)
+                             ~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/mnt/data/bge_continual_external_audit/source/scripts/step28_continual_population_evaluate.py", line 32, in curve_metrics
+    raise ValueError("Curve inputs need aligned finite scores and both classes")
+ValueError: Curve inputs need aligned finite scores and both classes

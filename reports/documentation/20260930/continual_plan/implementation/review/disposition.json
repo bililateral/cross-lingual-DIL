@@ -1,0 +1,198 @@
+{
+  "updated_at_utc": "2026-09-30T06:12:13Z",
+  "status": "PASS_LOCAL_DELIVERABLE_REVIEW_NATIVE_PENDING",
+  "actual_reply_id": "7ae1a159-88ce-45f5-aab3-b65f4dafae26",
+  "requested_model": "GPT 6 Pro",
+  "visible_selector": "Pro",
+  "reviewer_self_description": "GPT-6 Astra Pro",
+  "backend_identity": "not independently exposed",
+  "personally_reviewed": [
+    "Actual full response and complete external REVIEW F1-F12",
+    "Final independent reference, metric reference, diagnosis, exact revision diffs, logging/source/budget/packaging sources",
+    "All successful and failed test stderr/exit and saved stdout/command records; sixteen command JSON records plus initial verification stdout/stderr/exit",
+    "Current Supply/Memory/update, stage training/checkpoint/branch, blind gate/collect/execute and endpoint/guard paths; unchanged inherited sources reuse earlier recorded primary review"
+  ],
+  "integrity": "primary_integrity.json",
+  "evidence_consistency": "primary_evidence.json",
+  "integrity_counts": {
+    "external_members": 1274,
+    "external_payloads": 1272,
+    "checksum_entries": 1272,
+    "submitted_sources": 52,
+    "original_members": 53,
+    "numbered_copies": 53,
+    "current_scientific_sources": 18
+  },
+  "external_runtime": {
+    "supplied_tests": {
+      "passed": 22,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "independent_initial": {
+      "passed": 6,
+      "failed": 2,
+      "errors": 2,
+      "skipped": 0
+    },
+    "independent_second": {
+      "passed": 9,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "independent_final": {
+      "passed": 10,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "additional_handmade_cases": 6,
+    "metric_values": 132,
+    "endpoint_cases": 2464,
+    "count_rate_values": 2016
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "requirement": "阶段可见性与旧域留出泛化",
+      "evidence": "Supply和train逐路径只传当前48拟合/12校准群；公开预检与盲评未来域不参与训练反馈。",
+      "decision": "ACCEPT_WITH_STATED_SCOPE"
+    },
+    {
+      "id": "F2",
+      "requirement": "当前/历史目标、单次更新与梯度",
+      "evidence": "独立边列表目标、手写梯度和另一可微图；三臂当前前向相同、ER/LOGIT历史前向相同，更新后参数误差0。",
+      "decision": "ACCEPT"
+    },
+    {
+      "id": "F3",
+      "requirement": "阶段学习率与Adam/RNG续接",
+      "evidence": "微型实际288步、真实磁盘checkpoint和新实例分支后下一步一致；原生计数夹具与真正288步证据分开。",
+      "decision": "ACCEPT_NATIVE_PENDING"
+    },
+    {
+      "id": "F4",
+      "requirement": "随机六群、完整1MiB、旧参考不刷新",
+      "evidence": "三顺序48/96插入、288抽取和中途恢复；辅助字段超限拒绝，当前/历史成员及参考来源一致。",
+      "decision": "ACCEPT_FORMAL_BYTES_PENDING"
+    },
+    {
+      "id": "F5",
+      "requirement": "当前域校准及raw/stage-cal/first-cal",
+      "evidence": "12群手工真实拟合、映射/分数/模型绑定和角色正确。外审解析例NLL数值错配已单独更正，项目代码未改。",
+      "decision": "ACCEPT_AFTER_REPORT_CORRECTION"
+    },
+    {
+      "id": "F6",
+      "requirement": "完整盲输出门与一次监督解析",
+      "evidence": "21点、24伪权重及9选定分数损坏拒绝；真实微型加载证据另列，正式完整门尚未执行。",
+      "decision": "ACCEPT_FORMAL_PENDING"
+    },
+    {
+      "id": "F7",
+      "requirement": "64矩阵/计数保全与保存结果恢复",
+      "evidence": "四处统计故障后全部保存证据保留；部分采集失败不冒称完整，不重读标签或覆盖不同结果。",
+      "decision": "ACCEPT"
+    },
+    {
+      "id": "F8",
+      "requirement": "实际域端点与遗忘解释",
+      "evidence": "直接R(t,j)参考2464情况覆盖O/N/Z/F_first/F/G/final_all及损失符号；路径共存不冒称同一转换。",
+      "decision": "ACCEPT"
+    },
+    {
+      "id": "F9",
+      "requirement": "每比较23项条件及后续三种子范围",
+      "evidence": "23个逐项唯一失败和零点边界一致；本轮没有旧test0.01门，后续三种子未评价。",
+      "decision": "ACCEPT_NO_PERFORMANCE_RESULT"
+    },
+    {
+      "id": "F10",
+      "requirement": "22指标与5000次配对整群区间",
+      "evidence": "132手工指标、交错域映射与独立频数区间；明确概率表达式复用，AP/PR-AUC和Recall/Hit区分。",
+      "decision": "ACCEPT_CONDITIONAL_SCOPE"
+    },
+    {
+      "id": "F11",
+      "requirement": "源关系、预算及原生证据",
+      "evidence": "18绑定来源一致；6048/3456/9504/21/64预算正确；网页Python3.13 CPU不代替项目py310/BGE/CUDA。",
+      "decision": "ACCEPT_NATIVE_PENDING"
+    },
+    {
+      "id": "F12",
+      "requirement": "历史结果与创新定位",
+      "evidence": "旧test8/9、用户事后接受、18权重保留、新留出待另定保持；已知方法诊断不认证原创性。",
+      "decision": "ACCEPT"
+    }
+  ],
+  "local_corrections": [
+    {
+      "id": "P1",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "scope": "External report numeric provenance only",
+      "original": "Approximately0.01154 repeated from the preceding design's different probability-bin example",
+      "correct": "Current reference script/output and independent closed-form calculation:0.010836263997970538; Brier0.0009000000000000004",
+      "record": "primary_numeric_correction.json",
+      "project_change": false,
+      "blocking_after_correction": false
+    },
+    {
+      "id": "P2",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "scope": "External report description of command metadata coverage",
+      "original": "General statement that each operation has command/time JSON",
+      "correct": "16 later logged operations have it; initial verify_submission has source, stdout, stderr and exit but no command/time JSON",
+      "project_change": false,
+      "remedy": "Disclose coverage without fabricating a missing original or rerunning unchanged evidence",
+      "blocking": false
+    }
+  ],
+  "changed_scientific_sources": [],
+  "changed_performance_criteria": false,
+  "repeated_formal_experiments": 0,
+  "local_preparation_failure": "primary_evidence_initial.json: Windows default GBK source-text decode; corrected explicit UTF-8, no scientific code execution",
+  "primary_verdict": "Current complete deliverable implements the confirmed pilot within the reviewed handmade/tiny scope; no remaining required project fix before authorized Linux verification.",
+  "remaining": [
+    "User approval of this complete delivery and scoped Linux CPU stage",
+    "Existing Linux py310/native BGE six handmade updates and applicable supplied tests",
+    "Separate formal-stage authorization and fresh shared-resource/input checks",
+    "Formal 6048 updates, input/label alignment, raw/stage-cal results, actual memory/resources and performance"
+  ],
+  "project_linux_connections": 0,
+  "project_tests_executed": 0,
+  "formal_data_labels_models_accessed": false,
+  "formal_training_started": false,
+  "training_time": {
+    "estimated_total_hours": [
+      18,
+      26
+    ],
+    "hard_hours": 36,
+    "remaining_hours": null,
+    "expected_completion_asia_shanghai": null,
+    "reason": "Not started; estimate based on prior7776 updates14h25m and current9504 group gradient presentations plus persistence/calibration"
+  },
+  "next_cpu_scope": {
+    "minutes_estimate": [
+      15,
+      30
+    ],
+    "hard_seconds": 3600,
+    "evidence_limit_bytes": 268435456,
+    "one_cpu": true,
+    "gpu": false,
+    "existing_environment": "py310",
+    "formal_text_labels": false,
+    "native_handmade_updates": 6,
+    "retained_native_weights": false,
+    "authorization": "NOT_RESUMED"
+  },
+  "unchanged_history": [
+    "Original base test8/9 and user post-result acceptance",
+    "18 explicitly retained ranking inference weights",
+    "Old120test groups not new final untouched holdout",
+    "Joint-three-domain weights/maps not first-domain-only initialization"
+  ]
+}

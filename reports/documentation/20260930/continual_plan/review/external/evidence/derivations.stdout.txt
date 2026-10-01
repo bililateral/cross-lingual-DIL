@@ -1,0 +1,157 @@
+{
+  "scope": "Arithmetic/analytic illustrations; NOT project experiments or an implementation validation.",
+  "python": "3.13.5",
+  "executable": "/opt/pyvenv/bin/python",
+  "counts": {
+    "source": "draft L56-L68,L94,L102,L193-L204",
+    "values": {
+      "groups_fit_per_domain": 48,
+      "epochs": 6,
+      "stages": 3,
+      "orders": 3,
+      "updated_arms": 3,
+      "updates_per_stage": 288,
+      "shared_updates": 864,
+      "later_updates": 5184,
+      "physical_optimizer_calls": 6048,
+      "history_presentations": 3456,
+      "all_gradient_group_presentations": 9504,
+      "unique_stage_endpoints_and_maps": 21,
+      "current_calibration_pairs": 4536,
+      "current_calibration_positives": 240,
+      "reservoir_accounts": 168,
+      "reservoir_pairs": 2268,
+      "reservoir_positives": 120,
+      "reference_scores_float32_bytes": 9072,
+      "first_map_float64_scalar_bytes": 16
+    }
+  },
+  "schedule": {
+    "source": "draft L56-L58; RANKING L21",
+    "phase_sum": 0.00144,
+    "three_phase_sum": 0.00432,
+    "old_864_sum": 0.00432,
+    "exact_sums_equal": true,
+    "steps_1_29_30_287_288": [
+      3.4482758620689656e-07,
+      1e-05,
+      9.961389961389962e-06,
+      3.861003861003861e-08,
+      0.0
+    ],
+    "positive_lr_steps_per_path": 861,
+    "old_positive_lr_steps": 863,
+    "physical_positive_lr_calls": 6027,
+    "interpretation": "Equal sum does not imply same optimization trajectory or parameter displacement."
+  },
+  "reservoir_analytic": {
+    "source": "draft L62-L68; uniform six-of-96 assumption for Algorithm R",
+    "historical_fit_fraction_stage2": 0.125,
+    "historical_fit_fraction_stage3": 0.0625,
+    "expected_history_presentations_per_retained_group_in_one_stage": 48.0,
+    "current_presentations_per_group": 6,
+    "expected_repeat_ratio": 8,
+    "probability_named_domain_absent": 0.013237187260956362,
+    "probability_one_of_two_domains_absent": 0.026474374521912723,
+    "expected_old_domain_count": 3,
+    "fraction_of_1MiB_reference_numerics": 0.0086517333984375,
+    "not_claimed": "These are distributional calculations, not actual chosen groups or memory-byte measurements."
+  },
+  "orders": {
+    "source": "draft L35",
+    "transitions": {
+      "AB": 2,
+      "BC": 2,
+      "CA": 2
+    },
+    "missing_directed_transitions": [
+      "AC",
+      "CB",
+      "BA"
+    ],
+    "position_balanced": true,
+    "directed_transition_balanced": false
+  },
+  "calibration_counterexample": {
+    "source": "reviewer analytic example addressing draft L102-L108; two equally likely score bins -1,+1",
+    "not_data": "Not the project generator, not sampled labels, not actual metrics.",
+    "same_positive_prior": 0.05291005291005291,
+    "old_true_probabilities": [
+      0.01,
+      0.09582010582010582
+    ],
+    "new_true_probabilities": [
+      0.04,
+      0.0658201058201058
+    ],
+    "old_optimal_positive_affine_map": [
+      1.1752820236855472,
+      -3.4198378264490428
+    ],
+    "new_optimal_positive_affine_map": [
+      0.2626550778552488,
+      -2.9153987524926963
+    ],
+    "old_loss_using_old_map": {
+      "expected_brier": 0.048269306570364774,
+      "expected_nll": 0.18590102464780145
+    },
+    "old_loss_using_new_map": {
+      "expected_brier": 0.04916930657036477,
+      "expected_nll": 0.1974374827761363
+    },
+    "old_brier_increase": 0.000899999999999998,
+    "old_nll_increase": 0.011536458128334842,
+    "score_change": 0,
+    "rank_change": 0,
+    "claim": "Current-domain-perfect calibration may worsen old probability loss without model forgetting, despite equal class priors."
+  },
+  "endpoint_scope_counterexample": {
+    "source": "draft L118-L123,L147-L150",
+    "not_data": "Illustrative performance entries only; not observations.",
+    "values": {
+      "comparator": {
+        "O": 0.5,
+        "R22": 0.4,
+        "R33": 0.6,
+        "N": 0.5,
+        "final_all": 0.5333333333333333
+      },
+      "candidate": {
+        "O": 0.55,
+        "R22": 0.75,
+        "R33": 0.3,
+        "N": 0.525,
+        "final_all": 0.46666666666666673
+      }
+    },
+    "claim": "O and N can increase while final newest-domain and final overall MAP decrease."
+  },
+  "path_not_transition_counterexample": {
+    "source": "draft L137",
+    "not_data": "Illustrative scalar entries, no generated input or labels.",
+    "first_domain_MAP_stages": [
+      0.6,
+      0.5,
+      0.5
+    ],
+    "new_domain_gains_stages_2_3": [
+      -0.1,
+      0.3
+    ],
+    "first_loss": 0.1,
+    "average_new_gain": 0.1,
+    "claim": "Same-order positive final forgetting and average new learning need not co-occur in a single transition."
+  },
+  "resource_arithmetic": {
+    "source": "draft L193-L208; old elapsed is background report, not remeasured",
+    "linear_group_presentation_extrapolation_seconds": 63459.0,
+    "linear_extrapolation_hours": 17.6275,
+    "twenty_one_model_bytes_if_old_average_file_size_applies": 27435592184,
+    "is_formal_runtime_or_storage_bound": false,
+    "later_4_arms_3_seeds_3_orders_calls_if_864_per_arm_and_shared_first": 23328,
+    "net_new_calls_if_first_6048_all_reusable": 17280,
+    "baseline_BGE_4_arms_3_seeds_ABC_calls_if_same_288_per_stage": 7776,
+    "not_included": "Hyperparameter development, additional budgets, ablations, holdout generation or evaluation; candidate schedule not yet agreed."
+  }
+}

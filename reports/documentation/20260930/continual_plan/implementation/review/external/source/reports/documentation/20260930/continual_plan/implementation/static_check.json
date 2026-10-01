@@ -1,0 +1,296 @@
+{
+  "recorded_at_utc": "2026-09-30T04:42:40.994539+00:00",
+  "status": "PASS_STATIC_PREPARATION",
+  "operation": "Read source as text; ast.parse(feature_version=(3,10)), JSON decode, frozen-file SHA256, explicit contract arithmetic and local Markdown target existence. No project imports, model/data loading or code execution.",
+  "interpreter": "Existing Windows Python310; standard library only, no dependencies installed",
+  "syntax_sources": [
+    {
+      "path": "scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "sha256": "2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae",
+      "project_imports": [
+        "scripts/step28_alias_ranking.py",
+        "scripts/step28_alias_calibration.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "sha256": "bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9",
+      "project_imports": [
+        "scripts/step28_bge_continual.py",
+        "scripts/step28_bge_continual_evaluate.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1",
+      "project_imports": [
+        "scripts/step28_bge_continual.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_bge_continual_check.py",
+      "bytes": 12126,
+      "sha256": "d919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07",
+      "project_imports": [
+        "scripts/step28_bge_continual.py",
+        "scripts/step28_bge_continual_run.py",
+        "tests/test_step28_bge_continual_contracts.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "tests/test_step28_bge_continual_contracts.py",
+      "bytes": 31625,
+      "sha256": "de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a",
+      "project_imports": [
+        "scripts/step28_bge_continual.py",
+        "scripts/step28_bge_continual_run.py",
+        "scripts/step28_bge_continual_evaluate.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274",
+      "project_imports": [
+        "scripts/step28_chinese_base.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca",
+      "project_imports": [
+        "scripts/step28_alias_ranking.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+      "project_imports": [
+        "scripts/step28_continual_population.py",
+        "scripts/step28_continual_population_data.py",
+        "scripts/step28_continual_population_evaluate.py",
+        "scripts/step28_continual_population_run.py",
+        "scripts/step28_continual_expression_run.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20",
+      "project_imports": [
+        "scripts/step28_continual_population_data.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d",
+      "project_imports": [],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a",
+      "project_imports": [
+        "scripts/step28_continual_population_data.py",
+        "scripts/step28_continual_population_run.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4",
+      "project_imports": [
+        "scripts/step28_continual_population.py",
+        "scripts/step28_continual_population_data.py"
+      ],
+      "ast_python310": "PASS"
+    },
+    {
+      "path": "scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760",
+      "project_imports": [
+        "scripts/step28_continual_population.py",
+        "scripts/step28_continual_population_data.py",
+        "scripts/step28_continual_population_evaluate.py",
+        "scripts/step28_continual_population_run.py"
+      ],
+      "ast_python310": "PASS"
+    }
+  ],
+  "frozen_source_files": [
+    {
+      "path": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "bytes": 32430,
+      "sha256": "88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485"
+    },
+    {
+      "path": "schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+    },
+    {
+      "path": "schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+    },
+    {
+      "path": "schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+    },
+    {
+      "path": "scripts/run_step28_bge_continual_linux_20260930.sh",
+      "bytes": 1243,
+      "sha256": "5536ec24cecebc9e401c819f52b05aff4b976fcef530fffe42eaff605322c979"
+    },
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "path": "scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+    },
+    {
+      "path": "scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "sha256": "2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae"
+    },
+    {
+      "path": "scripts/step28_bge_continual_check.py",
+      "bytes": 12126,
+      "sha256": "d919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07"
+    },
+    {
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+    },
+    {
+      "path": "scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "sha256": "bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9"
+    },
+    {
+      "path": "scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+    },
+    {
+      "path": "scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+    },
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "tests/test_step28_bge_continual_contracts.py",
+      "bytes": 31625,
+      "sha256": "de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a"
+    }
+  ],
+  "frozen_source_count": 18,
+  "policy": {
+    "path": "schema/step28_bge_continual_policy.json",
+    "bytes": 5123,
+    "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+  },
+  "policy_digest_constant_matches": true,
+  "checked_arithmetic": {
+    "physical_updates": 6048,
+    "gradient_group_presentations": 9504,
+    "positive_encoder_updates": 6027
+  },
+  "new_test_functions": [
+    "test_confirmed_contract_and_stage_schedule",
+    "test_supply_cannot_rewind_or_skip",
+    "test_reservoir_pairing_restore_and_nonrefresh",
+    "test_complete_memory_bytes_not_just_reference_array",
+    "test_current_schedule_and_dropout_are_paired",
+    "test_live_combined_gradient_matches_independent_graph",
+    "test_history_logit_term_has_its_own_encoder_and_head_gradient",
+    "test_current_forward_same_with_or_without_replay",
+    "test_actual_288_calls_last_encoder_zero_and_adam_continues",
+    "test_full_disk_adam_rng_branch_next_update",
+    "test_actual_checkpoint_path_calibration_and_branch_restore",
+    "test_blind_gate_complete_then_rejects_changed_weight_and_wrong_current_domain",
+    "test_blind_gate_rejects_old_calibration_and_wrong_history_draw",
+    "test_single_parse_attempt_written_before_loader",
+    "test_endpoint_group_weights_with_interleaved_domains",
+    "test_actual_domain_bootstrap_against_frequency_reference",
+    "test_forgetting_loss_sign_and_frozen_zero",
+    "test_latest_domain_each_guard_cannot_be_masked_by_N",
+    "test_same_path_gate_is_not_same_transition_claim",
+    "test_collection_survives_first_bootstrap_failure",
+    "test_array_identity_and_schema_before_use",
+    "test_finalization_never_replaces_existing_different_bytes"
+  ],
+  "test_execution": {
+    "status": "NOT_RUN",
+    "executed": 0,
+    "passed": null,
+    "failures": null,
+    "skips": null
+  },
+  "bash_static": {
+    "LF_only": true,
+    "contains_py310_and_36h": true,
+    "bash_parser_executed": false
+  },
+  "document_links_checked": 62,
+  "broken_links": [],
+  "boundaries": {
+    "project_linux_connection": false,
+    "linux_sync": false,
+    "formal_text_read": false,
+    "formal_label_read": false,
+    "model_load": false,
+    "project_research_script_execution": false
+  },
+  "preparation_errors": [
+    "One read-only PowerShell command used Bash brace expansion and failed parsing; corrected explicit paths.",
+    "A targeted document patch did not match a whole paragraph and failed before mutation; reapplied exact paragraphs. No research invocation or retry."
+  ],
+  "limits": [
+    "Static syntax and file identity do not establish training/evaluation correctness.",
+    "All22 handmade cases, six proposed native updates, full native checkpoint/CUDA paths and formal behavior remain unexecuted."
+  ]
+}

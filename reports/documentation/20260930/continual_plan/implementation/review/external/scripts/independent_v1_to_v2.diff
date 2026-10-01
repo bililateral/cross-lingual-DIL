@@ -1,0 +1,100 @@
+--- independent_checks_v1.py
++++ independent_checks_v2.py
+@@ -38,7 +38,7 @@
+  items=tuple(tuple((f'{uid}_item_{i:02}_{j}',f'人工商品 {i%5} 型号 {j}',f'手写示例：条件 {shift} 样式 {OWNERS[i]} 记录 {i} {j}') for j in range(2+i%3)) for i in range(28))
+  g=m.data.Group(uid,sellers,items,tuple(int(y) for y in Y) if labels else None);g.validate();return g
+ 
+-def scalar_objective(z,y=Y):
++def scalar_objective(z,y=Y,hard_threshold=None):
+  """Independent Python/math evaluation and analytic dL/d(edge logit)."""
+  z=[float(v) for v in z];y=[int(v) for v in y]
+  def sp(v):return max(v,0.)+math.log1p(math.exp(-abs(v)))
+@@ -54,8 +54,10 @@
+   for k in pos:grad['rank'][k]-=1/(28*len(pos))
+   for p in pos:
+    for n,o in neg:
+-    scale=1/(28*len(pos)*5);vals['hard']+=sp(z[n]-z[p])*scale
+-    d=sig(z[n]-z[p])*scale;grad['hard'][n]+=d;grad['hard'][p]-=d
++    scale=1/(28*len(pos)*5);delta=z[n]-z[p]
++    linear=hard_threshold is not None and delta>hard_threshold
++    vals['hard']+=(delta if linear else sp(delta))*scale
++    d=(1. if linear else sig(delta))*scale;grad['hard'][n]+=d;grad['hard'][p]-=d
+  vals['total']=vals['bce']+vals['rank']+.5*vals['hard'];grad['total']=grad['bce']+grad['rank']+.5*grad['hard']
+  return vals,grad
+ 
+@@ -69,6 +71,19 @@
+   qs.append(torch.logsumexp(torch.stack([z[k] for k,o in ix]),0)-torch.stack([z[k] for k in pos]).mean())
+   hs.append(torch.stack([torch.logaddexp(z.new_zeros(()),z[n]-z[p]) for p in pos for n,o in neg]).mean())
+  return loss+torch.stack(qs).mean()+.5*torch.stack(hs).mean()
++
++def mixed_target_rounding_correction(z):
++ """Value only: actual runner makes float32 labels even for this double toy.
++ Exact Bernoulli derivative remains double (measured in diagnosis), whereas
++ BCE values are per-element float32 before reduction. Do not fake gradients.
++ """
++ term=torch.stack([torch.logaddexp(z.new_zeros(()),v)-int(y)*v for v,y in zip(z,Y)])
++ return float(term.detach().float().mean())-float(term.detach().mean())
++
++class IndependentHandmadeBudget:
++ """No formal budget assertion; fake monitoring interface for actual tiny path."""
++ def check(self,*args,**kwargs): pass
++ def state(self): return {'independent_scope':'handmade CPU; not formal resource measurement'}
+ 
+ class SmallScore(torch.nn.Module):
+  def __init__(self):
+@@ -132,8 +147,9 @@
+  def test_01_scalar_analytic_gradient(self):
+   rng=np.random.Generator(np.random.PCG64(951));records=[];maxloss=maxgrad=fdmax=0.
+   for name,z in [('continuous',rng.normal(size=378)*2),('ties',np.round(rng.normal(size=378),1)),('extreme',np.linspace(-100,100,378))]:
+-   vals,grad=scalar_objective(z);t=torch.tensor(z,dtype=torch.float64,requires_grad=True);got=m.ranking.objectives(t,torch.tensor(Y,dtype=torch.float64),.5)
+-   row={'case':name}
++   exact_vals,exact_grad=scalar_objective(z)
++   vals,grad=scalar_objective(z,hard_threshold=20.);t=torch.tensor(z,dtype=torch.float64,requires_grad=True);got=m.ranking.objectives(t,torch.tensor(Y,dtype=torch.float64),.5)
++   row={'case':name,'exact_mathematical_vs_runtime_softplus':{k:{'value_difference':vals[k]-exact_vals[k],'gradient_max_difference':float(np.max(abs(grad[k]-exact_grad[k])))} for k in vals},'runtime_threshold_explicit':20}
+    for k in vals:
+     g=torch.autograd.grad(got[k],t,retain_graph=True)[0].numpy();ld=abs(float(got[k].detach())-vals[k]);gd=float(np.max(abs(g-grad[k])));maxloss=max(maxloss,ld);maxgrad=max(maxgrad,gd)
+     self.assertLessEqual(ld,1e-12);self.assertLessEqual(gd,1e-12);row[k]={'value':vals[k],'value_error':ld,'gradient_error':gd}
+@@ -162,16 +178,17 @@
+    with mock.patch.object(m.base,'logits',side_effect=logits),mock.patch.object(torch.nn.utils,'clip_grad_norm_',wraps=origclip) as cl,mock.patch.object(optimizer,'step',wraps=optimizer.step) as st:
+     got=m.update(model,optimizer,current,None if arm=='seq' else old,target if arm=='logit' else None,c,arm,2,1,520,521,observe=True)
+     self.assertEqual(cl.call_count,1);self.assertEqual(st.call_count,1)
+-   ref.train();other.zero_grad(set_to_none=True);torch.manual_seed(520);pc=ref(current);loss=torch_reference(pc)
++   ref.train();other.zero_grad(set_to_none=True);torch.manual_seed(520);pc=ref(current);loss=torch_reference(pc);value_correction=mixed_target_rounding_correction(pc)
+    if arm!='seq':
+-    torch.manual_seed(521);ph=ref(old);loss=loss+torch_reference(ph)
++    torch.manual_seed(521);ph=ref(old);loss=loss+torch_reference(ph);value_correction+=mixed_target_rounding_correction(ph)
+     if arm=='logit':loss=loss+.5*torch.stack([(ph[i]-float(target[i]))**2 for i in range(378)]).mean()
+    loss.backward();refnorm=origclip(ref.parameters(),1.,error_if_nonfinite=True)
+    for g,lr in zip(other.param_groups,(independent_rate(1),.001)):g['lr']=lr
+    other.step();err=max(float((a-b).abs().max().detach()) for a,b in zip(model.parameters(),ref.parameters()))
+-   self.assertLess(err,1e-10);self.assertAlmostEqual(got['total'],float(loss.detach()),places=10)
++   expected_logged=float(loss.detach())+value_correction
++   self.assertLess(err,1e-10);self.assertLessEqual(abs(got['total']-expected_logged),1e-12)
+    self.assertEqual(len(seen),1 if arm=='seq' else 2);self.assertTrue(all(v['training'] for v in seen));captures.append(seen)
+-   rows.append({'method':arm,'parameter_error':err,'total_error':abs(got['total']-float(loss.detach())),'clip_count':1,'step_count':1,'forward_count':len(seen),'optimizer_step':m.adam_step(optimizer),'gradient_norm_error':abs(got['gradient_norm']-float(refnorm))})
++   rows.append({'method':arm,'parameter_error':err,'total_error':abs(got['total']-expected_logged),'mathematical_double_total':float(loss.detach()),'float32_target_value_correction':value_correction,'clip_count':1,'step_count':1,'forward_count':len(seen),'optimizer_step':m.adam_step(optimizer),'gradient_norm_error':abs(got['gradient_norm']-float(refnorm))})
+   for cap in captures[1:]:self.assertTrue(np.array_equal(cap[0]['values'],captures[0][0]['values']))
+   self.assertTrue(np.array_equal(captures[1][1]['values'],captures[2][1]['values']))
+   RESULT['live_targets']={'rows':rows,'shared_actual_warm_updates':1,'warm_counter_fixture':'explicit 1 -> 288; not 288 actual calls in this test','current_forward_identical':True,'history_forward_identical':True,'reference_uses_no_project_objective':True}
+@@ -214,7 +231,7 @@
+  def test_04_full_micro_stage_checkpoint_and_branch(self):
+   c=m.config(m.contract());c['input']['encoder_bf16']=False; p=m.contract(); root=OUT/'actual_micro';root.mkdir()
+   for f in ('branches','work','models','scores','maps','points','updates'): (root/f).mkdir()
+-  model=submitted.tiny_model();optimizer=m.core.make_optimizer(model,c);budget=submitted.HandmadeBudget()
++  model=submitted.tiny_model();optimizer=m.core.make_optimizer(model,c);budget=IndependentHandmadeBudget()
+   current=[handmade(f'fit_A_{i:02}',i%3) for i in range(48)]
+   calls=[];original=m.update
+   def wrapped(*a,**kw):
+@@ -348,10 +365,10 @@
+ 
+  def test_09_calibration_scalar_optimum_and_current_only(self):
+   # Reproduce known interior optimum on handmade equally repeated score bins,
+-  # independent Newton in (a,b), never formal stage mapping.
++  # independent closed-form optimum in (a,b), never formal stage mapping.
+   z=np.array([-1.]*200+[1.]*200,float);y=np.array([1]*20+[0]*180+[1]*80+[0]*120,dtype=np.uint8)
+   optimum=np.array([(math.log(.4/.6)-math.log(.1/.9))/2,(math.log(.4/.6)+math.log(.1/.9))/2])
+-  val,grad=m.calibration.objective(optimum,z,y)
++  val,grad=m.calibration.loss_gradient(optimum,z,y)
+   t=optimum[0]*z+optimum[1];prob=np.exp(-np.logaddexp(0.,-t));ref=float(np.mean(np.maximum(t,0)+np.log1p(np.exp(-abs(t)))-y*t));g=np.array([np.dot(prob-y,z),sum(prob-y)])/len(y)
+   self.assertLess(abs(val-ref),1e-12);np.testing.assert_allclose(grad,g,atol=1e-12,rtol=0)
+   # Full-shape natural supervised handmade groups, no addition of past-domain labels.

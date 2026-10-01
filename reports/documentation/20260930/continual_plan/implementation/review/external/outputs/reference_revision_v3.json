@@ -1,0 +1,13 @@
+{
+  "revision": "v2 -> v3",
+  "project_sources_modified": false,
+  "metric_tolerance_unchanged": 1e-12,
+  "diagnosis": "outputs/reference_v2_diagnosis.json",
+  "changes": [
+    "The diagnostic measured the mixed-dtype BCE per-element intermediate float32 rounding; independent scalar reference now explicitly includes both stores. Gradient reference remains exact Bernoulli analytic graph. No empirical fitted offset and no change to input, project algorithm, losses or test acceptance thresholds."
+  ],
+  "sha256": {
+    "independent_checks_v2.py": "0345596b8cc9bacb90aba3751787fa39df2f4596897722dfc38c8ec377b94a57",
+    "independent_checks_v3.py": "f9bc111bda9276eddadbbcf251c3f1da273219c8e343c34e62cceb2d32477129"
+  }
+}

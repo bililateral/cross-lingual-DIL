@@ -1,0 +1,247 @@
+0001: {
+0002:   "study": "seller_alias_chinese_base_improvement",
+0003:   "data_root": "reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data",
+0004:   "data_manifest_sha256": "3f14f1ed47bffabaec90640b9e212f5eab2d702efcf9304a310f22d2a0165f6b",
+0005:   "data_validation_sha256": "70b0cf6016f37a1e7190c3a9f569efaa464c33b68b74a7f0fb014c25d590069c",
+0006:   "groups_per_domain": {
+0007:     "train": 60,
+0008:     "development": 20,
+0009:     "heldout": 40
+0010:   },
+0011:   "partition": {
+0012:     "seed": 20260918,
+0013:     "fit_per_domain": 48,
+0014:     "calibration_per_domain": 12,
+0015:     "rule": "Within domain sort by SHA256(canonical JSON [seed,domain,group_uid]); first 48 fit, remainder calibrate; outputs follow public input row order"
+0016:   },
+0017:   "arms": [
+0018:     "mean_bce",
+0019:     "mean_rank",
+0020:     "split_bce",
+0021:     "split_rank"
+0022:   ],
+0023:   "models": {
+0024:     "mean_bce": {
+0025:       "path": "models/step7/embeddings/bge_large_zh",
+0026:       "model_id": "BAAI/bge-large-zh-v1.5",
+0027:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+0028:       "embedding_dim": 1024,
+0029:       "prefix": "",
+0030:       "pooling": "cls",
+0031:       "dense_module": false,
+0032:       "file_count": 12,
+0033:       "total_size_bytes": 1302803319,
+0034:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+0035:     },
+0036:     "mean_rank": {
+0037:       "path": "models/step7/embeddings/bge_large_zh",
+0038:       "model_id": "BAAI/bge-large-zh-v1.5",
+0039:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+0040:       "embedding_dim": 1024,
+0041:       "prefix": "",
+0042:       "pooling": "cls",
+0043:       "dense_module": false,
+0044:       "file_count": 12,
+0045:       "total_size_bytes": 1302803319,
+0046:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+0047:     },
+0048:     "split_bce": {
+0049:       "path": "models/step7/embeddings/bge_large_zh",
+0050:       "model_id": "BAAI/bge-large-zh-v1.5",
+0051:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+0052:       "embedding_dim": 1024,
+0053:       "prefix": "",
+0054:       "pooling": "cls",
+0055:       "dense_module": false,
+0056:       "file_count": 12,
+0057:       "total_size_bytes": 1302803319,
+0058:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+0059:     },
+0060:     "split_rank": {
+0061:       "path": "models/step7/embeddings/bge_large_zh",
+0062:       "model_id": "BAAI/bge-large-zh-v1.5",
+0063:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+0064:       "embedding_dim": 1024,
+0065:       "prefix": "",
+0066:       "pooling": "cls",
+0067:       "dense_module": false,
+0068:       "file_count": 12,
+0069:       "total_size_bytes": 1302803319,
+0070:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+0071:     }
+0072:   },
+0073:   "initialization_seed": 20260909,
+0074:   "schedule_seed": 20260918,
+0075:   "epochs": 6,
+0076:   "score_epochs": [
+0077:     3,
+0078:     6
+0079:   ],
+0080:   "primary_epoch": 6,
+0081:   "physical_updates": 3456,
+0082:   "input": {
+0083:     "token_budget": 256,
+0084:     "microbatch": 4,
+0085:     "encoder_bf16": true,
+0086:     "activation_checkpointing": true,
+0087:     "head_hidden": 128,
+0088:     "account_pooling": "Per intervention; see representation",
+0089:     "loss": "Unweighted mean BCE plus fixed intervention rank_weight times ranking objective"
+0090:   },
+0091:   "optimizer": {
+0092:     "name": "AdamW",
+0093:     "encoder_lr": 2E-05,
+0094:     "encoder_weight_decay": 0.01,
+0095:     "head_lr": 0.001,
+0096:     "head_weight_decay": 0,
+0097:     "betas": [
+0098:       0.9,
+0099:       0.999
+0100:     ],
+0101:     "eps": 1E-08,
+0102:     "foreach": false,
+0103:     "clip_norm": 1
+0104:   },
+0105:   "evaluation": {
+0106:     "maximum_fpr": 0.001,
+0107:     "minimum_recall": 0.5,
+0108:     "required_domains": [
+0109:       "A",
+0110:       "B",
+0111:       "C"
+0112:     ],
+0113:     "decision": "Each domain must pass both empirical point-value gates at the same calibration-only global threshold; no automatic winner",
+0114:     "threshold_rule": "For each calibration domain allow floor(negative_count/1000) false positives; float64 nextafter of the next negative order statistic toward +infinity; global maximum; prediction is float64(logit)>=threshold",
+0115:     "reference_threshold": 0.0,
+0116:     "bootstrap_replicates": 5000,
+0117:     "bootstrap_seed": 20260918,
+0118:     "confidence_level": 0.95,
+0119:     "heldout_access": false,
+0120:     "owners_access": false
+0121:   },
+0122:   "supervision": {
+0123:     "linux_train_parses": 1,
+0124:     "linux_development_parses": 1,
+0125:     "calibration_used_for_gradients": false,
+0126:     "partial_evaluation_allowed": false
+0127:   },
+0128:   "runtime": {
+0129:     "maximum_gpu_stage_seconds": 28800,
+0130:     "maximum_output_bytes": 34359738368,
+0131:     "minimum_free_gpu_bytes": 25769803776,
+0132:     "minimum_free_host_bytes": 17179869184,
+0133:     "torch_cpu_threads": 1
+0134:   },
+0135:   "execution_boundary": "User authorized Chinese improvement and writing contract/code on 2026-09-24. CPU implementation verification was explicitly resumed: 12 handmade contracts and four native one-step checks, one CPU, 1h/256MiB, no formal data/labels/GPU/retained weights, then web GPT6 Pro review. Model transfer also resumed. Formal 3456-update training with fresh train/valid parses still requires scoped resumption after review.",
+0136:   "interventions": {
+0137:     "mean_bce": {
+0138:       "account_dim": 1024,
+0139:       "representation": "combined_mean",
+0140:       "rank_weight": 0
+0141:     },
+0142:     "mean_rank": {
+0143:       "account_dim": 1024,
+0144:       "representation": "combined_mean",
+0145:       "rank_weight": 1
+0146:     },
+0147:     "split_bce": {
+0148:       "account_dim": 4096,
+0149:       "representation": "separate_moments",
+0150:       "rank_weight": 0
+0151:     },
+0152:     "split_rank": {
+0153:       "account_dim": 4096,
+0154:       "representation": "separate_moments",
+0155:       "rank_weight": 1
+0156:     }
+0157:   },
+0158:   "ranking": {
+0159:     "objective": "mean over 28 accounts of logsumexp(nonself logits) minus mean positive logit; all 378 unordered pairs scored once",
+0160:     "candidate_count": 27,
+0161:     "positive_degrees": [
+0162:       1,
+0163:       2
+0164:     ],
+0165:     "temperature": 1,
+0166:     "weight": 1
+0167:   },
+0168:   "representation": {
+0169:     "variance_epsilon": 1E-08,
+0170:     "separate": "normalize(concat(mean(title), population_std(title), mean(description), population_std(description)))",
+0171:     "combined": "normalize(mean(normalize(CLS(title + newline + description))))",
+0172:     "all_items": true,
+0173:     "record_normalization": "L2"
+0174:   },
+0175:   "primary_comparison": [
+0176:     "split_rank",
+0177:     "mean_bce"
+0178:   ],
+0179:   "comparisons": [
+0180:     [
+0181:       "split_rank",
+0182:       "mean_bce"
+0183:     ],
+0184:     [
+0185:       "mean_rank",
+0186:       "mean_bce"
+0187:     ],
+0188:     [
+0189:       "split_bce",
+0190:       "mean_bce"
+0191:     ],
+0192:     [
+0193:       "split_rank",
+0194:       "split_bce"
+0195:     ],
+0196:     [
+0197:       "split_rank",
+0198:       "mean_rank"
+0199:     ],
+0200:     [
+0201:       "mean_bce",
+0202:       "historical_labse"
+0203:     ],
+0204:     [
+0205:       "split_rank",
+0206:       "historical_labse"
+0207:     ]
+0208:   ],
+0209:   "historical_reference": {
+0210:     "name": "historical_labse",
+0211:     "model_loading": false,
+0212:     "root": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run",
+0213:     "retraining": false,
+0214:     "files": {
+0215:       "manifest.json": {
+0216:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/manifest.json",
+0217:         "bytes": 11604,
+0218:         "sha256": "bfc9c50e7e6f7df69badc5f399318834eee3f7d72bcd23222b86afe53a71a432"
+0219:       },
+0220:       "completion.json": {
+0221:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/completion.json",
+0222:         "bytes": 228,
+0223:         "sha256": "e7bd72576c710faecde6dd85622de48dde5d4407807325538481b34892e86d00"
+0224:       },
+0225:       "partition.json": {
+0226:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/partition.json",
+0227:         "bytes": 14922,
+0228:         "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+0229:       },
+0230:       "labse/manifest.json": {
+0231:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/manifest.json",
+0232:         "bytes": 31112,
+0233:         "sha256": "2f708c0a011f57847f7d01a5f37aa77646906b5970033375efbbe8b839d9cdb9"
+0234:       },
+0235:       "labse/calibration.json": {
+0236:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/calibration.json",
+0237:         "bytes": 1270,
+0238:         "sha256": "62bbcbc67b8b42271a54a8702a2410794b2c9152f5b93496e3998026c706cfa5"
+0239:       },
+0240:       "labse/scores/epoch6_development.npy": {
+0241:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/scores/epoch6_development.npy",
+0242:         "bytes": 90848,
+0243:         "sha256": "b32f894fb46f8440a0f8a462f26bab648c0568efd4a069b6012e04accac143f1"
+0244:       }
+0245:     }
+0246:   }
+0247: }

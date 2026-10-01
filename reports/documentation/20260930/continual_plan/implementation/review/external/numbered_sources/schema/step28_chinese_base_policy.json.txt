@@ -1,0 +1,247 @@
+    1 {
+    2   "study": "seller_alias_chinese_base_improvement",
+    3   "data_root": "reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data",
+    4   "data_manifest_sha256": "3f14f1ed47bffabaec90640b9e212f5eab2d702efcf9304a310f22d2a0165f6b",
+    5   "data_validation_sha256": "70b0cf6016f37a1e7190c3a9f569efaa464c33b68b74a7f0fb014c25d590069c",
+    6   "groups_per_domain": {
+    7     "train": 60,
+    8     "development": 20,
+    9     "heldout": 40
+   10   },
+   11   "partition": {
+   12     "seed": 20260918,
+   13     "fit_per_domain": 48,
+   14     "calibration_per_domain": 12,
+   15     "rule": "Within domain sort by SHA256(canonical JSON [seed,domain,group_uid]); first 48 fit, remainder calibrate; outputs follow public input row order"
+   16   },
+   17   "arms": [
+   18     "mean_bce",
+   19     "mean_rank",
+   20     "split_bce",
+   21     "split_rank"
+   22   ],
+   23   "models": {
+   24     "mean_bce": {
+   25       "path": "models/step7/embeddings/bge_large_zh",
+   26       "model_id": "BAAI/bge-large-zh-v1.5",
+   27       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+   28       "embedding_dim": 1024,
+   29       "prefix": "",
+   30       "pooling": "cls",
+   31       "dense_module": false,
+   32       "file_count": 12,
+   33       "total_size_bytes": 1302803319,
+   34       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+   35     },
+   36     "mean_rank": {
+   37       "path": "models/step7/embeddings/bge_large_zh",
+   38       "model_id": "BAAI/bge-large-zh-v1.5",
+   39       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+   40       "embedding_dim": 1024,
+   41       "prefix": "",
+   42       "pooling": "cls",
+   43       "dense_module": false,
+   44       "file_count": 12,
+   45       "total_size_bytes": 1302803319,
+   46       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+   47     },
+   48     "split_bce": {
+   49       "path": "models/step7/embeddings/bge_large_zh",
+   50       "model_id": "BAAI/bge-large-zh-v1.5",
+   51       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+   52       "embedding_dim": 1024,
+   53       "prefix": "",
+   54       "pooling": "cls",
+   55       "dense_module": false,
+   56       "file_count": 12,
+   57       "total_size_bytes": 1302803319,
+   58       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+   59     },
+   60     "split_rank": {
+   61       "path": "models/step7/embeddings/bge_large_zh",
+   62       "model_id": "BAAI/bge-large-zh-v1.5",
+   63       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+   64       "embedding_dim": 1024,
+   65       "prefix": "",
+   66       "pooling": "cls",
+   67       "dense_module": false,
+   68       "file_count": 12,
+   69       "total_size_bytes": 1302803319,
+   70       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+   71     }
+   72   },
+   73   "initialization_seed": 20260909,
+   74   "schedule_seed": 20260918,
+   75   "epochs": 6,
+   76   "score_epochs": [
+   77     3,
+   78     6
+   79   ],
+   80   "primary_epoch": 6,
+   81   "physical_updates": 3456,
+   82   "input": {
+   83     "token_budget": 256,
+   84     "microbatch": 4,
+   85     "encoder_bf16": true,
+   86     "activation_checkpointing": true,
+   87     "head_hidden": 128,
+   88     "account_pooling": "Per intervention; see representation",
+   89     "loss": "Unweighted mean BCE plus fixed intervention rank_weight times ranking objective"
+   90   },
+   91   "optimizer": {
+   92     "name": "AdamW",
+   93     "encoder_lr": 2E-05,
+   94     "encoder_weight_decay": 0.01,
+   95     "head_lr": 0.001,
+   96     "head_weight_decay": 0,
+   97     "betas": [
+   98       0.9,
+   99       0.999
+  100     ],
+  101     "eps": 1E-08,
+  102     "foreach": false,
+  103     "clip_norm": 1
+  104   },
+  105   "evaluation": {
+  106     "maximum_fpr": 0.001,
+  107     "minimum_recall": 0.5,
+  108     "required_domains": [
+  109       "A",
+  110       "B",
+  111       "C"
+  112     ],
+  113     "decision": "Each domain must pass both empirical point-value gates at the same calibration-only global threshold; no automatic winner",
+  114     "threshold_rule": "For each calibration domain allow floor(negative_count/1000) false positives; float64 nextafter of the next negative order statistic toward +infinity; global maximum; prediction is float64(logit)>=threshold",
+  115     "reference_threshold": 0.0,
+  116     "bootstrap_replicates": 5000,
+  117     "bootstrap_seed": 20260918,
+  118     "confidence_level": 0.95,
+  119     "heldout_access": false,
+  120     "owners_access": false
+  121   },
+  122   "supervision": {
+  123     "linux_train_parses": 1,
+  124     "linux_development_parses": 1,
+  125     "calibration_used_for_gradients": false,
+  126     "partial_evaluation_allowed": false
+  127   },
+  128   "runtime": {
+  129     "maximum_gpu_stage_seconds": 28800,
+  130     "maximum_output_bytes": 34359738368,
+  131     "minimum_free_gpu_bytes": 25769803776,
+  132     "minimum_free_host_bytes": 17179869184,
+  133     "torch_cpu_threads": 1
+  134   },
+  135   "execution_boundary": "User authorized Chinese improvement and writing contract/code on 2026-09-24. CPU implementation verification was explicitly resumed: 12 handmade contracts and four native one-step checks, one CPU, 1h/256MiB, no formal data/labels/GPU/retained weights, then web GPT6 Pro review. Model transfer also resumed. Formal 3456-update training with fresh train/valid parses still requires scoped resumption after review.",
+  136   "interventions": {
+  137     "mean_bce": {
+  138       "account_dim": 1024,
+  139       "representation": "combined_mean",
+  140       "rank_weight": 0
+  141     },
+  142     "mean_rank": {
+  143       "account_dim": 1024,
+  144       "representation": "combined_mean",
+  145       "rank_weight": 1
+  146     },
+  147     "split_bce": {
+  148       "account_dim": 4096,
+  149       "representation": "separate_moments",
+  150       "rank_weight": 0
+  151     },
+  152     "split_rank": {
+  153       "account_dim": 4096,
+  154       "representation": "separate_moments",
+  155       "rank_weight": 1
+  156     }
+  157   },
+  158   "ranking": {
+  159     "objective": "mean over 28 accounts of logsumexp(nonself logits) minus mean positive logit; all 378 unordered pairs scored once",
+  160     "candidate_count": 27,
+  161     "positive_degrees": [
+  162       1,
+  163       2
+  164     ],
+  165     "temperature": 1,
+  166     "weight": 1
+  167   },
+  168   "representation": {
+  169     "variance_epsilon": 1E-08,
+  170     "separate": "normalize(concat(mean(title), population_std(title), mean(description), population_std(description)))",
+  171     "combined": "normalize(mean(normalize(CLS(title + newline + description))))",
+  172     "all_items": true,
+  173     "record_normalization": "L2"
+  174   },
+  175   "primary_comparison": [
+  176     "split_rank",
+  177     "mean_bce"
+  178   ],
+  179   "comparisons": [
+  180     [
+  181       "split_rank",
+  182       "mean_bce"
+  183     ],
+  184     [
+  185       "mean_rank",
+  186       "mean_bce"
+  187     ],
+  188     [
+  189       "split_bce",
+  190       "mean_bce"
+  191     ],
+  192     [
+  193       "split_rank",
+  194       "split_bce"
+  195     ],
+  196     [
+  197       "split_rank",
+  198       "mean_rank"
+  199     ],
+  200     [
+  201       "mean_bce",
+  202       "historical_labse"
+  203     ],
+  204     [
+  205       "split_rank",
+  206       "historical_labse"
+  207     ]
+  208   ],
+  209   "historical_reference": {
+  210     "name": "historical_labse",
+  211     "model_loading": false,
+  212     "root": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run",
+  213     "retraining": false,
+  214     "files": {
+  215       "manifest.json": {
+  216         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/manifest.json",
+  217         "bytes": 11604,
+  218         "sha256": "bfc9c50e7e6f7df69badc5f399318834eee3f7d72bcd23222b86afe53a71a432"
+  219       },
+  220       "completion.json": {
+  221         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/completion.json",
+  222         "bytes": 228,
+  223         "sha256": "e7bd72576c710faecde6dd85622de48dde5d4407807325538481b34892e86d00"
+  224       },
+  225       "partition.json": {
+  226         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/partition.json",
+  227         "bytes": 14922,
+  228         "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+  229       },
+  230       "labse/manifest.json": {
+  231         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/manifest.json",
+  232         "bytes": 31112,
+  233         "sha256": "2f708c0a011f57847f7d01a5f37aa77646906b5970033375efbbe8b839d9cdb9"
+  234       },
+  235       "labse/calibration.json": {
+  236         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/calibration.json",
+  237         "bytes": 1270,
+  238         "sha256": "62bbcbc67b8b42271a54a8702a2410794b2c9152f5b93496e3998026c706cfa5"
+  239       },
+  240       "labse/scores/epoch6_development.npy": {
+  241         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/scores/epoch6_development.npy",
+  242         "bytes": 90848,
+  243         "sha256": "b32f894fb46f8440a0f8a462f26bab648c0568efd4a069b6012e04accac143f1"
+  244       }
+  245     }
+  246   }
+  247 }

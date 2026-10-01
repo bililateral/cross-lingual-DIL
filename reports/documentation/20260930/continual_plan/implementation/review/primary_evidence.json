@@ -1,0 +1,633 @@
+{
+  "status": "PASS_SAVED_EVIDENCE_CONSISTENCY",
+  "logged_commands": [
+    {
+      "name": "bash_syntax",
+      "command": [
+        "bash",
+        "-n",
+        "scripts/run_step28_bge_continual_linux_20260930.sh"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:07:45.269095+00:00",
+      "finished": "2026-09-30T05:07:45.270770+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 0
+    },
+    {
+      "name": "diagnose_reference_v1",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/diagnose_reference_v1.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:01:01.855126+00:00",
+      "finished": "2026-09-30T05:01:04.311473+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 2445
+    },
+    {
+      "name": "diagnose_reference_v2",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/diagnose_reference_v2.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:03:02.024807+00:00",
+      "finished": "2026-09-30T05:03:04.404722+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 1085
+    },
+    {
+      "name": "environment",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/environment.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T04:52:55.982300+00:00",
+      "finished": "2026-09-30T04:52:57.827836+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 634
+    },
+    {
+      "name": "final_source_verification",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/final_source_check.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:12:59.094149+00:00",
+      "finished": "2026-09-30T05:12:59.639212+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 223
+    },
+    {
+      "name": "help_only",
+      "command": [
+        "python",
+        "-B",
+        "scripts/step28_bge_continual_run.py",
+        "--help"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:07:45.899490+00:00",
+      "finished": "2026-09-30T05:07:46.583274+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 593
+    },
+    {
+      "name": "independent_metrics",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/independent_metrics.py"
+      ],
+      "exit": 1,
+      "started": "2026-09-30T05:06:12.434581+00:00",
+      "finished": "2026-09-30T05:06:13.031324+00:00",
+      "stderr_bytes": 1109,
+      "unittest_summary": [],
+      "stdout_bytes": 0
+    },
+    {
+      "name": "independent_metrics_v2",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/independent_metrics_v2.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:06:27.768642+00:00",
+      "finished": "2026-09-30T05:06:28.391135+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 11462
+    },
+    {
+      "name": "independent_v1",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v1.py",
+        "--out",
+        "/mnt/data/bge_continual_external_audit/outputs/independent_v1"
+      ],
+      "exit": 1,
+      "started": "2026-09-30T04:57:12.995635+00:00",
+      "finished": "2026-09-30T04:57:31.327234+00:00",
+      "stderr_bytes": 4338,
+      "unittest_summary": [
+        "Ran 10 tests in 15.946s",
+        "FAILED (failures=2, errors=2)"
+      ],
+      "stdout_bytes": 170
+    },
+    {
+      "name": "independent_v2",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v2.py",
+        "--out",
+        "/mnt/data/bge_continual_external_audit/outputs/independent_v2"
+      ],
+      "exit": 1,
+      "started": "2026-09-30T05:01:55.036798+00:00",
+      "finished": "2026-09-30T05:02:17.968557+00:00",
+      "stderr_bytes": 2022,
+      "unittest_summary": [
+        "Ran 10 tests in 20.416s",
+        "FAILED (failures=1)"
+      ],
+      "stdout_bytes": 2201
+    },
+    {
+      "name": "independent_v3",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v3.py",
+        "--out",
+        "/mnt/data/bge_continual_external_audit/outputs/independent_v3"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:03:24.695657+00:00",
+      "finished": "2026-09-30T05:03:47.204202+00:00",
+      "stderr_bytes": 1322,
+      "unittest_summary": [
+        "Ran 10 tests in 19.853s",
+        "OK"
+      ],
+      "stdout_bytes": 2201
+    },
+    {
+      "name": "metadata_budget",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/check_metadata_and_budget.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:07:43.918775+00:00",
+      "finished": "2026-09-30T05:07:44.589699+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 923
+    },
+    {
+      "name": "revise_metrics_reference",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/revise_metrics_reference.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:06:26.609259+00:00",
+      "finished": "2026-09-30T05:06:27.169246+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 519
+    },
+    {
+      "name": "revise_reference_v2",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/revise_reference_v2.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:01:53.940132+00:00",
+      "finished": "2026-09-30T05:01:54.478576+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 950
+    },
+    {
+      "name": "revise_reference_v3",
+      "command": [
+        "python",
+        "-B",
+        "/mnt/data/bge_continual_external_audit/scripts/revise_reference_v3.py"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T05:03:23.480227+00:00",
+      "finished": "2026-09-30T05:03:24.035011+00:00",
+      "stderr_bytes": 0,
+      "unittest_summary": [],
+      "stdout_bytes": 723
+    },
+    {
+      "name": "supplied_contracts",
+      "command": [
+        "python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_step28_bge_continual_contracts.py",
+        "-v"
+      ],
+      "exit": 0,
+      "started": "2026-09-30T04:52:58.411087+00:00",
+      "finished": "2026-09-30T04:53:06.807085+00:00",
+      "stderr_bytes": 3781,
+      "unittest_summary": [
+        "Ran 22 tests in 6.479s",
+        "OK"
+      ],
+      "stdout_bytes": 0
+    }
+  ],
+  "prior_and_final_counts": {
+    "independent_v1": {
+      "run": 10,
+      "passed": 6,
+      "failures": 2,
+      "errors": 2,
+      "skipped": 0
+    },
+    "independent_v2": {
+      "run": 10,
+      "passed": 9,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "independent_v3": {
+      "run": 10,
+      "passed": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "exact_revision_diffs": 3,
+  "numbered_source_copies_verified": 53,
+  "additional_metrics": {
+    "status": "PASS",
+    "handmade_cases": 6,
+    "metric_comparisons": 132,
+    "maximum_error": 1.1102230246251565e-15,
+    "probability_numeric_scope": "Frozen np.exp(-np.logaddexp(0.,-z)) and clipped log-loss probabilities deliberately same; independent aggregation/curves/counts/ranking",
+    "formal_input_label_model_access": false
+  },
+  "independent_final_details": {
+    "loss_gradient": {
+      "max_loss_error": 7.105427357601002e-15,
+      "max_gradient_error": 1.457167719820518e-16,
+      "max_finite_difference_error": 7.689934106158702e-11,
+      "finite_difference_points": 20
+    },
+    "live_targets": {
+      "rows": [
+        {
+          "method": "seq",
+          "parameter_error": 0.0,
+          "total_error": 8.881784197001252e-16,
+          "mathematical_double_total": 4.5689072928573875,
+          "float32_target_value_correction": -6.378170946952366e-08,
+          "clip_count": 1,
+          "step_count": 1,
+          "forward_count": 1,
+          "optimizer_step": 289,
+          "gradient_norm_error": 1.1102230246251565e-16
+        },
+        {
+          "method": "er",
+          "parameter_error": 0.0,
+          "total_error": 0.0,
+          "mathematical_double_total": 9.14360432288304,
+          "float32_target_value_correction": -2.6228846428111297e-08,
+          "clip_count": 1,
+          "step_count": 1,
+          "forward_count": 2,
+          "optimizer_step": 289,
+          "gradient_norm_error": 0.0
+        },
+        {
+          "method": "logit",
+          "parameter_error": 0.0,
+          "total_error": 0.0,
+          "mathematical_double_total": 9.287854633973724,
+          "float32_target_value_correction": -2.6228846428111297e-08,
+          "clip_count": 1,
+          "step_count": 1,
+          "forward_count": 2,
+          "optimizer_step": 289,
+          "gradient_norm_error": 0.0
+        }
+      ],
+      "shared_actual_warm_updates": 1,
+      "warm_counter_fixture": "explicit 1 -> 288; not 288 actual calls in this test",
+      "current_forward_identical": true,
+      "history_forward_identical": true,
+      "reference_uses_no_project_objective": true
+    },
+    "memory": {
+      "rows": [
+        {
+          "order": "ABC",
+          "logit": false,
+          "bytes_after48": 75026,
+          "bytes_after96": 75027,
+          "reference_numeric_bytes": 0,
+          "callback_groups": [],
+          "restored_partial_draw_sequence": true
+        },
+        {
+          "order": "ABC",
+          "logit": true,
+          "bytes_after48": 84203,
+          "bytes_after96": 84204,
+          "reference_numeric_bytes": 9072,
+          "callback_groups": [
+            "A_08",
+            "A_12",
+            "A_43",
+            "A_38",
+            "A_36",
+            "A_05",
+            "B_00",
+            "B_02"
+          ],
+          "restored_partial_draw_sequence": true
+        },
+        {
+          "order": "BCA",
+          "logit": false,
+          "bytes_after48": 75019,
+          "bytes_after96": 75020,
+          "reference_numeric_bytes": 0,
+          "callback_groups": [],
+          "restored_partial_draw_sequence": true
+        },
+        {
+          "order": "BCA",
+          "logit": true,
+          "bytes_after48": 84196,
+          "bytes_after96": 84197,
+          "reference_numeric_bytes": 9072,
+          "callback_groups": [
+            "B_30",
+            "B_26",
+            "B_28",
+            "B_45",
+            "B_31",
+            "B_43",
+            "C_34",
+            "C_37",
+            "C_01",
+            "C_22"
+          ],
+          "restored_partial_draw_sequence": true
+        },
+        {
+          "order": "CAB",
+          "logit": false,
+          "bytes_after48": 75009,
+          "bytes_after96": 75010,
+          "reference_numeric_bytes": 0,
+          "callback_groups": [],
+          "restored_partial_draw_sequence": true
+        },
+        {
+          "order": "CAB",
+          "logit": true,
+          "bytes_after48": 84186,
+          "bytes_after96": 84187,
+          "reference_numeric_bytes": 9072,
+          "callback_groups": [
+            "C_25",
+            "C_36",
+            "C_15",
+            "C_35",
+            "C_44",
+            "C_28",
+            "A_05",
+            "A_34",
+            "A_12",
+            "A_45",
+            "A_40",
+            "A_04"
+          ],
+          "restored_partial_draw_sequence": true
+        }
+      ],
+      "metadata_overflow_refused": true,
+      "no_archived_data_callback": true,
+      "same_members_and_draws": true
+    },
+    "actual_micro": {
+      "real_shared_stage_calls": 288,
+      "real_next_steps_on_original_and_restored": 2,
+      "full_Adam_before_after_checkpoint_equal": true,
+      "RNG_restored": true,
+      "next_model_and_Adam_exactly_equal": true,
+      "score_roles": [
+        "calibration",
+        "development",
+        "stage-cal",
+        "first-cal"
+      ],
+      "calibration_status": "PASS_CALIBRATION_FIT",
+      "native_BGE": false,
+      "source": "submitted TinyEncoder sample reused; actual project train_stage/checkpoint/restore_branch called"
+    },
+    "endpoints": {
+      "arm_role_endpoint_metric_cases": 2464,
+      "max_point_error": 8.326672684688674e-17,
+      "max_per_order_error": 1.214306433183765e-16,
+      "max_interval_error": 1.942890293094024e-16,
+      "independent_draws_identical": true,
+      "all_formula_branches_checked": true,
+      "bootstrap_sha256": "fb221925e6b780043dcd66fac823d901fea857204aaa8f2994e84a4f564382d8"
+    },
+    "acceptance": {
+      "number": 23,
+      "guard_equalities_accepted": true,
+      "performance_tolerance": 0,
+      "future_three_seed_not_evaluated": true,
+      "individual_failures_count": 23
+    },
+    "gate": {
+      "explicit_pseudo_weight_files": true,
+      "not_native_weights": true,
+      "complete_gate_baseline_points": 21,
+      "independently_mutated_files_refused": 33,
+      "valid_loader_called": false
+    },
+    "recovery": {
+      "matrix_count": 64,
+      "count_file_count": 64,
+      "injected_statistics_faults": [
+        "bootstrap_draws",
+        "stage_table",
+        "comparison_checks",
+        "forgetting_checks"
+      ],
+      "all_collected_files_preserved": true,
+      "finalize_twice_same_bytes": true,
+      "refuses_different_existing_result": true,
+      "partial_collection_matrix_count": 1,
+      "partial_not_claimed_complete": true,
+      "count_rate_checks": 2016,
+      "max_rate_error": 0.0,
+      "result_status": "COMPLETE_BGE_CONTINUAL_DIAGNOSTIC",
+      "group_labels_handmade_only": true
+    },
+    "calibration": {
+      "handmade_analytic_gradient_error": 5.076494780098528e-16,
+      "known_optimum": [
+        0.8958797346140275,
+        -1.3013448427221916
+      ],
+      "known_optimum_gradient": [
+        1.7763568394002505e-17,
+        5.329070518200751e-17
+      ],
+      "fullshape_handmade_fit": {
+        "a": 0.11404182496961074,
+        "b": -2.8925826346595227,
+        "role": "calibration",
+        "objective": "unweighted_unclipped_bernoulli_nll",
+        "initial_parameters": [
+          1.0,
+          0.0
+        ],
+        "bounds": [
+          [
+            0.001,
+            100.0
+          ],
+          [
+            -100.0,
+            100.0
+          ]
+        ],
+        "options": {
+          "maxiter": 200,
+          "maxfun": 2000,
+          "maxls": 40,
+          "maxcor": 10,
+          "ftol": 1e-12,
+          "gtol": 1e-08
+        },
+        "initial_nll": 0.8388382065524961,
+        "final_nll": 0.2065615454876306,
+        "optimizer_success": true,
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "optimizer_iterations": 10,
+        "objective_calls": 11,
+        "projected_gradient_max": 8.182125552977992e-09,
+        "trajectory": [
+          {
+            "iteration": 1,
+            "a": 0.7251603840907969,
+            "b": -0.4470899470899471,
+            "nll": 0.5928306678549791,
+            "projected_gradient_max": 0.35255124317921643
+          },
+          {
+            "iteration": 2,
+            "a": 0.001,
+            "b": -2.1248186799832856,
+            "nll": 0.22525832337920199,
+            "projected_gradient_max": 0.053797873714481366
+          },
+          {
+            "iteration": 3,
+            "a": 0.058148476122768585,
+            "b": -2.4493689729501336,
+            "nll": 0.2121398251258599,
+            "projected_gradient_max": 0.02671411298346471
+          },
+          {
+            "iteration": 4,
+            "a": 0.08764707530126915,
+            "b": -2.7674801953033357,
+            "nll": 0.20697082595182445,
+            "projected_gradient_max": 0.0064495472622860634
+          },
+          {
+            "iteration": 5,
+            "a": 0.10478891159743461,
+            "b": -2.8695974735901597,
+            "nll": 0.20657634252987436,
+            "projected_gradient_max": 0.0011010201081685911
+          },
+          {
+            "iteration": 6,
+            "a": 0.11232400792106298,
+            "b": -2.8912922623463224,
+            "nll": 0.20656167163622957,
+            "projected_gradient_max": 0.00010714136686985905
+          },
+          {
+            "iteration": 7,
+            "a": 0.1138167739640818,
+            "b": -2.8926312163252192,
+            "nll": 0.20656154732740353,
+            "projected_gradient_max": 1.549879710838242e-05
+          },
+          {
+            "iteration": 8,
+            "a": 0.11402330898325952,
+            "b": -2.8926117347607807,
+            "nll": 0.20656154552409003,
+            "projected_gradient_max": 1.5893185040174071e-06
+          },
+          {
+            "iteration": 9,
+            "a": 0.11404231567105837,
+            "b": -2.8925861661180856,
+            "nll": 0.20656154548796457,
+            "projected_gradient_max": 1.795403206732608e-07
+          },
+          {
+            "iteration": 10,
+            "a": 0.11404182496961074,
+            "b": -2.8925826346595227,
+            "nll": 0.2065615454876306,
+            "projected_gradient_max": 8.182125552977992e-09
+          }
+        ],
+        "group_count": 12,
+        "pair_count": 4536,
+        "positive_count": 240,
+        "status": "PASS_CALIBRATION_FIT",
+        "raw_brier": 0.3067908478864479,
+        "calibrated_brier": 0.05005456914204587
+      },
+      "fixed_model_mapping_change_counterexample": {
+        "both_domain_positive_rate": 0.05291005291005291,
+        "old_expected_brier_increase": 0.0009000000000000004,
+        "old_expected_log_loss_increase": 0.010836263997970538,
+        "unchanged_logits_and_ranking": true
+      }
+    },
+    "visibility": {
+      "count": 21,
+      "learner_functions_have_no_supply_or_archive_parameter": true,
+      "parse_attempt_recorded_before_loader": true,
+      "failed_attempt_not_retried": true,
+      "formal_objects_accessed": false
+    }
+  },
+  "local_execution_scope": "Read stored text/JSON and hashes only; no project or reviewer research code executed",
+  "known_logging_limit": "Initial verify_submission has stdout/stderr/exit and exact source, but no corresponding command/time JSON; all16 subsequent logged operations have it.",
+  "initial_local_read_error": "primary_evidence_initial.json; corrected explicit UTF-8 only"
+}

@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "group": "new_B",
+      "exact_cast_mean": 0.8553246259689331,
+      "sequential_store_mean": 0.8553246259689331,
+      "actual_mean": 0.8553246259689331,
+      "per_element_sequential_equal": true,
+      "max_sequential_error": 0.0,
+      "per_element_once_rounded_disagreements": 48,
+      "max_once_rounded_diff": 1.1920928955078125e-07,
+      "reference_v2_scalar_correction": -6.378170946952366e-08
+    },
+    {
+      "group": "old_A",
+      "exact_cast_mean": 0.8518105745315552,
+      "sequential_store_mean": 0.8518106937408447,
+      "actual_mean": 0.8518106937408447,
+      "per_element_sequential_equal": true,
+      "max_sequential_error": 0.0,
+      "per_element_once_rounded_disagreements": 41,
+      "max_once_rounded_diff": 1.1920928955078125e-07,
+      "reference_v2_scalar_correction": -8.165642650936888e-08
+    }
+  ],
+  "formula": "cast32(cast32((1-y)*z) + softplus(-z)) then float32 mean; compares recorded value only, independently differentiated mathematical gradient retained",
+  "project_source_modified": false
+}

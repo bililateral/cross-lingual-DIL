@@ -1,0 +1,191 @@
+{
+  "recorded_at_utc": "2026-09-30T06:37:00.015717+00:00",
+  "status": "PASS_PRIMARY_NATIVE_EVIDENCE_REVIEW",
+  "scope": "Read returned small CPU evidence and check scalar/hash/paired-state claims; no project import, research-script execution, formal input or label access on Windows. Source/requirements traced in implementation review.",
+  "contracts": {
+    "failed": 0,
+    "passed": 22,
+    "skipped": 0
+  },
+  "native": {
+    "er": {
+      "actual_updates": 2,
+      "loss_absolute_differences": {
+        "current": {
+          "bce": 2.381239094795262e-09,
+          "hard": 9.144076973388593e-08,
+          "rank": 2.751858256822004e-07,
+          "total": 5.030407024264605e-08
+        },
+        "history": {
+          "bce": 4.668132946861192e-08,
+          "hard": 1.7052046441534685e-09,
+          "rank": 4.5954457128516424e-08,
+          "total": 1.5794743291053237e-09
+        }
+      },
+      "probes_changed": 29,
+      "layers": 24,
+      "minimum_gradient_norm": 0.009532555006444454,
+      "adam_step": 289,
+      "seconds": 187.00403185700998,
+      "unused_only_pooler": true
+    },
+    "logit": {
+      "actual_updates": 2,
+      "loss_absolute_differences": {
+        "current": {
+          "bce": 2.381239094795262e-09,
+          "hard": 9.144076973388593e-08,
+          "rank": 2.751858256822004e-07,
+          "total": 5.030407024264605e-08
+        },
+        "history": {
+          "bce": 4.668132946861192e-08,
+          "hard": 1.7052046441534685e-09,
+          "rank": 4.5954457128516424e-08,
+          "total": 1.5794743291053237e-09
+        }
+      },
+      "probes_changed": 29,
+      "layers": 24,
+      "minimum_gradient_norm": 0.009584998711943626,
+      "adam_step": 289,
+      "seconds": 221.08026126003824,
+      "unused_only_pooler": true
+    },
+    "seq": {
+      "actual_updates": 2,
+      "loss_absolute_differences": {
+        "current": {
+          "bce": 2.381239094795262e-09,
+          "hard": 9.144076973388593e-08,
+          "rank": 2.751858256822004e-07,
+          "total": 5.030407024264605e-08
+        }
+      },
+      "probes_changed": 29,
+      "layers": 24,
+      "minimum_gradient_norm": 0.00646978011354804,
+      "adam_step": 289,
+      "seconds": 135.99838452599943,
+      "unused_only_pooler": true
+    }
+  },
+  "pairing_all_five_fields": true,
+  "paired_history_forward": true,
+  "mse_own_gradient": {
+    "encoder_first_query_weight": 0.00017231151286978275,
+    "head_hidden_weight": 0.003721559653058648,
+    "reference_is_detached": true,
+    "reference_mode": "origin_model_eval",
+    "student_mode": "train"
+  },
+  "mse_absolute_difference": 1.209871485223675e-11,
+  "source_files": [
+    {
+      "bytes": 32430,
+      "path": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "sha256": "88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485"
+    },
+    {
+      "bytes": 3489,
+      "path": "schema/step28_alias_ranking_policy.json",
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+    },
+    {
+      "bytes": 5123,
+      "path": "schema/step28_bge_continual_policy.json",
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+    },
+    {
+      "bytes": 8439,
+      "path": "schema/step28_chinese_base_policy.json",
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+    },
+    {
+      "bytes": 1243,
+      "path": "scripts/run_step28_bge_continual_linux_20260930.sh",
+      "sha256": "5536ec24cecebc9e401c819f52b05aff4b976fcef530fffe42eaff605322c979"
+    },
+    {
+      "bytes": 8818,
+      "path": "scripts/step28_alias_calibration.py",
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+    },
+    {
+      "bytes": 11658,
+      "path": "scripts/step28_alias_ranking.py",
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+    },
+    {
+      "bytes": 16341,
+      "path": "scripts/step28_bge_continual.py",
+      "sha256": "2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae"
+    },
+    {
+      "bytes": 12126,
+      "path": "scripts/step28_bge_continual_check.py",
+      "sha256": "d919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07"
+    },
+    {
+      "bytes": 13765,
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+    },
+    {
+      "bytes": 34789,
+      "path": "scripts/step28_bge_continual_run.py",
+      "sha256": "bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9"
+    },
+    {
+      "bytes": 51352,
+      "path": "scripts/step28_chinese_base.py",
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+    },
+    {
+      "bytes": 26322,
+      "path": "scripts/step28_continual_expression_run.py",
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+    },
+    {
+      "bytes": 9699,
+      "path": "scripts/step28_continual_population.py",
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "bytes": 11587,
+      "path": "scripts/step28_continual_population_data.py",
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "bytes": 20911,
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "bytes": 21310,
+      "path": "scripts/step28_continual_population_run.py",
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "bytes": 31625,
+      "path": "tests/test_step28_bge_continual_contracts.py",
+      "sha256": "de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a"
+    }
+  ],
+  "environment": {
+    "cpu_affinity": [
+      0
+    ],
+    "numpy": "2.2.6",
+    "python": "3.10.19",
+    "torch": "2.9.1+cu130"
+  },
+  "GNU_wall_seconds": 554.18,
+  "max_rss_kib": 10342296,
+  "formal_inputs": false,
+  "formal_labels": false,
+  "limitations": "Tiny full-stage/reload plus native two-update fixtures; no formal data/performance, native full checkpoint, CUDA/BF16 or 288-step native continuity claim",
+  "decision": "Necessary handmade and native evidence passes; proceed to authorized exact input and shared-resource checks, then formal launch."
+}

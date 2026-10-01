@@ -1,0 +1,16 @@
+{
+  "revision": "v1 -> v2",
+  "project_files_modified": false,
+  "metric_tolerance_unchanged": 1e-12,
+  "diagnosis": "outputs/reference_v1_diagnosis.json",
+  "changes": [
+    "Hard-loss scalar reference uses explicit documented threshold20 for matching runtime; exact mathematical differences separately retained, no tolerance loosening.",
+    "Double-valued toy preserves exact independent gradient graph; scalar reference explicitly accounts for runner float32 target BCE output rounding measured in diagnosis.",
+    "Own budget fixture now implements runner-required state interface, without claiming formal resource enforcement.",
+    "Correct function lookup objective -> loss_gradient, confirmed exact source function."
+  ],
+  "sha256": {
+    "independent_checks_v1.py": "1b367ba8826371d670f4daa494d18bcbf14196dae045de7a3f2e162491190cf9",
+    "independent_checks_v2.py": "0345596b8cc9bacb90aba3751787fa39df2f4596897722dfc38c8ec377b94a57"
+  }
+}

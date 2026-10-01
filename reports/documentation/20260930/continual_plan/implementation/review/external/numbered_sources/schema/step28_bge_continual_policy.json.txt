@@ -1,0 +1,199 @@
+    1 {
+    2   "study": "seller_alias_bge_limited_history_pilot",
+    3   "schema_version": 1,
+    4   "contract_document": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+    5   "decision": "reports/documentation/20260930/continual_plan/implementation_decision.json",
+    6   "configuration": "hard_bge_separate_moments",
+    7   "orders": [
+    8     "ABC",
+    9     "BCA",
+   10     "CAB"
+   11   ],
+   12   "seed": "s0",
+   13   "initialization_seed": 20260909,
+   14   "schedule_seed": 20260918,
+   15   "memory_seed": 20260930,
+   16   "methods": [
+   17     "frozen",
+   18     "seq",
+   19     "er",
+   20     "logit"
+   21   ],
+   22   "updated_methods": [
+   23     "seq",
+   24     "er",
+   25     "logit"
+   26   ],
+   27   "epochs_per_stage": 6,
+   28   "fit_groups_per_domain": 48,
+   29   "calibration_groups_per_domain": 12,
+   30   "valid_groups_per_domain": 20,
+   31   "updates_per_stage": 288,
+   32   "physical_updates": 6048,
+   33   "gradient_group_presentations": 9504,
+   34   "distinct_stage_endpoints": 21,
+   35   "encoder_schedule": {
+   36     "warmup_updates": 29,
+   37     "peak_lr": 0.00001,
+   38     "head_lr": 0.001,
+   39     "local_stage_restart": true,
+   40     "adam_moments_and_steps_continue": true
+   41   },
+   42   "loss": {
+   43     "bce": 1,
+   44     "rank": 1,
+   45     "known_top5_hard": 0.5,
+   46     "historical_supervision": 1,
+   47     "historical_logit_mse": 0.5,
+   48     "history_and_current_summed": true,
+   49     "one_clip_and_adam_step": true,
+   50     "student_mode": "train",
+   51     "reference_mode": "eval"
+   52   },
+   53   "memory": {
+   54     "capacity_groups": 6,
+   55     "maximum_bytes": 1048576,
+   56     "supply": "model_independent_algorithm_r_at_stage_end",
+   57     "insertion_order": "ascending_group_uid_each_unique_fit_group_once",
+   58     "same_members_and_draws_for_er_logit": true,
+   59     "draw": "one_uniform_group_with_replacement_per_update",
+   60     "refresh_survivor_reference": false,
+   61     "reference": "float32_raw_logits_at_origin_domain_end",
+   62     "include": "All serialized groups/labels/indices/RNG/counters/reference logits/first-map and related persistent auxiliary state",
+   63     "old_archive_reaccess": false
+   64   },
+   65   "calibration": {
+   66     "role": "current_domain_only",
+   67     "fit_groups": 12,
+   68     "positive_affine": true,
+   69     "bounds": [
+   70       [
+   71         0.001,
+   72         100
+   73       ],
+   74       [
+   75         -100,
+   76         100
+   77       ]
+   78     ],
+   79     "initial": [
+   80       1,
+   81       0
+   82     ],
+   83     "solver": "L-BFGS-B",
+   84     "options": {
+   85       "maxiter": 200,
+   86       "maxfun": 2000,
+   87       "maxls": 40,
+   88       "maxcor": 10,
+   89       "ftol": 1e-12,
+   90       "gtol": 1e-8
+   91     },
+   92     "accepted_projected_gradient_max": 0.000001,
+   93     "old_calibration_reuse": false,
+   94     "primary_role": "stage-cal",
+   95     "diagnostic_roles": [
+   96       "raw",
+   97       "first-cal"
+   98     ],
+   99     "initial_role": "raw"
+  100   },
+  101   "evaluation": {
+  102     "split": "development",
+  103     "bootstrap_replicates": 5000,
+  104     "bootstrap_seed": 20260930,
+  105     "draw_shape": [
+  106       5000,
+  107       3,
+  108       20
+  109     ],
+  110     "confidence_level": 0.95,
+  111     "quantile_method": "linear",
+  112     "actual_domain_order": [
+  113       "A",
+  114       "B",
+  115       "C"
+  116     ],
+  117     "comparisons": [
+  118       [
+  119         "er",
+  120         "seq"
+  121       ],
+  122       [
+  123         "logit",
+  124         "er"
+  125       ]
+  126     ],
+  127     "endpoints": [
+  128       "O",
+  129       "N",
+  130       "Z",
+  131       "F_first",
+  132       "F",
+  133       "G",
+  134       "final_all"
+  135     ],
+  136     "positive_metric_signs": {
+  137       "map": 1,
+  138       "recall_at_5": 1,
+  139       "average_precision": 1,
+  140       "roc_auc": 1,
+  141       "brier": -1,
+  142       "log_loss": -1
+  143     },
+  144     "old_map_strict_positive": true,
+  145     "old_map_interval_low_strict_positive": true,
+  146     "old_recall5_strict_positive": true,
+  147     "new_N_MAP_and_recall5_non_decrease": true,
+  148     "probability_guard_endpoints": [
+  149       "O",
+  150       "N",
+  151       "Z"
+  152     ],
+  153     "raw_comparator_loss_guard_endpoints": [
+  154       "O",
+  155       "N"
+  156     ],
+  157     "latest_Z_six_observed_guards": true,
+  158     "forgetting_required_orders": 2,
+  159     "classification_threshold_logit": 0,
+  160     "primary_ranking_role": "raw",
+  161     "primary_probability_role": "stage-cal",
+  162     "performance_tolerance": 0,
+  163     "no_winner_selection": true,
+  164     "scope": "One fixed seed, fixed models/order/map/generator; paired actual-domain whole-group conditional intervals, not population noninferiority or independent confirmatory test"
+  165   },
+  166   "supervision": {
+  167     "train_parse_attempts": 1,
+  168     "valid_parse_attempts": 1,
+  169     "test_access": false,
+  170     "owners_access": false,
+  171     "automatic_retry": false,
+  172     "valid_after_all_training_and_complete_blind_gate": true,
+  173     "formal_access_authorized_by_this_file": false
+  174   },
+  175   "runtime": {
+  176     "maximum_gpu_stage_seconds": 129600,
+  177     "maximum_output_bytes": 68719476736,
+  178     "minimum_free_gpu_bytes": 25769803776,
+  179     "minimum_free_host_bytes": 17179869184,
+  180     "torch_cpu_threads": 1,
+  181     "estimated_hours": [
+  182       18,
+  183       26
+  184     ]
+  185   },
+  186   "cpu_verification": {
+  187     "maximum_seconds": 3600,
+  188     "maximum_evidence_bytes": 268435456,
+  189     "formal_inputs": false,
+  190     "formal_labels": false,
+  191     "gpu": false,
+  192     "retained_native_weights": false,
+  193     "estimate_minutes": [
+  194       15,
+  195       30
+  196     ]
+  197   },
+  198   "execution_boundary": "Only local preparation is currently authorized. Complete local contract/policy/code and static review; user and actual web approval precede any project Linux access or sync. Formal execution requires separate source-bound authorization and native verification. No grants arise from this policy."
+  199 }

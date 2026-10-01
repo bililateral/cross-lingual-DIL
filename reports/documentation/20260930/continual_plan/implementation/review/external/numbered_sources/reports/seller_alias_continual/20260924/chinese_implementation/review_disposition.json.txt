@@ -1,0 +1,58 @@
+    1 {
+    2   "status": "R1_R2_R3_IMPLEMENTATION_AND_S1_METADATA_CLOSED",
+    3   "review_conversation": "https://chatgpt.com/c/6ab4c35e-e0a8-83ea-b8f1-5cfe35d48b3c",
+    4   "reply_id": "11e24951-0cb2-48a7-9bbf-ccfe589734cc",
+    5   "actual_dom_model_slug": "gpt-6-pro",
+    6   "model_self_description": "GPT-6 Astra Pro; retained separately from actual DOM identity",
+    7   "personally_read": [
+    8     "review_response.zh.md",
+    9     "external/chinese_external_audit_report.zh.md",
+   10     "external/chinese_external_audit/independent_checks.py",
+   11     "external/chinese_external_audit/independent_results.json",
+   12     "external/chinese_external_audit/check_suggested_fix.py",
+   13     "external/chinese_external_audit/suggested_fix_results.json"
+   14   ],
+   15   "findings": [
+   16     {
+   17       "id": "R1",
+   18       "classification": "REPRODUCIBILITY_DEFECT",
+   19       "claim": "A single development parse saves complete evidence before uncertainty computation",
+   20       "confirmed": true,
+   21       "evidence": "Original evaluate invokes automatic_report inside each arm loop; external handmade injection retained 2/9 matrices. Primary patch writes all nine matrices, all zero/calibrated counts, thresholds, partition and domain/group order before RNG/bootstrap. Collection-only status is distinct from evaluation completion.",
+   22       "verification": "Final 12/12 contracts, zero skips, 2.441 seconds; first-interval fault retains9 matrices and every fixed/calibrated count table, domain/group mapping, single handmade parse and failure receipt; no evaluation success receipt."
+   23     },
+   24     {
+   25       "id": "R2",
+   26       "classification": "REPRODUCIBILITY_DEFECT",
+   27       "claim": "Both zero and calibrated thresholds have pooled/domain classification reports",
+   28       "confirmed": true,
+   29       "evidence": "Original zero-threshold output contains per-group dictionaries and macro means only. Added sums of tp/fp/fn/tn before precision/recall/F1/FPR; original macro reports remain separate.",
+   30       "verification": "Final 12/12 affected contracts include independent pooled10/19 versus macro3/4 witness and all nine saved fixed-zero summaries."
+   31     },
+   32     {
+   33       "id": "R3",
+   34       "classification": "REPRODUCIBILITY_DEFECT",
+   35       "claim": "Disclose computation cost for the unequal-compute representations",
+   36       "confirmed": true,
+   37       "evidence": "Added per-arm CUDA allocator reset before model load, synchronization at bounds, peak allocated/reserved bytes, baseline, arm duration and parameter counts. Includes load/update/score/reload/calibration; excludes prior preflight and later cleanup; not device-total or other processes.",
+   38       "verification": "Installed PyTorch2.9.1 API definitions and source call-order checked without CUDA use; actual allocator measurement pending formal run. No gradient/update semantics changed."
+   39     }
+   40   ],
+   41   "reviewer_evidence_limits": "External12 and independent9 are reviewer environment executions, not additional project py310 cases. One independent pass demonstrates the original R1 defect. Reviewer proposal first-attempt dictionary-schema failure is retained as reviewer development history, not a new production defect.",
+   42   "not_requested": "No new models, seeds, metrics, thresholds, test/owners, labels, signing, Linux Git, network hardening or monitoring service.",
+   43   "gpu_api_references": [
+   44     "https://docs.pytorch.org/docs/2.9/generated/torch.cuda.memory.reset_peak_memory_stats.html",
+   45     "https://docs.pytorch.org/docs/2.9/generated/torch.cuda.memory.max_memory_allocated.html",
+   46     "https://docs.pytorch.org/docs/2.9/generated/torch.cuda.memory.max_memory_reserved.html"
+   47   ],
+   48   "formal_training_resumed": false,
+   49   "final_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+   50   "native_result": "Four actual CPU handmade updates passed, all24 query-layer probes plus embedding/head changed, objectives separately connected; no formal data/labels/GPU or retained native updated weights. Four source-bound reports preserved; unchanged native computation verified by AST.",
+   51   "supplemental_review": {
+   52     "reply_id": "5477b16b-9187-4cd4-b54d-39db8ec6095e",
+   53     "actual_dom_model_slug": "gpt-6-pro",
+   54     "local_read_and_disposition_complete": true,
+   55     "S1": "Corrected current SHA transcription, preserve original sent text and source receipts; no source change or experimental rerun.",
+   56     "remaining": "Formal CUDA, actual allocator measurements, full input lengths, eight real checkpoint reloads, budgets and capability remain unverified."
+   57   }
+   58 }

@@ -1,0 +1,83 @@
+{
+  "softplus_extreme": {
+    "bce": {
+      "value_reference": 24.692719119451834,
+      "value_project": 24.692719119451834,
+      "value_diff": 0.0,
+      "gradient_max_diff": 1.0842021724855044e-19
+    },
+    "rank": {
+      "value_reference": 11.93314182082711,
+      "value_project": 11.933141820827112,
+      "value_diff": 1.7763568394002505e-15,
+      "gradient_max_diff": 1.457167719820518e-16
+    },
+    "hard": {
+      "value_reference": 10.137932246973152,
+      "value_project": 10.137932246947498,
+      "value_diff": -2.5654145474618417e-11,
+      "gradient_max_diff": 1.2144604766284317e-11
+    },
+    "total": {
+      "value_reference": 41.694827063765516,
+      "value_project": 41.6948270637527,
+      "value_diff": -1.2818190953112207e-11,
+      "gradient_max_diff": 6.0723023831421585e-12
+    },
+    "explanation": {
+      "hard_exact": 10.137932246973149,
+      "hard_threshold20": 10.137932246947498,
+      "actual_hard": 10.137932246947498,
+      "threshold_branch_count": 44,
+      "max_individual_value_difference": 1.7578898336978455e-09,
+      "maximum_expected_bound": 2.061153620314381e-09
+    }
+  },
+  "BCE_mixed_dtype": {
+    "prediction_dtype": "torch.float64",
+    "target_dtype": "torch.float32",
+    "terms": {
+      "exact_double_mean": {
+        "dtype": "torch.float64",
+        "value": 0.8553246897506426
+      },
+      "per_cast32_then_mean": {
+        "dtype": "torch.float32",
+        "value": 0.8553246259689331
+      },
+      "double_mean_cast32": {
+        "dtype": "torch.float32",
+        "value": 0.8553246855735779
+      },
+      "actual32": {
+        "dtype": "torch.float32",
+        "value": 0.8553246259689331
+      },
+      "actual64": {
+        "dtype": "torch.float64",
+        "value": 0.8553246897506426
+      }
+    },
+    "term32_vs64": {
+      "bce": -6.378170946952366e-08,
+      "rank": 0.0,
+      "hard": 0.0,
+      "total": -6.378170880338985e-08
+    },
+    "actual_total": 4.568907229075679,
+    "prior_reference_total": 4.5689072928573875,
+    "grad_max_diffs": {
+      "exact_double_mean": 4.336808689942018e-19,
+      "per_cast32_then_mean": 5.146334812293485e-11,
+      "double_mean_cast32": 4.336808689942018e-19,
+      "actual32": 0.0,
+      "actual64": 0.0
+    }
+  },
+  "fixture_api": {
+    "budget_supplied_has_state": false,
+    "runner_requires_state": true,
+    "actual_calibration_function": "loss_gradient",
+    "nonexistent_function_used_by_v1": "objective"
+  }
+}

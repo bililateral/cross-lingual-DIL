@@ -1,0 +1,80 @@
+    1 {
+    2   "study": "seller_alias_ranking_training",
+    3   "base_policy_sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+    4   "base_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+    5   "decision": "reports/documentation/20260927/ranking_plan/decision.json",
+    6   "arms": ["d", "schedule", "hard"],
+    7   "seeds": {
+    8     "s0": {"initialization_seed": 20260909, "schedule_seed": 20260918},
+    9     "s1": {"initialization_seed": 20260925, "schedule_seed": 20260925},
+   10     "s2": {"initialization_seed": 20260926, "schedule_seed": 20260926}
+   11   },
+   12   "runs": ["s0_d", "s0_schedule", "s0_hard", "s1_d", "s1_schedule", "s1_hard", "s2_d", "s2_schedule", "s2_hard"],
+   13   "epochs": 6,
+   14   "updates_per_epoch": 144,
+   15   "updates_per_run": 864,
+   16   "physical_updates": 7776,
+   17   "score_epochs": [3, 6],
+   18   "primary_epoch": 6,
+   19   "primary_comparison": ["hard", "d"],
+   20   "auxiliary_comparisons": [["schedule", "d"], ["hard", "schedule"]],
+   21   "fixed_test_seed": "s0",
+   22   "encoder_schedule": {
+   23     "peak_lr": 0.00001,
+   24     "warmup_fraction": 0.1,
+   25     "warmup_updates": 87,
+   26     "definition": "one-based t=1..864: peak*t/87 for t<=87, then peak*(864-t)/(864-87)",
+   27     "last_lr": 0.0,
+   28     "positive_lr_updates": 863,
+   29     "head_lr": 0.001,
+   30     "head_schedule": "constant"
+   31   },
+   32   "hard_ranking": {
+   33     "count": 5,
+   34     "weight": 0.5,
+   35     "base_rank_weight": 1.0,
+   36     "bce_weight": 1.0,
+   37     "reduction": "mean over queries, within each query mean over all positive-by-selected-negative combinations",
+   38     "selection": "highest current logits among known within-group negatives; exclude self and every positive; stable ascending candidate index for exact ties",
+   39     "selection_gradients": "indices detached, selected score values differentiable",
+   40     "pair_comparisons_per_group": 200,
+   41     "no_parameter_search": true
+   42   },
+   43   "evaluation": {
+   44     "bootstrap_replicates": 5000,
+   45     "valid_bootstrap_seed": 20260927,
+   46     "minimum_map_gain": 0.01,
+   47     "recall_at_5_strict_improvement_mean_and_s0": true,
+   48     "guard_signs": {"average_precision": 1, "roc_auc": 1, "brier": -1, "log_loss": -1},
+   49     "scope": "Conditional paired whole-group resampling within domains after averaging fixed paired seeds; observed-value guards, not population noninferiority",
+   50     "automatic_threshold": "unchanged train-only calibration, diagnostic, not acceptance",
+   51     "model_selection": "None; hard E6 is primary, s0 fixed for any later separately authorized test"
+   52   },
+   53   "supervision": {
+   54     "train_parse_attempts": 1,
+   55     "valid_parse_attempts": 1,
+   56     "train_shared_across_nine_runs": true,
+   57     "formal_access_currently_authorized": false,
+   58     "test_access": false,
+   59     "owners_access": false,
+   60     "automatic_retry": false
+   61   },
+   62   "runtime": {
+   63     "maximum_gpu_stage_seconds": 86400,
+   64     "maximum_output_bytes": 34359738368,
+   65     "minimum_free_gpu_bytes": 25769803776,
+   66     "minimum_free_host_bytes": 17179869184,
+   67     "torch_cpu_threads": 1,
+   68     "estimated_hours": [14, 18]
+   69   },
+   70   "cpu_verification": {
+   71     "maximum_seconds": 3600,
+   72     "maximum_evidence_bytes": 268435456,
+   73     "native_handmade_updates": 4,
+   74     "formal_inputs": false,
+   75     "formal_labels": false,
+   76     "gpu": false,
+   77     "retained_native_weights": false
+   78   },
+   79   "execution_boundary": "Implementation preparation approved; formal runtime/storage and new supervision remain proposed until the user receives readiness report and explicitly starts the scoped run. A separate authorization receipt is required by execute; the policy itself remains byte-frozen."
+   80 }

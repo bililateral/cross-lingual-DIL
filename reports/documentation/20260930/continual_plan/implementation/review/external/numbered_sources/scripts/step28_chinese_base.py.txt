@@ -1,0 +1,880 @@
+    1 """Chinese alias identification: account representation by ranking-objective factorial.
+    2 
+    3 Preparation is authorized; a new Linux stage must be reported and resumed.
+    4 No owners/test access, automatic retry, validation threshold tuning, or winner.
+    5 """
+    6 from __future__ import annotations
+    7 
+    8 import argparse
+    9 import gc
+   10 import hashlib
+   11 import platform
+   12 import shutil
+   13 import sys
+   14 import time
+   15 import unittest
+   16 from datetime import datetime
+   17 from pathlib import Path
+   18 from typing import Any
+   19 
+   20 import numpy as np
+   21 
+   22 import step28_continual_population as core
+   23 import step28_continual_population_data as data
+   24 import step28_continual_population_evaluate as metrics
+   25 import step28_continual_population_run as persistence
+   26 import step28_continual_expression_run as public
+   27 
+   28 POLICY = data.ROOT / "schema/step28_chinese_base_policy.json"
+   29 POLICY_SHA256 = "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+   30 ARMS = ("mean_bce", "mean_rank", "split_bce", "split_rank")
+   31 ROLES = ("fit", "calibration", "development")
+   32 ROLE_SIZES = {"fit": 144, "calibration": 36, "development": 60}
+   33 COMPLETE = "COMPLETE_CHINESE_BASE_3456_CALIBRATED_VALID_BLIND"
+   34 CPU_CONTRACT_COUNT = 12
+   35 
+   36 
+   37 def contract() -> dict:
+   38     if data.sha256(POLICY) != POLICY_SHA256:
+   39         raise ValueError("Frozen Chinese-model policy differs")
+   40     return data.read_json(POLICY)
+   41 
+   42 
+   43 def sources() -> list[dict]:
+   44     paths = [Path(__file__), POLICY, Path(core.__file__), Path(data.__file__),
+   45              Path(metrics.__file__), Path(persistence.__file__), Path(public.__file__),
+   46              data.ROOT / "tests/test_step28_chinese_base_contracts.py",
+   47              data.ROOT / "scripts/step28_chinese_base_audit.py",
+   48              data.ROOT / "scripts/run_step28_chinese_base_linux_20260924.sh"]
+   49     return [data.record(p, data.ROOT) for p in paths]
+   50 
+   51 
+   52 def partition(groups: dict, metadata: list[dict], c: dict) -> tuple[dict, dict]:
+   53     """Only public group IDs/domain membership determine fit/calibration roles."""
+   54     by_id = {r["group_uid"]: r for r in metadata}
+   55     train = groups["train"]
+   56     if len(train) != 180 or len({g.uid for g in train}) != 180:
+   57         raise ValueError("Expected the original 180 complete training groups")
+   58     fit_ids: set[str] = set()
+   59     for domain in "ABC":
+   60         ids = [g.uid for g in train if by_id[g.uid]["domain"] == domain]
+   61         if len(ids) != 60 or any(by_id[uid]["split"] != "train" for uid in ids):
+   62             raise ValueError("Training domain membership differs")
+   63         ids.sort(key=lambda uid: hashlib.sha256(data.json_bytes(
+   64             [c["partition"]["seed"], domain, uid])).hexdigest())
+   65         fit_ids.update(ids[:48])
+   66     result = {"fit": [g for g in train if g.uid in fit_ids],
+   67               "calibration": [g for g in train if g.uid not in fit_ids],
+   68               "development": groups["development"]}
+   69     if any(len(result[r]) != ROLE_SIZES[r] for r in ROLES):
+   70         raise ValueError("Fit/calibration/valid counts differ")
+   71     all_ids = [g.uid for r in ROLES for g in result[r]]
+   72     if len(set(all_ids)) != len(all_ids):
+   73         raise ValueError("Groups cross fit/calibration/valid roles")
+   74     rows = {r: [{"group_uid": g.uid, "domain": by_id[g.uid]["domain"]}
+   75                 for g in result[r]] for r in ROLES}
+   76     for role, count in (("fit", 48), ("calibration", 12), ("development", 20)):
+   77         if any(sum(x["domain"] == d for x in rows[role]) != count for d in "ABC"):
+   78             raise ValueError("Per-domain role counts differ")
+   79     return result, rows
+   80 
+   81 
+   82 def schedule(groups: list[data.Group], c: dict) -> tuple[list, int]:
+   83     if len(groups) != 144 or len({g.uid for g in groups}) != 144:
+   84         raise ValueError("Only 144 fitting groups can enter the optimizer")
+   85     seed = data.seed_for(c["schedule_seed"], "BASE_JOINT", "current")
+   86     return data.schedule(groups, 6, seed), seed
+   87 
+   88 
+   89 def model_config(c: dict, arm: str) -> dict:
+   90     if arm not in ARMS:
+   91         raise ValueError("Unknown model")
+   92     return {"model": {**c["models"][arm], **c["input"]},
+   93             "optimizer": c["optimizer"], "initialization_seed": c["initialization_seed"]}
+   94 
+   95 
+   96 def pooling_modes(pool: Any) -> list[str]:
+   97     """Read actual native pooling across the installed and legacy module APIs."""
+   98     mode = getattr(pool, "pooling_mode", None)
+   99     if isinstance(mode, str):
+  100         return [mode]
+  101     if isinstance(mode, (tuple, list)) and all(isinstance(value, str) for value in mode):
+  102         return list(mode)
+  103     if mode is not None:
+  104         raise ValueError("Unrecognized native pooling representation")
+  105     names = {"pooling_mode_cls_token": "cls", "pooling_mode_mean_tokens": "mean"}
+  106     return [names.get(key, key) for key, value in vars(pool).items()
+  107             if key.startswith("pooling_mode_") and value is True]
+  108 
+  109 
+  110 def load_model(c: dict, arm: str, device: str = "cuda:0") -> Any:
+  111     import torch
+  112     from sentence_transformers import SentenceTransformer
+  113     m = c["models"][arm]
+  114     torch.manual_seed(c["initialization_seed"])
+  115     encoder = SentenceTransformer(str(data.ROOT / m["path"]), device=device,
+  116                                   local_files_only=True, trust_remote_code=False)
+  117     encoder.default_prompt_name = None
+  118     encoder.max_seq_length = c["input"]["token_budget"]
+  119     pools = [v for v in encoder if type(v).__name__ == "Pooling"]
+  120     has_dense = any(type(v).__name__ == "Dense" for v in encoder)
+  121     if len(pools) != 1 or has_dense != m["dense_module"]:
+  122         raise ValueError("Native encoder modules differ from the registered model")
+  123     pool = pools[0]
+  124     if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+  125         raise ValueError("Native pooling or output dimension differs")
+  126     if c["input"]["activation_checkpointing"]:
+  127         encoder[0].auto_model.gradient_checkpointing_enable(
+  128             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+  129     torch.manual_seed(c["initialization_seed"])
+  130     return core.build_model(encoder, c["interventions"][arm]["account_dim"],
+  131                             c["input"]["head_hidden"]).to(device)
+  132 
+  133 
+  134 def record_texts(group: data.Group, representation: str) -> list[str]:
+  135     records = [row for items in group.items for row in items]
+  136     if representation == "combined_mean":
+  137         return [title + "\n" + description for _, title, description in records]
+  138     if representation == "separate_moments":
+  139         return [title for _, title, _ in records] + [description for _, _, description in records]
+  140     raise ValueError("Unknown account representation")
+  141 
+  142 
+  143 def pool_channels(vectors: Any, counts: list[int], representation: str,
+  144                   epsilon: float = 1e-8) -> Any:
+  145     """Population moments, all items, with no ID/count/domain feature."""
+  146     import torch
+  147     if representation == "combined_mean":
+  148         return core.pool_records(vectors, counts)
+  149     if (representation != "separate_moments" or not counts or any(n <= 0 for n in counts)
+  150             or len(vectors) != 2 * sum(counts) or epsilon != 1e-8):
+  151         raise ValueError("Channel/account alignment or moment definition differs")
+  152     normalized = torch.nn.functional.normalize(vectors.float(), dim=1)
+  153     title, description = normalized.split(sum(counts))
+  154     accounts = []
+  155     for left, right in zip(title.split(counts), description.split(counts), strict=True):
+  156         parts = []
+  157         for channel in (left, right):
+  158             mean = channel.mean(0)
+  159             std = ((channel - mean).square().mean(0) + epsilon).sqrt()
+  160             parts.extend((mean, std))
+  161         accounts.append(torch.cat(parts))
+  162     return torch.nn.functional.normalize(torch.stack(accounts), dim=1)
+  163 
+  164 
+  165 def objectives(predicted: Any, truth: Any, rank_weight: float) -> dict:
+  166     """Each query averages its positive logits, never positive or negative pairs twice in BCE."""
+  167     import torch
+  168     if (predicted.shape != (378,) or truth.shape != (378,)
+  169             or not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all()
+  170             or int(truth.sum()) != 20 or rank_weight not in (0, 1)):
+  171         raise ValueError("Expected complete finite 28-account supervision and fixed loss weight")
+  172     left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+  173     positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+  174     positive[left, right] = truth.bool()
+  175     positive[right, left] = truth.bool()
+  176     degrees = positive.sum(1)
+  177     if (int((degrees == 1).sum()) != 16 or int((degrees == 2).sum()) != 12):
+  178         raise ValueError("Expected eight two-alias and four three-alias positive components")
+  179     # Same-controller labels must be transitive; a degree-two cycle is not a controller.
+  180     paths = positive.float() @ positive.float()
+  181     diagonal = torch.eye(28, dtype=torch.bool, device=predicted.device)
+  182     if ((paths > 0) & ~positive & ~diagonal).any():
+  183         raise ValueError("Positive relations are not disjoint controller cliques")
+  184     scores = predicted.new_zeros((28, 28))
+  185     scores[left, right] = predicted
+  186     scores[right, left] = predicted
+  187     log_denominator = torch.logsumexp(scores.masked_fill(diagonal, -torch.inf), dim=1)
+  188     positive_mean = scores.masked_fill(~positive, 0).sum(1) / degrees
+  189     rank = (log_denominator - positive_mean).mean()
+  190     bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  191     return {"bce": bce, "rank": rank, "total": bce + rank_weight * rank}
+  192 
+  193 
+  194 def account_vectors(model: Any, group: data.Group, c: dict, arm: str,
+  195                     check: Any = lambda: None) -> Any:
+  196     import contextlib
+  197     import torch
+  198     device = next(model.parameters()).device
+  199     representation = c["interventions"][arm]["representation"]
+  200     texts = record_texts(group, representation)
+  201     batch_size = c["input"]["microbatch"]
+  202     vectors = []
+  203     for i in range(0, len(texts), batch_size):
+  204         check()
+  205         batch = model.encoder.tokenizer(texts[i:i + batch_size], padding=True,
+  206                                         truncation=False, return_tensors="pt")
+  207         if batch["input_ids"].shape[1] > c["input"]["token_budget"]:
+  208             raise ValueError("Input exceeds token limit; no truncation is allowed")
+  209         batch = {key: value.to(device) for key, value in batch.items()}
+  210         context = (torch.autocast("cuda", dtype=torch.bfloat16)
+  211                    if device.type == "cuda" and c["input"]["encoder_bf16"]
+  212                    else contextlib.nullcontext())
+  213         with context:
+  214             vectors.append(model.encoder(batch)["sentence_embedding"].float())
+  215     return pool_channels(torch.cat(vectors), [len(rows) for rows in group.items],
+  216                          representation, c["representation"]["variance_epsilon"])
+  217 
+  218 
+  219 def logits(model: Any, group: data.Group, c: dict, arm: str, check: Any = lambda: None) -> Any:
+  220     return model.pair_logits(account_vectors(model, group, c, arm, check))
+  221 
+  222 
+  223 def score(model: Any, groups: list, c: dict, arm: str, check: Any = lambda: None) -> np.ndarray:
+  224     import torch
+  225     model.eval()
+  226     with torch.inference_mode():
+  227         values = np.stack([logits(model, g, c, arm, check).float().cpu().numpy() for g in groups])
+  228     if values.shape != (len(groups), 378) or values.dtype != np.float32 or not np.isfinite(values).all():
+  229         raise ValueError("Incomplete/nonfinite blind scores")
+  230     return values
+  231 
+  232 
+  233 def update(model: Any, optimizer: Any, group: data.Group, c: dict, arm: str,
+  234            seed: int, *, observe: bool = False, check: Any = lambda: None) -> dict:
+  235     import torch
+  236     if group.labels is None:
+  237         raise ValueError("A fitting group must carry authorized supervision")
+  238     model.train()
+  239     optimizer.zero_grad(set_to_none=True)
+  240     before = {name: core.state_digest(module.state_dict())
+  241               for name, module in (("encoder", model.encoder), ("head", model.head))} if observe else {}
+  242     torch.manual_seed(seed)
+  243     predicted = logits(model, group, c, arm, check)
+  244     truth = torch.tensor(group.labels, dtype=torch.float32, device=predicted.device)
+  245     if predicted.shape != truth.shape or not torch.isfinite(predicted).all():
+  246         raise ValueError("Nonfinite or misaligned logits")
+  247     terms = objectives(predicted, truth, c["interventions"][arm]["rank_weight"])
+  248     loss = terms["total"]
+  249     loss.backward()
+  250     evidence = {}
+  251     if observe:
+  252         for name, module in (("encoder", model.encoder), ("head", model.head)):
+  253             norms = [float(p.grad.float().norm()) for p in module.parameters() if p.grad is not None]
+  254             if not norms or not np.isfinite(norms).all() or max(norms) <= 0:
+  255                 raise ValueError("Encoder/head has no finite nonzero gradient")
+  256             evidence[name] = {"finite_nonzero_gradient": True}
+  257     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), c["optimizer"]["clip_norm"], error_if_nonfinite=True)
+  258     check()
+  259     optimizer.step()
+  260     if observe:
+  261         for name, module in (("encoder", model.encoder), ("head", model.head)):
+  262             if core.state_digest(module.state_dict()) == before[name]:
+  263                 raise ValueError("Encoder/head parameters did not change")
+  264             evidence[name]["parameters_changed"] = True
+  265     return {**{name: float(value.detach()) for name, value in terms.items()},
+  266             "gradient_norm_before_clip": float(norm), "modules": evidence}
+  267 
+  268 
+  269 def binary_counts(labels: np.ndarray, scores: np.ndarray, threshold: float) -> np.ndarray:
+  270     y, s = np.asarray(labels), np.asarray(scores, dtype=np.float64)
+  271     if (y.ndim != 2 or y.shape != s.shape or not np.isin(y, (0, 1)).all()
+  272             or not np.isfinite(s).all() or not np.isfinite(threshold)):
+  273         raise ValueError("Aligned binary labels and finite scores/threshold required")
+  274     positive, predicted = y == 1, s >= float(threshold)
+  275     return np.stack([(positive & predicted).sum(1), (~positive & predicted).sum(1),
+  276                      (positive & ~predicted).sum(1), (~positive & ~predicted).sum(1)], axis=1)
+  277 
+  278 
+  279 def calibrate(labels: np.ndarray, scores: np.ndarray, domains: list[str], maximum_fpr: float = .001) -> dict:
+  280     """One global threshold; calibrated solely against each train-calibration domain."""
+  281     y, s = np.asarray(labels), np.asarray(scores, dtype=np.float64)
+  282     if (maximum_fpr != .001 or y.shape != s.shape or y.ndim != 2 or len(domains) != len(y)
+  283             or set(domains) != set("ABC") or not np.isin(y, (0, 1)).all() or not np.isfinite(s).all()):
+  284         raise ValueError("Invalid calibration inputs or unapproved FPR target")
+  285     bounds = {}
+  286     for d in "ABC":
+  287         rows = np.asarray(domains) == d
+  288         negative = np.sort(s[rows][y[rows] == 0])[::-1]
+  289         if not len(negative) or not np.any(y[rows] == 1):
+  290             raise ValueError("Calibration domain needs both classes")
+  291         allowed = len(negative) // 1000
+  292         boundary = float(negative[allowed])
+  293         threshold = float(np.nextafter(np.float64(boundary), np.float64(np.inf)))
+  294         if not np.isfinite(threshold):
+  295             raise ValueError("Calibration threshold overflow")
+  296         bounds[d] = {"negative_pairs": len(negative), "allowed_false_positives": allowed,
+  297                      "next_negative_logit": boundary, "threshold": threshold}
+  298     threshold = max(row["threshold"] for row in bounds.values())
+  299     counts = binary_counts(y, s, threshold)
+  300     totals = {d: counts[np.asarray(domains) == d].sum(0).tolist() for d in "ABC"}
+  301     if any(totals[d][1] > bounds[d]["allowed_false_positives"] for d in "ABC"):
+  302         raise ValueError("Calibration did not satisfy its false-positive cap")
+  303     return {"threshold": threshold, "prediction": "float64(logit)>=float64(threshold)",
+  304             "source_role": "train_calibration_only", "bounds": bounds,
+  305             "counts_by_domain": totals, "counts_by_group": counts.tolist()}
+  306 
+  307 
+  308 def checkpoint_point(model: Any, optimizer: Any, c: dict, arm: str, epoch: int,
+  309                      groups: dict, out: Path, budget: persistence.Budget) -> dict:
+  310     started = time.monotonic()
+  311     name = f"epoch{epoch}"
+  312     before = {role: score(model, groups[role], c, arm, budget.check) for role in ROLES}
+  313     checkpoint = out / "work" / f"{name}.pt"
+  314     metadata = {"arm": arm, "epoch": epoch, "config": c}
+  315     budget.check(persistence.checkpoint_reserve(model, optimizer))
+  316     saved = core.save_state(checkpoint, model, optimizer, metadata)
+  317     if core.restore_state(checkpoint, model, optimizer, saved["state_sha256"]) != metadata:
+  318         raise ValueError("Restored model/optimizer metadata differs")
+  319     point = {"epoch": epoch, "arm": arm, "full_model_and_adam_reloaded": True,
+  320              "checkpoint": saved, "model_state_sha256": core.state_digest(model.state_dict()), "scores": {}}
+  321     for role in ROLES:
+  322         after = score(model, groups[role], c, arm, budget.check)
+  323         if not np.array_equal(before[role], after):
+  324             raise ValueError("Complete scores differ after actual model/Adam restore")
+  325         path = out / "scores" / f"{name}_{role}.npy"
+  326         np.save(path, before[role], allow_pickle=False)
+  327         point["scores"][role] = data.record(path, out)
+  328     target = out / "models" / f"{name}.pt"
+  329     budget.check(persistence.checkpoint_reserve(model, None))
+  330     retained = core.save_state(target, model, None, metadata)
+  331     core.restore_state(target, model, None, retained["state_sha256"])
+  332     if core.state_digest(model.state_dict()) != point["model_state_sha256"]:
+  333         raise ValueError("Retained inference model differs")
+  334     point["model"] = {**retained, "path": target.relative_to(out).as_posix(), "actual_reload_verified": True}
+  335     # Force a disk observation while inference and full optimizer files coexist.
+  336     budget.check(1)
+  337     persistence.remove_work_file(checkpoint, out)
+  338     point["point_seconds"] = time.monotonic() - started
+  339     return point
+  340 
+  341 
+  342 def train_arm(out: Path, arm: str, c: dict, groups: dict, partition_rows: dict,
+  343               budget: persistence.Budget, preflight: dict) -> dict:
+  344     import torch
+  345     device = torch.cuda.current_device()
+  346     torch.cuda.synchronize(device)
+  347     torch.cuda.reset_peak_memory_stats(device)
+  348     arm_started = time.monotonic()
+  349     initial_allocated = torch.cuda.memory_allocated(device)
+  350     initial_reserved = torch.cuda.memory_reserved(device)
+  351     out.mkdir()
+  352     for directory in ("work", "models", "scores"):
+  353         (out / directory).mkdir()
+  354     model = load_model(c, arm)
+  355     if core.state_digest(model.state_dict()) != preflight["initial_model_state_sha256"]:
+  356         raise ValueError("Preflight and formal initialization differ")
+  357     optimizer = core.make_optimizer(model, c)
+  358     rows, seed = schedule(groups["fit"], c)
+  359     r = {"arm": arm, "points": {}, "training": [], "label_parses": 0,
+  360          "parameter_count": sum(p.numel() for p in model.parameters()),
+  361          "trainable_parameter_count": sum(p.numel() for p in model.parameters() if p.requires_grad),
+  362          "preflight": preflight, "fit_group_ids": [g.uid for g in groups["fit"]],
+  363          "calibration_group_ids": [g.uid for g in groups["calibration"]]}
+  364     total_training = 0.
+  365     for start, stop, epoch in ((0, 432, 3), (432, 864, 6)):
+  366         started = time.monotonic()
+  367         losses, evidence = [], {}
+  368         for i in range(start, stop):
+  369             log = update(model, optimizer, rows[i], c, arm, data.seed_for(seed, i, "dropout"),
+  370                          observe=(i == start), check=budget.check)
+  371             losses.append([log[name] for name in ("bce", "rank", "total")])
+  372             if i == start:
+  373                 evidence = log["modules"]
+  374             if i in (start, stop - 1) and (not optimizer.state or any(
+  375                     float(v["step"]) != i + 1 for v in optimizer.state.values())):
+  376                 raise ValueError("Adam continuity or update count differs")
+  377             if (i + 1) % 24 == 0:
+  378                 print(data.json_bytes({"event": "updates", "arm": arm, "completed": i + 1,
+  379                                        **budget.state()}).decode(), flush=True)
+  380         elapsed = time.monotonic() - started
+  381         total_training += elapsed
+  382         r["training"].append({"start": start, "stop": stop, "updates": stop - start,
+  383                               "first_update_modules": evidence, "seconds": elapsed,
+  384                               "losses_by_epoch": dict(zip(("bce", "rank", "total"),
+  385                                   np.asarray(losses).reshape(3, 144, 3).mean(1).T.tolist()))})
+  386         point = checkpoint_point(model, optimizer, c, arm, epoch, groups, out, budget)
+  387         r["points"][str(epoch)] = point
+  388         point["train_metrics"] = {}
+  389         for role in ("fit", "calibration"):
+  390             scores = np.load(out / point["scores"][role]["path"], allow_pickle=False)
+  391             truth = np.asarray([g.labels for g in groups[role]], dtype=np.uint8)
+  392             matrix, counts = metrics.group_metrics(truth, scores)
+  393             path = out / "scores" / f"epoch{epoch}_{role}_metrics.npy"
+  394             np.save(path, matrix, allow_pickle=False)
+  395             point["train_metrics"][role] = {"file": data.record(path, out), "counts": counts,
+  396                 "stable_bce_by_group": np.mean(np.logaddexp(0., scores.astype(np.float64)) - truth * scores, axis=1).tolist()}
+  397         if epoch == 6:
+  398             truth = np.asarray([g.labels for g in groups["calibration"]], dtype=np.uint8)
+  399             scores = np.load(out / point["scores"]["calibration"]["path"], allow_pickle=False)
+  400             calibrated = calibrate(truth, scores, [x["domain"] for x in partition_rows["calibration"]])
+  401             calibrated.update(model_state_sha256=point["model_state_sha256"], epoch=6,
+  402                               score_sha256=point["scores"]["calibration"]["sha256"])
+  403             data.write_json(out / "calibration.json", calibrated)
+  404             r["calibration"] = data.record(out / "calibration.json", out)
+  405         data.write_json(out / "progress.json", r)
+  406     r.update(updates=864, formal_training_seconds=total_training,
+  407              group_schedule_sha256=hashlib.sha256(data.json_bytes([g.uid for g in rows])).hexdigest(),
+  408              dropout_stream=seed)
+  409     torch.cuda.synchronize(device)
+  410     r["resources"] = {
+  411         "arm_seconds_before_cleanup": time.monotonic() - arm_started,
+  412         "gpu_device": device, "gpu_name": torch.cuda.get_device_name(device),
+  413         "initial_allocated_bytes": initial_allocated, "initial_reserved_bytes": initial_reserved,
+  414         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
+  415         "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
+  416         "scope": "PyTorch CUDA allocator, reset immediately before arm model loading through both checkpoints and calibration; includes baseline allocations, excludes earlier public preflight and later cleanup. Not total device memory or other processes."
+  417     }
+  418     del optimizer, model
+  419     gc.collect()
+  420     torch.cuda.empty_cache()
+  421     data.write_json(out / "manifest.json", r)
+  422     return r
+  423 
+  424 
+  425 def preflight_model(c: dict, arm: str, groups: dict, budget: persistence.Budget) -> dict:
+  426     """Public text/tokenization and actual forward only; zero supervised updates."""
+  427     import torch
+  428     cfg = model_config(c, arm)
+  429     files = core.model_files(cfg)
+  430     if any(files[key] != c["models"][arm][key]
+  431            for key in ("file_count", "total_size_bytes", "content_sha256")):
+  432         raise ValueError("Archived pretrained model bytes differ")
+  433     model = load_model(c, arm)
+  434     maximum, records = 0, 0
+  435     for split in ("train", "development"):
+  436         for group in groups[split]:
+  437             budget.check()
+  438             texts = record_texts(group, c["interventions"][arm]["representation"])
+  439             batch = model.encoder.tokenizer(texts, padding=False, truncation=False)
+  440             lengths = [len(row) for row in batch["input_ids"]]
+  441             maximum, records = max(maximum, max(lengths)), records + len(lengths)
+  442             if maximum > c["input"]["token_budget"]:
+  443                 raise ValueError("A complete public record exceeds token budget")
+  444     blind = score(model, groups["train"][:1], c, arm, budget.check)
+  445     result = {"pretrained": files, "max_tokens": maximum, "records_checked": records,
+  446               "initial_model_state_sha256": core.state_digest(model.state_dict()),
+  447               "actual_forward_shape": list(blind.shape), "supervision_reads": 0, "updates": 0}
+  448     del model
+  449     gc.collect()
+  450     torch.cuda.empty_cache()
+  451     return result
+  452 
+  453 
+  454 def require_cpu_contracts() -> dict:
+  455     sys.path.insert(0, str(data.ROOT / "tests"))
+  456     suite = unittest.defaultTestLoader.loadTestsFromName("test_step28_chinese_base_contracts")
+  457     result = unittest.TextTestRunner(verbosity=2).run(suite)
+  458     if not result.wasSuccessful() or result.skipped or result.testsRun != CPU_CONTRACT_COUNT:
+  459         raise RuntimeError("All Chinese CPU contracts must pass without skips")
+  460     return {"passed": result.testsRun, "skipped": 0}
+  461 
+  462 
+  463 def run(out: Path) -> dict:
+  464     import torch
+  465     c = contract()
+  466     runtime = c["runtime"]
+  467     if (platform.system() != "Linux" or not torch.cuda.is_available()
+  468             or torch.cuda.device_count() != 1 or not torch.cuda.is_bf16_supported()):
+  469         raise RuntimeError("Requires separately resumed Linux stage and one eligible visible GPU")
+  470     available = next(int(row.split()[1]) * 1024 for row in Path("/proc/meminfo").read_text().splitlines()
+  471                      if row.startswith("MemAvailable:"))
+  472     if (torch.cuda.mem_get_info()[0] < runtime["minimum_free_gpu_bytes"]
+  473             or available < runtime["minimum_free_host_bytes"]
+  474             or shutil.disk_usage(data.ROOT).free < runtime["maximum_output_bytes"]):
+  475         raise RuntimeError("Insufficient shared resources; wait")
+  476     if out.exists() or not out.is_relative_to((data.ROOT / "reports").resolve()):
+  477         raise ValueError("Use a new project reports run directory")
+  478     out.mkdir(parents=True)
+  479     budget = persistence.Budget(out.parent, c)
+  480     snapshot = sources()
+  481     r = {"status": "RUNNING", "config": c, "source_files": snapshot, "arms": {},
+  482          "label_parses": {"train": 0, "development": 0, "heldout": 0, "owners": 0},
+  483          "environment": {"python": platform.python_version(), "torch": torch.__version__,
+  484                          "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0)}}
+  485     data.write_json(out / "startup.json", r)
+  486     try:
+  487         torch.set_num_threads(1)
+  488         torch.use_deterministic_algorithms(True)
+  489         torch.backends.cuda.matmul.allow_tf32 = False
+  490         torch.backends.cudnn.allow_tf32 = False
+  491         torch.backends.cudnn.benchmark = False
+  492         r["torch_contracts"] = require_cpu_contracts()
+  493         groups, metadata, checked = public.public_inputs(c)
+  494         _, partition_rows = partition(groups, metadata, c)
+  495         data.write_json(out / "partition.json", partition_rows)
+  496         r["partition"] = data.record(out / "partition.json", out)
+  497         r["inputs"] = checked
+  498         preflights = {arm: preflight_model(c, arm, groups, budget) for arm in ARMS}
+  499         for left, right in (("mean_bce", "mean_rank"), ("split_bce", "split_rank")):
+  500             if preflights[left]["initial_model_state_sha256"] != preflights[right]["initial_model_state_sha256"]:
+  501                 raise ValueError("Objective comparison must share the exact initial model state")
+  502         r["preflights"] = preflights
+  503         data.write_json(out / "preflight.json", r)
+  504         data.write_json(out / "access.json", {"train_parse_attempts": 1, "development": 0, "heldout": 0, "owners": 0})
+  505         r["label_parses"]["train"] = 1
+  506         groups["train"] = public.attach_labels(groups["train"], c, "train")
+  507         selected, aligned = partition(groups, metadata, c)
+  508         if aligned != partition_rows:
+  509             raise ValueError("Supervision changed the public partition")
+  510         for arm in ARMS:
+  511             result = train_arm(out / arm, arm, c, selected, partition_rows, budget, preflights[arm])
+  512             r["arms"][arm] = {"manifest": data.record(out / arm / "manifest.json", out),
+  513                                "updates": result["updates"], "formal_training_seconds": result["formal_training_seconds"]}
+  514             data.write_json(out / "progress.json", r)
+  515         if sources() != snapshot:
+  516             raise ValueError("Source files changed during execution")
+  517         r.update(status=COMPLETE, physical_updates=sum(x["updates"] for x in r["arms"].values()),
+  518                  formal_training_seconds=sum(x["formal_training_seconds"] for x in r["arms"].values()),
+  519                  budget=budget.state())
+  520         if r["physical_updates"] != 3456:
+  521             raise ValueError("Unexpected formal update count")
+  522         data.write_json(out / "manifest.json", r)
+  523         verify_models(out)
+  524         data.write_json(out / "completion.json", {"status": COMPLETE, "budget": budget.state(),
+  525                         "manifest_sha256": data.sha256(out / "manifest.json")})
+  526         return r
+  527     except Exception as error:
+  528         data.write_json(out / "failure.json", {"status": "FAILED_NO_RETRY_OR_PARTIAL_EVALUATION",
+  529             "error_type": type(error).__name__, "error": str(error), "label_parses": r["label_parses"]})
+  530         raise
+  531 
+  532 
+  533 def verify_models(out: Path) -> dict:
+  534     r = data.read_json(out / "manifest.json")
+  535     path = out / "model_verification.json"
+  536     if r["status"] != COMPLETE or path.exists() or (out / "failure.json").exists():
+  537         raise ValueError("Only a complete run and new model receipt are permitted")
+  538     records = []
+  539     for arm in ARMS:
+  540         a = data.read_json(data.verify(out / r["arms"][arm]["manifest"]["path"], r["arms"][arm]["manifest"]))
+  541         for epoch in ("3", "6"):
+  542             model = a["points"][epoch]["model"]
+  543             actual = data.verify(out / arm / model["path"], model)
+  544             records.append(data.record(actual, out))
+  545     result = {"status": "EIGHT_MODELS_FRESH_SIZE_SHA_VERIFIED", "files": records,
+  546               "manifest_sha256": data.sha256(out / "manifest.json")}
+  547     data.write_json(path, result)
+  548     return result
+  549 
+  550 
+  551 def load_array(path: Path, record: dict, shape: tuple, dtype: Any) -> np.ndarray:
+  552     a = np.load(data.verify(path, record), allow_pickle=False)
+  553     if a.shape != shape or a.dtype != dtype or not np.isfinite(a).all():
+  554         raise ValueError("Saved score/metric shape or dtype differs")
+  555     return a
+  556 
+  557 
+  558 def validated_run(out: Path, c: dict, groups: dict, metadata: list, checked: dict) -> tuple[dict, dict, dict]:
+  559     if (out / "failure.json").exists() or (out.parent / "exit_status.txt").read_text().strip() != "0":
+  560         raise ValueError("Failed or incomplete outer job")
+  561     for name in ("started.txt", "finished.txt", "resource_usage.log"):
+  562         if not (out.parent / name).is_file():
+  563             raise ValueError("Missing outer execution evidence")
+  564     started = datetime.fromisoformat((out.parent / "started.txt").read_text().strip())
+  565     finished = datetime.fromisoformat((out.parent / "finished.txt").read_text().strip())
+  566     if (started.utcoffset() is None or finished.utcoffset() is None
+  567             or not 0 <= (finished - started).total_seconds() <= c["runtime"]["maximum_gpu_stage_seconds"] + 60):
+  568         raise ValueError("Invalid outer job timing")
+  569     r = data.read_json(out / "manifest.json")
+  570     if (r["status"] != COMPLETE or r["config"] != c or r["source_files"] != sources()
+  571             or set(r["arms"]) != set(ARMS) or r["physical_updates"] != 3456
+  572             or r["inputs"] != checked or r["torch_contracts"] != {"passed": CPU_CONTRACT_COUNT, "skipped": 0}
+  573             or r["label_parses"] != {"train": 1, "development": 0, "heldout": 0, "owners": 0}):
+  574         raise ValueError("Incomplete/stale base-model stage")
+  575     completion = data.read_json(out / "completion.json")
+  576     if completion["status"] != COMPLETE or completion["manifest_sha256"] != data.sha256(out / "manifest.json"):
+  577         raise ValueError("Completion is not bound to this manifest")
+  578     for budget in (r["budget"], completion["budget"]):
+  579         if (not 0 <= budget["elapsed_seconds"] < c["runtime"]["maximum_gpu_stage_seconds"]
+  580                 or not 0 <= budget["peak_observed_bytes"] <= c["runtime"]["maximum_output_bytes"]):
+  581             raise ValueError("Budget exceeded")
+  582     selected, part = partition(groups, metadata, c)
+  583     saved_part = data.read_json(data.verify(out / r["partition"]["path"], r["partition"]))
+  584     if saved_part != part:
+  585         raise ValueError("Saved fitting/calibration group mapping differs")
+  586     rows, seed = schedule(selected["fit"], c)
+  587     expected_schedule = hashlib.sha256(data.json_bytes([g.uid for g in rows])).hexdigest()
+  588     result, expected_models = {}, []
+  589     for arm in ARMS:
+  590         ar = r["arms"][arm]
+  591         if ar["manifest"]["path"] != f"{arm}/manifest.json" or ar["updates"] != 864:
+  592             raise ValueError("Arm identity or update count differs")
+  593         a = data.read_json(data.verify(out / ar["manifest"]["path"], ar["manifest"]))
+  594         pre = a["preflight"]
+  595         if (a["arm"] != arm or a["label_parses"] != 0 or a["updates"] != 864
+  596                 or a["group_schedule_sha256"] != expected_schedule or a["dropout_stream"] != seed
+  597                 or a["fit_group_ids"] != [g.uid for g in selected["fit"]]
+  598                 or a["calibration_group_ids"] != [g.uid for g in selected["calibration"]]
+  599                 or set(a["points"]) != {"3", "6"} or len(a["training"]) != 2
+  600                 or pre != r["preflights"][arm] or pre["updates"] != 0 or pre["supervision_reads"] != 0
+  601                 or pre["actual_forward_shape"] != [1, 378] or not 0 < pre["max_tokens"] <= 256
+  602                 or pre["records_checked"] != 24103 * (2 if c["interventions"][arm]["representation"] == "separate_moments" else 1)):
+  603             raise ValueError("Training supply, prefix preflight, or scope differs")
+  604         if any(pre["pretrained"][key] != c["models"][arm][key]
+  605                for key in ("file_count", "total_size_bytes", "content_sha256")):
+  606             raise ValueError("Pretrained model source differs")
+  607         for log, start, stop in zip(a["training"], (0, 432), (432, 864), strict=True):
+  608             if (log["start"] != start or log["stop"] != stop or log["updates"] != 432
+  609                     or set(log["first_update_modules"]) != {"encoder", "head"}
+  610                     or any(v != {"finite_nonzero_gradient": True, "parameters_changed": True}
+  611                            for v in log["first_update_modules"].values())):
+  612                 raise ValueError("Actual optimizer/encoder/head evidence is incomplete")
+  613             losses = log["losses_by_epoch"]
+  614             if (set(losses) != {"bce", "rank", "total"}
+  615                     or any(np.asarray(v).shape != (3,) or not np.isfinite(v).all() for v in losses.values())
+  616                     or not np.allclose(losses["total"], np.asarray(losses["bce"]) +
+  617                                        c["interventions"][arm]["rank_weight"] * np.asarray(losses["rank"]),
+  618                                        rtol=1e-6, atol=1e-7)):
+  619                 raise ValueError("Saved objective components differ from the frozen intervention")
+  620         points = {}
+  621         for epoch in ("3", "6"):
+  622             p = a["points"][epoch]
+  623             if (p["arm"] != arm or p["epoch"] != int(epoch)
+  624                     or not p["full_model_and_adam_reloaded"] or set(p["scores"]) != set(ROLES)
+  625                     or not p["model"]["actual_reload_verified"]
+  626                     or p["model"]["path"] != f"models/epoch{epoch}.pt"):
+  627                 raise ValueError("Incomplete or mismatched model/score checkpoint")
+  628             arrays = {}
+  629             for role in ROLES:
+  630                 rec = p["scores"][role]
+  631                 if rec["path"] != f"scores/epoch{epoch}_{role}.npy":
+  632                     raise ValueError("Score role or point mismatch")
+  633                 arrays[role] = load_array(out / arm / rec["path"], rec, (ROLE_SIZES[role], 378), np.float32)
+  634             for role in ("fit", "calibration"):
+  635                 rec = p["train_metrics"][role]["file"]
+  636                 if rec["path"] != f"scores/epoch{epoch}_{role}_metrics.npy":
+  637                     raise ValueError("Metric role or point mismatch")
+  638                 load_array(out / arm / rec["path"], rec, (ROLE_SIZES[role], 22), np.float64)
+  639             points[epoch] = arrays
+  640             expected_models.append({k: p["model"][k] for k in ("bytes", "sha256")}
+  641                                    | {"path": f"{arm}/models/epoch{epoch}.pt"})
+  642         if a["calibration"]["path"] != "calibration.json":
+  643             raise ValueError("Calibration file role differs")
+  644         cal = data.read_json(data.verify(out / arm / a["calibration"]["path"], a["calibration"]))
+  645         point = a["points"]["6"]
+  646         if (cal["epoch"] != 6 or cal["source_role"] != "train_calibration_only"
+  647                 or cal["prediction"] != "float64(logit)>=float64(threshold)"
+  648                 or cal["model_state_sha256"] != point["model_state_sha256"]
+  649                 or cal["score_sha256"] != point["scores"]["calibration"]["sha256"]
+  650                 or set(cal["bounds"]) != set("ABC")):
+  651             raise ValueError("Threshold is not tied to this model's calibration scores")
+  652         counts = np.asarray(cal["counts_by_group"])
+  653         if (counts.shape != (36, 4) or counts.dtype.kind not in "iu" or (counts < 0).any()
+  654                 or not np.all(counts[:, 0] + counts[:, 2] == 20)
+  655                 or not np.all(counts[:, 1] + counts[:, 3] == 358)):
+  656             raise ValueError("Calibration group counts differ")
+  657         for d in "ABC":
+  658             mask = np.asarray([row["domain"] for row in part["calibration"]]) == d
+  659             bound = cal["bounds"][d]
+  660             if (bound["negative_pairs"] != 4296 or bound["allowed_false_positives"] != 4
+  661                     or counts[mask].sum(0).tolist() != cal["counts_by_domain"][d]
+  662                     or bound["threshold"] != float(np.nextafter(np.float64(bound["next_negative_logit"]), np.inf))
+  663                     or cal["counts_by_domain"][d][1] > 4):
+  664                 raise ValueError("Calibration boundary/count metadata differs")
+  665         if not np.isfinite(cal["threshold"]) or cal["threshold"] != max(x["threshold"] for x in cal["bounds"].values()):
+  666             raise ValueError("Not the single globally fixed calibration threshold")
+  667         result[arm] = {"points": points, "threshold": cal["threshold"]}
+  668     receipt = data.read_json(out / "model_verification.json")
+  669     if (receipt["status"] != "EIGHT_MODELS_FRESH_SIZE_SHA_VERIFIED"
+  670             or receipt["manifest_sha256"] != data.sha256(out / "manifest.json")
+  671             or receipt["files"] != expected_models):
+  672         raise ValueError("Missing or mismatched actual Linux model hash receipt")
+  673     # Evaluation now runs on Linux alongside retained weights. A historical
+  674     # receipt cannot establish that the actual model files still match today.
+  675     for model in expected_models:
+  676         data.verify(out / model["path"], model)
+  677     return result, part, r
+  678 
+  679 
+  680 def rates(counts: np.ndarray) -> dict:
+  681     tp, fp, fn, tn = np.asarray(counts, dtype=np.float64).sum(axis=0)
+  682     return {"tp": int(tp), "fp": int(fp), "fn": int(fn), "tn": int(tn),
+  683             "fpr": float(fp / (fp + tn)), "recall": float(tp / (tp + fn)),
+  684             "precision": float(tp / (tp + fp)) if tp + fp else 0.,
+  685             "f1": float(2 * tp / (2 * tp + fp + fn)) if 2 * tp + fp + fn else 0.}
+  686 
+  687 
+  688 def fixed_classification(counts: list[dict], domains: list[str]) -> dict:
+  689     """Sum saved per-group confusion counts before calculating classification rates."""
+  690     values = np.asarray([[row[key] for key in ("tp", "fp", "fn", "tn")]
+  691                          for row in counts], dtype=np.int64)
+  692     if values.shape != (len(domains), 4) or set(domains) != set("ABC") or np.any(values < 0):
+  693         raise ValueError("Invalid saved confusion counts/domain alignment")
+  694     return {"threshold": 0.0, "pooled": rates(values),
+  695             "by_domain": {d: rates(values[np.asarray(domains) == d]) for d in "ABC"},
+  696             "aggregation": "Sum confusion counts before computing rates; distinct from mean per-group metrics."}
+  697 
+  698 
+  699 def automatic_report(counts: np.ndarray, domains: list[str], draws: np.ndarray) -> dict:
+  700     out = {}
+  701     domain_boot_counts = []
+  702     for index, domain in enumerate("ABC"):
+  703         rows = np.flatnonzero(np.asarray(domains) == domain)
+  704         values = counts[rows]
+  705         point = rates(values)
+  706         boot = values[draws[:, index]].sum(axis=1).astype(np.float64)
+  707         domain_boot_counts.append(boot)
+  708         fpr = boot[:, 1] / (boot[:, 1] + boot[:, 3])
+  709         recall = boot[:, 0] / (boot[:, 0] + boot[:, 2])
+  710         precision = np.divide(boot[:, 0], boot[:, 0] + boot[:, 1],
+  711                               out=np.zeros(len(boot)), where=boot[:, 0] + boot[:, 1] > 0)
+  712         point["conditional_95pct_intervals"] = {k: np.quantile(v, [.025, .975]).tolist()
+  713                                                  for k, v in (("fpr", fpr), ("recall", recall), ("precision", precision))}
+  714         point["passes_point_gates"] = point["fp"] * 1000 <= point["fp"] + point["tn"] and point["tp"] * 2 >= point["tp"] + point["fn"]
+  715         out[domain] = point
+  716     pooled = rates(counts)
+  717     boot = np.stack(domain_boot_counts).sum(axis=0)
+  718     fpr = boot[:, 1] / (boot[:, 1] + boot[:, 3])
+  719     recall = boot[:, 0] / (boot[:, 0] + boot[:, 2])
+  720     precision = np.divide(boot[:, 0], boot[:, 0] + boot[:, 1],
+  721                           out=np.zeros(len(boot)), where=boot[:, 0] + boot[:, 1] > 0)
+  722     pooled["conditional_95pct_intervals"] = {k: np.quantile(v, [.025, .975]).tolist()
+  723                                              for k, v in (("fpr", fpr), ("recall", recall), ("precision", precision))}
+  724     return {"by_domain": out, "pooled": pooled,
+  725             "all_domains_pass": all(v["passes_point_gates"] for v in out.values()),
+  726             "interval_scope": "Group bootstrap conditional on fixed models, calibration groups and thresholds; zero observed FP may produce [0,0], not a population upper bound or deployment guarantee."}
+  727 
+  728 
+  729 def automatic_comparison(candidate: np.ndarray, reference: np.ndarray,
+  730                          domains: list[str], draws: np.ndarray) -> dict:
+  731     """Paired group resampling at each model's already fixed threshold."""
+  732     rows = [np.flatnonzero(np.asarray(domains) == d) for d in "ABC"]
+  733     bootstrap = [np.stack([counts[index][draws[:, j]].sum(1)
+  734                            for j, index in enumerate(rows)], axis=1)
+  735                  for counts in (candidate, reference)]
+  736     result = {}
+  737     for name, numerator, other in (("fpr", 1, 3), ("recall", 0, 2), ("precision", 0, 1)):
+  738         scopes = {}
+  739         for domain_index, scope in enumerate((*"ABC", "pooled")):
+  740             values, points = [], []
+  741             for counts, sampled in zip((candidate, reference), bootstrap, strict=True):
+  742                 totals = sampled[:, domain_index] if scope != "pooled" else sampled.sum(1)
+  743                 denom = totals[:, numerator] + totals[:, other]
+  744                 values.append(np.divide(totals[:, numerator], denom,
+  745                                         out=np.zeros(len(totals)), where=denom > 0))
+  746                 points.append(rates(counts[rows[domain_index]] if scope != "pooled" else counts)[name])
+  747             scopes[scope] = {"difference": points[0] - points[1],
+  748                              "conditional_95pct_interval": np.quantile(values[0] - values[1], [.025, .975]).tolist()}
+  749         result[name] = scopes
+  750     return result
+  751 
+  752 
+  753 def historical_reference(c: dict, partition_rows: dict) -> dict:
+  754     """Reuse frozen predictions, not archived weights or a new historical label parse."""
+  755     records = c["historical_reference"]["files"]
+  756     paths = {name: data.verify(data.ROOT / row["path"], row) for name, row in records.items()}
+  757     parent = data.read_json(paths["manifest.json"])
+  758     completion = data.read_json(paths["completion.json"])
+  759     arm = data.read_json(paths["labse/manifest.json"])
+  760     calibration = data.read_json(paths["labse/calibration.json"])
+  761     score_record = records["labse/scores/epoch6_development.npy"]
+  762     if (parent["status"] != "COMPLETE_BASE_MODELS_2592_CALIBRATED_VALID_BLIND"
+  763             or completion["manifest_sha256"] != records["manifest.json"]["sha256"]
+  764             or data.read_json(paths["partition.json"]) != partition_rows
+  765             or parent["arms"]["labse"]["manifest"]["sha256"] != records["labse/manifest.json"]["sha256"]
+  766             or arm["points"]["6"]["scores"]["development"]["sha256"] != score_record["sha256"]
+  767             or arm["calibration"]["sha256"] != records["labse/calibration.json"]["sha256"]
+  768             or calibration["model_state_sha256"] != arm["points"]["6"]["model_state_sha256"]):
+  769         raise ValueError("Historical LaBSE prediction/calibration/partition binding differs")
+  770     return {"scores": load_array(paths["labse/scores/epoch6_development.npy"], score_record,
+  771                                   (60, 378), np.float32),
+  772             "threshold": calibration["threshold"], "files": records}
+  773 
+  774 
+  775 def metric_comparison(candidate: np.ndarray, reference: np.ndarray,
+  776                       domains: list[str], draws: np.ndarray) -> dict:
+  777     domain_rows = [np.flatnonzero(np.asarray(domains) == d) for d in "ABC"]
+  778     result = {}
+  779     for i, column in enumerate(metrics.COLUMNS):
+  780         delta = candidate[:, i] - reference[:, i]
+  781         boot = np.stack([delta[rows][draws[:, j]].mean(1)
+  782                          for j, rows in enumerate(domain_rows)]).mean(0)
+  783         result[column] = {"mean": float(delta.mean()),
+  784                           "conditional_95pct_interval": np.quantile(boot, [.025, .975]).tolist()}
+  785     return result
+  786 
+  787 
+  788 def evaluate(out: Path, destination: Path) -> dict:
+  789     if platform.system() != "Linux" or destination.exists():
+  790         raise ValueError("Requires resumed Linux evaluation and a new directory")
+  791     c = contract()
+  792     groups, metadata, checked = public.public_inputs(c)
+  793     arrays, part, r = validated_run(out, c, groups, metadata, checked)
+  794     reference = historical_reference(c, part)
+  795     destination.mkdir(parents=True)
+  796     data.write_json(destination / "access.json", {"status": "ALL_FOUR_MODELS_COMPLETE_BEFORE_VALID",
+  797                     "development_parse_attempts": 1, "train": 0, "heldout": 0, "owners": 0})
+  798     try:
+  799         labelled = public.attach_labels(groups["development"], c, "development")
+  800         truth = np.asarray([g.labels for g in labelled], dtype=np.uint8)
+  801         e = c["evaluation"]
+  802         domains = [row["domain"] for row in part["development"]]
+  803         result = {"status": "CHINESE_BASE_METRICS_COLLECTED_BEFORE_UNCERTAINTY", "config": c,
+  804                   "manifest_sha256": data.sha256(out / "manifest.json"), "columns": list(metrics.COLUMNS),
+  805                   "label_parses": {"train": 0, "development": 1, "heldout": 0, "owners": 0},
+  806                   "arms": {}, "comparisons": {}, "primary_comparison": c["primary_comparison"],
+  807                   "domains": domains, "group_ids": [row["group_uid"] for row in part["development"]],
+  808                   "partition": r["partition"],
+  809                   "historical_reference": reference["files"],
+  810                   "formal_training_seconds": r["formal_training_seconds"]}
+  811         matrices, auto_counts = {}, {}
+  812         for arm in ARMS:
+  813             (destination / arm).mkdir()
+  814             points = {}
+  815             for epoch in ("3", "6"):
+  816                 scores = arrays[arm]["points"][epoch]["development"]
+  817                 matrix, counts = metrics.group_metrics(truth, scores)
+  818                 path = destination / arm / f"epoch{epoch}_metrics.npy"
+  819                 np.save(path, matrix, allow_pickle=False)
+  820                 points[epoch] = {"file": data.record(path, destination), "counts_at_logit_zero": counts,
+  821                                  "fixed_classification": fixed_classification(counts, domains),
+  822                                  "mean": dict(zip(metrics.COLUMNS, matrix.mean(0).tolist())),
+  823                                  "by_domain": {d: dict(zip(metrics.COLUMNS, matrix[np.asarray(domains) == d].mean(0).tolist())) for d in "ABC"}}
+  824                 if epoch == "6":
+  825                     matrices[arm] = matrix
+  826                     count = binary_counts(truth, scores, arrays[arm]["threshold"])
+  827                     auto_counts[arm] = count
+  828                     automatic = {"threshold": arrays[arm]["threshold"], "counts_by_group": count.tolist()}
+  829             result["arms"][arm] = {"points": points, "automatic_classification": automatic}
+  830         matrices["historical_labse"], historical_counts = metrics.group_metrics(truth, reference["scores"])
+  831         auto_counts["historical_labse"] = binary_counts(truth, reference["scores"], reference["threshold"])
+  832         path = destination / "historical_labse_metrics.npy"
+  833         np.save(path, matrices["historical_labse"], allow_pickle=False)
+  834         result["historical_labse"] = {"file": data.record(path, destination),
+  835             "counts_at_logit_zero": historical_counts,
+  836             "fixed_classification": fixed_classification(historical_counts, domains),
+  837             "threshold": reference["threshold"], "counts_by_group": auto_counts["historical_labse"].tolist()}
+  838         # Persist all nine matrices and all counts before ANY uncertainty calculation.
+  839         data.write_json(destination / "collected.json", result)
+  840         draws = np.random.default_rng(e["bootstrap_seed"]).integers(
+  841             0, 20, size=(e["bootstrap_replicates"], 3, 20))
+  842         for arm in ARMS:
+  843             raw = result["arms"][arm]["automatic_classification"]
+  844             result["arms"][arm]["automatic_classification"] = {
+  845                 **automatic_report(auto_counts[arm], domains, draws), **raw}
+  846         result["historical_labse"]["automatic_classification"] = automatic_report(
+  847             auto_counts["historical_labse"], domains, draws)
+  848         for candidate, baseline in c["comparisons"]:
+  849             result["comparisons"][f"{candidate}_minus_{baseline}"] = {
+  850                 "metrics": metric_comparison(matrices[candidate], matrices[baseline], domains, draws),
+  851                 "automatic": automatic_comparison(auto_counts[candidate], auto_counts[baseline], domains, draws)}
+  852         result["interpretation"] = "Each domain's fixed-threshold FPR<=0.001 AND recall>=0.5 is required. Point-value development qualification, not independent test, training-seed robustness, calibrated deployment guarantee, or automatic model selection. AP comparisons are secondary."
+  853         result["status"] = "CHINESE_BASE_DEVELOPMENT_EVALUATED_NO_AUTOMATIC_WINNER"
+  854         data.write_json(destination / "evaluation.json", result)
+  855         return result
+  856     except Exception as error:
+  857         data.write_json(destination / "failure.json", {"status": "EVALUATION_FAILED_NO_RETRY",
+  858                         "error_type": type(error).__name__, "error": str(error)})
+  859         raise
+  860 
+  861 
+  862 def main() -> None:
+  863     parser = argparse.ArgumentParser(description=__doc__)
+  864     parser.add_argument("action", choices=("train", "evaluate", "verify-models"))
+  865     parser.add_argument("--out", required=True, type=Path)
+  866     parser.add_argument("--evaluation", type=Path)
+  867     args = parser.parse_args()
+  868     if args.action == "evaluate" and args.evaluation is None:
+  869         parser.error("evaluate requires --evaluation")
+  870     if args.action == "train":
+  871         result = run(args.out.resolve())
+  872     elif args.action == "evaluate":
+  873         result = evaluate(args.out.resolve(), args.evaluation.resolve())
+  874     else:
+  875         result = verify_models(args.out.resolve())
+  876     print(data.json_bytes({"status": result["status"], "out": str(args.out)}).decode())
+  877 
+  878 
+  879 if __name__ == "__main__":
+  880     main()

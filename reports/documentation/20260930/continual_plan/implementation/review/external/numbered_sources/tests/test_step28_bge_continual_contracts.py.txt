@@ -1,0 +1,570 @@
+    1 """Handmade contracts for the new sequential/replay computation, not formal data."""
+    2 from __future__ import annotations
+    3 
+    4 import copy
+    5 import hashlib
+    6 import itertools
+    7 import math
+    8 from pathlib import Path
+    9 from typing import Any
+   10 import sys
+   11 import tempfile
+   12 import unittest
+   13 from unittest import mock
+   14 
+   15 import numpy as np
+   16 import torch
+   17 
+   18 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+   19 import step28_bge_continual as method
+   20 import step28_bge_continual_run as runner
+   21 import step28_bge_continual_evaluate as evaluation
+   22 
+   23 
+   24 def handmade_group(uid: str = "handmade", shift: int = 0) -> method.data.Group:
+   25     owners = [i for i, n in enumerate([3] * 4 + [2] * 8) for _ in range(n)]
+   26     labels = tuple(int(owners[i] == owners[j]) for i, j in itertools.combinations(range(28), 2))
+   27     group = method.data.Group(uid, tuple(f"{uid}_seller_{i:02}" for i in range(28)),
+   28                               tuple(tuple((f"{uid}_item_{i:02}_{j}",
+   29                                            f"人工商品{(i + shift) % 9}款式{j}",
+   30                                            f"手写描述，款式{owners[i]}，记录{i}，内容{j + shift}。")
+   31                                           for j in range(2 + i % 2)) for i in range(28)), labels)
+   32     group.validate()
+   33     return group
+   34 
+   35 
+   36 def scalar_losses(values: np.ndarray, labels: tuple[int, ...]) -> dict:
+   37     """Independent scalar edge traversal, inherited formula expressed without Torch."""
+   38     pairs = list(itertools.combinations(range(28), 2))
+   39     scores = np.asarray(values, dtype=np.float64)
+   40     bce = sum(float(np.logaddexp(0., s)) - y * s for s, y in zip(scores, labels, strict=True)) / 378
+   41     ranks, hard = [], []
+   42     for query in range(28):
+   43         edges = [(i, v if u == query else u) for i, (u, v) in enumerate(pairs) if query in (u, v)]
+   44         positive = [i for i, _ in edges if labels[i] == 1]
+   45         negative = sorted(((i, other) for i, other in edges if labels[i] == 0),
+   46                           key=lambda row: (-scores[row[0]], row[1]))[:5]
+   47         maximum = max(scores[i] for i, _ in edges)
+   48         ranks.append(maximum + math.log(sum(math.exp(scores[i] - maximum) for i, _ in edges))
+   49                      - sum(scores[i] for i in positive) / len(positive))
+   50         hard.append(sum(float(np.logaddexp(0., scores[neg] - scores[pos]))
+   51                         for pos in positive for neg, _ in negative) / (5 * len(positive)))
+   52     rank, difficult = sum(ranks) / 28, sum(hard) / 28
+   53     return {"bce": bce, "rank": rank, "hard": difficult, "total": bce + rank + .5 * difficult}
+   54 
+   55 
+   56 class TinyEncoder(torch.nn.Module):
+   57     def __init__(self) -> None:
+   58         super().__init__()
+   59         self.embedding = torch.nn.Embedding(64, 4)
+   60         self.dropout = torch.nn.Dropout(.2)
+   61 
+   62     def tokenizer(self, texts: list[str], **kwargs) -> dict:
+   63         return {"input_ids": torch.tensor([[v % 64 for v in hashlib.sha256(t.encode()).digest()[:5]]
+   64                                             for t in texts])}
+   65 
+   66     def forward(self, features: dict) -> dict:
+   67         return {"sentence_embedding": self.dropout(self.embedding(features["input_ids"])).mean(1)}
+   68 
+   69 
+   70 def tiny_model() -> Any:
+   71     torch.manual_seed(93)
+   72     return method.core.build_model(TinyEncoder(), 16, 7)
+   73 
+   74 
+   75 def config() -> dict:
+   76     result = method.config(method.contract())
+   77     result["input"]["encoder_bf16"] = False
+   78     return result
+   79 
+   80 
+   81 def toy_prior_step(model: Any, optimizer: Any, group: Any, c: dict, count: int = 288) -> None:
+   82     """One real update then a declared handmade Adam-counter fixture, not 288 updates.
+   83 
+   84     Moment tensors come from actual optimization. Counter rebasing isolates the
+   85     next-stage operation cheaply; another test exercises all actual 288 calls.
+   86     """
+   87     method.update(model, optimizer, group, None, None, c, "seq", 1, 1, 51, 52)
+   88     for state in optimizer.state.values():
+   89         state["step"].fill_(count)
+   90 
+   91 
+   92 def synthetic_matrices() -> tuple[dict, list[str]]:
+   93     domains = ["ABC"[i % 3] for i in range(60)]
+   94     arrays = {}
+   95     for j, point in enumerate(evaluation.expected_points()):
+   96         values = np.zeros((60, 22), dtype=np.float64)
+   97         for g in range(60):
+   98             values[g] = .2 + .001 * j + .0001 * g + np.arange(22) * .00001
+   99         arrays[point] = {role: values.copy() for role in method.ROLES}
+  100     return arrays, domains
+  101 
+  102 
+  103 class HandmadeBudget:
+  104     def check(self, reserve: int = 0) -> None:
+  105         pass
+  106 
+  107 
+  108 def gate_fixture(root: Path) -> tuple[dict, dict]:
+  109     """Explicit file-identity fixtures, NOT model training or checkpoint evidence."""
+  110     p = method.contract()
+  111     for folder in ("scores", "maps", "points", "updates", "models", "branches", "memory"):
+  112         (root / folder).mkdir()
+  113     groups = {role: [handmade_group(f"{role}_{d}_{i:02}") for d in "ABC" for i in range(count)]
+  114               for role, count in (("fit", 48), ("calibration", 12), ("development", 20))}
+  115     partition = {role: [{"group_uid": g.uid, "domain": g.uid.split("_")[1]} for g in rows]
+  116                  for role, rows in groups.items()}
+  117     method.data.write_json(root / "partition.json", partition)
+  118     raw = np.tile(np.linspace(-1, 1, 378, dtype=np.float32), (60, 1))
+  119     manifest = {"status": runner.COMPLETE, "source_files": runner.sources(), "physical_updates": 6048,
+  120                 "gradient_group_presentations": 9504, "points": {}, "training": {}, "memories": {},
+  121                 "partition": method.data.record(root / "partition.json", root),
+  122                 "initial": {"scores": runner.save_array(root / "scores/initial.npy", raw, root)}}
+  123     memories = {}
+  124     for order in method.ORDERS:
+  125         first = [g for g in groups["fit"] if g.uid.split("_")[1] == order[0]]
+  126         for arm in ("er", "logit"):
+  127             memory = method.Memory(order, p["memory_seed"], arm == "logit", {"a": 1., "b": 0.})
+  128             memory.retain(first, 1, lambda gs: np.zeros((len(gs), 378), np.float32))
+  129             memories[order, arm] = memory
+  130             key = order + "_" + arm + "_after1"
+  131             manifest["memories"][key] = runner.save_memory(root, key, memory)
+  132     for name in evaluation.expected_points():
+  133         order, stage = name[:3], 1 if name.endswith("_shared") else int(name[-1])
+  134         arm = "shared" if stage == 1 else name.split("_")[1]
+  135         current = [g for g in groups["fit"] if g.uid.split("_")[1] == order[stage - 1]]
+  136         sequence, stream = method.schedule(current, p, order, stage)
+  137         raw_rec = runner.save_array(root / "scores" / (name + "_raw.npy"), raw, root)
+  138         cal_rec = runner.save_array(root / "scores" / (name + "_calibration.npy"), raw[:12], root)
+  139         mapping = {"a": 1., "b": 0., "status": "PASS_CALIBRATION_FIT", "group_count": 12,
+  140                    "pair_count": 4536, "positive_count": 240, "actual_domain": order[stage - 1],
+  141                    "model_state_sha256": "handmade_fixture_not_weights", "score_source": cal_rec,
+  142                    "calibration_group_ids": [g.uid for g in groups["calibration"] if g.uid.split("_")[1] == order[stage - 1]]}
+  143         map_path = root / "maps" / (name + ".json")
+  144         method.data.write_json(map_path, mapping)
+  145         weight = root / "models" / (name + ".pt")
+  146         weight.write_bytes(b"handmade file identity fixture, not torch weights")
+  147         point = {"name": name, "stage": stage, "order": order, "actual_domain": order[stage - 1],
+  148                  "completed_updates": stage * 288, "full_model_adam_and_rng_restore_verified": True,
+  149                  "model_state_sha256": "handmade_fixture_not_weights", "model": method.data.record(weight, root),
+  150                  "mapping": method.data.record(map_path, root), "first_map_parameters": {"a": 1., "b": 0.},
+  151                  "scores": {"development": raw_rec, "calibration": cal_rec}}
+  152         if stage == 1:
+  153             full = root / "branches" / (name + ".pt")
+  154             full.write_bytes(b"handmade full file identity fixture, not torch state")
+  155             point["full_checkpoint"] = method.data.record(full, root)
+  156         for role in ("stage-cal", "first-cal"):
+  157             point["scores"][role] = runner.save_array(root / "scores" / (name + "_" + role + ".npy"), raw.astype(np.float64), root)
+  158         history, memory_summary = [], None
+  159         if arm in ("er", "logit"):
+  160             memory = memories[order, arm]
+  161             memory.begin_stage(stage)
+  162             history = [memory.draw()[0].uid for _ in range(288)]
+  163             memory_summary = memory.summary()
+  164         values = np.zeros((288, len(method.STEP_COLUMNS)), np.float64)
+  165         values[:, 0:3] = 1.
+  166         values[:, 3] = 2.5
+  167         if history:
+  168             values[:, 4:7], values[:, 7] = 1., 2.5
+  169         values[:, 9] = values[:, 3] + values[:, 7]
+  170         values[:, 10] = [method.stage_lr(s) for s in range(1, 289)]
+  171         values[:, 11], values[:, 12] = .001, 1.
+  172         log = {"order": order, "stage": stage, "method": arm, "actual_domain": order[stage - 1],
+  173                "updates": 288, "adam_step": 288 * stage, "update_columns": list(method.STEP_COLUMNS),
+  174                "current_ids": [g.uid for g in sequence], "history_ids": history,
+  175                "memory_after_training": memory_summary,
+  176                "update_file": runner.save_array(root / "updates" / (name + ".npy"), values, root)}
+  177         if arm in ("er", "logit") and stage == 2:
+  178             memories[order, arm].retain(current, 2, lambda gs: np.zeros((len(gs), 378), np.float32))
+  179             manifest["memories"][name] = runner.save_memory(root, name, memories[order, arm])
+  180         point_path, log_path = root / "points" / (name + ".json"), root / "updates" / (name + ".json")
+  181         method.data.write_json(point_path, point)
+  182         method.data.write_json(log_path, log)
+  183         manifest["points"][name], manifest["training"][name] = method.data.record(point_path, root), method.data.record(log_path, root)
+  184     return manifest, p
+  185 
+  186 
+  187 class ContinualContracts(unittest.TestCase):
+  188     @classmethod
+  189     def setUpClass(cls) -> None:
+  190         torch.set_num_threads(1)
+  191         torch.use_deterministic_algorithms(True)
+  192 
+  193     def test_confirmed_contract_and_stage_schedule(self) -> None:
+  194         p = method.contract()
+  195         self.assertEqual(p["physical_updates"], 3 * 288 + 3 * 3 * 2 * 288)
+  196         self.assertEqual(sum(method.stage_lr(i) > 0 for i in range(1, 289)), 287)
+  197         self.assertAlmostEqual(sum(method.stage_lr(i) for i in range(1, 289)), .00144, places=15)
+  198         self.assertEqual(method.stage_lr(288), 0)
+  199         self.assertEqual(method.stage_lr(29), 1e-5)
+  200         for bad in (0, 289, 1.0):
+  201             with self.assertRaises(ValueError):
+  202                 method.stage_lr(bad)
+  203 
+  204     def test_supply_cannot_rewind_or_skip(self) -> None:
+  205         groups, partition = {}, {}
+  206         for role, count in (("fit", 48), ("calibration", 12)):
+  207             groups[role] = [handmade_group(f"{role}_{d}_{i:02}") for d in "ABC" for i in range(count)]
+  208             partition[role] = [{"group_uid": g.uid, "domain": d}
+  209                                for d in "ABC" for g in groups[role] if g.uid.startswith(role + "_" + d)]
+  210         supply = method.Supply(groups, partition)
+  211         with self.assertRaises(ValueError):
+  212             supply.current("ABC_shared", "ABC", 2)
+  213         fit, cal = supply.current("ABC_shared", "ABC", 1)
+  214         self.assertEqual((len(fit), len(cal)), (48, 12))
+  215         self.assertTrue(all(g.uid.startswith("fit_A") for g in fit))
+  216         supply.branch_after_first("ABC_er", "ABC_shared")
+  217         with self.assertRaises(ValueError):
+  218             supply.current("ABC_er", "BCA", 2)
+  219         fit, _ = supply.current("ABC_er", "ABC", 2)
+  220         self.assertTrue(all(g.uid.startswith("fit_B") for g in fit))
+  221         with self.assertRaises(ValueError):
+  222             supply.current("ABC_er", "ABC", 1)
+  223 
+  224     def test_reservoir_pairing_restore_and_nonrefresh(self) -> None:
+  225         first = [handmade_group(f"A_{i:02}") for i in range(48)]
+  226         second = [handmade_group(f"B_{i:02}") for i in range(48)]
+  227         mem = [method.Memory("ABC", 20260930, use, {"a": .5, "b": -.2}) for use in (False, True)]
+  228         first_values = np.arange(378, dtype=np.float32)
+  229         for m in mem:
+  230             m.retain(first, 1, lambda groups: np.stack([first_values for _ in groups]))
+  231         self.assertEqual(mem[0].summary()["members"], mem[1].summary()["members"])
+  232         old = {uid: row.copy() for uid, row in mem[1].references.items()}
+  233         for m in mem:
+  234             m.begin_stage(2)
+  235         for _ in range(288):
+  236             self.assertEqual(mem[0].draw()[0].uid, mem[1].draw()[0].uid)
+  237         for m in mem:
+  238             with self.assertRaises(ValueError):
+  239                 m.draw()
+  240             restored = method.Memory.from_bytes(m.to_bytes())
+  241             self.assertEqual(restored.to_bytes(), m.to_bytes())
+  242             m.retain(second, 2, lambda groups: np.stack([first_values + 10 for _ in groups]))
+  243         self.assertEqual(mem[0].summary()["members"], mem[1].summary()["members"])
+  244         for uid, values in mem[1].references.items():
+  245             np.testing.assert_array_equal(values, old[uid] if uid in old else first_values + 10)
+  246         self.assertEqual(mem[1].reservoir.seen, 96)
+  247         self.assertLess(len(mem[1].to_bytes()), 1048576)
+  248 
+  249     def test_complete_memory_bytes_not_just_reference_array(self) -> None:
+  250         m = method.Memory("ABC", 1, False, {"a": 1, "b": 0})
+  251         groups = [handmade_group(f"A_{i:02}") for i in range(48)]
+  252         m.retain(groups, 1, None)
+  253         self.assertGreater(len(m.to_bytes()), 6 * 378 * 4)
+  254         g = m.reservoir.groups[0]
+  255         giant = tuple(tuple((uid, title, description + "大" * 10000) for uid, title, description in rows)
+  256                       for rows in g.items)
+  257         m.reservoir.groups[0] = method.data.Group(g.uid, g.sellers, giant, g.labels)
+  258         with self.assertRaises(ValueError):
+  259             m.to_bytes()
+  260 
+  261     def test_current_schedule_and_dropout_are_paired(self) -> None:
+  262         p = method.contract()
+  263         current = [handmade_group(f"B_{i:02}") for i in range(48)]
+  264         a, stream = method.schedule(current, p, "ABC", 2)
+  265         b, other = method.schedule(list(reversed(current)), p, "ABC", 2)
+  266         self.assertEqual([g.uid for g in a], [g.uid for g in b])
+  267         self.assertEqual(stream, other)
+  268         self.assertTrue(all(sum(g.uid == uid for g in a) == 6 for uid in {g.uid for g in current}))
+  269 
+  270     def test_live_combined_gradient_matches_independent_graph(self) -> None:
+  271         c, current, history = config(), handmade_group("B", 2), handmade_group("A", 1)
+  272         trained = tiny_model()
+  273         opt = method.core.make_optimizer(trained, c)
+  274         toy_prior_step(trained, opt, history, c)
+  275         reference_model, reference_opt = copy.deepcopy(trained), None
+  276         reference_opt = method.core.make_optimizer(reference_model, c)
+  277         reference_opt.load_state_dict(copy.deepcopy(opt.state_dict()))
+  278         target = np.linspace(-.8, .7, 378).astype(np.float32)
+  279         calls = []
+  280         original_logits = method.base.logits
+  281 
+  282         def observe(model, group, *args, **kwargs):
+  283             calls.append(group.uid)
+  284             return original_logits(model, group, *args, **kwargs)
+  285 
+  286         with mock.patch.object(method.base, "logits", side_effect=observe):
+  287             got = method.update(trained, opt, current, history, target, c, "logit", 2, 1, 18, 19, observe=True)
+  288         self.assertEqual(calls, ["B", "A"])
+  289         reference_model.train()
+  290         reference_opt.zero_grad(set_to_none=True)
+  291         torch.manual_seed(18)
+  292         pc = original_logits(reference_model, current, c, "split_rank")
+  293         lc = method.ranking.objectives(pc, torch.tensor(current.labels, dtype=torch.float32), .5)["total"]
+  294         torch.manual_seed(19)
+  295         ph = original_logits(reference_model, history, c, "split_rank")
+  296         lh = method.ranking.objectives(ph, torch.tensor(history.labels, dtype=torch.float32), .5)["total"]
+  297         penalty = torch.sum((ph - torch.tensor(target)) ** 2) / 378
+  298         (lc + lh + .5 * penalty).backward()
+  299         torch.nn.utils.clip_grad_norm_(reference_model.parameters(), 1., error_if_nonfinite=True)
+  300         for group, rate in zip(reference_opt.param_groups, (1e-5 / 29, .001), strict=True):
+  301             group["lr"] = rate
+  302         reference_opt.step()
+  303         self.assertAlmostEqual(got["total"], float((lc + lh + .5 * penalty).detach()), places=5)
+  304         for x, y in zip(trained.parameters(), reference_model.parameters(), strict=True):
+  305             torch.testing.assert_close(x, y, rtol=1e-6, atol=2e-7)
+  306         self.assertEqual(method.adam_step(opt), 289)
+  307 
+  308     def test_history_logit_term_has_its_own_encoder_and_head_gradient(self) -> None:
+  309         model, group = tiny_model(), handmade_group()
+  310         c = config()
+  311         model.train()
+  312         predicted = method.base.logits(model, group, c, "split_rank")
+  313         target = predicted.detach() + torch.linspace(.1, .8, 378)
+  314         penalty = (predicted - target).square().mean()
+  315         params = [model.encoder.embedding.weight, model.head[0].weight]
+  316         for gradient in torch.autograd.grad(penalty, params):
+  317             self.assertTrue(torch.isfinite(gradient).all())
+  318             self.assertGreater(float(gradient.norm()), 0)
+  319         self.assertFalse(target.requires_grad)
+  320 
+  321     def test_current_forward_same_with_or_without_replay(self) -> None:
+  322         c, current, old = config(), handmade_group("B"), handmade_group("A")
+  323         first = tiny_model()
+  324         optimizer = method.core.make_optimizer(first, c)
+  325         toy_prior_step(first, optimizer, old, c)
+  326         captures = []
+  327         for arm in ("seq", "er", "logit"):
+  328             model = copy.deepcopy(first)
+  329             opt = method.core.make_optimizer(model, c)
+  330             opt.load_state_dict(copy.deepcopy(optimizer.state_dict()))
+  331             logits = []
+  332             hook = model.head.register_forward_hook(lambda _, __, out: logits.append(out.detach().clone()))
+  333             try:
+  334                 method.update(model, opt, current, old if arm != "seq" else None,
+  335                               np.zeros(378, np.float32) if arm == "logit" else None,
+  336                               c, arm, 2, 1, 107, 108)
+  337             finally:
+  338                 hook.remove()
+  339             captures.append(logits[0])
+  340             self.assertEqual(len(logits), 1 if arm == "seq" else 2)
+  341         for got in captures[1:]:
+  342             self.assertTrue(torch.equal(got, captures[0]))
+  343 
+  344     def test_actual_288_calls_last_encoder_zero_and_adam_continues(self) -> None:
+  345         c, group = config(), handmade_group()
+  346         model = tiny_model()
+  347         optimizer = method.core.make_optimizer(model, c)
+  348         for step in range(1, 289):
+  349             log = method.update(model, optimizer, group, None, None, c, "seq", 1, step,
+  350                                 step, step + 1000, observe=step == 288)
+  351         self.assertEqual(method.adam_step(optimizer), 288)
+  352         self.assertFalse(log["modules"]["encoder"]["parameters_changed"])
+  353         self.assertTrue(log["modules"]["head"]["parameters_changed"])
+  354         method.update(model, optimizer, group, None, None, c, "seq", 2, 1, 19, 20)
+  355         self.assertEqual(method.adam_step(optimizer), 289)
+  356         with self.assertRaises(ValueError):
+  357             method.update(model, optimizer, group, None, None, c, "seq", 2, 1, 19, 20)
+  358 
+  359     def test_full_disk_adam_rng_branch_next_update(self) -> None:
+  360         c, group = config(), handmade_group()
+  361         model = tiny_model()
+  362         opt = method.core.make_optimizer(model, c)
+  363         toy_prior_step(model, opt, group, c)
+  364         state = runner.rng_state()
+  365         with tempfile.TemporaryDirectory() as tmp:
+  366             path = Path(tmp) / "shared.pt"
+  367             receipt = method.core.save_state(path, model, opt, {"rng": state, "completed_updates": 288})
+  368             clone = tiny_model()
+  369             other_opt = method.core.make_optimizer(clone, c)
+  370             metadata = method.core.restore_state(path, clone, other_opt, receipt["state_sha256"])
+  371             runner.restore_rng(metadata["rng"])
+  372             for m, o in ((model, opt), (clone, other_opt)):
+  373                 method.update(m, o, group, None, None, c, "seq", 2, 1, 19, 20)
+  374             self.assertEqual(method.core.state_digest(model.state_dict()), method.core.state_digest(clone.state_dict()))
+  375             self.assertEqual(method.core.state_digest(opt.state_dict()), method.core.state_digest(other_opt.state_dict()))
+  376 
+  377     def test_actual_checkpoint_path_calibration_and_branch_restore(self) -> None:
+  378         c, group = config(), handmade_group()
+  379         model, budget = tiny_model(), HandmadeBudget()
+  380         optimizer = method.core.make_optimizer(model, c)
+  381         toy_prior_step(model, optimizer, group, c)
+  382         calibration = [handmade_group(f"current_cal_{i:02}", i % 3) for i in range(12)]
+  383         valid = [handmade_group(f"valid_{i:02}", i % 4) for i in range(60)]
+  384         observed, original_score = [], method.ranking.score
+  385 
+  386         def score(model, rows, *args):
+  387             observed.append([g.uid for g in rows])
+  388             return original_score(model, rows, *args)
+  389 
+  390         with tempfile.TemporaryDirectory() as tmp:
+  391             root = Path(tmp)
+  392             for folder in ("branches", "work", "models", "scores", "maps", "points"):
+  393                 (root / folder).mkdir()
+  394             with mock.patch.object(method.ranking, "score", side_effect=score):
+  395                 point = runner.checkpoint(root, "ABC_shared", model, optimizer, c, "ABC", 1,
+  396                                           calibration, valid, None, budget)
+  397             self.assertEqual(observed, [[g.uid for g in gs] for gs in (calibration, valid, calibration, valid)])
+  398             self.assertTrue(point["full_checkpoint_retained"])
+  399             with mock.patch.object(method.base, "load_model", side_effect=lambda *a: tiny_model()):
+  400                 clone, other = runner.restore_branch(root, point, c)
+  401             self.assertEqual(method.core.state_digest(optimizer.state_dict()), method.core.state_digest(other.state_dict()))
+  402             for m, o in ((model, optimizer), (clone, other)):
+  403                 method.update(m, o, group, None, None, c, "seq", 2, 1, 9, 10)
+  404             self.assertEqual(method.core.state_digest(model.state_dict()), method.core.state_digest(clone.state_dict()))
+  405             self.assertEqual(method.core.state_digest(optimizer.state_dict()), method.core.state_digest(other.state_dict()))
+  406 
+  407     def test_blind_gate_complete_then_rejects_changed_weight_and_wrong_current_domain(self) -> None:
+  408         with tempfile.TemporaryDirectory() as tmp:
+  409             root = Path(tmp)
+  410             manifest, p = gate_fixture(root)
+  411             scores = runner.blind_gate(root, manifest, p)
+  412             self.assertEqual(len(scores["points"]), 21)
+  413             weight = root / "models/ABC_shared.pt"
+  414             original = weight.read_bytes()
+  415             weight.write_bytes(original + b"changed")
+  416             with self.assertRaises(ValueError):
+  417                 runner.blind_gate(root, manifest, p)
+  418             weight.write_bytes(original)
+  419             path = root / "updates/ABC_seq_stage2.json"
+  420             log = method.data.read_json(path)
+  421             log["current_ids"] = [uid.replace("fit_B_", "fit_C_") for uid in log["current_ids"]]
+  422             method.data.write_json(path, log)
+  423             changed = copy.deepcopy(manifest)
+  424             changed["training"]["ABC_seq_stage2"] = method.data.record(path, root)
+  425             with self.assertRaises(ValueError):
+  426                 runner.blind_gate(root, changed, p)
+  427 
+  428     def test_blind_gate_rejects_old_calibration_and_wrong_history_draw(self) -> None:
+  429         with tempfile.TemporaryDirectory() as tmp:
+  430             root = Path(tmp)
+  431             manifest, p = gate_fixture(root)
+  432             path = root / "maps/ABC_seq_stage2.json"
+  433             original_map = path.read_bytes()
+  434             mapping = method.data.read_json(path)
+  435             mapping["calibration_group_ids"][0] = "calibration_A_00"
+  436             method.data.write_json(path, mapping)
+  437             point_path = root / "points/ABC_seq_stage2.json"
+  438             original_point = point_path.read_bytes()
+  439             point = method.data.read_json(point_path)
+  440             point["mapping"] = method.data.record(path, root)
+  441             method.data.write_json(point_path, point)
+  442             changed = copy.deepcopy(manifest)
+  443             changed["points"]["ABC_seq_stage2"] = method.data.record(point_path, root)
+  444             with self.assertRaises(ValueError):
+  445                 runner.blind_gate(root, changed, p)
+  446             path.write_bytes(original_map)
+  447             point_path.write_bytes(original_point)
+  448             log_path = root / "updates/ABC_er_stage2.json"
+  449             log = method.data.read_json(log_path)
+  450             log["history_ids"][0] = "fit_C_00"
+  451             method.data.write_json(log_path, log)
+  452             changed = copy.deepcopy(manifest)
+  453             changed["training"]["ABC_er_stage2"] = method.data.record(log_path, root)
+  454             with self.assertRaises(ValueError):
+  455                 runner.blind_gate(root, changed, p)
+  456 
+  457     def test_single_parse_attempt_written_before_loader(self) -> None:
+  458         with tempfile.TemporaryDirectory() as tmp:
+  459             root = Path(tmp)
+  460             method.data.write_json(root / "access.json", {"train": 0, "valid": 0, "heldout": 0, "owners": 0})
+  461             def failure(*args):
+  462                 self.assertEqual(method.data.read_json(root / "access.json")["valid"], 1)
+  463                 raise RuntimeError("handmade failure before any real label")
+  464             with self.assertRaises(RuntimeError):
+  465                 runner.parse_once(root, [], {}, "development", failure)
+  466             with self.assertRaises(ValueError):
+  467                 runner.parse_once(root, [], {}, "development", failure)
+  468             with self.assertRaises(ValueError):
+  469                 runner.parse_once(root, [], {}, "heldout", failure)
+  470 
+  471     def test_endpoint_group_weights_with_interleaved_domains(self) -> None:
+  472         arrays, domains = synthetic_matrices()
+  473         fields = evaluation.endpoint_fields(arrays, domains, "er", "raw", "O")
+  474         k = method.metrics.COLUMNS.index("map")
+  475         independent = []
+  476         for order in method.ORDERS:
+  477             last = arrays[f"{order}_er_stage3"]["raw"]
+  478             independent.append(sum(sum(last[i, k] for i, d in enumerate(domains) if d == old) / 20
+  479                                    for old in order[:2]) / 2)
+  480         np.testing.assert_allclose(fields[..., k].mean(2).sum(1), independent, rtol=0, atol=1e-15)
+  481         z = evaluation.endpoint_fields(arrays, domains, "er", "raw", "Z")
+  482         all_ = evaluation.endpoint_fields(arrays, domains, "er", "raw", "final_all")
+  483         np.testing.assert_allclose(all_, (2 * fields + z) / 3, rtol=0, atol=1e-15)
+  484 
+  485     def test_actual_domain_bootstrap_against_frequency_reference(self) -> None:
+  486         arrays, domains = synthetic_matrices()
+  487         fields = evaluation.endpoint_fields(arrays, domains, "logit", "raw", "F_first")
+  488         draws = evaluation.bootstrap_draws()
+  489         got = evaluation.summarize_field(fields, draws)["map"]
+  490         k = method.metrics.COLUMNS.index("map")
+  491         values = fields[..., k].mean(0)
+  492         counts = np.asarray([[np.bincount(draws[b, d], minlength=20) for d in range(3)] for b in range(5000)])
+  493         boot = (counts * values).sum((1, 2)) / 20
+  494         np.testing.assert_allclose(got["conditional_95pct_interval"], np.quantile(boot, [.025, .975]), atol=1e-15, rtol=0)
+  495         self.assertEqual(draws.shape, (5000, 3, 20))
+  496 
+  497     def test_forgetting_loss_sign_and_frozen_zero(self) -> None:
+  498         arrays, domains = synthetic_matrices()
+  499         for role in method.ROLES:
+  500             self.assertTrue(np.all(evaluation.endpoint_fields(arrays, domains, "frozen", role, "F_first") == 0))
+  501         fields = evaluation.endpoint_fields(arrays, domains, "seq", "raw", "F_first")
+  502         b, m = (method.metrics.COLUMNS.index(n) for n in ("brier", "map"))
+  503         np.testing.assert_allclose(fields[..., b], -fields[..., m], rtol=0, atol=1e-15)
+  504 
+  505     def test_latest_domain_each_guard_cannot_be_masked_by_N(self) -> None:
+  506         def record(value):
+  507             return {"mean": value, "conditional_95pct_interval": [.001, .1],
+  508                     "per_order": {o: .01 for o in method.ORDERS}}
+  509         delta = {e: {n: record(.01 if n not in ("brier", "log_loss") else -.01)
+  510                      for n in method.metrics.COLUMNS} for e in evaluation.ENDPOINTS}
+  511         raw = copy.deepcopy(delta)
+  512         self.assertTrue(evaluation.comparison_checks(delta, raw)["pilot_observed_checks_pass"])
+  513         for name in ("map", "recall_at_5", "average_precision", "roc_auc", "brier", "log_loss"):
+  514             changed = copy.deepcopy(delta)
+  515             changed["Z"][name]["mean"] *= -1
+  516             self.assertFalse(evaluation.comparison_checks(changed, raw)["pilot_observed_checks_pass"])
+  517         changed = copy.deepcopy(raw)
+  518         changed["O"]["brier"]["mean"] = .001
+  519         self.assertFalse(evaluation.comparison_checks(delta, changed)["pilot_observed_checks_pass"])
+  520 
+  521     def test_same_path_gate_is_not_same_transition_claim(self) -> None:
+  522         first = {"map": {"mean": .1, "conditional_95pct_interval": [.05, .15],
+  523                          "per_order": {o: .1 for o in method.ORDERS}}}
+  524         gain = {"map": {"per_order": {o: (-.1 + .3) / 2 for o in method.ORDERS}}}
+  525         result = evaluation.forgetting_checks(first, gain)
+  526         self.assertTrue(result["established"])
+  527         self.assertIn("not necessarily same transition", result["claim"])
+  528 
+  529     def test_collection_survives_first_bootstrap_failure(self) -> None:
+  530         groups = [handmade_group(f"valid_{i:02}") for i in range(60)]
+  531         partition = {"development": [{"group_uid": g.uid, "domain": "ABC"[i % 3]} for i, g in enumerate(groups)]}
+  532         raw = np.tile(np.linspace(-2, 2, 378).astype(np.float32), (60, 1))
+  533         scores = {"initial": raw, "points": {p: {"raw": raw, "stage-cal": raw.astype(float),
+  534                                                  "first-cal": raw.astype(float)} for p in evaluation.expected_points()}}
+  535         with tempfile.TemporaryDirectory() as tmp:
+  536             root = Path(tmp) / "evaluation"
+  537             runner.collect(root, scores, groups, partition, [])
+  538             self.assertEqual(len(list(root.glob("*.npy"))), 64)
+  539             self.assertEqual(len(list(root.glob("*_counts.json"))), 64)
+  540             with mock.patch.object(evaluation, "bootstrap_draws", side_effect=RuntimeError("handmade statistics fault")):
+  541                 with self.assertRaises(RuntimeError):
+  542                     evaluation.finalize(root)
+  543             self.assertTrue((root / "collected.json").is_file())
+  544             self.assertFalse((root / "evaluation.json").exists())
+  545 
+  546     def test_array_identity_and_schema_before_use(self) -> None:
+  547         with tempfile.TemporaryDirectory() as tmp:
+  548             root = Path(tmp)
+  549             record = runner.save_array(root / "scores.npy", np.zeros((60, 378), np.float32), root)
+  550             runner.array(root, record, (60, 378), np.float32)
+  551             with self.assertRaises(ValueError):
+  552                 runner.array(root, record, (60, 378), np.float64)
+  553             raw = bytearray((root / "scores.npy").read_bytes())
+  554             raw[-1] ^= 1
+  555             (root / "scores.npy").write_bytes(raw)
+  556             with self.assertRaises(ValueError):
+  557                 runner.array(root, record, (60, 378), np.float32)
+  558 
+  559     def test_finalization_never_replaces_existing_different_bytes(self) -> None:
+  560         with tempfile.TemporaryDirectory() as tmp:
+  561             path = Path(tmp) / "evidence.json"
+  562             evaluation.write_once(path, b"original")
+  563             evaluation.write_once(path, b"original")
+  564             with self.assertRaises(FileExistsError):
+  565                 evaluation.write_once(path, b"changed")
+  566             self.assertEqual(path.read_bytes(), b"original")
+  567 
+  568 
+  569 if __name__ == "__main__":
+  570     unittest.main()

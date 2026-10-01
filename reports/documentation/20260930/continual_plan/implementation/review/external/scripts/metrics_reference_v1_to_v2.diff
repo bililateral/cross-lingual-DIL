@@ -1,0 +1,11 @@
+--- independent_metrics.py
++++ independent_metrics_v2.py
+@@ -41,7 +41,7 @@
+ cases={'all_tied':np.zeros(378),'continuous':rng.normal(size=378)*2,'partial_ties':np.round(rng.normal(size=378),1),'extreme':np.linspace(-100,100,378),'all_negative':np.full(378,-2.),'perfect_positive_top':y.astype(float)*2-1}
+ results=[];maxerror=0.
+ for name,z in cases.items():
+- expected,hits,counts=ref(z);got=m.metrics.group_metrics(y,z);diff={k:float(got[i]-expected[k]) for i,k in enumerate(m.metrics.COLUMNS)}
++ expected,hits,counts=ref(z);matrix,returned_counts=m.metrics.group_metrics(y[None,:],z[None,:]);got=matrix[0];assert returned_counts[0]==counts;diff={k:float(got[i]-expected[k]) for i,k in enumerate(m.metrics.COLUMNS)}
+  err=max(map(abs,diff.values()));maxerror=max(maxerror,err)
+  results.append({'name':name,'metrics':expected,'hit_at_k_not_recall':hits,'confusion':counts,'max_absolute_error':err,'differences':diff});assert err<=1e-12,(name,diff)
+ assert any(abs(x['metrics']['recall_at_1']-x['hit_at_k_not_recall'][1])>1e-6 for x in results)

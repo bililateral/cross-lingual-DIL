@@ -1,0 +1,689 @@
+{
+  "checked_at_utc": "2026-09-30T03:32:18.423Z",
+  "scope": "Independent closed-form document arithmetic in tool V8. No project research script, random sampling, fitting, labels, texts, model or Linux access.",
+  "reference": "external/outputs/derivations.json",
+  "method": "Counts from contract products; LR area from total/2 and endpoints; reservoir probability as product of 6 conditional draws; Brier via q*(1-q)+(p-q)^2; NLL and affine logits directly; endpoint/order/time identities.",
+  "numeric_comparisons": 82,
+  "max_absolute_difference": 2.220446049250313e-16,
+  "all_pass": true,
+  "checks": [
+    {
+      "path": "counts.values.groups_fit_per_domain",
+      "expected": 48,
+      "actual": 48,
+      "absolute_difference": 0,
+      "tolerance": 4.8e-11,
+      "pass": true
+    },
+    {
+      "path": "counts.values.epochs",
+      "expected": 6,
+      "actual": 6,
+      "absolute_difference": 0,
+      "tolerance": 6e-12,
+      "pass": true
+    },
+    {
+      "path": "counts.values.stages",
+      "expected": 3,
+      "actual": 3,
+      "absolute_difference": 0,
+      "tolerance": 3e-12,
+      "pass": true
+    },
+    {
+      "path": "counts.values.orders",
+      "expected": 3,
+      "actual": 3,
+      "absolute_difference": 0,
+      "tolerance": 3e-12,
+      "pass": true
+    },
+    {
+      "path": "counts.values.updated_arms",
+      "expected": 3,
+      "actual": 3,
+      "absolute_difference": 0,
+      "tolerance": 3e-12,
+      "pass": true
+    },
+    {
+      "path": "counts.values.updates_per_stage",
+      "expected": 288,
+      "actual": 288,
+      "absolute_difference": 0,
+      "tolerance": 2.88e-10,
+      "pass": true
+    },
+    {
+      "path": "counts.values.shared_updates",
+      "expected": 864,
+      "actual": 864,
+      "absolute_difference": 0,
+      "tolerance": 8.64e-10,
+      "pass": true
+    },
+    {
+      "path": "counts.values.later_updates",
+      "expected": 5184,
+      "actual": 5184,
+      "absolute_difference": 0,
+      "tolerance": 5.184e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.physical_optimizer_calls",
+      "expected": 6048,
+      "actual": 6048,
+      "absolute_difference": 0,
+      "tolerance": 6.048e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.history_presentations",
+      "expected": 3456,
+      "actual": 3456,
+      "absolute_difference": 0,
+      "tolerance": 3.456e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.all_gradient_group_presentations",
+      "expected": 9504,
+      "actual": 9504,
+      "absolute_difference": 0,
+      "tolerance": 9.504e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.unique_stage_endpoints_and_maps",
+      "expected": 21,
+      "actual": 21,
+      "absolute_difference": 0,
+      "tolerance": 2.1e-11,
+      "pass": true
+    },
+    {
+      "path": "counts.values.current_calibration_pairs",
+      "expected": 4536,
+      "actual": 4536,
+      "absolute_difference": 0,
+      "tolerance": 4.536e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.current_calibration_positives",
+      "expected": 240,
+      "actual": 240,
+      "absolute_difference": 0,
+      "tolerance": 2.4e-10,
+      "pass": true
+    },
+    {
+      "path": "counts.values.reservoir_accounts",
+      "expected": 168,
+      "actual": 168,
+      "absolute_difference": 0,
+      "tolerance": 1.68e-10,
+      "pass": true
+    },
+    {
+      "path": "counts.values.reservoir_pairs",
+      "expected": 2268,
+      "actual": 2268,
+      "absolute_difference": 0,
+      "tolerance": 2.268e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.reservoir_positives",
+      "expected": 120,
+      "actual": 120,
+      "absolute_difference": 0,
+      "tolerance": 1.2e-10,
+      "pass": true
+    },
+    {
+      "path": "counts.values.reference_scores_float32_bytes",
+      "expected": 9072,
+      "actual": 9072,
+      "absolute_difference": 0,
+      "tolerance": 9.072e-9,
+      "pass": true
+    },
+    {
+      "path": "counts.values.first_map_float64_scalar_bytes",
+      "expected": 16,
+      "actual": 16,
+      "absolute_difference": 0,
+      "tolerance": 1.6e-11,
+      "pass": true
+    },
+    {
+      "path": "schedule.phase_sum",
+      "expected": 0.00144,
+      "actual": 0.00144,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.three_phase_sum",
+      "expected": 0.00432,
+      "actual": 0.00432,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.old_864_sum",
+      "expected": 0.00432,
+      "actual": 0.00432,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.positive_lr_steps_per_path",
+      "expected": 861,
+      "actual": 861,
+      "absolute_difference": 0,
+      "tolerance": 8.61e-10,
+      "pass": true
+    },
+    {
+      "path": "schedule.old_positive_lr_steps",
+      "expected": 863,
+      "actual": 863,
+      "absolute_difference": 0,
+      "tolerance": 8.63e-10,
+      "pass": true
+    },
+    {
+      "path": "schedule.physical_positive_lr_calls",
+      "expected": 6027,
+      "actual": 6027,
+      "absolute_difference": 0,
+      "tolerance": 6.027e-9,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.historical_fit_fraction_stage2",
+      "expected": 0.125,
+      "actual": 0.125,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.historical_fit_fraction_stage3",
+      "expected": 0.0625,
+      "actual": 0.0625,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.expected_history_presentations_per_retained_group_in_one_stage",
+      "expected": 48,
+      "actual": 48,
+      "absolute_difference": 0,
+      "tolerance": 4.8e-11,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.current_presentations_per_group",
+      "expected": 6,
+      "actual": 6,
+      "absolute_difference": 0,
+      "tolerance": 6e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.expected_repeat_ratio",
+      "expected": 8,
+      "actual": 8,
+      "absolute_difference": 0,
+      "tolerance": 8e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.expected_old_domain_count",
+      "expected": 3,
+      "actual": 3,
+      "absolute_difference": 0,
+      "tolerance": 3e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.fraction_of_1MiB_reference_numerics",
+      "expected": 0.0086517333984375,
+      "actual": 0.0086517333984375,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.linear_group_presentation_extrapolation_seconds",
+      "expected": 63459,
+      "actual": 63459,
+      "absolute_difference": 0,
+      "tolerance": 6.3459e-8,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.linear_extrapolation_hours",
+      "expected": 17.6275,
+      "actual": 17.6275,
+      "absolute_difference": 0,
+      "tolerance": 1.76275e-11,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.twenty_one_model_bytes_if_old_average_file_size_applies",
+      "expected": 27435592184,
+      "actual": 27435592184,
+      "absolute_difference": 0,
+      "tolerance": 0.027435592184,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.later_4_arms_3_seeds_3_orders_calls_if_864_per_arm_and_shared_first",
+      "expected": 23328,
+      "actual": 23328,
+      "absolute_difference": 0,
+      "tolerance": 2.3328e-8,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.net_new_calls_if_first_6048_all_reusable",
+      "expected": 17280,
+      "actual": 17280,
+      "absolute_difference": 0,
+      "tolerance": 1.728e-8,
+      "pass": true
+    },
+    {
+      "path": "resource_arithmetic.baseline_BGE_4_arms_3_seeds_ABC_calls_if_same_288_per_stage",
+      "expected": 7776,
+      "actual": 7776,
+      "absolute_difference": 0,
+      "tolerance": 7.776e-9,
+      "pass": true
+    },
+    {
+      "path": "schedule.steps_1_29_30_287_288.0",
+      "expected": 3.4482758620689656e-7,
+      "actual": 3.4482758620689656e-7,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.steps_1_29_30_287_288.1",
+      "expected": 0.00001,
+      "actual": 0.00001,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.steps_1_29_30_287_288.2",
+      "expected": 0.000009961389961389962,
+      "actual": 0.000009961389961389962,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.steps_1_29_30_287_288.3",
+      "expected": 3.861003861003861e-8,
+      "actual": 3.861003861003861e-8,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "schedule.steps_1_29_30_287_288.4",
+      "expected": 0,
+      "actual": 0,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.probability_named_domain_absent",
+      "expected": 0.013237187260956362,
+      "actual": 0.013237187260956362,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "reservoir_analytic.probability_one_of_two_domains_absent",
+      "expected": 0.026474374521912723,
+      "actual": 0.026474374521912723,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "orders.transitions.AB",
+      "expected": 2,
+      "actual": 2,
+      "absolute_difference": 0,
+      "tolerance": 2e-12,
+      "pass": true
+    },
+    {
+      "path": "orders.transitions.BC",
+      "expected": 2,
+      "actual": 2,
+      "absolute_difference": 0,
+      "tolerance": 2e-12,
+      "pass": true
+    },
+    {
+      "path": "orders.transitions.CA",
+      "expected": 2,
+      "actual": 2,
+      "absolute_difference": 0,
+      "tolerance": 2e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.same_positive_prior",
+      "expected": 0.05291005291005291,
+      "actual": 0.05291005291005291,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_true_probabilities.0",
+      "expected": 0.01,
+      "actual": 0.01,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_true_probabilities.1",
+      "expected": 0.09582010582010582,
+      "actual": 0.09582010582010582,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_optimal_positive_affine_map.0",
+      "expected": 1.175282023685547,
+      "actual": 1.1752820236855472,
+      "absolute_difference": 2.220446049250313e-16,
+      "tolerance": 1.175282023685547e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_optimal_positive_affine_map.1",
+      "expected": -3.4198378264490428,
+      "actual": -3.4198378264490428,
+      "absolute_difference": 0,
+      "tolerance": 3.4198378264490428e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.new_true_probabilities.0",
+      "expected": 0.04,
+      "actual": 0.04,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.new_true_probabilities.1",
+      "expected": 0.0658201058201058,
+      "actual": 0.0658201058201058,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.new_optimal_positive_affine_map.0",
+      "expected": 0.2626550778552488,
+      "actual": 0.2626550778552488,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.new_optimal_positive_affine_map.1",
+      "expected": -2.9153987524926963,
+      "actual": -2.9153987524926963,
+      "absolute_difference": 0,
+      "tolerance": 2.9153987524926962e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_loss_using_old_map.expected_brier",
+      "expected": 0.048269306570364774,
+      "actual": 0.048269306570364774,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_loss_using_old_map.expected_nll",
+      "expected": 0.18590102464780145,
+      "actual": 0.18590102464780145,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_loss_using_new_map.expected_brier",
+      "expected": 0.04916930657036477,
+      "actual": 0.04916930657036477,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_loss_using_new_map.expected_nll",
+      "expected": 0.19743748277613632,
+      "actual": 0.1974374827761363,
+      "absolute_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_brier_increase",
+      "expected": 0.000899999999999998,
+      "actual": 0.000899999999999998,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.old_nll_increase",
+      "expected": 0.01153645812833487,
+      "actual": 0.011536458128334842,
+      "absolute_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.score_change",
+      "expected": 0,
+      "actual": 0,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "calibration_counterexample.rank_change",
+      "expected": 0,
+      "actual": 0,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.comparator.O",
+      "expected": 0.5,
+      "actual": 0.5,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.comparator.R22",
+      "expected": 0.4,
+      "actual": 0.4,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.comparator.R33",
+      "expected": 0.6,
+      "actual": 0.6,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.comparator.N",
+      "expected": 0.5,
+      "actual": 0.5,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.comparator.final_all",
+      "expected": 0.5333333333333333,
+      "actual": 0.5333333333333333,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.candidate.O",
+      "expected": 0.55,
+      "actual": 0.55,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.candidate.R22",
+      "expected": 0.75,
+      "actual": 0.75,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.candidate.R33",
+      "expected": 0.3,
+      "actual": 0.3,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.candidate.N",
+      "expected": 0.525,
+      "actual": 0.525,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "endpoint_scope_counterexample.values.candidate.final_all",
+      "expected": 0.46666666666666673,
+      "actual": 0.46666666666666673,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.first_domain_MAP_stages.0",
+      "expected": 0.6,
+      "actual": 0.6,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.first_domain_MAP_stages.1",
+      "expected": 0.5,
+      "actual": 0.5,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.first_domain_MAP_stages.2",
+      "expected": 0.5,
+      "actual": 0.5,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.new_domain_gains_stages_2_3.0",
+      "expected": -0.1,
+      "actual": -0.1,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.new_domain_gains_stages_2_3.1",
+      "expected": 0.3,
+      "actual": 0.3,
+      "absolute_difference": 0,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.first_loss",
+      "expected": 0.09999999999999998,
+      "actual": 0.1,
+      "absolute_difference": 2.7755575615628914e-17,
+      "tolerance": 1e-12,
+      "pass": true
+    },
+    {
+      "path": "path_not_transition_counterexample.average_new_gain",
+      "expected": 0.09999999999999999,
+      "actual": 0.1,
+      "absolute_difference": 1.3877787807814457e-17,
+      "tolerance": 1e-12,
+      "pass": true
+    }
+  ],
+  "flags": [
+    {
+      "claim": "equal exact LR sums",
+      "pass": true
+    },
+    {
+      "claim": "orders position balanced, reverse edges missing",
+      "pass": true
+    },
+    {
+      "claim": "current-map old losses both worse despite same score bins and prior",
+      "pass": true
+    },
+    {
+      "claim": "O/N improvement alone does not protect final newest domain or final average",
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "Arithmetic only; no native implementation, actual reservoir contents/byte occupancy, optimizer behavior or runtime verified.",
+    "Independent comparisons use tolerance 1e-12*max(1,abs(expected)); this is a verification tolerance, not a scientific nondegradation margin."
+  ]
+}

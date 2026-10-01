@@ -1,0 +1,24 @@
+test_01_scalar_analytic_gradient (__main__.IndependentAudit.test_01_scalar_analytic_gradient) ... ok
+test_02_independent_live_three_targets (__main__.IndependentAudit.test_02_independent_live_three_targets) ... FAIL
+test_03_reservoir_independent_stream_and_budget (__main__.IndependentAudit.test_03_reservoir_independent_stream_and_budget) ... ok
+test_04_full_micro_stage_checkpoint_and_branch (__main__.IndependentAudit.test_04_full_micro_stage_checkpoint_and_branch) ... ok
+test_05_all_endpoint_formulas_and_bootstrap (__main__.IndependentAudit.test_05_all_endpoint_formulas_and_bootstrap) ... ok
+test_06_twenty_three_single_condition_failures (__main__.IndependentAudit.test_06_twenty_three_single_condition_failures) ... ok
+test_07_gate_file_binding_and_draw_failures (__main__.IndependentAudit.test_07_gate_file_binding_and_draw_failures) ... ok
+test_08_collection_and_multi_failure_recovery (__main__.IndependentAudit.test_08_collection_and_multi_failure_recovery) ... ok
+test_09_calibration_scalar_optimum_and_current_only (__main__.IndependentAudit.test_09_calibration_scalar_optimum_and_current_only) ... ok
+test_10_access_and_visibility_scope (__main__.IndependentAudit.test_10_access_and_visibility_scope) ... ok
+
+======================================================================
+FAIL: test_02_independent_live_three_targets (__main__.IndependentAudit.test_02_independent_live_three_targets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bge_continual_external_audit/scripts/independent_checks_v2.py", line 189, in test_02_independent_live_three_targets
+    self.assertLess(err,1e-10);self.assertLessEqual(abs(got['total']-expected_logged),1e-12)
+                               ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1.1920928955078125e-07 not less than or equal to 1e-12
+
+----------------------------------------------------------------------
+Ran 10 tests in 20.416s
+
+FAILED (failures=1)

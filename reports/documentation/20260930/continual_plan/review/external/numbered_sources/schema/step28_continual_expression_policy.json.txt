@@ -1,0 +1,120 @@
+0001: {
+0002:   "schema_version": 1,
+0003:   "study": "seller_alias_continual_expression_shift",
+0004:   "root_seed": 20260910,
+0005:   "domains": {
+0006:     "A": [
+0007:       0.6,
+0008:       0.2,
+0009:       0.2
+0010:     ],
+0011:     "B": [
+0012:       0.2,
+0013:       0.6,
+0014:       0.2
+0015:     ],
+0016:     "C": [
+0017:       0.2,
+0018:       0.2,
+0019:       0.6
+0020:     ]
+0021:   },
+0022:   "groups_per_domain": {
+0023:     "train": 60,
+0024:     "development": 20,
+0025:     "heldout": 40
+0026:   },
+0027:   "controllers_per_group": 12,
+0028:   "controller_alias_counts": {
+0029:     "2": 8,
+0030:     "3": 4
+0031:   },
+0032:   "preference_inheritance": 0.75,
+0033:   "preferred_item_probability": 0.7,
+0034:   "style_axis_sizes": [
+0035:     12,
+0036:     12,
+0037:     12
+0038:   ],
+0039:   "style_sampling": "independent_uniform_controller_and_redraw",
+0040:   "redraw_may_equal_parent": true,
+0041:   "item_count_pmf": {
+0042:     "2": 0.563609467456,
+0043:     "3": 0.102071005917,
+0044:     "4": 0.068047337278,
+0045:     "5": 0.044378698225,
+0046:     "6": 0.038461538462,
+0047:     "7": 0.023668639053,
+0048:     "8": 0.159763313609
+0049:   },
+0050:   "item_count_reference": {
+0051:     "path": "reports/step28_synthetic_chinese_dataset/v13_dev_smoke_v1_20260727/reference/chinese_train_style_profile.json",
+0052:     "sha256": "5537f59fd558521d47a27702ba23e8a56620c4e14f2579e2658436f2729a3a34",
+0053:     "seller_count": 676,
+0054:     "scope": "Published aggregate clipped item counts only; no original seller rows or labels."
+0055:   },
+0056:   "text_limits": {
+0057:     "title": 48,
+0058:     "description": 720
+0059:   },
+0060:   "output_budget_bytes": 268435456,
+0061:   "small_records_budget_bytes": 4194304,
+0062:   "model_text_fields": [
+0063:     "title",
+0064:     "description"
+0065:   ],
+0066:   "public_item_fields": [
+0067:     "group_uid",
+0068:     "seller_uid",
+0069:     "item_uid",
+0070:     "title",
+0071:     "description"
+0072:   ],
+0073:   "id_format": "32 lowercase ASCII hex; independently shuffled account pool; metadata only",
+0074:   "contact_projection": "Generate C directly under projection(C,L)=C; L has no effect on C, styles, counts or lengths.",
+0075:   "generation_label_access": "New synthetic ownership and pair labels for all three splits only.",
+0076:   "training_authorized": false,
+0077:   "limitations": [
+0078:     "Artificial content and dependence mechanisms, not fitted real Chinese market distributions.",
+0079:     "Three mixtures over shared categories, not unseen-category arrival or real chronology.",
+0080:     "Independent heldout controllers; not new aliases of a previously seen controller.",
+0081:     "One or two positives among 27 candidates per query; no market-wide/open-set retrieval.",
+0082:     "No guarantee of learning, forgetting, replay benefit, novelty, or real-market effectiveness.",
+0083:     "Public-template rates and cyclic reliability are controlled assumptions, not measured real-market frequencies."
+0084:   ],
+0085:   "public_style_indices": [
+0086:     [
+0087:       0,
+0088:       1,
+0089:       2
+0090:     ],
+0091:     [
+0092:       0,
+0093:       1,
+0094:       2
+0095:     ],
+0096:     [
+0097:       0,
+0098:       1,
+0099:       2
+0100:     ]
+0101:   ],
+0102:   "public_style_probability": {
+0103:     "A": [
+0104:       0.1,
+0105:       0.6,
+0106:       0.3
+0107:     ],
+0108:     "B": [
+0109:       0.3,
+0110:       0.1,
+0111:       0.6
+0112:     ],
+0113:     "C": [
+0114:       0.6,
+0115:       0.3,
+0116:       0.1
+0117:     ]
+0118:   },
+0119:   "public_style_sampling": "independent_account_axis_override_uniform_public_subset"
+0120: }

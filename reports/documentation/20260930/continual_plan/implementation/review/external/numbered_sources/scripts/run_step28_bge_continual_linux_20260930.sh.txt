@@ -1,0 +1,33 @@
+    1 #!/usr/bin/env bash
+    2 set -euo pipefail
+    3 cd /home/yongpeng/cross-lingual
+    4 source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
+    5 conda activate py310
+    6 : "${CUDA_VISIBLE_DEVICES:?Select an inspected idle GPU}"
+    7 out="$(realpath -m -- "${1:?Pass a new reports job directory}")"
+    8 audit="$(realpath -- "${2:?Pass current CPU audit receipt}")"
+    9 authorization="$(realpath -- "${3:?Pass separate formal authorization receipt}")"
+   10 case "$out" in
+   11   "$PWD/reports/"*) ;;
+   12   *) echo 'Output must be within project reports' >&2; exit 2 ;;
+   13 esac
+   14 mkdir -p "$(dirname "$out")"
+   15 mkdir "$out"
+   16 unset LD_LIBRARY_PATH LD_PRELOAD
+   17 export CUBLAS_WORKSPACE_CONFIG=:4096:8
+   18 export TOKENIZERS_PARALLELISM=false
+   19 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+   20 export PYTHONDONTWRITEBYTECODE=1
+   21 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+   22 date --iso-8601=seconds > "$out/started.txt"
+   23 set +e
+   24 /usr/bin/time -v -o "$out/resource_usage.log" \
+   25   timeout --signal=TERM --kill-after=30s 36h \
+   26   python -u -B scripts/step28_bge_continual_run.py execute \
+   27   --out "$out" \
+   28   --audit "$audit" \
+   29   --authorization "$authorization" > "$out/train.log" 2>&1
+   30 status=$?
+   31 printf '%s\n' "$status" > "$out/exit_status.txt"
+   32 date --iso-8601=seconds > "$out/finished.txt"
+   33 exit "$status"

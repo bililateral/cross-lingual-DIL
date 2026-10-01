@@ -1,0 +1,27 @@
+    1 {
+    2   "date": "2026-09-30",
+    3   "timezone": "Asia/Shanghai",
+    4   "status": "TWO_DESIGN_CHOICES_CONFIRMED_NOT_FULL_EXECUTION_APPROVAL",
+    5   "original_preparation_record": "decision.json",
+    6   "answers": [
+    7     {
+    8       "question_item_id": "[\"request_user_input_async\",\"call_nZ0y5ZgA2GWbMMqtqOxwkYIJ\",0]",
+    9       "question": "首轮怎样模拟“可用历史训练数据较少”？建议每域结束时按预定随机规则保留最多6个完整拟合群，总历史数据及附属状态≤1MiB；两种重放方法使用相同成员和抽取序列，淘汰后不能读回。另一种设定是由外部预先给定少量旧数据，训练方法没有保留选择权。你采用哪种？这只确认首轮供给机制，不重复询问研究前提。",
+   10       "answer": "采用预定随机保留6群（推荐）",
+   11       "scope": "首轮模型无关的预定随机保留：最多6个完整拟合群，历史样本及附属状态总计不超过1MiB；ER与LOGIT共用成员和抽取序列，淘汰后不读回。不是允许训练算法自主选择有利历史子集。"
+   12     },
+   13     {
+   14       "question_item_id": "[\"request_user_input_async\",\"call_nZ0y5ZgA2GWbMMqtqOxwkYIJ\",1]",
+   15       "question": "“新群体能力不下降”是否也保护训练结束时的最新域？原草案只约束各域刚学完时的平均表现，可能掩盖最终最新域退化。我建议保留原平均约束，再要求最终最新域的MAP、Recall@5、AP、AUC不下降，Brier和log_loss不增加，均相对同一对照检查观察值。",
+   16       "answer": "同时保护最终最新域（推荐）",
+   17       "scope": "用户确认保留原平均保护并增加最终最新域保护；相对同一预定对照，MAP、Recall@5、AP、ROC-AUC观察值不下降，阶段校准Brier、log_loss不增加。",
+   18       "operationalization_in_revised_proposal": "沿用原三顺序等权规则，新增Z=平均R(3,3)，同时完整披露各顺序R(3,3)。这一精确定义随整体合同确认；不把用户回答扩大成逐域、逐种子或总体统计非劣效保证。"
+   19     }
+   20   ],
+   21   "unchanged_boundaries": [
+   22     "先完成本地当前阶段合同、policy、代码及可做的静态审查，用户和实际网页外审批准后才同步Linux",
+   23     "本次两项回答不等于整体方案、其余比较设置、训练预算或新增监督访问已获批准",
+   24     "未连接或同步项目Linux，未运行科研脚本，未读取正式文本、标签或模型",
+   25     "原提交ZIP、原始回复和证据、原decision.json保留，不回写成已批准状态"
+   26   ]
+   27 }
