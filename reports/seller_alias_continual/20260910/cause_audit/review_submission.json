@@ -1,0 +1,65 @@
+{
+  "status": "SENT_AWAITING_ACTUAL_REVIEW",
+  "conversation_url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+  "files": [
+    {
+      "path": "docs/SELLER_ALIAS_CAUSE.zh.md",
+      "bytes": 9227,
+      "sha256": "521b2e892688147f7d854e7bf93bdba068327a289dff86b6f8c7ea3ed64c70b5"
+    },
+    {
+      "path": "scripts/step28_continual_cause_probe.py",
+      "bytes": 20317,
+      "sha256": "e081372f50d994134eef9ea940281067509c924643fd8f4d0735842e118840e3"
+    },
+    {
+      "path": "tests/test_step28_continual_cause_probe_contracts.py",
+      "bytes": 6740,
+      "sha256": "55ab8b37c98bebd0c5b8a2c12433ea62a872c76f74371fb76797736dac9e2e1a"
+    },
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+    },
+    {
+      "path": "schema/step28_continual_catalog.json",
+      "bytes": 7875,
+      "sha256": "c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_audit/evidence.json",
+      "bytes": 51928,
+      "sha256": "ae3d6f6de28e2525771c70cb0752f596f461636a8a957d0a975db66fb7dca372"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_audit/style_association.json",
+      "bytes": 8151,
+      "sha256": "4d7b5278d8cda018683d7fc9dd0970c8f72df082f49aac8b09dcc6c9b7094d89"
+    }
+  ],
+  "prompt": "用户现在明确要求查明前次普通继续训练为何没有稳定域级遗忘，并补充“如果现有结果无法确定，那就做实验来确定”。请审查本条十附件的原因证据、第一项受控干预的科学识别范围及实际实现，不要再把检测是否遗忘替代解释原因。原方案9c48ad47虽获认可但仍不能独自回答原因，现不运行它。\n\n本地已完成：逐群审计发现120个顺序×旧群观测40降80升，净+0.0238117；重复60群非120独立样本；9点分数与公开三轴一致数相关0.843—0.919。所有6120条valid原文独立精确重建；不依赖scipy平均秩复算最大差4.44e-16。没有新标签读取/权重加载/训练/Linux。新脚本6项本地测试通过0跳过；实际数据测试只解析public valid原文，未给外审该载荷，应明确不能复测它。旧真实编码/评分语义不变，本次六模型各一遍、共6份原文完整分数必须与原run逐元素相等，不增加例行smoke。\n\n本项实验为已固定六模型×三视图，验证共享模板/服务话术对应关系是否是实际模型线索。原文/全局循环改名/改名后群内固定非零循环重分配。分别检查内容保持、原文精确重建、改名保持轴相等关系、重分配保持群内账号级组合多重集合。注意服务话术含语义，称联合表达线索干预；账号商品数不同，不声称逐商品频数完全相同。第一项探针不能独自保证唯一识别训练层原因；请指出它是否有识别价值、什么结果仍不能解释原因，以及最小必须补的证据。不要要求为了出现遗忘反复改数据/加学习率/加轮数。若确实需训练侧反事实，说明可检验的预测和相对本探针增量，而非扩张无边界方案。\n\n执行与资源：用户已授权必要诊断实验，但Linux新阶段必须先汇报暂停、用户恢复后连接；尚未连接。第一项无训练，现有六权重只读，一GPU/单CPU线程，预计10—25分钟、上限45分钟、小型留存64MiB；GPU至少12GiB空闲并先确认无他人任务。Linux只读valid原文并出盲分数，Windows完整门后本诊断阶段一次valid二值CSV解析，train/test/owners/旧封存均不读。\n\n请完整阅读与核对附件字节，检查模板变换与服务位置处理、六模型对应、首域行索引、旧分数严格重放门、完整18文件与一次标签边界、22指标及配对区间、结果解释尤其地板效应与因果措辞。能实际执行的手算/玩具测试可以做，不能把缺少项目数据或GPU写成已复测。继承数据/core/evaluate/run已附；原run manifest和大模型未重附，来源是同会话上轮，不能称本次读取了缺席载荷。分类SCIENTIFIC_BLOCKER/REPRODUCIBILITY_DEFECT/OUT_OF_SCOPE_OVERDESIGN，只提影响本任务的最小必要修改。需要实质科学选择时明确提出，不能私自更换比较。不要编造外部核验文件下载结果。\n\n本次附件清单（完整SHA256）：\ndocs/SELLER_ALIAS_CAUSE.zh.md | 9227 | 521b2e892688147f7d854e7bf93bdba068327a289dff86b6f8c7ea3ed64c70b5\nscripts/step28_continual_cause_probe.py | 20317 | e081372f50d994134eef9ea940281067509c924643fd8f4d0735842e118840e3\ntests/test_step28_continual_cause_probe_contracts.py | 6740 | 55ab8b37c98bebd0c5b8a2c12433ea62a872c76f74371fb76797736dac9e2e1a\nscripts/step28_continual_population.py | 9699 | f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20\nscripts/step28_continual_population_data.py | 11587 | 49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d\nscripts/step28_continual_population_evaluate.py | 20911 | 398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a\nscripts/step28_continual_population_run.py | 21310 | f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4\nschema/step28_continual_catalog.json | 7875 | c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660\nreports/seller_alias_continual/20260910/cause_audit/evidence.json | 51928 | ae3d6f6de28e2525771c70cb0752f596f461636a8a957d0a975db66fb7dca372\nreports/seller_alias_continual/20260910/cause_audit/style_association.json | 8151 | 4d7b5278d8cda018683d7fc9dd0970c8f72df082f49aac8b09dcc6c9b7094d89",
+  "local_tests": {
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 0.731
+  },
+  "linux_used": false,
+  "new_label_parses": 0
+}

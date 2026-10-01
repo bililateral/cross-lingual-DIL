@@ -1,0 +1,421 @@
+{
+  "status": "EXPLORATORY_CHARACTER_STYLE_BASELINE_COMPLETE",
+  "claim": "Unsupervised train-only TF-IDF diagnostic on the existing Chinese style input; no new method or transfer claim.",
+  "config": {
+    "analyzer": "char",
+    "ngram_range": [
+      3,
+      5
+    ],
+    "min_df": 2,
+    "max_features": 30000,
+    "sublinear_tf": true,
+    "norm": "l2",
+    "use_idf": true,
+    "smooth_idf": true,
+    "lowercase": true
+  },
+  "config_origin": "Unchanged character 3-5 gram settings from the English V6 style positive control; no English data is read.",
+  "environment": {
+    "python": "3.10.11",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "scikit_learn": "1.7.2"
+  },
+  "script": {
+    "path": "scripts/step28_character_baseline.py",
+    "size_bytes": 12122,
+    "sha256": "504176b94cdb65843456f7839470f0849810e58ae94839f5b2f8d73579b0f939"
+  },
+  "inputs": [
+    {
+      "path": "scripts/step28_style_transfer_common.py",
+      "size_bytes": 24349,
+      "sha256": "b3cfa6de654e4cc2cab7877e666f8f8582f7d4ed5143ae4357a8359d3f33e59b"
+    },
+    {
+      "path": "scripts/step7_build_synthetic_english_source.py",
+      "size_bytes": 117513,
+      "sha256": "2b27c900a387a92f9b0e09ce8dbab00a33505763813d9e3c4c475db88fd26241"
+    },
+    {
+      "path": "scripts/step7_build_english_source_dataset.py",
+      "size_bytes": 60658,
+      "sha256": "b337277d24338e77997448320d0d7eb458eeffdffd318008e9383853c9ea2151"
+    },
+    {
+      "path": "scripts/step28_saved_model_audit.py",
+      "size_bytes": 16088,
+      "sha256": "08a8c4fc6ebfd16ea247cf0f71b2c27982be53045818aa280b727530635c24c6"
+    },
+    {
+      "path": "schema/step28_style_transfer_policy.json",
+      "size_bytes": 9841,
+      "sha256": "17d4389fe903a29cb22563510ca96b03a03655c66a66347535318c05c10b621b"
+    },
+    {
+      "path": "reports/saved_model_audit/20260906/diagnostic.json",
+      "size_bytes": 26327,
+      "sha256": "42774c28500632b21c667b839f5c5652b8523cb3a6120e2379e5cbaf357045f7"
+    },
+    {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/root_manifest.json",
+      "size_bytes": 19346,
+      "sha256": "9190ecdead719ace3bdf74f635c1c23e0a0d19482cb4a9d4d2f6fc1f31dbbbe3"
+    },
+    {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/train/observed/redacted_items.jsonl",
+      "size_bytes": 38586938,
+      "sha256": "a6adf412795da1b3c9b0db1a470e0adaca65ebf4b28bed3729e3fef94cc4c819"
+    },
+    {
+      "path": "reports/step28_synthetic_chinese_dataset/v9_4_1_formal_500x4_attempt1_20260829/development/observed/redacted_items.jsonl",
+      "size_bytes": 39178859,
+      "sha256": "c8df9cc7aa7b68203da07fda85f36bb00777d2521b1bdb86aceaaa6f9fbdc406"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    {
+      "path": "schema/step28_train_development_execution_policy.json",
+      "size_bytes": 4414,
+      "sha256": "d392d33639567d79db7ca064945e36ddd5815b3540eb614f0ed5765673baa876"
+    },
+    {
+      "path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829/development/pair_labels.csv",
+      "size_bytes": 28161035,
+      "sha256": "96ab368eede0f15a58368684eeba6037083d5b0c3cb14a06ece8d8627a4ee45a"
+    },
+    {
+      "path": "schema/step28_model_experiment_policy.json",
+      "size_bytes": 26380,
+      "sha256": "a473624feec04efd024a4334815fa854b6ec4023b88bf21c709a6c5dccf61a9e"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/identity33.npy",
+      "size_bytes": 49896128,
+      "sha256": "eb00f256a7a9cdece055df1693ccbf8f7f5ede2a231ac36fb316cb1c69040fd0"
+    }
+  ],
+  "fit": {
+    "train_accounts": 14000,
+    "development_accounts": 14000,
+    "vocabulary_size": 2298,
+    "vocabulary_sha256": "f826bab27c19cb16d84283f20e24031a017b23126bfb79e4b91834b91e0866a1",
+    "idf_sha256": "82b12b0dace5edfb63164297803d4a9de69c5098369fbd2ce76651654f68fef8",
+    "train_streams_sha256": "3c13cf2aa6db2e9c07572208cf1122a5619f745023e5b55b1f789a659bb8265d",
+    "development_streams_sha256": "9ee4a0c823aca1ea8f639bb82e1530d4f0e7a24c8efd97aeff3a856c0e962b90",
+    "development_zero_vectors": 0,
+    "development_nnz": 3925860
+  },
+  "character_cosine": {
+    "all": {
+      "rows": 189000,
+      "positives": 10000,
+      "negatives": 179000,
+      "prevalence": 0.05291005291005291,
+      "pooled": {
+        "ap": 0.08535223134301899,
+        "trapezoidal_pr_auc": 0.08527878380612187,
+        "roc_auc": 0.6276662156424582
+      },
+      "world_equal_both_classes_only": {
+        "ap": 0.11190250537536699,
+        "trapezoidal_pr_auc": 0.10093324558330563,
+        "roc_auc": 0.6273055865921787
+      },
+      "eligible_worlds": 500,
+      "total_worlds": 500
+    },
+    "no_strong": {
+      "rows": 181000,
+      "positives": 2000,
+      "negatives": 179000,
+      "prevalence": 0.011049723756906077,
+      "pooled": {
+        "ap": 0.018443582874179375,
+        "trapezoidal_pr_auc": 0.018385591736705797,
+        "roc_auc": 0.6312071648044693
+      },
+      "world_equal_both_classes_only": {
+        "ap": 0.045744996319206,
+        "trapezoidal_pr_auc": 0.03299941141904574,
+        "roc_auc": 0.6313296089385476
+      },
+      "eligible_worlds": 500,
+      "total_worlds": 500
+    },
+    "zero_identity": {
+      "rows": 163001,
+      "positives": 1889,
+      "negatives": 161112,
+      "prevalence": 0.01158888595775486,
+      "pooled": {
+        "ap": 0.019491075961988444,
+        "trapezoidal_pr_auc": 0.019426774836024015,
+        "roc_auc": 0.6328210243729321
+      },
+      "world_equal_both_classes_only": {
+        "ap": 0.050158628644614026,
+        "trapezoidal_pr_auc": 0.03615953131948217,
+        "roc_auc": 0.6326722726072129
+      },
+      "eligible_worlds": 500,
+      "total_worlds": 500
+    }
+  },
+  "saved_comparators": {
+    "m0": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.0660455320609585,
+          "trapezoidal_pr_auc": 0.06599986744755863,
+          "roc_auc": 0.5590719058659217
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.08468672121100797,
+          "trapezoidal_pr_auc": 0.07551446866147771,
+          "roc_auc": 0.5589389664804468
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.014102923226206874,
+          "trapezoidal_pr_auc": 0.014066530788672545,
+          "roc_auc": 0.5567583645251396
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.03671603581537977,
+          "trapezoidal_pr_auc": 0.026236837640275925,
+          "roc_auc": 0.556157122905028
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01548423545582635,
+          "trapezoidal_pr_auc": 0.015439577062163333,
+          "roc_auc": 0.560919426949351
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.044111685163441765,
+          "trapezoidal_pr_auc": 0.03180452421608767,
+          "roc_auc": 0.5599679917446351
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      }
+    },
+    "m2": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.7517131108996691,
+          "trapezoidal_pr_auc": 0.7517381827394478,
+          "roc_auc": 0.9081370008379889
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.7586084775454703,
+          "trapezoidal_pr_auc": 0.7561530222067486,
+          "roc_auc": 0.9079831005586592
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.015161178434355205,
+          "trapezoidal_pr_auc": 0.015118720823569085,
+          "roc_auc": 0.571899467877095
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.042375040339301784,
+          "trapezoidal_pr_auc": 0.030735571566145214,
+          "roc_auc": 0.5709420391061453
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01548423545582635,
+          "trapezoidal_pr_auc": 0.015439577062163333,
+          "roc_auc": 0.560919426949351
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.044111685163441765,
+          "trapezoidal_pr_auc": 0.03180452421608767,
+          "roc_auc": 0.5599679917446351
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      }
+    },
+    "m3_base": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.07975869812294774,
+          "trapezoidal_pr_auc": 0.0797170592764112,
+          "roc_auc": 0.6071978296089385
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.1057377351410333,
+          "trapezoidal_pr_auc": 0.09500812544914967,
+          "roc_auc": 0.6072442737430167
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.01705352602280329,
+          "trapezoidal_pr_auc": 0.017010449226652145,
+          "roc_auc": 0.6119612332402234
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04533560888636036,
+          "trapezoidal_pr_auc": 0.033134114504180794,
+          "roc_auc": 0.6124972067039106
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.017681162924714725,
+          "trapezoidal_pr_auc": 0.01763436884567721,
+          "roc_auc": 0.6093919559222221
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04895994592271642,
+          "trapezoidal_pr_auc": 0.03620919335945739,
+          "roc_auc": 0.6088518148125461
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      }
+    },
+    "m3_joint": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.8426388001813032,
+          "trapezoidal_pr_auc": 0.8426665394396714,
+          "roc_auc": 0.9231423583798883
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.8439444873874589,
+          "trapezoidal_pr_auc": 0.8432666292498908,
+          "roc_auc": 0.9231601955307263
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.01788345532538194,
+          "trapezoidal_pr_auc": 0.01779657712746083,
+          "roc_auc": 0.6157117918994413
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04873762092996171,
+          "trapezoidal_pr_auc": 0.03621064025912341,
+          "roc_auc": 0.6158009776536313
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01815583822482089,
+          "trapezoidal_pr_auc": 0.01806428561144049,
+          "roc_auc": 0.6042640049879909
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.05094535454581066,
+          "trapezoidal_pr_auc": 0.03774500102524186,
+          "roc_auc": 0.6037449948237427
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      }
+    }
+  },
+  "truth_reads": {
+    "development_labels": 1,
+    "train_labels": 0,
+    "qrels": 0,
+    "audit_a": 0,
+    "audit_b": 0
+  },
+  "limitations": [
+    "Post hoc reused-development diagnosis; no confidence intervals, significance, confirmatory or real-Chinese effectiveness claim.",
+    "Only the existing lexical-free style stream is used. No claim that it exhausts public text information or identifies human authors.",
+    "TF-IDF sees all 500 training worlds without labels; this is not a paired low-label-budget training comparison.",
+    "Default character analysis lowercases placeholders and collapses repeated whitespace; no improvement to the input representation is asserted.",
+    "Saved M3 comparators use different richer feature representations; differences do not identify a causal contribution.",
+    "Complete old negative transfer results remain closed; no threshold selection, neural optimization or Linux use.",
+    "Vocabulary/IDF are deterministically reconstructible from pinned train inputs, code and environment; only scores and small receipt are retained."
+  ],
+  "score_file": {
+    "path": "reports/seller_alias_character_baseline/20260906/scores.npy",
+    "size_bytes": 1512128,
+    "sha256": "53785d0a56c30f4ef90683c2b91f5ee840bf16d819c36aefdc22ce2494954c64"
+  }
+}

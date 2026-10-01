@@ -1,0 +1,16 @@
+{
+  "status": "FAILED_BEFORE_MODEL_LOADING_NO_SCIENTIFIC_RESULT",
+  "run_id": "20260910_110624",
+  "exit_status": 1,
+  "python_wall_seconds": 1.52,
+  "root_cause": "Transfer selection omitted both catalog paths newly required by inputs(): the immutable data/sources/step28_continual_catalog.json snapshot and schema/step28_continual_catalog.json. The initial run failed at the snapshot; subsequent public-only preflight exposed the second missing path.",
+  "stage": "inputs() before output run directory creation and before core.load_model()",
+  "model_loads": 0,
+  "optimizer_updates": 0,
+  "label_parses": 0,
+  "score_files": 0,
+  "claim_boundary": "Operational missing dependency; no conclusion about model behavior or dataset validity.",
+  "code_sha256": "54fe6b42f350fd0e8560b32323ded793867aae0ef950c40fa281e840c0c2f0c5",
+  "remedy": "Copy both identical original 7875-byte catalogs with SHA-256 c4cd7a593e16b479a689822974ef82a0a08f3b6c4bf73b19aa23ef3c9e734660; verify all public inputs before restarting unchanged code in separate run 20260910_111105.",
+  "retention": "Keep original failure logs and transfer records. Never merge these files into a completed run or count this attempt as model evidence."
+}

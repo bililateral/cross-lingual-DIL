@@ -1,0 +1,789 @@
+{
+  "status": "EXPLORATORY_SAVED_DEVELOPMENT_MODEL_AUDIT_COMPLETE",
+  "environment": {
+    "python": "3.10.11",
+    "numpy": "2.2.6",
+    "lightgbm": "4.6.0",
+    "scikit_learn": "1.7.2"
+  },
+  "script": {
+    "path": "scripts/step28_saved_model_audit.py",
+    "size_bytes": 16088,
+    "sha256": "08a8c4fc6ebfd16ea247cf0f71b2c27982be53045818aa280b727530635c24c6"
+  },
+  "inputs": [
+    {
+      "path": "schema/step28_train_development_execution_policy.json",
+      "size_bytes": 4414,
+      "sha256": "d392d33639567d79db7ca064945e36ddd5815b3540eb614f0ed5765673baa876"
+    },
+    {
+      "path": "schema/step28_model_experiment_policy.json",
+      "size_bytes": 26380,
+      "sha256": "a473624feec04efd024a4334815fa854b6ec4023b88bf21c709a6c5dccf61a9e"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/manifest.json",
+      "size_bytes": 9441,
+      "sha256": "d86266e8abd405494ef409d32d2a5528e95c9cedd348594d063daf6306b033bc"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/manifest.json",
+      "size_bytes": 2907,
+      "sha256": "4b0229e58bbec0b6c29b73fea93d18230910e713c1ab232f114dc62c77cb1c72"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/public_projection_manifest.json",
+      "size_bytes": 2594,
+      "sha256": "eee19a09978e40a9016e1d9722579fae04feff90ffa7b5a19b08481e7a2bc4f2"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/base_projection_manifest.json",
+      "size_bytes": 2467,
+      "sha256": "e103493ae2d13b41eb7fd654336c023e5026f435cb51ebd60be8352bc34aa49a"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/identity_projection_manifest.json",
+      "size_bytes": 6552,
+      "sha256": "8e7419569d9840b0ecf9a1ca9d313b365a39749f069aa5f09e169f099402983a"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/train/split_manifest.json",
+      "size_bytes": 2070,
+      "sha256": "e53b61054355cf80bb1410a2da4af4a2c24fba47098d230ea117bfe03d6c4e0f"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/train/row_keys.csv",
+      "size_bytes": 43617502,
+      "sha256": "ced16cac64e6b3ee10387a824080aec30b785abd083bcad6a1683a500001acdc"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/train/row_keys.csv",
+      "size_bytes": 43617502,
+      "sha256": "ced16cac64e6b3ee10387a824080aec30b785abd083bcad6a1683a500001acdc"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/train/base24.npy",
+      "size_bytes": 36288128,
+      "sha256": "74c5f28ab835256ca87f31b1e2f60137f5ed616ce82a49c4ae8ddf2a52f9b306"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/train/identity33.npy",
+      "size_bytes": 49896128,
+      "sha256": "77e6b75b1d475258b0e6815d4ccf42ff01c97e2140039e20c1215b989a105052"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/split_manifest.json",
+      "size_bytes": 2100,
+      "sha256": "4c3d7367514b4b4c31f790c746806b335521d5015a6d244792383095bffe505b"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/row_keys.csv",
+      "size_bytes": 50421502,
+      "sha256": "0ac1d4baa205132f65ce2f8b16c37e889c195cd052305632d7a2043195817573"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/base_v1/development/base24.npy",
+      "size_bytes": 36288128,
+      "sha256": "ebe23d2cc22ca4a62ab0a239e762c40d80f93ceb0600d71d62b832baaf982458"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_public_projection_v1_20260831/identity_v1/development/identity33.npy",
+      "size_bytes": 49896128,
+      "sha256": "eb00f256a7a9cdece055df1693ccbf8f7f5ede2a231ac36fb316cb1c69040fd0"
+    },
+    {
+      "path": "private_custody/step28_v13_v1_13_v9_4_1_formal_500x4_attempt1_20260829/development/pair_labels.csv",
+      "size_bytes": 28161035,
+      "sha256": "96ab368eede0f15a58368684eeba6037083d5b0c3cb14a06ece8d8627a4ee45a"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/training_summary.json",
+      "size_bytes": 2721,
+      "sha256": "4198849223023a11b9b2eac59fdd22163eb0e99cac71e66031fc51f6d9077b0f"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/development_thresholds.json",
+      "size_bytes": 338,
+      "sha256": "a03befe8aad9aba6c4f4a158d096cffc4334976c9312e586d3dce03ef5d78975"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/development_evaluation.json",
+      "size_bytes": 105060,
+      "sha256": "3236ee51d98b4d664832c73afdee8bf63d2769c1296698ef34e7927966e02ae6"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/predictions/development/m0.npy",
+      "size_bytes": 1512128,
+      "sha256": "f34e610826ae9c9666e17422b5d0c27f4b37c487afa2e9b1e79de7ed669460c4"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/predictions/development/m2.npy",
+      "size_bytes": 1512128,
+      "sha256": "25ba032ecd19ed6525b01d57269b79da22ecfe121598c8bb6f60a55023dd6a2d"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/predictions/development/m3_base.npy",
+      "size_bytes": 1512128,
+      "sha256": "e97cf7a2dcf1a50159d5c7ae5a97b02667ddaa03cc66e19c82f241f246be9af5"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/models/m3_base/medians.npy",
+      "size_bytes": 320,
+      "sha256": "62f249a641b7fc8ef4717c46c79994df4c5bc5a268eeca08e0f54c33ac0b17b0"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/models/m3_base/model.txt",
+      "size_bytes": 188722,
+      "sha256": "48bceaebc0b8e453d2bcd2aa1db77376d90791e27505746eba5e7815e4e6f512"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/predictions/development/m3_joint.npy",
+      "size_bytes": 1512128,
+      "sha256": "c1825498a4afb256346e43ef91d56f4e40b84092c9753145167dc20abdf3a6a7"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/models/m3_joint/medians.npy",
+      "size_bytes": 584,
+      "sha256": "f303b0e8e1d0be6ffece302c86636aa745b8a3d5348f8ee8e773af56c577f07c"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_train_development_v2_20260901/models/m3_joint/model.txt",
+      "size_bytes": 191871,
+      "sha256": "af0d02c1f555ebf8019c51f71d1e09f32be3328a2e529d23416ae95b3d4c38a5"
+    },
+    {
+      "path": "reports/step28_model_experiment/v9_4_1_transfer_claim_controls_v4_20260901/predictions/i0_identity_only.npy",
+      "size_bytes": 1512128,
+      "sha256": "c26b65d5a6ac2a5f795493be85e1612ae5dc65d9dd02a6c50589f82f7c4eb2eb"
+    }
+  ],
+  "models": {
+    "m0": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.0660455320609585,
+          "trapezoidal_pr_auc": 0.06599986744755863,
+          "roc_auc": 0.5590719058659217
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.08468672121100797,
+          "trapezoidal_pr_auc": 0.07551446866147771,
+          "roc_auc": 0.5589389664804468
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "strong": {
+        "rows": 8000,
+        "positives": 8000,
+        "negatives": 0,
+        "prevalence": 1.0,
+        "pooled": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "world_equal_both_classes_only": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "eligible_worlds": 0,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.014102923226206874,
+          "trapezoidal_pr_auc": 0.014066530788672545,
+          "roc_auc": 0.5567583645251396
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.03671603581537977,
+          "trapezoidal_pr_auc": 0.026236837640275925,
+          "roc_auc": 0.556157122905028
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01548423545582635,
+          "trapezoidal_pr_auc": 0.015439577062163333,
+          "roc_auc": 0.560919426949351
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.044111685163441765,
+          "trapezoidal_pr_auc": 0.03180452421608767,
+          "roc_auc": 0.5599679917446351
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "active_without_strong": {
+        "rows": 17999,
+        "positives": 111,
+        "negatives": 17888,
+        "prevalence": 0.0061670092782932385,
+        "pooled": {
+          "ap": 0.00673238067303689,
+          "trapezoidal_pr_auc": 0.006392194567533345,
+          "roc_auc": 0.5123408012216152
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.10966697844202733,
+          "trapezoidal_pr_auc": 0.060988378309333534,
+          "roc_auc": 0.5237927726000954
+        },
+        "eligible_worlds": 87,
+        "total_worlds": 500
+      }
+    },
+    "m2": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.7517131108996691,
+          "trapezoidal_pr_auc": 0.7517381827394478,
+          "roc_auc": 0.9081370008379889
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.7586084775454703,
+          "trapezoidal_pr_auc": 0.7561530222067486,
+          "roc_auc": 0.9079831005586592
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "strong": {
+        "rows": 8000,
+        "positives": 8000,
+        "negatives": 0,
+        "prevalence": 1.0,
+        "pooled": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "world_equal_both_classes_only": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "eligible_worlds": 0,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.015161178434355205,
+          "trapezoidal_pr_auc": 0.015118720823569085,
+          "roc_auc": 0.571899467877095
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.042375040339301784,
+          "trapezoidal_pr_auc": 0.030735571566145214,
+          "roc_auc": 0.5709420391061453
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01548423545582635,
+          "trapezoidal_pr_auc": 0.015439577062163333,
+          "roc_auc": 0.560919426949351
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.044111685163441765,
+          "trapezoidal_pr_auc": 0.03180452421608767,
+          "roc_auc": 0.5599679917446351
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "active_without_strong": {
+        "rows": 17999,
+        "positives": 111,
+        "negatives": 17888,
+        "prevalence": 0.0061670092782932385,
+        "pooled": {
+          "ap": 0.011755041195569341,
+          "trapezoidal_pr_auc": 0.009362809075176424,
+          "roc_auc": 0.5629958278940836
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.13693619403185164,
+          "trapezoidal_pr_auc": 0.08660635148307522,
+          "roc_auc": 0.5620883246321875
+        },
+        "eligible_worlds": 87,
+        "total_worlds": 500
+      }
+    },
+    "m3_base": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.07975869812294774,
+          "trapezoidal_pr_auc": 0.0797170592764112,
+          "roc_auc": 0.6071978296089385
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.1057377351410333,
+          "trapezoidal_pr_auc": 0.09500812544914967,
+          "roc_auc": 0.6072442737430167
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "strong": {
+        "rows": 8000,
+        "positives": 8000,
+        "negatives": 0,
+        "prevalence": 1.0,
+        "pooled": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "world_equal_both_classes_only": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "eligible_worlds": 0,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.01705352602280329,
+          "trapezoidal_pr_auc": 0.017010449226652145,
+          "roc_auc": 0.6119612332402234
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04533560888636036,
+          "trapezoidal_pr_auc": 0.033134114504180794,
+          "roc_auc": 0.6124972067039106
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.017681162924714725,
+          "trapezoidal_pr_auc": 0.01763436884567721,
+          "roc_auc": 0.6093919559222221
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04895994592271642,
+          "trapezoidal_pr_auc": 0.03620919335945739,
+          "roc_auc": 0.6088518148125461
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "active_without_strong": {
+        "rows": 17999,
+        "positives": 111,
+        "negatives": 17888,
+        "prevalence": 0.0061670092782932385,
+        "pooled": {
+          "ap": 0.011859636580677079,
+          "trapezoidal_pr_auc": 0.011274539642143854,
+          "roc_auc": 0.638591576818321
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.2356802590720404,
+          "trapezoidal_pr_auc": 0.16769870104660584,
+          "roc_auc": 0.645887806694527
+        },
+        "eligible_worlds": 87,
+        "total_worlds": 500
+      }
+    },
+    "m3_joint": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.8426388001813032,
+          "trapezoidal_pr_auc": 0.8426665394396714,
+          "roc_auc": 0.9231423583798883
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.8439444873874589,
+          "trapezoidal_pr_auc": 0.8432666292498908,
+          "roc_auc": 0.9231601955307263
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "strong": {
+        "rows": 8000,
+        "positives": 8000,
+        "negatives": 0,
+        "prevalence": 1.0,
+        "pooled": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "world_equal_both_classes_only": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "eligible_worlds": 0,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.01788345532538194,
+          "trapezoidal_pr_auc": 0.01779657712746083,
+          "roc_auc": 0.6157117918994413
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.04873762092996171,
+          "trapezoidal_pr_auc": 0.03621064025912341,
+          "roc_auc": 0.6158009776536313
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01815583822482089,
+          "trapezoidal_pr_auc": 0.01806428561144049,
+          "roc_auc": 0.6042640049879909
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.05094535454581066,
+          "trapezoidal_pr_auc": 0.03774500102524186,
+          "roc_auc": 0.6037449948237427
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "active_without_strong": {
+        "rows": 17999,
+        "positives": 111,
+        "negatives": 17888,
+        "prevalence": 0.0061670092782932385,
+        "pooled": {
+          "ap": 0.011594121768801284,
+          "trapezoidal_pr_auc": 0.011213564722303896,
+          "roc_auc": 0.6373999782430015
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.2334613393911806,
+          "trapezoidal_pr_auc": 0.16635838624970894,
+          "roc_auc": 0.6502535750819697
+        },
+        "eligible_worlds": 87,
+        "total_worlds": 500
+      }
+    },
+    "i0_identity_only": {
+      "all": {
+        "rows": 189000,
+        "positives": 10000,
+        "negatives": 179000,
+        "prevalence": 0.05291005291005291,
+        "pooled": {
+          "ap": 0.8115316001734469,
+          "trapezoidal_pr_auc": 0.9005323620813501,
+          "roc_auc": 0.9045582223463686
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.8115675390515393,
+          "trapezoidal_pr_auc": 0.9005331786686004,
+          "roc_auc": 0.9045470670391061
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "strong": {
+        "rows": 8000,
+        "positives": 8000,
+        "negatives": 0,
+        "prevalence": 1.0,
+        "pooled": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "world_equal_both_classes_only": {
+          "ap": null,
+          "trapezoidal_pr_auc": null,
+          "roc_auc": null
+        },
+        "eligible_worlds": 0,
+        "total_worlds": 500
+      },
+      "no_strong": {
+        "rows": 181000,
+        "positives": 2000,
+        "negatives": 179000,
+        "prevalence": 0.011049723756906077,
+        "pooled": {
+          "ap": 0.011573526690603285,
+          "trapezoidal_pr_auc": 0.4783575077524032,
+          "roc_auc": 0.5227911117318436
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.011761315427790665,
+          "trapezoidal_pr_auc": 0.47835984093951645,
+          "roc_auc": 0.5227353351955307
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "zero_identity": {
+        "rows": 163001,
+        "positives": 1889,
+        "negatives": 161112,
+        "prevalence": 0.01158888595775486,
+        "pooled": {
+          "ap": 0.01158888595775486,
+          "trapezoidal_pr_auc": 0.5057944429788774,
+          "roc_auc": 0.5
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.011592056676289776,
+          "trapezoidal_pr_auc": 0.5057960283381449,
+          "roc_auc": 0.5
+        },
+        "eligible_worlds": 500,
+        "total_worlds": 500
+      },
+      "active_without_strong": {
+        "rows": 17999,
+        "positives": 111,
+        "negatives": 17888,
+        "prevalence": 0.0061670092782932385,
+        "pooled": {
+          "ap": 0.00849505614772853,
+          "trapezoidal_pr_auc": 0.00896626537005121,
+          "roc_auc": 0.6036066254089509
+        },
+        "world_equal_both_classes_only": {
+          "ap": 0.07967922794001354,
+          "trapezoidal_pr_auc": 0.18782811971713323,
+          "roc_auc": 0.5850034984924639
+        },
+        "eligible_worlds": 87,
+        "total_worlds": 500
+      }
+    }
+  },
+  "m3_replay": {
+    "m3_base": {
+      "prediction_max_abs_error": 0.0,
+      "prediction_value_sha256": "0a328e93813ee11ac099872795a0f755b6dac870d2c2acd68659c8447ee270a8",
+      "training_only_medians_match": true,
+      "five_reordered_rows_match": true,
+      "feature_count": 24,
+      "trees": 200,
+      "training_gain_by_block": {
+        "base24": 34283.56014037132,
+        "identity33": 0.0
+      },
+      "top_training_gain_features": [
+        {
+          "feature": "raw_labse_description_symmetric_top3_cosine",
+          "gain": 15491.6204931736
+        },
+        {
+          "feature": "raw_labse_description_centroid_cosine",
+          "gain": 9251.541384458542
+        },
+        {
+          "feature": "clean_shared_title_bool",
+          "gain": 1705.804312467575
+        },
+        {
+          "feature": "punct_ratio_mean_train_percentile_gap_abs",
+          "gain": 1704.069554567337
+        },
+        {
+          "feature": "digit_ratio_mean_train_percentile_gap_abs",
+          "gain": 1388.2101118564606
+        },
+        {
+          "feature": "description_length_median_train_percentile_gap_abs",
+          "gain": 1161.9501113891602
+        },
+        {
+          "feature": "raw_labse_title_centroid_cosine",
+          "gain": 758.7815005779266
+        },
+        {
+          "feature": "raw_labse_title_symmetric_top3_cosine",
+          "gain": 556.0257501602173
+        },
+        {
+          "feature": "clean_category_jaccard",
+          "gain": 419.3023111820221
+        },
+        {
+          "feature": "raw_labse_field_equal_centroid_cosine",
+          "gain": 339.8626389503479
+        },
+        {
+          "feature": "item_count_train_percentile_gap_abs",
+          "gain": 322.7555718421936
+        },
+        {
+          "feature": "title_length_median_train_percentile_gap_abs",
+          "gain": 320.8362069129944
+        }
+      ],
+      "frozen_threshold": 0.06934235129465603,
+      "predicted_positive_equals_strong_rule": false,
+      "strong_min_probability": 0.02435331353911637,
+      "no_strong_max_probability": 0.206146957390573,
+      "no_strong_at_frozen_threshold": {
+        "tp": 606,
+        "fp": 31546,
+        "fn": 1394,
+        "tn": 147454
+      }
+    },
+    "m3_joint": {
+      "prediction_max_abs_error": 0.0,
+      "prediction_value_sha256": "ddde341c09a7d700168d661e555336a7a7ed9fbcae2aac6efe41c8a486d8b965",
+      "training_only_medians_match": true,
+      "five_reordered_rows_match": true,
+      "feature_count": 57,
+      "trees": 200,
+      "training_gain_by_block": {
+        "base24": 8543.580837488174,
+        "identity33": 952776.2324779034
+      },
+      "top_training_gain_features": [
+        {
+          "feature": "verified_direct_token_count_log1p",
+          "gain": 745862.7427663803
+        },
+        {
+          "feature": "strong_rotation_path_count_log1p",
+          "gain": 205867.25543403625
+        },
+        {
+          "feature": "raw_labse_description_symmetric_top3_cosine",
+          "gain": 4082.458592414856
+        },
+        {
+          "feature": "raw_labse_description_centroid_cosine",
+          "gain": 1627.306316614151
+        },
+        {
+          "feature": "punct_ratio_mean_train_percentile_gap_abs",
+          "gain": 641.0723416805267
+        },
+        {
+          "feature": "weak_path_count_log1p",
+          "gain": 568.8290395736694
+        },
+        {
+          "feature": "description_length_median_train_percentile_gap_abs",
+          "gain": 391.4083979129791
+        },
+        {
+          "feature": "shared_identifier_type_count_log1p",
+          "gain": 376.97019720077515
+        },
+        {
+          "feature": "digit_ratio_mean_train_percentile_gap_abs",
+          "gain": 269.2570912837982
+        },
+        {
+          "feature": "clean_shared_category_count_capped",
+          "gain": 264.06633019447327
+        },
+        {
+          "feature": "raw_labse_title_centroid_cosine",
+          "gain": 217.578369140625
+        },
+        {
+          "feature": "raw_labse_title_symmetric_top3_cosine",
+          "gain": 203.3427700996399
+        }
+      ],
+      "frozen_threshold": 0.9971615097143042,
+      "predicted_positive_equals_strong_rule": true,
+      "strong_min_probability": 0.9971615097143042,
+      "no_strong_max_probability": 0.048872935770468556,
+      "no_strong_at_frozen_threshold": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2000,
+        "tn": 179000
+      }
+    }
+  },
+  "truth_reads": {
+    "development_labels": 1,
+    "train_labels": 0,
+    "qrels": 0,
+    "audit_a": 0,
+    "audit_b": 0
+  },
+  "limitations": [
+    "Post hoc development diagnosis, not new confirmatory performance or real Chinese darknet validation.",
+    "Conditional subsets change class prevalence; their AP is not directly comparable to full-set AP.",
+    "One-class worlds are excluded from subset curve means, with eligible counts reported; no confidence intervals or significance claims.",
+    "The saved matrix-to-model path is replayed. Raw text generation/extraction and original fitting are not re-executed or newly certified.",
+    "No fitting, new threshold, frozen-result overwrite, Linux access, audit predictions or audit truth read.",
+    "Tree training gain is descriptive, not causal importance or proof of generalization."
+  ]
+}

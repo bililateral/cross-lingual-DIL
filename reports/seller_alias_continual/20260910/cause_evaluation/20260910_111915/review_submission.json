@@ -1,0 +1,57 @@
+{
+  "status": "SENT_AWAITING_ACTUAL_REVIEW",
+  "conversation_url": "https://chatgpt.com/c/6aa0ee35-1060-83ed-82e5-4a9122734e96",
+  "files": [
+    {
+      "path": "docs/SELLER_ALIAS_CAUSE_RESULT.zh.md",
+      "bytes": 9471,
+      "sha256": "2f009b7ae0ac9675b94ae7dcdb885cb4c5ecdfdc3460666390e14b408c840052"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/analysis.json",
+      "bytes": 72009,
+      "sha256": "30484215b2cc6bbfbacce78350ba9134d1ae933d490dea657ff6f4bdb84777ad"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/evaluation/evaluation.json",
+      "bytes": 167472,
+      "sha256": "b326995cb36f4f295f69a88491392d52fe4c21bb68859c02725da258b400b69b"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_execution/20260910_111105/run/manifest.json",
+      "bytes": 22505,
+      "sha256": "846988c637e91278529f14849c84795e2f7bb82e2f25a9f06724a751c7daa096"
+    },
+    {
+      "path": "scripts/step28_continual_cause_probe.py",
+      "bytes": 22733,
+      "sha256": "54fe6b42f350fd0e8560b32323ded793867aae0ef950c40fa281e840c0c2f0c5"
+    },
+    {
+      "path": "tests/test_step28_continual_cause_probe_contracts.py",
+      "bytes": 8339,
+      "sha256": "0a24220430da706ec38c6642965f1b1d094496d330c246920398d0dd06c30878"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_CAUSE.zh.md",
+      "bytes": 12690,
+      "sha256": "2102e1c0b20270054c262bcbb71b108033659f00b6f13034f43b345c6388c940"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_execution/20260910_111105/return_verification.json",
+      "bytes": 239,
+      "sha256": "ac236ec2d398d7cbe6d017a827694fb1bd0f3085157506fdbe2a4a329341c903"
+    },
+    {
+      "path": "reports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/execution.json",
+      "bytes": 564,
+      "sha256": "c4a0ff1d53e5d02a554cb57cabdb85ce09827886a98f537be8c426807a1cbaf6"
+    }
+  ],
+  "prompt": "请以 GPT 6 Pro 审查刚完成的固定模型表达干预结果，承接上一条实际回复 eeda7674-36d8-4a7b-aab5-d258779cbfd3。不是旧1620更新方案，也不是要求再次判断有没有遗忘。用户要解释此前无稳定域级遗忘的原因；当前只做六既有模型×三输入视图探针，未追加训练。\n\n请全文读取本条9份附件并核对实际字节/完整SHA-256；先说明真实读取与未获得的载荷范围。文件如下：\ndocs/SELLER_ALIAS_CAUSE_RESULT.zh.md | 9471 bytes | 2f009b7ae0ac9675b94ae7dcdb885cb4c5ecdfdc3460666390e14b408c840052\nreports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/analysis.json | 72009 bytes | 30484215b2cc6bbfbacce78350ba9134d1ae933d490dea657ff6f4bdb84777ad\nreports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/evaluation/evaluation.json | 167472 bytes | b326995cb36f4f295f69a88491392d52fe4c21bb68859c02725da258b400b69b\nreports/seller_alias_continual/20260910/cause_execution/20260910_111105/run/manifest.json | 22505 bytes | 846988c637e91278529f14849c84795e2f7bb82e2f25a9f06724a751c7daa096\nscripts/step28_continual_cause_probe.py | 22733 bytes | 54fe6b42f350fd0e8560b32323ded793867aae0ef950c40fa281e840c0c2f0c5\ntests/test_step28_continual_cause_probe_contracts.py | 8339 bytes | 0a24220430da706ec38c6642965f1b1d094496d330c246920398d0dd06c30878\ndocs/SELLER_ALIAS_CAUSE.zh.md | 12690 bytes | 2102e1c0b20270054c262bcbb71b108033659f00b6f13034f43b345c6388c940\nreports/seller_alias_continual/20260910/cause_execution/20260910_111105/return_verification.json | 239 bytes | ac236ec2d398d7cbe6d017a827694fb1bd0f3085157506fdbe2a4a329341c903\nreports/seller_alias_continual/20260910/cause_evaluation/20260910_111915/execution.json | 564 bytes | c4a0ff1d53e5d02a554cb57cabdb85ce09827886a98f537be8c426807a1cbaf6\n\n最新结果以 SELLER_ALIAS_CAUSE_RESULT.zh.md、evaluation.json、analysis.json 和本次 manifest.json 为准；原因方案开头“尚未连接/等待恢复”是本阶段运行前快照，后续例行更新，不把旧状态当成本次未运行。上次建议增加的2x8标签条件计数已在唯一一次合法valid解析内实现，实际计数见evaluation.json.manipulation；当前代码/测试新字节随附。不声称此前回复已看过这些新字节。旧四个核心模块未变，可复用本会话已审范围；此次不提供权重、原始标签/owners/test、完整原始分数或逐群NPY，请不要冒称已重验模型/读取它们。\n\n实际：Linux6模型、18分数，全部原文与旧分数逐元素相等，0训练0标签；Windows完整门后valid解析一次，2.171秒；独立保存结果核对8858个数最大差0。评分主体367.355940646秒，Python总墙钟370.14秒。首次漏同步词表导致加载模型前失败已单独存档，补齐后源码不变、新目录成功。\n\n请重点审查：\n1. 从evaluation.json各域均值、混淆计数、8模式表独立核对报告的首域三顺序等权绝对表现、变化、操纵有效性；可独立算你获得原始数支持的项目，不把本地8858项当成外审实测。\n2. 改名AP约.3188/.3498，重分配约.0691/.0771；原文首域AP增益.03280748，改名.03094235，重分配.00798214；DID -.02296021。能否支持固定模型依赖该联合表达对应关系？限制是否充分：改名区间过零不等于等效证明、低值/地板效应、服务语义/商品配合、单置换/已见valid/条件区间、不当中介比例、残留阶段改善。\n3. 正负轴一致率差由约.358/.374/.400变为.005/-.012/.003；模式分布TV .5484降.03293。核对实际操纵关联削弱是否成立、是否有反例使现有表述无效。\n4. 报告明确未完全确定训练原因，不恢复防遗忘方法。下一步仅拟从配对首阶段完整模型及非空Adam，对后两个域训练信息通路进行保留/重分配反事实；具体新合同和资源未执行。请明确当前已确定什么、未确定什么、这一后续是否针对剩余因果缺口，而不是只寻找遗忘。不要要求更大数据/换种子/调学习率直到发生遗忘。\n5. 按 SCIENTIFIC_BLOCKER / REPRODUCIBILITY_DEFECT / OUT_OF_SCOPE_OVERDESIGN 分类，仅提出影响当前有效性的具体最小修复；日常文档状态整理、清理副本不需重开外审。清理仅旧文本模型Linux重复副本，Windows已归档，当前群体模型未动。\n请给出明确处置与可报告结论，不执行训练，不索要封存真值，不扩展到全新主线。",
+  "ui_model": "6 Pro",
+  "user_message_id": "7b56ab41-1f6d-4702-b7ed-8ea72a3bc89a",
+  "sent_utc": "2026-09-10T03:23:10+00:00",
+  "last_rendered_old_assistant_id_while_new_reply_thinking": "a43b704e-88c6-4788-ae78-ac64c69480ce",
+  "old_rendered_reply_not_accepted_as_current_result_review": true
+}
