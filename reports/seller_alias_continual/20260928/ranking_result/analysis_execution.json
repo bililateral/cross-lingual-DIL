@@ -1,0 +1,41 @@
+{
+  "status": "PASS_LINUX_SAVED_RESULT_AUDIT_AND_RETURN",
+  "verified_at": "2026-09-28T10:05:48.7168960+08:00",
+  "environment": "Existing Linux py310; CPU affinity 0; OMP/OPENBLAS/MKL threads 1; no GPU",
+  "command": "taskset -c 0 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /usr/bin/time -v -o reports/seller_alias_continual/20260928/ranking_result/analysis_resource.log timeout 300s /home/yongpeng/miniconda3/envs/py310/bin/python -B scripts/step28_alias_ranking_result.py --job reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job --out reports/seller_alias_continual/20260928/ranking_result/analysis",
+  "help_checked": true,
+  "started": "2026-09-28T09:59:34+08:00",
+  "finished": "2026-09-28T09:59:35+08:00",
+  "exit_code": 0,
+  "wall_seconds": 0.5,
+  "maximum_rss_kib": 51156,
+  "checks": {
+    "numerical_values": 35496,
+    "maximum_absolute_difference": 1.1102230246251565E-16,
+    "loss_values_checked": 7776,
+    "maximum_loss_roundoff": 2.980232238769531E-07,
+    "blind_count_rows": 5184,
+    "saved_metric_matrices": 54,
+    "verified_small_files": 179,
+    "formal_label_reads": 0,
+    "formal_text_reads": 0,
+    "model_loads": 0,
+    "retraining_updates": 0,
+    "bootstrap_frequency_weighted_reproduction": true
+  },
+  "returned_files": 10,
+  "returned_bytes": 1132179,
+  "new_research_unit_tests": 0,
+  "source_files": [
+    {
+      "sha256": "d2cfd8213be58394471320ee25100216dadac74c33144eadb72eaede272db4fb",
+      "bytes": 19217,
+      "path": "scripts/step28_alias_ranking_result.py"
+    },
+    {
+      "sha256": "16b46f388989706915f877c7e2ed29925c44e349548bc9aaa34a02f59378be4b",
+      "bytes": 19189,
+      "path": "scripts/step28_alias_pooling_result.py"
+    }
+  ]
+}

@@ -1,0 +1,344 @@
+
+==== reports/seller_alias_continual/20260927/ranking_execution/authorization.json ====
+date : "2026-09-27"
+recorded_at : "2026-09-27T11:44:28.4614516+08:00"
+status : "AUTHORIZED_RANKING_TRAIN_AND_VALID"
+user_instruction : "核验完毕后，无需向我申请，直接开始正式训练"
+scope : "Directly resume the reported frozen nine-run comparison after completed primary review. Necessary resource checks, synchronization, launch, monitoring, result return and review are authorized within this study."
+policy_sha256 : "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+runs : ["s0_d", "s0_schedule", "s0_hard", "s1_d", "s1_schedule", "s1_hard", "s2_d", "s2_schedule", "s2_hard"]
+physical_updates : 7776
+epochs_per_run : 6
+train_parse_attempts : 1
+valid_parse_attempts : 1
+test_access : false
+owners_access : false
+automatic_retry : false
+gpu_count : 1
+cpu_threads : 1
+runtime : {"maximum_gpu_stage_seconds": 86400, "maximum_output_bytes": 34359738368, "minimum_free_gpu_bytes": 25769803776, "minimum_free_host_bytes": 17179869184, "torch_cpu_threads": 1, "estimated_hours": [14, 18]}
+source_files COUNT 18 FIRST [{'bytes': 8508, 'path': 'docs/SELLER_ALIAS_RANKING.zh.md', 'sha256': '269bf5b07131865f1b3ef39e4e85d2c6e7d7937267c42fee1289fe4914c51e0e'}]
+cpu_audit : "reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/audit.json"
+review_disposition : "reports/seller_alias_continual/20260927/ranking_implementation/review/disposition.json"
+review_disposition_sha256 : "3182b4529449931cde752b640c0dd61a090994852ff00427d41418d939aebb8d"
+external_response_id : "ed10c5f4-24d8-40e5-9d14-b0761cf601aa"
+guards : "All frozen thirteen E6 C-A conditions; no arm, seed, epoch or parameter search."
+valid_condition : "All nine runs and eighteen actual model files plus fifty-four scores pass complete validation. Collect all eighteen matrices and counts before comparisons/bootstrap/acceptance."
+models_location : "Linux only; confirmed negative weights deleted after complete records per discipline."
+continual_design : "Deferred until valid improvement and separately authorized independent synthetic test acceptance."
+frozen_policy_note : "Preparation-time authorization=false remains immutable; execute verifies this separate later user authorization."
+
+==== reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/completion.json ====
+acceptance : {"checks": {"average_precision_mean_non_degradation": true, "average_precision_s0_non_degradation": true, "brier_mean_non_degradation": false, "brier_s0_non_degradation": false, "log_loss_mean_non_degradation": false, "log_loss_s0_non_degradation": false, "map_improves_each_seed": true, "map_interval_above_zero": true, "map_minimum_observed_gain": true, "recall_at_5_mean_strictly_improves": true, "recall_at_5_s0_strictly_improves": true, "roc_auc_mean_non_degradation": true, "roc_auc_s0_non_degradation": true}, "failed": ["brier_mean_non_degradation", "brier_s0_non_degradation", "log_loss_mean_non_degradation", "log_loss_s0_non_degradation"], "next": "RETAIN_NEGATIVE_RESULT_AND_DEFER_CONTINUAL_DESIGN", "passed": false, "scope": "Observed-value guards and conditional uncertainty, not population noninferiority."}
+budget : {"elapsed_seconds": 51919.57913995604, "peak_observed_bytes": 27435480672}
+formal_updates : 7776
+label_parses : {"development": 1, "heldout": 0, "owners": 0, "train": 1}
+status : "COMPLETE_RANKING_TRAIN_AND_VALID"
+
+==== reports/seller_alias_continual/20260928/ranking_result/weight_retention.json ====
+date : "2026-09-28"
+recorded_at : "2026-09-28T10:05:48.7424716+08:00"
+status : "RETAIN_ALL_RANKING_WEIGHTS_BY_EXPLICIT_USER_DIRECTION"
+user_instruction : "我觉得这一步的训练权重文件得保留，毕竟马甲预测概率的损失很小，而候选排序的能力提升较大，可能可以作为后续的候选"
+run_id : "20260927_114646"
+scope : "All 18 inference weights, three arms by three paired seeds at E3/E6, Linux only"
+linux_root : "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run"
+weight_inventory : "weight_inventory.json"
+file_count : 18
+total_bytes : 23516221872
+windows_weights : 0
+deleted_files : 0
+released_weight_bytes : 0
+supersedes : "The planned application of the general negative-result cleanup rule to this run. No deletion command was issued before the user correction."
+candidate_status : "C retained for possible future use; current composite acceptance remains failed (9 of 13 pass), with observed candidate-ranking gains and failed probability guards."
+does_not_authorize : ["New formal labels or data access", "Additional training or calibration", "Changing retrospective acceptance", "Test evaluation", "Continual-learning design"]
+historical_inventory_note : "Fresh size/SHA verification preceded the user retention instruction. Its pre-cleanup wording is immutable history, not current deletion permission."
+
+==== reports/seller_alias_continual/20260928/ranking_result/retention_verification.json ====
+status : "ALL_EIGHTEEN_WEIGHTS_RETAINED_NO_DELETION"
+observed_at : "2026-09-28T10:08:32.166413+08:00"
+files COUNT 18 FIRST [{'path': 'reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/run/s0_d/models/epoch3.pt', 'bytes': 1306456792, 'mtime_ns': 1790483770064108909, 'retained': True}]
+file_count : 18
+total_bytes : 23516221872
+deleted_files : 0
+full_hash_evidence : "weight_inventory.json (fresh byte verification before user retention instruction); this follow-up checks actual existence/size/ownership/path after that instruction."
+nonweight_files_unchanged : 161
+maximum_temporary_full_checkpoint_bytes : 3910960965
+conservative_job_coexistence_bytes : 27436077439
+
+==== reports/seller_alias_continual/20260928/ranking_result/analysis_execution.json ====
+status : "PASS_LINUX_SAVED_RESULT_AUDIT_AND_RETURN"
+verified_at : "2026-09-28T10:05:48.7168960+08:00"
+environment : "Existing Linux py310; CPU affinity 0; OMP/OPENBLAS/MKL threads 1; no GPU"
+command : "taskset -c 0 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /usr/bin/time -v -o reports/seller_alias_continual/20260928/ranking_result/analysis_resource.log timeout 300s /home/yongpeng/miniconda3/envs/py310/bin/python -B scripts/step28_alias_ranking_result.py --job reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job --out reports/seller_alias_continual/20260928/ranking_result/analysis"
+help_checked : true
+started : "2026-09-28T09:59:34+08:00"
+finished : "2026-09-28T09:59:35+08:00"
+exit_code : 0
+wall_seconds : 0.5
+maximum_rss_kib : 51156
+checks : {"numerical_values": 35496, "maximum_absolute_difference": 1.1102230246251565e-16, "loss_values_checked": 7776, "maximum_loss_roundoff": 2.980232238769531e-07, "blind_count_rows": 5184, "saved_metric_matrices": 54, "verified_small_files": 179, "formal_label_reads": 0, "formal_text_reads": 0, "model_loads": 0, "retraining_updates": 0, "bootstrap_frequency_weighted_reproduction": true}
+returned_files : 10
+returned_bytes : 1132179
+new_research_unit_tests : 0
+source_files COUNT 2 FIRST [{'sha256': 'd2cfd8213be58394471320ee25100216dadac74c33144eadb72eaede272db4fb', 'bytes': 19217, 'path': 'scripts/step28_alias_ranking_result.py'}]
+
+==== reports/seller_alias_continual/20260928/ranking_result/sync.json ====
+status : "PASS_EXACT_RESULT_RETURN"
+verified_at : "2026-09-28T09:51:24.3983064+08:00"
+files : 161
+bytes : 8894602
+sha256_mismatches : 0
+archive_sha256 : "6143d983f165cd6ad5aa82922598a3224c46dd110da97c79a42a55a77d413421"
+weights_copied : 0
+new_label_reads : 0
+note : "SFTP reached 100%; later connection reset. Complete downloaded archive and every extracted payload verified against fresh Linux inventory."
+
+==== JOB LOG EDGES ====
+/home/yongpeng/cross-lingual/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+/home/yongpeng/cross-lingual/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+{"completed":816,"elapsed_seconds":51104.48580282298,"encoder_lr":6.177606177606178e-07,"event":"updates","peak_observed_bytes":26128576185,"run_id":"s2_hard"}
+
+{"completed":840,"elapsed_seconds":51234.03111543087,"encoder_lr":3.088803088803089e-07,"event":"updates","peak_observed_bytes":26128576185,"run_id":"s2_hard"}
+
+{"completed":864,"elapsed_seconds":51359.92737967195,"encoder_lr":0.0,"event":"updates","peak_observed_bytes":26128576185,"run_id":"s2_hard"}
+
+{"out":"/home/yongpeng/cross-lingual/reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job","status":"COMPLETE_RANKING_TRAIN_AND_VALID"}
+
+lines 686
+
+==== started.txt ====
+2026-09-27T11:50:06+08:00
+
+
+==== finished.txt ====
+2026-09-28T02:15:28+08:00
+
+
+==== exit_status.txt ====
+0
+
+
+==== resource_usage.log ====
+	Command being timed: "timeout --signal=TERM --kill-after=30s 24h python -u -B scripts/step28_alias_ranking_run.py execute --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job --audit /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260927/ranking_implementation/cpu/20260927_105450/audit.json --authorization /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260927/ranking_execution/authorization.json"
+	User time (seconds): 51726.73
+	System time (seconds): 178.26
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 14:25:21
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 6936424
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 25
+	Minor (reclaiming a frame) page faults: 63419713
+	Voluntary context switches: 662999
+	Involuntary context switches: 1263242
+	Swaps: 0
+	File system inputs: 26488
+	File system outputs: 183447112
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
+==== SINGLE RUN RAW SAVE POINT & TRAIN ===
+preflight {
+  "actual_forward_shape": [
+    1,
+    378
+  ],
+  "initial_state_sha256": "e52523ec2f44dc7baa5dfad7ea595bbdc43f38aa3883114cdf62b5805dc6f2c7",
+  "label_reads": 0,
+  "max_tokens": 0,
+  "public_tokenization_performed": false,
+  "records_checked": 0,
+  "updates": 0
+}
+resources {
+  "arm_seconds_before_cleanup": 5673.244723808952,
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "initial_allocated_bytes": 69206016,
+  "initial_reserved_bytes": 71303168,
+  "peak_allocated_bytes": 8537722368,
+  "peak_reserved_bytes": 9458155520,
+  "scope": "CUDA allocator for this arm, not whole-card memory or other processes."
+}
+training [
+  {
+    "mean_losses_by_epoch": {
+      "bce": [
+        0.23256707843393087,
+        0.21355608509232601,
+        0.21461941808876064
+      ],
+      "hard": [
+        0.8078953675511811,
+        0.8100085117750697,
+        0.767610731224219
+      ],
+      "rank": [
+        2.9602471871508493,
+        2.645108093818029,
+        2.4784283431039915
+      ],
+      "total": [
+        3.5967619485325284,
+        3.263668446077241,
+        3.076853127943145
+      ]
+    },
+    "observations": {
+      "1": {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      },
+      "2": {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      },
+      "87": {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      },
+      "88": {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      }
+    },
+    "seconds": 2236.1901065649,
+    "start": 0,
+    "stop": 432,
+    "updates": 432
+  },
+  {
+    "mean_losses_by_epoch": {
+      "bce": [
+        0.20098779567827782,
+        0.18264915431953138,
+        0.16368349372512764
+      ],
+      "hard": [
+        0.7323455216570033,
+        0.6958945457720094,
+        0.6572692578451501
+      ],
+      "rank": [
+        2.336408971084489,
+        2.206506133079529,
+        2.0852637994620533
+      ],
+      "total": [
+        2.9035695261425443,
+        2.7371025648381977,
+        2.577581931319502
+      ]
+    },
+    "observations": {
+      "433": {
+        "encoder": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        },
+        "head": {
+          "finite_nonzero_gradient": true,
+          "parameters_changed": true
+        }
+      }
+    },
+    "seconds": 2276.981650214875,
+    "start": 432,
+    "stop": 864,
+    "updates": 432
+  }
+]
+3 {
+  "checkpoint": {
+    "bytes": 3910960965,
+    "path": "epoch3.pt",
+    "sha256": "f6e6673cbc32a3147af8c7ba6e95c0d4a2b38fd75fc69c7d406729b915da28d7",
+    "state_sha256": "d1e0ced15ea6af26ba684453103a788e6705598dc908e38be2be2924ad59fcbc"
+  },
+  "epoch": 3,
+  "full_model_and_adam_reloaded": true,
+  "metadata": {
+    "completed_updates": 432,
+    "epoch": 3,
+    "next_encoder_lr": 5.546975546975547e-06,
+    "optimizer_lrs": [
+      5.55984555984556e-06,
+      0.001
+    ],
+    "policy_sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01",
+    "run_id": "s0_hard"
+  },
+  "model": {
+    "actual_reload_verified": true,
+    "bytes": 1306456792,
+    "path": "models/epoch3.pt",
+    "sha256": "065933652728bafc92f5f46f29691a698f171cca74f72cf995d2b20a288a575c",
+    "state_sha256": "089c4c53f0e6c3f4b86aa01c2737b8d3f474a578920b3e42e72385d917b3d473"
+  },
+  "model_state_sha256": "df8f1bec9dc361efc23903f5bd9d8e5d576b03cdc6e1967019a4c17b1b40efe1",
+  "run_id": "s0_hard",
+  "seconds": 493.42199647706
+}
+6 {
+  "checkpoint": {
+    "bytes": 3910960965,
+    "path": "epoch6.pt",
+    "sha256": "b993b8a9fb5c57ec78f6e20887888b30cfe9a8447283d1df951716a048259435",
+    "state_sha256": "e5ffb2439618d2614e0c5b81f2c7ceef122df5330700bb206b018ba37e6b5a4e"
+  },
+  "epoch": 6,
+  "full_model_and_adam_reloaded": true,
+  "metadata": {
+    "completed_updates": 864,
+    "epoch": 6,
+    "next_encoder_lr": null,
+    "optimizer_lrs": [
+      0.0,
+      0.001
+    ],
+    "policy_sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01",
+    "run_id": "s0_hard"
+  },
+  "model": {
+    "actual_reload_verified": true,
+    "bytes": 1306456728,
+    "path": "models/epoch6.pt",
+    "sha256": "1b2a6100917d4aac14cbf63e67067d9d055fba9527be60b13e2bfc07bbd58608",
+    "state_sha256": "093a679b9f8582e7163521ecade34a89106c076c560b1ca3af36183f94acf1ec"
+  },
+  "model_state_sha256": "f8defe7b2c62b9f6a3de55242f731f3426f8cf08a5bf0e7071a0cf9c15b2d1a9",
+  "run_id": "s0_hard",
+  "seconds": 664.9143585918937
+}

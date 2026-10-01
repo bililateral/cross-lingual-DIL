@@ -1,0 +1,95 @@
+{
+  "status": "RESUBMITTED_WEB_REVIEW_IN_PROGRESS",
+  "submitted_at": "2026-09-28T10:44:03.383+08:00",
+  "conversation_url": "https://chatgpt.com/c/6ab5f4d8-8a10-83ea-91bd-2a02558cfb07",
+  "user_request": "外审生成回复失败了，重新上传",
+  "original_submission": "../submission.json",
+  "prior_failure": "failure.json",
+  "upload_authorization": "../upload_authorization.json",
+  "package": {
+    "path": "../ranking_result.zip",
+    "bytes": 7579246,
+    "sha256": "6d01ada467bc705044d31008302fb6a96aa6fd9fbb7817db4166dd06254c9474",
+    "source_files": 252,
+    "members": 253,
+    "unchanged_from_explicitly_authorized_package": true
+  },
+  "review_request": "request.zh.md",
+  "request_change": "Only prefixed a note explaining the prior Unknown error and the user's request to reupload; all original substantive review instructions retained.",
+  "model_identity": {
+    "visible_ui": "6 / Pro",
+    "backend_model_slug": null
+  },
+  "evidence": {
+    "ready": {
+      "observed_at": "2026-09-28T02:44:00.957Z",
+      "uploadProgress": 0,
+      "attachmentPresent": 1,
+      "sendEnabled": true,
+      "request_matches_ignoring_whitespace": true
+    },
+    "after": {
+      "observed_at": "2026-09-28T02:44:03.383Z",
+      "url": "https://chatgpt.com/c/6ab5f4d8-8a10-83ea-91bd-2a02558cfb07",
+      "tail": "不重复打开未变且已关闭的范围，也不把训练前微型测试当正式运行事实。\n2. 九模型7776更新、18个恢复点、54份盲分数、18 valid矩阵、36 fit/calibration矩阵与保存计数的身份和对应；实际label access、退出0、耗时和资源边界。你只能核查包内记录，不声称访问了服务器或重新载入了权重。外部没有权重，不据模型文件缺席推断Linux未保留。\n3. 独立复算三种比较、三种子／分域汇总、5000次域内整群配对bootstrap（种子20260927，先平均三个固定种子差）、全部13判据、22指标的保存汇总与阈值计数。AP与梯形PR-AUC须区分；Recall@1不是首位命中率，R5不是至少命中一次的概率。固定0的群宏precision与合并precision不能混淆。\n4. 正确解释概率指标与排序：平均Brier、log_loss退化虽小，条件区间仍>0；固定0召回/F1也下降。不能将Brier/log_loss直接当纯校准误差或断言后续校准必然修复。C−B的MAP增益与R5区间跨零、概率指标增加应分开；辅助比较没有多重校正。s1概率指标改善不能替代固定s0。E3→E6轨迹也不能事后选轮。\n5. 结果报告是否准确表达“C值得保留作后续候选，但本轮完整验收未过”，是否过度宣称真实市场、创新、总体非劣效或持续学习资格。不新增研究场景、标签访问、超参数搜索、强制多跑种子或无关系统加固。后续建议只能标为待讨论，不自动变成科研方案。\n\n## 核查入口与边界\n\n- docs/SELLER_ALIAS_RANKING_RESULT.zh.md：完整报告，含全部22指标、失败条件、轨迹和保留决定。\n- scripts/step28_alias_ranking_result.py＋scripts/step28_alias_pooling_result.py：主执行者的新保存结果复算及直接纯函数依赖，后者无改动。原Linux py310单CPU实际运行0.50秒、退出0，35,496数值、5,184盲计数、7776损失组合核对通过。不能仅复跑它就称独立原理核验。\n- reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/：完整161份小型原始结果8,894,602字节。\n- reports/seller_alias_continual/20260928/ranking_result/：原样回传、复算结果与原始执行记录、权重实物清单／用户保留决定。weight_inventory.json中清理前意图是新保留决定之前的历史，不能作为当前删除许可。\n- source_inventory.json：所有提交成员的相对路径、实际大小及SHA-256。\n\n只用保存证据和必要手工／微型参考核对，禁止访问／重建正式标签、下载模型、载入模型或新增训练。逐群AP/MAP/Brier真值计算不能仅凭盲分数重新验证；如只能复算保存矩阵汇总，应明确这个限制。不同外部Python/NumPy版本导致微小运算差异须按影响解释，不改原指标或阈值。若执行补测，保留实际源码、原始日志、退出码、版本、结果及小型清单，区分包内记录与网页实际执行。\n\n每条建议分为SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT或OUT_OF_SCOPE_OVERDESIGN；没有确认缺陷时不要凭标签制造问题。说明受影响结论、实物证据、最小修复和剩余限制。结果不理想本身不是实现错误。最终报告区分结果有效性审查、预定验收成败与用户明确的权重保留决定。\n…\n显示更多\nChatGPT 正在回应\nChatGPT 可能会出错。请核查重要信息。\n最新一条回复\n\n\n\n\nPro",
+      "buttons": [
+        {
+          "aria": "共享提示",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": "ranking_result.zip",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": null,
+          "text": "显示更多",
+          "disabled": false
+        },
+        {
+          "aria": "复制消息",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": "共享提示",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": "滚动到底部",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": "展开",
+          "text": "",
+          "disabled": false
+        },
+        {
+          "aria": "添加文件等内容",
+          "text": "",
+          "disabled": true
+        },
+        {
+          "aria": "选择 ChatGPT 模型",
+          "text": "Pro",
+          "disabled": false
+        },
+        {
+          "aria": "停止",
+          "text": "",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  "review_result_received": false,
+  "completed_review_response_id": null,
+  "next_action": "Pause after recording this resubmission. Await user notice of review completion; do not poll.",
+  "scope": "No Linux connection, formal data or label access, model load, training, scientific source change or weight deletion.",
+  "custody": "Existing 18 current ranking weight files remain under the user's Linux retention instruction. This retry did not recheck remote custody.",
+  "record_location": "Windows workspace; retry records have not been synchronized to Linux."
+}

@@ -1,0 +1,50 @@
+                    - generic [ref=f16e3933]:
+                      - generic [ref=f16e3936]:
+                        - button "ranking_result.zip" [ref=f16e3937] [cursor=pointer]
+                        - generic:
+                          - generic:
+                            - generic "ranking_result.zip"
+                            - generic: 文件
+                      - generic [ref=f16e3939]:
+                        - generic [ref=f16e3941]:
+                          - generic [ref=f16e3942]:
+                            - generic [ref=f16e3945]:
+                              - text: "附件为本次已明确获用户批准上传的 ranking_result.zip：7,579,246 字节，252份来源＋source_inventory.json，共253成员；SHA-256 6d01ada467bc705044d31008302fb6a96aa6fd9fbb7817db4166dd06254c9474。请审查本轮9月28日结果，完整要求如下。 # 九模型排序训练：结果外审请求 请使用当前网页GPT6 Pro对本轮已完成训练与结果做独立科研外审。附件含本轮合同、冻结源码、政策、实际训练／评价日志、完整保存矩阵和盲分数、主执行者复算入口及其实际Linux证据，不含正式原始文本、标签CSV、owners、模型权重或密码。请核对附件真实清单后阅读实际文件，不以执行者摘要或PASS替代核验。 ## 研究问题和最新用户指令 用户用途是中文合成卖家马甲候选检索；要求候选排序提升且基础识别不下降。沿用固定数据和原D表示／评分头：A为D，B为较小编码器学习率＋预热衰减，C为B＋固定0.5的前排5个已标注负例排序约束。三配对种子、九个新BGE、各6轮864调用，共7776。E6 C−A为唯一主要比较，B−A、C−B以及E3仅解释，不选臂／种子／轮次。预先确认的13判据及阶段访问见合同、政策和正式authorization.json；冻结合同准备期的“未获准”措辞是当时状态，后续单独授权提供实际许可，不能据历史状态否定已经授权的运行。 本轮有效结果是：平均ΔMAP +0.016499599，条件95%[0.010473378,0.022457469]；ΔR5 +0.016369048；三个种子MAP／R5均提高，AP／AUC也提高。但平均及固定s0的Brier、log_loss均增加，13项通过9项，整体未通过。test／owners未读，持续学习设计暂缓。不能把总体未通过说成排序没有改善，也不能把排序改善追认成完整验收通过。 用户看到结果后明确：“我觉得这一步的训练权重文件得保留，毕竟马甲预测概率的损失很小，而候选排序的能力提升较大，可能可以作为后续的候选”。执行者据此保留全部18份权重、23,516,221,872字节，仅在Linux。删除从未执行。此次明确指令覆盖通用负结果删除规则在本轮的应用，已记入科研纪律和weight_retention.json。请不要建议自动删除、自动选s1／B，或将保留候选等同于通过验收；该指令也不授权你或执行者校准、重训、改阈值、读取test或设计持续学习。 ## 请独立核对的核心事项 1. 从用户候选排序与基础识别目标出发，追踪真实输入、梯度目标、随机配对、更新预算、E3/E6保存恢复、完整门后valid到实际结果。能回答什么、不能回答什么，而不仅是源码与自写policy一致。直接相关训练前完整回复、报告F1—F10和主审处置已附；不重复打开未变且已关闭的范围，也不把训练前微型测试当正式运行事实。 2. 九模型7776更新、18个恢复点、54份盲分数、18 valid矩阵、36 fit/calibration矩阵与保存计数的身份和对应；实际label access、退出0、耗时和资源边界。你只能核查包内记录，不声称访问了服务器或重新载入了权重。外部没有权重，不据模型文件缺席推断Linux未保留。 3. 独立复算三种比较、三种子／分域汇总、5000次域内整群配对bootstrap（种子20260927，先平均三个固定种子差）、全部13判据、22指标的保存汇总与阈值计数。AP与梯形PR-AUC须区分；Recall@1不是首位命中率，R5不是至少命中一次的概率。固定0的群宏precision与合并precision不能混淆。 4. 正确解释概率指标与排序：平均Brier、log_loss退化虽小，条件区间仍>0；固定0召回/F1也下降。不能将Brier/log_loss直接当纯校准误差或断言后续校准必然修复。C−B的MAP增益与R5区间跨零、概率指标增加应分开；辅助比较没有多重校正。s1概率指标改善不能替代固定s0。E3→E6轨迹也不能事后选轮。 5. 结果报告是否准确表达“C值得保留作后续候选，但本轮完整验收未过”，是否过度宣称真实市场、创新、总体非劣效或持续学习资格。不新增研究场景、标签访问、超参数搜索、强制多跑种子或无关系统加固。后续建议只能标为待讨论，不自动变成科研方案。 ## 核查入口与边界 -"
+                              - code [ref=f16e3946]: docs/SELLER_ALIAS_RANKING_RESULT.zh.md
+                              - text: ：完整报告，含全部22指标、失败条件、轨迹和保留决定。 -
+                              - code [ref=f16e3947]: scripts/step28_alias_ranking_result.py
+                              - text: ＋
+                              - code [ref=f16e3948]: scripts/step28_alias_pooling_result.py
+                              - text: ：主执行者的新保存结果复算及直接纯函数依赖，后者无改动。原Linux py310单CPU实际运行0.50秒、退出0，35,496数值、5,184盲计数、7776损失组合核对通过。不能仅复跑它就称独立原理核验。 -
+                              - code [ref=f16e3949]: reports/seller_alias_continual/20260927/ranking_execution/20260927_114646/job/
+                              - text: ：完整161份小型原始结果8,894,602字节。 -
+                              - code [ref=f16e3950]: reports/seller_alias_continual/20260928/ranking_result/
+                              - text: ：原样回传、复算结果与原始执行记录、权重实物清单／用户保留决定。weight_inventory.json中清理前意图是新保留决定之前的历史，不能作为当前删除许可。 -
+                              - code [ref=f16e3951]: source_inventory.json
+                              - text: ：所有提交成员的相对路径、实际大小及SHA-256。 只用保存证据和必要手工／微型参考核对，禁止访问／重建正式标签、下载模型、载入模型或新增训练。逐群AP/MAP/Brier真值计算不能仅凭盲分数重新验证；如只能复算保存矩阵汇总，应明确这个限制。不同外部Python/NumPy版本导致微小运算差异须按影响解释，不改原指标或阈值。若执行补测，保留实际源码、原始日志、退出码、版本、结果及小型清单，区分包内记录与网页实际执行。 每条建议分为SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT或OUT_OF_SCOPE_OVERDESIGN；没有确认缺陷时不要凭标签制造问题。说明受影响结论、实物证据、最小修复和剩余限制。结果不理想本身不是实现错误。最终报告区分结果有效性审查、预定验收成败与用户明确的权重保留决定。
+                            - generic [aria-hidden] [ref=f16e3952]: …
+                          - button "显示更多" [ref=f16e3953] [cursor=pointer]
+                        - generic [ref=f16e3959]:
+                          - button "复制消息" [ref=f16e3961] [cursor=pointer]
+                          - button "共享提示" [ref=f16e3965] [cursor=pointer]
+                  - status [ref=f16e3970]:
+                    - generic [ref=f16e3971]: ChatGPT 正在回应
+              - generic [ref=f16e3794]: ChatGPT 可能会出错。请核查重要信息。
+            - generic:
+              - generic:
+                - button "滚动到底部" [ref=f16e3797] [cursor=pointer]
+                - heading "最新一条回复" [level=4] [ref=f16e3800]
+                - status [ref=f16e3801]
+                - generic [ref=f16e3812]:
+                  - button "添加文件等内容" [ref=f16e3817] [cursor=pointer]
+                  - textbox "询问 ChatGPT" [ref=f16e3823]:
+                    - paragraph: 询问 ChatGPT
+                  - generic [ref=f16e3825]:
+                    - button "选择 ChatGPT 模型" [ref=f16e3847] [cursor=pointer]:
+                      - generic [ref=f16e3848]: Pro
+                    - generic [ref=f16e3826]:
+                      - button "听写" [disabled] [ref=f16e3829]
+                      - button "停止" [ref=f16e3982] [cursor=pointer]
+        - status [ref=f16e3841]
+  - status [ref=f16e3842]
+  - status [ref=f16e3843]

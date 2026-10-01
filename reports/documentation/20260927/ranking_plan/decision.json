@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-27",
+  "timezone": "Asia/Shanghai",
+  "user_instruction": "那现在开始实施吧，准备正式训练时向我汇报",
+  "clarification": {
+    "question": "Fix the difficult-candidate loss weight at 0.5 without searching; require strictly positive Recall@5 differences for both the three-pair mean and fixed s0, retaining the earlier MAP and identification guards.",
+    "user_answer": "按上述设置冻结（推荐）"
+  },
+  "confirmed_preparation": "Implement the proposed D / encoder schedule / encoder schedule plus hard-candidate loss comparison; prepare the contract, applicable verification and web GPT 6 Pro review, then report before formal training.",
+  "intervention": {
+    "model": "Chinese BGE-large-zh-v1.5 with unchanged D account moments and symmetric pair head",
+    "arms": ["d", "schedule", "hard"],
+    "encoder_schedule_peak": 0.00001,
+    "warmup_fraction": 0.1,
+    "decay": "linear after warmup",
+    "hard_negative_count": 5,
+    "hard_loss_weight": 0.5,
+    "hard_loss": "Query-macro mean softplus(negative logit - positive logit), all positives against five highest-scoring known negatives in the same training group",
+    "primary_candidate": "hard",
+    "fixed_test_seed": "s0",
+    "new_runs_proposed": 9,
+    "epochs": 6,
+    "updates_proposed": 7776
+  },
+  "current_permissions": {
+    "implementation": true,
+    "research_execution_on_windows": false,
+    "new_linux_verification": "Report concrete scope and resume under AGENTS.md before connecting",
+    "formal_training": false,
+    "new_formal_train_or_valid_parse": false,
+    "test_or_owners": false
+  },
+  "preserved_boundaries": "Keep D as a configuration and saved-result reference; its old trained weights were deleted. The pooling negative result stays closed. Continual-learning design remains deferred until confirmed improvement and separately authorized test acceptance.",
+  "data_wording_correction": "User clarified that these are synthetic Chinese aliases. Positive aliases mean same-controller positives defined by the synthetic labels, not real-world collected aliases. All formal training/evaluation stays on the existing synthetic dataset; native implementation checks use handmade fixtures.",
+  "estimate": "Nine sequential runs approximately 14-18 hours based on earlier roughly 90-minute runs; formal runtime/storage cap and exact launch remain to be reported before authorization."
+}
