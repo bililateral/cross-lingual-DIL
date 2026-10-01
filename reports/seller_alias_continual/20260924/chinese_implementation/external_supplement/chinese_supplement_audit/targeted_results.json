@@ -1,0 +1,124 @@
+{
+  "scope": "Handmade evaluation fixtures; no formal data/labels, no BGE, no CUDA, no formal updates.",
+  "gate_scope": "validated_run and historical_reference are mocked for independent reporting checks; original submitted contracts separately exercise synthetic complete-run receipts.",
+  "faults": [
+    {
+      "fault": "rng",
+      "matrix_files": 9,
+      "fixed_zero_count_tables": 9,
+      "calibrated_count_tables": 5,
+      "group_ids": 60,
+      "handmade_parser_calls": 1,
+      "success_receipt": false,
+      "reconstruction_new_parser_calls": 0,
+      "all_five_automatic_reports_equal": true,
+      "reconstructed_comparisons_equal": 7
+    },
+    {
+      "fault": "automatic_first",
+      "matrix_files": 9,
+      "fixed_zero_count_tables": 9,
+      "calibrated_count_tables": 5,
+      "group_ids": 60,
+      "handmade_parser_calls": 1,
+      "success_receipt": false,
+      "reconstruction_new_parser_calls": 0,
+      "all_five_automatic_reports_equal": true,
+      "reconstructed_comparisons_equal": 7
+    },
+    {
+      "fault": "automatic_fifth",
+      "matrix_files": 9,
+      "fixed_zero_count_tables": 9,
+      "calibrated_count_tables": 5,
+      "group_ids": 60,
+      "handmade_parser_calls": 1,
+      "success_receipt": false,
+      "reconstruction_new_parser_calls": 0,
+      "all_five_automatic_reports_equal": true,
+      "reconstructed_comparisons_equal": 7
+    },
+    {
+      "fault": "comparison",
+      "matrix_files": 9,
+      "fixed_zero_count_tables": 9,
+      "calibrated_count_tables": 5,
+      "group_ids": 60,
+      "handmade_parser_calls": 1,
+      "success_receipt": false,
+      "reconstruction_new_parser_calls": 0,
+      "all_five_automatic_reports_equal": true,
+      "reconstructed_comparisons_equal": 7
+    }
+  ],
+  "success_equivalence": {
+    "existing_fields_exactly_equal": true,
+    "comparisons": 7,
+    "metrics": 22,
+    "handmade_parser_calls_per_invocation": 1,
+    "extra_fields_only": [
+      "domains",
+      "group_ids",
+      "partition",
+      "fixed_classification"
+    ]
+  },
+  "fixed_aggregation": {
+    "independent_60_group_shuffled_domain_check": true,
+    "witness_pooled_precision": 0.5263157894736842,
+    "witness_macro_precision": 0.75,
+    "no_predicted_positive_case": true,
+    "aggregation_values": {
+      "threshold": 0.0,
+      "pooled": {
+        "tp": 537,
+        "fp": 2215,
+        "fn": 663,
+        "tn": 19265,
+        "fpr": 0.10311918063314711,
+        "recall": 0.4475,
+        "precision": 0.19513081395348839,
+        "f1": 0.2717611336032389
+      },
+      "by_domain": {
+        "A": {
+          "tp": 198,
+          "fp": 700,
+          "fn": 202,
+          "tn": 6460,
+          "fpr": 0.09776536312849161,
+          "recall": 0.495,
+          "precision": 0.22048997772828507,
+          "f1": 0.3050847457627119
+        },
+        "B": {
+          "tp": 162,
+          "fp": 851,
+          "fn": 238,
+          "tn": 6309,
+          "fpr": 0.11885474860335196,
+          "recall": 0.405,
+          "precision": 0.15992102665350444,
+          "f1": 0.22929936305732485
+        },
+        "C": {
+          "tp": 177,
+          "fp": 664,
+          "fn": 223,
+          "tn": 6496,
+          "fpr": 0.09273743016759776,
+          "recall": 0.4425,
+          "precision": 0.21046373365041618,
+          "f1": 0.2852538275584206
+        }
+      },
+      "aggregation": "Sum confusion counts before computing rates; distinct from mean per-group metrics."
+    }
+  },
+  "status": "PASS",
+  "tests": 3,
+  "skipped": 0,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 4.140198755
+}

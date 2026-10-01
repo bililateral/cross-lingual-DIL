@@ -1,0 +1,83 @@
+--- native_source
++++ final
+@@ -342,6 +342,12 @@
+ def train_arm(out: Path, arm: str, c: dict, groups: dict, partition_rows: dict,
+               budget: persistence.Budget, preflight: dict) -> dict:
+     import torch
++    device = torch.cuda.current_device()
++    torch.cuda.synchronize(device)
++    torch.cuda.reset_peak_memory_stats(device)
++    arm_started = time.monotonic()
++    initial_allocated = torch.cuda.memory_allocated(device)
++    initial_reserved = torch.cuda.memory_reserved(device)
+     out.mkdir()
+     for directory in ("work", "models", "scores"):
+         (out / directory).mkdir()
+@@ -351,6 +357,8 @@
+     optimizer = core.make_optimizer(model, c)
+     rows, seed = schedule(groups["fit"], c)
+     r = {"arm": arm, "points": {}, "training": [], "label_parses": 0,
++         "parameter_count": sum(p.numel() for p in model.parameters()),
++         "trainable_parameter_count": sum(p.numel() for p in model.parameters() if p.requires_grad),
+          "preflight": preflight, "fit_group_ids": [g.uid for g in groups["fit"]],
+          "calibration_group_ids": [g.uid for g in groups["calibration"]]}
+     total_training = 0.
+@@ -398,6 +406,15 @@
+     r.update(updates=864, formal_training_seconds=total_training,
+              group_schedule_sha256=hashlib.sha256(data.json_bytes([g.uid for g in rows])).hexdigest(),
+              dropout_stream=seed)
++    torch.cuda.synchronize(device)
++    r["resources"] = {
++        "arm_seconds_before_cleanup": time.monotonic() - arm_started,
++        "gpu_device": device, "gpu_name": torch.cuda.get_device_name(device),
++        "initial_allocated_bytes": initial_allocated, "initial_reserved_bytes": initial_reserved,
++        "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
++        "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
++        "scope": "PyTorch CUDA allocator, reset immediately before arm model loading through both checkpoints and calibration; includes baseline allocations, excludes earlier public preflight and later cleanup. Not total device memory or other processes."
++    }
+     del optimizer, model
+     gc.collect()
+     torch.cuda.empty_cache()
+@@ -668,6 +685,17 @@
+             "f1": float(2 * tp / (2 * tp + fp + fn)) if 2 * tp + fp + fn else 0.}
+ 
+ 
++def fixed_classification(counts: list[dict], domains: list[str]) -> dict:
++    """Sum saved per-group confusion counts before calculating classification rates."""
++    values = np.asarray([[row[key] for key in ("tp", "fp", "fn", "tn")]
++                         for row in counts], dtype=np.int64)
++    if values.shape != (len(domains), 4) or set(domains) != set("ABC") or np.any(values < 0):
++        raise ValueError("Invalid saved confusion counts/domain alignment")
++    return {"threshold": 0.0, "pooled": rates(values),
++            "by_domain": {d: rates(values[np.asarray(domains) == d]) for d in "ABC"},
++            "aggregation": "Sum confusion counts before computing rates; distinct from mean per-group metrics."}
++
++
+ def automatic_report(counts: np.ndarray, domains: list[str], draws: np.ndarray) -> dict:
+     out = {}
+     domain_boot_counts = []
+@@ -776,6 +804,8 @@
+                   "manifest_sha256": data.sha256(out / "manifest.json"), "columns": list(metrics.COLUMNS),
+                   "label_parses": {"train": 0, "development": 1, "heldout": 0, "owners": 0},
+                   "arms": {}, "comparisons": {}, "primary_comparison": c["primary_comparison"],
++                  "domains": domains, "group_ids": [row["group_uid"] for row in part["development"]],
++                  "partition": r["partition"],
+                   "historical_reference": reference["files"],
+                   "formal_training_seconds": r["formal_training_seconds"]}
+         matrices, auto_counts = {}, {}
+@@ -788,6 +818,7 @@
+                 path = destination / arm / f"epoch{epoch}_metrics.npy"
+                 np.save(path, matrix, allow_pickle=False)
+                 points[epoch] = {"file": data.record(path, destination), "counts_at_logit_zero": counts,
++                                 "fixed_classification": fixed_classification(counts, domains),
+                                  "mean": dict(zip(metrics.COLUMNS, matrix.mean(0).tolist())),
+                                  "by_domain": {d: dict(zip(metrics.COLUMNS, matrix[np.asarray(domains) == d].mean(0).tolist())) for d in "ABC"}}
+                 if epoch == "6":
+@@ -802,6 +833,7 @@
+         np.save(path, matrices["historical_labse"], allow_pickle=False)
+         result["historical_labse"] = {"file": data.record(path, destination),
+             "counts_at_logit_zero": historical_counts,
++            "fixed_classification": fixed_classification(historical_counts, domains),
+             "threshold": reference["threshold"], "counts_by_group": auto_counts["historical_labse"].tolist()}
+         # Persist all nine matrices and all counts before ANY uncertainty calculation.
+         data.write_json(destination / "collected.json", result)

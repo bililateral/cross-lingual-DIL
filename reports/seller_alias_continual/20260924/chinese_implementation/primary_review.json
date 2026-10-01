@@ -1,0 +1,55 @@
+{
+  "status": "AUTHORIZED_PREPARATION_COMPLETE_PRIMARY_AND_EXTERNAL_REVIEW_CLOSED",
+  "date": "2026-09-24",
+  "approved_requirement": "Adopt a Chinese encoder and improve same-controller account-pair recognition on the fixed masked Chinese synthetic seller data before further continual learning.",
+  "implementation_direction": "BGE-large-zh-v1.5 with a four-arm representation-by-ranking-objective comparison; primary candidate split_rank and primary method comparison split_rank minus mean_bce.",
+  "traced_requirements": [
+    "Only title and description enter the model; all items retain account/channel alignment.",
+    "Separate channels share a single trainable Chinese encoder; population variance uses denominator n and epsilon 1e-8; head dimensions are 2048 or 8192.",
+    "BCE uses 378 unordered pairs once; rank uses 28 queries, 27 nonself candidates, and the mean logit of one or two positives.",
+    "Pair logits are symmetric; positive cliques are derived only from authorized binary supervision.",
+    "Each arm loads a fresh pretrained encoder and optimizer; paired objective arms must have identical initial model state.",
+    "The fixed 144 fitting groups supply six epochs; 36 calibration groups never enter gradients or epoch selection.",
+    "The original source-bound calibration threshold, per-domain capability gates, full 22 metrics, and paired group uncertainty are preserved.",
+    "All eight model files are freshly size/SHA checked before valid parsing; the historical LaBSE reference reuses bound blind scores and the identical partition.",
+    "Current scripts and 11 input files match the actual Linux CPU verification receipts; old base and sensitivity entry hashes are unchanged."
+  ],
+  "personally_read_historical_reviews": [
+    "reports/seller_alias_continual/20260918/base_implementation/review_reply.json",
+    "reports/seller_alias_continual/20260918/base_implementation/native_review_reply.json",
+    "reports/seller_alias_continual/20260924/result_review/response.txt"
+  ],
+  "historical_findings": "Original R1 current-model file check, R2 pooled intervals and native Pooling API fix remain in the new entry. Prior successful execution is contextual evidence, not proof of newly changed computation.",
+  "new_cpu_evidence": {
+    "unique_cases": 12,
+    "passed": 12,
+    "skipped": 0,
+    "latest_seconds": 2.441,
+    "formal_data_reads": 0,
+    "formal_label_parses": 0,
+    "native_pretrained_model_loads": 4,
+    "native_handmade_updates": 4,
+    "native_job_wall_seconds": 393.89,
+    "native_cpu_max_rss_kib": 7885252,
+    "transferred_evidence": "30 files69793 bytes individually size/SHA matched; inventory separately4736 bytes"
+  },
+  "local_corrections": [
+    "Record BCE, rank and total separately; do not relabel the combined loss as BCE.",
+    "Update channel preflight counts, account/head dimensions, four-arm/eight-checkpoint gates and comparison directions.",
+    "Strengthen the changed-model rejection test through the actual evaluation entrypoint and remove a nonfunctional scalar-conversion warning.",
+    "Qualify permutation/duplication invariance as the fixed-vector aggregation property, with floating-point and training-dropout limitations.",
+    "Confirmed and fixed externalR1 evidence-before-bootstrap ordering; injected first-interval failure retains all9 metric matrices,9 zero and5 calibrated count tables and domain/group mapping.",
+    "Confirmed and fixed R2 zero-threshold pooled/domain count aggregation, independently distinguishing pooled precision10/19 from macro3/4.",
+    "Confirmed and fixed R3 per-arm CUDA allocator peak recording with scope and initial allocations; actual GPU measurement still pending formal run."
+  ],
+  "remaining_unverified": [
+    "Formal CUDA/bf16 and actual GPU allocator peaks; public-data token lengths; eight real large-model checkpoint reloads; time/storage budget and empirical improvement; formal training and new train/valid permissions not yet resumed."
+  ],
+  "scientific_limits": "Chinese language suitability and correct training do not imply higher AP or passing FPR<=0.001 and recall>=0.5. C/D combine channel and moment changes and incur extra computation; conditional development comparisons do not establish independent-test, multiseed or real-market performance.",
+  "formal_training_resumed": false,
+  "final_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+  "native_evidence_source_correspondence": "All four reports bind runner111b4f3c052cfdb941348d1763cd2b78721ede64ca5d15da1250f0c81f8634b1. Its exact snapshot retained. AST confirms only train_arm/evaluate changed and fixed_classification added; all native computation functions and direct dependencies unchanged. No repeated native updates needed.",
+  "personal_external_review": "Read complete response and downloaded full report, independent_checks.py/results, check_suggested_fix.py/results; confirmed findings against source. External12+9 are separate from project12. Did not rerun unrelated independent checks; affected project cases and all actual native reports personally checked.",
+  "supplement_reply_id": "5477b16b-9187-4cd4-b54d-39db8ec6095e",
+  "supplement_primary_verification": "Read full supplemental response and downloaded report, targeted_checks.py and targeted_results.json; checked correspondence to saved evaluation order, fixed pooled arithmetic and allocator scope. Reviewer3 tests/4 failure subcases are external execution, not primary reruns. S1 finalSHA65-character transcription corrected in current documentation with immutable sent history retained; no production change."
+}

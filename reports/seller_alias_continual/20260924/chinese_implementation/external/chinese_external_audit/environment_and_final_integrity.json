@@ -1,0 +1,73 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "packages": {
+    "torch": "2.10.0+cpu",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "scikit-learn": "1.8.0",
+    "pytest": "9.0.2",
+    "transformers": null,
+    "sentence-transformers": null
+  },
+  "ast_parsed": [
+    "scripts/step28_base_model.py",
+    "scripts/step28_chinese_base_audit.py",
+    "scripts/step28_chinese_base.py",
+    "scripts/step28_continual_expression_run.py",
+    "scripts/step28_continual_population_data.py",
+    "scripts/step28_continual_population_evaluate.py",
+    "scripts/step28_continual_population_run.py",
+    "scripts/step28_continual_population.py",
+    "tests/test_step28_chinese_base_contracts.py"
+  ],
+  "commands": [
+    {
+      "args": [
+        "/opt/pyvenv/bin/python",
+        "-B",
+        "scripts/step28_chinese_base.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: step28_chinese_base.py [-h] --out OUT [--evaluation EVALUATION]\n                              {train,evaluate,verify-models}\n\nChinese alias identification: account representation by ranking-objective\nfactorial. Preparation is authorized; a new Linux stage must be reported and\nresumed. No owners/test access, automatic retry, validation threshold tuning,\nor winner.\n\npositional arguments:\n  {train,evaluate,verify-models}\n\noptions:\n  -h, --help            show this help message and exit\n  --out OUT\n  --evaluation EVALUATION\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "/opt/pyvenv/bin/python",
+        "-B",
+        "scripts/step28_chinese_base_audit.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: step28_chinese_base_audit.py [-h]\n                                    --arm {mean_bce,mean_rank,split_bce,split_rank}\n                                    --out OUT\n\nCPU-only native-model audit with one handmade group; no research data access.\n\noptions:\n  -h, --help            show this help message and exit\n  --arm {mean_bce,mean_rank,split_bce,split_rank}\n  --out OUT\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "bash",
+        "-n",
+        "scripts/run_step28_chinese_base_linux_20260924.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "bash",
+        "-n",
+        "scripts/run_step28_chinese_check_linux_20260924.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "payloads_rehashed_after_tests": 50,
+  "submitted_files_unchanged": true,
+  "formal_label_reads_or_parses": 0,
+  "native_model_loads": 0,
+  "gpu_compute": false
+}

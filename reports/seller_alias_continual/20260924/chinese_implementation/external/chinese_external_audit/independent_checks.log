@@ -1,0 +1,23 @@
+test_01_inventory_and_historical_blind_reference (__main__.Checks.test_01_inventory_and_historical_blind_reference) ... inventory_and_blind_reference: {"payloads_verified": 50, "zip_crc": "PASS", "checked_sources_verified": 11, "historical_shape": [60, 378], "historical_dtype": "float32", "historical_threshold": 0.10397195070981981, "partition_reordering_rejected": true, "native_weights_present": false, "formal_label_parses": 0}
+ok
+test_02_rank_scalar_gradient_and_invalid_graph (__main__.Checks.test_02_rank_scalar_gradient_and_invalid_graph) ... rank_numeric: {"cases": 3, "maximum_gradient_absolute_error": 3.0531133177191805e-16, "invalid_degree_two_cycle_rejected": true, "equal_logits_rank": 3.295836866004329, "equal_logits_bce": 0.6931471805599453, "rank_invariant_to_constant_logit_shift": true}
+ok
+test_03_unequal_items_moments_and_order (__main__.Checks.test_03_unequal_items_moments_and_order) ... moments: {"counts": [2, 3, 8], "embedding_dim": 1024, "account_shape": [3, 4096], "maximum_absolute_error": 1.0044722054125543e-08, "within_account_and_account_permutation": "PASS", "changed_record_affects_account": true}
+ok
+test_04_exact_calibration_and_gate_boundaries (__main__.Checks.test_04_exact_calibration_and_gate_boundaries) ... threshold_and_gates: {"threshold": 8.000000000000002, "calibration_counts_by_domain": {"A": [240, 2, 0, 4294], "B": [240, 3, 0, 4293], "C": [240, 4, 0, 4292]}, "fp7_tp200": "PASS", "fp8_tp200": "REJECT", "fp7_tp199": "REJECT", "pooled_pass_cannot_hide_domain_failure": true}
+ok
+test_05_metrics_and_paired_bootstrap_independent (__main__.Checks.test_05_metrics_and_paired_bootstrap_independent) ... metrics_bootstrap: {"columns": 22, "AP_PR_ROC_reference": "installed sklearn; handmade tied logits", "retrieval_reference": "independent query-wise Python ranking", "replicates": 5000, "pooled_intervals_and_paired_differences": "PASS", "all22_metric_difference_intervals": "PASS"}
+ok
+test_06_four_arm_update_adam_and_eight_tiny_checkpoints (__main__.Checks.test_06_four_arm_update_adam_and_eight_tiny_checkpoints) ... tiny_updates_and_checkpoints: {"mean_bce": {"adam_first_step_max_abs_error": 1.5471358283392078e-07, "post_clip_total_norm": 0.5546571170828282, "losses": {"bce": 0.7579137682914734, "rank": 3.29607892036438, "total": 0.7579137682914734}, "tiny_checkpoint_points": 2}, "mean_rank": {"adam_first_step_max_abs_error": 1.5471358283392078e-07, "post_clip_total_norm": 0.5558040612606111, "losses": {"bce": 0.7579137682914734, "rank": 3.29607892036438, "total": 4.053992748260498}, "tiny_checkpoint_points": 2}, "split_bce": {"adam_first_step_max_abs_error": 1.5471358283392078e-07, "post_clip_total_norm": 0.46190593184406487, "losses": {"bce": 0.6074146628379822, "rank": 3.2964282035827637, "total": 0.6074146628379822}, "tiny_checkpoint_points": 2}, "split_rank": {"adam_first_step_max_abs_error": 1.5471358283392078e-07, "post_clip_total_norm": 0.4675761528099436, "losses": {"bce": 0.6074146628379822, "rank": 3.2964282035827637, "total": 3.9038429260253906}, "tiny_checkpoint_points": 2}}
+ok
+test_07_all_eight_model_corruption_gates_before_parser (__main__.Checks.test_07_all_eight_model_corruption_gates_before_parser) ... all_eight_model_gates: {"same_size_corruptions_rejected": ["mean_bce/epoch3", "mean_bce/epoch6", "mean_rank/epoch3", "mean_rank/epoch6", "split_bce/epoch3", "split_bce/epoch6", "split_rank/epoch3", "split_rank/epoch6"], "label_parser_calls": 0, "files_are": "synthetic receipt fixture bytes, not weights"}
+ok
+test_08_failure_order_and_fixed_zero_report_witness (__main__.Checks.test_08_failure_order_and_fixed_zero_report_witness) ... reproduced_failure_order: {"status": "DEFECT_REPRODUCED", "injected_at": "first automatic_report", "handmade_parser_calls": 1, "matrices_surviving": ["mean_bce/epoch6_metrics.npy", "mean_bce/epoch3_metrics.npy"], "collected_exists": false, "failure_receipt": {"error": "injected interval failure", "error_type": "RuntimeError", "status": "EVALUATION_FAILED_NO_RETRY"}, "normal_run_matrices_present_at_each_automatic_report": [2, 4, 6, 8, 9], "required_total_matrices": 9, "zero_threshold_point_keys": ["file", "counts_at_logit_zero", "mean", "by_domain"], "zero_threshold_counts_available": "per group only; no pooled/domain micro classification summary"}
+ok
+test_09_active_global_gradient_clipping (__main__.Checks.test_09_active_global_gradient_clipping) ... active_global_clip: {"production_clip_norm": 1, "handmade_preclip_norm": 2.7112133502960205, "handmade_postclip_norm": 0.9999996704900291, "actual_clip_triggered": true}
+ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 4.472s
+
+OK

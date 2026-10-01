@@ -1,0 +1,135 @@
+{
+  "status": "AUTHORIZED_CPU_VERIFICATION_COMPLETE",
+  "model": "BAAI/bge-large-zh-v1.5",
+  "native_reports": [
+    {
+      "arm": "mean_bce",
+      "file": "cpu_initial/mean_bce.json",
+      "sha256": "0279b67778e95f778252991cb62b901ddd6e70468cd741d4c3905cec78da4697",
+      "seconds": 81.23297969205305,
+      "parameter_count": 325784833,
+      "probes": 29,
+      "layer_probes": 24,
+      "pooling_max_error": 0.0,
+      "bce_abs_error": 1.983332720278952E-09,
+      "rank_abs_error": 5.500759359122753E-08,
+      "unused_pooler_parameters": [
+        "encoder.0.model.pooler.dense.weight",
+        "encoder.0.model.pooler.dense.bias"
+      ],
+      "separate_objective_gradients": {
+        "bce": [
+          0.0004778820148203522,
+          0.08171839267015457
+        ],
+        "rank": [
+          0.0011642950121313334,
+          0.034735094755887985
+        ]
+      },
+      "handmade_updates": 1
+    },
+    {
+      "arm": "mean_rank",
+      "file": "cpu_initial/mean_rank.json",
+      "sha256": "838e5a0be32612a2e49056046fe4cacb7576c920292c7751f1651cddf7044c94",
+      "seconds": 80.91219192696735,
+      "parameter_count": 325784833,
+      "probes": 29,
+      "layer_probes": 24,
+      "pooling_max_error": 0.0,
+      "bce_abs_error": 1.983332720278952E-09,
+      "rank_abs_error": 5.500759359122753E-08,
+      "unused_pooler_parameters": [
+        "encoder.0.model.pooler.dense.weight",
+        "encoder.0.model.pooler.dense.bias"
+      ],
+      "separate_objective_gradients": {
+        "bce": [
+          0.0004778820148203522,
+          0.08171839267015457
+        ],
+        "rank": [
+          0.0011642950121313334,
+          0.034735094755887985
+        ]
+      },
+      "handmade_updates": 1
+    },
+    {
+      "arm": "split_bce",
+      "file": "cpu_initial/split_bce.json",
+      "sha256": "66342c8820815e4ebc94ccd866b578f49e2508a27459abe53f8804fa469f1b5e",
+      "seconds": 111.91373009304516,
+      "parameter_count": 326571265,
+      "probes": 29,
+      "layer_probes": 24,
+      "pooling_max_error": 0.0,
+      "bce_abs_error": 7.72815267335858E-09,
+      "rank_abs_error": 4.824993826701984E-08,
+      "unused_pooler_parameters": [
+        "encoder.0.model.pooler.dense.weight",
+        "encoder.0.model.pooler.dense.bias"
+      ],
+      "separate_objective_gradients": {
+        "bce": [
+          0.00028396249399520457,
+          0.08162038773298264
+        ],
+        "rank": [
+          0.0007683405419811606,
+          0.041392430663108826
+        ]
+      },
+      "handmade_updates": 1
+    },
+    {
+      "arm": "split_rank",
+      "file": "cpu_initial/split_rank.json",
+      "sha256": "e1630525685d6b082717d64a87759ce271ed76d7fc44ad8a3dc7ab089a66ce98",
+      "seconds": 110.58920907205902,
+      "parameter_count": 326571265,
+      "probes": 29,
+      "layer_probes": 24,
+      "pooling_max_error": 0.0,
+      "bce_abs_error": 7.72815267335858E-09,
+      "rank_abs_error": 4.824993826701984E-08,
+      "unused_pooler_parameters": [
+        "encoder.0.model.pooler.dense.weight",
+        "encoder.0.model.pooler.dense.bias"
+      ],
+      "separate_objective_gradients": {
+        "bce": [
+          0.00028396249399520457,
+          0.08162038773298264
+        ],
+        "rank": [
+          0.0007683405419811606,
+          0.041392430663108826
+        ]
+      },
+      "handmade_updates": 1
+    }
+  ],
+  "native_job_wall_seconds": 393.89,
+  "native_max_rss_kib": 7885252,
+  "contract_cases": 12,
+  "passed": 12,
+  "skipped": 0,
+  "final_test_seconds": 2.441,
+  "final_test_outer_seconds": 3.12,
+  "final_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+  "code_dependency_files": 11,
+  "gpu_execution": false,
+  "formal_data_reads": 0,
+  "formal_label_parses": 0,
+  "formal_updates": 0,
+  "native_saved_weights": 0,
+  "evidence_inventory": "cpu_initial/evidence_inventory.json",
+  "evidence_inventory_sha256": "fc5b7e6da2b0802066648613dc6ab72dd6cf4e8b61f528d96251ba1ff705c0a5",
+  "transferred_payload_files": 30,
+  "transferred_payload_bytes": 69793,
+  "inventory_bytes": 4736,
+  "semantics_check": "cpu_initial/final_semantics.json",
+  "scope": "FP32 CPU handmade computation; unchanged native function bodies reused after evaluation/resource-recording fixes. No CUDA/bf16, formal input length, formal checkpoint, budget or performance claim."
+}

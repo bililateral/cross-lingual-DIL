@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/scripts/step28_chinese_result.py", line 310, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/scripts/step28_chinese_result.py", line 306, in main
+    print(json.dumps(run(args.run, args.evaluation, args.out, args.historical), ensure_ascii=False))
+  File "/home/yongpeng/cross-lingual/scripts/step28_chinese_result.py", line 119, in run
+    if e["manifest_sha256"] != record(run_dir / "manifest.json")["sha256"]:
+  File "/home/yongpeng/cross-lingual/scripts/step28_chinese_result.py", line 36, in record
+    return {"path": path.relative_to(ROOT).as_posix(), "bytes": len(payload),
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run/manifest.json' is not in the subpath of '/home/yongpeng/cross-lingual' OR one path is relative and the other is absolute.

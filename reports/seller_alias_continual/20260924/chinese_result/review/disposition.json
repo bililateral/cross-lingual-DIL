@@ -1,0 +1,96 @@
+{
+  "status": "EXTERNAL_RESULT_REVIEW_AND_PRIMARY_VERIFICATION_COMPLETE",
+  "date": "2026-09-24",
+  "purpose": "Seller-alias candidate retrieval as explicitly confirmed by user; retain frozen automatic-gate failure.",
+  "conversation_url": "https://chatgpt.com/c/6ab4c35e-e0a8-83ea-b8f1-5cfe35d48b3c",
+  "reply_id": "787b5bcf-3b41-47f2-97ef-47ae5a9bc970",
+  "actual_dom_model": "gpt-6-pro",
+  "full_reply_read": true,
+  "external_scripts_and_initial_logs_read": true,
+  "reply_json_sha256": "d5efb470be232acfa0df0111d230a6cb9a09e6681d42d4391c0d7fd9905fae8e",
+  "external_zip": {
+    "bytes": 64250,
+    "sha256": "dadf363591c6b33535a78ee533a4ddf8e0d0e26b2f798f5a6570c86bbd1a33de",
+    "members": 19
+  },
+  "reviewed_requirements": [
+    {
+      "requirement": "Improve held-out same-controller candidate ranking from masked Chinese text.",
+      "evidence": [
+        "scripts/step28_chinese_base.py",
+        "scripts/step28_continual_population_evaluate.py",
+        "job/run/manifest.json",
+        "evaluation.json",
+        "primary_runtime.json"
+      ],
+      "finding": "BGE encoder and pair-head were trained under the approved four-arm comparison. Retrieval uses pair-head logits among 27 nonself candidates, not cosine or full-corpus ANN. D-A and D-LaBSE have positive individual conditional intervals on all ten retrieval measures.",
+      "limitation": "Synthetic data, fixed seed, reused development set, every query has one or two positives; no application qualification without a defined candidate pool/K/budget."
+    },
+    {
+      "requirement": "Preserve the approved data/label, model, comparison and endpoint boundaries.",
+      "evidence": [
+        "chinese_execution/authorization.json",
+        "schema/step28_chinese_base_policy.json",
+        "chinese_evaluation/20260924_202700/execution.json",
+        "review/primary_execution.json"
+      ],
+      "finding": "Four arms, 864 updates each, epoch-six primary, train/valid once each. All four frozen automatic gates fail. Independent audit uses only saved evidence and artificial hand cases; no formal reparse or retraining."
+    },
+    {
+      "requirement": "Independently scrutinize external conclusions and implementation.",
+      "evidence": [
+        "review/response.zh.md",
+        "review/external/independent_result_audit.py",
+        "review/external/document_and_final_integrity.py",
+        "review/primary_runtime.json"
+      ],
+      "finding": "Full originals read. Original independent audit executed unchanged on existing Linux py310; counts, matrices, seven comparisons, paired bootstrap, scheduling and hand metric definitions checked. R1/R2/R3 remain closed."
+    }
+  ],
+  "decisions": [
+    {
+      "classification": "SCIENTIFIC_BLOCKER",
+      "issue": "Overextending automatic-gate failure into absence of candidate ability or impossibility of continual research.",
+      "confirmed": "Conclusion overreach, not a defect in frozen numerical outputs.",
+      "remedy": "Preserve automatic failure; explain direct retrieval evidence and unresolved application threshold. Already corrected during result analysis; now strengthened after independent review.",
+      "status": "CLOSED_IN_INTERPRETATION"
+    },
+    {
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "issue": "Submitted document still asked whether use was retrieval or automatic decision.",
+      "confirmed": "Stale at submission snapshot; user clarified while web review was running.",
+      "remedy": "Current documents state candidate retrieval; only pool/K/review budget remain unconfirmed. Preserve submitted snapshot.",
+      "status": "CLOSED_BEFORE_COMPLETE_REPLY"
+    },
+    {
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "issue": "Repeated unchanged BGE updates, new models/seeds, formal label rereads or test/owners access for review closure.",
+      "remedy": "Not performed; retain stage boundaries.",
+      "status": "NOT_ADOPTED"
+    }
+  ],
+  "primary_runtime": {
+    "environment": "existing Linux py310, Python 3.10.19, one CPU thread, CUDA hidden",
+    "exit_status": 0,
+    "process_seconds": 0.31540616299025714,
+    "numeric_comparisons": 16475,
+    "blind_group_counts": 2424,
+    "metric_matrices": 25,
+    "manual_scenarios": 5,
+    "manual_metrics_each": 22,
+    "max_absolute_error": 8.881784197001252e-16,
+    "new_formal_label_reads": 0,
+    "model_loads": 0,
+    "formal_updates": 0
+  },
+  "corrected_external_auxiliary_assumptions": "External draft MAP<=MRR assumption and historical counts field path were fixed by reviewer and initial logs retained. Primary verified MAP can exceed MRR (positive ranks 2,3 => AP=7/12, RR=1/2). Neither was a submitted experiment defect.",
+  "limitations": [
+    "Saved formal curve/retrieval rows were not recomputed from truth.",
+    "Eight actual weights were hash checked at the formal evaluation gate, not read again by reviewers.",
+    "Bootstrap conditions on fixed models/calibration and is not multiplicity corrected; review counts overlap and are not extra independent samples.",
+    "NDCG@1 equals hit@1 here only because binary relevance and at least one relevant item make ideal DCG@1 equal one."
+  ],
+  "frozen_scientific_sources_changed": false,
+  "new_training_authorized": false,
+  "lfs": "Further cleanup cancelled by user; draft deleted, no Support contact or GitHub remote modification. Local prune had released zero bytes."
+}

@@ -1,0 +1,77 @@
+# 科研文件存储与恢复
+
+## 2026年9月24日中文编码器归档
+
+按用户明确要求，`BAAI/bge-large-zh-v1.5`先下载Windows，再以SFTP按原路径复制Linux。固定提交`79e7739b6ab944e86d6171e44d24c997fc1e0116`的12个文件共1,302,803,319字节；Windows先以官方LFS SHA／Git blob核对来源，Linux上传完成后重新读取全部实际文件计算大小和SHA-256，与Windows逐项相同，内容摘要`26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd`。
+
+归档位置为`/home/yongpeng/cross-lingual/models/step7/embeddings/bge_large_zh`。完整权重仅留Linux；Windows删除12个原文件及空模型目录前再次核对当地SHA和实际Linux回执，删除后目录确实不存在。释放逻辑文件字节1,302,803,319（约1.21 GiB），不冒称磁盘可用空间实测增量。来源记录、转存回执和外审所需的小型配置快照保留，不含重复权重。见[下载清单](../reports/seller_alias_continual/20260924/chinese_model/download.json)、[Linux实际核验](../reports/seller_alias_continual/20260924/chinese_model/linux_verification.json)、[Windows删除](../reports/seller_alias_continual/20260924/chinese_model/cleanup.json)。原中断传输及精确前缀核对记录保留；恢复传输未改模型字节。
+
+## 2026年9月24日结果回传
+
+基础三模型及两点敏感性结果已回传172份小型训练／评价证据，共6,180,044字节，逐项实际大小/SHA一致，见[回传回执](../reports/seller_alias_continual/20260924/result_sync/20260924_112014/sync.json)。12个推理模型共24,121,623,112字节继续位于Linux原base_execution／sensitivity_execution目录，实际哈希在评价完整门重核；没有把权重同步回Windows。Linux正式入口已删除自己的临时完整checkpoint，work为空，保留全部有效结果及历史缓存。
+
+经用户明确恢复授权，把缺失的原valid二值CSV（2,290,729字节）按冻结SHA补齐Linux供本阶段评价；同步本身只核对字节。没有移动test／owners／Audit封存资产。基础实际valid一次、敏感性在明确补充授权后累计两次，次数详见结果报告，不由存储保管权限推导新增评价权限。
+
+已删除两端各3个用完的传输ZIP，每端4,039,407字节；172份必要证据保留。见[Windows清理](../reports/seller_alias_continual/20260924/result_sync/20260924_112014/windows_cleanup.json)、[Linux清理](../reports/seller_alias_continual/20260924/result_sync/20260924_112014/linux_cleanup.json)。这些是文件逻辑大小，不是共享磁盘实测增量。
+
+实际结果外审与本地主审结束后，Windows另外删除上传ZIP及5个浏览器日志／快照，共6文件4,939,700字节，并移除空浏览器临时目录。删除前逐一确认299份提交材料可通过原路径或不可变快照恢复，25份冻结来源和4份恢复来源大小／SHA保持；完整回复文本／HTML、主审记录、核验命令／结果、请求、授权／拒绝和HTTP403历史均保留。见[外审清理](../reports/seller_alias_continual/20260924/result_review/cleanup.json)。本轮没有删除有效科研结果、缓存或Linux模型；外审后资料通过SFTP按原路径同步，回执见[同步记录](../reports/seller_alias_continual/20260924/result_review/sync.json)。
+
+2026-09-19再次按用户要求盘点Windows／Linux项目临时文件及科研产物，两端均未发现新增可确认丢弃的文件，本次删除0文件、0字节。Windows浏览器目录为空、未发现项目命名的临时文件；Linux六个已结束实验work为空，/tmp与/var/tmp未发现属于当前用户且以本项目命名的临时项。剩余压缩包属于外审原件或历史源码／状态快照；模型目录.cache中的小型下载来源元数据、有效负结果和唯一归档检查点保留。未加载模型、解析正式标签、操作封存资产或修改活动实验。此盘点不是对全部历史实验的重新科学评价；详见[本次汇总](../reports/maintenance/20260919_161100/summary.json)。下方为既有实际删除与归档记录。
+
+## 2026年9月18日两端临时副本清理
+
+按用户明确要求检查训练并清理无用文件，Windows实际删除16文件、3389085字节（约3.23 MiB），Linux删除5文件、42069字节（约41.1 KiB）。这是所删文件的逻辑大小，未将共享磁盘可用空间变化当作本次释放量。
+
+Windows清理了9个浏览器日志／快照／重复下载、2份已完成外审的上传包，以及5份已解包的结果传输包。Linux清理同类5份结果传输包；47个成员均逐一核对了保留文件的实际大小和SHA-256。上传请求、清单、完整审查回复、主执行者核验及解包结果继续保留。含独有旧源码或历史状态的包不因扩展名为ZIP而删除，历史审批拒绝记录仍保留原义。
+
+盘点未确认可删除的正式科研结果：Linux大型模型是历史有效实验的保留检查点，包含有效负结果和比较参照；六个已结束实验的work目录已为空。Windows剩余大型私有／封存资产仍遵守原保留范围。本次没有加载模型、解析实验标签、重新评判所有历史实验或修改活动队列。基础模型9份与敏感性21份批准来源均核验一致，去重并加监听、放行记录后的27文件在清理前后未变。
+
+逐项删除路径、原SHA及恢复位置见[Windows临时清理](../reports/maintenance/20260918_150800/windows_cleanup.json)、[Windows传输包清理](../reports/maintenance/20260918_150800/windows_archives_cleanup.json)、[Linux解包成员及保留路径](../reports/maintenance/20260918_150800/linux_plan.json)、[Linux清理回执](../reports/maintenance/20260918_150800/linux_cleanup.json)和[汇总](../reports/maintenance/20260918_150800/summary.json)。下文9月14日记录为既有大载荷归档历史。
+
+2026-09-14 用户要求尽量把 Windows 大型数据集、模型和 checkpoint 迁到 Linux；远端已有且核验一致的直接清理 Windows 副本，并明确列为长期科研纪律。此项是文件归档与副本清理，不改变科学结论、实验合同或标签权限，按现行纪律免外审。
+
+Windows 根目录：`C:/Users/35734/Downloads/2018-10-05-grams-finalexports`。
+Linux 归档根目录：`/home/yongpeng/cross-lingual`。两端保持清单中的相对路径。
+
+## 当前清单与执行状态
+
+状态：**归档、两端核验、Windows科研载荷清理及临时文件收尾均已完成。最后两个Windows临时文件由用户手动删除，执行者已核对均不存在。**
+
+最初盘点只遍历元数据；执行阶段按原始字节复制和计算散列，没有解析标签或载入模型。原项目文件逻辑大小约40.18 GiB，以下41,308文件、36,663,351,030字节（34.15 GiB）已在Linux完整归档，并从Windows删除。删除阶段观察到磁盘可用空间增加36,751,941,632字节（34.23 GiB）；逻辑大小与文件系统可用空间变化分别报告。
+
+| 类别 | 文件数 | 字节数 |
+|---|---:|---:|
+| `models/` 的完整预训练模型目录 | 71 | 11,134,845,748 |
+| 旧文本实验 `20260907_200309` 的推理 checkpoint | 12 | 22,633,965,684 |
+| 原始来源目录与根数据文件 | 41,209 | 1,957,413,921 |
+| 大型公开派生数据 | 16 | 937,125,677 |
+
+精确路径与分组保存在[原始元数据清单](../reports/storage_migration/20260914/inventory.json)。其中 `hashes_verified=false`、`deleted_files=0` 是盘点时的历史状态，原记录保持不变；当前完成状态以[两端核验](../reports/storage_migration/20260914/verification.json)、[删除回执](../reports/storage_migration/20260914/deletion.json)和[删除后核对](../reports/storage_migration/20260914/post_verification.json)为准。
+
+远端已有90文件、12,148,939,825字节与本地原件完全一致，直接复用；缺失41,218文件、24,514,411,205字节已补齐。41,206个原始小文件通过299,423,216字节的临时压缩包传输，解包后逐文件核对；12个checkpoint直接复制。新补齐的逻辑字节量不等于压缩后的网络传输量。最终远端41,308文件全部大小及SHA-256匹配，回传核验回执SHA-256为`1601b5fe3c26fdaffb26e5da54f81bd1467b9e2703b0fa03850adf787a831c86`。本地原件的12个checkpoint散列也与原point.json一致。
+
+Windows原生PowerShell于14:41:28—14:50:49执行逐文件删除，实际561.487秒；每项删除前再次计算本地SHA-256。41,308个路径均已不存在，6,683个未选中文件在最终文档更新前核对大小／修改时间均无变化。没有模型反序列化、标签解析或训练；冻结清单、原结论和实验目录标识保持。当前本地代码若依赖已归档路径，先按本记录恢复，不能把本地缺少归档载荷误判为实验失效。
+
+14:52的Linux检查：整盘约3.6 TiB、已用2.5 TiB（71%）、可用1015 GiB；项目实际占用约88 GiB，其中reports约72 GiB、models约14 GiB。GPU在14:18的独立只读复查仍为内核580.173.02、系统驱动库580.178.04，NVML不匹配、PyTorch Error804，未启动训练。
+
+原始来源范围为 `html-rips/`、`2017-12-09-grams-christopher/`，以及 `3z669jwe.sql`、`tijkc3xx.sql`、`market_item.xlsx`、`2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx`、`products_data.csv`。只调整原字节的存储位置，不修改、合并或再生成原始输入。公开派生项仅含清单内16文件；没有将“派生数据”解释为整个 reports 目录。
+
+`private_custody/`、私有审计／oracle、身份资产、封存真值与 qrels 不迁移或删除；Git、代码、文档、原始清单、审查与结果证据，以及当前 Windows 评价所需的小型输入保留。其他未明确属于公开输入的历史大文件暂留，不能只按体积扩大封存访问范围。预训练模型的选择依据本次用户明确的大文件归档要求，不沿用早期无关清理任务的 models 排除范围。
+
+## 迁移与删除方法
+
+本阶段先只读核对资源、项目归属和远端路径；初始远端可用空间1,114,211,950,592字节。使用单连接SFTP串行复制、单进程nice15／idle I/O散列核验。原计划按35 GiB预留，实际新补齐载荷为上述24,514,411,205字节；临时包仅299,423,216字节，未使用GPU或修改共享环境。以下方法继续作为后续归档纪律。
+
+对每个选中文件核对本地原件和远端实际文件大小及 SHA-256；远端不存在的先按原路径复制，存在但不同的停止该项而不覆盖。核验完成后，删除前再确认本地仍为相同文件、最终绝对路径在 Windows 项目根内，采用原生 PowerShell 精确路径删除。保留逐项复制／复用、核验、删除清单及实际释放空间；中断时保留未核验原件，不能把计划数量写成已完成。
+
+新科研输出直接留 Linux 时，只返回 Windows 审查必需的结果、分数、日志和小型记录；如需本地模型或大型输入，按清单从 Linux 恢复到相同路径并核对原散列，遵守另行适用的实验权限，用后清理多余副本。迁移本身不允许重训或重建文件来冒充原件。
+
+## 与旧归档的衔接
+
+9月10日的[Linux清理](LINUX_CLEANUP.zh.md)删除了旧文本实验的12个Linux模型副本，当时Windows为保留位置。该记录是正确的历史事实。9月14日已按原point.json及两端SHA-256恢复到Linux，并删除Windows副本；**当前恢复方向改为Linux→Windows，Linux为这批原模型的保留位置**。旧删除回执及冻结清单保持不变，不重新训练替代原模型。
+
+## 临时文件收尾
+
+Linux上的临时上传包已由执行者删除，见[远端清理回执](../reports/storage_migration/20260914/remote_cleanup.json)。Windows的`reports/storage_migration/20260914/source_upload.tar.gz`（原299,423,216字节）和`cleanup.ps1`（原4,603字节），合计299,427,819字节，已由用户手动删除；执行者随后检查两个精确路径均不存在，见[清理完成核验](../reports/storage_migration/20260914/cleanup_completion.json)。本次临时文件清理已闭环，不再列为待办。
+
+此前两次自动删除请求及用户再次明确要求后的第三次请求，均在执行前被自动审批以`blocked by policy`拒绝；[原拒绝记录](../reports/storage_migration/20260914/cleanup.json)和[再次尝试记录](../reports/storage_migration/20260914/cleanup_retry.json)保留为历史。不得把用户手动删除记为执行者命令成功，也不根据原文件大小虚构此次手动删除的实测磁盘增量；确认时间仅代表核验时点。此前34.15 GiB科研载荷删除及其磁盘观察值不变。

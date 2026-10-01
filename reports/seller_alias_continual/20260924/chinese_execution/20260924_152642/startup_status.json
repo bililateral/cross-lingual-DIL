@@ -1,0 +1,72 @@
+{
+  "status": "FORMAL_TRAINING_UPDATES_VERIFIED_RUNNING",
+  "training_log_snapshot_at": "2026-09-24T15:33:45.228779+08:00",
+  "monitoring_recovery": "Initial metadata-only snapshot collection stopped on a size_bytes key typo after copying six files. Continued from those unchanged snapshots using the actual bytes field; no training restart, source change or supervision access.",
+  "observed_at": "2026-09-24T15:34:14.891151+08:00",
+  "phase": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642",
+  "job": "reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job",
+  "launch_pid": 2902148,
+  "training_pid": 2902159,
+  "observed_logged_updates": {
+    "mean_bce": 24,
+    "mean_rank": 0,
+    "split_bce": 0,
+    "split_rank": 0
+  },
+  "observed_logged_total": 24,
+  "planned_total": 3456,
+  "progress_is_not_elapsed_time_fraction": true,
+  "last_update_event": {
+    "arm": "mean_bce",
+    "completed": 24,
+    "elapsed_seconds": 100.09730677003972,
+    "event": "updates",
+    "peak_observed_bytes": 42448
+  },
+  "torch_contracts": {
+    "passed": 12,
+    "skipped": 0
+  },
+  "access": {
+    "development": 0,
+    "heldout": 0,
+    "owners": 0,
+    "train_parse_attempts": 1
+  },
+  "preflight": {
+    "mean_bce": {
+      "max_tokens": 96,
+      "records_checked": 24103,
+      "supervision_reads": 0,
+      "updates": 0
+    },
+    "mean_rank": {
+      "max_tokens": 96,
+      "records_checked": 24103,
+      "supervision_reads": 0,
+      "updates": 0
+    },
+    "split_bce": {
+      "max_tokens": 82,
+      "records_checked": 48206,
+      "supervision_reads": 0,
+      "updates": 0
+    },
+    "split_rank": {
+      "max_tokens": 82,
+      "records_checked": 48206,
+      "supervision_reads": 0,
+      "updates": 0
+    }
+  },
+  "unchanged_source_files_verified": 10,
+  "gpu_snapshot_csv": "2026/09/24 15:34:14.912, NVIDIA GeForce RTX 5090, 7515, 24595, 27",
+  "own_process_snapshot": "USER         PID    PPID     ELAPSED %CPU STAT COMMAND\nyongpeng 2902148       1       03:07  0.0 Ss   bash /home/yongpeng/cross-lingual/scripts/run_step28_chinese_base_linux_20260924.sh /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job\nyongpeng 2902159 2902158       03:07  100 Sl   python -u -B scripts/step28_chinese_base.py train --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20260924/chinese_execution/20260924_152642/job/run",
+  "limits": {
+    "training_job_seconds": 28800,
+    "new_execution_bytes": 34359738368
+  },
+  "evaluation_started": false,
+  "capability_results_available": false,
+  "monitoring_read_formal_label_bytes": false
+}

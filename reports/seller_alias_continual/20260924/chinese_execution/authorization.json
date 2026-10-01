@@ -1,0 +1,22 @@
+{
+  "status": "FORMAL_CHINESE_BASE_STAGE_RESUMED_BY_USER",
+  "date": "2026-09-24",
+  "user_answer": "确认方案并开始正式训练（推荐）",
+  "question_item_id": "[\"request_user_input_async\",\"call_qbzcmke73lgGrmNLAaMVSEMo\",0]",
+  "approved_scope": {
+    "model": "BAAI/bge-large-zh-v1.5",
+    "arms": ["mean_bce", "mean_rank", "split_bce", "split_rank"],
+    "epochs_per_arm": 6,
+    "physical_updates": 3456,
+    "resources": "One inspected idle GPU, one CPU thread, existing Linux py310; training job maximum8hours and32GiB new execution artifacts; expected2-5hours is an estimate.",
+    "supervision": "One train binary-label parse shared by all four arms; one development parse after the complete model/source/score gate; no automatic failed-stage reparse.",
+    "capability_gate": "Each of three development domains FPR<=0.001 AND recall>=0.5 at the single globally calibrated threshold per arm.",
+    "follow_through": "Necessary deployment, monitoring, complete-gate evaluation, result synchronization, independent result analysis and default external result review within the confirmed plan.",
+    "forbidden": "No test/owners/sealed truth, new model/seed/endpoint selection, automatic retry, shared environment modification or interference with other users."
+  },
+  "policy": "schema/step28_chinese_base_policy.json",
+  "policy_sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+  "runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+  "implementation_review": "reports/seller_alias_continual/20260924/chinese_implementation/primary_review.json",
+  "formal_training_started_at_record_creation": false
+}
