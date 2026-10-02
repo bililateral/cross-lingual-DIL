@@ -60,8 +60,9 @@ def independent_update(model: object, optimizer: object, current: object, old: o
     return {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
 
 
-def gate_fixture(home: Path) -> tuple:
+def gate_fixture(home: Path, p: dict | None = None) -> tuple:
     """Small file-identity fixtures; not proof of native save/reload or training."""
+    p = method.contract() if p is None else p
     old_job = home / "original"
     old_root = old_job / "run"
     old_root.mkdir(parents=True)
@@ -80,13 +81,13 @@ def gate_fixture(home: Path) -> tuple:
     for directory in ("scores", "maps", "points", "updates", "models", "memory"):
         (root / directory).mkdir(parents=True)
     method.data.write_json(root / "partition.json", partition)
-    manifest = {"status": runner.COMPLETE, "source_files": method.sources(),
-                "policy_sha256": method.POLICY_SHA256, "physical_updates": 3456,
-                "gradient_group_presentations": 6912, "points": {}, "training": {},
+    manifest = {"status": runner.complete_status(p), "source_files": method.sources(p),
+                "policy_sha256": method.policy_sha256(p), "physical_updates": p["physical_updates"],
+                "gradient_group_presentations": p["gradient_group_presentations"], "points": {}, "training": {},
                 "restored_starts": {}, "memories": {}, "partition": method.data.record(root / "partition.json", root)}
     for order in method.ORDERS:
         shared = runner.old_point(reference, order + "_shared")
-        for arm, weight in method.ARMS.items():
+        for arm, weight in p["arms"].items():
             manifest["restored_starts"][order + "_" + arm] = {
                 "full_checkpoint": shared["full_checkpoint"], "adam_step": 288,
                 "first_scores_replayed_exactly": True, "model_state_sha256": shared["model_state_sha256"],
@@ -94,15 +95,15 @@ def gate_fixture(home: Path) -> tuple:
                 "memory_source": old_manifest["memories"][order + "_er_after1"]["file"],
                 "memory_summary": old_manifest["memories"][order + "_er_after1"]}
             retained = copy.deepcopy(old_manifest["memories"][f"{order}_er_stage2"])
-            memory_path = root / "memory" / (method.point_name(order, arm, 2) + ".json")
+            memory_path = root / "memory" / (method.point_name(order, arm, 2, p) + ".json")
             memory_path.write_bytes((old_root / retained["file"]["path"]).read_bytes())
             retained["file"] = method.data.record(memory_path, root)
-            manifest["memories"][method.point_name(order, arm, 2)] = retained
+            manifest["memories"][method.point_name(order, arm, 2, p)] = retained
             for stage in (2, 3):
-                name = method.point_name(order, arm, stage)
+                name = method.point_name(order, arm, stage, p)
                 old_point = runner.old_point(reference, f"{order}_er_stage{stage}")
                 point = copy.deepcopy(old_point)
-                point.update(name=name, history_weight=weight, policy_sha256=method.POLICY_SHA256)
+                point.update(name=name, history_weight=weight, policy_sha256=method.policy_sha256(p))
                 for role, rec in old_point["scores"].items():
                     values = np.load(old_root / rec["path"], allow_pickle=False)
                     point["scores"][role] = runner.save_array(root / "scores" / f"{name}_{role}.npy", values, root)
@@ -164,7 +165,7 @@ class WeightContracts(unittest.TestCase):
             self.assertEqual(a[key], b[key])
 
     def test_weights_match_independent_derivatives_and_adam(self) -> None:
-        for weight in (.5, .25):
+        for weight in (.5, .25, .1):
             with self.subTest(weight=weight):
                 model, opt, c, current, old = prepared()
                 reference, reference_opt = clone(model, opt, c)
@@ -183,7 +184,7 @@ class WeightContracts(unittest.TestCase):
     def test_only_history_weight_changes_forwards(self) -> None:
         model, opt, c, current, old = prepared()
         scores = []
-        for weight in (.5, .25):
+        for weight in (.5, .25, .1):
             other, other_opt = clone(model, opt, c)
             captured = []
             hook = other.head.register_forward_hook(lambda _, __, result: captured.append(result.detach().clone()))
@@ -193,8 +194,9 @@ class WeightContracts(unittest.TestCase):
                 hook.remove()
             self.assertEqual(len(captured), 2)
             scores.append(captured)
-        for a, b in zip(*scores, strict=True):
-            self.assertTrue(torch.equal(a, b))
+        for captured in scores[1:]:
+            for a, b in zip(scores[0], captured, strict=True):
+                self.assertTrue(torch.equal(a, b))
 
     def test_unknown_coefficients_and_missing_history_rejected(self) -> None:
         model, opt, c, current, old = prepared()
@@ -373,6 +375,132 @@ class WeightContracts(unittest.TestCase):
         for comparison in result["comparisons"].values():
             self.assertEqual(len(comparison["interpretation"]["checks"]), 23)
             self.assertTrue(comparison["interpretation"]["pilot_observed_checks_pass"])
+
+    def test_low_scope_and_six_point_blind_gate(self) -> None:
+        p = method.contract("low")
+        self.assertEqual(p["arms"], {"tenth": .1})
+        self.assertEqual(p["physical_updates"], 1728)
+        self.assertEqual(p["runtime"]["maximum_gpu_stage_seconds"], 43200)
+        self.assertEqual(p["runtime"]["maximum_output_bytes"], 16 * 1024 ** 3)
+        with tempfile.TemporaryDirectory() as directory:
+            root, manifest, reference = gate_fixture(Path(directory), p)
+            self.assertEqual(len(runner.blind_gate(root, manifest, reference, p)), 6)
+            with self.assertRaises(ValueError):
+                runner.blind_gate(root, manifest, reference)  # Cannot route low through the old scope.
+            del manifest["points"]["CAB_tenth_stage3"]
+            with self.assertRaises(ValueError):
+                runner.blind_gate(root, manifest, reference, p)
+
+    def test_low_checkpoint_uses_new_policy_and_weight(self) -> None:
+        p = method.contract("low")
+        model, opt, c, _, _ = prepared(576)
+        cal = [fixtures.handmade_group(f"cal_{i}") for i in range(12)]
+        valid = [fixtures.handmade_group(f"valid_{i}") for i in range(60)]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for folder in ("work", "models", "scores", "maps", "points"):
+                (root / folder).mkdir()
+            point = runner.checkpoint(root, "ABC_tenth_stage2", model, opt, c, "ABC", 2,
+                                      cal, valid, {"a": 1., "b": 0.}, fixtures.HandmadeBudget(), .1, p)
+            self.assertEqual(point["history_weight"], .1)
+            self.assertEqual(point["policy_sha256"], method.LOW_POLICY_SHA256)
+            self.assertFalse((root / point["full_checkpoint"]["path"]).exists())
+
+    def test_low_real_tiny_stage_uses_paired_schedule_and_tenth_updates(self) -> None:
+        p = method.contract("low")
+        model, opt, c, _, _ = prepared()
+        current = [fixtures.handmade_group(f"fit_B_{i}") for i in range(48)]
+        history = [fixtures.handmade_group(f"fit_A_{i}", 1) for i in range(48)]
+        memory = method.parent.Memory("ABC", method.parent.contract()["memory_seed"], False, {"a": 1., "b": 0.})
+        memory.retain(history, 1, None)
+        oracle = method.parent.Memory.from_bytes(memory.to_bytes())
+        oracle.begin_stage(2)
+        sequence, _ = method.parent.schedule(current, method.parent.contract(), "ABC", 2)
+        reference_log = {"current_ids": [g.uid for g in sequence],
+                         "history_ids": [oracle.draw()[0].uid for _ in range(288)],
+                         "memory_after_training": oracle.summary()}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "updates").mkdir()
+            budget = fixtures.HandmadeBudget()
+            budget.state = lambda: {"handmade_fixture": True}
+            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "tenth", root,
+                                     reference_log, budget, p)
+            values = np.load(root / row["update_file"]["path"], allow_pickle=False)
+            self.assertTrue(np.all(values[:, method.STEP_COLUMNS.index("history_weight")] == .1))
+            self.assertEqual(row["history_ids"], reference_log["history_ids"])
+            self.assertEqual(method.parent.adam_step(opt), 576)
+
+    def test_low_endpoint_differences_use_quarter_and_seq(self) -> None:
+        p = method.contract("low")
+        old, domains = fixtures.synthetic_matrices()
+        for roles in old.values():
+            for values in roles.values():
+                values[:] = .3
+        new = {}
+        for order in method.ORDERS:
+            for arm, gain in (("half", .04), ("quarter", .08), ("tenth", .1)):
+                for stage in (2, 3):
+                    values = np.full((60, 22), .3 + gain, dtype=np.float64)
+                    for key in ("brier", "log_loss"):
+                        values[:, method.metrics.COLUMNS.index(key)] = .3 - gain
+                    (new if arm == "tenth" else old)[f"{order}_{arm}_stage{stage}"] = {
+                        role: values.copy() for role in method.ROLES}
+        result = evaluation.evaluate_matrices(new, old, domains, p)
+        self.assertAlmostEqual(result["comparisons"]["tenth_minus_quarter"]["primary"]["O"]["map"]["mean"], .02)
+        self.assertAlmostEqual(result["comparisons"]["tenth_minus_seq"]["primary"]["O"]["map"]["mean"], .1)
+        self.assertEqual(result["selection"]["selected"], "tenth")
+
+    def test_low_selection_uses_quarter_independently_of_seq(self) -> None:
+        p = method.contract("low")
+        endpoints = {"tenth": {"primary": {"O": {"map": {"mean": .4}, "recall_at_5": {"mean": .5}}}}}
+        comparisons = {"tenth_minus_" + ref: {"interpretation": {"pilot_observed_checks_pass": False}}
+                       for ref in ("quarter", "seq")}
+        for versus_seq in (False, True):
+            comparisons["tenth_minus_seq"]["interpretation"]["pilot_observed_checks_pass"] = versus_seq
+            self.assertEqual(evaluation.select_configuration(endpoints, comparisons, p)["selected"], "quarter")
+        comparisons["tenth_minus_seq"]["interpretation"]["pilot_observed_checks_pass"] = False
+        comparisons["tenth_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"] = True
+        self.assertEqual(evaluation.select_configuration(endpoints, comparisons, p)["selected"], "tenth")
+
+    def test_low_full_collection_and_saved_reference_recovery(self) -> None:
+        p = method.contract("low")
+        def available_job(spec: dict) -> Path:
+            local = method.data.ROOT / spec["local_small_job"]
+            return local if local.is_dir() else method.data.ROOT / spec["linux_job"]
+
+        old_job, weight_job = available_job(p["baseline"]), available_job(p["weight_reference"])
+        reference = method.baseline(p, old_job, weight_job)
+        # Identifiers only from the saved result; all new truth/text/scores here are handmade.
+        groups = [fixtures.handmade_group(uid) for uid in reference["collected"]["group_ids"]]
+        raw = np.tile(np.linspace(-2, 1, 378, dtype=np.float32), (60, 1))
+        scores = {name: {role: raw if role == "raw" else raw.astype(np.float64) for role in method.ROLES}
+                  for name in method.expected_points(p)}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "collection"
+            runner.collect(root, scores, groups, reference["partition"], method.sources(p), p)
+            self.assertEqual(len(list(root.glob("*.npy"))), 18)
+            with mock.patch.object(method.base, "load_model", side_effect=AssertionError("Saved-only recovery")):
+                result = evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
+            self.assertEqual(result["new_metric_count_sets"], 18)
+            self.assertEqual(result["reused_metric_count_sets"], 81)
+            self.assertEqual(set(result["comparisons"]), {"tenth_minus_quarter", "tenth_minus_seq"})
+            for comparison in result["comparisons"].values():
+                self.assertEqual(len(comparison["interpretation"]["checks"]), 23)
+            saved = method.data.read_json(weight_job / "evaluation/evaluation.json")
+            for arm in ("quarter", "half", "seq", "er"):
+                for role, endpoints in result["endpoints"][arm].items():
+                    for endpoint, rows in endpoints.items():
+                        for metric, row in rows.items():
+                            expected = saved["endpoints"][arm][role][endpoint][metric]
+                            np.testing.assert_allclose(row["mean"], expected["mean"], rtol=0, atol=1e-12)
+                            np.testing.assert_allclose(row["conditional_95pct_interval"],
+                                                       expected["conditional_95pct_interval"], rtol=0, atol=1e-12)
+                            for order in method.ORDERS:
+                                self.assertAlmostEqual(row["per_order"][order], expected["per_order"][order], places=12)
+            before = (root / "evaluation.json").read_bytes()
+            evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
+            self.assertEqual((root / "evaluation.json").read_bytes(), before)
 
 
 if __name__ == "__main__":

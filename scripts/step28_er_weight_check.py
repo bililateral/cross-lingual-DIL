@@ -17,11 +17,13 @@ import numpy as np
 import step28_er_weight as method
 
 
-def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> tuple[dict, dict]:
     import torch
 
     started = time.monotonic()
-    c = method.config(method.contract())
+    p = method.contract() if p is None else p
+    weight = method.all_weights(p)[arm]
+    c = method.config(p)
     model = method.base.load_model(c, "split_rank", "cpu")
     optimizer = method.core.make_optimizer(model, c)
     old, current = fixtures.handmade_group("native_old", 1), fixtures.handmade_group("native_current", 2)
@@ -52,7 +54,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
     captured = []
     hooks.append(model.head.register_forward_hook(lambda _, __, output: captured.append(output.detach().flatten().numpy().copy())))
     try:
-        update = method.update(model, optimizer, current, old, c, method.ARMS[arm], 2, 1, 107, 108,
+        update = method.update(model, optimizer, current, old, c, weight, 2, 1, 107, 108,
                                observe=True, check=check)
     finally:
         for hook in hooks:
@@ -65,7 +67,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
         for term, value in independent[role].items():
             if abs(update[role + "_" + term] - value) > (4e-6 if term == "total" else 2e-6):
                 raise ValueError("Native objective differs from scalar reference")
-    expected_total = independent["current"]["total"] + method.ARMS[arm] * independent["history"]["total"]
+    expected_total = independent["current"]["total"] + weight * independent["history"]["total"]
     if abs(update["total"] - expected_total) > 6e-6:
         raise ValueError("Native history weight does not affect the full objective")
     rows = []
@@ -81,7 +83,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
     unused = [name for name, p in model.named_parameters() if p.grad is None]
     if any(".pooler." not in name for name in unused) or method.parent.adam_step(optimizer) != 289:
         raise ValueError("Unexpected native optimizer coverage or step")
-    result = {"arm": arm, "history_weight": method.ARMS[arm], "native_updates_actually_executed": 2,
+    result = {"arm": arm, "history_weight": weight, "native_updates_actually_executed": 2,
               "counter_fixture": "One real warm update, then Adam counters 1->288; no native full-stage continuity claim",
               "initial_model_state_sha256": initial, "after_warm_model_state_sha256": after_warm,
               "before_stage2_optimizer_sha256": before_optimizer,
@@ -100,12 +102,13 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
     return result, components
 
 
-def run(destination: Path) -> dict:
+def run(destination: Path, study: str = "weight") -> dict:
     import torch
 
     if platform.system() != "Linux" or os.environ.get("CUDA_VISIBLE_DEVICES") != "" or destination.exists():
         raise ValueError("New Linux CPU evidence only; CUDA_VISIBLE_DEVICES must be empty")
-    p, source_files = method.contract(), method.sources()
+    p = method.contract(study)
+    source_files = method.sources(p)
     torch.set_num_threads(1)
     os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
     torch.use_deterministic_algorithms(True)
@@ -138,29 +141,34 @@ def run(destination: Path) -> dict:
                    for key in ("file_count", "total_size_bytes", "content_sha256")):
                 raise ValueError("Pretrained archive differs")
             reports, components = {}, {}
-            for arm in method.ARMS:
+            native_arms = ("quarter", "tenth") if study == "low" else tuple(p["arms"])
+            for arm in native_arms:
                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
-                reports[arm], components[arm] = native(arm, fixtures, check)
+                reports[arm], components[arm] = native(arm, fixtures, check, p)
                 method.data.write_json(destination.parent / (arm + ".json"), reports[arm])
                 print(method.data.json_bytes({"event": "native_end", "arm": arm, "seconds": reports[arm]["seconds"]}).decode(), flush=True)
             for field in ("initial_model_state_sha256", "after_warm_model_state_sha256",
                           "before_stage2_optimizer_sha256", "captured_current_logits", "captured_history_logits"):
-                if reports["half"][field] != reports["quarter"][field]:
+                if reports[native_arms[0]][field] != reports[native_arms[1]][field]:
                     raise ValueError("Native current/history states are not paired: " + field)
             scaling = {}
-            for name in components["half"]:
-                half_current, half_history = components["half"][name]
-                quarter_current, quarter_history = components["quarter"][name]
-                torch.testing.assert_close(half_current, quarter_current, rtol=0, atol=0)
-                torch.testing.assert_close(half_history, 2 * quarter_history, rtol=1e-6, atol=1e-8)
+            ratio = method.all_weights(p)[native_arms[0]] / method.all_weights(p)[native_arms[1]]
+            for name in components[native_arms[0]]:
+                a_current, a_history = components[native_arms[0]][name]
+                b_current, b_history = components[native_arms[1]][name]
+                torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
+                torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
                 scaling[name] = {"current_exactly_equal": True,
-                                 "half_history_equals_twice_quarter": True,
-                                 "maximum_history_difference": float((half_history - 2 * quarter_history).abs().max())}
-            if method.sources() != source_files:
+                                 "compared_arms": list(native_arms), "expected_history_ratio": ratio,
+                                 "weighted_history_scaling_matches": True,
+                                 "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
+            if method.sources(p) != source_files:
                 raise ValueError("Sources changed during verification")
             result = {"status": "PASS_ER_WEIGHT_HANDMADE_CPU", "source_files": source_files,
                       "contracts": contracts, "native": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
-                                                         for arm in method.ARMS},
+                                                         for arm in p["arms"]},
+                      "native_reference": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
+                                           for arm in native_arms if arm not in p["arms"]},
                       "native_updates_actually_executed": 4, "native_history_gradient_scaling_verified": True,
                       "native_component_comparison": scaling, "formal_inputs": False, "formal_labels": False,
                       "formal_updates": 0, "gpu": False, "retained_native_weights": 0, "archive": archive,
@@ -181,6 +189,7 @@ def run(destination: Path) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--study", choices=("weight", "low"), default="weight")
     args = parser.parse_args()
-    result = run(args.out.resolve())
+    result = run(args.out.resolve(), args.study)
     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())

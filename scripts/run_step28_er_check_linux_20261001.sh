@@ -4,6 +4,11 @@ cd /home/yongpeng/cross-lingual
 source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
 conda activate py310
 out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
+study="${2:-weight}"
+case "$study" in
+  weight|low) ;;
+  *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
+esac
 case "$out" in
   "$PWD/reports/"*) ;;
   *) echo 'Output must be within project reports' >&2; exit 2 ;;
@@ -21,6 +26,7 @@ set +e
 /usr/bin/time -v -o "$out/resource_usage.log" \
   timeout --signal=TERM --kill-after=30s 1h \
   python -u -B scripts/step28_er_weight_check.py \
+  --study "$study" \
   --out "$out/audit.json" > "$out/stdout.log" 2> "$out/stderr.log"
 status=$?
 printf '%s\n' "$status" > "$out/exit_status.txt"

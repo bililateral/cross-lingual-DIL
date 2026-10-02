@@ -1,0 +1,165 @@
+{
+  "study": "seller_alias_er_low_weight",
+  "schema_version": 1,
+  "contract_document": "docs/SELLER_ALIAS_ER_LOW.zh.md",
+  "decision": "reports/documentation/20261002/er_low/decision.json",
+  "parent_policy_sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534",
+  "arms": {
+    "tenth": 0.1
+  },
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "seed": "s0",
+  "stages": [
+    2,
+    3
+  ],
+  "updates_per_stage": 288,
+  "physical_updates": 1728,
+  "gradient_group_presentations": 3456,
+  "distinct_stage_endpoints": 6,
+  "metric_count_sets": 18,
+  "baseline": {
+    "linux_job": "reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job",
+    "local_small_job": "reports/seller_alias_continual/20261001/bge_continual_result/returned/job",
+    "records": {
+      "execution.json": {
+        "path": "execution.json",
+        "bytes": 3065,
+        "sha256": "e9c0936b63a4dc97f5a4a5f7875f65fa1736dbf0f11e2a154a381b2a31a8238a"
+      },
+      "run/manifest.json": {
+        "path": "run/manifest.json",
+        "bytes": 25690,
+        "sha256": "c55c6a069dc1d14e41883dae69bebb4d4a1934611d9a493c6047da0ff19705cc"
+      },
+      "run/partition.json": {
+        "path": "run/partition.json",
+        "bytes": 14922,
+        "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+      },
+      "evaluation/collected.json": {
+        "path": "evaluation/collected.json",
+        "bytes": 24360,
+        "sha256": "22b792c678788d4f762ad38416635a255ca5c5f383f971387bdcdac3c074a857"
+      },
+      "evaluation/evaluation.json": {
+        "path": "evaluation/evaluation.json",
+        "bytes": 769370,
+        "sha256": "d8ad5763c8d504cc2e57943d362463ec0ec44136cfb3ce4310e78fead6808e23"
+      }
+    },
+    "environment": {
+      "python": "3.10.19",
+      "torch": "2.9.1+cu130",
+      "cuda": "13.0",
+      "gpu": "NVIDIA GeForce RTX 5090"
+    }
+  },
+  "loss": {
+    "current": 1,
+    "bce": 1,
+    "rank": 1,
+    "known_top5_hard": 0.5,
+    "logit_mse": 0,
+    "history_weight_scope": "entire independently reduced historical base objective",
+    "normalization": "current_plus_lambda_history_no_further_division"
+  },
+  "selection": {
+    "eligibility": "all_original_23_checks_against_quarter",
+    "primary": "O.map.mean",
+    "tie_break": [
+      "O.recall_at_5.mean",
+      "larger_history_weight"
+    ],
+    "fallback": "quarter",
+    "extra_configurations": false,
+    "scope": "developed_valid_selection_not_independent_confirmation",
+    "reference": "quarter"
+  },
+  "evaluation": {
+    "comparators": [
+      "quarter",
+      "seq"
+    ],
+    "roles": [
+      "raw",
+      "stage-cal",
+      "first-cal"
+    ],
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260930,
+    "threshold_logit": 0,
+    "observed_guard_tolerance": 0,
+    "inherit_original_23_checks": true
+  },
+  "supervision": {
+    "train_parse_attempts": 1,
+    "valid_parse_attempts": 1,
+    "test_access": false,
+    "owners_access": false,
+    "automatic_retry": false,
+    "after_all_training_and_blind_gate": true
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 43200,
+    "maximum_output_bytes": 17179869184,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "torch_cpu_threads": 1,
+    "estimated_hours": [
+      5,
+      7
+    ]
+  },
+  "cpu_verification": {
+    "maximum_seconds": 3600,
+    "maximum_evidence_bytes": 268435456,
+    "formal_inputs": false,
+    "formal_labels": false,
+    "gpu": false,
+    "retained_native_weights": false,
+    "estimate_minutes": [
+      10,
+      20
+    ]
+  },
+  "reference_arms": {
+    "half": 0.5,
+    "quarter": 0.25
+  },
+  "weight_reference": {
+    "linux_job": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/job",
+    "local_small_job": "reports/seller_alias_continual/20261002/er_weight_result/returned/job",
+    "records": {
+      "execution.json": {
+        "path": "execution.json",
+        "bytes": 4456,
+        "sha256": "11326929807ec2f9f3c13b6014974d3c2995c8b11556d68c4e125244a5bf6630"
+      },
+      "run/manifest.json": {
+        "path": "run/manifest.json",
+        "bytes": 21542,
+        "sha256": "95df52a3db121bd4dc17e691ea9839dbee60251f09b2a3abfd18a4769cb092aa"
+      },
+      "run/partition.json": {
+        "path": "run/partition.json",
+        "bytes": 14922,
+        "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+      },
+      "evaluation/collected.json": {
+        "path": "evaluation/collected.json",
+        "bytes": 17741,
+        "sha256": "556afc816305445c2b284727b9d01b9a8bd9e358e1930a72e1a5eca7d5d11a31"
+      },
+      "evaluation/evaluation.json": {
+        "path": "evaluation/evaluation.json",
+        "bytes": 929498,
+        "sha256": "4719696daac04cc5a6de75bc69db544cd67f0c6c2605fc81d2c325dfe6328e3a"
+      }
+    }
+  }
+}

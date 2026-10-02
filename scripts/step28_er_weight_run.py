@@ -21,6 +21,14 @@ save_array, rng_state, restore_rng = prior.save_array, prior.rng_state, prior.re
 COMPLETE = "COMPLETE_3456_ER_WEIGHT_UPDATES_VALID_BLIND"
 
 
+def complete_status(p: dict) -> str:
+    return f"COMPLETE_{p['physical_updates']}_ER_WEIGHT_UPDATES_VALID_BLIND"
+
+
+def collected_status(p: dict) -> str:
+    return f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+
+
 def old_point(reference: dict, name: str) -> dict:
     root = reference["job"] / "run"
     return data.read_json(data.verify(root / reference["manifest"]["points"][name]["path"],
@@ -34,9 +42,10 @@ def old_training(reference: dict, order: str, stage: int) -> dict:
 
 def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
                 order: str, stage: int, arm: str, root: Path, reference_log: dict,
-                budget: Any) -> dict:
+                budget: Any, p: dict | None = None) -> dict:
     import torch
 
+    p = method.contract() if p is None else p
     started = time.monotonic()
     old_policy = parent.contract()
     sequence, stream = parent.schedule(current, old_policy, order, stage)
@@ -53,7 +62,7 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
             raise ValueError("ER history is unpaired or contains logits")
         history_ids.append(history.uid)
         record = method.update(
-            model, optimizer, group, history, c, method.ARMS[arm], stage, index + 1,
+            model, optimizer, group, history, c, p["arms"][arm], stage, index + 1,
             data.seed_for(stream, index, "dropout"),
             data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
             observe=index + 1 in (1, 29, 30, 288), check=budget.check)
@@ -69,9 +78,9 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
     if (summary["draw_count"] != 288 or summary["members"] != reference_log["memory_after_training"]["members"]
             or history_ids != reference_log["history_ids"]):
         raise ValueError("Historical supply differs after training")
-    name = method.point_name(order, arm, stage)
+    name = method.point_name(order, arm, stage, p)
     result = {"name": name, "order": order, "arm": arm, "stage": stage,
-              "history_weight": method.ARMS[arm], "updates": 288,
+              "history_weight": p["arms"][arm], "updates": 288,
               "adam_step": parent.adam_step(optimizer), "actual_domain": order[stage - 1],
               "current_ids": [g.uid for g in sequence], "history_ids": history_ids,
               "current_dropout_stream": stream, "memory_after_training": summary,
@@ -89,16 +98,17 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
 
 def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
                order: str, stage: int, current_cal: list, valid: list,
-               first_map: dict, budget: Any, weight: float) -> dict:
+               first_map: dict, budget: Any, weight: float, p: dict | None = None) -> dict:
     """Real full state restore and complete score replay at every endpoint."""
+    p = method.contract() if p is None else p
     started = time.monotonic()
-    arm = next((arm for arm, value in method.ARMS.items() if value == weight), None)
-    if (arm is None or name != method.point_name(order, arm, stage) or first_map is None
+    arm = next((arm for arm, value in p["arms"].items() if value == weight), None)
+    if (arm is None or name != method.point_name(order, arm, stage, p) or first_map is None
             or len(current_cal) != 12 or len(valid) != 60 or parent.adam_step(optimizer) != stage * 288):
         raise ValueError("Checkpoint is not a complete stage with current-only calibration")
     state = rng_state()
     metadata = {"name": name, "order": order, "stage": stage, "seed": "s0",
-                "completed_updates": stage * 288, "policy_sha256": method.POLICY_SHA256,
+                "completed_updates": stage * 288, "policy_sha256": method.policy_sha256(p),
                 "history_weight": weight, "parent_policy_sha256": parent.POLICY_SHA256,
                 "rng": state, "config": c}
     scores = {"calibration": parent.ranking.score(model, current_cal, c, budget.check),
@@ -143,13 +153,13 @@ def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
     auxiliary = {"checkpoint_metadata": metadata,
                  "first_map": dict(zip(("a", "b"), parent.calibration.parameters(first))),
                  "stage_map": dict(zip(("a", "b"), parent.calibration.parameters(mapping))),
-                 "history_weight": weight, "er_weight_policy_sha256": method.POLICY_SHA256}
+                 "history_weight": weight, "er_weight_policy_sha256": method.policy_sha256(p)}
     auxiliary_bytes = len(data.json_bytes(auxiliary))
     if auxiliary_bytes > 1048576:
         raise ValueError("Common phase/RNG/map metadata alone exceeds history allowance")
     result = {"name": name, "order": order, "stage": stage, "actual_domain": order[stage - 1],
               "completed_updates": stage * 288, "full_model_adam_and_rng_restore_verified": True,
-              "history_weight": weight, "policy_sha256": method.POLICY_SHA256,
+              "history_weight": weight, "policy_sha256": method.policy_sha256(p),
               "model_state_sha256": model_digest,
               "model": {**inference, "path": path.relative_to(root).as_posix()},
               "full_checkpoint": {**full, "path": full_path.relative_to(root).as_posix()},
@@ -195,7 +205,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
     if after != partition:
         raise ValueError("Partition changed after training-label alignment")
     supply = method.ContinuationSupply(selected, partition)
-    manifest = {"status": "RUNNING", "source_files": method.sources(), "policy_sha256": method.POLICY_SHA256,
+    manifest = {"status": "RUNNING", "source_files": method.sources(p), "policy_sha256": method.policy_sha256(p),
                 "baseline_records": p["baseline"]["records"], "public_inputs": checked,
                 "pretrained_archive": archive, "partition": data.record(root / "partition.json", root),
                 "points": {}, "training": {}, "memories": {}, "restored_starts": {},
@@ -206,7 +216,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
         rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
         memory_payload = data.verify(old_root / rec["path"], rec).read_bytes()
         first_scores = prior.array(old_root, shared["scores"]["development"], (60, 378), np.float32)
-        for arm, weight in method.ARMS.items():
+        for arm, weight in p["arms"].items():
             path = order + "_" + arm
             model, optimizer = prior.restore_branch(old_root, shared, c)
             state = rng_state()
@@ -219,7 +229,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                     or memory.first_map != shared["first_map_parameters"]):
                 raise ValueError("Original ER cache/first-map restore differs")
             memory.auxiliary = {**shared["learner_auxiliary"], "history_weight": weight,
-                                "er_weight_policy_sha256": method.POLICY_SHA256}
+                                "er_weight_policy_sha256": method.policy_sha256(p)}
             memory.to_bytes()
             supply.resume(path, order, shared)
             manifest["restored_starts"][path] = {
@@ -229,11 +239,11 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                 "memory_summary": memory.summary()}
             for stage in (2, 3):
                 current, current_cal = supply.current(path, order, stage)
-                name = method.point_name(order, arm, stage)
+                name = method.point_name(order, arm, stage, p)
                 train_stage(model, optimizer, current, memory, c, order, stage, arm,
-                            root, old_training(reference, order, stage), budget)
+                            root, old_training(reference, order, stage), budget, p)
                 point = checkpoint(root, name, model, optimizer, c, order, stage,
-                                   current_cal, groups["development"], memory.first_map, budget, weight)
+                                   current_cal, groups["development"], memory.first_map, budget, weight, p)
                 memory.auxiliary = point["learner_auxiliary"]
                 data.write_json(root / "memory" / (name + "_budget.json"), memory.summary())
                 if stage == 2:
@@ -251,29 +261,31 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
             del model, optimizer, memory
             gc.collect()
             torch.cuda.empty_cache()
-    if method.sources() != manifest["source_files"]:
+    if method.sources(p) != manifest["source_files"]:
         raise ValueError("Scientific sources changed")
-    manifest.update(status=COMPLETE, budget=budget.state())
+    manifest.update(status=complete_status(p), budget=budget.state())
     data.write_json(root / "manifest.json", manifest)
     return manifest, partition, groups["development"], reference
 
 
-def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
+def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = None) -> dict:
     """Reject incomplete, unpaired, or incorrectly weighted updates before valid labels."""
-    if (manifest["status"] != COMPLETE or manifest["source_files"] != method.sources()
-            or manifest["policy_sha256"] != method.POLICY_SHA256
-            or manifest["physical_updates"] != 3456 or manifest["gradient_group_presentations"] != 6912
-            or set(manifest["points"]) != set(method.expected_points())
-            or set(manifest["training"]) != set(method.expected_points())
-            or set(manifest["memories"]) != {method.point_name(o, a, 2) for o in method.ORDERS for a in method.ARMS}
-            or set(manifest["restored_starts"]) != {o + "_" + a for o in method.ORDERS for a in method.ARMS}):
+    p = method.contract() if p is None else p
+    if (manifest["status"] != complete_status(p) or manifest["source_files"] != method.sources(p)
+            or manifest["policy_sha256"] != method.policy_sha256(p)
+            or manifest["physical_updates"] != p["physical_updates"]
+            or manifest["gradient_group_presentations"] != p["gradient_group_presentations"]
+            or set(manifest["points"]) != set(method.expected_points(p))
+            or set(manifest["training"]) != set(method.expected_points(p))
+            or set(manifest["memories"]) != {method.point_name(o, a, 2, p) for o in method.ORDERS for a in p["arms"]}
+            or set(manifest["restored_starts"]) != {o + "_" + a for o in method.ORDERS for a in p["arms"]}):
         raise ValueError("Incomplete ER weight experiment")
     partition = data.read_json(data.verify(root / manifest["partition"]["path"], manifest["partition"]))
     if partition != reference["partition"]:
         raise ValueError("Blind partition changed")
     result = {}
     for order in method.ORDERS:
-        for arm, weight in method.ARMS.items():
+        for arm, weight in p["arms"].items():
             start = manifest["restored_starts"][order + "_" + arm]
             shared = old_point(reference, order + "_shared")
             initial_memory = reference["manifest"]["memories"][order + "_er_after1"]
@@ -286,7 +298,7 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
                     or start["memory_summary"]["with_logits"]
                     or start["memory_summary"]["seen"] != 48):
                 raise ValueError("Shared start evidence differs")
-            retained = manifest["memories"][method.point_name(order, arm, 2)]
+            retained = manifest["memories"][method.point_name(order, arm, 2, p)]
             data.verify(root / retained["file"]["path"], retained["file"])
             if (retained["members"] != reference["manifest"]["memories"][f"{order}_er_stage2"]["members"]
                     or retained["seen"] != 96 or retained["with_logits"]
@@ -294,14 +306,14 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
                     or retained["serialized_bytes"] > 1048576):
                 raise ValueError("Saved next-stage cache is incomplete or unpaired")
             for stage in (2, 3):
-                name = method.point_name(order, arm, stage)
+                name = method.point_name(order, arm, stage, p)
                 point_rec, log_rec = manifest["points"][name], manifest["training"][name]
                 point = data.read_json(data.verify(root / point_rec["path"], point_rec))
                 log = data.read_json(data.verify(root / log_rec["path"], log_rec))
                 if (point["name"] != name or point["order"] != order or point["stage"] != stage
                         or point["actual_domain"] != order[stage - 1] or point["completed_updates"] != stage * 288
                         or point["history_weight"] != weight or not point["full_model_adam_and_rng_restore_verified"]
-                        or point["policy_sha256"] != method.POLICY_SHA256):
+                        or point["policy_sha256"] != method.policy_sha256(p)):
                     raise ValueError("Native endpoint identity or actual restoration differs")
                 data.verify(root / point["model"]["path"], point["model"])
                 original_log = old_training(reference, order, stage)
@@ -358,18 +370,20 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
     return result
 
 
-def collect(root: Path, scores: dict, labelled: list, partition: dict, source_files: list) -> dict:
+def collect(root: Path, scores: dict, labelled: list, partition: dict, source_files: list,
+            p: dict | None = None) -> dict:
+    p = method.contract() if p is None else p
     root.mkdir()
-    if set(scores) != set(method.expected_points()):
+    if set(scores) != set(method.expected_points(p)):
         raise ValueError("Collect all new points together")
     if [g.uid for g in labelled] != [row["group_uid"] for row in partition["development"]]:
         raise ValueError("Valid truth and blind group identities differ")
     truth = np.asarray([g.labels for g in labelled], dtype=np.uint8)
     collected = {"status": "COLLECTING", "points": {}, "source_files": source_files,
-                 "policy_sha256": method.POLICY_SHA256, "metric_columns": list(method.metrics.COLUMNS),
+                 "policy_sha256": method.policy_sha256(p), "metric_columns": list(method.metrics.COLUMNS),
                  "group_ids": [g.uid for g in labelled],
                  "domains": [row["domain"] for row in partition["development"]]}
-    for name in method.expected_points():
+    for name in method.expected_points(p):
         if set(scores[name]) != set(method.ROLES):
             raise ValueError("Missing output role")
         entries = {}
@@ -380,19 +394,20 @@ def collect(root: Path, scores: dict, labelled: list, partition: dict, source_fi
             data.write_json(counts_path, counts)
             entries[role] = {"matrix": rec, "counts": data.record(counts_path, root)}
         collected["points"][name] = entries
-    collected["status"] = "ALL_36_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+    collected["status"] = collected_status(p)
     data.write_json(root / "collected.json", collected)
     return collected
 
 
-def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
+def execute(job: Path, audit_path: Path, authorization_path: Path, study: str = "weight") -> dict:
     import torch
 
-    p, source_files = method.contract(), method.sources()
+    p = method.contract(study)
+    source_files = method.sources(p)
     auth = data.read_json(authorization_path)
     audit = data.read_json(audit_path)
     if (platform.system() != "Linux" or auth.get("status") != "AUTHORIZED_ER_WEIGHT_AFTER_REVIEW"
-            or auth.get("policy_sha256") != method.POLICY_SHA256 or auth.get("source_files") != source_files
+            or auth.get("policy_sha256") != method.policy_sha256(p) or auth.get("source_files") != source_files
             or auth.get("job") != job.relative_to(data.ROOT).as_posix()
             or auth.get("runtime") != p["runtime"] or auth.get("supervision") != p["supervision"]
             or auth.get("review_and_primary_passed") is not True):
@@ -400,10 +415,10 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
     if (audit.get("status") != "PASS_ER_WEIGHT_HANDMADE_CPU" or audit.get("source_files") != source_files
             or audit.get("contracts", {}).get("failed") != 0 or audit.get("contracts", {}).get("skipped") != 0
             or audit.get("formal_inputs") is not False or audit.get("formal_labels") is not False
-            or set(audit.get("native", {})) != set(method.ARMS)
+            or set(audit.get("native", {})) != set(p["arms"])
             or audit.get("native_history_gradient_scaling_verified") is not True):
         raise ValueError("Necessary current handmade/native CPU verification is missing")
-    for record in audit["native"].values():
+    for record in (*audit["native"].values(), *audit.get("native_reference", {}).values()):
         data.verify(audit_path.parent / record["path"], record)
     if (not job.is_relative_to((data.ROOT / "reports").resolve())
             or any((job / n).exists() for n in ("run", "evaluation", "access.json"))):
@@ -435,18 +450,18 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
                                             "cpu_affinity": sorted(os.sched_getaffinity(0))})
     try:
         manifest, partition, valid, reference = train(job, p, budget)
-        scores = blind_gate(job / "run", manifest, reference)
+        scores = blind_gate(job / "run", manifest, reference, p)
         data.write_json(job / "before_valid.json", {"status": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE",
                                                     "manifest": data.record(job / "run/manifest.json", job),
                                                     "label_parses": data.read_json(job / "access.json")})
         labelled = prior.parse_once(job, valid, method.config(p), "development")
-        collect(job / "evaluation", scores, labelled, partition, source_files)
+        collect(job / "evaluation", scores, labelled, partition, source_files, p)
         del labelled, valid, scores
-        result = evaluation.finalize(job / "evaluation", reference["job"] / "evaluation")
+        result = evaluation.finalize(job / "evaluation", reference["job"] / "evaluation", p)
         budget.check(1)
-        if method.sources() != source_files:
+        if method.sources(p) != source_files:
             raise ValueError("Sources changed before completion")
-        completion = {"status": result["status"], "physical_updates": 3456,
+        completion = {"status": result["status"], "physical_updates": p["physical_updates"],
                       "label_parses": data.read_json(job / "access.json"), "budget": budget.state(),
                       "selection": result["selection"],
                       "evaluation": data.record(job / "evaluation/evaluation.json", job)}
@@ -455,7 +470,7 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
     except Exception as error:
         data.write_json(job / "failure.json", {"status": "FAILED_NO_AUTOMATIC_RETRY", "error": str(error),
                                                "label_parses": data.read_json(job / "access.json"),
-                                               "recovery": "After all 36 matrices exist, finalize uses saved metrics only"})
+                                               "recovery": "After the complete collection exists, finalize uses saved metrics only"})
         raise
 
 
@@ -465,16 +480,17 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--audit", type=Path)
     parser.add_argument("--authorization", type=Path)
+    parser.add_argument("--study", choices=("weight", "low"), default="weight")
     args = parser.parse_args()
     if platform.system() != "Linux":
         parser.error("Research scripts run only on Linux py310")
     if args.action == "execute":
         if args.audit is None or args.authorization is None:
             parser.error("execute needs --audit and --authorization")
-        result = execute(args.out.resolve(), args.audit.resolve(), args.authorization.resolve())
+        result = execute(args.out.resolve(), args.audit.resolve(), args.authorization.resolve(), args.study)
     else:
-        p = method.contract()
-        result = evaluation.finalize(args.out.resolve(), data.ROOT / p["baseline"]["linux_job"] / "evaluation")
+        p = method.contract(args.study)
+        result = evaluation.finalize(args.out.resolve(), data.ROOT / p["baseline"]["linux_job"] / "evaluation", p)
     print(data.json_bytes({"status": result["status"], "out": str(args.out)}).decode())
 
 

@@ -13,29 +13,33 @@ import step28_bge_continual_evaluate as previous
 data, metrics = method.data, method.metrics
 
 
-def select_configuration(endpoints: dict, comparisons: dict) -> dict:
-    eligible = [arm for arm in method.ARMS
-                if comparisons[arm + "_minus_er"]["interpretation"]["pilot_observed_checks_pass"]]
+def select_configuration(endpoints: dict, comparisons: dict, p: dict | None = None) -> dict:
+    p = method.contract() if p is None else p
+    reference = p["selection"].get("reference", "er")
+    eligible = [arm for arm in p["arms"]
+                if comparisons[arm + "_minus_" + reference]["interpretation"]["pilot_observed_checks_pass"]]
     selected = max(eligible, key=lambda arm: (endpoints[arm]["primary"]["O"]["map"]["mean"],
                                             endpoints[arm]["primary"]["O"]["recall_at_5"]["mean"],
-                                            method.ARMS[arm])) if eligible else "er"
-    return {"selected": selected, "history_weight": method.ARMS.get(selected, 1.),
+                                            p["arms"][arm])) if eligible else reference
+    return {"selected": selected, "history_weight": method.all_weights(p)[selected],
             "eligible": eligible, "fallback_used": not eligible,
-            "criterion": "All 23 versus original ER, then O MAP, O Recall@5, larger lambda",
+            "criterion": "All 23 versus " + reference + ", then O MAP, O Recall@5, larger lambda",
             "scope": "Developed-valid configuration selection, not independent confirmation",
             "additional_configurations_authorized": False}
 
 
-def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
-    if set(new) != set(method.expected_points()):
+def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None = None) -> dict:
+    p = method.contract() if p is None else p
+    if set(new) != set(method.expected_points(p)):
         raise ValueError("Incomplete new matrix set")
     draws = previous.bootstrap_draws()
     views = {"seq": (old, "seq"), "er": (old, "er")}
-    for arm in method.ARMS:
+    for arm in (*p.get("reference_arms", {}), *p["arms"]):
         # The old endpoint function uses logical ER names. Explicit local views do
         # not rename a published artifact or mutate parent globals or source files.
         view = {order + "_shared": old[order + "_shared"] for order in method.ORDERS}
-        view.update({f"{order}_er_stage{stage}": new[method.point_name(order, arm, stage)]
+        source = new if arm in p["arms"] else old
+        view.update({f"{order}_er_stage{stage}": source[f"{order}_{arm}_stage{stage}"]
                      for order in method.ORDERS for stage in (2, 3)})
         views[arm] = (view, "er")
     fields = {arm: {role: {name: previous.endpoint_fields(arrays, domains, logical, role, name)
@@ -47,8 +51,8 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
                        for role, entries in variants.items()}
                  for arm, variants in fields.items()}
     comparisons = {}
-    for arm in method.ARMS:
-        for reference in ("er", "seq"):
+    for arm in p["arms"]:
+        for reference in p["evaluation"]["comparators"]:
             delta = {name: previous.summarize_field(fields[arm]["primary"][name]
                                                    - fields[reference]["primary"][name], draws)
                      for name in previous.ENDPOINTS}
@@ -61,7 +65,7 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
             comparisons[arm + "_minus_" + reference] = {
                 "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
     return {"endpoints": endpoints, "comparisons": comparisons,
-            "selection": select_configuration(endpoints, comparisons)}
+            "selection": select_configuration(endpoints, comparisons, p)}
 
 
 def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
@@ -79,59 +83,76 @@ def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, d
     return arrays, counts
 
 
-def stage_table(new: dict, old: dict, domains: list[str]) -> bytes:
+def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None) -> bytes:
+    p = method.contract() if p is None else p
     stream = io.StringIO(newline="")
     writer = csv.writer(stream, lineterminator="\n")
     writer.writerow(("order", "method", "history_weight", "stage", "source_point",
                      "role", "actual_domain", "metric", "group_macro"))
     rows = previous.domain_rows(domains)
     for order in method.ORDERS:
-        for arm in ("seq", "er", *method.ARMS):
+        for arm, weight in method.all_weights(p).items():
             for stage in (1, 2, 3):
                 point = (order + "_shared" if stage == 1 else
-                         method.point_name(order, arm, stage) if arm in method.ARMS else f"{order}_{arm}_stage{stage}")
-                source = new if arm in method.ARMS and stage > 1 else old
+                         f"{order}_{arm}_stage{stage}")
+                source = new if arm in p["arms"] and stage > 1 else old
                 for role in method.ROLES:
                     for domain, indices in zip("ABC", rows, strict=True):
                         for k, metric in enumerate(metrics.COLUMNS):
-                            writer.writerow((order, arm, method.ARMS.get(arm, 1. if arm == "er" else 0.),
+                            writer.writerow((order, arm, weight,
                                              stage, point, role, domain, metric,
                                              repr(float(source[point][role][indices, k].mean()))))
     return stream.getvalue().encode("utf-8")
 
 
-def finalize(root: Path, baseline_root: Path) -> dict:
-    p = method.contract()
-    reference = method.baseline(p, baseline_root.parent)
+def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+             weight_root: Path | None = None) -> dict:
+    p = method.contract() if p is None else p
+    reference = method.baseline(p, baseline_root.parent,
+                                None if weight_root is None else weight_root.parent)
     collected = data.read_json(root / "collected.json")
     old = reference["collected"]
-    if (collected["status"] != "ALL_36_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
-            or collected["policy_sha256"] != method.POLICY_SHA256
-            or collected["source_files"] != method.sources()
+    if (collected["status"] != f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+            or collected["policy_sha256"] != method.policy_sha256(p)
+            or collected["source_files"] != method.sources(p)
             or collected["metric_columns"] != list(metrics.COLUMNS)
-            or set(collected["points"]) != set(method.expected_points())
+            or set(collected["points"]) != set(method.expected_points(p))
             or collected["group_ids"] != old["group_ids"] or collected["domains"] != old["domains"]):
         raise ValueError("Complete aligned collection is required")
-    new_arrays, new_counts = read_points(root, collected, method.expected_points())
+    new_arrays, new_counts = read_points(root, collected, method.expected_points(p))
     names = [name for order in method.ORDERS for name in
              [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in ("seq", "er") for stage in (2, 3))]]
     old_arrays, old_counts = read_points(baseline_root, old, names)
+    reuse = [(baseline_root, old, names)]
+    if "weight_reference" in reference:
+        wr = reference["weight_reference"]
+        weight_names = [f"{order}_{arm}_stage{stage}" for order in method.ORDERS
+                        for arm in p["reference_arms"] for stage in (2, 3)]
+        weight_arrays, weight_counts = read_points(wr["job"] / "evaluation", wr["collected"], weight_names)
+        old_arrays.update(weight_arrays)
+        old_counts.update(weight_counts)
+        reuse.append((wr["job"] / "evaluation", wr["collected"], weight_names))
     # Preserve the exact small matrices/counts used, separately from new observations.
     destination = root / "reference"
     destination.mkdir(exist_ok=True)
-    for name in names:
-        for info in old["points"][name].values():
-            for rec in info.values():
-                source = data.verify(baseline_root / rec["path"], rec)
-                target = destination / rec["path"]
-                target.parent.mkdir(parents=True, exist_ok=True)
-                previous.write_once(target, source.read_bytes())
+    reused_points = {}
+    for source_root, collection, point_names in reuse:
+        for name in point_names:
+            reused_points[name] = collection["points"][name]
+            for info in collection["points"][name].values():
+                for rec in info.values():
+                    source = data.verify(source_root / rec["path"], rec)
+                    target = destination / rec["path"]
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    previous.write_once(target, source.read_bytes())
+    reused_count = len(reused_points) * len(method.ROLES)
     previous.write_once(destination / "collected.json", data.json_bytes({
         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
+        "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
         "group_ids": old["group_ids"], "domains": old["domains"],
-        "metric_columns": old["metric_columns"], "points": {name: old["points"][name] for name in names},
-        "status": "REUSED_45_ORIGINAL_PILOT_METRIC_COUNT_SETS"}))
-    result = evaluate_matrices(new_arrays, old_arrays, collected["domains"])
+        "metric_columns": old["metric_columns"], "points": reused_points,
+        "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))
+    result = evaluate_matrices(new_arrays, old_arrays, collected["domains"], p)
     absolute = {}
     rows = previous.domain_rows(collected["domains"])
     for arrays, counts in ((old_arrays, old_counts), (new_arrays, new_counts)):
@@ -145,15 +166,15 @@ def finalize(root: Path, baseline_root: Path) -> dict:
     buffer = io.BytesIO()
     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
-    previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"]))
+    previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
     result.update(status="COMPLETE_ER_WEIGHT_DEVELOPMENT_COMPARISON",
-                  source_files=collected["source_files"], policy_sha256=method.POLICY_SHA256,
+                  source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
                   collected=data.record(root / "collected.json", root),
                   reused_collection=data.record(destination / "collected.json", root),
-                  new_metric_count_sets=36, reused_metric_count_sets=45,
+                  new_metric_count_sets=p["metric_count_sets"], reused_metric_count_sets=reused_count,
                   stage_metrics=data.record(root / "stage_metrics.csv", root),
                   draws=data.record(root / "bootstrap_draws.npy", root), absolute_stage_results=absolute,
-                  scope="Two fixed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
+                  scope="Fixed confirmed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
                   next="Review full results; no further lambda or automatic training")
     previous.write_once(root / "evaluation.json", data.json_bytes(result))
     return result

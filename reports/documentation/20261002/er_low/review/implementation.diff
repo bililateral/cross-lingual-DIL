@@ -1,0 +1,1034 @@
+diff --git a/scripts/run_step28_er_check_linux_20261001.sh b/scripts/run_step28_er_check_linux_20261001.sh
+index a57aa1ab..77261cfa 100644
+--- a/scripts/run_step28_er_check_linux_20261001.sh
++++ b/scripts/run_step28_er_check_linux_20261001.sh
+@@ -4,6 +4,11 @@ cd /home/yongpeng/cross-lingual
+ source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
+ conda activate py310
+ out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
++study="${2:-weight}"
++case "$study" in
++  weight|low) ;;
++  *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
++esac
+ case "$out" in
+   "$PWD/reports/"*) ;;
+   *) echo 'Output must be within project reports' >&2; exit 2 ;;
+@@ -21,6 +26,7 @@ set +e
+ /usr/bin/time -v -o "$out/resource_usage.log" \
+   timeout --signal=TERM --kill-after=30s 1h \
+   python -u -B scripts/step28_er_weight_check.py \
++  --study "$study" \
+   --out "$out/audit.json" > "$out/stdout.log" 2> "$out/stderr.log"
+ status=$?
+ printf '%s\n' "$status" > "$out/exit_status.txt"
+diff --git a/scripts/run_step28_er_weight_linux_20261001.sh b/scripts/run_step28_er_weight_linux_20261001.sh
+index 85d4eb6b..23d0abf8 100644
+--- a/scripts/run_step28_er_weight_linux_20261001.sh
++++ b/scripts/run_step28_er_weight_linux_20261001.sh
+@@ -7,6 +7,12 @@ conda activate py310
+ out="$(realpath -m -- "${1:?Pass a new reports job directory}")"
+ audit="$(realpath -- "${2:?Pass current CPU audit receipt}")"
+ authorization="$(realpath -- "${3:?Pass matching formal authorization}")"
++study="${4:-weight}"
++case "$study" in
++  weight) time_limit=24h ;;
++  low) time_limit=12h ;;
++  *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
++esac
+ case "$out" in
+   "$PWD/reports/"*) ;;
+   *) echo 'Output must be within project reports' >&2; exit 2 ;;
+@@ -22,9 +28,10 @@ export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+ date --iso-8601=seconds > "$out/started.txt"
+ set +e
+ /usr/bin/time -v -o "$out/resource_usage.log" \
+-  timeout --signal=TERM --kill-after=30s 24h \
++  timeout --signal=TERM --kill-after=30s "$time_limit" \
+   python -u -B scripts/step28_er_weight_run.py execute \
+   --out "$out" \
++  --study "$study" \
+   --audit "$audit" \
+   --authorization "$authorization" > "$out/train.log" 2>&1
+ status=$?
+diff --git a/scripts/step28_er_weight.py b/scripts/step28_er_weight.py
+index 06a75251..e8c34517 100644
+--- a/scripts/step28_er_weight.py
++++ b/scripts/step28_er_weight.py
+@@ -13,6 +13,8 @@ import step28_bge_continual_run as prior
+ base, data, core, metrics = parent.base, parent.data, parent.core, parent.metrics
+ POLICY = data.ROOT / "schema/step28_er_weight_policy.json"
+ POLICY_SHA256 = "9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396"
++LOW_POLICY = data.ROOT / "schema/step28_er_low_policy.json"
++LOW_POLICY_SHA256 = "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
+ ARMS = {"half": .5, "quarter": .25}
+ ORDERS, ROLES = parent.ORDERS, parent.ROLES
+ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+@@ -21,13 +23,18 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+                 "gradient_norm", "history_weight")
+ 
+ 
+-def contract() -> dict:
+-    if data.sha256(POLICY) != POLICY_SHA256:
++def contract(study: str = "weight") -> dict:
++    if study not in ("weight", "low"):
++        raise ValueError("Unknown confirmed ER study")
++    path, digest = (LOW_POLICY, LOW_POLICY_SHA256) if study == "low" else (POLICY, POLICY_SHA256)
++    arms = {"tenth": .1} if study == "low" else ARMS
++    updates = len(arms) * 3 * 2 * 288
++    if data.sha256(path) != digest:
+         raise ValueError("ER weight policy changed")
+-    p = data.read_json(POLICY)
++    p = data.read_json(path)
+     old = parent.contract()
+-    if (p["arms"] != ARMS or p["orders"] != list(ORDERS) or p["stages"] != [2, 3]
+-            or p["physical_updates"] != 3456 or p["gradient_group_presentations"] != 6912
++    if (p["arms"] != arms or p["orders"] != list(ORDERS) or p["stages"] != [2, 3]
++            or p["physical_updates"] != updates or p["gradient_group_presentations"] != 2 * updates
+             or p["parent_policy_sha256"] != parent.POLICY_SHA256
+             or old["memory"]["capacity_groups"] != 6
+             or p["supervision"]["test_access"] or p["supervision"]["owners_access"]):
+@@ -35,13 +42,21 @@ def contract() -> dict:
+     return p
+ 
+ 
++def policy_sha256(p: dict) -> str:
++    return LOW_POLICY_SHA256 if p["study"] == "seller_alias_er_low_weight" else POLICY_SHA256
++
++
++def all_weights(p: dict) -> dict[str, float]:
++    return {"seq": 0., "er": 1., **p.get("reference_arms", {}), **p["arms"]}
++
++
+ def config(p: dict) -> dict:
+     result = parent.config(parent.contract())
+     result["runtime"] = copy.deepcopy(p["runtime"])
+     return result
+ 
+ 
+-def sources() -> list[dict]:
++def sources(p: dict | None = None) -> list[dict]:
+     additional = ["docs/SELLER_ALIAS_ER_WEIGHT.zh.md", "schema/step28_er_weight_policy.json",
+                   "scripts/step28_er_weight.py", "scripts/step28_er_weight_run.py",
+                   "scripts/step28_er_weight_evaluate.py", "scripts/step28_er_weight_check.py",
+@@ -49,21 +64,25 @@ def sources() -> list[dict]:
+                   "scripts/run_step28_er_weight_linux_20261001.sh",
+                   "scripts/run_step28_er_check_linux_20261001.sh",
+                   "reports/documentation/20261001/er_weight/decision.json"]
++    if p is not None and p["study"] == "seller_alias_er_low_weight":
++        additional += ["docs/SELLER_ALIAS_ER_LOW.zh.md", "schema/step28_er_low_policy.json",
++                       "reports/documentation/20261002/er_low/decision.json"]
+     rows = prior.sources() + [data.record(data.ROOT / name, data.ROOT) for name in additional]
+     return sorted(rows, key=lambda row: row["path"])
+ 
+ 
+-def point_name(order: str, arm: str, stage: int) -> str:
+-    if order not in ORDERS or arm not in ARMS or stage not in (2, 3):
++def point_name(order: str, arm: str, stage: int, p: dict | None = None) -> str:
++    if order not in ORDERS or arm not in (ARMS if p is None else p["arms"]) or stage not in (2, 3):
+         raise ValueError("Unknown new ER endpoint")
+     return f"{order}_{arm}_stage{stage}"
+ 
+ 
+-def expected_points() -> list[str]:
+-    return [point_name(order, arm, stage) for order in ORDERS for arm in ARMS for stage in (2, 3)]
++def expected_points(p: dict | None = None) -> list[str]:
++    return [point_name(order, arm, stage, p) for order in ORDERS
++            for arm in (ARMS if p is None else p["arms"]) for stage in (2, 3)]
+ 
+ 
+-def baseline(p: dict, job: Path | None = None) -> dict:
++def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None) -> dict:
+     """Verify pinned small records; native state and cache are checked when restored."""
+     job = job if job is not None else data.ROOT / p["baseline"]["linux_job"]
+     records = {name: data.read_json(data.verify(job / name, rec))
+@@ -83,8 +102,37 @@ def baseline(p: dict, job: Path | None = None) -> dict:
+     for key, value in p["baseline"]["environment"].items():
+         if records["execution.json"][key] != value:
+             raise ValueError("Original environment differs from pinned baseline")
+-    return {"job": job, "manifest": manifest, "partition": partition,
+-            "collected": collected, "execution": records["execution.json"]}
++    result = {"job": job, "manifest": manifest, "partition": partition,
++              "collected": collected, "execution": records["execution.json"]}
++    if "weight_reference" in p:
++        spec = p["weight_reference"]
++        weight_job = weight_job if weight_job is not None else data.ROOT / spec["linux_job"]
++        saved = {name: data.read_json(data.verify(weight_job / name, rec))
++                 for name, rec in spec["records"].items()}
++        wm, wc = saved["run/manifest.json"], saved["evaluation/collected.json"]
++        if (wm["status"] != "COMPLETE_3456_ER_WEIGHT_UPDATES_VALID_BLIND"
++                or wm["policy_sha256"] != POLICY_SHA256 or wc["policy_sha256"] != POLICY_SHA256
++                or wm["physical_updates"] != 3456 or wm["gradient_group_presentations"] != 6912
++                or wm["source_files"] != wc["source_files"]
++                or wm["baseline_records"] != p["baseline"]["records"]
++                or wc["status"] != "ALL_36_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++                or set(wc["points"]) != set(expected_points())
++                or any(wc[key] != collected[key] for key in ("group_ids", "domains", "metric_columns"))
++                or any(saved["execution.json"][key] != value for key, value in p["baseline"]["environment"].items())):
++            raise ValueError("Frozen half/quarter reference is not aligned with the shared pilot")
++        for order in ORDERS:
++            rec = manifest["points"][order + "_shared"]
++            shared = data.read_json(data.verify(job / "run" / rec["path"], rec))
++            for arm in p["reference_arms"]:
++                start = wm["restored_starts"][order + "_" + arm]
++                if (start["full_checkpoint"] != shared["full_checkpoint"]
++                        or start["model_state_sha256"] != shared["model_state_sha256"]
++                        or start["first_map"] != shared["first_map_parameters"]
++                        or start["memory_source"] != manifest["memories"][order + "_er_after1"]["file"]
++                        or start["adam_step"] != 288 or not start["first_scores_replayed_exactly"]):
++                    raise ValueError("A historical reference used a different first-stage state")
++        result["weight_reference"] = {"job": weight_job, "manifest": wm, "collected": wc}
++    return result
+ 
+ 
+ class ContinuationSupply(parent.Supply):
+@@ -104,7 +152,7 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
+     """Only lambda changes: two supervised forwards, weighted history, one clip/update."""
+     import torch
+ 
+-    if (type(weight) not in (int, float) or weight not in (1., .5, .25)
++    if (type(weight) not in (int, float) or weight not in (1., .5, .25, .1)
+             or stage not in (2, 3) or current is None or history is None
+             or current.labels is None or history.labels is None
+             or history.uid == current.uid or len(optimizer.param_groups) != 2
+diff --git a/scripts/step28_er_weight_check.py b/scripts/step28_er_weight_check.py
+index d35d51bd..02e066ee 100644
+--- a/scripts/step28_er_weight_check.py
++++ b/scripts/step28_er_weight_check.py
+@@ -17,11 +17,13 @@ import numpy as np
+ import step28_er_weight as method
+ 
+ 
+-def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
++def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> tuple[dict, dict]:
+     import torch
+ 
+     started = time.monotonic()
+-    c = method.config(method.contract())
++    p = method.contract() if p is None else p
++    weight = method.all_weights(p)[arm]
++    c = method.config(p)
+     model = method.base.load_model(c, "split_rank", "cpu")
+     optimizer = method.core.make_optimizer(model, c)
+     old, current = fixtures.handmade_group("native_old", 1), fixtures.handmade_group("native_current", 2)
+@@ -52,7 +54,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+     captured = []
+     hooks.append(model.head.register_forward_hook(lambda _, __, output: captured.append(output.detach().flatten().numpy().copy())))
+     try:
+-        update = method.update(model, optimizer, current, old, c, method.ARMS[arm], 2, 1, 107, 108,
++        update = method.update(model, optimizer, current, old, c, weight, 2, 1, 107, 108,
+                                observe=True, check=check)
+     finally:
+         for hook in hooks:
+@@ -65,7 +67,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+         for term, value in independent[role].items():
+             if abs(update[role + "_" + term] - value) > (4e-6 if term == "total" else 2e-6):
+                 raise ValueError("Native objective differs from scalar reference")
+-    expected_total = independent["current"]["total"] + method.ARMS[arm] * independent["history"]["total"]
++    expected_total = independent["current"]["total"] + weight * independent["history"]["total"]
+     if abs(update["total"] - expected_total) > 6e-6:
+         raise ValueError("Native history weight does not affect the full objective")
+     rows = []
+@@ -81,7 +83,7 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+     unused = [name for name, p in model.named_parameters() if p.grad is None]
+     if any(".pooler." not in name for name in unused) or method.parent.adam_step(optimizer) != 289:
+         raise ValueError("Unexpected native optimizer coverage or step")
+-    result = {"arm": arm, "history_weight": method.ARMS[arm], "native_updates_actually_executed": 2,
++    result = {"arm": arm, "history_weight": weight, "native_updates_actually_executed": 2,
+               "counter_fixture": "One real warm update, then Adam counters 1->288; no native full-stage continuity claim",
+               "initial_model_state_sha256": initial, "after_warm_model_state_sha256": after_warm,
+               "before_stage2_optimizer_sha256": before_optimizer,
+@@ -100,12 +102,13 @@ def native(arm: str, fixtures: object, check: object) -> tuple[dict, dict]:
+     return result, components
+ 
+ 
+-def run(destination: Path) -> dict:
++def run(destination: Path, study: str = "weight") -> dict:
+     import torch
+ 
+     if platform.system() != "Linux" or os.environ.get("CUDA_VISIBLE_DEVICES") != "" or destination.exists():
+         raise ValueError("New Linux CPU evidence only; CUDA_VISIBLE_DEVICES must be empty")
+-    p, source_files = method.contract(), method.sources()
++    p = method.contract(study)
++    source_files = method.sources(p)
+     torch.set_num_threads(1)
+     os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
+     torch.use_deterministic_algorithms(True)
+@@ -138,29 +141,34 @@ def run(destination: Path) -> dict:
+                    for key in ("file_count", "total_size_bytes", "content_sha256")):
+                 raise ValueError("Pretrained archive differs")
+             reports, components = {}, {}
+-            for arm in method.ARMS:
++            native_arms = ("quarter", "tenth") if study == "low" else tuple(p["arms"])
++            for arm in native_arms:
+                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
+-                reports[arm], components[arm] = native(arm, fixtures, check)
++                reports[arm], components[arm] = native(arm, fixtures, check, p)
+                 method.data.write_json(destination.parent / (arm + ".json"), reports[arm])
+                 print(method.data.json_bytes({"event": "native_end", "arm": arm, "seconds": reports[arm]["seconds"]}).decode(), flush=True)
+             for field in ("initial_model_state_sha256", "after_warm_model_state_sha256",
+                           "before_stage2_optimizer_sha256", "captured_current_logits", "captured_history_logits"):
+-                if reports["half"][field] != reports["quarter"][field]:
++                if reports[native_arms[0]][field] != reports[native_arms[1]][field]:
+                     raise ValueError("Native current/history states are not paired: " + field)
+             scaling = {}
+-            for name in components["half"]:
+-                half_current, half_history = components["half"][name]
+-                quarter_current, quarter_history = components["quarter"][name]
+-                torch.testing.assert_close(half_current, quarter_current, rtol=0, atol=0)
+-                torch.testing.assert_close(half_history, 2 * quarter_history, rtol=1e-6, atol=1e-8)
++            ratio = method.all_weights(p)[native_arms[0]] / method.all_weights(p)[native_arms[1]]
++            for name in components[native_arms[0]]:
++                a_current, a_history = components[native_arms[0]][name]
++                b_current, b_history = components[native_arms[1]][name]
++                torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
++                torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
+                 scaling[name] = {"current_exactly_equal": True,
+-                                 "half_history_equals_twice_quarter": True,
+-                                 "maximum_history_difference": float((half_history - 2 * quarter_history).abs().max())}
+-            if method.sources() != source_files:
++                                 "compared_arms": list(native_arms), "expected_history_ratio": ratio,
++                                 "weighted_history_scaling_matches": True,
++                                 "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
++            if method.sources(p) != source_files:
+                 raise ValueError("Sources changed during verification")
+             result = {"status": "PASS_ER_WEIGHT_HANDMADE_CPU", "source_files": source_files,
+                       "contracts": contracts, "native": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
+-                                                         for arm in method.ARMS},
++                                                         for arm in p["arms"]},
++                      "native_reference": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
++                                           for arm in native_arms if arm not in p["arms"]},
+                       "native_updates_actually_executed": 4, "native_history_gradient_scaling_verified": True,
+                       "native_component_comparison": scaling, "formal_inputs": False, "formal_labels": False,
+                       "formal_updates": 0, "gpu": False, "retained_native_weights": 0, "archive": archive,
+@@ -181,6 +189,7 @@ def run(destination: Path) -> dict:
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--out", type=Path, required=True)
++    parser.add_argument("--study", choices=("weight", "low"), default="weight")
+     args = parser.parse_args()
+-    result = run(args.out.resolve())
++    result = run(args.out.resolve(), args.study)
+     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())
+diff --git a/scripts/step28_er_weight_evaluate.py b/scripts/step28_er_weight_evaluate.py
+index f4d988e4..295bc69d 100644
+--- a/scripts/step28_er_weight_evaluate.py
++++ b/scripts/step28_er_weight_evaluate.py
+@@ -13,29 +13,33 @@ import step28_bge_continual_evaluate as previous
+ data, metrics = method.data, method.metrics
+ 
+ 
+-def select_configuration(endpoints: dict, comparisons: dict) -> dict:
+-    eligible = [arm for arm in method.ARMS
+-                if comparisons[arm + "_minus_er"]["interpretation"]["pilot_observed_checks_pass"]]
++def select_configuration(endpoints: dict, comparisons: dict, p: dict | None = None) -> dict:
++    p = method.contract() if p is None else p
++    reference = p["selection"].get("reference", "er")
++    eligible = [arm for arm in p["arms"]
++                if comparisons[arm + "_minus_" + reference]["interpretation"]["pilot_observed_checks_pass"]]
+     selected = max(eligible, key=lambda arm: (endpoints[arm]["primary"]["O"]["map"]["mean"],
+                                             endpoints[arm]["primary"]["O"]["recall_at_5"]["mean"],
+-                                            method.ARMS[arm])) if eligible else "er"
+-    return {"selected": selected, "history_weight": method.ARMS.get(selected, 1.),
++                                            p["arms"][arm])) if eligible else reference
++    return {"selected": selected, "history_weight": method.all_weights(p)[selected],
+             "eligible": eligible, "fallback_used": not eligible,
+-            "criterion": "All 23 versus original ER, then O MAP, O Recall@5, larger lambda",
++            "criterion": "All 23 versus " + reference + ", then O MAP, O Recall@5, larger lambda",
+             "scope": "Developed-valid configuration selection, not independent confirmation",
+             "additional_configurations_authorized": False}
+ 
+ 
+-def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
+-    if set(new) != set(method.expected_points()):
++def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None = None) -> dict:
++    p = method.contract() if p is None else p
++    if set(new) != set(method.expected_points(p)):
+         raise ValueError("Incomplete new matrix set")
+     draws = previous.bootstrap_draws()
+     views = {"seq": (old, "seq"), "er": (old, "er")}
+-    for arm in method.ARMS:
++    for arm in (*p.get("reference_arms", {}), *p["arms"]):
+         # The old endpoint function uses logical ER names. Explicit local views do
+         # not rename a published artifact or mutate parent globals or source files.
+         view = {order + "_shared": old[order + "_shared"] for order in method.ORDERS}
+-        view.update({f"{order}_er_stage{stage}": new[method.point_name(order, arm, stage)]
++        source = new if arm in p["arms"] else old
++        view.update({f"{order}_er_stage{stage}": source[f"{order}_{arm}_stage{stage}"]
+                      for order in method.ORDERS for stage in (2, 3)})
+         views[arm] = (view, "er")
+     fields = {arm: {role: {name: previous.endpoint_fields(arrays, domains, logical, role, name)
+@@ -47,8 +51,8 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
+                        for role, entries in variants.items()}
+                  for arm, variants in fields.items()}
+     comparisons = {}
+-    for arm in method.ARMS:
+-        for reference in ("er", "seq"):
++    for arm in p["arms"]:
++        for reference in p["evaluation"]["comparators"]:
+             delta = {name: previous.summarize_field(fields[arm]["primary"][name]
+                                                    - fields[reference]["primary"][name], draws)
+                      for name in previous.ENDPOINTS}
+@@ -61,7 +65,7 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str]) -> dict:
+             comparisons[arm + "_minus_" + reference] = {
+                 "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
+     return {"endpoints": endpoints, "comparisons": comparisons,
+-            "selection": select_configuration(endpoints, comparisons)}
++            "selection": select_configuration(endpoints, comparisons, p)}
+ 
+ 
+ def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
+@@ -79,59 +83,76 @@ def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, d
+     return arrays, counts
+ 
+ 
+-def stage_table(new: dict, old: dict, domains: list[str]) -> bytes:
++def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None) -> bytes:
++    p = method.contract() if p is None else p
+     stream = io.StringIO(newline="")
+     writer = csv.writer(stream, lineterminator="\n")
+     writer.writerow(("order", "method", "history_weight", "stage", "source_point",
+                      "role", "actual_domain", "metric", "group_macro"))
+     rows = previous.domain_rows(domains)
+     for order in method.ORDERS:
+-        for arm in ("seq", "er", *method.ARMS):
++        for arm, weight in method.all_weights(p).items():
+             for stage in (1, 2, 3):
+                 point = (order + "_shared" if stage == 1 else
+-                         method.point_name(order, arm, stage) if arm in method.ARMS else f"{order}_{arm}_stage{stage}")
+-                source = new if arm in method.ARMS and stage > 1 else old
++                         f"{order}_{arm}_stage{stage}")
++                source = new if arm in p["arms"] and stage > 1 else old
+                 for role in method.ROLES:
+                     for domain, indices in zip("ABC", rows, strict=True):
+                         for k, metric in enumerate(metrics.COLUMNS):
+-                            writer.writerow((order, arm, method.ARMS.get(arm, 1. if arm == "er" else 0.),
++                            writer.writerow((order, arm, weight,
+                                              stage, point, role, domain, metric,
+                                              repr(float(source[point][role][indices, k].mean()))))
+     return stream.getvalue().encode("utf-8")
+ 
+ 
+-def finalize(root: Path, baseline_root: Path) -> dict:
+-    p = method.contract()
+-    reference = method.baseline(p, baseline_root.parent)
++def finalize(root: Path, baseline_root: Path, p: dict | None = None,
++             weight_root: Path | None = None) -> dict:
++    p = method.contract() if p is None else p
++    reference = method.baseline(p, baseline_root.parent,
++                                None if weight_root is None else weight_root.parent)
+     collected = data.read_json(root / "collected.json")
+     old = reference["collected"]
+-    if (collected["status"] != "ALL_36_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+-            or collected["policy_sha256"] != method.POLICY_SHA256
+-            or collected["source_files"] != method.sources()
++    if (collected["status"] != f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++            or collected["policy_sha256"] != method.policy_sha256(p)
++            or collected["source_files"] != method.sources(p)
+             or collected["metric_columns"] != list(metrics.COLUMNS)
+-            or set(collected["points"]) != set(method.expected_points())
++            or set(collected["points"]) != set(method.expected_points(p))
+             or collected["group_ids"] != old["group_ids"] or collected["domains"] != old["domains"]):
+         raise ValueError("Complete aligned collection is required")
+-    new_arrays, new_counts = read_points(root, collected, method.expected_points())
++    new_arrays, new_counts = read_points(root, collected, method.expected_points(p))
+     names = [name for order in method.ORDERS for name in
+              [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in ("seq", "er") for stage in (2, 3))]]
+     old_arrays, old_counts = read_points(baseline_root, old, names)
++    reuse = [(baseline_root, old, names)]
++    if "weight_reference" in reference:
++        wr = reference["weight_reference"]
++        weight_names = [f"{order}_{arm}_stage{stage}" for order in method.ORDERS
++                        for arm in p["reference_arms"] for stage in (2, 3)]
++        weight_arrays, weight_counts = read_points(wr["job"] / "evaluation", wr["collected"], weight_names)
++        old_arrays.update(weight_arrays)
++        old_counts.update(weight_counts)
++        reuse.append((wr["job"] / "evaluation", wr["collected"], weight_names))
+     # Preserve the exact small matrices/counts used, separately from new observations.
+     destination = root / "reference"
+     destination.mkdir(exist_ok=True)
+-    for name in names:
+-        for info in old["points"][name].values():
+-            for rec in info.values():
+-                source = data.verify(baseline_root / rec["path"], rec)
+-                target = destination / rec["path"]
+-                target.parent.mkdir(parents=True, exist_ok=True)
+-                previous.write_once(target, source.read_bytes())
++    reused_points = {}
++    for source_root, collection, point_names in reuse:
++        for name in point_names:
++            reused_points[name] = collection["points"][name]
++            for info in collection["points"][name].values():
++                for rec in info.values():
++                    source = data.verify(source_root / rec["path"], rec)
++                    target = destination / rec["path"]
++                    target.parent.mkdir(parents=True, exist_ok=True)
++                    previous.write_once(target, source.read_bytes())
++    reused_count = len(reused_points) * len(method.ROLES)
+     previous.write_once(destination / "collected.json", data.json_bytes({
+         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
++        "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
+         "group_ids": old["group_ids"], "domains": old["domains"],
+-        "metric_columns": old["metric_columns"], "points": {name: old["points"][name] for name in names},
+-        "status": "REUSED_45_ORIGINAL_PILOT_METRIC_COUNT_SETS"}))
+-    result = evaluate_matrices(new_arrays, old_arrays, collected["domains"])
++        "metric_columns": old["metric_columns"], "points": reused_points,
++        "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))
++    result = evaluate_matrices(new_arrays, old_arrays, collected["domains"], p)
+     absolute = {}
+     rows = previous.domain_rows(collected["domains"])
+     for arrays, counts in ((old_arrays, old_counts), (new_arrays, new_counts)):
+@@ -145,15 +166,15 @@ def finalize(root: Path, baseline_root: Path) -> dict:
+     buffer = io.BytesIO()
+     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
+     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
+-    previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"]))
++    previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
+     result.update(status="COMPLETE_ER_WEIGHT_DEVELOPMENT_COMPARISON",
+-                  source_files=collected["source_files"], policy_sha256=method.POLICY_SHA256,
++                  source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
+                   collected=data.record(root / "collected.json", root),
+                   reused_collection=data.record(destination / "collected.json", root),
+-                  new_metric_count_sets=36, reused_metric_count_sets=45,
++                  new_metric_count_sets=p["metric_count_sets"], reused_metric_count_sets=reused_count,
+                   stage_metrics=data.record(root / "stage_metrics.csv", root),
+                   draws=data.record(root / "bootstrap_draws.npy", root), absolute_stage_results=absolute,
+-                  scope="Two fixed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
++                  scope="Fixed confirmed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
+                   next="Review full results; no further lambda or automatic training")
+     previous.write_once(root / "evaluation.json", data.json_bytes(result))
+     return result
+diff --git a/scripts/step28_er_weight_run.py b/scripts/step28_er_weight_run.py
+index f9227ccd..dd150090 100644
+--- a/scripts/step28_er_weight_run.py
++++ b/scripts/step28_er_weight_run.py
+@@ -21,6 +21,14 @@ save_array, rng_state, restore_rng = prior.save_array, prior.rng_state, prior.re
+ COMPLETE = "COMPLETE_3456_ER_WEIGHT_UPDATES_VALID_BLIND"
+ 
+ 
++def complete_status(p: dict) -> str:
++    return f"COMPLETE_{p['physical_updates']}_ER_WEIGHT_UPDATES_VALID_BLIND"
++
++
++def collected_status(p: dict) -> str:
++    return f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++
++
+ def old_point(reference: dict, name: str) -> dict:
+     root = reference["job"] / "run"
+     return data.read_json(data.verify(root / reference["manifest"]["points"][name]["path"],
+@@ -34,9 +42,10 @@ def old_training(reference: dict, order: str, stage: int) -> dict:
+ 
+ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+                 order: str, stage: int, arm: str, root: Path, reference_log: dict,
+-                budget: Any) -> dict:
++                budget: Any, p: dict | None = None) -> dict:
+     import torch
+ 
++    p = method.contract() if p is None else p
+     started = time.monotonic()
+     old_policy = parent.contract()
+     sequence, stream = parent.schedule(current, old_policy, order, stage)
+@@ -53,7 +62,7 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+             raise ValueError("ER history is unpaired or contains logits")
+         history_ids.append(history.uid)
+         record = method.update(
+-            model, optimizer, group, history, c, method.ARMS[arm], stage, index + 1,
++            model, optimizer, group, history, c, p["arms"][arm], stage, index + 1,
+             data.seed_for(stream, index, "dropout"),
+             data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
+             observe=index + 1 in (1, 29, 30, 288), check=budget.check)
+@@ -69,9 +78,9 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+     if (summary["draw_count"] != 288 or summary["members"] != reference_log["memory_after_training"]["members"]
+             or history_ids != reference_log["history_ids"]):
+         raise ValueError("Historical supply differs after training")
+-    name = method.point_name(order, arm, stage)
++    name = method.point_name(order, arm, stage, p)
+     result = {"name": name, "order": order, "arm": arm, "stage": stage,
+-              "history_weight": method.ARMS[arm], "updates": 288,
++              "history_weight": p["arms"][arm], "updates": 288,
+               "adam_step": parent.adam_step(optimizer), "actual_domain": order[stage - 1],
+               "current_ids": [g.uid for g in sequence], "history_ids": history_ids,
+               "current_dropout_stream": stream, "memory_after_training": summary,
+@@ -89,16 +98,17 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+ 
+ def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
+                order: str, stage: int, current_cal: list, valid: list,
+-               first_map: dict, budget: Any, weight: float) -> dict:
++               first_map: dict, budget: Any, weight: float, p: dict | None = None) -> dict:
+     """Real full state restore and complete score replay at every endpoint."""
++    p = method.contract() if p is None else p
+     started = time.monotonic()
+-    arm = next((arm for arm, value in method.ARMS.items() if value == weight), None)
+-    if (arm is None or name != method.point_name(order, arm, stage) or first_map is None
++    arm = next((arm for arm, value in p["arms"].items() if value == weight), None)
++    if (arm is None or name != method.point_name(order, arm, stage, p) or first_map is None
+             or len(current_cal) != 12 or len(valid) != 60 or parent.adam_step(optimizer) != stage * 288):
+         raise ValueError("Checkpoint is not a complete stage with current-only calibration")
+     state = rng_state()
+     metadata = {"name": name, "order": order, "stage": stage, "seed": "s0",
+-                "completed_updates": stage * 288, "policy_sha256": method.POLICY_SHA256,
++                "completed_updates": stage * 288, "policy_sha256": method.policy_sha256(p),
+                 "history_weight": weight, "parent_policy_sha256": parent.POLICY_SHA256,
+                 "rng": state, "config": c}
+     scores = {"calibration": parent.ranking.score(model, current_cal, c, budget.check),
+@@ -143,13 +153,13 @@ def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
+     auxiliary = {"checkpoint_metadata": metadata,
+                  "first_map": dict(zip(("a", "b"), parent.calibration.parameters(first))),
+                  "stage_map": dict(zip(("a", "b"), parent.calibration.parameters(mapping))),
+-                 "history_weight": weight, "er_weight_policy_sha256": method.POLICY_SHA256}
++                 "history_weight": weight, "er_weight_policy_sha256": method.policy_sha256(p)}
+     auxiliary_bytes = len(data.json_bytes(auxiliary))
+     if auxiliary_bytes > 1048576:
+         raise ValueError("Common phase/RNG/map metadata alone exceeds history allowance")
+     result = {"name": name, "order": order, "stage": stage, "actual_domain": order[stage - 1],
+               "completed_updates": stage * 288, "full_model_adam_and_rng_restore_verified": True,
+-              "history_weight": weight, "policy_sha256": method.POLICY_SHA256,
++              "history_weight": weight, "policy_sha256": method.policy_sha256(p),
+               "model_state_sha256": model_digest,
+               "model": {**inference, "path": path.relative_to(root).as_posix()},
+               "full_checkpoint": {**full, "path": full_path.relative_to(root).as_posix()},
+@@ -195,7 +205,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+     if after != partition:
+         raise ValueError("Partition changed after training-label alignment")
+     supply = method.ContinuationSupply(selected, partition)
+-    manifest = {"status": "RUNNING", "source_files": method.sources(), "policy_sha256": method.POLICY_SHA256,
++    manifest = {"status": "RUNNING", "source_files": method.sources(p), "policy_sha256": method.policy_sha256(p),
+                 "baseline_records": p["baseline"]["records"], "public_inputs": checked,
+                 "pretrained_archive": archive, "partition": data.record(root / "partition.json", root),
+                 "points": {}, "training": {}, "memories": {}, "restored_starts": {},
+@@ -206,7 +216,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+         rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
+         memory_payload = data.verify(old_root / rec["path"], rec).read_bytes()
+         first_scores = prior.array(old_root, shared["scores"]["development"], (60, 378), np.float32)
+-        for arm, weight in method.ARMS.items():
++        for arm, weight in p["arms"].items():
+             path = order + "_" + arm
+             model, optimizer = prior.restore_branch(old_root, shared, c)
+             state = rng_state()
+@@ -219,7 +229,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+                     or memory.first_map != shared["first_map_parameters"]):
+                 raise ValueError("Original ER cache/first-map restore differs")
+             memory.auxiliary = {**shared["learner_auxiliary"], "history_weight": weight,
+-                                "er_weight_policy_sha256": method.POLICY_SHA256}
++                                "er_weight_policy_sha256": method.policy_sha256(p)}
+             memory.to_bytes()
+             supply.resume(path, order, shared)
+             manifest["restored_starts"][path] = {
+@@ -229,11 +239,11 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+                 "memory_summary": memory.summary()}
+             for stage in (2, 3):
+                 current, current_cal = supply.current(path, order, stage)
+-                name = method.point_name(order, arm, stage)
++                name = method.point_name(order, arm, stage, p)
+                 train_stage(model, optimizer, current, memory, c, order, stage, arm,
+-                            root, old_training(reference, order, stage), budget)
++                            root, old_training(reference, order, stage), budget, p)
+                 point = checkpoint(root, name, model, optimizer, c, order, stage,
+-                                   current_cal, groups["development"], memory.first_map, budget, weight)
++                                   current_cal, groups["development"], memory.first_map, budget, weight, p)
+                 memory.auxiliary = point["learner_auxiliary"]
+                 data.write_json(root / "memory" / (name + "_budget.json"), memory.summary())
+                 if stage == 2:
+@@ -251,29 +261,31 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+             del model, optimizer, memory
+             gc.collect()
+             torch.cuda.empty_cache()
+-    if method.sources() != manifest["source_files"]:
++    if method.sources(p) != manifest["source_files"]:
+         raise ValueError("Scientific sources changed")
+-    manifest.update(status=COMPLETE, budget=budget.state())
++    manifest.update(status=complete_status(p), budget=budget.state())
+     data.write_json(root / "manifest.json", manifest)
+     return manifest, partition, groups["development"], reference
+ 
+ 
+-def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
++def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = None) -> dict:
+     """Reject incomplete, unpaired, or incorrectly weighted updates before valid labels."""
+-    if (manifest["status"] != COMPLETE or manifest["source_files"] != method.sources()
+-            or manifest["policy_sha256"] != method.POLICY_SHA256
+-            or manifest["physical_updates"] != 3456 or manifest["gradient_group_presentations"] != 6912
+-            or set(manifest["points"]) != set(method.expected_points())
+-            or set(manifest["training"]) != set(method.expected_points())
+-            or set(manifest["memories"]) != {method.point_name(o, a, 2) for o in method.ORDERS for a in method.ARMS}
+-            or set(manifest["restored_starts"]) != {o + "_" + a for o in method.ORDERS for a in method.ARMS}):
++    p = method.contract() if p is None else p
++    if (manifest["status"] != complete_status(p) or manifest["source_files"] != method.sources(p)
++            or manifest["policy_sha256"] != method.policy_sha256(p)
++            or manifest["physical_updates"] != p["physical_updates"]
++            or manifest["gradient_group_presentations"] != p["gradient_group_presentations"]
++            or set(manifest["points"]) != set(method.expected_points(p))
++            or set(manifest["training"]) != set(method.expected_points(p))
++            or set(manifest["memories"]) != {method.point_name(o, a, 2, p) for o in method.ORDERS for a in p["arms"]}
++            or set(manifest["restored_starts"]) != {o + "_" + a for o in method.ORDERS for a in p["arms"]}):
+         raise ValueError("Incomplete ER weight experiment")
+     partition = data.read_json(data.verify(root / manifest["partition"]["path"], manifest["partition"]))
+     if partition != reference["partition"]:
+         raise ValueError("Blind partition changed")
+     result = {}
+     for order in method.ORDERS:
+-        for arm, weight in method.ARMS.items():
++        for arm, weight in p["arms"].items():
+             start = manifest["restored_starts"][order + "_" + arm]
+             shared = old_point(reference, order + "_shared")
+             initial_memory = reference["manifest"]["memories"][order + "_er_after1"]
+@@ -286,7 +298,7 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
+                     or start["memory_summary"]["with_logits"]
+                     or start["memory_summary"]["seen"] != 48):
+                 raise ValueError("Shared start evidence differs")
+-            retained = manifest["memories"][method.point_name(order, arm, 2)]
++            retained = manifest["memories"][method.point_name(order, arm, 2, p)]
+             data.verify(root / retained["file"]["path"], retained["file"])
+             if (retained["members"] != reference["manifest"]["memories"][f"{order}_er_stage2"]["members"]
+                     or retained["seen"] != 96 or retained["with_logits"]
+@@ -294,14 +306,14 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
+                     or retained["serialized_bytes"] > 1048576):
+                 raise ValueError("Saved next-stage cache is incomplete or unpaired")
+             for stage in (2, 3):
+-                name = method.point_name(order, arm, stage)
++                name = method.point_name(order, arm, stage, p)
+                 point_rec, log_rec = manifest["points"][name], manifest["training"][name]
+                 point = data.read_json(data.verify(root / point_rec["path"], point_rec))
+                 log = data.read_json(data.verify(root / log_rec["path"], log_rec))
+                 if (point["name"] != name or point["order"] != order or point["stage"] != stage
+                         or point["actual_domain"] != order[stage - 1] or point["completed_updates"] != stage * 288
+                         or point["history_weight"] != weight or not point["full_model_adam_and_rng_restore_verified"]
+-                        or point["policy_sha256"] != method.POLICY_SHA256):
++                        or point["policy_sha256"] != method.policy_sha256(p)):
+                     raise ValueError("Native endpoint identity or actual restoration differs")
+                 data.verify(root / point["model"]["path"], point["model"])
+                 original_log = old_training(reference, order, stage)
+@@ -358,18 +370,20 @@ def blind_gate(root: Path, manifest: dict, reference: dict) -> dict:
+     return result
+ 
+ 
+-def collect(root: Path, scores: dict, labelled: list, partition: dict, source_files: list) -> dict:
++def collect(root: Path, scores: dict, labelled: list, partition: dict, source_files: list,
++            p: dict | None = None) -> dict:
++    p = method.contract() if p is None else p
+     root.mkdir()
+-    if set(scores) != set(method.expected_points()):
++    if set(scores) != set(method.expected_points(p)):
+         raise ValueError("Collect all new points together")
+     if [g.uid for g in labelled] != [row["group_uid"] for row in partition["development"]]:
+         raise ValueError("Valid truth and blind group identities differ")
+     truth = np.asarray([g.labels for g in labelled], dtype=np.uint8)
+     collected = {"status": "COLLECTING", "points": {}, "source_files": source_files,
+-                 "policy_sha256": method.POLICY_SHA256, "metric_columns": list(method.metrics.COLUMNS),
++                 "policy_sha256": method.policy_sha256(p), "metric_columns": list(method.metrics.COLUMNS),
+                  "group_ids": [g.uid for g in labelled],
+                  "domains": [row["domain"] for row in partition["development"]]}
+-    for name in method.expected_points():
++    for name in method.expected_points(p):
+         if set(scores[name]) != set(method.ROLES):
+             raise ValueError("Missing output role")
+         entries = {}
+@@ -380,19 +394,20 @@ def collect(root: Path, scores: dict, labelled: list, partition: dict, source_fi
+             data.write_json(counts_path, counts)
+             entries[role] = {"matrix": rec, "counts": data.record(counts_path, root)}
+         collected["points"][name] = entries
+-    collected["status"] = "ALL_36_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++    collected["status"] = collected_status(p)
+     data.write_json(root / "collected.json", collected)
+     return collected
+ 
+ 
+-def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
++def execute(job: Path, audit_path: Path, authorization_path: Path, study: str = "weight") -> dict:
+     import torch
+ 
+-    p, source_files = method.contract(), method.sources()
++    p = method.contract(study)
++    source_files = method.sources(p)
+     auth = data.read_json(authorization_path)
+     audit = data.read_json(audit_path)
+     if (platform.system() != "Linux" or auth.get("status") != "AUTHORIZED_ER_WEIGHT_AFTER_REVIEW"
+-            or auth.get("policy_sha256") != method.POLICY_SHA256 or auth.get("source_files") != source_files
++            or auth.get("policy_sha256") != method.policy_sha256(p) or auth.get("source_files") != source_files
+             or auth.get("job") != job.relative_to(data.ROOT).as_posix()
+             or auth.get("runtime") != p["runtime"] or auth.get("supervision") != p["supervision"]
+             or auth.get("review_and_primary_passed") is not True):
+@@ -400,10 +415,10 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
+     if (audit.get("status") != "PASS_ER_WEIGHT_HANDMADE_CPU" or audit.get("source_files") != source_files
+             or audit.get("contracts", {}).get("failed") != 0 or audit.get("contracts", {}).get("skipped") != 0
+             or audit.get("formal_inputs") is not False or audit.get("formal_labels") is not False
+-            or set(audit.get("native", {})) != set(method.ARMS)
++            or set(audit.get("native", {})) != set(p["arms"])
+             or audit.get("native_history_gradient_scaling_verified") is not True):
+         raise ValueError("Necessary current handmade/native CPU verification is missing")
+-    for record in audit["native"].values():
++    for record in (*audit["native"].values(), *audit.get("native_reference", {}).values()):
+         data.verify(audit_path.parent / record["path"], record)
+     if (not job.is_relative_to((data.ROOT / "reports").resolve())
+             or any((job / n).exists() for n in ("run", "evaluation", "access.json"))):
+@@ -435,18 +450,18 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
+                                             "cpu_affinity": sorted(os.sched_getaffinity(0))})
+     try:
+         manifest, partition, valid, reference = train(job, p, budget)
+-        scores = blind_gate(job / "run", manifest, reference)
++        scores = blind_gate(job / "run", manifest, reference, p)
+         data.write_json(job / "before_valid.json", {"status": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE",
+                                                     "manifest": data.record(job / "run/manifest.json", job),
+                                                     "label_parses": data.read_json(job / "access.json")})
+         labelled = prior.parse_once(job, valid, method.config(p), "development")
+-        collect(job / "evaluation", scores, labelled, partition, source_files)
++        collect(job / "evaluation", scores, labelled, partition, source_files, p)
+         del labelled, valid, scores
+-        result = evaluation.finalize(job / "evaluation", reference["job"] / "evaluation")
++        result = evaluation.finalize(job / "evaluation", reference["job"] / "evaluation", p)
+         budget.check(1)
+-        if method.sources() != source_files:
++        if method.sources(p) != source_files:
+             raise ValueError("Sources changed before completion")
+-        completion = {"status": result["status"], "physical_updates": 3456,
++        completion = {"status": result["status"], "physical_updates": p["physical_updates"],
+                       "label_parses": data.read_json(job / "access.json"), "budget": budget.state(),
+                       "selection": result["selection"],
+                       "evaluation": data.record(job / "evaluation/evaluation.json", job)}
+@@ -455,7 +470,7 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
+     except Exception as error:
+         data.write_json(job / "failure.json", {"status": "FAILED_NO_AUTOMATIC_RETRY", "error": str(error),
+                                                "label_parses": data.read_json(job / "access.json"),
+-                                               "recovery": "After all 36 matrices exist, finalize uses saved metrics only"})
++                                               "recovery": "After the complete collection exists, finalize uses saved metrics only"})
+         raise
+ 
+ 
+@@ -465,16 +480,17 @@ def main() -> None:
+     parser.add_argument("--out", type=Path, required=True)
+     parser.add_argument("--audit", type=Path)
+     parser.add_argument("--authorization", type=Path)
++    parser.add_argument("--study", choices=("weight", "low"), default="weight")
+     args = parser.parse_args()
+     if platform.system() != "Linux":
+         parser.error("Research scripts run only on Linux py310")
+     if args.action == "execute":
+         if args.audit is None or args.authorization is None:
+             parser.error("execute needs --audit and --authorization")
+-        result = execute(args.out.resolve(), args.audit.resolve(), args.authorization.resolve())
++        result = execute(args.out.resolve(), args.audit.resolve(), args.authorization.resolve(), args.study)
+     else:
+-        p = method.contract()
+-        result = evaluation.finalize(args.out.resolve(), data.ROOT / p["baseline"]["linux_job"] / "evaluation")
++        p = method.contract(args.study)
++        result = evaluation.finalize(args.out.resolve(), data.ROOT / p["baseline"]["linux_job"] / "evaluation", p)
+     print(data.json_bytes({"status": result["status"], "out": str(args.out)}).decode())
+ 
+ 
+diff --git a/tests/test_step28_er_weight_contracts.py b/tests/test_step28_er_weight_contracts.py
+index 22e6c4cf..d36ec63b 100644
+--- a/tests/test_step28_er_weight_contracts.py
++++ b/tests/test_step28_er_weight_contracts.py
+@@ -60,8 +60,9 @@ def independent_update(model: object, optimizer: object, current: object, old: o
+     return {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
+ 
+ 
+-def gate_fixture(home: Path) -> tuple:
++def gate_fixture(home: Path, p: dict | None = None) -> tuple:
+     """Small file-identity fixtures; not proof of native save/reload or training."""
++    p = method.contract() if p is None else p
+     old_job = home / "original"
+     old_root = old_job / "run"
+     old_root.mkdir(parents=True)
+@@ -80,13 +81,13 @@ def gate_fixture(home: Path) -> tuple:
+     for directory in ("scores", "maps", "points", "updates", "models", "memory"):
+         (root / directory).mkdir(parents=True)
+     method.data.write_json(root / "partition.json", partition)
+-    manifest = {"status": runner.COMPLETE, "source_files": method.sources(),
+-                "policy_sha256": method.POLICY_SHA256, "physical_updates": 3456,
+-                "gradient_group_presentations": 6912, "points": {}, "training": {},
++    manifest = {"status": runner.complete_status(p), "source_files": method.sources(p),
++                "policy_sha256": method.policy_sha256(p), "physical_updates": p["physical_updates"],
++                "gradient_group_presentations": p["gradient_group_presentations"], "points": {}, "training": {},
+                 "restored_starts": {}, "memories": {}, "partition": method.data.record(root / "partition.json", root)}
+     for order in method.ORDERS:
+         shared = runner.old_point(reference, order + "_shared")
+-        for arm, weight in method.ARMS.items():
++        for arm, weight in p["arms"].items():
+             manifest["restored_starts"][order + "_" + arm] = {
+                 "full_checkpoint": shared["full_checkpoint"], "adam_step": 288,
+                 "first_scores_replayed_exactly": True, "model_state_sha256": shared["model_state_sha256"],
+@@ -94,15 +95,15 @@ def gate_fixture(home: Path) -> tuple:
+                 "memory_source": old_manifest["memories"][order + "_er_after1"]["file"],
+                 "memory_summary": old_manifest["memories"][order + "_er_after1"]}
+             retained = copy.deepcopy(old_manifest["memories"][f"{order}_er_stage2"])
+-            memory_path = root / "memory" / (method.point_name(order, arm, 2) + ".json")
++            memory_path = root / "memory" / (method.point_name(order, arm, 2, p) + ".json")
+             memory_path.write_bytes((old_root / retained["file"]["path"]).read_bytes())
+             retained["file"] = method.data.record(memory_path, root)
+-            manifest["memories"][method.point_name(order, arm, 2)] = retained
++            manifest["memories"][method.point_name(order, arm, 2, p)] = retained
+             for stage in (2, 3):
+-                name = method.point_name(order, arm, stage)
++                name = method.point_name(order, arm, stage, p)
+                 old_point = runner.old_point(reference, f"{order}_er_stage{stage}")
+                 point = copy.deepcopy(old_point)
+-                point.update(name=name, history_weight=weight, policy_sha256=method.POLICY_SHA256)
++                point.update(name=name, history_weight=weight, policy_sha256=method.policy_sha256(p))
+                 for role, rec in old_point["scores"].items():
+                     values = np.load(old_root / rec["path"], allow_pickle=False)
+                     point["scores"][role] = runner.save_array(root / "scores" / f"{name}_{role}.npy", values, root)
+@@ -164,7 +165,7 @@ class WeightContracts(unittest.TestCase):
+             self.assertEqual(a[key], b[key])
+ 
+     def test_weights_match_independent_derivatives_and_adam(self) -> None:
+-        for weight in (.5, .25):
++        for weight in (.5, .25, .1):
+             with self.subTest(weight=weight):
+                 model, opt, c, current, old = prepared()
+                 reference, reference_opt = clone(model, opt, c)
+@@ -183,7 +184,7 @@ class WeightContracts(unittest.TestCase):
+     def test_only_history_weight_changes_forwards(self) -> None:
+         model, opt, c, current, old = prepared()
+         scores = []
+-        for weight in (.5, .25):
++        for weight in (.5, .25, .1):
+             other, other_opt = clone(model, opt, c)
+             captured = []
+             hook = other.head.register_forward_hook(lambda _, __, result: captured.append(result.detach().clone()))
+@@ -193,8 +194,9 @@ class WeightContracts(unittest.TestCase):
+                 hook.remove()
+             self.assertEqual(len(captured), 2)
+             scores.append(captured)
+-        for a, b in zip(*scores, strict=True):
+-            self.assertTrue(torch.equal(a, b))
++        for captured in scores[1:]:
++            for a, b in zip(scores[0], captured, strict=True):
++                self.assertTrue(torch.equal(a, b))
+ 
+     def test_unknown_coefficients_and_missing_history_rejected(self) -> None:
+         model, opt, c, current, old = prepared()
+@@ -374,6 +376,132 @@ class WeightContracts(unittest.TestCase):
+             self.assertEqual(len(comparison["interpretation"]["checks"]), 23)
+             self.assertTrue(comparison["interpretation"]["pilot_observed_checks_pass"])
+ 
++    def test_low_scope_and_six_point_blind_gate(self) -> None:
++        p = method.contract("low")
++        self.assertEqual(p["arms"], {"tenth": .1})
++        self.assertEqual(p["physical_updates"], 1728)
++        self.assertEqual(p["runtime"]["maximum_gpu_stage_seconds"], 43200)
++        self.assertEqual(p["runtime"]["maximum_output_bytes"], 16 * 1024 ** 3)
++        with tempfile.TemporaryDirectory() as directory:
++            root, manifest, reference = gate_fixture(Path(directory), p)
++            self.assertEqual(len(runner.blind_gate(root, manifest, reference, p)), 6)
++            with self.assertRaises(ValueError):
++                runner.blind_gate(root, manifest, reference)  # Cannot route low through the old scope.
++            del manifest["points"]["CAB_tenth_stage3"]
++            with self.assertRaises(ValueError):
++                runner.blind_gate(root, manifest, reference, p)
++
++    def test_low_checkpoint_uses_new_policy_and_weight(self) -> None:
++        p = method.contract("low")
++        model, opt, c, _, _ = prepared(576)
++        cal = [fixtures.handmade_group(f"cal_{i}") for i in range(12)]
++        valid = [fixtures.handmade_group(f"valid_{i}") for i in range(60)]
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            for folder in ("work", "models", "scores", "maps", "points"):
++                (root / folder).mkdir()
++            point = runner.checkpoint(root, "ABC_tenth_stage2", model, opt, c, "ABC", 2,
++                                      cal, valid, {"a": 1., "b": 0.}, fixtures.HandmadeBudget(), .1, p)
++            self.assertEqual(point["history_weight"], .1)
++            self.assertEqual(point["policy_sha256"], method.LOW_POLICY_SHA256)
++            self.assertFalse((root / point["full_checkpoint"]["path"]).exists())
++
++    def test_low_real_tiny_stage_uses_paired_schedule_and_tenth_updates(self) -> None:
++        p = method.contract("low")
++        model, opt, c, _, _ = prepared()
++        current = [fixtures.handmade_group(f"fit_B_{i}") for i in range(48)]
++        history = [fixtures.handmade_group(f"fit_A_{i}", 1) for i in range(48)]
++        memory = method.parent.Memory("ABC", method.parent.contract()["memory_seed"], False, {"a": 1., "b": 0.})
++        memory.retain(history, 1, None)
++        oracle = method.parent.Memory.from_bytes(memory.to_bytes())
++        oracle.begin_stage(2)
++        sequence, _ = method.parent.schedule(current, method.parent.contract(), "ABC", 2)
++        reference_log = {"current_ids": [g.uid for g in sequence],
++                         "history_ids": [oracle.draw()[0].uid for _ in range(288)],
++                         "memory_after_training": oracle.summary()}
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            (root / "updates").mkdir()
++            budget = fixtures.HandmadeBudget()
++            budget.state = lambda: {"handmade_fixture": True}
++            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "tenth", root,
++                                     reference_log, budget, p)
++            values = np.load(root / row["update_file"]["path"], allow_pickle=False)
++            self.assertTrue(np.all(values[:, method.STEP_COLUMNS.index("history_weight")] == .1))
++            self.assertEqual(row["history_ids"], reference_log["history_ids"])
++            self.assertEqual(method.parent.adam_step(opt), 576)
++
++    def test_low_endpoint_differences_use_quarter_and_seq(self) -> None:
++        p = method.contract("low")
++        old, domains = fixtures.synthetic_matrices()
++        for roles in old.values():
++            for values in roles.values():
++                values[:] = .3
++        new = {}
++        for order in method.ORDERS:
++            for arm, gain in (("half", .04), ("quarter", .08), ("tenth", .1)):
++                for stage in (2, 3):
++                    values = np.full((60, 22), .3 + gain, dtype=np.float64)
++                    for key in ("brier", "log_loss"):
++                        values[:, method.metrics.COLUMNS.index(key)] = .3 - gain
++                    (new if arm == "tenth" else old)[f"{order}_{arm}_stage{stage}"] = {
++                        role: values.copy() for role in method.ROLES}
++        result = evaluation.evaluate_matrices(new, old, domains, p)
++        self.assertAlmostEqual(result["comparisons"]["tenth_minus_quarter"]["primary"]["O"]["map"]["mean"], .02)
++        self.assertAlmostEqual(result["comparisons"]["tenth_minus_seq"]["primary"]["O"]["map"]["mean"], .1)
++        self.assertEqual(result["selection"]["selected"], "tenth")
++
++    def test_low_selection_uses_quarter_independently_of_seq(self) -> None:
++        p = method.contract("low")
++        endpoints = {"tenth": {"primary": {"O": {"map": {"mean": .4}, "recall_at_5": {"mean": .5}}}}}
++        comparisons = {"tenth_minus_" + ref: {"interpretation": {"pilot_observed_checks_pass": False}}
++                       for ref in ("quarter", "seq")}
++        for versus_seq in (False, True):
++            comparisons["tenth_minus_seq"]["interpretation"]["pilot_observed_checks_pass"] = versus_seq
++            self.assertEqual(evaluation.select_configuration(endpoints, comparisons, p)["selected"], "quarter")
++        comparisons["tenth_minus_seq"]["interpretation"]["pilot_observed_checks_pass"] = False
++        comparisons["tenth_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"] = True
++        self.assertEqual(evaluation.select_configuration(endpoints, comparisons, p)["selected"], "tenth")
++
++    def test_low_full_collection_and_saved_reference_recovery(self) -> None:
++        p = method.contract("low")
++        def available_job(spec: dict) -> Path:
++            local = method.data.ROOT / spec["local_small_job"]
++            return local if local.is_dir() else method.data.ROOT / spec["linux_job"]
++
++        old_job, weight_job = available_job(p["baseline"]), available_job(p["weight_reference"])
++        reference = method.baseline(p, old_job, weight_job)
++        # Identifiers only from the saved result; all new truth/text/scores here are handmade.
++        groups = [fixtures.handmade_group(uid) for uid in reference["collected"]["group_ids"]]
++        raw = np.tile(np.linspace(-2, 1, 378, dtype=np.float32), (60, 1))
++        scores = {name: {role: raw if role == "raw" else raw.astype(np.float64) for role in method.ROLES}
++                  for name in method.expected_points(p)}
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory) / "collection"
++            runner.collect(root, scores, groups, reference["partition"], method.sources(p), p)
++            self.assertEqual(len(list(root.glob("*.npy"))), 18)
++            with mock.patch.object(method.base, "load_model", side_effect=AssertionError("Saved-only recovery")):
++                result = evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
++            self.assertEqual(result["new_metric_count_sets"], 18)
++            self.assertEqual(result["reused_metric_count_sets"], 81)
++            self.assertEqual(set(result["comparisons"]), {"tenth_minus_quarter", "tenth_minus_seq"})
++            for comparison in result["comparisons"].values():
++                self.assertEqual(len(comparison["interpretation"]["checks"]), 23)
++            saved = method.data.read_json(weight_job / "evaluation/evaluation.json")
++            for arm in ("quarter", "half", "seq", "er"):
++                for role, endpoints in result["endpoints"][arm].items():
++                    for endpoint, rows in endpoints.items():
++                        for metric, row in rows.items():
++                            expected = saved["endpoints"][arm][role][endpoint][metric]
++                            np.testing.assert_allclose(row["mean"], expected["mean"], rtol=0, atol=1e-12)
++                            np.testing.assert_allclose(row["conditional_95pct_interval"],
++                                                       expected["conditional_95pct_interval"], rtol=0, atol=1e-12)
++                            for order in method.ORDERS:
++                                self.assertAlmostEqual(row["per_order"][order], expected["per_order"][order], places=12)
++            before = (root / "evaluation.json").read_bytes()
++            evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
++            self.assertEqual((root / "evaluation.json").read_bytes(), before)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
