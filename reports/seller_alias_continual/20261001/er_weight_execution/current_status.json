@@ -1,6 +1,6 @@
 {
-  "status": "FORMAL_TRAINING_RUNNING",
-  "observed_at_utc": "2026-10-01T08:00:57.347925+00:00",
+  "status": "COMPLETED_LOCAL_RESULT_AUDIT_REVIEW_PENDING",
+  "observed_at_utc": "2026-10-02T02:08:32.430915+00:00",
   "execution_root": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452",
   "review_and_primary_passed": true,
   "scientific_sources_changed": 0,
@@ -8,7 +8,7 @@
   "formal_training_started": true,
   "new_label_parse_attempts": {
     "train": 1,
-    "valid": 0,
+    "valid": 1,
     "test": 0,
     "owners": 0
   },
@@ -17,10 +17,6 @@
     14
   ],
   "formal_enforced_maximum_hours": 24,
-  "expected_completion_asia_shanghai": [
-    "2026-10-02T02:08:21+08:00",
-    "2026-10-02T05:08:21+08:00"
-  ],
   "user_latest_instruction": "外审已结束，及时审查、同步外审结果。完成后可以开始linux上的工作，若仍被自动审批阻拦再向我申请批准",
   "cpu_started_asia_shanghai": "2026-10-01T14:50:12+08:00",
   "cpu_contracts": {
@@ -43,47 +39,92 @@
   "formal_launcher_pid": 3277885,
   "formal_started_asia_shanghai": "2026-10-01T15:08:21+08:00",
   "formal_remaining_hours_estimate": [
-    10.1232366875,
-    13.1232366875
+    0,
+    0
   ],
-  "estimate_basis": "Original ER six later-stage durations total 19095.911 seconds; two weights approximately 10.61 hours of training plus checkpoint/scoring/evaluation overhead. At 2026-10-01 16:00:57 Asia/Shanghai, the first 288-update continuation stage took 3001.843661 seconds (about 50 minutes; recent logged speed 10.43 seconds/update), consistent with retaining the 11-14 hour total estimate. Only one training stage is complete and no complete endpoint is yet registered, so this observation does not justify narrowing the original range.",
+  "estimate_basis": "Completed at 2026-10-02 01:47:50 Asia/Shanghai. Start/end timestamps and GNU elapsed both give 38369 seconds (10h39m29s); program internal elapsed is 38367.119733 seconds. Remaining duration is zero; original 11-14 hour estimate and completion range are retained as history; 24h remains the enforced limit.",
   "cpu_check_completed": true,
   "cpu_finished_asia_shanghai": "2026-10-01T14:56:33+08:00",
   "cpu_gnu_elapsed_seconds": 380.63,
   "cpu_native_updates": 4,
   "cpu_history_gradient_scaling_verified": true,
-  "last_observation": "reports/seller_alias_continual/20261001/er_weight_execution/20261001_144452/progress_160057.json",
-  "completed_new_updates_at_least": 288,
+  "last_observation": "reports/seller_alias_continual/20261002/er_weight_result/observation.json",
+  "completed_new_updates_at_least": 3456,
   "last_update_event": {
-    "arm": "half",
-    "elapsed_seconds": 3084.321591004031,
+    "arm": "quarter",
+    "elapsed_seconds": 38188.72509424295,
     "event": "updates",
-    "logical_updates": 576,
-    "order": "ABC",
-    "peak_observed_bytes": 28577,
-    "stage": 2,
+    "logical_updates": 864,
+    "order": "CAB",
+    "peak_observed_bytes": 16982449087,
+    "stage": 3,
     "stage_updates": 288
   },
-  "formal_elapsed_seconds": 3156.347925,
+  "formal_elapsed_seconds": 38369,
   "first_arm_original_start_replay_passed": true,
-  "gpu_compute_apps": "3277900, python, 8770 MiB",
-  "observed_at_asia_shanghai": "2026-10-01T16:00:57.347925+08:00",
-  "completed_endpoint_count": 0,
-  "checkpoint_confirmed_updates": 0,
-  "completed_stage_training": [
-    {
-      "name": "ABC_half_stage2",
-      "order": "ABC",
-      "arm": "half",
-      "stage": 2,
-      "updates": 288,
-      "history_weight": 0.5,
-      "training_seconds": 3001.843660779996
-    }
-  ],
+  "gpu_compute_apps": "",
+  "observed_at_asia_shanghai": "2026-10-02T10:08:32.430915+08:00",
+  "completed_endpoint_count": 12,
+  "checkpoint_confirmed_updates": 3456,
   "failure_record_present": false,
-  "last_observation_sha256": "88aa73329d33a62e52df9b61c20dd4770c79c61f24ea737fe135b7ea4ac5bb8f",
-  "last_observation_bytes": 5340,
+  "last_observation_sha256": "9b517cd9991c80b999fc7b1b9ef65dae7d1dc64ccc2b9de8ec9163b6507a0bbb",
+  "last_observation_bytes": 9942,
   "monitoring_user_instruction": "现在去linux服务器上查看一下训练进度",
-  "inspection_scope": "Existing process/resource metadata and small status/log records only; no research entry, model load, formal text or label parse, restart or process change."
+  "inspection_scope": "Finished-job evidence return, hashing and independent saved-matrix audit only; no new formal texts, labels, model loading or training.",
+  "formal_training_completed": true,
+  "formal_finished_asia_shanghai": "2026-10-02T01:47:50+08:00",
+  "formal_exit_code": 0,
+  "formal_program_elapsed_seconds": 38367.11973335594,
+  "original_expected_completion_asia_shanghai": [
+    "2026-10-02T02:08:21+08:00",
+    "2026-10-02T05:08:21+08:00"
+  ],
+  "gradient_group_presentations": 6912,
+  "new_metric_count_sets": 36,
+  "reused_metric_count_sets": 45,
+  "selection": {
+    "additional_configurations_authorized": false,
+    "criterion": "All 23 versus original ER, then O MAP, O Recall@5, larger lambda",
+    "eligible": [
+      "half",
+      "quarter"
+    ],
+    "fallback_used": false,
+    "history_weight": 0.25,
+    "scope": "Developed-valid configuration selection, not independent confirmation",
+    "selected": "quarter"
+  },
+  "comparison_pass_counts": {
+    "half_minus_er": 23,
+    "quarter_minus_er": 23,
+    "half_minus_seq": 4,
+    "quarter_minus_seq": 4
+  },
+  "result_return": {
+    "files": 288,
+    "bytes": 11609562,
+    "receipt": "reports/seller_alias_continual/20261002/er_weight_result/return_sync.json"
+  },
+  "saved_result_audit": {
+    "status": "PASS_ER_WEIGHT_SAVED_RESULT_AUDIT",
+    "numeric_comparisons": 672510,
+    "maximum_absolute_error": 7.105427357601002E-15,
+    "report": "reports/seller_alias_continual/20261002/er_weight_result/audit/audit.json",
+    "new_label_parses": 0,
+    "models_loaded": 0
+  },
+  "review_and_primary_scope": "contract and implementation; result review separately pending",
+  "result_review_status": "SUBMITTED_AWAITING_RESULT",
+  "result_report": "docs/SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md",
+  "result_user_instruction": "去linux服务器上同步结果回来分析",
+  "weight_custody": {
+    "new_inference_files": 12,
+    "bytes": 15677731710,
+    "location": "Linux original run/models",
+    "deleted": 0,
+    "selected_history_weight": 0.25,
+    "rationale": "Both new configurations passed the prespecified comparison against ER. Retain valid positive evidence and selected baseline; existing shared/control-state and ranking-weight retention scopes remain unchanged."
+  },
+  "result_review_submission": "reports/seller_alias_continual/20261002/er_weight_result/review/submission.json",
+  "completed_training_stages": 12
 }
