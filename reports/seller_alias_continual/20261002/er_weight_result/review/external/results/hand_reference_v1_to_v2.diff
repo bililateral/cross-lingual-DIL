@@ -1,0 +1,20 @@
+--- /mnt/data/er_review_evidence/source/hand_objective_reference_v1.py	2026-10-02 02:39:15.116147622 +0000
++++ /mnt/data/er_review_evidence/source/hand_objective_reference_v2.py	2026-10-02 02:39:15.743701744 +0000
+@@ -7,7 +7,7 @@
+ import ast,copy,hashlib,json,math,os,pathlib,types,typing
+ import numpy as np
+ import torch
+-R=pathlib.Path('/mnt/data/er_review_input');O=pathlib.Path('/mnt/data/er_review_evidence/results/hand_reference');O.mkdir(exist_ok=False);os.sched_setaffinity(0,{0});torch.set_num_threads(1)
++R=pathlib.Path('/mnt/data/er_review_input');O=pathlib.Path('/mnt/data/er_review_evidence/results/hand_reference_v2');O.mkdir(exist_ok=False);os.sched_setaffinity(0,{0});torch.set_num_threads(1)
+ records=[];extracted=[]
+ def extract(file,names,env):
+  source=(R/file).read_text();tree=ast.parse(source)
+@@ -97,7 +97,7 @@
+  combined=parts[0]+lam*parts[1];norm=np.linalg.norm(combined);clipped=combined*min(1.,1/(norm+1e-6));m=.9*np.array([.03,-.02,.01])+.1*clipped;v=.999*np.array([.2,.3,.1])+.001*clipped**2;rates=np.array([1e-5/29,1e-5/29,.001]);wd=np.array([.01,.01,0.]);expected=theta*(1-rates*wd)-rates*(m/(1-.9**289))/(np.sqrt(v/(1-.999**289))+1e-8)
+  actual=np.concatenate([p.detach().numpy().ravel() for p in model.parameters()]);grad_actual=np.concatenate([p.grad.numpy().ravel() for p in model.parameters()]);check(f'weighted_update/{lam}/gradient',grad_actual,clipped,1e-8);check(f'weighted_update/{lam}/parameters',actual,expected,2e-12);check(f'weighted_update/{lam}/gradient_norm',out['gradient_norm'],norm,2e-7);check(f'weighted_update/{lam}/total',out['total'],unweighted[0]['total']+lam*unweighted[1]['total'],3e-6)
+  for p,expected_m,expected_v in zip(model.parameters(),(m[:2].reshape(1,2),m[2:].reshape(1,1)),(v[:2].reshape(1,2),v[2:].reshape(1,1))):check(f'weighted_update/{lam}/moment',opt.state[p]['exp_avg'].numpy(),expected_m,1e-8);check(f'weighted_update/{lam}/variance',opt.state[p]['exp_avg_sq'].numpy(),expected_v,1e-8)
+- fixture_results.append(dict(lambda_value=lam,combined_norm=norm,clipped=norm>1,parameter_values=actual.tolist(),adam_step=289,optimizer_calls=1))
++ fixture_results.append(dict(lambda_value=lam,combined_norm=norm,clipped=bool(norm>1),parameter_values=actual.tolist(),adam_step=289,optimizer_calls=1))
+  if lam==1.:
+   old_model=Toy();old_opt=Opt(old_model);calls.clear();old_out=old_update(old_model,old_opt,current,history,None,optconf,'er',2,1,cs,hs,observe=True)
+   check('lambda1_exact_old_ER_parameters',actual,np.concatenate([p.detach().numpy().ravel() for p in old_model.parameters()]),0.)

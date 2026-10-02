@@ -1,0 +1,448 @@
+    1  """Expression-shift pilot: single-domain, joint and sequential full-text training.
+    2  
+    3  Linux execution requires the user's resumption of the separately reported stage.
+    4  Only new train binary supervision is parsed there; valid is scored blindly.
+    5  Windows evaluation consumes valid once after the complete result gate.
+    6  """
+    7  from __future__ import annotations
+    8  
+    9  import argparse
+   10  from collections import defaultdict
+   11  import csv
+   12  import gc
+   13  import hashlib
+   14  import json
+   15  from pathlib import Path
+   16  import platform
+   17  import shutil
+   18  import time
+   19  from typing import Any
+   20  
+   21  import numpy as np
+   22  
+   23  import step28_continual_population as core
+   24  import step28_continual_population_data as data
+   25  import step28_continual_population_evaluate as metrics
+   26  import step28_continual_population_run as persistence
+   27  
+   28  POLICY = data.ROOT / 'schema/step28_continual_expression_run_policy.json'
+   29  COMPLETE = 'COMPLETE_EXPRESSION_PILOT_2160_VALID_BLIND'
+   30  ORDERS = ('ABC', 'BCA', 'CAB')
+   31  POINTS = ('initial',) + tuple(f'{o}_{s}' for o in ORDERS for s in ('shared', 'stage2', 'stage3')) + ('joint',)
+   32  
+   33  
+   34  def sources() -> list[dict]:
+   35      paths = [Path(__file__), POLICY, Path(core.__file__), Path(data.__file__),
+   36               Path(metrics.__file__), Path(persistence.__file__),
+   37               data.ROOT / 'tests/test_step28_continual_expression_run_contracts.py',
+   38               data.ROOT / 'scripts/run_step28_expression_linux_20260910.sh']
+   39      return [data.record(p, data.ROOT) for p in paths]
+   40  
+   41  
+   42  def contract() -> dict:
+   43      c = data.read_json(POLICY)
+   44      e = c['evaluation']
+   45      if (c['physical_updates'] != 2160 or c['orders'] != list(ORDERS)
+   46              or c['epochs_per_stage'] != 3 or c['initialization_seed'] != 20260909
+   47              or c['groups_per_domain'] != {'train': 60, 'development': 20, 'heldout': 40}
+   48              or e['heldout_access'] or e['owners_access'] or e['split'] != 'development'
+   49              or e['same_order_required'] != 2 or e['new_gain_min'] != .02
+   50              or e['forgetting_min'] != .03 or e['single_gain_min'] != .02
+   51              or e['joint_single_floor'] != -.02 or e['bootstrap_replicates'] != 5000
+   52              or e['threshold_logit'] != 0 or e['bootstrap_seed'] != 20260910
+   53              or e['confidence_level'] != .95):
+   54          raise ValueError('Pilot differs from confirmed design')
+   55      return c
+   56  
+   57  
+   58  def public_inputs(c: dict) -> tuple[dict, list[dict], dict]:
+   59      root = data.ROOT / c['data_root']
+   60      for name, key in (('manifest.json', 'data_manifest_sha256'), ('validation.json', 'data_validation_sha256')):
+   61          if data.sha256(root / name) != c[key]:
+   62              raise ValueError('Pinned expression dataset differs')
+   63      dm = data.read_json(root / 'manifest.json')
+   64      if (dm['study'] != 'seller_alias_continual_expression_shift' or dm['root_seed'] != 20260910
+   65              or data.read_json(root / 'validation.json')['status'] != 'PASS_GENERATION_CONTRACT_NOT_MODEL_QUALIFICATION'):
+   66          raise ValueError('Expression generation qualification missing')
+   67      checked = {}
+   68  
+   69      def path(name: str) -> Path:
+   70          checked[name] = dm['files'][name]
+   71          return data.verify(root / name, checked[name])
+   72  
+   73      with path('groups.csv').open(encoding='utf-8', newline='') as stream:
+   74          meta = sorted((r for r in csv.DictReader(stream) if r['split'] in ('train', 'development')),
+   75                        key=lambda r: (r['domain'], int(r['group_index'])))
+   76      groups, sellers_seen, items_seen = {}, set(), set()
+   77      for split, count in (('train', 60), ('development', 20)):
+   78          rows = [r for r in meta if r['split'] == split]
+   79          if len({r['group_uid'] for r in rows}) != 3 * count or any(
+   80                  sorted(int(r['group_index']) for r in rows if r['domain'] == d) != list(range(count)) for d in 'ABC'):
+   81              raise ValueError('Public domain partition differs')
+   82          collected = defaultdict(lambda: defaultdict(list))
+   83          with path(f'{split}/items.jsonl').open(encoding='utf-8') as stream:
+   84              for line in stream:
+   85                  r = json.loads(line)
+   86                  if set(r) != {'group_uid', 'seller_uid', 'item_uid', 'title', 'description'} or r['item_uid'] in items_seen:
+   87                      raise ValueError('Public item schema/identity differs')
+   88                  items_seen.add(r['item_uid'])
+   89                  collected[r['group_uid']][r['seller_uid']].append((r['item_uid'], r['title'], r['description']))
+   90          if set(collected) != {r['group_uid'] for r in rows}:
+   91              raise ValueError('Public group coverage differs')
+   92          groups[split] = []
+   93          for r in rows:
+   94              sellers = collected[r['group_uid']]
+   95              ids = tuple(sorted(sellers))
+   96              if sellers_seen.intersection(ids):
+   97                  raise ValueError('Seller reused across groups/splits')
+   98              sellers_seen.update(ids)
+   99              g = data.Group(r['group_uid'], ids, tuple(tuple(sorted(sellers[s])) for s in ids))
+  100              g.validate()
+  101              if int(r['accounts']) != 28 or int(r['items']) != sum(map(len, g.items)):
+  102                  raise ValueError('Group record counts differ')
+  103              groups[split].append(g)
+  104      return groups, meta, checked
+  105  
+  106  
+  107  def attach_labels(groups: list[data.Group], c: dict, split: str) -> list[data.Group]:
+  108      if split not in ('train', 'development'):
+  109          raise ValueError('Forbidden supervision split')
+  110      root = data.ROOT / c['data_root']
+  111      dm = data.read_json(root / 'manifest.json')
+  112      name = f'{split}/supervision/pairs.csv'
+  113      rows = defaultdict(list)
+  114      with data.verify(root / name, dm['files'][name]).open(encoding='utf-8', newline='') as stream:
+  115          reader = csv.DictReader(stream)
+  116          if reader.fieldnames != ['group_uid', 'seller_uid_left', 'seller_uid_right', 'label']:
+  117              raise ValueError('Unexpected binary supervision schema')
+  118          for r in reader:
+  119              rows[r['group_uid']].append(r)
+  120      if set(rows) != {g.uid for g in groups}:
+  121          raise ValueError('Supervision groups differ; do not retry')
+  122      result = []
+  123      for g in groups:
+  124          labels = data.align_labels(g, rows[g.uid])
+  125          if sum(labels) != 20:
+  126              raise ValueError('Positive pair count differs')
+  127          result.append(data.Group(g.uid, g.sellers, g.items, labels))
+  128      return result
+  129  
+  130  
+  131  def segment(order: str, stage: int) -> tuple[str, str, int]:
+  132      if order == 'JOINT' and stage == 1:
+  133          return 'joint', 'ABC', 0
+  134      if order not in ORDERS or stage not in (1, 2, 3):
+  135          raise ValueError('Unknown training segment')
+  136      return f'{order}_{"shared" if stage == 1 else "stage" + str(stage)}', order[stage - 1], (stage - 1) * 180
+  137  
+  138  
+  139  def segment_schedule(groups: list[data.Group], meta: list[dict], c: dict, order: str, stage: int) -> tuple[list, int]:
+  140      _, domains, _ = segment(order, stage)
+  141      selected = {r['group_uid'] for r in meta if r['split'] == 'train' and r['domain'] in domains}
+  142      current = [g for g in groups if g.uid in selected]
+  143      if len(current) != 60 * len(domains) or len({g.uid for g in current}) != len(current):
+  144          raise ValueError('Current-domain supply differs')
+  145      seed = data.seed_for(c['initialization_seed'], order, stage, 'current')
+  146      return data.schedule(current, 3, seed), seed
+  147  
+  148  
+  149  def train_segment(model: Any, optimizer: Any, groups: list, meta: list, c: dict,
+  150                    order: str, stage: int, budget: persistence.Budget) -> dict:
+  151      started = time.monotonic()
+  152      name, _, prior_steps = segment(order, stage)
+  153      rows, seed = segment_schedule(groups, meta, c, order, stage)
+  154      losses, norms, checks = [], [], {}
+  155      for i, g in enumerate(rows):
+  156          if i == 0:
+  157              before = {n: core.state_digest(m.state_dict()) for n, m in (('encoder', model.encoder), ('head', model.head))}
+  158          r = core.update(model, optimizer, g, None, c, data.seed_for(seed, i, 'dropout_current'),
+  159                          data.seed_for(seed, i, 'dropout_replay'), budget.check)
+  160          losses.append(r['current_bce'])
+  161          norms.append(r['gradient_norm_before_clip'])
+  162          if i == 0:
+  163              for n, m in (('encoder', model.encoder), ('head', model.head)):
+  164                  ns = [float(p.grad.detach().float().norm()) for p in m.parameters() if p.grad is not None]
+  165                  if not ns or not np.isfinite(ns).all() or max(ns) <= 0 or before[n] == core.state_digest(m.state_dict()):
+  166                      raise ValueError(f'Actual first update failed {n}')
+  167                  checks[n] = {'finite_nonzero_gradient': True, 'parameters_changed': True}
+  168              if not optimizer.state or any(float(v['step']) != prior_steps + 1 for v in optimizer.state.values()):
+  169                  raise ValueError('Adam did not inherit the correct update history')
+  170          if (i + 1) % 30 == 0:
+  171              print(data.json_bytes({'event': 'updates', 'segment': name, 'completed': i + 1,
+  172                                    'total': len(rows), **budget.state()}).decode(), flush=True)
+  173      ids = [g.uid for g in rows]
+  174      if not optimizer.state or any(float(v['step']) != prior_steps + len(rows) for v in optimizer.state.values()):
+  175          raise ValueError('Adam final update count differs')
+  176      return {'updates': len(rows), 'training_seconds': time.monotonic() - started,
+  177              'group_ids': ids, 'order_sha256': hashlib.sha256(data.json_bytes(ids)).hexdigest(),
+  178              'dropout_stream': seed, 'pair_presentations': len(rows) * 378,
+  179              'first_adam_step': prior_steps + 1, 'last_adam_step': prior_steps + len(rows),
+  180              'first_update_modules': checks, 'bce_by_epoch': np.asarray(losses).reshape(3, -1).mean(1).tolist(),
+  181              'maximum_gradient_norm_before_clip': max(norms)}
+  182  
+  183  
+  184  def run(out: Path) -> dict:
+  185      import torch
+  186      c = contract()
+  187      runtime = c['runtime']
+  188      if platform.system() != 'Linux' or not torch.cuda.is_available() or torch.cuda.device_count() != 1:
+  189          raise RuntimeError('Requires resumed Linux stage and one visible GPU')
+  190      if not torch.cuda.is_bf16_supported() or torch.cuda.mem_get_info()[0] < runtime['minimum_free_gpu_bytes']:
+  191          raise RuntimeError('Insufficient eligible idle GPU; wait')
+  192      available = next(int(r.split()[1]) * 1024 for r in Path('/proc/meminfo').read_text().splitlines() if r.startswith('MemAvailable:'))
+  193      if available < runtime['minimum_free_host_bytes'] or shutil.disk_usage(data.ROOT).free < runtime['maximum_output_bytes']:
+  194          raise RuntimeError('Insufficient shared host/disk resources; wait')
+  195      if out.exists() or not out.is_relative_to((data.ROOT / 'reports').resolve()):
+  196          raise ValueError('Use a new reports directory')
+  197      out.mkdir(parents=True)
+  198      for name in ('work', 'models', 'scores'):
+  199          (out / name).mkdir()
+  200      budget = persistence.Budget(out, c)
+  201      snapshot = sources()
+  202      r = {'status': 'RUNNING', 'config': c, 'source_files': snapshot, 'points': {}, 'training': {}, 'models': {},
+  203           'starts': {}, 'label_parses': {'train': 0, 'development': 0, 'heldout': 0, 'owners': 0},
+  204           'environment': {'python': platform.python_version(), 'torch': torch.__version__,
+  205                           'cuda': torch.version.cuda, 'gpu': torch.cuda.get_device_name(0)}}
+  206      data.write_json(out / 'startup.json', r)
+  207      try:
+  208          torch.set_num_threads(1)
+  209          torch.use_deterministic_algorithms(True)
+  210          torch.backends.cuda.matmul.allow_tf32 = False
+  211          torch.backends.cudnn.allow_tf32 = False
+  212          torch.backends.cudnn.benchmark = False
+  213          pretrained = core.model_files(c)
+  214          if any(pretrained[k] != c['model'][k] for k in ('file_count', 'total_size_bytes', 'content_sha256')):
+  215              raise ValueError('Pretrained model differs')
+  216          r['pretrained'] = pretrained
+  217          groups, meta, checked = public_inputs(c)
+  218          dm = data.read_json(data.ROOT / c['data_root'] / 'manifest.json')
+  219          checked['train/supervision/pairs.csv'] = dm['files']['train/supervision/pairs.csv']
+  220          r['inputs'] = {'files': checked, 'metadata': meta, 'valid_group_ids': [g.uid for g in groups['development']]}
+  221          data.write_json(out / 'access.json', {'train_parse_attempts': 1, 'development': 0, 'heldout': 0, 'owners': 0})
+  222          r['label_parses']['train'] = 1
+  223          groups['train'] = attach_labels(groups['train'], c, 'train')
+  224          model = core.load_model(c)
+  225          evaluation = {'development': groups['development']}
+  226          initial = persistence.point(model, None, 'initial', evaluation, c, out, budget)
+  227          r['points']['initial'] = initial
+  228          initial_path = out / initial['checkpoint']['path']
+  229          for order in ORDERS:
+  230              core.restore_state(initial_path, model, None, initial['checkpoint']['state_sha256'])
+  231              r['starts'][order] = initial['checkpoint']['state_sha256']
+  232              optimizer = core.make_optimizer(model, c)
+  233              for stage in (1, 2, 3):
+  234                  name, _, _ = segment(order, stage)
+  235                  r['training'][name] = train_segment(model, optimizer, groups['train'], meta, c, order, stage, budget)
+  236                  p = persistence.point(model, optimizer, name, evaluation, c, out, budget)
+  237                  r['points'][name] = p
+  238                  if stage in (1, 3):
+  239                      r['models'][name] = persistence.retain_inference(model, name, p, c, out, budget)
+  240                  if stage == 1:
+  241                      # Explicit new optimizer restoration, not only inference-weight reuse.
+  242                      del optimizer
+  243                      gc.collect()
+  244                      torch.cuda.empty_cache()
+  245                      optimizer = core.make_optimizer(model, c)
+  246                      core.restore_state(out / p['checkpoint']['path'], model, optimizer, p['checkpoint']['state_sha256'])
+  247                      r['starts'][order + '_continuation'] = p['checkpoint']['state_sha256']
+  248                  persistence.remove_work_file(out / p['checkpoint']['path'], out)
+  249                  data.write_json(out / 'progress.json', r)
+  250              del optimizer
+  251              gc.collect()
+  252              torch.cuda.empty_cache()
+  253          core.restore_state(initial_path, model, None, initial['checkpoint']['state_sha256'])
+  254          r['starts']['JOINT'] = initial['checkpoint']['state_sha256']
+  255          optimizer = core.make_optimizer(model, c)
+  256          r['training']['joint'] = train_segment(model, optimizer, groups['train'], meta, c, 'JOINT', 1, budget)
+  257          p = persistence.point(model, optimizer, 'joint', evaluation, c, out, budget)
+  258          r['points']['joint'] = p
+  259          r['models']['joint'] = persistence.retain_inference(model, 'joint', p, c, out, budget)
+  260          persistence.remove_work_file(out / p['checkpoint']['path'], out)
+  261          persistence.remove_work_file(initial_path, out)
+  262          r['physical_updates'] = sum(x['updates'] for x in r['training'].values())
+  263          if r['physical_updates'] != 2160 or sources() != snapshot:
+  264              raise ValueError('Update count or source mismatch')
+  265          r['formal_training_seconds'] = sum(x['training_seconds'] for x in r['training'].values())
+  266          r['inference_seconds_including_replay'] = sum(x['timing']['inference_seconds_including_replay'] for x in r['points'].values())
+  267          r['budget'] = budget.state()
+  268          r['status'] = COMPLETE
+  269          data.write_json(out / 'manifest.json', r)
+  270          verify_models(out)
+  271          return r
+  272      except Exception as e:
+  273          data.write_json(out / 'failure.json', {'status': 'FAILED_DO_NOT_EVALUATE_OR_AUTO_RESTART',
+  274                          'error_type': type(e).__name__, 'error': str(e), 'label_parses': r['label_parses']})
+  275          raise
+  276  
+  277  
+  278  def verify_models(out: Path) -> dict:
+  279      r = data.read_json(out / 'manifest.json')
+  280      if r['status'] != COMPLETE or len(r['models']) != 7:
+  281          raise ValueError('Incomplete retained models')
+  282      files = [data.record(data.verify(out / m['path'], m), out) for m in r['models'].values()]
+  283      result = {'manifest_sha256': data.sha256(out / 'manifest.json'), 'files': files}
+  284      data.write_json(out / 'model_verification.json', result)
+  285      return result
+  286  
+  287  
+  288  def validated_scores(out: Path, c: dict, groups: dict, meta: list, checked: dict) -> tuple[dict, dict]:
+  289      if (out / 'failure.json').exists():
+  290          raise ValueError('Failed run cannot be evaluated')
+  291      r = data.read_json(out / 'manifest.json')
+  292      if (r['status'] != COMPLETE or r['config'] != c or r['source_files'] != sources()
+  293              or r['label_parses'] != {'train': 1, 'development': 0, 'heldout': 0, 'owners': 0}
+  294              or r['physical_updates'] != 2160 or set(r['points']) != set(POINTS)
+  295              or set(r['training']) != set(POINTS) - {'initial'} or set(r['models']) != set(c['retained_points'])
+  296              or r['budget']['elapsed_seconds'] > c['runtime']['maximum_gpu_stage_seconds']
+  297              or r['budget']['peak_observed_bytes'] > c['runtime']['maximum_output_bytes']):
+  298          raise ValueError('Incomplete pilot result contract')
+  299      dm = data.read_json(data.ROOT / c['data_root'] / 'manifest.json')
+  300      expected_files = {**checked, 'train/supervision/pairs.csv': dm['files']['train/supervision/pairs.csv']}
+  301      if r['inputs'] != {'files': expected_files, 'metadata': meta, 'valid_group_ids': [g.uid for g in groups['development']]}:
+  302          raise ValueError('Input identities differ')
+  303      if any(r['pretrained'][k] != c['model'][k] for k in ('file_count', 'total_size_bytes', 'content_sha256')):
+  304          raise ValueError('Pretrained source differs')
+  305      expected_starts = dict.fromkeys((*ORDERS, 'JOINT'), r['points']['initial']['checkpoint']['state_sha256'])
+  306      expected_starts.update({o + '_continuation': r['points'][o + '_shared']['checkpoint']['state_sha256'] for o in ORDERS})
+  307      if r['starts'] != expected_starts:
+  308          raise ValueError('Initial/shared full-state mapping differs')
+  309      for order, stage in [(o, s) for o in ORDERS for s in (1, 2, 3)] + [('JOINT', 1)]:
+  310          name, _, prior_steps = segment(order, stage)
+  311          rows, seed = segment_schedule(groups['train'], meta, c, order, stage)
+  312          log, ids = r['training'][name], [g.uid for g in rows]
+  313          if (log['group_ids'] != ids or log['updates'] != len(rows) or log['dropout_stream'] != seed
+  314                  or log['order_sha256'] != hashlib.sha256(data.json_bytes(ids)).hexdigest()
+  315                  or log['pair_presentations'] != len(rows) * 378
+  316                  or log['first_adam_step'] != prior_steps + 1 or log['last_adam_step'] != prior_steps + len(rows)
+  317                  or log['first_update_modules'] != {k: {'finite_nonzero_gradient': True, 'parameters_changed': True} for k in ('encoder', 'head')}
+  318                  or len(log['bce_by_epoch']) != 3 or not np.isfinite(log['bce_by_epoch']).all()):
+  319              raise ValueError('Training schedule or actual update evidence differs')
+  320      receipt = data.read_json(out / 'model_verification.json')
+  321      expected_models = [{k: m[k] for k in ('path', 'bytes', 'sha256')} for m in r['models'].values()]
+  322      if receipt['manifest_sha256'] != data.sha256(out / 'manifest.json') or receipt['files'] != expected_models:
+  323          raise ValueError('Linux retained-model verification missing')
+  324      for name, m in r['models'].items():
+  325          if m['path'] != f'models/{name}.pt' or not m['actual_loaded_model_equals_replayed_state']:
+  326              raise ValueError('Retained model mapping/reload differs')
+  327      scores = {}
+  328      for name, p in r['points'].items():
+  329          if not p['full_model_and_adam_reloaded'] or set(p['scores']) != {'development'}:
+  330              raise ValueError('Full-state/score replay missing')
+  331          file = p['scores']['development']
+  332          if file['path'] != f'scores/{name}_development.npy':
+  333              raise ValueError('Score mapping differs')
+  334          a = np.load(data.verify(out / file['path'], file), allow_pickle=False)
+  335          if a.shape != (60, 378) or a.dtype != np.float32 or not np.isfinite(a).all():
+  336              raise ValueError('Incomplete/nonfinite score array')
+  337          scores[name] = a
+  338      return scores, r
+  339  
+  340  
+  341  def paired_summary(delta: np.ndarray, draws: np.ndarray) -> dict:
+  342      if delta.shape != (3, 20) or not np.isfinite(delta).all():
+  343          raise ValueError('Expected paired domain/group deltas')
+  344      sampled = np.stack([delta[d][draws[:, d]] for d in range(3)], axis=1).mean((1, 2))
+  345      return {'mean': float(delta.mean()), 'by_domain_or_first_domain': delta.mean(1).tolist(),
+  346              'conditional_95pct_interval': np.quantile(sampled, [.025, .975]).tolist()}
+  347  
+  348  
+  349  def contrasts(arrays: dict, column: int) -> dict[str, np.ndarray]:
+  350      initial = arrays['initial'][:, column].reshape(3, 20)
+  351      singles = np.stack([arrays[o + '_shared'][i*20:(i+1)*20, column] for i, o in enumerate(ORDERS)])
+  352      final = np.stack([arrays[o + '_stage3'][i*20:(i+1)*20, column] for i, o in enumerate(ORDERS)])
+  353      # Every target domain appears twice as a new domain; combine its same groups BEFORE bootstrap.
+  354      new_by_domain = defaultdict(list)
+  355      for o in ORDERS:
+  356          for stage in (2, 3):
+  357              before = o + ('_shared' if stage == 2 else '_stage2')
+  358              d = 'ABC'.index(o[stage - 1])
+  359              new_by_domain[d].append(arrays[o + f'_stage{stage}'][d*20:(d+1)*20, column]
+  360                                      - arrays[before][d*20:(d+1)*20, column])
+  361      return {'single_gain': singles - initial,
+  362              'joint_minus_single': arrays['joint'][:, column].reshape(3, 20) - singles,
+  363              'first_domain_forgetting': singles - final,
+  364              'new_domain_gain': np.stack([np.mean(new_by_domain[d], axis=0) for d in range(3)])}
+  365  
+  366  
+  367  def qualification(arrays: dict, comparison: dict, e: dict) -> dict:
+  368      ap = metrics.COLUMNS.index('average_precision')
+  369      c = contrasts(arrays, ap)
+  370      matched = []
+  371      order_details = {}
+  372      for i, o in enumerate(ORDERS):
+  373          gains = []
+  374          for stage in (2, 3):
+  375              before = o + ('_shared' if stage == 2 else '_stage2')
+  376              d = 'ABC'.index(o[stage - 1])
+  377              gains.append(float((arrays[o + f'_stage{stage}'] - arrays[before])[d*20:(d+1)*20, ap].mean()))
+  378          f = float(c['first_domain_forgetting'][i].mean())
+  379          ok = f > 0 and float(np.mean(gains)) >= e['new_gain_min']
+  380          if ok:
+  381              matched.append(o)
+  382          order_details[o] = {'first_domain_forgetting': f, 'new_gain_stage2_stage3': gains,
+  383                              'mean_new_gain': float(np.mean(gains)), 'joint_condition': bool(ok)}
+  384      gates = {'single_domain_gain': bool(np.all(c['single_gain'].mean(1) >= e['single_gain_min'])),
+  385               'joint_compatibility': bool(np.all(c['joint_minus_single'].mean(1) >= e['joint_single_floor'])),
+  386               'mean_forgetting': bool(c['first_domain_forgetting'].mean() >= e['forgetting_min']),
+  387               'positive_forgetting_interval': comparison['first_domain_forgetting']['conditional_95pct_interval'][0] > 0,
+  388               'mean_new_gain': bool(c['new_domain_gain'].mean() >= e['new_gain_min']),
+  389               'same_order_joint_condition': len(matched) >= e['same_order_required']}
+  390      return {'gates': gates, 'all_numeric_gates_pass': all(gates.values()), 'orders': order_details,
+  391              'matched_orders': matched, 'interpretation': 'Numeric qualification is not a novelty or publication claim. Inspect absolute performance, MAP and each transfer; it does not require every transfer to gain.'}
+  392  
+  393  
+  394  def evaluate(out: Path, destination: Path) -> dict:
+  395      c = contract()
+  396      if platform.system() != 'Windows' or destination.exists():
+  397          raise ValueError('Requires Windows and new evaluation directory')
+  398      groups, meta, checked = public_inputs(c)
+  399      scores, run_record = validated_scores(out, c, groups, meta, checked)
+  400      destination.mkdir(parents=True)
+  401      data.write_json(destination / 'access.json', {'status': 'COMPLETE_GATE_PASSED_VALID_PARSE_STARTING',
+  402                      'development_parse_attempts': 1, 'train': 0, 'heldout': 0, 'owners': 0})
+  403      labelled = attach_labels(groups['development'], c, 'development')
+  404      truth = np.asarray([g.labels for g in labelled], dtype=np.uint8)
+  405      arrays, points = {}, {}
+  406      for name, s in scores.items():
+  407          rows = [metrics.classification(y, x) for y, x in zip(truth, s)]
+  408          matrix = np.column_stack((np.asarray([[r[k] for k in metrics.CLASS_KEYS] for r in rows]), metrics.retrieval(truth, s, 28)))
+  409          arrays[name] = matrix
+  410          file = destination / (name + '_metrics.npy')
+  411          np.save(file, matrix, allow_pickle=False)
+  412          points[name] = {'file': data.record(file, destination), 'confusion': [r['confusion'] for r in rows],
+  413                         'by_domain': {d: dict(zip(metrics.COLUMNS, matrix[i*20:(i+1)*20].mean(0).tolist())) for i, d in enumerate('ABC')}}
+  414      e = c['evaluation']
+  415      draws = np.random.default_rng(e['bootstrap_seed']).integers(0, 20, size=(e['bootstrap_replicates'], 3, 20))
+  416      comparisons = {name: {key: paired_summary(delta, draws) for key, delta in contrasts(arrays, i).items()}
+  417                     for i, name in enumerate(metrics.COLUMNS)}
+  418      result = {'status': 'EXPRESSION_PILOT_VALID_EVALUATED_INTERPRETATION_REQUIRED',
+  419                'score_manifest_sha256': data.sha256(out / 'manifest.json'), 'points': points,
+  420                'columns': list(metrics.COLUMNS), 'comparisons': comparisons,
+  421                'qualification': qualification(arrays, comparisons['average_precision'], e),
+  422                'training_bce': {k: v['bce_by_epoch'] for k, v in run_record['training'].items()},
+  423                'label_parses': {'development': 1, 'train': 0, 'heldout': 0, 'owners': 0},
+  424                'bootstrap': {'replicates': e['bootstrap_replicates'], 'seed': e['bootstrap_seed'],
+  425                              'unit': 'paired independent full group within domain; repeated paths averaged first'}}
+  426      data.write_json(destination / 'evaluation.json', result)
+  427      return result
+  428  
+  429  
+  430  def main() -> None:
+  431      parser = argparse.ArgumentParser(description=__doc__)
+  432      parser.add_argument('action', choices=('train', 'evaluate', 'verify-models'))
+  433      parser.add_argument('--out', type=Path, required=True)
+  434      parser.add_argument('--evaluation', type=Path)
+  435      args = parser.parse_args()
+  436      if args.action == 'evaluate' and args.evaluation is None:
+  437          parser.error('evaluate requires --evaluation')
+  438      if args.action == 'train':
+  439          result = run(args.out.resolve())
+  440      elif args.action == 'verify-models':
+  441          result = verify_models(args.out.resolve())
+  442      else:
+  443          result = evaluate(args.out.resolve(), args.evaluation.resolve())
+  444      print(data.json_bytes({'status': result.get('status', 'MODEL_HASHES_VERIFIED'), 'out': str(args.out)}).decode())
+  445  
+  446  
+  447  if __name__ == '__main__':
+  448      main()

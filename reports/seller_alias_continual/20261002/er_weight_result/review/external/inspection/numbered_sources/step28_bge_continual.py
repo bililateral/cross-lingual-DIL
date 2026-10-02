@@ -1,0 +1,301 @@
+    1  """Limited-history BGE pilot primitives; no formal data or model loading here."""
+    2  from __future__ import annotations
+    3  
+    4  import copy
+    5  import hashlib
+    6  import json
+    7  import random
+    8  import time
+    9  from pathlib import Path
+   10  from typing import Any, Callable
+   11  
+   12  import numpy as np
+   13  
+   14  import step28_alias_ranking as ranking
+   15  import step28_alias_calibration as calibration
+   16  
+   17  base, data, core, metrics = ranking.base, ranking.data, ranking.core, ranking.metrics
+   18  POLICY = data.ROOT / "schema/step28_bge_continual_policy.json"
+   19  POLICY_SHA256 = "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+   20  ORDERS = ("ABC", "BCA", "CAB")
+   21  METHODS = ("frozen", "seq", "er", "logit")
+   22  UPDATED = METHODS[1:]
+   23  ROLES = ("raw", "stage-cal", "first-cal")
+   24  STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+   25                  "history_bce", "history_rank", "history_hard", "history_total",
+   26                  "logit_mse", "total", "encoder_lr", "head_lr", "gradient_norm",
+   27                  "logit_term_host_seconds")
+   28  
+   29  
+   30  def contract() -> dict:
+   31      if data.sha256(POLICY) != POLICY_SHA256:
+   32          raise ValueError("Continual policy differs from confirmed specification")
+   33      policy = data.read_json(POLICY)
+   34      ranking.contract()  # Checks inherited BGE policy/source without data access.
+   35      if (policy["orders"] != list(ORDERS) or policy["methods"] != list(METHODS)
+   36              or policy["physical_updates"] != 6048 or policy["updates_per_stage"] != 288
+   37              or policy["supervision"]["test_access"] or policy["supervision"]["owners_access"]):
+   38          raise ValueError("Unexpected pilot scope")
+   39      return policy
+   40  
+   41  
+   42  def config(policy: dict) -> dict:
+   43      result = copy.deepcopy(base.contract())
+   44      result["initialization_seed"] = policy["initialization_seed"]
+   45      result["schedule_seed"] = policy["schedule_seed"]
+   46      result["runtime"] = copy.deepcopy(policy["runtime"])
+   47      return result
+   48  
+   49  
+   50  def stage_lr(step: int) -> float:
+   51      if type(step) is not int or not 1 <= step <= 288:
+   52          raise ValueError("Stage step must be one-based in 1..288")
+   53      return 1e-5 * (step / 29 if step <= 29 else (288 - step) / 259)
+   54  
+   55  
+   56  def schedule(current: list, policy: dict, order: str, stage: int) -> tuple[list, int]:
+   57      if order not in ORDERS or stage not in (1, 2, 3) or len(current) != 48:
+   58          raise ValueError("Only the 48 current fitting groups enter a stage")
+   59      if len({g.uid for g in current}) != 48 or any(g.labels is None for g in current):
+   60          raise ValueError("Missing or repeated current supervision")
+   61      stream = data.seed_for(policy["schedule_seed"], order, stage, "current")
+   62      return data.schedule(current, 6, stream), stream
+   63  
+   64  
+   65  class Supply:
+   66      """Offline dispatcher. Never pass this object or its full archive to a learner."""
+   67  
+   68      def __init__(self, groups: dict, partition: dict):
+   69          self.groups, self.partition = groups, partition
+   70          self.next_stage: dict[str, int] = {}
+   71          self.orders: dict[str, str] = {}
+   72          seen = set()
+   73          for role, count in (("fit", 48), ("calibration", 12)):
+   74              rows = partition[role]
+   75              if len(rows) != 3 * count:
+   76                  raise ValueError("Incomplete dispatcher partition")
+   77              for group, row in zip(groups[role], rows, strict=True):
+   78                  if (group.uid != row["group_uid"] or row["domain"] not in "ABC"
+   79                          or group.uid in seen or group.labels is None):
+   80                      raise ValueError("Dispatcher identity, supervision or role separation differs")
+   81                  seen.add(group.uid)
+   82              if any(sum(row["domain"] == d for row in rows) != count for d in "ABC"):
+   83                  raise ValueError("Dispatcher domain sizes differ")
+   84  
+   85      def current(self, path: str, order: str, stage: int) -> tuple[list, list]:
+   86          if (order not in ORDERS or stage != self.next_stage.get(path, 1)
+   87                  or self.orders.get(path, order) != order):
+   88              raise ValueError("Future, old or repeated stage request")
+   89          if stage not in (1, 2, 3):
+   90              raise ValueError("No fourth domain")
+   91          result = []
+   92          for role, count in (("fit", 48), ("calibration", 12)):
+   93              selected = [g for g, row in zip(self.groups[role], self.partition[role], strict=True)
+   94                          if row["domain"] == order[stage - 1]]
+   95              if len(selected) != count:
+   96                  raise ValueError("Current domain role count differs")
+   97              result.append(selected)
+   98          self.next_stage[path] = stage + 1
+   99          self.orders[path] = order
+  100          return result[0], result[1]
+  101  
+  102      def branch_after_first(self, path: str, shared_path: str) -> None:
+  103          if path in self.next_stage or self.next_stage.get(shared_path) != 2:
+  104              raise ValueError("Branches must start from one completed first stage")
+  105          self.next_stage[path] = 2
+  106          self.orders[path] = self.orders[shared_path]
+  107  
+  108  
+  109  class Memory:
+  110      """Self-contained Algorithm R state, fixed first map and optional float32 targets.
+  111  
+  112      Receives only retained data and the current stage, never an archive callback.
+  113      JSON sizes include every serialized field, not just numeric tensor payloads.
+  114      """
+  115  
+  116      def __init__(self, order: str, seed: int, with_logits: bool, first_map: dict):
+  117          if order not in ORDERS:
+  118              raise ValueError("Unknown order")
+  119          self.order, self.seed, self.with_logits = order, seed, with_logits
+  120          self.first_map = dict(zip(("a", "b"), calibration.parameters(first_map)))
+  121          self.reservoir = data.Memory(data.seed_for(seed, order, "retention"))
+  122          self.references: dict[str, np.ndarray] = {}
+  123          self.reference_origins: dict[str, int] = {}
+  124          self.draw_rng: random.Random | None = None
+  125          self.draw_stage, self.draw_count = 0, 0
+  126          # Serialized branch/phase/RNG/map metadata is charged in addition to samples.
+  127          # Current dropout uses stateless per-update seeds; no uncharged token cache.
+  128          self.auxiliary: dict = {}
+  129  
+  130      def retain(self, current: list, stage: int, score: Callable[[list], np.ndarray] | None) -> None:
+  131          if (stage not in (1, 2) or self.reservoir.seen != (stage - 1) * 48
+  132                  or len(current) != 48 or len({g.uid for g in current}) != 48
+  133                  or any(g.labels is None for g in current)
+  134                  or {g.uid for g in current} & {g.uid for g in self.reservoir.groups}
+  135                  or (stage == 2 and (self.draw_stage != 2 or self.draw_count != 288))
+  136                  or (self.with_logits and score is None)):
+  137              raise ValueError("Only one unique insertion per originating stage")
+  138          previous = set(self.references)
+  139          self.reservoir.add_stage(sorted(current, key=lambda g: g.uid))
+  140          retained = {g.uid for g in self.reservoir.groups}
+  141          self.references = {uid: value for uid, value in self.references.items() if uid in retained}
+  142          self.reference_origins = {uid: value for uid, value in self.reference_origins.items()
+  143                                    if uid in retained}
+  144          if self.with_logits:
+  145              newcomers = [g for g in self.reservoir.groups if g.uid not in previous]
+  146              if newcomers:
+  147                  values = np.asarray(score(newcomers))
+  148                  if values.shape != (len(newcomers), 378) or values.dtype != np.float32 or not np.isfinite(values).all():
+  149                      raise ValueError("Origin-stage targets must be finite float32 raw logits")
+  150                  for group, row in zip(newcomers, values, strict=True):
+  151                      self.references[group.uid] = row.copy()
+  152                      self.reference_origins[group.uid] = stage
+  153          self.draw_rng, self.draw_stage, self.draw_count = None, 0, 0
+  154          self.to_bytes()
+  155  
+  156      def begin_stage(self, stage: int) -> None:
+  157          if (stage not in (2, 3) or self.reservoir.seen != (stage - 1) * 48
+  158                  or self.draw_stage != 0 or len(self.reservoir.groups) != 6):
+  159              raise ValueError("Historical memory does not match the arriving stage")
+  160          self.draw_rng = random.Random(data.seed_for(self.seed, self.order, stage, "history_draws"))
+  161          self.draw_stage, self.draw_count = stage, 0
+  162          self.to_bytes()
+  163  
+  164      def draw(self) -> tuple[data.Group, np.ndarray | None]:
+  165          if self.draw_rng is None or self.draw_count >= 288:
+  166              raise ValueError("Missing history stage or extra draw")
+  167          group = self.reservoir.groups[self.draw_rng.randrange(len(self.reservoir.groups))]
+  168          self.draw_count += 1
+  169          return group, self.references[group.uid].copy() if self.with_logits else None
+  170  
+  171      def to_bytes(self) -> bytes:
+  172          retained = {g.uid for g in self.reservoir.groups}
+  173          if (self.with_logits and (set(self.references) != retained or set(self.reference_origins) != retained)):
+  174              raise ValueError("Reference coverage differs from retained samples")
+  175          if not self.with_logits and (self.references or self.reference_origins):
+  176              raise ValueError("ER cannot silently use historical logits")
+  177          payload = data.json_bytes({"order": self.order, "seed": self.seed,
+  178                                    "with_logits": self.with_logits, "first_map": self.first_map,
+  179                                    "auxiliary": self.auxiliary,
+  180                                    "reservoir": json.loads(self.reservoir.to_bytes()),
+  181                                    "references": {uid: row.tolist() for uid, row in self.references.items()},
+  182                                    "reference_origins": self.reference_origins,
+  183                                    "draw_stage": self.draw_stage, "draw_count": self.draw_count,
+  184                                    "draw_rng": self.draw_rng.getstate() if self.draw_rng is not None else None})
+  185          if len(payload) > 1048576:
+  186              raise ValueError("Complete serialized history and auxiliary state exceed 1MiB")
+  187          return payload
+  188  
+  189      @classmethod
+  190      def from_bytes(cls, payload: bytes) -> Memory:
+  191          if len(payload) > 1048576:
+  192              raise ValueError("History payload exceeds budget")
+  193          obj = json.loads(payload)
+  194          result = cls(obj["order"], obj["seed"], obj["with_logits"], obj["first_map"])
+  195          result.reservoir = data.Memory.from_bytes(data.json_bytes(obj["reservoir"]))
+  196          if result.reservoir.capacity != 6 or result.reservoir.maximum_bytes != 1048576:
+  197              raise ValueError("Reservoir budget differs")
+  198          result.references = {uid: np.asarray(row, dtype=np.float32) for uid, row in obj["references"].items()}
+  199          if any(row.shape != (378,) or not np.isfinite(row).all() for row in result.references.values()):
+  200              raise ValueError("Bad reference vector")
+  201          result.reference_origins = obj["reference_origins"]
+  202          result.auxiliary = obj["auxiliary"]
+  203          result.draw_stage, result.draw_count = obj["draw_stage"], obj["draw_count"]
+  204          if obj["draw_rng"] is not None:
+  205              result.draw_rng = random.Random()
+  206              result.draw_rng.setstate(data.tuple_state(obj["draw_rng"]))
+  207          if result.to_bytes() != payload:
+  208              raise ValueError("History restore is not exact")
+  209          return result
+  210  
+  211      def summary(self) -> dict:
+  212          payload = self.to_bytes()
+  213          return {"members": [g.uid for g in self.reservoir.groups], "seen": self.reservoir.seen,
+  214                  "serialized_bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest(),
+  215                  "with_logits": self.with_logits, "draw_stage": self.draw_stage,
+  216                  "auxiliary_serialized_bytes": len(data.json_bytes(self.auxiliary)),
+  217                  "draw_count": self.draw_count, "reference_origins": dict(self.reference_origins),
+  218                  "references": {uid: hashlib.sha256(row.tobytes()).hexdigest()
+  219                                 for uid, row in self.references.items()}}
+  220  
+  221  
+  222  def adam_step(optimizer: Any) -> int:
+  223      steps = {int(float(state["step"])) for state in optimizer.state.values()}
+  224      if not steps:
+  225          return 0
+  226      if len(steps) != 1:
+  227          raise ValueError("Adam parameter steps disagree")
+  228      return steps.pop()
+  229  
+  230  
+  231  def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+  232             reference: np.ndarray | None, c: dict, method: str, stage: int,
+  233             step: int, current_seed: int, history_seed: int, *, observe: bool = False,
+  234             check: Callable[[], None] = lambda: None) -> dict:
+  235      """Separate live current/history graphs, sum gradients, clip once and step once."""
+  236      import torch
+  237  
+  238      if (method not in UPDATED or stage not in (1, 2, 3) or current.labels is None
+  239              or adam_step(optimizer) != (stage - 1) * 288 + step - 1
+  240              or (history is None) != (stage == 1 or method == "seq")
+  241              or (reference is not None) != (method == "logit" and stage > 1)):
+  242          raise ValueError("Update does not match current/history/Adam contract")
+  243      if history is not None and (history.labels is None or history.uid == current.uid):
+  244          raise ValueError("History must be a separate supervised old group")
+  245      if len(optimizer.param_groups) != 2:
+  246          raise ValueError("Only encoder/head optimizer groups expected")
+  247      rates = (stage_lr(step), 1e-3)
+  248      for group, rate in zip(optimizer.param_groups, rates, strict=True):
+  249          group["lr"] = rate
+  250      model.train()
+  251      optimizer.zero_grad(set_to_none=True)
+  252      before = {name: core.state_digest(module.state_dict()) for name, module in
+  253                (("encoder", model.encoder), ("head", model.head))} if observe else {}
+  254      result = {name: 0. for name in STEP_COLUMNS}
+  255      # Per-forward seeds pair the current path independently of replay draws/dropout.
+  256      torch.manual_seed(current_seed)
+  257      predicted = base.logits(model, current, c, "split_rank", check)
+  258      truth = torch.tensor(current.labels, dtype=torch.float32, device=predicted.device)
+  259      terms = ranking.objectives(predicted, truth, .5)
+  260      terms["total"].backward()
+  261      result.update({"current_" + k: float(v.detach()) for k, v in terms.items()})
+  262      del predicted, truth, terms
+  263      if history is not None:
+  264          torch.manual_seed(history_seed)
+  265          predicted = base.logits(model, history, c, "split_rank", check)
+  266          truth = torch.tensor(history.labels, dtype=torch.float32, device=predicted.device)
+  267          terms = ranking.objectives(predicted, truth, .5)
+  268          penalty = predicted.new_zeros(())
+  269          if reference is not None:
+  270              if reference.shape != (378,) or reference.dtype != np.float32 or not np.isfinite(reference).all():
+  271                  raise ValueError("Historical reference shape/dtype differs")
+  272              tick = time.perf_counter()
+  273              target = torch.tensor(reference, dtype=predicted.dtype, device=predicted.device)
+  274              penalty = (predicted - target).square().mean()
+  275              result["logit_term_host_seconds"] = time.perf_counter() - tick
+  276          (terms["total"] + .5 * penalty).backward()
+  277          result.update({"history_" + k: float(v.detach()) for k, v in terms.items()})
+  278          result["logit_mse"] = float(penalty.detach())
+  279      result["total"] = result["current_total"] + result["history_total"] + .5 * result["logit_mse"]
+  280      evidence = {}
+  281      if observe:
+  282          for name, module in (("encoder", model.encoder), ("head", model.head)):
+  283              norms = [float(p.grad.float().norm()) for p in module.parameters() if p.grad is not None]
+  284              if not norms or not np.isfinite(norms).all() or max(norms) <= 0:
+  285                  raise ValueError("No finite task gradient in " + name)
+  286              evidence[name] = {"finite_nonzero_combined_gradient": True}
+  287      result["gradient_norm"] = float(torch.nn.utils.clip_grad_norm_(
+  288          model.parameters(), c["optimizer"]["clip_norm"], error_if_nonfinite=True))
+  289      check()
+  290      optimizer.step()
+  291      if adam_step(optimizer) != (stage - 1) * 288 + step:
+  292          raise ValueError("Actual Adam continuity differs")
+  293      if observe:
+  294          for name, module in (("encoder", model.encoder), ("head", model.head)):
+  295              changed = before[name] != core.state_digest(module.state_dict())
+  296              if changed != (name == "head" or rates[0] > 0):
+  297                  raise ValueError("Unexpected actual parameter change: " + name)
+  298              evidence[name]["parameters_changed"] = changed
+  299      result.update(encoder_lr=rates[0], head_lr=rates[1], modules=evidence,
+  300                    stage=stage, step=step, adam_step=adam_step(optimizer))
+  301      return result

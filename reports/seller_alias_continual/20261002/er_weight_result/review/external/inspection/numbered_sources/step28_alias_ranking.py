@@ -1,0 +1,222 @@
+    1  """D, encoder learning-rate schedule, and known hard-candidate ranking.
+    2  
+    3  Model inputs and the D head are unchanged. No formal data loader or test entry.
+    4  """
+    5  from __future__ import annotations
+    6  
+    7  import copy
+    8  import math
+    9  from pathlib import Path
+   10  from typing import Any, Callable
+   11  
+   12  import numpy as np
+   13  
+   14  import step28_chinese_base as base
+   15  
+   16  data, core, metrics = base.data, base.core, base.metrics
+   17  POLICY = data.ROOT / "schema/step28_alias_ranking_policy.json"
+   18  POLICY_SHA256 = "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+   19  SEEDS = ("s0", "s1", "s2")
+   20  ARMS = ("d", "schedule", "hard")
+   21  RUNS = tuple(f"{seed}_{arm}" for seed in SEEDS for arm in ARMS)
+   22  LOSS_NAMES = ("bce", "rank", "hard", "total")
+   23  GUARDS = {"average_precision": 1, "roc_auc": 1, "brier": -1, "log_loss": -1}
+   24  
+   25  
+   26  def contract() -> dict:
+   27      if data.sha256(POLICY) != POLICY_SHA256:
+   28          raise ValueError("Ranking policy differs from the frozen contract")
+   29      p = data.read_json(POLICY)
+   30      if (p["arms"] != list(ARMS) or p["runs"] != list(RUNS)
+   31              or p["physical_updates"] != 7776 or p["updates_per_run"] != 864
+   32              or p["epochs"] != 6 or p["score_epochs"] != [3, 6] or p["primary_epoch"] != 6
+   33              or p["primary_comparison"] != ["hard", "d"] or p["fixed_test_seed"] != "s0"
+   34              or p["hard_ranking"]["count"] != 5 or p["hard_ranking"]["weight"] != .5
+   35              or p["evaluation"]["guard_signs"] != GUARDS
+   36              or p["evaluation"]["recall_at_5_strict_improvement_mean_and_s0"] is not True
+   37              or p["supervision"]["test_access"] is not False or p["supervision"]["owners_access"] is not False):
+   38          raise ValueError("Confirmed comparison or supervision scope differs")
+   39      base.contract()
+   40      if (p["base_policy_sha256"] != base.POLICY_SHA256
+   41              or data.sha256(Path(base.__file__)) != p["base_runner_sha256"]):
+   42          raise ValueError("Frozen D implementation differs")
+   43      return p
+   44  
+   45  
+   46  def reference_config(policy: dict, seed: str) -> dict:
+   47      if seed not in SEEDS:
+   48          raise ValueError("Unknown paired seed")
+   49      c = copy.deepcopy(base.contract())
+   50      c.update(policy["seeds"][seed])
+   51      c["runtime"] = copy.deepcopy(policy["runtime"])
+   52      return c
+   53  
+   54  
+   55  def split_run(run_id: str) -> tuple[str, str]:
+   56      if run_id not in RUNS:
+   57          raise ValueError("Unknown run identity")
+   58      seed, arm = run_id.split("_")
+   59      return seed, arm
+   60  
+   61  
+   62  def load_model(policy: dict, seed: str, device: str = "cuda:0") -> Any:
+   63      return base.load_model(reference_config(policy, seed), "split_rank", device)
+   64  
+   65  
+   66  def encoder_lr(policy: dict, arm: str, step: int) -> float:
+   67      """One-based actual optimizer step; the final scheduled encoder rate is zero."""
+   68      if arm not in ARMS or type(step) is not int or not 1 <= step <= policy["updates_per_run"]:
+   69          raise ValueError("Unknown arm or update outside the fixed budget")
+   70      if arm == "d":
+   71          return 2e-5
+   72      spec = policy["encoder_schedule"]
+   73      warmup, total = spec["warmup_updates"], policy["updates_per_run"]
+   74      if warmup != math.ceil(spec["warmup_fraction"] * total) or not 0 < warmup < total:
+   75          raise ValueError("Invalid warmup schedule")
+   76      factor = step / warmup if step <= warmup else (total - step) / (total - warmup)
+   77      return float(spec["peak_lr"] * factor)
+   78  
+   79  
+   80  def set_learning_rate(optimizer: Any, policy: dict, arm: str, step: int) -> tuple[float, float]:
+   81      if len(optimizer.param_groups) != 2:
+   82          raise ValueError("Expected encoder and head optimizer groups")
+   83      rates = (encoder_lr(policy, arm, step), policy["encoder_schedule"]["head_lr"])
+   84      for group, rate in zip(optimizer.param_groups, rates, strict=True):
+   85          group["lr"] = rate
+   86      return rates
+   87  
+   88  
+   89  def hard_candidates(predicted: Any, truth: Any, count: int = 5) -> tuple[Any, Any, Any]:
+   90      """Known-negative indices only, deterministic exact-tie order, live score values."""
+   91      import torch
+   92  
+   93      if predicted.shape != (378,) or truth.shape != (378,) or count != 5:
+   94          raise ValueError("Expected 28-account scores and five hard negatives")
+   95      # Independent shape/label/connectivity validation remains in base.objectives.
+   96      if not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all():
+   97          raise ValueError("Nonfinite scores or nonbinary labels")
+   98      left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+   99      scores = predicted.new_zeros((28, 28))
+  100      scores[left, right], scores[right, left] = predicted, predicted
+  101      positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+  102      positive[left, right], positive[right, left] = truth.bool(), truth.bool()
+  103      negative = ~positive & ~torch.eye(28, dtype=torch.bool, device=predicted.device)
+  104      if (positive.sum(1) < 1).any() or (negative.sum(1) < count).any():
+  105          raise ValueError("Each query needs positive and known negative candidates")
+  106      selected = torch.argsort(scores.detach().masked_fill(~negative, -torch.inf),
+  107                               dim=1, descending=True, stable=True)[:, :count]
+  108      if not negative.gather(1, selected).all():
+  109          raise ValueError("Self or positive entered hard negatives")
+  110      return scores, positive, selected
+  111  
+  112  
+  113  def objectives(predicted: Any, truth: Any, hard_weight: float) -> dict:
+  114      import torch
+  115  
+  116      if hard_weight not in (0., .5):
+  117          raise ValueError("Only disabled or approved fixed hard weight is allowed")
+  118      result = base.objectives(predicted, truth, 1)
+  119      if hard_weight == 0:
+  120          return {**result, "hard": predicted.new_zeros(())}
+  121      scores, positive, selected = hard_candidates(predicted, truth)
+  122      terms = []
+  123      for query in range(28):
+  124          pos = scores[query, positive[query]]
+  125          neg = scores[query, selected[query]]
+  126          terms.append(torch.nn.functional.softplus(neg.unsqueeze(0) - pos.unsqueeze(1)).mean())
+  127      hard = torch.stack(terms).mean()
+  128      return {"bce": result["bce"], "rank": result["rank"], "hard": hard,
+  129              "total": result["total"] + hard_weight * hard}
+  130  
+  131  
+  132  def score(model: Any, groups: list, config: dict, check: Callable[[], None] = lambda: None) -> np.ndarray:
+  133      return base.score(model, groups, config, "split_rank", check)
+  134  
+  135  
+  136  def update(model: Any, optimizer: Any, group: Any, config: dict, policy: dict,
+  137             arm: str, step: int, seed: int, *, observe: bool = False,
+  138             check: Callable[[], None] = lambda: None) -> dict:
+  139      import torch
+  140  
+  141      if group.labels is None:
+  142          raise ValueError("Only supervised fitting groups enter updates")
+  143      if step == 1 and optimizer.state:
+  144          raise ValueError("New run optimizer already has history")
+  145      if step > 1 and (not optimizer.state or any(float(v["step"]) != step - 1
+  146                                                 for v in optimizer.state.values())):
+  147          raise ValueError("Optimizer history does not match the declared update")
+  148      rates = set_learning_rate(optimizer, policy, arm, step)
+  149      if arm != "hard":
+  150          # Exact original D computation. No extra forward/random draws/zero-loss graph.
+  151          result = base.update(model, optimizer, group, config, "split_rank", seed,
+  152                               observe=observe and rates[0] > 0, check=check)
+  153          return {**result, "hard": 0., "step": step, "encoder_lr": rates[0], "head_lr": rates[1]}
+  154      model.train()
+  155      optimizer.zero_grad(set_to_none=True)
+  156      before = {name: core.state_digest(module.state_dict()) for name, module in
+  157                (("encoder", model.encoder), ("head", model.head))} if observe else {}
+  158      torch.manual_seed(seed)
+  159      predicted = base.logits(model, group, config, "split_rank", check)
+  160      truth = torch.tensor(group.labels, dtype=torch.float32, device=predicted.device)
+  161      terms = objectives(predicted, truth, policy["hard_ranking"]["weight"])
+  162      terms["total"].backward()
+  163      evidence = {}
+  164      if observe:
+  165          for name, module in (("encoder", model.encoder), ("head", model.head)):
+  166              norms = [float(p.grad.float().norm()) for p in module.parameters() if p.grad is not None]
+  167              if not norms or not np.isfinite(norms).all() or max(norms) <= 0:
+  168                  raise ValueError("Missing finite nonzero task gradient: " + name)
+  169              evidence[name] = {"finite_nonzero_gradient": True}
+  170      norm = torch.nn.utils.clip_grad_norm_(model.parameters(), config["optimizer"]["clip_norm"],
+  171                                           error_if_nonfinite=True)
+  172      check()
+  173      optimizer.step()
+  174      if observe:
+  175          for name, module in (("encoder", model.encoder), ("head", model.head)):
+  176              changed = before[name] != core.state_digest(module.state_dict())
+  177              expected = name == "head" or rates[0] > 0
+  178              if changed != expected:
+  179                  raise ValueError("Actual update differs from learning-rate scope: " + name)
+  180              evidence[name]["parameters_changed"] = changed
+  181      return {**{name: float(terms[name].detach()) for name in LOSS_NAMES}, "modules": evidence,
+  182              "gradient_norm": float(norm), "step": step, "encoder_lr": rates[0], "head_lr": rates[1]}
+  183  
+  184  
+  185  def paired_summary(deltas: np.ndarray, domains: list[str], evaluation: dict) -> dict:
+  186      """Three fixed paired seeds, then whole-group resampling separately within domains."""
+  187      values = np.asarray(deltas, dtype=np.float64)
+  188      if values.shape != (3, 60, len(metrics.COLUMNS)) or len(domains) != 60 or not np.isfinite(values).all():
+  189          raise ValueError("Expected complete paired seed-by-group matrices")
+  190      rows = [np.flatnonzero(np.asarray(domains) == d) for d in "ABC"]
+  191      if any(len(row) != 20 for row in rows):
+  192          raise ValueError("Unbalanced domain partition")
+  193      seed = evaluation["valid_bootstrap_seed"]
+  194      draws = np.random.default_rng(seed).integers(0, 20, size=(evaluation["bootstrap_replicates"], 3, 20))
+  195      average = values.mean(0)
+  196      point = np.stack([average[row].mean(0) for row in rows]).mean(0)
+  197      per_seed = np.stack([values[:, row].mean(1) for row in rows]).mean(0)
+  198      result = {}
+  199      for index, name in enumerate(metrics.COLUMNS):
+  200          boot = np.stack([average[row, index][draws[:, d]].mean(1) for d, row in enumerate(rows)]).mean(0)
+  201          result[name] = {"mean": float(point[index]), "per_seed": per_seed[:, index].tolist(),
+  202                          "conditional_95pct_interval": np.quantile(boot, [.025, .975], method="linear").tolist(),
+  203                          "by_domain": {d: float(average[row, index].mean()) for d, row in zip("ABC", rows, strict=True)}}
+  204      return {"metrics": result, "replicates": evaluation["bootstrap_replicates"], "seed": seed,
+  205              "scope": evaluation["scope"]}
+  206  
+  207  
+  208  def acceptance(summary: dict, evaluation: dict) -> dict:
+  209      m = summary["metrics"]
+  210      checks = {"map_minimum_observed_gain": m["map"]["mean"] >= evaluation["minimum_map_gain"],
+  211                "map_interval_above_zero": m["map"]["conditional_95pct_interval"][0] > 0,
+  212                "map_improves_each_seed": all(v > 0 for v in m["map"]["per_seed"]),
+  213                "recall_at_5_mean_strictly_improves": m["recall_at_5"]["mean"] > 0,
+  214                "recall_at_5_s0_strictly_improves": m["recall_at_5"]["per_seed"][0] > 0}
+  215      for name, sign in GUARDS.items():
+  216          checks[name + "_mean_non_degradation"] = sign * m[name]["mean"] >= 0
+  217          checks[name + "_s0_non_degradation"] = sign * m[name]["per_seed"][0] >= 0
+  218      return {"passed": all(checks.values()), "checks": checks,
+  219              "failed": [name for name, ok in checks.items() if not ok],
+  220              "next": "REVIEW_THEN_SEPARATELY_AUTHORIZED_TEST" if all(checks.values())
+  221                      else "RETAIN_NEGATIVE_RESULT_AND_DEFER_CONTINUAL_DESIGN",
+  222              "scope": "Observed-value guards and conditional uncertainty, not population noninferiority."}

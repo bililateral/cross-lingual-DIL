@@ -1,0 +1,16 @@
+--- /mnt/data/er_review_evidence/source/supplemental_result_audit_v1.py	2026-10-02 02:41:25.837438348 +0000
++++ /mnt/data/er_review_evidence/source/supplemental_result_audit_v2.py	2026-10-02 02:41:26.382433000 +0000
+@@ -87,10 +87,11 @@
+ with (a.output/'report_numeric_checks.csv').open('w',newline='') as f:
+  w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+ # Aggregate protection is not domain/order-wide protection. Export all final-domain differences.
+-col=read(N/'evaluation/collected.json');ref=read(N/'evaluation/reference/collected.json');groups=read(N/'evaluation/group_ids.json');print('GROUP_IDS_TYPE',type(groups).__name__)
++col=read(N/'evaluation/collected.json');ref=read(N/'evaluation/reference/collected.json');groups=col['group_ids'];print('GROUP_IDS_TYPE',type(groups).__name__)
+ # group_ids are already bound and independently aligned; select rows using partition development order.
+ guids=[v['group_uid'] for v in partition['development']];domain_rows={d:[i for i,v in enumerate(partition['development']) if v['domain']==d] for d in 'ABC'}
+-metric_names=list(ends['seq']['primary']['O']);domain_diffs=[]
++assert guids==groups==ref['group_ids']
++metric_names=list(ends['seq']['primary']['O']);assert metric_names==col['metric_columns']==ref['metric_columns'];domain_diffs=[]
+ for cand in ('half','quarter'):
+  for reference in ('er','seq'):
+   for order in ('ABC','BCA','CAB'):

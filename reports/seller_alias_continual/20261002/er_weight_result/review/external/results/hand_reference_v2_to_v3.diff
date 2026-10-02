@@ -1,0 +1,13 @@
+--- /mnt/data/er_review_evidence/source/hand_objective_reference_v2.py	2026-10-02 02:39:15.743701744 +0000
++++ /mnt/data/er_review_evidence/source/hand_objective_reference_v3.py	2026-10-02 02:42:36.337503159 +0000
+@@ -7,7 +7,9 @@
+ import ast,copy,hashlib,json,math,os,pathlib,types,typing
+ import numpy as np
+ import torch
+-R=pathlib.Path('/mnt/data/er_review_input');O=pathlib.Path('/mnt/data/er_review_evidence/results/hand_reference_v2');O.mkdir(exist_ok=False);os.sched_setaffinity(0,{0});torch.set_num_threads(1)
++import argparse
++parser=argparse.ArgumentParser();parser.add_argument('--project',type=pathlib.Path,required=True);parser.add_argument('--output',type=pathlib.Path,required=True);parser.add_argument('--cpu',type=int,required=True);args=parser.parse_args()
++R=args.project;O=args.output;O.mkdir(exist_ok=False);os.sched_setaffinity(0,{args.cpu});torch.set_num_threads(1)
+ records=[];extracted=[]
+ def extract(file,names,env):
+  source=(R/file).read_text();tree=ast.parse(source)

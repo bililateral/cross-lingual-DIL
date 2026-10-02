@@ -1,0 +1,178 @@
+    1  """Positive affine logit calibration on train-calibration scores only.
+    2  
+    3  No formal input loader, neural model or test access. Raw ranking is preserved by
+    4  a positive slope, with a separate numerical check for ties and strict order.
+    5  """
+    6  from __future__ import annotations
+    7  
+    8  from typing import Any, Callable
+    9  
+   10  import numpy as np
+   11  
+   12  import step28_alias_ranking as ranking
+   13  
+   14  data, metrics = ranking.data, ranking.metrics
+   15  SEEDS = ("s0", "s1", "s2")
+   16  ARMS = ("d", "hard")
+   17  RUNS = tuple(f"{seed}_{arm}" for seed in SEEDS for arm in ARMS)
+   18  VARIANTS = ("d_raw", "d_calibrated", "hard_raw", "hard_calibrated")
+   19  COMPARISONS = (("hard_calibrated", "d_calibrated"),
+   20                 ("hard_calibrated", "d_raw"),
+   21                 ("hard_calibrated", "hard_raw"),
+   22                 ("d_calibrated", "d_raw"))
+   23  BOUNDS = ((0.001, 100.0), (-100.0, 100.0))
+   24  OPTIONS = {"maxiter": 200, "maxfun": 2000, "maxls": 40,
+   25             "maxcor": 10, "ftol": 1e-12, "gtol": 1e-8}
+   26  EVALUATION = {"valid_bootstrap_seed": 20260927, "bootstrap_replicates": 5000,
+   27                "minimum_map_gain": .01,
+   28                "scope": "Fixed models, calibration maps, paired seeds and synthetic groups; "
+   29                         "not refitting, retraining, regeneration or repeated-valid selection uncertainty."}
+   30  
+   31  
+   32  def aligned(scores: np.ndarray, labels: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+   33      x, y = np.asarray(scores, dtype=np.float64), np.asarray(labels, dtype=np.float64)
+   34      if (x.shape != y.shape or x.ndim not in (1, 2) or not x.size
+   35              or not np.isfinite(x).all() or not np.isin(y, [0., 1.]).all()
+   36              or not 0 < y.sum() < y.size):
+   37          raise ValueError("Aligned finite logits and both binary classes required")
+   38      return x, y
+   39  
+   40  
+   41  def loss_gradient(parameters: np.ndarray, scores: np.ndarray,
+   42                    labels: np.ndarray) -> tuple[float, np.ndarray]:
+   43      """Unweighted mean Bernoulli NLL; differentiating the unclipped logit loss."""
+   44      a, b = np.asarray(parameters, dtype=np.float64)
+   45      z = a * scores + b
+   46      p = np.exp(-np.logaddexp(0., -z))
+   47      residual = p - labels
+   48      return (float(np.mean(np.logaddexp(0., z) - labels * z)),
+   49              np.array([np.mean(residual * scores), np.mean(residual)]))
+   50  
+   51  
+   52  def projected_gradient(parameters: np.ndarray, gradient: np.ndarray) -> np.ndarray:
+   53      result = gradient.copy()
+   54      for i, (lower, upper) in enumerate(BOUNDS):
+   55          if ((parameters[i] <= lower and gradient[i] > 0)
+   56                  or (parameters[i] >= upper and gradient[i] < 0)):
+   57              result[i] = 0.
+   58      return result
+   59  
+   60  
+   61  def parameters(record: dict) -> tuple[float, float]:
+   62      a, b = float(record["a"]), float(record["b"])
+   63      if (not np.isfinite([a, b]).all()
+   64              or not BOUNDS[0][0] <= a <= BOUNDS[0][1]
+   65              or not BOUNDS[1][0] <= b <= BOUNDS[1][1]):
+   66          raise ValueError("Calibration parameters outside the positive-slope contract")
+   67      return a, b
+   68  
+   69  
+   70  def transform(scores: np.ndarray, record: dict) -> np.ndarray:
+   71      a, b = parameters(record)
+   72      original = np.asarray(scores, dtype=np.float64)
+   73      result = a * original + b
+   74      if not original.size or not np.isfinite(original).all() or not np.isfinite(result).all():
+   75          raise ValueError("Invalid calibration logits")
+   76      return result
+   77  
+   78  
+   79  def preserve_order(original: np.ndarray, transformed: np.ndarray) -> dict:
+   80      """Preserve every group's total pair order and exact ties, hence every query order."""
+   81      x, z = np.asarray(original, dtype=np.float64), np.asarray(transformed, dtype=np.float64)
+   82      if x.shape != z.shape or x.ndim != 2 or not x.size or not np.isfinite([x, z]).all():
+   83          raise ValueError("Aligned finite group matrices required")
+   84      order = np.argsort(x, axis=1, kind="stable")
+   85      if not np.array_equal(order, np.argsort(z, axis=1, kind="stable")):
+   86          raise ValueError("Calibration changed pair order")
+   87      before = np.take_along_axis(x, order, axis=1)
+   88      after = np.take_along_axis(z, order, axis=1)
+   89      ties = before[:, 1:] == before[:, :-1]
+   90      if (not np.array_equal(ties, after[:, 1:] == after[:, :-1])
+   91              or not np.all(after[:, 1:][~ties] > after[:, :-1][~ties])):
+   92          raise ValueError("Calibration changed exact ties or collapsed distinct logits")
+   93      return {"groups": len(x), "pairs_per_group": x.shape[1],
+   94              "exact_order_and_ties_preserved": True}
+   95  
+   96  
+   97  def fit(scores: np.ndarray, labels: np.ndarray, *, role: str,
+   98          check: Callable[[], None] = lambda: None) -> dict:
+   99      """One deterministic real optimizer fit; no retry or alternative method selection."""
+  100      from scipy.optimize import minimize
+  101  
+  102      if role != "calibration":
+  103          raise ValueError("Only train-calibration labels may fit a probability map")
+  104      x, y = aligned(scores, labels)
+  105      initial = np.array([1., 0.])
+  106      initial_loss, _ = loss_gradient(initial, x, y)
+  107      trajectory: list[dict] = []
+  108      calls = 0
+  109  
+  110      def objective(theta: np.ndarray) -> tuple[float, np.ndarray]:
+  111          nonlocal calls
+  112          check()
+  113          calls += 1
+  114          if calls > OPTIONS["maxfun"]:
+  115              raise RuntimeError("Calibration objective evaluation budget exhausted")
+  116          return loss_gradient(theta, x, y)
+  117  
+  118      def callback(theta: np.ndarray) -> None:
+  119          check()
+  120          value, grad = loss_gradient(theta, x, y)
+  121          trajectory.append({"iteration": len(trajectory) + 1, "a": float(theta[0]),
+  122                             "b": float(theta[1]), "nll": value,
+  123                             "projected_gradient_max": float(np.max(np.abs(projected_gradient(theta, grad))))})
+  124  
+  125      fitted = minimize(objective, initial, method="L-BFGS-B", jac=True,
+  126                        bounds=BOUNDS, options=dict(OPTIONS), callback=callback)
+  127      final_loss, gradient = loss_gradient(fitted.x, x, y)
+  128      pg = float(np.max(np.abs(projected_gradient(fitted.x, gradient))))
+  129      result = {"a": float(fitted.x[0]), "b": float(fitted.x[1]),
+  130                "role": role, "objective": "unweighted_unclipped_bernoulli_nll",
+  131                "initial_parameters": initial.tolist(), "bounds": [list(v) for v in BOUNDS],
+  132                "options": dict(OPTIONS), "initial_nll": initial_loss, "final_nll": final_loss,
+  133                "optimizer_success": bool(fitted.success), "optimizer_message": str(fitted.message),
+  134                "optimizer_iterations": int(fitted.nit), "objective_calls": calls,
+  135                "projected_gradient_max": pg, "trajectory": trajectory,
+  136                "group_count": int(x.shape[0]) if x.ndim == 2 else None,
+  137                "pair_count": int(x.size), "positive_count": int(y.sum())}
+  138      parameters(result)
+  139      passed = (fitted.success and fitted.nit <= OPTIONS["maxiter"]
+  140                and calls <= OPTIONS["maxfun"] and np.isfinite(final_loss)
+  141                and pg <= 1e-6 and final_loss <= initial_loss + 1e-12)
+  142      result["status"] = "PASS_CALIBRATION_FIT" if passed else "FAILED_CALIBRATION_FIT_NO_RETRY"
+  143      # Empirical calibration diagnostics do not choose among maps or alter the fit.
+  144      for name, values in (("raw", x), ("calibrated", transform(x, result))):
+  145          probabilities = np.exp(-np.logaddexp(0., -values))
+  146          result[name + "_brier"] = float(np.mean((probabilities - y) ** 2))
+  147      return result
+  148  
+  149  
+  150  def acceptance(primary: dict, against_raw: dict) -> dict:
+  151      result = ranking.acceptance(primary, EVALUATION)
+  152      checks = dict(result["checks"])
+  153      for name in ("brier", "log_loss"):
+  154          value = against_raw["metrics"][name]
+  155          checks[name + "_mean_against_raw_a"] = value["mean"] <= 0
+  156          checks[name + "_s0_against_raw_a"] = value["per_seed"][0] <= 0
+  157      if len(checks) != 17:
+  158          raise ValueError("Expected the confirmed seventeen performance guards")
+  159      return {"passed": all(checks.values()), "checks": checks,
+  160              "failed": [name for name, ok in checks.items() if not ok],
+  161              "scope": result["scope"],
+  162              "next": "SEPARATELY_REVIEWED_AND_AUTHORIZED_TEST" if all(checks.values())
+  163                      else "RECORD_NEGATIVE_RESULT_NO_AUTOMATIC_RETRY"}
+  164  
+  165  
+  166  def summarize(matrices: dict[str, np.ndarray], domains: list[str]) -> dict[str, Any]:
+  167      expected = {f"{seed}_{variant}" for seed in SEEDS for variant in VARIANTS}
+  168      if set(matrices) != expected or any(v.shape != (60, 22) for v in matrices.values()):
+  169          raise ValueError("Twelve complete valid matrices required before comparisons")
+  170      comparisons = {}
+  171      for candidate, reference in COMPARISONS:
+  172          differences = np.stack([matrices[f"{seed}_{candidate}"] - matrices[f"{seed}_{reference}"]
+  173                                  for seed in SEEDS])
+  174          comparisons[candidate + "_minus_" + reference] = ranking.paired_summary(
+  175              differences, domains, EVALUATION)
+  176      return {"comparisons": comparisons,
+  177              "acceptance": acceptance(comparisons["hard_calibrated_minus_d_calibrated"],
+  178                                       comparisons["hard_calibrated_minus_d_raw"])}

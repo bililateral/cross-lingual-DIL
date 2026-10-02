@@ -1,0 +1,11 @@
+--- /mnt/data/er_review_evidence/source/build_review.py	2026-10-02 02:47:25.083716764 +0000
++++ /mnt/data/er_review_evidence/source/build_review_v2.py	2026-10-02 02:50:59.857550749 +0000
+@@ -333,6 +333,8 @@
+  x=read(p);logrows.append([p.parent.name,x['started_at_utc'],x['finished_at_utc'],str(x['exit_code']),f(x['elapsed_seconds'],6)])
+ sections.append(table(['运行','UTC开始','UTC结束','退出码','秒'],logrows))
+ sections.append('''
++另于UTC 02:49:15.543201至02:49:27.035418，在全新 `/mnt/data/er_review_portable_smoke` 目录实际执行了可移植复现入口，四个子进程均退出0。独立端点、比较、92条件CSV和draws与首次运行逐字节相同；手工参考与补充审计结论相同。四子进程完整日志另存 `logs/portable_child_*`，不是只测试入口或声称用户以后自行运行。随后最终质量核对再次确认原365成员未改。
++
+ 每个目录均保留 `execution.json`（完整argv、cwd、环境、起止、退出码）、原样完整 `stdout.log` 和 `stderr.log`。失败输出未覆盖，修订diff位于results；项目Linux日志仍在原ZIP的S中，不与网页日志混放。
+ 
+ 主要命令（以下已实际执行；完整绝对路径以日志为准）：

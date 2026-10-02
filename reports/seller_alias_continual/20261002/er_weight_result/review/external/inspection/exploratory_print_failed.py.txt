@@ -1,0 +1,7 @@
+import pathlib,json
+r=pathlib.Path('/mnt/data/er_review_evidence');print(json.loads((r/'logs/hand_reference_v3/execution.json').read_text()))
+e=json.loads((r/'results/independent_v1/independent_endpoints.json').read_text());c=json.loads((r/'results/independent_v1/independent_comparisons.json').read_text())
+for n in c:
+ print(n)
+ for ep,m in [('O','map'),('O','recall_at_5'),('N','map'),('Z','map'),('F_first','map')]: print(ep,m,c[n]['primary'][ep][m])
+print('quarter vs seq brier'):None
