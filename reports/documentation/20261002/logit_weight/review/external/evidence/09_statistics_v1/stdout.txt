@@ -1,0 +1,198 @@
+{
+  "scope": "All new scores and relevance in this reference are HANDWRITTEN, not new LOGIT results. Frozen 45 sets used as received.",
+  "numeric_comparisons": 62018,
+  "maximum_absolute_error": 6.661338147750939e-16,
+  "checks": [
+    {
+      "comparison": "logit_quarter_minus_quarter",
+      "passed": 0,
+      "total": 23,
+      "O_MAP": {
+        "mean": -0.23667725155957206,
+        "per_order": {
+          "ABC": -0.24261392582387495,
+          "BCA": -0.22761584948999403,
+          "CAB": -0.23980197936484715
+        },
+        "conditional_95pct_interval": [
+          -0.25497591292485533,
+          -0.21887664335531867
+        ]
+      },
+      "N_MAP": {
+        "mean": -0.24772259872021354,
+        "per_order": {
+          "ABC": -0.28588489693341723,
+          "BCA": -0.22216853167026562,
+          "CAB": -0.23511436755695775
+        },
+        "conditional_95pct_interval": [
+          -0.2663907970535921,
+          -0.2289460626935824
+        ]
+      },
+      "Z_MAP": {
+        "mean": -0.23889091008003002,
+        "per_order": {
+          "ABC": -0.24971617743344968,
+          "BCA": -0.2313504959059176,
+          "CAB": -0.23560605690072278
+        },
+        "conditional_95pct_interval": [
+          -0.25998131926443313,
+          -0.21871835896191122
+        ]
+      },
+      "note": "Only quarter_minus_seq is a historical observed comparison; new LOGIT is handwritten."
+    },
+    {
+      "comparison": "quarter_minus_seq",
+      "passed": 4,
+      "total": 23,
+      "O_MAP": {
+        "mean": -0.004599553080780601,
+        "per_order": {
+          "ABC": -0.015390462369616276,
+          "BCA": 0.011118501704401429,
+          "CAB": -0.009526698577126957
+        },
+        "conditional_95pct_interval": [
+          -0.015904316897120435,
+          0.006791038350746349
+        ]
+      },
+      "N_MAP": {
+        "mean": -0.027483750468518715,
+        "per_order": {
+          "ABC": -0.03631046335642779,
+          "BCA": -0.0129748994926977,
+          "CAB": -0.033165888556430656
+        },
+        "conditional_95pct_interval": [
+          -0.035225815433494664,
+          -0.019692009848518356
+        ]
+      },
+      "Z_MAP": {
+        "mean": -0.031082193543860975,
+        "per_order": {
+          "ABC": -0.048116068349563446,
+          "BCA": -0.007559749070197075,
+          "CAB": -0.0375707632118224
+        },
+        "conditional_95pct_interval": [
+          -0.043345612549187215,
+          -0.018853500088938376
+        ]
+      },
+      "note": "Only quarter_minus_seq is a historical observed comparison; new LOGIT is handwritten."
+    },
+    {
+      "comparison": "logit_quarter_minus_seq",
+      "passed": 0,
+      "total": 23,
+      "O_MAP": {
+        "mean": -0.24127680464035264,
+        "per_order": {
+          "ABC": -0.25800438819349125,
+          "BCA": -0.2164973477855926,
+          "CAB": -0.2493286779419741
+        },
+        "conditional_95pct_interval": [
+          -0.2573839745095919,
+          -0.22429398451589944
+        ]
+      },
+      "N_MAP": {
+        "mean": -0.2752063491887322,
+        "per_order": {
+          "ABC": -0.32219536028984497,
+          "BCA": -0.23514343116296332,
+          "CAB": -0.2682802561133884
+        },
+        "conditional_95pct_interval": [
+          -0.29499076773720884,
+          -0.25470918170896695
+        ]
+      },
+      "Z_MAP": {
+        "mean": -0.269973103623891,
+        "per_order": {
+          "ABC": -0.29783224578301315,
+          "BCA": -0.23891024497611468,
+          "CAB": -0.2731768201125452
+        },
+        "conditional_95pct_interval": [
+          -0.2936639693290326,
+          -0.24670023857866796
+        ]
+      },
+      "note": "Only quarter_minus_seq is a historical observed comparison; new LOGIT is handwritten."
+    }
+  ],
+  "recovery": {
+    "new_sets_saved_before_failure": 18,
+    "reused_sets_saved_before_failure": 45,
+    "saved_only_recovery_pass": true,
+    "all_saved_inputs_unchanged": true,
+    "repeated_finalization_byte_identical": true,
+    "formal_parser_calls": 0,
+    "model_loader_calls": 0
+  },
+  "handwritten_metric_checks": {
+    "sets": 18,
+    "groups": 1080,
+    "metrics_per_group": 22,
+    "max_error": 3.3306690738754696e-16
+  },
+  "ap_vs_pr_hand_example": {
+    "average_precision": 0.8333333333333333,
+    "trapezoidal_pr_auc": 0.7916666666666666,
+    "roc_auc": 0.75,
+    "recall_at_fpr_1pct": 0.5
+  },
+  "count_derived_values": 22680,
+  "better_ER_still_worse_SEQ_fixture": {
+    "method_checks": {
+      "increment_against_matched_er_passes": true,
+      "all_guards_against_seq_pass": false,
+      "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"
+    },
+    "matched_ER_checks": 23,
+    "SEQ_checks": 0,
+    "matched_ER_O_MAP": 0.050000000000000044,
+    "SEQ_O_MAP": -0.04999999999999993
+  },
+  "independent_23_guard_mutations": [
+    "old_map_improves",
+    "old_map_interval_above_zero",
+    "old_recall5_improves",
+    "new_map_non_decrease",
+    "new_recall5_non_decrease",
+    "O_average_precision_non_degradation",
+    "O_roc_auc_non_degradation",
+    "O_brier_non_degradation",
+    "O_log_loss_non_degradation",
+    "O_brier_against_raw_reference",
+    "O_log_loss_against_raw_reference",
+    "N_average_precision_non_degradation",
+    "N_roc_auc_non_degradation",
+    "N_brier_non_degradation",
+    "N_log_loss_non_degradation",
+    "N_brier_against_raw_reference",
+    "N_log_loss_against_raw_reference",
+    "Z_map_non_degradation",
+    "Z_recall_at_5_non_degradation",
+    "Z_average_precision_non_degradation",
+    "Z_roc_auc_non_degradation",
+    "Z_brier_non_degradation",
+    "Z_log_loss_non_degradation"
+  ],
+  "stage_table_rows": 5346,
+  "endpoint_summaries": 1848,
+  "comparison_summaries": 594,
+  "status": "PASS",
+  "cpu_affinity": [
+    0
+  ]
+}

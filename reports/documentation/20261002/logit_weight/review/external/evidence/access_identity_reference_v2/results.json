@@ -1,0 +1,68 @@
+{
+  "source_closure_current": 34,
+  "source_closure_original_unchanged": 18,
+  "policy_sha256": "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb",
+  "ledger_probes": [
+    {
+      "split": "train",
+      "actual_handwritten_loader_calls": 1,
+      "attempt_recorded_before_loader": true,
+      "second_attempt_rejected": "This stage's supervision parse has already been attempted",
+      "final_access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0
+      }
+    },
+    {
+      "split": "development",
+      "actual_handwritten_loader_calls": 1,
+      "attempt_recorded_before_loader": true,
+      "second_attempt_rejected": "This stage's supervision parse has already been attempted",
+      "final_access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 0,
+        "valid": 1
+      }
+    }
+  ],
+  "target_gradient": {
+    "fresh_target_tensor_count": 1,
+    "is_leaf": true,
+    "requires_grad": false,
+    "grad_is_none": true,
+    "input_reference_unchanged": true
+  },
+  "invalid_targets": [
+    {
+      "case": "infinity",
+      "error": "Historical raw-logit reference or independent MSE weight differs"
+    },
+    {
+      "case": "requires_grad_tensor",
+      "error": "Historical raw-logit reference or independent MSE weight differs"
+    },
+    {
+      "case": "python_list",
+      "error": "Historical raw-logit reference or independent MSE weight differs"
+    }
+  ],
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "executable": "/opt/pyvenv/bin/python",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "numpy": "2.3.5",
+    "torch": "2.10.0+cpu",
+    "torch_cpu_threads": 1,
+    "cpu_affinity": [
+      0
+    ],
+    "cuda_available": false,
+    "cuda_visible_devices": "",
+    "native_BGE_loaded": false,
+    "dependency_installed": false
+  },
+  "status": "PASS"
+}

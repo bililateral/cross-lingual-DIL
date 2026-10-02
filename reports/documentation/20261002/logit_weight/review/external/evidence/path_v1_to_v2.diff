@@ -1,0 +1,11 @@
+--- path_reference_v1.py
++++ path_reference_v2.py
+@@ -142,7 +142,7 @@
+   reject(name+'/'+role+'/nonfinite_with_updated_hash',lambda mf,n=name,r=role:mutate_score(mf,n,r))
+ name='ABC_logit_quarter_stage2';cols={key:i for i,key in enumerate(m.step_columns(p))}
+ reject('MSE_wrong_0.125_even_if_total_recomputed',lambda mf:mutate_values(mf,name,lambda a:(a.__setitem__((slice(None),cols['logit_weight']),.125),a.__setitem__((slice(None),cols['total']),a[:,cols['current_total']]+a[:,cols['weighted_history_total']]+.125*a[:,cols['logit_mse']]))))
+-reject('only_BCE_history_weighted_not_rank_hard',lambda mf:mutate_values(mf,name,lambda a:a.__setitem__((slice(None),cols['weighted_history_total']),.25*a[:,cols['history_bce']]+a[:,cols['history_rank']]+.5*a[:,cols['history_hard']]))))
++reject('only_BCE_history_weighted_not_rank_hard',lambda mf:mutate_values(mf,name,lambda a:a.__setitem__((slice(None),cols['weighted_history_total']),.25*a[:,cols['history_bce']]+a[:,cols['history_rank']]+.5*a[:,cols['history_hard']])))
+ reject('wrong_own_stage2_model_source',lambda mf:mf['memories'][name]['reference_update'].__setitem__('model_state_sha256','OLD_LOGIT1_STAGE2_IS_NOT_OWN_MODEL'))
+ reject('teacher_training_mode',lambda mf:mf['memories'][name]['reference_update'].__setitem__('mode','train'))
+ reject('new_target_list_missing',lambda mf:mf['memories'][name]['reference_update'].__setitem__('new_target_ids',[]))

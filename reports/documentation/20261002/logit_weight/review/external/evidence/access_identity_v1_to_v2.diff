@@ -1,0 +1,19 @@
+--- access_identity_reference_v1.py
++++ access_identity_reference_v2.py
+@@ -8,11 +8,14 @@
+ import step28_er_weight as m
+ import step28_er_weight_run as run
+ import test_step28_bge_continual_contracts as fixture
+-ROOT=Path(__file__).resolve().parents[1];SRC=ROOT/'submission';OUT=ROOT/'evidence/access_identity_reference';OUT.mkdir(exist_ok=False)
++ROOT=Path(__file__).resolve().parents[1];SRC=ROOT/'submission';OUT=ROOT/'evidence/access_identity_reference_v2';OUT.mkdir(exist_ok=False)
+ torch.set_num_threads(1)
+ if hasattr(os,'sched_setaffinity'):os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+ p=m.contract('logit');freeze=m.data.read_json(SRC/'reports/documentation/20261002/logit_weight/freeze.json')
+-assert m.sources(p)==freeze['source_files'] and len(m.sources(p))==34
++actual_sources=m.sources(p); frozen_sources=freeze['source_files']
++assert len(actual_sources)==len(frozen_sources)==34
++assert len({r['path'] for r in actual_sources})==len({r['path'] for r in frozen_sources})==34
++assert {r['path']:r for r in actual_sources}=={r['path']:r for r in frozen_sources}
+ oldjob=SRC/p['baseline']['local_small_job'];oldmanifest=m.data.read_json(oldjob/'run/manifest.json')
+ original=m.parent.POLICY_SHA256
+ assert len(run.prior.sources())==18 and run.prior.sources()==oldmanifest['source_files']
