@@ -1,0 +1,25 @@
+REPRODUCER_HELP_COMMAND ["/opt/pyvenv/bin/python", "/mnt/data/er_low_audit/reproduce_cpu.py", "--help"]
+REPRODUCER_HELP_STDOUT
+usage: reproduce_cpu.py [-h] --workdir WORKDIR
+
+Reproduce only the completed local CPU scope, using a new destination.
+Requires the user's own installed compatible Python/NumPy/Torch; installs
+nothing. Never calls native BGE, remote services, or the formal execute entry.
+
+options:
+  -h, --help         show this help message and exit
+  --workdir WORKDIR
+
+REPRODUCER_HELP_STDERR
+
+REPRODUCER_HELP_EXIT 0
+{
+  "status": "DELIVERY_INTERNAL_CHECKS_PASS",
+  "latest_distinct_tests": 34,
+  "all_version_executions": 41,
+  "all_version_failures": 1,
+  "all_version_errors": 2,
+  "initial_reference_sources_preserved": true,
+  "project_sources_changed": false,
+  "scope": "No native or formal execution"
+}

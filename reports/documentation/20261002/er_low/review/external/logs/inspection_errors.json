@@ -1,0 +1,21 @@
+{
+  "scope": "Non-test exploratory source lookup mistakes. Original source not modified. Exact timestamps were not recorded; these are not passed/failed scientific tests.",
+  "entries": [
+    {
+      "exit_code": 2,
+      "command_tail": "grep -n ... scripts/step28_seller* scripts/*metric* 2>/dev/null",
+      "stderr": "Suppressed by the exploratory command; glob targets did not exist."
+    },
+    {
+      "exit_code": 2,
+      "command_tail": "sed -n 1,220p scripts/step28_alias_metrics.py",
+      "stderr": "sed: can't read scripts/step28_alias_metrics.py: No such file or directory"
+    },
+    {
+      "exit_code": 2,
+      "command_tail": "sed -n 1,200p scripts/step28_pair_metrics.py",
+      "stderr": "sed: can't read scripts/step28_pair_metrics.py: No such file or directory"
+    }
+  ],
+  "resolution": "Read actual imports in step28_chinese_base.py, then inspected scripts/step28_continual_population_evaluate.py."
+}

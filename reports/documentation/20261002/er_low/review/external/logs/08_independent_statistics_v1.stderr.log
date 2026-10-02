@@ -1,0 +1,28 @@
+test_all_handwritten_new_metric_rows_and_old_count_ratios (test_independent_statistics.IndependentStatistics.test_all_handwritten_new_metric_rows_and_old_count_ratios) ... ok
+test_every_endpoint_interval_order_comparison_and_guard (test_independent_statistics.IndependentStatistics.test_every_endpoint_interval_order_comparison_and_guard) ... ok
+test_metrics_ties_and_handcalculated_endpoint_difference (test_independent_statistics.IndependentStatistics.test_metrics_ties_and_handcalculated_endpoint_difference) ... FAIL
+test_pooled_counts_and_saved_only_idempotent_recovery (test_independent_statistics.IndependentStatistics.test_pooled_counts_and_saved_only_idempotent_recovery) ... ERROR
+test_selection_uses_quarter_and_all_23_not_seq (test_independent_statistics.IndependentStatistics.test_selection_uses_quarter_and_all_23_not_seq) ... ok
+
+======================================================================
+ERROR: test_pooled_counts_and_saved_only_idempotent_recovery (test_independent_statistics.IndependentStatistics.test_pooled_counts_and_saved_only_idempotent_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/er_low_audit/independent/test_independent_statistics.py", line 136, in test_pooled_counts_and_saved_only_idempotent_recovery
+    n+=1;error=max(error,abs(actual[key]-value));self.assertAlmostEqual(actual[key],value,places=12)
+                             ~~~~~~^^^^^
+KeyError: 'specificity'
+
+======================================================================
+FAIL: test_metrics_ties_and_handcalculated_endpoint_difference (test_independent_statistics.IndependentStatistics.test_metrics_ties_and_handcalculated_endpoint_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/er_low_audit/independent/test_independent_statistics.py", line 196, in test_metrics_ties_and_handcalculated_endpoint_difference
+    reference=ref.summary(a[ep]-b[ep])['map'];self.assertAlmostEqual(reference['mean'],value,places=12)
+                                              ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: -0.025000000000000022 != -0.05 within 12 places (0.02499999999999998 difference)
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.908s
+
+FAILED (failures=1, errors=1)

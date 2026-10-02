@@ -1,0 +1,36 @@
+{
+  "scope": "Six endpoint file fixtures; not six trained native models",
+  "complete_points": 6,
+  "targeted_expected_rejections": [
+    {
+      "case": "wrong_weight",
+      "expected_rejection": true,
+      "error": "Shared start evidence differs",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_paths.py\", line 81, in test_low_six_point_gate_and_rejected_targeted_mutations\n    try:run.blind_gate(root,modified,reference,p)\n        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_run.py\", line 300, in blind_gate\n    raise ValueError(\"Shared start evidence differs\")\nValueError: Shared start evidence differs\n"
+    },
+    {
+      "case": "missing_endpoint",
+      "expected_rejection": true,
+      "error": "Incomplete ER weight experiment",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_paths.py\", line 81, in test_low_six_point_gate_and_rejected_targeted_mutations\n    try:run.blind_gate(root,modified,reference,p)\n        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_run.py\", line 282, in blind_gate\n    raise ValueError(\"Incomplete ER weight experiment\")\nValueError: Incomplete ER weight experiment\n"
+    },
+    {
+      "case": "wrong_policy_sha",
+      "expected_rejection": true,
+      "error": "Incomplete ER weight experiment",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_paths.py\", line 81, in test_low_six_point_gate_and_rejected_targeted_mutations\n    try:run.blind_gate(root,modified,reference,p)\n        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_run.py\", line 282, in blind_gate\n    raise ValueError(\"Incomplete ER weight experiment\")\nValueError: Incomplete ER weight experiment\n"
+    },
+    {
+      "case": "extra_point",
+      "expected_rejection": true,
+      "error": "Incomplete ER weight experiment",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_paths.py\", line 81, in test_low_six_point_gate_and_rejected_targeted_mutations\n    try:run.blind_gate(root,modified,reference,p)\n        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_run.py\", line 282, in blind_gate\n    raise ValueError(\"Incomplete ER weight experiment\")\nValueError: Incomplete ER weight experiment\n"
+    },
+    {
+      "case": "quarter_training_weight_in_tenth_study",
+      "expected_rejection": true,
+      "error": "Replay configuration or memory differs",
+      "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_paths.py\", line 87, in test_low_six_point_gate_and_rejected_targeted_mutations\n    try:run.blind_gate(root,modified,reference,p)\n        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_run.py\", line 327, in blind_gate\n    raise ValueError(\"Replay configuration or memory differs\")\nValueError: Replay configuration or memory differs\n"
+    }
+  ]
+}

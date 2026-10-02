@@ -1,0 +1,29 @@
+--- test_independent_statistics.py
++++ test_independent_statistics_v2.py
+@@ -11,7 +11,7 @@
+ import step28_er_weight_evaluate as prod
+ import test_step28_bge_continual_contracts as fixture
+ import statistics_reference as ref
+-E=Path(os.environ.get('ER_AUDIT_EVIDENCE','/mnt/data/er_low_audit/evidence'))/'statistics'
++E=Path(os.environ.get('ER_AUDIT_EVIDENCE','/mnt/data/er_low_audit/evidence'))/'statistics_v2'
+ 
+ 
+ def write(name,value):
+@@ -132,7 +132,7 @@
+                     selected=[r for i,r in enumerate(rows) if domain=='all' or self.domains[i]==domain]
+                     pooled={key:sum(r[key] for r in selected) for key in ('tp','fp','fn','tn')}
+                     actual=output['pooled'] if domain=='all' else output['by_domain'][domain]
+-                    for key,value in {**pooled,**ref.confusion(pooled),'fpr':pooled['fp']/(pooled['fp']+pooled['tn'])}.items():
++                    for key,value in {**pooled,**{k:ref.confusion(pooled)[k] for k in ('precision','recall','f1')},'fpr':pooled['fp']/(pooled['fp']+pooled['tn'])}.items():
+                         n+=1;error=max(error,abs(actual[key]-value));self.assertAlmostEqual(actual[key],value,places=12)
+         before=hashlib.sha256((self.root/'evaluation.json').read_bytes()).hexdigest()
+         with mock.patch.object(m.base,'load_model',side_effect=AssertionError('No model reading')),mock.patch.object(run.prior,'parse_once',side_effect=AssertionError('No data parser')):
+@@ -190,7 +190,7 @@
+         _,weights=ref.draw_counts()
+         a=ref.direct_endpoint_samples(arrays,domains,'tenth','primary',weights)
+         b=ref.direct_endpoint_samples(arrays,domains,'quarter','primary',weights)
+-        manual={ep:(.05 if ep in ('O','N','Z','final_all') else -.05 if ep in ('F_first','F') else .025) for ep in ref.ENDPOINTS}
++        manual={ep:(.05 if ep in ('O','N','Z','final_all') else -.05 if ep=='F_first' else -.025 if ep=='F' else .025) for ep in ref.ENDPOINTS}
+         evidence={}
+         for ep,value in manual.items():
+             reference=ref.summary(a[ep]-b[ep])['map'];self.assertAlmostEqual(reference['mean'],value,places=12)

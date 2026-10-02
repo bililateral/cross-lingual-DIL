@@ -1,0 +1,30 @@
+{
+  "recorded_at_utc": "2026-10-02T04:13:17.319806+00:00",
+  "submitted_source_changed": false,
+  "initial_run": "10_independent_paths_v1",
+  "initial_result": {
+    "tests": 2,
+    "passed": 1,
+    "failures": 0,
+    "errors": 1,
+    "skips": 0,
+    "exit_code": 1
+  },
+  "fixes": [
+    {
+      "id": "REF-03",
+      "class": "REFERENCE_ONLY",
+      "cause": "Reference attempted a 289th history draw in completed stage2 instead of completing the prescribed retain(current,2) and begin_stage(3) transition. Production correctly rejected it. Actual stage2 288 updates, checkpoint full restore and RNG equality had already passed before the reference error.",
+      "fix": "In separate v2 reference, retain handwritten stage2 current groups, begin stage3, then draw its first retained sample before next-update parity check."
+    },
+    {
+      "id": "REF-04",
+      "class": "REFERENCE_CASE_LABEL_ONLY",
+      "cause": "A mutation labeled wrong_weight changed the original shared Adam counter to289.",
+      "fix": "Label changed to wrong_shared_Adam_counter; actual weight mutation remains separately tested."
+    }
+  ],
+  "original_source_sha256": "112996653fb73e03e578e0fcb1bcfc9ccc5c3d78852039f38dac8e0687a5e7da",
+  "revised_source_sha256": "4bbcd805cc43094f2e6285edef0434d001aa5797d9e2269214ad9af83ebd594d",
+  "retention": "Original reference, all logs and paths/ evidence retained; v2 uses new paths_v2/."
+}

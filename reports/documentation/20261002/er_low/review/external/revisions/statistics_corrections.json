@@ -1,0 +1,30 @@
+{
+  "recorded_at_utc": "2026-10-02T04:11:06.289729+00:00",
+  "submitted_source_changed": false,
+  "initial_run": "08_independent_statistics_v1",
+  "initial_result": {
+    "tests": 5,
+    "passed": 3,
+    "failures": 1,
+    "errors": 1,
+    "skips": 0,
+    "exit_code": 1
+  },
+  "fixes": [
+    {
+      "id": "REF-01",
+      "class": "REFERENCE_ONLY",
+      "cause": "Hand expected F delta incorrectly -.05. F=(R11-R31+R22-R32)/2, candidates share R11 and all later points improve .05; delta F=(0-.05+.05-.05)/2=-.025. F_first remains -.05, G=.025.",
+      "fix": "Correct only explicit manual expected F to -.025; independent direct R formulas and project code unchanged."
+    },
+    {
+      "id": "REF-02",
+      "class": "REFERENCE_ONLY",
+      "cause": "Pooled rates schema reports counts, fpr, recall, precision, f1. Reference incorrectly requested specificity, balanced_accuracy and mcc from this schema. Six classification metrics already separately checked in all per-group metric matrices.",
+      "fix": "Pooled reference now checks all 8 actually published fields: four counts and four rates; no project schema or success line change."
+    }
+  ],
+  "original_source_sha256": "ded93b25f285a650b612c45e7f1eef3c58444b2ab6f52b213708814a9c6c4f3e",
+  "revised_source_sha256": "0c77e859c9b1fbc61c981ea6620a45bc47cbc2aa7ae6578dd6fd2b00f361b621",
+  "retention": "Original test file, all initial logs and statistics/ artifacts preserved; v2 uses distinct statistics_v2/ output directory."
+}

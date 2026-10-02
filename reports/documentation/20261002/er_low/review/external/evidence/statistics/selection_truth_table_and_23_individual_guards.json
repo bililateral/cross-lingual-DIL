@@ -1,0 +1,85 @@
+{
+  "truth_table": [
+    {
+      "quarter_pass": false,
+      "seq_pass": false,
+      "selection": {
+        "selected": "quarter",
+        "history_weight": 0.25,
+        "eligible": [],
+        "fallback_used": true,
+        "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+        "scope": "Developed-valid configuration selection, not independent confirmation",
+        "additional_configurations_authorized": false
+      }
+    },
+    {
+      "quarter_pass": false,
+      "seq_pass": true,
+      "selection": {
+        "selected": "quarter",
+        "history_weight": 0.25,
+        "eligible": [],
+        "fallback_used": true,
+        "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+        "scope": "Developed-valid configuration selection, not independent confirmation",
+        "additional_configurations_authorized": false
+      }
+    },
+    {
+      "quarter_pass": true,
+      "seq_pass": false,
+      "selection": {
+        "selected": "tenth",
+        "history_weight": 0.1,
+        "eligible": [
+          "tenth"
+        ],
+        "fallback_used": false,
+        "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+        "scope": "Developed-valid configuration selection, not independent confirmation",
+        "additional_configurations_authorized": false
+      }
+    },
+    {
+      "quarter_pass": true,
+      "seq_pass": true,
+      "selection": {
+        "selected": "tenth",
+        "history_weight": 0.1,
+        "eligible": [
+          "tenth"
+        ],
+        "fallback_used": false,
+        "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+        "scope": "Developed-valid configuration selection, not independent confirmation",
+        "additional_configurations_authorized": false
+      }
+    }
+  ],
+  "individually_flipped_guards": [
+    "old_map_improves",
+    "old_map_interval_above_zero",
+    "old_recall5_improves",
+    "new_map_non_decrease",
+    "new_recall5_non_decrease",
+    "O_average_precision_non_degradation",
+    "O_roc_auc_non_degradation",
+    "O_brier_non_degradation",
+    "O_log_loss_non_degradation",
+    "O_brier_against_raw_reference",
+    "O_log_loss_against_raw_reference",
+    "N_average_precision_non_degradation",
+    "N_roc_auc_non_degradation",
+    "N_brier_non_degradation",
+    "N_log_loss_non_degradation",
+    "N_brier_against_raw_reference",
+    "N_log_loss_against_raw_reference",
+    "Z_map_non_degradation",
+    "Z_recall_at_5_non_degradation",
+    "Z_average_precision_non_degradation",
+    "Z_roc_auc_non_degradation",
+    "Z_brier_non_degradation",
+    "Z_log_loss_non_degradation"
+  ]
+}

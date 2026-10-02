@@ -1,0 +1,8 @@
+{
+  "kind": "EXPECTED_FAULT_INJECTION_NOT_TEST_FAILURE",
+  "exception": "INJECTED_AFTER_ALL_NEW_AND_OLD_SETS_SAVED",
+  "traceback": "Traceback (most recent call last):\n  File \"/mnt/data/er_low_audit/independent/test_independent_statistics_v2.py\", line 63, in setUpClass\n    try:prod.finalize(cls.root,cls.oldjob/'evaluation',cls.p,cls.weightjob/'evaluation')\n        ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/mnt/data/er_low_source/scripts/step28_er_weight_evaluate.py\", line 155, in finalize\n    result = evaluate_matrices(new_arrays, old_arrays, collected[\"domains\"], p)\n  File \"/usr/lib/python3.13/unittest/mock.py\", line 1169, in __call__\n    return self._mock_call(*args, **kwargs)\n           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/unittest/mock.py\", line 1173, in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/unittest/mock.py\", line 1228, in _execute_mock_call\n    raise effect\nRuntimeError: INJECTED_AFTER_ALL_NEW_AND_OLD_SETS_SAVED\n",
+  "new_sets": 18,
+  "reused_sets": 81,
+  "evaluation_exists": false
+}
