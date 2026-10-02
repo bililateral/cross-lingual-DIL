@@ -33,7 +33,7 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
     if set(new) != set(method.expected_points(p)):
         raise ValueError("Incomplete new matrix set")
     draws = previous.bootstrap_draws()
-    views = {"seq": (old, "seq"), "er": (old, "er")}
+    views = {arm: (old, arm) for arm in p.get("baseline_methods", ("seq", "er"))}
     for arm in (*p.get("reference_arms", {}), *p["arms"]):
         # The old endpoint function uses logical ER names. Explicit local views do
         # not rename a published artifact or mutate parent globals or source files.
@@ -51,21 +51,29 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
                        for role, entries in variants.items()}
                  for arm, variants in fields.items()}
     comparisons = {}
-    for arm in p["arms"]:
-        for reference in p["evaluation"]["comparators"]:
-            delta = {name: previous.summarize_field(fields[arm]["primary"][name]
-                                                   - fields[reference]["primary"][name], draws)
-                     for name in previous.ENDPOINTS}
-            raw = {name: previous.summarize_field(fields[arm]["primary"][name]
-                                                 - fields[reference]["raw"][name], draws)
-                   for name in ("O", "N")}
-            verdict = previous.comparison_checks(delta, raw)
-            if len(verdict["checks"]) != 23:
-                raise ValueError("Original 23 checks changed")
-            comparisons[arm + "_minus_" + reference] = {
-                "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
-    return {"endpoints": endpoints, "comparisons": comparisons,
-            "selection": select_configuration(endpoints, comparisons, p)}
+    pairs = p["evaluation"].get("comparison_pairs", [
+        (arm, reference) for arm in p["arms"] for reference in p["evaluation"]["comparators"]])
+    for arm, reference in pairs:
+        delta = {name: previous.summarize_field(fields[arm]["primary"][name]
+                                               - fields[reference]["primary"][name], draws)
+                 for name in previous.ENDPOINTS}
+        raw = {name: previous.summarize_field(fields[arm]["primary"][name]
+                                             - fields[reference]["raw"][name], draws)
+               for name in ("O", "N")}
+        verdict = previous.comparison_checks(delta, raw)
+        if len(verdict["checks"]) != 23:
+            raise ValueError("Original 23 checks changed")
+        comparisons[arm + "_minus_" + reference] = {
+            "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
+    result = {"endpoints": endpoints, "comparisons": comparisons}
+    if method.with_logits(p):
+        result["method_checks"] = {
+            "increment_against_matched_er_passes": comparisons["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"],
+            "all_guards_against_seq_pass": comparisons["logit_quarter_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
+            "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"}
+    else:
+        result["selection"] = select_configuration(endpoints, comparisons, p)
+    return result
 
 
 def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
@@ -112,7 +120,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
                                 None if weight_root is None else weight_root.parent)
     collected = data.read_json(root / "collected.json")
     old = reference["collected"]
-    if (collected["status"] != f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+    if (collected["status"] != f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
             or collected["policy_sha256"] != method.policy_sha256(p)
             or collected["source_files"] != method.sources(p)
             or collected["metric_columns"] != list(metrics.COLUMNS)
@@ -121,7 +129,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
         raise ValueError("Complete aligned collection is required")
     new_arrays, new_counts = read_points(root, collected, method.expected_points(p))
     names = [name for order in method.ORDERS for name in
-             [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in ("seq", "er") for stage in (2, 3))]]
+             [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in p.get("baseline_methods", ("seq", "er")) for stage in (2, 3))]]
     old_arrays, old_counts = read_points(baseline_root, old, names)
     reuse = [(baseline_root, old, names)]
     if "weight_reference" in reference:
@@ -167,7 +175,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
     previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
-    result.update(status="COMPLETE_ER_WEIGHT_DEVELOPMENT_COMPARISON",
+    result.update(status=f"COMPLETE_{method.evidence_tag(p)}_DEVELOPMENT_COMPARISON",
                   source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
                   collected=data.record(root / "collected.json", root),
                   reused_collection=data.record(destination / "collected.json", root),

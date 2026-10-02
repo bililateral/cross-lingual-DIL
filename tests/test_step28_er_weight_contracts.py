@@ -34,7 +34,8 @@ def clone(model: object, optimizer: object, c: dict) -> tuple:
 
 
 def independent_update(model: object, optimizer: object, current: object, old: object,
-                       c: dict, weight: float) -> dict:
+                       c: dict, weight: float, reference: np.ndarray | None = None,
+                       step: int = 1) -> dict:
     """Separate unweighted derivatives, then explicit linear combination before clipping."""
     model.train()
     parameters = list(model.parameters())
@@ -48,16 +49,27 @@ def independent_update(model: object, optimizer: object, current: object, old: o
         scalar = fixtures.scalar_losses(scores.detach().numpy(), group.labels)
         for key, value in terms.items():
             np.testing.assert_allclose(float(value.detach()), scalar[key], rtol=2e-6, atol=2e-6)
-        components[name] = torch.autograd.grad(terms["total"], parameters)
+        needs_mse = name == "history" and reference is not None
+        components[name] = torch.autograd.grad(terms["total"], parameters, retain_graph=needs_mse)
         losses[name] = float(terms["total"].detach())
+        if needs_mse:
+            difference = scores - torch.tensor(reference, dtype=scores.dtype)
+            mse = torch.dot(difference, difference) / len(reference)
+            components["mse"] = torch.autograd.grad(mse, parameters)
+            losses["mse"] = float(mse.detach())
     optimizer.zero_grad(set_to_none=True)
-    for p, current_grad, old_grad in zip(parameters, components["current"], components["history"], strict=True):
+    for index, (p, current_grad, old_grad) in enumerate(zip(parameters, components["current"], components["history"], strict=True)):
         p.grad = current_grad + weight * old_grad
-    for group, lr in zip(optimizer.param_groups, (method.parent.stage_lr(1), .001), strict=True):
+        if reference is not None:
+            p.grad = p.grad + .5 * components["mse"][index]
+    for group, lr in zip(optimizer.param_groups, (method.parent.stage_lr(step), .001), strict=True):
         group["lr"] = lr
     norm = float(torch.nn.utils.clip_grad_norm_(parameters, c["optimizer"]["clip_norm"]))
     optimizer.step()
-    return {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
+    result = {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
+    if reference is not None:
+        result["logit_mse"] = losses["mse"]
+    return result
 
 
 def gate_fixture(home: Path, p: dict | None = None) -> tuple:
@@ -87,17 +99,23 @@ def gate_fixture(home: Path, p: dict | None = None) -> tuple:
                 "restored_starts": {}, "memories": {}, "partition": method.data.record(root / "partition.json", root)}
     for order in method.ORDERS:
         shared = runner.old_point(reference, order + "_shared")
+        memory_arm = p.get("memory_arm", "er")
+        first_memory = old_manifest["memories"][order + "_" + memory_arm + "_after1"]
         for arm, weight in p["arms"].items():
             manifest["restored_starts"][order + "_" + arm] = {
                 "full_checkpoint": shared["full_checkpoint"], "adam_step": 288,
                 "first_scores_replayed_exactly": True, "model_state_sha256": shared["model_state_sha256"],
                 "first_map": shared["first_map_parameters"],
-                "memory_source": old_manifest["memories"][order + "_er_after1"]["file"],
-                "memory_summary": old_manifest["memories"][order + "_er_after1"]}
-            retained = copy.deepcopy(old_manifest["memories"][f"{order}_er_stage2"])
+                "memory_source": first_memory["file"], "memory_summary": first_memory}
+            retained = copy.deepcopy(old_manifest["memories"][f"{order}_{memory_arm}_stage2"])
             memory_path = root / "memory" / (method.point_name(order, arm, 2, p) + ".json")
             memory_path.write_bytes((old_root / retained["file"]["path"]).read_bytes())
             retained["file"] = method.data.record(memory_path, root)
+            if method.with_logits(p):
+                retained["reference_update"] = {
+                    "model_state_sha256": "handmade_fixture_not_weights", "mode": "eval",
+                    "old_survivors_unchanged": True,
+                    "new_target_ids": sorted(set(retained["references"]) - set(first_memory["references"]))}
             manifest["memories"][method.point_name(order, arm, 2, p)] = retained
             for stage in (2, 3):
                 name = method.point_name(order, arm, stage, p)
@@ -119,19 +137,25 @@ def gate_fixture(home: Path, p: dict | None = None) -> tuple:
                 method.data.write_json(point_path, point)
                 manifest["points"][name] = method.data.record(point_path, root)
                 log = copy.deepcopy(runner.old_training(reference, order, stage))
-                log.update(history_weight=weight, update_columns=list(method.STEP_COLUMNS),
+                log.update(history_weight=weight, update_columns=list(method.step_columns(p)),
                            observations={str(s): {module: {
                                "finite_nonzero_combined_gradient": True,
                                "parameters_changed": module == "head" or s != 288}
                                for module in ("encoder", "head")} for s in (1, 29, 30, 288)})
-                values = np.zeros((288, len(method.STEP_COLUMNS)), dtype=np.float64)
-                fields = {key: values[:, i] for i, key in enumerate(method.STEP_COLUMNS)}
+                if method.with_logits(p):
+                    source_log = old_manifest["training"][f"{order}_logit_stage{stage}"]
+                    log["memory_after_training"] = method.data.read_json(old_root / source_log["path"])["memory_after_training"]
+                values = np.zeros((288, len(method.step_columns(p))), dtype=np.float64)
+                fields = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
                 for role in ("current", "history"):
                     for term in ("bce", "rank", "hard"):
                         fields[role + "_" + term][:] = 1.
                     fields[role + "_total"][:] = 2.5
                 fields["weighted_history_total"][:] = 2.5 * weight
                 fields["total"][:] = 2.5 + 2.5 * weight
+                if method.with_logits(p):
+                    fields["logit_mse"][:], fields["logit_weight"][:] = 2., .5
+                    fields["total"][:] += 1.
                 fields["history_weight"][:], fields["head_lr"][:], fields["gradient_norm"][:] = weight, .001, 1.
                 fields["encoder_lr"][:] = [method.parent.stage_lr(i) for i in range(1, 289)]
                 log["update_file"] = runner.save_array(root / "updates" / (name + ".npy"), values, root)
@@ -501,6 +525,162 @@ class WeightContracts(unittest.TestCase):
             before = (root / "evaluation.json").read_bytes()
             evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
             self.assertEqual((root / "evaluation.json").read_bytes(), before)
+
+
+class LogitWeightContracts(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        torch.set_num_threads(1)
+        torch.use_deterministic_algorithms(True)
+
+    def test_matched_scope_and_gate_rejects_wrong_mse_and_target_origin(self) -> None:
+        p = method.contract("logit")
+        self.assertEqual(p["arms"], {"logit_quarter": .25})
+        self.assertEqual(p["loss"]["logit_mse"], .5)
+        self.assertEqual(p["physical_updates"], 1728)
+        self.assertEqual(set(method.all_weights(p)), {"seq", "quarter", "logit_quarter"})
+        with tempfile.TemporaryDirectory() as directory:
+            root, manifest, reference = gate_fixture(Path(directory), p)
+            self.assertEqual(len(runner.blind_gate(root, manifest, reference, p)), 6)
+            name = "ABC_logit_quarter_stage2"
+            wrong = copy.deepcopy(manifest)
+            wrong["memories"][name]["reference_update"]["model_state_sha256"] = "old_LOGIT1_model"
+            with self.assertRaisesRegex(ValueError, "origin-stage model"):
+                runner.blind_gate(root, wrong, reference, p)
+            wrong = copy.deepcopy(manifest)
+            targets = wrong["restored_starts"]["ABC_logit_quarter"]["memory_summary"]["references"]
+            targets[next(iter(targets))] = "refreshed_old_target"
+            with self.assertRaisesRegex(ValueError, "targets"):
+                runner.blind_gate(root, wrong, reference, p)
+            log_path = root / manifest["training"][name]["path"]
+            log = method.data.read_json(log_path)
+            values = np.load(root / log["update_file"]["path"], allow_pickle=False)
+            values[:, method.step_columns(p).index("logit_weight")] = .125
+            log["update_file"] = runner.save_array(root / "updates" / (name + "_wrong_mse.npy"), values, root)
+            method.data.write_json(log_path, log)
+            wrong = copy.deepcopy(manifest)
+            wrong["training"][name] = method.data.record(log_path, root)
+            with self.assertRaisesRegex(ValueError, "MSE weight"):
+                runner.blind_gate(root, wrong, reference, p)
+
+    def test_original_logit_exact_parity_and_two_forwards_one_clip(self) -> None:
+        model, opt, c, current, old = prepared()
+        other, other_opt = clone(model, opt, c)
+        target = np.linspace(-.6, .4, 378, dtype=np.float32)
+        with mock.patch.object(method.base, "logits", wraps=method.base.logits) as forwards, \
+             mock.patch.object(torch.nn.utils, "clip_grad_norm_", wraps=torch.nn.utils.clip_grad_norm_) as clips:
+            actual = method.update(model, opt, current, old, c, 1., 2, 1, 401, 402,
+                                   reference=target, logit_weight=.5)
+        self.assertEqual((forwards.call_count, clips.call_count), (2, 1))
+        expected = method.parent.update(other, other_opt, current, old, target, c, "logit", 2, 1, 401, 402)
+        self.assertEqual(method.core.state_digest(model.state_dict()), method.core.state_digest(other.state_dict()))
+        self.assertEqual(method.core.state_digest(opt.state_dict()), method.core.state_digest(other_opt.state_dict()))
+        self.assertEqual(actual["logit_mse"], expected["logit_mse"])
+
+    def test_quarter_supervision_and_half_mse_independent_gradients_adam(self) -> None:
+        target = np.linspace(-1.5, 1.2, 378, dtype=np.float32)
+        for clip, step in ((.01, 1), (1e6, 1), (1., 288)):
+            with self.subTest(clip=clip, step=step):
+                model, opt, c, current, old = prepared(288 + step - 1)
+                c["optimizer"]["clip_norm"] = clip
+                other, other_opt = clone(model, opt, c)
+                expected = independent_update(other, other_opt, current, old, c, .25, target, step)
+                actual = method.update(model, opt, current, old, c, .25, 2, step, 401, 402,
+                                       reference=target, logit_weight=.5, observe=True)
+                for key, value in expected.items():
+                    self.assertAlmostEqual(actual[key], value, places=6)
+                self.assertEqual(actual["total"], actual["current_total"] + .25 * actual["history_total"] + .5 * actual["logit_mse"])
+                for parameter, reference in zip(model.parameters(), other.parameters(), strict=True):
+                    torch.testing.assert_close(parameter, reference, rtol=1e-6, atol=1e-7)
+                    torch.testing.assert_close(parameter.grad, reference.grad, rtol=1e-6, atol=1e-7)
+                    for key in ("exp_avg", "exp_avg_sq", "step"):
+                        torch.testing.assert_close(opt.state[parameter][key], other_opt.state[reference][key], rtol=1e-6, atol=1e-8)
+                self.assertEqual(actual["modules"]["encoder"]["parameters_changed"], step != 288)
+                self.assertEqual(method.parent.adam_step(opt), 288 + step)
+
+    def test_invalid_logit_reference_rejected_before_update(self) -> None:
+        for target, coefficient in ((None, .5), (np.zeros(378, np.float32), .125),
+                                    (np.zeros(378, np.float64), .5), (np.zeros(377, np.float32), .5),
+                                    (np.full(378, np.nan, np.float32), .5)):
+            model, opt, c, current, old = prepared()
+            before = method.core.state_digest(model.state_dict())
+            with self.assertRaises(ValueError):
+                method.update(model, opt, current, old, c, .25, 2, 1, 401, 402,
+                              reference=target, logit_weight=coefficient)
+            self.assertEqual(method.core.state_digest(model.state_dict()), before)
+            self.assertEqual(method.parent.adam_step(opt), 288)
+
+    def test_logit_real_continuation_checkpoint_and_unrefreshing_memory(self) -> None:
+        p = method.contract("logit")
+        model, opt, c, _, _ = prepared()
+        history = [fixtures.handmade_group(f"fit_A_{i}", 1) for i in range(48)]
+        current = [fixtures.handmade_group(f"fit_B_{i}", 2) for i in range(48)]
+        memory = method.parent.Memory("ABC", method.parent.contract()["memory_seed"], True, {"a": 1., "b": 0.})
+        memory.retain(history, 1, lambda rows: method.parent.ranking.score(model, rows, c))
+        initial_targets = {uid: row.copy() for uid, row in memory.references.items()}
+        oracle = method.parent.Memory.from_bytes(memory.to_bytes())
+        oracle.begin_stage(2)
+        sequence, _ = method.parent.schedule(current, method.parent.contract(), "ABC", 2)
+        reference_log = {"current_ids": [g.uid for g in sequence], "history_ids": [oracle.draw()[0].uid for _ in range(288)],
+                         "memory_after_training": oracle.summary()}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for folder in ("updates", "work", "models", "scores", "maps", "points"):
+                (root / folder).mkdir()
+            budget = fixtures.HandmadeBudget()
+            budget.state = lambda: {"handmade_fixture": True}
+            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "logit_quarter", root, reference_log, budget, p)
+            self.assertEqual(row["history_ids"], reference_log["history_ids"])
+            values = np.load(root / row["update_file"]["path"], allow_pickle=False)
+            self.assertTrue(np.all(values[:, method.step_columns(p).index("logit_weight")] == .5))
+            cal = [fixtures.handmade_group(f"cal_{i}") for i in range(12)]
+            valid = [fixtures.handmade_group(f"valid_{i}") for i in range(60)]
+            point = runner.checkpoint(root, "ABC_logit_quarter_stage2", model, opt, c, "ABC", 2,
+                                      cal, valid, memory.first_map, budget, .25, p)
+            self.assertEqual(point["learner_auxiliary"]["checkpoint_metadata"]["logit_weight"], .5)
+            self.assertTrue(point["full_model_adam_and_rng_restore_verified"])
+            memory.auxiliary = point["learner_auxiliary"]
+            scored = {}
+            def score(rows: list) -> np.ndarray:
+                result = method.parent.ranking.score(model, rows, c)
+                scored.update({g.uid: value.copy() for g, value in zip(rows, result, strict=True)})
+                return result
+            memory.retain(current, 2, score)
+            self.assertEqual(set(scored), set(memory.references) - set(initial_targets))
+            for uid, value in memory.references.items():
+                np.testing.assert_array_equal(value, initial_targets[uid] if uid in initial_targets else scored[uid])
+            self.assertEqual(method.parent.Memory.from_bytes(memory.to_bytes()).to_bytes(), memory.to_bytes())
+
+    def test_logit_complete_saved_comparisons_reuse_45_sets(self) -> None:
+        p = method.contract("logit")
+        def available(spec: dict) -> Path:
+            local = method.data.ROOT / spec["local_small_job"]
+            return local if local.is_dir() else method.data.ROOT / spec["linux_job"]
+        old_job, weight_job = available(p["baseline"]), available(p["weight_reference"])
+        reference = method.baseline(p, old_job, weight_job)
+        groups = [fixtures.handmade_group(uid) for uid in reference["collected"]["group_ids"]]
+        raw = np.tile(np.linspace(-2, 1, 378, dtype=np.float32), (60, 1))
+        scores = {name: {role: raw if role == "raw" else raw.astype(np.float64) for role in method.ROLES}
+                  for name in method.expected_points(p)}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "collection"
+            runner.collect(root, scores, groups, reference["partition"], method.sources(p), p)
+            with mock.patch.object(evaluation.previous, "bootstrap_draws", side_effect=RuntimeError("saved-first injection")):
+                with self.assertRaisesRegex(RuntimeError, "saved-first"):
+                    evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
+            with mock.patch.object(method.base, "load_model", side_effect=AssertionError("Saved-only recovery")), \
+                 mock.patch.object(method.base.public, "attach_labels", side_effect=AssertionError("No extra parse")):
+                result = evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
+            self.assertEqual((result["new_metric_count_sets"], result["reused_metric_count_sets"]), (18, 45))
+            self.assertEqual(set(result["endpoints"]), {"seq", "quarter", "logit_quarter"})
+            self.assertEqual(set(result["comparisons"]), {"logit_quarter_minus_quarter", "quarter_minus_seq", "logit_quarter_minus_seq"})
+            saved = method.data.read_json(weight_job / "evaluation/evaluation.json")
+            self.assertEqual(result["comparisons"]["quarter_minus_seq"]["interpretation"], saved["comparisons"]["quarter_minus_seq"]["interpretation"])
+            self.assertNotIn("selection", result)
+            self.assertEqual(result["method_checks"]["increment_against_matched_er_passes"], result["comparisons"]["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"])
+            before = (root / "evaluation.json").read_bytes()
+            evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
+            self.assertEqual(before, (root / "evaluation.json").read_bytes())
 
 
 if __name__ == "__main__":

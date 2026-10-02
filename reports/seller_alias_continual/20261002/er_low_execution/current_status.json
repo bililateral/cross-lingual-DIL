@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-02T13:07:54.916876+08:00",
+  "observed_at": "2026-10-02T14:27:03.049907+08:00",
   "status": "RUNNING_FORMAL_UPDATES_CONFIRMED",
   "formal_started_at": "2026-10-02T12:55:35+08:00",
   "training_pid": 3295228,
@@ -10,15 +10,15 @@
   "gpu_index": 0,
   "latest_update_event": {
     "arm": "tenth",
-    "elapsed_seconds": 587.5527262599207,
+    "elapsed_seconds": 5274.148907657014,
     "event": "updates",
-    "logical_updates": 336,
+    "logical_updates": 768,
     "order": "ABC",
-    "peak_observed_bytes": 27765,
-    "stage": 2,
-    "stage_updates": 48
+    "peak_observed_bytes": 3911077384,
+    "stage": 3,
+    "stage_updates": 192
   },
-  "new_physical_updates_observed_at_least": 48,
+  "new_physical_updates_observed_at_least": 480,
   "target_new_physical_updates": 1728,
   "label_parses": {
     "heldout": 0,
@@ -31,18 +31,18 @@
     7
   ],
   "estimated_remaining_seconds": [
-    17260.083124,
-    24460.083124
+    12512,
+    19712
   ],
   "estimated_completion_shanghai": [
     "2026-10-02T17:55:35+08:00",
     "2026-10-02T19:55:35+08:00"
   ],
-  "estimate_basis": "Original ER stage durations and current first-stage log intervals; initialization and later checkpoint/evaluation costs prevent a precise extrapolation.",
+  "estimate_basis": "Original ER stage durations and current observed 480 new updates in 1h31m28s; recent 24-update intervals about 250-255s. Total includes checkpoint reload, calibration and final valid collection, so retain a 5-7 hour range.",
   "hard_seconds": 43200,
   "hard_deadline_shanghai": "2026-10-03T00:55:35+08:00",
   "maximum_new_output_bytes": 17179869184,
-  "new_completed_endpoints": 0,
+  "new_completed_endpoints": 1,
   "failure_record_present": false,
   "linux_job": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
   "startup_return": {
@@ -52,5 +52,19 @@
     "exact_hash_match": true
   },
   "CPU_verification": "22 passed, 0 failed/skipped, 4 actual native handwritten updates; exit0; 364.25 seconds; 10 CPU files 58693 bytes returned exactly.",
-  "scientific_sources": "31 frozen sources unchanged; no implementation or policy edits after external review."
+  "scientific_sources": "Active Linux low job retains the reviewed 31-source version. Later matched-LOGIT changes are local-only, separately frozen as 34 sources; no new deployment has occurred.",
+  "process_observation": {
+    "observed_at": "2026-10-02T14:26:03+08:00",
+    "owner": "yongpeng",
+    "launcher_pid": 3295215,
+    "training_pid": 3295228,
+    "training_state": "Sl",
+    "launcher_state": "Ss",
+    "live_processes_confirmed": true,
+    "observation_method": "Read-only existing SSH monitoring; previous disconnected session reauthenticated; no new research stage or deployment"
+  },
+  "stage_updates_observed": {
+    "ABC:2": 288,
+    "ABC:3": 192
+  }
 }

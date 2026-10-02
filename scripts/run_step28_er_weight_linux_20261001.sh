@@ -10,7 +10,7 @@ authorization="$(realpath -- "${3:?Pass matching formal authorization}")"
 study="${4:-weight}"
 case "$study" in
   weight) time_limit=24h ;;
-  low) time_limit=12h ;;
+  low|logit) time_limit=12h ;;
   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
 esac
 case "$out" in

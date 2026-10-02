@@ -15,6 +15,8 @@ POLICY = data.ROOT / "schema/step28_er_weight_policy.json"
 POLICY_SHA256 = "9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396"
 LOW_POLICY = data.ROOT / "schema/step28_er_low_policy.json"
 LOW_POLICY_SHA256 = "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
+LOGIT_POLICY = data.ROOT / "schema/step28_logit_weight_policy.json"
+LOGIT_POLICY_SHA256 = "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb"
 ARMS = {"half": .5, "quarter": .25}
 ORDERS, ROLES = parent.ORDERS, parent.ROLES
 STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
@@ -24,10 +26,13 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
 
 
 def contract(study: str = "weight") -> dict:
-    if study not in ("weight", "low"):
+    if study not in ("weight", "low", "logit"):
         raise ValueError("Unknown confirmed ER study")
-    path, digest = (LOW_POLICY, LOW_POLICY_SHA256) if study == "low" else (POLICY, POLICY_SHA256)
-    arms = {"tenth": .1} if study == "low" else ARMS
+    path, digest, arms = {
+        "weight": (POLICY, POLICY_SHA256, ARMS),
+        "low": (LOW_POLICY, LOW_POLICY_SHA256, {"tenth": .1}),
+        "logit": (LOGIT_POLICY, LOGIT_POLICY_SHA256, {"logit_quarter": .25}),
+    }[study]
     updates = len(arms) * 3 * 2 * 288
     if data.sha256(path) != digest:
         raise ValueError("ER weight policy changed")
@@ -43,11 +48,25 @@ def contract(study: str = "weight") -> dict:
 
 
 def policy_sha256(p: dict) -> str:
-    return LOW_POLICY_SHA256 if p["study"] == "seller_alias_er_low_weight" else POLICY_SHA256
+    return {"seller_alias_er_low_weight": LOW_POLICY_SHA256,
+            "seller_alias_er_history_weight": POLICY_SHA256,
+            "seller_alias_logit_weight": LOGIT_POLICY_SHA256}[p["study"]]
+
+
+def with_logits(p: dict) -> bool:
+    return p.get("memory_arm", "er") == "logit"
+
+
+def evidence_tag(p: dict) -> str:
+    return "LOGIT_WEIGHT" if with_logits(p) else "ER_WEIGHT"
+
+
+def step_columns(p: dict) -> tuple[str, ...]:
+    return STEP_COLUMNS + (("logit_mse", "logit_weight") if with_logits(p) else ())
 
 
 def all_weights(p: dict) -> dict[str, float]:
-    return {"seq": 0., "er": 1., **p.get("reference_arms", {}), **p["arms"]}
+    return p.get("comparison_methods", {"seq": 0., "er": 1., **p.get("reference_arms", {}), **p["arms"]})
 
 
 def config(p: dict) -> dict:
@@ -64,9 +83,12 @@ def sources(p: dict | None = None) -> list[dict]:
                   "scripts/run_step28_er_weight_linux_20261001.sh",
                   "scripts/run_step28_er_check_linux_20261001.sh",
                   "reports/documentation/20261001/er_weight/decision.json"]
-    if p is not None and p["study"] == "seller_alias_er_low_weight":
+    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight"):
         additional += ["docs/SELLER_ALIAS_ER_LOW.zh.md", "schema/step28_er_low_policy.json",
                        "reports/documentation/20261002/er_low/decision.json"]
+    if p is not None and with_logits(p):
+        additional += ["docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md", "schema/step28_logit_weight_policy.json",
+                       "reports/documentation/20261002/logit_weight/decision.json"]
     rows = prior.sources() + [data.record(data.ROOT / name, data.ROOT) for name in additional]
     return sorted(rows, key=lambda row: row["path"])
 
@@ -148,8 +170,9 @@ class ContinuationSupply(parent.Supply):
 
 def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
            weight: float, stage: int, step: int, current_seed: int, history_seed: int,
-           *, observe: bool = False, check: Callable[[], None] = lambda: None) -> dict:
-    """Only lambda changes: two supervised forwards, weighted history, one clip/update."""
+           *, reference: np.ndarray | None = None, logit_weight: float = 0.,
+           observe: bool = False, check: Callable[[], None] = lambda: None) -> dict:
+    """Two forwards; independently weighted history supervision/MSE, one clip/update."""
     import torch
 
     if (type(weight) not in (int, float) or weight not in (1., .5, .25, .1)
@@ -158,6 +181,10 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
             or history.uid == current.uid or len(optimizer.param_groups) != 2
             or parent.adam_step(optimizer) != (stage - 1) * 288 + step - 1):
         raise ValueError("Unexpected ER continuation or supervision")
+    if (logit_weight not in (0., .5) or (reference is not None) != (logit_weight == .5)
+            or (reference is not None and (not isinstance(reference, np.ndarray)
+                or reference.shape != (378,) or reference.dtype != np.float32 or not np.isfinite(reference).all()))):
+        raise ValueError("Historical raw-logit reference or independent MSE weight differs")
     rates = (parent.stage_lr(step), .001)
     for group, rate in zip(optimizer.param_groups, rates, strict=True):
         group["lr"] = rate
@@ -174,11 +201,18 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
         terms = parent.ranking.objectives(predicted, truth, .5)
         # Keep the original current backward operation exactly; lambda applies to ALL old terms.
         objective = terms["total"] if role == "current" else coefficient * terms["total"]
+        if role == "history" and reference is not None:
+            target = torch.tensor(reference, dtype=predicted.dtype, device=predicted.device)
+            penalty = (predicted - target).square().mean()
+            objective = objective + logit_weight * penalty
+            result.update(logit_mse=float(penalty.detach()), logit_weight=logit_weight)
         objective.backward()
         result.update({role + "_" + key: float(value.detach()) for key, value in terms.items()})
         del predicted, truth, terms, objective
     result["weighted_history_total"] = weight * result["history_total"]
     result["total"] = result["current_total"] + result["weighted_history_total"]
+    if reference is not None:
+        result["total"] += logit_weight * result["logit_mse"]
     evidence = {}
     if observe:
         for name, module in (("encoder", model.encoder), ("head", model.head)):

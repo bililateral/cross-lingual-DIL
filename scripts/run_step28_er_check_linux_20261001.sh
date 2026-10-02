@@ -6,7 +6,7 @@ conda activate py310
 out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
 study="${2:-weight}"
 case "$study" in
-  weight|low) ;;
+  weight|low|logit) ;;
   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
 esac
 case "$out" in

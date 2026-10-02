@@ -22,11 +22,11 @@ COMPLETE = "COMPLETE_3456_ER_WEIGHT_UPDATES_VALID_BLIND"
 
 
 def complete_status(p: dict) -> str:
-    return f"COMPLETE_{p['physical_updates']}_ER_WEIGHT_UPDATES_VALID_BLIND"
+    return f"COMPLETE_{p['physical_updates']}_{method.evidence_tag(p)}_UPDATES_VALID_BLIND"
 
 
 def collected_status(p: dict) -> str:
-    return f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
+    return f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
 
 
 def old_point(reference: dict, name: str) -> dict:
@@ -58,15 +58,16 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
         torch.cuda.reset_peak_memory_stats()
     for index, group in enumerate(sequence):
         history, target = memory.draw()
-        if target is not None or history.uid != reference_log["history_ids"][index]:
-            raise ValueError("ER history is unpaired or contains logits")
+        if (target is not None) != method.with_logits(p) or history.uid != reference_log["history_ids"][index]:
+            raise ValueError("Historical group or target presence differs from the confirmed study")
         history_ids.append(history.uid)
         record = method.update(
             model, optimizer, group, history, c, p["arms"][arm], stage, index + 1,
             data.seed_for(stream, index, "dropout"),
             data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
+            reference=target, logit_weight=p["loss"]["logit_mse"],
             observe=index + 1 in (1, 29, 30, 288), check=budget.check)
-        updates.append([record[key] for key in method.STEP_COLUMNS])
+        updates.append([record[key] for key in method.step_columns(p)])
         if record["modules"]:
             observations[str(index + 1)] = record["modules"]
         if (index + 1) % 24 == 0:
@@ -84,7 +85,7 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
               "adam_step": parent.adam_step(optimizer), "actual_domain": order[stage - 1],
               "current_ids": [g.uid for g in sequence], "history_ids": history_ids,
               "current_dropout_stream": stream, "memory_after_training": summary,
-              "observations": observations, "update_columns": list(method.STEP_COLUMNS),
+              "observations": observations, "update_columns": list(method.step_columns(p)),
               "update_file": save_array(root / "updates" / (name + ".npy"),
                                         np.asarray(updates, dtype=np.float64), root)}
     if next(model.parameters()).is_cuda:
@@ -111,6 +112,8 @@ def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
                 "completed_updates": stage * 288, "policy_sha256": method.policy_sha256(p),
                 "history_weight": weight, "parent_policy_sha256": parent.POLICY_SHA256,
                 "rng": state, "config": c}
+    if method.with_logits(p):
+        metadata["logit_weight"] = p["loss"]["logit_mse"]
     scores = {"calibration": parent.ranking.score(model, current_cal, c, budget.check),
               "development": parent.ranking.score(model, valid, c, budget.check)}
     full_path = root / "work" / (name + ".pt")
@@ -185,6 +188,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
     for name in ("models", "work", "scores", "maps", "points", "memory", "updates"):
         (root / name).mkdir()
     c = method.config(p)
+    memory_arm = p.get("memory_arm", "er")
     groups, metadata, checked = base.public.public_inputs(c)
     _, partition = base.partition(groups, metadata, c)
     if partition != reference["partition"] or checked != reference["manifest"]["public_inputs"]:
@@ -198,7 +202,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
     for order in method.ORDERS:
         shared = old_point(reference, order + "_shared")
         data.verify(old_root / shared["full_checkpoint"]["path"], shared["full_checkpoint"])
-        rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
+        rec = reference["manifest"]["memories"][order + "_" + memory_arm + "_after1"]["file"]
         data.verify(old_root / rec["path"], rec)
     groups["train"] = prior.parse_once(job, groups["train"], c, "train")
     selected, after = base.partition(groups, metadata, c)
@@ -213,7 +217,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
     data.write_json(root / "startup.json", manifest)
     for order in method.ORDERS:
         shared = old_point(reference, order + "_shared")
-        rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
+        rec = reference["manifest"]["memories"][order + "_" + memory_arm + "_after1"]["file"]
         memory_payload = data.verify(old_root / rec["path"], rec).read_bytes()
         first_scores = prior.array(old_root, shared["scores"]["development"], (60, 378), np.float32)
         for arm, weight in p["arms"].items():
@@ -224,9 +228,11 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                 raise ValueError("Restored first-state full blind scores differ from original runtime")
             restore_rng(state)
             memory = parent.Memory.from_bytes(memory_payload)
-            if (memory.with_logits or memory.order != order or memory.reservoir.seen != 48
+            if (memory.with_logits != method.with_logits(p) or memory.order != order or memory.reservoir.seen != 48
                     or memory.draw_stage != 0 or memory.draw_count != 0
-                    or memory.first_map != shared["first_map_parameters"]):
+                    or memory.first_map != shared["first_map_parameters"]
+                    or memory.summary()["members"] != reference["manifest"]["memories"][order + "_er_after1"]["members"]
+                    or (method.with_logits(p) and set(memory.reference_origins.values()) != {1})):
                 raise ValueError("Original ER cache/first-map restore differs")
             memory.auxiliary = {**shared["learner_auxiliary"], "history_weight": weight,
                                 "er_weight_policy_sha256": method.policy_sha256(p)}
@@ -247,11 +253,28 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                 memory.auxiliary = point["learner_auxiliary"]
                 data.write_json(root / "memory" / (name + "_budget.json"), memory.summary())
                 if stage == 2:
-                    memory.retain(current, 2, None)
+                    old_references = memory.summary()["references"]
+                    scored_ids = []
+
+                    def reference_score(rows: list) -> np.ndarray:
+                        scored_ids.extend(group.uid for group in rows)
+                        return parent.ranking.score(model, rows, c, budget.check)
+
+                    memory.retain(current, 2, reference_score if method.with_logits(p) else None)
                     expected = reference["manifest"]["memories"][f"{order}_er_stage2"]
                     if memory.summary()["members"] != expected["members"]:
                         raise ValueError("Stage-end reservoir members differ from original ER")
+                    if method.with_logits(p):
+                        after = memory.summary()
+                        if (set(scored_ids) != set(after["references"]) - set(old_references)
+                                or any(after["references"][uid] != value for uid, value in old_references.items()
+                                       if uid in after["references"])):
+                            raise ValueError("Old target refreshed or new target supply differs")
                     manifest["memories"][name] = prior.save_memory(root, name, memory)
+                    if method.with_logits(p):
+                        manifest["memories"][name]["reference_update"] = {
+                            "model_state_sha256": point["model_state_sha256"],
+                            "new_target_ids": scored_ids, "mode": "eval", "old_survivors_unchanged": True}
                 manifest["points"][name] = data.record(root / "points" / (name + ".json"), root)
                 manifest["training"][name] = data.record(root / "updates" / (name + ".json"), root)
                 manifest["physical_updates"] += 288
@@ -288,23 +311,42 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
         for arm, weight in p["arms"].items():
             start = manifest["restored_starts"][order + "_" + arm]
             shared = old_point(reference, order + "_shared")
-            initial_memory = reference["manifest"]["memories"][order + "_er_after1"]
+            initial_memory = reference["manifest"]["memories"][order + "_" + p.get("memory_arm", "er") + "_after1"]
             if (start["full_checkpoint"] != shared["full_checkpoint"] or start["adam_step"] != 288
                     or not start["first_scores_replayed_exactly"]
                     or start["model_state_sha256"] != shared["model_state_sha256"]
                     or start["first_map"] != shared["first_map_parameters"]
                     or start["memory_source"] != initial_memory["file"]
                     or start["memory_summary"]["members"] != initial_memory["members"]
-                    or start["memory_summary"]["with_logits"]
+                    or start["memory_summary"]["with_logits"] != method.with_logits(p)
                     or start["memory_summary"]["seen"] != 48):
                 raise ValueError("Shared start evidence differs")
             retained = manifest["memories"][method.point_name(order, arm, 2, p)]
             data.verify(root / retained["file"]["path"], retained["file"])
             if (retained["members"] != reference["manifest"]["memories"][f"{order}_er_stage2"]["members"]
-                    or retained["seen"] != 96 or retained["with_logits"]
+                    or retained["seen"] != 96 or retained["with_logits"] != method.with_logits(p)
                     or retained["serialized_bytes"] != retained["file"]["bytes"]
                     or retained["serialized_bytes"] > 1048576):
                 raise ValueError("Saved next-stage cache is incomplete or unpaired")
+            if method.with_logits(p):
+                saved_memory = parent.Memory.from_bytes((root / retained["file"]["path"]).read_bytes())
+                if any(saved_memory.summary()[key] != retained[key] for key in saved_memory.summary()):
+                    raise ValueError("Serialized LOGIT cache disagrees with its record")
+                first_refs = initial_memory["references"]
+                if (start["memory_summary"]["references"] != first_refs
+                        or start["memory_summary"]["reference_origins"] != initial_memory["reference_origins"]
+                        or set(initial_memory["reference_origins"].values()) != {1}
+                        or any(retained["references"][uid] != value for uid, value in first_refs.items()
+                               if uid in retained["references"])):
+                    raise ValueError("First-domain LOGIT targets were replaced or refreshed")
+                fitting = {row["group_uid"]: row["domain"] for row in partition["fit"]}
+                if any(origin not in (1, 2) or fitting[uid] != order[origin - 1]
+                       for uid, origin in retained["reference_origins"].items()):
+                    raise ValueError("LOGIT reference origin differs from its fitting domain")
+                generation = retained["reference_update"]
+                if (generation["mode"] != "eval" or not generation["old_survivors_unchanged"]
+                        or set(generation["new_target_ids"]) != set(retained["references"]) - set(first_refs)):
+                    raise ValueError("New LOGIT target generation differs")
             for stage in (2, 3):
                 name = method.point_name(order, arm, stage, p)
                 point_rec, log_rec = manifest["points"][name], manifest["training"][name]
@@ -320,13 +362,23 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
                 for field in ("current_ids", "history_ids", "current_dropout_stream", "adam_step", "updates"):
                     if log[field] != original_log[field]:
                         raise ValueError("Training schedule is unpaired: " + field)
-                if (log["update_columns"] != list(method.STEP_COLUMNS)
+                if (log["update_columns"] != list(method.step_columns(p))
                         or log["history_weight"] != weight
                         or log["memory_after_training"]["members"] != original_log["memory_after_training"]["members"]
                         or log["memory_after_training"]["serialized_bytes"] > 1048576):
                     raise ValueError("Replay configuration or memory differs")
-                values = prior.array(root, log["update_file"], (288, len(method.STEP_COLUMNS)), np.float64)
-                columns = {key: values[:, i] for i, key in enumerate(method.STEP_COLUMNS)}
+                values = prior.array(root, log["update_file"], (288, len(method.step_columns(p))), np.float64)
+                columns = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
+                expected_total = columns["current_total"] + columns["weighted_history_total"]
+                if method.with_logits(p):
+                    expected_memory = initial_memory if stage == 2 else retained
+                    if any(log["memory_after_training"][key] != expected_memory[key]
+                           for key in ("with_logits", "references", "reference_origins")):
+                        raise ValueError("Training consumed different LOGIT targets from its stage cache")
+                    if (not np.all(columns["logit_weight"] == .5) or np.any(columns["logit_mse"] < 0)
+                            or (stage == 2 and retained["reference_update"]["model_state_sha256"] != point["model_state_sha256"])):
+                        raise ValueError("Independent MSE weight or origin-stage model differs")
+                    expected_total = expected_total + .5 * columns["logit_mse"]
                 for role in ("current", "history"):
                     if not np.allclose(columns[role + "_total"], columns[role + "_bce"]
                                        + columns[role + "_rank"] + .5 * columns[role + "_hard"],
@@ -334,7 +386,7 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
                         raise ValueError("Base objective decomposition differs")
                 if (not np.array_equal(columns["history_weight"], np.full(288, weight))
                         or not np.array_equal(columns["weighted_history_total"], weight * columns["history_total"])
-                        or not np.array_equal(columns["total"], columns["current_total"] + columns["weighted_history_total"])
+                        or not np.array_equal(columns["total"], expected_total)
                         or not np.array_equal(columns["encoder_lr"], [parent.stage_lr(i) for i in range(1, 289)])
                         or not np.all(columns["head_lr"] == .001)):
                     raise ValueError("Historical weight, total, or learning-rate log is wrong")
@@ -406,17 +458,18 @@ def execute(job: Path, audit_path: Path, authorization_path: Path, study: str = 
     source_files = method.sources(p)
     auth = data.read_json(authorization_path)
     audit = data.read_json(audit_path)
-    if (platform.system() != "Linux" or auth.get("status") != "AUTHORIZED_ER_WEIGHT_AFTER_REVIEW"
+    if (platform.system() != "Linux" or auth.get("status") != f"AUTHORIZED_{method.evidence_tag(p)}_AFTER_REVIEW"
             or auth.get("policy_sha256") != method.policy_sha256(p) or auth.get("source_files") != source_files
             or auth.get("job") != job.relative_to(data.ROOT).as_posix()
             or auth.get("runtime") != p["runtime"] or auth.get("supervision") != p["supervision"]
             or auth.get("review_and_primary_passed") is not True):
         raise ValueError("Matching reviewed formal authorization is required")
-    if (audit.get("status") != "PASS_ER_WEIGHT_HANDMADE_CPU" or audit.get("source_files") != source_files
+    gradient_evidence = "native_logit_gradient_increment_verified" if method.with_logits(p) else "native_history_gradient_scaling_verified"
+    if (audit.get("status") != f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU" or audit.get("source_files") != source_files
             or audit.get("contracts", {}).get("failed") != 0 or audit.get("contracts", {}).get("skipped") != 0
             or audit.get("formal_inputs") is not False or audit.get("formal_labels") is not False
             or set(audit.get("native", {})) != set(p["arms"])
-            or audit.get("native_history_gradient_scaling_verified") is not True):
+            or audit.get(gradient_evidence) is not True):
         raise ValueError("Necessary current handmade/native CPU verification is missing")
     for record in (*audit["native"].values(), *audit.get("native_reference", {}).values()):
         data.verify(audit_path.parent / record["path"], record)
@@ -463,7 +516,7 @@ def execute(job: Path, audit_path: Path, authorization_path: Path, study: str = 
             raise ValueError("Sources changed before completion")
         completion = {"status": result["status"], "physical_updates": p["physical_updates"],
                       "label_parses": data.read_json(job / "access.json"), "budget": budget.state(),
-                      "selection": result["selection"],
+                      **{key: result[key] for key in ("selection", "method_checks") if key in result},
                       "evaluation": data.record(job / "evaluation/evaluation.json", job)}
         data.write_json(job / "completion.json", completion)
         return completion
@@ -480,7 +533,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--audit", type=Path)
     parser.add_argument("--authorization", type=Path)
-    parser.add_argument("--study", choices=("weight", "low"), default="weight")
+    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
     args = parser.parse_args()
     if platform.system() != "Linux":
         parser.error("Research scripts run only on Linux py310")

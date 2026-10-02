@@ -1,0 +1,851 @@
+diff --git a/scripts/run_step28_er_check_linux_20261001.sh b/scripts/run_step28_er_check_linux_20261001.sh
+index 77261cfa..bc8998d1 100644
+--- a/scripts/run_step28_er_check_linux_20261001.sh
++++ b/scripts/run_step28_er_check_linux_20261001.sh
+@@ -6,7 +6,7 @@ conda activate py310
+ out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
+ study="${2:-weight}"
+ case "$study" in
+-  weight|low) ;;
++  weight|low|logit) ;;
+   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
+ esac
+ case "$out" in
+diff --git a/scripts/run_step28_er_weight_linux_20261001.sh b/scripts/run_step28_er_weight_linux_20261001.sh
+index 23d0abf8..5d70cf16 100644
+--- a/scripts/run_step28_er_weight_linux_20261001.sh
++++ b/scripts/run_step28_er_weight_linux_20261001.sh
+@@ -10,7 +10,7 @@ authorization="$(realpath -- "${3:?Pass matching formal authorization}")"
+ study="${4:-weight}"
+ case "$study" in
+   weight) time_limit=24h ;;
+-  low) time_limit=12h ;;
++  low|logit) time_limit=12h ;;
+   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
+ esac
+ case "$out" in
+diff --git a/scripts/step28_er_weight.py b/scripts/step28_er_weight.py
+index e8c34517..eca2c870 100644
+--- a/scripts/step28_er_weight.py
++++ b/scripts/step28_er_weight.py
+@@ -15,6 +15,8 @@ POLICY = data.ROOT / "schema/step28_er_weight_policy.json"
+ POLICY_SHA256 = "9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396"
+ LOW_POLICY = data.ROOT / "schema/step28_er_low_policy.json"
+ LOW_POLICY_SHA256 = "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
++LOGIT_POLICY = data.ROOT / "schema/step28_logit_weight_policy.json"
++LOGIT_POLICY_SHA256 = "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb"
+ ARMS = {"half": .5, "quarter": .25}
+ ORDERS, ROLES = parent.ORDERS, parent.ROLES
+ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+@@ -24,10 +26,13 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+ 
+ 
+ def contract(study: str = "weight") -> dict:
+-    if study not in ("weight", "low"):
++    if study not in ("weight", "low", "logit"):
+         raise ValueError("Unknown confirmed ER study")
+-    path, digest = (LOW_POLICY, LOW_POLICY_SHA256) if study == "low" else (POLICY, POLICY_SHA256)
+-    arms = {"tenth": .1} if study == "low" else ARMS
++    path, digest, arms = {
++        "weight": (POLICY, POLICY_SHA256, ARMS),
++        "low": (LOW_POLICY, LOW_POLICY_SHA256, {"tenth": .1}),
++        "logit": (LOGIT_POLICY, LOGIT_POLICY_SHA256, {"logit_quarter": .25}),
++    }[study]
+     updates = len(arms) * 3 * 2 * 288
+     if data.sha256(path) != digest:
+         raise ValueError("ER weight policy changed")
+@@ -43,11 +48,25 @@ def contract(study: str = "weight") -> dict:
+ 
+ 
+ def policy_sha256(p: dict) -> str:
+-    return LOW_POLICY_SHA256 if p["study"] == "seller_alias_er_low_weight" else POLICY_SHA256
++    return {"seller_alias_er_low_weight": LOW_POLICY_SHA256,
++            "seller_alias_er_history_weight": POLICY_SHA256,
++            "seller_alias_logit_weight": LOGIT_POLICY_SHA256}[p["study"]]
++
++
++def with_logits(p: dict) -> bool:
++    return p.get("memory_arm", "er") == "logit"
++
++
++def evidence_tag(p: dict) -> str:
++    return "LOGIT_WEIGHT" if with_logits(p) else "ER_WEIGHT"
++
++
++def step_columns(p: dict) -> tuple[str, ...]:
++    return STEP_COLUMNS + (("logit_mse", "logit_weight") if with_logits(p) else ())
+ 
+ 
+ def all_weights(p: dict) -> dict[str, float]:
+-    return {"seq": 0., "er": 1., **p.get("reference_arms", {}), **p["arms"]}
++    return p.get("comparison_methods", {"seq": 0., "er": 1., **p.get("reference_arms", {}), **p["arms"]})
+ 
+ 
+ def config(p: dict) -> dict:
+@@ -64,9 +83,12 @@ def sources(p: dict | None = None) -> list[dict]:
+                   "scripts/run_step28_er_weight_linux_20261001.sh",
+                   "scripts/run_step28_er_check_linux_20261001.sh",
+                   "reports/documentation/20261001/er_weight/decision.json"]
+-    if p is not None and p["study"] == "seller_alias_er_low_weight":
++    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight"):
+         additional += ["docs/SELLER_ALIAS_ER_LOW.zh.md", "schema/step28_er_low_policy.json",
+                        "reports/documentation/20261002/er_low/decision.json"]
++    if p is not None and with_logits(p):
++        additional += ["docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md", "schema/step28_logit_weight_policy.json",
++                       "reports/documentation/20261002/logit_weight/decision.json"]
+     rows = prior.sources() + [data.record(data.ROOT / name, data.ROOT) for name in additional]
+     return sorted(rows, key=lambda row: row["path"])
+ 
+@@ -148,8 +170,9 @@ class ContinuationSupply(parent.Supply):
+ 
+ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
+            weight: float, stage: int, step: int, current_seed: int, history_seed: int,
+-           *, observe: bool = False, check: Callable[[], None] = lambda: None) -> dict:
+-    """Only lambda changes: two supervised forwards, weighted history, one clip/update."""
++           *, reference: np.ndarray | None = None, logit_weight: float = 0.,
++           observe: bool = False, check: Callable[[], None] = lambda: None) -> dict:
++    """Two forwards; independently weighted history supervision/MSE, one clip/update."""
+     import torch
+ 
+     if (type(weight) not in (int, float) or weight not in (1., .5, .25, .1)
+@@ -158,6 +181,10 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
+             or history.uid == current.uid or len(optimizer.param_groups) != 2
+             or parent.adam_step(optimizer) != (stage - 1) * 288 + step - 1):
+         raise ValueError("Unexpected ER continuation or supervision")
++    if (logit_weight not in (0., .5) or (reference is not None) != (logit_weight == .5)
++            or (reference is not None and (not isinstance(reference, np.ndarray)
++                or reference.shape != (378,) or reference.dtype != np.float32 or not np.isfinite(reference).all()))):
++        raise ValueError("Historical raw-logit reference or independent MSE weight differs")
+     rates = (parent.stage_lr(step), .001)
+     for group, rate in zip(optimizer.param_groups, rates, strict=True):
+         group["lr"] = rate
+@@ -174,11 +201,18 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, c: dict,
+         terms = parent.ranking.objectives(predicted, truth, .5)
+         # Keep the original current backward operation exactly; lambda applies to ALL old terms.
+         objective = terms["total"] if role == "current" else coefficient * terms["total"]
++        if role == "history" and reference is not None:
++            target = torch.tensor(reference, dtype=predicted.dtype, device=predicted.device)
++            penalty = (predicted - target).square().mean()
++            objective = objective + logit_weight * penalty
++            result.update(logit_mse=float(penalty.detach()), logit_weight=logit_weight)
+         objective.backward()
+         result.update({role + "_" + key: float(value.detach()) for key, value in terms.items()})
+         del predicted, truth, terms, objective
+     result["weighted_history_total"] = weight * result["history_total"]
+     result["total"] = result["current_total"] + result["weighted_history_total"]
++    if reference is not None:
++        result["total"] += logit_weight * result["logit_mse"]
+     evidence = {}
+     if observe:
+         for name, module in (("encoder", model.encoder), ("head", model.head)):
+diff --git a/scripts/step28_er_weight_check.py b/scripts/step28_er_weight_check.py
+index 02e066ee..d4d97bf5 100644
+--- a/scripts/step28_er_weight_check.py
++++ b/scripts/step28_er_weight_check.py
+@@ -48,6 +48,21 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) ->
+     component_parameters = {
+         "encoder_first_query": model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,
+         "head_hidden": model.head[0].weight}
++    reference, mse_gradients = None, {}
++    if method.with_logits(p) and arm in p["arms"]:
++        reference = method.parent.ranking.score(model, [old], c, check)[0]
++        model.train()
++        torch.manual_seed(108)
++        prediction = method.base.logits(model, old, c, "split_rank", check)
++        target = torch.tensor(reference, dtype=prediction.dtype)
++        penalty = .5 * (prediction - target).square().mean()
++        gradients = torch.autograd.grad(penalty, tuple(component_parameters.values()))
++        mse_gradients = {name: gradient.detach().clone() for name, gradient in
++                         zip(component_parameters, gradients, strict=True)}
++        if target.requires_grad or any(not torch.isfinite(g).all() or float(g.norm()) <= 0
++                                       for g in mse_gradients.values()):
++            raise ValueError("Detached target MSE must independently reach encoder and head")
++        del prediction, target, penalty, gradients
+     components = {name: [] for name in component_parameters}
+     hooks = [parameter.register_hook(lambda grad, name=name: components[name].append(grad.detach().clone()))
+              for name, parameter in component_parameters.items()]
+@@ -55,6 +70,7 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) ->
+     hooks.append(model.head.register_forward_hook(lambda _, __, output: captured.append(output.detach().flatten().numpy().copy())))
+     try:
+         update = method.update(model, optimizer, current, old, c, weight, 2, 1, 107, 108,
++                               reference=reference, logit_weight=.5 if reference is not None else 0.,
+                                observe=True, check=check)
+     finally:
+         for hook in hooks:
+@@ -68,6 +84,12 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) ->
+             if abs(update[role + "_" + term] - value) > (4e-6 if term == "total" else 2e-6):
+                 raise ValueError("Native objective differs from scalar reference")
+     expected_total = independent["current"]["total"] + weight * independent["history"]["total"]
++    expected_mse = 0.
++    if reference is not None:
++        expected_mse = float(np.mean((captured[1].astype(np.float64) - reference) ** 2))
++        if abs(update["logit_mse"] - expected_mse) > 1e-6:
++            raise ValueError("Native MSE differs from independent scalar mean")
++        expected_total += .5 * expected_mse
+     if abs(update["total"] - expected_total) > 6e-6:
+         raise ValueError("Native history weight does not affect the full objective")
+     rows = []
+@@ -97,6 +119,11 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) ->
+                                       for name, values in components.items()},
+               "parameter_probes": rows, "unused_parameters": unused, "backbone_layers": layers,
+               "seconds": time.monotonic() - started}
++    if reference is not None:
++        result.update(origin_eval_reference=reference.tolist(), independent_logit_mse=expected_mse,
++                      mse_gradient_reference={name: {"norm": float(g.norm()), "sha256": method.core.state_digest(g)}
++                                              for name, g in mse_gradients.items()})
++        components["mse_reference"] = mse_gradients
+     del model, optimizer, covered, probes, component_parameters
+     gc.collect()
+     return result, components
+@@ -141,7 +168,8 @@ def run(destination: Path, study: str = "weight") -> dict:
+                    for key in ("file_count", "total_size_bytes", "content_sha256")):
+                 raise ValueError("Pretrained archive differs")
+             reports, components = {}, {}
+-            native_arms = ("quarter", "tenth") if study == "low" else tuple(p["arms"])
++            native_arms = (("quarter", "logit_quarter") if method.with_logits(p) else
++                           ("quarter", "tenth") if study == "low" else tuple(p["arms"]))
+             for arm in native_arms:
+                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
+                 reports[arm], components[arm] = native(arm, fixtures, check, p)
+@@ -157,19 +185,28 @@ def run(destination: Path, study: str = "weight") -> dict:
+                 a_current, a_history = components[native_arms[0]][name]
+                 b_current, b_history = components[native_arms[1]][name]
+                 torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
+-                torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
+-                scaling[name] = {"current_exactly_equal": True,
+-                                 "compared_arms": list(native_arms), "expected_history_ratio": ratio,
+-                                 "weighted_history_scaling_matches": True,
+-                                 "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
++                if method.with_logits(p):
++                    expected = a_history + components["logit_quarter"]["mse_reference"][name]
++                    torch.testing.assert_close(b_history, expected, rtol=2e-5, atol=2e-8)
++                    scaling[name] = {"current_exactly_equal": True, "compared_arms": list(native_arms),
++                                     "history_supervision_weight": .25, "independent_mse_weight": .5,
++                                     "history_equals_er_plus_mse_gradient": True,
++                                     "maximum_history_difference": float((b_history - expected).abs().max())}
++                else:
++                    torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
++                    scaling[name] = {"current_exactly_equal": True,
++                                     "compared_arms": list(native_arms), "expected_history_ratio": ratio,
++                                     "weighted_history_scaling_matches": True,
++                                     "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
+             if method.sources(p) != source_files:
+                 raise ValueError("Sources changed during verification")
+-            result = {"status": "PASS_ER_WEIGHT_HANDMADE_CPU", "source_files": source_files,
++            gradient_evidence = "native_logit_gradient_increment_verified" if method.with_logits(p) else "native_history_gradient_scaling_verified"
++            result = {"status": f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU", "source_files": source_files,
+                       "contracts": contracts, "native": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
+                                                          for arm in p["arms"]},
+                       "native_reference": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
+                                            for arm in native_arms if arm not in p["arms"]},
+-                      "native_updates_actually_executed": 4, "native_history_gradient_scaling_verified": True,
++                      "native_updates_actually_executed": 4, gradient_evidence: True,
+                       "native_component_comparison": scaling, "formal_inputs": False, "formal_labels": False,
+                       "formal_updates": 0, "gpu": False, "retained_native_weights": 0, "archive": archive,
+                       "seconds": time.monotonic() - started, "max_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+@@ -189,7 +226,7 @@ def run(destination: Path, study: str = "weight") -> dict:
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--out", type=Path, required=True)
+-    parser.add_argument("--study", choices=("weight", "low"), default="weight")
++    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
+     args = parser.parse_args()
+     result = run(args.out.resolve(), args.study)
+     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())
+diff --git a/scripts/step28_er_weight_evaluate.py b/scripts/step28_er_weight_evaluate.py
+index 295bc69d..cff6b498 100644
+--- a/scripts/step28_er_weight_evaluate.py
++++ b/scripts/step28_er_weight_evaluate.py
+@@ -33,7 +33,7 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
+     if set(new) != set(method.expected_points(p)):
+         raise ValueError("Incomplete new matrix set")
+     draws = previous.bootstrap_draws()
+-    views = {"seq": (old, "seq"), "er": (old, "er")}
++    views = {arm: (old, arm) for arm in p.get("baseline_methods", ("seq", "er"))}
+     for arm in (*p.get("reference_arms", {}), *p["arms"]):
+         # The old endpoint function uses logical ER names. Explicit local views do
+         # not rename a published artifact or mutate parent globals or source files.
+@@ -51,21 +51,29 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
+                        for role, entries in variants.items()}
+                  for arm, variants in fields.items()}
+     comparisons = {}
+-    for arm in p["arms"]:
+-        for reference in p["evaluation"]["comparators"]:
+-            delta = {name: previous.summarize_field(fields[arm]["primary"][name]
+-                                                   - fields[reference]["primary"][name], draws)
+-                     for name in previous.ENDPOINTS}
+-            raw = {name: previous.summarize_field(fields[arm]["primary"][name]
+-                                                 - fields[reference]["raw"][name], draws)
+-                   for name in ("O", "N")}
+-            verdict = previous.comparison_checks(delta, raw)
+-            if len(verdict["checks"]) != 23:
+-                raise ValueError("Original 23 checks changed")
+-            comparisons[arm + "_minus_" + reference] = {
+-                "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
+-    return {"endpoints": endpoints, "comparisons": comparisons,
+-            "selection": select_configuration(endpoints, comparisons, p)}
++    pairs = p["evaluation"].get("comparison_pairs", [
++        (arm, reference) for arm in p["arms"] for reference in p["evaluation"]["comparators"]])
++    for arm, reference in pairs:
++        delta = {name: previous.summarize_field(fields[arm]["primary"][name]
++                                               - fields[reference]["primary"][name], draws)
++                 for name in previous.ENDPOINTS}
++        raw = {name: previous.summarize_field(fields[arm]["primary"][name]
++                                             - fields[reference]["raw"][name], draws)
++               for name in ("O", "N")}
++        verdict = previous.comparison_checks(delta, raw)
++        if len(verdict["checks"]) != 23:
++            raise ValueError("Original 23 checks changed")
++        comparisons[arm + "_minus_" + reference] = {
++            "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
++    result = {"endpoints": endpoints, "comparisons": comparisons}
++    if method.with_logits(p):
++        result["method_checks"] = {
++            "increment_against_matched_er_passes": comparisons["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"],
++            "all_guards_against_seq_pass": comparisons["logit_quarter_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
++            "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"}
++    else:
++        result["selection"] = select_configuration(endpoints, comparisons, p)
++    return result
+ 
+ 
+ def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
+@@ -112,7 +120,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+                                 None if weight_root is None else weight_root.parent)
+     collected = data.read_json(root / "collected.json")
+     old = reference["collected"]
+-    if (collected["status"] != f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++    if (collected["status"] != f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
+             or collected["policy_sha256"] != method.policy_sha256(p)
+             or collected["source_files"] != method.sources(p)
+             or collected["metric_columns"] != list(metrics.COLUMNS)
+@@ -121,7 +129,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+         raise ValueError("Complete aligned collection is required")
+     new_arrays, new_counts = read_points(root, collected, method.expected_points(p))
+     names = [name for order in method.ORDERS for name in
+-             [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in ("seq", "er") for stage in (2, 3))]]
++             [order + "_shared", *(f"{order}_{arm}_stage{stage}" for arm in p.get("baseline_methods", ("seq", "er")) for stage in (2, 3))]]
+     old_arrays, old_counts = read_points(baseline_root, old, names)
+     reuse = [(baseline_root, old, names)]
+     if "weight_reference" in reference:
+@@ -167,7 +175,7 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
+     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
+     previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
+-    result.update(status="COMPLETE_ER_WEIGHT_DEVELOPMENT_COMPARISON",
++    result.update(status=f"COMPLETE_{method.evidence_tag(p)}_DEVELOPMENT_COMPARISON",
+                   source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
+                   collected=data.record(root / "collected.json", root),
+                   reused_collection=data.record(destination / "collected.json", root),
+diff --git a/scripts/step28_er_weight_run.py b/scripts/step28_er_weight_run.py
+index dd150090..e7edc10c 100644
+--- a/scripts/step28_er_weight_run.py
++++ b/scripts/step28_er_weight_run.py
+@@ -22,11 +22,11 @@ COMPLETE = "COMPLETE_3456_ER_WEIGHT_UPDATES_VALID_BLIND"
+ 
+ 
+ def complete_status(p: dict) -> str:
+-    return f"COMPLETE_{p['physical_updates']}_ER_WEIGHT_UPDATES_VALID_BLIND"
++    return f"COMPLETE_{p['physical_updates']}_{method.evidence_tag(p)}_UPDATES_VALID_BLIND"
+ 
+ 
+ def collected_status(p: dict) -> str:
+-    return f"ALL_{p['metric_count_sets']}_ER_WEIGHT_MATRICES_SAVED_BEFORE_COMPARISONS"
++    return f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
+ 
+ 
+ def old_point(reference: dict, name: str) -> dict:
+@@ -58,15 +58,16 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+         torch.cuda.reset_peak_memory_stats()
+     for index, group in enumerate(sequence):
+         history, target = memory.draw()
+-        if target is not None or history.uid != reference_log["history_ids"][index]:
+-            raise ValueError("ER history is unpaired or contains logits")
++        if (target is not None) != method.with_logits(p) or history.uid != reference_log["history_ids"][index]:
++            raise ValueError("Historical group or target presence differs from the confirmed study")
+         history_ids.append(history.uid)
+         record = method.update(
+             model, optimizer, group, history, c, p["arms"][arm], stage, index + 1,
+             data.seed_for(stream, index, "dropout"),
+             data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
++            reference=target, logit_weight=p["loss"]["logit_mse"],
+             observe=index + 1 in (1, 29, 30, 288), check=budget.check)
+-        updates.append([record[key] for key in method.STEP_COLUMNS])
++        updates.append([record[key] for key in method.step_columns(p)])
+         if record["modules"]:
+             observations[str(index + 1)] = record["modules"]
+         if (index + 1) % 24 == 0:
+@@ -84,7 +85,7 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
+               "adam_step": parent.adam_step(optimizer), "actual_domain": order[stage - 1],
+               "current_ids": [g.uid for g in sequence], "history_ids": history_ids,
+               "current_dropout_stream": stream, "memory_after_training": summary,
+-              "observations": observations, "update_columns": list(method.STEP_COLUMNS),
++              "observations": observations, "update_columns": list(method.step_columns(p)),
+               "update_file": save_array(root / "updates" / (name + ".npy"),
+                                         np.asarray(updates, dtype=np.float64), root)}
+     if next(model.parameters()).is_cuda:
+@@ -111,6 +112,8 @@ def checkpoint(root: Path, name: str, model: Any, optimizer: Any, c: dict,
+                 "completed_updates": stage * 288, "policy_sha256": method.policy_sha256(p),
+                 "history_weight": weight, "parent_policy_sha256": parent.POLICY_SHA256,
+                 "rng": state, "config": c}
++    if method.with_logits(p):
++        metadata["logit_weight"] = p["loss"]["logit_mse"]
+     scores = {"calibration": parent.ranking.score(model, current_cal, c, budget.check),
+               "development": parent.ranking.score(model, valid, c, budget.check)}
+     full_path = root / "work" / (name + ".pt")
+@@ -185,6 +188,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+     for name in ("models", "work", "scores", "maps", "points", "memory", "updates"):
+         (root / name).mkdir()
+     c = method.config(p)
++    memory_arm = p.get("memory_arm", "er")
+     groups, metadata, checked = base.public.public_inputs(c)
+     _, partition = base.partition(groups, metadata, c)
+     if partition != reference["partition"] or checked != reference["manifest"]["public_inputs"]:
+@@ -198,7 +202,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+     for order in method.ORDERS:
+         shared = old_point(reference, order + "_shared")
+         data.verify(old_root / shared["full_checkpoint"]["path"], shared["full_checkpoint"])
+-        rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
++        rec = reference["manifest"]["memories"][order + "_" + memory_arm + "_after1"]["file"]
+         data.verify(old_root / rec["path"], rec)
+     groups["train"] = prior.parse_once(job, groups["train"], c, "train")
+     selected, after = base.partition(groups, metadata, c)
+@@ -213,7 +217,7 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+     data.write_json(root / "startup.json", manifest)
+     for order in method.ORDERS:
+         shared = old_point(reference, order + "_shared")
+-        rec = reference["manifest"]["memories"][order + "_er_after1"]["file"]
++        rec = reference["manifest"]["memories"][order + "_" + memory_arm + "_after1"]["file"]
+         memory_payload = data.verify(old_root / rec["path"], rec).read_bytes()
+         first_scores = prior.array(old_root, shared["scores"]["development"], (60, 378), np.float32)
+         for arm, weight in p["arms"].items():
+@@ -224,9 +228,11 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+                 raise ValueError("Restored first-state full blind scores differ from original runtime")
+             restore_rng(state)
+             memory = parent.Memory.from_bytes(memory_payload)
+-            if (memory.with_logits or memory.order != order or memory.reservoir.seen != 48
++            if (memory.with_logits != method.with_logits(p) or memory.order != order or memory.reservoir.seen != 48
+                     or memory.draw_stage != 0 or memory.draw_count != 0
+-                    or memory.first_map != shared["first_map_parameters"]):
++                    or memory.first_map != shared["first_map_parameters"]
++                    or memory.summary()["members"] != reference["manifest"]["memories"][order + "_er_after1"]["members"]
++                    or (method.with_logits(p) and set(memory.reference_origins.values()) != {1})):
+                 raise ValueError("Original ER cache/first-map restore differs")
+             memory.auxiliary = {**shared["learner_auxiliary"], "history_weight": weight,
+                                 "er_weight_policy_sha256": method.policy_sha256(p)}
+@@ -247,11 +253,28 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
+                 memory.auxiliary = point["learner_auxiliary"]
+                 data.write_json(root / "memory" / (name + "_budget.json"), memory.summary())
+                 if stage == 2:
+-                    memory.retain(current, 2, None)
++                    old_references = memory.summary()["references"]
++                    scored_ids = []
++
++                    def reference_score(rows: list) -> np.ndarray:
++                        scored_ids.extend(group.uid for group in rows)
++                        return parent.ranking.score(model, rows, c, budget.check)
++
++                    memory.retain(current, 2, reference_score if method.with_logits(p) else None)
+                     expected = reference["manifest"]["memories"][f"{order}_er_stage2"]
+                     if memory.summary()["members"] != expected["members"]:
+                         raise ValueError("Stage-end reservoir members differ from original ER")
++                    if method.with_logits(p):
++                        after = memory.summary()
++                        if (set(scored_ids) != set(after["references"]) - set(old_references)
++                                or any(after["references"][uid] != value for uid, value in old_references.items()
++                                       if uid in after["references"])):
++                            raise ValueError("Old target refreshed or new target supply differs")
+                     manifest["memories"][name] = prior.save_memory(root, name, memory)
++                    if method.with_logits(p):
++                        manifest["memories"][name]["reference_update"] = {
++                            "model_state_sha256": point["model_state_sha256"],
++                            "new_target_ids": scored_ids, "mode": "eval", "old_survivors_unchanged": True}
+                 manifest["points"][name] = data.record(root / "points" / (name + ".json"), root)
+                 manifest["training"][name] = data.record(root / "updates" / (name + ".json"), root)
+                 manifest["physical_updates"] += 288
+@@ -288,23 +311,42 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
+         for arm, weight in p["arms"].items():
+             start = manifest["restored_starts"][order + "_" + arm]
+             shared = old_point(reference, order + "_shared")
+-            initial_memory = reference["manifest"]["memories"][order + "_er_after1"]
++            initial_memory = reference["manifest"]["memories"][order + "_" + p.get("memory_arm", "er") + "_after1"]
+             if (start["full_checkpoint"] != shared["full_checkpoint"] or start["adam_step"] != 288
+                     or not start["first_scores_replayed_exactly"]
+                     or start["model_state_sha256"] != shared["model_state_sha256"]
+                     or start["first_map"] != shared["first_map_parameters"]
+                     or start["memory_source"] != initial_memory["file"]
+                     or start["memory_summary"]["members"] != initial_memory["members"]
+-                    or start["memory_summary"]["with_logits"]
++                    or start["memory_summary"]["with_logits"] != method.with_logits(p)
+                     or start["memory_summary"]["seen"] != 48):
+                 raise ValueError("Shared start evidence differs")
+             retained = manifest["memories"][method.point_name(order, arm, 2, p)]
+             data.verify(root / retained["file"]["path"], retained["file"])
+             if (retained["members"] != reference["manifest"]["memories"][f"{order}_er_stage2"]["members"]
+-                    or retained["seen"] != 96 or retained["with_logits"]
++                    or retained["seen"] != 96 or retained["with_logits"] != method.with_logits(p)
+                     or retained["serialized_bytes"] != retained["file"]["bytes"]
+                     or retained["serialized_bytes"] > 1048576):
+                 raise ValueError("Saved next-stage cache is incomplete or unpaired")
++            if method.with_logits(p):
++                saved_memory = parent.Memory.from_bytes((root / retained["file"]["path"]).read_bytes())
++                if any(saved_memory.summary()[key] != retained[key] for key in saved_memory.summary()):
++                    raise ValueError("Serialized LOGIT cache disagrees with its record")
++                first_refs = initial_memory["references"]
++                if (start["memory_summary"]["references"] != first_refs
++                        or start["memory_summary"]["reference_origins"] != initial_memory["reference_origins"]
++                        or set(initial_memory["reference_origins"].values()) != {1}
++                        or any(retained["references"][uid] != value for uid, value in first_refs.items()
++                               if uid in retained["references"])):
++                    raise ValueError("First-domain LOGIT targets were replaced or refreshed")
++                fitting = {row["group_uid"]: row["domain"] for row in partition["fit"]}
++                if any(origin not in (1, 2) or fitting[uid] != order[origin - 1]
++                       for uid, origin in retained["reference_origins"].items()):
++                    raise ValueError("LOGIT reference origin differs from its fitting domain")
++                generation = retained["reference_update"]
++                if (generation["mode"] != "eval" or not generation["old_survivors_unchanged"]
++                        or set(generation["new_target_ids"]) != set(retained["references"]) - set(first_refs)):
++                    raise ValueError("New LOGIT target generation differs")
+             for stage in (2, 3):
+                 name = method.point_name(order, arm, stage, p)
+                 point_rec, log_rec = manifest["points"][name], manifest["training"][name]
+@@ -320,13 +362,23 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
+                 for field in ("current_ids", "history_ids", "current_dropout_stream", "adam_step", "updates"):
+                     if log[field] != original_log[field]:
+                         raise ValueError("Training schedule is unpaired: " + field)
+-                if (log["update_columns"] != list(method.STEP_COLUMNS)
++                if (log["update_columns"] != list(method.step_columns(p))
+                         or log["history_weight"] != weight
+                         or log["memory_after_training"]["members"] != original_log["memory_after_training"]["members"]
+                         or log["memory_after_training"]["serialized_bytes"] > 1048576):
+                     raise ValueError("Replay configuration or memory differs")
+-                values = prior.array(root, log["update_file"], (288, len(method.STEP_COLUMNS)), np.float64)
+-                columns = {key: values[:, i] for i, key in enumerate(method.STEP_COLUMNS)}
++                values = prior.array(root, log["update_file"], (288, len(method.step_columns(p))), np.float64)
++                columns = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
++                expected_total = columns["current_total"] + columns["weighted_history_total"]
++                if method.with_logits(p):
++                    expected_memory = initial_memory if stage == 2 else retained
++                    if any(log["memory_after_training"][key] != expected_memory[key]
++                           for key in ("with_logits", "references", "reference_origins")):
++                        raise ValueError("Training consumed different LOGIT targets from its stage cache")
++                    if (not np.all(columns["logit_weight"] == .5) or np.any(columns["logit_mse"] < 0)
++                            or (stage == 2 and retained["reference_update"]["model_state_sha256"] != point["model_state_sha256"])):
++                        raise ValueError("Independent MSE weight or origin-stage model differs")
++                    expected_total = expected_total + .5 * columns["logit_mse"]
+                 for role in ("current", "history"):
+                     if not np.allclose(columns[role + "_total"], columns[role + "_bce"]
+                                        + columns[role + "_rank"] + .5 * columns[role + "_hard"],
+@@ -334,7 +386,7 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
+                         raise ValueError("Base objective decomposition differs")
+                 if (not np.array_equal(columns["history_weight"], np.full(288, weight))
+                         or not np.array_equal(columns["weighted_history_total"], weight * columns["history_total"])
+-                        or not np.array_equal(columns["total"], columns["current_total"] + columns["weighted_history_total"])
++                        or not np.array_equal(columns["total"], expected_total)
+                         or not np.array_equal(columns["encoder_lr"], [parent.stage_lr(i) for i in range(1, 289)])
+                         or not np.all(columns["head_lr"] == .001)):
+                     raise ValueError("Historical weight, total, or learning-rate log is wrong")
+@@ -406,17 +458,18 @@ def execute(job: Path, audit_path: Path, authorization_path: Path, study: str =
+     source_files = method.sources(p)
+     auth = data.read_json(authorization_path)
+     audit = data.read_json(audit_path)
+-    if (platform.system() != "Linux" or auth.get("status") != "AUTHORIZED_ER_WEIGHT_AFTER_REVIEW"
++    if (platform.system() != "Linux" or auth.get("status") != f"AUTHORIZED_{method.evidence_tag(p)}_AFTER_REVIEW"
+             or auth.get("policy_sha256") != method.policy_sha256(p) or auth.get("source_files") != source_files
+             or auth.get("job") != job.relative_to(data.ROOT).as_posix()
+             or auth.get("runtime") != p["runtime"] or auth.get("supervision") != p["supervision"]
+             or auth.get("review_and_primary_passed") is not True):
+         raise ValueError("Matching reviewed formal authorization is required")
+-    if (audit.get("status") != "PASS_ER_WEIGHT_HANDMADE_CPU" or audit.get("source_files") != source_files
++    gradient_evidence = "native_logit_gradient_increment_verified" if method.with_logits(p) else "native_history_gradient_scaling_verified"
++    if (audit.get("status") != f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU" or audit.get("source_files") != source_files
+             or audit.get("contracts", {}).get("failed") != 0 or audit.get("contracts", {}).get("skipped") != 0
+             or audit.get("formal_inputs") is not False or audit.get("formal_labels") is not False
+             or set(audit.get("native", {})) != set(p["arms"])
+-            or audit.get("native_history_gradient_scaling_verified") is not True):
++            or audit.get(gradient_evidence) is not True):
+         raise ValueError("Necessary current handmade/native CPU verification is missing")
+     for record in (*audit["native"].values(), *audit.get("native_reference", {}).values()):
+         data.verify(audit_path.parent / record["path"], record)
+@@ -463,7 +516,7 @@ def execute(job: Path, audit_path: Path, authorization_path: Path, study: str =
+             raise ValueError("Sources changed before completion")
+         completion = {"status": result["status"], "physical_updates": p["physical_updates"],
+                       "label_parses": data.read_json(job / "access.json"), "budget": budget.state(),
+-                      "selection": result["selection"],
++                      **{key: result[key] for key in ("selection", "method_checks") if key in result},
+                       "evaluation": data.record(job / "evaluation/evaluation.json", job)}
+         data.write_json(job / "completion.json", completion)
+         return completion
+@@ -480,7 +533,7 @@ def main() -> None:
+     parser.add_argument("--out", type=Path, required=True)
+     parser.add_argument("--audit", type=Path)
+     parser.add_argument("--authorization", type=Path)
+-    parser.add_argument("--study", choices=("weight", "low"), default="weight")
++    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
+     args = parser.parse_args()
+     if platform.system() != "Linux":
+         parser.error("Research scripts run only on Linux py310")
+diff --git a/tests/test_step28_er_weight_contracts.py b/tests/test_step28_er_weight_contracts.py
+index d36ec63b..fe657b61 100644
+--- a/tests/test_step28_er_weight_contracts.py
++++ b/tests/test_step28_er_weight_contracts.py
+@@ -34,7 +34,8 @@ def clone(model: object, optimizer: object, c: dict) -> tuple:
+ 
+ 
+ def independent_update(model: object, optimizer: object, current: object, old: object,
+-                       c: dict, weight: float) -> dict:
++                       c: dict, weight: float, reference: np.ndarray | None = None,
++                       step: int = 1) -> dict:
+     """Separate unweighted derivatives, then explicit linear combination before clipping."""
+     model.train()
+     parameters = list(model.parameters())
+@@ -48,16 +49,27 @@ def independent_update(model: object, optimizer: object, current: object, old: o
+         scalar = fixtures.scalar_losses(scores.detach().numpy(), group.labels)
+         for key, value in terms.items():
+             np.testing.assert_allclose(float(value.detach()), scalar[key], rtol=2e-6, atol=2e-6)
+-        components[name] = torch.autograd.grad(terms["total"], parameters)
++        needs_mse = name == "history" and reference is not None
++        components[name] = torch.autograd.grad(terms["total"], parameters, retain_graph=needs_mse)
+         losses[name] = float(terms["total"].detach())
++        if needs_mse:
++            difference = scores - torch.tensor(reference, dtype=scores.dtype)
++            mse = torch.dot(difference, difference) / len(reference)
++            components["mse"] = torch.autograd.grad(mse, parameters)
++            losses["mse"] = float(mse.detach())
+     optimizer.zero_grad(set_to_none=True)
+-    for p, current_grad, old_grad in zip(parameters, components["current"], components["history"], strict=True):
++    for index, (p, current_grad, old_grad) in enumerate(zip(parameters, components["current"], components["history"], strict=True)):
+         p.grad = current_grad + weight * old_grad
+-    for group, lr in zip(optimizer.param_groups, (method.parent.stage_lr(1), .001), strict=True):
++        if reference is not None:
++            p.grad = p.grad + .5 * components["mse"][index]
++    for group, lr in zip(optimizer.param_groups, (method.parent.stage_lr(step), .001), strict=True):
+         group["lr"] = lr
+     norm = float(torch.nn.utils.clip_grad_norm_(parameters, c["optimizer"]["clip_norm"]))
+     optimizer.step()
+-    return {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
++    result = {"current_total": losses["current"], "history_total": losses["history"], "gradient_norm": norm}
++    if reference is not None:
++        result["logit_mse"] = losses["mse"]
++    return result
+ 
+ 
+ def gate_fixture(home: Path, p: dict | None = None) -> tuple:
+@@ -87,17 +99,23 @@ def gate_fixture(home: Path, p: dict | None = None) -> tuple:
+                 "restored_starts": {}, "memories": {}, "partition": method.data.record(root / "partition.json", root)}
+     for order in method.ORDERS:
+         shared = runner.old_point(reference, order + "_shared")
++        memory_arm = p.get("memory_arm", "er")
++        first_memory = old_manifest["memories"][order + "_" + memory_arm + "_after1"]
+         for arm, weight in p["arms"].items():
+             manifest["restored_starts"][order + "_" + arm] = {
+                 "full_checkpoint": shared["full_checkpoint"], "adam_step": 288,
+                 "first_scores_replayed_exactly": True, "model_state_sha256": shared["model_state_sha256"],
+                 "first_map": shared["first_map_parameters"],
+-                "memory_source": old_manifest["memories"][order + "_er_after1"]["file"],
+-                "memory_summary": old_manifest["memories"][order + "_er_after1"]}
+-            retained = copy.deepcopy(old_manifest["memories"][f"{order}_er_stage2"])
++                "memory_source": first_memory["file"], "memory_summary": first_memory}
++            retained = copy.deepcopy(old_manifest["memories"][f"{order}_{memory_arm}_stage2"])
+             memory_path = root / "memory" / (method.point_name(order, arm, 2, p) + ".json")
+             memory_path.write_bytes((old_root / retained["file"]["path"]).read_bytes())
+             retained["file"] = method.data.record(memory_path, root)
++            if method.with_logits(p):
++                retained["reference_update"] = {
++                    "model_state_sha256": "handmade_fixture_not_weights", "mode": "eval",
++                    "old_survivors_unchanged": True,
++                    "new_target_ids": sorted(set(retained["references"]) - set(first_memory["references"]))}
+             manifest["memories"][method.point_name(order, arm, 2, p)] = retained
+             for stage in (2, 3):
+                 name = method.point_name(order, arm, stage, p)
+@@ -119,19 +137,25 @@ def gate_fixture(home: Path, p: dict | None = None) -> tuple:
+                 method.data.write_json(point_path, point)
+                 manifest["points"][name] = method.data.record(point_path, root)
+                 log = copy.deepcopy(runner.old_training(reference, order, stage))
+-                log.update(history_weight=weight, update_columns=list(method.STEP_COLUMNS),
++                log.update(history_weight=weight, update_columns=list(method.step_columns(p)),
+                            observations={str(s): {module: {
+                                "finite_nonzero_combined_gradient": True,
+                                "parameters_changed": module == "head" or s != 288}
+                                for module in ("encoder", "head")} for s in (1, 29, 30, 288)})
+-                values = np.zeros((288, len(method.STEP_COLUMNS)), dtype=np.float64)
+-                fields = {key: values[:, i] for i, key in enumerate(method.STEP_COLUMNS)}
++                if method.with_logits(p):
++                    source_log = old_manifest["training"][f"{order}_logit_stage{stage}"]
++                    log["memory_after_training"] = method.data.read_json(old_root / source_log["path"])["memory_after_training"]
++                values = np.zeros((288, len(method.step_columns(p))), dtype=np.float64)
++                fields = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
+                 for role in ("current", "history"):
+                     for term in ("bce", "rank", "hard"):
+                         fields[role + "_" + term][:] = 1.
+                     fields[role + "_total"][:] = 2.5
+                 fields["weighted_history_total"][:] = 2.5 * weight
+                 fields["total"][:] = 2.5 + 2.5 * weight
++                if method.with_logits(p):
++                    fields["logit_mse"][:], fields["logit_weight"][:] = 2., .5
++                    fields["total"][:] += 1.
+                 fields["history_weight"][:], fields["head_lr"][:], fields["gradient_norm"][:] = weight, .001, 1.
+                 fields["encoder_lr"][:] = [method.parent.stage_lr(i) for i in range(1, 289)]
+                 log["update_file"] = runner.save_array(root / "updates" / (name + ".npy"), values, root)
+@@ -503,5 +527,161 @@ class WeightContracts(unittest.TestCase):
+             self.assertEqual((root / "evaluation.json").read_bytes(), before)
+ 
+ 
++class LogitWeightContracts(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls) -> None:
++        torch.set_num_threads(1)
++        torch.use_deterministic_algorithms(True)
++
++    def test_matched_scope_and_gate_rejects_wrong_mse_and_target_origin(self) -> None:
++        p = method.contract("logit")
++        self.assertEqual(p["arms"], {"logit_quarter": .25})
++        self.assertEqual(p["loss"]["logit_mse"], .5)
++        self.assertEqual(p["physical_updates"], 1728)
++        self.assertEqual(set(method.all_weights(p)), {"seq", "quarter", "logit_quarter"})
++        with tempfile.TemporaryDirectory() as directory:
++            root, manifest, reference = gate_fixture(Path(directory), p)
++            self.assertEqual(len(runner.blind_gate(root, manifest, reference, p)), 6)
++            name = "ABC_logit_quarter_stage2"
++            wrong = copy.deepcopy(manifest)
++            wrong["memories"][name]["reference_update"]["model_state_sha256"] = "old_LOGIT1_model"
++            with self.assertRaisesRegex(ValueError, "origin-stage model"):
++                runner.blind_gate(root, wrong, reference, p)
++            wrong = copy.deepcopy(manifest)
++            targets = wrong["restored_starts"]["ABC_logit_quarter"]["memory_summary"]["references"]
++            targets[next(iter(targets))] = "refreshed_old_target"
++            with self.assertRaisesRegex(ValueError, "targets"):
++                runner.blind_gate(root, wrong, reference, p)
++            log_path = root / manifest["training"][name]["path"]
++            log = method.data.read_json(log_path)
++            values = np.load(root / log["update_file"]["path"], allow_pickle=False)
++            values[:, method.step_columns(p).index("logit_weight")] = .125
++            log["update_file"] = runner.save_array(root / "updates" / (name + "_wrong_mse.npy"), values, root)
++            method.data.write_json(log_path, log)
++            wrong = copy.deepcopy(manifest)
++            wrong["training"][name] = method.data.record(log_path, root)
++            with self.assertRaisesRegex(ValueError, "MSE weight"):
++                runner.blind_gate(root, wrong, reference, p)
++
++    def test_original_logit_exact_parity_and_two_forwards_one_clip(self) -> None:
++        model, opt, c, current, old = prepared()
++        other, other_opt = clone(model, opt, c)
++        target = np.linspace(-.6, .4, 378, dtype=np.float32)
++        with mock.patch.object(method.base, "logits", wraps=method.base.logits) as forwards, \
++             mock.patch.object(torch.nn.utils, "clip_grad_norm_", wraps=torch.nn.utils.clip_grad_norm_) as clips:
++            actual = method.update(model, opt, current, old, c, 1., 2, 1, 401, 402,
++                                   reference=target, logit_weight=.5)
++        self.assertEqual((forwards.call_count, clips.call_count), (2, 1))
++        expected = method.parent.update(other, other_opt, current, old, target, c, "logit", 2, 1, 401, 402)
++        self.assertEqual(method.core.state_digest(model.state_dict()), method.core.state_digest(other.state_dict()))
++        self.assertEqual(method.core.state_digest(opt.state_dict()), method.core.state_digest(other_opt.state_dict()))
++        self.assertEqual(actual["logit_mse"], expected["logit_mse"])
++
++    def test_quarter_supervision_and_half_mse_independent_gradients_adam(self) -> None:
++        target = np.linspace(-1.5, 1.2, 378, dtype=np.float32)
++        for clip, step in ((.01, 1), (1e6, 1), (1., 288)):
++            with self.subTest(clip=clip, step=step):
++                model, opt, c, current, old = prepared(288 + step - 1)
++                c["optimizer"]["clip_norm"] = clip
++                other, other_opt = clone(model, opt, c)
++                expected = independent_update(other, other_opt, current, old, c, .25, target, step)
++                actual = method.update(model, opt, current, old, c, .25, 2, step, 401, 402,
++                                       reference=target, logit_weight=.5, observe=True)
++                for key, value in expected.items():
++                    self.assertAlmostEqual(actual[key], value, places=6)
++                self.assertEqual(actual["total"], actual["current_total"] + .25 * actual["history_total"] + .5 * actual["logit_mse"])
++                for parameter, reference in zip(model.parameters(), other.parameters(), strict=True):
++                    torch.testing.assert_close(parameter, reference, rtol=1e-6, atol=1e-7)
++                    torch.testing.assert_close(parameter.grad, reference.grad, rtol=1e-6, atol=1e-7)
++                    for key in ("exp_avg", "exp_avg_sq", "step"):
++                        torch.testing.assert_close(opt.state[parameter][key], other_opt.state[reference][key], rtol=1e-6, atol=1e-8)
++                self.assertEqual(actual["modules"]["encoder"]["parameters_changed"], step != 288)
++                self.assertEqual(method.parent.adam_step(opt), 288 + step)
++
++    def test_invalid_logit_reference_rejected_before_update(self) -> None:
++        for target, coefficient in ((None, .5), (np.zeros(378, np.float32), .125),
++                                    (np.zeros(378, np.float64), .5), (np.zeros(377, np.float32), .5),
++                                    (np.full(378, np.nan, np.float32), .5)):
++            model, opt, c, current, old = prepared()
++            before = method.core.state_digest(model.state_dict())
++            with self.assertRaises(ValueError):
++                method.update(model, opt, current, old, c, .25, 2, 1, 401, 402,
++                              reference=target, logit_weight=coefficient)
++            self.assertEqual(method.core.state_digest(model.state_dict()), before)
++            self.assertEqual(method.parent.adam_step(opt), 288)
++
++    def test_logit_real_continuation_checkpoint_and_unrefreshing_memory(self) -> None:
++        p = method.contract("logit")
++        model, opt, c, _, _ = prepared()
++        history = [fixtures.handmade_group(f"fit_A_{i}", 1) for i in range(48)]
++        current = [fixtures.handmade_group(f"fit_B_{i}", 2) for i in range(48)]
++        memory = method.parent.Memory("ABC", method.parent.contract()["memory_seed"], True, {"a": 1., "b": 0.})
++        memory.retain(history, 1, lambda rows: method.parent.ranking.score(model, rows, c))
++        initial_targets = {uid: row.copy() for uid, row in memory.references.items()}
++        oracle = method.parent.Memory.from_bytes(memory.to_bytes())
++        oracle.begin_stage(2)
++        sequence, _ = method.parent.schedule(current, method.parent.contract(), "ABC", 2)
++        reference_log = {"current_ids": [g.uid for g in sequence], "history_ids": [oracle.draw()[0].uid for _ in range(288)],
++                         "memory_after_training": oracle.summary()}
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            for folder in ("updates", "work", "models", "scores", "maps", "points"):
++                (root / folder).mkdir()
++            budget = fixtures.HandmadeBudget()
++            budget.state = lambda: {"handmade_fixture": True}
++            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "logit_quarter", root, reference_log, budget, p)
++            self.assertEqual(row["history_ids"], reference_log["history_ids"])
++            values = np.load(root / row["update_file"]["path"], allow_pickle=False)
++            self.assertTrue(np.all(values[:, method.step_columns(p).index("logit_weight")] == .5))
++            cal = [fixtures.handmade_group(f"cal_{i}") for i in range(12)]
++            valid = [fixtures.handmade_group(f"valid_{i}") for i in range(60)]
++            point = runner.checkpoint(root, "ABC_logit_quarter_stage2", model, opt, c, "ABC", 2,
++                                      cal, valid, memory.first_map, budget, .25, p)
++            self.assertEqual(point["learner_auxiliary"]["checkpoint_metadata"]["logit_weight"], .5)
++            self.assertTrue(point["full_model_adam_and_rng_restore_verified"])
++            memory.auxiliary = point["learner_auxiliary"]
++            scored = {}
++            def score(rows: list) -> np.ndarray:
++                result = method.parent.ranking.score(model, rows, c)
++                scored.update({g.uid: value.copy() for g, value in zip(rows, result, strict=True)})
++                return result
++            memory.retain(current, 2, score)
++            self.assertEqual(set(scored), set(memory.references) - set(initial_targets))
++            for uid, value in memory.references.items():
++                np.testing.assert_array_equal(value, initial_targets[uid] if uid in initial_targets else scored[uid])
++            self.assertEqual(method.parent.Memory.from_bytes(memory.to_bytes()).to_bytes(), memory.to_bytes())
++
++    def test_logit_complete_saved_comparisons_reuse_45_sets(self) -> None:
++        p = method.contract("logit")
++        def available(spec: dict) -> Path:
++            local = method.data.ROOT / spec["local_small_job"]
++            return local if local.is_dir() else method.data.ROOT / spec["linux_job"]
++        old_job, weight_job = available(p["baseline"]), available(p["weight_reference"])
++        reference = method.baseline(p, old_job, weight_job)
++        groups = [fixtures.handmade_group(uid) for uid in reference["collected"]["group_ids"]]
++        raw = np.tile(np.linspace(-2, 1, 378, dtype=np.float32), (60, 1))
++        scores = {name: {role: raw if role == "raw" else raw.astype(np.float64) for role in method.ROLES}
++                  for name in method.expected_points(p)}
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory) / "collection"
++            runner.collect(root, scores, groups, reference["partition"], method.sources(p), p)
++            with mock.patch.object(evaluation.previous, "bootstrap_draws", side_effect=RuntimeError("saved-first injection")):
++                with self.assertRaisesRegex(RuntimeError, "saved-first"):
++                    evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
++            with mock.patch.object(method.base, "load_model", side_effect=AssertionError("Saved-only recovery")), \
++                 mock.patch.object(method.base.public, "attach_labels", side_effect=AssertionError("No extra parse")):
++                result = evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
++            self.assertEqual((result["new_metric_count_sets"], result["reused_metric_count_sets"]), (18, 45))
++            self.assertEqual(set(result["endpoints"]), {"seq", "quarter", "logit_quarter"})
++            self.assertEqual(set(result["comparisons"]), {"logit_quarter_minus_quarter", "quarter_minus_seq", "logit_quarter_minus_seq"})
++            saved = method.data.read_json(weight_job / "evaluation/evaluation.json")
++            self.assertEqual(result["comparisons"]["quarter_minus_seq"]["interpretation"], saved["comparisons"]["quarter_minus_seq"]["interpretation"])
++            self.assertNotIn("selection", result)
++            self.assertEqual(result["method_checks"]["increment_against_matched_er_passes"], result["comparisons"]["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"])
++            before = (root / "evaluation.json").read_bytes()
++            evaluation.finalize(root, old_job / "evaluation", p, weight_job / "evaluation")
++            self.assertEqual(before, (root / "evaluation.json").read_bytes())
++
++
+ if __name__ == "__main__":
+     unittest.main()

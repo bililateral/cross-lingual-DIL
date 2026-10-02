@@ -48,6 +48,21 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> 
     component_parameters = {
         "encoder_first_query": model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,
         "head_hidden": model.head[0].weight}
+    reference, mse_gradients = None, {}
+    if method.with_logits(p) and arm in p["arms"]:
+        reference = method.parent.ranking.score(model, [old], c, check)[0]
+        model.train()
+        torch.manual_seed(108)
+        prediction = method.base.logits(model, old, c, "split_rank", check)
+        target = torch.tensor(reference, dtype=prediction.dtype)
+        penalty = .5 * (prediction - target).square().mean()
+        gradients = torch.autograd.grad(penalty, tuple(component_parameters.values()))
+        mse_gradients = {name: gradient.detach().clone() for name, gradient in
+                         zip(component_parameters, gradients, strict=True)}
+        if target.requires_grad or any(not torch.isfinite(g).all() or float(g.norm()) <= 0
+                                       for g in mse_gradients.values()):
+            raise ValueError("Detached target MSE must independently reach encoder and head")
+        del prediction, target, penalty, gradients
     components = {name: [] for name in component_parameters}
     hooks = [parameter.register_hook(lambda grad, name=name: components[name].append(grad.detach().clone()))
              for name, parameter in component_parameters.items()]
@@ -55,6 +70,7 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> 
     hooks.append(model.head.register_forward_hook(lambda _, __, output: captured.append(output.detach().flatten().numpy().copy())))
     try:
         update = method.update(model, optimizer, current, old, c, weight, 2, 1, 107, 108,
+                               reference=reference, logit_weight=.5 if reference is not None else 0.,
                                observe=True, check=check)
     finally:
         for hook in hooks:
@@ -68,6 +84,12 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> 
             if abs(update[role + "_" + term] - value) > (4e-6 if term == "total" else 2e-6):
                 raise ValueError("Native objective differs from scalar reference")
     expected_total = independent["current"]["total"] + weight * independent["history"]["total"]
+    expected_mse = 0.
+    if reference is not None:
+        expected_mse = float(np.mean((captured[1].astype(np.float64) - reference) ** 2))
+        if abs(update["logit_mse"] - expected_mse) > 1e-6:
+            raise ValueError("Native MSE differs from independent scalar mean")
+        expected_total += .5 * expected_mse
     if abs(update["total"] - expected_total) > 6e-6:
         raise ValueError("Native history weight does not affect the full objective")
     rows = []
@@ -97,6 +119,11 @@ def native(arm: str, fixtures: object, check: object, p: dict | None = None) -> 
                                       for name, values in components.items()},
               "parameter_probes": rows, "unused_parameters": unused, "backbone_layers": layers,
               "seconds": time.monotonic() - started}
+    if reference is not None:
+        result.update(origin_eval_reference=reference.tolist(), independent_logit_mse=expected_mse,
+                      mse_gradient_reference={name: {"norm": float(g.norm()), "sha256": method.core.state_digest(g)}
+                                              for name, g in mse_gradients.items()})
+        components["mse_reference"] = mse_gradients
     del model, optimizer, covered, probes, component_parameters
     gc.collect()
     return result, components
@@ -141,7 +168,8 @@ def run(destination: Path, study: str = "weight") -> dict:
                    for key in ("file_count", "total_size_bytes", "content_sha256")):
                 raise ValueError("Pretrained archive differs")
             reports, components = {}, {}
-            native_arms = ("quarter", "tenth") if study == "low" else tuple(p["arms"])
+            native_arms = (("quarter", "logit_quarter") if method.with_logits(p) else
+                           ("quarter", "tenth") if study == "low" else tuple(p["arms"]))
             for arm in native_arms:
                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
                 reports[arm], components[arm] = native(arm, fixtures, check, p)
@@ -157,19 +185,28 @@ def run(destination: Path, study: str = "weight") -> dict:
                 a_current, a_history = components[native_arms[0]][name]
                 b_current, b_history = components[native_arms[1]][name]
                 torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
-                torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
-                scaling[name] = {"current_exactly_equal": True,
-                                 "compared_arms": list(native_arms), "expected_history_ratio": ratio,
-                                 "weighted_history_scaling_matches": True,
-                                 "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
+                if method.with_logits(p):
+                    expected = a_history + components["logit_quarter"]["mse_reference"][name]
+                    torch.testing.assert_close(b_history, expected, rtol=2e-5, atol=2e-8)
+                    scaling[name] = {"current_exactly_equal": True, "compared_arms": list(native_arms),
+                                     "history_supervision_weight": .25, "independent_mse_weight": .5,
+                                     "history_equals_er_plus_mse_gradient": True,
+                                     "maximum_history_difference": float((b_history - expected).abs().max())}
+                else:
+                    torch.testing.assert_close(a_history, ratio * b_history, rtol=1e-6, atol=1e-8)
+                    scaling[name] = {"current_exactly_equal": True,
+                                     "compared_arms": list(native_arms), "expected_history_ratio": ratio,
+                                     "weighted_history_scaling_matches": True,
+                                     "maximum_history_difference": float((a_history - ratio * b_history).abs().max())}
             if method.sources(p) != source_files:
                 raise ValueError("Sources changed during verification")
-            result = {"status": "PASS_ER_WEIGHT_HANDMADE_CPU", "source_files": source_files,
+            gradient_evidence = "native_logit_gradient_increment_verified" if method.with_logits(p) else "native_history_gradient_scaling_verified"
+            result = {"status": f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU", "source_files": source_files,
                       "contracts": contracts, "native": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
                                                          for arm in p["arms"]},
                       "native_reference": {arm: method.data.record(destination.parent / (arm + ".json"), destination.parent)
                                            for arm in native_arms if arm not in p["arms"]},
-                      "native_updates_actually_executed": 4, "native_history_gradient_scaling_verified": True,
+                      "native_updates_actually_executed": 4, gradient_evidence: True,
                       "native_component_comparison": scaling, "formal_inputs": False, "formal_labels": False,
                       "formal_updates": 0, "gpu": False, "retained_native_weights": 0, "archive": archive,
                       "seconds": time.monotonic() - started, "max_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
@@ -189,7 +226,7 @@ def run(destination: Path, study: str = "weight") -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--study", choices=("weight", "low"), default="weight")
+    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
     args = parser.parse_args()
     result = run(args.out.resolve(), args.study)
     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())
