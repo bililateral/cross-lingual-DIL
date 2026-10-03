@@ -1,0 +1,78 @@
+test_actual_stage_memory_lifecycle_and_restore (test_step28_risk_replay.RiskReplayTests) ... ERROR
+test_invalid_reference_and_labels_fail_before_update (test_step28_risk_replay.RiskReplayTests) ... ok
+test_model_adam_and_memory_restore_preserves_next_update (test_step28_risk_replay.RiskReplayTests) ... ERROR
+test_real_update_gradient_decomposition_and_optimizer (test_step28_risk_replay.RiskReplayTests) ... ERROR
+test_scalar_formula_and_all_logit_derivatives (test_step28_risk_replay.RiskReplayTests) ... ERROR
+test_tail_improvement_permutation_strata_and_channels (test_step28_risk_replay.RiskReplayTests) ... ok
+test_zero_weight_matches_er_and_term_changes_both_modules (test_step28_risk_replay.RiskReplayTests) ... ok
+
+======================================================================
+ERROR: test_actual_stage_memory_lifecycle_and_restore (test_step28_risk_replay.RiskReplayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/tests/test_step28_risk_replay.py", line 164, in test_actual_stage_memory_lifecycle_and_restore
+    memory.retain(first, 1, model, optimizer, c)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 127, in retain
+    retained[group.uid] = {"stage": stage, "values": make_reference(row, group.labels)}
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 55, in make_reference
+    risks, counts = query_risks(torch.from_numpy(predicted.copy()), torch.tensor(labels))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 23, in query_risks
+    base.objectives(predicted, truth, 1)  # Includes clique/degree/finite checks.
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_chinese_base.py", line 190, in objectives
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 3593, in binary_cross_entropy_with_logits
+    return torch.binary_cross_entropy_with_logits(
+RuntimeError: result type Float can't be cast to the desired output type Long
+
+======================================================================
+ERROR: test_model_adam_and_memory_restore_preserves_next_update (test_step28_risk_replay.RiskReplayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/tests/test_step28_risk_replay.py", line 205, in test_model_adam_and_memory_restore_preserves_next_update
+    memory.retain([fixtures.handmade_group(f"a{i:02}") for i in range(48)], 1,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 127, in retain
+    retained[group.uid] = {"stage": stage, "values": make_reference(row, group.labels)}
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 55, in make_reference
+    risks, counts = query_risks(torch.from_numpy(predicted.copy()), torch.tensor(labels))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 23, in query_risks
+    base.objectives(predicted, truth, 1)  # Includes clique/degree/finite checks.
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_chinese_base.py", line 190, in objectives
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 3593, in binary_cross_entropy_with_logits
+    return torch.binary_cross_entropy_with_logits(
+RuntimeError: result type Float can't be cast to the desired output type Long
+
+======================================================================
+ERROR: test_real_update_gradient_decomposition_and_optimizer (test_step28_risk_replay.RiskReplayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/tests/test_step28_risk_replay.py", line 105, in test_real_update_gradient_decomposition_and_optimizer
+    current_loss = method.parent.ranking.objectives(cs, torch.tensor(new.labels), .5)["total"]
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_alias_ranking.py", line 118, in objectives
+    result = base.objectives(predicted, truth, 1)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_chinese_base.py", line 190, in objectives
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 3593, in binary_cross_entropy_with_logits
+    return torch.binary_cross_entropy_with_logits(
+RuntimeError: result type Float can't be cast to the desired output type Long
+
+======================================================================
+ERROR: test_scalar_formula_and_all_logit_derivatives (test_step28_risk_replay.RiskReplayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/tests/test_step28_risk_replay.py", line 59, in test_scalar_formula_and_all_logit_derivatives
+    ref = method.make_reference(np.zeros(378, dtype=np.float32), group.labels)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 55, in make_reference
+    risks, counts = query_risks(torch.from_numpy(predicted.copy()), torch.tensor(labels))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_risk_replay.py", line 23, in query_risks
+    base.objectives(predicted, truth, 1)  # Includes clique/degree/finite checks.
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261003/risk_replay/native_1710/workspace/scripts/step28_chinese_base.py", line 190, in objectives
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 3593, in binary_cross_entropy_with_logits
+    return torch.binary_cross_entropy_with_logits(
+RuntimeError: result type Float can't be cast to the desired output type Long
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.709s
+
+FAILED (errors=4)
