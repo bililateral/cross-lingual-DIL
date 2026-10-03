@@ -1,0 +1,209 @@
+{
+  "text": "分享\n你说：\nreview(2).zip\n文件\n请使用当前网页 GPT 6 Pro 对附件进行 LOGIT0.1 单点合同、实现及 Linux 增量核验的独立科研外审。先读取包内 reports/documentation/20261003/logit_low/request.zh.md，按其完整范围执行。附件 review.zip 为 3,573,700 字节、413 成员，SHA-256 576a07d9b7ec1387fcdc889e848db79808abcfc02655f5c85466fd893419e66e；用户已明确授权此包向本会话上传。\n\n本轮只新增 L当前 + 0.1 L历史完整监督 + 独立0.5原始logit MSE；主要比较ER0.1，固定另报LOGIT0.25和SEQ。3个顺序、s0、1728新更新，18套新结果＋63套复用。实际更新公式未改，本轮改动集中于study/对照接入/匹配核验/入口。Linux已完成31项测试及4次原生BGE手写更新，退出0，原证据在包中；尚未正式训练。请重点防止仅配置或日志正确、关键计算却未生效的伪实现，核查真实梯度、调用和对照来源。\n\n复用附带的未变历史审查及结果证据，仅做增量必要核查。可在网页Linux CPU用手写微型夹具及已开放小结果做独立参考；不安装科研依赖，不读正式文本/标签/模型/私有资产，不连接项目Linux，不扩大候选和成功线，不构造通用框架。区分真实缺陷、未验证范围和未来建议。请给出完整中文报告及必要源码、实际命令、原stdout/stderr/退出码和清单的可下载ZIP；失败及修订保留，不能把静态检查写成实际运行。请说明可见/自述模型身份与后台认证边界。\n…\n显示更多\n思考了 26m 10s\nChatGPT 说：\n外审结论：本轮通过，未发现需要修改被审科研源码的明确阻断\n\n我已完成附件身份核对、合同和实际调用链审读、增量源码逆向核对、独立手写参考运行、开放小结果的生产评价接入验证，以及 Linux 原始执行证据核查。\n\n在本轮明确范围内，没有发现已确认的 SCIENTIFIC_BLOCKER，也没有发现必须修改被审科研源码才能继续的未关闭 REPRODUCIBILITY_DEFECT。 主执行者完成既定主审后，可以按已有授权推进一次 LOGIT0.1 正式执行；正式入口原本要求的资源、运行环境、大状态身份和首域回放检查仍须实际通过。\n\n这不是 LOGIT0.1 的正式结果通过。 当前没有该配置的正式训练结果，本次手写分数和候选矩阵夹具均不能用于宣称其优于 ER0.1、LOGIT0.25 或 SEQ。\n\n下载完整报告与证据\n文件\t内容\n\nLOGIT01_REVIEW.zh.html\n\t完整中文报告，含源码定位、数学与调用分析、原 23 项、缺陷分类、执行边界和证据索引\n\nLOGIT01_REVIEW.zh.txt\n\t同内容文本版\n\nlogit01_independent_review_evidence.zip\n\t原始输入、必要源码、独立参考与输入、实际命令、原 stdout/stderr/退出码、失败修订和完整清单\n\nFILE_LIST.txt\n\tZIP 文件索引\n\ndelivery_verification.json\n\t最终 ZIP 身份和完整性核对结果\n\n交付 ZIP 为 8,615,892 字节、756 个成员；755 个清单载荷的大小与 SHA-256 全部匹配，清单不自哈希，ZIP CRC 通过。原上传 ZIP 与其 413 个解包成员均原样保留。\n\n纯文本\n交付 ZIP SHA-256\ne2f1406bbf82f541f838d2380fe1492049c343a5ce876dbb83cfc7cca1a3bf79\n一、收到的附件确实是你指定的原包\n核对项\t实测结果\n页面显示名\treview(2).zip\n字节数\t3,573,700\n成员数\t413，全部为文件\n重名成员\t0\nZIP CRC\t全部通过\nsource_inventory.json\t37 条唯一路径，大小和 SHA 全部匹配\nreview_inventory.json\t412 条载荷，大小和 SHA 全部匹配\n\n收到文件的 SHA-256 为：\n\n纯文本\n576a07d9b7ec1387fcdc889e848db79808abcfc02655f5c85466fd893419e66e\n\n与用户声明完全一致。412 条载荷清单唯一未列入的成员是清单文件自身，没有遗漏载荷。详细原输出见 \ninventory_check.json\n。\n\n**模型身份分三层说明：**我已查看包内 model_selection.png，截图显示“6 Pro”；本会话提供给我的模型标识是 GPT-6 Astra Pro，属于上下文标识和自述；我没有取得可独立认证的后台模型标识，也没有另行读取当前会话的实时选择器。因此，不能把截图或自述写成后台认证。\n\n二、“更新公式未改”有实际字节依据，增量范围合理\n\n我没有只看 diff 中是否出现 update，而是反向应用本轮七文件 diff，恢复旧源码，再与已完成 LOGIT0.25 的冻结来源记录比较。\n\n结果是：\n\n旧 34 份来源中，27 份原样保留。\n7 份修改文件逆向恢复后，大小和 SHA 与旧冻结记录逐份一致。\n本轮新增合同、决定和 policy 3 份，合计 37 份。\nupdate、原生 native 核验，以及 train_stage、checkpoint、train、blind_gate、collect、execute 的函数文本均未改变。\n修改集中在新 study、两个续训对照来源、匹配臂参数化、评价复用接入和 CLI/包装入口。\n\n这为复用未变历史审查提供了具体依据，同时新增接入仍由本轮实际运行单独验证。完整恢复记录和旧源码在 \ndelta_attempt01/result.json\n。\n\n另外，当前没有新的 freeze.json 不构成缺陷：实际入口不依赖这个文件名；policy SHA、37 份来源、部署和 CPU audit 已绑定本轮，正式 execute 还要求授权及 CPU 来源与实时源码一致。清单排序与 Python 排序不同，也已按唯一 path/bytes/SHA 核实，不能误判为来源变化。\n\n三、0.1 确实作用于完整历史监督，0.5 MSE 独立进入历史反向\n\n实际目标展开为：\n\n𝐿\n=\n\t\nB\nC\nE\n𝑐\n+\nR\na\nn\nk\n𝑐\n+\n0.5\n \nH\na\nr\nd\n𝑐\n\n\n\t\n+\n0.1\n \nB\nC\nE\nℎ\n+\n0.1\n \nR\na\nn\nk\nℎ\n+\n0.05\n \nH\na\nr\nd\nℎ\n\n\n\t\n+\n0.5\n⋅\n1\n378\n∑\n𝑖\n=\n1\n378\n(\n𝑧\nℎ\n,\n𝑖\n−\n𝑡\n𝑖\n)\n2\n.\nL=\n\t​\n\nBCE\nc\n\t​\n\n+Rank\nc\n\t​\n\n+0.5Hard\nc\n\t​\n\n+0.1BCE\nh\n\t​\n\n+0.1Rank\nh\n\t​\n\n+0.05Hard\nh\n\t​\n\n+0.5⋅\n378\n1\n\t​\n\ni=1\n∑\n378\n\t​\n\n(z\nh,i\n\t​\n\n−t\ni\n\t​\n\n)\n2\n.\n\t​\n\n\n**历史 hard 的有效系数是 0.05，MSE 的有效系数仍是 0.5。**没有再乘历史 0.1，没有除以 1.1，也没有仅对历史 BCE 降权。\n\n生产代码的关键路径是：\n\n当前群和历史群分别设定配对随机种子，各调用一次群级 base.logits。\n历史 objective 先取 0.1 × terms[\"total\"]，其中 total 包含 BCE、rank 和 0.5 hard。\n使用同一个历史 predicted计算原始 logit MSE，独立乘 0.5 加入该 objective。\n当前、历史各反向一次，累加后只做一次全局 clip 和一次 AdamW step。\ntrain_stage 确实把 policy 的 0.1、独立 0.5 和 memory.draw() 返回的目标传入该更新函数。\n\n对应实现见 \nstep28_er_weight.py\n 与 \nstep28_er_weight_run.py\n。\n\n底层 hard 的 detach 用于确定已知负例的 top-5 索引，选中的 live score 继续参与 softplus 梯度；未见把历史 rank/hard 梯度切断的操作。保存 target 是无梯度常量，学生为 train、目标来源为 eval，因此 MSE 包含 dropout 方差作用，不能解释成纯确定性函数保持。\n\n专门验证了“日志正确、实际梯度错误”\n\n本网页没有 Torch。我遵守了不安装科研依赖的限制，实际运行的是：\n\n提取生产 update 的控制语句，在明确的六参数 NumPy 手写夹具上执行；用完整标量目标的中央有限差分作为独立梯度参考。\n\n**生产 BGE 前向、生产 ranking.objectives、PyTorch autograd 和真实 AdamW 没有在本网页运行。**这一限制写入了源码、结果和报告。\n\n不裁剪、主动裁剪、阶段末步三个场景均通过，最大裁剪前梯度差为 \n1.40894\n×\n10\n−\n10\n1.40894×10\n−10\n。随后只修改实际 objective，保留正确日志，四种错误都被检出：\n\n主动构造的错误\t最大梯度偏差\nMSE 只写日志，没有加入 objective\t0.0657321\nMSE 又乘历史 0.1\t0.0591589\n历史仅用 BCE，漏掉 rank/hard\t0.0205159\n历史实际用 0.25，日志仍写 0.1\t0.0337005\n\n四种变体的日志总目标仍然正确，因此这些检出不能归功于检查日志。它们是审查者的预期错误注入，不是项目里发现了四个缺陷。结果与完整输入见 \ngradient/results03/result.json\n。\n\n四、Linux 增量证据支持必要的原生核验，但覆盖范围必须准确\n\n我核对了原命令、workspace、部署来源、逐项测试记录、两臂 JSON、计时、原 stdout/stderr 和退出码。记录对应：\n\n31 项测试，逐项名称与真实测试方法对应，全部 ok，没有失败、错误或跳过。\n4 次原生 BGE 更新：ER0.1 与 LOGIT0.1 各一次真实预热、一次真实加权更新。\n运行时间 15:01:51—15:08:54（+08:00）；程序内 421.013 秒，包装墙钟 7:02.92。\n原进程退出码 0。\n10 个 CPU 回传文件共 70,909 字节，逐文件大小/SHA 匹配。\n原 stderr 的两条 API 更名 FutureWarning 完整保留，不属于运行失败。\n不能把 Tiny 288 步或计数夹具写成原生 288 步\n\nstdout 中两组走到 288 的进度属于 Tiny 模型用例。原生每臂只做一次 warm，随后显式把 Adam step 从 1 设为 288，再做一次 weighted 更新至 289。\n\n因此，原生 moments 来自一次预热；没有原生连续 288 步的证据。源码和原 JSON 已明确这一点，本报告没有扩大该声明。\n\n两个梯度探针有实质性\n\n原生核验单独对 0.5 MSE 调用 autograd.grad，并在真实生产更新的 .backward() 中捕获 current/history 两次贡献，逐元素检查：\n\n𝑔\nL\nO\nG\nI\nT\n,\nℎ\n=\n𝑔\nE\nR\n0.1\n,\nℎ\n+\n𝑔\n0.5\nM\nS\nE\n.\ng\nLOGIT,h\n\t​\n\n=g\nER0.1,h\n\t​\n\n+g\n0.5MSE\n\t​\n\n.\n组件探针\t保存的逐元素等式最大残差\n编码器第一层 query.weight\t\n1.00044\n×\n10\n−\n11\n1.00044×10\n−11\n\nhead 隐藏层 weight\t\n2.76486\n×\n10\n−\n10\n2.76486×10\n−10\n\n二臂初始模型、预热后模型、加权前 Adam、当前/历史全部 logits 相等；加权后的模型与 Adam 不同。另有 29 个参数的更新观察，覆盖词 embedding、24 层 query.weight 和四个 head 参数。\n\n**两个组件的梯度分解验证，与 29 个参数的变化观察，是两种不同证据。**不能把后者写成全参数 MSE 增量逐元素核验。\n\n我还从保存范数检查了容差敏感性：头部探针允许通过的误差 L2 上界约为 \n2.06\n×\n10\n−\n5\n2.06×10\n−5\n，而漏 MSE 或将其再乘 0.1 会分别造成约 0.001861、0.001675 的误差。因此，在保存数值和所审代码成立的条件下，这个断言能识别上述两种伪实现。\n\n本网页独立重算了原生手写标量，没有伪称重算 BGE 梯度\n\n使用保存的 378 项 logits/target 和公开手写关系规则，标准库参考得到：\n\n量\t独立复算\n原始 logit MSE\t0.0001965899888976513\nER0.1 完整目标\t4.731686928666364\nLOGIT0.1 完整目标\t4.731785223660813\n独立增加的 0.5 MSE\t0.00009829499444882565\n\n与原 float32 完整目标日志误差约 \n5.05\n×\n10\n−\n8\n5.05×10\n−8\n。\n\n但原包没有完整原生梯度张量，只有范数、摘要和最大残差；我不能离线逆推出 BGE 逐元素梯度。另外，原生 ER/LOGIT 的基础监督部分共用 ranking.objectives，不能仅凭这 31 项就宣称每个基础项导数都被独立推导。这里结合了未变源码、历史实际 PyTorch 数值证据和本轮手写参考。详见 \nnative/REPORT.zh.md\n。\n\n五、首域、目标生命周期、盲门与单次访问没有发现新增错接\n\n实际路径明确使用原三个 shared 首域的完整 model/Adam/RNG、首映射和 LOGIT 首缓存，没有从 ER0.1 或 LOGIT0.25 后续末端续训。阶段二只给本路径最终新入缓存的群生成阶段末 eval target；存活旧 target 不刷新，淘汰 target 删除。\n\n本网页实际运行了生产 Supply、Memory、序列化和 parse_once 的手写参考，并检查了：\n\n旧阶段、未来阶段和重复阶段请求被拒绝。\n新 target 请求集合等于新入缓存集合，旧存活 target 字节不变。\n解析失败前已记账，再次请求在 loader 前拒绝。\ntest/heldout/owners 请求在 loader 前拒绝。\n正式 CLI 只有 execute/finalize，没有自动正式训练恢复。\n\n另运行真实 train_stage 的控制流，对六阶段共 1728 次显式 update spy 调用逐一核对 0.1、独立 0.5、群 ID、随机种子和 target 传递。这 1728 次是调用核验，真实优化器更新为 0。\n\n六终点各有四份分数数组，因此盲门检查 24 数组；三个 valid 输出角色才形成 18 套新指标/计数。实际顺序仍是全部训练、完整盲门、一次 valid 解析、完整收集，最后统计。详细结果见 \nflow/control_flow_artifacts/result.json\n。\n\n六、18＋63 和三个固定比较已经实际进入生产评价路径\n\n复用关系核对为：\n\n来源\t使用集合\t套数\n原共同首域＋SEQ\t三首域及 SEQ 后两阶段，三个角色\t27\nER0.1\ttenth_stage2/3\t18\nLOGIT0.25\tlogit_quarter_stage2/3\t18\n合计\t21 个 point × 3 个角色\t63\n\n旧结果按各自的冻结来源链核对；没有拿旧 31/34 份来源与当前后继代码比较后误判失效。起点小记录、partition、60 群 ID、实际域、22 列、角色和环境记录均匹配，没有误用 ER0.25 或旧 LOGIT1。\n\n为检验新增接入，我把已开放 ER0.1 的 18 套结果复制到 logit_tenth 候选槽位，明确放在 SYNTHETIC_NOT_LOGIT01_RESULTS 中，然后实际运行生产 contract(\"logit_low\")、baseline() 和 finalize()。\n\n结果正确产生：\n\nlogit_tenth_minus_tenth；\nlogit_tenth_minus_logit_quarter；\nlogit_tenth_minus_seq。\n\n每组原 23 项，没有自动 selection。因为夹具候选等于 ER0.1，第一组全部主角色差值及区间精确为零，而另外两组不同，能够检验是否错取对手或阶段。\n\n此外，独立参考没有调用项目端点、统计或判据函数：\n\n独立核对\t结果\n63 套计数派生的六类逐群分类率\t22,680 个标量，最大差 0\n端点均值、三顺序及区间\t14,784 个数值，最大差 \n4.44\n×\n10\n−\n16\n4.44×10\n−16\n\n三组夹具比较及两组既有对 SEQ\t5,940 个数值，最大差 \n2.22\n×\n10\n−\n16\n2.22×10\n−16\n\n三组夹具判据\t69 个布尔值逐项一致\n\n这些数量是复核标量数，不是独立实验次数。数值容差未进入性能判据。ER0.1−SEQ 的 10/23、LOGIT0.25−SEQ 的 16/23 保持原判定，没有被写成全部保护成功。详见 \nreference/REPORT.zh.md\n。\n\n七、失败、修订与最终边界\n\n审查自身的问题没有隐藏：\n\n记录\t实际情况\t处置\n梯度参考 v1\t退出 1：把 ndarray 手写标签误计为 target\tv2 改成对象身份检查；原源码、输入、stderr 保留\n梯度参考 v2\t退出 0，后续校对发现模拟 head decay 与正式配置不一致\tv3 改为 encoder=0.01、head=0；保留 v2 成功原件和修订说明\n一次探索性 rg\t退出 2：查询两个错误路径\t原流保留，随后按正确路径读取\n\n这些是审查参考或探索错误，没有据此修改项目源码，也没有触发科研重跑。最终采用的梯度参考是 v3，实际退出 0。\n\n本轮仍未验证的内容包括：本网页上的 PyTorch/BGE/CUDA/BF16、完整原生梯度、正式 model/Adam/RNG/cache 载荷、本轮真正的首域恢复与六终点，以及尚未产生的 LOGIT0.1 效果。它们是明确的范围界限，不能被包装成已完成，也不应因用户禁止访问而人为转成新阻断。\n\n本轮无需新增候选、λ/MSE、种子、成功线、全参数梯度归档、通用恢复框架或重复审批。 后续按已授权单点执行，分别完整报告三个比较，保留正负结果，并按原定结果审查流程收尾。\n\nLOGIT01_REVIEW.zh.html\nHTML\nLOGIT01_REVIEW.zh.txt\n文档\nFILE_LIST.txt\n文档\n另有 9 个\n目前为止，这次对话有帮助吗？\nChatGPT 可能会出错。请核查重要信息。\n最新一条回复\n\n\n\n\nPro",
+  "links": [
+    {
+      "text": "查看 TiBo 原帖",
+      "href": "https://x.com/thsottiaux/status/2106131810921136451"
+    },
+    {
+      "text": "官方 dot 介绍",
+      "href": "https://learn.chatgpt.com/docs/dots"
+    },
+    {
+      "text": "最新更新说明",
+      "href": "https://learn.chatgpt.com/docs/whats-new/september-28-october-2-2026"
+    },
+    {
+      "text": "official docs",
+      "href": "https://learn.chatgpt.com/docs/dots/tasks-and-memory"
+    },
+    {
+      "text": "官方关于上下文与记忆的说明",
+      "href": "https://learn.chatgpt.com/docs/dots/tasks-and-memory#context-and-memory"
+    },
+    {
+      "text": "官方：Context and memory",
+      "href": "https://learn.chatgpt.com/docs/dots/tasks-and-memory#context-and-memory"
+    },
+    {
+      "text": "OpenAI 缓存说明",
+      "href": "https://developers.openai.com/api/docs/guides/prompt-caching"
+    },
+    {
+      "text": "Anthropic 的上下文工程说明",
+      "href": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+    },
+    {
+      "text": "运行机制",
+      "href": "https://code.claude.com/docs/en/how-claude-code-works#when-context-fills-up"
+    },
+    {
+      "text": "压缩与缓存的具体关系",
+      "href": "https://code.claude.com/docs/en/prompt-caching#compacting-the-conversation"
+    },
+    {
+      "text": "窗口与阈值配置",
+      "href": "https://code.claude.com/docs/en/model-config#context-window-and-auto-compaction"
+    },
+    {
+      "text": "环境变量说明",
+      "href": "https://code.claude.com/docs/en/env-vars"
+    },
+    {
+      "text": "压缩后保留与重载清单",
+      "href": "https://code.claude.com/docs/en/context-window#what-survives-compaction"
+    },
+    {
+      "text": "记忆与指令说明",
+      "href": "https://code.claude.com/docs/en/memory"
+    },
+    {
+      "text": "Hooks 官方说明",
+      "href": "https://code.claude.com/docs/en/hooks#precompact"
+    },
+    {
+      "text": "分段总结与会话记录",
+      "href": "https://code.claude.com/docs/en/checkpointing#rewind-and-summarize"
+    },
+    {
+      "text": "SDK 压缩说明",
+      "href": "https://code.claude.com/docs/en/agent-sdk/agent-loop#automatic-compaction"
+    },
+    {
+      "text": "请求构造源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_remote_v2_attempt.rs#L34-L142"
+    },
+    {
+      "text": "响应检查源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_remote_v2.rs#L388-L504"
+    },
+    {
+      "text": "筛选与预算源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_remote_v2.rs#L506-L715"
+    },
+    {
+      "text": "图片预算处理",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_remote_v2_images.rs"
+    },
+    {
+      "text": "工具输出缩减源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_remote_history.rs#L68-L185"
+    },
+    {
+      "text": "公开摘要模板",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/prompts/templates/compact/prompt.md"
+    },
+    {
+      "text": "文字摘要与历史构建",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact.rs#L656-L747"
+    },
+    {
+      "text": "窗口切换源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_token_budget.rs#L19-L83"
+    },
+    {
+      "text": "模型元信息源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/protocol/src/openai_models.rs#L515-L537"
+    },
+    {
+      "text": "窗口状态计算源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/context_window.rs"
+    },
+    {
+      "text": "历史计量源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/context_manager/history.rs#L907-L944"
+    },
+    {
+      "text": "初始上下文注入逻辑",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact.rs#L60-L111"
+    },
+    {
+      "text": "恢复重建源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/rollout_reconstruction.rs#L395-L483"
+    },
+    {
+      "text": "文字路径错误处理",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact.rs#L302-L347"
+    },
+    {
+      "text": "OpenAI API 压缩指南",
+      "href": "https://developers.openai.com/api/docs/guides/compaction"
+    },
+    {
+      "text": "Anthropic API 压缩概览",
+      "href": "https://platform.claude.com/docs/en/build-with-claude/compaction"
+    },
+    {
+      "text": "内容清理",
+      "href": "https://platform.claude.com/docs/en/build-with-claude/context-editing"
+    },
+    {
+      "text": "Claude Code 对这类反复压缩的处理",
+      "href": "https://code.claude.com/docs/en/troubleshooting#auto-compaction-stops-with-a-thrashing-error"
+    },
+    {
+      "text": "公开摘要模板",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/prompts/templates/compact/prompt.md"
+    },
+    {
+      "text": "文字摘要与历史构建",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact.rs#L656-L747"
+    },
+    {
+      "text": "入口源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/compact_token_budget.rs#L19-L83"
+    },
+    {
+      "text": "换窗口实现",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/mod.rs#L4536-L4590"
+    },
+    {
+      "text": "公开模型配置",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/models.json"
+    },
+    {
+      "text": "恢复提示接入源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/ext/history-notes/src/extension.rs#L100-L153"
+    },
+    {
+      "text": "扩展启用条件",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/ext/history-notes/src/extension.rs#L45-L65"
+    },
+    {
+      "text": "后端客户端",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/ext/history-notes/src/backend.rs#L37-L105"
+    },
+    {
+      "text": "工具一致性契约",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/ext/history-notes/src/tools.rs#L25-L100"
+    },
+    {
+      "text": "工具处理器",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/tools/handlers/new_context_window.rs#L13-L43"
+    },
+    {
+      "text": "轮换判断",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/turn.rs#L552-L625"
+    },
+    {
+      "text": "预算计算",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/context_window.rs#L58-L117"
+    },
+    {
+      "text": "启用与优先级",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/token_budget.rs#L13-L159"
+    },
+    {
+      "text": "正确的模型配置链接",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/models-manager/models.json#L105-L112"
+    },
+    {
+      "text": "旧消息不再进入新请求的测试",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/tests/suite/token_budget.rs#L1394-L1427"
+    },
+    {
+      "text": "上下文组装源码",
+      "href": "https://github.com/openai/codex/blob/6326163b9abd7802c0e57be4e326e5f898bbba75/codex-rs/core/src/session/mod.rs#L4206-L4354"
+    }
+  ]
+}

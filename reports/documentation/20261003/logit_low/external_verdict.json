@@ -1,0 +1,70 @@
+{
+  "review_date": "2026-10-03",
+  "timezone": "Asia/Shanghai",
+  "stage": "contract_implementation_native_evidence_incremental_review",
+  "verdict": "PASS_WITH_EXPLICIT_SCOPE_LIMITS",
+  "scientific_blockers": [],
+  "unresolved_project_reproducibility_defects": [],
+  "approved_candidate_scope": {
+    "candidate": "logit_tenth",
+    "history_supervision_weight": 0.1,
+    "independent_raw_logit_mse_weight": 0.5,
+    "primary_comparator": "tenth",
+    "fixed_other_comparators": [
+      "logit_quarter",
+      "seq"
+    ],
+    "new_updates": 1728,
+    "new_metric_count_sets": 18,
+    "reused_metric_count_sets": 63,
+    "seed": "s0",
+    "orders": [
+      "ABC",
+      "BCA",
+      "CAB"
+    ]
+  },
+  "reviewer_execution": {
+    "dependency_installs": 0,
+    "project_server_connections": 0,
+    "formal_text_label_model_reads": 0,
+    "formal_training_runs": 0,
+    "torch_bge_runs": 0,
+    "gradient_reference": "NumPy six-parameter fixture executing extracted update control statements",
+    "flow_reference": "Production control functions with 1728 explicit update spy calls; zero optimizer updates",
+    "evaluation_reference": "Production finalize with 18 explicitly non-research ER0.1-rekeyed candidate sets plus 63 frozen reused sets"
+  },
+  "submitted_native_evidence": {
+    "contract_tests_recorded": 31,
+    "native_updates_recorded": 4,
+    "component_gradient_probes": 2,
+    "parameter_update_probes": 29,
+    "full_gradient_arrays_supplied": false
+  },
+  "reviewer_corrections": [
+    {
+      "id": "R1",
+      "initial_exit": 1,
+      "issue": "ndarray-based target observation also counted handwritten labels",
+      "resolved_in": "gradient_reference_v2.py"
+    },
+    {
+      "id": "R2",
+      "initial_exit": 0,
+      "issue": "simulation head weight_decay initially 0.01 instead of 0",
+      "resolved_in": "gradient_reference_v3.py"
+    },
+    {
+      "id": "R3",
+      "initial_exit": 2,
+      "issue": "exploratory rg used two nonexistent paths",
+      "resolved_by": "subsequent correct-path reads"
+    }
+  ],
+  "model_identity": {
+    "supplied_screenshot": "6 Pro visible",
+    "context_reported": "GPT-6 Astra Pro",
+    "independent_backend_authentication": false
+  },
+  "formal_logit01_results_exist_in_this_review": false
+}

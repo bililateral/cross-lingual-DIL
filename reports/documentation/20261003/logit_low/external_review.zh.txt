@@ -1,0 +1,379 @@
+# LOGIT0.1 单点合同、实现与 Linux 增量核验：独立科研外审报告
+
+日期：2026-10-03（Asia/Shanghai）。审查对象：用户上传的 review(2).zip，其字节身份与声明的 review.zip 一致。审查阶段：正式训练前的合同、实现及增量原生证据审查。
+
+## 0. 裁决与可推进范围
+
+**本轮外审通过。在本报告明确覆盖的范围内，没有发现已确认的 SCIENTIFIC_BLOCKER，也没有发现必须修改被审科研源码才能继续的未关闭 REPRODUCIBILITY_DEFECT。**
+
+此结论来自实际阅读合同与生产调用链、逆向恢复旧冻结源码、独立数值与调用核验、开放小结果的生产评价运行，以及对 Linux 原生证据的交叉核查。没有以 PASS 字符串、哈希一致或测试数量替代科学判断。[S1–S7；A1–A6]
+
+只针对以下冻结单点给出该结论：
+
+    L = L_base(current) + 0.1 L_base(history)
+        + 0.5 mean_378((raw_logit_history - saved_eval_target)^2)
+    L_base = BCE + query_rank + 0.5 known_top5_hard
+
+主比较为 LOGIT0.1−ER0.1；固定另报 LOGIT0.1−LOGIT0.25 和 LOGIT0.1−SEQ，各完整保留原 23 项。没有扩大候选、种子、成功线、数据权限或自动模型替换范围。[S1、S2]
+
+主执行者可以完成既定主审后，按已有授权和原入口推进一次正式 LOGIT0.1。正式入口中原本要求的大状态身份、首域盲分数回放、资源、配对运行环境与一次访问检查仍须实际通过；本报告没有预记这些尚未发生的执行结果。没有要求重训旧对照、重跑未变的全部旧审查，或增加新的审批门。[S1、S4]
+
+**本轮不存在 LOGIT0.1 正式结果。** 本报告中的新候选矩阵是明确标记的评价夹具；不能用于宣称 LOGIT0.1 优于任何对照。正式 1728 更新、六终点、18 套新指标的有效性与效果必须由后续实际结果决定。
+
+## 1. 附件身份、完整性及模型身份边界
+
+### 1.1 实际收到的附件
+
+| 项目 | 实测 |
+|---|---|
+| 上传显示名 | review(2).zip |
+| 用户声明的原名 | review.zip |
+| 字节数 | 3,573,700 |
+| ZIP 成员数 | 413，全部为文件 |
+| SHA-256 | 576a07d9b7ec1387fcdc889e848db79808abcfc02655f5c85466fd893419e66e |
+| 重名成员 | 0 |
+| ZIP CRC | 全部通过 |
+| 解包文件与 ZIP 原成员逐字节比较 | 413/413 一致 |
+| source_inventory.json | 37 条唯一路径，大小和 SHA 全部匹配 |
+| review_inventory.json | 412 条唯一路径，大小和 SHA 全部匹配 |
+
+412 条载荷清单唯一未列入的 ZIP 成员是清单文件自身，不存在遗漏载荷。不同显示文件名没有导致换包。独立检查脚本、原 stdout/stderr/退出码和完整 JSON 在 A1；它们证明收到的文件身份及内部一致性，不单独证明科学计算正确。
+
+### 1.2 可报告的模型身份
+
+用户指定当前网页 GPT 6 Pro。已实际查看包内 model_selection.png，截图中的选项显示“6 Pro”。本会话提供给审查者的模型标识为 GPT-6 Astra Pro；这是上下文标识/自述层面的说明。
+
+没有取得可独立认证的后台模型标识、服务端签名或路由证明，也没有另行读取当前会话的实时网页选择器。故只报告“包内截图可见 6 Pro”和“本会话标识 GPT-6 Astra Pro”，**不认证实际后台为某一型号**。本轮并行分项审查属于同一会话中的协作，不是多个独立后端或多个科研重复实验。[S9]
+
+## 2. 科学问题与本轮干预是否对应
+
+研究目标是不同中文合成卖家群体依次到来时，学习新群体，同时保持旧分布留出卖家的马甲候选排序和基础识别。每群 28 个账号，每个查询 27 个候选；它不自动等价于真实市场大规模身份检索或跨阶段追踪同一控制者。[S1、S8]
+
+生产输入链 record_texts 只取屏蔽后的标题/描述；账号、群及域标识用于分组、供给、配对和评价，没有进入文本编码器或被拼成额外模型特征。每域仍为 48 拟合、12 当前域校准、20 valid 群；没有扩大可读标签集合。[S5：step28_chinese_base.py 的 record_texts、pool_channels；S1]
+
+三个比较回答不同问题：
+
+| 固定比较 | 可以回答的问题 | 不能代替的结论 |
+|---|---|---|
+| LOGIT0.1−ER0.1 | 匹配历史监督 0.1 下，保存输出保持项的增量 | 不自动证明对 SEQ 的全部保护 |
+| LOGIT0.1−LOGIT0.25 | 在固定独立 MSE 系数下，完整历史监督降权的整体训练取舍 | 不证明任意 λ 单调、最优；阶段二新 target 会随各自训练轨迹形成 |
+| LOGIT0.1−SEQ | 相对无重放的旧能力、新能力与既定保护项 | 不由第一组通过自动推出 |
+
+三顺序 ABC/BCA/CAB 仍只有一个 s0；已开发 valid 上的追加单点不是独立最终留出。三个顺序、5000 次 bootstrap 和 23 项规则都不能被解释为独立训练重复次数。合同对这些界限已有明确表述，不需要新立成功线。[S1、S2、S8]
+
+## 3. 增量来源：实际证明哪些代码未变
+
+本次不止检查 diff 中“没有出现 update”。独立脚本反向应用提交的七文件 implementation.diff，逐块检查当前正文，再恢复旧文件。恢复出的每一份大小和 SHA 都与已完成 LOGIT0.25 的 execution.source_files 精确相同。[A2]
+
+| 与旧 34 来源的关系 | 数量 | 核查结果 |
+|---|---:|---|
+| 原样保留 | 27 | 与旧冻结描述符一致 |
+| 已有来源中的必要修改 | 7 | 逆向恢复后逐字节匹配旧冻结身份 |
+| 本轮新增 | 3 | 新合同、决定、policy |
+| 本轮合计 | 37 | 与当前清单、部署、CPU 来源相符 |
+
+七个修改文件是两个 Linux 包装脚本、step28_er_weight.py、step28_er_weight_check.py、step28_er_weight_evaluate.py、step28_er_weight_run.py，以及对应合同测试文件。update 和 native 函数全文不变；train_stage、checkpoint、train、blind_gate、collect、execute 函数全文也不变。变更集中在新 study/policy/source、两个 continuation reference、匹配臂参数化、finalize 复用接入及 CLI 枚举。[A2]
+
+因此，可以复用直接历史审查中已经关闭的基础损失、实际微型续训、缓存、恢复及统计数学证据，同时必须单独检查本轮新增接入。本报告按此分工执行，没有将旧 PASS 直接当作新入口已正确的证据。
+
+source_inventory/deployment 与 Python sources() 的列表排序不同，但按唯一 path/bytes/SHA 完全相同；实际运行 sources() 列表与 CPU audit 的顺序也一致。排序差异不构成来源失配。[A4]
+
+本包没有新的 freeze.json；实际入口不依赖该文件名。policy 的 SHA 常量、37 份来源清单、部署及 CPU audit 已钉住本轮；execute 再要求 auth/audit 的 source_files 与实时来源相同，训练结束及 finalize 继续检查。缺少一个未被入口要求的文件名不是缺陷。尚未生成的正式 authorization/execution 不能预认证。[S3：30–50、82–100；S4：458–473、515–516；A4]
+
+## 4. 真实计算与梯度：完整 0.1、独立 0.5
+
+### 4.1 目标展开与底层语义
+
+实际目标展开为：
+
+    BCE_current + Rank_current + 0.5 Hard_current
+    + 0.1 BCE_history + 0.1 Rank_history + 0.05 Hard_history
+    + 0.5 mean_378((z_history - target)^2)
+
+所以历史 hard 的有效系数是 0.05；MSE 的有效系数仍为 0.5。没有除以 1.1，也没有把 MSE 再乘 0.1。[S3：242–250；S5]
+
+底层 BCE 对 378 个无向账号对取均值。query rank 对 28 个查询，分别计算 27 候选的 logsumexp 减正例 logit 均值，再对查询平均。hard 只从已知负例中稳定选 top 5，计算正负 raw logit 差的 softplus；detach 仅用于选择索引，被选中的 live score 仍参与梯度。检查了该具体数据流，未见把历史 rank/hard 的梯度切断的操作。[S5：step28_chinese_base.py 165–191；step28_alias_ranking.py 89–129]
+
+对于固定 target，0.5 mean((z−target)^2) 对每个历史 logit 的导数是 (z−target)/378；误再乘 0.1 会令这部分缩小十倍。这个导数只描述 MSE 分量，不能由此推断裁剪后总梯度、AdamW 参数步长或效果也按相同比例变化。
+
+### 4.2 生产调用链
+
+| 环节 | 源码位置 | 实际语义 |
+|---|---|---|
+| 参数前置校验 | step28_er_weight.py 219–228 | reference 必须是 378 项有限 float32 数组；存在 reference 与 logit_weight=0.5 相互匹配 |
+| 当前/历史前向 | 同文件 237–242 | 两组分别设置配对 seed，各调用一次 base.logits |
+| 完整历史监督 | 同文件 243–244 | 历史 objective 使用 coefficient × terms['total'] |
+| 同图 MSE | 同文件 245–250 | 复用历史 predicted，独立加入 0.5 penalty 后执行 backward |
+| 联合更新 | 同文件 232–233、250、264–269 | 开始时一次 zero_grad；两次 backward 累加；最后一次 clip、一次 optimizer.step |
+| 正式参数传入 | step28_er_weight_run.py 59–69 | 传入 policy 的 0.1、独立 0.5 及 memory.draw 返回的实际 target |
+
+保存 target 由 NumPy 数据新建为无梯度 Tensor，不带旧教师参数图；memory.draw 返回副本。学生是 train，target 来源是 eval。MSE 因而包含输出偏移及 dropout 方差作用，合同已经明确，不应称为纯确定性函数保持。[S3、S4、S5]
+
+这里“两次前向”指两个完整群的 base.logits 调用；BGE 内部微批与 activation checkpoint 重算不是新增历史群前向。末步编码器 LR=0 而 head LR=0.001 是原计划行为，不能把该步编码器参数不变误报为优化失效。[S3：229–231、273–275；S5]
+
+### 4.3 本网页实际运行的手写梯度参考
+
+本环境 Python 3.12.14、NumPy 2.3.5，没有 Torch；没有安装科研依赖。独立程序 AST 提取生产 update，删除局部 import torch 后，在明确的六参数 affine-logit NumPy 夹具上执行其控制语句。生产 base.logits、ranking.objectives、PyTorch autograd、PyTorch AdamW 和 BGE 没有在本网页运行。[A3]
+
+夹具用手写边/查询目标及解析 logit 导数；期望参数梯度另由完整标量目标中央有限差分产生。输入设计矩阵、参数、378 targets 和手写关系标签全部保存。它验证系数组合、反向入口及调用次数，底层生产张量运算则结合未变历史 PyTorch 数值证据和本次原生证据判定。
+
+三个场景——不裁剪、主动裁剪、阶段第 288 步——均通过。最大裁剪前梯度差为 1.4089385214077765e-10。主动裁剪因子为 0.024164886300415172；每次顺序均为一次清梯度、当前前向/反向、历史前向/反向、一次裁剪和一次优化器调用。模拟参数与独立手算最大差不超过 3.212985433265203e-13；该数值是 NumPy 模拟误差，不能写成生产 AdamW 实测误差。[A3]
+
+为直接检验“日志正确，操作未生效”，在生产函数副本中只破坏实际 objective，保持全部总目标日志正确。以下四种错误都被独立梯度参考检出：
+
+| 预期错误注入 | 最大梯度偏差 |
+|---|---:|
+| MSE 仅记录日志，没有加入 objective | 0.0657321043201084 |
+| MSE 又乘历史 0.1 | 0.059158893891112396 |
+| 历史只用 BCE，遗漏 rank/hard | 0.02051590240131851 |
+| 历史计算使用 0.25，日志仍写 0.1 | 0.033700483183394137 |
+
+四者日志总目标仍相同，均为 5.279426343984742，因而不能靠检查日志数值识别；本次确实比较了梯度。这些是审查者主动构造的错误副本，不是项目中发现四个缺陷。[A3]
+
+## 5. Linux 增量原证据是否有实质作用
+
+### 5.1 命令与运行身份
+
+核对了 cpu_execution、deployment、cpu_inventory、audit、两臂 JSON、stdout/stderr、started/finished、exit_status 及 resource_usage。原启动经新 workspace 的相对路径包装进入 --study logit_low，原生配对臂从新 policy 实际取出 tenth 与 logit_tenth。沿用的 PASS_LOGIT_WEIGHT_HANDMADE_CPU 名称没有被误认为固定指 0.25。[S7；A5]
+
+| 项目 | 原记录及独立核对 |
+|---|---|
+| 时间 | 2026-10-03 15:01:51 至 15:08:54，+08:00 |
+| 程序内时长 | 421.01334596285596 秒 |
+| 包装墙钟 | 7:02.92，秒级时间戳差 423 秒 |
+| 返回值 | exit_status 与资源日志均为 0 |
+| 环境记录 | Python 3.10.19、Torch 2.9.1+cu130、NumPy 2.2.6，CPU affinity=[47] |
+| 测试 | stderr 中 31 个测试身份与 AST 提取的 test 方法逐一对应，全部 ok；没有失败/错误/跳过 |
+| 原生更新 | 两臂各 1 次真实预热和 1 次真实加权，合计 4 次 |
+| 回传证据 | 10 个文件、70,909 字节，逐文件大小/SHA 全部匹配 |
+
+stderr 原件包含两条 embedding-dimension 方法更名 FutureWarning；没有隐去，也没有误写成运行失败。约 9.88 GiB 的进程 RSS 与 256 MiB 的输出证据预算不是同一个限制。[S7；A5]
+
+### 5.2 原生 4 次与 tiny 288 步严格分开
+
+stdout 中两组到 288 的进度来自两个 Tiny 模型用例，带 handmade_fixture 标记；随后才开始两臂 native_start/native_end。原生每臂只有一次 warm 更新，其后将已有 Adam step 从 1 手写设为 288，再执行一次 weighted 更新至 289。moments 来自一次真实 warm，并非真实训练 288 步的 moments。源码和 JSON 的 counter_fixture 都明确这一点。[S7；S3 的 check.py 27–40、72–74、108–109]
+
+本轮核验没有原生连续 288 步或正式 1728 步的证明，也没有声称有。不能把计数、Tiny 更新或网页 spy 调用合并成原生训练数。
+
+### 5.3 独立 MSE 梯度是否真正到达模型
+
+原生核验先由同预热模型 eval 产生 target，再在 train/seed=108 下单独对 0.5 MSE 调用 autograd.grad。随后在真正生产 update 中对两个参数注册 gradient hooks，分别取得 current 和 history 两次反向的贡献，再逐元素核对：
+
+    g_LOGIT_history = g_ER0.1_history + g_independent_0.5MSE
+
+两臂初始模型、warm 后模型、加权前 Adam、全部当前/历史 378 logits 相等；当前梯度要求逐元素完全相等。原生 history 比较使用 rtol=2e-5、atol=2e-8。[S7；step28_er_weight_check.py 48–79、178–194]
+
+| 组件探针 | 独立 0.5 MSE 梯度 L2 范数 | 保存的逐元素等式最大残差 |
+|---|---:|---:|
+| 编码器第一层 query.weight | 8.615575643489137e-5 | 1.000444171950221e-11 |
+| head 隐藏层 weight | 0.001860779826529324 | 2.764863893389702e-10 |
+
+另有 29 个参数的非零有限梯度和实际变化观察：24 层 query.weight、词 embedding、两个 head Linear 的 weight/bias。这支持所选各层被更新；**两组件分解检查不等于所有参数的 MSE 增量逐元素检查**。[A5]
+
+按保存的头部维度及范数，逐元素容差对应的误差 L2 上界约 2.06082e-5；若漏 MSE，差为 0.00186078；若 MSE 误再乘 0.1，差约 0.00167470。故在这些原生记录成立的条件下，两种伪实现都应被这项探针断言检出。这是基于保存范数的独立数学敏感性核验，不能称为本网页重跑真实 BGE 梯度。[A5]
+
+### 5.4 独立重算原生手写标量
+
+标准库参考不调用项目损失函数，只读取已公开的两臂 378 logits/target，并由手写关系规则构造 4 个三节点团、8 个二节点团。重算结果如下；没有读取正式标签。[A5，另由 A3 的 NumPy 参考交叉印证]
+
+| 量 | 标准库独立结果 |
+|---|---:|
+| 当前完整基础损失 | 4.301472237346308 |
+| 历史完整基础损失 | 4.302146913200568 |
+| 原始 logit MSE | 0.0001965899888976513 |
+| ER0.1 总目标 | 4.731686928666364 |
+| LOGIT0.1 总目标 | 4.731785223660813 |
+| 独立增加的 0.5 MSE | 0.00009829499444882565 |
+
+与原生产 float32 运算导出的完整目标日志，差约 5.05e-8。
+
+### 5.5 原生证据的边界
+
+原包没有保存完整原生梯度张量，只保存 norm/hash/残差；无法离线逆推出或重新计算全部 BGE 参数梯度。本网页没有读取模型重做 native。原生 ER/LOGIT 的监督部分共用 ranking.objectives，附带 independent_update 也使用该函数；它们主要独立验证 MSE 增量及组合更新，不能仅凭 31 项测试宣称 BCE/rank/hard 每项导数已经被独立推导。基础监督图结合未变源码、直接历史 PyTorch 数值证据及本轮手写导数参考判定。[S5、S7、S8；A3、A5]
+
+正式入口被外层 mock 阻断、数据由手写群产生等源码与日志，支持沿所审路径没有消费正式文本/标签；它不是 OS 级全部读取审计。没有发现需要连接项目 Linux、重新读取私有资产或添加通用文件审计框架的具体矛盾。
+
+## 6. 首域恢复、target 生命周期及数据访问
+
+### 6.1 起点和供给
+
+新分支从原三个 shared 首域完整 model/Adam/RNG 与 first_map 恢复；明确使用 logit_after1 缓存，既不从 ER0.1/LOGIT0.25 的后续末端续训，也不重训首域。实际入口在消费新 train 监督之前核对原 checkpoint/cache 文件身份；恢复后要求 Adam288、首校准映射、缓存成员和目标起源匹配，并回放全部 60 群首域盲分数，再恢复 RNG。[S4：181–245]
+
+ContinuationSupply 只从阶段 2 开始，按 order 提供当前域 48 拟合与 12 校准群。实际生产 Supply 和 Memory 已在本网页手写夹具上运行，旧阶段、未来阶段和重复阶段请求均被拒绝。[A4]
+
+### 6.2 target 生命周期
+
+阶段二完成当前分支训练和 checkpoint 后，只对最终新入缓存的当前域群调用本路径模型 eval 评分；存活旧 target 字节不刷新，淘汰 target 删除。draw 返回副本；origin 只取对应阶段 1/2。缓存仍为模型无关 Algorithm R 六完整群，全部历史及附属状态计入 1 MiB。[S4：255–277；S5：Memory.retain/draw；A4]
+
+生产 Memory 的三顺序生命周期及序列化回环，已用明确手写评分回调实际核对。模型评分回调是夹具，未冒充本次真实 BGE 阶段末目标。真正的大状态、原生 target 载荷和本轮未来目标没有在本网页读取。
+
+### 6.3 1728 次参数转发的证据含义
+
+另对真实 train_stage 执行三顺序×两阶段的控制流，将 update 明确替换为调用 spy。独立展开日程和两套 seed，逐次核对当前/历史群、0.1、独立 0.5、378 项 float32 target 及预算回调，全部一致。[A4]
+
+这是 **1728 次 spy 调用，真实优化器更新为 0**。它证明新参数和 target 确实沿调用接口送达；数值梯度必须由第 4–5 节证据支持，不能由 spy 的日志和计数证明。
+
+### 6.4 盲门与失败处理
+
+每终点有校准 raw、valid raw、stage-cal、first-cal 四数组；六终点合计 24 数组。只有三个 valid 角色形成指标，所以新增 18 套指标/计数。execute 的实际顺序是：全部训练 → blind_gate → before_valid → 一次 development 解析 → collect → finalize。[S4：100–178、294–422、505–513]
+
+parse_once 在解析前记账。独立手写 loader 故意失败时，train/development 各记一次，再次尝试于 loader 前拒绝；test/heldout/owners 也先拒绝。没有打开正式标签文件。正式 execute 拒绝已经存在 run/evaluation/access 的作业；失败写 FAILED_NO_AUTOMATIC_RETRY 并抛出。CLI 只有 execute/finalize，没有正式训练 resume。[A4；S4：476–478、523–546]
+
+只有完整 collected 和指标/计数已经保存后，才允许 finalize 从保存结果恢复统计。仍需钉住的小型参考记录，不能借恢复重新解析标签或加载对照末端模型。
+
+## 7. 63 套对照及 18 套新增评价的实接入
+
+### 7.1 对照对应和同源检查
+
+| 角色 | 小结果根目录（相对 input_snapshot） | 复用 |
+|---|---|---:|
+| 原共同首域＋SEQ | reports/seller_alias_continual/20261001/bge_continual_result/returned/job | 27 套 |
+| ER0.1 | reports/seller_alias_continual/20261003/er_low_result/job | 18 套 tenth_stage2/3 |
+| LOGIT0.25 | reports/seller_alias_continual/20261003/logit_weight_result/job | 18 套 logit_quarter_stage2/3 |
+| 合计 | 21 个 point × 3 角色 | 63 套 |
+
+三组各自五份小记录 execution/manifest/partition/collected/evaluation 的身份与新 policy 相符。原 SEQ、ER0.1、LOGIT0.25 分别按自己 18/31/34 份来源链核对，不能要求旧修改源码与当前后继实现相同。两 continuation 的三起点分别与原 shared 对齐：full_checkpoint 描述符、model_state、Adam288、first_map、首分数回放记录及对应 ER/LOGIT 首缓存。60 群、实际 A/B/C 各 20、22 列与角色顺序也相同。[S2、S3：114–198；A6]
+
+实际打开 63 个 float64(60,22) 矩阵和 63 份计数 JSON。由整数计数独立推导逐群 precision、recall、F1、specificity、balanced accuracy、MCC，共 22,680 个标量，与对应矩阵差为 0；曲线/检索列在三个角色间逐位一致。[A6]
+
+以上核对不等于正式标签级 AP/MAP/Brier 重算，也不能重建每一条真阳性边。该限制在历史与本次报告均保留。
+
+### 7.2 真正运行新增 finalize，而非只检查配置
+
+为检验新增评价接入，将已开放 ER0.1 的 18 套小结果按相同顺序/阶段复制到 logit_tenth 候选槽位，并放入 SYNTHETIC_NOT_LOGIT01_RESULTS 目录。README 和 input mapping 明确它是非研究夹具。预期很明确：候选−ER0.1 的主角色差值应精确为零，而另外两个对手的差值不相同。[A6]
+
+本网页实际运行生产 contract('logit_low')、baseline() 和 finalize()，未替换项目统计函数。结果正确读取 18 套候选夹具和 63 套真复用，保存 126 个复用 matrix/count 载荷，并恰好输出：
+
+1. logit_tenth_minus_tenth；
+2. logit_tenth_minus_logit_quarter；
+3. logit_tenth_minus_seq。
+
+各有原 23 项；没有自动 selection。第一组主角色七端点/22 指标的均值、三顺序值和区间均精确为零。这直接检验了对手、阶段、角色和匹配判定接入，**不构成 LOGIT0.1 的正式效果**。[S6；A6]
+
+### 7.3 独立统计参考
+
+另外的 NumPy 参考没有调用项目 endpoint_fields、summarize_field 或 comparison_checks。按每个顺序的 R(stage, arrival) 显式写出七端点，按实际域整群配对，使用固定 PCG64/20260930 的 5000 次样本频数，手写排序后的线性分位插值。primary 中检索/曲线列取 raw，概率列取 stage-cal，原方向不变。[A6]
+
+| 核对量 | 结果 |
+|---|---:|
+| 四臂×四视图×七端点×22 指标的均值、三顺序及区间 | 14,784 个数值；最大差 4.440892098500626e-16 |
+| 三组夹具比较及两组既有对 SEQ | 5,940 个数值；最大差 2.220446049250313e-16 |
+| 三组夹具判据 | 69 个布尔值逐项一致 |
+| 既有 ER0.1−SEQ | 10/23，原判定保持 |
+| 既有 LOGIT0.25−SEQ | 16/23，原判定保持 |
+
+“四视图”为 raw/stage-cal/first-cal 加计算出的 primary；primary 不是第四套保存结果。上表数值个数不是实验重复次数或独立样本数。数值容差只用于复算，不放宽任何性能门槛。[A6]
+
+## 8. 冻结端点与原 23 项：没有新增成功线
+
+对于任一顺序，R(t,j) 表示阶段 t 在第 j 个到达域的相应群指标；先按每个顺序定义，再对三顺序等权聚合。实际域的同一留出群保持配对。
+
+| 端点 | 原定义 |
+|---|---|
+| O | (R(3,1)+R(3,2))/2 |
+| N | (R(2,2)+R(3,3))/2 |
+| Z | R(3,3) |
+| F_first | R(1,1)−R(3,1) |
+| F | [R(1,1)−R(3,1)+R(2,2)−R(3,2)]/2 |
+| G | [R(2,2)−R(1,2)+R(3,3)−R(2,3)]/2 |
+| final_all | [R(3,1)+R(3,2)+R(3,3)]/3 |
+
+F_first/F/G 中 Brier 和 log_loss 的符号按原定义反转。区间是条件于已训练模型、校准结果和已开发数据的实际域分层整群区间，不包含重新训练、校准重拟合或适应性选择的不确定性。[S6；A6]
+
+每个候选−对手比较的 23 项保持如下：
+
+| 编号 | 判据 |
+|---|---|
+| 1–3 | O MAP 差均值>0；O MAP 条件区间下界>0；O Recall@5 差均值>0 |
+| 4–5 | N MAP、N Recall@5 差均值≥0 |
+| 6–9 | O AP/ROC-AUC 差≥0；O Brier/log_loss 差≤0（primary 对 primary） |
+| 10–11 | O Brier/log_loss 对对手 raw 概率参照的差≤0 |
+| 12–15 | N AP/ROC-AUC 差≥0；N Brier/log_loss 差≤0（primary 对 primary） |
+| 16–17 | N Brier/log_loss 对对手 raw 概率参照的差≤0 |
+| 18–23 | Z MAP/Recall@5/AP/ROC-AUC 差≥0；Z Brier/log_loss 差≤0 |
+
+只有其中明确指定的一项使用区间下界；不能称为 23 个显著性检验。均值保护不保证每域、每顺序或每个阈值分类点都不下降。区间跨零也不能自动宣布非劣效。固定 0.5 工作点及 AP 与梯形 PR-AUC 的区别照原定义保留。[S6：comparison_checks；S8]
+
+历史 ER0.1 对 ER0.25 的 23/23、LOGIT0.25 对 ER0.25 的 23/23，以及 ER0.25 对 SEQ 的 4/23 均保留既有结论；本次新增实际复核了所用 ER0.1/LOGIT0.25 对 SEQ 的 10/23、16/23，没有把旧对比的成功或失败转写为新 LOGIT0.1 结果。[S8；A6]
+
+## 9. 实际执行记录与审查者修订
+
+### 9.1 本轮执行分类
+
+| 执行 | 实际做了什么 | 结果/日志 |
+|---|---|---|
+| 附件/清单检查 | 读取原 ZIP、413 成员、两清单，逐字节/大小/SHA 比较 | 退出 0；evidence/inventory.* |
+| 增量逆向检查 | 反向应用七文件 diff，恢复冻结旧源码，比较关键函数文本 | 退出 0；evidence/delta_attempt01.* |
+| 梯度参考 v1 | NumPy/AST 六参数夹具 | 退出 1；agents/gradient/run01 |
+| 梯度参考 v2 | 修正 target 观测 | 退出 0；agents/gradient/run02 |
+| 梯度参考 v3 | 校正模拟 head decay，最终采用版本 | 退出 0；agents/gradient/run03 |
+| 流程参考 | 真实 Supply/Memory/parse_once/CLI；update 明确为 spy | 退出 0；agents/flow/runs/012_control_flow_reference |
+| 两包装语法 | 两次 bash -n | 均退出 0；flow/runs/013、014 |
+| 原生证据参考 | 标准库读取记录、独立标量和敏感性复算 | 退出 0；agents/native/run_01 |
+| 评价参考 | 生产 finalize＋独立统计，18 夹具＋63 真复用 | 退出 0；agents/reference/runs/attempt_01 |
+
+表中不同类型不能相加为“通过多少原生科研测试”。本次没有运行原 31 个 PyTorch 测试；该 31 项和 4 次原生更新是附件中被审查的实际项目记录。
+
+### 9.2 失败与修订原样保留
+
+| 记录 | 原因与处置 | 分类 |
+|---|---|---|
+| 梯度 v1，退出 1 | 目标观测按 ndarray 类型计数，而手写 labels 也为 ndarray，误认三个 target；v2 改成对象身份比较 | 审查参考自身缺陷，已修正 |
+| 梯度 v2，退出 0 后继续校对 | 模拟两组 weight_decay 都设 0.01；实际配置 encoder=0.01/head=0；v3 同时校正模拟和独立手算 | 审查参考一致性问题，已修正；原成功日志保留 |
+| flow/runs/005，退出 2 | rg 查询两个不存在的探索路径，原 stderr 保留；后续改为实际路径读取 | 审查者路径查询错误，不是项目失败 |
+
+所有 v1/v2/v3 源码、原始 stdout/stderr/退出码、实际输入及两份修订说明保留，没有改写为最终成功版本。四个故意破坏 objective 的变体属于预期错误注入，不计为项目缺陷或需要修复的运行失败。
+
+审查初始下载副本检查及部分静态读取仅保留在会话工具记录；不声称每一条探索读取均有单独日志。核心可复核程序的精确 argv、原输出和退出码均在证据包内。分项清单可能只覆盖其生成时的子目录，最终以根 MANIFEST.json 为完整载荷清单。
+
+## 10. 分类、未验证范围与后续处置
+
+| 类别 | 最终结论 |
+|---|---|
+| SCIENTIFIC_BLOCKER | 未确认本轮存在具体阻断项。干预、实际目标、参数传递、对照来源和评价接入相符。 |
+| REPRODUCIBILITY_DEFECT（被审项目） | 未确认必须修复才能继续的未关闭项。没有为“找新问题”把排序、文件名或明确限制伪装为缺陷。 |
+| 审查参考自身问题 | target 计数失败、模拟 decay 校对、探索路径错误均透明留档并处置；最终采用 v3。 |
+| 未验证范围 | 本网页 PyTorch/BGE/CUDA/BF16；原生全梯度张量；正式模型/Adam/RNG/cache 载荷；本轮真正的首域恢复和六正式终点；尚未发生的 LOGIT0.1 训练/效果；后台型号认证。 |
+| 原有后续动作 | 主执行者独立主审后按已授权入口一次执行；按原纪律保留六终点、访问账、18 新/63 旧结果并进行结果审查；好坏均收尾。 |
+| OUT_OF_SCOPE_OVERDESIGN | 新增 λ/MSE/seed/候选/成功线；打开 test/owners/私有资产；为本轮重跑全部历史或原生 288 步；通用恢复/教师/审计框架；额外认证/审批体系。均不作为本轮通过条件。 |
+
+该单点是已知输出保持思想在固定任务中的开发比较，不据此主张新方法、最优权重或真实市场泛化。即使将来主比较通过，也必须分别报告另外两组的全部保护项，不能省略有效负结果。[S1、S8]
+
+## 11. 来源与独立证据索引
+
+所有 S 路径相对证据包内 input_snapshot/；所有 A 路径相对证据包根目录。完整输入原 ZIP 同时保存在 received_input/review.zip；413 个解包成员逐字节保留，便于阅读而不改变原件。
+
+| 标识 | 路径/内容 |
+|---|---|
+| S1 | reports/documentation/20261003/logit_low/request.zh.md；docs/SELLER_ALIAS_LOGIT_LOW.zh.md；同目录 decision.json |
+| S2 | schema/step28_logit_low_policy.json；reports/documentation/20261003/logit_low/source_inventory.json、review_inventory.json、implementation.diff |
+| S3 | scripts/step28_er_weight.py；scripts/step28_er_weight_check.py |
+| S4 | scripts/step28_er_weight_run.py；scripts/step28_bge_continual_run.py；两个 run_step28_er_*linux_20261001.sh |
+| S5 | scripts/step28_chinese_base.py；step28_alias_ranking.py；step28_bge_continual.py；step28_continual_population.py；相应 schema 及 tests |
+| S6 | scripts/step28_er_weight_evaluate.py；scripts/step28_bge_continual_evaluate.py；三个对照结果目录中的 execution/run/evaluation |
+| S7 | reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/ 下 deployment、cpu_execution、cpu_inventory、cpu 全部原件 |
+| S8 | docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md、SELLER_ALIAS_ER_LOW.zh.md、SELLER_ALIAS_BGE_CONTINUAL.zh.md；20261002/logit_weight、er_low 的直接外审/主审；20261003/result_review 的直接外审/主审 |
+| S9 | reports/documentation/20261003/logit_low/model_selection.png |
+| A1 | scripts/check_received_inventory.py；evidence/attachment_identity.json、received_members.json、inventory_check.json、inventory.command.json、inventory.stdout.log、inventory.stderr.log、inventory.exit_code.txt |
+| A2 | scripts/check_incremental_delta.py；evidence/delta_attempt01/result.json 及 recovered sources；evidence/delta_attempt01.command.json、stdout.log、stderr.log、exit_code.txt |
+| A3 | agents/gradient/REPORT.zh.md、gradient_reference_v1/v2/v3.py、run01/run02/run03、results01/results02/results03、revision_01/02.zh.md |
+| A4 | agents/flow/FLOW_REVIEW.zh.md、flow_reference.py、control_flow_artifacts、runs 各实际命令/输出/退出码 |
+| A5 | agents/native/REPORT.zh.md、verify_native_evidence.py、run_verify.py、run_01/command.json、stdout.log、stderr.log、exit_status.txt、result.json |
+| A6 | agents/reference/REPORT.zh.md、reference_audit.py、run_logged.py、runs/attempt_01 中实际脚本快照、原流及 output 结果/输入映射 |
+
+## 12. 复核入口与交付说明
+
+证据包包含原始输入、当前与逆向恢复的必要源码、完整分项报告、手写输入、所有核心实际命令及原 stdout/stderr/退出码、失败版本/修订、明确非研究的评价夹具、机器可读结果及总清单。没有放入任何新取得的正式文本/标签/模型、私有资产或凭据。
+
+核心程序均允许显式指定源码根目录，解包后使用现有 Python/NumPy 即可复放；本次没有安装任何依赖。以下是便于复放的相对路径写法，不替代各 command.json 中真实发生的绝对路径命令：
+
+    python scripts/check_received_inventory.py --archive received_input/review.zip --root input_snapshot --result new_inventory.json
+    python scripts/check_incremental_delta.py --root input_snapshot --out new_delta
+    python agents/gradient/gradient_reference_v3.py --source input_snapshot --out new_gradient
+    python agents/flow/flow_reference.py --source-root input_snapshot --out new_flow
+    python agents/native/run_verify.py --source-root input_snapshot --run-dir new_native
+    python agents/reference/reference_audit.py --input-root input_snapshot --output-root new_reference
+
+实际失败目录不能覆写；建议使用上述新目录名保留原证据。这些命令说明可复核性，不是在要求用户替本次审查执行工作。本轮的核心实际运行已经完成，结果见各原件。
+
+最终证据包的每一项载荷大小和 SHA-256 由根 MANIFEST.json 提供（清单不自哈希）；FILE_LIST.txt 提供便读索引。HTML 与本文内容一致，完整裁决及其限制以上述材料为准。
