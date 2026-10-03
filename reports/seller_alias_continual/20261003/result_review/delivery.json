@@ -1,20 +1,35 @@
 {
-  "recorded_at": "2026-10-03T13:08:05.2856566+08:00",
+  "recorded_at": "2026-10-03T13:27:02.1414039+08:00",
   "scientific_status": "COMPLETE_EXTERNAL_AND_PRIMARY_ACCEPT_LIMITED_DEVELOPMENT_CONCLUSIONS",
   "primary_disposition": "report.zh.md",
   "linux_sync": {
-    "status": "BLOCKED_BY_AUTOMATIC_APPROVAL_PENDING_SPECIFIC_USER_AUTHORIZATION",
+    "status": "COMPLETE_VERIFIED",
     "root": "/home/yongpeng/cross-lingual",
     "transport": "SFTP; external original ZIP extracted without executing contents",
     "rejected_action": "SFTP put result_review_evidence.zip (10216713 bytes) to /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/result_review/result_review_evidence.zip",
     "rejection_reason": "Automatic approval did not treat prior result/input-package permissions as specific authorization for the new external evidence bundle to this Linux destination; no transfer executed and no workaround attempted.",
-    "inventory": "sync_inventory.json"
+    "inventory": "sync_inventory.json",
+    "verified_at": "2026-10-03T13:25:12.289365+08:00",
+    "receipt": "sync.json",
+    "total_files_verified": 235,
+    "total_bytes_verified": 29105884,
+    "mismatches": [],
+    "receipt_return_identity": {
+      "bytes": 1005,
+      "sha256": "23a184c98b6f868f9530d9dac596bd9503025cfeeee34e08240a64fd7052ed72",
+      "local_matches_independent_remote": true
+    }
   },
   "git": {
-    "status": "PENDING",
+    "status": "SCIENCE_COMMIT_PUSHED_AND_INDEPENDENTLY_VERIFIED",
     "branch": "method/step27-english-pretrained-synthetic-adaptation",
     "origin": "https://github.com/bililateral/cross-lingual-DIL.git",
-    "previous_independently_verified_remote": "9fe49c688b0f15aa3f118a6eecc1c9baeb4ad171"
+    "previous_independently_verified_remote": "9fe49c688b0f15aa3f118a6eecc1c9baeb4ad171",
+    "scientific_commit": "fe71857cd6350f134cb34d34d300535cad957ec5",
+    "remote_ref": "refs/heads/method/step27-english-pretrained-synthetic-adaptation",
+    "independently_queried_remote": "fe71857cd6350f134cb34d34d300535cad957ec5",
+    "verified_at": "2026-10-03T13:27:02.1414039+08:00",
+    "verification": "Separate git ls-remote after ordinary push, using configured SOCKS proxy and schannel; exit 0 and exact commit match"
   },
   "boundaries": [
     "No new scientific scripts or tests run; existing native and saved-result evidence reused",
@@ -28,5 +43,26 @@
     "broken_links": 0,
     "git_diff_whitespace_check": "passed; CRLF allowed for original records",
     "formal_research_tests_rerun": 0
-  }
+  },
+  "authorization": {
+    "recorded_at": "2026-10-03T13:19:23.5521282+08:00",
+    "source": "Direct human reply to the concrete delivery question in this thread",
+    "answer": "允许Linux同步及公开推送（推荐）",
+    "authorized_stage_commit": "fe71857cd6350f134cb34d34d300535cad957ec5",
+    "stage_files": 236,
+    "includes_necessary_delivery_receipts": true,
+    "linux_destination": "yongpeng@10.201.109.111:/home/yongpeng/cross-lingual",
+    "public_destination": "https://github.com/bililateral/cross-lingual-DIL",
+    "branch": "method/step27-english-pretrained-synthetic-adaptation",
+    "external_archive": {
+      "file": "result_review_evidence.zip",
+      "bytes": 10216713,
+      "members": 223,
+      "sha256": "ef02ee822ab5a04624def2a3ddd39ffd07bac14042bdc942020ed71b6df30283"
+    },
+    "scope": "Original external report/evidence, independent sources/logs, primary disposition, result and handoff updates; no formal text/labels, cache bodies, credentials or weights",
+    "public_readability_disclosed": true,
+    "prior_auto_rejection_resolved_by_explicit_user_authorization": true
+  },
+  "receipt_delivery": "This necessary authorization/sync receipt and sync.json follow the scientific commit in one receipt commit; its own remote ref and final receipt hash are independently checked in the task response to avoid recursive receipt commits."
 }
