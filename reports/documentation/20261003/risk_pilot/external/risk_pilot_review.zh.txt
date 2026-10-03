@@ -1,0 +1,184 @@
+群体风险分布保持重放：固定开发点正式接入增量外审
+审查日期：2026-10-03（Asia/Shanghai）
+输入：review(4).zip，即本轮所称review.zip；1,575,125字节，83成员。
+SHA-256：654265a64f8a12b0450ad3003d0df1d986f6b88e22921a8ee2cf8be14800f623
+
+## 1. 明确裁决：一个监听文件作最小修正后，可以按既定合同启动
+
+当前送审原件不应原样签发“全部接入通过并启动一次性监听”。需要先修正run_step28_risk_linux_20261003.sh的两项已证实自删/回执缺陷：已有实际更新事件但子进程在下一轮轮询前退出时漏自删；rm失败仍写成功回执。本报告已给出未应用的最小补丁及完整修正版，并在隔离命令桩中验证四种情形。两项均为当前REPRODUCIBILITY_DEFECT，涉及用户明确要求的监听行为；不是算法科学阻断，也不要求改变科学配置。
+
+风险更新、共同首域恢复、ER六群转风险参考、阶段二/三存活参考、缓存元数据预算、盲门与校准、四比较、延后绑定LOGIT0.1及保存矩阵finalize，在本轮已核范围通过。未发现新增的已证实科学计算阻断或必须改动这些生产Python计算文件的错误。
+
+合入本报告这一个监听文件的精确最小修正，由主审核对实际隔离workspace的最终32项科学来源、既有最终CPU回执及修正监听的SHA，并满足合同已有授权和资源门后，可以启动用户已授权的唯一开发点：risk λ=.1、γ=.5，s0、ABC/BCA/CAB、后两阶段共1728更新。不是要求用户再次选择方案、追加授权或重新跑完整BGE核验。此次未部署补丁、未创建真实正式授权、未启动监听或训练，实际服务器当前资源和文件存在性仍由既有启动检查承担。
+
+保留三项范围裁决：算法合理性仍是有条件的缓存经验风险正则；创新不足的前轮结论不变；本轮没有正式效果结果。代理风险改善不保证MAP/FPR或未见身份能力，接入通过也不等于效果、创新或论文贡献通过。
+
+模型身份：会话配置标签为GPT-6 Astra Pro，没有独立可认证的后台模型/路由ID，不能认证为用户指定的网页GPT 6 Pro。配置、自述与后台认证分开。没有连接用户Linux服务器，没有读取正式文本/标签/缓存/权重、test、owners或凭据，没有启动GPU。本方实际运行是手写CPU、保存矩阵和隔离控制流核验。
+
+## 2. 附件身份、审读顺序与前轮复用
+
+已真实打开原ZIP，核对字节数、83成员、SHA、CRC、无重复路径及无越界/符号链接路径。review_inventory列出的82项载荷逐文件大小和SHA全部一致。原输入ZIP及解压成员未修改；所有变异和修正只在独立审查目录。
+
+先读risk_pilot/request.zh.md、implementation.zh.md，再完整读SELLER_ALIAS_RISK_PILOT.zh.md、step28_risk_policy.json和decision，随后依七项重点读正式runner、适配模块、共享对照/评价代码、风险观测增量、两类风险测试、CPU核验入口、监听及直接证据。RESEARCH_DISCIPLINE及直接父合同用于核对权限与复用语义，未递归重审全部项目历史。
+
+前轮嵌入报告40,500字节、证据ZIP 1,164,053字节，与本会话此前交付逐字节相同。当前query_risks、validate_reference、make_reference、distribution_penalty、RiskMemory及旧train_stage的AST与前轮相同；五个基础计算依赖逐字节相同。本轮新增update的observe和正式运行装配，故复用前轮独立数学/导数/反例结论，未再检索一遍文献、未重跑原八项历史变异或BGE。
+
+输入摘要和清单证明审查对象与复用对象一致；算法与接入判断另外来自源码分析和实际独立计算，不能从摘要相等推出正确性。
+
+## 3. 固定合同与研究目标没有被接入重定义
+
+冻结目标仍为L_current + 0.1 L_history_base + 0.5 mean(D_rank,D_positive,D_negative)，历史base包含BCE、query-rank和0.5倍known-top5 hard。保持系数不再乘历史系数。按m分层、各通道分别排序、只罚风险上升及来源参考冻结保持原样。
+
+三个顺序各从共同首域完整model/Adam/RNG及首校准映射续训，阶段2/3各288更新，合计1728新更新、3456群梯度呈现、6终点。每终点保存calibration、development raw、stage-cal、first-cal共4个分数数组，合计24数组；正式valid标签开放后生成6点×3角色=18套指标矩阵/计数。每套矩阵为60×22。三个顺序不是三个训练种子。
+
+四个比较固定为risk−LOGIT0.1、risk−ER0.1、risk−SEQ、risk−LOGIT0.25。policy的机器primary为risk_minus_logit_tenth；ER0.1是匹配历史监督强度的另一个主要比较，SEQ与LOGIT0.25完整补充。只输出各比较判断，无自动模型替换、无selection、无新参数搜索。相同γ不意味着与LOGIT强度相同。
+
+新合同采用O MAP正向证据及继承23项观察保护判读，不把对ER通过代替对LOGIT通过；O改善而N/Z损失应称取舍。既有低误报自动判定门未被重新包装成候选检索合格线，候选规模及人工复核预算未被本审查另定。valid已经用于开发，不能称独立确认；单点好坏均不自动终结整个方法族或证明创新。[S1][S2]
+
+## 4. 七项重点的实际审查结果
+
+### 4.1 风险梯度及原两项证据盲点：通过
+
+正式runner的step28_er_weight_run.py:61–89先memory.draw，再在67–72行真实调用risk.update，传history_weight=p.arms[arm]=.1、retention_weight=p.loss.risk_retention=.5、对应UID参考和两条固定dropout seed。risk_replay.py:179–194把保持项加入历史objective后backward，207–210统一clip后一次AdamW step；不是只保存正的retention日志。
+
+旧生命周期回归现在给同阶段48群不同手写文本，并用独立scalar_risks按UID重算、按层排序核对参考；以λ=.23、γ=.71逐调用检查权重和历史reference。另有正式runner测试以冻结.1/.5跑真实288步。独立再执行修补生命周期原用例得到PASS；将stage γ置0、将新参考score行倒序两个单缺陷副本分别运行，均为1个预期断言失败、0个运行错误。前轮R1/R2已针对性关闭，未用“多了组件/测试数量”代替检出证据。[S3][S4][E1]
+
+本方还在共享正式runner的1/29/30/288步用复用的独立标量logit导数、参数梯度与NumPy AdamW公式对照实际更新；288次逐次检查UID、参考、权重及seed。实际风险权重、通道平均和参考进入参数更新的链路获得增量支持，数值见第6节。
+
+### 4.2 共同首域、六群参考及阶段二/三：通过
+
+train():215–220先验证原共同首域完整checkpoint及ER after1缓存载荷身份，221行才消费本轮train解析。239行restore_branch恢复原model/Adam/RNG；240–243行对全部60群首域盲分数完整重放并恢复RNG。244–250行检查缓存模式、order、seen=48、draw_stage/count、首映射和成员与原ER一致。
+
+253–254行进入Memory.from_er。该适配只对原ER六个最终存活群评分并生成stage=1 eval参考，不将首域48群重新交给学习器。原Algorithm R和draw状态沿用；from_er不会用model分数改变保留选择。本方实际捕捉评分入参恰为六个存活UID，按独立标量风险逐UID核对；参数、Adam和RNG不变。[S3:215–261][S5:35–47]
+
+关键的auxiliary setter在risk_execution.py:23–24，将新的checkpoint辅助字段与原risk_replay合并，避免runner:269行赋值时擦掉风险参考。风险参考、原始缓存、随机状态和新辅助字段都经过同一to_bytes预算检查。本方实际替换metadata、序列化与恢复，参考保持，阶段二后的完整手写缓存为95,422字节，低于1MiB；这是Tiny夹具字节数，不能充作正式缓存将来精确字节数。
+
+阶段二checkpoint先保存/恢复实际模型并完成当前校准，随后runner:279–292由该路径模型为新存活群生成参考。旧存活参考不刷新；阶段三直接延续同一存活memory。RiskMemory.draw:140–145按UID取目标并拒绝当前/未来来源阶段；不存在重新读取淘汰历史给stage3学习器的路径。
+
+独立实际阶段结束为4旧2新参考，新参考仅来自两个新存活群；恢复后stage3的下一次实际Tiny更新一致。另直接调用verify_references，对真实保存payload的stage2、stage3两分支检查通过；同步重写payload和摘要后改变旧参考，两个分支均明确以Old risk reference refreshed拒绝，摘要与payload错配也拒绝。stage3这里是参考分支和下一更新检查，不冒称已执行完整第三阶段288步或六个原生终点。[E1]
+
+### 4.3 六终点完整盲门、恢复与校准：通过代码路径和分层手写证据
+
+blind_gate:313–450在valid标签开放之前检查完整来源/policy、1728/3456计数、六个points/training、三个阶段二缓存、三个恢复起点；逐点核对来源阶段、288步表、真实更新观察、阶段LR、λ/γ及三通道平均、基础目标和总目标分解、风险参考及1MiB预算。
+
+checkpoint:114–192实际保存完整model/Adam/metadata并恢复，重算12群当前校准和60群盲valid的全部分数；另验证推理权重恢复。校准仅用当前12群，映射含确切group IDs、4536对/240正对、模型摘要及分数来源。raw、stage-cal、first-cal变换完整保存并复核；恢复阶段前后RNG。不是只有“restore_verified=true”这个字段。
+
+execute:536–542顺序是train全部完成→blind_gate全部通过→before_valid记录→parse_once(development)→collect全部18套。parse_once先记账再解析；后续失败不归零，入口拒绝复用已有run/evaluation/access作业目录。collect完成全部指标矩阵及计数之后才写ALL_18状态，再进入比较，没有中途看指标选轮。[S3][S6]
+
+必须保留证据层级：附件盲门用例是文件身份夹具，明确mock了verify_references；它不证明六个原生终点已完成。本次补上真实Tiny缓存对verify_references的直接核验，并用手写60群分数/标签实际跑collect/group_metrics/read_points。完整BGE六终点仍只能由未来正式执行的同一盲门核对，不能拿本轮PASS冒充其结果。
+
+### 4.4 延后绑定LOGIT0.1与保存矩阵finalize：已实际通过
+
+risk_study.py:51–76固定预选job、execution字节身份和policy，先要求该job的completion状态为COMPLETE_LOGIT_WEIGHT_DEVELOPMENT_COMPARISON，再固定五份小结果身份。已有binding改变即拒绝。LOGIT0.1沿原逻辑使用LOGIT_WEIGHT标签是正确的，不应误改成新标签。
+
+evaluate.py:124–129明确执行p=resolve_comparator(p,root)，把解析后局部p传给baseline。不存在p未接回而丢失logit_tenth对照的问题。baseline:182–214核对policy、1728/3456、六端点、来源一致性、环境、分区/UID、共同首模型、首映射及对应ER/LOGIT缓存来源；语义核验不仅是文件哈希。
+
+独立用完整手写小文件实际调用未改的resolve_comparator→baseline→read_points→finalize→5000次bootstrap→write_once：缺completion时拒绝，18套候选矩阵字节不变；补齐后输出COMPLETE_RISK_REPLAY_DEVELOPMENT_COMPARISON，18新+81复用，四比较O MAP差依次为.04/.07/.08/.06。再次finalize有204个输出文件逐字节相同。此为手写算术标记，不是正式方法收益。
+
+错完成态、改动预绑定execution、绑定后更换结果、错policy、缺端点、错共享模型、错缓存来源、错UID顺序和source列表不一致均实检拒绝。语义错误探针重算了手写文件身份后仍拒绝，不是只依赖旧hash失败。训练、模型加载和标签解析入口均设置调用即报错，实际调用0；夹具没有原生权重或真实缓存。[E2]
+
+LOGIT0.25仅读五类固定小JSON、矩阵与聚合计数；比较JSON中的原checkpoint身份不等于打开其payload。新训练加载的是原共同首域checkpoint和ER首缓存，不依赖已删除的LOGIT0.25六个末端权重。
+
+若对照尚未完成，execute:544失败后555–557保留failure和已消费访问；CLI finalize:575–578能只用完整保存矩阵继续，不重训不重读。它不会补写job/completion.json，原failure也不改。本次实际确认统计结果能完整生成，故不以此阻断启动；收尾应明确记载“此前因对照待完成暂停统计，现从保存矩阵完成”，可另存小型finalization回执，不删除原失败、不伪称原execute退出0。
+
+### 4.5 诊断与随机流：通过所核不变性，观察范围有限
+
+mode_probe在每个新阶段取存活缓存第一个群，重新取得同一未更新模型的eval参考，eval自比较为0；用四个预定seed记录train相对该eval参考的保持量，并保存eval相对来源参考及各层参考标准差。它不调用memory.draw，不使用新标签，不优化，不依诊断调γ。finally恢复Torch CPU/可见CUDA RNG及模型模式；该探针未消耗Python/NumPy RNG，其状态不变另由独立检查确认。
+
+本方在模型原为train/eval两种模式下实际核对，另在改变train seed后注入异常；三种路径均保持RNG、模型、Adam、既有grad、缓存及模式原样。observe=False/True的首次真实更新和下一更新逐字节一致。头分量诊断用同一历史计算图的autograd.grad(..., retain_graph=True)，没有额外forward，也不向参数.grad累计这些观测值。[S4:187–218][S5:51–81][E1]
+
+第一更新记录的是隐藏头权重的加权历史监督及三个保持通道梯度范数，不是全编码器梯度，也不测梯度夹角或冲突。1/29/30/288记录模块合成梯度非零和实际参数变化；末步encoder LR=0时预期encoder参数不变。这些证据不能变成噪声大小已证明、γ强度公平已证明或全BGE逐参数独立认证。
+
+### 4.6 来源与CPU证据：最终链可满足，有少量非阻断材料缺口
+
+deploy.zip有48成员，与deploy_inventory完全一致；cpu_attempt1的33项科学来源与它完全一致。最终外层risk_study.py已去掉监听源登记，为4037字节、SHA 1aa0a436aaf41d5db84d9ac401619b16e28a1f6a229e1ee2209b1c88b4271012。最终CPU audit绑定32项科学来源，全部与外层实际文件相同。已实际调用当前sources和verify_audit，通过；旧deploy配最终audit则正确拒绝。
+
+这一个差异有明确的先后说明和回执：首次部署后发现自删监听不应列入全程必须存在的科学来源，随后去掉登记、重跑同十项手写用例并重绑，未改计算文件、未新增native更新。因此旧deploy是应保留的首次部署原件，不能直接判当前最终代码无法通过来源门；但应标清“历史初次部署”，正式落地使用外层最终32项来源，不要混用。
+
+原生探针首次新跑3次（warm及两个配对分支）；Adam计数1→288和参考风险减半是明示人工激活夹具，不是真实完成首阶段。最终native与该次结果逐字节相同，重绑新native更新为0。去掉新增观察字段后，新native所有已有数值和探针参数摘要与前轮一致。该事实支持观测未改变此原生CPU探针，不冒称本网页又加载了BGE。
+
+所附Linux记录为Python3.10.19、Torch2.9.1+cu130、CPU46、CUDA禁用。程序337.654秒、壁钟5:39.82、最大RSS约13.73GiB，证据合计52,853字节，观察值在合同范围。不能由观察未超限宣称所有异常情形均有额外内存/输出硬限制。
+
+两份日志都是相同十个用例，不计二十种测试。rebinding失败发生在十项测试全部通过以后，原因是相对路径与绝对ROOT混用；失败stderr/exit1及binding_fixed成功原件保留。独立执行实际record函数已复现路径失败及正确绝对路径的修正，不归算法失败。
+
+低级别材料缺口：说明写“8项载荷”，实际原清单10项；被引用的原运输压缩包本体未附，只能核展开成员；原重绑stdin源码及变异执行器精确argv未附。应纠正计数并补存原命令，不能声称这些历史命令完全可重放。它们不推翻当前32来源门、真实Tiny更新或本次独立变异证据，也不要求重跑BGE。[E4]
+
+### 4.7 一次性监听：两项当前修复，其他主链通过
+
+当前监听32–41行先读CPU和review回执，43–61行才等资源；正式execute:485–506又检查真实当前sources、policy、job、runtime、supervision、review标识和native文件，随后510行才检查GPU、536行才训练。根审查者另用四个手写启动门案例实际核对：review=false与错来源在CPU/GPU前拒绝；错CPU回执在GPU前拒绝；前提正确但GPU不可用在train/parse/access创建前拒绝。没有构造真实正式授权，所有授权形状JSON仅在明确标注的手写夹具目录。[E5]
+
+同workspace的listener和job都用不带-p的mkdir排他，不删除现场后重跑；只启动一次child，没有失败自动重启。24步事件在真实risk.update返回、Adam计数核对后输出。新job与新train.log避免引用旧事件；日志只作为触发信号，参数更新是否真实另有独立核验。
+
+GPU门24640MiB=24GiB+64MiB上下文余量，主存16777216KiB=16GiB，磁盘17179869184字节=16GiB，指定CPU两秒计数差空闲≥90%。timeout12h和Budget均在等待后才开始，不把等待计入训练预算。当前32项科学来源不含监听，实际在隔离副本删监听前后调用sources完全相同，故自删不破坏训练结束的来源重查；监听启动时独立记录自己的SHA。
+
+两项缺陷及修复见第5节。这不是要求新的全局队列、跨服务器锁、自动重试或通用系统加固。真实服务器是否已有其他作业、原共享状态及小结果是否仍在，由主执行者执行合同原有的启动前核对；本网页没有远端现状证据。
+
+## 5. 当前必须修的监听缺陷及最小补丁
+
+R-L1 / REPRODUCIBILITY_DEFECT / 运行接入修复。
+定位：scripts/run_step28_risk_linux_20261003.sh:75–83。
+while先检查kill -0，子进程已结束时直接离开循环，84–89行没有再检查落盘的updates。因此“写出24步事件→故障退出→下一次轮询”可留下监听文件。隔离生产语义案例中，已有手写24步事件、子进程状态为已退出，原片段返回0但文件存在，独立语义检查退出1，AssertionError明确报告漏自删。
+
+R-L2 / REPRODUCIBILITY_DEFECT / 运行回执修复。
+定位：同文件67行set +e、78–79行及84–89行。
+rm失败仍无条件写script_deleted_after_updates.txt，最终还可能沿训练状态退出0。隔离案例令rm返回1，文件仍在却生成成功回执；独立语义检查退出1。没有伪装真实服务器删除失败或真实训练失败。
+
+最小修正只改该文件：循环负责等待updates出现或child结束；离开循环后统一查看已落盘日志。存在updates才尝试删除，只有rm成功才写已删回执；失败单独保存删除失败码。保持真实训练退出码，训练成功但清理失败时监听返回非零；不重启训练，不自动重试删除，不改资源、预算和科学参数。
+
+证据包listener_review/proposed_listener.sh及listener_minimal_fix.patch是完整建议稿；deliverables/run_step28_risk_linux_20261003.sh为同一修正版的便于交付副本，未部署。四例均通过：正常更新自删、更新后退出仍自删、rm失败不冒成功、无更新退出不删。完整修正版bash -n退出0。
+
+原脚本语义对照有两项失败，修正版四项通过。主套件exit0表示正确捕获原缺陷并验证修正，不表示原监听全项通过。补丁无需改最终32科学来源和原生计算证据；应保留修正监听SHA及局部验证记录，由主审核对实际落地同一文件后按既定授权启动。[E6]
+
+## 6. 本网页实际执行结果、失败版本与数值边界
+
+本方环境复用前轮已有Python3.12.14、NumPy2.3.5、Torch2.7.1+cpu；禁CUDA、Torch单线程，没有下载新模型。这与所附Linux py310原生证据分开。所有输入为手写文本、手写分数/标签、文件身份夹具或控制流桩。
+
+本方Tiny夹具先做一次真实warm更新，再显式将Adam计数1→288；没有实际完成首阶段288步。配对observe检查将三通道参考乘[.76,.67,.55]以激活保持梯度；共享runner的288步使用未缩放的eval参考。独立Tiny配置clip_norm=.08是为触发并核对裁剪的手写夹具，不是修改正式冻结配置。这些操作不算正式阶段成果。
+
+增量Tiny检查：六存活群转换参考最大独立误差3.473259782e-7；转换后含新metadata的缓存95,256字节。mode_probe成功/异常状态恢复及observe开关首次和下一更新完全一致。共享正式runner真实288步使用λ=.1、γ=.5，最终Adam576；1/29/30/288全部独立梯度/裁剪/AdamW对照通过，最大梯度误差7.450580597e-8、参数误差2.712995064e-7，Adam一二阶矩同时检查；末步encoder不变、head更新。阶段二后95,422字节，4旧2新参考，下一阶段恢复更新一致。
+
+独立参考v1先通过转换、模式和observe检查，在step30的参数绝对差门失败，退出1，源码/输入/stdout/stderr/退出码完整保留。该分量实际-3.11403226852417，float64参考-3.1140325398236763，相差2.713e-7，即当地float32间距的约1.138倍；与最近float32参考差一个ULP。这是本方把float64手算与float32多次舍入比较时沿用固定2e-7绝对界过严，不是生产权重或更新公式错误。
+
+v2仅把参数比较改为预先记录的atol=2e-7 + rtol=2×float32 epsilon，独立数学、clip前梯度和Adam矩检查不变；先保存四个观测步的全部原始预期/实际数组再断言。阶段复跑退出0。v1失败和v2修正均未覆盖；未因这次误差再跑全部历史公式/八变异或BGE。重复执行属于核验修正，不冒充额外科学实验。
+
+评价独立检查：非均匀手写标记矩阵覆盖5方法、4视图（含primary）、7终点及四比较，用独立域索引、域内频数bootstrap与线性分位插值复核23,232个标量，最大差1.665334537e-16。实际collect/read_points生成18套60×22矩阵和计数；保存矩阵统计产出18新+81复用、8910条阶段表数据行。该分工的finalize算术管道显式mock来源绑定，真实绑定另由第4.4节独立完整文件夹具覆盖，不能把两种证据层级混淆。
+
+启动门四例、来源两个标准库程序、修补生命周期与两原盲点变异、监听原缺陷与局部修正均有各自完整源码、输入、命令、stdout/stderr和退出码。预期拒绝不伪称正常算法失败；空stderr按实际保留。没有正式六终点的新分数、指标或收益，未使用日志/测试数/哈希代替实际计算。
+
+## 7. 分类、最小处置和不应扩展的工作
+
+SCIENTIFIC_BLOCKER：本轮增量没有新增已证实科学阻断。前轮已否定的强保证仍不成立；未见卖家效果和方法创新仍未建立，不因本轮接入通过而上调。
+
+REPRODUCIBILITY_DEFECT，当前必须修：R-L1与R-L2，均在同一个监听文件。合入已核局部补丁即可；不要因此改风险损失、缓存选择、参数、数据、对照、种子或预算。
+
+已关闭：原阶段非默认系数透传/参考逐draw验证盲点、同文本参考行错配盲点；自删监听被登记科学来源的问题已在最终外层版本关闭；重绑定相对路径失败已有修正；本方数值精度门已按float32误差尺度修正并保存原件。
+
+当前非阻断收尾/材料建议：缺对照后manual finalize应另记完成统计回执，保留首次failure；标明deploy.zip是首次部署原件、正式用最终32来源；纠正8/10载荷表述并补存原重绑定及变异执行命令。它们不要求重新训练或读取正式标签。
+
+后续机制研究建议仅沿用前轮：缓存拟合与旧未见能力分别看，公平报告N/Z，正确理解模式偏差和通道尺度；本轮只记录预定诊断，不新增消融或调γ，不事后改成功线。正式结果形成后再按四组比较和完整保护判断实际收益或取舍。
+
+OUT_OF_SCOPE_OVERDESIGN：此次重开正式数据或test/owners，扩缓存，重跑全部历史/BGE，增加方法/分位网络/联合OT，建立通用恢复器或全局监听平台，均不是关闭这两个局部缺陷的必要条件。
+
+## 8. 实际启动前的既定条件与交付阅读路径
+
+科学Python路径通过增量外审；所附原监听需上述修正。实际启动应使用已核修正版监听、最终外层32项科学来源及最终CPU audit，由主审形成来源绑定授权，再让既有资源门决定启动时机。对照LOGIT0.1未完成不阻止训练；它只阻止最终比较，完整候选矩阵保存后可稍后运行finalize。
+
+独立统计恢复命令的out指向job/evaluation，而非job根；例如在实际隔离workspace中使用原入口：python scripts/step28_er_weight_run.py finalize --study risk --out reports/job/evaluation。它只使用已保存矩阵；这里给出的是经检查的既有恢复入口，不是在本网页执行正式收尾，也不授权提前查看不完整指标。
+
+机器总裁决：risk_pilot_verdict.json。完整证据包包含原review(4).zip及83原成员、最终报告、机器裁决、各分工独立源码/输入/输出/退出码、数值失败版本、原监听失败语义案例、修正版与补丁。README区分实际程序退出与预期语义拒绝，列出复跑入口。所有新结果来自明确手写夹具，不能混入正式研究结果。
+
+附录：原源码与独立证据定位（相对本证据包risk_pilot_audit）
+
+[S1] input/reports/documentation/20261003/risk_pilot/{request.zh.md,implementation.zh.md,decision.json}；input/docs/SELLER_ALIAS_RISK_PILOT.zh.md；input/schema/step28_risk_policy.json。
+[S2] input/docs/RESEARCH_DISCIPLINE.zh.md、SELLER_ALIAS_BGE_CONTINUAL.zh.md、SELLER_ALIAS_LOGIT_LOW.zh.md，以及直接父policy。
+[S3] input/scripts/step28_er_weight_run.py：44–111阶段；114–192checkpoint；195–310train；313–450盲门；453–479collect；482–558execute；561–582CLI。
+[S4] input/scripts/step28_risk_replay.py：19–80风险；83–145内存；148–224真实update；227–247旧阶段接口。input/tests/test_step28_risk_replay.py：158–203修补生命周期。
+[S5] input/scripts/step28_risk_execution.py：12–48内存适配；51–81模式诊断；84–97参考保存核查。
+[S6] input/scripts/step28_er_weight.py：131–215来源/对照；input/scripts/step28_er_weight_evaluate.py：31–82四比较；85–97读矩阵；122–206finalize。
+[S7] input/scripts/step28_risk_study.py：13–22固定合同；25–48来源/CPU门；51–76延后绑定。input/scripts/run_step28_risk_linux_20261003.sh：32–41前提；43–61资源；63–89启动/自删/退出。
+[E1] independent_reference/：incremental_v1与v2、reused_v4数学helper、repaired_lifecycle_original_run、mutants、precision_analysis、saved_reference_gate、汇总及完整运行记录。
+[E2] pending_binding_review/：reference_v1.py、fixture_v1、run_v1、reference_v1_results.json，完整未改绑定/统计调用。
+[E3] evaluation_review/：independent_evaluation.py、run、command/stdout/stderr/exit，独立非均匀矩阵算术与真实collect。
+[E4] provenance_review/与implementation_review/：清单/来源链、前轮复用、实际record路径失败及修正、AST/原生观察对照的独立脚本和日志。
+[E5] root_startup_review/：明确手写authorization形状输入、startup_reference.py、完整调用顺序/拒绝及退出0。
+[E6] listener_review/：原控制片段与建议稿、cases中原语义退出1和修正退出0、内嵌门/来源自删兼容证据、listener_minimal_fix.patch及proposed_listener.sh。

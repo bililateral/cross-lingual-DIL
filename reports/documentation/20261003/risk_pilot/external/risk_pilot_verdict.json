@@ -1,0 +1,676 @@
+{
+  "schema_version": "risk_pilot_incremental_review_v1",
+  "review_date": "2026-10-03",
+  "input": {
+    "filename": "review(4).zip",
+    "bytes": 1575125,
+    "members": 83,
+    "sha256": "654265a64f8a12b0450ad3003d0df1d986f6b88e22921a8ee2cf8be14800f623",
+    "crc_bad": null,
+    "safe_paths": true,
+    "duplicates": 0
+  },
+  "identity_statement": {
+    "session_configuration_label": "GPT-6 Astra Pro",
+    "user_requested_label": "Web GPT 6 Pro",
+    "authenticated_backend_model_id_available": false,
+    "requested_backend_identity_certified": false
+  },
+  "decision": {
+    "as_submitted": "HOLD_FOR_LISTENER_ONLY_FIX",
+    "as_submitted_one_shot_listener_may_start": false,
+    "scientific_python_incremental_review": "PASS_WITH_SCOPED_HANDWRITTEN_EVIDENCE",
+    "proposed_listener_control_flow": "PASS_FOUR_SYNTHETIC_CASES_AND_BASH_SYNTAX",
+    "after_exact_minimal_listener_fix": "MAY_START_FIXED_POINT_WHEN_EXISTING_PRIMARY_REVIEW_SOURCE_AUTHORIZATION_AND_RESOURCE_GATES_PASS",
+    "requires_new_user_choice_or_additional_experiment_permission": false,
+    "requires_full_bge_rerun_for_listener_only_fix": false,
+    "proposal_applied_to_attachment_or_server": false,
+    "formal_execution_performed": false,
+    "actual_listener_launched": false,
+    "current_server_resources_or_files_verified": false,
+    "real_formal_authorization_created": false
+  },
+  "fixed_point": {
+    "arm": "risk",
+    "history_weight": 0.1,
+    "retention_weight": 0.5,
+    "seed": "s0",
+    "orders": [
+      "ABC",
+      "BCA",
+      "CAB"
+    ],
+    "new_training_stages_per_order": [
+      2,
+      3
+    ],
+    "updates_per_stage": 288,
+    "total_new_updates": 1728,
+    "group_gradient_presentations": 3456,
+    "endpoints": 6,
+    "roles": [
+      "raw",
+      "stage-cal",
+      "first-cal"
+    ],
+    "new_metric_count_sets": 18,
+    "matrix_shape": [
+      60,
+      22
+    ],
+    "primary_comparison": "risk_minus_logit_tenth",
+    "comparisons": [
+      "risk_minus_logit_tenth",
+      "risk_minus_tenth",
+      "risk_minus_seq",
+      "risk_minus_logit_quarter"
+    ],
+    "new_candidates_seeds_data_or_budgets_added": false,
+    "policy": {
+      "path": "input/schema/step28_risk_policy.json",
+      "bytes": 7174,
+      "sha256": "5706629736dfe9c598f1d59cc61f04bb65e9fd83b4275e391dfc3d2ebf2e5548"
+    }
+  },
+  "current_scientific_blockers": [],
+  "current_required_repairs": [
+    {
+      "id": "R-L1",
+      "source": "scripts/run_step28_risk_linux_20261003.sh:75-83",
+      "finding": "Updates already recorded followed by child exit before next poll bypasses self deletion",
+      "required_before_listener_launch": true,
+      "production_semantic_check_exit_code": 1,
+      "proposed_semantic_check_exit_code": 0
+    },
+    {
+      "id": "R-L2",
+      "source": "scripts/run_step28_risk_linux_20261003.sh:67,78-79,84-89",
+      "finding": "Failed rm still creates successful deletion receipt and may return listener success",
+      "required_before_listener_launch": true,
+      "production_semantic_check_exit_code": 1,
+      "proposed_semantic_check_exit_code": 0
+    }
+  ],
+  "repair": {
+    "scope": "One listener file only; final 32 scientific source files unchanged",
+    "original": {
+      "path": "input/scripts/run_step28_risk_linux_20261003.sh",
+      "bytes": 3802,
+      "sha256": "d3e9882e29788fe8bfe1a5dac0b4e4e2a8d4fd3d10099dd4ee34e97b4f0dcf54"
+    },
+    "proposed": {
+      "path": "deliverables/run_step28_risk_linux_20261003.sh",
+      "bytes": 4017,
+      "sha256": "1a20eaa71a53a8a36074055d7c674ff5507df21dc357f339160f8acee849ac1f"
+    },
+    "patch": {
+      "path": "deliverables/listener_minimal_fix.patch",
+      "bytes": 1191,
+      "sha256": "397eab1a6c6921eb6e10f9620115cbebb3052655e6784996fe2548f077d0adcb"
+    },
+    "required_before_one_shot_listener_launch": true,
+    "verification": {
+      "suite_exit_code": 0,
+      "production_semantic_cases_passed": 2,
+      "production_semantic_cases_failed_as_expected": 2,
+      "proposed_semantic_cases_passed": 4,
+      "proposed_full_script_syntax_exit_code": 0,
+      "proposal_applied": false,
+      "bge_rerun_required_for_listener_only_fix": false
+    },
+    "original_fragment_exit_does_not_imply_semantic_success": true,
+    "existing_primary_reviewer_should_check_final_source_audit_and_patched_listener_identity": true
+  },
+  "seven_requested_paths": [
+    {
+      "id": 1,
+      "path": "risk objective -> gradient -> clip -> AdamW -> actual stage call",
+      "status": "PASS_SCOPED",
+      "evidence": "independent_reference/result.json",
+      "closed_previous_blind_spots": [
+        "R1 nondefault stage weights/reference passing",
+        "R2 per-UID different-text reference binding"
+      ]
+    },
+    {
+      "id": 2,
+      "path": "shared start -> six surviving ER groups -> immutable old refs -> bounded auxiliary -> restore",
+      "status": "PASS_SCOPED",
+      "evidence": "independent_reference/result.json",
+      "native_first_stage_and_six_endpoints_executed_here": false
+    },
+    {
+      "id": 3,
+      "path": "complete blind gate -> calibration -> three roles -> 22 metrics",
+      "status": "PASS_SOURCE_AND_LAYERED_HANDWRITTEN_EVIDENCE",
+      "evidence": [
+        "evaluation_review/run/collection_check.json",
+        "independent_reference/saved_reference_gate_data"
+      ],
+      "submitted_gate_fixture_mocks_reference_validation": true,
+      "real_tiny_saved_reference_helper_independently_checked": true
+    },
+    {
+      "id": 4,
+      "path": "preselected pending LOGIT0.1 -> complete-result identity -> saved-matrix finalize",
+      "status": "PASS_REAL_FUNCTIONS_ON_SYNTHETIC_FILES",
+      "evidence": "pending_binding_review/reference_v1_results.json",
+      "model_loader_train_or_label_parser_calls": 0
+    },
+    {
+      "id": 5,
+      "path": "mode and head-gradient diagnostics -> unchanged state and next update",
+      "status": "PASS_SCOPED",
+      "evidence": "independent_reference/result.json",
+      "finally_explicitly_restores": [
+        "Torch CPU RNG",
+        "visible CUDA RNG",
+        "model mode"
+      ],
+      "python_numpy_rng": "not consumed; unchanged in independent checks, not explicitly restored by finally",
+      "head_gradient_scale_probe_covers_full_encoder": false
+    },
+    {
+      "id": 6,
+      "path": "input inventory -> first deployment evidence -> final 32-source audit",
+      "status": "PASS_CURRENT_CHAIN_WITH_NONBLOCKING_HISTORICAL_COMMAND_GAPS",
+      "evidence": [
+        "provenance_review/findings.json",
+        "implementation_review/structure_check.json",
+        "root_startup_review/results.json"
+      ]
+    },
+    {
+      "id": 7,
+      "path": "review before resource gate -> unique one-shot execution -> self deletion",
+      "status": "REPAIR_TWO_LOCAL_LISTENER_DEFECTS",
+      "evidence": [
+        "listener_review/results.json",
+        "root_startup_review/results.json"
+      ],
+      "deleted_logit_quarter_terminal_weights_required": false
+    }
+  ],
+  "independent_executions": {
+    "risk_runner_memory_and_observation": {
+      "scope": "Current risk-pilot incremental CPU audit only; no formal input/model/labels/server access, no BGE or GPU training.",
+      "startup_verdict_for_checked_slice": "NO_CURRENT_BLOCKER_FOUND_IN_RISK_UPDATE_RUNNER_MEMORY_OBSERVATION_SLICE",
+      "whole_job_launch_verdict": "DEFER_TO_ROOT_INTEGRATED_REVIEW_OF_COMPARATORS_GATE_AUTHORIZATION_AND_LISTENER",
+      "environment": {
+        "python": "3.12.14",
+        "torch": "2.7.1+cpu",
+        "numpy": "2.3.5",
+        "torch_threads": 1,
+        "CUDA_VISIBLE_DEVICES": ""
+      },
+      "r1_r2_repaired_lifecycle_original_exit": 0,
+      "r1_r2_mutant_rejections": {
+        "stage_gamma_zero": {
+          "exit_code": 1,
+          "observed_expected_failure": true
+        },
+        "reference_rows_reversed": {
+          "exit_code": 1,
+          "observed_expected_failure": true
+        }
+      },
+      "independent_results": {
+        "er_conversion_and_mode_probe": {
+          "passed": true,
+          "only_surviving_groups_scored": [
+            "pilot_a_08",
+            "pilot_a_12",
+            "pilot_a_43",
+            "pilot_a_38",
+            "pilot_a_36",
+            "pilot_a_05"
+          ],
+          "max_per_uid_reference_error": 3.4732597820053e-07,
+          "metadata_keeps_risk_references": true,
+          "roundtrip_preserves_adapter_type": true,
+          "serialized_bytes": 95256,
+          "torch_python_numpy_rng_model_adam_gradients_memory_unchanged": true,
+          "train_and_eval_modes_restored": true,
+          "exception_after_seed_change_restored": true
+        },
+        "observe_invariance": {
+          "passed": true,
+          "first_update_identical": true,
+          "next_update_identical": true,
+          "model_adam_gradients_rng_mode_memory_bit_exact": true,
+          "actual_branch_risk_updates": 4,
+          "observe_true_diagnostics": {
+            "weighted_history": 0.008905956521630287,
+            "rank": 0.008098763413727283,
+            "positive": 0.008432767353951931,
+            "negative": 0.0071800267323851585
+          }
+        },
+        "shared_runner_actual_stage": {
+          "passed": true,
+          "physical_stage_updates": 288,
+          "lambda": 0.1,
+          "gamma": 0.5,
+          "adam_end_of_stage": 576,
+          "selected_independent_gradient_adam_steps": [
+            1,
+            29,
+            30,
+            288
+          ],
+          "all_actual_reference_uid_seed_and_coefficients_checked": true,
+          "observation_steps": [
+            "1",
+            "29",
+            "30",
+            "288"
+          ],
+          "serialized_bytes_with_metadata": 95422,
+          "newcomer_only_references": [
+            "pilot_b_00",
+            "pilot_b_02"
+          ],
+          "old_survivors_not_refreshed": true,
+          "next_stage_update_full_state_restore_identical": true,
+          "max_gradient_error": 7.450580596923828e-08,
+          "max_parameter_error": 2.712995064158008e-07
+        }
+      },
+      "actual_saved_reference_gate": {
+        "scope": "Saved actual Tiny data; no new model updates",
+        "positive_checks": {
+          "stage2_real_payload_and_training_log": true,
+          "stage3_helper_after_one_draw_only": true,
+          "stage3_drawn_uid": "pilot_a_08"
+        },
+        "negative_checks": {
+          "summary_payload_mismatch": {
+            "rejected": true,
+            "exception": "ValueError",
+            "message": "Risk memory record differs from serialized memory"
+          },
+          "old_reference_changed_stage2": {
+            "rejected": true,
+            "exception": "ValueError",
+            "message": "Old risk reference refreshed"
+          },
+          "old_reference_changed_stage3": {
+            "rejected": true,
+            "exception": "ValueError",
+            "message": "Old risk reference refreshed"
+          }
+        },
+        "passed": true
+      },
+      "scientific_blockers_found": [],
+      "production_reproducibility_defects_found": [],
+      "closed_previous_evidence_defects": [
+        "R1: stage nondefault gamma/reference transmission now discriminating",
+        "R2: different-text per-UID reference binding now discriminating"
+      ],
+      "auditor_failed_versions": [
+        {
+          "version": "incremental_v1",
+          "exit": 1,
+          "reason": "Float64 closed-form Adam reference versus sequential float32 arithmetic exceeded fixed 2e-7 absolute bound at one magnitude3.114 embedding value by 0.713e-7; independent gradients had passed.",
+          "classification": "AUDITOR_PRECISION_GATE",
+          "retained": true
+        }
+      ],
+      "precision_fix": {
+        "original_failure": "incremental_v1/original_run/stderr.txt",
+        "raw_arrays": "incremental_v2/runner_data/runner_step_30_raw.npz",
+        "same_error_as_v1": true,
+        "parameter": "encoder.emb.weight",
+        "index": [
+          62,
+          4
+        ],
+        "actual_torch_float32": -3.11403226852417,
+        "numpy_float64_closed_form": -3.1140325398236763,
+        "expected_rounded_to_float32": -3.114032506942749,
+        "parameter_absolute_scale": 3.1140325398236763,
+        "absolute_error": 2.712995064158008e-07,
+        "relative_error": 8.712160292042498e-08,
+        "local_float32_ulp": 2.384185791015625e-07,
+        "error_in_local_float32_ulps": 1.137912604957819,
+        "distance_from_nearest_rounded_reference_in_ulps": 1.0,
+        "v1_fixed_absolute_bound": 2e-07,
+        "v2_atol": 2e-07,
+        "v2_rtol": 2.384185791015625e-07,
+        "v2_component_bound": 9.424432134207907e-07,
+        "classification": "Auditor reference-precision gate, not a production algorithm failure.",
+        "reason": "NumPy reference evaluates the documented AdamW closed form in float64; production performs weight decay and adaptive subtraction with separate float32 roundings. The component is about magnitude 3, so a fixed bound smaller than ~one local ULP is inappropriate. Independent preclip gradient and moment criteria were unchanged."
+      },
+      "unverified": [
+        "Native BGE/GPU behavior not rerun; existing evidence is external submitted evidence.",
+        "No complete stage3 or six-endpoint training; current audit includes real 288 stage2 plus restored next stage3 update and reference-helper branch only.",
+        "No scientific effectiveness or innovation conclusion from Tiny checks."
+      ],
+      "disclosed_fixtures": [
+        "One real warm Tiny update then explicit Adam counter1->288 prior-stage operator fixture.",
+        "observe paired test uses reference factors[.76,.67,.55] to activate nonzero preservation gradient; the formal-runner Tiny reference is unscaled eval risk.",
+        "clip_norm=.08 in independent Tiny config ensures meaningful update checks; original policy untouched."
+      ],
+      "execution_files": {
+        "success_conversion_modes_observe": "incremental_v1/original_run",
+        "success_formal_runner_288": "incremental_v2/runner_run",
+        "failed_original_precision": "incremental_v1/original_run",
+        "gate": "saved_reference_gate_run",
+        "replay_entry": "incremental_v2/check.py",
+        "reused_original_math": "reused_v4/oracle.py"
+      }
+    },
+    "pending_binding_and_finalize": {
+      "cases": [
+        {
+          "case": "baseline_before_pending_completion",
+          "loaded_refs": [
+            "logit_quarter",
+            "tenth"
+          ],
+          "passed": true
+        },
+        {
+          "case": "missing_pending_completion",
+          "detected": true,
+          "exception": "FileNotFoundError",
+          "message": "[Errno 2] No such file or directory: '/workspace/scratch/ae1bf546d06e/risk_pilot_audit/pending_binding_review/fixture_v1/logit_tenth_job/completion.json'"
+        },
+        {
+          "case": "missing_control_preserved_all_candidate_matrices",
+          "passed": true
+        },
+        {
+          "case": "wrong_pending_completion_status",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Preselected LOGIT.1 has no complete result"
+        },
+        {
+          "case": "changed_preselected_execution",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "File differs: execution.json"
+        },
+        {
+          "candidate_evidence_tag": "RISK_REPLAY",
+          "case": "resolved_policy_scope_and_baseline",
+          "logit_evidence_tag": "LOGIT_WEIGHT",
+          "passed": true
+        },
+        {
+          "bootstrap_shape": [
+            5000,
+            3,
+            20
+          ],
+          "case": "actual_full_finalize",
+          "comparisons": [
+            "risk_minus_logit_quarter",
+            "risk_minus_logit_tenth",
+            "risk_minus_seq",
+            "risk_minus_tenth"
+          ],
+          "formal_training_or_parser_calls": 0,
+          "new_sets": 18,
+          "passed": true,
+          "reused_sets": 81,
+          "status": "COMPLETE_RISK_REPLAY_DEVELOPMENT_COMPARISON"
+        },
+        {
+          "case": "repeat_finalize_identical_bytes",
+          "files": 204,
+          "passed": true
+        },
+        {
+          "case": "comparator_changed_after_binding",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Comparator changed after binding"
+        },
+        {
+          "case": "wrong_ref_policy",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Frozen continuation reference is incomplete or unpaired: logit_tenth"
+        },
+        {
+          "case": "missing_ref_endpoint",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Frozen continuation reference is incomplete or unpaired: logit_tenth"
+        },
+        {
+          "case": "wrong_shared_model",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Continuation reference used a different shared start: logit_tenth"
+        },
+        {
+          "case": "wrong_memory_arm",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Continuation reference used a different shared start: logit_tenth"
+        },
+        {
+          "case": "misaligned_group_ids",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Frozen continuation reference is incomplete or unpaired: logit_tenth"
+        },
+        {
+          "case": "different_execution_sources",
+          "detected": true,
+          "exception": "ValueError",
+          "message": "Frozen continuation reference is incomplete or unpaired: logit_tenth"
+        },
+        {
+          "case": "job_lifecycle_after_saved_matrix_finalize",
+          "evaluation_status": "COMPLETE_RISK_REPLAY_DEVELOPMENT_COMPARISON",
+          "interpretation": "Statistics complete; generic CLI finalize does not issue job completion receipt",
+          "job_completion_file_exists": false,
+          "observation": true,
+          "original_failure_preserved": true
+        }
+      ],
+      "no_formal_data_or_models": true,
+      "nonblocking_lifecycle_observation": "saved-matrix finalize preserves failure.json and does not write job/completion.json",
+      "status": "PASS_HANDWRITTEN_PENDING_BINDING_AND_FULL_FINALIZE"
+    },
+    "evaluation_arithmetic": {
+      "checked_scalars": 23232,
+      "max_absolute_error": 1.6653345369377348e-16,
+      "views": [
+        "raw",
+        "stage-cal",
+        "first-cal",
+        "primary"
+      ],
+      "primary_is_statistical_combination_not_fourth_collected_role": true,
+      "pipeline": {
+        "passed": true,
+        "new_sets": 18,
+        "reused_sets": 81,
+        "stage_table_data_rows": 8910,
+        "comparisons": [
+          "risk_minus_logit_quarter",
+          "risk_minus_logit_tenth",
+          "risk_minus_seq",
+          "risk_minus_tenth"
+        ],
+        "mocked": [
+          "pending comparator resolver",
+          "prior source/state identity baseline binding"
+        ],
+        "real": [
+          "collection",
+          "saved matrix/count read",
+          "reference copy",
+          "evaluation arithmetic",
+          "stage CSV/output JSON"
+        ],
+        "formal_label_reads": 0,
+        "model_loads": 0,
+        "training_updates": 0,
+        "warning": "Not a real prior result binding or formal six-endpoint test"
+      }
+    },
+    "startup_prerequisite_order": {
+      "source": "/workspace/scratch/ae1bf546d06e/risk_pilot_audit/input",
+      "torch": "2.7.1+cpu",
+      "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "scope": "Synthetic startup prerequisites and call order only; no real approval or GPU availability claim",
+      "final_cpu_sources": 32,
+      "checks": [
+        {
+          "case": "review_false",
+          "events": [],
+          "exception": "ValueError: Matching reviewed formal authorization is required",
+          "formal_loader_calls": 0,
+          "train_calls": 0,
+          "job_created": false,
+          "access_record_created": false,
+          "passed": true
+        },
+        {
+          "case": "wrong_source",
+          "events": [],
+          "exception": "ValueError: Matching reviewed formal authorization is required",
+          "formal_loader_calls": 0,
+          "train_calls": 0,
+          "job_created": false,
+          "access_record_created": false,
+          "passed": true
+        },
+        {
+          "case": "bad_cpu_receipt",
+          "events": [
+            "cpu_audit_verify"
+          ],
+          "exception": "ValueError: Risk native and incremental CPU evidence required",
+          "formal_loader_calls": 0,
+          "train_calls": 0,
+          "job_created": false,
+          "access_record_created": false,
+          "passed": true
+        },
+        {
+          "case": "valid_prerequisites_no_gpu",
+          "events": [
+            "cpu_audit_verify",
+            "gpu_resource_check"
+          ],
+          "exception": "RuntimeError: One eligible visible GPU required",
+          "formal_loader_calls": 0,
+          "train_calls": 0,
+          "job_created": false,
+          "access_record_created": false,
+          "passed": true
+        }
+      ],
+      "all_passed": true
+    },
+    "listener": {
+      "subreview": "risk_pilot_listener_and_execution_gates",
+      "formal_execution_performed": false,
+      "actual_listener_launched": false,
+      "original_attachment_modified": false,
+      "listener_source_sha256": "d3e9882e29788fe8bfe1a5dac0b4e4e2a8d4fd3d10099dd4ee34e97b4f0dcf54",
+      "decision": "REPAIR_LISTENER_SELF_DELETION_BEFORE_LAUNCH",
+      "scientific_blockers_in_this_subreview": [],
+      "reproducibility_defects": [
+        {
+          "id": "R-L1",
+          "source": "scripts/run_step28_risk_linux_20261003.sh:75-83",
+          "finding": "Updates already recorded followed by child exit before next poll bypasses self deletion",
+          "required_before_listener_launch": true,
+          "production_semantic_check_exit_code": 1,
+          "proposed_semantic_check_exit_code": 0
+        },
+        {
+          "id": "R-L2",
+          "source": "scripts/run_step28_risk_linux_20261003.sh:67,78-79,84-89",
+          "finding": "Failed rm still creates successful deletion receipt and may return listener success",
+          "required_before_listener_launch": true,
+          "production_semantic_check_exit_code": 1,
+          "proposed_semantic_check_exit_code": 0
+        }
+      ],
+      "verified": {
+        "inline_review_flag_rejected_before_resource_loop": true,
+        "execute_rechecks_actual_scientific_sources_and_native_evidence_before_formal_inputs": true,
+        "same_workspace_atomic_listener_and_job_creation": true,
+        "automatic_training_retry_present": false,
+        "resource_wait_excluded_from_12h_timeout": true,
+        "source_count": 32,
+        "current_source_list_matches_cpu_audit": true,
+        "source_list_unchanged_after_deleting_listener_copy": true,
+        "logit_quarter_terminal_weights_required_by_current_training_or_comparison": false,
+        "actual_server_resource_or_file_presence_verified": false
+      },
+      "evidence": {
+        "suite_exit_code": 0,
+        "production_semantic_cases_passed": 2,
+        "production_semantic_cases_failed_as_expected": 2,
+        "proposed_semantic_cases_passed": 4,
+        "proposed_full_script_syntax_exit_code": 0,
+        "proposal_applied": false,
+        "bge_rerun_required_for_listener_only_fix": false
+      }
+    }
+  },
+  "provenance": {
+    "review_inventory_payload_count": 82,
+    "review_inventory_mismatches": 0,
+    "initial_deploy_members": 48,
+    "deploy_inventory_mismatches": 0,
+    "first_cpu_inventory_count": 10,
+    "first_cpu_inventory_mismatches": 0,
+    "initial_cpu_scientific_source_count": 33,
+    "final_cpu_scientific_source_count": 32,
+    "final_current_sources_match_final_audit": true,
+    "current_sources_and_verify_audit_actually_invoked": true,
+    "initial_deploy_with_final_audit_is_rejected": true,
+    "historical_deploy_difference_is_current_launch_blocker": false,
+    "final_registry_change": "listener excluded; scientific computation unchanged",
+    "final_native_reuses_first_attempt_bytes": true,
+    "new_native_updates_during_source_rebinding": 0,
+    "prior_report_and_evidence_zip_embedded_exactly": true,
+    "original_zip_and_all_original_member_bytes_preserved": true
+  },
+  "nonblocking_closeout_or_material_gaps": [
+    {
+      "id": "N-FINALIZE-RECEIPT",
+      "finding": "Manual saved-matrix finalize produces full evaluation but does not issue job/completion.json and preserves original failure.json.",
+      "action": "Document the completed statistics separately at closeout; preserve original failure; do not retrain or reparse."
+    },
+    {
+      "id": "N-DEPLOY-LABEL",
+      "finding": "Nested deploy.zip is the documented initial deployment; final outer code has the final 32-source binding.",
+      "action": "Label historical deployment and use final outer sources; no new BGE run required."
+    },
+    {
+      "id": "N-HISTORICAL-COMMANDS",
+      "finding": "8-versus-10 payload wording, original transport archive absent, original rebinding stdin and exact historical mutant argv absent.",
+      "action": "Correct wording and retain original commands if available; current independent checks remain valid."
+    }
+  ],
+  "scientific_interpretation": {
+    "algorithm_reasonableness": "Prior conditional empirical-cache regularizer judgment retained",
+    "innovation": "Prior insufficient-novelty judgment retained; task renaming not credited",
+    "proxy_risk_improvement": "Does not establish unseen-identity MAP/FPR or joint-risk preservation",
+    "formal_effectiveness": "NOT_EVALUATED_NO_FORMAL_RESULTS",
+    "development_point_is_independent_confirmation": false,
+    "old_unseen_identity_and_new_group_tradeoffs_must_remain_separate": true
+  },
+  "explicit_non_actions": [
+    "No formal text, labels, caches, weights, credentials, test or owners accessed",
+    "No GPU training, remote Linux execution, listener launch or actual resource verification",
+    "No source attachment edits or patch deployment",
+    "No extra candidate, method, seed, data, criterion or budget",
+    "No repeat of unchanged literature review, whole historical mutant suite or native BGE execution"
+  ],
+  "complete_report": "deliverables/risk_pilot_review.zh.txt",
+  "evidence_pack_readme": "README.zh.txt"
+}

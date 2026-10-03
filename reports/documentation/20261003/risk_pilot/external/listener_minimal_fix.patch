@@ -1,0 +1,32 @@
+--- a/scripts/run_step28_risk_linux_20261003.sh
++++ b/scripts/run_step28_risk_linux_20261003.sh
+@@ -74,16 +74,25 @@
+ printf '%s\n' "$child" > "$queue/training_wrapper_pid.txt"
+ while kill -0 "$child" 2>/dev/null; do
+   if grep -q '"event":"updates"' "$out/train.log"; then
+-    # Delete only this listener after actual new updates, preserving launch records.
+-    rm -- "$self"
+-    date --iso-8601=seconds > "$queue/script_deleted_after_updates.txt"
+     break
+   fi
+   sleep 15
+ done
++delete_status=0
++if grep -q '"event":"updates"' "$out/train.log"; then
++  if rm -- "$self"; then
++    date --iso-8601=seconds > "$queue/script_deleted_after_updates.txt"
++  else
++    delete_status=$?
++    printf '%s\n' "$delete_status" > "$queue/script_delete_failed.txt"
++  fi
++fi
+ wait "$child"
+ status=$?
+ printf '%s\n' "$status" > "$out/exit_status.txt"
+ date --iso-8601=seconds > "$out/finished.txt"
+-printf '%s exit=%s; no automatic retry\n' "$(date --iso-8601=seconds)" "$status"
++printf '%s training_exit=%s cleanup_exit=%s; no automatic retry\n' "$(date --iso-8601=seconds)" "$status" "$delete_status"
++if ((status == 0 && delete_status != 0)); then
++  exit "$delete_status"
++fi
+ exit "$status"
