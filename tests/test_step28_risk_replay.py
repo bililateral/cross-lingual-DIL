@@ -158,16 +158,30 @@ class RiskReplayTests(unittest.TestCase):
     def test_actual_stage_memory_lifecycle_and_restore(self):
         c, old, new, model, optimizer = prepared()
         policy = method.parent.contract()
-        first = [fixtures.handmade_group(f"a{i:02}") for i in range(48)]
-        second = [fixtures.handmade_group(f"b{i:02}", 1) for i in range(48)]
+        first = [fixtures.handmade_group(f"a{i:02}", i + 1) for i in range(48)]
+        second = [fixtures.handmade_group(f"b{i:02}", i + 100) for i in range(48)]
         memory = method.RiskMemory("ABC", policy["memory_seed"], {"a": 1., "b": 0.})
         memory.retain(first, 1, model, optimizer, c)
         origins = copy.deepcopy(memory.cache.auxiliary["risk_replay"]["groups"])
+        def assert_references():
+            for group in memory.cache.reservoir.groups:
+                row = method.parent.ranking.score(model, [group], c)[0]
+                risks, counts = scalar_risks(row, group.labels)
+                for degree in (1, 2):
+                    expected = np.sort(risks[counts == degree], axis=0)
+                    actual = memory.cache.auxiliary["risk_replay"]["groups"][group.uid]["values"][str(degree)]
+                    np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-6)
+        assert_references()
         baseline = method.parent.Memory("ABC", policy["memory_seed"], False, {"a": 1., "b": 0.})
         baseline.retain(first, 1, None); baseline.begin_stage(2)
         with mock.patch.object(method, "update", wraps=method.update) as calls:
-            trained = method.train_stage(model, optimizer, second, memory, c, "ABC", 2)
+            trained = method.train_stage(model, optimizer, second, memory, c, "ABC", 2,
+                                         history_weight=.23, retention_weight=.71)
         self.assertEqual(calls.call_count, 288)
+        for call in calls.call_args_list:
+            self.assertEqual(call.kwargs["history_weight"], .23)
+            self.assertEqual(call.kwargs["retention_weight"], .71)
+            self.assertEqual(call.args[4], origins[call.args[3].uid]["values"])
         self.assertEqual(trained["history_ids"], [baseline.draw()[0].uid for _ in range(288)])
         self.assertEqual(method.parent.adam_step(optimizer), 576)
         self.assertEqual(trained["updates"][-1]["encoder_lr"], 0.)
@@ -178,6 +192,13 @@ class RiskReplayTests(unittest.TestCase):
         for uid in set(origins) & set(live):
             self.assertEqual(origins[uid], live[uid])
         self.assertEqual({g.uid for g in score.call_args.args[1]}, set(live) - set(origins))
+        for group in memory.cache.reservoir.groups:
+            if group.uid not in origins:
+                row = method.parent.ranking.score(model, [group], c)[0]
+                risks, counts = scalar_risks(row, group.labels)
+                for degree in (1, 2):
+                    np.testing.assert_allclose(live[group.uid]["values"][str(degree)],
+                                               np.sort(risks[counts == degree], axis=0), rtol=0, atol=1e-6)
         restored = method.RiskMemory.from_bytes(memory.to_bytes())
         self.assertEqual(restored.to_bytes(), memory.to_bytes())
         self.assertLess(len(memory.to_bytes()), 1048576)

@@ -1,0 +1,235 @@
+{
+  "study": "seller_alias_risk_replay",
+  "schema_version": 1,
+  "contract_document": "docs/SELLER_ALIAS_RISK_PILOT.zh.md",
+  "decision": "reports/documentation/20261003/risk_pilot/decision.json",
+  "parent_policy_sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534",
+  "arms": {
+    "risk": 0.1
+  },
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "seed": "s0",
+  "stages": [
+    2,
+    3
+  ],
+  "updates_per_stage": 288,
+  "physical_updates": 1728,
+  "gradient_group_presentations": 3456,
+  "distinct_stage_endpoints": 6,
+  "metric_count_sets": 18,
+  "baseline": {
+    "linux_job": "reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job",
+    "local_small_job": "reports/seller_alias_continual/20261001/bge_continual_result/returned/job",
+    "records": {
+      "execution.json": {
+        "path": "execution.json",
+        "bytes": 3065,
+        "sha256": "e9c0936b63a4dc97f5a4a5f7875f65fa1736dbf0f11e2a154a381b2a31a8238a"
+      },
+      "run/manifest.json": {
+        "path": "run/manifest.json",
+        "bytes": 25690,
+        "sha256": "c55c6a069dc1d14e41883dae69bebb4d4a1934611d9a493c6047da0ff19705cc"
+      },
+      "run/partition.json": {
+        "path": "run/partition.json",
+        "bytes": 14922,
+        "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+      },
+      "evaluation/collected.json": {
+        "path": "evaluation/collected.json",
+        "bytes": 24360,
+        "sha256": "22b792c678788d4f762ad38416635a255ca5c5f383f971387bdcdac3c074a857"
+      },
+      "evaluation/evaluation.json": {
+        "path": "evaluation/evaluation.json",
+        "bytes": 769370,
+        "sha256": "d8ad5763c8d504cc2e57943d362463ec0ec44136cfb3ce4310e78fead6808e23"
+      }
+    },
+    "environment": {
+      "python": "3.10.19",
+      "torch": "2.9.1+cu130",
+      "cuda": "13.0",
+      "gpu": "NVIDIA GeForce RTX 5090"
+    }
+  },
+  "loss": {
+    "current": 1,
+    "bce": 1,
+    "rank": 1,
+    "known_top5_hard": 0.5,
+    "history_weight_scope": "entire independently reduced historical base objective",
+    "normalization": "current_plus_tenth_history_plus_half_mean_three_risk_penalties",
+    "risk_retention": 0.5
+  },
+  "evaluation": {
+    "comparators": [
+      "logit_tenth",
+      "tenth",
+      "seq",
+      "logit_quarter"
+    ],
+    "roles": [
+      "raw",
+      "stage-cal",
+      "first-cal"
+    ],
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260930,
+    "threshold_logit": 0,
+    "observed_guard_tolerance": 0,
+    "inherit_original_23_checks": true,
+    "comparison_pairs": [
+      [
+        "risk",
+        "logit_tenth"
+      ],
+      [
+        "risk",
+        "tenth"
+      ],
+      [
+        "risk",
+        "seq"
+      ],
+      [
+        "risk",
+        "logit_quarter"
+      ]
+    ],
+    "matched_er": "tenth",
+    "primary_comparison": "risk_minus_logit_tenth"
+  },
+  "supervision": {
+    "train_parse_attempts": 1,
+    "valid_parse_attempts": 1,
+    "test_access": false,
+    "owners_access": false,
+    "automatic_retry": false,
+    "after_all_training_and_blind_gate": true
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 43200,
+    "maximum_output_bytes": 17179869184,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "torch_cpu_threads": 1,
+    "estimated_hours": [
+      5,
+      7
+    ]
+  },
+  "cpu_verification": {
+    "maximum_seconds": 2700,
+    "maximum_evidence_bytes": 67108864,
+    "formal_inputs": false,
+    "formal_labels": false,
+    "gpu": false,
+    "retained_native_weights": false,
+    "estimate_minutes": [
+      7,
+      12
+    ]
+  },
+  "reference_arms": {
+    "tenth": 0.1,
+    "logit_quarter": 0.25,
+    "logit_tenth": 0.1
+  },
+  "comparison_methods": {
+    "seq": 0,
+    "tenth": 0.1,
+    "logit_quarter": 0.25,
+    "logit_tenth": 0.1,
+    "risk": 0.1
+  },
+  "baseline_methods": [
+    "seq"
+  ],
+  "memory_arm": "er",
+  "continuation_references": {
+    "tenth": {
+      "linux_job": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
+      "local_small_job": "reports/seller_alias_continual/20261003/er_low_result/job",
+      "policy_sha256": "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d",
+      "evidence_tag": "ER_WEIGHT",
+      "memory_arm": "er",
+      "records": {
+        "execution.json": {
+          "path": "execution.json",
+          "bytes": 4869,
+          "sha256": "f6e9871548256c75244dd999a2144a92d671379958d6ee87d6a4dbf82bb11348"
+        },
+        "run/manifest.json": {
+          "path": "run/manifest.json",
+          "bytes": 14752,
+          "sha256": "0fcacb9438572a7f35baba6d782aff99e476c8c6328e24059b0c2113814c5f5b"
+        },
+        "run/partition.json": {
+          "path": "run/partition.json",
+          "bytes": 14922,
+          "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+        },
+        "evaluation/collected.json": {
+          "path": "evaluation/collected.json",
+          "bytes": 12646,
+          "sha256": "29b05e2305f1d0e8746e025ceef55a6eebce70cbe162d0d1e6aab67a7296a8d5"
+        },
+        "evaluation/evaluation.json": {
+          "path": "evaluation/evaluation.json",
+          "bytes": 1032505,
+          "sha256": "7186d6df305021f6c1ba94bc0075bcae06a0d6eb4f42162d5a10cea2b168cb2f"
+        }
+      }
+    },
+    "logit_quarter": {
+      "linux_job": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job",
+      "local_small_job": "reports/seller_alias_continual/20261003/logit_weight_result/job",
+      "policy_sha256": "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb",
+      "evidence_tag": "LOGIT_WEIGHT",
+      "memory_arm": "logit",
+      "records": {
+        "execution.json": {
+          "path": "execution.json",
+          "bytes": 5173,
+          "sha256": "df85b93059c6600ff2b32567ed224c8b74d91b94754aeab959ce887bb06d6325"
+        },
+        "run/manifest.json": {
+          "path": "run/manifest.json",
+          "bytes": 21387,
+          "sha256": "7ad39bf900d6f24fc81a3da469d6417061560b78319672c1875c3b5181122f74"
+        },
+        "run/partition.json": {
+          "path": "run/partition.json",
+          "bytes": 14922,
+          "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+        },
+        "evaluation/collected.json": {
+          "path": "evaluation/collected.json",
+          "bytes": 13419,
+          "sha256": "96b744478f969962a19775ad1b642e5fe84f85da9f25efea4b1c7041022fd17e"
+        },
+        "evaluation/evaluation.json": {
+          "path": "evaluation/evaluation.json",
+          "bytes": 715238,
+          "sha256": "1ad9f51f83447256d3deeccc05afca7cf8f683d2e77bf7a921687467dbe1f7bc"
+        }
+      }
+    }
+  },
+  "pending_logit_reference": {
+    "execution": {
+      "path": "execution.json",
+      "sha256": "ceb783d99d2ef965624e33a5d0a3177d3e12b762bfc001e4944786853f0250ae",
+      "bytes": 5597
+    },
+    "linux_job": "reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace/reports/job",
+    "policy_sha256": "8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0"
+  }
+}

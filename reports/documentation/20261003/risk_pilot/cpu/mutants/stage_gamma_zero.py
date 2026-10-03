@@ -242,6 +242,6 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: RiskMemory, c
         records.append(update(model, optimizer, group, history, reference, c, stage, index + 1,
                               data.seed_for(stream, index, "dropout"),
                               data.seed_for(policy["memory_seed"], order, stage, index, "history_dropout"),
-                              history_weight=history_weight, retention_weight=retention_weight, check=check))
+                              history_weight=history_weight, retention_weight=0., check=check))
     return {"current_ids": [g.uid for g in sequence], "history_ids": history_ids,
             "updates": records, "physical_updates": len(records)}

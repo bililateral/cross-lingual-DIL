@@ -14,6 +14,8 @@
 
 ## 接手顺序与信息地图
 
+**最新执行授权（10月3日）**：用户在单点具体建议后明确“那开始运行吧”，授权[风险候选单点合同](SELLER_ALIAS_RISK_PILOT.zh.md)的λ=.1、γ=.5、6终点/1728更新及必要核验、审查和执行；旧“没有新训练许可”仅描述上一轮。独立Linux workspace为`reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace`。正式接入已完成；Linux CPU46于19:15:02—19:20:41完成10项手写检查和3次原生BGE更新探针，修补后的两项测试也实际检出γ置零与参考行错配，详见[增量核验](../reports/documentation/20261003/risk_pilot/implementation.zh.md)。用户已专项授权本次83成员增量包；19:45:16通过本地Playwright实际发送，网页显示正在回应，见[提交状态](../reports/documentation/20261003/risk_pilot/submission.json)。一次性监听脚本已部署，但尚未启用；待本次外审及独立主审通过后生成来源绑定授权并启用。尚未读取正式数据或启动风险算法GPU训练。18:59:58实查LOGIT0.1 PID3330435仍运行、GPU空闲22947MiB，未达到24GiB启动门。用户同时明确资源不足时监听自动启动、确认实际更新后自删；通用规则已写入科研纪律。LOGIT0.25六末端权重按用户指令于19:04:45删除，7,838,884,668字节，179份相关非权重证据不变，见[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)；下方旧保留记录不再代表这六份当前存在。
+
 先读本页和[科研纪律](RESEARCH_DISCIPLINE.zh.md)，建立问题、当前授权、历史结论与未决事项的全局认识；再沿下表进入本次任务的合同、实际代码、直接依赖和原始审查。按本轮变化与证据缺口确定[最小核验及完成条件](RESEARCH_DISCIPLINE.zh.md#5-实现核验与证据复用)，证据充分即推进交付。历史结论按需回到原件，不因换Agent重读全部历史、重跑已验证工作或扩大审查范围。任何读取仍受数据与结果权限限制。
 
 | 要掌握的信息 | 原始入口与使用边界 |
@@ -59,9 +61,9 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 
 当前数据、划分、六群Algorithm R／1MiB历史及附属状态、随机性、校准、22指标和条件区间均以[首轮合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)及相应扩展合同为准。三个顺序不是三个训练种子，已开发valid不是独立确认集。
 
-既有120群基础test已使用，不能再次当作未开发最终留出。新最终留出、创新算法、多种子确认、大候选库和无正候选查询只可先提出方案，尚无本轮执行许可。Audit A/B真值、Audit B预测、owners和私有身份资产维持既定封存边界。
+既有120群基础test已使用，不能再次当作未开发最终留出。风险算法的单点开发运行已按上文新合同授权；新最终留出、多种子确认、大候选库和无正候选查询只可先提出方案，尚无本轮执行许可。Audit A/B真值、Audit B预测、owners和私有身份资产维持既定封存边界。
 
-当前保留：排序s0候选及对照两份（ranking_execution/20260927_114646/job/run下s0_hard和s0_d的models/epoch6.pt）；首轮三个共享首域完整状态（bge_continual_execution/20260930_143700/job/run/branches下ABC_shared.pt、BCA_shared.pt、CAB_shared.pt）；ER0.1与LOGIT0.25各六份新权重、必要状态、缓存、预训练档案及证据。新权重共15,677,749,320字节，保管清单见两份结果报告；本次结果审查关闭没有新增删除决定。路径所属日期及完整清单见[存储](STORAGE.zh.md)和[依赖／删除记录](../reports/maintenance/20261002/unused_weights/report.zh.md)。已删49份旧推理权重的事实不变，旧18份全保留措辞不再适用；保留或后续清理由实际依赖与恢复需要决定。
+当前保留（10月3日清理后）：排序s0候选及对照两份（ranking_execution/20260927_114646/job/run下s0_hard和s0_d的models/epoch6.pt）；首轮三个共享首域完整状态（bge_continual_execution/20260930_143700/job/run/branches下ABC_shared.pt、BCA_shared.pt、CAB_shared.pt）；ER0.1六份新权重、必要状态、缓存、预训练档案及证据。LOGIT0.25六份末端权重已按用户最新指令于19:04:45删除，释放7,838,884,668字节；原小结果和历史保管清单保留，当前事实以[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)为准。路径所属日期及完整清单见[存储](STORAGE.zh.md)和[依赖／删除记录](../reports/maintenance/20261002/unused_weights/report.zh.md)。已删49份旧推理权重的事实不变，旧18份全保留措辞不再适用；保留或后续清理由实际依赖与恢复需要决定。
 
 ## 已有结论与历史边界
 

@@ -1,0 +1,31 @@
+test_actual_stage_memory_lifecycle_and_restore (test_step28_risk_replay.RiskReplayTests) ... FAIL
+
+======================================================================
+FAIL: test_actual_stage_memory_lifecycle_and_restore (test_step28_risk_replay.RiskReplayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace/tests/test_step28_risk_replay.py", line 174, in test_actual_stage_memory_lifecycle_and_restore
+    assert_references()
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace/tests/test_step28_risk_replay.py", line 173, in assert_references
+    np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-6)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 1715, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 921, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0, atol=1e-06
+
+Mismatched elements: 48 / 48 (100%)
+Max absolute difference among violations: 0.0240354
+Max relative difference among violations: 0.01722925
+ ACTUAL: array([[3.249573, 0.681238, 0.669889],
+       [3.265066, 0.681238, 0.675124],
+       [3.266057, 0.692356, 0.675136],...
+ DESIRED: array([[3.272487, 0.693181, 0.670657],
+       [3.273643, 0.693181, 0.673729],
+       [3.274781, 0.696048, 0.673792],...
+
+----------------------------------------------------------------------
+Ran 1 test in 0.056s
+
+FAILED (failures=1)

@@ -14,6 +14,7 @@ import numpy as np
 
 import step28_er_weight as method
 import step28_er_weight_evaluate as evaluation
+import step28_risk_execution as risk_execution
 
 parent, prior = method.parent, method.prior
 base, data, core = method.base, method.data, method.core
@@ -53,15 +54,26 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
         raise ValueError("Current schedule differs from original ER")
     memory.begin_stage(stage)
     updates, history_ids, observations = [], [], {}
+    diagnostics = risk_execution.mode_probe(model, memory, c, budget.check) if method.is_risk(p) else None
     if next(model.parameters()).is_cuda:
         torch.cuda.synchronize()
         torch.cuda.reset_peak_memory_stats()
     for index, group in enumerate(sequence):
         history, target = memory.draw()
-        if (target is not None) != method.with_logits(p) or history.uid != reference_log["history_ids"][index]:
+        if (target is not None) != (method.with_logits(p) or method.is_risk(p)) or history.uid != reference_log["history_ids"][index]:
             raise ValueError("Historical group or target presence differs from the confirmed study")
         history_ids.append(history.uid)
-        record = method.update(
+        if method.is_risk(p):
+            record = risk_execution.risk.update(
+                model, optimizer, group, history, target, c, stage, index + 1,
+                data.seed_for(stream, index, "dropout"),
+                data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
+                history_weight=p["arms"][arm], retention_weight=p["loss"]["risk_retention"],
+                observe=index + 1 in (1, 29, 30, 288), check=budget.check)
+            if "head_gradient_diagnostics" in record:
+                diagnostics["first_update_head_gradient_norms"] = record["head_gradient_diagnostics"]
+        else:
+            record = method.update(
             model, optimizer, group, history, c, p["arms"][arm], stage, index + 1,
             data.seed_for(stream, index, "dropout"),
             data.seed_for(old_policy["memory_seed"], order, stage, index, "history_dropout"),
@@ -93,6 +105,8 @@ def train_stage(model: Any, optimizer: Any, current: list, memory: Any, c: dict,
         result["cuda_allocator"] = {"peak_allocated_bytes": torch.cuda.max_memory_allocated(),
                                      "peak_reserved_bytes": torch.cuda.max_memory_reserved()}
     result["training_seconds"] = time.monotonic() - started
+    if diagnostics is not None:
+        result["risk_diagnostics"] = diagnostics
     data.write_json(root / "updates" / (name + ".json"), result)
     return result
 
@@ -236,6 +250,8 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                 raise ValueError("Original ER cache/first-map restore differs")
             memory.auxiliary = {**shared["learner_auxiliary"], "history_weight": weight,
                                 "er_weight_policy_sha256": method.policy_sha256(p)}
+            if method.is_risk(p):
+                memory = risk_execution.Memory.from_er(memory.to_bytes(), model, optimizer, c, budget.check)
             memory.to_bytes()
             supply.resume(path, order, shared)
             manifest["restored_starts"][path] = {
@@ -260,7 +276,10 @@ def train(job: Path, p: dict, budget: Any) -> tuple[dict, dict, list, dict]:
                         scored_ids.extend(group.uid for group in rows)
                         return parent.ranking.score(model, rows, c, budget.check)
 
-                    memory.retain(current, 2, reference_score if method.with_logits(p) else None)
+                    if method.is_risk(p):
+                        memory.retain(current, 2, model, optimizer, c, budget.check)
+                    else:
+                        memory.retain(current, 2, reference_score if method.with_logits(p) else None)
                     expected = reference["manifest"]["memories"][f"{order}_er_stage2"]
                     if memory.summary()["members"] != expected["members"]:
                         raise ValueError("Stage-end reservoir members differ from original ER")
@@ -370,6 +389,15 @@ def blind_gate(root: Path, manifest: dict, reference: dict, p: dict | None = Non
                 values = prior.array(root, log["update_file"], (288, len(method.step_columns(p))), np.float64)
                 columns = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
                 expected_total = columns["current_total"] + columns["weighted_history_total"]
+                if method.is_risk(p):
+                    risk_execution.verify_references(root, retained, start, log, stage)
+                    if (not np.all(columns["retention_weight"] == p["loss"]["risk_retention"])
+                            or any(np.any(columns["retention_" + c] < 0) for c in ("rank", "positive", "negative"))
+                            or not np.allclose(columns["retention"], sum(columns["retention_" + c] for c in
+                                                                         ("rank", "positive", "negative")) / 3,
+                                               rtol=2e-6, atol=1e-8)):
+                        raise ValueError("Risk penalty decomposition or coefficient differs")
+                    expected_total += p["loss"]["risk_retention"] * columns["retention"]
                 if method.with_logits(p):
                     expected_memory = initial_memory if stage == 2 else retained
                     if any(log["memory_after_training"][key] != expected_memory[key]
@@ -465,7 +493,10 @@ def execute(job: Path, audit_path: Path, authorization_path: Path, study: str = 
             or auth.get("review_and_primary_passed") is not True):
         raise ValueError("Matching reviewed formal authorization is required")
     gradient_evidence = "native_logit_gradient_increment_verified" if method.with_logits(p) else "native_history_gradient_scaling_verified"
-    if (audit.get("status") != f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU" or audit.get("source_files") != source_files
+    if method.is_risk(p):
+        from step28_risk_study import verify_audit
+        verify_audit(audit, audit_path, source_files)
+    elif (audit.get("status") != f"PASS_{method.evidence_tag(p)}_HANDMADE_CPU" or audit.get("source_files") != source_files
             or audit.get("contracts", {}).get("failed") != 0 or audit.get("contracts", {}).get("skipped") != 0
             or audit.get("formal_inputs") is not False or audit.get("formal_labels") is not False
             or set(audit.get("native", {})) != set(p["arms"])
@@ -533,7 +564,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--audit", type=Path)
     parser.add_argument("--authorization", type=Path)
-    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low"), default="weight")
+    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low", "risk"), default="weight")
     args = parser.parse_args()
     if platform.system() != "Linux":
         parser.error("Research scripts run only on Linux py310")

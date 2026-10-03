@@ -28,6 +28,9 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
 
 
 def contract(study: str = "weight") -> dict:
+    if study == "risk":
+        from step28_risk_study import contract as risk_contract
+        return risk_contract()
     if study not in ("weight", "low", "logit", "logit_low"):
         raise ValueError("Unknown confirmed ER study")
     path, digest, arms = {
@@ -51,6 +54,9 @@ def contract(study: str = "weight") -> dict:
 
 
 def policy_sha256(p: dict) -> str:
+    if is_risk(p):
+        from step28_risk_study import POLICY_SHA256 as risk_digest
+        return risk_digest
     return {"seller_alias_er_low_weight": LOW_POLICY_SHA256,
             "seller_alias_er_history_weight": POLICY_SHA256,
             "seller_alias_logit_weight": LOGIT_POLICY_SHA256,
@@ -61,11 +67,19 @@ def with_logits(p: dict) -> bool:
     return p.get("memory_arm", "er") == "logit"
 
 
+def is_risk(p: dict) -> bool:
+    return p["study"] == "seller_alias_risk_replay"
+
+
 def evidence_tag(p: dict) -> str:
+    if is_risk(p):
+        return "RISK_REPLAY"
     return "LOGIT_WEIGHT" if with_logits(p) else "ER_WEIGHT"
 
 
 def step_columns(p: dict) -> tuple[str, ...]:
+    if is_risk(p):
+        return STEP_COLUMNS + ("retention_rank", "retention_positive", "retention_negative", "retention", "retention_weight")
     return STEP_COLUMNS + (("logit_mse", "logit_weight") if with_logits(p) else ())
 
 
@@ -80,6 +94,9 @@ def config(p: dict) -> dict:
 
 
 def sources(p: dict | None = None) -> list[dict]:
+    if p is not None and is_risk(p):
+        from step28_risk_study import sources as risk_sources
+        return risk_sources()
     additional = ["docs/SELLER_ALIAS_ER_WEIGHT.zh.md", "schema/step28_er_weight_policy.json",
                   "scripts/step28_er_weight.py", "scripts/step28_er_weight_run.py",
                   "scripts/step28_er_weight_evaluate.py", "scripts/step28_er_weight_check.py",

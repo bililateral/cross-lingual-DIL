@@ -124,7 +124,7 @@ class RiskMemory:
         try:
             if newcomers:
                 values = parent.ranking.score(model, newcomers, c, check)
-                for group, row in zip(newcomers, values, strict=True):
+                for group, row in zip(newcomers, values[::-1], strict=True):
                     retained[group.uid] = {"stage": stage, "values": make_reference(row, group.labels)}
         finally:
             model.train(was_training)

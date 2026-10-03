@@ -1,0 +1,25 @@
+test_actual_stage_memory_lifecycle_and_restore (test_step28_risk_replay.RiskReplayTests) ... ok
+test_invalid_reference_and_labels_fail_before_update (test_step28_risk_replay.RiskReplayTests) ... ok
+test_model_adam_and_memory_restore_preserves_next_update (test_step28_risk_replay.RiskReplayTests) ... ok
+test_real_update_gradient_decomposition_and_optimizer (test_step28_risk_replay.RiskReplayTests) ... /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace/tests/test_step28_risk_replay.py:134: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  self.assertAlmostEqual(row["retention"], float(keep), places=6)
+ok
+test_scalar_formula_and_all_logit_derivatives (test_step28_risk_replay.RiskReplayTests) ... ok
+test_tail_improvement_permutation_strata_and_channels (test_step28_risk_replay.RiskReplayTests) ... ok
+test_zero_weight_matches_er_and_term_changes_both_modules (test_step28_risk_replay.RiskReplayTests) ... ok
+test_actual_runner_stage_and_mode_probe (test_step28_risk_execution.ExecutionTests) ... ok
+test_blind_gate_risk_coefficients_and_missing_endpoint (test_step28_risk_execution.ExecutionTests) ... ok
+test_four_matched_comparisons (test_step28_risk_execution.ExecutionTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 14.661s
+
+OK
+Traceback (most recent call last):
+  File "<stdin>", line 21, in <module>
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace/scripts/step28_continual_population_data.py", line 46, in record
+    return {"path": path.relative_to(base).as_posix(), "bytes": path.stat().st_size,
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'reports/cpu_attempt1/evidence/audit.json' is not in the subpath of '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace' OR one path is relative and the other is absolute.

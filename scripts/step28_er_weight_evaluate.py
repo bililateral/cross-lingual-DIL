@@ -66,7 +66,11 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
         comparisons[arm + "_minus_" + reference] = {
             "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
     result = {"endpoints": endpoints, "comparisons": comparisons}
-    if method.with_logits(p):
+    if method.is_risk(p):
+        candidate = next(iter(p["arms"]))
+        result["method_checks"] = {reference: comparisons[candidate + "_minus_" + reference]["interpretation"]
+                                  for reference in p["evaluation"]["comparators"]}
+    elif method.with_logits(p):
         candidate = next(iter(p["arms"]))
         matched = p["evaluation"].get("matched_er", "quarter")
         result["method_checks"] = {
@@ -118,6 +122,9 @@ def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None)
 def finalize(root: Path, baseline_root: Path, p: dict | None = None,
              weight_root: Path | None = None, continuation_jobs: dict[str, Path] | None = None) -> dict:
     p = method.contract() if p is None else p
+    if method.is_risk(p):
+        from step28_risk_study import resolve_comparator
+        p = resolve_comparator(p, root)
     reference = method.baseline(p, baseline_root.parent,
                                 None if weight_root is None else weight_root.parent, continuation_jobs)
     collected = data.read_json(root / "collected.json")
