@@ -1,6 +1,6 @@
 # 当前科研交接
 
-维护日期：2026-10-03。本页只维护一个当前入口；运行状态以带观测时点的实际回执为准。10月3日10:00（Asia/Shanghai）已查看两项作业的完成、完整盲门、访问账及来源身份，并回传17份11,204字节执行证据；完整结果回传、独立数值核对和结果外审尚未完成，不能把程序完成标记当作已审科研结论。
+维护日期：2026-10-03。本页只维护一个当前入口；运行状态以带观测时点的实际回执为准。两项作业均已完成，468份16,506,607字节正式小结果完整回传并逐文件核对；10月3日10:23:58（Asia/Shanghai）Linux独立保存结果核验通过。获准的联合结果包已于11:45通过本地Playwright MCP提交，实际网页审查已回应并开始执行，见[提交与状态](../reports/seller_alias_continual/20261003/result_review/submission.json)。当前剩余结果外审结论及最终主审，不能把实现审查、数值核验或提交成功写成结果外审已经通过。
 
 ## 研究问题与目标
 
@@ -21,7 +21,7 @@
 | 实现如何走到更新和结果 | [首轮实现说明](SELLER_ALIAS_BGE_IMPLEMENTATION.zh.md)、[共享模型／记忆](../scripts/step28_bge_continual.py)、[加权更新](../scripts/step28_er_weight.py)、[续训编排](../scripts/step28_er_weight_run.py)、[保存结果评价](../scripts/step28_er_weight_evaluate.py)；本地后继版本不能冒充ER0.1活动源码 |
 | 审查真正说了什么、哪些已关闭 | [ER0.1原文](../reports/documentation/20261002/er_low/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/er_low/review/report.zh.md)、[LOGIT原文](../reports/documentation/20261002/logit_weight/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/logit_weight/review/report.zh.md)；附件和失败修订从各主审记录回溯 |
 | 当前到底能执行什么、实际用了多少 | 下方状态表、[ER0.1授权及31来源](../reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/authorization.json)、[LOGIT授权](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/authorization.json)及[36项部署清单](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/source_inventory.json)；授权上限不是实际消费数，后者查运行账和状态回执 |
-| 已经得到哪些正负结果、什么仍未知 | 下方历史判读表、[早期分类](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)、[旧LaBSE阶段](RESEARCH_PROGRESS_20260923.zh.md)；当前两项新结果尚待实际回传和核验，不能由旧趋势预测为成功 |
+| 已经得到哪些正负结果、什么仍未知 | [ER0.1结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT0.25结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、下方历史判读表、[早期分类](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)、[旧LaBSE阶段](RESEARCH_PROGRESS_20260923.zh.md)；新结果已回传并独立数值核验，结果外审尚未完成 |
 | 文件在哪里、缺失能否恢复、接下来做什么 | [Linux与活动文件](#linux与活动文件)、[存储与删除事实](STORAGE.zh.md)、[已授权计划与新合同边界](RESEARCH_PLAN.md) |
 
 当前主模型是`BAAI/bge-large-zh-v1.5`，标题／描述分别编码并以均值和总体标准差汇总，4096维账号表示进入对称8192→128→1头；编码器和头均训练。基础损失为BCE＋query-rank＋0.5 hard，ER的λ乘完整历史基础损失，LOGIT再加独立0.5 MSE。省略历史损失是λ=0／SEQ的科学对照，省略乘数而保留历史项是λ=1；不能据此宣称任意实现都逐位等价。
@@ -32,8 +32,8 @@
 
 | 工作 | 最近已保存的观测 | 合同及实际状态入口 |
 |---|---|---|
-| ER λ=0.1单点 | 10月3日10:00：10月2日18:16:57正式结束，退出0；记录1728更新、完整盲门通过，train1、valid1、heldout/owners0；结果核对待完成 | [合同](SELLER_ALIAS_ER_LOW.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/er_low_execution/current_status.json)、[实现审查及主审](../reports/documentation/20261002/er_low/review/report.zh.md) |
-| 匹配LOGIT0.25 | 10月3日10:00：10月2日21:53:13正式结束，退出0；记录1728更新、完整盲门通过，train1、valid1、heldout/owners0；监听已退出，结果核对待完成 | [合同](SELLER_ALIAS_LOGIT_WEIGHT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/logit_weight_execution/current_status.json)、[实现主审及原生证据](../reports/documentation/20261002/logit_weight/review/report.zh.md) |
+| ER λ=0.1单点 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；270份结果回传，独立核验通过。对0.25为23/23并按规则选0.1，对SEQ为10/23；待结果外审 | [合同](SELLER_ALIAS_ER_LOW.zh.md)、[完整分析](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/er_low_execution/current_status.json) |
+| 匹配LOGIT0.25 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；198份结果回传，独立核验通过。对ER0.25为23/23，对SEQ为16/23；监听已退出／自删，待结果外审 | [合同](SELLER_ALIAS_LOGIT_WEIGHT.zh.md)、[完整分析](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/logit_weight_execution/current_status.json) |
 
 ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5—7小时；LOGIT于16:31:29—21:53:13运行，实际5小时21分44秒，原估6—8小时。两项剩余训练时间均为0，均在各自12小时／16GiB上限内。上述程序完成及来源核对证据见[最新观测](../reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/observation/20261003_095536/remote_status.json)；ER31份、LOGIT隔离目录34份科学来源匹配。下一步使用现有输出，不重复启动。
 
@@ -41,7 +41,7 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 
 **当前执行补充**：用户明确“不用等λ=0.1，资源够了就开始”，LOGIT实际已于ER结束前启动，资源门和预算没有改变。监听在10月2日16:37:14确认真实更新后自删Linux脚本，随正式作业于21:53:13退出0；最新实查确认脚本不存在。[具体决定](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/decision.json)、[自删原记录](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。监听任务已结束，不重建。
 
-**本次harness调整的边界**：已批准范围内连续执行；未来可批准手写CPU先于外审及条件故障恢复。当前两项实验仍使用冻结来源和原访问账，正式失败不自动重启；完整矩阵后的原有纯统计收尾另按合同。没有新增λ、种子、训练、标签或成功线。后续是必要回传、保存结果核对、实际结果外审／主审、交付；已完成的实现审查不重开。
+**本次harness调整的边界**：已批准范围内连续执行；未来可批准手写CPU先于外审及条件故障恢复。当前两项实验仍使用冻结来源和原访问账，正式失败不自动重启；完整矩阵后的原有纯统计收尾另按合同。没有新增λ、种子、训练、标签或成功线。结果回传与保存结果核对已完成，后续只剩实际结果外审／主审及相应交付，已完成的实现审查不重开。[联合结果审查请求](../reports/seller_alias_continual/20261003/result_review/request.zh.md)、[具体包身份](../reports/seller_alias_continual/20261003/result_review/package.json)及[本包专项上传许可](../reports/seller_alias_continual/20261003/result_review/upload_authorization.json)已留存。网页外审沿用本地Playwright MCP；此前CUA失败不计为审查，不能重复提交已经实际运行的请求。
 
 ## Linux与活动文件
 
@@ -66,6 +66,8 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 | 困难排序C／校准／基础test | 原排序9/13，排序正增益与概率退化并存；校准17/17；固定s0 test原8/9，用户事后接受实际提升，原passed=false不改。[排序](SELLER_ALIAS_RANKING_RESULT.zh.md)、[校准](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[test](SELLER_ALIAS_TEST_RESULT.zh.md) |
 | BGE首轮持续学习 | SEQ遗忘门通过；ER1−SEQ 4/23；LOGIT1−ER1 23/23，但相对SEQ旧域R5、新域和最终最新域仍有退化。有效的相对正结果不等于整体成功。[结果与审查](SELLER_ALIAS_BGE_RESULT.zh.md) |
 | ER0.5／0.25 | 两者对ER1均23/23、对SEQ均4/23，按原规则选0.25；原结果有效、对SEQ的不足保留。[结果](SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md) |
+| ER0.1（结果外审待完成） | 对0.25为23/23，对SEQ为10/23；O MAP和首域遗忘有正向证据，N MAP/R5有负向证据。从0.1到0时O MAP下降，不能宣称λ越小全面越好或0最优。[结果与独立核验](SELLER_ALIAS_ER_LOW_RESULT.zh.md) |
+| 匹配LOGIT0.25（结果外审待完成） | 对匹配ER为23/23，对SEQ为16/23；相对SEQ的O MAP/R5、首域遗忘和final_all MAP正向，新域若干观察值保护未满足，跨零不等于无退化；不换ER0.1作主要对手。[结果与独立核验](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md) |
 | 更早的有效正／零／负与无效运行 | [历史分类与原报告](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)逐项区分Step7—28；不能把小样本、旧输入或内部开发的局部正结果外推到当前任务 |
 
 特别保留：Step27-v1工程无效，而v1.1已实际完成并未通过OOF门；Step28-v12的固定合成家族内正结果不同于Step28-v13 v1.12；V9.3-R2为AUDITOR_DESIGN_INVALID_NO_DATASET_CONCLUSION，不能称有效数据集失败；v12.1应用弃权及Audit A未开真值的盲预测不是准确率负结果。

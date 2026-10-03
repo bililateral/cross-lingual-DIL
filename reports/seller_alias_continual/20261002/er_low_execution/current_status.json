@@ -1,6 +1,6 @@
 {
   "observed_at": "2026-10-03T10:00:10.618251+08:00",
-  "status": "FORMAL_COMPLETED_RESULT_AUDIT_PENDING",
+  "status": "RESULT_RETURN_AND_LOCAL_AUDIT_COMPLETE_EXTERNAL_REVIEW_RUNNING",
   "formal_started_at": "2026-10-02T12:55:35+08:00",
   "formal_finished_at": "2026-10-02T18:16:57+08:00",
   "exit_status": 0,
@@ -42,11 +42,36 @@
     "files": 17
   },
   "external_and_primary_implementation_passed": true,
-  "formal_result_validity_independently_audited": false,
+  "formal_result_validity_independently_audited": true,
   "result_external_and_primary_review_complete": false,
-  "full_result_return_complete": false,
-  "result_scope": "Program completion includes provisional selection/comparison flags; detailed effects and final conclusions require existing-contract saved-result verification and result review",
+  "full_result_return_complete": true,
+  "result_scope": "Original complete saved results independently audited on Linux; relative gains, failures of original guards, and developed-valid limitations remain distinct. Actual web result review running; final primary disposition pending.",
   "automatic_retry": false,
-  "next_action": "Return complete authorized small result artifacts; verify saved matrices and all original comparisons; actual result external review and primary disposition; no new training or label parsing",
-  "cpu_verification": "22 passed, 0 failed/skipped, 4 actual native handwritten updates; exit0; 364.25 seconds; 10 CPU files 58693 bytes returned exactly."
+  "next_action": "Read actual result external review and evidence; independently dispose findings, finalize reports and delivery. No new training or label parsing.",
+  "cpu_verification": "22 passed, 0 failed/skipped, 4 actual native handwritten updates; exit0; 364.25 seconds; 10 CPU files 58693 bytes returned exactly.",
+  "result_status_updated_at": "2026-10-03T11:47:46.9698374+08:00",
+  "full_result_return": {
+    "files": 270,
+    "bytes": 8721549,
+    "all_sizes_sha256_match": true,
+    "record": "reports/seller_alias_continual/20261003/er_low_result/return_sync.json"
+  },
+  "saved_result_audit": {
+    "completed_at_utc": "2026-10-03T02:23:58.498288+00:00",
+    "status": "PASS_ER_WEIGHT_SAVED_RESULT_AUDIT",
+    "record": "reports/seller_alias_continual/20261003/er_low_result/audit/audit.json",
+    "independent_of_formal_evaluator": true,
+    "label_parses_added": 0,
+    "limitations": [
+      "Saved aggregate metrics audited; label-dependent AP/MAP not recomputed from truth.",
+      "Native execution not repeated; weights hashed separately without model loading.",
+      "Single seed, developed valid and selection-conditional intervals; no independent test or method novelty claim."
+    ]
+  },
+  "result_external_review": {
+    "status": "RUNNING",
+    "submission": "reports/seller_alias_continual/20261003/result_review/submission.json",
+    "url": "https://chatgpt.com/c/6ac07a3e-80b8-83e9-a6fd-294b4ecf3f15",
+    "tool": "Local Playwright MCP"
+  }
 }
