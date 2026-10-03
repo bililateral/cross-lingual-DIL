@@ -1,0 +1,243 @@
+{
+  "observed_at": "2026-10-03T10:00:10.618251+08:00",
+  "scope": "Existing execution records and source files only; no label, score, or model parsing; no training",
+  "scientific_sources": {
+    "er_low_main_root": 31,
+    "logit_isolated_workspace": 34,
+    "mismatches": 0
+  },
+  "verification_note": "The first LOGIT source check used the local receipt location and stopped with FileNotFoundError; corrected to workspace/reports/authorization.json. ER31 already matched; LOGIT34 now matched.",
+  "jobs": {
+    "er_low": {
+      "linux_job": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
+      "failure_exists": false,
+      "started.txt": "2026-10-02T12:55:35+08:00",
+      "finished.txt": "2026-10-02T18:16:57+08:00",
+      "exit_status.txt": "0",
+      "completion.json": {
+        "budget": {
+          "elapsed_seconds": 19279.312225695,
+          "peak_observed_bytes": 10446866117
+        },
+        "evaluation": {
+          "bytes": 1032505,
+          "path": "evaluation/evaluation.json",
+          "sha256": "7186d6df305021f6c1ba94bc0075bcae06a0d6eb4f42162d5a10cea2b168cb2f"
+        },
+        "label_parses": {
+          "heldout": 0,
+          "owners": 0,
+          "train": 1,
+          "valid": 1
+        },
+        "physical_updates": 1728,
+        "selection": {
+          "additional_configurations_authorized": false,
+          "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+          "eligible": [
+            "tenth"
+          ],
+          "fallback_used": false,
+          "history_weight": 0.1,
+          "scope": "Developed-valid configuration selection, not independent confirmation",
+          "selected": "tenth"
+        },
+        "status": "COMPLETE_ER_WEIGHT_DEVELOPMENT_COMPARISON"
+      },
+      "before_valid.json": {
+        "label_parses": {
+          "heldout": 0,
+          "owners": 0,
+          "train": 1,
+          "valid": 0
+        },
+        "manifest": {
+          "bytes": 14752,
+          "path": "run/manifest.json",
+          "sha256": "0fcacb9438572a7f35baba6d782aff99e476c8c6328e24059b0c2113814c5f5b"
+        },
+        "status": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE"
+      },
+      "access.json": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 1
+      },
+      "blind_manifest_hash_matches": true
+    },
+    "logit_weight": {
+      "linux_job": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job",
+      "failure_exists": false,
+      "started.txt": "2026-10-02T16:31:29+08:00",
+      "finished.txt": "2026-10-02T21:53:13+08:00",
+      "exit_status.txt": "0",
+      "completion.json": {
+        "budget": {
+          "elapsed_seconds": 19302.0049627251,
+          "peak_observed_bytes": 10447072442
+        },
+        "evaluation": {
+          "bytes": 715238,
+          "path": "evaluation/evaluation.json",
+          "sha256": "1ad9f51f83447256d3deeccc05afca7cf8f683d2e77bf7a921687467dbe1f7bc"
+        },
+        "label_parses": {
+          "heldout": 0,
+          "owners": 0,
+          "train": 1,
+          "valid": 1
+        },
+        "method_checks": {
+          "all_guards_against_seq_pass": false,
+          "increment_against_matched_er_passes": true,
+          "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"
+        },
+        "physical_updates": 1728,
+        "status": "COMPLETE_LOGIT_WEIGHT_DEVELOPMENT_COMPARISON"
+      },
+      "before_valid.json": {
+        "label_parses": {
+          "heldout": 0,
+          "owners": 0,
+          "train": 1,
+          "valid": 0
+        },
+        "manifest": {
+          "bytes": 21387,
+          "path": "run/manifest.json",
+          "sha256": "7ad39bf900d6f24fc81a3da469d6417061560b78319672c1875c3b5181122f74"
+        },
+        "status": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE"
+      },
+      "access.json": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 1
+      },
+      "blind_manifest_hash_matches": true
+    }
+  },
+  "files": [
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/started.txt",
+      "name": "started.txt",
+      "bytes": 26,
+      "sha256": "52bf2f23572660d702e755bf363f232449321934edc6cec6ee329f86b408900c"
+    },
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/finished.txt",
+      "name": "finished.txt",
+      "bytes": 26,
+      "sha256": "85a1b0cf4810c83870c5c23ecbaaa776733ae3151401280c50a46047a443be1c"
+    },
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/exit_status.txt",
+      "name": "exit_status.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/completion.json",
+      "name": "completion.json",
+      "bytes": 658,
+      "sha256": "fbefd62dcd10a55261aead9c7f27361b5deba515a802b9b23de123822f6d4d74"
+    },
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/before_valid.json",
+      "name": "before_valid.json",
+      "bytes": 238,
+      "sha256": "64e3ea2a48f2f7fd20d5c74680ff895331ec1f98abf677956c24a7991522d0d2"
+    },
+    {
+      "study": "er_low",
+      "path": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job/access.json",
+      "name": "access.json",
+      "bytes": 45,
+      "sha256": "1b5641137802422d018defe13fd82fa4c68d56ea5187b95ac2ee84ca51f1401f"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/started.txt",
+      "name": "started.txt",
+      "bytes": 26,
+      "sha256": "a86418e26fd91699c5aa1413aa7b7f711fda5e08241c831cd36d5b43b3db8793"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/finished.txt",
+      "name": "finished.txt",
+      "bytes": 26,
+      "sha256": "a65969a2baf19e243b7c0e157ec80fa6df40de685c1dffba666153d8562a36b2"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/exit_status.txt",
+      "name": "exit_status.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/completion.json",
+      "name": "completion.json",
+      "bytes": 574,
+      "sha256": "0a7a1a06cfdc03748abfb6ee665c6b99a9e1e023262a1f5f3fae2ea936eafb39"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/before_valid.json",
+      "name": "before_valid.json",
+      "bytes": 238,
+      "sha256": "f878a3a7ab43eb7e0ae1abd7ceb37e665a9083494cb9293a333ddbe288f78693"
+    },
+    {
+      "study": "logit_weight",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/job/access.json",
+      "name": "access.json",
+      "bytes": 45,
+      "sha256": "1b5641137802422d018defe13fd82fa4c68d56ea5187b95ac2ee84ca51f1401f"
+    },
+    {
+      "study": "listener",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/listener/started.txt",
+      "name": "started.txt",
+      "bytes": 26,
+      "sha256": "1eb544953a12d26c7440020b6f0e6af4c51b5e8c0083882b7af9a7ea3c3457e9"
+    },
+    {
+      "study": "listener",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/listener/script_deleted_after_updates.txt",
+      "name": "script_deleted_after_updates.txt",
+      "bytes": 26,
+      "sha256": "0dbf9f88cc698a9e11c2004d4abfb5a83019cb15efba785e5c693bccebc10a49"
+    },
+    {
+      "study": "listener",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/listener/finished.txt",
+      "name": "finished.txt",
+      "bytes": 26,
+      "sha256": "a65969a2baf19e243b7c0e157ec80fa6df40de685c1dffba666153d8562a36b2"
+    },
+    {
+      "study": "listener",
+      "path": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace/reports/listener/exit_status.txt",
+      "name": "exit_status.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  ],
+  "listener": {
+    "script_exists": false,
+    "started.txt": "2026-10-02T15:47:25+08:00",
+    "script_deleted_after_updates.txt": "2026-10-02T16:37:14+08:00",
+    "finished.txt": "2026-10-02T21:53:13+08:00",
+    "exit_status.txt": "0"
+  }
+}

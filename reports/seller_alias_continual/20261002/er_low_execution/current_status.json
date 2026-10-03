@@ -1,74 +1,52 @@
 {
-  "observed_at": "2026-10-02T15:42:37.370051+08:00",
-  "status": "RUNNING_FORMAL_UPDATES_CONFIRMED",
+  "observed_at": "2026-10-03T10:00:10.618251+08:00",
+  "status": "FORMAL_COMPLETED_RESULT_AUDIT_PENDING",
   "formal_started_at": "2026-10-02T12:55:35+08:00",
-  "training_pid": 3295228,
-  "launcher_pid": 3295215,
-  "cpu_affinity": [
-    47
+  "formal_finished_at": "2026-10-02T18:16:57+08:00",
+  "exit_status": 0,
+  "actual_wall_seconds": 19282,
+  "remaining_training_seconds": 0,
+  "original_estimated_total_hours": [
+    5,
+    7
   ],
-  "gpu_index": 0,
-  "latest_update_event": {
-    "arm": "tenth",
-    "elapsed_seconds": 9984.679329880979,
-    "event": "updates",
-    "logical_updates": 600,
-    "order": "BCA",
-    "peak_observed_bytes": 6525359015,
-    "stage": 3,
-    "stage_updates": 24
-  },
-  "new_physical_updates_observed_at_least": 888,
+  "estimate_status": "Completed; use recorded actual duration, not the expired estimate",
+  "hard_seconds": 43200,
+  "maximum_new_output_bytes": 17179869184,
+  "physical_updates_recorded": 1728,
   "target_new_physical_updates": 1728,
+  "runtime_budget_record": {
+    "elapsed_seconds": 19279.312225695,
+    "peak_observed_bytes": 10446866117
+  },
   "label_parses": {
     "heldout": 0,
     "owners": 0,
     "train": 1,
-    "valid": 0
+    "valid": 1
   },
-  "estimated_total_hours": [
-    5,
-    7
-  ],
-  "estimated_remaining_seconds": [
-    7977.629949,
-    15177.629949
-  ],
-  "estimated_completion_shanghai": [
-    "2026-10-02T17:55:35+08:00",
-    "2026-10-02T19:55:35+08:00"
-  ],
-  "estimate_basis": "Original ER durations and actual log intervals; checkpoint and final evaluation time included as an uncertainty allowance",
-  "hard_seconds": 43200,
-  "hard_deadline_shanghai": "2026-10-03T00:55:35+08:00",
-  "maximum_new_output_bytes": 17179869184,
-  "new_completed_endpoints": 3,
+  "complete_blind_gate": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE",
+  "blind_manifest_hash_matches": true,
   "failure_record_present": false,
-  "linux_job": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
-  "startup_return": {
-    "verified_files": 7,
-    "verified_bytes": 15057.0,
-    "verified_at": "2026-10-02T13:10:42.2876686+08:00",
-    "exact_hash_match": true
+  "linux_job": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
+  "source_identity": {
+    "er_low_main_root": 31,
+    "logit_isolated_workspace": 34,
+    "mismatches": 0
   },
-  "CPU_verification": "22 passed, 0 failed/skipped, 4 actual native handwritten updates; exit0; 364.25 seconds; 10 CPU files 58693 bytes returned exactly.",
-  "scientific_sources": "Active main Linux root retains 31 low-study sources. Matched LOGIT has 34 frozen sources in its separate workspace; original active files unchanged.",
-  "process_observation": {
-    "observed_at": "2026-10-02T14:26:03+08:00",
-    "owner": "yongpeng",
-    "launcher_pid": 3295215,
-    "training_pid": 3295228,
-    "training_state": "Sl",
-    "launcher_state": "Ss",
-    "live_processes_confirmed": true,
-    "observation_method": "Read-only existing SSH monitoring; previous disconnected session reauthenticated; no new research stage or deployment"
+  "current_observation": "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/observation/20261003_095536/remote_status.json",
+  "returned_execution_records": {
+    "bytes": 11204,
+    "exact_size_sha256_match": true,
+    "scope": "Both studies completion/access/times plus listener and remote observation only",
+    "files": 17
   },
-  "stage_updates_observed": {
-    "ABC:2": 288,
-    "ABC:3": 288,
-    "BCA:2": 288,
-    "BCA:3": 24
-  },
-  "after_cleanup_observation": "reports/maintenance/20261002/unused_weights/post_cleanup.json",
-  "latest_monitoring_record": "reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation.json"
+  "external_and_primary_implementation_passed": true,
+  "formal_result_validity_independently_audited": false,
+  "result_external_and_primary_review_complete": false,
+  "full_result_return_complete": false,
+  "result_scope": "Program completion includes provisional selection/comparison flags; detailed effects and final conclusions require existing-contract saved-result verification and result review",
+  "automatic_retry": false,
+  "next_action": "Return complete authorized small result artifacts; verify saved matrices and all original comparisons; actual result external review and primary disposition; no new training or label parsing",
+  "cpu_verification": "22 passed, 0 failed/skipped, 4 actual native handwritten updates; exit0; 364.25 seconds; 10 CPU files 58693 bytes returned exactly."
 }

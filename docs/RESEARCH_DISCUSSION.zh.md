@@ -1,6 +1,30 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-02 科研harness重构
+
+用户在下方四项决定后进一步明确：
+
+> 你就结合你实际的体验修改现有的科研harness即可，假设由你来设计你会怎么设计力求让整个科研限制边界更清晰、更合理，让干活的Agent能更高效地工作。允许必要的重构，修改完成后向我汇报你的修改
+
+用户随后特别要求一并修复两项：
+
+> 未来合同可以更明确地区分：**技术读取次数、研究者查看结果的次数、依据结果选择下一实验的范围**。开发阶段可以批准有限候选和总预算；最终确认阶段保持预先固定方法、对手和一次开放。具体权限应前瞻确认，当前访问限制照旧执行。 &#x20;
+> 建议让 `AGENTS.md` 保持简短，只放执行入口和关键边界；科研纪律只放常设规则；交接文件的当前部分原位更新，历史通过链接回溯 &#x20;
+> 顺便修复上述问题
+
+本次据此直接重构现有文档：AGENTS为短入口，科研纪律为常设规则，交接为唯一当前状态入口；项目进展、当前设计、计划各自保留导航／合同索引／后续动作。未来合同分开技术读取、结果开放与适应性选择；允许有明确候选／预算／停止条件的开发，最终确认固定主张后一次开放。自主实施、越界确认、依赖暂停、增量核验、非阻断外审建议、条件恢复和依赖保管的边界写入现行纪律。原“仍属建议”的段落保留为形成时的讨论，已被本次明确授权及实际修改覆盖。
+
+用户随后明确：“重构前的八份原文件共约1.03 MB，已完整归档并逐成员核对大小和哈希，不要归档，重构前的原文件直接删掉”。据此删除本轮临时归档包及清单，不保留重构前文档的额外副本；现行八份文档原位维护，已有Git历史和原报告、合同、审查包及活动来源不改。历史入口见[当前交接](AI_RESEARCH_HANDOFF.zh.md#历史与证据)。
+
+本次为用户明确授权的harness与文档重构，按纪律维护免外审；不修改算法、当前23项、现行标签次数、运行预算或失败处理，不创建恢复／权限框架，不启动研究测试或新实验。交接中的训练状态仍注明原观测时点，本次文档更新不冒称重新查看训练。必要核查只针对信息覆盖、文档、引用、冻结来源与两端交付。
+
+2026-10-03用户继续要求：“继续未完成的任务，要确保这份harness能让拿到这个项目的agent掌握本项目的全部信息、工作时的边界约束，实现高效且正确地工作”。据此核对完整接手路径、历史分类和工作边界，补足原始证据及实现入口；“信息可完整追溯”不解释成每次重读全部历史或重跑旧实验。
+
+接手导航覆盖来源与拆分、数据生成、数学定义、实际实现、历史正负结果、原始审查、权限与消费、保管及后续动作。原AGENTS.md只被本地Git排除，本次将精简入口纳入版本交付，使新克隆也能发现执行规则。10月3日自动审批恢复后已实际核对Linux完成记录；当前交接改为两项正式作业已结束、结果核对与结果审查待完成，执行记录与完整科学结论分开。两端旧文档差异已核对，临时比较副本用后删除，不另存原文归档。
+
 ## 2026-10-02 科研执行约束核对与用户决定
+
+以下为重构前的问答和审查意见。四项回答继续有效；其中“尚未作为新规则”的建议后来已由上方明确授权推进，现行规则以科研纪律为准。
 
 用户原话：“你目前也交接这个项目一段时间了，看看目前项目约束你科研的harness是否合理以及是否存在哪些让你感到歧义的地方，都能提出来，我来看看如何修改。有问题就问”。本次阅读现行纪律、AGENTS、当前交接、既有讨论和当前合同，并核对访问记账、正式入口、监听及实际主审记录；评价执行约束，不重新宣判历史实验有效性，不运行科研脚本或增加实验。
 
@@ -74,14 +98,14 @@
 | Step7 英文来源选择 | 完整集有较高排序表现，但v4、v4.2稳定性审计未确定唯一稳定最强M0；去克隆与分量／pair口径反转限制外推。operational baseline不等于独立认证的最优来源模型。 | [v4审计](STEP7_RESULT_AUDIT_20260724.zh.md)、[新折分审计](STEP7_REPEAT_STABILITY_RESULT_AUDIT_20260727.zh.md) |
 | Step8／Step10 早期零样本与消融 | 38对旧中文test的BGE AP 0.919816、10对更早快照的AP 1.0，属于各自小样本历史信号；不能迁作后来扩充边界或当前纯标题／描述任务的证明。 | [Step8](STEP8_ZERO_SHOT_TRANSFER.md)、[Step10](STEP10_MODEL_AND_FEATURE_ABLATIONS.md) |
 | Step9／Step12／Step13 | 106对边界上少样本适配修复了弱来源融合，但相对raw E5增益有限；旧Step12把AP同时标作PR-AUC和MAP，并非梯形PR-AUC或逐查询MAP。后来v6已改正定义，不回写旧字节。 | [Step9](STEP9_FEW_SHOT_ADAPTATION.md)、[旧统计口径](STEP12_STATISTICAL_ROBUSTNESS.md)、[漂移诊断](STEP13_CONCEPT_DRIFT_AUDIT.md) |
-| Step15-v5／v5r | v5的mixup存在弱标签放大、跨域父样本和域权重混杂，不能把高分归因于干净mixup。修复后v5r域平衡整体相对raw E5在200对内部开发test上AP +0.201107，区间[0.051610,0.337688]，保留为该旧输入体系的内部正结果；但其Phase4−Phase3为+0.066345，区间[-0.005690,0.143394]，不支持独立mixup增量。旧语义输入包含身份、部分参考统计使用全池，不能称当前严格屏蔽输入的独立泛化证明。 | [缺陷审计](STEP15_EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE.md)、[已存配对统计](../reports/step12_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv)、[后续输入修正](PROJECT_PROGRESS.md) |
+| Step15-v5／v5r | v5的mixup存在弱标签放大、跨域父样本和域权重混杂，不能把高分归因于干净mixup。修复后v5r域平衡整体相对raw E5在200对内部开发test上AP +0.201107，区间[0.051610,0.337688]，保留为该旧输入体系的内部正结果；但其Phase4−Phase3为+0.066345，区间[-0.005690,0.143394]，不支持独立mixup增量。旧语义输入包含身份、部分参考统计使用全池，不能称当前严格屏蔽输入的独立泛化证明。 | [缺陷审计](STEP15_EVIDENCE_TYPE_INCREMENTAL_HARD_NEGATIVE.md)、[已存配对统计](../reports/step12_statistical_robustness_paired_comparisons_weighted_mixup_20260711.csv)、[后续输入修正的历史记录](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/PROJECT_PROGRESS.md) |
 | Step15-v6／v8 | v6正式晋级失败，已冻结为有效负结果。v8 V2把训练专用silver移入valid，评估无效；修正边界后contextual在内部test AP 0.620525高于clean 0.544139，是有限诊断正结果，但6条公共噪声负例仍全在top50。 | [v6负结果冻结](../schema/step15_negative_freeze.json)、[v8边界纠正](STEP15_POSTRUN_AUDIT_AND_CORRECTION_20260715.zh.md)、[修正边界实测](STEP26_FROZEN_AUTHORSHIP_BRIDGE_RESULT_AUDIT_20260718.zh.md) |
 | Step11／17与Step16I／18 | 候选图、复核流程和困难负例建设有工程／数据价值，不能把图边当同控真值。可信独立正身份不足；160条dev2只有1正、108负、51不确定，不是充分的最终准确率基准。 | [早期交接](AI_RESEARCH_HANDOFF_20260719.zh.md)、[复核记录](STEP16I_CODEX_ADJUDICATION_REPORT_20260716.zh.md) |
 | Step21／22／23 | Step21-v2增强相对等权复制AP −0.001179，区间跨零，属有效零结果；Step22完整增强相对复制−0.017662；Step23-v2.1主模型相对聚合−0.134735，原晋级失败。不得把Step23已作废v2混作修正版结果。 | [Step21](STEP21_SYNTHETIC_TRAIN_ONLY_AUGMENTATION_20260716.zh.md)、[Step22](STEP22_SAME_SELLER_SPLIT_AUGMENTATION_20260716.zh.md)、[Step23](STEP23_ITEM_LEVEL_MULTI_INSTANCE_20260717.zh.md) |
 | Step24／25／26 | Step24 train-D0 AP 0.802718不能外推。Step25-v3.1求解器正确收敛但仅2/11门通过；Step26同边界桥接valid AP 0.508495，低于v8 clean 0.574855，3/6门通过；均保留为有效负结果，Step26B不启动。局部public-noise或敏感性收益不能替换主模型。 | [Step25](STEP25_RESULT_AUDIT_20260718.zh.md)、[Step26](STEP26_FROZEN_AUTHORSHIP_BRIDGE_RESULT_AUDIT_20260718.zh.md) |
 | Step27-v1与v1.1 | v1输入契约漂移，属工程无效。**v1.1实际已完成**，不是旧准备文档中的“尚未运行”：S0重放通过；M2/M1 AP为0.509867/0.510156，差−0.000288，区间[-0.000498,0.000183]，仅2/10种子正向，技术OOF门失败。相对M0的小幅点增益不能证明增强优于等权复制；valid/test未评分。修复版属于事后工程修复后的有效开发零／负结果，不是独立确认实验。 | [修复契约](STEP27_SOURCE_CONTRACT_REPAIR_20260719.zh.md)、[实际训练摘要](../reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/training/step27_training_summary.json)、[实际审计](../reports/step27_english_pretrained_synthetic_adaptation/v1_1_20260719/statistical_audit/oof_gate/step12_step27_statistical_audit.json) |
 | Step28-v12与v12.1 | v12修正后保留1280审计行／842状态，完整历史AP 0.767197，比直接历史+0.073928，是固定生成器家族内有效正结果。v12.1另在2689未审核候选上得到0正修正／0盲审队列，是应用弃权，没有证明真实识别有效，也不是有真值的准确率负结果。**二者均不同于后来Step28-v13 v1.12。** | [修正复现与应用](STEP28_TRANSFERABLE_IDENTITY_HISTORY_CORRECTED_REPLICATION_20260720.zh.md) |
-| Step28数据资格及迁移 | v5、v6/v6.1、v11撤销；Step28-v13多轮关闭。V9.3-R2是审计器设计无效，不能下数据失败结论；V9.4.1资格通过、训练／开发V2和Audit A盲预测保留有效身份。正确历史输入的开发增益不等于英文知识迁移，盲预测未读审核真值就没有准确率正负判定。 | [现行历史边界](RESEARCH_DISCIPLINE.zh.md)、[训练／开发结果](STEP28_TRAIN_DEVELOPMENT_RESULT_20260901.zh.md)、[迁移归因对照](STEP28_TRANSFER_CLAIM_CONTROLS_RESULT_20260901.zh.md) |
+| Step28数据资格及迁移 | v5、v6/v6.1、v11撤销；Step28-v13多轮关闭。V9.3-R2是审计器设计无效，不能下数据失败结论；V9.4.1资格通过、训练／开发V2和Audit A盲预测保留有效身份。正确历史输入的开发增益不等于英文知识迁移，盲预测未读审核真值就没有准确率正负判定。 | [现行历史边界](AI_RESEARCH_HANDOFF.zh.md#已有结论与历史边界)、[训练／开发结果](STEP28_TRAIN_DEVELOPMENT_RESULT_20260901.zh.md)、[迁移归因对照](STEP28_TRANSFER_CLAIM_CONTROLS_RESULT_20260901.zh.md) |
 | 英文初始化与9月6日风格迁移 | 英文初始化LaBSE诊断未改善中文通用起点，另有来源捷径／历史信息接触限制。随后风格迁移25世界主端点相对通用起点AP −0.001365，区间为负，主张停止；1世界辅助预算有正向结果，必须保留但不能顶替主端点。 | [初始化诊断](STEP28_ENGLISH_INITIALIZED_LABSE_FINETUNE_RESULT_20260903.zh.md)、[风格迁移主结果](STYLE_TRANSFER_TARGET_RESULT_20260906.zh.md) |
 
 ### 持续学习主线与当前接手
