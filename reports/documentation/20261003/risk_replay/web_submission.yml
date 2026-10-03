@@ -1,0 +1,90 @@
+- main [ref=e943]:
+  - generic:
+    - generic:
+      - generic:
+        - generic [ref=e945]:
+          - button "分享" [disabled] [ref=e946]
+          - button "更多" [ref=e950] [cursor=pointer]
+        - button "切换摘要" [ref=e959] [cursor=pointer]
+  - generic [ref=e979]:
+    - generic [ref=e980]:
+      - generic [ref=e992]:
+        - generic [ref=e993]:
+          - heading "你说：" [level=4] [ref=e994]
+          - generic [ref=e995]:
+            - generic [ref=e998]:
+              - button "review(3).zip" [ref=e999] [cursor=pointer]
+              - generic:
+                - generic
+            - generic [ref=e1001]:
+              - generic [ref=e1003]:
+                - generic [ref=e1004]: 请对附件做独立科研方法与实现外审。首要任务是判断算法合理性，而不只是代码能不能运行。 研究问题：新卖家群体不断到来、历史训练数据只能保留很少时，如何学习新群体，同时保持旧分布中未见卖家的马甲候选排序和基础识别能力？本算法为“群体风险分布保持重放”。 请先读 reports/documentation/20261003/risk_replay/request.zh.md，再读 docs/SELLER_ALIAS_RISK_REPLAY.zh.md、实现及核验证据。要求： 1. 独立判断主线适配与机制是否站得住。它是否仅改变缓存误差拟合？对未见卖家泛化为何可能有用、何时失效？给出明确机制判断与反例，不能只用“需要实验”回避。 2. 独立检索最接近的原始文献，对照排序蒸馏、风险/分位分布约束及单向保持，明确已有重叠与剩余贡献；创新不足请直说，不以任务换名认可创新。 3. 检查分层、三类边际风险、非对称惩罚的公式/导数/性质，特别是个体好坏交换、联合风险不受保护、缓存很少、train/dropout相对eval参考偏差与各通道尺度问题。 4. 沿实际输入→目标→梯度→裁剪/AdamW更新→阶段调用→缓存/恢复排查伪实现：不能以日志、组件存在、测试PASS或哈希代替实际运算。删除或detach保持项、错误权重是否会被证据检出？请作独立最小参考核验。 5. 审核后续评价能否区分旧分布未见身份能力与缓存拟合，并公平兼顾新群体学习。 Linux手写CPU已完成：7项测试全过、Tiny真实288次更新、BGE三次实际更新及encoder/head增量梯度与参数变化证据；初次dtype失败和修复原件保留。原生Adam计数改写及参考风险减半是明确的人工激活探针，不是真实阶段训练成果。新算法未访问正式数据，未启动GPU训练。正式六端点编排需未来实验合同确定后接入，不冒称训练就绪。 附件 review.zip：193561字节，51成员，SHA-256 562b01b536a0bd43bee1366a0be09381d603d0770bbd8855ae027f26707fd61e。请真实打开并核对。提供详细中文审查报告、机器裁决，以及实际执行的独立参考源码/完整stdout和stderr/退出码/失败版本下载包。区分已证实科学阻断、复现缺陷、后续机制研究建议和无关过度设计；不改写原附件，不私自扩大数据或实验范围。请求网页GPT 6 Pro，模型自述与可认证后台身份分开。
+                - button "收起" [expanded] [active] [ref=e1091] [cursor=pointer]
+              - generic [ref=e1015]:
+                - button "复制消息" [ref=e1017] [cursor=pointer]
+                - button "共享提示" [ref=e1021] [cursor=pointer]
+                - button "编辑消息" [ref=e1093] [cursor=pointer]
+        - generic [ref=e1113]:
+          - generic [ref=e1114]:
+            - button "正在搜索 2 个网站" [expanded] [ref=e1115] [cursor=pointer]
+            - generic:
+              - generic:
+                - generic
+          - generic [ref=e1117]:
+            - generic [ref=e1118]:
+              - paragraph [ref=e1119]: 我会先核对附件大小、成员数和 SHA-256，再按请求文件审读方法、实现与原始证据。审查重点是保持项究竟约束了什么、为何可能帮助旧分布中的未见卖家、有哪些明确反例，以及实际梯度和更新是否符合公式；我也会独立检索原始文献，并交付可下载的报告、机器裁决和参考核验源码及日志。
+              - paragraph [ref=e1120]: 身份方面：当前会话配置标注为 GPT-6 Astra Pro，但我没有可独立核验的后台模型标识，不能据此认证本次运行就是你指定的“网页 GPT 6 Pro”。本轮仅审查附件和运行独立合成核验。
+            - generic [ref=e1121]: 已运行命令
+            - generic [ref=e1134] [cursor=pointer]:
+              - generic [ref=e1135]:
+                - generic [ref=e1136]: 共 4 个任务，已经完成 0 个
+                - button "折叠计划概要" [expanded] [ref=e1147]
+              - generic [ref=e1152]:
+                - generic [ref=e1153]
+                - generic [ref=e1162]
+                - generic [ref=e1169]
+                - generic [ref=e1176]
+            - region "子智能体活动" [ref=e1184]:
+              - generic [ref=e1185]:
+                - button "Literature" [ref=e1190] [cursor=pointer]
+                - button "Evidence evaluation" [ref=e1192] [cursor=pointer]
+              - generic [ref=e1194]:
+                - button "Mechanism" [ref=e1195] [cursor=pointer]
+                - text: 、
+                - button "Implementation" [ref=e1196] [cursor=pointer]
+                - text: 和
+                - button "另外2个子智能体" [ref=e1197] [cursor=pointer]
+                - text: 开始工作
+            - generic [ref=e1198]:
+              - paragraph [ref=e1199]: 附件身份已核对一致：193,561 字节、51 个成员，SHA-256 与你提供的值相同，ZIP 完整性检查也通过了。
+              - paragraph [ref=e1200]: 请求和方法文档明确把本轮限定为“算法与阶段学习器审查”，并承认个体风险可交换、联合风险不受保护、dropout 参考偏差等边界。我会据此分别裁定机制是否合理、运算是否真实，以及未来正式实验还缺什么。我已并行展开数学、实现、文献和原始证据审查，并使用文件交付技能整理最终报告与核验包。
+            - region "子智能体活动" [ref=e1202]:
+              - generic [ref=e1206]:
+                - button "Independent reference" [ref=e1207] [cursor=pointer]
+                - text: 开始工作
+            - generic [ref=e1208]: 已运行命令
+            - region "子智能体活动" [ref=e1222]:
+              - generic [ref=e1226]:
+                - button "Independent reference" [ref=e1227] [cursor=pointer]
+                - text: 有了更新
+            - generic [ref=e1232]:
+              - button "正在搜索 “检索脚本定义并查看风险重放证据”" [ref=e1233] [cursor=pointer]
+              - generic:
+                - generic
+      - generic [ref=e1030]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - generic:
+          - button [aria-hidden]
+        - heading "最新一条回复" [level=4] [ref=e1033]
+        - status [ref=e1034]
+        - generic [ref=e1049]:
+          - button "添加文件等内容" [ref=e1054] [cursor=pointer]
+          - textbox "询问 ChatGPT" [ref=e1060]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=e1062]:
+            - button "选择 ChatGPT 模型" [ref=e1066] [cursor=pointer]:
+              - generic [ref=e1067]: Pro
+            - generic [ref=e1077]:
+              - button "听写" [ref=e1080] [cursor=pointer]
+              - button "停止" [ref=e1086] [cursor=pointer]
