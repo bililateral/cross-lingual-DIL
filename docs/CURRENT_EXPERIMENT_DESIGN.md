@@ -4,6 +4,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [匹配LOGIT0.1](SELLER_ALIAS_LOGIT_LOW.zh.md) | 10月3日已批准；独立0.5 MSE，主比较ER0.1，另报LOGIT0.25与SEQ；先核验／外审，再单次正式执行 |
 | [BGE首轮持续学习](SELLER_ALIAS_BGE_CONTINUAL.zh.md) | 已完成问题诊断及SEQ／ER1／LOGIT1；后续扩展继承其明确适用设置 |
 | [ER0.5／0.25](SELLER_ALIAS_ER_WEIGHT.zh.md) | 已完成有限权重比较，按原规则选0.25；[结果](SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md) |
 | [ER0.1单点](SELLER_ALIAS_ER_LOW.zh.md) | 仅新增0.1，主比较对0.25，完整报告对SEQ；[结果与核验](SELLER_ALIAS_ER_LOW_RESULT.zh.md) |

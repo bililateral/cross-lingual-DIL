@@ -17,6 +17,8 @@ LOW_POLICY = data.ROOT / "schema/step28_er_low_policy.json"
 LOW_POLICY_SHA256 = "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
 LOGIT_POLICY = data.ROOT / "schema/step28_logit_weight_policy.json"
 LOGIT_POLICY_SHA256 = "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb"
+LOGIT_LOW_POLICY = data.ROOT / "schema/step28_logit_low_policy.json"
+LOGIT_LOW_POLICY_SHA256 = "8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0"
 ARMS = {"half": .5, "quarter": .25}
 ORDERS, ROLES = parent.ORDERS, parent.ROLES
 STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
@@ -26,12 +28,13 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
 
 
 def contract(study: str = "weight") -> dict:
-    if study not in ("weight", "low", "logit"):
+    if study not in ("weight", "low", "logit", "logit_low"):
         raise ValueError("Unknown confirmed ER study")
     path, digest, arms = {
         "weight": (POLICY, POLICY_SHA256, ARMS),
         "low": (LOW_POLICY, LOW_POLICY_SHA256, {"tenth": .1}),
         "logit": (LOGIT_POLICY, LOGIT_POLICY_SHA256, {"logit_quarter": .25}),
+        "logit_low": (LOGIT_LOW_POLICY, LOGIT_LOW_POLICY_SHA256, {"logit_tenth": .1}),
     }[study]
     updates = len(arms) * 3 * 2 * 288
     if data.sha256(path) != digest:
@@ -50,7 +53,8 @@ def contract(study: str = "weight") -> dict:
 def policy_sha256(p: dict) -> str:
     return {"seller_alias_er_low_weight": LOW_POLICY_SHA256,
             "seller_alias_er_history_weight": POLICY_SHA256,
-            "seller_alias_logit_weight": LOGIT_POLICY_SHA256}[p["study"]]
+            "seller_alias_logit_weight": LOGIT_POLICY_SHA256,
+            "seller_alias_logit_low": LOGIT_LOW_POLICY_SHA256}[p["study"]]
 
 
 def with_logits(p: dict) -> bool:
@@ -83,12 +87,15 @@ def sources(p: dict | None = None) -> list[dict]:
                   "scripts/run_step28_er_weight_linux_20261001.sh",
                   "scripts/run_step28_er_check_linux_20261001.sh",
                   "reports/documentation/20261001/er_weight/decision.json"]
-    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight"):
+    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight", "seller_alias_logit_low"):
         additional += ["docs/SELLER_ALIAS_ER_LOW.zh.md", "schema/step28_er_low_policy.json",
                        "reports/documentation/20261002/er_low/decision.json"]
     if p is not None and with_logits(p):
         additional += ["docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md", "schema/step28_logit_weight_policy.json",
                        "reports/documentation/20261002/logit_weight/decision.json"]
+    if p is not None and p["study"] == "seller_alias_logit_low":
+        additional += ["docs/SELLER_ALIAS_LOGIT_LOW.zh.md", "schema/step28_logit_low_policy.json",
+                       "reports/documentation/20261003/logit_low/decision.json"]
     rows = prior.sources() + [data.record(data.ROOT / name, data.ROOT) for name in additional]
     return sorted(rows, key=lambda row: row["path"])
 
@@ -104,7 +111,8 @@ def expected_points(p: dict | None = None) -> list[str]:
             for arm in (ARMS if p is None else p["arms"]) for stage in (2, 3)]
 
 
-def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None) -> dict:
+def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None,
+             continuation_jobs: dict[str, Path] | None = None) -> dict:
     """Verify pinned small records; native state and cache are checked when restored."""
     job = job if job is not None else data.ROOT / p["baseline"]["linux_job"]
     records = {name: data.read_json(data.verify(job / name, rec))
@@ -154,6 +162,39 @@ def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None) -
                         or start["adam_step"] != 288 or not start["first_scores_replayed_exactly"]):
                     raise ValueError("A historical reference used a different first-stage state")
         result["weight_reference"] = {"job": weight_job, "manifest": wm, "collected": wc}
+    for arm, spec in p.get("continuation_references", {}).items():
+        ref_job = (continuation_jobs or {}).get(arm, data.ROOT / spec["linux_job"])
+        saved = {name: data.read_json(data.verify(ref_job / name, rec))
+                 for name, rec in spec["records"].items()}
+        rm, rc = saved["run/manifest.json"], saved["evaluation/collected.json"]
+        names = {f"{order}_{arm}_stage{stage}" for order in ORDERS for stage in (2, 3)}
+        tag = spec["evidence_tag"]
+        if (rm["status"] != f"COMPLETE_1728_{tag}_UPDATES_VALID_BLIND"
+                or rc["status"] != f"ALL_18_{tag}_MATRICES_SAVED_BEFORE_COMPARISONS"
+                or saved["evaluation/evaluation.json"]["status"] != f"COMPLETE_{tag}_DEVELOPMENT_COMPARISON"
+                or any(saved[name]["policy_sha256"] != spec["policy_sha256"] for name in
+                       ("run/manifest.json", "evaluation/collected.json", "evaluation/evaluation.json"))
+                or rm["physical_updates"] != 1728 or rm["gradient_group_presentations"] != 3456
+                or set(rm["points"]) != names or set(rc["points"]) != names
+                or rm["baseline_records"] != p["baseline"]["records"]
+                or saved["run/partition.json"] != partition
+                or any(saved[name]["source_files"] != rm["source_files"] for name in
+                       ("execution.json", "evaluation/collected.json", "evaluation/evaluation.json"))
+                or any(rc[key] != collected[key] for key in ("group_ids", "domains", "metric_columns"))
+                or any(saved["execution.json"][key] != value for key, value in p["baseline"]["environment"].items())):
+            raise ValueError("Frozen continuation reference is incomplete or unpaired: " + arm)
+        for order in ORDERS:
+            rec = manifest["points"][order + "_shared"]
+            shared = data.read_json(data.verify(job / "run" / rec["path"], rec))
+            start = rm["restored_starts"][order + "_" + arm]
+            if (start["full_checkpoint"] != shared["full_checkpoint"]
+                    or start["model_state_sha256"] != shared["model_state_sha256"]
+                    or start["first_map"] != shared["first_map_parameters"]
+                    or start["memory_source"] != manifest["memories"][order + "_" + spec["memory_arm"] + "_after1"]["file"]
+                    or start["adam_step"] != 288 or not start["first_scores_replayed_exactly"]):
+                raise ValueError("Continuation reference used a different shared start: " + arm)
+        result.setdefault("continuation_references", {})[arm] = {
+            "job": ref_job, "manifest": rm, "collected": rc}
     return result
 
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd /home/yongpeng/cross-lingual
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
 conda activate py310
 out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
 study="${2:-weight}"
 case "$study" in
-  weight|low|logit) ;;
+  weight|low|logit|logit_low) ;;
   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
 esac
 case "$out" in

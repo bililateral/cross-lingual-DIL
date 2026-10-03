@@ -168,7 +168,7 @@ def run(destination: Path, study: str = "weight") -> dict:
                    for key in ("file_count", "total_size_bytes", "content_sha256")):
                 raise ValueError("Pretrained archive differs")
             reports, components = {}, {}
-            native_arms = (("quarter", "logit_quarter") if method.with_logits(p) else
+            native_arms = ((p["evaluation"].get("matched_er", "quarter"), next(iter(p["arms"]))) if method.with_logits(p) else
                            ("quarter", "tenth") if study == "low" else tuple(p["arms"]))
             for arm in native_arms:
                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
@@ -186,10 +186,10 @@ def run(destination: Path, study: str = "weight") -> dict:
                 b_current, b_history = components[native_arms[1]][name]
                 torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
                 if method.with_logits(p):
-                    expected = a_history + components["logit_quarter"]["mse_reference"][name]
+                    expected = a_history + components[native_arms[1]]["mse_reference"][name]
                     torch.testing.assert_close(b_history, expected, rtol=2e-5, atol=2e-8)
                     scaling[name] = {"current_exactly_equal": True, "compared_arms": list(native_arms),
-                                     "history_supervision_weight": .25, "independent_mse_weight": .5,
+                                     "history_supervision_weight": method.all_weights(p)[native_arms[0]], "independent_mse_weight": .5,
                                      "history_equals_er_plus_mse_gradient": True,
                                      "maximum_history_difference": float((b_history - expected).abs().max())}
                 else:
@@ -226,7 +226,7 @@ def run(destination: Path, study: str = "weight") -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
+    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low"), default="weight")
     args = parser.parse_args()
     result = run(args.out.resolve(), args.study)
     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())

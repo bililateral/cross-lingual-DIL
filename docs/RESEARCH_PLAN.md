@@ -6,7 +6,9 @@
 
 1. 两项正式实验的小结果已完整回传，保存端点、访问账及原判据已独立核对，详见[ER0.1结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)与[匹配LOGIT结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)；不重新训练、重读标签或重建已结束监听，结果好坏均结束各自单点。
 2. 实际网页结果外审及最终主审已完成，接受限定开发结论，原判定全部保留；详见[主审处置](../reports/seller_alias_continual/20261003/result_review/report.zh.md)。ER配置按规则选0.1；LOGIT主对手仍为ER0.25，两项相对SEQ的完整保护均未全过。已关闭且未变的审查不重开。
-3. 必要证据已保存，本轮两端同步、阶段提交、push及独立远端复核分别以[交付回执](../reports/seller_alias_continual/20261003/result_review/delivery.json)为准；已完成部分不重复执行。当前权重保管见交接，正负结果不自动授予删除许可。当前两项实验关闭后，没有已批准的追加实验。
+3. 必要证据已保存，本轮两端同步、阶段提交、push及独立远端复核分别以[交付回执](../reports/seller_alias_continual/20261003/result_review/delivery.json)为准；已完成部分不重复执行。当前权重保管见交接，正负结果不自动授予删除许可。两项旧实验已关闭；10月3日用户批准新的LOGIT0.1单点，范围见下项。
+
+4. 按[LOGIT0.1合同](SELLER_ALIAS_LOGIT_LOW.zh.md)实现并验证单点，主比较对ER0.1，固定另报对LOGIT0.25和SEQ；必要Linux手写CPU、网页外审与主审通过后执行一次正式训练，完整回传及结果审查。仅新增1728更新，12小时／16GiB，不扩展系数或种子。
 
 ## 需要新合同的研究
 

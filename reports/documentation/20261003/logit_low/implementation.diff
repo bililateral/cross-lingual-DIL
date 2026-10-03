@@ -1,0 +1,398 @@
+diff --git a/scripts/run_step28_er_check_linux_20261001.sh b/scripts/run_step28_er_check_linux_20261001.sh
+index bc8998d1..4eb69dee 100644
+--- a/scripts/run_step28_er_check_linux_20261001.sh
++++ b/scripts/run_step28_er_check_linux_20261001.sh
+@@ -1,12 +1,12 @@
+ #!/usr/bin/env bash
+ set -euo pipefail
+-cd /home/yongpeng/cross-lingual
++cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
+ conda activate py310
+ out="$(realpath -m -- "${1:?Pass a new reports CPU directory}")"
+ study="${2:-weight}"
+ case "$study" in
+-  weight|low|logit) ;;
++  weight|low|logit|logit_low) ;;
+   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
+ esac
+ case "$out" in
+diff --git a/scripts/run_step28_er_weight_linux_20261001.sh b/scripts/run_step28_er_weight_linux_20261001.sh
+index 5d70cf16..ef802fda 100644
+--- a/scripts/run_step28_er_weight_linux_20261001.sh
++++ b/scripts/run_step28_er_weight_linux_20261001.sh
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ set -euo pipefail
+-cd /home/yongpeng/cross-lingual
++cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
+ conda activate py310
+ : "${CUDA_VISIBLE_DEVICES:?Select an inspected idle GPU}"
+@@ -10,7 +10,7 @@ authorization="$(realpath -- "${3:?Pass matching formal authorization}")"
+ study="${4:-weight}"
+ case "$study" in
+   weight) time_limit=24h ;;
+-  low|logit) time_limit=12h ;;
++  low|logit|logit_low) time_limit=12h ;;
+   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
+ esac
+ case "$out" in
+diff --git a/scripts/step28_er_weight.py b/scripts/step28_er_weight.py
+index eca2c870..9bbf0f92 100644
+--- a/scripts/step28_er_weight.py
++++ b/scripts/step28_er_weight.py
+@@ -17,6 +17,8 @@ LOW_POLICY = data.ROOT / "schema/step28_er_low_policy.json"
+ LOW_POLICY_SHA256 = "201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d"
+ LOGIT_POLICY = data.ROOT / "schema/step28_logit_weight_policy.json"
+ LOGIT_POLICY_SHA256 = "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb"
++LOGIT_LOW_POLICY = data.ROOT / "schema/step28_logit_low_policy.json"
++LOGIT_LOW_POLICY_SHA256 = "8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0"
+ ARMS = {"half": .5, "quarter": .25}
+ ORDERS, ROLES = parent.ORDERS, parent.ROLES
+ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+@@ -26,12 +28,13 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+ 
+ 
+ def contract(study: str = "weight") -> dict:
+-    if study not in ("weight", "low", "logit"):
++    if study not in ("weight", "low", "logit", "logit_low"):
+         raise ValueError("Unknown confirmed ER study")
+     path, digest, arms = {
+         "weight": (POLICY, POLICY_SHA256, ARMS),
+         "low": (LOW_POLICY, LOW_POLICY_SHA256, {"tenth": .1}),
+         "logit": (LOGIT_POLICY, LOGIT_POLICY_SHA256, {"logit_quarter": .25}),
++        "logit_low": (LOGIT_LOW_POLICY, LOGIT_LOW_POLICY_SHA256, {"logit_tenth": .1}),
+     }[study]
+     updates = len(arms) * 3 * 2 * 288
+     if data.sha256(path) != digest:
+@@ -50,7 +53,8 @@ def contract(study: str = "weight") -> dict:
+ def policy_sha256(p: dict) -> str:
+     return {"seller_alias_er_low_weight": LOW_POLICY_SHA256,
+             "seller_alias_er_history_weight": POLICY_SHA256,
+-            "seller_alias_logit_weight": LOGIT_POLICY_SHA256}[p["study"]]
++            "seller_alias_logit_weight": LOGIT_POLICY_SHA256,
++            "seller_alias_logit_low": LOGIT_LOW_POLICY_SHA256}[p["study"]]
+ 
+ 
+ def with_logits(p: dict) -> bool:
+@@ -83,12 +87,15 @@ def sources(p: dict | None = None) -> list[dict]:
+                   "scripts/run_step28_er_weight_linux_20261001.sh",
+                   "scripts/run_step28_er_check_linux_20261001.sh",
+                   "reports/documentation/20261001/er_weight/decision.json"]
+-    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight"):
++    if p is not None and p["study"] in ("seller_alias_er_low_weight", "seller_alias_logit_weight", "seller_alias_logit_low"):
+         additional += ["docs/SELLER_ALIAS_ER_LOW.zh.md", "schema/step28_er_low_policy.json",
+                        "reports/documentation/20261002/er_low/decision.json"]
+     if p is not None and with_logits(p):
+         additional += ["docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md", "schema/step28_logit_weight_policy.json",
+                        "reports/documentation/20261002/logit_weight/decision.json"]
++    if p is not None and p["study"] == "seller_alias_logit_low":
++        additional += ["docs/SELLER_ALIAS_LOGIT_LOW.zh.md", "schema/step28_logit_low_policy.json",
++                       "reports/documentation/20261003/logit_low/decision.json"]
+     rows = prior.sources() + [data.record(data.ROOT / name, data.ROOT) for name in additional]
+     return sorted(rows, key=lambda row: row["path"])
+ 
+@@ -104,7 +111,8 @@ def expected_points(p: dict | None = None) -> list[str]:
+             for arm in (ARMS if p is None else p["arms"]) for stage in (2, 3)]
+ 
+ 
+-def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None) -> dict:
++def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None,
++             continuation_jobs: dict[str, Path] | None = None) -> dict:
+     """Verify pinned small records; native state and cache are checked when restored."""
+     job = job if job is not None else data.ROOT / p["baseline"]["linux_job"]
+     records = {name: data.read_json(data.verify(job / name, rec))
+@@ -154,6 +162,39 @@ def baseline(p: dict, job: Path | None = None, weight_job: Path | None = None) -
+                         or start["adam_step"] != 288 or not start["first_scores_replayed_exactly"]):
+                     raise ValueError("A historical reference used a different first-stage state")
+         result["weight_reference"] = {"job": weight_job, "manifest": wm, "collected": wc}
++    for arm, spec in p.get("continuation_references", {}).items():
++        ref_job = (continuation_jobs or {}).get(arm, data.ROOT / spec["linux_job"])
++        saved = {name: data.read_json(data.verify(ref_job / name, rec))
++                 for name, rec in spec["records"].items()}
++        rm, rc = saved["run/manifest.json"], saved["evaluation/collected.json"]
++        names = {f"{order}_{arm}_stage{stage}" for order in ORDERS for stage in (2, 3)}
++        tag = spec["evidence_tag"]
++        if (rm["status"] != f"COMPLETE_1728_{tag}_UPDATES_VALID_BLIND"
++                or rc["status"] != f"ALL_18_{tag}_MATRICES_SAVED_BEFORE_COMPARISONS"
++                or saved["evaluation/evaluation.json"]["status"] != f"COMPLETE_{tag}_DEVELOPMENT_COMPARISON"
++                or any(saved[name]["policy_sha256"] != spec["policy_sha256"] for name in
++                       ("run/manifest.json", "evaluation/collected.json", "evaluation/evaluation.json"))
++                or rm["physical_updates"] != 1728 or rm["gradient_group_presentations"] != 3456
++                or set(rm["points"]) != names or set(rc["points"]) != names
++                or rm["baseline_records"] != p["baseline"]["records"]
++                or saved["run/partition.json"] != partition
++                or any(saved[name]["source_files"] != rm["source_files"] for name in
++                       ("execution.json", "evaluation/collected.json", "evaluation/evaluation.json"))
++                or any(rc[key] != collected[key] for key in ("group_ids", "domains", "metric_columns"))
++                or any(saved["execution.json"][key] != value for key, value in p["baseline"]["environment"].items())):
++            raise ValueError("Frozen continuation reference is incomplete or unpaired: " + arm)
++        for order in ORDERS:
++            rec = manifest["points"][order + "_shared"]
++            shared = data.read_json(data.verify(job / "run" / rec["path"], rec))
++            start = rm["restored_starts"][order + "_" + arm]
++            if (start["full_checkpoint"] != shared["full_checkpoint"]
++                    or start["model_state_sha256"] != shared["model_state_sha256"]
++                    or start["first_map"] != shared["first_map_parameters"]
++                    or start["memory_source"] != manifest["memories"][order + "_" + spec["memory_arm"] + "_after1"]["file"]
++                    or start["adam_step"] != 288 or not start["first_scores_replayed_exactly"]):
++                raise ValueError("Continuation reference used a different shared start: " + arm)
++        result.setdefault("continuation_references", {})[arm] = {
++            "job": ref_job, "manifest": rm, "collected": rc}
+     return result
+ 
+ 
+diff --git a/scripts/step28_er_weight_check.py b/scripts/step28_er_weight_check.py
+index d4d97bf5..54cc99ef 100644
+--- a/scripts/step28_er_weight_check.py
++++ b/scripts/step28_er_weight_check.py
+@@ -168,7 +168,7 @@ def run(destination: Path, study: str = "weight") -> dict:
+                    for key in ("file_count", "total_size_bytes", "content_sha256")):
+                 raise ValueError("Pretrained archive differs")
+             reports, components = {}, {}
+-            native_arms = (("quarter", "logit_quarter") if method.with_logits(p) else
++            native_arms = ((p["evaluation"].get("matched_er", "quarter"), next(iter(p["arms"]))) if method.with_logits(p) else
+                            ("quarter", "tenth") if study == "low" else tuple(p["arms"]))
+             for arm in native_arms:
+                 print(method.data.json_bytes({"event": "native_start", "arm": arm}).decode(), flush=True)
+@@ -186,10 +186,10 @@ def run(destination: Path, study: str = "weight") -> dict:
+                 b_current, b_history = components[native_arms[1]][name]
+                 torch.testing.assert_close(a_current, b_current, rtol=0, atol=0)
+                 if method.with_logits(p):
+-                    expected = a_history + components["logit_quarter"]["mse_reference"][name]
++                    expected = a_history + components[native_arms[1]]["mse_reference"][name]
+                     torch.testing.assert_close(b_history, expected, rtol=2e-5, atol=2e-8)
+                     scaling[name] = {"current_exactly_equal": True, "compared_arms": list(native_arms),
+-                                     "history_supervision_weight": .25, "independent_mse_weight": .5,
++                                     "history_supervision_weight": method.all_weights(p)[native_arms[0]], "independent_mse_weight": .5,
+                                      "history_equals_er_plus_mse_gradient": True,
+                                      "maximum_history_difference": float((b_history - expected).abs().max())}
+                 else:
+@@ -226,7 +226,7 @@ def run(destination: Path, study: str = "weight") -> dict:
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--out", type=Path, required=True)
+-    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
++    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low"), default="weight")
+     args = parser.parse_args()
+     result = run(args.out.resolve(), args.study)
+     print(method.data.json_bytes({key: result[key] for key in ("status", "native_updates_actually_executed", "seconds")}).decode())
+diff --git a/scripts/step28_er_weight_evaluate.py b/scripts/step28_er_weight_evaluate.py
+index cff6b498..8e9a0a5a 100644
+--- a/scripts/step28_er_weight_evaluate.py
++++ b/scripts/step28_er_weight_evaluate.py
+@@ -67,9 +67,11 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
+             "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
+     result = {"endpoints": endpoints, "comparisons": comparisons}
+     if method.with_logits(p):
++        candidate = next(iter(p["arms"]))
++        matched = p["evaluation"].get("matched_er", "quarter")
+         result["method_checks"] = {
+-            "increment_against_matched_er_passes": comparisons["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"],
+-            "all_guards_against_seq_pass": comparisons["logit_quarter_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
++            "increment_against_matched_er_passes": comparisons[candidate + "_minus_" + matched]["interpretation"]["pilot_observed_checks_pass"],
++            "all_guards_against_seq_pass": comparisons[candidate + "_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
+             "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"}
+     else:
+         result["selection"] = select_configuration(endpoints, comparisons, p)
+@@ -114,10 +116,10 @@ def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None)
+ 
+ 
+ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+-             weight_root: Path | None = None) -> dict:
++             weight_root: Path | None = None, continuation_jobs: dict[str, Path] | None = None) -> dict:
+     p = method.contract() if p is None else p
+     reference = method.baseline(p, baseline_root.parent,
+-                                None if weight_root is None else weight_root.parent)
++                                None if weight_root is None else weight_root.parent, continuation_jobs)
+     collected = data.read_json(root / "collected.json")
+     old = reference["collected"]
+     if (collected["status"] != f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
+@@ -140,6 +142,12 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+         old_arrays.update(weight_arrays)
+         old_counts.update(weight_counts)
+         reuse.append((wr["job"] / "evaluation", wr["collected"], weight_names))
++    for arm, ref in reference.get("continuation_references", {}).items():
++        ref_names = [f"{order}_{arm}_stage{stage}" for order in method.ORDERS for stage in (2, 3)]
++        ref_arrays, ref_counts = read_points(ref["job"] / "evaluation", ref["collected"], ref_names)
++        old_arrays.update(ref_arrays)
++        old_counts.update(ref_counts)
++        reuse.append((ref["job"] / "evaluation", ref["collected"], ref_names))
+     # Preserve the exact small matrices/counts used, separately from new observations.
+     destination = root / "reference"
+     destination.mkdir(exist_ok=True)
+@@ -157,6 +165,9 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
+     previous.write_once(destination / "collected.json", data.json_bytes({
+         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
+         "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
++        **({"continuation_collected": {arm: spec["records"]["evaluation/collected.json"]
++                                       for arm, spec in p["continuation_references"].items()}}
++           if "continuation_references" in p else {}),
+         "group_ids": old["group_ids"], "domains": old["domains"],
+         "metric_columns": old["metric_columns"], "points": reused_points,
+         "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))
+diff --git a/scripts/step28_er_weight_run.py b/scripts/step28_er_weight_run.py
+index e7edc10c..1bcd5825 100644
+--- a/scripts/step28_er_weight_run.py
++++ b/scripts/step28_er_weight_run.py
+@@ -533,7 +533,7 @@ def main() -> None:
+     parser.add_argument("--out", type=Path, required=True)
+     parser.add_argument("--audit", type=Path)
+     parser.add_argument("--authorization", type=Path)
+-    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
++    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low"), default="weight")
+     args = parser.parse_args()
+     if platform.system() != "Linux":
+         parser.error("Research scripts run only on Linux py310")
+diff --git a/tests/test_step28_er_weight_contracts.py b/tests/test_step28_er_weight_contracts.py
+index fe657b61..ba18de39 100644
+--- a/tests/test_step28_er_weight_contracts.py
++++ b/tests/test_step28_er_weight_contracts.py
+@@ -577,19 +577,19 @@ class LogitWeightContracts(unittest.TestCase):
+         self.assertEqual(method.core.state_digest(opt.state_dict()), method.core.state_digest(other_opt.state_dict()))
+         self.assertEqual(actual["logit_mse"], expected["logit_mse"])
+ 
+-    def test_quarter_supervision_and_half_mse_independent_gradients_adam(self) -> None:
++    def test_matched_supervision_and_half_mse_independent_gradients_adam(self) -> None:
+         target = np.linspace(-1.5, 1.2, 378, dtype=np.float32)
+-        for clip, step in ((.01, 1), (1e6, 1), (1., 288)):
+-            with self.subTest(clip=clip, step=step):
++        for weight, clip, step in ((w, c, s) for w in (.25, .1) for c, s in ((.01, 1), (1e6, 1), (1., 288))):
++            with self.subTest(weight=weight, clip=clip, step=step):
+                 model, opt, c, current, old = prepared(288 + step - 1)
+                 c["optimizer"]["clip_norm"] = clip
+                 other, other_opt = clone(model, opt, c)
+-                expected = independent_update(other, other_opt, current, old, c, .25, target, step)
+-                actual = method.update(model, opt, current, old, c, .25, 2, step, 401, 402,
++                expected = independent_update(other, other_opt, current, old, c, weight, target, step)
++                actual = method.update(model, opt, current, old, c, weight, 2, step, 401, 402,
+                                        reference=target, logit_weight=.5, observe=True)
+                 for key, value in expected.items():
+                     self.assertAlmostEqual(actual[key], value, places=6)
+-                self.assertEqual(actual["total"], actual["current_total"] + .25 * actual["history_total"] + .5 * actual["logit_mse"])
++                self.assertEqual(actual["total"], actual["current_total"] + weight * actual["history_total"] + .5 * actual["logit_mse"])
+                 for parameter, reference in zip(model.parameters(), other.parameters(), strict=True):
+                     torch.testing.assert_close(parameter, reference, rtol=1e-6, atol=1e-7)
+                     torch.testing.assert_close(parameter.grad, reference.grad, rtol=1e-6, atol=1e-7)
+@@ -611,7 +611,7 @@ class LogitWeightContracts(unittest.TestCase):
+             self.assertEqual(method.parent.adam_step(opt), 288)
+ 
+     def test_logit_real_continuation_checkpoint_and_unrefreshing_memory(self) -> None:
+-        p = method.contract("logit")
++        p = method.contract("logit_low")
+         model, opt, c, _, _ = prepared()
+         history = [fixtures.handmade_group(f"fit_A_{i}", 1) for i in range(48)]
+         current = [fixtures.handmade_group(f"fit_B_{i}", 2) for i in range(48)]
+@@ -629,14 +629,15 @@ class LogitWeightContracts(unittest.TestCase):
+                 (root / folder).mkdir()
+             budget = fixtures.HandmadeBudget()
+             budget.state = lambda: {"handmade_fixture": True}
+-            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "logit_quarter", root, reference_log, budget, p)
++            row = runner.train_stage(model, opt, current, memory, c, "ABC", 2, "logit_tenth", root, reference_log, budget, p)
+             self.assertEqual(row["history_ids"], reference_log["history_ids"])
+             values = np.load(root / row["update_file"]["path"], allow_pickle=False)
+             self.assertTrue(np.all(values[:, method.step_columns(p).index("logit_weight")] == .5))
++            self.assertTrue(np.all(values[:, method.step_columns(p).index("history_weight")] == .1))
+             cal = [fixtures.handmade_group(f"cal_{i}") for i in range(12)]
+             valid = [fixtures.handmade_group(f"valid_{i}") for i in range(60)]
+-            point = runner.checkpoint(root, "ABC_logit_quarter_stage2", model, opt, c, "ABC", 2,
+-                                      cal, valid, memory.first_map, budget, .25, p)
++            point = runner.checkpoint(root, "ABC_logit_tenth_stage2", model, opt, c, "ABC", 2,
++                                      cal, valid, memory.first_map, budget, .1, p)
+             self.assertEqual(point["learner_auxiliary"]["checkpoint_metadata"]["logit_weight"], .5)
+             self.assertTrue(point["full_model_adam_and_rng_restore_verified"])
+             memory.auxiliary = point["learner_auxiliary"]
+@@ -683,5 +684,92 @@ class LogitWeightContracts(unittest.TestCase):
+             self.assertEqual(before, (root / "evaluation.json").read_bytes())
+ 
+ 
++class LogitLowContracts(unittest.TestCase):
++    @staticmethod
++    def references(p: dict) -> tuple:
++        def available(spec: dict) -> Path:
++            local = method.data.ROOT / spec["local_small_job"]
++            return local if local.is_dir() else method.data.ROOT / spec["linux_job"]
++        return available(p["baseline"]), {
++            arm: available(spec) for arm, spec in p["continuation_references"].items()}
++
++    def test_low_logit_scope_and_wrong_supervision_rejected(self) -> None:
++        p = method.contract("logit_low")
++        self.assertEqual(p["arms"], {"logit_tenth": .1})
++        self.assertEqual(p["evaluation"]["primary_comparison"], "logit_tenth_minus_tenth")
++        self.assertEqual(p["loss"]["logit_mse"], .5)
++        self.assertEqual(p["physical_updates"], 1728)
++        with tempfile.TemporaryDirectory() as directory:
++            root, manifest, reference = gate_fixture(Path(directory), p)
++            self.assertEqual(len(runner.blind_gate(root, manifest, reference, p)), 6)
++            name = "ABC_logit_tenth_stage2"
++            log_path = root / manifest["training"][name]["path"]
++            log = method.data.read_json(log_path)
++            values = np.load(root / log["update_file"]["path"], allow_pickle=False)
++            columns = {key: values[:, i] for i, key in enumerate(method.step_columns(p))}
++            columns["weighted_history_total"][:] = .25 * columns["history_total"]
++            columns["total"][:] = columns["current_total"] + columns["weighted_history_total"] + .5 * columns["logit_mse"]
++            log["update_file"] = runner.save_array(root / "updates/wrong_weight.npy", values, root)
++            method.data.write_json(log_path, log)
++            manifest["training"][name] = method.data.record(log_path, root)
++            with self.assertRaisesRegex(ValueError, "Historical weight"):
++                runner.blind_gate(root, manifest, reference, p)
++
++    def test_two_reference_sources_and_changed_start_rejected(self) -> None:
++        p = method.contract("logit_low")
++        original, jobs = self.references(p)
++        reference = method.baseline(p, original, continuation_jobs=jobs)
++        self.assertEqual(set(reference["continuation_references"]), {"tenth", "logit_quarter"})
++        with tempfile.TemporaryDirectory() as directory:
++            changed = copy.deepcopy(p)
++            altered = Path(directory)
++            spec = changed["continuation_references"]["tenth"]
++            for name in spec["records"]:
++                target = altered / name
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_bytes((jobs["tenth"] / name).read_bytes())
++            target = altered / "run/manifest.json"
++            manifest = method.data.read_json(target)
++            manifest["restored_starts"]["ABC_tenth"]["model_state_sha256"] = "different_start"
++            method.data.write_json(target, manifest)
++            spec["records"]["run/manifest.json"] = method.data.record(target, altered)
++            with self.assertRaisesRegex(ValueError, "different shared start"):
++                method.baseline(changed, original, continuation_jobs={**jobs, "tenth": altered})
++
++    def test_saved_three_comparisons_use_63_reference_sets(self) -> None:
++        p = method.contract("logit_low")
++        original, jobs = self.references(p)
++        reference = method.baseline(p, original, continuation_jobs=jobs)
++        groups = [fixtures.handmade_group(uid) for uid in reference["collected"]["group_ids"]]
++        raw = np.tile(np.linspace(-2, 1, 378, dtype=np.float32), (60, 1))
++        scores = {name: {role: raw if role == "raw" else raw.astype(np.float64) for role in method.ROLES}
++                  for name in method.expected_points(p)}
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory) / "collection"
++            runner.collect(root, scores, groups, reference["partition"], method.sources(p), p)
++            with mock.patch.object(method.base, "load_model", side_effect=AssertionError("Saved only")), \
++                 mock.patch.object(method.base.public, "attach_labels", side_effect=AssertionError("No labels")):
++                result = evaluation.finalize(root, original / "evaluation", p, continuation_jobs=jobs)
++            self.assertEqual((result["new_metric_count_sets"], result["reused_metric_count_sets"]), (18, 63))
++            self.assertEqual(set(result["endpoints"]), {"seq", "tenth", "logit_quarter", "logit_tenth"})
++            self.assertEqual(set(result["comparisons"]), {
++                "logit_tenth_minus_tenth", "logit_tenth_minus_logit_quarter", "logit_tenth_minus_seq"})
++            for arm, job in jobs.items():
++                saved = method.data.read_json(job / "evaluation/evaluation.json")
++                self.assertEqual(result["endpoints"][arm], saved["endpoints"][arm])
++                for endpoint in ("O", "N", "Z"):
++                    for metric in ("map", "recall_at_5"):
++                        delta = result["comparisons"]["logit_tenth_minus_" + arm]["primary"][endpoint][metric]["mean"]
++                        expected = (result["endpoints"]["logit_tenth"]["primary"][endpoint][metric]["mean"]
++                                    - saved["endpoints"][arm]["primary"][endpoint][metric]["mean"])
++                        self.assertAlmostEqual(delta, expected, places=14)
++            self.assertNotIn("selection", result)
++            self.assertEqual(result["method_checks"]["increment_against_matched_er_passes"],
++                             result["comparisons"]["logit_tenth_minus_tenth"]["interpretation"]["pilot_observed_checks_pass"])
++            before = (root / "evaluation.json").read_bytes()
++            evaluation.finalize(root, original / "evaluation", p, continuation_jobs=jobs)
++            self.assertEqual(before, (root / "evaluation.json").read_bytes())
++
++
+ if __name__ == "__main__":
+     unittest.main()

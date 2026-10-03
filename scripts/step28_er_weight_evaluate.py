@@ -67,9 +67,11 @@ def evaluate_matrices(new: dict, old: dict, domains: list[str], p: dict | None =
             "primary": delta, "against_raw_reference": raw, "interpretation": verdict}
     result = {"endpoints": endpoints, "comparisons": comparisons}
     if method.with_logits(p):
+        candidate = next(iter(p["arms"]))
+        matched = p["evaluation"].get("matched_er", "quarter")
         result["method_checks"] = {
-            "increment_against_matched_er_passes": comparisons["logit_quarter_minus_quarter"]["interpretation"]["pilot_observed_checks_pass"],
-            "all_guards_against_seq_pass": comparisons["logit_quarter_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
+            "increment_against_matched_er_passes": comparisons[candidate + "_minus_" + matched]["interpretation"]["pilot_observed_checks_pass"],
+            "all_guards_against_seq_pass": comparisons[candidate + "_minus_seq"]["interpretation"]["pilot_observed_checks_pass"],
             "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"}
     else:
         result["selection"] = select_configuration(endpoints, comparisons, p)
@@ -114,10 +116,10 @@ def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None)
 
 
 def finalize(root: Path, baseline_root: Path, p: dict | None = None,
-             weight_root: Path | None = None) -> dict:
+             weight_root: Path | None = None, continuation_jobs: dict[str, Path] | None = None) -> dict:
     p = method.contract() if p is None else p
     reference = method.baseline(p, baseline_root.parent,
-                                None if weight_root is None else weight_root.parent)
+                                None if weight_root is None else weight_root.parent, continuation_jobs)
     collected = data.read_json(root / "collected.json")
     old = reference["collected"]
     if (collected["status"] != f"ALL_{p['metric_count_sets']}_{method.evidence_tag(p)}_MATRICES_SAVED_BEFORE_COMPARISONS"
@@ -140,6 +142,12 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
         old_arrays.update(weight_arrays)
         old_counts.update(weight_counts)
         reuse.append((wr["job"] / "evaluation", wr["collected"], weight_names))
+    for arm, ref in reference.get("continuation_references", {}).items():
+        ref_names = [f"{order}_{arm}_stage{stage}" for order in method.ORDERS for stage in (2, 3)]
+        ref_arrays, ref_counts = read_points(ref["job"] / "evaluation", ref["collected"], ref_names)
+        old_arrays.update(ref_arrays)
+        old_counts.update(ref_counts)
+        reuse.append((ref["job"] / "evaluation", ref["collected"], ref_names))
     # Preserve the exact small matrices/counts used, separately from new observations.
     destination = root / "reference"
     destination.mkdir(exist_ok=True)
@@ -157,6 +165,9 @@ def finalize(root: Path, baseline_root: Path, p: dict | None = None,
     previous.write_once(destination / "collected.json", data.json_bytes({
         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
         "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
+        **({"continuation_collected": {arm: spec["records"]["evaluation/collected.json"]
+                                       for arm, spec in p["continuation_references"].items()}}
+           if "continuation_references" in p else {}),
         "group_ids": old["group_ids"], "domains": old["domains"],
         "metric_columns": old["metric_columns"], "points": reused_points,
         "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd /home/yongpeng/cross-lingual
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source /home/yongpeng/miniconda3/etc/profile.d/conda.sh
 conda activate py310
 : "${CUDA_VISIBLE_DEVICES:?Select an inspected idle GPU}"
@@ -10,7 +10,7 @@ authorization="$(realpath -- "${3:?Pass matching formal authorization}")"
 study="${4:-weight}"
 case "$study" in
   weight) time_limit=24h ;;
-  low|logit) time_limit=12h ;;
+  low|logit|logit_low) time_limit=12h ;;
   *) echo 'Unknown confirmed ER study' >&2; exit 2 ;;
 esac
 case "$out" in

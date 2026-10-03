@@ -533,7 +533,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--audit", type=Path)
     parser.add_argument("--authorization", type=Path)
-    parser.add_argument("--study", choices=("weight", "low", "logit"), default="weight")
+    parser.add_argument("--study", choices=("weight", "low", "logit", "logit_low"), default="weight")
     args = parser.parse_args()
     if platform.system() != "Linux":
         parser.error("Research scripts run only on Linux py310")
