@@ -1,0 +1,53 @@
+{
+  "status": "PASS_REPORT_TABLE_AND_REPLAY_CONSISTENCY",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "results": {
+    "low": {
+      "report_table_counts": {
+        "core_values": 40,
+        "endpoint_values": 330,
+        "comparison_values": 48,
+        "per_order_values": 6,
+        "boolean_checks": 48
+      },
+      "audit_replay_stable_fields_identical": true,
+      "diagnostics_identical": true,
+      "dynamic_fields_excluded": [
+        "completed_at_utc",
+        "cpu_affinity",
+        "elapsed_seconds"
+      ],
+      "passed_counts": {
+        "tenth_minus_quarter": 23,
+        "tenth_minus_seq": 10
+      }
+    },
+    "logit": {
+      "report_table_counts": {
+        "core_values": 24,
+        "endpoint_values": 198,
+        "comparison_values": 72,
+        "per_order_values": 9,
+        "boolean_checks": 72
+      },
+      "audit_replay_stable_fields_identical": true,
+      "diagnostics_identical": true,
+      "dynamic_fields_excluded": [
+        "completed_at_utc",
+        "cpu_affinity",
+        "elapsed_seconds"
+      ],
+      "passed_counts": {
+        "logit_quarter_minus_quarter": 23,
+        "logit_quarter_minus_seq": 16,
+        "quarter_minus_seq": 4
+      }
+    }
+  },
+  "checked_entries": 847,
+  "limitations": [
+    "No labels, models, calibration fitting, or native execution.",
+    "Compared published table values against authorized saved result JSON; independent endpoint recomputation is outside this script.",
+    "Audit replay stable-field identity does not independently establish scientific correctness."
+  ]
+}

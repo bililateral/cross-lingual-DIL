@@ -1,0 +1,166 @@
+{
+  "status": "PASS_HANDMADE_METRIC_AND_CALIBRATION_REFERENCE",
+  "cases": [
+    {
+      "name": "all_tied_zero",
+      "maximum_error": 2.220446049250313e-16,
+      "reference": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.5264550264550265,
+        "roc_auc": 0.5,
+        "recall_at_fpr_1pct": 0.0,
+        "brier": 0.25,
+        "log_loss": 0.6931471805599452,
+        "precision": 0.05291005291005291,
+        "recall": 1.0,
+        "f1": 0.10050251256281408,
+        "specificity": 0.0,
+        "balanced_accuracy": 0.5,
+        "mcc": 0.0,
+        "map": 0.20833469221293002,
+        "mrr": 0.1901760651257315,
+        "recall_at_1": 0.05357142857142857,
+        "recall_at_3": 0.10714285714285714,
+        "recall_at_5": 0.21428571428571427,
+        "recall_at_10": 0.375,
+        "ndcg_at_1": 0.10714285714285714,
+        "ndcg_at_3": 0.10714285714285714,
+        "ndcg_at_5": 0.1608499109294879,
+        "ndcg_at_10": 0.2224622060712527
+      },
+      "confusion": {
+        "tp": 20,
+        "fp": 358,
+        "fn": 0,
+        "tn": 0
+      }
+    },
+    {
+      "name": "mixed_ties",
+      "maximum_error": 5.551115123125783e-17,
+      "reference": {
+        "average_precision": 0.07230365001494513,
+        "trapezoidal_pr_auc": 0.13722411945532506,
+        "roc_auc": 0.5879888268156425,
+        "recall_at_fpr_1pct": 0.0,
+        "brier": 0.29385674223509767,
+        "log_loss": 0.8037629232807226,
+        "precision": 0.07281553398058252,
+        "recall": 0.75,
+        "f1": 0.13274336283185842,
+        "specificity": 0.4664804469273743,
+        "balanced_accuracy": 0.6082402234636871,
+        "mcc": 0.09731445468933753,
+        "map": 0.20582256050464615,
+        "mrr": 0.23005322804276712,
+        "recall_at_1": 0.08928571428571429,
+        "recall_at_3": 0.10714285714285714,
+        "recall_at_5": 0.23214285714285715,
+        "recall_at_10": 0.5535714285714286,
+        "ndcg_at_1": 0.10714285714285714,
+        "ndcg_at_3": 0.10714285714285714,
+        "ndcg_at_5": 0.158627853046849,
+        "ndcg_at_10": 0.27356300564561414
+      },
+      "confusion": {
+        "tp": 15,
+        "fp": 191,
+        "fn": 5,
+        "tn": 167
+      }
+    },
+    {
+      "name": "all_negative_ordered",
+      "maximum_error": 4.440892098500626e-16,
+      "reference": {
+        "average_precision": 0.13485809017494257,
+        "trapezoidal_pr_auc": 0.12680787616137273,
+        "roc_auc": 0.5379888268156424,
+        "recall_at_fpr_1pct": 0.05,
+        "brier": 0.05105197044094242,
+        "log_loss": 0.22294730333556026,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "specificity": 1.0,
+        "balanced_accuracy": 0.5,
+        "mcc": 0.0,
+        "map": 0.17412074133393096,
+        "mrr": 0.16485324392248032,
+        "recall_at_1": 0.07142857142857142,
+        "recall_at_3": 0.14285714285714285,
+        "recall_at_5": 0.21428571428571427,
+        "recall_at_10": 0.35714285714285715,
+        "ndcg_at_1": 0.07142857142857142,
+        "ndcg_at_3": 0.10714285714285714,
+        "ndcg_at_5": 0.13477520051675299,
+        "ndcg_at_10": 0.18008686687370398
+      },
+      "confusion": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 20,
+        "tn": 358
+      }
+    }
+  ],
+  "maximum_22_metric_error": 4.440892098500626e-16,
+  "calibration_case": {
+    "loss": 0.5296447803519829,
+    "gradient": [
+      -0.02007289810047642,
+      -0.16120725115583268
+    ],
+    "finite_difference": [
+      -0.020072898115897075,
+      -0.1612072511592011
+    ],
+    "maximum_gradient_error": 1.542065433679518e-11,
+    "projected_boundary_cases": 3
+  },
+  "sources": [
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a",
+      "extracted_functions": {
+        "curve_metrics": [
+          28,
+          44
+        ],
+        "confusion_metrics": [
+          47,
+          55
+        ],
+        "classification": [
+          58,
+          70
+        ],
+        "retrieval": [
+          73,
+          100
+        ],
+        "group_metrics": [
+          225,
+          228
+        ]
+      }
+    },
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca",
+      "extracted_functions": {
+        "loss_gradient": [
+          41,
+          49
+        ],
+        "projected_gradient": [
+          52,
+          58
+        ]
+      }
+    }
+  ],
+  "boundary": "Three handmade metric cases plus one handmade calibration objective, not formal label evaluation or proof of all corner cases."
+}

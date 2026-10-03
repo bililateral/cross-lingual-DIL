@@ -1,0 +1,61 @@
+{
+  "label": "audit_environment_v1",
+  "argv": [
+    "python",
+    "-B",
+    "-c",
+    "import json,os,platform,sys,numpy; print(json.dumps({\"executable\":sys.executable,\"python\":sys.version,\"numpy\":numpy.__version__,\"platform\":platform.platform(),\"machine\":platform.machine(),\"affinity\":sorted(os.sched_getaffinity(0)),\"thread_environment\":{k:os.environ.get(k) for k in (\"OMP_NUM_THREADS\",\"OPENBLAS_NUM_THREADS\",\"MKL_NUM_THREADS\",\"NUMEXPR_NUM_THREADS\",\"BLIS_NUM_THREADS\",\"VECLIB_MAXIMUM_THREADS\")}},indent=2))"
+  ],
+  "shell_command": "python -B -c 'import json,os,platform,sys,numpy; print(json.dumps({\"executable\":sys.executable,\"python\":sys.version,\"numpy\":numpy.__version__,\"platform\":platform.platform(),\"machine\":platform.machine(),\"affinity\":sorted(os.sched_getaffinity(0)),\"thread_environment\":{k:os.environ.get(k) for k in (\"OMP_NUM_THREADS\",\"OPENBLAS_NUM_THREADS\",\"MKL_NUM_THREADS\",\"NUMEXPR_NUM_THREADS\",\"BLIS_NUM_THREADS\",\"VECLIB_MAXIMUM_THREADS\")}},indent=2))'",
+  "cwd": "/workspace/scratch/ca13b63db3f0/review_work/input/project",
+  "wrapper_argv": [
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/src/run_record.py",
+    "--label",
+    "audit_environment_v1",
+    "--cwd",
+    "/workspace/scratch/ca13b63db3f0/review_work/input/project",
+    "--",
+    "python",
+    "-B",
+    "-c",
+    "import json,os,platform,sys,numpy; print(json.dumps({\"executable\":sys.executable,\"python\":sys.version,\"numpy\":numpy.__version__,\"platform\":platform.platform(),\"machine\":platform.machine(),\"affinity\":sorted(os.sched_getaffinity(0)),\"thread_environment\":{k:os.environ.get(k) for k in (\"OMP_NUM_THREADS\",\"OPENBLAS_NUM_THREADS\",\"MKL_NUM_THREADS\",\"NUMEXPR_NUM_THREADS\",\"BLIS_NUM_THREADS\",\"VECLIB_MAXIMUM_THREADS\")}},indent=2))"
+  ],
+  "environment_overrides": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "inherited_environment_values": "not recorded (may include secrets)",
+  "allowed_cpus_before": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "selected_cpu": 0,
+  "sources": [],
+  "started_at_utc": "2026-10-03T03:50:26.887633+00:00",
+  "ended_at_utc": "2026-10-03T03:50:27.003901+00:00",
+  "elapsed_seconds": 0.11615837599993029,
+  "exit_code": 0,
+  "streams": {
+    "stdout.txt": {
+      "bytes": 502,
+      "sha256": "55f87303ad14ffa0984ede94c14bf3f35bc5a0eb09e54e8c51c38da90757970b"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

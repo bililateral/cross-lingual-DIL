@@ -1,0 +1,41 @@
+--- independent_logit_reference.py (failed original)
++++ independent_logit_reference_v2.py (explicit missing-old-log boundary)
+@@ -132,7 +132,8 @@
+             name = f"{order}_logit_quarter_stage{stage}"
+             log = read(job / "run" / manifest["training"][name]["path"])
+             original_log = read(original / "run" / baseline["training"][f"{order}_er_stage{stage}"]["path"])
+-            quarter_log = read(weight / "run" / quarter["training"][f"{order}_quarter_stage{stage}"]["path"])
++            quarter_log_path = weight / "run" / quarter["training"][f"{order}_quarter_stage{stage}"]["path"]
++            quarter_log = read(quarter_log_path) if quarter_log_path.is_file() else None
+             stream = seed(policy["schedule_seed"], order, stage, "current")
+             schedule_rng = random.Random(stream)
+             current_ids = []
+@@ -142,9 +143,13 @@
+                 current_ids.extend(rows)
+             history_rng = random.Random(seed(policy["memory_seed"], order, stage, "history_draws"))
+             history_ids = [snapshots[stage - 1][history_rng.randrange(6)] for _ in range(288)]
+-            assert current_ids == log["current_ids"] == original_log["current_ids"] == quarter_log["current_ids"]
+-            assert history_ids == log["history_ids"] == original_log["history_ids"] == quarter_log["history_ids"]
+-            assert stream == log["current_dropout_stream"] == original_log["current_dropout_stream"] == quarter_log["current_dropout_stream"]
++            assert current_ids == log["current_ids"] == original_log["current_ids"]
++            assert history_ids == log["history_ids"] == original_log["history_ids"]
++            assert stream == log["current_dropout_stream"] == original_log["current_dropout_stream"]
++            if quarter_log is not None:
++                assert current_ids == quarter_log["current_ids"]
++                assert history_ids == quarter_log["history_ids"]
++                assert stream == quarter_log["current_dropout_stream"]
+             expected_targets = initial if stage == 2 else retained
+             for key in ("references", "reference_origins", "members"):
+                 assert log["memory_after_training"][key] == expected_targets[key]
+@@ -154,7 +159,10 @@
+                     "current_dropout_seed_from_protocol": seed(stream, index, "dropout"),
+                     "history_dropout_seed_from_protocol": seed(policy["memory_seed"], order, stage, index, "history_dropout")})
+             schedule_results[name] = {"current_rows": len(current_ids), "history_rows": len(history_ids),
+-                "matches_original_ER_and_ER025": True, "current_stream": stream,
++                "matches_original_ER": True,
++                "direct_ER025_log_comparison": "passed" if quarter_log is not None else "not_verified_original_old_log_not_in_submission",
++                "unprovided_ER025_log_record": None if quarter_log is not None else quarter["training"][f"{order}_quarter_stage{stage}"],
++                "current_stream": stream,
+                 "cache_targets_match_initial_or_retained_stage": True}
+     with (out / "independent_paired_schedule.csv").open("w", newline="") as f:
+         writer = csv.DictWriter(f, fieldnames=list(trace_rows[0]))

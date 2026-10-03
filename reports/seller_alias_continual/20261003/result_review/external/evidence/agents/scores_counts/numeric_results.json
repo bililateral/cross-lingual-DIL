@@ -1,0 +1,351 @@
+{
+  "status": "PASS_INDEPENDENT_SAVED_SCORES_COUNTS_CHECKS",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "cpu_affinity": [
+      0
+    ]
+  },
+  "studies": {
+    "low": {
+      "new_sets": 18,
+      "reused_sets": 81,
+      "points": [
+        "ABC_tenth_stage2",
+        "ABC_tenth_stage3",
+        "BCA_tenth_stage2",
+        "BCA_tenth_stage3",
+        "CAB_tenth_stage2",
+        "CAB_tenth_stage3"
+      ],
+      "group_count": 60,
+      "per_group_unordered_pairs": 378,
+      "per_group_positive_pairs": 20,
+      "new_formal_truth_read_for_review": 0
+    },
+    "logit": {
+      "new_sets": 18,
+      "reused_sets": 45,
+      "points": [
+        "ABC_logit_quarter_stage2",
+        "ABC_logit_quarter_stage3",
+        "BCA_logit_quarter_stage2",
+        "BCA_logit_quarter_stage3",
+        "CAB_logit_quarter_stage2",
+        "CAB_logit_quarter_stage3"
+      ],
+      "group_count": 60,
+      "per_group_unordered_pairs": 378,
+      "per_group_positive_pairs": 20,
+      "new_formal_truth_read_for_review": 0
+    }
+  },
+  "counts": {
+    "records_hash_and_size_checked": 401,
+    "reused_sets_compared_to_original_descriptors": 126,
+    "metric_count_sets_including_study_reuse": 162,
+    "group_confusion_rows_including_study_reuse": 9720,
+    "new_score_arrays": 48,
+    "calibration_trajectory_rows_including_final": 185,
+    "blind_score_predicted_positive_group_rows": 2160,
+    "conditional_valid_logloss_group_rows": 1440,
+    "cross_study_same_reference_sets": 45
+  },
+  "maximum_absolute_errors": {
+    "group_classification_rates": 0,
+    "pooled_classification": 0,
+    "macro_metrics": 5.551115123125783e-16,
+    "conditional_calibration_nll": 8.326672684688674e-17,
+    "conditional_calibration_projected_gradient": 9.367506770274758e-17,
+    "saved_affine_values": 0,
+    "conditional_affine_valid_log_loss": 1.1102230246251565e-16
+  },
+  "calibrations": [
+    {
+      "study": "low",
+      "point": "ABC_tenth_stage2",
+      "raw_logit_range": [
+        -10.53273868560791,
+        -0.04322022572159767
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.20843541129521787,
+        "final_independent_nll": 0.16704232901168986,
+        "final_independent_projected_gradient": 1.9912524129583886e-09,
+        "trajectory_rows_checked": 16,
+        "raw_logit_threshold_for_probability_half": -1.2199323921754208,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.551465298965007,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 98,
+        "first-cal": 155
+      }
+    },
+    {
+      "study": "low",
+      "point": "ABC_tenth_stage3",
+      "raw_logit_range": [
+        -13.141660690307617,
+        -0.02089104615151882
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.21358686563931736,
+        "final_independent_nll": 0.1728205325094531,
+        "final_independent_projected_gradient": 6.486695763863182e-09,
+        "trajectory_rows_checked": 14,
+        "raw_logit_threshold_for_probability_half": -0.5211503923721797,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.551465298965007,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 48,
+        "first-cal": 346
+      }
+    },
+    {
+      "study": "low",
+      "point": "BCA_tenth_stage2",
+      "raw_logit_range": [
+        -9.340332984924316,
+        0.014787495136260986
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.22031982671641917,
+        "final_independent_nll": 0.18684095239119158,
+        "final_independent_projected_gradient": 2.041818714104693e-09,
+        "trajectory_rows_checked": 17,
+        "raw_logit_threshold_for_probability_half": -0.6247169060021808,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.5558711071929892,
+      "role_predicted_positive_totals": {
+        "raw": 2,
+        "stage-cal": 15,
+        "first-cal": 140
+      }
+    },
+    {
+      "study": "low",
+      "point": "BCA_tenth_stage3",
+      "raw_logit_range": [
+        -9.997340202331543,
+        0.6293830871582031
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.15761552857665423,
+        "final_independent_nll": 0.17439281599917728,
+        "final_independent_projected_gradient": 2.0045189952355713e-09,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": 0.04799233685045091,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.5558711071929892,
+      "role_predicted_positive_totals": {
+        "raw": 131,
+        "stage-cal": 122,
+        "first-cal": 816
+      }
+    },
+    {
+      "study": "low",
+      "point": "CAB_tenth_stage2",
+      "raw_logit_range": [
+        -12.36866569519043,
+        -0.1522122621536255
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.24105874025895266,
+        "final_independent_nll": 0.1726626040131447,
+        "final_independent_projected_gradient": 8.476555635184013e-08,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -1.4500953190079584,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -3.2021533879967197,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 107,
+        "first-cal": 897
+      }
+    },
+    {
+      "study": "low",
+      "point": "CAB_tenth_stage3",
+      "raw_logit_range": [
+        -12.773715019226074,
+        0.023098627105355263
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.2113333107584125,
+        "final_independent_nll": 0.1720639281943851,
+        "final_independent_projected_gradient": 4.45830677930914e-10,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -0.40800663944897325,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -3.2021533879967197,
+      "role_predicted_positive_totals": {
+        "raw": 4,
+        "stage-cal": 75,
+        "first-cal": 1424
+      }
+    },
+    {
+      "study": "logit",
+      "point": "ABC_logit_quarter_stage2",
+      "raw_logit_range": [
+        -10.815901756286621,
+        -0.2508230209350586
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.23072760157957278,
+        "final_independent_nll": 0.1668462727417243,
+        "final_independent_projected_gradient": 9.549514345952304e-09,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -1.7969919358684987,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.551465298965007,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 104,
+        "first-cal": 74
+      }
+    },
+    {
+      "study": "logit",
+      "point": "ABC_logit_quarter_stage3",
+      "raw_logit_range": [
+        -11.140436172485352,
+        -0.0002870485186576843
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.23289493282162954,
+        "final_independent_nll": 0.17817069523876486,
+        "final_independent_projected_gradient": 7.694732712115737e-09,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -1.176696027234786,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.551465298965007,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 71,
+        "first-cal": 127
+      }
+    },
+    {
+      "study": "logit",
+      "point": "BCA_logit_quarter_stage2",
+      "raw_logit_range": [
+        -9.259249687194824,
+        0.013646057806909084
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.22916180593153782,
+        "final_independent_nll": 0.18791106349094758,
+        "final_independent_projected_gradient": 4.0956588398533e-09,
+        "trajectory_rows_checked": 17,
+        "raw_logit_threshold_for_probability_half": -0.5358306138138134,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.5558711071929892,
+      "role_predicted_positive_totals": {
+        "raw": 1,
+        "stage-cal": 16,
+        "first-cal": 120
+      }
+    },
+    {
+      "study": "logit",
+      "point": "BCA_logit_quarter_stage3",
+      "raw_logit_range": [
+        -11.109314918518066,
+        0.028796492144465446
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.20504155843247654,
+        "final_independent_nll": 0.1724466964369154,
+        "final_independent_projected_gradient": 3.327710385025995e-09,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -1.1695971027158276,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -1.5558711071929892,
+      "role_predicted_positive_totals": {
+        "raw": 3,
+        "stage-cal": 144,
+        "first-cal": 232
+      }
+    },
+    {
+      "study": "logit",
+      "point": "CAB_logit_quarter_stage2",
+      "raw_logit_range": [
+        -11.90721607208252,
+        -0.678938090801239
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.29428742599970864,
+        "final_independent_nll": 0.1719916754221829,
+        "final_independent_projected_gradient": 5.945868242207553e-10,
+        "trajectory_rows_checked": 16,
+        "raw_logit_threshold_for_probability_half": -2.629738620844064,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -3.2021533879967197,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 127,
+        "first-cal": 238
+      }
+    },
+    {
+      "study": "logit",
+      "point": "CAB_logit_quarter_stage3",
+      "raw_logit_range": [
+        -13.45848274230957,
+        -0.4021395444869995
+      ],
+      "stage_calibration": {
+        "sufficient_statistic_mean_y": 0.05291005291005291,
+        "sufficient_statistic_mean_y_times_logit": -0.2765631372178043,
+        "final_independent_nll": 0.1687740410490528,
+        "final_independent_projected_gradient": 3.072949672500158e-09,
+        "trajectory_rows_checked": 15,
+        "raw_logit_threshold_for_probability_half": -2.113266997377907,
+        "condition": "Original saved initial_nll and positive_count are assumed; no true labels independently available."
+      },
+      "first_raw_logit_threshold_for_probability_half": -3.2021533879967197,
+      "role_predicted_positive_totals": {
+        "raw": 0,
+        "stage-cal": 109,
+        "first-cal": 352
+      }
+    }
+  ],
+  "failures": [],
+  "unverified": [
+    "No formal labels were read; AP/MAP/MRR/Recall@K/NDCG@K/AUC were not independently recomputed from formal labels.",
+    "Confusion TP/FP membership and Brier values were not independently regenerated from formal labels.",
+    "Calibration trajectory identities condition on original saved initial_nll and positive_count; no independent-label fit or gradient verification.",
+    "Affine valid log-loss identity conditions on original saved raw log_loss and group class totals.",
+    "Shared model/Adam/RNG records are audited metadata, not a fresh native weight reload."
+  ]
+}

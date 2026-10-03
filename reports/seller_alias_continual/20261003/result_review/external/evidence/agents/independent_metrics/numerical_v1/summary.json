@@ -1,0 +1,84 @@
+{
+  "status": "PASS_INDEPENDENT_SAVED_RESULT_RECONSTRUCTION",
+  "collection_counts": {
+    "low_new": 18,
+    "low_reference": 81,
+    "logit_new": 18,
+    "logit_reference": 45
+  },
+  "unique_point_role_sets": 117,
+  "endpoint_rows": 3696,
+  "comparison_rows": 990,
+  "gate_count": 115,
+  "comparison_passes": {
+    "tenth_minus_quarter": 23,
+    "tenth_minus_seq": 10,
+    "logit_quarter_minus_quarter": 23,
+    "logit_quarter_minus_seq": 16,
+    "quarter_minus_seq": 4
+  },
+  "numerical_comparisons": {
+    "all_absolute_endpoints_and_CIs": {
+      "scalars": 14784,
+      "max_abs_error": 5.551115123125783e-16,
+      "worst_path": "low/half/raw/O/specificity/mean"
+    },
+    "all_absolute_per_order": {
+      "scalars": 14784,
+      "max_abs_error": 5.551115123125783e-16,
+      "worst_path": "low/seq/first-cal/F_first/specificity"
+    },
+    "all_five_comparisons_mean_CI": {
+      "scalars": 2970,
+      "max_abs_error": 2.242130092700023e-16,
+      "worst_path": "logit/quarter_minus_seq/primary/N/specificity/conditional_95pct_interval"
+    },
+    "all_five_comparisons_per_order": {
+      "scalars": 2970,
+      "max_abs_error": 2.7755575615628914e-16,
+      "worst_path": "low/tenth_minus_seq/against_raw_reference/N/balanced_accuracy"
+    },
+    "per_group_confusion_to_six_metrics": {
+      "scalars": 42120,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "absolute_stage_macro_all": {
+      "scalars": 3564,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "absolute_stage_macro_domain": {
+      "scalars": 10692,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "pooled_integer_counts_and_rates": {
+      "scalars": 5184,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "all_final_all_algebra_identity": {
+      "scalars": 2640528,
+      "max_abs_error": 3.3306690738754696e-16,
+      "worst_path": "seq/raw"
+    }
+  },
+  "checks_total": 1016,
+  "checks_failed": [],
+  "errors": [],
+  "ER_selection": {
+    "selected": "tenth",
+    "history_weight": 0.1,
+    "eligible": [
+      "tenth"
+    ],
+    "fallback_used": false,
+    "scope": "开发valid上的ER配置选择；不是独立最终验证，也不选择LOGIT替换ER"
+  },
+  "LOGIT_decisions": {
+    "increment_against_matched_er_passes": true,
+    "all_guards_against_seq_pass": false
+  },
+  "coverage_boundary": "Conditional reconstruction from 60 saved group metrics/counts; AP/MAP truth-dependent collection and native model/training are not replayed."
+}

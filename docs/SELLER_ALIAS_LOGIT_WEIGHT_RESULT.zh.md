@@ -1,6 +1,6 @@
 # 匹配LOGIT0.25的三方法比较结果
 
-2026-10-03，时间为Asia/Shanghai。正式训练、唯一valid评价、完整小结果回传和Linux保存结果独立核验已完成。**LOGIT0.25相对匹配ER0.25通过原23/23项，相对SEQ通过16/23项；旧ER0.25相对SEQ仍为4/23。输出保持机制有明确的匹配增量和局部抗遗忘收益，尚未实现对SEQ的全部新旧域保护。实际结果外审及最终主审尚待完成。**
+2026-10-03，时间为Asia/Shanghai。正式训练、唯一valid评价、完整小结果回传、Linux保存结果独立核验及实际结果外审／主审均已完成。**LOGIT0.25相对匹配ER0.25通过原23/23项，相对SEQ通过16/23项；旧ER0.25相对SEQ仍为4/23。输出保持配置有明确的匹配增量和局部抗遗忘收益，尚未实现对SEQ的全部新旧域保护。本轮科研收尾通过，原判定保持。**
 
 ## 1 结论与正负结果
 
@@ -205,8 +205,10 @@ LOGIT在O/N/Z的固定0.5分类Recall分别0.063333/0.063750/0.067500，F1为0.1
 
 全部阶段、实际域、raw/stage-cal/first-cal、22指标和计数见[评价JSON](../reports/seller_alias_continual/20261003/logit_weight_result/job/evaluation/evaluation.json)及[阶段CSV](../reports/seller_alias_continual/20261003/logit_weight_result/job/evaluation/stage_metrics.csv)。报告保留AP与梯形PR-AUC区别，未按结果选择更有利的输出角色。
 
-## 6 可支持主张与剩余收尾
+## 6 可支持主张与收尾
 
 这是单s0、已开发valid上的固定比较，三个顺序不是三个训练种子。条件区间不覆盖重新训练、校准拟合、调参选择的不确定性，没有独立最终test，不证明真实市场泛化、最优λ/MSE或方法创新。
 
-实现阶段[网页原文](../reports/documentation/20261002/logit_weight/review/external/REVIEW.zh.md)和[主审及Linux手写证据](../reports/documentation/20261002/logit_weight/review/report.zh.md)已存在；本次新结果仍须实际结果外审和最终主审，不能用先前通过替代。本点训练已结束，结果好坏均关闭该实验，不加点、不换种子、不重开标签。当前六权重留Linux用于本轮收尾，未扩大删除范围。
+联合结果[外审原文](../reports/seller_alias_continual/20261003/result_review/external/REVIEW.zh.md)及[最终主审](../reports/seller_alias_continual/20261003/result_review/report.zh.md)已完成，没有要求修改冻结代码、数值或重训的未决缺陷。五组比较共5,940个数值、115项原判定经主执行者与外审独立输出直接核对一致；保存分数／计数复算不冒称正式标签级指标重算或原生训练重演。本次网页未直接读取旧ER0.25逐步日志，其配对关系复用先前已关闭的审查证据；没有重新发送或索要受限材料。
+
+实现阶段[网页原文](../reports/documentation/20261002/logit_weight/review/external/REVIEW.zh.md)和[主审及Linux手写证据](../reports/documentation/20261002/logit_weight/review/report.zh.md)继续作为先前证据。本点按合同关闭，不加点、不换种子、不重开标签。当前六权重留Linux，未扩大删除范围；同步及Git完成情况分别查本轮交付回执。

@@ -1,0 +1,15 @@
+{
+  "reference_failure": "ER-REF-01",
+  "original_run": "runs/er_source_independent_v1",
+  "cause": "Independent reference assumed unprovided historical SEQ and half/quarter update JSON files existed.",
+  "fix": "Use independently regenerated frozen schedule and supplied original ER six update records. Explicitly exclude absent historical per-step logs from direct coverage.",
+  "input_project_changed": false,
+  "before": {
+    "path": "independent_er_source.py",
+    "sha256": "532a6fc1ff0fffb4fae5e2a0d4b74261b1532788c70948dd312a0399cf69f185"
+  },
+  "after": {
+    "path": "independent_er_source_v2.py",
+    "sha256": "c5e22495240f7b1a73c0af25771b07280c65f8d43f89233e8746fbc50932a804"
+  }
+}

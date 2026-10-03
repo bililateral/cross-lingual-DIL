@@ -1,0 +1,95 @@
+independent endpoint/bootstrap reconstruction complete: seq
+independent endpoint/bootstrap reconstruction complete: er
+independent endpoint/bootstrap reconstruction complete: half
+independent endpoint/bootstrap reconstruction complete: quarter
+independent endpoint/bootstrap reconstruction complete: tenth
+independent endpoint/bootstrap reconstruction complete: logit_quarter
+{"comparison": "tenth_minus_quarter", "pass_count": 23, "total": 23, "O_MAP": {"mean": 0.01570828892712328, "per_order": {"ABC": 0.009287531518695435, "BCA": 0.009105467461368533, "CAB": 0.028731867801305988}, "conditional_95pct_interval": [0.006622711094047107, 0.02457966668238088]}, "failed": []}
+{"comparison": "tenth_minus_seq", "pass_count": 10, "total": 23, "O_MAP": {"mean": 0.011108735846342699, "per_order": {"ABC": -0.00610293085092084, "BCA": 0.02022396916576996, "CAB": 0.01920516922417903}, "conditional_95pct_interval": [0.004096061003155324, 0.01833797814036337]}, "failed": ["old_recall5_improves", "new_map_non_decrease", "new_recall5_non_decrease", "N_average_precision_non_degradation", "N_roc_auc_non_degradation", "N_brier_non_degradation", "N_log_loss_non_degradation", "Z_map_non_degradation", "Z_recall_at_5_non_degradation", "Z_average_precision_non_degradation", "Z_roc_auc_non_degradation", "Z_brier_non_degradation", "Z_log_loss_non_degradation"]}
+{"comparison": "logit_quarter_minus_quarter", "pass_count": 23, "total": 23, "O_MAP": {"mean": 0.036125418649413765, "per_order": {"ABC": 0.062239870289648835, "BCA": 0.004389361917278012, "CAB": 0.04174702374131445}, "conditional_95pct_interval": [0.026500023704210333, 0.045934330437603706]}, "failed": []}
+{"comparison": "logit_quarter_minus_seq", "pass_count": 16, "total": 23, "O_MAP": {"mean": 0.03152586556863318, "per_order": {"ABC": 0.04684940792003256, "BCA": 0.01550786362167944, "CAB": 0.03222032516418749}, "conditional_95pct_interval": [0.020665072305501034, 0.042197713515078054]}, "failed": ["new_map_non_decrease", "new_recall5_non_decrease", "N_average_precision_non_degradation", "N_brier_non_degradation", "Z_map_non_degradation", "Z_average_precision_non_degradation", "Z_brier_non_degradation"]}
+{"comparison": "quarter_minus_seq", "pass_count": 4, "total": 23, "O_MAP": {"mean": -0.004599553080780583, "per_order": {"ABC": -0.015390462369616276, "BCA": 0.011118501704401429, "CAB": -0.009526698577126957}, "conditional_95pct_interval": [-0.015904316897120543, 0.0067910383507462915]}, "failed": ["old_map_improves", "old_map_interval_above_zero", "old_recall5_improves", "new_map_non_decrease", "new_recall5_non_decrease", "O_average_precision_non_degradation", "O_roc_auc_non_degradation", "O_brier_non_degradation", "O_log_loss_non_degradation", "N_average_precision_non_degradation", "N_roc_auc_non_degradation", "N_brier_non_degradation", "N_log_loss_non_degradation", "Z_map_non_degradation", "Z_recall_at_5_non_degradation", "Z_average_precision_non_degradation", "Z_roc_auc_non_degradation", "Z_brier_non_degradation", "Z_log_loss_non_degradation"]}
+{
+  "status": "PASS_INDEPENDENT_SAVED_RESULT_RECONSTRUCTION",
+  "collection_counts": {
+    "low_new": 18,
+    "low_reference": 81,
+    "logit_new": 18,
+    "logit_reference": 45
+  },
+  "unique_point_role_sets": 117,
+  "endpoint_rows": 3696,
+  "comparison_rows": 990,
+  "gate_count": 115,
+  "comparison_passes": {
+    "tenth_minus_quarter": 23,
+    "tenth_minus_seq": 10,
+    "logit_quarter_minus_quarter": 23,
+    "logit_quarter_minus_seq": 16,
+    "quarter_minus_seq": 4
+  },
+  "numerical_comparisons": {
+    "all_absolute_endpoints_and_CIs": {
+      "scalars": 14784,
+      "max_abs_error": 5.551115123125783e-16,
+      "worst_path": "low/half/raw/O/specificity/mean"
+    },
+    "all_absolute_per_order": {
+      "scalars": 14784,
+      "max_abs_error": 5.551115123125783e-16,
+      "worst_path": "low/seq/first-cal/F_first/specificity"
+    },
+    "all_five_comparisons_mean_CI": {
+      "scalars": 2970,
+      "max_abs_error": 2.242130092700023e-16,
+      "worst_path": "logit/quarter_minus_seq/primary/N/specificity/conditional_95pct_interval"
+    },
+    "all_five_comparisons_per_order": {
+      "scalars": 2970,
+      "max_abs_error": 2.7755575615628914e-16,
+      "worst_path": "low/tenth_minus_seq/against_raw_reference/N/balanced_accuracy"
+    },
+    "per_group_confusion_to_six_metrics": {
+      "scalars": 42120,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "absolute_stage_macro_all": {
+      "scalars": 3564,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "absolute_stage_macro_domain": {
+      "scalars": 10692,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "pooled_integer_counts_and_rates": {
+      "scalars": 5184,
+      "max_abs_error": 0.0,
+      "worst_path": null
+    },
+    "all_final_all_algebra_identity": {
+      "scalars": 2640528,
+      "max_abs_error": 3.3306690738754696e-16,
+      "worst_path": "seq/raw"
+    }
+  },
+  "checks_total": 1016,
+  "checks_failed": [],
+  "errors": [],
+  "ER_selection": {
+    "selected": "tenth",
+    "history_weight": 0.1,
+    "eligible": [
+      "tenth"
+    ],
+    "fallback_used": false,
+    "scope": "开发valid上的ER配置选择；不是独立最终验证，也不选择LOGIT替换ER"
+  },
+  "LOGIT_decisions": {
+    "increment_against_matched_er_passes": true,
+    "all_guards_against_seq_pass": false
+  },
+  "coverage_boundary": "Conditional reconstruction from 60 saved group metrics/counts; AP/MAP truth-dependent collection and native model/training are not replayed."
+}

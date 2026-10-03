@@ -1,0 +1,182 @@
+{
+  "recorded_at": "2026-10-03T13:01:03.7300696+08:00",
+  "status": "PASS_PRIMARY_COMPARISON_OF_ORIGINAL_AND_EXTERNAL_RESULTS",
+  "method": "Windows small saved-evidence comparison only; no research script, training, bootstrap rerun or label access",
+  "external_archive": {
+    "file": "result_review_evidence.zip",
+    "bytes": 10216713,
+    "sha256": "ef02ee822ab5a04624def2a3ddd39ffd07bac14042bdc942020ed71b6df30283",
+    "members": 223,
+    "payload_members_verified": 221,
+    "payload_bytes": 18756650,
+    "manifest_and_digest_verified": true,
+    "payload_mismatches": 0
+  },
+  "report": {
+    "file": "external/REVIEW.zh.md",
+    "bytes": 43919,
+    "sha256": "980967c3b57d7ab72c578d11857b32d4191c9ede5e9c30c53e789bb9d03401ad"
+  },
+  "retained_input_archive_sha256": "87ff5ae41173ea9f68172736a11bd90bf54846fc4a2f0843b12edaa2965b9f7c",
+  "numeric_scalars_compared": 5940,
+  "maximum_absolute_difference": 2.7755575615628914E-16,
+  "boolean_gates_compared": 115,
+  "comparisons": [
+    {
+      "comparison": "tenth_minus_quarter",
+      "passed": 23,
+      "total": 23,
+      "failed": [],
+      "old_map": {
+        "mean": 0.01570828892712328,
+        "per_order": {
+          "ABC": 0.009287531518695435,
+          "BCA": 0.009105467461368533,
+          "CAB": 0.028731867801305988
+        },
+        "conditional_95pct_interval": [
+          0.006622711094047107,
+          0.02457966668238088
+        ]
+      }
+    },
+    {
+      "comparison": "tenth_minus_seq",
+      "passed": 10,
+      "total": 23,
+      "failed": [
+        "old_recall5_improves",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "N_average_precision_non_degradation",
+        "N_roc_auc_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation"
+      ],
+      "old_map": {
+        "mean": 0.011108735846342699,
+        "per_order": {
+          "ABC": -0.00610293085092084,
+          "BCA": 0.02022396916576996,
+          "CAB": 0.01920516922417903
+        },
+        "conditional_95pct_interval": [
+          0.004096061003155324,
+          0.01833797814036337
+        ]
+      }
+    },
+    {
+      "comparison": "logit_quarter_minus_quarter",
+      "passed": 23,
+      "total": 23,
+      "failed": [],
+      "old_map": {
+        "mean": 0.036125418649413765,
+        "per_order": {
+          "ABC": 0.062239870289648835,
+          "BCA": 0.004389361917278012,
+          "CAB": 0.04174702374131445
+        },
+        "conditional_95pct_interval": [
+          0.026500023704210333,
+          0.045934330437603706
+        ]
+      }
+    },
+    {
+      "comparison": "logit_quarter_minus_seq",
+      "passed": 16,
+      "total": 23,
+      "failed": [
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "N_average_precision_non_degradation",
+        "N_brier_non_degradation",
+        "Z_map_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation"
+      ],
+      "old_map": {
+        "mean": 0.03152586556863318,
+        "per_order": {
+          "ABC": 0.04684940792003256,
+          "BCA": 0.01550786362167944,
+          "CAB": 0.03222032516418749
+        },
+        "conditional_95pct_interval": [
+          0.020665072305501034,
+          0.042197713515078054
+        ]
+      }
+    },
+    {
+      "comparison": "quarter_minus_seq",
+      "passed": 4,
+      "total": 23,
+      "failed": [
+        "old_map_improves",
+        "old_map_interval_above_zero",
+        "old_recall5_improves",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "O_average_precision_non_degradation",
+        "O_roc_auc_non_degradation",
+        "O_brier_non_degradation",
+        "O_log_loss_non_degradation",
+        "N_average_precision_non_degradation",
+        "N_roc_auc_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation"
+      ],
+      "old_map": {
+        "mean": -0.004599553080780583,
+        "per_order": {
+          "ABC": -0.015390462369616276,
+          "BCA": 0.011118501704401429,
+          "CAB": -0.009526698577126957
+        },
+        "conditional_95pct_interval": [
+          -0.015904316897120543,
+          0.0067910383507462915
+        ]
+      }
+    }
+  ],
+  "input_files": [
+    {
+      "path": "reports/seller_alias_continual/20261003/er_low_result/job/evaluation/evaluation.json",
+      "bytes": 1032505,
+      "sha256": "7186d6df305021f6c1ba94bc0075bcae06a0d6eb4f42162d5a10cea2b168cb2f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261003/logit_weight_result/job/evaluation/evaluation.json",
+      "bytes": 715238,
+      "sha256": "1ad9f51f83447256d3deeccc05afca7cf8f683d2e77bf7a921687467dbe1f7bc"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261003/result_review/external/evidence/agents/independent_metrics/numerical_v1/independent_comparisons.json",
+      "bytes": 404698,
+      "sha256": "0d8b648e0952a1d8ce299e164f63d544a522c67e4b2ebd8512575dc12ba000c5"
+    }
+  ],
+  "external_run_index": {
+    "records": 30,
+    "failed_review_runs": 6,
+    "formal_experiment_failures_added": 0
+  },
+  "primary_disposition": "report.zh.md",
+  "scope": "Saved means, conditional intervals, three per-order values and original gates; full external report and relevant independent sources/logs read. Existing native CPU and Linux saved-result audit evidence reused."
+}

@@ -1,0 +1,106 @@
+{
+  "label": "audit_replay_low_v1",
+  "argv": [
+    "python",
+    "-B",
+    "scripts/step28_er_weight_audit.py",
+    "--study",
+    "low",
+    "--project",
+    ".",
+    "--source-root",
+    ".",
+    "--job",
+    "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
+    "--baseline",
+    "reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job",
+    "--inventory",
+    "reports/seller_alias_continual/20261003/er_low_result/return_inventory.json",
+    "--output",
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/audit_replay/low",
+    "--cpu",
+    "24"
+  ],
+  "shell_command": "python -B scripts/step28_er_weight_audit.py --study low --project . --source-root . --job reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job --baseline reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job --inventory reports/seller_alias_continual/20261003/er_low_result/return_inventory.json --output /workspace/scratch/ca13b63db3f0/review_work/evidence/agents/audit_replay/low --cpu 24",
+  "cwd": "/workspace/scratch/ca13b63db3f0/review_work/input/project",
+  "wrapper_argv": [
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/src/run_record.py",
+    "--label",
+    "audit_replay_low_v1",
+    "--cwd",
+    "/workspace/scratch/ca13b63db3f0/review_work/input/project",
+    "--source",
+    "scripts/step28_bge_continual_audit.py",
+    "--",
+    "python",
+    "-B",
+    "scripts/step28_er_weight_audit.py",
+    "--study",
+    "low",
+    "--project",
+    ".",
+    "--source-root",
+    ".",
+    "--job",
+    "reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job",
+    "--baseline",
+    "reports/seller_alias_continual/20260930/bge_continual_execution/20260930_143700/job",
+    "--inventory",
+    "reports/seller_alias_continual/20261003/er_low_result/return_inventory.json",
+    "--output",
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/audit_replay/low",
+    "--cpu",
+    "24"
+  ],
+  "environment_overrides": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "inherited_environment_values": "not recorded (may include secrets)",
+  "allowed_cpus_before": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "selected_cpu": 0,
+  "sources": [
+    {
+      "path": "/workspace/scratch/ca13b63db3f0/review_work/input/project/scripts/step28_bge_continual_audit.py",
+      "snapshot": "source_snapshots/00_step28_bge_continual_audit.py",
+      "bytes": 24723,
+      "sha256": "2fff73cdc0e26843a10dfd35388ade1b31f9ca890d889c4c31f13b98efc1b193"
+    },
+    {
+      "path": "/workspace/scratch/ca13b63db3f0/review_work/input/project/scripts/step28_er_weight_audit.py",
+      "snapshot": "source_snapshots/01_step28_er_weight_audit.py",
+      "bytes": 23557,
+      "sha256": "77b30583fe58d23e51f66b2d75012cf45c3919cd73701426294a5caa4e656a1a"
+    }
+  ],
+  "started_at_utc": "2026-10-03T03:48:20.320539+00:00",
+  "ended_at_utc": "2026-10-03T03:48:20.402464+00:00",
+  "elapsed_seconds": 0.0817962080000143,
+  "exit_code": 1,
+  "streams": {
+    "stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.txt": {
+      "bytes": 366,
+      "sha256": "3a2c56d0088b6983e201d191d45ac1d4bc3ab7536e7dc56fe7442731d41dd3f2"
+    }
+  }
+}

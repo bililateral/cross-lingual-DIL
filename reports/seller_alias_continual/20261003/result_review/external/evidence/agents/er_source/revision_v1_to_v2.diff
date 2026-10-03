@@ -1,0 +1,22 @@
+--- independent_er_source.py
++++ independent_er_source_v2.py
+@@ -175,14 +175,11 @@
+             assert not log["memory_after_training"]["with_logits"]
+             assert log["memory_after_training"]["seen"] == 48 * (stage - 1)
+             assert log["memory_after_training"]["serialized_bytes"] <= 1048576
+-            paired_records = [read_json(OLD / "run/updates" / f"{order}_{arm}_stage{stage}.json")
+-                              for arm in ("seq", "er")]
+-            paired_records += [read_json(WEIGHT / "run/updates" / f"{order}_{arm}_stage{stage}.json")
+-                               for arm in ("half", "quarter")]
+-            for j, paired in enumerate(paired_records):
+-                assert paired["current_ids"] == schedule and paired["current_dropout_stream"] == stream
+-                if j:
+-                    assert paired["history_ids"] == history
++            # The delivered historical update logs contain original ER only.
++            # Never present absent SEQ/quarter logs as independently inspected.
++            paired = read_json(OLD / "run/updates" / f"{order}_er_stage{stage}.json")
++            assert paired["current_ids"] == schedule and paired["current_dropout_stream"] == stream
++            assert paired["history_ids"] == history
+             values = read_array(ER / "job/run" / log["update_file"]["path"])
+             assert values.dtype == np.float64 and values.shape == (288, 14) and np.isfinite(values).all()
+             columns = dict(zip(log["update_columns"], values.T))

@@ -1,0 +1,188 @@
+{
+  "scope": "Four handwritten 28-account examples, not formal-label recomputation or native training tests. Curves computed via independent threshold sets and pairwise AUROC; retrieval via explicit query/candidate loops.",
+  "source": {
+    "path": "scripts/step28_continual_population_evaluate.py",
+    "bytes": 20911,
+    "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a",
+    "executed_exact_function_definitions": [
+      "classification",
+      "confusion_metrics",
+      "curve_metrics",
+      "retrieval"
+    ]
+  },
+  "cases": [
+    {
+      "case": "all_tied",
+      "handwritten_pairs": 378,
+      "handwritten_positives": 20,
+      "retrieval_expected": [
+        0.20833469221293002,
+        0.1901760651257315,
+        0.05357142857142857,
+        0.10714285714285714,
+        0.21428571428571427,
+        0.375,
+        0.10714285714285714,
+        0.10714285714285714,
+        0.1608499109294879,
+        0.2224622060712527
+      ],
+      "retrieval_actual": [
+        0.20833469221293002,
+        0.1901760651257315,
+        0.05357142857142857,
+        0.10714285714285714,
+        0.21428571428571427,
+        0.375,
+        0.10714285714285714,
+        0.10714285714285714,
+        0.1608499109294879,
+        0.2224622060712527
+      ],
+      "retrieval_max_absolute_difference": 0.0,
+      "curves_expected": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.5264550264550265,
+        "roc_auc": 0.5,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_actual": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.5264550264550265,
+        "roc_auc": 0.5,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_max_absolute_difference": 0.0
+    },
+    {
+      "case": "bounded_ties",
+      "handwritten_pairs": 378,
+      "handwritten_positives": 20,
+      "retrieval_expected": [
+        0.1304430924292038,
+        0.14534911114880059,
+        0.0,
+        0.14285714285714285,
+        0.21428571428571427,
+        0.21428571428571427,
+        0.0,
+        0.0876887825271495,
+        0.12193209692781289,
+        0.12193209692781289
+      ],
+      "retrieval_actual": [
+        0.13044309242920382,
+        0.14534911114880059,
+        0.0,
+        0.14285714285714285,
+        0.21428571428571427,
+        0.21428571428571427,
+        0.0,
+        0.0876887825271495,
+        0.12193209692781289,
+        0.12193209692781289
+      ],
+      "retrieval_max_absolute_difference": 2.7755575615628914e-17,
+      "curves_expected": {
+        "average_precision": 0.04832646231874918,
+        "trapezoidal_pr_auc": 0.06940271426944893,
+        "roc_auc": 0.39036312849162014,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_actual": {
+        "average_precision": 0.04832646231874918,
+        "trapezoidal_pr_auc": 0.06940271426944891,
+        "roc_auc": 0.3903631284916201,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_max_absolute_difference": 5.551115123125783e-17
+    },
+    {
+      "case": "positive_edges_above",
+      "handwritten_pairs": 378,
+      "handwritten_positives": 20,
+      "retrieval_expected": [
+        1.0,
+        1.0,
+        0.7857142857142857,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "retrieval_actual": [
+        1.0,
+        1.0,
+        0.7857142857142857,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "retrieval_max_absolute_difference": 0.0,
+      "curves_expected": {
+        "average_precision": 1.0,
+        "trapezoidal_pr_auc": 1.0,
+        "roc_auc": 1.0,
+        "recall_at_fpr_1pct": 1.0
+      },
+      "curves_actual": {
+        "average_precision": 1.0,
+        "trapezoidal_pr_auc": 1.0,
+        "roc_auc": 1.0,
+        "recall_at_fpr_1pct": 1.0
+      },
+      "curves_max_absolute_difference": 0.0
+    },
+    {
+      "case": "positive_edges_below",
+      "handwritten_pairs": 378,
+      "handwritten_positives": 20,
+      "retrieval_expected": [
+        0.04527879527879528,
+        0.03764753764753765,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "retrieval_actual": [
+        0.04527879527879527,
+        0.03764753764753764,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "retrieval_max_absolute_difference": 1.3877787807814457e-17,
+      "curves_expected": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.026455026455026454,
+        "roc_auc": 0.0,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_actual": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.026455026455026454,
+        "roc_auc": 0.0,
+        "recall_at_fpr_1pct": 0.0
+      },
+      "curves_max_absolute_difference": 0.0
+    }
+  ]
+}

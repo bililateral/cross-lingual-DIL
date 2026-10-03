@@ -1,0 +1,74 @@
+{
+  "label": "scores_counts_handmade_v1",
+  "argv": [
+    "python",
+    "-B",
+    "handmade_metric_reference.py"
+  ],
+  "shell_command": "python -B handmade_metric_reference.py",
+  "cwd": "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/scores_counts",
+  "wrapper_argv": [
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/src/run_record.py",
+    "--label",
+    "scores_counts_handmade_v1",
+    "--cwd",
+    "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/scores_counts",
+    "--source",
+    "independent_scores_counts.py",
+    "--",
+    "python",
+    "-B",
+    "handmade_metric_reference.py"
+  ],
+  "environment_overrides": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "inherited_environment_values": "not recorded (may include secrets)",
+  "allowed_cpus_before": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "selected_cpu": 0,
+  "sources": [
+    {
+      "path": "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/scores_counts/independent_scores_counts.py",
+      "snapshot": "source_snapshots/00_independent_scores_counts.py",
+      "bytes": 19770,
+      "sha256": "285aefe08cd01e2e0a20ba1a0709392c2af80a6807d8497acdd591db9514e84c"
+    },
+    {
+      "path": "/workspace/scratch/ca13b63db3f0/review_work/evidence/agents/scores_counts/handmade_metric_reference.py",
+      "snapshot": "source_snapshots/01_handmade_metric_reference.py",
+      "bytes": 7388,
+      "sha256": "840e3b491bef8a7021716b514ba64e67cf3315c030b84ce799c0de85d28dde3b"
+    }
+  ],
+  "started_at_utc": "2026-10-03T03:55:12.855246+00:00",
+  "ended_at_utc": "2026-10-03T03:55:12.934194+00:00",
+  "elapsed_seconds": 0.07885268199970596,
+  "exit_code": 1,
+  "streams": {
+    "stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.txt": {
+      "bytes": 851,
+      "sha256": "524f0f72cd023ee6a0d44882b20d8c826cee4598752c18f44173c1cebd40dd16"
+    }
+  }
+}

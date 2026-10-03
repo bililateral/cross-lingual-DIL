@@ -1,6 +1,6 @@
 # 当前科研交接
 
-维护日期：2026-10-03。本页只维护一个当前入口；运行状态以带观测时点的实际回执为准。两项作业均已完成，468份16,506,607字节正式小结果完整回传并逐文件核对；10月3日10:23:58（Asia/Shanghai）Linux独立保存结果核验通过。获准的联合结果包已于11:45通过本地Playwright MCP提交，实际网页审查已回应并开始执行，见[提交与状态](../reports/seller_alias_continual/20261003/result_review/submission.json)。当前剩余结果外审结论及最终主审，不能把实现审查、数值核验或提交成功写成结果外审已经通过。
+维护日期：2026-10-03。本页只维护一个当前入口；运行状态以带观测时点的实际回执为准。两项作业均已完成，468份16,506,607字节正式小结果完整回传并逐文件核对；10月3日10:23:58（Asia/Shanghai）Linux独立保存结果核验通过。联合结果已通过本地Playwright MCP完成实际网页外审，原报告及223成员证据包已保存核对，最终[主审处置](../reports/seller_alias_continual/20261003/result_review/report.zh.md)接受限定开发结论。两项科研收尾均完成；ER0.1按原规则入选，匹配LOGIT0.25相对ER0.25增量通过，对SEQ完整保护仍分别10/23、16/23。同步与Git交付独立记录于[本轮交付](../reports/seller_alias_continual/20261003/result_review/delivery.json)，不能把科研完成等同于远端交付。
 
 ## 研究问题与目标
 
@@ -19,9 +19,9 @@
 | 当前数据是什么、域到底改变什么 | [9月10日生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮合同第2节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；中文合成主题混合与表达机制同时变化，不能称纯表达因果实验 |
 | 当前数学定义、运行配置和评价 | [合同索引](CURRENT_EXPERIMENT_DESIGN.md)、[首轮模型与评价合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)、[ER0.1 policy](../schema/step28_er_low_policy.json)、[LOGIT0.25 policy](../schema/step28_logit_weight_policy.json) |
 | 实现如何走到更新和结果 | [首轮实现说明](SELLER_ALIAS_BGE_IMPLEMENTATION.zh.md)、[共享模型／记忆](../scripts/step28_bge_continual.py)、[加权更新](../scripts/step28_er_weight.py)、[续训编排](../scripts/step28_er_weight_run.py)、[保存结果评价](../scripts/step28_er_weight_evaluate.py)；本地后继版本不能冒充ER0.1活动源码 |
-| 审查真正说了什么、哪些已关闭 | [ER0.1原文](../reports/documentation/20261002/er_low/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/er_low/review/report.zh.md)、[LOGIT原文](../reports/documentation/20261002/logit_weight/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/logit_weight/review/report.zh.md)；附件和失败修订从各主审记录回溯 |
+| 审查真正说了什么、哪些已关闭 | 最新联合结果[外审原文](../reports/seller_alias_continual/20261003/result_review/external/REVIEW.zh.md)及[主审](../reports/seller_alias_continual/20261003/result_review/report.zh.md)；实现阶段[ER0.1原文](../reports/documentation/20261002/er_low/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/er_low/review/report.zh.md)、[LOGIT原文](../reports/documentation/20261002/logit_weight/review/external/REVIEW.zh.md)及[主审](../reports/documentation/20261002/logit_weight/review/report.zh.md)继续复用；附件和失败修订从各主审记录回溯 |
 | 当前到底能执行什么、实际用了多少 | 下方状态表、[ER0.1授权及31来源](../reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/authorization.json)、[LOGIT授权](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/authorization.json)及[36项部署清单](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/source_inventory.json)；授权上限不是实际消费数，后者查运行账和状态回执 |
-| 已经得到哪些正负结果、什么仍未知 | [ER0.1结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT0.25结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、下方历史判读表、[早期分类](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)、[旧LaBSE阶段](RESEARCH_PROGRESS_20260923.zh.md)；新结果已回传并独立数值核验，结果外审尚未完成 |
+| 已经得到哪些正负结果、什么仍未知 | [ER0.1结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT0.25结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、下方历史判读表、[早期分类](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)、[旧LaBSE阶段](RESEARCH_PROGRESS_20260923.zh.md)；新结果已完成回传、独立数值核验、结果外审与主审，全部正负判定保持 |
 | 文件在哪里、缺失能否恢复、接下来做什么 | [Linux与活动文件](#linux与活动文件)、[存储与删除事实](STORAGE.zh.md)、[已授权计划与新合同边界](RESEARCH_PLAN.md) |
 
 当前主模型是`BAAI/bge-large-zh-v1.5`，标题／描述分别编码并以均值和总体标准差汇总，4096维账号表示进入对称8192→128→1头；编码器和头均训练。基础损失为BCE＋query-rank＋0.5 hard，ER的λ乘完整历史基础损失，LOGIT再加独立0.5 MSE。省略历史损失是λ=0／SEQ的科学对照，省略乘数而保留历史项是λ=1；不能据此宣称任意实现都逐位等价。
@@ -32,8 +32,8 @@
 
 | 工作 | 最近已保存的观测 | 合同及实际状态入口 |
 |---|---|---|
-| ER λ=0.1单点 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；270份结果回传，独立核验通过。对0.25为23/23并按规则选0.1，对SEQ为10/23；待结果外审 | [合同](SELLER_ALIAS_ER_LOW.zh.md)、[完整分析](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/er_low_execution/current_status.json) |
-| 匹配LOGIT0.25 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；198份结果回传，独立核验通过。对ER0.25为23/23，对SEQ为16/23；监听已退出／自删，待结果外审 | [合同](SELLER_ALIAS_LOGIT_WEIGHT.zh.md)、[完整分析](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/logit_weight_execution/current_status.json) |
+| ER λ=0.1单点 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；270份结果回传，独立核验、结果外审与主审通过。对0.25为23/23并按规则选0.1，对SEQ为10/23；本点关闭 | [合同](SELLER_ALIAS_ER_LOW.zh.md)、[完整分析](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/er_low_execution/current_status.json) |
+| 匹配LOGIT0.25 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；198份结果回传，独立核验、结果外审与主审通过。对ER0.25为23/23，对SEQ为16/23；监听已退出／自删，本点关闭 | [合同](SELLER_ALIAS_LOGIT_WEIGHT.zh.md)、[完整分析](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/logit_weight_execution/current_status.json) |
 
 ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5—7小时；LOGIT于16:31:29—21:53:13运行，实际5小时21分44秒，原估6—8小时。两项剩余训练时间均为0，均在各自12小时／16GiB上限内。上述程序完成及来源核对证据见[最新观测](../reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/observation/20261003_095536/remote_status.json)；ER31份、LOGIT隔离目录34份科学来源匹配。下一步使用现有输出，不重复启动。
 
@@ -41,7 +41,7 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 
 **当前执行补充**：用户明确“不用等λ=0.1，资源够了就开始”，LOGIT实际已于ER结束前启动，资源门和预算没有改变。监听在10月2日16:37:14确认真实更新后自删Linux脚本，随正式作业于21:53:13退出0；最新实查确认脚本不存在。[具体决定](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/decision.json)、[自删原记录](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。监听任务已结束，不重建。
 
-**本次harness调整的边界**：已批准范围内连续执行；未来可批准手写CPU先于外审及条件故障恢复。当前两项实验仍使用冻结来源和原访问账，正式失败不自动重启；完整矩阵后的原有纯统计收尾另按合同。没有新增λ、种子、训练、标签或成功线。结果回传与保存结果核对已完成，后续只剩实际结果外审／主审及相应交付，已完成的实现审查不重开。[联合结果审查请求](../reports/seller_alias_continual/20261003/result_review/request.zh.md)、[具体包身份](../reports/seller_alias_continual/20261003/result_review/package.json)及[本包专项上传许可](../reports/seller_alias_continual/20261003/result_review/upload_authorization.json)已留存。网页外审沿用本地Playwright MCP；此前CUA失败不计为审查，不能重复提交已经实际运行的请求。
+**本次harness调整的边界**：已批准范围内连续执行；未来可批准手写CPU先于外审及条件故障恢复。两项实验按冻结来源、原访问账和判据完成，没有新增λ、种子、训练、标签或成功线。结果审查和主审已关闭，既有实现／原生核验证据继续复用；不以外审未直接读取旧逐步日志或未认证后台身份另开实验、重发审查或补读受限材料。[联合审查请求](../reports/seller_alias_continual/20261003/result_review/request.zh.md)、[输入包身份](../reports/seller_alias_continual/20261003/result_review/package.json)、[专项上传许可](../reports/seller_alias_continual/20261003/result_review/upload_authorization.json)及[实际完成记录](../reports/seller_alias_continual/20261003/result_review/submission.json)均保留。网页外审使用本地Playwright MCP，专用页已关闭；此前CUA失败不计为审查。
 
 ## Linux与活动文件
 
@@ -56,7 +56,7 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 
 既有120群基础test已使用，不能再次当作未开发最终留出。新最终留出、创新算法、多种子确认、大候选库和无正候选查询只可先提出方案，尚无本轮执行许可。Audit A/B真值、Audit B预测、owners和私有身份资产维持既定封存边界。
 
-当前必须保留：排序s0候选及对照两份（ranking_execution/20260927_114646/job/run下s0_hard和s0_d的models/epoch6.pt）；首轮三个共享首域完整状态（bge_continual_execution/20260930_143700/job/run/branches下ABC_shared.pt、BCA_shared.pt、CAB_shared.pt）；活动实验所需状态、缓存、预训练档案及必要证据。路径所属日期及完整清单见[存储](STORAGE.zh.md)和[依赖／删除记录](../reports/maintenance/20261002/unused_weights/report.zh.md)。已删49份旧推理权重的事实不变，旧18份全保留措辞不再适用；当前通用保留依据是依赖与恢复需要。
+当前保留：排序s0候选及对照两份（ranking_execution/20260927_114646/job/run下s0_hard和s0_d的models/epoch6.pt）；首轮三个共享首域完整状态（bge_continual_execution/20260930_143700/job/run/branches下ABC_shared.pt、BCA_shared.pt、CAB_shared.pt）；ER0.1与LOGIT0.25各六份新权重、必要状态、缓存、预训练档案及证据。新权重共15,677,749,320字节，保管清单见两份结果报告；本次结果审查关闭没有新增删除决定。路径所属日期及完整清单见[存储](STORAGE.zh.md)和[依赖／删除记录](../reports/maintenance/20261002/unused_weights/report.zh.md)。已删49份旧推理权重的事实不变，旧18份全保留措辞不再适用；保留或后续清理由实际依赖与恢复需要决定。
 
 ## 已有结论与历史边界
 
@@ -66,8 +66,8 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 | 困难排序C／校准／基础test | 原排序9/13，排序正增益与概率退化并存；校准17/17；固定s0 test原8/9，用户事后接受实际提升，原passed=false不改。[排序](SELLER_ALIAS_RANKING_RESULT.zh.md)、[校准](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[test](SELLER_ALIAS_TEST_RESULT.zh.md) |
 | BGE首轮持续学习 | SEQ遗忘门通过；ER1−SEQ 4/23；LOGIT1−ER1 23/23，但相对SEQ旧域R5、新域和最终最新域仍有退化。有效的相对正结果不等于整体成功。[结果与审查](SELLER_ALIAS_BGE_RESULT.zh.md) |
 | ER0.5／0.25 | 两者对ER1均23/23、对SEQ均4/23，按原规则选0.25；原结果有效、对SEQ的不足保留。[结果](SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md) |
-| ER0.1（结果外审待完成） | 对0.25为23/23，对SEQ为10/23；O MAP和首域遗忘有正向证据，N MAP/R5有负向证据。从0.1到0时O MAP下降，不能宣称λ越小全面越好或0最优。[结果与独立核验](SELLER_ALIAS_ER_LOW_RESULT.zh.md) |
-| 匹配LOGIT0.25（结果外审待完成） | 对匹配ER为23/23，对SEQ为16/23；相对SEQ的O MAP/R5、首域遗忘和final_all MAP正向，新域若干观察值保护未满足，跨零不等于无退化；不换ER0.1作主要对手。[结果与独立核验](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md) |
+| ER0.1（结果外审／主审已关闭） | 对0.25为23/23，对SEQ为10/23；O MAP和首域遗忘有正向证据，N MAP/R5有负向证据。从0.1到0时O MAP下降，不能宣称λ越小全面越好或0最优。[结果与审查](SELLER_ALIAS_ER_LOW_RESULT.zh.md) |
+| 匹配LOGIT0.25（结果外审／主审已关闭） | 对匹配ER为23/23，对SEQ为16/23；相对SEQ的O MAP/R5、首域遗忘和final_all MAP正向，新域若干观察值保护未满足，跨零不等于无退化；不换ER0.1作主要对手。[结果与审查](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md) |
 | 更早的有效正／零／负与无效运行 | [历史分类与原报告](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)逐项区分Step7—28；不能把小样本、旧输入或内部开发的局部正结果外推到当前任务 |
 
 特别保留：Step27-v1工程无效，而v1.1已实际完成并未通过OOF门；Step28-v12的固定合成家族内正结果不同于Step28-v13 v1.12；V9.3-R2为AUDITOR_DESIGN_INVALID_NO_DATASET_CONCLUSION，不能称有效数据集失败；v12.1应用弃权及Audit A未开真值的盲预测不是准确率负结果。

@@ -1,0 +1,111 @@
+{
+  "status": "PASS_ER_WEIGHT_SAVED_RESULT_AUDIT",
+  "completed_at_utc": "2026-10-03T03:48:30.662387+00:00",
+  "elapsed_seconds": 0.8427755349998733,
+  "cpu_affinity": [
+    0
+  ],
+  "script": {
+    "bytes": 23557,
+    "sha256": "77b30583fe58d23e51f66b2d75012cf45c3919cd73701426294a5caa4e656a1a"
+  },
+  "helper": {
+    "bytes": 24723,
+    "sha256": "2fff73cdc0e26843a10dfd35388ade1b31f9ca890d889c4c31f13b98efc1b193"
+  },
+  "study": "low",
+  "numeric_comparisons": 413532,
+  "maximum_absolute_error": 7.105427357601002e-15,
+  "maximum_base_loss_decomposition_error": 3.427267074584961e-07,
+  "base_loss_decomposition_atol_rtol": 3e-06,
+  "checks": {
+    "returned_files": 270,
+    "unchanged_frozen_sources": 31,
+    "native_weight_hashes_match": 6,
+    "matrix_count_sets": 99,
+    "stage_csv_rows": 8910
+  },
+  "comparisons": {
+    "tenth_minus_quarter": {
+      "passed": 23,
+      "total": 23,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": true,
+        "old_recall5_improves": true,
+        "new_map_non_decrease": true,
+        "new_recall5_non_decrease": true,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": true,
+        "O_brier_non_degradation": true,
+        "O_log_loss_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": true,
+        "N_roc_auc_non_degradation": true,
+        "N_brier_non_degradation": true,
+        "N_log_loss_non_degradation": true,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": true,
+        "Z_recall_at_5_non_degradation": true,
+        "Z_average_precision_non_degradation": true,
+        "Z_roc_auc_non_degradation": true,
+        "Z_brier_non_degradation": true,
+        "Z_log_loss_non_degradation": true
+      }
+    },
+    "tenth_minus_seq": {
+      "passed": 10,
+      "total": 23,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": true,
+        "old_recall5_improves": false,
+        "new_map_non_decrease": false,
+        "new_recall5_non_decrease": false,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": true,
+        "O_brier_non_degradation": true,
+        "O_log_loss_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": false,
+        "N_brier_non_degradation": false,
+        "N_log_loss_non_degradation": false,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": false,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": false,
+        "Z_brier_non_degradation": false,
+        "Z_log_loss_non_degradation": false
+      }
+    }
+  },
+  "selection": {
+    "additional_configurations_authorized": false,
+    "criterion": "All 23 versus quarter, then O MAP, O Recall@5, larger lambda",
+    "eligible": [
+      "tenth"
+    ],
+    "fallback_used": false,
+    "history_weight": 0.1,
+    "scope": "Developed-valid configuration selection, not independent confirmation",
+    "selected": "tenth"
+  },
+  "new_label_parses": {
+    "train": 0,
+    "valid": 0,
+    "heldout": 0,
+    "owners": 0
+  },
+  "formal_texts_or_models_loaded": false,
+  "limitations": [
+    "Saved aggregate metrics audited; label-dependent AP/MAP not recomputed from truth.",
+    "Native execution not repeated; weights hashed separately without model loading.",
+    "Single seed, developed valid and selection-conditional intervals; no independent test or method novelty claim."
+  ]
+}

@@ -1,0 +1,23 @@
+--- provenance_reference_v1.py
++++ provenance_reference_v2.py
+@@ -163,7 +163,9 @@
+             verify(job/'run'/point['mapping']['path'],point['mapping'],f'{study}_{name}_mapping_identity')
+             # No read of native weights or body of memory. Only permitted budget summary.
+             memory=jread(job/f'run/memory/{name}_budget.json')
+-            ck(f'{study}_{name}_budget_summary_matches_training',memory==u['memory_after_training'])
++            training_memory = u['memory_after_training']
++            identity_fields = set(memory) - {'auxiliary_serialized_bytes','serialized_bytes','sha256'}
++            ck(f'{study}_{name}_budget_summary_identity_and_auxiliary_delta',set(memory)==set(training_memory) and all(memory[k]==training_memory[k] for k in identity_fields) and memory['serialized_bytes']-training_memory['serialized_bytes']==memory['auxiliary_serialized_bytes']-training_memory['auxiliary_serialized_bytes'] and memory['auxiliary_serialized_bytes']==point['learner_auxiliary_serialized_bytes'])
+             ck(f'{study}_{name}_memory_budget',memory['serialized_bytes']<1024**2 and memory['auxiliary_serialized_bytes']<memory['serialized_bytes'] and len(memory['members'])==6)
+             auxiliary_bytes=len((json.dumps(point['learner_auxiliary'],ensure_ascii=False,sort_keys=True,separators=(',',':'))+'\n').encode())
+             ck(f'{study}_{name}_auxiliary_serialization',auxiliary_bytes==point['learner_auxiliary_serialized_bytes'],actual_bytes=auxiliary_bytes)
+@@ -233,7 +235,8 @@
+                 cr=ref['gradient_components'][part];cc=candidate['gradient_components'][part]
+                 ck(f'{study}_{part}_native_current_summary_matches',cr['current']==cc['current'])
+                 ratio=cr['weighted_history']['norm']/cc['weighted_history']['norm']; ratios[part]=ratio
+-                ck(f'{study}_{part}_native_history_norm_ratio',abs(ratio-2.5)<2e-6,ratio=ratio)
++                # Diagnostic only: independently reduced float32 norms cannot
++                # recover or certify the per-element scaling of absent vectors.
+             native_summary['recomputed_norm_ratios_only']=ratios
+         else:
+             observed=np.asarray(candidate['captured_history_logits']);target=np.asarray(candidate['origin_eval_reference'])

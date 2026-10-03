@@ -1,0 +1,11 @@
+--- assemble_review_failed_v1.py
++++ assemble_review_corrected_v2.py
+@@ -30,7 +30,7 @@
+     [compname(c),f"{comparisons[c]['pass_count']}/23",signed(comparisons[c]['primary']['O']['map']['mean']),interval(comparisons[c]['primary']['O']['map']),interpret]
+     for c,interpret in zip(COMPS,['按冻结规则选ER0.1为开发ER配置','局部旧域收益；完整保护未过','相对固定ER0.25的增量通过','局部收益；完整保护未过','原有效负结果保持'])])
+ core_table=table(['方法','O MAP','O R@5','N MAP','N R@5','Z MAP','Z R@5','F_first MAP↓','final_all MAP'],[
+-    [NAMES[a],*[fixed(endpoints[a]['primary'][e][m]['mean']) for e,m in [('O','map'),('O','recall_at_5'),('N','map'),('N','recall_at_5'),('Z','map'),('Z','recall_at_5'),('F_first','map'),('final_all','map')]]
++    [NAMES[a],*[fixed(endpoints[a]['primary'][e][m]['mean']) for e,m in [('O','map'),('O','recall_at_5'),('N','map'),('N','recall_at_5'),('Z','map'),('Z','recall_at_5'),('F_first','map'),('final_all','map')]]]
+     for a in ['seq','er','half','quarter','tenth','logit_quarter']])
+ delta_rows=[]
+ for c in COMPS:
