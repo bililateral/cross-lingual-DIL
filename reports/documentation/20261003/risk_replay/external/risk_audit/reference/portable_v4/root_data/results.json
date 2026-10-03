@@ -1,0 +1,152 @@
+{
+  "results": {
+    "formula": {
+      "passed": true,
+      "logits": 378,
+      "risk_values_max_error": 1.7763568394002505e-15,
+      "analytic_vs_torch_gradient_max_error": 4.163336342344337e-17,
+      "finite_difference_gradient_max_error": 8.149311087057853e-12,
+      "base_finite_difference_max_error": 1.1086837654536441e-10,
+      "channels": [
+        1.1523430255596212,
+        0.25153375084189866,
+        1.4034276187640053e-06
+      ],
+      "penalty_mean": 0.46795939327637953,
+      "dtype": "float64"
+    },
+    "properties": {
+      "passed": true,
+      "mean_unchanged_tail_penalty": [
+        3.5714285714285777e-06,
+        0.0,
+        0.0
+      ],
+      "individual_swap_penalty": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint_reassignment_penalty": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cross_stratum_penalty": [
+        0.006309523809523807,
+        0.001158892128279884,
+        0.0007010582010582011
+      ],
+      "squared_hinge_zero_derivative": true,
+      "sort_tie": {
+        "stable_branch_gradient": 0.0071428571428571435,
+        "left_derivative": 0.007142855955148686,
+        "right_derivative": 0.0047619059541890996,
+        "central_difference": 0.005952380954668893,
+        "classical_derivative_exists": false,
+        "interpretation": "Stable sort selects a valid limiting branch; do not assert central finite differences at exact ties."
+      }
+    },
+    "real_update": {
+      "passed": true,
+      "backend": "2.7.1+cpu",
+      "actual_updates_in_probe": 2,
+      "counter_fixture": "One real warm update; Adam counter explicitly rebased 1->288; one risk update.",
+      "reference_fixture": "Independent eval risk reference multiplied by [0.76,0.67,0.55] to activate retention; not a scientific stage target.",
+      "lambda": 0.23,
+      "gamma": 0.71,
+      "preclip_norm": 0.5369031427775675,
+      "clip_scale": 0.14900238911574756,
+      "counts": {
+        "backward": 2,
+        "clip": 1,
+        "step": 1,
+        "forwards": [
+          {
+            "uid": "reference_current",
+            "training": true
+          },
+          {
+            "uid": "reference_old",
+            "training": true
+          }
+        ]
+      },
+      "retention_encoder_norm_sum": 0.02909128088504076,
+      "retention_head_norm_sum": 0.04566722549498081,
+      "per_parameter_comparison": {
+        "encoder.emb.weight": {
+          "gradient_max_error": 5.820766091346741e-10,
+          "parameter_max_error": 1.25013492002779e-07,
+          "first_moment_max_error": 1.2908991963486022e-11,
+          "second_moment_max_error": 8.913270442379098e-17
+        },
+        "encoder.project.weight": {
+          "gradient_max_error": 3.958120942115784e-09,
+          "parameter_max_error": 1.4871610998223872e-08,
+          "first_moment_max_error": 6.372726413413077e-11,
+          "second_moment_max_error": 7.044977633710337e-15
+        },
+        "encoder.project.bias": {
+          "gradient_max_error": 6.984919309616089e-09,
+          "parameter_max_error": 9.388930855003252e-09,
+          "first_moment_max_error": 1.2815769802267292e-10,
+          "second_moment_max_error": 7.762883306596586e-15
+        },
+        "head.0.weight": {
+          "gradient_max_error": 5.587935447692871e-09,
+          "parameter_max_error": 7.493553499937633e-09,
+          "first_moment_max_error": 9.077196936810306e-11,
+          "second_moment_max_error": 3.878825416678408e-15
+        },
+        "head.0.bias": {
+          "gradient_max_error": 2.2351741790771484e-08,
+          "parameter_max_error": 2.3129828052859125e-09,
+          "first_moment_max_error": 3.0193099821544667e-10,
+          "second_moment_max_error": 6.32957685694829e-14
+        },
+        "head.2.weight": {
+          "gradient_max_error": 2.2351741790771484e-08,
+          "parameter_max_error": 5.534335739687535e-09,
+          "first_moment_max_error": 3.434595860756645e-10,
+          "second_moment_max_error": 6.44138654006275e-14
+        },
+        "head.2.bias": {
+          "gradient_max_error": 5.960464477539063e-08,
+          "parameter_max_error": 1.8241572696808817e-09,
+          "first_moment_max_error": 1.3616710189956471e-10,
+          "second_moment_max_error": 1.490759352442729e-14
+        }
+      }
+    },
+    "zero_gamma": {
+      "passed": true,
+      "lambda": 0.1,
+      "model_equal": true,
+      "adam_equal": true
+    },
+    "real_stage": {
+      "passed": true,
+      "actual_stage_updates": 288,
+      "lambda": 0.23,
+      "gamma": 0.71,
+      "adam_step_final": 576,
+      "first_stage_counter_fixture": true,
+      "handwritten_text_groups_distinct": true,
+      "max_reference_error": 3.2595867960338865e-07,
+      "surviving_old_references": 4,
+      "new_surviving_references": 2,
+      "serialized_bytes": 80238,
+      "new_reference_per_uid_checked": true,
+      "old_references_not_refreshed": true,
+      "draws_restore_equal": true
+    },
+    "restore": {
+      "passed": true,
+      "next_update_and_model_adam_memory_rng_identical": true,
+      "actual_risk_updates_in_probe": 2,
+      "checkpoint": "tiny_checkpoint.pt"
+    }
+  },
+  "seconds": 12.392763071002264
+}

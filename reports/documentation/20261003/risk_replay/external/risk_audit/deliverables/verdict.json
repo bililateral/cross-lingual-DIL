@@ -1,0 +1,461 @@
+{
+  "schema_version": 1,
+  "review_id": "risk_replay_independent_20261003",
+  "review_language": "zh-CN",
+  "model_identity": {
+    "configuration_label": "GPT-6 Astra Pro",
+    "requested_label": "web GPT 6 Pro",
+    "independently_authenticated_backend_identity": null,
+    "backend_certified": false
+  },
+  "attachment": {
+    "received_filename": "review(3).zip",
+    "size_bytes": 193561,
+    "sha256": "562b01b536a0bd43bee1366a0be09381d603d0770bbd8855ae027f26707fd61e",
+    "members": 51,
+    "duplicate_names": 0,
+    "crc_bad_member": null,
+    "expected_match": true,
+    "original_zip_unchanged_after_review": true,
+    "inventories": {
+      "review_payloads": 50,
+      "source_files": 21,
+      "evidence_files": 17,
+      "all_bytes_and_hashes_match": true
+    }
+  },
+  "decisions": {
+    "mainline_fit": "PLAUSIBLE_CONDITIONAL",
+    "mathematical_definition": "CORRECT_WITH_EXPLICIT_EMPIRICAL_LIMITS",
+    "scoped_stage_implementation": "PASS_IN_INDEPENDENT_CHECKED_SCOPE",
+    "submitted_test_evidence": "TWO_CONFIRMED_MUTATION_BLIND_SPOTS",
+    "method_novelty": "INSUFFICIENT_TO_ESTABLISH_PAPER_METHOD_CONTRIBUTION",
+    "scientific_effect": "NOT_EVALUATED",
+    "unseen_identity_retention": "NOT_ESTABLISHED",
+    "native_bge_rerun_in_this_review": false,
+    "formal_six_endpoint_training_ready": false,
+    "formal_training_authorized_by_review": false
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "subcategory": "EVIDENCE_COVERAGE",
+      "production_bug_confirmed": false,
+      "blocks_current_scoped_implementation": false,
+      "location": "tests/test_step28_risk_replay.py:158-173; scripts/step28_risk_replay.py:217-220",
+      "finding_zh": "阶段γ强制为0的错误副本仍通过原7项；当前生产透传正确。",
+      "status": "INDEPENDENTLY_COVERED_NOT_PATCHED_IN_SUBMITTED_SUITE",
+      "minimum_fix_zh": "阶段用非默认不同λ/γ，检查每次真实传参、reference及至少一实际更新的独立梯度/AdamW。"
+    },
+    {
+      "id": "R2",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "subcategory": "EVIDENCE_COVERAGE",
+      "production_bug_confirmed": false,
+      "blocks_current_scoped_implementation": false,
+      "location": "tests/test_step28_risk_replay.py:161-180; tests/test_step28_bge_continual_contracts.py:24-31; scripts/step28_risk_replay.py:124-126",
+      "finding_zh": "新存活群score行倒序错误仍通过原7项，同阶段手写文本相同无法识别错配。",
+      "status": "INDEPENDENTLY_COVERED_NOT_PATCHED_IN_SUBMITTED_SUITE",
+      "minimum_fix_zh": "各群使用不同手写文本，按UID独立计算eval参考并逐值核对。"
+    },
+    {
+      "id": "R0",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "subcategory": "LEGACY_DTYPE",
+      "production_bug_confirmed": true,
+      "status": "CLOSED_IN_SUBMITTED_VERSION",
+      "blocks_current_scoped_implementation": false,
+      "finding_zh": "原Long标签BCE失败已由dtype/device对齐修复，失败源码和退出1证据保留。"
+    },
+    {
+      "id": "M1",
+      "classification": "FOLLOWUP_MECHANISM_RESEARCH",
+      "finding_zh": "六群缓存经验风险对未见身份只有有条件的共享表示泛化途径；同参考常数时退化为截断平方风险拟合。"
+    },
+    {
+      "id": "M2",
+      "classification": "FOLLOWUP_MECHANISM_RESEARCH",
+      "finding_zh": "三边际不保护联合/个体/MAP/FPR；有效378对称logit反例证明个体/MAP/FPR不保，联合结构另由风险空间代数反例证明。"
+    },
+    {
+      "id": "M3",
+      "classification": "FOLLOWUP_MECHANISM_RESEARCH",
+      "finding_zh": "train/dropout对eval参考存在无遗忘亦正惩罚的偏差；等权/相同γ不代表等梯度强度。"
+    }
+  ],
+  "scientific_blockers_for_current_narrow_scope": [],
+  "rejected_stronger_claims": [
+    {
+      "claim": "D_zero_implies_MAP_or_FPR_retention",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "basis": "EXECUTED_VALID_SYMMETRIC_SCORE_COUNTEREXAMPLE"
+    },
+    {
+      "claim": "D_zero_implies_individual_or_joint_retention",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "basis": "EXECUTED_IDENTITY_SWAP_AND_ALGEBRAIC_JOINT_COUNTEREXAMPLES"
+    },
+    {
+      "claim": "D_zero_implies_unseen_seller_retention",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "basis": "FINITE_CACHE_CONSTRAINT_DOES_NOT_IDENTIFY_OUT_OF_CACHE_BEHAVIOR"
+    },
+    {
+      "claim": "one_sided_squared_quantile_functional_is_new",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "basis": "DEL_BARRIO_2017_2018_AND_RIOUX_NEURIPS_2024"
+    },
+    {
+      "claim": "implementation_PASS_is_formal_effect_or_training_readiness",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "basis": "NO_FORMAL_DATA_OR_SIX_ENDPOINT_EVALUATION_IN_SCOPE"
+    }
+  ],
+  "independent_execution": {
+    "environment": {
+      "python": "3.12.14",
+      "torch": "2.7.1+cpu",
+      "numpy": "2.3.5",
+      "threads": 1,
+      "source": "official https://download.pytorch.org/whl/cpu",
+      "no_native_bge": true
+    },
+    "final_source": "risk_audit/reference/portable_v4/oracle.py",
+    "final_run": "risk_audit/reference/portable_v4/root_run",
+    "final_exit_code": 0,
+    "results": {
+      "formula": {
+        "passed": true,
+        "logits": 378,
+        "risk_values_max_error": 1.7763568394002505e-15,
+        "analytic_vs_torch_gradient_max_error": 4.163336342344337e-17,
+        "finite_difference_gradient_max_error": 8.149311087057853e-12,
+        "base_finite_difference_max_error": 1.1086837654536441e-10,
+        "channels": [
+          1.1523430255596212,
+          0.25153375084189866,
+          1.4034276187640053e-06
+        ],
+        "penalty_mean": 0.46795939327637953,
+        "dtype": "float64"
+      },
+      "properties": {
+        "passed": true,
+        "mean_unchanged_tail_penalty": [
+          3.5714285714285777e-06,
+          0.0,
+          0.0
+        ],
+        "individual_swap_penalty": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "joint_reassignment_penalty": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cross_stratum_penalty": [
+          0.006309523809523807,
+          0.001158892128279884,
+          0.0007010582010582011
+        ],
+        "squared_hinge_zero_derivative": true,
+        "sort_tie": {
+          "stable_branch_gradient": 0.0071428571428571435,
+          "left_derivative": 0.007142855955148686,
+          "right_derivative": 0.0047619059541890996,
+          "central_difference": 0.005952380954668893,
+          "classical_derivative_exists": false,
+          "interpretation": "Stable sort selects a valid limiting branch; do not assert central finite differences at exact ties."
+        }
+      },
+      "real_update": {
+        "passed": true,
+        "backend": "2.7.1+cpu",
+        "actual_updates_in_probe": 2,
+        "counter_fixture": "One real warm update; Adam counter explicitly rebased 1->288; one risk update.",
+        "reference_fixture": "Independent eval risk reference multiplied by [0.76,0.67,0.55] to activate retention; not a scientific stage target.",
+        "lambda": 0.23,
+        "gamma": 0.71,
+        "preclip_norm": 0.5369031427775675,
+        "clip_scale": 0.14900238911574756,
+        "counts": {
+          "backward": 2,
+          "clip": 1,
+          "step": 1,
+          "forwards": [
+            {
+              "uid": "reference_current",
+              "training": true
+            },
+            {
+              "uid": "reference_old",
+              "training": true
+            }
+          ]
+        },
+        "retention_encoder_norm_sum": 0.02909128088504076,
+        "retention_head_norm_sum": 0.04566722549498081,
+        "per_parameter_comparison": {
+          "encoder.emb.weight": {
+            "gradient_max_error": 5.820766091346741e-10,
+            "parameter_max_error": 1.25013492002779e-07,
+            "first_moment_max_error": 1.2908991963486022e-11,
+            "second_moment_max_error": 8.913270442379098e-17
+          },
+          "encoder.project.weight": {
+            "gradient_max_error": 3.958120942115784e-09,
+            "parameter_max_error": 1.4871610998223872e-08,
+            "first_moment_max_error": 6.372726413413077e-11,
+            "second_moment_max_error": 7.044977633710337e-15
+          },
+          "encoder.project.bias": {
+            "gradient_max_error": 6.984919309616089e-09,
+            "parameter_max_error": 9.388930855003252e-09,
+            "first_moment_max_error": 1.2815769802267292e-10,
+            "second_moment_max_error": 7.762883306596586e-15
+          },
+          "head.0.weight": {
+            "gradient_max_error": 5.587935447692871e-09,
+            "parameter_max_error": 7.493553499937633e-09,
+            "first_moment_max_error": 9.077196936810306e-11,
+            "second_moment_max_error": 3.878825416678408e-15
+          },
+          "head.0.bias": {
+            "gradient_max_error": 2.2351741790771484e-08,
+            "parameter_max_error": 2.3129828052859125e-09,
+            "first_moment_max_error": 3.0193099821544667e-10,
+            "second_moment_max_error": 6.32957685694829e-14
+          },
+          "head.2.weight": {
+            "gradient_max_error": 2.2351741790771484e-08,
+            "parameter_max_error": 5.534335739687535e-09,
+            "first_moment_max_error": 3.434595860756645e-10,
+            "second_moment_max_error": 6.44138654006275e-14
+          },
+          "head.2.bias": {
+            "gradient_max_error": 5.960464477539063e-08,
+            "parameter_max_error": 1.8241572696808817e-09,
+            "first_moment_max_error": 1.3616710189956471e-10,
+            "second_moment_max_error": 1.490759352442729e-14
+          }
+        }
+      },
+      "zero_gamma": {
+        "passed": true,
+        "lambda": 0.1,
+        "model_equal": true,
+        "adam_equal": true
+      },
+      "real_stage": {
+        "passed": true,
+        "actual_stage_updates": 288,
+        "lambda": 0.23,
+        "gamma": 0.71,
+        "adam_step_final": 576,
+        "first_stage_counter_fixture": true,
+        "handwritten_text_groups_distinct": true,
+        "max_reference_error": 3.2595867960338865e-07,
+        "surviving_old_references": 4,
+        "new_surviving_references": 2,
+        "serialized_bytes": 80238,
+        "new_reference_per_uid_checked": true,
+        "old_references_not_refreshed": true,
+        "draws_restore_equal": true
+      },
+      "restore": {
+        "passed": true,
+        "next_update_and_model_adam_memory_rng_identical": true,
+        "actual_risk_updates_in_probe": 2,
+        "checkpoint": "tiny_checkpoint.pt"
+      }
+    },
+    "seconds": 13.755564586997934,
+    "submitted_original_suite_tests": 7,
+    "submitted_original_suite_exit_code": 0,
+    "mutations": {
+      "cross_stratum_mix": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: channel penalties: max error 0.09499530364177988",
+        "path": "mutants/cross_stratum_mix"
+      },
+      "delete_retention": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: encoder.emb.weight preclip gradient: max error 0.0012806063750758767",
+        "path": "mutants/delete_retention",
+        "max_gradient_error": 0.012560874223709106,
+        "max_parameter_error": 0.002232135239508215,
+        "reported_retention": 0.25356021523475647
+      },
+      "detach_retention": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: encoder.emb.weight preclip gradient: max error 0.0012806063750758767",
+        "path": "mutants/detach_retention",
+        "max_gradient_error": 0.012560874223709106,
+        "max_parameter_error": 0.002232135239508215,
+        "reported_retention": 0.25356021523475647
+      },
+      "multiply_gamma_by_lambda": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: encoder.emb.weight preclip gradient: max error 0.0009860671125352383",
+        "path": "mutants/multiply_gamma_by_lambda",
+        "max_gradient_error": 0.009671896696090698,
+        "max_parameter_error": 0.0023042568596864377,
+        "reported_retention": 0.25356021523475647
+      },
+      "omit_channel_mean": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: encoder.emb.weight preclip gradient: max error 0.002561210887506604",
+        "path": "mutants/omit_channel_mean",
+        "max_gradient_error": 0.02512151002883911,
+        "max_parameter_error": 0.0029615478913029326,
+        "reported_retention": 0.25356021523475647
+      },
+      "retained_score_row_reverse": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: group-reference alignment phase1_08: max error 0.010181485395419632",
+        "path": "mutants/retained_score_row_reverse",
+        "submitted_suite_exit_code": 0,
+        "submitted_suite_passed_tests": 7
+      },
+      "stage_gamma_zero": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: train_stage lost nondefault gamma",
+        "path": "mutants/stage_gamma_zero",
+        "submitted_suite_exit_code": 0,
+        "submitted_suite_passed_tests": 7
+      },
+      "swap_weights": {
+        "oracle_exit_code": 1,
+        "rejected": true,
+        "failure": "AssertionError: encoder.emb.weight preclip gradient: max error 0.0016475969459861517",
+        "path": "mutants/swap_weights",
+        "max_gradient_error": 0.1982417106628418,
+        "max_parameter_error": 0.002315075102713171,
+        "reported_retention": 0.25356021523475647
+      }
+    },
+    "own_failed_versions": [
+      {
+        "version": "oracle_v1",
+        "exit_code": 1,
+        "reason": "Runtime dependency sympy absent; formulas/properties had already passed. Installed official dependency; no production code change."
+      },
+      {
+        "version": "oracle_v2",
+        "exit_code": 1,
+        "reason": "Own ER-equivalence probe used unsupported .23 in preexisting ER API; corrected that equivalence pair only to allowed .1. Main method .23/.71 tests unchanged."
+      }
+    ],
+    "artificial_probe_disclosure": [
+      "One real warm Tiny update, then explicit Adam step-counter rebase 1->288 as an operator fixture.",
+      "Activated update reference equals independent eval risk times [0.76,.67,.55]; no historical scientific-stage meaning.",
+      "clip_norm=.08 only in independent Tiny fixture; actual norm .536903 and scale .149002 verify common clipping; original input config never edited."
+    ]
+  },
+  "counterexamples": {
+    "valid_symmetric_28_accounts": {
+      "positive_cliques": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3
+      ],
+      "undirected_logits": 378,
+      "D": [
+        0,
+        0,
+        0
+      ],
+      "retention_gradient_max_abs": 0,
+      "MAP_before": 0.5357142857142857,
+      "MAP_after": 0.36904761904761907,
+      "FPR_at_zero_before": 0.03910614525139665,
+      "FPR_at_zero_after": 0.0782122905027933,
+      "full_base_before": 10.287183413469771,
+      "full_base_after": 1.550966293717012,
+      "not_a_claimed_BGE_training_trajectory": true
+    },
+    "individual_AP_swap": {
+      "before": [
+        0.037037037037037035,
+        0.037037037037037035,
+        1,
+        1
+      ],
+      "after": [
+        1,
+        1,
+        0.037037037037037035,
+        0.037037037037037035
+      ],
+      "D": [
+        0,
+        0,
+        0
+      ]
+    },
+    "risk_space_noise": {
+      "noise": [
+        -0.25,
+        0.25
+      ],
+      "probabilities": [
+        0.5,
+        0.5
+      ],
+      "expected_D_rank": 0.03125,
+      "not_measured_BGE_dropout": true
+    }
+  },
+  "scope": {
+    "formal_data_access": false,
+    "formal_gpu_training": false,
+    "production_source_modified": false,
+    "received_zip_modified": false,
+    "user_linux_connected": false,
+    "all_new_inputs_handwritten": true,
+    "native_large_model_weights_requested_or_loaded": false
+  },
+  "future_evaluation_requirements_not_authorization": [
+    "Freeze candidate, lambda/gamma, primary matched ER/LOGIT comparator, paired seeds/orders, memory/compute budget, and decision criteria before formal data access.",
+    "Report surviving-cache diagnostics separately from unseen-identity O plus N/Z and full metrics/matrices.",
+    "Attribute mechanism with individual-one-sided, mean-one-sided, and symmetric-distribution controls if authorized.",
+    "Distinguish train/eval perturbation and scale from actual retention; same gamma is not equal strength.",
+    "Treat developed valid and previously used test as development evidence, not fresh independent confirmation.",
+    "Complete the declared six-endpoint orchestration only under a separate authorized experiment contract."
+  ],
+  "out_of_scope_overdesign": [
+    "formal_data_or_owners_access_now",
+    "larger_or_all_history_memory",
+    "new_model_or_algorithm_search_now",
+    "full_native_BGE_288_updates_now",
+    "mandatory_joint_Sinkhorn",
+    "generic_recovery_or_security_framework",
+    "recursive_unrelated_prior_audits"
+  ],
+  "limitations": [
+    "New execution used Torch2.7.1 CPU and independent Tiny encoder; attached native evidence used Torch2.9.1+cu130 on CPU.",
+    "No fresh BGE/GPU/BF16 or scientific effect evaluation.",
+    "No full native gradient/logit arrays in original package; native summaries are not independently reconstructed here.",
+    "Novelty search is a primary-source comparison, not an exhaustive first-invention certification."
+  ]
+}

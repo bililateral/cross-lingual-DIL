@@ -10,7 +10,7 @@
 
 当前每群28账号，每查询27候选且有同控候选；结论不能直接外推到全市场、无正候选查询或真实中文市场。先完成本主线，再决定扩展范围。基础排序改进、已知LOGIT适配和调λ均不自动成立方法创新。
 
-用户10月3日在否决先前方案并继续讨论后，明确要求实现[群体风险分布保持重放](SELLER_ALIAS_RISK_REPLAY.zh.md)，完成后交网页端审核。该新指令取代本方案此前暂不上传的限制；当前范围为算法实现、必要Linux手写CPU核验和网页外审。旧[跨卖家修复迁移重放](SELLER_ALIAS_TRANSFER_REPLAY.zh.md)保留为未采用讨论稿，不是当前算法。新工作不修改LOGIT0.1活动合同，不授予正式数据／标签访问或新GPU训练，创新性和未见卖家效果仍待审查／实验。算法及完整阶段API已实现；Linux CPU46于17:15:00—17:20:27完成7项核验和3次原生BGE更新探针，全部通过，17份证据回传匹配。见[实现与核验](../reports/documentation/20261003/risk_replay/implementation.zh.md)。用户随后明确“那现在让网页端审核吧”；17:59:11已通过本地Playwright上传并发送同一51成员包，网页[审查会话](https://chatgpt.com/c/6ac0d1ea-764c-83e9-a768-254fa9aed2ad)已开始处理，尚未完成。审查以算法合理性／主线与创新为首要任务，兼审公式与伪实现；见[提交状态](../reports/documentation/20261003/risk_replay/submission.json)。
+用户10月3日在否决先前方案并继续讨论后，明确要求实现[群体风险分布保持重放](SELLER_ALIAS_RISK_REPLAY.zh.md)，完成后交网页端审核。该新指令取代本方案此前暂不上传的限制；当前范围为算法实现、必要Linux手写CPU核验和网页外审。旧[跨卖家修复迁移重放](SELLER_ALIAS_TRANSFER_REPLAY.zh.md)保留为未采用讨论稿，不是当前算法。新工作不修改LOGIT0.1活动合同，不授予正式数据／标签访问或新GPU训练，创新性和未见卖家效果仍待审查／实验。算法及完整阶段API已实现；Linux CPU46于17:15:00—17:20:27完成7项核验和3次原生BGE更新探针，全部通过，17份证据回传匹配。见[实现与核验](../reports/documentation/20261003/risk_replay/implementation.zh.md)。用户随后明确“那现在让网页端审核吧”；17:59:11已通过本地Playwright上传并发送同一51成员包，网页[审查会话](https://chatgpt.com/c/6ac0d1ea-764c-83e9-a768-254fa9aed2ad)已经完成。18:50:27回收的291成员原包全部290载荷大小／SHA匹配；[外审全文](../reports/documentation/20261003/risk_replay/external/risk_audit/deliverables/report.zh.txt)与[主审处置](../reports/documentation/20261003/risk_replay/report.zh.md)已保存。当前生产实现未发现未关闭计算错误，但单向分位平方泛函已有直接先例，创新尚不充分；合法反例证明三代理风险均改善仍可MAP下降、误报上升。原7项测试有阶段γ路由和同文本群参考错配两处盲点，网页独立检查已覆盖当前代码，项目回归尚待纳入。建议保留核心、先补最小检查与正式装配，再作待确认的单点配对开发实验；不是新训练许可。本轮没有修改算法或新启训练，详见[审查状态](../reports/documentation/20261003/risk_replay/submission.json)。
 
 ## 接手顺序与信息地图
 
