@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "review_component": "diagnostics_and_interpretation",
+  "status": "ACCEPT_WITH_STATED_LIMITATIONS",
+  "scientific_blockers": [],
+  "reproducibility_defects": [],
+  "required_report_corrections": [],
+  "requires_new_experiment_for_current_delivery": false,
+  "independent_arithmetic": {
+    "status": "PASS",
+    "assertions": 265,
+    "failed_assertions": [],
+    "input_files": 26,
+    "result_file": "results_v1.json",
+    "maximum_loss_decomposition_residual": 3.2782554626464844e-07
+  },
+  "claims": [
+    {
+      "id": "D1",
+      "claim": "联合报告三组模式噪声数值准确且eval_self六阶段为0",
+      "status": "SUPPORTED_BY_SAVED_RECORDS_AND_INDEPENDENT_AGGREGATION"
+    },
+    {
+      "id": "D2",
+      "claim": "首更新negative隐藏头加权分量范数很小；不是全编码器无效结论",
+      "status": "SUPPORTED_WITH_SCOPE"
+    },
+    {
+      "id": "D3",
+      "claim": "risk/MSE标量量级不同，系数相同不表示约束强度相同",
+      "status": "SUPPORTED_WITHOUT_CAUSAL_ATTRIBUTION"
+    },
+    {
+      "id": "D4",
+      "claim": "两方法各1728步的记录裁剪前norm均>1",
+      "status": "SUPPORTED_BY_INDEPENDENT_COUNT"
+    },
+    {
+      "id": "D5",
+      "claim": "报告未将模式差异、边际分布或小negative归为已证实退化主因",
+      "status": "TEXT_AND_EVIDENCE_BOUNDARIES_CONSISTENT"
+    },
+    {
+      "id": "D6",
+      "claim": "原生保持梯度来自已关闭3更新CPU探针；本轮不重新载模",
+      "status": "PRIOR_EVIDENCE_REUSED_NOT_RERUN"
+    }
+  ],
+  "additional_boundary_note": {
+    "mode_probe_vs_gradient_probe": "Only ABC stage3 uses the same retained UID; other five stages differ by design. Not a paired per-group causal comparison. Existing report makes no contrary claim.",
+    "is_defect": false
+  },
+  "future_research_only": [
+    "若未来提出主要退化机制、全编码器通道影响或约束强度公平新主张，应在另行授权范围中取得对应证据。"
+  ],
+  "out_of_scope_overdesign": [
+    "强制新增全缓存末端评价、全编码器分解、梯度角度或因果消融",
+    "使用已见valid事后换成功线或搜索gamma",
+    "读取服务器、权重、缓存或真值并盲目重训"
+  ],
+  "not_verified": [
+    "Native BGE parameters or CUDA trajectory were not regenerated.",
+    "Saved native gradient summaries were not independently reconstructed from weights.",
+    "AP/MAP labels were not reopened or recomputed in this component.",
+    "Endpoint statistics and formal provenance are covered by other components, not presumed here."
+  ],
+  "read_scope": [
+    {
+      "path": "docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md",
+      "read_scope": "全文；重点106–126",
+      "bytes": 16239,
+      "sha256": "e4c0f2b35ce03e7c9db96635ecc3f5eeff3f7a42dc10e4369d277d140b56546d"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_LOGIT_LOW.zh.md",
+      "read_scope": "全文；与actual source同字节",
+      "bytes": 5736,
+      "sha256": "394b9f3c73112f96056be86e595314c56fa3ffa867e5e0e1fa14540bb68ee15b"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_RISK_PILOT.zh.md",
+      "read_scope": "全文；与actual source同字节",
+      "bytes": 5766,
+      "sha256": "c3429b109149c27d949eeb04947e8b2b1795a7c5aeebab29f56ac9e0ed6604c2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_risk_replay.py",
+      "read_scope": "148–224",
+      "bytes": 12800,
+      "sha256": "9e25f8139279a3bc348765d90226e5ef95bbd6bcb42fc0a536d500250ecdfac9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_risk_execution.py",
+      "read_scope": "1–97",
+      "bytes": 4477,
+      "sha256": "0ff6d8c244acd9c7cb68384dbd3924f8765450771194578fd6735b11f25a40fe"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_er_weight_run.py",
+      "read_scope": "35–115",
+      "bytes": 38416,
+      "sha256": "6e2d76df9de8338e7c154d40e99497ed0a6cd52cce3329d6960373782c4637d2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_bge_continual_run.py",
+      "read_scope": "50–76",
+      "bytes": 34789,
+      "sha256": "bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_risk_replay_check.py",
+      "read_scope": "15–90",
+      "bytes": 6153,
+      "sha256": "e8af7db3b5d3fe494b8f0f57917b7cd0caa7ee28199763a66188ec370ba20df9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_risk_execution_check.py",
+      "read_scope": "全文",
+      "bytes": 2791,
+      "sha256": "bd280f02875e57ccd69887f5838dcc41ccfaf97776df3affdc4df9cc361468c7"
+    },
+    {
+      "path": "direct_reviews/risk_algorithm_primary.zh.md",
+      "read_scope": "全文",
+      "bytes": 10972,
+      "sha256": "b605148431224278b3394bae2cd4e03e1b20f07382ce1eb9438ea3ca8c068550"
+    },
+    {
+      "path": "direct_reviews/risk_execution_primary.zh.md",
+      "read_scope": "全文",
+      "bytes": 4795,
+      "sha256": "8f1ef477f5796634ccca260d492404aafb3c60f2733126807dc8b2104826de82"
+    },
+    {
+      "path": "direct_reviews/risk_algorithm_external.zh.txt",
+      "read_scope": "重点167–275；直接复用已关闭机制及创新边界",
+      "bytes": 40500,
+      "sha256": "efb6336ff5ccd1bdff4c0cee10b9e7506989d46eab903281e7bea875d7355d96"
+    },
+    {
+      "path": "direct_reviews/risk_execution_external.zh.txt",
+      "read_scope": "重点84–102；已关闭诊断与原生证据",
+      "bytes": 27999,
+      "sha256": "36dc7aa850a0bc739c049e9c9fefb891d0296d2a1acd2aa20fcce3b86834499c"
+    },
+    {
+      "path": "direct_reviews/risk_cpu/native.json",
+      "read_scope": "全文；已存原生摘要，不是本轮原生重跑",
+      "bytes": 2877,
+      "sha256": "795e32969ee7c84c5686875ec1357fdc5037d66f18a9f4f15ca7d6c32fc4c54b"
+    }
+  ],
+  "failure_versions": {
+    "new_reference_failures": 0,
+    "description": "首次运行退出0；未制造或掩盖失败。旧原件随输入附件保留。"
+  },
+  "artifacts": [
+    "independent_diagnostics.py",
+    "results_v1.json",
+    "run_v1.execution.json",
+    "run_v1.stdout.txt",
+    "run_v1.stderr.txt",
+    "run_v1.exit_status.txt",
+    "diagnostics_report.zh.txt"
+  ]
+}

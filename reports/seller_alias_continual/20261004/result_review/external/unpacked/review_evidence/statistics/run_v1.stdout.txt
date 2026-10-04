@@ -1,0 +1,167 @@
+logit_low logit_tenth_minus_tenth 23/23 O MAP {'mean': 0.033094412159952825, 'per_order': {'ABC': 0.06149575122761264, 'BCA': 0.004566555254924998, 'CAB': 0.03322092999732085}, 'conditional_95pct_interval': [0.023915622109051436, 0.041700114053044024]}
+logit_low logit_tenth_minus_logit_quarter 23/23 O MAP {'mean': 0.012677282437662382, 'per_order': {'ABC': 0.008543412456659238, 'BCA': 0.009282660799015519, 'CAB': 0.020205774057312387}, 'conditional_95pct_interval': [0.007486530098619464, 0.017796583085443442]}
+logit_low logit_tenth_minus_seq 20/23 O MAP {'mean': 0.044203148006295545, 'per_order': {'ABC': 0.0553928203766918, 'BCA': 0.02479052442069496, 'CAB': 0.05242609922149988}, 'conditional_95pct_interval': [0.03366428570445261, 0.05454101278986728]}
+risk risk_minus_logit_tenth 4/23 O MAP {'mean': -0.038174623331091194, 'per_order': {'ABC': -0.062487659354077296, 'BCA': -0.009345016303079157, 'CAB': -0.04269119433611712}, 'conditional_95pct_interval': [-0.04795063596155284, -0.027964422003872162]}
+risk risk_minus_tenth 5/23 O MAP {'mean': -0.005080211171138364, 'per_order': {'ABC': -0.0009919081264646579, 'BCA': -0.004778461048154159, 'CAB': -0.009470264338796275}, 'conditional_95pct_interval': [-0.011994026871717817, 0.0016823386545671958]}
+risk risk_minus_seq 7/23 O MAP {'mean': 0.006028524675204354, 'per_order': {'ABC': -0.007094838977385498, 'BCA': 0.015445508117615803, 'CAB': 0.009734904885382756}, 'conditional_95pct_interval': [-0.0033690207114936, 0.015395989287383767]}
+risk risk_minus_logit_quarter 4/23 O MAP {'mean': -0.02549734089342881, 'per_order': {'ABC': -0.05394424689741806, 'BCA': -6.23555040636381e-05, 'CAB': -0.022485420278804735}, 'conditional_95pct_interval': [-0.035065223187195814, -0.01540660263258502]}
+{
+  "status": "PASS_INDEPENDENT_SAVED_MATRIX_STATISTICS",
+  "finished_utc": "2026-10-04T02:58:59.735325+00:00",
+  "elapsed_seconds": 4.813353833000292,
+  "check_counts": {
+    "handmade_endpoint_formula_checks": 63,
+    "descriptor_bound_arrays": 182,
+    "saved_draws_identical": 2,
+    "unique_matrix_resampling": 96,
+    "logit_low_reused_matrices": 63,
+    "all_curve_and_retrieval_columns_invariant": 120,
+    "logit_low_new_matrices": 18,
+    "risk_reused_matrices": 81,
+    "risk_new_matrices": 18
+  },
+  "numeric_comparisons": {
+    "direct_vs_occurrence_counts": 31680000,
+    "final_all_identity": 11882376,
+    "quantile_linear_vs_manual": 20328,
+    "saved_results": 56364
+  },
+  "max_absolute_differences": {
+    "saved_results": 6.38378239159465e-16,
+    "direct_vs_occurrence_counts": 7.771561172376096e-16,
+    "quantile_linear_vs_manual": 1.1102230246251565e-16,
+    "final_all_identity": 2.220446049250313e-16
+  },
+  "max_difference_locations": {
+    "direct_vs_occurrence_counts": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_seq_stage2_stage-cal.npy",
+    "final_all_identity": "seq/raw/1",
+    "quantile_linear_vs_manual": "logit_low/seq/raw/O",
+    "saved_results": "risk/absolute/risk/first-cal/F_first/specificity/per_order/CAB"
+  },
+  "comparisons": {
+    "logit_tenth_minus_tenth": {
+      "passed": 23,
+      "total": 23,
+      "failed": []
+    },
+    "logit_tenth_minus_logit_quarter": {
+      "passed": 23,
+      "total": 23,
+      "failed": []
+    },
+    "logit_tenth_minus_seq": {
+      "passed": 20,
+      "total": 23,
+      "failed": [
+        "N_average_precision_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_map_non_degradation"
+      ]
+    },
+    "risk_minus_logit_tenth": {
+      "passed": 4,
+      "total": 23,
+      "failed": [
+        "N_average_precision_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "N_roc_auc_non_degradation",
+        "O_average_precision_non_degradation",
+        "O_brier_non_degradation",
+        "O_log_loss_non_degradation",
+        "O_roc_auc_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "old_map_improves",
+        "old_map_interval_above_zero",
+        "old_recall5_improves"
+      ]
+    },
+    "risk_minus_tenth": {
+      "passed": 5,
+      "total": 23,
+      "failed": [
+        "N_average_precision_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "N_roc_auc_non_degradation",
+        "O_average_precision_non_degradation",
+        "O_brier_non_degradation",
+        "O_log_loss_non_degradation",
+        "O_roc_auc_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "old_map_improves",
+        "old_map_interval_above_zero"
+      ]
+    },
+    "risk_minus_seq": {
+      "passed": 7,
+      "total": 23,
+      "failed": [
+        "N_average_precision_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "N_roc_auc_non_degradation",
+        "O_log_loss_non_degradation",
+        "O_roc_auc_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "old_map_interval_above_zero",
+        "old_recall5_improves"
+      ]
+    },
+    "risk_minus_logit_quarter": {
+      "passed": 4,
+      "total": 23,
+      "failed": [
+        "N_average_precision_non_degradation",
+        "N_brier_non_degradation",
+        "N_log_loss_non_degradation",
+        "N_roc_auc_non_degradation",
+        "O_average_precision_non_degradation",
+        "O_brier_non_degradation",
+        "O_log_loss_non_degradation",
+        "O_roc_auc_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation",
+        "Z_log_loss_non_degradation",
+        "Z_map_non_degradation",
+        "Z_recall_at_5_non_degradation",
+        "Z_roc_auc_non_degradation",
+        "new_map_non_decrease",
+        "new_recall5_non_decrease",
+        "old_map_improves",
+        "old_map_interval_above_zero",
+        "old_recall5_improves"
+      ]
+    }
+  },
+  "scientific_blockers": [],
+  "reproducibility_defects": [],
+  "limitations": [
+    "AP/MAP and other label-dependent group metrics are inputs; no label-level recomputation.",
+    "Intervals are conditional on fixed models, developed valid groups, calibration, and one training seed.",
+    "ABC/BCA/CAB are orders, not independent training seeds; repeated actual groups are paired.",
+    "No model, optimizer, true cache payload, server, private labels, test or owners access.",
+    "Passing all 23 mixed observational checks is not simultaneous significance or population noninferiority."
+  ]
+}

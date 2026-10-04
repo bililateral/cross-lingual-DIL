@@ -1,0 +1,75 @@
+来源、回传完整性与复用对照身份独立子审查
+日期：2026-10-04。范围：附件保存结果的字节身份、冻结来源闭合及固定比较来源；不替代主审对目标计算、统计和科学结论的审查。
+
+一、裁决
+在本分工范围内通过。未发现已证实科学阻断，也未发现影响本轮交付的来源缺失、错误绑定或返回文件损坏。这个结论不是由项目自身 PASS 推得：独立标准库脚本重新散列全部载荷，重建来源和对照记录的引用关系，并对训练入口的显式本地 import 图作静态闭合检查。
+
+二、实际范围和独立执行
+主审先核对外层 ZIP 的大小、成员数及外部 SHA。本分工核对 input_review 内 MANIFEST.json 的 728 个载荷和清单自身，共 729 个文件，重复路径、未列入清单文件及缺失文件均为 0。运行 independent_provenance_v1.py，首次 exit 0，2306/2306 大小及 SHA 比较通过，覆盖 728 个唯一载荷；包含结构身份检查共 3116/3116。这里的数量含同一载荷在多条绑定链的重复比较，绝不是 2306 个独立科学检验。
+
+实际阅读全文包括联合结果报告、LOGIT0.1 与 risk 的各自冻结合同、各自 policy、dependency mapping；实际审读来源构建函数、冻结原记录验证、对照完成后绑定及 evaluation/reference 保存路径。来源文件整体通过静态 import 扫描与字节核对；没有将 69 份来源的机械散列说成逐行全面重审历史算法。训练执行语义由其他审查分工负责。
+
+三、两个独立来源版本
+LOGIT0.1 的 source 为 37 份，risk 为 32 份；两目录各自恰好包含其声明的科学来源，没有未声明替换文件。每个作业在 authorization、execution、startup、run/manifest、evaluation/collected、evaluation/evaluation 中的来源列表完全相同，policy SHA 也一致。对应已关闭 CPU audit 的 source_files 与当前作业来源一致；execution 绑定的 CPU audit 字节身份分别准确对应 direct_reviews/logit_cpu/audit.json 和 direct_reviews/risk_cpu/audit.json。authorization 的 primary_disposition_sha256 分别对应 direct_reviews/logit_primary.zh.md 和 direct_reviews/risk_execution_primary.zh.md。
+
+LOGIT policy SHA：8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0
+risk policy SHA：5706629736dfe9c598f1d59cc61f04bb65e9fd83b4275e391dfc3d2ebf2e5548
+
+两个来源树共有 22 个同路径文件，19 个同字节，3 个确已发生变化：
+
+scripts/step28_er_weight.py
+  LOGIT：16922 字节；baef5becd4e9a88d54ddd4da3501f61e97a3166447902181bddec93ee8530d01
+  risk： 17560 字节；626d2e325166a18d995e1eb9dcb28d04349024455f54fe4b3b30d17df8e516c4
+
+scripts/step28_er_weight_evaluate.py
+  LOGIT：12346 字节；9b049050061ced73c50e07c98966365cbc977cde87785c6587e46702720e9d14
+  risk： 12733 字节；3a0ab65fd239537b7293172f09e569e07a1e0310f9100b58a95a93061f6dc019
+
+scripts/step28_er_weight_run.py
+  LOGIT：36251 字节；d88364c0feb92c6f38a9ab64d46e4d41e05faa5c0950cb75e0e0ce89429bc4e0
+  risk： 38416 字节；6e2d76df9de8338e7c154d40e99497ed0a6cd52cce3329d6960373782c4637d2
+
+完整差异保存于 run_v1/source_differences.diff。LOGIT 的科学执行核查必须指向 logit_low_result/source，不能把 risk 的后继 runner/evaluator 当成 LOGIT 冻结版本。附件顶层 scripts 只有两份保存结果 audit 工具，并非一个可替代冻结 source 的训练源码树。
+
+显式生产 import 闭合：LOGIT 从 step28_er_weight_run/evaluate 出发可达 14 个本地 step28 模块，risk 可达 17 个；全部存在于对应冻结 source 和来源清单，无遗漏本地依赖。该扫描不运行代码，也不宣称排除了任意未披露的动态注入；没有理由据此扩大为安全加固或新的可信执行研究。
+
+来源代码定位：LOGIT/source/scripts/step28_er_weight.py 第 82–100 行按 study 构造本作业来源；第 114–198 行验证 baseline 和续训对照的固定小记录、policy、来源列表、环境、划分、shared 起点及首映射。risk/source/scripts/step28_risk_study.py 第 25–35 行构造 risk 的来源清单，38–48 行绑定 prior CPU/native 证据。
+（上述 LOGIT、risk 前缀分别为 reports/seller_alias_continual/20261004/logit_low_result 与 risk_result。）
+
+四、回传 inventory 与真实目录映射
+LOGIT inventory 声明 272 个主回传文件，risk 声明 313 个，均在对应本地 result 目录逐项验证完整。验证增量另有 transfer_inventory.json，LOGIT 9 条、risk 8 条全部匹配。verification/inventory 中 Linux 项目相对路径分别映射为该 result 下 job，228/265 个原小结果条目均匹配，没有硬把 Linux 项目路径接到当前 source 根导致错读。
+
+LOGIT 原 workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace
+risk 原 workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace
+
+dependencies/mapping.json 指定的 shared/tenth/logit_quarter/logit_tenth 四个 Linux job 全部与所用 policy 路径一致。共享 baseline 的五份固定 JSON，以及 ER0.1 和 LOGIT0.25 各五份原 JSON 均按 policy 大小/SHA 复核。这里无需重拷贝旧模型和旧评价目录：本次实际使用的旧矩阵已经独立保存于各 job/evaluation/reference。
+
+五、63/81 套复用的身份
+LOGIT reference 有 21 个 point、每个 raw/stage-cal/first-cal 三角色，共 63 套；risk 有 27 个 point，共 81 套。构成为：三个 shared 首域 point 与 SEQ 后两阶段六 point 合计 27 套；ER0.1 后两阶段 18 套；LOGIT0.25 后两阶段 18 套；risk 再增加 LOGIT0.1 后两阶段 18 套。
+
+独立脚本为每个复用 point 找到唯一原 collected 来源，逐角色比较 descriptor，再重新散列本次实际 reference/matrix 与 counts 文件。所有 descriptor 与原记录精确相同，60 群的 group_ids、actual domains 和 22 个 metric_columns 的顺序也完全一致。不是只看 reference/collected 的自述条数。两项各自 6 个新增 point×3 角色=18 套，也逐份核对到各自 collected；completion 的 evaluation 绑定及评价引用的 collected、reference collected、bootstrap_draws、stage_metrics 均匹配。
+
+risk/source/schema/step28_risk_policy.json 第 226 行起预先固定 LOGIT0.1 的 Linux job、policy SHA 和 execution 字节身份。risk/job/evaluation/logit_reference_binding.json 保存的 preselected_job 与 policy 完全相同；execution SHA ceb783d99d2ef965624e33a5d0a3177d3e12b762bfc001e4944786853f0250ae 与附件中实际 LOGIT 作业一致。完成后填入的五份记录分别核对到真实 LOGIT job，selection_by_results=false。代码 step28_risk_study.py 第 51–76 行先验 execution 与完成状态，再记录完整五项，已绑定不一致即拒绝；不会按指标效果换对照。
+
+LOGIT 的 reference 写入路径见其 source/scripts/step28_er_weight_evaluate.py 第 118–173 行：首先核对完整 collection，再读取固定参考、按记录验证原文件并 write_once，之后才调用统计。risk 对应第 125–180 行保留相同机制。统计正确性需要独立重算，不能由这里的身份校验替代。
+
+六、新增 audit 与权重保管的可验证边界
+两份 Linux verification/audit 记录指向附件顶层同一 audit.py 与 helper，重新散列精确相同：
+step28_er_weight_audit.py：27249 字节，959f558ce5d9187f65887e505bf0bbf8c670c493893f3c0237abfaab0184a695
+step28_bge_continual_audit.py：24723 字节，2fff73cdc0e26843a10dfd35388ade1b31f9ca890d889c4c31f13b98efc1b193
+两份 verification/execution.json 的 --study、--source-root、--job、--baseline 与对应 inventory/policy 一致；exit 为 0、stderr 空、stdout 与 audit.json 同字节。execution.json 明确 recorded_after_execution=true；LOGIT command.txt 是简写说明，报告也没有把它充当完整 argv。原始 CPU47 属 Linux 运行，本独立脚本在网页当前允许的 CPU 上运行，没有设置 CPU47。
+
+LOGIT、risk 各六个 Linux weight custody 记录，字节总数分别 7,838,879,856 和 7,838,862,246；逐项与本作业 endpoint 的 model descriptor 对齐，包内原生权重确实不存在。本审查只能确认“Linux 提供的新鲜哈希记录与端点描述符相符”，不能声称网页重新哈希或载入了原模型。
+
+特别说明：顶层 scripts/step28_er_weight_audit.py 第 137–154 行的 native_weight_hashes_match 比较的是 payload_custody 保存值与 point 描述符，而不是现场读取原权重。文中 Linux 流式哈希的发生属于回传/保管证据层；本次网页不能独立认证其后台时刻。该限制已由请求和报告明确接受，不据此要求未经授权的服务器访问或模型重载。
+
+训练缓存正文也没有提供。缓存摘要和消费记录的身份比对不等于再次反序列化真实缓存；正式盲门执行和前轮已关闭原生证据的使用范围由主审说明。此分工不解析正式真值，不从盲分数猜标签。
+
+七、失败、修订及复现说明
+独立主脚本首次即通过，未产生需要覆盖的失败参考，没有静默修正输入文件。一次辅助 rg 搜索错误包含不存在的 reports/documentation/20261004 目录；这是审查端探索路径错误，非项目复现缺陷，原命令/错误及改用现有路径的纠正留在 inspection_failure_01.json 和 inspection_correction_01.log。未把该错误纳入科学阻断。
+
+重放命令：
+python independent_provenance_v1.py --root <原ZIP按Windows相对结构解包目录> --output <新空目录>
+仅需 Python 标准库，无 Torch、模型、标签或网络。已保存脚本 SHA、实际 argv、Python/平台、CPU affinity、开始/结束时刻、stdout/stderr、退出码、逐项大小/SHA结果和结构判定。原始脚本与 run_v1 保留不覆盖。
+
+问题分类：已证实科学阻断 0；影响本轮交付的复现缺陷 0；本分工不提出新的实验建议。重新下载模型、接触真实缓存/真值、增加独立后台认证系统不属于本轮保存结果外审范围。

@@ -1,0 +1,2574 @@
+{
+  "status": "PASS",
+  "scope": "Independent saved update arithmetic and diagnostic transcription; no weights, labels, Torch, training imports or server access",
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "argv": [
+      "/workspace/scratch/760670ef1a6e/review_evidence/diagnostics/independent_diagnostics.py",
+      "--input-root",
+      "/workspace/scratch/760670ef1a6e/input_review",
+      "--output-json",
+      "/workspace/scratch/760670ef1a6e/review_evidence/diagnostics/results_v1.json"
+    ]
+  },
+  "aggregates": {
+    "mode_noise_range": {
+      "rank": {
+        "minimum": 0.012830771505832672,
+        "maximum": 0.10479883849620819
+      },
+      "positive": {
+        "minimum": 0.006276884116232395,
+        "maximum": 0.0746508538722992
+      },
+      "negative": {
+        "minimum": 5.284519488668593e-08,
+        "maximum": 1.1337889191054273e-05
+      }
+    },
+    "head_component_norm_range": {
+      "weighted_history": {
+        "minimum": 0.009683465585112572,
+        "maximum": 0.016448644921183586
+      },
+      "rank": {
+        "minimum": 0.0,
+        "maximum": 0.011247961781919003
+      },
+      "positive": {
+        "minimum": 0.0,
+        "maximum": 0.022885151207447052
+      },
+      "negative": {
+        "minimum": 1.9238329684867495e-07,
+        "maximum": 3.530505409798934e-06
+      }
+    },
+    "stage_raw_retention_mean_range": {
+      "minimum": 0.011811665040865036,
+      "maximum": 0.027443264843568887
+    },
+    "stage_weighted_risk_mean_range": {
+      "minimum": 0.005905832397353154,
+      "maximum": 0.013721632021317442
+    },
+    "stage_weighted_mse_mean_range": {
+      "minimum": 0.0693277978635807,
+      "maximum": 0.13022161123808473
+    },
+    "stage_channel_mean_range": {
+      "rank": {
+        "minimum": 0.0346357255672258,
+        "maximum": 0.07584033200585812
+      },
+      "positive": {
+        "minimum": 0.00031544893203121975,
+        "maximum": 0.006424003161581303
+      },
+      "negative": {
+        "minimum": 2.9705667862595713e-05,
+        "maximum": 0.00022592384173157775
+      }
+    },
+    "risk_clip_count": 1728,
+    "logit_clip_count": 1728,
+    "mode_draw_count": 24,
+    "head_measurement_count": 6,
+    "first_update_probe_group_same_as_mode_group_count": 1,
+    "largest_independent_loss_decomposition_residual": 3.2782554626464844e-07
+  },
+  "stages": [
+    {
+      "name": "ABC_logit_tenth_stage2",
+      "method": "logit_tenth",
+      "stage": 2,
+      "order": "ABC",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 8.555654525756836,
+        "maximum": 21.237529754638672
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.10083165314022659,
+      "raw_retention_mean": 0.20166330628045318,
+      "current_total_mean": 2.8580026204387345,
+      "weighted_history_total_mean": 0.27614429849717353,
+      "total_mean": 3.234978572076135,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage3",
+      "method": "logit_tenth",
+      "stage": 3,
+      "order": "ABC",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 11.447051048278809,
+        "maximum": 23.955852508544922
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.13022161123808473,
+      "raw_retention_mean": 0.26044322247616947,
+      "current_total_mean": 2.8630441609356136,
+      "weighted_history_total_mean": 0.22888447534706857,
+      "total_mean": 3.2221502475207675,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage2",
+      "method": "logit_tenth",
+      "stage": 2,
+      "order": "BCA",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 6.488014221191406,
+        "maximum": 14.949858665466309
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.0693277978635807,
+      "raw_retention_mean": 0.1386555957271614,
+      "current_total_mean": 3.222867894503805,
+      "weighted_history_total_mean": 0.23111408427357671,
+      "total_mean": 3.5233097766409625,
+      "decomposition_maximum_errors": {
+        "current_base": 3.2782554626464844e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage3",
+      "method": "logit_tenth",
+      "stage": 3,
+      "order": "BCA",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 9.403114318847656,
+        "maximum": 23.0225772857666
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.09444479218089125,
+      "raw_retention_mean": 0.1888895843617825,
+      "current_total_mean": 2.8653618635402784,
+      "weighted_history_total_mean": 0.23253343353668848,
+      "total_mean": 3.192340089257858,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage2",
+      "method": "logit_tenth",
+      "stage": 2,
+      "order": "CAB",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 9.449132919311523,
+        "maximum": 20.054414749145508
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.09114793347867413,
+      "raw_retention_mean": 0.18229586695734826,
+      "current_total_mean": 2.8202113666468196,
+      "weighted_history_total_mean": 0.2644590313235919,
+      "total_mean": 3.1758183314490855,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage3",
+      "method": "logit_tenth",
+      "stage": 3,
+      "order": "CAB",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 12.893630981445312,
+        "maximum": 26.216278076171875
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.10685571250764446,
+      "raw_retention_mean": 0.21371142501528892,
+      "current_total_mean": 2.642111952934,
+      "weighted_history_total_mean": 0.2085400324728754,
+      "total_mean": 2.95750769791452,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.086162567138672e-07,
+        "weighted_history": 0.0,
+        "full_total": 0.0
+      }
+    },
+    {
+      "name": "ABC_risk_stage2",
+      "method": "risk",
+      "stage": 2,
+      "order": "ABC",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 7.715273380279541,
+        "maximum": 23.751832962036133
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.013721632021317442,
+      "raw_retention_mean": 0.027443264843568887,
+      "current_total_mean": 2.7992290523317127,
+      "weighted_history_total_mean": 0.26795166259010633,
+      "total_mean": 3.0809023473436032,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 8.789356797933578e-09,
+        "channel_mean": 1.7578713595867157e-08
+      },
+      "component_raw_means": {
+        "rank": 0.07584033200585812,
+        "positive": 0.006424003161581303,
+        "negative": 6.545696046522664e-05
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 4.993964353161573e-07,
+          "positive": 0.022885151207447052,
+          "rank": 0.004780376795679331,
+          "weighted_history": 0.016448644921183586
+        },
+        "group_uid": "4493a33635ae54f36d0edb28b00917ca",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            0.9940078717153966,
+            1.0910941071909268,
+            0.0032444371173835406
+          ],
+          "2": [
+            1.122832701466002,
+            1.2513894003738055,
+            0.002962369718060391
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.031200286000967026,
+            0.05523958057165146,
+            3.869700151426514e-07
+          ],
+          [
+            0.021847452968358994,
+            0.03747209534049034,
+            2.8257042572477076e-07
+          ],
+          [
+            0.019499721005558968,
+            0.03831513971090317,
+            2.1028999697136896e-07
+          ],
+          [
+            0.02766750007867813,
+            0.06318304687738419,
+            2.0674174550094904e-07
+          ]
+        ]
+      },
+      "first_update_history_uid": "cb72702c36441d8486ea59a9497d747c",
+      "diagnostic_group_and_first_update_group_identical": false
+    },
+    {
+      "name": "ABC_risk_stage3",
+      "method": "risk",
+      "stage": 3,
+      "order": "ABC",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 12.545038223266602,
+        "maximum": 32.964935302734375
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.0068342605527756915,
+      "raw_retention_mean": 0.01366852156654852,
+      "current_total_mean": 2.677704024646017,
+      "weighted_history_total_mean": 0.20358125735074284,
+      "total_mean": 2.8881195427800344,
+      "decomposition_maximum_errors": {
+        "current_base": 3.2782554626464844e-07,
+        "history_base": 2.086162567138672e-07,
+        "weighted_history": 0.0,
+        "full_total": 5.205341491176796e-09,
+        "channel_mean": 1.0410682690920048e-08
+      },
+      "component_raw_means": {
+        "rank": 0.03605182382944684,
+        "positive": 0.004865131372249741,
+        "negative": 8.860811495756436e-05
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0,
+          0.0,
+          8.687986507993628e-08
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 2.692822135941242e-06,
+          "positive": 0.0,
+          "rank": 0.0,
+          "weighted_history": 0.013667166233062744
+        },
+        "group_uid": "4493a33635ae54f36d0edb28b00917ca",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            0.9940078717153966,
+            1.0910941071909268,
+            0.0032444371173835406
+          ],
+          "2": [
+            1.122832701466002,
+            1.2513894003738055,
+            0.002962369718060391
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.05313466861844063,
+            0.0746508538722992,
+            1.6107278497656807e-06
+          ],
+          [
+            0.03296223282814026,
+            0.036119408905506134,
+            1.8308198832528433e-06
+          ],
+          [
+            0.031079623848199844,
+            0.02035672962665558,
+            2.204787051596213e-06
+          ],
+          [
+            0.0483500137925148,
+            0.039185427129268646,
+            2.0180186766083352e-06
+          ]
+        ]
+      },
+      "first_update_history_uid": "4493a33635ae54f36d0edb28b00917ca",
+      "diagnostic_group_and_first_update_group_identical": true
+    },
+    {
+      "name": "BCA_risk_stage2",
+      "method": "risk",
+      "stage": 2,
+      "order": "BCA",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 5.727230548858643,
+        "maximum": 20.345796585083008
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.009543132362179334,
+      "raw_retention_mean": 0.01908626527357329,
+      "current_total_mean": 3.178776384641727,
+      "weighted_history_total_mean": 0.22731732539832594,
+      "total_mean": 3.4156368426768395,
+      "decomposition_maximum_errors": {
+        "current_base": 3.2782554626464844e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 4.4334833582126976e-09,
+        "channel_mean": 8.866967007858939e-09
+      },
+      "component_raw_means": {
+        "rank": 0.05177889355708329,
+        "positive": 0.005426978254528235,
+        "negative": 5.292236146448026e-05
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 1.9987515997854644e-07,
+          "positive": 0.019765177741646767,
+          "rank": 0.00469751562923193,
+          "weighted_history": 0.009683465585112572
+        },
+        "group_uid": "b8c4e3bf692cd4ee4dd39c1167d158ed",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            0.977100375540557,
+            1.0364964693770924,
+            0.003923771020806228
+          ],
+          "2": [
+            0.8916814654385302,
+            0.904952035311375,
+            0.003820457152651369
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.016134113073349,
+            0.0301809161901474,
+            3.5866548842022894e-07
+          ],
+          [
+            0.012830771505832672,
+            0.021944867447018623,
+            3.8327928564285685e-07
+          ],
+          [
+            0.018240489065647125,
+            0.03548942878842354,
+            3.703119659803633e-07
+          ],
+          [
+            0.01925654336810112,
+            0.03496701642870903,
+            4.6290426780615235e-07
+          ]
+        ]
+      },
+      "first_update_history_uid": "e33b77d2612ef37895397e323904e019",
+      "diagnostic_group_and_first_update_group_identical": false
+    },
+    {
+      "name": "BCA_risk_stage3",
+      "method": "risk",
+      "stage": 3,
+      "order": "BCA",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 8.18799114227295,
+        "maximum": 23.914785385131836
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.005905832397353154,
+      "raw_retention_mean": 0.011811665040865036,
+      "current_total_mean": 2.800474647846487,
+      "weighted_history_total_mean": 0.21530457879934048,
+      "total_mean": 3.02168505916626,
+      "decomposition_maximum_errors": {
+        "current_base": 2.384185791015625e-07,
+        "history_base": 2.086162567138672e-07,
+        "weighted_history": 0.0,
+        "full_total": 4.3655745685100555e-09,
+        "channel_mean": 8.731149137020111e-09
+      },
+      "component_raw_means": {
+        "rank": 0.0346357255672258,
+        "positive": 0.0005733449751615413,
+        "negative": 0.00022592384173157775
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0009772191988304257,
+          0.0,
+          1.159728617494693e-05
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 3.197139221811085e-06,
+          "positive": 0.001512811053544283,
+          "rank": 0.0029396815225481987,
+          "weighted_history": 0.013134687207639217
+        },
+        "group_uid": "b8c4e3bf692cd4ee4dd39c1167d158ed",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            0.977100375540557,
+            1.0364964693770924,
+            0.003923771020806228
+          ],
+          "2": [
+            0.8916814654385302,
+            0.904952035311375,
+            0.003820457152651369
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.015068646520376205,
+            0.009995280764997005,
+            1.4901654594723368e-06
+          ],
+          [
+            0.01816726289689541,
+            0.024435315281152725,
+            1.4532963632518658e-06
+          ],
+          [
+            0.017227409407496452,
+            0.015715662389993668,
+            1.396560264765867e-06
+          ],
+          [
+            0.02728813700377941,
+            0.01920371875166893,
+            2.6280492875230266e-06
+          ]
+        ]
+      },
+      "first_update_history_uid": "bbd0dd10a3b4b71ada6be6264eadaf14",
+      "diagnostic_group_and_first_update_group_identical": false
+    },
+    {
+      "name": "CAB_risk_stage2",
+      "method": "risk",
+      "stage": 2,
+      "order": "CAB",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 8.143576622009277,
+        "maximum": 25.635465621948242
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.007978366351129848,
+      "raw_retention_mean": 0.015956733182141154,
+      "current_total_mean": 2.7324919783406787,
+      "weighted_history_total_mean": 0.25295743689768846,
+      "total_mean": 2.9934277818294377,
+      "decomposition_maximum_errors": {
+        "current_base": 2.2351741790771484e-07,
+        "history_base": 2.384185791015625e-07,
+        "weighted_history": 0.0,
+        "full_total": 7.909268795458502e-09,
+        "channel_mean": 1.581853817378409e-08
+      },
+      "component_raw_means": {
+        "rank": 0.04752504350688527,
+        "positive": 0.00031544893203121975,
+        "negative": 2.9705667862595713e-05
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 1.9238329684867495e-07,
+          "positive": 0.004977777134627104,
+          "rank": 0.002251319121569395,
+          "weighted_history": 0.013045570813119411
+        },
+        "group_uid": "7ed47812492183f2c6a7db331462ef4a",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            1.3014236433507915,
+            1.5465098969372792,
+            0.0007284298721388523
+          ],
+          "2": [
+            0.886387852442132,
+            1.0457488519098412,
+            0.0005538829362385854
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.025021864101290703,
+            0.026028359308838844,
+            7.575647487101378e-08
+          ],
+          [
+            0.02383049950003624,
+            0.03764578327536583,
+            6.303232424897942e-08
+          ],
+          [
+            0.027907347306609154,
+            0.06909820437431335,
+            5.284519488668593e-08
+          ],
+          [
+            0.026630502194166183,
+            0.028583595529198647,
+            6.528820506446209e-08
+          ]
+        ]
+      },
+      "first_update_history_uid": "c7a12cc55c8920816dccdca440524b47",
+      "diagnostic_group_and_first_update_group_identical": false
+    },
+    {
+      "name": "CAB_risk_stage3",
+      "method": "risk",
+      "stage": 3,
+      "order": "CAB",
+      "updates": 288,
+      "combined_gradient_norm": {
+        "minimum": 12.978867530822754,
+        "maximum": 34.569190979003906
+      },
+      "clip_count_gt_one": 288,
+      "weighted_retention_mean": 0.01277395566217381,
+      "raw_retention_mean": 0.02554791207484186,
+      "current_total_mean": 2.5203003788159952,
+      "weighted_history_total_mean": 0.1854593520363172,
+      "total_mean": 2.7185336868897334,
+      "decomposition_maximum_errors": {
+        "current_base": 2.2351741790771484e-07,
+        "history_base": 2.2351741790771484e-07,
+        "weighted_history": 0.0,
+        "full_total": 8.149072527885437e-09,
+        "channel_mean": 1.6298145055770874e-08
+      },
+      "component_raw_means": {
+        "rank": 0.07341228726261544,
+        "positive": 0.0031143778165110114,
+        "negative": 0.00011706889391642032
+      },
+      "diagnostics": {
+        "eval_against_origin": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "eval_self": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "first_update_head_gradient_norms": {
+          "negative": 3.530505409798934e-06,
+          "positive": 0.019574441015720367,
+          "rank": 0.011247961781919003,
+          "weighted_history": 0.015402201563119888
+        },
+        "group_uid": "19a7f577b51a4639a264ef63daf069aa",
+        "origin_channel_std_by_stratum": {
+          "1": [
+            0.7505703990598988,
+            0.9413765966150863,
+            0.00428351850218556
+          ],
+          "2": [
+            0.48586964082717166,
+            0.7559054306307377,
+            0.0031389615860371
+          ]
+        },
+        "scope": "One retained group, fixed four seeds; noise diagnostic, no adaptive tuning",
+        "train_against_same_model_eval": [
+          [
+            0.031123006716370583,
+            0.006276884116232395,
+            8.973996955319308e-06
+          ],
+          [
+            0.10479883849620819,
+            0.011992620304226875,
+            1.1337889191054273e-05
+          ],
+          [
+            0.04175404831767082,
+            0.014478801749646664,
+            8.091081326710992e-06
+          ],
+          [
+            0.06338703632354736,
+            0.010985910892486572,
+            1.065942706190981e-05
+          ]
+        ]
+      },
+      "first_update_history_uid": "f2e398d6d341ac956b647cfbd371feca",
+      "diagnostic_group_and_first_update_group_identical": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "frozen_risk_lambda",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "frozen_risk_gamma",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_logit_tenth_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 3.2782554626464844e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_logit_tenth_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.mse_weight_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.086162567138672e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_logit_tenth_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 8.789356797933578e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage2.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 1.7578713595867157e-08,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage2.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 3.2782554626464844e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.086162567138672e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 5.205341491176796e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage3.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 1.0410682690920048e-08,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "ABC_risk_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ABC_risk_stage3.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 3.2782554626464844e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 4.4334833582126976e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage2.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 8.866967007858939e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage2.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.086162567138672e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 4.3655745685100555e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage3.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 8.731149137020111e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "BCA_risk_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "BCA_risk_stage3.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.2351741790771484e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage2.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.384185791015625e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage2.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage2.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 7.909268795458502e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage2.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 1.581853817378409e-08,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage2.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage2.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.matrix_dimensions",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.all_finite",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.stage_identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.physical_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.lambda_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.four_observations",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.observed_modules_1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.observed_modules_29",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.observed_modules_30",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.observed_modules_288",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.gamma_each_update",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.decomposition_current_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.2351741790771484e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage3.decomposition_history_base",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 2.2351741790771484e-07,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage3.decomposition_weighted_history",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 0.0,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage3.decomposition_full_total",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 8.149072527885437e-09,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage3.decomposition_channel_mean",
+      "pass": true,
+      "detail": {
+        "maximum_absolute_error": 1.6298145055770874e-08,
+        "absolute_tolerance": 3e-06
+      }
+    },
+    {
+      "name": "CAB_risk_stage3.all_updates_clip",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.one_group_is_first_live",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.four_draws_three_channels",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.eval_self_zero",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.finite_positive_mode_noise",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.gradient_components",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "CAB_risk_stage3.scope_explicit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "report.noise_rank.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.012830771505832672,
+        "reported": 0.0128,
+        "rounding_tolerance": 5e-05
+      }
+    },
+    {
+      "name": "report.noise_rank.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.10479883849620819,
+        "reported": 0.1048,
+        "rounding_tolerance": 5e-05
+      }
+    },
+    {
+      "name": "report.noise_positive.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.006276884116232395,
+        "reported": 0.00628,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.noise_positive.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.0746508538722992,
+        "reported": 0.07465,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.noise_negative.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 5.284519488668593e-08,
+        "reported": 5.28e-08,
+        "rounding_tolerance": 5e-11
+      }
+    },
+    {
+      "name": "report.noise_negative.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 1.1337889191054273e-05,
+        "reported": 1.13e-05,
+        "rounding_tolerance": 5e-08
+      }
+    },
+    {
+      "name": "report.head_history.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.009683465585112572,
+        "reported": 0.00968,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.head_history.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.016448644921183586,
+        "reported": 0.01645,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.head_rank.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.0,
+        "reported": 0,
+        "rounding_tolerance": 0
+      }
+    },
+    {
+      "name": "report.head_rank.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.011247961781919003,
+        "reported": 0.01125,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.head_positive.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.0,
+        "reported": 0,
+        "rounding_tolerance": 0
+      }
+    },
+    {
+      "name": "report.head_positive.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.022885151207447052,
+        "reported": 0.02289,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.head_negative.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 1.9238329684867495e-07,
+        "reported": 1.92e-07,
+        "rounding_tolerance": 5e-10
+      }
+    },
+    {
+      "name": "report.head_negative.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 3.530505409798934e-06,
+        "reported": 3.53e-06,
+        "rounding_tolerance": 5e-09
+      }
+    },
+    {
+      "name": "report.risk_raw_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.011811665040865036,
+        "reported": 0.01181,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_raw_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.027443264843568887,
+        "reported": 0.02744,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_weighted_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.005905832397353154,
+        "reported": 0.00591,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_weighted_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.013721632021317442,
+        "reported": 0.01372,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.mse_weighted_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.0693277978635807,
+        "reported": 0.06933,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.mse_weighted_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.13022161123808473,
+        "reported": 0.13022,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_rank_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.0346357255672258,
+        "reported": 0.03464,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_rank_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.07584033200585812,
+        "reported": 0.07584,
+        "rounding_tolerance": 5e-06
+      }
+    },
+    {
+      "name": "report.risk_positive_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 0.00031544893203121975,
+        "reported": 0.000315,
+        "rounding_tolerance": 5e-07
+      }
+    },
+    {
+      "name": "report.risk_positive_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.006424003161581303,
+        "reported": 0.006424,
+        "rounding_tolerance": 5e-07
+      }
+    },
+    {
+      "name": "report.risk_negative_mean.minimum",
+      "pass": true,
+      "detail": {
+        "actual": 2.9705667862595713e-05,
+        "reported": 2.97e-05,
+        "rounding_tolerance": 5e-08
+      }
+    },
+    {
+      "name": "report.risk_negative_mean.maximum",
+      "pass": true,
+      "detail": {
+        "actual": 0.00022592384173157775,
+        "reported": 0.000226,
+        "rounding_tolerance": 5e-07
+      }
+    },
+    {
+      "name": "report.clip_each_method_1728",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "prior_native_explicit_three_updates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "prior_native_both_parameter_increments_nonzero",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "prior_native_summary_reused_not_rerun": {
+    "actual_native_updates": 3,
+    "counter_fixture": "one warm update; step counter 1->288; two paired next-step updates",
+    "independent_scalar_retention": 0.9849629715682611,
+    "parameter_digests": {
+      "risk": {
+        "encoder_query": "f5518e57fdb9c7d4e091fc8723641cdc5ca7f9c9fc38a5f241ccf97d6c9ec93b",
+        "head_hidden": "dfeaa1375968d8531d778f0ba88b4ff693c84032455005bd2bb663d6e4021f87"
+      },
+      "zero": {
+        "encoder_query": "33b7ea71759ab8abf5c448eb02c2eae7395dca6e7e9d5d0d5145f6b7efa984f3",
+        "head_hidden": "3acbaba81fd5ec379eddb18c9726af37c913d7e5d6e750184526a551eb967456"
+      }
+    },
+    "reference_fixture": "half of actual eval-origin risks; activation probe only, not scientific target",
+    "retention_gradient_decomposition": {
+      "encoder_query": {
+        "different_actual_parameter_update": true,
+        "increment_norm": 0.0016525621758773923,
+        "max_residual": 3.8198777474462986e-11
+      },
+      "head_hidden": {
+        "different_actual_parameter_update": true,
+        "increment_norm": 0.017053646966814995,
+        "max_residual": 8.731149137020111e-10
+      }
+    },
+    "updates": {
+      "risk": {
+        "adam_step": 289,
+        "current_bce": 0.6638181805610657,
+        "current_hard": 0.6927927732467651,
+        "current_rank": 3.2913691997528076,
+        "current_total": 4.301583766937256,
+        "encoder_lr": 3.4482758620689656e-07,
+        "gradient_norm": 0.7288448810577393,
+        "head_gradient_diagnostics": {
+          "negative": 0.007661333307623863,
+          "positive": 0.008414562791585922,
+          "rank": 0.015824971720576286,
+          "weighted_history": 0.00839450117200613
+        },
+        "head_lr": 0.001,
+        "history_bce": 0.6635127663612366,
+        "history_hard": 0.6929521560668945,
+        "history_rank": 3.291917562484741,
+        "history_total": 4.301906585693359,
+        "history_weight": 0.1,
+        "modules": {
+          "encoder": {
+            "finite_nonzero_combined_gradient": true,
+            "parameters_changed": true
+          },
+          "head": {
+            "finite_nonzero_combined_gradient": true,
+            "parameters_changed": true
+          }
+        },
+        "retention": 0.9849631190299988,
+        "retention_negative": 0.10678243637084961,
+        "retention_positive": 0.1345338076353073,
+        "retention_rank": 2.7135729789733887,
+        "retention_weight": 0.5,
+        "stage": 2,
+        "step": 1,
+        "total": 5.224255985021591,
+        "weighted_history_total": 0.43019065856933597
+      },
+      "zero": {
+        "adam_step": 289,
+        "current_bce": 0.6638181805610657,
+        "current_hard": 0.6927927732467651,
+        "current_rank": 3.2913691997528076,
+        "current_total": 4.301583766937256,
+        "encoder_lr": 3.4482758620689656e-07,
+        "gradient_norm": 0.676462709903717,
+        "head_gradient_diagnostics": {
+          "negative": 0.0,
+          "positive": 0.0,
+          "rank": 0.0,
+          "weighted_history": 0.00839450117200613
+        },
+        "head_lr": 0.001,
+        "history_bce": 0.6635127663612366,
+        "history_hard": 0.6929521560668945,
+        "history_rank": 3.291917562484741,
+        "history_total": 4.301906585693359,
+        "history_weight": 0.1,
+        "modules": {
+          "encoder": {
+            "finite_nonzero_combined_gradient": true,
+            "parameters_changed": true
+          },
+          "head": {
+            "finite_nonzero_combined_gradient": true,
+            "parameters_changed": true
+          }
+        },
+        "retention": 0.9849631190299988,
+        "retention_negative": 0.10678243637084961,
+        "retention_positive": 0.1345338076353073,
+        "retention_rank": 2.7135729789733887,
+        "retention_weight": 0.0,
+        "stage": 2,
+        "step": 1,
+        "total": 4.731774425506591,
+        "weighted_history_total": 0.43019065856933597
+      }
+    }
+  },
+  "input_files": [
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/source/schema/step28_risk_policy.json",
+      "bytes": 7174,
+      "sha256": "5706629736dfe9c598f1d59cc61f04bb65e9fd83b4275e391dfc3d2ebf2e5548"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/ABC_logit_tenth_stage2.json",
+      "bytes": 22889,
+      "sha256": "99f9988e55a1e0005fa1a919d6b6d909272567ef859cbe2474a18337ff6149db"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/ABC_logit_tenth_stage2.npy",
+      "bytes": 36992,
+      "sha256": "b792592fc77c00e2f25d52c7f38dcd066022c8fa8587a9d7a3f4466f13e2a6c1"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/ABC_logit_tenth_stage3.json",
+      "bytes": 22888,
+      "sha256": "a3ce8cb2c6b5de96ccb6b51c86e3ebb2659a546b83795a52d11e8c4b11a5808d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/ABC_logit_tenth_stage3.npy",
+      "bytes": 36992,
+      "sha256": "c3c17ca860f8b9b7f40a44f7a817c9684ebd64dd449f7263eae9a0f9d5c6d5ea"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/BCA_logit_tenth_stage2.json",
+      "bytes": 22889,
+      "sha256": "22524de7249a14a365a67ba420b44c037924db57e19e9beaee983eddceec6513"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/BCA_logit_tenth_stage2.npy",
+      "bytes": 36992,
+      "sha256": "6392f54d93b1f2b6a858deae0b70df940146086765f74897c12ce4ddcd743f78"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/BCA_logit_tenth_stage3.json",
+      "bytes": 22889,
+      "sha256": "a5ada43008afd8557b82085af464e17265366da33c9b2ba35deeeda36894b0d4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/BCA_logit_tenth_stage3.npy",
+      "bytes": 36992,
+      "sha256": "7b565b7c8531a5cec21e93a44c2739b4bf9ed5c406e0a1d4008039b3ada8a1a1"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/CAB_logit_tenth_stage2.json",
+      "bytes": 22890,
+      "sha256": "0c0bb3c9862a04d7900046788804789d4c2fc184238af51dcd15e6c15520d1d4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/CAB_logit_tenth_stage2.npy",
+      "bytes": 36992,
+      "sha256": "fe17b4e137d9a7a809934c4c31b247f70cc35172a42d322cac99a71fa753b72d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/CAB_logit_tenth_stage3.json",
+      "bytes": 22889,
+      "sha256": "5aed7f8abb86be462b7fcb695daefe676338994bb3e4e20ba497c2db25fe10d9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/run/updates/CAB_logit_tenth_stage3.npy",
+      "bytes": 36992,
+      "sha256": "51fb5c3c8b84eae4fae797740dcf98276e9069da33c15eb797176c6f805700ec"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/ABC_risk_stage2.json",
+      "bytes": 23817,
+      "sha256": "d60f68b3c836a78b079ae01f31d153e153bc7bb13182967a9962ed91e5252bf3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/ABC_risk_stage2.npy",
+      "bytes": 43904,
+      "sha256": "22366788e8bfccb065e4bd55195d8011b272ce4ebd233cb033a473d115885f4d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/ABC_risk_stage3.json",
+      "bytes": 23797,
+      "sha256": "4191d5918099e498df0910182d4147036d8097eff3b34ade905693d9c848ad05"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/ABC_risk_stage3.npy",
+      "bytes": 43904,
+      "sha256": "bd69af07f9f9408f47b0e34804b0050132e520d8c128629734794a6a81c5fe6a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/BCA_risk_stage2.json",
+      "bytes": 23812,
+      "sha256": "6495644e6ba86493e5623c27f99a4d64609a653e6c4f8ccff0947b06fb1d779e"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/BCA_risk_stage2.npy",
+      "bytes": 43904,
+      "sha256": "dbd9ac14327ab499ad3ca386e4262e86e25b514ab5315aff7923e5b9e9725a72"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/BCA_risk_stage3.json",
+      "bytes": 23854,
+      "sha256": "213a0499755f6a242c14914eda95afd15185d598671ef4e2ee817f8973ea51d5"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/BCA_risk_stage3.npy",
+      "bytes": 43904,
+      "sha256": "b6f5a1ecc60a24418be92a2bc332a3b25e44a1980adea6c9c0c23eb78999d2b8"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/CAB_risk_stage2.json",
+      "bytes": 23817,
+      "sha256": "70627f4fd7a48c487b8a0822d54eb65e86943795186133f20d774230babe2681"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/CAB_risk_stage2.npy",
+      "bytes": 43904,
+      "sha256": "8bedfb1c967be0bf6c9d583d449e7e20d48ba20a3b8c085cfa5f29b4bb88d7f8"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/CAB_risk_stage3.json",
+      "bytes": 23814,
+      "sha256": "16725a7e8c94c96d1ae5b8012c7f97861cad051d02f035685dec85eaae1828c6"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/risk_result/job/run/updates/CAB_risk_stage3.npy",
+      "bytes": 43904,
+      "sha256": "94f43bac53452882befce70363983a0fd13319a2229d574768f0d99a64d9f4d2"
+    },
+    {
+      "path": "direct_reviews/risk_cpu/native.json",
+      "bytes": 2877,
+      "sha256": "795e32969ee7c84c5686875ec1357fdc5037d66f18a9f4f15ca7d6c32fc4c54b"
+    }
+  ],
+  "limitations": [
+    "Gradients are saved measurements, not regenerated from original model weights.",
+    "Mode probes cover one live group and four fixed seeds per continuation stage.",
+    "Gradient components cover the hidden-head weight at only the first update per stage.",
+    "Mode probe and first-update gradient probe generally use different retained groups.",
+    "Scalar loss magnitude and component norms cannot establish combined update strength, angles or causality.",
+    "No full-cache end-of-stage evaluation, no new calibration, no labels or model weights loaded."
+  ]
+}

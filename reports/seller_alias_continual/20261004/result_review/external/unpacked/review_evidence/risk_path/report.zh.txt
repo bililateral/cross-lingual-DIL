@@ -1,0 +1,88 @@
+RISK 正式执行路径及固定对照绑定：独立结果审查分报告
+2026-10-04；用于联合外审总报告。原上传附件及解包输入未改动。
+
+一、裁决
+
+在本分项实际审读和复算的范围内，没有发现足以判定 risk 正式结果无效的已证实科学阻断，也没有发现影响当前小结果交付的未关闭复现缺陷。风险保持项确实处在正式 runner 调用到的历史反传目标中；全部 1728 步日志与固定 C+0.1H+0.5×mean(D_rank,D_positive,D_negative) 相符，固定首域、六群日程、来源参考、评价盲门及预选 LOGIT0.1 对照的链条一致。可以将它作为固定开发点的一次有效运行参与结果判断；算法效果及原23项是否通过，须由独立统计分项裁决，不能从本执行有效性结论推导。
+
+本分项只用附件内已保存的分数、群矩阵描述符、计数文件、更新日志及元数据。没有访问服务器，没有导入 Torch 或项目训练模块，没有读取真实文本、标签、训练缓存正文、模型、test、owners、私有身份材料或凭据，没有新训练。包内历史“等待上传授权”快照已由本次用户授权取代，不构成阻断。
+
+二、实际审读范围及冻结来源
+
+先读 docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md:1–128 与 docs/SELLER_ALIAS_RISK_PILOT.zh.md:1–29，随后读取 risk_result/source/schema/step28_risk_policy.json、风险32份 source 与执行/授权/收集/结果来源清单。risk_result 指 reports/seller_alias_continual/20261004/risk_result。
+
+实际逐段审读的关键源码为以下冻结副本，均在 risk_result/source/scripts/ 下：
+
+  step28_risk_replay.py:1–247，完整风险代数、参考构造、生命周期、更新及原阶段入口。
+  step28_risk_execution.py:1–97，完整正式内存适配、诊断保存恢复与参考复核。
+  step28_risk_study.py:1–76，policy冻结、来源构造、原生证据绑定、延后对照绑定。
+  step28_er_weight_run.py:1–582，完整正式 execute → train → blind_gate → collect → finalize 路径。
+  step28_er_weight_evaluate.py:1–206，完整保存矩阵角色/来源接入及 finalize。
+  step28_er_weight.py:1–115、120–295，study分流、对照来源及共享起点检查、供给与目标。
+  step28_bge_continual.py:50–218，当前日程、独立保留/抽样随机流及完整缓存预算。
+  step28_continual_population_data.py:28–31、202–258，序列化约定、Algorithm R、种子和日程。
+  step28_bge_continual_run.py:58–100、230–241，RNG恢复、先记账解析及原完整首域恢复。
+
+未变化的模型/基本损失实现和原数学反例采用 direct_reviews/risk_algorithm_primary.zh.md、risk_execution_external.zh.txt、risk_execution_primary.zh.md 及 risk_cpu/audit.json、native.json 等直接证据复用。没有递归重做所有旧实现测试或文献检索。独立脚本读取32份源码字节核对身份，不把“已哈希”写成逐文件全量代码重审。
+
+risk 实际 policy SHA-256 为 5706629736dfe9c598f1d59cc61f04bb65e9fd83b4275e391dfc3d2ebf2e5548；与授权、manifest、collection、evaluation 一致。32份 source 全部匹配 execution、authorization、原CPU审查、manifest及评价的来源清单；risk返回 inventory 的313项载荷逐项大小/SHA一致。LOGIT0.1对照使用其自身37份来源和 policy 8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0，未把risk后继副本充作LOGIT冻结源码。
+
+三、实际目标和梯度接入
+
+对每个查询的27个候选，风险向量为：
+
+  rank = logsumexp(全部非自身分数) − 正候选分数均值；
+  positive = 正候选 softplus(−logit) 均值；
+  negative = 负候选 softplus(logit) 均值。
+
+16个一正例查询与12个二正例查询各自成层；每层每通道独立排序。当前排序值保持在计算图中，来源参考从保存常量构造。每通道惩罚等于两层所有正向差平方之和除以28，亦即按16/28和12/28加权层均值；下降不罚。三通道最终取均值，γ=.5独立于历史监督λ=.1。证据位置：step28_risk_replay.py:19–80、148–224。
+
+正式入口 step28_er_weight_run.py:61–74 每步先 draw 当前存活历史群及对应 UID 参考，再调用 risk.update，显式传入λ、γ、当前及历史的独立dropout seed。risk.update:172–194 对当前与历史各进行一次前向/反向，保持项在历史 objective.backward() 前加入；207–211统一裁剪后一次AdamW更新。它没有只记录 retention 数值而漏接历史目标。
+
+独立 NumPy 参考从六份288×19更新表逐步重构基本损失、整个历史监督和三通道均值。当前/历史基本目标最大绝对分解差3.2782554626464844e−7；三通道均值与保存float32均值的最大差1.7578713595867157e−8；由三通道重构整个目标的最大差8.789356797933578e−9。保留原float32适用容差，不将这些差解释为梯度误差。全部1728步保持项正值，各阶段原始保持均值0.0118116650–0.0274432648；0.5倍均值0.0059058325–0.0137216324。
+
+日志分解本身不能证明梯度接入。额外复用实际冻结原生证据 direct_reviews/risk_cpu/native.json:1：它明确是3次手写原生更新、计数1→288及半参考激活夹具。相同基本目标下，risk与γ=0在 encoder_query/head_hidden 两处保持梯度增量范数分别0.00165256218/0.01705364697，独立分解残差3.82e−11/8.73e−10，实际参数摘要不同。当前 source与该证据绑定一致，并结合此前Tiny导数/Adam及错误变异检出记录，支持“保持项实际影响训练”；不将夹具说成正式1728步GPU轨迹重演或全参数梯度认证。
+
+四、共享起点、随机流、六群参考和预算
+
+三个顺序均记录从原首域同一完整model/Adam/RNG checkpoint恢复，Adam=288，首映射与原shared点完全一致，全部60群首盲分数原生重放一致。源码在恢复后调用完整盲评分并恢复RNG，六群参考仅针对原ER after1实际存活群生成，不再次向学习器交付首域48群。对应 step28_er_weight_run.py:215–261、step28_risk_execution.py:35–47。
+
+独立参考只从partition中的群UID重建保留与抽样，不读群正文或标签。使用固定种子重新产生Algorithm R，首域及第二域后的成员顺序全部等于保存元数据；每阶段当前48群各呈现6次，当前shuffle序列、独立当前stream、历史288次均匀有放回draw逐项等于正式日志及原ER日志。六阶段Adam终点576/864和1–288全部LR逐项匹配，首29步warmup、288步编码器LR为0。观察点1/29/30/288均有有限非零合成梯度；编码器在第288步参数不变符合零LR，头仍更新，不应误报为训练失败。
+
+阶段二结束后的风险参考构成为：ABC 4个旧存活+2个新群，BCA 2旧+4新，CAB 0旧+6新。这是预定Algorithm R在6群限制下的实际结果。每个保留旧群参考摘要和来源阶段不变；每个新群来源为第二阶段当前域；阶段三消费的参考字典与保存阶段二字典相同。CAB最终没有首域缓存并非参考刷新或筛选bug，也不能未经消融指定为下降原因。
+
+正式内存适配 auxiliary setter 将新checkpoint元数据合并到旧risk_replay字段，避免更新阶段辅助信息时抹掉参考。所有保存摘要所记录完整缓存及附属状态为202,482–227,733字节，均低于1MiB；阶段二持久缓存分别215,987、213,790、210,040字节。这里只重算UID随机过程并比较摘要、计数和来源哈希。真实缓存正文不在包内，本轮没有重新反序列化或独立计算其payload字节数；payload与摘要一致性采用实际正式盲门执行及已关闭的生命周期证据。
+
+五、完整盲门、校准及对照接入
+
+完整执行路径先完成1728更新/3456群梯度呈现、六个终点、24个分数数组，再执行blind_gate，写before_valid后才调用唯一valid解析。parse_once在打开标签前先记账。正式before_valid记录train=1、valid=0、heldout=0、owners=0，完成记录train=1、valid=1、heldout=0、owners=0；manifest/complete的身份与各自绑定一致，原execute退出0且无failure.json。对应源码step28_er_weight_run.py:313–450、535–558及step28_bge_continual_run.py:76–87。
+
+六个终点每点校准分数为12×378，开发raw为60×378，stage-cal/first-cal各60×378；独立复算两种正仿射映射并检查严格排序和并列保持，24数组完整。当前校准IDs严格属于该阶段当前域12群，4536对、240正对，模型/原始分数来源一致。这里没有重拟合校准或重开标签；首映射来自共享首域记录。六份权重Linux新鲜保管描述符与端点完全匹配，总计7,838,862,246字节，附件中无权重，因此没有网页重新加载模型的结论。
+
+18套新指标/计数与81套复用对照的角色和记录均绑定原集合。LOGIT0.1的预先选定job、execution SHA和policy与risk policy中的pending_logit_reference完全一致；完成后绑定的execution、manifest、partition、collected、evaluation五份JSON逐项匹配实际LOGIT0.1 job。补充独立脚本还核对ER0.1/LOGIT0.25/LOGIT0.1的原31/34/37份来源在各自execution→manifest→collected→evaluation链上一致、相同环境、群次序、共享完整首域描述符、原首映射和各18套结果。与源码resolve_comparator→baseline的实际分流一致，不依效果选对手。
+
+主干 execute 本身正常调用 evaluation.finalize 完成统计；没有走“对照未完成，先失败退出，再另以保存矩阵恢复统计”的故障恢复路径。LOGIT包装于10月3日21:23:48完成；risk最后一个更新事件已在五小时后，且绑定完整LOGIT结果及risk执行退出0。主报告“延后finalize故障恢复未触发”准确，不能误写成从未调用正常统计finalize。
+
+六、一次性监听和退出
+
+监听20:32:42开始，52次资源采样中前51次显存门未满足，最后一次21:23:46显存31,337MiB、主存258,939,961,344B、磁盘659,794,513,920B、CPU空闲201/202，满足24GiB/16GiB/16GiB/90%门后启动。等待3064秒，即51分04秒。risk开始21:23:46，结束次日02:43:55，时间戳差19209秒，程序内19206.534秒，实际time工具取整5:20:08，12小时上限和16GiB观察产物上限均未触发。
+
+训练日志完整72个每24步进度事件，六阶段各24…288、Adam逻辑步相符，只有一个完成事件。首次真实更新记录elapsed=343.619秒，21:29:31自删回执在其后；训练与监听均退出0，末条明确training_exit=0 cleanup_exit=0、无自动重试。listener/script.sha256等于已关闭修正版1a20eaa71a53a8a36074055d7c674ff5507df21dc357f339160f8acee849ac1f。监听脚本正文不在本结果包的32份常驻科研来源中，本轮采用该启动SHA、实际事件/回执及已关闭的控制流补丁证据，不伪称再次运行监听或现场检查服务器。
+
+risk启动比LOGIT包装完成早2秒，但启动资源实测已达门槛，两者包装收尾重叠不构成重复训练或擅自放宽资源门的证据。根据所附实际日志、固定入口拒绝已有run/access的检查及失败不重启逻辑，没有本次自动重试的证据；不声称凭附件能够排除一切未记录外部行为。
+
+七、分类与边界
+
+SCIENTIFIC_BLOCKER：本执行路径分项无已证实项。
+REPRODUCIBILITY_DEFECT：本执行路径分项无影响当前交付的未关闭项。原监听漏自删/假回执缺陷和原手写浮点参考精度失败保留其历史性质，不能当成本次退出0作业新发现的缺陷。
+FOLLOWUP_RESEARCH_SUGGESTION：本分项不添加新机制实验；诊断解释、统计效应和后续研究价值由联合报告处理。γ=.5不代表与MSE同等强度，代理保持不保证未见卖家MAP/FPR，原有数学先例与创新限制继续成立。
+OUT_OF_SCOPE_OVERDESIGN：重新读取实际缓存、重新加载权重/全部重训以证明附件不存在的错误，复做无变化历史和文献、事后调γ/λ或更换成功线，均非本次结果审查的必要补件。
+
+本分项没有新的失败参考尝试。risk_path_reference_v1.py与risk_binding_reference_v1.py均首次执行退出0；分别保存真实argv、输入清单、stdout、stderr、exit及完整机器判定。1169个通过断言不是科学正确性的代替；科学支持来自上述实际目标路径、独立公式/UID日程重建、原始来源及已关闭梯度证据的分层结合。
+
+八、重放与证据索引
+
+python risk_path_reference_v1.py --root <原ZIP解包根> --output <新的独立输出目录>
+python risk_binding_reference_v1.py --root <原ZIP解包根> --output <新的独立输出目录>
+
+本轮实际运行使用Python3.12.14、NumPy2.3.5，网页允许CPU为0–8，没有硬用服务器CPU46/47。主体仅标准库/NumPy，补充只标准库，项目模块导入数0，Torch未导入。attempt_v1/result.json保存1069项断言、详细阶段独立重算和适用边界；binding_v1/result.json保存100项对照/授权绑定。每目录execution.json、stdout.txt、stderr.txt、exit_status.txt为原始执行回执，主体attempt_v1/inputs.json逐项记录实际读取的允许小文件身份。

@@ -1,0 +1,133 @@
+# LOGIT0.1 正式结果：冻结执行路径与保存运行记录独立分项审查
+
+审查日期：2026-10-04。本文是联合结果外审的 LOGIT0.1 执行路径分项；全量统计及 risk 分项由联合主报告汇总。
+
+## 一、明确裁决
+
+在本附件允许核查的范围内，未发现已证实的科学阻断，也未发现影响本轮结果交付的未关闭复现缺陷。LOGIT0.1 的实际冻结路径、与之绑定的原生 CPU 证据、六阶段保存更新记录、共同首域与来源描述符、完整盲门和校准记录相互一致，支持将本次结果视为固定合同下完成的开发实验。
+
+此裁决不是凭“退出 0”“audit PASS”或 519 项断言独立作出的。实际源码表明 MSE 加入历史目标后才 backward；原生已关闭证据确有独立 MSE 梯度增量；本次正式记录再证明实际调用参数、日程、非零保持量与终点绑定一致。本次没有原生权重或真实缓存载荷，不能说网页重新载模、恢复 Adam、回放原生模型或反序列化训练缓存。
+
+局部效果、原 23 项和整体研究问题是否解决，由联合统计分项独立重算后裁决；执行有效不自动推出所有保护满足，也不意味着本配置原创、全局最优或具有独立最终泛化证据。
+
+## 二、实际审读范围与旧证据复用
+
+只以 reports/seller_alias_continual/20261004/logit_low_result/source/ 为本作业科学源码根，没有用主目录或 risk 的后继实现代替。
+
+全量核对的 37 份来源，以 job/execution.json 的 path/bytes/SHA 为准；实际字节与 source 目录逐份一致，且 execution、run/manifest、evaluation/collected、authorization 和 direct_reviews/logit_cpu/audit.json 的 source_files 列表完全相同。冻结 policy 的 SHA 为 8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0，与 manifest/authorization 一致。执行记录对 CPU audit 与 authorization 的文件描述符也分别匹配对应原件。这里的 37 是身份核对范围，不冒称逐行重审了全部旧实现。
+
+人工实际阅读的执行核心及行段如下，以下脚本路径均相对于上述 source 根：
+
+| 源文件/原件 | 实际审读范围与用途 |
+|---|---|
+| docs/SELLER_ALIAS_LOGIT_LOW.zh.md；schema/step28_logit_low_policy.json | 全文：目标、复用对手、预算、三种权限、冻结停止规则 |
+| 主目录 docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md | 全文：待核联合结论、运行陈述和证据限制 |
+| scripts/step28_er_weight.py | 1–278：本轮 contract/policy/source、对照绑定、ContinuationSupply、实际 update 全函数 |
+| scripts/step28_er_weight_run.py | 1–551：train_stage、首恢复、checkpoint、target 生命周期、完整 blind_gate、collect、execute/finalize CLI |
+| scripts/step28_bge_continual.py | 1–301：父合同、学习率、日程、Supply、Memory 与旧 update 的衔接 |
+| scripts/step28_bge_continual_run.py | 27–100、230–270：父来源、数组保存、CPU/CUDA RNG、parse_once、缓存保存、restore_branch |
+| scripts/step28_er_weight_check.py | 1–232：原生独立 MSE 梯度、实际 update hooks、两臂比较和 CPU 来源绑定 |
+| scripts/step28_er_weight_evaluate.py | 1–199：对手局部视图、三比较、63 套复用、保存后统计、不自动 selection |
+| scripts/step28_alias_ranking.py | 66–133：硬负例稳定索引、live score、完整 BCE/rank/hard 目标 |
+| scripts/step28_chinese_base.py | 90–230：原生 BGE 载入、文本输入、双通道 pooling、基础目标、评分模式 |
+| scripts/step28_continual_population_data.py | 1–90、202–258：记录/种子编码、ID-only Algorithm R 与日程 |
+| scripts/step28_continual_population.py | 170–210：完整模型/优化器状态保存与实际恢复的摘要比较 |
+| scripts/step28_alias_calibration.py | 18–143：正斜率仿射、严格保序与并列、当前校准拟合 |
+| scripts/run_step28_er_weight_linux_20261001.sh | 全文：logit_low 实际入口、12h、单线程、退出记录和无重试包装 |
+| direct_reviews/logit_external.zh.txt、logit_primary.zh.md | 直接已关闭外审及主审，区分原生四次、NumPy/AST 夹具、spy 与正式更新 |
+| direct_reviews/logit_cpu/{audit,tenth,logit_tenth}.json 及原日志 | 已关闭原生/手写证据，绑定本次同一 37 来源 |
+| LOGIT job 及 verification 小记录；dependencies/shared 与两个 continuation 的五份冻结记录 | 实际读取并由参考脚本逐项计算/对应 |
+
+未变的历史损失数学、原生 pooling、完整生命周期测试及原评价数学沿用直接已关闭审查；没有为本次结果重复整个历史实现审查，也没有重新做无变化文献检索。未发生新的科研训练、消融、搜索或标签访问。
+
+## 三、实际计算目标是否接入
+
+实际 update 不是仅把系数记入日志。step28_er_weight.py:237–250 每个更新依次做两次完整群 logits 调用：当前 objective 使用完整基础损失，历史 objective 使用 0.1×完整基础损失，再加入独立 0.5×378 个原始 logit 的均方误差，随后执行 backward。zero_grad 在两图前，clip 与 optimizer.step 在两图后各一次（232–233、264–268）。target 由 NumPy 值新建不需梯度的 tensor，学生为 train，来源为 eval。
+
+展开后历史 hard 的有效系数为 0.05，MSE 的有效系数仍是 0.5；没有除以 1.1，也没有再将 MSE 乘 0.1。MSE 对历史 logit 的导数是 (z−target)/378。这里导数只描述保持分量，不能推出裁剪后合成梯度、AdamW 参数改变量或效果按相同比例变化。
+
+train_stage:64–69 确实把 policy 的历史 0.1、独立 0.5、memory.draw 的实际 target、当前 dropout seed 与历史 dropout seed 传给该 update。code 会拒绝 target 缺失、shape/dtype 错误、历史群不符或不匹配的 Adam step，而不是依照一个后来填入的标志选择是否报告 MSE。
+
+已关闭原生证据在 step28_er_weight_check.py:48–79 单独对 0.5MSE 调用 autograd.grad，再在实际 update 对两个参数注册 hooks，取得 current/history 两次 backward 的贡献；178–194 比较 g_LOGIT_history = g_ER0.1_history + g_MSE。该记录确为同一初始模型、同一次预热后的模型、同一 Adam、同当前/历史 logits。两探针覆盖编码器首层 query.weight 与隐藏头 weight，MSE 梯度范数分别约 8.6156e−5 和 0.00186078；保存的逐元素等式最大差为 1.00044e−11 和 2.76486e−10。另有 29 个参数的更新观察，但不能把两个探针分量等式说成所有参数的逐元素增量验证。
+
+本网页仅复用这些已关闭原生原件，没有再执行 BGE。独立从已公开手写 378 个历史 logits 和 eval target 重算 MSE 得 0.0001965899888976513；0.5MSE 为 0.00009829499444882565；与生产 float32 保存 MSE 的绝对差 1.209871485223675e−11。两臂分别一次真实 warm 和一次加权更新、合计四次；中间 Adam 计数 1→288 是明确的手写夹具，不冒充真实 288 次预热。
+
+## 四、本轮网页新做的保存记录独立重算
+
+新参考为 independent_logit_path_v1.py，使用标准库与 NumPy，没有 import 任一项目模块，也没有 import Torch。它接受 --root/--output，首轮实际运行退出 0，519 项断言通过；原 argv、当前允许 CPU、环境、stdout、stderr、exit_status、全部实际输入大小/SHA 与 result.json 均保存在 run_v1/。没有失败参考，也没有覆盖失败修订的情况。
+
+参考直接读取六份 float64(288,16) 更新数组，按独立公式重建 current/history 的 BCE+rank+0.5hard 和总目标。以下均为正式保存的标量观测，不是网页重新计算原生前向：
+
+| 顺序/阶段 | 当前基础损失均值 | 0.1历史基础均值 | 0.5MSE 均值 | 该阶段最大已记账缓存字节 |
+|---|---:|---:|---:|---:|
+| ABC/2 | 2.8580026204 | 0.2761442985 | 0.1008316531 | 253,915 |
+| ABC/3 | 2.8630441609 | 0.2288844753 | 0.1302216112 | 255,832 |
+| BCA/2 | 3.2228678945 | 0.2311140843 | 0.0693277979 | 260,866 |
+| BCA/3 | 2.8653618635 | 0.2325334335 | 0.0944447922 | 253,740 |
+| CAB/2 | 2.8202113666 | 0.2644590313 | 0.0911479335 | 242,224 |
+| CAB/3 | 2.6421119529 | 0.2085400325 | 0.1068557125 | 249,621 |
+
+所有 1728 行 total 与 current_total+0.1history_total+0.5logit_mse 完全相等；基础损失分解最大绝对差 3.2782554626464844e−7，处于原 float32 分解容差 atol=rtol=3e−6 内。容差是数值重算容差，没有用来放宽性能零退化规则。
+
+1728 行 MSE 全部严格大于零。全部合成裁剪前梯度范数均大于 1，范围 [6.4880142212,26.2162780762]，因此原 clip_norm=1 在这批保存记录中每步触发。合成范数既没有梯度方向，也没有单独分量信息；它不能证明“当前与历史冲突”，也不能证明 MSE 引起某项效果。
+
+学习率按独立 1e−5×step/29 热身、其后 1e−5×(288−step)/259 重算，六阶段逐行完全一致；头学习率一直 0.001。阶段 288 的编码器 LR=0，所以其参数保持而头仍变化符合合同。1/29/30/288 四个位置的保存梯度/参数观察与这一规则一致。后续无需为正常的末步零编码器学习率要求重训。
+
+## 五、共同起点、供给、随机流与记忆来源
+
+对三个顺序分别把 restored_starts 与 dependencies/shared/run/points/*_shared.json 交叉核对：完整 checkpoint 描述符、model_state、Adam288、first_map、首 LOGIT 缓存来源均一致。共同首域完整 60×378 分数回放的运行记录为 true，代码会实际逐位 array_equal 全 60 群后才训练，然后恢复 RNG（train:225–239；restore_branch:230–241）。这一回放在网页未重做，不能把 bool 的一致描述成网页原生回放。
+
+新参考从允许的 partition 群 ID 和固定种子重建当前每域 48 群的六轮排列、Algorithm R 留存成员、每阶段 288 次历史抽样。六阶段 current_ids、history_ids、current_dropout_stream 都与独立重建和原 ER 对照逐项一致；每轮恰好遍历 48 当前群，各阶段只从六个旧群抽样，当前与历史群无交叠。各阶段 Adam 终点依次为 576 和 864；六份数组共 1728 次新物理更新，两个群/步对应 3456 次群梯度呈现，不能把每条轨迹的 864 全部当作本轮新增更新。
+
+当前/历史 dropout 使用显式独立 seed 公式；逐步 ID 日程不依赖模型，模型评分及 checkpoint 保存后会恢复 CPU/CUDA RNG。新参考重建了两套 seed 并保存其摘要，实际更新的 torch.manual_seed 使用由冻结代码确认，不把 seed 元数据等同于再次观察全部 dropout 张量。
+
+阶段二新增 target 的群数在 ABC/BCA/CAB 分别为 2/4/6；新增 target 的来源 model_state 绑定本分支阶段二终点，origin 指向对应实际域，存活旧 target 的摘要逐项不变。阶段三消费记录的 references/reference_origins 与该本分支缓存一致，不是 LOGIT0.25 的阶段二 target。原生缓存正文在附件外，因此这里实际做的是独立成员选择与摘要/消费/来源记录交叉核对，未重新反序列化真实文本、标签或 target 缓存。
+
+全体已保存完整记忆计费摘要最大为 260,866 字节，低于 1,048,576。参考还从每个 endpoint 保存的 learner_auxiliary 重新序列化，逐个重建 auxiliary 字节数，与 point 及阶段预算记录精确一致。完整缓存的正文长度仍依据正式序列化记录及已审 to_bytes 路径，不能声称网页自行测了缺席的正文。
+
+## 六、盲门、校准和结果角色
+
+execute:505–513 的固定顺序是全部训练完成→blind_gate→before_valid→唯一一次 development 标签解析→保存全部新矩阵/计数→finalize。blind_gate:294–422 需要六模型终点描述符、全部 24 分数数组、完整日程/损失/目标源/校准和来源一致；parse_once 在打开标签前记账，不提供自动重试。
+
+本次 before_valid 指向的完整 manifest 大小/SHA 精确匹配，访问账为 train1/valid0/heldout0/owners0；最终 access 与 completion 都为 train1/valid1/heldout0/owners0。训练日志有 72 条进度记录，六阶段各恰好 24,48,…,288，逻辑 Adam 步对应 312…576 与 600…864，时序单调，无重复阶段或重启片段。这里是冻结程序路径加实际小记录的核验，不宣称 OS 级所有读取已经被网页独立审计。
+
+六终点每个四个完整分数数组：calibration 为 float32(12,378)，development/raw 为 float32(60,378)，stage-cal 和 first-cal 为 float64(60,378)，总 24 个。六次映射记录均只列本阶段实际域 12 个校准群、4536 对、240 正例；a>0，map 的 score_source/model_state 与对应终点一致。240 是已存真实拟合计数和固定结构的核对，网页没有开校准标签重新拟合。
+
+独立使用 float64(raw)×a+b 重算 stage-cal 与 first-cal，全部逐位相同；对群内 378 分数独立核对稳定排序与精确并列块，完全保留。first-cal 参数各顺序固定，不随阶段二/三改动。校准 raw 不另生一套 valid 指标，因此只有六终点×三个 valid 角色=18 套新指标；18 份矩阵均为有限 float64(60,22)，群 ID 与实际域排列一致。
+
+冻结 evaluate:31–78 用局部视图将 logit_tenth、tenth、logit_quarter 的实际阶段矩阵对齐共同首域，没有重命名公开原件或修改全局。finalize:118–199 从唯一已收集结果读取，再按 policy 读取 SEQ 27 套、ER0.1 18 套、LOGIT0.25 18 套，共 63 旧套并逐字节保存到 reference/。三个固定比较、原 23 项和不自动 selection 的分支对应合同。全部七端点与整数混淆统计的数值重算交联合统计分项，不以本分项的结构/身份核对代替。
+
+## 七、正式耗时、权重证据与边界
+
+时间戳从 2026-10-03T16:01:03+08:00 至 21:23:48+08:00，相差 19,365 秒，即 5:22:45；程序内 budget 为 19,363.136873584008 秒。最大观察产物为 10,447,066,320 字节，低于 16GiB，耗时低于 12h。包装、resource_usage 的退出状态为 0，未见 failure.json；FutureWarning 原样保留，不误记为训练失败。
+
+六推理权重的 endpoint 文件大小/SHA 与 verification/payload_custody.json 中 Linux 新鲜哈希记录逐项一致，总大小 7,838,879,856 字节。payload_custody 明确 models_loaded=false、formal_labels_parsed=false。附件没有这六份原权重，网页只核对端点描述符和 Linux 提供的新鲜哈希记录，没有直接读取原模型字节或宣称重新验证原生推理。
+
+按证据层次保留以下限制：
+
+1. 保存日志的目标分解不能独自证明计算图；本次结合了实际冻结源码、正式参数调用和直接已关闭原生增量证据。
+2. 原生 model/Adam/RNG 恢复、首域 60 群回放和每终点重载由正式路径及记录支撑，网页未重执行。
+3. 真实缓存正文没有提供；群选择可由 ID 独立重建，完整缓存字节和 target 内容只能交叉核对所存摘要及旧已审路径。
+4. AP/MAP 等标签级指标、校准标签级拟合没有在本分项重算；不会从不含真值的分数猜回标签。
+5. 这是单 s0、三个顺序和已开发 valid 条件下的固定点，不是三个种子或独立最终留出；源和预算匹配不扩大外推范围。
+
+## 八、问题分类
+
+SCIENTIFIC_BLOCKER：本分项未发现已证实项目缺陷。
+
+REPRODUCIBILITY_DEFECT：本分项未发现影响本次交付的未关闭缺陷。verification/command.txt 的简写已由 verification/execution.json 提供完整真实 argv，联合文档已明确区分，不能将前者冒称逐字命令；网页独立参考使用实际允许的 CPU，未硬用服务器 CPU47。
+
+FOLLOW_UP_RESEARCH_SUGGESTION：本分项没有增加新的实验建议或验收条件。当前解释只需持续保留 train/eval 随机差异、条件区间、开发 valid、单 seed 和旧/新效果分开报告的边界。
+
+OUT_OF_SCOPE_OVERDESIGN：要求网页重新访问 Linux、原生权重/真实缓存/真值，重跑已关闭无变化的整套原生审查，或新增完整全编码器梯度归档/通用访问审计框架，均超出本轮授权且没有由具体矛盾触发的必要性。未实施这些操作；未自动启动另一实验。
+
+## 九、可复核新证据
+
+- independent_logit_path_v1.py：新参考全文，--root/--output 参数化。
+- run_v1/execution.json：真实命令、cwd、当前允许 CPU 及线程环境。
+- run_v1/stdout.log、stderr.log、exit_status.txt：第一次参考执行的原输出，退出 0，stderr 空。
+- run_v1/input_inventory.json：每个实际读取输入的附件相对路径、字节数、SHA。
+- run_v1/result.json：完整分项断言、独立数值、阶段汇总、限制。
+- machine_verdict.json：本分项机器裁决；仅执行路径范围，不替代联合统计裁决。
+
+原附件及已关闭直接审查原件由联合交付保留；本分项没有修改附件来源或清单。

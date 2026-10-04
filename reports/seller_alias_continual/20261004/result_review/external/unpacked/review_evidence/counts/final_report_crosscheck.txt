@@ -1,0 +1,17 @@
+最终交付文稿交叉检查（保存矩阵/计数/工作点子域）
+日期：2026-10-04
+
+结论：本子域未发现数值错误、角色混用或验证范围夸大；不需要修改。
+本次仅阅读交付文本、机器结果并与已完成子审输出交叉核对，没有重跑统计/模型/数据计算，没有新造测试。
+
+1. 文稿第86—88、137—146行的24/48分数数组、18新矩阵、10,800群计数、六分类列、宏均值/CSV误差和仿射差0与独立参考一致。
+2. 第144行准确说明stage-cal/first-cal保存a*z+b这一logit，threshold0对应概率0.5；未误称保存的是概率数组。
+3. 第146行NLL充分统计量恒等式正确，且明确以保存原NLL为条件，未声称重新开标签或重新拟合校准。
+4. 第258—269行六个工作点及第360—374行全部15行附表，与既成独立workpoint_summary的整数和率一致；百分比单位、O/N 120群呈现而非120新样本、stage-cal角色均正确。
+5. 固定工作点risk较低FPR/较高precision伴随低recall/F1、23项不保证FPR不增，均已准确写入，未扩展成新成功线。
+6. 第320—324行、机器reviewer_access/limitations保留AP/MAP等真值依赖指标没有逐标签重算、原始TP/FP未重新拆分、模型/cache未重载等边界。
+7. external_verdict.json的working_point_summary数值与本子审既成15行输出一致，counts_maximum_errors各值一致；相关机器限定与文稿无矛盾。
+
+审查对象身份（交叉检查时）：
+external_review.zh.txt: bytes=37596, sha256=d377fc6271c8359a242f8428e0212ec85be278220b910ba84040e7e969d719df
+external_verdict.json: bytes=313463, sha256=d9e982522e79b163c9a22563c5315f5ab3ec3870adac343a8db41802340e42eb

@@ -1,0 +1,97 @@
+保存矩阵、混淆整数、校准角色及固定工作点独立子审
+日期：2026-10-04
+
+一、范围与裁决
+
+本子审仅审两项正式作业已保存的小结果，独立编写 NumPy＋标准库参考，没有导入项目训练、评价或 audit 代码，没有导入 Torch，没有接触服务器、真值标签、文本、缓存正文或模型载荷，没有重训、搜索或更改成功线。
+
+子域裁决：PASS_SAVED_RESULTS_WITH_DECLARED_TRUTH_BOUNDARY。未发现已证实科学阻断；未发现影响本轮交付的复现缺陷。此裁决是保存结果的矩阵/计数/校准一致性结论，不是整项科研成功、不代表风险方法合格，也不证明已保存 AP/MAP 的逐标签计算正确。
+
+审读并计算了 LOGIT0.1 的18套新矩阵＋63套复用矩阵，risk的18套新矩阵＋81套复用矩阵；每套为60群×22列及60行混淆整数，合计180套、10,800群计数。两作业的参考目录均按照各自原 collection 描述符核对，没有用当前后继实现充当 LOGIT 冻结版本。risk使用的18套LOGIT0.1参考与其实际新结果逐记录一致，其他旧参考分别追溯 dependencies/shared、tenth、logit_quarter 的原 collected.json。
+
+全部两份 stage_metrics.csv，共7,128＋8,910＝16,038数据行，每条顺序/方法/阶段/角色/实际域/指标键均唯一且完整。两份 evaluation.json 的 absolute_stage_results 覆盖分别27与33个点，每点三角色，逐域及总体宏均值、合并混淆计数和固定阈值率均实际独立对照。
+
+两作业各24个真实盲分数数组也在包中，并非仅描述符：每点 calibration 为12×378 float32，development 为60×378 float32，stage-cal和first-cal分别为60×378 float64。本子审读取了全部48数组；这不包括真值和模型。
+
+二、独立公式、结果及可复核边界
+
+参考入口：independent_counts_v1.py。完整单CPU重放目录 run_v2_single_cpu 保存实际 argv、Python3.12.14、NumPy2.3.5、CPU0、四项线程环境=1、449份实际输入路径/字节/SHA-256、标准输出、标准错误和退出0。执行约1.23秒。run_v1为首次成功输出，当时允许运行CPU集合0—8；其结果和日志原样保留。收到明确单CPU要求后，使用同一参考脚本在CPU0重放，没有覆盖或改写初次原件；不存在被覆盖的失败参考。
+
+1. 原22列中的六个固定阈值分类列全部由整数独立重算：
+   precision=TP/(TP+FP)，recall=TP/(TP+FN)，specificity=TN/(TN+FP)，
+   F1=2TP/(2TP+FP+FN)，balanced_accuracy=(recall+specificity)/2，
+   MCC=(TP·TN−FP·FN)/sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))。
+   零分母按原定义置0。另独立补算accuracy=(TP+TN)/总对数、FPR=FP/(FP+TN)。
+   所有10,800群均为非负整数：20正对、358负对，共378对；六列逐值差均为0。
+
+2. 微平均始终先合并整数，再计算率，未把群precision/F1的均值冒充总体precision/F1。
+   各点总体及三实际域的已报告合并整数和率，最大绝对差0。
+   总体宏均值和逐域宏均值用math.fsum独立归约，与保存值最大差5.55×10^-16；CSV全部16,038行与对应保存矩阵独立归约一致，最大差2.22×10^-16。
+   一个可直接复核的差别：ABC_LOGIT0.1_stage2的stage-cal，群precision均值0.5469047619，而合并precision=73/(73+42)=0.6347826087。原结果没有混淆二者。
+
+3. 三种角色使用相同原始排序信息。
+   全180矩阵中，四项曲线指标和十项查询排序指标在raw、stage-cal、first-cal间逐值精确相等；每个共享首点stage-cal与first-cal全矩阵及计数完全相同。
+   对24个实际新校准变换，独立计算float64(a·raw+b)，与保存校准logit数组逐值差0。正斜率边界均满足；逐群遍历378对的严格顺序与精确并列均保持，发现并列数0或1时也未塌缩/拆散。LOGIT新阶段a范围0.695113—0.862322，risk为0.549164—0.713541。
+
+4. 阈值角色正确。
+   保存的stage-cal和first-cal数组是校准logit a·z+b，非已经sigmoid后的概率。因此evaluation.json中固定threshold=0与合同的概率阈值0.5完全等价；raw使用原始logit0。这不是校准角色用错阈值。
+   36套新点/角色的每群score≥0数量与其TP+FP逐群精确相同，同时核对sigmoid(score)≥0.5的预测集合完全相同。
+   这能检验阈值、预测阳性总量和数组绑定，但没有标签就不能独立将阳性预测拆为TP与FP；保存TP/FP/FN/TN的逐标签真实性仍依赖正式唯一收集及既审标签评价实现。
+
+5. 校准只用当前域12群的记录一致。
+   每个新点映射的12个calibration_group_ids与原共享partition中该顺序当阶段的实际域精确一致；与48拟合群和60 valid群均不相交。映射记录pair_count=4536、positive_count=240，score_source、模型状态摘要和点记录一致。每个点的first_map_parameters均与同一顺序共享首点原记录精确相等。
+   包中没有校准标签，故未重新拟合a,b，未从标签重算校准原始NLL或Brier。
+
+6. 在无标签下另做了有明确条件的校准NLL交叉检查。
+   令x为保存raw logit，l_raw为保存raw log_loss，p_y=20/378，则由
+   E[yx]=E[softplus(x)]−l_raw，
+   l(a·x+b)=E[softplus(a·x+b)]−a·E[yx]−b·p_y。
+   对所有新点两种校准角色逐群重构log_loss，与保存矩阵最大差1.11×10^-16。本包实际logit范围远离概率裁剪边界，因此这里可用未裁剪NLL恒等式。
+   对12个校准映射及其全部轨迹，使用保存initial_nll和240/4536作充分统计量重构NLL与梯度；最大差分别8.33×10^-17和1.18×10^-16。截距梯度还可仅由预测均值−阳性比例独立计算。
+   上述检查以既存raw/initial NLL及已存阳性总数为条件，验证校准代数与变换一致性，不等于重开真值重算原始NLL，更不等于重新拟合或验证逐对标签。
+
+三、固定工作点的实质解释
+
+以下仅为补充描述，绝不增加或改变原23项判据。使用stage-cal的概率0.5工作点；O、N各汇总三个顺序中的120群呈现，Z为60群呈现。这些呈现共享原60群，不能当作120个独立新样本。
+
+方法          端点  TP   FP   FN    TN     Precision   Recall    F1        FPR
+LOGIT0.1      O     195  82   2205  42878  0.703971    0.081250  0.145685  0.001908752
+risk          O     105  38   2295  42922  0.734266    0.043750  0.082580  0.000884544
+LOGIT0.1      N     180  78   2220  42882  0.697674    0.075000  0.135440  0.001815642
+risk          N     106  34   2294  42926  0.757143    0.044167  0.083465  0.000791434
+LOGIT0.1      Z     104  44   1096  21436  0.702703    0.086667  0.154303  0.002048417
+risk          Z      49  16   1151  21464  0.753846    0.040833  0.077470  0.000744879
+
+完整五方法×O/N/Z的15行整数、precision/recall/F1/specificity/FPR/accuracy保存于workpoint_summary/workpoint_summary.json和.csv。其参考脚本、输入SHA、实际argv、stdout/stderr及退出0完整保留。
+
+risk在固定工作点预测更少的阳性，误报率较低的同时召回和F1也更低；不能把低FPR孤立解释为成功。报告所说“AP/ROC-AUC/Brier/log_loss保护全部未过”在该有限范围内可成立；若写成“基础识别的每一项指标都下降”，则会忽略precision/FPR的工作点差异。
+
+同理，LOGIT0.1的原23项对两个匹配对照全部通过，并不保证固定0.5工作点FPR没有升高，也不能转述为自动判定任务达标。原研究用途是候选排序，固定阈值结果必须作为独立信息保留；这里不提出事后新成功线。所有新阶段raw0的阳性总数中多数为0或1，也与校准角色对应的非零召回并不矛盾。
+
+四、AP、PR-AUC、MAP不互换
+
+实际冻结评价函数的average_precision对每群378个无向对做按分数块汇总的阶梯PR积分；trapezoidal_pr_auc使用相邻PR点的梯形积分；map是28个查询、每查询其余27候选的查询AP均值。三者比较对象和归约不同。固定precision/recall/F1又是给定阈值后的分类指标。本子审确认保存列名、归约来源和三角色保序一致，没有声称用AP或Brier替代固定工作点，也没有声称无标签重算了AP、MAP、MRR、NDCG或原始Brier。
+
+五、分类结论及未验证边界
+
+已证实科学阻断：本子域未发现。
+影响本轮交付的复现缺陷：本子域未发现。
+后续研究建议：本子审不提出新实验。报告使用“基础识别”一词时继续明确具体指标与工作点，防止将原23项通过扩张为每域固定阈值非退化。
+范围外过度设计：要求为此子审重新加载模型、解析标签、复扫缓存、重拟合校准或新做参数/阈值搜索均不必要，且不在授权内。
+
+仍未验证：每个保存TP/FP的逐对标签分配、每个原始AP/MAP/Brier的逐标签重算、校准标签的实际逐对顺序、原生模型从文本产生盲分数的网页重演。以上不能由文件哈希、matrix通过或counts自洽替代。核心bootstrap、七端点和23项裁决由另一个独立子审承担，本文件不重复或抢占该结论。
+
+六、直接来源位置
+
+为避免引用混淆，L表示附件内reports/seller_alias_continual/20261004/logit_low_result/source/，R表示对应risk_result/source/。source_excerpts.txt保存下列精确路径、实际行号和原始节选，source_excerpt_manifest.json保存各来源字节和SHA。
+
+L docs/SELLER_ALIAS_LOGIT_LOW.zh.md:9—19：固定对照、首映射、完整矩阵、校准角色和概率0.5工作点。
+R docs/SELLER_ALIAS_RISK_PILOT.zh.md:9—17：共享首点、12群当前域校准、完整结果和四固定对照。
+L docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md:31—43及104—121：20正/378对，48/12/20划分，正仿射校准及角色边界。
+L/R scripts/step28_alias_calibration.py:61—94：正斜率边界、float64仿射、严格顺序/精确并列；97—145：校准拟合范围和记录字段。两冻结副本字节一致。
+L/R scripts/step28_continual_population_evaluate.py:21—100、225—228：22列、AP/梯形PR-AUC/查询MAP及固定阈值分类的不同定义。两冻结副本字节一致。
+L/R scripts/step28_chinese_base.py:680—696：合并整数再计算固定阈值率，threshold0为logit空间。两冻结副本字节一致。
+L scripts/step28_er_weight_evaluate.py:81—115、151—198及R同文件85—119、158—205：实际矩阵/角色读取，全部CSV输出、绝对结果和参考保存。两冻结文件整体SHA不同，本子审没有将后者冒充前者。
+docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md:49—54、92—104：待核主报告对本子域的声称及自述真值边界。
+
+原数据路径详见run_v2_single_cpu/input_hashes.json；独立输出含每个点/角色/实际域的完整重算工作点，不要求通过阅读本方audit才可复核。

@@ -1,0 +1,22 @@
+{
+  "status": "READ_ONLY_BROWSING_MISTAKES_CORRECTED",
+  "purpose": "Preserve the external reviewer's own initial path-guess failures; these are not submitted-attachment defects.",
+  "observations": [
+    {
+      "tool_chunk_id": "22695c",
+      "exit_code": 1,
+      "operation": "Python read of job/evaluation/reused_collection.json after printing LOGIT policy",
+      "exception": "FileNotFoundError: [Errno 2] No such file or directory: /workspace/scratch/760670ef1a6e/input_review/reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reused_collection.json",
+      "correction": "Read job/evaluation/reference/collected.json as instructed in the user request; succeeded in tool chunk 063edc."
+    },
+    {
+      "tool_chunk_id": "c81eed",
+      "exit_code": 2,
+      "operation": "rg search included nonexistent reports/seller_alias_continual/20261004/logit_low_result/source/src",
+      "stderr": "rg: reports/seller_alias_continual/20261004/logit_low_result/source/src: No such file or directory (os error 2)",
+      "correction": "rg --files confirmed Python sources are under source/scripts; successful source reads in chunks 360973 and ab91d5."
+    }
+  ],
+  "scope": "Read-only discovery. No formal calculation, input mutation, label access or experiment was performed during these failures.",
+  "retention_note": "These entries are transcribed from actual tool outputs; they are not a fresh replay or original process-log files."
+}

@@ -1,0 +1,828 @@
+{
+  "status": "PASS_INDEPENDENT_SAVED_MATRIX_STATISTICS",
+  "scope": "saved-matrix statistics only",
+  "script": "independent_saved_matrix_reference_v1.py",
+  "result_dir": "run_v1",
+  "comparisons": {
+    "logit_tenth_minus_tenth": {
+      "label": "LOGIT0.1−ER0.1",
+      "passed": 23,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": true,
+        "old_recall5_improves": true,
+        "new_map_non_decrease": true,
+        "new_recall5_non_decrease": true,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": true,
+        "O_brier_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": true,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": true,
+        "N_roc_auc_non_degradation": true,
+        "N_brier_non_degradation": true,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": true,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": true,
+        "Z_recall_at_5_non_degradation": true,
+        "Z_average_precision_non_degradation": true,
+        "Z_roc_auc_non_degradation": true,
+        "Z_brier_non_degradation": true,
+        "Z_log_loss_non_degradation": true
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": 0.033094412159952825,
+          "per_order": {
+            "ABC": 0.06149575122761264,
+            "BCA": 0.004566555254924998,
+            "CAB": 0.03322092999732085
+          },
+          "conditional_95pct_interval": [
+            0.023915622109051436,
+            0.041700114053044024
+          ]
+        },
+        "N": {
+          "mean": 0.007426046861752448,
+          "per_order": {
+            "ABC": 0.004115767824717342,
+            "BCA": 0.003626459676307481,
+            "CAB": 0.014535913084232521
+          },
+          "conditional_95pct_interval": [
+            0.002176441367166918,
+            0.012895916845166115
+          ]
+        },
+        "Z": {
+          "mean": 0.0050337851929433035,
+          "per_order": {
+            "ABC": -0.0027451704425878187,
+            "BCA": 0.007149710261792341,
+            "CAB": 0.010696815759625389
+          },
+          "conditional_95pct_interval": [
+            -0.004410523650227994,
+            0.014944455849428788
+          ]
+        },
+        "F_first": {
+          "mean": -0.03215895985650221,
+          "per_order": {
+            "ABC": -0.0713217649465196,
+            "BCA": -0.0016087399198419505,
+            "CAB": -0.02354637470314508
+          },
+          "conditional_95pct_interval": [
+            -0.04447639019584602,
+            -0.01837104199687559
+          ]
+        },
+        "F": {
+          "mean": -0.02818525789467204,
+          "per_order": {
+            "ABC": -0.05600739818160136,
+            "BCA": -0.004514950709513743,
+            "CAB": -0.02403342479290102
+          },
+          "conditional_95pct_interval": [
+            -0.03713034210318052,
+            -0.018789676696304148
+          ]
+        },
+        "G": {
+          "mean": 0.0010716869774290798,
+          "per_order": {
+            "ABC": 0.004053133757742633,
+            "BCA": -0.0013804327783964732,
+            "CAB": 0.0005423599529410794
+          },
+          "conditional_95pct_interval": [
+            -0.007022115672773109,
+            0.008779656891557878
+          ]
+        },
+        "final_all": {
+          "mean": 0.023740869837616307,
+          "per_order": {
+            "ABC": 0.04008211067087908,
+            "BCA": 0.005427606923880834,
+            "CAB": 0.02571289191808901
+          },
+          "conditional_95pct_interval": [
+            0.01671308535516703,
+            0.030654575320931108
+          ]
+        }
+      }
+    },
+    "logit_tenth_minus_logit_quarter": {
+      "label": "LOGIT0.1−LOGIT0.25",
+      "passed": 23,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": true,
+        "old_recall5_improves": true,
+        "new_map_non_decrease": true,
+        "new_recall5_non_decrease": true,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": true,
+        "O_brier_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": true,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": true,
+        "N_roc_auc_non_degradation": true,
+        "N_brier_non_degradation": true,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": true,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": true,
+        "Z_recall_at_5_non_degradation": true,
+        "Z_average_precision_non_degradation": true,
+        "Z_roc_auc_non_degradation": true,
+        "Z_brier_non_degradation": true,
+        "Z_log_loss_non_degradation": true
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": 0.012677282437662382,
+          "per_order": {
+            "ABC": 0.008543412456659238,
+            "BCA": 0.009282660799015519,
+            "CAB": 0.020205774057312387
+          },
+          "conditional_95pct_interval": [
+            0.007486530098619464,
+            0.017796583085443442
+          ]
+        },
+        "N": {
+          "mean": 0.0033122111062306634,
+          "per_order": {
+            "ABC": 0.004025107338579359,
+            "BCA": 0.0010898967680748606,
+            "CAB": 0.00482162921203777
+          },
+          "conditional_95pct_interval": [
+            -0.000999147419177748,
+            0.007695666538698965
+          ]
+        },
+        "Z": {
+          "mean": 0.0032312526300179445,
+          "per_order": {
+            "ABC": 0.008957830462222538,
+            "BCA": -0.0030697423786701927,
+            "CAB": 0.0038056698065014882
+          },
+          "conditional_95pct_interval": [
+            -0.003796649655731228,
+            0.010295123051683671
+          ]
+        },
+        "F_first": {
+          "mean": -0.01119131380626126,
+          "per_order": {
+            "ABC": -0.016556527557135103,
+            "BCA": -0.005223597058053697,
+            "CAB": -0.01179381680359498
+          },
+          "conditional_95pct_interval": [
+            -0.017970630660160997,
+            -0.0043419113461092285
+          ]
+        },
+        "F": {
+          "mean": -0.010980697646440718,
+          "per_order": {
+            "ABC": -0.008997220349191148,
+            "BCA": -0.006657892841605617,
+            "CAB": -0.01728697974852539
+          },
+          "conditional_95pct_interval": [
+            -0.01642425043591638,
+            -0.005382905799956828
+          ]
+        },
+        "G": {
+          "mean": 0.0001299882212605815,
+          "per_order": {
+            "ABC": 0.0016794372937855295,
+            "BCA": -0.0005868640154099436,
+            "CAB": -0.0007026086145938415
+          },
+          "conditional_95pct_interval": [
+            -0.004550888054255393,
+            0.004888716406316835
+          ]
+        },
+        "final_all": {
+          "mean": 0.009528605835114223,
+          "per_order": {
+            "ABC": 0.008681551791846931,
+            "BCA": 0.0051651930731203,
+            "CAB": 0.014739072640375439
+          },
+          "conditional_95pct_interval": [
+            0.005511851759376913,
+            0.013443350476598344
+          ]
+        }
+      }
+    },
+    "logit_tenth_minus_seq": {
+      "label": "LOGIT0.1−SEQ",
+      "passed": 20,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": true,
+        "old_recall5_improves": true,
+        "new_map_non_decrease": true,
+        "new_recall5_non_decrease": true,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": true,
+        "O_brier_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": true,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": true,
+        "N_brier_non_degradation": true,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": true,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": true,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": true,
+        "Z_brier_non_degradation": true,
+        "Z_log_loss_non_degradation": true
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": 0.044203148006295545,
+          "per_order": {
+            "ABC": 0.0553928203766918,
+            "BCA": 0.02479052442069496,
+            "CAB": 0.05242609922149988
+          },
+          "conditional_95pct_interval": [
+            0.03366428570445261,
+            0.05454101278986728
+          ]
+        },
+        "N": {
+          "mean": 9.299771410720137e-05,
+          "per_order": {
+            "ABC": -0.006858167757929912,
+            "BCA": -0.00011213801712228744,
+            "CAB": 0.007249298917373803
+          },
+          "conditional_95pct_interval": [
+            -0.007652069777056324,
+            0.008227885327303558
+          ]
+        },
+        "Z": {
+          "mean": -0.0028173869876509197,
+          "per_order": {
+            "ABC": -0.02087498721097697,
+            "BCA": 0.005766663908817693,
+            "CAB": 0.006656162339206517
+          },
+          "conditional_95pct_interval": [
+            -0.015713367877158612,
+            0.010176412904167391
+          ]
+        },
+        "F_first": {
+          "mean": -0.04355972515489968,
+          "per_order": {
+            "ABC": -0.08111054669960388,
+            "BCA": -0.014721136742483765,
+            "CAB": -0.03484749202261139
+          },
+          "conditional_95pct_interval": [
+            -0.058670604102976295,
+            -0.027082365010270976
+          ]
+        },
+        "F": {
+          "mean": -0.0427014567983629,
+          "per_order": {
+            "ABC": -0.051813494529133225,
+            "BCA": -0.027785994392226093,
+            "CAB": -0.04850488147372939
+          },
+          "conditional_95pct_interval": [
+            -0.054178800935789216,
+            -0.03092960048393158
+          ]
+        },
+        "G": {
+          "mean": -0.0073748350723629825,
+          "per_order": {
+            "ABC": -0.011457884188368822,
+            "BCA": -0.006269456179996941,
+            "CAB": -0.004397164848723184
+          },
+          "conditional_95pct_interval": [
+            -0.01754912351832379,
+            0.0029282007824562267
+          ]
+        },
+        "final_all": {
+          "mean": 0.02852963634164672,
+          "per_order": {
+            "ABC": 0.02997021784746884,
+            "BCA": 0.0184492375834025,
+            "CAB": 0.03716945359406881
+          },
+          "conditional_95pct_interval": [
+            0.020639764470211073,
+            0.0364531692792765
+          ]
+        }
+      }
+    },
+    "risk_minus_logit_tenth": {
+      "label": "risk−LOGIT0.1",
+      "passed": 4,
+      "checks": {
+        "old_map_improves": false,
+        "old_map_interval_above_zero": false,
+        "old_recall5_improves": false,
+        "new_map_non_decrease": false,
+        "new_recall5_non_decrease": false,
+        "O_average_precision_non_degradation": false,
+        "O_roc_auc_non_degradation": false,
+        "O_brier_non_degradation": false,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": false,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": false,
+        "N_brier_non_degradation": false,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": false,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": false,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": false,
+        "Z_brier_non_degradation": false,
+        "Z_log_loss_non_degradation": false
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": -0.038174623331091194,
+          "per_order": {
+            "ABC": -0.062487659354077296,
+            "BCA": -0.009345016303079157,
+            "CAB": -0.04269119433611712
+          },
+          "conditional_95pct_interval": [
+            -0.04795063596155284,
+            -0.027964422003872162
+          ]
+        },
+        "N": {
+          "mean": -0.017781015331507572,
+          "per_order": {
+            "ABC": -0.012277192282857896,
+            "BCA": -0.011279007876708436,
+            "CAB": -0.029786845834956388
+          },
+          "conditional_95pct_interval": [
+            -0.023747823209490402,
+            -0.011902539416437022
+          ]
+        },
+        "Z": {
+          "mean": -0.01641306574178573,
+          "per_order": {
+            "ABC": 0.0010473497974624602,
+            "BCA": -0.014636066911017709,
+            "CAB": -0.03565048011180194
+          },
+          "conditional_95pct_interval": [
+            -0.02712864417803309,
+            -0.005303258061401521
+          ]
+        },
+        "F_first": {
+          "mean": 0.03374196682331828,
+          "per_order": {
+            "ABC": 0.07095456267915923,
+            "BCA": 0.00471065132344195,
+            "CAB": 0.025560686467353655
+          },
+          "conditional_95pct_interval": [
+            0.019427956546644583,
+            0.04752533875450773
+          ]
+        },
+        "F": {
+          "mean": 0.02860014087047651,
+          "per_order": {
+            "ABC": 0.04968679217248817,
+            "BCA": 0.005384041881879603,
+            "CAB": 0.03072958855706176
+          },
+          "conditional_95pct_interval": [
+            0.01822129644192085,
+            0.0386108989715653
+          ]
+        },
+        "G": {
+          "mean": -0.010684535299269863,
+          "per_order": {
+            "ABC": -0.012875592950264192,
+            "BCA": -0.0038478413823818114,
+            "CAB": -0.015330171565163586
+          },
+          "conditional_95pct_interval": [
+            -0.018114887946139625,
+            -0.003148327890728102
+          ]
+        },
+        "final_all": {
+          "mean": -0.0309207708013227,
+          "per_order": {
+            "ABC": -0.041309322970230655,
+            "BCA": -0.011108699839058711,
+            "CAB": -0.04034428959467873
+          },
+          "conditional_95pct_interval": [
+            -0.03877310764537291,
+            -0.023104915669581557
+          ]
+        }
+      }
+    },
+    "risk_minus_tenth": {
+      "label": "risk−ER0.1",
+      "passed": 5,
+      "checks": {
+        "old_map_improves": false,
+        "old_map_interval_above_zero": false,
+        "old_recall5_improves": true,
+        "new_map_non_decrease": false,
+        "new_recall5_non_decrease": false,
+        "O_average_precision_non_degradation": false,
+        "O_roc_auc_non_degradation": false,
+        "O_brier_non_degradation": false,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": false,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": false,
+        "N_brier_non_degradation": false,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": false,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": false,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": false,
+        "Z_brier_non_degradation": false,
+        "Z_log_loss_non_degradation": false
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": -0.005080211171138364,
+          "per_order": {
+            "ABC": -0.0009919081264646579,
+            "BCA": -0.004778461048154159,
+            "CAB": -0.009470264338796275
+          },
+          "conditional_95pct_interval": [
+            -0.011994026871717817,
+            0.0016823386545671958
+          ]
+        },
+        "N": {
+          "mean": -0.010354968469755125,
+          "per_order": {
+            "ABC": -0.008161424458140554,
+            "BCA": -0.007652548200400955,
+            "CAB": -0.015250932750723867
+          },
+          "conditional_95pct_interval": [
+            -0.015260274865232728,
+            -0.005727127047712815
+          ]
+        },
+        "Z": {
+          "mean": -0.011379280548842427,
+          "per_order": {
+            "ABC": -0.0016978206451253586,
+            "BCA": -0.0074863566492253675,
+            "CAB": -0.024953664352176552
+          },
+          "conditional_95pct_interval": [
+            -0.020175074054781108,
+            -0.003306011818259302
+          ]
+        },
+        "F_first": {
+          "mean": 0.0015830069668160696,
+          "per_order": {
+            "ABC": -0.000367202267360367,
+            "BCA": 0.0031019114035999995,
+            "CAB": 0.002014311764208576
+          },
+          "conditional_95pct_interval": [
+            -0.008022887222665465,
+            0.011286575719966989
+          ]
+        },
+        "F": {
+          "mean": 0.0004148829758044703,
+          "per_order": {
+            "ABC": -0.006320606009113189,
+            "BCA": 0.0008690911723658601,
+            "CAB": 0.00669616376416074
+          },
+          "conditional_95pct_interval": [
+            -0.006747193469127499,
+            0.007595596828220026
+          ]
+        },
+        "G": {
+          "mean": -0.009612848321840783,
+          "per_order": {
+            "ABC": -0.008822459192521559,
+            "BCA": -0.0052282741607782846,
+            "CAB": -0.014787811612222507
+          },
+          "conditional_95pct_interval": [
+            -0.015232601102196356,
+            -0.004371170815475424
+          ]
+        },
+        "final_all": {
+          "mean": -0.007179900963706391,
+          "per_order": {
+            "ABC": -0.0012272122993515766,
+            "BCA": -0.005681092915177877,
+            "CAB": -0.014631397676589719
+          },
+          "conditional_95pct_interval": [
+            -0.012935138364328387,
+            -0.0014942658517466366
+          ]
+        }
+      }
+    },
+    "risk_minus_seq": {
+      "label": "risk−SEQ",
+      "passed": 7,
+      "checks": {
+        "old_map_improves": true,
+        "old_map_interval_above_zero": false,
+        "old_recall5_improves": false,
+        "new_map_non_decrease": false,
+        "new_recall5_non_decrease": false,
+        "O_average_precision_non_degradation": true,
+        "O_roc_auc_non_degradation": false,
+        "O_brier_non_degradation": true,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": false,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": false,
+        "N_brier_non_degradation": false,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": false,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": false,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": false,
+        "Z_brier_non_degradation": false,
+        "Z_log_loss_non_degradation": false
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": 0.006028524675204354,
+          "per_order": {
+            "ABC": -0.007094838977385498,
+            "BCA": 0.015445508117615803,
+            "CAB": 0.009734904885382756
+          },
+          "conditional_95pct_interval": [
+            -0.0033690207114936,
+            0.015395989287383767
+          ]
+        },
+        "N": {
+          "mean": -0.01768801761740037,
+          "per_order": {
+            "ABC": -0.019135360040787808,
+            "BCA": -0.011391145893830723,
+            "CAB": -0.022537546917582585
+          },
+          "conditional_95pct_interval": [
+            -0.02466602235902439,
+            -0.010384553245672584
+          ]
+        },
+        "Z": {
+          "mean": -0.01923045272943665,
+          "per_order": {
+            "ABC": -0.01982763741351451,
+            "BCA": -0.008869403002200016,
+            "CAB": -0.028994317772595424
+          },
+          "conditional_95pct_interval": [
+            -0.02984819449640143,
+            -0.008294564264925232
+          ]
+        },
+        "F_first": {
+          "mean": -0.009817758331581402,
+          "per_order": {
+            "ABC": -0.010155984020444653,
+            "BCA": -0.010010485419041815,
+            "CAB": -0.009286805555257738
+          },
+          "conditional_95pct_interval": [
+            -0.02217319395344949,
+            0.0026813837904486907
+          ]
+        },
+        "F": {
+          "mean": -0.01410131592788639,
+          "per_order": {
+            "ABC": -0.002126702356645055,
+            "BCA": -0.02240195251034649,
+            "CAB": -0.01777529291666763
+          },
+          "conditional_95pct_interval": [
+            -0.02363719465065058,
+            -0.004385418142781637
+          ]
+        },
+        "G": {
+          "mean": -0.018059370371632844,
+          "per_order": {
+            "ABC": -0.024333477138633014,
+            "BCA": -0.010117297562378752,
+            "CAB": -0.01972733641388677
+          },
+          "conditional_95pct_interval": [
+            -0.025846150745382702,
+            -0.010266280284330732
+          ]
+        },
+        "final_all": {
+          "mean": -0.002391134459675981,
+          "per_order": {
+            "ABC": -0.011339105122761817,
+            "BCA": 0.007340537744343789,
+            "CAB": -0.0031748360006099152
+          },
+          "conditional_95pct_interval": [
+            -0.00949837296918253,
+            0.004748024855244986
+          ]
+        }
+      }
+    },
+    "risk_minus_logit_quarter": {
+      "label": "risk−LOGIT0.25",
+      "passed": 4,
+      "checks": {
+        "old_map_improves": false,
+        "old_map_interval_above_zero": false,
+        "old_recall5_improves": false,
+        "new_map_non_decrease": false,
+        "new_recall5_non_decrease": false,
+        "O_average_precision_non_degradation": false,
+        "O_roc_auc_non_degradation": false,
+        "O_brier_non_degradation": false,
+        "O_brier_against_raw_reference": true,
+        "O_log_loss_non_degradation": false,
+        "O_log_loss_against_raw_reference": true,
+        "N_average_precision_non_degradation": false,
+        "N_roc_auc_non_degradation": false,
+        "N_brier_non_degradation": false,
+        "N_brier_against_raw_reference": true,
+        "N_log_loss_non_degradation": false,
+        "N_log_loss_against_raw_reference": true,
+        "Z_map_non_degradation": false,
+        "Z_recall_at_5_non_degradation": false,
+        "Z_average_precision_non_degradation": false,
+        "Z_roc_auc_non_degradation": false,
+        "Z_brier_non_degradation": false,
+        "Z_log_loss_non_degradation": false
+      },
+      "primary_map_endpoints": {
+        "O": {
+          "mean": -0.02549734089342881,
+          "per_order": {
+            "ABC": -0.05394424689741806,
+            "BCA": -6.23555040636381e-05,
+            "CAB": -0.022485420278804735
+          },
+          "conditional_95pct_interval": [
+            -0.035065223187195814,
+            -0.01540660263258502
+          ]
+        },
+        "N": {
+          "mean": -0.01446880422527691,
+          "per_order": {
+            "ABC": -0.008252084944278537,
+            "BCA": -0.010189111108633575,
+            "CAB": -0.024965216622918618
+          },
+          "conditional_95pct_interval": [
+            -0.020642011873259446,
+            -0.008473573377768669
+          ]
+        },
+        "Z": {
+          "mean": -0.013181813111767785,
+          "per_order": {
+            "ABC": 0.010005180259684998,
+            "BCA": -0.0177058092896879,
+            "CAB": -0.03184481030530045
+          },
+          "conditional_95pct_interval": [
+            -0.023920522454889587,
+            -0.002841735323798513
+          ]
+        },
+        "F_first": {
+          "mean": 0.022550653017057016,
+          "per_order": {
+            "ABC": 0.054398035122024124,
+            "BCA": -0.0005129457346117472,
+            "CAB": 0.013766869663758674
+          },
+          "conditional_95pct_interval": [
+            0.008337419234210906,
+            0.03597310814592639
+          ]
+        },
+        "F": {
+          "mean": 0.017619443224035792,
+          "per_order": {
+            "ABC": 0.04068957182329702,
+            "BCA": -0.001273850959726014,
+            "CAB": 0.013442608808536372
+          },
+          "conditional_95pct_interval": [
+            0.007438323257232795,
+            0.027326580815621684
+          ]
+        },
+        "G": {
+          "mean": -0.010554547078009282,
+          "per_order": {
+            "ABC": -0.011196155656478662,
+            "BCA": -0.004434705397791755,
+            "CAB": -0.016032780179757428
+          },
+          "conditional_95pct_interval": [
+            -0.018527909443272875,
+            -0.002822727730128978
+          ]
+        },
+        "final_all": {
+          "mean": -0.021392164966208476,
+          "per_order": {
+            "ABC": -0.032627771178383724,
+            "BCA": -0.005943506765938411,
+            "CAB": -0.02560521695430329
+          },
+          "conditional_95pct_interval": [
+            -0.028240046106413036,
+            -0.014464099230129103
+          ]
+        }
+      }
+    }
+  },
+  "numeric_comparisons": {
+    "direct_vs_occurrence_counts": 31680000,
+    "final_all_identity": 11882376,
+    "quantile_linear_vs_manual": 20328,
+    "saved_results": 56364
+  },
+  "max_absolute_differences": {
+    "saved_results": 6.38378239159465e-16,
+    "direct_vs_occurrence_counts": 7.771561172376096e-16,
+    "quantile_linear_vs_manual": 1.1102230246251565e-16,
+    "final_all_identity": 2.220446049250313e-16
+  },
+  "scientific_blockers": [],
+  "reproducibility_defects": [],
+  "report": "statistics_subreport.zh.txt"
+}

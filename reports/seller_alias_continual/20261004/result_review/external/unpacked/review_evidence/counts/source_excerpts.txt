@@ -1,0 +1,631 @@
+
+FILE docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md
+17: 研究问题仍是新卖家群体不断到来、历史训练群仅能少量保留时，保持旧分布未见卖家的马甲候选排序与基础识别，同时学习新群体。输入只有屏蔽标题和描述。当前是中文合成三域受控任务，每群28账号、每查询27候选；每域48拟合、12当前域校准、20 valid。单s0，ABC/BCA/CAB三个顺序不等于三个训练种子。
+49: - 核对三个共同首域恢复记录、全60群首分数精确回放记录、12群当前域校准、raw/stage-cal/first-cal全部24数组、正仿射变换和并列保序、存活旧目标不刷新。risk保存元数据中的来源摘要与消费记录一致；此次未重新解析真实缓存正文，其payload核查沿用正式盲门执行与已审实现。
+50: - 从完整60×22群矩阵重算七端点、全部方法／角色／顺序、按实际域整群配对5000次PCG64抽样、条件95%线性分位区间及七组原23项；从混淆整数重算分类指标、合并计数、阈值预测阳性总数和阶段CSV。
+51: 
+52: LOGIT核对392,250个计数器跟踪数值、81套矩阵计数及7128行阶段表；risk为417,636个数值、99套及8910行。两者最大绝对差均7.11e−15；基础float32损失分解另用原3e−6绝对／相对容差，不把7.11e−15扩大到所有检查。两项均首次通过、退出0。数量本身不证明科学正确性，关键是按不同实现从保存输入重构了实际比较。
+53: 
+54: [LOGIT核验](../reports/seller_alias_continual/20261004/logit_low_result/verification/audit/audit.json)、[risk核验](../reports/seller_alias_continual/20261004/risk_result/verification/audit/audit.json)、各自verification/execution.json保存展开的实际argv。命令回执在执行后整理；LOGIT的command.txt是较早写入的路径缩写说明，不能冒充完整argv。所有核验新增train/valid/heldout/owners解析均为0，无模型加载。AP/MAP等依赖真值的群指标来自正式唯一收集，本轮没有重新开标签从逐对真值计算它们。
+92: ## 6 基础识别与概率质量
+93: 
+94: | 方法 | O AP | O ROC-AUC | O Brier↓ | O log_loss↓ | N AP | Z AP |
+95: |---|---:|---:|---:|---:|---:|---:|
+96: | SEQ | .270029 | .738793 | .045746 | .184187 | .315116 | .323112 |
+97: | ER0.1 | .275484 | .739885 | .045410 | .183221 | .308073 | .314750 |
+98: | LOGIT0.25 | .299674 | .754376 | .044459 | .178871 | .307980 | .313172 |
+99: | LOGIT0.1 | .311544 | .762585 | .043975 | .176710 | .314805 | .320728 |
+100: | risk | .272791 | .735551 | .045603 | .184335 | .300284 | .305830 |
+101: 
+102: 对LOGIT0.1，risk在O/N/Z的AP、ROC-AUC、Brier、log_loss观察保护全部未过；不是只有MAP下降而识别能力得到了补偿。固定0.5工作点的precision/recall/F1/FPR及原始混淆整数另在完整evaluation.json的absolute_stage_results中，不能用AP或Brier替代工作点指标。
+103: 
+104: 完整七端点×22指标、所有角色、逐顺序及区间见[全部指标与判据附表](../reports/seller_alias_continual/20261004/result_analysis/full_metrics.zh.md)及[LOGIT完整机器结果](../reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/evaluation.json)、[risk完整机器结果](../reports/seller_alias_continual/20261004/risk_result/job/evaluation/evaluation.json)。逐顺序／阶段／域的原表为各job/evaluation/stage_metrics.csv。AP、梯形PR-AUC、查询MAP及MRR保留各自定义，不混称“准确率”。
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/docs/SELLER_ALIAS_LOGIT_LOW.zh.md
+9: 主比较LOGIT0.1−ER0.1，检验匹配监督下输出保持的增量；预先固定另外两组LOGIT0.1−LOGIT0.25和LOGIT0.1−SEQ，分别回答监督降权取舍与相对无重放的旧/新能力。三组完整给出七端点、22指标、区间及原23项，不把一组通过替代另一组。复用原ER0.1、LOGIT0.25和SEQ，无自动模型替换或新候选生成；旧比较的负结果保留。所有比较均是已开发valid上的单点开发证据，不证明创新、最优系数或独立最终泛化。
+10: 
+11: 保持s0、ABC/BCA/CAB、原BGE与优化器、每阶段288更新、六完整群Algorithm R及全部历史附属状态≤1MiB。从原三个共同首域完整model/Adam/RNG/首校准映射恢复，使用原LOGIT首域缓存，不从ER0.1或LOGIT0.25末端续训。共同首域模型、Adam288、缓存成员/目标来源及全部60群首域盲分数恢复核验不符即停。当前/历史供给及dropout流继续对原ER配对。
+12: 
+13: 阶段二仅对本路径新入缓存群生成阶段末eval目标；存活旧目标不刷新，淘汰群不恢复，不复用其他路径阶段二target。对照的首域来源、环境、划分、指标列/角色/群ID与小结果身份须一致；旧源码身份从其冻结记录核对，不要求旧记录与本地后继实现同字节。已有实现/结果主审及直接原始审查继续作为未变证据。
+14: 
+15: ## 2 三种权限、评价及停止
+16: 
+17: 技术读取：本轮新增train和valid各一次解析尝试，先记账；正式输入只经既有公共入口，训练仅使用当前阶段拟合群、存活历史记忆及当前域校准群。每域48拟合、12校准、20 valid；valid盲文本仅沿既有完整打分路径使用，标签须全部训练、6原生终点和24分数数组盲门完整后一次解析。test、owners、Audit真值和private_custody均不读取，不生成新留出。
+18: 
+19: 结果开放：新18套指标/计数完整保存后统一比较，可复用已开放的SEQ27套、ER0.1后两阶段18套、LOGIT0.25后两阶段18套，共63套；不加载对照末端模型或重新解析标签。采用原raw/stage-cal/first-cal角色、当前域校准、O/N/Z/F_first/F/G/final_all公式、按实际域分层整群配对5000次PCG64抽样及线性分位数。排序用raw logit、主概率用stage-cal，固定0.5工作点，23项原方向与零观察退化容忍不变；区间跨零不证明非劣效。
+
+FILE reports/seller_alias_continual/20261004/risk_result/source/docs/SELLER_ALIAS_RISK_PILOT.zh.md
+9: 复用原ABC/BCA/CAB共享首域完整model/Adam/RNG及首校准映射；恢复并完整复核60群首域盲分数。首域采用原ER六群缓存及其抽样/保留状态，只对这六群用该共享模型生成eval风险参考，不重新读取首域48训练群供学习器使用。阶段二只对本路径新存活群生成风险参考；旧参考不刷新，淘汰不恢复。原始缓存和全部附属状态整体≤1MiB，六群Algorithm R、更新日程、dropout流与原ER一致。仅新增后两阶段3×2×288=1728更新、3456群梯度呈现、6终点、18套指标计数；单s0，三个顺序不是三个种子。
+10: 
+11: 主要比较risk−LOGIT0.1及risk−ER0.1，完整报告risk−SEQ，固定补充risk−LOGIT0.25。复用保存指标与计数，不载对照末端权重；LOGIT0.25六权重按用户指令删除后仍可比较。LOGIT0.1确切活动job、执行记录与policy预先绑定；其完整结果可能尚未产生，待完成后核对来源、环境、共享起点、角色、群ID及完整18套矩阵，保存结果身份后比较，不依据效果选对手。不存在可用完整对照时保存本候选完整矩阵后暂停统计，可稍后只用保存矩阵finalize，不重新训练或读标签。
+12: 
+13: ## 权限、评价与停止
+14: 
+15: 沿用原BGE合同及LOGIT0.1合同的输入、阶段供给、校准、盲门、22指标和七端点定义。技术读取新增train及valid各一次解析尝试，先记账；每域48拟合/12校准/20 valid；学习器只见当前拟合群和存活历史。valid盲文本用于完整打分，valid标签必须全部1728更新、六原生终点恢复核验及24完整分数数组盲门后一次解析。禁止test、owners、Audit真值和private_custody。结果开放须全部18套新指标/计数保存完，不能中途看指标选轮。
+16: 
+17: 完整报告O/N/Z/F_first/F/G/final_all、逐顺序/阶段/域、raw/first-cal/stage-cal、合并混淆计数及原群级配对5000次bootstrap；排序用raw，概率主角色stage-cal。主比较以O MAP正向证据以及原23项完整保护判读，沿用既有方向与零观察退化容忍；四组分别判断，不把对ER通过替代对LOGIT通过。原23项中观察保护不称总体非劣效。若O改善而N/Z损失则称取舍；缓存保持好不能代替旧未见卖家收益。一次固定配置结束，不自动换γ/λ/种子、不新增消融，不根据结果改成功线；效应好不证明创新，单点负结果不否定整个方法族。valid已开发、test已用，不称独立确认。
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md
+29: 这是合成受控变化，不能称真实时间分布。当前版本同时保留商品主题混合变化：A为(0.60,0.20,0.20)、B为(0.20,0.60,0.20)、C为(0.20,0.20,0.60)，再叠加表中的表达变化，不能解释为纯表达因素的因果实验。9月9日早期数据主要改变商品内容，不能用它“表达机制相同”的描述概括当前版本。[数据机制](SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md)、[生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[表达policy](../schema/step28_continual_expression_policy.json)。既有文献定位中有关“表达机制保持”的概括已修正；原历史审查记录保留。
+30: 
+31: 每域原60个train群仍按既定划分分为48个梯度拟合群和12个校准群；另有20个valid群。每群28账号、378个无向对，其中20正对；每个查询排其余27账号，有1或2个同控候选。账号输入仍仅为屏蔽后的标题和描述，商品集合、表示、对称评分头均沿用中文BGE合同，不输入域、账号、控制者身份或生成器变量。
+32: 
+33: ### 到达顺序和隔离
+34: 
+35: 首轮提前固定三个循环顺序：**A→B→C、B→C→A、C→A→B**。它们使每个域各处于一次首、中、末位置，但没有覆盖全部六个排列。不能按结果挑顺序，也不能把三个顺序当三份独立评价数据。
+36: 
+37: 学习器在阶段t只接收当前域的48个拟合群及被允许的历史缓存；当前域12个校准群仅供独立概率拟合，禁止编码器梯度、困难负例挖掘和选轮。阶段结束后淘汰的历史正文、标签、表示及分数不得从归档恢复给学习器。
+38: 
+39: 这里隔离的是单条学习路径的未来域访问。基础配置已经通过联合三域训练和valid开发选定，研究者已了解这些生成分布；不能称未来分布对研究设计者也完全未知。
+40: 
+41: 第一轮拟申请新的train二值CSV一次解析，供隔离调度器按阶段分发；完成全部训练、评分、保存和重载核验后，valid二值CSV再解析一次，评价全部预定点。解析全部CSV是调度器的实现便利，不允许单条学习路径提前接触未来监督。不同方法、不同顺序之间不得借用缓存或监督。
+42: 
+43: 评价器可以对保存模型生成完整60群valid盲分数，但不得将任何valid文本、分数、标签或统计反馈给学习器、缓存选择器或校准器。所有训练结束后统一开放评价。现有已评价的120群test本轮不再读取，owners和其他封存真值不读；既有访问许可不自动恢复。
+104: ## 6 校准规则与概率保护
+105: 
+106: **每阶段仅用刚到达域的12个校准群拟合该阶段的一个全局正斜率仿射映射**：`p=sigmoid(a*z+b), a>0`。每次4536对、240正对，保留自然比例，用未加权NLL；沿用[原校准合同](SELLER_ALIAS_CALIBRATION.zh.md)的float64 L-BFGS-B、初值、边界及停止条件。
+107: 
+108: 三条方法路径接受同一规则，每个阶段模型各自拟合；首阶段同一模型只拟合一次。映射对所有域统一使用，推理不根据域选择映射。原始logit用于排名，校准必须核验严格次序／并列不变。旧域校准文本、标签和逐对分数在该路径下一阶段不能再次用于拟合。
+109: 
+110: 这个规则与原基础模型用36群联合校准不同，是为持续阶段的可用数据边界重新规定的协议。它可能改善当前域概率却损害旧域，因此同时报告原始概率`raw`、阶段校准概率`stage-cal`，以及**固定首阶段映射**作用于后续logit的`first-cal`诊断结果；最后一种只额外保留两个标量，不重新拟合。16字节仅指两个float64数值，实际持久化和恢复开销也计入辅助信息。不能在三种输出之间事后挑选胜者。未训练初始化只定义raw输出，不能借用尚未取得的首阶段映射；冻结首阶段参照始终复用首阶段模型和映射。
+111: 
+112: 主概率评价始终使用预定的阶段校准系统，评价对象是“模型＋当前域拟合映射”的完整系统，不是纯编码器遗忘。即便各域正例比例相同，条件概率也可能不同；保持logit完全不变时，换成当前域映射仍可能使旧域Brier／log_loss变差。固定首映射诊断帮助观察模型分数漂移，不能单独完整分解第二个旧域从自身获得时到最终的变化，也不能证明唯一因果根因。所有原始与校准Brier／log_loss均披露。这里没有新增旧域校准访问或额外映射拟合。
+113: 
+114: ## 7 评价对象和统计
+115: 
+116: 评价对象是**各域未参加训练和校准的20群卖家**，不是历史缓存中的训练身份。每群先计算指标，再域等权汇总；所有方法使用完全相同的账号、27候选、标签和顺序规则。
+117: 
+118: 对方法m、顺序o，记`R_m(o,t,j)`为学完第t阶段后，在该顺序第j个到达域上的群宏指标。MAP主要报告：
+119: 
+120: | 量 | 定义 | 解释 |
+121: | --- | --- | --- |
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/scripts/step28_alias_calibration.py
+61: def parameters(record: dict) -> tuple[float, float]:
+62:     a, b = float(record["a"]), float(record["b"])
+63:     if (not np.isfinite([a, b]).all()
+64:             or not BOUNDS[0][0] <= a <= BOUNDS[0][1]
+65:             or not BOUNDS[1][0] <= b <= BOUNDS[1][1]):
+66:         raise ValueError("Calibration parameters outside the positive-slope contract")
+67:     return a, b
+68: 
+69: 
+70: def transform(scores: np.ndarray, record: dict) -> np.ndarray:
+71:     a, b = parameters(record)
+72:     original = np.asarray(scores, dtype=np.float64)
+73:     result = a * original + b
+74:     if not original.size or not np.isfinite(original).all() or not np.isfinite(result).all():
+75:         raise ValueError("Invalid calibration logits")
+76:     return result
+77: 
+78: 
+79: def preserve_order(original: np.ndarray, transformed: np.ndarray) -> dict:
+80:     """Preserve every group's total pair order and exact ties, hence every query order."""
+81:     x, z = np.asarray(original, dtype=np.float64), np.asarray(transformed, dtype=np.float64)
+82:     if x.shape != z.shape or x.ndim != 2 or not x.size or not np.isfinite([x, z]).all():
+83:         raise ValueError("Aligned finite group matrices required")
+84:     order = np.argsort(x, axis=1, kind="stable")
+85:     if not np.array_equal(order, np.argsort(z, axis=1, kind="stable")):
+86:         raise ValueError("Calibration changed pair order")
+87:     before = np.take_along_axis(x, order, axis=1)
+88:     after = np.take_along_axis(z, order, axis=1)
+89:     ties = before[:, 1:] == before[:, :-1]
+90:     if (not np.array_equal(ties, after[:, 1:] == after[:, :-1])
+91:             or not np.all(after[:, 1:][~ties] > after[:, :-1][~ties])):
+92:         raise ValueError("Calibration changed exact ties or collapsed distinct logits")
+93:     return {"groups": len(x), "pairs_per_group": x.shape[1],
+94:             "exact_order_and_ties_preserved": True}
+97: def fit(scores: np.ndarray, labels: np.ndarray, *, role: str,
+98:         check: Callable[[], None] = lambda: None) -> dict:
+99:     """One deterministic real optimizer fit; no retry or alternative method selection."""
+100:     from scipy.optimize import minimize
+101: 
+102:     if role != "calibration":
+103:         raise ValueError("Only train-calibration labels may fit a probability map")
+104:     x, y = aligned(scores, labels)
+105:     initial = np.array([1., 0.])
+106:     initial_loss, _ = loss_gradient(initial, x, y)
+107:     trajectory: list[dict] = []
+108:     calls = 0
+109: 
+110:     def objective(theta: np.ndarray) -> tuple[float, np.ndarray]:
+111:         nonlocal calls
+112:         check()
+113:         calls += 1
+114:         if calls > OPTIONS["maxfun"]:
+115:             raise RuntimeError("Calibration objective evaluation budget exhausted")
+116:         return loss_gradient(theta, x, y)
+117: 
+118:     def callback(theta: np.ndarray) -> None:
+119:         check()
+120:         value, grad = loss_gradient(theta, x, y)
+121:         trajectory.append({"iteration": len(trajectory) + 1, "a": float(theta[0]),
+122:                            "b": float(theta[1]), "nll": value,
+123:                            "projected_gradient_max": float(np.max(np.abs(projected_gradient(theta, grad))))})
+124: 
+125:     fitted = minimize(objective, initial, method="L-BFGS-B", jac=True,
+126:                       bounds=BOUNDS, options=dict(OPTIONS), callback=callback)
+127:     final_loss, gradient = loss_gradient(fitted.x, x, y)
+128:     pg = float(np.max(np.abs(projected_gradient(fitted.x, gradient))))
+129:     result = {"a": float(fitted.x[0]), "b": float(fitted.x[1]),
+130:               "role": role, "objective": "unweighted_unclipped_bernoulli_nll",
+131:               "initial_parameters": initial.tolist(), "bounds": [list(v) for v in BOUNDS],
+132:               "options": dict(OPTIONS), "initial_nll": initial_loss, "final_nll": final_loss,
+133:               "optimizer_success": bool(fitted.success), "optimizer_message": str(fitted.message),
+134:               "optimizer_iterations": int(fitted.nit), "objective_calls": calls,
+135:               "projected_gradient_max": pg, "trajectory": trajectory,
+136:               "group_count": int(x.shape[0]) if x.ndim == 2 else None,
+137:               "pair_count": int(x.size), "positive_count": int(y.sum())}
+138:     parameters(result)
+139:     passed = (fitted.success and fitted.nit <= OPTIONS["maxiter"]
+140:               and calls <= OPTIONS["maxfun"] and np.isfinite(final_loss)
+141:               and pg <= 1e-6 and final_loss <= initial_loss + 1e-12)
+142:     result["status"] = "PASS_CALIBRATION_FIT" if passed else "FAILED_CALIBRATION_FIT_NO_RETRY"
+143:     # Empirical calibration diagnostics do not choose among maps or alter the fit.
+144:     for name, values in (("raw", x), ("calibrated", transform(x, result))):
+145:         probabilities = np.exp(-np.logaddexp(0., -values))
+
+FILE reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_alias_calibration.py
+61: def parameters(record: dict) -> tuple[float, float]:
+62:     a, b = float(record["a"]), float(record["b"])
+63:     if (not np.isfinite([a, b]).all()
+64:             or not BOUNDS[0][0] <= a <= BOUNDS[0][1]
+65:             or not BOUNDS[1][0] <= b <= BOUNDS[1][1]):
+66:         raise ValueError("Calibration parameters outside the positive-slope contract")
+67:     return a, b
+68: 
+69: 
+70: def transform(scores: np.ndarray, record: dict) -> np.ndarray:
+71:     a, b = parameters(record)
+72:     original = np.asarray(scores, dtype=np.float64)
+73:     result = a * original + b
+74:     if not original.size or not np.isfinite(original).all() or not np.isfinite(result).all():
+75:         raise ValueError("Invalid calibration logits")
+76:     return result
+77: 
+78: 
+79: def preserve_order(original: np.ndarray, transformed: np.ndarray) -> dict:
+80:     """Preserve every group's total pair order and exact ties, hence every query order."""
+81:     x, z = np.asarray(original, dtype=np.float64), np.asarray(transformed, dtype=np.float64)
+82:     if x.shape != z.shape or x.ndim != 2 or not x.size or not np.isfinite([x, z]).all():
+83:         raise ValueError("Aligned finite group matrices required")
+84:     order = np.argsort(x, axis=1, kind="stable")
+85:     if not np.array_equal(order, np.argsort(z, axis=1, kind="stable")):
+86:         raise ValueError("Calibration changed pair order")
+87:     before = np.take_along_axis(x, order, axis=1)
+88:     after = np.take_along_axis(z, order, axis=1)
+89:     ties = before[:, 1:] == before[:, :-1]
+90:     if (not np.array_equal(ties, after[:, 1:] == after[:, :-1])
+91:             or not np.all(after[:, 1:][~ties] > after[:, :-1][~ties])):
+92:         raise ValueError("Calibration changed exact ties or collapsed distinct logits")
+93:     return {"groups": len(x), "pairs_per_group": x.shape[1],
+94:             "exact_order_and_ties_preserved": True}
+97: def fit(scores: np.ndarray, labels: np.ndarray, *, role: str,
+98:         check: Callable[[], None] = lambda: None) -> dict:
+99:     """One deterministic real optimizer fit; no retry or alternative method selection."""
+100:     from scipy.optimize import minimize
+101: 
+102:     if role != "calibration":
+103:         raise ValueError("Only train-calibration labels may fit a probability map")
+104:     x, y = aligned(scores, labels)
+105:     initial = np.array([1., 0.])
+106:     initial_loss, _ = loss_gradient(initial, x, y)
+107:     trajectory: list[dict] = []
+108:     calls = 0
+109: 
+110:     def objective(theta: np.ndarray) -> tuple[float, np.ndarray]:
+111:         nonlocal calls
+112:         check()
+113:         calls += 1
+114:         if calls > OPTIONS["maxfun"]:
+115:             raise RuntimeError("Calibration objective evaluation budget exhausted")
+116:         return loss_gradient(theta, x, y)
+117: 
+118:     def callback(theta: np.ndarray) -> None:
+119:         check()
+120:         value, grad = loss_gradient(theta, x, y)
+121:         trajectory.append({"iteration": len(trajectory) + 1, "a": float(theta[0]),
+122:                            "b": float(theta[1]), "nll": value,
+123:                            "projected_gradient_max": float(np.max(np.abs(projected_gradient(theta, grad))))})
+124: 
+125:     fitted = minimize(objective, initial, method="L-BFGS-B", jac=True,
+126:                       bounds=BOUNDS, options=dict(OPTIONS), callback=callback)
+127:     final_loss, gradient = loss_gradient(fitted.x, x, y)
+128:     pg = float(np.max(np.abs(projected_gradient(fitted.x, gradient))))
+129:     result = {"a": float(fitted.x[0]), "b": float(fitted.x[1]),
+130:               "role": role, "objective": "unweighted_unclipped_bernoulli_nll",
+131:               "initial_parameters": initial.tolist(), "bounds": [list(v) for v in BOUNDS],
+132:               "options": dict(OPTIONS), "initial_nll": initial_loss, "final_nll": final_loss,
+133:               "optimizer_success": bool(fitted.success), "optimizer_message": str(fitted.message),
+134:               "optimizer_iterations": int(fitted.nit), "objective_calls": calls,
+135:               "projected_gradient_max": pg, "trajectory": trajectory,
+136:               "group_count": int(x.shape[0]) if x.ndim == 2 else None,
+137:               "pair_count": int(x.size), "positive_count": int(y.sum())}
+138:     parameters(result)
+139:     passed = (fitted.success and fitted.nit <= OPTIONS["maxiter"]
+140:               and calls <= OPTIONS["maxfun"] and np.isfinite(final_loss)
+141:               and pg <= 1e-6 and final_loss <= initial_loss + 1e-12)
+142:     result["status"] = "PASS_CALIBRATION_FIT" if passed else "FAILED_CALIBRATION_FIT_NO_RETRY"
+143:     # Empirical calibration diagnostics do not choose among maps or alter the fit.
+144:     for name, values in (("raw", x), ("calibrated", transform(x, result))):
+145:         probabilities = np.exp(-np.logaddexp(0., -values))
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/scripts/step28_continual_population_evaluate.py
+21: KS = (1, 3, 5, 10)
+22: CURVE_KEYS = ("average_precision", "trapezoidal_pr_auc", "roc_auc", "recall_at_fpr_1pct")
+23: CLASS_KEYS = CURVE_KEYS + ("brier", "log_loss", "precision", "recall", "f1",
+24:                          "specificity", "balanced_accuracy", "mcc")
+25: RETRIEVAL_KEYS = ("map", "mrr") + tuple(f"recall_at_{k}" for k in KS) + tuple(f"ndcg_at_{k}" for k in KS)
+26: COLUMNS = CLASS_KEYS + RETRIEVAL_KEYS
+27: 
+28: def curve_metrics(y: np.ndarray, scores: np.ndarray) -> dict[str, float]:
+29:     y, scores = np.asarray(y), np.asarray(scores, dtype=np.float64)
+30:     if (y.ndim != 1 or y.shape != scores.shape or not len(y) or not np.isin(y, [0, 1]).all()
+31:             or not np.isfinite(scores).all() or not 0 < y.sum() < len(y)):
+32:         raise ValueError("Curve inputs need aligned finite scores and both classes")
+33:     order = np.argsort(-scores, kind="stable")
+34:     ordered = scores[order]
+35:     end = np.r_[ordered[1:] != ordered[:-1], True]
+36:     tp = np.cumsum(y[order], dtype=np.float64)[end]
+37:     fp = np.cumsum(1 - y[order], dtype=np.float64)[end]
+38:     recall, fpr = tp / y.sum(), fp / (len(y) - y.sum())
+39:     precision = tp / (tp + fp)
+40:     dr = np.diff(np.r_[0., recall])
+41:     return {"average_precision": float(dr @ precision),
+42:             "trapezoidal_pr_auc": float(dr @ ((precision + np.r_[1., precision[:-1]]) / 2)),
+43:             "roc_auc": float(np.diff(np.r_[0., fpr]) @ ((recall + np.r_[0., recall[:-1]]) / 2)),
+44:             "recall_at_fpr_1pct": float(np.max(np.r_[0., recall[fpr <= .01]]))}
+45: 
+46: 
+47: def confusion_metrics(tp: float, fp: float, fn: float, tn: float) -> dict[str, float]:
+48:     precision = tp / (tp + fp) if tp + fp else 0.
+49:     recall = tp / (tp + fn) if tp + fn else 0.
+50:     specificity = tn / (tn + fp) if tn + fp else 0.
+51:     denominator = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+52:     return {"precision": precision, "recall": recall, "specificity": specificity,
+53:             "f1": 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.,
+54:             "balanced_accuracy": (recall + specificity) / 2,
+55:             "mcc": (tp * tn - fp * fn) / denominator if denominator else 0.}
+56: 
+57: 
+58: def classification(y: np.ndarray, scores: np.ndarray, threshold: float = 0.) -> dict[str, Any]:
+59:     result: dict[str, Any] = curve_metrics(y, scores)
+60:     scores = np.asarray(scores, dtype=np.float64)
+61:     probability = np.exp(-np.logaddexp(0., -scores))
+62:     clipped = np.clip(probability, 1e-15, 1 - 1e-15)
+63:     result["brier"] = float(np.mean((probability - y) ** 2))
+64:     result["log_loss"] = float(-np.mean(y * np.log(clipped) + (1 - y) * np.log1p(-clipped)))
+65:     predicted, positive = scores >= threshold, y == 1
+66:     tp, fp = int(np.sum(predicted & positive)), int(np.sum(predicted & ~positive))
+67:     fn, tn = int(np.sum(~predicted & positive)), int(np.sum(~predicted & ~positive))
+68:     result.update(confusion_metrics(tp, fp, fn, tn))
+69:     result["confusion"] = {"tp": tp, "fp": fp, "fn": fn, "tn": tn}
+70:     return result
+71: 
+72: 
+73: def retrieval(y: np.ndarray, scores: np.ndarray, sellers: int) -> np.ndarray:
+74:     """Complete sorted K_n edges; score ties use ascending public seller order."""
+75:     y, scores = np.asarray(y), np.asarray(scores, dtype=np.float64)
+76:     pairs = sellers * (sellers - 1) // 2
+77:     if y.shape != scores.shape or y.ndim != 2 or y.shape[1] != pairs or not np.isfinite(scores).all():
+78:         raise ValueError("Retrieval rows differ from complete worlds")
+79:     if not np.isin(y, [0, 1]).all():
+80:         raise ValueError("Nonbinary relevance")
+81:     left, right = np.triu_indices(sellers, 1)
+82:     adjacency = np.full((len(y), sellers, sellers), -np.inf)
+83:     relevant = np.zeros((len(y), sellers, sellers), dtype=np.uint8)
+84:     adjacency[:, left, right] = adjacency[:, right, left] = scores
+85:     relevant[:, left, right] = relevant[:, right, left] = y
+86:     order = np.argsort(-adjacency, axis=2, kind="stable")[:, :, :sellers - 1]
+87:     ranked = np.take_along_axis(relevant, order, axis=2)
+88:     total = relevant.sum(axis=2)
+89:     if not np.all((total >= 1) & (total <= 2)):
+90:         raise ValueError("Each qualified query must have one or two relevant candidates")
+91:     ranks = np.arange(1, sellers)
+92:     ap = (np.cumsum(ranked, axis=2) * ranked / ranks).sum(axis=2) / total
+93:     rr = 1. / (np.argmax(ranked, axis=2) + 1)
+94:     values = [ap, rr]
+95:     values.extend(ranked[:, :, :k].sum(axis=2) / total for k in KS)
+96:     discounts = 1. / np.log2(ranks + 1)
+97:     for k in KS:
+98:         ideal = np.asarray([discounts[:min(k, int(n))].sum() for n in total.ravel()]).reshape(total.shape)
+99:         values.append((ranked[:, :, :k] * discounts[:k]).sum(axis=2) / ideal)
+100:     return np.stack([v.mean(axis=1) for v in values], axis=1)
+225: def group_metrics(labels: np.ndarray, scores: np.ndarray) -> tuple[np.ndarray, list[dict]]:
+226:     results = [classification(y, s) for y, s in zip(labels, scores, strict=True)]
+227:     numeric = np.array([[row[k] for k in CLASS_KEYS] for row in results])
+228:     return np.column_stack((numeric, retrieval(labels, scores, 28))), [r["confusion"] for r in results]
+
+FILE reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_continual_population_evaluate.py
+21: KS = (1, 3, 5, 10)
+22: CURVE_KEYS = ("average_precision", "trapezoidal_pr_auc", "roc_auc", "recall_at_fpr_1pct")
+23: CLASS_KEYS = CURVE_KEYS + ("brier", "log_loss", "precision", "recall", "f1",
+24:                          "specificity", "balanced_accuracy", "mcc")
+25: RETRIEVAL_KEYS = ("map", "mrr") + tuple(f"recall_at_{k}" for k in KS) + tuple(f"ndcg_at_{k}" for k in KS)
+26: COLUMNS = CLASS_KEYS + RETRIEVAL_KEYS
+27: 
+28: def curve_metrics(y: np.ndarray, scores: np.ndarray) -> dict[str, float]:
+29:     y, scores = np.asarray(y), np.asarray(scores, dtype=np.float64)
+30:     if (y.ndim != 1 or y.shape != scores.shape or not len(y) or not np.isin(y, [0, 1]).all()
+31:             or not np.isfinite(scores).all() or not 0 < y.sum() < len(y)):
+32:         raise ValueError("Curve inputs need aligned finite scores and both classes")
+33:     order = np.argsort(-scores, kind="stable")
+34:     ordered = scores[order]
+35:     end = np.r_[ordered[1:] != ordered[:-1], True]
+36:     tp = np.cumsum(y[order], dtype=np.float64)[end]
+37:     fp = np.cumsum(1 - y[order], dtype=np.float64)[end]
+38:     recall, fpr = tp / y.sum(), fp / (len(y) - y.sum())
+39:     precision = tp / (tp + fp)
+40:     dr = np.diff(np.r_[0., recall])
+41:     return {"average_precision": float(dr @ precision),
+42:             "trapezoidal_pr_auc": float(dr @ ((precision + np.r_[1., precision[:-1]]) / 2)),
+43:             "roc_auc": float(np.diff(np.r_[0., fpr]) @ ((recall + np.r_[0., recall[:-1]]) / 2)),
+44:             "recall_at_fpr_1pct": float(np.max(np.r_[0., recall[fpr <= .01]]))}
+45: 
+46: 
+47: def confusion_metrics(tp: float, fp: float, fn: float, tn: float) -> dict[str, float]:
+48:     precision = tp / (tp + fp) if tp + fp else 0.
+49:     recall = tp / (tp + fn) if tp + fn else 0.
+50:     specificity = tn / (tn + fp) if tn + fp else 0.
+51:     denominator = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+52:     return {"precision": precision, "recall": recall, "specificity": specificity,
+53:             "f1": 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.,
+54:             "balanced_accuracy": (recall + specificity) / 2,
+55:             "mcc": (tp * tn - fp * fn) / denominator if denominator else 0.}
+56: 
+57: 
+58: def classification(y: np.ndarray, scores: np.ndarray, threshold: float = 0.) -> dict[str, Any]:
+59:     result: dict[str, Any] = curve_metrics(y, scores)
+60:     scores = np.asarray(scores, dtype=np.float64)
+61:     probability = np.exp(-np.logaddexp(0., -scores))
+62:     clipped = np.clip(probability, 1e-15, 1 - 1e-15)
+63:     result["brier"] = float(np.mean((probability - y) ** 2))
+64:     result["log_loss"] = float(-np.mean(y * np.log(clipped) + (1 - y) * np.log1p(-clipped)))
+65:     predicted, positive = scores >= threshold, y == 1
+66:     tp, fp = int(np.sum(predicted & positive)), int(np.sum(predicted & ~positive))
+67:     fn, tn = int(np.sum(~predicted & positive)), int(np.sum(~predicted & ~positive))
+68:     result.update(confusion_metrics(tp, fp, fn, tn))
+69:     result["confusion"] = {"tp": tp, "fp": fp, "fn": fn, "tn": tn}
+70:     return result
+71: 
+72: 
+73: def retrieval(y: np.ndarray, scores: np.ndarray, sellers: int) -> np.ndarray:
+74:     """Complete sorted K_n edges; score ties use ascending public seller order."""
+75:     y, scores = np.asarray(y), np.asarray(scores, dtype=np.float64)
+76:     pairs = sellers * (sellers - 1) // 2
+77:     if y.shape != scores.shape or y.ndim != 2 or y.shape[1] != pairs or not np.isfinite(scores).all():
+78:         raise ValueError("Retrieval rows differ from complete worlds")
+79:     if not np.isin(y, [0, 1]).all():
+80:         raise ValueError("Nonbinary relevance")
+81:     left, right = np.triu_indices(sellers, 1)
+82:     adjacency = np.full((len(y), sellers, sellers), -np.inf)
+83:     relevant = np.zeros((len(y), sellers, sellers), dtype=np.uint8)
+84:     adjacency[:, left, right] = adjacency[:, right, left] = scores
+85:     relevant[:, left, right] = relevant[:, right, left] = y
+86:     order = np.argsort(-adjacency, axis=2, kind="stable")[:, :, :sellers - 1]
+87:     ranked = np.take_along_axis(relevant, order, axis=2)
+88:     total = relevant.sum(axis=2)
+89:     if not np.all((total >= 1) & (total <= 2)):
+90:         raise ValueError("Each qualified query must have one or two relevant candidates")
+91:     ranks = np.arange(1, sellers)
+92:     ap = (np.cumsum(ranked, axis=2) * ranked / ranks).sum(axis=2) / total
+93:     rr = 1. / (np.argmax(ranked, axis=2) + 1)
+94:     values = [ap, rr]
+95:     values.extend(ranked[:, :, :k].sum(axis=2) / total for k in KS)
+96:     discounts = 1. / np.log2(ranks + 1)
+97:     for k in KS:
+98:         ideal = np.asarray([discounts[:min(k, int(n))].sum() for n in total.ravel()]).reshape(total.shape)
+99:         values.append((ranked[:, :, :k] * discounts[:k]).sum(axis=2) / ideal)
+100:     return np.stack([v.mean(axis=1) for v in values], axis=1)
+225: def group_metrics(labels: np.ndarray, scores: np.ndarray) -> tuple[np.ndarray, list[dict]]:
+226:     results = [classification(y, s) for y, s in zip(labels, scores, strict=True)]
+227:     numeric = np.array([[row[k] for k in CLASS_KEYS] for row in results])
+228:     return np.column_stack((numeric, retrieval(labels, scores, 28))), [r["confusion"] for r in results]
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/scripts/step28_chinese_base.py
+680: def rates(counts: np.ndarray) -> dict:
+681:     tp, fp, fn, tn = np.asarray(counts, dtype=np.float64).sum(axis=0)
+682:     return {"tp": int(tp), "fp": int(fp), "fn": int(fn), "tn": int(tn),
+683:             "fpr": float(fp / (fp + tn)), "recall": float(tp / (tp + fn)),
+684:             "precision": float(tp / (tp + fp)) if tp + fp else 0.,
+685:             "f1": float(2 * tp / (2 * tp + fp + fn)) if 2 * tp + fp + fn else 0.}
+686: 
+687: 
+688: def fixed_classification(counts: list[dict], domains: list[str]) -> dict:
+689:     """Sum saved per-group confusion counts before calculating classification rates."""
+690:     values = np.asarray([[row[key] for key in ("tp", "fp", "fn", "tn")]
+691:                          for row in counts], dtype=np.int64)
+692:     if values.shape != (len(domains), 4) or set(domains) != set("ABC") or np.any(values < 0):
+693:         raise ValueError("Invalid saved confusion counts/domain alignment")
+694:     return {"threshold": 0.0, "pooled": rates(values),
+695:             "by_domain": {d: rates(values[np.asarray(domains) == d]) for d in "ABC"},
+696:             "aggregation": "Sum confusion counts before computing rates; distinct from mean per-group metrics."}
+
+FILE reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_chinese_base.py
+680: def rates(counts: np.ndarray) -> dict:
+681:     tp, fp, fn, tn = np.asarray(counts, dtype=np.float64).sum(axis=0)
+682:     return {"tp": int(tp), "fp": int(fp), "fn": int(fn), "tn": int(tn),
+683:             "fpr": float(fp / (fp + tn)), "recall": float(tp / (tp + fn)),
+684:             "precision": float(tp / (tp + fp)) if tp + fp else 0.,
+685:             "f1": float(2 * tp / (2 * tp + fp + fn)) if 2 * tp + fp + fn else 0.}
+686: 
+687: 
+688: def fixed_classification(counts: list[dict], domains: list[str]) -> dict:
+689:     """Sum saved per-group confusion counts before calculating classification rates."""
+690:     values = np.asarray([[row[key] for key in ("tp", "fp", "fn", "tn")]
+691:                          for row in counts], dtype=np.int64)
+692:     if values.shape != (len(domains), 4) or set(domains) != set("ABC") or np.any(values < 0):
+693:         raise ValueError("Invalid saved confusion counts/domain alignment")
+694:     return {"threshold": 0.0, "pooled": rates(values),
+695:             "by_domain": {d: rates(values[np.asarray(domains) == d]) for d in "ABC"},
+696:             "aggregation": "Sum confusion counts before computing rates; distinct from mean per-group metrics."}
+
+FILE reports/seller_alias_continual/20261004/logit_low_result/source/scripts/step28_er_weight_evaluate.py
+81: def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
+82:     arrays, counts = {}, {}
+83:     for name in names:
+84:         records = collection["points"][name]
+85:         if set(records) != set(method.ROLES):
+86:             raise ValueError("Missing complete raw/stage-cal/first-cal metrics")
+87:         arrays[name] = {role: previous.read_matrix(root, rec["matrix"]) for role, rec in records.items()}
+88:         counts[name] = {role: previous.read_counts(root, rec["counts"]) for role, rec in records.items()}
+89:         for role in ("stage-cal", "first-cal"):
+90:             if not np.array_equal(arrays[name][role][:, previous.RANK_COLUMNS],
+91:                                   arrays[name]["raw"][:, previous.RANK_COLUMNS]):
+92:                 raise ValueError("Calibrated rank/curve metrics differ")
+93:     return arrays, counts
+94: 
+95: 
+96: def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None) -> bytes:
+97:     p = method.contract() if p is None else p
+98:     stream = io.StringIO(newline="")
+99:     writer = csv.writer(stream, lineterminator="\n")
+100:     writer.writerow(("order", "method", "history_weight", "stage", "source_point",
+101:                      "role", "actual_domain", "metric", "group_macro"))
+102:     rows = previous.domain_rows(domains)
+103:     for order in method.ORDERS:
+104:         for arm, weight in method.all_weights(p).items():
+105:             for stage in (1, 2, 3):
+106:                 point = (order + "_shared" if stage == 1 else
+107:                          f"{order}_{arm}_stage{stage}")
+108:                 source = new if arm in p["arms"] and stage > 1 else old
+109:                 for role in method.ROLES:
+110:                     for domain, indices in zip("ABC", rows, strict=True):
+111:                         for k, metric in enumerate(metrics.COLUMNS):
+112:                             writer.writerow((order, arm, weight,
+113:                                              stage, point, role, domain, metric,
+114:                                              repr(float(source[point][role][indices, k].mean()))))
+115:     return stream.getvalue().encode("utf-8")
+151:     # Preserve the exact small matrices/counts used, separately from new observations.
+152:     destination = root / "reference"
+153:     destination.mkdir(exist_ok=True)
+154:     reused_points = {}
+155:     for source_root, collection, point_names in reuse:
+156:         for name in point_names:
+157:             reused_points[name] = collection["points"][name]
+158:             for info in collection["points"][name].values():
+159:                 for rec in info.values():
+160:                     source = data.verify(source_root / rec["path"], rec)
+161:                     target = destination / rec["path"]
+162:                     target.parent.mkdir(parents=True, exist_ok=True)
+163:                     previous.write_once(target, source.read_bytes())
+164:     reused_count = len(reused_points) * len(method.ROLES)
+165:     previous.write_once(destination / "collected.json", data.json_bytes({
+166:         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
+167:         "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
+168:         **({"continuation_collected": {arm: spec["records"]["evaluation/collected.json"]
+169:                                        for arm, spec in p["continuation_references"].items()}}
+170:            if "continuation_references" in p else {}),
+171:         "group_ids": old["group_ids"], "domains": old["domains"],
+172:         "metric_columns": old["metric_columns"], "points": reused_points,
+173:         "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))
+174:     result = evaluate_matrices(new_arrays, old_arrays, collected["domains"], p)
+175:     absolute = {}
+176:     rows = previous.domain_rows(collected["domains"])
+177:     for arrays, counts in ((old_arrays, old_counts), (new_arrays, new_counts)):
+178:         for point, roles in arrays.items():
+179:             absolute[point] = {role: {
+180:                 "macro_all": dict(zip(metrics.COLUMNS, values.mean(0).tolist())),
+181:                 "macro_by_domain": {d: dict(zip(metrics.COLUMNS, values[r].mean(0).tolist()))
+182:                                     for d, r in zip("ABC", rows, strict=True)},
+183:                 "pooled_fixed_half_classification": method.base.fixed_classification(counts[point][role], collected["domains"])}
+184:                 for role, values in roles.items()}
+185:     buffer = io.BytesIO()
+186:     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
+187:     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
+188:     previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
+189:     result.update(status=f"COMPLETE_{method.evidence_tag(p)}_DEVELOPMENT_COMPARISON",
+190:                   source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
+191:                   collected=data.record(root / "collected.json", root),
+192:                   reused_collection=data.record(destination / "collected.json", root),
+193:                   new_metric_count_sets=p["metric_count_sets"], reused_metric_count_sets=reused_count,
+194:                   stage_metrics=data.record(root / "stage_metrics.csv", root),
+195:                   draws=data.record(root / "bootstrap_draws.npy", root), absolute_stage_results=absolute,
+196:                   scope="Fixed confirmed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
+197:                   next="Review full results; no further lambda or automatic training")
+198:     previous.write_once(root / "evaluation.json", data.json_bytes(result))
+
+FILE reports/seller_alias_continual/20261004/risk_result/source/scripts/step28_er_weight_evaluate.py
+85: def read_points(root: Path, collection: dict, names: list[str]) -> tuple[dict, dict]:
+86:     arrays, counts = {}, {}
+87:     for name in names:
+88:         records = collection["points"][name]
+89:         if set(records) != set(method.ROLES):
+90:             raise ValueError("Missing complete raw/stage-cal/first-cal metrics")
+91:         arrays[name] = {role: previous.read_matrix(root, rec["matrix"]) for role, rec in records.items()}
+92:         counts[name] = {role: previous.read_counts(root, rec["counts"]) for role, rec in records.items()}
+93:         for role in ("stage-cal", "first-cal"):
+94:             if not np.array_equal(arrays[name][role][:, previous.RANK_COLUMNS],
+95:                                   arrays[name]["raw"][:, previous.RANK_COLUMNS]):
+96:                 raise ValueError("Calibrated rank/curve metrics differ")
+97:     return arrays, counts
+98: 
+99: 
+100: def stage_table(new: dict, old: dict, domains: list[str], p: dict | None = None) -> bytes:
+101:     p = method.contract() if p is None else p
+102:     stream = io.StringIO(newline="")
+103:     writer = csv.writer(stream, lineterminator="\n")
+104:     writer.writerow(("order", "method", "history_weight", "stage", "source_point",
+105:                      "role", "actual_domain", "metric", "group_macro"))
+106:     rows = previous.domain_rows(domains)
+107:     for order in method.ORDERS:
+108:         for arm, weight in method.all_weights(p).items():
+109:             for stage in (1, 2, 3):
+110:                 point = (order + "_shared" if stage == 1 else
+111:                          f"{order}_{arm}_stage{stage}")
+112:                 source = new if arm in p["arms"] and stage > 1 else old
+113:                 for role in method.ROLES:
+114:                     for domain, indices in zip("ABC", rows, strict=True):
+115:                         for k, metric in enumerate(metrics.COLUMNS):
+116:                             writer.writerow((order, arm, weight,
+117:                                              stage, point, role, domain, metric,
+118:                                              repr(float(source[point][role][indices, k].mean()))))
+119:     return stream.getvalue().encode("utf-8")
+158:     # Preserve the exact small matrices/counts used, separately from new observations.
+159:     destination = root / "reference"
+160:     destination.mkdir(exist_ok=True)
+161:     reused_points = {}
+162:     for source_root, collection, point_names in reuse:
+163:         for name in point_names:
+164:             reused_points[name] = collection["points"][name]
+165:             for info in collection["points"][name].values():
+166:                 for rec in info.values():
+167:                     source = data.verify(source_root / rec["path"], rec)
+168:                     target = destination / rec["path"]
+169:                     target.parent.mkdir(parents=True, exist_ok=True)
+170:                     previous.write_once(target, source.read_bytes())
+171:     reused_count = len(reused_points) * len(method.ROLES)
+172:     previous.write_once(destination / "collected.json", data.json_bytes({
+173:         "original_collected": p["baseline"]["records"]["evaluation/collected.json"],
+174:         "weight_collected": p.get("weight_reference", {}).get("records", {}).get("evaluation/collected.json"),
+175:         **({"continuation_collected": {arm: spec["records"]["evaluation/collected.json"]
+176:                                        for arm, spec in p["continuation_references"].items()}}
+177:            if "continuation_references" in p else {}),
+178:         "group_ids": old["group_ids"], "domains": old["domains"],
+179:         "metric_columns": old["metric_columns"], "points": reused_points,
+180:         "status": f"REUSED_{reused_count}_FROZEN_METRIC_COUNT_SETS"}))
+181:     result = evaluate_matrices(new_arrays, old_arrays, collected["domains"], p)
+182:     absolute = {}
+183:     rows = previous.domain_rows(collected["domains"])
+184:     for arrays, counts in ((old_arrays, old_counts), (new_arrays, new_counts)):
+185:         for point, roles in arrays.items():
+186:             absolute[point] = {role: {
+187:                 "macro_all": dict(zip(metrics.COLUMNS, values.mean(0).tolist())),
+188:                 "macro_by_domain": {d: dict(zip(metrics.COLUMNS, values[r].mean(0).tolist()))
+189:                                     for d, r in zip("ABC", rows, strict=True)},
+190:                 "pooled_fixed_half_classification": method.base.fixed_classification(counts[point][role], collected["domains"])}
+191:                 for role, values in roles.items()}
+192:     buffer = io.BytesIO()
+193:     np.save(buffer, previous.bootstrap_draws(), allow_pickle=False)
+194:     previous.write_once(root / "bootstrap_draws.npy", buffer.getvalue())
+195:     previous.write_once(root / "stage_metrics.csv", stage_table(new_arrays, old_arrays, collected["domains"], p))
+196:     result.update(status=f"COMPLETE_{method.evidence_tag(p)}_DEVELOPMENT_COMPARISON",
+197:                   source_files=collected["source_files"], policy_sha256=method.policy_sha256(p),
+198:                   collected=data.record(root / "collected.json", root),
+199:                   reused_collection=data.record(destination / "collected.json", root),
+200:                   new_metric_count_sets=p["metric_count_sets"], reused_metric_count_sets=reused_count,
+201:                   stage_metrics=data.record(root / "stage_metrics.csv", root),
+202:                   draws=data.record(root / "bootstrap_draws.npy", root), absolute_stage_results=absolute,
+203:                   scope="Fixed confirmed candidates on developed valid, conditional paired intervals; no independent test or new-method qualification",
+204:                   next="Review full results; no further lambda or automatic training")
+205:     previous.write_once(root / "evaluation.json", data.json_bytes(result))

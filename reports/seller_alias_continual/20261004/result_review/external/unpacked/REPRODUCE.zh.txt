@@ -1,0 +1,97 @@
+# 本次外审证据重放说明
+
+本次独立计算已在网页执行环境实际完成，全部实际argv、输入SHA、stdout/stderr和退出码均已保留。下面是供核查者使用的复现入口，不要求用户另行执行来完成本次审查。
+
+## 1. 证据包结构
+
+- original/review.zip：收到的review(5).zip原始字节，未重新打包，SHA-256仍为0d5e45250361558d6b2d66bca8815103e6f0657eeab9fb9d63a4bbbec50c5053，9,639,622字节、729成员。
+- external_review.zh.txt：本次完整中文外审报告。
+- external_verdict.json：统一机器裁决，运行有效性、局部结果、原23项和未验证边界分开表示。
+- review_evidence/provenance/：完整性、冻结来源、对照身份、实际路径映射、差异。
+- review_evidence/logit_path/：LOGIT冻结实际调用、UID日程、保存目标/更新、恢复和记忆证据。
+- review_evidence/risk_path/：risk实际调用、UID日程、来源参考、盲门、预先绑定及监听证据。
+- review_evidence/statistics/：独立直接索引bootstrap、频数法交叉、七端点22指标、161项判断、分布与索引。
+- review_evidence/counts/：独立整数工作点、仿射/并列、阶段CSV、条件NLL核验。
+- review_evidence/diagnostics/：预定诊断及目标分解独立汇总。
+- review_evidence/integration/：文稿组装代码、输入身份及实际输出日志；它只组装报告。
+- MANIFEST.json：列出本证据ZIP内除清单本身以外每个文件的路径、大小和SHA-256；清单不自哈希。
+
+原附件使用的Windows仓库相对结构仍保存在original/review.zip内，解包后原样恢复。主报告的S1–S10指原附件内来源，R1–R6指本次review_evidence内新证据。
+
+## 2. 实际环境与边界
+
+本网页Python为3.12.14，NumPy为2.3.5；数值参考使用允许的CPU0，BLAS/OMP/MKL等单线程。原Linux正式训练为Python3.10.19/Torch2.9.1+cu130/RTX5090，两者不是同一原生环境。
+
+这些独立脚本只读取附件中的保存矩阵、盲分数、计数、源码文本及小型执行记录，不导入原训练/评价/audit模块或Torch，不加载模型、真实缓存或正式真值，不连接服务器。AP/MAP的标签级重算未进行。校准NLL恒等式以原保存NLL为条件。
+
+这里选择网页可用CPU，不使用原服务器CPU46/47。输入解包目录保持不变，所有输出使用新的独立目录，保留先前运行。原输入中的正式训练execute/run入口不属于这些复现命令。
+
+## 3. 可移植复现命令
+
+在证据ZIP解包根执行。先核对原ZIP，然后恢复输入：
+
+```bash
+python - <<'PY'
+from pathlib import Path
+import hashlib, zipfile
+p = Path('original/review.zip')
+assert p.stat().st_size == 9639622
+assert hashlib.sha256(p.read_bytes()).hexdigest() == '0d5e45250361558d6b2d66bca8815103e6f0657eeab9fb9d63a4bbbec50c5053'
+destination = Path('input_review')
+if destination.exists():
+    raise SystemExit('请使用新的目录，保留已有输入与输出。')
+with zipfile.ZipFile(p) as z:
+    assert len(z.infolist()) == 729 and z.testzip() is None
+    z.extractall(destination)
+PY
+```
+
+选定本环境允许的一个CPU并限制线程；这些变量不改变输入或成功线：
+
+```bash
+review_cpu="$(python -c 'import os; print(min(os.sched_getaffinity(0)))')"
+export OPENBLAS_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export CUDA_VISIBLE_DEVICES=""
+```
+
+以下命令按依赖独立，均为保存结果核查。各脚本输出目录应不存在；重放时不要覆盖review_evidence中本次实际证据。
+
+```bash
+taskset -c "$review_cpu" python review_evidence/provenance/independent_provenance_v1.py \
+  --root input_review --output replay/provenance
+
+taskset -c "$review_cpu" python review_evidence/logit_path/independent_logit_path_v1.py \
+  --root input_review --output replay/logit_path
+
+taskset -c "$review_cpu" python review_evidence/risk_path/risk_path_reference_v1.py \
+  --root input_review --output replay/risk_path
+
+taskset -c "$review_cpu" python review_evidence/risk_path/risk_binding_reference_v1.py \
+  --root input_review --output replay/risk_binding
+
+taskset -c "$review_cpu" python review_evidence/statistics/independent_saved_matrix_reference_v1.py \
+  --root input_review --output replay/statistics --cpu "$review_cpu"
+
+taskset -c "$review_cpu" python review_evidence/counts/independent_counts_v1.py \
+  --input-root input_review --output-dir replay/counts
+
+mkdir -p replay/diagnostics
+taskset -c "$review_cpu" python review_evidence/diagnostics/independent_diagnostics.py \
+  --input-root input_review --output-json replay/diagnostics/results.json
+```
+
+这里没有重新运行包内Linux本方audit。若选择重放本方audit，必须自行按请求重定位其source-root、job、baseline和inventory路径；不能使用risk后继source代替LOGIT source。上述新独立脚本直接访问原相对目录，不需要在源树增设符号链接。
+
+## 4. 预期结果与解释
+
+- 七组原23项：23、23、20、4、5、7、4，与机器判定的对应比较一致。
+- LOGIT−SEQ三个未过项为N AP、Z MAP、Z AP，区间均跨零。
+- risk−LOGIT0.1的O/N/Z MAP区间均为负；risk−ER0.1的O跨零、N/Z为负。
+- 两作业各18新矩阵，分别63/81复用；合计180矩阵路径，均60×22。
+- 计数和仿射核验通过；由保存整数重建的工作点不能替代标签级真实性认证。
+- 原生模型/缓存缺席，是明确边界，不通过再次执行这些脚本消除。
+
+全部新数值参考首次通过。counts另保留首次成功运行与固定CPU0后的成功运行。统计/来源的只读路径探索错误及修正记录另存，不冒充项目失败；没有覆盖原失败或制造历史日志。原附件中的已有失败/修正原件保持原样。
