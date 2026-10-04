@@ -1,0 +1,95 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta.py:35: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  or encoder.get_sentence_embedding_dimension() != spec["embedding_dim"]):
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged_check.py", line 67, in main
+    result['evidence'] = previous.native(False, check, update_function=update)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_gpu_check.py", line 140, in native
+    record = (update_function or method.update)(
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged_check.py", line 49, in update
+    return implementation.update(*args, progress=progress)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_jvp.py", line 33, in update
+    return staged.update(*args, **kwargs, hessian_product=hvp)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 177, in update
+    gradients, terms = gradient(model, episode, config, settings, seeds, check, progress, hessian_product)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 162, in gradient
+    gradients, diagnostics = staged_gradient(parameters, support, query, rates,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 81, in staged_gradient
+    else hessian_product(i, parameters, tuple(vector)))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 155, in transformed_hvp
+    correction = hessian_product(lambda p: scalar_loss(p, role)[0], params, vector)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_jvp.py", line 18, in hvp
+    product = torch.func.jvp(torch.func.grad(loss), (values,), (direction,))[1]
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/eager_transforms.py", line 1042, in jvp
+    return _jvp_with_argnums(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/eager_transforms.py", line 1101, in _jvp_with_argnums
+    result_duals = func(*duals)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/apis.py", line 406, in wrapper
+    return eager_transforms.grad_impl(func, argnums, has_aux, args, kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/eager_transforms.py", line 1406, in grad_impl
+    results = grad_and_value_impl(func, argnums, has_aux, args, kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/vmap.py", line 47, in fn
+    return f(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/eager_transforms.py", line 1364, in grad_and_value_impl
+    output = func(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 155, in <lambda>
+    correction = hessian_product(lambda p: scalar_loss(p, role)[0], params, vector)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta_staged.py", line 126, in scalar_loss
+    values = torch.func.functional_call(scorer, (params, buffers), (groups[role],), strict=True)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_functorch/functional_call.py", line 153, in functional_call
+    return nn.utils.stateless._functional_call(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/utils/stateless.py", line 282, in _functional_call
+    return module(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_group_meta.py", line 120, in forward
+    return base.logits(self.model, group, self.config, "split_rank", self.check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_chinese_base.py", line 220, in logits
+    return model.pair_logits(account_vectors(model, group, c, arm, check))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_jvp/workspace/scripts/step28_chinese_base.py", line 214, in account_vectors
+    vectors.append(model.encoder(batch)["sentence_embedding"].float())
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/sentence_transformers/base/model.py", line 511, in forward
+    input = module(input, **module_kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/sentence_transformers/base/modules/transformer.py", line 1096, in forward
+    model_output = model_method(**filtered_kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
+    encoder_outputs = self.encoder(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 695, in forward
+    layer_outputs = layer_module(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 627, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 248, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 639, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 539, in forward
+    hidden_states = self.dense(hidden_states)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 42.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 2.68 GiB is free. Including non-PyTorch memory, this process has 28.62 GiB memory in use. 28.00 GiB allowed; Of the allocated memory 26.39 GiB is allocated by PyTorch, and 1.60 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
