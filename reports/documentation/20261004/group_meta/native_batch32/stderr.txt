@@ -1,0 +1,43 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta.py:35: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  or encoder.get_sentence_embedding_dimension() != spec["embedding_dim"]):
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta_check.py", line 120, in main
+    result["native"] = native(check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta_check.py", line 86, in native
+    result = method.update(model, optimizer, episode, c, settings, 2, 1, (81, 82, 83, 84), check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta.py", line 188, in update
+    loss, terms, _ = objective(model, episode, config, settings, seeds, check)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta_check.py", line 62, in build
+    fast_probes = (fast["model.encoder.0.auto_model.encoder.layer.0.attention.self.query.weight"],
+KeyError: 'model.encoder.0.auto_model.encoder.layer.0.attention.self.query.weight'
+
+Command exited with non-zero status 1
+	Command being timed: "timeout --kill-after=20 6900 taskset -c 47 /home/yongpeng/miniconda3/envs/py310/bin/python -u scripts/step28_group_meta_check.py --output evidence/native_batch32/result.json --native-only"
+	User time (seconds): 109.41
+	System time (seconds): 18.19
+	Percent of CPU this job got: 97%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:10.86
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 34162588
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 344
+	Minor (reclaiming a frame) page faults: 15722181
+	Voluntary context switches: 5699
+	Involuntary context switches: 4720
+	Swaps: 0
+	File system inputs: 226384
+	File system outputs: 56
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

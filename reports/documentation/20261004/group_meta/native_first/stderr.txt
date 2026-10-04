@@ -1,0 +1,35 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta_check.py", line 116, in main
+    result["native"] = native(check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta/workspace/scripts/step28_group_meta_check.py", line 28, in native
+    transformer.set_attn_implementation("eager")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1964, in __getattr__
+    raise AttributeError(
+AttributeError: 'BertModel' object has no attribute 'set_attn_implementation'
+
+Command exited with non-zero status 1
+	Command being timed: "timeout --kill-after=20 7140 taskset -c 47 /home/yongpeng/miniconda3/envs/py310/bin/python -u scripts/step28_group_meta_check.py --output evidence/native_first/result.json --native-only"
+	User time (seconds): 3.27
+	System time (seconds): 0.86
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:04.15
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2125908
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 521349
+	Voluntary context switches: 8
+	Involuntary context switches: 63
+	Swaps: 0
+	File system inputs: 256
+	File system outputs: 32
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1
