@@ -1,0 +1,465 @@
+# 完整群隔离元更新：独立科研实现、合理性与创新边界外审
+
+审查日期：2026-10-04（UTC；各次运行的精确时刻见日志）
+审查对象：本会话附件 review(6).zip
+交付性质：已完成的独立实现与证据审查；不是正式训练结果审查或 GPU 准入批准。
+
+## 一、裁决先行
+
+我的结论是：本候选仍然针对“学习新群体，同时保持旧分布未见卖家的候选排序与基础识别”，作为机制尝试有合理性。当前正 beta、显式正内层率的生产路径，没有查出内层 detach、query 偷用原参数、只训练 head、临时 Adam 污染，或元损失仅记录却未参与更新的实质错误。源码与包内原生证据支持：一次完整二阶元更新确实在指定 CPU 配置下执行。
+
+但本轮不宜出具“没有任何缺陷的无保留通过”：确实存在一个 beta=0 阶段群呈现计数错误和一处原生梯度范数摘要误抄，另有若干具体的测试覆盖盲区。两项窄修正已提供补丁，且没有改写上传原件。计数补丁只以 Python 控制表达式与 AST 差异验证，不冒充修后 PyTorch/BGE 运行。
+
+科学定位应为：**已知元泛化结构在完整群、有限历史和 LOGIT 基础目标上的合理适配；效果未验证，方法创新目前不足。** MLDG 已有同型目标，MER 已有梯度对齐与重放，La-MAML 已有持续学习内外层更新。完整二阶实现正确，不能自动成为算法创新。
+
+| 判断维度 | 本轮结论 | 不能扩大为 |
+|---|---|---|
+| 主研究问题 | 未偏离；新旧群都进入真实目标 | 同控者跨阶段新增别名跟踪 |
+| 正 beta 数学与更新路径 | 源码语义及已提供原生记录支持 | 所有参数逐项独立认证 |
+| CPU 手写执行 | 一次成功元更新有证据，失败亦保留 | 真实首域 288 步、阶段 288 步或 GPU 已就绪 |
+| 当前交付缺陷 | 一处计数、一处文案；具体证据盲区需收窄表述或补测 | 算法目标整体错误、必须重跑旧实验 |
+| 未见卖家收益 | 本轮没有正式效果证据 | MAP、Recall@K、FPR 已改善或保证不退化 |
+| 创新 | 与直接近邻高度重合，非平凡差异尚未建立 | 新原创元学习算法已经成立 |
+
+本轮独立外审本身已经完成。后文所说“待修正”指执行者处置发现项，不表示本审查仍等待补做正式实验。
+
+### 模型身份及工作范围
+
+用户说明当前网页选择为“6 Pro”。我无法从本会话读取选择器的独立现场截图，也没有可核验的后台服务身份。本会话配置将我标识为 GPT-6 Astra Pro；这是配置标签，不是后台型号认证。不能把用户界面名称、配置自述和独立认证混为一谈。
+
+本次实际使用并行分项审查，主审重新阅读关键生产源码、检查器与原始数值，并打开原始论文核对。分项数量不是证据强度。当前执行环境有 Python 3.12.14、NumPy，没有 PyTorch、Transformers、SentenceTransformers。本次没有安装这些依赖，没有加载 BGE，没有运行上传的 PyTorch 测试套件，没有连接用户 Linux 服务器，没有正式文本/标签/旧实验模型访问，也没有 GPU 或新方法效果比较。
+
+实际新执行的内容包括：ZIP 与来源校验；标准库/NumPy 的独立解析与有限差分；精确提取原源码中可脱离 Torch 的验证、日程、记忆、stage 控制流；源码局部变异；原始日志复算；最小修正表达式验证。每类范围分别记录，不以 NumPy 或 spy 冒充神经网络。
+
+## 二、附件身份、来源链与复用边界
+
+### 2.1 实际收到的文件
+
+| 项目 | 实测 |
+|---|---|
+| 名称 | review(6).zip |
+| 大小 | 286,285 字节 |
+| 成员 | 103 个，均为文件 |
+| 解压载荷总字节 | 734,165 |
+| SHA-256 | 07cf8dfe944ad120922af6064d60a5037953e6c06ab170c56f6d8846e50895d6 |
+| CRC | 全部通过 |
+| 重复路径/越界路径/符号链接 | 未发现 |
+
+本次请求没有给出预先期望的附件散列，以上是收到文件的实测身份，不称为与一个未提供外部基准的匹配认证。独立脚本及输出见 evidence/scripts/00_verify_archive.py、evidence/outputs/00_archive/、evidence/inputs/archive_inventory.json。
+
+review_manifest.json 的 102 份载荷逐项大小与 SHA 全部匹配；清单不自哈希。linux_inventory.json 的 source 20 项和 evidence 70 项也均与所附字节匹配。这些结论只证明包内来源一致性，下面的计算语义、失败路径和数值核对才用于判断实现。
+
+### 2.2 首次与最终清单不能混用
+
+首次 source_inventory.json 对最终版本有 16 项相同、4 项改变。三份首次程序/测试源码可在 tests_first、native_first 等原件中找到精确字节；首次 5,969 字节合同只附散列，没有旧正文。最终合同为 7,076 字节，最终代码、检查器与成功原生记录的对应版本匹配。
+
+linux_inventory.root_documents 另列的 docs/AI_RESEARCH_HANDOFF.zh.md、docs/RESEARCH_DISCUSSION.zh.md 没有随包；现版合同及 implementation 两项有正文且匹配。我未声称逐字审读这两个缺席文件，也不能从散列恢复旧合同文字。它们不是这次实际计算的直接执行依赖；结合本次明确用户请求，不构成否定最终实现的理由。若未来要逐字恢复最早约定的历史变化，可另补旧正文；无需为本轮扩大到全部历史文档。
+
+完整核验与修复 diff：evidence/agent_native/analysis_v2/audit.json、source_ledger.json、version_changes.diff。
+
+### 2.3 已关闭部分的承接
+
+全文承接了上传的 LOGIT0.1 原实现外审、risk 原实现外审、联合结果说明和最新结果主审。原输入表示、基础排序监督、Algorithm R、保存 logit 的来源阶段与不刷新规则、已关闭的基础保存和评价机制，按未改变范围复用。本次重新核对新增 wrapper/functional_call、内外层图、四群路由、设置、随机流与真实单次更新。
+
+旧结果仅作为问题背景：LOGIT0.1 保留较强开发基线地位，risk 保留有效固定点负结果；不能据此认定“过拟合是唯一原因”。最新结果主审说明了固定阈值下 risk 更保守但漏报更多、模式探针与梯度探针通常不同群、三个顺序不是三个训练种子。旧待上传/待外审字样是历史快照，本次用户请求与后续主审已覆盖相应状态，不重新索取同一附件许可。
+
+来源位置：docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md:7–13、106–126；reports/seller_alias_continual/20261004/result_review/report.zh.md:7–19、29–44。复用矩阵见 evidence/agent_prior_scope/READING_REPORT.zh.md。没有重新加载旧指标真值或重算既有结果 bootstrap。
+
+## 三、完整群隔离能回答什么
+
+### 3.1 机制与研究问题仍然相符
+
+本候选用当前群 Cs 和历史存活群 Hs 构成内层目标，对其梯度做显式 SGD 前瞻，再在另一当前群 Cq 和另一历史群 Hq 上评价。这样，某个更新若只改善当步支持群，却损害另两个训练群的任务损失，外层就能产生修正信号。当前学习并未被删除：当前群同时出现在 Ls、Lq；基础识别也未被只排序目标取代：Lbase 继续包含 BCE。
+
+把账号的全部商品文本和群内 27 候选保在一起是有实质意义的训练单位选择。它保留完整候选竞争，避免仅把同一账号/商品分到两边后，将关系拆分误称为新身份泛化。生产前向只取标题、描述，UID 用于路由和校验，不进入文本表示。
+
+但它只是对“更新迁移到其他训练群”的诱导偏好。若六个历史群足够代表要保持的旧分布，且群间共有可迁移的文本关系，可能帮助未见卖家；这里的“可能”是可检验假设，不是本轮观察结果。
+
+### 3.2 四群隔离不等于独立未见卖家
+
+有三个层级必须区分：
+
+1. 同一步的 Cs/Hs/Cq/Hq 互不重用身份。
+2. query 群在别的步骤仍参与 support 或 query 优化；它们都是训练数据。
+3. 最终评价中的旧分布留出卖家不参加任何本轮训练，其指标才回答所需能力保持。
+
+当前 Cq 是该轮排列中下一位，通常就是下一步的 Cs；每当前群每阶段 support/query 各六次。历史 Hq 从六群中重复抽取，下一步也可能变成 Hs。外层反向直接训练 theta，不能把“meta-query”改名为真正的 validation/test。即使四群 UID 不同，合成模板、生成因素或经营措辞仍可能共享；身份互斥不认证语义独立。
+
+以下条件可使机制失效：有限记忆遗漏重要旧模式；某旧域完全没有存活群；缓存 query 自身反复过拟合；不同群共享合成捷径；历史保存 logits 带有偏差；新旧损失冲突；rho/beta 改变监督重心；虚拟步过大跨越局部分支；train/eval 随机差异；真实 AdamW 方向与虚拟 SGD 不同。既有 risk 负结果并没有在这些解释间完成因果识别。
+
+### 3.3 代理目标与应用指标之间仍有距离
+
+Lbase 的 BCE、query-rank、Top5-hard 与任务有关，但不保证 MAP、MRR、Recall@K 或给定阈值的 FPR/Recall 单调改善。对 J 的梯度下降，也不保证其每个组成项下降；query 在 theta' 变好，更不保证真实 AdamW 一步后变好。
+
+“27 候选中含有正例”的群内排序，也不能直接外推到任意规模候选库、没有正例的查询、真实市场或自动确认同控。当前训练内隔离有理由尝试，真实旧未见卖家能力仍需未来合法、预先界定的评价。不得把已反复开发的 valid 重新包装成独立最终留出；若某 test 已有开发使用历史，也不能重新包装。这是评价原则，并非本报告断言本项目已访问 test。
+
+## 四、精确数学目标与直接近邻
+
+### 4.1 实际目标
+
+定义 B(G;theta)=BCE+query-rank+0.5*known-Top5-hard，D(Hs;theta)=mean((z(Hs;theta)-saved_target(Hs))²)。本轮为：
+
+Ls(theta)=B(Cs;theta)+0.1 B(Hs;theta)+0.5 D(Hs;theta)
+theta'=theta-A grad Ls(theta)
+Lq(theta')=B(Cq;theta')+rho B(Hq;theta')
+J(theta)=Ls(theta)+beta Lq(theta')
+
+Ls 中的 0.1 乘完整历史基础监督，0.5 MSE 独立相加，没有再乘 0.1。Lq 没有额外的保存 logit MSE；不能把它误述为“对另外两个群再做一次完整 LOGIT”。A 是固定的编码器/头分块对角学习率，不是可训练元参数，也不含 Adam 的状态、裁剪和衰减。
+
+令 gs=grad Ls(theta)，Hs=Hessian Ls(theta)，gq'=grad_{theta'} Lq(theta')。在固定 Top5 集合、ReLU 及绝对值活动分支的局部：
+
+D_theta theta'=I-A Hs
+grad_theta J=gs+beta (I-Hs A)gq'
+
+第二式来自第一式雅可比的转置。Hs 与 A 通常不交换；把 Hs A 写成 A Hs 是可检出的错误。实现不需显式存一个密集 Hessian，自动微分可计算相应 Hessian-vector product。
+
+### 4.2 一阶展开是解释，不是 detach 许可
+
+小虚拟步下：
+
+J ≈ Ls+beta Lq-beta (grad Lq)^T A grad Ls。
+
+这个损失层面的 Taylor 展开已经包含已知的梯度对齐结构。若进一步对展开目标求导，仍会出现 Hq A gs 和 Hs A gq。detach 内层梯度只是保留相同快参数数值、删除一条链式导数，并不等价于忠实求导这个展开目标。
+
+若以 cs、hs、ds 表示当前基础、历史基础、MSE 梯度，对齐项为：
+
+-beta (cq+rho hq)^T A (cs+0.1 hs+0.5 ds)。
+
+它同时涉及当前群之间、历史群之间、新旧交叉和保存输出到 query 的作用，不是一个只保护历史、不改变当前学习重心的单一项。
+
+### 4.3 与近邻的对应
+
+| 近邻 | 已有结构 | 本候选与它的关系 |
+|---|---|---|
+| MLDG，AAAI 2018 | 原文 Eq.(3)/Algorithm 1 为 F(theta)+beta G(theta-alpha grad F)；Eq.(7) 已展开梯度内积 | 令 F=Ls、G=Lq，并以固定分块 A 替换标量 alpha，即为同型元目标。原 MLDG 按源域拆分，本轮按当前/历史完整群拆分；损失、记忆及外层 AdamW 不同。目标骨架不是新提出的。 |
+| MER，ICLR 2019 | Eq.(4) 已用损失和减去梯度内积；Algorithm 1 将 reservoir replay 与序列 SGD、批内/批间 Reptile 插值结合 | 有直接思想重叠，但 MER 的实际更新不是本轮一次显式 J 的完整二阶梯度加一次 AdamW。不能说两者逐步严格等价。 |
+| C-MAML/La-MAML，NeurIPS 2020 | 当前流做内层，当前加历史的 meta-batch 做外层；La-MAML 进一步学习逐参数率，并先更新率，再用非负率调制慢更新 | 本轮 A 固定，内层另含历史监督和 LOGIT，外层另取互斥完整群，目标显式加 Ls，实际外层为 AdamW；不是完整 La-MAML 复现，也不足以证明新的元学习原理。 |
+
+上述算法事实分别来自原论文 [W1] PDF pp.3–4、[W2] pp.3–5、[W3] pp.3–5。另核对 MLDG 作者 model.py 的 ModelMLDG.train 与 ops.py 的快参数路径：[W4–W5] 保留 create_graph，并已有明确停梯度分支。这也说明“真的算了二阶”是实现已知目标的技术要求。
+
+我的创新裁决是：整群作为隔离单位、完整候选排序和 LOGIT 组合都是合理适配，但当前没有足够材料把它们提升为非平凡方法贡献。仍可研究其任务条件、有效/失效边界和经验规律；若论文主张原创算法，目前应停止该主张，不能以“中文、合成、群、二阶、按字节记忆”替代新机制证据。该裁决不要求停止本轮已授权的手写实现。
+
+## 五、从 actual 入口追踪到一次真实更新
+
+以下源码位置均以证据 ZIP 的 source/ 为根。
+
+| 环节 | 位置 | 独立判断 |
+|---|---|---|
+| 原生入口 | scripts/step28_group_meta_check.py:84–86 | 包装生产 objective/clip 获取探针，实际调用 method.update；没有用 spy 替代原生模型更新。 |
+| 四群与参考验证 | scripts/step28_group_meta.py:69–86 | 验证完整监督、群/账号/商品跨群不交叉；reference 必须为 Hs UID、378项 float32 有限值。 |
+| 全部注册参数 | 同文件138–144 | GroupScorer 注册原 model，取完整 named_parameters，拒绝冻结参数；编码器前缀使用编码器内层率，其余为头率。 |
+| 文本链 | step28_chinese_base.py:134–162、194–220；step28_continual_population.py:14–27 | 只将标题/描述交 tokenizer，经 encoder、分通道统计池化、对称关系头产生378个logit；不是在快参数之外另用原模型前向。 |
+| 函数式前向 | step28_group_meta.py:149–159 | 每角色显式把 params 和复制的 buffers 交给 strict functional_call；truth 来自对应 groups[role].labels。 |
+| 支持损失 | 同文件161–167 | Cs 与 Hs 的基础目标、固定目标 MSE 按正确系数相加；保存目标不带梯度。 |
+| 内层图 | 同文件103–109 | autograd.grad(create_graph=True)，fast=theta-rate*grad；无 detach 内层和临时 optimizer。 |
+| 查询损失 | 同文件110、169–175 | query(fast)；用角色2/3并实际使用 rho；总目标实际使用 beta。 |
+| 真反向和优化 | 同文件180–205 | model.train、zero_grad、J.backward；encoder/head 有有限非零合成梯度后，一次clip，再一次optimizer.step；前后核对Adam计数。 |
+
+实际优化器由 step28_continual_population.py:32–40 构造为编码器/头两组 AdamW。内层没有动量更新、临时 optimizer.step 或写原参数；外层编码器按父 stage_lr 变化，头为 0.001。第288步编码器外层率为0是继承日程，不能由“完整图”推断每一步每个参数都必须改变。
+
+关于 allow_unused=True：结构上未被本次损失使用的登记参数可以保持原 fast 值。这不同于人为冻结编码器，但也意味着“全部参数都进入字典”不等于“每个登记参数都已经被逐项证明获得有效梯度”。本轮没有作后一种宣称。
+
+### 5.1 合法 detach 与错误 detach 必须区别
+
+step28_alias_ranking.py:106–107 对离散 Top5 索引选择使用 scores.detach；121–128 仍从活的 scores 取值计算 softplus。这是固定选择分支上的梯度，不是截断元学习内层。buffers 的 detach/clone 和保存 NumPy 目标变为常量，也不截断可训练参数。对称头还有 abs 在0处的分段边界，合同提到的 Top5/ReLU 局部说明可顺带补充 abs；这不是实现阻断。
+
+### 5.2 模式与随机流
+
+objective 为四个角色使用独立固定 seed，在 fork_rng 中前向，保护调用者相应随机状态。microbatch 改变会改变 dropout 随机消费分组，不保证逐位等价。原生 target 在 eval 下生成，update 把学生设为 train；它继承 train/eval 差异，不应解释成纯确定性输出保持。
+
+当前 loader 明确选择 eager，拒绝配置中的 bf16/checkpoint；objective 也拒绝实际开启 checkpoint 的模块。无 checkpoint 避免函数式替换退出后的重计算错用原参数这一风险。当前记录的 float32 是执行配置及路径结论，precision 字段本身是写入的字符串，没有全参数 dtype 逐项统计；不能把它当成独立全参数认证。
+
+## 六、本次真实运行的独立数学与变异检查
+
+### 6.1 标量反例：精确梯度推导
+
+取 theta=0.3、alpha=0.2、beta=0.7，Ls=0.5(theta-1)^2，Lq=0.5(theta+1)^2。
+
+gs=-0.7；theta'=0.3-0.2*(-0.7)=0.44；dtheta'/dtheta=0.8。
+
+精确梯度为：
+grad J=-0.7+0.7*0.8*(0.44+1)=0.1064。
+
+支持损失从0.245降到0.1568；查询损失从0.845升到1.0368。支持群改善并不保证另一个群改善。支持梯度为负，而完整元梯度为正，真实梯度下降倾向在这个例子里反转。
+
+| 计算 | 梯度 |
+|---|---:|
+| 精确解析 | 0.10639999999999994 |
+| 独立中心差分 | 0.10639999997730243 |
+| detach 内层梯度 | 0.30800000000000005 |
+| query 使用原 theta | 0.20999999999999996 |
+
+源代码、输入与输出：evidence/scripts/10_independent_math.py；evidence/inputs/math_fixture_description.json；evidence/outputs/10_math/。该检查独立于上传 PyTorch helper，验证数学，不声称在当前环境执行了其自动微分。
+
+### 6.2 保留任务形状的非线性 NumPy 参考
+
+另外手写了四群、每群28账号/378无向边/27候选/20正边的评分参考。每条边采用三个参数的非线性二次评分；四群使用不同的合法同控团划分、不同且逐边变化的 float32 保存目标。独立实现 BCE、query-rank、已知 Top5-hard 的值、梯度和 Hessian，再合成 Ls、快参数和 J。
+
+这里的三个参数是用于数学核验的评分参数，不是三参数 BGE，不是原始文本链，也不是正式模型效果。全部确定输入保存在 nonlinear_28_account_fixture.npz，可由同目录代码重建。
+
+在 rho=0.61、beta=0.43、内层率(0.031,0.067,0.113)下：
+
+J=8.179146333510483
+精确梯度=(0.17615662794077916, -0.25981298111211876, 0.16146042302021307)
+中心差分最大绝对差=9.926809374505297e-11
+||Hs A-A Hs||=0.00810501274815863
+
+各基础损失梯度与 Hessian 的独立差分也符合；所用微扰没有跨越 Top5 选择边界。非交换例子使错误的矩阵次序不能在一维中隐藏。
+
+### 6.3 九种实际运行的数学变体
+
+| 变体 | 与精确梯度的差范数 |
+|---|---:|
+| detach 内层 | 0.0044073770 |
+| query 用原 theta | 0.0131560557 |
+| Hessian乘法次序写反 | 0.0003582317 |
+| rho 错固定为0.3 | 0.0387825091 |
+| beta 错固定为0.7 | 0.0384379284 |
+| Hs误用另一群保存目标 | 0.0099214975 |
+| Hq前向实际使用Hs | 0.0740943065 |
+| query标签取自错误群 | 0.2984279022 |
+| 内层只适配最后一个参数分块 | 0.0074498521 |
+
+这些变体都有有限损失和非零梯度；detach 和错矩阵次序甚至保持相同 J 数值。它们说明“损失有限、梯度非零、日志出现元变量”不是充分检查。
+
+这些是本次 NumPy 参考上实际执行的变体，**不是对上传 PyTorch/BGE 整套程序实际实施的九次变异测试**。后者没有运行，报告不作替代认证。
+
+## 七、当前测试的覆盖与盲区
+
+上传的五个测试包含有意义的标量、实际微型图、模块二阶校正、单次优化、保存恢复及阶段路由；不能因为存在盲区而把这些证据全盘否定。以下逐项说明能证明什么。
+
+| 故障或变异 | 当前测试及本次核验 | 仍需注意 |
+|---|---|---|
+| 通用helper内detach/create_graph关闭 | 标量预期0.1064与微型二阶残差应检出 | 本环境没运行Torch变异；判断来自源码逻辑与独立解析 |
+| 通用helper查询用原参数 | 标量预期与fast依赖检查应检出 | 生产闭包的具体角色仍需单独核对 |
+| 临时写原参数/Adam/RNG | 微型检查全state_dict/RNG；原生检查optimizer摘要和两参数块 | 原生只比较两参数探针，不是所有参数逐项独立认证 |
+| rho固定0.3 | 原有Tiny/native/stage均rho=.3，无法区分 | 本次真实源码query表达式用rho=.3/.8分辨；仍未做Torch多值反向 |
+| 所有正beta固定0.7 | 原夹具正beta只有.7，另测0 | 普通无条件写死会被beta0抓住；“正值写死、0特判”无第二正值约束 |
+| stage始终传第一套Settings | 原spy输入与断言均为(.03,.04,.3,.7)，可漏检 | 本次原stage AST用第二组(.015,.09,.8,.2)真实检出硬编码变异；当前实际透传正确 |
+| encoder/head内层率映射错误 | 当前源码143–144正确；原有限差分验证实现自身 | 尚无按模块核对真实fast=theta-alpha*gs的独立多率断言 |
+| Cq错用Cs前向 | 现测试只独立改动Hq，未单独改Cq | 可以在已有图检查中自洽；当前生产角色2正确；Torch该变异未跑 |
+| Hq错用Hs前向 | Hq独立替换并要求梯度变化应检出 | 本次数学参考另有实际变体；未重跑原Torch套件 |
+| 群UID、账号UID重用 | 原测试有；本次提取原验证器也拒绝 | 单步隔离不认证历史全程未见身份 |
+| 只跨群重用商品UID | 当前guard正确；原测试无该单独输入 | 本次真实原验证器拒绝；删该guard的AST副本接受 |
+| 参考UID错、float64、NaN | 原guard加本次真实验证器检查 | 正确UID标签并不能单独认证其数值来自哪个群 |
+| query标签错绑 | 原四群labels实际相同，可隐藏错误 | 当前源码取对应群labels正确；建议不同合法标签布局 |
+| 参考群内边错序 | 最终spy各UID目标不同，但每群378项为常数 | 它能检出跨UID错绑，不能检测群内重排；本次参考已逐边不同 |
+
+最小加固是：两个不同非零rho/beta；第二套内层率并检查实际fast值；分别扰动Cq和Hq；不同合法标签布局、逐边不同reference；商品独立复用反例。它们可用廉价微型模型完成，不要求新增原生288步或正式GPU。
+
+当前没有发现实际系数写死或目标错绑；不能将“可设计的漏检错误”写成“生产已经发生该错误”。若本轮不补Torch检查，就把声明收窄为“当前指定夹具和源码路径已核对”，不要写“任意非默认设置和所有角色错误已被测试排除”。本次外审已实际补足纯Python路由与验证器层的几个缺口，但未补作神经目标的全部反向测试。
+
+对应原位置：tests/test_step28_group_meta.py:31、56–109、148–183；tests/test_step28_bge_continual_contracts.py:24–31；原生check.py:43。独立输出见 evidence/agent_meta/、evidence/agent_stage/。
+
+## 八、stage、记忆、参考和计数
+
+### 8.1 48/6/288/1152分别是什么
+
+| 数字 | 实际含义 |
+|---|---|
+| 48 | 当前阶段带监督的拟合群数量，不含校准或valid |
+| 六轮 | 每当前群作为Cs六次；循环query使其作为Cq也六次 |
+| 六群 | 整个历史的存活记忆上限，不是每旧域六群 |
+| 288 | 一阶段48×6次更新调用；只有真实update执行才是物理优化次数 |
+| 1152 | 正beta时288×4次群梯度呈现；没有包括额外二阶算术成本 |
+| 576 | 原两群LOGIT每阶段呈现数；本候选beta0实际也是两群/步 |
+
+父 schedule 在 step28_bge_continual.py:56–62 要求48群、UID唯一且有监督。当前query在新文件240行按每轮48位循环移一位。Hs由父draw有放回抽取；Hq从同一步排除Hs后的其余5群取1个。因此是同一步二者不重复、跨步可以重复，而不是整阶段无放回。
+
+本次对三顺序×两个后续阶段×两套显式设置执行12个原stage AST路由spy，检查每步4个UID、每当前群两角色各6次、参考值绑定、随机seed、设置透传和序列化。所有神经update都明确替换为spy，真实模型更新为0；不是3456次或288次BGE训练。完整每步路由在 evidence/agent_stage/routes.json。
+
+Settings 四项没有正式默认值；Tiny和原生夹具只是显式传入值。当前代码确实直接传递settings并在auxiliary序列化。本次第二组数值使“始终偷换为第一组”不再隐藏。
+
+### 8.2 历史目标来源和生命周期
+
+父 Memory.draw 在 step28_bge_continual.py:164–169 返回所抽Hs及references[Hs.uid].copy()。当前train_stage把该副本和Hs.uid一起交Episode，实际绑定正确。Episode能验证类型、形状、有限性、UID标签，不能仅凭一个外来数组认出其真实来源；这需由该实际供给路径承担，不应要求给低层数组建立新的密码学证明系统。
+
+retain 在130–154行删除淘汰者的references/origins，仅给新入缓存的当前群调用score；存活旧目标不刷新。新增group_meta设置计入auxiliary，然后to_bytes检查上限。完整序列化涵盖文本、标签、reservoir RNG/seen、logit参考/来源、首映射、draw RNG/计数及方法设置，不只计算378个float的裸字节。
+
+独立检查验证了存活旧目标不变、仅新增群评分、淘汰参考消失、序列化逐字节恢复。第37次draw后恢复，后续251次UID与目标相同；第289次draw被拒绝；额外1MiB辅助字段被拒绝。手写输入序列化约95.7–96.3KB，这只是手写夹具大小，不是正式缓存大小证明。
+
+本轮train_stage不接收Archive，没有正式数据装载入口。底层Algorithm R不保存已淘汰全历史ID集合，依赖未来runner只供给一次合法新阶段；它本身无法防止调用者把淘汰群伪装为新当前数据重送。这是既有分工，不是本轮新增读取漏洞。未来正式runner须继承来源阶段互斥与“淘汰不可重读”；本轮不应为此另造全历史档案。新stage也未实现任意中途恢复，不能把记忆round-trip或微型相同步测试写成完整正式作业断点续跑认证。
+
+### 8.3 旧域覆盖不是六群预算保证
+
+使用冻结记忆seed与每阶段48群，本次手写纯路由重构得到第二阶段入库后首域存活数：ABC为4，BCA为2，CAB为0。这个来源数量只由Algorithm R的插入数和随机流决定，不靠手写文本内容。最新历史结果主审第36行已独立记录CAB首域0群，二者相符。
+
+CAB第三阶段的Hs/Hq于是都来自第二域。首域只能靠共享表示的间接保持，不能说每个旧域都有明确历史query保护。这不是新增代码错误，不要求事后重抽。独立组合参考另外给出指定一域在96群中均匀留6时被全部漏掉的概率C(48,6)/C(96,6)=0.01323718726；该解析概率不是本次观测频率，三顺序也不因此变成三个独立统计重复。
+
+### 8.4 确认的计数缺陷 I1
+
+Settings.outer_weight=0 合法；lookahead:103–105直接返回Ls，不调用query。但是train_stage:253–254无条件报告4*len(records)。因此beta0的一阶段虽只进行两群/步的目标，却会记录1152，而非576。
+
+该缺陷由精确提取的原lookahead提前返回探针与原stage控制流真实重现。它没有影响包内beta=.7成功原生元更新，也没有污染不存在的新正式结果。
+
+最小修正为：
+
+"gradient_group_presentations": (2 if settings.outer_weight == 0 else 4) * len(records)
+
+补丁在 evidence/proposed/minimal_fixes.patch。独立验证beta=0返回576，beta=.2/.7仍返回1152，且load_model/lookahead/objective/update的AST完全不变。没有将拟议补丁覆盖到source/或旧Linux证据。
+
+## 九、Linux原生、微型、解析与spy证据的边界
+
+### 9.1 失败及兼容修复没有被抹去
+
+| 原件目录 | 程序time-v墙钟秒 | 退出 | 实际路径及含义 |
+|---|---:|---:|---|
+| tests_first | 2.62 | 0 | 五项微型/解析/spy检查完成 |
+| native_first | 4.15 | 1 | 运行时set_attn_implementation不存在；warm之前停止 |
+| native_load_fixed | 129.05 | 1 | 加载时eager修复；microbatch4在内层create_graph分配内存失败；完成一个warm |
+| native_batch32 | 130.86 | 1 | microbatch32成功构建目标；硬编码fast探针键不匹配；完成一个warm，尚未真实元更新 |
+| tests_load_fixed | 5.52 | 0 | 当时微型检查完成，与上一任务同CPU47分时 |
+| native_probe_fixed | 273.55 | 0 | 按参数对象身份反查名称；一个warm和一个完整元更新成功 |
+| tests_final | 2.56 | 0 | 每UID不同reference的阶段测试加固，5项零失败/错误/跳过 |
+
+修复1改变加载接口以选择eager；修复2改变手写文本microbatch；修复3修复检查器探针定位。没有把完整二阶改为一阶或只适配head。microbatch变化的随机消费与资源影响不能称为和旧设置逐位等价，然而它未删除账号、文本记录、参数或二阶项。
+
+最终生产源码、检查器与成功原生记录相同；tests_final只加固阶段参考，原生setup未改变，复用成功原生证据有依据。旧源码和失败stdout/stderr/退出状态仍可逐项打开。
+
+### 9.2 成功原生是怎么核对Hessian的
+
+check.py:52–82先建立原生产目标，检查虚拟过程没有改变optimizer摘要或两个原参数块；取支持梯度gs和fast节点上的query梯度gq'。真实J.backward之后、clip之前，对两个探针算：
+
+outer_increment = grad J - gs
+hessian_correction = grad J - gs - beta*gq'
+
+结合实际图，第二个残差对应 -beta*Hs*A*gq' 在相应参数块的分量，包含跨参数块作用。它不是只看总梯度非零，也不是只看保存日志里的“meta”字段。
+
+| 原生探针 | 外层增量范数 | Hessian校正范数 | 实际参数变化范数 |
+|---|---:|---:|---:|
+| encoder第1层attention query.weight | 0.006065167021006346 | 0.000019394265109440312 | 0.0005217837751843035 |
+| head[0].weight | 0.07288096100091934 | 0.0006202055956237018 | 1.342909336090088 |
+
+这些数来自native_probe_fixed/result.json。检查器真实执行残差，网页只有其范数记录，没有原梯度张量，不能仅凭范数重新计算Hessian。支持结论限于这两块的外层和二阶路径，并非逐个BGE参数、所有输入、所有系数的认证。
+
+成功运行先做一个真实warm，再显式把Adam计数1置为288，随后真实元更新至289。这检验阶段二入口的计数与一次更新，不获得真实288步动量。四次原生尝试合计4次实际更新：3次warm、1次元更新。
+
+### 9.3 资源独立复算
+
+七次time-v程序墙钟合计548.31秒；user合计461.63秒，system合计80.25秒。Python result.seconds合计529.149078秒，因不含更早导入/进程开销，与前者口径不同。两个并行时段均绑定CPU47，逐任务墙钟相加保守多计，不是第二个CPU核使用证据。
+
+失败最大RSS为62,336,704KiB=59.448914GiB；成功原生最大RSS为48,127,596KiB=45.898052GiB。全部记录swaps为0。wrapper以ulimit -v 64GiB约束地址空间，RSS是另一种观察指标；不能把两者称为同一峰值。
+
+Linux最后du -sb证据快照为292,411字节；70份回传运行原件的纯文件载荷为230,978字节。目录口径、快照时点及ZIP大小不同，无须相等。以上实际记录均远低于2小时/64GiB/128MiB授权，但不能把授权上限说成实际消费或未来GPU容量。
+
+### 9.4 确认的文案缺陷 I2，与另一数值残差分开
+
+implementation.zh.md:44写head模块梯度范数0.99251316；成功原件实际为0.9251316433178884。应勘误为0.92513164，原提交和JSON保留；本次补丁已给出。该误抄不改变两探针或真实更新判断。
+
+另外，使用正确的encoder/head记录计算平方和根得1.2321740542242985，而clip报告1.2320390939712524，相差0.00013496025304604586，约0.010954%。生产代码在模块统计和clip中采用不同float32归约；缺少原梯度，不能独立认定差额原因。报告保留该差，不说严格相等，也不据此断定二阶图错误。这个小残差与确定的文案误抄是两件事。
+
+### 9.5 各层证据不能互相替代
+
+| 证据 | 支持什么 | 未支持什么 |
+|---|---|---|
+| 本次独立解析/NumPy | 精确目标、局部导数、错误变体的可区分性 | 原BGE自动微分重跑 |
+| 本次精确源码AST/纯Python | 身份校验、路由、设置、记忆生命周期与计数 | 神经梯度或真实Adam |
+| 包内微型Torch | 指定完整微型文本链、模块校正、一个bias有限差分、beta0、单步及保存恢复 | 原生BGE全参数或正式GPU |
+| 包内原生CPU | 指定路径一次完整元更新、两块Hessian残差与参数变化 | 首域288步、多阶段效果、全参数认证 |
+| 包内stage spy | 288次调用的供给与记录 | 288次真实训练 |
+| 既有LOGIT/risk结果 | 旧固定开发点的基线事实及机制问题 | 本新方法效果、创新、过拟合唯一原因 |
+
+## 十、分级处置：本轮修正、科学边界、未来实验和过度设计
+
+### A. 科学主张目前被证据阻断的部分
+
+S1：不能主张已改善旧分布未见卖家或新群体学习。原因是query仍为训练群，本轮没有正式效果比较。最小处置是保持“候选机制/实现核验”的表述；未来再按固定合同评价，不是本轮补跑训练。
+
+S2：不能主张新的元学习原理或已具足够方法创新。MLDG目标同型，MER/La-MAML直接重叠。最小处置是如实定位适配，明确尚未证出的剩余差异；不要求为了原创新背书。
+
+这两项阻断的是超出证据的主张，并非判定本轮手写实现不值得做。没有发现必须弃置当前正beta算法或重开全部历史基础监督的科学错误。
+
+### B. 当前实现/证据中应明确修正的项目
+
+I1：beta0阶段呈现计数；位置step28_group_meta.py:253–254。更改计数条件并增加零beta计数检查；保留正beta结果。
+
+I2：head范数摘要误抄；位置implementation.zh.md:44对native_probe_fixed/result.json。勘误数值，保留原件，不重跑模型。
+
+E1：设置覆盖声明过宽；位置test_step28_group_meta.py:31、148–168与implementation.zh.md:36。当前源码透传正确，本次AST也加了第二组，但原神经测试只一个正rho/beta。最小处置是收窄声明，或添加第二组实际微型目标/fast梯度检查。
+
+E2：实际角色/目标错误的测试盲区；位置test_step28_group_meta.py:92–109、155–164及handmade_group:24–31。当前生产路由和labels绑定正确；补Cq独立扰动、不同合法labels、逐边reference，以及rate映射断言。它们是具体的廉价证据加固，不能误报为已发现生产错绑。
+
+E3：商品独立复用负例原测试缺席；位置test_step28_group_meta.py:56–67。当前guard正确，本次已真实运行原验证器和删guard变异；将这项廉价回归保留即可。
+
+I1/I2是确定缺陷；E1–E3是证据声明和回归覆盖处置。不得把后者扩大成要求本轮重跑原生模型、正式GPU、所有旧基线。独立外审补丁没有自动合入执行者项目。
+
+### C. 未来最小比较建议
+
+当前每步四群前后向与二阶，旧LOGIT每步两群，既不等呈现也不等计算。float32/eager/no-checkpoint、microbatch条件也不同。不能直接把候选与旧保存结果的差称为“只由元机制导致”。
+
+一个小而可解释的比较集合为：
+
+| 对照 | 定义/用途 |
+|---|---|
+| 两群LOGIT0.1 | 保留实际开发基线；如要求严格执行条件配对，须明确相同运行条件或承认差别 |
+| 四群普通目标J0 | J0=Ls(theta)+beta Lq(theta)，与候选同四群/同权重；区分额外呈现和监督重加权的综合作用 |
+| 当前完整元目标 | 相对J0检查虚拟步及完整元梯度的增量；相同呈现仍不等总计算 |
+| 预先定义的身份复用元对照 | 在匹配阶段/短区块边际呈现数下，检验当步完整群隔离/群搭配作用 |
+
+beta=0会取消query，不能代替四群J0；A=0才给出相同四群损失的退化公式。当前Settings要求head内层率正，因此未来普通J0宜单独定义普通联合目标，而不是偷偷绕过当前校验。
+
+隔离对照的一种两步区块是：(C1,H1)->(C2,H2)，随后(C2,H2)->(C1,H1)；复用对照则两步分别为(C1,H1)->自身、(C2,H2)->自身。每群在两步内作为support/query各一次，完整候选不拆分、更新数和呈现数相同。它仍改变当步独立群多样性与时序搭配，结论必须如此限定，不声称绝对无混杂。
+
+最直接MLDG型适配若与当前定义完全重合，没有必要换个方法名重复跑成“独立新基线”。如未来提出超越适配的贡献，再选择最直接且有实质差异的MER/La-MAML类对照；不要求本轮全部实现或大规模消融。
+
+未来只需另行前瞻界定一个固定点的设置、供给、源阶段恢复、阶段末记忆、合法评价、随机种子和资源；据实际目标配置核验GPU可行性。报告同时给出更新数、群呈现、实测时间/峰值内存和基础识别取舍；不强求一次实验同时实现所有互不兼容的等预算，也不在本轮自动追加运行。
+
+### D. 本轮无关或过度设计
+
+没有必要为了本次结论：重审全部历史依赖；重跑已结束LOGIT/risk；开展全参数有限差分或显式存全Hessian；建立历史全集UID库、额外教师或新恢复框架；访问owners/test或正式缓存补“未见”证明；用事后分层重抽修饰CAB零首域；把所有日志存成训练可读的额外历史；自动选正式超参数、增加种子或训练消融。
+
+## 十一、独立审查自身失败与交付证据
+
+本审查没有抹去自己的错误尝试。两个独立分项最初分别给模块范数平方和与clip总范数设置了1e-6和1e-5的过强一致性门槛，均退出1。该门槛没有得到不同float32归约相等的依据；修正仅取消该自设等式认证，保留原始残差及其未解决范围。两次失败分别在evidence/agent_meta/run_01/与evidence/agent_native/run_01/，原源码、stderr、stdout和退出码均在包中；后续run_02退出0。
+
+这些是本审查参考断言的问题，不是Linux原生新增失败，不影响原错误文案的确定性。其余实际检查的执行与输出由run.json/command.json、stdout.txt、stderr.txt、exit_status.txt/exit_code.txt记录；不能把最终退出0当作科学效果通过。
+
+证据ZIP包括：
+
+- 本报告与机器裁决external_verdict.json。
+- 收到的原始ZIP精确副本与按原清单提取的103文件，保留全部Linux失败和修正版本。
+- 本次真正编写、运行的独立参考代码、手写JSON/NPZ输入、完整逐步路由、stdout/stderr/退出码、来源与输出清单。
+- 两项最小拟议修正补丁及其独立控制表达式验证；原件未覆盖。
+- 直接近邻原始来源目录与实际访问/未访问范围；没有把未读源码或未跑模型写成已完成。
+
+未执行的事项再次明确：上传原Torch五项套件的网页复跑；原生BGE复跑；正式GPU路径；全参数dtype/梯度逐元素认证；正式训练或新方法性能比较；完整正式stage中途恢复；MER/La-MAML具体源码运行；原正式标签指标重新计算。它们不因本次解析、spy、哈希或原件PASS而自动成为已完成。
+
+## 附录A：关键文件定位
+
+| 简称 | ZIP内路径 |
+|---|---|
+| 新合同 | source/docs/SELLER_ALIAS_GROUP_META.zh.md |
+| 新算法 | source/scripts/step28_group_meta.py |
+| 检查器 | source/scripts/step28_group_meta_check.py |
+| 新测试 | source/tests/test_step28_group_meta.py |
+| Linux说明 | source/reports/documentation/20261004/group_meta/implementation.zh.md |
+| 原生成功 | source/reports/documentation/20261004/group_meta/native_probe_fixed/ |
+| 原生失败 | 同级native_first、native_load_fixed、native_batch32 |
+| 来源核验 | evidence/agent_native/analysis_v2/ |
+| 独立数学 | evidence/scripts/10_independent_math.py及evidence/outputs/10_math/ |
+| 独立阶段/记忆 | evidence/agent_stage/scripts/stage_memory_reference.py及results.json/routes.json |
+| 身份及表达式变异 | evidence/agent_meta/source_validator_and_coverage.py及findings.json |
+| 最小修正 | evidence/proposed/minimal_fixes.patch及evidence/outputs/20_minimal_fixes/ |
+| 新证据总清单 | EVIDENCE_MANIFEST.json；不自哈希 |
+
+## 附录B：直接原始文献来源
+
+[W1] Da Li, Yongxin Yang, Yi-Zhe Song, Timothy M. Hospedales. Learning to Generalize: Meta-Learning for Domain Generalization. AAAI 2018. 原论文PDF pp.3–4，Algorithm 1、Eq.(3)、Eq.(7)。
+https://homepages.inf.ed.ac.uk/thospeda/papers/li2017metaDG.pdf
+https://arxiv.org/abs/1710.03463
+
+[W2] Matthew Riemer et al. Learning to Learn without Forgetting by Maximizing Transfer and Minimizing Interference. ICLR 2019. 原论文PDF pp.3–5，Eq.(4)、Algorithm 1、Eq.(6)–(7)。
+https://arxiv.org/pdf/1810.11910
+https://arxiv.org/abs/1810.11910
+
+[W3] Gunshi Gupta, Karmesh Yadav, Liam Paull. La-MAML: Look-ahead Meta Learning for Continual Learning. NeurIPS 2020. 原论文PDF pp.3–5，§4.1–4.2、Eq.(5)–(9)、Algorithm 1。
+https://proceedings.neurips.cc/paper/2020/file/85b9a5ac91cd629bd3afe396ec07270a-Paper.pdf
+https://arxiv.org/abs/2007.13904
+
+[W4] MLDG作者代码，ops.py，linear/conv2d的快参数与stop_gradient分支。已读相关代码，未运行；所访问master不是冻结提交认证。
+https://github.com/HAHA-DL/MLDG/blob/master/ops.py
+
+[W5] MLDG作者代码，model.py，ModelMLDG.train。已读相关代码，未运行。
+https://github.com/HAHA-DL/MLDG/blob/master/model.py
+
+MER与La-MAML作者仓库README身份已核对，具体源码访问遇到工具限制，算法比较以已读原论文为据；访问失败记录在来源目录。OpenReview的MER入口遇到验证墙后改读同篇公开arXiv原文，没有处理登录。原始来源核对日期为2026-10-04。

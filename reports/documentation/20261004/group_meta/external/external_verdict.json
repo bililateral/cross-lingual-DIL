@@ -1,0 +1,118 @@
+{
+  "review_date_utc": "2026-10-04",
+  "review_complete": true,
+  "verdict": "mechanism_reasonable_implementation_supported_with_two_narrow_corrections_effect_unverified_novelty_insufficient",
+  "language": "zh-CN",
+  "model_identity": {
+    "user_reported_ui": "6 Pro",
+    "session_configuration_label": "GPT-6 Astra Pro",
+    "ui_selector_independently_observed": false,
+    "backend_model_authenticated": false
+  },
+  "scope": {
+    "attachment": "review(6).zip",
+    "original_bytes": 286285,
+    "original_sha256": "07cf8dfe944ad120922af6064d60a5037953e6c06ab170c56f6d8846e50895d6",
+    "user_supplied_expected_hash_this_turn": false,
+    "torch_rerun_by_this_review": false,
+    "native_bge_rerun_by_this_review": false,
+    "formal_data_access": false,
+    "gpu_run": false,
+    "new_method_effect_comparison": false,
+    "original_source_modified": false,
+    "proposed_patch_applied_to_original": false
+  },
+  "mathematical_target": {
+    "base": "B(G)=BCE+query_rank+0.5*known_Top5_hard",
+    "support": "Ls=B(Cs;theta)+0.1*B(Hs;theta)+0.5*MSE(z(Hs;theta),saved_target(Hs))",
+    "fast": "theta_fast=theta-A*grad(Ls)",
+    "query": "Lq=B(Cq;theta_fast)+rho*B(Hq;theta_fast)",
+    "total": "J=Ls+beta*Lq",
+    "exact_gradient": "g_s+beta*(I-H_s*A)*g_q_fast",
+    "A": "fixed encoder/head block-diagonal inner SGD rates; not a learned parameter or actual AdamW prediction",
+    "local_smoothness_scope": "fixed Top5, ReLU and absolute-value branches"
+  },
+  "scientific_claim_blockers": [
+    {
+      "id": "S1",
+      "claim_blocked": "improved retention on old-distribution unseen sellers or improved new-population learning",
+      "reason": "Meta-query groups are repeatedly optimized training groups; no new formal effect comparison exists.",
+      "locations": ["source/scripts/step28_group_meta.py:235-248", "group_meta_review.zh.txt sections 3 and 10A"],
+      "minimum_resolution_now": "Limit claims to a candidate mechanism and implementation verification; no new formal run automatically required."
+    },
+    {
+      "id": "S2",
+      "claim_blocked": "nontrivial new meta-learning method already established",
+      "reason": "MLDG has the same objective structure, MER has alignment with replay, and La-MAML is a direct continual meta-learning neighbor.",
+      "locations": ["sources/web_sources.json", "group_meta_review.zh.txt section 4"],
+      "minimum_resolution_now": "Describe a reasonable whole-group/ranking/LOGIT adaptation with insufficient demonstrated novelty."
+    }
+  ],
+  "confirmed_current_defects": [
+    {
+      "id": "I1",
+      "type": "accounting",
+      "location": "source/scripts/step28_group_meta.py:253-254",
+      "finding": "beta=0 skips query forward but stage always reports 4*288 presentations instead of 2*288.",
+      "actual": 1152,
+      "expected_at_beta_zero": 576,
+      "positive_beta_native_evidence_affected": false,
+      "minimum_fix": "(2 if settings.outer_weight == 0 else 4) * len(records)",
+      "independent_scope": "Exact source AST/early-return spy; proposed expression validation; no Torch patch rerun.",
+      "evidence": ["evidence/agent_stage/results.json", "evidence/outputs/20_minimal_fixes/result.json"]
+    },
+    {
+      "id": "I2",
+      "type": "documentation_transcription",
+      "location": "source/reports/documentation/20261004/group_meta/implementation.zh.md:44",
+      "finding": "The documented head gradient norm is 0.99251316 but the original successful result is 0.9251316433178884.",
+      "minimum_fix": "Correct the summary to 0.92513164 and preserve the submitted original and raw JSON.",
+      "native_rerun_required": false,
+      "evidence": ["source/reports/documentation/20261004/group_meta/native_probe_fixed/result.json", "evidence/proposed/minimal_fixes.patch"]
+    }
+  ],
+  "coverage_gaps_not_proven_production_bugs": [
+    "Only one positive rho/beta in the provided neural fixtures; a second positive value is not tested there.",
+    "No independent multi-rate per-module fast-parameter numerical oracle in the provided neural suite.",
+    "Cq is not perturbed independently of Cs in the provided neural test.",
+    "Identical label layouts across provided handmade groups can hide wrong-role label binding.",
+    "Per-UID constant 378-edge stage references do not detect within-group edge permutations.",
+    "The provided identity test lacks a separate item-only reuse example; current guard is correct and this review executed that example and a deleted-guard mutation.",
+    "A correct UID tag cannot by itself authenticate reference value origin; current Memory.draw/stage binding is correct."
+  ],
+  "unresolved_numerical_observation": {
+    "module_norm_hypotenuse": 1.2321740542242985,
+    "reported_clip_global_norm": 1.2320390939712524,
+    "absolute_difference": 0.00013496025304604586,
+    "relative_difference": 0.00010954218393429887,
+    "judgment": "Retain as a small unexplained aggregation residual. Different float32 reduction paths exist, but raw gradients are absent; neither exact equality nor a graph defect is independently established."
+  },
+  "evidence_limits": {
+    "provided_native_success": "one warm update and one actual full second-order meta update on CPU float32/eager/no-checkpoint; two parameter-block probes",
+    "provided_native_attempts_total_real_updates": {"warm": 3, "meta": 1},
+    "native_adam_counter": "one actual warm step, counter reset 1 to 288, then actual update to 289; not a real 288-step moment trajectory",
+    "provided_seven_time_v_elapsed_sum_seconds": 548.31,
+    "provided_peak_rss_gib_all_attempts": 59.44891357421875,
+    "provided_success_native_peak_rss_gib": 45.89805221557617,
+    "provided_native_failure_history_preserved": true,
+    "this_review_scalar_exact_gradient": 0.1064,
+    "this_review_numpy_gradient_max_abs_error": 9.926809374505297e-11,
+    "this_review_numpy_mutants": "nine explicit mathematical variants; not nine production Torch/BGE mutation runs",
+    "this_review_stage_spies": "12 extracted-AST scenarios, zero neural updates",
+    "this_review_initial_failed_reference_runs_preserved": ["evidence/agent_meta/run_01/", "evidence/agent_native/run_01/"]
+  },
+  "future_minimum_comparison_not_run": [
+    "Two-group LOGIT0.1 with execution conditions matched or the mismatch explicitly reported.",
+    "Four-group ordinary J0=Ls(theta)+beta*Lq(theta), matching candidate groups and weights.",
+    "Current full meta objective versus J0, acknowledging extra second-order compute.",
+    "A predeclared group-reuse meta control with matched marginal presentations over short blocks; state remaining pairing/diversity confounding."
+  ],
+  "not_required_this_round": [
+    "Formal GPU training or effect comparisons",
+    "All old baselines and large ablation grids",
+    "All-parameter finite differences or a dense Hessian",
+    "Reopening unchanged historical mechanisms",
+    "A new all-history UID archive or checkpoint framework",
+    "Post-hoc memory resampling to remove the observed zero first-domain case"
+  ]
+}

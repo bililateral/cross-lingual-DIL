@@ -1,0 +1,340 @@
+{
+  "scope": "Actual new reference commands are separate from uploaded Linux logs; neither count nor PASS proves scientific correctness.",
+  "this_review_runs": [
+    {
+      "path": "evidence/outputs/00_archive/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "group_meta_audit/evidence/scripts/00_verify_archive.py"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2",
+      "exit_code": 0,
+      "elapsed_seconds": 0.051649438002641546,
+      "started_utc": "2026-10-04T06:17:02.230436+00:00",
+      "finished_utc": "2026-10-04T06:17:02.282080+00:00",
+      "stdout": "evidence/outputs/00_archive/stdout.txt",
+      "stderr": "evidence/outputs/00_archive/stderr.txt",
+      "exit_status": "evidence/outputs/00_archive/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_meta/run_01/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/source_validator_and_coverage.py",
+        "--source",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+        "--input",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/inputs.json",
+        "--output",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/findings.json"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta",
+      "exit_code": 1,
+      "elapsed_seconds": 0.11809213399828877,
+      "started_utc": "2026-10-04T06:19:30.110703+00:00",
+      "finished_utc": "2026-10-04T06:19:30.228791+00:00",
+      "stdout": "evidence/agent_meta/run_01/stdout.txt",
+      "stderr": "evidence/agent_meta/run_01/stderr.txt",
+      "exit_status": "evidence/agent_meta/run_01/exit_status.txt",
+      "torch_or_bge_run": false,
+      "interpretation": "FAILED: overstrong norm-equality assertion, preserved; see corrected run_02.",
+      "source_at_run": "evidence/agent_meta/run_01/source_at_failure.py"
+    },
+    {
+      "path": "evidence/agent_meta/norm_diagnostic/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "-c",
+        "import math; e=.8138699788267703;h=.9251316433178884;g=1.2320390939712524;print(math.hypot(e,h), g, math.hypot(e,h)-g, math.hypot(e,.99251316))"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta",
+      "exit_code": 0,
+      "elapsed_seconds": 0.012354413000139175,
+      "started_utc": "2026-10-04T06:19:33.689611+00:00",
+      "finished_utc": "2026-10-04T06:19:33.701970+00:00",
+      "stdout": "evidence/agent_meta/norm_diagnostic/stdout.txt",
+      "stderr": "evidence/agent_meta/norm_diagnostic/stderr.txt",
+      "exit_status": "evidence/agent_meta/norm_diagnostic/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_meta/run_02/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/source_validator_and_coverage.py",
+        "--source",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+        "--input",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/inputs.json",
+        "--output",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta/findings.json"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_meta",
+      "exit_code": 0,
+      "elapsed_seconds": 0.11453016699670115,
+      "started_utc": "2026-10-04T06:19:53.852766+00:00",
+      "finished_utc": "2026-10-04T06:19:53.967290+00:00",
+      "stdout": "evidence/agent_meta/run_02/stdout.txt",
+      "stderr": "evidence/agent_meta/run_02/stderr.txt",
+      "exit_status": "evidence/agent_meta/run_02/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_stage/outputs/01_actual_ast_routing/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "group_meta_audit/evidence/agent_stage/scripts/stage_memory_reference.py",
+        "--source",
+        "group_meta_audit/source",
+        "--evidence",
+        "group_meta_audit/evidence/agent_stage"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2",
+      "exit_code": 0,
+      "elapsed_seconds": 1.484308137998596,
+      "started_utc": "2026-10-04T06:20:54.796663+00:00",
+      "finished_utc": "2026-10-04T06:20:56.280939+00:00",
+      "stdout": "evidence/agent_stage/outputs/01_actual_ast_routing/stdout.txt",
+      "stderr": "evidence/agent_stage/outputs/01_actual_ast_routing/stderr.txt",
+      "exit_status": "evidence/agent_stage/outputs/01_actual_ast_routing/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/outputs/10_math/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "group_meta_audit/evidence/scripts/10_independent_math.py"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2",
+      "exit_code": 0,
+      "elapsed_seconds": 0.701759701998526,
+      "started_utc": "2026-10-04T06:21:16.228667+00:00",
+      "finished_utc": "2026-10-04T06:21:16.930419+00:00",
+      "stdout": "evidence/outputs/10_math/stdout.txt",
+      "stderr": "evidence/outputs/10_math/stderr.txt",
+      "exit_status": "evidence/outputs/10_math/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_native/run_01/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/audit_native_evidence.py",
+        "--inputs",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/inputs.json",
+        "--out",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/analysis"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+      "exit_code": 1,
+      "elapsed_seconds": 0.061834340001951205,
+      "started_utc": "2026-10-04T06:21:39.162200+00:00",
+      "finished_utc": "2026-10-04T06:21:39.224028+00:00",
+      "stdout": "evidence/agent_native/run_01/stdout.txt",
+      "stderr": "evidence/agent_native/run_01/stderr.txt",
+      "exit_status": "evidence/agent_native/run_01/exit_status.txt",
+      "torch_or_bge_run": false,
+      "interpretation": "FAILED: overstrong norm-equality assertion, preserved; see v2/run_02.",
+      "source_at_run": "evidence/agent_native/audit_native_evidence.py"
+    },
+    {
+      "path": "evidence/agent_native/run_02/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/audit_native_evidence_v2.py",
+        "--inputs",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/inputs.json",
+        "--out",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/analysis_v2"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+      "exit_code": 0,
+      "elapsed_seconds": 0.056583190998935606,
+      "started_utc": "2026-10-04T06:22:40.488289+00:00",
+      "finished_utc": "2026-10-04T06:22:40.544874+00:00",
+      "stdout": "evidence/agent_native/run_02/stdout.txt",
+      "stderr": "evidence/agent_native/run_02/stderr.txt",
+      "exit_status": "evidence/agent_native/run_02/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_prior_scope/command.json",
+      "kind": "this_review_combinatorial_reference",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_prior_scope/sampling_reference.py",
+        "--source",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+        "--inputs",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_prior_scope/inputs.json",
+        "--output",
+        "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_prior_scope"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_prior_scope",
+      "started_utc": "2026-10-04T06:24:01.831287+00:00",
+      "finished_utc": "2026-10-04T06:24:01.861880+00:00",
+      "returncode": 0,
+      "exit_code": 0,
+      "stdout": "evidence/agent_prior_scope/stdout.txt",
+      "stderr": "evidence/agent_prior_scope/stderr.txt",
+      "exit_status": "evidence/agent_prior_scope/exit_code.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/agent_native/run_03_bytecount/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "-c",
+        "import json; from pathlib import Path; p=Path(\"/workspace/scratch/9020ffba1df2/group_meta_audit/evidence/agent_native/analysis_v2/audit.json\"); d=json.loads(p.read_text()); print(json.dumps({\"linux_evidence_70_file_payload_bytes\":sum(r[\"actual\"][\"bytes\"] for r in d[\"linux_evidence_checks\"]),\"review_102_file_payload_bytes\":sum(r[\"actual\"][\"bytes\"] for r in d[\"review_checks\"]),\"missing_linux_root_documents\":[r[\"path\"] for r in d[\"linux_root_document_checks\"] if r[\"state\"]==\"missing\"]},ensure_ascii=False,indent=2))"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit/source",
+      "exit_code": 0,
+      "elapsed_seconds": 0.02132998100205441,
+      "started_utc": "2026-10-04T06:26:16.511806+00:00",
+      "finished_utc": "2026-10-04T06:26:16.533134+00:00",
+      "stdout": "evidence/agent_native/run_03_bytecount/stdout.txt",
+      "stderr": "evidence/agent_native/run_03_bytecount/stderr.txt",
+      "exit_status": "evidence/agent_native/run_03_bytecount/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/outputs/20_minimal_fixes/run.json",
+      "kind": "this_review_reference_or_diagnostic",
+      "argv": [
+        "python",
+        "group_meta_audit/evidence/scripts/20_minimal_fix_reference.py"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2",
+      "exit_code": 0,
+      "elapsed_seconds": 0.041397331002372084,
+      "started_utc": "2026-10-04T06:26:30.109807+00:00",
+      "finished_utc": "2026-10-04T06:26:30.151202+00:00",
+      "stdout": "evidence/outputs/20_minimal_fixes/stdout.txt",
+      "stderr": "evidence/outputs/20_minimal_fixes/stderr.txt",
+      "exit_status": "evidence/outputs/20_minimal_fixes/exit_status.txt",
+      "torch_or_bge_run": false
+    },
+    {
+      "path": "evidence/outputs/90_bundle_prepare/run.json",
+      "kind": "packaging_only_not_a_scientific_test",
+      "argv": [
+        "python",
+        "evidence/scripts/build_review_bundle.py",
+        "--prepare"
+      ],
+      "cwd": "/workspace/scratch/9020ffba1df2/group_meta_audit",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07012442399718566,
+      "started_utc": "2026-10-04T06:46:18.382100+00:00",
+      "finished_utc": "2026-10-04T06:46:18.452218+00:00",
+      "stdout": "evidence/outputs/90_bundle_prepare/stdout.txt",
+      "stderr": "evidence/outputs/90_bundle_prepare/stderr.txt",
+      "exit_status": "evidence/outputs/90_bundle_prepare/exit_status.txt",
+      "torch_or_bge_run": false
+    }
+  ],
+  "provided_linux_runs": [
+    {
+      "run": "tests_first",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/tests_first",
+      "status_in_original": "PASS",
+      "exit_code": 0,
+      "started": "2026-10-04T13:43:43+08:00",
+      "finished": "2026-10-04T13:43:45+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/tests_first/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/tests_first/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/tests_first/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/tests_first/result.json"
+    },
+    {
+      "run": "native_first",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/native_first",
+      "status_in_original": "FAIL",
+      "exit_code": 1,
+      "started": "2026-10-04T13:44:46+08:00",
+      "finished": "2026-10-04T13:44:50+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/native_first/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/native_first/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/native_first/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/native_first/result.json"
+    },
+    {
+      "run": "native_load_fixed",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/native_load_fixed",
+      "status_in_original": "FAIL",
+      "exit_code": 1,
+      "started": "2026-10-04T13:48:17+08:00",
+      "finished": "2026-10-04T13:50:26+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/native_load_fixed/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/native_load_fixed/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/native_load_fixed/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/native_load_fixed/result.json"
+    },
+    {
+      "run": "native_batch32",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/native_batch32",
+      "status_in_original": "FAIL",
+      "exit_code": 1,
+      "started": "2026-10-04T13:54:12+08:00",
+      "finished": "2026-10-04T13:56:23+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/native_batch32/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/native_batch32/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/native_batch32/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/native_batch32/result.json"
+    },
+    {
+      "run": "tests_load_fixed",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/tests_load_fixed",
+      "status_in_original": "PASS",
+      "exit_code": 0,
+      "started": "2026-10-04T13:54:17+08:00",
+      "finished": "2026-10-04T13:54:22+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/tests_load_fixed/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/tests_load_fixed/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/tests_load_fixed/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/tests_load_fixed/result.json"
+    },
+    {
+      "run": "native_probe_fixed",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/native_probe_fixed",
+      "status_in_original": "PASS",
+      "exit_code": 0,
+      "started": "2026-10-04T13:58:08+08:00",
+      "finished": "2026-10-04T14:02:41+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/native_probe_fixed/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/native_probe_fixed/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/native_probe_fixed/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/native_probe_fixed/result.json"
+    },
+    {
+      "run": "tests_final",
+      "provided_by_user_not_executed_by_this_review": true,
+      "path": "source/reports/documentation/20261004/group_meta/tests_final",
+      "status_in_original": "PASS",
+      "exit_code": 0,
+      "started": "2026-10-04T14:06:35+08:00",
+      "finished": "2026-10-04T14:06:38+08:00",
+      "original_sources": "source/reports/documentation/20261004/group_meta/tests_final/source",
+      "stdout": "source/reports/documentation/20261004/group_meta/tests_final/stdout.txt",
+      "stderr": "source/reports/documentation/20261004/group_meta/tests_final/stderr.txt",
+      "result": "source/reports/documentation/20261004/group_meta/tests_final/result.json"
+    }
+  ],
+  "final_packaging_note": "The --pack command verifies the completed ZIP and reports its checksum outside the ZIP; it is not a reference/model run."
+}
