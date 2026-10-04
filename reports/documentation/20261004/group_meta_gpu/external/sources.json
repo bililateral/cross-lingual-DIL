@@ -1,0 +1,79 @@
+{
+  "accessed_date": "2026-10-04",
+  "scope": "Targeted public primary-source checks; not a renewed full literature review or a runtime attestation",
+  "sources": [
+    {
+      "id": "W1",
+      "title": "PyTorch v2.9.1 torch/autograd/graph.py",
+      "url": "https://github.com/pytorch/pytorch/blob/v2.9.1/torch/autograd/graph.py",
+      "sections_read": ["save_on_cpu", "pack_to_cpu", "unpack_from_cpu"],
+      "used_for": "Version-matched upstream saved-tensor transfer semantics, including absence of storage deduplication in this helper",
+      "does_not_prove": "Identity of the installed binary or BGE GPU second-order success"
+    },
+    {
+      "id": "W2",
+      "title": "PyTorch 2.9 Automatic differentiation package",
+      "url": "https://docs.pytorch.org/docs/2.9/autograd.html",
+      "sections_read": ["saved_tensors_hooks", "save_on_cpu", "double-backward discussion"],
+      "used_for": "Saved tensor hooks and backward retrieval contract",
+      "does_not_prove": "Project-level gradient parity"
+    },
+    {
+      "id": "W3",
+      "title": "PyTorch 2.9 torch.func.functional_call",
+      "url": "https://docs.pytorch.org/docs/2.9/generated/torch.func.functional_call.html",
+      "sections_read": ["parameter and buffer substitution", "in-place changes", "strict argument"],
+      "used_for": "Limits of functional state isolation"
+    },
+    {
+      "id": "W4",
+      "title": "PyTorch 2.9 torch.autograd.grad",
+      "url": "https://docs.pytorch.org/docs/2.9/generated/torch.autograd.grad.html",
+      "sections_read": ["grad_outputs", "create_graph", "retain_graph", "allow_unused"],
+      "used_for": "VJP and exact reverse-over-reverse HVP implementation semantics"
+    },
+    {
+      "id": "W5",
+      "title": "PyTorch 2.9 torch.utils.checkpoint",
+      "url": "https://docs.pytorch.org/docs/2.9/checkpoint.html",
+      "sections_read": ["recomputation equivalence warning", "non-reentrant autograd.grad support", "RNG preservation"],
+      "used_for": "Explain why changing a checkpoint flag alone does not prove functional fast-parameter recomputation correctness",
+      "selected_as_primary_engineering_solution": false
+    },
+    {
+      "id": "W6",
+      "title": "PyTorch 2.9 Optimizer.zero_grad",
+      "url": "https://docs.pytorch.org/docs/2.9/generated/torch.optim.Optimizer.zero_grad.html",
+      "sections_read": ["None versus zero gradients"],
+      "used_for": "Preserve optimizer skip behavior for wholly unused parameters in reviewer suggestion v2"
+    },
+    {
+      "id": "W7",
+      "title": "Learning to Generalize: Meta-Learning for Domain Generalization",
+      "url": "https://arxiv.org/html/1710.03463v1",
+      "sections_read": ["Algorithm 1", "Equation 3", "meta-train/meta-test explanation"],
+      "used_for": "Retain the already acknowledged MLDG objective-overlap limit; no new originality claim"
+    },
+    {
+      "id": "W8",
+      "title": "Learning to Learn without Forgetting by Maximizing Transfer and Minimizing Interference",
+      "url": "https://arxiv.org/abs/1810.11910",
+      "sections_read": ["title/authors", "abstract"],
+      "used_for": "Check MER paper identity and replay/gradient-alignment relationship",
+      "not_done": "No renewed full-paper/code review or execution in this incremental audit"
+    },
+    {
+      "id": "W9",
+      "title": "La-MAML: Look-ahead Meta Learning for Continual Learning",
+      "url": "https://arxiv.org/abs/2007.13904",
+      "sections_read": ["title/authors", "abstract"],
+      "used_for": "Check La-MAML identity and limited-memory look-ahead meta-learning relationship",
+      "not_done": "No renewed full-paper/code review or execution in this incremental audit"
+    }
+  ],
+  "source_access_limitations": [
+    "A subreview could not fetch raw.githubusercontent.com source URLs; the version-tagged GitHub graph.py page was successfully read instead.",
+    "No claim is made to have read installed PyTorch source or verified the project's compiled runtime byte for byte.",
+    "No public webpage is used as substitute evidence for a completed BGE GPU update."
+  ]
+}

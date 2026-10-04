@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0",
+  "review_id": "group_meta_gpu_incremental_20261004",
+  "review_completed": true,
+  "language": "zh-CN",
+  "model_identity": {
+    "session_configuration_label": "ChatGPT / GPT-6 Astra Pro",
+    "independent_backend_attestation_available": false,
+    "web_selector_independently_observed": false,
+    "requested_web_gpt6_pro_backend_certified": false
+  },
+  "input": {
+    "uploaded_name": "review(7).zip",
+    "bytes": 427942,
+    "members": 73,
+    "sha256": "636f8a2f41d2c6a5cc80e697b2e38044868de9e5152e45c75c0c5f9e104d7eb2",
+    "matches_user_expected_identity": true,
+    "crc_error": null,
+    "review_manifest_matching": "72/72",
+    "root_source_inventory_matching": "21/21",
+    "returned_source_inventory_matching": "21/21",
+    "returned_payload_inventory_matching": "42/42",
+    "execution_key_source_snapshots_matching": "9/9",
+    "main_meta_identical_to_old_original_bytes": false,
+    "main_meta_change_from_old_original": "Previously closed beta=0 group-presentation counter fix only",
+    "load_model_lookahead_objective_update_ast_unchanged": true
+  },
+  "overall_verdict": "INCREMENTAL_REVIEW_COMPLETE_CURRENT_NATIVE_GPU_RESOURCE_ADMISSION_NOT_GRANTED",
+  "dimensions": {
+    "new_proven_input_objective_or_gradient_defect_found": false,
+    "source_path_preserves_full_second_order": true,
+    "source_path_preserves_four_complete_groups": true,
+    "source_path_does_not_freeze_or_select_parameter_subset": true,
+    "tiny_cuda_evidence": "SUPPORTED_FOR_SUPPLIED_FIXTURE_WITH_RTOL_1E-5_ATOL_1E-7_NOT_INDEPENDENTLY_RERUN",
+    "native_bge_gpu_complete_meta_update_evidence": "NONE",
+    "native_gpu_resource_admission": "FAIL_AS_RUN",
+    "all_equivalent_implementations_infeasible": "NOT_ESTABLISHED",
+    "algorithm_effectiveness": "NOT_EVALUATED",
+    "formal_runner": "NOT_IMPLEMENTED_IN_THIS_PACKAGE",
+    "formal_training_admission": false,
+    "four_condition_experiments_required_now": false,
+    "novelty_boundary": "UNCHANGED_MLDG_MER_LA_MAML_PRIOR_ART_LIMITS"
+  },
+  "five_question_answers": {
+    "Q1": "Actual GPU wrapper calls unchanged positive-beta complete second-order objective/update. No new detach, head-only, reduced-group or proven functional-state contamination defect found. save_on_cpu semantics plus Tiny evidence do not establish native BGE success.",
+    "Q2": "Main conclusions match supplied raw records. Tiny comparator is a stop-gradient-inner variant evaluated at fast parameters, not an unadapted query. Direct fails in historical-support forward before inner grad; offload is RSS-killed after meta start, exact subphase unknown. Some ancillary reported resource checks lack raw snapshots.",
+    "Q3": "Recommend one engineering route: stage and release whole-group graphs, compute query VJP at numeric fast leaves, recompute exact full-parameter support HVPs and assemble gs+beta*(v-Hs.T@(A.T@v)). Mathematical checks executed; PyTorch suggestion not executed; 28GiB allocator/128GiB RSS feasibility unknown.",
+    "Q4": "1e-5/1e-3, rho=.1, beta=1 are a coherent prospective starting point, not tuned or validated optima. SGD look-ahead is not Adam simulation; J is not divided by two; extra group supervision and MSE relative weighting must be disclosed.",
+    "Q5": "Future formal entry must validate full model/Adam/RNG/memory/map restoration, runtime configuration differences, immutable surviving logit references, auxiliary-state merging, exact accounting and complete evaluation gates. No formal admission follows from this review."
+  },
+  "runs": [
+    {
+      "name": "tiny_first",
+      "wrapper_seconds": 4,
+      "exit_status": 0,
+      "status": "TINY_PARITY_PASS",
+      "actual_optimizer_step_calls": 3,
+      "meta_steps_are_two_independent_branches_from_same_start": true,
+      "hessian_correction_squared_norm_encoder": 1.724615970033483e-7,
+      "hessian_correction_squared_norm_head": 0.0011961045383941382,
+      "all_raw_gradient_arrays_present": false
+    },
+    {
+      "name": "direct_first",
+      "wrapper_seconds": 9,
+      "exit_status": 1,
+      "status": "CUDA_OOM",
+      "completed_warm_updates": 1,
+      "successful_complete_meta_updates": 0,
+      "failure_location": "history_support forward, BERT GELU, before support returns and before inner create_graph grad",
+      "next_allocation_mib": 42,
+      "peak_allocated_bytes": 28248230400,
+      "peak_reserved_bytes": 30058479616
+    },
+    {
+      "name": "offload_first",
+      "wrapper_seconds": 88,
+      "exit_status": 124,
+      "status": "WRAPPER_RSS_BUDGET_KILL",
+      "completed_warm_updates": 1,
+      "successful_complete_meta_updates": 0,
+      "meta_update_start_recorded": true,
+      "exact_internal_failure_subphase": "UNKNOWN",
+      "has_result_json": false,
+      "trigger_elapsed_seconds": 81,
+      "sampled_rss_kib": 134863072,
+      "sampled_rss_gib": 128.61544799804688,
+      "sampled_host_available_kib": 123168432,
+      "sampled_host_available_gib": 117.46257019042969,
+      "sampled_rss_is_exact_peak": false,
+      "stop_to_wrapper_finish_seconds": 7
+    }
+  ],
+  "budget": {
+    "authorization_scope": "group_meta_gpu_handwritten_only",
+    "allocator_gib": 28,
+    "rss_sampled_warning_gib": 128,
+    "rss_os_hard_isolation": false,
+    "maximum_seconds": 3600,
+    "sum_attempt_wrapper_seconds": 101,
+    "first_start_to_final_finish_calendar_seconds": 176,
+    "arithmetic_remaining_seconds": 3499,
+    "remaining_is_automatic_authorization_for_more_runs": false,
+    "saved_new_model_weight_artifacts": 0,
+    "formal_input_or_old_experiment_weight_access_authorized_in_this_scope": false
+  },
+  "findings": [
+    {
+      "id": "S1",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "title_zh": "当前原生GPU资源准入未成立",
+      "blocks": ["claim_of_native_bge_gpu_success", "formal_training_resource_admission"],
+      "does_not_establish": ["algorithm_effectiveness_failure", "objective_mathematical_error", "all_exact_implementations_infeasible"],
+      "evidence": ["evidence/supplied/direct_first/", "evidence/supplied/offload_first/"],
+      "disposition": "Keep admission closed; evaluate the proposed equivalent engineering route within a concrete handwritten scope before any formal runner admission."
+    },
+    {
+      "id": "R1",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "minor_wording",
+      "title_zh": "合同把快参数处内层stop-gradient对照误写成未适应query",
+      "location": "docs/SELLER_ALIAS_GROUP_META_GPU.zh.md:15",
+      "actual_comparator": "gs + beta * dLq(phi)/dphi, phi is already adapted",
+      "patch": "proposed/clarify_tiny_mutant.patch",
+      "patch_dry_run": "PASS",
+      "patch_applied_to_input_or_project": false,
+      "independently_blocks_resource_admission": false
+    },
+    {
+      "id": "R2",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "minor_ancillary_evidence_gap",
+      "title_zh": "部分报告观察未随包保存原始输出",
+      "reported_only_items": ["CPU47 200/200 idle jiffies sample", "16:11:36 intermediate RSS/GPU snapshot", "16:14 final GPU idle snapshot", "original Linux syntax/deployment check stdout"],
+      "facts_with_raw_evidence_retained": ["attempt startup numerical resources", "tiny/direct environment and affinity", "source inventory and nine execution snapshots", "direct OOM traceback", "offload RSS budget sample and termination"],
+      "disposition": "Qualify as executor-reported observations or attach already-existing raw records; no new BGE rerun required.",
+      "independently_blocks_resource_admission": false
+    }
+  ],
+  "primary_engineering_recommendation": {
+    "name": "whole_group_staged_exact_vjp_hvp",
+    "formula": "gJ = gs + beta * (v - Hs.T @ (A.T @ v))",
+    "rate_assumption": "A is a constant diagonal matrix within the update",
+    "all_cross_parameter_hessian_terms_preserved": true,
+    "full_MSE_Hessian_required": true,
+    "query_fast_leaves_are_allowed_only_with_exact_support_HVP_correction": true,
+    "same_role_dropout_and_forward_state_required": true,
+    "must_preserve_None_vs_zero_gradient_mask": true,
+    "logical_complete_group_roles_per_update": 4,
+    "physical_complete_group_forwards_per_update": 6,
+    "proposed_total_optimizer_updates": 1728,
+    "logical_role_presentations": 6912,
+    "physical_complete_group_forwards_excluding_warm_eval_diagnostics": 10368,
+    "target_equivalence": "MATHEMATICAL_UNDER_STATED_CONDITIONS_NOT_BITWISE_FP32_GUARANTEE",
+    "native_resource_feasibility": "UNKNOWN",
+    "suggestion_file": "proposed/staged_exact_hvp_suggestion.py",
+    "suggestion_version": "v2_None_semantics_corrected",
+    "suggestion_torch_runtime_executed": false,
+    "suggestion_production_integration_executed": false
+  },
+  "independent_math": {
+    "runtime": "NumPy 2.3.5 / Python 3.12.14",
+    "parameter_dimension": 7,
+    "affine_logit_case": {
+      "proposed_rates_staged_vs_analytic_max_abs": 1.1102230246251565e-16,
+      "proposed_rates_scalar_central_difference_at_1e-5_max_abs": 2.5219826227385056e-11,
+      "wrong_A_H_order_max_abs_difference": 8.055790155847564e-5
+    },
+    "nonlinear_logit_supplement": {
+      "formula": "z=u+0.35*sin(u)",
+      "proposed_rates_scalar_central_difference_at_1e-5_max_abs": 3.3340108451795913e-11,
+      "Gauss_Newton_MSE_mutation_max_abs_difference": 7.556358465432567e-5
+    },
+    "limits": ["not_production_ranking_loss", "not_BGE", "not_Torch", "not_GPU_memory_evidence", "not_Adam_parity"]
+  },
+  "reviewer_suggestion_revision": {
+    "v1_defect": "Fully-unused grad=None was materialized as zero",
+    "defect_belongs_to_uploaded_project": false,
+    "v1_preserved": true,
+    "v2_fix": "Track support/query/HVP participation and return None only for wholly unused parameters",
+    "review_and_diff_preserved": true,
+    "v2_verified_scope": "STATIC_REVIEW_AND_SYNTAX_ONLY",
+    "v2_runtime_validation": "NOT_RUN"
+  },
+  "future_formal_requirements_not_current_proven_defects": [
+    "Restore all original first-stage model/Adam/RNG/memory/map state rather than counter-only fixture",
+    "Use explicit meta-compatible eager loader and record old vs new execution configuration separately",
+    "Separate state restoration, new-configuration repeatability, and old/new prediction equality",
+    "Keep surviving old logit targets unchanged and generate only newcomer stage-end targets",
+    "Merge group_meta auxiliary with checkpoint metadata; do not overwrite the dictionary",
+    "Count all persistent historical method state within the existing one-MiB contract",
+    "Count recomputation cost and all actual optimizer updates",
+    "Adapt complete endpoint/score/map/label-opening gate to the new candidate",
+    "Freeze development criteria, acceptable ranking/identification tradeoffs and stopping/budget rules before new results"
+  ],
+  "overengineering_or_out_of_scope": [
+    "Require four mechanism conditions before the requested pilot",
+    "Rerun all previous LOGIT or risk experiments",
+    "Read sealed data, owners, test or outside credentials",
+    "Use formal data to test memory",
+    "Build a dense full Hessian or full-parameter finite-difference suite",
+    "Silently substitute first-order, head-only, smaller groups or fewer candidates",
+    "Use physical host capacity as permission to exceed the approved memory budget",
+    "Automatically spend remaining time on unscoped attempts"
+  ],
+  "review_execution": {
+    "source_and_raw_record_reads": true,
+    "independent_receipt_and_arithmetic": true,
+    "numpy_and_decimal_computations": true,
+    "python_AST_and_bash_syntax": true,
+    "public_primary_source_lookup": true,
+    "torch_executed": false,
+    "CUDA_executed": false,
+    "BGE_executed": false,
+    "connected_to_user_linux": false,
+    "formal_data_read": false,
+    "old_experiment_weights_read": false,
+    "formal_training_executed": false,
+    "formal_evaluation_executed": false
+  }
+}

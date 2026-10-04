@@ -1,0 +1,275 @@
+完整二阶群隔离元更新：GPU资源准入独立增量外审
+审查日期：2026-10-04（北京时间 UTC+8）
+唯一审查输入：用户上传 review(7).zip
+交付性质：增量实现、资源证据和工程建议审查；不含新正式训练或效果评价。
+
+一、裁决
+
+本次增量外审已完成。接受执行者的核心判断：当前直接GPU路径与save_on_cpu路径均没有取得一次原生BGE完整元更新的成功证据，当前资源准入未通过，不能据此启动正式效果训练。两次原生尝试是资源可行性失败，不能作为候选算法效果的负结果，也不能证明所有保持同一精确目标的等价实现在这台设备上都不可行。
+
+沿实际入口、核心函数、运行源码快照和原始日志检查，未发现本轮GPU接入把原定义偷换为一阶、只训练head、缩为两群、减少账号或候选，或把仅记录的元损失冒充实际优化目标。完整二阶链在源码中保留，Tiny CUDA记录支持指定小模型的直接/暂存完整梯度、模型及Adam状态在所设容差内一致。原生BGE未完成，不得把这个限定支持升级为“BGE GPU已通过”。
+
+当前确定的问题是一个很窄的比较对象文案错误，另有部分报告观察缺少随包原始快照。它们不推翻两条资源失败事实，也不要求重审已关闭的基础体系。主推下一项工程工作为：按完整群分阶段计算一阶梯度、释放图，再重算支持群的精确Hessian–向量乘积，显式组合原目标完整梯度。该方案有数学与独立小型计算依据；尚无原生执行依据，能否在28GiB分配器限额和128GiB RSS警戒内完成仍未知。
+
+拟议内层率1e-5/1e-3、rho=.1、beta=1没有发现足以否定固定点尝试的明显合理性问题；它们不代表经过效果选择的最优参数。SGD前瞻不是Adam模拟，MLDG/MER/La-MAML既有创新边界不变。按最新要求，先候选、暂不启动四条件机制对照；本报告不把对照训练变成本轮前提。
+
+机器裁决：verdict.json。
+
+二、模型身份、实际工作和证据等级
+
+当前会话配置将我标识为ChatGPT / GPT-6 Astra Pro。没有可独立核验的后端型号标识，也未读取网页模型选择器的现场状态，因此不能认证实际后端就是用户指定的“网页GPT 6 Pro”。这一配置标签和本报告自述均不作为独立身份认证。
+
+本次使用并行分项审查；主审重新读取关键入口、元目标、父级实际前向/更新/恢复与原始日志，核查分项意见，并独立复算。分项数、哈希数、AST数以及退出0都不作为科学正确性的充分条件。
+
+本环境为Python 3.12.14、NumPy 2.3.5，未发现可用PyTorch、Transformers或SentenceTransformers。实际新执行了：
+1. ZIP身份、CRC、成员、完整清单、来源及执行快照核验。
+2. 与prior原始版本的源码/AST差异比较，确认已关闭修复的影响范围。
+3. 三次实际运行时间、预算阈值、单位换算、退出原因和Tiny残差含义的独立复算。
+4. 15份当前Python来源的AST解析与包装脚本Bash语法检查。这是在本审查环境执行，不冒称Linux py310现场重跑。
+5. 无Torch的Decimal标量对照，以及NumPy float64七维完整梯度、中心差分、Hessian和错误乘法次序的独立计算。
+6. 一处拟议合同勘误补丁的dry-run；工程建议源码的语法审读与交叉检查。
+7. PyTorch 2.9/v2.9.1官方文档/源码和直接近邻原始文献的有针对性核对。
+
+未运行：上传PyTorch测试套件、Tiny CUDA、原生BGE、用户Linux服务器任务、正式文本/标签/缓存读取、旧实验模型/Adam/RNG恢复、正式候选训练、LOGIT0.1结果重新计算、四条件机制训练。没有安装依赖、下载模型、索取凭据或读取封存身份。工程建议没有在本项目原生环境成功执行的声明。
+
+证据等级按内容区分：包内实际代码和原始日志可支持对应执行路径；本审查数学参考可支持公式与错误变体区分；官方API资料可支持语义依据；没有原始数值的执行者观察只能作为报告陈述。上述各层不能互相替代。
+
+三、附件身份和增量承接
+
+实际测量：
+文件大小：427,942字节。
+ZIP成员：73，未发现重复名称。
+解压载荷合计：807,356字节。
+SHA-256：636f8a2f41d2c6a5cc80e697b2e38044868de9e5152e45c75c0c5f9e104d7eb2。
+CRC：全部通过，与用户给定身份一致。
+
+review_manifest.json列出72个其余载荷，逐项大小/SHA全部匹配，且没有未列入的载荷；清单不自哈希。根source_inventory.json的21项、回传source_inventory.json的21项、returned_inventory.json的42项均与本包对应文件匹配。三个运行目录各自保存的入口、元方法、包装脚本共9份快照均与当前源码字节相同。[E1]
+
+“未改元算法”须精确表述：当前step28_group_meta.py与prior/reviewed_implementation.zip中的原始文件不完全同字节；差异是prior/primary_review.zh.md已经关闭的beta=0群呈现计数修正。load_model、lookahead、objective、update及核心类的AST未改。当前正beta计算路径不能因为原包存在已关闭修复而被错误重开，也不能笼统写两份完整源码完全相同。[E1,E2]
+
+本轮承接prior已关闭的基础输入、损失、完整群、六群记忆、固定logit及旧CPU二阶核验边界；没有重新审全部旧实验，也没有从旧PASS推定GPU成功。较早四条件建议由最新用户“先候选、暂不四条件”的要求和当前VALIDATION文档明确收窄。
+
+21项来源匹配表示本包内容与回传来源记录一致，其中关键三份程序还有每次运行留存副本；本次没有登录服务器重新测量部署文件。implementation提及的returned.zip压缩原档没有单独随包提供，无法独立复算该压缩容器的44,223字节/SHA；其42份展开载荷已核对，足以复查本轮主要执行事实。以上身份限制不影响两条资源失败裁决。
+
+四、真实计算是否保持原定义
+
+4.1 入口和完整二阶链
+
+真实调用链为：
+run_step28_group_meta_gpu_linux_20261004.sh:79–80
+→ step28_group_meta_gpu_check.py:139–141，在可选CPU暂存上下文内调用method.update
+→ step28_group_meta.py:188–189，构造objective并loss.backward
+→ 同文件201–205，设置既有外层率、统一clip一次、AdamW.step一次。
+
+令B为既有完整群基础目标（BCE、query-rank及0.5倍known-Top5-hard），D为历史支持群raw-logit均方差。实际目标为：
+
+Ls(theta) = B(Cs;theta) + .1 B(Hs;theta) + .5 D(Hs;theta)
+phi = theta - A grad Ls(theta)
+Lq(phi) = B(Cq;phi) + rho B(Hq;phi)
+J(theta) = Ls(theta) + beta Lq(phi)
+
+lookahead:106–109用create_graph=True计算支持梯度，再以value-rate*grad构造快参数，没有对内层梯度detach。query真实接收快参数。历史监督.1与MSE .5独立，query没有另加MSE。更新只对最终完整梯度做一次外层clip与AdamW，没有临时优化器step写原参数。[E2]
+
+4.2 四群和全参数
+
+Episode.validate要求四群有完整监督，且群、账号、商品UID互斥；正beta时四角色各自进入目标。GPU夹具构造四群，每群28账号、99商品、198条标题/描述、378条无向关系，完整每查询27候选结构保留。手写标题和描述分别补至含特殊token的21/82长度。microbatch32只切编码调用；全部文本向量最后合并，账号聚合和候选关系没有减量。[E2]
+
+全部注册参数进入functional_call与encoder/head优化器组，objective拒绝冻结参数。这里的“全参数”指没有人为限制可训练子集；不等于证明BGE每个参数元素都有非零梯度或每一步都改变。激活分支、未使用参数、外层阶段末编码器率为零等都会影响实际变化，本轮原生也未完成更新。原生成功后才可提供其具体参数/状态变化证据。
+
+当前手写样例证明代码构造了该尺寸，没有认证所有正式内容、商品数或任意256-token输入都可运行。合同所引用的旧maximum_tokens=82来源没有在本次重新读取；不能将本轮手写压力样例升级为正式输入上界认证。
+
+4.3 函数式状态与CPU暂存
+
+GroupScorer将模型注册为子模块，参数键取scorer.named_parameters；functional_call使用完整参数与克隆的buffer字典，并设置strict=True。没有通过load_state_dict或复制普通模块来伪造可微快参数。每角色在fork_rng中使用独立固定seed；CUDA_VISIBLE_DEVICES只暴露GPU0，角色前向后恢复调用方CPU/GPU随机状态。[E2]
+
+PyTorch v2.9.1的save_on_cpu在pin_memory=False时逐次保存CPU副本，反向需要时回原设备。它作用于供反向使用的保存张量，不等于把目标定义中的grad Ls截断；本入口的上下文覆盖目标构造和反向。此次没有前向重算，因此没有新增“functional_call退出后checkpoint重算偷用原权重”的路径。官方语义和Tiny证据支持这一限定判断，仍不能替BGE双反向认证。[W1,W2]
+
+需保留两项界限。第一，官方v2.9.1源码是与记录版本对应的依据，不是安装目录或运行二进制逐字节审计。第二，functional_call会让被调用模块对参数/buffer的原地变更反映到传入字典；克隆buffer能隔离原对象，但原代码四角色共享一次克隆，并不保证任意可变buffer模型角色隔离。当前已知BERT/head路径没有发现BatchNorm式运行状态更新或实际污染证据；不能把潜在通用风险写成本轮已经发生的缺陷。[W3]
+
+逐次CPU拷贝且不去重，可能使多microbatch反复保存的权重或中间量占用大量主存；这是技术上可行的解释，不是本次128GiB超限的逐张量归因。没有证据把重复副本认定为唯一原因，也没有证据保证去重就能跑通。
+
+五、微型一致性、失败位置与预算
+
+5.1 三次运行的独立复算
+
+Tiny：16:09:35—16:09:39，包装4秒，exit0；内部计时2.145142300秒。
+Direct：16:10:16—16:10:25，包装9秒，exit1；内部计时6.796184990秒，CUDA OOM。
+Offload：16:11:03—16:12:31，包装88秒，exit124；没有最终Python result.json。
+
+4+9+88=101秒，按包装累计口径的算术余量为3600−101=3499秒。首次开始到最后结束的连续日历区间为176秒，含75秒尝试间隔。两种口径不同，均未达到1小时；不能用101秒或88秒估计成功原生元更新的耗时。余量不是自动启动其他计算的授权。[E3,E4]
+
+Tiny的实际三次更新是一次warm、一次direct元更新、恢复同一起点后一次offload元更新；两条元路径不是连续两步。两次原生各自完成过一次warm普通更新，然后显式把Adam计数1置为288，再打印第一个meta开始标记。故原件支持合计五次手写参数更新调用，其中原生完整元更新成功数为零；没有保存模型权重产物或正式效果结果。不能把“没有产生新训练权重”宽解为完全没有发生参数更新，也不能把计数288说成恢复了真实288步动量。[E2,E3]
+
+5.2 Tiny比较了什么
+
+检查器先恢复同一模型/Adam起点，求完整目标、support对theta的梯度、query对fast的梯度以及完整目标对theta的梯度；随后另行实际update并比较完整模型、Adam状态。容差为rtol=1e-5、atol=1e-7，不是全张量逐位一致断言。
+
+其残差是r = gJ − gs − beta*v，其中v在适应后的phi处计算。对应忽略内层梯度依赖的一阶替代，正确理论残差为−beta*Hs^T*A^T*v。两条路径记录的平方范数相同：encoder为1.724615970033483e-7，head为0.0011961045383941382；均明显超过检查阈值1e-14。根号后范数分别约0.00041528496和0.03458474430。[E3,E5]
+
+这是有实质内容的二阶区分检查，并非仅“梯度非零”。但包内没有全部原梯度数组，本次无法独立逐元素重算Tiny数值一致性；依据是实际比较代码、执行快照与完成日志相互吻合。检查器没有另外运行一个完整detach变异网络，而是按代数残差检查其梯度差。不能将其写成所有伪实现均被逐个实际运行排除。
+
+R1：GPU合同第15行写“与未适应query的一阶梯度区分”，与代码不符。真正未适应query应在原theta处求值。implementation写“内层detach的一阶替代”是正确的。独立标量例子显示：theta=.3、alpha=.2、beta=.7时，精确梯度.1064，快参数处stop-gradient变体.308，未适应query变体.21；两种变体确实不同。所附clarify_tiny_mutant.patch只修正文案，dry-run通过，没有覆盖输入或部署。[E5,E7]
+
+Tiny用.03/.04/.3/.7放大可检出差异，不能据此判断拟议1e-5/1e-3/.1/1在BGE上的实际二阶校正规模。
+
+5.3 Direct失败精确位置
+
+traceback明确为update → objective → lookahead → support → forward(params,1)，即历史支持群BERT前向的GELU分配失败。当前支持群图已存在，历史支持群尚未返回；支持总损失尚未返回给lookahead，因此该次内层create_graph求导、query与完整元反向都没有开始。[E3]
+
+最后区间峰值：allocated 28,248,230,400字节=26.30821466445923GiB；reserved 30,058,479,616字节=27.994140625GiB。报错明确28.00GiB allowed，下一次申请42MiB失败；运行时设备总容量文字约31.36GiB，不能把名义32GiB全当分配器可用额度。上下文等进程占用另计。下一次申请42MiB只是当时失败的分配，不是剩余完整元更新所需总量；错误消息中的通用碎片化建议也不能当成本项目已定位根因。[E3,E4]
+
+5.4 Offload失败只能定位到哪一层
+
+预算触发采样为elapsed=81秒、RSS=134,863,072KiB、MemAvailable=123,168,432KiB、evidence_bytes=115,064。换算RSS=128.61544799804688GiB，超过警戒630.21875MiB；MemAvailable=117.46257019042969GiB，未触发低于16GiB条件。输出约0.1097MiB、时间81<3587秒，两者也未触发。实际触发条件唯一为RSS。[E4]
+
+包装执行SIGKILL并等待，最终88秒结束、exit124；从超限采样到结束多7秒。exit124是包装预算退出状态，不是模型返回的效果失败或CUDA异常种类。检查是每轮ps采样并sleep 1，128GiB是采样警戒，不是内核硬隔离；128.615GiB是触发采样值，不是精确峰值。
+
+日志没有细分support/inner-grad/query/backward阶段，也没有Python堆栈或返回成功记录。只能说已进入首个meta且没有完成证据，不能具体宣称它死在内层求导、query或完整反向，更不能把未记录的部分当作通过。
+
+R2：implementation中的CPU47两秒200/200空闲、16:11:36中途RSS/GPU使用、16:14 GPU空闲及Linux语法/部署检查输出，没有相应完整原始快照随包。启动资源数值、affinity及关键退出有原件；其余应标为执行者报告观察。这里是轻微证据保存缺口，不是已证明资源违规，不改变OOM/RSS的主结论。可以补存当时已有原记录或收窄文字，不要求重跑BGE。
+
+六、一个主要工程建议：完整群分阶段精确HVP
+
+6.1 为什么选这个方向
+
+Direct在同时保留两个完整支持群的前向图时已经失败，而两次原生warm提供了同一手写规模单群一阶更新能执行的有限依据。因此优先缩短跨群、跨内外层计算图的存活时间，直接针对观察到的资源瓶颈。保留FP32、eager、checkpoint关闭、microbatch32及原四群，不同时叠加多种数值和内存优化，以便把下一次检查集中在等价梯度与峰值。
+
+这不是保证。单群HVP包含比单群一阶warm更多的图和临时量，额外完整参数向量、快参数、原模型及Adam状态也占资源；它仍可能超过28GiB allocator或128GiB RSS。当前没有其单群二阶峰值，不能填写一个虚构的成功率或正式时长。
+
+6.2 数学与正确乘法顺序
+
+采用列向量，令gs=grad Ls(theta)，Hs=D_theta gs，phi=theta−A gs，v=grad_phi Lq(phi)。A在本次更新内是常数。则：
+
+D_theta phi = I − A Hs
+grad_theta J = gs + beta (I − A Hs)^T v
+             = gs + beta [v − Hs^T (A^T v)]。
+
+本项目A是encoder/head不同常数率组成的对角矩阵。局部二阶可微处可写Hs(Av)，但不得交换成A(Hs v)。两个参数块的交叉Hessian不能删除。Top5选择、ReLU、绝对值等使用与原图相同的局部分支/自动微分约定；不要求对离散候选索引求导，也不能以此删掉现有可微链。[E2,E6]
+
+支持目标可拆为两个完整群标量s1=B(Cs)，s2=.1B(Hs)+.5D(Hs)；query拆为q1=B(Cq)、q2=rho B(Hq)。由微分线性性：gs=grad s1+grad s2，v=grad q1+grad q2，Hs^T u=H1^T u+H2^T u。拆的是群之间的加法，不拆账号统计、不拆群内候选竞争。
+
+建议执行：
+阶段A：在原theta分别计算两个完整支持群，create_graph=False取得并累计gs，各群结束释放图。
+阶段B：构造独立叶快参数phi=theta−A gs，在phi处分别计算两个完整query群并累计v，各群结束释放图。
+阶段C：把u=A v作为常向量，释放query图/快参数；以相同theta和角色随机状态逐个重算支持群，create_graph=True，再计算autograd.grad(g_i, theta, grad_outputs=u)取得精确H_i^T u；每群HVP后释放图。
+阶段D：组成gs+beta*v−beta*(H1^T u+H2^T u)，写入原参数梯度，再按原方式一次全局clip、一次AdamW更新。
+
+autograd.grad的grad_outputs是VJP向量，create_graph=True建立高阶图；该语义支持上述实现方式，但文档不代替原生验证。[W4]
+
+阶段B将快参数作为独立叶只是图生命周期安排；阶段C精确补回其组成导数。省略阶段C才会变为禁止的一阶替代。不得以有限差分、Gauss–Newton、仅head Hessian或块对角近似替换生产HVP。历史MSE的完整Hessian亦必须保留：非线性logit时除J_z^T J_z外还含残差乘logit二阶导数，不能悄悄省去。
+
+6.3 等价实施必须守住的条件
+
+（1）每次重算使用同一角色seed、theta、文本顺序、microbatch、padding、dtype、attention和训练模式。只在开头设一次全局seed不足以保证重算Dropout相同；不同mask会让phi来自一个支持目标而HVP来自另一个，破坏逐次实现的链式导数。
+（2）完整参数显式传入functional_call。若未来启用checkpoint，不能仅改一个开关后默认快参数重算正确；当前主方案无需checkpoint。非重入checkpoint官方支持autograd.grad，并不免除重算函数必须相同的条件。[W5]
+（3）确认当前BGE/head没有需要按角色推进的可变buffer。若存在，必须复现原各角色前的状态，不能额外推进或随意复位；梯度计算不得修改原模型、Adam或调用者随机状态。
+（4）诊断terms、列表或closure只能保存detach后的数值，不能保留live loss/embedding而使旧图继续存活。单群HVP放入独立函数作用域，可避免Python循环变量意外持有前一群梯度图。
+（5）u在HVP中是常量，不再对query向量求导。对全参数tuple求VJP，保留encoder/head交叉项。
+（6）不能将完全未收到梯度的参数.grad=None改成零Tensor；优化器对两者行为不同。组装梯度必须保留这一掩码，才能保持原Adam的跳过、计数、动量和衰减语义。[W6]
+（7）返回的诊断total只是数值，不可再调用backward；也不可把已经组装的梯度送回旧update让它重建图。只替换“取得原始完整梯度”的部分，其后的计数、学习率、clip和step保持。
+
+按群累计会改变FP32求和/归约顺序，属于同一数学目标的数值实现差异，不保证逐位相同。需要小型直接/分阶段完整梯度和更新后模型/Adam比较，再按同一手写规格确认原生完整更新及连续第二步的峰值/释放；不因数学推导而跳过这些检查。改变BF16、microbatch、随机mask须另外声明；一阶、head-only、缩群、降候选、改内层优化器或J除2均不属于本建议的无声等价调整。
+
+6.4 本次实际独立数学结果
+
+构造四个纯人工代数角色，各含28账号/378关系，七维参数和交叉参数块Hessian。其logits是仿射函数，损失为可解析的非线性BCE及历史MSE；没有复现生产BGE、文本表示或完整排序损失。用途是验证分阶段链式公式及不等步长次序，不是新算法效果或BGE梯度测试。[E6]
+
+本轮1e-5/1e-3两块率、rho=.1、beta=1的七维结果：
+分阶段梯度与解析组合最大绝对差：1.1102230246251565e-16。
+标量J逐坐标中心差分（epsilon=1e-5）最大绝对差：2.5219826227385056e-11。
+用独立差分Hessian再组装链式梯度最大绝对差：5.051514762044462e-15。
+删除Hessian导致最大梯度差：1.2434916685233333e-4。
+错误交换A与Hessian导致最大梯度差：8.055790155847564e-5。
+
+三档差分步长的全部输出均保留，没有只抽一个坐标或只报最好结果。另有放大率及非对称常数A的数学反例，用于检出错误次序/漏转置，不是新增正式参数点。它们没有运行任何Torch模型，也没有验证生产非线性logit的MSE残差二阶项；生产建议直接对完整损失做autograd HVP，不能以此数学夹具替代验证。[E6]
+
+另附已执行的非线性代数补充z=u+.35 sin(u)，专门检查完整MSE Hessian中的残差二阶项。在本轮两块率下，全七维中心差分最大误差3.3340108451795913e-11，分阶段对解析最大差1.1102230246251565e-16；仅把MSE Hessian换成Gauss–Newton近似即产生7.556358465432567e-5的最大梯度差。这一补充仍是人工数学模型，不是生产排序/BGE或GPU核验；原始仿射例及输出未被覆盖。[E6]
+
+6.5 成本计数和建议稿自身审查
+
+每次逻辑更新仍为四个不同完整群；本建议具体执行六次完整群前向：support首算2、query2、support重算2，另有HVP反传。拟议1728次更新仍可记6912个逻辑角色呈现，但实际完整群前向为10368次（不含warm、评价或额外实现检查）。不能据6912声称与旧LOGIT等计算预算，也不能把重算说成新增训练数据。
+
+本审查的首版未执行PyTorch建议稿把全部返回梯度初始化为零，交叉审查发现其可能把原本grad=None的完全unused参数变成0，从而改变AdamW行为。该问题属于本审查建议稿，不是上传生产代码的缺陷。已保留v1、审查原文、修正diff，并在v2按真实autograd参与情况返回None。v2仍只有源码/语法检查，没有Torch或原生运行成功声明。不要直接把它作为已验收的生产替换。[E8]
+
+七、拟议固定点合理性及创新边界
+
+1e-5/1e-3取既有外层峰值便于解释；但内层是未裁剪SGD位移−A gs，外层AdamW还受历史矩、bias correction、epsilon、衰减和clip影响。相同数字不表示相同位移，固定内层率也不等同外层逐阶段warmup/decay。小率可能使校正弱，也可能仍有作用，没有该点原生梯度不能断言。
+
+rho=.1让query历史/当前基础监督的标量比例与support相同；beta=1只使两个目标外部系数相同，不保证损失值、梯度范数或实际影响相同。以形式上的A=0极限说明：
+J0 = B(Cs)+B(Cq)+.1[B(Hs)+B(Hq)]+.5D(Hs)。
+相对两群LOGIT0.1，当前与历史基础监督各有额外群呈现，而MSE仍只在Hs一次。因而候选改变了监督呈现及相对结构，不能说仅多一个Hessian项。J不除2与合同一致，不应当作无害“归一化修复”；在继承旧Adam矩与clip的实际路径上没有普遍更新不变性。
+
+这些问题要求准确解释固定点，不构成要求现在增加调参或四条件训练的理由。可在未来已授权的同次手写检查中记录块位移和二阶校正规模，用于解释，不能据未完成的两次原生结果声称参数有效。
+
+MLDG原文Eq.(3)/Algorithm 1已有F(theta)+beta G(theta−alpha grad F)同型骨架；MER与La-MAML分别与重放梯度对齐、持续学习内外层更新直接相关。完整二阶正确与工程能运行不会自动产生新的算法原理；本轮不重包装原创性。[W7–W9]
+
+八、正式接入前必须核对的差异（不是本轮已发生缺陷）
+
+当前没有formal runner，且授权formal_data=false、old_experiment_weights=false。以下属于之后具体接入的必要验收事项；本报告没有验证它们已经完成，也不要求用本包之外封存数据来补本轮结论。[E2,E9]
+
+1. 首域完整状态：按ABC/BCA/CAB对应旧after1恢复完整model、Adam全部状态及参数组、实际计数288、CPU/CUDA RNG、首映射、六群LOGIT memory和原参考。比较实际加载内容，不能只比较文件哈希，也不能以warm后改计数代替真实旧矩恢复。
+
+2. loader与配置：旧step28_bge_continual_run.restore_branch:230–240调用base.load_model，没有显式eager；新的入口应使用元路径结构加载方式并恢复旧状态，分别记录旧来源metadata与新执行配置。不能直接照搬旧函数便标记GPU元入口已接通。
+
+3. 三类一致性分开：旧模型/Adam/RNG保存状态的恢复、同一新配置下重复运行、旧新配置的预测一致是三个问题。旧代码是BF16 autocast、checkpoint、microbatch4，新路径为FP32/eager/无checkpoint/microbatch32。状态相同不保证预测或Dropout消费逐位相同；旧新分数不同也不自动意味着恢复失败。原raw logit用float32存储，不表示其来源推断原来就是FP32。
+
+4. logit生命周期：继承旧reference原值、Hs UID及378边顺序，不按新精度刷新旧幸存targets。阶段2末只为新入缓存群用候选当阶段末eval模型和约定配置生成raw logits；删除淘汰者参考，旧幸存参考与来源阶段不变，不重读淘汰文本。
+
+5. memory与辅助状态：六群是全部历史总额，保留Algorithm R的seen、槽位、保留随机流、support draw状态、首映射，以及Hq排除Hs的既定派生流。持久元设置/RNG/map等均计入同一1MiB。CAB首域零幸存的既有事实不事后重抽。
+
+6. 一个具体覆盖风险：meta.train_stage:250–252写memory.auxiliary['group_meta']；旧runner:457会整字典赋值memory.auxiliary=point['learner_auxiliary']。将来若照搬会丢失元设置，需合并、保存并重新按同一1MiB口径计量。当前没有该formal调用链，不能把它说成本轮已经污染状态。
+
+7. 日程与成本：冻结s0、ABC/BCA/CAB的阶段2/3、各288真实更新、共1728更新、外层Adam连续性及全部终点。若采用分阶段HVP，增加真实重算/前后向/时间计数，不能继续只报原6912作总成本。阶段末评分和保留缓存产生参考的成本也需纳入实际预算。
+
+8. 评价和LOGIT0.1对齐：复用合法已开放结果可以，不要求现在重训旧基线。须核对精确来源、群/查询/候选顺序、域与阶段映射、raw/stage-cal/first-cal、首映射、指标和计数版本。适配新增候选6终点与18套输出的完整盲门，继承旧域保持、新域刚学完、最终最新域及逐域识别取舍；旧gate针对旧arms写死，不能仅改一个PASS标签。新结果开放前固定观察量、可接受取舍、继续/停止规则和明确预算。
+
+允许先用候选对已开放LOGIT0.1作整体开发参照，同时报告精度、随机流、额外监督、重算成本的差异。有利结果首先是候选值得继续的信号；不自动是完整二阶或群隔离的独立因果贡献。当前不强制先跑四条件。
+
+九、分级处置
+
+SCIENTIFIC_BLOCKER S1：阻断“当前原生完整GPU资源准入”和据此启动正式训练。两条原生路径未完成首个元更新，完整时间/峰值未知。不是已证目标或算法效果错误。
+
+正式范围保留：formal runner、完整恢复/参考/盲门适配和正式预算未完成；本轮手写授权不覆盖正式数据或旧实验权重。此项是已知范围边界，不新造一个已经发生的实现缺陷。
+
+REPRODUCIBILITY_DEFECT R1：合同将Tiny比较对象误写为未适应query。只需文案勘误；最小补丁已提供且dry-run通过，原件不变。
+
+REPRODUCIBILITY_DEFECT R2：少量资源/环境观察缺少随包原快照。保留为报告观察或补已有原件，不以此宣称现场独立验证；不要求重跑原生。
+
+后续建议：先实现并在手写规格下核验一个分阶段精确HVP方案；保存实际有效配置、输入形状和简短阶段标记，以便失败时定位；核对完整梯度/模型/Adam、None梯度语义、随机流和连续第二步资源。它们是下一方案的验证要求，不是当前已发现全部生产错误。
+
+过度设计/超范围：现在强制四条件机制训练；重审或重跑全部LOGIT/risk与基础数据体系；全参数有限差分或密集Hessian；用正式群探内存；读取owners/test/凭据；事后改变缓存覆盖；把主机物理内存作为追加预算；同时堆叠混合精度、checkpoint、编译和多个offload实现；因未用满一小时而自动追加尝试。本轮均不要求。
+
+十、交付证据索引与使用说明
+
+[E1] evidence/independent/receipt_run/audit.json、verify_review_package.py：身份、72/21/42清单、9源码快照、核心AST、原始时间与资源复算。输入精确副本在evidence/received/review7_original.zip。
+[E2] 输入包scripts/step28_group_meta_gpu_check.py、scripts/step28_group_meta.py、包装脚本及相关父源码；proposal和审查均未覆盖输入。核心来源diff在receipt_run/meta_vs_original.diff。
+[E3] evidence/supplied/tiny_first/、direct_first/：原始result/stdout/stderr/时间/资源/退出码。
+[E4] evidence/supplied/offload_first/及offload_wrapper.log：原始停止采样、终止和时间记录；无result.json是真实未产生，未补造成功文件。
+[E5] evidence/independent/gpu_semantics/：实际静态/Decimal审查源码、输出与详细声明；Tiny原梯度未随包，不冒称重算。
+[E6] evidence/independent/hvp/：NumPy脚本、完整七维计算、stdout/stderr和执行元记录；不含Torch/BGE成功认证。
+[E7] proposed/clarify_tiny_mutant.patch和evidence/independent/doc_patch_dry_run/：拟议文案修正与dry-run。
+[E8] proposed/staged_exact_hvp_suggestion.py、proposal_history/：未执行的v2建议、v1原件、交叉审查、None梯度修正及语法状态。
+[E9] reviews/formal_boundary.zh.md：未来恢复、logit、auxiliary与评价接入的逐文件定位；reviews/中其余分项报告保留各自范围。
+
+所有独立执行输出和必要来源在ZIP中，EVIDENCE_MANIFEST.json逐文件列大小/SHA且不自哈希。主裁决以本报告及verdict.json为准；分项内部笔记是审查过程证据，不新增训练授权。README.zh.txt说明如何复算无需Torch的证据。
+
+十一、实际使用的官方/原始资料
+
+[W1] PyTorch v2.9.1 graph.py，读取pack_to_cpu/unpack_from_cpu；解释保存位置与逐次拷贝，不作为BGE通过证明。
+https://github.com/pytorch/pytorch/blob/v2.9.1/torch/autograd/graph.py
+[W2] PyTorch 2.9 autograd，读取save_on_cpu/saved tensor hooks语义。
+https://docs.pytorch.org/docs/2.9/autograd.html
+[W3] PyTorch 2.9 functional_call，读取参数/buffer替代及原地状态说明。
+https://docs.pytorch.org/docs/2.9/generated/torch.func.functional_call.html
+[W4] PyTorch 2.9 autograd.grad，读取VJP、高阶图与释放语义。
+https://docs.pytorch.org/docs/2.9/generated/torch.autograd.grad.html
+[W5] PyTorch 2.9 checkpoint，读取非重入支持与重算函数差异警告；未将checkpoint列为本轮主推实现。
+https://docs.pytorch.org/docs/2.9/checkpoint.html
+[W6] PyTorch 2.9 Optimizer.zero_grad，读取None与零梯度的优化器行为差异。
+https://docs.pytorch.org/docs/2.9/generated/torch.optim.Optimizer.zero_grad.html
+[W7] Li等，Learning to Generalize: Meta-Learning for Domain Generalization，原文Eq.(3)/Algorithm 1。
+https://arxiv.org/html/1710.03463v1
+[W8] Riemer等，Learning to Learn without Forgetting by Maximizing Transfer and Minimizing Interference，MER原始论文摘要与身份；本次不重做完整算法源码审查。
+https://arxiv.org/abs/1810.11910
+[W9] Gupta等，La-MAML: Look-ahead Meta Learning for Continual Learning，原始论文摘要与身份；本次不重做完整算法源码审查。
+https://arxiv.org/abs/2007.13904
