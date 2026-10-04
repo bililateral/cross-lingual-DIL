@@ -1,0 +1,450 @@
+{
+  "schema_version": "1.0",
+  "review_id": "review8-staged-exact-gradient-20261004",
+  "language": "zh-CN",
+  "current_input": {
+    "filename": "review(8).zip",
+    "bytes": 792243,
+    "sha256": "aab6c2470c76a6d66985246310f0af6bb983e6527e88372778af089d83d90ca6",
+    "members": 96,
+    "crc_error_member": null
+  },
+  "prior_used_only_as_embedded_direct_background": true,
+  "review_completed": true,
+  "overall_verdict": "EXACT_STAGED_IMPLEMENTATION_SUPPORTED_WITH_LIMITS__NATIVE_RESOURCE_NOT_ADMITTED__STOP",
+  "summary_zh": "分阶段核心保持完整精确梯度，未发现当前生产梯度错误；首次tiny夹具错误已修复，修复后8项通过；原生BGE四群一阶后在首个支持群create_graph=True求导OOM，零成功元更新。当前资源及正式训练未准入，本轮停止。",
+  "admission": {
+    "incremental_implementation_review": "SUPPORTED_WITH_STATED_PRECONDITIONS_AND_EVIDENCE_LIMITS",
+    "tiny_tests": "PASS_AFTER_ONE_DOCUMENTED_FIXTURE_REPAIR",
+    "native_bge_full_meta_update": false,
+    "native_bge_two_consecutive_meta_updates": false,
+    "native_bge_final_hvp_completed": false,
+    "formal_training": false,
+    "effect_claim": false,
+    "further_resource_attempt": false,
+    "new_optimization_route": false,
+    "four_condition_experiments_required_this_round": false,
+    "baseline_retraining_required_this_round": false,
+    "round_action": "STOP"
+  },
+  "implementation": {
+    "target": "J = Ls(theta) + beta * Lq(theta - A * grad Ls(theta))",
+    "gradient": "gs + beta * (v - Hs.T @ (A @ v))",
+    "A": "fixed real diagonal encoder/head rates; A.T == A",
+    "support": "B(Cs) + 0.1 B(Hs) + 0.5 mean((z(Hs)-fixed_reference)^2)",
+    "query": "B(Cq;phi) + rho B(Hq;phi)",
+    "fixed_point": {
+      "inner_encoder_lr": 1e-05,
+      "inner_head_lr": 0.001,
+      "rho": 0.1,
+      "beta": 1.0,
+      "selected_using_formal_effects": false
+    },
+    "full_parameter_cross_terms_retained": true,
+    "full_mse_hessian_retained": true,
+    "none_vs_connected_zero_preserved": true,
+    "loss_diagnostics_detached_to_numbers": true,
+    "one_group_graph_per_successful_stage": "Supported by source lifetimes; not per-object memory attribution",
+    "per_role_torch_rng_replayed": true,
+    "buffer_policy": "Cloned registered buffers, checked equal after forward; mutable buffers rejected",
+    "generic_mutable_state_model_verified": false,
+    "objective_and_lookahead_ast_unchanged": true,
+    "other_unchanged_ast": {
+      "load_model": true,
+      "Settings": true,
+      "Episode": true,
+      "lookahead": true,
+      "GroupScorer": true,
+      "objective": true,
+      "train_stage": true
+    },
+    "outer_update_core_ast_unchanged": true,
+    "gpu_native_only_explicit_dispatch_change": true,
+    "outer_update": "All returned parameter gradients; original LR; one global clip; one AdamW step",
+    "physical_complete_group_forwards_if_full_update_succeeds": {
+      "beta_positive": 6,
+      "beta_zero": 2
+    },
+    "hvp_diagnostic": "sum of per-support squared correction norms; not squared norm of summed correction",
+    "bitwise_equivalence_claimed": false,
+    "current_proven_production_gradient_defects": []
+  },
+  "provenance": {
+    "identity_matches": true,
+    "review_manifest": {
+      "matched": 95,
+      "count": 95
+    },
+    "archive_expansion": {
+      "matched": 96,
+      "count": 96
+    },
+    "current_sources": {
+      "matched": 26,
+      "count": 26
+    },
+    "linux_final_inventory_identical": true,
+    "initial_sources": {
+      "matched": 26,
+      "count": 26,
+      "archive_members": 28
+    },
+    "returned_payloads": {
+      "matched": 58,
+      "count": 58,
+      "archive_members": 59,
+      "expansion_matches": 59
+    },
+    "run_key_snapshots": {
+      "matched": 21,
+      "count": 21
+    },
+    "repair_changed_source_paths": [
+      "docs/SELLER_ALIAS_GROUP_META_STAGED.zh.md",
+      "scripts/run_step28_group_meta_staged_linux_20261004.sh",
+      "tests/test_step28_group_meta_staged.py"
+    ],
+    "production_python_unchanged_across_three_runs": true,
+    "server_remeasured_by_reviewer": false
+  },
+  "submitted_runs": [
+    {
+      "run": "tiny_first",
+      "charged_seconds": 6,
+      "wrapper_exit": 1,
+      "result_status": "FAIL",
+      "tests": {
+        "errors": 1,
+        "failures": 0,
+        "run": 8,
+        "skipped": 0
+      },
+      "error_type": "AssertionError"
+    },
+    {
+      "run": "tiny_repair",
+      "charged_seconds": 8,
+      "wrapper_exit": 0,
+      "result_status": "PASS",
+      "tests": {
+        "errors": 0,
+        "failures": 0,
+        "run": 8,
+        "skipped": 0
+      },
+      "error_type": null
+    },
+    {
+      "run": "staged_first",
+      "charged_seconds": 11,
+      "wrapper_exit": 134,
+      "result_status": "FAIL",
+      "tests": null,
+      "error_type": "OutOfMemoryError"
+    }
+  ],
+  "tiny_evidence": {
+    "first": {
+      "passed": 7,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "wrapper_exit": 1
+    },
+    "repair": {
+      "passed": 8,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "wrapper_exit": 0
+    },
+    "repair_reason": "An artificial wholly unused parameter with preexisting Adam step 288 stayed at 288 while used parameters reached 289; the unchanged direct reference equal-counter gate rejected the mixed counters.",
+    "repair_action": "Move unused/connected-zero/old-moment behavior to an independent scalar optimizer fixture; retain production equal-step gate and all tolerances.",
+    "repair_allowance_consumed": 1,
+    "algorithm_changed_by_repair": false,
+    "tolerances_relaxed_by_repair": false,
+    "complete_group_cuda_test": true,
+    "all_eight_tests_run_on_cuda": false,
+    "scalar_device": "CPU float64",
+    "old_six_model_computations_device": "CPU",
+    "gradient_tolerance": {
+      "rtol": 2e-05,
+      "atol": 2e-06
+    },
+    "loss_absolute_tolerance": 3e-06,
+    "model_adam_tolerance": {
+      "rtol": 1e-05,
+      "atol": 1e-07
+    },
+    "rng_comparison": "exact torch.equal for CPU and selected CUDA state",
+    "none_mask_comparison": "exact",
+    "two_step_design": "Along two successive staged steps, each direct/staged comparison restores the same model/Adam starting state; step 2 starts from the staged step 1 result.",
+    "independent_dual_trajectory_cumulative_drift_test": false,
+    "tiny_nonempty_buffer_dynamic_coverage": false,
+    "tiny_shape": {
+      "groups": 4,
+      "accounts_per_group": 28,
+      "items_per_group": 70,
+      "texts_per_group": 140,
+      "relations_per_group": 378,
+      "microbatch": 4
+    },
+    "physical_forward_count_independently_spied_in_test": false,
+    "real_old_first_domain_state_restore_verified": false
+  },
+  "native_result": {
+    "status": "FAIL_RESOURCE",
+    "successful_warm_updates": 1,
+    "successful_meta_updates": 0,
+    "completed_first_order_roles": [
+      "current_support",
+      "history_support",
+      "current_query",
+      "history_query"
+    ],
+    "phase_order": [
+      "support_0_start",
+      "support_0_done",
+      "support_1_start",
+      "support_1_done",
+      "query_0_start",
+      "query_0_done",
+      "query_1_start",
+      "query_1_done",
+      "hvp_0_start"
+    ],
+    "failure_phase": "hvp_0",
+    "failure_location": {
+      "file": "scripts/step28_group_meta_staged.py",
+      "function": "one_hvp",
+      "line": 67,
+      "operation": "autograd.grad(loss, theta, create_graph=True, allow_unused=True)"
+    },
+    "first_support_recomputed_forward_completed": true,
+    "differentiable_support_gradient_returned": false,
+    "final_hvp_vjp_completed": false,
+    "outer_update_started": false,
+    "error_type": "OutOfMemoryError",
+    "result_saved": true,
+    "subsequent_stderr_termination": "terminate called without an active exception",
+    "intended_python_failure_exit": 1,
+    "actual_wrapper_exit": 134,
+    "termination_root_cause": "UNKNOWN",
+    "budget_stop_record": false,
+    "allocator_limit_gib": 28,
+    "rss_sampled_guard_gib": 128,
+    "rss_guard_is_os_hard_limit": false,
+    "failed_next_allocation_mib": 20,
+    "failed_next_allocation_is_total_shortfall": false,
+    "hvp_0_start_allocated_bytes": 6599675392,
+    "last_interval_peak_allocated_bytes": 28586800640,
+    "last_interval_peak_reserved_bytes": 30064771072,
+    "peak_rss_kib": 2649920,
+    "last_interval_peak_allocated_gib": 26.62353277206421,
+    "last_interval_peak_reserved_gib": 28.0,
+    "peak_rss_gib": 2.52716064453125,
+    "gpu_peak_interval": "Since reset_peak_memory_stats immediately before first native meta attempt; not an isolated HVP-only measurement",
+    "rss_peak_interval": "process ru_maxrss",
+    "configuration": {
+      "precision": "FP32",
+      "attention": "eager",
+      "checkpointing": false,
+      "offload": false,
+      "microbatch": 32,
+      "groups": 4,
+      "accounts_per_group": 28,
+      "items_per_group": 99,
+      "texts_per_group": 198,
+      "relations_per_group": 378,
+      "title_tokens": 21,
+      "description_tokens": 82
+    },
+    "limited_conclusion": "The staged attempt passed the old reached failure stage; its first single-group second-order construction with current resident states still did not fit the fixed allocator budget.",
+    "memory_root_cause_attribution": "UNKNOWN; no per-operator/tensor/allocator breakdown",
+    "fragmentation_as_unique_cause_proven": false,
+    "all_equivalent_implementations_infeasible_proven": false,
+    "formal_duration_estimate_supported": false,
+    "post_run_observation": "At 18:29:18+08:00 GPU free 32063 MiB/utilization 0, process field empty, workspace top-level file list empty; not a system-wide dump audit"
+  },
+  "budget": {
+    "prior_seconds": 101,
+    "current_seconds": 25,
+    "cumulative_seconds": 126,
+    "arithmetic_remaining_seconds": 3474,
+    "further_execution_authorized": false,
+    "total_seconds": 3600,
+    "remaining_is_permission": false,
+    "clock_scope": "submitted wrapper accounting including all three new attempts and prior 101 seconds"
+  },
+  "classifications": [
+    {
+      "id": "S1",
+      "category": "SCIENTIFIC_BLOCKER",
+      "status": "OPEN_RESOURCE_ADMISSION",
+      "blocks": [
+        "native_full_gpu_resource_admission",
+        "formal_training_admission"
+      ],
+      "is_proven_gradient_definition_error": false,
+      "is_negative_effect_result": false,
+      "summary_zh": "当前原生BGE未完成第一个完整元更新，资源完成证据缺失。"
+    },
+    {
+      "id": "R1",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED_WITH_PRESERVED_FAILURE_AND_FIXTURE_REPAIR",
+      "currently_blocks": [],
+      "summary_zh": "首次tiny错误来自人工unused旧Adam状态与既有计数门；已经分离夹具，未改算法或容差。"
+    },
+    {
+      "id": "A1",
+      "category": "FOLLOW_UP_ADVICE",
+      "status": "DOCUMENT_EVIDENCE_LIMITS_NOW",
+      "currently_blocks": [],
+      "authorizes_execution": false,
+      "summary_zh": "两步应称逐步同起点比较；披露Tiny设备/形状、空buffer和计数夹具边界。"
+    },
+    {
+      "id": "A2",
+      "category": "FOLLOW_UP_ADVICE",
+      "status": "UNKNOWN_REMAINS_UNKNOWN",
+      "currently_blocks": [],
+      "authorizes_execution": false,
+      "summary_zh": "保留OOM及134退出两个层次，内存组成和terminate成因未知；本轮不要求再诊断试跑。"
+    },
+    {
+      "id": "O1",
+      "category": "OVERDESIGN_OR_OUT_OF_SCOPE",
+      "status": "NOT_REQUIRED_NOT_AUTHORIZED",
+      "summary_zh": "另设计优化路线、参数/allocator搜索、正式数据探内存、四条件训练、基线重训或泛化安全加固。"
+    }
+  ],
+  "independent_math": {
+    "scope": "Independent closed-form analytic arithmetic for the shipped scalar fixture only; did not execute project Torch code, BGE, CUDA or server.",
+    "python": "3.12.14",
+    "point": [
+      0.3,
+      -0.2
+    ],
+    "beta": 0.7,
+    "rates": [
+      0.03,
+      0.11
+    ],
+    "support_gradient": [
+      -0.048316692881475415,
+      -0.6975249606777869
+    ],
+    "support_hessian": [
+      [
+        0.23779349722681245,
+        -0.5151067814328417
+      ],
+      [
+        -0.5151067814328417,
+        0.885035368760328
+      ]
+    ],
+    "fast_point": [
+      0.3014495007864442,
+      -0.12327225432544345
+    ],
+    "query_gradient_at_fast": [
+      0.5143587338995402,
+      0.7342387937885646
+    ],
+    "exact_gradient": [
+      0.3382881628468871,
+      -0.22803056414010126
+    ],
+    "central_difference": [
+      0.3382881627600476,
+      -0.2280305642088365
+    ],
+    "central_difference_max_abs_error": 8.683953556243296e-11,
+    "mutants": {
+      "drop_hessian": {
+        "gradient": [
+          0.3117344208482027,
+          -0.18355780502579166
+        ],
+        "max_abs_error_vs_exact": 0.04447275911430959,
+        "detected_by_fixture_places_8": true
+      },
+      "apply_A_after_H": {
+        "gradient": [
+          0.3171083254620798,
+          -0.21319338251253284
+        ],
+        "max_abs_error_vs_exact": 0.021179837384807332,
+        "detected_by_fixture_places_8": true
+      },
+      "drop_cross_parameter_H": {
+        "gradient": [
+          0.309165886442777,
+          -0.23359450725043934
+        ],
+        "max_abs_error_vs_exact": 0.029122276404110137,
+        "detected_by_fixture_places_8": true
+      },
+      "MSE_Gauss_Newton_only": {
+        "gradient": [
+          0.2899090375507475,
+          -0.23753174543833938
+        ],
+        "max_abs_error_vs_exact": 0.048379125296139636,
+        "detected_by_fixture_places_8": true
+      }
+    },
+    "notes": [
+      "Finite difference matches existing handwritten scalar objective; no new optimization route.",
+      "Mutation vectors are independent arithmetic, not executed mutated project programs.",
+      "None/zero/Adam semantics cannot be executed locally without Torch; assessed from code and supplied raw Linux tests."
+    ]
+  },
+  "reviewer_execution": {
+    "python": "3.12.14",
+    "performed": [
+      "read-only source and raw evidence review",
+      "ZIP/SHA/manifest and version snapshot verification",
+      "AST equality and textual differences",
+      "18 current Python source AST parses",
+      "2 shell bash -n checks",
+      "standard-library analytic scalar Hessian, central difference and four erroneous vector calculations",
+      "budget/unit/phase accounting",
+      "PyTorch 2.9 primary API document lookup"
+    ],
+    "torch_installed": false,
+    "torch_executed": false,
+    "cuda_executed": false,
+    "bge_executed": false,
+    "server_connected": false,
+    "mutated_production_programs_executed": false,
+    "formal_data_accessed": false,
+    "old_experiment_weights_accessed": false,
+    "dependencies_installed": false,
+    "production_code_modified": false
+  },
+  "patch_decision": {
+    "new_production_patch_required": false,
+    "new_production_patch_supplied": false,
+    "submitted_existing_fixture_repair_diffs_preserved": true,
+    "reason_zh": "未发现当前生产完整梯度具体错误；仅需准确限定证据措辞。"
+  },
+  "formal_and_novelty_boundary": {
+    "formal_runner_implemented": false,
+    "real_old_model_adam_rng_restore_verified": false,
+    "saved_logits_formal_integration_verified": false,
+    "opened_logit01_reuse_boundary": "unchanged; no rerun required in this round",
+    "originality_claim": "unchanged MLDG/MER/La-MAML limits; no new novelty from engineering rearrangement",
+    "necessary_formal_checks": "retain prior scoped recovery/reference/memory/configuration/evaluation-gate/budget requirements only if future user authorization occurs"
+  },
+  "evidence_files": {
+    "main_report": "main_report.zh.txt",
+    "execution": "execution.zh.txt",
+    "input": "input/review8_original.zip",
+    "source_and_raw_records": "submitted/",
+    "independent_checks": "independent/",
+    "file_manifest": "EVIDENCE_MANIFEST.json"
+  }
+}

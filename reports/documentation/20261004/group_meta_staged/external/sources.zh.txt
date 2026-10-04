@@ -1,0 +1,26 @@
+本轮实际采用的来源
+
+一、唯一当前审查包
+review(8).zip：792243字节，96成员，SHA-256 aab6c2470c76a6d66985246310f0af6bb983e6527e88372778af089d83d90ca6。
+完整原件见input/review8_original.zip，展开见submitted/。主报告E1–E11逐项定位合同、源码、测试、原生记录、初始/最终快照与直接背景。来源匹配和运行记录只证明包内一致性，不等于重新登录服务器认证。
+
+二、仅用于API语义的公开一手资料
+查阅日期2026-10-04。没有用其他工程博客或新优化案例扩大范围。
+
+W1 PyTorch2.9 torch.autograd.grad：
+https://docs.pytorch.org/docs/2.9/generated/torch.autograd.grad.html
+使用范围：grad_outputs的VJP语义、create_graph、retain_graph、allow_unused、None。
+
+W2 PyTorch2.9 torch.func.functional_call：
+https://docs.pytorch.org/docs/2.9/generated/torch.func.functional_call.html
+使用范围：传入参数/buffer、strict匹配及原地修改可能反映在输入字典。
+
+W3 PyTorch2.9 Optimizer.zero_grad：
+https://docs.pytorch.org/docs/2.9/generated/torch.optim.Optimizer.zero_grad.html
+使用范围：None与零Tensor导致优化器跳过或执行参数步骤的不同。
+
+三、本次独立计算
+independent/staged_scalar_oracle.py/.json为现有非线性标量的独立标准库解析计算；没有导入Torch，没有运行变异生产程序。
+independent/verify_increment.py/.stdout.json为读取本包ZIP和内嵌prior的机械核对；不构成科学正确性或资源准入的单独依据。
+
+MLDG/MER/La-MAML和正式接入限制按包内prior/external_review.zh.txt及prior/primary_review.zh.md保留；本轮不重新检索或递归审查已关闭体系。

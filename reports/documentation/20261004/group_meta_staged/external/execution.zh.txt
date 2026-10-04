@@ -1,0 +1,30 @@
+review(8) 外审实际执行说明
+
+一、本审查新执行的操作
+
+1. 读取本轮唯一上传 review(8).zip；复算实际大小、96成员、SHA-256和CRC。解压后逐字节核对96个成员；复算95载荷清单、26当前来源、26初始来源、21关键运行快照、returned的58载荷及59展开成员。
+2. 读取 request、STAGED合同、implementation、authorization、fixture_repair、三次Linux原始日志/结果/资源/代码快照及部署记录。仅将本包prior中的旧输入、外审和主审作为直接背景，未递归重审已关闭基础体系。
+3. 静态追踪包装→staged_check→原native显式update_function→staged.update→gradient→staged_gradient→共享apply_gradient。
+4. 使用Python AST/文本差异对照旧、新objective/lookahead及共享外层更新，确认既有主要函数不变。对18份当前Python来源做AST解析、2份shell做bash -n；这不是导入或运行生产程序。
+5. 用标准Python math独立计算新增非线性标量的完整Hessian、完整链式梯度、epsilon=1e-6中央差分及四种错误向量，保存全部输出。未执行变异生产程序。
+6. 从原件复算25/126秒预算及显存/RSS单位、阶段顺序、修复前后测试数量和实际退出码。阅读PyTorch2.9官方grad、functional_call、zero_grad文档解释API语义。
+
+本地Python 3.12.14，无Torch。主复核命令及退出0记录在independent/local_execution.json；其程序和完整stdout在verify_increment.py、verify_increment.stdout.json。单独数学程序/输出为staged_scalar_oracle.py/.json；原本地语法输出为resource_local_syntax.json。机械核验通过不替代主报告的数学和证据判断。
+
+二、仅核验包内原件、没有在本轮重跑的提交者执行
+
+Linux环境原件：Python3.10.19、PyTorch2.9.1+cu130、CUDA13.0、RTX5090、CPU47。
+tiny_first：6包装秒，7项ok+1ERROR，退出1。
+tiny_repair：8包装秒，修复后8项ok，退出0。
+staged_first：11包装秒，1次普通warm完成，四群一阶完成，第一个支持群create_graph=True求导OOM；0次成功BGE元更新，result保存后terminate，包装134。
+新增25秒，旧101秒，累计126秒。剩余3474仅算术，不授权执行。
+
+新增完整群Tiny比较在CUDA；标量float64及旧六项主要在CPU。Tiny的microbatch4、70商品/140文本，与native的microbatch32、99商品/198文本应分开；均保持28账号/378关系。两步是沿staged路径逐步同起点全模型/Adam比较，未验证独立双轨累计漂移。
+
+三、未执行
+
+未运行项目PyTorch测试、Tiny CUDA、BGE、CUDA双反向或用户服务器任务；未连接服务器，未下载模型、安装依赖或索取凭据。未读取正式文本、标签、缓存、旧实验权重、封存身份；未实现formal runner、复算LOGIT0.1、训练四条件或重训基线。未另设计或尝试优化路线。
+
+四、修改和补丁
+
+没有改动输入包或生产科研代码。首次unused夹具修复已经由提交者完成；*.repair.diff和initial_to_final_sources.diff仅保存该既有修复的证据，不是审查者新增修复。当前未发现必须更改生产完整梯度的具体错误，故无新生产补丁。主报告给出测试与退出事实的最小文字限定，不附带继续运行授权。

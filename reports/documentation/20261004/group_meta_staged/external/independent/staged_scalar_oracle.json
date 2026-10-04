@@ -1,0 +1,83 @@
+{
+  "scope": "Independent closed-form analytic arithmetic for the shipped scalar fixture only; did not execute project Torch code, BGE, CUDA or server.",
+  "python": "3.12.14",
+  "point": [
+    0.3,
+    -0.2
+  ],
+  "beta": 0.7,
+  "rates": [
+    0.03,
+    0.11
+  ],
+  "support_gradient": [
+    -0.048316692881475415,
+    -0.6975249606777869
+  ],
+  "support_hessian": [
+    [
+      0.23779349722681245,
+      -0.5151067814328417
+    ],
+    [
+      -0.5151067814328417,
+      0.885035368760328
+    ]
+  ],
+  "fast_point": [
+    0.3014495007864442,
+    -0.12327225432544345
+  ],
+  "query_gradient_at_fast": [
+    0.5143587338995402,
+    0.7342387937885646
+  ],
+  "exact_gradient": [
+    0.3382881628468871,
+    -0.22803056414010126
+  ],
+  "central_difference": [
+    0.3382881627600476,
+    -0.2280305642088365
+  ],
+  "central_difference_max_abs_error": 8.683953556243296e-11,
+  "mutants": {
+    "drop_hessian": {
+      "gradient": [
+        0.3117344208482027,
+        -0.18355780502579166
+      ],
+      "max_abs_error_vs_exact": 0.04447275911430959,
+      "detected_by_fixture_places_8": true
+    },
+    "apply_A_after_H": {
+      "gradient": [
+        0.3171083254620798,
+        -0.21319338251253284
+      ],
+      "max_abs_error_vs_exact": 0.021179837384807332,
+      "detected_by_fixture_places_8": true
+    },
+    "drop_cross_parameter_H": {
+      "gradient": [
+        0.309165886442777,
+        -0.23359450725043934
+      ],
+      "max_abs_error_vs_exact": 0.029122276404110137,
+      "detected_by_fixture_places_8": true
+    },
+    "MSE_Gauss_Newton_only": {
+      "gradient": [
+        0.2899090375507475,
+        -0.23753174543833938
+      ],
+      "max_abs_error_vs_exact": 0.048379125296139636,
+      "detected_by_fixture_places_8": true
+    }
+  },
+  "notes": [
+    "Finite difference matches existing handwritten scalar objective; no new optimization route.",
+    "Mutation vectors are independent arithmetic, not executed mutated project programs.",
+    "None/zero/Adam semantics cannot be executed locally without Torch; assessed from code and supplied raw Linux tests."
+  ]
+}
