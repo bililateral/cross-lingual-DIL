@@ -1,0 +1,32 @@
+test_actual_four_group_graph_hessian_and_query_routing (test_step28_group_meta.GroupMetaTests) ... ok
+test_analytic_counterexample_and_detach_mutation (test_step28_group_meta.GroupMetaTests) ... ok
+test_stage_routing_pairing_and_memory_lifecycle (test_step28_group_meta.GroupMetaTests) ... ok
+test_two_settings_role_labels_reference_edges_and_fast_rates (test_step28_group_meta.GroupMetaTests) ... ok
+test_whole_group_identity_and_reference_binding (test_step28_group_meta.GroupMetaTests) ... ok
+test_zero_beta_exact_logit_gradient_and_single_adam_update (test_step28_group_meta.GroupMetaTests) ... ok
+test_complete_gradient_dropout_and_two_adam_steps (test_step28_group_meta_staged.StagedTests) ... ERROR
+test_nonlinear_chain_rates_and_unused_adam (test_step28_group_meta_staged.StagedTests) ... ok
+
+======================================================================
+ERROR: test_complete_gradient_dropout_and_two_adam_steps (test_step28_group_meta_staged.StagedTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_staged/workspace/tests/test_step28_group_meta_staged.py", line 88, in test_complete_gradient_dropout_and_two_adam_steps
+    direct.update(model, optimizer, episode, c, setting, 2, step, seeds)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_staged/workspace/scripts/step28_group_meta.py", line 189, in update
+    return apply_gradient(model, optimizer, terms, stage, step, check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_staged/workspace/scripts/step28_group_meta.py", line 212, in apply_gradient
+    if parent.adam_step(optimizer) != (stage - 1) * 288 + step:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_staged/workspace/scripts/step28_bge_continual.py", line 227, in adam_step
+    raise ValueError("Adam parameter steps disagree")
+ValueError: Adam parameter steps disagree
+
+----------------------------------------------------------------------
+Ran 8 tests in 2.963s
+
+FAILED (errors=1)
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261004/group_meta_staged/workspace/scripts/step28_group_meta_staged_check.py", line 58, in main
+    raise AssertionError('Incremental gradient/update regression failed')
+AssertionError: Incremental gradient/update regression failed
+
