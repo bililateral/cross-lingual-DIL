@@ -1,6 +1,6 @@
 # 当前科研交接
 
-**当前工作（2026-10-04，21:14 UTC+8提交设计外审）**：用户要求将已讨论的关系目标记忆细化成文件，交网页端审查可行性和创新性，并提供必要上下文与约束。[具体方案](SELLER_ALIAS_RELATION_MEMORY.zh.md)已完成，包含平方识别/查询排序的统计量、可微迁移、缓存输出二次正则的等价化简、完整梯度与阶段生命周期、1MiB计量、资源准入建议及DPCR/FROMP/GATF等近邻。25,418字节文件已按本轮明确授权经本地Playwright上传并发送，网页可见选择6/Pro，已开始读取附件；[审查会话](https://chatgpt.com/c/6ac25136-7f64-83ea-b540-899859ffa846)、[提交回执](../reports/documentation/20261004/relation_memory/submission.json)和[原请求](../reports/documentation/20261004/relation_memory/request.zh.md)。当前等待外审，未实现、未新增Linux核验或正式训练；文内计算预算是待审建议，旧许可不转移。创新未定不等于抄袭，也不能因组件组合就宣称创新成立。
+**当前工作（2026-10-04，关系目标记忆设计外审已完成）**：用户告知外审结束后，已取回[完整网页答复](../reports/documentation/20261004/relation_memory/external/page.json)及8成员证据包，清单7载荷大小/SHA全部匹配，原送审设计同字节保留。[主审处置](../reports/documentation/20261004/relation_memory/report.zh.md)接受“最小修订后再核验”：核心(1)—(10)未发现需推倒的代数/梯度错误；确认缓存输出投影盲区、可能的统计迁移信息损失及单群训练/联合固化目标差异。它们是机制限制，不是已发生的训练负结果。已在[设计](SELLER_ALIAS_RELATION_MEMORY.zh.md)补边界、修正有界反例和FROMP引用、补FRCL/R2-D2近邻，核心公式与配置未改。具体完整群形状、运算精度、随机流/计数、完整历史计量仍待执行定义；没有本候选Linux/BGE原生资源证据，创新尚未成立，也未证明整体重复。建议保留单候选，必要核验后先看固定点，再做必要匹配对照，不叠加机制。当前未实现、未新增科研计算或正式训练，文内CPU/GPU预算仍未授权；[审查回执](../reports/documentation/20261004/relation_memory/submission.json)保留实际身份和状态。
 
 **最近关闭路线（2026-10-04，用户明确回退）**：完整群隔离泛化重放（group-meta）整条候选路线已关闭，标记为 **资源受限不可行**。回退范围包括原始完整二阶、GPU直接／CPU暂存、分阶段HVP和JVP路径；取消候选先导、四条件机制验证及尚未提交的JVP外审，不继续修补、试跑或正式训练。具体边界与回退核对见[关闭记录](../reports/documentation/20261004/group_meta/closure.zh.md)。历史合同、验证计划、源码快照及已发生审查／失败原件仅供回溯，旧“下一步／待授权”均不再生效。
 
