@@ -1,5 +1,7 @@
 # 当前科研交接
 
+**当前工作（2026-10-04）**：LOGIT0.1／risk结果外审及主审已关闭，详见下方“最新结果状态”；用户要求先做范围明确的机制设计、手写反例和文献区分，再确定最小比较，不马上训练。已完成[账号证据响应保持讨论稿](SELLER_ALIAS_EVIDENCE_RESPONSE.zh.md)：只提出一个单向局部响应保持机制，给出实际输入／梯度路径、手算及非线性与未见卖家失败反例。导数蒸馏等组成已有先例，创新充分性未成立；稿件尚未实现、未作Linux原生核验、未送外审，也不构成新比较或训练许可。后续先解决设计价值与近邻重叠，再明确核验／比较预算。以下10月3日运行叙述为历史观测，不表示仍有活动训练。
+
 维护日期：2026-10-03。本页只维护一个当前入口；运行状态以带观测时点的实际回执为准。两项作业均已完成，468份16,506,607字节正式小结果完整回传并逐文件核对；10月3日10:23:58（Asia/Shanghai）Linux独立保存结果核验通过。联合结果已通过本地Playwright MCP完成实际网页外审，原报告及223成员证据包已保存核对，最终[主审处置](../reports/seller_alias_continual/20261003/result_review/report.zh.md)接受限定开发结论。两项科研收尾均完成；ER0.1按原规则入选，匹配LOGIT0.25相对ER0.25增量通过，对SEQ完整保护仍分别10/23、16/23。同步与Git交付独立记录于[本轮交付](../reports/seller_alias_continual/20261003/result_review/delivery.json)，不能把科研完成等同于远端交付。
 
 **当前新增工作（10月3日）**：LOGIT0.1单点的实际网页外审及独立[主审](../reports/documentation/20261003/logit_low/report.zh.md)已完成，无未关闭阻断；原37份科学来源和31项/4次原生CPU证据保持，未改代码或重复核验。用户明确要求主审后开始正式训练。16:01:03（Asia/Shanghai）已在独立workspace启动唯一正式job，训练PID3330435，GPU0/CPU47；16:08:07实查ABC第二阶段已记录24次新更新、Adam312，确认该路径首域完整恢复/盲回放通过并实际训练；train访问1次、valid/heldout/owners均0，无退出状态，不预记正式终点或效果。预计启动后5—7小时，即10月3日21:01—23:01完成，硬上限10月4日04:01、16GiB。详见[实际更新观测](../reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/observation.json)及[当前状态](../reports/seller_alias_continual/20261003/logit_low_execution/current_status.json)。不得重复启动；后续按合同监控、完整回传、保存结果核验及结果外审。
