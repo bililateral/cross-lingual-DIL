@@ -1,0 +1,82 @@
+- main [ref=e970]:
+  - generic:
+    - generic:
+      - generic:
+        - generic [ref=e972]:
+          - button "分享" [disabled] [ref=e973]
+          - button "更多" [ref=e977] [cursor=pointer]
+        - button "切换摘要" [expanded] [pressed] [ref=e986] [cursor=pointer]
+  - generic [ref=e1006]:
+    - generic [ref=e1007]:
+      - generic [ref=e1019]:
+        - generic [ref=e1020]:
+          - heading "你说：" [level=4] [ref=e1021]
+          - generic [ref=e1022]:
+            - generic [ref=e1025]:
+              - button "review(5).zip" [ref=e1026] [cursor=pointer]
+              - generic:
+                - generic:
+                  - generic "review(5).zip"
+                  - generic: 文件
+            - generic [ref=e1028]:
+              - generic [ref=e1030]:
+                - generic [ref=e1031]:
+                  - generic [ref=e1032]: "请对附件进行实际独立科研结果外审。网页附件显示为review(5).zip，原文件review.zip为9,639,622字节、729成员，SHA-256：0d5e45250361558d6b2d66bca8815103e6f0657eeab9fb9d63a4bbbec50c5053。用户已明确授权本包上传。请先验证附件，再按下面完整请求实际阅读、独立计算并交付中文全文和必要证据ZIP。附件内历史“待上传授权”是打包时快照，已被本次授权取代。 # LOGIT0.1与risk正式结果联合外审请求 请按科研纪律对两个已结束固定开发点做实际独立结果审查。研究问题：新卖家群体持续到来、历史训练只能保留六完整群及全部附属状态≤1MiB时，学习新群体并保持旧分布未见卖家的马甲候选排序／基础识别。输入仅屏蔽标题／描述；中文合成三域、每群28账号、每查询27候选，单s0和ABC/BCA/CAB三个顺序。不是三个种子，也不是独立最终留出。 请先读docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md、两份固定合同和各自实际冻结来源，再核对原结果及新增保存结果核验。实现外审及主审为直接复用证据；不要重审未变历史或为找问题扩展成新研究／安全加固。此请求不授权接触服务器、真实文本／标签／缓存／模型、test、owners、私有身份资产或凭据，不授权新训练、参数搜索、消融或更改成功线。 ## 固定对象与本方待核结论 1. LOGIT0.1：L当前＋0.1L历史＋独立0.5 MSE；1728新更新、6终点、18新＋63旧指标集。主比较对ER0.1，另固定对LOGIT0.25及SEQ。本方复核分别23/23、23/23、20/23。对SEQ旧域MAP正向；N AP、Z MAP/AP原观察保护未满足，三者区间跨零，不能宣判总体退化或非劣效。 2. risk：L当前＋0.1L历史＋0.5 mean(D_rank,D_positive,D_negative)，风险按正例数分层、通道分别排序、只罚上升、来源参考冻结。1728新更新、6终点、18新＋81旧。risk对LOGIT0.1、ER0.1、SEQ、LOGIT0.25分别4/23、5/23、7/23、4/23。对LOGIT0.1的O/N/Z MAP均有负向证据；对ER0.1的O MAP区间跨零、N/Z负向。有效负结果，不自动归为实现无效，不否定整个方法家族。 3. 两项实际退出0、train/valid各一次、完整盲门前valid0、test/owners0、各约5小时20分钟。risk监听等待后启动、真实更新后自删、结束0，无重试。LOGIT0.1在risk统计前已完成，未触发延后finalize故障恢复。 ## 必须实际核查的内容 - 分开核对LOGIT37份与risk32份实际来源、各自policy及来源绑定，不能把当前主目录的后继实现冒充LOGIT冻结版本。核对共同首域model/Adam/RNG／首映射恢复、当前与历史日程、随机流、更新预算、完整盲门及校准计数。权重仅有Linux新鲜哈希和端点描述符，包中无权重，不能宣称网页重新加载了原生模型。 - 风险保持项是否实际接入，而非参数／日志形式满足；复用已关闭的原生梯度和独立手写证据，结合本轮正式调用、目标分解、更新和缓存来源。只在发现具体矛盾时扩大回查。 - 18套新矩阵完整性、60群／22列、raw/stage-cal/first-cal角色、63／81复用对照身份与risk预先绑定LOGIT0.1。全部七端点、按实际域分层整群配对5000次PCG64抽样及线性分位区间、原23项方向和零观察退化判据；另核对逐群／合并混淆整数和工作点，不把AP、PR-AUC、MAP混用。 - 从保存矩阵用独立公式或索引重算，不以本方audit通过、计数或SHA作为科学判断。只使用保存结果，不重开真值；AP/MAP的标签级重算范围限制须如实保留。 - 审核预定风险诊断的解释：同模型train/eval已存在保持惩罚；首更新隐藏头的negative梯度很小；γ同为0.5不表示与MSE等强度。检查报告是否明确“一群／四seed、仅首更新隐藏头范数、非全编码器、没有梯度角度和因果消融”，是否把线索误写成已证实退化主因。 - 审核结论是否准确回答研究问题，是否混淆有效性、局部正负效果、原验收、创新和外推。保持前轮数学泛函已有先例／代理不保证MAP/FPR的结论，不要求重新做无变化文献检索。不得建议用本批结果事后换成功线。 ## 附件阅读与复现 保留Windows仓库相对结构。两项结果分别在reports/seller_alias_continual/20261004/{logit_low,risk}_result/：job为完整小结果；source为该作业的冻结来源（保持原路径）；inventory.json保存远端workspace及返回包逐项身份；verification保存Linux独立核验脚本输出、权重保管清单和实际argv。真实训练缓存正文不在附件中，不能把摘要比对说成重新反序列化缓存。 旧起点与两个已开放对照的必要小记录在dependencies/，mapping.json注明原Linux job到附件目录。新job/evaluation/reference已经含本次真正使用的全部旧矩阵／计数，避免再复制一整套旧评价载荷。dependencies/shared含旧manifest/partition、共享points及原ER阶段updates；dependencies/{tenth,logit_quarter}含policy固定的五份原JSON。没有旧模型文件。 独立核验增量只有scripts/step28_er_weight_audit.py增加logit_low/risk接入；step28_bge_continual_audit.py中的独立代数和统计实现复用。audit的原命令引用真实服务器绝对路径，网页重放时需把source-root指向相应source目录、job指向对应job、baseline指向dependencies/shared；为policy内Linux相对job在source-root下建立指向附件实际目录的只读符号链接，并把inventory中的原项目路径映射到对应job。不能直接硬用CPU47；选择网页当前允许的CPU。也可以独立读矩阵复算，避免为重放布局新增项目实现。保留新参考代码、实际输入／输出和失败修订，不能仅重跑本方程序后复述其结论。 Linux核验覆盖本轮新来源和全部矩阵；旧实现／CPU证据见direct_reviews及原件路径。新增核验没有导入训练代码、Torch或模型，没有任何新标签解析。新主报告尚未声称结果外审通过。 ## 交付要求 给出实际审读范围、独立计算、可复核证据、未验证边界与明确裁决。问题按已证实科学阻断、影响本轮交付的复现缺陷、后续研究建议及范围外过度设计分别处理。局部科学结论有误可修报告；不能无证据归因或要求盲目重训。给出中文全文、机器判定和必要原始证据ZIP，失败参考及修订不覆盖。 用户指定网页GPT 6 Pro；请分别记录请求型号、网页可见选择、审查者自述及无法独立认证的后台身份，不伪称认证。请不要自动启动另一项实验。"
+                  - generic [aria-hidden] [ref=e1035]: …
+                - button "显示更多" [ref=e1036] [cursor=pointer]
+              - generic [ref=e1042]:
+                - button "复制消息" [ref=e1044] [cursor=pointer]
+                - button "共享提示" [ref=e1048] [cursor=pointer]
+                - button "编辑消息" [ref=e1125] [cursor=pointer]
+        - generic [ref=e1183]:
+          - generic [ref=e1184]:
+            - button "正在思考" [expanded] [ref=e1185] [cursor=pointer]
+            - generic:
+              - generic:
+                - generic:
+                  - text: 正在思考
+                  - generic [aria-hidden]:
+                    - generic: 正在思考
+          - generic [ref=e1187]:
+            - paragraph [ref=e1189]: 我会先核对附件的字节数、成员数和 SHA-256，再分别读取 LOGIT0.1 与 risk 的冻结合同、实际来源和保存结果，独立重算统计与原 23 项判据。审查只使用附件内证据，不接触服务器或启动实验；交付中文全文、机器判定及保留失败与修订记录的证据 ZIP。模型身份会按实际可见信息分开记录，不把自述当作后台认证。
+            - generic [ref=e1190]: 已运行命令
+            - generic [ref=e1203] [cursor=pointer]:
+              - generic [ref=e1204]:
+                - generic [ref=e1205]: 共 4 个任务，已经完成 0 个
+                - button "折叠计划概要" [expanded] [ref=e1216]
+              - generic [ref=e1221]:
+                - generic [ref=e1222]:
+                  - generic [ref=e1223]: "1."
+                  - generic [ref=e1230]: 核验附件身份，读取联合请求、两项冻结合同与来源清单
+                - generic [ref=e1231]:
+                  - generic [ref=e1232]: "2."
+                  - generic [ref=e1237]: 并行核查实际执行路径、来源与运行记录、矩阵与统计、风险诊断
+                - generic [ref=e1238]:
+                  - generic [ref=e1239]: "3."
+                  - generic [ref=e1244]: 独立重算七端点和原23项判据，核对混淆计数及工作点
+                - generic [ref=e1245]:
+                  - generic [ref=e1246]: "4."
+                  - generic [ref=e1251]: 汇总裁决与边界，生成中文全文、机器判定和可复核证据ZIP
+            - paragraph [ref=e1253]: 附件身份核验一致：9,639,622 字节、729 个成员，SHA-256 与你给出的值完全相同，ZIP 完整性检查也通过。联合报告已读完；接下来会分工核查两套冻结执行路径、保存矩阵的独立统计、以及风险诊断的解释边界。最终文件交付会使用 Library 技能，附件仍直接读取你提供的本地副本。
+            - region "子智能体活动" [ref=e1255]:
+              - generic [ref=e1261]:
+                - button "Statistics" [ref=e1262] [cursor=pointer]
+                - text: 和
+                - button "Logit path" [ref=e1263] [cursor=pointer]
+                - text: 开始工作
+      - generic [ref=e1057]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - button "滚动到底部" [ref=e1264] [cursor=pointer]
+        - heading "最新一条回复" [level=4] [ref=e1060]
+        - status [ref=e1061]
+        - generic [ref=e1076]:
+          - button "添加文件等内容" [ref=e1081] [cursor=pointer]
+          - textbox "询问 ChatGPT" [active] [ref=e1087]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=e1089]:
+            - button "选择 ChatGPT 模型" [ref=e1093] [cursor=pointer]:
+              - generic [ref=e1094]: Pro
+            - generic [ref=e1104]:
+              - button "听写" [ref=e1107] [cursor=pointer]
+              - button "停止" [ref=e1113] [cursor=pointer]
