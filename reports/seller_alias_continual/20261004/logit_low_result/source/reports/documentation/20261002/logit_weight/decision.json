@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-10-02T13:17:38.8487556+08:00",
+  "status": "CONFIRMED_MATCHED_LOGIT_AND_DIRECT_EXECUTION_AFTER_REVIEW",
+  "user_request": "除此之外，我觉得还得用λ=0.25 的改进版ER重做之前的实验(即SEQ、ER、LOGIT三个对比的实验)",
+  "sequencing_request": "先让λ=0.1 的实验开始正式训练后再开始着手我说的这个三个方法的对比实验",
+  "question": "λ=0.1 已开始正式更新。后续 SEQ／ER／LOGIT 比较，是否采用匹配方案：复用原 SEQ 和 ER0.25；仅新增 LOGIT＝L当前＋0.25×L历史＋0.5×MSE（MSE 不再乘0.25），复用原首域完整状态、s0及三顺序；新增1728更新／6终点，主比较LOGIT−ER沿用原23项并完整报告对SEQ，结果好坏均结束。单GPU＋单CPU预计6—8小时，硬12小时／16GiB，新train、valid各一次，不读test/owners；合同、最小实现、实际网页外审及主审后，直接必要手写CPU核验（≤1小时／256MiB）并在0.1释放资源后运行？需明确此选择，是因为仓库AGENTS.md要求未确认的比较方法、预算与标签范围先问清，不能由我把原LOGIT系数默改为0.25。",
+  "user_answer": "采用匹配0.25的完整方案并运行（推荐）",
+  "contract": "docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md",
+  "policy_sha256": "2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb",
+  "new_train_parse_attempts": 1,
+  "new_valid_parse_attempts": 1,
+  "test_access": false,
+  "owners_access": false,
+  "automatic_retry": false,
+  "repeat_startup_question_required": false,
+  "scope": "Minimal local implementation, actual web and primary review, then handmade CPU verification and one formal matched LOGIT run after low-weight job releases resources, followed by return and result review; no extra lambda, MSE coefficient or seed."
+}

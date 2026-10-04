@@ -14,7 +14,11 @@
 
 ## 接手顺序与信息地图
 
-**最新执行授权（10月3日）**：用户在单点具体建议后明确“那开始运行吧”，授权[风险候选单点合同](SELLER_ALIAS_RISK_PILOT.zh.md)的λ=.1、γ=.5、6终点/1728更新及必要核验、审查和执行；旧“没有新训练许可”仅描述上一轮。独立Linux workspace为`reports/seller_alias_continual/20261003/risk_execution/20261003_191000/workspace`。正式接入已完成；Linux CPU46于19:15:02—19:20:41完成10项手写检查和3次原生BGE更新探针，修补后的两项测试也实际检出γ置零与参考行错配，详见[增量核验](../reports/documentation/20261003/risk_pilot/implementation.zh.md)。用户已专项授权本次83成员增量包；19:45:16实际发送的增量外审已完成。科学Python接入通过，仅监听有“快速退出漏自删／删除失败冒写成功”两项缺陷；已合入外审精确最小修正并在Linux核对SHA与bash语法，32份科学来源不变。主审通过，见[主审处置](../reports/documentation/20261003/risk_pilot/report.zh.md)及[外审全文](../reports/documentation/20261003/risk_pilot/external/risk_pilot_review.zh.txt)。20:32:42已启动唯一监听PID3332651、CPU46，20:32:44记录GPU空闲22419MiB，未到24640MiB启动门，其他资源满足；风险正式训练尚未启动。监听满足资源条件后自动开启固定点、确认实际更新后自删，失败不重试。20:25:54实查LOGIT0.1 PID3330435仍运行。当前状态与真实启动后续查[运行观测](../reports/seller_alias_continual/20261003/risk_execution/20261003_191000/observation.json)，不得重复启用监听或作业。用户同时明确资源不足时监听自动启动、确认实际更新后自删；通用规则已写入科研纪律。LOGIT0.25六末端权重按用户指令于19:04:45删除，7,838,884,668字节，179份相关非权重证据不变，见[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)；下方旧保留记录不再代表这六份当前存在。
+**最新结果状态（10月4日）**：用户要求同步两个实验结果并按科研纪律分析。LOGIT0.1于10月3日16:01:03—21:23:48完成，risk于10月3日21:23:46—10月4日02:43:55完成，正式退出均0；各1728更新、六终点、完整盲门、train/valid各一次，heldout/owners为0。10月4日10:02:41实查无项目活动训练。risk监听21:29:31确认真实更新后自删，02:43:55退出0；禁止重复启动。完整小结果及37/32份冻结来源已回传并逐项匹配，Linux保存结果独立核验均通过，权重12份仍留Linux。本轮未新增训练、标签解析或载模。
+
+[联合分析](SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md)：LOGIT0.1对ER0.1和LOGIT0.25均23/23，对SEQ20/23；旧域MAP有正向证据，N AP、Z MAP/AP观察保护未满足。risk对LOGIT0.1、ER0.1、SEQ、LOGIT0.25分别4/23、5/23、7/23、4/23；相对LOGIT0.1的O/N/Z MAP均有负向证据，此固定点未达目标。有效性、具体效果、原验收与创新边界分开。新结果网页外审尚待具体新包上传授权，不能把实现外审通过当结果外审通过；此前精确实现包授权不泛化。直接证据见[LOGIT回传](../reports/seller_alias_continual/20261004/logit_low_result/inventory.json)、[risk回传](../reports/seller_alias_continual/20261004/risk_result/inventory.json)及各verification/audit。后续先完成本次结果审查，新增方法／系数／种子／数据另立范围。
+
+原执行授权、监听修正及原生CPU核验继续见[固定合同](SELLER_ALIAS_RISK_PILOT.zh.md)、[接入主审](../reports/documentation/20261003/risk_pilot/report.zh.md)。LOGIT0.25六权重已于10月3日19:04:45按用户指令删除，7,838,884,668字节，179份非权重证据不变，见[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)。不因本次risk负结果自动删除当前权重。
 
 先读本页和[科研纪律](RESEARCH_DISCIPLINE.zh.md)，建立问题、当前授权、历史结论与未决事项的全局认识；再沿下表进入本次任务的合同、实际代码、直接依赖和原始审查。按本轮变化与证据缺口确定[最小核验及完成条件](RESEARCH_DISCIPLINE.zh.md#5-实现核验与证据复用)，证据充分即推进交付。历史结论按需回到原件，不因换Agent重读全部历史、重跑已验证工作或扩大审查范围。任何读取仍受数据与结果权限限制。
 
@@ -51,7 +55,7 @@ ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5�
 
 ## Linux与活动文件
 
-- LOGIT0.1独立workspace：`reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace`；采用自身相对入口，旧两项冻结来源不覆盖。正式job位于该workspace下`reports/job`，已于16:01:03启动；包装PID3330418、训练PID3330435，禁止重复启动。沿用既有SSH认证。
+- LOGIT0.1独立workspace：`reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace`；采用自身相对入口，旧两项冻结来源不覆盖。正式job位于该workspace下`reports/job`，10月3日21:23:48已退出0；旧PID仅为历史身份，禁止重复启动。完整结果已回传，沿用既有SSH认证。
 - 现有服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，凭据不写入项目。
 - ER0.1作业：reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；活动来源留主目录，不能用本地后继代码覆盖。
 - LOGIT隔离工作区：reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace；其中reports/authorization.json是Linux实际授权文件，reports/listener存退出／自删记录，reports/job为已完成正式输出。Linux一次性监听脚本已删除；本地复现源码继续保留。历史PID只标识当时进程，不证明当前存活或身份。

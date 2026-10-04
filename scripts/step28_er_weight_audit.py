@@ -23,6 +23,10 @@ STUDIES = {
             [("tenth", "quarter"), ("tenth", "seq")], "quarter", "step28_er_low_policy.json"),
     "logit": ({"logit_quarter": .25}, {"seq": 0., "quarter": .25, "logit_quarter": .25},
               [("logit_quarter", "quarter"), ("quarter", "seq"), ("logit_quarter", "seq")], None, "step28_logit_weight_policy.json"),
+    "logit_low": ({"logit_tenth": .1}, {"seq": 0., "tenth": .1, "logit_quarter": .25, "logit_tenth": .1},
+                  [("logit_tenth", r) for r in ("tenth", "logit_quarter", "seq")], None, "step28_logit_low_policy.json"),
+    "risk": ({"risk": .1}, {"seq": 0., "tenth": .1, "logit_quarter": .25, "logit_tenth": .1, "risk": .1},
+             [("risk", r) for r in ("logit_tenth", "tenth", "seq", "logit_quarter")], None, "step28_risk_policy.json"),
 }
 
 
@@ -60,7 +64,8 @@ def main() -> None:
     project, job, baseline = args.project.resolve(), args.job.resolve(), args.baseline.resolve()
     source_root = args.source_root.resolve() if args.source_root else project
     arms, methods, pairs, selection_reference, policy_name = STUDIES[args.study]
-    is_logit = args.study == "logit"
+    is_logit = args.study in ("logit", "logit_low")
+    is_risk = args.study == "risk"
     memory_arm = "logit" if is_logit else "er"
     run, ev, old_run = job / "run", job / "evaluation", baseline / "run"
     audit = Audit()
@@ -73,6 +78,20 @@ def main() -> None:
     assert policy["arms"] == arms
     assert record(source_root / "schema" / policy_name)["sha256"] == manifest["policy_sha256"] == saved["policy_sha256"]
     reference_points = dict(old_collected["points"])
+    continuation = dict(policy.get("continuation_references", {}))
+    if is_risk:
+        binding = read(ev / "logit_reference_binding.json")
+        spec = policy["pending_logit_reference"]
+        assert binding["preselected_job"] == spec and binding["selection_by_results"] is False
+        bound(source_root / spec["linux_job"], spec["execution"])
+        continuation["logit_tenth"] = {**spec, "records": binding["completed_records"]}
+    for arm, spec in continuation.items():
+        ref_job = source_root / spec["linux_job"]
+        for item in spec["records"].values():
+            bound(ref_job, item)
+        ref_collection = read(ref_job / "evaluation/collected.json")
+        assert all(ref_collection[k] == old_collected[k] for k in ("group_ids", "domains", "metric_columns"))
+        reference_points.update(ref_collection["points"])
     if "weight_reference" in policy:
         weight_job = project / policy["weight_reference"]["linux_job"]
         for item in policy["weight_reference"]["records"].values():
@@ -142,7 +161,7 @@ def main() -> None:
         assert memory["members"] == reference["memory_after_training"]["members"]
         assert set(t["history_ids"]) <= set(memory["members"]) and not set(memory["members"]) & current_ids
         x = np.load(bound(run, t["update_file"]), allow_pickle=False)
-        assert x.shape == (288, 16 if is_logit else 14) and np.isfinite(x).all()
+        assert x.shape == (288, 19 if is_risk else 16 if is_logit else 14) and np.isfinite(x).all()
         c = {column: x[:, k] for k, column in enumerate(t["update_columns"])}
         for role in ("current", "history"):
             decomposed = c[role + "_bce"] + c[role + "_rank"] + .5 * c[role + "_hard"]
@@ -155,6 +174,17 @@ def main() -> None:
             audit.array(c["logit_weight"], np.full(288, .5), name + "/independent_MSE_weight", 0.)
             assert np.all(c["logit_mse"] >= 0)
             total = total + .5 * c["logit_mse"]
+        if is_risk:
+            audit.array(c["retention_weight"], np.full(288, .5), name + "/risk_weight", 0.)
+            components = np.stack([c["retention_" + k] for k in ("rank", "positive", "negative")])
+            assert np.all(components >= 0)
+            # Logged channels were converted independently from float32 tensors.
+            assert np.allclose(c["retention"], components.mean(0), atol=3e-6, rtol=3e-6)
+            total = total + .5 * c["retention"]
+            diag = t["risk_diagnostics"]
+            assert diag["eval_self"] == [0., 0., 0.]
+            assert np.asarray(diag["train_against_same_model_eval"]).shape == (4, 3)
+            assert all(np.isfinite(v) and v >= 0 for v in diag["first_update_head_gradient_norms"].values())
         audit.array(c["total"], total, name + "/total", 0.)
         audit.array(c["encoder_lr"], np.array([1e-5 * (s / 29 if s <= 29 else (288 - s) / 259) for s in range(1, 289)]), name + "/lr")
         audit.array(c["head_lr"], np.full(288, .001), name + "/head_lr", 0.)
@@ -180,6 +210,9 @@ def main() -> None:
         diagnostics["training"][name].update({key + "_mean": float(c[key].mean()) for key in ("current_total", "history_total", "weighted_history_total", "total")})
         if is_logit:
             diagnostics["training"][name].update(logit_mse_mean=float(c["logit_mse"].mean()), logit_term_mean=float((.5 * c["logit_mse"]).mean()))
+        if is_risk:
+            diagnostics["training"][name].update({k + "_mean": float(c[k].mean()) for k in ("retention", "retention_rank", "retention_positive", "retention_negative")})
+            diagnostics["training"][name]["risk_diagnostics"] = t["risk_diagnostics"]
         diagnostics["memory"][name] = {"bytes": memory["serialized_bytes"], "domains": dict(Counter(uid_domain[uid] for uid in memory["members"]))}
         diagnostics["calibration"][name] = {k: mapping[k] for k in ("a", "b", "initial_nll", "final_nll")}
     for order in ORDERS:
@@ -210,6 +243,19 @@ def main() -> None:
                 assert later["references"] == retained["references"]
                 assert later["reference_origins"] == retained["reference_origins"]
                 audit.checks["logit_target_provenance_orders"] += 1
+            if is_risk:
+                initial = start["memory_summary"]
+                assert set(initial["risk_origins"].values()) == {1}
+                added = set(retained["members"]) - set(initial["members"])
+                for uid in retained["members"]:
+                    assert retained["risk_origins"][uid] == (2 if uid in added else 1)
+                    if uid not in added:
+                        assert retained["risk_references"][uid] == initial["risk_references"][uid]
+                for stage, expected_memory in ((2, initial), (3, retained)):
+                    log = read(bound(run, manifest["training"][point(order, arm, stage)]))
+                    for key in ("risk_references", "risk_origins"):
+                        assert log["memory_after_training"][key] == expected_memory[key]
+                audit.checks["risk_reference_provenance_orders"] += 1
     matrices, counts = {}, {}
     for collection, folder in ((read(ev / "reference/collected.json"), ev / "reference"), (collected, ev)):
         for name, variants in collection["points"].items():
@@ -283,8 +329,15 @@ def main() -> None:
         comparisons[name] = {"passed": sum(checks.values()), "total": len(checks), "checks": checks}
     if is_logit:
         assert saved["method_checks"] == completion["method_checks"]
-        assert saved["method_checks"]["increment_against_matched_er_passes"] == (comparisons["logit_quarter_minus_quarter"]["passed"] == 23)
-        assert saved["method_checks"]["all_guards_against_seq_pass"] == (comparisons["logit_quarter_minus_seq"]["passed"] == 23)
+        candidate = next(iter(arms))
+        matched = "tenth" if args.study == "logit_low" else "quarter"
+        assert saved["method_checks"]["increment_against_matched_er_passes"] == (comparisons[candidate + "_minus_" + matched]["passed"] == 23)
+        assert saved["method_checks"]["all_guards_against_seq_pass"] == (comparisons[candidate + "_minus_seq"]["passed"] == 23)
+    elif is_risk:
+        assert saved["method_checks"] == completion["method_checks"]
+        assert "selection" not in saved
+        for reference, verdict in saved["method_checks"].items():
+            assert verdict == saved["comparisons"]["risk_minus_" + reference]["interpretation"]
     else:
         eligible = [a for a in arms if comparisons[a + "_minus_" + selection_reference]["passed"] == 23]
         selected = max(eligible, key=lambda a: (endpoints[a]["primary"]["O"]["map"]["mean"], endpoints[a]["primary"]["O"]["recall_at_5"]["mean"], arms[a])) if eligible else selection_reference
