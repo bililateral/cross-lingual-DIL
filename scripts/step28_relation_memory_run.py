@@ -9,6 +9,7 @@ import os
 import random
 from pathlib import Path
 import shutil
+import signal
 import threading
 import time
 import traceback
@@ -70,22 +71,116 @@ def expected_points() -> list[str]:
 
 
 class Budget(base.persistence.Budget):
-    def __init__(self, root: Path, p: dict):
+    def __init__(self, root: Path, p: dict, inherited: dict | None = None):
         super().__init__(root, p)
         self.started -= max(0., time.time()-float(os.environ["RELATION_STARTED_EPOCH"]))
-        self.peak_rss = 0
+        inherited = inherited or {}
+        self.started -= inherited.get("elapsed_seconds", 0.)
+        self.peak_bytes = inherited.get("peak_observed_bytes", 0)
+        self.peak_rss = inherited.get("peak_rss_bytes", 0)
+        self.allocated = inherited.get("peak_cuda_allocated_bytes", 0)
+        self.reserved = inherited.get("peak_cuda_reserved_bytes", 0)
+        self.progress = {"phase": "admission"}
+        self.lock = threading.RLock()
+        self.last_snapshot = -float("inf")
+
+    def mark(self, **progress) -> None:
+        with self.lock:
+            self.progress.update(progress)
+
+    def snapshot(self) -> dict:
+        # Safe after a budget violation: no assertion, directory scan or CUDA call.
+        with self.lock:
+            return {"elapsed_seconds": time.monotonic()-self.started,
+                    "peak_observed_bytes": self.peak_bytes, "peak_rss_bytes": self.peak_rss,
+                    "peak_cuda_allocated_bytes": self.allocated,
+                    "peak_cuda_reserved_bytes": self.reserved, "progress": dict(self.progress),
+                    "access_path": "access.json"}
+
+    def persist(self) -> None:
+        with self.lock:
+            path = self.root/"resource.json"
+            temporary = self.root/"resource.json.tmp"
+            data.write_json(temporary, self.snapshot())
+            temporary.replace(path)
 
     def check(self, reserve: int = 0) -> None:
         import torch
-        super().check(reserve)
-        siblings=sum(p.stat().st_size for p in (self.root.with_suffix(".console.txt"),self.root.with_suffix(".wrapper.txt")) if p.is_file())
-        if self.peak_bytes+siblings+reserve>self.config["maximum_output_bytes"]:
-            raise RuntimeError("Job plus launcher evidence exceeds output budget")
-        self.peak_rss = max(self.peak_rss, psutil.Process().memory_info().rss)
-        if self.peak_rss > 64*2**30:
-            raise RuntimeError("RSS exceeds 64GiB")
-        if torch.cuda.is_initialized() and torch.cuda.max_memory_reserved() > 28*2**30:
-            raise RuntimeError("CUDA reserved peak exceeds 28GiB")
+        with self.lock:
+            elapsed = time.monotonic()-self.started
+            self.peak_rss = max(self.peak_rss, psutil.Process().memory_info().rss)
+            if torch.cuda.is_initialized():
+                self.allocated = max(self.allocated, torch.cuda.max_memory_allocated())
+                self.reserved = max(self.reserved, torch.cuda.max_memory_reserved())
+            if reserve or elapsed-self.last_disk_check >= 10:
+                paths = list(self.root.rglob("*")) + [self.root.with_name(self.root.name+s)
+                    for s in (".console.txt", ".wrapper.txt")]
+                used = 0
+                for path in paths:
+                    try:
+                        if path.is_file(): used += path.stat().st_size
+                    except FileNotFoundError:
+                        # Only our verified disposable checkpoints can disappear normally.
+                        if path.parent != self.root/"run/work": raise
+                self.peak_bytes = max(self.peak_bytes, used)
+                self.last_disk_check = elapsed
+                if shutil.disk_usage(self.root).free < reserve:
+                    raise RuntimeError("Insufficient free space")
+            if elapsed >= self.config["maximum_gpu_stage_seconds"]:
+                raise RuntimeError("Approved cumulative time budget reached")
+            if self.peak_bytes+reserve > self.config["maximum_output_bytes"]:
+                raise RuntimeError("Job plus launcher evidence exceeds output budget")
+            if self.peak_rss > 64*2**30 or self.reserved > 28*2**30:
+                raise RuntimeError("RSS/CUDA peak exceeds approved limit")
+            if elapsed-self.last_snapshot >= 10:
+                self.persist(); self.last_snapshot = elapsed
+
+    def state(self) -> dict:
+        self.check(1)
+        return self.snapshot()
+
+
+def watchdog(job: Path, budget: Budget, stopped: threading.Event) -> None:
+    while not stopped.wait(1):
+        try:
+            budget.check()
+        except BaseException as exc:
+            try:
+                data.write_json(job/"failure.json", {"status":"BUDGET_STOP_NO_RETRY",
+                    "error":str(exc), "budget":budget.snapshot()})
+            finally:
+                os._exit(2)
+
+
+def supervised(job: Path, budget: Budget, body) -> dict:
+    stopped = threading.Event()
+    worker = threading.Thread(target=watchdog,args=(job,budget,stopped),daemon=True)
+    previous_handler = signal.getsignal(signal.SIGTERM)
+    def terminate(signum, frame):
+        raise RuntimeError("Received TERM; no automatic retry")
+    signal.signal(signal.SIGTERM,terminate)
+    worker.start()
+    try:
+        budget.check(1)
+        return body()
+    except BaseException as exc:
+        stopped.set(); worker.join(timeout=2)
+        eligible = isinstance(exc,OSError) and budget.progress.get("phase")=="statistics"
+        try: budget.check(1)
+        except BaseException: eligible = False
+        failure = {"status":"POSTPROCESS_IO_ONLY" if eligible else "FAILED_NO_AUTOMATIC_RETRY",
+                   "traceback":traceback.format_exc(),"budget":budget.snapshot(),
+                   "access_path":"access.json"}
+        try:
+            budget.persist()
+            data.write_json(job/"failure.json",failure)
+            data.write_json(job/f"failure_{time.time_ns()}.json",failure)
+        except OSError:
+            print("Failure snapshot write failed; launcher exit log remains authoritative",flush=True)
+        raise
+    finally:
+        stopped.set(); worker.join(timeout=2)
+        signal.signal(signal.SIGTERM,previous_handler)
 
 
 def checkpoint(root: Path, name: str, model, optimizer, memory, current, current_cal,
@@ -145,6 +240,8 @@ def checkpoint(root: Path, name: str, model, optimizer, memory, current, current
                   "count":memory.count,"seen":memory.reservoir.seen,"stage":memory.stage},
               "full_restore_verified":True,"full_state":full,
               "model":{**inference,"path":inference_path.relative_to(root).as_posix()}}
+    # Measure the actual full+inference overlap before verified temporary deletion.
+    budget.check(1)
     base.persistence.remove_work_file(full_path,root)
     result["intermediate_deleted_bytes"] = full["bytes"]
     data.write_json(root/"points"/(name+".json"),result)
@@ -183,11 +280,13 @@ def train(job: Path, p: dict, budget) -> tuple[dict,dict,list]:
             raise ValueError("Order initial model differs")
         optimizer=method.make_optimizer(model,c); memory=method.Memory(order)
         for stage in (1,2,3):
+            if isinstance(budget,Budget): budget.mark(phase="training",order=order,stage=stage,step=0)
             current,current_cal=supply.current(order,order,stage)
             sequence,_=parent.schedule(current,parent.contract(),order,stage)
             if stage>1: memory.begin_stage(stage)
             rows=[]; history=[]
             for i,g in enumerate(sequence,1):
+                if isinstance(budget,Budget): budget.mark(step=i)
                 record=method.update(model,optimizer,g,memory,c,stage,i,check=budget.check)
                 rows.append({k:v for k,v in record.items() if k!="history_uid"})
                 history.append(record["history_uid"])
@@ -197,6 +296,7 @@ def train(job: Path, p: dict, budget) -> tuple[dict,dict,list]:
             tr={"order":order,"stage":stage,"current_ids":[g.uid for g in sequence],
                 "history_ids":history,"updates":rows,"adam_step":parent.adam_step(optimizer)}
             data.write_json(root/"updates"/(name+".json"),tr)
+            if isinstance(budget,Budget): budget.mark(phase="checkpoint")
             _,memory=checkpoint(root,name,model,optimizer,memory,current,current_cal,
                                 groups["development"],c,stage,budget)
             manifest["points"][name]=data.record(root/"points"/(name+".json"),root)
@@ -351,14 +451,14 @@ def finalize(root: Path) -> dict:
             result["absolute_stage_results"][name][role]={"macro_all":dict(zip(parent.metrics.COLUMNS,matrix.mean(0).tolist())),
                 "macro_by_domain":{d:dict(zip(parent.metrics.COLUMNS,matrix[r].mean(0).tolist())) for d,r in zip("ABC",rows)},
                 "pooled_fixed_half_classification":base.fixed_classification(counts,collected["domains"])}
-    result.update(status="COMPLETE_RELATION_FIXED_POINT",collected=data.record(root/"collected.json",root),
+    result["observed_continuation_checks_pass"] = result.pop("worth_matched_replay")
+    result.update(status="STATISTICS_COMPLETE_REQUIRES_VALID_COMPLETION",collected=data.record(root/"collected.json",root),
                   reference=p["reference"],source_files=sources())
     evaluation.write_once(root/"evaluation.json",data.json_bytes(result))
     return result
 
 
-def execute(job: Path, gate_path: Path) -> dict:
-    import torch
+def validate_gate(job: Path, gate_path: Path) -> dict:
     p=policy(); gate=data.read_json(gate_path)
     if (gate.get("status")!="APPROVED_RELATION_PILOT" or gate.get("source_files")!=sources()
             or gate.get("job")!=job.relative_to(data.ROOT).as_posix()
@@ -372,6 +472,64 @@ def execute(job: Path, gate_path: Path) -> dict:
         if key=="integration_cpu" and evidence["source_files"]!=sources():
             raise ValueError("Integration verification source differs")
     if gate["review_disposition"]!="NO_OPEN_BLOCKERS": raise ValueError("External/main review incomplete")
+    return p
+
+
+def complete(job: Path, budget: Budget) -> dict:
+    budget.mark(phase="statistics")
+    result=finalize(job/"evaluation")
+    budget.check(16384)
+    completion={"status":"COMPLETE_RELATION_FIXED_POINT","physical_updates":2592,
+                "access":data.read_json(job/"access.json"),"budget":budget.snapshot(),
+                "worth_matched_replay":result["observed_continuation_checks_pass"],
+                "evaluation":data.record(job/"evaluation/evaluation.json",job)}
+    if completion["access"]!=dict(train=1,valid=1,heldout=0,owners=0):
+        raise ValueError("Completion access ledger differs")
+    # Only this receipt confers valid completion; raw statistics never do.
+    with budget.lock:
+        data.write_json(job/"completion.json",completion)
+        try: budget.check(1); budget.persist()
+        except BaseException:
+            (job/"completion.json").unlink(missing_ok=True)
+            raise
+    return completion
+
+
+def recover_statistics(job: Path, gate_path: Path) -> dict:
+    p=validate_gate(job,gate_path)
+    if len(psutil.Process().cpu_affinity())!=1 or any(os.environ.get(k)!="1"
+            for k in ("OMP_NUM_THREADS","MKL_NUM_THREADS","OPENBLAS_NUM_THREADS")):
+        raise ValueError("Recovery requires single CPU and pre-import thread limits")
+    execution=data.read_json(job/"execution.json")
+    if execution["gate"]!=data.record(gate_path,data.ROOT) or execution["sources"]!=sources():
+        raise ValueError("Recovery must inherit the original job/gate")
+    failure=data.read_json(job/"failure.json")
+    if failure["status"]!="POSTPROCESS_IO_ONLY" or (job/"completion.json").exists():
+        raise ValueError("Only eligible postprocessing I/O failure may recover")
+    inherited=dict(failure["budget"])
+    # Initial launcher can observe a later exit than the Python exception snapshot.
+    wrapper=job.with_name(job.name+".wrapper.txt")
+    if wrapper.is_file():
+        for line in wrapper.read_text().splitlines():
+            if line.startswith("total_wall_seconds="):
+                inherited["elapsed_seconds"]=max(inherited["elapsed_seconds"],float(line.split("=")[1]))
+    if not np.isfinite(inherited["elapsed_seconds"]) or inherited["elapsed_seconds"]<0:
+        raise ValueError("Missing trustworthy consumed-time ledger")
+    collected=data.read_json(job/"evaluation/collected.json")
+    if (collected["status"]!="ALL_28_RELATION_METRIC_COUNT_SETS_SAVED"
+            or sum(map(len,collected["points"].values()))!=28):
+        raise ValueError("Recovery requires all 28 saved sets")
+    # No train, model, blind-score recomputation or label parser on this path.
+    budget=Budget(job,p,inherited)
+    data.write_json(job/f"recovery_from_{time.time_ns()}.json",failure)
+    data.write_json(job/"failure.json",{"status":"RECOVERY_RUNNING_NO_AUTOMATIC_RETRY",
+                                        "budget":budget.snapshot()})
+    return supervised(job,budget,lambda:complete(job,budget))
+
+
+def execute(job: Path, gate_path: Path) -> dict:
+    import torch
+    p=validate_gate(job,gate_path)
     if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
         raise ValueError("New independent reports directory required")
     resources=admission.preflight()
@@ -381,37 +539,21 @@ def execute(job: Path, gate_path: Path) -> dict:
     torch.set_num_threads(1); torch.set_num_interop_threads(1)
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
     job.mkdir(parents=True)
-    budget=Budget(job,p); stopped=threading.Event()
+    budget=Budget(job,p)
     data.write_json(job/"access.json",dict(train=0,valid=0,heldout=0,owners=0))
     data.write_json(job/"execution.json",{"gate":data.record(gate_path,data.ROOT),"sources":sources(),"resources":resources})
-    def watchdog():
-        while not stopped.wait(1):
-            try: budget.check()
-            except Exception as exc:
-                data.write_json(job/"failure.json",{"status":"BUDGET_STOP_NO_RETRY","error":str(exc)})
-                os._exit(2)
-    threading.Thread(target=watchdog,daemon=True).start()
-    try:
+    def body():
         manifest,partition,valid=train(job,p,budget)
         scores,verified_partition=blind_gate(job/"run",manifest)
         if verified_partition!=partition: raise ValueError("Partition changed")
         data.write_json(job/"before_valid.json",{"status":"PASS_COMPLETE_BLIND_GATE","points":9,
             "manifest":data.record(job/"run/manifest.json",job),"access":data.read_json(job/"access.json")})
+        budget.mark(phase="collect")
         labelled=previous.parse_once(job,valid,method.config(),"development")
         collect(job/"evaluation",scores,labelled,partition)
         del labelled,scores,valid
-        result=finalize(job/"evaluation")
-        budget.check(1)
-        completion={"status":result["status"],"physical_updates":2592,"access":data.read_json(job/"access.json"),
-                    "budget":budget.state(),"peak_rss_bytes":budget.peak_rss,
-                    "evaluation":data.record(job/"evaluation/evaluation.json",job)}
-        data.write_json(job/"completion.json",completion)
-        return completion
-    except BaseException:
-        data.write_json(job/"failure.json",{"status":"FAILED_NO_AUTOMATIC_RETRY","traceback":traceback.format_exc(),
-                                            "access":data.read_json(job/"access.json")})
-        raise
-    finally: stopped.set()
+        return complete(job,budget)
+    return supervised(job,budget,body)
 
 
 if __name__=="__main__":
@@ -421,7 +563,7 @@ if __name__=="__main__":
     parser.add_argument("--gate",type=Path)
     args=parser.parse_args()
     if os.name!="posix": parser.error("Existing Linux py310 only")
+    if args.gate is None: parser.error("Reviewed gate required for execution or statistics recovery")
     if args.action=="execute":
-        if args.gate is None: parser.error("Reviewed gate required")
         execute(args.out.resolve(),args.gate.resolve())
-    else: finalize(args.out.resolve())
+    else: recover_statistics(args.out.resolve(),args.gate.resolve())

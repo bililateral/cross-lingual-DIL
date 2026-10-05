@@ -1,0 +1,20 @@
+# 正式入口修复与准入处置
+
+2026-10-05，Asia/Shanghai。用户明确授权：“可以，只修正式入口、补对应受限手写证据，关闭这些问题后，按你已经授权的单候选方案运行；不需要重新确认同一份训练预算”。本轮落实前轮外审的最小修复后运行裁决，不改数学定义、候选配置、数据权限或正式预算。
+
+## 修复与核验
+
+- P1：纯统计状态改为STATISTICS_COMPLETE_REQUIRES_VALID_COMPLETION，六项合取仅作为observed_continuation_checks_pass。有效COMPLETE及worth建议由完成时资源检查后的completion签发。公开finalize CLI必须有原job/gate、28套保存矩阵和合法POSTPROCESS_IO_ONLY失败账；继承累计耗时、产物及RSS/CUDA观察峰值和单CPU约束。恢复前另存旧失败账并置进行中状态，硬终止不能回用旧余额。没有训练或标签路径。
+- P2：正式Budget保存轻量resource快照，含阶段/步数、累计时间、RSS/CUDA峰值、作业及控制台观察峰值。快照不再调用预算断言。watchdog记账使用finally退出；普通异常和TERM尽力落盘，Bash总墙钟/退出码继续后备。完整及推理checkpoint共存、删除临时full之前强制量一次。只容忍本次run/work已消失临时文件的FileNotFoundError，未吞掉全部OSError。
+- P3：使用job.name追加控制台/包装后缀，含点名称也与Bash一致。
+- 手写恢复增强：保存后实际扰动模型参数、Adam exp_avg和Torch RNG，再沿真实checkpoint恢复与完整分数检查；没有增加BGE探针。
+
+Linux既有py310、CPU0、禁用GPU，3项全部通过，0失败/错误/跳过；测试57.853秒，外层59.59秒，最大RSS855796KiB。真实三顺序共2592小模型更新、九端点、28套保存继续执行；新增恢复/故障例证明超限不能晋升、剩余额度恢复不调用train/parse_once、写失败账报错仍调用退出、TERM留证及点号路径正确。恢复小例的gate资格提供者使用手写替身，未伪称执行正式APPROVED gate或GPU preflight；实际原gate来源检查保留，部署前另核对。
+
+四份新原件在本目录cpu及cpu.console/cpu.wrapper；回传大小/SHA一致，cpu/result.json中的23份科学来源与当前文件一致。入口SHA为213119e1205ed7cc765cc44f8a6fb8c3822198da25a28ca99a7d81b29a0bc094；集成测试SHA为90b8ab990a6b2d4a7f7dd66357e8bc081b1cdac4c0de44386c90692809a580d5。核心step28_relation_memory.py仍为4d2fc05c945470a0e22fd563eed93e6b346904a7c1138cb0029406f09676b044，既有原生26秒/15.555GiB证据继续适用。本次未修改Bash、policy、目标、采样或评价公式。
+
+新CPU59.59秒加此前CPU包装8秒、52.10秒及初次约数秒，未接近已批准CPU30分钟总额；本轮无失败修复重跑，不新增GPU核验。正式24小时/24GiB预算尚待实际启动，不能当作已消费或已经跑通。
+
+主执行者对照修后实际入口、异常路径及证据复核，P1/P2/P3关闭；采纳的局部恢复/删除竞态建议也已落实。按已完成外审的条件裁决及用户最新明确执行指令进入正式部署，无需重新设计或重复整轮外审，不声称网页已再次执行修后代码。正式运行仍须通过源绑定gate、真实保存基线文件和共享服务器资源门。原生一步不等于正式全程，真实六群容量/完整BGE恢复/全程耗时仍由正式运行检查；有效性、效果和创新分别判断。
+
+当前交付仅新增正式入口修复和受影响集成核验，没有扩展机制、消融、自动重试或训练续跑。固定s0、ABC/BCA/CAB、2592更新及一次train/valid权限保持，结果必须完整盲门后开放。实际部署与运行状态以本目录execution记录和当前交接为准。

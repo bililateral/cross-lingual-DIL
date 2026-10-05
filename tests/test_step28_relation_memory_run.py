@@ -36,14 +36,24 @@ class IntegrationTests(unittest.TestCase):
         original_parse=run.previous.parse_once
         def parse(job,rows,config,split):
             return original_parse(job,rows,config,split,loader=load_labels)
-        with tempfile.TemporaryDirectory(prefix="relation_handwritten_") as temp:
+        with tempfile.TemporaryDirectory(prefix="relation_handwritten_",dir=run.data.ROOT/"reports") as temp:
             job=Path(temp)
             run.data.write_json(job/"access.json",dict(train=0,valid=0,heldout=0,owners=0))
-            budget=run.base.persistence.Budget(job,{"runtime":{"maximum_gpu_stage_seconds":1200,"maximum_output_bytes":128*2**20}})
+            budget=run.Budget(job,{"runtime":{"maximum_gpu_stage_seconds":1200,"maximum_output_bytes":128*2**20}})
+            save_state=run.core.save_state
+            def save_and_disturb(path,model,optimizer,metadata):
+                saved=save_state(path,model,optimizer,metadata)
+                with torch.no_grad():
+                    next(model.parameters()).add_(.25)
+                    if optimizer is not None:
+                        next(iter(optimizer.state.values()))["exp_avg"].add_(.5)
+                torch.rand(11)  # Loading and RNG reset must undo real disturbances.
+                return saved
             with mock.patch.object(run.base.public,"public_inputs",return_value=(groups,metadata,{"handwritten":True})), \
                  mock.patch.object(run.core,"model_files",return_value=c["models"]["split_rank"]), \
                  mock.patch.object(run.method,"load_model",side_effect=lambda config:fixtures.tiny_model()), \
-                 mock.patch.object(run.previous,"parse_once",side_effect=parse):
+                 mock.patch.object(run.previous,"parse_once",side_effect=parse), \
+                 mock.patch.object(run.core,"save_state",side_effect=save_and_disturb):
                 manifest,partition,valid=run.train(job,p,budget)
             self.assertEqual(manifest["physical_updates"],2592)
             self.assertEqual(run.data.read_json(job/"access.json")["valid"],0)
@@ -79,11 +89,63 @@ class IntegrationTests(unittest.TestCase):
             pp=copy.deepcopy(p); pp["reference"]={"linux_root":str(baseline),"collections":refs}
             with mock.patch.object(run,"policy",return_value=pp):
                 result=run.finalize(job/"evaluation")
-            self.assertFalse(result["worth_matched_replay"])
+            self.assertFalse(result["observed_continuation_checks_pass"])
+            self.assertEqual(result["status"],"STATISTICS_COMPLETE_REQUIRES_VALID_COMPLETION")
+            self.assertNotIn("worth_matched_replay",result)
             self.assertEqual(result["delta"]["O"]["map"]["mean"],0.)
             self.assertEqual(len(result["absolute_stage_results"]),10)
             self.assertEqual(len(list((job/"run/models").glob("*.pt"))),9)
             self.assertFalse(list((job/"run/work").glob("*.pt")))
+            # Recovery exercises the public dispatch on these real handwritten 28 sets.
+            gate=job/"handwritten_gate.json"; run.data.write_json(gate,{"fixture_only":True})
+            run.data.write_json(job/"execution.json",{"gate":run.data.record(gate,run.data.ROOT),"sources":run.sources()})
+            with mock.patch.object(run,"validate_gate",return_value=pp), \
+                 mock.patch.object(run,"policy",return_value=pp), \
+                 mock.patch.object(run,"train",side_effect=AssertionError("Recovery must not train")) as training, \
+                 mock.patch.object(run.previous,"parse_once",side_effect=AssertionError("Recovery must not parse labels")) as labels:
+                exhausted={"status":"BUDGET_STOP_NO_RETRY","budget":{"elapsed_seconds":86401.}}
+                run.data.write_json(job/"failure.json",exhausted)
+                with self.assertRaisesRegex(ValueError,"Only eligible"):
+                    run.recover_statistics(job,gate)
+                exhausted["status"]="POSTPROCESS_IO_ONLY"
+                run.data.write_json(job/"failure.json",exhausted)
+                with self.assertRaisesRegex(RuntimeError,"cumulative time"):
+                    run.recover_statistics(job,gate)
+                self.assertFalse((job/"completion.json").exists())
+                fresh=run.Budget(job,pp)
+                with mock.patch.object(run,"finalize",side_effect=OSError("Handwritten output I/O failure")):
+                    with self.assertRaises(OSError):
+                        run.supervised(job,fresh,lambda:run.complete(job,fresh))
+                failed=run.data.read_json(job/"failure.json")
+                self.assertEqual(failed["status"],"POSTPROCESS_IO_ONLY")
+                done=run.recover_statistics(job,gate)
+                self.assertEqual(done["status"],"COMPLETE_RELATION_FIXED_POINT")
+                self.assertGreater(done["budget"]["elapsed_seconds"],failed["budget"]["elapsed_seconds"])
+                self.assertFalse(done["worth_matched_replay"])
+                training.assert_not_called(); labels.assert_not_called()
+                self.assertTrue(any(run.data.read_json(path)==failed for path in job.glob("recovery_from_*.json")))
+
+    def test_resource_paths_snapshot_and_stop_on_ledger_failure(self):
+        with tempfile.TemporaryDirectory(prefix="relation_budget_") as temp:
+            job=Path(temp)/"job.v1"; job.mkdir()
+            for suffix in (".console.txt",".wrapper.txt"):
+                job.with_name(job.name+suffix).write_bytes(b"0123456789")
+            budget=run.Budget(job,{"runtime":{"maximum_gpu_stage_seconds":60,"maximum_output_bytes":16}})
+            with self.assertRaisesRegex(RuntimeError,"output budget"):
+                budget.check()
+            self.assertEqual(budget.snapshot()["peak_observed_bytes"],20)
+            # Snapshot remains callable after violation and carries the failed usage.
+            budget.persist()
+            self.assertEqual(run.data.read_json(job/"resource.json")["peak_observed_bytes"],20)
+            with mock.patch.object(run.data,"write_json",side_effect=OSError("Handwritten disk failure")), \
+                 mock.patch.object(run.os,"_exit",side_effect=SystemExit(2)) as terminate:
+                with self.assertRaises(SystemExit):
+                    run.watchdog(job,budget,mock.Mock(wait=mock.Mock(return_value=False)))
+                terminate.assert_called_once_with(2)
+            room=run.Budget(job,{"runtime":{"maximum_gpu_stage_seconds":60,"maximum_output_bytes":2**20}})
+            with self.assertRaisesRegex(RuntimeError,"Received TERM"):
+                run.supervised(job,room,lambda:run.signal.raise_signal(run.signal.SIGTERM))
+            self.assertEqual(run.data.read_json(job/"failure.json")["status"],"FAILED_NO_AUTOMATIC_RETRY")
 
     def test_candidate_first_endpoint_and_observed_continuation(self):
         ref={}; cand={}; domains=[d for d in "ABC" for _ in range(20)]
@@ -110,6 +172,7 @@ class IntegrationTests(unittest.TestCase):
 if __name__=="__main__":
     if os.environ.get("CUDA_VISIBLE_DEVICES")!="": raise RuntimeError("CPU only")
     torch.set_num_threads(1); torch.set_num_interop_threads(1)
+    os.environ["RELATION_STARTED_EPOCH"]=str(time.time())
     out=Path(sys.argv[1]); out.mkdir(parents=True,exist_ok=False)
     tick=time.monotonic()
     with (out/"unittest.txt").open("w",encoding="utf-8") as stream:
