@@ -1,0 +1,76 @@
+{
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "torch_loaded": false,
+    "CUDA_VISIBLE_DEVICES": ""
+  },
+  "scope": "Web production non-torch functions; synthetic state; not trained 48 groups, not tokenized by BGE.",
+  "maximum_and_short_text_measurement": [
+    {
+      "text_characters_each_channel": 5,
+      "group_count": 6,
+      "accounts_per_group": 28,
+      "records_per_account": 8,
+      "channels_per_record": 2,
+      "stage": 1,
+      "count": 48,
+      "reservoir_seen": 48,
+      "raw_CJK_UTF8_text_bytes": 40320,
+      "original_1MiB_status": "ACCEPTED",
+      "complete_payload_bytes": 390929
+    },
+    {
+      "text_characters_each_channel": 254,
+      "group_count": 6,
+      "accounts_per_group": 28,
+      "records_per_account": 8,
+      "channels_per_record": 2,
+      "stage": 1,
+      "count": 48,
+      "reservoir_seen": 48,
+      "raw_CJK_UTF8_text_bytes": 2048256,
+      "original_1MiB_status": "REJECTED",
+      "error": "Historical state exceeds the approved byte budget",
+      "measurement_only_cap": 8388608,
+      "complete_payload_bytes": 2398865,
+      "raw_reservoir_json_bytes": 2099389,
+      "measurement_changes_metadata_length": false,
+      "reverted_1MiB_status": "REJECTED: Historical state exceeds the approved byte budget"
+    }
+  ],
+  "begin_stage_budget_boundary": {
+    "stage1_payload_bytes": 1048512,
+    "spare_bytes": 64,
+    "begin_stage_returned_normally": true,
+    "draw_stage": 2,
+    "serialization_after_begin_stage": "REJECTED: Complete effective history exceeds 1MiB",
+    "stage2_complete_payload_bytes": 1055231,
+    "new_rng_header_growth_bytes": 6719,
+    "over_budget_bytes": 6655,
+    "draw_after_oversized_begin_still_succeeds": true,
+    "drawn_uid": "budget_g04",
+    "draw_count": 1,
+    "scope": "Production begin_stage/draw paths; count=1 native fixture does not call these."
+  },
+  "raw_text_only_begin_stage_budget_boundary": {
+    "maps": {},
+    "groups_validate": true,
+    "records_per_account": 8,
+    "minimum_field_characters": 86,
+    "maximum_field_characters": 254,
+    "stage1_complete_payload_bytes": 1047575,
+    "spare_bytes": 1001,
+    "begin_stage_returned_normally": true,
+    "serialization_after_begin_stage": "REJECTED: Complete effective history exceeds 1MiB",
+    "stage2_complete_payload_bytes": 1054294,
+    "rng_header_growth_bytes": 6719,
+    "over_budget_bytes": 5718,
+    "draw_after_oversized_begin_still_succeeds": true,
+    "drawn_uid": "budget_g04",
+    "draw_count": 1,
+    "note": "All Group validations pass; CJK fields <=254 characters, but no tokenizer/native claim."
+  },
+  "source_unchanged": true,
+  "elapsed_seconds": 0.1036897969970596
+}

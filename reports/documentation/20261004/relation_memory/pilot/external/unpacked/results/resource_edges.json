@@ -1,0 +1,44 @@
+{
+  "scope": "Web-workspace stdlib-only; extracted budget/control AST; no project Linux/GPU/Torch/BGE/training",
+  "path_cases": [
+    {
+      "job_name": "job",
+      "actual_launcher_bytes": 20,
+      "configured_limit_bytes": 16,
+      "actual_files": [
+        "job.console.txt",
+        "job.wrapper.txt"
+      ],
+      "checked_files": [
+        "job.console.txt",
+        "job.wrapper.txt"
+      ],
+      "observed_check": "Job plus launcher evidence exceeds output budget"
+    },
+    {
+      "job_name": "job.v1",
+      "actual_launcher_bytes": 20,
+      "configured_limit_bytes": 16,
+      "actual_files": [
+        "job.v1.console.txt",
+        "job.v1.wrapper.txt"
+      ],
+      "checked_files": [
+        "job.console.txt",
+        "job.wrapper.txt"
+      ],
+      "observed_check": "PASS"
+    }
+  ],
+  "concurrent_verified_temp_cleanup": {
+    "limit_bytes": 1024,
+    "bytes_before_cleanup": 10,
+    "bytes_after_cleanup": 0,
+    "observed_check": "FileNotFoundError",
+    "note": "Deterministic interleaving simulation; not an observed project failure."
+  },
+  "watchdog_write_failure": {
+    "uncaught": "synthetic failure-ledger write error",
+    "process_exit_called": false
+  }
+}
