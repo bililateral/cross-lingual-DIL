@@ -1,0 +1,94 @@
+{
+  "audit_scope": "Saved metric/count aggregation only; Python/NumPy in web workspace, no project evaluation imports, labels, models, training or GPU.",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "candidate_metric_count_sets": 28,
+  "reference_metric_count_sets": 27,
+  "required_matrix_and_count_files_checked": 110,
+  "unique_groups": 60,
+  "domain_group_sizes": {
+    "A": 20,
+    "B": 20,
+    "C": 20
+  },
+  "headers_identical": true,
+  "frozen_source_files_hash_checked": 23,
+  "baseline_path_mapping": {
+    "linux_root": "reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace/reports/job/evaluation",
+    "local_root": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation",
+    "collections": [
+      {
+        "path": "collected.json",
+        "bytes": 13759,
+        "sha256": "e01708603a799dd8c4a53b7f5a86b7a5fc35936f00e7c78902650ca6137ad452"
+      },
+      {
+        "path": "reference/collected.json",
+        "bytes": 22474,
+        "sha256": "ffb6e7fd7d1437a9d3940848452c24d5a0560b2388f5913b2ffa5ed14f07926a"
+      }
+    ]
+  },
+  "group_count_metric_comparison": {
+    "sets": 55,
+    "numeric_values": 19800,
+    "maximum": {
+      "label": "relation/ABC_relation_stage1/first-cal",
+      "max_abs_error": 0.0,
+      "group_row": 0,
+      "metric": "precision"
+    }
+  },
+  "ranking_columns_equal_across_roles": true,
+  "endpoint_comparison": {
+    "numeric_leaves": 8316,
+    "max_abs_error": 1.3322676295501878e-15,
+    "max_error_location": "endpoints/logit0.1/raw/O/specificity/conditional_95pct_interval/1",
+    "independent_saved_values": [
+      1.0000000000000009,
+      0.9999999999999996
+    ],
+    "violations_above_1e_12": []
+  },
+  "absolute_macro_comparison": {
+    "numeric_leaves": 2464,
+    "max_abs_error": 0.0,
+    "max_error_location": "absolute/ABC_relation_stage1/first-cal/macro_all/average_precision",
+    "independent_saved_values": [
+      0.17559169036958072,
+      0.17559169036958072
+    ],
+    "violations_above_1e_12": []
+  },
+  "bootstrap": {
+    "method": "PCG64 whole-group paired by actual A/B/C, shared draws, three fixed orders averaged",
+    "resamples": 5000,
+    "seed": 20260930,
+    "draw_shape": [
+      5000,
+      3,
+      20
+    ],
+    "numpy_dtype": "int64",
+    "draws_sha256": "83818dd4f6a7d4ba8f2dd1a5f4dbda69d8074319d58050d4604a8d8f29dc3a66",
+    "interval": "linear percentile [.025,.975]"
+  },
+  "continuation_checks": {
+    "O_map_positive": false,
+    "N_map_non_decrease": false,
+    "Z_map_non_decrease": false,
+    "O_AP_non_decrease": false,
+    "N_AP_non_decrease": false,
+    "Z_AP_non_decrease": false
+  },
+  "number_passed": 0,
+  "observed_continuation_checks_pass": false,
+  "old_map_conditional_positive": false,
+  "automatic_followup": false,
+  "limitations": [
+    "Pair truth is absent. Candidate blind-score exports exist but are not read by this script; the LOGIT comparison uses saved matrices/counts. MAP/AP/AUC/ranking metric generation and Brier/log-loss are not recomputed from truth.",
+    "Matching recorded headers/hashes proves package alignment, not unrecorded original model predictions.",
+    "Intervals condition on these 60 developed-valid groups and fixed orders/s0; no seed or independent-valid uncertainty.",
+    "No claim about project Linux/GPU execution or mechanism attribution."
+  ]
+}

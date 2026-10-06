@@ -1,0 +1,78 @@
+{
+  "scope": "Saved metadata identity and declared lifecycle only; no Torch, model, original labels, or project Linux access",
+  "documents_match_actual_execution_descriptors": {
+    "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md": {
+      "bytes_match_execution": true,
+      "sha256_match_execution": true
+    },
+    "docs/SELLER_ALIAS_LOGIT_LOW.zh.md": {
+      "bytes_match_execution": true,
+      "sha256_match_execution": true
+    }
+  },
+  "same_ordered_saved_evaluation_identity": {
+    "domains": true,
+    "group_ids": true,
+    "metric_columns": true
+  },
+  "group_count": 60,
+  "metric_count": 22,
+  "baseline_completion": {
+    "budget": {
+      "elapsed_seconds": 19363.136873584008,
+      "peak_observed_bytes": 10447066320
+    },
+    "evaluation": {
+      "bytes": 899261,
+      "path": "evaluation/evaluation.json",
+      "sha256": "a68bb249ace9bb5911013a089e21eaeddda4d31eead459b1bcedf6913905d0c5"
+    },
+    "label_parses": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 1
+    },
+    "method_checks": {
+      "all_guards_against_seq_pass": false,
+      "increment_against_matched_er_passes": true,
+      "scope": "Separate fixed developed-valid comparisons; no automatic model replacement or new-method qualification"
+    },
+    "physical_updates": 1728,
+    "status": "COMPLETE_LOGIT_WEIGHT_DEVELOPMENT_COMPARISON"
+  },
+  "baseline_before_valid": {
+    "label_parses": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0
+    },
+    "manifest": {
+      "bytes": 21745,
+      "path": "run/manifest.json",
+      "sha256": "aeccd77ecd0fd9b8f8080983735c892e58f49d0471c26f53c5bb342348982771"
+    },
+    "status": "PASS_ER_WEIGHT_COMPLETE_BLIND_GATE"
+  },
+  "baseline_access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 1
+  },
+  "baseline_started": "2026-10-03T16:01:03+08:00",
+  "baseline_finished": "2026-10-03T21:23:48+08:00",
+  "baseline_wrapper_seconds": 19365.0,
+  "baseline_exit_status": 0,
+  "baseline_environment": {
+    "python": "3.10.19",
+    "torch": "2.9.1+cu130",
+    "cuda": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "cpu_affinity": [
+      47
+    ]
+  },
+  "conclusion": "No baseline-qualification contradiction found in this bounded audit. Wall time is not a matched algorithm-efficiency comparison."
+}
