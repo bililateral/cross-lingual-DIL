@@ -1,0 +1,54 @@
+{
+  "origin": "independent_web_handwritten_failures",
+  "formal_inputs": false,
+  "cases": {
+    "train": {
+      "attempt_consumed_before_failure": true,
+      "second_attempt_rejected": true,
+      "loader_calls": 1,
+      "ledger": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0
+      }
+    },
+    "development": {
+      "attempt_consumed_before_failure": true,
+      "second_attempt_rejected": true,
+      "loader_calls": 1,
+      "ledger": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 0,
+        "valid": 1
+      }
+    }
+  },
+  "resource_guard": {
+    "original_test_bound_to_new_runner": true,
+    "tests_run": 1,
+    "failures": 0,
+    "errors": 0,
+    "status": "PASS_WEB_CPU_ONLY"
+  },
+  "macro_vs_pooled_example": {
+    "counts": [
+      {
+        "tp": 1,
+        "fp": 0,
+        "fn": 19,
+        "tn": 358
+      },
+      {
+        "tp": 15,
+        "fp": 30,
+        "fn": 5,
+        "tn": 328
+      }
+    ],
+    "macro_f1": 0.2783882783882784,
+    "pooled_f1": 0.37209302325581395,
+    "not_effects": true
+  }
+}

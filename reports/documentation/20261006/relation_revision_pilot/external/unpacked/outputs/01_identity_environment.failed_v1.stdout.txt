@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/mnt/data/relation_revision_pilot_external_audit/code/01_identity_environment.py", line 59, in <genexpr>
+    report['old_core_unchanged']=all(next(x for x in changes if x['path']==p)['unchanged_vs_history'] for p in ('scripts/step28_relation_revision.py','scripts/step28_relation_memory.py','scripts/step28_relation_memory_run.py'))
+                                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/data/relation_revision_pilot_external_audit/code/01_identity_environment.py", line 59, in <module>
+    report['old_core_unchanged']=all(next(x for x in changes if x['path']==p)['unchanged_vs_history'] for p in ('scripts/step28_relation_revision.py','scripts/step28_relation_memory.py','scripts/step28_relation_memory_run.py'))
+                                 ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: generator raised StopIteration

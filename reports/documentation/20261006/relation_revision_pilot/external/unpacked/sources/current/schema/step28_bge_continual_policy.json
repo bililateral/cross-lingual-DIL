@@ -1,0 +1,199 @@
+{
+  "study": "seller_alias_bge_limited_history_pilot",
+  "schema_version": 1,
+  "contract_document": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+  "decision": "reports/documentation/20260930/continual_plan/implementation_decision.json",
+  "configuration": "hard_bge_separate_moments",
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "seed": "s0",
+  "initialization_seed": 20260909,
+  "schedule_seed": 20260918,
+  "memory_seed": 20260930,
+  "methods": [
+    "frozen",
+    "seq",
+    "er",
+    "logit"
+  ],
+  "updated_methods": [
+    "seq",
+    "er",
+    "logit"
+  ],
+  "epochs_per_stage": 6,
+  "fit_groups_per_domain": 48,
+  "calibration_groups_per_domain": 12,
+  "valid_groups_per_domain": 20,
+  "updates_per_stage": 288,
+  "physical_updates": 6048,
+  "gradient_group_presentations": 9504,
+  "distinct_stage_endpoints": 21,
+  "encoder_schedule": {
+    "warmup_updates": 29,
+    "peak_lr": 0.00001,
+    "head_lr": 0.001,
+    "local_stage_restart": true,
+    "adam_moments_and_steps_continue": true
+  },
+  "loss": {
+    "bce": 1,
+    "rank": 1,
+    "known_top5_hard": 0.5,
+    "historical_supervision": 1,
+    "historical_logit_mse": 0.5,
+    "history_and_current_summed": true,
+    "one_clip_and_adam_step": true,
+    "student_mode": "train",
+    "reference_mode": "eval"
+  },
+  "memory": {
+    "capacity_groups": 6,
+    "maximum_bytes": 1048576,
+    "supply": "model_independent_algorithm_r_at_stage_end",
+    "insertion_order": "ascending_group_uid_each_unique_fit_group_once",
+    "same_members_and_draws_for_er_logit": true,
+    "draw": "one_uniform_group_with_replacement_per_update",
+    "refresh_survivor_reference": false,
+    "reference": "float32_raw_logits_at_origin_domain_end",
+    "include": "All serialized groups/labels/indices/RNG/counters/reference logits/first-map and related persistent auxiliary state",
+    "old_archive_reaccess": false
+  },
+  "calibration": {
+    "role": "current_domain_only",
+    "fit_groups": 12,
+    "positive_affine": true,
+    "bounds": [
+      [
+        0.001,
+        100
+      ],
+      [
+        -100,
+        100
+      ]
+    ],
+    "initial": [
+      1,
+      0
+    ],
+    "solver": "L-BFGS-B",
+    "options": {
+      "maxiter": 200,
+      "maxfun": 2000,
+      "maxls": 40,
+      "maxcor": 10,
+      "ftol": 1e-12,
+      "gtol": 1e-8
+    },
+    "accepted_projected_gradient_max": 0.000001,
+    "old_calibration_reuse": false,
+    "primary_role": "stage-cal",
+    "diagnostic_roles": [
+      "raw",
+      "first-cal"
+    ],
+    "initial_role": "raw"
+  },
+  "evaluation": {
+    "split": "development",
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260930,
+    "draw_shape": [
+      5000,
+      3,
+      20
+    ],
+    "confidence_level": 0.95,
+    "quantile_method": "linear",
+    "actual_domain_order": [
+      "A",
+      "B",
+      "C"
+    ],
+    "comparisons": [
+      [
+        "er",
+        "seq"
+      ],
+      [
+        "logit",
+        "er"
+      ]
+    ],
+    "endpoints": [
+      "O",
+      "N",
+      "Z",
+      "F_first",
+      "F",
+      "G",
+      "final_all"
+    ],
+    "positive_metric_signs": {
+      "map": 1,
+      "recall_at_5": 1,
+      "average_precision": 1,
+      "roc_auc": 1,
+      "brier": -1,
+      "log_loss": -1
+    },
+    "old_map_strict_positive": true,
+    "old_map_interval_low_strict_positive": true,
+    "old_recall5_strict_positive": true,
+    "new_N_MAP_and_recall5_non_decrease": true,
+    "probability_guard_endpoints": [
+      "O",
+      "N",
+      "Z"
+    ],
+    "raw_comparator_loss_guard_endpoints": [
+      "O",
+      "N"
+    ],
+    "latest_Z_six_observed_guards": true,
+    "forgetting_required_orders": 2,
+    "classification_threshold_logit": 0,
+    "primary_ranking_role": "raw",
+    "primary_probability_role": "stage-cal",
+    "performance_tolerance": 0,
+    "no_winner_selection": true,
+    "scope": "One fixed seed, fixed models/order/map/generator; paired actual-domain whole-group conditional intervals, not population noninferiority or independent confirmatory test"
+  },
+  "supervision": {
+    "train_parse_attempts": 1,
+    "valid_parse_attempts": 1,
+    "test_access": false,
+    "owners_access": false,
+    "automatic_retry": false,
+    "valid_after_all_training_and_complete_blind_gate": true,
+    "formal_access_authorized_by_this_file": false
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 129600,
+    "maximum_output_bytes": 68719476736,
+    "minimum_free_gpu_bytes": 25769803776,
+    "minimum_free_host_bytes": 17179869184,
+    "torch_cpu_threads": 1,
+    "estimated_hours": [
+      18,
+      26
+    ]
+  },
+  "cpu_verification": {
+    "maximum_seconds": 3600,
+    "maximum_evidence_bytes": 268435456,
+    "formal_inputs": false,
+    "formal_labels": false,
+    "gpu": false,
+    "retained_native_weights": false,
+    "estimate_minutes": [
+      15,
+      30
+    ]
+  },
+  "execution_boundary": "Only local preparation is currently authorized. Complete local contract/policy/code and static review; user and actual web approval precede any project Linux access or sync. Formal execution requires separate source-bound authorization and native verification. No grants arise from this policy."
+}
