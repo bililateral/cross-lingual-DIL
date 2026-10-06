@@ -1,0 +1,272 @@
+{
+  "status": "PASS",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "torch_used": false,
+    "project_imports": false,
+    "formal_data_used": false,
+    "scope": "Web workspace algebraic handwritten fixtures; not project Linux/BGE evidence"
+  },
+  "fixture": {
+    "accounts": 28,
+    "edges": 378,
+    "positive_edges": 20,
+    "query_positive_degrees": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "total_query_comparisons": 1016
+  },
+  "checks": [
+    {
+      "name": "scalar_vs_vector_B",
+      "max_abs_error": 8.881784197001252e-16,
+      "atol": 2e-13,
+      "pass": true
+    },
+    {
+      "name": "scalar_vs_vector_R",
+      "max_abs_error": 1.1102230246251565e-16,
+      "atol": 2e-13,
+      "pass": true
+    },
+    {
+      "name": "zero_B_log27_plus_1p5_log2",
+      "max_abs_error": 8.881784197001252e-16,
+      "atol": 2e-14,
+      "pass": true
+    },
+    {
+      "name": "zero_R_log2",
+      "max_abs_error": 2.220446049250313e-16,
+      "atol": 2e-14,
+      "pass": true
+    },
+    {
+      "name": "score_directional_derivative_B",
+      "max_abs_error": 4.795290223930104e-10,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "score_directional_derivative_R",
+      "max_abs_error": 4.699450290718277e-11,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "combined_history_Y_direction",
+      "max_abs_error": 9.576464534560847e-11,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "combined_history_w_direction",
+      "max_abs_error": 2.848588032122734e-11,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "Q_w_via_p_finite_difference",
+      "max_abs_error": 3.5928221508996216e-10,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "Q_w_direct_finite_difference",
+      "max_abs_error": 6.251047249272723e-11,
+      "atol": 3e-09,
+      "pass": true
+    },
+    {
+      "name": "Q_statistics_constant",
+      "max_abs_error": 5.329070518200751e-15,
+      "atol": 2e-13,
+      "pass": true
+    },
+    {
+      "name": "Q_division_preserves_replicated_history",
+      "max_abs_error": 8.881784197001252e-16,
+      "atol": 3e-13,
+      "pass": true
+    },
+    {
+      "name": "old_blind_X_delta_zero",
+      "max_abs_error": 0.0,
+      "atol": 2e-15,
+      "pass": true
+    },
+    {
+      "name": "old_blind_Q_same",
+      "max_abs_error": 0.0,
+      "atol": 3e-13,
+      "pass": true
+    },
+    {
+      "name": "R_sees_old_harmful_null_example",
+      "pass": true
+    },
+    {
+      "name": "aggregate_tradeoff_Q_same",
+      "max_abs_error": 0.0,
+      "atol": 3e-13,
+      "pass": true
+    },
+    {
+      "name": "R_common_shift_invariance",
+      "max_abs_error": 0.0,
+      "atol": 2e-14,
+      "pass": true
+    },
+    {
+      "name": "valid_group_Q_conflict_formula",
+      "max_abs_error": 6.750155989720952e-14,
+      "atol": 1e-12,
+      "pass": true
+    },
+    {
+      "name": "valid_group_R_conflict_formula",
+      "max_abs_error": 4.336808689942018e-19,
+      "atol": 1e-14,
+      "pass": true
+    }
+  ],
+  "objective_reduction": {
+    "vectorized": {
+      "bce": 0.7837396496822427,
+      "query": 3.074186144225521,
+      "hard": 0.7622189648840625,
+      "B": 4.239035276349795,
+      "R": 0.5786001212404972,
+      "square_proxy": 4.831656759227711,
+      "wrong_global_comparison_R": 0.6204617893046521
+    },
+    "independent_stdlib": {
+      "B": 4.239035276349796,
+      "R": 0.5786001212404973
+    },
+    "correct_R_minus_wrong_global_R": -0.04186166806415492,
+    "zero_scores": {
+      "bce": 0.6931471805599454,
+      "query": 3.29583686600433,
+      "hard": 0.6931471805599451,
+      "B": 4.335557636844248,
+      "R": 0.6931471805599451,
+      "square_proxy": 4.999999999999998,
+      "wrong_global_comparison_R": 0.6931471805599454
+    }
+  },
+  "history_gradients": {
+    "Q": 5.332582514953623,
+    "R": 0.7569258130294266,
+    "Q_w_via_p_norm": 2.2954619064769988,
+    "Q_w_direct_norm": 0.3562269721497855,
+    "R_Y_norm": 0.11429255500915027,
+    "R_w_norm": 0.32554309732676334,
+    "combined_Y_direction_fd": 0.0002687725597638746,
+    "combined_Y_direction_analytic": 0.00026877246399922925,
+    "combined_w_direction_fd": 0.3850024197227242,
+    "combined_w_direction_analytic": 0.3850024196942383,
+    "constant_feature_row_was_not_perturbed": true
+  },
+  "old_Q_blind_example": {
+    "edges": [
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "labels": [
+      0,
+      1,
+      1
+    ],
+    "scores_before": [
+      -0.5,
+      0.0,
+      0.5
+    ],
+    "scores_after": [
+      -0.3,
+      -0.4,
+      0.7
+    ],
+    "Q_before": 1.2966269841269886,
+    "Q_after": 1.2966269841269886,
+    "R_before": 0.31900509097043295,
+    "R_after": 0.32349833362825603,
+    "dR_d_amplitude_at_1": 0.00535475613158125,
+    "weighted_dR_d_amplitude_at_1": 0.0005354756131581251,
+    "Q_and_R_values_are_not_MAP": true,
+    "feature_values_inside_tanh_range_except_constant_row": true
+  },
+  "aggregate_tradeoff_example": {
+    "maximum_X_delta": 1.1102230246251565e-16,
+    "Q_before": 1.4024299117285381,
+    "Q_after": 1.4024299117285381,
+    "R_before": 0.3524936854893668,
+    "R_after": 0.3466397499032126,
+    "specific_positive_minus_negative_before": 0.5,
+    "specific_positive_minus_negative_after": -0.10000000000000003,
+    "feature_max_abs_nonconstant": 0.7
+  },
+  "R_invariance": {
+    "score_nodes": 378,
+    "connected_component_from_first_node": 378,
+    "finite_score_hessian_kernel": "span(all-ones), by connected weighted-Laplacian argument",
+    "does_not_certify_unseen_or_evicted_group_behavior": true
+  },
+  "large_margin_conflict": {
+    "margin": 6.0,
+    "Q": 20.000000000000068,
+    "R": 0.00247568513773045,
+    "dQ_d_margin": 10.0,
+    "d_0p1R_d_margin": -0.00024726231566347745,
+    "Q_to_weighted_R_derivative_magnitude_ratio": 40442.87934927351,
+    "combined_history_dJ_d_margin": 9.999752737684336,
+    "weighted_R_score_gradient_l1_bound": 0.2,
+    "bound_is_not_a_parameter_gradient_or_objective_balance_guarantee": true
+  },
+  "limitations": [
+    "Independent formulas and finite differences do not execute Torch autograd or certify the production model.",
+    "The new current B differs from the historical square proxy; H/b/c/N do not summarize B or R.",
+    "Score/feature-space examples do not assert exact reachability by the fixed BGE/head parameterization.",
+    "R sees some harmful cache changes but does not protect every comparison or cache-external examples.",
+    "No coefficient tuning, effects training, formal-data read, or authorization was performed."
+  ]
+}

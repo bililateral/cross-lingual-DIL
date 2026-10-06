@@ -1,0 +1,142 @@
+{
+  "scope": "Attachment-only stdlib execution; AST/source/receipt checks and scalar examples. No project imports or training.",
+  "status": "PASS_SOURCE_BINDINGS_WITH_STATIC_TEST_COVERAGE_LIMITS",
+  "torch_module_available_in_this_environment": false,
+  "torch_imported_or_tests_executed_here": false,
+  "cpu_source_records_verified": 19,
+  "cpu_AST_closure_count": 19,
+  "cpu_recovery_records_verified": 5,
+  "old_frozen_records_verified": 23,
+  "new_test_names": [
+    "test_independent_objectives_and_margin_direction",
+    "test_projection_blind_counterexample_is_seen_by_rank",
+    "test_serial_kernel_matches_joint_and_both_history_paths_are_live",
+    "test_cumulative_statistic_changes_gradient_and_actual_update",
+    "test_stage_entry_consolidation_and_restore"
+  ],
+  "actual_Linux_test_names_from_log": [
+    "test_cumulative_statistic_changes_gradient_and_actual_update",
+    "test_independent_objectives_and_margin_direction",
+    "test_projection_blind_counterexample_is_seen_by_rank",
+    "test_serial_kernel_matches_joint_and_both_history_paths_are_live",
+    "test_stage_entry_consolidation_and_restore"
+  ],
+  "linux_evidence": {
+    "status": "PASS",
+    "exit_code": 0,
+    "limit_failure": null,
+    "elapsed_seconds": 11.379621805157512,
+    "peak_process_tree_rss_bytes": 711159808,
+    "affinity": [
+      0
+    ],
+    "gpu_visible": "",
+    "python": "3.10.19 | packaged by conda-forge | (main, Oct 22 2025, 22:29:10) [GCC 14.3.0]",
+    "formal_data_access": false,
+    "native_bge_loaded": false,
+    "retry": false
+  },
+  "label_routing_counterexample": {
+    "same_labels_for_all_handmade_group_UIDs": true,
+    "original_positive_edges": 20,
+    "permuted_positive_edges": 20,
+    "changed_labels_after_swapping_membership_positions_0_3": 8,
+    "original_query_positive_degrees": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "permuted_query_positive_degrees": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "both_have_positive_and_negative_per_query": true,
+    "purpose": "Shows a 20-positive, 28-account routing-discriminating fixture exists; no model/training was executed."
+  },
+  "first_Adam_discrimination_example": {
+    "scope": "Scalar illustrative first Adam moment, no weight decay; not a reproduced model mutant.",
+    "learning_rate": 0.001,
+    "epsilon": 1e-08,
+    "gradient_a": 1.0,
+    "gradient_b": 2.0,
+    "gradient_difference": 1.0,
+    "update_difference": 4.9999997631805515e-12,
+    "test_parameter_atol": 2e-06,
+    "note": "Global clip and first-step normalization can conceal changed gradient magnitude; compare pre-clip gradients."
+  },
+  "static_coverage_limits": [
+    {
+      "location": "new tests lines 88-99 and revision lines 32-39",
+      "finding": "Joint and serial both consume production history_objective.total. No independent assertion fixes total to Q+0.1R; changing only aggregation or coefficient can be shared by both.",
+      "not_claimed": "No Torch mutation run; this is an absent-oracle observation."
+    },
+    {
+      "location": "new tests lines 101-103",
+      "finding": "Only post-first-Adam parameters are compared, not pre-clip full gradients or optimizer moment state."
+    },
+    {
+      "location": "old test helper lines 19-21 and new tests lines 80,107,131",
+      "finding": "All helper groups share exactly the same labels. Passing current.labels to historical R would not be discriminated by these fixtures."
+    },
+    {
+      "location": "new tests lines 127-141",
+      "finding": "Two stages and two consolidations execute; roundtrip is checked, but restored Memory object is discarded and not used for stage2. No new model/Adam/RNG restore test."
+    },
+    {
+      "location": "new tests lines 36-42,105-125",
+      "finding": "count1/stage0/empty-reservoir kernel fixture cannot be serialized as a valid stage Memory. Alternative H/b from bounded random_z is a lawful quadratic-statistic fixture, not a demonstrated reachable same-cache accumulated history."
+    }
+  ],
+  "failures": []
+}

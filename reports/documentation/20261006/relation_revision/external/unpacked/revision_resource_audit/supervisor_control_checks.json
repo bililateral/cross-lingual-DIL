@@ -1,0 +1,76 @@
+{
+  "scope": "Web stdlib AST control-flow probes with fake process/psutil/time; no Torch, test, Linux project process or GPU execution",
+  "cases": [
+    {
+      "case": "time_limit",
+      "calls": {
+        "popen": 1,
+        "kill": 1,
+        "wait": 1
+      },
+      "caught": {
+        "type": "SystemExit",
+        "value": "1"
+      },
+      "record_status": "FAIL",
+      "record_limit_failure": "time, RSS, or evidence resource limit"
+    },
+    {
+      "case": "rss_limit",
+      "calls": {
+        "popen": 1,
+        "kill": 1,
+        "wait": 1
+      },
+      "caught": {
+        "type": "SystemExit",
+        "value": "1"
+      },
+      "record_status": "FAIL",
+      "record_limit_failure": "time, RSS, or evidence resource limit"
+    },
+    {
+      "case": "evidence_limit",
+      "calls": {
+        "popen": 1,
+        "kill": 1,
+        "wait": 1
+      },
+      "caught": {
+        "type": "SystemExit",
+        "value": "1"
+      },
+      "record_status": "FAIL",
+      "record_limit_failure": "time, RSS, or evidence resource limit"
+    },
+    {
+      "case": "test_failure",
+      "calls": {
+        "popen": 1,
+        "kill": 0,
+        "wait": 1
+      },
+      "caught": {
+        "type": "SystemExit",
+        "value": "1"
+      },
+      "record_status": "FAIL",
+      "record_limit_failure": null
+    },
+    {
+      "case": "monitor_exception",
+      "calls": {
+        "popen": 1,
+        "kill": 0,
+        "wait": 0
+      },
+      "caught": {
+        "type": "OSError",
+        "value": "controlled monitor read error"
+      },
+      "record_status": null,
+      "record_limit_failure": null
+    }
+  ],
+  "interpretation": "Normal resource-limit and failed-child routes stop without retry. Unexpected monitor exceptions currently bypass child cleanup; this was not observed in the submitted all-PASS run and is a limited robustness consideration for future reuse."
+}

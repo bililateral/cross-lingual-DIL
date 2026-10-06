@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 import itertools
 import math
 from pathlib import Path
 import sys
 import unittest
+from unittest import mock
 
 import numpy as np
 import torch
@@ -78,12 +80,19 @@ class RevisionTests(unittest.TestCase):
         model = tiny_model()
         joint = copy.deepcopy(model)
         previous, current = handmade_group("history"), handmade_group("current")
+        controls = [i for i, n in enumerate([3]*4 + [2]*8) for _ in range(n)]
+        controls = controls[1:] + controls[:1]
+        previous = replace(previous, labels=tuple(
+            int(controls[i] == controls[j]) for i, j in itertools.combinations(range(28), 2)))
+        previous.validate()
+        self.assertNotEqual(previous.labels, current.labels)
+        self.assertEqual(sum(previous.labels), 20)
         memory, x = fixture(model, previous, c)
         # Nonzero drift makes the compressed historical path observable.
         with torch.no_grad():
             model.weight.add_(.04)
             joint.weight.add_(.04)
-        optimizer, joint_optimizer = old.make_optimizer(model, c), old.make_optimizer(joint, c)
+        joint_optimizer = old.make_optimizer(joint, c)
         y = old.relation_features(joint, previous, c)
         terms = revision.history_objective(y, joint.weight, x, memory, previous.labels)
         probes = (joint.encoder.embedding.weight, joint.head[0].weight, joint.weight)
@@ -91,16 +100,82 @@ class RevisionTests(unittest.TestCase):
             grads = torch.autograd.grad(terms[name], probes, retain_graph=True)
             self.assertTrue(all(torch.isfinite(g).all() and float(g.norm()) > 0 for g in grads))
         z = old.relation_features(joint, current, c)
-        total = revision.current_objective(z.T@joint.weight, current.labels)["total"] + terms["total"]
+        # Independent aggregation: never use the production history total/weight.
+        # The unchanged Q kernel and B components have separate formula evidence.
+        q = old.historical_loss(y, joint.weight, x, memory.h, memory.b,
+                                memory.constant, memory.count)
+        scores = y.T @ joint.weight
+        edges = list(itertools.combinations(range(28), 2))
+        query_losses = []
+        for query in range(28):
+            positive = [i for i, edge in enumerate(edges) if query in edge and previous.labels[i]]
+            negative = [i for i, edge in enumerate(edges) if query in edge and not previous.labels[i]]
+            query_losses.append(torch.stack([
+                torch.nn.functional.softplus(scores[n] - scores[p])
+                for p in positive for n in negative]).mean())
+        r = torch.stack(query_losses).mean()
+        current_terms = revision.current_objective(z.T@joint.weight, current.labels)
+        b = current_terms["bce"] + current_terms["rank"] + .5 * current_terms["hard"]
+        total = b + q + .1 * r
         total.backward()
+        expected = {name: p.grad.detach().clone() for name, p in joint.named_parameters()}
         torch.nn.utils.clip_grad_norm_(joint.parameters(), 1.)
         joint_optimizer.param_groups[0]["lr"] = 1e-5
         joint_optimizer.step()
-        record = revision.optimization_step(model, optimizer, current, previous, x, memory, c, 1e-5)
+        original_history = revision.history_objective
+        original_clip = torch.nn.utils.clip_grad_norm_
+
+        def execute(mode):
+            network = copy.deepcopy(model)
+            optimizer = old.make_optimizer(network, c)
+            captured = {}
+
+            def capture(parameters, *args, **kwargs):
+                captured.update({name: p.grad.detach().clone()
+                                 for name, p in network.named_parameters()})
+                return original_clip(parameters, *args, **kwargs)
+
+            def history(*args):
+                values = original_history(*args[:-1], current.labels if mode == "wrong_labels" else args[-1])
+                if mode == "omit_rank":
+                    values["total"] = values["compressed"]
+                elif mode == "detach_rank":
+                    values["total"] = values["compressed"] + .1 * values["rank"].detach()
+                elif mode == "wrong_weight":
+                    values["total"] = values["compressed"] + .2 * values["rank"]
+                return values
+
+            with mock.patch.object(revision, "history_objective", side_effect=history), \
+                    mock.patch.object(torch.nn.utils, "clip_grad_norm_", side_effect=capture) as clip, \
+                    mock.patch.object(optimizer, "step", wraps=optimizer.step) as step:
+                record = revision.optimization_step(network, optimizer, current, previous, x, memory, c, 1e-5)
+            self.assertEqual(clip.call_count, 1)
+            self.assertEqual(step.call_count, 1)
+            self.assertEqual(captured.keys(), expected.keys())
+            return network, record, captured
+
+        def compare_gradients(actual):
+            for name in expected:
+                torch.testing.assert_close(actual[name], expected[name], atol=2e-7, rtol=3e-5,
+                                           msg=lambda text: f"preclip gradient {name}: {text}")
+
+        network, record, captured = execute("correct")
+        compare_gradients(captured)
         self.assertEqual(record["adam_step"], 1)
-        self.assertAlmostEqual(record["total"], float(total), places=5)
-        for a, b in zip(model.parameters(), joint.parameters()):
+        self.assertAlmostEqual(record["total"], float(total.detach()), places=5)
+        self.assertAlmostEqual(record["history_compressed"], float(q.detach()), places=6)
+        self.assertAlmostEqual(record["history_rank"], float(r.detach()), places=6)
+        self.assertAlmostEqual(record["history_total"], float((q+.1*r).detach()), places=6)
+        self.assertEqual(record["history_rank_weight"], .1)
+        self.assertEqual(record["history_uid"], previous.uid)
+        for a, b in zip(network.parameters(), joint.parameters()):
             torch.testing.assert_close(a, b, atol=2e-6, rtol=2e-4)
+        for fault in ("omit_rank", "detach_rank", "wrong_weight", "wrong_labels"):
+            with self.subTest(fault=fault):
+                _, _, gradients = execute(fault)
+                with self.assertRaisesRegex(AssertionError, "preclip gradient"):
+                    compare_gradients(gradients)
+                print(f"K1 rejected {fault} by preclip gradient", flush=True)
 
     def test_cumulative_statistic_changes_gradient_and_actual_update(self):
         c = old.config()
@@ -108,7 +183,7 @@ class RevisionTests(unittest.TestCase):
         model = tiny_model()
         memory, x = fixture(model, group, c)
         changed = copy.deepcopy(memory)
-        # Same cache and count; alternative legal historical representations change Q.
+        # Quadratic-statistic kernel fixture, not two consistent consolidated histories.
         h, b, constant = old.statistics(torch.from_numpy(random_z(91)), group.labels)
         changed.h, changed.b, changed.constant = h.numpy(), b.numpy(), constant
         y = old.relation_features(model, group, c)
