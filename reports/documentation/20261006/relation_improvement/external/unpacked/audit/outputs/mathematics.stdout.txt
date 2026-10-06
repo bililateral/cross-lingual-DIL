@@ -1,0 +1,122 @@
+{
+  "kind": "independent_web_sandbox_math_no_project_execution",
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "torch": "2.10.0+cpu",
+    "torch_threads": 1
+  },
+  "group": {
+    "accounts": 28,
+    "edges": 378,
+    "positives": 20,
+    "query_comparisons": 1016,
+    "trace_G": 3.000000000000001,
+    "trace_G_over3": 1.0,
+    "score_nullity_at_least": 249
+  },
+  "canonical_target": {
+    "explicit_loss_div3": 0.24444082514857743,
+    "statistics_loss_div3": 0.24444082514857732,
+    "error": 1.1102230246251565e-16,
+    "initial_expanded_Q_div3": -2.960594732333751e-15,
+    "initial_v_minus_teacher_max": 3.193972863968497e-13,
+    "ref16_live32_centered_Q_div3": 7.38053905262633e-08,
+    "ref16_live32_v_error_max": 0.0008307315689839168,
+    "raw_teacher_vs_quantized_teacher_Q_div3": 2.2353615349501314e-07,
+    "gram_condition_number": 65856.20989152338
+  },
+  "gradient": {
+    "torch_vs_analytic_Y_max": 1.2836953722228372e-16,
+    "torch_vs_analytic_w_max": 8.215650382226158e-15,
+    "directional_finite_difference_max": 6.944670359609884e-11,
+    "w_path_via_p_norm": 2.6300822668386044,
+    "w_direct_epsilon_path_norm": 0.007256462276774038,
+    "same_cache_different_history_w_gradient_difference": 1.8638635306521518
+  },
+  "accumulation": {
+    "kept_old_target_Q_div3": 0.16666666666666666,
+    "kept_old_target_grad": 0.3333333333333333,
+    "incorrect_recenter_Q": 0.0,
+    "congruence_identity_max_error": 0.0
+  },
+  "function_target_blindness": {
+    "cache_rank": 129,
+    "cache_nullity": 249,
+    "X_delta_norm": 5.462632932783955e-15,
+    "query": 1,
+    "positive_edge": [
+      1,
+      2
+    ],
+    "negative_edge": [
+      1,
+      3
+    ],
+    "alpha": -0.25238219042689714,
+    "correct_margin_before": 0.005859375,
+    "margin_after": -0.0029296875,
+    "centered_function_Q_after_div3": 4.052930194398573e-29,
+    "live_Y_is_float_continuous_shadow_not_a_BGE_trajectory": true
+  },
+  "exact_fp16_blindness": {
+    "cache_rank": 129,
+    "X_delta_is_exact_zero": true,
+    "all_live_and_reference_values_fp16_exact": true,
+    "margin_before": 0.5,
+    "margin_after": -0.25,
+    "centered_function_Q_after_div3": 2.313744616679887e-30,
+    "v_teacher_max_abs": 2.121084114855006e-15,
+    "raw_history_labels_still_usable_by_B": true,
+    "not_claimed_to_be_reachable_by_BGE": true
+  },
+  "quantization_surrogate": {
+    "input": 1.2339999675750732,
+    "canonical": 1.234375,
+    "true_finite_difference": 0.0,
+    "declared_STE_gradient": 6.675000190734863,
+    "overflow_rejected": true
+  },
+  "head_view": {
+    "num_parameter_tensors": 4,
+    "num_parameters": 1048833,
+    "output_max_abs_difference": 4.470348358154297e-08,
+    "gradient_max_abs_difference": 1.4901161193847656e-07,
+    "note": "ordinary full head forward remains unchanged; the concatenation is a live view construction, not another Parameter"
+  },
+  "bytes": {
+    "six_fp32_refs": 1170288,
+    "six_fp16_refs": 585144,
+    "H64": 133128,
+    "b64": 1032,
+    "c64_N64": 16,
+    "numeric_total": 719320,
+    "remaining_before_text_metadata": 329256,
+    "old_non_numeric_range": [
+      185674,
+      205813
+    ],
+    "heuristic_new_total_range": [
+      904994,
+      925133
+    ],
+    "heuristic_headroom_at_high": 123443,
+    "not_new_memory_serialization": true
+  },
+  "criterion_counterexample": {
+    "delta_O": 0.04,
+    "delta_Z": -0.07,
+    "delta_stage2_new": -0.11,
+    "delta_N": -0.09,
+    "delta_final_all": 0.003333333333333332
+  },
+  "elapsed_seconds": 0.039374886000018705,
+  "not_executed": [
+    "project Linux tests",
+    "BGE/GPU",
+    "formal data",
+    "model checkpoints",
+    "new candidate training",
+    "new serializer"
+  ]
+}
