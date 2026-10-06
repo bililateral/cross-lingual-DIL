@@ -1,0 +1,42 @@
+{
+  "study": "seller_alias_relation_memory",
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "seed": "s0",
+  "updates_per_stage": 288,
+  "physical_updates": 2592,
+  "gradient_group_presentations": 4320,
+  "metric_count_sets": 28,
+  "runtime": {
+    "maximum_gpu_stage_seconds": 86400,
+    "maximum_output_bytes": 25769803776,
+    "minimum_free_gpu_bytes": 32212254720,
+    "minimum_free_host_bytes": 77309411328
+  },
+  "reference": {
+    "linux_root": "reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace/reports/job/evaluation",
+    "local_root": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation",
+    "collections": [
+      {
+        "path": "collected.json",
+        "bytes": 13759,
+        "sha256": "e01708603a799dd8c4a53b7f5a86b7a5fc35936f00e7c78902650ca6137ad452"
+      },
+      {
+        "path": "reference/collected.json",
+        "bytes": 22474,
+        "sha256": "ffb6e7fd7d1437a9d3940848452c24d5a0560b2388f5913b2ffa5ed14f07926a"
+      }
+    ]
+  },
+  "supervision": {
+    "train": 1,
+    "valid": 1,
+    "heldout": 0,
+    "owners": 0
+  },
+  "continuation": "O_MAP>0,N_MAP>=0,Z_MAP>=0,O_AP>=0,N_AP>=0,Z_AP>=0; no automatic follow-up"
+}
