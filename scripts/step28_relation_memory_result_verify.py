@@ -38,10 +38,8 @@ def seed(value: int, *parts: object) -> int:
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big") % (2**63-1)
 
 
-def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> None:
+def main(job: Path, workspace: Path, output: Path) -> None:
     started = time.monotonic()
-    candidate = "relation_revision" if revision else "relation"
-    current_key, history_key = ("current_total", "history_total") if revision else ("current", "history")
     assert not output.exists(), "New output required"
     completion = read(job / "completion.json")
     assert completion["status"] == "COMPLETE_RELATION_FIXED_POINT"
@@ -73,7 +71,7 @@ def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> No
         members, seen = [], 0
         retention_rng = random.Random(seed(20260930, order, "retention"))
         for stage in (1,2,3):
-            name = f"{order}_{candidate}_stage{stage}"
+            name = f"{order}_relation_stage{stage}"
             point = read(verify(job / "run", manifest["points"][name]))
             tr = read(verify(job / "run", manifest["training"][name]))
             fit = sorted(uid for uid,d in uid_domain.items() if d == order[stage-1])
@@ -89,13 +87,7 @@ def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> No
             for i, update in enumerate(tr["updates"],1):
                 assert update["step"] == i and update["adam_step"] == (stage-1)*288+i
                 assert all(np.isfinite(v) for v in update.values())
-                assert np.isclose(update["total"],update[current_key]+update[history_key],rtol=1e-12,atol=1e-12)
-                if revision:
-                    assert update["history_rank_weight"] == .1
-                    expected_history = update["history_compressed"] + float(np.float32(update["history_rank"]) * np.float32(.1))
-                    assert np.isclose(update["history_total"], expected_history, rtol=1e-12, atol=1e-12)
-                    if stage == 1:
-                        assert update["history_total"] == update["history_compressed"] == update["history_rank"] == 0
+                assert np.isclose(update["total"],update["current"]+update["history"],rtol=1e-12,atol=1e-12)
                 lr = 1e-5*(i/29 if i <= 29 else (288-i)/259)
                 assert np.isclose(update["encoder_lr"],lr,rtol=1e-12,atol=1e-16) and update["head_lr"] == .001
             if stage < 3:
@@ -117,8 +109,8 @@ def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> No
                 np.testing.assert_array_equal(scores[role],expected)
             points[name] = {"memory_bytes":point["memory_bytes"],"members_by_domain":dict(Counter(uid_domain[u] for u in members)),
                 "calibration":{k:mapping[k] for k in ("a","b","final_nll","raw_brier","calibrated_brier")},
-                "mean_current_loss":float(np.mean([u[current_key] for u in tr["updates"]])),
-                "mean_history_loss":float(np.mean([u[history_key] for u in tr["updates"]])),
+                "mean_current_loss":float(np.mean([u["current"] for u in tr["updates"]])),
+                "mean_history_loss":float(np.mean([u["history"] for u in tr["updates"]])),
                 "min_gradient_norm":min(u["gradient_norm"] for u in tr["updates"]),
                 "max_gradient_norm":max(u["gradient_norm"] for u in tr["updates"]),
                 "retention":point["retention"]}
@@ -138,7 +130,7 @@ def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> No
         arrays[arm],counts[arm] = {},{}
         for order in ORDERS:
             for stage in (1,2,3):
-                if arm == "relation": root,col,name = job / "evaluation",collected,f"{order}_{candidate}_stage{stage}"
+                if arm == "relation": root,col,name = job / "evaluation",collected,f"{order}_relation_stage{stage}"
                 elif stage == 1: root,col,name = baseline / "reference",basecols[1],order+"_shared"
                 else: root,col,name = baseline,basecols[0],f"{order}_logit_tenth_stage{stage}"
                 a,c = {},{}
@@ -204,7 +196,7 @@ def main(job: Path, workspace: Path, output: Path, revision: bool = False) -> No
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(json.dumps({"status":"PASS_SAVED_RESULT_INDEPENDENT_VERIFICATION","seconds":time.monotonic()-started,
         "scope":"No labels/text/model loading; independent saved-matrix endpoints, bootstrap and evidence checks",
-        "candidate":candidate,"source_files":len(execution["sources"]),"metric_count_sets":28,"verified_statistic_triplets":63*22,
+        "source_files":len(execution["sources"]),"metric_count_sets":28,"verified_statistic_triplets":63*22,
         "continuation_checks":checks,"training_points":points,"fixed_half":classification,"stage_metrics":paths,
         "script_sha256":hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"status":"PASS","output":str(output),"seconds":time.monotonic()-started}))
@@ -215,6 +207,5 @@ if __name__ == "__main__":
     parser.add_argument("--job",type=Path,required=True)
     parser.add_argument("--workspace",type=Path,required=True)
     parser.add_argument("--output",type=Path,required=True)
-    parser.add_argument("--revision",action="store_true",help="Check the B+Q+0.1R run and its distinct endpoint names")
     args = parser.parse_args()
-    main(args.job,args.workspace,args.output,args.revision)
+    main(args.job,args.workspace,args.output)
