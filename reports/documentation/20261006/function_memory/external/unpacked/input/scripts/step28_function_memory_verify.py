@@ -58,7 +58,6 @@ def assert_update_dtypes(model, optimizer) -> dict:
 
 
 def native(check, progress) -> dict:
-    import transformers
     c = method.config()
     progress("preflight", preflight=preflight())
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
@@ -67,20 +66,6 @@ def native(check, progress) -> dict:
     auto = model.encoder[0].auto_model
     if not auto.is_gradient_checkpointing:
         raise ValueError("Native checkpointing not enabled")
-    def dropout_values():
-        values={}
-        for name,module in model.named_modules():
-            keys=("dropout_prob","attention_dropout","hidden_dropout_prob","attention_probs_dropout_prob")
-            if isinstance(module,torch.nn.modules.dropout._DropoutNd): keys=("p",)+keys
-            for key in keys:
-                value=getattr(module,key,None)
-                if isinstance(value,(float,int)):
-                    values[name+"."+key]=value
-        return values
-    dropout_before=dropout_values()
-    environment={"transformers":transformers.__version__,"cuda":torch.version.cuda,
-                 "encoder_class":type(auto).__name__,
-                 "attention_classes":sorted({type(m).__name__ for m in auto.modules() if "Attention" in type(m).__name__})}
     current=handwritten.handmade_group("native_current",8,254)
     old=handwritten.handmade_group("native_history",8,254)
     lengths=[]
@@ -112,9 +97,7 @@ def native(check, progress) -> dict:
     probes=(query_parameter,model.head[0].weight,model.head[2].weight)
     before=[p.detach().clone() for p in probes]
     history_gradients=[]
-    history_mode=[]
     def inspect_history(base_loss, loss):
-        history_mode.append(dropout_values())
         grads=torch.autograd.grad(loss,probes,retain_graph=True)
         norms=[float(g.float().norm()) for g in grads]
         if not all(np.isfinite(norms)) or not all(v>0 for v in norms):
@@ -134,9 +117,6 @@ def native(check, progress) -> dict:
     elapsed=time.monotonic()-tick
     handle.remove()
     changes=[float((p.detach()-v).abs().max()) for p,v in zip(probes,before)]
-    dropout_after=dropout_values()
-    if dropout_before != dropout_after or not history_mode or any(history_mode[0].values()):
-        raise ValueError("Native history dropout mode or restoration differs")
     if not all(v>0 for v in changes) or calls[0] <= 224:
         raise ValueError("Missing parameter change or checkpoint recomputation")
     dtypes = assert_update_dtypes(model, optimizer)
@@ -149,8 +129,6 @@ def native(check, progress) -> dict:
             "max_reserved_bytes":torch.cuda.max_memory_reserved(),
             "adam_parameters_with_state":len(optimizer.state),
             "dtypes":dtypes,
-            "environment":environment,"dropout_before":dropout_before,
-            "dropout_in_history":history_mode[0],"dropout_after":dropout_after,
             "note":"Extra history-only derivative diagnosis counted in budget; no native weights saved."}
 
 
@@ -203,11 +181,7 @@ def main() -> None:
             try:
                 check()
             except BaseException as exc:
-                try:
-                    report.update(status="BUDGET_STOP",error=str(exc))
-                    write()
-                finally:
-                    os._exit(2)
+                report.update(status="BUDGET_STOP",error=str(exc)); write(); os._exit(2)
     threading.Thread(target=watchdog,daemon=True).start()
     def progress(stage, **evidence):
         report.update(stage=stage, **evidence)

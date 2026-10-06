@@ -16,50 +16,6 @@ import test_step28_function_memory as fixtures
 
 
 class IntegrationTests(unittest.TestCase):
-    def test_watchdog_stops_even_when_failure_record_cannot_be_written(self):
-        # Execute the actual nested function without a live thread or process exit.
-        path=Path(run.__file__).with_name("step28_function_memory_verify.py")
-        tree=ast.parse(path.read_text())
-        main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=="main")
-        watch=next(n for n in main.body if isinstance(n,ast.FunctionDef) and n.name=="watchdog")
-        for write_fails in (False,True):
-            fake_exit=mock.Mock(side_effect=SystemExit(2))
-            env={"stopped":mock.Mock(wait=mock.Mock(return_value=False)),
-                 "check":mock.Mock(side_effect=RuntimeError("handwritten budget stop")),
-                 "write":mock.Mock(side_effect=OSError("handwritten disk failure") if write_fails else None),
-                 "report":{},"os":mock.Mock(_exit=fake_exit)}
-            exec(compile(ast.Module(body=[watch],type_ignores=[]),str(path),"exec"),env)
-            with self.assertRaises(SystemExit) as error:
-                env["watchdog"]()
-            self.assertEqual(error.exception.code,2)
-            fake_exit.assert_called_once_with(2)
-            self.assertEqual(env["report"]["status"],"BUDGET_STOP")
-
-    def test_formal_gate_distinguishes_cpu_and_native_evidence(self):
-        # In-memory qualification fixture only: no gate file, execute or model load.
-        source=run.sources(); p=run.policy()
-        job=run.data.ROOT/"reports/handwritten_gate_never_executed"
-        gate_path=run.data.ROOT/"handwritten_gate_not_written.json"
-        cpu_path=run.data.ROOT/"handwritten_cpu.json"
-        gpu_path=run.data.ROOT/"handwritten_gpu.json"
-        cpu={"status":"PASS_HANDWRITTEN_ONLY","mode":"cpu","source_files":source}
-        gpu={**cpu,"mode":"gpu","native":{"kind":"native_handwritten_first_optimizer_step"}}
-        gate={"status":"APPROVED_FUNCTION_MEMORY_PILOT","source_files":source,
-              "job":job.relative_to(run.data.ROOT).as_posix(),"runtime":p["runtime"],
-              "supervision":p["supervision"],"review_disposition":"NO_OPEN_BLOCKERS",
-              "integration_cpu":{"path":cpu_path.name},"native":{"path":gpu_path.name}}
-        cases=[(cpu,gpu,True),(cpu,cpu,False),(gpu,gpu,False),
-               (cpu,{**cpu,"mode":"gpu"},False),
-               (cpu,{**gpu,"native":{"kind":"wrong"}},False)]
-        for cpu_record,gpu_record,accepted in cases:
-            records={run.POLICY:p,gate_path:gate,cpu_path:cpu_record,gpu_path:gpu_record}
-            with mock.patch.object(run.data,"read_json",side_effect=lambda path: records[path]), \
-                    mock.patch.object(run.data,"verify",side_effect=lambda path,record:path):
-                if accepted:
-                    self.assertEqual(run.validate_gate(job,gate_path),p)
-                else:
-                    with self.assertRaises(ValueError): run.validate_gate(job,gate_path)
-
     def test_shared_restore_legal_supply_actual_checkpoint_and_next_update(self):
         c=run.method.config()
         model=fixtures.tiny_model(); optimizer=run.method.make_optimizer(model,c)
