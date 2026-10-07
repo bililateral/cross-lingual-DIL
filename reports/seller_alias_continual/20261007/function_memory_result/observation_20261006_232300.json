@@ -1,0 +1,49 @@
+{
+  "observed_at": "2026-10-06T23:23:25.342480+08:00",
+  "job": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/job",
+  "resource": {
+    "access_path": "access.json",
+    "elapsed_seconds": 243.33440334675834,
+    "peak_cuda_allocated_bytes": 7241492992,
+    "peak_cuda_reserved_bytes": 7866417152,
+    "peak_observed_bytes": 5218976979,
+    "peak_rss_bytes": 6102929408,
+    "progress": {
+      "order": "ABC",
+      "phase": "training",
+      "stage": 2,
+      "step": 14
+    }
+  },
+  "access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "failure_exists": false,
+  "completion_exists": false,
+  "launcher_pid": 3381420,
+  "processes": "USER         PID    PPID     ELAPSED STAT COMMAND\nyongpeng 3381420 3381014       04:09 S    bash scripts/run_step28_function_memory_linux_20261006.sh 0 reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/gate.json reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/job\nyongpeng 3381426 3381420       04:09 S    timeout --signal=TERM --kill-after=5 86395 taskset -c 0 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_function_memory_run.py execute --out reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/job --gate reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/gate.json\nyongpeng 3381427 3381426       04:09 Sl   /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_function_memory_run.py execute --out reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/job --gate reports/seller_alias_continual/20261006/function_memory_execution/20261006_231800/gate.json\n",
+  "first_stage": {
+    "stage": 1,
+    "adam_step": 288,
+    "memory_bytes": 916481,
+    "memory_summary": {
+      "count": 48,
+      "members": [
+        "4493a33635ae54f36d0edb28b00917ca",
+        "5f010eb94c3730f85698b8fa9434c21d",
+        "ec09d6151be95df8f486a9115f6fc209",
+        "d8c40a84400eada98184e752d40f286b",
+        "cb72702c36441d8486ea59a9497d747c",
+        "19a7f577b51a4639a264ef63daf069aa"
+      ],
+      "seen": 48,
+      "stage": 1
+    },
+    "full_restore_verified": true,
+    "model_state_sha256": "ab5224b4bd3b9eb621070f4ae8f9bd590fffeaa663186499c225b02b7f3ef209"
+  },
+  "note": "Administrative observation; no labels, blind score values or memory body opened"
+}

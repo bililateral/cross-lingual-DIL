@@ -140,3 +140,7 @@ Windows原生PowerShell于14:41:28—14:50:49执行逐文件删除，实际561.4
 Linux上的临时上传包已由执行者删除，见[远端清理回执](../reports/storage_migration/20260914/remote_cleanup.json)。Windows的`reports/storage_migration/20260914/source_upload.tar.gz`（原299,423,216字节）和`cleanup.ps1`（原4,603字节），合计299,427,819字节，已由用户手动删除；执行者随后检查两个精确路径均不存在，见[清理完成核验](../reports/storage_migration/20260914/cleanup_completion.json)。本次临时文件清理已闭环，不再列为待办。
 
 此前两次自动删除请求及用户再次明确要求后的第三次请求，均在执行前被自动审批以`blocked by policy`拒绝；[原拒绝记录](../reports/storage_migration/20260914/cleanup.json)和[再次尝试记录](../reports/storage_migration/20260914/cleanup_retry.json)保留为历史。不得把用户手动删除记为执行者命令成功，也不根据原文件大小虚构此次手动删除的实测磁盘增量；确认时间仅代表核验时点。此前34.15 GiB科研载荷删除及其磁盘观察值不变。
+
+## 2026-10-07 函数目标记忆固定点回传
+
+20261006_231800正式完成；本次九份阶段推理权重按用户后续“训练权重一起删掉”于10:04:38删除，逻辑释放11758264524字节（约10.950737GiB）；逐项最终路径/uid/大小/SHA、删除时间和不存在验证见[实际回执](../reports/maintenance/20261007/function_weights/receipt.json)。原inventory保留为删除前历史清单。171份非权重原件已回传逐项一致（Memory保管副本不进入网页/Git）；完整指标/分数/计数/日志与冻结源保留。结果外审仍进行中，但只用保存矩阵/证据，无权重加载或恢复依赖；本次明确删除许可已执行。171项非权重SHA和23项保留例外元数据前后不变，共同首域完整状态、预训练、ER0.1和排序例外继续保留。
