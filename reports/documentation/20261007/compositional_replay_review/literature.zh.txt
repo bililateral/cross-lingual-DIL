@@ -1,0 +1,38 @@
+与当前候选直接相关的一手文献及阅读范围
+2026-10-07。此表记录上一轮方案研究的阅读范围与推断；不是文献全文副本，也不声称系统穷尽。外审可继续检索公开一手资料。任何文献性能都不能直接转为本项目预期增益。
+
+1. Cross-Batch Memory for Embedding Learning，CVPR 2020。
+https://arxiv.org/pdf/1912.06798
+https://openaccess.thecvf.com/content_CVPR_2020/html/Wang_Cross-Batch_Memory_for_Embedding_Learning_CVPR_2020_paper.html
+已读相关正文§3.2–3.3、Algorithm 1与Eq.3–6。跨批嵌入队列及更多候选负例已经是明确先例；历史嵌入通常detach，使用慢漂移动机。本候选对存活文本两端重新编码并反传、保持27候选结构、对clique受约束上下文取期望；这些差别不自动保证更有价值。不能声称首次利用跨群历史负例。
+
+2. L²R: Lifelong Learning for First-stage Retrieval，CIKM 2023。
+https://jiafengguo.github.io/2023/CIKM2023-L2R.pdf
+已读§3、§4.2 PSS/ISD、§4.3及Eq.9–14。查询条件记忆选择、新负例与历史检索能力保持、列表保持/旧嵌入兼容是直接邻近机制。其query-positive与检索库生命周期、负例供给和listwise KL，与本任务新身份完整clique的28账号候选群分布并不相同。不能把持续排序、困难负例、蒸馏本身当成新贡献。
+
+3. Distillation without Positive Pairs，BMVC 2022。
+https://arxiv.org/pdf/2210.01600
+已读§3.1–3.3及Eq.4–9。以当前episode和临时prototype形成蒸馏分类器，并从保持目标中移除正项的无样本持续重识别工作。它不证明本项目正边MSE是失败原因，本候选也没有因而删除正项；仅用于防止把关系蒸馏的新旧冲突泛泛包装成新发现。
+
+4. Marginalizing Corrupted Features，ICML 2013。
+https://proceedings.mlr.press/v28/vandermaaten13.html
+https://proceedings.mlr.press/v28/vandermaaten13.pdf
+已读§3关于平方、指数、logistic损失及Eq.3–5。对随机腐蚀取期望或构造上界早已有之，不能声称“把采样变成期望”就是创新。这里的区别是候选集合上的有限clique选择、E logsumexp与top5选择概率，而不是特征独立腐蚀。也应检查此区别是否只是自然适配。
+
+5. Global Contrastive Training via Deep Learning MCMC（EMC²），ICML 2024。
+https://proceedings.mlr.press/v235/yau24a.html
+https://arxiv.org/abs/2404.10575
+https://openreview.net/pdf?id=GxOFM3f5Vm
+作者代码：https://github.com/amazon-science/contrastive_emc2
+已读正式摘要及论文开头全局对比目标Eq.1–3的可访问片段；未完整审读全部证明，不冒称全文核查。它针对全局对比目标使用MCMC等采样改进，本候选是固定有限56账号、合法28账号上下文的目标精确期望。应核查相关梯度无偏/效率工作是否已经覆盖本主张。
+
+6. Distributionally Robust Memory Evolution with Generalized Wasserstein Gradient Flow，ICML 2022。
+https://proceedings.mlr.press/v162/wang22v/wang22v.pdf
+已读§3.1–3.4及Eq.5–10。持续学习中直接改变重放分布和记忆演化已有明确先例；其分布鲁棒min-max/梯度流干预样本，与本候选固定原始文本的受约束clique重组不同。改变分布本身不是首次贡献。
+
+7. 未独立证实的一条高相关线索，不能忽略也不能当成已认证论文：
+Rao-Blackwellized Replay Gradient Estimators over Retrieval-Conditioned Sufficient Statistics
+https://www.researchgate.net/publication/411065401_Rao-Blackwellized_Replay_Gradient_Estimators_over_Retrieval-Conditioned_Sufficient_Statistics
+页面标注2026年8月preprint。已读该页面摘要及§3/§4.1–4.3展示文字；精确标题检索未取得另一可核对作者/正式论文集/arXiv一手来源。作者与上传者身份及同行发表状态未独立验证，不能称其伪造，也不能直接当作确定的一手创新否定证据。页面讨论冻结编码器/线性头的条件统计M,C及非线性控制变量，并使用Rao–Blackwell重放梯度语言，与本候选方差论证高度相关。我们的Σ_{S}完整非线性排序目标不同，不意味着不存在先例。请审查者如能获取可靠出处再判断，不采用该页性能数字作为证据。
+
+边界：XBM的更多负例、L²R的查询条件记忆、MCF的期望损失、EMC²的梯度估计改良、DRO的记忆分布干预、Rao–Blackwell条件期望均为已有思想。可讨论的组合特有部分只剩：保持二/三账号同控clique和原候选规模的有限集合分布，原完整query-rank/top5-hard的精确边际化，以及存活图teacher生命周期。需要尤其检查episode组合、group-aware batch sampling、structured augmentation、expected ranking loss及有限池梯度的更直接先例。若去掉精确积分就是MC组合重放；如果MC32几乎等价且更省成本，本候选可能没有足够的独立方法价值。
