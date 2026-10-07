@@ -1,0 +1,1017 @@
+“记录作用表与同控重组下的历史函数重放”
+逐文件身份核对与实际阅读范围
+
+日期：2026-10-07
+编码：UTF-8
+配套正文：RECORD_REPLAY_STATIC_REVIEW.zh.txt
+
+一、如何理解本清单
+
+本清单包含 ZIP 全部119个成员：118个载荷和1份manifest。每一成员均进行文件身份检查；这不意味着每一正文都经过语义阅读。
+“合并语义范围”是主审与三个并行AI辅助任务实际已读范围的最高等级，不表示主审单独逐字看过所有列为全文的文件，也不表示多个独立人类审稿人。
+主审阅读和辅助阅读分别列出。未列任何正文阅读的成员记“仅清单（正文未读）”。所有成员已在完整路径清单中核对，因此汇总中未单独出现“未读”，不代表全部背景已读。
+
+范围分级：
+全文：有明确的任务阅读记录表明正文完整展开并阅读；不是只收到标题或截断输出。
+相关节：实际阅读特定连续区段、函数或章节；其他正文未作全文审阅。
+摘要或关键词：仅摘要、标题或关键词命中及其邻近片段；不得据此声称已理解全文。
+仅清单：仅文件名/身份/清单检查，正文未读，或仅有未形成内容证据的检索。
+未读：若连文件清单身份也未查看才使用；本包所有成员完成身份核对，故合并范围无此类。
+
+同字节副本规则：没有另行展开的冻结源码副本仍记“仅清单”，另注已读副本的相关语义复用。哈希一致不伪装成一次新的正文阅读。
+本清单不评估未读文档中的每条主张。当前机制只由current/proposal.zh.txt确定，历史状态和权限不向当前迁移。
+
+二、完整性结果
+
+附件网页名：review_input(4).zip（与用户所称review_input.zip为同一附件）
+ZIP实际字节：918799
+ZIP实际SHA256：d03a93789dedec23aeb57765e92803e11694b07fc2af60ec58ba97424fa0835d
+成员：119；载荷：118；manifest：1。
+118个manifest载荷的路径、字节及SHA256全部与实际内容一致；无重复载荷路径、无缺项、无额外载荷。
+载荷未压缩字节合计：2391669。
+manifest.json实际字节：46739；实际SHA256：63a7e495b20976fdeb43c5684822109f84c014ad49bf74a9baebe7f035d788ea。
+生成器、policy、catalog还与包内source_identity.json所记来源身份一致；不是新连接远端的认证。source_identity/recovery不能计为两个独立证明。
+
+合并语义范围计数：
+  全文：25 个成员
+  相关节：21 个成员
+  摘要或关键词：2 个成员
+  仅清单：71 个成员
+  未读：0 个成员
+实际有正文语义阅读（包括关键词级）：48 个成员；其余为身份/清单层面。
+
+没有执行项目源码、测试、自创数值/训练实验，未连接项目Linux，未访问新正式数据、标签、owners、Audit/private_custody、权重、完整Memory或凭据。
+文件哈希及本清单生成属于附件身份/文件处理，不作为科研实验。公开文献的实际使用范围另列于审查正文第十四节。
+
+三、逐成员记录（按路径排序）
+
+[001/119] closed_evidence/function_memory_evaluation.json
+  实际字节：413172
+  实际SHA256：53ddb3a60c453610f5777ad934414088b4ee408bfc1eb05ee9cbc876a920ce23
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——主审做过关键词检索但未形成正文命中证据；未展开评价JSON，未用于新的指标重算。
+  辅助：无正文阅读记录。
+
+[002/119] closed_evidence/function_memory_full_tables.zh.md
+  实际字节：15444
+  实际SHA256：9ef7bb21a49f9b9399cd24b02ab945fe527363df941ea6d42d702c2a669652f3
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取 277 行既有指标与诊断表，包括 22 指标/8 端点和各顺序；摘录既有结果，没有执行统计重算。
+  数学/梯度辅助：相关节——253—267行训练标量/记忆诊断；资源/函数记忆关键词检索；未全文逐指标阅读
+  生成器/历史辅助：相关节——1–53、236–277；不重新计算
+
+[003/119] closed_evidence/function_memory_verification.json
+  实际字节：36789
+  实际SHA256：f354de3d43a65deefb91a7794e0d555fa7fea7c0a812a94cefc6567dcca89d54
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：摘要或关键词——主审查看 memory_bytes / serialized_bytes 等全部关键词命中；未重算验证对象。辅助任务读取若干完整相关区段。
+  数学/梯度辅助：相关节——1—70、235—280、514—559行及所有memory_bytes/serialized_bytes关键词；只核对既有资源字段与0/5汇总，未执行重算
+
+[004/119] closed_evidence/group_meta_closure.zh.md
+  实际字节：3798
+  实际SHA256：6871ddcba73255832c12473f163e06392faf9995cd96f884cb72d59e5f4c6c28
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取 29 行，区分资源关闭与正式效果未知。
+  生成器/历史辅助：全文——1–29
+
+[005/119] context.zh.txt
+  实际字节：9617
+  实际SHA256：4699319ca920b6750fca8b434893442c8b064ca28c0b189cfd71976140d99a1c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  数学/梯度辅助：全文——完整64行
+  生成器/历史辅助：全文——1–64
+  文献辅助：全文——当前授权、唯一对象、历史适用范围与材料地图
+
+[006/119] current/AGENTS.md
+  实际字节：3918
+  实际SHA256：0ea489344c894035761c696690c66ea613e99d804044dda77dd59adda0556b62
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  生成器/历史辅助：全文——1–21
+
+[007/119] current/AI_RESEARCH_HANDOFF.zh.md
+  实际字节：39553
+  实际SHA256：15216d994d27cc705d573f18d7328f0c66f598cffc03dfef1e9f59bb523a40ad
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 1—12 行；其余作交接/授权/状态关键词检索，未全文。
+  生成器/历史辅助：相关节——1–24；其他部分仅关键词命中
+
+[008/119] current/RESEARCH_DISCIPLINE.zh.md
+  实际字节：22351
+  实际SHA256：bb3252011c356d24d7689ec6741f91aa387b0aab505370fa0d1d2723d1e637d4
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  数学/梯度辅助：全文——完整162行
+  生成器/历史辅助：全文——1–162
+  文献辅助：全文——完整162行现行通用纪律；按本次静态外审范围适用
+
+[009/119] current/RESEARCH_DISCUSSION.zh.md
+  实际字节：113324
+  实际SHA256：6df62ab90df33ca2971c97e7be0ebc9b32614b690b0db083c914d42f18027d0c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 681—703 行；其他部分仅相关关键词及截断片段，不计全文。
+  生成器/历史辅助：相关节——621–703；其他部分仅关键词命中
+
+[010/119] current/proposal.zh.txt
+  实际字节：31578
+  实际SHA256：25a9849796898c75c9616b65b853750c5b78623bc90eac05decc695ffa22ffb4
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  数学/梯度辅助：全文——完整231行；带行号回读所有公式、手算、预算与C/S/F定义
+  生成器/历史辅助：全文——1–231
+  文献辅助：全文——分段补齐首次截断后全部231行；核心机制、两手算、来源、梯度、对照与近邻
+
+[011/119] current/user_brief.zh.txt
+  实际字节：19054
+  实际SHA256：83a229114e6d0260daba159a416a45c9eaeffd49a62d358ba9cc9c3b112ae5ae
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  数学/梯度辅助：全文——完整376行分两段阅读
+  生成器/历史辅助：全文——1–377，末行无换行导致wc计376
+  文献辅助：全文——完整376行原任务与方法贡献门槛
+
+[012/119] frozen/function_memory_source/docs/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md
+  实际字节：11390
+  实际SHA256：c5c2eff899e823055b82c13b71068c9b6eb72fff0f5d90df2945c46478ce9575
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：全文——完整96行；旧合同与719320B数值口径，旧许可不移植
+
+[013/119] frozen/function_memory_source/schema/step28_alias_ranking_policy.json
+  实际字节：3489
+  实际SHA256：b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[014/119] frozen/function_memory_source/schema/step28_bge_continual_policy.json
+  实际字节：5123
+  实际SHA256：28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[015/119] frozen/function_memory_source/schema/step28_chinese_base_policy.json
+  实际字节：8439
+  实际SHA256：add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[016/119] frozen/function_memory_source/schema/step28_function_memory_policy.json
+  实际字节：3029
+  实际SHA256：69032e8b1936ce9a67e5f857e5014254f4e804b9eb1002ecf717036372ef13da
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[017/119] frozen/function_memory_source/scripts/run_step28_function_memory_linux_20261006.sh
+  实际字节：977
+  实际SHA256：2d3f6fb282cf43bef17f49eff0352d125900b724d1189ce96169373c7f06ff46
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[018/119] frozen/function_memory_source/scripts/step28_alias_calibration.py
+  实际字节：8818
+  实际SHA256：d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[019/119] frozen/function_memory_source/scripts/step28_alias_ranking.py
+  实际字节：11658
+  实际SHA256：1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：仅清单——未另行展开正文；与 frozen/logit_low_source/scripts/step28_alias_ranking.py 同字节，按已读相关节复用语义。原辅助记录：未另行打开正文；SHA与已读logit副本相同，复用89—129行语义
+
+[020/119] frozen/function_memory_source/scripts/step28_bge_continual.py
+  实际字节：16341
+  实际SHA256：2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：仅清单——未另行展开正文；与 frozen/logit_low_source/scripts/step28_bge_continual.py 同字节，按已读相关节复用语义。原辅助记录：未另行打开正文；SHA与已读logit副本相同，复用42—220行语义
+
+[021/119] frozen/function_memory_source/scripts/step28_bge_continual_evaluate.py
+  实际字节：13765
+  实际SHA256：55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[022/119] frozen/function_memory_source/scripts/step28_bge_continual_run.py
+  实际字节：34789
+  实际SHA256：bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[023/119] frozen/function_memory_source/scripts/step28_chinese_base.py
+  实际字节：51352
+  实际SHA256：2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：仅清单——未另行展开正文；与 frozen/logit_low_source/scripts/step28_chinese_base.py 同字节，按已读相关节复用语义。原辅助记录：未另行打开正文；SHA与已读logit副本相同，复用其89—230行语义，明确为同字节副本复用
+
+[024/119] frozen/function_memory_source/scripts/step28_continual_expression_run.py
+  实际字节：26322
+  实际SHA256：3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[025/119] frozen/function_memory_source/scripts/step28_continual_population.py
+  实际字节：9699
+  实际SHA256：f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：仅清单——未另行展开正文；与 frozen/logit_low_source/scripts/step28_continual_population.py 同字节，按已读相关节复用语义。原辅助记录：未另行打开正文；SHA与已读logit副本相同，复用1—76行语义
+
+[026/119] frozen/function_memory_source/scripts/step28_continual_population_data.py
+  实际字节：11587
+  实际SHA256：49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[027/119] frozen/function_memory_source/scripts/step28_continual_population_evaluate.py
+  实际字节：20911
+  实际SHA256：398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[028/119] frozen/function_memory_source/scripts/step28_continual_population_run.py
+  实际字节：21310
+  实际SHA256：f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[029/119] frozen/function_memory_source/scripts/step28_function_memory.py
+  实际字节：19056
+  实际SHA256：072a60156284f0c45244fed7b5c1e6d6317739601e788d3ae10ee20e8ccc15ab
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：相关节——主审读取 250—286 行的二进制序列化；数学辅助任务完整读取全部脚本。
+  数学/梯度辅助：全文——完整396行分段读取；forward/quantization/gradient/memory/serialization/update静态审查
+
+[030/119] frozen/function_memory_source/scripts/step28_function_memory_run.py
+  实际字节：32894
+  实际SHA256：c0f79f0c9aad4177801814970df3322e8586d46e136f21a953e605739f0953f1
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[031/119] frozen/function_memory_source/scripts/step28_function_memory_verify.py
+  实际字节：13281
+  实际SHA256：41c957ca3487abd27565ed4036a3f4330f62745cac5bf29d716239c2bf4fd5aa
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[032/119] frozen/function_memory_source/scripts/step28_relation_memory.py
+  实际字节：19586
+  实际SHA256：4d2fc05c945470a0e22fd563eed93e6b346904a7c1138cb0029406f09676b044
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：相关节——96—151行，重点query_indices完整101—121；其余函数签名检索；旧32维方法不作本轮活动方案
+
+[033/119] frozen/function_memory_source/tests/test_step28_function_memory.py
+  实际字节：11324
+  实际SHA256：7342f0ef127cb3036e01867429fe2fa031dd83d5023422e01c035733220fce17
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[034/119] frozen/function_memory_source/tests/test_step28_function_memory_run.py
+  实际字节：9721
+  实际SHA256：9bbfc10d0d3b4da4672ac065c76ec3afa916fbba63bd4a574f1c27a3e1c37494
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[035/119] frozen/logit_low_source/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md
+  实际字节：32430
+  实际SHA256：88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[036/119] frozen/logit_low_source/docs/SELLER_ALIAS_ER_LOW.zh.md
+  实际字节：6234
+  实际SHA256：5dc9b64c456ef3d2bb08e0fcd0a847fe9cc1a764e7726aa585c345e268352bcb
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[037/119] frozen/logit_low_source/docs/SELLER_ALIAS_ER_WEIGHT.zh.md
+  实际字节：9233
+  实际SHA256：d0f7a81a5a1c5f722fb32c50ec672f596f3b411a625631601f40583642725748
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[038/119] frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_LOW.zh.md
+  实际字节：5736
+  实际SHA256：394b9f3c73112f96056be86e595314c56fa3ffa867e5e0e1fa14540bb68ee15b
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：全文——完整31行；本次只作历史合同核对，不移植许可
+
+[039/119] frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md
+  实际字节：6265
+  实际SHA256：432b453f07a60ac5422927d64b5f7892d536a63969a9721ca9d837af465b3f4d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[040/119] frozen/logit_low_source/reports/documentation/20261001/er_weight/decision.json
+  实际字节：1746
+  实际SHA256：da861037fc95389c088c19126d814742ffa9d1724415c39b22d6bb65f7ac1bc7
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[041/119] frozen/logit_low_source/reports/documentation/20261002/er_low/decision.json
+  实际字节：1604
+  实际SHA256：c7ee4c8076cba6b375f50b0ae23a3bf1a3757771889a715cf0450177555686c6
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[042/119] frozen/logit_low_source/reports/documentation/20261002/logit_weight/decision.json
+  实际字节：1851
+  实际SHA256：f97fc5df7a7abff48f3685c4f705ef9577aa188a96f940d93e901a69d20ca7cd
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[043/119] frozen/logit_low_source/reports/documentation/20261003/logit_low/decision.json
+  实际字节：811
+  实际SHA256：5de760de9b9d7bb05de81c69a91fb8ffd675990e55dcf400025afa01270c5fa2
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[044/119] frozen/logit_low_source/schema/step28_alias_ranking_policy.json
+  实际字节：3489
+  实际SHA256：b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[045/119] frozen/logit_low_source/schema/step28_bge_continual_policy.json
+  实际字节：5123
+  实际SHA256：28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：全文——完整199行；loss/memory/encoder_schedule/calibration/evaluation条款
+
+[046/119] frozen/logit_low_source/schema/step28_chinese_base_policy.json
+  实际字节：8439
+  实际SHA256：add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 76—108 行，输入/优化器；不把静态 encoder_lr 当作运行时 stage_lr。
+  数学/梯度辅助：相关节——76—107行input/optimizer及相关关键词；注意静态旧encoder_lr被stage_lr覆盖
+
+[047/119] frozen/logit_low_source/schema/step28_er_low_policy.json
+  实际字节：5029
+  实际SHA256：201c7a766965df127803be89a9f3b7b1a5246053d95b2bcafa4dcc08cfa08c3d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[048/119] frozen/logit_low_source/schema/step28_er_weight_policy.json
+  实际字节：3732
+  实际SHA256：9eddf92646892d5890491e068ecbd4834463d0751de530a4701b7de8a98e4396
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[049/119] frozen/logit_low_source/schema/step28_logit_low_policy.json
+  实际字节：6675
+  实际SHA256：8df56ee17a0159e6d3e56e86dadf8dab26290c6b34bc8dec04e926826af61da0
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：相关节——实际loss、arms、seed/orders、memory_arm、physical_updates、预算/比较等；不声称逐项复核全部历史来源记录
+
+[050/119] frozen/logit_low_source/schema/step28_logit_weight_policy.json
+  实际字节：5059
+  实际SHA256：2aaf41724055ed3dff93ad65a8be2cc4e83c8f35d4515dace34bcdc44b081deb
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[051/119] frozen/logit_low_source/scripts/run_step28_bge_continual_linux_20260930.sh
+  实际字节：1243
+  实际SHA256：5536ec24cecebc9e401c819f52b05aff4b976fcef530fffe42eaff605322c979
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[052/119] frozen/logit_low_source/scripts/run_step28_er_check_linux_20261001.sh
+  实际字节：1171
+  实际SHA256：3faf9970b781fa2935d83a37882bd4926d482e2b04c78b046be94917be30b2e0
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[053/119] frozen/logit_low_source/scripts/run_step28_er_weight_linux_20261001.sh
+  实际字节：1456
+  实际SHA256：ac0f5fcf91f59ee0db2537230ab83ac18a84035f47c8c24d9643bb3cfb81c9b3
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[054/119] frozen/logit_low_source/scripts/step28_alias_calibration.py
+  实际字节：8818
+  实际SHA256：d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[055/119] frozen/logit_low_source/scripts/step28_alias_ranking.py
+  实际字节：11658
+  实际SHA256：1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 80—134 行，重点 hard_candidates 与 objectives 的实际求导对象。
+  数学/梯度辅助：相关节——89—129行hard_candidates/objectives完整；其余相关关键词检索
+
+[056/119] frozen/logit_low_source/scripts/step28_bge_continual.py
+  实际字节：16341
+  实际SHA256：2af6bdf2001167aeafe9b701477e1c4785a146c7b8098498c73b6adf028eeaae
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 42—65、108—215 行，stage_lr、Memory 与状态序列化。
+  数学/梯度辅助：相关节——42—220行config/stage_lr/schedule/Supply/Memory完整；其余函数/目标/随机流关键词检索
+
+[057/119] frozen/logit_low_source/scripts/step28_bge_continual_check.py
+  实际字节：12126
+  实际SHA256：d919d2b26aee5b2e8676887fd5653e246bb20cb7cd65e28a5521df655c1e5e07
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[058/119] frozen/logit_low_source/scripts/step28_bge_continual_evaluate.py
+  实际字节：13765
+  实际SHA256：55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[059/119] frozen/logit_low_source/scripts/step28_bge_continual_run.py
+  实际字节：34789
+  实际SHA256：bc425a88e502f9802aac81a0ac0977368606ed12c4e87e4bb2a6020ce9804db9
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[060/119] frozen/logit_low_source/scripts/step28_chinese_base.py
+  实际字节：51352
+  实际SHA256：2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审分段读取 80—365 行，重点模型加载、标题/描述顺序、池化、归一化、目标及编码路径；未全文。
+  数学/梯度辅助：相关节——89—230行model_config/pooling_modes/load_model/record_texts/pool_channels/objectives/account_vectors/logits/score完整；其余相关关键词检索
+
+[061/119] frozen/logit_low_source/scripts/step28_continual_expression_run.py
+  实际字节：26322
+  实际SHA256：3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[062/119] frozen/logit_low_source/scripts/step28_continual_population.py
+  实际字节：9699
+  实际SHA256：f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 1—74 行，模型、优化器、checkpoint 设置。
+  数学/梯度辅助：相关节——1—76行模型、优化器、加载/checkpoint设置；其余相关关键词检索
+
+[063/119] frozen/logit_low_source/scripts/step28_continual_population_data.py
+  实际字节：11587
+  实际SHA256：49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[064/119] frozen/logit_low_source/scripts/step28_continual_population_evaluate.py
+  实际字节：20911
+  实际SHA256：398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[065/119] frozen/logit_low_source/scripts/step28_continual_population_run.py
+  实际字节：21310
+  实际SHA256：f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[066/119] frozen/logit_low_source/scripts/step28_er_weight.py
+  实际字节：16922
+  实际SHA256：baef5becd4e9a88d54ddd4da3501f61e97a3166447902181bddec93ee8530d01
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 225—278 行及目标、来源、模式等关键词；update 的其他相关行由数学辅助阅读核对。
+  数学/梯度辅助：相关节——201—278行ContinuationSupply.resume/update完整；其余函数名/目标/模式/来源关键词检索
+
+[067/119] frozen/logit_low_source/scripts/step28_er_weight_check.py
+  实际字节：15314
+  实际SHA256：ed0e0757cc3115d5751768744f5627049d509399d127f8f81e8feccc1d2b360b
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[068/119] frozen/logit_low_source/scripts/step28_er_weight_evaluate.py
+  实际字节：12346
+  实际SHA256：9b049050061ced73c50e07c98966365cbc977cde87785c6587e46702720e9d14
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[069/119] frozen/logit_low_source/scripts/step28_er_weight_run.py
+  实际字节：36251
+  实际SHA256：d88364c0feb92c6f38a9ab64d46e4d41e05faa5c0950cb75e0e0ce89429bc4e0
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  数学/梯度辅助：相关节——215—279行实际首域恢复与后续训练/固化流程；其余checkpoint/restore/source关键词检索
+
+[070/119] frozen/logit_low_source/tests/test_step28_bge_continual_contracts.py
+  实际字节：31625
+  实际SHA256：de1066bb2fa535ab6c8d1a9079a00327d3b21e7e264b2ecc13d59f8e8246fa9a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[071/119] frozen/logit_low_source/tests/test_step28_er_weight_contracts.py
+  实际字节：49920
+  实际SHA256：1c02362338c86de84d78e5a725e4ecbf1c2db0d85d26bb428709ddb6290deecd
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[072/119] generation/SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md
+  实际字节：16817
+  实际SHA256：4c9a89aaf4c046ddc17b8d5bd11b20ab9cfdee6fe452abc41a6e3bd66e5f6a23
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：相关节——主审读取 1—35 行，重点账号固定样式与数据合同；辅助阅读补充全文。
+  生成器/历史辅助：全文——1–96
+
+[073/119] generation/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md
+  实际字节：3283
+  实际SHA256：5ca67d89cb41cc98674ee80dfae29bdfa54c8f5807458c040b0a85a87f828f04
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取生成结果说明；未访问所描述的正式原始数据或标签。
+  生成器/历史辅助：全文——1–24
+
+[074/119] generation/recovery.json
+  实际字节：3653
+  实际SHA256：dc7cc355965a723fac0c8d319141bc42e864cc98bb20e3eff59507787ac15c8c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取来源记录；生成器/政策/catalog 与所记身份核对。两文件不是独立来源认证，也未连接远端复核。
+  生成器/历史辅助：全文——1–71，与source_identity内容相同角色，非独立证据
+
+[075/119] generation/source_identity.json
+  实际字节：3653
+  实际SHA256：dc7cc355965a723fac0c8d319141bc42e864cc98bb20e3eff59507787ac15c8c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取来源记录；生成器/政策/catalog 与所记身份核对。两文件不是独立来源认证，也未连接远端复核。
+  生成器/历史辅助：全文——1–71，既有来源回执，不当作远端原件再次认证
+
+[076/119] generation/step28_continual_expression_catalog.json
+  实际字节：10777
+  实际SHA256：3735c59f9e7d761dca3b4525190ffc2c487f6dc51823285988a1ce4903072daf
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审全文静态阅读；核对账号/轴样式、记录循环、重组支持集相关定义。源码没有执行。
+  生成器/历史辅助：全文——1–337
+
+[077/119] generation/step28_continual_expression_data.py
+  实际字节：18179
+  实际SHA256：23608792b288891f9bf9d51c4765c1ad0d38b13acefb9e904f509ed93376f7ef
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审全文静态阅读；核对账号/轴样式、记录循环、重组支持集相关定义。源码没有执行。
+  生成器/历史辅助：全文——1–369，静态不执行
+
+[078/119] generation/step28_continual_expression_policy.json
+  实际字节：2935
+  实际SHA256：e1d489476ef40ad04c8d0b98a4718204d0e680543c2933e72dd045e8dedeadf6
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审全文静态阅读；核对账号/轴样式、记录循环、重组支持集相关定义。源码没有执行。
+  生成器/历史辅助：全文——1–120
+
+[079/119] history/compositional/context.zh.txt
+  实际字节：6403
+  实际SHA256：8fa7cf1271df69b3668e89c75964a3912d2247531cf98351f3e6915443b4eadb
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[080/119] history/compositional/external.zh.txt
+  实际字节：61188
+  实际SHA256：9ddc563ad44678693fe3de680a984c9a8dedb165a70b441a313d4dc4e6abe448
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 1—36、113—186、399—459、634—663 行及标题/关键词；未全文。
+  生成器/历史辅助：相关节——1–185、455–535、631–665；另有关键词检索，未全文
+
+[081/119] history/compositional/literature.zh.txt
+  实际字节：4963
+  实际SHA256：23ad93c629ec5bfc8745bd3d6b4afb26e71d34ca8f96a1f0884731c74680682b
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[082/119] history/compositional/main_disposition.zh.txt
+  实际字节：14325
+  实际SHA256：180b9a009c01f8b86db7c39eae8338069337588ace573bc58afd3ab524c08ae8
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：相关节——主审实际可见的第4—8节相关内容；对组合输出截断部分不作全文声明；辅助阅读为全文。
+  生成器/历史辅助：全文——1–117
+
+[083/119] history/compositional/proposal.zh.txt
+  实际字节：22145
+  实际SHA256：803b55c5951be89a50a212aa9e8a212868fa7d4968fb6ce866193928127c4be5
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[084/119] history/compositional/reading_scope.zh.txt
+  实际字节：4974
+  实际SHA256：8b320ee1290b513f8de412cca603669f2e8b904896ea66767ee480115d83b636
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[085/119] history/compositional/submission.json
+  实际字节：2875
+  实际SHA256：f8b079684c2e2689072331711fba07fd2dc27d226036f3e7111385e9cf7baf48
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[086/119] history/operator/proposal.zh.txt
+  实际字节：30547
+  实际SHA256：7e9196fd05eccd1dc4085e03b27636d2ef0c3cc39e16bc89a631d596b957a0a1
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：摘要或关键词——主审相关关键词命中；不把旧待办或资源请求转为当前许可。
+  生成器/历史辅助：相关节——1–70、230–263
+
+[087/119] history/rank_protection/correction.zh.txt
+  实际字节：1554
+  实际SHA256：0739247e3193c89195004f59648bdb2939705573a255e4bdd2d7f764d511ca15
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[088/119] history/residual/external.zh.txt
+  实际字节：41076
+  实际SHA256：7055a7fb85ef79b5f3ab36b7c532b45c8a71610937763db0d4ef784b909f8058
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 1—20、236—314、419—454 行及标题/关键词；未全文。
+  生成器/历史辅助：相关节——1–80、234–326、390–451；另有关键词检索，未全文
+
+[089/119] history/residual/main_disposition.zh.txt
+  实际字节：13165
+  实际SHA256：1d6369cea04f9fd720d3fa348daccd5116dc18e2c8cfbaaea10dacc52dba56ec
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：相关节——主审核对第1、3—7节相关内容，保守记相关节；辅助阅读为全文。
+  生成器/历史辅助：全文——1–101
+
+[090/119] history/residual/proposal.zh.txt
+  实际字节：24747
+  实际SHA256：8e28e29ef761bb0b38d750ddb82acd244dc6c3d1157a427939118ac86e446670
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[091/119] history/residual/reading_scope.zh.txt
+  实际字节：51529
+  实际SHA256：1874dbce78a5be8e9ab817fdaf3532fca979357b90a986df8f4b400ddab4a1f5
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[092/119] history/residual/recovery.json
+  实际字节：2249
+  实际SHA256：e8e50e169970796ba87ce5159de451462d9a09509a39b9efe41fd16f05a621e9
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[093/119] history/trainable_screening/report.zh.txt
+  实际字节：11258
+  实际SHA256：47d9a126ed815e56a27e096d410def9814afeb497f800a4595aeadbebfc9f8ba
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：摘要或关键词——主审关键词检索固定BGE撤回、路线状态及筛选依据；辅助任务全文读取。
+  生成器/历史辅助：全文——1–117
+
+[094/119] manifest.json
+  实际字节：46739
+  实际SHA256：63a7e495b20976fdeb43c5684822109f84c014ad49bf74a9baebe7f035d788ea
+  身份检查：清单结构完整解析并逐项核对；manifest自身不属于118个载荷
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——完整结构化解析和身份逐项核对；顶部对象、来源字段有查看，但不把118项路径/哈希核对称作全部背景语义阅读。
+  辅助：无正文阅读记录。
+
+[095/119] prior_reviews/function_memory/external_review.zh.txt
+  实际字节：43908
+  实际SHA256：fab96ff6555f01d80cdf40aa54af0e8a6425363befebde5c0f25b1fc76be2137
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：相关节——主审读取 1—58 行的裁决与核心边界；辅助另读至80行，未全文。
+  生成器/历史辅助：相关节——1–80
+
+[096/119] prior_reviews/function_memory/main_review.zh.md
+  实际字节：4174
+  实际SHA256：796367ef446fe33049ea15e0e82f852651bb6fb1deed835261acbe7907581769
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取 27 行，核对负结果适用范围。
+  生成器/历史辅助：全文——1–27
+
+[097/119] prior_reviews/logit_risk/external_review.zh.txt
+  实际字节：37596
+  实际SHA256：d377fc6271c8359a242f8428e0212ec85be278220b910ba84040e7e969d719df
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：摘要或关键词
+  主审：摘要或关键词——主审只查看标题及相关关键词命中，未阅读全文。
+  辅助：无正文阅读记录。
+
+[098/119] prior_reviews/logit_risk/main_review.zh.md
+  实际字节：6170
+  实际SHA256：4e52cb303c44bd3acd9777d4007cbd5c6cf01bc49d85e7d7e57084d6e0d3819d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：全文——1–44
+
+[099/119] prior_reviews/relation_memory/external_review.zh.md
+  实际字节：48306
+  实际SHA256：4ae15f60f1ddc96a447d3cc0cb7e8aa1de5a3352dd6d16767fd027999e081c4f
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[100/119] prior_reviews/relation_memory/main_review.zh.md
+  实际字节：4830
+  实际SHA256：58add227e925e9d81cbc51d31be7723c795b8bc11e5b0491b68c620afa3f1ca7
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[101/119] prior_reviews/relation_revision/external_review.zh.md
+  实际字节：52304
+  实际SHA256：d5b303f9a12c84b636221c2e11d37d5845a8861ecfb08185b2002df0f925b5c5
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[102/119] prior_reviews/relation_revision/main_review.zh.md
+  实际字节：3743
+  实际SHA256：b1b2e63751a29c6c184560daed3a4e6e4be7e514ec6cecf00f4c18f803e8d34c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[103/119] project/SELLER_ALIAS_BGE_CONTINUAL.zh.md
+  实际字节：32430
+  实际SHA256：88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[104/119] project/SELLER_ALIAS_BGE_RESULT.zh.md
+  实际字节：19494
+  实际SHA256：4948f67b24769478ae737d714efb0ceeee4cdc84382ee1af1005db810f290400
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[105/119] project/SELLER_ALIAS_CONTINUAL_DATA.zh.md
+  实际字节：25818
+  实际SHA256：71383de64cfecf7933bbef0014201f5229a4ddae0eace3fe88647dccbf975957
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[106/119] project/SELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md
+  实际字节：8584
+  实际SHA256：eda256ff6012e9376ca72405b3676608e57704259d393a4d6fcd784484ee446a
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[107/119] project/SELLER_ALIAS_ER_LOW_RESULT.zh.md
+  实际字节：16515
+  实际SHA256：e374d6ff4cc95b634a18519611c10d227d1301f6cf1d72b809382030738a274c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[108/119] project/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md
+  实际字节：3283
+  实际SHA256：5ca67d89cb41cc98674ee80dfae29bdfa54c8f5807458c040b0a85a87f828f04
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[109/119] project/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md
+  实际字节：11390
+  实际SHA256：c5c2eff899e823055b82c13b71068c9b6eb72fff0f5d90df2945c46478ce9575
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：摘要或关键词
+  主审：摘要或关键词——主审定位719,320 B数值载荷及其相关字段（约第50行）；未全文。
+  辅助：无正文阅读记录。
+
+[110/119] project/SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md
+  实际字节：13590
+  实际SHA256：9b435681d5d4558c218c412a5dbbf47955f3f81f13b51fada921d616eb2e82c9
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：摘要或关键词——主审定位既有完整记忆字节范围（约第11行）；辅助任务全文。
+  生成器/历史辅助：全文——1–95；引用既有结果而非新数值复算
+
+[111/119] project/SELLER_ALIAS_LITERATURE.zh.md
+  实际字节：21996
+  实际SHA256：de59bbf6e6864d9e69e3bba315e890f0228b80ad850bd4a04c1527657235c4ba
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[112/119] project/SELLER_ALIAS_LOGIT_LOW.zh.md
+  实际字节：5736
+  实际SHA256：394b9f3c73112f96056be86e595314c56fa3ffa867e5e0e1fa14540bb68ee15b
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[113/119] project/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md
+  实际字节：16239
+  实际SHA256：e4c0f2b35ce03e7c9db96635ecc3f5eeff3f7a42dc10e4369d277d140b56546d
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：相关节——1–85
+
+[114/119] project/SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md
+  实际字节：16256
+  实际SHA256：bb270e0680bec7482868351c22369cd73cfbc1b3d70d4a1293c67e8b52a187f1
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：相关节——1–80
+
+[115/119] project/SELLER_ALIAS_RANKING_RESULT.zh.md
+  实际字节：17642
+  实际SHA256：d5ac833f13da0782f94585a49d9a64116ff9d8ee3696446c49407a8e829b7d88
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：仅清单（正文未独立展开）
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  辅助：无正文阅读记录。
+
+[116/119] project/SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md
+  实际字节：11859
+  实际SHA256：ff58eef43b2fdbc3430905c0aa3b90341e8b7118cb0c4c072ed310823107662e
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：相关节——1–64
+
+[117/119] project/SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md
+  实际字节：13922
+  实际SHA256：3c5d6757ab2db780d07996fbf6ad5a58084900cd8633e20e4c1ed51d187a0dd0
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：相关节——1–75
+
+[118/119] project/SELLER_ALIAS_TEST_RESULT.zh.md
+  实际字节：17098
+  实际SHA256：3cc34bb0e17d73c90477ee0876b0e22efb952b7b84656bb537681961897aa047
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：相关节
+  主审：仅清单——正文未读；完成该成员路径/字节/SHA身份核对。
+  生成器/历史辅助：相关节——1–80；只读既有结果文档，不读标签
+
+[119/119] request.zh.txt
+  实际字节：4650
+  实际SHA256：9b8180e43d9c8ce48c0fca942921dc1412b68e854df8d537d76e8be85918ae7c
+  身份检查：manifest载荷逐项比对一致
+  合并语义范围：全文
+  主审：全文——主审完整读取；曾截断的当前材料已分段补齐。历史状态词按 context 的时间和对象边界解释。
+  辅助：无正文阅读记录。
+
+四、范围声明
+
+1. 哈希全部相符，证明收到的包及载荷与给定身份一致，不证明历史文档每句内容正确，也不证明来源远端当前状态。
+2. 正文裁决优先依据全文读取的当前提案、背景和纪律、直接生成器材料，并结合实际已读冻结函数与既有结果。未读成员不能被用来补足未建立的事实。
+3. 旧外审原文较长，实际相关节已逐项列出；没有以读过主审处置或关键词就声称读完每篇外审。
+4. 完整指标表已由主审全文阅读，底层evaluation JSON没有全面展开或重算；不混淆这两种证据。
+5. 辅助阅读记录的行数在末行无换行、CRLF或显示差异时可能相差1行；全文声明以实际内容补齐为准。相关节的行号仅用于描述阅读范围，不要求用户执行代码或打开正式数据。
+
+本次最终裁决及其证据等级见配套正文。本清单本身不产生任何实现、实验、预算或数据访问许可。
