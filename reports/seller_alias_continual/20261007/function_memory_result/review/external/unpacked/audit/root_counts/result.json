@@ -1,0 +1,2057 @@
+{
+  "status": "PASS",
+  "scope": "Saved matrices/counts/scores/receipts only; no labels, model, Memory, fitting or project imports",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39"
+  },
+  "elapsed_seconds": 0.20694633599987355,
+  "checks": {
+    "columns": 1,
+    "groups": 1,
+    "alignment": 6,
+    "partition_alignment": 1,
+    "domain_count": 3,
+    "collection_count": 2,
+    "file_record": 146,
+    "matrix_shape_type": 55,
+    "counts_shape": 55,
+    "group_count_conservation": 3300,
+    "classification_from_saved_counts_numeric_values": 19800,
+    "classification_from_saved_counts": 3300,
+    "all_22_macro_numeric_values": 616,
+    "all_22_macro": 28,
+    "all_22_domain_numeric_values": 1848,
+    "all_22_domain": 84,
+    "pooled_absolute_numeric_values": 896,
+    "pooled_absolute": 112,
+    "stored_logit_threshold": 28,
+    "map_receipt_numeric_values": 18,
+    "map_receipt": 9,
+    "score_shape_finite": 9,
+    "predicted_positive_count_numeric_values": 1680,
+    "predicted_positive_count": 28,
+    "positive_affine": 18,
+    "affine_score_equality_numeric_values": 408240,
+    "affine_score_equality": 18,
+    "rank_order_preserved": 18,
+    "rank_curve_matrix_equality_numeric_values": 15120,
+    "rank_curve_matrix_equality": 18,
+    "shared_first_matrix_exact_numeric_values": 11880,
+    "shared_first_matrix_exact": 9,
+    "shared_first_counts_exact": 9
+  },
+  "maximum_absolute_errors": {
+    "classification_from_saved_counts": 0.0,
+    "all_22_macro": 0.0,
+    "all_22_domain": 0.0,
+    "pooled_absolute": 0.0,
+    "map_receipt": 0.0,
+    "predicted_positive_count": 0.0,
+    "affine_score_equality": 0.0,
+    "rank_curve_matrix_equality": 0.0,
+    "shared_first_matrix_exact": 0.0
+  },
+  "failures": [],
+  "endpoint_counts": {
+    "function_memory": {
+      "O": {
+        "tp": 83,
+        "fp": 29,
+        "fn": 2317,
+        "tn": 42931,
+        "fpr": 0.0006750465549348231,
+        "precision": 0.7410714285714286,
+        "recall": 0.034583333333333334,
+        "f1": 0.0660828025477707,
+        "group_contributions": 120,
+        "zero_prediction_groups": 64,
+        "macro_precision": 0.3784722222222222,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "A2": {
+        "tp": 62,
+        "fp": 26,
+        "fn": 1138,
+        "tn": 21454,
+        "fpr": 0.0012104283054003725,
+        "precision": 0.7045454545454546,
+        "recall": 0.051666666666666666,
+        "f1": 0.09627329192546584,
+        "group_contributions": 60,
+        "zero_prediction_groups": 24,
+        "macro_precision": 0.45944444444444443,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "N": {
+        "tp": 105,
+        "fp": 35,
+        "fn": 2295,
+        "tn": 42925,
+        "fpr": 0.0008147113594040968,
+        "precision": 0.75,
+        "recall": 0.04375,
+        "f1": 0.08267716535433071,
+        "group_contributions": 120,
+        "zero_prediction_groups": 53,
+        "macro_precision": 0.43805555555555553,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "Z": {
+        "tp": 43,
+        "fp": 9,
+        "fn": 1157,
+        "tn": 21471,
+        "fpr": 0.0004189944134078212,
+        "precision": 0.8269230769230769,
+        "recall": 0.035833333333333335,
+        "f1": 0.06869009584664537,
+        "group_contributions": 60,
+        "zero_prediction_groups": 29,
+        "macro_precision": 0.4166666666666667,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "final_all": {
+        "tp": 126,
+        "fp": 38,
+        "fn": 3474,
+        "tn": 64402,
+        "fpr": 0.0005896958410924892,
+        "precision": 0.7682926829268293,
+        "recall": 0.035,
+        "f1": 0.0669500531349628,
+        "group_contributions": 180,
+        "zero_prediction_groups": 93,
+        "macro_precision": 0.3912037037037037,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      }
+    },
+    "logit0.1": {
+      "O": {
+        "tp": 195,
+        "fp": 82,
+        "fn": 2205,
+        "tn": 42878,
+        "fpr": 0.001908752327746741,
+        "precision": 0.703971119133574,
+        "recall": 0.08125,
+        "f1": 0.14568546880836758,
+        "group_contributions": 120,
+        "zero_prediction_groups": 10,
+        "macro_precision": 0.6769907407407408,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "A2": {
+        "tp": 76,
+        "fp": 34,
+        "fn": 1124,
+        "tn": 21446,
+        "fpr": 0.0015828677839851025,
+        "precision": 0.6909090909090909,
+        "recall": 0.06333333333333334,
+        "f1": 0.11603053435114503,
+        "group_contributions": 60,
+        "zero_prediction_groups": 21,
+        "macro_precision": 0.48333333333333334,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "N": {
+        "tp": 180,
+        "fp": 78,
+        "fn": 2220,
+        "tn": 42882,
+        "fpr": 0.0018156424581005587,
+        "precision": 0.6976744186046512,
+        "recall": 0.075,
+        "f1": 0.13544018058690746,
+        "group_contributions": 120,
+        "zero_prediction_groups": 28,
+        "macro_precision": 0.5649074074074074,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "Z": {
+        "tp": 104,
+        "fp": 44,
+        "fn": 1096,
+        "tn": 21436,
+        "fpr": 0.002048417132216015,
+        "precision": 0.7027027027027027,
+        "recall": 0.08666666666666667,
+        "f1": 0.1543026706231454,
+        "group_contributions": 60,
+        "zero_prediction_groups": 7,
+        "macro_precision": 0.6464814814814815,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      },
+      "final_all": {
+        "tp": 299,
+        "fp": 126,
+        "fn": 3301,
+        "tn": 64314,
+        "fpr": 0.0019553072625698325,
+        "precision": 0.7035294117647058,
+        "recall": 0.08305555555555555,
+        "f1": 0.14857142857142858,
+        "group_contributions": 180,
+        "zero_prediction_groups": 17,
+        "macro_precision": 0.666820987654321,
+        "note": "Repeated appearances of the same actual group are contributions, not independent samples"
+      }
+    }
+  },
+  "all_sets": [
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage1",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 21,
+        "fp": 4,
+        "fn": 1179,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.84,
+        "recall": 0.0175,
+        "f1": 0.03428571428571429
+      },
+      "zero_prediction_groups": 40,
+      "macro_precision": 0.2833333333333333
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage1",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage1",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 21,
+        "fp": 4,
+        "fn": 1179,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.84,
+        "recall": 0.0175,
+        "f1": 0.03428571428571429
+      },
+      "zero_prediction_groups": 40,
+      "macro_precision": 0.2833333333333333
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 85,
+        "fp": 42,
+        "fn": 1115,
+        "tn": 21438,
+        "fpr": 0.0019553072625698325,
+        "precision": 0.6692913385826772,
+        "recall": 0.07083333333333333,
+        "f1": 0.1281085154483798
+      },
+      "zero_prediction_groups": 6,
+      "macro_precision": 0.5886111111111111
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 62,
+        "fp": 26,
+        "fn": 1138,
+        "tn": 21454,
+        "fpr": 0.0012104283054003725,
+        "precision": 0.7045454545454546,
+        "recall": 0.051666666666666666,
+        "f1": 0.09627329192546584
+      },
+      "zero_prediction_groups": 12,
+      "macro_precision": 0.5527777777777777
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 160,
+        "fp": 191,
+        "fn": 1040,
+        "tn": 21289,
+        "fpr": 0.008891992551210428,
+        "precision": 0.45584045584045585,
+        "recall": 0.13333333333333333,
+        "f1": 0.2063185041908446
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.4735200447700448
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1198,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.0016666666666666668,
+        "f1": 0.0033277870216306157
+      },
+      "zero_prediction_groups": 58,
+      "macro_precision": 0.03333333333333333
+    },
+    {
+      "arm": "function_memory",
+      "point": "ABC_function_memory_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 29,
+        "fp": 4,
+        "fn": 1171,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.8787878787878788,
+        "recall": 0.024166666666666666,
+        "f1": 0.047039740470397405
+      },
+      "zero_prediction_groups": 36,
+      "macro_precision": 0.36111111111111105
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage1",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 66,
+        "fp": 69,
+        "fn": 1134,
+        "tn": 21411,
+        "fpr": 0.003212290502793296,
+        "precision": 0.4888888888888889,
+        "recall": 0.055,
+        "f1": 0.09887640449438202
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.46781746031746024
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage1",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage1",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 66,
+        "fp": 69,
+        "fn": 1134,
+        "tn": 21411,
+        "fpr": 0.003212290502793296,
+        "precision": 0.4888888888888889,
+        "recall": 0.055,
+        "f1": 0.09887640449438202
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.46781746031746024
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 81,
+        "fp": 49,
+        "fn": 1119,
+        "tn": 21431,
+        "fpr": 0.0022811918063314713,
+        "precision": 0.6230769230769231,
+        "recall": 0.0675,
+        "f1": 0.12180451127819548
+      },
+      "zero_prediction_groups": 7,
+      "macro_precision": 0.5844444444444444
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1199,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.0008333333333333334,
+        "f1": 0.0016652789342214821
+      },
+      "zero_prediction_groups": 59,
+      "macro_precision": 0.016666666666666666
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 10,
+        "fp": 2,
+        "fn": 1190,
+        "tn": 21478,
+        "fpr": 9.310986964618249e-05,
+        "precision": 0.8333333333333334,
+        "recall": 0.008333333333333333,
+        "f1": 0.0165016501650165
+      },
+      "zero_prediction_groups": 50,
+      "macro_precision": 0.15555555555555556
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 186,
+        "fp": 186,
+        "fn": 1014,
+        "tn": 21294,
+        "fpr": 0.008659217877094972,
+        "precision": 0.5,
+        "recall": 0.155,
+        "f1": 0.2366412213740458
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.5198700836200836
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 1193,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.005833333333333334,
+        "f1": 0.0115990057995029
+      },
+      "zero_prediction_groups": 53,
+      "macro_precision": 0.11666666666666667
+    },
+    {
+      "arm": "function_memory",
+      "point": "BCA_function_memory_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 84,
+        "fp": 33,
+        "fn": 1116,
+        "tn": 21447,
+        "fpr": 0.001536312849162011,
+        "precision": 0.717948717948718,
+        "recall": 0.07,
+        "f1": 0.1275626423690205
+      },
+      "zero_prediction_groups": 8,
+      "macro_precision": 0.6458333333333334
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage1",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 91,
+        "fp": 64,
+        "fn": 1109,
+        "tn": 21416,
+        "fpr": 0.0029795158286778397,
+        "precision": 0.5870967741935483,
+        "recall": 0.07583333333333334,
+        "f1": 0.13431734317343175
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.55
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage1",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage1",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 91,
+        "fp": 64,
+        "fn": 1109,
+        "tn": 21416,
+        "fpr": 0.0029795158286778397,
+        "precision": 0.5870967741935483,
+        "recall": 0.07583333333333334,
+        "f1": 0.13431734317343175
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.55
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 203,
+        "fp": 221,
+        "fn": 997,
+        "tn": 21259,
+        "fpr": 0.010288640595903165,
+        "precision": 0.47877358490566035,
+        "recall": 0.16916666666666666,
+        "f1": 0.25
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.5051689514189514
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 87,
+        "fp": 39,
+        "fn": 1113,
+        "tn": 21441,
+        "fpr": 0.0018156424581005587,
+        "precision": 0.6904761904761905,
+        "recall": 0.0725,
+        "f1": 0.13122171945701358
+      },
+      "zero_prediction_groups": 7,
+      "macro_precision": 0.6327777777777778
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 319,
+        "fp": 643,
+        "fn": 881,
+        "tn": 20837,
+        "fpr": 0.029934823091247672,
+        "precision": 0.3316008316008316,
+        "recall": 0.2658333333333333,
+        "f1": 0.29509713228492135
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.34904778120564445
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "function_memory",
+      "point": "CAB_function_memory_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 13,
+        "fp": 1,
+        "fn": 1187,
+        "tn": 21479,
+        "fpr": 4.6554934823091246e-05,
+        "precision": 0.9285714285714286,
+        "recall": 0.010833333333333334,
+        "f1": 0.0214168039538715
+      },
+      "zero_prediction_groups": 49,
+      "macro_precision": 0.16666666666666666
+    },
+    {
+      "arm": "function_memory",
+      "point": "initial",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_shared",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 21,
+        "fp": 4,
+        "fn": 1179,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.84,
+        "recall": 0.0175,
+        "f1": 0.03428571428571429
+      },
+      "zero_prediction_groups": 40,
+      "macro_precision": 0.2833333333333333
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_shared",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_shared",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 21,
+        "fp": 4,
+        "fn": 1179,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.84,
+        "recall": 0.0175,
+        "f1": 0.03428571428571429
+      },
+      "zero_prediction_groups": 40,
+      "macro_precision": 0.2833333333333333
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 47,
+        "fp": 18,
+        "fn": 1153,
+        "tn": 21462,
+        "fpr": 0.0008379888268156424,
+        "precision": 0.7230769230769231,
+        "recall": 0.03916666666666667,
+        "f1": 0.07430830039525692
+      },
+      "zero_prediction_groups": 20,
+      "macro_precision": 0.4819444444444444
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 73,
+        "fp": 42,
+        "fn": 1127,
+        "tn": 21438,
+        "fpr": 0.0019553072625698325,
+        "precision": 0.6347826086956522,
+        "recall": 0.060833333333333336,
+        "f1": 0.11102661596958174
+      },
+      "zero_prediction_groups": 8,
+      "macro_precision": 0.5469047619047619
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 69,
+        "fp": 23,
+        "fn": 1131,
+        "tn": 21457,
+        "fpr": 0.0010707635009310987,
+        "precision": 0.75,
+        "recall": 0.0575,
+        "f1": 0.10681114551083591
+      },
+      "zero_prediction_groups": 10,
+      "macro_precision": 0.6627777777777778
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "ABC_logit_tenth_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 74,
+        "fp": 27,
+        "fn": 1126,
+        "tn": 21453,
+        "fpr": 0.0012569832402234637,
+        "precision": 0.7326732673267327,
+        "recall": 0.06166666666666667,
+        "f1": 0.1137586471944658
+      },
+      "zero_prediction_groups": 9,
+      "macro_precision": 0.6597222222222221
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_shared",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 66,
+        "fp": 69,
+        "fn": 1134,
+        "tn": 21411,
+        "fpr": 0.003212290502793296,
+        "precision": 0.4888888888888889,
+        "recall": 0.055,
+        "f1": 0.09887640449438202
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.46781746031746024
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_shared",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_shared",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 66,
+        "fp": 69,
+        "fn": 1134,
+        "tn": 21411,
+        "fpr": 0.003212290502793296,
+        "precision": 0.4888888888888889,
+        "recall": 0.055,
+        "f1": 0.09887640449438202
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.46781746031746024
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 60,
+        "fp": 30,
+        "fn": 1140,
+        "tn": 21450,
+        "fpr": 0.0013966480446927375,
+        "precision": 0.6666666666666666,
+        "recall": 0.05,
+        "f1": 0.09302325581395349
+      },
+      "zero_prediction_groups": 16,
+      "macro_precision": 0.5294444444444444
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1199,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.0008333333333333334,
+        "f1": 0.0016652789342214821
+      },
+      "zero_prediction_groups": 59,
+      "macro_precision": 0.016666666666666666
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 21,
+        "fp": 4,
+        "fn": 1179,
+        "tn": 21476,
+        "fpr": 0.00018621973929236498,
+        "precision": 0.84,
+        "recall": 0.0175,
+        "f1": 0.03428571428571429
+      },
+      "zero_prediction_groups": 44,
+      "macro_precision": 0.23888888888888887
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 116,
+        "fp": 58,
+        "fn": 1084,
+        "tn": 21422,
+        "fpr": 0.0027001862197392926,
+        "precision": 0.6666666666666666,
+        "recall": 0.09666666666666666,
+        "f1": 0.16885007278020378
+      },
+      "zero_prediction_groups": 3,
+      "macro_precision": 0.6583267195767195
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1199,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 1.0,
+        "recall": 0.0008333333333333334,
+        "f1": 0.0016652789342214821
+      },
+      "zero_prediction_groups": 59,
+      "macro_precision": 0.016666666666666666
+    },
+    {
+      "arm": "logit0.1",
+      "point": "BCA_logit_tenth_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 122,
+        "fp": 62,
+        "fn": 1078,
+        "tn": 21418,
+        "fpr": 0.0028864059590316573,
+        "precision": 0.6630434782608695,
+        "recall": 0.10166666666666667,
+        "f1": 0.17630057803468208
+      },
+      "zero_prediction_groups": 2,
+      "macro_precision": 0.6599074074074074
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_shared",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 91,
+        "fp": 64,
+        "fn": 1109,
+        "tn": 21416,
+        "fpr": 0.0029795158286778397,
+        "precision": 0.5870967741935483,
+        "recall": 0.07583333333333334,
+        "f1": 0.13431734317343175
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.55
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_shared",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_shared",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 91,
+        "fp": 64,
+        "fn": 1109,
+        "tn": 21416,
+        "fpr": 0.0029795158286778397,
+        "precision": 0.5870967741935483,
+        "recall": 0.07583333333333334,
+        "f1": 0.13431734317343175
+      },
+      "zero_prediction_groups": 5,
+      "macro_precision": 0.55
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage2",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 131,
+        "fp": 71,
+        "fn": 1069,
+        "tn": 21409,
+        "fpr": 0.0033054003724394786,
+        "precision": 0.6485148514851485,
+        "recall": 0.10916666666666666,
+        "f1": 0.18687589158345222
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.6639285714285715
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage2",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage2",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 107,
+        "fp": 43,
+        "fn": 1093,
+        "tn": 21437,
+        "fpr": 0.0020018621973929237,
+        "precision": 0.7133333333333334,
+        "recall": 0.08916666666666667,
+        "f1": 0.15851851851851853
+      },
+      "zero_prediction_groups": 4,
+      "macro_precision": 0.6622222222222222
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage3",
+      "role": "first-cal",
+      "pooled": {
+        "tp": 157,
+        "fp": 111,
+        "fn": 1043,
+        "tn": 21369,
+        "fpr": 0.005167597765363128,
+        "precision": 0.585820895522388,
+        "recall": 0.13083333333333333,
+        "f1": 0.21389645776566757
+      },
+      "zero_prediction_groups": 0,
+      "macro_precision": 0.6053571428571428
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage3",
+      "role": "raw",
+      "pooled": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1200,
+        "tn": 21480,
+        "fpr": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "zero_prediction_groups": 60,
+      "macro_precision": 0.0
+    },
+    {
+      "arm": "logit0.1",
+      "point": "CAB_logit_tenth_stage3",
+      "role": "stage-cal",
+      "pooled": {
+        "tp": 103,
+        "fp": 37,
+        "fn": 1097,
+        "tn": 21443,
+        "fpr": 0.001722532588454376,
+        "precision": 0.7357142857142858,
+        "recall": 0.08583333333333333,
+        "f1": 0.1537313432835821
+      },
+      "zero_prediction_groups": 6,
+      "macro_precision": 0.6808333333333334
+    }
+  ],
+  "positive_affine_maps": [
+    {
+      "point": "ABC_function_memory_stage1",
+      "role": "stage-cal",
+      "a": 0.7773772839302454,
+      "b": 1.2060738802214435
+    },
+    {
+      "point": "ABC_function_memory_stage1",
+      "role": "first-cal",
+      "a": 0.7773772839302454,
+      "b": 1.2060738802214435
+    },
+    {
+      "point": "ABC_function_memory_stage2",
+      "role": "stage-cal",
+      "a": 0.7480330091605446,
+      "b": 1.0040679869043603
+    },
+    {
+      "point": "ABC_function_memory_stage2",
+      "role": "first-cal",
+      "a": 0.7773772839302454,
+      "b": 1.2060738802214435
+    },
+    {
+      "point": "ABC_function_memory_stage3",
+      "role": "stage-cal",
+      "a": 0.6366016979953197,
+      "b": 0.1871867213709168
+    },
+    {
+      "point": "ABC_function_memory_stage3",
+      "role": "first-cal",
+      "a": 0.7773772839302454,
+      "b": 1.2060738802214435
+    },
+    {
+      "point": "BCA_function_memory_stage1",
+      "role": "stage-cal",
+      "a": 0.8549405711365727,
+      "b": 1.3301773329984659
+    },
+    {
+      "point": "BCA_function_memory_stage1",
+      "role": "first-cal",
+      "a": 0.8549405711365727,
+      "b": 1.3301773329984659
+    },
+    {
+      "point": "BCA_function_memory_stage2",
+      "role": "stage-cal",
+      "a": 0.6833992404465717,
+      "b": 0.3910992701822841
+    },
+    {
+      "point": "BCA_function_memory_stage2",
+      "role": "first-cal",
+      "a": 0.8549405711365727,
+      "b": 1.3301773329984659
+    },
+    {
+      "point": "BCA_function_memory_stage3",
+      "role": "stage-cal",
+      "a": 0.7339909350598853,
+      "b": 0.46594727020175064
+    },
+    {
+      "point": "BCA_function_memory_stage3",
+      "role": "first-cal",
+      "a": 0.8549405711365727,
+      "b": 1.3301773329984659
+    },
+    {
+      "point": "CAB_function_memory_stage1",
+      "role": "stage-cal",
+      "a": 0.8801147527483686,
+      "b": 2.818262437339084
+    },
+    {
+      "point": "CAB_function_memory_stage1",
+      "role": "first-cal",
+      "a": 0.8801147527483686,
+      "b": 2.818262437339084
+    },
+    {
+      "point": "CAB_function_memory_stage2",
+      "role": "stage-cal",
+      "a": 0.7078225128977073,
+      "b": 1.4925374870437356
+    },
+    {
+      "point": "CAB_function_memory_stage2",
+      "role": "first-cal",
+      "a": 0.8801147527483686,
+      "b": 2.818262437339084
+    },
+    {
+      "point": "CAB_function_memory_stage3",
+      "role": "stage-cal",
+      "a": 0.5516912515987854,
+      "b": 0.25082829800605394
+    },
+    {
+      "point": "CAB_function_memory_stage3",
+      "role": "first-cal",
+      "a": 0.8801147527483686,
+      "b": 2.818262437339084
+    }
+  ],
+  "input_files": [
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "ea6c8434357d36c66498432af6c6b3485a777afc29c94a1eb92cca57eb33b553"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "71e39e6e18dc0b076340f9c2d34f818b0caa6090f12378abc2e1e0658cb82e61"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "7d4f800d64036f9f56466db6a15697a00bf808014111d4e41a20fd176110e5e9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "a6a379f576057e9d0b46f44215dd0c1bfabc2c0b6a8268f743697d5c39631366"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "cb9fdf72eb084433b97fd370de4d35b47eba396d47d618b628d47e33cba23701"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "a865401e14281d4cd3a90435bab6d5049cfe0a49bb4871c8fe2ff268f3d15db0"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "25805cd86204751af634c3e5993250fda3b6c6aa33662fbd981ba287844900d3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "19cd9922882d516fa2c48771c6495184bf4ff6e1e9b95c4cb5e1a08306c14641"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "912600ab85baec07d2450d7e835c8169cb26b68ba54b2a8460a1d6f347f5bc6f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/ABC_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "88381d4e2986c600ac9f9d7e9c38d4820b23f792f92ee0ea39e78ded6f29df95"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "d1e8bfeec285e523ed60f71be691ba0d2c5abda2b16a2048b2c0d3d067be514c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "3476e9b28f292044830ab3d013d8260e9cd27782feaa1e8124c24c00ef18152f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "576d44ba90c73f43f03a011c0eb3f2e49ac77e7e6ad7208ef0b46b21ccdca952"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "6fe43fa4f61fa47bf259aa4f2632dee9b397fb0fbf09f1acffbe9e77ed0259cc"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "a706f8c32eb71ad6aa48e4e769f7927abffc41d4f0311b9de39ccafedac1c883"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1c966820512cf85c13d91dbb0400ac812519d343b597ef61ff3a8cfac88d59a3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "ed45761eea534d18aab6045d16f578d3ba7184080e16b204b5e87124b146a1ee"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "481fca06f17bedbfb6a76516dd9601f411c8aa9e2eaa3c7c70ee4095a122a7af"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "119e2713b16518d38fb66c95f1afb146310bb3911ae62ee8dfe52a1c9c8d4057"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "ef5eb5b0bbfca0b4250a3dc7488314e4fcea6e5b39cb08f87c98c3bfbf6dbccb"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "4e9a84eccfd706d4e25c3273958c6a5738cd9e995e289c128917f6e884792380"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/BCA_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "94b152bbc7d7d65e03d63e26962169e9c1c8157484edfbd15d124c1a1e3238e7"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "dc58c7c628c3944eafe53f6cb46b7509f3d7ce98beb6d54a95c66d1dd17733d2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "96f59dad9f74a41b360581338508cf4e40b7ec91f0bc4bffd4dc92524ad9f5e2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "77a225bec6bc5f5bb06e9e2609feb509c5cbcf179f15a5edd1f3cace239c4cf4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "d9fb7c97e997dbab920d4965c848725a734241dd017016bf5f0a7585c82d4095"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "e0c13b2f8d03b26f45b684c578b7c14195dae1fe5fe4f6f348ffe443dc6c422f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "226e02f407f9a81f1528440a2ecd68759e3368adcb13897723cd9588e1f5a4e0"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1241e5547045c7b227712c50587cdb90525dcad93c8bdd523c015010234fe68c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "8209ad06df174c966d204d65940965945424fd5cbd755f2d578f5374e976445d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "f3ee78c675d5ce1309ffe60f735ae1f684b956b56cefcb4225ce5e4aa20b96bb"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/CAB_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "8cb3726426e3397cc49c19dfd3377e5ab38e3488d3afb26b2dd4f3084f95a726"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/collected.json",
+      "bytes": 13759,
+      "sha256": "e01708603a799dd8c4a53b7f5a86b7a5fc35936f00e7c78902650ca6137ad452"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_raw.npy",
+      "bytes": 10688,
+      "sha256": "69123ec3e10de7f8676689ede9768b214ddc5795cb9b676c07f6262b5cf461c3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/ABC_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "2f00363d07b6b8fa3e63652c977a889e23f53b200c7ec1f5e926c8340ceee80a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_raw.npy",
+      "bytes": 10688,
+      "sha256": "f74db1c0203f225f3803bd9fedb6781e724f243533930db6fa5f3275ce5e84b0"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/BCA_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "2f00363d07b6b8fa3e63652c977a889e23f53b200c7ec1f5e926c8340ceee80a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "a406fa096416de47d9475652f557f9e60f8c8055f5e8d6612402dae3eb6d2aa9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_raw.npy",
+      "bytes": 10688,
+      "sha256": "f22c8709885849b3bfa096c88b9b5f5e274dcf618d2a79815a1d54e72e761495"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/CAB_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "a406fa096416de47d9475652f557f9e60f8c8055f5e8d6612402dae3eb6d2aa9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261004/logit_low_result/job/evaluation/reference/collected.json",
+      "bytes": 22474,
+      "sha256": "ffb6e7fd7d1437a9d3940848452c24d5a0560b2388f5913b2ffa5ed14f07926a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_raw.npy",
+      "bytes": 10688,
+      "sha256": "69123ec3e10de7f8676689ede9768b214ddc5795cb9b676c07f6262b5cf461c3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage1_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "1a377157f078bc69807e30f4607642ca880db5cece62f91c2577a46b8f80bec5"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "4bfa3b62a49730ea45e97d075cc95af1e5be7f595e99d671f20a125506b18ae1"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "3cad7e30474320a8a4b799be0ee54477f2f40bcebe252335576513e468be59bf"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "d4c5571efc5d5d1d972a9bd57d987df131a5b6595b098a49baa89524db98b61c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "84ef10a1d622edeaa07efd8c5338a88c44e2b36e81e6588144a1f3ffb8cd7a4d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "bc50ba65457e165a763c96edbf173da1d10e14479a9c479e4d5431d72ecf17b4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "f02aed61d5b8e7dacc841c196e48120c1e2a70f65d730155c1fc858d4f0d6cfa"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_first-cal_counts.json",
+      "bytes": 1983,
+      "sha256": "8ac97c2e552411c93b9a68680004dbf7a1fa29ce5bdea32477d969c82fa420a2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "807cd0b1fd00a9ee0aaee5de23ae628d3e78d6d14c1812d0f551eacfa9684168"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "8b5c45662af417dd29845cf793023ca18adb9f6fba5cbce12cb27f5ba50d6410"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "bc92c83c84dc9e9c52c8c120541922615bb2a7eaec0a4bab454934cda658652d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/ABC_function_memory_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "588e7b06ed43332dc6ca55d65d38f1c70af4be0ccc9638a40ff17ae3e9ec84fb"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "2f00363d07b6b8fa3e63652c977a889e23f53b200c7ec1f5e926c8340ceee80a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_raw.npy",
+      "bytes": 10688,
+      "sha256": "f74db1c0203f225f3803bd9fedb6781e724f243533930db6fa5f3275ce5e84b0"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage1_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "2f00363d07b6b8fa3e63652c977a889e23f53b200c7ec1f5e926c8340ceee80a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "22dbd828e13181d26d86c790c8881959bdc934133eaab50ff4ce1acee57be8d4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "6efc8baf4b91299a5d6036c242c168d3f2aa1a50a9695453365a7b770cfab007"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "c19aa3fef1a9cb0bbfebc1f055d01205df4c10d6afe1b1c579d3e5216efa714f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "6fe43fa4f61fa47bf259aa4f2632dee9b397fb0fbf09f1acffbe9e77ed0259cc"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "5a9b03328e3b1f27015457dd6d454f24d5bf0e4b4a3054bbc76f4767337e950c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "3a543713a18fcf2f192c4e3a9bc81f710ae53230408dbdc2f899d031ff7c54ce"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "dc002bcbdac37ea8b311e859285ebcceb937a40de82e2bf0347d48867f2e7987"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_first-cal_counts.json",
+      "bytes": 1983,
+      "sha256": "7d2eedd9e4ab1463730045d81dc6e2be96b28db137b29b3768fb132c5ecdd4d7"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "8f62963deb9753ca78c8c85501b3b51c341894196b7ea3a382550d972c75aad1"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "f1685c55d132e2096b51322e4e8533577f0e56810db525311e8a518903171f49"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "fdfce13e9a155cc1c1fc9017588b778401e4c317aa0126d989df5de223c7aef9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/BCA_function_memory_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "65a6a5c7a0bdcd40e4e0a5ca181135a0367ed6703eaa25772fd8fb557276fdfa"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_first-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "a406fa096416de47d9475652f557f9e60f8c8055f5e8d6612402dae3eb6d2aa9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_raw.npy",
+      "bytes": 10688,
+      "sha256": "f22c8709885849b3bfa096c88b9b5f5e274dcf618d2a79815a1d54e72e761495"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage1_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "a406fa096416de47d9475652f557f9e60f8c8055f5e8d6612402dae3eb6d2aa9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "f39f597634fc2f8125c206b8fe333397cca242790939baa21b7e317c00e4046f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_first-cal_counts.json",
+      "bytes": 1984,
+      "sha256": "cff0cd7319179af9c34b217eeec8251734a25010c7741ef5d90e7229745e38d1"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_raw.npy",
+      "bytes": 10688,
+      "sha256": "c90027d122eefcc06688f983a3af9d432e2a36d7e6a00421e5b363fbef4d733f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "796d6d4769cb35c4c076e8ab8cba4ff1d8c684c76cbe57213c3a3db968f699e7"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "8a795a1d549e2e1e13335bc6dd2fef3ea2d1e0c0010db0180493710ff896f6a4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_first-cal.npy",
+      "bytes": 10688,
+      "sha256": "a8e1e02803f0d89535ad0e2560b77aa53b9dfbfe95b7f2272515f4fbd43caf77"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_first-cal_counts.json",
+      "bytes": 2016,
+      "sha256": "542501eedb58ffd930386d06f230dd8977870931739801a14e631ced0ce55b83"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_raw.npy",
+      "bytes": 10688,
+      "sha256": "10a465788c3e6dfebcb184c9135b876d48b09c653386f121db62daedb2587f61"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "sha256": "6eb28de9cf528ee18ebc73bdaed198d8b1ba0b4236263f975a6d71f84dd3b39c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/CAB_function_memory_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "sha256": "0eb4a2bbe3ae071bfad35c78b766dfe8788b00e12affba09fb97ca851f234bac"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/collected.json",
+      "bytes": 15089,
+      "sha256": "d71c1ea3383957686019ae889a8f72332fb33b47118fe2e86c9e002dd05800df"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/evaluation.json",
+      "bytes": 413172,
+      "sha256": "53ddb3a60c453610f5777ad934414088b4ee408bfc1eb05ee9cbc876a920ce23"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/initial_raw.npy",
+      "bytes": 10688,
+      "sha256": "a0aba9892491879a5a5b1cdc48ef439e12698d916645790d1d0cf3b602a0ed21"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/evaluation/initial_raw_counts.json",
+      "bytes": 1982,
+      "sha256": "c898b3d3593703066e380741075871c9740ba2e51d80f3acced018980398c174"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/ABC_function_memory_stage1.json",
+      "bytes": 2726,
+      "sha256": "6aa37f4c3b4eaa2a3d5565a80731cb11fcf2419220d44ef871a4b60a1f8f1707"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/ABC_function_memory_stage2.json",
+      "bytes": 2728,
+      "sha256": "da8b1267ebe945a73112d6a0256e792cb8cac2ce47ccd2f9a9432f47333461ce"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/ABC_function_memory_stage3.json",
+      "bytes": 2741,
+      "sha256": "f7973c81df235a5e4bbb7c16a66b9acf31d11d557169550e9da45ed0aa6c2beb"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/BCA_function_memory_stage1.json",
+      "bytes": 2727,
+      "sha256": "956caa435e3bdd512b9c385f18b29ae90378d5e45cfa4ff151e63d3090215b0b"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/BCA_function_memory_stage2.json",
+      "bytes": 2735,
+      "sha256": "763af2de710bc9ace1d9c212159e6e61f1dd69cf50ce37ebe1cb9e7f8033ad00"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/BCA_function_memory_stage3.json",
+      "bytes": 2465,
+      "sha256": "c59fded22720fb67dcc495b4722683319105bb26a2783337c8a459b745d7d855"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/CAB_function_memory_stage1.json",
+      "bytes": 2716,
+      "sha256": "59ab15e789c1c9e95421cb7f0b09014976a3e949eff5ec4bf492df928eed1ae3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/CAB_function_memory_stage2.json",
+      "bytes": 2861,
+      "sha256": "618591c8a878f108d82c0ebb1586fefd9e872be465183e998564206d17714098"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/maps/CAB_function_memory_stage3.json",
+      "bytes": 2327,
+      "sha256": "480f55c26306d91393445d4aaca635040c43a50dfa37278db3eadde7db6a37d3"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/partition.json",
+      "bytes": 14922,
+      "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/ABC_function_memory_stage1.json",
+      "bytes": 2878,
+      "sha256": "0ce9d99e58da45b4e49c9b394eb27ca66282bc52fd0694a415995da63c92231a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/ABC_function_memory_stage2.json",
+      "bytes": 5562,
+      "sha256": "20e4a644fb851a53d7d44c63ac1427362185a28e07fce2289ce8f031deaa4059"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/ABC_function_memory_stage3.json",
+      "bytes": 2480,
+      "sha256": "1db62166eb3ca5d66cb4cc26c889bb79705ebc465dfb84e49c05dc892ff41359"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/BCA_function_memory_stage1.json",
+      "bytes": 2878,
+      "sha256": "c9344ff957be037b929277bda13e9a24a50adedb281eb90a185069f3f67b4d3c"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/BCA_function_memory_stage2.json",
+      "bytes": 5556,
+      "sha256": "a214a77065af4080c63c403bdbf0c49998328041f3c10ac5614628ba69ffa7cc"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/BCA_function_memory_stage3.json",
+      "bytes": 2481,
+      "sha256": "d14318d27d22d4162e34c85e9f5c458caba1ef6ca63f5402892014401fc38c00"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/CAB_function_memory_stage1.json",
+      "bytes": 2877,
+      "sha256": "9dd13df71a38d4cf25780fd032e261d3a2d0d3c35e973cf4b0b559eeea14eb99"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/CAB_function_memory_stage2.json",
+      "bytes": 5003,
+      "sha256": "08b77fdedcf6e2a2a77007779640f0ea73c8a859bdec8240e3006f17ba8d162d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/points/CAB_function_memory_stage3.json",
+      "bytes": 2480,
+      "sha256": "7d2641cb3282bfd30b13ae37cb9f04774db3888d30a8ef3d0d72d3986306e79f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage1_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "6a4f665198325965a59e52c1726573b6ae9eae0c92abd992fc9d716baa399630"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage1_raw.npy",
+      "bytes": 90848,
+      "sha256": "fa5abbc387f20e914fa6b2164988e4c96dabcc003eaff001ae637c0259306e2f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage1_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "6a4f665198325965a59e52c1726573b6ae9eae0c92abd992fc9d716baa399630"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage2_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "2ddfeff938c2989fb4c22c2cdf5f128d770a5bd1bff8a27703418fe5531fb7f7"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage2_raw.npy",
+      "bytes": 90848,
+      "sha256": "50e79c69d2426bfce23c80f300027fde89394c31f3e7168adf3e32d77a5a9d22"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "f1c13e186a84e521eba83d4d3a84811c4aed8bedb3161282e9d1dfa37a67e07e"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage3_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "575d3b90d4733feed560f8a3660c634069bbc4f1bb8abff324b2dbaf11c9e80a"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage3_raw.npy",
+      "bytes": 90848,
+      "sha256": "21d28ada0955c78716b65805ff8dd3f85f0bb93fedd71fc07a8ef7c0e22a391d"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/ABC_function_memory_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "618c6b44043fe2bfb6e31eb8466cd23841b57fbd1c25acaabb5fa49898c34719"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage1_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "6b16150b320d8660f84cee2ce12d65a3990cb4b9edeb7024a43e278ef448fe35"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage1_raw.npy",
+      "bytes": 90848,
+      "sha256": "8e1838616ba5ee962ea523d60c2f5d015c15c7bb7eca8f145b4635a671dc1f49"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage1_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "6b16150b320d8660f84cee2ce12d65a3990cb4b9edeb7024a43e278ef448fe35"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage2_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "e7377e21fc259679c93d670d8da544ecd3aea80e85a1139765deed0d20a760cc"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage2_raw.npy",
+      "bytes": 90848,
+      "sha256": "513836d826c198f3cb753be1622607df62994552f27db9b686ed13fcc118290e"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "47703c9a403ff300aa10d94fe39a480380c2143455590b1a3b811d3e47ec5414"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage3_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "67cd7752a3fe643698c9c54fd12117723ad42c45cdd522ac82eea689d3d592c4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage3_raw.npy",
+      "bytes": 90848,
+      "sha256": "36483803a24259ddf1e2c070f28ba122f204798ef4ccc9db7c0e4be4b5880ecd"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/BCA_function_memory_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "58264e1b0fa8ba36e74701969d4a732f7ff33117855031b3fa1f19ada58baed9"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage1_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "3577e62a53c0f7705d85147ae5a0d6f07aa2d3647122f0b4618ce3188a171e07"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage1_raw.npy",
+      "bytes": 90848,
+      "sha256": "01d7f85f0c0a5bbad97a79e5652c78166ea99bd9932f2c017bbb940fc5929cf4"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage1_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "3577e62a53c0f7705d85147ae5a0d6f07aa2d3647122f0b4618ce3188a171e07"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage2_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "fb88098ea635fb8ce135a9e9d3650e32f449f8788cc32ba6c8dcce69cdec589f"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage2_raw.npy",
+      "bytes": 90848,
+      "sha256": "946065ef853ae7ed51c3d1f6fa2960edf8846b33085f3432b06bcae1e0094fda"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "04afb3eeeeafc5c7e1132d279c60c39f75e266b7bb9ce0f0fbbafc108bf69a77"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage3_first-cal.npy",
+      "bytes": 181568,
+      "sha256": "375051a9e023f7283f6dbaca98f8cf4950c0dc8f011b67547d83a57af5df9784"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage3_raw.npy",
+      "bytes": 90848,
+      "sha256": "22a2f62008d1b833d48cf32faaa1a1cdb140785e70cab9516a5058265afbac28"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/CAB_function_memory_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "sha256": "2aeaba5ec6fb31ab6b0763f4bc31890a8c1befef308f6c644441515b7096632e"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261007/function_memory_result/job/run/scores/initial_raw.npy",
+      "bytes": 90848,
+      "sha256": "4b3017cc50efdc838261f52447ed01553a52d57d9fd297d2d427a8f6db8e6aa5"
+    }
+  ]
+}
