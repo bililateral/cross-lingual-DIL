@@ -223,11 +223,18 @@ class RecordReplayTests(unittest.TestCase):
         gate_path = method.data.ROOT/"handwritten_gate.json"
         cpu_path, gpu_path = [method.data.ROOT/(name+".json") for name in ("cpu", "gpu")]
         cpu = {"status": "PASS_HANDWRITTEN_ONLY", "mode": "cpu", "source_files": source}
-        gpu = {**cpu, "mode": "gpu", "native": {"kind": "native_record_replay_first_optimizer_step"}}
+        gpu = {**cpu, "mode": "gpu", "native": {"kind": "native_record_replay_first_optimizer_step",
+               "shape_upper_projection_seconds": 86400., "within_formal_24h_projection": True}}
         gate = {"status": "APPROVED_RECORD_REPLAY_PILOT", "source_files": source, "job": job.relative_to(method.data.ROOT).as_posix(),
                 "runtime": p["runtime"], "supervision": p["supervision"], "review_disposition": "NO_OPEN_BLOCKERS",
                 "cpu": {"path": cpu_path.name}, "gpu": {"path": gpu_path.name}}
-        for evidence, accepts in ((gpu, True), (cpu, False), ({**gpu, "source_files": []}, False)):
+        rejected_native = [
+            {"kind": "native_record_replay_first_optimizer_step"},
+            {**gpu["native"], "shape_upper_projection_seconds": 105135.},
+            {**gpu["native"], "shape_upper_projection_seconds": float("nan")},
+            {**gpu["native"], "within_formal_24h_projection": False}]
+        for evidence, accepts in [(gpu, True), (cpu, False), ({**gpu, "source_files": []}, False),
+                                  *(({**gpu, "native": native}, False) for native in rejected_native)]:
             lookup = {method.POLICY: p, gate_path: gate, cpu_path: cpu, gpu_path: evidence}
             with mock.patch.object(run.data, "read_json", side_effect=lambda path: lookup[path]), \
                     mock.patch.object(run.data, "verify", side_effect=lambda path, rec: path):
@@ -236,6 +243,23 @@ class RecordReplayTests(unittest.TestCase):
                 else:
                     with self.assertRaises(ValueError):
                         run.validate_gate(job, gate_path)
+
+    def test_disk_reservation_uses_current_bytes_after_temporary_delete(self):
+        with tempfile.TemporaryDirectory(dir=os.environ["RECORD_REPLAY_TEST_ROOT"]) as tmp:
+            root = Path(tmp)
+            payload = root/"temporary_full"
+            payload.write_bytes(b"x"*30)
+            budget = run.Budget(root)
+            budget.limits["maximum_output_bytes"] = 32
+            with mock.patch.object(run.data, "write_json"):
+                budget.check()
+                self.assertEqual(budget.peak_bytes, 30)
+                payload.unlink()
+                (root/"retained").write_bytes(b"x"*25)
+                budget.check(reserve=3)
+                self.assertEqual(budget.peak_bytes, 30)
+                with self.assertRaises(RuntimeError):
+                    budget.check(reserve=8)
 
     def test_paired_endpoints_use_actual_domain_and_A2_not_N(self):
         domains = [d for d in "ABC" for _ in range(20)]

@@ -1,6 +1,6 @@
 {
-  "status": "IMPLEMENTATION_REVIEW_SUBMITTED_AWAITING_RESPONSE",
-  "observed_at": "2026-10-07T23:14:56.4771846+08:00",
+  "status": "IMPLEMENTATION_REVIEW_CLOSED_NATIVE_PASSED_FORMAL_RUNNING",
+  "observed_at": "2026-10-07T23:58:53.787618+08:00",
   "submitted_at": "2026-10-07T23:13:24+08:00",
   "url": "https://chatgpt.com/c/6ac6618f-f25c-83ed-ad4d-5e98d01a4a78",
   "requested_model": "GPT 6 Pro",
@@ -29,22 +29,73 @@
   "send_actions": 1,
   "visible_attachment": "review_input(5).zip",
   "response_started": true,
-  "review_completed": false,
+  "review_completed": true,
   "initial_auto_review_rejection": "New internal research payload not yet explicitly authorized for ChatGPT; no upload occurred on this attempt",
   "subsequent_user_authorization": "授权上传此完整新包到 ChatGPT 外审（推荐）",
-  "gpu_probe_started": false,
-  "formal_training_started": false,
+  "gpu_probe_started": true,
+  "formal_training_started": true,
   "formal_label_parses": {
     "valid": 0,
     "test": 0,
-    "train": 0,
+    "train": 1,
     "owners": 0
   },
   "cpu": {
     "source_files_matched": 21,
-    "returned_evidence_files_matched": 8,
+    "returned_evidence_files_matched": 12,
     "final_status": "PASS_HANDWRITTEN_ONLY",
-    "all_attempts_wrapper_seconds": 15,
-    "final_tests": 8
+    "all_attempts_wrapper_seconds": 25,
+    "final_tests": 9
+  },
+  "main_disposition": "report.zh.txt",
+  "external_recovery": "external/recovery.json",
+  "dedicated_page_closed": true,
+  "external_defects": [
+    {
+      "disposition": "Closed by actual admission check and CPU rejection cases",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "id": "R1"
+    },
+    {
+      "disposition": "Closed by current-byte reservation and small-file deletion test",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "id": "R2"
+    }
+  ],
+  "gpu": {
+    "source_files_matched": 21,
+    "formal_feasibility": "native_disposition.zh.txt",
+    "returned_evidence_files_matched": 3,
+    "result": "gpu/attempt01/result.json",
+    "outer_seconds": 21,
+    "status": "PASS_HANDWRITTEN_ONLY"
+  },
+  "formal_run": {
+    "expected_total_hours": [
+      9,
+      12
+    ],
+    "completion_observed": false,
+    "automatic_retry": false,
+    "job": "reports/job",
+    "hard_deadline": "2026-10-08T23:55:07+08:00",
+    "expected_completion_interval": [
+      "2026-10-08T08:55:07+08:00",
+      "2026-10-08T11:55:07+08:00"
+    ],
+    "access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0
+    },
+    "stage": "ABC_shared",
+    "python_pid": 3396387,
+    "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace",
+    "wrapper_pid": 3396379,
+    "logged_updates_lower_bound": 48,
+    "started_at": "2026-10-07T23:55:07+08:00",
+    "observation": "launch/observation.json",
+    "launch_files_verified": 6
   }
 }
