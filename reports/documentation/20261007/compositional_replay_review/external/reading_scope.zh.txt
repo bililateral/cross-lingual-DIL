@@ -1,0 +1,67 @@
+# 外审阅读范围简录
+
+日期：2026-10-07
+对应完整报告：SELLER_ALIAS_COMBINATORIAL_REPLAY_EXTERNAL_REVIEW.zh.txt
+最终裁决：现阶段不值得推进。
+
+一、附件身份
+
+原名review_input.zip；页面名review_input(1).zip。
+大小：635,587字节。
+SHA-256：b4549b0f6807bc44b27249e495f29aade04bc059db9af8f29d21895b93fcb576。
+96成员＝manifest.json＋95载荷。95项大小与SHA全部匹配，无缺失／额外成员。
+此为身份核验，不等于全部95项逐行语义阅读。
+
+二、完整阅读的核心原件（主审与分工合并覆盖）
+
+- review/user_brief.zh.txt、context.zh.txt、proposal.zh.txt、literature.zh.txt。
+- review/withdrawn_rank_protection.zh.txt。
+- project/AGENTS.md、project/docs/RESEARCH_DISCIPLINE.zh.md。
+- project/docs/SELLER_ALIAS_CONTINUAL_DATA.zh.md。
+- project/docs/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md。
+- frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_LOW.zh.md。
+- project/docs/SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md。
+- closed_evidence/function_memory_full_tables.zh.md：8端点全部22指标、27个阶段／域行、训练标量及合并计数。
+- closed_evidence/group_meta_closure.zh.md。
+- prior_reviews/logit_risk/external_review.zh.txt与main_review.zh.md。
+- prior_reviews/relation_memory/external_review.zh.md与main_review.zh.md。
+- prior_reviews/relation_revision/external_review.zh.md与main_review.zh.md。
+- prior_reviews/function_memory/external_review.zh.txt与main_review.zh.md。
+- frozen/function_memory_source/schema/step28_function_memory_policy.json。
+
+四组外审均阅读全文与主审处置；不以摘要替代，不重新改变原验收。
+
+三、定点阅读
+
+- SELLER_ALIAS_BGE_CONTINUAL.zh.md：第1–10节主要数据／模型／训练／评价／预算合同；第11–13节定点背景。
+- AI_RESEARCH_HANDOFF.zh.md：当前研究与授权状态、末部后续决定相关段落；没有全文重审所有早期手记。
+- RESEARCH_DISCUSSION.zh.md：594–636行附近当前决定及相关标题；未全文审读更早讨论。
+- LOGIT低权重policy的核心算法、供数和Memory字段。
+- 冻结LOGIT源码：alias_ranking的hard_candidates/objectives/update；chinese_base的文本、pooling、损失与score；continual_population的真实头与优化器；population_data的标签对齐、Group.validate、Algorithm R；expression_run的供数和当前版本；bge_continual的Supply与Memory全生命周期和序列化；er_weight及er_weight_run的真实更新、统一clip/AdamW、共享首域和阶段末teacher。
+- 冻结函数记忆源码：完整头、确定性历史、规范坐标、statistics/transport、Memory与真实历史梯度路径。
+
+具体文件名、函数及行段见完整报告第12.2节。
+
+四、公开文献
+
+实际阅读相关正文／公式／算法：
+P×K/batch-hard（2017）；完整与不完整U统计量（JMLR 2016）；Rao–Blackwell随机梯度（ICML 2019）；概率排名生成函数（VLDB 2009）；XBM（CVPR 2020）；L²R（CIKM 2023）；MCF（ICML 2013）；EMC²（ICML 2024）；DRO Memory Evolution（ICML 2022）；On Episodes（NeurIPS 2021）；SoftRank（WSDM 2008）。
+
+另读2026 ResearchGate RB-Replay线索的可见页面／正文，没有独立来源认证，不采用其性能数字作已核实事实。完整题名、URL和章节见完整报告第十三节。
+没有逐一通读附件书目所列全部论文，也没有重新验证各论文全部实验或附录证明。
+
+五、未读／未做／缺件
+
+- 未逐行读完95项全部载荷、所有测试、shell启动器、旧policy、其他RESULT和早期讨论。
+- 未运行项目代码、测试、训练、数值模拟、新数值实验或新资源探针；仅解压、枚举、哈希核验、静态阅读、文献检索、数学推导和手算。
+- 未连接项目服务器，未访问研究文本／逐对标签／模型权重／Memory本体／owners／Audit／private_custody，未重建数据，未恢复删除负载。
+- 历史指标和置信区间引用原件，不是本轮复算。
+- 包内主动不含原文、标签、权重、Memory与凭据，不将其缺席判作违规。
+- 与新交换性论证直接相关的缺件：docs/SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md、schema/step28_continual_expression_policy.json、当前表达抽样生成器相关代码及来源绑定。只需公开合同／源码片段即可补论证，不需新私有数据或重生成。
+
+六、范围与身份声明
+
+用户最新“提交外审审核，注意上传完整的背景上下文”仅替代本次提交中旧“不得直接外审”限制；其他研究边界继续有效。
+本记录是同一会话内主审与分工的合并覆盖，不表示每个分工阅读全文或经过独立人类同行认证。
+会话配置自述GPT-6 Astra Pro；用户报告页面选择器“6 / Pro”；未独立认证后台。
+外审建议不构成新实现、模型读取、图重建、比较、预算或判据的用户许可。
