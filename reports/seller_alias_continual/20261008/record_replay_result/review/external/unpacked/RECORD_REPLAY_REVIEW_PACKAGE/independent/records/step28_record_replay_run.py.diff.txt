@@ -1,0 +1,43 @@
+--- historical/implementation/scripts/step28_record_replay_run.py
++++ actual/result/source/scripts/step28_record_replay_run.py
+@@ -78,6 +78,7 @@
+             self.peak_rss = max(self.peak_rss, psutil.Process().memory_info().rss)
+             if torch.cuda.is_initialized():
+                 self.peak_reserved = max(self.peak_reserved, torch.cuda.max_memory_reserved())
++            projected_bytes = self.peak_bytes
+             if reserve or elapsed-self.last_disk >= 10:
+                 used = 0
+                 for path in [*self.root.rglob("*"), self.root.with_suffix(".console.txt"), self.root.with_suffix(".wrapper.txt")]:
+@@ -88,12 +89,13 @@
+                         if path.parent != self.root/"run/work":
+                             raise
+                 self.peak_bytes = max(self.peak_bytes, used)
++                projected_bytes = max(self.peak_bytes, used+reserve)
+                 self.last_disk = elapsed
+                 if shutil.disk_usage(self.root).free < reserve:
+                     raise RuntimeError("Insufficient disk")
+                 data.write_json(self.root/"resource.json", self.snapshot())
+             if (elapsed >= self.limits["maximum_gpu_stage_seconds"]
+-                    or self.peak_bytes+reserve > self.limits["maximum_output_bytes"]
++                    or projected_bytes > self.limits["maximum_output_bytes"]
+                     or self.peak_rss > self.limits["maximum_rss_bytes"]
+                     or self.peak_reserved > self.limits["maximum_cuda_reserved_bytes"]):
+                 raise RuntimeError("Approved cumulative budget exceeded")
+@@ -491,8 +493,15 @@
+         evidence = data.read_json(data.verify(data.ROOT/rec["path"], rec))
+         if evidence.get("mode") != mode or evidence.get("status") != "PASS_HANDWRITTEN_ONLY" or evidence.get("source_files") != sources():
+             raise ValueError("Required matching verification evidence missing")
+-        if mode == "gpu" and evidence.get("native", {}).get("kind") != "native_record_replay_first_optimizer_step":
+-            raise ValueError("Native actual first update evidence missing")
++        if mode == "gpu":
++            native = evidence.get("native", {})
++            if native.get("kind") != "native_record_replay_first_optimizer_step":
++                raise ValueError("Native actual first update evidence missing")
++            estimate = native.get("shape_upper_projection_seconds", float("inf"))
++            if (not np.isfinite(estimate) or estimate <= 0
++                    or estimate > p["runtime"]["maximum_gpu_stage_seconds"]
++                    or native.get("within_formal_24h_projection") is not True):
++                raise ValueError("Native update passed but formal time projection is not admissible")
+     return p
+ 
+ 

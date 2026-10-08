@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/f39643c809b7/review_work/audit_run_records.py", line 282, in <module>
+    a=p.parse_args();main(a.input,a.output,a.archive)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/f39643c809b7/review_work/audit_run_records.py", line 93, in main
+    t=rd.read(p+'wrapper.txt','CPU wrapper wall clock').decode().splitlines()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/f39643c809b7/review_work/audit_saved_results.py", line 44, in read
+    name=str(name); data=(self.root/name).read_bytes(); digest=hashlib.sha256(data).hexdigest()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/f39643c809b7/review_work/input/qualification/cpu/attempt01/wrapper.txt'

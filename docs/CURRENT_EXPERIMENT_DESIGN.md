@@ -4,7 +4,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [记录作用表与同控重组 C/S](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md) | 最近一轮完整开发实验；新记录对头、同架构 C/S 对照及保存 LOGIT0.1 比较。训练和保存结果独立核验已完成，结果外审待回收，当前事实见交接 |
+| [记录作用表与同控重组 C/S](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md) | 最近一轮完整开发实验；新记录对头、同架构 C/S 对照及保存 LOGIT0.1 比较。训练、保存结果独立核验、结果外审及主审已完成；整体方案相对LOGIT有正向证据，C−S原主要条件未过，当前事实见交接 |
 | [函数目标累计关系记忆](SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md) | 已结束的固定配置开发实验；[结果](SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md) |
 | [关系目标记忆修改版](SELLER_ALIAS_RELATION_REVISION_PILOT.zh.md) | 已关闭，活动修改版已按用户决定清理；[结果](SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md) |
 | [关系目标记忆原版](SELLER_ALIAS_RELATION_MEMORY_PILOT.zh.md) | 已结束的固定配置开发实验；[结果](SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md) |
