@@ -1,0 +1,24 @@
+test_capture_both_architectures_preserves_state_and_next_update (test_step28_replay_improvement.ImprovementTests) ... ok
+test_four_actual_losses_and_vjp_match_independent_full_graph (test_step28_replay_improvement.ImprovementTests) ... ok
+test_metrics_and_independent_group_gap_with_fixed_epoch_changes (test_step28_replay_improvement.ImprovementTests) ... ok
+test_new_regroup_term_survives_original_view_nullspace (test_step28_replay_improvement.ImprovementTests) ... ok
+test_real_epoch_loop_and_checkpoint_for_both_architectures (test_step28_replay_improvement.ImprovementTests) ... ERROR
+
+======================================================================
+ERROR: test_real_epoch_loop_and_checkpoint_for_both_architectures (test_step28_replay_improvement.ImprovementTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace/tests/test_step28_replay_improvement.py", line 143, in test_real_epoch_loop_and_checkpoint_for_both_architectures
+    current = [handmade_group(f"fit{i:02}",1) for i in range(48)]
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace/tests/test_step28_replay_improvement.py", line 143, in <listcomp>
+    current = [handmade_group(f"fit{i:02}",1) for i in range(48)]
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace/tests/test_step28_record_replay.py", line 34, in handmade_group
+    group.validate()
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace/scripts/step28_continual_population_data.py", line 80, in validate
+    raise ValueError("Record multiplicity/order differs")
+ValueError: Record multiplicity/order differs
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.776s
+
+FAILED (errors=1)

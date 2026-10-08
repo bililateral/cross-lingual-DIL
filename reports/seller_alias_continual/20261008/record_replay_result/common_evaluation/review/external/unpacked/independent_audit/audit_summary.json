@@ -1,0 +1,524 @@
+{
+  "status": "PASS_SAVED_ARRAY_INCREMENTAL_REVIEW",
+  "started_at_utc": "2026-10-08T03:29:14.167547+00:00",
+  "elapsed_seconds": 3.1694227600000886,
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "max_rss_kib": 72988
+  },
+  "scope": "Web review workspace only; not project Linux native replay; no training or raw labels/text/weights/Memory read",
+  "input_zip_sha256": "dbed856f06482e29b444ce45b5b44973083bbd28964516ae2cb5ccf5c8be3c38",
+  "audit_script_sha256": "66827dcfb63ec2055345a92006d17f38edfad66f0def6e9249d7cf4c3f2cc07e",
+  "frozen_evaluator_identical_to_LOGIT_archive": true,
+  "physical_metric_matrices": 72,
+  "matrix_numeric_values": 95040,
+  "rank_columns_equal_all_roles": true,
+  "paired_group_metadata_equal": true,
+  "statistics": {
+    "existing_21120": {
+      "numbers": 21120,
+      "maximum_absolute_error": 4.440892098500626e-16
+    },
+    "new_S_LOGIT_4224": {
+      "numbers": 4224,
+      "maximum_absolute_error": 5.551115123125783e-17
+    }
+  },
+  "original_statistics_preserved_bitwise": 21120,
+  "table_metric_rows_verified": 704,
+  "table_decision_rows_verified": 69,
+  "common_23_checks": {
+    "C-LOGIT0.1": {
+      "passed": 23,
+      "total": 23,
+      "failed": []
+    },
+    "S-LOGIT0.1": {
+      "passed": 23,
+      "total": 23,
+      "failed": []
+    },
+    "C-S": {
+      "passed": 16,
+      "total": 23,
+      "failed": [
+        "old_map_improves",
+        "old_map_interval_above_zero",
+        "old_recall5_improves",
+        "O_brier_non_degradation",
+        "O_log_loss_non_degradation",
+        "Z_average_precision_non_degradation",
+        "Z_brier_non_degradation"
+      ]
+    }
+  },
+  "original_five_checks": {
+    "C-LOGIT0.1": {
+      "checks": {
+        "A2_MAP_lower_ge_minus_point01": true,
+        "O_AP_lower_ge_minus_point01": true,
+        "O_MAP_lower_positive": true,
+        "Z_MAP_lower_ge_minus_point01": true,
+        "final_all_MAP_mean_positive": true
+      },
+      "pass": true
+    },
+    "C-S": {
+      "checks": {
+        "A2_MAP_lower_ge_minus_point01": true,
+        "O_AP_lower_ge_minus_point01": true,
+        "O_MAP_lower_positive": false,
+        "Z_MAP_lower_ge_minus_point01": true,
+        "final_all_MAP_mean_positive": true
+      },
+      "pass": false
+    }
+  },
+  "original_development_criteria_pass": false,
+  "overfitting_diagnosis": "NOT_ASSESSABLE_FROM_SAVED_ARTIFACTS",
+  "opened_log_metadata_files": 15,
+  "read_identities": {
+    "result/job/completion.json": {
+      "bytes": 720,
+      "sha256": "76d26c96e9c8309925208c7f470258ea43c0026bf118f7a21b8c621c9719c319"
+    },
+    "result/job/evaluation/evaluation.json": {
+      "bytes": 883504,
+      "sha256": "1f46b85c195945391e812201dd0e8cda2134579424cc0df1c3098580e058bd2c"
+    },
+    "result/job/evaluation/collected.json": {
+      "bytes": 19162,
+      "sha256": "d880f087af4dc1c0bd10068eec9e4e80d81ea4d87658d693ec7b627f89ddf980"
+    },
+    "result/source/schema/step28_record_replay_policy.json": {
+      "bytes": 1680,
+      "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f"
+    },
+    "reference/collected.json": {
+      "bytes": 13759,
+      "sha256": "e01708603a799dd8c4a53b7f5a86b7a5fc35936f00e7c78902650ca6137ad452"
+    },
+    "reference/reference/collected.json": {
+      "bytes": 22474,
+      "sha256": "ffb6e7fd7d1437a9d3940848452c24d5a0560b2388f5913b2ffa5ed14f07926a"
+    },
+    "result/source/scripts/step28_bge_continual_evaluate.py": {
+      "bytes": 13765,
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+    },
+    "history/implementation_review_input.zip": {
+      "bytes": 1278500,
+      "sha256": "a4903d4a6a310729012b958a172424c5e1d218564be9ed1bd05c80f5436849e1"
+    },
+    "result/job/evaluation/ABC_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "66d440cdcf132ef6e5ea4bcb58cc8e406106fdc3ce213f1ccce8f1082243d532"
+    },
+    "result/job/evaluation/ABC_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "4be7b6016d417fca06c893e85d5eb760abefc1b6b137be180e5358222f94e914"
+    },
+    "result/job/evaluation/ABC_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "4be7b6016d417fca06c893e85d5eb760abefc1b6b137be180e5358222f94e914"
+    },
+    "result/job/evaluation/ABC_C_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "c52d640b37ac44a0e646a5d3ae1b2bbac1068e4251fb71d684663e85b4b96916"
+    },
+    "result/job/evaluation/ABC_C_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "801cd4cf58cc202fa627ac657b561e9868e2c5280d2895fa4da03378cb319280"
+    },
+    "result/job/evaluation/ABC_C_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "5681eb8df5ab2f48c9f0b080bb10b2342504daa42d592a09a2bdbe8058bed168"
+    },
+    "result/job/evaluation/ABC_C_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "7138ac464e0c2a89d7a16fef65a5844705eb1c86503a3a50bc6ede8ec7086a51"
+    },
+    "result/job/evaluation/ABC_C_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "1ec84b499b12b96df9df7382452f59e39fa615c5a227815523f7684f6c534dea"
+    },
+    "result/job/evaluation/ABC_C_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "7f209aa89539ae6a95323d760f987c0c321daafc88c7cd12c8b097b8f936b200"
+    },
+    "result/job/evaluation/BCA_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "4a2431a2482d9f728d4febf9cb1a5b444f007352b685c44ed14c3f9ac0661e76"
+    },
+    "result/job/evaluation/BCA_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "098b59d07a4bf90d4ae465b2e5cb8a2672bc151dcdaf6d634a7f5ecdcc1658e0"
+    },
+    "result/job/evaluation/BCA_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "098b59d07a4bf90d4ae465b2e5cb8a2672bc151dcdaf6d634a7f5ecdcc1658e0"
+    },
+    "result/job/evaluation/BCA_C_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "7c2ab9014b319816b7513fc0fe26034154bd6a517017fe463db92a8cb4257ff2"
+    },
+    "result/job/evaluation/BCA_C_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "0a17f1c9ece0aa1d815beef84875a6986d5c532bdef47a0bb486afbd82c73d88"
+    },
+    "result/job/evaluation/BCA_C_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "e96c2bb03470c5d5929d467e917c631ffae34c2eca9d6a092d7c5121d07e9784"
+    },
+    "result/job/evaluation/BCA_C_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "822b0d616a06bd29d9c248cb06c72cfb1f023721328357cd7057d78e194e8869"
+    },
+    "result/job/evaluation/BCA_C_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "79456486a6d666ffcf2b3b047f565e9e89423e460ec17bb62432bba6cc32fc52"
+    },
+    "result/job/evaluation/BCA_C_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "f5f8feeaf47bb47486ab02c698342c2f713b5297b69e4d6903d21dc7ed7f8855"
+    },
+    "result/job/evaluation/CAB_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "9ff9cc0abc2d265740e9c8d162e96ccb1d2030ec3b01dfe54c687bcb118f1dc0"
+    },
+    "result/job/evaluation/CAB_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "e8a61f5080038ecbf4f30607f55ed30d5cb5352fbef181df90f3ae5f444c3ab7"
+    },
+    "result/job/evaluation/CAB_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "e8a61f5080038ecbf4f30607f55ed30d5cb5352fbef181df90f3ae5f444c3ab7"
+    },
+    "result/job/evaluation/CAB_C_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "39b3bc1ad0fd14ff422729fe3732d11a92e3a0ea1bc48590494e4ead916d8ae8"
+    },
+    "result/job/evaluation/CAB_C_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "47d829de1a0bb3f22e44e1e2d739252f1f823fdb707ca43f578130155aca41b6"
+    },
+    "result/job/evaluation/CAB_C_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "d7ea857f45ba5d10f9cb6a5f267cdb0e58f12bd8d591956e548c56c1ecbdb53c"
+    },
+    "result/job/evaluation/CAB_C_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "2a5fd463e0b3ea7b2bfd03f4a164f8ff9e314e430f933810440c711a3ff6d311"
+    },
+    "result/job/evaluation/CAB_C_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c06e97dadf9c768047431cde221ece3c5c73f064f3ae8c88a719b73b2190bf78"
+    },
+    "result/job/evaluation/CAB_C_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "ba663d9a125d86c0a1902e1a4cdc70b9dda52e04951769630243eae5e53d9b2f"
+    },
+    "result/job/evaluation/ABC_S_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "779cea05b830f0bf96b4655a1c2ed836b9c4cb2492af9e9796307cbdd52657b6"
+    },
+    "result/job/evaluation/ABC_S_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "650b57ce89803ee14ba90f0f123f4c9393a0b47ac278fcbd52da894f8f00f3d0"
+    },
+    "result/job/evaluation/ABC_S_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c3f5701ba380655a21db9e314969ae2daf16499d3657952759d9a51ca2141383"
+    },
+    "result/job/evaluation/ABC_S_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "16c065f3334835f8977acc9709043c77651b3b7116664624f2df63834fbe4470"
+    },
+    "result/job/evaluation/ABC_S_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "d20ff9d9f114e6262340400d783bbf61bf7b17c260f4b74be563e4efc71e7f25"
+    },
+    "result/job/evaluation/ABC_S_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "2f99d26f44fc74866a2948c2770fbee970f3ddc80d7ee2fdfb8412cc11653a1a"
+    },
+    "result/job/evaluation/BCA_S_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "9e7a782061fd7495b5d48939e8c34ac7c850adc55104968dcf710c431905130d"
+    },
+    "result/job/evaluation/BCA_S_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c7c1120d673096c9ed3c242beb1e46462a47ed3a71ff1d95d6edda91ae2b93ee"
+    },
+    "result/job/evaluation/BCA_S_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "b498e986e12726b48e9ab31c7c755f0fa3c050322089ebeb93ef58fa7ea1e344"
+    },
+    "result/job/evaluation/BCA_S_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "0920e08d296ad0edadc49f67930a81fe9d181802ebae7a9ec4e5d7b54f93ec87"
+    },
+    "result/job/evaluation/BCA_S_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "3f07bab58a4942b3b591bb42a3bbcc941b57098efd5668bd8ae9618bb7afbd99"
+    },
+    "result/job/evaluation/BCA_S_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "4ad12a9aa05905879e5e7694e4c4586f7dfcb0cc3a0755cdf565b92589c166f4"
+    },
+    "result/job/evaluation/CAB_S_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "8acbdd18e2b3ab7138e4687f6ac531436df5758397a102eaa7fa9511d7a73149"
+    },
+    "result/job/evaluation/CAB_S_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "4b8edd424785dbe899b283e54faab774c4254b443babceff6f2ad1387e023721"
+    },
+    "result/job/evaluation/CAB_S_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "1bb18d3142d2e0392485ab8c8e764213fc1885860e72a86806f0fadee0dea500"
+    },
+    "result/job/evaluation/CAB_S_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "bc159741f166f64b3b0cbb1b679622fc63589adfe12fe9a19f305f423519f295"
+    },
+    "result/job/evaluation/CAB_S_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "a07f313681b3194d580ed1f47fbf51e17175a282f15942253ca796591730faff"
+    },
+    "result/job/evaluation/CAB_S_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "62866e555afd3218037a0ce23ca38844cedec55e556d08f7c6b9ff420cbdd90a"
+    },
+    "reference/reference/ABC_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "69123ec3e10de7f8676689ede9768b214ddc5795cb9b676c07f6262b5cf461c3"
+    },
+    "reference/reference/ABC_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    "reference/reference/ABC_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c161fa532f4334082cef51b80c7883d0feac4994f986b0d771df48a4829b7aad"
+    },
+    "reference/ABC_logit_tenth_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "7d4f800d64036f9f56466db6a15697a00bf808014111d4e41a20fd176110e5e9"
+    },
+    "reference/ABC_logit_tenth_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "a6a379f576057e9d0b46f44215dd0c1bfabc2c0b6a8268f743697d5c39631366"
+    },
+    "reference/ABC_logit_tenth_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "ea6c8434357d36c66498432af6c6b3485a777afc29c94a1eb92cca57eb33b553"
+    },
+    "reference/ABC_logit_tenth_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "19cd9922882d516fa2c48771c6495184bf4ff6e1e9b95c4cb5e1a08306c14641"
+    },
+    "reference/ABC_logit_tenth_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "912600ab85baec07d2450d7e835c8169cb26b68ba54b2a8460a1d6f347f5bc6f"
+    },
+    "reference/ABC_logit_tenth_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "a865401e14281d4cd3a90435bab6d5049cfe0a49bb4871c8fe2ff268f3d15db0"
+    },
+    "reference/reference/BCA_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "f74db1c0203f225f3803bd9fedb6781e724f243533930db6fa5f3275ce5e84b0"
+    },
+    "reference/reference/BCA_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    "reference/reference/BCA_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "c00ee31a65c8e56190bfa76c6a0bad920f441a90e5a375d9a044156b4170f228"
+    },
+    "reference/BCA_logit_tenth_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "576d44ba90c73f43f03a011c0eb3f2e49ac77e7e6ad7208ef0b46b21ccdca952"
+    },
+    "reference/BCA_logit_tenth_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "a706f8c32eb71ad6aa48e4e769f7927abffc41d4f0311b9de39ccafedac1c883"
+    },
+    "reference/BCA_logit_tenth_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "d1e8bfeec285e523ed60f71be691ba0d2c5abda2b16a2048b2c0d3d067be514c"
+    },
+    "reference/BCA_logit_tenth_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "119e2713b16518d38fb66c95f1afb146310bb3911ae62ee8dfe52a1c9c8d4057"
+    },
+    "reference/BCA_logit_tenth_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "4e9a84eccfd706d4e25c3273958c6a5738cd9e995e289c128917f6e884792380"
+    },
+    "reference/BCA_logit_tenth_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "ed45761eea534d18aab6045d16f578d3ba7184080e16b204b5e87124b146a1ee"
+    },
+    "reference/reference/CAB_shared_raw.npy": {
+      "bytes": 10688,
+      "sha256": "f22c8709885849b3bfa096c88b9b5f5e274dcf618d2a79815a1d54e72e761495"
+    },
+    "reference/reference/CAB_shared_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    "reference/reference/CAB_shared_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "8d09e118be8fa3d1d179862a3e62482a4f33002fc4d560fa48152308846ccb94"
+    },
+    "reference/CAB_logit_tenth_stage2_raw.npy": {
+      "bytes": 10688,
+      "sha256": "77a225bec6bc5f5bb06e9e2609feb509c5cbcf179f15a5edd1f3cace239c4cf4"
+    },
+    "reference/CAB_logit_tenth_stage2_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "d9fb7c97e997dbab920d4965c848725a734241dd017016bf5f0a7585c82d4095"
+    },
+    "reference/CAB_logit_tenth_stage2_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "dc58c7c628c3944eafe53f6cb46b7509f3d7ce98beb6d54a95c66d1dd17733d2"
+    },
+    "reference/CAB_logit_tenth_stage3_raw.npy": {
+      "bytes": 10688,
+      "sha256": "8209ad06df174c966d204d65940965945424fd5cbd755f2d578f5374e976445d"
+    },
+    "reference/CAB_logit_tenth_stage3_stage-cal.npy": {
+      "bytes": 10688,
+      "sha256": "f3ee78c675d5ce1309ffe60f735ae1f684b956b56cefcb4225ce5e4aa20b96bb"
+    },
+    "reference/CAB_logit_tenth_stage3_first-cal.npy": {
+      "bytes": 10688,
+      "sha256": "226e02f407f9a81f1528440a2ecd68759e3368adcb13897723cd9588e1f5a4e0"
+    },
+    "result/job/run/updates/ABC_C_stage2.json": {
+      "bytes": 190597,
+      "sha256": "8e6799a190974db747ba950935ec9c938ed54f3be5a0879d3e299b42a3d625a2"
+    },
+    "result/job/run/points/ABC_C_stage2.json": {
+      "bytes": 3358,
+      "sha256": "e1ce70b74dccd05e007f4e9743936869506850d6cd9023738bf0b61214d23761"
+    },
+    "result/job/run/updates/ABC_C_stage3.json": {
+      "bytes": 190395,
+      "sha256": "d9f48c45f0476f3a8e28b427840d0715b837569269b87c54a995dd2db7ddf175"
+    },
+    "result/job/run/points/ABC_C_stage3.json": {
+      "bytes": 3171,
+      "sha256": "fd8353a5abb12ce83d6ea3c4a9e85996f065dc015065717850fd5f6ddbbe6771"
+    },
+    "result/job/run/updates/ABC_S_stage2.json": {
+      "bytes": 190618,
+      "sha256": "3710a69fe1c04ae5fdeab291edc33bab0b3431d7f493f8b5dc3a2f76dfdd34e1"
+    },
+    "result/job/run/points/ABC_S_stage2.json": {
+      "bytes": 3358,
+      "sha256": "fd2aa2d11a31ecc2f2b5d5930faf99153f0d500b4f0538e27948f72151541fb2"
+    },
+    "result/job/run/updates/ABC_S_stage3.json": {
+      "bytes": 190530,
+      "sha256": "2f5fe88807a6858b607c10e7d381a3ea0eee4426dcd34766008646fceade3319"
+    },
+    "result/job/run/points/ABC_S_stage3.json": {
+      "bytes": 3172,
+      "sha256": "a87fece1bba2a40c61b7adcaa13d72dc62a2a822fb33b54eb045bce8f95505de"
+    },
+    "result/job/run/updates/ABC_shared.json": {
+      "bytes": 110532,
+      "sha256": "8c6a990c563667b8d30517b7a15c68707d4746f762a07fb12e11de3bb664d589"
+    },
+    "result/job/run/points/ABC_shared.json": {
+      "bytes": 3413,
+      "sha256": "550a60b5c1c601e0f730341f8c6a03e7b5472ba70b39c9d5a96af466488e6dce"
+    },
+    "result/job/run/updates/BCA_C_stage2.json": {
+      "bytes": 190621,
+      "sha256": "d7397e81204c27d7ac2320056ae47398f1b111d2f66c6055d725db1a281fcd08"
+    },
+    "result/job/run/points/BCA_C_stage2.json": {
+      "bytes": 3499,
+      "sha256": "fed5e174ba1e3bbaf572698a33d6e3a7c021ade45bff74452c0595fa93750f46"
+    },
+    "result/job/run/updates/BCA_C_stage3.json": {
+      "bytes": 190507,
+      "sha256": "6a88027b0f3ccd5347ce6eb4e31ab72aceb541fb8b75d5a8db93c4366893b465"
+    },
+    "result/job/run/points/BCA_C_stage3.json": {
+      "bytes": 3172,
+      "sha256": "361c7286d5bafaae90e3c82fb038a8d838c93fe5d295dae8f762100fabb987fa"
+    },
+    "result/job/run/updates/BCA_S_stage2.json": {
+      "bytes": 190650,
+      "sha256": "0c4331100f9b5e73ab3085ec08727cab1230f2f9fd5c60ecdd1ec090b9f9514f"
+    },
+    "result/job/run/points/BCA_S_stage2.json": {
+      "bytes": 3499,
+      "sha256": "5160d7ed1eedc04e004a90b190b3a38b2bb89a178f7786a20c60a595ddcb1667"
+    },
+    "result/job/run/updates/BCA_S_stage3.json": {
+      "bytes": 190533,
+      "sha256": "c87265124d7518cf347b32c1ebe0f6b19f61399ccaab51e966ecb4e9e78de798"
+    },
+    "result/job/run/points/BCA_S_stage3.json": {
+      "bytes": 3172,
+      "sha256": "2e51b61aad77be6debb1c51f30c6f2a31593c47898bef9b7c1ee8e1406c7af30"
+    },
+    "result/job/run/updates/BCA_shared.json": {
+      "bytes": 110528,
+      "sha256": "4b520687ae48db3a37ed660a77a7ecdc35c10aec9da71db90ce4fdc71822e49c"
+    },
+    "result/job/run/points/BCA_shared.json": {
+      "bytes": 3413,
+      "sha256": "d33b42b7384fcb4f594961640a469fdbcdee4c7b1ee9fcb590249a0e1d42c32a"
+    },
+    "result/job/run/updates/CAB_C_stage2.json": {
+      "bytes": 190477,
+      "sha256": "cddf299799718c8fd564d4ad00b15759021a64d8919eb51dfa227db0edac93ea"
+    },
+    "result/job/run/points/CAB_C_stage2.json": {
+      "bytes": 3637,
+      "sha256": "811d4e3544129d10e74d63de7c6ade1de51f6085b6e55a5c4d9d1d3b1667b15f"
+    },
+    "result/job/run/updates/CAB_C_stage3.json": {
+      "bytes": 190586,
+      "sha256": "5881513ab6674e363a3f3dc894d1f4b90f011ce3bd5d01803141e7b7b2d70dc9"
+    },
+    "result/job/run/points/CAB_C_stage3.json": {
+      "bytes": 3171,
+      "sha256": "0e858e723fe2c791b0e61281b6e2c56f7855266cee6a8a76c16d158543cf2dfe"
+    },
+    "result/job/run/updates/CAB_S_stage2.json": {
+      "bytes": 190496,
+      "sha256": "e1ecbaeb0b5b185832ee8dede3722f2281aa6e1f4137f54b8b6474ba6ee02b23"
+    },
+    "result/job/run/points/CAB_S_stage2.json": {
+      "bytes": 3637,
+      "sha256": "50a4eb508b6c920457649c069b745c43a655b7be6f1004b4d28381f87a278b35"
+    },
+    "result/job/run/updates/CAB_S_stage3.json": {
+      "bytes": 190616,
+      "sha256": "ba389fb62781a6b48e26f2c7fc34cb6f0ad12a1ba0d8892473eb3a0b6280fd36"
+    },
+    "result/job/run/points/CAB_S_stage3.json": {
+      "bytes": 3171,
+      "sha256": "e707a8ff5071951e373c56343494ec3eca7892719bb11c4b1578e15ca9943b06"
+    },
+    "result/job/run/updates/CAB_shared.json": {
+      "bytes": 110469,
+      "sha256": "5155bd294778ab9f6096d52ff32044cf48115ab0917528f0f2ecdd5e06571925"
+    },
+    "result/job/run/points/CAB_shared.json": {
+      "bytes": 3411,
+      "sha256": "1c68458a59913f35da3e7b18122185c1d8acd17d7ca266f5c8c26be111c498cd"
+    }
+  }
+}

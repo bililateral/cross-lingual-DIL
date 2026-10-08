@@ -1,0 +1,20 @@
+{
+  "study": "record_replay_improvement_with_blind_epoch_diagnostics",
+  "methods": ["LOGIT0.1", "C", "S", "C_plus", "S_strong"],
+  "orders": ["ABC", "BCA", "CAB"],
+  "seed": "s0",
+  "teacher_coefficients": {"C": [0.25, 0.25], "S": [0.5, 0.0], "C_plus": [0.5, 0.25], "S_strong": [0.75, 0.0]},
+  "physical_updates": 10368,
+  "gradient_group_presentations": 19008,
+  "physical_stage_states": 36,
+  "logical_stage_points": 45,
+  "epoch_diagnostic_points": 216,
+  "history_supervision": 0.1,
+  "memory_maximum_bytes": 1048576,
+  "cpu_verification": {"maximum_seconds": 300, "maximum_rss_bytes": 2147483648, "maximum_evidence_bytes": 67108864},
+  "native_verification": {"maximum_seconds": 600, "maximum_evidence_bytes": 134217728},
+  "runtime": {"maximum_gpu_stage_seconds": 172800, "maximum_output_bytes": 68719476736, "maximum_cuda_reserved_bytes": 30064771072, "maximum_rss_bytes": 68719476736, "minimum_free_gpu_bytes": 32212254720, "minimum_free_host_bytes": 77309411328, "torch_cpu_threads": 1},
+  "supervision": {"train_parse_attempts": 1, "valid_parse_attempts": 1, "test_access": false, "owners_access": false, "automatic_retry": false},
+  "diagnostics": {"epochs": [1, 2, 3, 4, 5, 6], "current_fit_groups": 48, "surviving_cache_groups": 6, "blind_valid_groups": 60, "metrics": ["map", "recall_at_5", "log_loss"], "regroup_seed": 20261008, "valid_opening": "after_all_training_restoration_and_blind_gates", "early_stopping": false},
+  "evaluation": {"bootstrap_replicates": 5000, "bootstrap_seed": 20260930, "comparisons": [["C_plus", "S"], ["C_plus", "S_strong"], ["C_plus", "LOGIT0.1"], ["C_plus", "C"], ["C", "S"], ["C", "LOGIT0.1"], ["S", "LOGIT0.1"]], "continue_requires_all_23_against": ["S", "S_strong", "LOGIT0.1"]}
+}

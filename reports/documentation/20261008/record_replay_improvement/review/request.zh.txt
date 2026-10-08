@@ -1,0 +1,26 @@
+请当前网页GPT 6 Pro实例独立审查本次已获用户确认的“五臂记录重放改进＋所有算法共同过拟合诊断”合同和真实实现。不得委派子agent或并行审查者，不访问项目服务器，不运行正式数据/标签/模型，不启动GPU或训练。本次允许在网页工作区对手写例子/保存公开证据作最小核对，但须与项目Linux原生核验分开。
+
+先读new/implementation.zh.txt、source/docs/SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md、source/schema/step28_replay_improvement_policy.json和current/AI_RESEARCH_HANDOFF.zh.md，再追踪实际实现/直接依赖与本次CPU证据。new/proposal.zh.txt是用户确认前的建议快照，“待确认”不覆盖已经发生的授权；new/authorization.json保存具体批准范围。
+
+背景：任务是在中文合成卖家群的持续域到达中训练BGE及关联评分头，以六群Algorithm R及完整历史/附属状态≤1MiB保留历史能力。固定train每域48拟合/12校准，valid每域20；s0/ABC-BCA-CAB。旧LOGIT0.1用账号汇总；旧记录表C/S用标题/描述规范化拼接记录表示、完整offdiag记录对头、P K P^T账号分数，两臂都做原分组A0和同控记录重组A1监督。旧C为0.25D0+0.25D1，旧S为0.50D0；完整实验有效，C−LOGIT原5项5/5、C−S4/5、整体false；事后同口径23项C−LOGIT23/23、S−LOGIT23/23、C−S16/23。原C未建立相对S的主要旧域收益或实质创新。raw概率退化、群宏F1局部负向和A2/G局部正向须并列；多轮valid选择偏差保留。
+
+background/common_evaluation_input.zip是此前9,907,776字节/12外层成员包，SHA c5cba199e4c1a2ffb0aab47a476a26971a29306289ee306970488cfdc751940e；嵌套原结果包9,614,123字节/335成员、SHA dbed856f06482e29b444ce45b5b44973083bbd28964516ae2cb5ccf5c8be3c38，其中有完整内部背景、合同、冻结源码、已开放结果、旧原始外审、原生证据和删除回执。background/common_evaluation_review.zip及primary_disposition.zh.txt是该增量评价已结束的外审/主审，不能把旧包“等待”当当前未审。本次提供背景用于直接追溯，未变历史不递归全量重审。
+
+用户现明确批准五臂完整新运行：LOGIT0.1、原C、原S、C_plus＝保留0.50D0再加0.25D1、S_strong＝仅0.75D0。记录表共同监督Bbar(current)+0.1Bbar(history)，Bbar为A0/A1的BCE+query-rank+0.5known-top5-hard均值；LOGIT保持原B(current)+0.1B(history)+0.50D0。四记录表臂各顺序共享重新训练首域完整状态，LOGIT自身完整三阶段重训以补首域诊断。10368更新、19008梯度群呈现、36物理状态/45逻辑点、216物理epoch诊断点。首域shared曲线同时属于四个记录表逻辑臂，不能计成四份独立训练。S_strong只匹配系数和，不匹配实际梯度范数；调系数不是创新主张，不承诺成功。
+
+本次实质新增：
+1. 原record_replay.py仅扩展C_plus/S_strong实际目标，保留C/S旧计算分支；新step28_replay_improvement_run.py直接调用真实记录表VJP/Adam和原LOGIT首域/延续更新，统一供给、分支、完整恢复/校准、盲门与评价。请从系数到encoder/head梯度及一次Adam追踪，不只查配置存在。
+2. step28_replay_diagnostics.py在每48更新后真正被调用：A0/eval/无autograd评价48 current fit与当前存活缓存，保存同口径MAP、R5、未加权log_loss；60valid仅盲存raw分数，全部训练/恢复/来源/完整性通过后一次解析valid，统一评价216点。没有early stopping、best-epoch、逐轮校准拟合或从档案恢复淘汰群。
+3. 诊断恢复每个子模块模式、Python/NumPy/Torch CPU/CUDA随机状态；缓存只读，不改变draw流/成员/来源。CPU实际核验两个架构插入完整capture后model/grad/Adam/RNG/memory/modes以及下一次实际更新相同；原生计划只在外审关闭后执行，核查最坏形状两架构实际更新/诊断中性、资源成本。不要把尚未做的原生写成已通过。
+4. 同实际域fit−valid/缓存−old-valid；两类群相互独立抽样，跨epoch/方法共享对应抽样；以固定epoch1→6方向和全部曲线判读，不挑最佳点，不设任意0.05差距线。诊断不是无过拟合证明、总体显著性或选择偏差校正。记录表缓存固定A1残差的D0/D1、交叉均值及差异不冒称参数梯度夹角；LOGIT对应A1为N/A。
+5. 阶段末原22指标、三个保存角色＋primary、8端点、5000 PCG64实际域整群配对bootstrap、原23函数。重点比较C_plus−S/C_plus−S_strong，并完整报告C_plus−LOGIT/C_plus−C及原C/S/LOGIT对照。三主要对手同时23项全过才支持进入后续独立方法验证；不通过也结束，无第二轮。新C/S/LOGIT对历史保存群指标逐域描述差异，不重开旧标签/权重。
+
+已批准边界：Linux既有py310手写CPU累计300秒/1CPU/2GiB RSS/64MiB证据，可先于外审；原生GPU核验累计600秒/单卡/28GiB reserved/64GiB RSS/128MiB证据；正式单GPU总墙钟48小时/输出64GiB，包含诊断、校准、恢复、统计。新train/valid各一次失败计账，test/owners/Audit/private零，不自动重启或调参。原生以真实最大N224/token256手写样例测两架构更新/前向/保存，按实际全部诊断及恢复数量推算时间/磁盘；超上限须停并说明，不能为了通过资格少做诊断或擅自扩预算。完整状态仅在当前完整恢复和分支需求期间保留，36阶段末权重按当前依赖保管，不能因负结果自动删。
+
+请着重审查实际路径中的科学正确性、范围/计数、旧基线是否被悄然改义、同口径诊断是否真的中性和全盲、统计方向与配对，以及资源投影是否包括全部新增开销。复用旧正确来源的证据，不要求为了形式新建恢复系统、安全加固、额外种子/候选/新确认集或重审所有关闭路线。
+
+包内无正式原始文本/标签、权重、完整Memory、private_custody或凭据；新CPU全为手写合成测试。旧首域权重和BGE无需上传，真实模型资格仍在项目原生阶段。若发现具体缺陷，请给可复核反例、实际调用位置和最小修正；新增科学选择不是审查者可代授权。
+
+返回完整中文正文及UTF-8可下载全文、逐文件实际阅读范围（全文/节选/机器字段/未读）、实际计算脚本/输出及失败事实。区分已证实SCIENTIFIC_BLOCKER、当前REPRODUCIBILITY_DEFECT、非阻断解释/未来建议、OUT_OF_SCOPE_OVERDESIGN。只评价充分证据，不把测试数量、SHA相同或您的意见本身当科学有效性证明。由当前实例独立完成，不委派。
+
+当前包制作时尚待用户对这个具体包的上传许可；实际网页发送意味着项目端已取得该许可。此句不要求您重复询问用户，也不授权正式实验绕过原生前提。

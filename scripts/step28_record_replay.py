@@ -130,7 +130,7 @@ def account_logits(table: Any, slots: np.ndarray) -> Any:
 def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
               reference: np.ndarray | None = None) -> tuple[Any, dict]:
     import torch
-    if arm not in ("C", "S") or group.labels is None:
+    if arm not in ("C", "S", "C_plus", "S_strong") or group.labels is None:
         raise ValueError("Unknown arm or missing train labels")
     slots = [assignment(group), assignment(group, regroup_seed)]
     predicted = [account_logits(table, a) for a in slots]
@@ -144,6 +144,10 @@ def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
         mse0, mse1 = [((p-account_logits(target, a))**2).mean()
                       for p, a in zip(predicted, slots)]
         mse = (mse0+mse1)/2 if arm == "C" else mse0
+        if arm == "C_plus":
+            mse = mse0 + .5*mse1
+        elif arm == "S_strong":
+            mse = 1.5*mse0
     result = supervised if reference is None else .1*supervised + .5*mse
     return result, {"supervised": float(supervised.detach()), "mse0": float(mse0.detach()),
                     "mse1": float(mse1.detach()), "distillation": float(mse.detach()),
