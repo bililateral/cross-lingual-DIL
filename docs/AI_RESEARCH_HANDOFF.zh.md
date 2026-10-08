@@ -1,141 +1,103 @@
 # 当前科研交接
 
-**最新已批准实验（2026-10-08）**：用户明确回复“按五臂完整范围执行（推荐）”，批准LOGIT0.1、原C、原S、C_plus、S_strong，s0及ABC/BCA/CAB、10,368更新、36物理阶段状态、216逐轮诊断点，CPU累计300秒／原生GPU600秒／正式单卡48小时／输出64GiB，新train/valid各解析一次，valid在全部训练和盲门后统一开放，test/owners为0，不自动调参重跑。见[现行合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)、[policy](../schema/step28_replay_improvement_policy.json)及确认前的[原建议](../reports/documentation/20261008/record_replay_improvement/proposal.zh.txt)。五臂入口、逐轮诊断、统一23项及历史端点对照已实现；Linux最终手写CPU attempt05为7项全过，28来源与Windows逐项匹配。五轮实际墙钟合计80.86秒，保守累计86.684秒，后续从88秒接账；一次非法条数的测试样例错误已修正并留原件。完整过程见[实现与核验](../reports/documentation/20261008/record_replay_improvement/implementation.zh.txt)。独立workspace为reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace。用户已明确“授权上传此实现包到 ChatGPT 外审”。同一11,277,970字节／65成员归档（SHA256 f24e5c147561fef9…）于13:51经本地Playwright上传并发送一次，网页选择器GPT-6／Pro，13:51:26实见开始审阅附件；见[实际提交](../reports/documentation/20261008/record_replay_improvement/review/submission.json)与[外审会话](https://chatgpt.com/c/6ac72f3f-5808-83eb-b3c2-fc377c4b6dca)。现待本轮合同／实现外审及独立主审，再按已授权范围完成原生前提和训练。新正式标签、GPU核验和训练均尚未执行；原包中的制作时待许可文字不覆盖当前授权，不重问已批准五臂范围。此前23项增量外审已结束，接收结论见下方；不把结果外审当作新实现已审。
-**最新补充（2026-10-08，统一指标与23项比较；增量外审与主审已关闭）**：用户明确选择“统一指标表，并补充相同的23项判据”。Linux py310仅用已开放保存矩阵完成C−LOGIT0.1、S−LOGIT0.1、C−S三组比较，原23项分别23/23、23/23、16/23；原5项验收及整体false不改。这是事后同口径补充，不是新独立确认，也不覆盖原始概率退化、顺序差异和归因限制。见[完整补充分析与过拟合边界](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/report.zh.txt)、[统一22指标表和69项判据明细](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/calculation/tables.zh.txt)及[机器结果](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/calculation/statistics.json)。现有记录缺同口径fit/缓存/valid训练过程曲线，不能判定已排除过拟合；多轮valid选择偏差风险亦保留。未来诊断需前瞻合同，本次无新训练、标签、模型或Memory正文访问。用户已专项授权9,907,776字节增量包，11:21:23经本地Playwright上传并发送一次，网页可见GPT-6/Pro，11:22:15确认审查进行中；[实际提交与页面证据](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/review/submission.json)、[会话](https://chatgpt.com/c/6ac70c2e-2a14-83ed-adf4-74d5a27bd759)。原补充报告/包内待许可文字保留为制作时快照。本次新增外审现已完整回收，29成员包的28载荷身份匹配、页面关闭；外审与独立主审接收有限开发比较，无当前未关闭阻断。非阻断文字补充为“七条失败对应六个端点—指标组合、五种指标类型”；原冻结报告和统计不追改。见[本次独立主审](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/review/report.zh.txt)。外审自报阅读范围、数值复核与实际日志均保留，不称全背景语义全审。
+本页顶部表格是唯一的当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按本次任务进入合同、实际实现、直接依赖及原始审查；历史通过下方索引回溯，不将旧报告中的“当前／待授权／下一步”当作新指令。2026-10-08本次整理仅维护harness与提醒，状态沿用下列已保存观测，不冒称重新检查了网页或训练进度。
 
-**原实验收尾（2026-10-08，记录作用表 C/S 结果外审与主审已关闭）**：完整开发实验有效，原验收仍未通过。C−LOGIT0.1五条件5/5，C−S为4/5，唯一未过C−S旧域O MAP差的条件95%下界>0，整体development_criteria_pass=false；完整方案相对LOGIT的排序提升保留，新增teacher分配策略的额外收益、必要性及创新未建立。见[原结果分析](../reports/seller_alias_continual/20261008/record_replay_result/report.zh.txt)、[完整外审](../reports/seller_alias_continual/20261008/record_replay_result/review/external/unpacked/RECORD_REPLAY_REVIEW_PACKAGE/RECORD_REPLAY_RESULT_REVIEW.zh.txt)及[独立主审处置](../reports/seller_alias_continual/20261008/record_replay_result/review/report.zh.txt)。原分析和送审包中的待审文字保留为制作时快照。
+## 当前工作
 
-**审查结论与补充**：没有当前未关闭科学阻断或必须修复的复现缺陷。主执行者完整阅读原文、核对独立统计路径，并从保存JSON核实15项相关统计和三顺序首域端点，采纳N1—N3：raw的O/N/Z log-loss对LOGIT更差、预定校准后更好；C−S旧域群宏F1有局部负向条件区间，须与A2/G log-loss辅助正结果并列；CAB较弱获得点主导描述性遗忘差，最终同一首域仅约+.000486，BCA仍有+.002179观察遗忘。低误报召回优势未建立，单seed开发条件区间不能当作种子稳定性或总体非劣效。两臂都有A1监督，C把S的0.50D0分为0.25D0+0.25D1，C−LOGIT另混合架构/增强/首域/计算变化，归因边界不变。
-
-**实际执行与留证**：10月7日23:55:07—10月8日07:39:49正常退出0，实际7小时44分42秒、剩余0；4320更新、7776梯度群呈现、15状态及全恢复/盲门，最终train/valid各1、heldout/owners0，无failure。项目Linux保存矩阵核验21,120数值最大误差4.44e-16；外审独立核对同一统计最大误差1.33e-15，计数重算26,280数值误差0，均未从原始标签重新生成AP/MAP等。外审34成员/566,250字节包已回收，33载荷SHA匹配；其335项输入身份与原包全部一致，专用网页关闭。外审自报35全文/9节选/20字段检视/137正文未读但机器核对/134数组核对，不称全背景语义全审；未委派，后台模型身份未独立认证。两次外审脚本路径/格式适配失败原件保留，不记成项目训练失败。详见[回收](../reports/seller_alias_continual/20261008/record_replay_result/review/external/recovery.json)、[状态](../reports/seller_alias_continual/20261008/record_replay_result/review/submission.json)及[原会话](https://chatgpt.com/c/6ac6f75e-d998-83eb-920f-e0e07875b4c0)。实现R1/R2及CPU/GPU资格已关闭，原生核验不重跑。
-
-**保管与后续**：15份权重已按用户“保留对应记录后删掉，删完后提交外审”于09:43:08清理，逻辑释放19,565,561,724字节；224非权重SHA和23保留例外元数据不变，[删除回执](../reports/maintenance/20261008/record_weights/receipt.json)保留。Memory、本轮21冻结来源、完整分数/指标/计数/日志及审查原件继续保管。独立workspace为/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace；10:42:53实查未见项目训练或GPU计算作业。本轮科研收尾完成，按合同正负均结束；不自动调参、消融、多seed、新数据或重训。用户持续寻找可行方法的研究要求保留，论文算法尚未确定；下一具体方案按范围汇报。服务器、Python和旧作业入口见下方Linux段，不复活旧监听。
-
-**等待期间的已授权维护（2026-10-08）**：两端大清理、15天征求许可规则与现行进度校正已完成；Git普通提交并保留历史，不另建逐文件删除记录。大清理完成/到期日期以[存储记录](STORAGE.zh.md#项目大清理周期)为准。现行状态按实际完成与主审更新，原始observation及冻结证据保持原字节；文件同步与Git交付分别核对。
-
-## 近期历史进展
-
-以下有日期的进展条目保留相应阶段的事实与判断；旧“当前”“待授权”“下一步”只描述当时阶段，现行状态以上方最新进展、当前合同和用户后续决定为准。
-
-**最新方案审查（2026-10-07，记录作用表外审与主审关闭，不推荐）**：用户告知“外审已结束”。通过本地Playwright回收[完整外审](../reports/documentation/20261007/record_replay/external/review.zh.txt)及[逐文件阅读范围](../reports/documentation/20261007/record_replay/external/reading_scope.zh.txt)，119成员身份与原918,799字节包逐项大小SHA全部匹配，专用页已关闭。外审自报合并范围25全文／21相关节／2关键词／71正文未读，不能称完整背景全审；其自报用了3个辅助AI任务，本轮未授权委派，主执行者记录流程偏差且未自行委派，不把辅助数量当独立外审。主执行者独立读完审查正文，核对原稿、冻结生成器和实际基线梯度路径，重推关键反例并查CKD/RKD一手方法，接受“不值得推进”，撤回此前受限核验推荐：有限表重建与条件性一阶VJP成立，但新增查询对旧域未见身份的必要性及实质贡献不足；同控重组改变账号固定样式支持集，新评分的记录混合线性限制及计算代价没有足够收益依据。接受Q期望测度、双通道归一化构造两处勘误，收窄C/S归因和“独立模型点”措辞，冻结原稿不改。详见[独立主审处置](../reports/documentation/20261007/record_replay/report.zh.txt)、[回收核对](../reports/documentation/20261007/record_replay/recovery.json)、[实际状态](../reports/documentation/20261007/record_replay/submission.json)及[原会话](https://chatgpt.com/c/6ac64969-e864-83eb-8968-c9558c1b3d5c)。这是未实施方案的静态不推荐，不是实验负结果、资源失败或整类方法被否定。用户持续寻找可行候选的要求有效，论文算法尚未确定；可继续既有范围的一手文献与数学研究，下一完整方案先汇报，不自动实施或移植具体包上传许可。本轮无Linux连接、新科研代码/数值实验、新正式数据/标签/模型/完整Memory读取；原负结果、失败账、关闭路线及删除事实保留。下文候选推荐为送审时历史状态。
-
-**送审时候选记录（2026-10-07，可训练记录作用表；推荐已由上方主审撤回）**：用户再次明确“不行就继续找”。本轮形成[记录作用表与同控重组下的历史函数重放](../reports/documentation/20261007/record_replay/proposal.zh.txt)：BGE及记录对头共同训练，记录对非线性作用平均成账号对分数；每个存活完整群保存来源FP32记录作用表，从而对同控内保持条数的记录重新分配重建来源账号输出，无旧完整教师或旧新表示运输。两个手算分别展示原账号目标遗漏的变化与全记录对保持的额外约束。主执行者判断值得有停止条件的受限验证，首先审查具体方案；不是创新、资源、效果已经通过，也不是用户批准实施。已核对集合核、DER、FunMatch、PseMix及持续MIL直接近邻，明确联合设计仍可能仅属自然适配。生成器按账号固定表达样式，重组会产生分布外混合，未见身份收益无保证；完整字节约0.776MiB仅为纸面估算，记录对头/推理成本增加。建议首轮C/S同架构同增强对照及原LOGIT保存结果、4,320物理更新等均待新范围确认，不转用旧许可。当前未连接Linux、未修改科研实现、未运行科研数值实验、未读新数据/标签/模型/Memory或上传新外审；旧负结果、关闭路线和删除事实不改。下文“尚无新首选”是本次成稿之前的阶段记录。
-
-**继续筛选（2026-10-07，可训练编码器主线，尚无新首选）**：用户回复“继续”。本轮核对活跃LOGIT的实际输入、历史目标、反传与一次AdamW更新路径，并对层间近端保护、小头可微求解、输入敏感性蒸馏及压缩多层重放作一手文献和手算筛选。没有形成符合要求的新完整方案；[阶段记录](../reports/documentation/20261007/trainable_screening/report.zh.txt)保存具体阅读范围和新手算反例：一个对固定参数无偏的粗细视图差分风险，在固定缓存上反复优化可奖励增大误差，不能把无偏性当作训练可行性或泛化保证。该反例不宣称本项目已发生这种故障，也不否定整个家族。持续研究目标未完成；没有新增实现、训练、外审或数据访问许可。本轮未连接Linux、未运行科研代码/数值实验、未读取新正式数据/标签/模型/Memory，原冻结证据及被撤回方案不改。
-
-**当前方向纠正（2026-10-07，撤回固定基底候选的首选推荐）**：用户质询“不是训练模型吗？你这是在干什么？”。主执行者说明前轮实际只完成文献、数学及文档工作，未运行新训练；[群风险算子提案](../reports/documentation/20261007/operator_memory/proposal.zh.txt)拟固定首域BGE、只求解关系矩阵。尽管这仍包含参数学习，主执行者判断其大幅收缩了本项目模型持续学习与表示变化的主线，不能凭数学闭合就推荐，现撤回其首选／受限核验推荐，不继续送审或实施该稿。原提案和实际推导保留为历史，未发生外审或实验，不记为效果负结果。后续筛选回到编码器和关系模型实际继续训练、有限历史知识在表示变化中保持可用的问题，追踪历史机制怎样影响编码器／评分头梯度和参数更新；仍需实质近邻差异、资源可行性与新旧域效果动机。这是主执行者针对质询作出的纠正，不扩写成用户已批准新算法、计算、数据或上传。持续研究要求有效，当前没有新的合格候选或新训练被批准；旧实验结论、失败账和删除事实不变。
-
-**最新方案审查（2026-10-07，外审与主审已关闭，不推荐；持续研究要求有效）**：用户告知“外审已结束”。“历史风险摘要与独立残差重放”的[完整外审](../reports/documentation/20261007/residual_replay/external/review.zh.txt)及实际阅读范围已通过本地Playwright回收，114条成员身份与原806,573字节包逐项大小SHA匹配，专用网页已关闭。外审自报27全文／6部分／1关键词／2清单／78正文未读，不能称全部材料已语义审完。主执行者接受“不值得推进”，撤回此前受限核验推荐：主要系数、有限总体恒等式及活跃锚点梯度路径成立，但来源二次代理经单锚点解码后，在来源点也未必匹配完整网络的一阶历史梯度；更直接的Hessian梯度跟踪／有限总体差分估计近邻已覆盖核心结构，额外计算相对两次真实重放的价值未建立。接受锚点Dropout期望及舍入后矩阵支配关系两项精确性勘误，冻结原稿不追改；属于未实施方案的审查不推荐，不是实验负结果、资源失败或整个方法家族无效。见[独立主审处置](../reports/documentation/20261007/residual_replay/report.zh.txt)、[回收核对](../reports/documentation/20261007/residual_replay/recovery.json)、[实际状态](../reports/documentation/20261007/residual_replay/submission.json)及[原会话](https://chatgpt.com/c/6ac5fd5a-2e6c-83eb-b374-3628d1a65e26)。用户“如果还不行就继续找下一个直至可行”仍生效，论文算法尚未确定，继续一手文献和数学研究；不自动实施已关闭候选或把具体包上传许可移植到下一候选。下一完整方案先向用户汇报，再按具体双审和新合同推进。本轮未连接Linux、未读取新原始数据／标签／Memory、未执行科研代码或新数值实验，原实验结论与已删权重事实保留。
-
-**前次方案审查（2026-10-07，外审与主审已关闭，不推荐推进）**：用户告知“外审已结束”。本地Playwright已回收“同控组保持的组合重放，并对完整历史目标作精确边际化”的[完整外审](../reports/documentation/20261007/compositional_replay_review/external/review.zh.txt)及阅读范围，专用页已关闭。主执行者接受“现阶段不值得推进”，撤回此前“值得进入受限验证”的推荐：主要数学成立，但结构化组合风险／条件期望／排序计数的既有基础明确，精确积分相对同池MC32的必要性与未见身份收益未建立。方案未实施，不记作实验负结果或资源失败。原包96成员／95载荷身份一致，但遗漏当前表达生成的直接合同、policy与源码绑定，原“完整背景”表述过强；主审已补读并核对冻结来源，确认当前覆盖按账号／轴抽取，外审群级共因反例不能当作已发现事实。教师跨臂比较定义及JSON／FP32字节差额两项勘误接受；补齐三处仍不足以翻转创新与投入价值判断。详见[独立主审处置](../reports/documentation/20261007/compositional_replay_review/report.zh.txt)、[回收与来源核对](../reports/documentation/20261007/compositional_replay_review/recovery.json)、[实际状态](../reports/documentation/20261007/compositional_replay_review/submission.json)。原送审稿、外审原件和旧结果不追改；本轮无新科研代码／数值实验／数据标签读取／Linux连接。用户持续寻找合格方案的要求有效，论文算法仍未确定；允许继续原范围文献与数学研究，不自动实施MC32或申请本候选训练，后续具体新方案仍须用户与外审双审及新合同。
-
-**最新方向纠正（2026-10-07）**：用户明确“我要的不是你在logit 0.1这个基线上简单堆砌的算法，你懂我意思吗？不懂就问？”主执行者撤回完整LOGIT0.1+βR候选，停止其原设计审查并向既有网页会话发送纠正；原草案/包仅保留历史，不进入实现或训练。用户此前允许修改核心仍有效，但要求围绕有限历史信息、新群体学习和旧分布未见卖家保持形成有实质贡献的完整机制。LOGIT0.1是比较对手，不把基线加常规损失或模块组合作为创新；共同编码器/优化器等可合理复用。具体新方案仍须用户与外审双审，新计算/数据权限未授予。见[纠正原文](../reports/documentation/20261007/rank_protection/correction.zh.txt)；网页仅收尾保存已有材料，不继续为已否决候选论证准入。
-**当前研究（2026-10-07，函数目标累计关系记忆完成，结果负向）**：20261006_231800于10月6日23:19:15—10月7日02:45:15完成，exit0、12360秒，剩余0；09:45:59实查原作业进程已退出。1728新更新/3456群梯度呈现/9逻辑点/28指标计数集，完整盲门，train/valid各1、heldout/owners0，无正式失败账。171份非权重结果及23冻结来源已回传逐项大小SHA匹配；Linux保存矩阵独立核验通过（1.26秒，无载模/标签重读），本次分析脚本首次括号语法错误0.02秒的日志保留。五条件0/5，O/N/Z MAP .425195/.451009/.450481，相对LOGIT0.1差−.035606/−.016022/−.018508，区间均负；final_all MAP .433623、差−.029906。共享首域矩阵逐值相同，A2已落后且后续遗忘扩大，不能归因为起点弱。详见[完整分析](SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md)、[全指标表](../reports/seller_alias_continual/20261007/function_memory_result/tables.zh.md)和[回传清单](../reports/seller_alias_continual/20261007/function_memory_result/inventory.json)。用户随后明确“训练权重一起删掉”，九权重已于10:04:38核对后删除，逻辑释放11758264524字节，171份非权重SHA及23项保留例外元数据未变，见[回执](../reports/maintenance/20261007/function_weights/receipt.json)；Memory完整904979—925109字节。结果外审10:30回收，39成员／38载荷大小SHA一致；10:32主审核对外审与原评价9,504数值，最大差4.44e-16，另从保存counts独立确认O空预测群贡献10/120→64/120（N28/120→53/120，Z7/60→29/60）。外审及主审接收有效配置级开发负结果，无当前科学阻断或必须修复的复现缺陷，五条件仍0/5；[主审处置](../reports/seller_alias_continual/20261007/function_memory_result/review/report.zh.md)及[实际状态](../reports/seller_alias_continual/20261007/function_memory_result/review/submission.json)已保存，网页专用页关闭。本点科研收尾完成，不自动调参/重训/恢复，不建周期任务；新方案另立具体范围。当前活动源码保留，原版和旧负结果/清理事实不改。
-**当前决定（2026-10-06 19:53，修改版已关闭并清理）**：用户明确要求删除修改版代码、保留原版和记录，并删除此次训练权重。Windows活动scripts/tests/schema恢复至修改前75e2fc22：删除10个修改版文件、恢复1个共用结果核验脚本，9份原版相关来源SHA一致；Linux删除34个修改版活动／部署文件，原版保留。20261006_135937九份阶段权重已于19:53:30—19:53:31删除，实际逻辑释放11758415337字节；315项科研证据SHA不变，23项保留例外元数据不变，九份Memory留作历史记录。详见[关闭记录](../reports/maintenance/20261006/relation_revision_closure/closure.zh.md)、[逐文件回执](../reports/maintenance/20261006/relation_revision_closure/receipt.json)。冻结源码和审查包仅为历史记录，不作为活动实现。原版关系目标记忆及LOGIT0.1基线代码、原结论保留；不重训、不恢复关闭路线。修改版正常完成13808秒、2592更新／9端点／28套结果，对LOGIT0.1六条件0/6，详见[原分析](SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md)。结果外审于20:21回收，66文件／65载荷大小SHA全部匹配；外审接受有效配置级开发负结果、无当前阻断，见[回收说明](../reports/seller_alias_continual/20261006/relation_revision_result/review/recovery.zh.md)。随后已完成[独立主审处置](../reports/seller_alias_continual/20261006/relation_revision_result/review/report.zh.md)：复用原生保存矩阵核验，并比较原统计与外审独立统计8316数值、最大差4.44e-16，结果审查关闭；用户最新清理指令结束权重加载／恢复依赖，不再以等待外审作为保管条件。旧后台跟进保持停用。此前保留权重和推进修改版的文字仅是历史状态。
-
-**原版历史状态（2026-10-06，关系目标记忆已完成，固定点负结果）**：10月6日09:35:38实查正式进程已退出；运行实际于10月5日15:06:32—18:57:22完成，退出0、耗时3小时50分50秒、剩余0。2592更新／9端点／28套完整指标计数，盲门前valid0、最终train/valid各1，heldout/owners0，无失败账。165份结果／源码回传大小与SHA全部一致；Linux单CPU禁GPU的保存矩阵独立核验通过，均值／分顺序值／配对区间与原统计一致，没有重读标签或载模。见[完整分析](SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md)、[同步状态](../reports/seller_alias_continual/20261006/relation_result/sync.json)。
-
-独立workspace为`reports/seller_alias_continual/20261005/relation_memory_execution/20261005_150520/workspace`，job为其`reports/job`。旧PID3359214/3359221为历史身份，禁止重复启动。最终reserved峰值约8.725GiB、RSS约6.426GiB、产物观察峰值约14.602GiB，均低于合同上限；原12—18小时预估偏保守。九份权重已于10月6日10:39:18按授权清理，详见下段；09:35时点保管记录为历史。此前入口P1/P2/P3关闭及原生证据仍按[修复处置](../reports/documentation/20261005/relation_memory/report.zh.md)复用。
-
-**结果审查关闭、九份权重已清理（10月6日）**：10:32:49实见外审结束，46成员证据包45载荷全部匹配；[主审处置与勘误](../reports/seller_alias_continual/20261006/relation_result/review/report.zh.md)已关闭三项展示／措辞问题，无科研阻断。保留原送审报告及冻结结果。按用户“完成后及时按照科研纪律删除此次试验的训练权重并做记录”和“授权后台跟进及条件满足后的清理”，在收尾及依赖核对后于10:39:18删除独立job/run/models下九份本次权重，合计11,758,382,199字节；165份非权重证据SHA不变，23项保留例外元数据不变。见[逐文件删除回执](../reports/maintenance/20261006/relation_weights/receipt.json)。预训练、共同首域完整状态、ER0.1和两份排序例外继续保留；不改负结果，不追加训练。后台跟进将在本轮同步／Git交付完成后停用。
-
-沿用[固定合同](SELLER_ALIAS_RELATION_MEMORY_PILOT.zh.md)，对LOGIT0.1六项继续条件为0/6。O/N/Z MAP分别0.421179/0.439300/0.443666，差值-0.039621/-0.027731/-0.025323，三者条件95%区间均低于零；O/N/Z AP也有负向证据，Brier/log-loss均退化。保留CAB首域局部改善与旧域固定0.5工作点召回略升、误报增加等细节，不能写成所有单项都变差。按规则不启动匹配重放、调参或新训练；不将配置负结果升级成整个方法家族无效。用户10月6日明确“确定，一定要上传完整的上下文给网页端模型审查”。已补为272成员／5,077,487字节完整上下文包，10:04:52通过本地Playwright提交既有会话，选择器6／Pro，10:05:03实见正在回应；[提交证据](../reports/seller_alias_continual/20261006/relation_result/review/submission.json)。本轮外审及主审现已关闭，裁决接收有效配置级开发负结果；包内旧待许可／待提交／待审文字保留为制作时快照，不重问已确认许可。当前LOGIT0.1仍是强基线，原冻结输出不改。
-**最近关闭路线（2026-10-04，用户明确回退）**：完整群隔离泛化重放（group-meta）整条候选路线已关闭，标记为 **资源受限不可行**。回退范围包括原始完整二阶、GPU直接／CPU暂存、分阶段HVP和JVP路径；取消候选先导、四条件机制验证及尚未提交的JVP外审，不继续修补、试跑或正式训练。具体边界与回退核对见[关闭记录](../reports/documentation/20261004/group_meta/closure.zh.md)。历史合同、验证计划、源码快照及已发生审查／失败原件仅供回溯，旧“下一步／待授权”均不再生效。
-
-活动 `scripts/`、`tests/` 恢复到首次引入该候选之前的 `fd9ac726` 状态。当前科研起点恢复为既有基线及其结果：**LOGIT0.1保留为强基线，risk固定点的有效负结果保留，论文最终算法尚未确定**。不恢复已删除探索草稿或权重，不重跑既有实验；后续设计仍须围绕有限历史记忆下的新群体学习，以及旧分布未见卖家的候选排序和基础识别。
-
-资源结论限定为当前服务器、已批准上限与本次完整二阶实现。小型CPU手写BGE曾成功完成元更新，但更大手写GPU形状的直接、CPU暂存、分阶段及JVP路径均未通过资源准入；正式训练从未启动，算法效果未知，不能记为效果负结果或否定整个元学习家族。CPU核验累计551.47秒；后续GPU核验与尝试累计151/3600秒，失败账保留，剩余额度不继续使用。最新关闭、同步与无活动作业核对见关闭记录。
-
-LOGIT0.1／risk的结果外审和主审均已关闭，详见下方“最新结果状态”。以下运行、授权及旧“当前”文字按其日期作为历史记录阅读；本页此处的最新用户决定优先。
+| 项目 | 当前范围、已保存事实与直接入口 |
+|---|---|
+| 研究问题 | 提高记录重放C相对S的收益，并实际加入LOGIT0.1及本算法的共同过拟合诊断；检验保留原分组保护后增加重组teacher约束的效果。调系数不作为实质方法创新，论文算法尚未确定。 |
+| 现行合同与实现 | [五臂合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)、[policy](../schema/step28_replay_improvement_policy.json)；[真实目标／VJP](../scripts/step28_record_replay.py)、[正式入口](../scripts/step28_replay_improvement_run.py)、[逐轮诊断](../scripts/step28_replay_diagnostics.py)、[核验入口](../scripts/step28_replay_improvement_verify.py)。旧C/S与LOGIT合同仅按新合同明确引用的部分继承。 |
+| 已批准运行 | 用户明确“按五臂完整范围执行（推荐）”：LOGIT0.1、C、S、C_plus、S_strong，s0及ABC/BCA/CAB；10,368更新、19,008梯度群呈现、36物理阶段状态／45逻辑点、216逐轮诊断点。必要实现、同步、核验、训练和回传不按命令重问；不自动调参重跑。 |
+| 资源与访问 | 手写CPU累计≤300秒；原生GPU核验累计≤600秒；正式单卡总墙钟≤48小时、输出≤64GiB，其余资源上限见合同。新train／valid标签各解析一次，valid在全部训练、恢复与盲门后统一开放；test／owners／Audit／private为0。所有失败尝试保留并记账。 |
+| 已完成证据 | 五臂入口、共同诊断、统一22指标／原23项及历史端点比较已实现。Linux最终手写CPU attempt05七项全过，28来源与Windows匹配；五轮外层墙钟合计80.86秒、保守累计86.684秒，下次从88秒接账。一次非法条数样例错误及中间来源保留。见[实现与核验](../reports/documentation/20261008/record_replay_improvement/implementation.zh.txt)及[最终CPU原件](../reports/documentation/20261008/record_replay_improvement/cpu/attempt05/result.json)。 |
+| 部署准备 | 独立workspace及服务器见[Linux与活动文件](#linux与活动文件)。[同步回执](../reports/documentation/20261008/record_replay_improvement/sync_receipt.json)观测于10月8日13:57:17，[路径准备](../reports/documentation/20261008/record_replay_improvement/workspace_preparation.json)观测于13:58:28；28科学来源与必要输入链接已准备。此准备不等于正式数据已读取或模型已运行。 |
+| 尚未满足的前提 | 尚无本轮实现外审完整回收与独立主审关闭记录，原生GPU核验和正式训练尚未执行，新正式train／valid解析为0。必须按合同关闭实质问题并通过原生核验；时间／存储投影超预算时报告具体选择，不偷减诊断或延长。 |
+| 当前审查：五臂合同／实现 | [会话：审查重放诊断合同实现](https://chatgpt.com/c/6ac72f3f-5808-83eb-b3c2-fc377c4b6dca)。用户已专项批准11,277,970字节／65成员包（SHA256 f24e5c147561fef9…）；10月8日13:51上传、发送各一次，网页可见GPT-6／Pro。最近保存网页观测为13:51:26审阅中；见[提交与页面证据](../reports/documentation/20261008/record_replay_improvement/review/submission.json)。接手先核对同一会话，不重复上传；包内制作时“待许可”不覆盖实际许可。 |
+| 已关闭审查：统一评价增量 | [会话：增量评价审查](https://chatgpt.com/c/6ac70c2e-2a14-83ed-adf4-74d5a27bd759)，审查统一22指标、原23项补充及过拟合证据边界；13:15:29的[关闭记录](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/review/submission.json)确认外审／主审接收、页面关闭。它不代替上一行的新实现审查；具体结果见历史索引。 |
+| 科研下一步与结束条件 | 回收本轮实现审查并独立处置，补实际需要的受影响证据，在已批准范围内通过原生前提后运行五臂、统一开放结果、完成分析与结果审查。C_plus对S、S_strong、LOGIT0.1三组原23项同时全过才满足继续条件；不通过也完整报告并结束本轮。新研究问题、候选、访问、预算或判据另行确认。 |
 
 ## 研究问题与目标
 
-目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞当前已批准工作。研究前提已确认：历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。当前是中文合成受控任务，输入只含屏蔽标题／描述，无身份特征；不研究同一控制者跨阶段新开别名追踪，不转向一般作者识别或AI文本检测。
+目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞已批准工作。历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。当前是中文合成受控任务，输入只含屏蔽标题／描述，无身份特征；不研究同一控制者跨阶段新开别名追踪，不转向一般作者识别或AI文本检测。
 
-当前每群28账号，每查询27候选且有同控候选；结论不能直接外推到全市场、无正候选查询或真实中文市场。先完成本主线，再决定扩展范围。基础排序改进、已知LOGIT适配和调λ均不自动成立方法创新。
-
-最近完成的是记录作用表与同控重组C/S开发实验，结果外审及主审已关闭，接收有效结果且原整体判据false不变。LOGIT0.1为保存结果比较基线；已结束的风险、关系与函数记忆路线及其正负结论见下方历史入口。已有相对基线提升不自动证明新增机制收益或方法创新，后续新方案须按当前范围另行明确。
+每群28账号，每查询27候选且有同控候选；结论不能直接外推到全市场、无正候选查询或真实中文市场。先完成中文合成主线，再决定扩展。编码器与评分模型继续训练；LOGIT0.1作为比较对手，基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，但具体新方案仍须用户与外审双审及相应范围确认。
 
 ## 接手顺序与信息地图
 
-**最新结果状态（10月4日）**：用户要求同步两个实验结果并按科研纪律分析。LOGIT0.1于10月3日16:01:03—21:23:48完成，risk于10月3日21:23:46—10月4日02:43:55完成，正式退出均0；各1728更新、六终点、完整盲门、train/valid各一次，heldout/owners为0。10月4日10:02:41实查无项目活动训练。risk监听21:29:31确认真实更新后自删，02:43:55退出0；禁止重复启动。完整小结果及37/32份冻结来源已回传并逐项匹配，Linux保存结果独立核验均通过，权重12份仍留Linux。本轮未新增训练、标签解析或载模。
+当前执行状态只看顶部表格；本节是证据导航。按本轮实际变化确定最小核验，未变且适用的证据可复用，不因换Agent递归重读或重跑全部历史。
 
-[联合分析](SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md)：LOGIT0.1对ER0.1和LOGIT0.25均23/23，对SEQ20/23；旧域MAP有正向证据，N AP、Z MAP/AP观察保护未满足。risk对LOGIT0.1、ER0.1、SEQ、LOGIT0.25分别4/23、5/23、7/23、4/23；相对LOGIT0.1的O/N/Z MAP均有负向证据，此固定点未达目标。有效性、具体效果、原验收与创新边界分开。用户10月4日回复“可以”，专项授权9,639,622字节、729成员的联合结果包。10:50:59已通过本地Playwright上传并发送，网页可见6/Pro，本次外审现已结束且主审接受；见[实际提交](../reports/seller_alias_continual/20261004/result_review/submission.json)及[审查会话](https://chatgpt.com/c/6ac1bf0d-9950-83ea-8edd-0836a7ee7486)。打包时的“待授权”保留为历史快照，当前无需再次询问本包许可。直接证据见[LOGIT回传](../reports/seller_alias_continual/20261004/logit_low_result/inventory.json)、[risk回传](../reports/seller_alias_continual/20261004/risk_result/inventory.json)及各verification/audit。10月4日通过本地Playwright回收116成员外审证据包，115载荷逐项匹配；[外审全文](../reports/seller_alias_continual/20261004/result_review/external/unpacked/external_review.zh.txt)及[主审处置](../reports/seller_alias_continual/20261004/result_review/report.zh.md)已保存，无未关闭科学阻断或交付复现缺陷，两固定点科研收尾完成。主审从保存计数核对15行工作点及6组诊断UID，采纳误报／召回取舍、探针通常不同群和权重核验边界三项补充；主要结论及原判据不变。网页已关闭，本轮未新增训练。新增方法／系数／种子／数据另立范围；同步与Git仍须分别核验。
-
-原执行授权、监听修正及原生CPU核验继续见[固定合同](SELLER_ALIAS_RISK_PILOT.zh.md)、[接入主审](../reports/documentation/20261003/risk_pilot/report.zh.md)。LOGIT0.25六权重已于10月3日19:04:45按用户指令删除，7,838,884,668字节，179份非权重证据不变，见[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)。10月4日用户在了解具体范围和依赖后明确“那就删”；11:13:39已删除本次LOGIT0.1／risk共12份末端推理权重，15,677,742,102字节，511份非权重证据SHA不变，保留例外元数据不变。此更新取代上文10:02时点的12份保管状态；清理依据是已结束且无当前依赖，不改变实验有效性、正负结论或外审状态。共同首域完整状态、BGE预训练、ER0.1六权重和两份排序例外保留。详见[本次清理回执](../reports/maintenance/20261004/logit_risk_weights/receipt.json)及[存储记录](STORAGE.zh.md)。
-
-先读本页和[科研纪律](RESEARCH_DISCIPLINE.zh.md)，建立问题、当前授权、历史结论与未决事项的全局认识；再沿下表进入本次任务的合同、实际代码、直接依赖和原始审查。按本轮变化与证据缺口确定[最小核验及完成条件](RESEARCH_DISCIPLINE.zh.md#5-实现核验与证据复用)，证据充分即推进交付。历史结论按需回到原件，不因换Agent重读全部历史、重跑已验证工作或扩大审查范围。任何读取仍受数据与结果权限限制。
-
-| 要掌握的信息 | 原始入口与使用边界 |
+| 要掌握的信息 | 入口与使用边界 |
 |---|---|
-| 为什么研究、与已有方法重叠何处 | [研究前提和用户决定](RESEARCH_DISCUSSION.zh.md)、[文献定位及原审查](SELLER_ALIAS_LITERATURE.zh.md)；文献整理有日期，新主张需补最新相关证据 |
-| 早期真实来源、身份线索和拆分如何形成 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核与冻结](STEP5_REVIEW_AND_FREEZE.md)；属于历史来源链，不等于当前合成数据或真值读取许可 |
-| 当前数据是什么、域到底改变什么 | [9月10日生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮合同第2节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；中文合成主题混合与表达机制同时变化，不能称纯表达因果实验 |
-| 当前数学定义、运行配置和评价 | [记录作用表合同](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)、[当前policy](../schema/step28_record_replay_policy.json)及[合同索引](CURRENT_EXPERIMENT_DESIGN.md)；数据和通用评价仅继承本轮合同明确引用的首轮设置 |
-| 实现如何走到更新和结果 | [记录作用表与梯度路径](../scripts/step28_record_replay.py)、[正式编排](../scripts/step28_record_replay_run.py)、[原生核验](../scripts/step28_record_replay_verify.py)、[保存结果独立核验](../scripts/step28_record_replay_result_verify.py)；实际21来源见本轮冻结目录，根目录后继修改不能冒充运行身份 |
-| 审查真正说了什么、哪些已关闭 | 本轮[实现主审](../reports/documentation/20261007/record_replay_implementation/20261007_225409/report.zh.txt)与[原生处置](../reports/documentation/20261007/record_replay_implementation/20261007_225409/native_disposition.zh.txt)已关闭；[结果外审及主审](../reports/seller_alias_continual/20261008/record_replay_result/review/report.zh.txt)亦已关闭。旧方案原文与既有结果审查从所属主审记录回溯，不能把旧已关闭外审当成本轮结果审查 |
-| 当前到底能执行什么、实际用了多少 | 本页顶部最新范围、[本轮固定合同](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)、[实际完成账](../reports/seller_alias_continual/20261008/record_replay_result/job/completion.json)及[独立核验](../reports/seller_alias_continual/20261008/record_replay_result/verification/attempt01/result.json)；当前没有活动训练，不重启已结束作业 |
-| 已经得到哪些正负结果、什么仍未知 | 本轮[完整分析](../reports/seller_alias_continual/20261008/record_replay_result/report.zh.txt)、[全指标表](../reports/seller_alias_continual/20261008/record_replay_result/verification/attempt01/tables.zh.txt)及下方历史判读表；C对LOGIT0.1通过五条件，C对S未通过整体目标，新增机制与创新主张未建立，结果外审及主审已关闭 |
-| 文件在哪里、缺失能否恢复、接下来做什么 | [Linux与活动文件](#linux与活动文件)、[存储与删除事实](STORAGE.zh.md)、[已授权计划与新合同边界](RESEARCH_PLAN.md) |
-
-当前记录作用表C/S使用可训练的BAAI/bge-large-zh-v1.5：每条标题／描述分别L2归一化后拼接并除以√2得到2048维记录表示，记录对头为4096→128→1，再按账号分组汇总。两臂都有同控重组监督；C把S在原分组上的0.5 teacher权重分为0.25原分组＋0.25重组。旧LOGIT基线的4096维账号汇总／8192输入头属于另一架构，不能直接当成本轮实现。具体目标、VJP、更新和归因边界见当前合同。
-
-数据根为`reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data`：每域60个train群分48拟合／12校准，另20 valid／40已用基础test群。O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。精确公式、22指标、输出角色和条件区间见[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)，不从简称自行重写评价。
-
-## 已授权工作与最近保存的状态
-
-| 工作 | 最近已保存的观测 | 合同及实际状态入口 |
-|---|---|---|
-| 记录作用表 C/S | 10月8日完成4320更新、15状态及独立结果核验；C−LOGIT0.1为5/5，C−S为4/5，结果外审及主审已关闭、接收有效开发结果；15权重已按最新指令清理 | [合同](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)、[结果](../reports/seller_alias_continual/20261008/record_replay_result/report.zh.txt)、[提交状态](../reports/seller_alias_continual/20261008/record_replay_result/review/submission.json) |
-| ER λ=0.1单点 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；270份结果回传，独立核验、结果外审与主审通过。对0.25为23/23并按规则选0.1，对SEQ为10/23；本点关闭 | [合同](SELLER_ALIAS_ER_LOW.zh.md)、[完整分析](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/er_low_execution/current_status.json) |
-| 匹配LOGIT0.25 | 10月3日：正式退出0，1728更新、完整盲门及访问账符合；198份结果回传，独立核验、结果外审与主审通过。对ER0.25为23/23，对SEQ为16/23；监听已退出／自删，本点关闭 | [合同](SELLER_ALIAS_LOGIT_WEIGHT.zh.md)、[完整分析](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[状态与实际耗时](../reports/seller_alias_continual/20261002/logit_weight_execution/current_status.json) |
-
-ER0.1于10月2日12:55:35—18:16:57运行，实际5小时21分22秒，原估5—7小时；LOGIT于16:31:29—21:53:13运行，实际5小时21分44秒，原估6—8小时。两项剩余训练时间均为0，均在各自12小时／16GiB上限内。上述程序完成及来源核对证据见[最新观测](../reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/observation/20261003_095536/remote_status.json)；ER31份、LOGIT隔离目录34份科学来源匹配。下一步使用现有输出，不重复启动。
-
-两项均只新增1728更新／6终点，s0及ABC/BCA/CAB，复用首域完整model/Adam/RNG和指定历史证据；各自一次train/valid许可，valid仅在完整盲门后开放，不读test／owners。ER0.1相对0.25原23项全过才替换，否则保留0.25；完整报告对SEQ，单点好坏均结束。匹配LOGIT为L当前＋0.25 L历史＋0.5 MSE，MSE不再乘0.25；复用SEQ和ER0.25，分别报告对ER与对SEQ，不随0.1结果自动改系数。
-
-**10月2日执行历史补充**：用户明确“不用等λ=0.1，资源够了就开始”，LOGIT实际已于ER结束前启动，资源门和预算没有改变。监听在10月2日16:37:14确认真实更新后自删Linux脚本，随正式作业于21:53:13退出0；最新实查确认脚本不存在。[具体决定](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/decision.json)、[自删原记录](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。监听任务已结束，不重建。
-
-**10月3日harness调整的历史边界**：已批准范围内连续执行；未来可批准手写CPU先于外审及条件故障恢复。两项实验按冻结来源、原访问账和判据完成，没有新增λ、种子、训练、标签或成功线。结果审查和主审已关闭，既有实现／原生核验证据继续复用；不以外审未直接读取旧逐步日志或未认证后台身份另开实验、重发审查或补读受限材料。[联合审查请求](../reports/seller_alias_continual/20261003/result_review/request.zh.md)、[输入包身份](../reports/seller_alias_continual/20261003/result_review/package.json)、[专项上传许可](../reports/seller_alias_continual/20261003/result_review/upload_authorization.json)及[实际完成记录](../reports/seller_alias_continual/20261003/result_review/submission.json)均保留。网页外审使用本地Playwright MCP，专用页已关闭；此前CUA失败不计为审查。
+| 用户问题、研究前提、后续决定 | [讨论记录](RESEARCH_DISCUSSION.zh.md)、[计划](RESEARCH_PLAN.md)；辨认每项决定的对象、时点和范围。 |
+| 当前计算、真实更新及资格 | 顶部五臂合同与实际入口；[来源清单](../reports/documentation/20261008/record_replay_improvement/sources_to_sync.json)、CPU原件与实现说明。相关历史实现原审查从本轮送审背景及原C/S主审回溯，不把旧通过当作新实现已审。 |
+| 数据究竟改变什么 | [表达生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮数据合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；主题混合与表达机制同时变化，不称纯表达因果实验。 |
+| 早期来源与身份资格 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核冻结](STEP5_REVIEW_AND_FREEZE.md)；历史来源链不授予真值或当前正式数据读取许可。 |
+| 评价定义与不确定性 | 本轮合同明确继承的[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)及实际评价函数。区分AP、逐查询MAP、raw与校准，不从简称重写公式。 |
+| 方法近邻与创新边界 | [文献定位](SELLER_ALIAS_LITERATURE.zh.md)、下方方案审查原件；文献有检索时点，新主张补相关一手证据。 |
+| 已完成结果、失败与关闭路线 | [近期历史进展](#近期历史进展)、[已有结论与历史边界](#已有结论与历史边界)；读取原报告及原始审查，不用摘要代替支撑当前主张的证据。 |
+| 文件位置、删除与清理提醒 | [Linux与活动文件](#linux与活动文件)、[存储记录](STORAGE.zh.md)；保管状态与历史身份分开，恢复前核对实物。 |
 
 ## Linux与活动文件
 
-最近记录作用表独立workspace为 reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace，完整小结果归档为 reports/seller_alias_continual/20261008/record_replay_result。2026-10-08 10:42:53资源与进程核对未见项目活动训练，GPU无计算进程。下列旧作业路径仅用于追溯，不作为待启动任务。
-
-- LOGIT0.1独立workspace：`reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace`；采用自身相对入口，旧两项冻结来源不覆盖。正式job位于该workspace下`reports/job`，10月3日21:23:48已退出0；旧PID仅为历史身份，禁止重复启动。完整结果已回传，沿用既有SSH认证。
-- 现有服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，凭据不写入项目。
-- ER0.1作业：reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；活动来源留主目录，不能用本地后继代码覆盖。
-- LOGIT隔离工作区：reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace；其中reports/authorization.json是Linux实际授权文件，reports/listener存退出／自删记录，reports/job为已完成正式输出。Linux一次性监听脚本已删除；本地复现源码继续保留。历史PID只标识当时进程，不证明当前存活或身份。
-- 最近完成的记录作用表运行使用自身21份冻结来源，位于其独立workspace及本轮结果source目录；旧LOGIT34份、ER0.1原31份属于各自历史运行。通用文档维护不进入这些冻结来源，不复制大模型，不清理活动状态。
+- 服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，密码只作认证输入，不写入项目。同步用SFTP／SCP，Git仅在Windows执行。
+- 五臂独立workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_131300/workspace。28科学来源及必要输入链接的身份见顶部准备回执；正式启动前核对同作业进程／监听和资源，不另起重复作业。
+- 五臂实施报告中最近资源观测为10月8日13:14未见项目训练／GPU计算作业；它不是实时资源保证。接手只据实际新观测判断能否启动，不把旧PID当作活动进程证据。
+- 主目录的规则与交接是可维护文件；独立workspace及结果归档中的冻结源码、合同、来源身份和运行证据不得被通用文档同步覆盖。当前harness维护不改变已送审的28科学来源。
+- 旧运行路径只用于追溯：C/S为reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace，完整小结果为reports/seller_alias_continual/20261008/record_replay_result；LOGIT0.1为reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace；ER0.1为reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；LOGIT0.25为reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace。这些作业已结束，旧监听已退出／自删，不重建或重启。
 
 ## 数据、保管和未授权范围
 
-当前数据、划分、六群Algorithm R／1MiB历史及附属状态、随机性、校准、22指标和条件区间均以[首轮合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)及相应扩展合同为准。三个顺序不是三个训练种子，已开发valid不是独立确认集。
+数据根为reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data。每域60个train群分48拟合／12校准，另20 valid／40已用基础test群。历史与附属状态采用六群Algorithm R及1MiB上限，具体权限以本轮合同为准；调度器可见全表不等于学习器可见未来域，研究归档不等于可用记忆。
 
-既有120群基础test已使用，不能再次当作未开发最终留出。各既有开发运行的许可及结果开放事实按其原合同和实际记录保留，不转为新运行许可；新最终留出、多种子确认、大候选库和无正候选查询只可先提出方案，尚无本轮执行许可。Audit A/B真值、Audit B预测、owners和私有身份资产维持既定封存边界。
+记录表模型将分别L2归一化的标题／描述表示拼接并除以√2，得到2048维记录表示；记录对头4096→128→1，再按账号汇总。LOGIT账号汇总为4096维、头输入8192维。四个记录表臂的A0/A1监督与teacher系数、LOGIT目标分别见五臂合同，不把跨架构比较当作单一机制归因。
 
-当前保留（2026-10-08核对）：排序s0候选及对照两份（ranking_execution/20260927_114646/job/run下s0_hard和s0_d的models/epoch6.pt）；首轮三个共享首域完整状态（bge_continual_execution/20260930_143700/job/run/branches下ABC_shared.pt、BCA_shared.pt、CAB_shared.pt）；ER0.1六份新权重、必要状态、缓存、预训练档案及证据。LOGIT0.25六份末端权重已按用户最新指令于19:04:45删除，释放7,838,884,668字节；原小结果和历史保管清单保留，当前事实以[删除回执](../reports/maintenance/20261003/logit_quarter_weights/receipt.json)为准。路径所属日期及完整清单见[存储](STORAGE.zh.md)和[依赖／删除记录](../reports/maintenance/20261002/unused_weights/report.zh.md)。已删49份旧推理权重的事实不变，旧18份全保留措辞不再适用；保留或后续清理由实际依赖与恢复需要决定。
+O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子，开发valid不是独立确认集，既有120群基础test已使用。新最终留出、多seed确认、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
+
+保管按2026-10-08[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、ER0.1六权重、排序s0_hard与s0_d两份例外及必要科研证据继续保留。C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
+
+两端项目大清理已于10月8日完成；最近完成日期、下一到期日期和独立提醒任务统一见[清理周期](STORAGE.zh.md#项目大清理周期)。提醒仅提示到期，实际清理仍须先说明理由、范围、空间收益及保留依赖并征得许可。局部清理不重置周期，普通删除提交不等于改写Git历史。
+
+## 近期历史进展
+
+以下均为已结束阶段或历史决定，按所属日期解释。详细过程、原始审查、计数、来源及删除记录留在所引原件中；本表不授予新运行权限。
+
+| 阶段 | 已发生事实、结论边界与证据 |
+|---|---|
+| 2026-10-08：统一评价增量 | 仅读已开放保存矩阵，C−LOGIT0.1、S−LOGIT0.1、C−S原23项分别23/23、23/23、16/23；原5项与整体false不改。这是事后同口径开发补充。旧三算法缺同口径过程曲线，过拟合直接证据不足，多轮valid选择偏差保留。七条失败对应六个端点—指标组合、五种指标类型。外审29成员包完整回收，外审与主审接收有限比较、页面关闭；审查会话与状态见顶部。见[分析](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/report.zh.txt)、[完整表](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/calculation/tables.zh.txt)、[主审及外审原件入口](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/review/report.zh.txt)。 |
+| 2026-10-08：记录作用表C/S完整实验 | 10月7日23:55:07—10月8日07:39:49正常退出0，7小时44分42秒，4320更新／7776梯度群呈现／15状态，完整恢复与盲门，train／valid各1、heldout／owners0、无failure。有效开发实验；原C−LOGIT五条件5/5、C−S4/5，整体false。C−S O MAP差−0.000138641479，条件95%区间跨零，新增teacher分配收益与创新未建立。见[完整分析](../reports/seller_alias_continual/20261008/record_replay_result/report.zh.txt)、[指标表](../reports/seller_alias_continual/20261008/record_replay_result/verification/attempt01/tables.zh.txt)、[完成账](../reports/seller_alias_continual/20261008/record_replay_result/job/completion.json)。 |
+| C/S审查与保管 | [实现主审](../reports/documentation/20261007/record_replay_implementation/20261007_225409/report.zh.txt)、[原生处置](../reports/documentation/20261007/record_replay_implementation/20261007_225409/native_disposition.zh.txt)及[结果主审](../reports/seller_alias_continual/20261008/record_replay_result/review/report.zh.txt)均已关闭；[完整结果外审](../reports/seller_alias_continual/20261008/record_replay_result/review/external/unpacked/RECORD_REPLAY_REVIEW_PACKAGE/RECORD_REPLAY_RESULT_REVIEW.zh.txt)接收有效结果，无该轮未关闭阻断。raw O/N/Z log-loss对LOGIT退化、校准后更好；C−S群宏F1局部负向与A2/G log-loss辅助正向并列；CAB弱获得点主导遗忘差，不能把低遗忘直接当最终旧域更强。15权重09:43:08按许可清理，释放19,565,561,724字节，224非权重SHA及23保留例外元数据不变，见[回执](../reports/maintenance/20261008/record_weights/receipt.json)。Memory、21冻结来源与完整科研证据保留。 |
+| 2026-10-07：记录作用表方案审查 | 静态方案外审／主审不推荐，有限表重建和条件一阶VJP成立，但重组对未见身份的必要性、表达样式混合及额外成本收益依据不足；Q期望测度与双通道归一化勘误保留。用户随后另行批准完整C/S实验，因此旧“不实施”不阻断后来的已批准运行。见[静态主审](../reports/documentation/20261007/record_replay/report.zh.txt)、[外审原文](../reports/documentation/20261007/record_replay/external/review.zh.txt)、[实际阅读范围](../reports/documentation/20261007/record_replay/external/reading_scope.zh.txt)。外审自报使用3辅助任务的流程偏差保留，不把辅助数量当独立证据。 |
+| 2026-10-07：候选筛选与方向纠正 | 群风险算子拟固定首域BGE、只求关系矩阵，主执行者在用户质询后撤回推荐；未实施，不是性能负结果。后续回到编码器／评分头实际继续学习。固定缓存上的粗细视图差分风险反例说明无偏性不保证训练可行或泛化，不能称项目已发生该故障。见[算子原稿](../reports/documentation/20261007/operator_memory/proposal.zh.txt)、[后续筛选](../reports/documentation/20261007/trainable_screening/report.zh.txt)。 |
+| 2026-10-07：历史风险摘要／残差重放 | 方案外审／主审不推荐；来源二次代理由单锚点解码未必在来源点匹配网络一阶梯度，直接近邻及额外计算价值未建立。两项数学／舍入勘误保留；未实施，不是实验负结果或整类方法无效。见[主审](../reports/documentation/20261007/residual_replay/report.zh.txt)、[外审原文](../reports/documentation/20261007/residual_replay/external/review.zh.txt)。 |
+| 2026-10-07：组合重放 | 方案外审／主审撤回推荐；主要数学成立，精确积分相对同池MC32的必要性、创新与未见身份收益未建立。原96成员包遗漏生成直接来源的背景覆盖问题、后续补核及两项勘误保留；外审群级共因反例不当作已发现的生成器事实。未实施。见[主审](../reports/documentation/20261007/compositional_replay_review/report.zh.txt)、[外审原文](../reports/documentation/20261007/compositional_replay_review/external/review.zh.txt)。 |
+| 2026-10-07：不接受简单基线堆砌 | 用户否决完整LOGIT0.1+βR作为创新方案，相关候选撤回且停止审查。允许改核心不等于允许任意新运行；共同模型与优化器可合理复用，实质贡献仍须证明。见[纠正原文](../reports/documentation/20261007/rank_protection/correction.zh.txt)、[完整用户研究要求](../reports/documentation/20261007/compositional_replay_review/user_brief.zh.txt)。 |
+| 2026-10-07：函数目标累计关系记忆 | 10月6日23:19:15—10月7日02:45:15完成，1728新更新，完整盲门，train／valid各1；五条件0/5，O/N/Z MAP相对LOGIT差−.035606／−.016022／−.018508，区间均负。共享首域相同，不能归因为起点弱。外审／主审接收配置级有效负结果；九权重按许可删除，活动源码和证据保留。见[结果](SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md)、[主审](../reports/seller_alias_continual/20261007/function_memory_result/review/report.zh.md)、[删除](../reports/maintenance/20261007/function_weights/receipt.json)。 |
+| 2026-10-06：关系目标记忆修改版 | 完成2592更新／9端点，对LOGIT六条件0/6。用户决定保留原版、删除修改版活动代码与九权重；冻结来源、九份Memory及315项科研证据保留。主审接受有效配置级负结果；旧后台跟进已停用。见[结果](SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md)、[主审](../reports/seller_alias_continual/20261006/relation_revision_result/review/report.zh.md)、[关闭与清理](../reports/maintenance/20261006/relation_revision_closure/closure.zh.md)。 |
+| 2026-10-06：关系目标记忆原版 | 实际10月5日15:06:32—18:57:22完成，3小时50分50秒、2592更新／9端点；六条件0/6，O/N/Z MAP对LOGIT均有负向条件区间，保留CAB首域局部改善及召回／误报取舍。原入口问题与核验已关闭，结果外审／主审接收有效负结果，九权重按依赖与许可清理。见[结果](SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md)、[接入处置](../reports/documentation/20261005/relation_memory/report.zh.md)、[结果主审](../reports/seller_alias_continual/20261006/relation_result/review/report.zh.md)、[删除](../reports/maintenance/20261006/relation_weights/receipt.json)。 |
+| 2026-10-04：完整群隔离泛化重放关闭 | 用户明确回退整条group-meta候选路线，包括完整二阶、GPU直接／CPU暂存、分阶段HVP及JVP，取消先导、机制验证与未提交审查，不继续使用剩余预算。当前服务器与批准上限下资源受限；正式训练未启动，效果未知，不否定整个元学习家族。CPU551.47秒及GPU151/3600秒尝试账保留。见[关闭与原始证据](../reports/documentation/20261004/group_meta/closure.zh.md)。 |
+| 2026-10-04：LOGIT0.1与risk | 各1728更新／六终点，正式退出0、完整盲门与访问账；LOGIT0.1对ER0.1／LOGIT0.25为23/23、对SEQ20/23，risk对LOGIT0.1为4/23且O/N/Z MAP负向。联合外审／主审已关闭，保留误报／召回取舍、探针不同群及权重核验边界。12权重于10月4日按许可清理，不再据旧清单加载。见[联合结果](SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md)、[结果主审](../reports/seller_alias_continual/20261004/result_review/report.zh.md)、[删除](../reports/maintenance/20261004/logit_risk_weights/receipt.json)。 |
+| 2026-10-02至03：ER0.1与匹配LOGIT0.25 | 两项各1728更新，实际5小时21分22秒／5小时21分44秒，完整盲门与访问账，结果外审／主审已关闭。用户允许资源足够时LOGIT不等ER结束；旧监听已退出／自删。ER对0.25为23/23、对SEQ10/23；LOGIT对匹配ER为23/23、对SEQ16/23。ER六权重保留，LOGIT六权重已清理。见[ER结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[联合审查状态](../reports/seller_alias_continual/20261003/result_review/submission.json)、[旧监听回执](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。 |
 
 ## 已有结论与历史边界
 
-| 实验／证据 | 应保留的判读 |
+| 更早实验／证据 | 应保留的判读 |
 |---|---|
-| 中文BGE基础与加权汇总 | 候选排序收益与严格自动识别失败分别保留；加权汇总改进失败，不把旧严格识别门变成全部研究的门槛。[基础结果](SELLER_ALIAS_CHINESE_RESULT.zh.md)、[汇总结果](SELLER_ALIAS_POOLING_RESULT.zh.md) |
-| 困难排序C／校准／基础test | 原排序9/13，排序正增益与概率退化并存；校准17/17；固定s0 test原8/9，用户事后接受实际提升，原passed=false不改。[排序](SELLER_ALIAS_RANKING_RESULT.zh.md)、[校准](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[test](SELLER_ALIAS_TEST_RESULT.zh.md) |
-| BGE首轮持续学习 | SEQ遗忘门通过；ER1−SEQ 4/23；LOGIT1−ER1 23/23，但相对SEQ旧域R5、新域和最终最新域仍有退化。有效的相对正结果不等于整体成功。[结果与审查](SELLER_ALIAS_BGE_RESULT.zh.md) |
-| ER0.5／0.25 | 两者对ER1均23/23、对SEQ均4/23，按原规则选0.25；原结果有效、对SEQ的不足保留。[结果](SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md) |
-| ER0.1（结果外审／主审已关闭） | 对0.25为23/23，对SEQ为10/23；O MAP和首域遗忘有正向证据，N MAP/R5有负向证据。从0.1到0时O MAP下降，不能宣称λ越小全面越好或0最优。[结果与审查](SELLER_ALIAS_ER_LOW_RESULT.zh.md) |
-| 匹配LOGIT0.25（结果外审／主审已关闭） | 对匹配ER为23/23，对SEQ为16/23；相对SEQ的O MAP/R5、首域遗忘和final_all MAP正向，新域若干观察值保护未满足，跨零不等于无退化；不换ER0.1作主要对手。[结果与审查](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md) |
-| 更早的有效正／零／负与无效运行 | [历史分类与原报告](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)逐项区分Step7—28；不能把小样本、旧输入或内部开发的局部正结果外推到当前任务 |
+| 中文BGE基础与加权汇总 | 候选排序收益与严格自动识别失败分别保留；加权汇总改进失败，不把旧严格识别门变成全部研究的门槛。[基础结果](SELLER_ALIAS_CHINESE_RESULT.zh.md)、[汇总结果](SELLER_ALIAS_POOLING_RESULT.zh.md)。 |
+| 困难排序C／校准／基础test | 原排序9/13，排序正增益与概率退化并存；校准17/17；固定s0 test原8/9，用户事后接受实际提升，原passed=false不改。[排序](SELLER_ALIAS_RANKING_RESULT.zh.md)、[校准](SELLER_ALIAS_CALIBRATION_RESULT.zh.md)、[test](SELLER_ALIAS_TEST_RESULT.zh.md)。 |
+| BGE首轮持续学习 | SEQ遗忘门通过；ER1−SEQ 4/23；LOGIT1−ER1 23/23，但相对SEQ旧域R5、新域与最终最新域仍有退化。有效相对正结果不等于整体成功。[结果与审查](SELLER_ALIAS_BGE_RESULT.zh.md)。 |
+| ER0.5／0.25 | 两者对ER1均23/23、对SEQ均4/23，按原规则选0.25；有效结果与对SEQ不足均保留。[结果](SELLER_ALIAS_ER_WEIGHT_RESULT.zh.md)。 |
+| ER0.1、LOGIT0.25的外推限制 | ER0.1的O MAP／首域遗忘正向与N MAP/R5负向并列，不称λ越小全面越好或0最优。LOGIT0.25对SEQ的新域观察保护未全满足，跨零不证明无退化，不换ER0.1作其主要对手。完整结果见上表。 |
+| 更早正／零／负与无效运行 | [历史分类与原报告](RESEARCH_DISCUSSION.zh.md#早期结果及后续限制)逐项区分Step7—28；不能将小样本、旧输入或内部开发局部正结果外推到当前任务。 |
 
-特别保留：Step27-v1工程无效，而v1.1已实际完成并未通过OOF门；Step28-v12的固定合成家族内正结果不同于Step28-v13 v1.12；V9.3-R2为AUDITOR_DESIGN_INVALID_NO_DATASET_CONCLUSION，不能称有效数据集失败；v12.1应用弃权及Audit A未开真值的盲预测不是准确率负结果。
+特别保留：Step27-v1工程无效，v1.1实际完成但未过OOF门；Step28-v12固定合成家族内正结果不同于Step28-v13 v1.12；V9.3-R2为AUDITOR_DESIGN_INVALID_NO_DATASET_CONCLUSION，不能称有效数据集失败；v12.1应用弃权及Audit A未开真值的盲预测不是准确率负结果。
 
-Step28-v13 v1.3—v1.12、V8、V9、V9.1、V9.2、V9.3-R2关闭路线不重启。合格V9.4.1投影、训练／开发V2及Audit A盲预测的有效身份保留。旧风格迁移25世界主端点失败及停止边界不变，1世界辅助正结果不替代它。[迁移结果](STYLE_TRANSFER_TARGET_RESULT_20260906.zh.md)。旧LaBSE持续学习的有效负结果、后继数据的独立身份见[阶段汇总](RESEARCH_PROGRESS_20260923.zh.md)。
+Step28-v13 v1.3—v1.12、V8、V9、V9.1、V9.2、V9.3-R2关闭路线不重启。合格V9.4.1投影、训练／开发V2及Audit A盲预测的有效身份保留。旧风格迁移25世界主端点失败与停止边界不变，1世界辅助正结果不替代它，见[迁移结果](STYLE_TRANSFER_TARGET_RESULT_20260906.zh.md)。旧LaBSE持续学习的有效负结果与后继数据的独立身份见[阶段汇总](RESEARCH_PROGRESS_20260923.zh.md)。
 
 ## 历史与证据
 
-历史只在与当前问题相关时读取，不作为现行授权。首选上述实际结果／合同和[用户原话](RESEARCH_DISCUSSION.zh.md)中的原始审查链接。按用户明确要求，不保留重构前八份文档的额外副本，临时归档及清单已删除；现行文档原位维护，已有Git历史和原始科研报告继续提供回溯。
+历史仅在与任务相关时读取，不作为现行授权。优先按上表进入实际合同、结果和所属主审，再读直接相关的外审原文与实现证据。详细用户决定见[讨论记录](RESEARCH_DISCUSSION.zh.md)，保管与删除事实见[存储](STORAGE.zh.md)。不称全部背景已经语义全审，不以文件数、哈希或外审自述代替主执行者判断。
 
-也可直接阅读已交付提交eecee09f的[原交接](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/AI_RESEARCH_HANDOFF.zh.md)、[原进展](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/PROJECT_PROGRESS.md)、[原设计](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/CURRENT_EXPERIMENT_DESIGN.md)、[原计划](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/RESEARCH_PLAN.md)。这些是固定历史版本，旧“当前／下一步／待批准”不生效。
+本页精简前的详细接手流水可通过已交付提交9bf7ed58的[交接原文](https://github.com/bililateral/cross-lingual-DIL/blob/9bf7ed58dd8e7f3bad58d6ac1420a4d89f02f07b/docs/AI_RESEARCH_HANDOFF.zh.md)回溯。更早重构前的[原交接](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/AI_RESEARCH_HANDOFF.zh.md)、[原进展](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/PROJECT_PROGRESS.md)、[原设计](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/CURRENT_EXPERIMENT_DESIGN.md)、[原计划](https://github.com/bililateral/cross-lingual-DIL/blob/eecee09f4d5c25f88d054cab359ba6fb97dcb8fa/docs/RESEARCH_PLAN.md)继续可追溯。这些是固定历史版本；原合同、报告、审查及运行证据保持原字节，不另存重构前文档副本。
 
-常设规则见[科研纪律](RESEARCH_DISCIPLINE.zh.md)，当前合同索引见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，随后工作见[计划](RESEARCH_PLAN.md)，文件位置和删除历史见[存储](STORAGE.zh.md)。今后更新当前状态只改本页相关位置与所属status，不向其他入口追加复制段落。
+当前状态只原位更新顶部表格与所属实际status；通用规则见[科研纪律](RESEARCH_DISCIPLINE.zh.md)，合同索引见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)，后续动作见[计划](RESEARCH_PLAN.md)。新进展不再向历史索引或其他入口追加第二份“当前”。
