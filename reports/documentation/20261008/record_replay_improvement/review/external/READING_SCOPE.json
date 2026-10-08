@@ -1,0 +1,4880 @@
+{
+  "scope_definition": {
+    "全文": "全文内容实际核阅，仍不等于执行其代码。",
+    "节选": "仅列明行段、函数或差异/关键词；不宣称全文。",
+    "机器字段": "结构化目标字段、数组计算、字节比较或容器元数据；不宣称逐文语义阅读。",
+    "未读": "未作本次内容核阅；至多目录/容器身份或外层统一哈希检查。"
+  },
+  "note": "该台账是当前实例本次工作范围。所有历史层均列件，但未读历史不递归重审。没有项目服务器、正式输入/标签/模型、GPU 或 subagent。",
+  "containers": [
+    {
+      "id": "P0",
+      "description": "用户本次上传包",
+      "local_path": "/workspace/scratch/fa11b6ce03cf/upload/review_input(8).zip",
+      "bytes": 11277970,
+      "sha256": "f24e5c147561fef9a37cc05842c0843207c95c859b1f076fb47d10f2033fedb7",
+      "members": 65
+    },
+    {
+      "id": "P1",
+      "description": "此前增量评价输入包",
+      "local_path": "/workspace/scratch/fa11b6ce03cf/review_current/background/common_evaluation_input.zip",
+      "bytes": 9907776,
+      "sha256": "c5cba199e4c1a2ffb0aab47a476a26971a29306289ee306970488cfdc751940e",
+      "members": 12
+    },
+    {
+      "id": "P2",
+      "description": "此前原结果包",
+      "local_path": "/workspace/scratch/fa11b6ce03cf/review_background/common/background/original_result_input.zip",
+      "bytes": 9614123,
+      "sha256": "dbed856f06482e29b444ce45b5b44973083bbd28964516ae2cb5ccf5c8be3c38",
+      "members": 335
+    },
+    {
+      "id": "P3",
+      "description": "已结束增量外审包",
+      "local_path": "/workspace/scratch/fa11b6ce03cf/review_current/background/common_evaluation_review.zip",
+      "bytes": 1050751,
+      "sha256": "9339a530380e391bec0c04d9b5cf6c721df44f8c2802d8a18604563bcf3b489b",
+      "members": 29
+    },
+    {
+      "id": "P4",
+      "description": "仅为追溯 LOGIT 来源而列出成员的旧实现包",
+      "local_path": "/workspace/scratch/fa11b6ce03cf/review_background/original/history/implementation_review_input.zip",
+      "bytes": 1278500,
+      "sha256": "a4903d4a6a310729012b958a172424c5e1d218564be9ed1bd05c80f5436849e1",
+      "members": 159
+    }
+  ],
+  "counts": {
+    "P0": {
+      "机器字段": 11,
+      "全文": 33,
+      "未读": 10,
+      "节选": 11
+    },
+    "P1": {
+      "未读": 11,
+      "机器字段": 1
+    },
+    "P2": {
+      "未读": 218,
+      "机器字段": 112,
+      "节选": 2,
+      "全文": 3
+    },
+    "P3": {
+      "节选": 1,
+      "未读": 28
+    },
+    "P4": {
+      "未读": 155,
+      "节选": 3,
+      "全文": 1
+    }
+  },
+  "files": [
+    {
+      "container": "P0",
+      "path": "background/common_evaluation_input.zip",
+      "bytes": 9907776,
+      "reading": "机器字段",
+      "scope": "核对压缩包字节数、SHA256、中央目录并解包；内部成员阅读范围分别见 P1/P3。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "background/common_evaluation_review.zip",
+      "bytes": 1050751,
+      "reading": "机器字段",
+      "scope": "核对压缩包字节数、SHA256、中央目录并解包；内部成员阅读范围分别见 P1/P3。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "background/primary_disposition.zh.txt",
+      "bytes": 2853,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/AGENTS.md",
+      "bytes": 3918,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 48342,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/CURRENT_EXPERIMENT_DESIGN.md",
+      "bytes": 2670,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 22952,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/RESEARCH_DISCUSSION.zh.md",
+      "bytes": 131381,
+      "reading": "节选",
+      "scope": "757–775 行及相关关键词定位；仅本次五臂/诊断最新决定，未递归重审历史讨论。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "current/RESEARCH_PLAN.md",
+      "bytes": 4327,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt01.console.txt",
+      "bytes": 1497,
+      "reading": "全文",
+      "scope": "attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt01/failed_test_source.py",
+      "bytes": 12509,
+      "reading": "节选",
+      "scope": "133–161 行；首轮失效手写群及训练入口测试附近，追溯每账号仅一条记录造成的 Group.validate 错误。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt01/result.json",
+      "bytes": 4542,
+      "reading": "机器字段",
+      "scope": "状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt01/unittest.txt",
+      "bytes": 2094,
+      "reading": "全文",
+      "scope": "完整阅读测试名称、通过/失败与错误栈。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02.console.txt",
+      "bytes": 3650,
+      "reading": "机器字段",
+      "scope": "attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02/result.json",
+      "bytes": 4196,
+      "reading": "机器字段",
+      "scope": "状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02/source/schema/step28_replay_improvement_policy.json",
+      "bytes": 1731,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02/source/scripts/step28_replay_improvement_run.py",
+      "bytes": 31260,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02/source/scripts/step28_replay_improvement_verify.py",
+      "bytes": 12507,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt02/unittest.txt",
+      "bytes": 810,
+      "reading": "全文",
+      "scope": "完整阅读测试名称、通过/失败与错误栈。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt03.console.txt",
+      "bytes": 3657,
+      "reading": "机器字段",
+      "scope": "attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt03/result.json",
+      "bytes": 4197,
+      "reading": "机器字段",
+      "scope": "状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt03/source/scripts/step28_replay_improvement_run.py",
+      "bytes": 35345,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt03/source/scripts/step28_replay_improvement_verify.py",
+      "bytes": 12600,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt03/unittest.txt",
+      "bytes": 939,
+      "reading": "全文",
+      "scope": "完整阅读测试名称、通过/失败与错误栈。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt04.console.txt",
+      "bytes": 3656,
+      "reading": "机器字段",
+      "scope": "attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt04/result.json",
+      "bytes": 4197,
+      "reading": "机器字段",
+      "scope": "状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt04/source/scripts/step28_replay_improvement_run.py",
+      "bytes": 35443,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt04/source/scripts/step28_replay_improvement_verify.py",
+      "bytes": 12880,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt04/unittest.txt",
+      "bytes": 939,
+      "reading": "全文",
+      "scope": "完整阅读测试名称、通过/失败与错误栈。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt05.console.txt",
+      "bytes": 3659,
+      "reading": "全文",
+      "scope": "attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt05/result.json",
+      "bytes": 4196,
+      "reading": "机器字段",
+      "scope": "状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "evidence/cpu/attempt05/unittest.txt",
+      "bytes": 939,
+      "reading": "全文",
+      "scope": "完整阅读测试名称、通过/失败与错误栈。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "new/authorization.json",
+      "bytes": 1031,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "new/implementation.zh.txt",
+      "bytes": 6662,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "new/proposal.zh.txt",
+      "bytes": 15477,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "package_manifest.json",
+      "bytes": 11045,
+      "reading": "机器字段",
+      "scope": "完整解析 64 条 path/bytes/sha256 并核对所有外层载荷；不等同 64 件语义全文审查。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P0",
+      "path": "request.zh.txt",
+      "bytes": 6920,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/docs/SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md",
+      "bytes": 6147,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "reading": "全文",
+      "scope": "完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "reading": "全文",
+      "scope": "完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "reading": "全文",
+      "scope": "完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/schema/step28_record_replay_policy.json",
+      "bytes": 1680,
+      "reading": "全文",
+      "scope": "完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/schema/step28_replay_improvement_policy.json",
+      "bytes": 1905,
+      "reading": "全文",
+      "scope": "逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/run_step28_replay_improvement_linux_20261008.sh",
+      "bytes": 695,
+      "reading": "全文",
+      "scope": "完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "reading": "节选",
+      "scope": "1–155 行；数组、save/RNG、parse_once 与旧训练入口。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "reading": "节选",
+      "scope": "1–232、678–700 行；合同、分组、模型加载、通道池化、目标/分数及固定群计数。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "reading": "节选",
+      "scope": "1–130 行；实际公开输入、标签入口。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "reading": "节选",
+      "scope": "1–102、210–250 行；群指标、分类/排名指标实际定义。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "reading": "节选",
+      "scope": "1–76 行；持久化空间预留/删除辅助；不将其旧 Budget 当作新运行 Budget。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "reading": "节选",
+      "scope": "1–74、157–210 行；模型/Adam 建立与 archive、完整状态保存恢复。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_er_weight.py",
+      "bytes": 17560,
+      "reading": "节选",
+      "scope": "1–155、218–295 行；实际 update 及相关保存/监督；与旧 LOGIT 冻结来源做函数 AST/差异核对。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_record_replay_run.py",
+      "bytes": 33257,
+      "reading": "节选",
+      "scope": "1–245、398–486 行；Budget、旧训练/检查点、read_roles、fields/统计；fields 414–426 原函数另由 AST 提取执行。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_record_replay_verify.py",
+      "bytes": 11390,
+      "reading": "节选",
+      "scope": "1–75 行；preflight 与被复用的原生前提。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_record_replay.py",
+      "bytes": 15340,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_replay_diagnostics.py",
+      "bytes": 10878,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_replay_improvement_run.py",
+      "bytes": 36009,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_replay_improvement_verify.py",
+      "bytes": 12953,
+      "reading": "全文",
+      "scope": "阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/scripts/step28_risk_study.py",
+      "bytes": 4037,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/tests/test_step28_record_replay.py",
+      "bytes": 15307,
+      "reading": "全文",
+      "scope": "完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P0",
+      "path": "source/tests/test_step28_replay_improvement.py",
+      "bytes": 13786,
+      "reading": "全文",
+      "scope": "完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。",
+      "identity_check": "外层登记载荷大小/SHA 已核验"
+    },
+    {
+      "container": "P1",
+      "path": "request.zh.txt",
+      "bytes": 4272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "supplement/report.zh.txt",
+      "bytes": 13046,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "supplement/step28_record_replay_compare.py",
+      "bytes": 13969,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "supplement/statistics.json",
+      "bytes": 1624019,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "supplement/tables.zh.txt",
+      "bytes": 138517,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "supplement/calculation.log",
+      "bytes": 3884,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "background/original_result_input.zip",
+      "bytes": 9614123,
+      "reading": "机器字段",
+      "scope": "核对 9,614,123 字节、335 成员及指定 SHA256；内部逐件范围见 P2。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "background/previous_external_review.zh.txt",
+      "bytes": 38641,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "background/previous_primary_disposition.zh.txt",
+      "bytes": 8533,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "current/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 45971,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "current/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 22952,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P1",
+      "path": "package_manifest.json",
+      "bytes": 2910,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "background/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md",
+      "bytes": 16239,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "docs/AGENTS.md",
+      "bytes": 3918,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "docs/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 44464,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "docs/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 22351,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "docs/RESEARCH_DISCUSSION.zh.md",
+      "bytes": 122621,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "docs/STORAGE.zh.md",
+      "bytes": 27660,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "history/implementation_review_input.zip",
+      "bytes": 1278500,
+      "reading": "机器字段",
+      "scope": "读取 159 成员中央目录；仅抽取旧 LOGIT 冻结来源和清单，不解读其他历史路线；逐件见 P4。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "maintenance/predelete.json",
+      "bytes": 53726,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "maintenance/receipt.json",
+      "bytes": 59895,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt01.console.txt",
+      "bytes": 2022,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt01.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt01/result.json",
+      "bytes": 3557,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt01/unittest.txt",
+      "bytes": 1001,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt02.console.txt",
+      "bytes": 1507,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt02.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt02/result.json",
+      "bytes": 3241,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt02/unittest.txt",
+      "bytes": 1024,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt03.console.txt",
+      "bytes": 1508,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt03.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt03/result.json",
+      "bytes": 3241,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/cpu/attempt03/unittest.txt",
+      "bytes": 1141,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/execution_source_inventory.json",
+      "bytes": 3547,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/external/reading_scope.zh.txt",
+      "bytes": 74482,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/external/recovery.json",
+      "bytes": 897,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/external/review.zh.txt",
+      "bytes": 45721,
+      "reading": "节选",
+      "scope": "246–355 行及相关关键词；旧资源门槛 R1/R2 与估计边界，未重审已关闭路线。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/gpu/attempt01.console.txt",
+      "bytes": 375,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/gpu/attempt01.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/gpu/attempt01/result.json",
+      "bytes": 4758,
+      "reading": "机器字段",
+      "scope": "旧原生状态、时间/资源/资格相关目标字段；不挪作本次原生测量。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/native_disposition.zh.txt",
+      "bytes": 2422,
+      "reading": "全文",
+      "scope": "复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/native_gate.json",
+      "bytes": 4524,
+      "reading": "机器字段",
+      "scope": "旧原生状态、时间/资源/资格相关目标字段；不挪作本次原生测量。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/report.zh.txt",
+      "bytes": 7259,
+      "reading": "全文",
+      "scope": "复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "qualification/tests/test_step28_record_replay.py",
+      "bytes": 15307,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/ABC_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/BCA_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/CAB_logit_tenth_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/access.json",
+      "bytes": 45,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/before_valid.json",
+      "bytes": 238,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/collected.json",
+      "bytes": 13759,
+      "reading": "机器字段",
+      "scope": "由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/completion.json",
+      "bytes": 576,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/ABC_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/BCA_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/CAB_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "reference/reference/collected.json",
+      "bytes": 22474,
+      "reading": "机器字段",
+      "scope": "由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/analysis/step28_record_replay_result_verify.py",
+      "bytes": 19573,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/custody/predelete.json",
+      "bytes": 53726,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/execution_gate.json",
+      "bytes": 5298,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/inventory.json",
+      "bytes": 41989,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job.console.txt",
+      "bytes": 106133,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job.wrapper.txt",
+      "bytes": 64,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/access.json",
+      "bytes": 45,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/before_valid.json",
+      "bytes": 235,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/completion.json",
+      "bytes": 720,
+      "reading": "机器字段",
+      "scope": "status/access/budget，特别 budget.elapsed_seconds；不把旧完成状态解释为新运行完成。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_C_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_S_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/ABC_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_C_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_S_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/BCA_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_C_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage2_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_S_stage3_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_first-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_first-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_raw.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_stage-cal.npy",
+      "bytes": 10688,
+      "reading": "机器字段",
+      "scope": "已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/CAB_shared_stage-cal_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/collected.json",
+      "bytes": 19162,
+      "reading": "机器字段",
+      "scope": "由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/evaluation.json",
+      "bytes": 883504,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/initial_raw.npy",
+      "bytes": 10688,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/evaluation/initial_raw_counts.json",
+      "bytes": 1982,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/execution.json",
+      "bytes": 3238,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/resource.json",
+      "bytes": 408,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/manifest.json",
+      "bytes": 150657,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/ABC_C_stage2.json",
+      "bytes": 2458,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/ABC_C_stage3.json",
+      "bytes": 2453,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/ABC_S_stage2.json",
+      "bytes": 2457,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/ABC_S_stage3.json",
+      "bytes": 2453,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/ABC_shared.json",
+      "bytes": 2044,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/BCA_C_stage2.json",
+      "bytes": 2468,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/BCA_C_stage3.json",
+      "bytes": 2725,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/BCA_S_stage2.json",
+      "bytes": 2590,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/BCA_S_stage3.json",
+      "bytes": 2717,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/BCA_shared.json",
+      "bytes": 2597,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/CAB_C_stage2.json",
+      "bytes": 2588,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/CAB_C_stage3.json",
+      "bytes": 2732,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/CAB_S_stage2.json",
+      "bytes": 2584,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/CAB_S_stage3.json",
+      "bytes": 2720,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/maps/CAB_shared.json",
+      "bytes": 2727,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/partition.json",
+      "bytes": 14922,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/ABC_C_stage2.json",
+      "bytes": 3358,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/ABC_C_stage3.json",
+      "bytes": 3171,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/ABC_S_stage2.json",
+      "bytes": 3358,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/ABC_S_stage3.json",
+      "bytes": 3172,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/ABC_shared.json",
+      "bytes": 3413,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/BCA_C_stage2.json",
+      "bytes": 3499,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/BCA_C_stage3.json",
+      "bytes": 3172,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/BCA_S_stage2.json",
+      "bytes": 3499,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/BCA_S_stage3.json",
+      "bytes": 3172,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/BCA_shared.json",
+      "bytes": 3413,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/CAB_C_stage2.json",
+      "bytes": 3637,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/CAB_C_stage3.json",
+      "bytes": 3171,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/CAB_S_stage2.json",
+      "bytes": 3637,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/CAB_S_stage3.json",
+      "bytes": 3171,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/points/CAB_shared.json",
+      "bytes": 3411,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/progress.json",
+      "bytes": 150626,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_C_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_S_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_shared_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_shared_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_shared_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/ABC_shared_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_C_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_S_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_shared_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_shared_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_shared_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/BCA_shared_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_C_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage2_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage2_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage2_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage2_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage3_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage3_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage3_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_S_stage3_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_shared_calibration.npy",
+      "bytes": 18272,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_shared_first-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_shared_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/CAB_shared_stage-cal.npy",
+      "bytes": 181568,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/scores/initial_raw.npy",
+      "bytes": 90848,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/startup.json",
+      "bytes": 5196,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/ABC_C_stage2.json",
+      "bytes": 190597,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/ABC_C_stage3.json",
+      "bytes": 190395,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/ABC_S_stage2.json",
+      "bytes": 190618,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/ABC_S_stage3.json",
+      "bytes": 190530,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/ABC_shared.json",
+      "bytes": 110532,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/BCA_C_stage2.json",
+      "bytes": 190621,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/BCA_C_stage3.json",
+      "bytes": 190507,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/BCA_S_stage2.json",
+      "bytes": 190650,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/BCA_S_stage3.json",
+      "bytes": 190533,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/BCA_shared.json",
+      "bytes": 110528,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/CAB_C_stage2.json",
+      "bytes": 190477,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/CAB_C_stage3.json",
+      "bytes": 190586,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/CAB_S_stage2.json",
+      "bytes": 190496,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/CAB_S_stage3.json",
+      "bytes": 190616,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/job/run/updates/CAB_shared.json",
+      "bytes": 110469,
+      "reading": "机器字段",
+      "scope": "仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/report.zh.txt",
+      "bytes": 11614,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md",
+      "bytes": 8397,
+      "reading": "全文",
+      "scope": "复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/schema/step28_record_replay_policy.json",
+      "bytes": 1680,
+      "reading": "机器字段",
+      "scope": "读取旧参考采集入口及本次继承的策略字段；另与当前配置做字节比较。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/run_step28_record_replay_linux_20261007.sh",
+      "bytes": 689,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_record_replay.py",
+      "bytes": 15198,
+      "reading": "节选",
+      "scope": "与当前文件做差异比对，重点 objective 的原 C/S 分支和 VJP/Adam 调用；当前全文见 P0，未另行重审所有未变历史代码。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_record_replay_run.py",
+      "bytes": 33257,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/scripts/step28_record_replay_verify.py",
+      "bytes": 11390,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/source/tests/test_step28_record_replay.py",
+      "bytes": 15307,
+      "reading": "机器字段",
+      "scope": "与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/verification/attempt01.console.txt",
+      "bytes": 582,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/verification/attempt01.wrapper.txt",
+      "bytes": 64,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/verification/attempt01/result.json",
+      "bytes": 30772,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "result/verification/attempt01/tables.zh.txt",
+      "bytes": 102154,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "review/context.zh.txt",
+      "bytes": 8099,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "review/request.zh.txt",
+      "bytes": 2924,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P2",
+      "path": "package_manifest.json",
+      "bytes": 99358,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "INCREMENTAL_EVALUATION_REVIEW.zh.txt",
+      "bytes": 31733,
+      "reading": "节选",
+      "scope": "1–28、51–76、165–224 行及相关关键词；确认增量评价已关闭、旧结论与原始指标口径，不递归复做所有旧审查。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "MANIFEST.json",
+      "bytes": 4452,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "READING_SCOPE.json",
+      "bytes": 218941,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "READING_SCOPE.zh.txt",
+      "bytes": 163541,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "README.zh.txt",
+      "bytes": 3208,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "audit_saved_arrays.py",
+      "bytes": 20127,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "delivery_validation.json",
+      "bytes": 696,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/independent_attempt01.execution.json",
+      "bytes": 834,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/independent_attempt01.stderr.txt",
+      "bytes": 0,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/independent_attempt01.stdout.txt",
+      "bytes": 2067,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/supplied_script_attempt01.execution.json",
+      "bytes": 823,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/supplied_script_attempt01.stderr.txt",
+      "bytes": 0,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "execution/supplied_script_attempt01.stdout.txt",
+      "bytes": 3874,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "history_member_inventory.json",
+      "bytes": 16080,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "history_selected_identities.json",
+      "bytes": 1278,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "independent_audit/all_69_checks.csv",
+      "bytes": 12662,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "independent_audit/audit_summary.json",
+      "bytes": 20620,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "independent_audit/independent_statistics.json",
+      "bytes": 1483334,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "independent_audit/independent_statistics.tsv",
+      "bytes": 708507,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "independent_audit/overfitting_saved_evidence.json",
+      "bytes": 14238,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "input/supplement/calculation.log",
+      "bytes": 3884,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "input/supplement/statistics.json",
+      "bytes": 1624019,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "input/supplement/step28_record_replay_compare.py",
+      "bytes": 13969,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "input/supplement/tables.zh.txt",
+      "bytes": 138517,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "old_identity.json",
+      "bytes": 66099,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "outer_identity.json",
+      "bytes": 2202,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "record_execution.py",
+      "bytes": 1899,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "supplied_replay/statistics.json",
+      "bytes": 1624009,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P3",
+      "path": "supplied_replay/tables.zh.txt",
+      "bytes": 138517,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/closed_evidence/function_memory_evaluation.json",
+      "bytes": 413172,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/closed_evidence/function_memory_full_tables.zh.md",
+      "bytes": 15444,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/closed_evidence/function_memory_verification.json",
+      "bytes": 36789,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/closed_evidence/group_meta_closure.zh.md",
+      "bytes": 3798,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/context.zh.txt",
+      "bytes": 9617,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/AGENTS.md",
+      "bytes": 3918,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 39553,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/proposal.zh.txt",
+      "bytes": 31578,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 22351,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/RESEARCH_DISCUSSION.zh.md",
+      "bytes": 113324,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/current/user_brief.zh.txt",
+      "bytes": 19054,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/docs/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md",
+      "bytes": 11390,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/schema/step28_function_memory_policy.json",
+      "bytes": 3029,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/run_step28_function_memory_linux_20261006.sh",
+      "bytes": 977,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_function_memory_run.py",
+      "bytes": 32894,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_function_memory_verify.py",
+      "bytes": 13281,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_function_memory.py",
+      "bytes": 19056,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/scripts/step28_relation_memory.py",
+      "bytes": 19586,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/tests/test_step28_function_memory_run.py",
+      "bytes": 9721,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/function_memory_source/tests/test_step28_function_memory.py",
+      "bytes": 11324,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "bytes": 32430,
+      "reading": "节选",
+      "scope": "17–135 行，含 104–125 行校准约定；核对旧 BGE 与校准/评价继承。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/docs/SELLER_ALIAS_ER_LOW.zh.md",
+      "bytes": 6234,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/docs/SELLER_ALIAS_ER_WEIGHT.zh.md",
+      "bytes": 9233,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_LOW.zh.md",
+      "bytes": 5736,
+      "reading": "全文",
+      "scope": "核对旧 LOGIT0.1 正式含义和已固定系数。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md",
+      "bytes": 6265,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/reports/documentation/20261001/er_weight/decision.json",
+      "bytes": 1746,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/reports/documentation/20261002/er_low/decision.json",
+      "bytes": 1604,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/reports/documentation/20261002/logit_weight/decision.json",
+      "bytes": 1851,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/reports/documentation/20261003/logit_low/decision.json",
+      "bytes": 811,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_er_low_policy.json",
+      "bytes": 5029,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_er_weight_policy.json",
+      "bytes": 3732,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_logit_low_policy.json",
+      "bytes": 6675,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/schema/step28_logit_weight_policy.json",
+      "bytes": 5059,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/run_step28_bge_continual_linux_20260930.sh",
+      "bytes": 1243,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/run_step28_er_check_linux_20261001.sh",
+      "bytes": 1171,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/run_step28_er_weight_linux_20261001.sh",
+      "bytes": 1456,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_bge_continual_check.py",
+      "bytes": 12126,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_er_weight_check.py",
+      "bytes": 15314,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_er_weight_evaluate.py",
+      "bytes": 12346,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_er_weight_run.py",
+      "bytes": 36251,
+      "reading": "节选",
+      "scope": "43–166 行；旧 LOGIT 种子、更新和检查点入口。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/scripts/step28_er_weight.py",
+      "bytes": 16922,
+      "reading": "节选",
+      "scope": "实际 update 函数及与当前 er_weight 全文件差异；另机器比较 update AST 相等。整文件字节不相等，不能宣称整件完全未改。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/tests/test_step28_bge_continual_contracts.py",
+      "bytes": 31625,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/frozen/logit_low_source/tests/test_step28_er_weight_contracts.py",
+      "bytes": 49920,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/recovery.json",
+      "bytes": 3653,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md",
+      "bytes": 16817,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md",
+      "bytes": 3283,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/source_identity.json",
+      "bytes": 3653,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/step28_continual_expression_catalog.json",
+      "bytes": 10777,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/step28_continual_expression_data.py",
+      "bytes": 18179,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/generation/step28_continual_expression_policy.json",
+      "bytes": 2935,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/context.zh.txt",
+      "bytes": 6403,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/external.zh.txt",
+      "bytes": 61188,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/literature.zh.txt",
+      "bytes": 4963,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/main_disposition.zh.txt",
+      "bytes": 14325,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/proposal.zh.txt",
+      "bytes": 22145,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/reading_scope.zh.txt",
+      "bytes": 4974,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/compositional/submission.json",
+      "bytes": 2875,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/operator/proposal.zh.txt",
+      "bytes": 30547,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/rank_protection/correction.zh.txt",
+      "bytes": 1554,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/residual/external.zh.txt",
+      "bytes": 41076,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/residual/main_disposition.zh.txt",
+      "bytes": 13165,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/residual/proposal.zh.txt",
+      "bytes": 24747,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/residual/reading_scope.zh.txt",
+      "bytes": 51529,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/residual/recovery.json",
+      "bytes": 2249,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/history/trainable_screening/report.zh.txt",
+      "bytes": 11258,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/manifest.json",
+      "bytes": 46739,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/function_memory/external_review.zh.txt",
+      "bytes": 43908,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/function_memory/main_review.zh.md",
+      "bytes": 4174,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/logit_risk/external_review.zh.txt",
+      "bytes": 37596,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/logit_risk/main_review.zh.md",
+      "bytes": 6170,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/relation_memory/external_review.zh.md",
+      "bytes": 48306,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/relation_memory/main_review.zh.md",
+      "bytes": 4830,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/relation_revision/external_review.zh.md",
+      "bytes": 52304,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/prior_reviews/relation_revision/main_review.zh.md",
+      "bytes": 3743,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "bytes": 32430,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_BGE_RESULT.zh.md",
+      "bytes": 19494,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md",
+      "bytes": 8584,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_CONTINUAL_DATA.zh.md",
+      "bytes": 25818,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_ER_LOW_RESULT.zh.md",
+      "bytes": 16515,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md",
+      "bytes": 3283,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md",
+      "bytes": 11390,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md",
+      "bytes": 13590,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_LITERATURE.zh.md",
+      "bytes": 21996,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_LOGIT_LOW.zh.md",
+      "bytes": 5736,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md",
+      "bytes": 16239,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md",
+      "bytes": 16256,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_RANKING_RESULT.zh.md",
+      "bytes": 17642,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md",
+      "bytes": 11859,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md",
+      "bytes": 13922,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/project/SELLER_ALIAS_TEST_RESULT.zh.md",
+      "bytes": 17098,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "background/request.zh.txt",
+      "bytes": 4650,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt01.console.txt",
+      "bytes": 2022,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt01.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt01/result.json",
+      "bytes": 3557,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt01/unittest.txt",
+      "bytes": 1001,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt02.console.txt",
+      "bytes": 1507,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt02.wrapper.txt",
+      "bytes": 60,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt02/result.json",
+      "bytes": 3241,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "cpu/attempt02/unittest.txt",
+      "bytes": 1024,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "current/AGENTS.md",
+      "bytes": 3918,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "current/AI_RESEARCH_HANDOFF.zh.md",
+      "bytes": 41976,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "current/RESEARCH_DISCIPLINE.zh.md",
+      "bytes": 22351,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "current/RESEARCH_DISCUSSION.zh.md",
+      "bytes": 118062,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md",
+      "bytes": 8397,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/schema/step28_record_replay_policy.json",
+      "bytes": 1680,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/run_step28_record_replay_linux_20261007.sh",
+      "bytes": 689,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_bge_continual_run.py",
+      "bytes": 34789,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_bge_continual.py",
+      "bytes": 16341,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_record_replay_run.py",
+      "bytes": 32707,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_record_replay_verify.py",
+      "bytes": 11390,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/scripts/step28_record_replay.py",
+      "bytes": 15198,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "implementation/tests/test_step28_record_replay.py",
+      "bytes": 13983,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "initial_source.zip",
+      "bytes": 106602,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "manifest.json",
+      "bytes": 29769,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "previous_review/reading_scope.zh.txt",
+      "bytes": 56565,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "previous_review/report.zh.txt",
+      "bytes": 15024,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "previous_review/review.zh.txt",
+      "bytes": 50767,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "request.zh.txt",
+      "bytes": 5991,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    },
+    {
+      "container": "P4",
+      "path": "reviewed_source_inventory.json",
+      "bytes": 3547,
+      "reading": "未读",
+      "scope": "未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。",
+      "identity_check": "容器身份已核对；成员身份仅按 scope 所述"
+    }
+  ]
+}

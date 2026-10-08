@@ -518,7 +518,7 @@ def validate_gate(job: Path,gate_path: Path) -> dict:
         if mode == "gpu":
             native = evidence.get("native",{})
             estimate = native.get("projected_total_seconds",float("inf"))
-            if (not np.isfinite(estimate) or not 0<estimate<=172800 or native.get("projected_peak_output_bytes",float("inf"))>64*2**30
+            if (not np.isfinite(estimate) or not 0<estimate<=259200 or native.get("projected_peak_output_bytes",float("inf"))>64*2**30
                     or native.get("neutrality_both_architectures") is not True or set(native.get("architectures",{})) != {"record","LOGIT0.1"}):
                 raise ValueError("Native update/diagnostic qualification or resource projection missing")
     return p

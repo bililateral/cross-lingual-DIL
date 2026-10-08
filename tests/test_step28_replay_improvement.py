@@ -189,12 +189,12 @@ class ImprovementTests(unittest.TestCase):
         job,gate_path = record.data.ROOT/"reports/job",record.data.ROOT/"gate.json"
         evidence = {"cpu":{"mode":"cpu","status":"PASS_HANDWRITTEN_ONLY","source_files":source},
             "gpu":{"mode":"gpu","status":"PASS_HANDWRITTEN_ONLY","source_files":source,
-                   "native":{"projected_total_seconds":172800,"projected_peak_output_bytes":64*2**30,
+                   "native":{"projected_total_seconds":259200,"projected_peak_output_bytes":64*2**30,
                              "neutrality_both_architectures":True,"architectures":{"record":{},"LOGIT0.1":{}}}}}
         gate = {"status":"APPROVED_REPLAY_IMPROVEMENT_FORMAL","source_files":source,"job":"reports/job",
                 "runtime":p["runtime"],"supervision":p["supervision"],"review_disposition":"NO_OPEN_BLOCKERS",
                 "cpu":{"path":"cpu.json"},"gpu":{"path":"gpu.json"}}
-        for seconds,ok in ((172800,True),(172801,False),(float("nan"),False)):
+        for seconds,ok in ((259200,True),(259201,False),(float("nan"),False)):
             evidence["gpu"]["native"]["projected_total_seconds"] = seconds
             lookup = {run.POLICY:p,gate_path:gate,**{record.data.ROOT/(m+".json"):e for m,e in evidence.items()}}
             with mock.patch.object(record.data,"read_json",side_effect=lambda path:lookup[path]),mock.patch.object(record.data,"verify",side_effect=lambda path,rec:path):

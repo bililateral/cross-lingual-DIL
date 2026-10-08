@@ -1,0 +1,12 @@
+这是整理逐文件台账时一次额外只读字段检查的真实失败，原命令为 python - <<'PY'，脚本正文见同目录 script.py。
+其前半段成功打印旧 completion 的 budget、ABC_shared 的 training_seconds 和旧 GPU 证据状态。
+末尾把 saved_history.json 的 read_matrices（字典）误当列表切片，实际工具输出：
+
+metricslist sample
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+KeyError: slice(None, 4, None)
+
+本次调用未使用计时包装器，未保存可独立复核的进程墙钟/RSS，故不补造这两个数值。stdout.txt/stderr.txt 是从当次工具合并输出按内容转录保存，不是计时包装器捕获的两个独立管道。
+未调用模型、Torch 更新、训练、正式标签或项目服务器。没有更改科学核对脚本或其成功输出。
+后续台账按 read_matrices 的字典键读取；此故障不构成被审项目缺陷。

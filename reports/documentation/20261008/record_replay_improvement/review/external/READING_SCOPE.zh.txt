@@ -1,0 +1,1819 @@
+逐文件实际阅读范围（UTF-8）
+
+该台账是当前实例本次工作范围。所有历史层均列件，但未读历史不递归重审。没有项目服务器、正式输入/标签/模型、GPU 或 subagent。
+
+分类定义：
+全文：全文内容实际核阅，仍不等于执行其代码。
+节选：仅列明行段、函数或差异/关键词；不宣称全文。
+机器字段：结构化目标字段、数组计算、字节比较或容器元数据；不宣称逐文语义阅读。
+未读：未作本次内容核阅；至多目录/容器身份或外层统一哈希检查。
+
+容器身份与统计：
+P0 用户本次上传包：11277970 字节；65 成员；SHA256 f24e5c147561fef9a37cc05842c0843207c95c859b1f076fb47d10f2033fedb7；分类计数 {'机器字段': 11, '全文': 33, '未读': 10, '节选': 11}
+P1 此前增量评价输入包：9907776 字节；12 成员；SHA256 c5cba199e4c1a2ffb0aab47a476a26971a29306289ee306970488cfdc751940e；分类计数 {'未读': 11, '机器字段': 1}
+P2 此前原结果包：9614123 字节；335 成员；SHA256 dbed856f06482e29b444ce45b5b44973083bbd28964516ae2cb5ccf5c8be3c38；分类计数 {'未读': 218, '机器字段': 112, '节选': 2, '全文': 3}
+P3 已结束增量外审包：1050751 字节；29 成员；SHA256 9339a530380e391bec0c04d9b5cf6c721df44f8c2802d8a18604563bcf3b489b；分类计数 {'节选': 1, '未读': 28}
+P4 仅为追溯 LOGIT 来源而列出成员的旧实现包：1278500 字节；159 成员；SHA256 a4903d4a6a310729012b958a172424c5e1d218564be9ed1bd05c80f5436849e1；分类计数 {'未读': 155, '节选': 3, '全文': 1}
+
+全部 600 个成员逐件台账（包括未读）：
+
+001. [P0] background/common_evaluation_input.zip
+    机器字段；9907776 字节。核对压缩包字节数、SHA256、中央目录并解包；内部成员阅读范围分别见 P1/P3。
+    身份核验：外层登记载荷大小/SHA 已核验
+002. [P0] background/common_evaluation_review.zip
+    机器字段；1050751 字节。核对压缩包字节数、SHA256、中央目录并解包；内部成员阅读范围分别见 P1/P3。
+    身份核验：外层登记载荷大小/SHA 已核验
+003. [P0] background/primary_disposition.zh.txt
+    全文；2853 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+004. [P0] current/AGENTS.md
+    全文；3918 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+005. [P0] current/AI_RESEARCH_HANDOFF.zh.md
+    全文；48342 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+006. [P0] current/CURRENT_EXPERIMENT_DESIGN.md
+    未读；2670 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+007. [P0] current/RESEARCH_DISCIPLINE.zh.md
+    全文；22952 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+008. [P0] current/RESEARCH_DISCUSSION.zh.md
+    节选；131381 字节。757–775 行及相关关键词定位；仅本次五臂/诊断最新决定，未递归重审历史讨论。
+    身份核验：外层登记载荷大小/SHA 已核验
+009. [P0] current/RESEARCH_PLAN.md
+    未读；4327 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+010. [P0] evidence/cpu/attempt01.console.txt
+    全文；1497 字节。attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。
+    身份核验：外层登记载荷大小/SHA 已核验
+011. [P0] evidence/cpu/attempt01/failed_test_source.py
+    节选；12509 字节。133–161 行；首轮失效手写群及训练入口测试附近，追溯每账号仅一条记录造成的 Group.validate 错误。
+    身份核验：外层登记载荷大小/SHA 已核验
+012. [P0] evidence/cpu/attempt01/result.json
+    机器字段；4542 字节。状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+013. [P0] evidence/cpu/attempt01/unittest.txt
+    全文；2094 字节。完整阅读测试名称、通过/失败与错误栈。
+    身份核验：外层登记载荷大小/SHA 已核验
+014. [P0] evidence/cpu/attempt02.console.txt
+    机器字段；3650 字节。attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。
+    身份核验：外层登记载荷大小/SHA 已核验
+015. [P0] evidence/cpu/attempt02/result.json
+    机器字段；4196 字节。状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+016. [P0] evidence/cpu/attempt02/source/schema/step28_replay_improvement_policy.json
+    未读；1731 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+017. [P0] evidence/cpu/attempt02/source/scripts/step28_replay_improvement_run.py
+    未读；31260 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+018. [P0] evidence/cpu/attempt02/source/scripts/step28_replay_improvement_verify.py
+    未读；12507 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+019. [P0] evidence/cpu/attempt02/unittest.txt
+    全文；810 字节。完整阅读测试名称、通过/失败与错误栈。
+    身份核验：外层登记载荷大小/SHA 已核验
+020. [P0] evidence/cpu/attempt03.console.txt
+    机器字段；3657 字节。attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。
+    身份核验：外层登记载荷大小/SHA 已核验
+021. [P0] evidence/cpu/attempt03/result.json
+    机器字段；4197 字节。状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+022. [P0] evidence/cpu/attempt03/source/scripts/step28_replay_improvement_run.py
+    未读；35345 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+023. [P0] evidence/cpu/attempt03/source/scripts/step28_replay_improvement_verify.py
+    未读；12600 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+024. [P0] evidence/cpu/attempt03/unittest.txt
+    全文；939 字节。完整阅读测试名称、通过/失败与错误栈。
+    身份核验：外层登记载荷大小/SHA 已核验
+025. [P0] evidence/cpu/attempt04.console.txt
+    机器字段；3656 字节。attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。
+    身份核验：外层登记载荷大小/SHA 已核验
+026. [P0] evidence/cpu/attempt04/result.json
+    机器字段；4197 字节。状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+027. [P0] evidence/cpu/attempt04/source/scripts/step28_replay_improvement_run.py
+    未读；35443 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+028. [P0] evidence/cpu/attempt04/source/scripts/step28_replay_improvement_verify.py
+    未读；12880 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+029. [P0] evidence/cpu/attempt04/unittest.txt
+    全文；939 字节。完整阅读测试名称、通过/失败与错误栈。
+    身份核验：外层登记载荷大小/SHA 已核验
+030. [P0] evidence/cpu/attempt05.console.txt
+    全文；3659 字节。attempt01/05 完整阅读；其余提取外部 wall/RSS 字段。所有五次失败或成功均保留计账。
+    身份核验：外层登记载荷大小/SHA 已核验
+031. [P0] evidence/cpu/attempt05/result.json
+    机器字段；4196 字节。状态、测试计数、累计时间、资源、来源清单等目标字段；attempt05 的 28 个来源大小/SHA 与当前源码核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+032. [P0] evidence/cpu/attempt05/unittest.txt
+    全文；939 字节。完整阅读测试名称、通过/失败与错误栈。
+    身份核验：外层登记载荷大小/SHA 已核验
+033. [P0] new/authorization.json
+    全文；1031 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+034. [P0] new/implementation.zh.txt
+    全文；6662 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+035. [P0] new/proposal.zh.txt
+    全文；15477 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+036. [P0] package_manifest.json
+    机器字段；11045 字节。完整解析 64 条 path/bytes/sha256 并核对所有外层载荷；不等同 64 件语义全文审查。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+037. [P0] request.zh.txt
+    全文；6920 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+038. [P0] source/docs/SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md
+    全文；6147 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+039. [P0] source/schema/step28_alias_ranking_policy.json
+    全文；3489 字节。完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。
+    身份核验：外层登记载荷大小/SHA 已核验
+040. [P0] source/schema/step28_bge_continual_policy.json
+    全文；5123 字节。完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。
+    身份核验：外层登记载荷大小/SHA 已核验
+041. [P0] source/schema/step28_chinese_base_policy.json
+    全文；8439 字节。完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。
+    身份核验：外层登记载荷大小/SHA 已核验
+042. [P0] source/schema/step28_record_replay_policy.json
+    全文；1680 字节。完整读取 JSON 配置并对照直接调用；配置存在本身不作为执行正确性证明。
+    身份核验：外层登记载荷大小/SHA 已核验
+043. [P0] source/schema/step28_replay_improvement_policy.json
+    全文；1905 字节。逐文核阅；首读顺序为 implementation、合同、policy、HANDOFF，随后核对授权与直接依赖。
+    身份核验：外层登记载荷大小/SHA 已核验
+044. [P0] source/scripts/run_step28_replay_improvement_linux_20261008.sh
+    全文；695 字节。完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。
+    身份核验：外层登记载荷大小/SHA 已核验
+045. [P0] source/scripts/step28_alias_calibration.py
+    全文；8818 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+046. [P0] source/scripts/step28_alias_ranking.py
+    全文；11658 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+047. [P0] source/scripts/step28_bge_continual_evaluate.py
+    全文；13765 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+048. [P0] source/scripts/step28_bge_continual_run.py
+    节选；34789 字节。1–155 行；数组、save/RNG、parse_once 与旧训练入口。
+    身份核验：外层登记载荷大小/SHA 已核验
+049. [P0] source/scripts/step28_bge_continual.py
+    全文；16341 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+050. [P0] source/scripts/step28_chinese_base.py
+    节选；51352 字节。1–232、678–700 行；合同、分组、模型加载、通道池化、目标/分数及固定群计数。
+    身份核验：外层登记载荷大小/SHA 已核验
+051. [P0] source/scripts/step28_continual_expression_run.py
+    节选；26322 字节。1–130 行；实际公开输入、标签入口。
+    身份核验：外层登记载荷大小/SHA 已核验
+052. [P0] source/scripts/step28_continual_population_data.py
+    全文；11587 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+053. [P0] source/scripts/step28_continual_population_evaluate.py
+    节选；20911 字节。1–102、210–250 行；群指标、分类/排名指标实际定义。
+    身份核验：外层登记载荷大小/SHA 已核验
+054. [P0] source/scripts/step28_continual_population_run.py
+    节选；21310 字节。1–76 行；持久化空间预留/删除辅助；不将其旧 Budget 当作新运行 Budget。
+    身份核验：外层登记载荷大小/SHA 已核验
+055. [P0] source/scripts/step28_continual_population.py
+    节选；9699 字节。1–74、157–210 行；模型/Adam 建立与 archive、完整状态保存恢复。
+    身份核验：外层登记载荷大小/SHA 已核验
+056. [P0] source/scripts/step28_er_weight.py
+    节选；17560 字节。1–155、218–295 行；实际 update 及相关保存/监督；与旧 LOGIT 冻结来源做函数 AST/差异核对。
+    身份核验：外层登记载荷大小/SHA 已核验
+057. [P0] source/scripts/step28_record_replay_run.py
+    节选；33257 字节。1–245、398–486 行；Budget、旧训练/检查点、read_roles、fields/统计；fields 414–426 原函数另由 AST 提取执行。
+    身份核验：外层登记载荷大小/SHA 已核验
+058. [P0] source/scripts/step28_record_replay_verify.py
+    节选；11390 字节。1–75 行；preflight 与被复用的原生前提。
+    身份核验：外层登记载荷大小/SHA 已核验
+059. [P0] source/scripts/step28_record_replay.py
+    全文；15340 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+060. [P0] source/scripts/step28_replay_diagnostics.py
+    全文；10878 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+061. [P0] source/scripts/step28_replay_improvement_run.py
+    全文；36009 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+062. [P0] source/scripts/step28_replay_improvement_verify.py
+    全文；12953 字节。阅读全文，沿本次真实调用路径核对语义；未在网页执行其 Torch/GPU/正式训练路径。
+    身份核验：外层登记载荷大小/SHA 已核验
+063. [P0] source/scripts/step28_risk_study.py
+    未读；4037 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：外层登记载荷大小/SHA 已核验
+064. [P0] source/tests/test_step28_record_replay.py
+    全文；15307 字节。完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。
+    身份核验：外层登记载荷大小/SHA 已核验
+065. [P0] source/tests/test_step28_replay_improvement.py
+    全文；13786 字节。完整阅读启动参数或测试实现；网页未执行 shell 启动器或 Torch 单元测试。
+    身份核验：外层登记载荷大小/SHA 已核验
+066. [P1] request.zh.txt
+    未读；4272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+067. [P1] supplement/report.zh.txt
+    未读；13046 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+068. [P1] supplement/step28_record_replay_compare.py
+    未读；13969 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+069. [P1] supplement/statistics.json
+    未读；1624019 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+070. [P1] supplement/tables.zh.txt
+    未读；138517 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+071. [P1] supplement/calculation.log
+    未读；3884 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+072. [P1] background/original_result_input.zip
+    机器字段；9614123 字节。核对 9,614,123 字节、335 成员及指定 SHA256；内部逐件范围见 P2。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+073. [P1] background/previous_external_review.zh.txt
+    未读；38641 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+074. [P1] background/previous_primary_disposition.zh.txt
+    未读；8533 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+075. [P1] current/AI_RESEARCH_HANDOFF.zh.md
+    未读；45971 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+076. [P1] current/RESEARCH_DISCIPLINE.zh.md
+    未读；22952 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+077. [P1] package_manifest.json
+    未读；2910 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+078. [P2] background/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md
+    未读；16239 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+079. [P2] docs/AGENTS.md
+    未读；3918 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+080. [P2] docs/AI_RESEARCH_HANDOFF.zh.md
+    未读；44464 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+081. [P2] docs/RESEARCH_DISCIPLINE.zh.md
+    未读；22351 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+082. [P2] docs/RESEARCH_DISCUSSION.zh.md
+    未读；122621 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+083. [P2] docs/STORAGE.zh.md
+    未读；27660 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+084. [P2] history/implementation_review_input.zip
+    机器字段；1278500 字节。读取 159 成员中央目录；仅抽取旧 LOGIT 冻结来源和清单，不解读其他历史路线；逐件见 P4。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+085. [P2] maintenance/predelete.json
+    未读；53726 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+086. [P2] maintenance/receipt.json
+    未读；59895 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+087. [P2] qualification/cpu/attempt01.console.txt
+    未读；2022 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+088. [P2] qualification/cpu/attempt01.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+089. [P2] qualification/cpu/attempt01/result.json
+    未读；3557 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+090. [P2] qualification/cpu/attempt01/unittest.txt
+    未读；1001 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+091. [P2] qualification/cpu/attempt02.console.txt
+    未读；1507 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+092. [P2] qualification/cpu/attempt02.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+093. [P2] qualification/cpu/attempt02/result.json
+    未读；3241 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+094. [P2] qualification/cpu/attempt02/unittest.txt
+    未读；1024 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+095. [P2] qualification/cpu/attempt03.console.txt
+    未读；1508 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+096. [P2] qualification/cpu/attempt03.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+097. [P2] qualification/cpu/attempt03/result.json
+    未读；3241 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+098. [P2] qualification/cpu/attempt03/unittest.txt
+    未读；1141 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+099. [P2] qualification/execution_source_inventory.json
+    未读；3547 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+100. [P2] qualification/external/reading_scope.zh.txt
+    未读；74482 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+101. [P2] qualification/external/recovery.json
+    未读；897 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+102. [P2] qualification/external/review.zh.txt
+    节选；45721 字节。246–355 行及相关关键词；旧资源门槛 R1/R2 与估计边界，未重审已关闭路线。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+103. [P2] qualification/gpu/attempt01.console.txt
+    未读；375 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+104. [P2] qualification/gpu/attempt01.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+105. [P2] qualification/gpu/attempt01/result.json
+    机器字段；4758 字节。旧原生状态、时间/资源/资格相关目标字段；不挪作本次原生测量。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+106. [P2] qualification/native_disposition.zh.txt
+    全文；2422 字节。复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+107. [P2] qualification/native_gate.json
+    机器字段；4524 字节。旧原生状态、时间/资源/资格相关目标字段；不挪作本次原生测量。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+108. [P2] qualification/report.zh.txt
+    全文；7259 字节。复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+109. [P2] qualification/tests/test_step28_record_replay.py
+    未读；15307 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+110. [P2] reference/ABC_logit_tenth_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+111. [P2] reference/ABC_logit_tenth_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+112. [P2] reference/ABC_logit_tenth_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+113. [P2] reference/ABC_logit_tenth_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+114. [P2] reference/ABC_logit_tenth_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+115. [P2] reference/ABC_logit_tenth_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+116. [P2] reference/ABC_logit_tenth_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+117. [P2] reference/ABC_logit_tenth_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+118. [P2] reference/ABC_logit_tenth_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+119. [P2] reference/ABC_logit_tenth_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+120. [P2] reference/ABC_logit_tenth_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+121. [P2] reference/ABC_logit_tenth_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+122. [P2] reference/BCA_logit_tenth_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+123. [P2] reference/BCA_logit_tenth_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+124. [P2] reference/BCA_logit_tenth_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+125. [P2] reference/BCA_logit_tenth_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+126. [P2] reference/BCA_logit_tenth_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+127. [P2] reference/BCA_logit_tenth_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+128. [P2] reference/BCA_logit_tenth_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+129. [P2] reference/BCA_logit_tenth_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+130. [P2] reference/BCA_logit_tenth_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+131. [P2] reference/BCA_logit_tenth_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+132. [P2] reference/BCA_logit_tenth_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+133. [P2] reference/BCA_logit_tenth_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+134. [P2] reference/CAB_logit_tenth_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+135. [P2] reference/CAB_logit_tenth_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+136. [P2] reference/CAB_logit_tenth_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+137. [P2] reference/CAB_logit_tenth_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+138. [P2] reference/CAB_logit_tenth_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+139. [P2] reference/CAB_logit_tenth_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+140. [P2] reference/CAB_logit_tenth_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+141. [P2] reference/CAB_logit_tenth_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+142. [P2] reference/CAB_logit_tenth_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+143. [P2] reference/CAB_logit_tenth_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+144. [P2] reference/CAB_logit_tenth_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+145. [P2] reference/CAB_logit_tenth_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+146. [P2] reference/access.json
+    未读；45 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+147. [P2] reference/before_valid.json
+    未读；238 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+148. [P2] reference/collected.json
+    机器字段；13759 字节。由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+149. [P2] reference/completion.json
+    未读；576 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+150. [P2] reference/reference/ABC_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+151. [P2] reference/reference/ABC_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+152. [P2] reference/reference/ABC_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+153. [P2] reference/reference/ABC_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+154. [P2] reference/reference/ABC_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+155. [P2] reference/reference/ABC_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+156. [P2] reference/reference/BCA_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+157. [P2] reference/reference/BCA_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+158. [P2] reference/reference/BCA_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+159. [P2] reference/reference/BCA_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+160. [P2] reference/reference/BCA_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+161. [P2] reference/reference/BCA_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+162. [P2] reference/reference/CAB_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+163. [P2] reference/reference/CAB_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+164. [P2] reference/reference/CAB_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+165. [P2] reference/reference/CAB_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+166. [P2] reference/reference/CAB_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+167. [P2] reference/reference/CAB_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+168. [P2] reference/reference/collected.json
+    机器字段；22474 字节。由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+169. [P2] result/analysis/step28_record_replay_result_verify.py
+    未读；19573 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+170. [P2] result/custody/predelete.json
+    未读；53726 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+171. [P2] result/execution_gate.json
+    未读；5298 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+172. [P2] result/inventory.json
+    未读；41989 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+173. [P2] result/job.console.txt
+    未读；106133 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+174. [P2] result/job.wrapper.txt
+    未读；64 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+175. [P2] result/job/access.json
+    未读；45 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+176. [P2] result/job/before_valid.json
+    未读；235 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+177. [P2] result/job/completion.json
+    机器字段；720 字节。status/access/budget，特别 budget.elapsed_seconds；不把旧完成状态解释为新运行完成。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+178. [P2] result/job/evaluation/ABC_C_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+179. [P2] result/job/evaluation/ABC_C_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+180. [P2] result/job/evaluation/ABC_C_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+181. [P2] result/job/evaluation/ABC_C_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+182. [P2] result/job/evaluation/ABC_C_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+183. [P2] result/job/evaluation/ABC_C_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+184. [P2] result/job/evaluation/ABC_C_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+185. [P2] result/job/evaluation/ABC_C_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+186. [P2] result/job/evaluation/ABC_C_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+187. [P2] result/job/evaluation/ABC_C_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+188. [P2] result/job/evaluation/ABC_C_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+189. [P2] result/job/evaluation/ABC_C_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+190. [P2] result/job/evaluation/ABC_S_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+191. [P2] result/job/evaluation/ABC_S_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+192. [P2] result/job/evaluation/ABC_S_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+193. [P2] result/job/evaluation/ABC_S_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+194. [P2] result/job/evaluation/ABC_S_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+195. [P2] result/job/evaluation/ABC_S_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+196. [P2] result/job/evaluation/ABC_S_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+197. [P2] result/job/evaluation/ABC_S_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+198. [P2] result/job/evaluation/ABC_S_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+199. [P2] result/job/evaluation/ABC_S_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+200. [P2] result/job/evaluation/ABC_S_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+201. [P2] result/job/evaluation/ABC_S_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+202. [P2] result/job/evaluation/ABC_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+203. [P2] result/job/evaluation/ABC_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+204. [P2] result/job/evaluation/ABC_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+205. [P2] result/job/evaluation/ABC_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+206. [P2] result/job/evaluation/ABC_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+207. [P2] result/job/evaluation/ABC_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+208. [P2] result/job/evaluation/BCA_C_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+209. [P2] result/job/evaluation/BCA_C_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+210. [P2] result/job/evaluation/BCA_C_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+211. [P2] result/job/evaluation/BCA_C_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+212. [P2] result/job/evaluation/BCA_C_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+213. [P2] result/job/evaluation/BCA_C_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+214. [P2] result/job/evaluation/BCA_C_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+215. [P2] result/job/evaluation/BCA_C_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+216. [P2] result/job/evaluation/BCA_C_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+217. [P2] result/job/evaluation/BCA_C_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+218. [P2] result/job/evaluation/BCA_C_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+219. [P2] result/job/evaluation/BCA_C_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+220. [P2] result/job/evaluation/BCA_S_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+221. [P2] result/job/evaluation/BCA_S_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+222. [P2] result/job/evaluation/BCA_S_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+223. [P2] result/job/evaluation/BCA_S_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+224. [P2] result/job/evaluation/BCA_S_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+225. [P2] result/job/evaluation/BCA_S_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+226. [P2] result/job/evaluation/BCA_S_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+227. [P2] result/job/evaluation/BCA_S_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+228. [P2] result/job/evaluation/BCA_S_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+229. [P2] result/job/evaluation/BCA_S_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+230. [P2] result/job/evaluation/BCA_S_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+231. [P2] result/job/evaluation/BCA_S_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+232. [P2] result/job/evaluation/BCA_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+233. [P2] result/job/evaluation/BCA_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+234. [P2] result/job/evaluation/BCA_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+235. [P2] result/job/evaluation/BCA_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+236. [P2] result/job/evaluation/BCA_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+237. [P2] result/job/evaluation/BCA_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+238. [P2] result/job/evaluation/CAB_C_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+239. [P2] result/job/evaluation/CAB_C_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+240. [P2] result/job/evaluation/CAB_C_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+241. [P2] result/job/evaluation/CAB_C_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+242. [P2] result/job/evaluation/CAB_C_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+243. [P2] result/job/evaluation/CAB_C_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+244. [P2] result/job/evaluation/CAB_C_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+245. [P2] result/job/evaluation/CAB_C_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+246. [P2] result/job/evaluation/CAB_C_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+247. [P2] result/job/evaluation/CAB_C_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+248. [P2] result/job/evaluation/CAB_C_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+249. [P2] result/job/evaluation/CAB_C_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+250. [P2] result/job/evaluation/CAB_S_stage2_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+251. [P2] result/job/evaluation/CAB_S_stage2_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+252. [P2] result/job/evaluation/CAB_S_stage2_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+253. [P2] result/job/evaluation/CAB_S_stage2_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+254. [P2] result/job/evaluation/CAB_S_stage2_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+255. [P2] result/job/evaluation/CAB_S_stage2_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+256. [P2] result/job/evaluation/CAB_S_stage3_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+257. [P2] result/job/evaluation/CAB_S_stage3_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+258. [P2] result/job/evaluation/CAB_S_stage3_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+259. [P2] result/job/evaluation/CAB_S_stage3_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+260. [P2] result/job/evaluation/CAB_S_stage3_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+261. [P2] result/job/evaluation/CAB_S_stage3_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+262. [P2] result/job/evaluation/CAB_shared_first-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+263. [P2] result/job/evaluation/CAB_shared_first-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+264. [P2] result/job/evaluation/CAB_shared_raw.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+265. [P2] result/job/evaluation/CAB_shared_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+266. [P2] result/job/evaluation/CAB_shared_stage-cal.npy
+    机器字段；10688 字节。已开放的 60×22 群指标矩阵：大小/SHA/形状校验，实际历史角色入口同输入差和旧 C−S O MAP 配对复算；未读取原始标签/权重/Memory。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+267. [P2] result/job/evaluation/CAB_shared_stage-cal_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+268. [P2] result/job/evaluation/collected.json
+    机器字段；19162 字节。由真实 historical_replay 的保存角色查找读取组指标登记、路径、大小、SHA 等目标字段。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+269. [P2] result/job/evaluation/evaluation.json
+    未读；883504 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+270. [P2] result/job/evaluation/initial_raw.npy
+    未读；10688 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+271. [P2] result/job/evaluation/initial_raw_counts.json
+    未读；1982 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+272. [P2] result/job/execution.json
+    未读；3238 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+273. [P2] result/job/resource.json
+    未读；408 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+274. [P2] result/job/run/manifest.json
+    未读；150657 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+275. [P2] result/job/run/maps/ABC_C_stage2.json
+    未读；2458 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+276. [P2] result/job/run/maps/ABC_C_stage3.json
+    未读；2453 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+277. [P2] result/job/run/maps/ABC_S_stage2.json
+    未读；2457 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+278. [P2] result/job/run/maps/ABC_S_stage3.json
+    未读；2453 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+279. [P2] result/job/run/maps/ABC_shared.json
+    未读；2044 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+280. [P2] result/job/run/maps/BCA_C_stage2.json
+    未读；2468 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+281. [P2] result/job/run/maps/BCA_C_stage3.json
+    未读；2725 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+282. [P2] result/job/run/maps/BCA_S_stage2.json
+    未读；2590 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+283. [P2] result/job/run/maps/BCA_S_stage3.json
+    未读；2717 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+284. [P2] result/job/run/maps/BCA_shared.json
+    未读；2597 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+285. [P2] result/job/run/maps/CAB_C_stage2.json
+    未读；2588 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+286. [P2] result/job/run/maps/CAB_C_stage3.json
+    未读；2732 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+287. [P2] result/job/run/maps/CAB_S_stage2.json
+    未读；2584 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+288. [P2] result/job/run/maps/CAB_S_stage3.json
+    未读；2720 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+289. [P2] result/job/run/maps/CAB_shared.json
+    未读；2727 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+290. [P2] result/job/run/partition.json
+    未读；14922 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+291. [P2] result/job/run/points/ABC_C_stage2.json
+    未读；3358 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+292. [P2] result/job/run/points/ABC_C_stage3.json
+    未读；3171 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+293. [P2] result/job/run/points/ABC_S_stage2.json
+    未读；3358 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+294. [P2] result/job/run/points/ABC_S_stage3.json
+    未读；3172 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+295. [P2] result/job/run/points/ABC_shared.json
+    未读；3413 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+296. [P2] result/job/run/points/BCA_C_stage2.json
+    未读；3499 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+297. [P2] result/job/run/points/BCA_C_stage3.json
+    未读；3172 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+298. [P2] result/job/run/points/BCA_S_stage2.json
+    未读；3499 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+299. [P2] result/job/run/points/BCA_S_stage3.json
+    未读；3172 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+300. [P2] result/job/run/points/BCA_shared.json
+    未读；3413 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+301. [P2] result/job/run/points/CAB_C_stage2.json
+    未读；3637 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+302. [P2] result/job/run/points/CAB_C_stage3.json
+    未读；3171 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+303. [P2] result/job/run/points/CAB_S_stage2.json
+    未读；3637 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+304. [P2] result/job/run/points/CAB_S_stage3.json
+    未读；3171 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+305. [P2] result/job/run/points/CAB_shared.json
+    未读；3411 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+306. [P2] result/job/run/progress.json
+    未读；150626 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+307. [P2] result/job/run/scores/ABC_C_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+308. [P2] result/job/run/scores/ABC_C_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+309. [P2] result/job/run/scores/ABC_C_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+310. [P2] result/job/run/scores/ABC_C_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+311. [P2] result/job/run/scores/ABC_C_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+312. [P2] result/job/run/scores/ABC_C_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+313. [P2] result/job/run/scores/ABC_C_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+314. [P2] result/job/run/scores/ABC_C_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+315. [P2] result/job/run/scores/ABC_S_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+316. [P2] result/job/run/scores/ABC_S_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+317. [P2] result/job/run/scores/ABC_S_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+318. [P2] result/job/run/scores/ABC_S_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+319. [P2] result/job/run/scores/ABC_S_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+320. [P2] result/job/run/scores/ABC_S_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+321. [P2] result/job/run/scores/ABC_S_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+322. [P2] result/job/run/scores/ABC_S_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+323. [P2] result/job/run/scores/ABC_shared_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+324. [P2] result/job/run/scores/ABC_shared_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+325. [P2] result/job/run/scores/ABC_shared_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+326. [P2] result/job/run/scores/ABC_shared_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+327. [P2] result/job/run/scores/BCA_C_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+328. [P2] result/job/run/scores/BCA_C_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+329. [P2] result/job/run/scores/BCA_C_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+330. [P2] result/job/run/scores/BCA_C_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+331. [P2] result/job/run/scores/BCA_C_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+332. [P2] result/job/run/scores/BCA_C_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+333. [P2] result/job/run/scores/BCA_C_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+334. [P2] result/job/run/scores/BCA_C_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+335. [P2] result/job/run/scores/BCA_S_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+336. [P2] result/job/run/scores/BCA_S_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+337. [P2] result/job/run/scores/BCA_S_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+338. [P2] result/job/run/scores/BCA_S_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+339. [P2] result/job/run/scores/BCA_S_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+340. [P2] result/job/run/scores/BCA_S_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+341. [P2] result/job/run/scores/BCA_S_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+342. [P2] result/job/run/scores/BCA_S_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+343. [P2] result/job/run/scores/BCA_shared_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+344. [P2] result/job/run/scores/BCA_shared_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+345. [P2] result/job/run/scores/BCA_shared_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+346. [P2] result/job/run/scores/BCA_shared_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+347. [P2] result/job/run/scores/CAB_C_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+348. [P2] result/job/run/scores/CAB_C_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+349. [P2] result/job/run/scores/CAB_C_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+350. [P2] result/job/run/scores/CAB_C_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+351. [P2] result/job/run/scores/CAB_C_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+352. [P2] result/job/run/scores/CAB_C_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+353. [P2] result/job/run/scores/CAB_C_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+354. [P2] result/job/run/scores/CAB_C_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+355. [P2] result/job/run/scores/CAB_S_stage2_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+356. [P2] result/job/run/scores/CAB_S_stage2_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+357. [P2] result/job/run/scores/CAB_S_stage2_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+358. [P2] result/job/run/scores/CAB_S_stage2_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+359. [P2] result/job/run/scores/CAB_S_stage3_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+360. [P2] result/job/run/scores/CAB_S_stage3_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+361. [P2] result/job/run/scores/CAB_S_stage3_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+362. [P2] result/job/run/scores/CAB_S_stage3_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+363. [P2] result/job/run/scores/CAB_shared_calibration.npy
+    未读；18272 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+364. [P2] result/job/run/scores/CAB_shared_first-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+365. [P2] result/job/run/scores/CAB_shared_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+366. [P2] result/job/run/scores/CAB_shared_stage-cal.npy
+    未读；181568 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+367. [P2] result/job/run/scores/initial_raw.npy
+    未读；90848 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+368. [P2] result/job/run/startup.json
+    未读；5196 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+369. [P2] result/job/run/updates/ABC_C_stage2.json
+    机器字段；190597 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+370. [P2] result/job/run/updates/ABC_C_stage3.json
+    机器字段；190395 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+371. [P2] result/job/run/updates/ABC_S_stage2.json
+    机器字段；190618 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+372. [P2] result/job/run/updates/ABC_S_stage3.json
+    机器字段；190530 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+373. [P2] result/job/run/updates/ABC_shared.json
+    机器字段；110532 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+374. [P2] result/job/run/updates/BCA_C_stage2.json
+    机器字段；190621 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+375. [P2] result/job/run/updates/BCA_C_stage3.json
+    机器字段；190507 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+376. [P2] result/job/run/updates/BCA_S_stage2.json
+    机器字段；190650 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+377. [P2] result/job/run/updates/BCA_S_stage3.json
+    机器字段；190533 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+378. [P2] result/job/run/updates/BCA_shared.json
+    机器字段；110528 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+379. [P2] result/job/run/updates/CAB_C_stage2.json
+    机器字段；190477 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+380. [P2] result/job/run/updates/CAB_C_stage3.json
+    机器字段；190586 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+381. [P2] result/job/run/updates/CAB_S_stage2.json
+    机器字段；190496 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+382. [P2] result/job/run/updates/CAB_S_stage3.json
+    机器字段；190616 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+383. [P2] result/job/run/updates/CAB_shared.json
+    机器字段；110469 字节。仅 JSON 顶层键及 training_seconds；未重做旧更新轨迹。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+384. [P2] result/report.zh.txt
+    未读；11614 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+385. [P2] result/source/docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md
+    全文；8397 字节。复用旧正确合同及已关闭原生处置；这些是旧记录表实验证据，不是本次新原生结果。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+386. [P2] result/source/schema/step28_alias_ranking_policy.json
+    机器字段；3489 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+387. [P2] result/source/schema/step28_bge_continual_policy.json
+    机器字段；5123 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+388. [P2] result/source/schema/step28_chinese_base_policy.json
+    机器字段；8439 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+389. [P2] result/source/schema/step28_record_replay_policy.json
+    机器字段；1680 字节。读取旧参考采集入口及本次继承的策略字段；另与当前配置做字节比较。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+390. [P2] result/source/scripts/run_step28_record_replay_linux_20261007.sh
+    未读；689 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+391. [P2] result/source/scripts/step28_alias_calibration.py
+    机器字段；8818 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+392. [P2] result/source/scripts/step28_alias_ranking.py
+    机器字段；11658 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+393. [P2] result/source/scripts/step28_bge_continual.py
+    机器字段；16341 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+394. [P2] result/source/scripts/step28_bge_continual_evaluate.py
+    机器字段；13765 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+395. [P2] result/source/scripts/step28_bge_continual_run.py
+    机器字段；34789 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+396. [P2] result/source/scripts/step28_chinese_base.py
+    机器字段；51352 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+397. [P2] result/source/scripts/step28_continual_expression_run.py
+    机器字段；26322 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+398. [P2] result/source/scripts/step28_continual_population.py
+    机器字段；9699 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+399. [P2] result/source/scripts/step28_continual_population_data.py
+    机器字段；11587 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+400. [P2] result/source/scripts/step28_continual_population_evaluate.py
+    机器字段；20911 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+401. [P2] result/source/scripts/step28_continual_population_run.py
+    机器字段；21310 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+402. [P2] result/source/scripts/step28_record_replay.py
+    节选；15198 字节。与当前文件做差异比对，重点 objective 的原 C/S 分支和 VJP/Adam 调用；当前全文见 P0，未另行重审所有未变历史代码。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+403. [P2] result/source/scripts/step28_record_replay_run.py
+    机器字段；33257 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+404. [P2] result/source/scripts/step28_record_replay_verify.py
+    机器字段；11390 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+405. [P2] result/source/tests/test_step28_record_replay.py
+    机器字段；15307 字节。与当前直接依赖作逐字节同源性比较；语义阅读范围以 P0 对应文件为准，未独立重审整个历史文件。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+406. [P2] result/verification/attempt01.console.txt
+    未读；582 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+407. [P2] result/verification/attempt01.wrapper.txt
+    未读；64 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+408. [P2] result/verification/attempt01/result.json
+    未读；30772 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+409. [P2] result/verification/attempt01/tables.zh.txt
+    未读；102154 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+410. [P2] review/context.zh.txt
+    未读；8099 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+411. [P2] review/request.zh.txt
+    未读；2924 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+412. [P2] package_manifest.json
+    未读；99358 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+413. [P3] INCREMENTAL_EVALUATION_REVIEW.zh.txt
+    节选；31733 字节。1–28、51–76、165–224 行及相关关键词；确认增量评价已关闭、旧结论与原始指标口径，不递归复做所有旧审查。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+414. [P3] MANIFEST.json
+    未读；4452 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+415. [P3] READING_SCOPE.json
+    未读；218941 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+416. [P3] READING_SCOPE.zh.txt
+    未读；163541 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+417. [P3] README.zh.txt
+    未读；3208 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+418. [P3] audit_saved_arrays.py
+    未读；20127 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+419. [P3] delivery_validation.json
+    未读；696 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+420. [P3] execution/independent_attempt01.execution.json
+    未读；834 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+421. [P3] execution/independent_attempt01.stderr.txt
+    未读；0 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+422. [P3] execution/independent_attempt01.stdout.txt
+    未读；2067 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+423. [P3] execution/supplied_script_attempt01.execution.json
+    未读；823 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+424. [P3] execution/supplied_script_attempt01.stderr.txt
+    未读；0 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+425. [P3] execution/supplied_script_attempt01.stdout.txt
+    未读；3874 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+426. [P3] history_member_inventory.json
+    未读；16080 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+427. [P3] history_selected_identities.json
+    未读；1278 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+428. [P3] independent_audit/all_69_checks.csv
+    未读；12662 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+429. [P3] independent_audit/audit_summary.json
+    未读；20620 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+430. [P3] independent_audit/independent_statistics.json
+    未读；1483334 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+431. [P3] independent_audit/independent_statistics.tsv
+    未读；708507 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+432. [P3] independent_audit/overfitting_saved_evidence.json
+    未读；14238 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+433. [P3] input/supplement/calculation.log
+    未读；3884 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+434. [P3] input/supplement/statistics.json
+    未读；1624019 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+435. [P3] input/supplement/step28_record_replay_compare.py
+    未读；13969 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+436. [P3] input/supplement/tables.zh.txt
+    未读；138517 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+437. [P3] old_identity.json
+    未读；66099 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+438. [P3] outer_identity.json
+    未读；2202 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+439. [P3] record_execution.py
+    未读；1899 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+440. [P3] supplied_replay/statistics.json
+    未读；1624009 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+441. [P3] supplied_replay/tables.zh.txt
+    未读；138517 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+442. [P4] background/closed_evidence/function_memory_evaluation.json
+    未读；413172 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+443. [P4] background/closed_evidence/function_memory_full_tables.zh.md
+    未读；15444 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+444. [P4] background/closed_evidence/function_memory_verification.json
+    未读；36789 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+445. [P4] background/closed_evidence/group_meta_closure.zh.md
+    未读；3798 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+446. [P4] background/context.zh.txt
+    未读；9617 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+447. [P4] background/current/AGENTS.md
+    未读；3918 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+448. [P4] background/current/AI_RESEARCH_HANDOFF.zh.md
+    未读；39553 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+449. [P4] background/current/proposal.zh.txt
+    未读；31578 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+450. [P4] background/current/RESEARCH_DISCIPLINE.zh.md
+    未读；22351 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+451. [P4] background/current/RESEARCH_DISCUSSION.zh.md
+    未读；113324 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+452. [P4] background/current/user_brief.zh.txt
+    未读；19054 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+453. [P4] background/frozen/function_memory_source/docs/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md
+    未读；11390 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+454. [P4] background/frozen/function_memory_source/schema/step28_alias_ranking_policy.json
+    未读；3489 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+455. [P4] background/frozen/function_memory_source/schema/step28_bge_continual_policy.json
+    未读；5123 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+456. [P4] background/frozen/function_memory_source/schema/step28_chinese_base_policy.json
+    未读；8439 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+457. [P4] background/frozen/function_memory_source/schema/step28_function_memory_policy.json
+    未读；3029 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+458. [P4] background/frozen/function_memory_source/scripts/run_step28_function_memory_linux_20261006.sh
+    未读；977 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+459. [P4] background/frozen/function_memory_source/scripts/step28_alias_calibration.py
+    未读；8818 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+460. [P4] background/frozen/function_memory_source/scripts/step28_alias_ranking.py
+    未读；11658 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+461. [P4] background/frozen/function_memory_source/scripts/step28_bge_continual_evaluate.py
+    未读；13765 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+462. [P4] background/frozen/function_memory_source/scripts/step28_bge_continual_run.py
+    未读；34789 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+463. [P4] background/frozen/function_memory_source/scripts/step28_bge_continual.py
+    未读；16341 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+464. [P4] background/frozen/function_memory_source/scripts/step28_chinese_base.py
+    未读；51352 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+465. [P4] background/frozen/function_memory_source/scripts/step28_continual_expression_run.py
+    未读；26322 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+466. [P4] background/frozen/function_memory_source/scripts/step28_continual_population_data.py
+    未读；11587 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+467. [P4] background/frozen/function_memory_source/scripts/step28_continual_population_evaluate.py
+    未读；20911 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+468. [P4] background/frozen/function_memory_source/scripts/step28_continual_population_run.py
+    未读；21310 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+469. [P4] background/frozen/function_memory_source/scripts/step28_continual_population.py
+    未读；9699 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+470. [P4] background/frozen/function_memory_source/scripts/step28_function_memory_run.py
+    未读；32894 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+471. [P4] background/frozen/function_memory_source/scripts/step28_function_memory_verify.py
+    未读；13281 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+472. [P4] background/frozen/function_memory_source/scripts/step28_function_memory.py
+    未读；19056 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+473. [P4] background/frozen/function_memory_source/scripts/step28_relation_memory.py
+    未读；19586 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+474. [P4] background/frozen/function_memory_source/tests/test_step28_function_memory_run.py
+    未读；9721 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+475. [P4] background/frozen/function_memory_source/tests/test_step28_function_memory.py
+    未读；11324 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+476. [P4] background/frozen/logit_low_source/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md
+    节选；32430 字节。17–135 行，含 104–125 行校准约定；核对旧 BGE 与校准/评价继承。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+477. [P4] background/frozen/logit_low_source/docs/SELLER_ALIAS_ER_LOW.zh.md
+    未读；6234 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+478. [P4] background/frozen/logit_low_source/docs/SELLER_ALIAS_ER_WEIGHT.zh.md
+    未读；9233 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+479. [P4] background/frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_LOW.zh.md
+    全文；5736 字节。核对旧 LOGIT0.1 正式含义和已固定系数。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+480. [P4] background/frozen/logit_low_source/docs/SELLER_ALIAS_LOGIT_WEIGHT.zh.md
+    未读；6265 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+481. [P4] background/frozen/logit_low_source/reports/documentation/20261001/er_weight/decision.json
+    未读；1746 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+482. [P4] background/frozen/logit_low_source/reports/documentation/20261002/er_low/decision.json
+    未读；1604 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+483. [P4] background/frozen/logit_low_source/reports/documentation/20261002/logit_weight/decision.json
+    未读；1851 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+484. [P4] background/frozen/logit_low_source/reports/documentation/20261003/logit_low/decision.json
+    未读；811 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+485. [P4] background/frozen/logit_low_source/schema/step28_alias_ranking_policy.json
+    未读；3489 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+486. [P4] background/frozen/logit_low_source/schema/step28_bge_continual_policy.json
+    未读；5123 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+487. [P4] background/frozen/logit_low_source/schema/step28_chinese_base_policy.json
+    未读；8439 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+488. [P4] background/frozen/logit_low_source/schema/step28_er_low_policy.json
+    未读；5029 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+489. [P4] background/frozen/logit_low_source/schema/step28_er_weight_policy.json
+    未读；3732 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+490. [P4] background/frozen/logit_low_source/schema/step28_logit_low_policy.json
+    未读；6675 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+491. [P4] background/frozen/logit_low_source/schema/step28_logit_weight_policy.json
+    未读；5059 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+492. [P4] background/frozen/logit_low_source/scripts/run_step28_bge_continual_linux_20260930.sh
+    未读；1243 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+493. [P4] background/frozen/logit_low_source/scripts/run_step28_er_check_linux_20261001.sh
+    未读；1171 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+494. [P4] background/frozen/logit_low_source/scripts/run_step28_er_weight_linux_20261001.sh
+    未读；1456 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+495. [P4] background/frozen/logit_low_source/scripts/step28_alias_calibration.py
+    未读；8818 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+496. [P4] background/frozen/logit_low_source/scripts/step28_alias_ranking.py
+    未读；11658 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+497. [P4] background/frozen/logit_low_source/scripts/step28_bge_continual_check.py
+    未读；12126 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+498. [P4] background/frozen/logit_low_source/scripts/step28_bge_continual_evaluate.py
+    未读；13765 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+499. [P4] background/frozen/logit_low_source/scripts/step28_bge_continual_run.py
+    未读；34789 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+500. [P4] background/frozen/logit_low_source/scripts/step28_bge_continual.py
+    未读；16341 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+501. [P4] background/frozen/logit_low_source/scripts/step28_chinese_base.py
+    未读；51352 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+502. [P4] background/frozen/logit_low_source/scripts/step28_continual_expression_run.py
+    未读；26322 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+503. [P4] background/frozen/logit_low_source/scripts/step28_continual_population_data.py
+    未读；11587 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+504. [P4] background/frozen/logit_low_source/scripts/step28_continual_population_evaluate.py
+    未读；20911 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+505. [P4] background/frozen/logit_low_source/scripts/step28_continual_population_run.py
+    未读；21310 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+506. [P4] background/frozen/logit_low_source/scripts/step28_continual_population.py
+    未读；9699 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+507. [P4] background/frozen/logit_low_source/scripts/step28_er_weight_check.py
+    未读；15314 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+508. [P4] background/frozen/logit_low_source/scripts/step28_er_weight_evaluate.py
+    未读；12346 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+509. [P4] background/frozen/logit_low_source/scripts/step28_er_weight_run.py
+    节选；36251 字节。43–166 行；旧 LOGIT 种子、更新和检查点入口。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+510. [P4] background/frozen/logit_low_source/scripts/step28_er_weight.py
+    节选；16922 字节。实际 update 函数及与当前 er_weight 全文件差异；另机器比较 update AST 相等。整文件字节不相等，不能宣称整件完全未改。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+511. [P4] background/frozen/logit_low_source/tests/test_step28_bge_continual_contracts.py
+    未读；31625 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+512. [P4] background/frozen/logit_low_source/tests/test_step28_er_weight_contracts.py
+    未读；49920 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+513. [P4] background/generation/recovery.json
+    未读；3653 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+514. [P4] background/generation/SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md
+    未读；16817 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+515. [P4] background/generation/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md
+    未读；3283 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+516. [P4] background/generation/source_identity.json
+    未读；3653 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+517. [P4] background/generation/step28_continual_expression_catalog.json
+    未读；10777 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+518. [P4] background/generation/step28_continual_expression_data.py
+    未读；18179 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+519. [P4] background/generation/step28_continual_expression_policy.json
+    未读；2935 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+520. [P4] background/history/compositional/context.zh.txt
+    未读；6403 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+521. [P4] background/history/compositional/external.zh.txt
+    未读；61188 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+522. [P4] background/history/compositional/literature.zh.txt
+    未读；4963 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+523. [P4] background/history/compositional/main_disposition.zh.txt
+    未读；14325 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+524. [P4] background/history/compositional/proposal.zh.txt
+    未读；22145 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+525. [P4] background/history/compositional/reading_scope.zh.txt
+    未读；4974 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+526. [P4] background/history/compositional/submission.json
+    未读；2875 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+527. [P4] background/history/operator/proposal.zh.txt
+    未读；30547 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+528. [P4] background/history/rank_protection/correction.zh.txt
+    未读；1554 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+529. [P4] background/history/residual/external.zh.txt
+    未读；41076 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+530. [P4] background/history/residual/main_disposition.zh.txt
+    未读；13165 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+531. [P4] background/history/residual/proposal.zh.txt
+    未读；24747 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+532. [P4] background/history/residual/reading_scope.zh.txt
+    未读；51529 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+533. [P4] background/history/residual/recovery.json
+    未读；2249 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+534. [P4] background/history/trainable_screening/report.zh.txt
+    未读；11258 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+535. [P4] background/manifest.json
+    未读；46739 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+536. [P4] background/prior_reviews/function_memory/external_review.zh.txt
+    未读；43908 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+537. [P4] background/prior_reviews/function_memory/main_review.zh.md
+    未读；4174 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+538. [P4] background/prior_reviews/logit_risk/external_review.zh.txt
+    未读；37596 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+539. [P4] background/prior_reviews/logit_risk/main_review.zh.md
+    未读；6170 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+540. [P4] background/prior_reviews/relation_memory/external_review.zh.md
+    未读；48306 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+541. [P4] background/prior_reviews/relation_memory/main_review.zh.md
+    未读；4830 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+542. [P4] background/prior_reviews/relation_revision/external_review.zh.md
+    未读；52304 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+543. [P4] background/prior_reviews/relation_revision/main_review.zh.md
+    未读；3743 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+544. [P4] background/project/SELLER_ALIAS_BGE_CONTINUAL.zh.md
+    未读；32430 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+545. [P4] background/project/SELLER_ALIAS_BGE_RESULT.zh.md
+    未读；19494 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+546. [P4] background/project/SELLER_ALIAS_CONTINUAL_DATA_RESULT.zh.md
+    未读；8584 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+547. [P4] background/project/SELLER_ALIAS_CONTINUAL_DATA.zh.md
+    未读；25818 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+548. [P4] background/project/SELLER_ALIAS_ER_LOW_RESULT.zh.md
+    未读；16515 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+549. [P4] background/project/SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md
+    未读；3283 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+550. [P4] background/project/SELLER_ALIAS_FUNCTION_MEMORY_PILOT.zh.md
+    未读；11390 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+551. [P4] background/project/SELLER_ALIAS_FUNCTION_MEMORY_RESULT.zh.md
+    未读；13590 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+552. [P4] background/project/SELLER_ALIAS_LITERATURE.zh.md
+    未读；21996 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+553. [P4] background/project/SELLER_ALIAS_LOGIT_LOW.zh.md
+    未读；5736 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+554. [P4] background/project/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md
+    未读；16239 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+555. [P4] background/project/SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md
+    未读；16256 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+556. [P4] background/project/SELLER_ALIAS_RANKING_RESULT.zh.md
+    未读；17642 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+557. [P4] background/project/SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md
+    未读；11859 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+558. [P4] background/project/SELLER_ALIAS_RELATION_REVISION_RESULT.zh.md
+    未读；13922 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+559. [P4] background/project/SELLER_ALIAS_TEST_RESULT.zh.md
+    未读；17098 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+560. [P4] background/request.zh.txt
+    未读；4650 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+561. [P4] cpu/attempt01.console.txt
+    未读；2022 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+562. [P4] cpu/attempt01.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+563. [P4] cpu/attempt01/result.json
+    未读；3557 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+564. [P4] cpu/attempt01/unittest.txt
+    未读；1001 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+565. [P4] cpu/attempt02.console.txt
+    未读；1507 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+566. [P4] cpu/attempt02.wrapper.txt
+    未读；60 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+567. [P4] cpu/attempt02/result.json
+    未读；3241 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+568. [P4] cpu/attempt02/unittest.txt
+    未读；1024 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+569. [P4] current/AGENTS.md
+    未读；3918 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+570. [P4] current/AI_RESEARCH_HANDOFF.zh.md
+    未读；41976 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+571. [P4] current/RESEARCH_DISCIPLINE.zh.md
+    未读；22351 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+572. [P4] current/RESEARCH_DISCUSSION.zh.md
+    未读；118062 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+573. [P4] implementation/docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md
+    未读；8397 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+574. [P4] implementation/schema/step28_alias_ranking_policy.json
+    未读；3489 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+575. [P4] implementation/schema/step28_bge_continual_policy.json
+    未读；5123 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+576. [P4] implementation/schema/step28_chinese_base_policy.json
+    未读；8439 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+577. [P4] implementation/schema/step28_record_replay_policy.json
+    未读；1680 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+578. [P4] implementation/scripts/run_step28_record_replay_linux_20261007.sh
+    未读；689 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+579. [P4] implementation/scripts/step28_alias_calibration.py
+    未读；8818 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+580. [P4] implementation/scripts/step28_alias_ranking.py
+    未读；11658 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+581. [P4] implementation/scripts/step28_bge_continual_evaluate.py
+    未读；13765 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+582. [P4] implementation/scripts/step28_bge_continual_run.py
+    未读；34789 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+583. [P4] implementation/scripts/step28_bge_continual.py
+    未读；16341 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+584. [P4] implementation/scripts/step28_chinese_base.py
+    未读；51352 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+585. [P4] implementation/scripts/step28_continual_expression_run.py
+    未读；26322 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+586. [P4] implementation/scripts/step28_continual_population_data.py
+    未读；11587 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+587. [P4] implementation/scripts/step28_continual_population_evaluate.py
+    未读；20911 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+588. [P4] implementation/scripts/step28_continual_population_run.py
+    未读；21310 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+589. [P4] implementation/scripts/step28_continual_population.py
+    未读；9699 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+590. [P4] implementation/scripts/step28_record_replay_run.py
+    未读；32707 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+591. [P4] implementation/scripts/step28_record_replay_verify.py
+    未读；11390 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+592. [P4] implementation/scripts/step28_record_replay.py
+    未读；15198 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+593. [P4] implementation/tests/test_step28_record_replay.py
+    未读；13983 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+594. [P4] initial_source.zip
+    未读；106602 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+595. [P4] manifest.json
+    未读；29769 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+596. [P4] previous_review/reading_scope.zh.txt
+    未读；56565 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+597. [P4] previous_review/report.zh.txt
+    未读；15024 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+598. [P4] previous_review/review.zh.txt
+    未读；50767 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+599. [P4] request.zh.txt
+    未读；5991 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述
+600. [P4] reviewed_source_inventory.json
+    未读；3547 字节。未作本次内容核阅；只列中央目录元数据。P0 的载荷 SHA 核验不改变此阅读分类。
+    身份核验：容器身份已核对；成员身份仅按 scope 所述

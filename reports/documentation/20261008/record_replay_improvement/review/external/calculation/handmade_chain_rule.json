@@ -1,0 +1,44 @@
+{
+  "scope": "Independent differentiable handwritten NumPy network and teacher terms; no production Torch update or formal model.",
+  "nullspace": {
+    "table_index": 0,
+    "A0_effect": 0.0,
+    "quarter_D1_gradient_at_index": -0.000248015873015873,
+    "expected": -0.000248015873015873
+  },
+  "arms": {
+    "C": {
+      "teacher_loss": 0.12017037874340153,
+      "encoder_gradient_norm": 0.0027435313442795884,
+      "head_gradient_norm": 1.1006946819357222,
+      "finite_difference_max_error": 2.2179369452146602e-11,
+      "handmade_AdamW_step_max_error": 4.442626821976603e-15
+    },
+    "S": {
+      "teacher_loss": 0.12049506354272439,
+      "encoder_gradient_norm": 0.002750088932728318,
+      "head_gradient_norm": 1.1020688022748906,
+      "finite_difference_max_error": 1.5342807211347897e-11,
+      "handmade_AdamW_step_max_error": 3.552713678800501e-15
+    },
+    "C_plus": {
+      "teacher_loss": 0.18041791051476372,
+      "encoder_gradient_norm": 0.004118393889802147,
+      "head_gradient_norm": 1.651728923526926,
+      "finite_difference_max_error": 3.039002383076195e-11,
+      "handmade_AdamW_step_max_error": 5.506012312750386e-15
+    },
+    "S_strong": {
+      "teacher_loss": 0.1807425953140866,
+      "encoder_gradient_norm": 0.004125133399092475,
+      "head_gradient_norm": 1.6531032034123356,
+      "finite_difference_max_error": 2.648832845772442e-11,
+      "handmade_AdamW_step_max_error": 5.68295410730002e-15
+    }
+  },
+  "parameter_gradient_identities": {
+    "C_plus_minus_S_equals_quarter_D1": 1.0547118733938987e-15,
+    "C_plus_minus_C_equals_quarter_D0": 8.326672684688674e-16,
+    "C_plus_minus_S_strong_equals_quarter_D1_minus_D0": 4.718447854656915e-16
+  }
+}

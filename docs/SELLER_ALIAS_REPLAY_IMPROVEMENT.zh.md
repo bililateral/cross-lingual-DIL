@@ -2,6 +2,8 @@
 
 2026-10-08，用户针对已经呈现的具体五臂方案明确回复：“按五臂完整范围执行（推荐）”。本合同将该许可落实为实现及执行边界；原[建议](../reports/documentation/20261008/record_replay_improvement/proposal.zh.txt)保留确认前快照，不把其中待确认措辞视为现行阻断。
 
+2026-10-08预算补充：原生功能核验通过后，最大形状时间投影63.8013小时超过原48小时；用户明确回复“上限改为72小时，按原实验范围继续（推荐）”。仅将正式总墙钟上限改为72小时，其余五臂、数据、判据、资源及失败处理不变；原48小时合同快照、外审与原生证据保留，核验累计用时不清零。见[原生处置](../reports/documentation/20261008/record_replay_improvement/native/disposition.zh.txt)。
+
 ## 问题与固定比较
 
 本轮检验保留原分组保护后增加重组teacher约束，能否提高C相对S的收益；不是已经建立的新方法或创新结论。数据、BGE、优化器、阶段日程、六群Algorithm R、校准、原22指标与23项函数，分别继承[原记录表合同](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)、[LOGIT0.1合同](SELLER_ALIAS_LOGIT_LOW.zh.md)及其明确引用。历史原件、原5项验收及false不追改。本轮具体常量见[policy](../schema/step28_replay_improvement_policy.json)。
@@ -26,7 +28,7 @@ B为原BCE＋query-rank＋0.5 known-top5-hard；记录表Bbar为A0/A1监督均�
 
 ## 资源、执行资格与失败
 
-Linux既有py310：手写CPU累计≤300秒、单CPU/2GiB RSS/64MiB证据；原生GPU核验累计≤600秒、单卡/28GiB reserved/64GiB RSS/128MiB证据；正式总墙钟≤48小时、单CPU/单卡、28GiB reserved/64GiB RSS、输出≤64GiB，包含全部诊断、校准、恢复及统计。旧核验不计作新运行资格；未变数学证据按适用范围复用。
+Linux既有py310：手写CPU累计≤300秒、单CPU/2GiB RSS/64MiB证据；原生GPU核验累计≤600秒、单卡/28GiB reserved/64GiB RSS/128MiB证据；正式总墙钟≤72小时、单CPU/单卡、28GiB reserved/64GiB RSS、输出≤64GiB，包含全部诊断、校准、恢复及统计。旧核验不计作新运行资格；未变数学证据按适用范围复用。
 
 实现及已授权手写CPU完成后，将本合同、代码、CPU证据与完整直接背景送网页GPT 6 Pro合并审查。主审关闭实质问题并通过原生核验才启动正式数据/标签与训练。原生需覆盖两架构实际更新与最坏诊断前向/输出成本，按实际群数推算时间和存储；超预算就报告具体选择，不偷减诊断或延长。具体新上传材料完成后按科研纪律第6节确认目的地/包范围，五臂运行范围不重问。
 
