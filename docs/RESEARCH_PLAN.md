@@ -4,11 +4,10 @@
 
 ## 已确认范围内
 
-1. 两项正式实验的小结果已完整回传，保存端点、访问账及原判据已独立核对，详见[ER0.1结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)与[匹配LOGIT结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)；不重新训练、重读标签或重建已结束监听，结果好坏均结束各自单点。
-2. 实际网页结果外审及最终主审已完成，接受限定开发结论，原判定全部保留；详见[主审处置](../reports/seller_alias_continual/20261003/result_review/report.zh.md)。ER配置按规则选0.1；LOGIT主对手仍为ER0.25，两项相对SEQ的完整保护均未全过。已关闭且未变的审查不重开。
-3. 必要证据已保存，本轮两端同步、阶段提交、push及独立远端复核分别以[交付回执](../reports/seller_alias_continual/20261003/result_review/delivery.json)为准；已完成部分不重复执行。当前权重保管见交接，正负结果不自动授予删除许可。两项旧实验已关闭；10月3日用户批准新的LOGIT0.1单点，范围见下项。
-
-4. 按[LOGIT0.1合同](SELLER_ALIAS_LOGIT_LOW.zh.md)实现并验证单点，主比较对ER0.1，固定另报对LOGIT0.25和SEQ；必要Linux手写CPU、网页外审与主审通过后执行一次正式训练，完整回传及结果审查。仅新增1728更新，12小时／16GiB，不扩展系数或种子。
+1. 最近一轮[记录作用表 C/S 实验](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)已完成训练、结果回传和保存矩阵独立核验；完整报告见[结果分析](../reports/seller_alias_continual/20261008/record_replay_result/report.zh.txt)。原判据和所有比较结果保持，不重启训练或重读标签。
+2. 本次结果外审已实际提交，下一步回收原文及必要附件，由主执行者结合保存证据独立处置。以[提交状态](../reports/seller_alias_continual/20261008/record_replay_result/review/submission.json)确认回收阶段，不重复上传；外审建议按当前问题与授权范围处理，不自动增加调参、消融或种子。
+3. 用户已经批准并完成的15份权重清理不构成重训许可；当前保留模型、文件位置及大清理周期统一见[存储记录](STORAGE.zh.md)。等待外审期间获准的两端清理和现行记录校正已完成；后续大清理按15天规则先说明并征得许可。
+4. ER、LOGIT、风险重放及关系／函数记忆的既有运行和已关闭审查保留原结论。用户持续寻找可行方法的研究要求仍有效；可继续已授权文献与数学分析，具体新方案形成后按范围汇报，不凭已开放结果自行开启新实验。
 
 ## 需要新合同的研究
 
