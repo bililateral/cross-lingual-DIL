@@ -8,11 +8,13 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
-## 2026-10-09 五臂改进：结果回传，36权重与Memory保留
+## 2026-10-09 五臂改进：36权重已留证删除，Memory保留
 
-20261008_151407/workspace正式作业于10月9日13:38:39正常结束。1,591份小结果／冻结来源／日志及资格证据共51,293,424字节已SFTP回传并逐项大小／SHA一致；分析和具体结果外审包亦保留，见[分析](../reports/seller_alias_continual/20261009/replay_improvement_result/report.zh.txt)及[回传清单](../reports/seller_alias_continual/20261009/replay_improvement_result/sync_manifest.json)。Linux原job/run/models的36模型和run/memory的36载荷合计46,988,038,388字节继续保留，未因本轮未达标删除；Memory正文不进入网页/Git或本地小结果包。清单的excluded_payloads给出实际相对路径与当时大小，本轮回传核验没有重新加载权重或读取Memory正文。
+20261008_151407/workspace正式作业于10月9日13:38:39正常结束。1,591份小结果／冻结来源／日志及资格证据共51,293,424字节已SFTP回传并逐项大小／SHA一致；分析和具体结果外审包亦保留，见[分析](../reports/seller_alias_continual/20261009/replay_improvement_result/report.zh.txt)及[回传清单](../reports/seller_alias_continual/20261009/replay_improvement_result/sync_manifest.json)。这些冻结原件记录的是删除前状态，excluded_payloads不再代表36权重仍存在。
 
-本轮结果审查尚未关闭，旧15份C/S或旧LOGIT权重清理许可不移用于这36份。预训练、旧三个共享首域完整状态、ER0.1六权重及排序两份例外仍按既定保留范围处理。临时传输ZIP核对后清理不改变上方大清理日期。
+用户随后明确：“模型训练权重确认无用后先保留相关记录再删掉”。本次核对全部训练、恢复和诊断已完成，保存结果分析及已授权外审无载模／恢复依赖，LOGIT历史复现问题当前依靠冻结来源、保存矩阵与更新记录核对；没有获准的后续训练／推理依赖。先逐份验证实际路径、归属、大小、SHA及状态摘要与原manifest一致，保存并回传[删除前记录](../reports/maintenance/20261009/replay_weights/predelete.json)，再于14:48:49—14:48:54删除原job/run/models内36份阶段推理权重，合计46,976,558,793字节（约43.75GiB逻辑文件大小）。实际36路径均不存在，目录剩余0；1,626份非权重证据SHA及23项保留例外元数据不变，见[删除回执](../reports/maintenance/20261009/replay_weights/receipt.json)。共享磁盘空闲变化另存，不全部归因于本次清理。
+
+36份Memory共11,479,595字节继续保留原job/run/memory；只核对字节身份，未反序列化或解析标签，不进入网页/Git。BGE预训练、旧三个共享首域完整状态、ER0.1六权重及排序两份例外保留。删除依据是已结束且无当前依赖及本次明确许可，不是结果正负；本轮外审尚未关闭、LOGIT复现问题及原性能结论不因此消失。SHA与记录不能恢复已删模型，未来载模须另行确定重建范围。局部权重清理不重置上方项目大清理日期。
 
 ## 2026-10-08 记录作用表C/S：15权重已删除
 

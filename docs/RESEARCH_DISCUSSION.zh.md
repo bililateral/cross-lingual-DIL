@@ -810,3 +810,11 @@ C_plus对S／S_strong／本轮LOGIT0.1分别4/23、18/23、23/23，原整体fals
 已先完成可审查的报告与具体包，再按科研纪律第6节询问新增包披露。用户明确回复：“授权上传此结果包外审（推荐）”。许可对象为47,913,772字节、1,629成员、SHA256 5b410fa7b80fb9fd89a02555a898014f3877e53620dfc170a2ffcc02870da2d1的结果包，目的地chatgpt.com，用本地Playwright MCP交给GPT 6 Pro作结果外审；不包含模型、Memory、正式文本／标签、封存真值或凭据。见[许可原记录](../reports/seller_alias_continual/20261009/replay_improvement_result/review/upload_authorization.json)、[请求](../reports/seller_alias_continual/20261009/replay_improvement_result/review/request.zh.txt)及[实际状态](../reports/seller_alias_continual/20261009/replay_improvement_result/review/submission.json)。上传／完成／接受分别记账，旧实现审查不代替本轮结果审查；未授权新训练或删除权重。
 
 14:27将相同字节的获准包上传／发送各一次，建立[五臂结果外审](https://chatgpt.com/c/6ac8893f-2780-83ed-9b80-9ed444f170b1)；14:28:55确认审查者已开始。页面显示GPT-6／Pro，后台身份未独立取得。上传附件被网页重命名为review_input(9).zip；发送后短暂旧路由／隐藏DOM未当作成功证明，重新核对当前会话后确认，没有重复上传或发送。当前为SUBMITTED_IN_PROGRESS，尚非结果外审通过。
+
+## 2026-10-09：五臂权重核对依赖后留证清理
+
+用户原话：“模型训练权重确认无用后先保留相关记录再删掉”。本次范围限定为刚完成五臂作业20261008_151407/workspace的36份阶段推理权重，不扩大到预训练或此前明确保留的模型。核对训练、全部恢复和固定epoch诊断已完成，保存结果分析及当前获准网页外审无载模／恢复依赖；LOGIT历史复现差异的当前核对依赖已保留的源码、保存矩阵和逐步更新日志，不以清理关闭该问题或自动授权复跑。
+
+逐权重实际路径／归属／大小／SHA／状态摘要与冻结manifest一致后，先将[删除前记录](../reports/maintenance/20261009/replay_weights/predelete.json)保存Linux、回传Windows并核对，再于14:48:49—14:48:54删除36份，共46,976,558,793字节（约43.75GiB逻辑文件大小）。36路径均不存在、模型目录剩余0；1,626份非权重SHA及23项保留例外元数据前后不变。36份Memory、BGE预训练、旧三个共享首域完整状态、ER0.1六权重、排序s0_hard／s0_d两份例外继续保留。见[实际删除回执](../reports/maintenance/20261009/replay_weights/receipt.json)与[当前保管](STORAGE.zh.md)。仅做文件身份与删除核验，载模、标签重解析和Memory反序列化均0；其他用户GPU作业未触碰。
+
+删除依据是已结束且无当前依赖和最新明确许可，不是本轮效果正负。原合同、结果报告、同步清单和审查输入包保留删除前字节，最新保管状态只在交接／STORAGE及本回执维护。哈希不能恢复已删权重；后续重建须另定范围与预算。本次局部清理不重置15日项目大清理周期，结果外审尚未关闭。
