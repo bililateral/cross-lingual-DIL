@@ -1,0 +1,46 @@
+{
+  "kind": "Mechanical arithmetic on already saved measurements, not new qualification",
+  "source": "external/three_arm_attribution_review_zh.zip :: review_work/input/background/FIVE_ARM_native.json",
+  "per_arm": [
+    {
+      "arm": "LOGIT0.1",
+      "paired_seconds": 14.380841952981427,
+      "first_seconds": 7.32887900294736,
+      "first_minus_half_paired": 0.13845802645664662,
+      "double_max": 0.13845802645664662,
+      "integer_first_argument_max": 0,
+      "train_seconds": 31063.864740677993
+    },
+    {
+      "arm": "R0",
+      "paired_seconds": 14.618478919146582,
+      "first_seconds": 7.755698027089238,
+      "first_minus_half_paired": 0.4464585675159469,
+      "double_max": 0.4464585675159469,
+      "integer_first_argument_max": 0,
+      "train_seconds": 31579.93259246426
+    },
+    {
+      "arm": "S",
+      "paired_seconds": 14.618478919146582,
+      "first_seconds": 7.755698027089238,
+      "first_minus_half_paired": 0.4464585675159469,
+      "double_max": 0.4464585675159469,
+      "integer_first_argument_max": 0,
+      "train_seconds": 31579.93259246426
+    }
+  ],
+  "train_seconds": 94223.72992560652,
+  "pure_forward_seconds": 29697.264359822497,
+  "small_save_proxy_seconds": 4.415288362652063,
+  "other_work_seconds": 3600,
+  "total_seconds": 159406.76196723958,
+  "hours": 44.279656102010996,
+  "original_prose_hours": 44.2764,
+  "difference_from_prose_seconds": 11.721967239573132,
+  "projected_peak_output_bytes": 45428115383.0,
+  "projected_peak_output_GiB": 42.308229378424585,
+  "explanation": "PowerShell Math.Max(0, floating_value) selects integer overload; Math.Max([double]0, floating_value) reproduces the native Python formula. Initial prose used the integer-overload approximation.",
+  "record_measurement": "Old C_plus, reused only for planning R0 and S",
+  "runtime_code_changed": false
+}
