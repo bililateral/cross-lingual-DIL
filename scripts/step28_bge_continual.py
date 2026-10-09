@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -25,6 +26,25 @@ STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
                 "history_bce", "history_rank", "history_hard", "history_total",
                 "logit_mse", "total", "encoder_lr", "head_lr", "gradient_norm",
                 "logit_term_host_seconds")
+
+
+def configure_numerics() -> dict:
+    """Apply the historical LOGIT runtime before model work; read back actual flags."""
+    import torch
+    if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
+        raise RuntimeError("Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8")
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.benchmark = False
+    return {
+        "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+        "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+        "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+        "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+        "cudnn_benchmark": torch.backends.cudnn.benchmark,
+        "cublas_workspace_config": os.environ["CUBLAS_WORKSPACE_CONFIG"],
+    }
 
 
 def contract() -> dict:

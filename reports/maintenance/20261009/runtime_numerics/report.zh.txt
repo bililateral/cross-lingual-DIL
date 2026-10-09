@@ -1,0 +1,26 @@
+2026-10-09 数值运行设置修复：实现及 Linux CPU 核验
+
+用户明确要求修复“旧入口明确设置确定性和 TF32 等开关，新五臂入口没有同样设置”的问题。此前用户已要求删除五臂活动入口；本次不恢复 C_plus、S_strong 或五臂入口，不覆盖冻结源码、合同、历史结果或原外审处置。
+
+本次交付
+1. 在保留的 step28_bge_continual.py 增加 configure_numerics，实际调用 PyTorch 设置：deterministic_algorithms=True、CUDA matmul TF32=False、cuDNN TF32=False、cuDNN benchmark=False。返回值来自 PyTorch 的实际读取，同时记录 warn_only=False 和 CUBLAS_WORKSPACE_CONFIG。
+2. 保留的原 BGE／LOGIT execute 与 C/S execute 在训练前调用同一函数，execution.json 保存 numerics。C/S 原生核验入口在载模前调用，CPU／GPU资格报告记录同样的值。原 CPU 资格测试集合包括新增的三项入口检查。
+3. C/S Bash 启动脚本在启动 Python 前设置 CUBLAS_WORKSPACE_CONFIG=:4096:8，与旧 BGE／LOGIT 启动条件一致。Python 入口若缺少该值直接报错，不在 CUDA 已可能使用后偷偷补写环境变量。其余精度、BF16 autocast、种子、目标、优化器及评价公式未改变。
+4. 六项活动来源见 sources.json。Linux 对已有五文件先核对修改前 SHA 与 Windows HEAD；C/S shell 此前不在 Linux 主目录，本次新增部署。历史独立 workspace 保留。检查中发现 Linux 主目录 ER 权重入口为更早实现，故撤回对该入口的非必要改动，不用本次修复顺带覆盖其方法版本；两端原 ER／LOGIT 续训入口已有四项显式设置，保持各自原样。
+
+实际核验
+Linux 既有 py310：Python 3.10.19、torch 2.9.1+cu130、CUDA build 13.0。单 CPU0、CUDA_VISIBLE_DEVICES=''，外层60秒硬上限；实际2.33秒，外部最大RSS 785840 KiB。这是当前修复的维护核验，不动用已关闭五臂实验的剩余预算，不产生新正式运行资格。
+六项通过，失败0、错误0、跳过0：
+— 先把真实 PyTorch 四开关及 warn_only 故意设错，确认函数实际纠正且读回记录一致；缺失 cuBLAS 环境配置时拒绝。
+— 从实际 C/S execute 进入，模拟资源／权限边界，确认首次训练调用前已纠正，execution.json 是实际值，访问账全0；在训练边界停止，没有正式训练。
+— 从实际 native 进入，在首次载模调用前核对真实开关，在载模边界停止，没有 GPU 核验或预训练模型加载。
+— 复用三项现有手写真实计算检查：VJP各参数及Adam更新对直接autograd、重组约束在原分配零空间中产生梯度、完整状态恢复后下一真实更新一致。
+另做两项必要反例：把设置函数替换成“只返回正确样子的字典、不执行设置”，正式／原生入口检查均实际失败。missing_operation_counterexample.txt 中两次预期失败是测试辨识能力证据，不是训练失败。原始核验日志、外层资源和结果均保留。
+Bash -n 检查退出0。六文件SFTP部署后大小／SHA全部匹配。没有正式数据／标签读取、Memory反序列化、预训练载模、GPU计算、指标重算或重训。
+
+历史边界
+已修复的是保留实现的“缺显式设置及有效值记录”问题；不能据此把历史五臂 R1 写成已经精确复现或根因已隔离。历史新进程的四项实际值依然未知。历史 LOGIT 0/27、C/S各27/27以及原统计和负结果不变；设置缺失是否足以解释全部历史差异没有实测。新代码不能使用不匹配的旧资格或旧 formal gate 启动。未来正式执行仍需其合同、审查及相应原生证据；本次没有新 GPU 或正式训练授权。
+
+外审状态：已先准备81,606字节、24成员的具体增量包，再询问新增上传许可。用户明确回复“此次修复免于网页外审”，依科研纪律第6节按本次范围豁免。没有上传、没有网页外审，不声称外审通过；无用临时送审包及其组装材料删除，包身份及豁免见review_package.json，代码与Linux原始核验记录保留。此次豁免不自动用于后续新方案、实现或实验。
+
+版本基点：Windows本次修改前HEAD为f06c7b3efb8a926fc0f57dbebec079b19953f6dd。sources.json保存六项活动代码修复前后身份；具体代码差异由本次Git提交保留。Linux主目录相关文件已同步，完整交付身份见sync_receipt.json。

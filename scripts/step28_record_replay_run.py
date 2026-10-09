@@ -518,11 +518,13 @@ def execute(job: Path, gate_path: Path) -> dict:
         data.verify(data.ROOT/p["reference"]["linux_root"]/name, rec)
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
+    numerics = parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
     job.mkdir(parents=True)
     budget = Budget(job)
     data.write_json(job/"access.json", dict(train=0, valid=0, heldout=0, owners=0))
-    data.write_json(job/"execution.json", {"gate": data.record(gate_path, data.ROOT), "sources": sources(), "resources": resources})
+    data.write_json(job/"execution.json", {"gate": data.record(gate_path, data.ROOT), "sources": sources(),
+                                        "resources": resources, "numerics": numerics})
     stopped = threading.Event()
     def watchdog():
         while not stopped.wait(1):

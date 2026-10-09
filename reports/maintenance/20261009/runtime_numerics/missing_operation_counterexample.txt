@@ -1,0 +1,45 @@
+test_formal_entry_applies_and_records_before_training (test_step28_record_replay.NumericsTests) ... FAIL
+test_native_entry_applies_before_model_loading (test_step28_record_replay.NumericsTests) ... FAIL
+
+======================================================================
+FAIL: test_formal_entry_applies_and_records_before_training (test_step28_record_replay.NumericsTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/tests/test_step28_record_replay.py", line 340, in test_formal_entry_applies_and_records_before_training
+    run.execute(job, Path(tmp)/"unused_gate.json")
+  File "/home/yongpeng/cross-lingual/scripts/step28_record_replay_run.py", line 544, in execute
+    manifest, partition, valid = train(job, budget)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/tests/test_step28_record_replay.py", line 324, in stop_before_training
+    self.assertEqual(self.observed(), self.expected)
+AssertionError: {'det[19 chars]ms': False, 'deterministic_warn_only': True, '[114 chars]6:8'} != {'det[19 chars]ms': True, 'deterministic_warn_only': False, '[117 chars]6:8'}
+Diff is 701 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_native_entry_applies_before_model_loading (test_step28_record_replay.NumericsTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/tests/test_step28_record_replay.py", line 354, in test_native_entry_applies_before_model_loading
+    verify.native(lambda: None, mock.Mock(), mock.Mock())
+  File "/home/yongpeng/cross-lingual/scripts/step28_record_replay_verify.py", line 49, in native
+    model = method.load_model(c)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/tests/test_step28_record_replay.py", line 347, in stop_before_loading
+    self.assertEqual(self.observed(), self.expected)
+AssertionError: {'det[19 chars]ms': False, 'deterministic_warn_only': True, '[114 chars]6:8'} != {'det[19 chars]ms': True, 'deterministic_warn_only': False, '[117 chars]6:8'}
+Diff is 701 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.006s
+
+FAILED (failures=2)

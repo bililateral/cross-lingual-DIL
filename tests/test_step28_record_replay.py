@@ -275,5 +275,84 @@ class RecordReplayTests(unittest.TestCase):
             np.testing.assert_allclose(result["map"]["conditional_95pct_interval"], [expected, expected], rtol=0, atol=1e-12)
 
 
+class NumericsTests(unittest.TestCase):
+    """Real torch switches; mocked resource/data boundaries stop before model loading."""
+
+    @staticmethod
+    def observed():
+        return {
+            "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+            "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+            "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+            "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+            "cudnn_benchmark": torch.backends.cudnn.benchmark,
+            "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+        }
+
+    def setUp(self):
+        old = self.observed()
+        self.addCleanup(torch.use_deterministic_algorithms, old["deterministic_algorithms"],
+                        warn_only=old["deterministic_warn_only"])
+        for obj, key, value in ((torch.backends.cuda.matmul, "allow_tf32", old["cuda_matmul_allow_tf32"]),
+                                (torch.backends.cudnn, "allow_tf32", old["cudnn_allow_tf32"]),
+                                (torch.backends.cudnn, "benchmark", old["cudnn_benchmark"])):
+            self.addCleanup(setattr, obj, key, value)
+        environment = mock.patch.dict(os.environ, {"CUBLAS_WORKSPACE_CONFIG": ":4096:8"})
+        environment.start()
+        self.addCleanup(environment.stop)
+        torch.use_deterministic_algorithms(False, warn_only=True)
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        torch.backends.cudnn.benchmark = True
+        self.expected = {"deterministic_algorithms": True, "deterministic_warn_only": False,
+                         "cuda_matmul_allow_tf32": False, "cudnn_allow_tf32": False,
+                         "cudnn_benchmark": False, "cublas_workspace_config": ":4096:8"}
+
+    def test_applies_real_flags_and_rejects_missing_workspace(self):
+        before = self.observed()
+        with mock.patch.dict(os.environ, {"CUBLAS_WORKSPACE_CONFIG": ""}):
+            with self.assertRaisesRegex(RuntimeError, "Start Python"):
+                method.parent.configure_numerics()
+        self.assertEqual(self.observed(), before)
+        receipt = method.parent.configure_numerics()
+        self.assertEqual(self.observed(), self.expected)
+        self.assertEqual(receipt, self.observed())
+
+    def test_formal_entry_applies_and_records_before_training(self):
+        import step28_record_replay_verify as verify
+        def stop_before_training(*args):
+            self.assertEqual(self.observed(), self.expected)
+            raise RuntimeError("HANDWRITTEN_STOP_BEFORE_TRAINING")
+        with tempfile.TemporaryDirectory(dir=os.environ["RECORD_REPLAY_TEST_ROOT"]) as tmp:
+            job = Path(tmp)/"job"
+            p = {"runtime": {"maximum_output_bytes": 1}, "reference": {"collections": {}}}
+            with mock.patch.object(run, "validate_gate", return_value=p), \
+                    mock.patch.object(verify, "preflight", return_value={}), \
+                    mock.patch.object(torch, "set_num_interop_threads"), \
+                    mock.patch.object(torch.cuda, "get_device_properties", return_value=mock.Mock(total_memory=32*2**30)), \
+                    mock.patch.object(torch.cuda, "set_per_process_memory_fraction"), \
+                    mock.patch.object(run, "Budget", return_value=mock.Mock(snapshot=mock.Mock(return_value={}))), \
+                    mock.patch.object(run, "sources", return_value=[]), \
+                    mock.patch.object(run.data, "record", return_value={}), \
+                    mock.patch.object(run.signal, "signal"), \
+                    mock.patch.object(run, "train", side_effect=stop_before_training):
+                with self.assertRaisesRegex(RuntimeError, "HANDWRITTEN_STOP_BEFORE_TRAINING"):
+                    run.execute(job, Path(tmp)/"unused_gate.json")
+            self.assertEqual(run.data.read_json(job/"execution.json")["numerics"], self.observed())
+            self.assertEqual(run.data.read_json(job/"access.json"), dict(train=0, valid=0, heldout=0, owners=0))
+
+    def test_native_entry_applies_before_model_loading(self):
+        import step28_record_replay_verify as verify
+        def stop_before_loading(*args):
+            self.assertEqual(self.observed(), self.expected)
+            raise RuntimeError("HANDWRITTEN_STOP_BEFORE_LOADING")
+        with mock.patch.object(verify, "preflight", return_value={}), \
+                mock.patch.object(torch.cuda, "get_device_properties", return_value=mock.Mock(total_memory=32*2**30)), \
+                mock.patch.object(torch.cuda, "set_per_process_memory_fraction"), \
+                mock.patch.object(method, "load_model", side_effect=stop_before_loading):
+            with self.assertRaisesRegex(RuntimeError, "HANDWRITTEN_STOP_BEFORE_LOADING"):
+                verify.native(lambda: None, mock.Mock(), mock.Mock())
+
+
 if __name__ == "__main__":
     unittest.main()

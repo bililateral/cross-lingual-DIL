@@ -43,6 +43,7 @@ def preflight() -> dict:
 
 def native(check, progress, handmade) -> dict:
     resources = preflight()
+    numerics = method.parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
     c = method.config()
     model = method.load_model(c)
@@ -55,7 +56,7 @@ def native(check, progress, handmade) -> dict:
                    padding=False, truncation=False)["input_ids"]]
         if len(lengths) != 448 or set(lengths) != {256}:
             raise ValueError("Handwritten probe is not the actual N224/token256 worst shape")
-    progress("native_source_eval", resources=resources)
+    progress("native_source_eval", resources=resources, numerics=numerics)
     tick = time.monotonic()
     teacher = method.reference(model, history, c, check)
     torch.cuda.synchronize()
@@ -106,7 +107,7 @@ def native(check, progress, handmade) -> dict:
     # paired update, all 2,274 eval/source group passes at worst-shape source cost;
     # 15*2*(12+60)+60+3*6+6*6 = 2,274. Add checkpoint time and a 25% margin.
     estimate = 1.25*(7776*update_seconds/2 + 2274*source_seconds + 1800)
-    return {"kind": "native_record_replay_first_optimizer_step", "records_per_group": 224,
+    return {"kind": "native_record_replay_first_optimizer_step", "numerics": numerics, "records_per_group": 224,
             "tokens_per_channel": 256, "source_table_values": 24976, "source_seconds": source_seconds,
             "paired_update_seconds": update_seconds, "gradient_increments": increments, "parameters_changed": changed,
             "first_layer_forward_calls": forwards[0], "adam_step": 1, "log": log,
@@ -176,6 +177,7 @@ def main() -> None:
     watcher = threading.Thread(target=watchdog, daemon=True)
     watcher.start()
     try:
+        report["numerics"] = method.parent.configure_numerics()
         if len(process.cpu_affinity()) != 1 or any(os.environ.get(k) != "1" for k in
                 ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS")):
             raise ValueError("One CPU and pre-import thread limits required")
@@ -183,7 +185,8 @@ def main() -> None:
         if args.mode == "cpu":
             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
                 raise ValueError("CPU checks must disable CUDA")
-            suite = unittest.defaultTestLoader.loadTestsFromTestCase(handwritten.RecordReplayTests)
+            suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromTestCase(case)
+                for case in (handwritten.RecordReplayTests, handwritten.NumericsTests))
             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:
                 result = unittest.TextTestRunner(stream=stream, verbosity=2, failfast=True).run(suite)
             report.update(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped))

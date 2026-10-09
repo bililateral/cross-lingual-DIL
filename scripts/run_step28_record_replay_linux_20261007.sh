@@ -7,6 +7,7 @@ job="$3"
 test ! -e "$job"
 test -d "$(dirname "$job")"
 export CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
 export TOKENIZERS_PARALLELISM=false PYTHONDONTWRITEBYTECODE=1
 export RECORD_REPLAY_STARTED_EPOCH="$(date +%s)"
 date -Is > "$job.wrapper.txt"

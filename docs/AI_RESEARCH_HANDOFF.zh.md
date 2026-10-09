@@ -1,11 +1,12 @@
 # 当前科研交接
 
-本页顶部表格是唯一的当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按本次任务进入合同、实际实现、直接依赖及原始审查；历史通过下方索引回溯，不将旧报告中的“当前／待授权／下一步”当作新指令。五臂作业、结果回传和结果外审／主审已完成；C_plus登记为本固定配置负结果，原继续条件false。按用户明确范围，两端候选及五臂活动入口已撤下，原C/S、LOGIT和通用过拟合诊断保留。LOGIT历史复现缺陷R1已登记并限定主张，数值根因未隔离，不自动重训。
+本页顶部表格是唯一的当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按本次任务进入合同、实际实现、直接依赖及原始审查；历史通过下方索引回溯，不将旧报告中的“当前／待授权／下一步”当作新指令。五臂作业、结果回传和结果外审／主审已完成；C_plus登记为本固定配置负结果，原继续条件false。按用户明确范围，两端候选及五臂活动入口已撤下，原C/S、LOGIT和通用过拟合诊断保留。用户随后要求修复数值设置遗漏；保留的BGE／LOGIT与C/S入口已显式对齐并记录实际值，Linux CPU核验通过，本次用户明确免网页外审。LOGIT历史复现缺陷R1的数值根因仍未隔离，不自动重训，旧结果与冻结源码不追改。
 
 ## 当前工作
 
 | 项目 | 当前范围、已保存事实与直接入口 |
 |---|---|
+| 最新修复 | 用户要求修复确定性／TF32遗漏，并明确“此次修复免于网页外审”。公共配置函数已接入保留的BGE／LOGIT、C/S执行与C/S核验入口，记录实际四开关、warn_only及cuBLAS环境；C/S shell补齐旧cuBLAS设置。Linux单CPU六项检查通过，去掉实际设置的两项反例均被检出，外层2.33秒、无GPU／正式数据／预训练载模；六来源两端一致。未恢复五臂入口、未改历史、未获得新运行资格；见[修复与边界](../reports/maintenance/20261009/runtime_numerics/report.zh.txt)、[核验原件](../reports/maintenance/20261009/runtime_numerics/result.json)。 |
 | 研究问题 | 最近已结束问题为提高记录重放C相对S的收益，并加入LOGIT0.1及本算法的共同过拟合诊断。C_plus未实现本配置改进目标，用户已要求撤下；调系数不作为实质方法创新，论文算法尚未确定。 |
 | 合同与保留实现 | [五臂合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)、[policy](../schema/step28_replay_improvement_policy.json)作为冻结方案保留，[实际五臂源码](../reports/seller_alias_continual/20261009/replay_improvement_result/source/scripts/step28_replay_improvement_run.py)仅供追溯。活动[目标／VJP](../scripts/step28_record_replay.py)已恢复原C/S；原C/S、LOGIT及[通用诊断](../scripts/step28_replay_diagnostics.py)保留。候选、五臂入口／核验／专用测试已删除，诊断模块未自动接入历史入口；见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。 |
 | 已批准运行 | 用户明确“按五臂完整范围执行（推荐）”：LOGIT0.1、C、S、C_plus、S_strong，s0及ABC/BCA/CAB；10,368更新、19,008梯度群呈现、36物理阶段状态／45逻辑点、216逐轮诊断点。必要实现、同步、核验、训练和回传不按命令重问；不自动调参重跑。 |

@@ -517,15 +517,12 @@ def execute(job: Path, audit_path: Path, authorization_path: Path) -> dict:
     job.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(1)
     os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
-    torch.use_deterministic_algorithms(True)
-    torch.backends.cuda.matmul.allow_tf32 = False
-    torch.backends.cudnn.allow_tf32 = False
-    torch.backends.cudnn.benchmark = False
+    numerics = method.configure_numerics()
     budget = base.persistence.Budget(job, {"runtime": p["runtime"]})
     data.write_json(job / "access.json", {"train": 0, "valid": 0, "heldout": 0, "owners": 0})
     data.write_json(job / "execution.json", {"authorization": data.record(authorization_path, data.ROOT),
                                             "audit": data.record(audit_path, data.ROOT),
-                                            "source_files": sources(), "python": platform.python_version(),
+                                            "source_files": sources(), "numerics": numerics, "python": platform.python_version(),
                                             "torch": torch.__version__, "cuda": torch.version.cuda,
                                             "gpu": torch.cuda.get_device_name(), "cpu_affinity": sorted(os.sched_getaffinity(0))})
     try:
