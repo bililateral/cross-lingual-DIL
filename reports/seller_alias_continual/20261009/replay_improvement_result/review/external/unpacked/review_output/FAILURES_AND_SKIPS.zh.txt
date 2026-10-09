@@ -1,0 +1,25 @@
+失败与跳过事实（本轮网页结果外审）
+
+一、当前项目正式作业
+随包completion及wrapper显示正常完成，exit_code=0；当前job未提供failure.json。网页核对没有发现正式失败或自动重训证据。不能将本网页辅助脚本错误算作项目训练失败。
+
+二、本网页科学主核对
+audit_saved.py execution / metrics / diagnostics / historical：四个阶段均首轮exit0；保留每次stdout和带环境／耗时的run JSON。
+所有原端点、比较、区间、判据和诊断判读已核对。teacher均值初次求和差至多1.11e-16，明确逐项加法核对612个标量精确一致；两份原输出均保留。
+
+三、本网页辅助脚本错误
+1. display attempt01：KeyError: 'pooled_all'。审查者读取代码错用了字段名，真实字段为pooled。修改后attempt02 exit0。
+   保留audit_displays_attempt01_failed.py、display_console_attempt01.txt、display_audit_attempt01_failed.json，以及修正后源码、console和display_audit.json。
+2. provenance attempt01：AssertionError: sync_source_binding。审查者把source_files整数计数28当作完整列表比较。改为核计数，并独立对真实source列表，attempt02 exit0。
+   保留audit_provenance_attempt01_failed.py、provenance_console_attempt01.txt，以及修正后源码、console和provenance_audit.json。
+   首轮脚本未设置内部异常计时收据，故不补造其内部耗时／峰值RSS。
+3. 早期只读路径探查run/collected.json未命中，实际为evaluation/collected.json；之后正确读取。该次不是程序异常或项目缺件。
+4. 一次批量展示工具输出截断了旧实现审查正文的中段；已单独补读98—149行，完整人工阅读范围由合并记录给出。不把截断内容声称为未补读前已经读过。
+
+四、原执行者保存的历史失败说明
+原report/summary记载汇总stdin曾因Windows中文编码触发Non-UTF-8 SyntaxError，随后UTF-8文件执行成功。本网页阅读的是保存说明，不伪称亲历原失败。关闭的CPU资格旧夹具失败按既有记录保留，本轮未递归重跑。
+
+五、有意跳过或未能独立证明的事项
+按本轮范围不读权重／Memory正文、正式文本／标签、owners、Audit、private_custody或凭据；不连项目服务器，不运行Torch/GPU、训练或校准拟合。因而模型真实重载和原始标签到指标的整条链没有在本网页再执行；审查使用对应冻结调用和保存收据。
+未隔离LOGIT历史数值差异的因果；未观察当前页面模型选择器；未独立验证服务端精确模型路由。未将这些缺口补写为通过。
+未进行新指标／新阈值／新seed／新bootstrap选择；仅复算原固定规则。未展开更深层旧实现审查输入ZIP，未对提供图像做视觉审查（只核字节及生成代码来源）。

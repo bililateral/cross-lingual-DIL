@@ -1,5 +1,5 @@
 {
-  "status": "SUBMITTED_IN_PROGRESS",
+  "status": "COMPLETED_PRIMARY_ACCEPTED_WITH_R1_RECORDED",
   "observed_at": "2026-10-09T14:28:55.6348974+08:00",
   "conversation_url": "https://chatgpt.com/c/6ac8893f-2780-83ed-9b80-9ed444f170b1",
   "conversation_title": "五臂结果外审",
@@ -17,8 +17,37 @@
   "file_upload_calls": 1,
   "send_clicks": 1,
   "review_started": true,
-  "review_completed": false,
-  "primary_disposition_completed": false,
+  "review_completed": true,
+  "primary_disposition_completed": true,
   "browser_route_note": "Immediately after send, the SPA briefly exposed the old implementation-review route and retained hidden DOM; a fresh accessibility snapshot confirmed the new conversation and one new request. No second upload or send.",
-  "evidence": "submitted_page.json"
+  "evidence": "submitted_page.json",
+  "completed_observed_at": "2026-10-09T07:04:42.698Z",
+  "closed_at": "2026-10-09T15:18:53.372165+08:00",
+  "browser_closed": true,
+  "external_zip": {
+    "path": "external/FIVE_ARM_REVIEW_20261009.zip",
+    "bytes": 1255425,
+    "members": 50,
+    "manifest_payloads_verified": 48,
+    "sha256": "bba998cf81e0b98d522a5e06b43147ae63b138241c471054f861b63ed1da274f"
+  },
+  "external_delivery_manifest": {
+    "sha256": "f204ecf12c45d24d84bccfea668eed71923cc87a2a747579494532ed2980ac50",
+    "path": "external/DELIVERY_MANIFEST.json"
+  },
+  "primary_disposition": "primary_disposition.zh.txt",
+  "reviewer_self_description": "GPT-6 Astra Pro; not independently verified backend identity",
+  "disposition": {
+    "candidate_result": "FIXED_CONFIGURATION_NEGATIVE",
+    "development_criteria_pass": false,
+    "scientific_blockers_confirmed": 0,
+    "reproducibility_defects_confirmed": 1,
+    "R1": "Historical LOGIT not exactly reproduced; four effective runtime flags unrecorded/unknown; numerical cause not isolated. Claims limited to this run."
+  },
+  "recovery_notes": [
+    "Single ZIP download succeeded. Standalone manifest viewer download timed out; viewer was subsequently absent. An ambiguous locator then stopped before download. The observed attachment-row download succeeded and its SHA matched the final response. No repeat upload or review submission.",
+    "Completed page text preserved; redundant shallow/full accessibility snapshots and transport ZIP removed.",
+    "Frozen input/result/source bytes unchanged. Model cleanup and candidate retirement are separate from numerical root-cause repair."
+  ],
+  "external_delivery_created_at": "2026-10-09T06:57:28.656023+00:00"
 }

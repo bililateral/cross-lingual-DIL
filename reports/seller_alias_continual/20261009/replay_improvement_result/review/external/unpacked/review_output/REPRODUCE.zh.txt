@@ -1,0 +1,32 @@
+复现与交付说明
+
+本ZIP保存本轮审查正文、阅读台账、必要计算源码和原始输出，未复制47,913,772字节输入包。
+唯一输入：review_input(9).zip（用户标称原名review_input.zip），SHA256：
+5b410fa7b80fb9fd89a02555a898014f3877e53620dfc170a2ffcc02870da2d1
+
+一、环境与位置
+已执行环境为网页审查工作区Python 3.12.14、NumPy 2.3.5。脚本只依赖标准库和NumPy，不导入项目模块、Torch，不需要网络、项目服务器、权重、Memory正文或原始标签。
+解压审查ZIP后保持review_output目录结构。在其父目录执行下列命令：
+
+python3 review_output/prepare_input.py /绝对路径/review_input(9).zip
+python3 review_output/audit_saved.py execution
+python3 review_output/audit_saved.py metrics
+python3 review_output/audit_saved.py diagnostics
+python3 review_output/audit_saved.py historical
+python3 review_output/audit_displays.py
+python3 review_output/audit_provenance.py
+
+命令行输入路径若含括号／空格应由本地shell适当引用。prepare_input验证唯一输入身份，再将附件解到同级input；已存在的同名文件只验证相同字节，不改写。每个audit阶段原始stdout已提供，run JSON含实际输入文件、SHA及执行环境。重跑会产生自己的新运行时间和run记录，不应替换这里交付的原始运行证据。
+
+二、核对与推断边界
+科学数值核对从原保存矩阵／计数开始。只复算原PCG64(20260930)的5000次统计、固定角色／端点／23项、epoch1→6及原诊断种子。2e-12仅为复算浮点相等检查的机器容差，不是新增性能容忍或科学判据；原主统计及诊断大部分实际逐值完全相同，明列的teacher求和舍入差另行精确次序核对。
+historical_matrix_drift中的旧／新端点为已定端点的描述性差值，没有新增置信区间或新的评价选择。
+不运行带attempt01_failed的脚本来代替最终脚本：它们只作为真实失败证据保存。
+
+三、阅读台账
+READING_SCOPE分人工全文、节选、结构搜索、机器数组／JSON处理和仅身份核验。列出文件不代表全文读过。P0全部1,629成员身份核对；P1/P2只有明确列出的历史成员真正读取，更深层历史ZIP未展开。
+read_evidence.py及reading_log.jsonl用于保留实际工具阅读范围；build_reading_scope.py据该记录及run输入记录汇总。build_report.py只是用已审查原字段排版本文和附表，没有产生新科学估计。
+
+四、哈希与文件清单
+BUNDLE_MANIFEST.json列包内其他有效载荷（不含其自身和SHA256SUMS.txt）；SHA256SUMS.txt列这些载荷及BUNDLE_MANIFEST.json，避免自我哈希。ZIP外的DELIVERY_MANIFEST.json记录ZIP本身及直接交付文件身份；最终聊天也给出ZIP SHA。
+本交付不会覆盖原项目来源、原统计、历史结果或用户附件。
