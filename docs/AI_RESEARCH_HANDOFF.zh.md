@@ -1,26 +1,19 @@
 # 当前科研交接
 
-本页顶部表格是唯一的当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按本次任务进入合同、实际实现、直接依赖及原始审查；历史通过下方索引回溯，不将旧报告中的“当前／待授权／下一步”当作新指令。五臂作业、结果回传和结果外审／主审已完成；C_plus登记为本固定配置负结果，原继续条件false。按用户明确范围，两端候选及五臂活动入口已撤下，原C/S、LOGIT和通用过拟合诊断保留。用户随后要求修复数值设置遗漏；保留的BGE／LOGIT与C/S入口已显式对齐并记录实际值，Linux CPU核验通过，本次用户明确免网页外审。LOGIT历史复现缺陷R1的数值根因仍未隔离，不自动重训，旧结果与冻结源码不追改。
+本页顶部表格是唯一当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按任务进入合同、实际实现、直接依赖及相关原始审查；历史不重新授予执行权限。当前为用户已确认的三臂归因实验准备：LOGIT0.1、无重组记录模型R0、原S，先明确原C/S系统收益来自记录结构还是重组监督。旧五臂已结束，C_plus负结果及撤下边界不变；本次数值修复免审不适用于新研究。
 
 ## 当前工作
 
-| 项目 | 当前范围、已保存事实与直接入口 |
+| 项目 | 当前范围、证据与执行前提 |
 |---|---|
-| 最新修复 | 用户要求修复确定性／TF32遗漏，并明确“此次修复免于网页外审”。公共配置函数已接入保留的BGE／LOGIT、C/S执行与C/S核验入口，记录实际四开关、warn_only及cuBLAS环境；C/S shell补齐旧cuBLAS设置。Linux单CPU六项检查通过，去掉实际设置的两项反例均被检出，外层2.33秒、无GPU／正式数据／预训练载模；六来源两端一致。未恢复五臂入口、未改历史、未获得新运行资格；见[修复与边界](../reports/maintenance/20261009/runtime_numerics/report.zh.txt)、[核验原件](../reports/maintenance/20261009/runtime_numerics/result.json)。 |
-| 已完成原生补核与监听 | 用户批准的手写中文BGE原生核验已完成。监听于10月9日16:39:27满足资源条件后只启动一次，16:39:43确认实际更新并自删活动脚本，16:40:36核验及监听均退出0；16:54:40回查无活动监听，后续核对无残留核验作业。C/S各自在固定起点／随机状态下比较旧显式设置与新公共设置，一共4次物理更新；每臂1,967张量／1,301,039,501元素的参数、梯度、Adam及Torch随机状态逐字节一致，实际编码器／头更新探针通过。外层69.57秒，加准备硬上限保守累计≤79.57秒；显存5.334GiB、外部RSS16.552GiB。16份完成载荷14,669字节已回传匹配，25来源由活动文件和冻结快照核对。见[完成补充与边界](../reports/maintenance/20261009/runtime_numerics_gpu/completion.zh.txt)、[原生原件](../reports/maintenance/20261009/runtime_numerics_gpu/attempt01/result.json)。沿用本次数值修复免审；无正式数据／标签，不代表完整历史复现、LOGIT更新比较或新实验资格，R1根因仍未隔离。 |
-| 研究问题 | 最近已结束问题为提高记录重放C相对S的收益，并加入LOGIT0.1及本算法的共同过拟合诊断。C_plus未实现本配置改进目标，用户已要求撤下；调系数不作为实质方法创新，论文算法尚未确定。 |
-| 合同与保留实现 | [五臂合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)、[policy](../schema/step28_replay_improvement_policy.json)作为冻结方案保留，[实际五臂源码](../reports/seller_alias_continual/20261009/replay_improvement_result/source/scripts/step28_replay_improvement_run.py)仅供追溯。活动[目标／VJP](../scripts/step28_record_replay.py)已恢复原C/S；原C/S、LOGIT及[通用诊断](../scripts/step28_replay_diagnostics.py)保留。候选、五臂入口／核验／专用测试已删除，诊断模块未自动接入历史入口；见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。 |
-| 已批准运行 | 用户明确“按五臂完整范围执行（推荐）”：LOGIT0.1、C、S、C_plus、S_strong，s0及ABC/BCA/CAB；10,368更新、19,008梯度群呈现、36物理阶段状态／45逻辑点、216逐轮诊断点。必要实现、同步、核验、训练和回传不按命令重问；不自动调参重跑。 |
-| 资源与访问 | 用户补充授权正式单卡总墙钟≤72小时；手写CPU累计≤300秒、原生GPU核验累计≤600秒、输出≤64GiB等其他范围均保持。见[预算补充授权](../reports/documentation/20261008/record_replay_improvement/budget_72h/authorization.json)。新train／valid标签各解析一次，valid在全部训练、恢复与盲门后统一开放；test／owners／Audit／private为0。所有失败尝试保留并记账。 |
-| 已完成证据 | 五臂入口、共同诊断、统一22指标／原23项及历史比较已实现。72小时来源下Linux CPU attempt06七项全过，28来源与Windows匹配，外层21.12秒、保守累计108.6828秒；以后若需CPU从112秒接账／余188秒。旧五轮及一次非法条数夹具错误保留，不清零。见[新CPU原件](../reports/documentation/20261008/record_replay_improvement/budget_72h/cpu/attempt06/result.json)、[预算补充与资格处置](../reports/documentation/20261008/record_replay_improvement/budget_72h/disposition.zh.txt)。 |
-| 部署与身份 | 独立workspace、[28来源](../reports/documentation/20261008/record_replay_improvement/budget_72h/sources.json)及[路径准备](../reports/documentation/20261008/record_replay_improvement/budget_72h/preparation.json)已核对；原48小时workspace保留。10月9日13:45:58观测正式进程已结束、GPU无计算作业；28来源在本次执行、manifest、collected、evaluation及formal_gate间一致。空闲资源不授予新实验。 |
-| 原生资格 | attempt01功能通过但投影63.80小时超原48小时，随后用户明确改72小时；attempt02在新完整来源下再次通过，15:20:22—15:22:24、退出0，外层121.13秒、保守累计252.0191秒。GPU reserved峰值17.80GiB、外部RSS约9.61GiB；新投影63.51小时，按两次较高63.80小时作计划，输出58.35GiB。以后若确需GPU核验从256秒接账／余344秒。见[资格汇总](../reports/documentation/20261008/record_replay_improvement/budget_72h/qualification.json)、[原生原件](../reports/documentation/20261008/record_replay_improvement/budget_72h/gpu/attempt02/result.json)、[正式门](../reports/documentation/20261008/record_replay_improvement/budget_72h/formal_gate.json)。 |
-| 正式完成与回传 | 10月8日15:25:57—10月9日13:38:39，退出0，实际22小时12分42秒、剩余0；原72小时硬上限未触及。10,368更新／19,008梯度群呈现／36物理状态／216物理诊断点全部完成，36恢复标记及完整盲门通过，最终train／valid各1、heldout／owners0，无failure。GPU reserved峰值8.7832GiB、RSS6.5742GiB、输出约49.86GiB。1,591份小结果逐项大小／SHA回传一致。36权重随后按用户许可于14:48:54完成留证删除，释放约43.75GiB；36份Memory及科研证据保留。见[完成账](../reports/seller_alias_continual/20261009/replay_improvement_result/job/completion.json)、[回传清单](../reports/seller_alias_continual/20261009/replay_improvement_result/sync_manifest.json)、[删除回执](../reports/maintenance/20261009/replay_weights/receipt.json)。 |
-| 新结果与复现边界 | C_plus对S／S_strong／本轮LOGIT0.1为4／18／23项通过，整体false；对S的新域N／Z MAP差−0.006123／−0.009344，条件区间均负，O跨零。共同过拟合六轮曲线已齐，C_plus与S_strong存在局部raw log_loss迹象；不能据C/S零项迹象证明无过拟合。C／S各27/27保存角色矩阵复现旧值，LOGIT为0/27；差异在首个更新已出现，早于诊断。旧入口的deterministic／TF32显式设置在新入口缺少，具体因果未隔离。报告限定为本轮LOGIT系统比较，未自动重训或修改冻结来源。见[完整分析](../reports/seller_alias_continual/20261009/replay_improvement_result/report.zh.txt)、[全指标](../reports/seller_alias_continual/20261009/replay_improvement_result/analysis/output/all_metrics.txt)。 |
-| 本轮结果审查 | 已回收[外审正文](../reports/seller_alias_continual/20261009/replay_improvement_result/review/external/unpacked/review_output/REVIEW_REPORT.zh.txt)及50成员完整包，1,255,425字节、SHA256 bba998cf81e0b98d…，48载荷逐项一致。[独立主审](../reports/seller_alias_continual/20261009/replay_improvement_result/review/primary_disposition.zh.txt)接收本轮结果及负结果收尾：0项已证实科学阻断，确认R1历史LOGIT复现缺陷；四项有效运行设置未记录／未知、根因未隔离，LOGIT相关主张限于本轮实际重训系统，内部C_plus对C/S负结果保留。用户批准的具体输入包仅上传一次，页面GPT-6／Pro与审查者自述身份分开记录，后台未独立核实；[实际回收／关闭状态](../reports/seller_alias_continual/20261009/replay_improvement_result/review/submission.json)。 |
-| 已关闭审查：五臂合同／实现 | [会话：审查五臂实现](https://chatgpt.com/c/6ac72f3f-5808-83eb-b3c2-fc377c4b6dca)已完成，完整35成员外审包11,356,640字节、SHA256 4ed3abff384ac9ae…已逐成员核对。[原始外审](../reports/documentation/20261008/record_replay_improvement/review/external/REPLAY_IMPROVEMENT_REVIEW.zh.txt)、[独立主审](../reports/documentation/20261008/record_replay_improvement/review/primary_disposition.zh.txt)、[回执](../reports/documentation/20261008/record_replay_improvement/review/submission.json)。0项已证实科学阻断／当前复现缺陷，NO_OPEN_BLOCKERS；15:02专用网页关闭。CPU完整capture与原生部件覆盖、截断概率log_loss、资源预留及条件推断边界已明确；后续获准预算补充仅五文件时间边界变更，未变科学计算复用本审查。 |
-| 已关闭审查：统一评价增量 | [会话：增量评价审查](https://chatgpt.com/c/6ac70c2e-2a14-83ed-adf4-74d5a27bd759)，审查统一22指标、原23项补充及过拟合证据边界；13:15:29的[关闭记录](../reports/seller_alias_continual/20261008/record_replay_result/common_evaluation/review/submission.json)确认外审／主审接收、页面关闭。它不代替上一行的新实现审查；具体结果见历史索引。 |
-| 两端撤下与下一步 | 用户明确“撤下候选及五臂入口，保留通用诊断（推荐）”。Windows／Linux各四专用文件已删除，共享模块逐字节恢复原C/S；Linux两项原手写梯度检查通过，诊断导入通过，1,626非权重证据SHA及23保留例外元数据不变；见[两端关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。本轮已结束，原方案／policy／源码／结果作为冻结记录保留；36权重此前已删除，36份Memory继续在Linux。后续新方法、根因复跑、种子或训练须另定范围及预算，不自动开展。 |
+| 最新用户决定 | 用户“那就按照你说的继续吧，有细节需要澄清的就问我”，随后明确“同意上述预算与读取范围（推荐）”“按归因诊断分别判读（推荐）”。见[本轮授权](../reports/documentation/20261009/record_attribution/authorization.json)、[三臂合同](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)。已明确范围内直接实施，不按子步骤重问。 |
+| 研究与工作量 | LOGIT0.1、R0、S；s0及ABC/BCA/CAB；各自从预训练起点训练三个阶段。7,776物理更新、12,960梯度群呈现、27阶段状态、162逐epoch诊断及两个未训练架构盲起点。R0/S只切换重组监督，首阶段不共享训练状态；R0−LOGIT是系统结构比较。主要分别报告O/N MAP及区间，无新总通过门，不自动追加候选。 |
+| 预算与三种权限 | 新CPU手写累计≤300秒，原生GPU核验≤600秒；正式单CPU／单GPU全过程≤48小时、输出峰值≤48GiB、CUDA reserved≤28GiB、RSS≤64GiB。train／valid各一次新解析尝试，全部训练／恢复／盲门后统一开放valid；test／owners／Audit／private为0，失败记账且不自动重启GPU／正式运行。具体CPU内存及证据预算见合同。 |
+| 实现与CPU | [三臂入口](../scripts/step28_record_attribution_run.py)、R0实际目标、公共数值设置、通用过拟合诊断及增量检查已接入。Linux attempt02的11项手写检查通过；attempt01因测试相对路径被独立目录保护拒绝，修正输出绝对路径后重验，失败原件及耗时保留。外层累计28.73秒，按30秒保守接账，CPU剩余270秒。见[实现及证据边界](../reports/documentation/20261009/record_attribution/implementation.zh.txt)、[累计核验](../reports/documentation/20261009/record_attribution/verification_summary.json)、[回传核对](../reports/documentation/20261009/record_attribution/sync_receipt.json)。原生资格及正式结果尚无。 |
+| 审查与下一步 | 用户已授权本次306,794字节／69成员具体合并包，18:42通过本地Playwright MCP上传并提交一次，[网页外审](https://chatgpt.com/c/6ac8c505-e954-83ed-bdf2-8eec66764e7e)正在运行；可见选择器为GPT-6、Pro，后台身份未独立核验。包身份与实际状态见[提交回执](../reports/documentation/20261009/record_attribution/review/submission.json)，旧包许可和数值修复免审不转移。关闭本轮外审／主审后，才做已批准原生GPU核验；通过并确认资源预算可行后执行正式训练。资源不足按一次性监听规则等待，不重复启动。 |
+| 当前部署 | 独立Linux workspace为reports/seller_alias_continual/20261009/record_attribution_execution/20261009_182606/workspace，CPU已退出，尚无本轮GPU、正式作业或监听。18:16只读观察其他用户GPU作业，未干预；后续GPU启动前重新核对资源。29项来源已同步并逐项核对，新实验没有覆盖历史workspace。 |
+| 已完成数值修复与边界 | 保留的BGE／LOGIT、C/S入口已显式统一数值设置并记录有效值；CPU与用户批准的C/S手写原生补核完成，后者4次更新逐字节一致，监听已退出／自删。见[修复](../reports/maintenance/20261009/runtime_numerics/report.zh.txt)、[原生完成](../reports/maintenance/20261009/runtime_numerics_gpu/completion.zh.txt)。历史LOGIT R1根因仍未隔离，不能追改旧结果或宣称完整历史复现。 |
+| 已关闭五臂 | 10,368更新、36状态、216物理诊断及结果外审／主审已结束；C_plus原继续条件false。C_plus/S_strong及五臂活动入口／测试已依许可撤下，原C/S、LOGIT、通用诊断和冻结证据保留。36权重已留证删除，36份Memory仍保留。见[结果与主审](../reports/seller_alias_continual/20261009/replay_improvement_result/review/primary_disposition.zh.txt)、[两端撤下](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。旧72小时及旧标签许可仅属已结束五臂。 |
 
 ## 研究问题与目标
 
@@ -35,7 +28,7 @@
 | 要掌握的信息 | 入口与使用边界 |
 |---|---|
 | 用户问题、研究前提、后续决定 | [讨论记录](RESEARCH_DISCUSSION.zh.md)、[计划](RESEARCH_PLAN.md)；辨认每项决定的对象、时点和范围。 |
-| 当前计算、真实更新及资格 | 顶部五臂合同与实际入口；[来源清单](../reports/documentation/20261008/record_replay_improvement/sources_to_sync.json)、CPU原件与实现说明。相关历史实现原审查从本轮送审背景及原C/S主审回溯，不把旧通过当作新实现已审。 |
+| 当前计算、真实更新及资格 | 顶部三臂合同与实际入口；旧五臂只作已审参考，[来源清单](../reports/documentation/20261008/record_replay_improvement/sources_to_sync.json)、CPU原件与实现说明。相关历史实现原审查从本轮送审背景及原C/S主审回溯，不把旧通过当作新实现已审。 |
 | 数据究竟改变什么 | [表达生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮数据合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；主题混合与表达机制同时变化，不称纯表达因果实验。 |
 | 早期来源与身份资格 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核冻结](STEP5_REVIEW_AND_FREEZE.md)；历史来源链不授予真值或当前正式数据读取许可。 |
 | 评价定义与不确定性 | 本轮合同明确继承的[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)及实际评价函数。区分AP、逐查询MAP、raw与校准，不从简称重写公式。 |
@@ -58,7 +51,7 @@
 
 记录表模型将分别L2归一化的标题／描述表示拼接并除以√2，得到2048维记录表示；记录对头4096→128→1，再按账号汇总。LOGIT账号汇总为4096维、头输入8192维。四个记录表臂的A0/A1监督与teacher系数、LOGIT目标分别见五臂合同，不把跨架构比较当作单一机制归因。
 
-本轮五臂均使用已选中文BAAI/bge-large-zh-v1.5同一预训练归档（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；四个记录表臂网络相同，LOGIT的聚合／头不同，各自训练后参数分化。36份Memory是27个记录表与9个LOGIT物理阶段的历史缓存快照，共11,479,595字节；每条实时路径最多六群／完整状态1MiB，包含允许的训练文本、标签、教师目标及附属状态。归档快照不合并成学习器可用历史，不等于模型权重；具体说明见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。
+10月8—9日五臂均使用已选中文BAAI/bge-large-zh-v1.5同一预训练归档（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；四个记录表臂网络相同，LOGIT的聚合／头不同，各自训练后参数分化。36份Memory是27个记录表与9个LOGIT物理阶段的历史缓存快照，共11,479,595字节；每条实时路径最多六群／完整状态1MiB，包含允许的训练文本、标签、教师目标及附属状态。归档快照不合并成学习器可用历史，不等于模型权重；具体说明见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。
 
 O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子，开发valid不是独立确认集，既有120群基础test已使用。新最终留出、多seed确认、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
 

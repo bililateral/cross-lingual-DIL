@@ -130,23 +130,29 @@ def account_logits(table: Any, slots: np.ndarray) -> Any:
 def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
               reference: np.ndarray | None = None) -> tuple[Any, dict]:
     import torch
-    if arm not in ("C", "S") or group.labels is None:
+    if arm not in ("C", "S", "R0") or group.labels is None:
         raise ValueError("Unknown arm or missing train labels")
-    slots = [assignment(group), assignment(group, regroup_seed)]
+    slots = [assignment(group)]
+    if arm != "R0":
+        slots.append(assignment(group, regroup_seed))
     predicted = [account_logits(table, a) for a in slots]
     truth = torch.tensor(group.labels, dtype=table.dtype, device=table.device)
     losses = [parent.ranking.objectives(v, truth, .5) for v in predicted]
-    supervised = (losses[0]["total"] + losses[1]["total"]) / 2
+    supervised = (losses[0]["total"] if arm == "R0" else
+                  (losses[0]["total"] + losses[1]["total"]) / 2)
     mse = table.new_zeros(())
     mse0 = mse1 = mse
     if reference is not None:
         target = torch.as_tensor(reference, device=table.device, dtype=table.dtype)
-        mse0, mse1 = [((p-account_logits(target, a))**2).mean()
-                      for p, a in zip(predicted, slots)]
+        errors = [((p-account_logits(target, a))**2).mean()
+                  for p, a in zip(predicted, slots)]
+        mse0 = errors[0]
+        if arm != "R0":
+            mse1 = errors[1]
         mse = (mse0+mse1)/2 if arm == "C" else mse0
     result = supervised if reference is None else .1*supervised + .5*mse
     return result, {"supervised": float(supervised.detach()), "mse0": float(mse0.detach()),
-                    "mse1": float(mse1.detach()), "distillation": float(mse.detach()),
+                    "mse1": None if arm == "R0" else float(mse1.detach()), "distillation": float(mse.detach()),
                     "weighted": float(result.detach())}
 
 
