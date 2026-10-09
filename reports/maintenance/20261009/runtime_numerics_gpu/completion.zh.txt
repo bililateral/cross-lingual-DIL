@@ -1,0 +1,23 @@
+2026-10-09 C/S原生数值补核：完成补充
+
+结论：PASS_NATIVE_NUMERICS_C_S。用户已批准的手写原生核验完成，C和S分别在历史显式设置与修复后公共设置下的一次实际更新逐位一致。此前report.zh.txt及sync_receipt.json中的等待状态是当时观测，本补充记录后续完成事实；原核验程序、授权、来源和历史实验均未修改。
+
+监听于16:18:23启动，16:39:27首次满足资源条件并自动启动唯一attempt01；当时GPU空闲32,059MiB且无计算进程，CPU0采样200/200空闲，主存与磁盘满足既定门槛。16:39:43确认真实梯度、参数改变和Adam一步后，Linux活动监听脚本按授权自删。16:40:36核验及监听均退出0。16:54:40只读回查确认PID3505392已不存在、活动脚本不存在、结果已完成；后续来源核对未见残留核验作业。没有停止其他用户作业，没有自动重试或新正式训练。
+
+实际覆盖
+- Linux既有py310：Python3.10.19、Torch2.9.1+cu130、CUDA13.0、RTX5090，沿用已选BAAI/bge-large-zh-v1.5及固定归档身份。
+- current/history均为手写28账号、每账号2条记录，共56条记录；历史参考为手写history的1,540个记录对分数。固定头权重扰动后，四次物理更新分别从相同全模型参数、新鲜AdamW和相同随机状态开始。
+- 每次先故意设置相反数值开关，再执行历史四行设置或公共configure_numerics。四次实际读回均为deterministic=True、warn_only=False、CUDA matmul TF32=False、cuDNN TF32=False、cuDNN benchmark=False、CUBLAS_WORKSPACE_CONFIG=:4096:8。
+- 调用保留C/S的实际method.update，包括当前群与历史群反向、统一裁剪和AdamW更新。编码器query及两层评分头在两个分支均有有限非零梯度，三类参数更新探针均改变，Adam步为1。
+- 每个臂比较1,967个张量、1,301,039,501个元素，内容包括完整模型状态、所有命名参数的梯度、Adam状态和Torch随机状态，另比较损失及分支梯度标量。张量由equal_state直接逐字节比较，非仅比较摘要；C与S均为BITWISE_EQUAL。这里是每个臂的旧设置对新设置一致，不声称C与S互相相同。
+- C两次状态摘要均bee7dc1aaecd11345bbdc8e0cfe263f2e5d07c8365c9d6664ff4a369a3422b72；S两次均53e21d8033592fb463dd6a90dbff053cb17276ef91a7fa5bfcdadd217a5260bb。历史参考数组更新前后未改变。
+
+预算及证据
+原生内部68.413332秒，外层time为69.57秒；准备实际1.602604秒。按准备硬上限10秒保守计账，两部分累计不超过79.57秒，低于300秒。CUDA reserved峰值5.333984GiB；外部最大RSS16.552490GiB，低于28/64GiB上限。16份完成载荷共14,669字节，不保存训练权重或梯度大文件，输出远低于4GiB。console.txt仅有既有sentence-transformers方法改名的FutureWarning，无运行错误。
+completion_sync_manifest.json记录完成载荷身份及Linux来源核对；16份载荷与Windows逐项大小/SHA一致。25项来源与执行结果、Windows及已冻结source_snapshot.zip一致；Linux保留24项活动来源，监听源码合法自删，由完整快照及删除回执保留身份。completion_sync_receipt.json记录本地核对。必要来源不重复部署，自删监听不重建。
+
+结论边界
+该结果补足本次数值设置修复在真实中文BGE、BF16及checkpoint下的C/S一次更新证据，沿用用户“此次修复免于网页外审”的许可，没有上传或冒称网页审查通过。原CPU证据继续保留。
+这是手写小形状、新鲜AdamW的更新路径核验；不是完整历史入口重跑、正式数据实验、阶段延续恢复、最坏形状资格、LOGIT一次更新比较或历史27矩阵复现。它没有隔离R1的全部历史数值根因，也不改变已完成C/S及C_plus五臂的原结果或授权新实验。
+
+原件：attempt01/result.json、attempt01/first_update.json、resources.txt、console.txt、exit_status.txt、finished.txt及listener/。
