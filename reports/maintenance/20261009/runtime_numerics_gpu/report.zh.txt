@@ -1,0 +1,17 @@
+2026-10-09 C/S原生数值设置补核与一次性监听
+
+当前状态（2026-10-09 16:19:16 Asia/Shanghai）：WAITING_GPU_RESOURCES。监听PID3505392存活；16:18:25首次检查GPU空闲10,311MiB，其他用户GPU进程3496867、3498352仍在运行；CPU0采样空闲198/199，主存与磁盘满足要求。尚未载模／启动原生核验，不能称GPU通过。后续实时事实以Linux listener/、attempt01/result.json和exit_status.txt为准。
+
+范围与计算
+这是用户明确批准的数值修复补核，沿用本次修复免网页外审决定，不上传。原代码修复和六项CPU核验见相邻runtime_numerics记录。保留原C/S、既有中文BAAI/bge-large-zh-v1.5、py310、BF16及checkpoint实际路径；不用正式文本、标签、Memory、封存真值或已删实验权重。
+使用既有手写函数生成current/history两个群，每群28账号、每账号2条完整商品，共56条记录。旧设置对照逐句使用历史SHA绑定入口的四项设置；修复设置对照调用公共configure_numerics。两者均先故意置为相反开关再执行设置，确认实际值，避免继承先前状态造成假通过。
+旧模型先在手写history上产生完整商品配对教师表；学生头的固定.003扰动使约束有非零残差。每次重置为同一全模型初始状态、空AdamW与同一Torch/CPU/CUDA、Python、NumPy随机状态。分别为C和S运行两种设置下的一次current＋history实际update，总计4次物理更新。比较所有参数梯度、更新后全模型状态、Adam矩／计数／参数组、Torch随机状态、损失及分支梯度；张量逐字节比较，另存摘要与计数。实际encoder/query及两层head的分支梯度须非零，实际参数须改变且Adam步为1。
+这是原生更新路径上的数值配置一致性检查，不是历史完整execute重跑、完整阶段延续、最坏形状资格或历史27矩阵复现。采用新鲜AdamW及手写小形状的事实不隐瞒；即使通过也不能据此隔离R1全部历史根因或改写旧结果。
+
+资源与失败
+用户上限：单CPU0／GPU0，累计计算墙钟300秒、显存28GiB、主存64GiB、新增输出4GiB。轻量准备硬上限10秒；原生外层285秒TERM＋最多5秒KILL，保守合计≤300秒。原生内部同时检查时间、RSS、GPU reserved、输出，GPU allocator限28GiB；不落盘保存大权重／梯度，状态比较在RAM中进行。失败保留结果／traceback／退出码，不自动重试、不清零预算。
+等待时间单独记录，未载模前不消耗原生计算预算。资源条件沿用原生preflight：无GPU计算作业、GPU至少30GiB空闲、主存至少72GiB、磁盘至少4GiB，以及CPU0采样至少90%空闲。每60秒检查一次，Python启动后再次查资源与25来源。不同配置不并行占卡，不停止他人进程。
+
+监听与证据
+Linux活动脚本：scripts/run_step28_numerics_linux_20261009.sh。核验程序：scripts/step28_record_replay_numerics.py。唯一attempt01输出位于本目录。listener目录以原子mkdir排除重复监听；现有step28作业检查为空后只启动一次。监听确认first_update.json（在实际梯度、参数改变和Adam一步核对后写出）才删除自己的活动源码；完整源码已保存在source_snapshot.zip，Windows与Git也保留。失败发生在首步前时不删脚本，但既有队列阻止自动重启。监听退出码／finished和实际核验退出码分别保存。
+preparation.json：Linux轻量检查实际1.602604秒，通过相同张量比较，且能识别正负零的字节差异；CUDA未初始化。Bash语法检查通过。25项来源与Windows逐项大小/SHA一致；源码快照125,165字节，SHA256 579853e6de129672b2dab65ebf10fe9e8e6a9163940ecabe1933b0091a5e52c3，25成员逐项匹配。

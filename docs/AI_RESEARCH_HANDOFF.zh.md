@@ -7,6 +7,7 @@
 | 项目 | 当前范围、已保存事实与直接入口 |
 |---|---|
 | 最新修复 | 用户要求修复确定性／TF32遗漏，并明确“此次修复免于网页外审”。公共配置函数已接入保留的BGE／LOGIT、C/S执行与C/S核验入口，记录实际四开关、warn_only及cuBLAS环境；C/S shell补齐旧cuBLAS设置。Linux单CPU六项检查通过，去掉实际设置的两项反例均被检出，外层2.33秒、无GPU／正式数据／预训练载模；六来源两端一致。未恢复五臂入口、未改历史、未获得新运行资格；见[修复与边界](../reports/maintenance/20261009/runtime_numerics/report.zh.txt)、[核验原件](../reports/maintenance/20261009/runtime_numerics/result.json)。 |
+| 当前原生补核与监听 | 用户随后明确“补做上述最小 GPU 核验（推荐）”，并要求落实资源不足时的一次性监听。仅手写输入、既有中文BGE、固定起点／随机状态，分别比较C/S在旧显式设置和新公共设置下的一次真实更新，共4次物理更新；累计计算墙钟≤300秒、显存≤28GiB、主存≤64GiB、输出≤4GiB。Linux监听PID3505392于10月9日16:18:23启动；16:18:25首次检查GPU余10,311MiB、有两个其他用户作业，16:19:16确认仍在等待，尚未载模／GPU计算。每60秒检查资源，满足后只启动一次，实际更新后删除活动监听脚本，失败留证不重试；来源25项两端一致且已冻结。见[批准范围](../reports/maintenance/20261009/runtime_numerics_gpu/authorization.json)、[补核与监听记录](../reports/maintenance/20261009/runtime_numerics_gpu/report.zh.txt)。该补核沿用本次数值修复免审，不授予正式重训或历史复现结论。 |
 | 研究问题 | 最近已结束问题为提高记录重放C相对S的收益，并加入LOGIT0.1及本算法的共同过拟合诊断。C_plus未实现本配置改进目标，用户已要求撤下；调系数不作为实质方法创新，论文算法尚未确定。 |
 | 合同与保留实现 | [五臂合同](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md)、[policy](../schema/step28_replay_improvement_policy.json)作为冻结方案保留，[实际五臂源码](../reports/seller_alias_continual/20261009/replay_improvement_result/source/scripts/step28_replay_improvement_run.py)仅供追溯。活动[目标／VJP](../scripts/step28_record_replay.py)已恢复原C/S；原C/S、LOGIT及[通用诊断](../scripts/step28_replay_diagnostics.py)保留。候选、五臂入口／核验／专用测试已删除，诊断模块未自动接入历史入口；见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。 |
 | 已批准运行 | 用户明确“按五臂完整范围执行（推荐）”：LOGIT0.1、C、S、C_plus、S_strong，s0及ABC/BCA/CAB；10,368更新、19,008梯度群呈现、36物理阶段状态／45逻辑点、216逐轮诊断点。必要实现、同步、核验、训练和回传不按命令重问；不自动调参重跑。 |
@@ -44,6 +45,7 @@
 
 ## Linux与活动文件
 
+- 当前一次性监听：scripts/run_step28_numerics_linux_20261009.sh，PID3505392；状态与实际启动／退出账在reports/maintenance/20261009/runtime_numerics_gpu/listener。核验脚本为scripts/step28_record_replay_numerics.py，唯一输出为同目录attempt01。先查现有监听与结果，不重复启动；确认真实更新后活动监听源码会自删，source_snapshot.zip保留原件，不把自删当文件丢失而重新部署。该作业是手写原生补核，不是历史正式训练重跑。
 - 服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，密码只作认证输入，不写入项目。同步用SFTP／SCP，Git仅在Windows执行。
 - 已结束的72小时五臂workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_151407/workspace，28项来源见[来源清单](../reports/documentation/20261008/record_replay_improvement/budget_72h/sources.json)。原48小时workspace（同一上级下20261008_131300/workspace）和首次原生证据保留；均为历史证据，不作为现行启动入口。
 - 最新已完成作业：新workspace下reports/job；资格与启动记录在reports/qualification，正式入口scripts/run_step28_replay_improvement_linux_20261008.sh。原单CPU0／GPU0训练PID3407207及wrapper3407201已于10月9日13:38:39正常退出，不重启。完整小结果及分析归档为reports/seller_alias_continual/20261009/replay_improvement_result；原job/run/models的36权重已于14:48:54按许可留证删除，36份Memory继续保留job/run/memory。旧workspace的attempt01亦已结束。
