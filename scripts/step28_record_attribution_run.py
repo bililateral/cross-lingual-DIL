@@ -498,10 +498,48 @@ def validate_gate(job: Path,gate_path: Path) -> dict:
             or gate.get("job") != job.relative_to(data.ROOT).as_posix() or gate.get("runtime") != p["runtime"]
             or gate.get("supervision") != p["supervision"] or gate.get("review_disposition") != "NO_OPEN_BLOCKERS"):
         raise ValueError("Source-bound reviewed execution gate differs")
+    qualified = gate.get("verification_source_files", sources())
+    if qualified != sources():
+        # The user extended 48h to 72h after successful native qualification.
+        # Reuse only if the frozen archive proves that these three budget/gate
+        # files alone changed; all training/evaluation AST must remain identical.
+        import hashlib
+        import zipfile
+        before, after = ({r["path"]:r for r in rows} for rows in (qualified, sources()))
+        runner = "scripts/step28_record_attribution_run.py"
+        wrapper = "scripts/run_step28_record_attribution_linux_20261009.sh"
+        policy_path = "schema/step28_record_attribution_policy.json"
+        changed = {path for path in before if before[path] != after.get(path)}
+        if (set(before) != set(after) or changed != {runner,wrapper,policy_path}
+                or p["runtime"]["maximum_gpu_stage_seconds"] != 259200):
+            raise ValueError("Qualification reuse is restricted to the approved 48h-to-72h change")
+        rec = gate["budget_authorization"]
+        authorization = data.read_json(data.verify(data.ROOT/rec["path"],rec))
+        if (authorization.get("status") != "USER_APPROVED_72H_ONLY"
+                or authorization.get("previous_maximum_seconds") != 172800
+                or authorization.get("maximum_seconds") != 259200):
+            raise ValueError("Missing 72h budget authorization")
+        rec = gate["verification_archive"]
+        with zipfile.ZipFile(data.verify(data.ROOT/rec["path"],rec)) as archive:
+            old_bytes = {path:archive.read(path) for path in changed}
+        for path, raw in old_bytes.items():
+            if len(raw) != before[path]["bytes"] or hashlib.sha256(raw).hexdigest() != before[path]["sha256"]:
+                raise ValueError("Frozen qualification source differs")
+        for path, old_value, new_value in ((policy_path,b'"maximum_gpu_stage_seconds": 172800',b'"maximum_gpu_stage_seconds": 259200'),
+                                            (wrapper,b'172795',b'259195')):
+            raw = old_bytes[path]
+            if raw.count(old_value) != 1 or raw.replace(old_value,new_value) != (data.ROOT/path).read_bytes():
+                raise ValueError("Change exceeds the approved time limit")
+        def scientific_ast(raw):
+            tree = ast.parse(raw)
+            tree.body = [node for node in tree.body if not (isinstance(node,ast.FunctionDef) and node.name=="validate_gate")]
+            return ast.dump(tree)
+        if scientific_ast(old_bytes[runner]) != scientific_ast((data.ROOT/runner).read_bytes()):
+            raise ValueError("Training/evaluation changed; old native evidence cannot qualify it")
     for mode in ("cpu","gpu"):
         rec = gate[mode]
         evidence = data.read_json(data.verify(data.ROOT/rec["path"],rec))
-        if evidence.get("mode") != mode or evidence.get("status") != "PASS_HANDWRITTEN_ONLY" or evidence.get("source_files") != sources():
+        if evidence.get("mode") != mode or evidence.get("status") != "PASS_HANDWRITTEN_ONLY" or evidence.get("source_files") != qualified:
             raise ValueError("Missing matching verification")
         if mode == "gpu":
             native = evidence.get("native",{})
