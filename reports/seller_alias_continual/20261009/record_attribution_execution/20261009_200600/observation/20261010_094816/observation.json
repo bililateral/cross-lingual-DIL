@@ -1,0 +1,502 @@
+{
+  "observed_at": "2026-10-10T09:48:16.062589+08:00",
+  "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace",
+  "observation_dir": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/observation/20261010_094816",
+  "status": "RUNNING",
+  "processes": [
+    {
+      "pid": 3555737,
+      "cmdline": "bash ",
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace",
+      "ps": "3555737       1 yongpeng Fri Oct  9 20:11:53 2026    13:36:22  0.0  4164"
+    },
+    {
+      "pid": 3570701,
+      "cmdline": "bash scripts/run_step28_record_attribution_linux_20261009.sh 0 /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/qualification/formal_gate.json /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/job ",
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace",
+      "ps": "3570701 3555737 yongpeng Fri Oct  9 20:59:05 2026    12:49:10  0.0  3560"
+    },
+    {
+      "pid": 3570707,
+      "cmdline": "timeout --signal=TERM --kill-after=5 259195 taskset -c 0 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_record_attribution_run.py --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/job --gate /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/qualification/formal_gate.json ",
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace",
+      "ps": "3570707 3570701 yongpeng Fri Oct  9 20:59:05 2026    12:49:10  0.0  1996"
+    },
+    {
+      "pid": 3570708,
+      "cmdline": "/home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_record_attribution_run.py --out /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/job --gate /home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace/reports/qualification/formal_gate.json ",
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261009/record_attribution_execution/20261009_200600/workspace",
+      "ps": "3570708 3570707 yongpeng Fri Oct  9 20:59:05 2026    12:49:10 99.9 5200916"
+    },
+    {
+      "pid": 3734829,
+      "cmdline": "python script/eval_policy.py [other-user arguments omitted]",
+      "cwd": "OTHER_USER_ACCESS_NOT_REQUESTED",
+      "ps": "3734829 3734828 zhanglu  Sat Oct 10 08:58:18 2026       49:57 95.4 10809080"
+    }
+  ],
+  "access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "markers": {
+    "completion.json": false,
+    "failure.json": false,
+    "before_valid.json": false
+  },
+  "wrapper": "2026-10-09T20:59:05+08:00\n",
+  "complete_stage_count": 12,
+  "completed_stage_updates": 3456,
+  "logged_updates_at_least": 3672,
+  "target_updates": 7776,
+  "latest_update": {
+    "completed": 216,
+    "elapsed_seconds": 45927.789612914436,
+    "event": "updates",
+    "limits": {
+      "maximum_cuda_reserved_bytes": 30064771072,
+      "maximum_gpu_stage_seconds": 259200,
+      "maximum_output_bytes": 51539607552,
+      "maximum_rss_bytes": 68719476736,
+      "minimum_free_gpu_bytes": 32212254720,
+      "minimum_free_host_bytes": 77309411328,
+      "torch_cpu_threads": 1
+    },
+    "peak_cuda_reserved_bytes": 9466544128,
+    "peak_output_bytes": 18288170680,
+    "peak_rss_bytes": 7108763648,
+    "phase": "BCA_R0_stage1",
+    "point": "BCA_R0_stage1",
+    "stage_elapsed_seconds": 1712.6797900260426
+  },
+  "completed_stages": [
+    {
+      "point": "ABC_LOGIT0.1_stage1",
+      "updates": 288,
+      "adam_step": 288,
+      "training_diagnostics_seconds": 2299.1494904109277,
+      "point_saved_at": "2026-10-09T21:41:48.509912+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_LOGIT0.1_stage2",
+      "updates": 288,
+      "adam_step": 576,
+      "training_diagnostics_seconds": 3888.636063783895,
+      "point_saved_at": "2026-10-09T22:49:52.247910+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_LOGIT0.1_stage3",
+      "updates": 288,
+      "adam_step": 864,
+      "training_diagnostics_seconds": 4057.6053449073806,
+      "point_saved_at": "2026-10-10T00:00:38.151831+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_R0_stage1",
+      "updates": 288,
+      "adam_step": 288,
+      "training_diagnostics_seconds": 2278.2361687580124,
+      "point_saved_at": "2026-10-10T00:42:55.506414+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_R0_stage2",
+      "updates": 288,
+      "adam_step": 576,
+      "training_diagnostics_seconds": 4106.20844309032,
+      "point_saved_at": "2026-10-10T01:54:33.327694+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_R0_stage3",
+      "updates": 288,
+      "adam_step": 864,
+      "training_diagnostics_seconds": 4110.868120736908,
+      "point_saved_at": "2026-10-10T03:06:08.170262+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_S_stage1",
+      "updates": 288,
+      "adam_step": 288,
+      "training_diagnostics_seconds": 2408.865025438834,
+      "point_saved_at": "2026-10-10T03:49:39.534765+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_S_stage2",
+      "updates": 288,
+      "adam_step": 576,
+      "training_diagnostics_seconds": 4078.62066708412,
+      "point_saved_at": "2026-10-10T05:00:47.200259+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "ABC_S_stage3",
+      "updates": 288,
+      "adam_step": 864,
+      "training_diagnostics_seconds": 4100.331602504011,
+      "point_saved_at": "2026-10-10T06:12:16.353451+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "BCA_LOGIT0.1_stage1",
+      "updates": 288,
+      "adam_step": 288,
+      "training_diagnostics_seconds": 2394.605399307329,
+      "point_saved_at": "2026-10-10T06:55:31.227796+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "BCA_LOGIT0.1_stage2",
+      "updates": 288,
+      "adam_step": 576,
+      "training_diagnostics_seconds": 4045.2691642129794,
+      "point_saved_at": "2026-10-10T08:05:43.544411+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    },
+    {
+      "point": "BCA_LOGIT0.1_stage3",
+      "updates": 288,
+      "adam_step": 864,
+      "training_diagnostics_seconds": 4024.1238789800555,
+      "point_saved_at": "2026-10-10T09:15:58.087660+08:00",
+      "full_restore_verified": true,
+      "stage_complete": true
+    }
+  ],
+  "diagnostic_json_count": 76,
+  "diagnostic_paths": [
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch1.json",
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch2.json",
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch3.json",
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch4.json",
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch5.json",
+    "diagnostics/ABC_LOGIT0.1_stage1_epoch6.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch1.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch2.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch3.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch4.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch5.json",
+    "diagnostics/ABC_LOGIT0.1_stage2_epoch6.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch1.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch2.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch3.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch4.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch5.json",
+    "diagnostics/ABC_LOGIT0.1_stage3_epoch6.json",
+    "diagnostics/ABC_R0_stage1_epoch1.json",
+    "diagnostics/ABC_R0_stage1_epoch2.json",
+    "diagnostics/ABC_R0_stage1_epoch3.json",
+    "diagnostics/ABC_R0_stage1_epoch4.json",
+    "diagnostics/ABC_R0_stage1_epoch5.json",
+    "diagnostics/ABC_R0_stage1_epoch6.json",
+    "diagnostics/ABC_R0_stage2_epoch1.json",
+    "diagnostics/ABC_R0_stage2_epoch2.json",
+    "diagnostics/ABC_R0_stage2_epoch3.json",
+    "diagnostics/ABC_R0_stage2_epoch4.json",
+    "diagnostics/ABC_R0_stage2_epoch5.json",
+    "diagnostics/ABC_R0_stage2_epoch6.json",
+    "diagnostics/ABC_R0_stage3_epoch1.json",
+    "diagnostics/ABC_R0_stage3_epoch2.json",
+    "diagnostics/ABC_R0_stage3_epoch3.json",
+    "diagnostics/ABC_R0_stage3_epoch4.json",
+    "diagnostics/ABC_R0_stage3_epoch5.json",
+    "diagnostics/ABC_R0_stage3_epoch6.json",
+    "diagnostics/ABC_S_stage1_epoch1.json",
+    "diagnostics/ABC_S_stage1_epoch2.json",
+    "diagnostics/ABC_S_stage1_epoch3.json",
+    "diagnostics/ABC_S_stage1_epoch4.json",
+    "diagnostics/ABC_S_stage1_epoch5.json",
+    "diagnostics/ABC_S_stage1_epoch6.json",
+    "diagnostics/ABC_S_stage2_epoch1.json",
+    "diagnostics/ABC_S_stage2_epoch2.json",
+    "diagnostics/ABC_S_stage2_epoch3.json",
+    "diagnostics/ABC_S_stage2_epoch4.json",
+    "diagnostics/ABC_S_stage2_epoch5.json",
+    "diagnostics/ABC_S_stage2_epoch6.json",
+    "diagnostics/ABC_S_stage3_epoch1.json",
+    "diagnostics/ABC_S_stage3_epoch2.json",
+    "diagnostics/ABC_S_stage3_epoch3.json",
+    "diagnostics/ABC_S_stage3_epoch4.json",
+    "diagnostics/ABC_S_stage3_epoch5.json",
+    "diagnostics/ABC_S_stage3_epoch6.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch1.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch2.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch3.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch4.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch5.json",
+    "diagnostics/BCA_LOGIT0.1_stage1_epoch6.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch1.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch2.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch3.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch4.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch5.json",
+    "diagnostics/BCA_LOGIT0.1_stage2_epoch6.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch1.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch2.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch3.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch4.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch5.json",
+    "diagnostics/BCA_LOGIT0.1_stage3_epoch6.json",
+    "diagnostics/BCA_R0_stage1_epoch1.json",
+    "diagnostics/BCA_R0_stage1_epoch2.json",
+    "diagnostics/BCA_R0_stage1_epoch3.json",
+    "diagnostics/BCA_R0_stage1_epoch4.json"
+  ],
+  "model_file_count": 12,
+  "current_output_bytes": 15684436590,
+  "formal_script_exists": false,
+  "source_checks": [
+    {
+      "path": "docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md",
+      "bytes": 15643,
+      "sha256": "a2493648924bd73e8dad9cc5a7074c576255963ce3f2ef3c0ea897c966641366",
+      "matches_gate": true
+    },
+    {
+      "path": "schema/step28_alias_ranking_policy.json",
+      "bytes": 3489,
+      "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01",
+      "matches_gate": true
+    },
+    {
+      "path": "schema/step28_bge_continual_policy.json",
+      "bytes": 5123,
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534",
+      "matches_gate": true
+    },
+    {
+      "path": "schema/step28_chinese_base_policy.json",
+      "bytes": 8439,
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+      "matches_gate": true
+    },
+    {
+      "path": "schema/step28_record_attribution_policy.json",
+      "bytes": 1756,
+      "sha256": "0ce82105ac4b9e2e03f3897fa88b00ee50201fa18f5930fb107db3cad7860bc4",
+      "matches_gate": true
+    },
+    {
+      "path": "schema/step28_record_replay_policy.json",
+      "bytes": 1680,
+      "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/run_step28_record_attribution_linux_20261009.sh",
+      "bytes": 727,
+      "sha256": "8ff089bbe6bdd581125179c2ed82099c0870ed48ed1c572dd0780e624b73a07e",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_alias_calibration.py",
+      "bytes": 8818,
+      "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_alias_ranking.py",
+      "bytes": 11658,
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_bge_continual.py",
+      "bytes": 17275,
+      "sha256": "62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_bge_continual_evaluate.py",
+      "bytes": 13765,
+      "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_bge_continual_run.py",
+      "bytes": 34672,
+      "sha256": "4ab2840dfe7ee27912e8e6ed19d3dd3d9919e668f1cbc10998ade2843966d181",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_chinese_base.py",
+      "bytes": 51352,
+      "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_continual_expression_run.py",
+      "bytes": 26322,
+      "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_continual_population.py",
+      "bytes": 9699,
+      "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "bytes": 11587,
+      "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_continual_population_evaluate.py",
+      "bytes": 20911,
+      "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_continual_population_run.py",
+      "bytes": 21310,
+      "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_er_weight.py",
+      "bytes": 17560,
+      "sha256": "626d2e325166a18d995e1eb9dcb28d04349024455f54fe4b3b30d17df8e516c4",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_attribution_run.py",
+      "bytes": 37508,
+      "sha256": "111d5a8b29b5d284c47340e7b30e276a515a0330f0352199e0b40340eef87155",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_attribution_verify.py",
+      "bytes": 15394,
+      "sha256": "2aba323b1e447166ae8b89b65ad1dc6abaec6f03ea16cc805b994d9e158dc56f",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_replay.py",
+      "bytes": 15399,
+      "sha256": "4b05a46f4b24a3a848b29a33be69f6ecc0ec9e00fa10c42f5d4fea8f98c3d73b",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_replay_numerics.py",
+      "bytes": 12028,
+      "sha256": "30fcb37ad43b823a87754bd660a42cdbedaa3ca8f0eb378b855d6666a96e408e",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_replay_run.py",
+      "bytes": 33362,
+      "sha256": "7f4e0a3f9f5a17092149b8c261442475095d27111468280478e2b9f01a788427",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_record_replay_verify.py",
+      "bytes": 11627,
+      "sha256": "c9b81490b83d9174ed4ee003ffe896dda20daf9fa4408bb8ca516b4cda38f2b9",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_replay_diagnostics.py",
+      "bytes": 10878,
+      "sha256": "40eaa04809375051eeef40403c3f6d46e389e26e34ddc619cac6109bb5b9f0bc",
+      "matches_gate": true
+    },
+    {
+      "path": "scripts/step28_risk_study.py",
+      "bytes": 4037,
+      "sha256": "1aa0a436aaf41d5db84d9ac401619b16e28a1f6a229e1ee2209b1c88b4271012",
+      "matches_gate": true
+    },
+    {
+      "path": "tests/test_step28_record_attribution.py",
+      "bytes": 19423,
+      "sha256": "211e3dea26bdce4038bc51bbe7daabaebabc80176d328a27af6a9a6e71046b82",
+      "matches_gate": true
+    },
+    {
+      "path": "tests/test_step28_record_replay.py",
+      "bytes": 20239,
+      "sha256": "a15d88b84685f9cbe9c70581fb186d59218196851a25a7030dd8f9ecfe5b8ee4",
+      "matches_gate": true
+    }
+  ],
+  "gpu": "0, NVIDIA GeForce RTX 5090, 29021 MiB, 3089 MiB, 44 %",
+  "gpu_processes": "3570708, /home/yongpeng/miniconda3/envs/py310/bin/python, 7768 MiB\n3734829, python, 21172 MiB",
+  "free_disk_bytes": 317562585088,
+  "timing_estimate": {
+    "basis": "Mean elapsed stage-completion intervals by arm and stage; 12 observed endpoints across ABC and BCA. Not a scientific result or budget change. Completion window uses current-rate residual through residual*1.25 plus 3600 seconds final evaluation/statistics reserve. Shared GPU and future-domain speed remain uncertain.",
+    "elapsed_seconds": 46151.062589,
+    "measured_stage_intervals_seconds": {
+      "LOGIT0.1_stage1": [
+        2563.509912,
+        2594.874345
+      ],
+      "LOGIT0.1_stage2": [
+        4083.737998,
+        4212.316615
+      ],
+      "LOGIT0.1_stage3": [
+        4245.903921,
+        4214.543249
+      ],
+      "R0_stage1": [
+        2537.354583
+      ],
+      "R0_stage2": [
+        4297.82128
+      ],
+      "R0_stage3": [
+        4294.842568
+      ],
+      "S_stage1": [
+        2611.364503
+      ],
+      "S_stage2": [
+        4267.665494
+      ],
+      "S_stage3": [
+        4289.153192
+      ]
+    },
+    "mean_stage_intervals_seconds": {
+      "LOGIT0.1_stage1": 2579.1921285,
+      "LOGIT0.1_stage2": 4148.0273065,
+      "LOGIT0.1_stage3": 4230.223585,
+      "R0_stage1": 2537.354583,
+      "R0_stage2": 4297.82128,
+      "R0_stage3": 4294.842568,
+      "S_stage1": 2611.364503,
+      "S_stage2": 4267.665494,
+      "S_stage3": 4289.153192
+    },
+    "projected_training_checkpoint_total_seconds": 99766.93392,
+    "central_total_including_3600s_final_reserve_seconds": 103366.93392,
+    "remaining_training_checkpoint_seconds": 53615.871330999995,
+    "central_remaining_including_final_reserve_seconds": 57215.871330999995,
+    "completion_window_start": "2026-10-11T00:41:51.933920+08:00",
+    "completion_window_end": "2026-10-11T05:25:15.901753+08:00",
+    "central_completion": "2026-10-11T01:41:51.933920+08:00",
+    "hard_deadline": "2026-10-12T20:59:05+08:00",
+    "original_maximum_shape_projection_seconds": 255359.75039522513
+  },
+  "process_metadata_note": "Own process identity includes full command and cwd; other-user observation retains only resource ownership and executable category."
+}
