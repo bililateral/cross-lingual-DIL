@@ -1,0 +1,14 @@
+请对本轮已完成LOGIT0.1／R0／S三臂归因实验的结果与主执行者结论做独立外审。请使用GPT 6 Pro；不委派辅助agent。本请求聚焦已发生的运行、保存结果与归因，不扩展为新候选、额外训练、独立留出或通用审计系统。
+
+先读report.zh.txt、source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md及qualification/authorization_72h.json，再读job/completion.json、before_valid.json、execution.json、run/manifest.json、evaluation/evaluation.json和analysis/summary.json。原合同48小时已被用户明确72小时补充替代，其他三臂、7776更新、读取、48GiB输出和不重试边界不变。该修订仅改变policy、wrapper超时和资格来源衔接；原资格与当前来源分别保留。background/包含已关闭的实现主审／外审、数值修复和真实原生资格补充；不要把旧审查时“尚未正式执行”的话恢复为当前事实。
+
+本包没有模型权重、Memory载荷、正式文本／标签、test／owners／Audit真值、private_custody或凭据。inventory.json列出仅留Linux的权重／Memory字节身份。job/run/scores及diagnostics含已开放的保存分数，evaluation包含保存指标矩阵／分类计数；可从这些结果复核统计，不要求重新解析标签或加载模型。
+
+优先核对：
+1. 原生资格、29来源、72小时修订、正式执行、27阶段恢复、162诊断、两个盲起点、7776更新及一次train／valid账的衔接。成功退出不单独作为有效性证明；核对实际入口与记录。未变实现复用已关闭审查，发现具体矛盾才追溯依赖。
+2. R0−LOGIT与S−R0的O/N主观察及第三组S−LOGIT总差异；四角色、八端点、22指标和实际域整群配对。analysis/analyze_saved.py提供未调用项目fields/summarize_field的直接矩阵参考，25,344标量已核对，不能仅凭PASS接受。
+3. 主结论是否准确：记录结构建立旧域收益但新域方向未定；重组监督增量在O/N为正；N增量主要来自Z，A2与G方向未定；首学起点较低，特别CAB的C，不能把负遗忘单独解释为保持更好；最终该单元仍略低于R0。
+4. 过拟合迹象、全部六轮曲线、N/A缓存域、raw与校准概率、固定阈值误报／召回取舍、成本及单seed重复开发数据限制，是否有遗漏或过度归因。S没有满足过拟合信号不等于无过拟合；顺序不是seed，多个辅助区间不是独立多重确认。
+5. 历史C／C_plus负结果及R1边界保持，不据新三臂结果反向宣称旧创新成立或历史根因已隔离。本轮是归因诊断，无新总通过门；overall_pass_gate=false不是失败判定。
+
+请明确区分已证实SCIENTIFIC_BLOCKER、当前REPRODUCIBILITY_DEFECT、有价值但非当前前提的后续建议、无关过度设计。结论可正可负；不要因结果好而省略边界，也不要自动要求新实验才接收当前有限结论。请给中文完整报告、实际阅读／计算范围、必要输出和未核验事项，打包成可下载文件并提供完整返回清单。任何网页计算注明其环境，不冒充Linux/Torch/GPU实测。只审查此上传包，不访问其他外部材料或披露到其他目的地。

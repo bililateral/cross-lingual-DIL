@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-11 三臂归因：结果已回传，阶段载荷仍留Linux
+
+LOGIT0.1／R0／S的20261009_200600/workspace于10月11日00:24:33正常完成。1,234份小结果、日志、冻结来源及资格证据共38,049,242字节已SFTP回传且逐文件大小／SHA一致；两端归档为reports/seller_alias_continual/20261011/record_attribution_result。Linux保存结果分析与图表共11份亦已回传核对；见[完整分析](../reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt)、[原始同步清单](../reports/seller_alias_continual/20261011/record_attribution_result/sync_manifest.json)、[分析清单](../reports/seller_alias_continual/20261011/record_attribution_result/analysis_manifest.json)。
+
+本次27份阶段权重共35,237,126,610字节、27份Memory共8,389,549字节仍在上述Linux独立workspace的reports/job/run/models和memory；本轮只核对字节身份，未反序列化、未回传载荷、未上传网页或Git。具体路径／uid／大小／SHA见[实物清单](../reports/seller_alias_continual/20261011/record_attribution_result/inventory.json)。当前结果外审尚待完成；本轮结束后按用户“确认无用后先保留相关记录再删掉”的既有决定核定权重依赖，不能按结果正负删除或按SHA声称可恢复。历史36份Memory的保管不变。此次结果回传不重置大清理周期。
+
 ## 2026-10-09 C_plus负结果：两端候选活动实现已撤下
 
 用户明确“撤下候选及五臂入口，保留通用诊断（推荐）”。Windows／Linux项目主目录各删除四个五臂专用入口、核验、shell及测试文件，共享记录重放模块恢复原C/S字节；原C/S、LOGIT和通用诊断保留。冻结合同／policy／建议、两份历史workspace、结果source、原结果和原始审查作为科研记录保留，不再作为活动候选入口。详见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)及同目录两端回执。Linux1,626份非权重证据SHA及23项模型例外元数据不变，36份Memory仍在；局部代码撤下不重置大清理周期。
