@@ -1,0 +1,19 @@
+主报告定向勘误：RD-01（非阻断）
+日期：2026-10-11
+
+对象：本轮授权上传包中的 report.zh.txt，第37行 R0 的主结果表。
+原值：G（MAP）=0.052435519。
+正确值：G（MAP）=0.0524351862692100…；九位小数为0.052435186。
+
+证据：
+1. job/evaluation/evaluation.json：endpoints.R0.primary.G.map.mean。
+2. analysis/summary.json：map_endpoints.R0.G.mean。
+3. 本次 outputs/recomputed_endpoints.json：absolute.R0.primary.G.map.mean。
+4. 本次 outputs/report_table_checks.json：第37行不一致记录。
+
+原值与独立复算的绝对差约3.3273079e-7。S−R0的G差仍为-0.000293983019…，
+条件95%区间[-0.011498040218,0.010855946382]，方向未确定。
+这一处抄录错误不改变原评价、保存矩阵、O/N主要比较或任何区间判读。
+
+建议主执行者在结果处置或报告更正中只订正该单元格。无需重训、重算原始指标、
+重新解析标签、覆盖冻结原件或重新进行整套实现审查。本外审没有修改上传包。

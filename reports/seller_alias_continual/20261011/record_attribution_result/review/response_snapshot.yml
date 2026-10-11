@@ -1,0 +1,673 @@
+- region "对话" [ref=e512]:
+  - generic [ref=e513]:
+    - generic [ref=e522]:
+      - generic [ref=e523]:
+        - generic [ref=e524]:
+          - heading "你说：" [level=4] [ref=e525]
+          - generic [ref=e526]:
+            - generic [ref=e529]:
+              - button "review_input(20261011-022206).zip" [ref=e530] [cursor=pointer]
+              - generic:
+                - generic:
+                  - generic "review_input(20261011-022206).zip"
+                  - generic: 文件
+            - generic [ref=e532]:
+              - generic [ref=e534]:
+                - generic [ref=e535]:
+                  - generic [ref=e536]: 请对本轮已完成LOGIT0.1／R0／S三臂归因实验的结果与主执行者结论做独立外审。请使用GPT 6 Pro；不委派辅助agent。本请求聚焦已发生的运行、保存结果与归因，不扩展为新候选、额外训练、独立留出或通用审计系统。 先读report.zh.txt、source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md及qualification/authorization_72h.json，再读job/completion.json、before_valid.json、execution.json、run/manifest.json、evaluation/evaluation.json和analysis/summary.json。原合同48小时已被用户明确72小时补充替代，其他三臂、7776更新、读取、48GiB输出和不重试边界不变。该修订仅改变policy、wrapper超时和资格来源衔接；原资格与当前来源分别保留。background/包含已关闭的实现主审／外审、数值修复和真实原生资格补充；不要把旧审查时“尚未正式执行”的话恢复为当前事实。 本包没有模型权重、Memory载荷、正式文本／标签、test／owners／Audit真值、private_custody或凭据。inventory.json列出仅留Linux的权重／Memory字节身份。job/run/scores及diagnostics含已开放的保存分数，evaluation包含保存指标矩阵／分类计数；可从这些结果复核统计，不要求重新解析标签或加载模型。 优先核对： 1. 原生资格、29来源、72小时修订、正式执行、27阶段恢复、162诊断、两个盲起点、7776更新及一次train／valid账的衔接。成功退出不单独作为有效性证明；核对实际入口与记录。未变实现复用已关闭审查，发现具体矛盾才追溯依赖。 2. R0−LOGIT与S−R0的O/N主观察及第三组S−LOGIT总差异；四角色、八端点、22指标和实际域整群配对。analysis/analyze_saved.py提供未调用项目fields/summarize_field的直接矩阵参考，25,344标量已核对，不能仅凭PASS接受。 3. 主结论是否准确：记录结构建立旧域收益但新域方向未定；重组监督增量在O/N为正；N增量主要来自Z，A2与G方向未定；首学起点较低，特别CAB的C，不能把负遗忘单独解释为保持更好；最终该单元仍略低于R0。 4. 过拟合迹象、全部六轮曲线、N/A缓存域、raw与校准概率、固定阈值误报／召回取舍、成本及单seed重复开发数据限制，是否有遗漏或过度归因。S没有满足过拟合信号不等于无过拟合；顺序不是seed，多个辅助区间不是独立多重确认。 5. 历史C／C_plus负结果及R1边界保持，不据新三臂结果反向宣称旧创新成立或历史根因已隔离。本轮是归因诊断，无新总通过门；overall_pass_gate=false不是失败判定。 请明确区分已证实SCIENTIFIC_BLOCKER、当前REPRODUCIBILITY_DEFECT、有价值但非当前前提的后续建议、无关过度设计。结论可正可负；不要因结果好而省略边界，也不要自动要求新实验才接收当前有限结论。请给中文完整报告、实际阅读／计算范围、必要输出和未核验事项，打包成可下载文件并提供完整返回清单。任何网页计算注明其环境，不冒充Linux/Torch/GPU实测。只审查此上传包，不访问其他外部材料或披露到其他目的地。 本次唯一授权上传包：review_input.zip，28,532,122字节，1,266成员，SHA256 9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a。请先核对包身份。
+                  - generic [aria-hidden] [ref=e539]: …
+                - button "显示更多" [ref=e540] [cursor=pointer]
+              - generic [ref=e546]:
+                - button "复制消息" [ref=e548] [cursor=pointer]
+                - button "共享提示" [ref=e552] [cursor=pointer]
+                - button "编辑消息" [ref=e556] [cursor=pointer]
+        - generic [ref=e564]:
+          - button "思考了 33m 44s" [ref=e565] [cursor=pointer]
+          - generic: 思考了 33m 44s
+        - generic [ref=e567]:
+          - heading "ChatGPT 说：" [level=4] [ref=e568]
+          - generic [ref=e570]:
+            - generic [ref=e571]:
+              - heading "外审结论" [level=2] [ref=e572]
+              - paragraph [ref=e573]:
+                - strong [ref=e574]: 可以接收本轮三臂实验在固定开发条件下的有限归因结论。未发现已证实的 SCIENTIFIC_BLOCKER；发现一项当前、非阻断的报告抄录错误。
+                - text: 接收这些有限结论不需要追加训练、增加候选或引入新的独立留出。
+              - paragraph [ref=e575]: 主执行者的核心判断得到保存结果支持：记录结构系统建立了旧域 O 的平均 MAP 收益；重组监督在相同记录结构上进一步建立了 O/N 的平均 MAP 收益。与此同时，N 的增量主要来自 Z，A2 与 G 方向未定；S 的首域获得值较低，CAB 的 C 最终仍略低于 R0；过拟合、概率校准、误报代价、单 seed 与重复开发数据的边界均须继续保留。
+              - heading "下载文件" [level=3] [ref=e576]
+              - generic [ref=e577]:
+                - table [ref=e580]:
+                  - rowgroup [ref=e581]:
+                    - row [ref=e582]:
+                      - columnheader "文件" [ref=e583]
+                      - columnheader "内容" [ref=e584]
+                  - rowgroup [ref=e585]:
+                    - row [ref=e586]:
+                      - cell [ref=e587]:
+                        - button "下载 three_arm_attribution_external_review_20261011.zip" [ref=e590] [cursor=pointer]:
+                          - generic [ref=e591]: three_arm_attribution_external_review_20261011.zip
+                      - cell [ref=e598]:
+                        - strong [ref=e599]: 完整返回包，30 个文件
+                        - text: ：中文报告、定向勘误、独立复算脚本、全部统计与曲线、阅读范围及散列清单
+                    - row [ref=e600]:
+                      - cell [ref=e601]:
+                        - button "打开 review_report.zh.txt 的预览" [ref=e604] [cursor=pointer]:
+                          - generic [ref=e605]: review_report.zh.txt
+                      - cell [ref=e612]:
+                        - strong [ref=e613]: 完整中文外审报告，42,919 字节
+                    - row [ref=e614]:
+                      - cell [ref=e615]:
+                        - button "打开 delivery_receipt.json 的预览" [ref=e618] [cursor=pointer]:
+                          - generic [ref=e619]: delivery_receipt.json
+                      - cell "输入与返回包身份、完整成员清单及各文件 SHA256" [ref=e625]
+                    - row [ref=e626]:
+                      - cell [ref=e627]:
+                        - button "打开 map_attribution.png 的预览" [ref=e630] [cursor=pointer]:
+                          - generic [ref=e631]: map_attribution.png
+                      - cell "三组比较的 O/N/Z MAP 差值及条件 95% 区间总图" [ref=e636]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e637]:
+                - text: 本次未委派辅助 agent，也未访问包外研究材料或项目服务器。会话向我提供的模型标识为
+                - strong [ref=e638]: GPT-6 Astra Pro
+                - text: ；后台实际路由未独立核验，报告对此作了明确说明。
+              - heading "一、输入身份与问题分类" [level=2] [ref=e639]
+              - paragraph [ref=e640]: 首先核对了唯一授权上传包，结果完全匹配：
+              - list [ref=e641]:
+                - listitem [ref=e642]:
+                  - text: 字节数：
+                  - strong [ref=e643]: 28,532,122
+                - listitem [ref=e644]:
+                  - text: 成员数：
+                  - strong [ref=e645]: 1,266
+                  - text: ，均为文件，没有重复成员名
+                - listitem [ref=e646]: SHA256：9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a
+                - listitem [ref=e647]:
+                  - text: 展开总字节数：
+                  - strong [ref=e648]: 40,039,402
+                - listitem [ref=e649]: 包内载荷清单逐项匹配，ZIP CRC 检查未发现错误。
+              - paragraph [ref=e650]: 问题分类如下。详细证据定位见主报告第一、二、十节及 E1—E10 索引。
+              - generic [ref=e651]:
+                - table [ref=e654]:
+                  - rowgroup [ref=e655]:
+                    - row [ref=e656]:
+                      - columnheader "类别" [ref=e657]
+                      - columnheader "判断" [ref=e658]
+                      - columnheader "本轮处置" [ref=e659]
+                  - rowgroup [ref=e660]:
+                    - row [ref=e661]:
+                      - cell "已证实 SCIENTIFIC_BLOCKER" [ref=e662]
+                      - cell [ref=e663]:
+                        - strong [ref=e664]: 0 项
+                      - cell "不阻断当前有限结论" [ref=e665]
+                    - row [ref=e666]:
+                      - cell "当前阻断性 REPRODUCIBILITY_DEFECT" [ref=e667]
+                      - cell [ref=e668]:
+                        - strong [ref=e669]: 0 项
+                      - cell "未发现必须重训或重新读取标签的依据" [ref=e670]
+                    - row [ref=e671]:
+                      - cell "当前非阻断 REPRODUCIBILITY_DEFECT" [ref=e672]
+                      - cell [ref=e673]:
+                        - strong [ref=e674]: 1 项：RD-01
+                      - cell "更正主报告中 R0 的 G 一格" [ref=e675]
+                    - row [ref=e676]:
+                      - cell "有价值但非当前前提的补充" [ref=e677]
+                      - cell "S 的证据不足诊断、N/G 区分、首学与最终能力、概率及阈值代价应更明确展示" [ref=e678]
+                      - cell "已在外审报告中补足" [ref=e679]
+                    - row [ref=e680]:
+                      - cell "无关过度设计" [ref=e681]
+                      - cell "通用审计系统、额外审批状态机、没有具体矛盾驱动的递归历史重审" [ref=e682]
+                      - cell "不作为本轮接收条件" [ref=e683]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - heading "RD-01：R0 的 G 抄录错误" [level=3] [ref=e684]
+              - paragraph [ref=e685]: 原 report.zh.txt 第 37 行写为：
+              - blockquote [ref=e686]:
+                - paragraph [ref=e687]: R0 的 G（MAP）＝0.052435519
+              - paragraph [ref=e688]: 保存评价、analysis/summary.json 和独立矩阵复算一致给出：
+              - paragraph [ref=e689]:
+                - strong [ref=e690]: 0.0524351862692100…，九位小数应为 0.052435186。
+              - paragraph [ref=e691]:
+                - text: 绝对误差约
+                - strong [ref=e692]: 3.3273079×10⁻⁷
+                - text: ，超过所展示精度下的正常舍入。该错误不改变 O/N 主要比较、任何已保存区间或 G 的方向判读；S−R0 的 G 差值和区间本身是正确的。
+              - paragraph [ref=e693]: 交付中已提供 main_report_erratum.zh.txt。原上传包没有被修改，无需为此重训、重新解析标签或覆盖冻结结果。依据见报告 E9，以及包内 outputs/report_table_checks.json 的逐格记录。
+              - heading "二、资格、72 小时修订和实际运行能够衔接" [level=2] [ref=e694]
+              - paragraph [ref=e695]: 核对不止于成功退出码，还覆盖了实际入口、来源、调度、保存记录和读取顺序。
+              - paragraph [ref=e696]:
+                - strong [ref=e697]: 72 小时补充授权有效替代原 48 小时条款。
+                - text: 原生资格的旧 29 来源与正式执行的当前 29 来源分别保留。26 项字节不变，三项变化对应：
+              - list [ref=e698]:
+                - listitem [ref=e699]: policy 的上限由 172800 秒改为 259200 秒；
+                - listitem [ref=e700]: wrapper 的 timeout 由 172795 秒改为 259195 秒；
+                - listitem [ref=e701]: runner 的 validate_gate 增加原资格与当前预算、来源的衔接。
+              - paragraph [ref=e702]: 移除该资格衔接函数后，新旧 runner 的 AST 一致；另外两项数值替换也逐字核对。独立静态依赖闭包与声明的 29 来源一致。没有将旧资格的散列改写成新来源，也没有把旧审查中的“尚未正式执行”恢复为当前事实。
+              - paragraph [ref=e703]:
+                - text: 保存的真实原生资格对应最大合法形状的实际更新和诊断中性检查。根据其组件时间机械复算得到
+                - strong [ref=e704]: 255,359.750395 秒，约 70.9333 小时
+                - text: 的预算投影：超过旧 48 小时、低于获准的 72 小时。它是资格预算投影，不是正式运行耗时。
+              - paragraph [ref=e705]: 正式运行证据对应：
+              - list [ref=e706]:
+                - listitem [ref=e707]:
+                  - strong [ref=e708]: 9 条独立路径、27 个阶段、7,776 条更新、12,960 次梯度群呈现
+                  - text: ；
+                - listitem [ref=e709]:
+                  - strong [ref=e710]: 162 条六轮诊断
+                  - text: 及
+                  - strong [ref=e711]: 两个未训练架构盲起点
+                  - text: ；
+                - listitem [ref=e712]: R0/S 的共同未训练起点、供给和预算配对；
+                - listitem [ref=e713]: 当前六轮顺序、历史抽样、Algorithm R 存活成员及目标散列延续；
+                - listitem [ref=e714]: before_valid 中 train=1、valid=0，最终 train=1、valid=1、heldout=0、owners=0；
+                - listitem [ref=e715]: 实际入口中的训练、盲门、开放前记录、一次 valid 解析、评价与完成顺序。
+              - paragraph [ref=e716]:
+                - text: 27 个阶段均保存了完整恢复通过记录。
+                - strong [ref=e717]: 本次独立检查的是实际源码断言、保存记录及分数一致性
+                - text: ：27 个 epoch6 盲分数数组与对应阶段 raw 分数逐位相同，共
+                - strong [ref=e718]: 612,360 个分数
+                - text: 。由于模型和 Memory 本体未上传，我没有声称重新执行过这 27 次 GPU 恢复。
+              - paragraph [ref=e719]:
+                - text: 正式 wrapper 保存耗时为
+                - strong [ref=e720]: 98,728 秒，即 27 小时 25 分 28 秒
+                - text: ，与资源末账的约一秒记录边界差异相容。上述证据见报告第三、四节、E3—E4，以及 outputs/execution_details.json。
+              - heading "三、独立统计支持哪些归因" [level=2] [ref=e721]
+              - paragraph [ref=e722]: 本次没有调用项目的 fields、endpoint_fields、summarize_field，也没有执行上传的 analyze_saved.py 来代替独立计算。
+              - paragraph [ref=e723]: 独立参考从保存矩阵出发，用显式端点系数和 bootstrap 群频数权重复算：
+              - list [ref=e724]:
+                - listitem [ref=e725]:
+                  - strong [ref=e726]: 83 套 60×22 指标矩阵
+                  - text: ；
+                - listitem [ref=e727]:
+                  - text: 由分类计数重新计算的
+                  - strong [ref=e728]: 29,880 个逐群指标值
+                  - text: ，误差为 0；
+                - listitem [ref=e729]:
+                  - text: 三个绝对方法与三组差值、四角色、八端点、22 指标的
+                  - strong [ref=e730]: 25,344 个统计标量
+                  - text: ，最大绝对差为
+                  - strong [ref=e731]: 1.3322676295501878×10⁻¹⁵
+                  - text: ；
+                - listitem [ref=e732]: 全部阶段／实际域均值、端点 CSV、诊断曲线及导出结果。
+              - paragraph [ref=e733]:
+                - text: 重采样按
+                - strong [ref=e734]: 实际 A/B/C 域内的群
+                - text: 配对，同一群跨方法、阶段和顺序保持成组；使用固定 PCG64、5,000 次抽样。三个顺序是固定路径，不是三个训练 seed。区间不包含重训随机性、重复开发中的适应性选择或未覆盖市场的变化。依据见报告第五节及 outputs/verification_summary.json。
+              - heading "三组主要 MAP 差异" [level=3] [ref=e735]
+              - paragraph [ref=e736]: 以下保留六位小数；完整精度和全部角色／端点见 outputs/recomputed_endpoints.json。
+              - generic [ref=e737]:
+                - table [ref=e740]:
+                  - rowgroup [ref=e741]:
+                    - row [ref=e742]:
+                      - columnheader "比较" [ref=e743]
+                      - columnheader "O：最终旧域" [ref=e744]
+                      - columnheader "N：新域学后水平" [ref=e745]
+                      - columnheader "Z：最终最新域" [ref=e746]
+                  - rowgroup [ref=e747]:
+                    - row [ref=e748]:
+                      - cell "R0−LOGIT0.1" [ref=e749]
+                      - cell [ref=e750]:
+                        - strong [ref=e751]: "+0.010473"
+                        - text: "[0.001575, 0.019370]"
+                      - cell "+0.000984 [−0.009008, 0.010439]" [ref=e752]
+                      - cell "−0.004766 [−0.018544, 0.008819]" [ref=e753]
+                    - row [ref=e754]:
+                      - cell "S−R0" [ref=e755]
+                      - cell [ref=e756]:
+                        - strong [ref=e757]: "+0.016436"
+                        - text: "[0.005108, 0.028173]"
+                      - cell [ref=e758]:
+                        - strong [ref=e759]: "+0.015999"
+                        - text: "[0.006573, 0.025872]"
+                      - cell [ref=e760]:
+                        - strong [ref=e761]: "+0.030924"
+                        - text: "[0.016795, 0.045505]"
+                    - row [ref=e762]:
+                      - cell "S−LOGIT0.1" [ref=e763]
+                      - cell [ref=e764]:
+                        - strong [ref=e765]: "+0.026909"
+                        - text: "[0.015891, 0.038317]"
+                      - cell [ref=e766]:
+                        - strong [ref=e767]: "+0.016983"
+                        - text: "[0.004613, 0.029339]"
+                      - cell [ref=e768]:
+                        - strong [ref=e769]: "+0.026159"
+                        - text: "[0.009329, 0.043351]"
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e770]: 方括号为条件 95% 区间。
+              - paragraph [ref=e771]:
+                - strong [ref=e772]: R0−LOGIT 支持整套记录结构系统的旧域收益，新域方向未定。
+                - text: 这一比较同时改变汇总顺序、head 函数族、历史目标表示及计算路径，因此不能进一步单独归因为“纯池化”或某一种 Memory 表示。
+              - paragraph [ref=e773]:
+                - strong [ref=e774]: S−R0 支持加入重组监督策略后的 O/N 增量。
+                - text: 它识别的是该策略连同后续学习轨迹、自身历史目标变化的整体作用，没有单独隔离当前重组、历史重组或某一个优化机制。
+              - paragraph [ref=e775]:
+                - strong [ref=e776]: S−LOGIT 是必要的第三组系统总差异。
+                - text: 三组比较在同一批结果上的差值可线性相加，但这不识别结构与重组之间的交互，也不提供普遍因果贡献百分比。
+              - heading "N 的改善主要来自 Z，G 仍未定" [level=3] [ref=e777]
+              - paragraph [ref=e778]: S−R0 的：
+              - list [ref=e779]:
+                - listitem [ref=e780]:
+                  - text: A2：
+                  - strong [ref=e781]: "+0.001072676"
+                  - text: ，区间
+                  - strong [ref=e782]: "[−0.009891257, 0.012091655]"
+                  - text: ；
+                - listitem [ref=e783]:
+                  - text: Z：
+                  - strong [ref=e784]: "+0.030924452"
+                  - text: ，区间全正；
+                - listitem [ref=e785]:
+                  - text: G：
+                  - strong [ref=e786]: −0.000293983
+                  - text: ，区间
+                  - strong [ref=e787]: "[−0.011498040, 0.010855946]"
+                  - text: 。
+              - paragraph [ref=e788]:
+                - text: 由 N=(A2+Z)/2，N 增量中的半权贡献分别约为
+                - strong [ref=e789]: "0.000536338"
+                - text: 和
+                - strong [ref=e790]: "0.015462226"
+                - text: 。因此，“新域平均学后水平提高”成立；“每次学习新域的增量更大”或“学得更快”没有建立。依据见报告第六节、E5。
+              - heading "四、首学代价和负遗忘必须一起解释" [level=2] [ref=e791]
+              - generic [ref=e792]:
+                - table [ref=e795]:
+                  - rowgroup [ref=e796]:
+                    - row [ref=e797]:
+                      - columnheader "MAP 均值" [ref=e798]
+                      - columnheader "R0" [ref=e799]
+                      - columnheader "S" [ref=e800]
+                  - rowgroup [ref=e801]:
+                    - row [ref=e802]:
+                      - cell "首域刚学完" [ref=e803]
+                      - cell "0.489001504" [ref=e804]
+                      - cell "0.474387958" [ref=e805]
+                    - row [ref=e806]:
+                      - cell "首域最终" [ref=e807]
+                      - cell "0.471269342" [ref=e808]
+                      - cell "0.487233535" [ref=e809]
+                    - row [ref=e810]:
+                      - cell "第二域最终" [ref=e811]
+                      - cell "0.471277298" [ref=e812]
+                      - cell "0.488184857" [ref=e813]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e814]:
+                - text: S 的首域获得值平均低
+                - strong [ref=e815]: "0.014613546"
+                - text: ，最终首域平均高
+                - strong [ref=e816]: "0.015964193"
+                - text: 。因此，较小的 F_first 同时包含较低获得值和较高最终值两个成分。O 的最终收益有绝对能力支持；负遗忘本身仍不能单独证明保持更好。
+              - paragraph [ref=e817]:
+                - strong [ref=e818]: CAB 首域 C 必须作为具体反例保留：
+              - list [ref=e819]:
+                - listitem [ref=e820]:
+                  - text: 首学：R0 约
+                  - strong [ref=e821]: "0.490856"
+                  - text: ，S 约
+                  - strong [ref=e822]: "0.436068"
+                  - text: ；
+                - listitem [ref=e823]:
+                  - text: 最终：R0
+                  - strong [ref=e824]: "0.474697468"
+                  - text: ，S
+                  - strong [ref=e825]: "0.473051542"
+                  - text: ；
+                - listitem [ref=e826]:
+                  - text: S 最终仍低
+                  - strong [ref=e827]: "0.001645926"
+                  - text: 。
+              - paragraph [ref=e828]: S 在后续阶段追回了大部分差距，但该单元没有最终超过 R0。全部最终实际域单元已列入报告第七节与 outputs/derived_findings.json，没有只展示有利单元。
+              - heading "五、过拟合、概率与阈值取舍没有被零信号掩盖" [level=2] [ref=e829]
+              - heading "六轮诊断" [level=3] [ref=e830]
+              - paragraph [ref=e831]:
+                - text: 完整复算覆盖
+                - strong [ref=e832]: 162 条诊断、51 个非空面板、153 条六轮指标曲线
+                - text: 。严格“有相应迹象”的计数为：
+              - generic [ref=e833]:
+                - table [ref=e836]:
+                  - rowgroup [ref=e837]:
+                    - row [ref=e838]:
+                      - columnheader "方法" [ref=e839]
+                      - columnheader "fit：MAP／Recall@5／raw log_loss，各 9 个面板" [ref=e840]
+                      - columnheader "cache：同三指标，各 8 个面板" [ref=e841]
+                  - rowgroup [ref=e842]:
+                    - row [ref=e843]:
+                      - cell "LOGIT0.1" [ref=e844]
+                      - cell "1／2／2" [ref=e845]
+                      - cell "5／3／2" [ref=e846]
+                    - row [ref=e847]:
+                      - cell "R0" [ref=e848]
+                      - cell "0／1／2" [ref=e849]
+                      - cell "2／1／1" [ref=e850]
+                    - row [ref=e851]:
+                      - cell "S" [ref=e852]
+                      - cell "0／0／0" [ref=e853]
+                      - cell "0／0／0" [ref=e854]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e855]:
+                - strong [ref=e856]: S 的零计数不构成无过拟合证明。
+                - text: 它仍有
+                - strong [ref=e857]: 7 个“证据不足”条目
+                - text: ，包括 ABC 第三阶段两个旧域缓存的 MAP、BCA 第二阶段 fit C 的 raw log_loss、缓存 B 的三指标，以及 BCA 第三阶段缓存 B 的 Recall@5。完整条目、点值和区间已在报告第八节展开。
+              - paragraph [ref=e858]:
+                - text: 另一个不能遗漏的现象是：S 在 CAB 首阶段的 raw log_loss，fit 约从
+                - strong [ref=e859]: 0.244397 升至 0.328737
+                - text: ，valid 从
+                - strong [ref=e860]: 0.244248 升至 0.351011
+                - text: ，均变差。既定判据要求训练端先改善，这类轨迹不会进入严格过拟合信号；不能据其标签推断概率拟合良好。
+              - paragraph [ref=e861]:
+                - text: 首阶段缓存为空，以及三臂 CAB 第三阶段
+                - strong [ref=e862]: C 没有存活缓存群
+                - text: ，均保留为 N/A。交付三张完整六轮图没有将 N/A 填零，也没有事后挑选最好 epoch。证据见 E6 和 outputs/recomputed_diagnostics.json。
+              - heading "Raw 与校准概率" [level=3] [ref=e863]
+              - paragraph [ref=e864]: MAP 等排序差异没有被校准制造：54 组保存校准分数的正仿射变换、排序和相应排序指标均已核对。
+              - paragraph [ref=e865]: 但概率表现依赖角色：
+              - list [ref=e866]:
+                - listitem [ref=e867]:
+                  - text: S−LOGIT 的
+                  - strong [ref=e868]: raw log_loss
+                  - text: 在 O/N/Z 分别恶化约
+                  - strong [ref=e869]: 0.022666／0.026200／0.024664
+                  - text: ，区间均全正；
+                - listitem [ref=e870]: stage-cal 后，相应 log_loss 差为负，区间均全负；
+                - listitem [ref=e871]: raw Brier 在这三个端点反而改善，不能把 raw log_loss 的退化扩大成“全部 raw 概率指标退化”。
+              - heading "固定阈值确有误报代价" [level=3] [ref=e872]
+              - paragraph [ref=e873]: 在 primary／stage-cal 的 0.5 阈值下，O 的保存计数按固定顺序×域出现次数相加：
+              - generic [ref=e874]:
+                - table [ref=e877]:
+                  - rowgroup [ref=e878]:
+                    - row [ref=e879]:
+                      - columnheader "方法" [ref=e880]
+                      - columnheader "TP" [ref=e881]
+                      - columnheader "FP" [ref=e882]
+                      - columnheader "FN" [ref=e883]
+                      - columnheader "TN" [ref=e884]
+                  - rowgroup [ref=e885]:
+                    - row [ref=e886]:
+                      - cell "LOGIT0.1" [ref=e887]
+                      - cell "195" [ref=e888]
+                      - cell "82" [ref=e889]
+                      - cell "2205" [ref=e890]
+                      - cell "42878" [ref=e891]
+                    - row [ref=e892]:
+                      - cell "R0" [ref=e893]
+                      - cell "194" [ref=e894]
+                      - cell "100" [ref=e895]
+                      - cell "2206" [ref=e896]
+                      - cell "42860" [ref=e897]
+                    - row [ref=e898]:
+                      - cell "S" [ref=e899]
+                      - cell "241" [ref=e900]
+                      - cell "137" [ref=e901]
+                      - cell "2159" [ref=e902]
+                      - cell "42823" [ref=e903]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e904]:
+                - text: R0→S 多
+                - strong [ref=e905]: 47 次 TP
+                - text: ，也多
+                - strong [ref=e906]: 37 次 FP
+                - text: 。这些是相关的固定出现次数，不能当作独立新增样本。S 的 O recall 仍约
+                - strong [ref=e907]: 10.04%
+                - text: 、群宏 F1 约
+                - strong [ref=e908]: "0.167"
+                - text: ；排序改善不能自动转化为充分可用的自动识别能力。证据见报告第九节、E7。
+              - heading "六、成本和历史边界继续保留" [level=2] [ref=e909]
+              - paragraph [ref=e910]: 保存的“训练循环＋逐轮诊断”累计时间为：
+              - list [ref=e911]:
+                - listitem [ref=e912]:
+                  - text: LOGIT0.1：
+                  - strong [ref=e913]: 30,811.893 秒
+                - listitem [ref=e914]:
+                  - text: R0：
+                  - strong [ref=e915]: 31,279.020 秒
+                - listitem [ref=e916]:
+                  - text: S：
+                  - strong [ref=e917]: 31,368.227 秒
+              - paragraph [ref=e918]:
+                - text: S 比 R0 多
+                - strong [ref=e919]: 89.207 秒，约 0.2852%
+                - text: 。这是本次顺序执行、包含诊断的墙钟观察，未包含全部保存／恢复与终统计，不能包装成通用零额外成本。记录的 CUDA reserved、RSS 和输出峰值分别约
+                - strong [ref=e920]: 8.82／6.62／35.28 GiB
+                - text: ，低于相应上限。证据见报告第十节、E3—E4。
+              - paragraph [ref=e921]:
+                - text: 历史
+                - strong [ref=e922]: C／C_plus 的固定配置负结果不翻转
+                - text: ；
+                - strong [ref=e923]: R1 的历史根因没有被本轮隔离
+                - text: 。当前显式数值配置和原生补核说明当前运行条件可追溯，不能回填旧运行当时未知的有效配置。
+              - paragraph [ref=e924]:
+                - text: overall_pass_gate=false 的正确含义是：
+                - strong [ref=e925]: 本轮没有设置新的总通过门。
+                - text: 它不构成失败判定，也不能由成功退出和多个正区间另外合成一次新总通过。
+              - heading "七、实际阅读／计算范围与未核验事项" [level=2] [ref=e926]
+              - paragraph [ref=e927]:
+                - text: 逐文件清单覆盖全部
+                - strong [ref=e928]: 1,266 个输入文件
+                - text: ，区分了：
+              - list [ref=e929]:
+                - listitem [ref=e930]:
+                  - strong [ref=e931]: 14 个文件的人工全文审读
+                  - text: ；
+                - listitem [ref=e932]:
+                  - strong [ref=e933]: 10 个文件的指定段落／检索片段审读
+                  - text: ；
+                - listitem [ref=e934]:
+                  - strong [ref=e935]: 38 个文件的关键字段、结构或指定样例审读
+                  - text: ；
+                - listitem [ref=e936]: 其余文件的程序解析、保存数组计算或仅字节身份核对。
+              - paragraph [ref=e937]:
+                - text: 主复算程序以 allow_pickle=False 读取
+                - strong [ref=e938]: 841 个不同 NPY 数组
+                - text: 。所有文件至少核对了字节身份；没有把哈希读取或 AST 解析称为人工逐行审读。
+              - paragraph [ref=e939]:
+                - strong [ref=e940]: 独立计算环境是网页会话附带的 Linux 容器，CPython 3.12.14、NumPy 2.3.5；Torch 未导入，GPU 未使用，项目 Linux 未连接。
+                - text: 这与包内项目 Linux／Torch／GPU 原生实测明确分开。
+              - paragraph [ref=e941]: 本次未独立核验：
+              - list [ref=e942]:
+                - listitem [ref=e943]: 从原始正式标签到全部 22 指标的重新计算，以及校准映射的重新拟合；
+                - listitem [ref=e944]: 未上传模型／Memory 实体的散列、再次恢复及后续训练更新；
+                - listitem [ref=e945]: 项目服务器的实时进程、系统调用、磁盘或 GPU 状态；
+                - listitem [ref=e946]: 历史 C/C_plus 原始运行的重新审查、R1 根因及外部新颖性；
+                - listitem [ref=e947]: 后台模型路由，以及单 seed、重复开发数据之外的泛化。
+              - paragraph [ref=e948]:
+                - text: 这些是本次材料与授权边界，
+                - strong [ref=e949]: 不被自动升级为当前有限结论的补实验前提
+                - text: 。详见报告第十一节和两份 reading_scope 文件。
+              - heading "八、完整返回清单" [level=2] [ref=e950]
+              - paragraph [ref=e951]:
+                - text: ZIP 内共
+                - strong [ref=e952]: 30 个文件
+                - text: ：
+              - generic [ref=e953]:
+                - table [ref=e956]:
+                  - rowgroup [ref=e957]:
+                    - row [ref=e958]:
+                      - columnheader "路径" [ref=e959]
+                      - columnheader "用途" [ref=e960]
+                  - rowgroup [ref=e961]:
+                    - row [ref=e962]:
+                      - cell "review_report.zh.txt" [ref=e963]
+                      - cell "完整中文外审报告" [ref=e964]
+                    - row [ref=e965]:
+                      - cell "main_report_erratum.zh.txt" [ref=e966]
+                      - cell "RD-01 定向勘误" [ref=e967]
+                    - row [ref=e968]:
+                      - cell "findings.json" [ref=e969]
+                      - cell "机器可读的问题分类与边界" [ref=e970]
+                    - row [ref=e971]:
+                      - cell "reading_scope.zh.txt" [ref=e972]
+                      - cell "实际阅读／计算范围说明" [ref=e973]
+                    - row [ref=e974]:
+                      - cell "reading_scope.csv" [ref=e975]
+                      - cell "1,266 个输入文件的逐文件阅读范围" [ref=e976]
+                    - row [ref=e977]:
+                      - cell "README.zh.txt" [ref=e978]
+                      - cell "交付说明、文件用途及可选复算命令" [ref=e979]
+                    - row [ref=e980]:
+                      - cell "RETURN_MANIFEST.json" [ref=e981]
+                      - cell "包内其他全部文件的字节数与 SHA256" [ref=e982]
+                    - row [ref=e983]:
+                      - cell "verify_saved_results.py" [ref=e984]
+                      - cell "独立保存结果核验脚本" [ref=e985]
+                    - row [ref=e986]:
+                      - cell "verify_report_claims.py" [ref=e987]
+                      - cell "报告 126 格、依赖闭包及预算核对脚本" [ref=e988]
+                    - row [ref=e989]:
+                      - cell "plot_saved_review.py" [ref=e990]
+                      - cell "四张科学图的绘制脚本" [ref=e991]
+                    - row [ref=e992]:
+                      - cell "outputs/verification_summary.json" [ref=e993]
+                      - cell "身份、来源、执行、统计误差及环境总账" [ref=e994]
+                    - row [ref=e995]:
+                      - cell "outputs/execution_details.json" [ref=e996]
+                      - cell "更新、阶段、资源与衔接细节" [ref=e997]
+                    - row [ref=e998]:
+                      - cell "outputs/input_file_inventory.csv" [ref=e999]
+                      - cell "主复算程序的文件读取模式记录" [ref=e1000]
+                    - row [ref=e1001]:
+                      - cell "outputs/recomputed_endpoints.json" [ref=e1002]
+                      - cell "全角色、全端点、全指标统计" [ref=e1003]
+                    - row [ref=e1004]:
+                      - cell "outputs/recomputed_endpoints.csv" [ref=e1005]
+                      - cell "4,224 行端点记录、25,344 个标量" [ref=e1006]
+                    - row [ref=e1007]:
+                      - cell "outputs/recomputed_stage_domain.csv" [ref=e1008]
+                      - cell "243 行阶段／实际域均值" [ref=e1009]
+                    - row [ref=e1010]:
+                      - cell "outputs/pooled_classification.csv" [ref=e1011]
+                      - cell "332 行合并分类计数与派生指标" [ref=e1012]
+                    - row [ref=e1013]:
+                      - cell "outputs/recomputed_diagnostics.json" [ref=e1014]
+                      - cell "六轮诊断、区间、解释标签与 N/A" [ref=e1015]
+                    - row [ref=e1016]:
+                      - cell "outputs/recomputed_curves.csv" [ref=e1017]
+                      - cell "153 条完整六轮指标曲线" [ref=e1018]
+                    - row [ref=e1019]:
+                      - cell "outputs/report_table_checks.json" [ref=e1020]
+                      - cell "主报告逐格核对及 RD-01 明细" [ref=e1021]
+                    - row [ref=e1022]:
+                      - cell "outputs/derived_findings.json" [ref=e1023]
+                      - cell "首学、最终域、阈值计数、成本及 N 分解点值" [ref=e1024]
+                    - row [ref=e1025]:
+                      - cell "figures/map_attribution.png" [ref=e1026]
+                      - cell "三组 O/N/Z 比较总图" [ref=e1027]
+                    - row [ref=e1028]:
+                      - cell "figures/all_six_epoch_map.png" [ref=e1029]
+                      - cell "完整 MAP 六轮曲线" [ref=e1030]
+                    - row [ref=e1031]:
+                      - cell "figures/all_six_epoch_recall_at_5.png" [ref=e1032]
+                      - cell "完整 Recall@5 六轮曲线" [ref=e1033]
+                    - row [ref=e1034]:
+                      - cell "figures/all_six_epoch_log_loss.png" [ref=e1035]
+                      - cell "完整 raw log_loss 六轮曲线" [ref=e1036]
+                    - row [ref=e1037]:
+                      - cell "verification_console.txt" [ref=e1038]
+                      - cell "最终主复算回执" [ref=e1039]
+                    - row [ref=e1040]:
+                      - cell "report_claims_console.txt" [ref=e1041]
+                      - cell "最终报告核对回执" [ref=e1042]
+                    - row [ref=e1043]:
+                      - cell "reviewer_computation_notes.json" [ref=e1044]
+                      - cell "审查者自身计算修正说明" [ref=e1045]
+                    - row [ref=e1046]:
+                      - cell "first_reference_console.txt" [ref=e1047]
+                      - cell "初次参考计算回执" [ref=e1048]
+                    - row [ref=e1049]:
+                      - cell "first_report_parser_console.txt" [ref=e1050]
+                      - cell "初次文本解析器异常回执" [ref=e1051]
+                - generic:
+                  - generic:
+                    - button "复制表格"
+                  - generic:
+                    - button "展开表格"
+              - paragraph [ref=e1052]: ZIP 外另提供 delivery_receipt.json；主报告与比较总图也提供了同字节的单独下载。
+              - paragraph [ref=e1053]:
+                - strong [ref=e1054]: 返回 ZIP 身份：
+              - list [ref=e1055]:
+                - listitem [ref=e1056]:
+                  - text: 字节数：
+                  - strong [ref=e1057]: 2,109,397
+                - listitem [ref=e1058]:
+                  - text: 成员数：
+                  - strong [ref=e1059]: "30"
+                - listitem [ref=e1060]: SHA256：5ac3e15f0b01fc657d18ae195c7b86ed7a6305a2ff74d3f8db9dc6d63f47b5da
+              - paragraph [ref=e1061]:
+                - text: 最终意见是：
+                - strong [ref=e1062]: 接受当前限定范围的归因结果，登记并更正 RD-01；保留全部已明确的科学边界后，可关闭本次结果外审。
+            - generic [ref=e1065]:
+              - generic [ref=e1066]:
+                - button "打开 review_report.zh.txt 的预览" [ref=e1067] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "review_report.zh.txt"
+                    - generic: 文档
+                  - generic:
+                    - generic:
+                      - generic:
+                        - button "下载文件"
+              - generic [ref=e1068]:
+                - button "打开 delivery_receipt.json 的预览" [ref=e1069] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "delivery_receipt.json"
+                    - generic: 代码
+                  - generic:
+                    - generic:
+                      - generic:
+                        - button "下载文件"
+              - generic [ref=e1070]:
+                - button "打开 map_attribution.png 的预览" [ref=e1071] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "map_attribution.png"
+                    - generic: 图像
+                  - generic:
+                    - generic:
+                      - generic:
+                        - button "下载文件"
+      - generic [ref=e1073]:
+        - button "复制" [ref=e1075] [cursor=pointer]
+        - button "评价回复" [ref=e1079] [cursor=pointer]
+        - button "分享" [ref=e1083] [cursor=pointer]
+        - button "朗读" [ref=e1087] [cursor=pointer]
+        - button "重新生成回复" [ref=e1091] [cursor=pointer]
+        - button "更多操作" [ref=e1094] [cursor=pointer]
+        - button "来源" [ref=e1098] [cursor=pointer]
+    - generic [ref=e1102]: ChatGPT 可能会出错。请核查重要信息。
+  - generic:
+    - generic:
+      - generic:
+        - button [aria-hidden]
+      - heading "最新一条回复" [level=4] [ref=e1105]
+      - status [ref=e1106]
+      - generic [ref=e1121]:
+        - button "添加文件等内容" [ref=e1126] [cursor=pointer]
+        - textbox "询问 ChatGPT" [active] [ref=e1133]:
+          - paragraph: 询问 ChatGPT
+        - generic [ref=e1136]:
+          - button "选择 ChatGPT 模型" [ref=e1140] [cursor=pointer]:
+            - generic [ref=e1141]: Pro
+          - generic [ref=e1151]:
+            - button "听写" [ref=e1154] [cursor=pointer]
+            - button "开始语音" [ref=e1159] [cursor=pointer]

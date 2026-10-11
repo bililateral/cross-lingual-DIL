@@ -1,6 +1,6 @@
 {
-  "status": "SUBMITTED_REVIEW_IN_PROGRESS",
-  "observed_at": "2026-10-11T10:42:35.3560611+08:00",
+  "status": "REVIEW_AND_PRIMARY_CLOSED_NO_OPEN_BLOCKERS",
+  "observed_at": "2026-10-11T11:16:02.7718269+08:00",
   "destination": "https://chatgpt.com/",
   "tool": "local Playwright MCP",
   "requested_model": "GPT 6 Pro",
@@ -19,7 +19,7 @@
   "appended_identity": "本次唯一授权上传包：review_input.zip，28,532,122字节，1,266成员，SHA256 9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a。请先核对包身份。",
   "conversation_url": "https://chatgpt.com/c/6acaf303-eda8-83eb-9a4f-e4a53b1d130e",
   "submitted": true,
-  "returned_review": false,
+  "returned_review": true,
   "attempts": [
     {
       "started_at": "2026-10-11T09:57:54+08:00",
@@ -47,7 +47,7 @@
     "Automatic review rejected closing the upload page; the close operation did not execute.",
     "Network errors are delivery failures, not scientific experiment failures. Exact package authorization persists."
   ],
-  "next_action": "Retrieve the complete review when available and independently dispose of findings. Do not duplicate submission.",
+  "next_action": "Result review closed. Use primary_disposition.zh.txt and correction.zh.txt with the frozen original report. No new run is authorized by this closure.",
   "git_delivery": {
     "result_commit": "9e3aa4253f5d8aa2a664e4294452fe149227f028",
     "first_push": "curl55 connection reset; did not update remote",
@@ -55,13 +55,13 @@
     "current_push_session": null,
     "current_push_started_at": "2026-10-11T10:13:35+08:00",
     "current_push_options": "per-command HTTP/1.1, postBuffer104857600, lowSpeedLimit1, lowSpeedTime60; no persistent settings changed",
-    "remote_last_confirmed": "318ed7102fcc86fd593de34cc4ddc319fd3cb334",
-    "status": "Result and previous transfer-status commits delivered; this recovery and cleanup record will be included in the next delivery commit.",
+    "remote_last_confirmed": "48ad562406580493c84a0d7d5d1dc67ad9ffa68c",
+    "status": "Prior result, cleanup, Harness and mechanism-design commits independently delivered before this turn. Current review closure follows the same commit/push and independent remote-ref verification procedure; final delivery is reported without a self-referential receipt commit.",
     "current_push_outcome": "Session 18748 returned exit 0; result commit 9e3aa425 independently confirmed remotely. Prior status commit 318ed710 subsequently pushed and independently confirmed."
   },
   "submitted_at": null,
   "submission_observation": "On recovery the existing conversation already contained the user request and authorized attachment; actual send time and sender were not independently observed. No duplicate upload or message was sent in this recovery turn.",
-  "visible_model_current": "Pro selector; Stop button and active review progress visible",
+  "visible_model_current": "Pro selector; final answer and delivery links visible; no active Stop button",
   "reviewer_self_report": "GPT-6 Astra Pro; reviewer explicitly cannot independently verify UI selection or backend routing",
   "uploaded_attachment": {
     "bytes": 28532122,
@@ -70,5 +70,81 @@
     "verification": "Downloaded the actual conversation attachment through local Playwright MCP; exact identity matches authorized original.",
     "members": 1266,
     "sha256": "9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a"
+  },
+  "review_completion": {
+    "external_verdict": "ACCEPT_BOUNDED_CONCLUSIONS_WITH_NONBLOCKING_REPORT_ERRATUM",
+    "closure_result": "No open tabs",
+    "browser_closed_observed_at": "2026-10-11T11:15:28+08:00",
+    "evidence": "Final answer, 33m 44s thinking summary and delivery links; complete page text saved.",
+    "browser_closed": true,
+    "response_snapshot": "response_snapshot.yml"
+  },
+  "recovered_files": {
+    "response_snapshot.yml": {
+      "bytes": 44999,
+      "sha256": "8cab925a8e4471d40c11cb289e9dd4430e92e08d38acc8a7fb7a975d3454f028"
+    },
+    "delivery_receipt.json": {
+      "bytes": 6229,
+      "sha256": "3da00a84d22b2d96f44a53288358c61985a2a0e8199c7e62309009e623d010ed"
+    },
+    "primary_disposition.zh.txt": {
+      "bytes": 12272,
+      "sha256": "dd9989ae170d26229a0a8ebf27108bb60f9fd0042a237aef4c535bdb77a261ed"
+    },
+    "external_review.zip": {
+      "bytes": 2109397,
+      "sha256": "5ac3e15f0b01fc657d18ae195c7b86ed7a6305a2ff74d3f8db9dc6d63f47b5da"
+    }
+  },
+  "recovery_verification": {
+    "standalone_report_and_figure_match": true,
+    "download_note": "Receipt response-body retrieval first produced an empty placeholder; actual browser attachment download recovered valid JSON. Empty placeholder replaced, signed URL not retained.",
+    "external_receipt_members_verified": 30,
+    "missing_or_extra_files": 0,
+    "inner_manifest_payloads_verified": 29,
+    "zip_members": 30,
+    "uncompressed_bytes": 5219790
+  },
+  "primary_disposition": {
+    "scientific_blockers": 0,
+    "mechanical_diagnostic_numeric_comparisons": 6069,
+    "nonblocking_findings": [
+      {
+        "status": "CLOSED",
+        "scope": "R0 G MAP transcription only; frozen original preserved",
+        "evidence": "correction.zh.txt",
+        "id": "RD-01"
+      }
+    ],
+    "new_data_reads": false,
+    "maximum_endpoint_difference": 1.3322676295501878E-15,
+    "new_scientific_run": false,
+    "blocking_current_reproducibility_defects": 0,
+    "diagnostic_text_comparisons": 156,
+    "maximum_diagnostic_difference": 6.522560269672795E-16,
+    "path": "primary_disposition.zh.txt",
+    "status": "CLOSED_NO_OPEN_BLOCKERS",
+    "mechanical_endpoint_comparisons": 25344
+  },
+  "linux_sync": {
+    "existing_remote_handoff_sha256": "6ef42ed00f7d72e44a88290548618e4c1ecd3e71c3293dd2c59d385f00fb9c22",
+    "existing_remote_submission_sha256": "d9d9099374369162dddc66aeb02b94403f9cc5860239efab66751e1a78595b2b",
+    "note": "Current handoff also carries the already committed user-authorized Harness text; no frozen workspace source is overwritten.",
+    "existing_remote_matches_previous_sync": true,
+    "status": "PAYLOAD_AND_HANDOFF_VERIFIED",
+    "root": "/home/yongpeng/cross-lingual",
+    "verified_at": "2026-10-11T11:17:22.249913+08:00",
+    "method": "SFTP; Linux existing py310 used only for ZIP/file management and SHA verification",
+    "external_members_verified": 30,
+    "review_files_verified": [
+      "external_review.zip",
+      "delivery_receipt.json",
+      "response_snapshot.yml",
+      "primary_disposition.zh.txt"
+    ],
+    "handoff_bytes": 32327,
+    "handoff_sha256": "a75389d1874ed6d50b0e3f1f706f9186c8fc7ec4190ef152fb40936e87b91f8d",
+    "receipt_note": "This mutable submission receipt is transferred after payload verification and its own final SHA is checked in the delivery command output; no circular self-hash is inserted."
   }
 }

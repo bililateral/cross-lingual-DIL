@@ -1,0 +1,391 @@
+{
+  "status": "CONSISTENT_SAVED_EVIDENCE",
+  "scope": "This upload only. Recorded outputs, no project imports, models, labels, Memory payloads, network, Torch or GPU.",
+  "package": {
+    "uncompressed_files": 1266,
+    "uncompressed_bytes": 40039402,
+    "declared_payload_records": 1265,
+    "zip_bytes": 28532122,
+    "zip_sha256": "9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a",
+    "zip_members": 1266
+  },
+  "sources": {
+    "active_sources": 29,
+    "native_qualified_sources": 29,
+    "changed_active_sources": [
+      "schema/step28_record_attribution_policy.json",
+      "scripts/run_step28_record_attribution_linux_20261009.sh",
+      "scripts/step28_record_attribution_run.py"
+    ],
+    "scientific_ast_unchanged_outside_validate_gate": true,
+    "native_elapsed_seconds": 285.47738230694085,
+    "native_projected_seconds": 255359.75039522513,
+    "native_environment": {
+      "torch": "2.9.1+cu130",
+      "cuda": "13.0",
+      "gpu": "NVIDIA GeForce RTX 5090"
+    },
+    "effective_numerics": {
+      "cublas_workspace_config": ":4096:8",
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "cudnn_benchmark": false,
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false
+    },
+    "weight_and_memory_native_replay_performed_by_this_review": false
+  },
+  "execution": {
+    "physical_updates": 7776,
+    "gradient_group_presentations": 12960,
+    "stages": 27,
+    "console_update_events": 351,
+    "non_json_console_lines": 18,
+    "wrapper_wall_seconds": 98728.0,
+    "budget_record": {
+      "elapsed_seconds": 98727.0183261563,
+      "limits": {
+        "maximum_cuda_reserved_bytes": 30064771072,
+        "maximum_gpu_stage_seconds": 259200,
+        "maximum_output_bytes": 51539607552,
+        "maximum_rss_bytes": 68719476736,
+        "minimum_free_gpu_bytes": 32212254720,
+        "minimum_free_host_bytes": 77309411328,
+        "torch_cpu_threads": 1
+      },
+      "peak_cuda_reserved_bytes": 9466544128,
+      "peak_output_bytes": 37879522044,
+      "peak_rss_bytes": 7108763648,
+      "phase": "statistics"
+    },
+    "loop_plus_diagnostics_seconds_by_arm": {
+      "LOGIT0.1": 30811.893404119648,
+      "R0": 31279.02030254854,
+      "S": 31368.227097307798
+    },
+    "model_bytes_inventory": 35237126610,
+    "memory_bytes_inventory": 8389549,
+    "max_memory_bytes": 352863,
+    "restore_verification_basis": "Source and recorded full_restore_verified plus saved-score consistency; no weights/Memory available here."
+  },
+  "matrices": {
+    "sets": 83,
+    "shape": [
+      60,
+      22
+    ],
+    "matrix_values": 109560,
+    "count_rows": 4980,
+    "rank_columns": 14,
+    "probability_and_threshold_columns": 8
+  },
+  "numerical_comparisons": {
+    "count_derived_group_metrics": {
+      "scalars": 29880,
+      "max_absolute_error": 0.0,
+      "worst_location": null
+    },
+    "stage_domain_means": {
+      "scalars": 5346,
+      "max_absolute_error": 0.0,
+      "worst_location": null
+    },
+    "stage_all_means": {
+      "scalars": 1782,
+      "max_absolute_error": 0.0,
+      "worst_location": null
+    },
+    "initial_domain_means": {
+      "scalars": 132,
+      "max_absolute_error": 0.0,
+      "worst_location": null
+    },
+    "pooled_classification": {
+      "scalars": 2656,
+      "max_absolute_error": 5.551115123125783e-17,
+      "worst_location": "CAB_R0_stage1/first-cal/B"
+    },
+    "endpoints_25344": {
+      "scalars": 25344,
+      "max_absolute_error": 1.3322676295501878e-15,
+      "worst_location": "LOGIT0.1/raw/O/specificity"
+    },
+    "reported_endpoint_csv": {
+      "scalars": 25344,
+      "max_absolute_error": 1.3322676295501878e-15,
+      "worst_location": "('absolute', 'LOGIT0.1', 'raw', 'O', 'specificity')"
+    },
+    "reported_stage_csv": {
+      "scalars": 5346,
+      "max_absolute_error": 0.0,
+      "worst_location": null
+    },
+    "diagnostic_curves_and_intervals": {
+      "scalars": 6069,
+      "max_absolute_error": 6.522560269672795e-16,
+      "worst_location": "BCA_LOGIT0.1_stage3/fit/A/benefit_gap_conditional_intervals"
+    },
+    "reported_curve_export": {
+      "scalars": 3213,
+      "max_absolute_error": 4.440892098500626e-16,
+      "worst_location": "ABC_S_stage1/fit/A/recall_at_5/epoch1_to_6_gap_widening"
+    },
+    "residual_algebra": {
+      "scalars": 432,
+      "max_absolute_error": 1.249000902703301e-16,
+      "worst_location": "ABC_S_stage3"
+    }
+  },
+  "diagnostics": {
+    "epoch_records": 162,
+    "eligible_panels": 51,
+    "metric_curves": 153,
+    "not_applicable": [
+      {
+        "point": "ABC_LOGIT0.1_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "ABC_R0_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "ABC_S_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "BCA_LOGIT0.1_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "BCA_R0_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "BCA_S_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "CAB_LOGIT0.1_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "CAB_LOGIT0.1_stage3",
+        "role": "cache",
+        "domain": "C",
+        "reason": "no_surviving_groups"
+      },
+      {
+        "point": "CAB_R0_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "CAB_R0_stage3",
+        "role": "cache",
+        "domain": "C",
+        "reason": "no_surviving_groups"
+      },
+      {
+        "point": "CAB_S_stage1",
+        "role": "cache",
+        "reason": "first_stage"
+      },
+      {
+        "point": "CAB_S_stage3",
+        "role": "cache",
+        "domain": "C",
+        "reason": "no_surviving_groups"
+      }
+    ],
+    "interpretation_counts": {
+      "LOGIT0.1": {
+        "fit/map/证据不足": 4,
+        "fit/recall_at_5/证据不足": 2,
+        "fit/log_loss/未见明确迹象": 6,
+        "fit/log_loss/有相应迹象": 2,
+        "cache/map/有相应迹象": 5,
+        "cache/recall_at_5/证据不足": 5,
+        "cache/log_loss/有相应迹象": 2,
+        "fit/map/未见明确迹象": 4,
+        "fit/recall_at_5/未见明确迹象": 5,
+        "cache/map/证据不足": 3,
+        "cache/log_loss/未见明确迹象": 4,
+        "cache/log_loss/证据不足": 2,
+        "fit/log_loss/证据不足": 1,
+        "cache/recall_at_5/有相应迹象": 3,
+        "fit/map/有相应迹象": 1,
+        "fit/recall_at_5/有相应迹象": 2
+      },
+      "R0": {
+        "fit/map/证据不足": 5,
+        "fit/recall_at_5/证据不足": 4,
+        "fit/log_loss/未见明确迹象": 6,
+        "fit/map/未见明确迹象": 4,
+        "fit/recall_at_5/未见明确迹象": 4,
+        "cache/map/证据不足": 5,
+        "cache/recall_at_5/证据不足": 6,
+        "cache/log_loss/未见明确迹象": 6,
+        "cache/log_loss/有相应迹象": 1,
+        "fit/log_loss/有相应迹象": 2,
+        "cache/map/有相应迹象": 2,
+        "cache/log_loss/证据不足": 1,
+        "cache/map/未见明确迹象": 1,
+        "cache/recall_at_5/未见明确迹象": 1,
+        "fit/recall_at_5/有相应迹象": 1,
+        "fit/log_loss/证据不足": 1,
+        "cache/recall_at_5/有相应迹象": 1
+      },
+      "S": {
+        "fit/map/未见明确迹象": 9,
+        "fit/recall_at_5/未见明确迹象": 9,
+        "fit/log_loss/未见明确迹象": 8,
+        "cache/map/未见明确迹象": 5,
+        "cache/recall_at_5/未见明确迹象": 6,
+        "cache/log_loss/未见明确迹象": 7,
+        "cache/map/证据不足": 3,
+        "fit/log_loss/证据不足": 1,
+        "cache/recall_at_5/证据不足": 2,
+        "cache/log_loss/证据不足": 1
+      }
+    }
+  },
+  "check_counts": {
+    "package_member_count": 1,
+    "package_member_coverage": 1,
+    "manifest_identity": 2510,
+    "manifest_total_bytes": 2,
+    "archive_crc": 1,
+    "archive_identity": 1,
+    "source_count": 1,
+    "active_source_tables_equal": 4,
+    "linked_file_identity": 1179,
+    "gate_policy_equal": 1,
+    "authorization_72h_only": 1,
+    "budget_changed_source_set": 1,
+    "native_snapshot_identity": 29,
+    "budget_exact_replacement": 2,
+    "unchanged_scientific_ast": 1,
+    "formal_snapshot_identity": 29,
+    "formal_snapshot_authorization": 1,
+    "formal_snapshot_listener": 1,
+    "formal_effective_numerics": 1,
+    "native_source_tables_equal": 1,
+    "qualification_binding": 2,
+    "qualification_budget": 2,
+    "native_claim_internal_consistency": 3,
+    "projection_requires_72h": 1,
+    "metric_dimensions": 1,
+    "array_schema": 841,
+    "confusion_class_totals": 81,
+    "count_derived_group_metrics_shape": 498,
+    "count_derived_group_metrics_numeric": 498,
+    "stage_domain_means_shape": 243,
+    "stage_domain_means_numeric": 243,
+    "stage_all_means_shape": 81,
+    "stage_all_means_numeric": 81,
+    "ranking_metric_invariance": 54,
+    "initial_confusion_class_totals": 2,
+    "initial_domain_means_shape": 6,
+    "initial_domain_means_numeric": 6,
+    "pooled_classification_shape": 332,
+    "pooled_classification_numeric": 332,
+    "development_alignment": 1,
+    "partition_disjoint": 1,
+    "partition_sizes": 1,
+    "physical_stage_coverage": 1,
+    "start_count": 1,
+    "paired_record_initial_state": 3,
+    "untrained_start": 9,
+    "same_family_start_across_orders": 9,
+    "blind_initial_identity": 2,
+    "point_manifest_equal": 27,
+    "stage_identity_restore_update": 27,
+    "current_schedule": 27,
+    "empty_first_stage_history": 9,
+    "memory_summary_budget_and_retention": 27,
+    "memory_birth_domain": 27,
+    "excluded_payload_declared_identity": 54,
+    "temporary_checkpoint_removed": 27,
+    "actual_update_row": 7776,
+    "logit_row_adam": 2592,
+    "actual_loss_decomposition": 7776,
+    "calibration_partition": 27,
+    "saved_calibration_fit_status": 27,
+    "scores_predicted_positive_match_counts": 81,
+    "affine_score_exact": 54,
+    "affine_rank_order_exact": 54,
+    "first_map_constant": 27,
+    "history_schedule": 18,
+    "within_stage_memory_stable": 18,
+    "prior_memory_summary_links": 18,
+    "surviving_target_hashes": 18,
+    "history_draw_count": 18,
+    "logit_loss_weights": 1728,
+    "three_arm_retention_equal": 18,
+    "regroup_loss_branch": 8640,
+    "D0_only_teacher": 8640,
+    "three_arm_supply_equal": 18,
+    "console_sequence_351_events": 1,
+    "first_update_listener_matches_console": 1,
+    "console_elapsed_monotonic": 1,
+    "final_access_account": 1,
+    "pre_valid_account": 1,
+    "actual_total_work": 1,
+    "no_new_overall_gate": 1,
+    "resource_bound_record": 3,
+    "wrapper_budget_timing": 1,
+    "no_packaged_failure": 1,
+    "endpoints_25344_shape": 4224,
+    "endpoints_25344_numeric": 4224,
+    "endpoints_scalar_count": 1,
+    "reported_endpoint_csv_coverage": 1,
+    "reported_endpoint_csv_shape": 4224,
+    "reported_endpoint_csv_numeric": 4224,
+    "reported_stage_csv_coverage": 1,
+    "reported_stage_csv_shape": 243,
+    "reported_stage_csv_numeric": 243,
+    "diagnostic_epoch_coverage": 27,
+    "diagnostic_identity_step": 162,
+    "diagnostic_population_fixed": 162,
+    "diagnostic_teacher_members": 162,
+    "epoch6_stage_score_identity": 27,
+    "epoch6_stage_metric_identity": 27,
+    "diagnostic_curves_and_intervals_shape": 612,
+    "diagnostic_curves_and_intervals_numeric": 612,
+    "diagnostic_curves_and_intervals_text": 156,
+    "reported_curve_export_shape": 765,
+    "reported_curve_export_numeric": 765,
+    "reported_curve_interpretation": 153,
+    "first_stage_cache_NA": 9,
+    "logit_D1_not_applicable": 216,
+    "residual_algebra_shape": 432,
+    "residual_algebra_numeric": 432,
+    "diagnostic_result_coverage": 1,
+    "diagnostic_summary_counts": 1
+  },
+  "failure_count": 0,
+  "failures": [],
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "numpy": "2.3.5",
+    "project_linux_connected": false,
+    "torch_imported": false,
+    "gpu_used": false,
+    "thread_env": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "elapsed_seconds": 2.3518779779997203,
+    "peak_rss_kib": 76568
+  }
+}

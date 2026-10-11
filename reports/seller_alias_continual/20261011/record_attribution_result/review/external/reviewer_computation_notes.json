@@ -1,0 +1,20 @@
+{
+  "first_review_execution_seconds": 2.344273130000147,
+  "first_reference_flags": [
+    {
+      "check": "diagnostic_curves_and_intervals_text",
+      "detail": "ABC_R0_stage3/cache/B/interpretation/recall_at_5"
+    },
+    {
+      "check": "reported_curve_interpretation",
+      "detail": "ABC_R0_stage3/cache/B/recall_at_5"
+    },
+    {
+      "check": "diagnostic_summary_counts",
+      "detail": null
+    }
+  ],
+  "explanation": "Reviewer initially used difference of epoch means for diagnostic point changes. The frozen implementation uses mean of within-group changes. For ABC_R0_stage3/cache/B/recall_at_5 the valid change is essentially zero: -8.326672684688674e-18 versus +1.1102230246251565e-16. This changes only the descriptive no-clear-sign/insufficient-evidence label, not the supported-overfitting count or any endpoint. Reviewer reference changed to the declared within-group-change reduction. Also corrected reviewer inventory tally key models (not model); no uploaded source was modified.",
+  "prior_endpoint_max_absolute_error": 1.3322676295501878e-15,
+  "report_parser_first_attempt": "The reviewer text-table parser continued beyond the three-row acquisition table and encountered the later integer overfitting table; strict zip raised ValueError before completing. Added explicit end-of-table after S. No input or scientific result changed."
+}

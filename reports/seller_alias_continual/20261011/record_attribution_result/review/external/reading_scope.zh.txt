@@ -1,0 +1,61 @@
+实际阅读与计算范围（2026-10-11）
+
+输入仅为已核对身份的本轮review_input.zip，1266个文件；原包未改变。
+本表记录本次实际发生的读取，不是要求下一位审查者重做全部实现的通用清单。
+
+reading_scope.csv逐文件提供路径、字节数、SHA-256、主复算程序读取模式、额外AST／文本核对、人工审读范围和用途。
+
+人工范围计数（文件互斥分类）：
+无单独人工语义审读声明：1204个文件
+人工全文审读：14个文件
+人工关键字段／结构或指定样例审读：38个文件
+人工指定段落／检索片段审读：10个文件
+
+“无单独人工语义审读声明”不是未读取：全部1266文件均核对身份，许多还完整解析或参加统计。相反，源文件经hash或AST解析也不等于其每一行逻辑得到新审查。未变实现按本包已关闭审查的适用边界复用。
+
+实际顺序：先核对唯一ZIP身份；再读主报告、冻结合同、72小时授权；然后核对completion/before_valid/execution/manifest/evaluation/summary及按具体问题必要的实现和背景。没有用旧“尚未正式运行”描述覆盖已完成记录。
+
+完整人工正文：
+— report.zh.txt：全文1—139行；主要表格126个显示单元格另作程序核对
+— source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md：全文1—97行；结合72小时补充解释旧48小时条款
+— qualification/authorization_72h.json：全文；用户72小时授权及未变边界
+— analysis/analyze_saved.py：全文1—245行；仅作为直接矩阵参考审读，未执行或导入
+— source/scripts/step28_record_attribution_run.py：全文1—630行；实际入口、资格衔接、训练、读取、恢复、评价顺序
+— source/scripts/step28_replay_diagnostics.py：全文1—196行；六轮capture、盲分数、开放后评价及诊断定义
+— source/schema/step28_record_attribution_policy.json：全文1—22行；冻结边界与72小时预算
+— source/scripts/run_step28_record_attribution_linux_20261009.sh：全文1—19行；实际外层timeout及入口
+— qualification/formal_listener/source.sh：全文1—187行；授权衔接、正式启动、first_update后自删
+— review/request.zh.txt：全文；输入包的本次审查范围和约束
+— review/background/implementation_primary.zh.txt：全文；复用已关闭实现主审的适用边界
+— review/background/numerics_fix.zh.txt：全文；当前数值配置修复与历史不可回填边界
+— review/background/numerics_native.zh.txt：全文；实际原生补充及最大合法形状资格
+— review/background/formal_autostart.zh.txt：全文1—37行；预算停止、72小时授权、正式启动衔接
+
+选读代码与历史正文：
+— source/scripts/step28_record_replay.py：130—206行objective/backward_group/update；232—330行Memory。未全面重审记录向量／分配等未变依赖。
+— source/scripts/step28_record_attribution_verify.py：42—173行native主体；176—212、236—266行资格入口主要段。
+— source/scripts/step28_record_replay_run.py：403—426行read_roles/fields；其余主要是函数索引与AST依赖。
+— source/scripts/step28_bge_continual_evaluate.py：38—47行bootstrap/readmatrix；91—138行endpoint_fields/summarize_field。未调用这些项目函数。
+— source/scripts/step28_alias_calibration.py：61—94行参数／变换／排序保持；97—149行fit。未用原标签重拟合。
+— source/scripts/step28_bge_continual.py：31—47行configure_numerics；70—82行学习率／调度；176—189行Memory抽样；191—239行to_bytes/summary相关检索片段，非整类逐行审读。
+— source/scripts/step28_continual_population_data.py：28—30行json_bytes；247—258行seed/调度；202—241行Memory相关检索片段。
+— source/scripts/step28_bge_continual_run.py：76—87行parse_once与少量相关检索片段。
+— source/scripts/step28_continual_population_evaluate.py：58—70行classification；225—228行group_metrics；混淆计数相关检索片段。
+— review/background/implementation_review.zh.txt：1—22、175—179、207—226、240—261行及标题／关键字检索；复用关闭状态，未重审全文历史实现。
+
+大JSON及日志：全部manifest/collected/evaluation/overfitting结构、27阶段点、7776更新和162诊断由程序完整解析；人工核对语义结构、关键字段、主要比较、S全部有效六轮指标曲线和明确指出的示例。没有逐个手工观察所有RNG状态元素／矩阵单元。console全部351条JSON事件程序核对；非JSON18行和若干样例人工审读。
+
+主要计算：
+— 主复算脚本读取841个不同NPY，均allow_pickle=False；另有历史原生手写分数NPY只哈希、未载入。
+— 83套60×22保存指标矩阵、4980行分类计数；由计数独立重算29880个值。
+— 三绝对方法和三差值，四角色、八端点、22指标，25344个均值／顺序值／区间端点；实际A/B/C域整群配对，5000次固定PCG64抽样。
+— 162份诊断；每臂9个fit和8个非空cache面板，共51面板、153条六轮指标曲线；6069个曲线／区间／样本数数值和3213个导出曲线数值。
+— 正仿射分数、排序和预测阳性数量、27个epoch6与阶段末分数、432项残差代数。
+— 当前与旧29来源、两个嵌套快照、72小时仅预算／wrapper／资格衔接；静态依赖闭包。未导入项目模块，也没有运行其测试。
+— 主报告126个显示表格单元格、成本和原生保存组件时间的预算机械复算。
+
+明确未核验：不读取正式文本／标签、不重算标签到全22指标、不重拟合校准；没有模型／Memory实体，不重复原生张量计算、checkpoint恢复或GPU训练；不查项目服务器进程／磁盘；不重做旧C/C_plus结果或隔离R1；不验证模型选择菜单／后台路由。
+
+环境：网页会话计算容器Linux、CPython3.12.14、NumPy2.3.5。Torch未导入、GPU未使用、项目Linux未连接。这里的Linux平台名称不等于项目Linux／Torch／GPU原生实测。所有结果保留单seed、固定三循环顺序、重复开发数据和条件区间边界。
+
+视觉范围：输入analysis目录4个PNG/SVG只核对身份，未逐图审读；交付的4张图由独立复算输出绘制，均已打开检查，3张六轮图保留全部固定有效面板及CAB stage3/cache C的N/A。
