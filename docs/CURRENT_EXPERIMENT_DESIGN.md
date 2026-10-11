@@ -2,6 +2,8 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
+配对候选之后的[信息采集与跨身份作用工作稿](../reports/documentation/20261011/retention_design/acquisition.zh.txt)是继续研究的静态筛查，尚未形成可推荐的新C方案，未外审；不是新增执行合同，不转用下列历史计算／读取许可。完整S仍为主要内部对照，旧C单独诊断不恢复。
+
 | 合同 | 研究内容及角色 |
 |---|---|
 | [C跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt) | 静态外审／[独立主审及补正](../reports/documentation/20261011/retention_design/matching_review/primary_disposition.zh.txt)已完成，本版本不推荐进入实现或四臂训练；数学主体成立，但结构化KD及U-centering已有、任务信息选择和独立贡献不足，效果未知。原稿保留，单合格视图9维、二阶式、反例及完整S更新边界以主审补正为准；不是新实验负结果，完整S仍为对照，旧C单独诊断不恢复 |
