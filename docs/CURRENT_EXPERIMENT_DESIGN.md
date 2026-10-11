@@ -4,7 +4,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [C联合排序响应收缩保持方案](../reports/documentation/20261011/retention_design/contraction.zh.txt) | 当前静态候选，保留完整S；定义历史联合变化的双随机收缩集合、真实更新、有限性质／反例、近邻及四臂最小验证。不是执行合同；原创性、未见身份收益和原生成本未建立，近邻KDConv全文待核对，新包上传及新运行权限均不沿用旧许可 |
+| [C联合排序响应收缩保持方案](../reports/documentation/20261011/retention_design/contraction.zh.txt) | 静态外审／[独立主审与补正](../reports/documentation/20261011/retention_design/review/primary_disposition.zh.txt)已完成，本版本不推荐实施；有限数学成立，但弱OT适配的任务信息依据与实质贡献不足，效果未知。四臂仅为未执行的固定策略比较；原稿保留，低维软约束、子包粒度、归因及文献勘误以主审为准。不是执行合同，未关闭整个C研究，完整S仍为主要内部对照 |
 | [C保持约束局部更新诊断](../reports/documentation/20261011/retention_design/diagnostic.zh.txt) | 曾获准的完整S单路径及四条件撤回干预；仅完成手写CPU首轮。按用户最新条件及主执行者判断停止继续推进；原范围、源码与证据保留，不自动启动GPU／正式流程。处置见第10节及交接顶部 |
 | [记录结构与重组监督三臂归因](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md) | LOGIT0.1／R0／S分别判读O/N MAP收益与代价，无新总通过门。三臂独立训练首阶段，保留共同过拟合诊断；原时间上限已有[明确补充](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)，有效预算、资格与执行状态只看当前交接及对应回执 |
 | [五臂改进与共同过拟合诊断](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md) | 已结束并完成结果外审／主审；C_plus本固定配置负结果、原继续条件false，LOGIT历史复现缺陷R1及比较边界保留。用户已明确撤下两端候选／五臂活动实现，保留原C/S、LOGIT、通用诊断、冻结方案和证据；[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)，实际状态见当前交接 |
