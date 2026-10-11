@@ -8,11 +8,15 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
-## 2026-10-11 三臂归因：结果已回传，阶段载荷仍留Linux
+## 2026-10-11 三臂归因：结果已回传，27权重已留证删除
 
 LOGIT0.1／R0／S的20261009_200600/workspace于10月11日00:24:33正常完成。1,234份小结果、日志、冻结来源及资格证据共38,049,242字节已SFTP回传且逐文件大小／SHA一致；两端归档为reports/seller_alias_continual/20261011/record_attribution_result。Linux保存结果分析与图表共11份亦已回传核对；见[完整分析](../reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt)、[原始同步清单](../reports/seller_alias_continual/20261011/record_attribution_result/sync_manifest.json)、[分析清单](../reports/seller_alias_continual/20261011/record_attribution_result/analysis_manifest.json)。
 
-本次27份阶段权重共35,237,126,610字节、27份Memory共8,389,549字节仍在上述Linux独立workspace的reports/job/run/models和memory；本轮只核对字节身份，未反序列化、未回传载荷、未上传网页或Git。具体路径／uid／大小／SHA见[实物清单](../reports/seller_alias_continual/20261011/record_attribution_result/inventory.json)。当前结果外审尚待完成；本轮结束后按用户“确认无用后先保留相关记录再删掉”的既有决定核定权重依赖，不能按结果正负删除或按SHA声称可恢复。历史36份Memory的保管不变。此次结果回传不重置大清理周期。
+用户本次明确要求“确认外审已开始后，核查linux服务器上此次的训练权重是否有用，若后续不再用到，按之前的规定删除”。恢复现有网页会话后已确认外审实际开始，并从网页下载附件逐字节核对为原授权包；没有重复提交。训练、27阶段恢复核对和162项诊断均已完成，当前分析／外审依赖保存分数、统计及冻结来源，现有合同与后续设计没有使用本次阶段权重的安排，现场没有该workspace活动进程、打开的模型文件或待恢复完整检查点。此判断依据实际依赖，不依据结果正负。
+
+先逐份核对最终路径、uid、大小／SHA及阶段身份，并把[删除前记录](../reports/maintenance/20261011/record_attribution_weights/predelete.json)回传Windows核验一致；随后于10月11日10:41:20—10:41:24删除本次27份阶段推理权重，共35,237,126,610字节（约32.82GiB逻辑文件大小）。27路径均不存在，原models目录为空；1,206份非权重证据SHA和23项保留例外元数据不变，见[删除回执](../reports/maintenance/20261011/record_attribution_weights/receipt.json)。BGE预训练、旧三个共享首域完整状态、ER0.1六权重及排序两例外继续保留。
+
+本次27份Memory共8,389,549字节继续保管于原reports/job/run/memory，历史36份Memory也保持原保管；未反序列化、未回传载荷、未上传网页或Git。原[实物清单](../reports/seller_alias_continual/20261011/record_attribution_result/inventory.json)保留删除前身份，不能据其认定27权重仍存在；SHA不能恢复已删模型，未来重建须另定范围。有效结果、冻结来源、诊断和完整指标均保留，局部权重清理不重置大清理周期。
 
 ## 2026-10-09 C_plus负结果：两端候选活动实现已撤下
 

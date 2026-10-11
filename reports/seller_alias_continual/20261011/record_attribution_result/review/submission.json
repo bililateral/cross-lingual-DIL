@@ -1,6 +1,6 @@
 {
-  "status": "UPLOAD_IN_PROGRESS_NOT_SUBMITTED",
-  "observed_at": "2026-10-11T10:18:32.1466774+08:00",
+  "status": "SUBMITTED_REVIEW_IN_PROGRESS",
+  "observed_at": "2026-10-11T10:42:35.3560611+08:00",
   "destination": "https://chatgpt.com/",
   "tool": "local Playwright MCP",
   "requested_model": "GPT 6 Pro",
@@ -17,8 +17,8 @@
   },
   "request": "request.zh.txt",
   "appended_identity": "本次唯一授权上传包：review_input.zip，28,532,122字节，1,266成员，SHA256 9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a。请先核对包身份。",
-  "conversation_url": null,
-  "submitted": false,
+  "conversation_url": "https://chatgpt.com/c/6acaf303-eda8-83eb-9a4f-e4a53b1d130e",
+  "submitted": true,
   "returned_review": false,
   "attempts": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "started_at": "2026-10-11T10:15:18+08:00",
-      "outcome": "Current authorized same-package upload in progress"
+      "outcome": "Previously observed in progress; on recovery the same authorized archive was present in a submitted, actively running review conversation."
     }
   ],
   "notes": [
@@ -47,15 +47,28 @@
     "Automatic review rejected closing the upload page; the close operation did not execute.",
     "Network errors are delivery failures, not scientific experiment failures. Exact package authorization persists."
   ],
-  "next_action": "Inspect the current page and active transfer before retrying; submit once with the authorized attachment, then save conversation identity. Do not duplicate a submitted review.",
+  "next_action": "Retrieve the complete review when available and independently dispose of findings. Do not duplicate submission.",
   "git_delivery": {
     "result_commit": "9e3aa4253f5d8aa2a664e4294452fe149227f028",
     "first_push": "curl55 connection reset; did not update remote",
     "second_push": "remote hung up after pack transfer; remote remained f191dc3c",
-    "current_push_session": 18748,
+    "current_push_session": null,
     "current_push_started_at": "2026-10-11T10:13:35+08:00",
     "current_push_options": "per-command HTTP/1.1, postBuffer104857600, lowSpeedLimit1, lowSpeedTime60; no persistent settings changed",
-    "remote_last_confirmed": "f191dc3c3bfc248cd7d04b24aa2827c84137fe9d",
-    "status": "awaiting current push completion and independent ref check"
+    "remote_last_confirmed": "318ed7102fcc86fd593de34cc4ddc319fd3cb334",
+    "status": "Result and previous transfer-status commits delivered; this recovery and cleanup record will be included in the next delivery commit.",
+    "current_push_outcome": "Session 18748 returned exit 0; result commit 9e3aa425 independently confirmed remotely. Prior status commit 318ed710 subsequently pushed and independently confirmed."
+  },
+  "submitted_at": null,
+  "submission_observation": "On recovery the existing conversation already contained the user request and authorized attachment; actual send time and sender were not independently observed. No duplicate upload or message was sent in this recovery turn.",
+  "visible_model_current": "Pro selector; Stop button and active review progress visible",
+  "reviewer_self_report": "GPT-6 Astra Pro; reviewer explicitly cannot independently verify UI selection or backend routing",
+  "uploaded_attachment": {
+    "bytes": 28532122,
+    "verified_at": "2026-10-11T10:34:04.8508558+08:00",
+    "visible_filename": "review_input(20261011-022206).zip",
+    "verification": "Downloaded the actual conversation attachment through local Playwright MCP; exact identity matches authorized original.",
+    "members": 1266,
+    "sha256": "9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a"
   }
 }
