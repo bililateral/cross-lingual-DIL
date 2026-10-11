@@ -4,6 +4,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [C跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt) | 当前新静态候选，完整S为对照；保留跨账号子包的条件配对关系，新项对节点可加偏置不敏感。已明确结构化KD代入、与去节点项MSE同等信息、实际VJP及普通排序风险；可审不等于贡献成立。建议最小四臂A→B仅为方案，无新执行合同／预算／数据许可，原C诊断不恢复 |
 | [C联合排序响应收缩保持方案](../reports/documentation/20261011/retention_design/contraction.zh.txt) | 静态外审／[独立主审与补正](../reports/documentation/20261011/retention_design/review/primary_disposition.zh.txt)已完成，本版本不推荐实施；有限数学成立，但弱OT适配的任务信息依据与实质贡献不足，效果未知。四臂仅为未执行的固定策略比较；原稿保留，低维软约束、子包粒度、归因及文献勘误以主审为准。不是执行合同，未关闭整个C研究，完整S仍为主要内部对照 |
 | [C保持约束局部更新诊断](../reports/documentation/20261011/retention_design/diagnostic.zh.txt) | 曾获准的完整S单路径及四条件撤回干预；仅完成手写CPU首轮。按用户最新条件及主执行者判断停止继续推进；原范围、源码与证据保留，不自动启动GPU／正式流程。处置见第10节及交接顶部 |
 | [记录结构与重组监督三臂归因](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md) | LOGIT0.1／R0／S分别判读O/N MAP收益与代价，无新总通过门。三臂独立训练首阶段，保留共同过拟合诊断；原时间上限已有[明确补充](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)，有效预算、资格与执行状态只看当前交接及对应回执 |
