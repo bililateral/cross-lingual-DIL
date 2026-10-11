@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-以完整S为主要内部对照，研究C额外历史保持是否有能支持旧分布未见身份排序的实质改进；先完成单候选的历史信息、运算／更新、近邻区别及可否证比较，不能把S已有收益归给C。具体执行与第一轮静态筛查见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)，实际状态只看交接顶部。若仍只剩普通损失拼接、重复信息或没有可信收益链，停止该具体提案并重新讨论定位，不自动训练下一个候选。
+以完整S为主要内部对照，研究C额外历史保持是否有能支持旧分布未见身份排序的实质改进；先完成单候选的历史信息、运算／更新、近邻区别及可否证比较，不能把S已有收益归给C。第一轮静态筛查见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)，后续单候选的完整定义、手算反例和不推荐实施的依据见[候选审查](../reports/documentation/20261011/retention_design/candidate.zh.txt)，实际状态只看交接顶部。只剩普通损失拼接、统计量替换或没有可信收益链时，停止该具体提案并重新讨论定位，不自动训练下一个候选；静态否决不冒称正式实验负结果。
 
 [三臂归因合同](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)及[72小时补充](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)保留已结束实验的计算、预算及权限来源，不转为新方案许可。已完成的核验和审查按适用范围复用，新的实质机制再明确受影响核验、数据权限、预算和结果判据；不为下一阶段恢复已退出监听或已删权重。
 
