@@ -1,12 +1,13 @@
 # 当前科研交接
 
-本页顶部表格是唯一当前工作入口。先读本页与[科研纪律](RESEARCH_DISCIPLINE.zh.md)，再按任务进入合同、实际实现、直接依赖及相关原始审查；历史不重新授予执行权限。当前为用户已确认的三臂归因实验准备：LOGIT0.1、无重组记录模型R0、原S，先明确原C/S系统收益来自记录结构还是重组监督。旧五臂已结束，C_plus负结果及撤下边界不变；本次数值修复免审不适用于新研究。
+本页顶部表格是唯一当前工作入口；按[AGENTS.md](../AGENTS.md)的任务路由补读合同、实现和证据，不把整页历史当成每次编辑的必读上下文。当前实验为LOGIT0.1、无重组记录模型R0、原S三臂归因，研究原C/S系统收益来自记录结构还是重组监督；实际执行阶段以带时间的观测为准。旧五臂已结束，C_plus负结果及撤下边界不变；数值修复免审不适用于新研究。
 
 ## 当前工作
 
 | 项目 | 当前范围、证据与执行前提 |
 |---|---|
-| 最新用户决定 | 已批准三臂、读取范围及归因诊断判读；10月9日明确要求“手写GPU核验通过后自动开始GPU正式训练”，真实更新后探测自删。按同条后半句和既有合同执行单CPU线程／单GPU训练，首句“CPU训练”不另开全CPU方案。新原生投影超48小时后，用户明确“同意将正式上限改为72小时”，其他范围不变。见[72小时补充授权](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)、[原三臂合同](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)、[自动启动及资格处置](../reports/documentation/20261009/record_attribution/qualification/formal_autostart.zh.txt)。旧主审“不自动创建正式门”和原48小时均按对应历史时点解释。 |
+| 当前实验授权 | 已批准三臂、读取范围及归因诊断判读；10月9日明确要求“手写GPU核验通过后自动开始GPU正式训练”，真实更新后探测自删。按同条后半句和既有合同执行单CPU线程／单GPU训练，首句“CPU训练”不另开全CPU方案。新原生投影超48小时后，用户明确“同意将正式上限改为72小时”，其他范围不变。见[72小时补充授权](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)、[原三臂合同](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)、[自动启动及资格处置](../reports/documentation/20261009/record_attribution/qualification/formal_autostart.zh.txt)。旧主审“不自动创建正式门”和原48小时均按对应历史时点解释。 |
+| 本轮Harness维护 | 10月9日本会话用户要求依据官方资料修改Harness，不新增实验、外审上传或资料外发授权。本地五文件为AGENTS、科研纪律、本交接、计划、设计入口；已核对差异、导航和实际恢复状态，保留科研来源及用户改动。已按后续明确要求删除技能加载／包装规则；复核第5节伪实现约束并恢复AGENTS的禁止与行为核验提示。按过度设计条款删减通用工具复述和常设指南长说明，入口保留具体缺口、充分即停及交付前实际删减要求；无新运行器或状态文件，未载模或解析正式数据。维护依据为[Astra指南](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra)、[Astra提示词整理](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)、[Codex长任务实践](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex)：模型行为建议按实际模型判断，通用闭环复用已有载体，不改变合同。后续科研按下列有效授权与实际作业继续。 |
 | 研究与工作量 | LOGIT0.1、R0、S；s0及ABC/BCA/CAB；各自从预训练起点训练三个阶段。7,776物理更新、12,960梯度群呈现、27阶段状态、162逐epoch诊断及两个未训练架构盲起点。R0/S只切换重组监督，首阶段不共享训练状态；R0−LOGIT是系统结构比较。主要分别报告O/N MAP及区间，无新总通过门，不自动追加候选。 |
 | 预算与三种权限 | CPU手写累计≤300秒，原生GPU核验≤600秒；正式单CPU／单GPU全过程现为≤72小时，输出峰值仍≤48GiB、CUDA reserved≤28GiB、RSS≤64GiB。train／valid各一次新解析尝试，全部训练／恢复／盲门后统一开放valid；test／owners／Audit／private为0，失败记账且不自动重启GPU／正式运行。72小时补充只改变时间界限，不扩计算或读取范围。 |
 | 实现与CPU | [正式入口](../scripts/step28_record_attribution_run.py)的计算及原11项检查证据复用；原CPU失败与28.73秒保留。新增编排7项／6.78秒，预算衔接6项／5.14秒全部通过，CPU保守累计43／300秒、剩余257秒。预算衔接仅允许policy与timeout改72小时、validate_gate引用原资格；26来源逐字节不变，训练／评价AST不变，预算监控实际接受49小时并在72小时停止。见[编排](../reports/documentation/20261009/record_attribution/qualification/formal_listener_check/attempt01/result.json)、[预算核验](../reports/documentation/20261009/record_attribution/qualification/budget_extension_check/attempt01/result.json)。不把旧CPU／GPU回执改成新来源，不重复原生训练。 |
