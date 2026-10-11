@@ -4,6 +4,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [C保持约束局部更新诊断](../reports/documentation/20261011/retention_design/diagnostic.zh.txt) | 曾获准的完整S单路径及四条件撤回干预；仅完成手写CPU首轮。按用户最新条件及主执行者判断停止继续推进；原范围、源码与证据保留，不自动启动GPU／正式流程。处置见第10节及交接顶部 |
 | [记录结构与重组监督三臂归因](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md) | LOGIT0.1／R0／S分别判读O/N MAP收益与代价，无新总通过门。三臂独立训练首阶段，保留共同过拟合诊断；原时间上限已有[明确补充](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)，有效预算、资格与执行状态只看当前交接及对应回执 |
 | [五臂改进与共同过拟合诊断](SELLER_ALIAS_REPLAY_IMPROVEMENT.zh.md) | 已结束并完成结果外审／主审；C_plus本固定配置负结果、原继续条件false，LOGIT历史复现缺陷R1及比较边界保留。用户已明确撤下两端候选／五臂活动实现，保留原C/S、LOGIT、通用诊断、冻结方案和证据；[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)，实际状态见当前交接 |
 | [记录作用表与同控重组 C/S](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md) | 已结束的开发实验；记录对头、同架构 C/S 对照及保存 LOGIT0.1 比较。训练、保存结果独立核验、结果外审及主审已完成；整体方案相对LOGIT有正向证据，C−S原主要条件未过，证据见交接 |
