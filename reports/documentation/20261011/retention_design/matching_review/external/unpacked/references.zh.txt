@@ -1,0 +1,56 @@
+跨账号条件配对保持：一手文献与实际核查范围
+检索/阅读日期：2026-10-11。只将取得的方法正文用于公式层面的近邻判断。
+
+L1. Xinyu Wang, Yong Jiang, Zhaohui Yan, Zixia Jia, Nguyen Bach, Tao Wang, Zhongqiang Huang, Fei Huang, Kewei Tu. Structural Knowledge Distillation: Tractably Distilling Information for Structured Predictor. ACL-IJCNLP 2021, 550–564.
+官方题录：https://aclanthology.org/2021.acl-long.46/
+官方 PDF：https://aclanthology.org/2021.acl-long.46.pdf
+正文范围：PDF 第 2—3 页（出版页 551—552），§2.1、§2.2、§3 主推导及 §3.1 相关解释，重点式 (1)—(3)；另读引言定位。没有复核后续全部任务、实验和附录。
+已核实：离散结构 Gibbs 概率、教师/学生交叉熵、用教师子结构边际和学生局部分数写成精确目标。当前稿选择六节点完美匹配与 q_ij/(3τ) 局部分数即为该目标实例。
+限度：论文不等于本项目全部采样/资格/Memory 生命周期；本文不作整套逐字同法或抄袭判断。引用支持基本目标已有，具体代入和本项目贡献判断由本外审独立完成。
+
+L2. Rizal Fathony, Sima Behpour, Xinhua Zhang, Brian Ziebart. Efficient and Consistent Adversarial Bipartite Matching. ICML 2018, PMLR 80:1457–1466.
+官方页：https://proceedings.mlr.press/v80/fathony18a.html
+官方 PDF：https://proceedings.mlr.press/v80/fathony18a/fathony18a.pdf
+正文范围：PDF 第 1—2 页，§2.1—§2.3，重点指数族、分区函数和小规模枚举；读取 §2.4 部分内容定位论文主问题，没有复审其对抗优化和全部一致性证明。
+已核实：匹配的指数族概率及小规模枚举是既有技术。文中的对象是二分匹配/排列；本案六节点无向完美匹配不同。文中 MAP 指 maximum a posteriori，并非本项目 mean average precision。其任务与一致性结论不能移植为本案未见账号 MAP 保证。
+
+L3. Wenhang Ge, Junlong Du, Ancong Wu, Yuqiao Xian, Ke Yan, Feiyue Huang, Wei-Shi Zheng. Lifelong Person Re-identification by Pseudo Task Knowledge Preservation. AAAI 2022, 36(1):688–696. DOI:10.1609/aaai.v36i1.19949.
+官方页：https://ojs.aaai.org/index.php/AAAI/article/view/19949
+官方 PDF：https://cdn.aaai.org/ojs/19949/19949-13-23962-1-2-20220628.pdf
+正文范围：PDF 第 3—5 页相关方法段，重点 Knowledge Preservation on Pseudo Tasks，式 (5)—(9)；并读前后伪任务关系与身份监督说明。没有复核全部实验表。
+已核实：旧/新表示的成对相似矩阵保持及伪任务关系与身份监督结合已经存在；式 (6) 的默认 F=1 是 L1 范数，不是本稿的去节点 MSE。其伪任务变换、旧/新特征空间与本稿冻结记录表有区别。
+限度：不能拿行人重识别的结果证明中文合成卖家任务有效，也不能说 PTKP 已逐式覆盖本稿完整选择。
+
+L4. Sebastian Hofstätter, Sophia Althammer, Michael Schröder, Mete Sertkan, Allan Hanbury. Improving Efficient Neural Ranking Models with Cross-Architecture Knowledge Distillation. 作者稿 arXiv:2010.02666v2，2021-01-22.
+作者 PDF：https://arxiv.org/pdf/2010.02666
+正文范围：PDF 第 1—2 页的分值尺度与 margin 动机；第 4 页 §3，重点式 (11)—(12) 及相邻训练说明。没有复审全部模型/实验。
+已核实：教师与学生在同一 query 下的正负评分差做 MSE，是明确已有的相对评分蒸馏。单 query 分差消去查询共同平移，一般不消去候选各自偏置；本案联合匹配的额外不变性与任务风险由本外审的代数给出。
+
+L5. Sashank Reddi, Rama Kumar Pasumarthi, Aditya Menon, Ankit Singh Rawat, Felix Yu, Seungyeon Kim, Andreas Veit, Sanjiv Kumar. RankDistil: Knowledge Distillation for Ranking. AISTATS 2021, PMLR 130:2368–2376.
+官方页：https://proceedings.mlr.press/v130/reddi21a.html
+官方 PDF：https://proceedings.mlr.press/v130/reddi21a/reddi21a.pdf
+正文范围：PDF 第 2—5 页相关段，§2/§2.1 的目标、兼容性及 p-focused 条件；§3、Algorithm 1、式 (2)，§3.1 的 r-Plackett 模型、式 (3) 和 Theorem 6 的明列条件；§3.2 只作相邻定位。不声称读完附录证明。
+已核实：排序蒸馏、顺序概率与交叉熵已有；其 top-k 目标、教师条件和负例处理不能替换成本稿的“整体真实匹配唯一最优”。本稿不具有该文直接给出的 top-k 相容性前提。
+
+L6. Gábor J. Székely, Maria L. Rizzo. Partial Distance Correlation with Methods for Dissimilarities. The Annals of Statistics, 2014, 42(6):2382–2412；本轮读取作者稿 arXiv:1310.2926v3，2014-07-08.
+作者题录：https://arxiv.org/abs/1310.2926
+作者 PDF：https://arxiv.org/pdf/1310.2926
+作者维护的配套说明：https://mariarizzo.github.io/energy/reference/centering.html
+正文范围：作者 PDF 第 3—6 页的中心化背景及 §3.1；重点 Definition 2 的式 (3.1)，以及相邻 Proposition 1/内积说明。没有重审概率统计和附录证明。
+已核实：对任意对称、实数、零对角矩阵的 U-centering 定义，其非对角式为 e_ij−s_i/(n−2)−s_j/(n−2)+Σs/[(n−1)(n−2)]。n=6 时与本稿最小二乘消去节点项的投影完全相同。
+限度：本外审只使用此线性运算的直接等价；不将距离协方差的无偏/独立性结论移植到 logit、合成控制者或蒸馏。该论文不是知识蒸馏论文，也不是本候选整体的先例。
+
+U1. Wonpyo Park, Dongju Kim, Yan Lu, Minsu Cho. Relational Knowledge Distillation. CVPR 2019；arXiv:1904.05068v2.
+取得的官方题录/摘要：https://arxiv.org/abs/1904.05068
+未取得正文的两个入口：
+https://openaccess.thecvf.com/content_CVPR_2019/papers/Park_Relational_Knowledge_Distillation_CVPR_2019_paper.pdf
+https://arxiv.org/pdf/1904.05068v2
+实际返回：两次均为浏览工具 Internal Error，没有可读方法正文，也没有可确认的 HTTP 错误码。本轮不冒称重新读过 RKD 方法公式；其摘要只作关系蒸馏背景定位，不承担本案公式等价或否决依据。
+
+其他定位/未采纳材料：
+搜索还返回 U-centering as subset ANOVA: edge regression and higher ...（arXiv:2608.01364）的结果片段；本轮未打开、未核其作者/正文，不引用为已证实近邻。搜索中的百科、聚合页及无关结果未作技术证据。L6 的旧公式已经足够核实投影关系。
+current/matching.zh.txt 第 150 行所提部分 CVF/PLD 获取限制，属于提出者的历史阅读记录；本轮没有将这些未给完整题录、未取得的正文用作原创或非原创证明。
+prior_search、prior_contraction 和旧外审中其余 OT、CKD、DwoPP、函数记忆等文献，仅按附件范围读取其历史记述，没有把历史“已读”升级为本轮重新通读。本次不重开前候选的文献审查。
+
+文献判断边界：
+本次六项一手正文足以确认结构化 KD 目标、相对/关系蒸馏基础和去节点投影的已有来源。它们不证明世界上不存在新的应用贡献，也不证明本候选全部细节被某篇文章逐字覆盖。本次不推荐来自“已知核心＋任务信息选择依据仍不足”的合并判断，不来自摘要猜测、正文失败或搜索未命中。

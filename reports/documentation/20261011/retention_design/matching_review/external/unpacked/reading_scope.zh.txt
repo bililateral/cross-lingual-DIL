@@ -1,0 +1,52 @@
+跨账号条件配对保持：本轮实际阅读范围
+日期：2026-10-11，Asia/Shanghai
+
+一、范围说明
+
+本轮直接读取随消息提供的 ZIP 副本，不通过其他文件或历史会话替换当前输入。先完整读取 request.zh.txt，再完整读取 current/matching.zh.txt，追踪直接源码及必要历史。截断的显示已补读涉及的正文。本表的“全文”指文本内容全部阅读；“定点”仅指所列行段及定位检索，不能扩大为通读。身份核对与语义阅读分别登记。
+
+原包：174,209 字节，19 个成员，18 个载荷＋package_manifest.json。
+SHA-256：ce88be1d007f82d2b5c2596bc358fcf5a8693ad37013cbaa2a87e7583e8f08e7。
+18 项载荷大小、SHA-256 与内部清单逐项相同；成员集合完全对应，无重复名称，ZIP CRC 检查未发现坏成员。详见 input_identity.json。
+
+二、逐文件范围（行号按解包后 UTF-8 splitlines，从 1 开始）
+
+编号 | ZIP 成员 | 字节 | 总行数 | 实际语义阅读
+I01 | request.zh.txt | 4035 | 19 | 全文 1—19；八项审查问题、交付与权限范围。
+I02 | current/matching.zh.txt | 23019 | 193 | 全文 1—193；唯一当前候选，所有公式、反例、近邻及四臂提议。
+I03 | context/RESEARCH_DISCIPLINE.zh.md | 27132 | 179 | 全文 1—179；现行规则、历史时点、外审及执行边界。
+I04 | context/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md | 8397 | 45 | 全文 1—45；完整 S/C 的冻结历史合同及其适用限度。
+I05 | source/step28_record_replay.py | 15399 | 330 | 全文 1—330；记录表示、完整表、assignment、account_logits、objective、VJP、update、reference、score、Memory。
+I06 | source/step28_record_replay_run.py | 33362 | 588 | 全文 1—588；实际入口、共享首阶段、阶段训练、恢复、盲门、评价接线及旧硬编码范围。未执行。
+I07 | source/step28_chinese_base.py | 51352 | 880 | 定点 1—233、680—699；导入与来源、划分、模型加载、文本次序、聚合、BCE/query-rank、评分接口、固定分类计数；另检索全部函数定义定位。第 233、699 行仅为下一函数签名。234—679、700—880 未作语义复审。
+I08 | source/step28_alias_ranking.py | 11658 | 222 | 全文 1—222；top5 已知负候选、softplus hard 项、完整 B 的组成；历史运行/统计边界只作背景。
+I09 | source/step28_continual_expression_data.py | 18179 | 369 | 全文 1—369；生成层次、控制者/账号偏好与风格、公共覆盖、记录循环、标签构造与历史生成入口。未调用生成器。
+I10 | source/step28_bge_continual.py | 17275 | 321 | 全文 1—321；数值设置、288 步调度、Supply、旧 Memory、优化器步计数及父接口。其父目标不能替换 I05 中本轮实际 S 目标。
+I11 | source/step28_record_replay_policy.json | 1680 | 30 | 全文 1—30；旧 C/S、三顺序、4320/7776、系数、1 MiB、旧预算和读取边界。
+I12 | context/prior_contraction.zh.txt | 26590 | 247 | 定点 1—71、155—185、227—247；前候选定义、近邻声称及结案/权限背景。没有重审其未变求解器。
+I13 | history/contraction_review.zh.txt | 50959 | 553 | 定点 1—20、55—104、331—375、473—486；原始外审裁决、完整 S 边界、任务依据与比较限度。另检索章节定位。其他段落未作本轮语义复审。
+I14 | history/contraction_primary.zh.txt | 13996 | 116 | 全文 1—116；接受/补正内容、否决仅及该版本、不恢复旧 C 诊断的边界。
+I15 | context/prior_search.zh.txt | 18638 | 170 | 定点 1—20、128—170；继续研究要求、未见身份目标、DwoPP 的历史阅读记录及访问范围。21—127 的旧函数修正候选不重审。
+I16 | history/original_c_plan_review.zh.txt | 50767 | 547 | 定点 1—28、62—121、263—319、489—496；旧 C 原始静态裁决、生成支持集、有限信息/未见身份及原贡献判断。其他数学和执行设计不重审。
+I17 | history/three_arm_primary.zh.txt | 12272 | 89 | 全文 1—89；已关闭 LOGIT0.1/R0/S 结果归因、S 收益、统计限度、权重/Memory 时点。
+I18 | history/five_arm_primary.zh.txt | 6381 | 37 | 全文 1—37；C_plus 负结果、LOGIT R1 及关闭范围。旧“未修复”等文字仅按该时点解读。
+I19 | package_manifest.json | 4701 | 114 | 全文 1—114；18 项原路径、大小、SHA-256 及静态范围。
+
+三、哪些没有取得或没有审查
+
+1. 没有新 C 配对实现、原生资格或新结果；输入包本来就没有这些材料，不把缺少它们列为静态送审缺件。
+2. 这不是可独立启动的完整工程依赖包。core.build_model/make_optimizer、底层 Group/Algorithm R/seed_for、完整 22 指标定义、部分公共加载器、原生核验/过拟合诊断及其政策不在本包。I05/I06 的调用与 I04 的合同可以核查，但未提供函数的内部实现没有在本轮重新验证。
+3. 记录头 4096 维输入可由 I05 直接确认；128 隐层、ReLU 和无头 dropout 的依据为 I04 及历史记录，本轮没有读到 core.build_model 的定义，不能写成逐层源码独立核验。
+4. 三臂、五臂的原始保存矩阵、完整审查附件和执行载荷不在本包；本轮阅读所附主审处置，引用其已关闭历史结论，不冒称重新复算这些结果。I13/I16 是所列旧静态外审的原文选段，不是三臂/五臂结果外审原文。
+5. 没有读取本次附件以外的正式文本、标签、Memory 载荷、模型、owners、test、Audit、私有身份或凭据；没有连接项目服务器，没有导入/运行项目源码，没有训练、推理或新数据生成。
+6. 本轮未委派子 agent，未创建另一审查会话，未操作网页选择器。运行环境自述 GPT-6 Astra Pro；网页后台路由未独立核实。
+
+四、公开一手正文范围
+
+实际取得正文并阅读相关方法段：ACL 2021 Structural KD、ICML 2018 Fathony 等匹配论文、AAAI 2022 PTKP、Margin-MSE 作者稿、AISTATS 2021 RankDistil、2014 U-centering 作者稿。各自页码/公式、取得方式与限度见 references.zh.txt。
+RKD 的 CVF PDF 及 arXiv v2 PDF 请求均返回工具 Internal Error；只取得官方 arXiv 题录/摘要，不作已读方法正文。其失败不是项目或论文缺陷。本轮判断不依赖它。
+
+五、网页数学参考
+
+math_reference.py 是本轮另写的标准库参考，使用全部手写的有限表、整数/有理数线性代数和浮点有限差分。没有导入项目模块，没有执行候选采样器/学习器、自动微分 VJP 或 BGE/Adam 更新。13 项检查的结果、具体数值、环境和脚本 SHA-256 在 math_results.json；原始运行输出在 math_execution.log。
+该环境实际报告 Python 3.12.14、Linux-6.18.44-x86_64-with-glibc2.39。这是 ChatGPT 工作区参考环境，不是项目 Linux py310，不能记为项目 CPU/GPU 资格。首次运行完成，13 项均通过；没有需要隐去的失败数学运行。

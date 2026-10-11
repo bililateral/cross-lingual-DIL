@@ -6,7 +6,7 @@
 
 用户最新要求诊断必须能指导具体设计，否则回到方案研究。主执行者判断现有局部诊断仅能筛选宽泛解释，尚未连接有近邻区别的候选及明确设计取舍，故停止其补测、外审和GPU／正式流程。保留既有批准与CPU证据，继续以完整S为对照形成具体C机制，先完成信息用途、运算、更新、近邻差异及最小反证比较，再判断哪项未决设计确需有限实测；无需先穷尽旧C根因，也不要求候选在实验前保证胜出。当前状态只维护在交接顶部。
 
-以完整S为主要内部对照，研究C额外历史保持是否有能支持旧分布未见身份排序的实质改进；候选须有历史信息、运算／更新或最终判断、近邻区别及可否证比较，不能把S已有收益归给C。第一轮见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)，抽样均值／方差候选见[完整定义与裁决](../reports/documentation/20261011/retention_design/candidate.zh.txt)，后续[函数修正及其他方向筛查](../reports/documentation/20261011/retention_design/search.zh.txt)及收缩候选的静态否决保留。用户再次要求继续找，现形成[跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt)，仅到具体可审阶段：它是结构化KD在任务视图上的实例，独立贡献与未见身份收益尚未成立，实际状态只看交接顶部。普通损失拼接、统计量替换或没有可信收益链的具体提案停止推进；其他实质方向的静态研究继续，不自动训练下一个候选或关闭整条C改进线。静态否决不冒称正式实验负结果，也不要求算法在实验前保证胜出。
+以完整S为主要内部对照，研究C额外历史保持是否有能支持旧分布未见身份排序的实质改进；候选须有历史信息、运算／更新或最终判断、近邻区别及可否证比较，不能把S已有收益归给C。第一轮见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)，抽样均值／方差候选见[完整定义与裁决](../reports/documentation/20261011/retention_design/candidate.zh.txt)，后续[函数修正及其他方向筛查](../reports/documentation/20261011/retention_design/search.zh.txt)及收缩候选的静态否决保留。[跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt)也已完成[静态外审／主审](../reports/documentation/20261011/retention_design/matching_review/primary_disposition.zh.txt)，当前版本不推荐实施：核心为结构化KD，投影对应U-centering，未将代数信息选择与未见身份收益建立足够联系，效果未知。普通损失拼接、统计量替换或没有可信收益链的具体提案停止推进；其他实质方向的静态研究安排仍有效，不自动训练下一个候选或关闭整条C改进线。新的设计应说明具体任务信息及相对直接近邻的作用，不能仅调温度／权重／子包数后重新包装此候选；不先单独诊断旧C，也不要求算法在实验前保证胜出。
 
 [三臂归因合同](SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md)及[72小时补充](../reports/documentation/20261009/record_attribution/qualification/authorization_72h.json)保留已结束实验的计算、预算及权限来源，不转为新方案许可。已完成的核验和审查按适用范围复用，新的实质机制再明确受影响核验、数据权限、预算和结果判据；不为下一阶段恢复已退出监听或已删权重。
 
