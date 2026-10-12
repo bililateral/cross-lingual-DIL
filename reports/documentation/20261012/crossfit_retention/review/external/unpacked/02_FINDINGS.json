@@ -1,0 +1,372 @@
+{
+  "review_date": "2026-10-12",
+  "input_zip_sha256": "f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477",
+  "decision": "有条件可推进；R01原生前修复，R02正式前补齐；既定原生及资源门仍必须实际完成。",
+  "counts": {
+    "SCIENTIFIC_BLOCKER": 0,
+    "REPRODUCIBILITY_DEFECT": 2,
+    "合理非阻断建议": 3,
+    "OUT_OF_SCOPE_OVERDESIGN": 3
+  },
+  "finding_count": 8,
+  "scientific_effect_established": false,
+  "native_qualification_substituted": false,
+  "implementation_modified_by_external_review": false,
+  "findings": [
+    {
+      "id": "R01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "high",
+      "title": "原生资格重复恢复同一 Adam baseline，默认 step 张量别名污染共同起点",
+      "blocking_stage": "native qualification and dependent formal entry",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_verify.py",
+          "function": "state / restore / native",
+          "lines": [
+            [
+              27,
+              39
+            ],
+            [
+              75,
+              85
+            ],
+            [
+              109,
+              151
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_crossfit_retention.py",
+          "function": "update",
+          "lines": [
+            [
+              132,
+              145
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_population.py",
+          "function": "make_optimizer",
+          "lines": [
+            [
+              32,
+              40
+            ]
+          ]
+        }
+      ],
+      "trigger": "默认非 capturable／非 fused AdamW；同一 saved[adam] 多次直接传给 load_state_dict。",
+      "consequence": "按官方默认加载语义，paired_S 把 baseline.step 从288原地改289，下一次 C_cf/on 在预期288断言处拒绝，七次资格无法完成；删断言会使对照起点失配。",
+      "evidence_type": [
+        "submitted source static path",
+        "official PyTorch default state policy and in-place step update",
+        "executed pure Python alias illustration; explicitly not torch"
+      ],
+      "confidence": "默认实现条件下的具体推导；项目所装 PyTorch 精确版本未独立核验，未观察到本地原生异常。",
+      "minimum_fix": "restore 中 optimizer.load_state_dict(cpu_copy(saved[\"adam\"]))；在现有本轮 CPU 套件内检查同一 baseline 连续真实恢复／更新，全部保存 Adam 状态不变且每次288→289。保留原定七次原生更新。",
+      "not_affected": "正式 core.restore_state 每次新 torch.load；不能据此宣布正式共享A磁盘恢复也有此别名缺陷。",
+      "why_current_cpu_pass_not_sufficient": "完整调度测试替换 update／source_update；真实小模型参考没有覆盖 verify.restore 的重复 baseline 入口。",
+      "web_actual_torch_executed": false,
+      "project_native_executed": false,
+      "references": [
+        "W1",
+        "W2",
+        "reference/results.json:R01",
+        "reference/torch_restore_probe.py (not executed)"
+      ]
+    },
+    {
+      "id": "R02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "medium",
+      "title": "正式实际磁盘峰值账漏计 job 目录外已保留资格材料",
+      "blocking_stage": "formal entry; does not itself require more native updates",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_run.py",
+          "function": "Budget / execute",
+          "lines": [
+            [
+              184,
+              187
+            ],
+            [
+              689,
+              705
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_record_replay_run.py",
+          "function": "Budget.check",
+          "lines": [
+            [
+              74,
+              101
+            ]
+          ]
+        },
+        {
+          "file": "docs/SELLER_ALIAS_CROSSFIT_RETENTION.zh.md",
+          "function": "§8",
+          "lines": [
+            [
+              175,
+              175
+            ],
+            [
+              207,
+              211
+            ]
+          ]
+        }
+      ],
+      "trigger": "资格材料保留在 reports/qualification 等正式新 job 外；当前扫描只有 job 树和两个 sidecar。",
+      "consequence": "合同要求的16GiB全部新产物实际账不完整；2GiB投影预留不是实际统计。没有声称当前已经超限。",
+      "evidence_type": [
+        "submitted source and CPU launch layout",
+        "executed exact submitted Budget class under controlled resource probes with real small files"
+      ],
+      "minimum_fix": "将本次已封存资格材料的实际字节作为固定基数加入现有 used／peak／reserve，正确去重并记录范围；相关监听侧产物按实际归属计入。仅一例 job+qualification 跨限小文件检查。",
+      "web_witness": {
+        "job_bytes": 7000,
+        "qualification_bytes": 4000,
+        "limit_bytes": 10000,
+        "submitted_accepted": true,
+        "submitted_peak": 7000
+      },
+      "not_claimed": [
+        "formal actual over-budget event",
+        "native storage measurement",
+        "need for broad filesystem auditing"
+      ],
+      "references": [
+        "reference/results.json:R02",
+        "evidence/CPU_EVIDENCE_AUDIT.json"
+      ]
+    },
+    {
+      "id": "N01",
+      "classification": "合理非阻断建议",
+      "severity": "low",
+      "title": "clip 后 encoder 差异不单独隔离直接保持项梯度",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_verify.py",
+          "function": "native",
+          "lines": [
+            [
+              135,
+              144
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_record_replay.py",
+          "function": "update",
+          "lines": [
+            [
+              185,
+              208
+            ]
+          ]
+        },
+        {
+          "file": "tests/test_step28_crossfit_retention.py",
+          "function": "test_chunked_new_term_matches_direct_autograd_and_actual_adam",
+          "lines": [
+            [
+              97,
+              131
+            ]
+          ]
+        }
+      ],
+      "trigger": "把 clip 后 on/off 差异单独称为直接 ∂D/∂encoder 证据。",
+      "consequence": "全局 clip 系数也可传递间接差异。",
+      "minimum_fix": "准确称整体实际更新可区分；可在同样七次更新内记录 clip 前组件梯度。已有 CPU direct-autograd 和 z.backward 静态链足以使本项非阻断；不加更新。"
+    },
+    {
+      "id": "N02",
+      "classification": "合理非阻断建议",
+      "severity": "low",
+      "title": "h 单次自然出生计时未必覆盖全启用支持模式",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_verify.py",
+          "function": "native.birth",
+          "lines": [
+            [
+              96,
+              104
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_crossfit_retention_run.py",
+          "function": "projection",
+          "lines": [
+            [
+              190,
+              201
+            ]
+          ]
+        }
+      ],
+      "trigger": "实际手写出生稀疏／全零，仍将 h 称为任意支持模式严格上界。",
+      "consequence": "最大错配循环未覆盖；没有证明实际超时。",
+      "minimum_fix": "既定资格内用已有手写全启用可行分数测目标／错配并取max，或明确所测最大值的外推限度；保持原余量和硬限，不增加模型更新。"
+    },
+    {
+      "id": "N03",
+      "classification": "合理非阻断建议",
+      "severity": "low",
+      "title": "正式报告区分裁剪概率 log_loss、训练损失及 pooled 字段范围",
+      "locations": [
+        {
+          "file": "scripts/step28_continual_population_evaluate.py",
+          "function": "classification / group_metrics",
+          "lines": [
+            [
+              58,
+              70
+            ],
+            [
+              225,
+              228
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_chinese_base.py",
+          "function": "rates",
+          "lines": [
+            [
+              680,
+              685
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_crossfit_retention_run.py",
+          "function": "finalize",
+          "lines": [
+            [
+              642,
+              649
+            ]
+          ]
+        }
+      ],
+      "trigger": "把既有 log_loss 写成 Bbar／未裁剪校准 NLL，或将 pooled 输出说成全部22指标。",
+      "consequence": "报告口径误读。",
+      "minimum_fix": "沿用准确字段：裁剪概率 log_loss；计数先合后算 FPR、recall、precision、F1，其余保留逐群／macro。不改冻结指标。"
+    },
+    {
+      "id": "O01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "not_a_defect",
+      "title": "重开创新搜索、新臂／折／种子或旧 C 诊断",
+      "locations": [
+        {
+          "file": "schema/step28_crossfit_retention_policy.json",
+          "function": "methods / seed / comparisons",
+          "lines": [
+            [
+              1,
+              22
+            ]
+          ]
+        },
+        {
+          "file": "docs/SELLER_ALIAS_CROSSFIT_RETENTION.zh.md",
+          "function": "§1、§3、§6",
+          "lines": []
+        }
+      ],
+      "trigger": "以缺少正式效果为由扩大本轮设计或强度匹配。",
+      "consequence": "改变已批准比较、预算与解释，不能修复R01/R02。",
+      "minimum_fix": "不实施该扩展；保留固定三臂、单seed及有限任务化增量定位。"
+    },
+    {
+      "id": "O02",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "not_a_defect",
+      "title": "为两个局部缺口重建通用恢复／权限／资源平台和全量回归",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_verify.py",
+          "function": "restore",
+          "lines": [
+            [
+              32,
+              39
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_crossfit_retention_run.py",
+          "function": "Budget / blind_gate",
+          "lines": [
+            [
+              184,
+              187
+            ],
+            [
+              457,
+              584
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_bge_continual_run.py",
+          "function": "parse_once",
+          "lines": [
+            [
+              76,
+              87
+            ]
+          ]
+        }
+      ],
+      "trigger": "把快照克隆和资格字节计数扩成通用框架。",
+      "consequence": "增大代码面与验证成本，没有具体新增失效依据。",
+      "minimum_fix": "保持现有入口和盲门，局部克隆、固定基数与套件内窄断言即可。"
+    },
+    {
+      "id": "O03",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "not_a_defect",
+      "title": "用正式模型／标签上传或额外科研更新替代既定原生资格",
+      "locations": [
+        {
+          "file": "scripts/step28_crossfit_retention_verify.py",
+          "function": "native",
+          "lines": [
+            [
+              42,
+              195
+            ]
+          ]
+        },
+        {
+          "file": "scripts/step28_crossfit_retention_run.py",
+          "function": "validate_gate",
+          "lines": [
+            [
+              675,
+              686
+            ]
+          ]
+        }
+      ],
+      "trigger": "要求网页载模／标签、原生完整双144步来源或全量48/6/40循环才能审查。",
+      "consequence": "越过既定数据及更新范围。",
+      "minimum_fix": "不实施扩展；修复具体夹具后做原定七更新／600秒本地资格，分开CPU编排、原生部件与正式效果。"
+    }
+  ]
+}

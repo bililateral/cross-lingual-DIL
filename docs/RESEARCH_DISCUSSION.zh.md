@@ -988,3 +988,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 用户要求落实静态外审与独立复核补正，以完整S为对照形成执行合同，并在明确16小时、16GiB、CPU300秒／GPU600秒、标签各一次及盲门范围后选择：“批准合同范围，完成实现与核验，前提满足后正式运行（推荐）”。完整范围见[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)及[授权](../reports/documentation/20261012/crossfit_retention/authorization.json)。继续实现、手写资格、审查和满足前提后的正式运行均已授权；新具体上传包及公开推送不在此答复内。旧C单独诊断不恢复，旧预算和失败账不转用。
 
 具体合并包形成后，主执行者就570,664字节、64成员、SHA256为f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477的review/review_input.zip补充询问上传许可；用户明确：“授权此合并包实现外审（推荐）”。14:19经指定本地Playwright MCP完成一次上传及一次提交，网页附件显示review_input(20261012-061828).zip；[会话](https://chatgpt.com/c/6acc7bb2-9ffc-83eb-89dd-b01cc2687fff)出现完整请求、正在思考及停止按钮。请求GPT 6 Pro、可见GPT-6／Pro和后台身份未独立取得分别记录，见[提交回执](../reports/documentation/20261012/crossfit_retention/review/submission.json)。该答复只批准此包到chatgpt.com的实现外审，未扩大公开Git推送范围；科研执行许可及实际前置条件分别按合同处理。
+
+用户随后明确：“外审已结束，完整回收审查材料并仔细独立审核，落实必要修改；前提满足后按已批准范围继续原生 GPU 核验和正式运行，有需要澄清的实质细节再问我。”已完整回收19成员返回包及原始证据，独立接受并修复原生Adam快照别名和正式资格输出漏计两项缺陷；原合同、三臂、预算及访问范围不变。Linux CPU第三轮13项通过，实际旧加载污染被复现、修复后连续三次真实更新同起点且快照不变，新增输出合计和reserve拒绝通过；保守累计52／300秒。实现[主审处置](../reports/documentation/20261012/crossfit_retention/review/primary_disposition.zh.txt)关闭，原生和正式运行仍分别需要实际资格。活动作业及后续状态统一见当前交接。
+
+2026-10-12 15:29执行补充：GPU首轮在第五次真实更新后的梯度有限性检查因grad=None失败，完整失败账保留，正式输入／标签仍0。核验器已最小补正并通过Linux CPU attempt04十四项（累计保守70／300秒）。原GPU已消费保守122／600秒；因没有可续接状态，完整再核验需要新增七步，累计五＋七为十二步，超过原七步范围。按合同§7／§9无自动GPU重跑，目前只提出一次性补核例外，尚未取得用户决定，不启动依赖工作；完整范围见qualification/native_disposition.zh.txt。
+
+2026-10-12随后明确决定：用户对首次GPU失败后的具体补核提议回复“批准一次补核，累计最多12步、600秒（推荐）”。只追加一次七步原生资格，首轮五步及保守122秒均保留，累计上限12步／600秒，本次外层最多478秒；第二次失败仍停止。原正式1440步、16小时／16GiB及一次train／valid读取和盲门不变，核验与投影／资源合格后继续已批准正式运行。身份及范围见reports/documentation/20261012/crossfit_retention/qualification/native_retry_authorization.json。
+
+2026-10-12 15:44执行结果：一次获准GPU补核完整通过，累计12次实际更新、保守341／600秒。正式固定公式投影12.692412小时／15.545293GiB，现场资源及29来源均满足；15:43:14按原许可启动一次正式S／C_cf／C_perm实验，已观察实际参数更新。CPU累计保守70／300秒，首轮GPU失败原件保留，正式读取train=1／valid=0；详情见reports/documentation/20261012/crossfit_retention/qualification/formal_disposition.zh.txt及当前交接，不据启动预支效果。

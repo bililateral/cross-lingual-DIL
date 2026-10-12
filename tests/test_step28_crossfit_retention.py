@@ -250,6 +250,106 @@ class CrossfitTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             run.projection({**m,"r_F":float("nan")})
 
+    def test_native_restore_keeps_saved_adam_immutable(self):
+        import step28_crossfit_retention_verify as verify
+        model = tiny_model()
+        optimizer = core.make_optimizer(model,run.config())
+        current,history = handmade_group("restore_current"),handmade_group("restore_history")
+        method.update(model,optimizer,current,None,None,run.config(),"S",1,1)
+        for state in optimizer.state.values():
+            state["step"].fill_(288)
+        saved = verify.state(model,optimizer)
+        expected = core.state_digest(saved)
+        rng,modes = diag.rng_state(),[m.training for m in model.modules()]
+        # Reproduce the old direct-load alias with actual installed AdamW on CPU.
+        unprotected = copy.deepcopy(saved)
+        optimizer.load_state_dict(unprotected["adam"])
+        method.update(model,optimizer,current,history,np.ones(1016,np.float32),run.config(),"C_cf",2,1)
+        original_changed = core.state_digest(unprotected) != expected
+        self.assertTrue(original_changed)
+        self.assertEqual({int(s["step"]) for s in unprotected["adam"]["state"].values()},{289})
+        trials = []
+        for _ in range(3):
+            verify.restore(model,optimizer,saved,rng,modes)
+            self.assertEqual(run.parent.adam_step(optimizer),288)
+            row = method.update(model,optimizer,current,history,np.ones(1016,np.float32),run.config(),"C_cf",2,1)
+            self.assertEqual(run.parent.adam_step(optimizer),289)
+            self.assertEqual(core.state_digest(saved),expected)
+            trials.append({"state":core.state_digest(verify.state(model,optimizer)),"row":row,"rng":diag.rng_state()})
+        self.assertEqual(trials[0],trials[1])
+        self.assertEqual(trials[1],trials[2])
+        data.write_json(Path(os.environ["CROSSFIT_TEST_ROOT"])/"restore_isolation.json",
+            {"torch":torch.__version__,"old_direct_load_polluted_saved_step":original_changed,
+             "fixed_real_updates":3,"before_steps":[288]*3,"after_steps":[289]*3,
+             "entire_saved_state_unchanged":True,"repeated_results_identical":True})
+
+    def test_budget_counts_qualification_and_listener_outputs(self):
+        root = self.temporary()
+        job = root/"reports/job"
+        job.mkdir(parents=True)
+        qualified = root/"reports/qualification/cpu/attempt03"
+        qualified.mkdir(parents=True)
+        (job/"payload.bin").write_bytes(b"J"*7000)
+        (qualified/"evidence.bin").write_bytes(b"Q"*4000)
+        # The inherited default remains job-only for unchanged historical callers.
+        old = run.legacy.Budget(job)
+        self.assertNotIn(qualified/"evidence.bin",old.output_files())
+        with mock.patch.object(data,"ROOT",root):
+            budget = run.Budget(job)
+            budget.limits = {**budget.limits,"maximum_output_bytes":10000}
+            with self.assertRaisesRegex(RuntimeError,"budget exceeded"):
+                budget.check()
+            self.assertEqual(budget.peak_bytes,11000)
+            side = job.with_suffix(".listener.json")
+            side.write_bytes(b"L"*2000)
+            inputs = root/"reports/seller_alias_continual/inputs"
+            inputs.mkdir(parents=True)
+            (inputs/"not_an_output.bin").write_bytes(b"I"*20000)
+            budget.limits["maximum_output_bytes"] = 20000
+            budget.last_disk = -float("inf")
+            budget.check()
+            actual = sum(p.stat().st_size for p in budget.output_files() if p.is_file())
+            self.assertLess(actual,20000)
+            with self.assertRaisesRegex(RuntimeError,"budget exceeded"):
+                budget.check(reserve=8000)
+            self.assertEqual(len(budget.output_files()),len(set(budget.output_files())))
+            data.write_json(Path(os.environ["CROSSFIT_TEST_ROOT"])/"output_scope.json",
+                {"job_bytes":7000,"qualification_bytes":4000,"limit":10000,"combined_rejected":True,
+                 "listener_counted":side in budget.output_files(),"input_tree_excluded":True,"reserve_rejected":True})
+
+    def test_native_effects_preserve_unused_parameter_checks(self):
+        import step28_crossfit_retention_verify as verify
+        model = tiny_model()
+        model.encoder.register_parameter("unused_probe",torch.nn.Parameter(torch.ones(2)))
+        optimizer = core.make_optimizer(model,run.config())
+        current,history = handmade_group("effects_current"),handmade_group("effects_history")
+        method.update(model,optimizer,current,None,None,run.config(),"S",1,1)
+        for value in optimizer.state.values():
+            value["step"].fill_(288)
+        saved = verify.state(model,optimizer)
+        rng,modes = diag.rng_state(),[m.training for m in model.modules()]
+        method.update(model,optimizer,current,history,np.ones(1016,np.float32),run.config(),"C_cf",2,1)
+        on = verify.state(model,optimizer)
+        verify.restore(model,optimizer,saved,rng,modes)
+        method.update(model,optimizer,current,history,np.zeros(1016,np.float32),run.config(),"C_cf",2,1)
+        effects = verify.component_effects(model,on)
+        self.assertEqual(effects["encoder"]["inactive_grad_parameters"],["encoder.unused_probe"])
+        with self.assertRaisesRegex(ValueError,"active update effect"):
+            verify.component_effects(model,verify.state(model,optimizer))
+        parameter = next(p for n,p in model.named_parameters() if n.startswith("encoder.") and p.grad is not None)
+        grad = parameter.grad
+        parameter.grad = None
+        with self.assertRaisesRegex(ValueError,"participation"):
+            verify.component_effects(model,on)
+        parameter.grad = grad
+        with torch.no_grad():
+            model.encoder.unused_probe.add_(1)
+        with self.assertRaisesRegex(ValueError,"Unused parameter changed"):
+            verify.component_effects(model,on)
+        data.write_json(Path(os.environ["CROSSFIT_TEST_ROOT"])/"native_effects_scope.json",
+            {"effects":effects,"same_update_rejected":True,"missing_active_gradient_rejected":True,
+             "changed_unused_parameter_rejected":True,"real_tiny_updates":3,"formal_model_loaded":False})
+
     def test_AB_filter_before_construction_alignment_and_parse_ledger(self):
         root = self.temporary()
         rows, originals, files = [], {}, {}

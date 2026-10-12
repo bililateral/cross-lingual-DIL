@@ -1,22 +1,26 @@
 {
   "remote_workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261012/crossfit_retention_execution/20261012_140200/workspace",
-  "observed_at": "2026-10-12T14:19:17+08:00",
+  "observed_at": "2026-10-12T15:47:52+08:00",
   "cpu_attempts": [
     "attempt01",
-    "attempt02"
+    "attempt02",
+    "attempt03",
+    "attempt04"
   ],
   "cpu_wrapper_pids": [
     4026827,
-    4026883
+    4026883,
+    4037106,
+    4038107
   ],
   "cpu_wrappers_exited": true,
-  "actual_cpu_wall_seconds": 33.559717168,
-  "conservative_cpu_seconds": 34,
+  "actual_cpu_wall_seconds": 68.34012564,
+  "conservative_cpu_seconds": 70,
   "cpu_budget_seconds": 300,
-  "gpu_seconds": 0,
-  "formal_labels_parsed": 0,
-  "model_payload_linked": false,
-  "formal_job_exists": false,
+  "gpu_seconds": 341,
+  "formal_labels_parsed": 1,
+  "model_payload_linked": true,
+  "formal_job_exists": true,
   "active_native_or_formal_listener": false,
   "source_count": 29,
   "source_identity_matches_current": true,
@@ -117,14 +121,14 @@
       "sha256": "0e98c4229807182a88472364d771dd8345def09e4e0593eb920f2a240db70f8a"
     },
     {
-      "bytes": 44440,
+      "bytes": 45193,
       "path": "scripts/step28_crossfit_retention_run.py",
-      "sha256": "1ba6c00ec2936419e421391667c087ac47574ca2924195c3072bb66dfebf398f"
+      "sha256": "17bdfddba7e3e26a0681a8e8adbd179c154c80bff33bbdad596fb875bb63751c"
     },
     {
-      "bytes": 16208,
+      "bytes": 18590,
       "path": "scripts/step28_crossfit_retention_verify.py",
-      "sha256": "606adb8575f5bb418fbb8a0a08c97f5faea19a03372d865d1cb84904d8a06864"
+      "sha256": "c827d5483af58aee88e1ba9f7c4443b1031e185595018fc04eec79ba8221ecf7"
     },
     {
       "bytes": 3424,
@@ -142,9 +146,9 @@
       "sha256": "30fcb37ad43b823a87754bd660a42cdbedaa3ca8f0eb378b855d6666a96e408e"
     },
     {
-      "bytes": 33362,
+      "bytes": 33426,
       "path": "scripts/step28_record_replay_run.py",
-      "sha256": "7f4e0a3f9f5a17092149b8c261442475095d27111468280478e2b9f01a788427"
+      "sha256": "584ea874e50134e837613a664b531773797dad451be07b1d1ff06de4b3c38338"
     },
     {
       "bytes": 11627,
@@ -157,14 +161,75 @@
       "sha256": "1634491cca72a9ccb44a0092f3c70dcd0782f845adfcc230dc04484090275148"
     },
     {
-      "bytes": 29195,
+      "bytes": 35325,
       "path": "tests/test_step28_crossfit_retention.py",
-      "sha256": "b69e4db7abd2e49da306cfc7d2a01a9c2d15e1c10b5ba8ef9087ec309908a6dc"
+      "sha256": "5679ebbbeac358699ccdcd2200e63de657d501817cb85e97349d77bc7dd87f1a"
     },
     {
       "bytes": 20239,
       "path": "tests/test_step28_record_replay.py",
       "sha256": "a15d88b84685f9cbe9c70581fb186d59218196851a25a7030dd8f9ecfe5b8ee4"
     }
-  ]
+  ],
+  "status": "FORMAL_RUNNING_ACTUAL_UPDATE_OBSERVED",
+  "actual_gpu_wall_seconds": 339.460547155,
+  "gpu_attempts": [
+    {
+      "attempt": "attempt01",
+      "status": "FAIL",
+      "actual_updates_from_trace_location": 5,
+      "wrapper_pid": 4037545,
+      "exit_code": 1,
+      "reason": "isfinite received grad=None in paired_off effect checker"
+    },
+    {
+      "attempt": "attempt02",
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "wrapper_pid": 4038271,
+      "timeout_pid": 4038274,
+      "started_at": "2026-10-12T15:34:15+08:00",
+      "hard_deadline_including_kill_grace": "2026-10-12T15:42:13+08:00",
+      "prior_seconds": 122,
+      "actual_updates_observed": 7,
+      "ended_at": "2026-10-12T15:37:53+08:00",
+      "wrapper_exited": true
+    }
+  ],
+  "formal_inputs_linked": true,
+  "native_qualified": true,
+  "native_retry_authorized": true,
+  "disposition": "formal_disposition.zh.txt",
+  "native_retry_authorization": "native_retry_authorization.json",
+  "formal_access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "formal": {
+    "started_at": "2026-10-12T15:43:14+08:00",
+    "wrapper_pid": 4038813,
+    "timeout_pid": 4038818,
+    "python_pid": 4038819,
+    "phase": "A_shared",
+    "latest_logged_updates": 24,
+    "failure_exists": false,
+    "projection": {
+      "forward_seconds": 6267.049569682218,
+      "io_seconds": 131.26628675218672,
+      "projected_peak_output_bytes": 16691630919,
+      "projected_total_seconds": 45692.68333830871,
+      "train_seconds": 26555.83081421256,
+      "within_budget": true
+    },
+    "planning_completion_interval": [
+      "2026-10-13T01:52:28.146671+08:00",
+      "2026-10-13T04:24:46.683338+08:00"
+    ],
+    "planning_interval_scope": "Unbuffered fixed estimate through 25 percent time margin, not statistical confidence or guaranteed bounds.",
+    "hard_deadline_including_kill_grace": "2026-10-13T07:43:14+08:00",
+    "observation": "formal/startup_observation.json",
+    "latest_update_event_elapsed_seconds": 132.62332311132923,
+    "latest_observation_note": "All three expected owner/command processes present; latest logged A_shared count24 is a lower bound while training continues; access train1 valid0, no failure."
+  }
 }

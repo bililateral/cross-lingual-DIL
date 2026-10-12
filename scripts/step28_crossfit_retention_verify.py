@@ -31,12 +31,41 @@ def state(model, optimizer):
 
 def restore(model, optimizer, saved, rng, modes):
     model.load_state_dict(saved["model"])
-    optimizer.load_state_dict(saved["adam"])
+    optimizer.load_state_dict(cpu_copy(saved["adam"]))
     for p, g in zip(model.parameters(), saved["grads"], strict=True):
         p.grad = None if g is None else g.to(p.device)
     for m, mode in zip(model.modules(), modes, strict=True):
         m.training = mode
     diag.restore_rng(rng)
+
+
+def component_effects(model, on):
+    """Compare active paths; unused parameters must keep both mask and value."""
+    parameters = list(model.named_parameters())
+    effects = {}
+    for component in ("encoder", "head"):
+        active, inactive = [], []
+        for i, (name, parameter) in enumerate(parameters):
+            if not name.startswith(component+"."):
+                continue
+            gradient, previous = parameter.grad, on["grads"][i]
+            if (gradient is None) != (previous is None):
+                raise ValueError("On/off gradient participation changed: "+name)
+            if gradient is None:
+                if not torch.equal(on["model"][name], parameter.detach().cpu()):
+                    raise ValueError("Unused parameter changed: "+name)
+                inactive.append(name)
+            else:
+                if not torch.isfinite(gradient).all() or not torch.isfinite(previous).all():
+                    raise ValueError("Nonfinite on/off gradient: "+name)
+                active.append((i, name, parameter))
+        grad_changed = any(not torch.equal(on["grads"][i], p.grad.detach().cpu()) for i, n, p in active)
+        update_changed = any(not torch.equal(on["model"][n], p.detach().cpu()) for i, n, p in active)
+        if not active or not grad_changed or not update_changed:
+            raise ValueError("New floor has no distinguishable encoder/head active update effect")
+        effects[component] = {"post_clip_gradient_distinguishable": True, "actual_update_distinguishable": True,
+                              "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive}
+    return effects
 
 
 def native(check, progress, handwritten, out):
@@ -67,6 +96,7 @@ def native(check, progress, handwritten, out):
     modes0, rng0 = [m.training for m in model.modules()], diag.rng_state()
     progress("main_first_allocation")
     updates.append(timed("t_A", lambda: method.update(model, optimizer, current, None, None, c, "S", 1, 1, check)))
+    progress("main_first_complete", actual_updates=len(updates), completed_updates=updates, measurements=measurements)
     if run.parent.adam_step(optimizer) != 1:
         raise ValueError("First actual main update missing")
     with diag.neutral(model):
@@ -83,6 +113,7 @@ def native(check, progress, handwritten, out):
         raise ValueError("Handwritten source did not reset to pre-A/empty Adam")
     progress("source_first_lr_index_2")
     updates.append(timed("t_U", lambda: method.source_update(model, optimizer, current, c, "U0", 1, check)))
+    progress("source_first_complete", actual_updates=len(updates), completed_updates=updates, measurements=measurements)
     if run.parent.adam_step(optimizer) != 1 or updates[-1]["encoder_lr"] != run.parent.stage_lr(2):
         raise ValueError("Source actual Adam/LR clocks confused")
     del before
@@ -102,6 +133,17 @@ def native(check, progress, handwritten, out):
             raise ValueError("Handwritten permutation birth not feasible")
         return {**detail, "changed": int(np.count_nonzero(p != b)), "full_source": "one main update", "outside_source": "one auxiliary update; role evaluation only"}
     born = timed("h", birth)
+    def dense_birth():
+        # Maximal support timing, distinct from the real handwritten model scores.
+        f = torch.as_tensor(history.labels, dtype=torch.float32, device="cuda")*3
+        f += torch.linspace(0., .2, 378, device="cuda")
+        b, capacity, detail = method.birth(history, f, f*.5)
+        p = method.permute(history, b, capacity, np.random.Generator(np.random.PCG64(20261012)))
+        loss, details = method.floor_loss(f, history, p)
+        if detail["active"] != 1016 or float(loss) or details["violations"]:
+            raise ValueError("Dense handwritten timing fixture is not fully active/feasible")
+        return {"active": detail["active"], "fixture": "handwritten all-supported scores; timing only, no model update"}
+    dense = timed("h", dense_birth)
     floor = np.linspace(1., 2., 1016, dtype=np.float32)
     inactive = np.zeros(1016, np.float32)
     # Deliberately active term witness, separate from the honest source-birth above.
@@ -124,6 +166,7 @@ def native(check, progress, handwritten, out):
         row = timed("t_S" if arm == "S" else "t_perm" if arm == "C_perm" else "t_cf",
                     lambda: method.update(model, optimizer, current, history, target, c, arm, 2, 1, check))
         updates.append(row)
+        progress("paired_"+label+"_complete", actual_updates=len(updates), completed_updates=updates, measurements=measurements)
         if run.parent.adam_step(optimizer) != 289:
             raise ValueError("Actual native paired update missing")
         outcomes[label] = row
@@ -132,16 +175,7 @@ def native(check, progress, handwritten, out):
             if row["history"]["violations"] <= 0 or row["history"]["distillation"] <= 0:
                 raise ValueError("New-term fixture was not active")
         elif label == "off":
-            effects = {}
-            parameters = dict(model.named_parameters())
-            for component in ("encoder", "head"):
-                selected = [(i, n, p) for i, (n, p) in enumerate(parameters.items()) if n.startswith(component+".")]
-                grad_changed = any(not torch.equal(on["grads"][i], p.grad.detach().cpu()) for i, n, p in selected)
-                update_changed = any(not torch.equal(on["model"][n], p.detach().cpu()) for i, n, p in selected)
-                finite = all(torch.isfinite(p.grad).all() for i, n, p in selected)
-                if not grad_changed or not update_changed or not finite:
-                    raise ValueError("New floor has no distinguishable finite encoder/head update effect")
-                effects[component] = {"added_gradient_distinguishable": grad_changed, "actual_update_distinguishable": update_changed, "finite": bool(finite)}
+            effects = component_effects(model,on)
         elif label == "repeat":
             equality = {"tensors": 0, "elements": 0}
             equal_state(on, state(model, optimizer), equality)
@@ -150,7 +184,8 @@ def native(check, progress, handwritten, out):
         check()
     if len(updates) != 7:
         raise ValueError("Native physical update scope differs")
-    tensors = [*model.parameters(), *(p.grad for p in model.parameters()), *(s[k] for s in optimizer.state.values() for k in ("exp_avg", "exp_avg_sq"))]
+    tensors = [*model.parameters(), *(p.grad for p in model.parameters() if p.grad is not None),
+               *(s[k] for s in optimizer.state.values() for k in ("exp_avg", "exp_avg_sq"))]
     if any(t is None or t.dtype != torch.float32 or not torch.isfinite(t).all() for t in tensors):
         raise ValueError("Native parameters/grad/Adam must be finite FP32")
     del baseline, on, tensors
@@ -183,8 +218,9 @@ def native(check, progress, handwritten, out):
     removal["removed_after_verification"] = not full_path.exists() and not infer_path.exists()
     data.write_json(out/"temporary_checkpoint_identity.json", removal)
     result = {"resources": resources, "numerics": numerics, "actual_updates": 7, "updates": updates,
-        "actual_source_birth": born, "measurements": measurements, "projection": run.projection(measurements),
+        "actual_source_birth": born, "dense_target_timing": dense, "measurements": measurements, "projection": run.projection(measurements),
         "new_term_encoder_head_effect": True, "effects": effects, "next_update_bitwise_equal": True, "equality_counts": equality,
+        "effect_scope": "Actual on/off parameter and post-global-clip gradient differences; direct VJP checked separately on CPU",
         "own_memory_bytes": len(payload), "maximum_records": 224, "channel_tokens": 256,
         "torch": torch.__version__, "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
         "fixture": "One main and one auxiliary first update; five real paired updates from one synthetic counter-288 state. No formal inputs, no claim of 144-step native sources."}
@@ -202,8 +238,8 @@ def main():
     parser.add_argument("--prior-seconds", type=float, default=0.)
     args = parser.parse_args()
     args.output = args.output.resolve()
-    if os.name != "posix" or args.output.exists() or args.prior_seconds < 0 or (args.mode == "gpu" and args.prior_seconds):
-        parser.error("Linux, new evidence and cumulative CPU ledger required; GPU has no automatic retry")
+    if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
+        parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
     args.output.mkdir(parents=True)
     sys.path.insert(0, str(data.ROOT/"tests"))
     import test_step28_crossfit_retention as handwritten
@@ -213,7 +249,7 @@ def main():
     numerics = run.parent.configure_numerics()
     process = psutil.Process()
     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
-    report = {"status": "RUNNING", "mode": args.mode, "source_files": run.sources(), "formal_inputs": False,
+    report = {"status": "RUNNING", "mode": args.mode, "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
     stopped, lock = threading.Event(), threading.RLock()
     def write():
@@ -249,8 +285,8 @@ def main():
                 report.update(status="BUDGET_STOP", error=str(exc))
                 write()
                 os._exit(2)
-    def progress(stage):
-        report["stage"] = stage
+    def progress(stage, **details):
+        report.update(stage=stage, **details)
         write()
     watcher = threading.Thread(target=watchdog, daemon=True)
     watcher.start()
@@ -270,7 +306,9 @@ def main():
         else:
             if args.gate is None:
                 raise ValueError("Implementation review gate required")
-            run.reviewed_gate(args.gate, "NATIVE")
+            gate = run.reviewed_gate(args.gate, "NATIVE")
+            if args.prior_seconds != gate.get("native_prior_seconds", 0):
+                raise ValueError("Prior GPU budget must match the explicitly approved attempt gate")
             report["native"] = native(check, progress, handwritten, args.output)
         check()
         report["status"] = "PASS_HANDWRITTEN_ONLY"

@@ -1,0 +1,81 @@
+{
+  "scope": "WEB_REVIEW_HANDWRITTEN_ONLY_NOT_PROJECT_LINUXPY310",
+  "input_zip_sha256": "f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477",
+  "R01": {
+    "status": "PASS_SEMANTIC_ILLUSTRATION_ONLY",
+    "assumption": "Default non-capturable, non-fused optimizer restore retains the incoming mutable CPU step object; the update increments that object in place. This model does NOT execute PyTorch or AdamW.",
+    "pytorch_executed": false,
+    "submitted_semantics": {
+      "clone_on_restore": false,
+      "trials": [
+        {
+          "attempt": 1,
+          "live_step_before": 288,
+          "shares_saved_step": true,
+          "status": "SIMULATED_UPDATE",
+          "actual_update": false,
+          "live_step_after": 289,
+          "saved_step_after": 289
+        },
+        {
+          "attempt": 2,
+          "live_step_before": 289,
+          "shares_saved_step": true,
+          "status": "REJECTED_EXPECTED_288_BEFORE_UPDATE",
+          "actual_update": false
+        }
+      ],
+      "saved_state_unchanged": false,
+      "saved_step_final": 289
+    },
+    "clone_on_restore_semantics": {
+      "clone_on_restore": true,
+      "trials": [
+        {
+          "attempt": 1,
+          "live_step_before": 288,
+          "shares_saved_step": false,
+          "status": "SIMULATED_UPDATE",
+          "actual_update": false,
+          "live_step_after": 289,
+          "saved_step_after": 288
+        },
+        {
+          "attempt": 2,
+          "live_step_before": 288,
+          "shares_saved_step": false,
+          "status": "SIMULATED_UPDATE",
+          "actual_update": false,
+          "live_step_after": 289,
+          "saved_step_after": 288
+        }
+      ],
+      "saved_state_unchanged": true,
+      "saved_step_final": 288
+    }
+  },
+  "R02": {
+    "status": "PASS_CONTROLLED_OMISSION_WITNESS",
+    "executed_exact_class": true,
+    "source_lines": [
+      60,
+      101
+    ],
+    "class_text_sha256": "f75d99b3d349198b4c6bd440c89e1008b195d90969bdf9449128272cec06ad79",
+    "controlled_dependencies": "Only psutil RSS, torch.cuda resource probes, policy limits and JSON writer are substituted. The submitted Budget class and its actual filesystem scan execute unchanged.",
+    "submitted_check_accepted": true,
+    "submitted_error": null,
+    "submitted_peak_output_bytes": 7000,
+    "formal_job_bytes_before_check": 7000,
+    "retained_qualification_bytes": 4000,
+    "combined_bytes_before_check": 11000,
+    "formal_job_bytes_after_resource_json": 7324,
+    "combined_bytes_after_resource_json": 11324,
+    "limit_bytes": 10000,
+    "fixed_base_would_reject": true,
+    "native_resource_measurement": false,
+    "temporary_fixture_removed_on_exit": true,
+    "source_path": "scripts/step28_record_replay_run.py",
+    "source_sha256": "7f4e0a3f9f5a17092149b8c261442475095d27111468280478e2b9f01a788427"
+  }
+}

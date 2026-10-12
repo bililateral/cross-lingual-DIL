@@ -1,0 +1,84 @@
+# 实际阅读范围
+
+本记录逐一对应原包63载荷；input_manifest.json另已完整解析。身份核对不是全文阅读，全文阅读不是实际执行。
+
+主审读当前重点入口并复核具体缺陷；三项静态分工的边界见对应JSON。未连接项目Linux，未执行本包CPU套件、Torch、原生或正式运行。
+
+## 当前29来源
+
+| 文件 | 主审实际范围 | 分工补读／用途 |
+|---|---|---|
+| docs/SELLER_ALIAS_CROSSFIT_RETENTION.zh.md | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| schema/step28_alias_ranking_policy.json | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| schema/step28_bge_continual_policy.json | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| schema/step28_chinese_base_policy.json | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| schema/step28_crossfit_retention_policy.json | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| schema/step28_record_replay_policy.json | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/run_step28_crossfit_retention_linux_20261012.sh | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_alias_calibration.py | 1—150；fit、parameters、transform、preserve_order | 当前正仿射校准与保序；旧 acceptance／summary 不作为本轮结果门；数据分工 1—178 |
+| scripts/step28_alias_ranking.py | 1—55、89—135；依赖／config、hard_candidates、objectives | 监督 primitive 和固定 hard 排序；其余旧训练入口未作全面审计；数据分工 1—166 |
+| scripts/step28_bge_continual.py | 1—85、242—250；配置／种子／stage_lr、adam_step | 共享数值设置与真实 Adam 计数；其他旧模型路径不全面审计；目标分工 1—95、235—270 |
+| scripts/step28_bge_continual_evaluate.py | 1—61；模块导入／旧ABC函数识别；另列函数索引 | 确认当前 collect/finalize 不调用旧60群／三阶段包装；数据分工 1—160 |
+| scripts/step28_bge_continual_run.py | 1—90；array、save_array、rng_state、restore_rng、parse_once | 实际数组／RNG／先记后开；未全面审计旧主运行入口；数据分工 15—100 |
+| scripts/step28_chinese_base.py | 19—143、165—193、680—698；配置、partition、load_model、record_texts、objectives、rates | 实际模型初始化／监督和分类计数汇总；其他旧实验入口不重审；目标分工 100—175；数据分工 50—80、85—122、670—703 |
+| scripts/step28_continual_expression_run.py | 1—131及函数索引；顶层导入／旧public_inputs／attach_labels | 默认旧供给依赖及AB适配对照；当前调用显式新loader；无额外全文声明 |
+| scripts/step28_continual_population.py | 1—74、157—210；build_model／optimizer、model_files、state_digest、save_state／restore_state | 实际优化器和完整／推理检查点；R01与正式磁盘恢复区分；目标分工 1—210 |
+| scripts/step28_continual_population_data.py | 1—118、198—258；身份工具、Group、align_labels、Memory、种子／日程 | 当前Group／标签对齐／Algorithm R；旧Archive仅识别不用于本轮；数据分工 1—170、193—220；目标分工 1—110、190—258 |
+| scripts/step28_continual_population_evaluate.py | 1—194、210—258；特别纯指标1—100、group_metrics225—228 | 完整22纯指标；旧validate_run只辨识范围，未重审旧整套evaluate；数据分工 1—245 |
+| scripts/step28_continual_population_run.py | 1—76；checkpoint_reserve、remove_work_file | 真实大文件reserve及工作权重释放；不审旧全流程；资源分工同一存储函数 |
+| scripts/step28_crossfit_retention.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_crossfit_retention_run.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_crossfit_retention_verify.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_crossfit_retention_wait.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_record_replay.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| scripts/step28_record_replay_numerics.py | 1—76；cpu_copy、equal_state及相关数值 | 实际深拷贝／逐位比较；旧native main未执行、未全面审计；资源分工引用同函数 |
+| scripts/step28_record_replay_run.py | 1—105；顶层依赖和Budget60—101 | 当前继承Budget；旧ABC训练／评价未当本轮路径审查；资源分工 Budget；数据分工识别旧入口 |
+| scripts/step28_record_replay_verify.py | 1—44；preflight | 共享线程／GPU／进程前提；旧资格main未执行、未全面审计；资源分工 preflight及资源前提 |
+| scripts/step28_replay_diagnostics.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| tests/test_step28_crossfit_retention.py | 全文；分段输出截断处已补读 | 当前实现／合同或历史F01—F12有限处置；重点目标／数据／资源有重叠分读；主结论不只依赖分工自述 |
+| tests/test_step28_record_replay.py | 1—240；本轮实际导入的handmade_group／tiny_model／literal_scores为23—64 | 辅助旧测试文件不等于本轮执行整份旧测试；其余240以后未读；目标分工1—163 |
+
+## 其余文档与原件
+
+| 文件 | 阅读层级／范围 |
+|---|---|
+| AGENTS.md | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| docs/RESEARCH_DISCIPLINE.zh.md | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261011/retention_design/crossfit.zh.txt | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/01_REVIEW.zh.txt | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/02_FINDINGS.json | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/03_READING_SCOPE.zh.txt | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/04_INPUT_IDENTITY.json | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/05_REFERENCES.zh.txt | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/06_SEARCH_LOG.json | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/math/execution.json | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/math/inputs.json | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/math/reference.py | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/math/results.json | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/external/unpacked/math/run.log | IDENTITY_ONLY_HISTORICAL：仅清单／大小／SHA；未全文复查其研究内容 |
+| reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261012/crossfit_retention/authorization.json | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261012/crossfit_retention/implementation.zh.txt | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/console.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/launch.sh | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/result/result.json | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/result/scheduler_evidence.json | IDENTICAL_CONTENT_REUSE：解析／哈希核对；与已全文读取第二轮scheduler_evidence逐字节相同，复用同内容阅读 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/result/unittest.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/source.tar.gz | ARCHIVE_BYTE_AUDIT：逐普通文件读字节、大小／SHA对照各自回执及当前闭包；查看第一轮四文件diff；不宣称全部冻结旧源码逐行重读 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt01/wrapper.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/console.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/launch.sh | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/result/result.json | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/result/scheduler_evidence.json | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/result/unittest.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/source.tar.gz | ARCHIVE_BYTE_AUDIT：逐普通文件读字节、大小／SHA对照各自回执及当前闭包；查看第一轮四文件diff；不宣称全部冻结旧源码逐行重读 |
+| reports/documentation/20261012/crossfit_retention/qualification/cpu/attempt02/wrapper.txt | CPU_RECEIPT_READ：完整读取文本／解析JSON；结合当前测试实现判定证明范围 |
+| reports/documentation/20261012/crossfit_retention/review/request.zh.txt | MAIN_FULL_TEXT：全文；分段输出截断处已补读 |
+
+## 执行边界
+
+已执行的网页参考仅为 reference/reference.py 中的两个窄检查；R01是明示假设下的纯Python别名语义，R02是原Budget类在小文件／受控资源探针下的计数检查。没有真实autograd或Adam更新。torch_restore_probe.py未执行。
+tools/audit_input.py只作字节、CRC、来源闭包、冻结tar和CPU时间账机械核对。首轮将tar目录也要求为普通文件，断言失败；已区分目录与普通文件重验，日志没有删除。
+旧外审的参考文献／搜索记录／数学源码等只保留其原身份；当前报告复用原正文与主审处置，不把这些原件说成新检索或本次独立计算。

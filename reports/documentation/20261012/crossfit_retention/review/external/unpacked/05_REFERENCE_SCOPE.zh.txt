@@ -1,0 +1,43 @@
+# 本次引用、外部实现核对与独立参考边界
+
+一、包内依据
+
+所有实现、合同和CPU事实以 input/review_input.zip 的原始字节为准。ZIP SHA256：f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477。完整成员身份见 evidence/04_INPUT_IDENTITY.json；逐文件语义阅读边界见 03_READING_SCOPE.json。
+
+历史有限增量定位及F01—F12直接复用本包 reports/documentation/20261011/retention_design 下的原静态稿、原外审01正文、02_FINDINGS.json与primary_disposition。未重新访问其中五篇方法文献，未重跑旧数学脚本，未重新证明首创性。不能将历史检索日志视为本次新检索。
+
+二、仅为R01追加的官方实现语义核对
+
+W1. PyTorch 官方源代码：torch/optim/optimizer.py，main。
+URL：https://github.com/pytorch/pytorch/blob/main/torch/optim/optimizer.py
+检索日期：2026-10-12；网页检索引用标识 turn2search0。
+实际核对：Optimizer._process_value_according_to_param_policy 中，step 在 capturable/fused 均关闭时直接返回原张量；load_state_dict 的浅拷贝/参数组处理相关可见源码。关键短片段为“return value”。该页面是当前主分支，未据此推断项目安装版本号；检索返回的页面片段不是完整本地安装文件或提交绑定副本。
+
+W2. PyTorch 官方源代码：torch/optim/adam.py，main。
+URL：https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py
+检索日期：2026-10-12；网页引用 turn1view3、turn3view2、turn5search0/turn5search1。
+实际核对：未启用capturable/fused时step驻留CPU；既有张量不在__setstate__中重新构造；单张量更新对该step原地加一。关键短片段为“step_t += 1”。与W1和包内make_optimizer/restore/native共同支持R01的条件推导。
+
+本次也尝试读取官方v2.5.1 GitHub/raw页面、官方docs的模块页及GitHub plain视图，工具未成功返回可用正文；没有将失败页面当依据，也没有以版本号冒充项目版本。搜索出现的无关站点／其他项目没有用作技术结论。可复核的后续窄查询包括：
+
+- site:github.com/pytorch/pytorch/blob "def _cast" "state[param]" "load_state_dict" optimizer.py
+- site:github.com/pytorch/pytorch/blob "state_steps" "step_t += 1" "adam.py"
+
+官方源码事实与对本包的后果推导应分开：网页可见实现说明默认行为；本包传入同一baseline及288断言构成触发路径；实际项目PyTorch版本和原生运行结果仍需主执行者用既有范围核对。未观察到实际Linuxpy310异常。
+
+三、本次已执行参考
+
+reference/reference.py、inputs.json、results.json、execution.json、run.log 为完整源码／手写输入／输出／环境与日志。
+
+R01：纯Python可变对象模拟。其“加载保留引用”是显式给定的假设，不是执行PyTorch后测得的事实。结果仅演示别名污染与每次克隆的差别；不能拿示例自证库实现。
+R02：从原ZIP用AST取出Budget类，正文不改；psutil、torch.cuda、policy和JSON写入依赖用明示小返回，其目录扫描/判断直接执行。实际小文件是7000字节job与4000字节资格，上限10000；原类接受并报7000。这证明扫描范围遗漏，不是实际资源压力测试。
+
+环境：ChatGPT网页工作区，Python3.12.14；系统Linux-6.18.44-x86_64-with-glibc2.39；无torch／psutil；不是项目Linuxpy310。无真实autograd、Adam或GPU更新，无正式模型／文本／标签。
+
+四、另附未执行探针
+
+reference/torch_restore_probe.py 本网页未执行。它只需既有PyTorch，用CPU两参数线性模型和手写线性loss，按原包AST取state/restore/cpu_copy，对照直接恢复与每次克隆Adam载荷，打印版本及baseline是否被污染。它不安装依赖、不调用项目入口、不访问正式数据或预训练模型；不得把文件存在当作PASS。是否纳入现有CPU核对及如何保持累计预算，由主执行者依当前合同处置。
+
+五、机械核对
+
+tools/audit_input.py 与 evidence_audit.log 给出ZIP/清单/冻结来源/时间核对的可重演路径。第一次tar目录项断言失败是审查方脚本错误，已修复为分别处理目录和普通文件；原日志保留。该脚本没有执行项目模块，其PASS不证明科学作用。

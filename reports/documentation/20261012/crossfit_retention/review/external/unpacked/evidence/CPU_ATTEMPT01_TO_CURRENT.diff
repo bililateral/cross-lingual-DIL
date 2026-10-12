@@ -1,0 +1,122 @@
+--- attempt01/frozen/scripts/step28_crossfit_retention.py
++++ current/scripts/step28_crossfit_retention.py
+@@ -209,6 +209,12 @@
+             raise ValueError("Floor/group alignment differs")
+         if len(members) != 6 or self.reservoir.seen != 48 or set(self.origins.values()) != {1}:
+             raise ValueError("Only the six A-born groups are legal in this AB study")
++        if set(self.source_ids) != set(members):
++            raise ValueError("Every target needs its own fold and both source identities")
++        for row in self.source_ids.values():
++            if (row.get("fold") not in (0, 1) or row.get("role") != "U"+str(row["fold"])
++                    or any(len(row.get(k, "")) != 64 for k in ("source_sha256", "full_source_sha256"))):
++                raise ValueError("Incomplete target birth source identity")
+         blocks = []
+         for uid in members:
+             validate_floor(self.tables[uid])
+--- attempt01/frozen/scripts/step28_crossfit_retention_run.py
++++ current/scripts/step28_crossfit_retention_run.py
+@@ -14,7 +14,6 @@
+ import random
+ import shutil
+ import signal
+-import subprocess
+ import threading
+ import time
+ import traceback
+@@ -416,7 +415,8 @@
+         manifest["physical_updates"] += 144
+         manifest["gradient_group_presentations"] += 144
+         data.write_json(root/"progress.json", manifest)
+-    ids = {g.uid: {"fold": i, "role": "U"+str(i), "source_sha256": manifest["sources"]["U"+str(i)]["sha256"]}
++    ids = {g.uid: {"fold": i, "role": "U"+str(i), "source_sha256": manifest["sources"]["U"+str(i)]["sha256"],
++                  "full_source_sha256": point["full_state"]["state_sha256"]}
+            for i, fold in enumerate(folds) for g in fold if g.uid in full}
+     device = next(model.parameters()).device
+     memories, birth = target_memories(shared, full, outside, ids, device)
+--- attempt01/frozen/scripts/step28_crossfit_retention_verify.py
++++ current/scripts/step28_crossfit_retention_verify.py
+@@ -158,7 +158,7 @@
+     memory = handwritten.shared_memory()
+     memory.maps = {"first": {"a": 1., "b": 0.}, "stage": {"a": 1., "b": 0.}, "rng": diag.rng_state(), "completed_stage": 1, "adam_step": 288}
+     own = method.Memory.from_shared(memory, "C_cf", {g.uid: floor.copy() for g in memory.reservoir.groups},
+-                                    {g.uid: {"fold": i%2, "role": "U"+str(i%2), "source_sha256": "0"*64} for i,g in enumerate(memory.reservoir.groups)})
++                                    handwritten.source_ids(memory))
+     payload = own.to_bytes()
+     if method.Memory.from_bytes(payload).to_bytes() != payload:
+         raise ValueError("Native own Memory roundtrip differs")
+--- attempt01/frozen/tests/test_step28_crossfit_retention.py
++++ current/tests/test_step28_crossfit_retention.py
+@@ -29,6 +29,11 @@
+     memory = record.Memory("ABC")
+     memory.retain(groups, 1, lambda g: np.zeros(sum(map(len, g.items))*(sum(map(len, g.items))-1)//2, np.float32))
+     return memory
++
++
++def source_ids(memory):
++    return {g.uid: {"fold": i%2, "role": "U"+str(i%2), "source_sha256": "0"*64,
++                    "full_source_sha256": "1"*64} for i,g in enumerate(memory.reservoir.groups)}
+ 
+ 
+ def literal_floor(scores, group, values):
+@@ -67,7 +72,7 @@
+         torch.testing.assert_close(live, reference, rtol=2e-6, atol=2e-7)
+         torch.testing.assert_close(g, r, rtol=3e-6, atol=2e-8)
+         self.assertGreater(details["violations"], 0)
+-        self.assertGreater(float(live), 0)
++        self.assertGreater(float(live.detach()), 0)
+         self.assertAlmostEqual(float(method.indices(group)[2].sum()), 1., places=6)
+         zero, d = method.floor_loss(s.detach(), group, np.zeros(1016, np.float32))
+         self.assertEqual((float(zero), d["violations"]), (0., 0))
+@@ -134,6 +139,17 @@
+         self.assertEqual(actual,expected)
+         self.assertEqual(core.state_digest(a.state_dict()),core.state_digest(b.state_dict()))
+         self.assertEqual(core.state_digest(oa.state_dict()),core.state_digest(ob.state_dict()))
++        history = handmade_group("history")
++        with diag.neutral(a):
++            target = record.reference(a,history,c)
++        for optimizer in (oa,ob):
++            for s in optimizer.state.values():
++                s["step"].fill_(288)
++        expected = record.update(a,oa,group,history,target,c,"S","ABC",2,1)
++        actual = method.update(b,ob,group,history,target,c,"S",2,1)
++        self.assertEqual(actual,expected)
++        self.assertEqual(core.state_digest(a.state_dict()),core.state_digest(b.state_dict()))
++        self.assertEqual(core.state_digest(oa.state_dict()),core.state_digest(ob.state_dict()))
+         model = tiny_model()
+         optimizer = core.make_optimizer(model,c)
+         row = method.source_update(model,optimizer,group,c,"U0",1)
+@@ -149,7 +165,7 @@
+         groups = memory.reservoir.groups
+         scores = np.asarray(groups[0].labels,np.float32)*3+np.linspace(0,.2,378,dtype=np.float32)
+         full, outside = {g.uid:scores for g in groups}, {g.uid:scores*.5 for g in groups}
+-        memories, result = run.target_memories(memory,full,outside,{},"cpu")
++        memories, result = run.target_memories(memory,full,outside,source_ids(memory),"cpu")
+         self.assertEqual(result["status"],"NONDEGENERATE")
+         a,b = memories["C_cf"],memories["C_perm"]
+         for g in groups:
+@@ -169,11 +185,13 @@
+         with self.assertRaises(ValueError):
+             restored.retain(groups,2,None)
+         zeros = {g.uid:np.zeros(378,np.float32) for g in groups}
+-        self.assertEqual(run.target_memories(memory,full,zeros,{},"cpu")[1]["status"],"DEGENERATE_STOP_BEFORE_B_VALID")
++        self.assertEqual(run.target_memories(memory,full,zeros,source_ids(memory),"cpu")[1]["status"],"DEGENERATE_STOP_BEFORE_B_VALID")
+         same = {g.uid:np.asarray(g.labels,np.float32)*3 for g in groups}
+-        identical = run.target_memories(memory,same,same,{},"cpu")[1]
++        identical = run.target_memories(memory,same,same,source_ids(memory),"cpu")[1]
+         self.assertEqual(identical["status"],"DEGENERATE_STOP_BEFORE_B_VALID")
+         self.assertGreater(identical["active_total"],0)
++        with self.assertRaises(ValueError):
++            method.Memory.from_shared(memory,"C_cf",a.tables,{})
+         restored.maps["oversize"] = "x"*1048576
+         with self.assertRaises(ValueError):
+             restored.to_bytes()
+@@ -413,7 +431,8 @@
+         method.update(model,optimizer,current,None,None,c,"S",1,1)
+         for s in optimizer.state.values():
+             s["step"].fill_(336)  # Explicit epoch-1 continuation fixture.
+-        memory = method.Memory.from_shared(shared_memory(),"C_cf",{g.uid:np.ones(1016,np.float32) for g in shared_memory().reservoir.groups},{})
++        shared = shared_memory()
++        memory = method.Memory.from_shared(shared,"C_cf",{g.uid:np.ones(1016,np.float32) for g in shared.reservoir.groups},source_ids(shared))
+         memory.begin_stage(2)
+         for _ in range(48):
+             memory.draw()

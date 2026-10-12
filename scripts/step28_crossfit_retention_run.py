@@ -186,6 +186,17 @@ class Budget(legacy.Budget):
         super().__init__(root)
         self.limits = policy()["runtime"]
 
+    def output_files(self):
+        # Only this isolated run's output trees; never scan formal input links.
+        extra = (data.ROOT/"reports/qualification",
+                 data.ROOT/"reports/documentation/20261012/crossfit_retention")
+        sidecars = [self.root.with_suffix(s) for s in (".dispatch.json", ".listener.json", ".listener.console.txt")]
+        return list(dict.fromkeys([*super().output_files(), *sidecars,
+                                   *(p for folder in extra for p in folder.rglob("*"))]))
+
+    def snapshot(self) -> dict:
+        return {**super().snapshot(), "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261012/crossfit_retention, all within this isolated workspace"}
+
 
 def projection(m: dict) -> dict:
     keys = ("t_A", "t_U", "t_S", "t_cf", "t_perm", "f", "h", "L", "s_F", "r_F", "s_I", "r_I", "W_F", "W_I")

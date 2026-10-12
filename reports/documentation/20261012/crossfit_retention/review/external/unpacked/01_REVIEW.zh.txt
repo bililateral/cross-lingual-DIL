@@ -1,0 +1,244 @@
+# C_cf 已批准合同与当前实现：针对性科研外审
+
+审查日期：2026-10-12。输入：review_input.zip；网页显示 review_input(20261012-061828).zip。
+
+## 一、结论先行
+
+研究方案可以保留，当前源码还不宜直接进入原生资格及其后的正式执行。发现 0 项 SCIENTIFIC_BLOCKER、2 项 REPRODUCIBILITY_DEFECT：R01 应在原生资格前修复；R02 应在正式运行前补齐。另有 3 项合理非阻断建议和 3 类 OUT_OF_SCOPE_OVERDESIGN。本判断不等于实现已经取得原生资格，更不等于 C_cf 已改善正式模型效果。
+
+R01 是原生核验夹具重复恢复同一 Adam 快照时的张量别名问题。按官方默认非 capturable、非 fused AdamW 的加载语义，第一次 S 配对更新会把保存的 baseline.step 从 288 改为 289，下一次 C_cf 开启更新在预期 288 的断言处失败。网页没有 PyTorch；这是包内代码结合官方实现语义的具体推导，尚未在项目 py310 上观察到该异常。当前 11 项 CPU 检查没有调用这段重复恢复入口，不能排除此问题。
+
+R02 是正式资源实际账漏计目录外已保留资格材料。Budget 只扫描正式 job 及其两个包装侧文件；正常资格目录独立于新建 job。合同要求这些资格材料计入 16GiB 新产物峰值。网页对原 Budget 类的受控小文件检查确认了这条漏计路径；这不代表实际正式产物已超限，也不否定投影中的 2GiB 小产物预留。
+
+最小推进路径是：修复 R01，补齐 R02，在原累计 CPU 预算内核对受影响行为并更新来源绑定；主执行者独立处置后，完成原定七次更新、累计不超过 600 秒的本地原生资格；只有新的实测投影不超过 16 小时／16GiB、现场资源与其他既定前提全部满足，才按既有授权开始一次正式运行。无需新增臂、种子、旧 C 诊断、创新搜索或另一次泛化审批。GPU／正式失败仍不自动重试。
+
+本审查认可的是“值得按固定范围检验的有限任务化增量”。主要研究问题仍是 C_cf 相对完整 S 的旧域未见账号排序改善，并同时交代新域、识别、校准和来源成本。C_cf−C_perm 只是本次原赋值与固定可行错配之差，不能据此识别 cross-fitting 的独立必要性。
+
+## 二、输入身份、授权与实际范围
+
+收到的 ZIP 已在阅读实现前核对，结果如下。
+
+| 项目 | 实际结果 |
+|---|---|
+| 用户给出的本地原名 | review_input.zip |
+| 实际网页附件名 | review_input(20261012-061828).zip |
+| 压缩包大小 | 570,664 字节 |
+| ZIP 成员数 | 64，无重复名称 |
+| 全部成员未压缩字节之和 | 1,044,502 字节 |
+| ZIP SHA256 | f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477 |
+| input_manifest.json | 12,882 字节；SHA256 daabcf95f741923fa8159ddfbf31bb1bd877ecf33c15c736478e42fdc844fa27 |
+| 清单与实物 | 63 个声明载荷全部大小／SHA256 相符；另一个成员为清单自身；无漏项、额外载荷或重复声明 |
+| CRC | 全部 ZIP 成员校验通过 |
+| 当前来源闭包 | 对 imports 作机械 AST 追踪，加合同／五个 schema／包装／监听，共 29 项，与清单相符 |
+
+逐成员结果和两轮冻结来源比较见 evidence/04_INPUT_IDENTITY.json、CPU_EVIDENCE_AUDIT.json。ZIP 内保留原输入包的逐字节副本 input/review_input.zip，方便主执行者独立复核。
+
+当前 authorization.json 的状态是 APPROVED_CONTRACT_SCOPE_CONDITIONAL_EXECUTION，已批准合同实现、CPU／GPU 资格和前提满足后的正式运行；旧静态稿中“待批准”“未实现”的句子按其历史时点解释。authorization.json 的 new_package_upload_authorized=false 是形成该记录时的状态，本轮用户已明确授权这个具体 SHA256 的附件审查。具体上传许可与科研执行许可仍分开；本报告不将其解释成公开推送或新增范围许可。
+
+实际阅读以本包为边界：主审全文阅读当前合同、implementation、authorization、review/request、五个 schema、四个 crossfit Python 入口及 shell 包装、新 crossfit 测试、record_replay 与 replay_diagnostics；按调用读取继承的优化器、存储、输入、数值、校准和纯指标函数。历史 crossfit 静态稿、原外审正文、F01—F12 JSON、primary_disposition 和两个继承合同均已阅读。旧外审的文献目录、搜索日志、旧输入身份／阅读声明和旧数学参考文件只作身份保留，不声称本次重新执行或重开文献审查。
+
+本轮用了三个同会话静态分工，分别核对目标／Memory、数据／评价、资源／资格；主审阅读关键入口、独立复核两项缺陷并整合结论。分工没有执行项目测试或接触项目服务器。03_READING_SCOPE.zh.txt 和对应 JSON 区分主审全文、定向范围、分工补读、机械身份核对与未执行内容；“29 个来源绑定”不等于“29 个文件的所有旧分支都全面审计”。
+
+本网页未连接项目 Linux，未安装依赖，未载入预训练模型、Memory、正式文本／标签、封存真值或凭据；没有 GPU 或正式运行。包内两个 Linux CPU 回执是提交证据，机械一致性可核对，但不冒充外审亲眼观察了远端现场。
+
+## 三、F01—F12 的复用与当前处置
+
+| 原 finding | 本次沿用的边界及实现判断 |
+|---|---|
+| F01 折外／混合目标 | O 的拟合群外隔离已接入；b 仍同时依赖 F、O 和本群训练标签，是折外支持的混合目标，不是独立折外估计或真实间隔置信下界。 |
+| F02 对称平移 | 当前合同采用主审补正：单查询子项的平移性质与全对称群项的全局共同平移分开；不承诺任意逐位 FP32 不变。 |
+| F03 FP32 | 出生、容量、错配及同态可行性复用 FP32 差值；严格零、非有限拒绝和平方下溢下的违约计数已接入。 |
+| F04 错配归因 | 块内多重集合及 F 可行性保持；不匹配 O 支持、松弛、未来活跃强度或梯度。当前合同没有作独立 OOF 必要性的伪承诺。 |
+| F05 可行性／退化 | 正下限降序的嵌套容量分配正确；全零或全部六群逐值相同停在 B／valid 前，没有重抽。 |
+| F06 有效强度 | 0.5 相同不等于强度相同；保持项可能始终无违约梯度，D=0 不保证 MAP。正常日志保留启用、下限、违约和损失；不调 λ。 |
+| F07 VJP／实际作用 | 新回调已接入代理表、head VJP、encoder、共同 clip 和 Adam；真实 CPU 独立直接参考有实质覆盖。原生作用证据仍待 R01 修复后完成。 |
+| F08 Memory／诊断 | 自足 b Memory、双方来源身份、完整序列化上限和候选下限诊断已接入；候选不把 b 当完整记录对表。 |
+| F09 AB／B 终点／共享 A | 40 群、共享 A 三次恢复、各自 Memory、B 不 retain 已接入；没有偷用旧 ABC 端点包装。 |
+| F10 成本／条件统计 | 1440／2304／4／24、完整 S、额外双来源、三角色和整群配对统计保留。共享不能抹掉独立候选的来源成本。 |
+| F11 创新定位 | 复用已关闭的有限增量定位，不重开首创搜索，不将普通适配升级为新基础原理。 |
+| F12 资源 | 旧 12 小时草案已被当前获准 16 小时及完整公式替代；调用量可核对，原生实测未有，实际磁盘账另见 R02。 |
+
+## 四、目标、梯度与完整 S
+
+对应文件／函数：scripts/step28_crossfit_retention.py 的 indices、margins、birth、floor_loss、objective、update（21—145 行）；scripts/step28_record_replay.py 的 account_logits、objective、backward_group、update（113—208 行）。
+
+每群 28 查询，由八个 K2、四个 K3 组成，比较数为 16×1×26＋12×2×25＝1016。每条比较权重固定为 1/[28|P_q||N_q|]：K2 为 1/728，K3 为 1/1400；全群权重和为 1，不随启用条数改变。按规范的 q、p、n 顺序产生目标。
+
+实际定义为：mF=FP32[F(q,p)−F(q,n)]，mO 同理；仅当 mF>0 且 mO>0 才令 b=min(mF,mO)，否则精确为零。b=0 的整个项被关闭，不要求当前间隔达到零。输入、差值、目标及损失有限性分别检查；出生和错配容量不先转 FP64 重减。
+
+    D(g)=Σ_e w_e 1[b_e>0] max(0,b_e−(s_qp−s_qn))²
+    J_cf=Bbar(current)＋0.1 Bbar(history)＋0.5 D(history)
+    Bbar=[B(A0)＋B(A1)]/2，B=BCE＋query-rank＋0.5 top5-hard。
+
+0.1 只缩放历史监督，0.5 单独缩放保持项。对启用且违反的单条比较，令 r=b−(s_qp−s_qn)>0，D 对正／负分数的偏导为 −2wr／+2wr，乘外层 0.5 后为 −wr／+wr。对称共享边累加其参与的各查询贡献；账号均分对跨账号记录对的导数为 1/(r_i r_j)，不凭对称存储额外乘二。违约用严格 delta<b 计数，平方下溢显示零时仍保留违约信息。
+
+实际反传并未停在 detached 表：先用一次 live encoder 生成 z；用 detached 表求损失对表的代理梯度；以 leaf z 分块重算确定性、无 dropout 的 head，累加 head 参数梯度和 leaf.grad；最后 z.backward(leaf.grad) 回到 encoder。current 和 history 两份梯度完成后才统一 clip=1，再执行一次 AdamW。单项偏导不保证最终更新方向、间隔单调或 MAP 改善，因为监督、全局裁剪、Adam 状态共同作用。
+
+完整 S 保留 Bbar、自然分组 D0、完整 FP32 记录对来源表、A1 同控重组监督、0.1／0.5、共同裁剪和延续 Adam；新增包装对 S 传入默认回调 None。main_rng_order 仍为 ABC、只使用 stage 1/2，current schedule、history draw、dropout／regroup 种子不包含臂名。没有发现以改名为 AB 或候选臂名造成主随机流漂移。第二轮 CPU 还将 S 等价检查补到了真实带历史更新，不只比较首阶段无历史状态。
+
+tests/test_step28_crossfit_retention.py 的出生测试覆盖当前双正 min 和不支持等手写例；独立逐三元组 floor 参考及 97—161 行真实 tiny encoder／head 对照，针对该夹具上的零哨兵、固定分母、损失／梯度接线、encoder／head 回传和实际 Adam 更新偏差提供实质检查。不能据这些有限案例声称能检出所有错误 min 实现：literal_floor 本身不重算出生，现有出生例主要是 F 大于 O。直接参考不使用代理表和分块 VJP，账号评分用 literal_scores 跨记录枚举；逐参数比较共同 clip 后梯度及 Adam 后参数。它复用未改的 record_vectors、assignment 和监督 primitive，故是针对新接线的独立参考，不是完全独立重写整个 BGE 系统。
+
+## 五、两来源、一次错配和历史生命周期
+
+对应文件／函数：crossfit_retention.py 的 folds、source_schedule、source_update、permute、Memory；crossfit_retention_run.py 的 fresh、auxiliary、target_memories、train、restore_common、checkpoint。
+
+两个来源均由 fresh 重新加载同一 pre-A 模型并建立空 Adam；完整 model／optimizer 摘要必须等于主 pre-A 身份，不能从学过全 A 的主模型接着训练。48 个完整 fit 群按固定 SHA256 UID 规则分为 24／24；U0 只训练另一折，U1 对称。正式入口要求每源六轮共 144 次实际 Adam 更新，计数为 t，编码器学习率索引为 2t；头学习率 1e−3。来源 role 派生独立的排列、重组及 dropout 流。这里是对实际调用路径的判断；现有完整调度 CPU 夹具替换了这些更新，尚无两份来源各 144 步真实模型执行的本轮证据。
+
+eval_groups 仅是六个最终存活群在本折的无标签重建对象。auxiliary 拒绝训练／评价 UID 交集和带标签的 eval；按入口逻辑，某折没有存活群时也会走满 144 次来源训练，评分函数显式处理空列表。只在 A 末六群生成 F 和合计六群 O，不评价全 48 群以挑来源，不产生 B 末新来源或下阶段目标。
+
+错配只建立一个 PCG64(20261012)，六群按 UTF-8 UID 顺序，块内按 q、p、n 规范序。每个 (g,q,p) 的正 b 从大到小、同值按原索引处理，从未用且 mF≥b 的规范负候选中均匀抽取；剩余位置为零。原赋值可行，容量合格集合嵌套，因此这个降序过程可完成。实现检查逐块完整多重集合及 F 出生零损失／零违约，没有重抽或事后强度匹配。
+
+全六群 active_total=0，或 changed_total=0 时，train 在任何 B 更新和 valid 开放前返回 DEGENERATE_STOP_BEFORE_B_VALID。全部相同可以是数学退化，不应自动修成“强制不同”。部分相同如实报告。该对照没有保持 O 支持、F 松弛、负例难度和未来梯度，不能从胜 C_perm 单独推出跨身份信息的独立因果贡献。
+
+候选 Memory.to_bytes 包括完整存活记录／训练标签／账号记录顺序、origins、fold 和 F/O 来源身份、schema／dtype、Algorithm R seen／RNG、stage／count／draw RNG、first／current map 及恢复辅助 RNG。六群裸 b 的 24,384 字节只是其中一部分；完整 payload 超过 1,048,576 字节即拒绝，from_bytes 要逐字节往返。第一轮遗漏的 F 身份已在第二轮补全，冻结差异可复核。
+
+B 分支从各自 A_<arm>.bin 恢复自身 Memory；共同 model／Adam 从共享 A 完整文件实际恢复、清空残留梯度，再恢复逐模块模式和 RNG。三个 starts 比较实际 model、Adam、RNG、modes 和成员身份，Memory 目标载荷有意不同，不错误要求全部 Memory 哈希相同。F/O 小评分档案只供出生审计；候选恢复／训练路径不读取它们重建 b。共享 A 只保存一份；B 终点不调用 retain，候选 retain 本身也拒绝。
+
+四个端点逐一保存／读回自身 Memory，实际保存／恢复 model 和 Adam，在全部 12 calibration＋40 valid 文本上逐位核对恢复前后 raw 分数；推理导出另实际恢复并核对模型身份，不额外声称又做了一遍推理全量前向。B 完整工作状态核对后留身份删除，共享 A 保留到三分支结束。没有发现需要补充 F/O 档案依赖才能恢复的缺项。实际正式六群文本大小仍须现场序列化通过；手写小载荷不能证明任意合法文本组合均小于 1MiB。
+
+## 六、数据边界、盲门、评价与正常曲线
+
+crossfit_retention_run.public_inputs 在处理 ABC 合表时先技术扫描／校验，再按允许 UID 筛除 C，之后才构造 Group；attach_labels 在数值转换和 align_labels 前过滤 C。tokenizer 只接收到这些 Group 的标题／描述。没有发现 C 进入模型、来源、校准或评价。不能把这个结论写成“从未技术扫描 C 行”。
+
+step28_bge_continual_run.parse_once 先持久登记尝试次数，再调用 loader，失败也消费次数。本轮 train 解析一次供离线分发，学习函数只取得当前 fit 和自身历史；calibration 不进入 encoder 更新。open_valid 顺序为完整 blind_gate、保存 before_valid、再进行一次 development 标签解析。不存在先开 valid 再倒填门的正常执行路径。
+
+blind_gate（457—584 行）核对当前来源身份、1440 物理更新／2304 梯度群呈现、两个来源各 144 实际计数及正确 LR／群序列、四端点、三共同起点、独立重算折与 Algorithm R 六群、目标出生／非退化、完整和推理恢复、每段 288 步 current／history 序列、Memory 不 retain／不刷新、40 群三角色预测和 24 份诊断。缺任何要求或不一致均抛错；不是只读一个 COMPLETE 字符串。CPU 编排删除点／诊断／来源／start、关闭恢复标志时 valid 仍保持未开，但这仍是受控编排证据。
+
+未发现 valid 开放前计算 valid 指标、选最好 epoch 或据结果调整目标的代码路径。训练／fit／cache 日志、calibration 拟合及 F/O 出生信息会存在，合同允许查看但不允许用来换折、改阈值或调臂；这是当前固定执行规则，不能把“没有 valid 标签”夸大成没有任何可观察信息。
+
+评价实际走新的 collect／finalize，调用底层 group_metrics，没有复用旧 60×22／ABC 三阶段包装。每端点三角色各保存 (40,22) 数值矩阵和 40 个混淆计数，每群 20 正对、358 负对；全 40 群合计正 800、负 14,320。22 指标为 AP、梯形 PR-AUC、ROC-AUC、FPR≤1% 召回、Brier、log_loss、precision、recall、F1、specificity、balanced accuracy、MCC、MAP、MRR、Recall@1/3/5/10、NDCG@1/3/5/10。分类阈值为本角色 logit≥0；曲线并列成块，检索排除自身，按公开规范次序处理并列。
+
+stage-cal 仅用当前域 12 个 calibration 群拟合既有正斜率仿射映射；first-cal 固定共享 A 的映射。raw 是 FP32，仿射结果 FP64，继续核对严格顺序和精确并列。没有选择校准方案或多次拟合挑结果。正仿射保排序，但阈值识别／概率校准可以变化，因此三个角色仍须并列。
+
+finalize 一次 PCG64(20260930) 产生 (5000,2,20) 域内群抽样，各臂／端点／角色／指标共用。先求同群候选减对手或 B 末减 A 末，再抽样均值和 2.5%／97.5% 分位；不把 28 queries 或 1016 比较当独立样本。固定 O_AB 为 B 末 A 域 MAP、N_AB 为 B 末 B 域 MAP，并列共享 A 绝对水平及旧域变化。分类汇总调用 base.rates 先合 TP/FP/FN/TN 再算率，宏平均另列。没有总 PASS 门、总体置换 p 值或非劣效证明。
+
+replay_diagnostics.neutral 保存／恢复逐模块模式和 Python／NumPy／Torch／CUDA RNG，包围 eval／inference_mode。候选诊断直接用已算的 cache A0 分数和自身 b，S 保留完整表残差额外前向。正常曲线固定六点和 epoch1→6，不选轮、不开 early stopping；B fit 对 B-valid，A 出生 cache 对 A-valid，首阶段空 cache 为 N/A。CPU 中性检查还比较参数、Adam、已有梯度、Memory 和随后一次实际候选更新；它是小模型、缩小前向人口的检查，不能冒充全 BGE 48／6／40 原生循环。
+
+## 七、原生资格、调用量、IO 与硬限
+
+原定七次物理更新的设计可以保留：一次主 current 首次 Adam 分配；一次从 pre-A／空 Adam 开始的辅助首步；五次从共同合成 counter=288 起点的 S、C_cf 开启、关闭、中性诊断后重复开启、C_perm 配对更新。288 是显式合成计数，矩来自一次真实更新，代码没有把它说成完整 A 训练。两个 O 评分类别在同一个辅助首步末模型上重复 eval，也没有伪称已训练两份原生 144 步来源。
+
+最大形状是 28×8=224 记录，标题／描述共 448 文本，逐条 tokenizer 长度必须恰为 256，否则拒绝；实际走规定 microbatch4、BF16 encoder、FP32 参数／头／梯度／Adam。开启／关闭要求 encoder 和 head 梯度及参数更新可区分；中性重复要求下一实际更新和状态逐位一致。修复 R01 是这些比较有效的先决条件。开启／关闭比较位于共同 clip 后，见 N01 的解释限定。
+
+2684 群纯前向可从入口逐项复核：
+
+| 用途 | 群次数 |
+|---|---:|
+| A 六次诊断：6×(48+40) | 528 |
+| B_S 六次：6×(48+6+40+6 额外完整表诊断) | 600 |
+| 两候选 B 六次：2×6×(48+6+40) | 1128 |
+| 四端点完整恢复前后：4×2×(12+40) | 416 |
+| A 末六群 F、合计六群 O | 12 |
+| 合计 | 2684 |
+
+模型初始化是主 A、U0、U1 共三次；三 B 复用同结构对象恢复，不新增预训练加载。四端点各完整保存／恢复一次，加三个 B 共同起点恢复，共 4sF＋7rF；四推理各保存／恢复一次。原生实际 save_state／restore_state 读取写入有非空 Adam 的真实文件、核对摘要、测 W_F/W_I，再留身份删除资格临时权重。
+
+    T_train=288(t_A+t_U+t_S+t_cf+t_perm)
+    T_eval=2684f+6h
+    T_IO=3L+4sF+7rF+4sI+4rI
+    T_projected=1.25×(T_train+T_eval+T_IO+3600秒)
+    W_projected=ceil[1.10×(2W_F+4W_I+2GiB)]
+
+大文件排程最多同时保留共享 A 完整、当前 B 完整和四推理；两来源不落完整权重。checkpoint_reserve 是完整 3P＋64MiB、推理 P＋64MiB，未发现凭空多计第四份参数状态或省掉大型恢复 IO 的当前证据。3600 秒是固定预留，不是本次实测；25%／10% 余量也不是完成保证。h 的测量覆盖限制见 N02。
+
+入口在正式输入之前要求当前 CPU／原生来源绑定、七次更新与新项作用／中性结果、重新计算投影。正式包装从启动记时，timeout 57595 秒加 5 秒 kill-after；Budget 承接包装开始时间并检查墙钟、RSS、CUDA reserved、目录字节，主循环与 watchdog 持续检查。除 R02 的磁盘对象范围外，没有发现将加载、解析、评价和收尾排除出 16 小时的路径。监控有采样周期，不能解释成每纳秒原子限额；大 checkpoint 写入前 reserve 和外层 timeout 承担对应约束。
+
+一次性监听先用独占 claim 防重复，只 launch 一次；看到训练在 method.update 返回且真实 Adam 递增后打印的 updates completed≥1，才删除活动监听源码。子进程失败不会重启，claim 不清零。现有 CPU 对这个行为是 fake-child 编排检查；本轮没有实际部署或观测服务器监听。
+
+## 八、finding 清单：触发、后果和最小处理
+
+### SCIENTIFIC_BLOCKER：0 项
+
+在限定设计与当前实际目标中未找到足以否定科学可检验性的具体错误。此项为零不等于可以绕过下面的复现缺陷、原生资格或资源门。
+
+### R01 — REPRODUCIBILITY_DEFECT，高：原生共同 Adam baseline 被恢复后更新污染
+
+位置：scripts/step28_crossfit_retention_verify.py state（27—29）、restore（32—39，尤其 34）、native（75—85、109—151）；关联 crossfit_retention.update（139—145）、continual_population.make_optimizer（32—40）。
+
+触发：默认非 capturable／非 fused AdamW，保存的 baseline["adam"] 被多次直接传给 optimizer.load_state_dict。官方 Optimizer 的 step 处理在此条件下保留输入张量；Adam 的 CPU step 随更新原地递增。[W1][W2]
+
+后果：state() 初次 cpu_copy 并不保证以后 load 时仍隔离。第一次 paired_S 从 288 到 289 同时改掉 saved baseline；下一次 paired_on restore 取到 289，method.update 预期 288，因此在第四个拟议实际更新之前拒绝，原定七次无法完成。若删计数断言继续跑，则 on/off／中性重复不再同起点，科学作用证据失效。不能用改计数、关闭检查或更换 optimizer 掩盖。
+
+证据等级：包内调用链＋官方当前默认实现的静态推导；网页纯 Python 别名模型复现该语义的后果，未运行实际 torch。附件 CPU 回执没有记录项目 torch 精确版本，本报告不虚构该版本；附极小 torch_restore_probe.py 供主执行者在既有 CPU 范围核对实际版本。它在本网页明确未执行。正式 core.restore_state 每次从文件新 torch.load，不是重复传入同一内存快照；未发现 R01 可据此扩展成正式共享 A 恢复缺陷。
+
+最小修复：restore 的 Adam 加载改为 optimizer.load_state_dict(cpu_copy(saved["adam"]))，或等价逐张量深拷贝。沿用现有 cpu_copy，不新造状态框架。在现有本轮手写 CPU 套件加固定 baseline 连续 restore→真实 update 的窄检查，核对每次 288→289 且保存的全部 Adam 状态不变。既定原生仍为七次更新，不能多加来源训练或自动重试。
+
+### R02 — REPRODUCIBILITY_DEFECT，中：正式实际磁盘账未涵盖保留资格材料
+
+位置：scripts/step28_crossfit_retention_run.py Budget（184—187）、execute（689—705）；继承 scripts/step28_record_replay_run.py Budget.check（74—101，尤其 84）；当前合同第 175、207—211 行；CPU launch.sh 的 reports/qualification/cpu/attempt02 布局。
+
+触发：已保留 CPU／GPU 资格证据位于新正式 job 目录外。当前 Budget 只计 job 树、job.console.txt、job.wrapper.txt；execute 要求 job 尚不存在，资格必须先已取得，因此正常布局就有此情况。
+
+后果：peak_output_bytes 和实际 16GiB 拒绝条件小于合同“本次新增产物”的范围。投影 2GiB 预留不能代替实际合计；不是证明当前已超预算。网页原类受控检查中，job=7000、资格=4000、上限=10000 字节，实际类仍接受并报 peak=7000，尽管两者预先合计 11000。
+
+最小修复：正式前量出本次已封存资格材料的固定字节基数，在现有 Budget 的 used、peak、reserve 判断中加一次，记录这一口径；若采用共同输出根则去重 job，不能把既有无关项目树全部扫入。必要的同作业监听侧产物一并按实际归属计数。保留原 16GiB 上限、既有 checkpoint 排程和原资源失败处理。用一例“job 单独合格但加资格超限”的小文件检查即可，不扩科研测试。
+
+### N01 — 合理非阻断建议：新增 encoder 作用的原生证据用语
+
+位置：verify.native 135—144；record_replay.update 203—207；真实直接参考 tests 97—131。
+
+触发：把 clip 后 on/off encoder 梯度差称为独立测得的 ∂D/∂encoder。后果：head 梯度变化也可能通过全局 clip 系数间接改变 encoder 梯度，单靠这个比较不隔离直接通路。最小处理：准确称“新项导致整体真实 encoder/head 更新可区分”；现有 CPU direct-autograd 和静态 z.backward 已支持接通。如需加强，在同样七次更新内部记录 clip 前各组件梯度，不新增训练。不是科学阻断。
+
+### N02 — 合理非阻断建议：h 不宜被解释为所有支持模式的严格计时上界
+
+位置：verify.native.birth 96—104；run.projection 190—201；合同 §8.1。
+
+触发：本次手写 F/O 出生得到稀疏或全零支持，仍把单次 h 称为任意密度的严格上界。后果：未覆盖最密集错配循环；这属于测量外推限定，不是已证实超时。最小处理：在既定资格内用已有手写全启用可行分数补测目标生成／错配并取 max，或明确 h 是所测最大值且保留原余量／硬限。不新增模型更新或正式样本。只有六次 h，现有固定预留很大，无依据因此重做原生排程。
+
+### N03 — 合理非阻断建议：正式报告沿用准确指标口径
+
+位置：continual_population_evaluate.classification 58—70、group_metrics 225—228；chinese_base.rates 680—685；crossfit_run.finalize 642—649；diagnostics.curve_comparison。
+
+触发：把评价 log_loss／曲线称为训练 Bbar 或未裁剪校准 NLL，或声称 fixed_half_classification 已输出全部 22 指标的 pooled 版本。后果：解释混淆。最小处理：明确 log_loss 是既有裁剪概率指标，pooled 字段为计数及 FPR／recall／precision／F1，其他指标在完整逐群矩阵／macro；不修改冻结指标或另加统计。
+
+### O01 — OUT_OF_SCOPE_OVERDESIGN：重开创新／扩臂／扩种子／旧 C 诊断
+
+位置：当前合同 §1、§3、§6；policy methods／seed／comparisons；历史 primary_disposition 的 F01—F12。
+
+触发：因本轮没有正式效果，就要求文献穷尽、新臂、新折／种子、来源强度匹配或重诊断旧 C。后果：改变研究问题、成本及已批准比较，不修复 R01/R02。最小处理：保留固定三臂与有限解释，完成本轮后据实报告；无当前代码修复需要。
+
+### O02 — OUT_OF_SCOPE_OVERDESIGN：为单个恢复／计数问题新造通用框架
+
+位置：verify.restore、run.Budget、parse_once、blind_gate。
+
+触发：扩成通用 checkpoint 管理、权限状态机、全项目磁盘扫描、签名平台或历史全量回归。后果：扩大代码面和核验成本，没有新的具体失效证据。最小处理：一处快照克隆、一个固定资格字节基数及现有套件内窄断言；保留当前有效盲门。
+
+### O03 — OUT_OF_SCOPE_OVERDESIGN：把缺原生资格补成额外科研运行
+
+位置：verify.native 的七次更新及合同 §7—§8；run.validate_gate。
+
+触发：要求本网页上传正式模型／标签、GPU 跑两份完整 144 步来源、全量 48/6/40 诊断或额外更新才可审查。后果：越过分层资格范围，增加数据和计算而不能替代本地指定资格。最小处理：修复具体夹具后完成原定资格，保留 CPU 编排与原生部件证据的边界；不向用户索取模型或正式标签。
+
+## 九、已有 CPU 证据能复用到哪里
+
+| 原件 | tests／失败／错误／跳过 | 外层耗时 | 与当前 29 来源 |
+|---|---|---:|---|
+| attempt01 | 11／0／0／0 | 16.842430269 秒 | 25 同、4 不同；仅证明自己的冻结源码 |
+| attempt02 | 11／0／0／0 | 16.717286899 秒 | 29／29 全同；当前直接来源回执 |
+
+外层累计 33.559717168 秒，保守按 34／300 秒，剩余 266 秒。第二轮内部 cumulative=33.29814686300233 不是更完整的外层账；第一轮 prior=0，第二轮 prior=17 保守继承。两轮是相同 11 项各通过一次，不是 22 项独立检查。两份 tar 含 29 个普通来源文件及 4 个目录项，普通文件均与各自 result.json 相符。第二轮补全 F/O 身份、补 S 带历史等价检查和相关夹具；四文件差异随报告给出。
+
+可复用层级：
+
+| 检查类型 | 实際做到 | 不得外推 |
+|---|---|---|
+| floor 数学／数值 | 手写逐三元枚举、固定权重、零哨兵、双正 min、FP32 溢出／下溢与严格违约 | 正式下限分布、正式效果 |
+| 真实小模型 autograd／Adam | 完整 head 图与分块 VJP 逐参数梯度／实际更新对照；S 默认一致；辅助首步真实 Adam=1、LR 索引2 | BGE 最大形状或两份来源各144步实际训练 |
+| Memory／错配／边界 | 真实序列化、往返、上限拒绝、块多重集合、F 可行性、退化停止 | 正式六群的实际字节大小、来源泛化 |
+| 完整调度 | 实际 train/checkpoint/Memory/诊断 IO/盲门；1152 main 与288 source 调用、4端点24诊断，明确 mock 更新／前向／指标／校准 | 1440 次真实模型更新或完整模型效果 |
+| 诊断中性 | 少量真实 tiny 前向、已有梯度／状态／RNG／Memory 和随后实际更新一致；人口用重复小返回扩展 | 全量原生诊断压力和运行时间 |
+| 数据／统计／监听 | C 非数值标签拒接入、先记后开；真实40×22组织、代表性配对分位、计数汇总；fake child 单次监听 | 现场数据身份新认证、原生资源与服务器监听已经发生 |
+
+没有原生 GPU 回执，没有正式数据／模型效应。不能将“测试 PASS”“静态接通”“controlled scheduler 完成”改写为旧域排序改善、新域无损或识别／校准收益。
+
+## 十、本网页独立参考与交付边界
+
+已执行 reference/reference.py，环境为 ChatGPT 网页工作区 Python 3.12.14、Linux-6.18.44-x86_64-with-glibc2.39；不是项目 Linuxpy310。torch 和 psutil 均未安装。源代码、手写 inputs、results、execution 和原 stdout 日志全部随包。
+
+R01 参考仅以 Python 可变对象演示已明确假设的加载别名语义：未克隆时保存步数由288变289、第二次预期288被拒；每次克隆后保存快照不变。它没有验证实际 PyTorch 的装载行为、autograd 或 Adam，不能独立替代 [W1][W2] 和本地窄检查。torch_restore_probe.py 是另附但未执行的真实 PyTorch 小探针，使用包内 state／restore／cpu_copy 函数的 AST、手写 CPU 张量，无项目模块导入、无模型／数据；仅供主执行者按既有范围判断是否使用。
+
+R02 参考读取原包 Budget 类并保持类正文不变，资源探针及 policy 使用明示小返回，文件扫描真实执行。结果确认“只计 job 会漏掉外部资格树”，不测 BGE 运行时间、GPU、RSS 或真实正式峰值。审查方的机械 tar 核对脚本首轮误把目录项也要求为普通文件而失败，随后改为区分目录／普通文件；原 stderr 和成功日志均保留，此为审查脚本问题，不是输入包缺陷。
+
+正式推进依次需要：R01／R02 最小处置；当前来源绑定的受影响 CPU 证据及主执行者独立复核；原定本地七更新／600秒资格；实测时间／存储投影、现场单 CPU／单 GPU0 资源与既有盲门。满足后可按当前已批准合同运行。本外审不创建 execution gate，不代替本地原生资格，也不把外审自述当作主执行者的最终裁决。
+
+引用与定位：本报告所有包内路径均相对原 input/review_input.zip 根；行号对应本次 SHA 绑定版本。W1 为 PyTorch 官方 Optimizer 状态策略源码（https://github.com/pytorch/pytorch/blob/main/torch/optim/optimizer.py）；W2 为官方 Adam 实现（https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py）。本次仅为 R01 查阅这项依赖实现语义，没有重开创新／近邻文献搜索；详情及检索限制见 05_REFERENCE_SCOPE.zh.txt。

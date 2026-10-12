@@ -1,0 +1,30 @@
+{
+  "scope": "WEB_REVIEW_HANDWRITTEN_ONLY_NOT_PROJECT_LINUXPY310",
+  "input_zip_sha256": "f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477",
+  "alias_semantic_model": {
+    "baseline_step": 288,
+    "attempts": 2,
+    "assumption": "Default non-capturable, non-fused optimizer restore retains the incoming mutable CPU step object; the update increments that object in place. This model does NOT execute PyTorch or AdamW."
+  },
+  "budget_controlled_fixture": {
+    "formal_job_bytes": 7000,
+    "retained_qualification_bytes": 4000,
+    "maximum_output_bytes": 10000,
+    "actual_class": "scripts/step28_record_replay_run.py:Budget",
+    "controlled_dependencies": "Only psutil RSS, torch.cuda resource probes, policy limits and JSON writer are substituted. The submitted Budget class and its actual filesystem scan execute unchanged."
+  },
+  "torch_probe_handwritten": {
+    "baseline_step": 288,
+    "initial_parameters": [0.25, -0.5],
+    "linear_loss_coefficients": [1.0, -2.0],
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "betas": [0.9, 0.999],
+    "eps": 1e-8,
+    "foreach": false,
+    "capturable": false,
+    "fused": false,
+    "device": "cpu",
+    "status_in_this_web_review": "NOT_EXECUTED_TORCH_UNAVAILABLE"
+  }
+}

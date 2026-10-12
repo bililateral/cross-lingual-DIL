@@ -71,6 +71,9 @@ class Budget:
                 "peak_rss_bytes": self.peak_rss, "peak_cuda_reserved_bytes": self.peak_reserved,
                 "phase": self.phase, "limits": self.limits}
 
+    def output_files(self):
+        return [*self.root.rglob("*"), self.root.with_suffix(".console.txt"), self.root.with_suffix(".wrapper.txt")]
+
     def check(self, reserve: int = 0) -> None:
         import torch
         with self.lock:
@@ -81,7 +84,7 @@ class Budget:
             projected_bytes = self.peak_bytes
             if reserve or elapsed-self.last_disk >= 10:
                 used = 0
-                for path in [*self.root.rglob("*"), self.root.with_suffix(".console.txt"), self.root.with_suffix(".wrapper.txt")]:
+                for path in self.output_files():
                     try:
                         if path.is_file():
                             used += path.stat().st_size
