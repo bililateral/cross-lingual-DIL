@@ -60,12 +60,12 @@ def metrics(groups: list, values: np.ndarray) -> np.ndarray:
 
 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
             c: dict, arm: str, order: str, stage: int, epoch: int, root: Path,
-            point: str, check: Callable = lambda: None) -> dict:
+            point: str, check: Callable = lambda: None, scope: str = "ABC") -> dict:
     """Called by the actual training loop after every 48 updates; never loads labels."""
     import torch
     if epoch not in range(1, 7) or parent.adam_step(optimizer) != (stage-1)*288+epoch*48:
         raise ValueError("Diagnostic not at the registered epoch endpoint")
-    if len(current) != 48 or len(valid) != 60 or any(g.labels is not None for g in valid):
+    if scope not in ("ABC", "AB") or len(current) != 48 or len(valid) != 20*len(scope) or any(g.labels is not None for g in valid):
         raise ValueError("Diagnostic fit/valid scope differs")
     cache = [] if memory is None else list(memory.reservoir.groups)
     if len(cache) != (0 if stage == 1 else 6):
@@ -85,6 +85,11 @@ def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
                 e0 = cache_scores[i] - memory.references[group.uid]
                 errors.append({"uid": group.uid, "D0": float(np.mean(e0.astype(np.float64)**2)),
                                "D1": None, "residual_cross_mean": None, "residual_difference_mse": None})
+            elif arm in ("C_cf", "C_perm"):
+                from step28_crossfit_retention import floor_loss
+                # The saved score is the actual FP32 A0 pooling result. No extra forward.
+                _, details = floor_loss(torch.from_numpy(cache_scores[i]), group, memory.tables[group.uid])
+                errors.append({"uid": group.uid, **details})
             else:
                 live = record.reference(model, group, c, check)
                 target = memory.tables[group.uid]
@@ -156,9 +161,9 @@ def curve_comparison(train: np.ndarray, valid: np.ndarray, seed: int) -> dict:
             "limits": "No absence proof, causal attribution, seed coverage, selection-bias correction, or early stopping."}
 
 
-def evaluate(root: Path, manifest: dict, labelled: list, partition: dict, out: Path) -> dict:
+def evaluate(root: Path, manifest: dict, labelled: list, partition: dict, out: Path, scope: str = "ABC") -> dict:
     """Only the caller after complete blind gates may supply newly opened valid."""
-    if [g.uid for g in labelled] != [r["group_uid"] for r in partition["development"]]:
+    if scope not in ("ABC", "AB") or len(labelled) != 20*len(scope) or [g.uid for g in labelled] != [r["group_uid"] for r in partition["development"]]:
         raise ValueError("Valid group order mismatch")
     valid_domains = [r["domain"] for r in partition["development"]]
     report = {"columns": list(COLUMNS), "points": {}, "group_metrics": {}}
@@ -174,7 +179,7 @@ def evaluate(root: Path, manifest: dict, labelled: list, partition: dict, out: P
                     raise ValueError("Curve population changed within phase")
             for role in ("fit", "cache"):
                 curves[role].append(previous.array(root, entry[role], (len(entry[role+"_ids"]),3), np.float64))
-            values = metrics(labelled, previous.array(root, entry["valid_blind"], (60,378), np.float32))
+            values = metrics(labelled, previous.array(root, entry["valid_blind"], (20*len(scope),378), np.float32))
             curves["valid"].append(values)
             report["group_metrics"][f"{point}_epoch{entry['epoch']}"] = previous.save_array(out/f"{point}_epoch{entry['epoch']}_valid_metrics.npy", values, out)
         curves = {k: np.stack(v) for k,v in curves.items()}

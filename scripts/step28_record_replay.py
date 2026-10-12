@@ -158,7 +158,7 @@ def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
 
 def backward_group(model: Any, group: data.Group, c: dict, arm: str,
                    dropout_seed: int, regroup_seed: int, reference: np.ndarray | None,
-                   check: Callable = lambda: None) -> dict:
+                   check: Callable = lambda: None, objective_fn: Callable | None = None) -> dict:
     """One live encoder graph; exact chain rule through chunked deterministic head."""
     import torch
     torch.manual_seed(dropout_seed)
@@ -166,7 +166,7 @@ def backward_group(model: Any, group: data.Group, c: dict, arm: str,
     with torch.no_grad():
         values = pair_table(model, z.detach(), check)
     proxy = values.detach().requires_grad_(True)
-    loss, log = objective(proxy, group, regroup_seed, arm, reference)
+    loss, log = (objective_fn or objective)(proxy, group, regroup_seed, arm, reference)
     gradient, = torch.autograd.grad(loss, proxy)
     leaf = z.detach().requires_grad_(True)
     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
@@ -184,7 +184,8 @@ def backward_group(model: Any, group: data.Group, c: dict, arm: str,
 
 def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
            reference: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
-           step: int, check: Callable = lambda: None, observe: Callable | None = None) -> dict:
+           step: int, check: Callable = lambda: None, observe: Callable | None = None,
+           objective_fn: Callable | None = None) -> dict:
     import torch
     model.train()
     optimizer.zero_grad(set_to_none=True)
@@ -196,7 +197,8 @@ def update(model: Any, optimizer: Any, current: data.Group, history: data.Group 
             continue
         logs[role] = backward_group(model, group, c, arm,
             data.seed_for(20260918, order, stage, step, role, "dropout"),
-            data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check)
+            data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check,
+            objective_fn=objective_fn)
         if observe is not None:
             observe(role, logs[role])
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)

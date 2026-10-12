@@ -2,10 +2,11 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-用户最新接受“实在找不到的话，用一个有点创新性的方案做算了”。当前收敛为[折外支持的历史排序间隔保持](../reports/documentation/20261011/retention_design/crossfit.zh.txt)，静态外审与[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)已完成，建议进入实现前合同／资格准备；尚未实现或证明有效。原稿保持冻结，下一阶段须同时采用主审对平移、混合目标及错配归因的补正。此前[信息采集与跨身份作用工作稿](../reports/documentation/20261011/retention_design/acquisition.zh.txt)及已关闭候选保留。完整S仍为主要内部对照，旧C单独诊断不恢复；新运行／读取／预算不转用下列历史许可。
+当前执行以已获用户明确批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)为准，见交接顶部。完整S为主要内部对照，S／C_cf／C_perm、s0 A→B固定。静态[原稿](../reports/documentation/20261011/retention_design/crossfit.zh.txt)及[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)保持原件；补正已落实到合同与实现，Linux手写CPU已完成，效果及原生资格尚未知。后续实现外审／独立处置、原生资格及完整预算／资源门满足后按已有授权正式运行。旧C单独诊断不恢复，旧历史许可不转用。
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [C_cf执行合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md) | 当前执行依据，用户已批准范围并要求实现、核验及满足前提后正式运行。完整S／C_cf／C_perm、A→B、1440更新／2304梯度群呈现；CPU300秒、原生600秒、正式16小时／16GiB，标签各一次及统一盲门。实现／CPU、实现外审／独立处置、原生与完整预算／资源门依次落实；旧静态稿中的待批准草案不作为当前阻断。 |
 | [C折外支持的历史排序间隔保持](../reports/documentation/20261011/retention_design/crossfit.zh.txt) | 静态外审／[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)已完成，按有限增量策略推荐继续准备。完整群折外来源与全域来源共同支持的单边正负间隔，替换候选自己的D0，完整S不变。S／C_cf／可行错配C_perm能比较系统替换及原赋值相对本次错配，不能证明折外信息的独立必要性；已知cross-fitting／排序KD构件不冒称首创。拟议A→B、1,440更新／2,304梯度群呈现；新目标接线、Memory诊断、A/B评价、共享A和完整预算投影待落实，访问与12小时／16GiB等未获具体批准。尚未实现／运行或建立效果；[完整回收状态](../reports/documentation/20261011/retention_design/crossfit_review/submission.json) |
 | [C跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt) | 静态外审／[独立主审及补正](../reports/documentation/20261011/retention_design/matching_review/primary_disposition.zh.txt)已完成，本版本不推荐进入实现或四臂训练；数学主体成立，但结构化KD及U-centering已有、任务信息选择和独立贡献不足，效果未知。原稿保留，单合格视图9维、二阶式、反例及完整S更新边界以主审补正为准；不是新实验负结果，完整S仍为对照，旧C单独诊断不恢复 |
 | [C联合排序响应收缩保持方案](../reports/documentation/20261011/retention_design/contraction.zh.txt) | 静态外审／[独立主审与补正](../reports/documentation/20261011/retention_design/review/primary_disposition.zh.txt)已完成，本版本不推荐实施；有限数学成立，但弱OT适配的任务信息依据与实质贡献不足，效果未知。四臂仅为未执行的固定策略比较；原稿保留，低维软约束、子包粒度、归因及文献勘误以主审为准。不是执行合同，未关闭整个C研究，完整S仍为主要内部对照 |

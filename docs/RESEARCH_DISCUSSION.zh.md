@@ -982,3 +982,9 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 原生核验于19:50:28—19:55:15实际完成并通过，外层286.80秒，三臂完整更新及诊断后model／Adam／grad逐字节一致；实测投影70.933264小时、42.308229GiB。首次正式探测因超过已批48小时，于19:55:45按门控退出，未启动正式训练或读取正式内容。主执行者给出72小时具体补充，说明其余计算、读取和资源约束全部保持；用户明确选择：“同意将正式上限改为72小时”。补充授权见authorization_72h.json，原停止事实保留。
 
 据此另建20261009_200600/workspace，仅改policy的时间、timeout和资格引用核对，26来源逐字节相同、训练／评价AST不变。原CPU／GPU报告继续绑定原来源，入口使用冻结源码ZIP逐项证明本次只改预算，不伪造新资格；六项Linux CPU增量检查5.14秒全过，不重做GPU核验。CPU保守累计43／300秒，GPU288／600秒。20:11:53启动当前正式探测PID3555737，72小时正式门已实际通过，等待共享GPU资源；真实更新后才自删。完整边界、停止账、复用理由与证据见[自动启动及预算补充](../reports/documentation/20261009/record_attribution/qualification/formal_autostart.zh.txt)。
+
+## 2026-10-12：C_cf具体合同获准执行
+
+用户要求落实静态外审与独立复核补正，以完整S为对照形成执行合同，并在明确16小时、16GiB、CPU300秒／GPU600秒、标签各一次及盲门范围后选择：“批准合同范围，完成实现与核验，前提满足后正式运行（推荐）”。完整范围见[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)及[授权](../reports/documentation/20261012/crossfit_retention/authorization.json)。继续实现、手写资格、审查和满足前提后的正式运行均已授权；新具体上传包及公开推送不在此答复内。旧C单独诊断不恢复，旧预算和失败账不转用。
+
+具体合并包形成后，主执行者就570,664字节、64成员、SHA256为f5e48cf6d4bd06dd2eb546a171b41ebc34fe2d5a40651c86fdbd72466242a477的review/review_input.zip补充询问上传许可；用户明确：“授权此合并包实现外审（推荐）”。14:19经指定本地Playwright MCP完成一次上传及一次提交，网页附件显示review_input(20261012-061828).zip；[会话](https://chatgpt.com/c/6acc7bb2-9ffc-83eb-89dd-b01cc2687fff)出现完整请求、正在思考及停止按钮。请求GPT 6 Pro、可见GPT-6／Pro和后台身份未独立取得分别记录，见[提交回执](../reports/documentation/20261012/crossfit_retention/review/submission.json)。该答复只批准此包到chatgpt.com的实现外审，未扩大公开Git推送范围；科研执行许可及实际前置条件分别按合同处理。
