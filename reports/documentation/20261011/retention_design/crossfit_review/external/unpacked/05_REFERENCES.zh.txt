@@ -1,0 +1,57 @@
+一手参考来源与实际阅读位置
+检索／访问日期：2026-10-12
+
+L1
+作者：Tri Dao, Govinda M. Kamath, Vasilis Syrgkanis, Lester Mackey。
+标题：Knowledge Distillation as Semiparametric Inference。
+版本：arXiv:2104.09732v1，2021-04-20，21 页。
+直接 PDF：https://arxiv.org/pdf/2104.09732
+实际方法阅读：§4.1 中相关条件；§4.2 三个 cross-fitting 步骤、Theorem 5；§4.3 开头。另核对首页作者／版本。
+对照点：已有逐折教师拟合和学生使用对应折外输出；不把理论条件转移为本项目 BGE／AdamW／MAP 保证。
+范围限制：未通读 21 页和全部附录证明；未运行作者代码。
+
+L2
+作者：Sashank J. Reddi, Rama Kumar Pasumarthi, Aditya Krishna Menon, Ankit Singh Rawat, Felix Yu, Seungyeon Kim, Andreas Veit, Sanjiv Kumar。
+标题：RankDistil: Knowledge Distillation for Ranking。
+出处：AISTATS 2021，PMLR 130；PDF 11 页。
+直接 PDF：https://proceedings.mlr.press/v130/reddi21a/reddi21a.pdf
+实际方法阅读：摘要／问题定义、§2.1；§3 Algorithm 1 与 §3.1–3.4，尤其表 1、式 (5)–(6)。另核对首页。
+对照点：已有基于教师排序的成对 hinge／squared hinge 和与原标签损失结合。
+范围限制：未全文重审附录或实验，不借其 top-k 保证担保当前 MAP。
+
+L3
+作者：Yu-Chu Yu, Chi-Pin Huang, Jr-Jen Chen, Kai-Po Chang, Yung-Hsuan Lai, Fu-En Yang, Yu-Chiang Frank Wang。
+标题：Select and Distill: Selective Dual-Teacher Knowledge Transfer for Continual Learning on Vision-Language Models。
+出处：ECCV 2024 官方论文 PDF，18 页；相关 arXiv 标识 2403.09296。
+直接 PDF：https://www.ecva.net/papers/eccv_2024/papers_ECCV/papers/03759.pdf
+实际方法阅读：§3.1–3.3，式 (1)–(5) 及相邻上下文。另核对首页作者。
+对照点：已有双教师选择与持续知识保持；其参考数据、教师身份、特征损失与本稿不同。
+范围限制：未读全篇 18 页或复核实验，未检查作者代码。
+
+L4
+作者：Sebastian Hofstätter, Sophia Althammer, Michael Schröder, Mete Sertkan, Allan Hanbury。
+标题：Improving Efficient Neural Ranking Models with Cross-Architecture Knowledge Distillation。
+版本：arXiv:2010.02666 的作者 PDF，10 页；本报告按所读作者版本引用，不推断其他出版版本的逐字一致性。
+直接 PDF：https://arxiv.org/pdf/2010.02666
+实际方法阅读：§3、式 (11)–(12)、图 2 和相邻架构上下文。另核对首页作者。
+对照点：Margin-MSE 已直接匹配教师正负分差并离线保留来源分数；与双正筛选的单边下限不相同。
+范围限制：未读全部 10 页或运行作者代码。
+
+L5
+作者：Fusheng Wang, Jianhao Yan, Fandong Meng, Jie Zhou。
+标题：Selective Knowledge Distillation for Neural Machine Translation。
+出处：ACL-IJCNLP 2021，6456–6466；PDF 11 页。
+直接 PDF：https://aclanthology.org/2021.acl-long.504.pdf
+实际方法阅读：§5、Algorithm 1、§4 邻接结论。另核对首页书目信息。
+对照点：已有根据标签相关的学生损失选择部分样本接受 KD 的方法；不能把“有标签筛选”本身当作新原则。
+范围限制：未读完整 11 页、复现 BLEU 或检查作者代码。
+
+获取和检索边界
+
+当前稿引用的 L1、L3 arXiv HTML 地址在主审访问时返回工具 DisabledError，改用上述公开一手 PDF 并实际读到方法。辅助检索记录还有 OpenReview 获取受阻；该尝试不算成功阅读或证据。PDF 成功打开不等于全文已读。
+
+有针对性检索使用 cross-fitting、ranking／margin、selection／dual-teacher 和 continual learning 的组合，实际查询列在 06_SEARCH_LOG.json。搜索没有覆盖所有语言、数据库、预印本版本、专利、引用网络或后续论文；搜索排序及索引也可能遗漏相关结果。
+
+在上述已读方法中未见逐项等价的完整机制。此为有界阅读观察，不是排除全部先例的证明。报告的继续建议基于可检验的任务化增量，而非“搜索未命中所以原创”。论文的经验结果没有被用作本项目有效性证据。
+
+本包不重分发论文 PDF 全文或大段摘录。完整方法结论与本稿的差异由 01_REVIEW.zh.txt 第八节给出，以上定位用于独立复查。

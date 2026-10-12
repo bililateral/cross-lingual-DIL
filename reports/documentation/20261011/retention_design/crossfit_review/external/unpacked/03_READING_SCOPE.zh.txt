@@ -1,0 +1,74 @@
+实际阅读范围与证据边界
+日期：2026-10-12
+
+一、口径
+
+“全文”指本包对应文件的文本；不表示其外部依赖、引用或历史结果也已复核。行号按原 ZIP 成员的文本行号，含空行。“定向”只把列明的函数／范围用于裁决，不把 AST／函数名索引、rg 搜索、哈希或解包统计计成全文科研阅读。
+
+主审先核对 ZIP 清单和实际成员，优先读 current/crossfit.zh.txt 及 source 直接函数。context 用来界定完整 S、历史和执行权限；history 只作角色及已有处置事实的边界。没有递归重审整个项目，也没有执行包内科研程序。
+
+二、主审逐文件范围
+
+ID | ZIP 相对路径 | 总行数 | 实际阅读
+I01 | request.zh.txt | 21 | 全文。
+I02 | current/crossfit.zh.txt | 212 | 全文；公式、C_perm、三臂计数及后续资格段定向重读。
+I03 | context/AGENTS.md | 24 | 全文；按本轮用户限定作为角色与事实边界，不产生新的执行授权。
+I04 | context/RESEARCH_DISCIPLINE.zh.md | 179 | 1–128、147–179；其余仅检索标题／局部定位，不计全文。
+I05 | context/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md | 45 | 全文，用于原 S／历史保持合同。
+I06 | context/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md | 97 | 全文，用于历史三臂、诊断和评价边界。
+I07 | source/step28_record_replay.py | 330 | 全文；重点 record_vectors、assignment、pair_table、account_logits、objective、backward_group、update、reference、Memory。
+I08 | source/step28_record_replay_run.py | 588 | 104–317、484–505；其他仅函数／调用索引。重点 run_stage、checkpoint、共享前缀与旧资格入口。
+I09 | source/step28_bge_continual.py | 321 | 全文；重点数值初始化、stage_lr、Supply、Memory 和更新计数。
+I10 | source/step28_alias_ranking.py | 222 | 全文；重点 top5 hard 与 objectives。
+I11 | source/step28_chinese_base.py | 880 | 52–191、279–307、680–698；其余函数索引。重点公开分区、模型创建、基础排序目标和 ABC 分类假设。
+I12 | source/step28_continual_population.py | 210 | 1–72、157–210；头、AdamW、状态哈希及完整状态保存／恢复。
+I13 | source/step28_continual_expression_data.py | 369 | 58–100、216–349；其余函数索引。只读 RNG 与身份生成／校验逻辑，没有运行生成器或读取生成数据。
+I14 | source/step28_replay_diagnostics.py | 196 | 全文；重点 neutral、capture、旧完整表诊断和 60 群假设。
+I15 | source/step28_record_attribution_run.py | 630 | 74–415、447–491；其余函数索引。重点 Adam 计数、六点诊断、checkpoint 生命周期、盲门及结果读取。部分额外输出不计为已完成阅读。
+I16 | source/step28_alias_calibration.py | 178 | 1–163；重点正斜率映射、排序不变检查、校准数据范围。
+I17 | source/step28_record_replay_policy.json | 30 | 全文；只界定旧入口政策，不沿用为当前新候选资格。
+I18 | history/matching_review.zh.txt | 489 | 1–62；只读先前静态结论和范围，未全文重审旧候选。
+I19 | history/matching_primary.zh.txt | 101 | 全文；只核对主执行处置／已关闭边界，没有重算历史结果。
+I20 | history/three_arm_primary.zh.txt | 89 | 1–64；只核对三臂 S 的历史角色及成本记载，未重新核验训练。
+I21 | history/five_arm_primary.zh.txt | 37 | 1–22；只核对旧 C／C_plus 等负结果的历史地位。
+— | manifest.json | JSON 清单 | 完整机械解析并逐项核对实际大小／SHA256；不是科学内容证据。
+
+三、辅助分工的实际覆盖
+
+本轮有三个辅助核对分工，不冒称单人全文阅读或没有委派。辅助代理仅分担静态阅读与公开检索，没有项目训练授权。采用的证据由主审再次阅读或独立推导。
+
+source_lifecycle：
+全文：I01、I02、I05、I06、I07、I08、I09、I12、I14、I15、I16、I17。
+定向：I10 的 1–80；I11 的 1–90、670–707。
+用途：完整 S 继承、来源状态、Memory／checkpoint、自足恢复、诊断和 AB 接口。
+
+math_control：
+全文：I02、I07、I10。
+定向：I11 的 145–200。
+用途：查询计数、单边目标、对称平移、可行赋值完成性和归因反例。未执行本项目或独立参考代码。
+
+primary_literature：
+包内全文：I02。
+公开材料：五篇一手论文直接方法、相关检索及有限获取尝试，细目见 05_REFERENCES.zh.txt 和 06_SEARCH_LOG.json。
+用途：cross-fitting KD、ranking／margin KD、selective KD 的先例与当前增量范围。未读取正式数据或模型。
+
+主审随后亲自打开五篇一手 PDF 的方法段及首页元数据；没有直接借用辅助代理的“搜到”结果代替方法阅读。
+
+四、公开论文阅读深度
+
+L1：§4.1 中相关条件、§4.2 三步骤与 Theorem 5、§4.3 开头及首页。不是 21 页全文／全部证明。
+L2：摘要／问题定义、§2.1、§3 Algorithm 1、§3.1–3.4、表 1 与式 (5)–(6) 及首页。没有全文重审附录或实验。
+L3：§3.1–3.3、式 (1)–(5) 和相邻上下文及首页。不是 18 页全文／全部实验。
+L4：§3、式 (11)–(12)、图 2、相邻架构上下文及首页。不是 10 页全文。
+L5：§5、Algorithm 1、§4 邻接结论及首页。不是 11 页全文／全部实验。
+
+对于没有阅读的章节，不据其缺席判断不存在相关机制。没有克隆作者仓库、跑作者代码、重现论文数字或做穷尽的文献首创证明。
+
+五、实际运行和未运行项
+
+已运行：上传 ZIP 的字节／清单检查；本地文本阅读和代码结构索引；math/reference.py 一次手写有限数学参考；返回材料的成员和摘要校验。
+未运行：包内科研入口或其 import、BGE／head／Adam、正式训练、项目服务器命令、项目 py310 资格、GPU、bootstrap、正式模型／数据／标签／Memory 读取、封存真值或凭据访问。
+
+独立参考使用 NumPy 2.3.5 与 Python 3.12.14，仅为网页工作区数学辅助；“运行在某个 Linux 内核上”不等于“通过本项目 Linux 资格”。
+
+模型身份来自本轮系统提供的 GPT-6 Astra Pro；没有独立观察网页选择器或核实后台路由。没有新建另一用户审查会话。本报告与辅助意见均可由主执行者独立核查和否决。

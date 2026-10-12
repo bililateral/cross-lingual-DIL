@@ -1,0 +1,371 @@
+{
+  "scope": "网页静态科研外审的手写有限分数参考；无项目数据、模型、科研源码或原生资格。",
+  "source_sha256": "eb4d3cc3ed0a18e791cdab0c2bb56302f776befd9f5278db5cbe0f1052866475",
+  "input_sha256": "e29682adaabb48e9c95991fd2860bd4f7adfc9cfe4d9376c2f7ec24609b030c8",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "project_python_or_native_qualification": false
+  },
+  "checks": {
+    "topology_and_weights": {
+      "queries": 28,
+      "undirected_pairs": 378,
+      "positive_pairs": 20,
+      "directed_comparisons": 1016,
+      "weight_sum": 0.9999999999999998,
+      "k2_comparison_weight": "1/728",
+      "k3_comparison_weight": "1/1400"
+    },
+    "scalar_floor_cases": [
+      {
+        "name": "violated_positive_floor",
+        "mF": 2,
+        "mO": 0.5,
+        "current": 0.2,
+        "b": 0.5,
+        "unweighted_loss": 0.09,
+        "derivative_positive": -0.6,
+        "derivative_negative": 0.6
+      },
+      {
+        "name": "freely_above_floor",
+        "mF": 2,
+        "mO": 0.5,
+        "current": 1,
+        "b": 0.5,
+        "unweighted_loss": 0,
+        "derivative_positive": 0,
+        "derivative_negative": 0
+      },
+      {
+        "name": "freely_larger",
+        "mF": 2,
+        "mO": 0.5,
+        "current": 3,
+        "b": 0.5,
+        "unweighted_loss": 0,
+        "derivative_positive": 0,
+        "derivative_negative": 0
+      },
+      {
+        "name": "o_disagrees_zero_is_disabled",
+        "mF": 2,
+        "mO": -0.1,
+        "current": -1,
+        "b": 0.0,
+        "unweighted_loss": 0.0,
+        "derivative_positive": -0.0,
+        "derivative_negative": 0.0
+      },
+      {
+        "name": "f_disagrees_zero_is_disabled",
+        "mF": -0.1,
+        "mO": 2,
+        "current": -1,
+        "b": 0.0,
+        "unweighted_loss": 0.0,
+        "derivative_positive": -0.0,
+        "derivative_negative": 0.0
+      },
+      {
+        "name": "zero_is_not_enabled",
+        "mF": 2,
+        "mO": 0,
+        "current": -1,
+        "b": 0.0,
+        "unweighted_loss": 0.0,
+        "derivative_positive": -0.0,
+        "derivative_negative": 0.0
+      }
+    ],
+    "permutation_examples": {
+      "forced_identity": {
+        "labelled_choice_traces": 1,
+        "distinct_outputs": 1,
+        "uniform_over_distinct_feasible_outputs_in_this_example": true,
+        "outputs": [
+          {
+            "b": [
+              1.0,
+              10.0
+            ],
+            "probability_exact": "1"
+          }
+        ]
+      },
+      "support_can_move": {
+        "labelled_choice_traces": 2,
+        "distinct_outputs": 2,
+        "uniform_over_distinct_feasible_outputs_in_this_example": true,
+        "outputs": [
+          {
+            "b": [
+              0.0,
+              1.0
+            ],
+            "probability_exact": "1/2"
+          },
+          {
+            "b": [
+              1.0,
+              0.0
+            ],
+            "probability_exact": "1/2"
+          }
+        ]
+      },
+      "nested_distinct": {
+        "labelled_choice_traces": 4,
+        "distinct_outputs": 4,
+        "uniform_over_distinct_feasible_outputs_in_this_example": true,
+        "outputs": [
+          {
+            "b": [
+              0.0,
+              2.0,
+              1.0
+            ],
+            "probability_exact": "1/4"
+          },
+          {
+            "b": [
+              1.0,
+              2.0,
+              0.0
+            ],
+            "probability_exact": "1/4"
+          },
+          {
+            "b": [
+              2.0,
+              0.0,
+              1.0
+            ],
+            "probability_exact": "1/4"
+          },
+          {
+            "b": [
+              2.0,
+              1.0,
+              0.0
+            ],
+            "probability_exact": "1/4"
+          }
+        ]
+      },
+      "duplicate_values": {
+        "labelled_choice_traces": 6,
+        "distinct_outputs": 3,
+        "uniform_over_distinct_feasible_outputs_in_this_example": true,
+        "outputs": [
+          {
+            "b": [
+              0.0,
+              1.0,
+              1.0
+            ],
+            "probability_exact": "1/3"
+          },
+          {
+            "b": [
+              1.0,
+              0.0,
+              1.0
+            ],
+            "probability_exact": "1/3"
+          },
+          {
+            "b": [
+              1.0,
+              1.0,
+              0.0
+            ],
+            "probability_exact": "1/3"
+          }
+        ]
+      }
+    },
+    "ascending_order_can_fail": {
+      "capacities": [
+        1,
+        2
+      ],
+      "thresholds_ascending": [
+        1,
+        2
+      ],
+      "first_assignment": {
+        "threshold": 1,
+        "chosen_capacity": 2
+      },
+      "remaining_capacity": 1,
+      "second_threshold": 2,
+      "failure": true,
+      "scope": "Not the proposed descending algorithm."
+    },
+    "permutation_attribution_counterexample": {
+      "source_relation": "O=0.5*F; all source query ranks and ties identical",
+      "enabled": [
+        {
+          "triple": [
+            0,
+            1,
+            2
+          ],
+          "mF": 2.0,
+          "mO": 1.0,
+          "b": 1.0,
+          "b_perm": 1.5
+        },
+        {
+          "triple": [
+            0,
+            1,
+            3
+          ],
+          "mF": 3.0,
+          "mO": 1.5,
+          "b": 1.5,
+          "b_perm": 1.0
+        },
+        {
+          "triple": [
+            2,
+            3,
+            0
+          ],
+          "mF": 2.0,
+          "mO": 1.0,
+          "b": 1.0,
+          "b_perm": 1.0
+        },
+        {
+          "triple": [
+            3,
+            2,
+            0
+          ],
+          "mF": 3.0,
+          "mO": 1.5,
+          "b": 1.5,
+          "b_perm": 1.5
+        }
+      ],
+      "F_feasible_both": true,
+      "O_feasible_cf": true,
+      "O_feasible_perm": false,
+      "cf_loss_at_O": 0.0,
+      "perm_loss_at_O": 0.00034340659340659343,
+      "perm_loss_exact": "1/2912",
+      "outer_0_5_perm_loss_exact": "1/5824",
+      "fixed_project_seed_outcome_claimed": false
+    },
+    "symmetric_query_shift": {
+      "query_own_margins_unchanged": true,
+      "whole_group_loss": 0.03637362637362638,
+      "whole_group_loss_exact": "331/9100",
+      "violated_comparisons": 38,
+      "all_edges_common_shift_loss": 0.0
+    },
+    "zero_history_loss_does_not_protect_map": {
+      "enabled": 1014,
+      "disabled_triples": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          2,
+          3,
+          0
+        ]
+      ],
+      "loss_at_current": 0.0,
+      "MAP_F_exact": "1",
+      "MAP_current_exact": "27/28",
+      "changed_query_AP_exact": {
+        "0": "1/2",
+        "2": "1/2"
+      },
+      "scope": "Handwritten cached-score example; not a trained model or formal result."
+    },
+    "same_outer_coefficient_different_strength": {
+      "epsilon": 0.25,
+      "D_cf": 0.004464285714285715,
+      "D0": 0.00016534391534391533,
+      "ratio": 27.000000000000004,
+      "exact_ratio": "27"
+    },
+    "account_pooling_VJP_reference": {
+      "record_count": 56,
+      "table_values": 1540,
+      "loss_before_outer_coefficient": 0.48999999999999994,
+      "cross_account_derivative_factor": "1/(r_i*r_j)=1/4",
+      "within_account_A0_only_gradient_zero": true,
+      "directional_checks": [
+        {
+          "name": "record_edge_(0, 1)",
+          "finite_difference": 0.0,
+          "analytic": 0.0,
+          "absolute_error": 0.0
+        },
+        {
+          "name": "record_edge_(0, 2)",
+          "finite_difference": -0.012499999993420552,
+          "analytic": -0.012499999999999983,
+          "absolute_error": 6.579431444109218e-12
+        },
+        {
+          "name": "record_edge_(0, 4)",
+          "finite_difference": 0.0004807692438602018,
+          "analytic": 0.0004807692307692308,
+          "absolute_error": 1.3090971015539132e-11
+        },
+        {
+          "name": "dense_deterministic_direction",
+          "finite_difference": -0.0049697164300477326,
+          "analytic": -0.00496971643804942,
+          "absolute_error": 8.001687853975703e-12
+        }
+      ],
+      "precision": "float64 calculus reference with fixed FP32 target; no head/BGE/Adam executed",
+      "proves_native_encoder_connection": false
+    },
+    "FP32_semantics": {
+      "F_positive": 1.0,
+      "F_negative": 2.9802322387695312e-08,
+      "margin32": 1.0,
+      "margin64_after_promoting_scores": 0.9999999701976776,
+      "b": 1.0,
+      "born_feasible_using_defined_margin32": true,
+      "infeasible_after_changing_to_margin64": true,
+      "large_common_shift": 16777216.0,
+      "margin_after_FP32_shift": 0.0,
+      "tiny_residual": 9.999999998199587e-24,
+      "FP32_squared_residual": 0.0,
+      "formal_square_derivative_in_FP32": 1.9999999996399175e-23,
+      "finite_source_subtraction_can_overflow": true,
+      "note": "Loss rounding to zero is not a native-autograd test; zero/positive gates must retain specified semantics."
+    },
+    "work_and_payload_arithmetic": {
+      "physical_updates": 1440,
+      "gradient_group_presentations": 2304,
+      "main_endpoints": 4,
+      "main_epoch_diagnostics": 24,
+      "independent_S_updates": 576,
+      "independent_Ccf_updates": 864,
+      "Ccf_extra_update_fraction_vs_S": 0.5,
+      "b_bytes_one_group": 4064,
+      "b_bytes_six_groups": 24384,
+      "minimum_S_table_values_one_group": 1540,
+      "minimum_S_table_bytes_one_group": 6160,
+      "linear_training_volume_reference_hours_only": 4.875456790123457,
+      "runtime_or_output_budget_qualification": false
+    }
+  },
+  "status": "PASS_FINITE_REFERENCE_ONLY",
+  "executed_utc": "2026-10-12T04:15:04.376540+00:00"
+}

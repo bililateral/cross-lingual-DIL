@@ -1,0 +1,557 @@
+{
+  "review_date": "2026-10-12",
+  "input_zip_sha256": "7f3917c75e166e0e7ebac2d30c0bb788dc261147d1cd2d4065d70095db4dce94",
+  "current_proposal_sha256": "d7e2670827317b6ad83122fac0803accee1e8cc7dfd1aa612c720db0f4051735",
+  "decision": "建议继续到实现前合同／资格准备",
+  "decision_scope": "有限任务化增量策略值得最小检验；不是实现、原生资格、效果、首创或授权结论。",
+  "severity_legend": {
+    "none": "数学或合同确认，无缺陷。",
+    "low": "有限文字／解释修正，不改变算法可定义性。",
+    "medium": "实质科学解释边界或下一实现必要事项，不自动阻断当前静态推进。",
+    "pending_execution_supplement": "未来完整预算／执行资格必需，当前不冒称已证明或已失败。"
+  },
+  "finding_count": 12,
+  "current_scientific_blocker_count": 0,
+  "findings": [
+    {
+      "id": "F01",
+      "title": "O 的拟合折外，最终 b 是折外支持的混合目标",
+      "severity": "medium",
+      "kind": "scientific_interpretation",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 24,
+            "end": 28
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 53,
+            "end": 71
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 125,
+            "end": 131
+          }
+        }
+      ],
+      "basis": [
+        "完整群两折与域前 model／Adam 初始化排除本群的当前域辅助拟合更新；eval 和独立随机流各自解决随机目标及主过程污染问题，不能替代身份隔离。",
+        "b 同时依赖全域拟合内 F、折外 O 和本群训练标签；严格双正筛选的正确性属于筛选定义。"
+      ],
+      "scientific_or_implementation_impact": "不能把 b 称为独立于本群的完整折外估计量、真实间隔置信下界或已确认可迁移的身份知识；共同模板、易例及共有伪线索仍可被选中。",
+      "minimum_action": "明确使用“折外支持的混合目标”，保留半域来源弱化及共同伪线索边界；未来按现稿落实完整群、域前参数／Adam、144 步及主随机流隔离。",
+      "required_when": "科学文字随实现前合同收紧；实际来源隔离在获准资格阶段验证。",
+      "independent_math_result_keys": [],
+      "primary_references": [
+        "L1"
+      ]
+    },
+    {
+      "id": "F02",
+      "title": "单查询平移不变不能扩展为对称整群损失不变",
+      "severity": "low",
+      "kind": "mathematical_wording",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 103,
+            "end": 103
+          }
+        },
+        {
+          "input_id": "I07",
+          "file": "source/step28_record_replay.py",
+          "lines": {
+            "start": 113,
+            "end": 127
+          }
+        }
+      ],
+      "basis": [
+        "单个查询的正负差在候选共同平移下不变。",
+        "378 个分数对称共用；只给包含查询 q 的边加常数，也改变其他查询以 q 为候选的间隔。",
+        "手写完整拓扑给一个 K2 查询全部关联边加 1，q 自身子项不变，但整群 D_cf=331/9100。"
+      ],
+      "scientific_or_implementation_impact": "原第 103 行若指整个历史项则不正确；不影响主要的单边目标、出生可行性或全局 logit 偏移自由。",
+      "minimum_action": "改为“单查询子项在该查询候选共同平移下不变；对称整群项在所有无向账号对共同平移下不变”，并注明这是实数代数性质，不是任意缩放或逐位 FP32 不变性。",
+      "required_when": "实现前合同中的有限文字修正；无需新增算法或重开同样的静态审查。",
+      "independent_math_result_keys": [
+        "symmetric_query_shift",
+        "FP32_semantics"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F03",
+      "title": "出生与错配可行性须使用同一套 FP32 差值语义",
+      "severity": "medium",
+      "kind": "preimplementation_numerics",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 79,
+            "end": 84
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 101,
+            "end": 101
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 143,
+            "end": 145
+          }
+        }
+      ],
+      "basis": [
+        "对同一组有限 FP32 mF／mO 取 min 不破坏 b≤mF。",
+        "FP32 的 1−2^−25 舍入为 1；先把分数转 FP64 再减得到 0.9999999701976776，可能错误拒绝 b=1 的出生候选。",
+        "非有限输入差值、巨大共同平移舍入及平方下溢均需要与规定语义区分。"
+      ],
+      "scientific_or_implementation_impact": "混用计算精度／顺序会改变严格双正门、零哨兵、可行候选和出生零损失判断。",
+      "minimum_action": "目标生成、可行错配和相同状态重算复用定义一致的有限 FP32 差值；对差值／目标做有限性检查；记录实际违约数，不能只看已舍入损失是否显示为零。不要凭此新增筛选阈值。",
+      "required_when": "新目标实现与获准数值资格之前。",
+      "independent_math_result_keys": [
+        "FP32_semantics",
+        "scalar_floor_cases"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F04",
+      "title": "可行错配不匹配松弛、O 支持或梯度，限制独立信息归因",
+      "severity": "medium",
+      "kind": "causal_attribution",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 139,
+            "end": 151
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 176,
+            "end": 179
+          }
+        }
+      ],
+      "basis": [
+        "重配保持每个 (g,q,p) 的启用条数、正下限多重集合、权重及 F 出生可行性。",
+        "不保持 mF−b、O 是否支持、负候选难度、后续活跃集或梯度。",
+        "完整 O=F/2 例中两来源所有排序相同，一个合法重配在 G=O 产生 D_perm=1/2912，而 D_cf=0。"
+      ],
+      "scientific_or_implementation_impact": "只胜 C_perm 不能识别 cross-fitting 的独立必要性，甚至不能排除由 F 难度／松弛结构保真引起差异；也不等于胜完整 S。",
+      "minimum_action": "把 C_cf−C_perm 限定为本次原赋值与可行错配之差；结合 C_cf−S 报告整体替换。保留一个固定错配，不生成总体置换 p 值，不额外堆叠新臂。",
+      "required_when": "结果解释在实现前固定；比较局限不会因未来区间显著而消失。",
+      "independent_math_result_keys": [
+        "permutation_attribution_counterexample"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F05",
+      "title": "降序嵌套分配总能完成；目标完全相同可为结构性退化",
+      "severity": "none",
+      "kind": "mathematical_confirmation",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 143,
+            "end": 149
+          }
+        }
+      ],
+      "basis": [
+        "第 j 个降序下限至少有 j 个原可行容量，之前至多占用 j−1 个，所以存在可选候选。",
+        "嵌套集合下每一步可选数为 |H_j|−j+1，逐步均匀选择在该条件可行子集上均匀；不产生零假设分布。",
+        "若 O=F，则 b 用尽 F 的所有正容量，重配可行且总和相同迫使目标逐值不变。"
+      ],
+      "scientific_or_implementation_impact": "不能因一般贪心反例否定本稿算法，也不能把全同目标自动视为程序错误或重抽理由。",
+      "minimum_action": "保留降序、固定次序和一次种子；全零或全六群逐值相同按稿停在 B 前，部分相同比例如实报告。代码接入时核对多重集合／可行性。",
+      "required_when": "数学设计已确认；实现前将规范次序与退化判断落实。",
+      "independent_math_result_keys": [
+        "permutation_examples",
+        "ascending_order_can_fail",
+        "permutation_attribution_counterexample"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F06",
+      "title": "新项可能不更新或复用标签排序；相同 0.5 不匹配有效强度",
+      "severity": "medium",
+      "kind": "information_and_objective_strength",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 88,
+            "end": 105
+          }
+        },
+        {
+          "input_id": "I10",
+          "file": "source/step28_alias_ranking.py",
+          "lines": {
+            "start": 113,
+            "end": 129
+          }
+        },
+        {
+          "input_id": "I11",
+          "file": "source/step28_chinese_base.py",
+          "lines": {
+            "start": 165,
+            "end": 191
+          }
+        }
+      ],
+      "basis": [
+        "原 Bbar 已包含 query-rank 与 top5 负候选比较；新增信息仅为来源相关准入、数值下限及停止处罚规则。",
+        "所有启用下限一直被满足时，新保持项可没有梯度；满足启用缓存比较也不保证缓存 MAP。",
+        "完整手写例只有两条禁用比较即可令 D_cf=0 而 MAP 从 1 降至 27/28。",
+        "另一个合法方向仅降低一条 K2 正边 ε：D_cf=ε²/14，D0=ε²/378，惩罚比为 27。"
+      ],
+      "scientific_or_implementation_impact": "不能把候选写成统一弱化 S、同等强度的纯信息替换、或由零保持损失直接推出排序保持。",
+      "minimum_action": "报告启用数、下限范围、实际违约与保持损失，保留 Bbar；将 C_cf−S 理解为信息、约束几何及有效强度共同改变的系统比较。不得用日志自动改阈值或 λ。",
+      "required_when": "科学解释与正常训练日志定义；不追加旧 C 诊断。",
+      "independent_math_result_keys": [
+        "zero_history_loss_does_not_protect_map",
+        "same_outer_coefficient_different_strength",
+        "scalar_floor_cases"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F07",
+      "title": "现有 VJP 能承接但并未接入新目标，最终更新不能由单项偏导推断",
+      "severity": "medium",
+      "kind": "preimplementation_gradient_path",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I07",
+          "file": "source/step28_record_replay.py",
+          "lines": {
+            "start": 113,
+            "end": 206
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 88,
+            "end": 94
+          }
+        },
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 196,
+            "end": 204
+          }
+        }
+      ],
+      "basis": [
+        "现有 objective 只允许 C／S／R0。backward_group 从 dJ/dK 经分块 head 重算及 dJ/dZ 回到 BGE。",
+        "1016 条应按查询宏平均，K2 权重 1/728，K3 权重 1/1400；外层 0.5 独立于 history Bbar 的 0.1。",
+        "账号均分链式导数为 1/(r_i r_j)，对称存储不自动引入额外因子 2。",
+        "网页参考只检查线性均分，未执行实际 head、BGE、共同 clip 或 AdamW。"
+      ],
+      "scientific_or_implementation_impact": "仅看到总梯度非零、静态调用链或已有 S 资格都不能证明新增保持项接入；其他梯度和 Adam 状态可改变最终间隔及 MAP。",
+      "minimum_action": "依现稿做能区分新增项关闭、误接点 MSE、按活跃数平均或断开编码器的有限证据；覆盖共同 clip 和延续 Adam 的一次真实更新，但仅在后续相应范围获准后。",
+      "required_when": "新接线与原生资格阶段；当前没有新实现缺陷可判定。",
+      "independent_math_result_keys": [
+        "topology_and_weights",
+        "account_pooling_VJP_reference"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F08",
+      "title": "b 可自足保存，但完整 Memory 与旧残差诊断接口仍需适配",
+      "severity": "medium",
+      "kind": "preimplementation_memory_lifecycle",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 109,
+            "end": 115
+          }
+        },
+        {
+          "input_id": "I07",
+          "file": "source/step28_record_replay.py",
+          "lines": {
+            "start": 232,
+            "end": 330
+          }
+        },
+        {
+          "input_id": "I14",
+          "file": "source/step28_replay_diagnostics.py",
+          "lines": {
+            "start": 88,
+            "end": 101
+          }
+        },
+        {
+          "input_id": "I15",
+          "file": "source/step28_record_attribution_run.py",
+          "lines": {
+            "start": 148,
+            "end": 180
+          }
+        }
+      ],
+      "basis": [
+        "24,384 字节只等于六群的 1016 维 FP32 裸目标，全部群文本／训练标签、索引、RNG、schema、来源与必要映射仍须计入完整 Memory。",
+        "未来 D_cf 及恢复可直接依赖 b 与存活群，不需要 F／O、mF／mO 或额外教师。",
+        "旧 diagnostics 对非 LOGIT 路径把 memory.tables 当完整记录对表；1016 维 b 不能传入该 account_logits 分支。",
+        "已有 Algorithm R 与存活不刷新、淘汰同步删除可作基础；辅助状态只能作为当前来源工作的临时状态。"
+      ],
+      "scientific_or_implementation_impact": "少计附属状态、从归档重构目标或为了旧残差诊断重新存完整来源，都会改变既定 Memory 条件；旧接口不可直接复用。",
+      "minimum_action": "保存自足且有 schema 的 b Memory，完整实测 ≤1MiB；候选用已规定的下限诊断，S 保留其残差。辅助及工作 checkpoint 另计，出生完成后不进入后阶段学习器依赖，归档不能回流。",
+      "required_when": "Memory／诊断实现及恢复资格；工作 checkpoint 峰值排程进入执行补充。",
+      "independent_math_result_keys": [
+        "work_and_payload_arithmetic"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F09",
+      "title": "AB 范围、B 终点和共享 A 必须贯穿旧入口适配",
+      "severity": "medium",
+      "kind": "preimplementation_scope_and_checkpoint",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I08",
+          "file": "source/step28_record_replay_run.py",
+          "lines": {
+            "start": 142,
+            "end": 196
+          }
+        },
+        {
+          "input_id": "I08",
+          "file": "source/step28_record_replay_run.py",
+          "lines": {
+            "start": 297,
+            "end": 298
+          }
+        },
+        {
+          "input_id": "I14",
+          "file": "source/step28_replay_diagnostics.py",
+          "lines": {
+            "start": 68,
+            "end": 68
+          }
+        },
+        {
+          "input_id": "I14",
+          "file": "source/step28_replay_diagnostics.py",
+          "lines": {
+            "start": 177,
+            "end": 177
+          }
+        },
+        {
+          "input_id": "I15",
+          "file": "source/step28_record_attribution_run.py",
+          "lines": {
+            "start": 143,
+            "end": 205
+          }
+        },
+        {
+          "input_id": "I15",
+          "file": "source/step28_record_attribution_run.py",
+          "lines": {
+            "start": 302,
+            "end": 304
+          }
+        },
+        {
+          "input_id": "I15",
+          "file": "source/step28_record_attribution_run.py",
+          "lines": {
+            "start": 409,
+            "end": 409
+          }
+        },
+        {
+          "input_id": "I11",
+          "file": "source/step28_chinese_base.py",
+          "lines": {
+            "start": 692,
+            "end": 695
+          }
+        }
+      ],
+      "basis": [
+        "旧 checkpoint 的 stage<3 会在 B 末继续 retain，旧 valid／分类路径有 60 群和 ABC 硬编码。",
+        "旧归因入口在恢复后立即删除 full 状态，不能照搬为三个 B 分支共享的 A。",
+        "旧 C/S starts 全部相等包含 Memory；S 的 K 与候选 b 有意不同，不能要求完整 Memory 哈希相同。"
+      ],
+      "scientific_or_implementation_impact": "直接套旧入口会增加不存在的 B 出生工作、误纳 C 或错误共享／删除状态；属于下一新入口必须明确的变化。",
+      "minimum_action": "固定仅 AB 的 40 valid、终点 B 不建新目标；共享 A 的 model／Adam／RNG／成员与抽样状态实际相同，目标载荷按臂分别核对；A 完整状态保留到三个 B 分支结束。",
+      "required_when": "实现前合同与有限入口实现，不是本轮已发生的错误。",
+      "independent_math_result_keys": [],
+      "primary_references": []
+    },
+    {
+      "id": "F10",
+      "title": "更新计数正确，额外成本和有限条件统计必须并列报告",
+      "severity": "medium",
+      "kind": "evaluation_cost_and_inference",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 155,
+            "end": 182
+          }
+        },
+        {
+          "input_id": "I16",
+          "file": "source/step28_alias_calibration.py",
+          "lines": {
+            "start": 60,
+            "end": 147
+          }
+        }
+      ],
+      "basis": [
+        "共享 A 288、双来源 288、三个 B 共 864，合计 1440 物理更新；梯度群呈现 288+288+1728=2304；4 主端点、24 主 epoch 诊断。",
+        "独立候选 864 次更新相对 S 576 多 50%；按群呈现 1152 对 864 多 1/3，均不等于墙钟或 FLOPs 比。",
+        "O_AB／N_AB 分别是 A／B 在 B 末 MAP；两组主要差值为 CF−S 和 CF−perm。",
+        "每域 20 群、固定路径 s0、重复开发 valid 的配对群 bootstrap 只表达相应条件下群重采样不确定性。"
+      ],
+      "scientific_or_implementation_impact": "共享工作不抹去来源算力；区间不覆盖训练／折／错配／开发选择的不确定性；只胜错配不完成对 S 改进，未显著下降不证明非劣效。",
+      "minimum_action": "并列 O_AB、N_AB、raw／stage-cal／first-cal 与识别计数及完整来源成本；保持阈值和校准范围；使用既定整群配对区间，不造总体置换 p 值或最终确认。",
+      "required_when": "预先固定解释和完整结果报告；不扩展本轮路径或种子。",
+      "independent_math_result_keys": [
+        "work_and_payload_arithmetic"
+      ],
+      "primary_references": []
+    },
+    {
+      "id": "F11",
+      "title": "已有常规构件上的任务化增量有检验价值，首创与独立贡献未确立",
+      "severity": "medium",
+      "kind": "contribution_positioning",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 117,
+            "end": 131
+          }
+        }
+      ],
+      "basis": [
+        "五篇一手直接方法已包含 cross-fitting KD、ranking／margin KD 和 selective KD 的关键构件。",
+        "所读方法中未发现逐项等价的全部机制，但检索有限，论文不是全文／附录／代码穷尽审查。",
+        "本稿把未拟合本群的支持条件、F 的出生可行性、持续使用的有限单边目标及可行赋值比较连成可反驳的任务假设。"
+      ],
+      "scientific_or_implementation_impact": "不足以宣称新基础原理、文献首创或 cross-fitting 独立必要性；按用户接受的诚实增量标准，尚有值得最小检验的研究对象。",
+      "minimum_action": "以“待验证的任务化增量策略”继续；主要检验完整 S 的 D0 替代效果及指定赋值比较。若最终只有普通适配的效果，就按普通适配报告，不用新增模块挽救创新标签。",
+      "required_when": "当前裁决和后续贡献表述。",
+      "independent_math_result_keys": [],
+      "primary_references": [
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5"
+      ]
+    },
+    {
+      "id": "F12",
+      "title": "12 小时／16GiB 是预算草案，完整投影和工作状态峰值尚未形成",
+      "severity": "pending_execution_supplement",
+      "kind": "future_resource_qualification",
+      "current_scientific_blocker": false,
+      "status": "静态判断；无新实现或项目运行可被判定通过／失败",
+      "locations": [
+        {
+          "input_id": "I02",
+          "file": "current/crossfit.zh.txt",
+          "lines": {
+            "start": 184,
+            "end": 206
+          }
+        }
+      ],
+      "basis": [
+        "当前明确没有新代码或原生资格；12h、16GiB、CPU／GPU 限值均为建议。",
+        "旧三臂耗时按群呈现机械比例约 4.87546 小时，仅是训练量参照。",
+        "来源加载／训练／评分、24 次诊断、4 端点恢复校准、保存 IO 和 model／Adam 状态重叠峰值尚待执行补充。"
+      ],
+      "scientific_or_implementation_impact": "不能由本次静态继续建议推断能完成预算、生成执行门、沿用历史授权或开始 GPU 运行。",
+      "minimum_action": "在正式授权及原生核验前按稿写完整调用量投影与 checkpoint 排程；明确共享 A、当前分支和来源临时状态峰值。当前静态裁决无需因此先运行 GPU，也不追加通用框架。",
+      "required_when": "下一执行补充及独立的相应授权之前。",
+      "independent_math_result_keys": [
+        "work_and_payload_arithmetic"
+      ],
+      "primary_references": []
+    }
+  ]
+}
