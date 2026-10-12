@@ -862,3 +862,80 @@ G_m是0到m人排在阈值前面的概率生成多项式。同一个控制者的
 [L27] Taylor等，SoftRank: Optimising Non-Smooth Rank Metrics，WSDM2008。已读Microsoft Research提供的作者稿§3.1—3.3，尤其式(9)—(12)的比较概率及排名递推、对真实排序分布的近似说明，以及式(14)—(16)的期望指标和梯度连接；该网页PDF带提交稿标识，不宣称逐字核对最终ACM版或完整实验／实现。
 https://www.microsoft.com/en-us/research/publication/softrank-optimising-non-smooth-rank-metrics/
 https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/SoftRankWsdm08Submitted.pdf
+
+20. 继续研究输入构造：成组特征传输及其真实梯度（2026-10-12）
+
+本节检验一个具体操作：保留来源人群的层级变化规律，把当前合法账号的特征成组变换成历史分布，再经原记录对头训练。它试图补足§19中“只有出生分布、没有当前参数作用”的缺口；以下是静态构造与手算，尚不是推荐方案，不启动旧C诊断或新运行。
+
+20.1 逐账号变换不能一般地同时匹配两个层级
+
+先用抽象账号向量说明，不把它冒充实际S的记录输入。设
+
+    x_ca = mu_D + u_c + e_ca，
+    u_c ~ N(0,B_D)，e_ca iid ~ N(0,W_D)，W_D正定，
+
+不同控制者独立。B是同控账号共享变化，W是账号特有变化；它们不是已辨明的“身份／无关风格”，公共表达因素也可能进入B。这是已知随机效应／PLDA型模型，不是新的生成事实。m个同控账号的堆叠协方差为
+
+    Gamma_D,m = I_m tensor W_D + 11^T tensor B_D。
+
+同一个可逆逐账号线性变换A若要把当前n的两个层级都映到历史o，须同时满足A B_n A^T=B_o、A W_n A^T=W_o。这要求两组(B,W)广义特征值相同；一般的来源／当前差异不满足。例如标量B_n=W_n=W_o=1、B_o=4，分别要求A²=4与A²=1，不可能。该限制只针对这种可逆、逐账号、确定性线性构造，不排除随机或非线性方法。
+
+20.2 一个数学成立的联合变换，以及标签究竟在哪里进入
+
+令xbar=(1/m)sum_a(x_ca-mu_n)，定义
+
+    A_mean,m=(W_o+m B_o)^(1/2) (W_n+m B_n)^(-1/2)，
+    A_contrast=W_o^(1/2) W_n^(-1/2)，
+    x_tilde_ca=mu_o+A_mean,m xbar+A_contrast[(x_ca-mu_n)-xbar]。
+
+这里用对称正定平方根，其乘积本身未必对称，也不声称是最优运输映射。均值与账号对比在该高斯模型下独立，协方差分别是B_n+W_n/m及(delta_ab-1/m)W_n。直接代入得到
+
+    Cov(x_tilde_ca,x_tilde_cb)=B_o+delta_ab W_o。
+
+因此两／三账号联合律都能匹配指定的目标高斯律。不同m的目标律有一致边缘，但同一对输入加入第三个账号后，变换出来的具体数值一般会改变，不能把分布一致说成逐样本一致。已有白化／着色变换见[L28]；分层使用它不是自动成立的新贡献。
+
+这一步使用训练同控分量来算xbar，而不是部署时可见的信息。特别取B_n=0、B_o>0：当前账号特征完全没有共享变化，变换仍能造出B_o，因为它使用了真实分量标签来耦合独立噪声。这可以是一个明确声明的条件合成器，但“合成样本有同控相关性”不能证明编码器从原文本学到了同控特征；部署时不能对未知账号使用真实分量来做相同变换。完整S的正常监督并不能让这项额外作用的归因自动成立。
+
+20.3 分布匹配得精确，新增encoder作用也可能恰好消失
+
+取标量x_theta=theta z，theta>0，z均值0方差1。若每次按当前精确方差theta²重新估计传输T_theta=1/theta，则y_theta=T_theta x_theta=z。对ell(y)=y²/2，传输后风险恒为1/2，完整链式导数为0。
+
+若只截断T_theta的梯度，反传却给出z²/theta，期望1/theta。这是另定义的代理更新，不是上述恒定风险的真实导数。一般地，若每个theta都将条件联合律精确变成同一历史律，对固定head及可交换微分／积分的损失，分布风险本身就不随encoder改变；固定样本路径梯度可非零，但不能据此宣布它是正确旧风险梯度。
+
+截断梯度并非一概不可用；EFDM已明确通过直通构造在分布替换后反传[L29]，其用途是特征增强。若本候选采取相同做法，必须把目标说成增强所定义的代理训练，并给出超出这种直接适配的依据，不能以“encoder梯度非零”冒充解决了§19.4。另一选择是在阶段起点估计映射并固定，此时后续确有该固定变换目标的梯度，却不再持续精确匹配旧分布，仍需验证这种增强是否有益。
+
+20.4 落到实际记录层，而不是悄悄替换S结构
+
+已静态回读step28_record_replay.py的record_vectors、pair_table、account_logits、backward_group与update。实际S分别归一化标题／描述，再拼成2048维记录向量；每个记录对先过非线性head，最后平均为账号分数。账号均值先变换再打分并不等价，尤其不能把20.2账号模型直接插入而声称完整结构保留。
+
+在仅供手算的平衡层级模型中，每个控制者m个账号、每账号k条记录，设
+
+    z_car=mu+u_c+v_ca+e_car，协方差分别为B、A、R。
+
+令N=mk，Q0=J_N/N，Qa=I_m tensor (J_k/k)-Q0，Qr=I_N-I_m tensor(J_k/k)。三者是互相正交且和为I的投影，则完整记录协方差分解为
+
+    Gamma=Qr tensor R + Qa tensor(R+k A) + Q0 tensor(R+k A+mk B)。
+
+分别在这三个子空间用目标平方根乘来源逆平方根，就得到该假设下的完整记录联合传输；这只是对20.2的层级推广。账号记录数不等时，Gamma=I_N tensor R+blockdiag(J_k1,...,J_km) tensor A+J_N tensor B，不能原封不动沿用平衡投影。实际记录两半各有固定范数，非退化欧氏高斯不可能恰是其分布；变换后重新归一化又会改变上述矩匹配。改在归一化前操作可以定义另一个近似，但需要明确输入及目标，不能保留“最终记录律精确匹配”的说法。
+
+保存三份2048×2048的FP32稠密矩阵就需50,331,648字节，未计均值、原始六群及teacher，明显超过1MiB历史状态限制。低秩、对角或分通道近似可以另作设计，却不是本公式已经满足预算；构造期临时内存与跨阶段持久历史载荷仍分别核算。
+
+20.5 近邻与当前处置
+
+WCT提供白化／着色，EFDM明确采用直通梯度；近期GATF已把特征传输、历史统计和学习过程联系起来[L30]。因此“保存矩＋传输＋反传”本身不能作为新C贡献。身份相关特征增强也有直接近邻CCFA：本次仅取得作者原稿摘要／引言，明确涉及身份相关增强策略；方法全文抓取未成功，不声称已经逐式审核[L31]。
+
+GATF的式(8)还提醒必须逐支路看梯度：其中forward residual calibration对当前特征目标使用stopgrad；按该显示式及分离参数的通常解释，这一支直接训练的是残差映射，不能单凭“联合优化”名称说它直接约束backbone。其另一backward distiller支路确实连接当前特征。本稿只用这个具体计算区别核对自己的设计，未审计该论文代码，也不据此判其完整方法无效。
+
+本构造的有效收获是：同控联合变化需要不同于逐账号边缘的操作；但联合变换又引入标签条件合成、代理梯度、真实记录接口及持久预算四个具体问题。尚未找到同时解决这些问题、且超过层级白化／常规增强适配的机制，所以此版本不包装成可送审的新方案。它不是实验负结果，也不否定特征增强家族。继续转向能在来源消失后保留可重算输入或有依据响应的构造；不把不断补充旧C诊断当作进展，不申请本版本实施。
+
+[L28] Li等，Universal Style Transfer via Feature Transforms，NeurIPS2017；本次读作者稿v2的§3.1—3.3，重点式(2)—(4)及encoder／decoder固定条件。借用其已知白化／着色机制，不移植图像效果或声称层级推广原创。
+https://arxiv.org/html/1705.08086
+
+[L29] Zhang等，Exact Feature Distribution Matching for Arbitrary Style Transfer and Domain Generalization，CVPR2022；本次读作者稿v2的§3.2、式(5)、Algorithm 1及相关实例检索说明。确认梯度截断／直通构造，未审计全部实验或实现。
+https://arxiv.org/html/2203.07740
+
+[L30] Xu／Krawczyk，Geometry-Anchored Transport Framework for Exemplar-Free Class-Incremental Learning，arXiv2606.25347v2（2026-06-25）。本次读§3.1—3.4式(1)—(13)，尤其GLS映射、双向分支、stopgrad及EMA；未审计补充代码、效果表或依据仓库名断言会议录用。
+https://arxiv.org/html/2606.25347
+
+[L31] Han等，Clothing-Change Feature Augmentation for Person Re-Identification，CVPR2023。作者原稿检索正文提供摘要／引言及身份相关增强概述；本次PDF打开／方法定位失败，阅读范围不包括方法逐式或实现。仅用作不得忽略的近邻线索，不据此作完全等价裁决。
+https://www.eecs.qmul.ac.uk/~sgg/papers/HanEtAl_CVPR2023.pdf
