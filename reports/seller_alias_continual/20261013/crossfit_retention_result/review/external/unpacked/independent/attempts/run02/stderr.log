@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 562, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 560, in main
+    review.provenance();review.execution_check();review.statistics();review.diagnostics();review.finish(start)
+                                                                     ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 536, in diagnostics
+    recursive(self.results[key],saved[key],key)
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 532, in recursive
+    for k in expected: recursive(actual[k],expected[k],path+'/'+k)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 534, in recursive
+    else: self.close(actual,expected,'linux_reference_summary',path)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 58, in close
+    a, b = np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: float() argument must be a string or a real number, not 'dict'

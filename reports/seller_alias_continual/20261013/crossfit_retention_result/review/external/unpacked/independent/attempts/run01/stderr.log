@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 558, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 556, in main
+    review.provenance();review.execution_check();review.statistics();review.diagnostics();review.finish(start)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 252, in execution_check
+    self.eq([r['history_uid'] for r in t['rows']],t['history_ids'],point+' rows align history IDs')
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 55, in eq
+    self.require(a == b, name)
+  File "/workspace/scratch/c3884a91f17d/c_cf_result_review_20261013/independent/recompute.py", line 51, in require
+    if not bool(condition): raise AssertionError(name)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: A_shared rows align history IDs

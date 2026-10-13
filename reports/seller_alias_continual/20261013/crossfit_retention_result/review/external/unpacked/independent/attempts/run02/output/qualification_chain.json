@@ -1,0 +1,129 @@
+{
+  "attempts": [
+    {
+      "kind": "cpu",
+      "attempt": 1,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "outer_seconds": 16.842430353164673,
+      "inner_seconds": 16.421365288086236,
+      "outer_conservative_seconds": 17,
+      "tests_run": 11,
+      "updates": null,
+      "source_count": 29,
+      "different_current_paths": [
+        "scripts/step28_crossfit_retention.py",
+        "scripts/step28_crossfit_retention_run.py",
+        "scripts/step28_crossfit_retention_verify.py",
+        "scripts/step28_record_replay_run.py",
+        "tests/test_step28_crossfit_retention.py"
+      ],
+      "tar_sha256": "eea2b7cc388bc806ecc3688484c00c42fe25b4f39e86725c0fdcd47e50947ece",
+      "torch": null,
+      "stage": null
+    },
+    {
+      "kind": "cpu",
+      "attempt": 2,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "outer_seconds": 16.717286825180054,
+      "inner_seconds": 16.29814686300233,
+      "outer_conservative_seconds": 17,
+      "tests_run": 11,
+      "updates": null,
+      "source_count": 29,
+      "different_current_paths": [
+        "scripts/step28_crossfit_retention_run.py",
+        "scripts/step28_crossfit_retention_verify.py",
+        "scripts/step28_record_replay_run.py",
+        "tests/test_step28_crossfit_retention.py"
+      ],
+      "tar_sha256": "207077a35cf7211ccdba2cb13f07afb96efdc3f5f9a267f8b53fcd7a4357add7",
+      "torch": null,
+      "stage": null
+    },
+    {
+      "kind": "cpu",
+      "attempt": 3,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "outer_seconds": 17.29218602180481,
+      "inner_seconds": 16.86677206121385,
+      "outer_conservative_seconds": 18,
+      "tests_run": 13,
+      "updates": null,
+      "source_count": 29,
+      "different_current_paths": [
+        "scripts/step28_crossfit_retention_verify.py",
+        "tests/test_step28_crossfit_retention.py"
+      ],
+      "tar_sha256": "af748322512aa3c27cb3056ff2b4bc13fe31f05e3bc51472ab67169c22527d42",
+      "torch": "2.9.1+cu130",
+      "stage": null
+    },
+    {
+      "kind": "cpu",
+      "attempt": 4,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "outer_seconds": 17.488222122192383,
+      "inner_seconds": 17.0610495749861,
+      "outer_conservative_seconds": 18,
+      "tests_run": 14,
+      "updates": null,
+      "source_count": 29,
+      "different_current_paths": [],
+      "tar_sha256": "e391af6f284c4e01570ddc8bd91a40a1b02323cdc82667d8d910560e9fd025a1",
+      "torch": "2.9.1+cu130",
+      "stage": null
+    },
+    {
+      "kind": "gpu",
+      "attempt": 1,
+      "status": "FAIL",
+      "outer_seconds": 121.40740728378296,
+      "inner_seconds": 119.86113061383367,
+      "outer_conservative_seconds": 122,
+      "tests_run": null,
+      "updates": null,
+      "source_count": 29,
+      "different_current_paths": [
+        "scripts/step28_crossfit_retention_verify.py",
+        "tests/test_step28_crossfit_retention.py"
+      ],
+      "tar_sha256": "af748322512aa3c27cb3056ff2b4bc13fe31f05e3bc51472ab67169c22527d42",
+      "torch": "2.9.1+cu130",
+      "stage": "paired_off"
+    },
+    {
+      "kind": "gpu",
+      "attempt": 2,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "outer_seconds": 218.05313968658447,
+      "inner_seconds": 216.8830241980031,
+      "outer_conservative_seconds": 219,
+      "tests_run": null,
+      "updates": 7,
+      "source_count": 29,
+      "different_current_paths": [],
+      "tar_sha256": "e391af6f284c4e01570ddc8bd91a40a1b02323cdc82667d8d910560e9fd025a1",
+      "torch": "2.9.1+cu130",
+      "stage": "actual_checkpoint_IO_and_restore"
+    }
+  ],
+  "seconds": {
+    "cpu_qualification_seconds": {
+      "actual_outer_sum": 68.34012532234192,
+      "sum_per_attempt_ceiling": 70
+    },
+    "gpu_qualification_seconds": {
+      "actual_outer_sum": 339.46054697036743,
+      "sum_per_attempt_ceiling": 341
+    }
+  },
+  "recomputed_projection": {
+    "train_seconds": 26555.83081421256,
+    "forward_seconds": 6267.049569682218,
+    "io_seconds": 131.26628675218672,
+    "total_seconds": 45692.68333830871,
+    "peak_output_bytes": 16691630919
+  },
+  "boundary": "All GPU/CPU behavior above is supplied project receipt evidence, not performed in this web review."
+}

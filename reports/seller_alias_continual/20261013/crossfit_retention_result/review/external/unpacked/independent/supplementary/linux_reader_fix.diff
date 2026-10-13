@@ -1,0 +1,13 @@
+--- input/analysis_attempt01/source.py
++++ input/step28_crossfit_result_audit.py
+@@ -41,8 +41,9 @@
+     assert not (root / "failure.json").exists()
+     gate = read(args.workspace / "reports/documentation/20261012/crossfit_retention/qualification/formal_gate.json")
+     source_files = completion["source_files"]
+-    for obj in [manifest, col, reported, before, read(root / "execution.json"), gate]:
++    for obj in [manifest, col, reported, before, gate]:
+         assert obj["source_files"] == source_files
++    assert read(root / "execution.json")["sources"] == source_files
+     checked_files = []
+ 
+     def verify(parent, rec):

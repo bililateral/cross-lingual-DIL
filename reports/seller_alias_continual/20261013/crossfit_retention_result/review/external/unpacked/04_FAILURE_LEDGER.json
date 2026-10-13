@@ -1,0 +1,84 @@
+{
+  "formal_experiment_failure_observed_in_supplied_evidence": false,
+  "original_formal_exit_code": 0,
+  "main_web_success": "independent/attempts/run03",
+  "failures": [
+    {
+      "id": "P01",
+      "scope": "project native qualification",
+      "status": "FAILED_THEN_EXPLICITLY_AUTHORIZED_SUPPLEMENT",
+      "paths": [
+        "input/qualification/evidence/gpu/attempt01",
+        "input/qualification/native_disposition.zh.txt",
+        "input/qualification/native_retry_authorization.json"
+      ],
+      "cause": "torch.isfinite on None gradient at paired_off; five prior updates inferred from stage, not five saved per-step receipts.",
+      "disposition": "Original failure retained; CPU04 checker correction and one approved seven-step GPU02; cumulative 12 steps, 341 conservative seconds."
+    },
+    {
+      "id": "P02",
+      "scope": "project saved-result reader",
+      "status": "FAILED_THEN_READER_ONLY_FIXED",
+      "paths": [
+        "input/analysis_attempt01",
+        "input/step28_crossfit_result_audit.py",
+        "independent/supplementary/linux_reader_fix.diff"
+      ],
+      "cause": "execution.json sources field read as source_files; KeyError before statistics.",
+      "disposition": "One reader-only diff hunk; no formal source or result mutation."
+    },
+    {
+      "id": "W00",
+      "scope": "web exploratory display",
+      "status": "FAILED_ORIGINAL_OUTPUT_TRUNCATED_EXPLICIT_REPLAY_RETAINED",
+      "paths": [
+        "independent/exploration_failure_replay.py",
+        "independent/exploration_failure_replay"
+      ],
+      "cause": "Called .items() on list-root analysis_manifest.json.",
+      "disposition": "Original interactive full stdout/stderr not retained; exact command transcription and labelled replay preserve complete reproducer logs. Not passed off as original logs."
+    },
+    {
+      "id": "W01",
+      "scope": "web independent numerical reference",
+      "status": "FAILED_OWN_ASSERTION_FIXED",
+      "paths": [
+        "independent/attempts/run01"
+      ],
+      "cause": "Compared 288 A-stage row-level history_uid=None entries to empty history_ids draw list.",
+      "disposition": "Assert each correct representation separately; scientific formulas and inputs unchanged."
+    },
+    {
+      "id": "W02",
+      "scope": "web independent numerical reference",
+      "status": "FAILED_OWN_RECURSION_FIXED",
+      "paths": [
+        "independent/attempts/run02"
+      ],
+      "cause": "Generic numeric comparison failed to recurse into list of dictionary residual records.",
+      "disposition": "Container handling fixed only; run03 fully passes, all partial outputs and snapshots retained."
+    },
+    {
+      "id": "W03",
+      "scope": "web supplementary receipt check",
+      "status": "FAILED_OWN_TEMPORAL_ASSUMPTION_FIXED",
+      "paths": [
+        "independent/supplementary_attempt01",
+        "independent/supplementary"
+      ],
+      "cause": "Assumed access_at_start meant pre-parse train=0; observed receipt is after first real update and correctly train=1.",
+      "disposition": "Check startup_observation time/status/first event and train=1; no project access ledger mutation."
+    },
+    {
+      "id": "H01",
+      "scope": "earlier implementation review",
+      "status": "HISTORICAL_NARRATIVE_ONLY_IN_CURRENT_INPUT",
+      "paths": [
+        "input/review/support/reports/documentation/20261012/crossfit_retention/review/external/unpacked/01_REVIEW.zh.txt"
+      ],
+      "cause": "Earlier reviewer tar checker treated directory members as ordinary files.",
+      "disposition": "Current 303-member package provides narrative, not original prior stderr or full 19-member return ZIP. No claim of independent reread of unavailable raw log."
+    }
+  ],
+  "not_failures": "CPU attempts 01-04 PASS; expected negative fixtures not formal failures; output truncation alone not a script failure."
+}

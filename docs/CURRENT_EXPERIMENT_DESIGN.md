@@ -2,7 +2,7 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-当前已批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B已于10月12日19:53:39正常完成，结果回传和独立保存统计复核完成。当前[结果分析](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势；新结果包已获具体许可并于10月13日09:42提交外审、确认网页开始，当前状态见交接。静态原稿、实施外审／主审、资格与失败证据保持原件；不据辅助指标选轮／调参／扩跑，不恢复旧C单独诊断。
+当前已批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B已于10月12日19:53:39正常完成，结果回传和独立保存统计复核完成。当前[结果分析](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势；新结果外审与[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，完整返回包与保存统计核对一致，无当前科学／复现阻断；本固定配置按“有效完成，未建立改进”结束。已补齐训练—valid差距扩大和原判据未触发原因，完整S继续作为主要内部对照，当前状态见交接。静态原稿、实施外审／主审、资格与失败证据保持原件；不据辅助指标选轮／调参／扩跑，不恢复旧C单独诊断。
 
 | 合同 | 研究内容及角色 |
 |---|---|
