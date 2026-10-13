@@ -2,11 +2,14 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-当前已批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B已于10月12日19:53:39正常完成，结果回传和独立保存统计复核完成。当前[结果分析](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势；新结果外审与[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，完整返回包与保存统计核对一致，无当前科学／复现阻断；本固定配置按“有效完成，未建立改进”结束。已补齐训练—valid差距扩大和原判据未触发原因，完整S继续作为主要内部对照，当前状态见交接。静态原稿、实施外审／主审、资格与失败证据保持原件；不据辅助指标选轮／调参／扩跑，不恢复旧C单独诊断。
+用户2026-10-13明确下一步先做[完整S贡献定位](../reports/documentation/20261013/s_contribution/report.zh.txt)：核查已有方法的实质区别，判断是否值得作为最终方法基础；不足再明确机制缺口。当前仅静态研究，不开新训练、不恢复旧C诊断，也未自动将S定为最终算法。外审及交付状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
+
+已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [C_cf执行合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md) | 当前执行依据，用户已批准范围并要求实现、核验及满足前提后正式运行。完整S／C_cf／C_perm、A→B、1440更新／2304梯度群呈现；CPU300秒、原生600秒、正式16小时／16GiB，标签各一次及统一盲门。实现／CPU、实现外审／独立处置、原生与完整预算／资源门依次落实；旧静态稿中的待批准草案不作为当前阻断。 |
+| [完整S贡献定位与机制缺口](../reports/documentation/20261013/s_contribution/report.zh.txt) | 当前静态研究报告，不是执行合同。核对实际S、归因实验和直接近邻；判断基础系统价值与独立创新是否充分，明确自然账号内部结构与同控重组的待研究问题。不新增训练、数据读取或旧C诊断，当前审查状态见交接 |
+| [C_cf执行合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md) | 已结束固定实验的执行依据。完整S／C_cf／C_perm、A→B、1440更新／2304梯度群呈现；CPU300秒、原生600秒、正式16小时／16GiB，标签各一次及统一盲门。原生失败及一次补核例外、完整结果审查与权重清理按交接和回执解释，旧静态稿中的待批准草案不恢复成当前阻断，也不重授训练权限 |
 | [C折外支持的历史排序间隔保持](../reports/documentation/20261011/retention_design/crossfit.zh.txt) | 静态外审／[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)已完成，按有限增量策略推荐继续准备。完整群折外来源与全域来源共同支持的单边正负间隔，替换候选自己的D0，完整S不变。S／C_cf／可行错配C_perm能比较系统替换及原赋值相对本次错配，不能证明折外信息的独立必要性；已知cross-fitting／排序KD构件不冒称首创。拟议A→B、1,440更新／2,304梯度群呈现；新目标接线、Memory诊断、A/B评价、共享A和完整预算投影待落实，访问与12小时／16GiB等未获具体批准。尚未实现／运行或建立效果；[完整回收状态](../reports/documentation/20261011/retention_design/crossfit_review/submission.json) |
 | [C跨账号条件配对保持候选](../reports/documentation/20261011/retention_design/matching.zh.txt) | 静态外审／[独立主审及补正](../reports/documentation/20261011/retention_design/matching_review/primary_disposition.zh.txt)已完成，本版本不推荐进入实现或四臂训练；数学主体成立，但结构化KD及U-centering已有、任务信息选择和独立贡献不足，效果未知。原稿保留，单合格视图9维、二阶式、反例及完整S更新边界以主审补正为准；不是新实验负结果，完整S仍为对照，旧C单独诊断不恢复 |
 | [C联合排序响应收缩保持方案](../reports/documentation/20261011/retention_design/contraction.zh.txt) | 静态外审／[独立主审与补正](../reports/documentation/20261011/retention_design/review/primary_disposition.zh.txt)已完成，本版本不推荐实施；有限数学成立，但弱OT适配的任务信息依据与实质贡献不足，效果未知。四臂仅为未执行的固定策略比较；原稿保留，低维软约束、子包粒度、归因及文献勘误以主审为准。不是执行合同，未关闭整个C研究，完整S仍为主要内部对照 |
