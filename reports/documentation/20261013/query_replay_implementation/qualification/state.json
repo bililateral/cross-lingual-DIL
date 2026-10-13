@@ -1,6 +1,6 @@
 {
   "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace",
-  "current_stage": "NATIVE_FAILED_FIXED_CPU_PASS_AWAITING_ONE_REQUALIFICATION_AUTHORIZATION",
+  "current_stage": "FORMAL_RUNNING",
   "cpu_attempts": [
     {
       "attempt": 1,
@@ -47,11 +47,36 @@
         "bytes": 4626,
         "sha256": "04f64d9ab5f2d55550140cc55d7e06b74aa7ba89d3739f1708ee21463e91bdeb"
       }
+    },
+    {
+      "attempt": 2,
+      "status": "PASS_HANDWRITTEN_ONLY",
+      "started_at": "2026-10-13T17:58:13+08:00",
+      "wrapper_pid": 9397,
+      "prior_conservative_seconds": 201,
+      "maximum_additional_seconds": 399,
+      "maximum_additional_updates": 6,
+      "gate": "qualification/gpu/attempt02/gate.json",
+      "result": "qualification/gpu/attempt02/result/result.json",
+      "ended_at": "2026-10-13T18:02:41+08:00",
+      "outer_seconds": 267.9413435459137,
+      "charged_seconds": 268,
+      "actual_updates": 6,
+      "source_snapshot": "qualification/cpu/attempt03/source.tar.gz",
+      "process_exited": true,
+      "retrieval": {
+        "archive_bytes": 69325,
+        "archive_sha256": "f4ad6292840dc37158176a48b39bbc3f25ff04d2cbf9320264df89be663a6984",
+        "members": 13,
+        "all_payloads_retrieved": true,
+        "remote_archive_removed_after_verified_retrieval": true,
+        "local_transfer_archive_removed": true
+      }
     }
   ],
-  "gpu_used_conservative_seconds": 201,
-  "formal_started": false,
-  "formal_inputs": false,
+  "gpu_used_conservative_seconds": 469,
+  "formal_started": true,
+  "formal_inputs": true,
   "cpu_evidence_retrieval": {
     "archive_bytes": 148579,
     "archive_sha256": "09f6483cc11120876f89a810311e49cf4de18019a504ae131c3aeacca450dd2c",
@@ -112,7 +137,7 @@
     ]
   },
   "implementation_review": "../review/submission.json",
-  "observed_at": "2026-10-13T17:45:02.701339+08:00",
+  "observed_at": "2026-10-13T18:14:35.607006+08:00",
   "cpu_attempt02_retrieval": {
     "archive_bytes": 152282,
     "archive_sha256": "ba89240abbe2275d3f2658975eed4cad51ac9c7b5375b0e0d6d758456678e2bc",
@@ -181,7 +206,7 @@
     ]
   },
   "native_disposition": "native_disposition.zh.txt",
-  "native_requalification_authorized": false,
+  "native_requalification_authorized": true,
   "cpu_attempt03_retrieval": {
     "archive_bytes": 151877,
     "archive_sha256": "e8a7c39d6d7e1a1fc44c5119630cb44b2ffcc97bf54246d6b5e2b8945dbd46c0",
@@ -245,12 +270,123 @@
     ]
   },
   "latest_remote_verification": {
-    "source_files": 29,
-    "primary_review_native_disposition_state_and_return_archive_match": true,
-    "formal_job_exists": false,
-    "retry_attempt_exists": false,
-    "failed_native_checkpoint_files": 0,
-    "gpu_compute_apps": [],
-    "transport_note": "Final inspection first hit an automatic approval timeout, then the old SSH connection reset; one reconnect recovered and verified actual state. No scientific rerun."
+    "observed_at": "2026-10-13T18:14:35.607006+08:00",
+    "formal_job_exists": true,
+    "native_attempt02_completed": true,
+    "wrapper_timeout_training_identity_verified": true,
+    "formal_training_affinity": [
+      0
+    ],
+    "formal_started_once": true,
+    "formal_failure": false,
+    "formal_completion": false,
+    "qualification_sources_match_cpu03_and_deployed": 29,
+    "observation": "qualification/formal_observation.json"
+  },
+  "native_requalification_authorization": "native_authorization.json",
+  "gpu_used_actual_updates": 11,
+  "native_conclusion": {
+    "pinned_chinese_BGE_identity_verified": true,
+    "actual_Q_vs_S_encoder_head_updates": true,
+    "actual_C_q_vs_Q_encoder_head_updates": true,
+    "diagnostic_and_next_update_bitwise_equal": true,
+    "full_and_inference_state_restoration": true,
+    "temporary_checkpoints_removed_after_verification": true,
+    "projection": {
+      "forward_seconds": 8067.985079616308,
+      "io_seconds": 158.5920913736336,
+      "projected_peak_output_bytes": 18126446362,
+      "projected_total_seconds": 51691.62682383263,
+      "train_seconds": 29526.724288076162,
+      "within_budget": true
+    },
+    "saved_field_arithmetic_verified": true,
+    "scientific_limit": "Handwritten qualification only; no formal efficacy conclusion"
+  },
+  "formal": {
+    "workspace_job": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/reports/job",
+    "started_at": "2026-10-13T18:07:16+08:00",
+    "wrapper_pid": 9555,
+    "timeout_pid": 9561,
+    "training_pid": 9562,
+    "training_owner": "yongpeng",
+    "cpu_affinity": [
+      0
+    ],
+    "gpu": 0,
+    "access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0
+    },
+    "last_progress": {
+      "completed": 48,
+      "elapsed_seconds": 348.0706233396195,
+      "event": "updates",
+      "limits": {
+        "maximum_cuda_reserved_bytes": 30064771072,
+        "maximum_gpu_stage_seconds": 57600,
+        "maximum_output_bytes": 19327352832,
+        "maximum_rss_bytes": 68719476736,
+        "minimum_free_gpu_bytes": 32212254720,
+        "minimum_free_host_bytes": 77309411328,
+        "torch_cpu_threads": 1
+      },
+      "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261013/query_replay_implementation, all within this isolated workspace",
+      "peak_cuda_reserved_bytes": 7417626624,
+      "peak_output_bytes": 1481307,
+      "peak_rss_bytes": 2672799744,
+      "phase": "A_shared",
+      "point": "A_shared"
+    },
+    "failure": null,
+    "completion_exists": false,
+    "gate": "qualification/formal_gate.json",
+    "observation": "qualification/formal_observation.json",
+    "listener_created": false,
+    "eta": {
+      "basis": "Initial conservative planning from maximum-shape native measurements; lower end before the fixed 25 percent allowance, upper end after it; not a confidence interval or observed formal average",
+      "projected_total_seconds": 51691.62682383263,
+      "projected_remaining_seconds_at_observation": 51252.01981783263,
+      "planning_window_start": "2026-10-14T05:36:29.301459+08:00",
+      "planning_window_end": "2026-10-14T08:28:47.626824+08:00",
+      "forced_deadline": "2026-10-14T10:07:16+08:00"
+    },
+    "resource": {
+      "elapsed_seconds": 436.5423974096775,
+      "limits": {
+        "maximum_cuda_reserved_bytes": 30064771072,
+        "maximum_gpu_stage_seconds": 57600,
+        "maximum_output_bytes": 19327352832,
+        "maximum_rss_bytes": 68719476736,
+        "minimum_free_gpu_bytes": 32212254720,
+        "minimum_free_host_bytes": 77309411328,
+        "torch_cpu_threads": 1
+      },
+      "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261013/query_replay_implementation, all within this isolated workspace",
+      "peak_cuda_reserved_bytes": 7417626624,
+      "peak_output_bytes": 1547933,
+      "peak_rss_bytes": 2674266112,
+      "phase": "A_shared"
+    },
+    "start_observation": "qualification/formal_start.json",
+    "evidence_retrieval": {
+      "formal_preflight.json": {
+        "bytes": 294,
+        "sha256": "9914c1cd4e82404a5748662dfe2e88f2fbb8b1e1c25f63c983512f3ed462ee7a",
+        "remote_identity_matches": true
+      },
+      "formal_start.json": {
+        "bytes": 4787,
+        "sha256": "8d981ce32f4ebb022204ea4c83d2faa93786b405ff4e8293fc432af9f47b1322",
+        "remote_identity_matches": true
+      },
+      "formal_observation.json": {
+        "bytes": 4467,
+        "sha256": "15583659ce3b969a734d0e5a2634c32c6993bfbf162239a66330d9445daf3a1a",
+        "remote_identity_matches": true
+      }
+    }
   }
 }

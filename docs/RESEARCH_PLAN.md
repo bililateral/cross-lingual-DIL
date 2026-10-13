@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-按用户2026-10-13最新决定，本轮起草[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)，落实已结束静态外审的[必要补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)；[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)与送审包冻结。用户随后已明确批准合同范围，当前实现、受影响CPU补核及[合并实现外审独立处置](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)已完成；原生首次失败后已修复目录路径并补核CPU，按[失败处置](../reports/documentation/20261013/query_replay_implementation/qualification/native_disposition.zh.txt)等待一次补核例外，正式仍须完整原生、固定实测投影和现场条件，旧C诊断不恢复；实际状态只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。
+按用户2026-10-13最新决定，本轮起草[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)，落实已结束静态外审的[必要补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)；[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)与送审包冻结。用户随后已明确批准合同范围，当前实现、受影响CPU补核及[合并实现外审独立处置](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)已完成；原生目录故障修复后，已按用户批准的一次补核例外完成资格，累计11步／469秒；固定实测投影及现场资源满足，正式已启动。持续遵守统一盲门与失败不自动重跑，旧C诊断不恢复；实际状态只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。
 
 此前已完成[静态外审与独立处置](../reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt)，区分“有效基础系统”“值得保留的任务化候选”和“贡献充分的最终方法”。S符合前两项，第三项尚未建立；不因构件已有就否定组合价值，也不把独立历史增益设成所有增量贡献的硬门槛。若主张历史专属作用，仍须相应归因。新增近邻C²Aug及FDR覆盖已补足。具体机制缺口收窄为：处理重组引入的共同原账号来源证据，同时保留有价值的非退化重组；严格禁止所有来源重叠会退化为整账号置换，简单屏蔽未成为推荐方案。可在已有静态范围内继续形成明确运算与证伪逻辑，暂不开训练或旧C诊断；新包外发、新执行及最终方法选择分别遵守对应许可，外审不自动授权。
 

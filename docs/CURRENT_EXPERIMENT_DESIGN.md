@@ -2,7 +2,7 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-用户2026-10-13最新要求起草具体方案实现合同，现见[C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)中的信息损失、偏置、条件控制与共享状态要求已纳入合同。完整S不削弱，效果和最终贡献未建立；合同随后已获用户批准，实现及Linux手写CPU资格已完成，合并实现外审已完整回收并经独立主审关闭；已落实模型归档身份和S/Q作用证据补正，原生首次失败的目录问题已修复并补核CPU，GPU例外尚待决定；正式仍按资格／预算前提衔接，旧C诊断不恢复，状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
+用户2026-10-13最新要求起草具体方案实现合同，现见[C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)中的信息损失、偏置、条件控制与共享状态要求已纳入合同。完整S不削弱，效果和最终贡献未建立；合同随后已获用户批准，实现及Linux手写CPU资格已完成，合并实现外审已完整回收并经独立主审关闭；已落实模型归档身份和S/Q作用证据补正，原生目录故障修复后的一次获准补核已通过，累计11步／469秒；实测投影及现场条件满足，正式四臂已启动，旧C诊断不恢复，状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
 已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
 

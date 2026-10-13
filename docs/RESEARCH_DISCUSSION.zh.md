@@ -1071,3 +1071,10 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 实现审查已关闭，专用网页在确认无运行或待发送操作后关闭；原生按原批准最多6实际更新／600秒启动，固定投影、资源与恢复资格全部满足才可正式运行，GPU／正式失败无自动重跑。最新实测、访问账和实际运行状态统一见[交接](AI_RESEARCH_HANDOFF.zh.md)与[资格账](../reports/documentation/20261013/query_replay_implementation/qualification/state.json)。旧C诊断持续停止，C_q相对完整S收益尚未建立，新材料仅本地Git，不扩大旧公开推送许可。
 
 原生首次核验于16:57:20—17:00:40完成5步后，在诊断实际写盘时因子目录未创建退出1；未第6步、未保存检查点、未正式读取。失败保守计201／600秒。已最小修复本轮核验调用，并于17:06直接使用不存在子目录的Linux CPU实际完整诊断验证通过，CPU累计46／300秒；原失败证据不覆盖。17:09确认相关进程退出、无正式job，已向用户具体请求只补一次完整6步，累计最多11步／600秒不变、余399秒，再失败停止；当前等待决定，不自动重跑。完整范围与依据见[原生处置](../reports/documentation/20261013/query_replay_implementation/qualification/native_disposition.zh.txt)。
+
+
+## 2026-10-13：批准一次C_q原生补核
+
+用户对call_bb77c7fbc8374bd7957060e3fadfcd43明确答复：“批准一次补核，累计最多11步、600秒（推荐）”。覆盖一次完整6步补核，首轮5步／保守201秒继续计账，补核至多399秒；单CPU线程／单GPU、28GiB显存、64GiB主存、6GiB临时磁盘及128MiB证据不变，再失败仍停止。通过且固定实测投影、现场资源等全部满足后继续原批准四臂正式运行，不重新确认既有范围；无旧C诊断、新候选、额外数据权限或公开推送许可。原失败与目录补正原件不改，具体来源绑定见[本次补核授权](../reports/documentation/20261013/query_replay_implementation/qualification/native_authorization.json)。
+
+获准补核于17:58:13—18:02:41完成6实际更新，exit0；连首轮失败累计11步／保守469秒。真实固定中文BGE身份、Q/S和C_q/Q实际更新、完整诊断中立性及完整／推理保存恢复全部通过，临时权重留身份后删除。固定投影14.358785小时／16.881569GiB满足原预算，18:05现场资源充足，正式于18:07:16直接启动，无监听；18:08确认CPU0／GPU0实际更新、train=1／valid=0，未开放valid或任何效果结论。详见[资格与启动账](../reports/documentation/20261013/query_replay_implementation/qualification/state.json)。
