@@ -1,0 +1,86 @@
+# 逐文件实际阅读范围
+
+列全80个输入成员。行号为原UTF-8文本1起始；完整身份机械核对不等于通读。源文件的已读范围合并重复窗口，未读补集明确列出。JSON长单行的全文结构化展示记为该原始一行。未把旧算例或旧GPU结果当本轮新证据。
+
+| 文件 | 状态／总行数 | 已读行 | 未读行 | 范围说明 |
+|---|---|---|---|---|
+| `AGENTS.md` | FULL_TEXT / 24 | 1–24 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `INPUT_MANIFEST.json` | MECHANICAL_ONLY / 412 | 无 | 1–412 | 完整结构化解析并逐项校验路径、大小和SHA；不把身份清单的机械处理等同科研正文阅读。 |
+| `docs/RESEARCH_DISCIPLINE.zh.md` | PARTIAL_TEXT / 179 | 1–125 | 126–179 | 只读适用于当前实现及审查边界的条款；其余通用／历史部分不扩审。 |
+| `docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md` | MECHANICAL_ONLY / 231 | 无 | 1–231 | 旧实验文档未通读；本轮以当前C_q合同及实际直接依赖为准，不追溯全历史。 |
+| `docs/SELLER_ALIAS_CROSSFIT_RETENTION.zh.md` | PARTIAL_TEXT / 225 | 68–136 | 1–67；137–225 | 只读旧A/B编排、读取、恢复、评价依据；不重审其折外目标或旧结果。 |
+| `docs/SELLER_ALIAS_QUERY_REPLAY.zh.md` | FULL_TEXT / 249 | 1–249 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `docs/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md` | MECHANICAL_ONLY / 45 | 无 | 1–45 | 旧实验文档未通读；本轮以当前C_q合同及实际直接依赖为准，不追溯全历史。 |
+| `reports/documentation/20261012/crossfit_retention/qualification/formal_disposition.zh.txt` | MECHANICAL_ONLY / 26 | 无 | 1–26 | 旧C_cf审查／资格背景未重开；本轮A/B行为依据读旧合同相关段和实际复用函数。 |
+| `reports/documentation/20261012/crossfit_retention/qualification/gpu/attempt02/result/result.json` | MECHANICAL_ONLY / 1 | 无 | 1 | 旧C_cf GPU原始结果，不是新C_q资格；本轮未重算旧测量，当前预算只独立核对新公式与调用数。 |
+| `reports/documentation/20261012/crossfit_retention/review/external/unpacked/01_REVIEW.zh.txt` | MECHANICAL_ONLY / 244 | 无 | 1–244 | 旧C_cf审查／资格背景未重开；本轮A/B行为依据读旧合同相关段和实际复用函数。 |
+| `reports/documentation/20261012/crossfit_retention/review/primary_disposition.zh.txt` | MECHANICAL_ONLY / 41 | 无 | 1–41 | 旧C_cf审查／资格背景未重开；本轮A/B行为依据读旧合同相关段和实际复用函数。 |
+| `reports/documentation/20261013/query_replay/proposal.zh.txt` | FULL_TEXT / 268 | 1–268 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/FILE_SIZES_SHA256.tsv` | MECHANICAL_ONLY / 21 | 无 | 1–21 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/README.zh.md` | MECHANICAL_ONLY / 39 | 无 | 1–39 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/audit/access_and_limits.zh.md` | MECHANICAL_ONLY / 29 | 无 | 1–29 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/audit/final_input_integrity.json` | MECHANICAL_ONLY / 157 | 无 | 1–157 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/audit/input_verification.json` | MECHANICAL_ONLY / 244 | 无 | 1–244 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/audit/reading_scope.json` | MECHANICAL_ONLY / 454 | 无 | 1–454 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/audit/reading_scope.zh.md` | MECHANICAL_ONLY / 35 | 无 | 1–35 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/literature.zh.md` | MECHANICAL_ONLY / 113 | 无 | 1–113 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/minimal_edits.zh.md` | FULL_TEXT / 39 | 1–39 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/payload_manifest.json` | MECHANICAL_ONLY / 109 | 无 | 1–109 | 旧静态审查附属材料，仅核对随包字节；当前承接依据为已全文阅读的review及minimal_edits和主审处置。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/check_math.py` | MECHANICAL_ONLY / 251 | 无 | 1–251 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/enumerations.json` | MECHANICAL_ONLY / 8454 | 无 | 1–8454 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/environment.json` | MECHANICAL_ONLY / 17 | 无 | 1–17 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/failures_and_corrections.zh.md` | MECHANICAL_ONLY / 9 | 无 | 1–9 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/gradient_details.json` | MECHANICAL_ONLY / 570 | 无 | 1–570 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/inputs.json` | MECHANICAL_ONLY / 33 | 无 | 1–33 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/results.json` | MECHANICAL_ONLY / 212 | 无 | 1–212 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/run.json` | MECHANICAL_ONLY / 16 | 无 | 1–16 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/run_checks.py` | MECHANICAL_ONLY / 27 | 无 | 1–27 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/stderr.txt` | EMPTY / 0 | 无 | 无 | 实测空文件；不存在可读正文，不当作缺失内容。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/repro/stdout.txt` | MECHANICAL_ONLY / 15 | 无 | 1–15 | 旧静态审查算例材料，仅核对随包字节并保留；本轮没有重新执行或据此宣称当前实现合格。 |
+| `reports/documentation/20261013/query_replay/review/external/unpacked/review.zh.md` | FULL_TEXT / 383 | 1–383 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt` | FULL_TEXT / 125 | 1–125 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay/review/recovery.json` | MECHANICAL_ONLY / 36 | 无 | 1–36 | 旧静态回收凭据未重开核验；仅保留原件与输入清单机械匹配。 |
+| `reports/documentation/20261013/query_replay_implementation/authorization.json` | FULL_TEXT / 47 | 1–47 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/implementation.zh.txt` | FULL_TEXT / 50 | 1–50 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/console.txt` | FULL_TEXT / 3 | 1–3 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/launch.sh` | FULL_TEXT / 14 | 1–14 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/launcher.txt` | EMPTY / 0 | 无 | 无 | 实测空文件；不存在可读正文，不当作缺失内容。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/result/actual_update_evidence.json` | FULL_TEXT / 1 | 1 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/result/result.json` | FULL_TEXT / 1 | 1 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/result/scheduler_evidence.json` | FULL_TEXT / 1 | 1 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/result/unittest.txt` | FULL_TEXT / 16 | 1–16 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/source.tar.gz` | BINARY_MECHANICAL / 二进制 | 无 | 不适用 | 二进制归档逐成员机械核对；29来源及授权与当前相同。各内部文本的阅读范围见其外层同路径条目。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/source_manifest.json` | MECHANICAL_ONLY / 147 | 无 | 1–147 | 完整结构化解析并逐项校验路径、大小和SHA；不把身份清单的机械处理等同科研正文阅读。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/cpu/attempt01/wrapper.txt` | FULL_TEXT / 5 | 1–5 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/qualification/state.json` | FULL_TEXT / 78 | 1–78 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/query_replay_implementation/review/request.zh.txt` | FULL_TEXT / 24 | 1–24 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt` | FULL_TEXT / 71 | 1–71 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `schema/step28_alias_ranking_policy.json` | FULL_TEXT / 80 | 1–80 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `schema/step28_bge_continual_policy.json` | PARTIAL_TEXT / 199 | 1–65 | 66–199 | 读取继承配置中与本轮模型／输入／优化等有关段；其余历史实验包装按未变边界复用，仅校验完整文件字节。 |
+| `schema/step28_chinese_base_policy.json` | PARTIAL_TEXT / 247 | 1–175 | 176–247 | 读取继承配置中与本轮模型／输入／优化等有关段；其余历史实验包装按未变边界复用，仅校验完整文件字节。 |
+| `schema/step28_query_replay_policy.json` | FULL_TEXT / 72 | 1–72 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `schema/step28_record_replay_policy.json` | FULL_TEXT / 30 | 1–30 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/run_step28_query_replay_linux_20261013.sh` | FULL_TEXT / 19 | 1–19 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/step28_alias_calibration.py` | PARTIAL_TEXT / 178 | 1–147 | 148–178 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_alias_ranking.py` | PARTIAL_TEXT / 222 | 1–134 | 135–222 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_bge_continual.py` | PARTIAL_TEXT / 321 | 1–175；235–255 | 176–234；256–321 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_bge_continual_evaluate.py` | MECHANICAL_ONLY / 254 | 无 | 1–254 | 机械核对来源／函数导航；此旧入口或未激活分支未作正文逐行审查，不作为新方法资格证明。 |
+| `scripts/step28_bge_continual_run.py` | PARTIAL_TEXT / 572 | 1–87 | 88–572 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_chinese_base.py` | PARTIAL_TEXT / 880 | 1–191；680–691 | 192–679；692–880 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_continual_expression_run.py` | MECHANICAL_ONLY / 448 | 无 | 1–448 | 机械核对来源／函数导航；此旧入口或未激活分支未作正文逐行审查，不作为新方法资格证明。 |
+| `scripts/step28_continual_population.py` | PARTIAL_TEXT / 210 | 1–130；157–210 | 131–156 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_continual_population_data.py` | PARTIAL_TEXT / 258 | 1–116；198–258 | 117–197 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_continual_population_evaluate.py` | PARTIAL_TEXT / 349 | 1–100；225–249 | 101–224；250–349 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_continual_population_run.py` | PARTIAL_TEXT / 356 | 1–74 | 75–356 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_crossfit_retention.py` | MECHANICAL_ONLY / 251 | 无 | 1–251 | 机械核对来源／函数导航；此旧入口或未激活分支未作正文逐行审查，不作为新方法资格证明。 |
+| `scripts/step28_crossfit_retention_run.py` | MECHANICAL_ONLY / 761 | 无 | 1–761 | 机械核对来源／函数导航；此旧入口或未激活分支未作正文逐行审查，不作为新方法资格证明。 |
+| `scripts/step28_query_replay.py` | FULL_TEXT / 174 | 1–174 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/step28_query_replay_run.py` | FULL_TEXT / 707 | 1–707 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/step28_query_replay_verify.py` | FULL_TEXT / 307 | 1–307 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/step28_record_replay.py` | FULL_TEXT / 332 | 1–332 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `scripts/step28_record_replay_numerics.py` | PARTIAL_TEXT / 229 | 1–75 | 76–229 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_record_replay_run.py` | PARTIAL_TEXT / 591 | 1–105 | 106–591 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_record_replay_verify.py` | PARTIAL_TEXT / 219 | 1–90 | 91–219 | 只读当前入口调用到的函数及必要上下文；未读区间为旧入口／旧算法或无本轮具体矛盾的历史实现，不宣称全文复审。 |
+| `scripts/step28_replay_diagnostics.py` | FULL_TEXT / 204 | 1–204 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `tests/test_step28_query_replay.py` | FULL_TEXT / 512 | 1–512 | 无 | 全文读取；重复出现的阅读区间已合并。 |
+| `tests/test_step28_record_replay.py` | PARTIAL_TEXT / 358 | 1–100 | 101–358 | 只读本轮复用的手写输入、小网络和直接参考函数及必要上下文；其余旧测试未重审或执行。 |

@@ -336,17 +336,27 @@ def fresh(c):
     return model, optimizer, identity
 
 
+def verify_archive(archive: dict, c: dict) -> dict:
+    expected = c["models"]["split_rank"]
+    if not isinstance(archive, dict) or any(archive.get(k) != expected[k]
+            for k in ("file_count", "total_size_bytes", "content_sha256")):
+        raise ValueError("Pinned BGE archive differs or is missing")
+    return archive
+
+
+def pretrained_archive(c: dict) -> dict:
+    return verify_archive(core.model_files(base.model_config(c, "split_rank")), c)
+
+
 def train(job, budget):
     import torch
     root = job/"run"
     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics", "sources"):
         (root/sub).mkdir(parents=True)
     c = config()
+    archive = pretrained_archive(c)
     groups, metadata, checked = public_inputs(c)
     _, split = partition(groups, metadata, c)
-    archive = core.model_files(base.model_config(c, "split_rank"))
-    if any(archive[k] != c["models"]["split_rank"][k] for k in ("file_count", "total_size_bytes", "content_sha256")):
-        raise ValueError("Pinned BGE archive differs")
     data.write_json(root/"partition.json", split)
     manifest = {"status": "RUNNING", "source_files": sources(), "public_inputs": checked, "pretrained_archive": archive,
         "partition": data.record(root/"partition.json", root), "points": {}, "training": {}, "diagnostics": {},
@@ -640,8 +650,10 @@ def validate_gate(job, path):
     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
     if (gpu.get("mode") != "gpu" or gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("source_files") != sources()
             or gpu.get("native", {}).get("actual_updates") != 6 or gpu["native"].get("next_update_bitwise_equal") is not True
-            or gpu["native"].get("new_term_encoder_head_effect") is not True):
+            or gpu["native"].get("new_term_encoder_head_effect") is not True
+            or gpu["native"].get("query_encoder_head_effect") is not True):
         raise ValueError("Matching six-update query/response native qualification required")
+    verify_archive(gpu["native"].get("pretrained_archive"), config())
     if not projection(gpu["native"]["measurements"])["within_budget"]:
         raise ValueError("New projection exceeds approved budget; no formal input opened")
     return gate

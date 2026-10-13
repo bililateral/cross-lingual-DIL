@@ -1,0 +1,16 @@
+/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_query_replay_verify.py", line 337, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_query_replay_verify.py", line 324, in main
+    report["native"] = native(check, progress, handwritten, args.output)
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_query_replay_verify.py", line 151, in native
+    diag.capture(model, optimizer, fit, memory, valid, c, arm, "ABC", 2, 1,
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_replay_diagnostics.py", line 120, in capture
+    "fit": previous.save_array(root/(tag+"_fit.npy"), fit_values, root),
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/scripts/step28_bge_continual_run.py", line 52, in save_array
+    np.save(path, values, allow_pickle=False)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/lib/_npyio_impl.py", line 577, in save
+    file_ctx = open(file, "wb")
+FileNotFoundError: [Errno 2] No such file or directory: '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261013/query_replay_execution/20261013_151500/workspace/reports/qualification/gpu/attempt01/result/diagnostics/handwritten_epoch1_fit.npy'

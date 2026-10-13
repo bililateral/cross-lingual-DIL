@@ -8,6 +8,7 @@ import argparse
 import gc
 import os
 from pathlib import Path
+import shutil
 import sys
 import threading
 import traceback
@@ -59,17 +60,34 @@ def component_effects(model, on):
                 if not torch.isfinite(gradient).all() or not torch.isfinite(previous).all():
                     raise ValueError("Nonfinite on/off gradient: "+name)
                 active.append((i, name, parameter))
-        grad_changed = any(not torch.equal(on["grads"][i], p.grad.detach().cpu()) for i, n, p in active)
-        update_changed = any(not torch.equal(on["model"][n], p.detach().cpu()) for i, n, p in active)
-        if not active or not grad_changed or not update_changed:
-            raise ValueError("New response has no distinguishable encoder/head active update effect")
+        gradient_delta = max((float((on["grads"][i]-p.grad.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+        parameter_delta = max((float((on["model"][n]-p.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+        if not active or gradient_delta == 0 or parameter_delta == 0:
+            raise ValueError("No distinguishable encoder/head active update effect")
         effects[component] = {"post_clip_gradient_distinguishable": True, "actual_update_distinguishable": True,
-                              "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive}
+            "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive,
+            "active_parameter_names": [n for i, n, p in active],
+            "post_clip_gradient_max_delta": gradient_delta, "parameter_max_delta": parameter_delta}
     return effects
+
+
+def checked_fresh(c):
+    archive = run.pretrained_archive(c)
+    model, optimizer, initial = run.fresh(c)
+    return model, optimizer, initial, archive
+
+
+def capture_handwritten_diagnostic(model, optimizer, fit, memory, valid, c, arm, out, check=lambda: None):
+    root = out/"diagnostics"
+    root.mkdir()
+    return diag.capture(model, optimizer, fit, memory, valid, c, arm, "ABC", 2, 1,
+                        root, "handwritten", check, scope="AB", table_diagnostic=method.diagnostic)
 
 
 def native(check, progress, handwritten, out):
     resources = preflight()
+    if shutil.disk_usage(out).free < run.policy()["native_verification"]["maximum_work_bytes"]:
+        raise ValueError("Insufficient native temporary disk")
     numerics = run.parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
     measurements, updates = {}, []
@@ -83,7 +101,7 @@ def native(check, progress, handwritten, out):
         return value
     c = run.config()
     progress("load_native_BGE")
-    model, optimizer, initial = timed("L", lambda: run.fresh(c))
+    model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
         raise ValueError("BF16/checkpointing required")
     current, history = [handwritten.handmade_group("native_"+s, 8, 254) for s in ("current", "history")]
@@ -130,15 +148,14 @@ def native(check, progress, handwritten, out):
     payload = memory.to_bytes()
     fit = [handwritten.handmade_group(f"native_fit_{i}") for i in range(48)]
     valid = [data.Group(g.uid, g.sellers, g.items) for g in [handwritten.handmade_group(f"native_valid_{i}") for i in range(40)]]
-    on, off, outcomes, effects, equality = None, None, {}, {}, {}
+    on, off, outcomes, effects, equality, query_effect = None, None, {}, {}, {}, {}
     for arm, label, timing in (("S","S","t_S"),("Q","Q","t_Q"),("C_q","on","t_q"),
                                ("C_b","bootstrap","t_b"),("C_q","repeat","t_q")):
         restore(model, optimizer, baseline, rng, modes)
         if label == "repeat":
             progress("actual_native_epoch_diagnostic")
             before_hash = core.state_digest(state(model, optimizer))
-            diag.capture(model, optimizer, fit, memory, valid, c, arm, "ABC", 2, 1,
-                         out/"diagnostics", "handwritten", check, scope="AB", table_diagnostic=method.diagnostic)
+            capture_handwritten_diagnostic(model, optimizer, fit, memory, valid, c, arm, out, check)
             if (before_hash != core.state_digest(state(model, optimizer)) or rng != diag.rng_state()
                     or modes != [m.training for m in model.modules()] or payload != memory.to_bytes()):
                 raise ValueError("Actual diagnostic changed model/Adam/grad/RNG/modes/Memory")
@@ -149,10 +166,18 @@ def native(check, progress, handwritten, out):
         progress("paired_"+label+"_complete", actual_updates=len(updates), completed_updates=updates, measurements=measurements)
         if run.parent.adam_step(optimizer) != 337:
             raise ValueError("Paired native Adam continuation differs")
-        if label == "Q":
+        if label == "S":
+            original = state(model, optimizer)
+        elif label == "Q":
+            difference = row["total"]-outcomes["S"]["total"]
+            if difference == 0:
+                raise ValueError("Handwritten Q/S objective witness is inactive")
+            query_effect = {"target_difference": difference, "effects": component_effects(model, original)}
+            del original
             off = state(model, optimizer)
         elif label == "on":
-            if row["history"]["response"] <= 0 or row["history"]["assignment_sha256"] != outcomes["Q"]["history"]["assignment_sha256"]:
+            if (row["history"]["response"] <= 0 or row["total"] == outcomes["Q"]["total"]
+                    or row["history"]["assignment_sha256"] != outcomes["Q"]["history"]["assignment_sha256"]):
                 raise ValueError("Response inactive or Q/C_q allocations differ")
             effects = component_effects(model, off)
             del off
@@ -200,9 +225,12 @@ def native(check, progress, handwritten, out):
     removal["removed_after_verification"] = not full_path.exists() and not infer_path.exists()
     data.write_json(out/"temporary_checkpoint_identity.json", removal)
     result = {"resources": resources, "numerics": numerics, "actual_updates": 6, "updates": updates,
+        "pretrained_archive": archive, "initial_state": initial,
         "measurements": measurements, "projection": run.projection(measurements), "active_handwritten_response": target_details,
         "new_term_encoder_head_effect": True, "effects": effects, "next_update_bitwise_equal": True, "equality_counts": equality,
-        "effect_scope": "Actual Q versus C_q on/off update and post-clip gradients; independent direct VJP separately on CPU",
+        "query_encoder_head_effect": True, "Q_minus_S": query_effect,
+        "C_q_minus_Q_target_difference": outcomes["on"]["total"]-outcomes["Q"]["total"],
+        "effect_scope": "Actual Q versus S and C_q versus Q updates and post-clip gradients; independent direct VJP separately on CPU",
         "memory_bytes": len(payload), "maximum_records": 224, "channel_tokens": 256,
         "torch": torch.__version__, "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
         "fixture": "One actual S allocation plus five paired updates from one explicitly synthetic counter-336 state; full real epoch diagnostic before repeat. No formal inputs."}
@@ -218,10 +246,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--gate", type=Path)
     parser.add_argument("--prior-seconds", type=float, default=0.)
+    parser.add_argument("--cpu-tests", nargs="+", help="Affected QueryReplayTests methods; prior evidence is retained separately")
     args = parser.parse_args()
     args.output = args.output.resolve()
     if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+    if args.cpu_tests and args.mode != "cpu":
+        parser.error("Selected tests are only for affected CPU qualification")
     args.output.mkdir(parents=True)
     sys.path.insert(0, str(data.ROOT/"tests"))
     import test_step28_query_replay as handwritten
@@ -279,7 +310,12 @@ def main():
         if args.mode == "cpu":
             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
                 raise ValueError("CPU qualification must disable GPU")
-            suite = unittest.defaultTestLoader.loadTestsFromTestCase(handwritten.QueryReplayTests)
+            available = unittest.defaultTestLoader.getTestCaseNames(handwritten.QueryReplayTests)
+            selected = args.cpu_tests or available
+            if len(set(selected)) != len(selected) or any(name not in available for name in selected):
+                raise ValueError("Unknown or duplicate affected CPU test")
+            report["selected_tests"] = selected
+            suite = unittest.TestSuite(handwritten.QueryReplayTests(name) for name in selected)
             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:
                 result = unittest.TextTestRunner(stream=stream, verbosity=2, failfast=True).run(suite)
             report.update(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped))

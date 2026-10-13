@@ -1,0 +1,54 @@
+--- independent_checks_run01.py
++++ independent_checks.py
+@@ -19,7 +19,7 @@
+     p.write_text(json.dumps(x, ensure_ascii=False, indent=2, allow_nan=False), encoding='utf-8')
+ 
+ def main():
+-    ap=argparse.ArgumentParser();ap.add_argument('--source-root',type=Path,required=True);ap.add_argument('--out',type=Path,required=True)
++    ap=argparse.ArgumentParser();ap.add_argument('--source-root',type=Path,required=True);ap.add_argument('--out',type=Path,required=True);ap.add_argument('--only',default=None)
+     args=ap.parse_args();args.out.mkdir(parents=True,exist_ok=True)
+     sys.path.insert(0,str(args.source_root/'scripts'))
+     import step28_query_replay as m
+@@ -67,6 +67,7 @@
+         return torch.stack(terms).sum()/756
+     tests=[];start=time.monotonic()
+     def test(name, fn):
++        if args.only is not None and name != args.only: return
+         tick=time.monotonic()
+         try:
+             detail=fn();tests.append({'name':name,'status':'PASS','seconds':time.monotonic()-tick,'detail':detail});print('PASS',name,json.dumps(detail,ensure_ascii=False),flush=True)
+@@ -111,9 +112,9 @@
+                 'wrong_triangle_loss_delta':float((wrongloss-a).detach()),'tie_gradient_max_error':float((tg-te).abs().max())}
+     test('directed_loss_gradients_and_wrong_triangle',directed_test)
+     def response_test():
+-        a=m.response_loss(table,g,target);b=response(table,g,target)
+-        ga=torch.autograd.grad(a,table,retain_graph=True)[0];gb=torch.autograd.grad(b,table,retain_graph=True)[0]
+-        torch.testing.assert_close(a,b,atol=1e-10,rtol=1e-9);torch.testing.assert_close(ga,gb,atol=1e-10,rtol=1e-9)
++        actual_R=m.response_loss(table,g,target);literal_R=response(table,g,target)
++        ga=torch.autograd.grad(actual_R,table,retain_graph=True)[0];gb=torch.autograd.grad(literal_R,table,retain_graph=True)[0]
++        torch.testing.assert_close(actual_R,literal_R,atol=1e-10,rtol=1e-9);torch.testing.assert_close(ga,gb,atol=1e-10,rtol=1e-9)
+         inds=idx(g);owner={r:a for a,rs in enumerate(inds) for r in rs};err=(matrix(table)-matrix(target)).detach().numpy()
+         E={};weights={}
+         for q in range(28):
+@@ -132,17 +133,17 @@
+         torch.testing.assert_close(ga,torch.tensor(manual),atol=1e-10,rtol=1e-9)
+         missing=max(abs(x-y) for x,y in zip(manual,one_side));assert missing>1e-8
+         wrong=m.response_loss(table,g,np.zeros(k));wrongg=torch.autograd.grad(wrong,table,retain_graph=True)[0];assert (wrongg-ga).abs().max()>1e-8
+-        v32=m.response_loss(table.detach().float(),g,target.float());torch.testing.assert_close(v32.double(),a.detach(),atol=1e-6,rtol=1e-5)
+-        g32=torch.autograd.grad(m.response_loss(table.detach().float().requires_grad_(),g,target.float()),[],allow_unused=True) if False else None
++        table32=table.detach().float().requires_grad_();v32=m.response_loss(table32,g,target.float());torch.testing.assert_close(v32.double(),actual_R.detach(),atol=1e-6,rtol=1e-5)
++        g32=torch.autograd.grad(v32,table32)[0];torch.testing.assert_close(g32.double(),ga,atol=1e-6,rtol=1e-5)
+         finite=[]
+         for j in np.linspace(0,k-1,19,dtype=int):
+             p=table.detach().clone();mi=p.clone();p[j]+=1e-5;mi[j]-=1e-5
+             est=(float(m.response_loss(p,g,target))-float(m.response_loss(mi,g,target)))/2e-5
+             finite.append({'index':int(j),'manual':manual[j],'finite_difference':est,'error':abs(est-manual[j])})
+         dump(args.out/'gradient_details.json',{'all_manual':manual,'all_autograd':ga.tolist(),'finite_differences':finite})
+-        return {'R':float(a.detach()),'literal_R_error':float((a-b).abs().detach()),'gradient_max_error':float((ga-gb).abs().max()),
++        return {'R':float(actual_R.detach()),'literal_R_error':float((actual_R-literal_R).abs().detach()),'gradient_max_error':float((ga-gb).abs().max()),
+                 'manual_dual_role_max_error':float(np.max(np.abs(ga.numpy()-manual))),'missing_role_max_error':missing,
+-                'wrong_teacher_gradient_max_delta':float((wrongg-ga).abs().max()),'finite_difference_max_error':max(x['error'] for x in finite),'fp32_value_error':abs(float(v32)-float(a.detach()))}
++                'wrong_teacher_gradient_max_delta':float((wrongg-ga).abs().max()),'finite_difference_max_error':max(x['error'] for x in finite),'fp32_gradient_error':float((g32.double()-ga).abs().max()),'fp32_value_error':abs(float(v32)-float(actual_R.detach()))}
+     test('finite_population_R_and_symmetric_two_roles',response_test)
+     def enumeration():
+         e=[Fraction(-1),Fraction(1),Fraction(-2),Fraction(1,2),Fraction(3,2)];vals=[]

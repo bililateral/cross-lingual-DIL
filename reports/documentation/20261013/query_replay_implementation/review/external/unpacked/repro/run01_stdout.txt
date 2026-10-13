@@ -1,0 +1,16 @@
+PASS source_exclusion_and_multisets {"queries": 28, "directed_candidates": 756, "positives": 40, "records": 83, "bootstrap_slots_with_repeats": 557, "global_rng_unchanged": true}
+PASS directed_loss_gradients_and_wrong_triangle {"score_max_error": 3.3306690738754696e-16, "loss_error": 0.0, "gradient_max_error": 3.469446951953614e-18, "asymmetry": 1.6130704955476578, "wrong_triangle_loss_delta": 0.03829763552029508, "tie_gradient_max_error": 0.0}
+FAIL finite_population_R_and_symmetric_two_roles Traceback (most recent call last):
+  File "/mnt/data/cq_review/return/repro/independent_checks.py", line 72, in test
+    detail=fn();tests.append({'name':name,'status':'PASS','seconds':time.monotonic()-tick,'detail':detail});print('PASS',name,json.dumps(detail,ensure_ascii=False),flush=True)
+  File "/mnt/data/cq_review/return/repro/independent_checks.py", line 135, in response_test
+    v32=m.response_loss(table.detach().float(),g,target.float());torch.testing.assert_close(v32.double(),a.detach(),atol=1e-6,rtol=1e-5)
+                                                                                                         ^^^^^^^^
+AttributeError: 'int' object has no attribute 'detach'
+
+PASS unequal_slot_joint_exact_enumeration {"joint_partitions": 10, "mean_fraction": "221/240", "exact_fraction": "221/240"}
+PASS blind_spaces_bias_and_source_gradient {"W_Q": 0.0, "W_C_q": 0.0, "K2_Q": 0.0, "K2_C_q": 0.0, "query_independent_bias_R": 0.35273368606701944, "same_origin_gradient_max": 0.0, "same_table_R": 0.0}
+PASS actual_chunked_VJP_vs_independent_graph_and_four_toy_paths {"direct_loss_error": 4.76837158203125e-07, "direct_parameter_max_error": 3.725290298461914e-09, "direct_clipped_gradient_max_error": 1.1175870895385742e-07, "effects": {"Q-S": {"loss_delta": 5.4836273193359375e-06, "encoder": {"parameter_max_delta": 1.8417835235595703e-05, "clipped_gradient_max_delta": 0.0004395551513880491}, "head": {"parameter_max_delta": 3.98978590965271e-06, "clipped_gradient_max_delta": 0.0010978281497955322}}, "C_q-Q": {"loss_delta": 0.07175683975219727, "encoder": {"parameter_max_delta": 1.8417835235595703e-05, "clipped_gradient_max_delta": 0.00039877742528915405}, "head": {"parameter_max_delta": 2.682209014892578e-07, "clipped_gradient_max_delta": 0.0010582227259874344}}}, "Q_Cq_assignments_equal": true, "Cq_Cb_same_R_at_common_state": true, "scope": "Tiny in-RAM modules only; not native qualification or project training"}
+PASS qualification_archive_binding_counterexample {"native_record_without_model_archive_accepted_by_formal_gate": true, "formal_entry_invocations": 0, "native_entry_invocations": 0, "formal_file_reads": 0, "scope": "Synthetic gate data. Demonstrates absence of archive binding, not a forged real approval or a native success."}
+PASS fixed_call_accounting {"A_diagnostic_forwards": 528, "B_diagnostic_forwards": 2400, "endpoint_forwards": 520, "birth_forwards": 6, "total_forwards": 3454, "h_calls": 144, "updates": 1440, "presentations": 2592, "L": 1, "s_F": 5, "r_F": 9, "s_I": 5, "r_I": 5, "full_states_peak": 2, "inference_states_peak": 5}
+SUMMARY {"tests": 8, "failures": 1, "elapsed_seconds": 2.0867321089999677}

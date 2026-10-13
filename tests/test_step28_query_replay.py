@@ -237,7 +237,7 @@ class QueryReplayTests(unittest.TestCase):
             torch.testing.assert_close(a.grad,b.grad,atol=1e-6,rtol=1e-5)
 
     def test_actual_R_effect_complete_S_and_diagnostic_neutrality(self):
-        from step28_query_replay_verify import state, restore, component_effects
+        from step28_query_replay_verify import state, restore, component_effects, capture_handwritten_diagnostic
         c = run.config()
         model = tiny_model()
         optimizer = core.make_optimizer(model,c)
@@ -247,16 +247,19 @@ class QueryReplayTests(unittest.TestCase):
             v["step"].fill_(336)
         saved,rng,modes = state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
         target = (3*np.sin(np.arange(1540)/7)).astype(np.float32)
-        method.update(model,optimizer,current,history,target,c,"S",2,49)
+        s = method.update(model,optimizer,current,history,target,c,"S",2,49)
         original = state(model,optimizer)
         restore(model,optimizer,saved,rng,modes)
         record.update(model,optimizer,current,history,target,c,"S","ABC",2,49)
         self.assertEqual(core.state_digest(original),core.state_digest(state(model,optimizer)))
         restore(model,optimizer,saved,rng,modes)
         q = method.update(model,optimizer,current,history,target,c,"Q",2,49)
+        self.assertNotEqual(q["total"],s["total"])
+        query_effect = {"target_difference":q["total"]-s["total"],"effects":component_effects(model,original)}
         off = state(model,optimizer)
         restore(model,optimizer,saved,rng,modes)
         on = method.update(model,optimizer,current,history,target,c,"C_q",2,49)
+        self.assertNotEqual(on["total"],q["total"])
         self.assertEqual(q["history"]["assignment_sha256"],on["history"]["assignment_sha256"])
         self.assertGreater(on["history"]["response"],0.)
         effects = component_effects(model,off)
@@ -269,14 +272,65 @@ class QueryReplayTests(unittest.TestCase):
         fit = [handmade_group(f"fit{i}") for i in range(48)]
         valid = [data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"valid{i}") for i in range(40)]]
         path = self.temporary()
-        diag.capture(model,optimizer,fit,memory,valid,c,"C_q","ABC",2,1,path,"hand",scope="AB",table_diagnostic=method.diagnostic)
+        self.assertFalse((path/"diagnostics").exists())
+        capture_handwritten_diagnostic(model,optimizer,fit,memory,valid,c,"C_q",path)
+        self.assertTrue((path/"diagnostics/handwritten_epoch1_fit.npy").is_file())
         self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
         self.assertEqual((rng,payload,modes),(diag.rng_state(),memory.to_bytes(),[m.training for m in model.modules()]))
         after = method.update(model,optimizer,current,history,target,c,"C_q",2,49)
         self.assertEqual(after,on)
         self.assertEqual(core.state_digest(expected),core.state_digest(state(model,optimizer)))
         self.assertEqual(expected_rng,diag.rng_state())
-        data.write_json(Path(os.environ["QUERY_REPLAY_TEST_ROOT"])/"actual_update_evidence.json",{"effects":effects,"actual_full_diagnostic_neutral":True,"next_update_equal":True,"scope":"handwritten lightweight encoder/head; not BGE qualification"})
+        data.write_json(Path(os.environ["QUERY_REPLAY_TEST_ROOT"])/"actual_update_evidence.json",{"effects":effects,"Q_minus_S":query_effect,"C_q_minus_Q_target_difference":on["total"]-q["total"],"actual_full_diagnostic_neutral":True,"next_update_equal":True,"scope":"handwritten lightweight encoder/head; not BGE qualification"})
+
+    def test_native_model_identity_precedes_loading_and_public_inputs(self):
+        from step28_query_replay_verify import checked_fresh
+        root = self.temporary()
+        model_dir = root/"handwritten_model"
+        model_dir.mkdir()
+        (model_dir/"weights.txt").write_text("handwritten identity only",encoding="utf-8")
+        (model_dir/"tokenizer.json").write_text("{}",encoding="utf-8")
+        c = copy.deepcopy(run.config())
+        c["models"]["split_rank"]["path"] = str(model_dir)
+        archive = core.model_files(run.base.model_config(c,"split_rank"))
+        for key in ("file_count","total_size_bytes","content_sha256"):
+            c["models"]["split_rank"][key] = archive[key]
+        with mock.patch.object(run,"fresh",return_value=("model","optimizer",{"handwritten":True})) as load:
+            self.assertEqual(checked_fresh(c)[3],archive)
+            load.assert_called_once_with(c)
+        (model_dir/"weights.txt").write_text("different bytes",encoding="utf-8")
+        with mock.patch.object(run,"fresh") as load, self.assertRaises(ValueError):
+            checked_fresh(c)
+        load.assert_not_called()
+        with mock.patch.object(run,"config",return_value=c), mock.patch.object(run,"public_inputs") as public, \
+             mock.patch.object(run,"fresh") as load, self.assertRaises(ValueError):
+            run.train(root/"job",None)
+        public.assert_not_called()
+        load.assert_not_called()
+        measurements = dict(t_A=1.,t_S=2.,t_Q=2.,t_q=2.,t_b=2.,f=.1,h=.1,L=1.,s_F=1.,r_F=1.,s_I=1.,r_I=1.,W_F=1000,W_I=500)
+        gpu_path = root/"gpu.json"
+        gpu = {"mode":"gpu","status":"PASS_HANDWRITTEN_ONLY","source_files":run.sources(),
+               "native":{"actual_updates":6,"next_update_bitwise_equal":True,"new_term_encoder_head_effect":True,
+                         "query_encoder_head_effect":True,"measurements":measurements}}
+        job = data.ROOT/"reports/handwritten_nonexecuted_job"
+        gate = {"job":job.relative_to(data.ROOT).as_posix(),"runtime":run.policy()["runtime"],"supervision":run.policy()["supervision"]}
+        def save_native():
+            data.write_json(gpu_path,gpu)
+            gate["gpu"] = {"path":str(gpu_path),"bytes":gpu_path.stat().st_size,"sha256":data.sha256(gpu_path)}
+        with mock.patch.object(run,"reviewed_gate",return_value=gate), mock.patch.object(run,"config",return_value=c):
+            save_native()
+            with self.assertRaises(ValueError):run.validate_gate(job,root/"unused_gate.json")
+            gpu["native"]["pretrained_archive"] = archive
+            save_native()
+            self.assertEqual(run.validate_gate(job,root/"unused_gate.json"),gate)
+            for key in ("file_count","total_size_bytes","content_sha256"):
+                gpu["native"]["pretrained_archive"] = {**archive,key:"mismatch"}
+                save_native()
+                with self.assertRaises(ValueError):run.validate_gate(job,root/"unused_gate.json")
+        data.write_json(Path(os.environ["QUERY_REPLAY_TEST_ROOT"])/"model_identity_evidence.json",
+            {"scope":"Handwritten small files and controlled loader only; not BGE qualification",
+             "matching_archive_allows_loader":True,"mismatch_precedes_loader_and_public_inputs":True,
+             "missing_or_mismatched_native_archive_rejected":True,"actual_handwritten_archive":archive})
 
     def test_projection_and_entry_gate_fail_closed(self):
         m = dict(t_A=1.,t_S=2.,t_Q=3.,t_q=4.,t_b=5.,f=.1,h=.2,L=7.,s_F=8.,r_F=9.,s_I=10.,r_I=11.,W_F=1000,W_I=500)

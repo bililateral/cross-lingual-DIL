@@ -1,0 +1,88 @@
+{
+  "verdict": "FIX_BEFORE_NATIVE_QUALIFICATION",
+  "formal_execution_ready": false,
+  "efficacy_verdict": null,
+  "findings": [
+    {
+      "id": "I01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "NATIVE_ENTRY_BLOCKER",
+      "claim": "原生模型archive未实际核对及绑定；正式当前archive检查晚于公共输入读取",
+      "locations": [
+        "scripts/step28_query_replay_verify.py:71-87,202-208",
+        "scripts/step28_query_replay_run.py:330-349,636-646",
+        "scripts/step28_chinese_base.py:110-131",
+        "scripts/step28_continual_population.py:43-53"
+      ],
+      "minimum_action": "原生L先核对固定archive并写结果；正式门校验该身份；现有正式archive检查前移。"
+    },
+    {
+      "id": "I02",
+      "classification": "MINIMAL_EVIDENCE_CORRECTION",
+      "severity": "REQUIRED_AFFECTED_CPU_CORRECTION",
+      "claim": "合同要求的Q-S目标、关键梯度和参数差异缺少明确包内断言",
+      "locations": [
+        "docs/SELLER_ALIAS_QUERY_REPLAY.zh.md:169-174",
+        "tests/test_step28_query_replay.py:239-279",
+        "scripts/step28_query_replay_verify.py:134-164"
+      ],
+      "minimum_action": "复用既有S/Q更新和共同状态补断言与差值；不加原生步数。"
+    },
+    {
+      "id": "I03",
+      "classification": "EVIDENCE_BOUNDARY",
+      "severity": "NONBLOCKING",
+      "claim": "CPU小网络及模拟1440调度不能替代BGE原生或正式结果",
+      "locations": [
+        "reports/documentation/20261013/query_replay_implementation/implementation.zh.txt:25-44",
+        "reports/documentation/20261013/query_replay_implementation/qualification/state.json:4-18"
+      ],
+      "minimum_action": "保留原证据与准确层级；GPU仍待真正执行。"
+    },
+    {
+      "id": "I04",
+      "classification": "SCIENTIFIC_INTERPRETATION_BOUNDARY",
+      "severity": "NONBLOCKING",
+      "claim": "W/K2/偏置盲区及Cb同R条件比较已承接，不支持纯捷径因果归因",
+      "locations": [
+        "scripts/step28_query_replay.py:71-167",
+        "reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt:1-125"
+      ],
+      "minimum_action": "保持现有窄解释，不新增臂或改方法。"
+    },
+    {
+      "id": "I05",
+      "classification": "RESOURCE_AND_PROCESS_BOUNDARY",
+      "severity": "NONBLOCKING_PENDING_NATIVE_MEASUREMENT",
+      "claim": "完整计数与投影正确，余量非实测保证；现场原生6GiB核对仍须落实",
+      "locations": [
+        "docs/SELLER_ALIAS_QUERY_REPLAY.zh.md:204-239",
+        "scripts/step28_query_replay_run.py:202-213,650-697",
+        "scripts/step28_query_replay_verify.py:235-303"
+      ],
+      "minimum_action": "使用新原生完整实测与现有累计账；不预建监听、不自动重跑。"
+    },
+    {
+      "id": "I06",
+      "classification": "MINOR_DOCUMENTATION_CORRECTION",
+      "severity": "NONBLOCKING",
+      "claim": "沿用曲线log_loss含概率截断，不总等于未截断BCEWithLogits",
+      "locations": [
+        "scripts/step28_continual_population_evaluate.py:58-64",
+        "scripts/step28_replay_diagnostics.py:143"
+      ],
+      "minimum_action": "只澄清用语，不更改22指标或旧结果。"
+    }
+  ],
+  "out_of_scope": [
+    "extra_training_arms",
+    "full_neighbor_benchmarks",
+    "old_C_diagnostics",
+    "new_seeds",
+    "sealed_data",
+    "general_platform",
+    "full_regression",
+    "persistent_listener",
+    "automatic_GPU_or_formal_retry"
+  ]
+}
