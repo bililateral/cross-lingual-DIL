@@ -2,12 +2,13 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-用户2026-10-13最新要求完整回收并独立审核C_q外审。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已完成：核心运算成立，有具体任务化差别，建议准备执行合同；效果和最终贡献未建立。信息损失、偏置风险、条件控制与共同随机／完整状态要求须一并承接。完整S不削弱；当前不开新训练、不恢复旧C诊断，具体状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
+用户2026-10-13最新要求起草具体方案实现合同，现见[C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)中的信息损失、偏置、条件控制与共享状态要求已纳入合同。完整S不削弱，效果和最终贡献未建立；当前只完成合同写作，新实现／资格／数据与条件运行范围待决定，不开新训练、不恢复旧C诊断，状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
 已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md) | 当前待批准执行范围的合同草案。完整S／Q／C_q／C_b，共同A＋四支B，1440更新／2592梯度群呈现、5端点／30诊断。明确计算、接线、Memory／恢复、数据及四项条件比较；建议CPU300秒、原生600秒／6步、正式16小时／18GiB、标签各一次与完整盲门。写作不授权实现或运行；新实现需合并审查、原生资格及现场资源／投影。 |
 | [自然查询锚定的历史重放C_q](../reports/documentation/20261013/query_replay/proposal.zh.txt) | 静态外审／[独立主审](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已关闭，推荐合同准备，尚非执行合同。只改候选历史分支的查询条件分配及额外中心化响应MSE，保留完整S对照、当前S及0.5D0。整个历史目标的异来源交互盲区、R偏置／幅度和bootstrap条件控制按补正解释；Q/C_q共享增强规则键及完整共同A。S／Q／C_q／账号内bootstrap四臂仍为未执行提议，真实收益、原生资格和新预算／读取范围均未建立。 |
 | [完整S贡献定位与机制缺口](../reports/documentation/20261013/s_contribution/report.zh.txt) | 当前静态研究报告，不是执行合同。核对实际S、归因实验和直接近邻；判断基础系统价值与独立创新是否充分，明确自然账号内部结构与同控重组的待研究问题。不新增训练、数据读取或旧C诊断，当前审查状态见交接 |
 | [C_cf执行合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md) | 已结束固定实验的执行依据。完整S／C_cf／C_perm、A→B、1440更新／2304梯度群呈现；CPU300秒、原生600秒、正式16小时／16GiB，标签各一次及统一盲门。原生失败及一次补核例外、完整结果审查与权重清理按交接和回执解释，旧静态稿中的待批准草案不恢复成当前阻断，也不重授训练权限 |
