@@ -60,7 +60,8 @@ def metrics(groups: list, values: np.ndarray) -> np.ndarray:
 
 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
             c: dict, arm: str, order: str, stage: int, epoch: int, root: Path,
-            point: str, check: Callable = lambda: None, scope: str = "ABC") -> dict:
+            point: str, check: Callable = lambda: None, scope: str = "ABC",
+            table_diagnostic: Callable | None = None) -> dict:
     """Called by the actual training loop after every 48 updates; never loads labels."""
     import torch
     if epoch not in range(1, 7) or parent.adam_step(optimizer) != (stage-1)*288+epoch*48:
@@ -104,6 +105,8 @@ def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
                 errors.append({"uid": group.uid, "D0": float(np.mean(e0**2)), "D1": float(np.mean(e1**2)),
                                "residual_cross_mean": float(np.mean(e0*e1)),
                                "residual_difference_mse": float(np.mean((e1-e0)**2))})
+                if table_diagnostic is not None:
+                    errors[-1].update(table_diagnostic(live, group, target))
     if (parent.adam_step(optimizer) != step_before
             or (memory.to_bytes() if memory is not None else None) != before):
         raise ValueError("Diagnostics changed optimizer step or bounded history")

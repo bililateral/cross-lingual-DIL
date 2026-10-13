@@ -1,0 +1,72 @@
+{
+  "study": "natural_query_anchored_historical_replay",
+  "methods": [
+    "S",
+    "Q",
+    "C_q",
+    "C_b"
+  ],
+  "seed": "s0",
+  "domains": "AB",
+  "main_rng_order": "ABC",
+  "physical_updates": 1440,
+  "gradient_group_presentations": 2592,
+  "physical_stage_states": 5,
+  "epoch_diagnostic_points": 30,
+  "history_supervision": 0.1,
+  "teacher_weight": 0.5,
+  "memory_maximum_bytes": 1048576,
+  "cpu_verification": {
+    "maximum_seconds": 300,
+    "maximum_rss_bytes": 2147483648,
+    "maximum_evidence_bytes": 67108864
+  },
+  "native_verification": {
+    "maximum_seconds": 600,
+    "maximum_rss_bytes": 68719476736,
+    "maximum_work_bytes": 6442450944,
+    "maximum_evidence_bytes": 134217728,
+    "actual_updates": 6
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 57600,
+    "maximum_output_bytes": 19327352832,
+    "maximum_cuda_reserved_bytes": 30064771072,
+    "maximum_rss_bytes": 68719476736,
+    "minimum_free_gpu_bytes": 32212254720,
+    "minimum_free_host_bytes": 77309411328,
+    "torch_cpu_threads": 1
+  },
+  "supervision": {
+    "train_parse_attempts": 1,
+    "valid_parse_attempts": 1,
+    "test_access": false,
+    "owners_access": false,
+    "automatic_retry": false
+  },
+  "evaluation": {
+    "bootstrap_replicates": 5000,
+    "bootstrap_seed": 20260930,
+    "comparisons": [
+      [
+        "C_q",
+        "S"
+      ],
+      [
+        "Q",
+        "S"
+      ],
+      [
+        "C_q",
+        "Q"
+      ],
+      [
+        "C_q",
+        "C_b"
+      ]
+    ],
+    "primary_metric": "map",
+    "overall_pass_gate": false
+  },
+  "response_weight": 0.25
+}
