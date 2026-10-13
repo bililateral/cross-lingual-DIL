@@ -1,0 +1,41 @@
+C_cf合同／实现外审：独立主审及最小补正
+2026-10-12。实施处置：NO_OPEN_BLOCKERS；原生资格及正式效果仍分别待实际取得。
+
+回收与证据边界
+
+原会话：https://chatgpt.com/c/6acc7bb2-9ffc-83eb-89dd-b01cc2687fff。
+完整返回包external/C_cf_targeted_external_review_20261012.zip为627,512字节、19成员，SHA256 767b22128b8eae1b9dd60f1f83f472ddf86a783ad2c31b42cdf3b7e9adb49b47。ZIP CRC、18载荷大小／SHA和原送审ZIP逐字节身份均核对。原输入、原审查正文、finding／实际阅读范围、引用范围、源码／输入／输出／执行日志及审查方首轮机械脚本失败日志全部保留；不改原包或原CPU回执。
+
+已完整阅读外审正文与finding、阅读／参考范围，并对照当前目标与实际VJP、来源、Memory、A/B供给／评价、保存恢复和资源代码。此次复用前轮已核对的算法推导与CPU证据，重点独立核查两项新缺陷。外审没有运行PyTorch，其R01例子只是明确假设的可变对象示意；R02运行的是原Budget类加受控资源探针、真实小文件。附torch_restore_probe.py在网页未执行，本执行也不将其文件存在当作核验。
+
+外审自报三个静态分工，本轮没有明确授权这项委派，作为外审流程偏差保留；本执行未自行委派，不以分工数量或审查者自述作独立证据。相关必要判断由主执行者核对代码和Linux实际证据，不因此另造全量重审。请求模型、可见GPT-6／Pro及后台身份未独立取得仍分开记录。
+
+R01：接受并已修复
+
+原生verify.restore反复将同一内存快照的Adam状态直接交给load_state_dict，保存时clone不保证每次加载后的隔离。新增Linux手写检查使用项目实际PyTorch 2.9.1+cu130、实际tiny模型和同款AdamW，证实旧加载后真实更新会污染保存步数288→289。修复为每次cpu_copy(saved["adam"])再加载；连续三次restore→真实候选更新均为288→289，完整保存的model／Adam／gradient快照不变，三次实际结果及RNG一致。证据：../qualification/cpu/attempt03/result/restore_isolation.json及冻结来源。
+
+这是原生夹具内存快照复用缺陷。正式core.restore_state每次从文件重新torch.load、检查实际model及Adam摘要，不复用同一内存对象；不能据此追改历史运行或声称正式共享A恢复已经失败。原计数断言保留，不换优化器、不额外增加原生更新。
+
+R02：接受并已修复
+
+原继承Budget确实只扫描job及console／wrapper。主执行者保留其默认输出枚举，用一个小output_files方法让当前C_cf加入同一独立workspace下的reports/qualification和reports/documentation/20261012/crossfit_retention，以及本job的dispatch／listener／listener.console侧产物；路径去重。现有used／peak／reserve和16GiB拒绝计算直接消费此枚举，资源回执明确口径。没有扫描其他实验、正式输入链接或全项目，也没有为此新增通用资源框架。
+
+Linux实际文件检查：job=7,000、资格=4,000、限额=10,000时合计11,000被拒，旧调用默认仍为job-only；监听计入、输入树排除、reserve超限拒绝均通过。证据：../qualification/cpu/attempt03/result/output_scope.json。修复的是当前监控覆盖，不是补写已发生超限；正式16GiB、checkpoint排程和失败规则不变。
+
+非阻断意见与解释补正
+
+N01：接受用语限定。原生开启／关闭观察的是共同全局clip后梯度与真实参数更新差异，不能单靠它隔离直接的dD/dencoder，因为head变化也可影响全局clip系数。回执改称post_clip_gradient_distinguishable并记录effect_scope；实际直接VJP仍由既有CPU独立逐参数参考和z.backward路径支撑，不添加模型更新。
+N02：按既定手写范围补一个全1016条目启用的可行F/O分数计时，走实际birth／permute／floor_loss，h取自然手写模型出生与此稠密手写计时的最大值。该分数只是计时夹具，不伪称来源模型输出；无新模型更新。实测仍是所测最大值，非任意环境严格上界，25%余量及原硬限保持。
+N03：报告沿用既有裁剪概率log_loss，不称训练Bbar或未裁剪NLL。fixed_half_classification字段仅保存计数与FPR／recall／precision／F1；完整22指标保存在逐群矩阵／macro／逐域读数，不声称已有所有22项的pooled版本。无需改冻结指标或新增统计。
+O01—O03：不扩臂、seed、折、强度匹配、旧C诊断、通用管理框架、额外GPU来源训练或数据上传。当前科学比较、权重、随机流和归因边界不变。
+
+当前CPU资格与来源
+
+attempt03于15:03:42—15:03:59在既有Linux py310、CPU0单线程、CUDA不可见、纯手写输入下完成；13项、0失败／错误／跳过。外层17.292186250秒，内部16.866772061秒，入口prior=34；与前两轮外层累计50.851903418秒，逐轮保守34+18=52／300秒，余248秒。没有BGE载模／GPU／正式内容或标签读取。原两轮各11项证据保留，不称累计35项不同测试。
+
+最新29来源与Windows实际大小／SHA一致，source.tar.gz保留本次字节。只改verify、crossfit_run、共享Budget的枚举接口及本轮测试四文件；合同／算法目标／policy／正式更新数不变。范围跨恢复夹具与继承Budget，当前入口要求完整来源匹配，因此重验本轮13项有限套件，不扩到历史关闭路线。旧CPU证据仍绑定其原来源。
+
+推进裁决
+
+外审与独立核对均未找到当前科学比较需另选方案的具体缺陷；R01／R02的必要修改及受影响CPU证据已完成。修复对应现有意见，未新增科学选择，按原范围关闭实施审查，不把这次处置冒充另一次网页审查。
+允许在用户既有范围内继续本轮至多七次实际更新、累计600秒原生资格；实际通过且完整时间／存储投影、共享资源及正式入口全部满足后，按原批准启动一次正式实验。原生或正式失败／超预算即停止，不自动重跑、不先读正式标签。C_cf对完整S的真实收益和代价仍未知，留待本固定实验及结果审查。

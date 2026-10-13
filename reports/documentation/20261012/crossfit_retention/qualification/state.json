@@ -1,6 +1,6 @@
 {
   "remote_workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261012/crossfit_retention_execution/20261012_140200/workspace",
-  "observed_at": "2026-10-12T15:47:52+08:00",
+  "observed_at": "2026-10-13T09:25:17.547101+08:00",
   "cpu_attempts": [
     "attempt01",
     "attempt02",
@@ -18,7 +18,7 @@
   "conservative_cpu_seconds": 70,
   "cpu_budget_seconds": 300,
   "gpu_seconds": 341,
-  "formal_labels_parsed": 1,
+  "formal_labels_parsed": 2,
   "model_payload_linked": true,
   "formal_job_exists": true,
   "active_native_or_formal_listener": false,
@@ -171,7 +171,7 @@
       "sha256": "a15d88b84685f9cbe9c70581fb186d59218196851a25a7030dd8f9ecfe5b8ee4"
     }
   ],
-  "status": "FORMAL_RUNNING_ACTUAL_UPDATE_OBSERVED",
+  "status": "FORMAL_COMPLETE_RESULTS_SYNCED_ANALYZED_EXTERNAL_REVIEW_IN_PROGRESS",
   "actual_gpu_wall_seconds": 339.460547155,
   "gpu_attempts": [
     {
@@ -201,18 +201,17 @@
   "disposition": "formal_disposition.zh.txt",
   "native_retry_authorization": "native_retry_authorization.json",
   "formal_access": {
-    "heldout": 0,
-    "owners": 0,
     "train": 1,
-    "valid": 0
+    "valid": 1,
+    "heldout": 0,
+    "owners": 0
   },
   "formal": {
     "started_at": "2026-10-12T15:43:14+08:00",
     "wrapper_pid": 4038813,
     "timeout_pid": 4038818,
     "python_pid": 4038819,
-    "phase": "A_shared",
-    "latest_logged_updates": 24,
+    "phase": "COMPLETE",
     "failure_exists": false,
     "projection": {
       "forward_seconds": 6267.049569682218,
@@ -229,7 +228,15 @@
     "planning_interval_scope": "Unbuffered fixed estimate through 25 percent time margin, not statistical confidence or guaranteed bounds.",
     "hard_deadline_including_kill_grace": "2026-10-13T07:43:14+08:00",
     "observation": "formal/startup_observation.json",
-    "latest_update_event_elapsed_seconds": 132.62332311132923,
-    "latest_observation_note": "All three expected owner/command processes present; latest logged A_shared count24 is a lower bound while training continues; access train1 valid0, no failure."
-  }
+    "latest_observation_note": "Completion and wrapper exit0 agree; all original training PIDs absent; no failure; saved results recovered and independently audited, no new labels/models/Memory.",
+    "ended_at": "2026-10-12T19:53:39+08:00",
+    "exit_code": 0,
+    "processes_exited": true,
+    "physical_updates": 1440,
+    "gradient_group_presentations": 2304,
+    "actual_elapsed_seconds": 15024.925083151087,
+    "remaining_training_seconds": 0,
+    "result_path": "reports/seller_alias_continual/20261013/crossfit_retention_result"
+  },
+  "result_review": "reports/seller_alias_continual/20261013/crossfit_retention_result/review/submission.json"
 }

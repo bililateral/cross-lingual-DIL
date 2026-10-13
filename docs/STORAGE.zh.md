@@ -8,6 +8,10 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-13 C_cf三臂：结果已回传，审查依赖待核实
+
+本次固定A→B于10月12日19:53:39正常完成；280份结果／日志／冻结来源／资格证据5,765,044字节和10份Linux分析397,368字节已回传且实际大小／SHA匹配。两端归档为reports/seller_alias_continual/20261013/crossfit_retention_result，见[回传清单](../reports/seller_alias_continual/20261013/crossfit_retention_result/inventory.json)和[分析清单](../reports/seller_alias_continual/20261013/crossfit_retention_result/analysis_manifest.json)。4推理权重共5,217,548,401字节、6Memory共1,646,210字节及F/O审计评分仅留Linux原20261012_140200/workspace/reports/job/run；未反序列化、上传或删除。临时完整训练状态已由正式入口在恢复核对及分支依赖解除后释放，身份保留在points。当前先保留推理权重到新结果外审的实际依赖核实；确认无后续用途后按原规则留证删除，不因本次未达主要目标直接删权重。此为局部回传，不重置大清理周期。
+
 ## 2026-10-11 三臂归因：结果已回传，27权重已留证删除
 
 LOGIT0.1／R0／S的20261009_200600/workspace于10月11日00:24:33正常完成。1,234份小结果、日志、冻结来源及资格证据共38,049,242字节已SFTP回传且逐文件大小／SHA一致；两端归档为reports/seller_alias_continual/20261011/record_attribution_result。Linux保存结果分析与图表共11份亦已回传核对；见[完整分析](../reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt)、[原始同步清单](../reports/seller_alias_continual/20261011/record_attribution_result/sync_manifest.json)、[分析清单](../reports/seller_alias_continual/20261011/record_attribution_result/analysis_manifest.json)。

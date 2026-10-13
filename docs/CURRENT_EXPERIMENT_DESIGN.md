@@ -2,7 +2,7 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-当前执行以已获用户明确批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)为准，见交接顶部。完整S为主要内部对照，S／C_cf／C_perm、s0 A→B固定。静态[原稿](../reports/documentation/20261011/retention_design/crossfit.zh.txt)及[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)保持原件；补正已落实到合同与实现，实现外审／[独立处置](../reports/documentation/20261012/crossfit_retention/review/primary_disposition.zh.txt)及受影响Linux手写CPU已完成；当前原生资格和正式运行状态见交接。原生资格及完整预算／资源门满足后按已有授权正式运行，效果仍待实验。旧C单独诊断不恢复，旧历史许可不转用。
+当前已批准的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B已于10月12日19:53:39正常完成，结果回传和独立保存统计复核完成。当前[结果分析](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势；新结果包已获具体许可并于10月13日09:42提交外审、确认网页开始，当前状态见交接。静态原稿、实施外审／主审、资格与失败证据保持原件；不据辅助指标选轮／调参／扩跑，不恢复旧C单独诊断。
 
 | 合同 | 研究内容及角色 |
 |---|---|

@@ -996,3 +996,9 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 2026-10-12随后明确决定：用户对首次GPU失败后的具体补核提议回复“批准一次补核，累计最多12步、600秒（推荐）”。只追加一次七步原生资格，首轮五步及保守122秒均保留，累计上限12步／600秒，本次外层最多478秒；第二次失败仍停止。原正式1440步、16小时／16GiB及一次train／valid读取和盲门不变，核验与投影／资源合格后继续已批准正式运行。身份及范围见reports/documentation/20261012/crossfit_retention/qualification/native_retry_authorization.json。
 
 2026-10-12 15:44执行结果：一次获准GPU补核完整通过，累计12次实际更新、保守341／600秒。正式固定公式投影12.692412小时／15.545293GiB，现场资源及29来源均满足；15:43:14按原许可启动一次正式S／C_cf／C_perm实验，已观察实际参数更新。CPU累计保守70／300秒，首轮GPU失败原件保留，正式读取train=1／valid=0；详情见reports/documentation/20261012/crossfit_retention/qualification/formal_disposition.zh.txt及当前交接，不据启动预支效果。
+
+## 2026-10-13：C_cf结果查看、回传与独立分析
+
+用户要求：“去 Linux 服务器看看 C_cf 三臂实验完成了没有，如果完成了就把结果同步回来，仔细分析 C_cf 相对完整 S 有没有收益，以及与 C_perm 的差异到底能说明什么。”09:23—09:25现场确认原作业10月12日19:53:39正常结束，1440更新／4端点／24诊断及盲门完整，train／valid各一次、未访问heldout／owners。280份小证据和10份Linux分析逐项同步核对；保存矩阵／计数独立复核通过，无新标签读取／载模。主MAP未建立C_cf相对S或C_perm改善；局部raw概率收益、校准代价、缓存拟合与归因界限见[完整报告](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)。本固定配置结束，不自动调参、扩种子或旧C诊断。新结果外审仅待针对实物的新上传许可，不把已批准实现包许可移用；当前新材料仍限本地Git。
+
+用户对新结果包4,285,123字节／303成员／SHA256 261b82d9b7d26b1e93c38cdc6ac63512acc8876fd78329e7b1dfe6a2c7ded3f0明确选择：“授权此结果包外审（推荐）”。10月13日09:42通过指定本地Playwright MCP上传并提交一次，附件显示review_input(20261013-014202).zip，GPT-6选择器与Pro强度可见，后台模型身份未独立取得；[会话](https://chatgpt.com/c/6acd8c62-0818-83eb-8a6a-ad3270c0ad45)出现正在思考与停止按钮。提交身份见[记录](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/submission.json)，原上传包及其形成时待审文字保持冻结；当前状态为结果外审进行中，授权不含公开Git推送。
