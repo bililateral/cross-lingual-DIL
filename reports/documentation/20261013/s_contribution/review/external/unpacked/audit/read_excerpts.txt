@@ -1,0 +1,3018 @@
+
+=== current/report.zh.txt [lines 42-82; total 239] ===
+42: 
+43: 固定监督目标B为原合同中的BCE＋逐查询排序损失＋0.5倍top5困难负例项。S对当前群和抽中的历史群都平均原视图与重组视图监督：
+44:   Bbar_theta(g) = [B(s_A0,y) + B(s_A1,y)]/2。
+45: 有历史群时，一次物理更新的目标是：
+46:   J_S = Bbar_theta(g_current) + 0.1 Bbar_theta(g_history) + 0.5 D0。
+47:   D0 = mean_{378对}[s_theta(A0)-s_birth(A0)]²。
+48: 首阶段没有历史项。这里“birth”是该历史群进入存活缓存时保存的旧模型输出；不是另选一种外部模型，也不是第二个同时训练的教师网络。
+49: 
+50: R0采用同样记录架构、历史格式和原分组D0，只关闭A1监督。旧C则把历史教师权重分成0.25 D0＋0.25 D1；D1指相同历史表在重组A1上的旧评分约束。S的mse1虽然被计算和记录，却不进入其训练目标。不能把C的新增保持机制或C_cf的折外来源算作S的贡献。
+51: 
+52: 1.3 更新、缓存与计算作用
+53: 冻结实现先在一次live encoder图上产生记录表示和记录对分数，再求目标对分数的导数，以512对分块重算确定性head，累计head和记录表示梯度，最后将记录梯度传回实际encoder。当前与历史两组梯度合并、裁剪到1后，一次AdamW更新。正式入口确实调用该路径，不是只计算指标的旁路。
+54: 
+55: A0/A1复用同一次记录编码和作用表，新增监督会改变记录对梯度的组合方式。它不是凭空增加独立历史观察；是在既有记录和关系标签上施加不同的训练约束。分块反传是适用链式法则的内存实现，不应作为新梯度理论。
+56: 
+57: 历史缓存为六个完整群的Algorithm R；文本、训练标签、FP32旧记录作用表及附属状态合计受1MiB实时上限约束。阶段结束时只为新存活群生成旧参考，仍存活的旧参考不刷新，淘汰群不重取。每条训练路径与归档快照必须分开解释。
+58: 
+59: 关键贡献边界：对S的实际训练目标，历史整张记录表只通过固定A0的378个账号对旧评分进入D0。代数上，若预先保存这378个投影值，D0需要的信息已经齐全；整表能回答其他分配的问题，但S不利用它们产生额外教师梯度。因此，“保存记录细节以生成新的历史教师查询”不是S已建立的创新。这里不是提出当场改变Memory；原格式用于匹配实验和诊断，浮点归约、格式、容量与恢复改动均未实施或实测。
+60: 
+61: 当前活动step28_record_replay.py相对归因实验冻结版新增了可选objective_fn接线，用于后续C_cf；本次核对差异仅为该可选参数与调用转发，默认S目标不变。冻结版SHA256为4b05a46f4b24a3a848b29a33be69f6ecc0ec9e00fa10c42f5d4fea8f98c3d73b，当前文件为ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d；不能声称两者同字节。本文数值对应冻结实验，不追改旧来源。
+62: 
+63: 2. 哪些数学性质成立，哪些不能升级成贡献
+64: 
+65: 2.1 两种“分组不变”必须区分
+66: 账号内部记录的排列顺序不影响上述平均评分，这是架构的排列不变性。将记录移到另一个同控账号，会改变s_A；S仅监督两种分配都正确，没有要求s_A0=s_A1，也不保证交换后的分数或梯度严格不变。Deep Sets的集合排列结论不证明跨账号重分配合理。
+67: 
+68: 2.2 重组改变了哪些训练对象
+69: 固定一次参数及记录表示，对一个总记录数为m的同控团，均匀无放回分配后，任意两个不同账号槽位间的期望评分等于该团全部不同记录对作用的平均：
+70:   E_A s_ij = [1/(m(m-1))] sum_{r≠t∈团} K_theta(r,t)。
+71: 理由是有序记录对分入这两个槽位的概率为n_i n_j/[m(m-1)]，再除以n_i n_j。不同控制者团之间，期望评分则为两个完整团记录池之间的平均作用。
+72: 
+73: 因此A1有可能减少模型对某一次账号记录分配的依赖，并训练来自不同原账号的记录组合。但每一步计算的是随机视图上的损失，非线性损失的平均不等于对平均分数求损失；实际过程也不是把每个团永久压成一个账号。这一推导不证明未见账号收益，更不构成新的重组原则。
+74: 
+75: 2.3 评分器仍有明确限制
+76: 固定theta，对与Y不共享记录的两个记录袋X_a、X_b，其经验分布混合X_mix=alpha X_a+(1-alpha)X_b满足：
+77:   s(X_mix,Y)=alpha s(X_a,Y)+(1-alpha)s(X_b,Y)。
+78: 虽然K本身可以很复杂，最终账号评分对每侧经验分布仍是线性的。若两个纯记录袋各自与Y得分高，而混合袋应该因内部不相容而得分低，当前平均式不能额外表示这项混合惩罚。该局限不证明本数据需要更复杂评分器，也不证明LOGIT整体优于S；已有多实例模型也能引入上下文聚合，不能简单加attention便声称原创。
+79: 
+80: 3. 与已有方法的实质比较
+81: 
+82: 以下均核查一手论文的相应方法部分，范围见第8节；没有把检索摘要当完整方法审查，也没有声称穷尽截至今日所有文献。判断分别针对基本运算、具体任务化适配和已获实证。
+
+=== frozen_source/scripts/step28_record_replay.py [lines 1-220; total 330] ===
+1: """Complete-record regrouping and source-table replay; no formal data entry here."""
+2: from __future__ import annotations
+3: 
+4: import contextlib
+5: import copy
+6: import hashlib
+7: import json
+8: import random
+9: import struct
+10: from typing import Any, Callable
+11: 
+12: import numpy as np
+13: 
+14: import step28_bge_continual as parent
+15: 
+16: base, data, core = parent.base, parent.data, parent.core
+17: POLICY = data.ROOT / "schema/step28_record_replay_policy.json"
+18: 
+19: 
+20: def policy() -> dict:
+21:     p = data.read_json(POLICY)
+22:     if (p["methods"] != ["C", "S"] or p["orders"] != list(parent.ORDERS)
+23:             or p["physical_updates"] != 4320 or p["gradient_group_presentations"] != 7776
+24:             or p["pair_chunk"] != 512 or p["record_dimension"] != 2048
+25:             or p["history_supervision"] != .1 or p["teacher_weight"] != .5
+26:             or p["memory_maximum_bytes"] != 1048576):
+27:         raise ValueError("Record replay contract differs")
+28:     return p
+29: 
+30: 
+31: def config() -> dict:
+32:     c = copy.deepcopy(parent.config(parent.contract()))
+33:     c["runtime"] = policy()["runtime"]
+34:     # Reuse the pinned native loader, with this experiment's actual record head.
+35:     c["interventions"]["split_rank"]["account_dim"] = 2048
+36:     return c
+37: 
+38: 
+39: def load_model(c: dict, device: str = "cuda:0") -> Any:
+40:     return base.load_model(c, "split_rank", device)
+41: 
+42: 
+43: def record_vectors(model: Any, group: data.Group, c: dict,
+44:                    check: Callable = lambda: None) -> Any:
+45:     import torch
+46:     texts = base.record_texts(group, "separate_moments")
+47:     device = next(model.parameters()).device
+48:     parts = []
+49:     for i in range(0, len(texts), c["input"]["microbatch"]):
+50:         check()
+51:         features = model.encoder.tokenizer(texts[i:i+c["input"]["microbatch"]],
+52:             padding=True, truncation=False, return_tensors="pt")
+53:         if features["input_ids"].shape[1] > c["input"]["token_budget"]:
+54:             raise ValueError("Record exceeds frozen token budget; truncation forbidden")
+55:         features = {k: v.to(device) for k, v in features.items()}
+56:         autocast = (torch.autocast("cuda", dtype=torch.bfloat16)
+57:                     if device.type == "cuda" else contextlib.nullcontext())
+58:         with autocast:
+59:             output = model.encoder(features)["sentence_embedding"]
+60:         parts.append(output.float())
+61:     channels = torch.nn.functional.normalize(torch.cat(parts), dim=1)
+62:     title, description = channels.chunk(2)
+63:     return torch.cat((title, description), dim=1) / (2 ** .5)
+64: 
+65: 
+66: def assignment(group: data.Group, seed: int | None = None) -> np.ndarray:
+67:     """Record indices in frozen order; labels consulted only for training A1."""
+68:     counts = list(map(len, group.items))
+69:     slots = np.repeat(np.arange(28), counts)
+70:     if seed is None:
+71:         return slots
+72:     if group.labels is None:
+73:         raise ValueError("Regrouping requires authorized binary train labels")
+74:     adjacency = np.eye(28, dtype=bool)
+75:     left, right = np.triu_indices(28, 1)
+76:     adjacency[left, right] = group.labels
+77:     adjacency[right, left] = group.labels
+78:     components, remaining = [], set(range(28))
+79:     while remaining:
+80:         component = np.flatnonzero(adjacency[min(remaining)]).tolist()
+81:         if not set(component) <= remaining or not all(
+82:                 np.array_equal(adjacency[j], adjacency[component[0]]) for j in component):
+83:             raise ValueError("Positive labels must be disjoint cliques")
+84:         remaining.difference_update(component)
+85:         components.append(component)
+86:     if sorted(map(len, components)) != [2]*8 + [3]*4:
+87:         raise ValueError("Expected eight K2 and four K3")
+88:     rng = random.Random(seed)
+89:     result = slots.copy()
+90:     for component in components:
+91:         records = np.flatnonzero(np.isin(slots, component)).tolist()
+92:         rng.shuffle(records)
+93:         start = 0
+94:         for account in component:
+95:             result[records[start:start+counts[account]]] = account
+96:             start += counts[account]
+97:     if not np.array_equal(np.bincount(result, minlength=28), counts):
+98:         raise ValueError("Record count conservation failed")
+99:     return result
+100: 
+101: 
+102: def pair_table(model: Any, z: Any, check: Callable = lambda: None) -> Any:
+103:     import torch
+104:     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+105:     parts = []
+106:     for start in range(0, len(left), 512):
+107:         check()
+108:         u, v = z[left[start:start+512]], z[right[start:start+512]]
+109:         parts.append(model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten())
+110:     return torch.cat(parts)
+111: 
+112: 
+113: def account_logits(table: Any, slots: np.ndarray) -> Any:
+114:     import torch
+115:     n = len(slots)
+116:     if table.shape != (n*(n-1)//2,):
+117:         raise ValueError("Complete off-diagonal record table required")
+118:     left, right = torch.triu_indices(n, n, 1, device=table.device)
+119:     matrix = table.new_zeros((n, n))
+120:     matrix[left, right] = table
+121:     matrix[right, left] = table
+122:     assigned = torch.as_tensor(slots, device=table.device)
+123:     pooling = torch.nn.functional.one_hot(assigned, 28).T.to(table.dtype)
+124:     pooling = pooling / pooling.sum(1, keepdim=True)
+125:     scores = pooling @ matrix @ pooling.T
+126:     i, j = torch.triu_indices(28, 28, 1, device=table.device)
+127:     return scores[i, j]
+128: 
+129: 
+130: def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
+131:               reference: np.ndarray | None = None) -> tuple[Any, dict]:
+132:     import torch
+133:     if arm not in ("C", "S", "R0") or group.labels is None:
+134:         raise ValueError("Unknown arm or missing train labels")
+135:     slots = [assignment(group)]
+136:     if arm != "R0":
+137:         slots.append(assignment(group, regroup_seed))
+138:     predicted = [account_logits(table, a) for a in slots]
+139:     truth = torch.tensor(group.labels, dtype=table.dtype, device=table.device)
+140:     losses = [parent.ranking.objectives(v, truth, .5) for v in predicted]
+141:     supervised = (losses[0]["total"] if arm == "R0" else
+142:                   (losses[0]["total"] + losses[1]["total"]) / 2)
+143:     mse = table.new_zeros(())
+144:     mse0 = mse1 = mse
+145:     if reference is not None:
+146:         target = torch.as_tensor(reference, device=table.device, dtype=table.dtype)
+147:         errors = [((p-account_logits(target, a))**2).mean()
+148:                   for p, a in zip(predicted, slots)]
+149:         mse0 = errors[0]
+150:         if arm != "R0":
+151:             mse1 = errors[1]
+152:         mse = (mse0+mse1)/2 if arm == "C" else mse0
+153:     result = supervised if reference is None else .1*supervised + .5*mse
+154:     return result, {"supervised": float(supervised.detach()), "mse0": float(mse0.detach()),
+155:                     "mse1": None if arm == "R0" else float(mse1.detach()), "distillation": float(mse.detach()),
+156:                     "weighted": float(result.detach())}
+157: 
+158: 
+159: def backward_group(model: Any, group: data.Group, c: dict, arm: str,
+160:                    dropout_seed: int, regroup_seed: int, reference: np.ndarray | None,
+161:                    check: Callable = lambda: None) -> dict:
+162:     """One live encoder graph; exact chain rule through chunked deterministic head."""
+163:     import torch
+164:     torch.manual_seed(dropout_seed)
+165:     z = record_vectors(model, group, c, check)
+166:     with torch.no_grad():
+167:         values = pair_table(model, z.detach(), check)
+168:     proxy = values.detach().requires_grad_(True)
+169:     loss, log = objective(proxy, group, regroup_seed, arm, reference)
+170:     gradient, = torch.autograd.grad(loss, proxy)
+171:     leaf = z.detach().requires_grad_(True)
+172:     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+173:     for start in range(0, len(left), 512):
+174:         check()
+175:         u, v = leaf[left[start:start+512]], leaf[right[start:start+512]]
+176:         block = model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten()
+177:         block.backward(gradient[start:start+512])
+178:     if leaf.grad is None or not torch.isfinite(leaf.grad).all():
+179:         raise ValueError("Missing or nonfinite explicit dJ/dZ")
+180:     z.backward(leaf.grad)
+181:     log["record_gradient_norm"] = float(leaf.grad.norm())
+182:     return log
+183: 
+184: 
+185: def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+186:            reference: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+187:            step: int, check: Callable = lambda: None, observe: Callable | None = None) -> dict:
+188:     import torch
+189:     model.train()
+190:     optimizer.zero_grad(set_to_none=True)
+191:     optimizer.param_groups[0]["lr"] = parent.stage_lr(step)
+192:     optimizer.param_groups[1]["lr"] = .001
+193:     logs = {}
+194:     for role, group, target in (("current", current, None), ("history", history, reference)):
+195:         if group is None:
+196:             continue
+197:         logs[role] = backward_group(model, group, c, arm,
+198:             data.seed_for(20260918, order, stage, step, role, "dropout"),
+199:             data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check)
+200:         if observe is not None:
+201:             observe(role, logs[role])
+202:     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)
+203:     check()
+204:     optimizer.step()
+205:     return {**logs, "gradient_norm": float(norm), "encoder_lr": parent.stage_lr(step),
+206:             "head_lr": .001, "total": sum(v["weighted"] for v in logs.values())}
+207: 
+208: 
+209: def reference(model: Any, group: data.Group, c: dict, check: Callable = lambda: None) -> np.ndarray:
+210:     import torch
+211:     model.eval()
+212:     with torch.inference_mode():
+213:         table = pair_table(model, record_vectors(model, group, c, check), check)
+214:     result = table.float().cpu().numpy().copy()
+215:     if not np.isfinite(result).all():
+216:         raise ValueError("Nonfinite source table")
+217:     return result
+218: 
+219: 
+220: def score(model: Any, groups: list[data.Group], c: dict, check: Callable = lambda: None) -> np.ndarray:
+
+=== frozen_source/scripts/step28_record_replay.py [lines 220-330; total 330] ===
+220: def score(model: Any, groups: list[data.Group], c: dict, check: Callable = lambda: None) -> np.ndarray:
+221:     import torch
+222:     model.eval()
+223:     with torch.inference_mode():
+224:         rows = [account_logits(pair_table(model, record_vectors(model, g, c, check), check),
+225:                                assignment(g)).float().cpu().numpy() for g in groups]
+226:     result = np.stack(rows).astype(np.float32)
+227:     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
+228:         raise ValueError("Incomplete blind scores")
+229:     return result
+230: 
+231: 
+232: class Memory:
+233:     """Single bounded payload: UTF-8 groups/metadata followed by binary FP32 tables."""
+234: 
+235:     def __init__(self, order: str):
+236:         if order not in parent.ORDERS:
+237:             raise ValueError("Unknown order")
+238:         self.order = order
+239:         self.reservoir = data.Memory(data.seed_for(20260930, order, "retention"))
+240:         self.tables: dict[str, np.ndarray] = {}
+241:         self.origins: dict[str, int] = {}
+242:         self.maps: dict = {}
+243:         self.stage = self.count = 0
+244:         self.draw_rng: random.Random | None = None
+245: 
+246:     def retain(self, current: list[data.Group], stage: int, teacher: Callable) -> dict:
+247:         if (stage not in (1, 2) or len(current) != 48 or self.reservoir.seen != 48*(stage-1)
+248:                 or (stage == 2 and (self.stage != 2 or self.count != 288))):
+249:             raise ValueError("Retention boundary differs")
+250:         old = {uid: hashlib.sha256(t.tobytes()).hexdigest() for uid, t in self.tables.items()}
+251:         self.reservoir.add_stage(sorted(current, key=lambda g: g.uid))
+252:         kept = {g.uid for g in self.reservoir.groups}
+253:         self.tables = {uid: table for uid, table in self.tables.items() if uid in kept}
+254:         self.origins = {uid: birth for uid, birth in self.origins.items() if uid in kept}
+255:         new = []
+256:         for group in self.reservoir.groups:
+257:             if group.uid not in self.tables:
+258:                 self.tables[group.uid] = np.asarray(teacher(group), dtype=np.float32).copy()
+259:                 self.origins[group.uid] = stage
+260:                 new.append(group.uid)
+261:         for uid in kept & old.keys():
+262:             if hashlib.sha256(self.tables[uid].tobytes()).hexdigest() != old[uid]:
+263:                 raise ValueError("Survivor source was refreshed")
+264:         self.stage = self.count = 0
+265:         self.draw_rng = None
+266:         self.to_bytes()
+267:         return {"created": new, "evicted": sorted(old.keys()-kept), "survivors_unchanged": True}
+268: 
+269:     def begin_stage(self, stage: int) -> None:
+270:         if stage not in (2, 3) or self.stage != 0 or self.reservoir.seen != 48*(stage-1):
+271:             raise ValueError("History stage boundary differs")
+272:         self.stage, self.count = stage, 0
+273:         self.draw_rng = random.Random(data.seed_for(20260930, self.order, stage, "history_draws"))
+274: 
+275:     def draw(self) -> tuple[data.Group, np.ndarray]:
+276:         if self.draw_rng is None or self.count >= 288 or len(self.reservoir.groups) != 6:
+277:             raise ValueError("History draw boundary differs")
+278:         group = self.draw_rng.choice(self.reservoir.groups)
+279:         self.count += 1
+280:         self.to_bytes()
+281:         return group, self.tables[group.uid]
+282: 
+283:     def to_bytes(self) -> bytes:
+284:         if set(self.tables) != {g.uid for g in self.reservoir.groups} or set(self.origins) != set(self.tables):
+285:             raise ValueError("Historical groups/source alignment differs")
+286:         blocks, records = [], []
+287:         for group in self.reservoir.groups:
+288:             n = sum(map(len, group.items))
+289:             t = self.tables[group.uid]
+290:             if t.shape != (n*(n-1)//2,) or t.dtype != np.float32 or not np.isfinite(t).all():
+291:                 raise ValueError("Historical table shape, type or finiteness differs")
+292:             blocks.append(t.astype("<f4", copy=False).tobytes())
+293:             records.append({"uid": group.uid, "count": len(t), "origin": self.origins[group.uid]})
+294:         header = data.json_bytes({"format": "record_table_f32_v1", "order": self.order,
+295:             "reservoir": json.loads(self.reservoir.to_bytes()), "tables": records, "maps": self.maps,
+296:             "stage": self.stage, "count": self.count,
+297:             "draw_rng": self.draw_rng.getstate() if self.draw_rng else None})
+298:         payload = struct.pack("<I", len(header)) + header + b"".join(blocks)
+299:         if len(payload) > 1048576:
+300:             raise ValueError("Entire historical state exceeds 1 MiB")
+301:         return payload
+302: 
+303:     @classmethod
+304:     def from_bytes(cls, payload: bytes) -> Memory:
+305:         size, = struct.unpack("<I", payload[:4])
+306:         obj = json.loads(payload[4:4+size])
+307:         if obj["format"] != "record_table_f32_v1":
+308:             raise ValueError("Unknown memory format")
+309:         result = cls(obj["order"])
+310:         result.reservoir = data.Memory.from_bytes(data.json_bytes(obj["reservoir"]))
+311:         result.maps, result.stage, result.count = obj["maps"], obj["stage"], obj["count"]
+312:         cursor = 4+size
+313:         for row in obj["tables"]:
+314:             end = cursor+4*row["count"]
+315:             result.tables[row["uid"]] = np.frombuffer(payload[cursor:end], dtype="<f4").copy()
+316:             result.origins[row["uid"]] = row["origin"]
+317:             cursor = end
+318:         if obj["draw_rng"] is not None:
+319:             result.draw_rng = random.Random()
+320:             result.draw_rng.setstate(data.tuple_state(obj["draw_rng"]))
+321:         if cursor != len(payload) or result.to_bytes() != payload:
+322:             raise ValueError("Full history payload did not roundtrip")
+323:         return result
+324: 
+325:     def summary(self) -> dict:
+326:         payload = self.to_bytes()
+327:         return {"members": [g.uid for g in self.reservoir.groups], "seen": self.reservoir.seen,
+328:                 "stage": self.stage, "count": self.count, "bytes": len(payload),
+329:                 "origins": self.origins.copy(), "sha256": hashlib.sha256(payload).hexdigest(),
+330:                 "tables": {uid: hashlib.sha256(t.tobytes()).hexdigest() for uid, t in self.tables.items()}}
+
+=== frozen_source/scripts/step28_record_attribution_run.py [lines 1-207; total 630] ===
+1: """Three independent trajectories isolate record structure and regrouped supervision."""
+2: from __future__ import annotations
+3: 
+4: import argparse
+5: import ast
+6: import gc
+7: import os
+8: from pathlib import Path
+9: import random
+10: import shutil
+11: import signal
+12: import threading
+13: import time
+14: import traceback
+15: from typing import Any, Callable
+16: 
+17: import numpy as np
+18: 
+19: import step28_record_replay as record
+20: import step28_record_replay_run as old
+21: import step28_er_weight as logit
+22: import step28_replay_diagnostics as diagnostics
+23: 
+24: data, parent, base, core = record.data, record.parent, record.base, record.core
+25: previous, evaluation = old.previous, old.evaluation
+26: POLICY = data.ROOT/"schema/step28_record_attribution_policy.json"
+27: ARMS = ("LOGIT0.1", "R0", "S")
+28: 
+29: 
+30: def policy() -> dict:
+31:     p = data.read_json(POLICY)
+32:     if (p["methods"] != list(ARMS) or p["physical_updates"] != 7776 or p["physical_stage_states"] != 27
+33:             or p["epoch_diagnostic_points"] != 162 or p["gradient_group_presentations"] != 12960
+34:             or p["history_supervision"] != .1 or p["teacher_weight"] != .5
+35:             or p["regroup_supervision"] != {"LOGIT0.1": False, "R0": False, "S": True}
+36:             or p["evaluation"]["comparisons"] != [["R0", "LOGIT0.1"], ["S", "R0"], ["S", "LOGIT0.1"]]
+37:             or p["evaluation"]["overall_pass_gate"] is not False
+38:             or p["orders"] != list(parent.ORDERS) or p["seed"] != "s0"):
+39:         raise ValueError("Approved three-arm scope differs")
+40:     return p
+41: 
+42: 
+43: def config(arm: str) -> dict:
+44:     if arm not in ARMS:
+45:         raise ValueError("Unapproved arm")
+46:     c = parent.config(parent.contract()) if arm == "LOGIT0.1" else record.config()
+47:     c["runtime"] = policy()["runtime"]
+48:     return c
+49: 
+50: 
+51: def sources() -> list[dict]:
+52:     paths = {data.ROOT/name for name in (
+53:         "scripts/step28_record_attribution_run.py", "scripts/step28_record_attribution_verify.py",
+54:         "scripts/step28_replay_diagnostics.py", "tests/test_step28_record_attribution.py")}
+55:     todo = list(paths)
+56:     while todo:
+57:         path = todo.pop()
+58:         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+59:             names = [v.name for v in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
+60:             for name in names:
+61:                 if name and name.startswith("step28_"):
+62:                     child = data.ROOT/"scripts"/(name+".py")
+63:                     if child not in paths:
+64:                         paths.add(child)
+65:                         todo.append(child)
+66:     paths.update(data.ROOT/"schema"/name for name in (
+67:         "step28_record_attribution_policy.json", "step28_record_replay_policy.json",
+68:         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
+69:     paths.update(data.ROOT/name for name in ("docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md",
+70:         "scripts/run_step28_record_attribution_linux_20261009.sh", "tests/test_step28_record_replay.py"))
+71:     return [data.record(path, data.ROOT) for path in sorted(paths)]
+72: 
+73: 
+74: def point_name(order: str, arm: str, stage: int) -> str:
+75:     return f"{order}_{arm}_stage{stage}"
+76: 
+77: 
+78: def specifications() -> dict:
+79:     return {point_name(order, arm, stage): (order, arm, stage)
+80:             for order in parent.ORDERS for arm in ARMS for stage in (1,2,3)}
+81: 
+82: 
+83: class Budget(old.Budget):
+84:     def __init__(self, root: Path):
+85:         super().__init__(root)
+86:         self.limits = policy()["runtime"]
+87: 
+88: 
+89: def memory_from(payload: bytes, arm: str) -> parent.Memory | record.Memory:
+90:     return (parent.Memory if arm == "LOGIT0.1" else record.Memory).from_bytes(payload)
+91: 
+92: 
+93: def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+94:            target: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+95:            step: int, check: Callable) -> dict:
+96:     if parent.adam_step(optimizer) != (stage-1)*288+step-1:
+97:         raise ValueError("Actual update's Adam step differs")
+98:     if arm != "LOGIT0.1":
+99:         return record.update(model, optimizer, current, history, target, c, arm, order, stage, step, check)
+100:     stream = data.seed_for(20260918, order, stage, "current")
+101:     seeds = (data.seed_for(stream, step-1, "dropout"), data.seed_for(20260930, order, stage, step-1, "history_dropout"))
+102:     if stage == 1:
+103:         return parent.update(model, optimizer, current, None, None, c, "logit", stage, step, *seeds, check=check)
+104:     return logit.update(model, optimizer, current, history, c, .1, stage, step, *seeds,
+105:                         reference=target, logit_weight=.5, check=check)
+106: 
+107: 
+108: def train_stage(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
+109:                 c: dict, arm: str, order: str, stage: int, root: Path, budget: Any) -> tuple[dict,list]:
+110:     if parent.adam_step(optimizer) != (stage-1)*288:
+111:         raise ValueError("Adam continuity differs")
+112:     if memory is not None:
+113:         memory.begin_stage(stage)
+114:     before = None if memory is None else memory.summary()
+115:     schedule, _ = parent.schedule(current, parent.contract(), order, stage)
+116:     rows, epoch_records = [], []
+117:     name = point_name(order, arm, stage)
+118:     budget.phase = name
+119:     started = time.monotonic()
+120:     for step, group in enumerate(schedule, 1):
+121:         history, target = memory.draw() if memory is not None else (None,None)
+122:         row = update(model, optimizer, group, history, target, c, arm, order, stage, step, budget.check)
+123:         row.update(step=step, current_uid=group.uid, history_uid=None if history is None else history.uid)
+124:         rows.append(row)
+125:         if step % 48 == 0:
+126:             epoch_records.append(diagnostics.capture(model, optimizer, current, memory, valid, c, arm,
+127:                 order, stage, step//48, root/"diagnostics", name, budget.check))
+128:         if step == 1 or step % 24 == 0:
+129:             print(data.json_bytes({"event":"updates", "point":name, "completed":step,
+130:                   "stage_elapsed_seconds":time.monotonic()-started, **budget.snapshot()}).decode(), flush=True)
+131:     after = None if memory is None else memory.summary()
+132:     keys = ("members","seen","reference_origins","references") if arm == "LOGIT0.1" else ("members","seen","origins","tables")
+133:     if memory is not None and any(before[k] != after[k] for k in keys):
+134:         raise ValueError("Stage mutated retained membership or birth sources")
+135:     result = {"order":order,"arm":arm,"stage":stage,"updates":288,"adam_step":parent.adam_step(optimizer),
+136:               "current_ids":[g.uid for g in schedule],"history_ids":[r["history_uid"] for r in rows if r["history_uid"] is not None],
+137:               "memory_before":before,"memory_after":after,"rows":rows,"elapsed_seconds":time.monotonic()-started}
+138:     path = root/"updates"/(name+".json")
+139:     data.write_json(path,result)
+140:     return data.record(path,root), epoch_records
+141: 
+142: 
+143: def checkpoint(root: Path, name: str, model: Any, optimizer: Any, memory: Any,
+144:                current: list, calibration: list, valid: list, c: dict, arm: str,
+145:                order: str, stage: int, budget: Any) -> tuple[dict, Any]:
+146:     if len(calibration) != 12 or len(valid) != 60 or parent.adam_step(optimizer) != 288*stage:
+147:         raise ValueError("Incomplete stage endpoint")
+148:     state = diagnostics.rng_state()
+149:     with diagnostics.neutral(model):
+150:         scores = {"calibration":diagnostics.score(model,calibration,c,arm,budget.check),
+151:                   "raw":diagnostics.score(model,valid,c,arm,budget.check)}
+152:         mapping = parent.calibration.fit(scores["calibration"], np.asarray([g.labels for g in calibration],np.uint8),
+153:                                          role="calibration", check=budget.check)
+154:         map_path = root/"maps"/(name+".json")
+155:         data.write_json(map_path,mapping)
+156:         if mapping["status"] != "PASS_CALIBRATION_FIT":
+157:             raise ValueError("Calibration failed; no retry")
+158:         current_map = dict(zip(("a","b"),parent.calibration.parameters(mapping)))
+159:         if memory is None:
+160:             memory = parent.Memory(order,20260930,True,current_map) if arm == "LOGIT0.1" else record.Memory(order)
+161:         first_map = memory.first_map if arm == "LOGIT0.1" else memory.maps.get("first",current_map)
+162:         auxiliary = {"first":first_map,"stage":current_map,"rng":state,"completed_stage":stage,"adam_step":288*stage}
+163:         if arm == "LOGIT0.1":
+164:             memory.auxiliary = auxiliary
+165:             if stage < 3:
+166:                 memory.retain(current,stage,lambda groups:diagnostics.score(model,groups,c,arm,budget.check))
+167:         else:
+168:             memory.maps = auxiliary
+169:             if stage < 3:
+170:                 memory.retain(current,stage,lambda group:record.reference(model,group,c,budget.check))
+171:     mp = root/"memory"/(name+".bin")
+172:     mp.write_bytes(memory.to_bytes())
+173:     memory = memory_from(mp.read_bytes(),arm)
+174:     meta = {"name":name,"order":order,"stage":stage,"arm":arm,"rng":state,
+175:             "memory":data.record(mp,root),"policy_sha256":data.sha256(POLICY)}
+176:     full_path = root/"work"/(name+".pt")
+177:     budget.check(base.persistence.checkpoint_reserve(model,optimizer))
+178:     full = core.save_state(full_path,model,optimizer,meta)
+179:     if core.restore_state(full_path,model,optimizer,full["state_sha256"]) != meta:
+180:         raise ValueError("Full model/Adam metadata differs")
+181:     diagnostics.restore_rng(state)
+182:     with diagnostics.neutral(model):
+183:         for role,groups in (("calibration",calibration),("raw",valid)):
+184:             if not np.array_equal(scores[role],diagnostics.score(model,groups,c,arm,budget.check)):
+185:                 raise ValueError("Full restored scores differ")
+186:     budget.check(base.persistence.checkpoint_reserve(model,None))
+187:     model_path = root/"models"/(name+".pt")
+188:     inference = core.save_state(model_path,model,None,meta)
+189:     if core.restore_state(model_path,model,None,inference["state_sha256"]) != meta:
+190:         raise ValueError("Inference restore differs")
+191:     diagnostics.restore_rng(state)
+192:     for role,m in (("stage-cal",current_map),("first-cal",first_map)):
+193:         scores[role] = parent.calibration.transform(scores["raw"],m)
+194:         parent.calibration.preserve_order(scores["raw"],scores[role])
+195:     keep_full = False
+196:     result = {"order":order,"arm":arm,"stage":stage,"adam_step":stage*288,"full_restore_verified":True,
+197:         "calibration_ids":[g.uid for g in calibration],"maps":{"first":first_map,"stage":current_map},
+198:         "mapping":data.record(map_path,root),"memory":data.record(mp,root),"memory_summary":memory.summary(),
+199:         "full_state":{**full,"path":full_path.relative_to(root).as_posix()},"full_retained":keep_full,
+200:         "model":{**inference,"path":model_path.relative_to(root).as_posix()},
+201:         "scores":{role:previous.save_array(root/"scores"/(name+"_"+role+".npy"),value,root) for role,value in scores.items()}}
+202:     if not keep_full:
+203:         base.persistence.remove_work_file(full_path,root)
+204:     data.write_json(root/"points"/(name+".json"),result)
+205:     return result,memory
+206: 
+207: 
+
+=== frozen_source/scripts/step28_alias_ranking.py [lines 1-185; total 222] ===
+1: """D, encoder learning-rate schedule, and known hard-candidate ranking.
+2: 
+3: Model inputs and the D head are unchanged. No formal data loader or test entry.
+4: """
+5: from __future__ import annotations
+6: 
+7: import copy
+8: import math
+9: from pathlib import Path
+10: from typing import Any, Callable
+11: 
+12: import numpy as np
+13: 
+14: import step28_chinese_base as base
+15: 
+16: data, core, metrics = base.data, base.core, base.metrics
+17: POLICY = data.ROOT / "schema/step28_alias_ranking_policy.json"
+18: POLICY_SHA256 = "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+19: SEEDS = ("s0", "s1", "s2")
+20: ARMS = ("d", "schedule", "hard")
+21: RUNS = tuple(f"{seed}_{arm}" for seed in SEEDS for arm in ARMS)
+22: LOSS_NAMES = ("bce", "rank", "hard", "total")
+23: GUARDS = {"average_precision": 1, "roc_auc": 1, "brier": -1, "log_loss": -1}
+24: 
+25: 
+26: def contract() -> dict:
+27:     if data.sha256(POLICY) != POLICY_SHA256:
+28:         raise ValueError("Ranking policy differs from the frozen contract")
+29:     p = data.read_json(POLICY)
+30:     if (p["arms"] != list(ARMS) or p["runs"] != list(RUNS)
+31:             or p["physical_updates"] != 7776 or p["updates_per_run"] != 864
+32:             or p["epochs"] != 6 or p["score_epochs"] != [3, 6] or p["primary_epoch"] != 6
+33:             or p["primary_comparison"] != ["hard", "d"] or p["fixed_test_seed"] != "s0"
+34:             or p["hard_ranking"]["count"] != 5 or p["hard_ranking"]["weight"] != .5
+35:             or p["evaluation"]["guard_signs"] != GUARDS
+36:             or p["evaluation"]["recall_at_5_strict_improvement_mean_and_s0"] is not True
+37:             or p["supervision"]["test_access"] is not False or p["supervision"]["owners_access"] is not False):
+38:         raise ValueError("Confirmed comparison or supervision scope differs")
+39:     base.contract()
+40:     if (p["base_policy_sha256"] != base.POLICY_SHA256
+41:             or data.sha256(Path(base.__file__)) != p["base_runner_sha256"]):
+42:         raise ValueError("Frozen D implementation differs")
+43:     return p
+44: 
+45: 
+46: def reference_config(policy: dict, seed: str) -> dict:
+47:     if seed not in SEEDS:
+48:         raise ValueError("Unknown paired seed")
+49:     c = copy.deepcopy(base.contract())
+50:     c.update(policy["seeds"][seed])
+51:     c["runtime"] = copy.deepcopy(policy["runtime"])
+52:     return c
+53: 
+54: 
+55: def split_run(run_id: str) -> tuple[str, str]:
+56:     if run_id not in RUNS:
+57:         raise ValueError("Unknown run identity")
+58:     seed, arm = run_id.split("_")
+59:     return seed, arm
+60: 
+61: 
+62: def load_model(policy: dict, seed: str, device: str = "cuda:0") -> Any:
+63:     return base.load_model(reference_config(policy, seed), "split_rank", device)
+64: 
+65: 
+66: def encoder_lr(policy: dict, arm: str, step: int) -> float:
+67:     """One-based actual optimizer step; the final scheduled encoder rate is zero."""
+68:     if arm not in ARMS or type(step) is not int or not 1 <= step <= policy["updates_per_run"]:
+69:         raise ValueError("Unknown arm or update outside the fixed budget")
+70:     if arm == "d":
+71:         return 2e-5
+72:     spec = policy["encoder_schedule"]
+73:     warmup, total = spec["warmup_updates"], policy["updates_per_run"]
+74:     if warmup != math.ceil(spec["warmup_fraction"] * total) or not 0 < warmup < total:
+75:         raise ValueError("Invalid warmup schedule")
+76:     factor = step / warmup if step <= warmup else (total - step) / (total - warmup)
+77:     return float(spec["peak_lr"] * factor)
+78: 
+79: 
+80: def set_learning_rate(optimizer: Any, policy: dict, arm: str, step: int) -> tuple[float, float]:
+81:     if len(optimizer.param_groups) != 2:
+82:         raise ValueError("Expected encoder and head optimizer groups")
+83:     rates = (encoder_lr(policy, arm, step), policy["encoder_schedule"]["head_lr"])
+84:     for group, rate in zip(optimizer.param_groups, rates, strict=True):
+85:         group["lr"] = rate
+86:     return rates
+87: 
+88: 
+89: def hard_candidates(predicted: Any, truth: Any, count: int = 5) -> tuple[Any, Any, Any]:
+90:     """Known-negative indices only, deterministic exact-tie order, live score values."""
+91:     import torch
+92: 
+93:     if predicted.shape != (378,) or truth.shape != (378,) or count != 5:
+94:         raise ValueError("Expected 28-account scores and five hard negatives")
+95:     # Independent shape/label/connectivity validation remains in base.objectives.
+96:     if not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all():
+97:         raise ValueError("Nonfinite scores or nonbinary labels")
+98:     left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+99:     scores = predicted.new_zeros((28, 28))
+100:     scores[left, right], scores[right, left] = predicted, predicted
+101:     positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+102:     positive[left, right], positive[right, left] = truth.bool(), truth.bool()
+103:     negative = ~positive & ~torch.eye(28, dtype=torch.bool, device=predicted.device)
+104:     if (positive.sum(1) < 1).any() or (negative.sum(1) < count).any():
+105:         raise ValueError("Each query needs positive and known negative candidates")
+106:     selected = torch.argsort(scores.detach().masked_fill(~negative, -torch.inf),
+107:                              dim=1, descending=True, stable=True)[:, :count]
+108:     if not negative.gather(1, selected).all():
+109:         raise ValueError("Self or positive entered hard negatives")
+110:     return scores, positive, selected
+111: 
+112: 
+113: def objectives(predicted: Any, truth: Any, hard_weight: float) -> dict:
+114:     import torch
+115: 
+116:     if hard_weight not in (0., .5):
+117:         raise ValueError("Only disabled or approved fixed hard weight is allowed")
+118:     result = base.objectives(predicted, truth, 1)
+119:     if hard_weight == 0:
+120:         return {**result, "hard": predicted.new_zeros(())}
+121:     scores, positive, selected = hard_candidates(predicted, truth)
+122:     terms = []
+123:     for query in range(28):
+124:         pos = scores[query, positive[query]]
+125:         neg = scores[query, selected[query]]
+126:         terms.append(torch.nn.functional.softplus(neg.unsqueeze(0) - pos.unsqueeze(1)).mean())
+127:     hard = torch.stack(terms).mean()
+128:     return {"bce": result["bce"], "rank": result["rank"], "hard": hard,
+129:             "total": result["total"] + hard_weight * hard}
+130: 
+131: 
+132: def score(model: Any, groups: list, config: dict, check: Callable[[], None] = lambda: None) -> np.ndarray:
+133:     return base.score(model, groups, config, "split_rank", check)
+134: 
+135: 
+136: def update(model: Any, optimizer: Any, group: Any, config: dict, policy: dict,
+137:            arm: str, step: int, seed: int, *, observe: bool = False,
+138:            check: Callable[[], None] = lambda: None) -> dict:
+139:     import torch
+140: 
+141:     if group.labels is None:
+142:         raise ValueError("Only supervised fitting groups enter updates")
+143:     if step == 1 and optimizer.state:
+144:         raise ValueError("New run optimizer already has history")
+145:     if step > 1 and (not optimizer.state or any(float(v["step"]) != step - 1
+146:                                                for v in optimizer.state.values())):
+147:         raise ValueError("Optimizer history does not match the declared update")
+148:     rates = set_learning_rate(optimizer, policy, arm, step)
+149:     if arm != "hard":
+150:         # Exact original D computation. No extra forward/random draws/zero-loss graph.
+151:         result = base.update(model, optimizer, group, config, "split_rank", seed,
+152:                              observe=observe and rates[0] > 0, check=check)
+153:         return {**result, "hard": 0., "step": step, "encoder_lr": rates[0], "head_lr": rates[1]}
+154:     model.train()
+155:     optimizer.zero_grad(set_to_none=True)
+156:     before = {name: core.state_digest(module.state_dict()) for name, module in
+157:               (("encoder", model.encoder), ("head", model.head))} if observe else {}
+158:     torch.manual_seed(seed)
+159:     predicted = base.logits(model, group, config, "split_rank", check)
+160:     truth = torch.tensor(group.labels, dtype=torch.float32, device=predicted.device)
+161:     terms = objectives(predicted, truth, policy["hard_ranking"]["weight"])
+162:     terms["total"].backward()
+163:     evidence = {}
+164:     if observe:
+165:         for name, module in (("encoder", model.encoder), ("head", model.head)):
+166:             norms = [float(p.grad.float().norm()) for p in module.parameters() if p.grad is not None]
+167:             if not norms or not np.isfinite(norms).all() or max(norms) <= 0:
+168:                 raise ValueError("Missing finite nonzero task gradient: " + name)
+169:             evidence[name] = {"finite_nonzero_gradient": True}
+170:     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), config["optimizer"]["clip_norm"],
+171:                                          error_if_nonfinite=True)
+172:     check()
+173:     optimizer.step()
+174:     if observe:
+175:         for name, module in (("encoder", model.encoder), ("head", model.head)):
+176:             changed = before[name] != core.state_digest(module.state_dict())
+177:             expected = name == "head" or rates[0] > 0
+178:             if changed != expected:
+179:                 raise ValueError("Actual update differs from learning-rate scope: " + name)
+180:             evidence[name]["parameters_changed"] = changed
+181:     return {**{name: float(terms[name].detach()) for name in LOSS_NAMES}, "modules": evidence,
+182:             "gradient_norm": float(norm), "step": step, "encoder_lr": rates[0], "head_lr": rates[1]}
+183: 
+184: 
+185: def paired_summary(deltas: np.ndarray, domains: list[str], evaluation: dict) -> dict:
+
+=== frozen_source/schema/step28_record_attribution_policy.json [lines 1-22; total 22] ===
+1: {
+2:   "study": "record_structure_and_regrouped_supervision_attribution",
+3:   "methods": ["LOGIT0.1", "R0", "S"],
+4:   "orders": ["ABC", "BCA", "CAB"],
+5:   "seed": "s0",
+6:   "regroup_supervision": {"LOGIT0.1": false, "R0": false, "S": true},
+7:   "history_supervision": 0.1,
+8:   "teacher_weight": 0.5,
+9:   "physical_updates": 7776,
+10:   "gradient_group_presentations": 12960,
+11:   "physical_stage_states": 27,
+12:   "logical_stage_points": 27,
+13:   "epoch_diagnostic_points": 162,
+14:   "untrained_architecture_points": 2,
+15:   "memory_maximum_bytes": 1048576,
+16:   "cpu_verification": {"maximum_seconds": 300, "maximum_rss_bytes": 2147483648, "maximum_evidence_bytes": 67108864},
+17:   "native_verification": {"maximum_seconds": 600, "maximum_evidence_bytes": 134217728},
+18:   "runtime": {"maximum_gpu_stage_seconds": 259200, "maximum_output_bytes": 51539607552, "maximum_cuda_reserved_bytes": 30064771072, "maximum_rss_bytes": 68719476736, "minimum_free_gpu_bytes": 32212254720, "minimum_free_host_bytes": 77309411328, "torch_cpu_threads": 1},
+19:   "supervision": {"train_parse_attempts": 1, "valid_parse_attempts": 1, "test_access": false, "owners_access": false, "automatic_retry": false},
+20:   "diagnostics": {"epochs": [1, 2, 3, 4, 5, 6], "current_fit_groups": 48, "surviving_cache_groups": 6, "blind_valid_groups": 60, "metrics": ["map", "recall_at_5", "log_loss"], "regroup_seed": 20261008, "valid_opening": "after_all_training_restoration_and_blind_gates", "early_stopping": false},
+21:   "evaluation": {"bootstrap_replicates": 5000, "bootstrap_seed": 20260930, "comparisons": [["R0", "LOGIT0.1"], ["S", "R0"], ["S", "LOGIT0.1"]], "primary_comparisons": [["R0", "LOGIT0.1"], ["S", "R0"]], "primary_endpoints": ["O", "N"], "primary_metric": "map", "overall_pass_gate": false, "automatic_followup": false}
+22: }
+
+=== frozen_source/schema/step28_record_replay_policy.json [lines 1-30; total 30] ===
+1: {
+2:   "study": "seller_alias_record_replay_development",
+3:   "orders": ["ABC", "BCA", "CAB"],
+4:   "methods": ["C", "S"],
+5:   "seed": "s0",
+6:   "initialization_seed": 20260909,
+7:   "schedule_seed": 20260918,
+8:   "memory_seed": 20260930,
+9:   "physical_updates": 4320,
+10:   "gradient_group_presentations": 7776,
+11:   "physical_stage_states": 15,
+12:   "logical_stage_points": 18,
+13:   "record_dimension": 2048,
+14:   "pair_chunk": 512,
+15:   "history_supervision": 0.1,
+16:   "teacher_weight": 0.5,
+17:   "memory_maximum_bytes": 1048576,
+18:   "cpu_verification": {"maximum_seconds": 180, "maximum_rss_bytes": 2147483648, "maximum_evidence_bytes": 16777216},
+19:   "native_verification": {"maximum_seconds": 600, "maximum_evidence_bytes": 134217728},
+20:   "runtime": {"maximum_gpu_stage_seconds": 86400, "maximum_output_bytes": 34359738368, "maximum_cuda_reserved_bytes": 30064771072, "maximum_rss_bytes": 68719476736, "minimum_free_gpu_bytes": 32212254720, "minimum_free_host_bytes": 77309411328, "torch_cpu_threads": 1},
+21:   "supervision": {"train_parse_attempts": 1, "valid_parse_attempts": 1, "test_access": false, "owners_access": false, "automatic_retry": false},
+22:   "evaluation": {"comparisons": ["C-S", "C-LOGIT0.1"], "development_guard": -0.01, "bootstrap_replicates": 5000, "bootstrap_seed": 20260930},
+23:   "reference": {
+24:     "linux_root": "reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace/reports/job/evaluation",
+25:     "collections": {
+26:       "collected.json": {"bytes": 13759, "sha256": "e01708603a799dd8c4a53b7f5a86b7a5fc35936f00e7c78902650ca6137ad452"},
+27:       "reference/collected.json": {"bytes": 22474, "sha256": "ffb6e7fd7d1437a9d3940848452c24d5a0560b2388f5913b2ffa5ed14f07926a"}
+28:     }
+29:   }
+30: }
+
+=== frozen_source/scripts/step28_record_attribution_run.py [lines 74-142; total 630] ===
+74: def point_name(order: str, arm: str, stage: int) -> str:
+75:     return f"{order}_{arm}_stage{stage}"
+76: 
+77: 
+78: def specifications() -> dict:
+79:     return {point_name(order, arm, stage): (order, arm, stage)
+80:             for order in parent.ORDERS for arm in ARMS for stage in (1,2,3)}
+81: 
+82: 
+83: class Budget(old.Budget):
+84:     def __init__(self, root: Path):
+85:         super().__init__(root)
+86:         self.limits = policy()["runtime"]
+87: 
+88: 
+89: def memory_from(payload: bytes, arm: str) -> parent.Memory | record.Memory:
+90:     return (parent.Memory if arm == "LOGIT0.1" else record.Memory).from_bytes(payload)
+91: 
+92: 
+93: def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+94:            target: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+95:            step: int, check: Callable) -> dict:
+96:     if parent.adam_step(optimizer) != (stage-1)*288+step-1:
+97:         raise ValueError("Actual update's Adam step differs")
+98:     if arm != "LOGIT0.1":
+99:         return record.update(model, optimizer, current, history, target, c, arm, order, stage, step, check)
+100:     stream = data.seed_for(20260918, order, stage, "current")
+101:     seeds = (data.seed_for(stream, step-1, "dropout"), data.seed_for(20260930, order, stage, step-1, "history_dropout"))
+102:     if stage == 1:
+103:         return parent.update(model, optimizer, current, None, None, c, "logit", stage, step, *seeds, check=check)
+104:     return logit.update(model, optimizer, current, history, c, .1, stage, step, *seeds,
+105:                         reference=target, logit_weight=.5, check=check)
+106: 
+107: 
+108: def train_stage(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
+109:                 c: dict, arm: str, order: str, stage: int, root: Path, budget: Any) -> tuple[dict,list]:
+110:     if parent.adam_step(optimizer) != (stage-1)*288:
+111:         raise ValueError("Adam continuity differs")
+112:     if memory is not None:
+113:         memory.begin_stage(stage)
+114:     before = None if memory is None else memory.summary()
+115:     schedule, _ = parent.schedule(current, parent.contract(), order, stage)
+116:     rows, epoch_records = [], []
+117:     name = point_name(order, arm, stage)
+118:     budget.phase = name
+119:     started = time.monotonic()
+120:     for step, group in enumerate(schedule, 1):
+121:         history, target = memory.draw() if memory is not None else (None,None)
+122:         row = update(model, optimizer, group, history, target, c, arm, order, stage, step, budget.check)
+123:         row.update(step=step, current_uid=group.uid, history_uid=None if history is None else history.uid)
+124:         rows.append(row)
+125:         if step % 48 == 0:
+126:             epoch_records.append(diagnostics.capture(model, optimizer, current, memory, valid, c, arm,
+127:                 order, stage, step//48, root/"diagnostics", name, budget.check))
+128:         if step == 1 or step % 24 == 0:
+129:             print(data.json_bytes({"event":"updates", "point":name, "completed":step,
+130:                   "stage_elapsed_seconds":time.monotonic()-started, **budget.snapshot()}).decode(), flush=True)
+131:     after = None if memory is None else memory.summary()
+132:     keys = ("members","seen","reference_origins","references") if arm == "LOGIT0.1" else ("members","seen","origins","tables")
+133:     if memory is not None and any(before[k] != after[k] for k in keys):
+134:         raise ValueError("Stage mutated retained membership or birth sources")
+135:     result = {"order":order,"arm":arm,"stage":stage,"updates":288,"adam_step":parent.adam_step(optimizer),
+136:               "current_ids":[g.uid for g in schedule],"history_ids":[r["history_uid"] for r in rows if r["history_uid"] is not None],
+137:               "memory_before":before,"memory_after":after,"rows":rows,"elapsed_seconds":time.monotonic()-started}
+138:     path = root/"updates"/(name+".json")
+139:     data.write_json(path,result)
+140:     return data.record(path,root), epoch_records
+141: 
+142: 
+
+=== frozen_source/scripts/step28_record_attribution_run.py [lines 143-275; total 630] ===
+143: def checkpoint(root: Path, name: str, model: Any, optimizer: Any, memory: Any,
+144:                current: list, calibration: list, valid: list, c: dict, arm: str,
+145:                order: str, stage: int, budget: Any) -> tuple[dict, Any]:
+146:     if len(calibration) != 12 or len(valid) != 60 or parent.adam_step(optimizer) != 288*stage:
+147:         raise ValueError("Incomplete stage endpoint")
+148:     state = diagnostics.rng_state()
+149:     with diagnostics.neutral(model):
+150:         scores = {"calibration":diagnostics.score(model,calibration,c,arm,budget.check),
+151:                   "raw":diagnostics.score(model,valid,c,arm,budget.check)}
+152:         mapping = parent.calibration.fit(scores["calibration"], np.asarray([g.labels for g in calibration],np.uint8),
+153:                                          role="calibration", check=budget.check)
+154:         map_path = root/"maps"/(name+".json")
+155:         data.write_json(map_path,mapping)
+156:         if mapping["status"] != "PASS_CALIBRATION_FIT":
+157:             raise ValueError("Calibration failed; no retry")
+158:         current_map = dict(zip(("a","b"),parent.calibration.parameters(mapping)))
+159:         if memory is None:
+160:             memory = parent.Memory(order,20260930,True,current_map) if arm == "LOGIT0.1" else record.Memory(order)
+161:         first_map = memory.first_map if arm == "LOGIT0.1" else memory.maps.get("first",current_map)
+162:         auxiliary = {"first":first_map,"stage":current_map,"rng":state,"completed_stage":stage,"adam_step":288*stage}
+163:         if arm == "LOGIT0.1":
+164:             memory.auxiliary = auxiliary
+165:             if stage < 3:
+166:                 memory.retain(current,stage,lambda groups:diagnostics.score(model,groups,c,arm,budget.check))
+167:         else:
+168:             memory.maps = auxiliary
+169:             if stage < 3:
+170:                 memory.retain(current,stage,lambda group:record.reference(model,group,c,budget.check))
+171:     mp = root/"memory"/(name+".bin")
+172:     mp.write_bytes(memory.to_bytes())
+173:     memory = memory_from(mp.read_bytes(),arm)
+174:     meta = {"name":name,"order":order,"stage":stage,"arm":arm,"rng":state,
+175:             "memory":data.record(mp,root),"policy_sha256":data.sha256(POLICY)}
+176:     full_path = root/"work"/(name+".pt")
+177:     budget.check(base.persistence.checkpoint_reserve(model,optimizer))
+178:     full = core.save_state(full_path,model,optimizer,meta)
+179:     if core.restore_state(full_path,model,optimizer,full["state_sha256"]) != meta:
+180:         raise ValueError("Full model/Adam metadata differs")
+181:     diagnostics.restore_rng(state)
+182:     with diagnostics.neutral(model):
+183:         for role,groups in (("calibration",calibration),("raw",valid)):
+184:             if not np.array_equal(scores[role],diagnostics.score(model,groups,c,arm,budget.check)):
+185:                 raise ValueError("Full restored scores differ")
+186:     budget.check(base.persistence.checkpoint_reserve(model,None))
+187:     model_path = root/"models"/(name+".pt")
+188:     inference = core.save_state(model_path,model,None,meta)
+189:     if core.restore_state(model_path,model,None,inference["state_sha256"]) != meta:
+190:         raise ValueError("Inference restore differs")
+191:     diagnostics.restore_rng(state)
+192:     for role,m in (("stage-cal",current_map),("first-cal",first_map)):
+193:         scores[role] = parent.calibration.transform(scores["raw"],m)
+194:         parent.calibration.preserve_order(scores["raw"],scores[role])
+195:     keep_full = False
+196:     result = {"order":order,"arm":arm,"stage":stage,"adam_step":stage*288,"full_restore_verified":True,
+197:         "calibration_ids":[g.uid for g in calibration],"maps":{"first":first_map,"stage":current_map},
+198:         "mapping":data.record(map_path,root),"memory":data.record(mp,root),"memory_summary":memory.summary(),
+199:         "full_state":{**full,"path":full_path.relative_to(root).as_posix()},"full_retained":keep_full,
+200:         "model":{**inference,"path":model_path.relative_to(root).as_posix()},
+201:         "scores":{role:previous.save_array(root/"scores"/(name+"_"+role+".npy"),value,root) for role,value in scores.items()}}
+202:     if not keep_full:
+203:         base.persistence.remove_work_file(full_path,root)
+204:     data.write_json(root/"points"/(name+".json"),result)
+205:     return result,memory
+206: 
+207: 
+208: def train(job: Path, budget: Any) -> tuple[dict, dict, list]:
+209:     import torch
+210:     root = job/"run"
+211:     root.mkdir()
+212:     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics"):
+213:         (root/sub).mkdir()
+214:     groups, metadata, checked = base.public.public_inputs(config("R0"))
+215:     _, partition = base.partition(groups, metadata, config("R0"))
+216:     archive = core.model_files(base.model_config(config("R0"), "split_rank"))
+217:     if any(archive[k] != config("R0")["models"]["split_rank"][k]
+218:            for k in ("file_count", "total_size_bytes", "content_sha256")):
+219:         raise ValueError("Pretrained BGE differs")
+220:     data.write_json(root/"partition.json", partition)
+221:     manifest = {"status": "RUNNING", "source_files": sources(), "public_inputs": checked,
+222:         "pretrained_archive": archive, "partition": data.record(root/"partition.json", root),
+223:         "points": {}, "training": {}, "diagnostics": {}, "starts": {}, "initial": {},
+224:         "physical_updates": 0, "gradient_group_presentations": 0}
+225:     data.write_json(root/"startup.json", manifest)
+226:     groups["train"] = previous.parse_once(job, groups["train"], config("R0"), "train")
+227:     selected, after = base.partition(groups, metadata, config("R0"))
+228:     if after != partition:
+229:         raise ValueError("Partition changed after supervision alignment")
+230:     supply = parent.Supply(selected, partition)
+231:     initial_digests = {}
+232:     for order in parent.ORDERS:
+233:         for arm in ARMS:
+234:             c = config(arm)
+235:             family = "LOGIT0.1" if arm == "LOGIT0.1" else "record"
+236:             random.seed(c["initialization_seed"])
+237:             np.random.seed(c["initialization_seed"])
+238:             model = record.load_model(c)
+239:             digest = core.state_digest(model.state_dict())
+240:             if family in initial_digests and initial_digests[family] != digest:
+241:                 raise ValueError("Same-architecture initialization differs")
+242:             initial_digests[family] = digest
+243:             optimizer = core.make_optimizer(model, c)
+244:             path = order+"_"+arm
+245:             manifest["starts"][path] = {"model_sha256": digest,
+246:                 "optimizer_sha256": core.state_digest(optimizer.state_dict()),
+247:                 "rng": diagnostics.rng_state(), "adam_step": parent.adam_step(optimizer),
+248:                 "memory": None, "family": family}
+249:             if family not in manifest["initial"]:
+250:                 with diagnostics.neutral(model):
+251:                     raw = diagnostics.score(model, groups["development"], c, arm, budget.check)
+252:                 manifest["initial"][family] = {
+253:                     "model_sha256": digest, "valid_labels_used": False,
+254:                     "raw": previous.save_array(root/"scores"/("initial_"+family+".npy"), raw, root)}
+255:             # R0 and S each train their own first stage; neither branches from a trained peer.
+256:             memory = None
+257:             for stage in (1, 2, 3):
+258:                 current, cal = supply.current(path, order, stage)
+259:                 name = point_name(order, arm, stage)
+260:                 log, diags = train_stage(model, optimizer, current, memory, groups["development"],
+261:                     c, arm, order, stage, root, budget)
+262:                 point, memory = checkpoint(root, name, model, optimizer, memory, current, cal,
+263:                     groups["development"], c, arm, order, stage, budget)
+264:                 manifest["training"][name], manifest["diagnostics"][name], manifest["points"][name] = log, diags, point
+265:                 manifest["physical_updates"] += 288
+266:                 manifest["gradient_group_presentations"] += 288 if stage == 1 else 576
+267:                 data.write_json(root/"progress.json", manifest)
+268:             del model, optimizer, current, cal, memory
+269:             gc.collect()
+270:             torch.cuda.empty_cache()
+271:     manifest.update(status="ALL_7776_UPDATES_27_STATES_162_EPOCHS_VALID_BLIND",
+272:                     initial_model_digests=initial_digests)
+273:     data.write_json(root/"manifest.json", manifest)
+274:     return manifest, partition, groups["development"]
+275: 
+
+=== frozen_source/scripts/step28_chinese_base.py [lines 89-193; total 880] ===
+89: def model_config(c: dict, arm: str) -> dict:
+90:     if arm not in ARMS:
+91:         raise ValueError("Unknown model")
+92:     return {"model": {**c["models"][arm], **c["input"]},
+93:             "optimizer": c["optimizer"], "initialization_seed": c["initialization_seed"]}
+94: 
+95: 
+96: def pooling_modes(pool: Any) -> list[str]:
+97:     """Read actual native pooling across the installed and legacy module APIs."""
+98:     mode = getattr(pool, "pooling_mode", None)
+99:     if isinstance(mode, str):
+100:         return [mode]
+101:     if isinstance(mode, (tuple, list)) and all(isinstance(value, str) for value in mode):
+102:         return list(mode)
+103:     if mode is not None:
+104:         raise ValueError("Unrecognized native pooling representation")
+105:     names = {"pooling_mode_cls_token": "cls", "pooling_mode_mean_tokens": "mean"}
+106:     return [names.get(key, key) for key, value in vars(pool).items()
+107:             if key.startswith("pooling_mode_") and value is True]
+108: 
+109: 
+110: def load_model(c: dict, arm: str, device: str = "cuda:0") -> Any:
+111:     import torch
+112:     from sentence_transformers import SentenceTransformer
+113:     m = c["models"][arm]
+114:     torch.manual_seed(c["initialization_seed"])
+115:     encoder = SentenceTransformer(str(data.ROOT / m["path"]), device=device,
+116:                                   local_files_only=True, trust_remote_code=False)
+117:     encoder.default_prompt_name = None
+118:     encoder.max_seq_length = c["input"]["token_budget"]
+119:     pools = [v for v in encoder if type(v).__name__ == "Pooling"]
+120:     has_dense = any(type(v).__name__ == "Dense" for v in encoder)
+121:     if len(pools) != 1 or has_dense != m["dense_module"]:
+122:         raise ValueError("Native encoder modules differ from the registered model")
+123:     pool = pools[0]
+124:     if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+125:         raise ValueError("Native pooling or output dimension differs")
+126:     if c["input"]["activation_checkpointing"]:
+127:         encoder[0].auto_model.gradient_checkpointing_enable(
+128:             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+129:     torch.manual_seed(c["initialization_seed"])
+130:     return core.build_model(encoder, c["interventions"][arm]["account_dim"],
+131:                             c["input"]["head_hidden"]).to(device)
+132: 
+133: 
+134: def record_texts(group: data.Group, representation: str) -> list[str]:
+135:     records = [row for items in group.items for row in items]
+136:     if representation == "combined_mean":
+137:         return [title + "\n" + description for _, title, description in records]
+138:     if representation == "separate_moments":
+139:         return [title for _, title, _ in records] + [description for _, _, description in records]
+140:     raise ValueError("Unknown account representation")
+141: 
+142: 
+143: def pool_channels(vectors: Any, counts: list[int], representation: str,
+144:                   epsilon: float = 1e-8) -> Any:
+145:     """Population moments, all items, with no ID/count/domain feature."""
+146:     import torch
+147:     if representation == "combined_mean":
+148:         return core.pool_records(vectors, counts)
+149:     if (representation != "separate_moments" or not counts or any(n <= 0 for n in counts)
+150:             or len(vectors) != 2 * sum(counts) or epsilon != 1e-8):
+151:         raise ValueError("Channel/account alignment or moment definition differs")
+152:     normalized = torch.nn.functional.normalize(vectors.float(), dim=1)
+153:     title, description = normalized.split(sum(counts))
+154:     accounts = []
+155:     for left, right in zip(title.split(counts), description.split(counts), strict=True):
+156:         parts = []
+157:         for channel in (left, right):
+158:             mean = channel.mean(0)
+159:             std = ((channel - mean).square().mean(0) + epsilon).sqrt()
+160:             parts.extend((mean, std))
+161:         accounts.append(torch.cat(parts))
+162:     return torch.nn.functional.normalize(torch.stack(accounts), dim=1)
+163: 
+164: 
+165: def objectives(predicted: Any, truth: Any, rank_weight: float) -> dict:
+166:     """Each query averages its positive logits, never positive or negative pairs twice in BCE."""
+167:     import torch
+168:     if (predicted.shape != (378,) or truth.shape != (378,)
+169:             or not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all()
+170:             or int(truth.sum()) != 20 or rank_weight not in (0, 1)):
+171:         raise ValueError("Expected complete finite 28-account supervision and fixed loss weight")
+172:     left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+173:     positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+174:     positive[left, right] = truth.bool()
+175:     positive[right, left] = truth.bool()
+176:     degrees = positive.sum(1)
+177:     if (int((degrees == 1).sum()) != 16 or int((degrees == 2).sum()) != 12):
+178:         raise ValueError("Expected eight two-alias and four three-alias positive components")
+179:     # Same-controller labels must be transitive; a degree-two cycle is not a controller.
+180:     paths = positive.float() @ positive.float()
+181:     diagonal = torch.eye(28, dtype=torch.bool, device=predicted.device)
+182:     if ((paths > 0) & ~positive & ~diagonal).any():
+183:         raise ValueError("Positive relations are not disjoint controller cliques")
+184:     scores = predicted.new_zeros((28, 28))
+185:     scores[left, right] = predicted
+186:     scores[right, left] = predicted
+187:     log_denominator = torch.logsumexp(scores.masked_fill(diagonal, -torch.inf), dim=1)
+188:     positive_mean = scores.masked_fill(~positive, 0).sum(1) / degrees
+189:     rank = (log_denominator - positive_mean).mean()
+190:     bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+191:     return {"bce": bce, "rank": rank, "total": bce + rank_weight * rank}
+192: 
+193: 
+
+=== frozen_source/scripts/step28_alias_ranking.py [lines 89-129; total 222] ===
+89: def hard_candidates(predicted: Any, truth: Any, count: int = 5) -> tuple[Any, Any, Any]:
+90:     """Known-negative indices only, deterministic exact-tie order, live score values."""
+91:     import torch
+92: 
+93:     if predicted.shape != (378,) or truth.shape != (378,) or count != 5:
+94:         raise ValueError("Expected 28-account scores and five hard negatives")
+95:     # Independent shape/label/connectivity validation remains in base.objectives.
+96:     if not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all():
+97:         raise ValueError("Nonfinite scores or nonbinary labels")
+98:     left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+99:     scores = predicted.new_zeros((28, 28))
+100:     scores[left, right], scores[right, left] = predicted, predicted
+101:     positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+102:     positive[left, right], positive[right, left] = truth.bool(), truth.bool()
+103:     negative = ~positive & ~torch.eye(28, dtype=torch.bool, device=predicted.device)
+104:     if (positive.sum(1) < 1).any() or (negative.sum(1) < count).any():
+105:         raise ValueError("Each query needs positive and known negative candidates")
+106:     selected = torch.argsort(scores.detach().masked_fill(~negative, -torch.inf),
+107:                              dim=1, descending=True, stable=True)[:, :count]
+108:     if not negative.gather(1, selected).all():
+109:         raise ValueError("Self or positive entered hard negatives")
+110:     return scores, positive, selected
+111: 
+112: 
+113: def objectives(predicted: Any, truth: Any, hard_weight: float) -> dict:
+114:     import torch
+115: 
+116:     if hard_weight not in (0., .5):
+117:         raise ValueError("Only disabled or approved fixed hard weight is allowed")
+118:     result = base.objectives(predicted, truth, 1)
+119:     if hard_weight == 0:
+120:         return {**result, "hard": predicted.new_zeros(())}
+121:     scores, positive, selected = hard_candidates(predicted, truth)
+122:     terms = []
+123:     for query in range(28):
+124:         pos = scores[query, positive[query]]
+125:         neg = scores[query, selected[query]]
+126:         terms.append(torch.nn.functional.softplus(neg.unsqueeze(0) - pos.unsqueeze(1)).mean())
+127:     hard = torch.stack(terms).mean()
+128:     return {"bce": result["bce"], "rank": result["rank"], "hard": hard,
+129:             "total": result["total"] + hard_weight * hard}
+
+=== frozen_source/scripts/step28_record_attribution_run.py [lines 225-244; total 630] ===
+225:     data.write_json(root/"startup.json", manifest)
+226:     groups["train"] = previous.parse_once(job, groups["train"], config("R0"), "train")
+227:     selected, after = base.partition(groups, metadata, config("R0"))
+228:     if after != partition:
+229:         raise ValueError("Partition changed after supervision alignment")
+230:     supply = parent.Supply(selected, partition)
+231:     initial_digests = {}
+232:     for order in parent.ORDERS:
+233:         for arm in ARMS:
+234:             c = config(arm)
+235:             family = "LOGIT0.1" if arm == "LOGIT0.1" else "record"
+236:             random.seed(c["initialization_seed"])
+237:             np.random.seed(c["initialization_seed"])
+238:             model = record.load_model(c)
+239:             digest = core.state_digest(model.state_dict())
+240:             if family in initial_digests and initial_digests[family] != digest:
+241:                 raise ValueError("Same-architecture initialization differs")
+242:             initial_digests[family] = digest
+243:             optimizer = core.make_optimizer(model, c)
+244:             path = order+"_"+arm
+
+=== current_source/step28_continual_expression_data.py [lines 84-136; total 369] ===
+84: def preference(rng: random.Random, weights: list[float]) -> tuple[int, int]:
+85:     first = weighted_index(rng, weights)
+86:     remaining = weights.copy()
+87:     remaining[first] = 0.0
+88:     second = weighted_index(rng, remaining)
+89:     return tuple(sorted((first, second)))
+90: 
+91: 
+92: def inherit_preference(
+93:     rng: random.Random, parent: tuple[int, int], weights: list[float], probability: float
+94: ) -> tuple[int, int]:
+95:     # A redraw equal to the parent is valid; never retry it.
+96:     return parent if rng.random() < probability else preference(rng, weights)
+97: 
+98: 
+99: def inherit_style(rng: random.Random, parent: int, size: int, probability: float) -> int:
+100:     return parent if rng.random() < probability else rng.randrange(size)
+101: 
+102: 
+103: def public_override(rng: random.Random, personal: int, public: list[int], probability: float) -> int:
+104:     """One account-axis draw, independent of ownership/pair labels and item count."""
+105:     return public[rng.randrange(len(public))] if rng.random() < probability else personal
+106: 
+107: 
+108: def subcategories(catalog: dict[str, Any]) -> list[dict[str, Any]]:
+109:     return [sub for topic in catalog["topics"] for sub in topic["subcategories"]]
+110: 
+111: 
+112: def valid_text(text: str, limit: int) -> bool:
+113:     return bool(text) and len(text) <= limit and all(
+114:         ord(char) <= 0xFFFF and not 0xD800 <= ord(char) <= 0xDFFF
+115:         and (ord(char) >= 32 or char in "\n\t")
+116:         for char in text
+117:     )
+118: 
+119: 
+120: def render(
+121:     rng: random.Random, catalog: dict[str, Any], sub_index: int, style: tuple[int, ...]
+122: ) -> tuple[str, str]:
+123:     sub = subcategories(catalog)[sub_index]
+124:     product = rng.choice(sub["products"])
+125:     title = catalog["title_templates"][style[0]].format(
+126:         product=product, qualifier=rng.choice(catalog["qualifiers"])
+127:     )
+128:     description = catalog["description_templates"][style[1]].format(
+129:         intro=rng.choice(catalog["intros"]).format(product=product),
+130:         detail=rng.choice(sub["details"]),
+131:         packaging=rng.choice(catalog["packaging"]),
+132:         delivery=rng.choice(catalog["delivery"]),
+133:         service=rng.choice(catalog["service_phrases"][style[2]]),
+134:     )
+135:     return title, description
+136: 
+
+=== current_source/step28_continual_expression_data.py [lines 216-280; total 369] ===
+216: def make_group(
+217:     policy: dict[str, Any], catalog: dict[str, Any], domain: str, split: str, index: int
+218: ) -> tuple[dict[str, Any], list[dict[str, str]], list[dict[str, str]]]:
+219:     seed = policy["root_seed"]
+220:     context = (domain, split, index)
+221:     group_uid = opaque_id(seed, *context, "group")
+222:     weights = [weight / 4 for weight in policy["domains"][domain] for _ in range(4)]
+223:     sizes = [int(size) for size, count in sorted(policy["controller_alias_counts"].items())
+224:              for _ in range(count)]
+225:     stream(seed, *context, "alias_counts").shuffle(sizes)
+226:     account_ids = [opaque_id(seed, *context, "account", n) for n in range(sum(sizes))]
+227:     stream(seed, *context, "id_assignment").shuffle(account_ids)
+228:     item_numbers = sorted(map(int, policy["item_count_pmf"]))
+229:     count_weights = [policy["item_count_pmf"][str(n)] for n in item_numbers]
+230:     items: list[dict[str, str]] = []
+231:     owners: list[dict[str, str]] = []
+232:     account_slot = 0
+233:     for controller, size in enumerate(sizes):
+234:         controller_uid = opaque_id(seed, *context, "controller", controller)
+235:         parent = preference(stream(seed, *context, "controller_preference", controller), weights)
+236:         parent_style = tuple(stream(seed, *context, "controller_style", controller, axis)
+237:                              .randrange(n) for axis, n in enumerate(policy["style_axis_sizes"]))
+238:         for alias in range(size):
+239:             seller_uid = account_ids[account_slot]
+240:             account_slot += 1
+241:             account_context = (*context, controller, alias)
+242:             own_preference = inherit_preference(
+243:                 stream(seed, *account_context, "account_preference"), parent,
+244:                 weights, policy["preference_inheritance"]
+245:             )
+246:             style = tuple(inherit_style(
+247:                 stream(seed, *account_context, "account_style", axis), parent_style[axis],
+248:                 n, policy["preference_inheritance"]
+249:             ) for axis, n in enumerate(policy["style_axis_sizes"]))
+250:             style = tuple(public_override(
+251:                 stream(seed, *account_context, "public_style", axis), personal,
+252:                 policy["public_style_indices"][axis],
+253:                 policy["public_style_probability"][domain][axis]
+254:             ) for axis, personal in enumerate(style))
+255:             number = item_numbers[weighted_index(
+256:                 stream(seed, *account_context, "item_count"), count_weights)]
+257:             owners.append(dict(group_uid=group_uid, seller_uid=seller_uid,
+258:                                controller_uid=controller_uid))
+259:             for item in range(number):
+260:                 category_rng = stream(seed, *account_context, "item_category", item)
+261:                 if category_rng.random() < policy["preferred_item_probability"]:
+262:                     sub_index = category_rng.choice(own_preference)
+263:                 else:
+264:                     sub_index = weighted_index(category_rng, weights)
+265:                 title, description = render(
+266:                     stream(seed, *account_context, "item_wording", item), catalog, sub_index, style
+267:                 )
+268:                 require(valid_text(title, 48) and valid_text(description, 720), "Rendered text")
+269:                 items.append(dict(
+270:                     group_uid=group_uid, seller_uid=seller_uid,
+271:                     item_uid=opaque_id(seed, *account_context, "item_id", item),
+272:                     title=title, description=description
+273:                 ))
+274:     items.sort(key=lambda row: (row["seller_uid"], row["item_uid"]))
+275:     owners.sort(key=lambda row: row["seller_uid"])
+276:     group = dict(domain=domain, split=split, group_uid=group_uid, group_index=index,
+277:                  accounts=len(owners), items=len(items))
+278:     return group, items, owners
+279: 
+280: 
+
+=== frozen_source/scripts/step28_bge_continual.py [lines 1-135; total 321] ===
+1: """Limited-history BGE pilot primitives; no formal data or model loading here."""
+2: from __future__ import annotations
+3: 
+4: import copy
+5: import hashlib
+6: import json
+7: import os
+8: import random
+9: import time
+10: from pathlib import Path
+11: from typing import Any, Callable
+12: 
+13: import numpy as np
+14: 
+15: import step28_alias_ranking as ranking
+16: import step28_alias_calibration as calibration
+17: 
+18: base, data, core, metrics = ranking.base, ranking.data, ranking.core, ranking.metrics
+19: POLICY = data.ROOT / "schema/step28_bge_continual_policy.json"
+20: POLICY_SHA256 = "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+21: ORDERS = ("ABC", "BCA", "CAB")
+22: METHODS = ("frozen", "seq", "er", "logit")
+23: UPDATED = METHODS[1:]
+24: ROLES = ("raw", "stage-cal", "first-cal")
+25: STEP_COLUMNS = ("current_bce", "current_rank", "current_hard", "current_total",
+26:                 "history_bce", "history_rank", "history_hard", "history_total",
+27:                 "logit_mse", "total", "encoder_lr", "head_lr", "gradient_norm",
+28:                 "logit_term_host_seconds")
+29: 
+30: 
+31: def configure_numerics() -> dict:
+32:     """Apply the historical LOGIT runtime before model work; read back actual flags."""
+33:     import torch
+34:     if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
+35:         raise RuntimeError("Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8")
+36:     torch.use_deterministic_algorithms(True)
+37:     torch.backends.cuda.matmul.allow_tf32 = False
+38:     torch.backends.cudnn.allow_tf32 = False
+39:     torch.backends.cudnn.benchmark = False
+40:     return {
+41:         "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+42:         "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+43:         "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+44:         "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+45:         "cudnn_benchmark": torch.backends.cudnn.benchmark,
+46:         "cublas_workspace_config": os.environ["CUBLAS_WORKSPACE_CONFIG"],
+47:     }
+48: 
+49: 
+50: def contract() -> dict:
+51:     if data.sha256(POLICY) != POLICY_SHA256:
+52:         raise ValueError("Continual policy differs from confirmed specification")
+53:     policy = data.read_json(POLICY)
+54:     ranking.contract()  # Checks inherited BGE policy/source without data access.
+55:     if (policy["orders"] != list(ORDERS) or policy["methods"] != list(METHODS)
+56:             or policy["physical_updates"] != 6048 or policy["updates_per_stage"] != 288
+57:             or policy["supervision"]["test_access"] or policy["supervision"]["owners_access"]):
+58:         raise ValueError("Unexpected pilot scope")
+59:     return policy
+60: 
+61: 
+62: def config(policy: dict) -> dict:
+63:     result = copy.deepcopy(base.contract())
+64:     result["initialization_seed"] = policy["initialization_seed"]
+65:     result["schedule_seed"] = policy["schedule_seed"]
+66:     result["runtime"] = copy.deepcopy(policy["runtime"])
+67:     return result
+68: 
+69: 
+70: def stage_lr(step: int) -> float:
+71:     if type(step) is not int or not 1 <= step <= 288:
+72:         raise ValueError("Stage step must be one-based in 1..288")
+73:     return 1e-5 * (step / 29 if step <= 29 else (288 - step) / 259)
+74: 
+75: 
+76: def schedule(current: list, policy: dict, order: str, stage: int) -> tuple[list, int]:
+77:     if order not in ORDERS or stage not in (1, 2, 3) or len(current) != 48:
+78:         raise ValueError("Only the 48 current fitting groups enter a stage")
+79:     if len({g.uid for g in current}) != 48 or any(g.labels is None for g in current):
+80:         raise ValueError("Missing or repeated current supervision")
+81:     stream = data.seed_for(policy["schedule_seed"], order, stage, "current")
+82:     return data.schedule(current, 6, stream), stream
+83: 
+84: 
+85: class Supply:
+86:     """Offline dispatcher. Never pass this object or its full archive to a learner."""
+87: 
+88:     def __init__(self, groups: dict, partition: dict):
+89:         self.groups, self.partition = groups, partition
+90:         self.next_stage: dict[str, int] = {}
+91:         self.orders: dict[str, str] = {}
+92:         seen = set()
+93:         for role, count in (("fit", 48), ("calibration", 12)):
+94:             rows = partition[role]
+95:             if len(rows) != 3 * count:
+96:                 raise ValueError("Incomplete dispatcher partition")
+97:             for group, row in zip(groups[role], rows, strict=True):
+98:                 if (group.uid != row["group_uid"] or row["domain"] not in "ABC"
+99:                         or group.uid in seen or group.labels is None):
+100:                     raise ValueError("Dispatcher identity, supervision or role separation differs")
+101:                 seen.add(group.uid)
+102:             if any(sum(row["domain"] == d for row in rows) != count for d in "ABC"):
+103:                 raise ValueError("Dispatcher domain sizes differ")
+104: 
+105:     def current(self, path: str, order: str, stage: int) -> tuple[list, list]:
+106:         if (order not in ORDERS or stage != self.next_stage.get(path, 1)
+107:                 or self.orders.get(path, order) != order):
+108:             raise ValueError("Future, old or repeated stage request")
+109:         if stage not in (1, 2, 3):
+110:             raise ValueError("No fourth domain")
+111:         result = []
+112:         for role, count in (("fit", 48), ("calibration", 12)):
+113:             selected = [g for g, row in zip(self.groups[role], self.partition[role], strict=True)
+114:                         if row["domain"] == order[stage - 1]]
+115:             if len(selected) != count:
+116:                 raise ValueError("Current domain role count differs")
+117:             result.append(selected)
+118:         self.next_stage[path] = stage + 1
+119:         self.orders[path] = order
+120:         return result[0], result[1]
+121: 
+122:     def branch_after_first(self, path: str, shared_path: str) -> None:
+123:         if path in self.next_stage or self.next_stage.get(shared_path) != 2:
+124:             raise ValueError("Branches must start from one completed first stage")
+125:         self.next_stage[path] = 2
+126:         self.orders[path] = self.orders[shared_path]
+127: 
+128: 
+129: class Memory:
+130:     """Self-contained Algorithm R state, fixed first map and optional float32 targets.
+131: 
+132:     Receives only retained data and the current stage, never an archive callback.
+133:     JSON sizes include every serialized field, not just numeric tensor payloads.
+134:     """
+135: 
+
+=== frozen_source/scripts/step28_continual_population.py [lines 1-130; total 210] ===
+1: """Trainable item/account pooling and symmetric pure-text pair classification."""
+2: from __future__ import annotations
+3: 
+4: import contextlib
+5: import hashlib
+6: from pathlib import Path
+7: from typing import Any, Callable
+8: 
+9: import numpy as np
+10: 
+11: import step28_continual_population_data as data
+12: 
+13: 
+14: def build_model(encoder: Any, dimension: int, hidden: int = 128) -> Any:
+15:     import torch
+16: 
+17:     class PairModel(torch.nn.Module):
+18:         def __init__(self) -> None:
+19:             super().__init__()
+20:             self.encoder = encoder
+21:             self.head = torch.nn.Sequential(torch.nn.Linear(dimension * 2, hidden),
+22:                                             torch.nn.ReLU(), torch.nn.Linear(hidden, 1))
+23: 
+24:         def pair_logits(self, accounts: Any) -> Any:
+25:             left, right = torch.triu_indices(len(accounts), len(accounts), 1, device=accounts.device)
+26:             u, v = accounts[left], accounts[right]
+27:             return self.head(torch.cat(((u - v).abs(), u * v), dim=1)).flatten()
+28: 
+29:     return PairModel()
+30: 
+31: 
+32: def make_optimizer(model: Any, config: dict) -> Any:
+33:     import torch
+34:     p = config["optimizer"]
+35:     return torch.optim.AdamW(
+36:         [{"params": model.encoder.parameters(), "lr": p["encoder_lr"],
+37:           "weight_decay": p["encoder_weight_decay"]},
+38:          {"params": model.head.parameters(), "lr": p["head_lr"],
+39:           "weight_decay": p["head_weight_decay"]}],
+40:         betas=tuple(p["betas"]), eps=p["eps"], foreach=p["foreach"])
+41: 
+42: 
+43: def model_files(config: dict) -> dict:
+44:     base = data.ROOT / config["model"]["path"]
+45:     rows = [{"path": path.relative_to(base).as_posix(), "size_bytes": path.stat().st_size,
+46:              "sha256": data.sha256(path)}
+47:             for path in sorted(base.rglob("*"), key=lambda p: p.relative_to(base).as_posix())
+48:             if path.is_file() and ".cache" not in path.parts and "__pycache__" not in path.parts
+49:             and path.suffix != ".pyc"]
+50:     # Preserve step7's canonical_hash: size_bytes keys and no trailing newline.
+51:     content = hashlib.sha256(data.json_bytes(rows).rstrip(b"\n")).hexdigest()
+52:     return {"files": rows, "file_count": len(rows),
+53:             "total_size_bytes": sum(row["size_bytes"] for row in rows), "content_sha256": content}
+54: 
+55: 
+56: def load_model(config: dict, device: str = "cuda:0") -> Any:
+57:     import torch
+58:     from sentence_transformers import SentenceTransformer
+59: 
+60:     torch.manual_seed(config["initialization_seed"])
+61:     encoder = SentenceTransformer(str(data.ROOT / config["model"]["path"]),
+62:                                   device=device, local_files_only=True)
+63:     encoder.default_prompt_name = None
+64:     encoder.max_seq_length = config["model"]["token_budget"]
+65:     if encoder.get_sentence_embedding_dimension() != config["model"]["embedding_dim"]:
+66:         raise ValueError("LaBSE embedding dimension differs")
+67:     if config["model"]["activation_checkpointing"]:
+68:         encoder[0].auto_model.gradient_checkpointing_enable(
+69:             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+70:     # Head initialization must not depend on encoder loader's incidental RNG use.
+71:     torch.manual_seed(config["initialization_seed"])
+72:     return build_model(encoder, config["model"]["embedding_dim"], config["model"]["pair_head"][1]).to(device)
+73: 
+74: 
+75: def pool_records(vectors: Any, counts: list[int]) -> Any:
+76:     import torch
+77:     if sum(counts) != len(vectors) or any(n <= 0 for n in counts):
+78:         raise ValueError("Record/account alignment differs")
+79:     normalized = torch.nn.functional.normalize(vectors.float(), dim=1)
+80:     means = torch.stack([chunk.mean(dim=0) for chunk in normalized.split(counts)])
+81:     return torch.nn.functional.normalize(means, dim=1)
+82: 
+83: 
+84: def account_vectors(model: Any, group: data.Group, config: dict,
+85:                     check_budget: Callable[[], None] = lambda: None) -> Any:
+86:     import torch
+87:     device = next(model.parameters()).device
+88:     texts = [title + "\n" + description for rows in group.items for _, title, description in rows]
+89:     counts = list(map(len, group.items))
+90:     size = config["model"]["microbatch"]
+91:     blocks = []
+92:     for start in range(0, len(texts), size):
+93:         check_budget()
+94:         batch = texts[start:start + size]
+95:         # Do not use SentenceTransformer.tokenize: it silently truncates long input.
+96:         features = model.encoder.tokenizer(batch, padding=True, truncation=False, return_tensors="pt")
+97:         if features["input_ids"].shape[1] > config["model"]["token_budget"]:
+98:             raise ValueError("An item exceeds the frozen token budget")
+99:         features = {key: value.to(device) for key, value in features.items()}
+100:         context = (torch.autocast("cuda", dtype=torch.bfloat16)
+101:                    if device.type == "cuda" and config["model"]["encoder_bf16"] else contextlib.nullcontext())
+102:         with context:
+103:             vectors = model.encoder(features)["sentence_embedding"]
+104:         blocks.append(vectors.float())
+105:     return pool_records(torch.cat(blocks), counts)
+106: 
+107: 
+108: def logits(model: Any, group: data.Group, config: dict,
+109:            check_budget: Callable[[], None] = lambda: None) -> Any:
+110:     return model.pair_logits(account_vectors(model, group, config, check_budget))
+111: 
+112: 
+113: def backward_group(model: Any, group: data.Group, config: dict, seed: int,
+114:                    check_budget: Callable[[], None] = lambda: None) -> float:
+115:     import torch
+116:     if group.labels is None:
+117:         raise ValueError("Training requires authorized current/replay supervision")
+118:     torch.manual_seed(seed)
+119:     predicted = logits(model, group, config, check_budget)
+120:     truth = torch.tensor(group.labels, dtype=torch.float32, device=predicted.device)
+121:     if predicted.shape != truth.shape or not torch.isfinite(predicted).all():
+122:         raise ValueError("Nonfinite or misaligned train logits")
+123:     loss = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+124:     loss.backward()
+125:     return float(loss.detach())
+126: 
+127: 
+128: def update(model: Any, optimizer: Any, current: data.Group, replay: data.Group | None,
+129:            config: dict, current_seed: int, replay_seed: int,
+130:            check_budget: Callable[[], None] = lambda: None) -> dict:
+
+=== context/AGENTS.md [lines 1-24; total 24] ===
+1: # 科研 Agent 执行入口
+2: 
+3: 本文件保留必要边界与导航；常设规则集中在[科研纪律](docs/RESEARCH_DISCIPLINE.zh.md)，运行状态集中在[当前交接](docs/AI_RESEARCH_HANDOFF.zh.md)顶部。本文件不记录进度。
+4: 
+5: ## 按任务读取
+6: 
+7: | 本轮工作 | 需要的上下文 |
+8: |---|---|
+9: | 首次接手或上下文恢复 | 科研纪律第1—4节、交接顶部；按任务补读下列条款。恢复还须按第7节核对实际文件与相关作业，不能只信摘要 |
+10: | 文字、规则、链接维护 | 受影响条款及直接来源；纪律第5、10节。已有且仍适用的上下文复用，不为每次编辑通读历史 |
+11: | 科研实现、执行或结果分析 | 现行合同与明确补充、实际入口／直接依赖、相关原始审查；纪律第5—8节。由[设计入口](docs/CURRENT_EXPERIMENT_DESIGN.md)定位，不递归加载全仓库 |
+12: | 文件同步、保管、清理、Git交付 | 纪律第7、9、10节及[存储记录](docs/STORAGE.zh.md)；先查实际对象和已有许可 |
+13: 
+14: ## 必守边界
+15: 
+16: - 先辨对象、时间和范围：最新明确用户决定优先，当前合同及补充决定执行边界。历史“待授权”不恢复成当前阻断，旧批准不扩大到新动作；冻结原件和已发生事实不追改。
+17: - 已确认范围内持续完成实现、观察、针对性验证、修复和交付，不按普通步骤重复确认。有影响执行的不确定或冲突时先核对已有决定，仍不能解消则附出处与影响询问，只暂停依赖工作；新增研究、数据权限、比较、预算或判据须确认。
+18: - 防止过度设计贯穿执行：新增代码、测试或流程须对应本轮具体缺口，复用适用证据，必要核验充分后停止。交付前实际撤回、合并或简化无关扩展与重复改动，不另造自查报告；外审建议也按范围和证据处置，不自动全部实现。
+19: - 技术读取、结果开放、依据结果作选择是三种权限。文件小、只读、归档存在均不授予数据／标签权限；未来域、test／owners、封存材料及private_custody按合同隔离，失败账不清零。
+20: - 科研实现／测试、指标重算、重采样、载模推理／训练只用Linux既有py310；Windows限编辑、文件管理及获准证据的机械核对。共享Linux先查归属和资源，不动他人作业；密码只作SSH认证。SFTP／SCP同步，Git仅在Windows使用。
+21: - 禁止伪实现：从用户要求追踪实际输入、目标、梯度／更新、恢复和评价，关键操作须接入实际入口并产生约定作用；按科研纪律第5节核验，须能识别关键操作缺失。组件存在、PASS、哈希、测试数量或退出码不能替代实际行为证据，更不授予正式运行。保留有效负结果、原验收和外推边界。
+22: - 实质科研方案／实现／评价／结论默认本地Playwright MCP网页GPT 6 Pro外审，主执行者独立处置；不用ComputerUse／CUA替代。纯文档维护免审，其他免审仅限明确范围。新运行用独立目录；已有监听不重复启动，故障按现行合同处理。
+23: 
+24: 执行、等待、失败与完成条件见科研纪律第2、5、7、10节。用户原话与历史证据分别从[讨论记录](docs/RESEARCH_DISCUSSION.zh.md)和[交接历史入口](docs/AI_RESEARCH_HANDOFF.zh.md#历史与证据)按需回溯。
+
+=== evidence/attribution_primary.zh.txt [lines 1-89; total 89] ===
+1: 三臂结果外审：独立主审处置
+2: 日期：2026-10-11
+3: 对象：正式运行20261009_200600的LOGIT0.1／R0／S结果；不新增实验合同。
+4: 状态：CLOSED_NO_OPEN_BLOCKERS；接受固定开发条件下的有限归因结论。
+5: 
+6: 一、外审完成与完整回收
+7: 
+8: 沿用已提交会话：https://chatgpt.com/c/6acaf303-eda8-83eb-9a4f-e4a53b1d130e
+9: 页面已给出最终答复及交付链接，显示“思考了33m 44s”，无进行中的停止按钮。本轮没有重复上传或重复发问。请求模型为GPT 6 Pro；此前可见GPT-6与Pro强度，本次页面可见Pro，审查者自述GPT-6 Astra Pro；未独立取得后台路由身份，不能把自述升级成后台证明。
+10: 
+11: 授权输入保持原样：review_input.zip，28,532,122字节，1,266成员，SHA256 9aaf0f2a82de854741313ee1b948432d335132085f5bc92e21e3ae9f9a2ff29a。
+12: 已完整回收：
+13: - response_snapshot.yml：本轮会话的完整最终页面文本快照。
+14: - external_review.zip：2,109,397字节，30成员，解包5,219,790字节；SHA256 5ac3e15f0b01fc657d18ae195c7b86ed7a6305a2ff74d3f8db9dc6d63f47b5da。
+15: - delivery_receipt.json：外审交付身份及30成员清单；SHA256 3da00a84d22b2d96f44a53288358c61985a2a0e8199c7e62309009e623d010ed。
+16: - external/：完整30文件，包括42,919字节审查正文、发现清单、勘误、读取范围、独立参考与报告核验源码、全部输出、首轮失败和最终日志、四幅图、返回清单。
+17: 
+18: 29个载荷与内部RETURN_MANIFEST逐项一致；全部30文件与外部delivery_receipt逐项核对大小／SHA，无缺件或额外文件。外部单独提供的报告、主图与包内相应文件的大小／SHA一致，已回收相同字节，不另存重复副本。初次通过浏览器响应体保存receipt得到空文件，已识别为传输失败，改用页面实际附件下载取回有效JSON；空占位未当作交付证据。签名下载URL不写入项目。
+19: 
+20: 二、独立主审做了什么，以及没有做什么
+21: 
+22: 本次读完外审正文、发现、读取范围、计算说明和关键日志，并对照现行三臂合同、72小时补充、冻结实现、正式门／before_valid／completion、原主分析与既有Linux参考证据核查。重点是实际比较含义、统计定义与结论边界，不以外审PASS、哈希或核验数量代替判断。
+23: 
+24: 1. 实际更新：step28_record_replay.py的objective中，R0只用原分组监督；S平均原分组与同控重组监督，历史约束仍用原分组mse0。backward_group把该目标对记录对得分的梯度反传至head和encoder，update汇合当前／历史项、裁剪梯度并调用optimizer.step；正式入口确实传入相应arm。两臂同结构，但历史目标来自各自训练轨迹，不能宣称全程共用完全相同的教师数值。
+25: 2. 端点：O为末阶段两个旧域均值；N为第二阶段新域学完表现A2与第三阶段新域学完表现Z的均值；G为各新域学习前后变化的均值。核对了实际域与阶段位置的映射、A2专用覆盖、损失类F/F_first/G的方向，以及primary的排序／概率角色。
+26: 3. 统计：外审参考独立构造端点系数和整群抽样频数，不导入项目实现；与冻结实现在实际A/B/C域内配对整群抽样、跨臂／阶段／顺序保持对应、三顺序等权、5,000次PCG64抽样及线性分位数的定义一致。三个顺序不是三个独立新样本，条件区间不覆盖seed、生成机制和反复开发选择的不确定性。
+27: 4. Windows仅机械比较已有文件和保存字段：4,224行CSV的25,344个标量全部对应，最大绝对差1.3322676295501878e-15；诊断JSON的6,069个数值字段及156个文本字段均对应，最大数值差6.522560269672795e-16。153项解释标签及3项不适用状态一致。原Linux独立参考的最大差4.44e-16与外审不同浮点归约的差异均远小于既定1e-12核对尺度，不构成新统计结果。
+28: 5. 运行证据与既有原生核验衔接一致：7,776次更新、12,960次梯度群呈现、27阶段完整恢复、162逐epoch诊断、两个架构盲起点；完整盲门后才开放valid。train=1、valid=1、heldout=0、owners=0。72小时补充只改变授权预算与门的来源衔接，不追改原48小时拒绝现场；实际27小时25分28秒结束，资源未越界。
+29: 
+30: 本次没有在Windows运行科研实现、重新生成指标或bootstrap；没有新读正式文本／标签、Memory、封存材料或加载权重。外审的保存证据复算也不是Linux原生载模重放。本次复用已关闭实现外审、手写CPU／GPU核验和正式恢复记录，不把网页计算宣称为新的原生训练证明。
+31: 
+32: 三、逐项处置
+33: 
+34: 外审最终意见为ACCEPT_BOUNDED_CONCLUSIONS_WITH_NONBLOCKING_REPORT_ERRATUM：已证实科学阻断0，当前阻断性复现缺陷0，非阻断RD-01一项。主执行者经上述独立核查接受该有限结论。
+35: 
+36: RD-01：已关闭。
+37: 原report.zh.txt第37行将R0 G（MAP）抄成0.052435519；原评价、analysis/summary.json、all_endpoints.csv与外审参考均为0.05243518626921002，九位小数应为0.052435186。不是所列精度下的舍入差异。此前correction.zh.txt已独立核对并登记，本次再次确认。冻结原报告及原上传包不追改；今后引用该单元格必须使用勘误值。外审main_report_erratum.zh.txt与本地勘误一致。S−R0的G仍为-0.000293983，区间跨零；O/N结果和归因结论不变。
+38: 
+39: 外审参考首次诊断标签差异：不是项目新增缺陷。
+40: ABC_R0_stage3/cache/B/Recall@5的valid变化在零附近。外审首次用两个epoch均值之差得到+1.11022e-16，冻结定义先逐群相减再平均为-8.32667e-18，造成一项“证据不足／未见明确迹象”描述分档不同。已核对冻结curve_comparison，确实要求后者；外审改其参考的归约次序后与保存标签一致。严格信号计数与所有主要端点均不受影响，没有事后改项目判据或加容忍阈值。初次清点models键、报告解析越表触发ValueError也属于审查工具失败，完整保留首轮记录，不能记成正式训练失败或掩去失败后只留PASS。
+41: 
+42: 当前权重保管时点：需要澄清，非外审科学缺陷。
+43: 送审包及外审原文所说“权重留Linux”对应上传快照。本轮27权重已按用户后续明确许可，于10月11日10:41:20—10:41:24留证删除35,237,126,610字节，非权重结果及保留例外核对未变。现在的保管依据是reports/maintenance/20261011/record_attribution_weights/receipt.json。27份Memory继续保留Linux。不得追改外审原件／原inventory，也不能因审查结束误报权重仍在或可直接载模重放。
+44: 
+45: 四、接受的结果及必须保留的解释
+46: 
+47: 下列为MAP原始0—1量纲及配对条件95%区间，不是相对提升百分比：
+48: 比较 | O：最终旧域 | N：新域学完表现
+49: R0−LOGIT0.1 | +0.010473228 [0.001575118, 0.019370052] | +0.000984269 [-0.009008174, 0.010438589]
+50: S−R0 | +0.016435877 [0.005107917, 0.028173005] | +0.015998564 [0.006573217, 0.025871752]
+51: S−LOGIT0.1 | +0.026909104 [0.015890726, 0.038316505] | +0.016982833 [0.004613102, 0.029339358]
+52: 
+53: （1）记录系统贡献了一部分旧域收益，重组监督在相同记录系统上又带来额外O/N收益。
+54: R0−LOGIT同时改变文本如何表示、如何给记录对和账号对打分、head函数与维数、历史参考形式及计算路径。因此归因对象是整个记录表示／评分系统，不能缩写成“只靠pooling”或“只靠Memory”。S−R0更接近重组策略的比较，但包含整条训练轨迹及其历史参考的后续变化；没有分别拆出当前群重组、历史群重组或唯一因果机制。三臂沿LOGIT→R0→S的差值可以相加，不等于已测得普适贡献百分比或排除了结构与重组交互。
+55: 
+56: （2）N的收益主要在第三阶段，不能写成每次到新域都学得更快。
+57: S−R0的A2为+0.001072676，区间[-0.009891257,0.012091655]；Z为+0.030924452，区间[0.016795443,0.045505259]。N=(A2+Z)/2，两个保存均值的贡献分别约0.000536338与0.015462226。G的区间跨零，N是学完后的水平，G才是学习前后差，二者不能混称。
+58: 
+59: （3）首学代价和个别域例外仍在。
+60: 首域刚学完平均MAP：R0为0.489001504，S为0.474387958；到最后该首域平均：R0为0.471269342，S为0.487233535。因此S的负遗忘部分受较低首学起点影响，但最终O优势不只是这个算术现象。CAB中的首域C最终S=0.473051542、R0=0.474697468，S仍略低。九个顺序×实际域格子中八个最终均值较高只是描述，不是九次独立确认。
+61: 
+62: （4）S未触发严格过拟合信号，不是证明过拟合已被消除。
+63: 按MAP／Recall@5／raw log_loss依次，fit严格信号数为LOGIT 1/2/2、R0 0/1/2、S 0/0/0；cache为LOGIT 5/3/2、R0 2/1/1、S 0/0/0。每臂fit各指标9个可用面板，cache各8个；首阶段cache及CAB第三阶段无残存C群的格子为不适用，不能算零。
+64: S仍有七项点估计呈现相应形状但区间证据不足：
+65: - ABC stage3，cache A的MAP；cache B的MAP。
+66: - BCA stage2，fit C的raw log_loss；cache B的MAP、Recall@5、raw log_loss。
+67: - BCA stage3，cache B的Recall@5。
+68: 此外CAB S stage1的raw log_loss，fit为0.244397471→0.328736684，valid为0.244247565→0.351011393，均变差。严格诊断要求训练端改善才可能触发，所以这里不触发不代表概率拟合良好。该现象、完整曲线及有限诊断定义必须同时报告，不新增事后早停或判据。
+69: 
+70: （5）排序改善真实存在，概率与固定阈值的代价不能隐藏。
+71: 14项排序指标在raw、stage-cal、first-cal中一致，已核对的正仿射校准保持排序，所以主要MAP提升不是校准制造的。S相对LOGIT的raw log_loss在O/N/Z均更差，但raw Brier反而改善；不能概括成所有原始概率指标都退化。stage-cal的O/N log_loss与Brier改善也要同时保留。
+72: 旧域O按既定阈值合并固定顺序／域出现位置的计数：
+73: 方法 | TP | FP | FN | TN
+74: LOGIT0.1 | 195 | 82 | 2205 | 42878
+75: R0 | 194 | 100 | 2206 | 42860
+76: S | 241 | 137 | 2159 | 42823
+77: S相对R0多47个真阳性，同时多37个假阳性；O specificity差-0.000861266，区间[-0.001396648,-0.000325885]。这些是相关的固定出现位置汇总，不是新增独立样本。S的O召回率约10.04%、群宏F1约0.167，不能凭MAP改进宣称已达到实际自动识别要求。
+78: S−R0的N Recall@5区间仍跨零，部分其他检索和ROC-AUC指标也未建立严格改善；MAP优势不能写成22指标全面提升。
+79: 
+80: （6）成本与外推仍按原合同解释。
+81: 训练循环加诊断总时长LOGIT=30,811.893秒，R0=31,279.020秒，S=31,368.227秒；S相对R0多89.207秒、约0.2852%，这是本轮混合实测口径，不是纯训练FLOPs或普适零开销证明。单s0、三个固定循环顺序、中文合成受控数据及反复用于开发的valid，不能支持跨seed稳健性、真实市场外推或确认性统计主张。本轮没有新总通过门；相关false字段表示未设门，不是又一次总验收失败。原C／C_plus负结果、旧五项／23项验收及历史LOGIT R1边界继续保留。
+82: 
+83: 五、需要修改的范围与关闭条件
+84: 
+85: 已经完成的必要处置：引用既有R0 G勘误关闭RD-01；本文件补全归因对象、N/G、七项证据不足、双端log_loss恶化、raw Brier方向、阈值误报代价和权重时点；更新当前交接及提交状态指向完整外审与本处置。原主报告、正式结果、统计定义、冻结代码和外审原件均保留原字节。
+86: 
+87: 没有已证实依据要求修改训练／评价实现、恢复C_plus、补新seed、开放封存数据、重训或重新上传。本轮可关闭为“有限归因结论成立、无开放阻断”，不能改称“整个研究问题已经解决”或“方法创新已被证明”。若以后要隔离重组的细分机制、提高固定阈值识别能力或进行独立确认，属于另行明确的新科研范围，不由外审建议自动授权。
+88: 
+89: 本文件、回收原件和当前入口的两端同步身份、浏览器关闭实况见submission.json；Git提交与远端独立核对作为当次交付完成，不为记录自身提交再循环追加提交。
+
+=== evidence/attribution_correction.zh.txt [lines 1-17; total 17] ===
+1: 三臂结果主报告勘误
+2: 2026-10-11。依据网页外审指出的问题，主执行者已独立核对保存字段。
+3: 
+4: 原 report.zh.txt 第37行主要MAP表的R0、G单元格误写为0.052435519。
+5: 正确保存均值为0.05243518626921002；按原表九位小数应写为0.052435186。
+6: 直接来源为 analysis/summary.json 的R0、G记录及 analysis/all_endpoints.csv 中
+7: absolute、R0、primary、G、map行；四个评分角色的该数值相同。
+8: 这是报告抄录错误，原评价JSON、独立参考结果和CSV未发生此错误。
+9: 
+10: S−R0的G差值仍为−0.0002939830192160778，条件95%区间为
+11: [−0.01149804021761418, 0.010855946381568265]，方向未确定。
+12: 本项不改变O/N主要归因、第三阶段收益分布或现有结论边界，不要求重训、
+13: 重新解析标签或重做已充分核验的全部统计。
+14: 
+15: 原报告SHA256为fb9973a31b8c5f6587bbec91909da91bf6c379be373d5e9c90adc9fcae42b940；
+16: 原报告及已授权上传包均保留原字节。本补充为其当前勘误，不覆盖冻结原件。
+17: 完整外审是否结束及独立处置状态见同目录submission.json及后续主审记录。
+
+=== context/AGENTS.md [lines 1-24; total 24] ===
+1: # 科研 Agent 执行入口
+2: 
+3: 本文件保留必要边界与导航；常设规则集中在[科研纪律](docs/RESEARCH_DISCIPLINE.zh.md)，运行状态集中在[当前交接](docs/AI_RESEARCH_HANDOFF.zh.md)顶部。本文件不记录进度。
+4: 
+5: ## 按任务读取
+6: 
+7: | 本轮工作 | 需要的上下文 |
+8: |---|---|
+9: | 首次接手或上下文恢复 | 科研纪律第1—4节、交接顶部；按任务补读下列条款。恢复还须按第7节核对实际文件与相关作业，不能只信摘要 |
+10: | 文字、规则、链接维护 | 受影响条款及直接来源；纪律第5、10节。已有且仍适用的上下文复用，不为每次编辑通读历史 |
+11: | 科研实现、执行或结果分析 | 现行合同与明确补充、实际入口／直接依赖、相关原始审查；纪律第5—8节。由[设计入口](docs/CURRENT_EXPERIMENT_DESIGN.md)定位，不递归加载全仓库 |
+12: | 文件同步、保管、清理、Git交付 | 纪律第7、9、10节及[存储记录](docs/STORAGE.zh.md)；先查实际对象和已有许可 |
+13: 
+14: ## 必守边界
+15: 
+16: - 先辨对象、时间和范围：最新明确用户决定优先，当前合同及补充决定执行边界。历史“待授权”不恢复成当前阻断，旧批准不扩大到新动作；冻结原件和已发生事实不追改。
+17: - 已确认范围内持续完成实现、观察、针对性验证、修复和交付，不按普通步骤重复确认。有影响执行的不确定或冲突时先核对已有决定，仍不能解消则附出处与影响询问，只暂停依赖工作；新增研究、数据权限、比较、预算或判据须确认。
+18: - 防止过度设计贯穿执行：新增代码、测试或流程须对应本轮具体缺口，复用适用证据，必要核验充分后停止。交付前实际撤回、合并或简化无关扩展与重复改动，不另造自查报告；外审建议也按范围和证据处置，不自动全部实现。
+19: - 技术读取、结果开放、依据结果作选择是三种权限。文件小、只读、归档存在均不授予数据／标签权限；未来域、test／owners、封存材料及private_custody按合同隔离，失败账不清零。
+20: - 科研实现／测试、指标重算、重采样、载模推理／训练只用Linux既有py310；Windows限编辑、文件管理及获准证据的机械核对。共享Linux先查归属和资源，不动他人作业；密码只作SSH认证。SFTP／SCP同步，Git仅在Windows使用。
+21: - 禁止伪实现：从用户要求追踪实际输入、目标、梯度／更新、恢复和评价，关键操作须接入实际入口并产生约定作用；按科研纪律第5节核验，须能识别关键操作缺失。组件存在、PASS、哈希、测试数量或退出码不能替代实际行为证据，更不授予正式运行。保留有效负结果、原验收和外推边界。
+22: - 实质科研方案／实现／评价／结论默认本地Playwright MCP网页GPT 6 Pro外审，主执行者独立处置；不用ComputerUse／CUA替代。纯文档维护免审，其他免审仅限明确范围。新运行用独立目录；已有监听不重复启动，故障按现行合同处理。
+23: 
+24: 执行、等待、失败与完成条件见科研纪律第2、5、7、10节。用户原话与历史证据分别从[讨论记录](docs/RESEARCH_DISCUSSION.zh.md)和[交接历史入口](docs/AI_RESEARCH_HANDOFF.zh.md#历史与证据)按需回溯。
+
+=== frozen_source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md [lines 1-50; total 97] ===
+1: # 记录模型与重组监督：三臂归因实验合同
+2: 
+3: 2026-10-09。用户在三臂归因建议后明确回复：“那就按照你说的继续吧，有细节需要澄清的就问我”。随后针对本合同具体范围确认“同意上述预算与读取范围（推荐）”及“按归因诊断分别判读（推荐）”。本轮为 LOGIT0.1、去掉重组监督的记录模型 R0、原 S，s0、ABC/BCA/CAB，共 7,776 次更新；新增预算、train／valid 各一次及归因判读均已确认。完成受影响实现、必要核验和网页外审／主审后执行正式实验；五臂旧许可和本次数值修复免审均不转移到本研究。
+4: 
+5: ## 1. 要回答的问题
+6: 
+7: 原 C/S 相对 LOGIT 的差异同时包含记录表示／配对结构和重组监督，不能据旧比较判断哪一部分起作用；C−S 没有建立原主问题所需的主要旧域增量，C_plus 是已关闭的固定配置负结果。本轮拆开前两个因素，为下一步方法设计提供证据，不将消融本身包装成创新算法，也不承诺本轮解决整体研究问题。
+8: 
+9: 研究对象仍为：有限历史训练信息下，依次学习新卖家群体，并保持对旧分布未见卖家的候选排序／基础识别。继续使用已选 BAAI/bge-large-zh-v1.5（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；“历史目标”是该路径过去保存的数值评分，不是另一个预训练模型。
+10: 
+11: 固定两个主要比较：R0−LOGIT0.1 回答整套记录表示及评分结构相对旧账号汇总系统的效果；S−R0 回答加入同控重组监督的增量。S−LOGIT0.1 是预先列出的系统总差异。后者不能证明更复杂的方法更有效，前者也不是只改变一个池化算子的严格单因素实验：头维度、函数族、历史目标表示、计算量及跨架构 dropout 路径都有区别。不增加计算量匹配对照、纯 SEQ、C、C_plus 或 S_strong。
+12: 
+13: ## 2. 三臂实际计算
+14: 
+15: 继承[原 C/S 合同](SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md)和[LOGIT0.1 合同](SELLER_ALIAS_LOGIT_LOW.zh.md)中本节明确采用的输入、优化器、损失、记忆和评价定义。B 为 BCE＋query-rank＋0.5 known-top5-hard。A0 是记录仍属于原账号；A1 是仅在同控连通分量内打乱完整记录、按原账号条数重新分配。B0=B(A0)，Bbar=(B(A0)+B(A1))/2。D0 是当前模型与本路径保存的历史评分在原分组下的 378 项 raw logit 均方误差。
+16: 
+17: | 臂 | 当前群监督 | 历史群监督与评分保持 | 结构 |
+18: |---|---|---|---|
+19: | LOGIT0.1 | B0 | 0.1 B0＋0.5 D0 | 原账号均值／标准差表示及原配对头 |
+20: | R0 | B0 | 0.1 B0＋0.5 D0 | 原 C/S 的记录表示、记录对头与账号汇总；训练不构造 A1 |
+21: | S | Bbar | 0.1 Bbar＋0.5 D0 | 与 R0 完全相同的记录结构，沿用原 S 的重组监督 |
+22: 
+23: 首阶段没有历史项。后两阶段每步当前与历史各一群，梯度累加后一次 clip=1、一次 AdamW；不按监督视图数额外增加优化器更新。R0 不计算两份相同 B0 再平均，不把 A1 的日志存在当成增强生效。S 的两视图共享同一次 live encoder 表示与记录对表，监督平均而非相加翻倍。记录表 VJP 继续从损失经 dJ/dK、分块头、dJ/dZ 回传 live BGE；标题／描述分别归一化后拼接除以 √2，2,048 维记录表示，头 4,096→128→1；LOGIT 维持原 4,096 维账号表示、8,192→128→1 头。
+24: 
+25: R0/S 使用相同完整记录表 Memory 格式、同样六群和 1MiB 上限，仅 D0 进入历史保持目标。保留完整表是为了使 S−R0 只切换重组监督，并复用既有记忆实现；不是声称 R0 需要使用所有表项，也不据本轮宣布该记忆表示最节省。两臂各自在自己的阶段末产生新留存群的历史目标，存活旧目标不刷新，淘汰群不从档案恢复；不能共用已分化模型的目标。LOGIT 仍保存原 378 项账号分数。
+26: 
+27: ## 3. 起点、供给和实际工作量
+28: 
+29: 三臂均从同一已选 BGE 预训练归档重新开始三阶段，不复用旧训练权重。R0/S 头结构和初始化逐位相同，但首阶段监督不同，必须分别完成首阶段，不共享已训练的 S 首阶段模型／Adam／Memory。三个顺序的未训练同架构起点相同；跨架构只要求同 BGE、既定 seed 和各自固定头，不伪称完整参数或 dropout 张量逐位配对。
+30: 
+31: 沿用 initialization=20260909、current schedule=20260918、memory=20260930，s0 及 ABC/BCA/CAB；保留各自现有命名 dropout 流，R0/S 不以臂名改变随机流。当前群顺序、历史群抽样和模型无关 Algorithm R 成员在三臂配对。每阶段每域 48 fit 群、六轮、288 更新，Adam 连续到 288／576／864；阶段学习率重按原日程。
+32: 
+33: 总计 3臂×3顺序×3阶段×288＝7,776 物理更新，12,960 次梯度群呈现，27 个物理／逻辑阶段状态，162 个实际 epoch 诊断点，不存在 shared 首阶段别名。另按两个未训练架构各保存一份 60 群 raw 盲预测，R0/S 共同引用相同记录起点；这是起点观察，不多训练路径、不选初始化。每个阶段保留本路径当前 12 校准群的映射、首域固定映射、全 60 valid 的 raw／stage-cal／first-cal 分数。
+34: 
+35: 所有实际执行入口在载模前调用公共 configure_numerics 并保存生效值：deterministic=True、warn_only=False、CUDA matmul TF32=False、cuDNN TF32=False、cuDNN benchmark=False，Python 启动前 CUBLAS_WORKSPACE_CONFIG=:4096:8。原生核验与正式运行都记录；不靠模块导入的副作用。不以本轮新结果修补历史 LOGIT R1 或声称已隔离其根因。
+36: 
+37: ## 4. 数据和三种权限
+38: 
+39: 固定数据为 reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data，每域 48 fit／12 calibration／20 development-valid。模型输入仍仅屏蔽后的标题和描述，全部 2—8 条记录／账号、28 账号／群、最大 224 记录，256 token 上限、microbatch 4、BF16 encoder 和 FP32 参数／头／梯度／Adam；不截断、不将 UID、域或控制者作为模型特征。
+40: 
+41: - 技术读取：本轮新 train 标签解析尝试一次，由离线调度器按阶段供给，学习器只取得当前 fit 和自身存活记忆，校准器只取得当前域 12 群。valid 文本仅用于无标签前向；全部训练及盲门通过后 valid 标签解析尝试一次。失败也记账。test、owners、Audit、private_custody 为零；不读取旧 Memory 正文来恢复训练，不生成新数据或留出。
+42: - 结果开放：7,776 更新、27 次完整阶段恢复、162 份六轮诊断、两个未训练盲起点及全部来源／预算／分数检查完成后，统一开放一次 valid 结果。先完整保存指标与计数，再比较。不看中途 valid 指标，不选最好 epoch，不提前停止取有利模型。可查看训练损失、fit／缓存诊断和资源，但不据其更改实验。
+43: - 根据结果选择：本轮没有可自适应调整的候选、系数、种子或轮数。三组比较完整报告后结束，只形成后续研究建议；任何下一轮训练另行明确范围。反复使用的开发 valid 与已用基础 test 不会变为独立确认集。
+44: 
+45: ## 5. 过拟合诊断和阶段完整性
+46: 
+47: 实际训练循环每 48 次更新调用保留的通用诊断：A0／eval／无 autograd，当前 48 fit、当前存活缓存（首阶段为零，后续六群）和全 60 valid。fit／缓存保存 MAP、Recall@5 和原评价器的截断概率 log_loss；valid 只盲存 raw 预测，完整结束后统一评价。cache 按实际出生域与对应 valid 比较，缺失域为 N/A；固定 epoch1→6 及全部六点，不把遗忘、欠拟合、校准变化与过拟合混称。
+48: 
+49: 复用通用诊断现有的记录表 D0/D1 残差输出，R0 的 D1 只在无梯度、状态中性的诊断中计算，绝不进入 R0 训练目标。保留它不授予新增比较或选模型权限；不将残差称为梯度夹角或泛化机制证明。诊断须保持参数、已有梯度、Adam、所有子模块模式、Python／NumPy／Torch 随机状态、Memory 成员／目标／抽样状态不变，且不改变下一次实际更新。
+50: 
+
+=== evidence/crossfit_result_primary.zh.txt [lines 1-45; total 78] ===
+1: C_cf三臂结果外审：独立主审与补充说明
+2: 2026-10-13，UTC+08:00。处置：CLOSED_NO_OPEN_BLOCKERS。
+3: 
+4: 本固定配置有效完成，但未建立C_cf相对完整S的旧域未见账号排序改进；对C_perm也未建立原赋值优势。接受外审在此限定内的结论。没有发现必须修改正式训练、评价数值或重跑实验的科学／复现缺陷。以下补充作为原report.zh.txt的伴随说明，原报告、合同、源码、统计、上传包及外审原件均保持形成时字节。
+5: 
+6: 1. 回收、实际阅读与独立核对
+7: 
+8: 原会话为https://chatgpt.com/c/6acd8c62-0818-83eb-8a6a-ad3270c0ad45。10:16页面仍在输出最终正文；10:19确认最终答复完整且停止按钮消失，之后下载完整交付包。返回ZIP为11,231,763字节、389成员，SHA256为6c331819a5013c2ec94d32b871a30633f37c481abb3844a021b791b3ef14294a。CRC、两个交付清单和387项载荷逐项大小／SHA一致；两份清单自身由原ZIP身份覆盖。返回input_archive.zip与原获准上传包逐字节相同，303个返回输入成员也与原包逐字节相同。303项阅读范围的成员集合完整，见recovery.json及external/unpacked/FILES_MANIFEST.json。
+9: 
+10: 主执行者完整阅读37,961字节审查正文、10项finding、失败清单与来源／阅读范围说明；检查成功参考的固定整群配对统计、分类计数、校准变换、诊断及递归比对代码，核对其成功源码快照与执行回执、错误栈及修正范围。复读当前合同、实际birth／permute／floor_loss和既有诊断判据，复用已关闭实施／原生资格及此前Linux保存结果独立复算，不重新审查无变化的全部历史实现。网页图表也已查看，与主要数值和六点曲线相符。
+11: 
+12: 外审在自己的Python 3.12／NumPy环境重算保存结果，没有执行项目BGE或连接项目Linux；它的PASS不冒充项目原生资格。请求模型和网页可见GPT-6／Pro保留，外审自报GPT-6 Astra Pro，后台路由仍未独立取得。本轮外审自报未委派，回收材料没有提供相反证据；主执行者未委派。
+13: 
+14: 10:19主执行者另在项目Linux只读确认原作业完成、该workspace无活动进程，access仍train=1／valid=1、heldout／owners=0，四权重目录为空、六Memory保留。此为当时现场事实，与外审仅依保存回执的边界分开。
+15: 
+16: 10:26在既有Linux py310、单CPU、GPU不可见条件下执行本目录primary_check.py，实际0.016549秒。复用此前analysis/audit.json的独立矩阵／统计复算，将返回990行完整统计与本地既有Linux结果对应核对；将外审诊断数值与原保存诊断对应，并从原六点曲线和已保存区间独立重建21项判读，全部一致。3,852个保存数值比较最大差3.3306690738754696e-16；这是相关数值核对规模，不是独立科学检验次数。首阶段空缓存仍为N/A。源码、日志与结果见primary_check.py、primary_check.log、primary_verification.json。没有再抽样、解析标签、载模、读取Memory或F/O评分、训练或旧C诊断；不冒称本次又从真值重算原始指标。
+17: 
+18: 2. C_cf相对完整S的收益裁决
+19: 
+20: 主要终点为学习B结束后的A旧域及B新域未见账号MAP；三臂同款中文BGE，完整S配置保持。
+21: 
+22:                          A旧域MAP       B新域MAP
+23: 完整S                    0.494131716    0.505870437
+24: C_cf                     0.489917573    0.498875081
+25: C_perm                   0.490960832    0.500162668
+26: 
+27: C_cf−S：A为−0.004214143，条件95%区间[−0.015758150,+0.006392627]；B为−0.006995356，区间[−0.017560005,+0.003951017]。
+28: C_cf−C_perm：A为−0.001043259，区间[−0.008232223,+0.006165310]；B为−0.001287588，区间[−0.006410982,+0.003630643]。
+29: 
+30: 四个点估计均偏低、区间均跨零，因此本配置未提供预定改进证据；未证明总体劣效或等效。相对共享A末，三臂的A MAP点估计均未净下降，S也有同样现象，不能把C_cf末态接近A末归作其独有的防遗忘贡献。
+31: 
+32: 局部收益仍如实保留：raw概率Brier／裁剪log_loss两域较S低且相应条件区间全负。但stage-cal同样给S校准后，候选log_loss两域更高，B域Brier也更高；first-cal沿用A映射时，两域概率误差更高。first-cal虽提高召回与F1，合并误报207对49、precision约0.4567对0.6288；raw提高后的合并召回也仅3.375%。这不是主要排序收益，更不能概括为整体校准更好。
+33: 
+34: 独立使用成本为S的576更新／864梯度群呈现，对比C_cf含辅助来源的864／1152，即更新多50%、呈现多1/3；不宣称墙钟或FLOPs比例。当前六群末态Memory由348,167降至242,541字节，少105,626字节、约30.3377%。它是本批存储收益，没有在本合同中换成更多历史群，也没有建立排序收益。
+35: 
+36: 3. C_perm对照的准确解释
+37: 
+38: C_cf保存一批由全域来源F与未训练本群的来源O共同支持的“正候选应比负候选至少高多少”的下限。C_perm沿用同一批下限数值，在规定的小块中改绑到其他可行负候选，并保证F在出生时仍满足约束。O仍参与决定下限数值和启用数目，因此C_perm没有移除折外信息。
+39: 
+40: 本结果只支持：没有证据表明原来的具体对应关系比这一份固定可行错配更好。不能推出两臂等效、任意打乱都一样、O没有信息或整个cross-fitting家族无效。错配还改变出生松弛、O支持、候选难度和后续有效强度；即便某次原赋值胜过错配，也不能只据此证明O来源独立必要。一次固定错配不构成总体置换检验。
+41: 
+42: C_cf−S同时改变保持对象、惩罚几何与有效强度，回答的是整体候选替换是否获益，不能单独归因于其中一个成分。完整S已有记录结构和重组监督的收益不计入C_cf贡献。
+43: 
+44: 4. 采纳的补充：差距扩大与判据未触发必须同时报告
+45: 
+
+=== frozen_source/schema/step28_bge_continual_policy.json [lines 1-199; total 199] ===
+1: {
+2:   "study": "seller_alias_bge_limited_history_pilot",
+3:   "schema_version": 1,
+4:   "contract_document": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+5:   "decision": "reports/documentation/20260930/continual_plan/implementation_decision.json",
+6:   "configuration": "hard_bge_separate_moments",
+7:   "orders": [
+8:     "ABC",
+9:     "BCA",
+10:     "CAB"
+11:   ],
+12:   "seed": "s0",
+13:   "initialization_seed": 20260909,
+14:   "schedule_seed": 20260918,
+15:   "memory_seed": 20260930,
+16:   "methods": [
+17:     "frozen",
+18:     "seq",
+19:     "er",
+20:     "logit"
+21:   ],
+22:   "updated_methods": [
+23:     "seq",
+24:     "er",
+25:     "logit"
+26:   ],
+27:   "epochs_per_stage": 6,
+28:   "fit_groups_per_domain": 48,
+29:   "calibration_groups_per_domain": 12,
+30:   "valid_groups_per_domain": 20,
+31:   "updates_per_stage": 288,
+32:   "physical_updates": 6048,
+33:   "gradient_group_presentations": 9504,
+34:   "distinct_stage_endpoints": 21,
+35:   "encoder_schedule": {
+36:     "warmup_updates": 29,
+37:     "peak_lr": 0.00001,
+38:     "head_lr": 0.001,
+39:     "local_stage_restart": true,
+40:     "adam_moments_and_steps_continue": true
+41:   },
+42:   "loss": {
+43:     "bce": 1,
+44:     "rank": 1,
+45:     "known_top5_hard": 0.5,
+46:     "historical_supervision": 1,
+47:     "historical_logit_mse": 0.5,
+48:     "history_and_current_summed": true,
+49:     "one_clip_and_adam_step": true,
+50:     "student_mode": "train",
+51:     "reference_mode": "eval"
+52:   },
+53:   "memory": {
+54:     "capacity_groups": 6,
+55:     "maximum_bytes": 1048576,
+56:     "supply": "model_independent_algorithm_r_at_stage_end",
+57:     "insertion_order": "ascending_group_uid_each_unique_fit_group_once",
+58:     "same_members_and_draws_for_er_logit": true,
+59:     "draw": "one_uniform_group_with_replacement_per_update",
+60:     "refresh_survivor_reference": false,
+61:     "reference": "float32_raw_logits_at_origin_domain_end",
+62:     "include": "All serialized groups/labels/indices/RNG/counters/reference logits/first-map and related persistent auxiliary state",
+63:     "old_archive_reaccess": false
+64:   },
+65:   "calibration": {
+66:     "role": "current_domain_only",
+67:     "fit_groups": 12,
+68:     "positive_affine": true,
+69:     "bounds": [
+70:       [
+71:         0.001,
+72:         100
+73:       ],
+74:       [
+75:         -100,
+76:         100
+77:       ]
+78:     ],
+79:     "initial": [
+80:       1,
+81:       0
+82:     ],
+83:     "solver": "L-BFGS-B",
+84:     "options": {
+85:       "maxiter": 200,
+86:       "maxfun": 2000,
+87:       "maxls": 40,
+88:       "maxcor": 10,
+89:       "ftol": 1e-12,
+90:       "gtol": 1e-8
+91:     },
+92:     "accepted_projected_gradient_max": 0.000001,
+93:     "old_calibration_reuse": false,
+94:     "primary_role": "stage-cal",
+95:     "diagnostic_roles": [
+96:       "raw",
+97:       "first-cal"
+98:     ],
+99:     "initial_role": "raw"
+100:   },
+101:   "evaluation": {
+102:     "split": "development",
+103:     "bootstrap_replicates": 5000,
+104:     "bootstrap_seed": 20260930,
+105:     "draw_shape": [
+106:       5000,
+107:       3,
+108:       20
+109:     ],
+110:     "confidence_level": 0.95,
+111:     "quantile_method": "linear",
+112:     "actual_domain_order": [
+113:       "A",
+114:       "B",
+115:       "C"
+116:     ],
+117:     "comparisons": [
+118:       [
+119:         "er",
+120:         "seq"
+121:       ],
+122:       [
+123:         "logit",
+124:         "er"
+125:       ]
+126:     ],
+127:     "endpoints": [
+128:       "O",
+129:       "N",
+130:       "Z",
+131:       "F_first",
+132:       "F",
+133:       "G",
+134:       "final_all"
+135:     ],
+136:     "positive_metric_signs": {
+137:       "map": 1,
+138:       "recall_at_5": 1,
+139:       "average_precision": 1,
+140:       "roc_auc": 1,
+141:       "brier": -1,
+142:       "log_loss": -1
+143:     },
+144:     "old_map_strict_positive": true,
+145:     "old_map_interval_low_strict_positive": true,
+146:     "old_recall5_strict_positive": true,
+147:     "new_N_MAP_and_recall5_non_decrease": true,
+148:     "probability_guard_endpoints": [
+149:       "O",
+150:       "N",
+151:       "Z"
+152:     ],
+153:     "raw_comparator_loss_guard_endpoints": [
+154:       "O",
+155:       "N"
+156:     ],
+157:     "latest_Z_six_observed_guards": true,
+158:     "forgetting_required_orders": 2,
+159:     "classification_threshold_logit": 0,
+160:     "primary_ranking_role": "raw",
+161:     "primary_probability_role": "stage-cal",
+162:     "performance_tolerance": 0,
+163:     "no_winner_selection": true,
+164:     "scope": "One fixed seed, fixed models/order/map/generator; paired actual-domain whole-group conditional intervals, not population noninferiority or independent confirmatory test"
+165:   },
+166:   "supervision": {
+167:     "train_parse_attempts": 1,
+168:     "valid_parse_attempts": 1,
+169:     "test_access": false,
+170:     "owners_access": false,
+171:     "automatic_retry": false,
+172:     "valid_after_all_training_and_complete_blind_gate": true,
+173:     "formal_access_authorized_by_this_file": false
+174:   },
+175:   "runtime": {
+176:     "maximum_gpu_stage_seconds": 129600,
+177:     "maximum_output_bytes": 68719476736,
+178:     "minimum_free_gpu_bytes": 25769803776,
+179:     "minimum_free_host_bytes": 17179869184,
+180:     "torch_cpu_threads": 1,
+181:     "estimated_hours": [
+182:       18,
+183:       26
+184:     ]
+185:   },
+186:   "cpu_verification": {
+187:     "maximum_seconds": 3600,
+188:     "maximum_evidence_bytes": 268435456,
+189:     "formal_inputs": false,
+190:     "formal_labels": false,
+191:     "gpu": false,
+192:     "retained_native_weights": false,
+193:     "estimate_minutes": [
+194:       15,
+195:       30
+196:     ]
+197:   },
+198:   "execution_boundary": "Only local preparation is currently authorized. Complete local contract/policy/code and static review; user and actual web approval precede any project Linux access or sync. Formal execution requires separate source-bound authorization and native verification. No grants arise from this policy."
+199: }
+
+=== frozen_source/schema/step28_chinese_base_policy.json [lines 1-247; total 247] ===
+1: {
+2:   "study": "seller_alias_chinese_base_improvement",
+3:   "data_root": "reports/seller_alias_continual/20260910/expression_generation/20260910_150500/data",
+4:   "data_manifest_sha256": "3f14f1ed47bffabaec90640b9e212f5eab2d702efcf9304a310f22d2a0165f6b",
+5:   "data_validation_sha256": "70b0cf6016f37a1e7190c3a9f569efaa464c33b68b74a7f0fb014c25d590069c",
+6:   "groups_per_domain": {
+7:     "train": 60,
+8:     "development": 20,
+9:     "heldout": 40
+10:   },
+11:   "partition": {
+12:     "seed": 20260918,
+13:     "fit_per_domain": 48,
+14:     "calibration_per_domain": 12,
+15:     "rule": "Within domain sort by SHA256(canonical JSON [seed,domain,group_uid]); first 48 fit, remainder calibrate; outputs follow public input row order"
+16:   },
+17:   "arms": [
+18:     "mean_bce",
+19:     "mean_rank",
+20:     "split_bce",
+21:     "split_rank"
+22:   ],
+23:   "models": {
+24:     "mean_bce": {
+25:       "path": "models/step7/embeddings/bge_large_zh",
+26:       "model_id": "BAAI/bge-large-zh-v1.5",
+27:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+28:       "embedding_dim": 1024,
+29:       "prefix": "",
+30:       "pooling": "cls",
+31:       "dense_module": false,
+32:       "file_count": 12,
+33:       "total_size_bytes": 1302803319,
+34:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+35:     },
+36:     "mean_rank": {
+37:       "path": "models/step7/embeddings/bge_large_zh",
+38:       "model_id": "BAAI/bge-large-zh-v1.5",
+39:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+40:       "embedding_dim": 1024,
+41:       "prefix": "",
+42:       "pooling": "cls",
+43:       "dense_module": false,
+44:       "file_count": 12,
+45:       "total_size_bytes": 1302803319,
+46:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+47:     },
+48:     "split_bce": {
+49:       "path": "models/step7/embeddings/bge_large_zh",
+50:       "model_id": "BAAI/bge-large-zh-v1.5",
+51:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+52:       "embedding_dim": 1024,
+53:       "prefix": "",
+54:       "pooling": "cls",
+55:       "dense_module": false,
+56:       "file_count": 12,
+57:       "total_size_bytes": 1302803319,
+58:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+59:     },
+60:     "split_rank": {
+61:       "path": "models/step7/embeddings/bge_large_zh",
+62:       "model_id": "BAAI/bge-large-zh-v1.5",
+63:       "revision": "79e7739b6ab944e86d6171e44d24c997fc1e0116",
+64:       "embedding_dim": 1024,
+65:       "prefix": "",
+66:       "pooling": "cls",
+67:       "dense_module": false,
+68:       "file_count": 12,
+69:       "total_size_bytes": 1302803319,
+70:       "content_sha256": "26d94141907d840eb6890ce9fa690bc3e32229f16704e7a794ae2218fd9685cd"
+71:     }
+72:   },
+73:   "initialization_seed": 20260909,
+74:   "schedule_seed": 20260918,
+75:   "epochs": 6,
+76:   "score_epochs": [
+77:     3,
+78:     6
+79:   ],
+80:   "primary_epoch": 6,
+81:   "physical_updates": 3456,
+82:   "input": {
+83:     "token_budget": 256,
+84:     "microbatch": 4,
+85:     "encoder_bf16": true,
+86:     "activation_checkpointing": true,
+87:     "head_hidden": 128,
+88:     "account_pooling": "Per intervention; see representation",
+89:     "loss": "Unweighted mean BCE plus fixed intervention rank_weight times ranking objective"
+90:   },
+91:   "optimizer": {
+92:     "name": "AdamW",
+93:     "encoder_lr": 2E-05,
+94:     "encoder_weight_decay": 0.01,
+95:     "head_lr": 0.001,
+96:     "head_weight_decay": 0,
+97:     "betas": [
+98:       0.9,
+99:       0.999
+100:     ],
+101:     "eps": 1E-08,
+102:     "foreach": false,
+103:     "clip_norm": 1
+104:   },
+105:   "evaluation": {
+106:     "maximum_fpr": 0.001,
+107:     "minimum_recall": 0.5,
+108:     "required_domains": [
+109:       "A",
+110:       "B",
+111:       "C"
+112:     ],
+113:     "decision": "Each domain must pass both empirical point-value gates at the same calibration-only global threshold; no automatic winner",
+114:     "threshold_rule": "For each calibration domain allow floor(negative_count/1000) false positives; float64 nextafter of the next negative order statistic toward +infinity; global maximum; prediction is float64(logit)>=threshold",
+115:     "reference_threshold": 0.0,
+116:     "bootstrap_replicates": 5000,
+117:     "bootstrap_seed": 20260918,
+118:     "confidence_level": 0.95,
+119:     "heldout_access": false,
+120:     "owners_access": false
+121:   },
+122:   "supervision": {
+123:     "linux_train_parses": 1,
+124:     "linux_development_parses": 1,
+125:     "calibration_used_for_gradients": false,
+126:     "partial_evaluation_allowed": false
+127:   },
+128:   "runtime": {
+129:     "maximum_gpu_stage_seconds": 28800,
+130:     "maximum_output_bytes": 34359738368,
+131:     "minimum_free_gpu_bytes": 25769803776,
+132:     "minimum_free_host_bytes": 17179869184,
+133:     "torch_cpu_threads": 1
+134:   },
+135:   "execution_boundary": "User authorized Chinese improvement and writing contract/code on 2026-09-24. CPU implementation verification was explicitly resumed: 12 handmade contracts and four native one-step checks, one CPU, 1h/256MiB, no formal data/labels/GPU/retained weights, then web GPT6 Pro review. Model transfer also resumed. Formal 3456-update training with fresh train/valid parses still requires scoped resumption after review.",
+136:   "interventions": {
+137:     "mean_bce": {
+138:       "account_dim": 1024,
+139:       "representation": "combined_mean",
+140:       "rank_weight": 0
+141:     },
+142:     "mean_rank": {
+143:       "account_dim": 1024,
+144:       "representation": "combined_mean",
+145:       "rank_weight": 1
+146:     },
+147:     "split_bce": {
+148:       "account_dim": 4096,
+149:       "representation": "separate_moments",
+150:       "rank_weight": 0
+151:     },
+152:     "split_rank": {
+153:       "account_dim": 4096,
+154:       "representation": "separate_moments",
+155:       "rank_weight": 1
+156:     }
+157:   },
+158:   "ranking": {
+159:     "objective": "mean over 28 accounts of logsumexp(nonself logits) minus mean positive logit; all 378 unordered pairs scored once",
+160:     "candidate_count": 27,
+161:     "positive_degrees": [
+162:       1,
+163:       2
+164:     ],
+165:     "temperature": 1,
+166:     "weight": 1
+167:   },
+168:   "representation": {
+169:     "variance_epsilon": 1E-08,
+170:     "separate": "normalize(concat(mean(title), population_std(title), mean(description), population_std(description)))",
+171:     "combined": "normalize(mean(normalize(CLS(title + newline + description))))",
+172:     "all_items": true,
+173:     "record_normalization": "L2"
+174:   },
+175:   "primary_comparison": [
+176:     "split_rank",
+177:     "mean_bce"
+178:   ],
+179:   "comparisons": [
+180:     [
+181:       "split_rank",
+182:       "mean_bce"
+183:     ],
+184:     [
+185:       "mean_rank",
+186:       "mean_bce"
+187:     ],
+188:     [
+189:       "split_bce",
+190:       "mean_bce"
+191:     ],
+192:     [
+193:       "split_rank",
+194:       "split_bce"
+195:     ],
+196:     [
+197:       "split_rank",
+198:       "mean_rank"
+199:     ],
+200:     [
+201:       "mean_bce",
+202:       "historical_labse"
+203:     ],
+204:     [
+205:       "split_rank",
+206:       "historical_labse"
+207:     ]
+208:   ],
+209:   "historical_reference": {
+210:     "name": "historical_labse",
+211:     "model_loading": false,
+212:     "root": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run",
+213:     "retraining": false,
+214:     "files": {
+215:       "manifest.json": {
+216:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/manifest.json",
+217:         "bytes": 11604,
+218:         "sha256": "bfc9c50e7e6f7df69badc5f399318834eee3f7d72bcd23222b86afe53a71a432"
+219:       },
+220:       "completion.json": {
+221:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/completion.json",
+222:         "bytes": 228,
+223:         "sha256": "e7bd72576c710faecde6dd85622de48dde5d4407807325538481b34892e86d00"
+224:       },
+225:       "partition.json": {
+226:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/partition.json",
+227:         "bytes": 14922,
+228:         "sha256": "24defbf38f44ebf5cfc75fa86b1b5bfb5a4c9ca4eb333bb7da147d62124048f2"
+229:       },
+230:       "labse/manifest.json": {
+231:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/manifest.json",
+232:         "bytes": 31112,
+233:         "sha256": "2f708c0a011f57847f7d01a5f37aa77646906b5970033375efbbe8b839d9cdb9"
+234:       },
+235:       "labse/calibration.json": {
+236:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/calibration.json",
+237:         "bytes": 1270,
+238:         "sha256": "62bbcbc67b8b42271a54a8702a2410794b2c9152f5b93496e3998026c706cfa5"
+239:       },
+240:       "labse/scores/epoch6_development.npy": {
+241:         "path": "reports/seller_alias_continual/20260918/base_execution/20260918_113800/job/run/labse/scores/epoch6_development.npy",
+242:         "bytes": 90848,
+243:         "sha256": "b32f894fb46f8440a0f8a462f26bab648c0568efd4a069b6012e04accac143f1"
+244:       }
+245:     }
+246:   }
+247: }
+
+=== frozen_source/schema/step28_alias_ranking_policy.json [lines 1-80; total 80] ===
+1: {
+2:   "study": "seller_alias_ranking_training",
+3:   "base_policy_sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+4:   "base_runner_sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc",
+5:   "decision": "reports/documentation/20260927/ranking_plan/decision.json",
+6:   "arms": ["d", "schedule", "hard"],
+7:   "seeds": {
+8:     "s0": {"initialization_seed": 20260909, "schedule_seed": 20260918},
+9:     "s1": {"initialization_seed": 20260925, "schedule_seed": 20260925},
+10:     "s2": {"initialization_seed": 20260926, "schedule_seed": 20260926}
+11:   },
+12:   "runs": ["s0_d", "s0_schedule", "s0_hard", "s1_d", "s1_schedule", "s1_hard", "s2_d", "s2_schedule", "s2_hard"],
+13:   "epochs": 6,
+14:   "updates_per_epoch": 144,
+15:   "updates_per_run": 864,
+16:   "physical_updates": 7776,
+17:   "score_epochs": [3, 6],
+18:   "primary_epoch": 6,
+19:   "primary_comparison": ["hard", "d"],
+20:   "auxiliary_comparisons": [["schedule", "d"], ["hard", "schedule"]],
+21:   "fixed_test_seed": "s0",
+22:   "encoder_schedule": {
+23:     "peak_lr": 0.00001,
+24:     "warmup_fraction": 0.1,
+25:     "warmup_updates": 87,
+26:     "definition": "one-based t=1..864: peak*t/87 for t<=87, then peak*(864-t)/(864-87)",
+27:     "last_lr": 0.0,
+28:     "positive_lr_updates": 863,
+29:     "head_lr": 0.001,
+30:     "head_schedule": "constant"
+31:   },
+32:   "hard_ranking": {
+33:     "count": 5,
+34:     "weight": 0.5,
+35:     "base_rank_weight": 1.0,
+36:     "bce_weight": 1.0,
+37:     "reduction": "mean over queries, within each query mean over all positive-by-selected-negative combinations",
+38:     "selection": "highest current logits among known within-group negatives; exclude self and every positive; stable ascending candidate index for exact ties",
+39:     "selection_gradients": "indices detached, selected score values differentiable",
+40:     "pair_comparisons_per_group": 200,
+41:     "no_parameter_search": true
+42:   },
+43:   "evaluation": {
+44:     "bootstrap_replicates": 5000,
+45:     "valid_bootstrap_seed": 20260927,
+46:     "minimum_map_gain": 0.01,
+47:     "recall_at_5_strict_improvement_mean_and_s0": true,
+48:     "guard_signs": {"average_precision": 1, "roc_auc": 1, "brier": -1, "log_loss": -1},
+49:     "scope": "Conditional paired whole-group resampling within domains after averaging fixed paired seeds; observed-value guards, not population noninferiority",
+50:     "automatic_threshold": "unchanged train-only calibration, diagnostic, not acceptance",
+51:     "model_selection": "None; hard E6 is primary, s0 fixed for any later separately authorized test"
+52:   },
+53:   "supervision": {
+54:     "train_parse_attempts": 1,
+55:     "valid_parse_attempts": 1,
+56:     "train_shared_across_nine_runs": true,
+57:     "formal_access_currently_authorized": false,
+58:     "test_access": false,
+59:     "owners_access": false,
+60:     "automatic_retry": false
+61:   },
+62:   "runtime": {
+63:     "maximum_gpu_stage_seconds": 86400,
+64:     "maximum_output_bytes": 34359738368,
+65:     "minimum_free_gpu_bytes": 25769803776,
+66:     "minimum_free_host_bytes": 17179869184,
+67:     "torch_cpu_threads": 1,
+68:     "estimated_hours": [14, 18]
+69:   },
+70:   "cpu_verification": {
+71:     "maximum_seconds": 3600,
+72:     "maximum_evidence_bytes": 268435456,
+73:     "native_handmade_updates": 4,
+74:     "formal_inputs": false,
+75:     "formal_labels": false,
+76:     "gpu": false,
+77:     "retained_native_weights": false
+78:   },
+79:   "execution_boundary": "Implementation preparation approved; formal runtime/storage and new supervision remain proposed until the user receives readiness report and explicitly starts the scoped run. A separate authorization receipt is required by execute; the policy itself remains byte-frozen."
+80: }
+
+=== evidence/attribution_external.zh.txt [lines 47-90; total 363] ===
+47: 
+48: 原生资格对应原 48 小时版本的 29 来源。当前 29 来源中，26 项字节不变，三项变化为：
+49: 
+50: （1）step28_record_attribution_policy.json：仅将 maximum_gpu_stage_seconds 从 172800 改为 259200。
+51: （2）run_step28_record_attribution_linux_20261009.sh：仅将外层 timeout 从 172795 改为 259195，保留其后的 5 秒强制结束余量。
+52: （3）step28_record_attribution_run.py：仅在 validate_gate 中加入本次来源／预算衔接；移除该函数后，新旧模块 AST 完全相同。
+53: 
+54: 本次既逐字比较两个数值替换，也比较了其余训练、保存、诊断与评价代码的 AST。formal_gate 同时保留当前 source_files 与原 verification_source_files；没有把旧资格的来源散列篡改为新散列，也没有声称因时限变化重跑了原生核验。新快照的另外两项是本次授权和监听脚本，不是新科研计算来源。[E3]
+55: 
+56: authorization_72h.json 明确记录用户“同意将正式上限改为72小时”，且三臂、7,776 更新、12,960 梯度群呈现、27 状态、162 诊断、48 GiB 输出、28 GiB CUDA reserved、64 GiB RSS、train／valid 各一次和不自动重试均不变。因此合同正文保留的 48 小时是旧条款，被本次具体补充替代；不能据此把已获准的当前运行误判为超出权限。[E2]
+57: 
+58: 3.2 原生资格的实质与限度
+59: 
+60: 原始回执中的三臂均为 N=224 条记录，标题／描述各 256 token，使用项目的实际 BGE／BF16／checkpoint 更新部件。每臂包含首次实际更新与两次从同一模型／Adam／RNG 状态出发的配对后续更新；三臂合计 9 次实际更新、15 次梯度群呈现。编码器与两层 head 的实际梯度／参数变化及 model／Adam／grad 逐字节一致记录，与当前 native 实现中的调用、恢复和比较位置对应。[E3]
+61: 
+62: 每臂比较 1,967 个张量；LOGIT 为 1,303,136,653 个元素，R0/S 各为 1,301,039,501 个元素。这里的 Adam 阶段计数 288 是明示的手写延续夹具，不表示核验前真的训练了 288 步。原生只核对实际最大形状部件和插入诊断后的后续更新中性；完整 48／6／60 群 capture 的调度与中性证据复用已关闭 CPU／实现审查，不把部件核验说成完整正式流程预演。[E3、E8]
+63: 
+64: 原生内部耗时 285.477382 秒，Torch 2.9.1+cu130、CUDA build 13.0、RTX 5090 的描述来自包内项目记录。网页审查没有重做这些张量运算。
+65: 
+66: 用保存组件时间直接机械复算预算：训练 145,552.560180 秒，纯前向 55,130.462512 秒，小数组保存代理 4.777624 秒，加 3,600 秒预留后乘 1.25，恰得 255,359.750395 秒，即约 70.933264 小时。该值大于原 48 小时、小于获准的 72 小时；存储投影 45,428,115,383 字节约 42.31 GiB。原生资格后对 48 小时的停止是正式启动前的预算拒绝，不是一次已消费 train 读取的正式失败。70.93 小时是最坏合法形状投影，不是正式实际耗时，也不能据二者差异推断某个数值开关或算法的运行时根因。[E3]
+67: 
+68: 3.3 成功退出之外的运行证据
+69: 
+70: wrapper 记录 2026-10-09 20:59:05（+08:00）启动、2026-10-11 00:24:33 退出，exit_code=0，外层 98,728 秒，即 27 小时 25 分 28 秒。预算末账为 98,727.018326 秒，约一秒差来自记录边界；两者均未触及 72 小时。[E4]
+71: 
+72: 正式入口先校验来源／资格／资源，在载模前调用 configure_numerics，保存的生效值为 deterministic_algorithms=true、warn_only=false、两项 TF32=false、cuDNN benchmark=false、CUBLAS=:4096:8。实际配置函数确实调用 PyTorch 设置并读回，并非仅构造外观正确的字典。这里证明的是当前入口和当前保存记录的对应，不回填历史五臂运行当时未知的数值状态。[E3、E4、E8]
+73: 
+74: 独立检查覆盖九条独立路径、27 个阶段的全部 7,776 条更新记录。每阶段 288 行；LOGIT 逐步 Adam 计数与阶段端计数、三臂学习率、当前／历史 UID、损失分解均一致。R0 的 mse1 均为 null，实际目标只构造 A0；S 保留重组监督而保持项仍只用 D0。总梯度群呈现为 12,960。三个顺序中 R0/S 的未训练 model／optimizer／RNG 记录一致，同架构跨顺序起点一致；没有共享训练后的首阶段。[E4]
+75: 
+76: 全部当前六轮顺序以冻结 seed 重新生成，并独立重放元数据层面的 Algorithm R 六群保留和每阶段 288 次历史索引抽样；三臂当前／历史供给及成员配对一致。只读保留成员 UID、出生阶段与目标散列；没有打开 Memory 载荷。存活目标的保存散列沿阶段保持不变，且属于各臂自己的学习轨迹。27 份 Memory 的记录最大为 352,863 字节，小于 1 MiB；不能把全部快照合并成学习器可读取的额外历史。[E4]
+77: 
+78: stdout 中 351 条 update 事件的 point／step 顺序完整对应 27 阶段的 step1、24、48、…、288。监听保存的 first_update 与首条事件完全相同；启动／退出／自删记录彼此衔接。其余 18 个非空非 JSON 行是同一方法更名 FutureWarning 及源码提示，没有在包中发现 failure.json。没有据退出码单独推定训练有效。[E4]
+79: 
+80: 四、27 次恢复、162 诊断与一次读取账
+81: 
+82: 实际 checkpoint 在阶段末保存并恢复 model／Adam／RNG／Memory，重新评分 12 个校准群及 60 个 valid 群，只有逐位相等才登记 full_restore_verified。之后保留推理模型和分数，并删除临时完整 checkpoint。27 个阶段记录的恢复项均为真，阶段点 JSON 与 manifest 完全一致。[E4]
+83: 
+84: 在本包可独立检查的范围内，27 个 epoch6 盲分数数组与对应阶段 raw 分数逐位相同，共 612,360 个分数；epoch6 的 3 项 valid 指标也与阶段原始指标列逐位一致。27 份模型、27 份 Memory 的清单记录与阶段引用身份一致，分别合计 35,237,126,610 和 8,389,549 字节。模型及 Memory 本体没有上传，本审查未独立重算这些载荷的 SHA 或再次恢复模型；核验的是包内声明的身份对应、实际源代码断言和保存结果的一致性。[E4、E10]
+85: 
+86: 27 阶段均有 epoch1—6 六条诊断，共 162；每条诊断的阶段／Adam 步、当前 48 fit 群、阶段存活缓存、全 60 valid 顺序均与分区和日志对应。首阶段缓存为空，后续为六群。valid_labels_used=false 的盲分数与已开放后的保存指标分开存在。另有两份未训练架构盲起点，R0/S 引用共同的 record 起点，不增加第三个架构起点或训练路径。[E4、E6]
+87: 
+88: 实际 execute 顺序是 train → blind_gate → before_valid → parse_once(development) → collect 全指标／计数 → diagnostics.evaluate → finalize → completion。parse_once 在打开标签前先记账，失败也算一次尝试。before_valid 中 train=1、valid=0；最终 access 和 completion 均为 train=1、valid=1、heldout=0、owners=0。上述调用关系、原始记录和分数链没有发现相互矛盾。[E4]
+89: 
+90: 这是一轮作业内的晚开放和一次解析账；valid 在整个研究中已被重复使用。一次本轮解析不使它变成全研究未见的独立确认集。也不能把这份应用层账提升成操作系统层面所有历史访问的独立证明；本轮没有要求、也不需要为了这个限定结论新造系统审计框架。
+
+=== frozen_source/scripts/step28_continual_population_data.py [lines 66-104; total 258] ===
+66: class Group:
+67:     uid: str
+68:     sellers: tuple[str, ...]
+69:     # (item UID, title, description), account order matches sellers exactly.
+70:     items: tuple[tuple[tuple[str, str, str], ...], ...]
+71:     labels: tuple[int, ...] | None = None
+72: 
+73:     def validate(self, accounts: int = 28) -> None:
+74:         if (len(self.sellers) != accounts or self.sellers != tuple(sorted(set(self.sellers)))
+75:                 or len(self.items) != accounts):
+76:             raise ValueError("Account identities or alignment differ")
+77:         item_ids = []
+78:         for rows in self.items:
+79:             if not 2 <= len(rows) <= 8 or rows != tuple(sorted(rows)):
+80:                 raise ValueError("Record multiplicity/order differs")
+81:             for uid, title, description in rows:
+82:                 if not uid or not title or not description:
+83:                     raise ValueError("Empty public item")
+84:                 item_ids.append(uid)
+85:         if len(item_ids) != len(set(item_ids)):
+86:             raise ValueError("Repeated item identity")
+87:         if self.labels is not None:
+88:             if len(self.labels) != accounts * (accounts - 1) // 2:
+89:                 raise ValueError("Incomplete pair labels")
+90:             if any(type(v) is not int or v not in (0, 1) for v in self.labels):
+91:                 raise ValueError("Nonbinary supervision")
+92: 
+93:     def payload(self) -> dict:
+94:         return asdict(self)
+95: 
+96:     @classmethod
+97:     def restore(cls, value: dict) -> Group:
+98:         result = cls(value["uid"], tuple(value["sellers"]),
+99:                      tuple(tuple(tuple(row) for row in rows) for rows in value["items"]),
+100:                      None if value["labels"] is None else tuple(value["labels"]))
+101:         result.validate()
+102:         return result
+103: 
+104: 
+
+=== frozen_source/scripts/step28_continual_population_data.py [lines 198-258; total 258] ===
+198: def tuple_state(value: Any) -> Any:
+199:     return tuple(tuple_state(v) for v in value) if isinstance(value, list) else value
+200: 
+201: 
+202: class Memory:
+203:     """Algorithm R; all retained contents and selection RNG count toward bytes."""
+204: 
+205:     def __init__(self, seed: int, capacity: int = 6, maximum_bytes: int = 1048576):
+206:         self.rng = random.Random(seed)
+207:         self.capacity, self.maximum_bytes = capacity, maximum_bytes
+208:         self.seen = 0
+209:         self.groups: list[Group] = []
+210: 
+211:     def add_stage(self, current: list[Group]) -> None:
+212:         # The runner supplies disjoint frozen stages exactly once. No all-history ID set.
+213:         if len({g.uid for g in current}) != len(current) or {g.uid for g in current} & {g.uid for g in self.groups}:
+214:             raise ValueError("Repeated current group")
+215:         for group in current:
+216:             if group.labels is None:
+217:                 raise ValueError("Replay lacks authorized binary labels")
+218:             self.seen += 1
+219:             index = len(self.groups) if len(self.groups) < self.capacity else self.rng.randrange(self.seen)
+220:             if index < self.capacity:
+221:                 if index == len(self.groups):
+222:                     self.groups.append(group)
+223:                 else:
+224:                     self.groups[index] = group
+225:         self.to_bytes()
+226: 
+227:     def to_bytes(self) -> bytes:
+228:         result = json_bytes({"capacity": self.capacity, "maximum_bytes": self.maximum_bytes,
+229:                              "seen": self.seen, "rng": self.rng.getstate(),
+230:                              "groups": [g.payload() for g in self.groups]})
+231:         if len(result) > self.maximum_bytes:
+232:             raise ValueError("Historical state exceeds the approved byte budget")
+233:         return result
+234: 
+235:     @classmethod
+236:     def from_bytes(cls, payload: bytes) -> Memory:
+237:         obj = json.loads(payload)
+238:         result = cls(0, obj["capacity"], obj["maximum_bytes"])
+239:         result.seen = obj["seen"]
+240:         result.rng.setstate(tuple_state(obj["rng"]))
+241:         result.groups = [Group.restore(row) for row in obj["groups"]]
+242:         if len(result.groups) != min(result.capacity, result.seen) or result.to_bytes() != payload:
+243:             raise ValueError("Memory serialization differs")
+244:         return result
+245: 
+246: 
+247: def seed_for(seed: int, *parts: Any) -> int:
+248:     return int.from_bytes(hashlib.sha256(json_bytes([seed, *parts])).digest()[:8], "big") % (2**63 - 1)
+249: 
+250: 
+251: def schedule(groups: list[Group], epochs: int, seed: int) -> list[Group]:
+252:     rng = random.Random(seed)
+253:     result = []
+254:     for _ in range(epochs):
+255:         rows = sorted(groups, key=lambda g: g.uid)
+256:         rng.shuffle(rows)
+257:         result.extend(rows)
+258:     return result
+
+=== frozen_source/schema/step28_chinese_base_policy.json [lines 73-126; total 247] ===
+73:   "initialization_seed": 20260909,
+74:   "schedule_seed": 20260918,
+75:   "epochs": 6,
+76:   "score_epochs": [
+77:     3,
+78:     6
+79:   ],
+80:   "primary_epoch": 6,
+81:   "physical_updates": 3456,
+82:   "input": {
+83:     "token_budget": 256,
+84:     "microbatch": 4,
+85:     "encoder_bf16": true,
+86:     "activation_checkpointing": true,
+87:     "head_hidden": 128,
+88:     "account_pooling": "Per intervention; see representation",
+89:     "loss": "Unweighted mean BCE plus fixed intervention rank_weight times ranking objective"
+90:   },
+91:   "optimizer": {
+92:     "name": "AdamW",
+93:     "encoder_lr": 2E-05,
+94:     "encoder_weight_decay": 0.01,
+95:     "head_lr": 0.001,
+96:     "head_weight_decay": 0,
+97:     "betas": [
+98:       0.9,
+99:       0.999
+100:     ],
+101:     "eps": 1E-08,
+102:     "foreach": false,
+103:     "clip_norm": 1
+104:   },
+105:   "evaluation": {
+106:     "maximum_fpr": 0.001,
+107:     "minimum_recall": 0.5,
+108:     "required_domains": [
+109:       "A",
+110:       "B",
+111:       "C"
+112:     ],
+113:     "decision": "Each domain must pass both empirical point-value gates at the same calibration-only global threshold; no automatic winner",
+114:     "threshold_rule": "For each calibration domain allow floor(negative_count/1000) false positives; float64 nextafter of the next negative order statistic toward +infinity; global maximum; prediction is float64(logit)>=threshold",
+115:     "reference_threshold": 0.0,
+116:     "bootstrap_replicates": 5000,
+117:     "bootstrap_seed": 20260918,
+118:     "confidence_level": 0.95,
+119:     "heldout_access": false,
+120:     "owners_access": false
+121:   },
+122:   "supervision": {
+123:     "linux_train_parses": 1,
+124:     "linux_development_parses": 1,
+125:     "calibration_used_for_gradients": false,
+126:     "partial_evaluation_allowed": false
+
+=== evidence/attribution_external.zh.txt [lines 129-155; total 363] ===
+129: 6.1 经核对的主要 MAP 差值
+130: 
+131: 比较 | O 差值 [条件95%区间] | N 差值 [条件95%区间] | Z 差值 [条件95%区间]
+132: R0−LOGIT0.1 | +0.010473228 [0.001575118, 0.019370052] | +0.000984269 [-0.009008174, 0.010438589] | -0.004765650 [-0.018544047, 0.008818927]
+133: S−R0 | +0.016435877 [0.005107917, 0.028173005] | +0.015998564 [0.006573217, 0.025871752] | +0.030924452 [0.016795443, 0.045505259]
+134: S−LOGIT0.1 | +0.026909104 [0.015890726, 0.038316505] | +0.016982833 [0.004613102, 0.029339358] | +0.026158801 [0.009328718, 0.043351296]
+135: 
+136: 第一组支持“记录结构系统带来旧域 O 的平均 MAP 收益”；新域 N、最终最新域 Z 的方向未确定。R0−LOGIT0.1 的 O Recall@5、ROC-AUC 也有正向区间，可作为同一固定条件下的辅助描述，但不能据此说全部新域能力无代价。R0−LOGIT 的 final_all MAP 区间也跨零；O 正向不是所有总体或逐域指标均正向。[E5]
+137: 
+138: 第二组支持“在相同记录架构之上，加入重组监督这一整体策略使 O/N 平均 MAP 提高”。S−R0 三顺序 O 点差为 +0.022689682、+0.020313467、+0.006304481；N 为 +0.037562423、+0.001745797、+0.008687471。方向在这三个固定顺序的均值上相同，但 BCA 的 N 增量很小。不能把这个一致方向称为跨 seed 稳定优势或逐实际域保护。[E5]
+139: 
+140: 第三组确认 S 相对 LOGIT0.1 的系统总差异。O 的 +2.690910 MAP 百分点可以分解成当前路径中的 +1.047323（R0−LOGIT）和 +1.643588（S−R0）；这是同一批保存输出上的线性差值分解。未设置“账号结构＋重组”的第四臂，不能识别结构与重组交互，也不能给出交换干预顺序后的贡献或普遍因果贡献百分比。
+141: 
+142: 6.2 两个差异各自包括什么
+143: 
+144: R0−LOGIT0.1 同时改变记录／账号的汇总顺序、head 输入维度和函数族、历史目标表示及计算／dropout 路径。因此“整套记录结构系统效果”是准确表述；“纯池化收益”“单独是记录 Memory 更好”或“已隔离某一算子根因”均超出本轮识别能力。
+145: 
+146: S−R0 共享记录架构、未训练起点、样本供给和更新预算，改变当前群与历史群的 A0/A1 平均监督；后续自身保存的历史评分也随轨迹改变。因此可识别的是“加入重组监督策略”的整体增量，不能只归因于当前重组、历史重组或固定教师下的直接效应。没有新增独立预训练教师；“历史目标”仍是该路径过去保存的数值。[E2、E4]
+147: 
+148: 6.3 N 的增量主要来自 Z，不能改写成学得更快
+149: 
+150: S−R0 的 A2 MAP 差为 +0.001072676，区间 [-0.009891257, 0.012091655]；Z 差为 +0.030924452，区间全正。由 N=(A2+Z)/2，N 的 +0.015998564 中，A2 的半权贡献为 +0.000536338，Z 的半权贡献为 +0.015462226。这支持“本轮平均新域收益主要出现在第三阶段”，而不是第二、第三阶段同样受益。[E5]
+151: 
+152: 第二阶段新域的 S−R0 点差分别为：ABC 的 B +0.022623006、BCA 的 C -0.012410267、CAB 的 A -0.006994712；第三阶段新域则分别为 +0.052501840、+0.015901862、+0.024369654。这是完整既定单元的描述，不添加逐单元显著性结论。
+153: 
+154: S−R0 的 G MAP 差为 -0.000293983，区间 [-0.011498040, 0.010855946]，方向未确定。根据定义，ΔN=ΔG＋学习新域前平均水平的差；该学前水平点差约 +0.016292547。此代数关系与“此前阶段迁移／学前状态／后续轨迹共同作用”相容，不能进一步确认其中哪个机制。N 更高不能写成每次新域学习增量更大或学习更快。主执行者在这一点上的保留是正确的。
+155: 
+
+=== evidence/attribution_external.zh.txt [lines 306-338; total 363] ===
+306: 十一、实际阅读／计算范围与未核验事项
+307: 
+308: 11.1 人工语义审读
+309: 
+310: 完整阅读：report.zh.txt（139 行）、source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md（97 行）、authorization_72h.json、analysis/analyze_saved.py（245 行）、step28_record_attribution_run.py（630 行）、step28_replay_diagnostics.py（196 行）、本轮 policy／wrapper／正式监听源码，以及 implementation_primary、numerics_fix、numerics_native、formal_autostart 的本包正文。
+311: 
+312: 针对性选读：record_replay.objective／backward_group／update 与 Memory；原生 verify.native 主体及资格入口主要段；公共 configure_numerics、seed_for／json_bytes、学习率／抽样公式；旧统计 fields／endpoint_fields／summarize_field；校准参数、变换、排序保持与 fit；parse_once 及分类计数相关公式。旧 implementation_review 只读结论分类、R1、RD-P1、失败／复用边界和相关建议段，没有声称全文重新审查全部历史实现。
+313: 
+314: run/manifest、evaluation、collected、diagnostic report 等大型 JSON 是程序完整解析、对关键逻辑与聚合结构作语义审读；不是逐个手工观察每一个随机状态元素或每一个矩阵单元。29 来源均核对实际字节并做依赖闭包 AST 检查，其中未变而未进入上述必要代码段的内容没有声称逐行重审。精确路径、行段和程序用途见 reading_scope.csv 及 reading_scope.zh.txt。
+315: 
+316: 11.2 计算覆盖
+317: 
+318: — 唯一包身份、1,265 载荷身份、同步／分析清单、原／当前来源快照及 29 项依赖闭包。
+319: — 九起点、两架构盲起点、27 阶段、全部 7,776 更新、12,960 梯度群呈现；当前六轮顺序、Algorithm R 成员、历史抽样、学习率、损失分解、目标散列延续及一次读取账。
+320: — 83 套 60×22 指标矩阵／计数；29,880 个从计数重算的逐群分类指标；所有阶段／实际域和 pooled 计数汇总。
+321: — 三绝对方法、三差值、四角色、八端点、22 指标的 25,344 个均值／顺序值／区间端点；CSV 导出完整性。
+322: — 全部 162 条诊断与 51 个非空面板；六轮曲线、条件区间、解释标签、N/A 和 432 项残差代数关系。
+323: — raw／stage-cal／first-cal 保存分数变换、预测阳性数量与分类计数、epoch6／阶段终点一致。
+324: — 主报告 126 个主要表格显示单元格、成本和原生预算投影的机械算术。
+325: 
+326: 所有 1,266 文件均至少作字节身份核对。主复算程序共以 allow_pickle=False 读取 841 个不同 NPY 数组；阅读清单明确区分“哈希读取”“JSON／AST 结构解析”“保存数组计算”“人工全文／段落审读”，避免把机器读取字节写成人工全文阅读。
+327: 
+328: 11.3 本次明确没有独立核验的事项
+329: 
+330: （1）未从原始标签重算 MAP／pair AP／PR-AUC／ROC-AUC／检索等 22 指标定义；指标实现的资格复用已关闭审查。本次独立重算的是保存矩阵的统计及可由分类计数重算的 6 项指标，不能把它夸大成原始真值到全部指标的第二条独立计算链。
+331: （2）未重新生成任何校准映射，因为没有校准标签；只核对保存映射、声明拟合回执、正斜率、变换和派生结果。
+332: （3）没有模型／Memory 实体，未重新散列 Linux 载荷、再次完整恢复或执行下一训练步；包内 payload 身份比对属于元数据核对。27 次实际恢复及原生全张量比较属于经来源核对的项目保存证据。
+333: （4）没有实时查询项目进程、磁盘、GPU 或实际系统调用。退出、资源峰值、监听自删及读取次数依据本包记录与实际入口衔接，不是实时服务器测量。
+334: （5）没有重审历史全部实验、独立校验旧 C/C_plus 结果原件或隔离 R1；也没有验证外部文献的新颖性。
+335: （6）没有多 seed、未探索域、新生成数据或真实中文市场验证；条件区间不包含这些不确定性，也不调整重复开发选择造成的偏倚。
+336: （7）没有独立核实网页模型选择和后台路由。
+337: 
+338: 以上是此次授权与材料的明确边界，不是自动要求补实验、索取封存数据或阻断当前有限结论的理由。
+
+=== evidence/record_static_primary.zh.txt [lines 1-12; total 116] ===
+1: 记录作用表方案：独立主审处置
+2: 2026-10-07，Asia/Shanghai。
+3: 
+4: 一、决定及其边界
+5: 
+6: 接受外审“现阶段不值得推进”的结论，撤回主执行者在原 proposal.zh.txt 中“值得进入受限验证”的推荐。当前候选停在静态方案阶段，不推进实现、CPU/GPU探针或正式训练。
+7: 
+8: 决定不是把外审意见自动当命令。主执行者已全文读取回收正文，核对决定性的原稿定义、冻结生成器和基线直接路径，重新手推相关反例，并独立访问CKD/RKD一手方法章节。主要依据是：新增教师查询的结构事实成立，但其相对已知缓存/组合蒸馏的实质必要性没有建立；重组引入的输入变化与当前账号固定风格机制直接冲突；为获得可查询有限教师而限制预测族的收益未能抵偿已知表达和计算代价。两处局部勘误修完也不能补上这条收益链。
+9: 
+10: 这是未实施候选的研究选择，不是新的有效性能负结果、工程无效实验、已测资源失败，也不是整个记录建模/函数重放家族被否定。原稿、上传包、旧结果、验收、失败账和权重删除事实均保留原样。用户“如果还不行就继续找下一个直至可行”“不行就继续找”的持续研究要求仍有效，最终算法尚未确定。
+11: 
+12: 二、实际回收与阅读范围
+
+=== evidence/record_static_primary.zh.txt [lines 64-116; total 116] ===
+64: 四、决定性研究问题：新增查询是否对应真实需要
+65: 
+66: 已直接读取包内generation/step28_continual_expression_data.py的public_override、render、make_group及catalog的标题/描述/服务样式。make_group在账号记录循环外固定账号style；public_override按账号/轴独立发生，render逐条使用该style。这支持账号固定样式的判断，不支持旧群级共因假说。此处仅读生成源码与公共生成资源，没有读owners或正式记录。
+67: 
+68: 独立手算：同控两个账号各两条，某个可区分风格轴为{a,a}与{b,b}。第一个新袋的六种二记录子集里四种含a和b，所以2/3的均匀重组变成两个{a,b}袋。这样的同一轴混合不是原固定账号style机制产生的事件。若k仅识别该轴相同，原正账号对分数0，两个混合袋分数1/2，重组期望1/3；不同控制者用另外两种风格，跨控制者分数仍为0。该例说明标签条件增强可制造便于分类的共有混合成分信号。概率2/3只属于这个明确2+2条件例，不是本项目正式数据发生率，更不是已测BGE捷径。
+69: 
+70: 接受支持集改变及潜在捷径判断；不接受将其升级为“增强必然有害”“新架构必然输”。重组保持关系标签，却没有足够论据表明它实现了当前任务需要的不变性。C/S共享增强也不能替代这一问题。
+71: 
+72: 另一个确定代价来自预测族本身。对固定Y，记录对均值评分必满足
+73: s(X_mix,Y)=alpha s(X_a,Y)+(1-alpha)s(X_b,Y)，
+74: 其中X_mix的经验分布是两个经验分布的该凸组合。重新训练BGE与记录头仍不能破坏这个恒等式。若两种纯账号都应高分、其混合却因内部不一致而低分，新结构无法表示。原账号均值/标准差后的非线性头可以表达某些这种方差/一致性规则。反过来，新结构也可能保留旧池化压缩丢失的信息，故不声称旧模型全面包含新模型。
+75: 
+76: 原稿坦白了这些风险，但坦白风险不等于建立正向动机。当前还没有证据表明LOGIT的关键瓶颈正是只能查询原账号组合，或新增记录表方向恰好可迁移到旧域未见身份。精确保留来源在该重组族上的选择，仍可能只更完整保存其偏差。
+77: 
+78: 也不能把第一反例中的两个来源解称作“完整增强训练目标等价”：来源从首域就接受两视图监督，其表项并非完全未受约束。成立的结论只是原378输出不能唯一确定更多查询；有限增强监督是否足以让额外查询可靠仍未证实。
+79: 
+80: 五、最近邻的独立处置
+81: 
+82: 本轮独立读取CKD作者版v1的§3.1—3.3及RKD的§3.2；CKD正式WACV PDF打开失败，不能将v1方法细节写成已核对正式版全文。
+83: 
+84: CKD：https://arxiv.org/html/2311.02253v1
+85: §3.3把已缓存教师表示随机分组，按质心聚合后比较，无须新增教师调用。这支持“缓存可组合目标产生更多关系监督”已有直接基础。CKD的向量差/softmax/KL与本稿标量记录对表/账号分数/MSE不逐式相同；本稿不是因此被证明完全同法。
+86: 
+87: RKD：https://arxiv.org/html/1904.05068
+88: §3.2式(4)将关系势作为传递对象，距离/角度实例允许某些内部表示变化。这支持“只约束关系可见信息”是旧原则，不证明它已覆盖本稿全部L_A结构。
+89: 
+90: 原稿已经承认Multi-Instance Kernels的集合聚合、DER的历史输出、FunMatch的同增强匹配，以及PseMix/持续MIL的袋重组与细粒度记忆；本轮复用其原阅读说明，没有把外审新增ConSlide/ReMix摘要升级为自己已读全文。
+91: 
+92: 主执行者的推断是：本案真实区别在于刻意选取可分解模型，把一个有限输入族上的教师查询写成可存表接口；但数学闭合主要是该分解的直接后果，尚无足够证据使这一取舍超出自然适配并优先值得投入。没有作“绝对无创新”或“单篇已完全覆盖”的事实断言。
+93: 
+94: 六、对照与资源意见的处置
+95: 
+96: C/S比较有意义，后续阶段各用自身来源也正确。但蒸馏部分实际为
+97: C=0.25 MSE_0+0.25 MSE_1，S=0.50 MSE_0。
+98: 所以C−S比较的是保护权重从原输入向新分配重新分配的完整策略，不能单独证明新增查询信息的净贡献。L_A1 d=0、L_A0 d!=0时，C仅施加S一半惩罚。原稿已说明质量分配，需收窄“隔离查询范围”的解释，不将S判为无效对照。若未来确有正收益并需要净信息归因，再由具体新合同考虑原分配半权重对照；本轮不新增第三臂。
+99: 
+100: F的平方应施于加权误差，即F=d^T diag(Q_hat)d，而非sum L*d²或均匀全表MSE。它去交叉项，但不自动匹配真实梯度强度。F/同实际计算直接重放是有条件的后续建议，不成为被否决候选当前必须执行的消融。
+101: 
+102: 六张最大FP32表599,424B是确定算术，完整813,405B仍为跨旧格式差额估算，8,192B是估计；原稿已披露，不能指控为已发生超限或隐瞒。实际若用JSON十进制数组就不能按每值4B计。所有历史正文/token、标签、索引、来源、RNG及持久附属状态仍需纳入1MiB。
+103: 
+104: 最大头第一层乘法比约33.04成立，但不是全模型实测慢33倍；分块头重算、BGE编码/反传/激活重算、来源表构建与推理另计。没有候选资源实测，不批准或否决具体GPU容量。
+105: 
+106: 4,320物理更新、15个不重复物理状态、18个逻辑阶段点的算术成立。“15独立模型点”应改称“15个不重复物理模型状态”，不具有统计独立性。既有按实际域配对整群bootstrap可复用其定义；不能把重复顺序贡献独立重采样，也不能让已开发valid重新成为确认集。CPU180秒/GPU600秒/24GPU小时、所有比较和继续门均没有转为执行许可。
+107: 
+108: 七、关闭与后续研究
+109: 
+110: 本轮必要工作为收回原件、核对身份、独立处置关键意见、更新入口及交付；没有增加候选实现、测试或执行框架。两处勘误和术语/归因修正集中保存在本处置中，冻结送审稿不追改，不另造修订方案来为当前候选翻案。旧函数记忆的有效配置负结果及其已关闭原生核验证据继续复用，没有重算旧实验或重新读取标签。
+111: 
+112: 下一候选仍须面向可训练编码器与关系模型、有限历史信息和旧分布未见身份，先有针对目标的可论证收益链及最近邻差异，再谈可计算闭合；不能通过固定BGE、改名复活当前重组或给LOGIT增加常规模块交差。继续公开一手文献及数学研究的许可有效；具体新方案先完整向用户汇报，其上传、实现、数据和预算按新的明确范围处理。本次只关闭当前候选审查，持续研究目标尚未完成。
+113: 
+114: 科研状态：静态不推荐，外审回收与独立主审关闭；未训练，效果未知。
+115: 执行/同步状态：本轮无Linux连接、科研程序或新数值实验、新正式数据/标签/模型/完整Memory读取，因而没有新增Linux同步任务。
+116: Git交付：按实际提交与远端ref核对结果另向用户报告，不在本报告预写推送成功。
+
+=== evidence/crossfit_result_primary.zh.txt [lines 46-78; total 78] ===
+46: 原报告第6节“21项未见明确迹象”数值判读没有错误，但原Linux参考摘要只是转录判读标签。外审N03／N07指出的是解释显著性和覆盖范围，未发现正式诊断错误。主执行者已核对原函数并以本次Linux补核独立重建21项，不修改冻结诊断实现或已有标签。
+47: 
+48: C_cf，固定epoch1→6的MAP变化：
+49:                     训练侧提高     valid提高      训练—valid差距扩大及条件95%区间
+50: A缓存／A-valid      +0.135090957    +0.011248768   +0.123842190 [0.080285517,0.164270690]
+51: B-fit／B-valid      +0.100672435    +0.018695139   +0.081977296 [0.058732464,0.104423484]
+52: 
+53: 两种差距扩大均有当前条件区间支持；不能因原判据未触发而省略。原判据要求“训练改善、valid下降且差距扩大”，而这里valid的epoch1→6点估计也上升，B-valid提高的区间[0.000567712,0.036289674]还全正，因此没有触发。A-valid提高区间[−0.007061710,0.030520719]跨零。共同A的log_loss则是训练／valid都变差，不能把同一“未见明确迹象”标签普遍解读成训练健康。
+54: 
+55: 应同时区分三个问题：本臂第1至6轮是否改善；训练与valid差距是否扩大；本臂最终是否优于完整S。这些问题可以得到不同答案。本轮C_cf训练侧拟合明显提高、与valid差距扩大、最终又未建立对S的排序提升；它们描述泛化收益未得到证实，尚不足以确诊“缓存过拟合”是失败根因，也没有排除过拟合。不据第4轮局部高点改选模型。
+56: 
+57: 5. finding处置与当前需要修改的范围
+58: 
+59: N01：接受，维持本固定s0／A→B／两折／开发群条件下“未建立改进”；无正式数值修改。
+60: N02：接受，原报告三种校准角色及误报取舍已满足，继续保留。
+61: N03：接受，以上第4节补齐既有训练—valid差距数值与未触发原因。
+62: N04：接受，维持一次固定可行赋值比较的归因边界，不称无O对照或总体置换检验。
+63: N05：接受，非零新项支持正式消费；损失值、0.5系数或含监督的总梯度范数不能直接说明纯保持项强度、信息质量或根因。
+64: N06：接受，独立路径成本和本批六群Memory口径已充分保留。
+65: N07：接受并补足，明确原Linux审计的标签转录范围，外审重算及本次主审独立判读均一致。
+66: O01—O03：不采纳为本轮自动新增工作；没有新臂／seed／折／错配／选轮／旧C独立诊断，也不索取标签／模型／Memory／F/O／封存资产，不重开创新或全历史实现审查。
+67: 
+68: 必须修改的训练／评价缺陷为0；实际落实的是第4节说明及独立判读覆盖记录。纯粹把未来可能有用的实验列为阻断没有依据。
+69: 
+70: 6. 证据限制、保管与收尾
+71: 
+72: 网页自身run01、run02及补充attempt01的源码、错误栈、输出和后续成功记录保留；早期展示脚本W00的首轮完整日志未保存，返回的是明确标注的重放，不冒称首次原件。build_initial来源也明确标为按精确差异恢复、散列匹配；这些不是正式训练失败。更早实施外审的tar错误原日志未在本次送审包内，外审只依收到的历史叙述；本轮不据此虚构完整重读或追加无关历史核验。项目首轮原生及原Linux分析字段错误账保持。
+73: 
+74: 本轮条件区间仅覆盖给定训练结果下每域20个完整群的抽样，不覆盖重训seed、折、错配、生成或反复开发选择的不确定性；没有独立最终留出或真实市场外推，也没有多重检验后的总体结论。
+75: 
+76: 四份本次推理权重已于09:57依用户指令留证删除，六Memory及必要评分、指标、诊断和来源仍保留。外审正文关于权重留存的说法是原输入形成时的保管事实，以docs/STORAGE.zh.md和reports/maintenance/20261013/crossfit_weights/receipt.json为当前事实，不修改冻结原件。
+77: 
+78: 本固定C_cf合同按“有效完成，主要改进假设未获支持”结束，完整S继续作为主要内部对照；不把本配置收尾解释为整个C方向已被证明无效，也不自动启动后续实验。当前研究需要的不是修改本次结果直到有利。若以后继续C线，须有新的具体依据与前瞻范围。新材料仅本地Git，旧指定提交的公开许可不移用。网页完整回收／本主审完成后关闭；同步和关闭事实记录在submission.json。
+
+=== context/SELLER_ALIAS_RECORD_REPLAY_PILOT.zh.md [lines 1-45; total 45] ===
+1: # 记录作用表与同控重组：完整开发实验合同
+2: 
+3: 2026-10-07。用户在静态外审关闭后提出“做完整的实验来尝试一下……具体效果”，随后明确确认本合同的两臂、三顺序、4,320 更新、180 秒 CPU／600 秒 GPU 核验、24 小时正式运行、32 GiB 输出、train/valid 各一次及失败不自动重跑范围。该决定改变后续执行方向，不改写[原方案](../reports/documentation/20261007/record_replay/proposal.zh.txt)、[外审原文](../reports/documentation/20261007/record_replay/external/review.zh.txt)和[主审处置](../reports/documentation/20261007/record_replay/report.zh.txt)关于创新不足、未推荐优先投入及尚无性能证据的判断。
+4: 
+5: ## 问题与比较
+6: 
+7: 实际训练可更新的 BGE 与记录配对头，检验完整候选 C 的具体效果，以及相对同架构对照 S 和已保存 LOGIT0.1 的差异。仅 s0、ABC/BCA/CAB；三个顺序不是三个随机种子。历史 valid 已用于开发，本次为固定配置开发实验，不是独立最终确认。
+8: 
+9: 沿用[首轮合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md)的数据身份、48 fit／12 calibration／20 valid 每域、每阶段六轮 288 更新、优化器、阶段学习率、校准、22 指标及配对域群 bootstrap。三条首域路径必须由新架构重新训练，C/S 从各自顺序同一完整 model/Adam/RNG/Memory 分支；每臂再训练两个阶段。因此实际更新为 3×288＋2×3×2×288＝4,320，梯度群呈现 7,776 次，15 个实际阶段状态、18 个逻辑阶段点。另有一个共同未训练初始化的盲评分。LOGIT0.1 只复用固定保存矩阵，不载入旧头或重训。
+10: 
+11: ## 具体运算
+12: 
+13: 每条完整记录的标题和描述分别经过 BGE CLS 编码，各自 L2 归一化后拼接并除以 √2，形成 2,048 维记录表示。使用全部 2—8 条／账号记录，28 账号／群，最大 224 记录；256 token 上限、microbatch 4、BF16 encoder、FP32 参数／归一化／头，禁止截断。记录对头为 `[|u-v|;u*v] → Linear(4096,128) → ReLU → Linear(128,1)`，无头 dropout。输入不含 ID、域、controller 或历史状态。
+14: 
+15: 计算完整无对角无序记录对表 K，包含原本属于同一账号的记录对。原分组 A0 与同控重组 A1 都以 `P_A K P_Aᵀ` 的 378 个上三角值评分。P 每行在该账号槽的记录上为 1/n。训练标签只用于验证 8 个 K2 和 4 个 K3，并在各连通分量内独立均匀打乱完整记录、按原账号槽数量切分；不跨群／控制者、不丢失／复制记录、不拆开标题描述。每次群呈现重采一次 A1；两个视图共享同一次 live encoder dropout 与 K。评价只用 A0，不读取标签或推断分量。
+16: 
+17: 令 B 为已有 BCE＋query-rank＋0.5 top5-hard，B̄＝(B(A0)＋B(A1))/2。首域目标为 B̄(current)。后续目标为 `B̄(current) + 0.1 B̄(history) + 0.5 D(history)`。C 的 D＝(MSE(A0)＋MSE(A1))/2，S 的 D＝MSE(A0)。C/S 的监督增强、架构、记忆格式、抽样均相同。C 将原分组 teacher 权重从 S 的 0.5 分摊为 0.25＋0.25；比较只能归因于这项整体约束策略，不能声称只增加一个无代价信息项。
+18: 
+19: 每步当前群和历史群梯度累加后统一 clip=1、一次 AdamW。记录表的显式 VJP 先得到 dJ/dK，再按 512 对分块重算无随机头、累加头梯度和 dJ/dZ，最后恰好一次传回原 live BGE 图；不能将 detached 表当作完成 encoder 训练。独立直接 autograd 参考需比对每个参数梯度和真实 Adam 更新，并检查移除 A1 项的差异。
+20: 
+21: ## 记忆、随机性和恢复
+22: 
+23: 沿用同样的模型无关六群 Algorithm R；当前域 48 群按 UID 排序，每群恰好插入一次，阶段内成员不变。来源表为该群首次在所属域末保留时的 eval 模型完整 FP32 K。只计算阶段 1/2 新保留群的表，存活旧群表永不刷新；淘汰即移出学习器，不从归档取回。阶段 3 不构造无后续用途的新表。表以 FP32 二进制存储；全部历史文本、监督、顺序、索引、来源、计数、随机流和校准／RNG 辅助状态序列化后合计 ≤1,048,576 字节，实测超限即停止，不缩群、不降精度。
+24: 
+25: 沿用初始化 seed=20260909、current schedule=20260918、memory=20260930；dropout、history draw、retention、regroup 使用分开的有名随机流，C/S 不包含臂名以保持配对。重组以顺序、阶段、局部步、当前／历史角色和 UID 派生种子，不保存无限日志作为训练输入。
+26: 
+27: 每个阶段完整保存／恢复 model、Adam、RNG、Memory 并对全 12 校准群和全 60 valid 群逐位核对分数。保存 15 份推理状态；每个顺序的首域完整分支仅在两臂都完成后删除临时 full 文件，其余验证完成的临时 full 文件随阶段删除。正式推理权重和原始科研证据保留，不因正负结果删除。新目录运行，不覆盖旧证据。失败保留现场，不自动重试；CPU 实现缺陷可在原 180 秒累计计算预算内修复重验，失败记录和耗时不清零；GPU 探针或正式失败须先报告具体恢复方案。
+28: 
+29: ## 三种权限与结果
+30: 
+31: 技术读取：仅 Linux 既有 py310 读取固定 train／development 文本、必要公开元数据和 BGE；新运行 train 标签一次解析供离线分发器，学习器只接收当前 fit 与自身存活记忆，校准器只接收当前域 12 群。valid 标签一次，失败尝试也消费次数；test、owners、Audit 和 private_custody 不读取。历史 LOGIT0.1 只读已开放的固定矩阵／计数和身份文件。手写核验不使用正式数据／标签。
+32: 
+33: 结果开放：全部 4,320 更新、15 状态、完整恢复核对、校准／三角色盲分数、来源与预算检查通过后，才一次开放全 valid 结果。先保存全部矩阵和计数再比较，不看中途 valid 指标。纯训练损失、资源、无标签评分完整性可监控。
+34: 
+35: 根据结果选择：本轮没有自适应候选或自动调参；正负均报告并结束。原方案提出的开发验收分别作用于 C−S 与 C−LOGIT0.1：O MAP 差的配对 95% 下界 >0；final_all MAP 均差 >0；A2 MAP、Z MAP、O AP 差的下界 ≥−0.01；两比较均五项全过才称本轮达到目标。0.01 是原方案的一个绝对点开发取舍，不称总体非劣效界。完整输出各臂三角色、所有 22 指标、O/N/Z/F_first/F/G/final_all/A2、每顺序／域、计数及条件区间；不按单个显著结果改主终点。F 全表蒸馏、半权重对照、算力匹配对照、多种子和新数据不在本合同。
+36: 
+37: ## 执行前提、预算和停止
+38: 
+39: 先完成受影响的手写 CPU 核验（累计 ≤180 秒、1 CPU、2 GiB RSS、16 MiB 证据），与合同及实现一起经网页 GPT 6 Pro 外审和主执行者处置。旧创新／研究优先级意见如实保留；本次实现审查解决实际科学有效性、代码和复现问题，不以争取改判创新为前提。外审建议不自动扩展本轮。
+40: 
+41: 实现审查的实质问题关闭后，只运行一次手写最坏形状原生 GPU 探针：N=224、标题／描述各 256 token、完整 C 当前＋历史目标和首次 Adam 分配，≤600 秒、28 GiB CUDA reserved、64 GiB RSS、128 MiB 证据、不留 BGE 权重。记录实际 encoder/head 梯度、变化、全部 VJP 路径、峰值和耗时；通过后估算正式完成时间，超 24 小时可行性即停止，不偷偷放宽。
+42: 
+43: 正式运行单卡累计墙钟 ≤86,400 秒（含启动、校准、恢复、评价和清理）、输出 ≤32 GiB、CUDA reserved ≤28 GiB、RSS ≤64 GiB，单 CPU 线程。启动前 GPU0 无他人或重复项目作业、空闲显存 ≥30 GiB、可用主存 ≥72 GiB、可用磁盘 ≥32 GiB。资源不足依既有一次性监听授权等待，不能绕过审查、核验或另起重复作业。监控须给实际观测时间、依据和预计区间；尚无探针时不编造 ETA。
+44: 
+45: 原方案 Q 的支配关系只对包含 A0 的混合测度成立，重组分布本身不保证；完整表含分组函数不可见方向，有限记录恒等不证明总体／泛化。生成器的账号固定表达风格与同控重组的分布偏离、线性记录均值类表达能力和更高记录对成本，均保留为解释边界。实测失败不否定整个方法家族，实测优势也不自动证明创新或普适性。
+
+=== frozen_source/docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md [lines 51-97; total 97] ===
+51: 每阶段完整保存并恢复 model／Adam／RNG／Memory，在 12 校准群与 60 valid 群逐位核对分数；保留 27 份推理状态和必要科研证据。没有共享首阶段，因此只需一个当前临时完整检查点，恢复核对后即删除该临时文件。阶段权重待后续诊断／复核／审查及恢复依赖消失后，按既有用户要求先留记录再清理；不能只因负结果删除。
+52: 
+53: ## 6. 结果判读
+54: 
+55: 本轮作为归因诊断，不新增一个“总通过”门，也不把五臂原 23 项改为更容易通过的新验收。两个主要比较各以 O MAP（最终两个旧域平均）和 N MAP（后两阶段刚学完的新域平均）并列为主要观察；分别给实际差值、三顺序结果和配对条件 95% 区间。固定 S−LOGIT0.1 为第三个系统比较。旧合同的五项／23 项及历史 false 永远保留，不因本研究改写。
+56: 
+57: 继续完整报告原 22 指标、三个保存角色与 primary、O/N/Z/F_first/F/G/final_all/A2、全部阶段／实际域结果和分类计数；保留 raw 与校准的不同结论。沿用实际域整群配对 PCG64(20260930) 的 5,000 次 bootstrap，各方法／阶段／顺序共用群抽样。区间是给定模型与反复开发数据的条件区间，不覆盖训练种子、生成、选择不确定性；多个辅助区间不称多项独立显著性证据或总体多重检验通过。
+58: 
+59: | 观察 | 允许的解释及下一步建议 |
+60: |---|---|
+61: | 某端点差的区间全正／全负 | 该固定条件下有正向／负向证据，明确比较和端点 |
+62: | 区间跨零或触零 | 方向未确定；不说等效、无作用或无损失，不据此自动选择更复杂方法 |
+63: | 旧域正向、新域负向 | 存在旧／新取舍；不能说不牺牲新学习 |
+64: | 旧域正向、新域跨零 | 旧域收益有证据，新域代价未确定；不能说已证实非劣效 |
+65: | 两个主要端点均正向 | 两端点在本固定条件下均有正向证据，仍须检查逐域差异及成本；不等于研究问题全部解决 |
+66: 
+67: R0 有收益而 S−R0 未建立收益时，优先围绕较简结构整理后续研究，但不将跨零当等效。S−R0 有收益时，区分首阶段学习、后续新域学习与保持；本实验同时改变当前和历史监督的重组，不能进一步归因于其中一支。首域起点较低导致 F 看起来较好时必须并列报告绝对表现，不能直接声称改善持续学习。两比较都缺乏稳定收益时保留旧正结果与新差异，重新审视路线。生成器的账号固定风格与重组样本分布差异仅为待证假说，不能事后直接判为根因。
+68: 
+69: ## 7. 新资源预算
+70: 
+71: 沿用指定 Linux、既有 py310、单 CPU 线程／单 GPU；本轮新预算独立于已结束实验，旧失败与历史预算记录不清除。
+72: 
+73: | 阶段 | 累计计算墙钟上限 | 内存／产物 |
+74: |---|---|---|
+75: | 手写 CPU 增量核验 | 300 秒 | RSS≤2GiB、证据≤64MiB，无 GPU／预训练载模／正式文本或标签 |
+76: | 手写原生 GPU 核验 | 600 秒 | CUDA reserved≤28GiB、RSS≤64GiB、证据≤128MiB，无正式文本／标签，不留核验权重 |
+77: | 正式三臂全过程 | 48 小时 | CUDA reserved≤28GiB、RSS≤64GiB、作业新增产物峰值≤48GiB；含启动、诊断、校准、恢复、统计及收尾 |
+78: 
+79: 按已保存五臂最大合法形状原生实测，只替换本轮计数机械估算：记录梯度群 8,640、LOGIT 梯度群 4,320；含两个盲起点的纯前向记录群上限 15,252、LOGIT 7,440；27 推理权重、至多一个当前完整状态、2GiB 小产物预留。沿原 25% 时间裕量、3,600 秒保存／统计预留及 10% 存储裕量，约 44.28 小时／42.31GiB。这是预算依据，不是新代码资格、实际 ETA 或完成保证。新原生测量须用本轮实际计数和入口重新判断，超 48 小时或 48GiB 则停止并报告，不偷减诊断或延时。
+80: 
+81: 启动要求 GPU0 无他人计算／重复项目作业，空闲显存≥30GiB、可用主存≥72GiB、可用磁盘≥48GiB，实际所用 CPU 有可用余量。前提具备但资源不足时依现行一次性监听规则等待，只启动一次，在确认实际训练更新后自删 Linux 活动监听源码，保留源码证据和启动／退出记录，失败不自动重试。
+82: 
+83: ## 8. 最小实现与证据复用
+84: 
+85: 实际接线与必要核验要求如下；实现和资格是否完成，以本轮对应源码及原始回执为准，合同描述本身不代表核验通过。
+86: 
+87: 1. 在现行 step28_record_replay.objective 增加严格限定的 R0 分支：只建立 A0，当前 B0、历史 0.1B0＋0.5D0，沿用现有 VJP／update；C/S 公式及原入口不改变。手写独立直接 autograd 参考比对全部参数梯度与一次 Adam 更新，另用禁止访问 A1 的反例检查 R0，以及移除 S 重组项能被检出的对照。复用原 C/S 已有效的数学和 VJP 证据，受影响部分补验。
+88: 2. 新三臂入口按 arm/order/stage 顺序独立走完整路径，接入公共数值配置和每 epoch 通用诊断；复用现有供给、优化器、评分、Memory、保存恢复与统计函数。旧五臂冻结编排只作为已审参考，不重新启用被撤下文件或导入 C_plus／S_strong。新 policy 固定三臂及工作量；盲门实际核对 27 点、162 诊断、两初始化以及配对日程，禁止共享已训练首阶段。
+89: 3. 受影响手写 CPU 检查覆盖 R0 公式／梯度／真实更新、S 差异、三臂实际编排、盲开放顺序、全部诊断调用与中性。原共同诊断和群配对统计不改公式，不重写整套测试框架。需用手写分数核对新增结果组织和主要判读输出，不重新解析旧标签。
+90: 4. 新原生核验使用指定 BGE 与手写中文，覆盖 N=224、标题／描述各256token、首次 Adam 分配、R0/S/LOGIT 的实际更新及诊断后续更新中性、数值实际生效值；LOGIT 对应旧显式配置的更新路径需纳入受影响核对。既有 C/S 小样例逐字节数值对齐可复用，但不冒充本轮最大形状资格。GPU 不跑完整 48/6/60 群诊断循环，原生核对真实前向／更新部件，完整 capture 的调度与状态证据来自 CPU；据实际调用量估时，不把部件核验说成完成了全正式循环。
+91: 5. 合同、实现、CPU 证据和必要既有证据合并送本地 Playwright MCP 网页 GPT 6 Pro；默认一轮充分实现审查，主执行者独立处置。待具体上传包完成，再按科研纪律第6节确认新包身份与目的地；旧包许可及数值修复免审不泛化。正式结果另按必要结果审查闭环，不为同一已关闭问题反复送审。
+92: 
+93: ## 9. 失败与收尾
+94: 
+95: 新运行用独立目录，不覆盖冻结原件。CPU 明确实现错误可在本轮 300 秒累计内最小修复重验，失败证据与耗时保留；GPU 核验／正式失败保留现场、已消费读取和预算，不自动重启或改配置。若全部指标及计数已经完整保存，允许仅从保存矩阵完成未完统计，不再访问标签、不再训练，仍在原剩余预算内；其余恢复先提出具体方案。
+96: 
+97: 交付分别报告实验有效性、每个比较的收益／代价／未确定、原历史验收和本轮开发边界；同步必要小结果并核对身份，Git 仅在 Windows 提交、普通推送并独立核实远端 ref。权重和 Memory 依据实际依赖及既有清理授权处理，保留复现来源和原始科研证据。
+
+=== evidence/record_static_external.zh.txt [lines 9-29; total 547] ===
+9: 一、核心裁决
+10: 
+11: 裁决：现阶段不值得推进为本项目当前首选的新方法候选。不同意主执行者“值得受限验证”的初判；本次不建议据此启动实现、CPU/GPU 探测或正式训练。
+12: 
+13: 主要理由是研究贡献和预期收益的依据不足，而不是这套机制数学上不能成立。它把已知的元素对评分及集合聚合、缓存函数目标、增强输入上的蒸馏，组织成一个可查询有限历史教师的接口。这个接口有真实的工程区别：相较只保存原来 378 个账号对输出，完整记录对表确实包含能回答部分新分配的问题的信息。但是，一旦选择了线性聚合的模型族，按分配重建教师就是直接的代数后果。现稿尚未说明这种特定结构为什么是解决本项目已证实瓶颈的必要选择，以及为什么它的收益足以抵偿模型族改变、增强支持集偏移和计算增加。
+14: 
+15: 本次没有发现能够证明“全部细节已被同一篇论文逐式覆盖”的证据。因此，不作抄袭或完全同法的指控。相应地，没有找到逐式同文、首次在本项目实现、可训练 BGE、中文同控应用与六群预算，也都不能单独成为实质创新。
+16: 
+17: 可分别作出以下判断：
+18: 
+19: 1. 有限结构可计算性：通过。对于存活记录及所规定模型，完整非对角记录作用表足以精确重建合法分配的确定性教师输出。
+20: 2. 一阶梯度可达性：条件性通过。所提分块 VJP 可以与直接图的链式法则一致；候选尚无实现，本次不声称运行验证过。
+21: 3. 两个手算：基本成立；第一个需补实际双通道归一化约束，第二个仅证明表空间中的区别。
+22: 4. 理论表述：Q 的期望测度需要明确，否则“至少保留一半原分配误差”的下界不成立。
+23: 5. 增强分布：能确认其改变生成器支持集；是否实际有害尚未证实。
+24: 6. 新方法贡献与旧域未见身份收益：现稿不充分。这是拒绝晋级的主要理由。
+25: 7. 内存与时间：只有可复核的纸面算式和既有格式数据，没有候选完整状态或运行成本的实测证明。
+26: 8. 执行资格：本次仅完成静态审查。所有执行、效果门和预算仍未批准。
+27: 
+28: 修正两处局部数学表述，不能自动把上述裁决改为“批准小试”。这也不是认定该结构在所有任务都无用，更不是声称它已产生新的实验负结果。
+29: 
+
+=== evidence/record_static_external.zh.txt [lines 88-121; total 547] ===
+88: 四、最近邻与联合构造：有区别，但未达到所要求的实质贡献门槛
+89: 
+90: 4.1 已有基础及更直接的一手近邻
+91: 
+92: 以下只使用实际可读的一手文献范围；详细版本和阅读限度见文末参考文献。
+93: 
+94: • Multi-Instance Kernels 的元素核双重求和、大小归一化以及从元素矩阵按行列聚合得到集合矩阵，已覆盖 P K P^T 的代数骨架。原文使用核条件，本候选的对称 MLP 不保证半正定；不能冒称同一个 Mercer 核，但去掉 PSD 约束不创造新的聚合算式。[L1]
+95: 
+96: • DER 将缓存旧输出的函数匹配与持续训练连接，DER++ 加入历史标签监督；reservoir 也属既有工具。原 DER 的轨迹采样来源时点与本案阶段末固化不同，不能说字节级同实现。[L2] FDR 支持函数空间约束这一旧基础；本次 FDR 仅核到作者/官方摘要，不用它单独证明缓存实现细节。[L3]
+97: 
+98: • FunMatch 的核心相关原则是教师、学生使用同一增强输入进行函数匹配。其 mixup 讨论已经涉及扩大输入支持；本案只是利用特定分解，在有限重组族中免去再次调用教师。[L4]
+99: 
+100: • 更直接的近邻是 Comparative Knowledge Distillation（CKD）。2023 年作者版正文 §3.2—3.3 缓存教师输出，组合出样本比较及随机分组后的质心比较，在不新增教师调用的情况下生成额外监督。它已覆盖“缓存可组合目标，查询更多组关系”的一般思路。区别是其比较向量差/组质心差，本案聚合完整记录对标量表，重建实际账号关系函数；不能断言两者逐式等价。[L5]
+101: 
+102: • Relational Knowledge Distillation（RKD）明确以关系势约束多个输出，不要求逐点复制全部表示。因而“只保留关系可见方向，允许其余内部表示变化”不是新的普遍原理。本案的关系势具体是 L_A，与 RKD 的距离、角度实现仍有区别。[L6]
+103: 
+104: • PseMix 已研究伪袋划分、袋重组/mix、标签与语义保持，并明确依赖对子袋内容分布的假设。其底层特征固定，与可训练 BGE 不同；这种差别是适配条件，不能独立补足创新。[L7]
+105: 
+106: • 持续 MIL 的细粒度记忆是更贴近组合层面的历史基础：CVPR 2025 的 Advancing Multiple Instance Learning with Continual Learning for Whole Slide Imaging 保存伪袋、旧注意力及输出，并用 reservoir；Algorithm 1 可直接核到缓存输出取回和写入。它采用固定底层特征，未核到本案的完整标量教师表。[L8]
+107: 
+108: • ConSlide 的正式摘要及作者仓库已经明确细粒度缓存和 breakup-reorganize rehearsal；ReMix 的正式摘要明确 prototype bag 的 reduce/mix 和保持类别身份的语义改变。本次未取得这两篇完整方法正文，不据此认定全部联合构造已被覆盖；但“持续 MIL + 缓存重组”或“同类内混合”本身已不能单作创新标题。[L9、L10]
+109: 
+110: 4.2 剩余机制的准确位置
+111: 
+112: 最窄且可证实的设计差异是：
+113: 
+114: 刻意选择一个由有限记录对作用值线性聚合的关系模型，保存来源教师的全部相关标量叶节点，使其在一族合法记录重分配上仍能被查询；随后在相同分配上匹配活跃学生的最终账号输出。
+115: 
+116: 这个区别真实存在，但其结构精确性是 f_source(A)=L_A t 的直接后果。对于这个模型族，保存 t 再计算 L_A t，与保留确定性来源模型并对相同记录/分配询问 f_source(A)，在实数输出目标及对应学生损失上相同。它不是另一个新的蒸馏更新原则，而是一种教师函数的有限编译/缓存表示。
+117: 
+118: 如果要成为本项目要求的实质方法贡献，需要有针对性的理由说明：为什么原分配 LOGIT 约束丢失的恰好是旧域未见身份所需的信息；为什么当前生成分布允许通过这种重分配把它补回来；为什么选择该可分解模型，而非已有模型或普通重放，能获得有价值的存储、计算、表达能力折中。当前只有“可以增加约束问题”和一般正则化直觉，缺少这几环之间的联系。
+119: 
+120: 这不是要求在静态外审前已经完成所有实验。静态候选可以依靠清晰且不易被直接反例推翻的收益机制进入验证。本稿的额外信息来源、目标分布和表达能力三者恰有冲突；在用户明确排除自然拼接的筛选标准下，我不把它列为优先投入对象。
+121: 
+
+=== evidence/record_static_external.zh.txt [lines 263-294; total 547] ===
+263: 七、重组保持同控标签，但确实改变了生成分布
+264: 
+265: 7.1 直接生成器证据
+266: 
+267: 生成器 make_group 先产生 controller style，再对每个账号/风格轴进行继承或公共风格覆盖，账号 style 在逐条生成记录的循环外固定；render 逐条使用该固定 style。public_override 是账号—轴层面的抽样，不是所有账号共享的一枚群级硬币。合同也规定同一账号使用固定的相应样式。[附件：generation/step28_continual_expression_data.py，make_group/public_override/render；generation/SELLER_ALIAS_CONTINUAL_REDESIGN.zh.md]
+268: 
+269: policy/catalog 给出三个风格轴、每轴 12 种风格及域相关比例；其作用不是为旧外审的群共因假说补证，恰应按真实账号层级生成逻辑重新判断。
+270: 
+271: 将不同同控账号的记录打散再分配，可能使一个新账号同时含有多个原账号样式。这样的账号并非当前固定样式生成器自然产生的账号。因此，“记录不丢、同控标签不变”不能推出输入分布不变。
+272: 
+273: 7.2 有区分力的支持集与捷径手算
+274: 
+275: 取同一控制者的两个账号，每个两条记录，某风格轴分别是 {a,a} 与 {b,b}，且 a≠b。原生成器允许这两个账号风格不同，但不允许单个账号在该轴中同时有 a、b。
+276: 
+277: 在保持 2+2 大小的均匀分配中，第一个新账号共有六种二记录子集，其中四种是一条 a、一条 b；它们的补集也同样是 {a,b}。所以，有 2/3 的重组会生成两个混合样式账号。这个事件在原固定轴样式的账号生成机制下概率为 0。
+278: 
+279: 再取一个合法的示意评分 k(r,s)=1{记录样式相同}。原正账号对平均分为 0；两个混合账号之间的平均分为 1/2；对均匀重组的平均分为 1/3。若另一控制者的样式为 c、d，且 a、b、c、d 两两不同，跨控制者评分仍为 0。
+280: 
+281: 这展示一种具体风险：按真实同控标签做混合，能制造“同控账号具有相似混合成分”的人工信号，并可让表教师精确重建、强化这个信号。这里没有复制同一记录，没有把 owners 或标签直接喂给模型；风险来自条件增强改变特征—标签关系。
+282: 
+283: 这是在生成规则允许的条件场景下的手算，不是对正式数据频率、BGE 实际识别样式能力或候选实测性能的声明。它证明分布保持不成立、捷径存在可能性，尚不证明整体增强一定有害。
+284: 
+285: 7.3 对主线信息的潜在影响
+286: 
+287: 账号内部稳定的别名风格及其跨账号关系可能就是任务可用信息。重组使账号内部混合，既可能鼓励对偶然账号划分的不变性，也可能破坏自然账号内一致性。项目当前材料没有证明前一种变化必然是所需不变性。
+288: 
+289: 必须同时承认：来源训练从首域开始就使用 B̄ 的原分配和随机分配监督。原同账号记录对可在来源训练的 A1 中分到不同账号并获得聚合约束，并非完全无监督的任意自由变量。
+290: 
+291: 问题在于，记录对作用只经有限采样的账号聚合受约束，不由原来 378 个输出唯一标定。两个原账号预测相同的来源解，仍可能给新分配不同目标——第五节的第一手算证明的是相对于原输出的不识别性，不能扩写成它们在完整来源增强训练目标上也等价。候选保存了来源在这类输入上选定的分解；有限增强监督是否已经使其外推可靠，当前没有证据。精确重建本身不会额外保证语义正确。
+292: 
+293: C/S 共享增强，可控制增强的共同影响；但两者共同使用一个改变支持集的输入族，不能因此证明 C 的增强教师更符合真实旧域。
+294: 
+
+=== current/report.zh.txt [lines 118-126; total 239] ===
+118: 3.9 最难回避的构造性比较
+119: 把本群每个同控连通分量当作临时的局部类别，把记录当作实例、账号当作袋，再给“同类重组”补上固定袋大小和无放回分配，便能构造S的A1。之后在共同记录评分器上使用常见排序监督与旧输出重放，得到非常接近S的系统。这不是声称某篇论文已经写出S全部代码，而是说明S的差异需要超过已知构件的自然组合，才有充分独立贡献。
+120: 
+121: 仍可保留的窄主张是：在本任务中采用“同控关系约束、记录守恒的联合账号重组训练”，使同一记录作用计算服务于原账号与重组账号的排序，并在小历史缓存下得到有限开发收益。它是一项有实证的任务化方法候选；尚未建立新的通用集合算子、重放原理、表示不变性定理或持续学习专属信息优势。
+122: 
+123: 4. 实验已经支持什么
+124: 
+125: 主要证据是已关闭的2026-10-11三臂结果主审，而非再次使用C_cf的单路径结果挑主方法：
+126: reports/seller_alias_continual/20261011/record_attribution_result/review/primary_disposition.zh.txt
+
+=== context/RESEARCH_DISCIPLINE.zh.md [lines 1-50; total 179] ===
+1: # 科研纪律
+2: 
+3: 本文件是常设执行规则。项目目标、当前授权、作业状态和保留例外见[当前交接](AI_RESEARCH_HANDOFF.zh.md)；具体计算与预算见实验合同；用户原话见[讨论记录](RESEARCH_DISCUSSION.zh.md)。本文件不复制进度、PID、标签消费数或历史审查流水。
+4: 
+5: ## 1. 规则职责与优先关系
+6: 
+7: | 材料 | 职责 | 更新方式 |
+8: |---|---|---|
+9: | AGENTS.md | 接手入口和关键边界 | 保持简短，不复制纪律或进度 |
+10: | 本文件 | 共用授权、验证、数据和交付规则 | 规则变化时原位更新 |
+11: | AI_RESEARCH_HANDOFF.zh.md | 当前研究、已批准范围、下一步 | 一个当前段落／表格，注明观测时点并链接实际回执 |
+12: | 合同、policy、来源清单 | 本轮问题、干预、访问、预算、判据及实现身份 | 正式使用后冻结，变化另留明确补充或新合同 |
+13: | 执行、结果、审查原件 | 实际发生的事及结论依据 | 保留原件；纠正另记，不覆盖旧字节 |
+14: | RESEARCH_DISCUSSION.zh.md | 用户决定、范围和未决事项 | 保留原话与时点，旧提议标明历史性质 |
+15: 
+16: 先判断对象、阶段和时间，再判断优先级。用户最新明确指令在其范围内优先；当前实验按已确认合同及后续明确补充执行；通用规则补充未约定事项；历史快照不授予新权限。新通用规则不自动改造活动实验或重置其预算。
+17: 
+18: 事实与授权分别处理：用户可以接受已有提升、改变后续计划或保管范围，原验收、标签接触和运行结果仍如实保留。代码、policy、文档一致不等于符合用户问题，发现冲突须追溯需求和原始证据。已知且适用的最新决定直接执行，不以旧文字重问相同许可；有未决实质选择时仅暂停依赖工作。
+19: 
+20: 边界的目的决定处理方式：
+21: 
+22: | 要保护的内容 | 为什么限制、何时优先落实 |
+23: |---|---|
+24: | 数据资格与评价独立性 | 未来域、封存真值和未开放结果会改变可支持的主张；即使只读、复制或调试也先核对权限，接触过的结果不因新合同变回未见 |
+25: | 科研问题与公平比较 | 干预、起点、随机流、预算和主要对手决定差异能否归因；变化前先确认实质选择，不能用实现方便或漂亮结果反推需求 |
+26: | 真实实现与证据 | 同一误解可能同时进入代码、测试和合同；审查实际计算，针对缺口核验，未变且适用的证据可直接复用 |
+27: | 资源与保管 | 预算保护研究范围和共享服务器；删除由实际依赖及恢复需要决定，不由结果是否好看决定 |
+28: | 历史事实与推进效率 | 固定原结论、明确当前许可；旧等待措辞、重复审查和额外报告不能阻塞已授权工作，当前确有缺口才暂停依赖动作 |
+29: 
+30: 项目内发生冲突时，先定位具体对象及最新明确决定，再区分“允许做什么”“何时具备执行条件”“证据支持什么”；其中任一项不能替代另外两项。
+31: 
+32: ## 2. 授权与自主执行
+33: 
+34: 用户指令模糊、存在歧义或缺少决定执行方向的细节时，先核对已有上下文、当前合同及最新明确决定；仍无法确定目标、对象、术语含义、范围或交付要求，且不同理解会实质影响执行或结果时，必须主动向用户澄清，不得自行猜测后执行。澄清须指出具体疑点、可行解释及各自影响，必要时给出推荐；即使已有执行授权，也不能以“不重复确认”为由跳过需求澄清。未获答复前只暂停依赖该歧义的工作，继续独立且已授权的工作；用户未回复不视为确认。
+35: 
+36: | 情况 | Agent的动作 |
+37: |---|---|
+38: | 阅读已获准文档／既有结果、整理方案、维护规则与引用 | 直接完成；“只读”不授予读取封存或未开放结果的权限 |
+39: | 已确认合同内的实施、同步、核验、训练、回传与收尾 | 按前置条件连续推进，不按连接、命令或子步骤重复确认 |
+40: | 不改变科研语义的实现选择，或已确认方案内的明确实现错误 | 自主作最小处理并验证；涉及已产结果或冻结运行时保留原件、说明影响 |
+41: | 新研究问题、数据／标签权限、比较、候选范围、预算或判据 | 先给具体方案、依据和取舍，确认后推进依赖工作 |
+42: | 已证实有效性缺陷、许可超限、必要证据缺失或资源不足 | 暂停受影响动作，保留现场，明确恢复条件；独立且已授权的工作继续 |
+43: 
+44: “继续”“开始”“按方案执行”等答复可以直接授权已经呈现的完整范围，不要求固定口令。目标和边界已明确时，文件组织、常规实现和检查选择由执行者判断。问题须自包含并解释影响，不让用户重填已有答案。
+45: 
+46: 执行按“完成当前动作→观察实际结果→针对性验证→修复受影响问题→更新状态”闭环推进，不在只有计划或未经检查的第一版处提前结束。跨回合工作复用交接顶部与该作业已有status／回执，记录目标、有效授权及出处、已完成项、证据位置、阻塞、下一步和观测时点；只更新变化，不另建平行计划、报告或状态系统。
+47: 
+48: | 停留状态 | 处理与继续条件 |
+49: |---|---|
+50: | 完成 | 本轮交付已实际形成、必要核验充分、相关问题已处置并更新证据入口；按第10节交付。有效负结果也可完成，不为翻转结果继续搜索 |

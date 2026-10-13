@@ -2,7 +2,7 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-用户2026-10-13明确下一步先做[完整S贡献定位](../reports/documentation/20261013/s_contribution/report.zh.txt)：核查已有方法的实质区别，判断是否值得作为最终方法基础；不足再明确机制缺口。当前仅静态研究，不开新训练、不恢复旧C诊断，也未自动将S定为最终算法。外审及交付状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
+用户2026-10-13明确下一步先做[完整S贡献定位](../reports/documentation/20261013/s_contribution/report.zh.txt)：核查已有方法的实质区别，判断是否值得作为最终方法基础；不足再明确机制缺口。[静态外审及独立主审](../reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt)已关闭：保留完整S为基础／主要对照和任务化增量候选，贡献尚未充分；补入C²Aug近邻及共同原账号来源证据的具体取舍。当前不开新训练、不恢复旧C诊断，也未自动将S定为最终算法；具体状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
 已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
 
