@@ -2,13 +2,13 @@
 
 本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-用户2026-10-13最新明确围绕共同原账号来源带来的可能捷径，继续形成以完整S为对照的具体改进。[C_q静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)给出逐自然查询排除来源的候选分配、原监督的有向行运算及跨来源组成响应保持；它是待审任务化增量候选，不是执行合同或已建立效果。[S定位主审](../reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt)继续作为前提，完整S不削弱；当前不开新训练、不恢复旧C诊断，具体状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
+用户2026-10-13最新要求完整回收并独立审核C_q外审。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已完成：核心运算成立，有具体任务化差别，建议准备执行合同；效果和最终贡献未建立。信息损失、偏置风险、条件控制与共同随机／完整状态要求须一并承接。完整S不削弱；当前不开新训练、不恢复旧C诊断，具体状态见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
 已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [自然查询锚定的历史重放C_q](../reports/documentation/20261013/query_replay/proposal.zh.txt) | 当前具体静态方案。只改变候选的历史分支：每个自然查询分别排除自己的所有记录，重组其余同控候选；保留原A0／0.5D0与当前S，额外响应保持可精确化为加权MSE。明确K2正例无新增变化、候选自然性及近邻限制；S／Q／C_q／账号内bootstrap四臂是未执行的最小证伪提议。新包审查、独立处置及未来执行许可分开，不转用旧合同。 |
+| [自然查询锚定的历史重放C_q](../reports/documentation/20261013/query_replay/proposal.zh.txt) | 静态外审／[独立主审](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已关闭，推荐合同准备，尚非执行合同。只改候选历史分支的查询条件分配及额外中心化响应MSE，保留完整S对照、当前S及0.5D0。整个历史目标的异来源交互盲区、R偏置／幅度和bootstrap条件控制按补正解释；Q/C_q共享增强规则键及完整共同A。S／Q／C_q／账号内bootstrap四臂仍为未执行提议，真实收益、原生资格和新预算／读取范围均未建立。 |
 | [完整S贡献定位与机制缺口](../reports/documentation/20261013/s_contribution/report.zh.txt) | 当前静态研究报告，不是执行合同。核对实际S、归因实验和直接近邻；判断基础系统价值与独立创新是否充分，明确自然账号内部结构与同控重组的待研究问题。不新增训练、数据读取或旧C诊断，当前审查状态见交接 |
 | [C_cf执行合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md) | 已结束固定实验的执行依据。完整S／C_cf／C_perm、A→B、1440更新／2304梯度群呈现；CPU300秒、原生600秒、正式16小时／16GiB，标签各一次及统一盲门。原生失败及一次补核例外、完整结果审查与权重清理按交接和回执解释，旧静态稿中的待批准草案不恢复成当前阻断，也不重授训练权限 |
 | [C折外支持的历史排序间隔保持](../reports/documentation/20261011/retention_design/crossfit.zh.txt) | 静态外审／[独立主审补正](../reports/documentation/20261011/retention_design/crossfit_review/primary_disposition.zh.txt)已完成，按有限增量策略推荐继续准备。完整群折外来源与全域来源共同支持的单边正负间隔，替换候选自己的D0，完整S不变。S／C_cf／可行错配C_perm能比较系统替换及原赋值相对本次错配，不能证明折外信息的独立必要性；已知cross-fitting／排序KD构件不冒称首创。拟议A→B、1,440更新／2,304梯度群呈现；新目标接线、Memory诊断、A/B评价、共享A和完整预算投影待落实，访问与12小时／16GiB等未获具体批准。尚未实现／运行或建立效果；[完整回收状态](../reports/documentation/20261011/retention_design/crossfit_review/submission.json) |
