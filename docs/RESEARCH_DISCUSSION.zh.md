@@ -1053,3 +1053,10 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 用户对本轮具体执行提问明确回复：“批准合同范围，按前提推进（推荐）”。许可覆盖完整S／Q／C_q／C_b、1440更新、CPU累计300秒、原生累计600秒／最多6步、正式16小时／18GiB、train／valid各一次及统一盲门；先实现和CPU核验、合并外审，再在原生资格、投影与资源满足后正式运行。GPU／正式失败不自动重跑，旧C诊断保持停止。新具体外审包上传及公开推送不在本次许可内，见[授权原文与范围](../reports/documentation/20261013/query_replay_implementation/authorization.json)。
 
 2026-10-13已完成上述实现及Linux手写CPU attempt01：15:14:59—15:15:37运行，11项通过，外层38.680504秒，累计保守39／300秒；29来源与冻结CPU及当前实现大小／SHA一致。实际手写更新核对R对encoder／head的作用、独立参考及完整诊断中立性，完整1440步仅作明确替代更新／前向的编排核验，未冒充正式训练。15:21:11确认进程退出、无正式job；GPU、正式标签／模型／旧Memory读取均未开始。见[实现及原始证据](../reports/documentation/20261013/query_replay_implementation/implementation.zh.txt)。合同／实现／CPU合并包已具体形成并核对，下一步只需对应新包上传许可；原生与条件正式继续遵守既有批准及前提，无新监听、无公开推送。
+
+
+## 2026-10-13：C_q合并实现包获准并提交外审
+
+用户明确回复“授权此合并包实现外审（推荐）”，对应call_7719da16c9ce40939cd9765712260e37及517,400字节／80成员／SHA256 24f05a5f5b42e3f4b40bcd3dabd2bad45d79f3a8359b3a234a2430ec22a425a2。只覆盖此合同／实现／CPU包上传chatgpt.com，经本地Playwright MCP交GPT 6 Pro；既有条件执行范围不重问，公开推送不在许可内。
+
+核对实物和现有浏览器空白页后上传一次，15:39:59发送全文请求一次；15:40:21现场确认正式[会话](https://chatgpt.com/c/6acde04a-3dd8-83eb-8d4c-757a751120f6)、已发送附件、空输入框及停止按钮。实际选择器为GPT-6／Pro强度5/5，后台身份未独立取得；包、许可、选择器与开始证据见[提交记录](../reports/documentation/20261013/query_replay_implementation/review/submission.json)。保留这一活动会话等待回收／独立主审，不重复上传或提交。CPU39／300秒、原生0步／0秒、正式及标签读取0的执行账不变；本轮未连接Linux或新增科研执行，旧C诊断持续停止。

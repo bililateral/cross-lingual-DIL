@@ -4,11 +4,11 @@
 
 ## 已确认范围内
 
-按用户2026-10-13最新决定，本轮起草[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)，落实已结束静态外审的[必要补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)；[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)与送审包冻结。用户随后已明确批准合同范围，当前实现与首轮手写CPU资格已完成，合并实现包待具体上传许可；原生／正式仍等对应前提，旧C诊断不恢复；实际状态只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。
+按用户2026-10-13最新决定，本轮起草[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)，落实已结束静态外审的[必要补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)；[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)与送审包冻结。用户随后已明确批准合同范围，当前实现与首轮手写CPU资格已完成，合并实现外审已获具体包级许可并开始；原生／正式仍等对应前提，旧C诊断不恢复；实际状态只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。
 
 此前已完成[静态外审与独立处置](../reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt)，区分“有效基础系统”“值得保留的任务化候选”和“贡献充分的最终方法”。S符合前两项，第三项尚未建立；不因构件已有就否定组合价值，也不把独立历史增益设成所有增量贡献的硬门槛。若主张历史专属作用，仍须相应归因。新增近邻C²Aug及FDR覆盖已补足。具体机制缺口收窄为：处理重组引入的共同原账号来源证据，同时保留有价值的非退化重组；严格禁止所有来源重叠会退化为整账号置换，简单屏蔽未成为推荐方案。可在已有静态范围内继续形成明确运算与证伪逻辑，暂不开训练或旧C诊断；新包外发、新执行及最终方法选择分别遵守对应许可，外审不自动授权。
 
-C_q合同保留四臂窄比较，明确逐自然查询排除来源、有向监督、原D0外的解析响应MSE及实际更新；同时纳入整个历史目标舍弃的零行列和交互、K2正例盲区、查询无关偏置及幅度保持代价。Q/C_q共享增强规则键，四支共享完整A状态。已获准合同所列新增实现、CPU／GPU／正式预算及读取范围；现已完成实现和Linux手写CPU，将合同／代码／CPU证据合并审查，再按资格与现场条件推进原生及正式流程。具体新包上传在实物完成时确认，不提前重复询问。相对完整S的收益仍未知，原valid开发身份不变，不为维持C名称扩跑；旧C单独诊断持续停止。
+C_q合同保留四臂窄比较，明确逐自然查询排除来源、有向监督、原D0外的解析响应MSE及实际更新；同时纳入整个历史目标舍弃的零行列和交互、K2正例盲区、查询无关偏置及幅度保持代价。Q/C_q共享增强规则键，四支共享完整A状态。已获准合同所列新增实现、CPU／GPU／正式预算及读取范围；现已完成实现和Linux手写CPU，将合同／代码／CPU证据合并审查，再按资格与现场条件推进原生及正式流程。本次517,400字节／80成员实现包已获具体上传许可并提交，等待完整回收和独立处置；未来新包仍按具体范围判断，不重复询问已有许可。相对完整S的收益仍未知，原valid开发身份不变，不为维持C名称扩跑；旧C单独诊断持续停止。
 
 既有C研究证据与失败边界继续保留，不能把S收益追认为C贡献。第一轮见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)、[均值／方差裁决](../reports/documentation/20261011/retention_design/candidate.zh.txt)、[后续筛查](../reports/documentation/20261011/retention_design/search.zh.txt)及[信息采集工作稿](../reports/documentation/20261011/retention_design/acquisition.zh.txt)；收缩、跨账号配对的静态否决和C_cf固定配置未建立主要改进，均按原范围解释。先前旧C诊断已停止，原批准与CPU证据保留，不补测或转用其预算。后续若形成候选，仍须说明具体信息、实际运算／更新、近邻区别和可推翻的比较，不要求实验前保证胜出，也不以候选名称为继续理由。
 
