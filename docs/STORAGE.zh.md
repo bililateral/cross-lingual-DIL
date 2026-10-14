@@ -8,6 +8,18 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-14 本地快照清理
+
+用户明确要求清理 `reports/seller_alias_continual` 无用快照，并指出“不要补传”“没用就删掉”。本次未向Linux补传任何历史归档，也未删除或改动Linux项目文件。原拟补传15份归档的调用被自动审批拒绝，未执行；用户随后明确否决补传，今后不从本次清理要求推导补传授权。
+
+目标目录实际删除526个文件、460,782,500字节（439.44MiB），由1,043,163,605降至582,381,105字节（555.40MiB），减少44.17%。其中49份ZIP为已现场核对Linux原件大小／SHA一致的本地副本，477份为与完整原包成员逐字节SHA一致的解包数组、测试载荷及压缩源码副本。报告、主审处置、原始日志、可读统计表、正式结果与正式冻结来源保留；没有解析正式文本／标签、Memory或模型。
+
+已删ZIP均可从Linux项目 `/home/yongpeng/cross-lingual/` 下原相对路径恢复，唯一异路径恢复项是 `20261001/bge_continual_result/review/bge_continual_result_review.zip`，对应同结果目录的 `review/external/input/bge_continual_result_review.zip`。已删解包载荷在该轮完整外审ZIP内保持原字节：原包在Linux已有同字节归档，或属于仍留本地的14份完整ZIP。冻结历史清单不改写为当前在盘清单，恢复时查包内原成员；未重算任何科研指标。
+
+另清理S/G/F CPU attempt03本地5份冗余文件、181,941字节：源码ZIP（Linux已有同字节原件）、与attempt04完全一致的actual_paths／all_shapes／single_graph_vjp三个输出及空launcher。保留实际失败日志、结果／来源身份、运行脚本和包装耗时；失败原因是测试mutation lambda旧签名，不是科学负结果。91／300秒是累计预算用量，含失败轮向上取整的8秒，账不清零；失败原件不等于每份重复载荷永远保留。
+
+合计移除531份本地文件、460,964,441字节（439.61MiB逻辑文件大小）。这是工作目录释放量，不包含Git历史或LFS对象库；采用普通本地删除提交，不改写历史、不扩大公开push。局部清理不重置上方两端大清理周期。
+
 ## 2026-10-14 C_q四臂：结果已回传，五权重已留证删除
 
 固定作业20261013_151500/workspace于10月13日22:55:47正常完成。306份结果／日志／资格小证据共7,760,771字节、从实际workspace另补的29份冻结来源505,635字节及8份Linux保存结果分析472,248字节均经SFTP回传并逐项大小／SHA核对；两端结果归档为reports/seller_alias_continual/20261014/query_replay_result，见[回传核对](../reports/seller_alias_continual/20261014/query_replay_result/receive_verification.json)。原job/run/sources为空，未将首次传输虚称包含源码；补源身份单列于source_manifest.json。完整训练状态已由正式入口按恢复与分支依赖释放，五份推理权重的后续分析／外审均无载模依赖。
