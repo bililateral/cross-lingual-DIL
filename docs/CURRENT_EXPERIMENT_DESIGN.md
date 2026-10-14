@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-本页只索引合同，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
+本页索引合同及当前待审静态提案，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
 [C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)及获准的一次原生补核已执行完毕，固定四臂于2026-10-13 22:55:47正常完成。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)中的信息损失、偏置、条件控制与共享状态要求不变。10月14日[保存结果分析](../reports/seller_alias_continual/20261014/query_replay_result/report.zh.txt)未建立相对完整S的排序收益；四比较八个A/B MAP区间均跨零，概率代价和训练—valid差距分别保留，不推成等价或整个方法家族失败。结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭；24个未定义导出零值按N/A解释，宏／汇总分类及证据边界已补明，正式数值和原判据不变。五权重已按本次具体批准留证删除。原生累计11步／469秒与失败账不清零，旧C诊断不恢复；实际状态及授权只看[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
@@ -8,6 +8,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
+| [双边覆盖的记录匹配评分](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt) | 2026-10-14新静态性能候选，尚未外审／实现／执行，不是合同。均匀双边际熵正则最优值替代均值，完整S与去边际G为拟议对照；数学作用和错误匹配反例已列，OT先例明确，效果及独立贡献未知。需先完成具体新包静态外审／主审，再决定是否形成实施合同；旧许可不转用。 |
 | [C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md) | 已完成固定运行及结果外审／独立主审的执行依据，无未关闭科学／复现阻断。完整S／Q／C_q／C_b，共同A＋四支B，1440更新／2592梯度群呈现、5端点／30诊断；CPU300秒、原生600秒／原6步（后获一次补核、累计最多11步）、正式16小时／18GiB、标签各一次及统一盲门。原生累计11步／469秒，原失败不清零；[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)按未变范围复用。原合同不授权重训或根据结果调参。 |
 | [自然查询锚定的历史重放C_q](../reports/documentation/20261013/query_replay/proposal.zh.txt) | 静态外审／[独立主审](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已关闭，当时推荐合同准备，原稿不是执行合同。只改候选历史分支的查询条件分配及额外中心化响应MSE，保留完整S对照、当前S及0.5D0。整个历史目标的异来源交互盲区、R偏置／幅度和bootstrap条件控制按补正解释；Q/C_q共享增强规则键及完整共同A。稿内四臂为形成时未执行提议，后续实际执行／结果以本表上行和交接为准，不追改冻结原稿。 |
 | [完整S贡献定位与机制缺口](../reports/documentation/20261013/s_contribution/report.zh.txt) | 当前静态研究报告，不是执行合同。核对实际S、归因实验和直接近邻；判断基础系统价值与独立创新是否充分，明确自然账号内部结构与同控重组的待研究问题。不新增训练、数据读取或旧C诊断，当前审查状态见交接 |
