@@ -101,8 +101,10 @@ def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
                 for seed in seeds:
                     slots = record.assignment(group, seed)
                     # Eval-only CPU pooling of the same FP32 tables; no model gradient.
-                    residual.append((pool(torch.from_numpy(live), slots)
-                                    -pool(torch.from_numpy(target), slots)).numpy().astype(np.float64))
+                    view = "A0" if seed is None else "A1"
+                    live_score = pool(torch.from_numpy(live), slots, group, view) if pooling_fn else pool(torch.from_numpy(live), slots)
+                    teacher_score = pool(torch.from_numpy(target), slots, group, "teacher_"+view) if pooling_fn else pool(torch.from_numpy(target), slots)
+                    residual.append((live_score-teacher_score).numpy().astype(np.float64))
                 e0, e1 = residual
                 errors.append({"uid": group.uid, "D0": float(np.mean(e0**2)), "D1": float(np.mean(e1**2)),
                                "residual_cross_mean": float(np.mean(e0*e1)),

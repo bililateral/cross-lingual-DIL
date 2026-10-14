@@ -1,0 +1,28 @@
+test_AB_filter_before_construction_alignment_and_parse_ledger (test_step28_balanced_pooling.BalancedPoolingTests) ... ok
+test_actual_scoring_diagnostics_restoration_and_next_update (test_step28_balanced_pooling.BalancedPoolingTests) ... ok
+test_all_shapes_equivariance_and_additive_identity (test_step28_balanced_pooling.BalancedPoolingTests) ... ok
+test_chunked_real_updates_match_independent_single_graph (test_step28_balanced_pooling.BalancedPoolingTests) ... ok
+test_full_objective_proxy_and_mutation_witnesses (test_step28_balanced_pooling.BalancedPoolingTests) ... ERROR
+
+======================================================================
+ERROR: test_full_objective_proxy_and_mutation_witnesses (test_step28_balanced_pooling.BalancedPoolingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261014/balanced_pooling_execution/20261014_143200/workspace/tests/test_step28_balanced_pooling.py", line 209, in test_full_objective_proxy_and_mutation_witnesses
+    mutant,_=method.objective(x,group,29,"F",target)
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261014/balanced_pooling_execution/20261014_143200/workspace/scripts/step28_balanced_pooling.py", line 205, in objective
+    predicted = [account_logits(table, a, arm, stats, {**context, "view": "A"+str(i)}) for i, a in enumerate(slots)]
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261014/balanced_pooling_execution/20261014_143200/workspace/scripts/step28_balanced_pooling.py", line 205, in <listcomp>
+    predicted = [account_logits(table, a, arm, stats, {**context, "view": "A"+str(i)}) for i, a in enumerate(slots)]
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+TypeError: BalancedPoolingTests.test_full_objective_proxy_and_mutation_witnesses.<locals>.<lambda>() takes from 3 to 4 positional arguments but 5 were given
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.304s
+
+FAILED (errors=1)

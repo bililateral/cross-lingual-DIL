@@ -77,6 +77,16 @@ def checked_fresh(c):
     return model, optimizer, initial, archive
 
 
+def disk_reserve(path, total, reserve, maximum):
+    if total+reserve > maximum or shutil.disk_usage(path).free < reserve:
+        raise RuntimeError("Qualification checkpoint reserve exceeds available disk or approved work bytes")
+
+
+def native_save(path, model, optimizer, metadata, check):
+    check(run.base.persistence.checkpoint_reserve(model, optimizer))
+    return core.save_state(path, model, optimizer, metadata)
+
+
 def native(check, progress, handwritten, out):
     resources = preflight()
     if shutil.disk_usage(out).free < 10*2**30:
@@ -177,11 +187,15 @@ def native(check, progress, handwritten, out):
     del tensors
     work=out/"work";work.mkdir();identities={}
     for arm in method.ARMS:
+        c["pooling_context"] = {"stage": 2, "step": 49, "role": "native_restore_prediction"}
         def residual():
             errors=[]
             for seed in (None,data.seed_for(20261008,"ABC",2,history.uid,"diagnostic_regroup")):
                 slots=record.assignment(history,seed)
-                errors.append((method.account_logits(torch.from_numpy(table),slots,arm)-method.account_logits(torch.from_numpy(target),slots,arm)).numpy().astype(np.float64))
+                context={"stage":2,"step":49,"role":"native_history_diagnostic","group_uid":history.uid}
+                view="A0" if seed is None else "A1"
+                errors.append((method.account_logits(torch.from_numpy(table),slots,arm,context={**context,"view":view})
+                    -method.account_logits(torch.from_numpy(target),slots,arm,context={**context,"view":"teacher_"+view})).numpy().astype(np.float64))
             return {"D0":float(np.mean(errors[0]**2)),"D1":float(np.mean(errors[1]**2))}
         timed("h_"+arm,residual)
         meta={"fixture":"handwritten native","pooling":method.identity(arm),"rng":diag.rng_state(),
@@ -193,7 +207,7 @@ def native(check, progress, handwritten, out):
         identities[arm]={}
         for kind,opt,skey,rkey,wkey in (("full",optimizer,"s_F","r_F","W_F"),("inference",None,"s_I","r_I","W_I")):
             path=work/(arm+"_"+kind+".pt")
-            saved=timed(skey,lambda:core.save_state(path,model,opt,meta))
+            saved=timed(skey,lambda:native_save(path,model,opt,meta,check))
             if timed(rkey,lambda:run.restore_point(path,saved,model,opt,arm))!=meta:
                 raise ValueError("Native pooling restore differs")
             with diag.neutral(model):
@@ -244,7 +258,7 @@ def main():
             if args.mode == "gpu" and torch.cuda.is_initialized():
                 report["max_reserved_bytes"] = torch.cuda.max_memory_reserved()
             data.write_json(args.output/"result.json", report)
-    def check():
+    def check(reserve=0):
         report["peak_rss_bytes"] = max(report["peak_rss_bytes"], process.memory_info().rss)
         total, evidence = 0, 0
         for path in args.output.parent.rglob("*"):
@@ -257,6 +271,7 @@ def main():
             except FileNotFoundError:
                 pass
         report["peak_work_bytes"] = max(report["peak_work_bytes"], total)
+        disk_reserve(args.output, total, reserve, limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"]))
         if (time.monotonic()-STARTED+args.prior_seconds > limits["maximum_seconds"]
                 or evidence > limits["maximum_evidence_bytes"] or total > limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"])
                 or report["peak_rss_bytes"] > limits["maximum_rss_bytes"]
@@ -299,8 +314,8 @@ def main():
             report["native"] = native(check, progress, handwritten, args.output)
         check()
         report["status"] = "PASS_HANDWRITTEN_ONLY"
-    except BaseException:
-        report.update(status="FAIL", traceback=traceback.format_exc())
+    except BaseException as exc:
+        report.update(status="FAIL", traceback=traceback.format_exc(), solver_failure=getattr(exc, "details", None))
         raise
     finally:
         stopped.set()

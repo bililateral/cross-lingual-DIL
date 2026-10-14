@@ -205,7 +205,7 @@ class BalancedPoolingTests(unittest.TestCase):
         fv,plan,_=method.solve(k)
         self.assertGreater(abs(float(fv-(plan*k).sum())),.1)
         x=table.detach().clone().requires_grad_()
-        with mock.patch.object(method,"account_logits",side_effect=lambda t,s,a,stats=None:record.account_logits(t,s)):
+        with mock.patch.object(method,"account_logits",side_effect=lambda t,s,a,stats=None,context=None:record.account_logits(t,s)):
             mutant,_=method.objective(x,group,29,"F",target)
         self.assertGreater(abs(float(mutant)-rows["F"]["value"]),1e-3)
         self.evidence("objective_witnesses",dict(values={k:v["value"] for k,v in rows.items()},
@@ -328,6 +328,88 @@ class BalancedPoolingTests(unittest.TestCase):
             for role in comparison.values():
                 for domain in role.values():
                     for metric in domain.values():self.assertEqual(metric,{"mean":0.,"conditional_95pct_interval":[0.,0.]})
+
+    def test_undefined_saved_metrics_preserve_fixed_groups(self):
+        labelled=[handmade_group(f"{d}_valid_{i:02}") for d in "AB" for i in range(20)]
+        split={"development":[dict(group_uid=g.uid,domain=g.uid[0]) for g in labelled]}
+        perfect=np.stack([np.asarray(g.labels,np.float64)*2-1 for g in labelled])
+        scores={}
+        for point in run.POINTS:
+            mixed=perfect.copy()
+            if point[-1]=="S":mixed[0]=-1
+            if point[-1]=="F":mixed[1]=-1
+            scores[point]={"raw":-np.ones((40,378)),"stage-cal":np.ones((40,378)),"first-cal":mixed}
+        root=self.temporary()/"nullable_evaluation"
+        saved=run.collect(root,scores,labelled,split)
+        result=run.finalize(root)
+        negative=result["absolute"]["B_S"]["raw"]
+        positive=result["absolute"]["B_S"]["stage-cal"]
+        for key in ("precision","mcc"):
+            self.assertIsNone(negative["by_domain"]["A"][key]["mean"])
+            self.assertIsNone(negative["by_domain"]["A"][key]["conditional_95pct_interval"])
+            self.assertEqual(negative["by_domain"]["A"][key]["undefined_groups"],20)
+            self.assertIsNone(negative["macro_all"][key])
+            self.assertEqual(negative["macro_undefined_groups"][key],40)
+            paired=result["comparisons"]["F-S"]["first-cal"]["A"][key]
+            self.assertEqual(paired["undefined_groups"],2)
+            self.assertEqual(paired["total_groups"],20)
+            self.assertIsNone(paired["conditional_95pct_interval"])
+            self.assertIsNone(result["forgetting_comparisons"]["F-S"]["first-cal"][key]["mean"])
+        self.assertEqual(negative["by_domain"]["A"]["recall"],{"mean":0.,"conditional_95pct_interval":[0.,0.]})
+        self.assertEqual(negative["by_domain"]["A"]["f1"]["mean"],0.)
+        self.assertIsNone(negative["fixed_half_classification"]["all"]["precision"])
+        self.assertAlmostEqual(positive["by_domain"]["A"]["precision"]["mean"],20/378)
+        self.assertIsNone(positive["by_domain"]["A"]["mcc"]["mean"])
+        self.assertEqual(result["comparisons"]["F-S"]["first-cal"]["B"]["precision"]["mean"],0.)
+        # Pooled precision is defined by summed counts even when one group is N/A.
+        self.assertEqual(result["absolute"]["B_S"]["first-cal"]["fixed_half_classification"]["A"]["precision"],1.)
+        rec=saved["points"]["B_S"]["raw"]["matrix"]
+        values=data.read_json(root/rec["path"])["values"]
+        self.assertIsNone(values[0][6]);self.assertIsNone(values[0][11]);self.assertEqual(values[0][7],0.)
+        self.evidence("nullable_metrics",dict(all_negative=negative,all_positive=positive,
+            paired_mismatched_groups=result["comparisons"]["F-S"]["first-cal"],fixture="Handwritten only; role names exercise persistence, not calibration claims"))
+
+    def test_solver_failure_context_and_native_write_reserve(self):
+        import step28_balanced_pooling_verify as verify
+        g=handmade_group("failure_history")
+        slots=record.assignment(g)
+        left,right=np.triu_indices(len(slots),1)
+        table=torch.zeros(len(left))
+        bad=int(np.flatnonzero((slots[left]==0)&(slots[right]==1))[0])
+        target=table.numpy().copy();target[bad]=np.nan
+        stats={}
+        with self.assertRaises(method.SolverFailure) as caught:
+            method.objective(table,g,3,"F",target,stats,{"stage":2,"step":7,"role":"history"})
+        details=caught.exception.details
+        self.assertEqual({k:details[k] for k in ("arm","stage","step","role","view","group_uid","failure_count")},
+            dict(arm="F",stage=2,step=7,role="history",view="teacher_A0",group_uid=g.uid,failure_count=1))
+        self.assertEqual(len(details["failed_blocks"]),1)
+        self.assertEqual(details["failed_blocks"][0],dict(batch_index=0,n=2,m=2,iteration=0,marginal_error=None,
+            feasible_error=None,gap_checked=None,account_pair_index=0,account_slots=[0,1]))
+        with self.assertRaises(method.SolverFailure) as short:
+            method.solve(torch.tensor([[[8.,1.,-4.],[2.,-2.,3.]]]),maximum_iterations=1)
+        row=short.exception.details["failed_blocks"][0]
+        self.assertEqual((row["n"],row["m"],row["iteration"]),(2,3,1))
+        self.assertGreater(row["marginal_error"],method.SOLVER["marginal_tolerance"])
+        out=self.temporary()
+        data.write_json(out/"failure.json",{"solver_failure":details})
+        self.assertEqual(data.read_json(out/"failure.json")["solver_failure"],details)
+        model=object()
+        with mock.patch.object(verify.run.base.persistence,"checkpoint_reserve",return_value=6), \
+                mock.patch.object(verify.core,"save_state") as save, \
+                mock.patch.object(verify.shutil,"disk_usage",return_value=mock.Mock(free=50)) as disk:
+            with self.assertRaises(RuntimeError):
+                verify.native_save(out/"too_large.pt",model,None,{},lambda reserve:verify.disk_reserve(out,7,reserve,12))
+            save.assert_not_called()
+            disk.return_value.free=4
+            with self.assertRaises(RuntimeError):
+                verify.native_save(out/"too_little_free.pt",model,None,{},lambda reserve:verify.disk_reserve(out,7,reserve,20))
+            save.assert_not_called()
+            disk.return_value.free=50
+            verify.native_save(out/"fits.pt",model,None,{},lambda reserve:verify.disk_reserve(out,7,reserve,20))
+            save.assert_called_once()
+        self.evidence("failure_and_reserve",dict(solver_failure=details,iteration_failure=short.exception.details,
+            no_write_before_approved_reserve=True,fixture="Actual handwritten solver failure; mocked filesystem/save to prove refusal ordering, no large payload"))
 
     def test_AB_filter_before_construction_alignment_and_parse_ledger(self):
         root = self.temporary()

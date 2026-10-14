@@ -1,0 +1,16 @@
+本文件记录本轮确实执行的主要可复核命令；不是项目Linux命令，也不是建议启动native/formal。
+
+[1] 独立手写数学与未定义指标复现（一次；退出0；stdout/stderr/exit原件已保存）
+CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false CUBLAS_WORKSPACE_CONFIG=:4096:8 PYTHONDONTWRITEBYTECODE=1 python /mnt/data/bp_review/evidence/independent_checks.py /mnt/data/bp_input /mnt/data/bp_review/evidence > /mnt/data/bp_review/evidence/independent_checks.stdout.txt 2> /mnt/data/bp_review/evidence/independent_checks.stderr.txt
+
+[2] 最终29来源与旧/新CPU身份核对（成功输出保存在source_identity.stdout/stderr）
+python /mnt/data/bp_review/evidence/verify_source_identity.py /mnt/data/bp_input /mnt/data/bp_review/evidence > /mnt/data/bp_review/evidence/source_identity.stdout.txt 2> /mnt/data/bp_review/evidence/source_identity.stderr.txt
+
+[3] 最终重新核对原ZIP/所有提取字节/22回执（退出0，完整命令/源码/日志可复核）
+python /mnt/data/bp_review/evidence/audit_input.py '/mnt/data/review_input(20261014-065418).zip' /mnt/data/bp_input /mnt/data/bp_review/evidence > /mnt/data/bp_review/evidence/audit_input.stdout.txt 2> /mnt/data/bp_review/evidence/audit_input.stderr.txt
+printf '%s\n' "$?" > /mnt/data/bp_review/evidence/audit_input.exit_code.txt
+
+[4] 保留唯一授权输入（确实执行；拷贝后整体SHA再次核对）
+cp '/mnt/data/review_input(20261014-065418).zip' /mnt/data/bp_review/authorized_input/review_input.zip
+
+源文阅读使用nl -ba/sed/grep/cat，路径范围详见reading_scope；没有声称本文件包含每条阅读命令的完整终端转录。ZIP制作脚本及校验日志在metadata/。对原档的首次散列/解包和早期辅助错误见metadata/failures.zh.md；没有伪造其当时未重定向的stderr。

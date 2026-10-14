@@ -1,5 +1,5 @@
 {
-  "status": "CPU_QUALIFIED_ONLY_REVIEW_NOT_YET_SUBMITTED",
+  "status": "REVIEW_CORRECTIONS_CPU_QUALIFIED",
   "remote_root": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261014/balanced_pooling_execution/20261014_143200",
   "attempts": [
     {
@@ -17,12 +17,30 @@
       "ended_epoch": 1791959905.638729,
       "wall_seconds": 26.468205213546753,
       "charged_seconds": 27
+    },
+    {
+      "attempt": "attempt03",
+      "exit_code": 1,
+      "started_epoch": 1791963925.895682,
+      "ended_epoch": 1791963932.9555054,
+      "wall_seconds": 7.059823274612427,
+      "charged_seconds": 8,
+      "reason": "New failure-context argument exposed outdated test mutation lambda signature; 4 passed, fifth error; no GPU/formal access"
+    },
+    {
+      "attempt": "attempt04",
+      "exit_code": 0,
+      "started_epoch": 1791964055.7090068,
+      "ended_epoch": 1791964084.0232165,
+      "wall_seconds": 28.314209699630737,
+      "charged_seconds": 29,
+      "reason": "Full affected suite 10 passed, zero errors/failures/skips after minimal mutation-fixture signature repair"
     }
   ],
-  "cumulative_charged_seconds": 54,
+  "cumulative_charged_seconds": 91,
   "maximum_seconds": 300,
-  "remaining_seconds": 246,
-  "final_cpu": "cpu/attempt02/result/result.json",
+  "remaining_seconds": 209,
+  "final_cpu": "cpu/attempt04/result/result.json",
   "first_attempt": "All 8 passed. Superseded only by explicit transpose/FP32 assertions and removing unused test-selection CLI. No scientific solver/trainer change.",
   "formal_inputs": false,
   "formal_labels": false,

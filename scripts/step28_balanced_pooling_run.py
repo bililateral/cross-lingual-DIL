@@ -272,6 +272,8 @@ def checkpoint(root, name, model, optimizer, memory, current, calibration, valid
     if len(calibration) != 12 or len(valid) != 40 or parent.adam_step(optimizer) != 288*stage:
         raise ValueError("Endpoint scope differs")
     optimizer.zero_grad(set_to_none=True)
+    c = {**c, "pooling_stats": c.setdefault("pooling_stats", {}),
+         "pooling_context": {"stage": stage, "step": 288, "role": "endpoint_prediction_or_restore"}}
     state, modes = diag.rng_state(), [m.training for m in model.modules()]
     with diag.neutral(model):
         scores = {"calibration": method.score(model, calibration, c, arm, budget.check),
@@ -596,7 +598,12 @@ def collect(root, scores, labelled, split):
                 raise ValueError("Full metric/confusion coverage differs")
             path = root/(name+"_"+role+"_counts.json")
             data.write_json(path, counts)
-            result["points"][name][role] = {"matrix": previous.save_array(root/(name+"_"+role+".npy"), matrix, root),
+            nullable = matrix.astype(object)
+            nullable[undefined_metrics(counts)] = None
+            matrix_path = root/(name+"_"+role+"_metrics.json")
+            data.write_json(matrix_path, {"columns": result["columns"], "values": nullable.tolist(),
+                "na_reason": "Zero precision or MCC denominator; null is undefined, never zero."})
+            result["points"][name][role] = {"matrix": data.record(matrix_path, root),
                 "queries": previous.save_array(root/(name+"_"+role+"_queries.npy"), queries, root),
                 "counts": data.record(path, root)}
     result["status"] = "ALL_18_METRIC_COUNT_SETS_SAVED"
@@ -604,14 +611,38 @@ def collect(root, scores, labelled, split):
     return result
 
 
+def undefined_metrics(counts):
+    """Only precision/MCC can be undefined for the contracted two-class groups."""
+    mask = np.zeros((len(counts), 22), dtype=bool)
+    for i, r in enumerate(counts):
+        tp, fp, fn, tn = (r[k] for k in ("tp", "fp", "fn", "tn"))
+        mask[i, 6] = tp+fp == 0
+        mask[i, 11] = (tp+fp)*(tp+fn)*(tn+fp)*(tn+fn) == 0
+    return mask
+
+
+def pooled_rates(counts):
+    result = base.rates(counts)
+    if result["tp"]+result["fp"] == 0:
+        result.update(precision=None, precision_na_reason="No predicted positives")
+    return result
+
+
 def summarize(matrix, domain_rows, draws):
     result = {}
     for i, d in enumerate("AB"):
         values = matrix[domain_rows[i]]
-        estimate = values[draws[:, i]].mean(1)
-        bounds = np.quantile(estimate, [.025, .975], axis=0)
-        result[d] = {k: {"mean": float(values[:, j].mean()), "conditional_95pct_interval": bounds[:, j].tolist()}
-                     for j, k in enumerate(parent.metrics.COLUMNS)}
+        result[d] = {}
+        for j, k in enumerate(parent.metrics.COLUMNS):
+            missing = int(np.isnan(values[:, j]).sum())
+            if missing:
+                result[d][k] = {"mean": None, "conditional_95pct_interval": None,
+                    "undefined_groups": missing, "total_groups": len(values),
+                    "na_reason": "At least one required group operand is undefined; fixed groups retained."}
+            else:
+                estimates = values[:, j][draws[:, i]].mean(1)
+                result[d][k] = {"mean": float(values[:, j].mean()),
+                    "conditional_95pct_interval": np.quantile(estimates, [.025, .975]).tolist()}
     return result
 
 
@@ -629,18 +660,24 @@ def finalize(root):
         if set(roles) != set(parent.ROLES):
             raise ValueError("All calibration roles required")
         for role, rec in roles.items():
-            v = previous.array(root, rec["matrix"], (40, 22), np.float64)
+            saved = data.read_json(data.verify(root/rec["matrix"]["path"], rec["matrix"]))
+            v = np.asarray(saved["values"], np.float64)
+            if saved["columns"] != col["columns"] or v.shape != (40, 22) or np.isinf(v).any():
+                raise ValueError("Nullable metric matrix differs")
             q = previous.array(root, rec["queries"], (40, 28, 10), np.float64)
             if not np.allclose(q.mean(1), v[:, 12:], atol=1e-12, rtol=1e-12):
                 raise ValueError("Saved query and group rankings differ")
             counts = data.read_json(data.verify(root/rec["counts"]["path"], rec["counts"]))
             if len(counts) != 40 or any(r["tp"]+r["fn"] != 20 or r["fp"]+r["tn"] != 358 for r in counts):
                 raise ValueError("Classification group coverage differs")
+            if not np.array_equal(np.isnan(v), undefined_metrics(counts)):
+                raise ValueError("Undefined metric mask differs from confusion denominators")
             ct = np.asarray([[r[k] for k in ("tp", "fp", "fn", "tn")] for r in counts], np.int64)
             arrays[name][role] = v
             result["absolute"][name][role] = {"by_domain": summarize(v, rows, draws),
-                "macro_all": dict(zip(col["columns"], v.mean(0).tolist())),
-                "fixed_half_classification": {"all": base.rates(ct), **{d: base.rates(ct[r]) for d, r in zip("AB", rows)}}}
+                "macro_all": {k: None if np.isnan(v[:, j]).any() else float(v[:, j].mean()) for j, k in enumerate(col["columns"])},
+                "macro_undefined_groups": dict(zip(col["columns"], np.isnan(v).sum(0).tolist())),
+                "fixed_half_classification": {"all": pooled_rates(ct), **{d: pooled_rates(ct[r]) for d, r in zip("AB", rows)}}}
     result["initial_comparisons"], result["forgetting_comparisons"] = {}, {}
     for candidate, other in policy()["evaluation"]["comparisons"]:
         key = candidate+"-"+other
@@ -653,6 +690,7 @@ def finalize(root):
     result.update(status="FIXED_AB_STATISTICS_COMPLETE", source_files=sources(), primary_role="raw", primary_metric="map",
         forgetting_sign="A endpoint minus B-end A ability; old_changes uses the opposite signed ability change",
         bootstrap="One PCG64(20260930) (5000,2,20) whole-group array shared by all contrasts and roles",
+        undefined_policy="Null denotes N/A. Any undefined required group operand makes the fixed-group mean/interval N/A; no groups dropped, no per-arm nanmean. Pooled rates use summed counts first.",
         limits="Reused development; single seed AB; independent training trajectories; conditional system contrasts, not isolated retention or inference causality; no overall pass gate.")
     data.write_json(root/"evaluation.json", result)
     return result
@@ -729,8 +767,9 @@ def execute(job, gate_path):
             "gradient_group_presentations": 2592, "access": data.read_json(job/"access.json"), "budget": budget.snapshot()}
         data.write_json(job/"completion.json", result)
         return result
-    except BaseException:
-        data.write_json(job/"failure.json", {"status": "FAIL_NO_RETRY", "traceback": traceback.format_exc(), "budget": budget.snapshot()})
+    except BaseException as exc:
+        data.write_json(job/"failure.json", {"status": "FAIL_NO_RETRY", "traceback": traceback.format_exc(),
+            "solver_failure": getattr(exc, "details", None), "budget": budget.snapshot()})
         raise
     finally:
         stopped.set()

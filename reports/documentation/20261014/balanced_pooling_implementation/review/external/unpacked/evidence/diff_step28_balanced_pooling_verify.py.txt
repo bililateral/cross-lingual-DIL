@@ -1,0 +1,37 @@
+--- attempt01/scripts/step28_balanced_pooling_verify.py
++++ current/scripts/step28_balanced_pooling_verify.py
+@@ -108,7 +108,7 @@
+     # A deliberately active handwritten interaction target, never a formal teacher claim.
+     target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
+     baseline=state(model,optimizer);rng=diag.rng_state();modes=[m.training for m in model.modules()]
+-    outcomes,effects,preclips={}, {}, {}
++    outcomes,effects={}, {}
+     probes={"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,
+             "head":model.head[0].weight}
+     memory=handwritten.shared_memory("F");memory.begin_stage(2)
+@@ -221,13 +221,10 @@
+     parser.add_argument("--output", type=Path, required=True)
+     parser.add_argument("--gate", type=Path)
+     parser.add_argument("--prior-seconds", type=float, default=0.)
+-    parser.add_argument("--cpu-tests", nargs="+", help="Affected BalancedPoolingTests methods; prior evidence is retained separately")
+     args = parser.parse_args()
+     args.output = args.output.resolve()
+     if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
+         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+-    if args.cpu_tests and args.mode != "cpu":
+-        parser.error("Selected tests are only for affected CPU qualification")
+     args.output.mkdir(parents=True)
+     sys.path.insert(0, str(data.ROOT/"tests"))
+     import test_step28_balanced_pooling as handwritten
+@@ -285,10 +282,7 @@
+         if args.mode == "cpu":
+             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+                 raise ValueError("CPU qualification must disable GPU")
+-            available = unittest.defaultTestLoader.getTestCaseNames(handwritten.BalancedPoolingTests)
+-            selected = args.cpu_tests or available
+-            if len(set(selected)) != len(selected) or any(name not in available for name in selected):
+-                raise ValueError("Unknown or duplicate affected CPU test")
++            selected = unittest.defaultTestLoader.getTestCaseNames(handwritten.BalancedPoolingTests)
+             report["selected_tests"] = selected
+             suite = unittest.TestSuite(handwritten.BalancedPoolingTests(name) for name in selected)
+             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:

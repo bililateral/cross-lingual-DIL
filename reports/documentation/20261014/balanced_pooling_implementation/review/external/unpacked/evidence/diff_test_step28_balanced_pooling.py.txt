@@ -1,0 +1,36 @@
+--- attempt01/tests/test_step28_balanced_pooling.py
++++ current/tests/test_step28_balanced_pooling.py
+@@ -26,6 +26,10 @@
+ def reference_2xm(k):
+     """Eliminate column constraints and solve ONE scalar; no matrix scaling."""
+     k = np.asarray(k, np.float64)
++    if k.shape == (2,2):
++        delta=(k[0,0]+k[1,1]-k[0,1]-k[1,0])/4
++        x=.5/(1+math.exp(-2*delta))
++        return float(k.mean()+np.logaddexp(delta,-delta)-math.log(2)),np.array([[x,.5-x],[.5-x,x]])
+     d = k[0]-k[1]
+     lo, hi = float(d.min()), float(d.max())
+     for _ in range(200):
+@@ -122,6 +126,11 @@
+                 self.assertLessEqual(abs(float(value)-ref),bound)
+                 self.assertLessEqual(float(np.abs(grad[0].numpy()-refp).sum()),2e-4)
+                 if k.shape==(2,2): self.assertLessEqual(float(np.abs(grad[0].numpy()-refp).sum()),1e-7)
++                xt=x.detach().transpose(1,2).requires_grad_()
++                vt=method.block_scores(xt,"F")
++                gt,=torch.autograd.grad(vt.sum(),xt)
++                self.assertLessEqual(abs(float(vt.detach())-ref),bound)
++                self.assertLessEqual(float(np.abs(gt[0].numpy()-refp.T).sum()),2e-4)
+             value,plan,info = method.solve(torch.from_numpy(k)[None])
+             self.assertLessEqual(abs(float(value)-expected),1e-8)
+             fd = np.empty_like(k)
+@@ -164,6 +173,10 @@
+             self.assertLessEqual(abs(float(fs-f)-float((i*.3+j*.2-1).mean())),1e-8)
+             self.assertGreaterEqual(float(f-k.mean()),-1e-8)
+             self.assertLessEqual(float(f-method.block_scores(k[None],"G")),1e-8)
++            rounded=k.float()
++            reference64,_,_=method.solve(rounded.double()[None])
++            output32=method.block_scores(rounded[None],"F")
++            self.assertLessEqual(abs(float(output32-reference64)),1e-8+1e-7*max(1,abs(float(reference64))))
+             rows.append(dict(n=n,m=m,**info))
+         self.evidence("all_shapes",rows)
+ 

@@ -18,6 +18,20 @@ SOLVER = dict(version="log_sinkhorn_round_v1", tau=1., maximum_iterations=4096,
               gap_tolerance=5e-9, roundoff_factor=256.)
 
 
+class SolverFailure(ValueError):
+    """Small numeric failure receipt; never retain a table or teacher payload."""
+    def __init__(self, message, indices, n, m, iteration, **residuals):
+        super().__init__(message)
+        self.details = {"reason": message, "failed_blocks": []}
+        for i, index in enumerate(indices.tolist()):
+            row = {"batch_index": index, "n": n, "m": m, "iteration": iteration,
+                   "marginal_error": None, "feasible_error": None, "gap_checked": None}
+            for key, values in residuals.items():
+                value = float(values[i])
+                row[key] = value if math.isfinite(value) else None
+            self.details["failed_blocks"].append(row)
+
+
 def identity(arm: str) -> dict:
     if arm not in ARMS:
         raise ValueError("Unknown pooling arm")
@@ -41,9 +55,10 @@ def bind(model, metadata: dict) -> str:
 def solve(blocks: torch.Tensor, stats: dict | None = None, *, maximum_iterations: int = 4096):
     try:
         return _solve(blocks, stats, maximum_iterations=maximum_iterations)
-    except ValueError:
+    except SolverFailure as exc:
         if stats is not None:
             stats["failures"] = stats.get("failures", 0)+1
+        exc.details["failure_count"] = stats["failures"] if stats is not None else 1
         raise
 
 
@@ -53,9 +68,9 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
             or not 1 <= maximum_iterations <= SOLVER["maximum_iterations"]):
         raise ValueError("Unsupported transport shape or iteration budget")
     k = blocks.double()
-    if not torch.isfinite(k).all():
-        raise ValueError("Nonfinite transport input")
     batch, n, m = k.shape
+    if not torch.isfinite(k).all():
+        raise SolverFailure("Nonfinite transport input", torch.where(~torch.isfinite(k).all((1, 2)))[0], n, m, 0)
     mu = k.mean((1, 2))
     w = k-k.mean(2, keepdim=True)-k.mean(1, keepdim=True)+mu[:, None, None]
     kernel = w-math.log(n*m)  # tau = 1, uniform U.
@@ -79,18 +94,25 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
         q = p * torch.clamp((1/n)/p.sum(2), max=1.)[:, :, None]
         q = q * torch.clamp((1/m)/q.sum(1), max=1.)[:, None, :]
         er, ec = 1/n-q.sum(2), 1/m-q.sum(1)
-        if (er < -eps[:, None]).any() or (ec < -eps[:, None]).any():
-            raise ValueError("Negative transport rounding mass")
+        bad = (er < -eps[:, None]).any(1) | (ec < -eps[:, None]).any(1)
+        if bad.any():
+            raise SolverFailure("Negative transport rounding mass", idx[bad], n, m, iteration,
+                                marginal_error=torch.maximum(rowerr, colerr)[bad])
         er, ec = er.clamp_min(0), ec.clamp_min(0)
         mass = er.sum(1)
         q = q+er[:, :, None]*ec[:, None, :]/torch.where(mass > 0, mass, 1.)[:, None, None]
         primal = (q*w[idx]-torch.special.xlogy(q, q*(n*m))).sum((1, 2))
         dual = p.sum((1, 2))-1-aw.mean(1)-bw.mean(1)
         gap = dual-primal
-        if not all(torch.isfinite(x).all() for x in (p, q, primal, dual, eps)) or (q < 0).any():
-            raise ValueError("Nonfinite or negative transport result")
-        if (gap < -eps).any():
-            raise ValueError("Transport dual bound below primal beyond roundoff")
+        bad = (~torch.isfinite(p).all((1, 2)) | ~torch.isfinite(q).all((1, 2))
+               | ~torch.isfinite(primal) | ~torch.isfinite(dual) | ~torch.isfinite(eps) | (q < 0).any((1, 2)))
+        if bad.any():
+            raise SolverFailure("Nonfinite or negative transport result", idx[bad], n, m, iteration,
+                                marginal_error=torch.maximum(rowerr, colerr)[bad])
+        bad = gap < -eps
+        if bad.any():
+            raise SolverFailure("Transport dual bound below primal beyond roundoff", idx[bad], n, m, iteration,
+                                marginal_error=torch.maximum(rowerr, colerr)[bad], gap_checked=gap[bad])
         checked = gap.clamp_min(0)+eps
         feasible = torch.maximum((q.sum(2)-1/n).abs().amax(1), (q.sum(1)-1/m).abs().amax(1))
         marginal = torch.maximum(rowerr, colerr)
@@ -111,8 +133,9 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
                 for key, value in maxima.items():
                     stats[key] = max(stats.get(key, 0), value)
             return values, plans, maxima
-    raise ValueError(f"Transport did not converge in {maximum_iterations} full iterations; "
-                     f"remaining={int((~done).sum())}, marginal={float(marginal.max())}, gap={float(checked.max())}")
+    failed = ~accept
+    raise SolverFailure(f"Transport did not converge in {maximum_iterations} full iterations", idx[failed], n, m,
+                        maximum_iterations, marginal_error=marginal[failed], feasible_error=feasible[failed], gap_checked=checked[failed])
 
 
 class _Envelope(torch.autograd.Function):
@@ -138,7 +161,7 @@ def block_scores(blocks, arm: str, stats: dict | None = None):
     raise ValueError("Unknown scoring arm")
 
 
-def account_logits(table, slots, arm: str, stats: dict | None = None):
+def account_logits(table, slots, arm: str, stats: dict | None = None, context=None):
     if arm == "S":
         return record.account_logits(table, slots)
     identity(arm)
@@ -160,24 +183,33 @@ def account_logits(table, slots, arm: str, stats: dict | None = None):
         rows = torch.as_tensor(np.stack([e[1] for e in entries]), device=table.device)
         cols = torch.as_tensor(np.stack([e[2] for e in entries]), device=table.device)
         blocks = matrix[rows[:, :, None], cols[:, None, :]]
-        scores = scores.index_copy(0, ids, block_scores(blocks, arm, stats))
+        try:
+            scores = scores.index_copy(0, ids, block_scores(blocks, arm, stats))
+        except SolverFailure as exc:
+            pairs = list(zip(*np.triu_indices(28, 1)))
+            exc.details.update(context or {}, arm=arm)
+            for failed in exc.details["failed_blocks"]:
+                index = entries[failed["batch_index"]][0]
+                failed.update(account_pair_index=index, account_slots=[int(x) for x in pairs[index]])
+            raise
     return scores
 
 
-def objective(table, group, regroup_seed, arm, reference=None, stats=None):
+def objective(table, group, regroup_seed, arm, reference=None, stats=None, context=None):
     if arm == "S":
         return record.objective(table, group, regroup_seed, arm, reference)
     if group.labels is None:
         raise ValueError("Authorized train labels required")
     slots = [record.assignment(group), record.assignment(group, regroup_seed)]
-    predicted = [account_logits(table, a, arm, stats) for a in slots]
+    context = {**(context or {}), "group_uid": group.uid}
+    predicted = [account_logits(table, a, arm, stats, {**context, "view": "A"+str(i)}) for i, a in enumerate(slots)]
     truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
     losses = [record.parent.ranking.objectives(v, truth, .5)["total"] for v in predicted]
     supervised = (losses[0]+losses[1])/2
     mse = table.new_zeros(())
     if reference is not None:
         target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
-        mse = ((predicted[0]-account_logits(target, slots[0], arm, stats))**2).mean()
+        mse = ((predicted[0]-account_logits(target, slots[0], arm, stats, {**context, "view": "teacher_A0"}))**2).mean()
     result = supervised if reference is None else .1*supervised+.5*mse
     return result, {"supervised": float(supervised.detach()), "mse0": float(mse.detach()),
                     "mse1": None, "distillation": float(mse.detach()), "weighted": float(result.detach())}
@@ -187,7 +219,8 @@ def update(model, optimizer, current, history, reference, c, arm, stage, step, c
     stats = c.setdefault("pooling_stats", {})
     result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
         stage, step, check, observe=observe,
-        objective_fn=lambda t, g, seed, a, ref: objective(t, g, seed, a, ref, stats))
+        objective_fn=lambda t, g, seed, a, ref: objective(t, g, seed, a, ref, stats,
+            {"stage": stage, "step": step, "role": "current" if ref is None else "history"}))
     for role, g in (("current", current), ("history", history)):
         if g is not None:
             key = data.seed_for(20260918, RNG_ORDER, stage, step, role, g.uid, "regroup")
@@ -205,7 +238,8 @@ def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None):
     model.eval()
     with torch.inference_mode():
         rows = [account_logits(record.pair_table(model, record.record_vectors(model, g, c, check), check),
-                              record.assignment(g), arm, c.setdefault("pooling_stats", {})).float().cpu().numpy()
+                              record.assignment(g), arm, c.setdefault("pooling_stats", {}),
+                              {**c.get("pooling_context", {}), "group_uid": g.uid, "view": "A0"}).float().cpu().numpy()
                 for g in groups]
     result = np.stack(rows).astype(np.float32)
     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
@@ -220,6 +254,9 @@ def restored_score(model, groups, c, check=lambda: None):
 
 def capture(model, optimizer, current, memory, valid, c, arm, stage, epoch, root, point, check=lambda: None):
     import step28_replay_diagnostics as diag
-    return diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch, root,
+    cfg = {**c, "pooling_stats": c.setdefault("pooling_stats", {}),
+           "pooling_context": {"stage": stage, "step": epoch*48, "role": "diagnostic_prediction"}}
+    return diag.capture(model, optimizer, current, memory, valid, cfg, arm, RNG_ORDER, stage, epoch, root,
         point, check, scope="AB", score_fn=lambda m, gs, cfg, a, ck: score(m, gs, cfg, a, ck),
-        pooling_fn=lambda table, slots: account_logits(table, slots, arm, c.setdefault("pooling_stats", {})))
+        pooling_fn=lambda table, slots, g, view: account_logits(table, slots, arm, c["pooling_stats"],
+            {"stage": stage, "step": epoch*48, "role": "history_diagnostic", "group_uid": g.uid, "view": view}))

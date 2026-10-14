@@ -1,0 +1,107 @@
+{
+  "status": "MINIMUM_CORRECTIONS_REQUIRED_BEFORE_NATIVE_PROGRESS",
+  "counts": {
+    "SCIENTIFIC_BLOCKER": 1,
+    "REPRODUCIBILITY_DEFECT": 2
+  },
+  "findings": [
+    {
+      "id": "SB-01",
+      "classification": "SCIENTIFIC_BLOCKER",
+      "title": "未定义precision/MCC被0填充并进入保存汇总和区间",
+      "evidence_level": "实际手写函数及collect/finalize完整保存链复现",
+      "contract_lines": [
+        160
+      ],
+      "locations": [
+        {
+          "path": "scripts/step28_continual_population_evaluate.py",
+          "lines": "47–55"
+        },
+        {
+          "path": "scripts/step28_chinese_base.py",
+          "lines": "680–685"
+        },
+        {
+          "path": "scripts/step28_balanced_pooling_run.py",
+          "lines": "591–601,607–615,632–650"
+        },
+        {
+          "path": "scripts/step28_bge_continual_run.py",
+          "lines": "42–46"
+        }
+      ],
+      "trigger": "合法20正358负群，全部logit=-1；无预测正例，precision和MCC分母为0。全部正预测时MCC仍未定义。",
+      "observed": "新正式收尾函数输出FIXED_AB_STATISTICS_COMPLETE，precision/MCC=0及[0,0]；F-S precision差=0及[0,0]。",
+      "impact": "破坏22指标中的部分绝对值、宏平均、pooled值、臂间差及区间的合同语义；不证明MAP计算错误。",
+      "minimum_fix": "本轮指标路径使用显式NA/有效性mask，贯通保存/读取/汇总/差值/bootstrap和原因计数；不按臂静默删群、不仅改NaN、不将有定义的0误删。手写全负/全正/部分未定义保存测试。",
+      "evidence_files": [
+        "evidence/independent_checks.py",
+        "evidence/independent_checks.json",
+        "evidence/na_pipeline/evaluation.json"
+      ]
+    },
+    {
+      "id": "RD-01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "title": "求解失败缺群/账号对/视图角色等必要上下文",
+      "evidence_level": "实际错误消息复现＋正式异常保存链静态追踪",
+      "contract_lines": [
+        78,
+        79,
+        80
+      ],
+      "locations": [
+        {
+          "path": "scripts/step28_balanced_pooling.py",
+          "lines": "41–57,82–115,155–180"
+        },
+        {
+          "path": "scripts/step28_balanced_pooling_run.py",
+          "lines": "228–245,732–734"
+        }
+      ],
+      "trigger": "当前/历史A0/A1或教师投影中非有限、超差或不收敛。",
+      "observed": "坏表objective异常只有Nonfinite transport input；底层超迭代给批汇总无具体账号对；正式failure仅traceback/budget。",
+      "impact": "能停止但不能据小证据定位失败群/块；未否定成功数值或既有CPU通过。",
+      "minimum_fix": "在现有异常和failure.json附arm/stage/step/current-history/A0-A1-teacher/groupUID/账号对索引/nm/迭代残差摘要和失败数；不导出K、正文、标签或Memory。",
+      "evidence_files": [
+        "evidence/independent_checks.json"
+      ]
+    },
+    {
+      "id": "RD-02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "title": "原生资格大文件写前缺保守reserve检查",
+      "evidence_level": "静态控制流；无实际原生超盘或保存失败",
+      "contract_lines": [
+        199,
+        240,
+        242
+      ],
+      "locations": [
+        {
+          "path": "scripts/step28_balanced_pooling_verify.py",
+          "lines": "80–90,194–205,247–264"
+        },
+        {
+          "path": "scripts/step28_continual_population_run.py",
+          "lines": "63–66"
+        },
+        {
+          "path": "scripts/step28_balanced_pooling_run.py",
+          "lines": "298–310"
+        }
+      ],
+      "trigger": "起始空间通过后，写前可用空间减少或当前占用+待写reserve超过资格临时上限。",
+      "observed": "native timed仅无参数check，check只统计现有文件；正式checkpoint已有reserve，但native没有。",
+      "impact": "不符合合同写前检查，可能在消费八次调用后丢失可预防的保存/资格收尾证据；非性能失败。",
+      "minimum_fix": "现有资格check加reserve参数，写前复用checkpoint_reserve并检查总占用和实际空闲；保留现有watchdog，不加预算/更新/系统。",
+      "evidence_files": [
+        "authorized_input/review_input.zip"
+      ]
+    }
+  ],
+  "no_performance_conclusion": true,
+  "no_execution_authorization": true
+}

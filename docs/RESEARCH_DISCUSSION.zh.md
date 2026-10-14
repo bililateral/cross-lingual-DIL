@@ -1144,3 +1144,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 本轮执行：最小S/G/F实现与Linux手写CPU资格已完成。首轮8项全过；交付前按合同补矩形转置独立参考、49形状FP32转换与2×2解析断言，撤下未需使用的选择性测试参数，补核当前来源8项亦全过。两轮实际52.764556秒、保守累计54/300秒；原件与29来源保留。没有GPU/BGE/正式文本或标签/旧Memory读取。合同、实现与CPU证据的具体合并外审包已准备完成（280892字节／69成员，身份见同目录review/package.json），按合同7.2及纪律6节另确认新包上传范围；旧静态包授权不泛化。详见[实施说明](../reports/documentation/20261014/balanced_pooling_implementation/implementation.zh.txt)与[累计账](../reports/documentation/20261014/balanced_pooling_implementation/qualification/ledger.json)。
 
 用户随后对已列出280892字节／69成员／SHA256 821415de49e848672d6ae5a025bbe88e63dfb4c4990c86aaf1cc0061b2fb6b6a的具体合并包明确回复：“授权此合并包外审（推荐）”。许可原件见[上传授权](../reports/documentation/20261014/balanced_pooling_implementation/review/upload_authorization.json)。14:55已通过指定本地Playwright MCP发送一次，原会话显示附件、正在思考及停止按钮；可见GPT-6/Pro强度5/5，后台身份未独立取得。见[提交状态](../reports/documentation/20261014/balanced_pooling_implementation/review/submission.json)。没有据上传成功启动GPU或正式数据运行。
+
+## 2026-10-14：回收S／G／F合并外审，独立主审及约定内推进
+
+用户原话：“外审已结束，仔细回收并分析 S、G、F 合同与实现的审查意见，独立主审后按约定继续推进。”本次沿用已批准合同及具体上传许可回收373863字节／88成员完整返回包，正文、清单、原输入和独立脚本／输出均保留；见[回收记录](../reports/documentation/20261014/balanced_pooling_implementation/review/recovery.json)。
+
+[独立主审](../reports/documentation/20261014/balanced_pooling_implementation/review/primary_disposition.zh.txt)接受SB-01、RD-01、RD-02，分别最小修复未定义precision/MCC贯通保存统计、实际求解异常定位及原生写前空间预留。保留原合同/审查/旧结果，未扩算法、数据、精度或预算。CPU03旧mutation测试接口错误保留并计8秒，修正后CPU04十项全过计29秒；累计91/300秒。原生资格已在15:52:31依条件授权启动，固定8实际调用/900秒，后续严格依新投影和资源，不自动重跑。当前实际状态统一看[交接顶部](AI_RESEARCH_HANDOFF.zh.md)，本段不提前声称原生或正式通过。新材料仅本地Git，无新公开push许可。
+
+后续约定内实际推进：原生attempt01八次真实更新全部完成，363.249906秒计364/900秒；实际F诊断与下一更新逐项一致，三臂两种状态保存恢复通过，临时六权重留身份后释放。新实测投影15.089510小时/14.217833GiB在24小时/16GiB内。16:03:39依现有批准及再次资源核对启动正式独立三臂，无监听；16:05:50确认A_S已发生实际更新、访问train=1/valid=0/heldout=0/owners=0，无failure。来源、进程、预算、预期完成区间和硬限统一见[当前交接](AI_RESEARCH_HANDOFF.zh.md)及[原生处置](../reports/documentation/20261014/balanced_pooling_implementation/qualification/native_disposition.zh.txt)。没有新的方法效果结论，不因启动而提前开放valid。

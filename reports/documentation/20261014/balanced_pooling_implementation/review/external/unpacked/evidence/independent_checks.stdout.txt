@@ -1,0 +1,226 @@
+{
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "torch": "2.10.0+cpu",
+    "numpy": "2.3.5",
+    "device": "cpu",
+    "project_py310_qualification": false
+  },
+  "expected_rejections": [
+    {
+      "case": "forced_one_iteration",
+      "exception": "ValueError",
+      "message": "Transport did not converge in 1 full iterations; remaining=1, marginal=0.15467757654267222, gap=0.42730956303605494",
+      "stats": {
+        "failures": 1
+      }
+    },
+    {
+      "case": "nan",
+      "exception": "ValueError",
+      "message": "Nonfinite transport input",
+      "stats": {
+        "failures": 1
+      }
+    },
+    {
+      "case": "inf",
+      "exception": "ValueError",
+      "message": "Nonfinite transport input",
+      "stats": {
+        "failures": 1
+      }
+    },
+    {
+      "case": "shape_1x2",
+      "exception": "ValueError",
+      "message": "Unsupported transport shape or iteration budget",
+      "stats": {
+        "failures": 1
+      }
+    }
+  ],
+  "symmetric_8x8_fp32": {
+    "input": "3*I_8",
+    "reference_value": 1.2195583508697845,
+    "actual_value": 1.2195583581924438,
+    "plan_L1_error": 2.6077032061477823e-08
+  },
+  "pure_additive_2x3": {
+    "input": [
+      [
+        2.0,
+        4.0,
+        7.0
+      ],
+      [
+        5.0,
+        7.0,
+        10.0
+      ]
+    ],
+    "value": 5.833333333333333,
+    "mean": 5.833333333333333,
+    "plan": [
+      [
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666
+      ],
+      [
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666
+      ]
+    ],
+    "diagnostics": {
+      "iterations": 1,
+      "marginal_error": 2.220446049250313e-16,
+      "feasible_error": 0.0,
+      "gap_checked": 5.684341886080804e-14
+    }
+  },
+  "undefined_metric_reproduction": {
+    "all_negative": {
+      "input": {
+        "controller_sizes": [
+          3,
+          3,
+          3,
+          3,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "all_logits": -1.0,
+        "pairs": 378,
+        "positives": 20
+      },
+      "actual": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.5264550264550265,
+        "roc_auc": 0.5,
+        "recall_at_fpr_1pct": 0.0,
+        "brier": 0.09678013136978363,
+        "log_loss": 0.3661717404282756,
+        "precision": 0.0,
+        "recall": 0.0,
+        "specificity": 1.0,
+        "f1": 0.0,
+        "balanced_accuracy": 0.5,
+        "mcc": 0.0,
+        "confusion": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 20,
+          "tn": 358
+        }
+      },
+      "contract_NA_columns": [
+        "precision",
+        "mcc"
+      ]
+    },
+    "all_positive": {
+      "input": {
+        "controller_sizes": [
+          3,
+          3,
+          3,
+          3,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "all_logits": 1.0,
+        "pairs": 378,
+        "positives": 20
+      },
+      "actual": {
+        "average_precision": 0.05291005291005291,
+        "trapezoidal_pr_auc": 0.5264550264550265,
+        "roc_auc": 0.5,
+        "recall_at_fpr_1pct": 0.0,
+        "brier": 0.5099960021472526,
+        "log_loss": 1.2603516346081698,
+        "precision": 0.05291005291005291,
+        "recall": 1.0,
+        "specificity": 0.0,
+        "f1": 0.10050251256281408,
+        "balanced_accuracy": 0.5,
+        "mcc": 0.0,
+        "confusion": {
+          "tp": 20,
+          "fp": 358,
+          "fn": 0,
+          "tn": 0
+        }
+      },
+      "contract_NA_columns": [
+        "mcc"
+      ]
+    }
+  },
+  "saved_pipeline": {
+    "status": "FIXED_AB_STATISTICS_COMPLETE",
+    "B_F_raw_A_precision": {
+      "mean": 0.0,
+      "conditional_95pct_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "B_F_raw_A_mcc": {
+      "mean": 0.0,
+      "conditional_95pct_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "F_minus_S_raw_A_precision": {
+      "mean": 0.0,
+      "conditional_95pct_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    "pooled": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 800,
+      "tn": 14320,
+      "fpr": 0.0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "f1": 0.0
+    }
+  },
+  "objective_failure_context": {
+    "group_uid": "A_hand_00",
+    "injected_nonfinite_upper_triangle_index": 0,
+    "exception": "Nonfinite transport input",
+    "stats": {
+      "blocks": 378,
+      "failures": 1,
+      "iterations": 1,
+      "marginal_error": 0,
+      "feasible_error": 0,
+      "gap_checked": 5.684341886080802e-14
+    },
+    "group_uid_in_exception": false
+  },
+  "elapsed_seconds": 1.8338437840000097,
+  "status": "EXPECTED_BEHAVIORS_AND_METRIC_DEFECT_REPRODUCED"
+}
+solver_cases_checked= 26
