@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-用户10月14日要求继续设计效果超过S的方案，已形成[双边覆盖记录匹配评分静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)。当前工作是对具体性能假设、运算／梯度、错误匹配与重组风险、近邻及最小比较作静态审查，具体包已获明确授权并提交一次，等待该会话的完整外审与独立主审；尚不进入新实现或训练。该候选改变最终评分函数，不能转用旧历史保持合同或共享已训练S首阶段。核心OT原理已有先例，性能与独立贡献分开判定；若静态价值不足则停止此候选，不自动追加模块。
+用户10月14日要求继续设计效果超过S的方案，已形成[双边覆盖记录匹配评分静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)。具体包静态外审已完整回收并经[独立主审](../reports/documentation/20261014/balanced_pooling/review/primary_disposition.zh.txt)关闭，接受进入具体实施合同准备的有限建议；尚不进入新实现或训练。H已补明F不保证比均值降低异控分数，双边质量也不保证多条可靠匹配。下一步需形成求解值／梯度误差、全路径评分接线、独立A及完整资源／读取范围；不能用网页算例替代项目原生资格。该候选改变最终评分函数，不能转用旧历史保持合同或共享已训练S首阶段。核心OT原理已有先例，性能与独立贡献分开判定；若静态价值不足则停止此候选，不自动追加模块。
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
 

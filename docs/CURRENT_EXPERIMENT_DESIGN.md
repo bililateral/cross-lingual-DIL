@@ -8,7 +8,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [双边覆盖的记录匹配评分](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt) | 2026-10-14新静态性能候选，具体包已获准并提交静态外审，等待完整回收／独立主审；尚未实现／执行，不是合同。均匀双边际熵正则最优值替代均值，完整S与去边际G为拟议对照；数学作用和错误匹配反例已列，OT先例明确，效果及独立贡献未知。需先完成具体新包静态外审／主审，再决定是否形成实施合同；旧许可不转用。 |
+| [双边覆盖的记录匹配评分](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt) | 2026-10-14新静态性能候选，静态外审及独立主审已关闭，建议进入实施合同准备；尚未实现／执行，不是合同。均匀双边际熵正则最优值替代均值，完整S与去边际G为拟议对照；数学作用和错误匹配反例已列，OT先例明确，效果及独立贡献未知。H按[主审补正](../reports/documentation/20261014/balanced_pooling/review/primary_disposition.zh.txt)解释为相对G的集中限制与相对S的差异化奖励；数值／接线／资源合同仍待形成，旧许可不转用。 |
 | [C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md) | 已完成固定运行及结果外审／独立主审的执行依据，无未关闭科学／复现阻断。完整S／Q／C_q／C_b，共同A＋四支B，1440更新／2592梯度群呈现、5端点／30诊断；CPU300秒、原生600秒／原6步（后获一次补核、累计最多11步）、正式16小时／18GiB、标签各一次及统一盲门。原生累计11步／469秒，原失败不清零；[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)按未变范围复用。原合同不授权重训或根据结果调参。 |
 | [自然查询锚定的历史重放C_q](../reports/documentation/20261013/query_replay/proposal.zh.txt) | 静态外审／[独立主审](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)已关闭，当时推荐合同准备，原稿不是执行合同。只改候选历史分支的查询条件分配及额外中心化响应MSE，保留完整S对照、当前S及0.5D0。整个历史目标的异来源交互盲区、R偏置／幅度和bootstrap条件控制按补正解释；Q/C_q共享增强规则键及完整共同A。稿内四臂为形成时未执行提议，后续实际执行／结果以本表上行和交接为准，不追改冻结原稿。 |
 | [完整S贡献定位与机制缺口](../reports/documentation/20261013/s_contribution/report.zh.txt) | 当前静态研究报告，不是执行合同。核对实际S、归因实验和直接近邻；判断基础系统价值与独立创新是否充分，明确自然账号内部结构与同控重组的待研究问题。不新增训练、数据读取或旧C诊断，当前审查状态见交接 |

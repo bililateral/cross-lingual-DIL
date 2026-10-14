@@ -1,0 +1,28 @@
+{
+  "purpose": "Self-authored isolated hand-matrix checks; no project code, text, labels, model, Memory, or training.",
+  "tau": 1.0,
+  "solver_tolerance": 5e-14,
+  "solver_max_iterations": 10000,
+  "finite_difference_step": 1e-5,
+  "cases": {
+    "cover22": [[2.0,0.0],[0.0,2.0]],
+    "row22": [[2.0,2.0],[0.0,0.0]],
+    "isolated22": [[4.0,0.0],[0.0,0.0]],
+    "anti_cover22": [[0.0,2.0],[2.0,0.0]],
+    "additive22": [[5.0,1.0],[3.0,-1.0]],
+    "constant23": [[1.25,1.25,1.25],[1.25,1.25,1.25]],
+    "rect23": [[8.0,1.0,-4.0],[2.0,-2.0,3.0]],
+    "centered23": [[0.5,-1.0,0.5],[-0.5,1.0,-0.5]],
+    "rect28": [[1.0,-2.0,3.0,0.0,2.0,-1.0,4.0,1.0],[-1.0,0.0,2.0,1.0,-3.0,2.0,0.0,3.0]],
+    "diag88": [[2,0,0,0,0,0,0,0],[0,2,0,0,0,0,0,0],[0,0,2,0,0,0,0,0],[0,0,0,2,0,0,0,0],[0,0,0,0,2,0,0,0],[0,0,0,0,0,2,0,0],[0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,2]],
+    "slow22": [[20.0,0.0],[0.0,0.0]]
+  },
+  "finite_iteration_cases": ["slow22", "rect23"],
+  "finite_iterations": [1,2,20],
+  "property_base": "rect23",
+  "row_shift": [0.7,-1.1],
+  "column_shift": [1.2,-0.4,0.3],
+  "row_permutation": [1,0],
+  "column_permutation": [2,0,1],
+  "small_centered_scale": 0.001
+}

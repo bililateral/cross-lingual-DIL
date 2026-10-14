@@ -1,0 +1,215 @@
+- main [ref=e92]:
+  - generic:
+    - generic:
+      - generic:
+        - button "分享" [ref=e125] [cursor=pointer]
+        - button "切换摘要面板固定状态" [ref=e131] [cursor=pointer]
+        - button "更多" [ref=e137] [cursor=pointer]
+  - region "对话" [ref=e150]:
+    - generic [ref=e151]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e162]:
+            - heading "你说：" [level=4] [ref=e163]
+            - generic [ref=e164]:
+              - generic [ref=e167]:
+                - button "review_input(20261014-043655).zip" [ref=e168] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "review_input(20261014-043655).zip"
+                    - generic: 文件
+              - generic [ref=e170]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]:
+                    - generic [ref=e174]: 请审查这份“针对完整S的双边覆盖记录匹配评分”静态性能提案。用户最新要求是：“还能不能设计一套效果比S更优的方案，仔细思考”。本轮只形成方案，未获新实现、Linux科研执行、数据读取或训练许可。此前S是否能做论文主算法仍是贡献成熟度讨论，没有被宣布为不可更改的最终方法。 先读reports/documentation/20261014/balanced_pooling/proposal.zh.txt。以完整S为未削弱对照；新候选用均匀两侧边际、tau=1的熵正则最大化最优值替换账号对均值，贯通A0/A1监督、该臂出生输出保持、诊断、恢复及最终预测。另提出去掉边际约束的G=log-mean-exp机制对照。三臂s0 A→B的1728 optimizer调用、2592梯度群呈现、6端点／36诊断只是待审草图，预算和执行许可尚未形成。 请先给出独立判断：值得进入实施合同准备、需要一项有根据的最小修订、还是应在静态阶段停止。分别判断性能假设的可检验价值与独立方法创新，不能因为数学成立就许诺收益，也不能因为最优传输已有就跳过具体任务作用判断。现稿已承认其核心是已有熵正则OT集合匹配，未宣称新算法理论；如果只能作为S的普通适配／对照，应明确指出。 重点审查： 1. F的KL归一化、n不等m、最优值含熵项、常数／转置／置换／行列加性性质、mean<=F<=G<=max、F=均值+F(W)、2×2闭式与反例是否正确。特别检查“任意非零W都得到正奖励”对有效性假设的威胁，不把交互结构自动称为身份信息。 2. 准确最优值的梯度为P*的条件，有限Sinkhorn下的数值／梯度与实现边界。现有proxy→head分块VJP→encoder链能否容纳新聚合；不能只看新增loss或非零总梯度。诊断模块默认mean、恢复模式和来源评分是否会造成伪接线。 3. H的任务依据是否足够支持一轮有限性能检验。均匀质量强制噪声记录参与、错误主题／模板匹配、A1共同原账号来源带来的人工对应是否使这条候选显著不值得。区分数学反例和实际数据发生率；包中无正式文本、标签或Memory，不能假称观察到实际根因。 4. 三臂能否区分双边约束和普通非线性聚合。候选D_f随评分改变，是整体系统干预，不伪称纯推理消融；首阶段不同须独立A，不能共享S已训练首阶段。未变的训练／统计证据按适用范围复用，不重审全部旧实验。 5. 直接近邻至少核DeepEMD与Sinkhorn原论文。原S／旧收缩保持／C_q的边界已附；不要把旧方案改个名字判作新工作，也不要要求与S完全相同的自身对手。检索不全时诚实标注，不以未搜到同名宣布原创。 请按SCIENTIFIC_BLOCKER、REPRODUCIBILITY_DEFECT、合理后续建议、OUT_OF_SCOPE_OVERDESIGN区分发现。当前是静态提案，没有已执行的新数值或训练可撤销。不要把更多seed、全因子、可学习边际／门控、新损失、温度网格、旧C诊断、全量代码审计或系统加固自动列为当前前提。若认为原始路线不值得，直接给最小理由，不无限补丁救方案。 可在网页自己的隔离环境中用自写的极小手写矩阵参考检查公式，禁止执行／导入项目科研代码、使用正式数据或假称项目Linux资格。如有计算，保存实际源码、输入、输出、stdout/stderr、运行环境和所有失败／修正记录；没有计算则明确说明，不补造日志。只有原始输入、已读材料和实际完成操作能支持结论。 交付完整中文正文、逐项发现和最小修订意见、阅读范围／一手文献来源、身份说明及上述必要算例证据；打包ZIP，提供逐文件相对路径／字节数／SHA256清单和外部回执，注明清单自排除。可以返回原输入ZIP以核对身份，不必重复解包复制全部输入。保留初稿与更正的时间关系，不静默改原始执行输出。提供可下载附件，不仅给网页摘要。 模型请求为GPT 6 Pro；请区分自述身份和你能实际核实的选择器／后台身份。不要声称能访问用户Linux、看到被删除权重或知道未提供的正式标签。主执行者将独立判断你的结论及授权范围。
+                    - generic [aria-hidden] [ref=e177]: …
+                  - button "显示更多" [ref=e178] [cursor=pointer]
+                - generic [ref=e184]:
+                  - button "复制消息" [ref=e186] [cursor=pointer]
+                  - button "共享提示" [ref=e190] [cursor=pointer]
+                  - button "编辑消息" [ref=e194] [cursor=pointer]
+          - generic [ref=e202]:
+            - button "思考了 21m 37s" [ref=e203] [cursor=pointer]
+            - generic: 思考了 21m 37s
+          - generic [ref=e205]:
+            - heading "ChatGPT 说：" [level=4] [ref=e206]
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - heading "结论" [level=2] [ref=e210]
+                - paragraph [ref=e211]:
+                  - strong [ref=e212]: 选择第一项：值得进入实施合同准备。
+                  - text: 但目前应定位为
+                  - strong [ref=e213]: 完整 S 的常规熵正则 OT 适配／机制对照
+                  - text: ，不是已经建立独立创新的新算法，也没有证据承诺其效果会超过 S。完整中文审查、推导、逐项发现和实际算例证据已打包交付。
+                - paragraph [ref=e214]:
+                  - text: 我不建议静态停止，因为这次确实改变了自然账号的最终评分及相应学习权重，能够区分固定记录作用表上均值相同的某些结构；G 对照也能直接检验双边边际约束是否比普通非线性聚合更有价值。但这些只支持
+                  - strong [ref=e215]: 一次有限、可失败的性能检验
+                  - text: ，不支持收益预判。
+                - heading "最关键的审查发现" [level=3] [ref=e216]
+                - paragraph [ref=e217]:
+                  - strong [ref=e218]: 数学定义和现稿反例成立。
+                  - text: KL 相对均匀独立计划的归一化、不同记录数、最优值包含熵项、常数／转置／置换／行列加性性质、mean≤F≤G≤max、F(K)=mean(K)+F(W) 以及 2×2 闭式均未发现错误。其最重要的风险也确实成立：
+                  - strong [ref=e219]: 任意非零双中心交互 W 都得到正奖励，奖励本身不区分身份对应、主题模板对应和噪声。
+                  - text: 完整证明与限制见审查正文第三节。
+                - paragraph [ref=e220]:
+                  - text: 建议对 H 作
+                  - strong [ref=e221]: 一处非阻断的文字澄清
+                  - text: ：F 在同一个 K 上不会把异控分数压到 S 的均值以下；它限制的是相对 G 的额外集中择优。真正待验证的是：这种新增奖励经训练后，是否更有利于自然同控账号，而不是错误主题、模板或 A1 共同原账号来源形成的人工对应。无需因此更换算法、加入门控或新增实验臂。
+                - paragraph [ref=e222]:
+                  - strong [ref=e223]: 数值正确性与梯度正确性必须一起落实。
+                  - text: 精确最优值在固定边际、固定 τ 等条件下的梯度是 P*；有限 Sinkhorn 的结果不能直接冒充精确包络梯度。本次自写手算中，[[20,0],[0,0]] 固定执行 20 次后，最大边际误差仍约
+                  - strong [ref=e224]: "0.01220"
+                  - text: ，最优值误差约
+                  - strong [ref=e225]: "0.18661"
+                  - text: 。这支持现稿要求明确收敛和梯度误差的边界，不代表项目已经发生实现失败。
+                - paragraph [ref=e226]:
+                  - strong [ref=e227]: 现有 VJP 架构可以容纳 F，但诊断存在具体的条件性伪接线风险。
+                  - text: 公共诊断对非 LOGIT 臂默认调用 mean 评分，教师残差还有独立的 mean 投影调用；仅新增臂名、训练 objective_fn 或额外诊断字段，不会自动替换这些路径。恢复时还必须绑定本臂的 pooling 模式、τ、求解配置和自身出生来源。这是未来需要定点核验的接线事项，不是旧 S 诊断本身有错。
+                - paragraph [ref=e228]:
+                  - strong [ref=e229]: 三臂草图可回答限定的问题，但属于整体系统干预。
+                  - text: F−S、G−S、F−G 可以分别检验总体价值、普通非线性聚合价值和双边约束的条件增量；不能称为纯推理消融，因为训练轨迹和 D_f 也改变。三个臂必须独立训练 A。
+                  - strong [ref=e230]: 1728 次 optimizer 调用、2592 次梯度群呈现、6 个端点／36 个诊断点的算术正确，但不是完整计算预算或执行许可。
+                - paragraph [ref=e231]:
+                  - strong [ref=e232]: 独立创新目前不足。
+                  - text: DeepEMD 原始作者版已经包含局部匹配、双侧运输、最终集合评分和端到端训练，而且表 2 明确比较了平均聚合与等质量 EMD；均匀边际本身不能作为新增原理。其原始作者版已实际阅读，CVF 正式页面访问失败的情况也保留在来源说明中。
+                  - 'link "arXiv: https://arxiv.org/pdf/2003.06777v1, https://arxiv.org/pdf/2003.06777v1, 另外 1 个来源" [ref=e236] [cursor=pointer]':
+                    - /url: https://arxiv.org/pdf/2003.06777v1
+                    - generic [ref=e237]:
+                      - generic [ref=e238]: arXiv
+                      - generic [aria-hidden] [ref=e241]: "+1"
+                  - text: Cuturi 原论文提供了直接的熵正则与矩阵缩放先例；同时，其式(2)报告的运输线性项不能与本提案含熵的最优值混为一谈。
+                  - 'link "NIPS 论文集: https://papers.nips.cc/paper_files/paper/2013/file/af21d0c97db2e27e13572cbf59eb343d-Paper.pdf, https://papers.nips.cc/paper_files/paper/2013/file/af21d0c97db2e27e13572cbf59eb343d-Paper.pdf" [ref=e245] [cursor=pointer]':
+                    - /url: https://papers.nips.cc/paper_files/paper/2013/file/af21d0c97db2e27e13572cbf59eb343d-Paper.pdf
+                    - generic [ref=e246]: NIPS 论文集
+                - paragraph [ref=e250]:
+                  - text: 分类结论是：
+                  - strong [ref=e251]: 当前确认的 SCIENTIFIC_BLOCKER 为 0；已发生的新候选 REPRODUCIBILITY_DEFECT 为 0。
+                  - text: 正文另列出了具体的条件性复现风险、合理后续建议与不应作为前提的超范围事项。
+                - heading "下载交付" [level=2] [ref=e252]
+                - generic [ref=e253]:
+                  - table [ref=e256]:
+                    - rowgroup [ref=e257]:
+                      - row [ref=e258]:
+                        - columnheader "文件" [ref=e259]
+                        - columnheader "内容" [ref=e260]
+                    - rowgroup [ref=e261]:
+                      - row [ref=e262]:
+                        - cell [ref=e263]:
+                          - strong [ref=e264]:
+                            - button "下载 balanced_pooling_static_review.zip" [ref=e267] [cursor=pointer]:
+                              - generic [ref=e268]: 完整审查 ZIP
+                        - cell "完整中文正文、逐项发现、最小修订、阅读范围、一手来源、手写算例源码与原始日志、初稿和更正记录" [ref=e275]
+                      - row [ref=e276]:
+                        - cell [ref=e277]:
+                          - button "打开 review.zh.md 的预览" [ref=e280] [cursor=pointer]:
+                            - generic [ref=e281]: 完整中文正文 · Markdown
+                          - text: ／
+                          - button "打开 review.zh.txt 的预览" [ref=e290] [cursor=pointer]:
+                            - generic [ref=e291]: 纯文本版
+                        - cell "完整数学推导、源码接线分析、性能与创新判断" [ref=e298]
+                      - row [ref=e299]:
+                        - cell [ref=e300]:
+                          - button "打开 MANIFEST.tsv 的预览" [ref=e303] [cursor=pointer]:
+                            - generic [ref=e304]: 逐文件清单
+                        - cell [ref=e308]:
+                          - text: 每项相对路径、字节数、SHA-256；
+                          - strong [ref=e309]: 清单自排除
+                      - row [ref=e310]:
+                        - cell [ref=e311]:
+                          - button "打开 balanced_pooling_review_delivery_receipt.json 的预览" [ref=e314] [cursor=pointer]:
+                            - generic [ref=e315]: 外部交付回执
+                        - cell "ZIP 及全部成员（含内部清单）的散列与核对结果" [ref=e321]
+                      - row [ref=e322]:
+                        - cell [ref=e323]:
+                          - button "下载 review_input(20261014-043655).zip" [ref=e326] [cursor=pointer]:
+                            - generic [ref=e327]: 原输入 ZIP
+                        - cell "保持接收时原字节，供核对身份" [ref=e334]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e335]:
+                  - text: 返回 ZIP 为
+                  - strong [ref=e336]: 89,762 字节、28 个成员
+                  - text: ，其中 27 项载荷加 1 份自排除清单。SHA-256：
+                - generic [ref=e338]:
+                  - generic [ref=e339]:
+                    - generic [ref=e342]: 纯文本
+                    - generic [ref=e343]:
+                      - button "启用自动换行" [ref=e345] [cursor=pointer]
+                      - button "复制代码" [ref=e349] [cursor=pointer]
+                  - code [ref=e353]:
+                    - generic [ref=e354]: 19609f83a3e3bacf530723af3ebdf77871e598479dcf2502ff5e97f06b88368a
+                - paragraph [ref=e355]:
+                  - text: 实际数值证据包含
+                  - strong [ref=e356]: 一次自写参考程序运行、45 项通过检查及 6 组有意截断反例
+                  - text: ；源码、输入、输出、stdout/stderr、环境和时间记录均在包内。初稿及定稿引用更正、尺度说明增补的时间关系已保留，未改写原始数值输出。没有执行或导入项目科研代码，没有访问用户 Linux、正式标签、Memory 或权重；这些手算不是项目原生资格。
+                - paragraph [ref=e357]:
+                  - text: 我的自述身份为
+                  - strong [ref=e358]: GPT-6 Astra Pro
+                  - text: ；用户请求为 GPT 6 Pro。当前网页选择器、强度设置和后台路由未被本实例独立核实。
+                  - strong [ref=e359]: 本次结论只支持准备实施合同，不构成实现、数据读取或训练许可。
+              - generic [ref=e362]:
+                - generic [ref=e363]:
+                  - button "打开 review.zh.md 的预览" [ref=e364] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "review.zh.md"
+                      - generic: 文档
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=e365]:
+                  - button "打开 review.zh.txt 的预览" [ref=e366] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "review.zh.txt"
+                      - generic: 文档
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=e367]:
+                  - button "打开 MANIFEST.tsv 的预览" [ref=e368] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "MANIFEST.tsv"
+                      - generic: 电子表格
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=e369]:
+                  - button "打开 balanced_pooling_review_delivery_receipt.json 的预览" [ref=e370] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "balanced_pooling_review_delivery_receipt.json"
+                      - generic: 打开文件
+                    - button "下载文件" [ref=e464] [cursor=pointer]
+        - generic [ref=e372]:
+          - button "复制" [ref=e374] [cursor=pointer]
+          - button "评价回复" [ref=e378] [cursor=pointer]
+          - button "分享" [ref=e382] [cursor=pointer]
+          - button "朗读" [ref=e386] [cursor=pointer]
+          - button "重新生成回复" [ref=e390] [cursor=pointer]
+          - button "更多操作" [ref=e393] [cursor=pointer]
+          - button "来源" [ref=e397] [cursor=pointer]
+      - generic [ref=e401]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - generic:
+          - button [aria-hidden]
+        - heading "最新一条回复" [level=4] [ref=e404]
+        - status [ref=e405]
+        - generic [ref=e421]:
+          - button "添加文件等内容" [ref=e426] [cursor=pointer]
+          - textbox "询问 ChatGPT" [ref=e433]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=e436]:
+            - button "选择 ChatGPT 模型" [ref=e440] [cursor=pointer]:
+              - generic [ref=e441]: Pro
+            - generic [ref=e451]:
+              - button "听写" [ref=e454] [cursor=pointer]
+              - button "开始语音" [ref=e459] [cursor=pointer]
