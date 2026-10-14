@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-14 C_q四臂：结果已回传，五权重已留证删除
+
+固定作业20261013_151500/workspace于10月13日22:55:47正常完成。306份结果／日志／资格小证据共7,760,771字节、从实际workspace另补的29份冻结来源505,635字节及8份Linux保存结果分析472,248字节均经SFTP回传并逐项大小／SHA核对；两端结果归档为reports/seller_alias_continual/20261014/query_replay_result，见[回传核对](../reports/seller_alias_continual/20261014/query_replay_result/receive_verification.json)。原job/run/sources为空，未将首次传输虚称包含源码；补源身份单列于source_manifest.json。完整训练状态已由正式入口按恢复与分支依赖释放，五份推理权重的后续分析／外审均无载模依赖。
+
+首次删除被工具自动审批以缺少本次具体授权拒绝，实际未删；用户随后明确回复“批准删除这五份权重（推荐）”，对应[授权](../reports/maintenance/20261014/query_weights/authorization.json)。[删除前身份](../reports/maintenance/20261014/query_weights/predelete.json)先回传核验，再次确认五文件最终路径、属主、大小／SHA、无活动作业及打开描述符、247份非权重SHA一致后，于10:35:52—10:35:53只删除A_shared、B_S、B_Q、B_C_q、B_C_b，共6,521,871,122字节（约6.07GiB逻辑大小）。五路径均不存在，models为空，247份非权重SHA前后不变，[删除回执](../reports/maintenance/20261014/query_weights/receipt.json)已回传核验。
+
+五份Memory共1,734,069字节仍仅留Linux原workspace/reports/job/run/memory，未反序列化、同步载荷或上传；预训练及其他作业文件不在删除范围。原报告／清单／获准上传包保存形成时字节，“仍保留／待许可”是删除前事实，当前保管以本次回执为准。SHA不能恢复已删除权重，未来重建不在现许可内；局部清理不重置大清理周期。
+
 ## 2026-10-13 C_cf三臂：结果已回传，四权重已留证删除
 
 本次固定A→B于10月12日19:53:39正常完成；280份结果／日志／冻结来源／资格证据5,765,044字节和10份Linux分析397,368字节已回传且实际大小／SHA匹配。两端归档为reports/seller_alias_continual/20261013/crossfit_retention_result，见[回传清单](../reports/seller_alias_continual/20261013/crossfit_retention_result/inventory.json)和[分析清单](../reports/seller_alias_continual/20261013/crossfit_retention_result/analysis_manifest.json)。临时完整训练状态已由正式入口在恢复核对及分支依赖解除后释放，身份保留在points。用户随后明确“记得及时删除此次训练产生的模型权重文件”。本次核对四端点完整／推理恢复、评价和保存结果独立复核均已完成；当前网页外审实际使用保存矩阵／分数与源码，现行合同无后续载模用途。现场无该workspace活动进程、打开的模型文件或待恢复完整状态。逐份核对最终路径、uid、大小／SHA与points一致，先将[删除前记录](../reports/maintenance/20261013/crossfit_weights/predelete.json)回传Windows并核验同字节，再于10月13日09:57:18—09:57:19删除A_shared、B_S、B_C_cf、B_C_perm四份推理权重，共5,217,548,401字节（约4.86GiB逻辑文件大小）。四路径均不存在、models目录为空，225份非权重文件SHA前后不变，见[删除回执](../reports/maintenance/20261013/crossfit_weights/receipt.json)。6Memory共1,646,210字节及F/O审计评分继续仅留Linux原20261012_140200/workspace/reports/job/run；未反序列化、回传载荷或上传。预训练及其他作业的保留例外不在本次删除范围。原报告、清单和上传包保留形成时字节，其“权重留存”表述属于删除前事实；SHA不能恢复已删模型，后续重建需另定范围。此次清理由实际依赖决定，局部清理不重置大清理周期。
