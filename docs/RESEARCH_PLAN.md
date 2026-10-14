@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)及[独立主审补正](../reports/documentation/20261014/balanced_pooling/review/primary_disposition.zh.txt)冻结。用户随后明确先准备具体实施合同，现已形成[完整S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)：固定tau=1与三臂独立A，落实有限求解值／梯度精度、全路径实际评分及恢复、完整时间／空间和三种访问权限；不复用已训练S首阶段。下一阶段在执行范围获准后，以最小实现和手写CPU证据与合同合并外审，原生资格通过且新实测投影满足预算后才可进入正式三臂；具体上传包另按实际范围确认，避免重复静态外审。当前只完成合同准备，无实现、Linux执行或正式数据读取。H仍是相对G的集中限制与相对S的差异化奖励，不保证可靠身份覆盖；核心OT原理已有先例，性能与独立贡献分开判定，固定实验不获收益也不自动调参或追加模块。
+用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)及[独立主审补正](../reports/documentation/20261014/balanced_pooling/review/primary_disposition.zh.txt)冻结。用户现已批准[完整S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)，授权在其范围和前提内推进；固定tau=1与三臂独立A，求解值／梯度、全路径实际评分与恢复、完整预算及三种访问权限不变。最小实现和Linux手写CPU核验已形成，下一步将合同、实现与CPU证据合并外审，具体新包外发按合同7.2确认；不重复已关闭静态核心审查。外审回收并经主审关闭、手写BGE原生资格通过且新实测投影及资源满足后，才进入正式三臂；实际状态与证据见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。H仍是相对G的集中限制与相对S的差异化奖励，不保证可靠身份覆盖；核心OT已有先例，性能与独立贡献分开判定，固定实验不获收益也不自动调参或追加模块。
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
 

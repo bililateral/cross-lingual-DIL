@@ -1,0 +1,19 @@
+请对完整 S／G／F 的已批准合同、最小实现和 Linux 手写 CPU 证据做一轮合并审查。请求模型 GPT 6 Pro。当前尚未进行 BGE 原生资格或正式数据运行，本包不请求性能结论。
+
+阅读入口
+1. docs/SELLER_ALIAS_BALANCED_POOLING.zh.md 是已批准且冻结的合同；其开头“准备版／未授权”保留形成时事实，后续批准见 reports/documentation/20261014/balanced_pooling_implementation/authorization.json。最新实现与证据解释见同目录 implementation.zh.txt、qualification/ledger.json。
+2. scripts/step28_balanced_pooling.py 实现唯一 F 求解、G、目标、VJP 分派和实际评分；step28_balanced_pooling_run.py 是正式入口；step28_balanced_pooling_verify.py 是 CPU／未来原生入口。通用 replay_diagnostics 只增加必要 scorer/pooling 回调。tests/test_step28_balanced_pooling.py 有独立参考、真实微型更新和单独标注的编排 fixture。
+3. qualification/cpu/attempt02 是最终当前来源完整 CPU 核验，attempt01 原件保留。deployment_manifest.json 与最终 result.json 绑定同一组 29 科研来源。所有源码按原仓库相对路径提供，依赖随包。
+4. prior_review/ 放已关闭静态原提案、外审正文及独立主审；复用其数学、近邻和风险，不重做完整静态外审。AGENTS.md、docs/RESEARCH_DISCIPLINE.zh.md 为纪律依据。
+
+本次必须核对的具体变化
+A. FP64 双中心化 log-Sinkhorn、固定 tau=1、最多 4096 次完整行列更新；局部可行化 Q、primal/dual 符号、浮点保护量与值／计划误差。返回含熵的 mu+primal，反向为上游乘 Q；Q 是受验收的近似包络梯度，不冒称有限迭代程序的精确导数。eps_fp 不是严格区间证书。请查独立 2×2 闭式、2×m 及转置标量参考、8×8 解析和 49 形状/FP32 对应是否覆盖合同；拒绝未收敛／非有限／错误形状的真实行为。
+B. 不只查函数名或 PASS。沿正式入口追踪 A0、原配对 A1、BCE/rank/top5、当前与历史 .1 监督和 .5 D_f、FP32 自身出生 T、proxy→512 head VJP→encoder→Adam、自然预测、校准、实际 fit/cache/valid 诊断、D0/D1 与两种恢复后实际评分。指出能否仍混入 mean；区分真实微型更新和 mock 编排计数。
+C. 三臂从相同未训练初始化分别 A→B；各自 Adam、RNG、Memory 延续，不共享已训练 S A。1728 次／2592 群呈现、六端点、36 诊断、自己 first-cal、出生 T 不刷新，配对调度和 A1 索引是否实际正确。完整／推理恢复绑定 arm、tau、求解配置、记录顺序及数值，并重新评分。
+D. 未来原生八次真实调用、最大 224 记录／双通道256 token、两种监督路径的 G−S/F−G pre/post clip 与实际参数位移、实际 F 诊断及下一步逐位复现；三臂实际保存恢复；全部调用／IO 是否包含在 900 秒资格和正式 24 小时／16 GiB 的投影内。现未实测，不得将旧 S 估算或本次 CPU 值作为原生通过。
+E. 七文件技术扫描、C 在构造/tokenize/标签数值对齐前丢弃、train/valid 各一次尝试、失败消费、完整盲门前 valid 未开，test/owners/private/旧 Memory 禁止。统一22指标、自然查询细项与整群配对 bootstrap、A初始能力/最终旧域/遗忘并列、完整比较 F−S/G−S/F−G、原严格过拟合标签与实际 gap 扩大量是否对应合同。未定义字段不能以零充当有定义的结果。
+
+处置要求
+仅把有具体证据且影响本轮科学有效性或必要复现的缺陷列为 SCIENTIFIC_BLOCKER／REPRODUCIBILITY_DEFECT，并给出文件、行号、触发条件和最小修复。合理后续研究及 OUT_OF_SCOPE_OVERDESIGN 单列，不要求全因子、更多种子、温度搜索、通用求解框架、全仓回归或安全加固。外审不是新增预算／数据许可。CPU 通过不等于 BGE 资格、正式运行或性能成功；本轮主执行者独立处置后才会进入原生阶段。
+
+交付：完整中文审查正文、逐项 findings、实际阅读范围、模型可见／自述信息及限制；如做独立手算，提供真实输入、源码、输出、命令、失败和日志，明确网页环境不属于项目 py310 资格。请返回一个可下载 ZIP，附成员路径／字节／SHA256 清单及返回包摘要；不要把自述当后台模型身份。输入无正式文本、标签、模型、Memory 载荷或凭据。不要要求访问它们，不上传其他目的地。

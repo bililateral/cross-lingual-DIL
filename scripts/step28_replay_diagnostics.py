@@ -61,7 +61,8 @@ def metrics(groups: list, values: np.ndarray) -> np.ndarray:
 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
             c: dict, arm: str, order: str, stage: int, epoch: int, root: Path,
             point: str, check: Callable = lambda: None, scope: str = "ABC",
-            table_diagnostic: Callable | None = None) -> dict:
+            table_diagnostic: Callable | None = None, score_fn: Callable | None = None,
+            pooling_fn: Callable | None = None) -> dict:
     """Called by the actual training loop after every 48 updates; never loads labels."""
     import torch
     if epoch not in range(1, 7) or parent.adam_step(optimizer) != (stage-1)*288+epoch*48:
@@ -74,11 +75,12 @@ def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
     before = memory.to_bytes() if memory is not None else None
     step_before = parent.adam_step(optimizer)
     origins = ({} if memory is None else memory.reference_origins if arm == "LOGIT0.1" else memory.origins)
+    scorer, pool = score_fn or score, pooling_fn or record.account_logits
     with neutral(model):
-        fit_values = metrics(current, score(model, current, c, arm, check))
-        cache_scores = score(model, cache, c, arm, check)
+        fit_values = metrics(current, scorer(model, current, c, arm, check))
+        cache_scores = scorer(model, cache, c, arm, check)
         cache_values = metrics(cache, cache_scores)
-        blind = score(model, valid, c, arm, check)
+        blind = scorer(model, valid, c, arm, check)
         errors = []
         for i, group in enumerate(cache):
             check()
@@ -99,8 +101,8 @@ def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
                 for seed in seeds:
                     slots = record.assignment(group, seed)
                     # Eval-only CPU pooling of the same FP32 tables; no model gradient.
-                    residual.append((record.account_logits(torch.from_numpy(live), slots)
-                                    -record.account_logits(torch.from_numpy(target), slots)).numpy().astype(np.float64))
+                    residual.append((pool(torch.from_numpy(live), slots)
+                                    -pool(torch.from_numpy(target), slots)).numpy().astype(np.float64))
                 e0, e1 = residual
                 errors.append({"uid": group.uid, "D0": float(np.mean(e0**2)), "D1": float(np.mean(e1**2)),
                                "residual_cross_mean": float(np.mean(e0*e1)),
