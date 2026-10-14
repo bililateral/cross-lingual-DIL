@@ -1,0 +1,322 @@
+"""Assemble the review and tabular appendices from independently checked outputs."""
+from pathlib import Path
+import json,csv,collections,hashlib
+R=Path(__file__).resolve().parents[1]; D=R/'reference/run01'; A=R/'appendices';A.mkdir(exist_ok=True)
+def load(n):return json.loads((D/n).read_text())
+def tab(n):
+ with (D/n).open(encoding='utf-8',newline='') as f:return list(csv.DictReader(f,delimiter='\t'))
+def fmt(v,signed=False):return format(float(v),'+.9f' if signed else '.9f')
+def ci(v):return '['+fmt(v[0],True)+', '+fmt(v[1],True)+']'
+def cell(v):return fmt(v['mean'],True)+' '+ci(v['conditional_95pct_interval'])
+def md(headers,rows):return '| '+' | '.join(headers)+' |\n| '+' | '.join(['---']*len(headers))+' |\n'+''.join('| '+' | '.join(map(str,r))+' |\n' for r in rows)
+M=load('main_results.json'); E=json.loads((R/'reference/reporting_clarification/execution_evidence.corrected.json').read_text()); X=load('check_result.json'); G=load('diagnostics.json'); stats=tab('all_statistics.tsv'); cls=tab('classification.tsv'); diag=tab('diagnostic_decisions.tsv')
+abs_table=md(['端点','旧域A MAP［条件95%区间］','新域B MAP［条件95%区间］'],[[p,fmt(v['A']['mean'])+' '+ci(v['A']['conditional_95pct_interval']),fmt(v['B']['mean'])+' '+ci(v['B']['conditional_95pct_interval'])] for p,v in M['map_absolute'].items()])
+comp_table=md(['固定比较（前项−后项）','域','MAP差值','条件95%区间'],[[p,d,fmt(v['mean'],True),ci(v['conditional_95pct_interval'])] for p,ds in M['comparisons'].items() for d,v in ds.items()])
+old_table=md(['B末态−共同A获得点','A MAP变化','条件95%区间'],[[p,fmt(v['mean'],True),ci(v['conditional_95pct_interval'])] for p,v in M['old_changes'].items()])
+prob=[r for r in stats if r['kind']=='contrast' and r['metric'] in ['brier','log_loss']]
+prob_raw_table=md(['比较','域','raw Brier差［区间］','raw log-loss差［区间］'],[[p,d,*[fmt(v['mean'],True)+' '+ci([v['lower95'],v['upper95']]) for met in ['brier','log_loss'] for v in prob if v['point_or_contrast']==p and v['role']=='raw' and v['domain']==d and v['metric']==met]] for p in M['comparisons'] for d in 'AB'])
+class_table=md(['角色','末态','TP','FP','汇总precision','汇总recall','汇总F1','群宏precision','群宏F1'],[[r['role'],r['point'].replace('B_',''),r['TP'],r['FP'],*[f'{float(r[k]):.6f}' for k in ['pooled_precision','pooled_recall','pooled_F1','macro_precision','macro_F1']]] for role in ['raw','stage-cal','first-cal'] for r in cls if r['point']!='A_shared' and r['domain']=='all' and r['role']==role])
+gap_table=md(['端点／子集','训练或缓存MAP改善','相应valid MAP改善','差距扩大［条件95%区间］'],[[r['point']+'/'+r['role'],fmt(r['train_benefit'],True),fmt(r['valid_benefit'],True),fmt(r['gap_widening'],True)+' '+ci([r['gap_lo'],r['gap_hi']])] for r in diag if r['metric']=='map'])
+r5_table=md(['缓存A','训练R5改善','valid R5变化［条件95%区间］','差距扩大［条件95%区间］'],[[r['point'],fmt(r['train_benefit'],True),fmt(r['valid_benefit'],True)+' '+ci([r['valid_lo'],r['valid_hi']]),fmt(r['gap_widening'],True)+' '+ci([r['gap_lo'],r['gap_hi']])] for r in diag if r['interpretation']=='证据不足'])
+all_diag_table=md(['端点/子集/域','指标','训练benefit［区间］','valid benefit［区间］','差距扩大［区间］','原规则判读'],[[r['point']+'/'+r['role']+'/'+r['domain'],r['metric'],fmt(r['train_benefit'],True)+' '+ci([r['train_lo'],r['train_hi']]),fmt(r['valid_benefit'],True)+' '+ci([r['valid_lo'],r['valid_hi']]),fmt(r['gap_widening'],True)+' '+ci([r['gap_lo'],r['gap_hi']]),r['interpretation']] for r in diag])
+prob_table=md(['比较','角色','域','指标（越低越好）','差值','条件95%区间'],[[r['point_or_contrast'],r['role'],r['domain'],r['metric'],fmt(r['mean'],True),ci([r['lower95'],r['upper95']])] for r in prob])
+cal_table=md(['端点','a','b','原始cal NLL','拟合后cal NLL','投影梯度最大值'],[[r['point'],fmt(r['a']),fmt(r['b']),fmt(r['initial_nll']),fmt(r['final_nll']),f'{float(r["projected_gradient_max"]):.12g}'] for r in tab('calibration_records.tsv')])
+res_table=md(['轮次','S的描述R','Q的描述R','C_q的描述R','C_b的描述R'],[[str(i+1),*[fmt(G['residuals'][p][i]['R_q']) for p in ['B_S','B_Q','B_C_q','B_C_b']]] for i in range(6)])
+report=r'''# C_q四臂固定A→B实验：独立结果外审
+
+审查日期：2026-10-14。对象：本次上传ZIP及本条用户状态补充。审查由当前实例独立完成，未委派其他审查者。本报告中的“核对”有明确层级：冻结字节核对、保存数值参考重算、执行记录与源码的定向交叉核查；不是在本工作区重放项目训练。
+
+## 一、结论先行
+
+**本次固定实验可以作为有效的开发结果接受；未发现已被证据证实、足以否定本次运行或主要统计结论的SCIENTIFIC_BLOCKER，也未发现要求改动正式数值或重训的具体缺口。** 这不是对未提供模型、标签或服务器现场状态的重新认证，而是结合已关闭的实现／原生资格，核查本次新增执行链和保存结果后作出的判断。
+
+**C_q相对完整S未建立旧域A未见账号排序收益，新域B也未建立正向收益。** C_q−S、Q−S、C_q−Q、C_q−C_b八个A/B MAP区间均跨零，不能由此得出等价、确定有害、非劣或所有类似方法无效。C_q−Q在B的区间上界是实质仍为正的 **+0.000076953920975482**，不是可以删去正号的显示误差。本固定配置结束、保留完整S为主要内部对照，是与证据相称的处理；它不等于要求另开补救试验，也不把旧S收益改记成C_q贡献。
+
+结果并非“所有指标都没有差异”：C_q对S的raw Brier／log-loss在A、B均有条件退化证据；对C_b的同类raw误差则有条件改善，校准后这些差异区间均跨零。分类存在明确的计数取舍；训练／缓存和valid之间的MAP差距确实扩大。**接受实验有效性，不等于接受候选已产生方法效果，也不等于抹去辅助收益和代价。**
+
+唯一需要单列的已知格式问题是`analysis/summary.json`中沿用旧格式的`violations_total=0`：原始残差没有相应约束计数，0由缺字段默认值产生。将其分类为**非阻断REPRODUCIBILITY_DEFECT（分析导出字段的语义缺陷，非新增数值失败）**；送审请求已明确排除它，本报告也不使用。最小处置是外置勘误注明“本轮未定义／不适用”，不改冻结输入、不重算、更不新增总验收门。
+
+本判断不是复述报告：本审查另写了不导入项目代码的参考脚本，从保存数组与计数重新计算全部1,452行统计、27项诊断条件、校准映射及分类比率，并对1440行更新、UID排程、288对分配摘要和来源链交叉核查。支持主报告的部分是由这些独立核对得到的，而不是由`PASS`文字推出的。
+
+## 二、输入身份、状态优先级与模型身份边界
+
+实际收到`review_input(20261014-023634).zip`，**4,808,851字节，357个不重复文件成员**；SHA256为：
+
+`9013c992a925bac6e69ba603438d5ca62692fcc38d5306a89f8a942f05973c96`
+
+与用户给出的上传身份一致；全部成员CRC／大小／SHA已检查。`inventory.json`的306份、7,760,771字节，`source_manifest.json`的29份、505,635字节，`analysis_manifest.json`的8份、472,248字节，分别对应不同回传批次，不应要求第一批inventory冒充整个上传ZIP总清单。原包全部357项的实际身份在`reference/run01/input_members.tsv`和`input_identity.json`。返回包保留原ZIP的逐字节副本，不解压覆盖或修改其成员。[E1]
+
+状态按时间与对象区分：`qualification/state.json`在2026-10-13 18:14:35（+08:00）记录`FORMAL_RUNNING`，其“尚无completion”是运行中快照，不覆盖后来22:55:47退出0、最终completion和已开放评价。类似地，包内“新包尚待上传许可／五权重仍在”是形成时事实。用户本条补充明确本具体ZIP外审和五权重删除已获批准，并称五权重于2026-10-14 10:35:52—10:35:53删除；该补充只更新保管状态，不更改原结果或来源。**本审查没有访问项目服务器，未独立目击删除或重新检查删除后的服务器247份SHA。**[E2,E8]
+
+能够另外核实的是：predelete中的五份权重记录与五端点manifest的大小／SHA一致，总计6,521,871,122字节；247项非权重记录中242项在ZIP内有实际字节并已逐项核对，另5项是未回传的Memory，其身份与manifest记录一致，合计1,734,069字节。后五项没有被读取为载荷。这澄清了“247非权重证据”和“本包不含Memory”并不矛盾；predelete本身仍不是删除回执。[E8]
+
+**模型选择／身份：** 当前对话没有提供本轮实时模型选择器画面或可独立读取的选择值；包内历史送审／主审提到的“GPT-6／Pro”只属于历史文字记录，不能外推为本次选择。本实例自述为GPT-6 Astra Pro，但这不验证页面选择、思考强度或后台路由。实际页面选择与后台身份均不能由本包独立核实；本报告的可信度来自可检查的审查内容与返回记录，而非自述型号。详见`evidence/model_identity.json`。
+
+## 三、执行证据是否足以支撑这一次固定比较
+
+### 3.1 数量、来源与失败账
+
+来源的“29项一致”不是仅看文件名：实际29份源码字节与completion、before_valid、run manifest、evaluation/collected、正式gate、最终CPU attempt03及原生attempt02的来源记录一致。三个CPU冻结`source.tar.gz`也逐项核对；attempt01与最终源的差别限于runner、verify、test三项，attempt02差别限于verify、test两项，attempt03与最终29项完全一致。保留早期差异及修复轨迹，不能拿旧资格散列假装从未改源，也不需要重审未变化的全部项目历史。[E1,E3]
+
+形式数量有记录及源码循环相互支持：共同A的288次optimizer调用，加四个B分支各288次，合计**1440更新**；A每步一个当前群，B每步当前群加一个历史群，合计`288+4×288×2=2592`次梯度群呈现。每个物理阶段6轮，5个端点对应**30次诊断**。参考核对读取5份训练日志的全部1440行，逐行核对步骤、当前／历史UID、有限正梯度范数、目标分解、学习率和最终Adam计数；这不是只读completion的总数。[E2,E4]
+
+“1440更新”按合同是optimizer实际调用数，不是每次encoder都具有正学习率：每阶段第288步encoder学习率为0，head仍为0.001，Adam步计数继续。故将其写成“1440次均有非零encoder参数位移”反而错误。保存正式日志没有逐步逐参数位移，不能越级声称本审查证实了该更强命题。[E4]
+
+原生失败没有清零：attempt01真实完成5次更新后，在写手写诊断文件时因目录缺失失败；原始traceback与结果留存，外层约200.17秒，保守计201秒。明确授权的补核attempt02完成6次实际更新，外层约267.94秒，计268秒。**累计11次／469秒**，在补充授权的累计11次／600秒内；不是失败那5次被替换为“没有发生”，也不是自动重试。CPU三次分别计39／4／3秒，合计46秒。正式成功运行与此前失败资格分别保留，不能用正式退出0删除资格失败成本。[E3]
+
+### 3.2 完整A共享、Memory、候选一致性与五端点恢复
+
+四个B分支的起点记录逐字段一致，包括模型、Adam、模式、随机状态、Memory成员／来源／教师表身份以及映射；不是只比较权重SHA。A末Adam=288，各B末=576；五个端点分别有完整状态恢复后52群重评分一致的记录，以及推理状态实际加载后参数／buffer与元数据一致的记录。活动runner中的保存—实际恢复—重评分路径与这些记录一致，原生资格也证明诊断后下一更新及完整状态恢复可保持一致。本次没有重新载入五个模型，因而准确的结论是“来源一致且有已关闭资格支持的完整恢复证据”，而非本工作区又恢复了五个模型。[E2,E3,E4]
+
+利用公开UID元数据、不读取Memory载荷，参考脚本独立重建固定划分、当前群洗牌、Algorithm R六群保留和288次历史抽取：结果与保存日志一致。每域48 fit／12 calibration／20 valid；四个B分支在同样的当前UID、历史UID与共同键下更新，B中六群成员、教师表、来源及seen保持，未将B扩成后续学习记忆。实际记录的单个历史状态最大348,167字节，低于1MiB。五份保管快照总量不等于学习器可同时访问的历史预算。[E2,E4]
+
+Q／C_q全部**288对候选分配SHA一致**；独立参考核对检查了逐步相等和共同随机键源码，盲门还在原项目中对候选一致性进行检查。本包没有记录载荷，因此本审查不能从摘要重建每一个候选记录索引；不能把摘要一致称作这里逐索引重采样。结合冻结实现、原生针对性资格、正式逐步记录，可接受“本轮Q与C_q按合同同分配”的证据链，不存在有根据的错配反例。[E2,E4]
+
+### 3.3 统一开放与访问账
+
+`before_valid`的状态为`ALL_BLIND_GATES_PASS`，保存train=1、valid=0；与其所指manifest字节相符。其后completion/access为train=1、valid=1、heldout=0、owners=0，五端点及30诊断的盲结果先形成，再一次开放valid进行评价。直接查看runner的blind_gate、parse_once和评价调用顺序，未发现第一臂先看valid、后续臂据结果改动或按诊断选轮的入口。[E2,E4]
+
+这是**访问计数和来源绑定的执行证据**，不是对整个服务器所有进程作绝对无访问证明。当前参考核对自身的正式标签解析、模型载入、Memory反序列化、训练更新、项目服务器连接均为0。不得用本工作区检查替换项目Linux原生资格，也不得因这里没有标签而索取封存真值来完成另一轮审计。
+
+## 四、主要MAP：重算方式、数值与各比较的含义
+
+### 4.1 统计单元和条件性
+
+保存指标每角色为40群×22列；逐查询明细为40群×28查询×10排名指标。参考脚本重算逐查询到群平均、域平均及全部固定统计，不把每域560个查询看作560个独立样本。A/B各20群，固定`PCG64(20260930)`一次生成`(5000,2,20)`整群索引；各比较先同群作差再平均，角色、指标及端点共用原索引。区间为2.5%／97.5%线性分位数，未新抽种子或更改验收阈值。[E5,E9]
+
+共核对：五端点绝对值660行、四比较528行、四臂旧A变化264行，合计**1452行**。与保存evaluation及analysis CSV的最大绝对差为2.220446049250313e−16；本工作区的算术核对误差界不是新的科学非劣容忍。
+
+这些是**固定数据、s0、AB顺序、已选训练实现和已多次使用的开发valid条件下**的群抽样区间，不涵盖种子／顺序／重新生成／方法选择的不确定性，也不提供八项或整个22指标族的联合覆盖保证。不把“条件区间”写成对真实中文市场的置信保证。[E5,E7]
+
+### 4.2 五端点绝对值
+
+{{ABS}}
+
+校准为正斜率仿射映射，排名及精确并列关系都核对不变，所以主要MAP不随三个角色改变。A_shared在B上的数值是学习B之前的同一端点评分，不是额外训练分支或额外种子。
+
+### 4.3 四项比较
+
+{{COMP}}
+
+八项均无法按原定义确定MAP差值方向。尤其C_q−Q在B的上界+0.000076953920975482仍大于0：可以说点估计偏负、上界接近0，不能写“严格负区间”或“已经证明损害B”。也不能用窄小正上界自创非劣阈值。另一方面，下界允许一定下降，所以“未证明有害”也不等于“保证无代价”。
+
+四项比较不是同一句话重复四遍：
+
+- **C_q−S：** 整个新历史目标相对完整主要对照的净增量；A的主要收益主张未建立。S没有被删掉模块、候选化重写或要求战胜与自身等同的方法。
+- **Q−S：** 自然完整查询＋来源排除＋单端行条件候选替换这整套策略的效果。Q自身未建立收益，所以不能把本结果改述为“Q有效，只是R多余”。
+- **C_q−Q：** 同分配Q条件下固定0.25R的增量。A点估计略正、B略负，均未确定；不能把R的缓存收益当成排序收益，也不能宣布R在所有条件下无用。
+- **C_q−C_b：** 固定同一R条件下不同候选策略的比较。两者都排除查询来源，但同时不同于跨账号混合、无／有放回和覆盖率；本次没有建立更复杂跨账号策略的必要性，也未证明所有bootstrap方案等价。
+
+C_q−S的逐群MAP差符号在A为8正／12负，B为11正／9负。B虽正差群略多而均值负，说明差值幅度不可被胜群数替代。C_q−Q的A为8正／8负／4零，B为5正／13负／2零。这些只是描述明细，不是新验收门，也不据此剔除群。
+
+### 4.4 旧域变化不等于相对对手优势
+
+{{OLD}}
+
+四臂A的平均点估计都没有相对共同A端点下降，但区间均跨零，因此不能证明总体无遗忘或非劣；同时不妨碍C_q相对S尚无增量的结论。把“自身获得点未降”替代“胜过完整S”，会把两个不同问题混在一起。
+
+C_q−S的MRR A/B点差−0.002107346／−0.000783331，Recall@5点差+0.001785714／+0.002678571，区间同样跨零。C_q−C_b的A/B Recall@5差及区间为0，是这一离散指标在保存群上的相同，不是两个算法等价。完整其它指标在返回TSV，不以只报MAP掩盖辅助表现。
+
+## 五、概率误差、校准与分类取舍
+
+### 5.1 raw误差的方向与校准后的边界
+
+以下差值均为前项−后项，Brier／log-loss越低越好。
+
+{{RAWPROB}}
+
+C_q−S和Q−S在两域这两项raw误差均严格为正，有**条件退化**证据，不能写成“总体指标没有差异”。C_q−C_b的四项raw误差严格为负，是应保留的局部改善；不能因主要MAP未建立就将它删去。但这既不支持胜过S，也不能替代旧域排序目标或证明复杂重组必要。
+
+C_q−Q在raw、stage-cal、first-cal三角色、A/B两域的两项误差区间全部跨零。C_q−S及C_q−C_b在stage-cal与first-cal后的相应区间也都跨零。这里的校准改变了数值尺度与阈值，不会改善已核对不变的排序；“校准后没有确定差异”不是“校准已证明消除所有代价”。完整48行概率差值区间见附录二。
+
+五次映射记录均为成功，a>0，每次12个当域calibration群／4536对／240正例。参考计算逐元素核对`a*raw_logits+b`与保存校准分数相同，排序和精确并列关系相同，first-cal均使用共同A映射；没有重新拟合、试选校准或重读cal标签。拟合成功状态／梯度记录被核对，但没有在缺少标签时冒称重新解决了拟合问题。[E5]
+
+评价log-loss是保存实现中的概率裁剪后无权重对数损失，与训练中未裁剪BCE及其它排序项不是同一个标量。不能将概率误差曲线与总训练loss直接相减或把不同定义的变化解释成实现矛盾。
+
+### 5.2 汇总计数率与逐群宏率：两者都报
+
+下表合计40群、800正对、14,320负对。FP／TP为汇总数；“汇总”比率由总计数算；“群宏”是先每群算率再平均。分母为0时的precision按保存实现记0。每群正例数相同，因此本例宏recall等于汇总recall，但precision和F1一般不等。
+
+{{CLASS}}
+
+最直观的反例是raw S：汇总precision=1，不等于群宏precision=0.1；raw C_q的群宏precision=0.075，也不是1。原因不是指标冲突，而是大量群完全没有预测阳性。召回不足1%，raw的100%汇总precision不能解释为自动识别问题已解决。
+
+first-cal下C_q相对S为**少7个FP，同时少2个TP**：汇总precision提高至0.658537，但recall从0.103750降至0.101250、F1从0.178112降至0.175515；FPR由0.003421788降至0.002932961。stage-cal则同样27个FP但少2个TP。C_q相对Q在first-cal多1个TP也多1个FP；相对C_b多2个TP也多2个FP。故局部概率改善、降低误报和整体分类支配是不同命题，四臂不存在由这张表即可推出的全面优势。
+
+原主报告确实披露了S/C_q的计数取舍，并指出完整四臂计数所在文件，不构成隐瞒；本审查补列Q/C_b和群宏列，使读者无需将两种率混算。242份可见非权重证据并不含可用于重建标签的真值文件；本核对只由保存计数重算六项分类率，并由logit≥0核对预测阳性总数。TP／FP各自的逐对标签真实性仍依赖已关闭原评价证据，而非这里新读标签。[E5,E8]
+
+## 六、全部六轮诊断：原规则正确，不代表没有差距
+
+### 6.1 独立判读规则
+
+全部30次捕获的epoch、fit/cache/valid UID、Adam步、盲valid分数、fit/cache矩阵及解盲后valid指标均检查。六轮全部使用，不据曲线另选端点；各端点第六轮盲分数与端点raw分数**文件字节一致**，对应MAP／R5／log-loss矩阵也一致。[E6]
+
+诊断共9个“端点—训练子集—对应域”组合×3指标=27项。MAP／R5的benefit为第6轮减第1轮；log-loss的benefit取相反号，使正值都表示改善。保持原固定诊断抽样键：在同一子集内跨轮配对，训练群与valid群独立整群重采样，跨臂共用同类抽样。未把六个缓存群当作48个训练群，也不把缓存和valid当同一批配对账号。
+
+原点信号要求同时满足：训练benefit>0、valid benefit<0、差距扩大>0。更强区间判读还要求训练改善区间下界>0、valid变化区间上界<0、差距扩大区间下界>0；仅点条件满足但区间不足为“证据不足”，否则按旧规则为“未见明确迹象”。本审查从保存矩阵重建这些量，而不是复制旧标签。
+
+核对结果确为**24项“未见明确迹象”、3项“证据不足”、0项“有相应迹象”**。但这不是“没有过拟合”验收门。该规则刻意要求valid下降；只要valid小幅上升，即使训练改善远快于valid、差距明确扩大，也不会触发下降标签。这是规则逻辑，不是消除泛化落差的证明。
+
+### 6.2 MAP原量与C_q的关键区别
+
+{{GAPS}}
+
+C_q缓存A的MAP提高0.093828078，valid A提高0.011947227；差距扩大0.081880851，区间[0.045345299,0.119078198]。C_q fit B提高0.081810678、valid B提高0.010626215；差距扩大0.071184463，区间[0.052481931,0.089115593]。**两域valid点估计都未下降**，所以没有触发下降型标签；不能反向写成“C_q的valid已退化”，也不能说“没有泛化差距”。
+
+Q／C_q／C_b缓存MAP差距的点扩大量都比S更大，但当前这些区间是各臂内部的差距变化区间，不是“候选−S差距变化”的新配对检验；不能仅凭各自区间或大小排序宣称跨臂显著更易过拟合。共同A本身的MAP差距也扩大0.080424890，并非候选独有。
+
+### 6.3 三项缓存R5点信号
+
+{{R5}}
+
+这三项的训练缓存R5上升、valid点估计小幅下降，确有原规则的点信号；但valid变化区间跨零，保留“证据不足”正确。不能因缓存改善就判成功，也不能因点下降就宣判对未见旧账号确定有害。
+
+共同A的raw log-loss在fit和valid均变差：原始loss分别上升0.073333795和0.090690259，其benefit均为负，差距扩大0.017356463。原规则不触发，不是因为两个loss都在改善，而是因为“训练改善”条件不成立。这一事实在原报告已有披露，独立重算确认了其重要性：不同训练目标与概率评价量不能混作单调优化保证。
+
+全部27项的训练benefit、valid benefit、差距、各自区间与判读在附录一逐项列出，原始六轮曲线在`reference/run01/diagnostic_curves.tsv`（162行）和原包中保留。不要从这些曲线挑最好一轮重命名本固定最终结果。
+
+## 七、R是否接入实际更新：证据强度分层
+
+**第一层：冻结源码有可微通路。** 历史C_q目标为`0.1*Bbar_q+0.5*D0+0.25*R`，当前群保持完整S。proxy上的dJ/dK经head分块VJP累积head与记录表示梯度，再`z.backward`进入encoder；当前和历史合并、clip后只做一次AdamW。教师停止梯度，学生均值／中心化／R通路没有用no_grad替代。自然S走原函数路径，不是候选函数的近似重写。[E4]
+
+**第二层：项目原生资格证明关键参数确实受新项影响。** 已保存的Q−S和C_q−Q构造样例不只比较loss。C_q−Q时encoder的post-clip梯度最大差4.995235940441489e−5、更新后参数最大差2.9733404517173767e−5；head分别8.396431803703308e−5和2.781730145215988e−4，均可区分。记录389个活动encoder参数张量、4个head参数张量；不能要求本来未使用的pooler也有梯度。本轮未重跑这项原生资格，而是核对原件、实际来源与最终来源绑定。[E3]
+
+该原生样例使用专门构造的手写群、教师扰动及恢复状态，目的是避免R恰好无效而不能测试接线；构造的Adam步状态不代表已额外训练数百步。它证明关键通路可产生真实参数作用，**不估计正式1440步每个参数的R梯度大小**，也不把构造教师的效果当成正式旧域收益。保存的诊断后下一更新bitwise一致记录，为诊断非干预性提供针对性支持。
+
+**第三层：正式运行确实执行了绑定的目标。** 两个候选历史分支各288步均记录非零加权R，逐步目标分解与固定系数在FP32算术容差内一致；Q／C_q同分配，当前／历史UID和更新路径一致。非零R、梯度范数、累计Adam步或loss分解单独都不能证明全部梯度正确；它们与前两层联合支撑“R按合同进入本次更新”，不是每步逐参数的重复资格。[E2,E4]
+
+训练日志平均R为Q 0.010382815、C_q 0.009756695、C_b 0.009749154；C_q平均加权R=0.002439174。Q的正式R描述值权重为0；S的正式训练日志**没有同一R字段**，不能把缺字段默认为实测R=0。S／Q共同诊断中的`weighted_R_q`只是统一按0.25缩放的描述量，不是它们使用了R优化；D1也只是共同残差描述，没有接回旧C目标。
+
+六轮缓存eval残差如下；不同于训练日志的dropout条件，不将两条序列混算：
+
+{{RESIDUALS}}
+
+C_q六轮均低于Q，支持“相应缓存边际响应偏差有所减轻”的描述；并不推出自然未见账号MAP提高。C_q自己的R从第一轮0.006834786增到第六轮0.016008867，不能宣称漂移消失。R是标量目标，梯度还取决于局部导数、方向和其它项；其loss份额较小既不证明没接入，也不自动要求增大系数。
+
+本参考计算核对了保存残差的`D1+D0−2*cross`代数、R缩放与六轮均值，没有缺失T/K时冒称从真实教师／学生表重新计算R。`violations_total`则完全排除，原因与处置见发现F01。
+
+## 八、信息盲区与可识别的因果主张
+
+本轮不重新开创新检索，但必须保留会改变结果解释的已审数学边界。以下是对结果含义的检查，不是新增方法或新实验。
+
+对异来源误差块写`E_sr=m+α_s+β_r+W_sr`，其中α／β零均值，W每行每列和均为0。D0看到m；以完整自然查询作平均时，W在任一候选记录上的查询均值为0，反方向也为0。因此无论该行怎样重分配候选，**整个Q／C_q历史监督＋D0＋R都不见W**，而不只是R单项不见。2×2块`[[t,−t],[−t,t]]`就是非零W的直接反例。完整S允许双端重组，局部子块均值可以非零，所以它可能保留候选放弃的交互信息；这说明机制存在信息取舍，不说明该信息在本次是好是坏。[E7]
+
+一般该W空间维数为`(n_q−1)(n_a−1)`。对于查询所在K2的唯一正候选，候选保留其完整原账号，两方向的b均为0；因此Q／C_q在该正例块中只能看到总均值，**所有总均值为0的变化**都不可见，维数扩大到`n_q*n_a−1`。这是整个候选历史目标的性质，不是“当前完整S分支也看不到”。每群16个K2查询的正候选不重组，12个K3查询共有24个具备非平凡重组条件的正有向单位；不能称40个正单位全部被增强，也不能由结构系数非零断言正式梯度必非零。
+
+C_b也完整固定查询，所以一般W盲区仍应注意；但账号内bootstrap会使K2正候选的记录重复／遗漏，可以看到部分边际变化，不能把Q／C_q的更大K2盲区原封不动套给C_b。它使用同一个R是**条件控制**：账号内bootstrap的单候选二阶矩通常为`Σe²/n_a²`，不是无放回候选的b权重。这是预定公平比较条件之一，不是声称C_b用了自身最优保持项或两种抽样律等价。
+
+R也不是“纯身份／纯排序”量。令`E_sr=t_s+t_r`且各原账号内t均值为0，自然块均值D0可以为0，但在b非零的块，R仍惩罚记录偏置；某些保持排序的幅度变化也可能被惩罚。所以R下降只保证所选响应统计更接近，不保证所保留内容全可迁移或对B无干扰。
+
+由这四臂不能识别“来源排除本身”的纯因果效应，不能证明某一个组件唯一必要，不能宣称Q与R的全因子协同；也不能倒推此前旧S／旧C的失败必由共同原账号来源捷径造成。现有结果可支持对这一个具体任务化组合的有限增量评价，**既不因构件已有就否定组合，也不因有数学定义就认定贡献已建立**。当前没有主要排序优势的证据，最终方法基础仍未由C_q确定。
+
+## 九、代价和“独立重训”的正确尺度
+
+正式wrapper记录2026-10-13 18:07:16启动、22:55:47退出0，共4小时48分31秒；completion内部计时17,310.399665秒。峰值CUDA reserved **9.388672GiB**、RSS **6.491680GiB**、输出 **12.139508GiB**，低于28／64／18GiB限额和16小时硬限。原生事前投影14.358785小时及最大输出投影是按最大形状和固定余量计算的保守预算，不是每臂实测耗时，也不是实际需用那么久。[E2,E3]
+
+原生失败的201秒、补核268秒及CPU46秒仍是此轮资格成本，不从成本账里抹掉。R复用K不代表零计算开销：解析边际项、梯度及候选聚合仍需计算；但正式日志不提供干净的逐臂纯训练计时实验，不能用混有诊断／I/O的时间段声称C_q更快或算力更省。现有总运行／峰值／存储报告已披露主要实际代价；不以缺少全新性能基准阻断本结果。
+
+S确由本轮共同A及B_S路径重新训练；本次A_shared／B_S的raw、stage-cal、first-cal六份端点分数与C_cf同名端点相同的机械对照回执也在包内。本审查逐个核对了**当前侧六份分数SHA与回执**；旧C_cf六份分数原字节不在本包，没有声称又读取了旧包进行双侧比较。相同固定数据／配置／种子的字节一致既不是新种子，也不扩充独立统计样本；S的“重新训练”可作为执行事实，不能作为独立确认次数。[E2,E8]
+
+五个推理权重删除后的大小和保留Memory总量是保管事项，不能用“已删除”否定此前完成的实际恢复，也不能用SHA声称未来可恢复原权重。用户本次授权与状态补充已解决“仍待许可”的当前描述；本审查不据此请求重新获取模型、正式文本或标签。
+
+## 十、逐项发现、分类与最小处置
+
+### F01 — 旧`violations_total`默认零：非阻断REPRODUCIBILITY_DEFECT
+
+**证据：** 原分析脚本`step28_query_result_audit.py:195–199`对teacher_errors使用`sum(r.get("violations",0)...)`；全部144条缓存残差原记录没有`violations`键，而summary导出24个`violations_total=0`。这个0是“缺失字段求和的默认值”，不是“144个样本均满足某个已定义约束”。
+
+**影响：** 只能否定对该字段作科学解释，不能否定MAP、概率、计数、27标签或训练接线。用户已明示不能使用，主结论也未靠它。本轮不将它升级为SCIENTIFIC_BLOCKER。
+
+**最小处置：** 在独立勘误中列清这些键“本轮未定义／N/A／不得解释为违反次数”；冻结summary原字节保留。没有必要改原统计或补建新的约束门。本返回包的`obsolete_field.json`和`minimal_corrections.zh.md`完成此说明。
+
+### F02 — 宏率／计数率与辅助代价的可读性：合理后续建议，非正确性缺陷
+
+原报告已注明汇总计数率并给出C_q−S误报／召回取舍，完整四臂结果也存在。建议仅在报告使用时同时保留本审查四臂表的宏precision/F1列，避免raw100%被误读。无需新统计、标签或实验；不能以这项展示偏好阻断。
+
+### F03 — 状态快照与提交后删除补充：合理后续建议，已作外置状态说明
+
+`qualification/state.json`的运行中快照、predelete和旧“仍保留”陈述均可按时间对齐，不构成训练有效性矛盾。当前用户补充更新为已获授权且已删除；标清该状态来源是用户补充、不是本审查服务器观察。最小处置是保留`state_addendum.zh.txt`，不覆写冻结证据，不新增删除／上传仪式。
+
+### F04 — 来源一致不等于本工作区重放：合理后续建议，属于必须保留的解释边界
+
+本审查支持正式更新、恢复、读数顺序的来源绑定证据，不声称逐参数重跑每步梯度、重读真值重建全部22指标或直接读Memory。对C_cf双侧字节身份、删除后的247项服务器SHA、当前后台模型路由也没有独立现场证据。**这些是明确的剩余不确定性，不是已证实错误。** 现有问题的正确性不依赖新取这些未授权数据；只需在引用结论时保留本边界。
+
+### F05 — 不应设置的额外阻断：OUT_OF_SCOPE_OVERDESIGN
+
+将“必须再做S+R／全因子／新seed／新系数／新方法／新预算”、新建旧23项或四比较全过总门、临时非劣幅度、重开旧C根因诊断、获取封存标签／模型、通用安全加固／全量历史回归，作为本次结果能否接受的前提，均超出当前问题。这里不推荐或启动这些操作。S无需战胜与自身等同的方法；构件已有也不是本结果的否决理由。
+
+**分类汇总：SCIENTIFIC_BLOCKER 0项；已知非阻断REPRODUCIBILITY_DEFECT 1项（F01，科学解释已排除）；合理后续建议3项（F02–F04，仅说明／展示维护）；OUT_OF_SCOPE_OVERDESIGN 1组（F05）。没有“必须修复后才能承认当前运行有效”的剩余事项。**
+
+## 十一、参考核对、实际阅读范围与未解决项
+
+### 11.1 本工作区参考核对
+
+`reference/check_saved.py`只用Python标准库与NumPy，不导入送审项目代码。环境为Python 3.13.5、NumPy 2.3.5、单线程环境变量；不是项目py310原生资格。一次完整参考执行退出0、stderr为空：187,168个标量比较；固定统计最大误差2.220446049250313e−16，六轮诊断重建最大误差3.3306690738754696e−16；校准映射、精确排名不变和计数率重建误差为0。报告`PASS_SAVED_ARTIFACT_REFERENCE_CHECKS`只表示这些检查未发现不一致，**不是本轮科学总门或候选成功标签**。
+
+另有两项轻量记录工作：保管身份检查核对242份字节＋五Memory身份记录；本参考输出自身的报告性澄清。后者是：run01最初汇总所有臂时将S未记录的`response`默认显示为`mean_R=0.0`，现外置更正为null／NOT_LOGGED。原run01输出与脚本均保留，`reference/reporting_clarification/`说明该零不是S实测残差；没有任何正式输入或科学数值被改，也没有将Q/S诊断R当优化项。此透明更正不是项目训练缺陷。
+
+完整源代码、原输入副本、环境、命令说明、stdout／stderr／退出码、无失败的执行账，以及该报告性澄清均随包。原生attempt01失败原日志仍在嵌套原ZIP；本参考执行本身没有失败训练或新增项目更新。`reference/logs/failure_ledger.json`分别记录两者，不把参考检查成功覆盖原生失败。
+
+### 11.2 逐文件阅读层级
+
+已按优先顺序阅读主report、当前249行合同、静态主审125行、实现主审53行、audit及资格状态；并直接阅读当前query目标174行、runner719行、verify343行、diagnostics204行、结果audit298行、policy72行和启动wrapper19行。对通用record的目标／VJP／Memory、评价22指标／计数／排序、校准、读取及随机键只追到本次依赖的相关函数／范围，没有全量重审未变化模块。
+
+全部357项做字节身份核对，参考主检查对252个文件作机器解析／数值核对，24个文件有列明的定向语义阅读范围。详细逐文件层级、行范围／JSON字段、是否仅哈希，见`evidence/reading_scope.tsv`／`.json`。大数组的“机器全读”不等于人类式逐数阅读；完整RNG状态字典的相等比较也不声称人工逐个解释每个整数。工具读取请求日志不是自动宣称完整语义审读，范围表对截断或仅定位部分保守列示。
+
+未作全文语义阅读的内容包括：未受影响的其余通用模块／测试文件、CPU冻结包中未变全部源码、历史完整实现外审长文、额外S贡献主审、support科研纪律全文等（字节身份仍已核对）。复用关闭范围依据本次用户约束与两份实际主审处置，不把这些未读材料包装成已独立重审。`analysis/map_comparison.png`实际视觉查看；同内容PDF只核对身份，没有打开或分析PDF。数值判定依据保存矩阵和参考重算，不依赖图上读值。
+
+### 11.3 尚不能独立排除的范围
+
+未获得原始标签，不能独立逐对重建AP、AUC、MAP等原指标的标签来源；未获得模型／Memory／完整梯度张量，不能重放训练、重新测每步真实R梯度或重新完成端点恢复。这里能确认的是保存矩阵／计数／映射／统计／曲线与来源和执行证据的一致性。没有证据要求把这些范围限制推定为造假、实现失效或补读权限的理由。
+
+固定开发条件下的不确定性仍包括：运行种子／域顺序、数据生成与研究选择、旧教师可迁移性、W或K2盲区实际因果作用，以及真实中文暗网有效性。四臂未单独识别这些因素，不能由本次跨零区间证明其无影响。本审查不提出新实验来填满这些边界。
+
+## 十二、最终裁决
+
+**认可本次固定C_q四臂A→B运行及保存结果分析的有效性；认可“C_q相对完整S未建立旧域未见账号排序收益”的有限结论；不认可等价、确定有害、纯来源因果、唯一必要性或全因子协同等越界结论。**
+
+保留raw概率相对S的退化、相对C_b的局部改善，保留分类误报／召回取舍与明显扩大的训练—valid差距；不把非零R、较低缓存R、24个“未见明确迹象”或默认`violations_total=0`替代科学效果。当前固定配置可如实结案，完整S继续为主要内部对照，不需要为本结论新增方法、训练或权限。
+
+---
+
+## 证据定位表
+
+文中[E#]为原ZIP内路径／字段定位，不是网页文献引用。输入原件保存在返回包`input/original_input.zip`；下列文件的完整SHA见原成员身份清单。
+
+|定位|冻结输入与关键位置|本审查对应输出|
+|---|---|---|
+|E1|`inventory.json`、`source_manifest.json`、`analysis_manifest.json`；29个`source/`成员；CPU三份`source.tar.gz`及对应result|`reference/run01/input_identity.json`、`execution_evidence.json`|
+|E2|`job/completion.json`、`before_valid.json`、`access.json`、`execution.json`；`job/run/manifest.json:starts/points/training/diagnostics`；`job.wrapper.txt`、`job.console.txt`|`reference/reporting_clarification/execution_evidence.corrected.json`|
+|E3|`qualification/state.json`；`native_authorization.json`、`native_disposition.zh.txt`；`gpu/attempt01/{console.txt,result/result.json}`及`attempt02/result/result.json:native`；CPU三次result|`reference/run01/execution_evidence.json:qualification_*/cpu_source_snapshots/native_*`|
+|E4|`source/scripts/step28_query_replay.py:1–174`；`step28_query_replay_run.py:1–719`；`step28_query_replay_verify.py:1–343`；`step28_record_replay.py:130–222,235–282,327–332`；query policy／wrapper|`reference/check_saved.py`；`evidence/reading_scope.tsv`|
+|E5|`job/evaluation/{collected.json,evaluation.json}`、15套metrics/queries/counts；`job/run`的scores/maps；`step28_continual_population_evaluate.py:1–102,225–230`、`step28_alias_calibration.py:1–148`；runner评价/统计函数|`all_statistics.tsv`、`classification.tsv`、`calibration_records.tsv`、`main_results.json`|
+|E6|`job/run/diagnostics`全部30次；`job/diagnostics_evaluation/overfitting.json`及30份valid metrics；`step28_replay_diagnostics.py:1–204`；`step28_query_result_audit.py:181–252`|`diagnostics.json`、`diagnostic_decisions.tsv`、`diagnostic_curves.tsv`|
+|E7|当前合同`source/docs/SELLER_ALIAS_QUERY_REPLAY.zh.md:36–100,137–157`；support中query_replay静态主审、query_replay_implementation主审全文|本报告§八及阅读范围|
+|E8|`receive_verification.json:supplemental_verification.shared_control_scores`；support维护目录`query_weights/{predelete.json,disposition.zh.txt}`；本条用户状态补充|`reference/custody_check/custody_record_check.json`；`evidence/state_addendum.zh.txt`|
+|E9|`analysis/{audit.json,summary.json,all_metrics.csv}`；`step28_query_result_audit.py:1–298`，尤其195–199默认零字段|`check_result.json`、`obsolete_field.json`、`reference/logs/`|
+
+## 附录一：全部27项诊断判读及原量
+
+下表统一benefit方向；正值表示改善。log-loss因此与原始loss第6轮减第1轮相反。表为9位小数显示，全部浮点精度、六轮原值另见TSV；接近机器精度的0不用于创造额外显著性结论。
+
+{{ALLDIAG}}
+
+## 附录二：全部48项概率误差比较区间
+
+raw／stage-cal／first-cal，四比较×两域×两指标。差值前项减后项，越低越好；这些不是新增48个验收门。
+
+{{ALLPROB}}
+
+## 附录三：五次校准记录
+
+本表核对保存记录及映射，未重新拟合。
+
+{{CAL}}
+'''
+for k,v in {'ABS':abs_table,'COMP':comp_table,'OLD':old_table,'RAWPROB':prob_raw_table,'CLASS':class_table,'GAPS':gap_table,'R5':r5_table,'RESIDUALS':res_table,'ALLDIAG':all_diag_table,'ALLPROB':prob_table,'CAL':cal_table}.items():report=report.replace('{{'+k+'}}',v)
+assert '{{' not in report
+(R/'review.zh.md').write_text(report,encoding='utf-8');(R/'review.zh.txt').write_text(report,encoding='utf-8')
+(A/'diagnostics_full.zh.md').write_text('# 全部27项诊断参考核对\n\n'+all_diag_table,encoding='utf-8')
+(A/'probability_comparisons.zh.md').write_text('# 全部48项概率误差比较\n\n'+prob_table,encoding='utf-8')
+(A/'classification_comparison.zh.md').write_text('# 四臂分类：汇总率与群宏率\n\n'+class_table+'\n全部A/B逐域与共同A计数见reference/run01/classification.tsv。\n',encoding='utf-8')
+print('review bytes',len(report.encode()),'characters',len(report),'lines',len(report.splitlines()))

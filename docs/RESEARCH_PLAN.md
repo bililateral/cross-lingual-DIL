@@ -4,11 +4,11 @@
 
 ## 已确认范围内
 
-已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。当前已确认的后续工作是回收本次获准的结果外审、独立处置具体发现并完成必要交付；外审开始事实及唯一会话见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
+已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
 
 此前已完成[静态外审与独立处置](../reports/documentation/20261013/s_contribution/review/primary_disposition.zh.txt)，区分“有效基础系统”“值得保留的任务化候选”和“贡献充分的最终方法”。S符合前两项，第三项尚未建立；不因构件已有就否定组合价值，也不把独立历史增益设成所有增量贡献的硬门槛。若主张历史专属作用，仍须相应归因。新增近邻C²Aug及FDR覆盖已补足。具体机制缺口收窄为：处理重组引入的共同原账号来源证据，同时保留有价值的非退化重组；严格禁止所有来源重叠会退化为整账号置换，简单屏蔽未成为推荐方案。可在已有静态范围内继续形成明确运算与证伪逻辑，暂不开训练或旧C诊断；新包外发、新执行及最终方法选择分别遵守对应许可，外审不自动授权。
 
-C_q四臂窄比较保留逐自然查询排除来源、有向监督、D0外解析响应MSE、Q/C_q共同增强键及完整共同A状态；整个历史目标的零行列和交互盲区、K2正例盲区、R的查询无关偏置／幅度代价和bootstrap条件控制继续限制归因。当前[结果](../reports/seller_alias_continual/20261014/query_replay_result/report.zh.txt)未建立相对完整S的排序提升，不能用更低缓存R替代自然查询收益，也不能自动要求提高系数。原valid仍是开发评价，单配置区间不覆盖多seed或研究选择。建议按原范围结束固定实验，保留完整S和有效未达收益证据；若形成下一候选，先说明新问题、可区分比较和预算，按相应范围另行取得许可。
+C_q四臂窄比较保留逐自然查询排除来源、有向监督、D0外解析响应MSE、Q/C_q共同增强键及完整共同A状态；整个历史目标的零行列和交互盲区、K2正例盲区、R的查询无关偏置／幅度代价和bootstrap条件控制继续限制归因。当前[结果](../reports/seller_alias_continual/20261014/query_replay_result/report.zh.txt)未建立相对完整S的排序提升，不能用更低缓存R替代自然查询收益，也不能自动要求提高系数。原valid仍是开发评价，单配置区间不覆盖多seed或研究选择。已按原范围结束固定实验，保留完整S和有效未达收益证据；若形成下一候选，先说明新问题、可区分比较和预算，按相应范围另行取得许可。
 
 既有C研究证据与失败边界继续保留，不能把S收益追认为C贡献。第一轮见[工作稿](../reports/documentation/20261011/retention_design/proposal.zh.txt)、[均值／方差裁决](../reports/documentation/20261011/retention_design/candidate.zh.txt)、[后续筛查](../reports/documentation/20261011/retention_design/search.zh.txt)及[信息采集工作稿](../reports/documentation/20261011/retention_design/acquisition.zh.txt)；收缩、跨账号配对的静态否决和C_cf固定配置未建立主要改进，均按原范围解释。先前旧C诊断已停止，原批准与CPU证据保留，不补测或转用其预算。后续若形成候选，仍须说明具体信息、实际运算／更新、近邻区别和可推翻的比较，不要求实验前保证胜出，也不以候选名称为继续理由。
 

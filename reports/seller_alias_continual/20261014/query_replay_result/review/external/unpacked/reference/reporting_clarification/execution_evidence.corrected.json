@@ -1,0 +1,168 @@
+{
+  "identity_checks": {
+    "inventory.json": {
+      "files": 306,
+      "bytes": 7760771
+    },
+    "source_manifest.json": {
+      "files": 29,
+      "bytes": 505635
+    },
+    "analysis_manifest.json": {
+      "files": 8,
+      "bytes": 472248
+    }
+  },
+  "cpu_source_snapshots": {
+    "qualification/cpu/attempt01/source.tar.gz": {
+      "verified_sources": 29,
+      "different_from_current": [
+        "scripts/step28_query_replay_run.py",
+        "scripts/step28_query_replay_verify.py",
+        "tests/test_step28_query_replay.py"
+      ]
+    },
+    "qualification/cpu/attempt02/source.tar.gz": {
+      "verified_sources": 29,
+      "different_from_current": [
+        "scripts/step28_query_replay_verify.py",
+        "tests/test_step28_query_replay.py"
+      ]
+    },
+    "qualification/cpu/attempt03/source.tar.gz": {
+      "verified_sources": 29,
+      "different_from_current": []
+    }
+  },
+  "qualification_cpu_seconds": 46,
+  "qualification_gpu_conservative_seconds": 469,
+  "qualification_gpu_actual_updates": 11,
+  "formal_updates": 1440,
+  "gradient_group_presentations": 2592,
+  "restored_endpoints": 5,
+  "diagnostics": 30,
+  "common_start_model_sha": "c64fb1d7e111f60f7c4563a529e562cac0288450cea422136169d8f5e5bbb8f4",
+  "common_start_adam_sha": "784426e3f64bca26be3f1a08d33312f3506ae4e7a0360367013310f59aecb2f2",
+  "uid_reservoir": [
+    "4493a33635ae54f36d0edb28b00917ca",
+    "5f010eb94c3730f85698b8fa9434c21d",
+    "ec09d6151be95df8f486a9115f6fc209",
+    "d8c40a84400eada98184e752d40f286b",
+    "cb72702c36441d8486ea59a9497d747c",
+    "19a7f577b51a4639a264ef63daf069aa"
+  ],
+  "candidate_assignment_hash_pairs": 288,
+  "training": {
+    "B_S": {
+      "mean_R": null,
+      "mean_weighted_R": 0.0,
+      "nonzero_weighted_R_steps": 0,
+      "last_encoder_lr": 0.0,
+      "memory_max_recorded_bytes": 348167,
+      "mean_R_status": "NOT_LOGGED_IN_FORMAL_S_TRAINING; null is not measured zero",
+      "mean_weighted_R_status": "NOT_AN_OPTIMIZATION_TERM; recorded zero denotes excluded contribution, not a measured residual"
+    },
+    "B_Q": {
+      "mean_R": 0.010382814613371415,
+      "mean_weighted_R": 0.0,
+      "nonzero_weighted_R_steps": 0,
+      "last_encoder_lr": 0.0,
+      "memory_max_recorded_bytes": 348167
+    },
+    "B_C_q": {
+      "mean_R": 0.009756695217220113,
+      "mean_weighted_R": 0.002439173804305028,
+      "nonzero_weighted_R_steps": 288,
+      "last_encoder_lr": 0.0,
+      "memory_max_recorded_bytes": 348166
+    },
+    "B_C_b": {
+      "mean_R": 0.009749153527890384,
+      "mean_weighted_R": 0.002437288381972596,
+      "nonzero_weighted_R_steps": 288,
+      "last_encoder_lr": 0.0,
+      "memory_max_recorded_bytes": 348166
+    }
+  },
+  "formal_budget": {
+    "elapsed_seconds": 17310.399664624594,
+    "limits": {
+      "maximum_cuda_reserved_bytes": 30064771072,
+      "maximum_gpu_stage_seconds": 57600,
+      "maximum_output_bytes": 19327352832,
+      "maximum_rss_bytes": 68719476736,
+      "minimum_free_gpu_bytes": 32212254720,
+      "minimum_free_host_bytes": 77309411328,
+      "torch_cpu_threads": 1
+    },
+    "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261013/query_replay_implementation, all within this isolated workspace",
+    "peak_cuda_reserved_bytes": 10081009664,
+    "peak_output_bytes": 13034697405,
+    "peak_rss_bytes": 6970388480,
+    "phase": "evaluation"
+  },
+  "formal_console_intervals": {
+    "A_shared": {
+      "after_step1_seconds": 14.606466765981168,
+      "after_step288_seconds": 2045.6284840246662,
+      "step2_to288_plus_6_diagnostics_seconds": 2031.022017258685
+    },
+    "B_S": {
+      "after_step1_seconds": 2203.3696605297737,
+      "after_step288_seconds": 5832.652548618615,
+      "step2_to288_plus_6_diagnostics_seconds": 3629.282888088841
+    },
+    "B_Q": {
+      "after_step1_seconds": 5983.0028136759065,
+      "after_step288_seconds": 9614.409956821706,
+      "step2_to288_plus_6_diagnostics_seconds": 3631.4071431457996
+    },
+    "B_C_q": {
+      "after_step1_seconds": 9764.358454693574,
+      "after_step288_seconds": 13388.651173419785,
+      "step2_to288_plus_6_diagnostics_seconds": 3624.2927187262103
+    },
+    "B_C_b": {
+      "after_step1_seconds": 13538.639469367918,
+      "after_step288_seconds": 17161.691141005605,
+      "step2_to288_plus_6_diagnostics_seconds": 3623.051671637688
+    }
+  },
+  "native_projection": {
+    "train_seconds": 29526.724288076162,
+    "forward_seconds": 8067.985079616308,
+    "io_seconds": 158.5920913736336,
+    "projected_total_seconds": 51691.62682383263,
+    "projected_peak_output_bytes": 18126446362
+  },
+  "native_effects": {
+    "encoder": {
+      "active_grad_parameters": 389,
+      "actual_update_distinguishable": true,
+      "finite": true,
+      "parameter_max_delta": 2.9733404517173767e-05,
+      "post_clip_gradient_distinguishable": true,
+      "post_clip_gradient_max_delta": 4.995235940441489e-05
+    },
+    "head": {
+      "active_grad_parameters": 4,
+      "actual_update_distinguishable": true,
+      "finite": true,
+      "parameter_max_delta": 0.0002781730145215988,
+      "post_clip_gradient_distinguishable": true,
+      "post_clip_gradient_max_delta": 8.396431803703308e-05
+    }
+  },
+  "custody_identity_totals": {
+    "weights_bytes": 6521871122,
+    "memory_snapshots_bytes": 1734069
+  },
+  "source_model_identity": "Source-bound records only; no model files loaded",
+  "Ccf_comparison": "Verified current six score hashes against supplied receipt; prior C_cf bytes are not included and were not re-read",
+  "clarification": {
+    "source": "run01/execution_evidence.json",
+    "source_sha256": "aa398005ae96e9de8a6f8bfdad094ce296745886ccfbee4803aba5861f590299",
+    "changed_field": "training.B_S.mean_R",
+    "reason": "Our check_saved.py used get(response,0) when summarizing all arms. S formal log has no response field. Descriptive S R exists only in common diagnostics. This clarification changes no arithmetic check or result."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "run01": {
+    "script": "reference/check_saved.py",
+    "input": "input/original_input.zip",
+    "output": "reference/run01",
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "failure": false,
+    "source_sha256": "909dafa288e8173cb26a9ce2236579bb125e7bef5481d92f6d794fd4b7c6e89f",
+    "invocation_note": "Equivalent arguments recorded; original shell literal was not separately saved."
+  },
+  "clarification": {
+    "script": "reference/clarify_reference_reporting.py",
+    "input": "reference/run01",
+    "output": "reference/reporting_clarification",
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "failure": false,
+    "source_sha256": "983fe70e672075ebca2417d8531561f610d830d232d0fadb62a33fd0c2c6c17f",
+    "reporting_change": "S mean_R missing, not measured zero"
+  },
+  "custody": {
+    "script": "reference/check_custody_records.py",
+    "input": "input/original_input.zip",
+    "output": "reference/custody_check",
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "failure": false,
+    "source_sha256": "adc157e8dd5ef39c50e41c254be1b974f99a2f4d1dc11b510165ba1eabbf4821",
+    "not_observed": "server deletion and post-deletion hashes"
+  }
+}

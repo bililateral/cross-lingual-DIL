@@ -1,0 +1,48 @@
+{
+  "scientific_blockers": 0,
+  "required_formal_numeric_changes": 0,
+  "required_retraining": false,
+  "findings": [
+    {
+      "id": "F01",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "blocking": false,
+      "status": "Known undefined analysis-export field; scientifically excluded in user request and this review",
+      "title": "violations_total默认零不代表科学约束次数",
+      "evidence": [
+        "step28_query_result_audit.py:195-199",
+        "analysis/summary.json:residuals",
+        "reference/run01/obsolete_field.json"
+      ],
+      "minimal_action": "外置说明N/A，冻结输入不改，无重算或重训"
+    },
+    {
+      "id": "F02",
+      "category": "合理后续建议",
+      "blocking": false,
+      "title": "分类表保留汇总率、群宏率和误报／召回取舍",
+      "minimal_action": "展示已有数据，不新增实验／门"
+    },
+    {
+      "id": "F03",
+      "category": "合理后续建议",
+      "blocking": false,
+      "title": "按时间说明资格状态与用户删除补充",
+      "minimal_action": "外置状态说明，不修改形成时记录"
+    },
+    {
+      "id": "F04",
+      "category": "合理后续建议",
+      "blocking": false,
+      "title": "引用结论时保留保存证据层级及未核实范围",
+      "minimal_action": "不升级为标签重建／训练重放／服务器删除目击／模型后台验证"
+    },
+    {
+      "id": "F05",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "blocking": false,
+      "title": "新方法／种子／系数／全因子／新门／新权限／通用加固不得作为本结果接受前提",
+      "minimal_action": "不新增或启动这些任务"
+    }
+  ]
+}
