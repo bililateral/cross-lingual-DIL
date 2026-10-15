@@ -18,30 +18,40 @@
   "cpu_verification": {
     "maximum_seconds": 300,
     "maximum_rss_bytes": 2147483648,
-    "maximum_evidence_bytes": 67108864
+    "maximum_evidence_bytes": 67108864,
+    "prior_charged_seconds": 97
   },
   "native_verification": {
     "maximum_seconds": 900,
     "maximum_rss_bytes": 68719476736,
     "maximum_work_bytes": 10737418240,
     "maximum_evidence_bytes": 134217728,
-    "actual_updates": 8
+    "actual_updates": 3,
+    "prior_actual_updates": 8,
+    "maximum_cumulative_updates": 11,
+    "prior_charged_seconds": 364
   },
   "runtime": {
-    "maximum_gpu_stage_seconds": 86400,
+    "maximum_gpu_stage_seconds": 67971,
     "maximum_output_bytes": 17179869184,
     "maximum_cuda_reserved_bytes": 30064771072,
     "maximum_rss_bytes": 68719476736,
     "minimum_free_gpu_bytes": 32212254720,
     "minimum_free_host_bytes": 77309411328,
-    "torch_cpu_threads": 1
+    "torch_cpu_threads": 1,
+    "prior_charged_seconds": 18428.570150192827,
+    "maximum_cumulative_seconds": 86400
   },
   "supervision": {
     "train_parse_attempts": 1,
     "valid_parse_attempts": 1,
     "test_access": false,
     "owners_access": false,
-    "automatic_retry": false
+    "automatic_retry": false,
+    "prior_train_parse_attempts": 1,
+    "prior_valid_parse_attempts": 0,
+    "maximum_cumulative_train_parse_attempts": 2,
+    "maximum_cumulative_valid_parse_attempts": 1
   },
   "evaluation": {
     "bootstrap_replicates": 5000,
@@ -64,12 +74,49 @@
     "overall_pass_gate": false
   },
   "solver": {
-    "version": "log_sinkhorn_round_v1",
+    "version": "log_sinkhorn_terminal_q_v1",
     "tau": 1,
     "maximum_iterations": 4096,
     "marginal_tolerance": 1e-10,
     "feasible_tolerance": 1e-12,
     "gap_tolerance": 5e-9,
     "roundoff_factor": 256
+  },
+  "prior_evidence": {
+    "formal_gate": {
+      "path": "reports/documentation/20261014/balanced_pooling_implementation/qualification/formal_gate.json",
+      "bytes": 6664,
+      "sha256": "5339b80ced4e4d855c67fd6b5467f50d53e41e46263f05689b6a8c0c70c61369"
+    },
+    "failure": {
+      "path": "reports/seller_alias_continual/20261015/balanced_pooling_failure/evidence/reports/job/failure.json",
+      "bytes": 5825,
+      "sha256": "a9538a635f0c2e43aeb90927ce42e03990657077547e00e2df90e13e788635e0"
+    },
+    "access": {
+      "path": "reports/seller_alias_continual/20261015/balanced_pooling_failure/evidence/reports/job/access.json",
+      "bytes": 45,
+      "sha256": "f41e6ba830dcb8ec7e5f5414357048d2756ec836bb7f8513f5d2a5e7a842f1ea"
+    },
+    "amendment_authorization": {
+      "path": "reports/documentation/20261015/balanced_pooling_repair/authorization.json",
+      "bytes": 799,
+      "sha256": "809e42f500334c98c7722c133cc8db40d850b2f9405df7b2705a6609022201b4"
+    },
+    "native_result": {
+      "path": "reports/documentation/20261014/balanced_pooling_implementation/qualification/gpu/attempt01/result/result.json",
+      "bytes": 122845,
+      "sha256": "4b6ef97922be368fe3c4f1ae48323acc5722697c2673e78ff51c8b1faf604263"
+    },
+    "native_disposition": {
+      "path": "reports/documentation/20261014/balanced_pooling_implementation/qualification/native_disposition.zh.txt",
+      "bytes": 2258,
+      "sha256": "9f841fc335455ea9f4514a4de36e8a229af94118bd1e8a904d1527b3ce60fbfc"
+    },
+    "qualification_state": {
+      "path": "reports/documentation/20261014/balanced_pooling_implementation/qualification/state.json",
+      "bytes": 2364,
+      "sha256": "f995e95475139650bda982ac8a2022d8249418b2996fd9bc92cfe200b291e717"
+    }
   }
 }

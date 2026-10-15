@@ -569,3 +569,241 @@ class BalancedPoolingTests(unittest.TestCase):
             diagnostics=36,endpoints=6,own_A_states=True,blind_rejections=True,
             scope="Control-flow evidence only. Real tiny gradient/update and actual diagnostic tests are separate."))
 
+
+
+# Fixed terminal witnesses; no formal inputs or model files.
+def terminal_block(e=1e-4):
+    p = np.array([[1/3-.05-e, .05, e], [.05, 1/3-.05-e, e], [e, e, 1/3-2*e]], np.float64)
+    return torch.from_numpy(np.log(9*p))
+
+
+def rounded_reference(k):
+    from decimal import Decimal, localcontext
+    with localcontext() as ctx:
+        ctx.prec = 80
+        d = lambda x: Decimal.from_float(float(x))
+        a, b, c, z = (d(k[i,j]) for i,j in ((0,0),(0,1),(0,2),(2,2)))
+        assert k[0,0] == k[1,1] and k[0,1] == k[1,0]
+        assert all(k[i,j] == k[0,2] for i,j in ((1,2),(2,0),(2,1)))
+        s = Decimal(1)/3
+        beta = (2*c-z).exp()/(a.exp()+b.exp())
+        x = 2*beta*s/(3*beta+(beta*beta+4*beta).sqrt())
+        u = (s-x)/(1+(b-a).exp()); v = s-x-u
+        p = [[u,v,x],[v,u,x],[x,x,s-2*x]]
+        value = sum(p[i][j]*d(k[i,j])-p[i][j]*(9*p[i][j]).ln() for i in range(3) for j in range(3))
+        return float(value), np.array([[float(t) for t in row] for row in p])
+
+
+def terminal_table(device="cpu"):
+    slots = np.repeat(np.arange(28), 3)
+    i,j = torch.triu_indices(84,84,1,device=device)
+    return terminal_block().to(device).float()[i%3,j%3], slots
+
+
+def terminal_group(uid, role):
+    """Edge-colour the fixed A0/A1 incidence so each account has all three types.
+
+    This constructs one deterministic handwritten input, without choosing a seed
+    or searching model/text outcomes. The actual regroup function remains active.
+    """
+    g = handmade_group(uid,3)
+    seed = data.seed_for(20260918,"ABC",2,49,role,g.uid,"regroup")
+    a0,a1 = record.assignment(g),record.assignment(g,seed)
+    remaining = set(range(84)); colors = np.full(84,-1)
+    for color in range(3):
+        matched = {}
+        def augment(account, seen):
+            for edge in sorted(remaining):
+                dest = int(a1[edge])
+                if a0[edge] != account or dest in seen: continue
+                seen.add(dest)
+                if dest not in matched or augment(int(a0[matched[dest]]),seen):
+                    matched[dest]=edge; return True
+            return False
+        for account in range(28):
+            if not augment(account,set()): raise AssertionError("Handwritten incidence is not regular")
+        edges=set(matched.values());remaining-=edges
+        for edge in edges:colors[edge]=color
+    for slots in (a0,a1):
+        assert all(sorted(colors[slots==i].tolist())==[0,1,2] for i in range(28))
+    items=tuple(tuple((item[0],f"{colors[i*3+j]}/{i}",f"{colors[i*3+j]}/{i}") for j,item in enumerate(rows)) for i,rows in enumerate(g.items))
+    return data.Group(g.uid,g.sellers,items,g.labels),colors
+
+
+def terminal_model():
+    class Encoder(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            embedding=torch.zeros(84,31)
+            for account in range(28):
+                for color in range(3):embedding[3*account+color,color]=1;embedding[3*account+color,3+account]=1
+            self.embedding=torch.nn.Embedding.from_pretrained(embedding,freeze=False)
+        def tokenizer(self,texts,**kwargs):
+            return {"input_ids":torch.tensor([[int(t.split("/")[0])+3*int(t.split("/")[1])] for t in texts])}
+        def forward(self,batch):
+            return {"sentence_embedding":self.embedding(batch["input_ids"][:,0])}
+    model=core.build_model(Encoder(),62)
+    model.head=torch.nn.Linear(124,1)
+    k=terminal_block().float()
+    a,b,c=(float(k[i,j])*2 for i,j in ((0,1),(0,2),(1,2)))
+    with torch.no_grad():
+        model.head.weight.zero_();model.head.bias.zero_()
+        model.head.weight[0,:3]=torch.tensor([(a+b-c)/2,(a+c-b)/2,(b+c-a)/2])
+        model.head.weight[0,62:65]=4*k.diagonal()
+        # Row/column-only offsets distinguish hard-negative ranks without changing
+        # the exact transport plan. Both different/same source-account pairs agree.
+        offsets=torch.arange(28)*.01
+        model.head.weight[0,3:31]=2*offsets
+        model.head.weight[0,65:93]=8*offsets
+    return model
+
+
+class TerminalPoolingTests(BalancedPoolingTests):
+    def test_terminal_precision_vjp_and_batch(self):
+        evidence=[]
+        for dtype in (torch.float64,torch.float32):
+            k=terminal_block().to(dtype)
+            variants=torch.stack((k,k.T,k.flip((0,1)),torch.zeros_like(k)))
+            stats={};values,q,info=method.solve(variants,stats)
+            ref,refp=rounded_reference(k.double().numpy())
+            self.assertLessEqual(abs(float(values[0])-ref),1e-8)
+            self.assertLessEqual(float((q[0]-torch.from_numpy(refp)).abs().sum()),2e-4)
+            self.assertEqual(stats["terminal_acceptances"],3)
+            self.assertEqual(stats["terminal_min_iteration"],4096)
+            run.solver_gate(stats)
+            for j,plan in ((1,q[0].T),(2,q[0].flip((0,1)))):
+                torch.testing.assert_close(q[j],plan,atol=1e-12,rtol=0)
+            x=variants.clone().requires_grad_();upstream=x.new_tensor([-.7,1.3,.2,-2.])
+            output=method.block_scores(x,"F");gradient,=torch.autograd.grad(output,x,upstream)
+            torch.testing.assert_close(gradient,upstream[:,None,None]*q.to(dtype),atol=0,rtol=0)
+            bound=1e-8 if dtype==torch.float64 else 1e-8+1e-7*max(1,abs(ref))
+            self.assertLessEqual(abs(float(output[0])-ref),bound)
+            self.assertLessEqual(float((q[0].to(dtype).double()-torch.from_numpy(refp)).abs().sum()),2e-4)
+            before=copy.deepcopy(stats)
+            with self.assertRaises(method.SolverFailure):
+                method.solve(torch.stack((torch.zeros_like(k),terminal_block(1e-8).to(dtype))),stats)
+            self.assertEqual(stats,{**before,"failures":1})
+            with self.assertRaises(method.SolverFailure):method.solve(k[None],maximum_iterations=1)
+            # Successful calls sum T; a failed mixed call commits no partial success.
+            method.solve(k[None],before)
+            self.assertEqual(before["terminal_acceptances"],4)
+            evidence.append(dict(dtype=str(dtype),reference_value=ref,reference_plan=refp.tolist(),value=float(values[0]),
+                plan=q[0].tolist(),actual_vjp=gradient.tolist(),upstream=upstream.tolist(),stats=info,
+                failed_mixed_call_kept_success_counts=True,early_terminal_rejected=True))
+        self.evidence("terminal_precision",evidence)
+
+    def test_terminal_real_chunked_update(self):
+        c=run.config(); model=terminal_model();direct=copy.deepcopy(model)
+        current,cc=terminal_group("terminal_current","current")
+        history,hc=terminal_group("terminal_history","history")
+        oa,ob=[core.make_optimizer(m,c) for m in (model,direct)]
+        with torch.no_grad():
+            initial=record.pair_table(model,record.record_vectors(model,current,c))
+        lookup={(i,j):idx for idx,(i,j) in enumerate(itertools.combinations(range(84),2))}
+        first=[int(np.flatnonzero(cc[:3]==i)[0]) for i in range(3)]
+        second=[int(np.flatnonzero(cc[3:6]==i)[0])+3 for i in range(3)]
+        k=np.array([[float(initial[lookup[min(i,j),max(i,j)]]) for j in second] for i in first])
+        value,plan=rounded_reference(k)
+        ti,tj=np.triu_indices(84,1)
+        target=(k[hc[ti],hc[tj]]+.3).astype(np.float32)
+        actual_proxy=[];actual_objective=method.objective
+        def observed(table,*args,**kwargs):
+            table.register_hook(lambda grad:actual_proxy.append(grad.detach().clone()))
+            return actual_objective(table,*args,**kwargs)
+        # Observation-only hook: no replaced solve, value, gradient or update.
+        with mock.patch.object(method,"objective",side_effect=observed):
+            row=method.update(model,oa,current,history,target,c,"F",2,49)
+        direct.train();ob.zero_grad(set_to_none=True);totals=[];expected_proxy=[]
+        def independent_pool(table,slots,colors,offset=0.):
+            values=[]
+            for a,b in itertools.combinations(range(28),2):
+                terms=[];weights=[]
+                for i in np.flatnonzero(slots==a):
+                    for j in np.flatnonzero(slots==b):
+                        terms.append(table[lookup[min(i,j),max(i,j)]])
+                        weights.append(plan[colors[i],colors[j]])
+                p=torch.tensor(weights,dtype=table.dtype)
+                values.append((torch.stack(terms)*p).sum()-(p*torch.log(9*p)).sum())
+            return torch.stack(values)
+        for role,g,colors,t in (("current",current,cc,None),("history",history,hc,target)):
+            z=record.record_vectors(direct,g,c);i,j=torch.triu_indices(84,84,1)
+            table=direct.head(torch.cat(((z[i]-z[j]).abs(),z[i]*z[j]),1)).flatten()
+            seed=data.seed_for(20260918,"ABC",2,49,role,g.uid,"regroup")
+            v0,v1=[independent_pool(table,record.assignment(g,s),colors) for s in (None,seed)]
+            loss=(literal_loss(v0,g)+literal_loss(v1,g))/2
+            if t is not None:
+                old=independent_pool(torch.from_numpy(t),record.assignment(g),colors)
+                loss=.1*loss+.5*(v0-old).square().mean()
+            expected_proxy.append(torch.autograd.grad(loss,table,retain_graph=True)[0])
+            totals.append(float(loss.detach()));loss.backward()
+        torch.nn.utils.clip_grad_norm_(direct.parameters(),1.)
+        ob.param_groups[0]["lr"],ob.param_groups[1]["lr"]=run.parent.stage_lr(49),.001;ob.step()
+        self.assertAlmostEqual(row["total"],sum(totals),places=5)
+        proxy_delta=max(float((a-b).abs().max()) for a,b in zip(actual_proxy,expected_proxy))
+        self.evidence("terminal_update_proxy",dict(max_delta=proxy_delta,actual_objective=row["total"],independent_objective=sum(totals),solver_summary=c["pooling_stats"]))
+        for a,b in zip(actual_proxy,expected_proxy):torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-5)
+        changes={}
+        for (name,a),b in zip(model.named_parameters(),direct.parameters()):
+            torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-5)
+            torch.testing.assert_close(a.grad,b.grad,atol=2e-6,rtol=2e-5)
+            self.assertGreater(float(a.grad.norm()),0)
+            changes[name]=dict(gradient_norm=float(a.grad.norm()),gradient_max_delta=float((a.grad-b.grad).abs().max()),parameter_max_delta=float((a-b).abs().max()))
+        self.assertGreater(row["history"]["supervised"],0);self.assertGreater(row["history"]["mse0"],0)
+        self.assertEqual(c["pooling_stats"]["terminal_acceptances"],5*378)
+        self.assertEqual(run.parent.adam_step(oa),1)
+        self.evidence("terminal_real_update",dict(actual_input=k.tolist(),reference_value=value,reference_plan=plan.tolist(),
+            update=row,proxy_max_delta=proxy_delta,parameters=changes,actual_optimizer_calls=1,
+            fixture="Trainable type/account-token embedding and linear symmetric head with fixed row/column offsets; actual A0/A1, objectives, 512 VJP and AdamW. Independent analytic envelope reference; observation-only proxy hook."))
+
+    def test_terminal_gate_budget_and_inherited_evidence(self):
+        s=dict(blocks=2,failures=0,iterations=4096,marginal_error=4e-7,ordinary_marginal_error=0.,
+               terminal_acceptances=1,terminal_min_iteration=4096,feasible_error=1e-16,gap_checked=4e-10)
+        run.solver_gate(s)
+        for key,value in (("terminal_min_iteration",1),("iterations",4095),("terminal_acceptances",0),
+                          ("marginal_error",0.),("ordinary_marginal_error",2e-10),("gap_checked",1e-8),
+                          ("feasible_error",1e-9),("failures",1),("terminal_acceptances",3)):
+            with self.assertRaises(ValueError):run.solver_gate({**s,key:value})
+        old=method.identity("F");old["solver"]["version"]="log_sinkhorn_round_v1"
+        with self.assertRaises(ValueError):method.bind(tiny_model(),{"pooling":old})
+        inherited=run.prior_evidence()
+        m={f"{k}_{a}":1. for a in method.ARMS for k in ("t_A","t_B","v","h")}
+        m.update(L=1.,s_F=1.,r_F=1.,s_I=1.,r_I=1.,W_F=1000,W_I=500)
+        initial=run.projection(m)["projected_total_seconds"]
+        m["t_B_F"]+=(70000-initial)/(1.25*288)
+        projected=run.projection(m)
+        self.assertAlmostEqual(projected["projected_total_seconds"],70000)
+        self.assertFalse(projected["within_budget"])
+        budget_root=self.temporary();budget=run.Budget(budget_root);snap=budget.snapshot()
+        self.assertEqual(snap["prior_charged_seconds"],18428.570150192827)
+        self.assertEqual(snap["cumulative_seconds"],snap["elapsed_seconds"]+18428.570150192827)
+        budget.started-=67972
+        with self.assertRaises(RuntimeError):budget.check()
+        p=run.policy();gpu=copy.deepcopy(inherited["native_result"])
+        gpu.update(mode="gpu",scope="terminal-q",source_files=run.sources(),prior_compute_seconds=364,cumulative_charged_seconds=365)
+        n=gpu["native"];natural=copy.deepcopy(n["measurements"])
+        stress=dict(c_gpu=.001,c_cpu=.001,accounts=28,records=84,pairs=378,
+                    solver_summaries={k:{**s,"blocks":378,"terminal_acceptances":378,"ordinary_marginal_error":None} for k in ("cpu","gpu")})
+        n.update(actual_updates=3,cumulative_updates=11,F_pooling_restores_verified=True,terminal_gpu_vjp_verified=True,
+                 inherited_native=p["prior_evidence"]["native_result"],terminal_stress=stress,
+                 natural_measurements=natural,solver_summary=s)
+        for key,mult,cost in (("t_A_F",2,"c_gpu"),("t_B_F",5,"c_gpu"),("v_F",1,"c_gpu"),("h_F",4,"c_cpu")):
+            n["measurements"][key]=natural[key]+mult*stress[cost]
+        run.delta_native_gate(gpu,inherited["native_result"])
+        for bad in (8,11):
+            damaged=copy.deepcopy(gpu);damaged["native"]["actual_updates"]=bad
+            with self.assertRaises(ValueError):run.delta_native_gate(damaged,inherited["native_result"])
+        damaged=copy.deepcopy(gpu);damaged["source_files"]=inherited["native_result"]["source_files"]
+        with self.assertRaises(ValueError):run.delta_native_gate(damaged,inherited["native_result"])
+        adjust=(70000-run.projection(n["measurements"])["projected_total_seconds"])/(1.25*288)
+        n["natural_measurements"]["t_B_F"]+=adjust
+        n["measurements"]["t_B_F"]=n["natural_measurements"]["t_B_F"]+5*stress["c_gpu"]
+        gpu_path=budget_root/"gpu_fixture.json";data.write_json(gpu_path,gpu)
+        job=budget_root/"not_created_job"
+        gate=dict(job=job.relative_to(data.ROOT).as_posix(),runtime=p["runtime"],supervision=p["supervision"],gpu=data.record(gpu_path,data.ROOT))
+        with mock.patch.object(run,"reviewed_gate",return_value=gate),mock.patch.object(run,"public_inputs") as reader, \
+             mock.patch.dict(os.environ,{"RECORD_REPLAY_STARTED_EPOCH":str(__import__("time").time())}):
+            with self.assertRaisesRegex(ValueError,"projection"):run.execute(job,budget_root/"fixture_gate")
+            reader.assert_not_called();self.assertFalse(job.exists())
+        self.evidence("terminal_gate_budget",dict(inherited_updates=inherited["native_result"]["native"]["actual_updates"],
+            remaining_seconds=67971,over_budget_projection=projected,new_directory_budget=snap,
+            inconsistent_terminal_rejected=True,old_identity_rejected=True))

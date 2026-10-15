@@ -1178,3 +1178,10 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 55404字节／11成员返回包已完整回收，10内部载荷与58输入身份核对一致；[独立主审](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/primary_disposition.zh.txt)支持窄终端Q验收方向，接受旧八次资格与新三次不能只改数字、剩余预算必须贯通实际入口、终端数量需最小迭代证据三项具体要求；更正旧报告对A端点随机元数据缺失的过宽说法，精确续跑仍因缺Adam及失败点完整状态不可行。FP32按实际舍入输入参考，实际VJP直接核对返回Q；没有运行新的项目科研计算，原CPU97／300秒和原生8次／364秒不变。
 
 [具体合同补充](SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md)已准备，待用户批准：精度不降低、O/T互斥，固定F三次增量及旧证据明确继承，CPU余203秒、原生总≤11次／900秒、正式累计24小时内本次有效67971秒；默认完整三臂新目录，train跨作业最多2次、valid最多1次且统一盲门后，禁读范围不变。此为具体拟批准范围，静态外审同意不替代实施／资格／训练许可；实际差异和CPU完成后再合并审查，不重复同一静态方向外审。专用网页已关闭，实际状态统一见[当前交接](AI_RESEARCH_HANDOFF.zh.md)与[回收记录](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/recovery.json)，新材料仅本地Git。
+
+
+## 2026-10-15：批准F修复补充，实施与CPU增量资格
+
+用户原话：“批准这份合同补充，按约定范围和前提继续推进，先完成最小实现和 Linux 手写 CPU 增量核验，再准备合同与实现的合并外审。保持原输出精度和累计预算限制。”[批准回执](../reports/documentation/20261015/balanced_pooling_repair/authorization.json)绑定补充原件；不因原稿写有待批准而重新阻断已有许可。
+
+已落实固定终端Q、O/T统计与盲门、旧八次资格与新三次来源衔接、累计67971秒实际入口。两轮Linux手写CPU分别计26与45秒，第一轮并列排名fixture比较失败保留；以不改精度的固定行列偏移修正，独立新workspace第二轮四项通过，累计168/300秒。一次复用首轮workspace的部署启动请求被自动审批拒绝且未执行，改独立目录完成。当前仅准备合并外审，原生／正式尚未进入；[实现报告](../reports/documentation/20261015/balanced_pooling_repair/report.zh.txt)和[资格账](../reports/documentation/20261015/balanced_pooling_repair/qualification/state.json)明确证据、未变部分与边界，新材料仅本地Git。

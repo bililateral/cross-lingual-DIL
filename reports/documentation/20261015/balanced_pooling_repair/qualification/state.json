@@ -1,0 +1,66 @@
+{
+  "status": "CPU_INCREMENTAL_PASS_MERGED_REVIEW_PREPARATION",
+  "authorization": "../authorization.json",
+  "cpu": {
+    "prior_charged_seconds": 97,
+    "attempts": [
+      {
+        "attempt": "attempt01",
+        "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_105800/workspace",
+        "exit_code": 1,
+        "started_epoch": 1792033239.9044452,
+        "ended_epoch": 1792033265.764446,
+        "actual_wall_seconds": 25.86000084877014,
+        "charged_seconds": 26,
+        "prior_charged_seconds": 97,
+        "cumulative_charged_seconds": 123,
+        "status": "FAIL",
+        "tests_run": 2
+      },
+      {
+        "attempt": "attempt02",
+        "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_110600/workspace",
+        "exit_code": 0,
+        "started_epoch": 1792033583.3502226,
+        "ended_epoch": 1792033628.2409296,
+        "actual_wall_seconds": 44.89070701599121,
+        "charged_seconds": 45,
+        "prior_charged_seconds": 123,
+        "cumulative_charged_seconds": 168,
+        "status": "PASS_HANDWRITTEN_ONLY",
+        "tests_run": 4
+      }
+    ],
+    "cumulative_charged_seconds": 168,
+    "maximum_seconds": 300,
+    "remaining_seconds": 132,
+    "current_result": "cpu/attempt02/result/result.json",
+    "matching_current_sources": 30
+  },
+  "native": {
+    "prior_actual_updates": 8,
+    "prior_charged_seconds": 364,
+    "new_updates": 0,
+    "remaining_seconds": 536,
+    "conditional_new_updates": 3
+  },
+  "formal": {
+    "prior_charged_seconds": 18428.570150192827,
+    "new_seconds": 0,
+    "effective_remaining_seconds": 67971,
+    "prior_access": {
+      "train": 1,
+      "valid": 0,
+      "heldout": 0,
+      "owners": 0
+    },
+    "new_access": false
+  },
+  "source_manifest": "../source_manifest.json",
+  "automatic_review_rejection": {
+    "action": "Unpack second CPU source into first workspace and start second qualification",
+    "executed": false,
+    "resolution": "Separate 20261015_110600/workspace deployed; first workspace unchanged"
+  },
+  "next_action": "Concrete merged contract/implementation review package; upload only after specific authorization; no native gate until complete independent disposition"
+}

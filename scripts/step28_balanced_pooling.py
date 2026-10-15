@@ -13,7 +13,7 @@ import step28_record_replay as record
 data = record.data
 ARMS = ("S", "G", "F")
 RNG_ORDER = "ABC"
-SOLVER = dict(version="log_sinkhorn_round_v1", tau=1., maximum_iterations=4096,
+SOLVER = dict(version="log_sinkhorn_terminal_q_v1", tau=1., maximum_iterations=4096,
               marginal_tolerance=1e-10, feasible_tolerance=1e-12,
               gap_tolerance=5e-9, roundoff_factor=256.)
 
@@ -77,7 +77,8 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
     a, b = k.new_zeros((batch, n)), k.new_zeros((batch, m))
     done = torch.zeros(batch, dtype=torch.bool, device=k.device)
     values, plans = mu.clone(), k.new_zeros(k.shape)
-    maxima = dict(iterations=0, marginal_error=0., feasible_error=0., gap_checked=0.)
+    maxima = dict(iterations=0, marginal_error=0., feasible_error=0., gap_checked=0.,
+                  ordinary_marginal_error=None, terminal_acceptances=0, terminal_min_iteration=None)
     for iteration in range(1, maximum_iterations+1):
         idx = torch.where(~done)[0]
         kw, aw, bw = kernel[idx], a[idx], b[idx]
@@ -116,9 +117,10 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
         checked = gap.clamp_min(0)+eps
         feasible = torch.maximum((q.sum(2)-1/n).abs().amax(1), (q.sum(1)-1/m).abs().amax(1))
         marginal = torch.maximum(rowerr, colerr)
-        accept = ((marginal <= SOLVER["marginal_tolerance"])
-                  & (feasible <= SOLVER["feasible_tolerance"])
-                  & (checked <= SOLVER["gap_tolerance"]))
+        qualified = (feasible <= SOLVER["feasible_tolerance"]) & (checked <= SOLVER["gap_tolerance"])
+        ordinary = qualified & (marginal <= SOLVER["marginal_tolerance"])
+        terminal = qualified & ~ordinary & (iteration == SOLVER["maximum_iterations"] == 4096)
+        accept = ordinary | terminal
         if accept.any():
             finished = idx[accept]
             plans[finished], values[finished] = q[accept], mu[finished]+primal[accept]
@@ -126,12 +128,22 @@ def _solve(blocks: torch.Tensor, stats: dict | None, *, maximum_iterations: int)
             maxima["iterations"] = iteration
             for name, tensor in (("marginal_error", marginal), ("feasible_error", feasible), ("gap_checked", checked)):
                 maxima[name] = max(maxima[name], float(tensor[accept].max()))
+            if ordinary.any():
+                maxima["ordinary_marginal_error"] = max(maxima["ordinary_marginal_error"] or 0., float(marginal[ordinary].max()))
+            if terminal.any():
+                maxima["terminal_acceptances"] += int(terminal.sum())
+                maxima["terminal_min_iteration"] = min(maxima["terminal_min_iteration"] or iteration, iteration)
         if done.all():
             if stats is not None:
                 stats["blocks"] = stats.get("blocks", 0)+batch
                 stats["failures"] = stats.get("failures", 0)
-                for key, value in maxima.items():
+                for key in ("iterations", "marginal_error", "feasible_error", "gap_checked"):
+                    value = maxima[key]
                     stats[key] = max(stats.get(key, 0), value)
+                stats["terminal_acceptances"] = stats.get("terminal_acceptances", 0)+maxima["terminal_acceptances"]
+                for key, op in (("ordinary_marginal_error", max), ("terminal_min_iteration", min)):
+                    values_to_merge = [v for v in (stats.get(key), maxima[key]) if v is not None]
+                    stats[key] = op(values_to_merge) if values_to_merge else None
             return values, plans, maxima
     failed = ~accept
     raise SolverFailure(f"Transport did not converge in {maximum_iterations} full iterations", idx[failed], n, m,

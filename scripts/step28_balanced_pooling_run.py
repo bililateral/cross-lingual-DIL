@@ -37,12 +37,22 @@ def policy() -> dict:
     if (p["methods"] != list(method.ARMS) or p["domains"] != "AB" or p["main_rng_order"] != "ABC"
             or p["physical_updates"] != 1728 or p["gradient_group_presentations"] != 2592
             or p["physical_stage_states"] != 6 or p["epoch_diagnostic_points"] != 36
-            or p["solver"] != method.SOLVER or p["native_verification"]["actual_updates"] != 8
+            or p["solver"] != method.SOLVER or p["native_verification"]["actual_updates"] != 3
             or p["history_supervision"] != .1 or p["teacher_weight"] != .5 or p["seed"] != "s0"
             or p["memory_maximum_bytes"] != 1048576
             or p["evaluation"]["comparisons"] != [["F", "S"], ["G", "S"], ["F", "G"]]
             or p["evaluation"]["overall_pass_gate"] is not False):
         raise ValueError("Approved balanced-pooling contract differs")
+    n, r, s = p["native_verification"], p["runtime"], p["supervision"]
+    if (n["prior_actual_updates"] != 8 or n["maximum_cumulative_updates"] != 11
+            or n["prior_charged_seconds"] != 364 or n["maximum_seconds"] != 900
+            or p["cpu_verification"]["prior_charged_seconds"] != 97 or p["cpu_verification"]["maximum_seconds"] != 300
+            or r["prior_charged_seconds"] != 18428.570150192827 or r["maximum_cumulative_seconds"] != 86400
+            or r["maximum_gpu_stage_seconds"] != math.floor(r["maximum_cumulative_seconds"]-r["prior_charged_seconds"])
+            or s != dict(train_parse_attempts=1, valid_parse_attempts=1, test_access=False, owners_access=False,
+                         automatic_retry=False, prior_train_parse_attempts=1, prior_valid_parse_attempts=0,
+                         maximum_cumulative_train_parse_attempts=2, maximum_cumulative_valid_parse_attempts=1)):
+        raise ValueError("Approved amendment ledger differs")
     return p
 
 
@@ -70,7 +80,8 @@ def sources() -> list[dict]:
         "step28_balanced_pooling_policy.json", "step28_record_replay_policy.json",
         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
     paths.update(data.ROOT / n for n in ("docs/SELLER_ALIAS_BALANCED_POOLING.zh.md",
-        "scripts/run_step28_balanced_pooling_linux_20261014.sh"))
+        "docs/SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md",
+        "scripts/run_step28_balanced_pooling_linux_20261015.sh"))
     return [data.record(p, data.ROOT) for p in sorted(paths)]
 
 
@@ -191,13 +202,17 @@ class Budget(legacy.Budget):
     def output_files(self):
         # Only this isolated run's output trees; never scan formal input links.
         extra = (data.ROOT/"reports/qualification",
-                 data.ROOT/"reports/documentation/20261014/balanced_pooling_implementation")
+                 data.ROOT/"reports/documentation/20261015/balanced_pooling_repair")
         sidecars = [self.root.with_suffix(s) for s in (".dispatch.json", ".listener.json", ".listener.console.txt")]
         return list(dict.fromkeys([*super().output_files(), *sidecars,
                                    *(p for folder in extra for p in folder.rglob("*"))]))
 
     def snapshot(self) -> dict:
-        return {**super().snapshot(), "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261014/balanced_pooling_implementation, all within this isolated workspace"}
+        result = super().snapshot()
+        result.update(prior_charged_seconds=self.limits["prior_charged_seconds"],
+                      cumulative_seconds=result["elapsed_seconds"]+self.limits["prior_charged_seconds"],
+                      output_scope="job and wrapper/listener sidecars; qualification and amendment evidence in this isolated workspace")
+        return result
 
 
 def projection(m: dict) -> dict:
@@ -212,7 +227,7 @@ def projection(m: dict) -> dict:
     size = math.ceil(1.1*(m["W_F"]+6*m["W_I"]+2*2**30))
     return {"train_seconds": train, "forward_seconds": forward, "io_seconds": io,
             "projected_total_seconds": seconds, "projected_peak_output_bytes": size,
-            "within_budget": seconds <= 86400 and size <= 16*2**30}
+            "within_budget": seconds <= policy()["runtime"]["maximum_gpu_stage_seconds"] and size <= 16*2**30}
 
 
 def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget):
@@ -414,6 +429,28 @@ def train(job, budget):
     return manifest, split, valid, metadata
 
 
+def solver_gate(stats: dict) -> None:
+    """Check the recorded O/T partition; never replace raw P by rounded Q."""
+    b, t, it = (stats.get(k) for k in ("blocks", "terminal_acceptances", "iterations"))
+    if (any(type(v) is not int for v in (b, t, it, stats.get("failures")))
+            or b <= 0 or not 0 <= t <= b or stats["failures"] != 0 or not 1 <= it <= 4096):
+        raise ValueError("Missing/failed solver counts")
+    p, q, gap = (stats.get(k) for k in ("marginal_error", "feasible_error", "gap_checked"))
+    ordinary, terminal_min = stats.get("ordinary_marginal_error"), stats.get("terminal_min_iteration")
+    if (any(not isinstance(v, (int, float)) or not np.isfinite(v) or v < 0 for v in (p, q, gap))
+            or q > method.SOLVER["feasible_tolerance"] or gap > method.SOLVER["gap_tolerance"]):
+        raise ValueError("Solver output precision differs")
+    if b > t:
+        if (not isinstance(ordinary, (int, float)) or not np.isfinite(ordinary)
+                or not 0 <= ordinary <= method.SOLVER["marginal_tolerance"] or ordinary > p):
+            raise ValueError("Ordinary P evidence differs")
+    elif ordinary is not None:
+        raise ValueError("No ordinary blocks but non-null ordinary maximum")
+    if (t == 0 and (terminal_min is not None or p > method.SOLVER["marginal_tolerance"])) or (t > 0 and (
+            type(terminal_min) is not int or terminal_min != 4096 or it != 4096 or p <= method.SOLVER["marginal_tolerance"])):
+        raise ValueError("Terminal acceptance iteration/P evidence differs")
+
+
 def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
     if (manifest["status"] != COMPLETE or manifest["source_files"] != sources()
             or manifest["physical_updates"] != 1728 or manifest["gradient_group_presentations"] != 2592
@@ -498,13 +535,7 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
                 raise ValueError("Actual loss/LR decomposition differs")
         sequences[stage].append((log["current_ids"], log["history_ids"], assignments))
         if arm == "F":
-            stats = point["solver_summary"]
-            if (stats.get("blocks", 0) <= 0 or stats.get("failures") != 0
-                    or stats["iterations"] > method.SOLVER["maximum_iterations"]
-                    or any(not np.isfinite(stats[k]) or stats[k] > method.SOLVER[t]
-                           for k,t in (("marginal_error","marginal_tolerance"),
-                                       ("feasible_error","feasible_tolerance"),("gap_checked","gap_tolerance")))):
-                raise ValueError("Missing/failed solver evidence in actual run")
+            solver_gate(point["solver_summary"])
         mapping = data.read_json(data.verify(root/point["mapping"]["path"], point["mapping"]))
         if mapping["status"] != "PASS_CALIBRATION_FIT" or point["maps"]["first"] != a_point["maps"]["first"]:
             raise ValueError("Calibration failed or first map changed")
@@ -551,6 +582,8 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
 
 
 def open_valid(job, manifest, groups, metadata, c):
+    if data.read_json(job/"access.json") != dict(train=1, valid=0, heldout=0, owners=0):
+        raise ValueError("Current access ledger must retain the one prior train attempt")
     scores, split = blind_gate(job/"run", manifest)
     data.write_json(job/"before_valid.json", {"status": "ALL_BLIND_GATES_PASS", "source_files": sources(),
         "manifest": data.record(job/"run/manifest.json", job), "access": data.read_json(job/"access.json")})
@@ -696,17 +729,94 @@ def finalize(root):
     return result
 
 
+def prior_evidence():
+    """Exact old receipts, not re-labelled qualification of current F."""
+    p = policy()
+    refs = p["prior_evidence"]
+    loaded = {k: data.read_json(data.verify(data.ROOT/refs[k]["path"], refs[k]))
+              for k in ("formal_gate", "failure", "access", "native_result", "qualification_state", "amendment_authorization")}
+    data.verify(data.ROOT/refs["native_disposition"]["path"], refs["native_disposition"])
+    old, native, ledger = loaded["formal_gate"], loaded["native_result"], loaded["qualification_state"]
+    for key, reference in (("gpu", refs["native_result"]), ("native_disposition", refs["native_disposition"])):
+        if any(old[key][field] != reference[field] for field in ("bytes", "sha256")):
+            raise ValueError("Old qualification receipt identity differs")
+    if (old["status"] != "APPROVED_BALANCED_POOLING_FORMAL" or old["review_disposition"] != "NO_OPEN_BLOCKERS"
+            or native["status"] != "PASS_HANDWRITTEN_ONLY" or native["source_files"] != old["source_files"]
+            or native["native"]["actual_updates"] != 8 or not all(native["native"].get(k) is True for k in
+                ("next_update_bitwise_equal", "both_phases_encoder_head_effect", "three_pooling_restores_verified"))
+            or ledger["native"]["actual_updates"] != 8 or ledger["native"]["charged_seconds"] != 364
+            or loaded["failure"]["status"] != "FAIL_NO_RETRY"
+            or loaded["failure"]["budget"]["elapsed_seconds"] != p["runtime"]["prior_charged_seconds"]
+            or loaded["access"] != dict(train=1, valid=0, heldout=0, owners=0)):
+        raise ValueError("Old failure, access or native ledger differs")
+    amendment = data.ROOT/"docs/SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md"
+    data.verify(amendment, loaded["amendment_authorization"]["contract"])
+    current = {r["path"]: r for r in sources()}
+    changed = {"scripts/step28_balanced_pooling.py", "scripts/step28_balanced_pooling_run.py",
+               "scripts/step28_balanced_pooling_verify.py", "tests/test_step28_balanced_pooling.py",
+               "schema/step28_balanced_pooling_policy.json", "scripts/run_step28_balanced_pooling_linux_20261014.sh"}
+    for r in old["source_files"]:
+        if r["path"] not in changed and current.get(r["path"]) != r:
+            raise ValueError("Inherited native dependency changed: "+r["path"])
+    return loaded
+
+
 def reviewed_gate(path, kind):
     gate = data.read_json(path)
+    p = policy()
+    prior_evidence()
     if (gate.get("status") != "APPROVED_BALANCED_POOLING_"+kind or gate.get("source_files") != sources()
-            or gate.get("review_disposition") != "NO_OPEN_BLOCKERS" or gate.get("user_scope_approved") is not True):
-        raise ValueError("Reviewed, approved source-bound gate required")
+            or gate.get("review_disposition") != "NO_OPEN_BLOCKERS" or gate.get("user_scope_approved") is not True
+            or gate.get("prior_evidence") != p["prior_evidence"]
+            or gate.get("authorization") != p["prior_evidence"]["amendment_authorization"]):
+        raise ValueError("Reviewed, approved amendment source-bound gate required")
     for name in ("authorization", "review"):
         data.verify(data.ROOT/gate[name]["path"], gate[name])
     cpu = data.read_json(data.verify(data.ROOT/gate["cpu"]["path"], gate["cpu"]))
-    if cpu.get("mode") != "cpu" or cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("source_files") != sources():
-        raise ValueError("Matching successful CPU qualification required")
+    if (cpu.get("mode") != "cpu" or cpu.get("scope") != "terminal-q" or cpu.get("status") != "PASS_HANDWRITTEN_ONLY"
+            or cpu.get("source_files") != sources() or cpu.get("prior_compute_seconds", -1) < 97
+            or not 97 < cpu.get("cumulative_charged_seconds", 0) <= 300):
+        raise ValueError("Matching successful incremental CPU qualification required")
     return gate
+
+
+def delta_native_gate(gpu, old):
+    n = gpu.get("native", {})
+    if (gpu.get("mode") != "gpu" or gpu.get("scope") != "terminal-q" or gpu.get("status") != "PASS_HANDWRITTEN_ONLY"
+            or gpu.get("source_files") != sources() or gpu.get("prior_compute_seconds") != 364
+            or not 364 < gpu.get("cumulative_charged_seconds", 0) <= 900
+            or n.get("actual_updates") != 3 or n.get("cumulative_updates") != 11
+            or any(n.get(k) is not True for k in ("next_update_bitwise_equal", "both_phases_encoder_head_effect",
+                "F_pooling_restores_verified", "terminal_gpu_vjp_verified"))
+            or n.get("inherited_native") != policy()["prior_evidence"]["native_result"]):
+        raise ValueError("Matching three-update incremental F qualification required")
+    verify_archive(n.get("pretrained_archive"), config())
+    # Current report contains old S/G and conservative max IO explicitly, never invented timings.
+    for arm in ("S", "G"):
+        for key in ("t_A", "t_B", "v", "h"):
+            name = key+"_"+arm
+            if n["measurements"][name] != old["native"]["measurements"][name]:
+                raise ValueError("Inherited S/G measurement differs")
+    for key in ("L", "s_F", "r_F", "s_I", "r_I", "W_F", "W_I"):
+        if n["measurements"][key] < old["native"]["measurements"][key]:
+            raise ValueError("Inherited IO/size maximum lost")
+    stress = n["terminal_stress"]
+    for key in ("c_gpu", "c_cpu"):
+        if not np.isfinite(stress[key]) or stress[key] <= 0:
+            raise ValueError("Missing measured terminal stress")
+    if stress["accounts"] != 28 or stress["records"] != 84 or stress["pairs"] != 378:
+        raise ValueError("Terminal stress was not a complete table")
+    for key, multiplier, cost in (("t_A_F", 2, "c_gpu"), ("t_B_F", 5, "c_gpu"),
+                                  ("v_F", 1, "c_gpu"), ("h_F", 4, "c_cpu")):
+        if n["measurements"][key] != n["natural_measurements"][key]+multiplier*stress[cost]:
+            raise ValueError("Hard solver cost not propagated to full call count")
+    if set(stress["solver_summaries"]) != {"cpu", "gpu"}:
+        raise ValueError("Both measured terminal stress devices required")
+    for s in stress["solver_summaries"].values():
+        solver_gate(s)
+        if s["blocks"] != 378 or s["terminal_acceptances"] != 378:
+            raise ValueError("Terminal stress did not actually use hard blocks")
+    solver_gate(n["solver_summary"])
 
 
 def validate_gate(job, path):
@@ -714,12 +824,7 @@ def validate_gate(job, path):
     if gate.get("job") != job.relative_to(data.ROOT).as_posix() or gate.get("runtime") != policy()["runtime"] or gate.get("supervision") != policy()["supervision"]:
         raise ValueError("Formal scope differs")
     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
-    if (gpu.get("mode") != "gpu" or gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("source_files") != sources()
-            or gpu.get("native", {}).get("actual_updates") != 8 or gpu["native"].get("next_update_bitwise_equal") is not True
-            or gpu["native"].get("both_phases_encoder_head_effect") is not True
-            or gpu["native"].get("three_pooling_restores_verified") is not True):
-        raise ValueError("Matching eight-update scoring native qualification required")
-    verify_archive(gpu["native"].get("pretrained_archive"), config())
+    delta_native_gate(gpu, prior_evidence()["native_result"])
     if not projection(gpu["native"]["measurements"])["within_budget"]:
         raise ValueError("New projection exceeds approved budget; no formal input opened")
     return gate
@@ -728,6 +833,9 @@ def validate_gate(job, path):
 def execute(job, gate_path):
     import torch
     from step28_record_replay_verify import preflight
+    started = float(os.environ.get("RECORD_REPLAY_STARTED_EPOCH", "nan"))
+    if not math.isfinite(started) or not 0 <= time.time()-started < policy()["runtime"]["maximum_gpu_stage_seconds"]:
+        raise ValueError("Bounded wrapper start required before any formal read")
     validate_gate(job, gate_path)
     if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
         raise ValueError("New independent output required")
@@ -756,7 +864,9 @@ def execute(job, gate_path):
     watcher = threading.Thread(target=watchdog, daemon=True)
     watcher.start()
     try:
+        budget.check()
         manifest, split, valid, metadata = train(job, budget)
+        budget.check()
         scores, split, labelled = open_valid(job, manifest, valid, metadata, config())
         budget.phase = "evaluation"
         collect(job/"evaluation", scores, labelled, split)
