@@ -14,6 +14,10 @@
 
 用户随后明确：“此次实验的训练权重给我删除”。本次六份新权重A_S/B_S/A_G/B_G/A_F/B_F已于20:24:27—20:24:28删除，共7,826,218,590字节（约7.29GiB），实际models目录为空。删除前核对无活动作业/打开的权重、六端点恢复已完成、当前保存结果分析/外审无载模依赖，逐文件最终路径/属主/单链接/大小/SHA与原记录一致；[删除前身份](../reports/maintenance/20261015/balanced_result_weights/predelete.json)先经SFTP回传核验。349份非权重文件大小/SHA全部不变，包括六Memory共2,071,353字节、完整结果/日志/来源/访问与计费账；临时完整work为空。文件系统可用空间由19,553,755,136增至27,380,006,912字节（约25.50GiB），见[实际删除回执](../reports/maintenance/20261015/balanced_result_weights/receipt.json)，两份记录均在Linux/Windows同相对目录核验保存。未下载或备份权重，不涉及原预训练或其他作业。原[观测](../reports/seller_alias_continual/20261015/balanced_pooling_result/observation.json)、报告和送审包的权重留存状态保留为删除前事实；SHA不能恢复权重，未来重训仍须授权。两端各一个5,766,787字节结果传输ZIP和234,948字节分析传输ZIP已在成功回传核验后删除；必要原件和清单保留，见[收尾](../reports/seller_alias_continual/20261015/balanced_pooling_result/closeout.json)。未补传历史归档，局部清理不重置周期。
 
+结果外审及独立主审现已完成。完整回收的39份外部原件（1,574,378字节）、页面正文、交付身份/清单、主审、18行损失遗忘补正及当前状态共49份/1,632,314字节已通过SFTP同步并逐项大小/SHA一致，当前状态只写运行目录外current_state.json；见[同步记录](../reports/seller_alias_continual/20261015/balanced_pooling_result/review/sync.json)。[20:57现场核对](../reports/seller_alias_continual/20261015/balanced_pooling_result/review/closeout.json)确认完成/访问/31来源不变、无相关活动进程、models为空、六Memory身份相同。外审包内旧保管状态不追改。
+
+按网页外审包清理规则，345,535字节返回ZIP在39成员验收并保留后删除，避免重复副本；6,123,032字节原输入ZIP仍由外审原始核算程序直接按大小/SHA绑定为复算输入，保留唯一Windows原件及具体用途，未上传Linux或补传历史归档。详细身份及处置见[回收记录](../reports/seller_alias_continual/20261015/balanced_pooling_result/review/recovery.json)。专用网页已关闭；不删除必要失败证据，不新建权重备份或科研运行，本次局部清理不重置周期。
+
 ## 2026-10-15 失败S/G/F旧权重清理
 
 用户明确要求：“上次训练失败产生的训练权重文件你删了吗？没删的话就删掉并做好记录”。对象仅为Linux旧作业20261014_143200/workspace/reports/job/run/models下A_S.pt、B_S.pt、A_G.pt、B_G.pt、A_F.pt五份权重；此前仍保留。已批准的新完整重训从固定预训练独立起步，不加载旧失败模型／Memory；旧作业无可精确恢复至B/F第247步的完整Adam状态，无当前或已批准后续载模依赖。

@@ -1,0 +1,22 @@
+隔离核算记录与限制
+
+环境：网页工作区；Python3.13.5，NumPy2.3.5。Linux-6.18.44-x86_64-with-glibc2.41是网页容器，不是项目Linux。
+OPENBLAS_NUM_THREADS=1；OMP_NUM_THREADS=1；MKL_NUM_THREADS=1。
+没有网络请求、项目远程连接、Torch导入、模型/Adam/Memory加载、正式标签解析或训练。
+
+第一版：code/independent_review_attempt01.py；raw/attempt01.log和raw/attempt01/保存部分成功输出及真实异常。
+断言错误为“current objective contract”，源于错误要求S的mse1也为null。S旧目标实际计算/记录mse1，但只训练mse0。
+最终版：code/independent_review.py；raw/attempt02.log和raw/attempt02/保存完整输出。只按臂修正审查断言，未修改输入或项目源码。
+最终版内部计时1.7131650300000274秒。代码提取/阅读/辅助字节检查及文字报告耗时不包含在这一计时中。
+输出58527断言；numeric_checks中的标量位置合计219676；相关最大绝对差6.661338147750939e-16。
+训练loss分解另计，最大误差3.2782554615362614e-08，不与前者混为同一最大差。
+
+PCG64固定种子20260930，5000×2×20群抽样；没有新seed或“最好”重采样选择。
+端点/比较全部1980行（146行N/A）、全部36次诊断、6×288行更新、F累计调用及成本均按已保存证据计算。
+原始正式标签不在输入；不能称从标签独立重建AP/ROC/Brier/log-loss、全部查询排名真值或校准最优解。
+不重跑CPU/GPU资格；原生下一状态及梯度等只是读取限定资格记录，不是本次逐张量重算。
+不重放正式K/P/Q，不声称任意浮点输入严格证书；不以PASS或计数代替这些边界。
+
+补充程序supplemental_evidence.py只检查保存结构与摘出证据；build_reading_scope.py只处理审查元数据/字节引用。
+阅读日志逐文件提取窗口是实际范围，不等于对每个所提取字节均作完备语义证明。
+所有输出原件保留，模型自述/用户选择器陈述/不可独立核实后台分别在model_identity.json。

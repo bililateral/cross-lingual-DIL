@@ -1,0 +1,376 @@
+BEGIN identity_check
+COMPLETE identity_check
+BEGIN source_execution
+COMPLETE source_execution
+BEGIN metrics
+COMPLETE metrics
+BEGIN training
+COMPLETE training
+BEGIN diagnostics
+COMPLETE diagnostics
+BEGIN costs_and_addenda
+COMPLETE costs_and_addenda
+{
+  "status": "COMPLETE",
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "numpy": "2.3.5",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "elapsed_seconds": 1.7131650300000274,
+  "input": {
+    "file": "review_input(20261015-121313).zip",
+    "bytes": 6123032,
+    "sha256": "07f941b2d689c4f9e2cd024364b57e3607bd9bb762868378a854b5be97ef83f6"
+  },
+  "assertions": 58527,
+  "numeric_checks": {
+    "cost": [
+      1,
+      0.0
+    ],
+    "confusion-derived rates": [
+      4320,
+      0.0
+    ],
+    "query to group means": [
+      7200,
+      3.3306690738754696e-16
+    ],
+    "1980 statistics": [
+      5502,
+      0.0
+    ],
+    "Linux summary absolute": [
+      792,
+      0.0
+    ],
+    "macro all N/A propagation": [
+      396,
+      5.551115123125783e-16
+    ],
+    "pooled confusion rates": [
+      432,
+      0.0
+    ],
+    "Linux pooled summary": [
+      432,
+      0.0
+    ],
+    "affine saved scores": [
+      181440,
+      0.0
+    ],
+    "ranking metrics role invariance": [
+      6720,
+      0.0
+    ],
+    "paired group MAP values": [
+      120,
+      0.0
+    ],
+    "CSV 1980 values and nulls": [
+      5940,
+      2.220446049250313e-16
+    ],
+    "all encoder LR": [
+      1728,
+      1.6940658945086007e-21
+    ],
+    "current weighted": [
+      1728,
+      0.0
+    ],
+    "D0 equality": [
+      864,
+      0.0
+    ],
+    "all 36 valid curves": [
+      216,
+      0.0
+    ],
+    "last diagnostic metrics vs endpoint": [
+      720,
+      0.0
+    ],
+    "all train curves": [
+      162,
+      3.3306690738754696e-16
+    ],
+    "all valid curves": [
+      162,
+      0.0
+    ],
+    "all gap curves": [
+      162,
+      3.3306690738754696e-16
+    ],
+    "all epoch gap intervals": [
+      324,
+      5.273559366969494e-16
+    ],
+    "diagnostic change means": [
+      81,
+      3.3306690738754696e-16
+    ],
+    "diagnostic change intervals": [
+      162,
+      6.661338147750939e-16
+    ],
+    "teacher residual means": [
+      72,
+      0.0
+    ]
+  },
+  "results": {
+    "array_files": 210,
+    "qualification_inheritance": {
+      "unchanged": 26,
+      "changed": [
+        "schema/step28_balanced_pooling_policy.json",
+        "scripts/run_step28_balanced_pooling_linux_20261015.sh",
+        "scripts/step28_balanced_pooling_run.py",
+        "tests/test_step28_balanced_pooling.py"
+      ],
+      "added": [
+        "docs/SELLER_ALIAS_BALANCED_POOLING_RUNTIME.zh.md"
+      ],
+      "native_actual_updates": 3,
+      "native_cumulative_updates": 11,
+      "native_inner_charged_seconds": 559.0,
+      "outer_accounting_seconds_from_disposition": 561
+    },
+    "execution": {
+      "source_count": 31,
+      "cost": {
+        "cumulative_seconds": 37867.71471321862,
+        "elapsed_seconds": 19439.144563025795,
+        "limits": {
+          "maximum_cuda_reserved_bytes": 30064771072,
+          "maximum_cumulative_seconds": 97200,
+          "maximum_gpu_stage_seconds": 78771,
+          "maximum_output_bytes": 17179869184,
+          "maximum_rss_bytes": 68719476736,
+          "minimum_free_gpu_bytes": 32212254720,
+          "minimum_free_host_bytes": 77309411328,
+          "prior_charged_seconds": 18428.570150192827,
+          "torch_cpu_threads": 1
+        },
+        "output_scope": "job and wrapper/listener sidecars; qualification and amendment evidence in this isolated workspace",
+        "peak_cuda_reserved_bytes": 8652849152,
+        "peak_output_bytes": 11740400571,
+        "peak_rss_bytes": 6911311872,
+        "phase": "evaluation",
+        "prior_charged_seconds": 18428.570150192827
+      },
+      "access_before": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0
+      },
+      "access_final": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 1
+      },
+      "old_failure_budget": {
+        "elapsed_seconds": 18428.570150192827,
+        "limits": {
+          "maximum_cuda_reserved_bytes": 30064771072,
+          "maximum_gpu_stage_seconds": 86400,
+          "maximum_output_bytes": 17179869184,
+          "maximum_rss_bytes": 68719476736,
+          "minimum_free_gpu_bytes": 32212254720,
+          "minimum_free_host_bytes": 77309411328,
+          "torch_cpu_threads": 1
+        },
+        "output_scope": "job and wrapper/listener sidecars; reports/qualification; reports/documentation/20261014/balanced_pooling_implementation, all within this isolated workspace",
+        "peak_cuda_reserved_bytes": 8652849152,
+        "peak_output_bytes": 10434275104,
+        "peak_rss_bytes": 6877294592,
+        "phase": "B_F"
+      }
+    },
+    "bootstrap": {
+      "shape": [
+        5000,
+        2,
+        20
+      ],
+      "dtype": "int64",
+      "raw_bytes_sha256": "b1a539f80631940936dbd78b7141db5b37d96eeb9283a28c964afc733eda552e",
+      "seed": 20260930,
+      "replicates": 5000,
+      "quantile": "linear"
+    },
+    "statistics": {
+      "rows": 1980,
+      "null_rows": 146,
+      "scalar_matrix_entries": 15840,
+      "query_metric_entries": 201600,
+      "confusion_count_entries": 2880,
+      "no_predicted_positive_groups": {
+        "A_S": {
+          "raw": 40,
+          "stage-cal": 4,
+          "first-cal": 4
+        },
+        "B_S": {
+          "raw": 36,
+          "stage-cal": 4,
+          "first-cal": 1
+        },
+        "A_G": {
+          "raw": 40,
+          "stage-cal": 1,
+          "first-cal": 1
+        },
+        "B_G": {
+          "raw": 40,
+          "stage-cal": 2,
+          "first-cal": 0
+        },
+        "A_F": {
+          "raw": 40,
+          "stage-cal": 2,
+          "first-cal": 2
+        },
+        "B_F": {
+          "raw": 37,
+          "stage-cal": 2,
+          "first-cal": 0
+        }
+      }
+    },
+    "training": {
+      "points": {
+        "A_S": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 0,
+          "last_adam_step": 288
+        },
+        "B_S": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 288,
+          "last_adam_step": 576
+        },
+        "A_G": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 0,
+          "last_adam_step": 288
+        },
+        "B_G": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 288,
+          "last_adam_step": 576
+        },
+        "A_F": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 0,
+          "last_adam_step": 288
+        },
+        "B_F": {
+          "updates": 288,
+          "encoder_zero_lr_calls": 1,
+          "nonzero_history_D0": 288,
+          "last_adam_step": 576
+        }
+      },
+      "calls": 1728,
+      "gradient_groups": 2592,
+      "encoder_zero_lr_calls": 6,
+      "combined_gradient_min": 0.5264294743537903,
+      "maximum_loss_decomposition_error": 3.2782554615362614e-08,
+      "A1_limit": "same recorded assignments; raw record ownership unavailable, no A1 reconstruction",
+      "parameter_displacement_limit": "per-step separate encoder/head displacement not saved"
+    },
+    "solver": {
+      "endpoints": {
+        "A_F": {
+          "blocks": 476280,
+          "failures": 0,
+          "feasible_error": 2.7755575615628914e-16,
+          "gap_checked": 9.74713292218393e-13,
+          "iterations": 1549,
+          "marginal_error": 9.999739924992923e-11,
+          "ordinary_marginal_error": 9.999739924992923e-11,
+          "terminal_acceptances": 0,
+          "terminal_min_iteration": null
+        },
+        "B_F": {
+          "blocks": 1347192,
+          "failures": 0,
+          "feasible_error": 3.0531133177191805e-16,
+          "gap_checked": 1.1903572258609137e-12,
+          "iterations": 4096,
+          "marginal_error": 5.77854764038932e-09,
+          "ordinary_marginal_error": 9.999845396180262e-11,
+          "terminal_acceptances": 3,
+          "terminal_min_iteration": 4096
+        }
+      },
+      "increments": [
+        {
+          "point": "B_F",
+          "step": 248,
+          "new": 3,
+          "cumulative": 3
+        }
+      ],
+      "B_incremental_blocks": 870912,
+      "total_successes": 1347192,
+      "ordinary_successes": 1347189,
+      "accounting": {
+        "A_updates": 217728,
+        "A_diagnostics": 199584,
+        "A_endpoints": 58968,
+        "B_updates": 544320,
+        "B_diagnostics": 267624,
+        "B_endpoints": 58968
+      },
+      "limits": "logged successful block summaries and exact call accounting; no per-block K/P/Q independent replay or rigorous universal floating point certificate"
+    },
+    "diagnostics": {
+      "points": 36,
+      "labels": {
+        "未见明确迹象": 25,
+        "证据不足": 2
+      },
+      "curve_rows": 126
+    },
+    "cost_windows": {
+      "seconds": {
+        "S": 5813.4675315083,
+        "G": 5857.515495338943,
+        "F": 7128.461823448073
+      },
+      "F_vs_S_percent": 22.61979248723176,
+      "G_vs_S_percent": 0.757688308946558,
+      "scope": "first A logged update to last B logged update; includes intermediate diagnostics/save/restore, excludes margins; not pure training/inference benchmark"
+    },
+    "custody": {
+      "model_bytes": 7826218590,
+      "model_count": 6,
+      "memory_bytes": 2071353,
+      "memory_count": 6
+    },
+    "loss_forgetting_semantics": {
+      "affected_rows": 18,
+      "frozen_definition": "A endpoint minus B-end A ability; old_changes uses the opposite signed ability change",
+      "operation": "For a loss, conventional positive-worsening forgetting contrast is the negative of the saved A-minus-B metric contrast. Transform interval [lo,hi] to [-hi,-lo]. Not a change of endpoint or new statistical test."
+    }
+  },
+  "limits": "External isolated saved-evidence consistency audit only. No project Linux, Torch/model/Memory load, formal labels, AP/ROC/Brier/log-loss label reconstruction, qualification rerun, training or new scientific resampling choices."
+}

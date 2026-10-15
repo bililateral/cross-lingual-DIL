@@ -1,0 +1,66 @@
+{
+  "scientific_blockers": [],
+  "reproducibility_defects": [
+    {
+      "id": "RD-01",
+      "blocking": false,
+      "title": "Brier/log-loss遗忘差输出的方向语义缺少逐指标区分",
+      "evidence": [
+        "context/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md:130",
+        "result/job/run/sources/scripts/step28_balanced_pooling_run.py:715-725",
+        "result/step28_balanced_result_audit.py:174-175",
+        "result/job/evaluation/evaluation.json:forgetting_comparisons",
+        "result/analysis/all_metrics.csv:kind=forgetting_contrast, metric=brier/log_loss"
+      ],
+      "confirmed_fact": "18行损失记录保存(A_c-B_c)-(A_o-B_o)，而损失遗忘定义为最终损失减获得时损失。数值与已写明的A-B公式一致，问题是统一遗忘/ability语义，不是算术失败。",
+      "affected_rows": 18,
+      "main_map_conclusion_affected": false,
+      "final_probability_contrasts_affected": false,
+      "minimum_action": "保持冻结原件，加数据字典和18行符号附注。损失遗忘mean=-saved_mean，interval=[-saved_hi,-saved_lo]。old_changes注明数值变化而非统一能力受益。",
+      "no_required_actions": [
+        "重训",
+        "新标签读取",
+        "改主要端点",
+        "重跑CPU/GPU资格",
+        "新bootstrap选择"
+      ],
+      "addendum": "raw/attempt02/loss_forgetting_direction_addendum.csv"
+    }
+  ],
+  "reasonable_suggestions": [
+    {
+      "id": "RS-01",
+      "title": "G初始优势延续仅作描述性轨迹分解，不升级唯一因果解释",
+      "evidence": "result/report.zh.txt:6,30-39",
+      "minimum_action": "保留初始/最终/遗忘三组数值与区间，并明确描述性分解。"
+    },
+    {
+      "id": "RS-02",
+      "title": "明示stage-cal主概率角色和comparison图的子集覆盖",
+      "evidence": [
+        "context/docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md:104-112",
+        "result/analysis/comparison.png",
+        "result/report.zh.txt:108"
+      ],
+      "minimum_action": "文字注释即可；不增加模型或统计运行。"
+    }
+  ],
+  "out_of_scope_overdesign": [
+    "为显著性增加seed/顺序/预算",
+    "新非劣幅度或旧23项/全部同时通过总门",
+    "事后合并域/选择最佳epoch或bootstrap",
+    "新求解器/8192次/温度或边际搜索",
+    "全面重测CPU/GPU/通用验证框架",
+    "补传模型Memory正式标签或重新连接项目Linux",
+    "重开旧C根因及无关身份认证仪式"
+  ],
+  "reviewer_script_failure": {
+    "project_defect": false,
+    "attempt": 1,
+    "reason": "错误地把G/F的mse1=null规则套到完整S；S计算/记录mse1但训练只用mse0",
+    "correction": "只修正外部按臂断言；输入与生产代码不变",
+    "preserved_source": "code/independent_review_attempt01.py",
+    "preserved_log": "raw/attempt01.log"
+  },
+  "disposition": "无新增已证实SCIENTIFIC_BLOCKER。主要结果可保留；建议主审以非阻断数据字典附注关闭RD-01，不覆盖冻结结果或扩大执行。"
+}
