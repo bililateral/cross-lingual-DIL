@@ -12,7 +12,7 @@
 
 新作业20261015_131600/workspace于18:40:15 exit0。347份结果/日志/冻结来源共11,094,881字节及7份Linux独立分析程序/表/图/原始输出共491,617字节已SFTP回传，逐文件大小/SHA核验；见[回传记录](../reports/seller_alias_continual/20261015/balanced_pooling_result/receive_verification.json)。原始证据继续留Linux实际workspace，分析和报告另存reports/seller_alias_continual/20261015/balanced_pooling_result；不复制正式文本/标签、模型或Memory到Windows。
 
-六份新推理模型共7,826,218,590字节、六Memory共2,071,353字节保留Linux原job/run/models和memory，大小/SHA与六端点记录一致，见[实际保管身份](../reports/seller_alias_continual/20261015/balanced_pooling_result/observation.json)。临时完整work为空；结果分析不载模，当前结果外审尚待完成，不转用旧五失败权重删除许可。两端各一个5,766,787字节结果传输ZIP和234,948字节分析传输ZIP已在成功回传核验后删除；必要原件和清单保留，见[收尾](../reports/seller_alias_continual/20261015/balanced_pooling_result/closeout.json)。未补传历史归档，局部清理不重置周期。
+用户随后明确：“此次实验的训练权重给我删除”。本次六份新权重A_S/B_S/A_G/B_G/A_F/B_F已于20:24:27—20:24:28删除，共7,826,218,590字节（约7.29GiB），实际models目录为空。删除前核对无活动作业/打开的权重、六端点恢复已完成、当前保存结果分析/外审无载模依赖，逐文件最终路径/属主/单链接/大小/SHA与原记录一致；[删除前身份](../reports/maintenance/20261015/balanced_result_weights/predelete.json)先经SFTP回传核验。349份非权重文件大小/SHA全部不变，包括六Memory共2,071,353字节、完整结果/日志/来源/访问与计费账；临时完整work为空。文件系统可用空间由19,553,755,136增至27,380,006,912字节（约25.50GiB），见[实际删除回执](../reports/maintenance/20261015/balanced_result_weights/receipt.json)，两份记录均在Linux/Windows同相对目录核验保存。未下载或备份权重，不涉及原预训练或其他作业。原[观测](../reports/seller_alias_continual/20261015/balanced_pooling_result/observation.json)、报告和送审包的权重留存状态保留为删除前事实；SHA不能恢复权重，未来重训仍须授权。两端各一个5,766,787字节结果传输ZIP和234,948字节分析传输ZIP已在成功回传核验后删除；必要原件和清单保留，见[收尾](../reports/seller_alias_continual/20261015/balanced_pooling_result/closeout.json)。未补传历史归档，局部清理不重置周期。
 
 ## 2026-10-15 失败S/G/F旧权重清理
 
