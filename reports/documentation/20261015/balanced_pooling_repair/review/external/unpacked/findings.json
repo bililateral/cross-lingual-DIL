@@ -1,0 +1,53 @@
+{
+  "new_scientific_blockers": 0,
+  "production_changes_required_before_fixed_native": false,
+  "report_corrections": 2,
+  "findings": [
+    {
+      "id": "RD-01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "NON_BLOCKING_REPORT_SCOPE_CORRECTION",
+      "finding": "Second-attempt bytes also change stress device completeness validation, a duplicate import, proxy evidence output and budget fixture arithmetic; not only offsets. Solver and tolerances unchanged.",
+      "minimum_action": "Record exact three-file difference and purposes in primary disposition; preserve original receipts, no solver rewrite or rerun requested.",
+      "evidence": [
+        "checks/attempt01_to_current.patch",
+        "reports/documentation/20261015/balanced_pooling_repair/report.zh.txt:16",
+        "reports/documentation/20261015/balanced_pooling_repair/review/request.zh.txt:9",
+        "scripts/step28_balanced_pooling_run.py:813-814"
+      ]
+    },
+    {
+      "id": "RD-02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "severity": "NON_BLOCKING_COUNT_SCOPE_CORRECTION",
+      "finding": "One tested production AdamW step plus one independent-reference AdamW step per integration test. The value 1 is only the production-path count, not total calls. Both included in wrapper CPU charge.",
+      "minimum_action": "Clarify production/reference/total counts in primary disposition; do not rewrite raw JSON or relabel BGE/native calls.",
+      "evidence": [
+        "scripts/step28_record_replay.py:206",
+        "tests/test_step28_balanced_pooling.py:739-755",
+        "reports/documentation/20261015/balanced_pooling_repair/report.zh.txt:20",
+        "local_checks/current/result.json",
+        "local_checks/attempt01/result.json"
+      ]
+    },
+    {
+      "id": "RS-01",
+      "classification": "合理后续建议",
+      "severity": "EVIDENCE_BOUNDARY",
+      "finding": "Project parameter deltas compare two implementations, not initial-to-updated displacement; analytic reference is fixed symmetric/additive family, not arbitrary matrices.",
+      "minimum_action": "Preserve scope wording; execute already-planned native displacement assertions without extra CPU calls.",
+      "evidence": [
+        "tests/test_step28_balanced_pooling.py:747-755",
+        "scripts/step28_balanced_pooling_verify.py:117-131",
+        "reports/documentation/20261015/balanced_pooling_repair/report.zh.txt:22-25"
+      ]
+    },
+    {
+      "id": "OO-01",
+      "classification": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "NOT_REQUESTED",
+      "finding": "No new solver, 8192 iterations, warm-start, grids, universal interval system, full-history reruns, selective restoration, formal asset uploads or repeated authorization are required.",
+      "minimum_action": "Do not expand scope."
+    }
+  ]
+}

@@ -1,0 +1,189 @@
+/mnt/data/fq_review/input/tests/test_step28_balanced_pooling.py:750: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  changes[name]=dict(gradient_norm=float(a.grad.norm()),gradient_max_delta=float((a.grad-b.grad).abs().max()),parameter_max_delta=float((a-b).abs().max()))
+{
+  "test_success": true,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "actual_adamw_step_calls": 2,
+  "optimizer_step_observations": [
+    [
+      {
+        "lr": 9.227799227799229e-06,
+        "max_displacement_from_pre_step": 9.357929229736328e-06,
+        "parameter_displacements": [
+          9.357929229736328e-06
+        ],
+        "changed_elements": 2523
+      },
+      {
+        "lr": 0.001,
+        "max_displacement_from_pre_step": 0.0010000020265579224,
+        "parameter_displacements": [
+          0.0010000020265579224,
+          0.0009999999310821295
+        ],
+        "changed_elements": 125
+      }
+    ],
+    [
+      {
+        "lr": 9.227799227799229e-06,
+        "max_displacement_from_pre_step": 9.357929229736328e-06,
+        "parameter_displacements": [
+          9.357929229736328e-06
+        ],
+        "changed_elements": 2523
+      },
+      {
+        "lr": 0.001,
+        "max_displacement_from_pre_step": 0.0010000020265579224,
+        "parameter_displacements": [
+          0.0010000020265579224,
+          0.0009999999310821295
+        ],
+        "changed_elements": 125
+      }
+    ]
+  ],
+  "production_pool_calls": 5,
+  "actual_symmetric_reference_input": [
+    [
+      0.9457403421401978,
+      -0.7885076999664307,
+      -7.003115653991699
+    ],
+    [
+      -0.7885076999664307,
+      0.9457403421401978,
+      -7.003115653991699
+    ],
+    [
+      -7.003115653991699,
+      -7.003115653991699,
+      1.108012080192566
+    ]
+  ],
+  "reference_value": 0.009999982540628076,
+  "initial_pool_analysis": [
+    {
+      "call": 0,
+      "role": "current_A0",
+      "max_value_delta": 2.5331974029541016e-07,
+      "hard_negative_set_mismatch_queries": 0,
+      "mismatch_examples": [],
+      "minimum_reference_fifth_sixth_margin": 0.009999752044677734,
+      "maximum_nonadditive_FP32_residual": 4.2385525178545436e-07,
+      "exact_optimum_plan_L1_perturbation_bound": 4.2385525178545436e-07,
+      "fixed_plan_value_suboptimality_bound": 1.796532744661109e-13
+    },
+    {
+      "call": 1,
+      "role": "current_A1",
+      "max_value_delta": 2.5331974029541016e-07,
+      "hard_negative_set_mismatch_queries": 0,
+      "mismatch_examples": [],
+      "minimum_reference_fifth_sixth_margin": 0.0033330917358398438,
+      "maximum_nonadditive_FP32_residual": 3.973642985211079e-07,
+      "exact_optimum_plan_L1_perturbation_bound": 3.973642985211079e-07,
+      "fixed_plan_value_suboptimality_bound": 1.5789838573917213e-13
+    },
+    {
+      "call": 2,
+      "role": "history_A0",
+      "max_value_delta": 2.980232238769531e-07,
+      "hard_negative_set_mismatch_queries": 0,
+      "mismatch_examples": [],
+      "minimum_reference_fifth_sixth_margin": 0.009999871253967285,
+      "maximum_nonadditive_FP32_residual": 4.2385525178545436e-07,
+      "exact_optimum_plan_L1_perturbation_bound": 4.2385525178545436e-07,
+      "fixed_plan_value_suboptimality_bound": 1.796532744661109e-13
+    },
+    {
+      "call": 3,
+      "role": "history_A1",
+      "max_value_delta": 2.086162567138672e-07,
+      "hard_negative_set_mismatch_queries": 0,
+      "mismatch_examples": [],
+      "minimum_reference_fifth_sixth_margin": 0.0033330917358398438,
+      "maximum_nonadditive_FP32_residual": 3.70873345284517e-07,
+      "exact_optimum_plan_L1_perturbation_bound": 3.70873345284517e-07,
+      "fixed_plan_value_suboptimality_bound": 1.3754703824252855e-13
+    },
+    {
+      "call": 4,
+      "role": "teacher_A0",
+      "max_value_delta": 5.960464477539063e-08,
+      "hard_negative_set_mismatch_queries": 27,
+      "mismatch_examples": [
+        {
+          "query": 0,
+          "actual_top5": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "independent_top5": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "query": 2,
+          "actual_top5": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "independent_top5": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "query": 3,
+          "actual_top5": [
+            0,
+            1,
+            2,
+            6,
+            7
+          ],
+          "independent_top5": [
+            6,
+            7,
+            8,
+            10,
+            11
+          ]
+        }
+      ],
+      "minimum_reference_fifth_sixth_margin": 0.0,
+      "maximum_nonadditive_FP32_residual": 1.9868214928830952e-07,
+      "exact_optimum_plan_L1_perturbation_bound": 1.9868214928830952e-07,
+      "fixed_plan_value_suboptimality_bound": 3.947459644582211e-14
+    }
+  ],
+  "elapsed_seconds": 22.290516389999993,
+  "environment": {
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "torch": "2.10.0+cpu",
+    "numpy": "2.3.5",
+    "cpu_threads": 1,
+    "gpu_visible": "",
+    "project_linux": false
+  },
+  "scope": "Only one supplied handwritten integration test per source version; includes production AdamW and independent reference AdamW; observer-only delegation; not project Linux qualification"
+}

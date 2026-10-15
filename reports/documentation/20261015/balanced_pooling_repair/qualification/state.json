@@ -1,5 +1,5 @@
 {
-  "status": "CPU_INCREMENTAL_PASS_MERGED_REVIEW_PREPARATION",
+  "status": "NATIVE_PASS_FORMAL_NOT_ADMITTED_PROJECTION",
   "authorization": "../authorization.json",
   "cpu": {
     "prior_charged_seconds": 97,
@@ -40,9 +40,27 @@
   "native": {
     "prior_actual_updates": 8,
     "prior_charged_seconds": 364,
-    "new_updates": 0,
-    "remaining_seconds": 536,
-    "conditional_new_updates": 3
+    "new_updates": 3,
+    "new_actual_wall_seconds": 196.21727442741394,
+    "new_charged_seconds": 197,
+    "cumulative_actual_updates": 11,
+    "maximum_cumulative_updates": 11,
+    "cumulative_charged_seconds": 561,
+    "maximum_seconds": 900,
+    "remaining_seconds": 339,
+    "automatic_retry": false,
+    "status": "PASS_HANDWRITTEN_ONLY",
+    "attempt": "gpu/attempt01",
+    "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_120600/workspace",
+    "launcher_pid": 122659,
+    "launcher_exited": true,
+    "started_epoch": 1792036989.708466,
+    "ended_epoch": 1792037185.9257405,
+    "source_records_match": 30,
+    "receipt": "gpu/attempt01/receive_manifest.json",
+    "disposition": "native_disposition.zh.txt",
+    "local_received_files_verified": 8,
+    "local_transfer_zip_removed_after_verification": true
   },
   "formal": {
     "prior_charged_seconds": 18428.570150192827,
@@ -54,7 +72,20 @@
       "heldout": 0,
       "owners": 0
     },
-    "new_access": false
+    "new_access": false,
+    "admission": "NOT_ADMITTED_PROJECTION",
+    "projection": {
+      "forward_seconds": 17839.63451923337,
+      "io_seconds": 157.5531028099358,
+      "projected_peak_output_bytes": 15266281909,
+      "projected_total_seconds": 77073.03956648684,
+      "train_seconds": 40061.24403114617,
+      "within_budget": false
+    },
+    "excess_seconds": 9102.039566486841,
+    "gate_created": false,
+    "job_created": false,
+    "new_actual_updates": 0
   },
   "source_manifest": "../source_manifest.json",
   "automatic_review_rejection": {
@@ -62,5 +93,6 @@
     "executed": false,
     "resolution": "Separate 20261015_110600/workspace deployed; first workspace unchanged"
   },
-  "next_action": "Concrete merged contract/implementation review package; upload only after specific authorization; no native gate until complete independent disposition"
+  "next_action": "No formal start or native retry under current scope. Any future continuation requires a concrete approved change to resource budget or experiment scope; retain precision and all consumed budgets.",
+  "review": "../review/primary_disposition.zh.txt"
 }

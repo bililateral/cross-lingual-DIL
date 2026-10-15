@@ -1,0 +1,21 @@
+test_terminal_real_chunked_update (test_step28_balanced_pooling.TerminalPoolingTests.test_terminal_real_chunked_update) ... FAIL
+
+======================================================================
+FAIL: test_terminal_real_chunked_update (test_step28_balanced_pooling.TerminalPoolingTests.test_terminal_real_chunked_update)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/fq_review/attempt01_source/tests/test_step28_balanced_pooling.py", line 734, in test_terminal_real_chunked_update
+    for a,b in zip(actual_proxy,expected_proxy):torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-5)
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/pyvenv/lib/python3.13/site-packages/torch/testing/_comparison.py", line 1600, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not close!
+
+Mismatched elements: 773 / 3486 (22.2%)
+Greatest absolute difference: 0.0011897629592567682 at index (1283,) (up to 2e-06 allowed)
+Greatest relative difference: 0.8999996781349182 at index (102,) (up to 2e-05 allowed)
+
+----------------------------------------------------------------------
+Ran 1 test in 20.294s
+
+FAILED (failures=1)

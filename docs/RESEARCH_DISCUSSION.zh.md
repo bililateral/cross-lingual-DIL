@@ -1187,3 +1187,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 已落实固定终端Q、O/T统计与盲门、旧八次资格与新三次来源衔接、累计67971秒实际入口。两轮Linux手写CPU分别计26与45秒，第一轮并列排名fixture比较失败保留；以不改精度的固定行列偏移修正，独立新workspace第二轮四项通过，累计168/300秒。一次复用首轮workspace的部署启动请求被自动审批拒绝且未执行，改独立目录完成。当前仅准备合并外审，原生／正式尚未进入；[实现报告](../reports/documentation/20261015/balanced_pooling_repair/report.zh.txt)和[资格账](../reports/documentation/20261015/balanced_pooling_repair/qualification/state.json)明确证据、未变部分与边界，新材料仅本地Git。
 
 用户随后对本次具体497290字节／66成员／SHA256 c1ba62c3b84368a66e3276bee1c66fef8a346d156d70b7eb85e5a915e8cc4f57合并包明确回复：“授权此合并包外审（推荐）”。11:27通过指定本地Playwright MCP上传并发送一次，可见GPT-6／Pro强度5/5，页面确认附件、完整请求、正在思考、停止按钮及空编辑框；见[具体许可](../reports/documentation/20261015/balanced_pooling_repair/review/upload_authorization.json)与[提交记录](../reports/documentation/20261015/balanced_pooling_repair/review/submission.json)。本次只完成已获准外发，未连接Linux或新增CPU／GPU／正式数据执行，CPU168/300秒、原生8次/364秒、正式有效余67971秒不变；完整回收和独立主审仍是后续固定三次F原生及新投影的前提。活动审查包保留，未作公开Git推送。
+
+## 2026-10-15：回收F终端Q合并外审并按补充推进
+
+用户原话：“外审已结束，仔细回收并分析 F 终端 Q 合同与实现的合并审查意见，独立主审后按已批准的合同补充继续推进。保持原输出精度和累计预算限制。”完整返回包122295字节／52成员已回收，51载荷核验一致；[独立主审](../reports/documentation/20261015/balanced_pooling_repair/review/primary_disposition.zh.txt)接受无新增科学阻断，关闭两项报告口径勘误：两轮之间实际改变run/verify/tests三文件，修复梯度比较的机制是fixture偏移；每轮为生产被测1次加独立参考1次轻量AdamW调用，全部已计入外层费用。冻结原件不改，生产源码未新增修改，CPU仍168/300秒，网页隔离核查不冒称项目资格。原会话已在完整回收／主审后关闭。
+
+按原批准补充形成当前来源绑定NATIVE gate，在现场确认旧失败及train1/valid0不变、无本项目作业／监听且共享资源充足后，于12:03:09启动独立20261015_120600/workspace的一次固定三次F原生，包装PID122659。当前等待实际资格、新成本投影及主审，正式训练尚未开始；后续不重复相同合同批准，也不越过原生、预算、数据及资源条件。实际完成状态统一见[交接](AI_RESEARCH_HANDOFF.zh.md)及本轮资格账。
+
+本轮后续实际结果：原生12:06:25完成，三次真实F更新及诊断后状态、两类恢复、终端VJP/378对压力证据通过，外层196.217秒计197秒，累计11/11次、561/900秒。新正式投影77073.039566秒超过67971秒剩额，输出14.217833GiB符合原限；按合同停止正式准入，未创建FORMAL gate/job，新增正式访问0。费用、来源、实际行为与超额构成见[原生主审](../reports/documentation/20261015/balanced_pooling_repair/qualification/native_disposition.zh.txt)。原生余339秒不转成额外调用许可，未放宽精度或删除困难成本。

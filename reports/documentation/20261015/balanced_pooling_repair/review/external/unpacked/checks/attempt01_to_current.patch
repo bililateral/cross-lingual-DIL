@@ -1,0 +1,95 @@
+--- attempt01/scripts/step28_balanced_pooling_run.py
++++ current/scripts/step28_balanced_pooling_run.py
+@@ -810,6 +810,8 @@
+                                   ("v_F", 1, "c_gpu"), ("h_F", 4, "c_cpu")):
+         if n["measurements"][key] != n["natural_measurements"][key]+multiplier*stress[cost]:
+             raise ValueError("Hard solver cost not propagated to full call count")
++    if set(stress["solver_summaries"]) != {"cpu", "gpu"}:
++        raise ValueError("Both measured terminal stress devices required")
+     for s in stress["solver_summaries"].values():
+         solver_gate(s)
+         if s["blocks"] != 378 or s["terminal_acceptances"] != 378:
+
+--- attempt01/scripts/step28_balanced_pooling_verify.py
++++ current/scripts/step28_balanced_pooling_verify.py
+@@ -8,7 +8,6 @@
+ 
+ import argparse
+ import gc
+-import os
+ from pathlib import Path
+ import shutil
+ import sys
+
+--- attempt01/tests/test_step28_balanced_pooling.py
++++ current/tests/test_step28_balanced_pooling.py
+@@ -626,26 +626,35 @@
+         for edge in edges:colors[edge]=color
+     for slots in (a0,a1):
+         assert all(sorted(colors[slots==i].tolist())==[0,1,2] for i in range(28))
+-    items=tuple(tuple((item[0],str(colors[i*3+j]),str(colors[i*3+j])) for j,item in enumerate(rows)) for i,rows in enumerate(g.items))
++    items=tuple(tuple((item[0],f"{colors[i*3+j]}/{i}",f"{colors[i*3+j]}/{i}") for j,item in enumerate(rows)) for i,rows in enumerate(g.items))
+     return data.Group(g.uid,g.sellers,items,g.labels),colors
+ 
+ 
+ def terminal_model():
+     class Encoder(torch.nn.Module):
+         def __init__(self):
+-            super().__init__();self.embedding=torch.nn.Embedding.from_pretrained(torch.eye(3),freeze=False)
++            super().__init__()
++            embedding=torch.zeros(84,31)
++            for account in range(28):
++                for color in range(3):embedding[3*account+color,color]=1;embedding[3*account+color,3+account]=1
++            self.embedding=torch.nn.Embedding.from_pretrained(embedding,freeze=False)
+         def tokenizer(self,texts,**kwargs):
+-            return {"input_ids":torch.tensor([[int(t)] for t in texts])}
++            return {"input_ids":torch.tensor([[int(t.split("/")[0])+3*int(t.split("/")[1])] for t in texts])}
+         def forward(self,batch):
+             return {"sentence_embedding":self.embedding(batch["input_ids"][:,0])}
+-    model=core.build_model(Encoder(),6)
+-    model.head=torch.nn.Linear(12,1)
++    model=core.build_model(Encoder(),62)
++    model.head=torch.nn.Linear(124,1)
+     k=terminal_block().float()
+-    a,b,c=(float(k[i,j])*math.sqrt(2) for i,j in ((0,1),(0,2),(1,2)))
++    a,b,c=(float(k[i,j])*2 for i,j in ((0,1),(0,2),(1,2)))
+     with torch.no_grad():
+         model.head.weight.zero_();model.head.bias.zero_()
+         model.head.weight[0,:3]=torch.tensor([(a+b-c)/2,(a+c-b)/2,(b+c-a)/2])
+-        model.head.weight[0,6:9]=2*k.diagonal()
++        model.head.weight[0,62:65]=4*k.diagonal()
++        # Row/column-only offsets distinguish hard-negative ranks without changing
++        # the exact transport plan. Both different/same source-account pairs agree.
++        offsets=torch.arange(28)*.01
++        model.head.weight[0,3:31]=2*offsets
++        model.head.weight[0,65:93]=8*offsets
+     return model
+ 
+ 
+@@ -731,6 +740,7 @@
+         ob.param_groups[0]["lr"],ob.param_groups[1]["lr"]=run.parent.stage_lr(49),.001;ob.step()
+         self.assertAlmostEqual(row["total"],sum(totals),places=5)
+         proxy_delta=max(float((a-b).abs().max()) for a,b in zip(actual_proxy,expected_proxy))
++        self.evidence("terminal_update_proxy",dict(max_delta=proxy_delta,actual_objective=row["total"],independent_objective=sum(totals),solver_summary=c["pooling_stats"]))
+         for a,b in zip(actual_proxy,expected_proxy):torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-5)
+         changes={}
+         for (name,a),b in zip(model.named_parameters(),direct.parameters()):
+@@ -743,7 +753,7 @@
+         self.assertEqual(run.parent.adam_step(oa),1)
+         self.evidence("terminal_real_update",dict(actual_input=k.tolist(),reference_value=value,reference_plan=plan.tolist(),
+             update=row,proxy_max_delta=proxy_delta,parameters=changes,actual_optimizer_calls=1,
+-            fixture="Trainable 3-type embedding and linear symmetric head; actual A0/A1, objectives, 512 VJP and AdamW. Independent analytic envelope reference; observation-only proxy hook."))
++            fixture="Trainable type/account-token embedding and linear symmetric head with fixed row/column offsets; actual A0/A1, objectives, 512 VJP and AdamW. Independent analytic envelope reference; observation-only proxy hook."))
+ 
+     def test_terminal_gate_budget_and_inherited_evidence(self):
+         s=dict(blocks=2,failures=0,iterations=4096,marginal_error=4e-7,ordinary_marginal_error=0.,
+@@ -785,7 +795,8 @@
+         damaged=copy.deepcopy(gpu);damaged["source_files"]=inherited["native_result"]["source_files"]
+         with self.assertRaises(ValueError):run.delta_native_gate(damaged,inherited["native_result"])
+         adjust=(70000-run.projection(n["measurements"])["projected_total_seconds"])/(1.25*288)
+-        n["measurements"]["t_B_F"]+=adjust;n["natural_measurements"]["t_B_F"]+=adjust
++        n["natural_measurements"]["t_B_F"]+=adjust
++        n["measurements"]["t_B_F"]=n["natural_measurements"]["t_B_F"]+5*stress["c_gpu"]
+         gpu_path=budget_root/"gpu_fixture.json";data.write_json(gpu_path,gpu)
+         job=budget_root/"not_created_job"
+         gate=dict(job=job.relative_to(data.ROOT).as_posix(),runtime=p["runtime"],supervision=p["supervision"],gpu=data.record(gpu_path,data.ROOT))
