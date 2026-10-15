@@ -1,0 +1,29 @@
+test_terminal_gate_budget_and_inherited_evidence (test_step28_balanced_pooling.TerminalPoolingTests) ... ERROR
+test_runtime_inheritance (test_step28_balanced_pooling.TerminalPoolingTests) ... ERROR
+
+======================================================================
+ERROR: test_terminal_gate_budget_and_inherited_evidence (test_step28_balanced_pooling.TerminalPoolingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace/tests/test_step28_balanced_pooling.py", line 804, in test_terminal_gate_budget_and_inherited_evidence
+    gate=dict(job=job.relative_to(data.ROOT).as_posix(),runtime=p["runtime"],supervision=p["supervision"],gpu=data.record(gpu_path,data.ROOT))
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'reports/qualification/cpu/runtime/result/tmpvljc263h/not_created_job' is not in the subpath of '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace' OR one path is relative and the other is absolute.
+
+======================================================================
+ERROR: test_runtime_inheritance (test_step28_balanced_pooling.TerminalPoolingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace/tests/test_step28_balanced_pooling.py", line 833, in test_runtime_inheritance
+    runtime_cpu=data.record(receipt, data.ROOT))
+  File "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace/scripts/step28_continual_population_data.py", line 46, in record
+    return {"path": path.relative_to(base).as_posix(), "bytes": path.stat().st_size,
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'reports/qualification/cpu/runtime/result/tmpa3ggq2_a/synthetic_runtime_cpu.json' is not in the subpath of '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace' OR one path is relative and the other is absolute.
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.717s
+
+FAILED (errors=2)

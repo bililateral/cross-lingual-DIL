@@ -1,0 +1,24 @@
+{
+  "status": "APPROVED_RUNTIME_27H",
+  "date": "2026-10-15",
+  "user_instruction": "GPU验证和后续的正式训练都可以执行",
+  "specific_answer": "累计上限调整为 27 小时（推荐）",
+  "question": "是否将正式计算的累计时间上限从24小时调整为27小时？旧失败费用18428.57秒照常计入，新作业可用78771秒；GPU验证已通过不重跑，精度、困难成本、三臂、数据权限和不自动重试保持。",
+  "contract": {
+    "path": "docs/SELLER_ALIAS_BALANCED_POOLING_RUNTIME.zh.md",
+    "bytes": 2971,
+    "sha256": "7c22444ef9efdb0ccf98aa76435a7543e868e7448d8b030576c5324604bf3be6"
+  },
+  "runtime": {
+    "maximum_gpu_stage_seconds": 78771,
+    "maximum_output_bytes": 17179869184,
+    "maximum_cuda_reserved_bytes": 30064771072,
+    "maximum_rss_bytes": 68719476736,
+    "minimum_free_gpu_bytes": 32212254720,
+    "minimum_free_host_bytes": 77309411328,
+    "torch_cpu_threads": 1,
+    "prior_charged_seconds": 18428.570150192827,
+    "maximum_cumulative_seconds": 97200
+  },
+  "limits": "一次完整三臂新运行；不追加GPU调用，不清零失败费用；必要准入核验、审查和资源条件仍须满足。"
+}

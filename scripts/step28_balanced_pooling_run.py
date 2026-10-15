@@ -47,7 +47,7 @@ def policy() -> dict:
     if (n["prior_actual_updates"] != 8 or n["maximum_cumulative_updates"] != 11
             or n["prior_charged_seconds"] != 364 or n["maximum_seconds"] != 900
             or p["cpu_verification"]["prior_charged_seconds"] != 97 or p["cpu_verification"]["maximum_seconds"] != 300
-            or r["prior_charged_seconds"] != 18428.570150192827 or r["maximum_cumulative_seconds"] != 86400
+            or r["prior_charged_seconds"] != 18428.570150192827 or r["maximum_cumulative_seconds"] != 97200
             or r["maximum_gpu_stage_seconds"] != math.floor(r["maximum_cumulative_seconds"]-r["prior_charged_seconds"])
             or s != dict(train_parse_attempts=1, valid_parse_attempts=1, test_access=False, owners_access=False,
                          automatic_retry=False, prior_train_parse_attempts=1, prior_valid_parse_attempts=0,
@@ -81,6 +81,7 @@ def sources() -> list[dict]:
         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
     paths.update(data.ROOT / n for n in ("docs/SELLER_ALIAS_BALANCED_POOLING.zh.md",
         "docs/SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md",
+        "docs/SELLER_ALIAS_BALANCED_POOLING_RUNTIME.zh.md",
         "scripts/run_step28_balanced_pooling_linux_20261015.sh"))
     return [data.record(p, data.ROOT) for p in sorted(paths)]
 
@@ -761,6 +762,21 @@ def prior_evidence():
     return loaded
 
 
+def terminal_q_sources():
+    """Reuse the completed qualification only across this approved time-budget change."""
+    ref = dict(path="reports/documentation/20261015/balanced_pooling_repair/qualification/native_gate.json",
+               bytes=8248, sha256="83a36dc6e4fa8626fd5405dd045f63947753bc1657b9cd064f3e88a20f08c0f8")
+    frozen = data.read_json(data.verify(data.ROOT/ref["path"], ref))["source_files"]
+    old, current = {r["path"]: r for r in frozen}, {r["path"]: r for r in sources()}
+    changed = {"scripts/step28_balanced_pooling_run.py", "schema/step28_balanced_pooling_policy.json",
+               "scripts/run_step28_balanced_pooling_linux_20261015.sh", "tests/test_step28_balanced_pooling.py"}
+    added = {"docs/SELLER_ALIAS_BALANCED_POOLING_RUNTIME.zh.md"}
+    if (set(current) != set(old) | added or
+            any(current[name] != ref for name, ref in old.items() if name not in changed)):
+        raise ValueError("Terminal-Q qualification dependency changed beyond time-budget scope")
+    return frozen
+
+
 def reviewed_gate(path, kind):
     gate = data.read_json(path)
     p = policy()
@@ -774,16 +790,26 @@ def reviewed_gate(path, kind):
         data.verify(data.ROOT/gate[name]["path"], gate[name])
     cpu = data.read_json(data.verify(data.ROOT/gate["cpu"]["path"], gate["cpu"]))
     if (cpu.get("mode") != "cpu" or cpu.get("scope") != "terminal-q" or cpu.get("status") != "PASS_HANDWRITTEN_ONLY"
-            or cpu.get("source_files") != sources() or cpu.get("prior_compute_seconds", -1) < 97
+            or cpu.get("source_files") != terminal_q_sources() or cpu.get("prior_compute_seconds", -1) < 97
             or not 97 < cpu.get("cumulative_charged_seconds", 0) <= 300):
         raise ValueError("Matching successful incremental CPU qualification required")
+    if kind == "FORMAL":
+        auth = data.read_json(data.verify(data.ROOT/gate["runtime_authorization"]["path"], gate["runtime_authorization"]))
+        data.verify(data.ROOT/"docs/SELLER_ALIAS_BALANCED_POOLING_RUNTIME.zh.md", auth["contract"])
+        if auth.get("status") != "APPROVED_RUNTIME_27H" or auth.get("runtime") != p["runtime"]:
+            raise ValueError("Approved 27-hour cumulative allowance required")
+        increment = data.read_json(data.verify(data.ROOT/gate["runtime_cpu"]["path"], gate["runtime_cpu"]))
+        if (increment.get("status") != "PASS_RUNTIME_ONLY" or increment.get("source_files") != sources()
+                or increment.get("prior_charged_seconds", -1) < 168
+                or not increment["prior_charged_seconds"] < increment.get("cumulative_charged_seconds", 0) <= 300):
+            raise ValueError("Current runtime/source inheritance CPU evidence required")
     return gate
 
 
 def delta_native_gate(gpu, old):
     n = gpu.get("native", {})
     if (gpu.get("mode") != "gpu" or gpu.get("scope") != "terminal-q" or gpu.get("status") != "PASS_HANDWRITTEN_ONLY"
-            or gpu.get("source_files") != sources() or gpu.get("prior_compute_seconds") != 364
+            or gpu.get("source_files") != terminal_q_sources() or gpu.get("prior_compute_seconds") != 364
             or not 364 < gpu.get("cumulative_charged_seconds", 0) <= 900
             or n.get("actual_updates") != 3 or n.get("cumulative_updates") != 11
             or any(n.get(k) is not True for k in ("next_update_bitwise_equal", "both_phases_encoder_head_effect",

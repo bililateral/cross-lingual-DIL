@@ -1,5 +1,5 @@
 {
-  "status": "NATIVE_PASS_FORMAL_NOT_ADMITTED_PROJECTION",
+  "status": "FORMAL_RUNNING",
   "authorization": "../authorization.json",
   "cpu": {
     "prior_charged_seconds": 97,
@@ -29,13 +29,41 @@
         "cumulative_charged_seconds": 168,
         "status": "PASS_HANDWRITTEN_ONLY",
         "tests_run": 4
+      },
+      {
+        "attempt": "runtime/attempt01",
+        "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130100/workspace",
+        "exit_code": 1,
+        "started_epoch": 1792040484.8498943,
+        "ended_epoch": 1792040488.5120156,
+        "actual_wall_seconds": 3.662121295928955,
+        "charged_seconds": 4,
+        "prior_charged_seconds": 168,
+        "cumulative_charged_seconds": 172,
+        "status": "FAIL_RUNTIME_NO_FORMAL",
+        "tests_run": 2
+      },
+      {
+        "attempt": "runtime/attempt02",
+        "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_repair/20261015_130500/workspace",
+        "exit_code": 0,
+        "started_epoch": 1792040586.458488,
+        "ended_epoch": 1792040591.9546597,
+        "actual_wall_seconds": 5.496171712875366,
+        "charged_seconds": 6,
+        "prior_charged_seconds": 172,
+        "cumulative_charged_seconds": 178,
+        "status": "PASS_RUNTIME_ONLY",
+        "tests_run": 2
       }
     ],
-    "cumulative_charged_seconds": 168,
+    "cumulative_charged_seconds": 178,
     "maximum_seconds": 300,
-    "remaining_seconds": 132,
-    "current_result": "cpu/attempt02/result/result.json",
-    "matching_current_sources": 30
+    "remaining_seconds": 122,
+    "current_result": "../runtime/cpu/attempt02/result.json",
+    "matching_current_sources": 31,
+    "terminal_q_result": "cpu/attempt02/result/result.json",
+    "terminal_q_source_count": 30
   },
   "native": {
     "prior_actual_updates": 8,
@@ -64,35 +92,62 @@
   },
   "formal": {
     "prior_charged_seconds": 18428.570150192827,
-    "new_seconds": 0,
-    "effective_remaining_seconds": 67971,
+    "new_seconds": 113.61159400036559,
+    "effective_remaining_seconds": 78771,
     "prior_access": {
       "train": 1,
       "valid": 0,
       "heldout": 0,
       "owners": 0
     },
-    "new_access": false,
-    "admission": "NOT_ADMITTED_PROJECTION",
+    "new_access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0
+    },
+    "admission": "APPROVED_AND_STARTED",
     "projection": {
       "forward_seconds": 17839.63451923337,
       "io_seconds": 157.5531028099358,
       "projected_peak_output_bytes": 15266281909,
       "projected_total_seconds": 77073.03956648684,
       "train_seconds": 40061.24403114617,
-      "within_budget": false
+      "within_budget": true
     },
-    "excess_seconds": 9102.039566486841,
-    "gate_created": false,
-    "job_created": false,
-    "new_actual_updates": 0
+    "excess_seconds": 0,
+    "gate_created": true,
+    "job_created": true,
+    "maximum_cumulative_seconds": 97200,
+    "runtime_authorization": "../runtime/authorization.json",
+    "projected_margin_seconds": 1697.960433513159,
+    "observed_cumulative_seconds": 18542.181744193193,
+    "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_execution/20261015_131600/workspace",
+    "started_epoch": 1792041375,
+    "deadline_epoch": 1792120146,
+    "observed_epoch": 1792041491.694046,
+    "wrapper_pid": 123682,
+    "timeout_pid": 123689,
+    "training_pid": 123690,
+    "owner": "yongpeng",
+    "last_logged_update": {
+      "point": "A_S",
+      "completed": 1,
+      "elapsed_seconds": 14.953278238419443
+    },
+    "gate": "formal_gate.json",
+    "observation": "formal_observation.json",
+    "runtime_review_waiver": "../runtime/review_waiver.json",
+    "failure_observed": false,
+    "completion_observed": false
   },
-  "source_manifest": "../source_manifest.json",
+  "source_manifest": "../runtime/source_manifest.json",
   "automatic_review_rejection": {
     "action": "Unpack second CPU source into first workspace and start second qualification",
     "executed": false,
     "resolution": "Separate 20261015_110600/workspace deployed; first workspace unchanged"
   },
-  "next_action": "No formal start or native retry under current scope. Any future continuation requires a concrete approved change to resource budget or experiment scope; retain precision and all consumed budgets.",
-  "review": "../review/primary_disposition.zh.txt"
+  "next_action": "Observe this existing formal job, never start a duplicate. Keep original precision, cost/data gates and cumulative allowance. On failure retain the scene and stop without retry. Only after complete unified blind gates analyze the authorized saved results.",
+  "review": "../review/primary_disposition.zh.txt",
+  "runtime_report": "../runtime/report.zh.txt"
 }

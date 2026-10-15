@@ -769,17 +769,19 @@ class TerminalPoolingTests(BalancedPoolingTests):
         m={f"{k}_{a}":1. for a in method.ARMS for k in ("t_A","t_B","v","h")}
         m.update(L=1.,s_F=1.,r_F=1.,s_I=1.,r_I=1.,W_F=1000,W_I=500)
         initial=run.projection(m)["projected_total_seconds"]
-        m["t_B_F"]+=(70000-initial)/(1.25*288)
+        m["t_B_F"]+=(80000-initial)/(1.25*288)
         projected=run.projection(m)
-        self.assertAlmostEqual(projected["projected_total_seconds"],70000)
+        self.assertAlmostEqual(projected["projected_total_seconds"],80000)
         self.assertFalse(projected["within_budget"])
         budget_root=self.temporary();budget=run.Budget(budget_root);snap=budget.snapshot()
         self.assertEqual(snap["prior_charged_seconds"],18428.570150192827)
         self.assertEqual(snap["cumulative_seconds"],snap["elapsed_seconds"]+18428.570150192827)
         budget.started-=67972
+        budget.check()  # The former cutoff is no longer the approved cutoff.
+        budget.started-=10800
         with self.assertRaises(RuntimeError):budget.check()
         p=run.policy();gpu=copy.deepcopy(inherited["native_result"])
-        gpu.update(mode="gpu",scope="terminal-q",source_files=run.sources(),prior_compute_seconds=364,cumulative_charged_seconds=365)
+        gpu.update(mode="gpu",scope="terminal-q",source_files=run.terminal_q_sources(),prior_compute_seconds=364,cumulative_charged_seconds=365)
         n=gpu["native"];natural=copy.deepcopy(n["measurements"])
         stress=dict(c_gpu=.001,c_cpu=.001,accounts=28,records=84,pairs=378,
                     solver_summaries={k:{**s,"blocks":378,"terminal_acceptances":378,"ordinary_marginal_error":None} for k in ("cpu","gpu")})
@@ -794,7 +796,7 @@ class TerminalPoolingTests(BalancedPoolingTests):
             with self.assertRaises(ValueError):run.delta_native_gate(damaged,inherited["native_result"])
         damaged=copy.deepcopy(gpu);damaged["source_files"]=inherited["native_result"]["source_files"]
         with self.assertRaises(ValueError):run.delta_native_gate(damaged,inherited["native_result"])
-        adjust=(70000-run.projection(n["measurements"])["projected_total_seconds"])/(1.25*288)
+        adjust=(80000-run.projection(n["measurements"])["projected_total_seconds"])/(1.25*288)
         n["natural_measurements"]["t_B_F"]+=adjust
         n["measurements"]["t_B_F"]=n["natural_measurements"]["t_B_F"]+5*stress["c_gpu"]
         gpu_path=budget_root/"gpu_fixture.json";data.write_json(gpu_path,gpu)
@@ -805,5 +807,50 @@ class TerminalPoolingTests(BalancedPoolingTests):
             with self.assertRaisesRegex(ValueError,"projection"):run.execute(job,budget_root/"fixture_gate")
             reader.assert_not_called();self.assertFalse(job.exists())
         self.evidence("terminal_gate_budget",dict(inherited_updates=inherited["native_result"]["native"]["actual_updates"],
-            remaining_seconds=67971,over_budget_projection=projected,new_directory_budget=snap,
+            remaining_seconds=78771,over_budget_projection=projected,new_directory_budget=snap,
             inconsistent_terminal_rejected=True,old_identity_rejected=True))
+
+    def test_runtime_inheritance(self):
+        frozen = run.terminal_q_sources()
+        repair = data.ROOT/"reports/documentation/20261015/balanced_pooling_repair"
+        gpu = data.read_json(repair/"qualification/gpu/attempt01/result/result.json")
+        cpu = data.read_json(repair/"qualification/cpu/attempt02/result/result.json")
+        self.assertEqual(cpu["source_files"], frozen)
+        self.assertEqual(gpu["source_files"], frozen)
+        run.delta_native_gate(gpu, run.prior_evidence()["native_result"])
+        projection = run.projection(gpu["native"]["measurements"])
+        self.assertEqual(projection["projected_total_seconds"], 77073.03956648684)
+        self.assertTrue(projection["within_budget"])
+        current = run.sources()
+        scratch = self.temporary()
+        # A labelled unit-test receipt exercises the gate, never authorizes a run.
+        receipt = scratch/"synthetic_runtime_cpu.json"
+        data.write_json(receipt, dict(status="PASS_RUNTIME_ONLY", source_files=current,
+            prior_charged_seconds=168, cumulative_charged_seconds=169, synthetic_fixture=True))
+        gate = data.read_json(repair/"qualification/native_gate.json")
+        gate.update(status="APPROVED_BALANCED_POOLING_FORMAL", source_files=current,
+            runtime_authorization=data.record(repair/"runtime/authorization.json", data.ROOT),
+            runtime_cpu=data.record(receipt, data.ROOT))
+        gate_path = scratch/"synthetic_formal_gate.json"
+        data.write_json(gate_path, gate)
+        run.reviewed_gate(gate_path, "FORMAL")
+        for field, value in (("source_files", frozen), ("runtime_cpu", gate["cpu"])):
+            data.write_json(gate_path, {**gate, field: value})
+            with self.assertRaises(ValueError):
+                run.reviewed_gate(gate_path, "FORMAL")
+        for action in ("solver_change", "extra_source", "missing_source"):
+            damaged = copy.deepcopy(current)
+            if action == "solver_change":
+                next(r for r in damaged if r["path"] == "scripts/step28_balanced_pooling.py")["sha256"] = "changed"
+            elif action == "extra_source":
+                damaged.append(dict(path="scripts/unapproved.py", bytes=1, sha256="changed"))
+            else:
+                damaged.pop()
+            with mock.patch.object(run, "sources", return_value=damaged):
+                with self.assertRaisesRegex(ValueError, "dependency"):
+                    run.terminal_q_sources()
+        self.evidence("runtime_inheritance", dict(inherited_source_count=len(frozen), current_source_count=len(current),
+            real_saved_native_validated=True, projection=projection,
+            solver_change_extra_and_missing_sources_rejected=True, stale_gate_and_cpu_rejected=True,
+            reviewed_gate_check="Synthetic runtime receipt in a removed scratch directory; no formal gate issued",
+            model_or_optimizer_calls=0))
