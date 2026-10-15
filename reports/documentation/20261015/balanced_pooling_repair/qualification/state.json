@@ -1,5 +1,5 @@
 {
-  "status": "FORMAL_RUNNING",
+  "status": "FORMAL_COMPLETE_RESULT_EXTERNAL_REVIEW_RUNNING",
   "authorization": "../authorization.json",
   "cpu": {
     "prior_charged_seconds": 97,
@@ -92,8 +92,8 @@
   },
   "formal": {
     "prior_charged_seconds": 18428.570150192827,
-    "new_seconds": 113.61159400036559,
-    "effective_remaining_seconds": 78771,
+    "new_seconds": 19439.144563025795,
+    "effective_remaining_seconds": 0,
     "prior_access": {
       "train": 1,
       "valid": 0,
@@ -104,9 +104,9 @@
       "heldout": 0,
       "owners": 0,
       "train": 1,
-      "valid": 0
+      "valid": 1
     },
-    "admission": "APPROVED_AND_STARTED",
+    "admission": "COMPLETED",
     "projection": {
       "forward_seconds": 17839.63451923337,
       "io_seconds": 157.5531028099358,
@@ -121,25 +121,34 @@
     "maximum_cumulative_seconds": 97200,
     "runtime_authorization": "../runtime/authorization.json",
     "projected_margin_seconds": 1697.960433513159,
-    "observed_cumulative_seconds": 18542.181744193193,
+    "observed_cumulative_seconds": 37867.71471321862,
     "workspace": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_execution/20261015_131600/workspace",
     "started_epoch": 1792041375,
     "deadline_epoch": 1792120146,
-    "observed_epoch": 1792041491.694046,
+    "observed_epoch": 1792064824.6242604,
     "wrapper_pid": 123682,
     "timeout_pid": 123689,
     "training_pid": 123690,
     "owner": "yongpeng",
     "last_logged_update": {
-      "point": "A_S",
-      "completed": 1,
-      "elapsed_seconds": 14.953278238419443
+      "point": "B_F",
+      "completed": 288,
+      "elapsed_seconds": 19192.275957813486
     },
     "gate": "formal_gate.json",
-    "observation": "formal_observation.json",
+    "observation": "../../../../seller_alias_continual/20261015/balanced_pooling_result/observation.json",
     "runtime_review_waiver": "../runtime/review_waiver.json",
     "failure_observed": false,
-    "completion_observed": false
+    "completion_observed": true,
+    "approved_new_limit_seconds": 78771,
+    "original_pids_exited": true,
+    "completed_at": "2026-10-15T18:40:15+08:00",
+    "physical_updates": 1728,
+    "diagnostic_count": 36,
+    "endpoint_count": 6,
+    "start_observation": "formal_observation.json",
+    "result_report": "../../../../seller_alias_continual/20261015/balanced_pooling_result/report.zh.txt",
+    "result_review": "../../../../seller_alias_continual/20261015/balanced_pooling_result/review/submission.json"
   },
   "source_manifest": "../runtime/source_manifest.json",
   "automatic_review_rejection": {
@@ -147,7 +156,7 @@
     "executed": false,
     "resolution": "Separate 20261015_110600/workspace deployed; first workspace unchanged"
   },
-  "next_action": "Observe this existing formal job, never start a duplicate. Keep original precision, cost/data gates and cumulative allowance. On failure retain the scene and stop without retry. Only after complete unified blind gates analyze the authorized saved results.",
+  "next_action": "Recover completed result review and necessary evidence from the recorded conversation, independently disposition actual findings, then close the dedicated review tab. No repeated submission, training or additional data access. Retain six current weights/Memory pending actual dependencies and specific cleanup permission.",
   "review": "../review/primary_disposition.zh.txt",
   "runtime_report": "../runtime/report.zh.txt"
 }

@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-15 完整S/G/F结果保管
+
+新作业20261015_131600/workspace于18:40:15 exit0。347份结果/日志/冻结来源共11,094,881字节及7份Linux独立分析程序/表/图/原始输出共491,617字节已SFTP回传，逐文件大小/SHA核验；见[回传记录](../reports/seller_alias_continual/20261015/balanced_pooling_result/receive_verification.json)。原始证据继续留Linux实际workspace，分析和报告另存reports/seller_alias_continual/20261015/balanced_pooling_result；不复制正式文本/标签、模型或Memory到Windows。
+
+六份新推理模型共7,826,218,590字节、六Memory共2,071,353字节保留Linux原job/run/models和memory，大小/SHA与六端点记录一致，见[实际保管身份](../reports/seller_alias_continual/20261015/balanced_pooling_result/observation.json)。临时完整work为空；结果分析不载模，当前结果外审尚待完成，不转用旧五失败权重删除许可。两端各一个5,766,787字节结果传输ZIP和234,948字节分析传输ZIP已在成功回传核验后删除；必要原件和清单保留，见[收尾](../reports/seller_alias_continual/20261015/balanced_pooling_result/closeout.json)。未补传历史归档，局部清理不重置周期。
+
 ## 2026-10-15 失败S/G/F旧权重清理
 
 用户明确要求：“上次训练失败产生的训练权重文件你删了吗？没删的话就删掉并做好记录”。对象仅为Linux旧作业20261014_143200/workspace/reports/job/run/models下A_S.pt、B_S.pt、A_G.pt、B_G.pt、A_F.pt五份权重；此前仍保留。已批准的新完整重训从固定预训练独立起步，不加载旧失败模型／Memory；旧作业无可精确恢复至B/F第247步的完整Adam状态，无当前或已批准后续载模依赖。
