@@ -12,7 +12,11 @@
 
 独立Linux workspace为reports/documentation/20261015/g_half_implementation/20261015_224000/workspace。必要CPU失败/成功、两轮源码身份、预算、43份旧结果身份核对等27文件111662字节已SFTP回传逐项一致；[原始回传](../reports/documentation/20261015/g_half_implementation/qualification/receive_verification.json)及[增量验收](../reports/documentation/20261015/g_half_implementation/qualification/cpu_receipt.json)保留首轮错误和累计17/180秒。两轮快照中64份与当前33项来源相同的重复文件已在Linux逐项核验后删除，释放1064841字节，仅保留两份不同的attempt01旧源码及原始失败/成功证据，见[清理记录](../reports/documentation/20261015/g_half_implementation/qualification/duplicate_cleanup.json)。清理前91文件的inventory保留原观测事实，不当作当前存量。
 
-具体322949字节/78成员合并包获准后于23:02单次上传网页，仍在审查，原输入包当前保留用于回收及后续身份验收。只有本轮CPU验收、请求和发送证据7文件25577字节同步至独立workspace，逐项SHA一致，见[同步](../reports/documentation/20261015/g_half_implementation/review/sync.json)；未向Linux补传输入ZIP或历史归档。Windows/Linux当前33来源均仍与CPU第二轮一致，23:02现场无G_half进程。已关闭SSH连接，删除8份一次性传输助手/清单及7份冗余页面快照，共15文件120016字节；保留必要发送页面，活动审查专用页及当前浏览器日志留待审查验收收尾。无模型/Memory清理，不重置10月23日大清理周期。
+具体322949字节/78成员合并包获准后于23:02单次上传网页，提交时仍在审查（现已完成，见下段），原输入包当前保留用于回收及后续身份验收。只有本轮CPU验收、请求和发送证据7文件25577字节同步至独立workspace，逐项SHA一致，见[同步](../reports/documentation/20261015/g_half_implementation/review/sync.json)；未向Linux补传输入ZIP或历史归档。Windows/Linux当前33来源均仍与CPU第二轮一致，23:02现场无G_half进程。已关闭SSH连接，删除8份一次性传输助手/清单及7份冗余页面快照，共15文件120016字节；保留必要发送页面，活动审查专用页及当前浏览器日志留待审查验收收尾。无模型/Memory清理，不重置10月23日大清理周期。
+
+G_half合并外审已完成验收/独立主审：49份必要返回原件及外部清单/交付回执、页面、主审保留。删除已无独立用途的361104字节返回ZIP、重复下载回执/清单和本轮临时页面/日志，共9份836379字节，详见[回收记录](../reports/documentation/20261015/g_half_implementation/review/recovery.json)。唯一原输入322949字节ZIP仍为外审audit_identity.py精确身份复核输入，留Windows，不向Linux补传。原生新workspace只同步本轮89份必要部署载荷及一份部署清单，逐项核对；旧CPU原件留原独立目录，不复制64份已删重复快照。
+
+原生6次资格完成后12份原件136105字节已SFTP回传逐项一致，含实际诊断/恢复身份、原始计时与日志；完整墙钟采用320/600秒。两完整工作状态及一推理状态已按批准生命周期在Linux释放，work目录实查不存在。正式workspace仅部署40必要载荷及一部署清单；43旧结果与7正式输入用逐文件链接，无旧Memory目录暴露，无历史归档补传。正式活动模型/Memory留Linux，最终两推理权重预计共2608757722字节约2.43GiB，不沿用旧六权重删除许可。启动/部署/首观测及访问账7份35673字节另回传保管，00:03:45当前观测1450字节亦回传核对。收尾关闭SSH，删除10份已用一次性传输助手/清单共54461字节；正式训练由已启动独立进程继续，不受SSH关闭影响。
 
 ## 2026-10-15 G_half静态外审保管
 

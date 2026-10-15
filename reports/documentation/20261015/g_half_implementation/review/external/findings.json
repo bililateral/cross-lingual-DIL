@@ -1,0 +1,111 @@
+{
+  "document_kind": "EXTERNAL_REVIEW_FINDINGS_NOT_A_RUNTIME_GATE",
+  "reviewer_self_description": "GPT-6 Astra Pro",
+  "requested_model": "网页GPT 6 Pro",
+  "selector_independently_observed": false,
+  "backend_independently_verified": false,
+  "verdict": "CONTRACT_AND_INCREMENT_ACCEPTABLE_FOR_CONDITIONAL_NATIVE_REVIEW_DISPOSITION",
+  "open_demonstrated_scientific_blockers": [],
+  "open_necessary_reproducibility_defects": [],
+  "formal_launch_qualified_now": false,
+  "project_code_modified_by_reviewer": false,
+  "findings": [
+    {
+      "id": "F01",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "status": "HISTORICAL_FIXED",
+      "title": "首轮临时查询夹具重复保存触发正确拒绝覆盖",
+      "locations": [
+        "tests/test_step28_g_half.py:358",
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/unittest.txt"
+      ],
+      "minimal_counterexample": "临时qpath已经存在后再次save_array同路径；应抛FileExistsError。",
+      "impact": "首轮第五项error、第六项failfast未运行；不影响未变四项已通过结果。",
+      "minimal_fix": "仅在本测试自己的临时qpath.unlink()后再保存；不改生产拒绝覆盖接口。",
+      "necessary_increment": "第二轮仅补保存比较/权限/预算及单H编排，已经完成。",
+      "current_blocker": false
+    },
+    {
+      "id": "F02",
+      "category": "CONTRACT_IMPLEMENTATION_REVIEW",
+      "status": "NO_DEMONSTRATED_OPEN_BLOCKER",
+      "title": "H公式与实际A0/A1、top5、D0、VJP、诊断和恢复接线一致",
+      "locations": [
+        "scripts/step28_g_half.py:35-133",
+        "scripts/step28_record_replay.py:159-208",
+        "tests/test_step28_g_half.py:75-236"
+      ],
+      "support": "项目真实tiny/独立完整图及隔离数表计算共同支持各自有限范围。",
+      "limitations": "不是BGE/BF16/最大形状或正式576次资格。",
+      "current_blocker": false
+    },
+    {
+      "id": "F03",
+      "category": "REASONABLE_NONBLOCKING_RECOMMENDATION",
+      "status": "OPTIONAL_NOT_REQUIRED_FOR_CURRENT_RECEIPT",
+      "title": "CPU增量门只检查qualified_tests长度",
+      "locations": [
+        "scripts/step28_g_half_run.py:586-588"
+      ],
+      "minimal_counterexample": "[同一个既定测试名]*6能通过该字段的长度条件；纯静态反例，未运行伪批准门。",
+      "impact": "当前实际六名恰为完整不同集合，已逐项核对；不能据一般漏检说当前回执失效。",
+      "minimal_fix": "后续维护时同时核对长度和既定六名集合。",
+      "necessary_increment": "若真的修改，仅针对入口正确/重复/缺项检查并更新来源绑定，保留17秒与未变继承；不要求当前追加。",
+      "current_blocker": false
+    },
+    {
+      "id": "F04",
+      "category": "EVIDENCE_LIMITATION_AND_EXISTING_PREREQUISITE",
+      "status": "BASELINE_METADATA_MATCHED_PAYLOADS_NOT_READ",
+      "title": "43旧保存文件身份记录吻合，实际载荷不在本包",
+      "locations": [
+        "reports/documentation/20261015/g_refinement/baseline_sources.json",
+        "reports/documentation/20261015/g_half_implementation/qualification/baseline_identity.json",
+        "scripts/step28_g_half_run.py:87-115,335-469"
+      ],
+      "support": "43项归档/Linux根映射后bytes/SHA全部一致。",
+      "limitations": "本网页0/43实际载荷读取；手写旧日志不是实际配对。",
+      "required_existing_action": "未来批准路径实际可用且baseline_inputs/实际新轨迹盲门通过；缺失则停，不重训旧对照。",
+      "current_blocker": false
+    },
+    {
+      "id": "F05",
+      "category": "PENDING_NATIVE_AND_FORMAL_PREREQUISITES",
+      "status": "NOT_EXECUTED",
+      "title": "GPU六调用及实际投影尚未发生，正式准入尚不成立",
+      "locations": [
+        "scripts/step28_g_half_verify.py:91-222,306-312",
+        "scripts/step28_g_half_run.py:573-673"
+      ],
+      "required_existing_action": "独立主审后唯一GPU尝试；真实效果/恢复/最大形状/资源及当前来源门满足后才可正式。",
+      "not_authorized_by_review": [
+        "自动重试",
+        "增加第七次GPU调用",
+        "延长600秒或8小时",
+        "放宽精度",
+        "新候选或正式数据读取"
+      ],
+      "current_blocker": false,
+      "formal_launch_permitted_now": false
+    },
+    {
+      "id": "F06",
+      "category": "SCIENTIFIC_INTERPRETATION_BOUNDARY",
+      "status": "LIMITED_DEVELOPMENT_CANDIDATE",
+      "title": "实现可接受不等于性能优越或论文贡献充分",
+      "locations": [
+        "docs/SELLER_ALIAS_G_HALF.zh.md:15-17,63-75",
+        "scripts/step28_g_half_run.py:550-567"
+      ],
+      "support": "H-S双域MAP条件目标、H-G直接新域证据、完整概率/遗忘/N/A/诊断和成本分别解释。",
+      "current_blocker": false
+    }
+  ],
+  "out_of_scope_overdesign": [
+    "增加系数/温度/seed/顺序/新教师/新损失/对照臂",
+    "增加GPU调用、时限、精度容差或自动重试",
+    "全量重审项目/F求解器或通用验证/认证框架",
+    "重训S/G、加载旧Memory或封存资产",
+    "为结果显著性追加训练"
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "contract": "docs/SELLER_ALIAS_G_HALF.zh.md",
+  "rows": [
+    {
+      "claim": "固定公式与精度",
+      "contract_lines": [
+        9,
+        45
+      ],
+      "code": [
+        "scripts/step28_g_half.py:35-69"
+      ],
+      "evidence": [
+        "checks/pure_checks_result.json",
+        "checks/raw_numeric_outputs.npz",
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/local_precision.json"
+      ],
+      "assessment": "CPU小例和独立数表一致；GPU未执行"
+    },
+    {
+      "claim": "两视图当前/历史监督",
+      "contract_lines": [
+        23,
+        30
+      ],
+      "code": [
+        "scripts/step28_g_half.py:72-88",
+        "scripts/step28_alias_ranking.py:89-129",
+        "scripts/step28_chinese_base.py:165-191"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/objective_witnesses.json"
+      ],
+      "assessment": "遗漏A1可辨别；历史0.1及D0外0.5正确"
+    },
+    {
+      "claim": "H自己的top5",
+      "contract_lines": [
+        23,
+        23
+      ],
+      "code": [
+        "scripts/step28_alias_ranking.py:89-129",
+        "tests/test_step28_g_half.py:103-154"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/objective_witnesses.json",
+        "checks/pure_checks_result.json"
+      ],
+      "assessment": "H/G第5候选不同；所选值带梯度"
+    },
+    {
+      "claim": "教师D0与D1区分",
+      "contract_lines": [
+        25,
+        30
+      ],
+      "code": [
+        "scripts/step28_g_half.py:83-88,126-133",
+        "scripts/step28_replay_diagnostics.py:61-129"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/objective_witnesses.json",
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/actual_capture_restore.json"
+      ],
+      "assessment": "先H投影再差平方；D1仅诊断"
+    },
+    {
+      "claim": "encoder/head真实更新",
+      "contract_lines": [
+        21,
+        45
+      ],
+      "code": [
+        "scripts/step28_g_half.py:91-102",
+        "scripts/step28_record_replay.py:159-208",
+        "tests/test_step28_g_half.py:155-186"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/independent_full_graph.json"
+      ],
+      "assessment": "真实tiny对完整图；norm<1未主动裁剪缩放；不是576真实更新"
+    },
+    {
+      "claim": "两诊断回调与中立性",
+      "contract_lines": [
+        73,
+        73
+      ],
+      "code": [
+        "scripts/step28_g_half.py:126-133",
+        "scripts/step28_replay_diagnostics.py:31-129",
+        "tests/test_step28_g_half.py:187-236"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/actual_capture_restore.json"
+      ],
+      "assessment": "实际48/6/40tiny capture；下一更新一致；GPU仍待执行"
+    },
+    {
+      "claim": "完整/推理恢复身份",
+      "contract_lines": [
+        43,
+        43
+      ],
+      "code": [
+        "scripts/step28_g_half.py:18-32,105-123",
+        "scripts/step28_g_half_run.py:180-270"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/result/actual_capture_restore.json"
+      ],
+      "assessment": "tiny实际恢复；正式两端点未发生"
+    },
+    {
+      "claim": "只H和独立A接B",
+      "contract_lines": [
+        49,
+        57
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:31-58,149-177,273-332"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt02/result/orchestration.json"
+      ],
+      "assessment": "576模拟调度/864逻辑群/2端点/12诊断，真实optimizer=0"
+    },
+    {
+      "claim": "旧结果配对",
+      "contract_lines": [
+        51,
+        55
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:87-115,335-469"
+      ],
+      "evidence": [
+        "evidence/records_v2.json",
+        "reports/documentation/20261015/g_half_implementation/qualification/baseline_identity.json"
+      ],
+      "assessment": "43身份记录吻合；载荷未在网页读取；未来实际门"
+    },
+    {
+      "claim": "统一盲门",
+      "contract_lines": [
+        108,
+        108
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:335-479",
+        "tests/test_step28_g_half.py:237-338"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt02/result/orchestration.json"
+      ],
+      "assessment": "实际受影响拒绝逻辑在手写fixture中可辨别"
+    },
+    {
+      "claim": "评价/方向/N/A",
+      "contract_lines": [
+        61,
+        75
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:482-569",
+        "scripts/step28_balanced_pooling_run.py:648-680"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt02/result/comparison_and_permissions.json"
+      ],
+      "assessment": "两对手直接共享整群抽样；loss遗忘B-A；未重算旧实际结果"
+    },
+    {
+      "claim": "技术/开放/选择权限",
+      "contract_lines": [
+        94,
+        112
+      ],
+      "code": [
+        "scripts/step28_balanced_pooling_run.py:89-195",
+        "scripts/step28_bge_continual_run.py:76-87",
+        "scripts/step28_g_half_run.py:472-479"
+      ],
+      "evidence": [
+        "reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt02/result/comparison_and_permissions.json"
+      ],
+      "assessment": "正式七文件/AB先过滤/失败消费/valid完整门；未正式读取"
+    },
+    {
+      "claim": "六次GPU固定构造",
+      "contract_lines": [
+        120,
+        133
+      ],
+      "code": [
+        "scripts/step28_g_half_verify.py:91-222"
+      ],
+      "evidence": [],
+      "assessment": "纯静态；计数336显式合成；不能称GPU资格已过"
+    },
+    {
+      "claim": "完整投影/生命周期",
+      "contract_lines": [
+        135,
+        166
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:123-146,205-270",
+        "scripts/step28_g_half_verify.py:185-217"
+      ],
+      "evidence": [
+        "checks/pure_checks_result.json"
+      ],
+      "assessment": "1446v+36h与代码数量一致；人工测量只验算式，实际H投影待GPU"
+    },
+    {
+      "claim": "批准门/停止",
+      "contract_lines": [
+        168,
+        174
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:573-673",
+        "scripts/step28_g_half_verify.py:225-325",
+        "scripts/run_step28_g_half_linux_20261015.sh:1-23"
+      ],
+      "evidence": [
+        "evidence/source_inheritance.json"
+      ],
+      "assessment": "NATIVE/FORMAL门未创建；不自动重试"
+    },
+    {
+      "claim": "来源增量/计费",
+      "contract_lines": [
+        116,
+        118
+      ],
+      "code": [
+        "scripts/step28_g_half_run.py:586-588",
+        "tests/test_step28_g_half.py:358"
+      ],
+      "evidence": [
+        "evidence/source_inheritance.json",
+        "evidence/actual_attempt_delta.diff",
+        "evidence/records_v2.json"
+      ],
+      "assessment": "31相同+2最小变化；四项函数未变；17/180秒"
+    }
+  ]
+}

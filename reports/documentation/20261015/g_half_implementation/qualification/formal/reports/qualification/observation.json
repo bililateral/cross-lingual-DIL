@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-16T00:00:39.856527+08:00",
+  "processes": [
+    {
+      "pid": 206553,
+      "owner": "yongpeng",
+      "created_at": "2026-10-16T00:00:07.920000+08:00",
+      "cmdline": [
+        "bash",
+        "scripts/run_step28_g_half_linux_20261015.sh",
+        "0",
+        "reports/documentation/20261015/g_half_implementation/qualification/formal_gate.json",
+        "reports/job"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/g_half_execution/20261015_235900/workspace",
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "pid": 206560,
+      "owner": "yongpeng",
+      "created_at": "2026-10-16T00:00:07.960000+08:00",
+      "cmdline": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5",
+        "28795",
+        "taskset",
+        "-c",
+        "0",
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "scripts/step28_g_half_run.py",
+        "--job",
+        "reports/job",
+        "--gate",
+        "reports/documentation/20261015/g_half_implementation/qualification/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/g_half_execution/20261015_235900/workspace",
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "pid": 206561,
+      "owner": "yongpeng",
+      "created_at": "2026-10-16T00:00:07.960000+08:00",
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "scripts/step28_g_half_run.py",
+        "--job",
+        "reports/job",
+        "--gate",
+        "reports/documentation/20261015/g_half_implementation/qualification/formal_gate.json"
+      ],
+      "cwd": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/g_half_execution/20261015_235900/workspace",
+      "cpu_affinity": [
+        0
+      ]
+    }
+  ],
+  "wrapper": "2026-10-16T00:00:08+08:00\n",
+  "console_tail": "/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/g_half_execution/20261015_235900/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.\n  if pooling_modes(pool) != [m[\"pooling\"]] or encoder.get_sentence_embedding_dimension() != m[\"embedding_dim\"]:\n{\"completed\":1,\"elapsed_seconds\":14.581672591622919,\"event\":\"updates\",\"limits\":{\"maximum_cuda_reserved_bytes\":30064771072,\"maximum_gpu_stage_seconds\":28800,\"maximum_output_bytes\":10737418240,\"maximum_rss_bytes\":68719476736,\"minimum_free_gpu_bytes\":32212254720,\"minimum_free_host_bytes\":77309411328,\"torch_cpu_threads\":1},\"peak_cuda_reserved_bytes\":4152360960,\"peak_output_bytes\":50595,\"peak_rss_bytes\":2553520128,\"phase\":\"A_G_half\",\"point\":\"A_G_half\"}\n\n",
+  "access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "failure": null,
+  "complete": false
+}

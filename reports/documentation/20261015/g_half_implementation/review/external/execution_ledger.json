@@ -1,0 +1,164 @@
+{
+  "review_environment": "网页隔离容器，非项目Linux py310",
+  "no_delegation": true,
+  "no_network_or_project_server": true,
+  "project_sources_modified": false,
+  "original_input_zip_returned": false,
+  "unexpected_reviewer_exceptions_count": 1,
+  "all_scientific_check_sources_inputs_outputs_retained": true,
+  "interactive_viewing_note": "普通文件阅读/grep/sed显示不等同科学检查日志，未声称所有交互式显示均有逐命令单独转录。初次机械查看的留证范围已明确。",
+  "executions": [
+    {
+      "id": "R01",
+      "activity": "原始ZIP和source_manifest机械复核",
+      "source": [
+        "tools/audit_identity.py"
+      ],
+      "outputs": [
+        "evidence/input_identity.json",
+        "logs/identity.stdout.txt",
+        "logs/identity.stderr.txt"
+      ],
+      "outcome": "SUCCESS",
+      "note": "初始交互式ZIP查看/解包的显示未另存为独立日志；本脚本的重定向输出是随后机械复核的原始输出，不冒称最初调用转录。"
+    },
+    {
+      "id": "R02",
+      "activity": "当前AST闭包、两轮继承、四函数与旧源比较",
+      "source": [
+        "tools/audit_inheritance.py"
+      ],
+      "outputs": [
+        "evidence/source_inheritance.json",
+        "evidence/actual_attempt_delta.diff",
+        "logs/inheritance.stdout.txt",
+        "logs/inheritance.stderr.txt",
+        "logs/inheritance.exit_code.txt"
+      ],
+      "outcome": "EXIT_0_WITH_BASELINE_PATH_JOIN_LIMITATION",
+      "note": "首版完整路径联结使43项未匹配；保留原输出，后续显式根映射修正。"
+    },
+    {
+      "id": "R03",
+      "activity": "首次元数据摘要读取",
+      "source": [
+        "tools/inspect_receipts_v1.py"
+      ],
+      "outputs": [
+        "logs/receipt_inspection_v1.tool_transcript.txt"
+      ],
+      "outcome": "REAL_UNEXPECTED_TYPEERROR",
+      "exception": "TypeError: object of type int has no len()",
+      "note": "对omitted_duplicate_sources整数误用len；初次未独立重定向stdout/stderr，源码和实际失败子段从工具记录转录。外层shell还有后续cat，未独立取得失败Python子进程退出码。未重跑制造失败。"
+    },
+    {
+      "id": "R04",
+      "activity": "元数据摘要仅修正类型分支",
+      "source": [
+        "tools/inspect_receipts_v2.py"
+      ],
+      "outputs": [
+        "logs/receipt_inspection_v2.stdout.txt",
+        "logs/receipt_inspection_v2.stderr.txt",
+        "logs/receipt_inspection_v2.exit_code.txt"
+      ],
+      "outcome": "EXIT_0"
+    },
+    {
+      "id": "R05",
+      "activity": "43项显式根映射、27回收与64去重身份",
+      "source": [
+        "tools/audit_records_v2.py"
+      ],
+      "outputs": [
+        "evidence/records_v2.json",
+        "logs/records_v2.stdout.txt",
+        "logs/records_v2.stderr.txt",
+        "logs/records_v2.exit_code.txt"
+      ],
+      "outcome": "EXIT_0",
+      "note": "只比较提供的记录，不打开项目Linux上43个载荷。"
+    },
+    {
+      "id": "R06",
+      "activity": "AST提取纯数表/梯度/top5/投影检查",
+      "source": [
+        "checks/check_pure_functions.py",
+        "checks/step28_g_half_extracted.py",
+        "checks/step28_alias_ranking_extracted.py",
+        "checks/step28_g_half_run_extracted.py"
+      ],
+      "inputs": [
+        "checks/handwritten_inputs.npz",
+        "checks/check_pure_functions.py中明确的非法输入及人工投影常量"
+      ],
+      "outputs": [
+        "checks/raw_numeric_outputs.npz",
+        "checks/pure_checks_result.json",
+        "logs/pure_checks.stdout.txt",
+        "logs/pure_checks.stderr.txt",
+        "logs/pure_checks.exit_code.txt"
+      ],
+      "outcome": "EXIT_0",
+      "environment": {
+        "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+        "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+        "numpy": "2.3.5",
+        "torch": "2.10.0+cpu",
+        "cuda_initialized": false,
+        "torch_threads": 1
+      },
+      "check_body_seconds_after_imports": 0.21950529299999744,
+      "full_process_wall_seconds": "NOT_MEASURED",
+      "model_instances": 0,
+      "memory_instances": 0,
+      "optimizer_calls": 0,
+      "formal_asset_reads": 0,
+      "project_qualification_seconds_charged": 0,
+      "note": "三个预期ValueError不计意外失败；不导入完整项目入口，不执行其tiny测试/训练/统计。"
+    },
+    {
+      "id": "R07",
+      "activity": "中文报告、阅读范围、结构化发现与交付封装",
+      "source": [
+        "tools/build_review_metadata.py",
+        "tools/package_review.py"
+      ],
+      "outputs": [
+        "report.zh.md",
+        "findings.json",
+        "reading_scope.json",
+        "execution_ledger.json",
+        "evidence/traceability.json",
+        "README.zh.md",
+        "MANIFEST.payload.json",
+        "MANIFEST.payload.tsv"
+      ],
+      "outcome": "DOCUMENT_AND_ARCHIVE_GENERATION_ONLY",
+      "note": "交付封装身份检查不新增模型计算或项目资格。"
+    },
+    {
+      "id": "R08",
+      "activity": "交付前元数据/阅读行范围/输入身份与手写NPZ CRC核对",
+      "source": [
+        "tools/final_static_consistency.py"
+      ],
+      "outputs": [
+        "logs/final_consistency.stdout.txt",
+        "logs/final_consistency.stderr.txt",
+        "logs/final_consistency.exit_code.txt"
+      ],
+      "outcome": "EXIT_0",
+      "note": "不导入项目代码，不新增科学数值试验；随后封装结果由ZIP外部交付回执完整覆盖。"
+    }
+  ],
+  "tool_response_warning": {
+    "operation": "build_review_metadata",
+    "visible_diagnostic": "TERM environment variable not set.",
+    "transcript": "logs/build_metadata.tool_tail.txt",
+    "script_stderr_empty": true,
+    "script_exit_code": 0,
+    "origin": "NOT_INDEPENDENTLY_IDENTIFIED",
+    "not_a_project_or_numerical_failure": true
+  }
+}

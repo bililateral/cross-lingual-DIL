@@ -1,0 +1,120 @@
+BASELINE fields ['status', 'observed_at', 'run_id', 'root', 'scope', 'initial_identity', 'partition', 'group_count', 'groups_per_domain', 'roles', 'points', 'metric_columns', 'paired_schedule_checks', 'files']
+IDENT sample {'path': '/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261015/balanced_pooling_execution/20261015_131600/workspace/reports/job/evaluation/A_S_raw_metrics.json', 'bytes': 12975, 'sha256': 'b3b301bce0de0abb0c4a4320bf3a4c4ada7efd62a271a437466a36ca7955be3c'}
+BASE sample {'path': 'reports/seller_alias_continual/20261015/balanced_pooling_result/job/evaluation/A_S_raw_metrics.json', 'bytes': 12975, 'sha256': 'b3b301bce0de0abb0c4a4320bf3a4c4ada7efd62a271a437466a36ca7955be3c'}
+{
+  "source_count": 33,
+  "computed_source_closure_matches": true,
+  "attempt02_matches_current": true,
+  "receipt_matches_current": true,
+  "changed_files": [
+    "scripts/step28_g_half_run.py",
+    "tests/test_step28_g_half.py"
+  ],
+  "attempt01_snapshots_verified": [
+    {
+      "path": "scripts/step28_g_half_run.py",
+      "matches_attempt01": true
+    },
+    {
+      "path": "tests/test_step28_g_half.py",
+      "matches_attempt01": true
+    }
+  ],
+  "four_test_functions_ast_unchanged": {
+    "test_actual_capture_restore_and_next_update": true,
+    "test_full_objective_top5_teacher_and_proxy_gradient": true,
+    "test_local_value_derivative_precision_and_rejections": true,
+    "test_real_vjp_encoder_head_gradients_and_updates": true
+  },
+  "attempts": [
+    {
+      "attempt": "01",
+      "result": {
+        "cumulative_charged_seconds": 5.0,
+        "cumulative_seconds": 4.28901079017669,
+        "elapsed_seconds": 4.28901079017669,
+        "errors": 1,
+        "failures": 0,
+        "formal_inputs": false,
+        "formal_labels": false,
+        "mode": "cpu",
+        "numerics": {
+          "cublas_workspace_config": ":4096:8",
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "deterministic_algorithms": true,
+          "deterministic_warn_only": false
+        },
+        "peak_rss_bytes": 728903680,
+        "peak_work_bytes": 575496,
+        "prior_compute_seconds": 0.0,
+        "scope": "G_half_increment",
+        "selected_tests": [
+          "test_actual_capture_restore_and_next_update",
+          "test_full_objective_top5_teacher_and_proxy_gradient",
+          "test_local_value_derivative_precision_and_rejections",
+          "test_real_vjp_encoder_head_gradients_and_updates",
+          "test_saved_comparisons_directions_permissions_and_budgets",
+          "test_single_candidate_orchestration_and_blind_gate"
+        ],
+        "skipped": 0,
+        "status": "FAIL",
+        "tests_run": 5,
+        "torch": "2.9.1+cu130",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/yongpeng/cross-lingual/reports/documentation/20261015/g_half_implementation/20261015_224000/workspace/scripts/step28_g_half_verify.py\", line 305, in main\n    raise RuntimeError(\"Affected handwritten qualification failed\")\nRuntimeError: Affected handwritten qualification failed\n"
+      },
+      "source_list_matches": true,
+      "wallclock": {
+        "elapsed_seconds": 4.738021612167358,
+        "charged_seconds": 5,
+        "prior_charged_seconds": 0,
+        "cumulative_charged_seconds": 5
+      }
+    },
+    {
+      "attempt": "02",
+      "result": {
+        "cumulative_charged_seconds": 17.0,
+        "cumulative_seconds": 16.484012051019818,
+        "elapsed_seconds": 11.484012051019818,
+        "errors": 0,
+        "failures": 0,
+        "formal_inputs": false,
+        "formal_labels": false,
+        "mode": "cpu",
+        "numerics": {
+          "cublas_workspace_config": ":4096:8",
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "deterministic_algorithms": true,
+          "deterministic_warn_only": false
+        },
+        "peak_rss_bytes": 686292992,
+        "peak_work_bytes": 4654536,
+        "prior_compute_seconds": 5.0,
+        "scope": "G_half_increment",
+        "selected_tests": [
+          "test_saved_comparisons_directions_permissions_and_budgets",
+          "test_single_candidate_orchestration_and_blind_gate"
+        ],
+        "skipped": 0,
+        "status": "PASS_HANDWRITTEN_ONLY",
+        "tests_run": 2,
+        "torch": "2.9.1+cu130"
+      },
+      "source_list_matches": true,
+      "wallclock": {
+        "elapsed_seconds": 11.93231725692749,
+        "charged_seconds": 12,
+        "prior_charged_seconds": 5,
+        "cumulative_charged_seconds": 17
+      }
+    }
+  ],
+  "baseline_count": 43,
+  "baseline_total_bytes": 2873124,
+  "baseline_payloads_present": 0
+}
+Old differing present source files: [('reports/documentation/20261014/balanced_pooling_implementation/qualification/cpu/attempt04/result/result.json', ['scripts/step28_balanced_pooling.py', 'scripts/step28_balanced_pooling_run.py']), ('reports/documentation/20261014/balanced_pooling_implementation/qualification/gpu/attempt01/result/result.json', ['scripts/step28_balanced_pooling.py', 'scripts/step28_balanced_pooling_run.py'])]

@@ -1,0 +1,94 @@
+BASELINE metadata: {
+  "status": "LOCAL_SAVED_EVIDENCE_AVAILABLE_NOT_NEW_EXECUTION_QUALIFICATION",
+  "observed_at": "2026-10-15T13:59:34.700Z",
+  "run_id": "20261015_131600",
+  "root": "reports/seller_alias_continual/20261015/balanced_pooling_result/job",
+  "scope": "Opened S/G saved group metrics and query/count files; canonical group/domain order, untrained initial identity and paired schedules. No model/Memory/text/labels loaded, no metrics or bootstrap regenerated.",
+  "initial_identity": {
+    "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20",
+    "model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b"
+  },
+  "partition": {
+    "bytes": 9962,
+    "path": "partition.json",
+    "sha256": "a828b9cd7b2acade501a8bed7209282ae7f916c4fa2944426f49f755fcf01c51"
+  },
+  "group_count": 40,
+  "groups_per_domain": 20,
+  "roles": [
+    "raw",
+    "stage-cal",
+    "first-cal"
+  ],
+  "points": [
+    "A_S",
+    "B_S",
+    "A_G",
+    "B_G"
+  ],
+  "metric_columns": [
+    "average_precision",
+    "trapezoidal_pr_auc",
+    "roc_auc",
+    "recall_at_fpr_1pct",
+    "brier",
+    "log_loss",
+    "precision",
+    "recall",
+    "f1",
+    "specificity",
+    "balanced_accuracy",
+    "mcc",
+    "map",
+    "mrr",
+    "recall_at_1",
+    "recall_at_3",
+    "recall_at_5",
+    "recall_at_10",
+    "ndcg_at_1",
+    "ndcg_at_3",
+    "ndcg_at_5",
+    "ndcg_at_10"
+  ],
+  "paired_schedule_checks": [
+    {
+      "stage": "A",
+      "sequence_equal": true,
+      "history_equal": true,
+      "a1_equal": true,
+      "steps": 288
+    },
+    {
+      "stage": "B",
+      "sequence_equal": true,
+      "history_equal": true,
+      "a1_equal": true,
+      "steps": 288
+    }
+  ]
+}
+RESULT: {
+  "baseline_all43": true,
+  "received27_match": true,
+  "cleanup64_equivalents_match": true,
+  "old_sources_summary": [
+    {
+      "evidence": "reports/documentation/20261014/balanced_pooling_implementation/qualification/cpu/attempt04/result/result.json",
+      "present_compared": 25,
+      "same": 23,
+      "different": [
+        "scripts/step28_balanced_pooling.py",
+        "scripts/step28_balanced_pooling_run.py"
+      ]
+    },
+    {
+      "evidence": "reports/documentation/20261014/balanced_pooling_implementation/qualification/gpu/attempt01/result/result.json",
+      "present_compared": 25,
+      "same": 23,
+      "different": [
+        "scripts/step28_balanced_pooling.py",
+        "scripts/step28_balanced_pooling_run.py"
+      ]
+    }
+  ]
+}
