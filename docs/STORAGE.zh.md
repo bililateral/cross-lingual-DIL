@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-15 G_half静态外审保管
+
+本次返回ZIP227026字节/23成员完整回收并逐项验收，独立主审及具体合同准备已完成。必要审查原文、结构化发现、手写核查源码/输入/输出、真实失败/成功日志、阅读范围和清单保留在reports/documentation/20261015/g_refinement/review/external。验收后删除返回ZIP、返回的173263字节重复输入及本轮浏览器临时项，共11文件590958字节；逐项身份及保留用途见[回收记录](../reports/documentation/20261015/g_refinement/review/recovery.json)。
+
+仅保留一份原review_input.zip（173263字节，SHA256 d36f32f225023aeecfe184eb2220c402e4c29d857bf2bcdee05d66ecb5b938cb），因外审check_static.py明确按该压缩原字节/SHA读取并复核；重放可用--input-zip指向这一原件，默认运行助手的input路径可按同字节恢复，无需永久保留重复副本。未向Linux补传历史归档，未删除旧科研证据/模型；专用页已关闭。局部清理不重置10月23日大清理周期。
+
 ## 2026-10-15 完整S/G/F结果保管
 
 新作业20261015_131600/workspace于18:40:15 exit0。347份结果/日志/冻结来源共11,094,881字节及7份Linux独立分析程序/表/图/原始输出共491,617字节已SFTP回传，逐文件大小/SHA核验；见[回传记录](../reports/seller_alias_continual/20261015/balanced_pooling_result/receive_verification.json)。原始证据继续留Linux实际workspace，分析和报告另存reports/seller_alias_continual/20261015/balanced_pooling_result；不复制正式文本/标签、模型或Memory到Windows。

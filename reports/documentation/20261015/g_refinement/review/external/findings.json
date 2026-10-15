@@ -1,0 +1,131 @@
+{
+  "verdict": "CONDITIONAL_GO_TO_SINGLE_CANDIDATE_CONTRACT_ONLY",
+  "implementation_or_execution_approved": false,
+  "paper_main_algorithm_contribution_established": false,
+  "new_proven_scientific_blockers": 0,
+  "classification_note_zh": "RC为未来合同/实现的可复现要求，不等于未提交新代码已存在缺陷；RD-01是已关闭旧语义缺陷的继承，非重开。",
+  "findings": [
+    {
+      "id": "SC-01",
+      "category": "SCIENTIFIC_BLOCKER",
+      "status": "NONE_FOUND_FOR_LIMITED_PROBE",
+      "finding_zh": "没有发现否定唯一固定候选有限开发的已证科学阻断。",
+      "boundary_zh": "不是效果已证、不是候选代码资格通过。",
+      "evidence": [
+        "proposal.zh.txt:14-26",
+        "checks/output.json"
+      ]
+    },
+    {
+      "id": "RS-01",
+      "category": "REASONABLE_SUGGESTION",
+      "status": "NONBLOCKING_CLARIFICATION",
+      "finding_zh": "解析式正确；补充负离群值敏感性、全元素置换盲性；局部导数下界不推出身份/参数梯度/泛化保证。",
+      "boundary_zh": "不据此增加鲁棒损失、来源过滤或F求解器。",
+      "evidence": [
+        "proposal.zh.txt:21-26",
+        "source/step28_record_replay.py:159-208",
+        "checks/output.json"
+      ]
+    },
+    {
+      "id": "RS-02",
+      "category": "REASONABLE_SUGGESTION",
+      "status": "LIMITED_EVIDENCE",
+      "finding_zh": "G的A获得和最终A有条件正向；B差及遗忘差未确定，集中不是已证根因。",
+      "boundary_zh": "仅支持一次可停止探针，不估胜率，不扩跑求显著。",
+      "evidence": [
+        "result/all_metrics.csv:1136",
+        "result/all_metrics.csv:1158",
+        "result/all_metrics.csv:1180",
+        "result/all_metrics.csv:1224",
+        "result/primary_disposition.zh.txt:31-40"
+      ]
+    },
+    {
+      "id": "RS-03",
+      "category": "REASONABLE_SUGGESTION",
+      "status": "PRIOR_ART_ADDITION",
+      "finding_zh": "补充Lee等固定50/50 max/mean混合及局部均匀梯度分支先例；H不是同式，但此思路不能承担原创性。",
+      "boundary_zh": "未完成精确H先例穷尽检索；不据先例存在否定系统级贡献可能。",
+      "evidence": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "context/s_contribution_primary.zh.txt:18-38"
+      ]
+    },
+    {
+      "id": "RC-01",
+      "category": "REPRODUCIBILITY_REQUIREMENT",
+      "status": "BEFORE_REUSE_CONTRACT",
+      "finding_zh": "新配对比较需已保存S/G逐群值、UID、次序/角色/来源身份及共同抽样规则；汇总均值/CI不足。",
+      "boundary_zh": "不是要求上传正式资产；不可用时暂停依赖比较，不自动重训。",
+      "evidence": [
+        "proposal.zh.txt:36-40",
+        "source/step28_balanced_pooling_run.py:665-728"
+      ]
+    },
+    {
+      "id": "RC-02",
+      "category": "REPRODUCIBILITY_REQUIREMENT",
+      "status": "BEFORE_IMPLEMENTATION_CONTRACT",
+      "finding_zh": "旧三臂/计数/initials[S]/points[A_S]和三路配对写死，单H专用入口必须定向适配。",
+      "boundary_zh": "旧源码适合旧三臂，非新发现旧bug；不新建通用框架。",
+      "evidence": [
+        "source/step28_balanced_pooling_run.py:31-55",
+        "source/step28_balanced_pooling_run.py:398-404",
+        "source/step28_balanced_pooling_run.py:455-485",
+        "source/step28_balanced_pooling_run.py:580-581"
+      ]
+    },
+    {
+      "id": "RC-03",
+      "category": "REPRODUCIBILITY_REQUIREMENT",
+      "status": "TARGETED_FUTURE_QUALIFICATION",
+      "finding_zh": "明确混合后平方D、非恒定自身出生T、H自己的top5、两支VJP、诊断双回调、完整/推理恢复身份。",
+      "boundary_zh": "当前只有标量隔离核算，未通过项目Linux资格；D1只诊断。",
+      "evidence": [
+        "source/step28_balanced_pooling.py:210-274",
+        "source/step28_alias_ranking.py:89-129",
+        "source/step28_record_replay.py:159-219",
+        "source/step28_replay_diagnostics.py:31-129",
+        "checks/output.json"
+      ]
+    },
+    {
+      "id": "RD-01-REUSE",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "status": "PREVIOUSLY_CLOSED_NOT_REOPENED",
+      "finding_zh": "18行旧损失遗忘方向附注与原CSV及符号/CI映射一致；新导出按方向命名实现。",
+      "boundary_zh": "不改旧冻结结果，不影响原MAP，不重跑老实验。",
+      "evidence": [
+        "result/primary_disposition.zh.txt:18-28",
+        "result/loss_forgetting_direction.csv:1-19",
+        "source/step28_balanced_pooling_run.py:715-725"
+      ]
+    },
+    {
+      "id": "RS-04",
+      "category": "REASONABLE_SUGGESTION",
+      "status": "PROSPECTIVE_DECISION_RULE",
+      "finding_zh": "B末A和B的H-S MAP配对条件区间下界均>0；直接报告H-G，未达则按单候选停止。",
+      "boundary_zh": "不以A/B均值抵消，不事后非劣，不扩为全22门，不把开发valid变独立留出。",
+      "evidence": [
+        "proposal.zh.txt:35-40"
+      ]
+    },
+    {
+      "id": "OOD-01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "NOT_REQUESTED",
+      "finding_zh": "不要求系数/温度网格、新教师/损失、更多臂/seed/顺序、F求解器、全回归、通用验证系统或正式资产。",
+      "boundary_zh": "后续论文确认只说明证据与主张匹配原则，不在本轮开新运行。",
+      "evidence": [
+        "request.zh.txt:1-10",
+        "proposal.zh.txt:40-52"
+      ]
+    }
+  ]
+}
