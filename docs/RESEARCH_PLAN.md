@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)及[独立主审补正](../reports/documentation/20261014/balanced_pooling/review/primary_disposition.zh.txt)冻结。用户现已批准[完整S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)，授权在其范围和前提内推进；固定tau=1与三臂独立A，求解值／梯度、全路径实际评分与恢复、完整预算及三种访问权限不变。最小实现、Linux手写CPU及获准合并外审已完成；[独立主审](../reports/documentation/20261014/balanced_pooling_implementation/review/primary_disposition.zh.txt)已关闭未定义指标、失败定位和写前预留三项最小修正。原生资格与新投影已满足，继续完整正式三臂、保存结果独立分析及具体结果外审，不重复已关闭部分审查或扩大预算；新包外发仍按具体范围确认。外审回收并经主审关闭、手写BGE原生资格通过且新实测投影及资源满足后，才进入正式三臂；实际状态与证据见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。H仍是相对G的集中限制与相对S的差异化奖励，不保证可靠身份覆盖；核心OT已有先例，性能与独立贡献分开判定，固定实验不获收益也不自动调参或追加模块。
+用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)、[完整S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)及已关闭实现／资格证据保持原字节。正式运行的F求解已失败，现按用户10月15日的明确许可完成必要证据回收、分析及[最小修复提案](../reports/seller_alias_continual/20261015/balanced_pooling_failure/report.zh.txt)。下一步是具体静态方案外审与独立处置、确认受影响合同补充，再依许可实施并只补受影响CPU／F原生资格；满足新来源、累计预算及数据前提后才可新运行。不能直接续原正式流程、从推理权重配新Adam冒充精确恢复、开放部分valid或自动扩大迭代／放宽输出精度。当前终端Q验收建议尚未实施或获准；S/G复用与完整重跑的取舍已列，不同时建设两套路径。新包外发按具体范围确认，费用和状态只见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。H的机制、OT先例、性能与创新边界不因数值故障改变。
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
 

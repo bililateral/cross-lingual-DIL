@@ -1,0 +1,102 @@
+{
+  "purpose": "HANDWRITTEN_MECHANISM_WITNESS_NOT_FORMAL_REPLAY",
+  "source_sha256": "21973808be64245e330cef08d28d841acea3716ba8b07043403a0c22b1958aac",
+  "solver": {
+    "version": "log_sinkhorn_round_v1",
+    "tau": 1.0,
+    "maximum_iterations": 4096,
+    "marginal_tolerance": 1e-10,
+    "feasible_tolerance": 1e-12,
+    "gap_tolerance": 5e-09,
+    "roundoff_factor": 256.0
+  },
+  "torch": "2.9.1+cu130",
+  "gpu_initialized": false,
+  "cpu_threads": 1,
+  "epsilon": 0.0001,
+  "input": [
+    [
+      0.9357403556954683,
+      -0.7985076962177716,
+      -7.013115794639964
+    ],
+    [
+      -0.7985076962177716,
+      0.9357403556954683,
+      -7.013115794639964
+    ],
+    [
+      -7.013115794639964,
+      -7.013115794639964,
+      1.0980121085960775
+    ]
+  ],
+  "independent_optimal_plan": [
+    [
+      0.28323333333333334,
+      0.05,
+      0.0001
+    ],
+    [
+      0.05,
+      0.28323333333333334,
+      0.0001
+    ],
+    [
+      0.0001,
+      0.0001,
+      0.33313333333333334
+    ]
+  ],
+  "independent_optimal_value": 0.0,
+  "original_status": "ORIGINAL_REJECTED",
+  "original_diagnostics": {
+    "reason": "Transport did not converge in 4096 full iterations",
+    "failed_blocks": [
+      {
+        "batch_index": 0,
+        "n": 3,
+        "m": 3,
+        "iteration": 4096,
+        "marginal_error": 3.834609707542569e-07,
+        "feasible_error": 5.551115123125783e-17,
+        "gap_checked": 3.683746926944946e-10
+      }
+    ],
+    "failure_count": 1
+  },
+  "final_rounded_plan": [
+    [
+      0.28323325187431697,
+      0.04999998561980411,
+      0.0001000958392122022
+    ],
+    [
+      0.04999998561980411,
+      0.28323325187431697,
+      0.0001000958392122022
+    ],
+    [
+      0.00010009583921222307,
+      0.00010009583921222307,
+      0.3331331416549089
+    ]
+  ],
+  "actual_value": -1.837259233639088e-10,
+  "value_error": 1.837259233639088e-10,
+  "rounded_feasibility": 5.551115123125783e-17,
+  "plan_l1_error": 7.667136977824855e-07,
+  "independent_kl": 1.837270181169222e-10,
+  "float32_plan_l1_error": 7.700962480320403e-07,
+  "local_slow_mode_factor": 0.9982008099999999,
+  "zero_control": {
+    "iterations": 1,
+    "marginal_error": 5.551115123125783e-17,
+    "feasible_error": 0.0,
+    "gap_checked": 5.684341886080802e-14
+  },
+  "formal_inputs": false,
+  "formal_labels": false,
+  "models_loaded": false,
+  "elapsed_seconds": 2.183067560195923
+}
