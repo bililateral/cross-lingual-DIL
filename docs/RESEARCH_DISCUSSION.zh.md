@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-15：批准G_half合同并完成最小实现与CPU增量
+
+用户原话：“批准合同，现在开始最小实现与 CPU 增量核验 → 合同和实现合并外审 → 原生 GPU 资格与资源投影 → 唯一固定训练”。
+
+该决定批准[合同](SELLER_ALIAS_G_HALF.zh.md)完整执行范围，见[授权回执](../reports/documentation/20261015/g_half_implementation/authorization.json)，不按普通步骤重问。合并审查及结果的新具体外发包仍按合同第7/9节单包许可办理。当前新增H评分/目标、单臂运行器、资格与针对性测试、固定policy及限时wrapper；旧S/G/F源码不改，H不引入其他损失/求解器/候选。
+
+Linux手写CPU两轮已完成，首轮四项通过后临时保存值夹具因拒绝覆盖文件报错，保守5秒；修正只在临时夹具先删原临时文件，次轮仅补保存比较/权限/预算和编排两项，12秒。共六个不同核验范围、七次测试调用、历史1error、累计17/180秒；精度不变，真实tiny梯度/更新/capture/恢复与模拟576次调度分开。33项当前来源与第二轮一致，首轮四个通过测试函数和科研计算源码未变，见[CPU增量验收](../reports/documentation/20261015/g_half_implementation/qualification/cpu_receipt.json)。Linux43份旧S/G结果身份再次一致，未载模或解析其指标。合同实现合并包已形成；没有GPU/正式训练/监听，正式数据/标签/BGE/旧Memory访问0。
+
+用户对322949字节/78成员、SHA256 f0f09f50daddbcf948bf9717edcb9b204fc19ea8f8a6d1ecc74b353f09f403e9具体合并包明确答复：“授权此合并包外审（推荐）”。23:02经指定本地Playwright发送一次至[合同实现审查](https://chatgpt.com/c/6ad0eab6-ef94-83eb-854b-1a270afefb05)，附件及正文已入会话，正在思考且停止按钮可见、输入为空；可见GPT-6/Pro第5档，后台身份未独立取得。见[授权](../reports/documentation/20261015/g_half_implementation/review/upload_authorization.json)及[发送记录](../reports/documentation/20261015/g_half_implementation/review/submission.json)。等待外审期间只完成同步/存储/本地提交；不把CPU或已上传等同资格通过，不重复索要已有GPU与唯一训练许可。
+
 ## 2026-10-15：G_half静态外审回收与具体合同准备
 
 用户原话：“外审已结束，仔细回收并分析 G_half 改进方案与论文定位的审查意见，独立主审后给我完整结论。若值得推进，准备具体实施合同，明确比较判据、实际接线核验、数据权限和资源预算。”

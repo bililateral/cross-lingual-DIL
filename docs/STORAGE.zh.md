@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-15 G_half实施与CPU增量保管
+
+独立Linux workspace为reports/documentation/20261015/g_half_implementation/20261015_224000/workspace。必要CPU失败/成功、两轮源码身份、预算、43份旧结果身份核对等27文件111662字节已SFTP回传逐项一致；[原始回传](../reports/documentation/20261015/g_half_implementation/qualification/receive_verification.json)及[增量验收](../reports/documentation/20261015/g_half_implementation/qualification/cpu_receipt.json)保留首轮错误和累计17/180秒。两轮快照中64份与当前33项来源相同的重复文件已在Linux逐项核验后删除，释放1064841字节，仅保留两份不同的attempt01旧源码及原始失败/成功证据，见[清理记录](../reports/documentation/20261015/g_half_implementation/qualification/duplicate_cleanup.json)。清理前91文件的inventory保留原观测事实，不当作当前存量。
+
+具体322949字节/78成员合并包获准后于23:02单次上传网页，仍在审查，原输入包当前保留用于回收及后续身份验收。只有本轮CPU验收、请求和发送证据7文件25577字节同步至独立workspace，逐项SHA一致，见[同步](../reports/documentation/20261015/g_half_implementation/review/sync.json)；未向Linux补传输入ZIP或历史归档。Windows/Linux当前33来源均仍与CPU第二轮一致，23:02现场无G_half进程。已关闭SSH连接，删除8份一次性传输助手/清单及7份冗余页面快照，共15文件120016字节；保留必要发送页面，活动审查专用页及当前浏览器日志留待审查验收收尾。无模型/Memory清理，不重置10月23日大清理周期。
+
 ## 2026-10-15 G_half静态外审保管
 
 本次返回ZIP227026字节/23成员完整回收并逐项验收，独立主审及具体合同准备已完成。必要审查原文、结构化发现、手写核查源码/输入/输出、真实失败/成功日志、阅读范围和清单保留在reports/documentation/20261015/g_refinement/review/external。验收后删除返回ZIP、返回的173263字节重复输入及本轮浏览器临时项，共11文件590958字节；逐项身份及保留用途见[回收记录](../reports/documentation/20261015/g_refinement/review/recovery.json)。

@@ -1,0 +1,25 @@
+diff --git a/reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/sources/scripts/step28_g_half_run.py b/scripts/step28_g_half_run.py
+index 9f455f29..bd120924 100644
+--- a/reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/sources/scripts/step28_g_half_run.py
++++ b/scripts/step28_g_half_run.py
+@@ -585,7 +585,7 @@ def reviewed_gate(path: Path, kind: str) -> dict:
+     cpu = data.read_json(data.ROOT/gate["cpu"]["path"])
+     if (cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("mode") != "cpu"
+             or cpu.get("source_files") != sources() or cpu.get("cumulative_charged_seconds", float("inf")) > 180
+-            or any(cpu.get(k) != 0 for k in ("failures", "errors", "skipped"))):
++            or cpu.get("unresolved_checks") != [] or len(cpu.get("qualified_tests", [])) != 6):
+         raise ValueError("Current CPU increment not qualified")
+     return gate
+ 
+diff --git a/reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/sources/tests/test_step28_g_half.py b/tests/test_step28_g_half.py
+index 99bfc2f4..490e69e1 100644
+--- a/reports/documentation/20261015/g_half_implementation/qualification/cpu/attempt01/sources/tests/test_step28_g_half.py
++++ b/tests/test_step28_g_half.py
+@@ -355,6 +355,7 @@ class GHalfTests(unittest.TestCase):
+                     row[columns.index("log_loss")]=loss_value
+                 data.write_json(p,v);rec["matrix"]=data.record(p,origin)
+                 qpath=origin/rec["queries"]["path"];q=np.load(qpath,allow_pickle=False);q[:,:,0]=map_value
++                qpath.unlink()  # Replace only this explicitly constructed temporary algebra fixture.
+                 rec["queries"]=run.previous.save_array(qpath,q,origin)
+         for origin,collection,a,b,la,lb in ((hroot,col,.5,.6,.4,.5),(oldroot/"evaluation",oldcol,.4,.4,.3,.3)):
+             set_values(origin,collection,"A_G_half",a,la);set_values(origin,collection,"B_G_half",b,lb)

@@ -1,0 +1,22 @@
+test_actual_capture_restore_and_next_update (test_step28_g_half.GHalfTests) ... ok
+test_full_objective_top5_teacher_and_proxy_gradient (test_step28_g_half.GHalfTests) ... ok
+test_local_value_derivative_precision_and_rejections (test_step28_g_half.GHalfTests) ... ok
+test_real_vjp_encoder_head_gradients_and_updates (test_step28_g_half.GHalfTests) ... ok
+test_saved_comparisons_directions_permissions_and_budgets (test_step28_g_half.GHalfTests) ... ERROR
+
+======================================================================
+ERROR: test_saved_comparisons_directions_permissions_and_budgets (test_step28_g_half.GHalfTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261015/g_half_implementation/20261015_224000/workspace/tests/test_step28_g_half.py", line 360, in test_saved_comparisons_directions_permissions_and_budgets
+    set_values(origin,collection,"A_G_half",a,la);set_values(origin,collection,"B_G_half",b,lb)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261015/g_half_implementation/20261015_224000/workspace/tests/test_step28_g_half.py", line 358, in set_values
+    rec["queries"]=run.previous.save_array(qpath,q,origin)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261015/g_half_implementation/20261015_224000/workspace/scripts/step28_bge_continual_run.py", line 51, in save_array
+    raise FileExistsError(path)
+FileExistsError: /home/yongpeng/cross-lingual/reports/documentation/20261015/g_half_implementation/20261015_224000/workspace/reports/qualification/cpu/attempt01/result/tmp2fnvczxk/H/A_G_half_raw_queries.npy
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.919s
+
+FAILED (errors=1)
