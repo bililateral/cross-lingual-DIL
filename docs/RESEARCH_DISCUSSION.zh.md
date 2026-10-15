@@ -1185,3 +1185,5 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 用户原话：“批准这份合同补充，按约定范围和前提继续推进，先完成最小实现和 Linux 手写 CPU 增量核验，再准备合同与实现的合并外审。保持原输出精度和累计预算限制。”[批准回执](../reports/documentation/20261015/balanced_pooling_repair/authorization.json)绑定补充原件；不因原稿写有待批准而重新阻断已有许可。
 
 已落实固定终端Q、O/T统计与盲门、旧八次资格与新三次来源衔接、累计67971秒实际入口。两轮Linux手写CPU分别计26与45秒，第一轮并列排名fixture比较失败保留；以不改精度的固定行列偏移修正，独立新workspace第二轮四项通过，累计168/300秒。一次复用首轮workspace的部署启动请求被自动审批拒绝且未执行，改独立目录完成。当前仅准备合并外审，原生／正式尚未进入；[实现报告](../reports/documentation/20261015/balanced_pooling_repair/report.zh.txt)和[资格账](../reports/documentation/20261015/balanced_pooling_repair/qualification/state.json)明确证据、未变部分与边界，新材料仅本地Git。
+
+用户随后对本次具体497290字节／66成员／SHA256 c1ba62c3b84368a66e3276bee1c66fef8a346d156d70b7eb85e5a915e8cc4f57合并包明确回复：“授权此合并包外审（推荐）”。11:27通过指定本地Playwright MCP上传并发送一次，可见GPT-6／Pro强度5/5，页面确认附件、完整请求、正在思考、停止按钮及空编辑框；见[具体许可](../reports/documentation/20261015/balanced_pooling_repair/review/upload_authorization.json)与[提交记录](../reports/documentation/20261015/balanced_pooling_repair/review/submission.json)。本次只完成已获准外发，未连接Linux或新增CPU／GPU／正式数据执行，CPU168/300秒、原生8次/364秒、正式有效余67971秒不变；完整回收和独立主审仍是后续固定三次F原生及新投影的前提。活动审查包保留，未作公开Git推送。
