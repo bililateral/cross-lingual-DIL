@@ -1170,3 +1170,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 [失败分析与提案](../reports/seller_alias_continual/20261015/balanced_pooling_failure/report.zh.txt)已形成：必要小证据回收并核对；三个正式失败块仅P条件未过，Q可行性／gap在原限内，但K未保存，未声称原样复现。两次固定Linux手写解析例证明Q可行不足以保证值精度，以及P未达原限并不必然代表Q输出不合格；累计CPU从91增至97/300秒，失败／旧资格费用保留。推荐审查最后4096次的Q精度验收补充，原输出精度不降低，P超限如实记录；须同步修改停止条款、实际统一盲门和身份，再补受影响资格。无完整Adam状态，不能续跑最后41步；新运行／S/G复用、三种数据权限及累计资源取舍已列。当前仅提出具体方案，未修改冻结合同或生产实现，未新增GPU调用、载模、正式读取或valid开放。具体状态和证据只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，新材料仅本地Git。
 
 用户随后对本次具体291160字节／59成员／SHA256 1fb624a61ee9e075fc11262c2eacecf3349330a08a026da1ea7cb03907247cd5静态包回复：“授权此包静态外审（推荐）”。09:47通过指定本地Playwright MCP上传并发送一次，GPT-6／Pro强度5/5，页面确认附件、停止按钮及空输入框；详见[具体许可](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/upload_authorization.json)及[提交记录](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/submission.json)。仅授权该包静态外审，不批准改停止条件、追加GPU调用或重训；最终意见尚待完整回收和独立处置。
+
+## 2026-10-15：回收F失败提案外审，独立主审并准备合同补充
+
+用户原话：“外审已结束，仔细回收并分析 F 求解失败与最小修复方案的审查意见，独立主审后准备具体合同补充，明确代码修改、增量核验、数据权限和重训范围，不要随意放宽精度。”本轮是回收、主审和具体合同准备，未据此修改生产停止规则、增加GPU调用、再解析正式数据或重训。
+
+55404字节／11成员返回包已完整回收，10内部载荷与58输入身份核对一致；[独立主审](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/primary_disposition.zh.txt)支持窄终端Q验收方向，接受旧八次资格与新三次不能只改数字、剩余预算必须贯通实际入口、终端数量需最小迭代证据三项具体要求；更正旧报告对A端点随机元数据缺失的过宽说法，精确续跑仍因缺Adam及失败点完整状态不可行。FP32按实际舍入输入参考，实际VJP直接核对返回Q；没有运行新的项目科研计算，原CPU97／300秒和原生8次／364秒不变。
+
+[具体合同补充](SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md)已准备，待用户批准：精度不降低、O/T互斥，固定F三次增量及旧证据明确继承，CPU余203秒、原生总≤11次／900秒、正式累计24小时内本次有效67971秒；默认完整三臂新目录，train跨作业最多2次、valid最多1次且统一盲门后，禁读范围不变。此为具体拟批准范围，静态外审同意不替代实施／资格／训练许可；实际差异和CPU完成后再合并审查，不重复同一静态方向外审。专用网页已关闭，实际状态统一见[当前交接](AI_RESEARCH_HANDOFF.zh.md)与[回收记录](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/recovery.json)，新材料仅本地Git。

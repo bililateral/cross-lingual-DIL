@@ -1,0 +1,121 @@
+{
+  "scope": "CHATGPT_ISOLATED_CPU_HANDWRITTEN_CHECK_NOT_PROJECT_LINUX_QUALIFICATION",
+  "python": "3.13.5",
+  "torch": "2.10.0+cpu",
+  "source_sha256": "21973808be64245e330cef08d28d841acea3716ba8b07043403a0c22b1958aac",
+  "solver_source_unchanged": true,
+  "formal_inputs": false,
+  "models_loaded": false,
+  "optimizer_calls": 0,
+  "cuda_initialized": false,
+  "repair_implemented": false,
+  "cases": [
+    {
+      "epsilon": "1e-8",
+      "original_status": "ORIGINAL_REJECTED",
+      "original_residuals": {
+        "batch_index": 0,
+        "n": 3,
+        "m": 3,
+        "iteration": 4096,
+        "marginal_error": 3.0569428663973497e-06,
+        "feasible_error": 5.551115123125783e-17,
+        "gap_checked": 2.769394184107427e-05
+      },
+      "value": -2.467672157902001e-05,
+      "plan": [
+        [
+          0.2833320325829713,
+          0.049999772220516395,
+          1.5285298456232826e-06
+        ],
+        [
+          0.049999772220516395,
+          0.2833320325829713,
+          1.5285298456232826e-06
+        ],
+        [
+          1.5285298456405587e-06,
+          1.5285298456405587e-06,
+          0.3333302762736421
+        ]
+      ],
+      "value_error_to_analytic_zero": 2.467672157902001e-05,
+      "plan_l1_error": 1.2148238765054128e-05,
+      "fp32_plan_l1_error": 1.2173397926535974e-05,
+      "high_precision_kl_to_exact_p": "0.00002467672157743642131954709237698312823032706760602185393428466093853963595258556",
+      "high_precision_phi_at_actual_float_k": "-0.000024676721577524340082949070039547301110868531549219255373918322658948209724803381",
+      "high_precision_actual_q_feasible_residual": "0.000000000000000037674472600134646197804026238979228461782137552897135416666666666842369965720509",
+      "high_precision_actual_q_mass_minus_one": "-0.0000000000000000054625154768429828866516118068830110132694244384765625",
+      "float_k_construction_max_error": "0.00000000000000066526701524454412120842301048088468490479723454046559229098160191850724726215677",
+      "note_reference": "For exact analytic K the optimum is 0. F is 1-Lipschitz in infinity norm, so float K shifts its exact optimum by at most the construction error.",
+      "local_b_map_eigenvalues": [
+        0.48999995800000107,
+        0.999999820000008,
+        0.9999999999999999
+      ],
+      "local_slow_factor": 0.9999998200000081,
+      "saved_q_max_difference": 0.0,
+      "saved_value_difference": 0.0,
+      "proposed_terminal_output_predicate_only": false,
+      "predicate_note": "This is an arithmetic assessment of the saved residuals, not execution or qualification of a repaired solver."
+    },
+    {
+      "epsilon": "1e-4",
+      "original_status": "ORIGINAL_REJECTED",
+      "original_residuals": {
+        "batch_index": 0,
+        "n": 3,
+        "m": 3,
+        "iteration": 4096,
+        "marginal_error": 3.834609707542569e-07,
+        "feasible_error": 5.551115123125783e-17,
+        "gap_checked": 3.683746926944946e-10
+      },
+      "value": -1.837259233639088e-10,
+      "plan": [
+        [
+          0.28323325187431697,
+          0.04999998561980411,
+          0.0001000958392122022
+        ],
+        [
+          0.04999998561980411,
+          0.28323325187431697,
+          0.0001000958392122022
+        ],
+        [
+          0.00010009583921222307,
+          0.00010009583921222307,
+          0.3331331416549089
+        ]
+      ],
+      "value_error_to_analytic_zero": 1.837259233639088e-10,
+      "plan_l1_error": 7.667136977824855e-07,
+      "fp32_plan_l1_error": 7.700962480320403e-07,
+      "high_precision_kl_to_exact_p": "0.00000000018372707612448987980590917060314426424495024452661954307098867723174651560642722",
+      "high_precision_phi_at_actual_float_k": "-0.0000000001837270022612211138535386406636406740169916746283735312436967799297896288146667",
+      "high_precision_actual_q_feasible_residual": "0.000000000000000052168194532760855016325270601858695348103841145833333333333333333157630034279491",
+      "high_precision_actual_q_mass_minus_one": "-0.000000000000000065160550566378816483847913332283496856689453125",
+      "float_k_construction_max_error": "0.00000000000000024278733480280656322780109762206790699933607706340469814772780801295552796004654",
+      "note_reference": "For exact analytic K the optimum is 0. F is 1-Lipschitz in infinity norm, so float K shifts its exact optimum by at most the construction error.",
+      "local_b_map_eigenvalues": [
+        0.48958008999999997,
+        0.99820081,
+        0.9999999999999999
+      ],
+      "local_slow_factor": 0.9982008099999999,
+      "saved_q_max_difference": 0.0,
+      "saved_value_difference": 0.0,
+      "proposed_terminal_output_predicate_only": true,
+      "predicate_note": "This is an arithmetic assessment of the saved residuals, not execution or qualification of a repaired solver."
+    }
+  ],
+  "zero_control": {
+    "iterations": 1,
+    "marginal_error": 5.551115123125783e-17,
+    "feasible_error": 0.0,
+    "gap_checked": 5.684341886080802e-14
+  },
+  "local_elapsed_seconds": 4.095462933999954
+}

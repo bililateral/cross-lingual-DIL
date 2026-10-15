@@ -4,7 +4,7 @@
 
 ## 已确认范围内
 
-用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)、[完整S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)及已关闭实现／资格证据保持原字节。正式运行的F求解已失败，现按用户10月15日的明确许可完成必要证据回收、分析及[最小修复提案](../reports/seller_alias_continual/20261015/balanced_pooling_failure/report.zh.txt)。下一步是具体静态方案外审与独立处置、确认受影响合同补充，再依许可实施并只补受影响CPU／F原生资格；满足新来源、累计预算及数据前提后才可新运行。不能直接续原正式流程、从推理权重配新Adam冒充精确恢复、开放部分valid或自动扩大迭代／放宽输出精度。当前终端Q验收建议尚未实施或获准；S/G复用与完整重跑的取舍已列，不同时建设两套路径。新包外发按具体范围确认，费用和状态只见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。H的机制、OT先例、性能与创新边界不因数值故障改变。
+用户10月14日要求继续设计效果超过S的方案；[原静态提案](../reports/documentation/20261014/balanced_pooling/proposal.zh.txt)、[原S／G／F合同](SELLER_ALIAS_BALANCED_POOLING.zh.md)及已关闭实现／资格证据保持原字节。正式F求解失败后的静态外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261015/balanced_pooling_failure/review/primary_disposition.zh.txt)处置；现有[具体合同补充](SELLER_ALIAS_BALANCED_POOLING_AMENDMENT.zh.md)待批准，确定输出精度不降低的4096次终端Q验收、实际blind_gate／资格／预算接线、固定3次F原生增量及一次完整三臂新运行。批准后按补充前提连续实施、Linux CPU、合同与实际差异合并审查、原生与新投影，再进入正式；当前准备请求不授权上述新执行。新包外发按具体范围确认，费用和状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md)。不能从A_F配新Adam冒充精确续跑，不能混用旧S/G或开放部分valid，不同时建设选择性恢复系统；H的机制、OT先例、性能与创新边界不因数值故障改变。
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
 
