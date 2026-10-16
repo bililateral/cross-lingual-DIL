@@ -1,6 +1,6 @@
 {
   "status": "RUNNING_FORMAL_H_CONS",
-  "observed_at": "2026-10-16T15:46:54.995878+08:00",
+  "observed_at": "2026-10-16T16:15:37+08:00",
   "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace",
   "cpu_charged_seconds": 51,
   "cpu_maximum_seconds": 180,
@@ -8,8 +8,8 @@
   "gpu_maximum_seconds": 600,
   "gpu_actual_updates": 9,
   "gpu_maximum_total_updates": 9,
-  "formal_charged_seconds": 956,
-  "formal_actual_updates": 120,
+  "formal_charged_seconds": 2678,
+  "formal_actual_updates": 312,
   "formal_inputs": true,
   "formal_labels": true,
   "formal_gate_created": true,
@@ -125,9 +125,9 @@
     "valid": 0
   },
   "formal_development_labels_opened": false,
-  "formal_actual_updates_at_least": 120,
+  "formal_actual_updates_at_least": 312,
   "formal_charge_is_provisional": true,
-  "formal_elapsed_seconds_at_observation": 955.995878,
+  "formal_elapsed_seconds_at_observation": 2678.0,
   "formal_start": {
     "path": "reports/documentation/20261016/h_consistency_implementation/qualification/formal_start.json",
     "bytes": 12384,
@@ -145,8 +145,8 @@
   },
   "objective_transport_deleted_at_both_ends": true,
   "formal_last_update_event": {
-    "completed": 120,
-    "elapsed_seconds": 817.4610622208565,
+    "completed": 24,
+    "elapsed_seconds": 2483.3477390096523,
     "event": "updates",
     "limits": {
       "maximum_cuda_reserved_bytes": 30064771072,
@@ -157,14 +157,14 @@
       "minimum_free_host_bytes": 77309411328,
       "torch_cpu_threads": 1
     },
-    "peak_cuda_reserved_bytes": 7417626624,
-    "peak_output_bytes": 5083182,
-    "peak_rss_bytes": 2715041792,
-    "phase": "A_H_cons",
-    "point": "A_H_cons"
+    "peak_cuda_reserved_bytes": 8613003264,
+    "peak_output_bytes": 5215219241,
+    "peak_rss_bytes": 6658129920,
+    "phase": "B_H_cons",
+    "point": "B_H_cons"
   },
   "formal_resource": {
-    "elapsed_seconds": 947.3069986989722,
+    "elapsed_seconds": 2674.637911646627,
     "limits": {
       "maximum_cuda_reserved_bytes": 30064771072,
       "maximum_gpu_stage_seconds": 28800,
@@ -174,18 +174,35 @@
       "minimum_free_host_bytes": 77309411328,
       "torch_cpu_threads": 1
     },
-    "peak_cuda_reserved_bytes": 7417626624,
-    "peak_output_bytes": 5083638,
-    "peak_rss_bytes": 2715041792,
-    "phase": "A_H_cons"
+    "peak_cuda_reserved_bytes": 8613003264,
+    "peak_output_bytes": 5215219241,
+    "peak_rss_bytes": 6658129920,
+    "phase": "B_H_cons"
   },
   "current_source44_verified_while_running": true,
   "formal_actual_updates_definition": "Lower bound from the latest periodic updates log; not an exact instantaneous optimizer count.",
-  "formal_process_observation": "    PID    PPID USER                      STARTED     ELAPSED COMMAND\n 222764       1 yongpeng Fri Oct 16 15:30:59 2026       15:55 bash scripts/run_step28_h_consistency_linux_20261016.sh 0 reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json reports/job\n 222771  222764 yongpeng Fri Oct 16 15:30:59 2026       15:55 timeout --signal=TERM --kill-after=5 28795 taskset -c 0 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n 222772  222771 yongpeng Fri Oct 16 15:30:59 2026       15:55 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n",
+  "formal_process_observation": "    PID    PPID USER                      STARTED     ELAPSED COMMAND\n 222764       1 yongpeng Fri Oct 16 15:30:59 2026       44:38 bash scripts/run_step28_h_consistency_linux_20261016.sh 0 reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json reports/job\n 222771  222764 yongpeng Fri Oct 16 15:30:59 2026       44:38 timeout --signal=TERM --kill-after=5 28795 taskset -c 0 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n 222772  222771 yongpeng Fri Oct 16 15:30:59 2026       44:38 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n",
   "formal_process_cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace",
   "formal_cpu_affinity": [
     0
   ],
   "formal_failure_present": false,
-  "formal_completion_present": false
+  "formal_completion_present": false,
+  "takeover_observation": {
+    "observed_at": "2026-10-16T16:15:37+08:00",
+    "source_files_verified": 44,
+    "phase_update_lower_bounds": {
+      "A_H_cons": 288,
+      "B_H_cons": 24
+    },
+    "total_update_lower_bound": 312,
+    "formal_gate_sha256": "d6639330ff5a53e7ac5f72d74c85b4a72fcf403be126ef5f600f6d27f9ae2d01",
+    "process_affinity": "pid 222772 的当前亲和力列表：0",
+    "wrapper_text": "2026-10-16T15:30:59+08:00\n",
+    "gpu": "0, 32607 MiB, 8920 MiB, 23190 MiB, 14 %",
+    "filesystem": "文件系统              1B的块          已用         可用 已用% 挂载点\n/dev/nvme0n1p2 3936290357248 2984486776832 751774392320   80% /",
+    "memory": "total        used        free      shared  buff/cache   available\n内存：270124224512 11159105536 149101735936    54345728 109863383040 256287797248\n交换： 2147479552    42991616  2104487936",
+    "scientific_execution": false,
+    "opened_development_results": false
+  }
 }
