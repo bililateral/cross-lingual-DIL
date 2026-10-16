@@ -1,6 +1,6 @@
 {
-  "status": "RUNNING_FORMAL_H_CONS",
-  "observed_at": "2026-10-16T16:15:37+08:00",
+  "status": "COMPLETE_FORMAL_H_CONS_PENDING_INDEPENDENT_ANALYSIS",
+  "observed_at": "2026-10-16T17:12:38.873585+08:00",
   "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace",
   "cpu_charged_seconds": 51,
   "cpu_maximum_seconds": 180,
@@ -8,12 +8,12 @@
   "gpu_maximum_seconds": 600,
   "gpu_actual_updates": 9,
   "gpu_maximum_total_updates": 9,
-  "formal_charged_seconds": 2678,
-  "formal_actual_updates": 312,
+  "formal_charged_seconds": 6043,
+  "formal_actual_updates": 576,
   "formal_inputs": true,
   "formal_labels": true,
   "formal_gate_created": true,
-  "next_step": "Continue this existing fixed formal job only. Source44/contract/policy must remain frozen. Observe progress/failure under data permissions; when complete SFTP permitted small evidence and independently analyze within remaining formal budget. No automatic restart. New concrete result external package requires permission.",
+  "next_step": "Complete SFTP return of permitted saved scores, counts, query/group metrics, diagnostics, logs and frozen sources. Independently analyze on existing Linux py310 within 22757 remaining formal seconds. Saved evaluation fields have only been mechanically read. Prepare a concrete result package before requesting external upload permission. No restart, new candidates, new labels or reuse of old Memory.",
   "transport_cleanup": {
     "deleted_at_both_ends": [
       {
@@ -109,11 +109,7 @@
     "bytes": 354,
     "sha256": "66020dec0f889b01e08172ae4761f0fdc2ef4045c7780c5a5a970ff6498c6e68"
   },
-  "formal_processes": [
-    222764,
-    222771,
-    222772
-  ],
+  "formal_processes": [],
   "formal_started_at": "2026-10-16T15:30:59+08:00",
   "formal_hard_deadline": "2026-10-16T23:30:59+08:00",
   "formal_projected_seconds": 18745.47757901193,
@@ -122,12 +118,12 @@
     "heldout": 0,
     "owners": 0,
     "train": 1,
-    "valid": 0
+    "valid": 1
   },
-  "formal_development_labels_opened": false,
-  "formal_actual_updates_at_least": 312,
-  "formal_charge_is_provisional": true,
-  "formal_elapsed_seconds_at_observation": 2678.0,
+  "formal_development_labels_opened": true,
+  "formal_actual_updates_at_least": 576,
+  "formal_charge_is_provisional": false,
+  "formal_elapsed_seconds_at_observation": 6043,
   "formal_start": {
     "path": "reports/documentation/20261016/h_consistency_implementation/qualification/formal_start.json",
     "bytes": 12384,
@@ -145,8 +141,8 @@
   },
   "objective_transport_deleted_at_both_ends": true,
   "formal_last_update_event": {
-    "completed": 24,
-    "elapsed_seconds": 2483.3477390096523,
+    "completed": 288,
+    "elapsed_seconds": 5857.002546594944,
     "event": "updates",
     "limits": {
       "maximum_cuda_reserved_bytes": 30064771072,
@@ -164,7 +160,7 @@
     "point": "B_H_cons"
   },
   "formal_resource": {
-    "elapsed_seconds": 2674.637911646627,
+    "elapsed_seconds": 6042.561180470977,
     "limits": {
       "maximum_cuda_reserved_bytes": 30064771072,
       "maximum_gpu_stage_seconds": 28800,
@@ -175,19 +171,19 @@
       "torch_cpu_threads": 1
     },
     "peak_cuda_reserved_bytes": 8613003264,
-    "peak_output_bytes": 5215219241,
-    "peak_rss_bytes": 6658129920,
-    "phase": "B_H_cons"
+    "peak_output_bytes": 6521516105,
+    "peak_rss_bytes": 6833790976,
+    "phase": "evaluation"
   },
   "current_source44_verified_while_running": true,
-  "formal_actual_updates_definition": "Lower bound from the latest periodic updates log; not an exact instantaneous optimizer count.",
-  "formal_process_observation": "    PID    PPID USER                      STARTED     ELAPSED COMMAND\n 222764       1 yongpeng Fri Oct 16 15:30:59 2026       44:38 bash scripts/run_step28_h_consistency_linux_20261016.sh 0 reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json reports/job\n 222771  222764 yongpeng Fri Oct 16 15:30:59 2026       44:38 timeout --signal=TERM --kill-after=5 28795 taskset -c 0 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n 222772  222771 yongpeng Fri Oct 16 15:30:59 2026       44:38 /home/yongpeng/miniconda3/envs/py310/bin/python scripts/step28_h_consistency_run.py --job reports/job --gate reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json\n",
+  "formal_actual_updates_definition": "Final completion and manifest count; optimizer calls, not a claim that every parameter moved on every call.",
+  "formal_process_observation": "    PID USER                      STARTED COMMAND\n",
   "formal_process_cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace",
   "formal_cpu_affinity": [
     0
   ],
   "formal_failure_present": false,
-  "formal_completion_present": false,
+  "formal_completion_present": true,
   "takeover_observation": {
     "observed_at": "2026-10-16T16:15:37+08:00",
     "source_files_verified": 44,
@@ -204,5 +200,80 @@
     "memory": "total        used        free      shared  buff/cache   available\n内存：270124224512 11159105536 149101735936    54345728 109863383040 256287797248\n交换： 2147479552    42991616  2104487936",
     "scientific_execution": false,
     "opened_development_results": false
+  },
+  "formal_finished_at": "2026-10-16T17:11:42+08:00",
+  "formal_remaining_seconds": 22757,
+  "formal_gradient_group_presentations": 864,
+  "completion_observation": {
+    "observed_at": "2026-10-16T17:12:38.873585+08:00",
+    "source_files_verified": 44,
+    "source_mismatches": [],
+    "formal_gate_sha256": "d6639330ff5a53e7ac5f72d74c85b4a72fcf403be126ef5f600f6d27f9ae2d01",
+    "source_lists_match": true,
+    "wrapper_text": "2026-10-16T15:30:59+08:00\nexit_code=0\n2026-10-16T17:11:42+08:00\n",
+    "processes": "    PID USER                      STARTED COMMAND\n",
+    "manifest": {
+      "status": "COMPLETE_576_UPDATES_2_RESTORES_12_DIAGNOSTICS_VALID_BLIND",
+      "points": [
+        "A_H_cons",
+        "B_H_cons"
+      ],
+      "diagnostics": {
+        "A_H_cons": 6,
+        "B_H_cons": 6
+      },
+      "physical_updates": 576,
+      "gradient_group_presentations": 864
+    },
+    "completion_status": "COMPLETE_H_CONS_FIXED_AB",
+    "before_valid_status": "ALL_BLIND_GATES_PASS",
+    "before_valid_access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 0
+    },
+    "final_access": {
+      "heldout": 0,
+      "owners": 0,
+      "train": 1,
+      "valid": 1
+    },
+    "scientific_execution": false,
+    "opened_saved_development_summary_after_completion": true,
+    "independent_analysis_complete": false,
+    "result_external_review_complete": false,
+    "partial_result_return": [
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job.wrapper.txt",
+        "bytes": 64,
+        "sha256": "2dc78734b6cf5b72373c80df3b867544a1143892ca90a63f8f628c3de421a7f9"
+      },
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job/access.json",
+        "bytes": 45,
+        "sha256": "1b5641137802422d018defe13fd82fa4c68d56ea5187b95ac2ee84ca51f1401f"
+      },
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job/before_valid.json",
+        "bytes": 6526,
+        "sha256": "cd7a557977a61bfcc389573f9df54b295903f33e04b37ba3230cb95e0df4da08"
+      },
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job/completion.json",
+        "bytes": 6873,
+        "sha256": "e1e1e47373daee478fd718bc26281e163abec82a366276a554ebe7763945e906"
+      },
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job/evaluation/evaluation.json",
+        "bytes": 222609,
+        "sha256": "4a90db40ca0db647f007e3f376264dff84e7357007bff85198f437a80192db5a"
+      },
+      {
+        "path": "reports/seller_alias_continual/20261016/h_consistency_result/job/run/manifest.json",
+        "bytes": 110333,
+        "sha256": "5e285ba0346c5dfe04712c9b4202283917d83e6301f89a99ba4aefccb2ff9520"
+      }
+    ]
   }
 }
