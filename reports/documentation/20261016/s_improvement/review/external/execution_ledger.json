@@ -1,0 +1,87 @@
+{
+  "scope": "本轮独立静态审查；下列为实际科研/核验执行，不是所有文本检索与文档写入工具调用的原始逐字会话日志。",
+  "no_delegation": true,
+  "project_server_connections": 0,
+  "project_module_imports": 0,
+  "project_optimizer_calls": 0,
+  "formal_data_or_label_reads": 0,
+  "model_or_memory_loads": 0,
+  "new_formal_comparison_statistics": 0,
+  "events": [
+    {
+      "id": "I1",
+      "action": "files.search scoped to the uploaded ZIP",
+      "result": "empty result; ZIP had no usable parsed search text",
+      "interpretation": "不能推断材料不存在；改读自动挂载原ZIP",
+      "scientific_failure": false
+    },
+    {
+      "id": "I2",
+      "action": "python /mnt/data/s_pos_static_review/scripts/verify_input.py",
+      "result": "exit0; expected 152565 bytes/22 members/SHA and all21 payloads match",
+      "logs": [
+        "logs/verify_input.stdout.txt",
+        "logs/verify_input.stderr.txt"
+      ],
+      "independent_timing": null,
+      "timing_note": "没有保存独立可靠计时，不补造数值"
+    },
+    {
+      "id": "R1",
+      "action": "Readonly file inspection and five author arXiv HTML method checks",
+      "result": "scope recorded in reading_scope and external_sources",
+      "scientific_code_executed": false,
+      "note": "长输出截断后补读，不把未显示内容计入正文审读"
+    },
+    {
+      "id": "M0",
+      "action": "Construct explicit handwritten score JSON and save program/input SHA before running",
+      "result": "checks/handwritten_pre_execution_identity.json",
+      "note": "8 K2 plus4 K3, six explicit scalar cases; no random seed/sample generator/formal labels"
+    },
+    {
+      "id": "M1",
+      "action": "Handwritten NumPy algebra script",
+      "execution": {
+        "command": [
+          "python",
+          "/mnt/data/s_pos_static_review/scripts/handwritten_math.py"
+        ],
+        "exit_code": 0,
+        "outer_elapsed_seconds": 1.114774987999965,
+        "timeout_seconds": 40,
+        "environment_overrides": {
+          "CUDA_VISIBLE_DEVICES": "",
+          "OPENBLAS_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "scope": "Reviewer handwritten algebra; no project execution; no project budget consumption"
+      },
+      "logs": [
+        "logs/handwritten_math.stdout.txt",
+        "logs/handwritten_math.stderr.txt"
+      ],
+      "result": "PASS_HANDWRITTEN_ALGEBRA_ONLY",
+      "actual_attempts": 1,
+      "repairs": 0,
+      "retries": 0,
+      "expected_negative_control_expressions": 4,
+      "negative_controls_are_training_failures": false
+    },
+    {
+      "id": "D1",
+      "action": "Write Chinese report, findings, reading/source scope and package metadata",
+      "result": "document/file operations; no project scientific execution",
+      "independent_timing": null
+    }
+  ],
+  "failures": {
+    "project_failures": [],
+    "reviewer_numerical_execution_failures": [],
+    "retrieval_limitations": [
+      "Files search returned no ZIP text; some long terminal display outputs were truncated and relevant missing ranges were reread."
+    ]
+  },
+  "budget_statement": "本次网页隔离手写核验不冒充项目Linux资格或改变历史项目预算；提案新预算仍待批准。"
+}

@@ -1,0 +1,147 @@
+{
+  "verdict": "有限支持准备单S_pos合同；不默认推荐双臂；所有新执行仍未授权；不认定性能或创新。",
+  "scope_change_requires_user_decision": true,
+  "new_production_implementation_reviewed": false,
+  "findings": [
+    {
+      "id": "F01",
+      "finding": "新rank直接对应RINCE式(2)，旧rank对应合法SupCon式结构。",
+      "classification": "科学主张限制",
+      "disposition": "保留已知适配定位；原创损失、旧实现bug之说不成立。",
+      "evidence": [
+        "proposal.zh.txt:19–27,79–87",
+        "external_sources.zh.md:W1/W2"
+      ]
+    },
+    {
+      "id": "F02",
+      "finding": "S/H的hard已经逐正例比较自己的top5负例。",
+      "classification": "必要科学解释修订",
+      "disposition": "写明不是首次补全困难正例监督；不削弱S。",
+      "evidence": [
+        "context/scripts/step28_alias_ranking.py:89–129",
+        "proposal.zh.txt:15–16,32"
+      ]
+    },
+    {
+      "id": "F03",
+      "finding": "双正例负梯度增大，弱正例吸引可减小；变化非纯“取消竞争”。",
+      "classification": "已证静态事实/必要解释",
+      "disposition": "补充第5节推导与反例；不据此新增调权重消融。",
+      "evidence": [
+        "proposal.zh.txt:24–29",
+        "checks/handwritten_results.json#/queries/1",
+        "review.zh.md:第5.2节"
+      ]
+    },
+    {
+      "id": "F04",
+      "finding": "log(m)是无界分数条件下的下确界；FP32不保证严格符号/逐位等价。",
+      "classification": "数学措辞与资格条件修订",
+      "disposition": "修第27行，冻结dtype和合理容差，不要求极端浮点梯度全非零。",
+      "evidence": [
+        "proposal.zh.txt:27,45–48",
+        "review.zh.md:第5.1及5.3节"
+      ]
+    },
+    {
+      "id": "F05",
+      "finding": "主问题只需S_pos；H_pos为合理但非必要的次级问题。",
+      "classification": "研究范围选择",
+      "disposition": "建议单臂；改变原双臂范围需用户决定，不能擅自执行。",
+      "evidence": [
+        "proposal.zh.txt:5–7,38,52–55,61",
+        "review.zh.md:第6节"
+      ]
+    },
+    {
+      "id": "F06",
+      "finding": "objective_fn→proxy→head→encoder→更新入口实际存在。",
+      "classification": "静态可行/未实现",
+      "disposition": "不把源码可注入视为新臂已接线；后续只补受影响实现。",
+      "evidence": [
+        "context/scripts/step28_record_replay.py:159–208",
+        "context/scripts/step28_g_half.py:95–108"
+      ]
+    },
+    {
+      "id": "F07",
+      "finding": "每臂六调用尚无精确状态表；总更新差可能只来自current。",
+      "classification": "实施合同待定事项",
+      "disposition": "冻结状态、分支、精度、恢复及逐分支证据；不加假total≠门。",
+      "evidence": [
+        "proposal.zh.txt:44–49",
+        "context/docs/SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md:3–32"
+      ]
+    },
+    {
+      "id": "F08",
+      "finding": "52份旧对照原件和其清单不在本静态ZIP。",
+      "classification": "继承/复现证据边界",
+      "disposition": "本轮不称重新验证；获准依赖比较前按原身份核实，无须重训/载模。",
+      "evidence": [
+        "context/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md:71–86",
+        "originals/review.zh(7).md:46–54",
+        "input/input_manifest.json"
+      ]
+    },
+    {
+      "id": "F09",
+      "finding": "第54行“每臂24诊断”与第38行每臂12不一致。",
+      "classification": "文档数量歧义",
+      "disposition": "实施前明确每臂12、双臂24；9判读/臂与capture数分开。",
+      "evidence": [
+        "proposal.zh.txt:38,54,56"
+      ]
+    },
+    {
+      "id": "F10",
+      "finding": "三种权限、共享解析和C合表筛选需逐层明确。",
+      "classification": "必要权限表述",
+      "disposition": "禁止用parse次数代替可见/选择；C零不冒称字节I/O零；分组另写授权。",
+      "evidence": [
+        "proposal.zh.txt:54–60",
+        "context/docs/RESEARCH_DISCIPLINE.zh.md:67–79",
+        "context/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md:133–145"
+      ]
+    },
+    {
+      "id": "F11",
+      "finding": "59,100秒加总正确；新作用/资源/16GiB峰值未实测。",
+      "classification": "待批准预算与资格",
+      "disposition": "原生实测后投影；不继承旧余额、不漏第一臂保留产物。",
+      "evidence": [
+        "proposal.zh.txt:61–64"
+      ]
+    },
+    {
+      "id": "F12",
+      "finding": "主门及固定群配对可保留；反复valid与未来seed限制仍在。",
+      "classification": "统计解释/停止边界",
+      "disposition": "全量报告代价与失败，不事后换门；未来seed不是独立数据确认。",
+      "evidence": [
+        "proposal.zh.txt:52–57,67–69"
+      ]
+    },
+    {
+      "id": "F13",
+      "finding": "两臂自己的A模型/出生表改变；分组和H_pos−S_pos不证明机制交互。",
+      "classification": "科学归因限制",
+      "disposition": "只称完整策略效应；不声称孤立B保持、H协同或瓶颈已定位。",
+      "evidence": [
+        "proposal.zh.txt:28–29,34–38,52,57",
+        "originals/primary_disposition.zh.txt:44–55"
+      ]
+    },
+    {
+      "id": "F14",
+      "finding": "H_cons关闭、权重删除与当前静态许可是不同事实。",
+      "classification": "时间/范围继承",
+      "disposition": "不重开旧审查、不用旧权重/Memory；删除现场未独立验证须明示。",
+      "evidence": [
+        "request_context.zh.txt",
+        "originals/primary_disposition.zh.txt:58–60"
+      ]
+    }
+  ]
+}

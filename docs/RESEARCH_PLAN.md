@@ -10,7 +10,7 @@
 
 完整S/G/F及H=G_half均已结束，结果外审和独立主审已关闭，具体证据见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)与交接历史。F未建立主要收益，G/H旧A的局部正向证据不构成双域胜S；H原双域目标false保留。本轮只新增H_cons并复用合同指定的S/H保存对照，不重训旧臂、不转用旧预算，也不将实现修复或资格通过写成性能提升。
 
-用户本轮另要求仔细研究超过S的方案。已形成[逐正例排序有限开发提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)及可审查的具体静态包：优先S_pos、固定H_pos结构对照，不增加JS、教师或参数网格；该目标已有直接文献先例，现有局部梯度推导不证明正式瓶颈。用户现已批准具体静态包及必要背景外发，19:36:28经本地Playwright单次提交GPT 6 Pro，见[提交回执](../reports/documentation/20261016/s_improvement/review/submission.json)；等待同会话完整回收及独立主审。实施合同与Linux计算仍须按具体范围批准；不启动训练、不复活旧C或S_strong。
+用户本轮另要求仔细研究超过S的方案。已形成[逐正例排序有限开发提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)及可审查的具体静态包：优先S_pos、固定H_pos结构对照，不增加JS、教师或参数网格；该目标已有直接文献先例，现有局部梯度推导不证明正式瓶颈。用户现已批准具体静态包及必要背景外发，19:36:28经本地Playwright单次提交GPT 6 Pro，见[提交回执](../reports/documentation/20261016/s_improvement/review/submission.json)；完整回收及[独立主审](../reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt)现已完成，建议只做S_pos；H_pos信息价值与额外轨迹成本已说明。[具体实现/CPU范围](../reports/documentation/20261016/s_improvement/implementation_scope.zh.txt)待用户确认单/双臂后开始；GPU与正式合同另按范围批准，不复活旧C或S_strong。
 
 ## 已完成路线与后续研究边界
 
