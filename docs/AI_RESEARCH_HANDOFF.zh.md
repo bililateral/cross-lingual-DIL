@@ -1,5 +1,7 @@
 # 当前科研交接
 
+Git交付授权（2026-10-16）：用户最新明确要求“本地Git都提交到远端”，据此将截至6b5174d5的34个未推送提交及本次授权记录一并推送到origin既有科研分支method/step27-english-pretrained-synthetic-adaptation。下文这批材料此前的“仅本地Git／无公开push许可”按历史时点解释，不再阻断本次交付；不合并main、不改写历史，不扩大科研执行或未来新材料的外发范围。完成以实际远端ref与本地HEAD一致为准。
+
 本页顶部表格是唯一当前工作入口；按[AGENTS.md](../AGENTS.md)补读相关合同及证据。完整S/G/F于2026年10月15日13:16:15—18:40:15正常完成，实际5小时24分钟、剩余0；1728更新/2592梯度群、6端点/36诊断和两种恢复齐全。统一盲门先过，本作业train1/valid1/heldout0/owners0；旧失败加后累计train2/valid1，正式累计37867.714713/97200秒，失败账不清零。347份结果/来源及7份独立分析文件已回传核验，1980行统计及诊断独立复核最大差5.55e-16。F−S两域MAP、F−G两域均跨零；G−S旧域A有边界很窄的条件正向区间，新域未确定且点估计下降，初始获得/遗忘/概率代价分开，不能宣布全面胜出。F在B第248步实际终端接受3块，Q/gap原限保持。结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261015/balanced_pooling_result/review/primary_disposition.zh.txt)关闭，无新增已证实科学阻断。18行Brier/log-loss遗忘方向存在非阻断语义缺陷，已以[逐行补正](../reports/seller_alias_continual/20261015/balanced_pooling_result/review/loss_forgetting_direction.csv)关闭解释缺口，区间仍全部跨零，MAP及原结果不改；未来复用导出须落实逐指标方向。用户随后明确要求删除本次权重，20:24已留证删除新六权重7826218590字节；六Memory及349份非权重证据不变，见[删除回执](../reports/maintenance/20261015/balanced_result_weights/receipt.json)。旧五失败权重亦已按下述授权删除。该旧S/G/F路线不开新训练或监听；后续G_half按下方新合同授权另行执行。新材料仅本地Git，无公开push许可。
 
 旧失败作业保管更新（10月15日13:47）：按用户本次明确要求，20261014_143200的五份旧权重已留证删除，共6,521,848,505字节（约6.07GiB）；207份其余证据／五Memory不变，当前训练不依赖它们且三进程身份未变。详见[存储记录](STORAGE.zh.md#2026-10-15-失败sgf旧权重清理)及[删除回执](../reports/maintenance/20261015/balanced_pooling_weights/receipt.json)。旧冻结报告中的留存状态不追改。
