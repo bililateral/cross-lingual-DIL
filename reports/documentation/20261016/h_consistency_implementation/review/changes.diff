@@ -1,0 +1,1806 @@
+diff --git a/scripts/step28_g_half.py b/scripts/step28_g_half.py
+index 718902b5..9fd0744d 100644
+--- a/scripts/step28_g_half.py
++++ b/scripts/step28_g_half.py
+@@ -32,6 +32,10 @@ def bind(model, metadata: dict) -> str:
+     return "G_half"
+ 
+ 
++def metadata(arm: str = "G_half") -> dict:
++    return {"pooling": identity(arm)}
++
++
+ def block_scores(blocks, arm: str = "G_half", stats: dict | None = None):
+     identity(arm)
+     if (blocks.ndim != 3 or not 2 <= blocks.shape[1] <= 8 or not 2 <= blocks.shape[2] <= 8
+diff --git a/scripts/step28_g_half_run.py b/scripts/step28_g_half_run.py
+index bd120924..851f30f9 100644
+--- a/scripts/step28_g_half_run.py
++++ b/scripts/step28_g_half_run.py
+@@ -11,6 +11,7 @@ from pathlib import Path
+ import random
+ import shutil
+ import signal
++import sys
+ import threading
+ import time
+ import traceback
+@@ -115,6 +116,33 @@ def baseline_inputs():
+     return manifest, root, col, old
+ 
+ 
++DIRECT_COMPARISON_KEY = "direct_G_new_B_positive"
++COMPLETION_STATUS = "COMPLETE_G_HALF_FIXED_AB"
++CPU_TESTS = ("test_local_value_derivative_precision_and_rejections", "test_full_objective_top5_teacher_and_proxy_gradient",
++             "test_real_vjp_encoder_head_gradients_and_updates", "test_actual_capture_restore_and_next_update",
++             "test_single_candidate_orchestration_and_blind_gate", "test_saved_comparisons_directions_permissions_and_budgets")
++
++
++def baseline_runs():
++    baseline, root, col, manifest = baseline_inputs()
++    return {arm: (root, col, manifest) for arm in ("S", "G")}
++
++
++def loss_total(row, stage, arm):
++    total = row["current"]["supervised"]
++    if stage == 2:
++        total += .1*row["history"]["supervised"]+.5*row["history"]["mse0"]
++    return total
++
++
++def validate_diagnostic(d, arm):
++    return None
++
++
++def validate_native(native):
++    return None
++
++
+ def trajectory(log):
+     return (log["current_ids"], log["history_ids"],
+             [[r["current"]["assignment_sha256"]]+([r["history"]["assignment_sha256"]] if r["history_uid"] else []) for r in log["rows"]])
+@@ -146,24 +174,25 @@ def projection(m: dict) -> dict:
+                 within_budget=seconds <= 28800 and size <= 10*2**30)
+ 
+ 
+-def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget):
++def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     if parent.adam_step(optimizer) != (stage-1)*288:
+         raise ValueError("Stage continuity differs")
+     if memory is not None:
+         memory.begin_stage(stage)
+     before = None if memory is None else memory.summary()
+-    schedule, _ = parent.schedule(current, parent.contract(), method.RNG_ORDER, stage)
++    schedule, _ = parent.schedule(current, parent.contract(), entry.method.RNG_ORDER, stage)
+     name = "AB"[stage-1]+"_"+arm
+     budget.phase = name
+     rows, captures = [], []
+     for step, group in enumerate(schedule, 1):
+         history, target = (None, None) if memory is None else memory.draw()
+-        row = method.update(model, optimizer, group, history, target, c, arm, stage, step, budget.check)
++        row = entry.method.update(model, optimizer, group, history, target, c, arm, stage, step, budget.check)
+         if parent.adam_step(optimizer) != (stage-1)*288+step:
+             raise ValueError("Actual optimizer call missing")
+         rows.append({**row, "step": step, "current_uid": group.uid, "history_uid": history.uid if history else None})
+         if step % 48 == 0:
+-            captures.append(method.capture(model, optimizer, current, memory, valid, c, arm,
++            captures.append(entry.method.capture(model, optimizer, current, memory, valid, c, arm,
+                 stage, step//48, root/"diagnostics", name, budget.check))
+         if step == 1 or step % 24 == 0:
+             print(data.json_bytes({"event": "updates", "point": name, "completed": step, **budget.snapshot()}).decode(), flush=True)
+@@ -177,11 +206,12 @@ def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, b
+     return data.record(path, root), captures
+ 
+ 
+-def memory_from(payload: bytes, arm: str):
+-    if arm not in method.ARMS:
++def memory_from(payload: bytes, arm: str, *, entry=None):
++    entry = entry or sys.modules[__name__]
++    if arm not in entry.method.ARMS:
+         raise ValueError("Unknown arm Memory")
+     memory = record.Memory.from_bytes(payload)
+-    if memory.maps.get("pooling") != method.identity(arm):
++    if any(memory.maps.get(k) != v for k, v in entry.method.metadata(arm).items()):
+         raise ValueError("Memory candidate identity differs")
+     return memory
+ 
+@@ -192,9 +222,10 @@ def continuity(model, optimizer, memory):
+             "memory_sha256": hashlib.sha256(memory.to_bytes()).hexdigest()}
+ 
+ 
+-def restore_point(path, expected, model, optimizer, arm):
++def restore_point(path, expected, model, optimizer, arm, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     meta = core.restore_state(path, model, optimizer, expected["state_sha256"])
+-    if method.bind(model, meta) != arm:
++    if entry.method.bind(model, meta) != arm:
+         raise ValueError("Restored arm differs")
+     for m, mode in zip(model.modules(), meta["modes"], strict=True):
+         m.training = mode
+@@ -202,7 +233,8 @@ def restore_point(path, expected, model, optimizer, arm):
+     return meta
+ 
+ 
+-def checkpoint(root, name, model, optimizer, memory, current, calibration, valid, c, arm, stage, budget):
++def checkpoint(root, name, model, optimizer, memory, current, calibration, valid, c, arm, stage, budget, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     if len(calibration) != 12 or len(valid) != 40 or parent.adam_step(optimizer) != 288*stage:
+         raise ValueError("Endpoint scope differs")
+     optimizer.zero_grad(set_to_none=True)
+@@ -210,45 +242,45 @@ def checkpoint(root, name, model, optimizer, memory, current, calibration, valid
+          "pooling_context": {"stage": stage, "step": 288, "role": "endpoint_prediction_or_restore"}}
+     state, modes = diag.rng_state(), [m.training for m in model.modules()]
+     with diag.neutral(model):
+-        scores = {"calibration": method.score(model, calibration, c, arm, budget.check),
+-                  "raw": method.score(model, valid, c, arm, budget.check)}
++        scores = {"calibration": entry.method.score(model, calibration, c, arm, budget.check),
++                  "raw": entry.method.score(model, valid, c, arm, budget.check)}
+         mapping = parent.calibration.fit(scores["calibration"], np.asarray([g.labels for g in calibration], np.uint8),
+                                          role="calibration", check=budget.check)
+         if mapping["status"] != "PASS_CALIBRATION_FIT":
+             raise ValueError("Calibration failed; no retry")
+         current_map = dict(zip(("a", "b"), parent.calibration.parameters(mapping)))
+         if memory is None:
+-            memory = record.Memory(method.RNG_ORDER)
++            memory = record.Memory(entry.method.RNG_ORDER)
+         first_map = memory.maps.get("first", current_map)
+         memory.maps = {"first": first_map, "stage": current_map, "rng": state,
+-                       "completed_stage": stage, "adam_step": stage*288, "pooling": method.identity(arm)}
++                       "completed_stage": stage, "adam_step": stage*288, **entry.method.metadata(arm)}
+         if stage == 1:
+             memory.retain(current, 1, lambda g: record.reference(model, g, c, budget.check))
+     mp = root/"memory"/(name+".bin")
+     mp.write_bytes(memory.to_bytes())
+-    memory = memory_from(mp.read_bytes(), arm)
+-    meta = {"name": name, "rng": state, "modes": modes, "pooling": method.identity(arm),
++    memory = entry.memory_from(mp.read_bytes(), arm)
++    meta = {"name": name, "rng": state, "modes": modes, **entry.method.metadata(arm),
+             "members": [g.uid for g in memory.reservoir.groups], "maps": memory.maps,
+-            "memory": data.record(mp, root), "policy_sha256": data.sha256(POLICY)}
++            "memory": data.record(mp, root), "policy_sha256": data.sha256(entry.POLICY)}
+     full_path = root/"work"/(name+".pt")
+     budget.check(base.persistence.checkpoint_reserve(model, optimizer))
+     full = core.save_state(full_path, model, optimizer, meta)
+-    if restore_point(full_path, full, model, optimizer, arm) != meta:
++    if entry.restore_point(full_path, full, model, optimizer, arm) != meta:
+         raise ValueError("Full model/Adam restore mismatch")
+     with diag.neutral(model):
+         for role, groups in (("calibration", calibration), ("raw", valid)):
+-            restored = method.restored_score(model, groups, c, budget.check)
++            restored = entry.method.restored_score(model, groups, c, budget.check)
+             if not np.array_equal(scores[role], restored):
+                 raise ValueError("Full restored scoring differs")
+             scores["full-"+role] = restored
+     model_path = root/"models"/(name+".pt")
+     budget.check(base.persistence.checkpoint_reserve(model, None))
+     inference = core.save_state(model_path, model, None, meta)
+-    if restore_point(model_path, inference, model, None, arm) != meta:
++    if entry.restore_point(model_path, inference, model, None, arm) != meta:
+         raise ValueError("Inference restore mismatch")
+     with diag.neutral(model):
+         for role, groups in (("calibration", calibration), ("raw", valid)):
+-            restored = method.restored_score(model, groups, c, budget.check)
++            restored = entry.method.restored_score(model, groups, c, budget.check)
+             if not np.array_equal(scores[role], restored):
+                 raise ValueError("Inference restored scoring differs")
+             scores["inference-"+role] = restored
+@@ -258,7 +290,7 @@ def checkpoint(root, name, model, optimizer, memory, current, calibration, valid
+     map_path = root/"maps"/(name+".json")
+     data.write_json(map_path, mapping)
+     result = {"arm": arm, "stage": stage, "adam_step": parent.adam_step(optimizer),
+-        "full_restore_verified": True, "inference_restore_verified": True, "pooling": method.identity(arm),
++        "full_restore_verified": True, "inference_restore_verified": True, **entry.method.metadata(arm),
+         "calibration_ids": [g.uid for g in calibration], "maps": {"first": first_map, "stage": current_map},
+         "mapping": data.record(map_path, root), "memory": data.record(mp, root), "memory_summary": memory.summary(),
+         "continuity": continuity(model, optimizer, memory), 
+@@ -270,37 +302,38 @@ def checkpoint(root, name, model, optimizer, memory, current, calibration, valid
+     return result, memory
+ 
+ 
+-def train(job, budget):
++def train(job, budget, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     import torch
+     root = job/"run"
+     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics", "sources"):
+         (root/sub).mkdir(parents=True)
+-    c = config()
+-    baseline, old_root, old_col, old_manifest = baseline_inputs()
+-    archive = pretrained_archive(c)
+-    groups, metadata, checked = public_inputs(c)
++    c = entry.config()
++    baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
++    archive = entry.pretrained_archive(c)
++    groups, metadata, checked = entry.public_inputs(c)
+     if checked != old_manifest["public_inputs"]:
+         raise ValueError("Formal input bytes differ from frozen S/G")
+-    _, split = partition(groups, metadata, c)
++    _, split = entry.partition(groups, metadata, c)
+     if split != data.read_json(old_root/"run/partition.json"):
+         raise ValueError("H partition differs from frozen S/G")
+     data.write_json(root/"partition.json", split)
+-    manifest = {"status": "RUNNING", "source_files": sources(), "public_inputs": checked, "pretrained_archive": archive,
++    manifest = {"status": "RUNNING", "source_files": entry.sources(), "public_inputs": checked, "pretrained_archive": archive,
+         "partition": data.record(root/"partition.json", root), "points": {}, "training": {}, "diagnostics": {},
+-        "baseline_identity": data.record(BASELINE, data.ROOT), "initials": {}, "starts": {}, "physical_updates": 0, "gradient_group_presentations": 0}
++        "baseline_identity": data.record(entry.BASELINE, data.ROOT), "initials": {}, "starts": {}, "physical_updates": 0, "gradient_group_presentations": 0}
+     data.write_json(root/"startup.json", manifest)
+     groups["train"] = previous.parse_once(job, groups["train"], c, "train",
+-        loader=lambda gs, cfg, s: attach_labels(gs, cfg, s, metadata))
+-    selected, after = partition(groups, metadata, c)
++        loader=lambda gs, cfg, s: entry.attach_labels(gs, cfg, s, metadata))
++    selected, after = entry.partition(groups, metadata, c)
+     if after != split:
+         raise ValueError("Labels changed partition")
+     def domain(role, d):
+         return [g for g,r in zip(selected[role], split[role], strict=True) if r["domain"] == d]
+     valid = groups["development"]
+-    for arm in method.ARMS:
++    for arm in entry.method.ARMS:
+         c["pooling_stats"] = {}
+-        model, optimizer, initial = fresh(c)
+-        method.bind(model, {"pooling": method.identity(arm)})
++        model, optimizer, initial = entry.fresh(c)
++        entry.method.bind(model, entry.method.metadata(arm))
+         manifest["initials"][arm] = initial
+         if initial != baseline["initial_identity"] or parent.adam_step(optimizer) != 0:
+             raise ValueError("Independent identical untrained starts required")
+@@ -312,8 +345,8 @@ def train(job, budget):
+                 if manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]:
+                     raise ValueError("B did not continue its own restored A state")
+             current = domain("fit", d)
+-            log, captures = train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget)
+-            endpoint, memory = checkpoint(root, name, model, optimizer, memory, current if stage==1 else None,
++            log, captures = entry.train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget)
++            endpoint, memory = entry.checkpoint(root, name, model, optimizer, memory, current if stage==1 else None,
+                 domain("calibration", d), valid, c, arm, stage, budget)
+             manifest["training"][name], manifest["diagnostics"][name], manifest["points"][name] = log, captures, endpoint
+             manifest["physical_updates"] += 288
+@@ -323,7 +356,7 @@ def train(job, budget):
+         gc.collect()
+         if torch.cuda.is_initialized():
+             torch.cuda.empty_cache()
+-    manifest["status"] = COMPLETE
++    manifest["status"] = entry.COMPLETE
+     data.write_json(root/"manifest.json", manifest)
+     for source in manifest["source_files"]:
+         destination = root/"sources"/source["path"]
+@@ -332,14 +365,15 @@ def train(job, budget):
+     return manifest, split, valid, metadata
+ 
+ 
+-def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+-    if (manifest["status"] != COMPLETE or manifest["source_files"] != sources()
++def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
++    entry = entry or sys.modules[__name__]
++    if (manifest["status"] != entry.COMPLETE or manifest["source_files"] != entry.sources()
+             or manifest["physical_updates"] != 576 or manifest["gradient_group_presentations"] != 864
+-            or any(set(manifest[k]) != set(POINTS) for k in ("points", "training", "diagnostics"))
+-            or any(set(manifest[k]) != set(method.ARMS) for k in ("starts", "initials"))):
++            or any(set(manifest[k]) != set(entry.POINTS) for k in ("points", "training", "diagnostics"))
++            or any(set(manifest[k]) != set(entry.method.ARMS) for k in ("starts", "initials"))):
+         raise ValueError("Incomplete source-bound blind experiment")
+-    baseline, old_root, old_col, old_manifest = baseline_inputs()
+-    if manifest.get("baseline_identity") != data.record(BASELINE, data.ROOT):
++    baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
++    if manifest.get("baseline_identity") != data.record(entry.BASELINE, data.ROOT):
+         raise ValueError("Baseline provenance missing")
+     split = data.read_json(data.verify(root/manifest["partition"]["path"], manifest["partition"]))
+     if split != data.read_json(old_root/"run/partition.json"):
+@@ -351,7 +385,7 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+     canonical = sorted(u for u, domain in fit.items() if domain == "A")
+     if len(canonical) != 48:
+         raise ValueError("Shared A fit scope differs")
+-    a_point = manifest["points"]["A_G_half"]
++    a_point = manifest["points"]["A_"+entry.method.ARMS[0]]
+     shared = record.Memory.from_bytes(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes())
+     members = shared.summary()["members"]
+     rng = random.Random(data.seed_for(20260930, "ABC", "retention"))
+@@ -365,18 +399,18 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+                 retained[k] = uid
+     if retained != members:
+         raise ValueError("Independent Algorithm R differs")
+-    for arm in method.ARMS:
++    for arm in entry.method.ARMS:
+         if (manifest["initials"][arm] != baseline["initial_identity"]
+                 or manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]):
+             raise ValueError("Independent starts/own A continuation missing")
+     scores, sequences = {}, {1: [], 2: []}
+-    for name in POINTS:
++    for name in entry.POINTS:
+         point = manifest["points"][name]
+         arm, stage = name[2:], "AB".index(name[0])+1
+         a_point = manifest["points"]["A_"+arm]
+         if (point["arm"] != arm or point["stage"] != stage or point["adam_step"] != stage*288
+                 or point["full_restore_verified"] is not True or point["inference_restore_verified"] is not True
+-                or point["pooling"] != method.identity(arm)):
++                or any(point.get(k) != v for k, v in entry.method.metadata(arm).items())):
+             raise ValueError("Endpoint restoration missing")
+         logrec = manifest["training"][name]
+         log = data.read_json(data.verify(root/logrec["path"], logrec))
+@@ -385,13 +419,13 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+         expected = data.schedule([type("ID", (), {"uid": u})() for u in expected_fit], 6, stream)
+         if log["updates"] != 288 or len(log["rows"]) != 288 or log["adam_step"] != stage*288 or log["current_ids"] != [g.uid for g in expected]:
+             raise ValueError("Main schedule/update count differs")
+-        memory = memory_from(data.verify(root/point["memory"]["path"], point["memory"]).read_bytes(), arm)
++        memory = entry.memory_from(data.verify(root/point["memory"]["path"], point["memory"]).read_bytes(), arm)
+         if (memory.summary() != point["memory_summary"] or memory.reservoir.seen != 48 or memory.summary()["members"] != members
+-                or memory.maps["pooling"] != method.identity(arm)
++                or memory.maps["pooling"] != entry.method.identity(arm)
+                 or point["continuity"]["memory_sha256"] != memory.summary()["sha256"]):
+             raise ValueError("Terminal memory unexpectedly retained B")
+         if stage == 2:
+-            prior = memory_from(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes(), arm)
++            prior = entry.memory_from(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes(), arm)
+             prior.begin_stage(2)
+             if prior.summary() != log["memory_before"]:
+                 raise ValueError("Wrong own A Memory")
+@@ -404,11 +438,10 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+             raise ValueError("Shared A used history")
+         assignments = []
+         for step, row in enumerate(log["rows"], 1):
+-            total = row["current"]["supervised"]
++            total = entry.loss_total(row, stage, arm)
+             hashes = [row["current"]["assignment_sha256"]]
+             if stage == 2:
+                 h = row["history"]
+-                total += .1*h["supervised"]+.5*h["mse0"]
+                 group = next(g for g in memory.reservoir.groups if g.uid == row["history_uid"])
+                 key = data.seed_for(20260918, "ABC", stage, step, "history", group.uid, "regroup")
+                 if h["assignment_sha256"] != hashlib.sha256(record.assignment(group, key).tobytes()).hexdigest():
+@@ -416,7 +449,7 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+                 hashes.append(h["assignment_sha256"])
+             assignments.append(hashes)
+             if (row["step"] != step or row["encoder_lr"] != parent.stage_lr(step) or row["head_lr"] != .001
+-                    or row["pooling"] != method.identity(arm)
++                    or row["pooling"] != entry.method.identity(arm)
+                     or not np.isfinite(row["total"]) or not np.isclose(row["total"], total, rtol=2e-6, atol=2e-6)):
+                 raise ValueError("Actual loss/LR decomposition differs")
+         sequences[stage].append((log["current_ids"], log["history_ids"], assignments))
+@@ -442,6 +475,7 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+         for epoch, rec in enumerate(captures, 1):
+             droot = root/"diagnostics"
+             d = data.read_json(data.verify(droot/rec["path"], rec))
++            entry.validate_diagnostic(d, arm)
+             cache_ids = [] if stage == 1 else members
+             if (d["epoch"] != epoch or d["adam_step"] != (stage-1)*288+epoch*48 or d["stage_step"] != epoch*48
+                     or d["stage"] != stage or d["arm"] != arm or d["order"] != "ABC" or d["valid_labels_used"] is not False
+@@ -461,7 +495,7 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+                     raise ValueError("Nonfinite history diagnostic")
+         scores[name] = roles
+     for stage, sequences_here in sequences.items():
+-        for other in ("S", "G"):
++        for other, (old_root, _, _) in entry.baseline_runs().items():
+             name = "AB"[stage-1]+"_"+other
+             old_log = data.read_json(old_root/"run/updates"/(name+".json"))
+             if sequences_here != [trajectory(old_log)]:
+@@ -469,22 +503,24 @@ def blind_gate(root: Path, manifest: dict) -> tuple[dict, dict]:
+     return scores, split
+ 
+ 
+-def open_valid(job, manifest, groups, metadata, c):
++def open_valid(job, manifest, groups, metadata, c, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     if data.read_json(job/"access.json") != dict(train=1, valid=0, heldout=0, owners=0):
+         raise ValueError("Single new train attempt and blind valid ledger required")
+-    scores, split = blind_gate(job/"run", manifest)
+-    data.write_json(job/"before_valid.json", {"status": "ALL_BLIND_GATES_PASS", "source_files": sources(),
++    scores, split = entry.blind_gate(job/"run", manifest)
++    data.write_json(job/"before_valid.json", {"status": "ALL_BLIND_GATES_PASS", "source_files": entry.sources(),
+         "manifest": data.record(job/"run/manifest.json", job), "access": data.read_json(job/"access.json")})
+-    labelled = previous.parse_once(job, groups, c, "development", loader=lambda gs, cfg, s: attach_labels(gs, cfg, s, metadata))
++    labelled = previous.parse_once(job, groups, c, "development", loader=lambda gs, cfg, s: entry.attach_labels(gs, cfg, s, metadata))
+     return scores, split, labelled
+ 
+ 
+-def collect(root, scores, labelled, split):
++def collect(root, scores, labelled, split, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     root.mkdir()
+     if [g.uid for g in labelled] != [r["group_uid"] for r in split["development"]]:
+         raise ValueError("Opened valid alignment differs")
+     truth = np.asarray([g.labels for g in labelled], np.uint8)
+-    result = {"source_files": sources(), "group_ids": [g.uid for g in labelled],
++    result = {"source_files": entry.sources(), "group_ids": [g.uid for g in labelled],
+         "domains": [r["domain"] for r in split["development"]], "columns": list(parent.metrics.COLUMNS), "points": {}}
+     for name, roles in scores.items():
+         result["points"][name] = {}
+@@ -510,21 +546,28 @@ def collect(root, scores, labelled, split):
+     return result
+ 
+ 
+-def finalize(root):
++def finalize(root, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     col = data.read_json(root/"collected.json")
+-    if col["status"] != "ALL_6_H_METRIC_COUNT_SETS_SAVED" or set(col["points"]) != set(POINTS) or col["source_files"] != sources():
++    if col["status"] != "ALL_6_H_METRIC_COUNT_SETS_SAVED" or set(col["points"]) != set(entry.POINTS) or col["source_files"] != entry.sources():
+         raise ValueError("Complete saved collection required")
+-    baseline, old_root, old_col, _ = baseline_inputs()
+-    if col["group_ids"] != old_col["group_ids"] or col["domains"] != old_col["domains"] or col["columns"] != old_col["columns"]:
+-        raise ValueError("New and frozen group correspondence differs")
+-    all_points = {**col["points"], **{name: old_col["points"][name] for name in baseline["points"]}}
++    old_runs = entry.baseline_runs()
++    all_points = dict(col["points"])
++    origins = {name: root for name in entry.POINTS}
++    for arm, (old_root, old_col, _) in old_runs.items():
++        if any(col[k] != old_col[k] for k in ("group_ids", "domains", "columns")):
++            raise ValueError("New and frozen group correspondence differs")
++        for stage in "AB":
++            name = stage+"_"+arm
++            all_points[name] = old_col["points"][name]
++            origins[name] = old_root/"evaluation"
+     rows = [np.flatnonzero(np.asarray(col["domains"]) == d) for d in "AB"]
+     if any(len(r) != 20 for r in rows):
+         raise ValueError("AB bootstrap scope differs")
+     draws = np.random.Generator(np.random.PCG64(20260930)).integers(20, size=(5000, 2, 20))
+     arrays, result = {}, {"absolute": {}, "comparisons": {}, "old_changes": {}, "columns": col["columns"]}
+     for name, roles in all_points.items():
+-        origin = root if name in POINTS else old_root/"evaluation"
++        origin = origins[name]
+         arrays[name], result["absolute"][name] = {}, {}
+         if set(roles) != set(parent.ROLES):
+             raise ValueError("All calibration roles required")
+@@ -549,18 +592,18 @@ def finalize(root):
+                 "fixed_half_classification": {"all": pooled_rates(ct), **{d: pooled_rates(ct[r]) for d, r in zip("AB", rows)}}}
+     signs = np.array([-1. if key in ("brier", "log_loss") else 1. for key in col["columns"]])
+     result["initial_comparisons"], result["forgetting_comparisons"] = {}, {}
+-    for candidate, other in policy()["evaluation"]["comparisons"]:
++    for candidate, other in entry.policy()["evaluation"]["comparisons"]:
+         key = candidate+"-"+other
+         result["comparisons"][key] = {role: summarize(arrays["B_"+candidate][role]-arrays["B_"+other][role], rows, draws) for role in parent.ROLES}
+         result["initial_comparisons"][key] = {role: summarize(arrays["A_"+candidate][role]-arrays["A_"+other][role], rows, draws) for role in parent.ROLES}
+         result["forgetting_comparisons"][key] = {role: summarize(
+             ((arrays["A_"+candidate][role]-arrays["B_"+candidate][role])-(arrays["A_"+other][role]-arrays["B_"+other][role]))*signs, rows, draws)["A"] for role in parent.ROLES}
+-    for arm in ("G_half", "S", "G"):
++    for arm in (*entry.method.ARMS, *old_runs):
+         result["old_changes"][arm] = {role: summarize(arrays["B_"+arm][role]-arrays["A_"+arm][role], rows, draws)["A"] for role in parent.ROLES}
+-    result["success"] = {"criterion": policy()["evaluation"]["success"],
+-        "passed": all(result["comparisons"]["G_half-S"]["raw"][d]["map"]["conditional_95pct_interval"][0] > 0 for d in "AB"),
+-        "direct_G_new_B_positive": result["comparisons"]["G_half-G"]["raw"]["B"]["map"]["conditional_95pct_interval"][0] > 0}
+-    result.update(status="FIXED_AB_STATISTICS_COMPLETE", source_files=sources(), primary_role="raw", primary_metric="map",
++    result["success"] = {"criterion": entry.policy()["evaluation"]["success"],
++        "passed": all(result["comparisons"][entry.method.ARMS[0]+"-S"]["raw"][d]["map"]["conditional_95pct_interval"][0] > 0 for d in "AB"),
++        entry.DIRECT_COMPARISON_KEY: result["comparisons"]["-".join(entry.policy()["evaluation"]["comparisons"][1])]["raw"]["B"]["map"]["conditional_95pct_interval"][0] > 0}
++    result.update(status="FIXED_AB_STATISTICS_COMPLETE", source_files=entry.sources(), primary_role="raw", primary_metric="map",
+         forgetting_sign="High-good: A-B; brier/log_loss: B-A; arm difference candidate-other; old_changes always raw B-A",
+         bootstrap="One PCG64(20260930) (5000,2,20) whole-group array shared by all contrasts and roles",
+         undefined_policy="Null denotes N/A. Any undefined required group operand makes the fixed-group mean/interval N/A; no groups dropped, no per-arm nanmean. Pooled rates use summed counts first.",
+@@ -570,11 +613,12 @@ def finalize(root):
+ 
+ 
+ 
+-def reviewed_gate(path: Path, kind: str) -> dict:
++def reviewed_gate(path: Path, kind: str, *, entry=None) -> dict:
++    entry = entry or sys.modules[__name__]
+     gate = data.read_json(path)
+     if (gate.get("kind") != kind or gate.get("status") != "APPROVED_NO_OPEN_BLOCKERS"
+-            or gate.get("source_files") != sources() or gate.get("pooling") != method.identity()
+-            or gate.get("authorization") != data.record(AUTHORIZATION, data.ROOT)):
++            or gate.get("source_files") != entry.sources() or any(gate.get(k) != v for k, v in entry.method.metadata().items())
++            or gate.get("authorization") != data.record(entry.AUTHORIZATION, data.ROOT)):
+         raise ValueError("Source-bound approved G_half gate required")
+     auth = data.read_json(data.verify(data.ROOT/gate["authorization"]["path"], gate["authorization"]))
+     if auth["status"] != "APPROVED_FULL_CONTRACT_GATED_SEQUENCE":
+@@ -584,36 +628,39 @@ def reviewed_gate(path: Path, kind: str) -> dict:
+         data.verify(data.ROOT/gate[key]["path"], gate[key])
+     cpu = data.read_json(data.ROOT/gate["cpu"]["path"])
+     if (cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("mode") != "cpu"
+-            or cpu.get("source_files") != sources() or cpu.get("cumulative_charged_seconds", float("inf")) > 180
+-            or cpu.get("unresolved_checks") != [] or len(cpu.get("qualified_tests", [])) != 6):
++            or cpu.get("source_files") != entry.sources() or cpu.get("cumulative_charged_seconds", float("inf")) > 180
++            or cpu.get("unresolved_checks") != [] or set(cpu.get("qualified_tests", [])) != set(entry.CPU_TESTS)):
+         raise ValueError("Current CPU increment not qualified")
+     return gate
+ 
+ 
+-def validate_gate(job: Path, path: Path) -> dict:
+-    gate = reviewed_gate(path, "FORMAL")
++def validate_gate(job: Path, path: Path, *, entry=None) -> dict:
++    entry = entry or sys.modules[__name__]
++    gate = entry.reviewed_gate(path, "FORMAL")
+     if (gate.get("job") != job.relative_to(data.ROOT).as_posix()
+-            or gate.get("runtime") != policy()["runtime"] or gate.get("supervision") != policy()["supervision"]):
++            or gate.get("runtime") != entry.policy()["runtime"] or gate.get("supervision") != entry.policy()["supervision"]):
+         raise ValueError("Formal H scope differs")
+     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
+     native = gpu.get("native", {})
+     if (gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("mode") != "gpu"
+-            or gpu.get("source_files") != sources() or gpu.get("cumulative_charged_seconds", float("inf")) > 600
++            or gpu.get("source_files") != entry.sources() or gpu.get("cumulative_charged_seconds", float("inf")) > 600
+             or native.get("actual_updates") != 6 or native.get("maximum_records") != 224
+             or native.get("channel_tokens") != 256 or native.get("both_phases_encoder_head_effect") is not True
+             or native.get("next_update_bitwise_equal") is not True or native.get("H_pooling_restores_verified") is not True
+-            or not projection(native["measurements"])["within_budget"]):
++            or not entry.projection(native["measurements"])["within_budget"]):
+         raise ValueError("Native H effects/restores/projection not qualified")
++    entry.validate_native(native)
+     return gate
+ 
+ 
+-def execute(job, gate_path):
++def execute(job, gate_path, *, entry=None):
++    entry = entry or sys.modules[__name__]
+     import torch
+     from step28_record_replay_verify import preflight
+     started = float(os.environ.get("RECORD_REPLAY_STARTED_EPOCH", "nan"))
+-    if not math.isfinite(started) or not 0 <= time.time()-started < policy()["runtime"]["maximum_gpu_stage_seconds"]:
++    if not math.isfinite(started) or not 0 <= time.time()-started < entry.policy()["runtime"]["maximum_gpu_stage_seconds"]:
+         raise ValueError("Bounded wrapper start required before any formal read")
+-    validate_gate(job, gate_path)
++    entry.validate_gate(job, gate_path)
+     if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
+         raise ValueError("New independent output required")
+     resources = preflight()
+@@ -624,9 +671,9 @@ def execute(job, gate_path):
+     numerics = parent.configure_numerics()
+     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
+     job.mkdir(parents=True)
+-    budget = Budget(job)
++    budget = entry.Budget(job)
+     data.write_json(job/"access.json", dict(train=0, valid=0, heldout=0, owners=0))
+-    data.write_json(job/"execution.json", {"gate": data.record(gate_path, data.ROOT), "sources": sources(), "resources": resources, "numerics": numerics})
++    data.write_json(job/"execution.json", {"gate": data.record(gate_path, data.ROOT), "sources": entry.sources(), "resources": resources, "numerics": numerics})
+     stopped = threading.Event()
+     def watchdog():
+         while not stopped.wait(1):
+@@ -642,15 +689,15 @@ def execute(job, gate_path):
+     watcher.start()
+     try:
+         budget.check()
+-        manifest, split, valid, metadata = train(job, budget)
++        manifest, split, valid, metadata = entry.train(job, budget)
+         budget.check()
+-        scores, split, labelled = open_valid(job, manifest, valid, metadata, config())
++        scores, split, labelled = entry.open_valid(job, manifest, valid, metadata, entry.config())
+         budget.phase = "evaluation"
+-        collect(job/"evaluation", scores, labelled, split)
++        entry.collect(job/"evaluation", scores, labelled, split)
+         diag.evaluate(job/"run/diagnostics", manifest, labelled, split, job/"diagnostics_evaluation", scope="AB")
+-        finalize(job/"evaluation")
++        entry.finalize(job/"evaluation")
+         budget.check()
+-        result = {"status": "COMPLETE_G_HALF_FIXED_AB", "source_files": sources(), "physical_updates": 576,
++        result = {"status": entry.COMPLETION_STATUS, "source_files": entry.sources(), "physical_updates": 576,
+             "gradient_group_presentations": 864, "access": data.read_json(job/"access.json"), "budget": budget.snapshot()}
+         data.write_json(job/"completion.json", result)
+         return result
+diff --git a/scripts/step28_g_half_verify.py b/scripts/step28_g_half_verify.py
+index ed18fd96..c128ff93 100644
+--- a/scripts/step28_g_half_verify.py
++++ b/scripts/step28_g_half_verify.py
+@@ -88,7 +88,10 @@ def native_save(path, model, optimizer, metadata, check):
+     return core.save_state(path, model, optimizer, metadata)
+ 
+ 
+-def native(check, progress, handwritten, out):
++def native(check, progress, handwritten, out, *, entry=None, consistency=False):
++    run = entry or sys.modules["step28_g_half_run"]
++    method = run.method
++    active, control = method.ARMS[0], "H" if consistency else "G"
+     import step28_balanced_pooling as original
+     resources = preflight()
+     if shutil.disk_usage(out).free < 10*2**30:
+@@ -102,17 +105,22 @@ def native(check, progress, handwritten, out):
+         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
+         return value
+     c = run.config()
++    if consistency:
++        c["handwritten_qualification"] = True
+     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+         raise ValueError("BF16/checkpointing required")
+-    method.bind(model,{"pooling":method.identity()})
++    if consistency and initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
++            "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
++        raise ValueError("H_cons native initial identity differs")
++    method.bind(model, method.metadata())
+     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
+     for g in (current,history):
+         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
+         if len(lengths)!=448 or set(lengths)!={256}:
+             raise ValueError("Maximum N224/token256 fixture differs")
+     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
+-    gradients, effects = {}, {}
++    gradients, effects, table_checks = {}, {}, []
+     def updated(arm, phase, step, h=None, target=None):
+         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
+         pre = {}
+@@ -121,48 +129,66 @@ def native(check, progress, handwritten, out):
+                 for key,p in probes.items():
+                     if p.grad is None or not torch.isfinite(p.grad).all(): raise ValueError("Missing native gradient")
+                     pre[key] = p.grad.detach().cpu().clone()
+-        scorer = method if arm=="G_half" else original
+-        row = timed(("t_"+phase) if arm=="G_half" else "G_"+phase,
+-            lambda: scorer.update(model,optimizer,current,h,target,c,arm,1 if h is None else 2,step,check,observe))
++        scorer = method if consistency or arm == active else original
++        captured = []
++        options = {}
++        if consistency:
++            options = dict(qualification_without_c=arm == control,
++                table_observer=(lambda table, group, seed: captured.append((table.clone(), group, seed))) if arm == active else None)
++        progress("native_call_started", attempted_calls=len(updates)+1, actual_updates=len(updates))
++        row = timed(("t_"+phase) if arm == active else "control_"+phase,
++            lambda: scorer.update(model,optimizer,current,h,target,c,active if consistency else arm,
++                                  1 if h is None else 2,step,check,observe,**options))
+         updates.append(dict(arm=arm,phase=phase,step=step,log=row))
+         gradients[len(updates)] = pre
+         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
++        for table, group, seed in captured:
++            table_checks.append(handwritten.verify_native_table(table, group, seed))
+         return row
+     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
+-    updated("G","allocation",1)
++    updated(control,"allocation",1)
+     work=out/"work";work.mkdir(); identities={}
+     def metadata(label):
+-        return dict(fixture=label,pooling=method.identity(),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
+-    common_path=work/"common.pt";common_meta=metadata("One actual G update; common current fixture Adam step1")
++        return dict(fixture=label,**method.metadata(),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
++    common_path=work/"common.pt";common_meta=metadata("One actual "+control+" update; common current fixture Adam step1")
+     common = timed("s_F",lambda:native_save(common_path,model,optimizer,common_meta,check))
+     identities["common"] = common
+     def reload(path,receipt):
+-        return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,"G_half"))
+-    reload(common_path,common); updated("G","A",2); gcurrent=state(model,optimizer)
+-    reload(common_path,common); hrow=updated("G_half","A",2)
++        return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
++    reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
++    reload(common_path,common); hrow=updated(active,"A",2)
+     effects["current"] = component_effects(model,gcurrent)
+     for key in probes:
+         delta=float((gradients[2][key]-gradients[3][key]).abs().max())
+-        if delta<=0:raise ValueError("H-G preclip current gradient not distinguishable")
++        if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
+         effects["current"][key]["pre_clip_gradient_max_delta"]=delta
+-    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current H-G objective indistinguishable")
++    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current candidate-control objective indistinguishable")
++    if consistency:
++        run.loss_total(hrow, 1, active)
++        if not np.isclose(hrow["total"]-updates[1]["log"]["total"], hrow["current"]["consistency"], atol=2e-6, rtol=2e-6):
++            raise ValueError("Native current C contribution differs")
+     del gcurrent;gc.collect()
+     reload(common_path,common)
+     # Same trained-one-step parameters/moments, but legal B epoch1 counter336 for the paired fixture.
+     for value in optimizer.state.values(): value["step"].fill_(336)
+     with diag.neutral(model):table=timed("v",lambda:record.reference(model,history,c,check))
+     i,j=np.triu_indices(224,1);target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
+-    paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from the one real G allocation update")
++    paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from one real "+control+" allocation update")
+     paired=timed("s_F",lambda:native_save(paired_path,model,optimizer,paired_meta,check));identities["paired"]=paired
+-    reload(paired_path,paired);updated("G","B",49,history,target);gpaired=state(model,optimizer)
+-    reload(paired_path,paired);first=updated("G_half","B",49,history,target)
++    reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
++    reload(paired_path,paired);first=updated(active,"B",49,history,target)
+     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
+     effects["paired"]=component_effects(model,gpaired)
+     for key in probes:
+         delta=float((gradients[4][key]-gradients[5][key]).abs().max())
+-        if delta<=0:raise ValueError("H-G preclip paired gradient not distinguishable")
++        if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
+         effects["paired"][key]["pre_clip_gradient_max_delta"]=delta
+-    if updates[3]["log"]["total"]==first["total"]:raise ValueError("Paired H-G objective indistinguishable")
++    if updates[3]["log"]["total"]==first["total"]:raise ValueError("Paired candidate-control objective indistinguishable")
++    if consistency:
++        run.loss_total(first, 2, active)
++        extra = first["current"]["consistency"]+.1*first["history"]["consistency"]
++        if not np.isclose(first["total"]-updates[3]["log"]["total"], extra, atol=2e-6, rtol=2e-6):
++            raise ValueError("Native paired C contribution differs")
+     del gpaired;gc.collect()
+     expected, expected_rng = state(model,optimizer), diag.rng_state()
+     reload(paired_path,paired)
+@@ -173,10 +199,10 @@ def native(check, progress, handwritten, out):
+     valid=[data.Group(g.uid,g.sellers,g.items) for g in [handwritten.handmade_group(f"native_valid_{i}") for i in range(40)]]
+     before=core.state_digest(state(model,optimizer));droot=out/"diagnostics";droot.mkdir()
+     progress("actual_H_full_role_capture", actual_updates=len(updates))
+-    method.capture(model,optimizer,fit,memory,valid,c,"G_half",2,1,droot,"handwritten",check)
++    method.capture(model,optimizer,fit,memory,valid,c,active,2,1,droot,"handwritten",check)
+     if before!=core.state_digest(state(model,optimizer)) or rng!=diag.rng_state() or payload!=memory.to_bytes():
+         raise ValueError("Actual H capture mutated state")
+-    repeated=updated("G_half","B",49,history,target)
++    repeated=updated(active,"B",49,history,target)
+     equality={"tensors":0,"elements":0};equal_state(expected,state(model,optimizer),equality)
+     if expected_rng!=diag.rng_state() or payload!=memory.to_bytes() or modes!=[m.training for m in model.modules()] or first!=repeated:
+         raise ValueError("Capture changed repeated next update")
+@@ -186,8 +212,8 @@ def native(check, progress, handwritten, out):
+         errors=[]
+         for seed in (None,data.seed_for(20261008,"ABC",2,history.uid,"diagnostic_regroup")):
+             slots=record.assignment(history,seed)
+-            errors.append((method.account_logits(torch.from_numpy(table),slots,"G_half")-
+-                           method.account_logits(torch.from_numpy(target),slots,"G_half")).numpy().astype(np.float64))
++            errors.append((method.account_logits(torch.from_numpy(table),slots,active)-
++                           method.account_logits(torch.from_numpy(target),slots,active)).numpy().astype(np.float64))
+         return dict(D0=float(np.mean(errors[0]**2)),D1=float(np.mean(errors[1]**2)))
+     residuals=timed("h",residual)
+     # Persist the actual H-updated state, releasing the obsolete common work file first.
+@@ -205,7 +231,7 @@ def native(check, progress, handwritten, out):
+             raise ValueError("Full H scores not bitwise restored")
+     inference_path=work/"H_inference.pt";infer_meta=metadata("Actual H inference restore fixture")
+     infer=timed("s_I",lambda:native_save(inference_path,model,None,infer_meta,check));identities["inference"]=infer
+-    if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,"G_half"))!=infer_meta:
++    if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,active))!=infer_meta:
+         raise ValueError("Inference H metadata restore mismatch")
+     with diag.neutral(model):
+         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
+@@ -218,11 +244,15 @@ def native(check, progress, handwritten, out):
+     return dict(resources=resources,numerics=numerics,pretrained_archive=archive,initial_state=initial,
+         actual_updates=6,updates=updates,measurements=measurements,projection=run.projection(measurements),effects=effects,
+         both_phases_encoder_head_effect=True,H_pooling_restores_verified=True,next_update_bitwise_equal=True,
++        training_identity=method.metadata().get("training"), consistency_precision_verified=bool(table_checks),
++        table_precision=table_checks,
+         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
+         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
+ 
+ 
+-def main():
++def main(*, entry=None, handwritten_module="test_step28_g_half", test_class_name="GHalfTests", consistency=False):
++    import importlib
++    run = entry or sys.modules["step28_g_half_run"]
+     parser = argparse.ArgumentParser()
+     parser.add_argument("mode", choices=("cpu", "gpu"))
+     parser.add_argument("--output", type=Path, required=True)
+@@ -235,14 +265,15 @@ def main():
+         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+     args.output.mkdir(parents=True)
+     sys.path.insert(0, str(data.ROOT/"tests"))
+-    import test_step28_g_half as handwritten
++    handwritten = importlib.import_module(handwritten_module)
+     os.environ["G_HALF_TEST_ROOT"] = str(args.output)
++    os.environ["H_CONS_TEST_ROOT"] = str(args.output)
+     torch.set_num_threads(1)
+     torch.set_num_interop_threads(1)
+     numerics = run.parent.configure_numerics()
+     process = psutil.Process()
+     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
+-    report = {"status": "RUNNING", "mode": args.mode, "scope": "G_half_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
++    report = {"status": "RUNNING", "mode": args.mode, "scope": run.method.ARMS[0]+"_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
+         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
+     stopped, lock = threading.Event(), threading.RLock()
+     def write():
+@@ -294,7 +325,7 @@ def main():
+         if args.mode == "cpu":
+             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+                 raise ValueError("CPU qualification must disable GPU")
+-            test_class = handwritten.GHalfTests
++            test_class = getattr(handwritten, test_class_name)
+             selected = args.tests or unittest.defaultTestLoader.getTestCaseNames(test_class)
+             report["selected_tests"] = selected
+             suite = unittest.TestSuite(test_class(name) for name in selected)
+@@ -309,7 +340,7 @@ def main():
+             run.reviewed_gate(args.gate, "NATIVE")
+             if args.prior_seconds != 0:
+                 raise ValueError("Unique GPU attempt; no automatic retry")
+-            report["native"] = native(check, progress, handwritten, args.output)
++            report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
+         check()
+         report["status"] = "PASS_HANDWRITTEN_ONLY"
+     except BaseException as exc:
+diff --git a/reports/documentation/20261016/h_consistency_implementation/authorization.json b/reports/documentation/20261016/h_consistency_implementation/authorization.json
+new file mode 100644
+--- /dev/null
++++ b/reports/documentation/20261016/h_consistency_implementation/authorization.json
+@@ -0,0 +1,11 @@
++{
++  "status": "APPROVED_FULL_CONTRACT_GATED_SEQUENCE",
++  "observed_at": "2026-10-16T04:35:10.990Z",
++  "user_verbatim": "批准这份 H_cons 合同，按约定范围和前提继续推进：先完成最小实现和 Linux 手写 CPU 增量核验，再准备合同与实现合并外审；审查通过后进行原生 GPU 资格与资源投影，满足条件后启动唯一固定训练。保持原定精度、数据权限和累计预算，避免过度设计和伪实现。",
++  "contract": {
++    "path": "docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
++    "bytes": 30924,
++    "sha256": "57e39227b2a789316f3475af7aa97a88c834db883b0b7c9a7a45e9db6feb68bf"
++  },
++  "scope": "Full gated sequence, CPU180/GPU600 and six calls/formal28800 seconds, no prior balance transfer. Each concrete external package still needs permission."
++}
+diff --git a/schema/step28_h_consistency_policy.json b/schema/step28_h_consistency_policy.json
+new file mode 100644
+--- /dev/null
++++ b/schema/step28_h_consistency_policy.json
+@@ -0,0 +1,97 @@
++{
++  "study": "fixed_H_natural_regrouped_query_consistency",
++  "methods": [
++    "H_cons"
++  ],
++  "seed": "s0",
++  "domains": "AB",
++  "main_rng_order": "ABC",
++  "physical_updates": 576,
++  "gradient_group_presentations": 864,
++  "physical_stage_states": 2,
++  "epoch_diagnostic_points": 12,
++  "history_supervision": 0.1,
++  "teacher_weight": 0.5,
++  "memory_maximum_bytes": 1048576,
++  "cpu_verification": {
++    "maximum_seconds": 180,
++    "maximum_rss_bytes": 2147483648,
++    "maximum_evidence_bytes": 67108864,
++    "prior_charged_seconds": 0
++  },
++  "native_verification": {
++    "maximum_seconds": 600,
++    "maximum_rss_bytes": 68719476736,
++    "maximum_work_bytes": 10737418240,
++    "maximum_evidence_bytes": 134217728,
++    "actual_updates": 6,
++    "prior_charged_seconds": 0
++  },
++  "runtime": {
++    "maximum_gpu_stage_seconds": 28800,
++    "maximum_output_bytes": 10737418240,
++    "maximum_cuda_reserved_bytes": 30064771072,
++    "maximum_rss_bytes": 68719476736,
++    "minimum_free_gpu_bytes": 32212254720,
++    "minimum_free_host_bytes": 77309411328,
++    "torch_cpu_threads": 1
++  },
++  "supervision": {
++    "train_parse_attempts": 1,
++    "valid_parse_attempts": 1,
++    "test_access": false,
++    "owners_access": false,
++    "automatic_retry": false
++  },
++  "evaluation": {
++    "bootstrap_replicates": 5000,
++    "bootstrap_seed": 20260930,
++    "comparisons": [
++      [
++        "H_cons",
++        "S"
++      ],
++      [
++        "H_cons",
++        "G_half"
++      ]
++    ],
++    "primary_metric": "map",
++    "primary_role": "raw",
++    "success": "B_end_H_cons_minus_S_each_AB_MAP_CI_lower_strictly_positive"
++  },
++  "pooling": {
++    "arm": "G_half",
++    "mean_weight": 0.5,
++    "logavgexp_weight": 0.5,
++    "tau": 1,
++    "record_order": "canonical_offdiagonal_upper_v1",
++    "output_dtype": "float32",
++    "numerics": {
++      "pooling": "float64_then_one_float32_cast",
++      "encoder_forward": "bfloat16",
++      "head_parameters_gradients_adam": "float32",
++      "tf32": false,
++      "deterministic_algorithms": true
++    }
++  },
++  "training": {
++    "arm": "H_cons",
++    "consistency": "symmetric_query_JS",
++    "queries": 28,
++    "candidates": 27,
++    "candidate_order": "canonical_index_excluding_self",
++    "lambda_current": 1,
++    "lambda_history": 0.1,
++    "temperature": 1,
++    "reduction": "sum_candidates_mean_28_queries",
++    "log_base": "e",
++    "students": "both_live",
++    "mixture": "live_arithmetic_half",
++    "precision": "actual_H_FP32_to_FP64_one_FP32_loss_cast",
++    "current_supervision": 1,
++    "history_supervision": 0.1,
++    "teacher_A0": 0.5,
++    "rng_order": "ABC"
++  }
++}
+diff --git a/scripts/run_step28_h_consistency_linux_20261016.sh b/scripts/run_step28_h_consistency_linux_20261016.sh
+new file mode 100644
+--- /dev/null
++++ b/scripts/run_step28_h_consistency_linux_20261016.sh
+@@ -0,0 +1,23 @@
++#!/usr/bin/env bash
++set -euo pipefail
++export RECORD_REPLAY_STARTED_EPOCH="$(date +%s)"
++cd "$(dirname "$0")/.."
++cpu="$1"
++gate="$2"
++job="$3"
++test ! -e "$job"
++test -d "$(dirname "$job")"
++export CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
++export CUBLAS_WORKSPACE_CONFIG=:4096:8 TOKENIZERS_PARALLELISM=false PYTHONDONTWRITEBYTECODE=1
++# Wrapper and interpreter startup, validation, and TERM grace are inside one deadline.
++limit=$(/home/yongpeng/miniconda3/envs/py310/bin/python -c 'import json; p=json.load(open("schema/step28_h_consistency_policy.json")); r=p["runtime"]; assert r["maximum_gpu_stage_seconds"]==28800; print(r["maximum_gpu_stage_seconds"])')
++remaining=$((RECORD_REPLAY_STARTED_EPOCH + limit - $(date +%s) - 5))
++test "$remaining" -gt 0
++date -Is > "$job.wrapper.txt"
++set +e
++timeout --signal=TERM --kill-after=5 "$remaining" taskset -c "$cpu" /home/yongpeng/miniconda3/envs/py310/bin/python \
++  scripts/step28_h_consistency_run.py --job "$job" --gate "$gate" > "$job.console.txt" 2>&1
++status=$?
++printf 'exit_code=%s\n' "$status" >> "$job.wrapper.txt"
++date -Is >> "$job.wrapper.txt"
++exit "$status"
+diff --git a/scripts/step28_h_consistency.py b/scripts/step28_h_consistency.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/step28_h_consistency.py
+@@ -0,0 +1,136 @@
++"""Fixed H scores with live natural/regrouped query JS; no data entry."""
++from __future__ import annotations
++
++import hashlib
++import math
++
++import numpy as np
++import torch
++
++import step28_g_half as h
++
++record, data = h.record, h.data
++ARMS = ("H_cons",)
++RNG_ORDER = "ABC"
++
++
++def identity(arm: str = "H_cons") -> dict:
++    if arm != "H_cons":
++        raise ValueError("Only H_cons is authorized")
++    return h.identity()
++
++
++def training_identity() -> dict:
++    return dict(arm="H_cons", consistency="symmetric_query_JS", queries=28, candidates=27,
++        candidate_order="canonical_index_excluding_self", lambda_current=1., lambda_history=.1,
++        temperature=1., reduction="sum_candidates_mean_28_queries", log_base="e",
++        students="both_live", mixture="live_arithmetic_half", precision="actual_H_FP32_to_FP64_one_FP32_loss_cast",
++        current_supervision=1., history_supervision=.1, teacher_A0=.5, rng_order="ABC")
++
++
++def metadata(arm: str = "H_cons") -> dict:
++    return dict(pooling=identity(arm), training=training_identity())
++
++
++def bind(model, meta: dict) -> str:
++    if any(meta.get(k) != v for k, v in metadata().items()):
++        raise ValueError("Missing or incompatible H_cons scoring/training metadata")
++    model.pooling_identity, model.training_identity = identity(), training_identity()
++    return "H_cons"
++
++
++def account_logits(table, slots, arm="H_cons", stats=None, context=None):
++    identity(arm)
++    return h.account_logits(table, slots, "G_half", stats, context)
++
++
++def query_logits(scores):
++    if scores.shape != (378,) or scores.dtype not in (torch.float32, torch.float64) or not torch.isfinite(scores).all():
++        raise ValueError("Finite canonical 378 H scores required")
++    i, j = torch.triu_indices(28, 28, 1, device=scores.device)
++    indices = torch.zeros((28, 28), dtype=torch.long, device=scores.device)
++    indices[i, j] = indices[j, i] = torch.arange(378, device=scores.device)
++    return scores[indices[~torch.eye(28, dtype=torch.bool, device=scores.device)].reshape(28, 27)]
++
++
++def consistency(z0, z1):
++    """Both student branches and mixture stay live; inputs already exclude self."""
++    if (z0.shape != (28, 27) or z1.shape != z0.shape or z0.dtype != z1.dtype
++            or z0.dtype not in (torch.float32, torch.float64)
++            or not torch.isfinite(z0).all() or not torch.isfinite(z1).all()):
++        raise ValueError("Two finite aligned 28x27 logit tables required")
++    l0, l1 = torch.log_softmax(z0.double(), 1), torch.log_softmax(z1.double(), 1)
++    lm = torch.logaddexp(l0, l1)-math.log(2.)
++    result = (.5*(l0.exp()*(l0-lm)+l1.exp()*(l1-lm)).sum(1).mean()).to(z0.dtype)
++    if not torch.isfinite(result):
++        raise ValueError("Nonfinite query consistency")
++    return result
++
++
++def objective(table, group, regroup_seed, arm, reference=None, stats=None, context=None, *, qualification_without_c=False):
++    identity(arm)
++    if group.labels is None:
++        raise ValueError("Authorized train labels required")
++    slots = (record.assignment(group), record.assignment(group, regroup_seed))
++    predicted = [account_logits(table, a, arm, stats, context) for a in slots]
++    truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
++    supervised = sum(record.parent.ranking.objectives(v, truth, .5)["total"] for v in predicted)/2
++    coupling = consistency(*(query_logits(v) for v in predicted))
++    mse = table.new_zeros(())
++    if reference is not None:
++        target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
++        mse = (predicted[0]-account_logits(target, slots[0], arm, stats, context)).square().mean()
++    weight = 1. if reference is None else .1
++    c_weight = 0. if qualification_without_c else weight
++    supervised_contribution, consistency_contribution = weight*supervised, c_weight*coupling
++    teacher_contribution = .5*mse
++    result = supervised_contribution+consistency_contribution+teacher_contribution
++    return result, dict(supervised=float(supervised.detach()), consistency=float(coupling.detach()),
++        supervised_contribution=float(supervised_contribution.detach()),
++        consistency_contribution=float(consistency_contribution.detach()),
++        teacher_contribution=float(teacher_contribution.detach()), mse0=float(mse.detach()),
++        mse1=None, distillation=float(mse.detach()), weighted=float(result.detach()),
++        qualification_without_c=qualification_without_c)
++
++
++def update(model, optimizer, current, history, reference, c, arm, stage, step, check=lambda: None,
++           observe=None, *, qualification_without_c=False, table_observer=None):
++    bind(model, dict(pooling=getattr(model, "pooling_identity", None), training=getattr(model, "training_identity", None)))
++    if (qualification_without_c or table_observer is not None) and c.get("handwritten_qualification") is not True:
++        raise ValueError("Formal entry cannot disable C or inspect live qualification tables")
++    def target(table, group, seed, candidate, ref):
++        value, log = objective(table, group, seed, candidate, ref, c.setdefault("pooling_stats", {}),
++                               qualification_without_c=qualification_without_c)
++        if table_observer is not None:
++            table_observer(table.detach(), group, seed)
++        return value, log
++    result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
++                           stage, step, check, observe=observe, objective_fn=target)
++    for role, group in (("current", current), ("history", history)):
++        if group is not None:
++            seed = data.seed_for(20260918, RNG_ORDER, stage, step, role, group.uid, "regroup")
++            result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(group, seed).tobytes()).hexdigest()
++    result.update(metadata(arm))
++    return result
++
++
++def score(model, groups, c, arm, check=lambda: None):
++    identity(arm)
++    bind(model, dict(pooling=getattr(model, "pooling_identity", None), training=getattr(model, "training_identity", None)))
++    return h.score(model, groups, c, "G_half", check)
++
++
++def restored_score(model, groups, c, check=lambda: None):
++    return score(model, groups, c, "H_cons", check)
++
++
++def capture(model, optimizer, current, memory, valid, c, arm, stage, epoch, root, point, check=lambda: None):
++    import step28_replay_diagnostics as diag
++    result = diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch,
++        root, point, check, scope="AB", score_fn=score,
++        pooling_fn=lambda table, slots, group, view: account_logits(table, slots, arm))
++    path = root/result["path"]
++    value = data.read_json(path)
++    value.update(metadata(arm))
++    data.write_json(path, value)
++    return data.record(path, root)
+diff --git a/scripts/step28_h_consistency_run.py b/scripts/step28_h_consistency_run.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/step28_h_consistency_run.py
+@@ -0,0 +1,182 @@
++"""H_cons entry; reuse the single-arm lifecycle with explicit dependencies."""
++from __future__ import annotations
++
++import argparse
++import ast
++from functools import partial
++import os
++from pathlib import Path
++import sys
++
++import numpy as np
++
++import step28_g_half_run as single
++import step28_h_consistency as method
++
++record, data, parent, core = single.record, single.data, single.parent, single.core
++base, previous, diag = single.base, single.previous, single.diag
++POLICY = data.ROOT/"schema/step28_h_consistency_policy.json"
++BASELINE = data.ROOT/"reports/documentation/20261016/h_consistency/baseline_sources.json"
++AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/authorization.json"
++POINTS = ("A_H_cons", "B_H_cons")
++COMPLETE = single.COMPLETE
++COMPLETION_STATUS = "COMPLETE_H_CONS_FIXED_AB"
++DIRECT_COMPARISON_KEY = "direct_H_new_B_positive"
++CPU_TESTS = ("test_js_value_gradient_precision_and_faults", "test_shared_table_pullback_and_finite_difference",
++             "test_complete_objective_vjp_and_actual_updates", "test_actual_capture_restore_and_training_identity",
++             "test_loss_gate_and_saved_comparison_interfaces", "test_unchanged_single_arm_defaults")
++projection, continuity = single.projection, single.continuity
++fresh, pretrained_archive = single.fresh, single.pretrained_archive
++public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
++
++
++def policy() -> dict:
++    p = data.read_json(POLICY)
++    old = single.policy()
++    expected = {**old, "study": "fixed_H_natural_regrouped_query_consistency", "methods": ["H_cons"],
++        "pooling": method.identity(), "training": method.training_identity(),
++        "evaluation": dict(bootstrap_replicates=5000, bootstrap_seed=20260930,
++            comparisons=[["H_cons", "S"], ["H_cons", "G_half"]], primary_metric="map", primary_role="raw",
++            success="B_end_H_cons_minus_S_each_AB_MAP_CI_lower_strictly_positive")}
++    if p != expected:
++        raise ValueError("Approved fixed H_cons policy differs")
++    return p
++
++
++def config() -> dict:
++    c = record.config()
++    c["runtime"] = policy()["runtime"]
++    return c
++
++
++def sources() -> list[dict]:
++    paths = {data.ROOT/n for n in ("scripts/step28_h_consistency_run.py", "scripts/step28_h_consistency_verify.py",
++        "tests/test_step28_h_consistency.py", "tests/test_step28_g_half.py", "tests/test_step28_record_replay.py")}
++    todo = list(paths)
++    while todo:
++        for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
++            names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
++            for name in names:
++                if name and name.startswith("step28_"):
++                    child = data.ROOT/"scripts"/(name+".py")
++                    if child not in paths:
++                        paths.add(child)
++                        todo.append(child)
++    paths.update(data.ROOT/"schema"/name for name in ("step28_h_consistency_policy.json", "step28_g_half_policy.json",
++        "step28_record_replay_policy.json", "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json",
++        "step28_chinese_base_policy.json"))
++    paths.update((BASELINE, AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
++                  data.ROOT/"scripts/run_step28_h_consistency_linux_20261016.sh",
++                  single.BASELINE, single.AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_G_HALF.zh.md",
++                  data.ROOT/"scripts/run_step28_g_half_linux_20261015.sh"))
++    return [data.record(path, data.ROOT) for path in sorted(paths)]
++
++
++def baseline_runs() -> dict:
++    manifest = data.read_json(BASELINE)
++    if (data.sha256(BASELINE) != "b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3"
++            or len(manifest["files"]) != 52 or set(manifest["baselines"]) != {"S", "H"}):
++        raise ValueError("Approved S/H saved scope differs")
++    for row in manifest["files"]:
++        data.verify(data.ROOT/row["path"], row)
++    for row in manifest["unchanged_direct_sources"]:
++        data.verify(data.ROOT/row["path"], row)
++    runs = {}
++    for info in manifest["baselines"].values():
++        root = data.ROOT/info["root"]
++        old = data.read_json(root/"run/manifest.json")
++        col = data.read_json(root/"evaluation/collected.json")
++        split = data.read_json(root/"run/partition.json")
++        if (col["group_ids"] != [r["group_uid"] for r in split["development"]]
++                or col["domains"] != [r["domain"] for r in split["development"]]
++                or col["columns"] != list(parent.metrics.COLUMNS)
++                or old["initials"][info["arm"]] != info["initial_identity"]):
++            raise ValueError("Saved alignment/initial identity differs")
++        for name in info["points"]:
++            if set(col["points"][name]) != set(parent.ROLES):
++                raise ValueError("Saved role coverage differs")
++        runs[info["arm"]] = (root, col, old)
++    a, b = runs["S"], runs["G_half"]
++    if (data.read_json(a[0]/"run/partition.json") != data.read_json(b[0]/"run/partition.json")
++            or a[2]["public_inputs"] != b[2]["public_inputs"]):
++        raise ValueError("S/H inputs/partition differ")
++    return runs
++
++
++def baseline_inputs():
++    runs = baseline_runs()
++    root, col, old = runs["S"]
++    manifest = data.read_json(BASELINE)
++    return {"initial_identity": manifest["baselines"]["S"]["initial_identity"]}, root, col, old
++
++
++def loss_total(row: dict, stage: int, arm: str) -> float:
++    if any(row.get(k) != v for k, v in method.metadata(arm).items()):
++        raise ValueError("Update scoring/training identity differs")
++    total = 0.
++    for role, weight in (("current", 1.), ("history", .1)):
++        if role == "history" and stage == 1:
++            if "history" in row:
++                raise ValueError("Unexpected A history")
++            continue
++        r = row[role]
++        if r.get("qualification_without_c") is not False or r["mse1"] is not None:
++            raise ValueError("Formal update used qualification mode or wrong teacher")
++        if role == "current" and r["mse0"] != 0:
++            raise ValueError("Current branch used birth teacher")
++        expected = dict(supervised_contribution=weight*r["supervised"],
++            consistency_contribution=weight*r["consistency"], teacher_contribution=.5*r["mse0"],
++            distillation=r["mse0"])
++        for key, value in expected.items():
++            if not np.isfinite(value) or not np.isclose(r[key], value, atol=2e-6, rtol=2e-6):
++                raise ValueError("Wrong explicit H_cons contribution: "+role+"/"+key)
++        contribution = sum(expected[k] for k in ("supervised_contribution", "consistency_contribution", "teacher_contribution"))
++        if not np.isclose(r["weighted"], contribution, atol=2e-6, rtol=2e-6):
++            raise ValueError("Weighted branch omitted a contribution")
++        total += contribution
++    if not np.isclose(row["total"], total, atol=2e-6, rtol=2e-6):
++        raise ValueError("Actual total omitted H_cons contribution")
++    return total
++
++
++def validate_diagnostic(value: dict, arm: str) -> None:
++    if any(value.get(k) != v for k, v in method.metadata(arm).items()):
++        raise ValueError("Diagnostic H_cons identity missing")
++
++
++def validate_native(value: dict) -> None:
++    if (value.get("training_identity") != method.training_identity()
++            or value.get("consistency_precision_verified") is not True
++            or len(value.get("table_precision", [])) != 5):
++        raise ValueError("Actual native H_cons table precision/training identity missing")
++
++
++class Budget(single.Budget):
++    def __init__(self, root: Path):
++        super().__init__(root)
++        self.limits = policy()["runtime"]
++
++
++# The shared lifecycle receives this module explicitly; no process-global monkey patch.
++train_stage = partial(single.train_stage, entry=sys.modules[__name__])
++memory_from = partial(single.memory_from, entry=sys.modules[__name__])
++restore_point = partial(single.restore_point, entry=sys.modules[__name__])
++checkpoint = partial(single.checkpoint, entry=sys.modules[__name__])
++train = partial(single.train, entry=sys.modules[__name__])
++blind_gate = partial(single.blind_gate, entry=sys.modules[__name__])
++open_valid = partial(single.open_valid, entry=sys.modules[__name__])
++collect = partial(single.collect, entry=sys.modules[__name__])
++finalize = partial(single.finalize, entry=sys.modules[__name__])
++reviewed_gate = partial(single.reviewed_gate, entry=sys.modules[__name__])
++validate_gate = partial(single.validate_gate, entry=sys.modules[__name__])
++execute = partial(single.execute, entry=sys.modules[__name__])
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--job", type=Path, required=True)
++    parser.add_argument("--gate", type=Path, required=True)
++    args = parser.parse_args()
++    if os.name != "posix":
++        parser.error("Scientific execution is Linux-only")
++    execute(args.job.resolve(), args.gate.resolve())
+diff --git a/scripts/step28_h_consistency_verify.py b/scripts/step28_h_consistency_verify.py
+new file mode 100644
+--- /dev/null
++++ b/scripts/step28_h_consistency_verify.py
+@@ -0,0 +1,7 @@
++"""H_cons handwritten qualification using the existing bounded Linux executor."""
++import step28_g_half_verify as qualification
++import step28_h_consistency_run as run
++
++if __name__ == "__main__":
++    qualification.main(entry=run, handwritten_module="test_step28_h_consistency",
++                       test_class_name="HConsistencyTests", consistency=True)
+diff --git a/tests/test_step28_h_consistency.py b/tests/test_step28_h_consistency.py
+new file mode 100644
+--- /dev/null
++++ b/tests/test_step28_h_consistency.py
+@@ -0,0 +1,537 @@
++"""Independent handwritten H_cons references; Linux qualification only."""
++from __future__ import annotations
++
++import copy
++import hashlib
++import inspect
++import itertools
++import math
++import os
++from pathlib import Path
++import tempfile
++import unittest
++from unittest import mock
++
++import numpy as np
++import torch
++
++import step28_h_consistency as method
++import step28_h_consistency_run as run
++import step28_g_half_verify as qualification
++from test_step28_g_half import literal_pool, literal_loss, GHalfTests
++from test_step28_record_replay import handmade_group, tiny_model
++
++record, core, data, diag = run.record, run.core, run.data, run.diag
++PAIRS = list(itertools.combinations(range(28), 2))
++PAIR_INDEX = {pair: i for i, pair in enumerate(PAIRS)}
++QUERY_INDEX = np.array([[PAIR_INDEX[tuple(sorted((q, j)))] for j in range(28) if j != q] for q in range(28)])
++
++
++def js_reference(z0, z1):
++    """Scalar log-normalizers and analytic derivatives, independent of torch JS."""
++    values, gradients = [], [np.zeros((28, 27)), np.zeros((28, 27))]
++    for q in range(28):
++        logs, probabilities = [], []
++        for z in (z0[q], z1[q]):
++            peak = max(z)
++            normalizer = peak+math.log(math.fsum(math.exp(float(t)-peak) for t in z))
++            log = np.asarray(z, np.float64)-normalizer
++            logs.append(log)
++            probabilities.append(np.exp(log))
++        lm = np.array([max(a, b)+math.log((math.exp(a-max(a, b))+math.exp(b-max(a, b)))/2)
++                       for a, b in zip(*logs)])
++        kl = [math.fsum(float(p*(l-m)) for p, l, m in zip(prob, log, lm)) for prob, log in zip(probabilities, logs)]
++        values.append(sum(kl)/2)
++        for v in range(2):
++            gradients[v][q] = probabilities[v]*(logs[v]-lm-kl[v])/56
++    return math.fsum(values)/28, gradients
++
++
++def table_reference(values, slots):
++    """Explicit record-pair membership and analytic H derivative; no production pool."""
++    edges = list(itertools.combinations(range(len(slots)), 2))
++    ids = {pair: i for i, pair in enumerate(edges)}
++    scores, blocks = [], []
++    for a, b in PAIRS:
++        block = [ids[tuple(sorted((int(i), int(j))))] for i in np.flatnonzero(slots == a) for j in np.flatnonzero(slots == b)]
++        x = values[block].astype(np.float64)
++        peak = float(max(x)); weights = np.exp(x-peak); den = math.fsum(weights)
++        scores.append(.5*math.fsum(x)/len(x)+.5*(peak+math.log(den/len(x))))
++        blocks.append((block, .5/len(x)+.5*weights/den))
++    return np.array(scores), blocks
++
++
++def table_precision(table, group, seed):
++    """Actual device/dtype H/JS versus scalar FP64 value and complete pullback."""
++    x = table.detach().clone().requires_grad_(True)
++    slots = [record.assignment(group), record.assignment(group, seed)]
++    scores = [method.account_logits(x, s) for s in slots]
++    rows = [method.query_logits(v) for v in scores]
++    loss = method.consistency(*rows)
++    query_grads = torch.autograd.grad(loss, rows, retain_graph=True)
++    branch_grads = [torch.autograd.grad(v, x, g, retain_graph=True)[0] for v, g in zip(rows, query_grads)]
++    total, = torch.autograd.grad(loss, x)
++    raw = x.detach().cpu().numpy()
++    local = [table_reference(raw, s) for s in slots]
++    for values, (expected, _) in zip(scores, local):
++        actual = values.detach().cpu().numpy().astype(np.float64)
++        bound = 1e-8+1e-7*np.maximum(1, np.abs(expected)) if x.dtype == torch.float32 else 1e-12+1e-12*np.abs(expected)
++        if np.any(np.abs(actual-expected) > bound):
++            raise AssertionError("H output precision exceeded")
++    # FP32 H output is the real JS input; casting does not undo that rounding.
++    inputs = [v.detach().cpu().numpy().astype(np.float64) for v in rows]
++    expected, qg = js_reference(*inputs)
++    tolerance = 1e-8+1e-7*abs(expected) if x.dtype == torch.float32 else 1e-12+1e-12*abs(expected)
++    if abs(float(loss)-expected) > tolerance:
++        raise AssertionError("JS scalar precision exceeded")
++    pulls, l1 = [], []
++    for view, (actual, (_, blocks)) in enumerate(zip(query_grads, local)):
++        error = float(np.abs(actual.detach().cpu().numpy()-qg[view]).sum())
++        if x.dtype == torch.float32:
++            if error > 2e-7: raise AssertionError("FP32 per-view gradient L1 exceeded")
++        else:
++            np.testing.assert_allclose(actual.detach().cpu().numpy(), qg[view], atol=1e-12, rtol=1e-12)
++        l1.append(error)
++        directed = np.zeros((28, 28))
++        directed[~np.eye(28, dtype=bool)] = qg[view].ravel()
++        pull = np.zeros(len(raw))
++        for (a, b), (indices, derivative) in zip(PAIRS, blocks):
++            pull[indices] += (directed[a, b]+directed[b, a])*derivative
++        pulls.append(pull)
++        if x.dtype == torch.float64:
++            np.testing.assert_allclose(branch_grads[view].detach().cpu().numpy(), pull, atol=1e-12, rtol=1e-12)
++    error = float(np.abs(total.detach().cpu().numpy()-sum(pulls)).sum())
++    if x.dtype == torch.float32:
++        if error > 5e-7: raise AssertionError("FP32 shared K gradient L1 exceeded")
++    else:
++        np.testing.assert_allclose(total.detach().cpu().numpy(), sum(pulls), atol=1e-12, rtol=1e-12)
++    return dict(dtype=str(x.dtype), device=str(x.device), js=float(loss), scalar_error=abs(float(loss)-expected),
++                view_gradient_l1=l1, shared_gradient_l1=error, branch_max=[float(np.max(np.abs(p))) for p in pulls]), pulls
++
++
++def verify_native_table(table, group, seed):
++    result, _ = table_precision(table, group, seed)
++    return result
++
++
++def independent_js(v0, v1):
++    # Independent full graph uses entropy of explicit normalized probabilities.
++    p = [torch.stack([v[PAIR_INDEX[tuple(sorted((q, j)))]] for j in range(28) if j != q]).double()
++         for v in (v0, v1) for q in range(28)]
++    p = [torch.exp(z-torch.logsumexp(z, 0)) for z in p]
++    values = []
++    for q in range(28):
++        a, b = p[q], p[q+28]; m = (a+b)/2
++        values.append((a*a.log()).sum()/2+(b*b.log()).sum()/2-(m*m.log()).sum())
++    return (torch.stack(values).sum()/28).to(v0.dtype)
++
++
++def independent_objective(table, group, seed, target=None):
++    slots = [record.assignment(group), record.assignment(group, seed)]
++    v0, v1 = [literal_pool(table, s) for s in slots]
++    sup = (literal_loss(v0, group)+literal_loss(v1, group))/2
++    c = independent_js(v0, v1)
++    d = table.new_zeros(()) if target is None else (v0-literal_pool(torch.as_tensor(target, dtype=table.dtype), slots[0])).square().mean()
++    w = 1. if target is None else .1
++    return w*sup+w*c+.5*d, dict(supervised=float(sup.detach()), consistency=float(c.detach()), mse0=float(d.detach()))
++
++
++def shared_memory():
++    groups = [handmade_group(f"A_fit_{i:02}") for i in range(48)]
++    memory = record.Memory("ABC")
++    memory.retain(groups, 1, lambda g: (np.sin(np.arange(1540)/7)*2).astype(np.float32))
++    memory.maps.update(method.metadata())
++    return memory
++
++
++class HConsistencyTests(unittest.TestCase):
++    def temporary(self):
++        t = tempfile.TemporaryDirectory(dir=os.environ["H_CONS_TEST_ROOT"])
++        self.addCleanup(t.cleanup)
++        return Path(t.name)
++
++    def evidence(self, name, value):
++        data.write_json(Path(os.environ["H_CONS_TEST_ROOT"])/(name+".json"), value)
++
++    def test_js_value_gradient_precision_and_faults(self):
++        scores = torch.sin(torch.arange(378, dtype=torch.float64)*.31)*3
++        np.testing.assert_array_equal(method.query_logits(scores).numpy(), scores.numpy()[QUERY_INDEX])
++        rows = []
++        z0 = np.sin(np.arange(756).reshape(28, 27)*.17)*2
++        z1 = np.cos(np.arange(756).reshape(28, 27)*.23)*3
++        reference, expected = js_reference(z0, z1)
++        for dtype in (torch.float64, torch.float32):
++            a, b = [torch.tensor(v, dtype=dtype, requires_grad=True) for v in (z0, z1)]
++            value = method.consistency(a, b)
++            ref, gradients = js_reference(a.detach().double().numpy(), b.detach().double().numpy())
++            actual = torch.autograd.grad(value, (a, b), retain_graph=True)
++            self.assertLessEqual(abs(float(value)-ref), 1e-12+1e-12*abs(ref) if dtype == torch.float64 else 1e-8+1e-7*abs(ref))
++            for v, g in zip(actual, gradients):
++                if dtype == torch.float64: np.testing.assert_allclose(v.numpy(), g, atol=1e-12, rtol=1e-12)
++                else: self.assertLessEqual(float(np.abs(v.numpy()-g).sum()), 2e-7)
++            # Locate the actual live mixture node, with both log-softmax parents.
++            todo, seen, mixtures = [value.grad_fn], set(), []
++            while todo:
++                node = todo.pop()
++                if node is None or node in seen: continue
++                seen.add(node)
++                if type(node).__name__.startswith("LogaddexpBackward"):
++                    mixtures.append([type(n).__name__ for n, _ in node.next_functions])
++                todo.extend(n for n, _ in node.next_functions)
++            self.assertEqual(len(mixtures), 1)
++            self.assertTrue(all(n.startswith("LogSoftmaxBackward") for n in mixtures[0]))
++            self.assertNotIn("detach", inspect.getsource(method.consistency))
++            rows.append(dict(dtype=str(dtype), js=float(value), scalar_error=abs(float(value)-ref), mixture_parents=mixtures[0]))
++        self.assertAlmostEqual(float(method.consistency(torch.tensor(z0), torch.tensor(z0))), 0., places=14)
++        q = method.query_logits(scores)
++        self.assertLess(abs(float(method.consistency(q, method.query_logits(scores+7)))), 1e-12)
++        star = scores.clone();star[:27] += 1
++        self.assertGreater(float(method.consistency(q, method.query_logits(star))), 1e-5)
++        self.assertGreater(abs(float(method.consistency(torch.tensor(z0), torch.tensor(z1[:, ::-1].copy())))-reference), 1e-5)
++        self.assertGreater(abs(reference-reference/27), 1e-5)
++        extreme = torch.full((28, 27), -1000., dtype=torch.float64);extreme[:, 0] = 1000.
++        other = torch.roll(extreme, 1, 1)
++        self.assertAlmostEqual(float(method.consistency(extreme, other)), math.log(2), places=12)
++        with self.assertRaises(ValueError):method.consistency(torch.zeros(28, 28), torch.zeros(28, 28))
++        with self.assertRaises(ValueError):method.consistency(torch.full((28, 27), float("nan")), torch.zeros(28, 27))
++        self.evidence("js_precision", dict(cases=rows, canonical_columns=True, global_offset_only=True,
++            mixture_live_graph=True, extreme_logit_bound=math.log(2), scope="First-order m-only detach is equivalent; no Hessian requirement"))
++
++    def test_shared_table_pullback_and_finite_difference(self):
++        group = handmade_group("pullback")
++        values = np.sin(np.arange(1540)*.17)*3+np.cos(np.arange(1540)*.07)
++        results = []
++        for dtype in (torch.float64, torch.float32):
++            result, branches = table_precision(torch.tensor(values, dtype=dtype), group, 17)
++            self.assertTrue(all(float(np.max(np.abs(g))) > 5e-7 for g in branches))
++            x = torch.tensor(values, dtype=dtype, requires_grad=True)
++            view = [method.query_logits(method.account_logits(x, record.assignment(group, seed))) for seed in (None, 17)]
++            complete, = torch.autograd.grad(method.consistency(*view), x, retain_graph=True)
++            for missing in (0, 1):
++                detached = [v.detach() if i == missing else v for i, v in enumerate(view)]
++                wrong, = torch.autograd.grad(method.consistency(*detached), x, retain_graph=True)
++                self.assertGreater(float((complete-wrong).abs().sum()), 5e-7)
++            results.append(result)
++        slots = [record.assignment(group, seed) for seed in (None, 17)]
++        def scalar(v):
++            q = [table_reference(v, s)[0][QUERY_INDEX] for s in slots]
++            return js_reference(*q)[0]
++        _, branches = table_precision(torch.tensor(values, dtype=torch.float64), group, 17)
++        total = sum(branches);differences=[]
++        for i in (2, 11, 53, 79, 123, 301, 511, 777, 1001, 1403):
++            self.assertGreater(abs(total[i]), 1e-10)
++            a, b = values.copy(), values.copy();a[i] += 1e-5;b[i] -= 1e-5
++            observed = (scalar(a)-scalar(b))/2e-5
++            self.assertLessEqual(abs(observed-total[i]), 2e-9)
++            differences.append(dict(coordinate=i, analytical=float(total[i]), finite_difference=observed, error=abs(observed-total[i])))
++        zero = torch.ones(1540, dtype=torch.float64)
++        v = [method.query_logits(method.account_logits(zero, s)) for s in slots]
++        self.assertLess(abs(float(method.consistency(*v))), 1e-12)
++        native = []
++        for role, stage, step in (("current",1,2),("current",2,49),("history",2,49)):
++            group = handmade_group("native_"+role, 8, 254)
++            self.assertEqual(sum(map(len, group.items)), 224)
++            self.assertEqual({len(text) for records in group.items for item in records for text in item[1:]}, {254})
++            seed = data.seed_for(20260918,"ABC",stage,step,role,group.uid,"regroup")
++            natural, regrouped = record.assignment(group), record.assignment(group,seed)
++            np.testing.assert_array_equal(np.bincount(natural),np.bincount(regrouped))
++            self.assertFalse(np.array_equal(natural,regrouped))
++            i,j=np.triu_indices(224,1)
++            hand_table=(np.sin(.17*i+.31*j)*3+np.cos(.07*i-.19*j)).astype(np.float32)
++            check,_=table_precision(torch.from_numpy(hand_table),group,seed)
++            self.assertGreater(check["js"],1e-6)
++            target=(hand_table+2*np.sin(.31*i+.71*j)).astype(np.float32)
++            _,parts=method.objective(torch.from_numpy(hand_table),group,seed,"H_cons",target)
++            self.assertGreater(parts["mse0"],1e-6)
++            native.append(dict(role=role,stage=stage,step=step,seed=seed,assignment_sha256=hashlib.sha256(regrouped.tobytes()).hexdigest(),
++                               precision=check,synthetic_D0=parts["mse0"]))
++        self.evidence("shared_K_precision", dict(cases=results, finite_difference=differences, missing_students_detected=True,
++            legal_assignment_zero=True, native_handwritten_geometry=native,
++            native_fixture=dict(current_uid="native_current",history_uid="native_history",
++                records_per_account=8,text_length=254,expected_tokens=256,paired_clock=336,
++                teacher="W_eval_K + 2*sin(.31*i+.71*j)", fixed_steps=[1,2,2,49,49,49])))
++
++    def test_complete_objective_vjp_and_actual_updates(self):
++        c = run.config();c["handwritten_qualification"] = True
++        current, history = handmade_group("current"), handmade_group("history")
++        model = tiny_model();method.bind(model, method.metadata());optimizer = core.make_optimizer(model, c)
++        method.update(model, optimizer, current, None, None, c, "H_cons", 1, 1, qualification_without_c=True)
++        initial, rng, modes = qualification.state(model, optimizer), diag.rng_state(), [m.training for m in model.modules()]
++        with diag.neutral(model): old = record.reference(model, history, c)
++        i, j = np.triu_indices(56, 1); target = (old+2*np.sin(.31*i+.71*j)).astype(np.float32)
++        effects = {}
++        for stage, step, historic in ((1, 2, False), (2, 49, True)):
++            qualification.restore(model, optimizer, initial, rng, modes)
++            if historic:
++                for v in optimizer.state.values():v["step"].fill_(336)
++            start = qualification.state(model, optimizer)
++            direct = copy.deepcopy(model);direct_opt = core.make_optimizer(direct, c);direct_opt.load_state_dict(copy.deepcopy(optimizer.state_dict()))
++            branch = history if historic else None; teacher = target if historic else None
++            pre_off = {}
++            def observe_off(role, log):
++                pre_off[role] = {n:p.grad.clone() for n,p in model.named_parameters() if p.grad is not None}
++            off_log = method.update(model, optimizer, current, branch, teacher, c, "H_cons", stage, step,
++                                    observe=observe_off, qualification_without_c=True)
++            off = qualification.state(model, optimizer)
++            qualification.restore(model, optimizer, start, rng, modes)
++            observed = {}
++            def observe(role, log):observed[role] = {n:p.grad.clone() for n,p in model.named_parameters() if p.grad is not None}
++            row = method.update(model, optimizer, current, branch, teacher, c, "H_cons", stage, step, observe=observe)
++            run.loss_total(row, stage, "H_cons")
++            direct.train();direct_opt.zero_grad(set_to_none=True);values=[]
++            for role, group, ref in (("current",current,None), ("history",branch,teacher)):
++                if group is None:continue
++                torch.manual_seed(data.seed_for(20260918,"ABC",stage,step,role,"dropout"))
++                z = record.record_vectors(direct,group,c);a,b=torch.triu_indices(len(z),len(z),1)
++                u,v=z[a],z[b];table=direct.head(torch.cat(((u-v).abs(),u*v),1)).flatten()
++                seed=data.seed_for(20260918,"ABC",stage,step,role,group.uid,"regroup")
++                loss, components=independent_objective(table,group,seed,ref);values.append(float(loss.detach()))
++                for key,value in components.items():self.assertTrue(np.isclose(row[role][key],value,atol=2e-6,rtol=2e-5))
++                loss.backward()
++                for name,p in direct.named_parameters():torch.testing.assert_close(observed[role][name],p.grad,atol=2e-6,rtol=2e-5)
++            torch.nn.utils.clip_grad_norm_(direct.parameters(),1.)
++            direct_opt.param_groups[0]["lr"],direct_opt.param_groups[1]["lr"]=run.parent.stage_lr(step),.001
++            direct_opt.step()
++            self.assertTrue(np.isclose(row["total"],sum(values),atol=2e-6,rtol=2e-5))
++            for (name,p),q in zip(model.named_parameters(),direct.parameters()):
++                torch.testing.assert_close(p,q,atol=2e-6,rtol=2e-5)
++                torch.testing.assert_close(p.grad,q.grad,atol=2e-6,rtol=2e-5)
++                for key in ("step","exp_avg","exp_avg_sq"):
++                    torch.testing.assert_close(optimizer.state[p][key],direct_opt.state[q][key],atol=2e-6,rtol=2e-5)
++            effect = qualification.component_effects(model,off)
++            role = "history" if historic else "current"
++            for component in ("encoder","head"):
++                delta=max(float((observed[role][n]-pre_off[role][n]).abs().max()) for n in observed[role] if n.startswith(component+"."))
++                self.assertGreater(delta,0);effect[component]["preclip_max_delta"]=delta
++            extra=row["current"]["consistency"]+(.1*row["history"]["consistency"] if historic else 0)
++            self.assertTrue(np.isclose(row["total"]-off_log["total"],extra,atol=2e-6,rtol=2e-6))
++            self.assertGreater(extra,2e-6)
++            bad=copy.deepcopy(row);bad["total"]-=extra
++            with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
++            bad=copy.deepcopy(row);bad.pop("training")
++            with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
++            if historic:
++                self.assertGreater(row["history"]["mse0"],0)
++                bad=copy.deepcopy(row);bad["history"]["consistency_contribution"]=bad["history"]["consistency"]
++                with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
++            effects["paired" if historic else "current"] = dict(components=effect,total=row["total"],without_c=off_log["total"],C_contribution=extra)
++        with self.assertRaises(ValueError):method.update(model,optimizer,current,None,None,run.config(),"H_cons",1,2,qualification_without_c=True)
++        self.evidence("complete_graph_and_update",dict(effects=effects,independent_full_graph=True,adam_moments_compared=True,
++            scope="Real tiny-model updates; paired clock336 synthetic, no formal model or inputs"))
++
++    def test_actual_capture_restore_and_training_identity(self):
++        c=run.config();model=tiny_model();method.bind(model,method.metadata());optimizer=core.make_optimizer(model,c)
++        current,history=handmade_group("current"),handmade_group("history")
++        method.update(model,optimizer,current,None,None,c,"H_cons",1,1)
++        for v in optimizer.state.values():v["step"].fill_(336)
++        start,rng,modes=qualification.state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
++        target=(3*np.sin(np.arange(1540)/7)).astype(np.float32)
++        first=method.update(model,optimizer,current,history,target,c,"H_cons",2,49)
++        expected,expected_rng=qualification.state(model,optimizer),diag.rng_state()
++        qualification.restore(model,optimizer,start,rng,modes)
++        memory=shared_memory();memory.begin_stage(2)
++        for _ in range(48):memory.draw()
++        payload=memory.to_bytes();fit=[handmade_group(f"fit{i}") for i in range(48)]
++        valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"valid{i}") for i in range(40)]]
++        out=self.temporary();rec=method.capture(model,optimizer,fit,memory,valid,c,"H_cons",2,1,out,"fixture")
++        capture=data.read_json(out/rec["path"]);run.validate_diagnostic(capture,"H_cons")
++        with diag.neutral(model):
++            raw=method.score(model,valid,c,"H_cons")
++            np.testing.assert_array_equal(run.previous.array(out,capture["valid_blind"],(40,378),np.float32),raw)
++            for role,groups in (("fit",fit),("cache",memory.reservoir.groups)):
++                live=method.score(model,groups,c,"H_cons")
++                np.testing.assert_array_equal(run.previous.array(out,capture[role],(len(groups),3),np.float64),diag.metrics(groups,live))
++            group=memory.reservoir.groups[0];live=record.reference(model,group,c);old=memory.tables[group.uid]
++            for key,seed in (("D0",None),("D1",data.seed_for(20261008,"ABC",2,group.uid,"diagnostic_regroup"))):
++                slots=record.assignment(group,seed)
++                residual=(literal_pool(torch.from_numpy(live),slots)-literal_pool(torch.from_numpy(old),slots)).numpy().astype(np.float64)
++                self.assertAlmostEqual(capture["teacher_errors"][0][key],float(np.mean(residual**2)),places=6)
++        self.assertEqual(core.state_digest(start),core.state_digest(qualification.state(model,optimizer)))
++        self.assertEqual((rng,modes,payload),(diag.rng_state(),[m.training for m in model.modules()],memory.to_bytes()))
++        repeated=method.update(model,optimizer,current,history,target,c,"H_cons",2,49)
++        self.assertEqual(first,repeated);self.assertEqual(expected_rng,diag.rng_state())
++        self.assertEqual(core.state_digest(expected),core.state_digest(qualification.state(model,optimizer)))
++        meta={**method.metadata(),"rng":diag.rng_state(),"modes":[m.training for m in model.modules()]}
++        with diag.neutral(model):before=method.restored_score(model,[current],c)
++        for kind,opt in (("full",optimizer),("inference",None)):
++            p=out/(kind+".pt");receipt=core.save_state(p,model,opt,meta);model.training_identity={"arm":"H"}
++            run.restore_point(p,receipt,model,opt,"H_cons")
++            with diag.neutral(model):np.testing.assert_array_equal(before,method.restored_score(model,[current],c))
++        for bad in ({"pooling":method.identity()}, {**method.metadata(),"training":{}}):
++            with self.assertRaises(ValueError):method.bind(model,bad)
++        bad=copy.deepcopy(capture);bad.pop("training")
++        with self.assertRaises(ValueError):run.validate_diagnostic(bad,"H_cons")
++        self.assertEqual(run.memory_from(payload,"H_cons").to_bytes(),payload)
++        memory.maps.pop("training")
++        with self.assertRaises(ValueError):run.memory_from(memory.to_bytes(),"H_cons")
++        self.evidence("capture_restore_identity",dict(actual_roles=[48,6,40],all_H_scores=True,D0_D1_H=True,
++            next_update_bitwise_equal=True,full_inference_restored=True,missing_training_rejected=True))
++
++    def test_unchanged_single_arm_defaults(self):
++        # Only shared runner/default paths changed. Reuse their existing witnesses.
++        for name in ("test_single_candidate_orchestration_and_blind_gate",
++                     "test_saved_comparisons_directions_permissions_and_budgets"):
++            result=unittest.TestResult();GHalfTests(name).run(result)
++            self.assertTrue(result.wasSuccessful(),str(result.errors)+str(result.failures))
++        self.evidence("old_default_increment",dict(tests=2,scope="Existing H control-flow and saved-statistic fixtures only"))
++
++    def test_loss_gate_and_saved_comparison_interfaces(self):
++        root=self.temporary();groups={};metadata=[]
++        for split,count in (("train",60),("development",20)):
++            groups[split]=[]
++            for d in "AB":
++                for i in range(count):
++                    g=handmade_group(f"{d}_{split}_{i:02}")
++                    metadata.append(dict(group_uid=g.uid,domain=d,split=split,group_index=i))
++                    groups[split].append(g if split=="train" else data.Group(g.uid,g.sellers,g.items))
++        loads,calls=[],[];c=run.config()
++        _,split_expected=run.partition(groups,metadata,c)
++        oldroot=root/"frozen_fixture"; (oldroot/"run/updates").mkdir(parents=True)
++        data.write_json(oldroot/"run/partition.json",split_expected)
++        tiny=tiny_model(); tinyopt=core.make_optimizer(tiny,c)
++        fake_baseline={"initial_identity":{"model":core.state_digest(tiny.state_dict()),"adam":core.state_digest(tinyopt.state_dict())}}
++        del tiny,tinyopt
++        class Budget:
++            phase="handwritten orchestration"
++            def check(self,*args):pass
++            def snapshot(self):return {}
++        def load(cfg):
++            loads.append("fresh");return tiny_model()
++        def update(model,optimizer,current,history,target,cfg,arm,stage,step,check):
++            self.assertTrue(current.uid.startswith("AB"[stage-1]+"_"))
++            self.assertEqual(run.parent.adam_step(optimizer),(stage-1)*288+step-1)
++            calls.append((arm,stage,step,current.uid,None if history is None else history.uid))
++            if history:self.assertTrue(history.uid.startswith("A_"))
++            t=(stage-1)*288+step
++            for p in model.parameters():
++                optimizer.state[p]={"step":torch.tensor(float(t)),"exp_avg":torch.zeros_like(p),"exp_avg_sq":torch.zeros_like(p)}
++            with torch.no_grad():model.head[2].bias.fill_(t*.001+method.ARMS.index(arm)*.3)
++            row=dict(total=1.2,encoder_lr=run.parent.stage_lr(step),head_lr=.001,**method.metadata(arm))
++            for role,g in (("current",current),("history",history)):
++                if g is not None:
++                    seed=data.seed_for(20260918,"ABC",stage,step,role,g.uid,"regroup")
++                    row[role]=dict(supervised=1.,consistency=.2,weighted=1.2 if role=="current" else .12,mse0=0.,mse1=None,distillation=0.,
++                        qualification_without_c=False,supervised_contribution=1. if role=="current" else .1,
++                        consistency_contribution=.2 if role=="current" else .02,teacher_contribution=0.,
++                        assignment_sha256=hashlib.sha256(record.assignment(g,seed).tobytes()).hexdigest())
++            if history:row["total"]=1.32
++            return row
++        truth=np.asarray(handmade_group("geometry").labels);tables={}
++        def reference(model,g,cfg,check=lambda:None):
++            if g.uid not in tables:
++                slots=record.assignment(g)
++                lookup={p:k for k,p in enumerate(itertools.combinations(range(28),2))}
++                values=[]
++                for i,j in itertools.combinations(range(len(slots)),2):
++                    a,b=sorted((int(slots[i]),int(slots[j])))
++                    k=0 if a==b else lookup[a,b]
++                    values.append((0 if a==b else truth[k]*3)+math.sin(i*.7+j*.3))
++                tables[g.uid]=np.asarray(values,np.float32)
++            return tables[g.uid]+float(model.head[2].bias.detach())
++        def score(model,gs,cfg,arm,check=lambda:None):
++            if not gs:return np.empty((0,378),np.float32)
++            return np.stack([method.account_logits(torch.from_numpy(reference(model,g,cfg)),record.assignment(g),arm,
++                cfg.setdefault("pooling_stats",{})).numpy() for g in gs]).astype(np.float32)
++        with mock.patch.object(run,"baseline_runs",return_value={a:(oldroot,{}, {}) for a in ("S","G_half")}), \
++             mock.patch.object(run,"baseline_inputs",return_value=(fake_baseline,oldroot,{},{"public_inputs":{"handwritten":True}})), \
++             mock.patch.object(run,"public_inputs",return_value=(groups,metadata,{"handwritten":True})), \
++             mock.patch.object(run,"attach_labels",side_effect=lambda gs,cfg,s,meta:gs), \
++             mock.patch.object(core,"model_files",return_value=c["models"]["split_rank"]), \
++             mock.patch.object(record,"load_model",side_effect=load), \
++             mock.patch.object(method,"update",side_effect=update), \
++             mock.patch.object(record,"reference",side_effect=reference), \
++             mock.patch.object(method,"score",side_effect=score), \
++             mock.patch.object(diag,"metrics",side_effect=lambda gs,vs:np.zeros((len(gs),3),np.float64)), \
++             mock.patch.object(run.parent.calibration,"fit",return_value={"status":"PASS_CALIBRATION_FIT","a":1.,"b":0.}), \
++             mock.patch("builtins.print"):
++            data.write_json(root/"access.json",dict(train=0,valid=0,heldout=0,owners=0))
++            manifest,split,valid,meta=run.train(root,Budget())
++            self.assertEqual((len(loads),len(calls)),(1,576))
++            self.assertEqual(manifest["physical_updates"],576)
++            self.assertEqual(manifest["gradient_group_presentations"],864)
++            self.assertEqual(sum(map(len,manifest["diagnostics"].values())),12)
++            self.assertEqual(len(list((root/"run/memory").glob("*.bin"))),2)
++            self.assertFalse(list((root/"run/work").glob("*.pt")))
++            for stage in "AB":
++                log=data.read_json(root/"run/updates"/(stage+"_H_cons.json"))
++                for other in ("S","G_half"):data.write_json(oldroot/"run/updates"/(stage+"_"+other+".json"),log)
++            scores,checked=run.blind_gate(root/"run",manifest)
++            self.assertEqual((set(scores),checked),(set(run.POINTS),split))
++            for arm in method.ARMS:
++                self.assertEqual(manifest["starts"][arm],manifest["points"]["A_"+arm]["continuity"])
++            for collection,key in (("points","A_H_cons"),("diagnostics","B_H_cons"),("training","A_H_cons"),("starts","H_cons")):
++                damaged=copy.deepcopy(manifest);del damaged[collection][key]
++                with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
++                self.assertEqual(data.read_json(root/"access.json")["valid"],0)
++            damaged=copy.deepcopy(manifest);damaged["starts"]["H_cons"]["model"]="wrong_A"
++            with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
++            damaged=copy.deepcopy(manifest);damaged["points"]["B_H_cons"]["pooling"]={"arm":"S"}
++            with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
++            self.assertEqual(data.read_json(root/"access.json")["valid"],0)
++            badlog=data.read_json(oldroot/"run/updates/B_G_half.json")
++            badlog["rows"][0]["current"]["assignment_sha256"]="wrong"
++            data.write_json(oldroot/"run/updates/B_G_half.json",badlog)
++            with self.assertRaises(ValueError):run.open_valid(root,manifest,valid,meta,c)
++            self.assertEqual(data.read_json(root/"access.json")["valid"],0)
++        self.check_saved_comparisons()
++        self.evidence("h_cons_orchestration",dict(fixture="Actual scheduler, pooling, Memory and checkpoint/diagnostic IO; mocked update/forward/metrics/calibration only",
++            scheduler_calls=len(calls),real_updates_in_this_fixture=0,independent_initializations=len(loads),
++            diagnostics=12,endpoints=2,own_A_states=True,blind_rejections=True,
++            scope="Control-flow evidence only. Real tiny gradient/update and actual diagnostic tests are separate."))
++
++    def check_saved_comparisons(self):
++        labelled=[handmade_group(f"{d}_valid_{i:02}") for d in "AB" for i in range(20)]
++        split={"development":[dict(group_uid=g.uid,domain=g.uid[0]) for g in labelled]}
++        raw=np.stack([np.asarray(g.labels,np.float32)*2-1+np.sin(np.arange(378)+i).astype(np.float32)*.2 for i,g in enumerate(labelled)])
++        score={p:{"raw":raw.copy(),"stage-cal":raw.astype(np.float64),"first-cal":raw.astype(np.float64)} for p in run.POINTS}
++        temp=self.temporary();hroot=temp/"H";oldroot=temp/"old";oldroot.mkdir()
++        col=run.collect(hroot,score,labelled,split)
++        oldcol=run.collect(oldroot/"evaluation",score,labelled,split)
++        # Explicit saved-metric algebra fixture, not a performance claim or recomputation of old results.
++        columns=col["columns"]
++        def set_values(origin,collection,point,map_value,loss_value):
++            for role,rec in collection["points"][point].items():
++                p=origin/rec["matrix"]["path"];v=data.read_json(p)
++                for row in v["values"]:
++                    row[columns.index("map")]=map_value
++                    row[columns.index("brier")]=loss_value
++                    row[columns.index("log_loss")]=loss_value
++                data.write_json(p,v);rec["matrix"]=data.record(p,origin)
++                qpath=origin/rec["queries"]["path"];q=np.load(qpath,allow_pickle=False);q[:,:,0]=map_value
++                qpath.unlink()  # Replace only this explicitly constructed temporary algebra fixture.
++                rec["queries"]=run.previous.save_array(qpath,q,origin)
++        for origin,collection,a,b,la,lb in ((hroot,col,.5,.6,.4,.5),(oldroot/"evaluation",oldcol,.4,.4,.3,.3)):
++            set_values(origin,collection,"A_H_cons",a,la);set_values(origin,collection,"B_H_cons",b,lb)
++        oldcol["points"]={stage+"_"+arm:copy.deepcopy(oldcol["points"][stage+"_H_cons"]) for stage in "AB" for arm in ("S","G_half")}
++        data.write_json(hroot/"collected.json",col)
++        baseline={"points":list(oldcol["points"])}
++        with mock.patch.object(run,"baseline_runs",return_value={a:(oldroot,oldcol,{}) for a in ("S","G_half")}):
++            result=run.finalize(hroot)
++            self.assertTrue(result["success"]["passed"]);self.assertTrue(result["success"]["direct_H_new_B_positive"])
++            for other in ("S","G_half"):
++                self.assertAlmostEqual(result["comparisons"]["H_cons-"+other]["raw"]["A"]["map"]["mean"],.2)
++                self.assertAlmostEqual(result["forgetting_comparisons"]["H_cons-"+other]["raw"]["map"]["mean"],-.1)
++                for key in ("brier","log_loss"):
++                    self.assertAlmostEqual(result["forgetting_comparisons"]["H_cons-"+other]["raw"][key]["mean"],.1)
++            oldcol["group_ids"]=oldcol["group_ids"][::-1]
++            with self.assertRaises(ValueError):run.finalize(hroot)
++        m={k:1. for k in ("t_A","t_B","v","h","L","s_F","r_F","s_I","r_I")};m.update(W_F=1000,W_I=500)
++        projection=run.projection(m)
++        self.assertEqual(projection["train_seconds"],576);self.assertEqual(projection["forward_seconds"],1482)
++        self.assertEqual(projection["io_seconds"],9);self.assertEqual(projection["projected_total_seconds"],1.25*(576+1482+9+1800))
++        self.assertFalse(run.projection({**m,"t_B":1000})["within_budget"])
++        for key in m:
++            with self.assertRaises(ValueError):run.projection({**m,key:0})
++        job=temp/"job";job.mkdir();data.write_json(job/"access.json",dict(train=0,valid=0,heldout=0,owners=0))
++        with self.assertRaises(RuntimeError):
++            run.previous.parse_once(job,[],run.config(),"train",loader=mock.Mock(side_effect=RuntimeError("handwritten read failure")))
++        with self.assertRaises(ValueError):
++            run.previous.parse_once(job,[],run.config(),"train",loader=mock.Mock())
++        with self.assertRaises((ValueError,KeyError)):run.open_valid(job,{},[],[],run.config())
++        self.assertEqual(data.read_json(job/"access.json"),dict(train=1,valid=0,heldout=0,owners=0))
++        budget=run.Budget(job);budget.started-=28801
++        with self.assertRaises(RuntimeError):budget.check()
++        from step28_g_half_verify import disk_reserve
++        with self.assertRaises(RuntimeError):disk_reserve(temp,8,3,10)
++        self.evidence("h_cons_comparison_and_permissions",dict(success=result["success"],forgetting=result["forgetting_comparisons"]["H_cons-S"]["raw"],
++            fixture="Handwritten saved-metric signs/UID and real collection; no baseline payload read",parse_failure_consumed=True,blind_open_blocked=True,projection=projection))

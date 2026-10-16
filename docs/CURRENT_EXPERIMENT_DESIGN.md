@@ -8,7 +8,7 @@
 
 | 合同 | 研究内容及角色 |
 |---|---|
-| [H_cons单候选实施合同](SELLER_ALIAS_H_CONSISTENCY.zh.md) | 2026-10-16已形成待批准具体合同。唯一固定JS，H评分不变；分层精度、分支/K/head/encoder真实作用、日志/训练身份/恢复、52份S/H保存对照、三种数据权限及CPU180/GPU600秒6调用/正式8小时10GiB明确。只新训一臂576/864、2端点/12诊断；双域胜S与新B直接胜H分开，旧A相对H完整披露。当前未实现或执行，未获新增数据/预算许可；后续批准及状态见交接。 |
+| [H_cons单候选实施合同](SELLER_ALIAS_H_CONSISTENCY.zh.md) | 2026-10-16已获完整条件批准。最小JS及实际损失/身份/恢复/双根比较接线完成，Linux CPU累计41/180秒、三轮均通过；生产源码未在首轮后改变，定向补齐原生夹具及证据文件命名。合同/实现合并包待具体外发许可；原生GPU600秒6调用及正式8小时10GiB已获条件授权，前提满足后推进。只训一臂576/864，双域胜S与新B直接胜H分开，当前GPU/正式/新正式数据访问均0；状态及证据见交接。 |
 | [H自然/重组查询分布一致性草案](../reports/documentation/20261016/h_consistency/proposal.zh.txt) | 唯一静态候选H_cons的外审及[独立主审](../reports/documentation/20261016/h_consistency/review/primary_disposition.zh.txt)已完成，支持为固定lambda=1、tau=1准备一次受限开发合同；原稿冻结。原rank、m断梯度一阶等价、对称图offset和实际损失/训练身份接线按主审补正；不是已知根因修复或论文贡献证明。26返回成员验收，必要25独立成员保留、专用页关闭。尚无实施合同批准、新实现、CPU/GPU、正式数据或训练权限，旧预算不移用。 |
 | [G_half单候选实施合同](SELLER_ALIAS_G_HALF.zh.md) | 唯一H于10月16日00:00:08—01:40:56完整完成，576/864、2端点/12诊断、统一盲门及两恢复齐全；正式含保存结果核算6050/28800秒，CPU17/180、原生6/6次320/600秒。[完整分析](../reports/seller_alias_continual/20261016/g_half_result/report.zh.txt)：H−S旧A MAP有条件正向证据，新B差跨零，固定双域目标false；H−G最终两域均跨零，相对旧A变化收益不替代最终水平。1650行统计和9项诊断独立核算一致，未新开标签/载模。结果外审及[独立主审](../reports/seller_alias_continual/20261016/g_half_result/review/primary_disposition.zh.txt)已关闭，无新增科学阻断；formal_gate.scope说明缺陷已附注澄清，冻结原门/数值不改。本固定候选未达目标，不自动追加候选/训练。状态与保管见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。 |
 | [G的最小性能改进与论文定位](../reports/documentation/20261015/g_refinement/proposal.zh.txt) | 唯一G_half=0.5 mean+0.5 G，静态外审及[独立主审](../reports/documentation/20261015/g_refinement/review/primary_disposition.zh.txt)已关闭，原稿冻结。数学正确、弱动机支持一次有限开发，不保证双域收益、不称新聚合原理或论文主贡献；补充负离群/结构盲性及混合池化近邻。23成员返回包/18输入身份核对，必要原件保存、专用页关闭，范围由上行新合同承接。 |

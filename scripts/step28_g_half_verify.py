@@ -88,7 +88,10 @@ def native_save(path, model, optimizer, metadata, check):
     return core.save_state(path, model, optimizer, metadata)
 
 
-def native(check, progress, handwritten, out):
+def native(check, progress, handwritten, out, *, entry=None, consistency=False):
+    run = entry or sys.modules["step28_g_half_run"]
+    method = run.method
+    active, control = method.ARMS[0], "H" if consistency else "G"
     import step28_balanced_pooling as original
     resources = preflight()
     if shutil.disk_usage(out).free < 10*2**30:
@@ -102,17 +105,22 @@ def native(check, progress, handwritten, out):
         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
         return value
     c = run.config()
+    if consistency:
+        c["handwritten_qualification"] = True
     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
         raise ValueError("BF16/checkpointing required")
-    method.bind(model,{"pooling":method.identity()})
+    if consistency and initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
+            "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
+        raise ValueError("H_cons native initial identity differs")
+    method.bind(model, method.metadata())
     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
     for g in (current,history):
         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
         if len(lengths)!=448 or set(lengths)!={256}:
             raise ValueError("Maximum N224/token256 fixture differs")
     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
-    gradients, effects = {}, {}
+    gradients, effects, table_checks = {}, {}, []
     def updated(arm, phase, step, h=None, target=None):
         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
         pre = {}
@@ -121,48 +129,66 @@ def native(check, progress, handwritten, out):
                 for key,p in probes.items():
                     if p.grad is None or not torch.isfinite(p.grad).all(): raise ValueError("Missing native gradient")
                     pre[key] = p.grad.detach().cpu().clone()
-        scorer = method if arm=="G_half" else original
-        row = timed(("t_"+phase) if arm=="G_half" else "G_"+phase,
-            lambda: scorer.update(model,optimizer,current,h,target,c,arm,1 if h is None else 2,step,check,observe))
+        scorer = method if consistency or arm == active else original
+        captured = []
+        options = {}
+        if consistency:
+            options = dict(qualification_without_c=arm == control,
+                table_observer=(lambda table, group, seed: captured.append((table.clone(), group, seed))) if arm == active else None)
+        progress("native_call_started", attempted_calls=len(updates)+1, actual_updates=len(updates))
+        row = timed(("t_"+phase) if arm == active else "control_"+phase,
+            lambda: scorer.update(model,optimizer,current,h,target,c,active if consistency else arm,
+                                  1 if h is None else 2,step,check,observe,**options))
         updates.append(dict(arm=arm,phase=phase,step=step,log=row))
         gradients[len(updates)] = pre
         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
+        for table, group, seed in captured:
+            table_checks.append(handwritten.verify_native_table(table, group, seed))
         return row
     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
-    updated("G","allocation",1)
+    updated(control,"allocation",1)
     work=out/"work";work.mkdir(); identities={}
     def metadata(label):
-        return dict(fixture=label,pooling=method.identity(),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
-    common_path=work/"common.pt";common_meta=metadata("One actual G update; common current fixture Adam step1")
+        return dict(fixture=label,**method.metadata(),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
+    common_path=work/"common.pt";common_meta=metadata("One actual "+control+" update; common current fixture Adam step1")
     common = timed("s_F",lambda:native_save(common_path,model,optimizer,common_meta,check))
     identities["common"] = common
     def reload(path,receipt):
-        return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,"G_half"))
-    reload(common_path,common); updated("G","A",2); gcurrent=state(model,optimizer)
-    reload(common_path,common); hrow=updated("G_half","A",2)
+        return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
+    reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
+    reload(common_path,common); hrow=updated(active,"A",2)
     effects["current"] = component_effects(model,gcurrent)
     for key in probes:
         delta=float((gradients[2][key]-gradients[3][key]).abs().max())
-        if delta<=0:raise ValueError("H-G preclip current gradient not distinguishable")
+        if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
         effects["current"][key]["pre_clip_gradient_max_delta"]=delta
-    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current H-G objective indistinguishable")
+    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current candidate-control objective indistinguishable")
+    if consistency:
+        run.loss_total(hrow, 1, active)
+        if not np.isclose(hrow["total"]-updates[1]["log"]["total"], hrow["current"]["consistency"], atol=2e-6, rtol=2e-6):
+            raise ValueError("Native current C contribution differs")
     del gcurrent;gc.collect()
     reload(common_path,common)
     # Same trained-one-step parameters/moments, but legal B epoch1 counter336 for the paired fixture.
     for value in optimizer.state.values(): value["step"].fill_(336)
     with diag.neutral(model):table=timed("v",lambda:record.reference(model,history,c,check))
     i,j=np.triu_indices(224,1);target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
-    paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from the one real G allocation update")
+    paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from one real "+control+" allocation update")
     paired=timed("s_F",lambda:native_save(paired_path,model,optimizer,paired_meta,check));identities["paired"]=paired
-    reload(paired_path,paired);updated("G","B",49,history,target);gpaired=state(model,optimizer)
-    reload(paired_path,paired);first=updated("G_half","B",49,history,target)
+    reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
+    reload(paired_path,paired);first=updated(active,"B",49,history,target)
     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
     effects["paired"]=component_effects(model,gpaired)
     for key in probes:
         delta=float((gradients[4][key]-gradients[5][key]).abs().max())
-        if delta<=0:raise ValueError("H-G preclip paired gradient not distinguishable")
+        if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
         effects["paired"][key]["pre_clip_gradient_max_delta"]=delta
-    if updates[3]["log"]["total"]==first["total"]:raise ValueError("Paired H-G objective indistinguishable")
+    if updates[3]["log"]["total"]==first["total"]:raise ValueError("Paired candidate-control objective indistinguishable")
+    if consistency:
+        run.loss_total(first, 2, active)
+        extra = first["current"]["consistency"]+.1*first["history"]["consistency"]
+        if not np.isclose(first["total"]-updates[3]["log"]["total"], extra, atol=2e-6, rtol=2e-6):
+            raise ValueError("Native paired C contribution differs")
     del gpaired;gc.collect()
     expected, expected_rng = state(model,optimizer), diag.rng_state()
     reload(paired_path,paired)
@@ -173,10 +199,10 @@ def native(check, progress, handwritten, out):
     valid=[data.Group(g.uid,g.sellers,g.items) for g in [handwritten.handmade_group(f"native_valid_{i}") for i in range(40)]]
     before=core.state_digest(state(model,optimizer));droot=out/"diagnostics";droot.mkdir()
     progress("actual_H_full_role_capture", actual_updates=len(updates))
-    method.capture(model,optimizer,fit,memory,valid,c,"G_half",2,1,droot,"handwritten",check)
+    method.capture(model,optimizer,fit,memory,valid,c,active,2,1,droot,"handwritten",check)
     if before!=core.state_digest(state(model,optimizer)) or rng!=diag.rng_state() or payload!=memory.to_bytes():
         raise ValueError("Actual H capture mutated state")
-    repeated=updated("G_half","B",49,history,target)
+    repeated=updated(active,"B",49,history,target)
     equality={"tensors":0,"elements":0};equal_state(expected,state(model,optimizer),equality)
     if expected_rng!=diag.rng_state() or payload!=memory.to_bytes() or modes!=[m.training for m in model.modules()] or first!=repeated:
         raise ValueError("Capture changed repeated next update")
@@ -186,8 +212,8 @@ def native(check, progress, handwritten, out):
         errors=[]
         for seed in (None,data.seed_for(20261008,"ABC",2,history.uid,"diagnostic_regroup")):
             slots=record.assignment(history,seed)
-            errors.append((method.account_logits(torch.from_numpy(table),slots,"G_half")-
-                           method.account_logits(torch.from_numpy(target),slots,"G_half")).numpy().astype(np.float64))
+            errors.append((method.account_logits(torch.from_numpy(table),slots,active)-
+                           method.account_logits(torch.from_numpy(target),slots,active)).numpy().astype(np.float64))
         return dict(D0=float(np.mean(errors[0]**2)),D1=float(np.mean(errors[1]**2)))
     residuals=timed("h",residual)
     # Persist the actual H-updated state, releasing the obsolete common work file first.
@@ -205,7 +231,7 @@ def native(check, progress, handwritten, out):
             raise ValueError("Full H scores not bitwise restored")
     inference_path=work/"H_inference.pt";infer_meta=metadata("Actual H inference restore fixture")
     infer=timed("s_I",lambda:native_save(inference_path,model,None,infer_meta,check));identities["inference"]=infer
-    if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,"G_half"))!=infer_meta:
+    if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,active))!=infer_meta:
         raise ValueError("Inference H metadata restore mismatch")
     with diag.neutral(model):
         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
@@ -218,11 +244,15 @@ def native(check, progress, handwritten, out):
     return dict(resources=resources,numerics=numerics,pretrained_archive=archive,initial_state=initial,
         actual_updates=6,updates=updates,measurements=measurements,projection=run.projection(measurements),effects=effects,
         both_phases_encoder_head_effect=True,H_pooling_restores_verified=True,next_update_bitwise_equal=True,
+        training_identity=method.metadata().get("training"), consistency_precision_verified=bool(table_checks),
+        table_precision=table_checks,
         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
 
 
-def main():
+def main(*, entry=None, handwritten_module="test_step28_g_half", test_class_name="GHalfTests", consistency=False):
+    import importlib
+    run = entry or sys.modules["step28_g_half_run"]
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("cpu", "gpu"))
     parser.add_argument("--output", type=Path, required=True)
@@ -235,14 +265,15 @@ def main():
         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
     args.output.mkdir(parents=True)
     sys.path.insert(0, str(data.ROOT/"tests"))
-    import test_step28_g_half as handwritten
+    handwritten = importlib.import_module(handwritten_module)
     os.environ["G_HALF_TEST_ROOT"] = str(args.output)
+    os.environ["H_CONS_TEST_ROOT"] = str(args.output)
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     numerics = run.parent.configure_numerics()
     process = psutil.Process()
     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
-    report = {"status": "RUNNING", "mode": args.mode, "scope": "G_half_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
+    report = {"status": "RUNNING", "mode": args.mode, "scope": run.method.ARMS[0]+"_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
     stopped, lock = threading.Event(), threading.RLock()
     def write():
@@ -294,7 +325,7 @@ def main():
         if args.mode == "cpu":
             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
                 raise ValueError("CPU qualification must disable GPU")
-            test_class = handwritten.GHalfTests
+            test_class = getattr(handwritten, test_class_name)
             selected = args.tests or unittest.defaultTestLoader.getTestCaseNames(test_class)
             report["selected_tests"] = selected
             suite = unittest.TestSuite(test_class(name) for name in selected)
@@ -309,7 +340,7 @@ def main():
             run.reviewed_gate(args.gate, "NATIVE")
             if args.prior_seconds != 0:
                 raise ValueError("Unique GPU attempt; no automatic retry")
-            report["native"] = native(check, progress, handwritten, args.output)
+            report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
         check()
         report["status"] = "PASS_HANDWRITTEN_ONLY"
     except BaseException as exc:

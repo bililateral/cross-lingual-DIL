@@ -32,6 +32,10 @@ def bind(model, metadata: dict) -> str:
     return "G_half"
 
 
+def metadata(arm: str = "G_half") -> dict:
+    return {"pooling": identity(arm)}
+
+
 def block_scores(blocks, arm: str = "G_half", stats: dict | None = None):
     identity(arm)
     if (blocks.ndim != 3 or not 2 <= blocks.shape[1] <= 8 or not 2 <= blocks.shape[2] <= 8

@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-16：H_cons批准实施与CPU增量完成
+
+用户原话：“批准这份 H_cons 合同，按约定范围和前提继续推进：先完成最小实现和 Linux 手写 CPU 增量核验，再准备合同与实现合并外审；审查通过后进行原生 GPU 资格与资源投影，满足条件后启动唯一固定训练。保持原定精度、数据权限和累计预算，避免过度设计和伪实现。”据此按[批准记录](../reports/documentation/20261016/h_consistency_implementation/authorization.json)推进完整条件顺序，原合同字节冻结；后续GPU及唯一训练无需重复确认，但新具体包仍需单独外发许可。
+
+最小实现复用H评分/record VJP和显式参数化单臂流程，实际接入JS、分项损失重建、训练/评分身份、恢复/诊断及S/H两根保存接口。Linux52保存对照原件已逐项核验。三次手写CPU进程均通过，按外层计费25+3+13=41/180秒；第二次只补224记录的固定原生夹具几何，第三次修复新旧测试同名覆盖并仅补受影响接口证据。当前42来源一致，生产代码在首轮后未变；逐项继承和范围见[CPU验收](../reports/documentation/20261016/h_consistency_implementation/qualification/cpu_receipt.json)。原输出/梯度精度和预算未调整，模拟编排不算真实训练，tiny作用不代替BGE资格。
+
+[合同与实现合并包](../reports/documentation/20261016/h_consistency_implementation/review/submission.json)已形成，尚未上传；已请求其具体外发许可。当前未载BGE、未解析新正式文本/标签、未读旧Memory，GPU及正式均0，未创建监听或新正式门。新材料仅本地Git，无公开push。
+
 ## 2026-10-16：H_cons具体实施合同准备
 
 用户原话：“那就按外审和你的独立主审意见继续，先把 H_cons 的具体实施合同准备好，明确比较判据、求解与梯度精度、实际接线核验、S/H 保存对照复用、数据权限和累计资源预算，注意避免过度设计和伪实现。”本轮据此形成[具体合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)，状态为待批准，不把合同准备解释成实现或训练许可。
