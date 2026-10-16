@@ -8,6 +8,16 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 G_half完整结果与外审保管
+
+唯一正式20261015_235900/workspace于10月16日01:40:56完整结束。147份小结果/日志/33冻结来源共4102971字节、8份Linux独立分析证据375924字节已SFTP回传逐项大小/SHA相符，详见[接收记录](../reports/seller_alias_continual/20261016/g_half_result/receive_verification.json)及[原始逐文件身份](../reports/seller_alias_continual/20261016/g_half_result/inventory.json)。本地完整结果目录为reports/seller_alias_continual/20261016/g_half_result；Linux原件仍在该workspace/reports/job，新增独立分析和报告在其reports/result_sync。不回传正式文本/标签、权重或Memory。
+
+[09:42现场](../reports/seller_alias_continual/20261016/g_half_result/closeout.json)确认无原三PID/相关训练及failure；两份推理权重A_G_half.pt/B_G_half.pt各1304396666字节，共2608793332字节（约2.43GiB），两份Memory分别341728/348491字节，共690219字节，仍留Linux。此为现场文件大小核对，未载模/反序列化；预期SHA及恢复证据保留原manifest。这是删除前观测，随后用户明确“推理权重给我删掉，没用的话”。本次核对训练/两恢复/保存分析完成，外审不依赖载模，无已批准后续模型加载或恢复需要；先回传[删除前身份](../reports/maintenance/20261016/g_half_weights/predelete.json)并核对SHA，再于09:53:18—09:53:19删除这两份权重2608793332字节，models现为空。147份其余文件大小/SHA全部不变，含两Memory690219字节；未下载或备份权重，详见[实际删除回执](../reports/maintenance/20261016/g_half_weights/receipt.json)。文件系统free由24709599232增至27318407168字节（约25.44GiB），逻辑释放与文件系统观测分开。两份回执在Linux/Windows均保留，逐项SHA一致；SSH关闭后另删除3份本次权重清理助手/清单1488字节。最初通用进程fd盘点遇到旧sd-pam受保护目录后停止且未删除，改为精确路径lsof核对，受限的其他用户FUSE挂载警告原样保留，不冒称全系统可见。冻结原报告/送审包保管状态不追改。
+
+用户已单独批准2798254字节/219成员结果包（SHA256 c1831a58ba41c7ff46c77b782aad9789730d234e9bf50faa836094cd23cc3880），09:45通过本地Playwright单次发送，结果外审正在进行，见[发送](../reports/seller_alias_continual/20261016/g_half_result/review/submission.json)。唯一输入ZIP、成员清单、请求、授权、可见模型与发送页面保留Windows用于本次审查验收；未向Linux补传输入ZIP或历史归档。仅本次报告/接收回执及外审元数据7文件91144字节同步至result_sync，逐项SHA一致，见[同步回执](../reports/seller_alias_continual/20261016/g_half_result/sync.json)。
+
+SSH已关闭；10份已用一次性传输/打包助手及清单102134字节、6份冗余浏览器快照68558字节已实际删除，共16文件170692字节。必要Linux分析脚本/成功原件/全部小结果、当前专用审查页及活动浏览器日志保留；外审验收/处置后再按实际用途处理包，不提前删除必要输入。局部清理不重置10月23日大清理周期，新材料仅本地Git，无公开push许可。
+
 ## 2026-10-15 G_half实施与CPU增量保管
 
 独立Linux workspace为reports/documentation/20261015/g_half_implementation/20261015_224000/workspace。必要CPU失败/成功、两轮源码身份、预算、43份旧结果身份核对等27文件111662字节已SFTP回传逐项一致；[原始回传](../reports/documentation/20261015/g_half_implementation/qualification/receive_verification.json)及[增量验收](../reports/documentation/20261015/g_half_implementation/qualification/cpu_receipt.json)保留首轮错误和累计17/180秒。两轮快照中64份与当前33项来源相同的重复文件已在Linux逐项核验后删除，释放1064841字节，仅保留两份不同的attempt01旧源码及原始失败/成功证据，见[清理记录](../reports/documentation/20261015/g_half_implementation/qualification/duplicate_cleanup.json)。清理前91文件的inventory保留原观测事实，不当作当前存量。
