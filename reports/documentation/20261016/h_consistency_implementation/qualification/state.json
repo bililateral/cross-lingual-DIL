@@ -1,39 +1,19 @@
 {
-  "status": "FAILED_NATIVE_RECOVERY_NO_FURTHER_RETRY",
-  "observed_at": "2026-10-16T14:42:54.431557+08:00",
+  "status": "RUNNING_FORMAL_H_CONS",
+  "observed_at": "2026-10-16T15:35:06.652346+08:00",
   "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace",
-  "cpu_charged_seconds": 47,
+  "cpu_charged_seconds": 51,
   "cpu_maximum_seconds": 180,
-  "gpu_charged_seconds": 90,
+  "gpu_charged_seconds": 418,
   "gpu_maximum_seconds": 600,
-  "gpu_actual_updates": 3,
-  "gpu_maximum_total_updates": 6,
-  "formal_charged_seconds": 0,
-  "formal_actual_updates": 0,
-  "formal_inputs": false,
-  "formal_labels": false,
-  "formal_gate_created": false,
-  "processes_absent": [
-    221432,
-    221438
-  ],
-  "failure": "Current candidate-control objective indistinguishable; FP32 total equality despite nonzero C and different gradient logs",
-  "recovery_authorization": {
-    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/preload_recovery_authorization.json",
-    "bytes": 1406,
-    "sha256": "b46267f78f660b0f5806980eac6db0572f34d4cc67f340578b64a8d3018d5228"
-  },
-  "outcome": {
-    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/recovery_outcome.zh.txt",
-    "bytes": 6705,
-    "sha256": "2722357de33eee0c31874f68cc20907b04b3c67c30992ba388db9b3d397e0cd0"
-  },
-  "closeout": {
-    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/recovery_closeout.json",
-    "bytes": 1693,
-    "sha256": "0204c96225c9e06d3ce83abb100359f64da4288a1e8d165fb9ac77e365e7476d"
-  },
-  "next_step": "Stop. No further recovery authorized; any new qualification plan requires explicit scope, criterion and cumulative update-budget decision. Do not launch formal training.",
+  "gpu_actual_updates": 9,
+  "gpu_maximum_total_updates": 9,
+  "formal_charged_seconds": 248,
+  "formal_actual_updates": 24,
+  "formal_inputs": true,
+  "formal_labels": true,
+  "formal_gate_created": true,
+  "next_step": "Continue this existing fixed formal job only. Source44/contract/policy must remain frozen. Observe progress/failure under data permissions; when complete SFTP permitted small evidence and independently analyze within remaining formal budget. No automatic restart. New concrete result external package requires permission.",
   "transport_cleanup": {
     "deleted_at_both_ends": [
       {
@@ -84,5 +64,120 @@
     ],
     "bytes_per_end": 158312,
     "reason": "All required payloads and raw evidence preserved; source and receipt manifests retained. Redundant SFTP ZIPs and superseded model reference removed."
-  }
+  },
+  "gpu_prior_charged_seconds": 90,
+  "gpu_attempt": "attempt03",
+  "requalification_authorization": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/objective_requalification_authorization.json",
+    "bytes": 1529,
+    "sha256": "57d2798b29f256af1ecbdbc8c65a8f207b9db55289854a537b6c31d77b86153e"
+  },
+  "previous_failure": "Current candidate-control objective indistinguishable; FP32 total equality despite nonzero C and different gradient logs",
+  "previous_recovery_authorization": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/preload_recovery_authorization.json",
+    "bytes": 1406,
+    "sha256": "b46267f78f660b0f5806980eac6db0572f34d4cc67f340578b64a8d3018d5228"
+  },
+  "previous_outcome": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/recovery_outcome.zh.txt",
+    "bytes": 6705,
+    "sha256": "2722357de33eee0c31874f68cc20907b04b3c67c30992ba388db9b3d397e0cd0"
+  },
+  "previous_closeout": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/recovery_closeout.json",
+    "bytes": 1693,
+    "sha256": "0204c96225c9e06d3ce83abb100359f64da4288a1e8d165fb9ac77e365e7476d"
+  },
+  "gpu_attempt_actual_updates": 6,
+  "gpu_native_status": "PASS_HANDWRITTEN_ONLY",
+  "formal_job": "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/reports/job",
+  "formal_wrapper_pid": 222764,
+  "formal_maximum_seconds": 28800,
+  "formal_maximum_output_bytes": 10737418240,
+  "formal_gate": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/formal_gate.json",
+    "bytes": 11364,
+    "sha256": "d6639330ff5a53e7ac5f72d74c85b4a72fcf403be126ef5f600f6d27f9ae2d01"
+  },
+  "outcome": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/objective_outcome.zh.txt",
+    "bytes": 5773,
+    "sha256": "adc0fd9413f609007f80ba7525b05c689a668ff9e0ee839b9b1c67d251487be9"
+  },
+  "closeout": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/objective_closeout.json",
+    "bytes": 354,
+    "sha256": "66020dec0f889b01e08172ae4761f0fdc2ef4045c7780c5a5a970ff6498c6e68"
+  },
+  "formal_processes": [
+    222764,
+    222771,
+    222772
+  ],
+  "formal_started_at": "2026-10-16T15:30:59+08:00",
+  "formal_hard_deadline": "2026-10-16T23:30:59+08:00",
+  "formal_projected_seconds": 18745.47757901193,
+  "formal_projected_completion": "2026-10-16T20:43:24+08:00",
+  "formal_access": {
+    "heldout": 0,
+    "owners": 0,
+    "train": 1,
+    "valid": 0
+  },
+  "formal_development_labels_opened": false,
+  "formal_actual_updates_at_least": 24,
+  "formal_charge_is_provisional": true,
+  "formal_elapsed_seconds_at_observation": 247.652346,
+  "formal_start": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/formal_start.json",
+    "bytes": 12384,
+    "sha256": "57af8081f710b7c7af90d23a0f9a9ab4a565ce6cb37362d94fc500115eaa5b88"
+  },
+  "formal_preflight": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/formal_preflight.json",
+    "bytes": 3251,
+    "sha256": "f3c2575c58f48e1ba7126f1865d36923447500b30b133658963a5fe5e5844428"
+  },
+  "objective_transport_cleanup": {
+    "path": "reports/documentation/20261016/h_consistency_implementation/qualification/objective_transport_cleanup.json",
+    "bytes": 1031,
+    "sha256": "eda36caf924349886ab45cb2b2b472ea8fd942ff4af5878093a49c63c1be6351"
+  },
+  "objective_transport_deleted_at_both_ends": true,
+  "formal_last_update_event": {
+    "completed": 24,
+    "elapsed_seconds": 132.8721362799406,
+    "event": "updates",
+    "limits": {
+      "maximum_cuda_reserved_bytes": 30064771072,
+      "maximum_gpu_stage_seconds": 28800,
+      "maximum_output_bytes": 10737418240,
+      "maximum_rss_bytes": 68719476736,
+      "minimum_free_gpu_bytes": 32212254720,
+      "minimum_free_host_bytes": 77309411328,
+      "torch_cpu_threads": 1
+    },
+    "peak_cuda_reserved_bytes": 7235174400,
+    "peak_output_bytes": 4947782,
+    "peak_rss_bytes": 2700464128,
+    "phase": "A_H_cons",
+    "point": "A_H_cons"
+  },
+  "formal_resource": {
+    "elapsed_seconds": 243.55545752076432,
+    "limits": {
+      "maximum_cuda_reserved_bytes": 30064771072,
+      "maximum_gpu_stage_seconds": 28800,
+      "maximum_output_bytes": 10737418240,
+      "maximum_rss_bytes": 68719476736,
+      "minimum_free_gpu_bytes": 32212254720,
+      "minimum_free_host_bytes": 77309411328,
+      "torch_cpu_threads": 1
+    },
+    "peak_cuda_reserved_bytes": 7417626624,
+    "peak_output_bytes": 4948237,
+    "peak_rss_bytes": 2711461888,
+    "phase": "A_H_cons"
+  },
+  "current_source44_verified_while_running": true
 }

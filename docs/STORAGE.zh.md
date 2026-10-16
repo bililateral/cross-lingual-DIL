@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons原生重核完成与正式启动
+
+原生attempt03完整通过后，按冻结生命周期保留四次写入的路径/大小/SHA/状态身份，并清理common.pt、paired.pt、H_inference.pt三个最终临时路径，work目录已不存在；原生输出峰值约8.488GiB。见[临时状态身份](../reports/documentation/20261016/h_consistency_implementation/qualification/gpu/attempt03/result/temporary_checkpoint_identity.json)及[实际收尾](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_closeout.json)。10份必要小原件630147字节逐项SFTP核验保留。原BGE未改，先前失败不追改。
+
+本次5个已用部署/回传ZIP共258966字节，两端按相同身份精确删除，见[传输清理](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_transport_cleanup.json)。没有为清理补传历史归档。CPU原件/冻结来源及外审必要材料保留。正式作业15:30:59开始，活动权重/自身Memory及正式输入7文件精确链接继续保留，原旧作业权重删除决定不扩展到新活动模型。本次局部清理不重置10月23日大清理日期。
+
 ## 2026-10-16 H_cons合并外审与原生失败收尾
 
 合并外审完整回收及独立主审处置后，删除返回ZIP、浏览器重复下载及内嵌重复输入，共3文件1757356字节；93个非重复载荷、审查正文/主审/清单和唯一用于冻结源码复核的review_input.zip继续保留。见[回收记录](../reports/documentation/20261016/h_consistency_implementation/review/recovery.json)，没有以补传Linux作为删除前提。

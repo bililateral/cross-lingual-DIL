@@ -18,7 +18,8 @@ base, previous, diag = single.base, single.previous, single.diag
 POLICY = data.ROOT/"schema/step28_h_consistency_policy.json"
 BASELINE = data.ROOT/"reports/documentation/20261016/h_consistency/baseline_sources.json"
 AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/authorization.json"
-RECOVERY_AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/qualification/preload_recovery_authorization.json"
+RECOVERY_AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/qualification/objective_requalification_authorization.json"
+NATIVE_AMENDMENT = data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md"
 POINTS = ("A_H_cons", "B_H_cons")
 COMPLETE = single.COMPLETE
 COMPLETION_STATUS = "COMPLETE_H_CONS_FIXED_AB"
@@ -26,7 +27,7 @@ DIRECT_COMPARISON_KEY = "direct_H_new_B_positive"
 CPU_TESTS = ("test_js_value_gradient_precision_and_faults", "test_shared_table_pullback_and_finite_difference",
              "test_complete_objective_vjp_and_actual_updates", "test_actual_capture_restore_and_training_identity",
              "test_loss_gate_and_saved_comparison_interfaces", "test_unchanged_single_arm_defaults",
-             "test_authorized_preload_recovery")
+             "test_authorized_native_requalification", "test_rounding_aware_native_objective")
 projection, continuity = single.projection, single.continuity
 fresh, pretrained_archive = single.fresh, single.pretrained_archive
 public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
@@ -67,7 +68,7 @@ def sources() -> list[dict]:
     paths.update(data.ROOT/"schema"/name for name in ("step28_h_consistency_policy.json", "step28_g_half_policy.json",
         "step28_record_replay_policy.json", "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json",
         "step28_chinese_base_policy.json"))
-    paths.update((BASELINE, AUTHORIZATION, RECOVERY_AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+    paths.update((BASELINE, AUTHORIZATION, RECOVERY_AUTHORIZATION, NATIVE_AMENDMENT, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
                   data.ROOT/"scripts/run_step28_h_consistency_linux_20261016.sh",
                   single.BASELINE, single.AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_G_HALF.zh.md",
                   data.ROOT/"scripts/run_step28_g_half_linux_20261015.sh"))
@@ -146,12 +147,58 @@ def validate_diagnostic(value: dict, arm: str) -> None:
         raise ValueError("Diagnostic H_cons identity missing")
 
 
+def native_objective_pair(off: dict, on: dict, stage: int) -> dict:
+    """Check actual FP32 branch arithmetic; scalar inequality is only diagnostic."""
+    loss_total(on, stage, "H_cons")
+    if any(off.get(k) != v for k, v in method.metadata().items()):
+        raise ValueError("Native control identity differs")
+    roles = ("current",) if stage == 1 else ("current", "history")
+    if stage not in (1, 2) or (stage == 1 and "history" in off):
+        raise ValueError("Native objective stage differs")
+    details, totals = {}, [0., 0.]
+    for role in roles:
+        a, b = off[role], on[role]
+        for key in ("supervised", "consistency", "mse0", "distillation", "mse1", "assignment_sha256"):
+            if a[key] != b[key]:
+                raise ValueError("Native on/off base terms or allocation differ: "+role+"/"+key)
+        weight = np.float32(1. if role == "current" else .1)
+        for index, row in enumerate((a, b)):
+            if row["qualification_without_c"] is not (index == 0):
+                raise ValueError("Native C switch differs")
+            for key in ("supervised", "consistency", "mse0"):
+                if not np.isfinite(row[key]) or float(np.float32(row[key])) != row[key]:
+                    raise ValueError("Native component is not the actual finite FP32 value")
+            expected = (weight*np.float32(row["supervised"]),
+                        np.float32(0. if index == 0 else weight)*np.float32(row["consistency"]),
+                        np.float32(.5)*np.float32(row["mse0"]))
+            for key, number in zip(("supervised_contribution", "consistency_contribution", "teacher_contribution"), expected):
+                if row[key] != float(number):
+                    raise ValueError("Native explicit FP32 contribution differs: "+role+"/"+key)
+            weighted = float(np.float32(np.float32(expected[0]+expected[1])+expected[2]))
+            if row["weighted"] != weighted:
+                raise ValueError("Native FP32 addition order differs")
+            totals[index] += weighted
+        details[role] = dict(consistency=b["consistency"], contribution=b["consistency_contribution"],
+                             off_weighted=a["weighted"], on_weighted=b["weighted"])
+    if off["total"] != totals[0] or on["total"] != totals[1]:
+        raise ValueError("Native total differs from actual branch sum")
+    return dict(roles=details, off_total=totals[0], on_total=totals[1],
+                actual_difference=totals[1]-totals[0], totals_equal=totals[0] == totals[1],
+                component_reference_difference=sum(r["contribution"] for r in details.values()),
+                fp32_branch_arithmetic_verified=True)
+
+
 def validate_native(value: dict) -> None:
     if (value.get("training_identity") != method.training_identity()
             or value.get("consistency_precision_verified") is not True
             or len(value.get("table_precision", [])) != 5):
         raise ValueError("Actual native H_cons table precision/training identity missing")
-    for phase in ("current", "paired"):
+    updates = value.get("updates", [])
+    if len(updates) != 6:
+        raise ValueError("Native six-call logs missing")
+    for phase, index, stage in (("current", 1, 1), ("paired", 3, 2)):
+        if value.get("objective_pairs", {}).get(phase) != native_objective_pair(updates[index]["log"], updates[index+1]["log"], stage):
+            raise ValueError("Native rounded objective evidence missing or inconsistent")
         for component in ("encoder", "head"):
             effect = value.get("effects", {}).get(phase, {}).get(component, {})
             adam = effect.get("adam", {})
@@ -170,23 +217,24 @@ def validate_native(value: dict) -> None:
                     raise ValueError("Native on/off Adam clock differs")
 
 
-def validate_preload_recovery(gate: dict, prior_seconds: float, output: Path) -> None:
-    if gate.get("preload_recovery_authorization") != data.record(RECOVERY_AUTHORIZATION, data.ROOT):
-        raise ValueError("Specific preload recovery approval missing")
+def validate_native_requalification(gate: dict, prior_seconds: float, output: Path) -> int:
+    if gate.get("requalification_authorization") != data.record(RECOVERY_AUTHORIZATION, data.ROOT):
+        raise ValueError("Specific native requalification approval missing")
     auth = data.read_json(RECOVERY_AUTHORIZATION)
-    if (auth["status"] != "APPROVED_ONE_PRELOAD_RECOVERY" or prior_seconds != auth["prior_charged_seconds"]
-            or prior_seconds != 3 or output != data.ROOT/auth["attempt_output"]
-            or auth["maximum_cumulative_gpu_seconds"] != 600 or auth["maximum_total_updates"] != 6):
-        raise ValueError("Preload recovery scope or cumulative charge differs")
-    for key in ("supplement", "failed_result", "failed_wallclock"):
+    if (auth["status"] != "APPROVED_OBJECTIVE_GATE_REQUALIFICATION" or prior_seconds != auth["prior_charged_seconds"]
+            or prior_seconds != 90 or output != data.ROOT/auth["attempt_output"]
+            or auth["maximum_cumulative_gpu_seconds"] != 600 or auth["maximum_total_updates"] != 9
+            or auth["prior_actual_updates"] != 3 or auth["attempt_updates"] != 6):
+        raise ValueError("Native requalification scope or cumulative charge differs")
+    for key in ("supplement", "primary_static_review", "failed_result", "failed_wallclock"):
         data.verify(data.ROOT/auth[key]["path"], auth[key])
     failed = data.read_json(data.ROOT/auth["failed_result"]["path"])
     wall = data.read_json(data.ROOT/auth["failed_wallclock"]["path"])
-    if (failed["status"] != "FAIL" or failed.get("actual_updates", 0) != 0 or failed.get("updates")
-            or failed.get("stage") is not None or failed.get("native") is not None
-            or failed.get("max_reserved_bytes") != 0 or wall["cumulative_charged_seconds"] != prior_seconds
-            or not failed.get("traceback", "").rstrip().endswith("ValueError: Pinned BGE archive differs or is missing")):
-        raise ValueError("Only the approved zero-update preload failure can recover")
+    if (failed["status"] != "FAIL" or failed.get("actual_updates") != 3 or len(failed.get("updates", [])) != 3
+            or failed.get("native") is not None or wall["cumulative_charged_seconds"] != prior_seconds
+            or not failed.get("traceback", "").rstrip().endswith("ValueError: Current candidate-control objective indistinguishable")):
+        raise ValueError("Only the approved three-update objective-gate failure can requalify")
+    return auth["prior_actual_updates"]
 
 
 class Budget(single.Budget):

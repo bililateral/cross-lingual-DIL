@@ -145,26 +145,64 @@ def shared_memory():
 
 
 class HConsistencyTests(unittest.TestCase):
-    def test_authorized_preload_recovery(self):
-        gate = {"preload_recovery_authorization": data.record(run.RECOVERY_AUTHORIZATION, data.ROOT)}
-        output = data.ROOT/"reports/qualification/gpu/attempt02/result"
-        run.validate_preload_recovery(gate,3,output)
-        for fee in (0,2,4):
-            with self.assertRaises(ValueError):run.validate_preload_recovery(gate,fee,output)
-        with self.assertRaises(ValueError):run.validate_preload_recovery({},3,output)
-        with self.assertRaises(ValueError):run.validate_preload_recovery(gate,3,output.parent.parent/"attempt03/result")
+    def test_authorized_native_requalification(self):
+        gate = {"requalification_authorization": data.record(run.RECOVERY_AUTHORIZATION, data.ROOT)}
+        output = data.ROOT/"reports/qualification/gpu/attempt03/result"
+        self.assertEqual(run.validate_native_requalification(gate,90,output),3)
+        for fee in (0,3,89,91):
+            with self.assertRaises(ValueError):run.validate_native_requalification(gate,fee,output)
+        with self.assertRaises(ValueError):run.validate_native_requalification({},90,output)
+        with self.assertRaises(ValueError):run.validate_native_requalification(gate,90,output.parent.parent/"attempt04/result")
         original = data.read_json
         def wrong_failure(path):
             value = original(path)
-            if path.name == "result.json":value["actual_updates"] = 1
+            if path.name == "result.json":value["actual_updates"] = 4
             return value
         with mock.patch.object(data,"read_json",side_effect=wrong_failure):
-            with self.assertRaises(ValueError):run.validate_preload_recovery(gate,3,output)
-        bad = copy.deepcopy(gate);bad["preload_recovery_authorization"]["sha256"]="0"*64
-        with self.assertRaises(ValueError):run.validate_preload_recovery(bad,3,output)
-        self.evidence("preload_recovery",dict(prior_gpu_seconds=3,allowed_output=output.relative_to(data.ROOT).as_posix(),
-            wrong_cost_missing_approval_wrong_identity_new_attempt_or_nonzero_updates_rejected=True,
+            with self.assertRaises(ValueError):run.validate_native_requalification(gate,90,output)
+        bad = copy.deepcopy(gate);bad["requalification_authorization"]["sha256"]="0"*64
+        with self.assertRaises(ValueError):run.validate_native_requalification(bad,90,output)
+        self.evidence("native_requalification",dict(prior_gpu_seconds=90,prior_actual_updates=3,
+            allowed_output=output.relative_to(data.ROOT).as_posix(),
+            wrong_cost_missing_approval_wrong_identity_new_attempt_or_wrong_updates_rejected=True,
             scientific_execution="CPU approval/accounting check only; no model or GPU"))
+
+    def test_rounding_aware_native_objective(self):
+        auth = data.read_json(run.RECOVERY_AUTHORIZATION)
+        previous = data.read_json(data.ROOT/auth["failed_result"]["path"])
+        off, on = [v["log"] for v in previous["updates"][1:3]]
+        pair = run.native_objective_pair(off,on,1)
+        self.assertTrue(pair["totals_equal"])
+        self.assertGreater(pair["component_reference_difference"],0)
+        bad = copy.deepcopy(on);bad["current"]["consistency_contribution"] = 0.
+        with self.assertRaises(ValueError):run.native_objective_pair(off,bad,1)
+        examples = []
+        for kind in ("small_live", "constant", "detached"):
+            model = torch.nn.Module()
+            model.encoder = torch.nn.Linear(1,1,bias=False)
+            model.head = torch.nn.Linear(1,1,bias=False)
+            for p in model.parameters():torch.nn.init.zeros_(p)
+            optimizer = torch.optim.AdamW(model.parameters(),lr=.001)
+            initial,rng,modes = qualification.state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+            def objective(enabled):
+                theta = sum(p.sum() for p in model.parameters())
+                extra = 2**-25*(1+theta) if kind == "small_live" else theta.new_tensor(1.) if kind == "constant" else (1+theta).detach()
+                return 4+0*theta+(extra if enabled else 0)
+            off_value = objective(False);off_value.backward();optimizer.step()
+            control = qualification.state(model,optimizer)
+            qualification.restore(model,optimizer,initial,rng,modes)
+            on_value = objective(True);on_value.backward();optimizer.step()
+            if kind == "small_live":
+                self.assertEqual(float(off_value),float(on_value))
+                for p in model.parameters():self.assertEqual(float(p.grad),2**-25)
+                effects = qualification.component_effects(model,control,optimizer=optimizer)
+            else:
+                self.assertNotEqual(float(off_value),float(on_value))
+                with self.assertRaises(ValueError):qualification.component_effects(model,control,optimizer=optimizer)
+                effects = "rejected_no_actual_effect"
+            examples.append(dict(kind=kind,off_total=float(off_value),on_total=float(on_value),effects=effects))
+        self.evidence("rounding_aware_objective",dict(previous_native_pair=pair,missing_small_C_rejected=True,
+            analytic_examples=examples,scope="Saved native scalar replay plus independent two-parameter CPU counterexamples; not a native pass"))
 
     def temporary(self):
         t = tempfile.TemporaryDirectory(dir=os.environ["H_CONS_TEST_ROOT"])
@@ -280,7 +318,7 @@ class HConsistencyTests(unittest.TestCase):
         initial, rng, modes = qualification.state(model, optimizer), diag.rng_state(), [m.training for m in model.modules()]
         with diag.neutral(model): old = record.reference(model, history, c)
         i, j = np.triu_indices(56, 1); target = (old+2*np.sin(.31*i+.71*j)).astype(np.float32)
-        effects = {}
+        effects, objective_pairs, paired_logs = {}, {}, {}
         for stage, step, historic in ((1, 2, False), (2, 49, True)):
             qualification.restore(model, optimizer, initial, rng, modes)
             if historic:
@@ -299,6 +337,9 @@ class HConsistencyTests(unittest.TestCase):
             def observe(role, log):observed[role] = {n:p.grad.clone() for n,p in model.named_parameters() if p.grad is not None}
             row = method.update(model, optimizer, current, branch, teacher, c, "H_cons", stage, step, observe=observe)
             run.loss_total(row, stage, "H_cons")
+            phase = "paired" if historic else "current"
+            objective_pairs[phase] = run.native_objective_pair(off_log,row,stage)
+            paired_logs[phase] = [{"log":off_log},{"log":row}]
             direct.train();direct_opt.zero_grad(set_to_none=True);values=[]
             for role, group, ref in (("current",current,None), ("history",branch,teacher)):
                 if group is None:continue
@@ -356,14 +397,17 @@ class HConsistencyTests(unittest.TestCase):
                 with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
             effects["paired" if historic else "current"] = dict(components=effect,total=row["total"],without_c=off_log["total"],C_contribution=extra)
         native = dict(training_identity=method.training_identity(),consistency_precision_verified=True,table_precision=[{}]*5,
-                      effects={phase:value["components"] for phase,value in effects.items()})
+                      effects={phase:value["components"] for phase,value in effects.items()},objective_pairs=objective_pairs,
+                      updates=[{"log":{}}]+paired_logs["current"]+paired_logs["paired"]+[paired_logs["paired"][1]])
         run.validate_native(native)
+        bad=copy.deepcopy(native);bad.pop("objective_pairs")
+        with self.assertRaises(ValueError):run.validate_native(bad)
         for phase in ("current","paired"):
             for component in ("encoder","head"):
                 bad = copy.deepcopy(native);bad["effects"][phase][component].pop("adam")
                 with self.assertRaises(ValueError):run.validate_native(bad)
         with self.assertRaises(ValueError):method.update(model,optimizer,current,None,None,run.config(),"H_cons",1,2,qualification_without_c=True)
-        self.evidence("complete_graph_and_update",dict(effects=effects,independent_full_graph=True,adam_moments_compared=True,
+        self.evidence("complete_graph_and_update",dict(effects=effects,objective_pairs=objective_pairs,independent_full_graph=True,adam_moments_compared=True,
             scope="Real tiny-model updates; paired clock336 synthetic, no formal model or inputs"))
 
     def test_actual_capture_restore_and_training_identity(self):

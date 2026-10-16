@@ -152,7 +152,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         if len(lengths)!=448 or set(lengths)!={256}:
             raise ValueError("Maximum N224/token256 fixture differs")
     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
-    gradients, effects, table_checks = {}, {}, []
+    gradients, effects, table_checks, objective_pairs = {}, {}, [], {}
     def updated(arm, phase, step, h=None, target=None):
         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
         pre = {}
@@ -176,6 +176,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
         for table, group, seed in captured:
             table_checks.append(handwritten.verify_native_table(table, group, seed))
+            progress("native_table_precision", table_precision=table_checks)
         return row
     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
     updated(control,"allocation",1)
@@ -194,11 +195,12 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         delta=float((gradients[2][key]-gradients[3][key]).abs().max())
         if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
         effects["current"][key]["pre_clip_gradient_max_delta"]=delta
-    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current candidate-control objective indistinguishable")
+    progress("native_effects", effects=effects)
     if consistency:
-        run.loss_total(hrow, 1, active)
-        if not np.isclose(hrow["total"]-updates[1]["log"]["total"], hrow["current"]["consistency"], atol=2e-6, rtol=2e-6):
-            raise ValueError("Native current C contribution differs")
+        objective_pairs["current"] = run.native_objective_pair(updates[1]["log"], hrow, 1)
+        progress("native_objective_pair", objective_pairs=objective_pairs)
+    elif updates[1]["log"]["total"]==hrow["total"]:
+        raise ValueError("Current candidate-control objective indistinguishable")
     del gcurrent;gc.collect()
     reload(common_path,common)
     # Same trained-one-step parameters/moments, but legal B epoch1 counter336 for the paired fixture.
@@ -215,12 +217,12 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         delta=float((gradients[4][key]-gradients[5][key]).abs().max())
         if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
         effects["paired"][key]["pre_clip_gradient_max_delta"]=delta
-    if updates[3]["log"]["total"]==first["total"]:raise ValueError("Paired candidate-control objective indistinguishable")
+    progress("native_effects", effects=effects)
     if consistency:
-        run.loss_total(first, 2, active)
-        extra = first["current"]["consistency"]+.1*first["history"]["consistency"]
-        if not np.isclose(first["total"]-updates[3]["log"]["total"], extra, atol=2e-6, rtol=2e-6):
-            raise ValueError("Native paired C contribution differs")
+        objective_pairs["paired"] = run.native_objective_pair(updates[3]["log"], first, 2)
+        progress("native_objective_pair", objective_pairs=objective_pairs)
+    elif updates[3]["log"]["total"]==first["total"]:
+        raise ValueError("Paired candidate-control objective indistinguishable")
     del gpaired;gc.collect()
     expected, expected_rng = state(model,optimizer), diag.rng_state()
     reload(paired_path,paired)
@@ -277,7 +279,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         actual_updates=6,updates=updates,measurements=measurements,projection=run.projection(measurements),effects=effects,
         both_phases_encoder_head_effect=True,H_pooling_restores_verified=True,next_update_bitwise_equal=True,
         training_identity=method.metadata().get("training"), consistency_precision_verified=bool(table_checks),
-        table_precision=table_checks,
+        table_precision=table_checks, objective_pairs=objective_pairs,
         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
 
@@ -313,6 +315,8 @@ def main(*, entry=None, handwritten_module="test_step28_g_half", test_class_name
             report["elapsed_seconds"] = time.monotonic()-STARTED
             report["cumulative_seconds"] = args.prior_seconds+report["elapsed_seconds"]
             report["cumulative_charged_seconds"] = args.prior_seconds+math.ceil(report["elapsed_seconds"])
+            if "prior_actual_updates" in report:
+                report["cumulative_actual_updates"] = report["prior_actual_updates"]+report.get("actual_updates", 0)
             if args.mode == "gpu" and torch.cuda.is_initialized():
                 report["max_reserved_bytes"] = torch.cuda.max_memory_reserved()
             data.write_json(args.output/"result.json", report)
@@ -370,11 +374,13 @@ def main(*, entry=None, handwritten_module="test_step28_g_half", test_class_name
             if args.gate is None:
                 raise ValueError("Implementation review gate required")
             gate = run.reviewed_gate(args.gate, "NATIVE")
-            if consistency and (args.prior_seconds != 0 or "preload_recovery_authorization" in gate):
-                run.validate_preload_recovery(gate, args.prior_seconds, args.output)
+            if consistency:
+                report["prior_actual_updates"] = run.validate_native_requalification(gate, args.prior_seconds, args.output)
             elif args.prior_seconds != 0:
                 raise ValueError("Unique GPU attempt; no automatic retry")
             report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
+            if consistency:
+                run.validate_native(report["native"])
         check()
         report["status"] = "PASS_HANDWRITTEN_ONLY"
     except BaseException as exc:

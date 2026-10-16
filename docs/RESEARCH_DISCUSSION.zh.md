@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-16：批准标量资格修订并重新完成原生GPU校验
+
+用户原话：“实施修订并重新完成原生GPU校验”。承接已呈现的独立主审及“从头六调用会累计9次更新”范围，批准[原生资格补充](SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md)：唯一attempt03保留旧3更新/90秒，新6调用，累计最多9更新/600秒；CPU180秒、原精度、原手写输入、数据权限和正式8小时/10GiB条件保持。此前本条件定向免审继续有效，原审查未变部分继承，本修订由主执行者独立负责，不重新打包外发。
+
+最小修订和Linux手写CPU attempt06已通过，三项收费4秒，累计51/180；实际总值舍入、关键作用缺失反例和完整图/VJP/参数/Adam已核对，见[增量主审](../reports/documentation/20261016/h_consistency_implementation/review/objective_primary.zh.txt)。独立workspace的44来源、12原模型文件和空闲资源核实后启动唯一原生attempt03；最终结果由[当前状态](../reports/documentation/20261016/h_consistency_implementation/qualification/state.json)及后续原件记载，不以启动代替通过。历史失败及旧许可不追改。
+
+原生attempt03完整通过，新6次加旧3次累计9，外层328秒加旧90累计418/600；精度/作用/恢复及5小时12分25秒、8.873GiB投影通过，详见[独立验收](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_outcome.zh.txt)。用户进一步原话：“既然GPU原生验证通过就开始正式训练”。据此于15:30:59开始唯一固定正式作业，已确认真实A阶段更新，访问账train1、valid0、heldout0、owners0；原8小时/10GiB、576更新/864群呈现、保存S/H对照及盲门保持。未新增候选或免除未来结果外审包许可，运行详情由当前交接/状态承接。
+
 ## 2026-10-16：审查FP32总目标严格不等资格条件
 
 用户原话：“现在给我审查‘舍入后的总目标必须严格不等’是否适合作为资格条件”。据此完成[定向独立静态审查](../reports/documentation/20261016/h_consistency_objective_gate/analysis.zh.txt)：审查合同原话、实际前向/VJP/更新、失败原数和匹配PyTorch2.9.1的官方反向规则，给出非必要/非充分手算反例及不能只靠isclose的反例。未执行新CPU/GPU科学计算，未改运行源码/精度/合同，旧失败和累计账不变。
