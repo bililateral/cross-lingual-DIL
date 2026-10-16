@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons完整结果与独立分析保管
+
+正式运行已完成。158份必要保存分数/指标/查询/计数/诊断/更新日志/44来源及外层账共4700169字节SFTP回传至reports/seller_alias_continual/20261016/h_consistency_result，逐项大小/SHA一致，见[inventory](../reports/seller_alias_continual/20261016/h_consistency_result/inventory.json)与[回传核对](../reports/seller_alias_continual/20261016/h_consistency_result/receive_verification.json)。7份Linux独立分析共386764字节及清单已回传核验；分析源码、报告及回传记录保管在原20261016_124900/workspace/reports/result_sync，当前state两端一致。
+
+18:14:05现场原三PID均退出、无failure，正式completion/访问账未变。两推理权重各1304398010字节、合计2608796020字节；两Memory为342189/348952字节、合计691141字节，继续留Linux原job/run/models与memory，未载入、下载或删除，见[收尾](../reports/seller_alias_continual/20261016/h_consistency_result/closeout.json)。旧H删除许可不扩大到本轮。2176647字节h_cons_result_transfer.zip已在双方必要成员验收后删除；不是正式科研证据删除。具体结果外审输入包3187528字节/276成员有待审用途，暂保留Windows一份，未外发、未为备份补传Linux；后续按合同取得具体许可。局部清理不重置10月23日大清理周期。
+
 ## 2026-10-16 H_cons原生重核完成与正式启动
 
 原生attempt03完整通过后，按冻结生命周期保留四次写入的路径/大小/SHA/状态身份，并清理common.pt、paired.pt、H_inference.pt三个最终临时路径，work目录已不存在；原生输出峰值约8.488GiB。见[临时状态身份](../reports/documentation/20261016/h_consistency_implementation/qualification/gpu/attempt03/result/temporary_checkpoint_identity.json)及[实际收尾](../reports/documentation/20261016/h_consistency_implementation/qualification/objective_closeout.json)。10份必要小原件630147字节逐项SFTP核验保留。原BGE未改，先前失败不追改。
