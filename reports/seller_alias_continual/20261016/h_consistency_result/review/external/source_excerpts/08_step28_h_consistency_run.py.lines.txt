@@ -1,0 +1,274 @@
+原输入路径: evidence/scripts/step28_h_consistency_run.py
+原输入SHA256: 0837bfd94f769b30b61e5b2fffd2e0a66ed66da70dcf60d3aeec60ab37702925
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_h_consistency_run.py:1-268 ---
+    1  """H_cons entry; reuse the single-arm lifecycle with explicit dependencies."""
+    2  from __future__ import annotations
+    3  
+    4  import argparse
+    5  import ast
+    6  from functools import partial
+    7  import os
+    8  from pathlib import Path
+    9  import sys
+   10  
+   11  import numpy as np
+   12  
+   13  import step28_g_half_run as single
+   14  import step28_h_consistency as method
+   15  
+   16  record, data, parent, core = single.record, single.data, single.parent, single.core
+   17  base, previous, diag = single.base, single.previous, single.diag
+   18  POLICY = data.ROOT/"schema/step28_h_consistency_policy.json"
+   19  BASELINE = data.ROOT/"reports/documentation/20261016/h_consistency/baseline_sources.json"
+   20  AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/authorization.json"
+   21  RECOVERY_AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/qualification/objective_requalification_authorization.json"
+   22  NATIVE_AMENDMENT = data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md"
+   23  POINTS = ("A_H_cons", "B_H_cons")
+   24  COMPLETE = single.COMPLETE
+   25  COMPLETION_STATUS = "COMPLETE_H_CONS_FIXED_AB"
+   26  DIRECT_COMPARISON_KEY = "direct_H_new_B_positive"
+   27  CPU_TESTS = ("test_js_value_gradient_precision_and_faults", "test_shared_table_pullback_and_finite_difference",
+   28               "test_complete_objective_vjp_and_actual_updates", "test_actual_capture_restore_and_training_identity",
+   29               "test_loss_gate_and_saved_comparison_interfaces", "test_unchanged_single_arm_defaults",
+   30               "test_authorized_native_requalification", "test_rounding_aware_native_objective")
+   31  projection, continuity = single.projection, single.continuity
+   32  fresh, pretrained_archive = single.fresh, single.pretrained_archive
+   33  public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
+   34  
+   35  
+   36  def policy() -> dict:
+   37      p = data.read_json(POLICY)
+   38      old = single.policy()
+   39      expected = {**old, "study": "fixed_H_natural_regrouped_query_consistency", "methods": ["H_cons"],
+   40          "pooling": method.identity(), "training": method.training_identity(),
+   41          "evaluation": dict(bootstrap_replicates=5000, bootstrap_seed=20260930,
+   42              comparisons=[["H_cons", "S"], ["H_cons", "G_half"]], primary_metric="map", primary_role="raw",
+   43              success="B_end_H_cons_minus_S_each_AB_MAP_CI_lower_strictly_positive")}
+   44      if p != expected:
+   45          raise ValueError("Approved fixed H_cons policy differs")
+   46      return p
+   47  
+   48  
+   49  def config() -> dict:
+   50      c = record.config()
+   51      c["runtime"] = policy()["runtime"]
+   52      return c
+   53  
+   54  
+   55  def sources() -> list[dict]:
+   56      paths = {data.ROOT/n for n in ("scripts/step28_h_consistency_run.py", "scripts/step28_h_consistency_verify.py",
+   57          "tests/test_step28_h_consistency.py", "tests/test_step28_g_half.py", "tests/test_step28_record_replay.py")}
+   58      todo = list(paths)
+   59      while todo:
+   60          for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
+   61              names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
+   62              for name in names:
+   63                  if name and name.startswith("step28_"):
+   64                      child = data.ROOT/"scripts"/(name+".py")
+   65                      if child not in paths:
+   66                          paths.add(child)
+   67                          todo.append(child)
+   68      paths.update(data.ROOT/"schema"/name for name in ("step28_h_consistency_policy.json", "step28_g_half_policy.json",
+   69          "step28_record_replay_policy.json", "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json",
+   70          "step28_chinese_base_policy.json"))
+   71      paths.update((BASELINE, AUTHORIZATION, RECOVERY_AUTHORIZATION, NATIVE_AMENDMENT, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+   72                    data.ROOT/"scripts/run_step28_h_consistency_linux_20261016.sh",
+   73                    single.BASELINE, single.AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_G_HALF.zh.md",
+   74                    data.ROOT/"scripts/run_step28_g_half_linux_20261015.sh"))
+   75      return [data.record(path, data.ROOT) for path in sorted(paths)]
+   76  
+   77  
+   78  def baseline_runs() -> dict:
+   79      manifest = data.read_json(BASELINE)
+   80      if (data.sha256(BASELINE) != "b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3"
+   81              or len(manifest["files"]) != 52 or set(manifest["baselines"]) != {"S", "H"}):
+   82          raise ValueError("Approved S/H saved scope differs")
+   83      for row in manifest["files"]:
+   84          data.verify(data.ROOT/row["path"], row)
+   85      for row in manifest["unchanged_direct_sources"]:
+   86          data.verify(data.ROOT/row["path"], row)
+   87      runs = {}
+   88      for info in manifest["baselines"].values():
+   89          root = data.ROOT/info["root"]
+   90          old = data.read_json(root/"run/manifest.json")
+   91          col = data.read_json(root/"evaluation/collected.json")
+   92          split = data.read_json(root/"run/partition.json")
+   93          if (col["group_ids"] != [r["group_uid"] for r in split["development"]]
+   94                  or col["domains"] != [r["domain"] for r in split["development"]]
+   95                  or col["columns"] != list(parent.metrics.COLUMNS)
+   96                  or old["initials"][info["arm"]] != info["initial_identity"]):
+   97              raise ValueError("Saved alignment/initial identity differs")
+   98          for name in info["points"]:
+   99              if set(col["points"][name]) != set(parent.ROLES):
+  100                  raise ValueError("Saved role coverage differs")
+  101          runs[info["arm"]] = (root, col, old)
+  102      a, b = runs["S"], runs["G_half"]
+  103      if (data.read_json(a[0]/"run/partition.json") != data.read_json(b[0]/"run/partition.json")
+  104              or a[2]["public_inputs"] != b[2]["public_inputs"]):
+  105          raise ValueError("S/H inputs/partition differ")
+  106      return runs
+  107  
+  108  
+  109  def baseline_inputs():
+  110      runs = baseline_runs()
+  111      root, col, old = runs["S"]
+  112      manifest = data.read_json(BASELINE)
+  113      return {"initial_identity": manifest["baselines"]["S"]["initial_identity"]}, root, col, old
+  114  
+  115  
+  116  def loss_total(row: dict, stage: int, arm: str) -> float:
+  117      if any(row.get(k) != v for k, v in method.metadata(arm).items()):
+  118          raise ValueError("Update scoring/training identity differs")
+  119      total = 0.
+  120      for role, weight in (("current", 1.), ("history", .1)):
+  121          if role == "history" and stage == 1:
+  122              if "history" in row:
+  123                  raise ValueError("Unexpected A history")
+  124              continue
+  125          r = row[role]
+  126          if r.get("qualification_without_c") is not False or r["mse1"] is not None:
+  127              raise ValueError("Formal update used qualification mode or wrong teacher")
+  128          if role == "current" and r["mse0"] != 0:
+  129              raise ValueError("Current branch used birth teacher")
+  130          expected = dict(supervised_contribution=weight*r["supervised"],
+  131              consistency_contribution=weight*r["consistency"], teacher_contribution=.5*r["mse0"],
+  132              distillation=r["mse0"])
+  133          for key, value in expected.items():
+  134              if not np.isfinite(value) or not np.isclose(r[key], value, atol=2e-6, rtol=2e-6):
+  135                  raise ValueError("Wrong explicit H_cons contribution: "+role+"/"+key)
+  136          contribution = sum(expected[k] for k in ("supervised_contribution", "consistency_contribution", "teacher_contribution"))
+  137          if not np.isclose(r["weighted"], contribution, atol=2e-6, rtol=2e-6):
+  138              raise ValueError("Weighted branch omitted a contribution")
+  139          total += contribution
+  140      if not np.isclose(row["total"], total, atol=2e-6, rtol=2e-6):
+  141          raise ValueError("Actual total omitted H_cons contribution")
+  142      return total
+  143  
+  144  
+  145  def validate_diagnostic(value: dict, arm: str) -> None:
+  146      if any(value.get(k) != v for k, v in method.metadata(arm).items()):
+  147          raise ValueError("Diagnostic H_cons identity missing")
+  148  
+  149  
+  150  def native_objective_pair(off: dict, on: dict, stage: int) -> dict:
+  151      """Check actual FP32 branch arithmetic; scalar inequality is only diagnostic."""
+  152      loss_total(on, stage, "H_cons")
+  153      if any(off.get(k) != v for k, v in method.metadata().items()):
+  154          raise ValueError("Native control identity differs")
+  155      roles = ("current",) if stage == 1 else ("current", "history")
+  156      if stage not in (1, 2) or (stage == 1 and "history" in off):
+  157          raise ValueError("Native objective stage differs")
+  158      details, totals = {}, [0., 0.]
+  159      for role in roles:
+  160          a, b = off[role], on[role]
+  161          for key in ("supervised", "consistency", "mse0", "distillation", "mse1", "assignment_sha256"):
+  162              if a[key] != b[key]:
+  163                  raise ValueError("Native on/off base terms or allocation differ: "+role+"/"+key)
+  164          weight = np.float32(1. if role == "current" else .1)
+  165          for index, row in enumerate((a, b)):
+  166              if row["qualification_without_c"] is not (index == 0):
+  167                  raise ValueError("Native C switch differs")
+  168              for key in ("supervised", "consistency", "mse0"):
+  169                  if not np.isfinite(row[key]) or float(np.float32(row[key])) != row[key]:
+  170                      raise ValueError("Native component is not the actual finite FP32 value")
+  171              expected = (weight*np.float32(row["supervised"]),
+  172                          np.float32(0. if index == 0 else weight)*np.float32(row["consistency"]),
+  173                          np.float32(.5)*np.float32(row["mse0"]))
+  174              for key, number in zip(("supervised_contribution", "consistency_contribution", "teacher_contribution"), expected):
+  175                  if row[key] != float(number):
+  176                      raise ValueError("Native explicit FP32 contribution differs: "+role+"/"+key)
+  177              weighted = float(np.float32(np.float32(expected[0]+expected[1])+expected[2]))
+  178              if row["weighted"] != weighted:
+  179                  raise ValueError("Native FP32 addition order differs")
+  180              totals[index] += weighted
+  181          details[role] = dict(consistency=b["consistency"], contribution=b["consistency_contribution"],
+  182                               off_weighted=a["weighted"], on_weighted=b["weighted"])
+  183      if off["total"] != totals[0] or on["total"] != totals[1]:
+  184          raise ValueError("Native total differs from actual branch sum")
+  185      return dict(roles=details, off_total=totals[0], on_total=totals[1],
+  186                  actual_difference=totals[1]-totals[0], totals_equal=totals[0] == totals[1],
+  187                  component_reference_difference=sum(r["contribution"] for r in details.values()),
+  188                  fp32_branch_arithmetic_verified=True)
+  189  
+  190  
+  191  def validate_native(value: dict) -> None:
+  192      if (value.get("training_identity") != method.training_identity()
+  193              or value.get("consistency_precision_verified") is not True
+  194              or len(value.get("table_precision", [])) != 5):
+  195          raise ValueError("Actual native H_cons table precision/training identity missing")
+  196      updates = value.get("updates", [])
+  197      if len(updates) != 6:
+  198          raise ValueError("Native six-call logs missing")
+  199      for phase, index, stage in (("current", 1, 1), ("paired", 3, 2)):
+  200          if value.get("objective_pairs", {}).get(phase) != native_objective_pair(updates[index]["log"], updates[index+1]["log"], stage):
+  201              raise ValueError("Native rounded objective evidence missing or inconsistent")
+  202          for component in ("encoder", "head"):
+  203              effect = value.get("effects", {}).get(phase, {}).get(component, {})
+  204              adam = effect.get("adam", {})
+  205              rows = adam.get("parameters", [])
+  206              active = [r for r in rows if r.get("state_present")]
+  207              if (adam.get("finite") is not True or not active
+  208                      or {r["name"] for r in active} != set(effect.get("active_parameter_names", []))):
+  209                  raise ValueError("Native on/off Adam mapping/evidence missing")
+  210              for row in active:
+  211                  for key in ("step", "exp_avg", "exp_avg_sq"):
+  212                      delta = row.get(key, {}).get("max_abs_delta", float("nan"))
+  213                      if not np.isfinite(delta) or delta < 0:
+  214                          raise ValueError("Native on/off Adam difference missing/nonfinite")
+  215                  expected_step = 2 if phase == "current" else 337
+  216                  if row["step"].get("off") != expected_step or row["step"].get("on") != expected_step:
+  217                      raise ValueError("Native on/off Adam clock differs")
+  218  
+  219  
+  220  def validate_native_requalification(gate: dict, prior_seconds: float, output: Path) -> int:
+  221      if gate.get("requalification_authorization") != data.record(RECOVERY_AUTHORIZATION, data.ROOT):
+  222          raise ValueError("Specific native requalification approval missing")
+  223      auth = data.read_json(RECOVERY_AUTHORIZATION)
+  224      if (auth["status"] != "APPROVED_OBJECTIVE_GATE_REQUALIFICATION" or prior_seconds != auth["prior_charged_seconds"]
+  225              or prior_seconds != 90 or output != data.ROOT/auth["attempt_output"]
+  226              or auth["maximum_cumulative_gpu_seconds"] != 600 or auth["maximum_total_updates"] != 9
+  227              or auth["prior_actual_updates"] != 3 or auth["attempt_updates"] != 6):
+  228          raise ValueError("Native requalification scope or cumulative charge differs")
+  229      for key in ("supplement", "primary_static_review", "failed_result", "failed_wallclock"):
+  230          data.verify(data.ROOT/auth[key]["path"], auth[key])
+  231      failed = data.read_json(data.ROOT/auth["failed_result"]["path"])
+  232      wall = data.read_json(data.ROOT/auth["failed_wallclock"]["path"])
+  233      if (failed["status"] != "FAIL" or failed.get("actual_updates") != 3 or len(failed.get("updates", [])) != 3
+  234              or failed.get("native") is not None or wall["cumulative_charged_seconds"] != prior_seconds
+  235              or not failed.get("traceback", "").rstrip().endswith("ValueError: Current candidate-control objective indistinguishable")):
+  236          raise ValueError("Only the approved three-update objective-gate failure can requalify")
+  237      return auth["prior_actual_updates"]
+  238  
+  239  
+  240  class Budget(single.Budget):
+  241      def __init__(self, root: Path):
+  242          super().__init__(root)
+  243          self.limits = policy()["runtime"]
+  244  
+  245  
+  246  # The shared lifecycle receives this module explicitly; no process-global monkey patch.
+  247  train_stage = partial(single.train_stage, entry=sys.modules[__name__])
+  248  memory_from = partial(single.memory_from, entry=sys.modules[__name__])
+  249  restore_point = partial(single.restore_point, entry=sys.modules[__name__])
+  250  checkpoint = partial(single.checkpoint, entry=sys.modules[__name__])
+  251  train = partial(single.train, entry=sys.modules[__name__])
+  252  blind_gate = partial(single.blind_gate, entry=sys.modules[__name__])
+  253  open_valid = partial(single.open_valid, entry=sys.modules[__name__])
+  254  collect = partial(single.collect, entry=sys.modules[__name__])
+  255  finalize = partial(single.finalize, entry=sys.modules[__name__])
+  256  reviewed_gate = partial(single.reviewed_gate, entry=sys.modules[__name__])
+  257  validate_gate = partial(single.validate_gate, entry=sys.modules[__name__])
+  258  execute = partial(single.execute, entry=sys.modules[__name__])
+  259  
+  260  
+  261  if __name__ == "__main__":
+  262      parser = argparse.ArgumentParser()
+  263      parser.add_argument("--job", type=Path, required=True)
+  264      parser.add_argument("--gate", type=Path, required=True)
+  265      args = parser.parse_args()
+  266      if os.name != "posix":
+  267          parser.error("Scientific execution is Linux-only")
+  268      execute(args.job.resolve(), args.gate.resolve())
+

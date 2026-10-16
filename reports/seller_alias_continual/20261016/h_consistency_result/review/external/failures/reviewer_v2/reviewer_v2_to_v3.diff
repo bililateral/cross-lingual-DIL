@@ -1,0 +1,13 @@
+--- /mnt/data/hcons_review/return/failures/reviewer_v2/reviewer_saved_checks.py	2026-10-16 10:38:08.465075796 +0000
++++ /mnt/data/hcons_review/return/scripts/reviewer_saved_checks.py	2026-10-16 10:38:33.577794771 +0000
+@@ -168,7 +168,9 @@
+             classification[point][role]={}
+             for d,sel in [('all',np.arange(40)),('A',rows[0]),('B',rows[1])]:
+                 t,p,f,n=map(int,counts[sel].sum(0)); rates=dict(tp=t,fp=p,fn=f,tn=n,precision=t/(t+p) if t+p else None,recall=t/(t+f),f1=2*t/(2*t+p+f),fpr=p/(p+n))
+-                assert rates==ev['absolute'][point][role]['fixed_half_classification'][d]
++                saved_rates=ev['absolute'][point][role]['fixed_half_classification'][d]
++                assert all(value==saved_rates[key] for key,value in rates.items())
++                if rates['precision'] is None: assert saved_rates['precision_na_reason']=='No predicted positives'
+                 classification[point][role][d]=rates
+             matrices[point][role]=v
+             if point in m['points']:

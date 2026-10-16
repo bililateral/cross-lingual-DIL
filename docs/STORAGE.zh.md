@@ -8,11 +8,17 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons结果外审回收与处置
+
+3536092字节/96成员返回包已完整验收，95内部载荷及原275输入身份一致。完整正文、必要统计/源码/命令/失败/补丁及回收清单保留；[独立主审](../reports/seller_alias_continual/20261016/h_consistency_result/review/primary_disposition.zh.txt)已完成，原有效未达目标结论不变。95个非重复返回成员共1352398字节在review/external；审查材料/处置及state按[sync.json](../reports/seller_alias_continual/20261016/h_consistency_result/review/sync.json)SFTP同步原20261016_124900/workspace/reports/result_sync/review，各文件读回字节一致。主目录可变docs未同步，不把本轮证据同步写成全仓同步。
+
+验收后删除返回ZIP、浏览器下载副本、内嵌重复输入与冗余页面快照，精确身份/字节及canonical恢复路径见[recovery.json](../reports/seller_alias_continual/20261016/h_consistency_result/review/recovery.json)。保留唯一原输入ZIP供外审脚本精确重放，不为删除补传历史包。原专用页已关闭。19:11现场仅核对模型/Memory元数据，确认两模型2608796020字节、两Memory691141字节仍留原目录；未下载/载入/删除。局部清理不重置10月23日大清理周期；仅本地Git，无公开push。
+
 ## 2026-10-16 H_cons完整结果与独立分析保管
 
 正式运行已完成。158份必要保存分数/指标/查询/计数/诊断/更新日志/44来源及外层账共4700169字节SFTP回传至reports/seller_alias_continual/20261016/h_consistency_result，逐项大小/SHA一致，见[inventory](../reports/seller_alias_continual/20261016/h_consistency_result/inventory.json)与[回传核对](../reports/seller_alias_continual/20261016/h_consistency_result/receive_verification.json)。7份Linux独立分析共386764字节及清单已回传核验；分析源码、报告及回传记录保管在原20261016_124900/workspace/reports/result_sync，当前state两端一致。
 
-18:14:05现场原三PID均退出、无failure，正式completion/访问账未变。两推理权重各1304398010字节、合计2608796020字节；两Memory为342189/348952字节、合计691141字节，继续留Linux原job/run/models与memory，未载入、下载或删除，见[收尾](../reports/seller_alias_continual/20261016/h_consistency_result/closeout.json)。旧H删除许可不扩大到本轮。2176647字节h_cons_result_transfer.zip已在双方必要成员验收后删除；不是正式科研证据删除。具体结果外审输入包3187528字节/276成员有待审用途，暂保留Windows一份，未外发、未为备份补传Linux；后续按合同取得具体许可。局部清理不重置10月23日大清理周期。
+18:14:05现场原三PID均退出、无failure，正式completion/访问账未变。两推理权重各1304398010字节、合计2608796020字节；两Memory为342189/348952字节、合计691141字节，继续留Linux原job/run/models与memory，未载入、下载或删除，见[收尾](../reports/seller_alias_continual/20261016/h_consistency_result/closeout.json)。旧H删除许可不扩大到本轮。2176647字节h_cons_result_transfer.zip已在双方必要成员验收后删除；不是正式科研证据删除。具体结果外审输入包3187528字节/276成员随后获准并完成审查；唯一原ZIP仍用于外审verify_input_identity.py的成员/CRC/原字节复核，保留Windows一份，未向Linux补传输入包。局部清理不重置10月23日大清理周期。
 
 ## 2026-10-16 H_cons原生重核完成与正式启动
 

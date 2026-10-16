@@ -1,0 +1,142 @@
+原输入路径: evidence/scripts/step28_h_consistency.py
+原输入SHA256: f922e6dfb341539c479db78ae14a992ed67eb76796200f02fb33bb157b4fe502
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_h_consistency.py:1-136 ---
+    1  """Fixed H scores with live natural/regrouped query JS; no data entry."""
+    2  from __future__ import annotations
+    3  
+    4  import hashlib
+    5  import math
+    6  
+    7  import numpy as np
+    8  import torch
+    9  
+   10  import step28_g_half as h
+   11  
+   12  record, data = h.record, h.data
+   13  ARMS = ("H_cons",)
+   14  RNG_ORDER = "ABC"
+   15  
+   16  
+   17  def identity(arm: str = "H_cons") -> dict:
+   18      if arm != "H_cons":
+   19          raise ValueError("Only H_cons is authorized")
+   20      return h.identity()
+   21  
+   22  
+   23  def training_identity() -> dict:
+   24      return dict(arm="H_cons", consistency="symmetric_query_JS", queries=28, candidates=27,
+   25          candidate_order="canonical_index_excluding_self", lambda_current=1., lambda_history=.1,
+   26          temperature=1., reduction="sum_candidates_mean_28_queries", log_base="e",
+   27          students="both_live", mixture="live_arithmetic_half", precision="actual_H_FP32_to_FP64_one_FP32_loss_cast",
+   28          current_supervision=1., history_supervision=.1, teacher_A0=.5, rng_order="ABC")
+   29  
+   30  
+   31  def metadata(arm: str = "H_cons") -> dict:
+   32      return dict(pooling=identity(arm), training=training_identity())
+   33  
+   34  
+   35  def bind(model, meta: dict) -> str:
+   36      if any(meta.get(k) != v for k, v in metadata().items()):
+   37          raise ValueError("Missing or incompatible H_cons scoring/training metadata")
+   38      model.pooling_identity, model.training_identity = identity(), training_identity()
+   39      return "H_cons"
+   40  
+   41  
+   42  def account_logits(table, slots, arm="H_cons", stats=None, context=None):
+   43      identity(arm)
+   44      return h.account_logits(table, slots, "G_half", stats, context)
+   45  
+   46  
+   47  def query_logits(scores):
+   48      if scores.shape != (378,) or scores.dtype not in (torch.float32, torch.float64) or not torch.isfinite(scores).all():
+   49          raise ValueError("Finite canonical 378 H scores required")
+   50      i, j = torch.triu_indices(28, 28, 1, device=scores.device)
+   51      indices = torch.zeros((28, 28), dtype=torch.long, device=scores.device)
+   52      indices[i, j] = indices[j, i] = torch.arange(378, device=scores.device)
+   53      return scores[indices[~torch.eye(28, dtype=torch.bool, device=scores.device)].reshape(28, 27)]
+   54  
+   55  
+   56  def consistency(z0, z1):
+   57      """Both student branches and mixture stay live; inputs already exclude self."""
+   58      if (z0.shape != (28, 27) or z1.shape != z0.shape or z0.dtype != z1.dtype
+   59              or z0.dtype not in (torch.float32, torch.float64)
+   60              or not torch.isfinite(z0).all() or not torch.isfinite(z1).all()):
+   61          raise ValueError("Two finite aligned 28x27 logit tables required")
+   62      l0, l1 = torch.log_softmax(z0.double(), 1), torch.log_softmax(z1.double(), 1)
+   63      lm = torch.logaddexp(l0, l1)-math.log(2.)
+   64      result = (.5*(l0.exp()*(l0-lm)+l1.exp()*(l1-lm)).sum(1).mean()).to(z0.dtype)
+   65      if not torch.isfinite(result):
+   66          raise ValueError("Nonfinite query consistency")
+   67      return result
+   68  
+   69  
+   70  def objective(table, group, regroup_seed, arm, reference=None, stats=None, context=None, *, qualification_without_c=False):
+   71      identity(arm)
+   72      if group.labels is None:
+   73          raise ValueError("Authorized train labels required")
+   74      slots = (record.assignment(group), record.assignment(group, regroup_seed))
+   75      predicted = [account_logits(table, a, arm, stats, context) for a in slots]
+   76      truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+   77      supervised = sum(record.parent.ranking.objectives(v, truth, .5)["total"] for v in predicted)/2
+   78      coupling = consistency(*(query_logits(v) for v in predicted))
+   79      mse = table.new_zeros(())
+   80      if reference is not None:
+   81          target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
+   82          mse = (predicted[0]-account_logits(target, slots[0], arm, stats, context)).square().mean()
+   83      weight = 1. if reference is None else .1
+   84      c_weight = 0. if qualification_without_c else weight
+   85      supervised_contribution, consistency_contribution = weight*supervised, c_weight*coupling
+   86      teacher_contribution = .5*mse
+   87      result = supervised_contribution+consistency_contribution+teacher_contribution
+   88      return result, dict(supervised=float(supervised.detach()), consistency=float(coupling.detach()),
+   89          supervised_contribution=float(supervised_contribution.detach()),
+   90          consistency_contribution=float(consistency_contribution.detach()),
+   91          teacher_contribution=float(teacher_contribution.detach()), mse0=float(mse.detach()),
+   92          mse1=None, distillation=float(mse.detach()), weighted=float(result.detach()),
+   93          qualification_without_c=qualification_without_c)
+   94  
+   95  
+   96  def update(model, optimizer, current, history, reference, c, arm, stage, step, check=lambda: None,
+   97             observe=None, *, qualification_without_c=False, table_observer=None):
+   98      bind(model, dict(pooling=getattr(model, "pooling_identity", None), training=getattr(model, "training_identity", None)))
+   99      if (qualification_without_c or table_observer is not None) and c.get("handwritten_qualification") is not True:
+  100          raise ValueError("Formal entry cannot disable C or inspect live qualification tables")
+  101      def target(table, group, seed, candidate, ref):
+  102          value, log = objective(table, group, seed, candidate, ref, c.setdefault("pooling_stats", {}),
+  103                                 qualification_without_c=qualification_without_c)
+  104          if table_observer is not None:
+  105              table_observer(table.detach(), group, seed)
+  106          return value, log
+  107      result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
+  108                             stage, step, check, observe=observe, objective_fn=target)
+  109      for role, group in (("current", current), ("history", history)):
+  110          if group is not None:
+  111              seed = data.seed_for(20260918, RNG_ORDER, stage, step, role, group.uid, "regroup")
+  112              result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(group, seed).tobytes()).hexdigest()
+  113      result.update(metadata(arm))
+  114      return result
+  115  
+  116  
+  117  def score(model, groups, c, arm, check=lambda: None):
+  118      identity(arm)
+  119      bind(model, dict(pooling=getattr(model, "pooling_identity", None), training=getattr(model, "training_identity", None)))
+  120      return h.score(model, groups, c, "G_half", check)
+  121  
+  122  
+  123  def restored_score(model, groups, c, check=lambda: None):
+  124      return score(model, groups, c, "H_cons", check)
+  125  
+  126  
+  127  def capture(model, optimizer, current, memory, valid, c, arm, stage, epoch, root, point, check=lambda: None):
+  128      import step28_replay_diagnostics as diag
+  129      result = diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch,
+  130          root, point, check, scope="AB", score_fn=score,
+  131          pooling_fn=lambda table, slots, group, view: account_logits(table, slots, arm))
+  132      path = root/result["path"]
+  133      value = data.read_json(path)
+  134      value.update(metadata(arm))
+  135      data.write_json(path, value)
+  136      return data.record(path, root)
+

@@ -1,0 +1,11 @@
+--- report_tables_v1.py
++++ report_tables_v2.py
+@@ -66,7 +66,7 @@
+   cc=np.array([r['consistency'] for r in rr]);check(nz,str(int(np.count_nonzero(cc))),n,'nonzero JS');check(mean,fmt(cc.mean()),n,'JS mean')
+   check(minmax,f'{cc.min():.9f}/{cc.max():.9f}',n,'JS minmax')
+   for text,k in [(weighted,'consistency_contribution'),(sup,'supervised_contribution'),(teacher,'teacher_contribution')]:check(text,fmt(np.mean([r[k] for r in rr])),n,k)
+-assert len(checked)>500
++assert len(checked)==471 and len({x['line'] for x in checked})==108
+ summary=dict(status='PASS_ALL_SUPPLIED_NUMERIC_TABLE_CELLS',checked_cells=len(checked),source_report='report.zh.txt',against='reviewer_independent_v3/independent_all_metrics.csv and independently checked saved counts/diagnostics/update components',table_rows=len(set(x['line'] for x in checked)),checks=checked)
+ (O/'report_table_check.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+ print(json.dumps({k:v for k,v in summary.items() if k!='checks'},ensure_ascii=False,indent=2))

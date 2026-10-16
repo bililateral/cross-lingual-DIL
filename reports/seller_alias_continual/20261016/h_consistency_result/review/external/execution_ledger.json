@@ -1,0 +1,134 @@
+{
+  "scope": "Only isolated saved-evidence computations; not project-native qualification or new training",
+  "environment": {
+    "python": "3.13.5",
+    "numpy": "2.3.5",
+    "matplotlib": "3.10.8",
+    "cuda_visible_devices": "",
+    "blas_threads": 1
+  },
+  "attempts": [
+    {
+      "id": "submitted_audit",
+      "source": "scripts/submitted_audit.py",
+      "command_script": "scripts/run_submitted_audit.sh",
+      "exit_code": 0,
+      "wallclock_seconds": 2.6,
+      "internal_seconds": 1.691486057,
+      "logs": "logs/submitted_audit.*",
+      "production_modified": false
+    },
+    {
+      "id": "reviewer_v1",
+      "source": "failures/reviewer_v1/reviewer_saved_checks.py",
+      "command_script": "failures/reviewer_v1/run_reviewer_saved_checks.sh",
+      "exit_code": 1,
+      "wallclock_seconds": 0.79,
+      "reason": "Reviewer LR arithmetic-order assertion, not production LR difference",
+      "patch": "failures/reviewer_v1/reviewer_v1_to_v2.diff",
+      "logs": "failures/reviewer_v1/reviewer_saved_checks.*"
+    },
+    {
+      "id": "reviewer_v2",
+      "source": "failures/reviewer_v2/reviewer_saved_checks.py",
+      "command_script": "failures/reviewer_v2/run_reviewer_saved_checks.sh",
+      "exit_code": 1,
+      "wallclock_seconds": 0.77,
+      "reason": "Reviewer full-dict comparison rejects legitimate precision_na_reason metadata; numeric fields agree",
+      "patch": "failures/reviewer_v2/reviewer_v2_to_v3.diff",
+      "logs": "failures/reviewer_v2/reviewer_saved_checks.*"
+    },
+    {
+      "id": "exploratory_empty_max",
+      "source": "failures/reviewer_v2/exploratory_empty_max.py",
+      "source_status": "Transcript copy of previously executed inline code; not rerun to manufacture failure",
+      "exit_code": 1,
+      "wallclock_seconds": null,
+      "reason": "max(empty) during diagnostic printing; no F1 differences and no output JSON at that point",
+      "logs": "failures/reviewer_v2/exploratory_empty_max.record.txt"
+    },
+    {
+      "id": "count_dictionary_diagnosis",
+      "source": "failures/reviewer_v2/diagnose_count_comparison.py",
+      "exit_code": 0,
+      "wallclock_seconds": null,
+      "logs": "failures/reviewer_v2/count_diagnosis.*"
+    },
+    {
+      "id": "reviewer_v3",
+      "source": "scripts/reviewer_saved_checks.py",
+      "command_script": "scripts/run_reviewer_saved_checks.sh",
+      "exit_code": 0,
+      "wallclock_seconds": 1.84,
+      "internal_seconds": 1.1912719850000144,
+      "logs": "logs/reviewer_saved_checks.*",
+      "outputs": "reviewer_independent_v3"
+    },
+    {
+      "id": "report_tables_v1",
+      "source": "failures/report_tables_v1/check_report_tables.py",
+      "exit_code": 1,
+      "wallclock_seconds": null,
+      "reason": "All value comparisons passed; erroneous >500 terminal comparison-count assertion (actual471)",
+      "logs": "failures/report_tables_v1/report_tables.*"
+    },
+    {
+      "id": "report_tables_count_diagnosis",
+      "exit_code": 0,
+      "wallclock_seconds": null,
+      "source_status": "Executed v1 source via compile/exec, replacing only terminal >500 assertion by count printing",
+      "outputs": "failures/report_tables_v1/diagnostic_report_table_check.json"
+    },
+    {
+      "id": "report_tables_v2",
+      "source": "scripts/check_report_tables.py",
+      "exit_code": 0,
+      "wallclock_seconds": null,
+      "logs": "logs/report_tables.*",
+      "outputs": "report_table_check.json"
+    },
+    {
+      "id": "final_input_identity",
+      "source": "scripts/verify_input_identity.py",
+      "exit_code": 0,
+      "wallclock_seconds": null,
+      "logs": "logs/input_identity.*",
+      "outputs": "input_identity_final.json"
+    },
+    {
+      "id": "report_assembly",
+      "source": "scripts/build_review_report.py",
+      "exit_code": 0,
+      "wallclock_seconds": null,
+      "outputs": [
+        "review.zh.md",
+        "review.zh.txt"
+      ],
+      "note": "No new scientific computation"
+    }
+  ],
+  "project_accounting_preserved": {
+    "formal_training_seconds": 6043,
+    "original_local_analysis_charged_seconds": 2,
+    "total_seconds": 6045,
+    "limit_seconds": 28800,
+    "cpu_seconds": 51,
+    "cpu_limit": 180,
+    "gpu_seconds": 418,
+    "gpu_limit": 600,
+    "gpu_calls": 9
+  },
+  "not_executed": [
+    "Project/Linux remote commands",
+    "Model/Memory/label loading",
+    "Production blind_gate/finalize",
+    "GPU or CPU-native qualification",
+    "New metrics/statistical selection/seeds/candidates/training",
+    "PDF visual review"
+  ],
+  "other_observations": [
+    "Files ZIP read returned no parseable content, so mounted archive was used.",
+    "One read-only grep for def rates had no match and exit1; not a science run.",
+    "Some packaging/read-only shell commands emitted TERM environment variable not set; this is separate from Python script stdout/stderr."
+  ]
+}

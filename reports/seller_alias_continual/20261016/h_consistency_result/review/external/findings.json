@@ -1,0 +1,90 @@
+{
+  "result_review": "SUPPORTED_WITH_EXPLICIT_SAVED_EVIDENCE_AND_INHERITANCE_LIMITS",
+  "scientific_goal_passed": false,
+  "direct_H_new_B_positive": true,
+  "project_scientific_blockers": [],
+  "project_reproducibility_defects": [],
+  "claim_constraints": [
+    {
+      "id": "F01",
+      "finding": "Primary S dual-domain MAP criterion false; H new-B direct true accompanied by old-A negative",
+      "evidence": [
+        "E01",
+        "reviewer_independent_v3/reviewer_checks.json#/key_MAP"
+      ]
+    },
+    {
+      "id": "F04",
+      "finding": "Primary stage-cal old-A Brier and log-loss worsen vs H",
+      "evidence": [
+        "E04",
+        "reviewer_independent_v3/independent_all_metrics.csv"
+      ]
+    },
+    {
+      "id": "F05",
+      "finding": "Whole A-to-B policy contrast, not isolated B-stage causality; forgetting contrasts cross zero",
+      "evidence": [
+        "E05"
+      ]
+    },
+    {
+      "id": "F06",
+      "finding": "Nine strict diagnostic triggers false but nine gap-widening intervals positive",
+      "evidence": [
+        "E06"
+      ]
+    },
+    {
+      "id": "F07",
+      "finding": "Formal components align; training-effect proof inherited narrowly, not established by nonzero scalar/norm alone",
+      "evidence": [
+        "E07"
+      ]
+    }
+  ],
+  "reproducibility_coverage_limits": [
+    {
+      "id": "F03",
+      "finding": "Primary group metrics and query rankings not regenerated from labels"
+    },
+    {
+      "id": "F08",
+      "finding": "Original script coverage gaps supplemented only where relevant; no material mismatch"
+    },
+    {
+      "id": "F10",
+      "finding": "Native raw receipts absent, model/Memory/labels deliberately excluded; remote state not independently observed"
+    }
+  ],
+  "reviewer_closed_reproducibility_defects": [
+    {
+      "id": "R-F01",
+      "status": "CLOSED_WITH_FAILURE_AND_DIFF",
+      "path": "failures/reviewer_v1"
+    },
+    {
+      "id": "R-F02",
+      "status": "CLOSED_WITH_FAILURE_AND_DIFF",
+      "path": "failures/reviewer_v2"
+    },
+    {
+      "id": "R-F02a",
+      "status": "DIAGNOSTIC_FAILURE_RETAINED_NOT_COUNTED_AS_PASS",
+      "path": "failures/reviewer_v2/exploratory_empty_max.record.txt"
+    },
+    {
+      "id": "R-F03",
+      "status": "CLOSED_WITH_FAILURE_AND_DIFF",
+      "path": "failures/report_tables_v1"
+    }
+  ],
+  "reasonable_followup": "Keep primary failure, direct new-B benefit, old-A ranking/probability cost and overfitting limits together; archive actual evidence and reviewer failures for the primary executor independent disposition.",
+  "out_of_scope_overdesign": [
+    "New arms/seeds/orders/lambda or temperature grids",
+    "New acceptance metric or statistical rule",
+    "Model/Memory/label re-access or native requalification without a concrete new contradiction",
+    "Require every Adam moment nonzero or rounded total different",
+    "General audit/security framework or whole-project re-review"
+  ]
+}

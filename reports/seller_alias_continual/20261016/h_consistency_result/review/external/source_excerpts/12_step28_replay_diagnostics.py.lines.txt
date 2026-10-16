@@ -1,0 +1,137 @@
+原输入路径: evidence/scripts/step28_replay_diagnostics.py
+原输入SHA256: 8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_replay_diagnostics.py:78-208 ---
+   78      scorer, pool = score_fn or score, pooling_fn or record.account_logits
+   79      with neutral(model):
+   80          fit_values = metrics(current, scorer(model, current, c, arm, check))
+   81          cache_scores = scorer(model, cache, c, arm, check)
+   82          cache_values = metrics(cache, cache_scores)
+   83          blind = scorer(model, valid, c, arm, check)
+   84          errors = []
+   85          for i, group in enumerate(cache):
+   86              check()
+   87              if arm == "LOGIT0.1":
+   88                  e0 = cache_scores[i] - memory.references[group.uid]
+   89                  errors.append({"uid": group.uid, "D0": float(np.mean(e0.astype(np.float64)**2)),
+   90                                 "D1": None, "residual_cross_mean": None, "residual_difference_mse": None})
+   91              elif arm in ("C_cf", "C_perm"):
+   92                  from step28_crossfit_retention import floor_loss
+   93                  # The saved score is the actual FP32 A0 pooling result. No extra forward.
+   94                  _, details = floor_loss(torch.from_numpy(cache_scores[i]), group, memory.tables[group.uid])
+   95                  errors.append({"uid": group.uid, **details})
+   96              else:
+   97                  live = record.reference(model, group, c, check)
+   98                  target = memory.tables[group.uid]
+   99                  seeds = (None, data.seed_for(20261008, order, stage, group.uid, "diagnostic_regroup"))
+  100                  residual = []
+  101                  for seed in seeds:
+  102                      slots = record.assignment(group, seed)
+  103                      # Eval-only CPU pooling of the same FP32 tables; no model gradient.
+  104                      view = "A0" if seed is None else "A1"
+  105                      live_score = pool(torch.from_numpy(live), slots, group, view) if pooling_fn else pool(torch.from_numpy(live), slots)
+  106                      teacher_score = pool(torch.from_numpy(target), slots, group, "teacher_"+view) if pooling_fn else pool(torch.from_numpy(target), slots)
+  107                      residual.append((live_score-teacher_score).numpy().astype(np.float64))
+  108                  e0, e1 = residual
+  109                  errors.append({"uid": group.uid, "D0": float(np.mean(e0**2)), "D1": float(np.mean(e1**2)),
+  110                                 "residual_cross_mean": float(np.mean(e0*e1)),
+  111                                 "residual_difference_mse": float(np.mean((e1-e0)**2))})
+  112                  if table_diagnostic is not None:
+  113                      errors[-1].update(table_diagnostic(live, group, target))
+  114      if (parent.adam_step(optimizer) != step_before
+  115              or (memory.to_bytes() if memory is not None else None) != before):
+  116          raise ValueError("Diagnostics changed optimizer step or bounded history")
+  117      tag = f"{point}_epoch{epoch}"
+  118      result = {"point": point, "order": order, "arm": arm, "stage": stage, "epoch": epoch,
+  119                "stage_step": epoch*48, "adam_step": step_before, "seed": "s0", "metric_columns": list(COLUMNS),
+  120                "fit_ids": [g.uid for g in current], "fit_domains": [order[stage-1]]*48,
+  121                "cache_ids": [g.uid for g in cache], "cache_domains": [order[origins[g.uid]-1] for g in cache],
+  122                "valid_ids": [g.uid for g in valid], "teacher_errors": errors,
+  123                "mode": "A0_eval_no_autograd", "valid_labels_used": False,
+  124                "fit": previous.save_array(root/(tag+"_fit.npy"), fit_values, root),
+  125                "cache": previous.save_array(root/(tag+"_cache.npy"), cache_values, root),
+  126                "valid_blind": previous.save_array(root/(tag+"_valid.npy"), blind, root)}
+  127      path = root/(tag+".json")
+  128      data.write_json(path, result)
+  129      return data.record(path, root)
+  130  
+  131  
+  132  def summary(values: np.ndarray, draws: np.ndarray) -> dict:
+  133      estimates = values[draws].mean(axis=1)
+  134      return {"mean": values.mean(axis=0).tolist(),
+  135              "conditional_95pct_interval": np.quantile(estimates, [.025, .975], axis=0).T.tolist()}
+  136  
+  137  
+  138  def curve_comparison(train: np.ndarray, valid: np.ndarray, seed: int) -> dict:
+  139      """Six epochs x actual groups x three metrics; independent train/valid groups."""
+  140      if train.shape[0] != 6 or valid.shape[0] != 6 or train.shape[2] != 3 or valid.shape[2] != 3:
+  141          raise ValueError("Complete six-point curves required")
+  142      if train.shape[1] == 0:
+  143          return {"status": "NOT_APPLICABLE_NO_SURVIVING_GROUPS"}
+  144      rng = np.random.Generator(np.random.PCG64(seed))
+  145      td = rng.integers(train.shape[1], size=(5000, train.shape[1]))
+  146      vd = rng.integers(valid.shape[1], size=(5000, valid.shape[1]))
+  147      # Positive benefit is up for MAP/R5 and down for unweighted BCE.
+  148      signs = np.array([1., 1., -1.])
+  149      train_change = (train[-1]-train[0])*signs
+  150      valid_change = (valid[-1]-valid[0])*signs
+  151      tdelta, vdelta = summary(train_change, td), summary(valid_change, vd)
+  152      gap = (train.mean(1)-valid.mean(1))*signs
+  153      boot_gap = (train[:, td].mean(2)-valid[:, vd].mean(2))*signs
+  154      widening = boot_gap[-1]-boot_gap[0]
+  155      bounds = np.quantile(widening, [.025, .975], axis=0).T
+  156      decisions = []
+  157      for k in range(3):
+  158          point_signal = tdelta["mean"][k] > 0 and vdelta["mean"][k] < 0 and gap[-1,k] > gap[0,k]
+  159          supported = tdelta["conditional_95pct_interval"][k][0] > 0 and vdelta["conditional_95pct_interval"][k][1] < 0 and bounds[k,0] > 0
+  160          decisions.append("有相应迹象" if supported else "证据不足" if point_signal else "未见明确迹象")
+  161      return {"status": "DESCRIPTIVE_CONDITIONAL_DEVELOPMENT_DIAGNOSIS", "columns": list(COLUMNS),
+  162              "fit_or_cache_groups": train.shape[1], "valid_groups": valid.shape[1],
+  163              "train_raw_curve": train.mean(1).tolist(), "valid_raw_curve": valid.mean(1).tolist(),
+  164              "benefit_gap_curve": gap.tolist(), "benefit_gap_conditional_intervals": np.quantile(boot_gap, [.025,.975], axis=1).transpose(1,2,0).tolist(),
+  165              "epoch1_to_6_train_benefit": tdelta, "epoch1_to_6_valid_benefit": vdelta,
+  166              "epoch1_to_6_gap_widening": {"mean": (gap[-1]-gap[0]).tolist(), "conditional_95pct_interval": bounds.tolist()},
+  167              "interpretation": dict(zip(COLUMNS, decisions)),
+  168              "limits": "No absence proof, causal attribution, seed coverage, selection-bias correction, or early stopping."}
+  169  
+  170  
+  171  def evaluate(root: Path, manifest: dict, labelled: list, partition: dict, out: Path, scope: str = "ABC") -> dict:
+  172      """Only the caller after complete blind gates may supply newly opened valid."""
+  173      if scope not in ("ABC", "AB") or len(labelled) != 20*len(scope) or [g.uid for g in labelled] != [r["group_uid"] for r in partition["development"]]:
+  174          raise ValueError("Valid group order mismatch")
+  175      valid_domains = [r["domain"] for r in partition["development"]]
+  176      report = {"columns": list(COLUMNS), "points": {}, "group_metrics": {}}
+  177      out.mkdir()
+  178      for point, records in manifest["diagnostics"].items():
+  179          entries = [data.read_json(data.verify(root/r["path"], r)) for r in records]
+  180          if [e["epoch"] for e in entries] != list(range(1,7)):
+  181              raise ValueError("Epoch coverage differs")
+  182          curves = {role: [] for role in ("fit", "cache", "valid")}
+  183          for entry in entries:
+  184              for key in ("fit_ids", "cache_ids", "fit_domains", "cache_domains", "valid_ids"):
+  185                  if entry[key] != entries[0][key]:
+  186                      raise ValueError("Curve population changed within phase")
+  187              for role in ("fit", "cache"):
+  188                  curves[role].append(previous.array(root, entry[role], (len(entry[role+"_ids"]),3), np.float64))
+  189              values = metrics(labelled, previous.array(root, entry["valid_blind"], (20*len(scope),378), np.float32))
+  190              curves["valid"].append(values)
+  191              report["group_metrics"][f"{point}_epoch{entry['epoch']}"] = previous.save_array(out/f"{point}_epoch{entry['epoch']}_valid_metrics.npy", values, out)
+  192          curves = {k: np.stack(v) for k,v in curves.items()}
+  193          entry = entries[0]
+  194          result = {}
+  195          for role in ("fit", "cache"):
+  196              result[role] = {}
+  197              domains = [entry["order"][entry["stage"]-1]] if role == "fit" else list(entry["order"][:entry["stage"]-1])
+  198              for domain in domains:
+  199                  selected = np.flatnonzero(np.asarray(entry[role+"_domains"]) == domain)
+  200                  vr = np.flatnonzero(np.asarray(valid_domains) == domain)
+  201                  # Exclude arm from seed: same populations across arms share draws.
+  202                  result[role][domain] = curve_comparison(curves[role][:,selected], curves["valid"][:,vr],
+  203                      data.seed_for(20260930, entry["order"], entry["stage"], role, domain, "diagnostics"))
+  204              if not domains:
+  205                  result[role] = {"status": "NOT_APPLICABLE_FIRST_STAGE"}
+  206          report["points"][point] = result
+  207      data.write_json(out/"overfitting.json", report)
+  208      return report
+

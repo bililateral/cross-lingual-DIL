@@ -1,0 +1,19 @@
+原输入路径: evidence/scripts/step28_bge_continual.py
+原输入SHA256: 62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_bge_continual.py:70-82 ---
+   70  def stage_lr(step: int) -> float:
+   71      if type(step) is not int or not 1 <= step <= 288:
+   72          raise ValueError("Stage step must be one-based in 1..288")
+   73      return 1e-5 * (step / 29 if step <= 29 else (288 - step) / 259)
+   74  
+   75  
+   76  def schedule(current: list, policy: dict, order: str, stage: int) -> tuple[list, int]:
+   77      if order not in ORDERS or stage not in (1, 2, 3) or len(current) != 48:
+   78          raise ValueError("Only the 48 current fitting groups enter a stage")
+   79      if len({g.uid for g in current}) != 48 or any(g.labels is None for g in current):
+   80          raise ValueError("Missing or repeated current supervision")
+   81      stream = data.seed_for(policy["schedule_seed"], order, stage, "current")
+   82      return data.schedule(current, 6, stream), stream
+

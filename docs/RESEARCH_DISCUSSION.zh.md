@@ -1,8 +1,14 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-16：回收H_cons结果外审并独立分析
+
+用户明确：“结果外审已结束，同步结果回来仔细分析”。沿原Playwright会话回收完整正文和3536092字节/96成员返回包，身份逐项核对，[独立主审](../reports/seller_alias_continual/20261016/h_consistency_result/review/primary_disposition.zh.txt)接受有效限定结果，无新增开放科学阻断。原双域胜S门false、新B对H直接门true、旧A排序及stage-cal代价并列；不称无过拟合或孤立B因果效果。
+
+主执行者核对外审源码/失败/补丁、三方1650行已保存统计及原生回执原件身份；不新跑科研计算、重开标签或载模。19:11现场完成/访问/44来源/资格原件一致，无相关进程或failure；模型/Memory保持。完整证据及state通过SFTP同步，返回重复包按规则清理，原页关闭，原始数值/判据不改。新S_pos/H_pos静态包仍待其单独许可，本次结果审查不扩大为新提案外发或训练授权；仅本地Git。
+
 ## 2026-10-16：批准H_cons结果外审并研究超过S的方案
 
-用户明确：“把结果上传外审，然后我需要你仔细想想，怎样才能超过S，给出详细可行的方案”。此前呈现的3187528字节/276成员结果包获准，经本地Playwright于18:32:22提交一次至[结果会话](https://chatgpt.com/c/6ad1fd00-c2ac-83eb-8a73-4e8502dbbe94)，原包SHA不变，实际选择器GPT-6、Pro第5档。见[提交回执](../reports/seller_alias_continual/20261016/h_consistency_result/review/submission.json)。当前等待完整审查后独立处置，不重复上传；本轮授权不扩大到新方案包。
+用户明确：“把结果上传外审，然后我需要你仔细想想，怎样才能超过S，给出详细可行的方案”。此前呈现的3187528字节/276成员结果包获准，经本地Playwright于18:32:22提交一次至[结果会话](https://chatgpt.com/c/6ad1fd00-c2ac-83eb-8a73-4e8502dbbe94)，原包SHA不变，实际选择器GPT-6、Pro第5档。见[提交回执](../reports/seller_alias_continual/20261016/h_consistency_result/review/submission.json)。此时等待完整审查后独立处置，不重复上传；本轮授权不扩大到新方案包。后续结果回收见上条最新用户决定。
 
 主执行者静态阅读实际rank、hard、S/H目标与VJP入口，并核对相关旧结果/审查及一手文献，形成[逐正例排序有限开发提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)。S_pos为主候选、H_pos为固定结构对照；新rank对应RINCE已有式(2)的归一化适配，不是原创损失，局部正例竞争不冒称已测瓶颈。两臂共1152调用/4端点/24诊断，预算、数据及判据均为待批准建议，未实现、未连接Linux进行科学计算或读取新数据。具体152565字节/22成员静态外审包已准备但未上传；后续按该包许可、审查及新执行合同推进，不移用旧余额，不自动开启候选。
 

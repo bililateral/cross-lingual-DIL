@@ -1,0 +1,12 @@
+执行方式：在 container.exec 内运行的临时 python stdin 诊断；上附文件是该已执行源码的转存，不为制造失败再次执行。
+真实异常（来自工具执行记录）：
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+ValueError: max() iterable argument is empty
+
+这次临时诊断猜测 F1 是否有舍入差；没有发现任何不一致，差异列表为空，诊断打印却调用 max(empty) 导致错误。
+异常发生在 write_text 前；未生成该次预期 JSON。
+随后 diagnose_count_comparison.py 的成功诊断证实：54组汇总数值无差异；11组合法字典多了 precision_na_reason 字段。
+不得把本次异常记为生产评价失败、F1数值错误或成功核验。
+同一临时 shell 后续 grep '^def rates' step28_bge_continual.py 无匹配，退出1；该只读查找不是评价或训练执行。
+本次未单独 /usr/bin/time，不能提供可靠耗时。没有修改输入、来源或统计定义。

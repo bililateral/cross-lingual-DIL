@@ -1,0 +1,18 @@
+原输入路径: evidence/scripts/step28_continual_population_data.py
+原输入SHA256: 49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_continual_population_data.py:247-258 ---
+  247  def seed_for(seed: int, *parts: Any) -> int:
+  248      return int.from_bytes(hashlib.sha256(json_bytes([seed, *parts])).digest()[:8], "big") % (2**63 - 1)
+  249  
+  250  
+  251  def schedule(groups: list[Group], epochs: int, seed: int) -> list[Group]:
+  252      rng = random.Random(seed)
+  253      result = []
+  254      for _ in range(epochs):
+  255          rows = sorted(groups, key=lambda g: g.uid)
+  256          rng.shuffle(rows)
+  257          result.extend(rows)
+  258      return result
+

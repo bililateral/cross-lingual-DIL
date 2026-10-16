@@ -1,0 +1,11 @@
+--- /mnt/data/hcons_review/return/failures/reviewer_v1/reviewer_saved_checks.py	2026-10-16 10:37:29.848616417 +0000
++++ /mnt/data/hcons_review/return/scripts/reviewer_saved_checks.py	2026-10-16 10:37:45.364964037 +0000
+@@ -110,7 +110,7 @@
+         component_rows={r:[] for r in (('current',) if stage==1 else ('current','history'))}
+         max64=0.
+         for n,row in enumerate(t['rows'],1):
+-            expected_lr=1e-5*n/29 if n<=29 else 1e-5*(288-n)/259
++            expected_lr=1e-5*(n/29 if n<=29 else (288-n)/259)
+             assert row['step']==n and row['encoder_lr']==expected_lr and row['head_lr']==.001
+             assert row['training']==pol['training'] and row['pooling']==pol['pooling']
+             assert np.isfinite(row['gradient_norm']) and row['gradient_norm']>0

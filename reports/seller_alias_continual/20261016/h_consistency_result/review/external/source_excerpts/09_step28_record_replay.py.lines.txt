@@ -1,0 +1,79 @@
+原输入路径: evidence/scripts/step28_record_replay.py
+原输入SHA256: ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d
+说明: 这是带原文件行号的只读节录，不是新生产来源。
+
+--- evidence/scripts/step28_record_replay.py:159-208 ---
+  159  def backward_group(model: Any, group: data.Group, c: dict, arm: str,
+  160                     dropout_seed: int, regroup_seed: int, reference: np.ndarray | None,
+  161                     check: Callable = lambda: None, objective_fn: Callable | None = None) -> dict:
+  162      """One live encoder graph; exact chain rule through chunked deterministic head."""
+  163      import torch
+  164      torch.manual_seed(dropout_seed)
+  165      z = record_vectors(model, group, c, check)
+  166      with torch.no_grad():
+  167          values = pair_table(model, z.detach(), check)
+  168      proxy = values.detach().requires_grad_(True)
+  169      loss, log = (objective_fn or objective)(proxy, group, regroup_seed, arm, reference)
+  170      gradient, = torch.autograd.grad(loss, proxy)
+  171      leaf = z.detach().requires_grad_(True)
+  172      left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+  173      for start in range(0, len(left), 512):
+  174          check()
+  175          u, v = leaf[left[start:start+512]], leaf[right[start:start+512]]
+  176          block = model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten()
+  177          block.backward(gradient[start:start+512])
+  178      if leaf.grad is None or not torch.isfinite(leaf.grad).all():
+  179          raise ValueError("Missing or nonfinite explicit dJ/dZ")
+  180      z.backward(leaf.grad)
+  181      log["record_gradient_norm"] = float(leaf.grad.norm())
+  182      return log
+  183  
+  184  
+  185  def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+  186             reference: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+  187             step: int, check: Callable = lambda: None, observe: Callable | None = None,
+  188             objective_fn: Callable | None = None) -> dict:
+  189      import torch
+  190      model.train()
+  191      optimizer.zero_grad(set_to_none=True)
+  192      optimizer.param_groups[0]["lr"] = parent.stage_lr(step)
+  193      optimizer.param_groups[1]["lr"] = .001
+  194      logs = {}
+  195      for role, group, target in (("current", current, None), ("history", history, reference)):
+  196          if group is None:
+  197              continue
+  198          logs[role] = backward_group(model, group, c, arm,
+  199              data.seed_for(20260918, order, stage, step, role, "dropout"),
+  200              data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check,
+  201              objective_fn=objective_fn)
+  202          if observe is not None:
+  203              observe(role, logs[role])
+  204      norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)
+  205      check()
+  206      optimizer.step()
+  207      return {**logs, "gradient_norm": float(norm), "encoder_lr": parent.stage_lr(step),
+  208              "head_lr": .001, "total": sum(v["weighted"] for v in logs.values())}
+
+--- evidence/scripts/step28_record_replay.py:271-283 ---
+  271      def begin_stage(self, stage: int) -> None:
+  272          if stage not in (2, 3) or self.stage != 0 or self.reservoir.seen != 48*(stage-1):
+  273              raise ValueError("History stage boundary differs")
+  274          self.stage, self.count = stage, 0
+  275          self.draw_rng = random.Random(data.seed_for(20260930, self.order, stage, "history_draws"))
+  276  
+  277      def draw(self) -> tuple[data.Group, np.ndarray]:
+  278          if self.draw_rng is None or self.count >= 288 or len(self.reservoir.groups) != 6:
+  279              raise ValueError("History draw boundary differs")
+  280          group = self.draw_rng.choice(self.reservoir.groups)
+  281          self.count += 1
+  282          self.to_bytes()
+  283          return group, self.tables[group.uid]
+
+--- evidence/scripts/step28_record_replay.py:327-332 ---
+  327      def summary(self) -> dict:
+  328          payload = self.to_bytes()
+  329          return {"members": [g.uid for g in self.reservoir.groups], "seen": self.reservoir.seen,
+  330                  "stage": self.stage, "count": self.count, "bytes": len(payload),
+  331                  "origins": self.origins.copy(), "sha256": hashlib.sha256(payload).hexdigest(),
+  332                  "tables": {uid: hashlib.sha256(t.tobytes()).hexdigest() for uid, t in self.tables.items()}}
+
