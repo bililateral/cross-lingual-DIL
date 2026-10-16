@@ -1,0 +1,48 @@
+- region "对话" [ref=e922]:
+  - generic [ref=e923]:
+    - generic [ref=e933]:
+      - generic [ref=e934]:
+        - heading "你说：" [level=4] [ref=e935]
+        - generic [ref=e936]:
+          - generic [ref=e939]:
+            - button "review_input(20261016-053330).zip" [ref=e940] [cursor=pointer]
+            - generic:
+              - generic:
+                - generic "review_input(20261016-053330).zip"
+                - generic: 文件
+          - generic [ref=e942]:
+            - generic [ref=e944]:
+              - generic [ref=e945]:
+                - generic [ref=e946]: 请对 H_cons 批准合同与最小实现进行一轮合并、反对性审查。当前只完成 Linux 手写 CPU 增量；GPU资格/资源投影/唯一正式训练已获用户条件授权，但尚未执行。审查通过及主执行者独立处置是GPU前提。请先完整阅读批准合同、authorization.json、本请求与实际差异，再沿实际入口阅读新目标、共享VJP、单臂编排、六调用资格及定向核验。旧静态报告的“未授权实施”是当时时点，不能覆盖随后明确批准。 一、固定研究范围 唯一H_cons，H=旧G_half评分不变，JS只进入训练；lambda=1、tau=1、两学生/m live，27个规范非自身候选、仅28查询平均。J_A=Bbar_cur+C_cur；J_B=Bbar_cur+C_cur+.1Bbar_hist+.1C_hist+.5D0_H。本臂从共同预训练产生自己的A状态/出生表。576更新/864梯度群、2端点/12诊断，S/H保存对照复用，不重训，不加S+JS、网格、seed或正式A1机制诊断。B末raw MAP双域胜S与新B直接胜H分别判断，旧A相对H完整披露，不临时加非劣门。单seed、重复开发valid、条件区间限制仍在。 二、本轮实现及复用方式 新增step28_h_consistency.py/run.py/verify.py、policy、一个定向测试文件及必要Linux入口。H的闭式池化、record模型/assignment/分块VJP/update、Memory、校准和诊断计算复用。g_half.py只增加metadata函数；g_half_run.py通过显式entry参数复用已有单臂流程，补入双根比较、元数据、损失重建/诊断回调；没有生产全局monkey-patch。g_half_verify.py显式接收entry/handwritten/consistency，复用既有预算/六次更新生命周期。冻结旧作业源码不改。请从实际调用检查，不能仅以新组件存在判为已接通。 重点检查： 1. actual FP32 H→FP64 log_softmax/logaddexp→一次FP32 C；排自环、候选对应、双向边和28平均；两个学生及m图连接；C的两支经K→head VJP→encoder→clip→Adam实际作用。 2. supervised仍只表示原Bbar；每个分支显式记录supervised/consistency/teacher贡献；新盲门按五项重建，拒绝资格去C模式。H评分身份保持，H_cons训练身份进入来源、日志、端点、Memory元数据、诊断及两恢复，不只改名字。 3. 新臂完整恢复及盲门只读自身Memory；S/H对照只读批准52文件，已完成本地及Linux原件逐项大小/SHA核对。40UID、22列、三角色、日程与起点固定。核对双根映射、直接H比较、低好指标遗忘方向和N/A规则。 4. 原生计划恰好六调用：一次原H去C准备W；W上的current去/加C；显式合成Adam时钟336的P上的paired去/加C；从P恢复、实际48/6/40诊断后重复后一更新。P教师=W_eval_K+2sin(.31i+.71j)，不是正式出生表。两对encoder/head必须真实参数差，且同一捕获K的H/JS值及独立解析回传检查。调用发生后先记账，再检查局部精度；准备/合成时钟不冒称历史训练。没有第七步、换夹具或自动重试。原生尚未测量，CPU不能代替。 5. CPU180秒、GPU600秒/6调用、正式28800秒三账不挪用；正式投影包括训练/诊断/出生表/两种恢复/统计与分析及25%余量，10GiB峰值包括临时/原子写入；旧费用保持。正式七输入、A/B筛选、train/valid各一次尝试、完整新盲门前valid未开放；没有旧Memory/test/owners/private权限。 三、实际CPU证据与补核 Linux既有py310，CPU0单线程，CUDA隐藏；未载BGE、未读正式文本/标签/Memory。三个实际进程全部exit0，0失败/错误/跳过：attempt01六项22.351s unittest，外层24.13945484s收费25；attempt02只补固定原生224记录/254汉字输入的三种阶段角色分配与合成K回传，外层2.38010406s收费3；attempt03只补新臂盲门/双对照输出收集，外层12.64404964s收费13。累计41/180秒。GPU0次、正式0次。以外层/内部较大值逐次向上取整，保留全部原件。 attempt01新臂orchestration/comparison输出沿用了旧H测试的文件名，随后旧默认回归覆盖了这两份JSON；unittest两者均通过，但原新臂具体JSON不能据此声称已保存。已仅将新臂两个证据文件名前缀改为h_cons_，attempt03重跑该受影响项并完整保留。原件不追改。attempt02是主审补足明确合同夹具范围，不是失败后调方法。生产/共享代码从attempt01起不变，只有新测试文件这两次变化；cpu_receipt按实际方法变化继承其余证据，不把最后1项当全套重跑。 FP32共享K总梯度L1误差：56记录1.0874424224e-8；224记录三例最大1.1430479433e-8，合同上限5e-7。10坐标FP64差分最大误差1.3083286828e-12，上限2e-9。current/paired实际encoder最大参数差分别7.4505805969e-9/1.1920928955e-7；head分别1.0728836060e-5/3.3393502235e-5。它们证明这些tiny例中新增项实际作用，不代表BGE作用或性能收益。完整独立图同时核对分项、逐张量梯度/裁剪、更新及Adam矩。m由实际Logaddexp双LogSoftmax父节点与源码确认，不要求一阶区分仅detach m。 真实48fit/6cache/40blind手写capture使用H并带新身份，D0/D1经独立池化核对；恢复/诊断后下一更新所有状态逐元素相同。576调度/2端点/12诊断的编排夹具明确mock了forward/update/metric/calibration，仅控制流证据，真实梯度证据来自另一测试，不冒称已训练576步。统计夹具内passed/直接H为true只是人为保存数值的代数例，不是模型结果。 四、包内证据与审查边界 manifest列全部文件身份；sources为当前42直接来源，changes.diff给出相对已批准合同提交3cd20ad3的修改与新文件。CPU原始result/unittest/console/wrapper与方法级数值保存；各轮sources.json/result.source_files记录原身份，未变来源映射当前同字节文件，只有旧新测试文件需另附两份原字节。deployment_receipt核验52份旧S/H Linux原件，仅哈希/允许保存元数据，不触及旧Memory。必要旧H CPU/原生及主审仅继承未变部分，不迁移资格标签、旧6次调用或余额。静态外审和主审补正附在包内，原rank/m一阶等价/对称图offset不重新争论未变事实。 没有正式文本/标签载荷、模型、Memory、正式盲预测数组或凭据。包含已开放群定位标识和手写资格输入/输出。请不要要求读取这些未授权载荷来补动机，也不要自动扩大候选、GPU次数、预算或精度；发现合同内部/实现实质矛盾请明确指出并停止相关准入。 五、期望交付 区分已证科学阻断、复现缺陷、合理后续建议及范围外过度设计；每条给实际文件/行、触发条件、科学影响和最小处置，主执行者独立判断。若做隔离手写核算，请保存源码、输入、完整输出/环境/退出记录，明确不是项目Linux原生资格。请在可下载ZIP中交付完整审查正文、结构化发现、实际阅读范围、输入身份核对和任何执行证据；页面给主要结论和链接。不要改写原批准合同或旧结果，不以PASS数量替代行为证据。
+                - generic [aria-hidden] [ref=e949]: …
+              - button "显示更多" [ref=e950] [cursor=pointer]
+            - generic [ref=e956]:
+              - button "复制消息" [ref=e958] [cursor=pointer]
+              - button "共享提示" [ref=e962] [cursor=pointer]
+      - generic [ref=e1044]:
+        - generic [ref=e1045]:
+          - button "正在思考" [expanded] [ref=e1046] [cursor=pointer]
+          - generic:
+            - generic:
+              - generic:
+                - text: 正在思考
+                - generic [aria-hidden]:
+                  - generic: 正在思考
+        - paragraph [ref=e1050]: 我会先核对包身份、批准合同与实际差异，再追踪训练、恢复、盲门、六调用资格及CPU证据，区分已证行为与未执行部分并
+    - generic [ref=e970]: ChatGPT 可能会出错。请核查重要信息。
+  - generic:
+    - generic:
+      - generic:
+        - button [aria-hidden]
+      - heading "最新一条回复" [level=4] [ref=e974]
+      - status [ref=e975]
+      - generic [ref=e995]:
+        - button "添加文件等内容" [ref=e1000] [cursor=pointer]
+        - textbox "询问 ChatGPT" [active] [ref=e1007]:
+          - paragraph: 询问 ChatGPT
+        - generic [ref=e1010]:
+          - button "选择 ChatGPT 模型" [ref=e1015] [cursor=pointer]:
+            - generic [ref=e1016]: Pro
+          - generic [ref=e1026]:
+            - button "听写" [ref=e1030] [cursor=pointer]
+            - button "停止" [ref=e1035] [cursor=pointer]

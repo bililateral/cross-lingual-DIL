@@ -6,7 +6,7 @@
 
 最小实现复用H评分/record VJP和显式参数化单臂流程，实际接入JS、分项损失重建、训练/评分身份、恢复/诊断及S/H两根保存接口。Linux52保存对照原件已逐项核验。三次手写CPU进程均通过，按外层计费25+3+13=41/180秒；第二次只补224记录的固定原生夹具几何，第三次修复新旧测试同名覆盖并仅补受影响接口证据。当前42来源一致，生产代码在首轮后未变；逐项继承和范围见[CPU验收](../reports/documentation/20261016/h_consistency_implementation/qualification/cpu_receipt.json)。原输出/梯度精度和预算未调整，模拟编排不算真实训练，tiny作用不代替BGE资格。
 
-[合同与实现合并包](../reports/documentation/20261016/h_consistency_implementation/review/submission.json)已形成，尚未上传；已请求其具体外发许可。当前未载BGE、未解析新正式文本/标签、未读旧Memory，GPU及正式均0，未创建监听或新正式门。新材料仅本地Git，无公开push。
+对424454字节、92成员、SHA256 b8f344c4eb7f50276bf1967ed6c1579aa47d871828d0bf69015c02534c9a4e73的[合同与实现合并包](../reports/documentation/20261016/h_consistency_implementation/review/submission.json)，用户答复原话：“授权此合并包外审（推荐）”。10月16日13:34经指定本地Playwright MCP单次上传/提交至[独立会话](https://chatgpt.com/c/6ad1b728-394c-83eb-ae1a-d4a098c3acaa)，可见GPT-6/Pro第5档。页面已开始核对/提取附件并显示读取文件，完整请求与冻结文本一致；当前尚无最终结论，待回收和独立主审后按既有条件授权继续。当前未载BGE、未解析新正式文本/标签、未读旧Memory，GPU及正式均0，未创建监听或新正式门。新材料仅本地Git，无公开push。
 
 ## 2026-10-16：H_cons具体实施合同准备
 
