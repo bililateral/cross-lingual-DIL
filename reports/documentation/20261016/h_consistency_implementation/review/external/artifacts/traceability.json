@@ -1,0 +1,82 @@
+{
+  "reference_key": "M=h_consistency.py; R=h_consistency_run.py; S=g_half_run.py; V=g_half_verify.py; all scripts under sources/scripts; C=approved H_cons contract",
+  "requirements": [
+    {
+      "id": "precision_and_queries",
+      "requirement": "FP32 H→FP64 JS→一次FP32 C；排自环、规范27列、仅28平均",
+      "source": "M:42-67; g_half:39-73",
+      "evidence": "CPU/js_precision; shared_K_precision; reviewer probe FP32/FP64",
+      "limit": "已验证代码和手写例；不是BGE"
+    },
+    {
+      "id": "shared_live_graph",
+      "requirement": "两学生/m连通；双向边、两分配在同K汇合",
+      "source": "M:47-114; record_replay:159-208",
+      "evidence": "独立解析/FD/完整图与tiny更新",
+      "limit": "无新增encoder前向；资源仍待测"
+    },
+    {
+      "id": "five_term_target",
+      "requirement": "Bbar字段不藏C；current/history/.5 D0分开；正式拒绝去C",
+      "source": "M:70-114; R:113-139; S:422-451",
+      "evidence": "CPU total/weight/identity故障检测",
+      "limit": "目标与新盲门一致"
+    },
+    {
+      "id": "training_identity",
+      "requirement": "H评分身份保持，H_cons训练身份贯穿",
+      "source": "M:17-39,117-136; S:209-302",
+      "evidence": "CPU capture/restore/missing-training反例",
+      "limit": "两正式端点未执行"
+    },
+    {
+      "id": "one_arm_trajectory",
+      "requirement": "共同预训练→自身A/出生表→自身B；576/864/2/12",
+      "source": "R:160-182; S:177-365",
+      "evidence": "attempt03 orchestration; actual tiny另外证明梯度",
+      "limit": "576为mock控制流，实际训练0"
+    },
+    {
+      "id": "memory_and_blind",
+      "requirement": "新臂盲门仅恢复自身Memory，不载旧Memory",
+      "source": "S:368-514; record_replay:234-332",
+      "evidence": "CPU actual capture + controlled blind fixture",
+      "limit": "未实际读取正式Memory"
+    },
+    {
+      "id": "saved_baselines",
+      "requirement": "52批准文件，两个旧根，UID/22列/三角色/起点与日程",
+      "source": "R:75-110; S:497-612",
+      "evidence": "批准与deployment逐项metadata一致；reviewer不同根例",
+      "limit": "未在网页读取远端52原件"
+    },
+    {
+      "id": "statistics",
+      "requirement": "直接H比較独立于双域S门；低好遗忘及固定群N/A",
+      "source": "S:549-612; balanced_pooling_run:648-680",
+      "evidence": "CPU代数例；reviewer root/N/A例",
+      "limit": "非效果结果；条件区间"
+    },
+    {
+      "id": "native_six_calls",
+      "requirement": "W/P固定；1准备，2/3current，4/5paired，6诊断后重复",
+      "source": "V:91-250",
+      "evidence": "源代码追踪；CPU geometry固定",
+      "limit": "原生未执行；R01 Adam记录缺口"
+    },
+    {
+      "id": "budget",
+      "requirement": "180/600/28800独立；1446v+36h、1800预留和25%；10GiB峰值",
+      "source": "C:176-197; S:151-174; V budget/main",
+      "evidence": "CPU41收费复算；代数投影",
+      "limit": "所有新原生测量待取得"
+    },
+    {
+      "id": "data_permissions",
+      "requirement": "七输入、C技术扫描后筛除、train/valid失败也耗一次、全新门前不开valid",
+      "source": "balanced_pooling_run:89-173; previous:76-87; S:506-514",
+      "evidence": "CPU消费失败尝试/盲门拒绝；静态调用",
+      "limit": "test/owners/private、旧Memory无许可"
+    }
+  ]
+}

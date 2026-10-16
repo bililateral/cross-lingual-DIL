@@ -145,6 +145,27 @@ def shared_memory():
 
 
 class HConsistencyTests(unittest.TestCase):
+    def test_authorized_preload_recovery(self):
+        gate = {"preload_recovery_authorization": data.record(run.RECOVERY_AUTHORIZATION, data.ROOT)}
+        output = data.ROOT/"reports/qualification/gpu/attempt02/result"
+        run.validate_preload_recovery(gate,3,output)
+        for fee in (0,2,4):
+            with self.assertRaises(ValueError):run.validate_preload_recovery(gate,fee,output)
+        with self.assertRaises(ValueError):run.validate_preload_recovery({},3,output)
+        with self.assertRaises(ValueError):run.validate_preload_recovery(gate,3,output.parent.parent/"attempt03/result")
+        original = data.read_json
+        def wrong_failure(path):
+            value = original(path)
+            if path.name == "result.json":value["actual_updates"] = 1
+            return value
+        with mock.patch.object(data,"read_json",side_effect=wrong_failure):
+            with self.assertRaises(ValueError):run.validate_preload_recovery(gate,3,output)
+        bad = copy.deepcopy(gate);bad["preload_recovery_authorization"]["sha256"]="0"*64
+        with self.assertRaises(ValueError):run.validate_preload_recovery(bad,3,output)
+        self.evidence("preload_recovery",dict(prior_gpu_seconds=3,allowed_output=output.relative_to(data.ROOT).as_posix(),
+            wrong_cost_missing_approval_wrong_identity_new_attempt_or_nonzero_updates_rejected=True,
+            scientific_execution="CPU approval/accounting check only; no model or GPU"))
+
     def temporary(self):
         t = tempfile.TemporaryDirectory(dir=os.environ["H_CONS_TEST_ROOT"])
         self.addCleanup(t.cleanup)
@@ -298,7 +319,26 @@ class HConsistencyTests(unittest.TestCase):
                 torch.testing.assert_close(p.grad,q.grad,atol=2e-6,rtol=2e-5)
                 for key in ("step","exp_avg","exp_avg_sq"):
                     torch.testing.assert_close(optimizer.state[p][key],direct_opt.state[q][key],atol=2e-6,rtol=2e-5)
-            effect = qualification.component_effects(model,off)
+            effect = qualification.component_effects(model,off,optimizer=optimizer)
+            by_name = dict(model.named_parameters())
+            for component in ("encoder", "head"):
+                for item in effect[component]["adam"]["parameters"]:
+                    p = by_name[item["name"]]
+                    self.assertEqual(item["state_present"], p in optimizer.state)
+                    if not item["state_present"]:continue
+                    before = off["adam"]["state"][item["optimizer_parameter_id"]]
+                    for key in ("step", "exp_avg", "exp_avg_sq"):
+                        expected_delta = float((before[key]-optimizer.state[p][key]).abs().max())
+                        self.assertEqual(item[key]["max_abs_delta"], expected_delta)
+                    self.assertEqual(item["step"]["off"], 337 if historic else 2)
+                    self.assertEqual(item["step"]["on"], 337 if historic else 2)
+            pid = next(iter(off["adam"]["state"]))
+            bad_adam = copy.deepcopy(off["adam"]);bad_adam["state"][pid].pop("exp_avg")
+            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
+            bad_adam = copy.deepcopy(off["adam"]);bad_adam["state"][pid]["exp_avg"].fill_(float("nan"))
+            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
+            bad_adam = copy.deepcopy(off["adam"]);bad_adam["param_groups"][0]["params"][0] = -1
+            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
             role = "history" if historic else "current"
             for component in ("encoder","head"):
                 delta=max(float((observed[role][n]-pre_off[role][n]).abs().max()) for n in observed[role] if n.startswith(component+"."))
@@ -315,6 +355,13 @@ class HConsistencyTests(unittest.TestCase):
                 bad=copy.deepcopy(row);bad["history"]["consistency_contribution"]=bad["history"]["consistency"]
                 with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
             effects["paired" if historic else "current"] = dict(components=effect,total=row["total"],without_c=off_log["total"],C_contribution=extra)
+        native = dict(training_identity=method.training_identity(),consistency_precision_verified=True,table_precision=[{}]*5,
+                      effects={phase:value["components"] for phase,value in effects.items()})
+        run.validate_native(native)
+        for phase in ("current","paired"):
+            for component in ("encoder","head"):
+                bad = copy.deepcopy(native);bad["effects"][phase][component].pop("adam")
+                with self.assertRaises(ValueError):run.validate_native(bad)
         with self.assertRaises(ValueError):method.update(model,optimizer,current,None,None,run.config(),"H_cons",1,2,qualification_without_c=True)
         self.evidence("complete_graph_and_update",dict(effects=effects,independent_full_graph=True,adam_moments_compared=True,
             scope="Real tiny-model updates; paired clock336 synthetic, no formal model or inputs"))

@@ -41,7 +41,36 @@ def restore(model, optimizer, saved, rng, modes):
     diag.restore_rng(rng)
 
 
-def component_effects(model, on):
+def adam_effects(model, optimizer, saved):
+    """Record on/off Adam states by actual optimizer parameter ID and model name."""
+    current = optimizer.state_dict()
+    if [g["params"] for g in current["param_groups"]] != [g["params"] for g in saved["param_groups"]]:
+        raise ValueError("On/off Adam parameter mapping differs")
+    names = {id(p): name for name, p in model.named_parameters()}
+    result = {component: {"finite": True, "parameters": []} for component in ("encoder", "head")}
+    for live, packed in zip(optimizer.param_groups, current["param_groups"], strict=True):
+        for parameter, pid in zip(live["params"], packed["params"], strict=True):
+            name = names[id(parameter)]
+            component = name.split(".", 1)[0]
+            before, after = saved["state"].get(pid), current["state"].get(pid)
+            row = {"name": name, "optimizer_parameter_id": pid, "state_present": after is not None}
+            if (before is None) != (after is None) or (after is None and parameter.grad is not None):
+                raise ValueError("On/off Adam participation differs: "+name)
+            if after is not None:
+                for key in ("step", "exp_avg", "exp_avg_sq"):
+                    if key not in before or key not in after:
+                        raise ValueError("Missing on/off Adam field: "+name+"/"+key)
+                    a, b = before[key], after[key].detach().cpu()
+                    if a.shape != b.shape or a.dtype != b.dtype or not torch.isfinite(a).all() or not torch.isfinite(b).all():
+                        raise ValueError("Invalid on/off Adam field: "+name+"/"+key)
+                    row[key] = {"max_abs_delta": float((a-b).abs().max())}
+                    if key == "step":
+                        row[key].update(off=float(a), on=float(b))
+            result[component]["parameters"].append(row)
+    return result
+
+
+def component_effects(model, on, *, optimizer=None):
     """Compare active paths; unused parameters must keep both mask and value."""
     parameters = list(model.named_parameters())
     effects = {}
@@ -69,6 +98,9 @@ def component_effects(model, on):
             "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive,
             "active_parameter_names": [n for i, n, p in active],
             "post_clip_gradient_max_delta": gradient_delta, "parameter_max_delta": parameter_delta}
+    if optimizer is not None:
+        for component, value in adam_effects(model, optimizer, on["adam"]).items():
+            effects[component]["adam"] = value
     return effects
 
 
@@ -157,7 +189,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
         return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
     reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
     reload(common_path,common); hrow=updated(active,"A",2)
-    effects["current"] = component_effects(model,gcurrent)
+    effects["current"] = component_effects(model,gcurrent,optimizer=optimizer if consistency else None)
     for key in probes:
         delta=float((gradients[2][key]-gradients[3][key]).abs().max())
         if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
@@ -178,7 +210,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
     reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
     reload(paired_path,paired);first=updated(active,"B",49,history,target)
     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
-    effects["paired"]=component_effects(model,gpaired)
+    effects["paired"]=component_effects(model,gpaired,optimizer=optimizer if consistency else None)
     for key in probes:
         delta=float((gradients[4][key]-gradients[5][key]).abs().max())
         if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
@@ -337,8 +369,10 @@ def main(*, entry=None, handwritten_module="test_step28_g_half", test_class_name
         else:
             if args.gate is None:
                 raise ValueError("Implementation review gate required")
-            run.reviewed_gate(args.gate, "NATIVE")
-            if args.prior_seconds != 0:
+            gate = run.reviewed_gate(args.gate, "NATIVE")
+            if consistency and (args.prior_seconds != 0 or "preload_recovery_authorization" in gate):
+                run.validate_preload_recovery(gate, args.prior_seconds, args.output)
+            elif args.prior_seconds != 0:
                 raise ValueError("Unique GPU attempt; no automatic retry")
             report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
         check()

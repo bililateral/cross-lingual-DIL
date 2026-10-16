@@ -1,0 +1,101 @@
+{
+  "scope": "ISOLATED_REVIEWER_CPU_HANDWRITTEN_NOT_PROJECT_QUALIFICATION",
+  "torch": "2.10.0+cpu",
+  "numpy": "2.3.5",
+  "shared_K": {
+    "float64": {
+      "actual_C": 0.04196256321022686,
+      "reference_C": 0.041962563210226796,
+      "value_abs_error": 6.245004513516506e-17,
+      "query_gradient_L1": [
+        8.744892555417525e-17,
+        8.896090583480377e-17
+      ],
+      "shared_K_total_gradient_L1": 9.21091155415112e-17,
+      "H_abs_max_before_output_cast": [
+        2.220446049250313e-16,
+        1.1102230246251565e-16
+      ]
+    },
+    "float32": {
+      "actual_C": 0.04196256399154663,
+      "reference_C": 0.04196256313145697,
+      "value_abs_error": 8.600896592159124e-10,
+      "query_gradient_L1": [
+        2.2817743315323162e-09,
+        2.325216954487658e-09
+      ],
+      "shared_K_total_gradient_L1": 6.677402546130055e-09,
+      "H_abs_max_before_output_cast": [
+        5.909374989343519e-08,
+        5.495497168439556e-08
+      ]
+    }
+  },
+  "off_C_equals_old_H": {
+    "float64_current": {
+      "objective_bitwise_equal": true,
+      "K_gradient_bitwise_equal": true,
+      "objective": 4.650201508381583
+    },
+    "float64_history": {
+      "objective_bitwise_equal": true,
+      "K_gradient_bitwise_equal": true,
+      "objective": 0.9384727729831548
+    },
+    "float32_current": {
+      "objective_bitwise_equal": true,
+      "K_gradient_bitwise_equal": true,
+      "objective": 4.650201797485352
+    },
+    "float32_history": {
+      "objective_bitwise_equal": true,
+      "K_gradient_bitwise_equal": true,
+      "objective": 0.9384728670120239
+    }
+  },
+  "distinct_roots": {
+    "roots": {
+      "H_cons": "distinct_root_H_cons",
+      "S": "distinct_root_S",
+      "G_half": "distinct_root_G_half"
+    },
+    "colliding_relative_filenames": true,
+    "MAP_H_cons_minus_S_B": {
+      "mean": 0.29999999999999993,
+      "conditional_95pct_interval": [
+        0.29999999999999993,
+        0.29999999999999993
+      ]
+    },
+    "MAP_H_cons_minus_H_B": {
+      "mean": 0.1499999999999999,
+      "conditional_95pct_interval": [
+        0.1499999999999999,
+        0.1499999999999999
+      ]
+    },
+    "MAP_forgetting_difference": {
+      "mean": -0.1,
+      "conditional_95pct_interval": [
+        -0.1,
+        -0.1
+      ]
+    },
+    "log_loss_forgetting_difference": {
+      "mean": 0.10000000000000005,
+      "conditional_95pct_interval": [
+        0.10000000000000005,
+        0.10000000000000005
+      ]
+    },
+    "fixed_group_NA": {
+      "mean": null,
+      "conditional_95pct_interval": null,
+      "undefined_groups": 1,
+      "total_groups": 20,
+      "na_reason": "At least one required group operand is undefined; fixed groups retained."
+    },
+    "meaning": "Saved algebra/routing fixture only; synthetic true booleans are NOT model results."
+  }
+}

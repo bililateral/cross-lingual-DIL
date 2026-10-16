@@ -1,5 +1,20 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-16：审查FP32总目标严格不等资格条件
+
+用户原话：“现在给我审查‘舍入后的总目标必须严格不等’是否适合作为资格条件”。据此完成[定向独立静态审查](../reports/documentation/20261016/h_consistency_objective_gate/analysis.zh.txt)：审查合同原话、实际前向/VJP/更新、失败原数和匹配PyTorch2.9.1的官方反向规则，给出非必要/非充分手算反例及不能只靠isclose的反例。未执行新CPU/GPU科学计算，未改运行源码/精度/合同，旧失败和累计账不变。
+
+已准备35成员148125字节的新[静态外审包](../reports/documentation/20261016/h_consistency_objective_gate/review/submission.json)，SHA256 8b6c470cefcf31bbc94c9804a11ba839e1aaae5d48394140b346331b58eed4cd；仅请求指定本地Playwright外发许可，尚未上传。此审查不授予实现、额外GPU调用或正式训练；若后续修改资格和恢复范围，须另明确具体补充。
+
+## 2026-10-16：H_cons合并外审关闭与一次载模前恢复批准
+
+用户要求：“外审已结束，仔细回收并分析 H_cons 合同与实现的审查意见，独立主审后按已批准合同继续推进原生 GPU 资格与资源投影。”完整外审正文及95成员返回包已回收核对，独立主审接受R01的原生Adam留证缺口，只补真实on/off状态摘要与受影响CPU一项，累计45/180秒；其余已关闭意见、有限证据和论文解释边界见[主审](../reports/documentation/20261016/h_consistency_implementation/review/primary_disposition.zh.txt)。未新增候选或放宽精度。
+
+第一次GPU attempt01因独立workspace缺少获准BGE链接在载模前失败，0更新、收费3秒，必要原件及[处置方案](../reports/documentation/20261016/h_consistency_implementation/qualification/native_disposition.zh.txt)保留。12原模型文件实际逐项核对后只补准确链接；没有擅自重试。用户针对一次恢复具体问题答复：“批准这一次受限恢复（推荐）”。[批准](../reports/documentation/20261016/h_consistency_implementation/qualification/preload_recovery_authorization.json)仅覆盖attempt02、累计GPU600秒中余597秒、总计至多6更新，失败再停；CPU180秒与正式8小时/10GiB、原精度/数据/比较均不变。
+
+批准后只补恢复入口及Linux手写CPU费用/身份核验，attempt05收费2秒，累计47/180秒；原六类别与R01按未变范围继承，43当前来源绑定新门。[恢复主审](../reports/documentation/20261016/h_consistency_implementation/review/recovery_primary.zh.txt)关闭本次入口问题。attempt02于14:38:15启动，14:39:42在第3调用后因current加/去C的FP32总目标相同停止；本次87秒加旧3秒累计90/600。已回收五原件并分析舍入原因与证据限制；无进一步恢复，正式未启动，临时无恢复用途3.64GiB状态已留证删除。详细见[失败分析](../reports/documentation/20261016/h_consistency_implementation/qualification/recovery_outcome.zh.txt)；最终执行状态以[当前回执](../reports/documentation/20261016/h_consistency_implementation/qualification/state.json)和交接顶部为准，不把启动当资格通过。旧失败账不清零，无新外发或第二恢复许可。
+
+
 ## 2026-10-16：全部现有本地提交推送授权
 
 用户原话：“本地Git都提交到远端”。本次覆盖截至6b5174d5的34个未推送提交及本条授权衔接，目的地为现有origin的method/step27-english-pretrained-synthetic-adaptation分支。工作区原本干净，远端实际分支仍为916a3e78，无分叉；新增1320个Git文件对象及其2252个压缩成员完成凭据／受限载荷名核对，无候选命中，无新增LFS指针。保持普通快进推送，不合并main、不改写历史；历史“未获push许可”不覆盖这次明确决定，实验合同、数据权限和预算不变。推送后独立核对远端ref，不以本地提交替代远端交付。

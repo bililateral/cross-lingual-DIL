@@ -1,0 +1,144 @@
+diff --git a/scripts/step28_g_half_verify.py b/scripts/step28_g_half_verify.py
+index c128ff93..02a96de2 100644
+--- a/scripts/step28_g_half_verify.py
++++ b/scripts/step28_g_half_verify.py
+@@ -41,7 +41,36 @@ def restore(model, optimizer, saved, rng, modes):
+     diag.restore_rng(rng)
+ 
+ 
+-def component_effects(model, on):
++def adam_effects(model, optimizer, saved):
++    """Record on/off Adam states by actual optimizer parameter ID and model name."""
++    current = optimizer.state_dict()
++    if [g["params"] for g in current["param_groups"]] != [g["params"] for g in saved["param_groups"]]:
++        raise ValueError("On/off Adam parameter mapping differs")
++    names = {id(p): name for name, p in model.named_parameters()}
++    result = {component: {"finite": True, "parameters": []} for component in ("encoder", "head")}
++    for live, packed in zip(optimizer.param_groups, current["param_groups"], strict=True):
++        for parameter, pid in zip(live["params"], packed["params"], strict=True):
++            name = names[id(parameter)]
++            component = name.split(".", 1)[0]
++            before, after = saved["state"].get(pid), current["state"].get(pid)
++            row = {"name": name, "optimizer_parameter_id": pid, "state_present": after is not None}
++            if (before is None) != (after is None) or (after is None and parameter.grad is not None):
++                raise ValueError("On/off Adam participation differs: "+name)
++            if after is not None:
++                for key in ("step", "exp_avg", "exp_avg_sq"):
++                    if key not in before or key not in after:
++                        raise ValueError("Missing on/off Adam field: "+name+"/"+key)
++                    a, b = before[key], after[key].detach().cpu()
++                    if a.shape != b.shape or a.dtype != b.dtype or not torch.isfinite(a).all() or not torch.isfinite(b).all():
++                        raise ValueError("Invalid on/off Adam field: "+name+"/"+key)
++                    row[key] = {"max_abs_delta": float((a-b).abs().max())}
++                    if key == "step":
++                        row[key].update(off=float(a), on=float(b))
++            result[component]["parameters"].append(row)
++    return result
++
++
++def component_effects(model, on, *, optimizer=None):
+     """Compare active paths; unused parameters must keep both mask and value."""
+     parameters = list(model.named_parameters())
+     effects = {}
+@@ -69,6 +98,9 @@ def component_effects(model, on):
+             "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive,
+             "active_parameter_names": [n for i, n, p in active],
+             "post_clip_gradient_max_delta": gradient_delta, "parameter_max_delta": parameter_delta}
++    if optimizer is not None:
++        for component, value in adam_effects(model, optimizer, on["adam"]).items():
++            effects[component]["adam"] = value
+     return effects
+ 
+ 
+@@ -157,7 +189,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
+         return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
+     reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
+     reload(common_path,common); hrow=updated(active,"A",2)
+-    effects["current"] = component_effects(model,gcurrent)
++    effects["current"] = component_effects(model,gcurrent,optimizer=optimizer if consistency else None)
+     for key in probes:
+         delta=float((gradients[2][key]-gradients[3][key]).abs().max())
+         if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
+@@ -178,7 +210,7 @@ def native(check, progress, handwritten, out, *, entry=None, consistency=False):
+     reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
+     reload(paired_path,paired);first=updated(active,"B",49,history,target)
+     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
+-    effects["paired"]=component_effects(model,gpaired)
++    effects["paired"]=component_effects(model,gpaired,optimizer=optimizer if consistency else None)
+     for key in probes:
+         delta=float((gradients[4][key]-gradients[5][key]).abs().max())
+         if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
+diff --git a/scripts/step28_h_consistency_run.py b/scripts/step28_h_consistency_run.py
+index 093e3103..8c0e4f0c 100644
+--- a/scripts/step28_h_consistency_run.py
++++ b/scripts/step28_h_consistency_run.py
+@@ -149,6 +149,23 @@ def validate_native(value: dict) -> None:
+             or value.get("consistency_precision_verified") is not True
+             or len(value.get("table_precision", [])) != 5):
+         raise ValueError("Actual native H_cons table precision/training identity missing")
++    for phase in ("current", "paired"):
++        for component in ("encoder", "head"):
++            effect = value.get("effects", {}).get(phase, {}).get(component, {})
++            adam = effect.get("adam", {})
++            rows = adam.get("parameters", [])
++            active = [r for r in rows if r.get("state_present")]
++            if (adam.get("finite") is not True or not active
++                    or {r["name"] for r in active} != set(effect.get("active_parameter_names", []))):
++                raise ValueError("Native on/off Adam mapping/evidence missing")
++            for row in active:
++                for key in ("step", "exp_avg", "exp_avg_sq"):
++                    delta = row.get(key, {}).get("max_abs_delta", float("nan"))
++                    if not np.isfinite(delta) or delta < 0:
++                        raise ValueError("Native on/off Adam difference missing/nonfinite")
++                expected_step = 2 if phase == "current" else 337
++                if row["step"].get("off") != expected_step or row["step"].get("on") != expected_step:
++                    raise ValueError("Native on/off Adam clock differs")
+ 
+ 
+ class Budget(single.Budget):
+diff --git a/tests/test_step28_h_consistency.py b/tests/test_step28_h_consistency.py
+index 97a383e7..3494978a 100644
+--- a/tests/test_step28_h_consistency.py
++++ b/tests/test_step28_h_consistency.py
+@@ -298,7 +298,26 @@ class HConsistencyTests(unittest.TestCase):
+                 torch.testing.assert_close(p.grad,q.grad,atol=2e-6,rtol=2e-5)
+                 for key in ("step","exp_avg","exp_avg_sq"):
+                     torch.testing.assert_close(optimizer.state[p][key],direct_opt.state[q][key],atol=2e-6,rtol=2e-5)
+-            effect = qualification.component_effects(model,off)
++            effect = qualification.component_effects(model,off,optimizer=optimizer)
++            by_name = dict(model.named_parameters())
++            for component in ("encoder", "head"):
++                for item in effect[component]["adam"]["parameters"]:
++                    p = by_name[item["name"]]
++                    self.assertEqual(item["state_present"], p in optimizer.state)
++                    if not item["state_present"]:continue
++                    before = off["adam"]["state"][item["optimizer_parameter_id"]]
++                    for key in ("step", "exp_avg", "exp_avg_sq"):
++                        expected_delta = float((before[key]-optimizer.state[p][key]).abs().max())
++                        self.assertEqual(item[key]["max_abs_delta"], expected_delta)
++                    self.assertEqual(item["step"]["off"], 337 if historic else 2)
++                    self.assertEqual(item["step"]["on"], 337 if historic else 2)
++            pid = next(iter(off["adam"]["state"]))
++            bad_adam = copy.deepcopy(off["adam"]);bad_adam["state"][pid].pop("exp_avg")
++            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
++            bad_adam = copy.deepcopy(off["adam"]);bad_adam["state"][pid]["exp_avg"].fill_(float("nan"))
++            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
++            bad_adam = copy.deepcopy(off["adam"]);bad_adam["param_groups"][0]["params"][0] = -1
++            with self.assertRaises(ValueError):qualification.adam_effects(model,optimizer,bad_adam)
+             role = "history" if historic else "current"
+             for component in ("encoder","head"):
+                 delta=max(float((observed[role][n]-pre_off[role][n]).abs().max()) for n in observed[role] if n.startswith(component+"."))
+@@ -315,6 +334,13 @@ class HConsistencyTests(unittest.TestCase):
+                 bad=copy.deepcopy(row);bad["history"]["consistency_contribution"]=bad["history"]["consistency"]
+                 with self.assertRaises(ValueError):run.loss_total(bad,stage,"H_cons")
+             effects["paired" if historic else "current"] = dict(components=effect,total=row["total"],without_c=off_log["total"],C_contribution=extra)
++        native = dict(training_identity=method.training_identity(),consistency_precision_verified=True,table_precision=[{}]*5,
++                      effects={phase:value["components"] for phase,value in effects.items()})
++        run.validate_native(native)
++        for phase in ("current","paired"):
++            for component in ("encoder","head"):
++                bad = copy.deepcopy(native);bad["effects"][phase][component].pop("adam")
++                with self.assertRaises(ValueError):run.validate_native(bad)
+         with self.assertRaises(ValueError):method.update(model,optimizer,current,None,None,run.config(),"H_cons",1,2,qualification_without_c=True)
+         self.evidence("complete_graph_and_update",dict(effects=effects,independent_full_graph=True,adam_moments_compared=True,
+             scope="Real tiny-model updates; paired clock336 synthetic, no formal model or inputs"))

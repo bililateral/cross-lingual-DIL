@@ -1,0 +1,225 @@
+{
+  "archive": {
+    "name": "review_input(20261016-053330).zip",
+    "bytes": 424454,
+    "sha256": "b8f344c4eb7f50276bf1967ed6c1579aa47d871828d0bf69015c02534c9a4e73",
+    "members": 92,
+    "manifest_payloads": 91,
+    "CRC_bad_members": 0,
+    "duplicate_members": 0,
+    "all_payloads_match": true
+  },
+  "current_sources": 42,
+  "CPU": [
+    {
+      "attempt": "attempt01",
+      "source_count": 42,
+      "tests": [
+        "test_actual_capture_restore_and_training_identity",
+        "test_complete_objective_vjp_and_actual_updates",
+        "test_js_value_gradient_precision_and_faults",
+        "test_loss_gate_and_saved_comparison_interfaces",
+        "test_shared_table_pullback_and_finite_difference",
+        "test_unchanged_single_arm_defaults"
+      ],
+      "unittest_seconds": 22.351,
+      "outer_seconds": 24.13945484161377,
+      "internal_seconds": 23.743050183635205,
+      "charge": 25,
+      "cumulative_charge": 25,
+      "exit": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "paths_differing_from_current": [
+        "tests/test_step28_h_consistency.py"
+      ]
+    },
+    {
+      "attempt": "attempt02",
+      "source_count": 42,
+      "tests": [
+        "test_shared_table_pullback_and_finite_difference"
+      ],
+      "unittest_seconds": 0.681,
+      "outer_seconds": 2.3801040649414062,
+      "internal_seconds": 2.074068178422749,
+      "charge": 3,
+      "cumulative_charge": 28,
+      "exit": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "paths_differing_from_current": [
+        "tests/test_step28_h_consistency.py"
+      ]
+    },
+    {
+      "attempt": "attempt03",
+      "source_count": 42,
+      "tests": [
+        "test_loss_gate_and_saved_comparison_interfaces"
+      ],
+      "unittest_seconds": 10.882,
+      "outer_seconds": 12.644049644470215,
+      "internal_seconds": 12.242730893660337,
+      "charge": 13,
+      "cumulative_charge": 41,
+      "exit": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "paths_differing_from_current": []
+    }
+  ],
+  "test_AST_changes": [
+    {
+      "from": "cpu/attempt01/sources/tests/test_step28_h_consistency.py",
+      "to": "cpu/attempt02/sources/tests/test_step28_h_consistency.py",
+      "changed_methods": [
+        "HConsistencyTests.test_shared_table_pullback_and_finite_difference"
+      ]
+    },
+    {
+      "from": "cpu/attempt02/sources/tests/test_step28_h_consistency.py",
+      "to": "sources/tests/test_step28_h_consistency.py",
+      "changed_methods": [
+        "HConsistencyTests.check_saved_comparisons",
+        "HConsistencyTests.test_loss_gate_and_saved_comparison_interfaces"
+      ]
+    }
+  ],
+  "authorization": {
+    "status": "APPROVED_FULL_CONTRACT_GATED_SEQUENCE",
+    "contract": {
+      "path": "docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+      "bytes": 30924,
+      "sha256": "57e39227b2a789316f3475af7aa97a88c834db883b0b7c9a7a45e9db6feb68bf"
+    },
+    "observed_at": "2026-10-16T04:35:10.990Z"
+  },
+  "baseline": {
+    "files": 52,
+    "bytes": 2940294,
+    "approved_deployment_identity_metadata_equal": true,
+    "remote_file_bytes_independently_read_by_reviewer": false,
+    "unchanged_direct_sources_matched": 8,
+    "development_ids": 40,
+    "columns": 22,
+    "deployment_sources_equal_attempt01": true,
+    "initial_identity_equal": true
+  },
+  "diff": {
+    "sections": [
+      {
+        "path": "scripts/step28_g_half.py",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": false,
+        "old_side_sha256_from_diff": "8fc18146ad069d81dfb0dd8155cf368bed1ccea1d5bfe2aba36d4ed0259658c4",
+        "changed_top_level_definitions": [
+          "metadata"
+        ]
+      },
+      {
+        "path": "scripts/step28_g_half_run.py",
+        "hunks": 26,
+        "current_side_exact": true,
+        "new_file": false,
+        "old_side_sha256_from_diff": "f04bb6d1b6dd7f7e4856db11624ebf6825e37c3d472d1bf5ad04e9518c514d8b",
+        "changed_top_level_definitions": [
+          "baseline_runs",
+          "blind_gate",
+          "checkpoint",
+          "collect",
+          "execute",
+          "finalize",
+          "loss_total",
+          "memory_from",
+          "open_valid",
+          "restore_point",
+          "reviewed_gate",
+          "train",
+          "train_stage",
+          "validate_diagnostic",
+          "validate_gate",
+          "validate_native"
+        ]
+      },
+      {
+        "path": "scripts/step28_g_half_verify.py",
+        "hunks": 10,
+        "current_side_exact": true,
+        "new_file": false,
+        "old_side_sha256_from_diff": "187e5c1ce745efc967e16ff7b7e329cf08993a5e53a3c18ee75013a527cf099c",
+        "changed_top_level_definitions": [
+          "main",
+          "native"
+        ]
+      },
+      {
+        "path": "reports/documentation/20261016/h_consistency_implementation/authorization.json",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "schema/step28_h_consistency_policy.json",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "scripts/run_step28_h_consistency_linux_20261016.sh",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "scripts/step28_h_consistency.py",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "scripts/step28_h_consistency_run.py",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "scripts/step28_h_consistency_verify.py",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      },
+      {
+        "path": "tests/test_step28_h_consistency.py",
+        "hunks": 1,
+        "current_side_exact": true,
+        "new_file": true,
+        "old_side_sha256_from_diff": null
+      }
+    ],
+    "claimed_base_commit": "3cd20ad3",
+    "base_commit_independently_available": false,
+    "claim": "Current side verified; old side reconstructable from supplied diff only"
+  },
+  "native_adam_evidence": {
+    "component_effects_saved_state_keys_read": [
+      "grads",
+      "model"
+    ],
+    "adam_compared_in_2_vs_3_or_4_vs_5": false,
+    "adam_compared_in_5_vs_6": true,
+    "contract_reference": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md:166",
+    "code_reference": "sources/scripts/step28_g_half_verify.py:44-72,158-170,178-192,244-250",
+    "meaning": "Missing required per-component native Adam-change record, not proof of incorrect Adam update."
+  }
+}

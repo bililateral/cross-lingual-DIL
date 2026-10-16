@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons合并外审与原生失败收尾
+
+合并外审完整回收及独立主审处置后，删除返回ZIP、浏览器重复下载及内嵌重复输入，共3文件1757356字节；93个非重复载荷、审查正文/主审/清单和唯一用于冻结源码复核的review_input.zip继续保留。见[回收记录](../reports/documentation/20261016/h_consistency_implementation/review/recovery.json)，没有以补传Linux作为删除前提。
+
+获准唯一原生恢复attempt02在3次更新后失败，累计GPU90秒，无后续恢复许可或正式依赖。按合同第8节，回收五份小失败原件并确认作业退出后，14:42:54删除唯一手写common.pt完整状态3904681029字节（约3.64GiB）；路径/大小/SHA、五原件删除前后不变与空work见[实际收尾](../reports/documentation/20261016/h_consistency_implementation/qualification/recovery_closeout.json)。原BGE、CPU/失败/审查证据保留，未创建备份或搬走大载荷；SHA不能恢复已删模型。局部清理不改变项目大清理周期。
+
 ## 2026-10-16 H_cons静态审查收尾
 
 完整回收返回ZIP289811字节/26成员，解压472481字节；大小/SHA与页面交付一致，25内部载荷和原输入16成员/15载荷均核对。必要审查原文、数学源码/手写输入/梯度数组/执行日志等25个独立成员344227字节保存在reports/documentation/20261016/h_consistency/review/external；[独立主审](../reports/documentation/20261016/h_consistency/review/primary_disposition.zh.txt)已完成，支持准备受限合同，未授予新执行权限。

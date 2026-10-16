@@ -1,0 +1,13 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/tests/test_step28_h_consistency.py:85: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  if abs(float(loss)-expected) > tolerance:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_h_consistency_verify.py", line 6, in <module>
+    qualification.main(entry=run, handwritten_module="test_step28_h_consistency",
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 377, in main
+    report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 197, in native
+    if updates[1]["log"]["total"]==hrow["total"]:raise ValueError("Current candidate-control objective indistinguishable")
+ValueError: Current candidate-control objective indistinguishable

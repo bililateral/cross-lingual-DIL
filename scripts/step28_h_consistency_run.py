@@ -18,13 +18,15 @@ base, previous, diag = single.base, single.previous, single.diag
 POLICY = data.ROOT/"schema/step28_h_consistency_policy.json"
 BASELINE = data.ROOT/"reports/documentation/20261016/h_consistency/baseline_sources.json"
 AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/authorization.json"
+RECOVERY_AUTHORIZATION = data.ROOT/"reports/documentation/20261016/h_consistency_implementation/qualification/preload_recovery_authorization.json"
 POINTS = ("A_H_cons", "B_H_cons")
 COMPLETE = single.COMPLETE
 COMPLETION_STATUS = "COMPLETE_H_CONS_FIXED_AB"
 DIRECT_COMPARISON_KEY = "direct_H_new_B_positive"
 CPU_TESTS = ("test_js_value_gradient_precision_and_faults", "test_shared_table_pullback_and_finite_difference",
              "test_complete_objective_vjp_and_actual_updates", "test_actual_capture_restore_and_training_identity",
-             "test_loss_gate_and_saved_comparison_interfaces", "test_unchanged_single_arm_defaults")
+             "test_loss_gate_and_saved_comparison_interfaces", "test_unchanged_single_arm_defaults",
+             "test_authorized_preload_recovery")
 projection, continuity = single.projection, single.continuity
 fresh, pretrained_archive = single.fresh, single.pretrained_archive
 public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
@@ -65,7 +67,7 @@ def sources() -> list[dict]:
     paths.update(data.ROOT/"schema"/name for name in ("step28_h_consistency_policy.json", "step28_g_half_policy.json",
         "step28_record_replay_policy.json", "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json",
         "step28_chinese_base_policy.json"))
-    paths.update((BASELINE, AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+    paths.update((BASELINE, AUTHORIZATION, RECOVERY_AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
                   data.ROOT/"scripts/run_step28_h_consistency_linux_20261016.sh",
                   single.BASELINE, single.AUTHORIZATION, data.ROOT/"docs/SELLER_ALIAS_G_HALF.zh.md",
                   data.ROOT/"scripts/run_step28_g_half_linux_20261015.sh"))
@@ -149,6 +151,42 @@ def validate_native(value: dict) -> None:
             or value.get("consistency_precision_verified") is not True
             or len(value.get("table_precision", [])) != 5):
         raise ValueError("Actual native H_cons table precision/training identity missing")
+    for phase in ("current", "paired"):
+        for component in ("encoder", "head"):
+            effect = value.get("effects", {}).get(phase, {}).get(component, {})
+            adam = effect.get("adam", {})
+            rows = adam.get("parameters", [])
+            active = [r for r in rows if r.get("state_present")]
+            if (adam.get("finite") is not True or not active
+                    or {r["name"] for r in active} != set(effect.get("active_parameter_names", []))):
+                raise ValueError("Native on/off Adam mapping/evidence missing")
+            for row in active:
+                for key in ("step", "exp_avg", "exp_avg_sq"):
+                    delta = row.get(key, {}).get("max_abs_delta", float("nan"))
+                    if not np.isfinite(delta) or delta < 0:
+                        raise ValueError("Native on/off Adam difference missing/nonfinite")
+                expected_step = 2 if phase == "current" else 337
+                if row["step"].get("off") != expected_step or row["step"].get("on") != expected_step:
+                    raise ValueError("Native on/off Adam clock differs")
+
+
+def validate_preload_recovery(gate: dict, prior_seconds: float, output: Path) -> None:
+    if gate.get("preload_recovery_authorization") != data.record(RECOVERY_AUTHORIZATION, data.ROOT):
+        raise ValueError("Specific preload recovery approval missing")
+    auth = data.read_json(RECOVERY_AUTHORIZATION)
+    if (auth["status"] != "APPROVED_ONE_PRELOAD_RECOVERY" or prior_seconds != auth["prior_charged_seconds"]
+            or prior_seconds != 3 or output != data.ROOT/auth["attempt_output"]
+            or auth["maximum_cumulative_gpu_seconds"] != 600 or auth["maximum_total_updates"] != 6):
+        raise ValueError("Preload recovery scope or cumulative charge differs")
+    for key in ("supplement", "failed_result", "failed_wallclock"):
+        data.verify(data.ROOT/auth[key]["path"], auth[key])
+    failed = data.read_json(data.ROOT/auth["failed_result"]["path"])
+    wall = data.read_json(data.ROOT/auth["failed_wallclock"]["path"])
+    if (failed["status"] != "FAIL" or failed.get("actual_updates", 0) != 0 or failed.get("updates")
+            or failed.get("stage") is not None or failed.get("native") is not None
+            or failed.get("max_reserved_bytes") != 0 or wall["cumulative_charged_seconds"] != prior_seconds
+            or not failed.get("traceback", "").rstrip().endswith("ValueError: Pinned BGE archive differs or is missing")):
+        raise ValueError("Only the approved zero-update preload failure can recover")
 
 
 class Budget(single.Budget):

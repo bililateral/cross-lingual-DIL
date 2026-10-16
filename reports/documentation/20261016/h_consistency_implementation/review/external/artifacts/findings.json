@@ -1,0 +1,232 @@
+{
+  "review_verdict": "CORE_IMPLEMENTATION_ACCEPTABLE_WITH_ONE_OPEN_REPRODUCIBILITY_FIX_BEFORE_GPU",
+  "proved_scientific_blockers": 0,
+  "open_required_reproducibility_fixes": 1,
+  "conditional_next_stage": "Only after independent disposition/closure; unique native six calls remains pending",
+  "findings": [
+    {
+      "id": "R01",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "status": "OPEN",
+      "severity": "PRE_GPU_EVIDENCE_FIX_REQUIRED",
+      "title": "原生开关C的两组Adam变化记录没有实现",
+      "references": [
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 166,
+          "end_line": 166
+        },
+        {
+          "path": "sources/scripts/step28_g_half_verify.py",
+          "start_line": 29,
+          "end_line": 31
+        },
+        {
+          "path": "sources/scripts/step28_g_half_verify.py",
+          "start_line": 44,
+          "end_line": 72
+        },
+        {
+          "path": "sources/scripts/step28_g_half_verify.py",
+          "start_line": 158,
+          "end_line": 192
+        },
+        {
+          "path": "sources/scripts/step28_g_half_verify.py",
+          "start_line": 244,
+          "end_line": 250
+        },
+        {
+          "path": "sources/scripts/step28_h_consistency_run.py",
+          "start_line": 147,
+          "end_line": 151
+        }
+      ],
+      "trigger": "按当前代码完成原生调用2/3、4/5后，effects仅含参数/梯度差，捕获的off Adam矩未被比较或记录。",
+      "established_fact": "component_effects实际仅读取on[model]和on[grads]；gcurrent/gpaired的adam被捕获但在两个比较中未消费，之后删除。",
+      "impact": "无法从原生结果审计合同166行约定的两组分组件Adam变化；不证明Adam算法错误、不否定真实参数差。",
+      "not_a_substitute": [
+        "CPU独立全图Adam正确性",
+        "原生调用5/6完整Adam一致性",
+        "泛化的both_phases_encoder_head_effect布尔值"
+      ],
+      "minimal_disposition": "删除off状态前，利用现有model/optimizer与off快照按命名参数映射，记录current/paired两组件的step、exp_avg、exp_avg_sq有限性与实际差异摘要；仅补受影响测试、来源与增量回执，不增更新/精度门/预算。",
+      "gate_effect": "建议主执行者关闭前不要为本包签APPROVED_NO_OPEN_BLOCKERS或启动依赖GPU；本报告不代替主审。",
+      "scientific_blocker": false
+    },
+    {
+      "id": "R02",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED_IN_INPUT",
+      "severity": "CORRECTED_HISTORY_RETAINED",
+      "title": "attempt01新臂两个证据JSON被旧默认回归覆盖，attempt03已补存",
+      "references": [
+        {
+          "path": "cpu_receipt.json",
+          "start_line": 311,
+          "end_line": 311,
+          "field": "reproducibility_correction"
+        },
+        {
+          "path": "sources/tests/test_step28_h_consistency.py",
+          "start_line": 477,
+          "end_line": 480
+        },
+        {
+          "path": "sources/tests/test_step28_h_consistency.py",
+          "start_line": 536,
+          "end_line": 536
+        },
+        {
+          "path": "cpu/attempt03/result/h_cons_orchestration.json",
+          "start_line": 1,
+          "end_line": 1
+        },
+        {
+          "path": "cpu/attempt03/result/h_cons_comparison_and_permissions.json",
+          "start_line": 1,
+          "end_line": 1
+        }
+      ],
+      "trigger": "把attempt01中沿用旧名的orchestration/comparison JSON当作当时新臂具体保存证据。",
+      "impact": "unittest通过不能恢复已被覆写的细节原件；不属于CPU科学失败。",
+      "minimal_disposition": "只使用attempt03的h_cons_前缀原件支持对应细节，保留attempt01、全部收费及按方法继承，不全套重跑。",
+      "gate_effect": "已关闭，不另加GPU前提"
+    },
+    {
+      "id": "N01",
+      "category": "EVIDENCE_LIMITATION_RECOMMENDATION",
+      "status": "NONBLOCKING",
+      "severity": "NARROW_TEST_SCOPE",
+      "title": "项目CPU旧S/H比较夹具共用根与数值，未独立区分两个物理根",
+      "references": [
+        {
+          "path": "sources/tests/test_step28_h_consistency.py",
+          "start_line": 435,
+          "end_line": 435
+        },
+        {
+          "path": "sources/tests/test_step28_h_consistency.py",
+          "start_line": 482,
+          "end_line": 508
+        },
+        {
+          "path": "sources/scripts/step28_g_half_run.py",
+          "start_line": 549,
+          "end_line": 591
+        }
+      ],
+      "trigger": "将同根mock的PASS宣传为有区分力的双根文件读取实测。",
+      "impact": "该夹具不能检出串根；实际finalize按端点origin路由正确，审查侧不同根/同名文件/不同值已通过。",
+      "minimal_disposition": "限定原CPU结论；以后相关测试改动时可替换成不同根/值的最小例，不强制新平台或全套重测。",
+      "gate_effect": "不阻断；审查侧结果也不替代项目原生资格"
+    },
+    {
+      "id": "P01",
+      "category": "PENDING_CONTRACT_PREREQUISITE",
+      "status": "NOT_EXECUTED",
+      "severity": "STAGE_BOUNDARY",
+      "title": "新BGE六调用、资源和正式执行仍未发生",
+      "references": [
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 153,
+          "end_line": 197
+        },
+        {
+          "path": "sources/scripts/step28_g_half_verify.py",
+          "start_line": 124,
+          "end_line": 250
+        },
+        {
+          "path": "sources/scripts/step28_g_half_run.py",
+          "start_line": 616,
+          "end_line": 711
+        }
+      ],
+      "trigger": "把CPU、旧H资格或本审查写成H_cons原生/正式PASS。",
+      "impact": "未知作用及资源被错误确证。",
+      "minimal_disposition": "先关闭R01并独立主审，再按原合同唯一六调用，不足即停；实际投影和完整新盲门仍必须履行。",
+      "gate_effect": "原生与正式均未取得资格，不是已失败"
+    },
+    {
+      "id": "L01",
+      "category": "SCIENTIFIC_CLAIM_LIMIT",
+      "status": "RETAIN",
+      "severity": "INTERPRETATION_BOUNDARY",
+      "title": "保存对照回答固定系统性能，不识别B-only因果或H特有协同",
+      "references": [
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 30,
+          "end_line": 30
+        },
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 92,
+          "end_line": 106
+        },
+        {
+          "path": "sources/scripts/step28_g_half_run.py",
+          "start_line": 593,
+          "end_line": 612
+        }
+      ],
+      "trigger": "将未来双域胜S/新B胜H推广成根因修复、普遍优势、确认性显著性或已成立论文贡献。",
+      "impact": "新A/出生表也变化；单seed、复用valid和条件区间不支持上述推广。",
+      "minimal_disposition": "分别报告两个判据、旧A相对H及22列/三角色代价，保留有限主张；不追加S+JS或非劣门。",
+      "gate_effect": "不是本轮实现阻断"
+    },
+    {
+      "id": "E01",
+      "category": "REVIEWER_EXECUTION_ERROR",
+      "status": "CLOSED_WITH_RECORDS",
+      "severity": "NOT_PROJECT_FAILURE",
+      "title": "审查脚本v1误用Group.records字段",
+      "references": [
+        {
+          "path": "evidence/reviewer_probes.py",
+          "start_line": 41,
+          "end_line": 41
+        },
+        {
+          "path": "evidence/reviewer_probes_execution/stderr.txt",
+          "start_line": 1,
+          "end_line": 5
+        }
+      ],
+      "trigger": "仅审查侧脚本创建手写输入记录时AttributeError退出1。",
+      "impact": "v1未完成检查；不涉及项目代码、不计项目资格或预算。",
+      "minimal_disposition": "保留v1、完整失败记录；v2仅改为items及新输出目录，原输入公式和容差不变，退出0。",
+      "gate_effect": "不影响项目准入；不得隐藏这次失败"
+    },
+    {
+      "id": "O01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "status": "REJECTED",
+      "severity": "DO_NOT_EXPAND",
+      "title": "不扩大候选、数据、GPU调用、预算或重审旧项目",
+      "references": [
+        {
+          "path": "request.zh.txt",
+          "start_line": 1,
+          "end_line": 27
+        },
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 9,
+          "end_line": 9
+        },
+        {
+          "path": "sources/docs/SELLER_ALIAS_H_CONSISTENCY.zh.md",
+          "start_line": 201,
+          "end_line": 209
+        }
+      ],
+      "trigger": "以本次意见追加S+JS、grid、seed、正式A1诊断、旧Memory或第七次调用等。",
+      "impact": "超出已批准范围且不解决R01这个具体记录缺口。",
+      "minimal_disposition": "不实施上述扩展，保留旧结果与费用。",
+      "gate_effect": "不新造准入总门"
+    }
+  ]
+}

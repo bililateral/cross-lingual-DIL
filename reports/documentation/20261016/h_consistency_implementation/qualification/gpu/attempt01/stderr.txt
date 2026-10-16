@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_h_consistency_verify.py", line 6, in <module>
+    qualification.main(entry=run, handwritten_module="test_step28_h_consistency",
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 375, in main
+    report["native"] = native(check, progress, handwritten, args.output, entry=run, consistency=consistency)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 142, in native
+    model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 136, in timed
+    value = fn(); torch.cuda.synchronize()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 142, in <lambda>
+    model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_g_half_verify.py", line 108, in checked_fresh
+    archive = run.pretrained_archive(c)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_balanced_pooling_run.py", line 373, in pretrained_archive
+    return verify_archive(core.model_files(base.model_config(c, "split_rank")), c)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/h_consistency_execution/20261016_124900/workspace/scripts/step28_balanced_pooling_run.py", line 368, in verify_archive
+    raise ValueError("Pinned BGE archive differs or is missing")
+ValueError: Pinned BGE archive differs or is missing
