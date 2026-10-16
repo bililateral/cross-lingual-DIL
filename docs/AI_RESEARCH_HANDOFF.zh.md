@@ -80,7 +80,7 @@
 
 O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子，开发valid不是独立确认集，既有120群基础test已使用。新最终留出、多seed确认、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
 
-保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、ER0.1六权重、排序s0_hard与s0_d两份例外及必要科研证据继续保留。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
+保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、排序s0_hard与s0_d两份例外及必要科研证据继续保留。ER0.1六份末端权重已于10月16日10:09按本轮Linux清理要求、核对无现行载模依赖后留证删除，共7,838,864,652字节；273份其余文件SHA不变，含三份Memory。另删57份冗余／成员已保管ZIP，本轮合计63文件约7.49GiB，见[实际回执](../reports/maintenance/20261016/linux_cleanup/receipt.json)。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
 
 两端项目大清理已于10月8日完成；最近完成日期、下一到期日期和独立提醒任务统一见[清理周期](STORAGE.zh.md#项目大清理周期)。提醒仅提示到期，实际清理仍须先说明理由、范围、空间收益及保留依赖并征得许可。局部清理不重置周期，普通删除提交不等于改写Git历史。
 
@@ -104,7 +104,7 @@ O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为�
 | 2026-10-06：关系目标记忆原版 | 实际10月5日15:06:32—18:57:22完成，3小时50分50秒、2592更新／9端点；六条件0/6，O/N/Z MAP对LOGIT均有负向条件区间，保留CAB首域局部改善及召回／误报取舍。原入口问题与核验已关闭，结果外审／主审接收有效负结果，九权重按依赖与许可清理。见[结果](SELLER_ALIAS_RELATION_MEMORY_RESULT.zh.md)、[接入处置](../reports/documentation/20261005/relation_memory/report.zh.md)、[结果主审](../reports/seller_alias_continual/20261006/relation_result/review/report.zh.md)、[删除](../reports/maintenance/20261006/relation_weights/receipt.json)。 |
 | 2026-10-04：完整群隔离泛化重放关闭 | 用户明确回退整条group-meta候选路线，包括完整二阶、GPU直接／CPU暂存、分阶段HVP及JVP，取消先导、机制验证与未提交审查，不继续使用剩余预算。当前服务器与批准上限下资源受限；正式训练未启动，效果未知，不否定整个元学习家族。CPU551.47秒及GPU151/3600秒尝试账保留。见[关闭与原始证据](../reports/documentation/20261004/group_meta/closure.zh.md)。 |
 | 2026-10-04：LOGIT0.1与risk | 各1728更新／六终点，正式退出0、完整盲门与访问账；LOGIT0.1对ER0.1／LOGIT0.25为23/23、对SEQ20/23，risk对LOGIT0.1为4/23且O/N/Z MAP负向。联合外审／主审已关闭，保留误报／召回取舍、探针不同群及权重核验边界。12权重于10月4日按许可清理，不再据旧清单加载。见[联合结果](SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md)、[结果主审](../reports/seller_alias_continual/20261004/result_review/report.zh.md)、[删除](../reports/maintenance/20261004/logit_risk_weights/receipt.json)。 |
-| 2026-10-02至03：ER0.1与匹配LOGIT0.25 | 两项各1728更新，实际5小时21分22秒／5小时21分44秒，完整盲门与访问账，结果外审／主审已关闭。用户允许资源足够时LOGIT不等ER结束；旧监听已退出／自删。ER对0.25为23/23、对SEQ10/23；LOGIT对匹配ER为23/23、对SEQ16/23。ER六权重保留，LOGIT六权重已清理。见[ER结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[联合审查状态](../reports/seller_alias_continual/20261003/result_review/submission.json)、[旧监听回执](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。 |
+| 2026-10-02至03：ER0.1与匹配LOGIT0.25 | 两项各1728更新，实际5小时21分22秒／5小时21分44秒，完整盲门与访问账，结果外审／主审已关闭。用户允许资源足够时LOGIT不等ER结束；旧监听已退出／自删。ER对0.25为23/23、对SEQ10/23；LOGIT对匹配ER为23/23、对SEQ16/23。ER六权重于10月16日核对无后续载模依赖后留证删除，三Memory和结果证据保留；LOGIT六权重已清理。见[ER结果](SELLER_ALIAS_ER_LOW_RESULT.zh.md)、[LOGIT结果](SELLER_ALIAS_LOGIT_WEIGHT_RESULT.zh.md)、[联合审查状态](../reports/seller_alias_continual/20261003/result_review/submission.json)、[旧监听回执](../reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/observation/20261003_095536/listener/script_deleted_after_updates.txt)。 |
 
 ## 已有结论与历史边界
 
