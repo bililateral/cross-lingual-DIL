@@ -18,7 +18,7 @@ H_cons[合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)完整条件批准仍有效。�
 
 本次一次恢复许可已用尽，余额510秒不授予attempt03；原生paired/两恢复/五表精度/完整投影未完成，正式准入不满足，禁止直接训练。若后续继续须先明确资格判据与调用累计范围，原失败账保持；原总调用6已用3，从头完整六调用将累计至少9，不能隐去前三次。原外审专用页已关闭，三份冗余包1757356字节已清理，必要原审查/证据和用于重放的唯一冻结输入包保留；本轮新材料仅本地Git。当前以[状态](../reports/documentation/20261016/h_consistency_implementation/qualification/state.json)及原件为准。
 
-最新工作（10月16日）：用户要求审查“舍入后的总目标必须严格不等”。[独立静态审查](../reports/documentation/20261016/h_consistency_objective_gate/analysis.zh.txt)结论为该条件对真实训练作用既非必要也非充分；本次FP32舍入可解释标量相同，但不能只删strict检查再靠宽于C的isclose通过。建议保留完整图/同K/VJP、两组件梯度/真实参数/Adam与恢复，仅将标量不等改为诊断并明确按原精度核对分项；尚未改代码/合同或新增科学执行。35成员/148125字节[具体静态包](../reports/documentation/20261016/h_consistency_objective_gate/review/submission.json)已准备，待新包外发许可，未上传；原生失败/预算/停机状态不变。
+最新工作（10月16日）：用户要求审查“舍入后的总目标必须严格不等”。[独立静态审查](../reports/documentation/20261016/h_consistency_objective_gate/analysis.zh.txt)结论为该条件对真实训练作用既非必要也非充分；本次FP32舍入可解释标量相同，但不能只删strict检查再靠宽于C的isclose通过。建议保留完整图/同K/VJP、两组件梯度/真实参数/Adam与恢复，仅将标量不等改为诊断并明确按原精度核对分项；尚未改代码/合同或新增科学执行。用户随后明确“这不用外审，外审包删掉，你自己把握”，本次静态审查由主执行者独立负责、无需等待外审；未上传的35成员/148125字节ZIP及无用打包附件已删除，[决定与删除记录](../reports/documentation/20261016/h_consistency_objective_gate/review/submission.json)保留。免审不追加运行许可，原生失败/预算/停机状态不变。
 
 ## 当前工作
 

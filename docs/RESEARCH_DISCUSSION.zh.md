@@ -4,7 +4,7 @@
 
 用户原话：“现在给我审查‘舍入后的总目标必须严格不等’是否适合作为资格条件”。据此完成[定向独立静态审查](../reports/documentation/20261016/h_consistency_objective_gate/analysis.zh.txt)：审查合同原话、实际前向/VJP/更新、失败原数和匹配PyTorch2.9.1的官方反向规则，给出非必要/非充分手算反例及不能只靠isclose的反例。未执行新CPU/GPU科学计算，未改运行源码/精度/合同，旧失败和累计账不变。
 
-已准备35成员148125字节的新[静态外审包](../reports/documentation/20261016/h_consistency_objective_gate/review/submission.json)，SHA256 8b6c470cefcf31bbc94c9804a11ba839e1aaae5d48394140b346331b58eed4cd；仅请求指定本地Playwright外发许可，尚未上传。此审查不授予实现、额外GPU调用或正式训练；若后续修改资格和恢复范围，须另明确具体补充。
+已准备35成员148125字节的新[静态外审包](../reports/documentation/20261016/h_consistency_objective_gate/review/submission.json)，SHA256 8b6c470cefcf31bbc94c9804a11ba839e1aaae5d48394140b346331b58eed4cd；仅请求指定本地Playwright外发许可，尚未上传。此审查不授予实现、额外GPU调用或正式训练；若后续修改资格和恢复范围，须另明确具体补充。 用户随后明确：“这不用外审，外审包删掉，你自己把握”。据此免除本次静态条件审查的外审，由主执行者独立负责；未上传ZIP及无用途manifest/request已实际删除，保留独立分析及上述决定/删除身份。该新决定覆盖前句的外审等待，不重开科研运行。
 
 ## 2026-10-16：H_cons合并外审关闭与一次载模前恢复批准
 
