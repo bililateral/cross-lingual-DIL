@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons权重删除与新方案送审
+
+用户明确要求先删除此次试验权重，再上传S_pos/H_pos方案静态外审。19:31:39现场确认原正式作业已完成、访问账train1/valid1/heldout0/owners0、无相关属主进程和两权重打开句柄；最终路径为原20261016_124900/workspace/reports/job/run/models下A_H_cons.pt、B_H_cons.pt，两者均为yongpeng的普通单链接文件。逐文件路径/大小/SHA及158份非权重文件身份先存[删除前记录](../reports/maintenance/20261016/h_cons_weights/predelete.json)，并在删除前SFTP回传逐字节核对。
+
+19:31:41精确删除上述两文件，各1304398010字节、合计2608796020字节（约2.43GiB）；models为空，158份非权重作业文件大小/SHA不变，含两Memory共691141字节。既有临时完整状态路径原已不存在；权重未下载/备份/载入，Memory未反序列化。实际[删除回执](../reports/maintenance/20261016/h_cons_weights/receipt.json)两端保管，冻结报告/旧回执保留其历史保管事实，不追改；哈希不能恢复权重，重训仍须授权。
+
+之后于19:36:28单次上传原152565字节/22成员S_pos/H_pos输入ZIP，并附刚关闭H_cons外审正文和主审处置，见[送审记录](../reports/documentation/20261016/s_improvement/review/submission.json)。新审查进行中，原输入及必要页面/请求证据保留，未为删除向Linux补传输入ZIP。当前state和必要新送审元数据按[同步记录](../reports/maintenance/20261016/h_cons_weights/sync.json)SFTP逐字节回读核验；可变主目录docs仍仅Windows维护，不把证据同步写成全仓同步。一次性助手和冗余浏览器观测用后清理；局部清理不重置10月23日大清理周期，新材料仅本地Git。
+
 ## 2026-10-16 H_cons结果外审回收与处置
 
 3536092字节/96成员返回包已完整验收，95内部载荷及原275输入身份一致。完整正文、必要统计/源码/命令/失败/补丁及回收清单保留；[独立主审](../reports/seller_alias_continual/20261016/h_consistency_result/review/primary_disposition.zh.txt)已完成，原有效未达目标结论不变。95个非重复返回成员共1352398字节在review/external；审查材料/处置及state按[sync.json](../reports/seller_alias_continual/20261016/h_consistency_result/review/sync.json)SFTP同步原20261016_124900/workspace/reports/result_sync/review，各文件读回字节一致。主目录可变docs未同步，不把本轮证据同步写成全仓同步。

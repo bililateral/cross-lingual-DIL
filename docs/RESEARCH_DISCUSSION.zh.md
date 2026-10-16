@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-16：批准删除H_cons权重并送审S_pos/H_pos新方案
+
+用户原话：“先把服务器上此次试验得到的模型训练权重文件按科研纪律删掉，完成后把 S_pos/H_pos 新方案包也上传 GPT 6 Pro 做静态外审（交代清楚背景信息）。”按该顺序，先核对H_cons完成状态、归属、最终路径、活动/恢复依赖及完整证据，逐文件身份在删除前两端保管；19:31:41删除两权重2608796020字节，158份非权重文件大小/SHA不变，Memory保留，见[删除回执](../reports/maintenance/20261016/h_cons_weights/receipt.json)。
+
+19:36:28经本地Playwright向[新方案会话](https://chatgpt.com/c/6ad20bfc-173c-83ed-81c1-59ea049663f4)单次提交原152565字节/22成员静态包及H_cons外审/独立处置两份背景附件，实际选择器GPT-6/Pro第5档。完整[背景与请求](../reports/documentation/20261016/s_improvement/review/submitted_request.zh.txt)交代完整S、已关闭结果与旧A代价、已知目标先例、开发选择偏差、权重已删，以及伪实现/过度设计和两候选必要性；允许审查结论为不推荐。仅当前静态外发获准，原包历史待授权状态按本次决定解释；不扩大到实现、科研计算、新数据或训练预算。原包不重打、冻结材料不改；审查进行中，后续沿同一会话回收并独立处置，见[提交回执](../reports/documentation/20261016/s_improvement/review/submission.json)。
+
 ## 2026-10-16：回收H_cons结果外审并独立分析
 
 用户明确：“结果外审已结束，同步结果回来仔细分析”。沿原Playwright会话回收完整正文和3536092字节/96成员返回包，身份逐项核对，[独立主审](../reports/seller_alias_continual/20261016/h_consistency_result/review/primary_disposition.zh.txt)接受有效限定结果，无新增开放科学阻断。原双域胜S门false、新B对H直接门true、旧A排序及stage-cal代价并列；不称无过拟合或孤立B因果效果。
