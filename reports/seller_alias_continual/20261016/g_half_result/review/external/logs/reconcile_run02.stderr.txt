@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/mnt/data/h_external_review/checks/reconcile_summary_v1.py", line 46, in <module>
+    h=load(r/'result/job/evaluation/B_G_half.raw.metrics.json');b=load(r/f'baseline/evaluation/B_{other}.raw.metrics.json')
+  File "/mnt/data/h_external_review/checks/reconcile_summary_v1.py", line 10, in load
+    b=path.read_bytes();reads[str(path)]={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()};return json.loads(b)
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/h_review_input/result/job/evaluation/B_G_half.raw.metrics.json'
+Traceback (most recent call last):
+  File "/mnt/data/h_external_review/checks/reconcile_summary_v1.py", line 46, in <module>
+    h=load(r/'result/job/evaluation/B_G_half.raw.metrics.json');b=load(r/f'baseline/evaluation/B_{other}.raw.metrics.json')
+  File "/mnt/data/h_external_review/checks/reconcile_summary_v1.py", line 10, in load
+    b=path.read_bytes();reads[str(path)]={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()};return json.loads(b)
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/h_review_input/result/job/evaluation/B_G_half.raw.metrics.json'

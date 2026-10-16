@@ -1,0 +1,135 @@
+{
+  "review_status": "COMPLETE_RESULT_REVIEW_WITH_ONE_MINOR_DOCUMENTATION_NOTE",
+  "scientific_verdict": "支持本固定H未达目标但旧A等局部收益保留；不支持整体优于S/G或论文主贡献充分。",
+  "groups": {
+    "SCIENTIFIC_BLOCKER": [],
+    "REPRODUCIBILITY_DEFECT": [
+      {
+        "id": "RD-01",
+        "category": "REPRODUCIBILITY_DEFECT",
+        "severity": "LOW_NON_BLOCKING_DOCUMENTATION",
+        "status": "CONFIRMED_METADATA_INCONSISTENCY",
+        "title": "正式门的说明性scope保留了原生资格文字",
+        "evidence": [
+          "E02",
+          "context/formal_gate.json#/scope",
+          "context/formal_gate.json#/kind,/runtime,/supervision,/authorization",
+          "result/job/run/sources/reports/documentation/20261015/g_half_implementation/authorization.json#/user_verbatim"
+        ],
+        "observed": "scope写Unique six-call...no formal data;600 seconds，但kind=FORMAL且runtime=28800秒、正式监督字段与政策完全一致；用户明确批准门控序列直到唯一固定训练。",
+        "impact": "降低单独阅读该门文件的人类可理解性；不构成未授权训练或统计失效，不影响机器按结构化字段校验。",
+        "minimal_disposition": "在本次主审处置/收尾说明追加一条勘误，说明scope保留原生模板措辞，正式有效范围由已绑定授权、kind、job、runtime、supervision、gpu共同确定；保持原门与所有哈希不变。",
+        "requires_training": false,
+        "requires_reanalysis": false,
+        "requires_restricted_assets": false
+      }
+    ],
+    "REASONABLE_FOLLOW_UP": [
+      {
+        "id": "RS-01",
+        "category": "REASONABLE_FOLLOW_UP",
+        "severity": "NON_BLOCKING",
+        "status": "ALREADY_ADDRESSED_IN_SUBMITTED_REPORT_KEEP",
+        "title": "保留固定目标失败与旧A局部收益",
+        "evidence": [
+          "E06"
+        ],
+        "observed": "双域H-S MAP门false；H-G/B直接门false；A最终收益有正区间。",
+        "minimal_disposition": "保留现有判据及原始终点；不换平均/容忍门，不用R5/AP替代MAP。",
+        "requires_new_compute": false
+      },
+      {
+        "id": "RS-02",
+        "category": "REASONABLE_FOLLOW_UP",
+        "severity": "NON_BLOCKING",
+        "status": "ALREADY_ADDRESSED_IN_SUBMITTED_REPORT_KEEP",
+        "title": "不把完整轨迹差异解释为孤立抗遗忘机制",
+        "evidence": [
+          "E03/E06"
+        ],
+        "observed": "H-S A末已有优势；H-G遗忘差CI全负但最终MAP差跨零。",
+        "minimal_disposition": "同时展示获得、终点与遗忘差，沿用原稿的相关性/因果边界。",
+        "requires_new_compute": false
+      },
+      {
+        "id": "RS-03",
+        "category": "REASONABLE_FOLLOW_UP",
+        "severity": "NON_BLOCKING",
+        "status": "ALREADY_ADDRESSED_IN_SUBMITTED_REPORT_KEEP",
+        "title": "概率与阈值代价必须和排序收益同页保留",
+        "evidence": [
+          "E07"
+        ],
+        "observed": "raw损失代价、stage-cal主角色局部收益、first-cal误报代价均存在。",
+        "minimal_disposition": "原稿已披露，保留三角色和宏/汇总区分；不重新调阈值或角色。",
+        "requires_new_compute": false
+      },
+      {
+        "id": "RS-04",
+        "category": "REASONABLE_FOLLOW_UP",
+        "severity": "NON_BLOCKING",
+        "status": "ALREADY_ADDRESSED_IN_SUBMITTED_REPORT_KEEP",
+        "title": "九个未见明确迹象不等于没有过拟合",
+        "evidence": [
+          "E08"
+        ],
+        "observed": "九项差距扩大CI全部为正；B fit MAP强增益较少转移至valid；A raw损失两侧恶化。",
+        "minimal_disposition": "保留九项分量与限定语，不回选epoch。",
+        "requires_new_compute": false
+      },
+      {
+        "id": "RS-05",
+        "category": "REASONABLE_FOLLOW_UP",
+        "severity": "NON_BLOCKING",
+        "status": "ALREADY_ADDRESSED_IN_SUBMITTED_REPORT_KEEP",
+        "title": "数值复核与资格/泛化证明分开",
+        "evidence": [
+          "E01/E04/E05/E10"
+        ],
+        "observed": "1650行重算正确，但未重建标签原值、模型/Memory、校准拟合或后端执行。",
+        "minimal_disposition": "继续使用已披露的边界；发布时注明单seed/AB、重复开发、20群条件CI及未多重校正。",
+        "requires_new_compute": false
+      }
+    ],
+    "OUT_OF_SCOPE_OVERDESIGN": [
+      {
+        "id": "OOD-01",
+        "category": "OUT_OF_SCOPE_OVERDESIGN",
+        "request_rejected": "为显著性新增seed、顺序、臂、温度、系数、epoch选择或预算",
+        "reason": "本轮固定候选结果审查；当前失败不授权新探索。"
+      },
+      {
+        "id": "OOD-02",
+        "category": "OUT_OF_SCOPE_OVERDESIGN",
+        "request_rejected": "补传正式标签/文本、旧权重/Memory、封存/private资产；重载或重训S/G",
+        "reason": "当前43实际保存输入已足以做预定比较，受限载荷不属于网页复核前提。"
+      },
+      {
+        "id": "OOD-03",
+        "category": "OUT_OF_SCOPE_OVERDESIGN",
+        "request_rejected": "重审F求解器、旧项目全部历史、通用认证/验证系统或敌对环境审计",
+        "reason": "没有与本结果相关的新矛盾要求扩大范围。"
+      }
+    ]
+  },
+  "category_note": "没有新发现足以否定本次结果的科学阻断。RD-01仅是当前formal_gate说明字段的文本矛盾，不把历史待批准文字当作现在未批准。",
+  "reviewer_execution_error": {
+    "id": "REVIEWER-ERR-01",
+    "project_defect": false,
+    "status": "CLOSED",
+    "failed_program": "checks/reconcile_summary_v1.py",
+    "exit_code": 1,
+    "cause": "审查者猜写点号分隔文件名；实际路径为下划线且collected.json提供了准确路径。",
+    "fix": "v2仅改用collected.json中的matrix.path，并更换输出目录保留失败现场。",
+    "successful_program": "checks/reconcile_summary_v2.py",
+    "successful_exit_code": 0,
+    "impact": "补充summary核对首版中断，不影响已成功的1650行独立统计；没有项目文件变更或预算重置。"
+  },
+  "model_identity": {
+    "requested_selector": "GPT 6 Pro（用户指定）",
+    "selector_independently_observed_this_turn": false,
+    "self_description": "GPT-6 Astra Pro",
+    "backend_route_verified": false
+  },
+  "authority": "外部审查意见，不替代主执行者独立判断。"
+}

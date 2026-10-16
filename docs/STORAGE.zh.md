@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H结果外审回收、处置与静态新包
+
+H结果[外审](https://chatgpt.com/c/6ad18187-f8c0-83eb-8fdc-73440d50847b)已完整回收，359571字节返回ZIP的48成员2476525字节均验收，内部47载荷及原219输入身份一致。[独立主审](../reports/seller_alias_continual/20261016/g_half_result/review/primary_disposition.zh.txt)无开放科学阻断，说明文字缺陷以附注关闭；正式结果/原验收不改。55份必要审查原件、主审及收尾文件共2526229字节SFTP同步至原20261015_235900/workspace/reports/result_sync/review，逐项大小/SHA相同；另同步[sync.json](../reports/seller_alias_continual/20261016/g_half_result/review/sync.json)9872字节并核验。没有补传历史包、原输入ZIP或任何模型/Memory。
+
+原专用页关闭，48必要成员保留于本地review/external和Linux对应位置。验收与处置完成后，删除冗余返回ZIP及旧网页/预览共11文件710467字节，详见[回收及清理记录](../reports/seller_alias_continual/20261016/g_half_result/review/recovery.json)。唯一2798254字节原输入ZIP仍用于外审reconcile_summary_v2.py的--archive精确成员/CRC身份复核，保留Windows一份，有具体用途；不以复制Linux作为删除前提。10:28现场models为空，两Memory690219字节SHA不变，H权重已删事实及预算保持。SSH关闭后删除本轮6份本地助手/传输清单38558字节，远端一次性_verify.py 7852字节亦已删除；不将这些新临时文件计入历史释放量。
+
+新的[H_cons静态包](../reports/documentation/20261016/h_consistency/review/package.json)128254字节/16成员已获具体许可并单次发至chatgpt.com；原方案和15载荷身份冻结。连接错误后沿同会话恢复正在处理，专用页保持，详见[当前状态](../reports/documentation/20261016/h_consistency/review/submission.json)。本包尚有当前审查用途，继续本地保管；无新实现/数据/CPU/GPU/训练，不上传到Linux，不公开push。本次局部收尾不重置10月23日大清理周期。
+
 ## 2026-10-16 Linux冗余归档与ER0.1权重清理
 
 用户要求“看看服务器上的项目里有什么无用文件给我删掉，腾出点磁盘空间”，随后针对旧保留例外询问“ER0.1权重能删掉吗？”。按本轮清理范围核对实际依赖：ER0.1于10月3日已完成训练、评价和结果外审／主审，后续对比使用保存的evaluation／collected等证据；现行合同无加载这六份末端权重的安排，无活动作业或精确目标打开描述符。原“保留例外”状态已据本次明确对象与当前依赖重新判断，不按结果正负决定删除。三个共享首域完整状态仍另行保留。

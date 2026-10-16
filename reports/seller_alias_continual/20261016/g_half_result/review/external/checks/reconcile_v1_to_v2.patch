@@ -1,0 +1,23 @@
+--- reconcile_summary_v1.py
++++ reconcile_summary_v2.py
+@@ -4,7 +4,7 @@
+ import argparse,csv,hashlib,json,platform,time,traceback,zipfile
+ import numpy as np
+ p=argparse.ArgumentParser();p.add_argument('--input',type=Path,required=True);p.add_argument('--review',type=Path,required=True);p.add_argument('--archive',type=Path,required=True)
+-a=p.parse_args();r=a.input.resolve();o=a.review.resolve();dest=o/'checks/run02';dest.mkdir(parents=True,exist_ok=True)
++a=p.parse_args();r=a.input.resolve();o=a.review.resolve();dest=o/'checks/run03';dest.mkdir(parents=True,exist_ok=True)
+ start=time.perf_counter();reads={};count=0;maxdiff=0.;res={}
+ def load(path):
+  b=path.read_bytes();reads[str(path)]={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()};return json.loads(b)
+@@ -41,9 +41,9 @@
+      row=lookup[('absolute',point,role,domain,metric)];eq(v,float(row['mean']) if row['mean'] else None,'summary absolute')
+  eq(summary['classification'],audit['classification'],'classification')
+  eq(summary['success'],audit['statistics']['success'],'success');eq(summary['baseline_files'],43,'baseline files')
+- c=load(r/'result/job/evaluation/collected.json');cols=c['columns'];domains=np.array(c['domains']);group_out={}
++ c=load(r/'result/job/evaluation/collected.json');old_col=load(r/'baseline/evaluation/collected.json');cols=c['columns'];domains=np.array(c['domains']);group_out={}
+  for other in ['S','G']:
+-  h=load(r/'result/job/evaluation/B_G_half.raw.metrics.json');b=load(r/f'baseline/evaluation/B_{other}.raw.metrics.json')
++  h=load(r/'result/job/evaluation'/c['points']['B_G_half']['raw']['matrix']['path']);b=load(r/'baseline/evaluation'/old_col['points']['B_'+other]['raw']['matrix']['path'])
+   d=np.asarray(h['values'],float)[:,cols.index('map')]-np.asarray(b['values'],float)[:,cols.index('map')]
+   group_out['G_half-'+other]={}
+   for domain in 'AB':

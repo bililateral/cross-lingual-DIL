@@ -1,0 +1,167 @@
+{
+  "E01": {
+    "topic": "收到的附件及内部身份",
+    "sources": [
+      "manifest.json",
+      "context/baseline_sources.json",
+      "result/inventory.json",
+      "result/analysis_inventory.json",
+      "result/receive_verification.json"
+    ],
+    "review_outputs": [
+      "checks/input_identity.json",
+      "evidence/input_members.json",
+      "checks/run01/audit_result.json#/identity",
+      "checks/run03/result.json"
+    ]
+  },
+  "E02": {
+    "topic": "授权、资格继承、门文本差异",
+    "sources": [
+      "context/formal_gate.json#/kind,/scope,/authorization,/gpu,/runtime,/supervision",
+      "context/cpu_receipt.json#/qualified_tests,/attempts",
+      "context/native_result.json#/native",
+      "context/native_disposition.zh.txt",
+      "context/implementation_primary.zh.txt",
+      "result/job/run/sources/reports/documentation/20261015/g_half_implementation/authorization.json",
+      "result/job/run/sources/schema/step28_g_half_policy.json",
+      "result/job/run/sources/scripts/step28_g_half_run.py:573-609"
+    ],
+    "review_outputs": [
+      "checks/run01/audit_result.json#/identity",
+      "checks/run03/result.json#/gate_text_inconsistency"
+    ]
+  },
+  "E03": {
+    "topic": "初始、连续性、旧对照配对、全部逐步目标",
+    "sources": [
+      "result/job/run/manifest.json#/initials,/starts,/points,/training,/public_inputs,/pretrained_archive",
+      "result/job/run/updates/A_G_half.json",
+      "result/job/run/updates/B_G_half.json",
+      "baseline/run/manifest.json",
+      "baseline/run/partition.json",
+      "baseline/run/updates/{A_S,B_S,A_G,B_G}.json",
+      "result/job/run/sources/scripts/step28_g_half.py:34-103",
+      "result/job/run/sources/scripts/step28_record_replay.py:159-210",
+      "result/job/run/sources/scripts/step28_g_half_run.py:275-469"
+    ],
+    "review_outputs": [
+      "checks/run01/audit_result.json#/training",
+      "checks/run01/program_read_files.json"
+    ]
+  },
+  "E04": {
+    "topic": "恢复、诊断末轮、盲门与一次开放",
+    "sources": [
+      "result/job/run/points/{A_G_half,B_G_half}.json",
+      "result/job/run/scores/*.npy",
+      "result/job/run/diagnostics/*",
+      "result/job/before_valid.json",
+      "result/job/access.json",
+      "result/job/completion.json",
+      "result/job/run/sources/scripts/step28_g_half_run.py:210-273,334-479,610-658",
+      "result/job/run/sources/scripts/step28_replay_diagnostics.py:1-208"
+    ],
+    "review_outputs": [
+      "checks/run01/numeric_differences.json",
+      "checks/run01/audit_result.json#/diagnostics"
+    ]
+  },
+  "E05": {
+    "topic": "逐群/查询/计数与1650行独立配对统计",
+    "sources": [
+      "result/job/evaluation/collected.json",
+      "result/job/evaluation/*_metrics.json",
+      "result/job/evaluation/*_queries.npy",
+      "result/job/evaluation/*_counts.json",
+      "baseline/evaluation/*",
+      "result/job/evaluation/evaluation.json",
+      "result/analysis/all_metrics.csv",
+      "result/analysis/summary.json",
+      "result/step28_g_half_result_audit.py",
+      "result/job/run/sources/scripts/step28_g_half_run.py:482-570",
+      "result/job/run/sources/scripts/step28_balanced_pooling_run.py:595-616,648-682",
+      "result/job/run/sources/scripts/step28_continual_population_evaluate.py:28-102"
+    ],
+    "review_outputs": [
+      "checks/run01/recomputed_statistics.csv",
+      "checks/run01/registered_draws.npy",
+      "checks/run01/audit_result.json#/statistics",
+      "checks/run03/result.json"
+    ]
+  },
+  "E06": {
+    "topic": "MAP终点、获得、变化、遗忘方向",
+    "sources": [
+      "result/job/evaluation/evaluation.json#/comparisons,/initial_comparisons,/forgetting_comparisons,/old_changes,/success",
+      "context/baseline_loss_correction.csv",
+      "result/job/run/sources/scripts/step28_g_half_run.py:550-570"
+    ],
+    "review_outputs": [
+      "evidence/key_map_statistics.csv",
+      "evidence/loss_forgetting_contrasts.csv",
+      "evidence/selected_secondary_contrasts.csv"
+    ]
+  },
+  "E07": {
+    "topic": "概率、校准、阈值及不同统计对象",
+    "sources": [
+      "result/job/run/maps/{A_G_half,B_G_half}.json",
+      "result/job/run/manifest.json#/points/*/maps",
+      "result/job/evaluation/evaluation.json#/absolute",
+      "context/evaluation_definition.zh.txt:104-137"
+    ],
+    "review_outputs": [
+      "evidence/final_probability_contrasts.csv",
+      "checks/run01/audit_result.json#/classification"
+    ]
+  },
+  "E08": {
+    "topic": "九诊断、六轮曲线及D0/D1",
+    "sources": [
+      "result/job/diagnostics_evaluation/overfitting.json",
+      "result/job/diagnostics_evaluation/*_valid_metrics.npy",
+      "result/job/run/diagnostics/*",
+      "result/analysis/summary.json#/diagnostic_summary,/valid_curves,/residuals",
+      "result/job/run/sources/scripts/step28_g_half.py:122-133",
+      "result/job/run/sources/scripts/step28_replay_diagnostics.py"
+    ],
+    "review_outputs": [
+      "checks/run01/diagnostics.json",
+      "checks/run01/diagnostic_curves.csv",
+      "checks/run01/residuals.json",
+      "checks/run03/result.json"
+    ]
+  },
+  "E09": {
+    "topic": "实际资源、累计账、关闭记录",
+    "sources": [
+      "result/job.wrapper.txt",
+      "result/job.console.txt",
+      "result/job/completion.json#/budget",
+      "result/analysis_wallclock.json",
+      "context/native_wallclock.json",
+      "context/cpu_receipt.json",
+      "result/closeout.json",
+      "context/native_result.json#/native/measurements,/native/projection"
+    ],
+    "review_outputs": [
+      "checks/run01/audit_result.json#/budget",
+      "checks/run03/result.json#/progress_events"
+    ]
+  },
+  "E10": {
+    "topic": "论文与适用边界，继承而非重新文献搜索",
+    "sources": [
+      "result/report.zh.txt",
+      "context/static_primary.zh.txt",
+      "context/baseline_primary.zh.txt",
+      "context/implementation_external.zh.txt:307-338",
+      "result/job/run/sources/docs/SELLER_ALIAS_G_HALF.zh.md"
+    ],
+    "review_outputs": [
+      "findings.json",
+      "reading_scope.zh.md"
+    ]
+  }
+}
