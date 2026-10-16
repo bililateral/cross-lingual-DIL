@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-16 H_cons静态审查收尾
+
+完整回收返回ZIP289811字节/26成员，解压472481字节；大小/SHA与页面交付一致，25内部载荷和原输入16成员/15载荷均核对。必要审查原文、数学源码/手写输入/梯度数组/执行日志等25个独立成员344227字节保存在reports/documentation/20261016/h_consistency/review/external；[独立主审](../reports/documentation/20261016/h_consistency/review/primary_disposition.zh.txt)已完成，支持准备受限合同，未授予新执行权限。
+
+按既有清理规则，验收与处置后精确删除返回ZIP及浏览器下载副本、内嵌重复原输入、7份预览和2份本轮已用日志，共12文件814195字节，路径/大小/SHA及实际不存在核验见[回收记录](../reports/documentation/20261016/h_consistency/review/recovery.json)。保留唯一原review_input.zip 128254字节，因为外审evidence/reverify_input.py直接复核其ZIP成员/CRC和原字节；该脚本的external/input/review_input.zip相对路径若将来需要，在独立临时重放副本按canonical原字节恢复即可，不改原脚本、不永久保留重复包。页面正文、选择器/原发送证据、主审与清单保留，专用页已关闭。
+
+本轮仅从网页回收至Windows并作静态主审，未连接Linux、未补传任何包、未修改权重/Memory或旧预算。无公开push许可，仅本地Git；本次局部清理不重置10月23日两端大清理周期。其他用户浏览器活动相关日志不在本次清理范围。
+
 ## 2026-10-16 H结果外审回收、处置与静态新包
 
 H结果[外审](https://chatgpt.com/c/6ad18187-f8c0-83eb-8fdc-73440d50847b)已完整回收，359571字节返回ZIP的48成员2476525字节均验收，内部47载荷及原219输入身份一致。[独立主审](../reports/seller_alias_continual/20261016/g_half_result/review/primary_disposition.zh.txt)无开放科学阻断，说明文字缺陷以附注关闭；正式结果/原验收不改。55份必要审查原件、主审及收尾文件共2526229字节SFTP同步至原20261015_235900/workspace/reports/result_sync/review，逐项大小/SHA相同；另同步[sync.json](../reports/seller_alias_continual/20261016/g_half_result/review/sync.json)9872字节并核验。没有补传历史包、原输入ZIP或任何模型/Memory。
