@@ -4,11 +4,13 @@
 
 ## 已确认范围内
 
-已批准的[H_cons合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)及[原生资格补充](SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md)所限定正式作业现已完成，完整回传与独立分析已完成，当前待具体结果外审包许可；实际退出、观测、累计账及证据只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。不重启已执行资格或正式作业、不另建监听；冻结算法、44来源、原精度、S/H保存对照及原数据权限。
+已批准的[H_cons合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)及[原生资格补充](SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md)所限定正式作业现已完成，完整回传与独立分析已完成，具体结果包已获准并提交外审；实际退出、观测、累计账及证据只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。不重启已执行资格或正式作业、不另建监听；冻结算法、44来源、原精度、S/H保存对照及原数据权限。
 
-[完整结果](../reports/seller_alias_continual/20261016/h_consistency_result/report.zh.txt)及Linux独立核算已完成，原双域胜S门false、相对H新B直接门true，同时旧A有负向代价；原判据和范围不改。具体3187528字节/276成员结果包已形成，取得该包外发许可后，再用本地Playwright回收外审、独立处置并交付；原生标量条件免审不免除结果审查。模型/Memory继续留Linux，本次未获权重删除许可。有效未达目标也结案，不自动开启下一候选；实际累计账及证据见当前交接。
+[完整结果](../reports/seller_alias_continual/20261016/h_consistency_result/report.zh.txt)及Linux独立核算已完成，原双域胜S门false、相对H新B直接门true，同时旧A有负向代价；原判据和范围不改。具体3187528字节/276成员结果包已于本轮获准，经本地Playwright提交一次；沿[原会话](https://chatgpt.com/c/6ad1fd00-c2ac-83eb-8a73-4e8502dbbe94)回收外审、独立处置并交付；原生标量条件免审不免除结果审查。模型/Memory继续留Linux，本次未获权重删除许可。有效未达目标也结案，不自动开启下一候选；实际累计账及证据见当前交接。
 
 完整S/G/F及H=G_half均已结束，结果外审和独立主审已关闭，具体证据见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)与交接历史。F未建立主要收益，G/H旧A的局部正向证据不构成双域胜S；H原双域目标false保留。本轮只新增H_cons并复用合同指定的S/H保存对照，不重训旧臂、不转用旧预算，也不将实现修复或资格通过写成性能提升。
+
+用户本轮另要求仔细研究超过S的方案。已形成[逐正例排序有限开发提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)及可审查的具体静态包：优先S_pos、固定H_pos结构对照，不增加JS、教师或参数网格；该目标已有直接文献先例，现有局部梯度推导不证明正式瓶颈。新包外发、实施合同及Linux计算须按相应具体范围批准；不启动训练、不复活旧C或S_strong。
 
 ## 已完成路线与后续研究边界
 
