@@ -219,7 +219,7 @@ for _name in ("train_stage", "memory_from", "restore_point", "checkpoint", "trai
 def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
     entry = entry or sys.modules[__name__]
     if (manifest["status"] != entry.COMPLETE or manifest["source_files"] != entry.sources()
-            or manifest["physical_updates"] != 1152 or manifest["gradient_group_presentations"] != 1728
+            or manifest["physical_updates"] != 576*len(entry.method.ARMS) or manifest["gradient_group_presentations"] != 864*len(entry.method.ARMS)
             or any(set(manifest[k]) != set(entry.POINTS) for k in ("points", "training", "diagnostics"))
             or any(set(manifest[k]) != set(entry.method.ARMS) for k in ("starts", "initials"))):
         raise ValueError("Incomplete source-bound blind experiment")
@@ -237,9 +237,10 @@ def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
     if len(canonical) != 48:
         raise ValueError("Shared A fit scope differs")
     a_point = manifest["points"]["A_"+entry.method.ARMS[0]]
-    shared = record.Memory.from_bytes(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes())
+    shared = entry.memory_from(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes(), entry.method.ARMS[0])
     members = shared.summary()["members"]
-    rng = random.Random(data.seed_for(20260930, "ABC", "retention"))
+    roots = getattr(entry, "roots", dict(memory=20260930, schedule=20260918))
+    rng = random.Random(data.seed_for(roots["memory"], "ABC", "retention"))
     retained = []
     for seen, uid in enumerate(sorted(canonical), 1):
         k = seen-1 if seen <= 6 else rng.randrange(seen)
@@ -251,7 +252,9 @@ def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
     if retained != members:
         raise ValueError("Independent Algorithm R differs")
     for arm in entry.method.ARMS:
-        if (manifest["initials"][arm] != baseline["initial_identity"]
+        initial_ok = (entry.validate_saved_initial(manifest["initials"][arm], baseline)
+                      if hasattr(entry, "validate_saved_initial") else manifest["initials"][arm] == baseline["initial_identity"])
+        if (not initial_ok
                 or manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]):
             raise ValueError("Independent starts/own A continuation missing")
     scores, sequences = {}, {1: [], 2: []}
@@ -266,7 +269,7 @@ def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
         logrec = manifest["training"][name]
         log = data.read_json(data.verify(root/logrec["path"], logrec))
         expected_fit = [r["group_uid"] for r in split["fit"] if r["domain"] == "AB"[stage-1]]
-        stream = data.seed_for(20260918, "ABC", stage, "current")
+        stream = data.seed_for(roots["schedule"], "ABC", stage, "current")
         expected = data.schedule([type("ID", (), {"uid": u})() for u in expected_fit], 6, stream)
         if log["updates"] != 288 or len(log["rows"]) != 288 or log["adam_step"] != stage*288 or log["current_ids"] != [g.uid for g in expected]:
             raise ValueError("Main schedule/update count differs")
@@ -294,12 +297,13 @@ def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
             if stage == 2:
                 h = row["history"]
                 group = next(g for g in memory.reservoir.groups if g.uid == row["history_uid"])
-                key = data.seed_for(20260918, "ABC", stage, step, "history", group.uid, "regroup")
+                key = data.seed_for(roots["schedule"], "ABC", stage, step, "history", group.uid, "regroup")
                 if h["assignment_sha256"] != hashlib.sha256(record.assignment(group, key).tobytes()).hexdigest():
                     raise ValueError("Historical A1 assignment differs")
                 hashes.append(h["assignment_sha256"])
             assignments.append(hashes)
-            if (row["step"] != step or row["encoder_lr"] != parent.stage_lr(step) or row["head_lr"] != .001
+            rates = entry.spec.rates(step) if hasattr(entry, "spec") else (parent.stage_lr(step), .001)
+            if (row["step"] != step or (row["encoder_lr"], row["head_lr"]) != rates
                     or row["pooling"] != entry.method.identity(arm)
                     or not np.isfinite(row["total"]) or not np.isclose(row["total"], total, rtol=2e-6, atol=2e-6)):
                 raise ValueError("Actual loss/LR decomposition differs")
@@ -345,7 +349,7 @@ def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
                 if not all(np.isfinite(e[k]) for k in keys):
                     raise ValueError("Nonfinite history diagnostic")
         scores[name] = roles
-    for stage, sequences_here in sequences.items():
+    for stage, sequences_here in (sequences.items() if roots["schedule"] == 20260918 and roots["memory"] == 20260930 else ()):
         for other, (old_root, _, _) in entry.baseline_runs().items():
             name = "AB"[stage-1]+"_"+other
             old_log = data.read_json(old_root/"run/updates"/(name+".json"))

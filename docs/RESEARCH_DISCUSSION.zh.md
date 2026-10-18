@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-18 批准并完成Optuna最小实现与手写CPU
+
+用户针对已呈现的implementation_scope.zh.txt明确回复：“批准最小实现与手写CPU核验”。[批准原件](../reports/documentation/20261018/optuna_implementation/authorization.json)限定代码/合同/policy和Linux既有py310手写CPU累计300秒，1线程/RSS2GiB/证据64MiB；不含正式文本/标签、BGE/旧Memory、GPU或45次正式运行，完成后准备具体实现包。
+
+已完成[实际接线及独立报告](../reports/documentation/20261018/optuna_implementation/report.zh.txt)：完整S/两pos分支、实际目标/VJP/逐步LR、初始化/日程/Memory根与自身恢复、三持续sampler/精确选参/失败停止、真实子进程和九次统一开放、共享分段硬截止。Linux7项适用CPU检查通过，attempt02汇总漏ARMS名称失败后定向修复；外层累计82/300秒，真实CPU小模型39次更新。六调用流程的CPU测试显式mock原生资源/BGE/形状，不是GPU资格；模拟36反馈slot/45分析槽不是正式训练。保存统计独立核对33924字段差0，仅人工输入；正式科学结果未新增。
+
+当前46来源两端一致，49必要原件1422971字节完整回传，现场无相关任务。[当前CPU门](../reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json)保留失败/适用映射。F05计费逻辑有证据但共享容量未证明，F06的9000秒/114小时仍未准入；不能用82秒CPU替代原生时间资格。新[具体实现包](../reports/documentation/20261018/optuna_implementation/review/package.json)包含此前未送审的预算补充及新源码/证据，依据科研纪律第6节待本包外发确认；没有启动GPU/训练，新材料只本地Git。
+
 ## 2026-10-18 Optuna外审完整回收、独立主审与待确认实施
 
 用户原话：“外审已结束，把审查结果完整同步回来，结合刚补清的两处预算问题仔细分析并独立主审，详细汇报方案是否可行、还需要修改哪些地方，确认后再实施。”

@@ -181,7 +181,7 @@ def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, b
     if memory is not None:
         memory.begin_stage(stage)
     before = None if memory is None else memory.summary()
-    schedule, _ = parent.schedule(current, parent.contract(), entry.method.RNG_ORDER, stage)
+    schedule, _ = parent.schedule(current, c, entry.method.RNG_ORDER, stage)
     name = "AB"[stage-1]+"_"+arm
     budget.phase = name
     rows, captures = [], []
@@ -335,7 +335,9 @@ def train(job, budget, *, entry=None):
         model, optimizer, initial = entry.fresh(c)
         entry.method.bind(model, entry.method.metadata(arm))
         manifest["initials"][arm] = initial
-        if initial != baseline["initial_identity"] or parent.adam_step(optimizer) != 0:
+        initial_ok = (entry.validate_initial(model, optimizer, initial, baseline)
+                      if hasattr(entry, "validate_initial") else initial == baseline["initial_identity"])
+        if not initial_ok or parent.adam_step(optimizer) != 0:
             raise ValueError("Independent identical untrained starts required")
         memory = None
         for stage, d in enumerate("AB", 1):

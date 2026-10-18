@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-18 Optuna实现与手写CPU
+
+新隔离目录为`/home/yongpeng/cross-lingual/reports/documentation/20261018/optuna_implementation/workspace`；仅46必要源码/合同/政策/批准材料，无正式数据/模型链接。6次CPU原件（含attempt02失败与修复）及各次源码tar快照共49文件1422971字节已SFTP回传，47载荷SHA逐项一致，当前46来源与Linux一致，见[回传记录](../reports/documentation/20261018/optuna_implementation/receive.json)。[CPU汇总门](../reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json)累计82/300秒、7项适用检查；临时手写模型/Memory已由测试目录清理，既有正式权重/Memory不接触。23:07:05现场无相关作业。
+
+Windows一次性deployment目录在核对当前Linux来源后已按解析绝对路径精确删除；必要源码留主目录，各次冻结快照及成功/失败证据保留。新实现外审包和清单见[package.json](../reports/documentation/20261018/optuna_implementation/review/package.json)，目前仅准备，等待具体外发确认。新材料仅本地Git，局部副本清理不重置10月23日大清理周期。
+
 ## 2026-10-18 Optuna方案外审回收及主审
 
 已完整回收260847字节/22成员外审返回包；22外部成员、20内部载荷、内嵌原包及25输入载荷身份一致，见[回收核验/保管映射](../reports/documentation/20261018/optuna_plan/review/recovery.json)。保留21必要外审原件220049字节、外部身份/成员清单、最终网页、[主审](../reports/documentation/20261018/optuna_plan/review/primary_disposition.zh.txt)及[待确认实施稿](../reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt)。唯一原186342字节输入ZIP继续保留；冗余返回ZIP、浏览器重复包/清单、内嵌重复输入及下载临时记录共10文件按精确路径核对后清理，实际字节数见recovery。外审机械脚本如需重放，原输入路径映射已记录，不修改外审原件。专用页已确认无生成/待发内容并关闭。
