@@ -1,0 +1,23 @@
+N08后续反证核查：控制器启动与失败/最终落盘的C计时缺口
+
+受主审定向请求，仅静态追踪当前实际入口是否存在外层formal包装覆盖；未执行项目代码、测试或模拟。
+
+结论：支持新增N08，建议P2、正式调度前修正。它独立于N03的worker释放终点：即使没有worker、无GPU清理残留，控制器本身的启动/最终/失败工作仍有未受C硬截止或未计入C的区段。
+
+直接源码：
+1. step28_optuna_search.py5记录MODULE_STARTED，7–18继续导入，包括run及其依赖。95–103的charged只在进入context时安装SIGALRM；实际execute首次进入charged为160。故155对time.monotonic()-MODULE_STARTED的回填可记录已返回的导入耗时，但不能在导入阻塞期间施加C300硬截止。
+2. 155回填以后，156–158的job.exists/path检查/mkdir仍在任何charged区间之外；这部分既没有被155的早先差值计入，又未有新计时区间。mkdir和底层文件系统I/O可阻塞。
+3. 所有charged在退出时103关闭定时器。206–211的search.fail/traceback/access_total/failure写盘和finally ledger写盘处于这些context之外；没有把这段实际控制I/O加回C，也没有剩余C/总时限保护。正常成功也执行211的最终ledger落盘，因此不是仅限极端异常。
+4. control.Ledger.interval77–78在failed=True时直接拒绝，不能简单把上述失败收尾塞进未改的普通interval就称修好。修正需保持失败态不能重启任何训练/选参调度，同时允许按既定边界计费和完成有界保存/退出。
+
+外层覆盖反证：
+- rg --files列出的当前附件仅有scripts/run_step28_optuna_cpu_linux_20261018.sh一个shell。
+- 已完整静态阅读该21行脚本；13–14的timeout只调用CPU step28_optuna_verify.py --output/--prior-seconds，10明确CUDA_VISIBLE_DEVICES为空。它不包装正式step28_optuna_search.py。
+- run.sources49–50仅将该CPU shell绑定为源码；无formal包装器。
+- 对scripts/docs/当前实施报告和两补充检索step28_optuna_search、MODULE_STARTED、SIGALRM、ITIMER_REAL、timeout相关入口，未找到可覆盖父控制器导入和收尾的另一个实际formal timer/wrapper。未访问包外项目或假定未来已有包装。
+
+触发/影响：父控制器在导入、mkdir或最终/失败保存期间出现普通慢I/O/阻塞，可在无C定时器时继续占用；mkdir和收尾费用也没有进入最终C账。已经运行的子run时间仍按各自区间计，不能把此缺口误称为全部计时不成立。
+
+最小修改：仅覆盖已有启动、最终与失败收尾，令其受剩余C/总额的实际截止与连续计费约束。子run等待期间仍不重复计C；失败态仅允许必要留证/清理/退出，不重新ask/tell/训练或补slot。真实超限消耗与未完成保存状态应保留，不能为收尾抹去失败、借其他段或另造通用恢复/安全框架。
+
+本专项未编辑主审report.zh.txt；主审独立决定findings整合。原“核心分段计时已接通”仍适用于各已包裹的活动区间，需要增加本项对未覆盖控制边界的限定。

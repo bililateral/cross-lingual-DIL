@@ -1,0 +1,115 @@
+{
+  "reviewer": "control_budget subreview",
+  "scope": "Static control/search/budget and directly affected execution/resource paths only",
+  "execution_boundary": {
+    "submitted_code_imported_or_executed": false,
+    "tests_or_handwritten_scientific_examples_run": false,
+    "model_loading_or_metric_recalculation_or_bootstrap": false,
+    "project_linux_or_network_access": false,
+    "library_upload": false,
+    "allowed_operations": ["source reading", "AST structure inspection", "saved timing/budget arithmetic", "local report writing"],
+    "mechanical_failures": [],
+    "notes": "Some batched tool output was truncated; affected current run code was reread in smaller ranges. Prior findings F01/F02 beginning was not fully visible to this subreviewer, so no claim of fully reading the prior external report/findings. Root reviewer owns full-history coverage."
+  },
+  "conclusion": "The three independent samplers, genuine trial dispatch, exact finite objective selection, separate search/replication opening, disjoint C/E/A accounting and rejection of old time PASS are connected. The current implementation is not completely closed: campaign resource checks do not cover the terminal shared evaluation/analysis; failure cleanup does not establish disappearance of all owned workers before ending the run interval. New 9000-second/114-hour feasibility remains independently unestablished. A further native disk-reservation omission should be judged against the retained old resource gate, without expanding the task into a general safety framework.",
+  "findings": [
+    {
+      "id": "CB01",
+      "priority": "P1",
+      "status": "CONFIRMED_STATIC_PATH",
+      "title": "E/A and final control can bypass the campaign resource limits after the last training run",
+      "locations": [
+        "scripts/step28_optuna_run.py:70-82,249",
+        "scripts/step28_optuna_run.py:279-300,354-364",
+        "scripts/step28_optuna_search.py:106-130,195-205",
+        "scripts/step28_optuna_verify.py:215-216",
+        "schema/step28_optuna_policy.json:16-17"
+      ],
+      "trigger": "During the actual shared evaluation or independent analysis, campaign evidence/output or the phase process RSS exceeds its retained limit while elapsed time remains below E2400/A600. The parent launch loop checks time and process-group exit only; the last trial's Budget no longer runs.",
+      "mechanism": "The sole Budget constructor in optuna_run is execute_trial line249. Budget.check implements the campaign 64GiB output and 2GiB evidence checks, and inherited RSS/GPU checks. joint_evaluate never creates or invokes it. --analyze returns directly through independent_analysis before verify's qualification watchdog is initialized. The parent subsequently writes COMPLETE after checking only the access tally.",
+      "impact": "All 45 runs and the final two children may return success even though the overall campaign resource contract was exceeded after the last run. This concerns ordinary execution coverage; no forged gate, extra candidate or direct helper invocation is required.",
+      "minimum_change": "Reuse the existing resource checks/watchdog for the actual shared evaluation and analysis and check campaign output in final control. Retain phase-specific E/A time limits without double charging. Monitor the real executing process (or owned group) and preserve observed peak/stop evidence. No new service or broad safety framework is needed.",
+      "gate": "Fix before approving the formal campaign path as implementation-complete. This missing formal E/A check does not by itself invalidate the already performed CPU tests or prove that native BGE qualification will fail.",
+      "evidence_limit": "No resources were consumed experimentally by this review; the possible overrun is derived from the real call path and the absent checks. Current fixed outputs might stay below the caps, but the code does not enforce them in these phases."
+    },
+    {
+      "id": "CB02",
+      "priority": "P2",
+      "status": "CONFIRMED_STATIC_PATH",
+      "title": "Failure/timeout stops the accounting interval before all owned workers are confirmed released",
+      "locations": [
+        "scripts/step28_optuna_search.py:106-130,171-178,206-211",
+        "scripts/step28_optuna_control.py:75-103",
+        "tests/test_step28_optuna.py:207-214",
+        "reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt:28-34"
+      ],
+      "trigger": "A real launched child has a same-process-group worker when an error or timeout occurs. The success loop observes process-group membership, but the exception handler sends SIGKILL to the group and waits only for the group leader.",
+      "mechanism": "Lines125-130 do not repeat the all-member disappearance check used by lines113-121. child.wait proves only the main child is reaped. The Ledger interval ends as soon as launch raises, so a worker still tearing down or blocked in kernel work is outside that recorded interval.",
+      "impact": "The campaign correctly stops and does not schedule a replacement, but the stated failure endpoint (all owned workers exited/resources released) and full cleanup cost are not proved. This should not be described as successful worker-release coverage based on the current simple-child test.",
+      "minimum_change": "Use the same owned-group release observation in the failure cleanup path, preserve the stopped status and actual cleanup duration/any unresolved resources, and never convert cleanup or a time overrun into a fresh training allowance. This is a small completion-path correction, not automatic recovery.",
+      "gate": "Close before formal execution's failure/resource accounting is accepted. It is not a reason to discard the valid CPU control/sampler evidence or rerun unmodified scientific code.",
+      "evidence_limit": "Existing CPU launcher tests run a normal child, an exit3 child, and a sleeping child. They create no descendant worker and therefore do not cover this branch. No worker experiment was run externally."
+    },
+    {
+      "id": "CB03",
+      "priority": "P2",
+      "status": "CONFIRMED_CODE_DIFFERENCE_MAIN_REVIEW_TO_ASSIGN_GATE",
+      "title": "The new native six-call path drops the old available-disk reservation check",
+      "locations": [
+        "scripts/step28_positive_ranking_verify.py:55-60",
+        "scripts/step28_g_half_verify.py:113-120",
+        "scripts/step28_optuna_verify.py:85-103,110-120,229-235"
+      ],
+      "trigger": "The native work directory has less available disk than the required checkpoint reserve, though its current recorded output size plus reserve is within the 10GiB work cap.",
+      "mechanism": "The old native path explicitly rejects free disk below10GiB. native_save passes checkpoint_reserve to the supplied check, but the new check looks only at elapsed/RSS and current files plus reserve. It does not query actual filesystem free bytes. The new native_arm also lacks the old startup disk check.",
+      "impact": "BGE loading and real optimizer calls can begin before a checkpoint write hits ENOSPC. The new check enforces an allowed output size, not availability of the physical storage needed to execute the saved-state qualification.",
+      "minimum_change": "Retain the old startup available-disk check and/or use the already supplied disk_reserve helper from the new check(reserve), without adding a new resource architecture.",
+      "gate": "If the old physical-space gate is retained by the current native specification, close before native execution. It does not establish that present storage is insufficient; no project filesystem was inspected by this review."
+    }
+  ],
+  "prior_findings_latest": {
+    "F03": "Core implementation substantially addressed: three persistent independent Optuna4.6.0 samplers; actual anchor consumes trial0; trial1-3 paired random startup; later TPE; exact (U,mean delta,-number); finite checks and negative U accepted; child success/release before tell; exceptions stop all dispatch. CPU feedback records are handwritten slots, not36 model fits. Failure worker endpoint in CB02 remains.",
+    "F04": "Real search and replication branches are separated. Search parses valid only after blind gate and full training; each replication exits valid0; nine records require exact trial identities and successful released child receipts before one joint parse. parse_once records attempts before calling the label loader. Parent tallies45 train/37 valid and forbids heldout/owners. Full scientific metrics/diagnostic details remain under the run/evaluation subreview.",
+    "F05": "Budget amendment is newly reviewed here; it was not in the prior26-member review. C300/E2400/A600 are genuinely separate timed intervals, and fixed caps plus disjoint accounting preserve E+A3000 before E and A600 before A. Previous replication intervals are not updated while later runs execute. Ordinary active-phase failure elapsed time is retained. CB01/CB02 prevent claiming every resource/release aspect is closed.",
+    "F06": "Still open independently of the above defects. The formal gate requires current source-bound native six-call results and recomputes retained1.25/1800 projections from measurements. It rejects old time PASS and each search/replication projection above9000, shared components beyond300/2400/600, and stage/total overruns. No new actual native or shared-stage capacity evidence exists. CPU82 seconds and old actual runtime averages do not qualify the new campaign.",
+    "F07": "Future final confirmation only; no proposed new80-group source, generation or evaluation work was reviewed or executed here.",
+    "F08": "Current implementation/report consistently describe finite equal-opportunity tuning and development direction, and do not claim rank-only causation or innovation. This subreview introduces no new arm, hyperparameter or scientific claim."
+  },
+  "budget_and_projection_notes": [
+    "Budget arithmetic is410400 seconds=114 hours, shared3300 seconds, with36*9000 search and9*9000 replication. Saved CPU charged attempt sum14+17+21+4+6+20=82; outer wall sum77.254095395 seconds matches the saved outer_wall_ns. These are saved-field arithmetic only.",
+    "The old projected candidate values stated in budget_amendment sum to38079.87608841504 seconds, exceeding two9000-second slots by20079.87608841504 seconds. This subreview did not independently open the old native raw result; root can bind the earlier attached historical evidence.",
+    "The new timing gate uses the same conservative full-run seconds for both P_search and P_rep. That is conservative for a replication excluding final label evaluation if the same workload assumptions hold; it is not a bug requiring artificially lower replication projections.",
+    "The old projection computes projected_peak_output_bytes/within_budget as well. New validate_gate uses only projected_total_seconds. Because the current scope explicitly freezes the time projection conditions, and the source-bound BGE shape/native temporary cap constrain actual file sizes, merely fabricating giant W_F/W_I is not a sound independent ordinary-input defect. The full campaign's18 retained inference weights still require capacity accounting before formal qualification.",
+    "The new native L measurement excludes pretrained_archive hashing at optuna_verify99-100. The old timed checked_fresh at positive_verify71 includes archive verification through g_half_verify107-110. Keeping1.25/1800 does not itself show identical measurement semantics. Future time qualification should explicitly assign this cost to L or the1800 allowance and justify coverage before formal results; no added call count is required.",
+    "The native continuation cleanup is not a defect: positive_ranking_verify25-52 calls gc.collect, synchronize, clear cuBLAS workspaces, empty_cache and requires allocated/reserved zero before the next arm. native_arm returns value records, not live GPU models. Missing explicit del at its return is not enough to claim a leak."
+  ],
+  "read_scope_summary": {
+    "fully_visible_current_files": [
+      "reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt",
+      "reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt",
+      "reports/documentation/20261018/optuna_plan/review/primary_disposition.zh.txt",
+      "reports/documentation/20261018/optuna_implementation/report.zh.txt",
+      "reports/documentation/20261018/optuna_implementation/authorization.json",
+      "reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json",
+      "docs/SELLER_ALIAS_OPTUNA.zh.md",
+      "schema/step28_optuna_policy.json",
+      "scripts/step28_optuna_control.py",
+      "scripts/step28_optuna_search.py",
+      "scripts/step28_optuna_run.py"
+    ],
+    "selected_ranges": [
+      "scripts/step28_optuna_verify.py:85-277",
+      "tests/test_step28_optuna.py:135-318",
+      "scripts/step28_g_half_run.py:145-181,320-420",
+      "scripts/step28_record_replay_run.py:1-121",
+      "scripts/step28_bge_continual_run.py:65-103,125-166",
+      "scripts/step28_positive_ranking_verify.py:1-92",
+      "scripts/step28_g_half_verify.py:36-85,100-133",
+      "schema/step28_g_half_policy.json:30-40",
+      "reports/documentation/20261018/optuna_plan/proposal.zh.txt:65-92",
+      "reports/documentation/20261018/optuna_plan/review/external/review/findings.json:F03-F08 and tail visible; beginning truncated"
+    ],
+    "authoritative_mechanical_read_log": "../reads_control_budget.jsonl; range logs record requested output; this note distinguishes visibility after tool truncation."
+  },
+  "related_artifacts": ["control_budget.mechanical.py", "control_budget.mechanical.json", "control_budget.zh.txt"]
+}

@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-19 Optuna实现外审完整回收及主审
+
+[回收核验](../reports/documentation/20261018/optuna_implementation/review/recovery.json)：返回ZIP297884字节/58成员、SHA256 f7632fd38f714f0634d013e19b890152a8f1a5d9604268081383927c400bd216；58外部成员、56内部载荷及原140输入回执一致，解包1061502字节。完整外审原文/findings/阅读范围/机械证据/六次失败/辅助原意见均保留，外层身份/成员清单和完成网页齐全。主审及待确认修复范围保存在同review目录。68必要文件1196148字节按[sync](../reports/documentation/20261018/optuna_implementation/review/sync.json)同步Linux同相对目录并逐项核对；不执行外审程序或科研测试，不覆盖隔离workspace。
+
+CPU计数由主审补正为39生产+6参考=45实际更新，82秒预算不变，旧报告/gate原件保持。当前46源码在Windows/Linux一致，00:16:54无本用户Optuna任务。返回整包和浏览器下载/日志重复件在完整验收后清理；原2011821字节输入包仍用于待修复证据重放，仅本地保留。外审专用页已确认无生成/待发送并关闭，新材料仅本地Git，不改变10月23日大清理周期。
+
 ## 2026-10-18 Optuna实现与手写CPU
 
 新隔离目录为`/home/yongpeng/cross-lingual/reports/documentation/20261018/optuna_implementation/workspace`；仅46必要源码/合同/政策/批准材料，无正式数据/模型链接。6次CPU原件（含attempt02失败与修复）及各次源码tar快照共49文件1422971字节已SFTP回传，47载荷SHA逐项一致，当前46来源与Linux一致，见[回传记录](../reports/documentation/20261018/optuna_implementation/receive.json)。[CPU汇总门](../reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json)累计82/300秒、7项适用检查；临时手写模型/Memory已由测试目录清理，既有正式权重/Memory不接触。23:07:05现场无相关作业。
@@ -19,6 +25,7 @@ Windows一次性deployment目录在核对当前Linux来源后已按解析绝对�
 已完整回收260847字节/22成员外审返回包；22外部成员、20内部载荷、内嵌原包及25输入载荷身份一致，见[回收核验/保管映射](../reports/documentation/20261018/optuna_plan/review/recovery.json)。保留21必要外审原件220049字节、外部身份/成员清单、最终网页、[主审](../reports/documentation/20261018/optuna_plan/review/primary_disposition.zh.txt)及[待确认实施稿](../reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt)。唯一原186342字节输入ZIP继续保留；冗余返回ZIP、浏览器重复包/清单、内嵌重复输入及下载临时记录共10文件按精确路径核对后清理，实际字节数见recovery。外审机械脚本如需重放，原输入路径映射已记录，不修改外审原件。专用页已确认无生成/待发内容并关闭。
 
 F05计费规格已补清，F06资源可行性未建立；本地预算补充和新实施稿尚未送外审。无新科学执行或Linux同步，材料仅Windows/本地Git；原proposal/ZIP/提交时点记录及已有依赖安装事实不追改。本次局部冗余清理不重置项目大清理周期。
+
 ## 2026-10-18 Optuna静态方案待审材料
 
 后续用户指出时间资格与集中评价计费两项缺口，已另存[预算补充](../reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt)，仅Windows保管/本地Git，尚未外发；原26成员输入包及原稿不改。当前9000秒/114小时可行性未建立，集中评价归已有3300秒共享段，详见补充。未新增Linux执行/同步/数据读取或依赖变更。

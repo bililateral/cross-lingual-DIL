@@ -1,0 +1,41 @@
+{
+  "reader": "objectives_native",
+  "record_kind": "retained_visible_tool_failure_evidence",
+  "provenance": "Copied from this agent's existing exec_command tool-call inputs and visible returned outputs. The failed commands were not rerun. exec_command exposed a combined output field, not separate stdout/stderr streams; the error lines below are verbatim visible error fragments from that field, not a newly captured stderr stream.",
+  "scientific_code_executed": false,
+  "failures": [
+    {
+      "sequence": 1,
+      "tool": "tools.exec_command",
+      "tool_result_chunk_id": "89cb39",
+      "cmd": "rg -n 'def (load_model|make_optimizer|train_stage|train|checkpoint|restore_point|fresh|schedule|stage_lr|backward_group|record_vectors|config)|class Memory|schedule_seed|initialization_seed' scripts/step28_g_half_run.py scripts/step28_record_replay.py scripts/step28_chinese_base.py scripts/step28_continual* scripts/step28_function* scripts/step28_*py",
+      "workdir": "/workspace/scratch/3e46faac4c35/optuna_review_input",
+      "max_output_tokens_requested": 9000,
+      "exit_code": 2,
+      "wall_time_seconds": 0.000038137,
+      "original_token_count_reported": 2492,
+      "stderr_separately_captured": false,
+      "visible_error_fragment_verbatim": "rg: scripts/step28_function*: No such file or directory (os error 2)\n",
+      "capture_scope": "Only the visible error line is retained verbatim here. The returned combined output also contained successful source matches from existing files, which are not reproduced in this failure-only record. No unseen stderr or separate-stream attribution is claimed.",
+      "trigger": "The literal glob scripts/step28_function* had no matching file in the attachment tree, so rg reported that path while also searching the existing paths.",
+      "disposition": "Continued static reading along paths actually present in the attachment; did not rerun this failed command or modify input files."
+    },
+    {
+      "sequence": 2,
+      "tool": "tools.exec_command",
+      "tool_result_chunk_id": "efb368",
+      "cmd": "rg --files reports/documentation/20261016/h_consistency reports/documentation/20261015/g_refinement",
+      "workdir": "/workspace/scratch/3e46faac4c35/optuna_review_input",
+      "max_output_tokens_requested": 3000,
+      "exit_code": 2,
+      "wall_time_seconds": 0.00004659,
+      "original_token_count_reported": 39,
+      "stderr_separately_captured": false,
+      "visible_error_fragment_verbatim": "rg: reports/documentation/20261015/g_refinement: No such file or directory (os error 2)\n",
+      "visible_combined_output_verbatim": "rg: reports/documentation/20261015/g_refinement: No such file or directory (os error 2)\nreports/documentation/20261016/h_consistency/baseline_sources.json\n",
+      "capture_scope": "The complete visible combined output is retained above. The tool did not expose a separate stderr stream.",
+      "trigger": "The queried g_refinement directory was absent from the attachment tree; the existing h_consistency directory still returned baseline_sources.json.",
+      "disposition": "Read the returned h_consistency/baseline_sources.json and followed its actual Entry dependency. Did not treat absence from this attachment as proof that the project lacked the historical directory; did not rerun the failed command."
+    }
+  ]
+}

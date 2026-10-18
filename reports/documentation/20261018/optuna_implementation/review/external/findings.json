@@ -1,0 +1,635 @@
+{
+  "schema_version": "1.0",
+  "review_date_utc": "2026-10-18",
+  "language": "zh-CN",
+  "input_identity": {
+    "bytes": 2011821,
+    "sha256": "52bad7b321d0fa77de36ae7126213da815ba968afeb7d2aa74699f282f373672",
+    "members": 141,
+    "payloads": 140,
+    "expected_identity_matches": true
+  },
+  "requested_model": "GPT-6 / Pro",
+  "environment_self_description": "GPT-6 Astra Pro",
+  "ui_model_selector_observed": false,
+  "backend_routing_verified": false,
+  "collaboration": {
+    "auxiliary_agents": [
+      "objectives_native",
+      "control_budget",
+      "run_evaluation"
+    ],
+    "explicit_model_override": false,
+    "final_adjudication": "root",
+    "single_instance_only_claim": false
+  },
+  "decision": {
+    "status": "CONTINUE_TARGETED_IMPLEMENTATION_NOT_ACCEPTED_AS_COMPLETE",
+    "worth_continuing": true,
+    "worth_applying_for_planned_native_after_targeted_fixes_and_primary_review": true,
+    "native_pass": false,
+    "formal_execution_allowed": false,
+    "new_9000_second_qualification_established": false,
+    "shared_capacity_established": false,
+    "development_114_hour_feasibility_established": false,
+    "new_data_or_final_evaluation_authorized": false,
+    "summary_zh": "主科学接线成立，八项资源/释放/计时/输出/证据和口径问题须分阶段处置；有限修正值得继续，新时间资格独立未建立。"
+  },
+  "actual_review_execution": {
+    "static_only": true,
+    "project_imports": 0,
+    "project_test_runs": 0,
+    "model_loads": 0,
+    "metric_recomputations": 0,
+    "bootstrap_runs": 0,
+    "project_server_connections": 0,
+    "web_lookups": 0,
+    "library_or_other_destination_uploads": 0,
+    "prohibited_dataset_accesses": 0,
+    "operations": [
+      "text_read",
+      "zip_and_tar_member_bytes",
+      "sha256_and_size",
+      "AST_structure_and_function_text_comparison",
+      "saved_field_extraction",
+      "budget_and_count_arithmetic"
+    ]
+  },
+  "previous_findings": [
+    {
+      "id": "F01",
+      "title_zh": "随机根、旧 s0 兼容与新 seed 身份",
+      "latest_status": "IMPLEMENTED_WITH_FORMAL_COMPATIBILITY_PENDING",
+      "judgment_zh": "F01 随机根、运行身份与恢复：主要实现要求在静态及适用 CPU 范围内满足。TrialSpec、loader 初始化、训练日程/dropout/regroup、Memory 留存/抽样与保存恢复连贯；固定划分与诊断根未错误跟着训练根变化。非默认 LR 不强求整个空 Adam 元数据等于历史。默认初始/最终兼容检查确实接到真实入口，但历史正式分数实际相等尚待未来运行，正例锚点旧来源外部绑定另有 N07。不能写成原生/正式兼容已通过。[E03,E04,E09,N07]",
+      "linked_new_findings": [
+        "N07"
+      ]
+    },
+    {
+      "id": "F02",
+      "title_zh": "lambda/LR 与完整 S 正式分支",
+      "latest_status": "IMPLEMENTED_CPU_APPLICABLE_NATIVE_PENDING",
+      "judgment_zh": "F02 完整 S、目标、LR 与独立参考：主科学接线成立。独立 CPU 参考包含四处 lambda、历史 0.1、D0 0.5、VJP/梯度/Adam/参数与实际 LR，不只是比日志。六调用原生规格能在既定调用数内分离 lambda 与 LR 及恢复下一步；当前只有 CPU 小模型证据，真实 BGE/最大形状/原生资源仍未验证。N01 应在原生执行前补齐。[E03,E09,E10,N01]",
+      "linked_new_findings": [
+        "N01",
+        "N06"
+      ]
+    },
+    {
+      "id": "F03",
+      "title_zh": "持续三 study、精确反馈、失败与硬截止",
+      "latest_status": "CORE_IMPLEMENTED_SPECIFIC_GAPS_OPEN",
+      "judgment_zh": "F03 三 study、实际 slot、精确反馈/选参及停止：核心已实现。三个持续独立 sampler，真实锚点占 slot，首 4 点含锚点，后 8 点 TPE，精确 (U, mean_delta, -number)，负 U 合法；父进程等实际成功和释放后才 tell。失败会停止全项，不免费补抽。N03 限制异常释放终点的闭合；N05 限制独立保存分析对真实反馈来源的覆盖。36 个手写反馈 slot 不等于 36 次训练。[E05,E07,N03,N05]",
+      "linked_new_findings": [
+        "N03",
+        "N05"
+      ]
+    },
+    {
+      "id": "F04",
+      "title_zh": "九次集中开放、45/37 与全评价",
+      "latest_status": "OPEN_REQUIRED_OUTPUTS_INCOMPLETE",
+      "judgment_zh": "F04 开放节奏与完整评价：搜索自身盲完整后开放；九复验各 valid=0 完成/退出后集中一次开放，45/37 尝试账已接到实际路径。22 指标、全部端点/角色、N/A、诊断、候选相对 S 的逐 seed/三 seed 比较大体存在；N04 的 H_pos−S_pos 与跨三 seed 诊断描述仍缺。CPU 测了编排和保存矩阵统计，不是九个真实 BGE 轨迹或实际集中标签开放的实证。[E06,E08,E11,N04]",
+      "linked_new_findings": [
+        "N04",
+        "N05"
+      ]
+    },
+    {
+      "id": "F05",
+      "title_zh": "集中评价预算、资源与退出端点",
+      "latest_status": "CORE_ACCOUNTING_IMPLEMENTED_RESOURCE_AND_RELEASE_GAPS_OPEN",
+      "judgment_zh": "F05 时间端点、共享预算、资源与生命周期：本轮首次审查此前未外发的预算补充和实施规格，并已核对与新代码的对应。已进入活动区间的 C/E/A 不重叠、单 run 退出停表、共享硬截止与总账主体成立，不需要另建预算状态机。N02 的 E/A 非时间资源门、N03 的异常 worker 释放、N08 的控制器启动/最终收尾计时覆盖仍未闭合。共享容量是未建立的资格，不可由手写时钟 PASS 替代。[E02,E07,E13,N02,N03,N08]",
+      "linked_new_findings": [
+        "N01",
+        "N02",
+        "N03",
+        "N06",
+        "N08"
+      ]
+    },
+    {
+      "id": "F06",
+      "title_zh": "新 9000 秒及 114 小时时间准入",
+      "latest_status": "NOT_ESTABLISHED_INDEPENDENTLY_OPEN",
+      "judgment_zh": "F06 9000 秒及 114 小时准入：独立保持未建立。旧双臂保守投影不能放行新两次 18000 秒；当前 formal gate 确会要求新原生来源并按保留模型重算，而非仅相信填入的预测数字。当前没有满足新条件的原生/共享材料。未来还须说明 L 测量边界的变化如何被成本模型覆盖；不能删 1.25 或 1800 秒去凑门。[E02,E07,E13]",
+      "linked_new_findings": []
+    },
+    {
+      "id": "F07",
+      "title_zh": "新 80 群和最终确认",
+      "latest_status": "DEFERRED_FINAL_CONTRACT_ONLY",
+      "judgment_zh": "F07 新 80 群及最终独立确认：仅在最终阶段前保持开放。当前不批准新数据、最终标签或最终评价；不以尚无这份后续合同阻断现在两参数实现和有限 CPU 修正，也不要求当前实现生成它。[E01,E02]",
+      "linked_new_findings": []
+    },
+    {
+      "id": "F08",
+      "title_zh": "有限机会、因果与创新解释边界",
+      "latest_status": "ACCEPTED_WITH_INTERPRETATION_LIMITS",
+      "judgment_zh": "F08 解释与主张范围：保留协议内同额有限探索，不称充分优化、rank 的独立因果效应、方法创新、真实市场泛化或种子总体保证。原固定 S_pos/H_pos 运行有效且主要 S_pos−S 双域 raw MAP 门失败，旧 A 局部正向不改变失败。后续六格全正也仅是三个指定 seed 在既有开发集的方向一致。[E01,E08,E15]",
+      "linked_new_findings": []
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "N01",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_resource_preflight_omission",
+      "title_zh": "新原生路径没有检查实际空闲磁盘及 checkpoint 可用空间。",
+      "stage": "before_native_execution",
+      "stage_zh": "原生执行前",
+      "related_previous_findings": [
+        "F02",
+        "F05"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_verify.py",
+          "lines": [
+            85,
+            103
+          ],
+          "sha256": "df53607d6d59a24f0a7d3a7cf294eb1e022398ba7d0032f85fbe1bcbba72c8ad"
+        },
+        {
+          "path": "scripts/step28_optuna_verify.py",
+          "lines": [
+            229,
+            235
+          ],
+          "sha256": "df53607d6d59a24f0a7d3a7cf294eb1e022398ba7d0032f85fbe1bcbba72c8ad"
+        },
+        {
+          "path": "scripts/step28_positive_ranking_verify.py",
+          "lines": [
+            55,
+            60
+          ],
+          "sha256": "afddcb46dc05a4ef585d064eeb073d032f60e8bc1228a3086ab9d6407012e0ef"
+        },
+        {
+          "path": "scripts/step28_g_half_verify.py",
+          "lines": [
+            113,
+            120
+          ],
+          "sha256": "76edbaf1d9b2714b90933a5c30b92589e98b0b5ca2781471ca00312371052622"
+        }
+      ],
+      "trigger_zh": "有具体原生批准后，out 的逻辑文件体积仍在 10 GiB 内，但文件系统空闲不足 10 GiB 或小于即将保存的 checkpoint reserve。",
+      "impact_zh": "可进入 BGE/真实调用后才因 ENOSPC 失败或留下部分文件；丢掉的是现成资源前置检查，非已观察到的现场磁盘事故。",
+      "minimum_change_zh": "恢复旧 free≥10 GiB 预检；在 check(reserve) 复用 disk_reserve 使 total+reserve 与真实 free 同时受约束；原有失败时间/部分证据照记。不要新增通用资源框架。",
+      "disposition_zh": "原生前关闭；不据此宣布既有小模型 CPU 运行无效。[E10]",
+      "complete_finding_zh": "N01 / P2 / 原生执行前 / 确认的既有资源门遗漏\n标题：新原生路径没有检查实际空闲磁盘及 checkpoint 可用空间。\n位置：scripts/step28_optuna_verify.py:85–103,229–235；对照 step28_positive_ranking_verify.py:55–60 与 step28_g_half_verify.py:113–120。\n触发：有具体原生批准后，out 的逻辑文件体积仍在 10 GiB 内，但文件系统空闲不足 10 GiB 或小于即将保存的 checkpoint reserve。\n影响：可进入 BGE/真实调用后才因 ENOSPC 失败或留下部分文件；丢掉的是现成资源前置检查，非已观察到的现场磁盘事故。\n最小修改：恢复旧 free≥10 GiB 预检；在 check(reserve) 复用 disk_reserve 使 total+reserve 与真实 free 同时受约束；原有失败时间/部分证据照记。不要新增通用资源框架。\n处置：原生前关闭；不据此宣布既有小模型 CPU 运行无效。[E10]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": true,
+      "blocks_formal_acceptance": false,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N02",
+      "priority": "P1",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_runtime_resource_guard_omission",
+      "title_zh": "集中评价和独立分析没有接入 campaign 输出/证据/RSS 门。",
+      "stage": "before_formal_execution",
+      "stage_zh": "正式执行前",
+      "related_previous_findings": [
+        "F05"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            70,
+            82
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            237,
+            300
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            195,
+            205
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_verify.py",
+          "lines": [
+            215,
+            216
+          ],
+          "sha256": "df53607d6d59a24f0a7d3a7cf294eb1e022398ba7d0032f85fbe1bcbba72c8ad"
+        }
+      ],
+      "trigger_zh": "最后一个训练子进程已结束，E/A 在剩余时间内写入较多完整评价/分析或占用较多主存。",
+      "impact_zh": "E/A 仅有时间和退出监督，缺少训练 Budget 的 64 GiB 输出、2 GiB 非权重证据及 RSS 检查；可仍写整体 COMPLETE。不是断言当前材料已超限。",
+      "minimum_change_zh": "在 E/A 的真实进程中复用现有 campaign 资源检查（根目录要指向整个 campaign），维持原 E/A 时间收费；在整体完成前再作最终检查。无需新数据、前向或扩大共享预算。",
+      "disposition_zh": "正式执行前修复。E2400/A600 的时间硬截止本身已经存在，不把问题误称为“评价完全免费”。[E06,E07]",
+      "complete_finding_zh": "N02 / P1 / 正式路径执行前 / 确认的普通执行缺陷\n标题：集中评价和独立分析没有接入 campaign 输出/证据/RSS 门。\n位置：step28_optuna_run.py:70–82,237–276,279–300；step28_optuna_search.py:195–205；step28_optuna_verify.py:215–216。\n触发：最后一个训练子进程已结束，E/A 在剩余时间内写入较多完整评价/分析或占用较多主存。\n影响：E/A 仅有时间和退出监督，缺少训练 Budget 的 64 GiB 输出、2 GiB 非权重证据及 RSS 检查；可仍写整体 COMPLETE。不是断言当前材料已超限。\n最小修改：在 E/A 的真实进程中复用现有 campaign 资源检查（根目录要指向整个 campaign），维持原 E/A 时间收费；在整体完成前再作最终检查。无需新数据、前向或扩大共享预算。\n处置：正式执行前修复。E2400/A600 的时间硬截止本身已经存在，不把问题误称为“评价完全免费”。[E06,E07]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N03",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_failure_cleanup_gap",
+      "title_zh": "launch 异常清理仅等待组长，不确认自身 workers 全部退出。",
+      "stage": "before_formal_dispatch",
+      "stage_zh": "正式子进程调度前",
+      "related_previous_findings": [
+        "F03",
+        "F05"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            106,
+            130
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            171,
+            178
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        }
+      ],
+      "trigger_zh": "子运行超时/异常时仍有同进程组 worker；killpg 发出后，组长先被 wait 回收，其他成员尚在终止或资源释放。",
+      "impact_zh": "活动区间可以在未证明整个组释放时结束，清理余耗或残留记录不完整。全项仍会停止，未发现它把失败写作资源已释放的成功或继续补抽。",
+      "minimum_change_zh": "异常路径复用有界的所属进程组退出观察，保留实际清理时间和未释放状态；不把失败/超限清零、不借别段时间，也不在残留时声明完成。定向核验限于既有 launcher 的该反例。",
+      "disposition_zh": "正式调度前关闭，不要求分布式或全仓回归。[E07]",
+      "complete_finding_zh": "N03 / P2 / 正式调度前 / 确认的异常释放缺口\n标题：launch 异常清理仅等待组长，不确认自身 workers 全部退出。\n位置：step28_optuna_search.py:106–130，特别是成功 :113–121 与异常 :125–130；计费 :171–178。\n触发：子运行超时/异常时仍有同进程组 worker；killpg 发出后，组长先被 wait 回收，其他成员尚在终止或资源释放。\n影响：活动区间可以在未证明整个组释放时结束，清理余耗或残留记录不完整。全项仍会停止，未发现它把失败写作资源已释放的成功或继续补抽。\n最小修改：异常路径复用有界的所属进程组退出观察，保留实际清理时间和未释放状态；不把失败/超限清零、不借别段时间，也不在残留时声明完成。定向核验限于既有 launcher 的该反例。\n处置：正式调度前关闭，不要求分布式或全仓回归。[E07]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N04",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_required_output_omission",
+      "title_zh": "缺少 H_pos−S_pos 次级比较和三固定 seed 的诊断汇总。",
+      "stage": "before_formal_evaluation_completion",
+      "stage_zh": "正式完整评价前",
+      "related_previous_findings": [
+        "F04"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "reports/documentation/20261018/optuna_plan/proposal.zh.txt",
+          "lines": [
+            52,
+            52
+          ],
+          "sha256": "270c2eb800f1e12daf95daeec9daa29c1a03f9665494d7bdc5b551c7ca81a484"
+        },
+        {
+          "path": "reports/documentation/20261018/optuna_plan/proposal.zh.txt",
+          "lines": [
+            70,
+            70
+          ],
+          "sha256": "270c2eb800f1e12daf95daeec9daa29c1a03f9665494d7bdc5b551c7ca81a484"
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            303,
+            351
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "scripts/step28_replay_diagnostics.py",
+          "lines": [
+            130,
+            208
+          ],
+          "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea"
+        }
+      ],
+      "trigger_zh": "九份 run 正常完成后运行 replication_statistics。",
+      "impact_zh": "NINE_REPLICATIONS_EVALUATED/整体 COMPLETE 不含两项已承诺内容；不是缺 12 捕获、不是缺所有诊断。",
+      "minimum_change_zh": "用已保存评价补 H_pos−S_pos 描述性比较；索引逐 seed 诊断并给三固定轨迹的算术描述，保持各 seed 缓存定义与条件区间解释。不得新增选择规则、合并成额外独立样本或新增捕获。",
+      "disposition_zh": "正式完整评价前关闭；不阻碍六调用原生对目标/LR/恢复资格。[E01,E08]",
+      "complete_finding_zh": "N04 / P2 / 正式评价完整性前 / 确认的冻结输出缺项\n标题：缺少 H_pos−S_pos 次级比较和三固定 seed 的诊断汇总。\n位置：proposal.zh.txt:52,70；implementation_scope:15；step28_optuna_run.py:303–351，特别是 :318 仅循环候选对 S；replay_diagnostics.py:130–208 只有逐 run 评价。\n触发：九份 run 正常完成后运行 replication_statistics。\n影响：NINE_REPLICATIONS_EVALUATED/整体 COMPLETE 不含两项已承诺内容；不是缺 12 捕获、不是缺所有诊断。\n最小修改：用已保存评价补 H_pos−S_pos 描述性比较；索引逐 seed 诊断并给三固定轨迹的算术描述，保持各 seed 缓存定义与条件区间解释。不得新增选择规则、合并成额外独立样本或新增捕获。\n处置：正式完整评价前关闭；不阻碍六调用原生对目标/LR/恢复资格。[E01,E08]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N05",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_verification_coverage_gap",
+      "title_zh": "保存结果分析没有核对实际选参反馈的 B raw MAP 来源。",
+      "stage": "before_formal_feedback_analysis_acceptance",
+      "stage_zh": "正式反馈/独立分析验收前",
+      "related_previous_findings": [
+        "F03",
+        "F04"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_verify.py",
+          "lines": [
+            25,
+            82
+          ],
+          "sha256": "df53607d6d59a24f0a7d3a7cf294eb1e022398ba7d0032f85fbe1bcbba72c8ad"
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            222,
+            222
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "tests/test_step28_optuna.py",
+          "lines": [
+            266,
+            283
+          ],
+          "sha256": "82445d2cbc88d8f364b5aefc2fb8ae4a1dcbd55d93b324584f6af4df07b3e39d"
+        }
+      ],
+      "trigger_zh": "search/evaluation 的 domains 在产生或接线时取错端点/角色/列，而保存 group 矩阵及其 absolute 汇总仍正确，selected 又与同一 search 账自洽。",
+      "impact_zh": "分析仍可 PASS，因为它重用生产 select_trial，只审计那些汇总字段，没有把每个 search domains/U 与加载矩阵独立对应。当前生产取列代码正确，本轮没有发现发生过该错源。",
+      "minimum_change_zh": "从已载入的 B raw matrix 的 MAP 列和固定群域，独立核对 D_A/D_B、U、search/保存反馈及最终选择的来源；准确声明其余汇总字段覆盖范围。无需重新解析标签、载模或在外审运行统计。",
+      "disposition_zh": "正式反馈/独立分析证据链前关闭；不是新增全面指标重算要求。[E08,E09]",
+      "complete_finding_zh": "N05 / P2 / 正式反馈和独立分析验收前 / 确认的验证覆盖缺口\n标题：保存结果分析没有核对实际选参反馈的 B raw MAP 来源。\n位置：step28_optuna_verify.py:25–30,52–64,79–82；生产域反馈来源 step28_optuna_run.py:222；测试 test_step28_optuna.py:266–283。\n触发：search/evaluation 的 domains 在产生或接线时取错端点/角色/列，而保存 group 矩阵及其 absolute 汇总仍正确，selected 又与同一 search 账自洽。\n影响：分析仍可 PASS，因为它重用生产 select_trial，只审计那些汇总字段，没有把每个 search domains/U 与加载矩阵独立对应。当前生产取列代码正确，本轮没有发现发生过该错源。\n最小修改：从已载入的 B raw matrix 的 MAP 列和固定群域，独立核对 D_A/D_B、U、search/保存反馈及最终选择的来源；准确声明其余汇总字段覆盖范围。无需重新解析标签、载模或在外审运行统计。\n处置：正式反馈/独立分析证据链前关闭；不是新增全面指标重算要求。[E08,E09]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N06",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_reporting_count_error",
+      "title_zh": "39 次生产更新遗漏 6 次真实独立参考更新。",
+      "stage": "current_report_correction",
+      "stage_zh": "当前交付报告纠正",
+      "related_previous_findings": [
+        "F02",
+        "F05"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "reports/documentation/20261018/optuna_implementation/report.zh.txt",
+          "lines": [
+            35,
+            35
+          ],
+          "sha256": "d1cac385bec5821029e4708b0dc9f10730941aa55b7843fe6f6c6da527d73466"
+        },
+        {
+          "path": "reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json",
+          "lines": [
+            356,
+            356
+          ],
+          "sha256": "2c1e1e12883d9a075189975aefd8ca94180d586587297aa5d7abcf50b142db14"
+        },
+        {
+          "path": "tests/test_step28_optuna.py",
+          "lines": [
+            65,
+            111
+          ],
+          "sha256": "82445d2cbc88d8f364b5aefc2fb8ae4a1dcbd55d93b324584f6af4df07b3e39d"
+        },
+        {
+          "path": "tests/test_step28_optuna.py",
+          "lines": [
+            134,
+            147
+          ],
+          "sha256": "82445d2cbc88d8f364b5aefc2fb8ae4a1dcbd55d93b324584f6af4df07b3e39d"
+        }
+      ],
+      "trigger_zh": "把生产 method.update 次数称为全部真实 CPU optimizer 调用。",
+      "impact_zh": "物理更新数报告少 6；外层 82 秒没有少计，原资格不因此被推翻。正确为 39+6=45 次。",
+      "minimum_change_zh": "以可审计补充记录区分 production/reference/total=39/6/45，保留旧原件和失败，勿补跑来修一个静态计数问题。",
+      "disposition_zh": "当前报告即应更正；不改变 GPU/BGE/正式均 0。[E09,E13]",
+      "complete_finding_zh": "N06 / P2 / 当前交付报告纠正 / 确认的计数口径错误\n标题：39 次生产更新遗漏 6 次真实独立参考更新。\n位置：当前实现 report.zh.txt:35；cpu_gate.json:356；tests/test_step28_optuna.py:65–111（尤其 :86 ob.step()）、134/140/147；attempt01/05 的保存测试列表。\n触发：把生产 method.update 次数称为全部真实 CPU optimizer 调用。\n影响：物理更新数报告少 6；外层 82 秒没有少计，原资格不因此被推翻。正确为 39+6=45 次。\n最小修改：以可审计补充记录区分 production/reference/total=39/6/45，保留旧原件和失败，勿补跑来修一个静态计数问题。\n处置：当前报告即应更正；不改变 GPU/BGE/正式均 0。[E09,E13]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": false,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N07",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_historical_reference_binding_gap",
+      "title_zh": "两个正例默认锚点只验证历史 manifest 内部 receipt，未绑定已审定 manifest 身份。",
+      "stage": "before_formal_anchor_acceptance",
+      "stage_zh": "正式默认锚点前",
+      "related_previous_findings": [
+        "F01"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            168,
+            178
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": [
+            33,
+            51
+          ],
+          "sha256": "c31373201c576887911fca7d82bcedfb352e251daa7d0bf12a8b0b0d9f304e87"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            72,
+            91
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_h_consistency_run.py",
+          "lines": [
+            19,
+            19
+          ],
+          "sha256": "0837bfd94f769b30b61e5b2fffd2e0a66ed66da70dcf60d3aeec60ab37702925"
+        },
+        {
+          "path": "scripts/step28_h_consistency_run.py",
+          "lines": [
+            78,
+            113
+          ],
+          "sha256": "0837bfd94f769b30b61e5b2fffd2e0a66ed66da70dcf60d3aeec60ab37702925"
+        }
+      ],
+      "trigger_zh": "规定路径下存在内容自洽但非原审定版本的 positive_ranking_result/job/run/manifest.json 及 raw 数组。",
+      "impact_zh": "数组哈希虽与该 manifest 自洽，比较对象仍未证明是旧审定锚点。S 的旧 52 来源链已绑定；该链只有旧 balanced S/G_half 的 manifest，不能自动覆盖 20261018 正例 job。fixed_reference 固定的是 summary 中 S0，也不能替代正例 raw 的来源绑定。",
+      "minimum_change_zh": "从已审定保存结果固定该 manifest 的大小/SHA，或固定四份 S_pos/H_pos 的 A/B raw receipt，纳入审查来源/资格依据。无需旧权重、旧 Memory 或新数据。",
+      "disposition_zh": "正式锚点前关闭；本包没有那些 raw 原件，故不宣称已发现错误文件或默认分数不兼容；不作为当前 CPU/六调用原生的阻断。[E04,E07,E17]",
+      "complete_finding_zh": "N07 / P2 / 正式默认锚点前 / 确认的历史来源绑定缺口\n标题：两个正例默认锚点只验证历史 manifest 内部 receipt，未绑定已审定 manifest 身份。\n位置：step28_optuna_run.py:168–178；sources:33–51；step28_optuna_search.py:72–91；祖先 h_consistency_run.py:19,78–113 与 baseline_sources.json。\n触发：规定路径下存在内容自洽但非原审定版本的 positive_ranking_result/job/run/manifest.json 及 raw 数组。\n影响：数组哈希虽与该 manifest 自洽，比较对象仍未证明是旧审定锚点。S 的旧 52 来源链已绑定；该链只有旧 balanced S/G_half 的 manifest，不能自动覆盖 20261018 正例 job。fixed_reference 固定的是 summary 中 S0，也不能替代正例 raw 的来源绑定。\n最小修改：从已审定保存结果固定该 manifest 的大小/SHA，或固定四份 S_pos/H_pos 的 A/B raw receipt，纳入审查来源/资格依据。无需旧权重、旧 Memory 或新数据。\n处置：正式锚点前关闭；本包没有那些 raw 原件，故不宣称已发现错误文件或默认分数不兼容；不作为当前 CPU/六调用原生的阻断。[E04,E07,E17]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    },
+    {
+      "id": "N08",
+      "priority": "P2",
+      "status": "OPEN_FOR_PRIMARY_DISPOSITION",
+      "kind": "confirmed_controller_time_guard_and_charge_gap",
+      "title_zh": "控制器启动和最终/失败收尾并非全部受 C 计费及硬截止约束。",
+      "stage": "before_formal_controller_execution",
+      "stage_zh": "正式控制器执行前",
+      "related_previous_findings": [
+        "F05"
+      ],
+      "confidence": "high_static",
+      "observed_runtime_failure": false,
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            5,
+            18
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            95,
+            103
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            153,
+            160
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": [
+            202,
+            211
+          ],
+          "sha256": "24ed39f163d905c9b097fe794286ab881e044614f47ef21b1b20effc410564ca"
+        },
+        {
+          "path": "scripts/step28_optuna_control.py",
+          "lines": [
+            75,
+            103
+          ],
+          "sha256": "cb493dadabf2a43c3fe9967b995f8775892a1f837762826d8b35ba039d7e50de"
+        }
+      ],
+      "trigger_zh": "控制器导入阻塞，或 job 检查/建目录、成功 finally 的 ledger 落盘、失败 traceback/access/failure/ledger 保存发生较慢 I/O。",
+      "impact_zh": ":155 只事后回填启动导入耗时，导入时尚无 timer；:156–158 在回填后/charged 前，:206–211 在全部 charged 退出后，实际控制工作可未入 C 且无该段硬截止。正常成功也有 finally 写账，问题不依赖伪造输入或恶意调用；尚未实测发生超限。",
+      "minimum_change_zh": "只为现有控制器启动及最终/失败收尾补实际连续计费与剩余 C/共享/总额截止；失败状态仅允许留证和退出，不重新打开调度。Ledger.failed 会拒绝普通 interval，不能简单再套一次普通 charged；应明确有限收尾路径并记录真实超限费用，不清零、不借段。可以采用很小的外层启动/监督适配，不要求通用框架或永久服务。",
+      "disposition_zh": "正式控制器执行前关闭。核心互斥区间内的计时和子进程导入收费仍有效，不把该缺口扩大成所有预算逻辑无效。[E07,E13]",
+      "complete_finding_zh": "N08 / P2 / 正式控制器执行前 / 确认的控制计时与硬截止覆盖缺口\n标题：控制器启动和最终/失败收尾并非全部受 C 计费及硬截止约束。\n位置：step28_optuna_search.py:5–18,95–103,153–160,202–211；step28_optuna_control.py:75–103；包内唯一 CPU shell wrapper 不覆盖正式 search。\n触发：控制器导入阻塞，或 job 检查/建目录、成功 finally 的 ledger 落盘、失败 traceback/access/failure/ledger 保存发生较慢 I/O。\n影响：:155 只事后回填启动导入耗时，导入时尚无 timer；:156–158 在回填后/charged 前，:206–211 在全部 charged 退出后，实际控制工作可未入 C 且无该段硬截止。正常成功也有 finally 写账，问题不依赖伪造输入或恶意调用；尚未实测发生超限。\n最小修改：只为现有控制器启动及最终/失败收尾补实际连续计费与剩余 C/共享/总额截止；失败状态仅允许留证和退出，不重新打开调度。Ledger.failed 会拒绝普通 interval，不能简单再套一次普通 charged；应明确有限收尾路径并记录真实超限费用，不清零、不借段。可以采用很小的外层启动/监督适配，不要求通用框架或永久服务。\n处置：正式控制器执行前关闭。核心互斥区间内的计时和子进程导入收费仍有效，不把该缺口扩大成所有预算逻辑无效。[E07,E13]",
+      "blocks_current_authorized_targeted_implementation": false,
+      "blocks_native_execution": false,
+      "blocks_formal_acceptance": true,
+      "invalidates_existing_cpu_wall_charge": false,
+      "external_scientific_reproduction": false
+    }
+  ],
+  "cpu_evidence": {
+    "applicable_test_count": 7,
+    "outer_wall_seconds": 77.254095395,
+    "charged_seconds": 82,
+    "cap_seconds": 300,
+    "original_claimed_actual_optimizer_calls": 39,
+    "production_optimizer_steps": 39,
+    "independent_reference_optimizer_steps": 6,
+    "total_actual_cpu_optimizer_steps": 45,
+    "native_bge_gpu_calls": 0,
+    "formal_training_runs": 0,
+    "actual_cpu_six_call_arm": "H_pos",
+    "mocked_six_call_resource_and_shape_checks": true,
+    "source_files": 46,
+    "snapshots": 6,
+    "snapshot_files_each": 46,
+    "attempt02_failure_preserved": true,
+    "synthetic_feedback_slots": 36,
+    "synthetic_saved_analysis_slots": 45,
+    "synthetic_slots_are_training": false
+  },
+  "time_admission": {
+    "status": "NOT_ESTABLISHED",
+    "old_two_arm_projection_seconds": 38079.87608841504,
+    "new_two_run_cap_seconds": 18000,
+    "retained_model": "legacy_1.25_allowance1800",
+    "per_run_cap_seconds": 9000,
+    "shared_caps_seconds": {
+      "control": 300,
+      "evaluation": 2400,
+      "analysis": 600
+    },
+    "total_budget_seconds": 410400,
+    "old_actual_mean_or_cpu_seconds_are_not_admission": true,
+    "L_measurement_boundary_caveat_zh": "新 L 在 pretrained_archive 校验后开始；未来资格须明确覆盖该成本，不能仅因公式名相同宣称测量边界相同。"
+  },
+  "report_path": "report.zh.txt",
+  "evidence_index_path": "evidence_index.tsv",
+  "reading_scope_path": "reading_scope.json",
+  "mechanical_failures_path": "execution/failures.json"
+}

@@ -1,0 +1,771 @@
+- main [ref=e92]:
+  - generic:
+    - generic:
+      - generic:
+        - button "分享" [ref=e543] [cursor=pointer]
+        - button "切换摘要面板固定状态" [ref=e549] [cursor=pointer]
+        - button "更多" [ref=e555] [cursor=pointer]
+  - region "对话" [active] [ref=e568]:
+    - generic [ref=e569]:
+      - generic [ref=e578]:
+        - generic [ref=e579]:
+          - generic [ref=e580]:
+            - heading "你说：" [level=4] [ref=e581]
+            - generic [ref=e582]:
+              - generic [ref=e585]:
+                - button "optuna_implementation_review.zip" [ref=e586] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "optuna_implementation_review.zip"
+                    - generic: 文件
+              - generic [ref=e588]:
+                - generic [ref=e590]:
+                  - generic [ref=e591]:
+                    - generic [ref=e595]:
+                      - paragraph [ref=e596]: 本次已获用户明确批准：“提交外审”“批准该具体实现包静态外审”。请使用当前界面 GPT-6 / Pro 进行本轮静态实现外审。
+                      - paragraph [ref=e598]: 唯一附件 optuna_implementation_review.zip：2,011,821 字节，141 成员（140 载荷及 manifest.json），SHA256 52bad7b321d0fa77de36ae7126213da815ba968afeb7d2aa74699f282f373672。请先核对实际附件身份。此包未包含正式文本/标签原表、权重、Memory载荷或凭据。
+                      - paragraph [ref=e600]:
+                        - text: 上一轮静态方案外审会话为
+                        - link "https://chatgpt.com/c/6ad4c6f5-b954-83eb-b1e5-d393b3d31f19；完整返回材料和主审已放在附件中，无须跨会话索取资料。本轮不是重复方案审查，而是连同此前未送审的预算补充检查实际新实现与CPU证据。下面为包内" [ref=e601] [cursor=pointer]:
+                          - /url: https://chatgpt.com/c/6ad4c6f5-b954-83eb-b1e5-d393b3d31f19；完整返回材料和主审已放在附件中，无须跨会话索取资料。本轮不是重复方案审查，而是连同此前未送审的预算补充检查实际新实现与CPU证据。下面为包内
+                        - text: review_request.zh.txt 的完整请求：
+                      - paragraph [ref=e605]: 请对 S / S_pos / H_pos 三臂有限 Optuna 的实现作静态外审，承接本包所附上一轮方案审查，给出中文完整报告和逐项结构化 findings。你是外部审查者，主执行者将独立处置，不要求你追求通过。
+                      - paragraph [ref=e607]: 背景：本项目原 S 是完整 A0/A1、原 rank、历史监督0.1和D0教师0.5系统；H是固定半均值/半LogAvgExp pooling。固定 S_pos/H_pos 已完整运行，主要 S_pos−S 双域 raw MAP 门失败；结果外审确认运行有效，不应因局部旧A正向结果改变失败。用户要求三臂同额有限两参调优，并明确确认后再实施；现仅批准代码、Linux既有py310累计300秒手写CPU和必要部署。没有GPU、正式45次训练、新80群或本轮新数据权限。
+                      - paragraph [ref=e609]: 先读 reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt、budget_amendment.zh.txt、review/primary_disposition.zh.txt，以及同目录review/external/review/report.zh.txt/findings.json。原26成员静态外审没有收到本地预算补充和实施规格，本轮请明确审核它们与新源码的对应，不能称上一轮已经审过补充。再读 docs/SELLER_ALIAS_OPTUNA.zh.md、当前实现report.zh.txt、authorization.json和qualification/cpu_gate.json。
+                      - paragraph [ref=e611]: 当前新入口：scripts/step28_optuna.py（方法/TrialSpec/Memory）、step28_optuna_control.py（三sampler/选参/账）、step28_optuna_run.py（实际单run、九次集中评价）、step28_optuna_search.py（实际子进程/硬截止/许可/时间门）、step28_optuna_verify.py（手写CPU、待许可原生六调用、保存统计独立分析）。tests/test_step28_optuna.py是本轮受影响参考。两个旧公共文件的极小适配见implementation.diff；其余未变直接科学依赖一起提供，旧资格不冒称覆盖新行为。
+                      - paragraph [ref=e613]: 需要重点独立追踪：1. S是否为完整正式分支，lambda是否真正作用于current/history两视图而保持D0独立0.5；LR是否每步影响真实参数组/更新。独立参考是否能拒绝关键操作缺失。2. 三组训练随机根、固定划分/诊断根、默认锚点与新seed初始门、自身Memory/恢复/下一更新是否一致；非默认LR不要求错误的全Adam元数据相同。是否存在初始/最终分数兼容或实际入口未接通问题。3. 实际三study持续sampler、启动4点含真实锚点、后8点TPE、精确(U,mean,-number)选参、负U合法、失败/NaN/超时停止全项，是否被真实子进程完成和退出门落实。不能把mock的36反馈slot或45分析槽当训练。4. 搜索自身全盲完成再valid，九复验全部盲完成/退出再一次统一valid，45/37尝试账及七文件/C技术扫描边界是否正确。完整22指标、N/A、诊断、全部端点/角色、三seed与分组描述是否完整且不用于违规选择。5. 第一至第八复验退出后不继续算训练，控制等待不双计，集中九份全评价在共享E2400、控制C300、独立分析A600，各段与阶段/总账硬截止是否落到真实路径。失败不清零、资源/证据/权重生命周期是否遵循尚待未来具体批准的范围。6. 旧双臂保守投影38079.876秒明显不能放行新两次18000秒。当前保留旧1.25/1800模型，并从原生measurements重新计算；共享容量和新9000秒/114小时资格均未建立。不要用当前CPU计时或旧实际均值解除这个前提。若实现本身存在可绕过既定资源门的普通执行缺陷，请指出；不要求另建安全框架。7. 待许可原生6调用/臂是否足以分离lambda与LR、验证真实encoder/head梯度/参数/Adam及恢复后下一步；QB=336是fixture计数，真实只6调用。CPU六调用测试显式mock BGE/资源/tokenizer形状，不是原生证据。lambda初次Adam可能归一化掉参数差，故同时记录实际参数和要求梯度/Adam矩影响；LR-only梯度/矩应相同，实际参数更新需生效。是否有当前实质缺口。
+                      - paragraph [ref=e615]: 已有CPU事实：attempt01五项通过；attempt02新汇总缺ARMS名称失败；修复后的attempt03定向通过；attempt04小模型六调用流程通过；attempt05去重复目标计算后独立目标/VJP/LR通过；attempt06以不同seed结果和未定义指标补强汇总参考，通过且未改科学实现。当前7项适用证据、外层累计82/300秒，39个真实CPU小模型optimizer调用；GPU/BGE/正式0。47返回载荷加两份清单共49文件1422971字节、46来源已经回传核验。原件的进程内计时与完整外层不同，最终取外层，不追改失败。源码快照tar.gz可供静态查看/机械身份核对，全部只有源码/合同/许可；不含数据或权重。请核对CPU证据的真实适用边界，不因测试数量、哈希或PASS代替主审。
+                      - paragraph [ref=e617]: 外审执行边界：只对附件做静态阅读、文件身份/结构/保存字段及算术机械核对；不要执行项目科研代码、测试、载模、指标重算或bootstrap，手写样例也不在外部运行。科研实证仅Linux既有py310。不得索取/读取test、owners、private_custody、旧Memory或新留出，不上传Library或其他目的地；本次交付通过本会话回复和可下载文件即可。新80群/最终评价属于后续合同，不扩大为当前CPU实现阻断。不提无关分布式、全仓回归、自动恢复、更多超参数或额外候选要求。
+                      - paragraph [ref=e619]: 请给出：完整读过范围；F01—F08逐项最新判断；新缺陷的具体文件/位置/触发/影响/最小修改；哪些是实施前真正阻断，哪些仅在未来原生/正式/最终确认前成立；当前是否值得继续实现审查后申请原生资格；保留9000秒时间准入未建立的独立结论。回复中区别请求模型、界面可见身份与自述，不能证明后台路由时不要编造。保存实际机械失败，不静默删除失败记录。返回完整中文report、findings、必要可复核证据和清单，勿仅给摘要或只有PASS。
+                    - generic [aria-hidden] [ref=e620]: …
+                  - button "显示更多" [ref=e621] [cursor=pointer]
+                - generic [ref=e627]:
+                  - button "复制消息" [ref=e629] [cursor=pointer]
+                  - button "共享提示" [ref=e633] [cursor=pointer]
+                  - button "编辑消息" [ref=e637] [cursor=pointer]
+          - generic [ref=e645]:
+            - button "思考了 44m 10s" [ref=e646] [cursor=pointer]
+            - generic: 思考了 44m 10s
+          - generic [ref=e648]:
+            - heading "ChatGPT 说：" [level=4] [ref=e649]
+            - generic [ref=e651]:
+              - generic [ref=e652]:
+                - paragraph [ref=e653]:
+                  - strong [ref=e654]: 已完成静态实现外审。结论是：值得继续定向修正，并在独立主审后申请原定六调用原生资格；当前不宜整包验收为“实现无开放问题”，更不能据此放行正式 45 次训练。
+                - paragraph [ref=e655]:
+                  - text: 主科学接线成立，但发现
+                  - strong [ref=e656]: 8 项需要分阶段处置的问题
+                  - text: 。其中，原生执行前应补回实际可用磁盘检查；正式执行前仍有资源检查、异常释放、控制计时、既定输出和证据对应方面的缺口。
+                  - strong [ref=e657]: 9000 秒单次、114 小时总账及共享阶段容量尚未建立资格的结论，独立保留。
+                - heading "完整交付" [level=2] [ref=e658]
+                - list [ref=e659]:
+                  - listitem [ref=e660]:
+                    - strong [ref=e661]: 完整返回包：
+                    - button "下载 optuna_implementation_static_review_20261018.zip" [ref=e664] [cursor=pointer]:
+                      - generic [ref=e665]: optuna_implementation_static_review_20261018.zip
+                  - listitem [ref=e672]:
+                    - strong [ref=e673]: 完整中文报告：
+                    - button "打开 report.zh.txt 的预览" [ref=e676] [cursor=pointer]:
+                      - generic [ref=e677]: report.zh.txt
+                  - listitem [ref=e684]:
+                    - strong [ref=e685]: 逐项结构化意见：
+                    - button "打开 findings.json 的预览" [ref=e688] [cursor=pointer]:
+                      - generic [ref=e689]: findings.json
+                  - listitem [ref=e695]:
+                    - strong [ref=e696]: 证据定位与源码摘录：
+                    - button "打开 evidence_index.tsv 的预览" [ref=e699] [cursor=pointer]:
+                      - generic [ref=e700]: evidence_index.tsv
+                    - text: 、
+                    - button "打开 source_extracts.zh.txt 的预览" [ref=e706] [cursor=pointer]:
+                      - generic [ref=e707]: source_extracts.zh.txt
+                  - listitem [ref=e714]:
+                    - strong [ref=e715]: 实际阅读范围：
+                    - button "打开 reading_scope.json 的预览" [ref=e718] [cursor=pointer]:
+                      - generic [ref=e719]: reading_scope.json
+                  - listitem [ref=e725]:
+                    - strong [ref=e726]: 返回包身份与完整成员清单：
+                    - button "打开 optuna_implementation_static_review_20261018.identity.json 的预览" [ref=e729] [cursor=pointer]:
+                      - generic [ref=e730]: optuna_implementation_static_review_20261018.identity.json
+                    - text: 、
+                    - button "打开 optuna_implementation_static_review_20261018.members.tsv 的预览" [ref=e738] [cursor=pointer]:
+                      - generic [ref=e739]: optuna_implementation_static_review_20261018.members.tsv
+                - paragraph [ref=e743]:
+                  - text: 返回 ZIP 为
+                  - strong [ref=e744]: 297,884 字节、58 成员
+                  - text: ，SHA256：
+                - generic [ref=e746]:
+                  - generic [ref=e747]:
+                    - generic [ref=e750]: 纯文本
+                    - generic [ref=e751]:
+                      - button "启用自动换行" [ref=e753] [cursor=pointer]
+                      - button "复制代码" [ref=e757] [cursor=pointer]
+                  - code [ref=e761]: f7632fd38f714f0634d013e19b890152a8f1a5d9604268081383927c400bd216
+                - paragraph [ref=e762]: 内部载荷大小、SHA256、成员对应和 ZIP CRC 最终核对通过。包中包含完整报告、F01—F08 最新状态、N01—N08、51 条证据索引、CPU 原件与快照适用映射、机械程序及实际失败记录。
+                - heading "1. 附件身份与审查边界" [level=2] [ref=e763]
+                - paragraph [ref=e764]: 实际附件与指定身份完全一致：
+                - generic [ref=e765]:
+                  - table [ref=e768]:
+                    - rowgroup [ref=e769]:
+                      - row "项目 实际核对结果" [ref=e770]:
+                        - columnheader "项目" [ref=e771]
+                        - columnheader "实际核对结果" [ref=e772]
+                    - rowgroup [ref=e773]:
+                      - row "文件 optuna_implementation_review.zip" [ref=e774]:
+                        - cell "文件" [ref=e775]
+                        - cell "optuna_implementation_review.zip" [ref=e776]
+                      - row "大小 2,011,821 字节" [ref=e777]:
+                        - cell "大小" [ref=e778]
+                        - cell "2,011,821 字节" [ref=e779]:
+                          - strong [ref=e780]: 2,011,821 字节
+                      - row "SHA256 52bad7b321d0fa77de36ae7126213da815ba968afeb7d2aa74699f282f373672" [ref=e781]:
+                        - cell "SHA256" [ref=e782]
+                        - cell "52bad7b321d0fa77de36ae7126213da815ba968afeb7d2aa74699f282f373672" [ref=e783]
+                      - row "ZIP 成员 141" [ref=e784]:
+                        - cell "ZIP 成员" [ref=e785]
+                        - cell "141" [ref=e786]:
+                          - strong [ref=e787]: "141"
+                      - row "载荷 140 份，另加 manifest.json" [ref=e788]:
+                        - cell "载荷" [ref=e789]
+                        - cell "140 份，另加 manifest.json" [ref=e790]:
+                          - strong [ref=e791]: 140 份，另加 manifest.json
+                      - row "载荷清单 140 份大小及 SHA256 全部匹配" [ref=e792]:
+                        - cell "载荷清单" [ref=e793]
+                        - cell "140 份大小及 SHA256 全部匹配" [ref=e794]:
+                          - strong [ref=e795]: 140 份大小及 SHA256 全部匹配
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e796]:
+                  - text: 没有用旧包或跨会话材料替代本附件。完整身份结果见
+                  - button "打开 input_identity.json 的预览" [ref=e799] [cursor=pointer]:
+                    - generic [ref=e800]: input_identity.json
+                  - text: 。
+                - paragraph [ref=e806]:
+                  - text: 本轮只做静态阅读、文件身份/结构、源码快照对应、保存字段及计数和预算算术检查。
+                  - strong [ref=e807]: 没有执行项目代码、测试、手写科研样例、载模、指标重算或 bootstrap，没有连接项目 Linux，也没有读取受禁数据。
+                - paragraph [ref=e808]: 模型身份也作了明确区分：
+                - list [ref=e809]:
+                  - listitem [ref=e810]: "**用户请求：**当前界面 GPT-6 / Pro。"
+                  - listitem [ref=e811]: "**环境自述：**GPT-6 Astra Pro。"
+                  - listitem [ref=e812]: "**独立观察：**本轮没有直接观察模型选择器，也没有可验证后台路由的证据，因此不声称证明了界面档位或后台实际路由。"
+                  - listitem [ref=e813]: 本轮使用了三个会话内辅助静态审查分工；主审完整阅读五个新入口、当前测试及关键合同，并独立裁决保留的 findings。没有把这次审查描述为单实例独审。
+                - heading "2. 主科学实现：哪些已经成立" [level=2] [ref=e814]
+                - heading "完整 S、四处 lambda 与独立 D0" [level=3] [ref=e815]
+                - paragraph [ref=e816]: step28_optuna.py 的 S 正式路径调用原 ranking.objectives(..., .5)，不是用资格测试里的 old_rank 开关代替正式身份。S/S_pos 使用原均值评分，H_pos 使用固定半均值/半 LogAvgExp。
+                - paragraph [ref=e817]: 每视图监督项实际为：
+                - generic [ref=e820]:
+                  - math [ref=e822]:
+                    - generic [ref=e824]:
+                      - generic [ref=e825]:
+                        - generic [ref=e826]: B
+                        - generic [ref=e827]: v
+                      - generic [ref=e828]: =
+                      - generic [ref=e829]:
+                        - generic [ref=e830]:
+                          - generic [ref=e831]: B
+                          - generic [ref=e832]: C
+                          - generic [ref=e833]: E
+                        - generic [ref=e834]: v
+                      - generic [ref=e835]: +
+                      - generic [ref=e836]:
+                        - generic [ref=e837]: λ
+                        - generic [ref=e838]:
+                          - generic [ref=e839]: r
+                          - generic [ref=e840]: a
+                          - generic [ref=e841]: "n"
+                          - generic [ref=e842]: k
+                      - generic [ref=e843]:
+                        - generic [ref=e844]: R
+                        - generic [ref=e845]: v
+                      - generic [ref=e846]: +
+                      - generic [ref=e847]: "0.5"
+                      - generic [ref=e848]:
+                        - generic [ref=e849]: H
+                        - generic [ref=e850]: v
+                  - generic [aria-hidden] [ref=e851]:
+                    - generic [ref=e852]:
+                      - generic [ref=e853]:
+                        - text: B
+                        - generic [ref=e854]: v
+                      - text: =
+                    - generic [ref=e862]:
+                      - generic [ref=e863]:
+                        - generic [ref=e864]: BCE
+                        - generic [ref=e865]: v
+                      - text: +
+                    - generic [ref=e873]:
+                      - generic [ref=e874]:
+                        - text: λ
+                        - generic [ref=e875]: rank
+                      - generic [ref=e885]:
+                        - text: R
+                        - generic [ref=e886]: v
+                      - text: +
+                    - generic [ref=e894]:
+                      - text: "0.5"
+                      - generic [ref=e895]:
+                        - text: H
+                        - generic [ref=e896]: v
+                - paragraph [ref=e904]: A 阶段使用 current 两视图均值；B 阶段为：
+                - generic [ref=e907]:
+                  - math [ref=e909]:
+                    - generic [ref=e911]:
+                      - generic [ref=e912]:
+                        - generic [ref=e913]: J
+                        - generic [ref=e914]: B
+                      - generic [ref=e915]: =
+                      - generic [ref=e916]:
+                        - generic [ref=e917]:
+                          - generic [ref=e918]
+                          - generic [ref=e923]: +
+                          - generic [ref=e924]
+                        - generic [ref=e929]: "2"
+                      - generic [ref=e930]: +
+                      - generic [ref=e931]: "0.1"
+                      - generic [ref=e932]:
+                        - generic [ref=e933]:
+                          - generic [ref=e934]
+                          - generic [ref=e939]: +
+                          - generic [ref=e940]
+                        - generic [ref=e945]: "2"
+                      - generic [ref=e946]: +
+                      - generic [ref=e947]: "0.5"
+                      - generic [ref=e948]:
+                        - generic [ref=e949]: D
+                        - generic [ref=e950]: "0"
+                  - generic [aria-hidden] [ref=e951]:
+                    - generic [ref=e952]:
+                      - generic [ref=e953]:
+                        - text: J
+                        - generic [ref=e954]: B
+                      - text: =
+                    - generic [ref=e962]:
+                      - generic [ref=e967]:
+                        - generic [ref=e968]: "2"
+                        - generic [ref=e970]:
+                          - generic [ref=e971]
+                          - text: +
+                          - generic [ref=e981]
+                      - text: +
+                    - generic [ref=e994]:
+                      - text: "0.1"
+                      - generic [ref=e999]:
+                        - generic [ref=e1000]: "2"
+                        - generic [ref=e1002]:
+                          - generic [ref=e1003]
+                          - text: +
+                          - generic [ref=e1013]
+                      - text: +
+                    - generic [ref=e1026]:
+                      - text: "0.5"
+                      - generic [ref=e1027]:
+                        - text: D
+                        - generic [ref=e1028]: "0"
+                - paragraph [ref=e1036]: 因此，lambda 确实进入 current/history 的四处 rank，历史监督 0.1 与教师 0.5 分别计算，D0 没有被 lambda 连带缩放。独立 CPU 参考对目标、VJP、encoder/head 梯度、参数和 Adam 作了比较，并包含关键遗漏负例。
+                - heading "LR 确实作用于实际更新" [level=3] [ref=e1037]
+                - paragraph [ref=e1038]: 实际参数组在每次更新前赋值为：
+                - list [ref=e1039]:
+                  - listitem [ref=e1040]: encoder：m × 1e-5 × f(t)；
+                  - listitem [ref=e1041]: head：m × 0.001；
+                  - listitem [ref=e1042]: t=1…288，阶段内重置日程；
+                  - listitem [ref=e1043]: 第 288 步 encoder LR 为 0，head 仍非零。
+                - paragraph [ref=e1044]: 这条赋值后面接真实反向、clip 和 optimizer.step()。非默认 LR 的空 Adam 参数组元数据可以与默认不同；新初始门没有错误要求它们的完整序列化身份都等于旧默认。
+                - heading "随机根、Memory 和恢复接线一致" [level=3] [ref=e1045]
+                - generic [ref=e1046]:
+                  - table [ref=e1049]:
+                    - rowgroup [ref=e1050]:
+                      - row "运行 初始化根 schedule/dropout/regroup 根 Memory 留存/抽样根" [ref=e1051]:
+                        - columnheader "运行" [ref=e1052]
+                        - columnheader "初始化根" [ref=e1053]
+                        - columnheader "schedule/dropout/regroup 根" [ref=e1054]
+                        - columnheader "Memory 留存/抽样根" [ref=e1055]
+                    - rowgroup [ref=e1056]:
+                      - row "搜索 s0 20260909 20260918 20260930" [ref=e1057]:
+                        - cell "搜索 s0" [ref=e1058]
+                        - cell "20260909" [ref=e1059]
+                        - cell "20260918" [ref=e1060]
+                        - cell "20260930" [ref=e1061]
+                      - row "rep1 2026101901 2026102901 2026103901" [ref=e1062]:
+                        - cell "rep1" [ref=e1063]
+                        - cell "2026101901" [ref=e1064]
+                        - cell "2026102901" [ref=e1065]
+                        - cell "2026103901" [ref=e1066]
+                      - row "rep2 2026101902 2026102902 2026103902" [ref=e1067]:
+                        - cell "rep2" [ref=e1068]
+                        - cell "2026101902" [ref=e1069]
+                        - cell "2026102902" [ref=e1070]
+                        - cell "2026103902" [ref=e1071]
+                      - row "rep3 2026101903 2026102903 2026103903" [ref=e1072]:
+                        - cell "rep3" [ref=e1073]
+                        - cell "2026101903" [ref=e1074]
+                        - cell "2026102903" [ref=e1075]
+                        - cell "2026103903" [ref=e1076]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1077]: 划分根固定为 20260918，诊断扰动根为 20261008，开发统计根为 20260930。配置实际传入 loader、schedule 和更新路径；Memory 保存自身规格与未来抽样状态，正式恢复拒绝其他 run 身份。
+                - paragraph [ref=e1078]:
+                  - text: 默认锚点初始门和最终 raw 分数比较都接到了实际入口，
+                  - strong [ref=e1079]: 但实际 BGE 初始/端点兼容尚未运行验证
+                  - text: 。另有 N07 的旧正例锚点来源绑定缺口，不能因比较函数存在就宣布正式兼容已通过。
+                - paragraph [ref=e1080]:
+                  - text: 以上具体接线、测试和依赖位置见
+                  - button "打开 source_extracts.zh.txt 的预览" [ref=e1083] [cursor=pointer]:
+                    - generic [ref=e1084]: source_extracts.zh.txt
+                  - text: 的 E03、E04、E09、E12。
+                - heading "3. 新发现的八项问题" [level=2] [ref=e1091]
+                - paragraph [ref=e1092]:
+                  - text: 下表中的“阶段”是需要关闭问题的时间点，
+                  - strong [ref=e1093]: 不是把所有未来条件追溯成当前 CPU 运行无效
+                  - text: 。N02 为 P1，其余为 P2；完整触发、影响、最小修改和源码身份均写入
+                  - button "打开 findings.json 的预览" [ref=e1096] [cursor=pointer]:
+                    - generic [ref=e1097]: findings.json
+                  - text: 。
+                - generic [ref=e1103]:
+                  - table [ref=e1106]:
+                    - rowgroup [ref=e1107]:
+                      - row "ID 具体问题与位置 触发、影响和最小处置" [ref=e1108]:
+                        - columnheader "ID" [ref=e1109]
+                        - columnheader "具体问题与位置" [ref=e1110]
+                        - columnheader "触发、影响和最小处置" [ref=e1111]
+                    - rowgroup [ref=e1112]:
+                      - row "N01 原生路径遗漏实际空闲磁盘检查。 step28_optuna_verify.py:85–103,229–235；对照旧 positive_ranking_verify.py:55–60、g_half_verify.py:113–120。 新路径只检查已用文件加 reserve 是否超过 10 GiB，没有保留真实 free 检查。磁盘不足时可先进入原生，实际保存量无法容纳时才失败。原生执行前恢复旧 free≥10 GiB 预检及 disk_reserve 的 free≥reserve 检查。没有观察到现场磁盘不足。" [ref=e1113]:
+                        - cell "N01" [ref=e1114]:
+                          - strong [ref=e1115]: N01
+                        - cell "原生路径遗漏实际空闲磁盘检查。 step28_optuna_verify.py:85–103,229–235；对照旧 positive_ranking_verify.py:55–60、g_half_verify.py:113–120。" [ref=e1116]:
+                          - strong [ref=e1117]: 原生路径遗漏实际空闲磁盘检查。
+                          - text: step28_optuna_verify.py:85–103,229–235；对照旧 positive_ranking_verify.py:55–60、g_half_verify.py:113–120。
+                        - cell "新路径只检查已用文件加 reserve 是否超过 10 GiB，没有保留真实 free 检查。磁盘不足时可先进入原生，实际保存量无法容纳时才失败。原生执行前恢复旧 free≥10 GiB 预检及 disk_reserve 的 free≥reserve 检查。没有观察到现场磁盘不足。" [ref=e1118]:
+                          - text: 新路径只检查已用文件加 reserve 是否超过 10 GiB，没有保留真实 free 检查。磁盘不足时可先进入原生，实际保存量无法容纳时才失败。
+                          - strong [ref=e1119]: 原生执行前
+                          - text: 恢复旧 free≥10 GiB 预检及 disk_reserve 的 free≥reserve 检查。没有观察到现场磁盘不足。
+                      - row "N02 集中评价和独立分析未接输出、证据及 RSS 门。 step28_optuna_run.py:70–82,237–300；step28_optuna_search.py:195–205；step28_optuna_verify.py:215–216。 第九 run 退出后，其 Budget 已结束。E/A 只有时间和退出监督，写入更多评价时可能超过 64 GiB 输出、2 GiB 证据或 RSS 限制，仍进入整体 COMPLETE。正式执行前在 E/A 真实进程复用 campaign 资源检查，并在整体完成前检查。E2400/A600 时间截止本身已经存在。" [ref=e1120]:
+                        - cell "N02" [ref=e1121]:
+                          - strong [ref=e1122]: N02
+                        - cell "集中评价和独立分析未接输出、证据及 RSS 门。 step28_optuna_run.py:70–82,237–300；step28_optuna_search.py:195–205；step28_optuna_verify.py:215–216。" [ref=e1123]:
+                          - strong [ref=e1124]: 集中评价和独立分析未接输出、证据及 RSS 门。
+                          - text: step28_optuna_run.py:70–82,237–300；step28_optuna_search.py:195–205；step28_optuna_verify.py:215–216。
+                        - cell "第九 run 退出后，其 Budget 已结束。E/A 只有时间和退出监督，写入更多评价时可能超过 64 GiB 输出、2 GiB 证据或 RSS 限制，仍进入整体 COMPLETE。正式执行前在 E/A 真实进程复用 campaign 资源检查，并在整体完成前检查。E2400/A600 时间截止本身已经存在。" [ref=e1125]:
+                          - text: 第九 run 退出后，其 Budget 已结束。E/A 只有时间和退出监督，写入更多评价时可能超过 64 GiB 输出、2 GiB 证据或 RSS 限制，仍进入整体 COMPLETE。
+                          - strong [ref=e1126]: 正式执行前
+                          - text: 在 E/A 真实进程复用 campaign 资源检查，并在整体完成前检查。E2400/A600 时间截止本身已经存在。
+                      - row "N03 异常清理只等待组长，没有确认同组 workers 全部退出。 step28_optuna_search.py:106–130,171–178。 成功路径扫描整个进程组；异常路径 killpg 后只 child.wait()。有 worker 时，区间可能在全部释放前结束。正式调度前补有界的进程组释放观察，保留清理费用和残留状态。全项停止本身正确，未发现自动补抽。" [ref=e1127]:
+                        - cell "N03" [ref=e1128]:
+                          - strong [ref=e1129]: N03
+                        - cell "异常清理只等待组长，没有确认同组 workers 全部退出。 step28_optuna_search.py:106–130,171–178。" [ref=e1130]:
+                          - strong [ref=e1131]: 异常清理只等待组长，没有确认同组 workers 全部退出。
+                          - text: step28_optuna_search.py:106–130,171–178。
+                        - cell "成功路径扫描整个进程组；异常路径 killpg 后只 child.wait()。有 worker 时，区间可能在全部释放前结束。正式调度前补有界的进程组释放观察，保留清理费用和残留状态。全项停止本身正确，未发现自动补抽。" [ref=e1132]:
+                          - text: 成功路径扫描整个进程组；异常路径 killpg 后只 child.wait()。有 worker 时，区间可能在全部释放前结束。
+                          - strong [ref=e1133]: 正式调度前
+                          - text: 补有界的进程组释放观察，保留清理费用和残留状态。全项停止本身正确，未发现自动补抽。
+                      - row "N04 两个冻结输出缺项。 proposal.zh.txt:52,70；step28_optuna_run.py:303–351。 当前汇总只生成两个候选对 S，缺少 H_pos−S_pos 描述性次级比较；各 run 有诊断，但缺少三固定 seed 的诊断汇总。正式完整评价前用已有保存结果补齐，不新增捕获、选择门或独立样本。" [ref=e1134]:
+                        - cell "N04" [ref=e1135]:
+                          - strong [ref=e1136]: N04
+                        - cell "两个冻结输出缺项。 proposal.zh.txt:52,70；step28_optuna_run.py:303–351。" [ref=e1137]:
+                          - strong [ref=e1138]: 两个冻结输出缺项。
+                          - text: proposal.zh.txt:52,70；step28_optuna_run.py:303–351。
+                        - cell "当前汇总只生成两个候选对 S，缺少 H_pos−S_pos 描述性次级比较；各 run 有诊断，但缺少三固定 seed 的诊断汇总。正式完整评价前用已有保存结果补齐，不新增捕获、选择门或独立样本。" [ref=e1139]:
+                          - text: 当前汇总只生成两个候选对 S，缺少
+                          - strong [ref=e1140]: H_pos−S_pos 描述性次级比较
+                          - text: ；各 run 有诊断，但缺少
+                          - strong [ref=e1141]: 三固定 seed 的诊断汇总
+                          - text: 。
+                          - strong [ref=e1142]: 正式完整评价前
+                          - text: 用已有保存结果补齐，不新增捕获、选择门或独立样本。
+                      - row "N05 独立分析未把实际反馈与 B raw MAP 来源闭合。 step28_optuna_verify.py:25–30,52–64,79–82。 分析复用 select_trial，检查 selected 与 search 账自洽，却没有从已载入 B raw 矩阵独立重建每个 D_A/D_B 并对照真实反馈。错源但自洽的反馈可漏检。当前生产取 B raw MAP 的代码正确，未发现已发生错源。正式反馈/分析验收前补这一对应。" [ref=e1143]:
+                        - cell "N05" [ref=e1144]:
+                          - strong [ref=e1145]: N05
+                        - cell "独立分析未把实际反馈与 B raw MAP 来源闭合。 step28_optuna_verify.py:25–30,52–64,79–82。" [ref=e1146]:
+                          - strong [ref=e1147]: 独立分析未把实际反馈与 B raw MAP 来源闭合。
+                          - text: step28_optuna_verify.py:25–30,52–64,79–82。
+                        - cell "分析复用 select_trial，检查 selected 与 search 账自洽，却没有从已载入 B raw 矩阵独立重建每个 D_A/D_B 并对照真实反馈。错源但自洽的反馈可漏检。当前生产取 B raw MAP 的代码正确，未发现已发生错源。正式反馈/分析验收前补这一对应。" [ref=e1148]:
+                          - text: 分析复用 select_trial，检查 selected 与 search 账自洽，却没有从已载入 B raw 矩阵独立重建每个 D_A/D_B 并对照真实反馈。错源但自洽的反馈可漏检。当前生产取 B raw MAP 的代码正确，未发现已发生错源。
+                          - strong [ref=e1149]: 正式反馈/分析验收前
+                          - text: 补这一对应。
+                      - row "N06 39 次的口径遗漏独立参考更新。 当前报告第 35 行、cpu_gate.json:356、tests/test_step28_optuna.py:86。 **39 次是生产路径，另有 6 次真实独立参考 ob.step()，总计 45 次 CPU AdamW.step。**全部已包含在 82 秒外层账里。当前报告应纠正为 39/6/45 分类，保留原件，不需要补跑。" [ref=e1150]:
+                        - cell "N06" [ref=e1151]:
+                          - strong [ref=e1152]: N06
+                        - cell "39 次的口径遗漏独立参考更新。 当前报告第 35 行、cpu_gate.json:356、tests/test_step28_optuna.py:86。" [ref=e1153]:
+                          - strong [ref=e1154]: 39 次的口径遗漏独立参考更新。
+                          - text: 当前报告第 35 行、cpu_gate.json:356、tests/test_step28_optuna.py:86。
+                        - cell "**39 次是生产路径，另有 6 次真实独立参考 ob.step()，总计 45 次 CPU AdamW.step。**全部已包含在 82 秒外层账里。当前报告应纠正为 39/6/45 分类，保留原件，不需要补跑。" [ref=e1155]:
+                          - text: "**39 次是生产路径，另有 6 次真实独立参考 ob.step()，总计 45 次 CPU AdamW.step。**全部已包含在 82 秒外层账里。"
+                          - strong [ref=e1156]: 当前报告应纠正
+                          - text: 为 39/6/45 分类，保留原件，不需要补跑。
+                      - row "N07 两个正例锚点的历史 manifest 缺外部冻结身份。 step28_optuna_run.py:168–178，结合 sources():33–51 和旧 baseline 链。 当前验证 raw 数组与其历史 manifest 内部 receipt 自洽，但该正例 manifest 本身没有绑定到已审定版本。旧 52 来源链和固定 S0 summary 不能自动覆盖它。正式锚点前固定旧 manifest 或四份 A/B raw receipt 的大小/SHA。未发现实际错误文件或分数不兼容。" [ref=e1157]:
+                        - cell "N07" [ref=e1158]:
+                          - strong [ref=e1159]: N07
+                        - cell "两个正例锚点的历史 manifest 缺外部冻结身份。 step28_optuna_run.py:168–178，结合 sources():33–51 和旧 baseline 链。" [ref=e1160]:
+                          - strong [ref=e1161]: 两个正例锚点的历史 manifest 缺外部冻结身份。
+                          - text: step28_optuna_run.py:168–178，结合 sources():33–51 和旧 baseline 链。
+                        - cell "当前验证 raw 数组与其历史 manifest 内部 receipt 自洽，但该正例 manifest 本身没有绑定到已审定版本。旧 52 来源链和固定 S0 summary 不能自动覆盖它。正式锚点前固定旧 manifest 或四份 A/B raw receipt 的大小/SHA。未发现实际错误文件或分数不兼容。" [ref=e1162]:
+                          - text: 当前验证 raw 数组与其历史 manifest 内部 receipt 自洽，但该正例 manifest 本身没有绑定到已审定版本。旧 52 来源链和固定 S0 summary 不能自动覆盖它。
+                          - strong [ref=e1163]: 正式锚点前
+                          - text: 固定旧 manifest 或四份 A/B raw receipt 的大小/SHA。未发现实际错误文件或分数不兼容。
+                      - row "N08 控制器启动、最终和失败收尾存在计费/硬截止空档。 step28_optuna_search.py:5–18,153–160,202–211。 导入耗时只是事后回填 C，导入期间没有 timer；建目录在回填后、charged 前；最终/失败落盘在所有 charged 之外。包内没有正式外层 wrapper 覆盖。正式控制器执行前给这些既有区段补有限计费及截止；失败状态只留证和退出，不重新启动调度。" [ref=e1164]:
+                        - cell "N08" [ref=e1165]:
+                          - strong [ref=e1166]: N08
+                        - cell "控制器启动、最终和失败收尾存在计费/硬截止空档。 step28_optuna_search.py:5–18,153–160,202–211。" [ref=e1167]:
+                          - strong [ref=e1168]: 控制器启动、最终和失败收尾存在计费/硬截止空档。
+                          - text: step28_optuna_search.py:5–18,153–160,202–211。
+                        - cell "导入耗时只是事后回填 C，导入期间没有 timer；建目录在回填后、charged 前；最终/失败落盘在所有 charged 之外。包内没有正式外层 wrapper 覆盖。正式控制器执行前给这些既有区段补有限计费及截止；失败状态只留证和退出，不重新启动调度。" [ref=e1169]:
+                          - text: 导入耗时只是事后回填 C，导入期间没有 timer；建目录在回填后、charged 前；最终/失败落盘在所有 charged 之外。包内没有正式外层 wrapper 覆盖。
+                          - strong [ref=e1170]: 正式控制器执行前
+                          - text: 给这些既有区段补有限计费及截止；失败状态只留证和退出，不重新启动调度。
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1171]: N03 与 N08 是两件事：前者涉及子进程组退出，后者即使没有任何 worker，也存在控制器自身的未覆盖工作。
+                - heading "4. F01—F08 最新判断" [level=2] [ref=e1172]
+                - generic [ref=e1173]:
+                  - table [ref=e1176]:
+                    - rowgroup [ref=e1177]:
+                      - row "原 finding 本轮判断" [ref=e1178]:
+                        - columnheader "原 finding" [ref=e1179]
+                        - columnheader "本轮判断" [ref=e1180]
+                    - rowgroup [ref=e1181]:
+                      - row "F01 随机根、身份、Memory 与恢复主接线满足静态及适用 CPU 要求。真实 BGE/default 端点兼容待后续；N07 在正式锚点前关闭。" [ref=e1182]:
+                        - cell "F01" [ref=e1183]:
+                          - strong [ref=e1184]: F01
+                        - cell "随机根、身份、Memory 与恢复主接线满足静态及适用 CPU 要求。真实 BGE/default 端点兼容待后续；N07 在正式锚点前关闭。" [ref=e1185]
+                      - row "F02 完整 S、四处 lambda、独立 D0、实际 LR 与独立 CPU 参考成立。六调用设计可用；真实原生证据未取得，N01 原生前修复。" [ref=e1186]:
+                        - cell "F02" [ref=e1187]:
+                          - strong [ref=e1188]: F02
+                        - cell "完整 S、四处 lambda、独立 D0、实际 LR 与独立 CPU 参考成立。六调用设计可用；真实原生证据未取得，N01 原生前修复。" [ref=e1189]
+                      - row "F03 持续三 sampler、锚点占真实 slot、后八点 TPE、精确选择、负 U 与失败停止主体成立。N03、N05 仍开放。" [ref=e1190]:
+                        - cell "F03" [ref=e1191]:
+                          - strong [ref=e1192]: F03
+                        - cell "持续三 sampler、锚点占真实 slot、后八点 TPE、精确选择、负 U 与失败停止主体成立。N03、N05 仍开放。" [ref=e1193]
+                      - row "F04 搜索自身盲完成再 valid、九复验共同盲完成/退出后统一 valid、45/37 尝试账已接通。全评价大体完整，N04 缺项不能标关闭。" [ref=e1194]:
+                        - cell "F04" [ref=e1195]:
+                          - strong [ref=e1196]: F04
+                        - cell "搜索自身盲完成再 valid、九复验共同盲完成/退出后统一 valid、45/37 尝试账已接通。全评价大体完整，N04 缺项不能标关闭。" [ref=e1197]
+                      - row "F05 **本轮首次审核预算补充和实施规格。**活动区间内的互斥计费、预留和截止主体成立；N02、N03、N08 阻止“资源与退出计时全部闭合”的结论。" [ref=e1198]:
+                        - cell "F05" [ref=e1199]:
+                          - strong [ref=e1200]: F05
+                        - cell "**本轮首次审核预算补充和实施规格。**活动区间内的互斥计费、预留和截止主体成立；N02、N03、N08 阻止“资源与退出计时全部闭合”的结论。" [ref=e1201]
+                      - row "F06 **9000 秒与 114 小时时间准入独立未建立。**当前 CPU、旧 PASS、旧实际均值都不能关闭。" [ref=e1202]:
+                        - cell "F06" [ref=e1203]:
+                          - strong [ref=e1204]: F06
+                        - cell "**9000 秒与 114 小时时间准入独立未建立。**当前 CPU、旧 PASS、旧实际均值都不能关闭。" [ref=e1205]
+                      - row "F07 新 80 群及最终独立确认仅属后续合同，不扩大为当前 CPU 实现阻断。" [ref=e1206]:
+                        - cell "F07" [ref=e1207]:
+                          - strong [ref=e1208]: F07
+                        - cell "新 80 群及最终独立确认仅属后续合同，不扩大为当前 CPU 实现阻断。" [ref=e1209]
+                      - row "F08 保留有限开发探索的解释边界。旧固定运行有效、主要门失败不变；局部旧 A 正向及未来六格全正都不能替代最终独立确认。" [ref=e1210]:
+                        - cell "F08" [ref=e1211]:
+                          - strong [ref=e1212]: F08
+                        - cell "保留有限开发探索的解释边界。旧固定运行有效、主要门失败不变；局部旧 A 正向及未来六格全正都不能替代最终独立确认。" [ref=e1213]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1214]:
+                  - text: 对应的完整逐项理由见
+                  - button "打开 report.zh.txt 的预览" [ref=e1217] [cursor=pointer]:
+                    - generic [ref=e1218]: report.zh.txt
+                  - text: 第三节。
+                - heading "5. CPU 证据：可接受的事实与必须纠正的口径" [level=2] [ref=e1225]
+                - paragraph [ref=e1226]: 六次外层时间及收费与保存记录对应：
+                - generic [ref=e1227]:
+                  - table [ref=e1230]:
+                    - rowgroup [ref=e1231]:
+                      - row "Attempt 外层秒数 本次计费 累计 结果及边界" [ref=e1232]:
+                        - columnheader "Attempt" [ref=e1233]
+                        - columnheader "外层秒数" [ref=e1234]
+                        - columnheader "本次计费" [ref=e1235]
+                        - columnheader "累计" [ref=e1236]
+                        - columnheader "结果及边界" [ref=e1237]
+                    - rowgroup [ref=e1238]:
+                      - row "01 13.257703867 14 14 五项通过" [ref=e1239]:
+                        - cell "01" [ref=e1240]
+                        - cell "13.257703867" [ref=e1241]
+                        - cell "14" [ref=e1242]
+                        - cell "14" [ref=e1243]
+                        - cell "五项通过" [ref=e1244]
+                      - row "02 16.275620304 17 31 Optuna 控制通过；汇总缺 ARMS，失败保留" [ref=e1245]:
+                        - cell "02" [ref=e1246]
+                        - cell "16.275620304" [ref=e1247]
+                        - cell "17" [ref=e1248]
+                        - cell "31" [ref=e1249]
+                        - cell "Optuna 控制通过；汇总缺 ARMS，失败保留" [ref=e1250]
+                      - row "03 20.046096401 21 52 ARMS 修复后的汇总/分析定向通过" [ref=e1251]:
+                        - cell "03" [ref=e1252]
+                        - cell "20.046096401" [ref=e1253]
+                        - cell "21" [ref=e1254]
+                        - cell "52" [ref=e1255]
+                        - cell "ARMS 修复后的汇总/分析定向通过" [ref=e1256]
+                      - row "04 3.337981781 4 56 H_pos CPU 小模型六调用通过" [ref=e1257]:
+                        - cell "04" [ref=e1258]
+                        - cell "3.337981781" [ref=e1259]
+                        - cell "4" [ref=e1260]
+                        - cell "56" [ref=e1261]
+                        - cell "H_pos CPU 小模型六调用通过" [ref=e1262]
+                      - row "05 5.135184057 6 62 去重复目标调用后的目标/VJP/LR 通过" [ref=e1263]:
+                        - cell "05" [ref=e1264]
+                        - cell "5.135184057" [ref=e1265]
+                        - cell "6" [ref=e1266]
+                        - cell "62" [ref=e1267]
+                        - cell "去重复目标调用后的目标/VJP/LR 通过" [ref=e1268]
+                      - row "06 19.201508985 20 82 不同 seed 与 N/A 汇总参考补强通过" [ref=e1269]:
+                        - cell "06" [ref=e1270]
+                        - cell "19.201508985" [ref=e1271]
+                        - cell "20" [ref=e1272]
+                        - cell "82" [ref=e1273]
+                        - cell "不同 seed 与 N/A 汇总参考补强通过" [ref=e1274]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1275]:
+                  - text: 外层原始和是
+                  - strong [ref=e1276]: 77.254095395 秒
+                  - text: ，逐次向上取整合计
+                  - strong [ref=e1277]: 82/300 秒
+                  - text: 。内层原件计时较小，不回改；attempt02 也没有被后来 PASS 覆盖。当前七项受影响检查有适用通过证据，不能解释成所有尝试均成功。
+                - paragraph [ref=e1278]:
+                  - strong [ref=e1279]: 物理更新数应更正如下：
+                - generic [ref=e1280]:
+                  - table [ref=e1283]:
+                    - rowgroup [ref=e1284]:
+                      - row "来源 生产更新 独立参考更新 实际 CPU 更新合计" [ref=e1285]:
+                        - columnheader "来源" [ref=e1286]
+                        - columnheader "生产更新" [ref=e1287]
+                        - columnheader "独立参考更新" [ref=e1288]
+                        - columnheader "实际 CPU 更新合计" [ref=e1289]
+                    - rowgroup [ref=e1290]:
+                      - row "attempt01 18 3 21" [ref=e1291]:
+                        - cell "attempt01" [ref=e1292]
+                        - cell "18" [ref=e1293]
+                        - cell "3" [ref=e1294]
+                        - cell "21" [ref=e1295]
+                      - row "attempt04 6 0 6" [ref=e1296]:
+                        - cell "attempt04" [ref=e1297]
+                        - cell "6" [ref=e1298]
+                        - cell "0" [ref=e1299]
+                        - cell "6" [ref=e1300]
+                      - row "attempt05 15 3 18" [ref=e1301]:
+                        - cell "attempt05" [ref=e1302]
+                        - cell "15" [ref=e1303]
+                        - cell "3" [ref=e1304]
+                        - cell "18" [ref=e1305]
+                      - row "其他 0 0 0" [ref=e1306]:
+                        - cell "其他" [ref=e1307]
+                        - cell "0" [ref=e1308]
+                        - cell "0" [ref=e1309]
+                        - cell "0" [ref=e1310]
+                      - row "合计 39 6 45" [ref=e1311]:
+                        - cell "合计" [ref=e1312]:
+                          - strong [ref=e1313]: 合计
+                        - cell "39" [ref=e1314]:
+                          - strong [ref=e1315]: "39"
+                        - cell "6" [ref=e1316]:
+                          - strong [ref=e1317]: "6"
+                        - cell "45" [ref=e1318]:
+                          - strong [ref=e1319]: "45"
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1320]: 这里的 45 次是小模型 AdamW 更新，与计划中的 45 次正式训练没有关系，也没有额外未计入外层时间的调用。
+                - paragraph [ref=e1321]: 同时必须保留这些限制：
+                - list [ref=e1322]:
+                  - listitem [ref=e1323]:
+                    - strong [ref=e1324]: 36 个反馈 slot
+                    - text: 是实际 Optuna 接收的手写反馈，不是 36 次训练。
+                  - listitem [ref=e1325]:
+                    - strong [ref=e1326]: 45 个保存分析槽
+                    - text: 由手写结果复制构成，不是 45 条真实轨迹。
+                  - listitem [ref=e1327]:
+                    - text: CPU 六调用只跑了
+                    - strong [ref=e1328]: H_pos 小模型
+                    - text: ，明确 mock BGE、原生资源、初始门和 tokenizer 形状，不能证明三臂原生或 N224/token256 容量。
+                  - listitem [ref=e1329]: “33924 字段、最大差 0”是保存汇总字段的审计范围，不是独立样本数，也不覆盖所有诊断、分组、计数及反馈来源。
+                  - listitem [ref=e1330]: 六份源码快照每份 46 文件与其各自 result 来源清单一致；当前 46 来源与最终 gate 对应。旧证据通过明确映射复用，不能仅凭函数名或哈希宣称覆盖所有新行为。
+                - paragraph [ref=e1331]:
+                  - text: 机械依据见
+                  - button "打开 budget_and_count_arithmetic.json 的预览" [ref=e1334] [cursor=pointer]:
+                    - generic [ref=e1335]: budget_and_count_arithmetic.json
+                  - text: 、
+                  - button "打开 cpu_attempts_and_snapshots.json 的预览" [ref=e1343] [cursor=pointer]:
+                    - generic [ref=e1344]: cpu_attempts_and_snapshots.json
+                  - text: 。
+                - heading "6. 六调用原生设计是否值得继续" [level=2] [ref=e1350]
+                - paragraph [ref=e1351]:
+                  - strong [ref=e1352]: 值得，当前没有发现必须增加调用才能分离所要求作用的逻辑缺口。
+                - paragraph [ref=e1353]: 其对照关系清楚：
+                - list [ref=e1354]:
+                  - listitem [ref=e1355]: A，λ=1、m=1，从 Q0 更新。
+                  - listitem [ref=e1356]: A，λ=.5、m=1，重放 Q0，分离 current lambda。
+                  - listitem [ref=e1357]: B，λ=1、m=1，从含历史与 D0 的共同 Q_B 更新。
+                  - listitem [ref=e1358]: B，λ=.5、m=1，重放 Q_B，分离 current/history lambda。
+                  - listitem [ref=e1359]: B，λ=.5、m=.5，重放 Q_B，与 4 分离 LR。
+                  - listitem [ref=e1360]: 同 5，完整恢复并经过中性诊断后更新，与 5 比较下一更新、RNG、Memory，另核推理恢复。
+                - paragraph [ref=e1361]: Q_B=336 是合法阶段位置的 fixture counter，真实仍只有六调用。lambda 首步 Adam 可能归一化掉参数差，因此要求梯度/Adam 矩作用，同时记录实际参数作用，是合理设计；LR-only 应保持梯度/矩一致而让参数更新生效；恢复后的下一步再比较完整状态。
+                - paragraph [ref=e1362]: 不过，当前只有小模型流程证据。**600 秒/臂、1800 秒总原生预算能否容纳真实 BGE，尚不能预判为通过。**原生前先补 N01，完成当前来源与修订的独立主审及具体批准；没有理由为此扩大到额外调用或正式训练。详细六调用审查见完整报告第八节及证据 E10。
+                - heading "7. 时间准入为何仍不能放行" [level=2] [ref=e1363]
+                - paragraph [ref=e1364]: 旧保存投影为：
+                - generic [ref=e1367]:
+                  - math [ref=e1369]:
+                    - generic [ref=e1371]:
+                      - generic [ref=e1372]: "18844.60961239063"
+                      - generic [ref=e1373]: +
+                      - generic [ref=e1374]: "19235.266476024408"
+                      - generic [ref=e1375]: =
+                      - generic [ref=e1376]: "38079.87608841504"
+                      - generic [ref=e1377]: 秒
+                  - generic [aria-hidden] [ref=e1378]:
+                    - generic [ref=e1379]: 18844.60961239063 +
+                    - generic [ref=e1380]: 19235.266476024408 =
+                    - generic [ref=e1381]:
+                      - text: "38079.87608841504"
+                      - generic [ref=e1383]: 秒
+                - paragraph [ref=e1384]: 而两次新运行的上限是：
+                - generic [ref=e1387]:
+                  - math [ref=e1389]:
+                    - generic [ref=e1391]:
+                      - generic [ref=e1392]: "2"
+                      - generic [ref=e1393]: ×
+                      - generic [ref=e1394]: "9000"
+                      - generic [ref=e1395]: =
+                      - generic [ref=e1396]: "18000"
+                      - generic [ref=e1397]: 秒
+                  - generic [aria-hidden] [ref=e1398]:
+                    - generic [ref=e1399]: 2 ×
+                    - generic [ref=e1400]: 9000 =
+                    - generic [ref=e1401]:
+                      - text: "18000"
+                      - generic [ref=e1403]: 秒
+                - paragraph [ref=e1404]:
+                  - text: 旧投影超出新两次上限
+                  - strong [ref=e1405]: 20079.87608841504 秒
+                  - text: 。旧 PASS 对应自己的旧预算，不能移植。
+                - paragraph [ref=e1406]:
+                  - text: 当前 formal gate 的积极之处是：确实从新 native measurements 按保留的
+                  - strong [ref=e1407]: 1.25 / 1800 秒余量模型
+                  - text: 重算，并核每臂、搜索、复验、共享及总上限；没有仅凭一个手填的 9000 内数字放行。但当前没有新原生和共享容量材料。
+                - paragraph [ref=e1408]: 还存在需要在未来资格中说明的测量边界：新 native_arm 在 pretrained_archive 验证之后才开始计 L，而旧 checked_fresh 的 L 包含 archive 验证。**公式名称相同，不代表测量边界相同。**应把这段成本计回 L，或预先明确、有依据地纳入既有余量；不增加 optimizer 调用，也不能漏算。
+                - paragraph [ref=e1409]: 总账：
+                - generic [ref=e1412]:
+                  - math [ref=e1414]:
+                    - generic [ref=e1416]:
+                      - generic [ref=e1417]: "300"
+                      - generic [ref=e1418]: +
+                      - generic [ref=e1419]: "1800"
+                      - generic [ref=e1420]: +
+                      - generic [ref=e1421]: "36"
+                      - generic [ref=e1422]: ×
+                      - generic [ref=e1423]: "9000"
+                      - generic [ref=e1424]: +
+                      - generic [ref=e1425]: "9"
+                      - generic [ref=e1426]: ×
+                      - generic [ref=e1427]: "9000"
+                      - generic [ref=e1428]: +
+                      - generic [ref=e1429]: "300"
+                      - generic [ref=e1430]: +
+                      - generic [ref=e1431]: "2400"
+                      - generic [ref=e1432]: +
+                      - generic [ref=e1433]: "600"
+                      - generic [ref=e1434]: =
+                      - generic [ref=e1435]: "410400"
+                      - generic [ref=e1436]: 秒
+                      - generic [ref=e1437]: =
+                      - generic [ref=e1438]: "114"
+                      - generic [ref=e1439]: 小时
+                  - generic [aria-hidden] [ref=e1440]:
+                    - generic [ref=e1441]: 300 +
+                    - generic [ref=e1442]: 1800 +
+                    - generic [ref=e1443]: 36 ×
+                    - generic [ref=e1444]: 9000 +
+                    - generic [ref=e1445]: 9 ×
+                    - generic [ref=e1446]: 9000 +
+                    - generic [ref=e1447]: 300 +
+                    - generic [ref=e1448]: 2400 +
+                    - generic [ref=e1449]: 600 =
+                    - generic [ref=e1450]:
+                      - text: "410400"
+                      - generic [ref=e1452]: 秒
+                      - text: =
+                    - generic [ref=e1453]:
+                      - text: "114"
+                      - generic [ref=e1455]: 小时
+                - paragraph [ref=e1456]:
+                  - text: 这是预算恒等式，
+                  - strong [ref=e1457]: 不是资源可行性证明
+                  - text: 。修完 N01—N08、甚至原生六调用通过，都不会自动证明 E2400、C300、A600 或新 9000 秒运行可行。
+                  - button "打开 budget_and_count_arithmetic.json 的预览" [ref=e1460] [cursor=pointer]:
+                    - generic [ref=e1461]: budget_and_count_arithmetic.json
+                - heading "8. 阅读范围与失败留证" [level=2] [ref=e1467]
+                - paragraph [ref=e1468]: 主审完整读过指定的两项补充、前轮主审与外审全文、当前合同/报告/授权/gate、五个新入口、当前测试和关键直接依赖；其余旧依赖按真实调用链定向阅读。**140 载荷身份核对不等于 140 文件全文语义审读。**完整/定向/机械范围和批量输出截断的限制都列在阅读清单中。
+                - paragraph [ref=e1469]:
+                  - text: 本轮审查实际发生
+                  - strong [ref=e1470]: 六次机械失败
+                  - text: ：两次辅助路径检索、一次主审错误相对路径读取，以及三次打包前路径/引用检查失败。后两次引用检查是审查工具自身把预算记号或失败说明误识别成证据引用。它们均已纠正，原命令、退出码、可见错误及必要失败版本保留，未静默删除。项目 attempt02 及旧候选包准备失败的必要原件也在返回包中。
+                  - button "打开 failures.json 的预览" [ref=e1473] [cursor=pointer]:
+                    - generic [ref=e1474]: failures.json
+                - paragraph [ref=e1480]:
+                  - strong [ref=e1481]: 主执行者现在可以据这份具体报告逐项处置：先修实际资源、释放和控制计时路径，纠正 CPU 计数，再补既定汇总与证据对应；完成定向复核及独立主审后，申请原定每臂六调用资格。正式 45 次训练继续等待新时间资格和具体许可，新 80 群继续留在后续合同。
+              - generic [ref=e1483]:
+                - generic [ref=e1484]:
+                  - generic [ref=e1485]:
+                    - button "打开 report.zh.txt 的预览" [ref=e1486] [cursor=pointer]
+                    - generic:
+                      - generic:
+                        - generic "report.zh.txt"
+                        - generic: 文档
+                      - generic:
+                        - generic:
+                          - generic
+                  - generic [ref=e1487]:
+                    - button "打开 findings.json 的预览" [ref=e1488] [cursor=pointer]
+                    - generic:
+                      - generic:
+                        - generic "findings.json"
+                        - generic: 代码
+                      - generic:
+                        - generic:
+                          - generic
+                  - generic [ref=e1489]:
+                    - button "打开 evidence_index.tsv 的预览" [ref=e1490] [cursor=pointer]
+                    - generic:
+                      - generic:
+                        - generic "evidence_index.tsv"
+                        - generic: 电子表格
+                      - generic:
+                        - generic:
+                          - generic
+                - button "另有 8 个" [ref=e1491] [cursor=pointer]
+        - generic [ref=e1495]:
+          - button "复制" [ref=e1497] [cursor=pointer]
+          - button "评价回复" [ref=e1501] [cursor=pointer]
+          - button "分享" [ref=e1505] [cursor=pointer]
+          - button "朗读" [ref=e1509] [cursor=pointer]
+          - button "重新生成回复" [ref=e1513] [cursor=pointer]
+          - button "更多操作" [ref=e1516] [cursor=pointer]
+          - button "来源" [ref=e1520] [cursor=pointer]
+      - generic [ref=e1524]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - button "滚动到底部" [ref=e1528] [cursor=pointer]
+        - heading "最新一条回复" [level=4] [ref=e1531]
+        - status [ref=e1532]
+        - generic [ref=e1552]:
+          - button "添加文件等内容" [ref=e1557] [cursor=pointer]
+          - textbox "询问 ChatGPT" [ref=e1564]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=e1567]:
+            - button "选择 ChatGPT 模型" [ref=e1572] [cursor=pointer]:
+              - generic [ref=e1573]: Pro
+            - generic [ref=e1583]:
+              - button "听写" [ref=e1587] [cursor=pointer]
+              - button "开始语音" [ref=e1592] [cursor=pointer]

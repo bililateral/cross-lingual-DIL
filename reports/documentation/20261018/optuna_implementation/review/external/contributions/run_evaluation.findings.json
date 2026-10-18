@@ -1,0 +1,97 @@
+{
+  "reviewer": "run_evaluation",
+  "mode": "static_attachment_only",
+  "scientific_execution": false,
+  "findings": [
+    {
+      "id": "R_EVAL01",
+      "priority": "P2",
+      "title": "既定H_pos−S_pos次级比较及三seed诊断汇总未接入",
+      "status": "confirmed_static_omission",
+      "contract_locations": [
+        "reports/documentation/20261018/optuna_plan/proposal.zh.txt:52,70",
+        "reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt:15"
+      ],
+      "code_locations": [
+        "scripts/step28_optuna_run.py:229-234",
+        "scripts/step28_optuna_run.py:303-351",
+        "scripts/step28_replay_diagnostics.py:171-208"
+      ],
+      "trigger": "九次运行和现有评价全部正常完成",
+      "impact": "仍缺合同承诺的描述性比较和三seed诊断交付，却可写NINE_REPLICATIONS_EVALUATED及整体COMPLETE。主要选参目标公式未因此判错。",
+      "minimum_fix": "只在保存结果汇总补固定H_pos−S_pos与三seed诊断描述，补对应保存参考，保持不参与选参且不增加模型前向/标签/训练。",
+      "blocks_native_by_itself": false,
+      "required_before": "正式集中评价完整交付",
+      "new_80_groups_related": false
+    },
+    {
+      "id": "R_EVAL02",
+      "priority": "P2",
+      "title": "独立保存分析未闭合domains反馈与B末raw矩阵，33924只覆盖部分字段",
+      "status": "confirmed_audit_scope_gap_not_observed_wrong_metric",
+      "code_locations": [
+        "scripts/step28_optuna_verify.py:25-82",
+        "scripts/step28_optuna_run.py:198-226",
+        "scripts/step28_optuna_run.py:303-351"
+      ],
+      "checked_fields_decomposition": {
+        "all_45_absolute_and_old_changes": 29700,
+        "two_candidates_by_seed_vs_S": 3168,
+        "two_candidates_three_seed_mean_vs_S": 1056,
+        "sum": 33924
+      },
+      "not_checked": [
+        "trial evaluation.domains and feedback search.domains against own B-end raw matrix",
+        "three_seed_absolute",
+        "forgetting summaries",
+        "query-positive-count subgroups and comparisons",
+        "macro_all and macro_undefined_groups",
+        "fixed_half_classification",
+        "N/A undefined_groups/total_groups",
+        "diagnostics_evaluation"
+      ],
+      "current_production_domains_formula": "run.py:222按B末raw矩阵map列按域float64 mean，静态正确",
+      "minimum_fix": "以已读保存矩阵独立核feedback domains/U/selected来源；把其余独立核验声明列清具体范围，补已约定受影响输出参考。",
+      "blocks_native_by_itself": false,
+      "required_before": "反馈归约的独立闭环在正式搜索前；完整保存字段声明本轮即补正"
+    },
+    {
+      "id": "R_EVAL03",
+      "priority": "P2",
+      "title": "两正例臂默认锚点的历史manifest缺少外部冻结身份绑定",
+      "status": "source_binding_gap_for_primary_disposition",
+      "code_locations": [
+        "scripts/step28_optuna_run.py:168-178",
+        "scripts/step28_optuna_run.py:33-51",
+        "scripts/step28_optuna_search.py:72-92"
+      ],
+      "fact": "S基准走固定52来源，S_pos/H_pos直接打开固定路径的positive历史manifest并使用其自报raw receipts。内部数组身份仍核验，但本身manifest未见冻结外部身份绑定。",
+      "observed_wrong_reference": false,
+      "minimum_fix": "以已审历史manifest或四个raw来源的明确大小/SHA补同等冻结引用，不加载旧权重或Memory。",
+      "blocks_native_by_itself": false,
+      "required_before": "正式默认锚点来源核验"
+    }
+  ],
+  "non_escalated_observations": [
+    {
+      "id": "OBS_EVAL_NAN",
+      "code": "scripts/step28_optuna_verify.py:33-41",
+      "observation": "check局部NaN比较可漏拒",
+      "reason_not_upgraded": "当前生产write_json allow_nan=False；允许N/A矩阵单元经过掩码并由audit_summary按None处理，未找到正常当前生产路径使有限expected对应saved NaN。"
+    },
+    {
+      "id": "OBS_EVAL_CPU_SCOPE",
+      "fact": "现CPU测试实际执行old.collect/statistics/replication_statistics/independent_analysis，并没有执行production joint_evaluate；模拟36槽/45分析槽不是正式训练，entry288更新也mock。"
+    }
+  ],
+  "f_status_subset": {
+    "F01": "spec根/Memory/恢复/初始门/锚点路径已接线，BGE及真实最终兼容尚待原生/正式",
+    "F04": "两种单run开放节奏及九份联合门实际实现；既定描述输出仍有R_EVAL01",
+    "F05": "新预算补充分段路径可见，容量仍未证明，控制硬截止由主审其他专项判定",
+    "F06": "9000秒/114小时及共享容量资格未建立",
+    "F07": "新80群仅未来最终确认前提，不是当前代码/CPU阻断",
+    "F08": "保留有限开发、条件区间、seed/总体/因果与旧负结果边界"
+  },
+  "local_mechanical_failures": [],
+  "input_mutated": false
+}

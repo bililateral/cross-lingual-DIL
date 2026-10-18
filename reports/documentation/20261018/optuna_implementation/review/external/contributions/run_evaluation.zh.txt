@@ -1,0 +1,102 @@
+三臂 Optuna 静态实现外审：单 run、集中评价与保存分析专项
+审阅者：run_evaluation（交由主审独立核实并合并）
+范围：仅附件静态阅读；未执行项目科研代码、测试、手写科研样例、指标重算或 bootstrap，未连接项目 Linux，未加载模型或 Memory，未联网、外发或上传 Library。
+
+一、专项结论
+
+新生产单 run 与九次集中开放的调用链实际存在，不能再套用上一轮“直接循环旧 execute 九次”的缺项判断。step28_optuna_run.execute_trial 在完整 train→blind_gate→anchor_compatibility 后，仅 search 分支解析 valid 与全评价；replication 分支保存 REPLICATION_BLIND_COMPLETE、valid=0 并退出。控制器在全部九次盲完成及退出后才运行 joint_evaluate。由代码可确认的两端点、三概率角色、完整22指标、计数/N/A、正例数 MAP 描述及每 run 六轮诊断路径基本齐全。
+
+本专项未找到必然导致当前真实单 run/集中入口失败的签名或数组 shape 冲突；这不是原生或正式 PASS。仍有明确的既定描述交付缺项：H_pos−S_pos 次级比较，以及三 seed 的诊断比较/算术汇总没有实现。独立保存分析的33924字段有明确、较窄的覆盖，不能称为所有保存统计字段已独立核验；尤其没有把向 Optuna 反馈的 domains 与 B末 raw 矩阵闭合。9000秒/共享容量资格没有因此建立。
+
+二、已追通的实际路径与适用边界
+
+1. 单 run 训练/恢复/盲门
+- step28_optuna_run.py 85—165：Entry 为一个 TrialSpec 建立唯一 arm、A/B 两点、自身方法与 Memory，初始门允许非默认 LR 的 Adam 参数组元数据合理不同。
+- step28_g_half_run.py 177—206、236—367：实际每阶段288更新，每48更新捕获一次；两阶段产生576更新、864呈现、两端点及12捕获。A阶段无历史，A末才 retain；B继续自己的 A模型/Adam/Memory。完整与推理恢复后各自重新评分并逐位比较，完整临时状态按既有流程删除。
+- step28_positive_ranking_run.py 219—358：新单臂计数保留来源/固定划分、独立 Algorithm R、新根日程、实际 LR、Memory抽样/出生表、两种恢复分数和全部诊断门。新 seed 不再与旧 s0 轨迹强等；固定根仍与 S/H 旧轨迹核对。
+- 默认锚点另有 step28_optuna_run.py 168—178 的两端点 raw 精确比较。当前没有运行该真实兼容检查，不把代码中的比较当兼容已通过。
+
+2. 开放节奏与45/37
+- step28_optuna_run.py 237—276：search 在自身盲门之后由 previous.parse_once 一次 valid；replication 无该解析。
+- step28_optuna_control.py 202—209：联合门要求九条、三臂×三预定seed，逐条相同规格、valid0、exit0、resources_released。
+- step28_optuna_run.py 279—300：再核九份 completion 身份、实际 access、每条完整 blind_gate、九份相同划分，再建立 joint/access.json，统一一次 valid 解析，逐条全评价。
+- step28_bge_continual_run.py 76—87：接触尝试写账发生在标签 loader 前；失败也留下已尝试事实。
+- step28_optuna_search.py 166—205：真实子进程退出以后才向 study 反馈；九份全部完成后 E阶段统一评价，再 A阶段独立分析，最终访问账要求45/37。
+- step28_balanced_pooling_run.py 89—195：公共输入仍是既定 train/development 与元数据路径；合表 C 行被技术扫描后排除，不进 Group/分词或数字标签对齐。A训练只接收 A fit 群，校准只接收本域12群；AB监督统一解析与A学习器使用范围需区分。
+
+3. 指标与描述
+- step28_positive_ranking_run.collect 361—398：每 run 两端点×三角色共六组40×22矩阵/计数；查询细节40×28×10，查询均值核对矩阵后10列；真值几何要求每群16个一正例查询、12个二正例查询。N/A以 counts 的零分母掩码序列化为 null。
+- step28_optuna_run.load_arrays 181—195：读回各矩阵/计数/查询身份，核shape、列名、允许NaN的精确位置以及查询均值关系。
+- statistics 198—226：逐端点/角色/域绝对均值与区间、全群宏均值、未定义群计数、pooled计数/率、旧A的 B末−A末变化、按正例数的raw MAP；唯一反馈 domains 是 B末raw矩阵第12列按域20群 float64 mean。
+- replication_statistics 303—351：先对齐九份群id/域/列；分别报告两候选相对 S 的逐seed/两端点/三角色22指标、三seed群级差均值、旧域遗忘差，以及 B末raw 正例数分组；六格门只看每seed×域的B末raw MAP点差是否严格正。它不是分数集成，也不将seed×群当独立抽样单位。
+- diag.evaluate 171—208：实际评估所有每 run 两阶段各六个capture，每阶段 fit/相应历史cache 与同域valid对照；缓存首阶段N/A；共108个复验capture会经九次调用被评价。该代码只给逐run诊断，未做跨三seed汇总。
+
+三、新发现 R_EVAL01：既定描述输出缺项（建议 P2）
+
+合同来源：proposal.zh.txt 第52行明确 H_pos−S_pos 为描述性次级；第70行要求逐seed/逐域及三seed算术均值报告MAP、全指标和诊断。implementation_scope.zh.txt 第15行保留原稿其他设定。
+代码位置：step28_optuna_run.py 318—348只生成 S_pos−S 与 H_pos−S；229—234按run评估诊断；303—351的集中汇总不读 diagnostics_evaluation/overfitting.json 或诊断保存群值。
+普通触发：九次运行及现有评价全部正常完成。
+实际影响：最终 NINE_REPLICATIONS_EVALUATED/整体 COMPLETE 仍会缺少合同要求的 H_pos−S_pos 描述，以及三seed诊断比较/均值。不是主要 MAP 选参公式算错，也不影响全部九次都被开放；但不能称完整描述交付齐全。
+最小修改：在现有已保存结果汇总中补一个固定 H_pos−S_pos 次级比较，补逐seed诊断的规范索引和预定三seed算术描述汇总；只消费现有保存数组/诊断，不增加模型前向、标签解析、训练、候选或选择门。相应保存参考只补这些受影响字段。三seed含不同cache群，汇总应明确是三条固定轨迹的诊断描述，不能把18个cache位置当独立同一总体。
+阻断阶段：正式集中评价完整性之前须闭合；本项不单独阻止获准原生目标/恢复资格，也不涉及新80群合同。
+
+四、保存分析的确切覆盖与 R_EVAL02（建议 P2／范围补正）
+
+step28_optuna_verify.independent_analysis 25—82 的33924字段可以由静态循环计数完整解释：
+- 45轨迹 × [两端点×三角色×两域×22列×(均值+区间) + 旧A变化三角色×一域×22列×(均值+区间)] = 29700。
+- 两候选×三seed×两端点×三角色×两域×22列×(均值+区间) = 3168。
+- 两候选×两端点×三角色×两域×22列×(均值+区间) = 1056。
+- 合计33924；另核六格布尔不计入该字段计数。
+
+它实际独立做 sum/20 与 quantile，复用 load_arrays及固定 draws 定义；选参调用的是同一个 select_trial。它没有核对：
+- 每trial evaluation.json 的 domains，与 search.json/Optuna反馈 domains/目标，是否等于该trial的B末raw群矩阵；selected只从同一search行再走原selector。
+- three_seed_absolute、逐seed/三seed forgetting、正例数分组 MAP 及对比、macro_all、macro_undefined_groups、fixed_half_classification、N/A的undefined_groups/total_groups、diagnostics_evaluation。
+
+当前 production domains 赋值在 run.py 222/268 是正确接线；没有证据显示已产生错误反馈。问题在于独立分析不能发现“其余完整保存矩阵正确而domains反馈归约/拷贝错了”这一关键接线缺失，也不能把未读取字段冒称已独立覆盖。最小补法是以已读 B末raw矩阵独立核对 feedback domains、U、selected 来源，再将独立分析的声明准确列为已检查字段；对于R_EVAL01新增且合同需独立交付的描述字段，只增加相应定向保存参考。无需重算标签层指标、bootstrap科学结果或新增训练。
+
+阶段判断：报告应立即收窄“全部保存统计独立核验”的含义；反馈归约与选择的独立闭环应在正式搜索前形成可审材料。已实现的主要归约不据本观察判错。
+
+五、锚点冻结来源边界 R_EVAL03（建议 P2／主审裁量）
+
+run.py 171—176：S锚点通过 baseline_runs()[S]读取受既有52来源约束的历史manifest；S_pos/H_pos则直接打开 positive_ranking_result/job/run/manifest.json，再凭其内部receipt核raw数组。当前 run.sources/fixed_reference 未见绑定这个positive锚点manifest本身的既定历史大小/SHA。内部数组哈希确实检查，因此不是“完全无来源校验”；也没有证据显示历史文件已经换错。
+若本轮要求默认兼容比较具有与S相同的冻结来源闭环，最小补正是将旧positive manifest或对应四个raw来源明确绑定到已审历史身份，不读取旧权重/Memory、不重新跑旧模型。该项属于正式锚点前来源准备，不是当前CPU证据作废或新科学方法阻断。
+
+六、不升级的NaN观察
+
+verify.py 33—41 局部 check 确实没有显式 isfinite：当 expected有限而value为NaN时，delta为NaN，delta>1e-12为false。可是当前产生这些结果的 data.write_json→json_bytes 固定 allow_nan=False；load_arrays仅允许counts解释的NaN，audit_summary对任何有NaN的列走expected=None分支。未找到当前正常生产路径会把非标准JSON NaN送入该检查。故不以假想外部篡改将此单独升级P1或新增安全框架。若修改此比较，增加有限性检测是小范围合理整理，但不是本专项最主要问题。
+
+七、CPU证据边界
+
+test_entry_orchestration_and_access_negative_controls 216—235：真实train_stage调用288槽，但update/capture/adam_step为mock；不是真实288更新。提前valid负例作用于Entry.open_valid；production execute_trial实际采用手写同序blind_gate→parse_once，不直接调用该辅助open_valid。
+test_nine_saved_evaluation_and_independent_analysis 237—283：真正调用old.collect/statistics/replication_statistics与independent_analysis，但不调用production joint_evaluate；36搜索分析槽由九套人工结果中取seed1复制，并非45次真实训练。attempt06新增不同seed结果和无预测正例群，可拒绝用seed1冒充三seed均值并检查一处N/A传播，证据有用但范围明确。
+attempt04六调用测试285—318：只用CPU小模型，真实BGE/资源/tokenizer shape与初始门显式mock；不能支持新BGE初始兼容或GPU容量。
+cpu_gate保留attempt02 exit1及累计账82/300；33924来自已述人工保存统计。没有依据将这些PASS写成生产九次联合入口已在原生执行。
+
+八、F01—F08涉及本专项的最新状态建议
+
+F01：显式spec、新root、own Memory/恢复、新seed初始门和默认锚点路径已接入；BGE新seed与默认最终raw真实兼容未验证；R_EVAL03冻结引用边界请主审裁量。
+F02：本专项只核Entry.loss_total与正式分支接线，具体目标/VJP/LR独立作用由主审及另一专项确认；不据计数/日志作原生结论。
+F03：真实生产反馈只接收B末raw domains，完整子进程退出后才tell，有限目标与三级精确选择可见；R_EVAL02的独立反馈闭环仍需补或明确范围。
+F04：独立search/replication与统一九份门实际实现；当前局部CPU证据不等同已走真实joint_evaluate；R_EVAL01既定描述输出缺项仍在。
+F05：预算补充为本轮新增审查对象；E包含统一门、全9评价及汇总，A独立分析，由真实父进程区段计时。未以此证明E2400/A600容量；计时缺陷由主审的控制专项独立处置。
+F06：旧38079.876双臂投影不满足两次18000；新三臂9000/114h与共享容量没有测量资格，本专项保留未建立。
+F07：新80群、20000/1.25%规则属于未来单独合同，不把现代码40群/5000次开发描述判为当前阻断。
+F08：现六格只称development direction consistency，输出limits限制seed总体/独立确认；原旧负结果不被此实现追改。
+
+九、实际阅读记录与失败
+
+read_source.py 的 run_evaluation 阅读记录已留在主审工作目录。完整/实质连续阅读：三份优先计划补充及主审；当前合同、报告、授权；optuna_run/control/search/method；g_half_run 1—369；positive_ranking_run 1—93及219—400；replay_diagnostics全208行；h_consistency_run 1—160；balanced_pooling_run 1—260、640—697；bge_continual_run 1—140；population_data 1—54；tests_optuna 205—318；verify 1—131、205—277；proposal1—122；implementation.diff全95行；旧外审report125—243；cpu_gate关键账236—367；attempt01/entry与attempt06/saved_evaluation。
+曾请求某些大文件较长范围，工具聚合输出出现截断；未将未显示内容当作逐字读过的实质证据，后续已针对引用段重新读取。baseline_sources身份/字段审阅只用于确认已绑定未改源清单及S/H旧来源结构，未加载其指向的任何模型/Memory/正式数据。
+本专项所有机械读取命令成功退出；无本专项执行失败需要删除或重跑，输入未改。已存在attempt02失败仅静态阅读与保留，不静默改写。
+
+十、主审定向反证复核补记
+
+已再次沿真实别名和祖先链查找是否存在对旧positive锚点manifest的绑定，未找到可反驳R_EVAL03的现有代码：
+- optuna_run.Entry的BASELINE与baseline函数（86—88）来自positive_ranking_run 28、40行；后者来自h_consistency_run 19、78—113行。
+- h_consistency_run.baseline_runs硬绑定b71119f5…的旧52来源清单；该清单的两份run/manifest分别在507—510行（20261015 balanced S）及663—666行（20261016 G_half），不含20261018 positive job。
+- run.sources 33—51只递归搜集step28_ Python导入，再显式加既定schema与当前合同/范围/授权/CPU脚本；它不调用每个旧模块自己的sources，不递归追文本合同中的链接。
+- gate以gate.source_files==run.sources作源绑定，因此不能经这些Python路径自动把运行时打开的任意旧报告manifest钉住。
+- fixed_reference 74—91固定positive analysis/summary及旧S三个保存文件，只提取/核对S0与旧S归约，没有核positive job/run/manifest.json。
+故可将其保留为P2正式锚点前的历史来源门；明确未观察到错误原件，也不据此阻断当前CPU或原生目标资格。
+
+R_EVAL01的要求属于冻结方案：第52行明确“H_pos−S_pos为描述性次级”；第70行明确“逐seed/逐域及三seed算术均值报告两候选相对S_tuned的MAP、全指标和诊断”；scope15未撤销。整改不应额外要求平均CI端点、新增显著性门、bootstrap方案或将三个seed各6个cache成员拼成独立18样本；只补既定固定比较与三固定轨迹的算术描述。

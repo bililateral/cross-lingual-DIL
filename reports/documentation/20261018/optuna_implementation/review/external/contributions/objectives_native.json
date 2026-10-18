@@ -1,0 +1,103 @@
+{
+  "reader": "objectives_native",
+  "scope": "静态追踪三臂目标、TrialSpec随机根、Memory、初始门/恢复、真实更新入口、手写CPU独立参考与未来原生六调用；无项目源码/测试/模型/指标执行。",
+  "verdict": "目标和随机根的主要实现缺口已有实质修复；本专项未发现需要改科学公式的当前阻断。未来BGE六调用、默认正式分数兼容及9000秒时间资格仍未成立。发现CPU optimizer调用统计的非阻断口径问题。",
+  "prior_findings": [
+    {
+      "id": "F01",
+      "status": "IMPLEMENTED_WITH_SCOPED_CPU_EVIDENCE_NATIVE_AND_DEFAULT_SCORES_PENDING",
+      "reason": "TrialSpec将初始化/训练/Memory三个随机根与固定partition/diagnostic/statistics根区分；实际fresh loader、schedule、dropout/regroup、retention/draw、Memory envelope、checkpoint/restore及blind_gate消费该规格。默认s0初始模型仍绑历史，lr=1时还比较旧Adam元数据；不同LR只要求空矩而不错误比较整Adam哈希；新seed对自己的expected_head，不强制等于旧s0。默认search trial0的历史A/B raw分数兼容调用已接在blind_gate后、valid解析前，但未实际执行；CPU six-call对fresh/validate_initial等明确mock，不能冒称已覆盖真实BGE初始门。",
+      "evidence": [
+        {"path": "scripts/step28_optuna.py", "lines": [[26,120],[188,241]]},
+        {"path": "scripts/step28_optuna_run.py", "lines": [[85,140],[168,178],[260,268]]},
+        {"path": "scripts/step28_g_half_run.py", "lines": [[177,206],[219,367]]},
+        {"path": "scripts/step28_positive_ranking_run.py", "lines": [[219,358]]},
+        {"path": "scripts/step28_chinese_base.py", "lines": [[110,131]]},
+        {"path": "tests/test_step28_optuna.py", "lines": [[106,157],[285,318]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01/seeds_memory_restore.json", "lines": [[1,1]]}
+      ],
+      "remaining_phase": "未来原生资格须真实载BGE完成适用初始/恢复检查；未来正式默认锚点须兑现已有精确分数门。以上未执行本身不构成当前CPU实现错误。"
+    },
+    {
+      "id": "F02",
+      "status": "IMPLEMENTED_WITH_SCOPED_CPU_EVIDENCE_NATIVE_PENDING",
+      "reason": "S由arm=='S'正式调用原ranking.objectives，不借old_rank资格开关；S/S_pos推理均原FP32矩阵均值，H_pos仍既有H。每视图BCE+lambda*rank+.5hard，current双视图均值加.1*history双视图均值+.5*A0教师MSE；lambda未乘D0。真实Method.update在每步写两个实际optimizer参数组LR后经record.backward_group共享VJP、clip、step。CPU独立逐正例/候选/池化计算参考、完整小模型直接图、所有有梯度参数及Adam比较支持该接线，而非仅日志PASS。",
+      "evidence": [
+        {"path": "scripts/step28_optuna.py", "lines": [[132,217]]},
+        {"path": "scripts/step28_positive_ranking.py", "lines": [[17,105]]},
+        {"path": "scripts/step28_record_replay.py", "lines": [[43,63],[102,182]]},
+        {"path": "scripts/step28_alias_ranking.py", "lines": [[89,129]]},
+        {"path": "scripts/step28_bge_continual.py", "lines": [[70,82]]},
+        {"path": "scripts/step28_continual_population.py", "lines": [[14,40]]},
+        {"path": "tests/test_step28_optuna.py", "lines": [[25,104]]},
+        {"path": "tests/test_step28_positive_ranking.py", "lines": [[26,92]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/qualification/attempt05/actual_objective_vjp.json", "lines": [[1,1]]}
+      ],
+      "remaining_phase": "未来每臂六次BGE真实调用证明实际encoder/head原生作用、恢复与资源；当前没有GPU结果。"
+    }
+  ],
+  "native_six_call_review": {
+    "status": "STATICALLY_COHERENT_NOT_NATIVE_QUALIFIED",
+    "source": {"path": "scripts/step28_optuna_verify.py", "lines": [[85,206],[253,271]]},
+    "schedule": [
+      {"call": 1, "from": "Q0", "stage": "A", "lambda_rank": 1, "lr_multiplier": 1},
+      {"call": 2, "from": "Q0", "stage": "A", "lambda_rank": 0.5, "lr_multiplier": 1},
+      {"call": 3, "from": "QB derived from Q1", "stage": "B", "lambda_rank": 1, "lr_multiplier": 1},
+      {"call": 4, "from": "same QB", "stage": "B", "lambda_rank": 0.5, "lr_multiplier": 1},
+      {"call": 5, "from": "same QB", "stage": "B", "lambda_rank": 0.5, "lr_multiplier": 0.5},
+      {"call": 6, "from": "same QB restored then actual neutral capture", "stage": "B", "lambda_rank": 0.5, "lr_multiplier": 0.5}
+    ],
+    "checks": [
+      "A lambda比较同Q0并记录两组件探针current preclip梯度差、实际参数差和Adam矩差；只要求第一矩差>0，不强求首步参数必不同。",
+      "B current/history梯度通过累计history梯度减current梯度分离，分别拒绝lambda不起作用；D0定义与常数.5仍由实际目标及独立CPU参考核对。",
+      "第4/5调用只改LR，要求history后总preclip梯度和step/exp_avg/exp_avg_sq逐位相同，encoder/head探针实际参数不同。参数组率由Method.update设置。",
+      "第5/6调用包含同QB完整恢复、自己Memory往返、真实neutral诊断后下一更新；比较全模型/Adam/梯度state、返回日志、RNG及Memory字节；另做完整与推理分数恢复。",
+      "QB step336通过直接填counter构造，不冒称336次更新；只有六处update调用。跨参数rebind只在明确fixture reload局部函数；正式restore_point通过文件metadata绑定本run规格。",
+      "native_arm返回仅数值/日志/测量，不返回模型或CUDA参数；下一臂native_preflight(continuing=True)执行gc.collect、synchronize、清cuBLAS workspace和empty_cache，并断言allocated/reserved=0，不能仅因末尾无del而列缺陷。"
+    ],
+    "limits": [
+      "当前唯一CPU six-call只运行H_pos小模型，明确mock BGE fresh、资源、tokenizer shape、validate_initial、pretrained_archive和configure_numerics；不是N224/token256实际BGE资格。",
+      "作用差检查使用encoder首层query.weight与head首层weight两组件探针，不是逐个BGE参数的作用枚举；完整下一步恢复比较是全state。未变优化器构造/参数参与路径及CPU独立参考按适用范围复用。",
+      "第1步lambda参数差可能被Adam归一化压低，因此代码记录该差而以真实梯度和第一矩影响作判定，符合补充，不应制造参数差必须大于0的首步伪门。",
+      "六调用测量表完成后仍需各臂600秒/合计1800秒；不从当前CPU时间推出BGE时间，也不推出9000秒search/rep或共享段容量。"
+    ]
+  },
+  "new_findings": [
+    {
+      "id": "N_CPU_STEP_ACCOUNTING",
+      "severity": "minor_reporting",
+      "blocking": false,
+      "title": "39次只覆盖生产路径，独立参考另有6次真实AdamW.step",
+      "location": [
+        {"path": "tests/test_step28_optuna.py", "lines": [[54,104],[131,157],[285,318]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/report.zh.txt", "lines": [[27,38]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json", "lines": [[337,366]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01/unittest.txt", "lines": [[1,10]]},
+        {"path": "reports/documentation/20261018/optuna_implementation/qualification/attempt05/unittest.txt", "lines": [[1,6]]}
+      ],
+      "trigger": "把CPU报告中的actual_cpu_optimizer_calls=39解释为整个手写核验的所有真实optimizer.step调用。",
+      "evidence": "独立参考测试每臂Method.update共5次，另在86行ob.step执行1次真实参考AdamW更新。此测试在attempt01和attempt05三臂各执行一次，合计6次参考step；attempt01的恢复测试3次、attempt04的六调用6次加上两个三臂15次生产路径，得到39生产+6参考=45实际总step。",
+      "impact": "修正执行描述精度；所有参考调用已包含在各次完整外层耗时和82/300秒中，未发现因此漏计时间或超授权，不否定独立CPU参考，也不改变GPU/BGE/正式0。",
+      "minimal_change": "保留原件字节，在补充报告/新汇总明确production_path_optimizer_calls=39、independent_reference_optimizer_calls=6、all_cpu_optimizer_step_calls=45；无需重跑。",
+      "required_before": "最终审查报告/后续主审引述CPU执行事实时统一口径；非原生或正式训练的科学阻断。",
+      "parent_recheck": "主审拟逐快照核对attempt01与attempt05相应测试函数、ob.step及测试映射；本记录不将静态计数宣称为外审实际运行。"
+    }
+  ],
+  "mechanical_failures": [
+    {
+      "kind": "static_rg_search",
+      "exit_code": 2,
+      "detail": "初次批量搜索使用scripts/step28_function*模式，包内无该匹配，rg报No such file or directory；其他已存在文件仍返回静态匹配。",
+      "scientific_execution": false,
+      "disposition": "按已有实际文件继续read_source；保留本记录，不改输入。"
+    },
+    {
+      "kind": "static_rg_inventory",
+      "exit_code": 2,
+      "detail": "查询reports/documentation/20261016/h_consistency及reports/documentation/20261015/g_refinement文件清单时，后者不存在；前者返回baseline_sources.json。该缺失不被当作项目文件缺失或实现缺陷。",
+      "scientific_execution": false,
+      "disposition": "已读取实际存在的h_consistency/baseline_sources.json并追踪Entry绑定；保留本记录。"
+    }
+  ],
+  "read_log": "由read_source.py --reader objectives_native逐文件记录。初次三文件批量输出曾截断，已对核心丢失片段单独重读；完整读取与部分读取不能混称。"
+}

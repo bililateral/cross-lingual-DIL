@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-19 三臂Optuna实现外审回收、独立主审与待确认修复
+
+用户原话：“外审已结束，把三臂 Optuna 实现的审查结果完整同步回来，结合两处预算问题仔细分析并独立主审，详细分析需要修改哪些地方。确认后修复后再实施GPU原生校验，GPU校验通过后开始正式训练”。本轮先完成完整回收/主审，按“确认后修复”保留用户决策点，没有先改代码或启动GPU。
+
+58成员返回包297884字节完整回收，58外部成员、56内部载荷和140原输入回执匹配。独立核对五个实际新模块/测试及直接依赖，接受N01磁盘、N02集中E/A资源门、N03异常worker释放、N04既定次级比较和三seed诊断、N05独立反馈来源、N06更新数口径、N07正例历史manifest身份、N08控制器启动/收尾计时；另把正文中L未含归档核验的问题列为T01，要求新原生测量前修复。N06已由主审补正为39生产+6参考=45实际CPU更新，82秒账不变，原件不改。
+
+[完整主审](../reports/documentation/20261018/optuna_implementation/review/primary_disposition.zh.txt)认为有限设计仍有价值、无需换科学目标，但GPU数值PASS不能单独放行正式：旧保守两臂38079.876秒高于新18000秒，当前9000/114小时及C300/E2400/A600容量仍未建立，若新实测相近就须停在正式之前。已形成[具体修复和条件执行范围](../reports/documentation/20261018/optuna_implementation/review/repair_scope.zh.txt)，待确认后修复/剩余CPU定向核验，修订外审/主审关闭后原生18调用，全部时间/资源/数据前提通过后自动36+9；未来新源码包仍须具体外发批准，任何预算/成本模型变化另确认。新80群和最终评价不在本范围。
+
+回收时一处附件事件超时、空缓存正文及网络/过期链接等工具问题均经实际文件核验解决，必要失败摘要见[recovery](../reports/documentation/20261018/optuna_implementation/review/recovery.json)，不保存凭据/签名URL。外审使用三个辅助分工的事实保留，不冒称单实例或三次独立外审；我方未委派、逐项独立复核。完整审查原件与主审按[sync](../reports/documentation/20261018/optuna_implementation/review/sync.json)两端保管，专用页已关闭，新材料只本地Git。当前科研来源和CPU账不变，无新训练。
+
 ## 2026-10-18 批准并完成Optuna最小实现与手写CPU
 
 用户针对已呈现的implementation_scope.zh.txt明确回复：“批准最小实现与手写CPU核验”。[批准原件](../reports/documentation/20261018/optuna_implementation/authorization.json)限定代码/合同/policy和Linux既有py310手写CPU累计300秒，1线程/RSS2GiB/证据64MiB；不含正式文本/标签、BGE/旧Memory、GPU或45次正式运行，完成后准备具体实现包。

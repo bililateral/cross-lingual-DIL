@@ -1,0 +1,18 @@
+{
+  "scientific_execution": false,
+  "mechanical_failure_count": 6,
+  "raw_tool_read_logs": "reads_*.jsonl",
+  "limitations_zh": [
+    "部分批量输出截断，核心按分段补读；完整阅读确认与工具请求范围分开。",
+    "未捕获所有成功shell命令的独立stdout/stderr档案；工具结果在会话中，返回提供实际机械程序、结果和失败记录。",
+    "失败工具暴露combined output，不将可见错误片段伪称为独立完整stderr。",
+    "目录不存在的静态查询不证明项目现场缺失该目录。",
+    "检查、生成与打包只使用Python标准库；任何输入源码仅按文本或字节读取。"
+  ],
+  "review_mechanical_scripts": [
+    "mechanical_checks.py",
+    "supplemental_mechanical_checks.py",
+    "build_return_materials.py"
+  ],
+  "not_uploaded_to_external_storage": true
+}

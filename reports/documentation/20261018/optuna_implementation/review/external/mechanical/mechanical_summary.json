@@ -1,0 +1,223 @@
+{
+  "source_count": 46,
+  "all_current_sources_match": true,
+  "attempts": [
+    {
+      "attempt": "attempt01",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [
+        "scripts/step28_optuna_run.py",
+        "scripts/step28_optuna.py",
+        "scripts/step28_optuna_verify.py",
+        "scripts/step28_positive_ranking_run.py",
+        "scripts/step28_optuna_search.py",
+        "scripts/step28_optuna_control.py",
+        "tests/test_step28_optuna.py"
+      ],
+      "qualified_tests": [
+        "test_actual_objective_vjp_lr_and_rejected_omissions",
+        "test_disjoint_budgets_and_real_launcher_failure",
+        "test_entry_orchestration_and_access_negative_controls",
+        "test_real_optuna_selection_and_stop",
+        "test_seeds_own_memory_capture_and_restore"
+      ],
+      "status": "PASS_HANDWRITTEN_ONLY"
+    },
+    {
+      "attempt": "attempt02",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [
+        "scripts/step28_optuna_run.py",
+        "scripts/step28_optuna.py",
+        "scripts/step28_optuna_verify.py",
+        "scripts/step28_positive_ranking_run.py",
+        "scripts/step28_optuna_search.py",
+        "tests/test_step28_optuna.py"
+      ],
+      "qualified_tests": null,
+      "status": "FAIL"
+    },
+    {
+      "attempt": "attempt03",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [
+        "scripts/step28_optuna_run.py",
+        "scripts/step28_optuna.py",
+        "scripts/step28_optuna_verify.py",
+        "scripts/step28_positive_ranking_run.py",
+        "tests/test_step28_optuna.py"
+      ],
+      "qualified_tests": [
+        "test_nine_saved_evaluation_and_independent_analysis"
+      ],
+      "status": "PASS_HANDWRITTEN_ONLY"
+    },
+    {
+      "attempt": "attempt04",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [
+        "scripts/step28_optuna.py",
+        "scripts/step28_positive_ranking_run.py",
+        "tests/test_step28_optuna.py"
+      ],
+      "qualified_tests": [
+        "test_cpu_six_call_fixture_orchestration"
+      ],
+      "status": "PASS_HANDWRITTEN_ONLY"
+    },
+    {
+      "attempt": "attempt05",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [
+        "tests/test_step28_optuna.py"
+      ],
+      "qualified_tests": [
+        "test_actual_objective_vjp_lr_and_rejected_omissions"
+      ],
+      "status": "PASS_HANDWRITTEN_ONLY"
+    },
+    {
+      "attempt": "attempt06",
+      "files": 46,
+      "source_manifest_matches": true,
+      "changed_from_current": [],
+      "qualified_tests": [
+        "test_nine_saved_evaluation_and_independent_analysis"
+      ],
+      "status": "PASS_HANDWRITTEN_ONLY"
+    }
+  ],
+  "arithmetic": {
+    "outer_wall_ns_sum": 77254095395,
+    "outer_charged_seconds_sum": 82,
+    "individually_ceiled_seconds_sum": 82,
+    "recorded_outer_wall_ns": 77254095395,
+    "recorded_charge": 82,
+    "remaining_cpu_budget_seconds": 218,
+    "optimizer_call_accounting": {
+      "attempt01": {
+        "production": 18,
+        "independent_reference": 3
+      },
+      "attempt02": {
+        "production": 0,
+        "independent_reference": 0
+      },
+      "attempt03": {
+        "production": 0,
+        "independent_reference": 0
+      },
+      "attempt04": {
+        "production": 6,
+        "independent_reference": 0
+      },
+      "attempt05": {
+        "production": 15,
+        "independent_reference": 3
+      },
+      "attempt06": {
+        "production": 0,
+        "independent_reference": 0
+      },
+      "production_total": 39,
+      "independent_reference_total": 6,
+      "total_actual_cpu_steps": 45,
+      "basis": "Static successful test control flow and original saved test lists; no tests executed externally."
+    },
+    "development_budget_components": {
+      "cpu": 300,
+      "native": 1800,
+      "search": 324000,
+      "replication": 81000,
+      "control": 300,
+      "evaluation": 2400,
+      "analysis": 600
+    },
+    "development_total_seconds": 410400,
+    "development_total_hours": 114.0,
+    "prior_two_arm_projection_seconds": 38079.87608841504,
+    "new_two_run_cap_seconds": 18000,
+    "prior_two_arm_projection_exceeds_new_cap": true,
+    "saved_analysis_field_count_components": {
+      "trial_absolute_and_old_A": 29700,
+      "replication_per_seed": 3168,
+      "replication_three_seed": 1056
+    },
+    "saved_analysis_field_count_total": 33924,
+    "non_actions": [
+      "No project imports",
+      "No scientific code/tests/model execution",
+      "No metric means recomputed",
+      "No bootstrap/resampling",
+      "No project server or external storage access"
+    ]
+  },
+  "saved_reference_fields": {
+    "S0": {
+      "A": 0.49413171588434307,
+      "B": 0.5058704368257183
+    },
+    "group_ids_aligned": true,
+    "domains_aligned": true,
+    "metric_columns": [
+      "average_precision",
+      "trapezoidal_pr_auc",
+      "roc_auc",
+      "recall_at_fpr_1pct",
+      "brier",
+      "log_loss",
+      "precision",
+      "recall",
+      "f1",
+      "specificity",
+      "balanced_accuracy",
+      "mcc",
+      "map",
+      "mrr",
+      "recall_at_1",
+      "recall_at_3",
+      "recall_at_5",
+      "recall_at_10",
+      "ndcg_at_1",
+      "ndcg_at_3",
+      "ndcg_at_5",
+      "ndcg_at_10"
+    ],
+    "row_count": 40,
+    "column_counts": [
+      22
+    ],
+    "saved_reduction_not_recomputed": true
+  },
+  "checksum_overview": [
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/receive.sha256",
+      "rows": 39,
+      "matched": 39,
+      "missing": 0
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/receive_delta.sha256",
+      "rows": 8,
+      "matched": 8,
+      "missing": 0
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/workspace.sha256",
+      "rows": 46,
+      "matched": 45,
+      "missing": 0
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/workspace_final.sha256",
+      "rows": 46,
+      "matched": 46,
+      "missing": 0
+    }
+  ]
+}

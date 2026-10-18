@@ -1,0 +1,23 @@
+--- attempt05/tests/test_step28_optuna.py
++++ current/tests/test_step28_optuna.py
+@@ -239,9 +239,10 @@
+         split={"development":[dict(group_uid=g.uid,domain="A" if i<20 else "B") for i,g in enumerate(groups)]}
+         specs=[m.TrialSpec(arm,"replication",s-1,1,1,s) for s in (1,2,3) for arm in m.ARMS]
+         rng=np.random.Generator(np.random.PCG64(117));base=rng.normal(size=(40,378)).astype(np.float32)
++        base[0]=-10  # Undefined precision/MCC must remain N/A in the saved aggregates.
+         for spec in specs:
+             entry=run.Entry(spec);root=campaign/spec.run_id;root.mkdir()
+-            values=base+(0.1 if spec.arm=="S_pos" else -.1 if spec.arm=="H_pos" else 0)*np.asarray([g.labels for g in groups])
++            values=base+spec.seed*(0.05 if spec.arm=="S_pos" else -.05 if spec.arm=="H_pos" else 0)*np.asarray([g.labels for g in groups])
+             values=values.astype(np.float32)
+             scores={point:{role:values if role=="raw" else values.astype(np.float64) for role in run.parent.ROLES} for point in entry.POINTS}
+             col=run.old.collect(root/"evaluation",scores,groups,split,entry=entry)
+@@ -260,6 +261,8 @@
+                         return np.asarray(data.read_json(campaign/spec.run_id/"evaluation"/("B_"+candidate+"_raw_metrics.json"))["values"],float)[list(rows),12]
+                     values.append(read(arm)-read("S"))
+                 self.assertAlmostEqual(joint["comparisons"][arm+"-S"]["three_seed_mean"]["B"]["raw"][d]["map"]["mean"],float(np.mean(values)),places=14)
++                self.assertNotEqual(float(np.mean(values)),float(np.mean(values[0])))
++        self.assertIsNone(joint["three_seed_absolute"]["S"]["B"]["raw"]["A"]["precision"]["mean"])
+         # Run the actual independent analyzer on a deliberately complete handwritten 36-slot ledger.
+         search={a:[] for a in m.ARMS}
+         import shutil

@@ -1,0 +1,63 @@
+三臂Optuna静态实现专项记录：目标、随机根、自身Memory和未来原生六调用
+
+本记录供主审独立核对。全部判断来自附件源码/合同/已保存CPU证据的静态阅读。没有import或执行项目源码，没有跑测试/手写科学样例，没有载模型/Memory/正式数据，没有重算科学指标或bootstrap，没有连接项目Linux或外发。
+
+一、当前判断
+
+F01/F02的主要接线缺口已经由真实代码补上；不能继续沿用上一轮“尚未实现”作当前事实。此专项没有找到lambda、D0、LR、三根或正式恢复的当前实质科学错误。未来真实BGE资格、默认完整锚点分数兼容及9000秒资格没有发生，应保留未验证状态。当前CPU证据只能证明其手写规模和所列mock边界，不是原生证据。
+
+二、完整S与目标的实际计算
+
+step28_optuna.Method.objective在arm=='S'时正式进入parent.ranking.objectives(predicted,truth,.5)，并使用其rank；它没有调用positive的qualification_old_rank开关。identity把S和S_pos映射到同一原FP32均值池化，是评分身份复用，training身份仍分别写S/original_rank与S_pos/positive_rank，不是把S伪装成候选。H_pos只映射既有H，lambda不改变推理pooling。
+
+对于current/history的每个A0/A1，实际total=bce+lambda_rank*rank+.5*hard。两视图均值后current取1倍，history取.1倍。教师使用history的自然A0 live score与该run自身出生表A0 score的MSE，再独立乘.5；没有把教师缩成.05，没有给A1加新教师，没有给current加出生教师。历史组和reference必须同有同无，A禁止history，B要求history，减少了“执行了不同分支却仍记正规B”的风险。
+
+目标经record.backward_group传入真正的shared VJP：生成同一live encoder图；离线表proxy上求dJ/dK；deterministic head逐块将该梯度回传到record leaf及head；再把dJ/dZ回传真实encoder。Method.update执行两角色、统一clip，再真正optimizer.step。不是只计算一个报告中的loss或把lambda写进日志。
+
+LR由spec.rates(step)调用已冻结stage_lr，返回m*1e-5*f(step)和m*.001；每次真实update在param_groups[0]/[1]覆写。make_optimizer明确第0组encoder.parameters、第1组head.parameters。第288步只有encoder=0，head=.001*m。新config也设置初始参数组率，随后每步重设，旧record.update的常数LR路径没有被调用。
+
+三、CPU参考的独立性和界限
+
+tests.reference复用既有未变assignment，但对池化、query候选枚举、原rank或逐正例rank、BCE与top5 hard按独立参考构造。原rank每query为logsumexp(27候选)-正例分数均值；新rank由独立logaddexp展开。两视图/历史教师分别形成完整参考。对proxy同时比较值和gradient；weight=1参考相对lambda=.5必须可分，从而可发现lambda仅改日志或遗漏历史分支。实际生产small-model VJP还与完整direct graph按所有named_parameters逐角色比较preclip gradient，随后独立clip/AdamW更新比较参数和step/exp_avg/exp_avg_sq。
+
+LR测试先故意把真实两组lr写99，再在1/29/30/288步调用生产update检查真实参数组；完整direct更新在B step49比较参数与Adam。不是仅检查计算器返回一个正确LR。attempt05保存最大preclip误差S为current 8.940696716308594e-08/history 1.6391277313232422e-07，S_pos为7.450580596923828e-08/5.960464477539063e-08，H_pos为2.0116567611694336e-07/2.2351741790771484e-07，均属包内原件，不是本外审重新核算。
+
+执行次数应更精确：两个独立目标测试（attempt01、attempt05）各三臂，每臂5次生产Method.update之外各有1次reference ob.step。生产路径15+恢复3+六调用6+生产路径15=39；另参考3+3=6。若说全部真实CPU AdamW.step，应为45。该区别不改变82秒外层账，不能据此声称超CPU范围或要求重跑。原件39应保留并用后续补充说明口径。
+
+四、随机根和实际初始门
+
+TrialSpec.roots冻结三训练根：s0为20260909/20260918/20260930；s1—s3为2026101901—03、2026102901—03、2026103901—03。number、path、sampler根没有进入训练stream。partition=20260918、diagnostic=20261008、statistics=20260930独立保留。
+
+实际fresh仍通过record.load_model→base.load_model，base载encoder前和建head前都torch.manual_seed(c.initialization_seed)；fresh另设Python/NumPy seed。Entry.expected_head在fork_rng中独立构造相同维度head，使用本seed；不会用旧s0 head拒绝新seed。真实validate_initial首先要求optimizer.state为空和adam_step0，再保存seed、headhash、empty_moments。s0比较完整模型旧hash；s0且lr_multiplier=1才要求旧完整Adam hash。非默认LR允许param_groups元数据不同，仍必须空矩。新seed不比较旧model hash，但有固定已核归档+实际loader路径+对应head门，当前没有看到代码把旧head强加给新seed。
+
+CPU测试展示四个expected_head hash不同，包含schedule/Memory独立Random重建和自己的restore。但CPU six-call把fresh、validate_initial、baseline_inputs等mock；它没有在CPU“证明BGE真实初始门已通过”。未来原生native_arm真实调用fresh+validate_initial；它只用预定s0，不把未测新seedBGE初始验证写成已发生。
+
+默认正式anchor_compatibility仅针对search trial0，读历史manifest中的A/B raw数组并逐位np.array_equal，位于实际run的blind_gate之后、valid解析之前。其他参数/新seed没有被错误要求等于旧最终分数。这条门静态接通，实际默认分数兼容仍待将来获准执行，不能拿CPU默认loss相等代替整轨迹相等。旧S/H baseline unchanged_direct_sources没有包含本次两个已适配公共入口，不存在仅因这两处补丁就必然卡死旧源hash门的问题。
+
+五、自身Memory、恢复与下一步
+
+新Memory外层header绑定完整trial identity，内层保留原record.Memory及Algorithm R状态、teacher表、origins、maps、stage/count、draw_rng。from_bytes先验证header，再用原解析恢复内层，再更新实例；old.__dict__没有spec，因此新spec不会被内层覆盖。最终再次to_bytes比较全部字节。retention在自己的memory root种子；begin_stage重设自己的history draw root；既有reservoir序列化保存其RNG。memory_from还检查评分和训练metadata。不同lambda/LR/run即便训练随机根相同，也不能串用正式Memory。
+
+Entry.checkpoint在A阶段显式提供新Memory，避免旧空缓存落入未经规格绑定的record.Memory。A端点才retain current48并保存自身模型reference；B对这个Memory begin_stage，期间旧teacher不刷新。full/inference恢复都经entry.restore_point和method.bind以checkpoint metadata校验本run；B启动还要求当前模型/Adam/RNG/modes/Memory continuity等于自己的A端点。
+
+positive.blind_gate适配后按单臂576/864检查，独立重建自己的日程、Algorithm R和history draw；s0保留旧轨迹相等，新seed只跳过不合理的旧s0相等要求，仍核自身轨迹。日志真实LR按spec.rates核对；完整捕获和最终raw等值仍保留。
+
+六、未来六调用是否解决两参数混淆
+
+调用1/2同Q0、A、m=1，只有lambda从1到.5；调用3/4同QB、B、m=1，仅lambda变；调用4/5同QB、lambda=.5，仅m变到.5；调用6同QB完整恢复并作真实中性诊断后重复调用5。QB的Adam step336是手写fixture合法位置，不是执行336步，源码注释和返回字段均明示。跨参数重新bind仅在native_arm的局部reload，正式Entry从保存meta绑定，不能沿用该fixture放宽正常恢复。
+
+原生preclip取encoder首层query.weight和head首层weight探针；A比较current，B对history累计gradient减current，分别得到current和history贡献再比较。lambda既记录参数差又要求Adam第一矩有影响，避免首步Adam归一化使参数差消失就误拒绝。LR-only要求总preclip gradient和Adam矩逐位相同，真实参数发生差，符合AdamW的正确预期。第五/六调用用state全模型/Adam/gradients逐位比较以及日志/RNG/Memory，另验证full/inference恢复分数。
+
+它不是逐一枚举BGE所有参数的新作用证明；作用检查范围是两个组件探针，而全state恢复比较范围更广。未变optimizer/encoder参与路径和CPU完整参数参考按适用边界复用。没有必要仅因使用探针就要求额外调用或全面原生回归；真正是否在N224/token256、BGE FP32/BF16配置下观察到这些作用，必须等待预定六调用每臂真实证据。
+
+本次CPU六调用mock资源/预训练加载/shape tokenizer，仅H_pos小模型，保存原件D0/history确实非零、各作用差非零、next update相同；但绝非实际BGE资格。原生下一臂进入native_preflight(continuing=True)时会主动gc.collect、同步、清cuBLAS workspace、empty_cache，再断言allocated/reserved均0。native_arm不把model/optimizer返回；没有依据把“函数末尾没显式del”当作持续GPU泄漏。
+
+七、时间结论和未升格事项
+
+本专项没有执行任何计时投影，只核对源码/已存字段。六调用每臂600秒和合计1800秒尚未完成，新单run9000秒及共享C/E/A容量也未建立；旧双臂38079.87608841504秒不能放行新18000秒。本次目标实现正确不解除该独立准入门。
+
+有一个成本口径细节已提交计费专项判断：新native_arm把pretrained_archive放在timed L之外，而旧checked_fresh的L含归档验证。若按原公式继续使用新L，归档核验费用须说明由未测1800秒覆盖，不能无说明称实测项定义完全同旧。此记录没有单凭该差别就断言时间漏计或正式可行；整体资格本来未建立。
+
+八、机械故障留证
+
+本专项两次rg静态搜索exit2：首次scripts/step28_function*无匹配，第二次不存在的reports/documentation/20261015/g_refinement目录；均非项目科研运行，其他静态输出可用。已按实际存在路径继续阅读，保留详细JSON，未把输入包不含某历史目录宣称为项目缺件。初次批量读取输出截断后，核心缺失片段均定向单独重读。

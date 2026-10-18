@@ -1,0 +1,49 @@
+--- attempt04/scripts/step28_optuna.py
++++ current/scripts/step28_optuna.py
+@@ -166,8 +166,9 @@
+         truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+         pieces = []
+         for predicted in predictions:
+-            original = parent.ranking.objectives(predicted, truth, .5)
+-            rank = original["rank"] if arm == "S" else positive.objectives(predicted, truth)["rank_pos"]
++            original = (parent.ranking.objectives(predicted, truth, .5) if arm == "S"
++                        else positive.objectives(predicted, truth))
++            rank = original["rank"] if arm == "S" else original["rank_pos"]
+             pieces.append(dict(bce=original["bce"], rank_used=rank, hard=original["hard"],
+                                total=original["bce"]+self.spec.lambda_rank*rank+.5*original["hard"]))
+         supervised = (pieces[0]["total"]+pieces[1]["total"])/2
+--- attempt04/scripts/step28_positive_ranking_run.py
++++ current/scripts/step28_positive_ranking_run.py
+@@ -349,8 +349,7 @@
+                 if not all(np.isfinite(e[k]) for k in keys):
+                     raise ValueError("Nonfinite history diagnostic")
+         scores[name] = roles
+-    for stage, sequences_here in (sequences.items() if roots == dict(memory=20260930, schedule=20260918) or
+-                                roots.get("schedule") == 20260918 and roots.get("memory") == 20260930 else ()):
++    for stage, sequences_here in (sequences.items() if roots["schedule"] == 20260918 and roots["memory"] == 20260930 else ()):
+         for other, (old_root, _, _) in entry.baseline_runs().items():
+             name = "AB"[stage-1]+"_"+other
+             old_log = data.read_json(old_root/"run/updates"/(name+".json"))
+--- attempt04/tests/test_step28_optuna.py
++++ current/tests/test_step28_optuna.py
+@@ -239,9 +239,10 @@
+         split={"development":[dict(group_uid=g.uid,domain="A" if i<20 else "B") for i,g in enumerate(groups)]}
+         specs=[m.TrialSpec(arm,"replication",s-1,1,1,s) for s in (1,2,3) for arm in m.ARMS]
+         rng=np.random.Generator(np.random.PCG64(117));base=rng.normal(size=(40,378)).astype(np.float32)
++        base[0]=-10  # Undefined precision/MCC must remain N/A in the saved aggregates.
+         for spec in specs:
+             entry=run.Entry(spec);root=campaign/spec.run_id;root.mkdir()
+-            values=base+(0.1 if spec.arm=="S_pos" else -.1 if spec.arm=="H_pos" else 0)*np.asarray([g.labels for g in groups])
++            values=base+spec.seed*(0.05 if spec.arm=="S_pos" else -.05 if spec.arm=="H_pos" else 0)*np.asarray([g.labels for g in groups])
+             values=values.astype(np.float32)
+             scores={point:{role:values if role=="raw" else values.astype(np.float64) for role in run.parent.ROLES} for point in entry.POINTS}
+             col=run.old.collect(root/"evaluation",scores,groups,split,entry=entry)
+@@ -260,6 +261,8 @@
+                         return np.asarray(data.read_json(campaign/spec.run_id/"evaluation"/("B_"+candidate+"_raw_metrics.json"))["values"],float)[list(rows),12]
+                     values.append(read(arm)-read("S"))
+                 self.assertAlmostEqual(joint["comparisons"][arm+"-S"]["three_seed_mean"]["B"]["raw"][d]["map"]["mean"],float(np.mean(values)),places=14)
++                self.assertNotEqual(float(np.mean(values)),float(np.mean(values[0])))
++        self.assertIsNone(joint["three_seed_absolute"]["S"]["B"]["raw"]["A"]["precision"]["mean"])
+         # Run the actual independent analyzer on a deliberately complete handwritten 36-slot ledger.
+         search={a:[] for a in m.ARMS}
+         import shutil

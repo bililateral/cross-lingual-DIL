@@ -1,0 +1,385 @@
+--- attempt01/scripts/step28_optuna.py
++++ current/scripts/step28_optuna.py
+@@ -166,8 +166,9 @@
+         truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+         pieces = []
+         for predicted in predictions:
+-            original = parent.ranking.objectives(predicted, truth, .5)
+-            rank = original["rank"] if arm == "S" else positive.objectives(predicted, truth)["rank_pos"]
++            original = (parent.ranking.objectives(predicted, truth, .5) if arm == "S"
++                        else positive.objectives(predicted, truth))
++            rank = original["rank"] if arm == "S" else original["rank_pos"]
+             pieces.append(dict(bce=original["bce"], rank_used=rank, hard=original["hard"],
+                                total=original["bce"]+self.spec.lambda_rank*rank+.5*original["hard"]))
+         supervised = (pieces[0]["total"]+pieces[1]["total"])/2
+--- attempt01/scripts/step28_optuna_control.py
++++ current/scripts/step28_optuna_control.py
+@@ -171,6 +171,7 @@
+         try:
+             if (result.get("status") != "SEARCH_COMPLETE" or result.get("trial") != spec.identity()
+                     or result.get("child_exit_code") != 0 or result.get("resources_released") is not True
++                    or result.get("access") != dict(train=1, valid=1, heldout=0, owners=0)
+                     or result.get("anchor_compatible") is not True and spec.number == 0):
+                 raise ValueError("Completion/exit/anchor evidence incomplete")
+             value = objective(result["domains"], self.reference)
+--- attempt01/scripts/step28_optuna_run.py
++++ current/scripts/step28_optuna_run.py
+@@ -18,11 +18,16 @@
+ import step28_positive_ranking_run as old
+ 
+ single, data, core, parent, diag, previous = old.single, old.data, old.core, old.parent, old.diag, old.previous
++ARMS=method.ARMS
+ POLICY = data.ROOT/"schema/step28_optuna_policy.json"
+ CONTRACT = data.ROOT/"docs/SELLER_ALIAS_OPTUNA.zh.md"
+ SCOPE = data.ROOT/"reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt"
+ AUTHORIZATION = data.ROOT/"reports/documentation/20261018/optuna_implementation/authorization.json"
+ COMPLETE = single.COMPLETE
++CPU_TESTS=("test_actual_objective_vjp_lr_and_rejected_omissions", "test_seeds_own_memory_capture_and_restore",
++    "test_real_optuna_selection_and_stop", "test_disjoint_budgets_and_real_launcher_failure",
++    "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
++    "test_cpu_six_call_fixture_orchestration")
+ 
+ 
+ def sources():
+@@ -195,9 +200,16 @@
+     rows = [np.flatnonzero(np.asarray(col["domains"]) == d) for d in "AB"]
+     if any(len(r) != 20 for r in rows): raise ValueError("Fixed AB populations required")
+     draws = np.random.Generator(np.random.PCG64(20260930)).integers(20, size=(5000,2,20))
+-    result = dict(absolute={}, old_changes={}, columns=col["columns"])
++    result = dict(absolute={}, old_changes={}, columns=col["columns"], query_positive_count_MAP={})
++    degrees=previous.array(root,col["query_positive_counts"],(40,28),np.uint8)
+     for name, roles in arrays.items():
+         result["absolute"][name] = {}
++        queries=previous.array(root,col["points"][name]["raw"]["queries"],(40,28,10),np.float64)
++        result["query_positive_count_MAP"][name]={}
++        for count in (1,2):
++            subgroup=(queries[:,:,0]*(degrees==count)).sum(1)/(degrees==count).sum(1)
++            result["query_positive_count_MAP"][name][str(count)]={d:dict(mean=float(subgroup[r].mean()),
++                conditional_95pct_interval=np.quantile(subgroup[r][draws[:,index,:]].mean(1),[.025,.975]).tolist()) for index,(d,r) in enumerate(zip("AB",rows))}
+         for role, values in roles.items():
+             rec = col["points"][name][role]
+             counts = data.read_json(root/rec["counts"]["path"])
+@@ -269,6 +281,9 @@
+     prepared=[]
+     for spec in specs:
+         job=campaign/spec.run_id;entry=Entry(spec)
++        rec=next(r for r in records if r["trial"]==spec.identity())
++        data.verify(data.ROOT/rec["completion_identity"]["path"],rec["completion_identity"])
++        if data.read_json(job/"access.json")!=rec["access"]:raise ValueError("Own actual access ledger changed before joint opening")
+         manifest=data.read_json(job/"run/manifest.json")
+         scores,split=entry.blind_gate(job/"run",manifest)
+         prepared.append((job,entry,manifest,scores,split))
+@@ -296,7 +311,10 @@
+     rows=[np.flatnonzero(np.asarray(first["domains"])==d) for d in "AB"]
+     draws=np.random.Generator(np.random.PCG64(20260930)).integers(20,size=(5000,2,20))
+     signs=np.array([-1 if k in ("brier","log_loss") else 1 for k in first["columns"]])
+-    result=dict(comparisons={},development_direction_consistency={},source_files=sources())
++    result=dict(comparisons={},development_direction_consistency={},source_files=sources(),three_seed_absolute={},query_subgroup_MAP_comparisons={})
++    for arm in ARMS:
++        result["three_seed_absolute"][arm]={phase:{role:old.summarize(np.mean([arrays[arm,s][phase+"_"+arm][role] for s in (1,2,3)],axis=0),rows,draws)
++            for role in parent.ROLES} for phase in "AB"}
+     for arm in ("S_pos","H_pos"):
+         each={};aggregate={}
+         for seed in (1,2,3):
+@@ -308,8 +326,26 @@
+         for phase in "AB":
+             aggregate[phase]={role:old.summarize(np.mean([arrays[arm,s][phase+"_"+arm][role]-
+                 arrays["S",s][phase+"_S"][role] for s in (1,2,3)],axis=0),rows,draws) for role in parent.ROLES}
++        aggregate["forgetting"]={role:old.summarize(np.mean([((arrays[arm,s]["A_"+arm][role]-arrays[arm,s]["B_"+arm][role])-
++            (arrays["S",s]["A_S"][role]-arrays["S",s]["B_S"][role]))*signs for s in (1,2,3)],axis=0),rows,draws)["A"] for role in parent.ROLES}
+         result["comparisons"][arm+"-S"]=dict(by_seed=each,three_seed_mean=aggregate)
+         result["development_direction_consistency"][arm]=all(each[str(s)]["B"]["raw"][d]["map"]["mean"]>0 for s in (1,2,3) for d in "AB")
++        sub={}
++        for count in (1,2):
++            deltas=[];by_seed={}
++            for seed in (1,2,3):
++                pair=[]
++                for candidate in (arm,"S"):
++                    spec=next(s for s in specs if s.arm==candidate and s.seed==seed)
++                    root=campaign/spec.run_id/"evaluation";col=cols[candidate,seed]
++                    degrees=previous.array(root,col["query_positive_counts"],(40,28),np.uint8)
++                    q=previous.array(root,col["points"]["B_"+candidate]["raw"]["queries"],(40,28,10),np.float64)
++                    pair.append((q[:,:,0]*(degrees==count)).sum(1)/(degrees==count).sum(1))
++                delta=pair[0]-pair[1];deltas.append(delta)
++                by_seed[str(seed)]={d:dict(mean=float(delta[r].mean()),conditional_95pct_interval=np.quantile(delta[r][draws[:,i,:]].mean(1),[.025,.975]).tolist()) for i,(d,r) in enumerate(zip("AB",rows))}
++            delta=np.mean(deltas,axis=0)
++            sub[str(count)]=dict(by_seed=by_seed,three_seed_mean={d:dict(mean=float(delta[r].mean()),conditional_95pct_interval=np.quantile(delta[r][draws[:,i,:]].mean(1),[.025,.975]).tolist()) for i,(d,r) in enumerate(zip("AB",rows))})
++        result["query_subgroup_MAP_comparisons"][arm+"-S"]=sub
+     result.update(status="NINE_REPLICATIONS_EVALUATED",limits="Development only; all nine retained regardless of six-cell result. No seed-population or final independent confirmation claim.")
+     data.write_json(campaign/"joint/evaluation.json",result)
+     return result
+--- attempt01/scripts/step28_optuna_search.py
++++ current/scripts/step28_optuna_search.py
+@@ -1,5 +1,8 @@
+ """Sequential 36+9 production dispatch. Explicit reviewed permission is mandatory."""
+ from __future__ import annotations
++
++import time
++MODULE_STARTED=time.monotonic()
+ 
+ import argparse
+ from contextlib import contextmanager
+@@ -37,6 +40,7 @@
+     cpu,native=bound("cpu"),bound("native")
+     if (cpu.get("status")!="PASS_HANDWRITTEN_ONLY" or cpu.get("source_files")!=current
+         or cpu.get("cumulative_charged_seconds",math.inf)>300 or cpu.get("unresolved_checks")!=[]
++        or set(cpu.get("qualified_tests",[]))!=set(run.CPU_TESTS)
+         or native.get("status")!="PASS_HANDWRITTEN_ONLY" or native.get("source_files")!=current
+         or native.get("cumulative_charged_seconds",math.inf)>1800 or set(native.get("arms",{}))!=set(ARMS)):
+         raise ValueError("Current bounded CPU/native evidence missing")
+@@ -52,6 +56,14 @@
+         data.verify(data.ROOT/record["path"],record)
+     if not projection["measurement_evidence"]:
+         raise ValueError("Actual conservative cost evidence required")
++    expected={arm:{key:run.single.projection(native["arms"][arm]["measurements"])["projected_total_seconds"]
++                   for key in ("search","replication")} for arm in ARMS}
++    if projection.get("cost_model")!="legacy_1.25_allowance1800" or projection["arms"]!=expected:
++        raise ValueError("Projection must recompute the retained cost model; a revised model needs a reviewed amendment")
++    for key in ("control","evaluation","analysis"):
++        bound=projection["shared_evidence"][key]
++        data.verify(data.ROOT/bound["evidence"]["path"],bound["evidence"])
++        if bound["conservative_seconds"]!=projection["shared"][key]:raise ValueError("Unbound shared-stage projection")
+     projected_gate(projection)
+     run.policy()
+     return gate,cpu,native
+@@ -140,6 +152,7 @@
+ 
+ def execute(job,gate_path):
+     ledger=Ledger();search=None
++    ledger.used["control"]=time.monotonic()-MODULE_STARTED
+     if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
+         raise ValueError("New independent campaign output required")
+     job.mkdir(parents=True)
+--- attempt01/scripts/step28_optuna_verify.py
++++ current/scripts/step28_optuna_verify.py
+@@ -41,8 +41,9 @@
+         rows_checked+=1
+     rng=np.random.Generator(np.random.PCG64(20260930));draws=rng.integers(20,size=(5000,2,20))
+     matrices={};groups=None
+-    def audit_summary(values,saved,rows):
++    def audit_summary(values,saved,rows,domains="AB"):
+         for dindex,(domain,indices) in enumerate(zip("AB",rows)):
++            if domain not in domains:continue
+             for k,name in enumerate(run.parent.metrics.COLUMNS):
+                 v=values[indices,k];undefined=np.isnan(v).any()
+                 check(saved[domain][name]["mean"],None if undefined else float(np.sum(v)/20))
+@@ -59,7 +60,7 @@
+             for role,values in roles.items():audit_summary(values,saved["absolute"][point][role]["by_domain"],rows)
+         for role in run.parent.ROLES:
+             delta=arrays["B_"+spec.arm][role]-arrays["A_"+spec.arm][role]
+-            audit_summary(delta,{"A":saved["old_changes"][role],"B":run.old.summarize(delta,rows,draws)["B"]},rows)
++            audit_summary(delta,{"A":saved["old_changes"][role]},rows,domains="A")
+         if spec.phase=="replication":matrices[spec.arm,spec.seed]=arrays
+     joint=data.read_json(job/"joint/evaluation.json")
+     for arm in ("S_pos","H_pos"):
+@@ -128,17 +129,21 @@
+         entry.loss_total(row,stage,arm);updates.append(row);gradients[len(updates)]=pre
+         progress("call_completed",actual_updates=len(updates),updates=updates,measurements=measurements)
+         return row
+-    parameter_snapshots={}
++    parameter_snapshots={};moment_snapshots={}
+     def parameters():return {k:p.detach().cpu().clone() for k,p in probes.items()}
+-    save("Q0",entries[0]);update(entries[0],1,1);parameter_snapshots[1]=parameters();save("Q1",entries[0])
++    def moments():return {k:{field:optimizer.state[p][field].detach().cpu().clone() for field in ("step","exp_avg","exp_avg_sq")} for k,p in probes.items()}
++    def lambda_state_effect(call,component):
++        p=probes[component]
++        deltas={key:float((moment_snapshots[call][component][key]-optimizer.state[p][key].detach().cpu()).abs().max()) for key in ("exp_avg","exp_avg_sq")}
++        if deltas["exp_avg"]<=0:raise ValueError("Lambda changed no actual Adam first moment")
++        return dict(parameter_delta=float((parameter_snapshots[call][component]-p.detach().cpu()).abs().max()),adam_moment_deltas=deltas)
++    save("Q0",entries[0]);update(entries[0],1,1);parameter_snapshots[1]=parameters();moment_snapshots[1]=moments();save("Q1",entries[0])
+     reload("Q0",entries[1]);update(entries[1],1,1)
+     for component in probes:
+         delta=float((gradients[1]["current"][component]-gradients[2]["current"][component]).abs().max())
+         if delta<=0:raise ValueError("Missing actual A lambda gradient effect")
+         effects[component]={"A_current_preclip_delta":delta}
+-        change=float((parameter_snapshots[1][component]-probes[component].detach().cpu()).abs().max())
+-        if change<=0:raise ValueError("A lambda did not affect actual parameters")
+-        effects[component]["A_parameter_delta"]=change
++        effects[component]["A_state_effect"]=lambda_state_effect(1,component)
+     data.write_json(out/"Q0_retirement.json",data.record(work/"Q0.pt",out));(work/"Q0.pt").unlink()
+     reload("Q1",entries[0])
+     for value in optimizer.state.values():value["step"].fill_(336)
+@@ -146,7 +151,7 @@
+     i,j=np.triu_indices(224,1);target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
+     save("QB",entries[0])
+     data.write_json(out/"Q1_retirement.json",data.record(work/"Q1.pt",out));(work/"Q1.pt").unlink()
+-    update(entries[0],2,49,target);parameter_snapshots[3]=parameters()
++    update(entries[0],2,49,target);parameter_snapshots[3]=parameters();moment_snapshots[3]=moments()
+     reload("QB",entries[1]);update(entries[1],2,49,target)
+     for component in probes:
+         for role in ("current","history"):
+@@ -155,13 +160,14 @@
+             delta=float((a-b).abs().max())
+             if delta<=0:raise ValueError("Missing actual B branch lambda effect")
+             effects[component]["B_"+role+"_preclip_delta"]=delta
+-        change=float((parameter_snapshots[3][component]-probes[component].detach().cpu()).abs().max())
+-        if change<=0:raise ValueError("B lambda did not affect actual parameters")
+-        effects[component]["B_parameter_delta"]=change
++        effects[component]["B_state_effect"]=lambda_state_effect(3,component)
+     lr_full={k:p.detach().cpu().clone() for k,p in probes.items()}
++    lr_moments=moments()
+     reload("QB",entries[2]);first=update(entries[2],2,49,target)
+     for k,p in probes.items():
+         if not torch.equal(gradients[4]["history"][k],gradients[5]["history"][k]):raise ValueError("LR-only forward/gradient changed")
++        for field in ("step","exp_avg","exp_avg_sq"):
++            if not torch.equal(lr_moments[k][field],optimizer.state[p][field].detach().cpu()):raise ValueError("LR-only Adam moments changed")
+         delta=float((lr_full[k]-p.detach().cpu()).abs().max())
+         if delta<=0:raise ValueError("LR had no actual update effect")
+         effects[k]["LR_parameter_delta"]=delta
+@@ -216,7 +222,7 @@
+     started=STARTED-max(0.,time.time()-float(os.environ.get("QUALIFICATION_STARTED_EPOCH",time.time()))-(time.monotonic()-STARTED))
+     report=dict(status="RUNNING",mode="gpu" if native else "cpu",source_files=run.sources(),prior_charged_seconds=args.prior_seconds,
+         peak_rss_bytes=0,peak_output_bytes=0,formal_inputs=False,formal_labels=False)
+-    stop=threading.Event();limit=1800 if native else 300
++    stop=threading.Event();limit=1800 if native else 300;arm_deadline=[None]
+     def write():
+         report.update(elapsed_seconds=time.monotonic()-started,cumulative_charged_seconds=args.prior_seconds+math.ceil(time.monotonic()-started))
+         data.write_json(out/"result.json",report)
+@@ -224,7 +230,8 @@
+         report["peak_rss_bytes"]=max(report["peak_rss_bytes"],process.memory_info().rss)
+         size=sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
+         report["peak_output_bytes"]=max(report["peak_output_bytes"],size+reserve)
+-        if (args.prior_seconds+time.monotonic()-started>=limit or report["peak_rss_bytes"]>(64 if native else 2)*2**30
++        if (args.prior_seconds+time.monotonic()-started>=limit or arm_deadline[0] is not None and time.monotonic()>=arm_deadline[0]
++            or report["peak_rss_bytes"]>(64 if native else 2)*2**30
+             or size+reserve>(10*2**30 if native else 64*2**20)):raise RuntimeError("Qualification cumulative resource limit")
+     def watchdog():
+         while not stop.wait(.2):
+@@ -237,7 +244,7 @@
+         if not native:
+             if os.environ.get("CUDA_VISIBLE_DEVICES")!="":raise ValueError("CPU qualification requires hidden GPU")
+             from test_step28_optuna import OptunaTests
+-            tests=args.tests or unittest.defaultTestLoader.getTestCaseNames(OptunaTests)
++            tests=args.tests or list(run.CPU_TESTS)
+             with (out/"unittest.txt").open("w",encoding="utf-8") as stream:
+                 result=unittest.TextTestRunner(stream=stream,verbosity=2,failfast=True).run(unittest.TestSuite(OptunaTests(n) for n in tests))
+             report.update(tests_run=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped))
+@@ -251,16 +258,16 @@
+             permission=data.read_json(data.ROOT/gate["execution_authorization"]["path"])
+             if permission.get("status")!="APPROVED" or permission.get("stages")!=["NATIVE"] or permission.get("source_files")!=run.sources() or not permission.get("user_quote"):raise ValueError("Specific native execution permission required")
+             cpu=data.read_json(data.ROOT/gate["cpu"]["path"])
+-            if cpu.get("status")!="PASS_HANDWRITTEN_ONLY" or cpu.get("source_files")!=run.sources() or cpu.get("cumulative_charged_seconds",math.inf)>300 or cpu.get("unresolved_checks")!=[]:raise ValueError("Current bounded CPU evidence required")
++            if cpu.get("status")!="PASS_HANDWRITTEN_ONLY" or cpu.get("source_files")!=run.sources() or cpu.get("cumulative_charged_seconds",math.inf)>300 or cpu.get("unresolved_checks")!=[] or set(cpu.get("qualified_tests",[]))!=set(run.CPU_TESTS):raise ValueError("Current bounded CPU evidence required")
+             report["arms"]={}
+             for arm in ARMS:
+-                tick=time.monotonic();arm_out=out/arm;arm_out.mkdir()
++                tick=time.monotonic();arm_deadline[0]=tick+600;arm_out=out/arm;arm_out.mkdir()
+                 def arm_check(reserve=0):
+                     check(reserve)
+                     if time.monotonic()-tick>=600:raise RuntimeError("Per-arm native deadline")
+                 def progress(stage,**details):report.update(stage=stage,active_arm=arm,**details);write()
+                 value=native_arm(arm_out,arm,arm_check,progress,bool(report["arms"]))
+-                arm_check();value["charged_seconds"]=math.ceil(time.monotonic()-tick);report["arms"][arm]=value;write()
++                arm_check();value["charged_seconds"]=math.ceil(time.monotonic()-tick);report["arms"][arm]=value;arm_deadline[0]=None;write()
+         check();report["status"]="PASS_HANDWRITTEN_ONLY"
+     except BaseException:
+         report.update(status="FAIL",traceback=traceback.format_exc());raise
+--- attempt01/scripts/step28_positive_ranking_run.py
++++ current/scripts/step28_positive_ranking_run.py
+@@ -349,8 +349,7 @@
+                 if not all(np.isfinite(e[k]) for k in keys):
+                     raise ValueError("Nonfinite history diagnostic")
+         scores[name] = roles
+-    for stage, sequences_here in (sequences.items() if roots == dict(memory=20260930, schedule=20260918) or
+-                                roots.get("schedule") == 20260918 and roots.get("memory") == 20260930 else ()):
++    for stage, sequences_here in (sequences.items() if roots["schedule"] == 20260918 and roots["memory"] == 20260930 else ()):
+         for other, (old_root, _, _) in entry.baseline_runs().items():
+             name = "AB"[stage-1]+"_"+other
+             old_log = data.read_json(old_root/"run/updates"/(name+".json"))
+--- attempt01/tests/test_step28_optuna.py
++++ current/tests/test_step28_optuna.py
+@@ -162,6 +162,7 @@
+             for arm in search.order(number):
+                 spec=search.ask(arm,number)
+                 result=dict(status="SEARCH_COMPLETE",trial=spec.identity(),child_exit_code=0,resources_released=True,
++                    access=dict(train=1,valid=1,heldout=0,owners=0),
+                     anchor_compatible=True,domains={"A":.50+number*.001,"B":.51+number*.002},completion_identity={"handwritten":True})
+                 search.tell(result)
+         selected=search.selected()
+@@ -232,3 +233,86 @@
+             with self.assertRaises(ValueError):entry.open_valid(out,{},[],[],entry.config())
+             loader.assert_not_called()
+         self.evidence("entry",dict(simulated_updates=288,actual_config_schedule_used=True,incomplete_B_prevents_supervision=True,actual_optimizer_calls=0))
++
++    def test_nine_saved_evaluation_and_independent_analysis(self):
++        campaign=self.temporary();groups=[handmade_group(f"g{i:02}") for i in range(40)]
++        split={"development":[dict(group_uid=g.uid,domain="A" if i<20 else "B") for i,g in enumerate(groups)]}
++        specs=[m.TrialSpec(arm,"replication",s-1,1,1,s) for s in (1,2,3) for arm in m.ARMS]
++        rng=np.random.Generator(np.random.PCG64(117));base=rng.normal(size=(40,378)).astype(np.float32)
++        base[0]=-10  # Undefined precision/MCC must remain N/A in the saved aggregates.
++        for spec in specs:
++            entry=run.Entry(spec);root=campaign/spec.run_id;root.mkdir()
++            values=base+spec.seed*(0.05 if spec.arm=="S_pos" else -.05 if spec.arm=="H_pos" else 0)*np.asarray([g.labels for g in groups])
++            values=values.astype(np.float32)
++            scores={point:{role:values if role=="raw" else values.astype(np.float64) for role in run.parent.ROLES} for point in entry.POINTS}
++            col=run.old.collect(root/"evaluation",scores,groups,split,entry=entry)
++            col["status"]="ALL_6_TRIAL_METRIC_COUNT_SETS_SAVED";data.write_json(root/"evaluation/collected.json",col)
++            run.statistics(root/"evaluation",col,spec.arm)
++        (campaign/"joint").mkdir();joint=run.replication_statistics(campaign,specs)
++        self.assertTrue(joint["development_direction_consistency"]["S_pos"])
++        self.assertFalse(joint["development_direction_consistency"]["H_pos"])
++        for arm in ("S_pos","H_pos"):
++            for d in "AB":
++                rows=range(20) if d=="A" else range(20,40)
++                values=[]
++                for s in (1,2,3):
++                    def read(candidate):
++                        spec=next(x for x in specs if x.seed==s and x.arm==candidate)
++                        return np.asarray(data.read_json(campaign/spec.run_id/"evaluation"/("B_"+candidate+"_raw_metrics.json"))["values"],float)[list(rows),12]
++                    values.append(read(arm)-read("S"))
++                self.assertAlmostEqual(joint["comparisons"][arm+"-S"]["three_seed_mean"]["B"]["raw"][d]["map"]["mean"],float(np.mean(values)),places=14)
++                self.assertNotEqual(float(np.mean(values)),float(np.mean(values[0])))
++        self.assertIsNone(joint["three_seed_absolute"]["S"]["B"]["raw"]["A"]["precision"]["mean"])
++        # Run the actual independent analyzer on a deliberately complete handwritten 36-slot ledger.
++        search={a:[] for a in m.ARMS}
++        import shutil
++        for arm in m.ARMS:
++            origin=next(s for s in specs if s.arm==arm and s.seed==1)
++            domains=data.read_json(campaign/origin.run_id/"evaluation/evaluation.json")["domains"]
++            for number in range(12):
++                spec=m.TrialSpec(arm,"search",number)
++                shutil.copytree(campaign/origin.run_id/"evaluation",campaign/spec.run_id/"evaluation")
++                search[arm].append(dict(number=number,state="COMPLETE",spec=spec.identity(),domains=domains,value=ctl.objective(domains,ctl.S0)))
++        data.write_json(campaign/"search.json",search)
++        data.write_json(campaign/"selected.json",{a:ctl.select_trial(search[a],ctl.S0) for a in m.ARMS})
++        data.write_json(campaign/"replications.json",[dict(trial=s.identity()) for s in specs])
++        from step28_optuna_verify import independent_analysis
++        independent_analysis(campaign)
++        audit=data.read_json(campaign/"analysis/audit.json");self.assertEqual(audit["status"],"PASS_SAVED_ARITHMETIC")
++        self.evidence("saved_evaluation",dict(actual_handwritten_collections=9,synthetic_analysis_slots=45,audit=audit,
++            synthetic_copies_are_not_training=True,actual_optimizer_calls=0))
++
++    def test_cpu_six_call_fixture_orchestration(self):
++        from contextlib import ExitStack
++        from types import SimpleNamespace
++        from test_step28_record_replay import TinyEncoder
++        from step28_optuna_verify import native_arm
++        class FixtureEncoder(TinyEncoder):
++            def __getitem__(self,index):
++                auto=SimpleNamespace(is_gradient_checkpointing=True,encoder=SimpleNamespace(layer=[SimpleNamespace(
++                    attention=SimpleNamespace(self=SimpleNamespace(query=self.embedding)))]))
++                return SimpleNamespace(auto_model=auto)
++            def tokenizer(self,texts,**kwargs):
++                if kwargs.get("padding") is False:return {"input_ids":[[0]*256 for _ in texts]}
++                return super().tokenizer(texts,**kwargs)
++        def fresh(c):
++            torch.manual_seed(c["initialization_seed"])
++            model=core.build_model(FixtureEncoder(),8,5);optimizer=core.make_optimizer(model,c)
++            return model,optimizer,dict(model=core.state_digest(model.state_dict()),adam=core.state_digest(optimizer.state_dict()))
++        with ExitStack() as stack:
++            for target,kwargs in (
++                ("step28_positive_ranking_verify.native_preflight",dict(return_value={"CPU_fixture_only":True})),
++                ("torch.cuda.synchronize",dict(return_value=None)),("torch.cuda.set_per_process_memory_fraction",dict(return_value=None)),
++                ("torch.cuda.get_device_properties",dict(return_value=SimpleNamespace(total_memory=48*2**30))),
++                ("torch.cuda.is_bf16_supported",dict(return_value=True)),
++                ("step28_optuna_run.Entry.pretrained_archive",dict(return_value={"handwritten_no_archive":True})),
++                ("step28_optuna_run.Entry.fresh",dict(side_effect=fresh)),
++                ("step28_optuna_run.Entry.validate_initial",dict(return_value=True)),
++                ("step28_optuna_run.Entry.baseline_inputs",dict(return_value=({},None,None,None))),
++                ("step28_optuna_run.parent.configure_numerics",dict(return_value={}))):stack.enter_context(mock.patch(target,**kwargs))
++            def progress(stage,**value):self.evidence("six_call_progress",dict(stage=stage,**value,CPU_fixture_only=True))
++            value=native_arm(self.temporary(),"H_pos",lambda reserve=0:None,progress,False)
++        self.assertEqual(value["actual_updates"],6)
++        self.evidence("six_call_fixture",dict(actual_CPU_optimizer_calls=6,native_BGE_GPU_evidence=False,
++            maximum_shape_tokenizer_check_mocked=True,initial_and_resource_checks_mocked=True,
++            actual_next_update_equal=value["next_update_bitwise_equal"],effects=value["effects"],updates=value["updates"]))
