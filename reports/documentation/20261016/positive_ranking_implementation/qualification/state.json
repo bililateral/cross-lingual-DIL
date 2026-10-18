@@ -1,5 +1,5 @@
 {
-  "status": "NATIVE_PASSED_FORMAL_RUNNING",
+  "status": "FORMAL_COMPLETE_RESULT_RECOVERED_INDEPENDENTLY_ANALYZED_PRIMARY_FAILED",
   "observed_date": "2026-10-18",
   "methods": [
     "S_pos",
@@ -62,38 +62,36 @@
     "conditional_on": "Both native arms pass, saved behavior and resource projection verified, fresh production gate/resource checks pass",
     "maximum_seconds": 57600,
     "maximum_output_bytes": 17179869184,
-    "state": "RUNNING_B_S_pos",
+    "state": "COMPLETE_S_POS_H_POS_FIXED_AB",
     "automatic_retry": false,
     "started_at": "2026-10-18T14:14:43.561503+08:00",
     "pid": 798095,
     "wrapper_pid": 798087,
     "timeout_pid": 798094,
-    "confirmed_updates_at_least": 289,
-    "confirmed_completed_endpoints": [
-      "A_S_pos"
-    ],
     "access": {
       "train": 1,
-      "valid": 0,
+      "valid": 1,
       "heldout": 0,
       "owners": 0
     },
-    "completion_present": false,
+    "completion_present": true,
     "failure_present": false,
-    "estimate": {
-      "tentative_total_hours": [
-        3.5,
-        5.0
-      ],
-      "tentative_completion_shanghai": [
-        "2026-10-18T17:45:00+08:00",
-        "2026-10-18T19:15:00+08:00"
-      ],
-      "basis": "A S_pos 288 updates and six captures in35.54min plus endpoint about3.5min; native paired update about twice A and H similar. Early rough estimate, shared GPU and later endpoints/evaluation may alter it. Not statistical interval.",
-      "native_conservative_projection_seconds": 38079.87608841504,
-      "native_projected_peak_output_bytes": 12396649894,
-      "hard_deadline_shanghai": "2026-10-19T06:14:43+08:00"
-    }
+    "actual_updates": 1152,
+    "gradient_group_presentations": 1728,
+    "completed_endpoints": [
+      "A_S_pos",
+      "B_S_pos",
+      "A_H_pos",
+      "B_H_pos"
+    ],
+    "diagnostic_captures": 24,
+    "diagnostic_decisions": 18,
+    "finished_at": "2026-10-18T17:45:44+08:00",
+    "training_wallclock_seconds": 12661,
+    "independent_analysis_charged_seconds": 3,
+    "cumulative_seconds": 12664,
+    "remaining_runtime_seconds": 0,
+    "processes_exited": true
   },
   "implementation_review": {
     "status": "COMPLETE_RECOVERED_AND_INDEPENDENTLY_ADJUDICATED",
@@ -125,16 +123,16 @@
     "primary_disposition": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt",
     "remaining_specific_blockers": 0
   },
-  "next": "正式原进程798095继续；监听已自删退出，禁止重建。下次核对实际completion/failure、访问账及进程；完成且共同盲门通过后才按合同回传正式小原件并在Linux独立分析。失败保留现场，无自动重试。",
+  "next": "固定正式运行和Linux独立分析已完成，保留有效未达标结果；具体389成员结果包已获准并单次提交GPT 6 Pro外审，等待完整回收与独立主审，不重训/调参/选轮/补种子。四权重及四Memory继续保管，原H_cons删除许可不扩大。",
   "git": "local_only",
   "legacy_H_cons": "完成且原负结果/预算不改；两权重已删，Memory保留。",
-  "custody": "已完整SFTP回传11份原生证据及8份启动/门禁/执行原件，共19文件1000572字节，大小/SHA全部一致。当前正式分数、模型和Memory留Linux活动目录，未下载或读取中途评价。",
+  "custody": "255份必要正式结果8685752字节及7份分析572387字节已SFTP回传逐项大小/SHA核对；权重/Memory留Linux，未载入/下载/删除；报告、分析源码和必要接收/收尾记录按实际同步回执保管。",
   "execution": {
     "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace",
     "listener_pid": 788758,
     "listener_dispatch": "reports/documentation/20261016/positive_ranking_implementation/qualification/dispatch.json",
-    "last_observation": "Read-only actual process identity/cwd, job resource/access/console, absent failure/completion, source SHA and CUDA owner checks; no unfinished formal score transfer.",
-    "observed_at": "2026-10-18T14:55:26.669917+08:00",
+    "last_observation": "reports/seller_alias_continual/20261018/positive_ranking_result/closeout.json",
+    "observed_at": "2026-10-18T19:32:27.462302+08:00",
     "sequence": "one native attempt; validate actual evidence and projection; one formal attempt; remove listener source after first actual formal update; stop on any failure",
     "native_result": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/qualification/native/result.json",
     "native_wallclock": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_wallclock.json",
@@ -155,7 +153,25 @@
       "other_mib": 21172,
       "other_started_after_formal_seconds": 27.19,
       "current_blocker": false,
-      "note": "Formal entry resource gate passed before this later other-user job. Do not stop other jobs or restart this run; actual OOM/failure follows existing no-retry contract."
+      "note": "Historical observation while the formal run was active. The run has now completed normally and the own PID is absent; this field does not describe current occupation."
+    },
+    "run_pids_absent": true
+  },
+  "result": {
+    "primary_passed": false,
+    "secondary_H_pos_minus_S_both_positive": false,
+    "validity": "Valid fixed configuration; no execution or saved-result audit blocker found. Result-specific external review pending.",
+    "report": "reports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt",
+    "inventory": "reports/seller_alias_continual/20261018/positive_ranking_result/inventory.json",
+    "receive_verification": "reports/seller_alias_continual/20261018/positive_ranking_result/receive_verification.json",
+    "independent_audit": "reports/seller_alias_continual/20261018/positive_ranking_result/analysis/audit.json",
+    "analysis_script": "scripts/step28_positive_ranking_audit.py",
+    "review": {
+      "status": "SUBMITTED_IN_PROGRESS",
+      "submission": "reports/seller_alias_continual/20261018/positive_ranking_result/review/submission.json",
+      "url": "https://chatgpt.com/c/6ad4b0e7-4ee8-83eb-9777-fd67a74468af",
+      "observed_at": "2026-10-18T19:43:57.018+08:00",
+      "sha256": "4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7"
     }
   }
 }
