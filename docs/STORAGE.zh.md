@@ -12,7 +12,7 @@
 
 新隔离目录为`/home/yongpeng/cross-lingual/reports/documentation/20261018/optuna_implementation/workspace`；仅46必要源码/合同/政策/批准材料，无正式数据/模型链接。6次CPU原件（含attempt02失败与修复）及各次源码tar快照共49文件1422971字节已SFTP回传，47载荷SHA逐项一致，当前46来源与Linux一致，见[回传记录](../reports/documentation/20261018/optuna_implementation/receive.json)。[CPU汇总门](../reports/documentation/20261018/optuna_implementation/qualification/cpu_gate.json)累计82/300秒、7项适用检查；临时手写模型/Memory已由测试目录清理，既有正式权重/Memory不接触。23:07:05现场无相关作业。
 
-Windows一次性deployment目录在核对当前Linux来源后已按解析绝对路径精确删除；必要源码留主目录，各次冻结快照及成功/失败证据保留。新实现外审包和清单见[package.json](../reports/documentation/20261018/optuna_implementation/review/package.json)，目前仅准备，等待具体外发确认。新材料仅本地Git，局部副本清理不重置10月23日大清理周期。
+Windows一次性deployment目录在核对当前Linux来源后已按解析绝对路径精确删除；必要源码留主目录，各次冻结快照及成功/失败证据保留。新实现外审包和清单见[package.json](../reports/documentation/20261018/optuna_implementation/review/package.json)，用户已批准上述具体2011821字节/141成员包，23:19:35单次上传并提交[GPT 6 Pro实现外审](../reports/documentation/20261018/optuna_implementation/review/submission.json)；活动输入包字节不变，模型选择/实际请求/页面/回执在同目录保管，专用页等待完整回收。新材料仅本地Git，局部副本清理不重置10月23日大清理周期。
 
 ## 2026-10-18 Optuna方案外审回收及主审
 
