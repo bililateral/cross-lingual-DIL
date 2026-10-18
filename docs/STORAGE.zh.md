@@ -8,6 +8,10 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-18 Optuna静态方案待审材料
+
+三臂[具体方案及独立主审](../reports/documentation/20261018/optuna_plan/proposal.zh.txt)、请求和25载荷清单已保存在Windows；新静态ZIP186342字节/26成员，SHA256 60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd，逐成员身份已核对，见[包记录](../reports/documentation/20261018/optuna_plan/review/package.json)。待该具体包外发许可，尚未上传/连接Linux或同步/执行；不复制权重、Memory、正式文本/标签或旧完整外审返回包。此材料保留用于待审，未新增冗余备份或清理已保管资产，新材料仅本地Git，大清理周期不变。
+
 ## 2026-10-18 S_pos/H_pos实现、CPU与实现外审
 
 用户随后明确：“给我把此次训练的权重删掉”。20:46:16—20:46:17已精确删除本次A_S_pos/B_S_pos/A_H_pos/B_H_pos四权重共5217586212字节；先核对四项原端点SHA、最终路径/属主/无运行依赖并回传删除前清单，再删除。models现为空，257个非权重作业文件逐项大小/SHA不变，四Memory共1381626字节保留；见[删除前身份](../reports/maintenance/20261018/positive_ranking_weights/predelete.json)及[实际回执](../reports/maintenance/20261018/positive_ranking_weights/receipt.json)。检查中两次系统会话/proc权限失败发生在删除前，根因与定向处置保留，不属科研失败。冻结审查/20:35观测保持当时事实；新许可覆盖本次四权重，不扩展其他资产。删除记录两端保管，局部清理不重置项目周期。
