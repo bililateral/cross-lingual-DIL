@@ -1,0 +1,20 @@
+test_rank_reference_and_rejected_mutants (test_step28_positive_ranking.PositiveRankingTests) ... ERROR
+
+======================================================================
+ERROR: test_rank_reference_and_rejected_mutants (test_step28_positive_ranking.PositiveRankingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_095700/workspace/tests/test_step28_positive_ranking.py", line 161, in test_rank_reference_and_rejected_mutants
+    old=record.parent.ranking.objectives(zero,torch.tensor(labels),.5)["rank"]
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_095700/workspace/scripts/step28_alias_ranking.py", line 118, in objectives
+    result = base.objectives(predicted, truth, 1)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_095700/workspace/scripts/step28_chinese_base.py", line 190, in objectives
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(predicted, truth, reduction="mean")
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 3593, in binary_cross_entropy_with_logits
+    return torch.binary_cross_entropy_with_logits(
+RuntimeError: result type Double can't be cast to the desired output type Long
+
+----------------------------------------------------------------------
+Ran 1 test in 0.091s
+
+FAILED (errors=1)

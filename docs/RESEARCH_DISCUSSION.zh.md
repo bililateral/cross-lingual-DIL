@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-18：批准具体双臂实现包外审
+
+用户明确回复：“批准上传该实现包外审”。自包含确认所指为333034字节／75成员、SHA256 81d3757f4acf1d6c9c93f0f921e2b8c38c5cf5b9c85aaebfe051449eebbf9342的[具体实现包](../reports/documentation/20261016/positive_ranking_implementation/review/package.json)，含合同、源码、CPU成功及失败原件和审查背景；不含正式数据/标签、权重、Memory或密码。许可仅外发，不启动GPU或正式训练。使用本地Playwright，第一次会话提交403未被接受；正常页面恢复后从资料库复用同一文件，第二次提交成功。10:11:34建立[唯一实现审查任务](https://chatgpt.com/c/6ad42ab0-aee0-83eb-b53a-81e1302fb008)，选择器GPT-6/Pro第5档，详见[发送回执](../reports/documentation/20261016/positive_ranking_implementation/review/submission.json)。一次上传、一个被接受任务；不把失败写成已开始，不另造重复审查。
+
+## 2026-10-18：继续已确认的S_pos/H_pos双臂实现
+
+用户对候选选择问题明确回复：“把两个都实现了，对比看看效果”，本日又明确“继续”。该问题已自包含限定对应代码实现及Linux既有py310手写CPU累计300秒；不读取正式文本/标签、不加载BGE或旧Memory，GPU资格和正式训练按具体合同另批。因此按[批准记录](../reports/documentation/20261016/positive_ranking_implementation/authorization.json)实现两臂，不再沿用此前主审建议单臂作为当前阻断，也不把该回复扩大为新GPU/数据预算。
+
+[双臂实施合同](SELLER_ALIAS_POSITIVE_RANKING.zh.md)固定current/history及A0/A1替换、两种原评分数值路径、各自Memory、共同valid门和四比较。主要门仍S_pos−S双域B末raw MAP；H_pos次级结果不能替换主要失败。必要CPU修复计入300秒并保留失败原件；具体新实现包外发、原生和正式执行分别按实际前提推进。旧方案／外审／主审原件中“待候选确认”是当时时点，不追改。
+
 ## 2026-10-16：回收S_pos/H_pos外审并独立主审
 
 用户原话：“外审已结束，把 S_pos/H_pos 的审查结果完整同步回来，仔细分析并独立主审，详细汇报这个方案是否值得做、两臂是否都有必要，以及需要修改哪些地方。确认后开始具体实现”。原会话47成员返回包及外部清单已完整回收核验，[独立主审](../reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt)建议一次有限单S_pos检验，H_pos可选但非必要；14项意见已逐条处置，不将外审建议自动作为执行许可。原包及补充身份、手写证据和52份本地保存对照已机械核对，无新科学计算。

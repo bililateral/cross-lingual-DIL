@@ -1,0 +1,29 @@
+test_rank_reference_and_rejected_mutants (test_step28_positive_ranking.PositiveRankingTests) ... FAIL
+
+======================================================================
+FAIL: test_rank_reference_and_rejected_mutants (test_step28_positive_ranking.PositiveRankingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_095200/workspace/tests/test_step28_positive_ranking.py", line 139, in test_rank_reference_and_rejected_mutants
+    np.testing.assert_allclose(gradient.numpy(),grad,atol=atol,rtol=rtol)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 1715, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 921, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=2e-05, atol=2e-06
+
+Mismatched elements: 1 / 378 (0.265%)
+Max absolute difference among violations: 3.59543732e-06
+Max relative difference among violations: 5.03361225e-05
+ ACTUAL: array([-0.035713, -0.03373 ,  0.003974,  0.      ,  0.004085,  0.003875,
+        0.      ,  0.004085,  0.003786,  0.      ,  0.004085,  0.003666,
+        0.      ,  0.004027,  0.003595,  0.      ,  0.004027,  0.00353 ,...
+ DESIRED: array([-0.035714, -0.03373 ,  0.003974,  0.      ,  0.004085,  0.003875,
+        0.      ,  0.004085,  0.003786,  0.      ,  0.004085,  0.003666,
+        0.      ,  0.004027,  0.003595,  0.      ,  0.004027,  0.003531,...
+
+----------------------------------------------------------------------
+Ran 1 test in 0.062s
+
+FAILED (failures=1)

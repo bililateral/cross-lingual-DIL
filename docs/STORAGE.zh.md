@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-18 S_pos/H_pos实现、CPU与实现外审
+
+三轮CPU分别位于Linux的`reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_095200/workspace`、`20261018_095700/workspace`、`20261018_100100/workspace`，各自部署41份必要文件并SFTP回读一致，失败来源未覆盖。17份必要CPU成功/失败原件共39033字节已回传Windows，逐项身份及实际Linux恢复路径见[接收映射](../reports/documentation/20261016/positive_ranking_implementation/qualification/receive_verification.json)。两次失败各计3秒、成功计24秒，累计30/300秒；不能用成功覆盖失败账。10:16:51现场无属主相关核验/训练进程，attempt03输出目录存在。
+
+15份必要授权、CPU验收/接收映射/状态和实现审查元数据共61933字节，以及3957字节[同步记录](../reports/documentation/20261016/positive_ranking_implementation/qualification/sync.json)，均按项目相对路径SFTP同步Linux主目录并逐字节回读一致。CPU运行原件保留各独立工作区；当前可变主目录docs只在Windows维护，不把本次小证据同步写成全仓同步。没有正式输入链接、BGE/旧Memory载入、GPU或正式训练，H_cons此前权重删除事实不改。
+
+用户批准的333034字节/75成员[实现包](../reports/documentation/20261016/positive_ranking_implementation/review/package.json)仅上传chatgpt.com一次；首次会话发送403未被接受，正常页面恢复后从资料库复用同一上传文件，10:11:34建立一个有效[审查任务](https://chatgpt.com/c/6ad42ab0-aee0-83eb-b53a-81e1302fb008)。包仍有当前审查/回收身份核对用途，唯一Windows原件及必要请求、选择器和接受证据保留，未向Linux补传ZIP。保留活动审查专用页与当前控制台日志；SSH已关闭，4份用后的一次性助手/传输清单与12份冗余页面快照已精确删除，共16文件184786字节，未清理科研原件或模型/Memory。局部收尾不重置10月23日大清理周期，新材料仅本地Git。
+
 ## 2026-10-16 S_pos/H_pos静态外审回收
 
 388411字节/47成员返回ZIP、内部46载荷和外部47项TSV均逐项核验；原22输入成员与两补充原件保持。完整报告、读取范围、14发现、手写核验源码/输入/结果/预执行身份/日志/执行账等22必要返回成员保管在reports/documentation/20261016/s_improvement/review/external。外审没有连接项目服务器或执行项目科研，本地主审也未重跑其算例。
