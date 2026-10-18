@@ -10,6 +10,8 @@
 
 ## 2026-10-18 Optuna静态方案待审材料
 
+后续用户指出时间资格与集中评价计费两项缺口，已另存[预算补充](../reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt)，仅Windows保管/本地Git，尚未外发；原26成员输入包及原稿不改。当前9000秒/114小时可行性未建立，集中评价归已有3300秒共享段，详见补充。未新增Linux执行/同步/数据读取或依赖变更。
+
 三臂[具体方案及独立主审](../reports/documentation/20261018/optuna_plan/proposal.zh.txt)、请求和25载荷清单保存在Windows；静态ZIP186342字节/26成员，SHA256 60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd，逐成员身份已核对，见[包记录](../reports/documentation/20261018/optuna_plan/review/package.json)。用户已批准具体包，21:18:18单次上传GPT 6 Pro，见[提交回执及页面](../reports/documentation/20261018/optuna_plan/review/submission.json)；活动外审输入保留，不复制权重、Memory、正式文本/标签或旧完整外审返回包。用户另行授权缺失时自行安装Optuna；既有Linux py310现为Optuna 4.6.0，原137包版本不变。安装前后清单、依赖解析/安装报告与回执共11文件159833字节在Linux的reports/maintenance/20261018/optuna_install及Windows同相对路径保管，已[SFTP回传逐文件身份集合核验](../reports/maintenance/20261018/optuna_install/receive_verification.json)。无科研执行，新材料仅本地Git，大清理周期不变。
 
 ## 2026-10-18 S_pos/H_pos实现、CPU与实现外审
