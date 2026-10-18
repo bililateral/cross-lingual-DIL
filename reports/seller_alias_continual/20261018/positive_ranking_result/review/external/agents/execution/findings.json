@@ -1,0 +1,63 @@
+{
+  "review_scope": "New S_pos/H_pos saved execution and provenance evidence only",
+  "verdict": "NO_SUPPORTED_RUN_INVALIDATING_OR_REPRODUCIBILITY_DEFECT",
+  "scientific_blockers": [],
+  "reproducibility_defects": [],
+  "observations": [
+    {
+      "id": "E01",
+      "title": "Authorized archive, 40 source identities and current/frozen copies align",
+      "evidence": [
+        "attempt02/mechanical_summary.json#/archive_identity",
+        "attempt02/mechanical_summary.json#/sources"
+      ]
+    },
+    {
+      "id": "E02",
+      "title": "255 returned originals and 52 saved baselines verified",
+      "evidence": [
+        "attempt02/mechanical_summary.json#/files"
+      ]
+    },
+    {
+      "id": "E03",
+      "title": "Native evidence includes branch-specific encoder/head gradient/parameter/Adam effects and second-arm zero memory",
+      "evidence": [
+        "attempt02/mechanical_summary.json#/native"
+      ]
+    },
+    {
+      "id": "E04",
+      "title": "1152 updates, 1728 group presentations, 4 endpoints, 24 captures and 18 interpretations reconstructed from records",
+      "evidence": [
+        "attempt02/mechanical_summary.json#/formal_counts"
+      ]
+    },
+    {
+      "id": "E05",
+      "title": "Before/after access and wrapper/resource/analysis accounting agree",
+      "evidence": [
+        "attempt02/mechanical_summary.json#/formal_resources"
+      ]
+    }
+  ],
+  "limitations": [
+    "No project-server connection, network, training, model loading, formal text/label parsing or Memory loading.",
+    "Bytes and metadata of excluded payloads are preserved source assertions; actual payload content could not be reverified in this package.",
+    "Source identities, saved score restore equality, update/capture records and fixed result accounting are replayed locally; label-derived metric truth is not recomputed.",
+    "Native tensor-effect entries are preserved project-native evidence; this local execution did not generate the underlying tensor effects."
+  ],
+  "out_of_scope_overdesign": [
+    "Additional data, model/Memory loading, project-server connection, re-running closed native qualification or formal training, new algorithms/seeds/epochs, new recovery frameworks or network hardening."
+  ],
+  "reviewer_execution_failures": [
+    {
+      "artifact": "attempt01/execution.json",
+      "cause": "Reviewer used incorrect inventory base directory and assumed analysis inventory dict schema; fixed only reviewer script. Exact failed script/stdout/stderr preserved."
+    },
+    {
+      "artifact": "exploratory_failure_excerpt.json",
+      "cause": "Early interactive print assumed native log has current_uid; excerpt explicitly not a complete stdout record."
+    }
+  ]
+}

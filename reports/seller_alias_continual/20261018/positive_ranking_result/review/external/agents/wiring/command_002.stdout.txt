@@ -1,0 +1,700 @@
+
+=== workspace/scripts/step28_positive_ranking.py [1..155/155] ===
+1: """Fixed S_pos/H_pos objectives on the existing record VJP; no data entry."""
+2: from __future__ import annotations
+3: 
+4: import hashlib
+5: from typing import Any
+6: 
+7: import numpy as np
+8: import torch
+9: 
+10: import step28_g_half as h
+11: 
+12: record, data = h.record, h.data
+13: ARMS = ("S_pos", "H_pos")
+14: RNG_ORDER = "ABC"
+15: 
+16: 
+17: def identity(arm: str) -> dict:
+18:     if arm not in ARMS:
+19:         raise ValueError("Only fixed S_pos/H_pos candidates are supported")
+20:     if arm == "H_pos":
+21:         return h.identity()
+22:     return dict(arm="S", pooling="complete_record_mean", record_order="canonical_offdiagonal_upper_v1",
+23:                 output_dtype="float32", numerics="original_FP32_matrix_mean")
+24: 
+25: 
+26: def training_identity(arm: str) -> dict:
+27:     identity(arm)
+28:     return dict(arm=arm, rank="mean_positive_logsumexp_zero_and_all_negative_differences",
+29:                 temperature=1., queries=28, candidates=27, positive_counts=[1, 2],
+30:                 reduction="mean_positive_then_mean_query", precision="actual_FP32_logits_FP32_rank",
+31:                 current_supervision=1., history_supervision=.1, teacher_A0=.5, hard_weight=.5,
+32:                 optimizer="AdamW", rng_order=RNG_ORDER)
+33: 
+34: 
+35: def metadata(arm: str) -> dict:
+36:     return dict(pooling=identity(arm), training=training_identity(arm))
+37: 
+38: 
+39: def bind(model: Any, meta: dict) -> str:
+40:     arm = meta.get("training", {}).get("arm")
+41:     if any(meta.get(k) != v for k, v in metadata(arm).items()):
+42:         raise ValueError("Candidate scoring/training identity mismatch")
+43:     model.pooling_identity, model.training_identity = identity(arm), training_identity(arm)
+44:     return arm
+45: 
+46: 
+47: def bound_arm(model: Any) -> str:
+48:     return bind(model, dict(pooling=getattr(model, "pooling_identity", None),
+49:                             training=getattr(model, "training_identity", None)))
+50: 
+51: 
+52: def account_logits(table: Any, slots: np.ndarray, arm: str) -> Any:
+53:     identity(arm)
+54:     return (record.account_logits(table, slots) if arm == "S_pos"
+55:             else h.account_logits(table, slots, "G_half"))
+56: 
+57: 
+58: def objectives(predicted: Any, truth: Any, *, old_rank: bool = False) -> dict:
+59:     """Replace rank, retaining the established label validation, BCE and hard."""
+60:     inherited = record.parent.ranking.objectives(predicted, truth, .5)
+61:     scores, positive, _ = record.parent.ranking.hard_candidates(predicted, truth)
+62:     diagonal = torch.eye(28, dtype=torch.bool, device=predicted.device)
+63:     negative = ~positive & ~diagonal
+64:     terms = []
+65:     for q in range(28):
+66:         pos, neg = scores[q, positive[q]], scores[q, negative[q]]
+67:         differences = neg[None, :] - pos[:, None]
+68:         terms_with_zero = torch.cat((differences.new_zeros((len(pos), 1)), differences), 1)
+69:         # Center explicitly so backward normalizes small FP32 values rather than
+70:         # subtracting a rounded, potentially large logsumexp from each difference.
+71:         peak = terms_with_zero.detach().amax(1, keepdim=True)
+72:         terms.append((torch.logsumexp(terms_with_zero-peak, 1)+peak[:, 0]).mean())
+73:     rank_pos = torch.stack(terms).mean()
+74:     if not torch.isfinite(rank_pos):
+75:         raise ValueError("Nonfinite positive ranking loss")
+76:     rank_used = inherited["rank"] if old_rank else rank_pos
+77:     # Do not add rank_pos to inherited total: that would retain the old rank.
+78:     return dict(bce=inherited["bce"], rank_pos=rank_pos, hard=inherited["hard"],
+79:                 rank_used=rank_used, total=inherited["bce"]+rank_used+.5*inherited["hard"])
+80: 
+81: 
+82: def objective(table: Any, group: Any, regroup_seed: int, arm: str,
+83:               reference: np.ndarray | None = None, *, old_rank: bool = False) -> tuple[Any, dict]:
+84:     identity(arm)
+85:     if group.labels is None:
+86:         raise ValueError("Authorized training labels required")
+87:     slots = (record.assignment(group), record.assignment(group, regroup_seed))
+88:     predictions = [account_logits(table, a, arm) for a in slots]
+89:     truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+90:     pieces = [objectives(p, truth, old_rank=old_rank) for p in predictions]
+91:     supervised = (pieces[0]["total"]+pieces[1]["total"])/2
+92:     mse = table.new_zeros(())
+93:     if reference is not None:
+94:         target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
+95:         mse = (predictions[0]-account_logits(target, slots[0], arm)).square().mean()
+96:     weight = 1. if reference is None else .1
+97:     supervised_contribution, teacher_contribution = weight*supervised, .5*mse
+98:     total = supervised_contribution+teacher_contribution
+99:     if not torch.isfinite(total):
+100:         raise ValueError("Nonfinite complete objective")
+101:     return total, dict(supervised=float(supervised.detach()), mse0=float(mse.detach()), mse1=None,
+102:         distillation=float(mse.detach()), supervised_contribution=float(supervised_contribution.detach()),
+103:         teacher_contribution=float(teacher_contribution.detach()), weighted=float(total.detach()),
+104:         qualification_old_rank=old_rank,
+105:         views=[{k: float(v.detach()) for k, v in p.items()} for p in pieces])
+106: 
+107: 
+108: def update(model: Any, optimizer: Any, current: Any, history: Any, reference: Any, c: dict,
+109:            arm: str, stage: int, step: int, check=lambda: None, observe=None,
+110:            *, qualification_old_rank: bool = False, table_observer=None) -> dict:
+111:     if bound_arm(model) != arm:
+112:         raise ValueError("Bound candidate differs from requested update")
+113:     if (qualification_old_rank or table_observer is not None) and c.get("handwritten_qualification") is not True:
+114:         raise ValueError("Only handwritten qualification can switch rank or observe tables")
+115:     if (history is None) != (reference is None):
+116:         raise ValueError("Historical group and its own birth table must be paired")
+117:     def target(table, group, seed, candidate, ref):
+118:         value, log = objective(table, group, seed, candidate, ref, old_rank=qualification_old_rank)
+119:         if table_observer is not None:
+120:             table_observer(table.detach(), group, seed, ref)
+121:         return value, log
+122:     result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
+123:                            stage, step, check, observe=observe, objective_fn=target)
+124:     for role, group in (("current", current), ("history", history)):
+125:         if group is not None:
+126:             seed = data.seed_for(20260918, RNG_ORDER, stage, step, role, group.uid, "regroup")
+127:             result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(group, seed).tobytes()).hexdigest()
+128:     result.update(metadata(arm))
+129:     return result
+130: 
+131: 
+132: def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None) -> np.ndarray:
+133:     if bound_arm(model) != arm:
+134:         raise ValueError("Scoring candidate differs from restored training identity")
+135:     if not groups:
+136:         return np.empty((0, 378), np.float32)
+137:     return (record.score(model, groups, c, check) if arm == "S_pos"
+138:             else h.score(model, groups, c, "G_half", check))
+139: 
+140: 
+141: def restored_score(model: Any, groups: list, c: dict, check=lambda: None) -> np.ndarray:
+142:     return score(model, groups, c, bound_arm(model), check)
+143: 
+144: 
+145: def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list, c: dict,
+146:             arm: str, stage: int, epoch: int, root, point: str, check=lambda: None) -> dict:
+147:     import step28_replay_diagnostics as diag
+148:     result = diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch,
+149:         root, point, check, scope="AB", score_fn=score,
+150:         pooling_fn=lambda table, slots, group, view: account_logits(table, slots, arm))
+151:     path = root/result["path"]
+152:     row = data.read_json(path)
+153:     row.update(metadata(arm))
+154:     data.write_json(path, row)
+155:     return data.record(path, root)
+
+=== workspace/scripts/step28_positive_ranking_run.py [1..541/541] ===
+1: """Two fixed positive-rank arms; shared record lifecycle, one joint valid opening."""
+2: from __future__ import annotations
+3: 
+4: import argparse
+5: import ast
+6: from functools import partial
+7: import math
+8: import os
+9: from pathlib import Path
+10: import random
+11: import shutil
+12: import signal
+13: import sys
+14: import threading
+15: import time
+16: import traceback
+17: import hashlib
+18: 
+19: import numpy as np
+20: 
+21: import step28_positive_ranking as method
+22: import step28_g_half_run as single
+23: import step28_h_consistency_run as baselines
+24: 
+25: record, data, parent, core = single.record, single.data, single.parent, single.core
+26: base, previous, diag = single.base, single.previous, single.diag
+27: POLICY = data.ROOT/"schema/step28_positive_ranking_policy.json"
+28: BASELINE = baselines.BASELINE
+29: AUTHORIZATION = data.ROOT/"reports/documentation/20261016/positive_ranking_implementation/authorization.json"
+30: CONTRACT = data.ROOT/"docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md"
+31: POINTS = tuple(stage+"_"+arm for arm in method.ARMS for stage in "AB")
+32: COMPLETE = "COMPLETE_1152_UPDATES_4_RESTORES_24_DIAGNOSTICS_VALID_BLIND"
+33: COMPLETION_STATUS = "COMPLETE_S_POS_H_POS_FIXED_AB"
+34: CPU_TESTS = ("test_rank_reference_and_rejected_mutants", "test_views_history_and_actual_vjp_adamw",
+35:              "test_capture_restore_and_next_update", "test_dual_orchestration_and_joint_opening",
+36:              "test_saved_comparisons_and_permissions", "test_stage_a_empty_cache",
+37:              "test_native_continuation_preflight")
+38: fresh, pretrained_archive = single.fresh, single.pretrained_archive
+39: public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
+40: baseline_runs, baseline_inputs = baselines.baseline_runs, baselines.baseline_inputs
+41: query_metrics, undefined_metrics = single.query_metrics, single.undefined_metrics
+42: pooled_rates, summarize = single.pooled_rates, single.summarize
+43: trajectory = single.trajectory
+44: 
+45: 
+46: def policy():
+47:     p = data.read_json(POLICY)
+48:     old = single.policy()
+49:     expected = {**old, "study": "fixed_positive_rank_S_and_H", "methods": list(method.ARMS),
+50:         "physical_updates": 1152, "gradient_group_presentations": 1728,
+51:         "physical_stage_states": 4, "epoch_diagnostic_points": 24,
+52:         "cpu_verification": {**old["cpu_verification"], "maximum_seconds": 300},
+53:         "native_verification": {**old["native_verification"], "maximum_seconds": 1200,
+54:                                 "per_arm_maximum_seconds": 600, "actual_updates": 12},
+55:         "runtime": {**old["runtime"], "maximum_gpu_stage_seconds": 57600, "maximum_output_bytes": 16*2**30},
+56:         "candidates": {arm: method.metadata(arm) for arm in method.ARMS},
+57:         "evaluation": dict(bootstrap_replicates=5000, bootstrap_seed=20260930,
+58:             comparisons=[["S_pos", "S"], ["H_pos", "S"], ["H_pos", "G_half"], ["H_pos", "S_pos"]],
+59:             primary_metric="map", primary_role="raw",
+60:             success="B_end_S_pos_minus_S_each_AB_MAP_CI_lower_strictly_positive")}
+61:     del expected["pooling"]
+62:     if p != expected:
+63:         raise ValueError("Fixed dual positive-rank policy differs")
+64:     return p
+65: 
+66: 
+67: def config():
+68:     c = record.config()
+69:     c["runtime"] = policy()["runtime"]
+70:     return c
+71: 
+72: 
+73: def sources():
+74:     paths = {data.ROOT/n for n in ("scripts/step28_positive_ranking_run.py",
+75:         "scripts/step28_positive_ranking_verify.py", "tests/test_step28_positive_ranking.py",
+76:         "tests/test_step28_g_half.py", "tests/test_step28_record_replay.py")}
+77:     todo = list(paths)
+78:     while todo:
+79:         for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
+80:             names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
+81:             for name in names:
+82:                 if name and name.startswith("step28_"):
+83:                     child = data.ROOT/"scripts"/(name+".py")
+84:                     if child not in paths:
+85:                         paths.add(child)
+86:                         todo.append(child)
+87:     paths.update(data.ROOT/"schema"/n for n in ("step28_g_half_policy.json", "step28_record_replay_policy.json",
+88:         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
+89:     paths.update((POLICY, BASELINE, AUTHORIZATION, CONTRACT,
+90:                   data.ROOT/"scripts/run_step28_positive_ranking_linux_20261018.sh"))
+91:     return [data.record(p, data.ROOT) for p in sorted(paths)]
+92: 
+93: 
+94: def loss_total(row, stage, arm):
+95:     if stage not in (1, 2) or any(row.get(k) != v for k, v in method.metadata(arm).items()):
+96:         raise ValueError("Wrong stage or update identity")
+97:     total = 0.
+98:     def close(a, b):
+99:         if not np.isfinite(a) or not np.isfinite(b) or not np.isclose(a, b, atol=2e-6, rtol=2e-6):
+100:             raise ValueError("Positive-rank loss decomposition differs")
+101:     for role, weight in (("current", 1.), ("history", .1)):
+102:         if role == "history" and stage == 1:
+103:             if role in row: raise ValueError("Stage A cannot use history")
+104:             continue
+105:         r = row[role]
+106:         if r["qualification_old_rank"] is not False or r["mse1"] is not None or len(r["views"]) != 2:
+107:             raise ValueError("Wrong rank/teacher/views in formal update")
+108:         if role == "current" and r["mse0"] != 0:
+109:             raise ValueError("Current used a birth teacher")
+110:         for v in r["views"]:
+111:             close(v["rank_used"], v["rank_pos"])
+112:             close(v["total"], v["bce"]+v["rank_pos"]+.5*v["hard"])
+113:         close(r["supervised"], sum(v["total"] for v in r["views"])/2)
+114:         close(r["distillation"], r["mse0"])
+115:         close(r["supervised_contribution"], weight*r["supervised"])
+116:         close(r["teacher_contribution"], .5*r["mse0"])
+117:         contribution = weight*r["supervised"]+.5*r["mse0"]
+118:         close(r["weighted"], contribution)
+119:         total += contribution
+120:     close(row["total"], total)
+121:     return total
+122: 
+123: 
+124: def validate_diagnostic(d, arm):
+125:     if any(d.get(k) != v for k, v in method.metadata(arm).items()):
+126:         raise ValueError("Diagnostic scoring/training identity differs")
+127: 
+128: 
+129: def native_objective_pair(off, on, stage):
+130:     arm = on["training"]["arm"]
+131:     loss_total(on, stage, arm)
+132:     if any(off.get(k) != v for k, v in method.metadata(arm).items()):
+133:         raise ValueError("Native control identity differs")
+134:     details = {}
+135:     for role in (("current",) if stage == 1 else ("current", "history")):
+136:         a, b = off[role], on[role]
+137:         if a["qualification_old_rank"] is not True or b["qualification_old_rank"] is not False:
+138:             raise ValueError("Wrong old/new rank switch")
+139:         for key in ("mse0", "mse1", "assignment_sha256", "teacher_contribution"):
+140:             if a[key] != b[key]: raise ValueError("Rank comparison changed teacher/allocation")
+141:         for va, vb in zip(a["views"], b["views"], strict=True):
+142:             for key in ("bce", "hard", "rank_pos"):
+143:                 if va[key] != vb[key]: raise ValueError("Rank comparison changed other terms")
+144:             if not np.isclose(va["total"], va["bce"]+va["rank_used"]+.5*va["hard"], atol=2e-6, rtol=2e-6):
+145:                 raise ValueError("Old-rank control arithmetic differs")
+146:         details[role] = dict(old_rank=[v["rank_used"] for v in a["views"]],
+147:             new_rank=[v["rank_pos"] for v in b["views"]], old_weighted=a["weighted"],new_weighted=b["weighted"],
+148:             actual_total_difference=b["weighted"]-a["weighted"], scalar_difference_is_not_effect_gate=True)
+149:     return details
+150: 
+151: 
+152: class Budget(single.Budget):
+153:     def __init__(self, root):
+154:         super().__init__(root)
+155:         self.limits = policy()["runtime"]
+156: 
+157: 
+158: def projection(measurements):
+159:     arms = {arm: single.projection(measurements[arm]) for arm in method.ARMS}
+160:     seconds = sum(p["projected_total_seconds"] for p in arms.values())
+161:     peak = math.ceil(1.1*(max(m["W_F"] for m in measurements.values())+
+162:                            sum(2*m["W_I"] for m in measurements.values())+2*2**30))
+163:     return dict(arms=arms, projected_total_seconds=seconds, projected_peak_output_bytes=peak,
+164:                 within_budget=seconds <= 57600 and peak <= 16*2**30)
+165: 
+166: 
+167: def reviewed_gate(path, kind):
+168:     gate = data.read_json(path)
+169:     if (kind not in ("NATIVE", "FORMAL") or gate.get("kind") != kind
+170:             or gate.get("status") != "APPROVED_NO_OPEN_BLOCKERS" or gate.get("source_files") != sources()
+171:             or gate.get("candidates") != policy()["candidates"]
+172:             or gate.get("implementation_authorization") != data.record(AUTHORIZATION, data.ROOT)):
+173:         raise ValueError("Source-bound positive-rank implementation gate required")
+174:     # Implementation approval is not GPU/data permission. The future permission is a separate exact record.
+175:     permission = data.read_json(data.verify(data.ROOT/gate["execution_authorization"]["path"], gate["execution_authorization"]))
+176:     if (permission.get("status") != "APPROVED" or kind not in permission.get("stages", [])
+177:             or permission.get("contract") != data.record(CONTRACT, data.ROOT)
+178:             or permission.get("source_files") != sources() or not permission.get("user_quote")):
+179:         raise ValueError("Specific execution approval missing")
+180:     for key in ("external_review", "primary_disposition", "cpu"):
+181:         data.verify(data.ROOT/gate[key]["path"], gate[key])
+182:     cpu = data.read_json(data.ROOT/gate["cpu"]["path"])
+183:     if (cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("mode") != "cpu"
+184:             or cpu.get("source_files") != sources() or cpu.get("cumulative_charged_seconds", math.inf) > 300
+185:             or cpu.get("unresolved_checks") != [] or set(cpu.get("qualified_tests", [])) != set(CPU_TESTS)):
+186:         raise ValueError("Affected CPU evidence missing")
+187:     return gate
+188: 
+189: 
+190: def validate_gate(job, path):
+191:     gate = reviewed_gate(path, "FORMAL")
+192:     if (gate.get("job") != job.relative_to(data.ROOT).as_posix() or gate.get("runtime") != policy()["runtime"]
+193:             or gate.get("supervision") != policy()["supervision"]):
+194:         raise ValueError("Dual formal scope differs")
+195:     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
+196:     if (gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("mode") != "gpu"
+197:             or gpu.get("source_files") != sources() or gpu.get("cumulative_charged_seconds", math.inf) > 1200
+198:             or set(gpu.get("arms", {})) != set(method.ARMS)):
+199:         raise ValueError("Both native candidates must qualify")
+200:     for arm, native in gpu["arms"].items():
+201:         if (native.get("actual_updates") != 6 or native.get("charged_seconds", math.inf) > 600
+202:                 or native.get("maximum_records") != 224 or native.get("channel_tokens") != 256
+203:                 or native.get("both_phases_encoder_head_effect") is not True
+204:                 or native.get("next_update_bitwise_equal") is not True
+205:                 or native.get("pooling_restores_verified") is not True
+206:                 or native.get("rank_precision_verified") is not True
+207:                 or native.get("metadata") != method.metadata(arm)):
+208:             raise ValueError("Native effects/restoration missing: "+arm)
+209:     if not projection({arm: v["measurements"] for arm, v in gpu["arms"].items()})["within_budget"]:
+210:         raise ValueError("Measured dual run exceeds budget")
+211:     return gate
+212: 
+213: 
+214: # These functions already receive an explicit entry: no global mutation or default-arm substitution.
+215: for _name in ("train_stage", "memory_from", "restore_point", "checkpoint", "train", "open_valid"):
+216:     globals()[_name] = partial(getattr(single, _name), entry=sys.modules[__name__])
+217: 
+218: 
+219: def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
+220:     entry = entry or sys.modules[__name__]
+221:     if (manifest["status"] != entry.COMPLETE or manifest["source_files"] != entry.sources()
+222:             or manifest["physical_updates"] != 1152 or manifest["gradient_group_presentations"] != 1728
+223:             or any(set(manifest[k]) != set(entry.POINTS) for k in ("points", "training", "diagnostics"))
+224:             or any(set(manifest[k]) != set(entry.method.ARMS) for k in ("starts", "initials"))):
+225:         raise ValueError("Incomplete source-bound blind experiment")
+226:     baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
+227:     if manifest.get("baseline_identity") != data.record(entry.BASELINE, data.ROOT):
+228:         raise ValueError("Baseline provenance missing")
+229:     split = data.read_json(data.verify(root/manifest["partition"]["path"], manifest["partition"]))
+230:     if split != data.read_json(old_root/"run/partition.json"):
+231:         raise ValueError("Frozen baseline partition differs")
+232:     valid_ids = [r["group_uid"] for r in split["development"]]
+233:     if len(valid_ids) != 40 or any(sum(r["domain"] == d for r in split["development"]) != 20 for d in "AB"):
+234:         raise ValueError("AB valid coverage differs")
+235:     fit = {r["group_uid"]: r["domain"] for r in split["fit"]}
+236:     canonical = sorted(u for u, domain in fit.items() if domain == "A")
+237:     if len(canonical) != 48:
+238:         raise ValueError("Shared A fit scope differs")
+239:     a_point = manifest["points"]["A_"+entry.method.ARMS[0]]
+240:     shared = record.Memory.from_bytes(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes())
+241:     members = shared.summary()["members"]
+242:     rng = random.Random(data.seed_for(20260930, "ABC", "retention"))
+243:     retained = []
+244:     for seen, uid in enumerate(sorted(canonical), 1):
+245:         k = seen-1 if seen <= 6 else rng.randrange(seen)
+246:         if k < 6:
+247:             if k == len(retained):
+248:                 retained.append(uid)
+249:             else:
+250:                 retained[k] = uid
+251:     if retained != members:
+252:         raise ValueError("Independent Algorithm R differs")
+253:     for arm in entry.method.ARMS:
+254:         if (manifest["initials"][arm] != baseline["initial_identity"]
+255:                 or manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]):
+256:             raise ValueError("Independent starts/own A continuation missing")
+257:     scores, sequences = {}, {1: [], 2: []}
+258:     for name in entry.POINTS:
+259:         point = manifest["points"][name]
+260:         arm, stage = name[2:], "AB".index(name[0])+1
+261:         a_point = manifest["points"]["A_"+arm]
+262:         if (point["arm"] != arm or point["stage"] != stage or point["adam_step"] != stage*288
+263:                 or point["full_restore_verified"] is not True or point["inference_restore_verified"] is not True
+264:                 or any(point.get(k) != v for k, v in entry.method.metadata(arm).items())):
+265:             raise ValueError("Endpoint restoration missing")
+266:         logrec = manifest["training"][name]
+267:         log = data.read_json(data.verify(root/logrec["path"], logrec))
+268:         expected_fit = [r["group_uid"] for r in split["fit"] if r["domain"] == "AB"[stage-1]]
+269:         stream = data.seed_for(20260918, "ABC", stage, "current")
+270:         expected = data.schedule([type("ID", (), {"uid": u})() for u in expected_fit], 6, stream)
+271:         if log["updates"] != 288 or len(log["rows"]) != 288 or log["adam_step"] != stage*288 or log["current_ids"] != [g.uid for g in expected]:
+272:             raise ValueError("Main schedule/update count differs")
+273:         memory = entry.memory_from(data.verify(root/point["memory"]["path"], point["memory"]).read_bytes(), arm)
+274:         if (memory.summary() != point["memory_summary"] or memory.reservoir.seen != 48 or memory.summary()["members"] != members
+275:                 or memory.maps["pooling"] != entry.method.identity(arm)
+276:                 or point["continuity"]["memory_sha256"] != memory.summary()["sha256"]):
+277:             raise ValueError("Terminal memory unexpectedly retained B")
+278:         if stage == 2:
+279:             prior = entry.memory_from(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes(), arm)
+280:             prior.begin_stage(2)
+281:             if prior.summary() != log["memory_before"]:
+282:                 raise ValueError("Wrong own A Memory")
+283:             ids = [prior.draw()[0].uid for _ in range(288)]
+284:             if ids != log["history_ids"] or prior.summary() != log["memory_after"]:
+285:                 raise ValueError("History draw state differs")
+286:             if any(not np.array_equal(prior.tables[u], memory.tables[u]) for u in members):
+287:                 raise ValueError("Birth target refreshed")
+288:         elif log["history_ids"] or log["memory_before"] is not None:
+289:             raise ValueError("Shared A used history")
+290:         assignments = []
+291:         for step, row in enumerate(log["rows"], 1):
+292:             total = entry.loss_total(row, stage, arm)
+293:             hashes = [row["current"]["assignment_sha256"]]
+294:             if stage == 2:
+295:                 h = row["history"]
+296:                 group = next(g for g in memory.reservoir.groups if g.uid == row["history_uid"])
+297:                 key = data.seed_for(20260918, "ABC", stage, step, "history", group.uid, "regroup")
+298:                 if h["assignment_sha256"] != hashlib.sha256(record.assignment(group, key).tobytes()).hexdigest():
+299:                     raise ValueError("Historical A1 assignment differs")
+300:                 hashes.append(h["assignment_sha256"])
+301:             assignments.append(hashes)
+302:             if (row["step"] != step or row["encoder_lr"] != parent.stage_lr(step) or row["head_lr"] != .001
+303:                     or row["pooling"] != entry.method.identity(arm)
+304:                     or not np.isfinite(row["total"]) or not np.isclose(row["total"], total, rtol=2e-6, atol=2e-6)):
+305:                 raise ValueError("Actual loss/LR decomposition differs")
+306:         sequences[stage].append((log["current_ids"], log["history_ids"], assignments))
+307:         mapping = data.read_json(data.verify(root/point["mapping"]["path"], point["mapping"]))
+308:         if mapping["status"] != "PASS_CALIBRATION_FIT" or point["maps"]["first"] != a_point["maps"]["first"]:
+309:             raise ValueError("Calibration failed or first map changed")
+310:         if point["calibration_ids"] != [r["group_uid"] for r in split["calibration"] if r["domain"] == "AB"[stage-1]]:
+311:             raise ValueError("Calibration scope differs")
+312:         data.verify(root/point["model"]["path"], point["model"])
+313:         calibration = previous.array(root, point["scores"]["calibration"], (12, 378), np.float32)
+314:         roles = {r: previous.array(root, point["scores"][r], (40, 378), np.float32 if r == "raw" else np.float64) for r in parent.ROLES}
+315:         for prefix in ("full", "inference"):
+316:             for role, expected_values in (("calibration", calibration), ("raw", roles["raw"])):
+317:                 restored = previous.array(root, point["scores"][prefix+"-"+role], expected_values.shape, np.float32)
+318:                 if not np.array_equal(restored, expected_values):
+319:                     raise ValueError("Saved restored scores differ")
+320:         for role, key in (("stage-cal", "stage"), ("first-cal", "first")):
+321:             if not np.array_equal(roles[role], parent.calibration.transform(roles["raw"], point["maps"][key])):
+322:                 raise ValueError("Saved affine scores differ")
+323:         captures = manifest["diagnostics"][name]
+324:         if len(captures) != 6:
+325:             raise ValueError("Missing complete epoch diagnostics")
+326:         for epoch, rec in enumerate(captures, 1):
+327:             droot = root/"diagnostics"
+328:             d = data.read_json(data.verify(droot/rec["path"], rec))
+329:             entry.validate_diagnostic(d, arm)
+330:             cache_ids = [] if stage == 1 else members
+331:             if (d["epoch"] != epoch or d["adam_step"] != (stage-1)*288+epoch*48 or d["stage_step"] != epoch*48
+332:                     or d["stage"] != stage or d["arm"] != arm or d["order"] != "ABC" or d["valid_labels_used"] is not False
+333:                     or d["fit_ids"] != expected_fit or d["cache_ids"] != cache_ids or d["valid_ids"] != valid_ids
+334:                     or d["fit_domains"] != ["AB"[stage-1]]*48 or d["cache_domains"] != ["A"]*len(cache_ids)):
+335:                 raise ValueError("Diagnostic scope/epoch/identity differs")
+336:             previous.array(droot, d["fit"], (48, 3), np.float64)
+337:             previous.array(droot, d["cache"], (len(cache_ids), 3), np.float64)
+338:             v = previous.array(droot, d["valid_blind"], (40, 378), np.float32)
+339:             if epoch == 6 and not np.array_equal(v, roles["raw"]):
+340:                 raise ValueError("Final diagnostic and endpoint raw differ")
+341:             if [e["uid"] for e in d["teacher_errors"]] != cache_ids:
+342:                 raise ValueError("History diagnostics missing")
+343:             for e in d["teacher_errors"]:
+344:                 keys = ("D0", "D1", "residual_cross_mean", "residual_difference_mse")
+345:                 if not all(np.isfinite(e[k]) for k in keys):
+346:                     raise ValueError("Nonfinite history diagnostic")
+347:         scores[name] = roles
+348:     for stage, sequences_here in sequences.items():
+349:         for other, (old_root, _, _) in entry.baseline_runs().items():
+350:             name = "AB"[stage-1]+"_"+other
+351:             old_log = data.read_json(old_root/"run/updates"/(name+".json"))
+352:             if sequences_here != [trajectory(old_log)]*len(entry.method.ARMS):
+353:                 raise ValueError("H actual schedule/A1/history differs from frozen "+other)
+354:     return scores, split
+355: 
+356: 
+357: def collect(root, scores, labelled, split, *, entry=None):
+358:     entry = entry or sys.modules[__name__]
+359:     root.mkdir()
+360:     if [g.uid for g in labelled] != [r["group_uid"] for r in split["development"]]:
+361:         raise ValueError("Opened valid alignment differs")
+362:     truth = np.asarray([g.labels for g in labelled], np.uint8)
+363:     result = {"source_files": entry.sources(), "group_ids": [g.uid for g in labelled],
+364:         "domains": [r["domain"] for r in split["development"]], "columns": list(parent.metrics.COLUMNS), "points": {}}
+365:     for name, roles in scores.items():
+366:         result["points"][name] = {}
+367:         for role, values in roles.items():
+368:             matrix, counts = parent.metrics.group_metrics(truth, values)
+369:             queries = query_metrics(truth, values)
+370:             if queries.shape != (40, 28, 10) or not np.allclose(queries.mean(1), matrix[:, 12:], atol=1e-12, rtol=1e-12):
+371:                 raise ValueError("Query detail and retained ranking metrics disagree")
+372:             if matrix.shape != (40, 22) or any(r["tp"]+r["fn"] != 20 or r["tn"]+r["fp"] != 358 for r in counts):
+373:                 raise ValueError("Full metric/confusion coverage differs")
+374:             path = root/(name+"_"+role+"_counts.json")
+375:             data.write_json(path, counts)
+376:             nullable = matrix.astype(object)
+377:             nullable[undefined_metrics(counts)] = None
+378:             matrix_path = root/(name+"_"+role+"_metrics.json")
+379:             data.write_json(matrix_path, {"columns": result["columns"], "values": nullable.tolist(),
+380:                 "na_reason": "Zero precision or MCC denominator; null is undefined, never zero."})
+381:             result["points"][name][role] = {"matrix": data.record(matrix_path, root),
+382:                 "queries": previous.save_array(root/(name+"_"+role+"_queries.npy"), queries, root),
+383:                 "counts": data.record(path, root)}
+384:     result["status"] = "ALL_12_POS_METRIC_COUNT_SETS_SAVED"
+385:     left, right = np.triu_indices(28, 1)
+386:     degrees = np.zeros((40, 28), np.uint8)
+387:     for k, (a, b) in enumerate(zip(left, right)):
+388:         degrees[:, a] += truth[:, k]
+389:         degrees[:, b] += truth[:, k]
+390:     if not np.all((degrees == 1).sum(1) == 16) or not np.all((degrees == 2).sum(1) == 12):
+391:         raise ValueError("Query positive-count geometry differs")
+392:     result["query_positive_counts"] = previous.save_array(root/"query_positive_counts.npy", degrees, root)
+393:     data.write_json(root/"collected.json", result)
+394:     return result
+395: 
+396: 
+397: def finalize(root, *, entry=None):
+398:     entry = entry or sys.modules[__name__]
+399:     col = data.read_json(root/"collected.json")
+400:     if col["status"] != "ALL_12_POS_METRIC_COUNT_SETS_SAVED" or set(col["points"]) != set(entry.POINTS) or col["source_files"] != entry.sources():
+401:         raise ValueError("Complete saved collection required")
+402:     old_runs = entry.baseline_runs()
+403:     all_points = dict(col["points"])
+404:     origins = {name: root for name in entry.POINTS}
+405:     for arm, (old_root, old_col, _) in old_runs.items():
+406:         if any(col[k] != old_col[k] for k in ("group_ids", "domains", "columns")):
+407:             raise ValueError("New and frozen group correspondence differs")
+408:         for stage in "AB":
+409:             name = stage+"_"+arm
+410:             all_points[name] = old_col["points"][name]
+411:             origins[name] = old_root/"evaluation"
+412:     rows = [np.flatnonzero(np.asarray(col["domains"]) == d) for d in "AB"]
+413:     if any(len(r) != 20 for r in rows):
+414:         raise ValueError("AB bootstrap scope differs")
+415:     draws = np.random.Generator(np.random.PCG64(20260930)).integers(20, size=(5000, 2, 20))
+416:     arrays, result = {}, {"absolute": {}, "comparisons": {}, "old_changes": {}, "columns": col["columns"]}
+417:     for name, roles in all_points.items():
+418:         origin = origins[name]
+419:         arrays[name], result["absolute"][name] = {}, {}
+420:         if set(roles) != set(parent.ROLES):
+421:             raise ValueError("All calibration roles required")
+422:         for role, rec in roles.items():
+423:             saved = data.read_json(data.verify(origin/rec["matrix"]["path"], rec["matrix"]))
+424:             v = np.asarray(saved["values"], np.float64)
+425:             if saved["columns"] != col["columns"] or v.shape != (40, 22) or np.isinf(v).any():
+426:                 raise ValueError("Nullable metric matrix differs")
+427:             q = previous.array(origin, rec["queries"], (40, 28, 10), np.float64)
+428:             if not np.allclose(q.mean(1), v[:, 12:], atol=1e-12, rtol=1e-12):
+429:                 raise ValueError("Saved query and group rankings differ")
+430:             counts = data.read_json(data.verify(origin/rec["counts"]["path"], rec["counts"]))
+431:             if len(counts) != 40 or any(r["tp"]+r["fn"] != 20 or r["fp"]+r["tn"] != 358 for r in counts):
+432:                 raise ValueError("Classification group coverage differs")
+433:             if not np.array_equal(np.isnan(v), undefined_metrics(counts)):
+434:                 raise ValueError("Undefined metric mask differs from confusion denominators")
+435:             ct = np.asarray([[r[k] for k in ("tp", "fp", "fn", "tn")] for r in counts], np.int64)
+436:             arrays[name][role] = v
+437:             result["absolute"][name][role] = {"by_domain": summarize(v, rows, draws),
+438:                 "macro_all": {k: None if np.isnan(v[:, j]).any() else float(v[:, j].mean()) for j, k in enumerate(col["columns"])},
+439:                 "macro_undefined_groups": dict(zip(col["columns"], np.isnan(v).sum(0).tolist())),
+440:                 "fixed_half_classification": {"all": pooled_rates(ct), **{d: pooled_rates(ct[r]) for d, r in zip("AB", rows)}}}
+441:     signs = np.array([-1. if key in ("brier", "log_loss") else 1. for key in col["columns"]])
+442:     result["initial_comparisons"], result["forgetting_comparisons"] = {}, {}
+443:     for candidate, other in entry.policy()["evaluation"]["comparisons"]:
+444:         key = candidate+"-"+other
+445:         result["comparisons"][key] = {role: summarize(arrays["B_"+candidate][role]-arrays["B_"+other][role], rows, draws) for role in parent.ROLES}
+446:         result["initial_comparisons"][key] = {role: summarize(arrays["A_"+candidate][role]-arrays["A_"+other][role], rows, draws) for role in parent.ROLES}
+447:         result["forgetting_comparisons"][key] = {role: summarize(
+448:             ((arrays["A_"+candidate][role]-arrays["B_"+candidate][role])-(arrays["A_"+other][role]-arrays["B_"+other][role]))*signs, rows, draws)["A"] for role in parent.ROLES}
+449:     for arm in (*entry.method.ARMS, *old_runs):
+450:         result["old_changes"][arm] = {role: summarize(arrays["B_"+arm][role]-arrays["A_"+arm][role], rows, draws)["A"] for role in parent.ROLES}
+451:     result["success"] = {"criterion": entry.policy()["evaluation"]["success"],
+452:         "passed": all(result["comparisons"][entry.method.ARMS[0]+"-S"]["raw"][d]["map"]["conditional_95pct_interval"][0] > 0 for d in "AB"),
+453:         "secondary_H_pos_minus_S_both_positive": all(result["comparisons"]["H_pos-S"]["raw"][d]["map"]["conditional_95pct_interval"][0] > 0 for d in "AB")}
+454:     degrees = previous.array(root, col["query_positive_counts"], (40, 28), np.uint8)
+455:     subgroup = {}
+456:     for name in all_points:
+457:         q = previous.array(origins[name], all_points[name]["raw"]["queries"], (40, 28, 10), np.float64)
+458:         subgroup[name] = {m: (q[:, :, 0]*(degrees == m)).sum(1)/(degrees == m).sum(1) for m in (1, 2)}
+459:     result["query_subgroup_MAP_comparisons"] = {}
+460:     for candidate, other in entry.policy()["evaluation"]["comparisons"]:
+461:         by_count = {}
+462:         for m in (1, 2):
+463:             delta = subgroup["B_"+candidate][m]-subgroup["B_"+other][m]
+464:             by_count[str(m)] = {d: dict(mean=float(delta[r].mean()),
+465:                 conditional_95pct_interval=np.quantile(delta[r][draws[:, index, :]].mean(1), [.025, .975]).tolist())
+466:                 for index, (d, r) in enumerate(zip("AB", rows))}
+467:         result["query_subgroup_MAP_comparisons"][candidate+"-"+other] = by_count
+468:     result["query_subgroup_limits"] = "Descriptive raw B-end MAP differences only; same whole-group draws; no success gate or causal attribution. Counts derived once from the authorized joint valid opening."
+469:     result.update(status="FIXED_AB_STATISTICS_COMPLETE", source_files=entry.sources(), primary_role="raw", primary_metric="map",
+470:         forgetting_sign="High-good: A-B; brier/log_loss: B-A; arm difference candidate-other; old_changes always raw B-A",
+471:         bootstrap="One PCG64(20260930) (5000,2,20) whole-group array shared by all contrasts and roles",
+472:         undefined_policy="Null denotes N/A. Any undefined required group operand makes the fixed-group mean/interval N/A; no groups dropped, no per-arm nanmean. Pooled rates use summed counts first.",
+473:         limits="Reused development; single seed AB; independent training trajectories; conditional system contrasts, not isolated retention or inference causality; primary S_pos-S dual-domain MAP gate; H_pos comparisons secondary and cannot replace a failed primary; no universal superiority.")
+474:     data.write_json(root/"evaluation.json", result)
+475:     return result
+476: 
+477: 
+478: def execute(job, gate_path, *, entry=None):
+479:     entry = entry or sys.modules[__name__]
+480:     import torch
+481:     from step28_record_replay_verify import preflight
+482:     started = float(os.environ.get("RECORD_REPLAY_STARTED_EPOCH", "nan"))
+483:     if not math.isfinite(started) or not 0 <= time.time()-started < entry.policy()["runtime"]["maximum_gpu_stage_seconds"]:
+484:         raise ValueError("Bounded wrapper start required before any formal read")
+485:     entry.validate_gate(job, gate_path)
+486:     if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
+487:         raise ValueError("New independent output required")
+488:     resources = preflight()
+489:     if shutil.disk_usage(data.ROOT).free < 16*2**30:
+490:         raise ValueError("Insufficient output disk")
+491:     torch.set_num_threads(1)
+492:     torch.set_num_interop_threads(1)
+493:     numerics = parent.configure_numerics()
+494:     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
+495:     job.mkdir(parents=True)
+496:     budget = entry.Budget(job)
+497:     data.write_json(job/"access.json", dict(train=0, valid=0, heldout=0, owners=0))
+498:     data.write_json(job/"execution.json", {"gate": data.record(gate_path, data.ROOT), "sources": entry.sources(), "resources": resources, "numerics": numerics})
+499:     stopped = threading.Event()
+500:     def watchdog():
+501:         while not stopped.wait(1):
+502:             try:
+503:                 budget.check()
+504:             except BaseException as exc:
+505:                 data.write_json(job/"failure.json", {"status": "BUDGET_STOP_NO_RETRY", "error": str(exc), "budget": budget.snapshot()})
+506:                 os._exit(2)
+507:     def terminate(signum, frame):
+508:         raise RuntimeError("TERM: retain scene, no automatic retry")
+509:     signal.signal(signal.SIGTERM, terminate)
+510:     watcher = threading.Thread(target=watchdog, daemon=True)
+511:     watcher.start()
+512:     try:
+513:         budget.check()
+514:         manifest, split, valid, metadata = entry.train(job, budget)
+515:         budget.check()
+516:         scores, split, labelled = entry.open_valid(job, manifest, valid, metadata, entry.config())
+517:         budget.phase = "evaluation"
+518:         entry.collect(job/"evaluation", scores, labelled, split)
+519:         diag.evaluate(job/"run/diagnostics", manifest, labelled, split, job/"diagnostics_evaluation", scope="AB")
+520:         entry.finalize(job/"evaluation")
+521:         budget.check()
+522:         result = {"status": entry.COMPLETION_STATUS, "source_files": entry.sources(), "physical_updates": 1152,
+523:             "gradient_group_presentations": 1728, "access": data.read_json(job/"access.json"), "budget": budget.snapshot()}
+524:         data.write_json(job/"completion.json", result)
+525:         return result
+526:     except BaseException as exc:
+527:         data.write_json(job/"failure.json", {"status": "FAIL_NO_RETRY", "traceback": traceback.format_exc(),
+528:             "budget": budget.snapshot()})
+529:         raise
+530:     finally:
+531:         stopped.set()
+532:         watcher.join(timeout=2)
+533: 
+534: 
+535: if __name__ == "__main__":
+536:     parser = argparse.ArgumentParser()
+537:     parser.add_argument("--job", type=Path, required=True)
+538:     parser.add_argument("--gate", type=Path, required=True)
+539:     args = parser.parse_args()
+540:     if os.name != "posix": parser.error("Scientific execution is Linux-only")
+541:     execute(args.job.resolve(), args.gate.resolve())

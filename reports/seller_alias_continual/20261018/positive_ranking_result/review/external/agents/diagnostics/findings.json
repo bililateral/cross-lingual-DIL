@@ -1,0 +1,108 @@
+{
+  "SCIENTIFIC_BLOCKER": [],
+  "REPRODUCIBILITY_DEFECT": [],
+  "scope": "Diagnostics, calibration/probability interpretation, forgetting directions, subgroup interpretation; primary gate and complete execution/source audit belongs to parent review.",
+  "supported_observations": [
+    {
+      "id": "D01",
+      "title": "24 captures and 18 strict decisions reproduced",
+      "evidence": [
+        "workspace/reports/job/run/diagnostics/*.json",
+        "workspace/reports/job/diagnostics_evaluation/overfitting.json",
+        "attempt01/independent_results.json"
+      ],
+      "detail": "17 未见明确迹象, 1 证据不足; 18/18 widening intervals have lower bound >0."
+    },
+    {
+      "id": "D02",
+      "title": "A-stage raw log-loss worsens on both fit and valid populations",
+      "evidence": [
+        "workspace/reports/result_sync/report.zh.txt:159,168,175–177",
+        "attempt01/independent_results.json/diagnostic_rows"
+      ],
+      "detail": "Strict no-clear-signal labels do not prove absence of overfitting or sound probabilities."
+    },
+    {
+      "id": "D03",
+      "title": "Calibration cannot change main MAP result",
+      "evidence": [
+        "workspace/scripts/step28_g_half_run.py:236–300",
+        "workspace/scripts/step28_alias_calibration.py:62–93",
+        "attempt01/independent_results.json/calibration_checks"
+      ],
+      "detail": "Eight saved new calibrated score arrays exactly match positive affine transforms; all eight endpoints preserve all ranking/query columns across roles."
+    },
+    {
+      "id": "D04",
+      "title": "Raw probability quality worsens relative to corresponding S/H baseline",
+      "evidence": [
+        "workspace/reports/result_sync/report.zh.txt:103–126",
+        "attempt01/independent_results.json/final_comparisons"
+      ],
+      "detail": "Both Brier and log-loss lower bounds >0 for S_pos−S and H_pos−H in both domains; stage-cal partial improvements do not rescue ranking gate."
+    },
+    {
+      "id": "D05",
+      "title": "Old-A change and signed forgetting comparisons correctly separated",
+      "evidence": [
+        "workspace/scripts/step28_positive_ranking_run.py:442–450",
+        "attempt01/independent_results.json/old_change",
+        "attempt01/independent_results.json/forgetting_comparisons"
+      ],
+      "detail": "All raw MAP old changes and forgetting contrast intervals cross zero; no confirmed catastrophe or retention improvement."
+    },
+    {
+      "id": "D06",
+      "title": "Single/double-positive grouping uses shared whole-group sampling",
+      "evidence": [
+        "workspace/scripts/step28_positive_ranking_run.py:454–468",
+        "attempt01/independent_results.json/subgroup_contrasts"
+      ],
+      "detail": "40 groups have 16/12 queries; weighted subgroup MAP identity and all 16 contrast intervals reproduced."
+    }
+  ],
+  "coverage_limits": [
+    {
+      "id": "L01",
+      "title": "Epoch 1 to 6 excludes stage-entry-to-first-epoch change",
+      "evidence": [
+        "workspace/scripts/step28_replay_diagnostics.py:68–69,138–168"
+      ],
+      "action": "State limitation; no new experiment or gate."
+    },
+    {
+      "id": "L02",
+      "title": "cache/A uses six surviving training groups",
+      "evidence": [
+        "workspace/scripts/step28_replay_diagnostics.py:72–74,195–203"
+      ],
+      "action": "Do not equate it with all historical training or held-out performance."
+    },
+    {
+      "id": "L03",
+      "title": "Subgroup-specific crossing of zero is not an interaction test",
+      "evidence": [
+        "workspace/reports/result_sync/report.zh.txt:91–99"
+      ],
+      "action": "Retain prespecified descriptive claim; no causal or multiple-comparison success claim."
+    },
+    {
+      "id": "L04",
+      "title": "Saved-label-derived originals not re-created from labels",
+      "evidence": [
+        "workspace/reports/result_sync/report.zh.txt:16–22",
+        "attempt01/independent_results.json/limitations"
+      ],
+      "action": "Preserve explicit distinction between saved-value replay and source-label recomputation."
+    }
+  ],
+  "OUT_OF_SCOPE_OVERDESIGN": [
+    "new seeds/candidates/retraining",
+    "posthoc epoch selection",
+    "new threshold/weight/temperature tuning",
+    "new interaction test as acceptance requirement",
+    "formal labels/model/Memory request",
+    "project server access",
+    "generic restoration or security framework"
+  ]
+}

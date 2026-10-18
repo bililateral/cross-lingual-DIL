@@ -1,0 +1,67 @@
+{
+  "scope": "S_pos/H_pos result-linked objective wiring, native action and formal update evidence only",
+  "scientific_blockers": [],
+  "reproducibility_defects": [],
+  "findings": [
+    {
+      "id": "W01",
+      "classification": "VERIFIED_FINDING",
+      "title": "四位置新rank和0.5A0教师连接到实际VJP",
+      "conclusion": "未见漏history、重复旧rank、误乘0.05或反向传播断开。",
+      "sources": [
+        "workspace/scripts/step28_positive_ranking.py:58-129",
+        "workspace/scripts/step28_record_replay.py:159-208"
+      ],
+      "evidence": "1152更新/1728分支/3456新rank视图，教师各臂B288项均为正；86机械断言满足。"
+    },
+    {
+      "id": "W02",
+      "classification": "VERIFIED_FINDING",
+      "title": "两臂真实原生旧新rank均有encoder/head作用",
+      "conclusion": "current和paired均有梯度、实际参数、Adam矩差异，扣除current后的history探针差异仍>0。",
+      "sources": [
+        "workspace/reports/qualification/native/result.json#/arms",
+        "workspace/scripts/step28_positive_ranking_verify.py:85-171",
+        "workspace/scripts/step28_g_half_verify.py:44-104"
+      ]
+    },
+    {
+      "id": "W03",
+      "classification": "VERIFIED_FINDING",
+      "title": "R03已关闭后的真实第二臂零值证据存在",
+      "conclusion": "H_pos continuation ownPID797388，live_allocated/reserved均0，外层650秒exit0。",
+      "sources": [
+        "workspace/reports/qualification/native/result.json#/arms/H_pos/resources",
+        "workspace/reports/launch/native_wallclock.json",
+        "workspace/scripts/step28_positive_ranking_verify.py:25-52"
+      ]
+    },
+    {
+      "id": "W04",
+      "classification": "EVIDENCE_LIMITATION",
+      "title": "保存原生最大差不等于审查环境重演张量",
+      "conclusion": "本审查独立核对标量、身份和源码，未获得或载入正式标签、权重、Memory或原生模型张量；未独立重算所有GPU梯度/参数或教师的因果效应。",
+      "is_defect": false,
+      "new_run_required": false
+    }
+  ],
+  "reasonable_followups": [
+    "在总结果裁决中保留主次比较及证据边界，不把真实目标作用称为性能成功。"
+  ],
+  "out_of_scope_overdesign": [
+    "追加训练、种子、候选或教师消融以证明已经有证据支持的接线。",
+    "新的通用恢复框架、网络加固或全仓回归。"
+  ],
+  "input_changes": false,
+  "project_patch": false,
+  "execution_artifacts": [
+    "wiring_replay.py",
+    "wiring_replay_result.json",
+    "wiring_replay.stdout.txt",
+    "wiring_replay.execution.json",
+    "mechanically_read_inputs.json",
+    "commands.json",
+    "read_scope.json",
+    "read_scope_summary.json"
+  ]
+}

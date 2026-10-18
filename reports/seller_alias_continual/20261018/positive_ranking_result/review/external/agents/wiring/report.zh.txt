@@ -1,0 +1,117 @@
+# S_pos/H_pos 结果外审：实际目标接线及原生作用证据定向复核
+
+本分报告只覆盖本轮新结果与冻结目标、运行入口和已保存原生作用证据的对应。结论以包内字节、直接源码和保存数值为依据，不将本次审查环境的核算称作项目 Linux 原生资格。
+
+## 一、结论
+
+未发现使本轮正式结果失效的具体接线缺陷。本范围内新增 SCIENTIFIC_BLOCKER 为 0，REPRODUCIBILITY_DEFECT 为 0。该结论不能替代主要性能判据，也不意味着任一候选超过完整 S。
+
+实际入口使用 S_pos/H_pos 的新目标，current 和 history 的 A0/A1 共 3456 个保存视图均使用 rank_pos；1152 次更新对应 1728 个梯度群分支。历史监督权重为 0.1，历史自然 A0 出生表的教师项单独乘 0.5。两臂 B 阶段各 288 个教师贡献均为正，未见漏掉 history 新 rank、重复加入旧 rank、教师误乘 0.05、错误调用旧 H/H_cons 训练或只记录损失而没有反向传播的证据。
+
+这个判断由四层证据共同支持：直接训练函数和共享 VJP 接线；独立完整图与实际 VJP 的既有手写测试结构；真实 BGE 原生旧/新 rank 配对时的梯度、参数和 Adam 保存差异；正式全部更新日志及来源身份对应。原生梯度张量、正式权重和 Memory 载荷不在本次审查范围内，不能声称本审查重建了这些张量。
+
+## 二、范围和可复现核对
+
+本次定向复核直接完整阅读 10 个文本源码/证据文件，并阅读 5 个直接依赖的相关范围；逐次文件、字节数、SHA256、行范围和读取方式见 read_scope.json，合并统计见 read_scope_summary.json。40 份冻结来源全部进行字节身份复核，不把哈希覆盖等同全文语义阅读。
+
+独立脚本 wiring_replay.py 仅用 Python 标准库，未导入项目模块、PyTorch 或 NumPy，未执行任何训练、GPU 操作或网络访问。脚本机械处理 94 个输入身份，86 项具体断言全部满足；成功原件为 wiring_replay.stdout.txt 与 wiring_replay_result.json。命令、退出码和资源记录在 wiring_replay.execution.json。首次执行 exit 0，无科研计算失败或重试。该次计算墙钟约 0.099 秒、CPU 约 0.098 秒，峰值 RSS 21932 KiB；这是审查环境资源，不能并入或冒充项目 Linux 的原生/正式执行账。
+
+本复核核对全部 40 来源的三方相符：workspace 当前文件、job/run/sources 冻结副本、manifest 给定的大小/SHA；native.source_files、formal_gate.source_files 和 execution.sources 均等于该清单。原生结果为 844420 字节，SHA256 417054dd68670770bdf814cc044fd25b4fb3818ed70b7df8fbdad406f5523d68，正式门和 native_acceptance 指向这份结果。
+
+## 三、实际计算路径
+
+### 1. 新 rank 确实替换了四个位置
+
+冻结合同 workspace/docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md 第 17—23 行规定：每查询先对正例平均，再对 28 查询平均；每个正例只与已知负例比较，另一正例不进入负集；每视图 BCE + rank_pos + 0.5 hard，两视图均值进入 current/history。
+
+workspace/scripts/step28_positive_ranking.py 第 58—79 行先复用旧目标的标签验证、BCE 与 hard；第 62—73 行重新建立已知负集并按每正例差分 logsumexp 计算 rank_pos；第 76—79 行以 rank_used 构造新的 total。正式默认 old_rank=False，因此旧 rank 的中间计算并没有作为额外项进入最终损失。看到 inherited/旧 objectives 被调用不能据此判为旧 rank 被重复加入。
+
+第 82—105 行同时构造自然 assignment 和固定重组 assignment，即 A0、A1，并对两视图新的 total 取均值。第 108—129 行把这个 objective 作为 objective_fn 传给共享 record.update；formal train_stage 的实际调用位于 workspace/scripts/step28_g_half_run.py 第 177—206 行。positive_ranking_run.py 第 214—216 行通过显式 entry 绑定继承生命周期，所以复用 g_half_run 文件名并不表示训练调用了旧 H 目标。
+
+正式开关还有限制：positive_ranking.py 第 113—120 行只允许手写资格配置启用旧 rank 对照；全部正式行的 qualification_old_rank 都为 false，rank_used 和 rank_pos 逐值完全相等。
+
+### 2. 教师 0.5 的位置正确，进入了实际 VJP 目标
+
+positive_ranking.py 第 93—98 行只对自然 A0 预测和本臂出生表构造 D0；supervised_contribution 为 0.1 × history_supervised，teacher_contribution 为 0.5 × D0，两者相加。该代码没有将教师包进历史 0.1 权重，也没有新加 A1 教师。
+
+若 s_i 为当前自然 A0 的第 i 个无向账号对分数、t_i 为固定出生表对应分数，则该代码的教师项为 0.5 × (1/378) Σ_i(s_i−t_i)^2；对当前参数的导数为 (1/378) Σ_i(s_i−t_i)∇s_i。target 为从保存数组建立的常量，predictions[0] 仍连接到可导 table，没有在损失前脱离计算图。
+
+workspace/scripts/step28_record_replay.py 第 159—182 行执行实际链式法则：live encoder 给出 z；在 proxy 上对完整 objective 求梯度；每个 512 块的 head.backward 接收对应梯度；最终 z.backward(leaf.grad) 将梯度回传 encoder。第 185—208 行对 current/history 顺序累积、最后一次 clip1 和 AdamW step。日志 float/detach 只用于记录，返回给 autograd 的 loss 保留了教师与新 rank 的计算图。
+
+既有手写完整图参照在 workspace/tests/test_step28_positive_ranking.py 第 77—92、168—232 行：独立逐条 hard/positive 枚举和 A0 教师构成完整图，对比实际 VJP 的各分支梯度、裁剪后梯度、参数及 Adam 状态；history callback 是累计梯度，测试第 214—224 行扣除 current 后比较自身作用。该既有测试本轮未重跑；其适用结论随已关闭 CPU 资格继承。本轮另核对真实原生作用保存证据，见下节。
+
+### 3. S/H 评分及自己的出生状态保持
+
+positive_ranking.py 第 52—55 行使 S_pos 直接使用 record.account_logits，H_pos 使用 g_half.account_logits(..., "G_half")。record_replay.py 第 113—127 行仍是 FP32 矩阵均值；g_half.py 第 39—73 行仍是 FP64 的 0.5 mean + 0.5 logavgexp，随后一次转回输入 dtype。新 rank 在实际 FP32 账号分数上工作。H 的 G_half 历史名称与 H_pos 的训练身份分开保存，未混同为旧 H 重训。
+
+g_half_run.py 第 333—358 行逐臂重新 fresh、验证固定未训练初始身份、建立自己的空 Memory，再在自身 A→B 上推进。第 236—264 行在 A 端点用本臂模型记录出生表，第 343—346 行要求 B 起点严格等于自己的恢复 A 连续状态。独立机械核对两臂初始身份相同且与原生身份一致；B starts 与各自 A continuity 完全一致。每臂 A/B 的历史成员、起源和出生表 SHA 相同；两臂的出生表 SHA 不同，符合各自训练产生自身教师，而非共享旧 Memory。
+
+本审查只读这些已开放摘要与身份，未读取 Memory .bin 或权重 .pt。
+
+## 四、真实原生作用证据
+
+原件 workspace/reports/qualification/native/result.json 为单行 JSON；下述依据可用 JSON 路径 arms.<arm>.updates/effects/table_precision/equality_counts 定位。源码构造与比较过程在 positive_ranking_verify.py 第 85—212 行，以及 g_half_verify.py 第 44—104 行。
+
+每臂严格 6 次真实调用，保存顺序为：旧 rank warm-up；从共同非空状态比较旧/新 A step2；共同状态明确设置合成 Adam clock336 后比较旧/新 B step49；从第5调用之前恢复，经实际 48 fit / 6 history / 40 盲 valid 诊断，再重演第5调用。合成 clock337 表示参照状态计数，不能把它报告为 337 次实际调用。第5与第6次完整日志逐值相同。
+
+原生两个阶段都保存了 encoder/head 裁剪后梯度与实际参数差异：
+
+| 臂/阶段 | 组件 | 裁剪后梯度最大绝对差 | 实际参数最大绝对差 |
+| --- | --- | ---: | ---: |
+| S_pos/current | encoder | 1.5480909497e-5 | 1.0523945093e-6 |
+| S_pos/current | head | 3.0198134482e-5 | 2.4058017880e-4 |
+| S_pos/paired | encoder | 1.3737473637e-5 | 2.2529158741e-5 |
+| S_pos/paired | head | 3.5896664485e-5 | 6.8357912824e-5 |
+| H_pos/current | encoder | 1.2604519725e-5 | 9.6019357443e-7 |
+| H_pos/current | head | 3.0066817999e-5 | 8.4909517318e-4 |
+| H_pos/paired | encoder | 1.5292316675e-5 | 2.4031382054e-5 |
+| H_pos/paired | head | 3.7974212319e-5 | 1.9268970937e-3 |
+
+更关键的是 paired 阶段在扣除 current 后仍有自身 history 新 rank 作用：S_pos 的 encoder/head 探针最大差为 1.6938429326e-7 / 4.8289075494e-7，H_pos 为 3.3219839679e-7 / 5.1467213780e-7。其算法并非把累计 current+history 差异误叫 history 差异：positive_ranking_verify.py 第 143—150 行明确相减。
+
+每种阶段/臂都有 389 个 encoder 和 4 个 head 活跃梯度参数。两个未使用的 encoder pooler 参数保持未参与，而非漏掉正在使用的参数。逐参数 Adam 保存项核对了状态存在性、off/on 相同计数及 exp_avg/exp_avg_sq 的变化；各组件均有正的矩差异。详细逐组件摘要保存在 wiring_replay_result.json 的 native.effects 中，原始逐参数保存证据仍在输入 native/result.json。
+
+每臂有 5 个实际表核对记录、每个包含 A0/A1 两视图：S_pos 保存的逐坐标 rank 梯度最大误差不超过 1.9201305171e-8，H_pos 不超过 1.1745983644e-8。它们是实际 FP32 分数与独立解析参考的比较，不是正式数据标签重算。旧/新 rank 配对的 BCE、hard、assignment、D0 和教师贡献逐值相同，因此这些原生差异定位于同状态下的 rank 替换，而非更换教师或重组。
+
+两种模型恢复、诊断中性及下一次更新相等在原件中有真实执行证据。每臂 next-update equality_counts 均为 1967 张量、1301039501 元素；这是项目原生检查记录，本审查未从未提供的张量重演 13 亿元素比较。
+
+R03 的本轮实际结果也与旧“尚待原生”的时间边界对应：第二臂 H_pos resources 记录 allowed_context_pid=797388，与原生外层 PID 相同；live_allocated_bytes=0、reserved_bytes=0。compute_apps 仍有自身 CUDA context 的约 650 MiB 记录，不与 PyTorch allocator 两项为零矛盾。positive_ranking_verify.py 第 25—52 行在 gc、synchronize、clearCublasWorkspaces、empty_cache 之后检查零值，并排除自身 PID 后检查外部作业。没有证据要重开已关闭 R01/R02/R03 静态问题。
+
+计费以更完整的外层为准：native 内部 647.851596 秒、保守 648；外层 649.137154 秒、保守 650，exit0。总真实调用12；各臂时间与资源在原件及生成摘要中逐项保留。不能用内部648替代用户报告的外层650，也不能把原生通过作为效果通过。
+
+## 五、全部正式日志的独立算术对应
+
+4 份 updates 原件各有288行，A端 Adam step288、B端576；所有正式行采用新训练 metadata，A没有history。共1152更新、1728梯度群和3456视图。新 rank 每个视图均为正，rank_used=rank_pos 逐值完全相等。
+
+从保存标量重新计算的最大误差：每视图 BCE+rank_pos+0.5hard 为 3.5762786865e-7；两视图平均为 2.3841857910e-7；历史监督加权为 1.7881393422e-8；teacher_contribution=0.5D0 精确相等；完整 optimizer total 的误差为 3.2782554449e-8。误差处于浮点保存/相加的声明容差内，未见额外旧 rank 或遗漏分项。
+
+| 正式阶段 | current 监督均值 | history 监督加权均值 | 0.5D0 均值 | 历史教师正值计数 |
+| --- | ---: | ---: | ---: | ---: |
+| A_S_pos | 2.7157536803 | 不适用 | 0 | 0/0，A无历史 |
+| B_S_pos | 2.2009879897 | 0.2255170289 | 0.0711611354 | 288/288 |
+| A_H_pos | 2.6050652791 | 不适用 | 0 | 0/0，A无历史 |
+| B_H_pos | 2.0750206138 | 0.2142752252 | 0.0696463944 | 288/288 |
+
+B_S_pos 的教师加权贡献范围为[0.0267048273, 0.1272536218]；B_H_pos为[0.0267615747, 0.1266967952]。这说明保存目标里教师实际启用且权重正确，不能从分项值推断其因果性能收益或每个参数的独立教师梯度方向。
+
+每臂288个B历史分支的 record_gradient_norm 也均为正；两臂 current/history 的UID顺序和A1 assignment SHA相同，符合固定配对调度。4端点保存的full/inference raw与calibration条目的SHA与对应原评分条目一致。本分任务核对的是这些来源/条目身份与调用路径；主结果审计另行从保存数组重放分数一致性。
+
+## 六、证据强度与不能越过的解释边界
+
+1. 源码足以检查返回目标到VJP的连接；本分任务读到既有手写完整图测试结构，并继承已关闭CPU资格的适用结论，没有把未在本轮重放的CPU张量当成本轮独立核算；真实原生记录显示旧/新rank改变实际encoder/head梯度、参数和Adam。这些证据共同排除了目前能定位到的“只是增加字段或算出非零loss、实际没更新”问题。
+2. 原生旧/新rank比较的D0保持相同，所以它定位了rank替换的工程作用，不能解释D0本身对最终MAP的因果贡献。无需为此追加教师消融或第7次原生调用。
+3. 正式日志和来源对应支持1152次计划更新执行了当前代码，但本包没有正式参数/梯度张量，因此不能宣称本审查逐步重算每一张量，也不能把梯度群呈现1728称为1728次optimizer更新。
+4. 本分报告未重新解析任何正式标签；没有从正式标签重算AP、ROC、Brier或log-loss原值；没有载入任何正式权重、Memory、手写原生权重或BGE归档。无项目服务器连接、无数据请求、无外部平台上传。
+5. 已关闭实现审查的历史未授权/尚待原生表述，按记录形成时点解释；本轮外层exit0、两臂原生和正式证据不能反向修改历史原件，也不受那些旧时点文字否定。
+
+## 七、发现分类与处置
+
+SCIENTIFIC_BLOCKER：无新增、无证据支持将本次结果因目标接线判为无效。
+
+REPRODUCIBILITY_DEFECT：无新增。原生张量、正式标签、模型和Memory不在本包是明确的材料边界，不是本次发现的实现缺陷；不能把没有权限的重算包装成已经完成的独立验证。
+
+合理后续：在总报告中继续保留完整S的主要地位、固定两臂和本轮主失败，并保留本报告所述native/正式/审查环境证据区分。不因真实梯度作用而推断方法效果成立。
+
+OUT_OF_SCOPE_OVERDESIGN：为补充本轮接线结论而新加候选、重新跑训练/模型恢复、教师或rank额外消融、网络/服务器加固、全仓回归或新的通用恢复框架。当前没有具体矛盾要求这些操作。
+
+本分报告未修改任何输入源码或证据，没有项目补丁。

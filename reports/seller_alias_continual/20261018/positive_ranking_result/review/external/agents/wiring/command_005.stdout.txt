@@ -1,0 +1,428 @@
+
+=== workspace/scripts/step28_g_half_run.py [130..424/720] ===
+130: 
+131: def loss_total(row, stage, arm):
+132:     total = row["current"]["supervised"]
+133:     if stage == 2:
+134:         total += .1*row["history"]["supervised"]+.5*row["history"]["mse0"]
+135:     return total
+136: 
+137: 
+138: def validate_diagnostic(d, arm):
+139:     return None
+140: 
+141: 
+142: def validate_native(native):
+143:     return None
+144: 
+145: 
+146: def trajectory(log):
+147:     return (log["current_ids"], log["history_ids"],
+148:             [[r["current"]["assignment_sha256"]]+([r["history"]["assignment_sha256"]] if r["history_uid"] else []) for r in log["rows"]])
+149: 
+150: 
+151: class Budget(legacy.Budget):
+152:     def __init__(self, root: Path):
+153:         super().__init__(root)
+154:         self.limits = policy()["runtime"]
+155: 
+156:     def output_files(self):
+157:         # Inputs are outside these output trees; no recursive scan through linked data/models.
+158:         sidecars = [self.root.with_suffix(s) for s in (".dispatch.json", ".listener.json", ".listener.console.txt")]
+159:         extra = data.ROOT/"reports/qualification"
+160:         return list(dict.fromkeys([*super().output_files(), *sidecars, *(p for p in extra.rglob("*"))]))
+161: 
+162: 
+163: def projection(m: dict) -> dict:
+164:     keys = ("t_A", "t_B", "v", "h", "L", "s_F", "r_F", "s_I", "r_I", "W_F", "W_I")
+165:     if any(not np.isfinite(m[k]) or m[k] <= 0 for k in keys):
+166:         raise ValueError("Actual positive finite H measurements required")
+167:     train = 288*(m["t_A"]+m["t_B"])
+168:     forward = 1446*m["v"]+36*m["h"]
+169:     io = m["L"]+2*(m["s_F"]+m["r_F"]+m["s_I"]+m["r_I"])
+170:     seconds = 1.25*(train+forward+io+1800)
+171:     size = math.ceil(1.1*(m["W_F"]+2*m["W_I"]+2*2**30))
+172:     return dict(train_seconds=train, forward_seconds=forward, io_seconds=io, unmeasured_allowance_seconds=1800,
+173:                 projected_total_seconds=seconds, projected_peak_output_bytes=size,
+174:                 within_budget=seconds <= 28800 and size <= 10*2**30)
+175: 
+176: 
+177: def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget, *, entry=None):
+178:     entry = entry or sys.modules[__name__]
+179:     if parent.adam_step(optimizer) != (stage-1)*288:
+180:         raise ValueError("Stage continuity differs")
+181:     if memory is not None:
+182:         memory.begin_stage(stage)
+183:     before = None if memory is None else memory.summary()
+184:     schedule, _ = parent.schedule(current, parent.contract(), entry.method.RNG_ORDER, stage)
+185:     name = "AB"[stage-1]+"_"+arm
+186:     budget.phase = name
+187:     rows, captures = [], []
+188:     for step, group in enumerate(schedule, 1):
+189:         history, target = (None, None) if memory is None else memory.draw()
+190:         row = entry.method.update(model, optimizer, group, history, target, c, arm, stage, step, budget.check)
+191:         if parent.adam_step(optimizer) != (stage-1)*288+step:
+192:             raise ValueError("Actual optimizer call missing")
+193:         rows.append({**row, "step": step, "current_uid": group.uid, "history_uid": history.uid if history else None})
+194:         if step % 48 == 0:
+195:             captures.append(entry.method.capture(model, optimizer, current, memory, valid, c, arm,
+196:                 stage, step//48, root/"diagnostics", name, budget.check))
+197:         if step == 1 or step % 24 == 0:
+198:             print(data.json_bytes({"event": "updates", "point": name, "completed": step, **budget.snapshot()}).decode(), flush=True)
+199:     after = None if memory is None else memory.summary()
+200:     if before is not None and any(before[k] != after[k] for k in ("members", "seen", "origins", "tables")):
+201:         raise ValueError("History targets/membership changed within B")
+202:     path = root/"updates"/(name+".json")
+203:     data.write_json(path, {"arm": arm, "stage": stage, "updates": 288, "adam_step": parent.adam_step(optimizer),
+204:         "current_ids": [g.uid for g in schedule], "history_ids": [r["history_uid"] for r in rows if r["history_uid"]],
+205:         "memory_before": before, "memory_after": after, "rows": rows})
+206:     return data.record(path, root), captures
+207: 
+208: 
+209: def memory_from(payload: bytes, arm: str, *, entry=None):
+210:     entry = entry or sys.modules[__name__]
+211:     if arm not in entry.method.ARMS:
+212:         raise ValueError("Unknown arm Memory")
+213:     memory = record.Memory.from_bytes(payload)
+214:     if any(memory.maps.get(k) != v for k, v in entry.method.metadata(arm).items()):
+215:         raise ValueError("Memory candidate identity differs")
+216:     return memory
+217: 
+218: 
+219: def continuity(model, optimizer, memory):
+220:     return {"model": core.state_digest(model.state_dict()), "adam": core.state_digest(optimizer.state_dict()),
+221:             "rng": diag.rng_state(), "modes": [m.training for m in model.modules()],
+222:             "memory_sha256": hashlib.sha256(memory.to_bytes()).hexdigest()}
+223: 
+224: 
+225: def restore_point(path, expected, model, optimizer, arm, *, entry=None):
+226:     entry = entry or sys.modules[__name__]
+227:     meta = core.restore_state(path, model, optimizer, expected["state_sha256"])
+228:     if entry.method.bind(model, meta) != arm:
+229:         raise ValueError("Restored arm differs")
+230:     for m, mode in zip(model.modules(), meta["modes"], strict=True):
+231:         m.training = mode
+232:     diag.restore_rng(meta["rng"])
+233:     return meta
+234: 
+235: 
+236: def checkpoint(root, name, model, optimizer, memory, current, calibration, valid, c, arm, stage, budget, *, entry=None):
+237:     entry = entry or sys.modules[__name__]
+238:     if len(calibration) != 12 or len(valid) != 40 or parent.adam_step(optimizer) != 288*stage:
+239:         raise ValueError("Endpoint scope differs")
+240:     optimizer.zero_grad(set_to_none=True)
+241:     c = {**c, "pooling_stats": c.setdefault("pooling_stats", {}),
+242:          "pooling_context": {"stage": stage, "step": 288, "role": "endpoint_prediction_or_restore"}}
+243:     state, modes = diag.rng_state(), [m.training for m in model.modules()]
+244:     with diag.neutral(model):
+245:         scores = {"calibration": entry.method.score(model, calibration, c, arm, budget.check),
+246:                   "raw": entry.method.score(model, valid, c, arm, budget.check)}
+247:         mapping = parent.calibration.fit(scores["calibration"], np.asarray([g.labels for g in calibration], np.uint8),
+248:                                          role="calibration", check=budget.check)
+249:         if mapping["status"] != "PASS_CALIBRATION_FIT":
+250:             raise ValueError("Calibration failed; no retry")
+251:         current_map = dict(zip(("a", "b"), parent.calibration.parameters(mapping)))
+252:         if memory is None:
+253:             memory = record.Memory(entry.method.RNG_ORDER)
+254:         first_map = memory.maps.get("first", current_map)
+255:         memory.maps = {"first": first_map, "stage": current_map, "rng": state,
+256:                        "completed_stage": stage, "adam_step": stage*288, **entry.method.metadata(arm)}
+257:         if stage == 1:
+258:             memory.retain(current, 1, lambda g: record.reference(model, g, c, budget.check))
+259:     mp = root/"memory"/(name+".bin")
+260:     mp.write_bytes(memory.to_bytes())
+261:     memory = entry.memory_from(mp.read_bytes(), arm)
+262:     meta = {"name": name, "rng": state, "modes": modes, **entry.method.metadata(arm),
+263:             "members": [g.uid for g in memory.reservoir.groups], "maps": memory.maps,
+264:             "memory": data.record(mp, root), "policy_sha256": data.sha256(entry.POLICY)}
+265:     full_path = root/"work"/(name+".pt")
+266:     budget.check(base.persistence.checkpoint_reserve(model, optimizer))
+267:     full = core.save_state(full_path, model, optimizer, meta)
+268:     if entry.restore_point(full_path, full, model, optimizer, arm) != meta:
+269:         raise ValueError("Full model/Adam restore mismatch")
+270:     with diag.neutral(model):
+271:         for role, groups in (("calibration", calibration), ("raw", valid)):
+272:             restored = entry.method.restored_score(model, groups, c, budget.check)
+273:             if not np.array_equal(scores[role], restored):
+274:                 raise ValueError("Full restored scoring differs")
+275:             scores["full-"+role] = restored
+276:     model_path = root/"models"/(name+".pt")
+277:     budget.check(base.persistence.checkpoint_reserve(model, None))
+278:     inference = core.save_state(model_path, model, None, meta)
+279:     if entry.restore_point(model_path, inference, model, None, arm) != meta:
+280:         raise ValueError("Inference restore mismatch")
+281:     with diag.neutral(model):
+282:         for role, groups in (("calibration", calibration), ("raw", valid)):
+283:             restored = entry.method.restored_score(model, groups, c, budget.check)
+284:             if not np.array_equal(scores[role], restored):
+285:                 raise ValueError("Inference restored scoring differs")
+286:             scores["inference-"+role] = restored
+287:     for role, mapping_value in (("stage-cal", current_map), ("first-cal", first_map)):
+288:         scores[role] = parent.calibration.transform(scores["raw"], mapping_value)
+289:         parent.calibration.preserve_order(scores["raw"], scores[role])
+290:     map_path = root/"maps"/(name+".json")
+291:     data.write_json(map_path, mapping)
+292:     result = {"arm": arm, "stage": stage, "adam_step": parent.adam_step(optimizer),
+293:         "full_restore_verified": True, "inference_restore_verified": True, **entry.method.metadata(arm),
+294:         "calibration_ids": [g.uid for g in calibration], "maps": {"first": first_map, "stage": current_map},
+295:         "mapping": data.record(map_path, root), "memory": data.record(mp, root), "memory_summary": memory.summary(),
+296:         "continuity": continuity(model, optimizer, memory), 
+297:         "full_state": {**full, "path": full_path.relative_to(root).as_posix()},
+298:         "model": {**inference, "path": model_path.relative_to(root).as_posix()},
+299:         "scores": {k: previous.save_array(root/"scores"/(name+"_"+k+".npy"), v, root) for k,v in scores.items()}}
+300:     data.write_json(root/"points"/(name+".json"), result)
+301:     base.persistence.remove_work_file(full_path, root)
+302:     return result, memory
+303: 
+304: 
+305: def train(job, budget, *, entry=None):
+306:     entry = entry or sys.modules[__name__]
+307:     import torch
+308:     root = job/"run"
+309:     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics", "sources"):
+310:         (root/sub).mkdir(parents=True)
+311:     c = entry.config()
+312:     baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
+313:     archive = entry.pretrained_archive(c)
+314:     groups, metadata, checked = entry.public_inputs(c)
+315:     if checked != old_manifest["public_inputs"]:
+316:         raise ValueError("Formal input bytes differ from frozen S/G")
+317:     _, split = entry.partition(groups, metadata, c)
+318:     if split != data.read_json(old_root/"run/partition.json"):
+319:         raise ValueError("H partition differs from frozen S/G")
+320:     data.write_json(root/"partition.json", split)
+321:     manifest = {"status": "RUNNING", "source_files": entry.sources(), "public_inputs": checked, "pretrained_archive": archive,
+322:         "partition": data.record(root/"partition.json", root), "points": {}, "training": {}, "diagnostics": {},
+323:         "baseline_identity": data.record(entry.BASELINE, data.ROOT), "initials": {}, "starts": {}, "physical_updates": 0, "gradient_group_presentations": 0}
+324:     data.write_json(root/"startup.json", manifest)
+325:     groups["train"] = previous.parse_once(job, groups["train"], c, "train",
+326:         loader=lambda gs, cfg, s: entry.attach_labels(gs, cfg, s, metadata))
+327:     selected, after = entry.partition(groups, metadata, c)
+328:     if after != split:
+329:         raise ValueError("Labels changed partition")
+330:     def domain(role, d):
+331:         return [g for g,r in zip(selected[role], split[role], strict=True) if r["domain"] == d]
+332:     valid = groups["development"]
+333:     for arm in entry.method.ARMS:
+334:         c["pooling_stats"] = {}
+335:         model, optimizer, initial = entry.fresh(c)
+336:         entry.method.bind(model, entry.method.metadata(arm))
+337:         manifest["initials"][arm] = initial
+338:         if initial != baseline["initial_identity"] or parent.adam_step(optimizer) != 0:
+339:             raise ValueError("Independent identical untrained starts required")
+340:         memory = None
+341:         for stage, d in enumerate("AB", 1):
+342:             name = d+"_"+arm
+343:             if stage == 2:
+344:                 manifest["starts"][arm] = continuity(model, optimizer, memory)
+345:                 if manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]:
+346:                     raise ValueError("B did not continue its own restored A state")
+347:             current = domain("fit", d)
+348:             log, captures = entry.train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget)
+349:             endpoint, memory = entry.checkpoint(root, name, model, optimizer, memory, current if stage==1 else None,
+350:                 domain("calibration", d), valid, c, arm, stage, budget)
+351:             manifest["training"][name], manifest["diagnostics"][name], manifest["points"][name] = log, captures, endpoint
+352:             manifest["physical_updates"] += 288
+353:             manifest["gradient_group_presentations"] += 288*stage
+354:             data.write_json(root/"progress.json", manifest)
+355:         del model, optimizer, memory
+356:         gc.collect()
+357:         if torch.cuda.is_initialized():
+358:             torch.cuda.empty_cache()
+359:     manifest["status"] = entry.COMPLETE
+360:     data.write_json(root/"manifest.json", manifest)
+361:     for source in manifest["source_files"]:
+362:         destination = root/"sources"/source["path"]
+363:         destination.parent.mkdir(parents=True, exist_ok=True)
+364:         shutil.copyfile(data.verify(data.ROOT/source["path"], source), destination)
+365:     return manifest, split, valid, metadata
+366: 
+367: 
+368: def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
+369:     entry = entry or sys.modules[__name__]
+370:     if (manifest["status"] != entry.COMPLETE or manifest["source_files"] != entry.sources()
+371:             or manifest["physical_updates"] != 576 or manifest["gradient_group_presentations"] != 864
+372:             or any(set(manifest[k]) != set(entry.POINTS) for k in ("points", "training", "diagnostics"))
+373:             or any(set(manifest[k]) != set(entry.method.ARMS) for k in ("starts", "initials"))):
+374:         raise ValueError("Incomplete source-bound blind experiment")
+375:     baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
+376:     if manifest.get("baseline_identity") != data.record(entry.BASELINE, data.ROOT):
+377:         raise ValueError("Baseline provenance missing")
+378:     split = data.read_json(data.verify(root/manifest["partition"]["path"], manifest["partition"]))
+379:     if split != data.read_json(old_root/"run/partition.json"):
+380:         raise ValueError("Frozen baseline partition differs")
+381:     valid_ids = [r["group_uid"] for r in split["development"]]
+382:     if len(valid_ids) != 40 or any(sum(r["domain"] == d for r in split["development"]) != 20 for d in "AB"):
+383:         raise ValueError("AB valid coverage differs")
+384:     fit = {r["group_uid"]: r["domain"] for r in split["fit"]}
+385:     canonical = sorted(u for u, domain in fit.items() if domain == "A")
+386:     if len(canonical) != 48:
+387:         raise ValueError("Shared A fit scope differs")
+388:     a_point = manifest["points"]["A_"+entry.method.ARMS[0]]
+389:     shared = record.Memory.from_bytes(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes())
+390:     members = shared.summary()["members"]
+391:     rng = random.Random(data.seed_for(20260930, "ABC", "retention"))
+392:     retained = []
+393:     for seen, uid in enumerate(sorted(canonical), 1):
+394:         k = seen-1 if seen <= 6 else rng.randrange(seen)
+395:         if k < 6:
+396:             if k == len(retained):
+397:                 retained.append(uid)
+398:             else:
+399:                 retained[k] = uid
+400:     if retained != members:
+401:         raise ValueError("Independent Algorithm R differs")
+402:     for arm in entry.method.ARMS:
+403:         if (manifest["initials"][arm] != baseline["initial_identity"]
+404:                 or manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]):
+405:             raise ValueError("Independent starts/own A continuation missing")
+406:     scores, sequences = {}, {1: [], 2: []}
+407:     for name in entry.POINTS:
+408:         point = manifest["points"][name]
+409:         arm, stage = name[2:], "AB".index(name[0])+1
+410:         a_point = manifest["points"]["A_"+arm]
+411:         if (point["arm"] != arm or point["stage"] != stage or point["adam_step"] != stage*288
+412:                 or point["full_restore_verified"] is not True or point["inference_restore_verified"] is not True
+413:                 or any(point.get(k) != v for k, v in entry.method.metadata(arm).items())):
+414:             raise ValueError("Endpoint restoration missing")
+415:         logrec = manifest["training"][name]
+416:         log = data.read_json(data.verify(root/logrec["path"], logrec))
+417:         expected_fit = [r["group_uid"] for r in split["fit"] if r["domain"] == "AB"[stage-1]]
+418:         stream = data.seed_for(20260918, "ABC", stage, "current")
+419:         expected = data.schedule([type("ID", (), {"uid": u})() for u in expected_fit], 6, stream)
+420:         if log["updates"] != 288 or len(log["rows"]) != 288 or log["adam_step"] != stage*288 or log["current_ids"] != [g.uid for g in expected]:
+421:             raise ValueError("Main schedule/update count differs")
+422:         memory = entry.memory_from(data.verify(root/point["memory"]["path"], point["memory"]).read_bytes(), arm)
+423:         if (memory.summary() != point["memory_summary"] or memory.reservoir.seen != 48 or memory.summary()["members"] != members
+424:                 or memory.maps["pooling"] != entry.method.identity(arm)
+
+=== workspace/scripts/step28_g_half_verify.py [1..129/396] ===
+1: """Cumulative Linux handwritten CPU/native qualification; no formal inputs."""
+2: from __future__ import annotations
+3: 
+4: import time
+5: import os
+6: import math
+7: STARTED = time.monotonic()-max(0.,time.time()-float(os.environ.get("QUALIFICATION_STARTED_EPOCH",time.time())))
+8: 
+9: import argparse
+10: import gc
+11: from pathlib import Path
+12: import shutil
+13: import sys
+14: import threading
+15: import traceback
+16: import unittest
+17: 
+18: import numpy as np
+19: import psutil
+20: import torch
+21: 
+22: import step28_g_half_run as run
+23: from step28_record_replay_verify import preflight
+24: from step28_record_replay_numerics import cpu_copy, equal_state
+25: 
+26: method, record, diag, core, data = run.method, run.record, run.diag, run.core, run.data
+27: 
+28: 
+29: def state(model, optimizer):
+30:     return cpu_copy({"model": model.state_dict(), "adam": optimizer.state_dict(),
+31:                      "grads": [p.grad for p in model.parameters()]})
+32: 
+33: 
+34: def restore(model, optimizer, saved, rng, modes):
+35:     model.load_state_dict(saved["model"])
+36:     optimizer.load_state_dict(cpu_copy(saved["adam"]))
+37:     for p, g in zip(model.parameters(), saved["grads"], strict=True):
+38:         p.grad = None if g is None else g.to(p.device)
+39:     for m, mode in zip(model.modules(), modes, strict=True):
+40:         m.training = mode
+41:     diag.restore_rng(rng)
+42: 
+43: 
+44: def adam_effects(model, optimizer, saved):
+45:     """Record on/off Adam states by actual optimizer parameter ID and model name."""
+46:     current = optimizer.state_dict()
+47:     if [g["params"] for g in current["param_groups"]] != [g["params"] for g in saved["param_groups"]]:
+48:         raise ValueError("On/off Adam parameter mapping differs")
+49:     names = {id(p): name for name, p in model.named_parameters()}
+50:     result = {component: {"finite": True, "parameters": []} for component in ("encoder", "head")}
+51:     for live, packed in zip(optimizer.param_groups, current["param_groups"], strict=True):
+52:         for parameter, pid in zip(live["params"], packed["params"], strict=True):
+53:             name = names[id(parameter)]
+54:             component = name.split(".", 1)[0]
+55:             before, after = saved["state"].get(pid), current["state"].get(pid)
+56:             row = {"name": name, "optimizer_parameter_id": pid, "state_present": after is not None}
+57:             if (before is None) != (after is None) or (after is None and parameter.grad is not None):
+58:                 raise ValueError("On/off Adam participation differs: "+name)
+59:             if after is not None:
+60:                 for key in ("step", "exp_avg", "exp_avg_sq"):
+61:                     if key not in before or key not in after:
+62:                         raise ValueError("Missing on/off Adam field: "+name+"/"+key)
+63:                     a, b = before[key], after[key].detach().cpu()
+64:                     if a.shape != b.shape or a.dtype != b.dtype or not torch.isfinite(a).all() or not torch.isfinite(b).all():
+65:                         raise ValueError("Invalid on/off Adam field: "+name+"/"+key)
+66:                     row[key] = {"max_abs_delta": float((a-b).abs().max())}
+67:                     if key == "step":
+68:                         row[key].update(off=float(a), on=float(b))
+69:             result[component]["parameters"].append(row)
+70:     return result
+71: 
+72: 
+73: def component_effects(model, on, *, optimizer=None):
+74:     """Compare active paths; unused parameters must keep both mask and value."""
+75:     parameters = list(model.named_parameters())
+76:     effects = {}
+77:     for component in ("encoder", "head"):
+78:         active, inactive = [], []
+79:         for i, (name, parameter) in enumerate(parameters):
+80:             if not name.startswith(component+"."):
+81:                 continue
+82:             gradient, previous = parameter.grad, on["grads"][i]
+83:             if (gradient is None) != (previous is None):
+84:                 raise ValueError("On/off gradient participation changed: "+name)
+85:             if gradient is None:
+86:                 if not torch.equal(on["model"][name], parameter.detach().cpu()):
+87:                     raise ValueError("Unused parameter changed: "+name)
+88:                 inactive.append(name)
+89:             else:
+90:                 if not torch.isfinite(gradient).all() or not torch.isfinite(previous).all():
+91:                     raise ValueError("Nonfinite on/off gradient: "+name)
+92:                 active.append((i, name, parameter))
+93:         gradient_delta = max((float((on["grads"][i]-p.grad.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+94:         parameter_delta = max((float((on["model"][n]-p.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+95:         if not active or gradient_delta == 0 or parameter_delta == 0:
+96:             raise ValueError("No distinguishable encoder/head active update effect")
+97:         effects[component] = {"post_clip_gradient_distinguishable": True, "actual_update_distinguishable": True,
+98:             "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive,
+99:             "active_parameter_names": [n for i, n, p in active],
+100:             "post_clip_gradient_max_delta": gradient_delta, "parameter_max_delta": parameter_delta}
+101:     if optimizer is not None:
+102:         for component, value in adam_effects(model, optimizer, on["adam"]).items():
+103:             effects[component]["adam"] = value
+104:     return effects
+105: 
+106: 
+107: def checked_fresh(c):
+108:     archive = run.pretrained_archive(c)
+109:     model, optimizer, initial = run.fresh(c)
+110:     return model, optimizer, initial, archive
+111: 
+112: 
+113: def disk_reserve(path, total, reserve, maximum):
+114:     if total+reserve > maximum or shutil.disk_usage(path).free < reserve:
+115:         raise RuntimeError("Qualification checkpoint reserve exceeds available disk or approved work bytes")
+116: 
+117: 
+118: def native_save(path, model, optimizer, metadata, check):
+119:     check(run.base.persistence.checkpoint_reserve(model, optimizer))
+120:     return core.save_state(path, model, optimizer, metadata)
+121: 
+122: 
+123: def native(check, progress, handwritten, out, *, entry=None, consistency=False):
+124:     run = entry or sys.modules["step28_g_half_run"]
+125:     method = run.method
+126:     active, control = method.ARMS[0], "H" if consistency else "G"
+127:     import step28_balanced_pooling as original
+128:     resources = preflight()
+129:     if shutil.disk_usage(out).free < 10*2**30:

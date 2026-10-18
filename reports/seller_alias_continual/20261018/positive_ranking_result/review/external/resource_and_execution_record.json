@@ -1,0 +1,224 @@
+{
+  "scope": "Review computation records only; never project-native or formal execution charges",
+  "local_runs": [
+    {
+      "review_task": "input_identity",
+      "scope": "Isolated reviewer workspace only; not project Linux execution",
+      "command_argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/0f307e99d302/audit_output/scripts/check_input_identity.py"
+      ],
+      "cwd": "/workspace/scratch/0f307e99d302",
+      "environment_overrides": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MPLCONFIGDIR": "/workspace/scratch/0f307e99d302/audit_output/temporary/matplotlib"
+      },
+      "started_utc": "2026-10-18T11:47:14.519023+00:00",
+      "launcher_python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "elapsed_seconds": 0.3691753120001522,
+      "completed_utc": "2026-10-18T11:47:14.888198+00:00",
+      "child_user_seconds": 0.255693,
+      "child_system_seconds": 0.067102,
+      "child_peak_rss_kib_linux": 23608,
+      "stdout.txt": {
+        "bytes": 505,
+        "sha256": "2ad3439e7e856ca12e17bedc04b97dfed0ee6a4036002fc6983307708bee6581"
+      },
+      "stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "review_task": "supplied_audit_replay",
+      "scope": "Isolated reviewer workspace only; not project Linux execution",
+      "command_argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/0f307e99d302/review_input/workspace/scripts/step28_positive_ranking_audit.py",
+        "--workspace",
+        "/workspace/scratch/0f307e99d302/review_input/workspace",
+        "--output",
+        "/workspace/scratch/0f307e99d302/audit_output/supplied_replay"
+      ],
+      "cwd": "/workspace/scratch/0f307e99d302",
+      "environment_overrides": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MPLCONFIGDIR": "/workspace/scratch/0f307e99d302/audit_output/temporary/matplotlib"
+      },
+      "started_utc": "2026-10-18T11:47:24.842522+00:00",
+      "launcher_python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "elapsed_seconds": 6.28618462200393,
+      "completed_utc": "2026-10-18T11:47:31.128709+00:00",
+      "child_user_seconds": 5.569591,
+      "child_system_seconds": 0.6688219999999999,
+      "child_peak_rss_kib_linux": 113280,
+      "stdout.txt": {
+        "bytes": 805,
+        "sha256": "0fb35620dbc01c433822cc40f8dcf5d9bf127dc25f54b125d3640455eb820424"
+      },
+      "stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "review_task": "independent_statistics",
+      "scope": "Isolated reviewer workspace only; not project Linux execution",
+      "command_argv": [
+        "python",
+        "-B",
+        "/workspace/scratch/0f307e99d302/audit_output/scripts/independent_statistics.py"
+      ],
+      "cwd": "/workspace/scratch/0f307e99d302",
+      "environment_overrides": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MPLCONFIGDIR": "/workspace/scratch/0f307e99d302/audit_output/temporary/matplotlib"
+      },
+      "started_utc": "2026-10-18T11:50:04.023261+00:00",
+      "launcher_python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "elapsed_seconds": 2.073056818000623,
+      "completed_utc": "2026-10-18T11:50:06.096319+00:00",
+      "child_user_seconds": 1.995371,
+      "child_system_seconds": 0.041063999999999996,
+      "child_peak_rss_kib_linux": 37720,
+      "stdout.txt": {
+        "bytes": 3120,
+        "sha256": "e3ff995b03632407663a7914826407a28e293529fc3d59d05080580c8aaf5096"
+      },
+      "stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "review_task": "execution_attempt01",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/workspace/scratch/0f307e99d302/audit_output/agents/execution/attempt01/execution_evidence_audit.py"
+      ],
+      "cwd": "/workspace/scratch/0f307e99d302/audit_output/agents/execution",
+      "started_at_utc": "2026-10-18T11:50:34.788788+00:00",
+      "finished_at_utc": "2026-10-18T11:50:35.412830+00:00",
+      "elapsed_seconds": 0.6240436130028684,
+      "exit_code": 2,
+      "script_sha256": "ed3e9b541efdb5f51235af7ff7467b4f54a05a2eec5b3ae2abf19c9cc0bd0516",
+      "stdout": "stdout.txt",
+      "stderr": "stderr.txt",
+      "purpose": "Isolated read-only saved execution evidence verification; no project imports or server connection.",
+      "attempt": "attempt01",
+      "peak_rss_bytes": 22433792
+    },
+    {
+      "review_task": "execution_attempt02",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/workspace/scratch/0f307e99d302/audit_output/agents/execution/attempt02/execution_evidence_audit.py"
+      ],
+      "cwd": "/workspace/scratch/0f307e99d302/audit_output/agents/execution",
+      "started_at_utc": "2026-10-18T11:51:04.942997+00:00",
+      "finished_at_utc": "2026-10-18T11:51:05.833166+00:00",
+      "elapsed_seconds": 0.8900769939937163,
+      "exit_code": 0,
+      "script_sha256": "d794b4bc53300d1038967b56f1b4b67ca84537eeaac3f2ca80abf41bb67e4fb6",
+      "stdout": "stdout.txt",
+      "stderr": "stderr.txt",
+      "purpose": "Isolated read-only saved execution evidence verification; no project imports or server connection.",
+      "attempt": "attempt02",
+      "peak_rss_bytes": 27279360
+    },
+    {
+      "review_task": "wiring",
+      "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python /workspace/scratch/0f307e99d302/audit_output/agents/wiring/wiring_replay.py",
+      "cwd": "/workspace/scratch/0f307e99d302",
+      "exit_code": 0,
+      "stdout": "wiring_replay.stdout.txt",
+      "stderr": "",
+      "resource": {
+        "start_utc": "2026-10-18T11:50:23.168852+00:00",
+        "wall_seconds": 0.09850670499872649,
+        "cpu_seconds": 0.09849469200000002,
+        "peak_rss_kib": 21932,
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]"
+      },
+      "input_list": "mechanically_read_inputs.json"
+    },
+    {
+      "review_task": "diagnostics",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/workspace/scratch/0f307e99d302/audit_output/agents/diagnostics/independent_diagnostics.py",
+        "--workspace",
+        "/workspace/scratch/0f307e99d302/review_input/workspace",
+        "--output",
+        "/workspace/scratch/0f307e99d302/audit_output/agents/diagnostics/attempt01"
+      ],
+      "exit_code": 0,
+      "outer_elapsed_seconds": 0.9205053179975948,
+      "environment_overrides": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "CUDA_VISIBLE_DEVICES": ""
+      }
+    }
+  ],
+  "project_resources_from_preserved_evidence": {
+    "wrapper_start": "2026-10-18T14:14:43+08:00",
+    "wrapper_end": "2026-10-18T17:45:44+08:00",
+    "wrapper_exit": 0,
+    "wrapper_seconds": 12661.0,
+    "analysis_seconds": 2.3853077590465546,
+    "charged_with_analysis": 12664,
+    "budget": {
+      "elapsed_seconds": 12659.635004023556,
+      "limits": {
+        "maximum_cuda_reserved_bytes": 30064771072,
+        "maximum_gpu_stage_seconds": 57600,
+        "maximum_output_bytes": 17179869184,
+        "maximum_rss_bytes": 68719476736,
+        "minimum_free_gpu_bytes": 32212254720,
+        "minimum_free_host_bytes": 77309411328,
+        "torch_cpu_threads": 1
+      },
+      "peak_cuda_reserved_bytes": 8652849152,
+      "peak_output_bytes": 9130164115,
+      "peak_rss_bytes": 6715924480,
+      "phase": "evaluation"
+    },
+    "console_update_checkpoints": 52,
+    "closeout_is_saved_observation_not_live_verification": true
+  },
+  "review_failure_count": 1,
+  "separate_exploratory_field_error": true,
+  "walltime_not_whole_session": true,
+  "overlapping_checks_not_independent_samples": true
+}

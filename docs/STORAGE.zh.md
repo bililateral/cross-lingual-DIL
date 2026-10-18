@@ -10,6 +10,12 @@
 
 ## 2026-10-18 S_pos/H_pos实现、CPU与实现外审
 
+用户随后明确：“给我把此次训练的权重删掉”。20:46:16—20:46:17已精确删除本次A_S_pos/B_S_pos/A_H_pos/B_H_pos四权重共5217586212字节；先核对四项原端点SHA、最终路径/属主/无运行依赖并回传删除前清单，再删除。models现为空，257个非权重作业文件逐项大小/SHA不变，四Memory共1381626字节保留；见[删除前身份](../reports/maintenance/20261018/positive_ranking_weights/predelete.json)及[实际回执](../reports/maintenance/20261018/positive_ranking_weights/receipt.json)。检查中两次系统会话/proc权限失败发生在删除前，根因与定向处置保留，不属科研失败。冻结审查/20:35观测保持当时事实；新许可覆盖本次四权重，不扩展其他资产。删除记录两端保管，局部清理不重置项目周期。
+
+结果外审收尾：6340418字节/93成员返回ZIP完整回收，92内部载荷及原输入388载荷身份相符；保留92个非重复外审原件5306388字节、最终页面、主审与[回收记录](../reports/seller_alias_continual/20261018/positive_ranking_result/review/recovery.json)。必要审查材料和当前state经SFTP同步原20261018_133500/workspace/reports/result_sync/review及既有state路径，逐项回读见[同步记录](../reports/seller_alias_continual/20261018/positive_ranking_result/review/sync.json)；主目录可变docs仅Windows维护，不声称全仓同步。20:35:34[现场](../reports/seller_alias_continual/20261018/positive_ranking_result/review/closeout.json)核对40来源/完成/访问不变，无相关作业，四权重5217586212字节及四Memory1381626字节保留，未载入/下载/删除。
+
+完整回收及主审处置后，专用页已关闭；精确删除返回ZIP、浏览器重复ZIP、内嵌重复输入和临时控制台日志，合计18191777字节，身份/不存在复核及唯一输入路径映射见recovery。唯一5481875字节获准输入ZIP仍供外审源码精确重放，仅本地一份；冻结原报告/审查原件/失败保留。本次局部清理不重置10月23日大清理周期，新材料仅本地Git。
+
 正式完成后回传：255份必要原件8685752字节及7份Linux独立分析572387字节已逐项核对，见[完整回传](../reports/seller_alias_continual/20261018/positive_ranking_result/receive_verification.json)和[分析账](../reports/seller_alias_continual/20261018/positive_ranking_result/analysis_wallclock.json)。19:32现场四权重5217586212字节、四Memory1381626字节仍为yongpeng普通文件，work为空，原三进程退出；未下载/载入/删除。详细报告及接收记录留Windows并同步原workspace/reports/result_sync，分析源码同步原workspace/scripts；当前可变state两端按旧SHA核对后更新，见[同步核验](../reports/seller_alias_continual/20261018/positive_ranking_result/sync.json)。已验收的4163123字节传输ZIP两端用后删除；此为局部冗余清理，不重置10月23日周期。用户批准5481875字节/389成员、SHA256 4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7的结果包后，19:43经本地Playwright单次提交GPT 6 Pro，见[提交原件](../reports/seller_alias_continual/20261018/positive_ranking_result/review/submission.json)；唯一输入包及活动网页保留至完整回收/主审，准备时点报告与package原件不追改。新材料仅本地Git。
 
 原生通过与正式启动的新增保管：原生11份必要小证据及8份启动/门禁/执行原件共19文件1000572字节，已按[来源清单](../reports/documentation/20261016/positive_ranking_implementation/qualification/receive_native.json)SFTP回传并核对大小/SHA。原生两臂临时work已由原入口清理，身份原件保留；正式14:14:43启动，14:15:03确认首个实际更新后Linux监听源码自删，Windows复现源保留。14:55原正式进程继续运行，正式模型/Memory/盲分数为活动资产，未下载或删除；本次不新增未完成训练的进度快照文件，只更新唯一当前入口。新材料仅本地Git，局部临时助手清理不重置大清理周期。

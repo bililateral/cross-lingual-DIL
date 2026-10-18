@@ -1,0 +1,319 @@
+
+=== workspace/tests/test_step28_positive_ranking.py [1..234/533] ===
+1: """Changed-objective evidence only, entirely handwritten; Linux py310."""
+2: from __future__ import annotations
+3: import copy
+4: import hashlib
+5: import itertools
+6: import math
+7: import os
+8: from pathlib import Path
+9: import tempfile
+10: import unittest
+11: from unittest import mock
+12: import numpy as np
+13: import torch
+14: 
+15: import step28_positive_ranking_run as run
+16: from test_step28_record_replay import handmade_group, tiny_model
+17: from test_step28_g_half import literal_pool as h_pool
+18: from step28_g_half_verify import state, restore, component_effects
+19: 
+20: method, record, core, data, diag = run.method, run.record, run.core, run.data, run.diag
+21: PAIRS = list(itertools.combinations(range(28), 2))
+22: LOOKUP = {p: k for k, p in enumerate(PAIRS)}
+23: ATOL, RTOL = 2e-6, 2e-5
+24: 
+25: 
+26: def independent_rank(values, labels, mutant=None):
+27:     """Separate candidate enumeration and logaddexp formulation."""
+28:     terms = []
+29:     for q in range(28):
+30:         ids = [LOOKUP[tuple(sorted((q, j)))] for j in range(28) if j != q]
+31:         positives = [k for k in ids if labels[k]]
+32:         negatives = [k for k in ids if not labels[k]]
+33:         if mutant == "constant_only":
+34:             term = torch.logsumexp(values[ids], 0)-values[positives].mean()-math.log(len(positives))
+35:         else:
+36:             if mutant == "omit_second": positives = positives[:1]
+37:             pieces = []
+38:             for p in positives:
+39:                 ns = negatives if mutant != "other_positive_negative" else [k for k in ids if k != p]
+40:                 pieces.append(torch.logaddexp(values.new_zeros(()), torch.logsumexp(values[ns], 0)-values[p]))
+41:             term = torch.stack(pieces).mean()
+42:         terms.append(term)
+43:     return torch.stack(terms).mean()/(27 if mutant == "extra_average" else 1)
+44: 
+45: 
+46: def analytic_rank(values, labels):
+47:     """Plain Python scalar log-sum and analytical edge gradient, no production helper."""
+48:     gradient = np.zeros(378, np.float64)
+49:     losses, query_gradients = [], []
+50:     for q in range(28):
+51:         ids = [LOOKUP[tuple(sorted((q,j)))] for j in range(28) if j != q]
+52:         pos, neg = [k for k in ids if labels[k]], [k for k in ids if not labels[k]]
+53:         qgrad = np.zeros(378, np.float64)
+54:         pieces = []
+55:         for p in pos:
+56:             differences = [float(values[n])-float(values[p]) for n in neg]
+57:             peak = max(0., *differences)
+58:             weights = [math.exp(d-peak) for d in differences]
+59:             den = math.exp(-peak)+math.fsum(weights)
+60:             pieces.append(peak+math.log(den))
+61:             for n, w in zip(neg, weights): qgrad[n] += w/den/len(pos)
+62:             qgrad[p] -= math.fsum(weights)/den/len(pos)
+63:         losses.append(math.fsum(pieces)/len(pos))
+64:         query_gradients.append(qgrad)
+65:         gradient += qgrad/28
+66:     return math.fsum(losses)/28, gradient, query_gradients
+67: 
+68: 
+69: def independent_pool(table, slots, arm):
+70:     if arm == "H_pos": return h_pool(table, slots)
+71:     lookup = {p: k for k, p in enumerate(itertools.combinations(range(len(slots)), 2))}
+72:     return torch.stack([table[[lookup[tuple(sorted((int(i),int(j))))]
+73:         for i in np.flatnonzero(slots == a) for j in np.flatnonzero(slots == b)]].mean()
+74:         for a, b in PAIRS])
+75: 
+76: 
+77: def independent_loss(values, group):
+78:     bce = torch.stack([torch.nn.functional.softplus(v)-float(group.labels[k])*v for k,v in enumerate(values)]).mean()
+79:     hard = []
+80:     for q in range(28):
+81:         ids = [(j, LOOKUP[tuple(sorted((q,j)))]) for j in range(28) if j != q]
+82:         pos = [k for j,k in ids if group.labels[k]]
+83:         neg = sorted([(j,k) for j,k in ids if not group.labels[k]], key=lambda jk:(-float(values[jk[1]].detach()),jk[0]))[:5]
+84:         hard.append(torch.stack([torch.nn.functional.softplus(values[n]-values[p]) for p in pos for j,n in neg]).mean())
+85:     return bce+independent_rank(values, group.labels)+.5*torch.stack(hard).mean()
+86: 
+87: 
+88: def independent_objective(table, group, seed, arm, target=None):
+89:     a0, a1 = record.assignment(group), record.assignment(group, seed)
+90:     v0, v1 = [independent_pool(table, slots, arm) for slots in (a0,a1)]
+91:     supervised = (independent_loss(v0, group)+independent_loss(v1, group))/2
+92:     return supervised if target is None else .1*supervised+.5*(v0-independent_pool(torch.as_tensor(target,device=table.device,dtype=table.dtype),a0,arm)).square().mean()
+93: 
+94: 
+95: def shared_memory(arm):
+96:     groups = [handmade_group(f"A_fit_{i:02}") for i in range(48)]
+97:     memory = record.Memory("ABC")
+98:     memory.retain(groups, 1, lambda g: (np.sin(np.arange(1540)/7)*2).astype(np.float32))
+99:     memory.maps.update(method.metadata(arm))
+100:     return memory
+101: 
+102: 
+103: def verify_native_table(table, group, seed, reference, arm):
+104:     """Actual FP32 table -> both views -> independent rank values/gradients."""
+105:     rows = []
+106:     for name, slots in (("A0",record.assignment(group)),("A1",record.assignment(group,seed))):
+107:         scores = method.account_logits(table,slots,arm).detach().requires_grad_(True)
+108:         rank = method.objectives(scores,torch.as_tensor(group.labels,device=scores.device,dtype=scores.dtype))["rank_pos"]
+109:         gradient, = torch.autograd.grad(rank,scores)
+110:         value, grad, _ = analytic_rank(scores.detach().double().cpu().tolist(),group.labels)
+111:         np.testing.assert_allclose(float(rank.detach()),value,atol=ATOL,rtol=RTOL)
+112:         np.testing.assert_allclose(gradient.detach().cpu().numpy(),grad,atol=ATOL,rtol=RTOL)
+113:         rows.append(dict(view=name,value=float(rank.detach()),reference=value,gradient_max_error=float(np.max(np.abs(gradient.detach().cpu().numpy()-grad)))))
+114:     return dict(arm=arm,uid=group.uid,role="history" if reference is not None else "current",views=rows)
+115: 
+116: 
+117: class PositiveRankingTests(unittest.TestCase):
+118:     def temporary(self):
+119:         t = tempfile.TemporaryDirectory(dir=os.environ["G_HALF_TEST_ROOT"])
+120:         self.addCleanup(t.cleanup)
+121:         return Path(t.name)
+122: 
+123:     def evidence(self,name,value):
+124:         data.write_json(Path(os.environ["G_HALF_TEST_ROOT"])/(name+".json"),value)
+125: 
+126:     def test_rank_reference_and_rejected_mutants(self):
+127:         g = handmade_group("rank")
+128:         labels = np.asarray(g.labels)
+129:         rows = []
+130:         for dtype in (torch.float64, torch.float32):
+131:             for tag, values in (("unequal",np.sin(np.arange(378)*.7)*4), ("equal",np.zeros(378)),
+132:                                 ("extreme",np.where(np.arange(378)%3,1000.,-1000.))):
+133:                 x = torch.tensor(values,dtype=dtype,requires_grad=True)
+134:                 actual = method.objectives(x,torch.tensor(labels,dtype=dtype))["rank_pos"]
+135:                 gradient, = torch.autograd.grad(actual,x)
+136:                 ref, grad, qgrad = analytic_rank(x.detach().tolist(),labels)
+137:                 atol,rtol = (1e-12,1e-12) if dtype == torch.float64 else (ATOL,RTOL)
+138:                 np.testing.assert_allclose(float(actual.detach()),ref,atol=atol,rtol=rtol)
+139:                 np.testing.assert_allclose(gradient.numpy(),grad,atol=atol,rtol=rtol)
+140:                 self.assertTrue(np.all(grad[labels.astype(bool)] <= 0))
+141:                 self.assertTrue(np.all(grad[~labels.astype(bool)] >= 0))
+142:                 for k,(a,b) in enumerate(PAIRS): self.assertAlmostEqual(grad[k],(qgrad[a][k]+qgrad[b][k])/28,places=12)
+143:                 if tag == "unequal" and dtype == torch.float64:
+144:                     for k in (0,1,53,97,377):
+145:                         xp,xm=values.copy(),values.copy();xp[k]+=1e-5;xm[k]-=1e-5
+146:                         fd=(analytic_rank(xp,labels)[0]-analytic_rank(xm,labels)[0])/2e-5
+147:                         self.assertLessEqual(abs(fd-grad[k]),2e-8)
+148:                 rows.append(dict(case=tag,dtype=str(dtype),value=float(actual.detach()),reference=ref,
+149:                                  gradient_max_error=float(np.max(np.abs(gradient.numpy()-grad)))))
+150:         x=torch.tensor(np.sin(np.arange(378)*.7)*4,dtype=torch.float64,requires_grad=True)
+151:         correct=independent_rank(x,labels);cg,=torch.autograd.grad(correct,x,retain_graph=True)
+152:         rejected={}
+153:         for name in ("constant_only","omit_second","other_positive_negative","extra_average"):
+154:             bad=independent_rank(x,labels,name);bg,=torch.autograd.grad(bad,x,retain_graph=True)
+155:             delta=float((bg-cg).abs().max());self.assertGreater(delta,1e-5);rejected[name]=delta
+156:         # Real-number single-positive identity and double-positive equal-score strengthening.
+157:         neg=torch.arange(26,dtype=torch.float64)/9-2;p=torch.tensor(1.3,dtype=torch.float64)
+158:         torch.testing.assert_close(torch.logsumexp(torch.cat((p[None],neg)),0)-p,
+159:                                   torch.logaddexp(p.new_zeros(()),torch.logsumexp(neg,0)-p),atol=1e-12,rtol=1e-12)
+160:         zero=torch.zeros(378,dtype=torch.float64,requires_grad=True)
+161:         old=record.parent.ranking.objectives(zero,torch.tensor(labels,dtype=zero.dtype),.5)["rank"]
+162:         new=method.objectives(zero,torch.tensor(labels,dtype=zero.dtype))["rank_pos"]
+163:         og,=torch.autograd.grad(old,zero,retain_graph=True);ng,=torch.autograd.grad(new,zero)
+164:         # q0 and q3 are both K3; this negative edge receives two strengthened contributions.
+165:         k=LOOKUP[(0,3)];self.assertGreater(float(ng[k]),float(og[k]))
+166:         self.evidence("rank_reference",dict(cases=rows,rejected_mutants=rejected,undirected_two_query_gradient=True))
+167: 
+168:     def test_views_history_and_actual_vjp_adamw(self):
+169:         c={**run.config(),"handwritten_qualification":True}
+170:         current,history=handmade_group("current"),handmade_group("history")
+171:         target=(np.sin(np.arange(1540)/7)*3).astype(np.float32)
+172:         evidence={}
+173:         for arm in method.ARMS:
+174:             proxy=(torch.sin(torch.arange(1540)*.39)*3).requires_grad_()
+175:             for ref in (None,target):
+176:                 actual,log=method.objective(proxy,current,29,arm,ref)
+177:                 independent=independent_objective(proxy,current,29,arm,ref)
+178:                 ga,=torch.autograd.grad(actual,proxy,retain_graph=True);gi,=torch.autograd.grad(independent,proxy,retain_graph=True)
+179:                 torch.testing.assert_close(actual,independent,atol=ATOL,rtol=RTOL)
+180:                 torch.testing.assert_close(ga,gi,atol=ATOL,rtol=RTOL)
+181:             model=tiny_model();method.bind(model,method.metadata(arm));opt=core.make_optimizer(model,c)
+182:             # One real warm-up gives common nonempty Adam moments, not an invented state.
+183:             method.update(model,opt,current,None,None,c,arm,1,1)
+184:             direct=copy.deepcopy(model);od=core.make_optimizer(direct,c);od.load_state_dict(copy.deepcopy(opt.state_dict()))
+185:             old=copy.deepcopy(model);oo=core.make_optimizer(old,c);oo.load_state_dict(copy.deepcopy(opt.state_dict()))
+186:             observed={};tables=[]
+187:             def observe(role,log):observed[role]={n:p.grad.clone() for n,p in model.named_parameters() if p.grad is not None}
+188:             row=method.update(model,opt,current,history,target,c,arm,2,49,observe=observe,
+189:                 table_observer=lambda t,g,s,r:tables.append(verify_native_table(t,g,s,r,arm)))
+190:             run.loss_total(row,2,arm)
+191:             direct.train();od.zero_grad(set_to_none=True);losses=[];pre_errors={}
+192:             for role,g,t in (("current",current,None),("history",history,target)):
+193:                 torch.manual_seed(data.seed_for(20260918,"ABC",2,49,role,"dropout"))
+194:                 z=record.record_vectors(direct,g,c);i,j=torch.triu_indices(len(z),len(z),1)
+195:                 table=direct.head(torch.cat(((z[i]-z[j]).abs(),z[i]*z[j]),1)).flatten()
+196:                 seed=data.seed_for(20260918,"ABC",2,49,role,g.uid,"regroup")
+197:                 loss=independent_objective(table,g,seed,arm,t);losses.append(float(loss.detach()));loss.backward()
+198:                 pre_errors[role]={}
+199:                 for n,p in direct.named_parameters():
+200:                     torch.testing.assert_close(observed[role][n],p.grad,atol=ATOL,rtol=RTOL)
+201:                     pre_errors[role][n]=float((observed[role][n]-p.grad).abs().max())
+202:             torch.nn.utils.clip_grad_norm_(direct.parameters(),1.)
+203:             od.param_groups[0]["lr"],od.param_groups[1]["lr"]=run.parent.stage_lr(49),.001;od.step()
+204:             self.assertAlmostEqual(row["total"],sum(losses),places=5)
+205:             for (n,a),b in zip(model.named_parameters(),direct.parameters()):
+206:                 torch.testing.assert_close(a,b,atol=ATOL,rtol=RTOL);torch.testing.assert_close(a.grad,b.grad,atol=ATOL,rtol=RTOL)
+207:                 for key in ("step","exp_avg","exp_avg_sq"):
+208:                     torch.testing.assert_close(opt.state[a][key],od.state[b][key],atol=ATOL,rtol=RTOL)
+209:             old_observed={}
+210:             def old_observe(role,log):old_observed[role]={n:p.grad.clone() for n,p in old.named_parameters() if p.grad is not None}
+211:             method.update(old,oo,current,history,target,c,arm,2,49,observe=old_observe,qualification_old_rank=True)
+212:             effects=component_effects(model,state(old,oo),optimizer=opt)
+213:             branch_delta={}
+214:             for role in ("current","history"):
+215:                 # History callback contains accumulated current+history; subtract current to isolate its own effect.
+216:                 branch_delta[role]={}
+217:                 for component in ("encoder","head"):
+218:                     deltas=[]
+219:                     for n in observed[role]:
+220:                         if n.startswith(component+"."):
+221:                             a=observed[role][n]-(observed["current"][n] if role=="history" else 0)
+222:                             b=old_observed[role][n]-(old_observed["current"][n] if role=="history" else 0)
+223:                             deltas.append(float((a-b).abs().max()))
+224:                     branch_delta[role][component]=max(deltas);self.assertGreater(max(deltas),0)
+225:             # Omit new history rank but retain new current: independent reference detects this fault.
+226:             new_hist,_=method.objective(proxy,history,29,arm,target)
+227:             old_hist,_=method.objective(proxy,history,29,arm,target,old_rank=True)
+228:             nh,=torch.autograd.grad(new_hist,proxy,retain_graph=True);oh,=torch.autograd.grad(old_hist,proxy)
+229:             self.assertGreater(float((nh-oh).abs().max()),1e-5)
+230:             evidence[arm]=dict(total=row["total"],independent_total=sum(losses),preclip_errors=pre_errors,
+231:                 old_new_effects=effects,isolated_branch_preclip_deltas=branch_delta,tables=tables,
+232:                 actual_optimizer_calls=3,history_only_rank_fault_rejected=True)
+233:         self.evidence("actual_vjp_adamw",evidence)
+234: 
+
+=== workspace/scripts/step28_alias_ranking.py [55..135/222] ===
+55: def split_run(run_id: str) -> tuple[str, str]:
+56:     if run_id not in RUNS:
+57:         raise ValueError("Unknown run identity")
+58:     seed, arm = run_id.split("_")
+59:     return seed, arm
+60: 
+61: 
+62: def load_model(policy: dict, seed: str, device: str = "cuda:0") -> Any:
+63:     return base.load_model(reference_config(policy, seed), "split_rank", device)
+64: 
+65: 
+66: def encoder_lr(policy: dict, arm: str, step: int) -> float:
+67:     """One-based actual optimizer step; the final scheduled encoder rate is zero."""
+68:     if arm not in ARMS or type(step) is not int or not 1 <= step <= policy["updates_per_run"]:
+69:         raise ValueError("Unknown arm or update outside the fixed budget")
+70:     if arm == "d":
+71:         return 2e-5
+72:     spec = policy["encoder_schedule"]
+73:     warmup, total = spec["warmup_updates"], policy["updates_per_run"]
+74:     if warmup != math.ceil(spec["warmup_fraction"] * total) or not 0 < warmup < total:
+75:         raise ValueError("Invalid warmup schedule")
+76:     factor = step / warmup if step <= warmup else (total - step) / (total - warmup)
+77:     return float(spec["peak_lr"] * factor)
+78: 
+79: 
+80: def set_learning_rate(optimizer: Any, policy: dict, arm: str, step: int) -> tuple[float, float]:
+81:     if len(optimizer.param_groups) != 2:
+82:         raise ValueError("Expected encoder and head optimizer groups")
+83:     rates = (encoder_lr(policy, arm, step), policy["encoder_schedule"]["head_lr"])
+84:     for group, rate in zip(optimizer.param_groups, rates, strict=True):
+85:         group["lr"] = rate
+86:     return rates
+87: 
+88: 
+89: def hard_candidates(predicted: Any, truth: Any, count: int = 5) -> tuple[Any, Any, Any]:
+90:     """Known-negative indices only, deterministic exact-tie order, live score values."""
+91:     import torch
+92: 
+93:     if predicted.shape != (378,) or truth.shape != (378,) or count != 5:
+94:         raise ValueError("Expected 28-account scores and five hard negatives")
+95:     # Independent shape/label/connectivity validation remains in base.objectives.
+96:     if not torch.isfinite(predicted).all() or not torch.isin(truth, truth.new_tensor([0, 1])).all():
+97:         raise ValueError("Nonfinite scores or nonbinary labels")
+98:     left, right = torch.triu_indices(28, 28, 1, device=predicted.device)
+99:     scores = predicted.new_zeros((28, 28))
+100:     scores[left, right], scores[right, left] = predicted, predicted
+101:     positive = torch.zeros((28, 28), dtype=torch.bool, device=predicted.device)
+102:     positive[left, right], positive[right, left] = truth.bool(), truth.bool()
+103:     negative = ~positive & ~torch.eye(28, dtype=torch.bool, device=predicted.device)
+104:     if (positive.sum(1) < 1).any() or (negative.sum(1) < count).any():
+105:         raise ValueError("Each query needs positive and known negative candidates")
+106:     selected = torch.argsort(scores.detach().masked_fill(~negative, -torch.inf),
+107:                              dim=1, descending=True, stable=True)[:, :count]
+108:     if not negative.gather(1, selected).all():
+109:         raise ValueError("Self or positive entered hard negatives")
+110:     return scores, positive, selected
+111: 
+112: 
+113: def objectives(predicted: Any, truth: Any, hard_weight: float) -> dict:
+114:     import torch
+115: 
+116:     if hard_weight not in (0., .5):
+117:         raise ValueError("Only disabled or approved fixed hard weight is allowed")
+118:     result = base.objectives(predicted, truth, 1)
+119:     if hard_weight == 0:
+120:         return {**result, "hard": predicted.new_zeros(())}
+121:     scores, positive, selected = hard_candidates(predicted, truth)
+122:     terms = []
+123:     for query in range(28):
+124:         pos = scores[query, positive[query]]
+125:         neg = scores[query, selected[query]]
+126:         terms.append(torch.nn.functional.softplus(neg.unsqueeze(0) - pos.unsqueeze(1)).mean())
+127:     hard = torch.stack(terms).mean()
+128:     return {"bce": result["bce"], "rank": result["rank"], "hard": hard,
+129:             "total": result["total"] + hard_weight * hard}
+130: 
+131: 
+132: def score(model: Any, groups: list, config: dict, check: Callable[[], None] = lambda: None) -> np.ndarray:
+133:     return base.score(model, groups, config, "split_rank", check)
+134: 
+135: 

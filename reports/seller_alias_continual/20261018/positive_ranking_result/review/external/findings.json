@@ -1,0 +1,143 @@
+{
+  "review_scope": "New fixed S_pos/H_pos results and correspondence to preserved execution/source evidence",
+  "input_sha256": "4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7",
+  "verdict": "VALID_WITHIN_SAVED_EVIDENCE_SCOPE_PRIMARY_OBJECTIVE_NOT_MET",
+  "SCIENTIFIC_BLOCKER": [],
+  "REPRODUCIBILITY_DEFECT": [],
+  "primary_passed": false,
+  "confirmed_results": [
+    {
+      "id": "O01",
+      "type": "PRIMARY_OBJECTIVE_NOT_MET",
+      "finding": "S_pos−S B末raw MAP两域下界均未严格>0；旧A近零负下界保持负值。",
+      "evidence": [
+        "E02",
+        "E06",
+        "R01",
+        "R02"
+      ]
+    },
+    {
+      "id": "O02",
+      "type": "EXECUTION_CORRESPONDENCE",
+      "finding": "40来源、255原件、52基线与1152/1728/4/24/18及访问/退出对应；未发现新矛盾。",
+      "evidence": [
+        "E03",
+        "E04",
+        "E05",
+        "R03"
+      ]
+    },
+    {
+      "id": "O03",
+      "type": "ACTIVE_OBJECTIVE_WIRING",
+      "finding": "四位置新rank进入共享VJP；0.1历史监督与0.5D0分开；既有原生encoder/head/Adam和正式日志共同支持实际作用。",
+      "evidence": [
+        "E04",
+        "E05",
+        "E09",
+        "R04"
+      ]
+    },
+    {
+      "id": "O04",
+      "type": "LIMITED_SECONDARY_BENEFIT",
+      "finding": "H_pos旧A对S/S_pos有条件正向差；对H两域总MAP均未确定；次级不能覆盖主失败。",
+      "evidence": [
+        "E06",
+        "R02"
+      ]
+    },
+    {
+      "id": "O05",
+      "type": "NEGATIVE_PROBABILITY_EVIDENCE",
+      "finding": "S_pos−S及H_pos−H两域raw Brier/log-loss区间全正；校准只改善部分概率表现，不改变排序。",
+      "evidence": [
+        "E06",
+        "R02",
+        "R05"
+      ]
+    },
+    {
+      "id": "O06",
+      "type": "GENERALIZATION_GAP",
+      "finding": "18差距扩大区间下界全正；严格判读17未见明确迹象、1证据不足，不等于没有过拟合。",
+      "evidence": [
+        "E07",
+        "R05"
+      ]
+    },
+    {
+      "id": "O07",
+      "type": "DESCRIPTIVE_SUBGROUP_COST",
+      "finding": "H_pos−H新B双正例MAP差区间全负；同一整群抽样，描述性而非交互或因果证据。",
+      "evidence": [
+        "E06",
+        "R02",
+        "R05"
+      ]
+    },
+    {
+      "id": "O08",
+      "type": "FORGETTING_NOT_ESTABLISHED",
+      "finding": "四方法旧A MAP原始变化与四个遗忘差区间均跨0，不确证灾难性遗忘或改进遗忘。",
+      "evidence": [
+        "E06",
+        "R02"
+      ]
+    }
+  ],
+  "interpretation_limits": [
+    {
+      "id": "L01",
+      "finding": "未从正式标签重建AP/ROC/PR-AUC/Brier/log-loss或查询相关性；原值是保存标签派生证据。",
+      "requires_new_execution": false
+    },
+    {
+      "id": "L02",
+      "finding": "诊断epoch1已完成48步；epoch1→6不覆盖阶段入口至首轮结束；cache/A只含6个存活群。",
+      "requires_new_execution": false
+    },
+    {
+      "id": "L03",
+      "finding": "单/双正例区间是否跨0的差异不等于交互检验；辅助区间不是同时置信区间。",
+      "requires_new_execution": false
+    },
+    {
+      "id": "L04",
+      "finding": "A获得表是A末状态及候选−对手比较，不是已独立核算相对预训练初始模型的获得量。",
+      "requires_new_execution": false
+    },
+    {
+      "id": "L05",
+      "finding": "重复开发集、单种子、固定顺序的条件bootstrap不覆盖重训/选择不确定性及真实市场有效性。",
+      "requires_new_execution": false
+    },
+    {
+      "id": "L06",
+      "finding": "原生张量作用与服务器保管为保存原件，未在本地重新产生张量或实时确认服务器状态。",
+      "requires_new_execution": false
+    }
+  ],
+  "reasonable_followup": [
+    "保留有效未达标结果与完整S主要对照地位",
+    "摘要明确列示既有诊断/标签复核/分组解释边界；无须项目代码补丁"
+  ],
+  "OUT_OF_SCOPE_OVERDESIGN": [
+    "按已见曲线选epoch",
+    "临时调权重/温度/教师",
+    "新增候选/种子/对手",
+    "添加新显著性或交互成功门",
+    "重训旧S/H",
+    "请求正式标签/模型/Memory",
+    "连接项目服务器",
+    "全仓回归/通用恢复框架/网络加固"
+  ],
+  "input_modified": false,
+  "project_patch_generated": false,
+  "project_server_connected": false,
+  "formal_labels_reparsed": false,
+  "model_or_memory_loaded": false,
+  "new_training_executed": false,
+  "external_web_sources_used": false
+}

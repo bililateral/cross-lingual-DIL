@@ -1,0 +1,75 @@
+S_pos/H_pos 结果外审：执行、来源、数量与资源证据定向子报告
+审查日期：2026-10-18。输入为获准 positive_ranking_result_review.zip；本报告仅覆盖执行证据，不替代主审统计与科学结论。
+
+一、结论
+
+本范围内没有发现足以使本轮正式结果失效的 SCIENTIFIC_BLOCKER，也没有发现 REPRODUCIBILITY_DEFECT。现有具体原件之间的来源、两臂身份、更新及诊断数量、盲门、访问账、恢复分数、退出及预算相互吻合。此结论不是把 PASS 当效果证明：它支持本轮可以作为固定配置的有效结果解释，不能把主要性能门失败改判成功。
+
+审查直接读取获准保存证据；未连接项目服务器、未联网、未运行训练入口、未加载任何模型或 Memory，未解析正式文本/标签。原生真实张量作用和现场进程/资源属于项目保存原件；本地标准库执行仅复核它们的结构、对应及可重放部分，不能冒称又做了一轮项目原生资格。
+
+二、输入、40 冻结来源与文件清单
+
+授权 ZIP 独立读取结果：5,481,875 字节、389 ZIP 成员，SHA256 4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7，CRC 未见坏成员。根 manifest.json 的 388 项载荷逐项大小/SHA 与解包实际文件一致；成员集合除清单自身外没有增删。
+
+formal_gate.json 的 40 项来源与 native_gate、CPU gate、execution_authorization、native/result、正式 execution、before_valid、completion、startup、progress、run/manifest、collected、evaluation 的对应来源清单一致。每一项都再核对 workspace 当前文件和 job/run/sources 冻结副本的实际字节；40 个冻结副本集合恰等于来源集合。另以标准库 AST 从既有指定入口独立追踪 step28_ 模块导入，并补入既有合同/策略/基线清单/授权/shell，闭包恰为同一 40 项。没有执行生产模块来获取这个结果。
+
+授权链中 formal/native gate 对执行许可、实现许可、CPU gate、上次外审全文及主审处置的路径/大小/SHA 全部相符。execution_authorization.json 的当前用户原话明确覆盖 NATIVE 与 FORMAL。合同和上次审查中“未批准/待原生”的文字属于先前时点，不能推翻随后已保存的明确授权。
+
+reports/result_sync/inventory.json 所列 255 项共 8,685,752 字节全部存在并身份一致。其中 job 子树是 253 项，再加 reports/job.console.txt 和 reports/job.wrapper.txt 为 255；这不是少了两项。52 份原 S/H 开放基线共 2,940,294 字节，与 baseline_sources.json 逐项匹配。其固定清单本身 SHA256 为 b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3，与本轮 manifest 的 baseline_identity 一致。另核对了 7 项独立分析回传清单，文件身份全部匹配。
+
+依据：根 manifest.json；workspace/reports/documentation/20261016/positive_ranking_implementation/qualification/ 下四份 gate/permission；workspace/reports/job/{execution,before_valid,completion}.json；workspace/reports/job/run/{startup,progress,manifest}.json；workspace/reports/result_sync/{inventory,analysis_inventory,receive_verification}.json；workspace/reports/documentation/20261016/h_consistency/baseline_sources.json。
+
+三、原生资格具有实际作用原件
+
+reports/qualification/native/result.json 的 arms.S_pos、arms.H_pos 各保存 6 条实际 update：allocation step1、A step2 旧/新各一次、B step49 旧/新各一次、B step49 恢复重演一次。合计 12 条，合成 Adam 计数 337 不冒充 337 次真实优化。两臂初始模型与空 Adam 身份和固定基线初始化相符。
+
+两臂 current 与 paired 阶段均有 encoder/head 的非零裁剪前差、裁剪后差、实际参数差、Adam 一阶/二阶矩差；paired 还保存 current/history 独立分支差。这些不是仅比较总损失标量不同。历史分支 encoder/head preclip 差值分别为：
+S_pos：1.6938429325819016e-7 / 4.828907549381256e-7。
+H_pos：3.321983967907727e-7 / 5.146721377968788e-7。
+每个 current/paired effect 的 Adam 参数记录逐项读取了状态存在性和配对时钟，并核对分支汇总有限标志、非零矩差；本地没有重新拿到张量内容验证每个元素。实际参与 encoder 梯度 389 张量、head 4 张量。未参与的 encoder 项保留记录，没有被虚称全部都更新。
+
+每臂保存两种评分恢复通过、下一更新逐元素一致，等值核对计数各为 1,967 张量、1,301,039,501 元素。实际表 A0/A1 rank 精度结果随原生包保存。审查没有重新获得这些张量，结论是原件的粒度足以超出裸 PASS，且与本轮冻结来源和入口准入逻辑相符。
+
+第二臂 H_pos 的 resources 明确保存 live_allocated_bytes=0、reserved_bytes=0；allowed_context_pid=797388，与 native_start/native_wallclock 的 pid 相同。compute_apps 中只报告本次已有 CUDA 上下文。此前 cuBLAS 释放后的真实准入条件由这份新原生证据支持，不需要以旧 CPU mock 代替，也不需要重启 R03 静态审查。
+
+原生每臂 charged_seconds 为 S_pos 327、H_pos 320，均不超过 600；原生整体内层累计 648，外层 649.1371538639069 秒保守计 650，均在 1,200 秒内。每臂计费、整体内层、整体外层的计时边界不同且保守计费，不能将 327+320 与 650 的差当作执行矛盾。正式报告使用较保守的外层 650。
+
+原生投影根据保存实测量独立重算：288(t_A+t_B)、1446v+36h、装载/双端点 IO、1,800 秒未测余量，再乘 1.25。S_pos 18,844.60961239063 秒，H_pos 19,235.266476024408 秒，合计 38,079.87608841504 秒；双臂输出峰值公式给出 12,396,649,894 字节，均与 native_acceptance.json 相同并在批准上限内。正式入口实际调用 validate_gate 再核对两臂原生及投影，调用发生在正式数据读取之前。
+
+依据：workspace/reports/qualification/native/result.json 的 arms.*.{updates,effects,initial_state,resources,measurements,projection,equality_counts}；workspace/reports/launch/{native_start,native_wallclock,native_acceptance}.json；workspace/scripts/step28_positive_ranking_run.py 第 158—210、478—498 行；workspace/scripts/step28_g_half_run.py 第 163—174 行。
+
+四、1152/1728/4/24/18 与执行原件对应
+
+四个实际点 A_S_pos、B_S_pos、A_H_pos、B_H_pos，每点 updates JSON 均为 288 行，step 连续 1—288；A 末 Adam=288，B 末 Adam=576。两臂 A 各有 288 当前群、0 历史群，B 各有 288 当前群与 288 历史群，因此独立按行计算为 1,152 次更新、1,728 次梯度群呈现，不是只读取 completion 的预设总数。每阶段 48 个 fit 群各出现 6 次，分区为 AB fit 各 48、calibration 各 12、development 各 20。旧新四方法的 current UID、history UID 和 A1 assignment SHA 轨迹完全相同。
+
+两臂各自独立初始身份一致，但 B 起点严格对应本臂的 A continuity，而不是借用其他臂 A 状态。本轮四份 point JSON 与 manifest.points 对应结构完全一致。四点 full/inference 恢复后的 raw 和 calibration NPY payload 与原保存 payload 完全相同；raw 40×378、calibration 12×378。这里重比了实际获准保存分数文件的 payload，没有加载权重。
+
+四个端点各有 epoch1—6 六份 capture，合计 24 份；每份 stage_step=48×epoch、Adam 时钟对应阶段；fit 48×3，A 阶段 cache 0×3、B 阶段 cache 6×3，valid 盲分数 40×378。valid_labels_used 全为 false，UID 集与相应 split/存活 A Memory 成员相符。每端 epoch6 的盲分数 payload 等于该端保存 raw payload。24 份事后诊断评价矩阵均有清单身份。
+
+严格判读是 18 项而非 24 项：每臂 A 阶段 fit/A 三指标；B 阶段 fit/B 三指标与 cache/A 三指标，共每臂 9 项。overfitting.json 实际有 17 项“未见明确迹象”、1 项“证据不足”，后者为 B_H_pos fit/B 的 MAP。此处只核对覆盖/数量和原件归属；该文案是否充分描述差距扩大和概率质量，由主审统计报告进一步判断。无触发不是没有过拟合的证据。
+
+依据：workspace/reports/job/run/{manifest,partition}.json；workspace/reports/job/run/updates/ 四份 JSON；workspace/reports/job/run/points/ 四份 JSON；workspace/reports/job/run/diagnostics/ 全部 24 JSON 及相关 NPY；workspace/reports/job/diagnostics_evaluation/overfitting.json；workspace/scripts/step28_positive_ranking_run.py 第 219—354 行。
+
+五、盲门、退出、资源与保管边界
+
+before_valid 原件的状态为 ALL_BLIND_GATES_PASS，访问账 train1/valid0/heldout0/owners0，并绑定本次 manifest 实际 SHA。完成原件、access 及 closeout 均为 train1/valid1/heldout0/owners0。直接入口顺序为 train→open_valid→collect→diagnostic evaluate→finalize；被实际绑定的 open_valid 先检查 train1/valid0，再执行该臂集合的 blind_gate，写 before_valid，之后才 parse_once development。读取保存账与这个具体入口顺序相符，未发现先开 valid 后补门的具体证据。
+
+wrapper 原件为 2026-10-18T14:14:43+08:00、exit_code=0、2026-10-18T17:45:44+08:00，整秒差 12,661 秒。completion 内层 12,659.635004023556 秒在这个外层时长内。console 保存了四阶段各 13 个更新检查点（1，24，…，288），总 52 个，顺序为 S_pos A→B 后 H_pos A→B，记录时间全局单调；未发现失败 traceback。
+
+正式峰值 CUDA reserved 8,652,849,152 字节、RSS 6,715,924,480 字节、输出 9,130,164,115 字节，均在批准 28 GiB / 64 GiB / 16 GiB 内。Linux 独立分析原件外层 2.3853077590465546 秒保守计 3 秒，脚本 SHA 与本次携带脚本实际相符；12,661+3=12,664≤57,600 秒。
+
+closeout 是 19:32:27 的保存现场观察：进程已结束、无 failure 文件、4 份模型和 4 份 Memory 留在原 Linux，work_files 为空。包内仅有其路径、大小、部分原保存身份，实际模型/Memory 载荷均未携入。本审查确认“交付包排除这些载荷”与“保存观察称仍留 Linux”相容；没有实时核验其当前服务器存在性，不声称自行验证或删除了它们。
+
+依据：workspace/reports/job.wrapper.txt；workspace/reports/job/{before_valid,completion,access,resource}.json；workspace/reports/job.console.txt；workspace/reports/result_sync/{analysis_wallclock,closeout}.json；workspace/scripts/step28_g_half_run.py 第 506—514 行；workspace/scripts/step28_positive_ranking_run.py 第 478—532 行；workspace/scripts/run_step28_positive_ranking_linux_20261018.sh 全文。
+
+六、实际本地执行、失败和适用范围
+
+本子审查另写 execution_evidence_audit.py，仅使用标准库，不导入生产模块。执行结果：attempt02 共 2,078 条具体断言、失败 0、exit0；Python 3.12.14；纯脚本 0.8163065289991209 秒，监督进程外层 0.8900769939937163 秒，峰值 RSS 27,279,360 字节。该解释器是审查环境，不是项目 Linux py310。
+
+attempt01 自写审查脚本发生路径/结构错误：把 result inventory 的 reports 相对路径当作 workspace 相对路径，又把 analysis_inventory 顶层列表当作带 files 的字典。因此先产生清单“未找到”断言，再在该列表处 TypeError；这是审查脚本误读清单格式，不是实际文件缺失。attempt01 的执行前脚本快照、完整 stdout/stderr、检查记录和资源记录均原样保留。其 exit2、外层 0.6240436130028684 秒、峰值 RSS 22,433,792 字节。修正仅在审查输出目录实施；attempt02 单独目录运行，未覆盖 attempt01 或输入。两次正式本地审查进程外层合计约 1.514120607 秒，不纳入项目正式科研预算。
+
+另有一次早期交互式字段摘要打印误取原生 log.current_uid 而触发 KeyError；原生 log 实際没有正式运行 wrapper 增补的 current_uid 键。该探查在任何审查断言前失败，不影响上述核算；保留工具错误文字摘录及其未保存完整 stdout 的事实，不将摘录包装为完整原件。stored_tool_calls.json 保留随后实际工具调用与返回原串（工具截断处仍保留截断标记）。
+
+本地能够独立核对源文件身份、保存分数恢复等值、更新/诊断账、原生作用记录、时间和固定清单；不能从不存在于包内的权重、Memory 或正式标签重新证明实际训练参数及标签派生指标原值。这个边界由任务故意限定，不构成本轮新出现的复现缺陷。要求新标签、载入四权重或再跑项目原生/训练以作全量复验均为 OUT_OF_SCOPE_OVERDESIGN。无须追加候选、种子、恢复框架或网络加固。
+
+结构化 findings.json 中运行失效类和复现缺陷类均为空。实际逐文件读取方式见 read_scope.json；所有字节核对不能被误读成全部源代码逐行语义重审。

@@ -1,0 +1,519 @@
+
+=== workspace/scripts/step28_positive_ranking_run.py [73..245/541] ===
+73: def sources():
+74:     paths = {data.ROOT/n for n in ("scripts/step28_positive_ranking_run.py",
+75:         "scripts/step28_positive_ranking_verify.py", "tests/test_step28_positive_ranking.py",
+76:         "tests/test_step28_g_half.py", "tests/test_step28_record_replay.py")}
+77:     todo = list(paths)
+78:     while todo:
+79:         for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
+80:             names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
+81:             for name in names:
+82:                 if name and name.startswith("step28_"):
+83:                     child = data.ROOT/"scripts"/(name+".py")
+84:                     if child not in paths:
+85:                         paths.add(child)
+86:                         todo.append(child)
+87:     paths.update(data.ROOT/"schema"/n for n in ("step28_g_half_policy.json", "step28_record_replay_policy.json",
+88:         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
+89:     paths.update((POLICY, BASELINE, AUTHORIZATION, CONTRACT,
+90:                   data.ROOT/"scripts/run_step28_positive_ranking_linux_20261018.sh"))
+91:     return [data.record(p, data.ROOT) for p in sorted(paths)]
+92: 
+93: 
+94: def loss_total(row, stage, arm):
+95:     if stage not in (1, 2) or any(row.get(k) != v for k, v in method.metadata(arm).items()):
+96:         raise ValueError("Wrong stage or update identity")
+97:     total = 0.
+98:     def close(a, b):
+99:         if not np.isfinite(a) or not np.isfinite(b) or not np.isclose(a, b, atol=2e-6, rtol=2e-6):
+100:             raise ValueError("Positive-rank loss decomposition differs")
+101:     for role, weight in (("current", 1.), ("history", .1)):
+102:         if role == "history" and stage == 1:
+103:             if role in row: raise ValueError("Stage A cannot use history")
+104:             continue
+105:         r = row[role]
+106:         if r["qualification_old_rank"] is not False or r["mse1"] is not None or len(r["views"]) != 2:
+107:             raise ValueError("Wrong rank/teacher/views in formal update")
+108:         if role == "current" and r["mse0"] != 0:
+109:             raise ValueError("Current used a birth teacher")
+110:         for v in r["views"]:
+111:             close(v["rank_used"], v["rank_pos"])
+112:             close(v["total"], v["bce"]+v["rank_pos"]+.5*v["hard"])
+113:         close(r["supervised"], sum(v["total"] for v in r["views"])/2)
+114:         close(r["distillation"], r["mse0"])
+115:         close(r["supervised_contribution"], weight*r["supervised"])
+116:         close(r["teacher_contribution"], .5*r["mse0"])
+117:         contribution = weight*r["supervised"]+.5*r["mse0"]
+118:         close(r["weighted"], contribution)
+119:         total += contribution
+120:     close(row["total"], total)
+121:     return total
+122: 
+123: 
+124: def validate_diagnostic(d, arm):
+125:     if any(d.get(k) != v for k, v in method.metadata(arm).items()):
+126:         raise ValueError("Diagnostic scoring/training identity differs")
+127: 
+128: 
+129: def native_objective_pair(off, on, stage):
+130:     arm = on["training"]["arm"]
+131:     loss_total(on, stage, arm)
+132:     if any(off.get(k) != v for k, v in method.metadata(arm).items()):
+133:         raise ValueError("Native control identity differs")
+134:     details = {}
+135:     for role in (("current",) if stage == 1 else ("current", "history")):
+136:         a, b = off[role], on[role]
+137:         if a["qualification_old_rank"] is not True or b["qualification_old_rank"] is not False:
+138:             raise ValueError("Wrong old/new rank switch")
+139:         for key in ("mse0", "mse1", "assignment_sha256", "teacher_contribution"):
+140:             if a[key] != b[key]: raise ValueError("Rank comparison changed teacher/allocation")
+141:         for va, vb in zip(a["views"], b["views"], strict=True):
+142:             for key in ("bce", "hard", "rank_pos"):
+143:                 if va[key] != vb[key]: raise ValueError("Rank comparison changed other terms")
+144:             if not np.isclose(va["total"], va["bce"]+va["rank_used"]+.5*va["hard"], atol=2e-6, rtol=2e-6):
+145:                 raise ValueError("Old-rank control arithmetic differs")
+146:         details[role] = dict(old_rank=[v["rank_used"] for v in a["views"]],
+147:             new_rank=[v["rank_pos"] for v in b["views"]], old_weighted=a["weighted"],new_weighted=b["weighted"],
+148:             actual_total_difference=b["weighted"]-a["weighted"], scalar_difference_is_not_effect_gate=True)
+149:     return details
+150: 
+151: 
+152: class Budget(single.Budget):
+153:     def __init__(self, root):
+154:         super().__init__(root)
+155:         self.limits = policy()["runtime"]
+156: 
+157: 
+158: def projection(measurements):
+159:     arms = {arm: single.projection(measurements[arm]) for arm in method.ARMS}
+160:     seconds = sum(p["projected_total_seconds"] for p in arms.values())
+161:     peak = math.ceil(1.1*(max(m["W_F"] for m in measurements.values())+
+162:                            sum(2*m["W_I"] for m in measurements.values())+2*2**30))
+163:     return dict(arms=arms, projected_total_seconds=seconds, projected_peak_output_bytes=peak,
+164:                 within_budget=seconds <= 57600 and peak <= 16*2**30)
+165: 
+166: 
+167: def reviewed_gate(path, kind):
+168:     gate = data.read_json(path)
+169:     if (kind not in ("NATIVE", "FORMAL") or gate.get("kind") != kind
+170:             or gate.get("status") != "APPROVED_NO_OPEN_BLOCKERS" or gate.get("source_files") != sources()
+171:             or gate.get("candidates") != policy()["candidates"]
+172:             or gate.get("implementation_authorization") != data.record(AUTHORIZATION, data.ROOT)):
+173:         raise ValueError("Source-bound positive-rank implementation gate required")
+174:     # Implementation approval is not GPU/data permission. The future permission is a separate exact record.
+175:     permission = data.read_json(data.verify(data.ROOT/gate["execution_authorization"]["path"], gate["execution_authorization"]))
+176:     if (permission.get("status") != "APPROVED" or kind not in permission.get("stages", [])
+177:             or permission.get("contract") != data.record(CONTRACT, data.ROOT)
+178:             or permission.get("source_files") != sources() or not permission.get("user_quote")):
+179:         raise ValueError("Specific execution approval missing")
+180:     for key in ("external_review", "primary_disposition", "cpu"):
+181:         data.verify(data.ROOT/gate[key]["path"], gate[key])
+182:     cpu = data.read_json(data.ROOT/gate["cpu"]["path"])
+183:     if (cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("mode") != "cpu"
+184:             or cpu.get("source_files") != sources() or cpu.get("cumulative_charged_seconds", math.inf) > 300
+185:             or cpu.get("unresolved_checks") != [] or set(cpu.get("qualified_tests", [])) != set(CPU_TESTS)):
+186:         raise ValueError("Affected CPU evidence missing")
+187:     return gate
+188: 
+189: 
+190: def validate_gate(job, path):
+191:     gate = reviewed_gate(path, "FORMAL")
+192:     if (gate.get("job") != job.relative_to(data.ROOT).as_posix() or gate.get("runtime") != policy()["runtime"]
+193:             or gate.get("supervision") != policy()["supervision"]):
+194:         raise ValueError("Dual formal scope differs")
+195:     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
+196:     if (gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("mode") != "gpu"
+197:             or gpu.get("source_files") != sources() or gpu.get("cumulative_charged_seconds", math.inf) > 1200
+198:             or set(gpu.get("arms", {})) != set(method.ARMS)):
+199:         raise ValueError("Both native candidates must qualify")
+200:     for arm, native in gpu["arms"].items():
+201:         if (native.get("actual_updates") != 6 or native.get("charged_seconds", math.inf) > 600
+202:                 or native.get("maximum_records") != 224 or native.get("channel_tokens") != 256
+203:                 or native.get("both_phases_encoder_head_effect") is not True
+204:                 or native.get("next_update_bitwise_equal") is not True
+205:                 or native.get("pooling_restores_verified") is not True
+206:                 or native.get("rank_precision_verified") is not True
+207:                 or native.get("metadata") != method.metadata(arm)):
+208:             raise ValueError("Native effects/restoration missing: "+arm)
+209:     if not projection({arm: v["measurements"] for arm, v in gpu["arms"].items()})["within_budget"]:
+210:         raise ValueError("Measured dual run exceeds budget")
+211:     return gate
+212: 
+213: 
+214: # These functions already receive an explicit entry: no global mutation or default-arm substitution.
+215: for _name in ("train_stage", "memory_from", "restore_point", "checkpoint", "train", "open_valid"):
+216:     globals()[_name] = partial(getattr(single, _name), entry=sys.modules[__name__])
+217: 
+218: 
+219: def blind_gate(root: Path, manifest: dict, *, entry=None) -> tuple[dict, dict]:
+220:     entry = entry or sys.modules[__name__]
+221:     if (manifest["status"] != entry.COMPLETE or manifest["source_files"] != entry.sources()
+222:             or manifest["physical_updates"] != 1152 or manifest["gradient_group_presentations"] != 1728
+223:             or any(set(manifest[k]) != set(entry.POINTS) for k in ("points", "training", "diagnostics"))
+224:             or any(set(manifest[k]) != set(entry.method.ARMS) for k in ("starts", "initials"))):
+225:         raise ValueError("Incomplete source-bound blind experiment")
+226:     baseline, old_root, old_col, old_manifest = entry.baseline_inputs()
+227:     if manifest.get("baseline_identity") != data.record(entry.BASELINE, data.ROOT):
+228:         raise ValueError("Baseline provenance missing")
+229:     split = data.read_json(data.verify(root/manifest["partition"]["path"], manifest["partition"]))
+230:     if split != data.read_json(old_root/"run/partition.json"):
+231:         raise ValueError("Frozen baseline partition differs")
+232:     valid_ids = [r["group_uid"] for r in split["development"]]
+233:     if len(valid_ids) != 40 or any(sum(r["domain"] == d for r in split["development"]) != 20 for d in "AB"):
+234:         raise ValueError("AB valid coverage differs")
+235:     fit = {r["group_uid"]: r["domain"] for r in split["fit"]}
+236:     canonical = sorted(u for u, domain in fit.items() if domain == "A")
+237:     if len(canonical) != 48:
+238:         raise ValueError("Shared A fit scope differs")
+239:     a_point = manifest["points"]["A_"+entry.method.ARMS[0]]
+240:     shared = record.Memory.from_bytes(data.verify(root/a_point["memory"]["path"], a_point["memory"]).read_bytes())
+241:     members = shared.summary()["members"]
+242:     rng = random.Random(data.seed_for(20260930, "ABC", "retention"))
+243:     retained = []
+244:     for seen, uid in enumerate(sorted(canonical), 1):
+245:         k = seen-1 if seen <= 6 else rng.randrange(seen)
+
+=== workspace/scripts/step28_positive_ranking_verify.py [1..342/342] ===
+1: """Bounded dual positive-rank CPU/native qualification; no formal data."""
+2: from __future__ import annotations
+3: from step28_g_half_verify import STARTED, state, restore, component_effects, checked_fresh, disk_reserve, native_save
+4: import argparse
+5: import gc
+6: import math
+7: import os
+8: import shutil
+9: import subprocess
+10: from pathlib import Path
+11: import sys
+12: import threading
+13: import time
+14: import traceback
+15: import unittest
+16: import numpy as np
+17: import psutil
+18: import torch
+19: import step28_positive_ranking_run as run
+20: from step28_record_replay_verify import preflight
+21: from step28_record_replay_numerics import equal_state
+22: method,record,diag,core,data=run.method,run.record,run.diag,run.core,run.data
+23: 
+24: 
+25: def native_preflight(continuing: bool = False) -> dict:
+26:     if not continuing:
+27:         return preflight()
+28:     # The completed first arm leaves a CUDA context, but no live model/state may survive.
+29:     gc.collect()
+30:     torch.cuda.synchronize()
+31:     torch._C._cuda_clearCublasWorkspaces()
+32:     torch.cuda.empty_cache()
+33:     if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
+34:         raise ValueError("Previous arm still owns live/reserved CUDA tensors")
+35:     process = psutil.Process()
+36:     if (os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1
+37:             or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+38:             or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+39:         raise ValueError("Physical GPU0 and pre-import single-thread environment required")
+40:     gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+41:                                    "--format=csv,noheader,nounits"], text=True).strip()
+42:     apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+43:                                     "--format=csv,noheader,nounits"], text=True).strip()
+44:     foreign_apps = [line for line in apps.splitlines() if int(line.split(",", 1)[0].strip()) != process.pid]
+45:     ancestors = {process.pid, *(p.pid for p in process.parents())}
+46:     jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+47:             if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+48:     available = psutil.virtual_memory().available
+49:     if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or foreign_apps or jobs:
+50:         raise ValueError(f"Continuation resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+51:     return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs,
+52:             "allowed_context_pid": process.pid, "live_allocated_bytes": 0, "reserved_bytes": 0}
+53: 
+54: 
+55: def native(check, progress, handwritten, out, arm, *, continuing=False):
+56:     method = run.method
+57:     active, control = arm, arm+"_old_rank"
+58:     resources = native_preflight(continuing)
+59:     if shutil.disk_usage(out).free < 10*2**30:
+60:         raise ValueError("Insufficient native temporary disk")
+61:     numerics = run.parent.configure_numerics()
+62:     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
+63:     measurements, updates = {}, []
+64:     def timed(name, fn):
+65:         check(); torch.cuda.synchronize(); started = time.monotonic()
+66:         value = fn(); torch.cuda.synchronize()
+67:         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
+68:         return value
+69:     c = run.config()
+70:     c["handwritten_qualification"] = True
+71:     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+72:     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+73:         raise ValueError("BF16/checkpointing required")
+74:     if initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
+75:             "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
+76:         raise ValueError("positive-rank native initial identity differs")
+77:     method.bind(model, method.metadata(active))
+78:     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
+79:     for g in (current,history):
+80:         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
+81:         if len(lengths)!=448 or set(lengths)!={256}:
+82:             raise ValueError("Maximum N224/token256 fixture differs")
+83:     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
+84:     gradients, effects, table_checks, objective_pairs = {}, {}, [], {}
+85:     def updated(arm, phase, step, h=None, target=None):
+86:         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
+87:         pre = {}
+88:         def observe(role, log):
+89:             pre[role] = {}
+90:             for key,p in probes.items():
+91:                 if p.grad is None or not torch.isfinite(p.grad).all(): raise ValueError("Missing native gradient")
+92:                 pre[role][key] = p.grad.detach().cpu().clone()
+93:         captured = []
+94:         options = dict(qualification_old_rank=arm == control,
+95:             table_observer=(lambda table, group, seed, reference: captured.append((table.clone(), group, seed, reference))) if arm == active else None)
+96:         progress("native_call_started", attempted_calls=len(updates)+1, actual_updates=len(updates))
+97:         row = timed(("t_"+phase) if arm == active else "control_"+phase,
+98:             lambda: method.update(model,optimizer,current,h,target,c,active,
+99:                                   1 if h is None else 2,step,check,observe,**options))
+100:         updates.append(dict(arm=arm,phase=phase,step=step,log=row))
+101:         gradients[len(updates)] = pre
+102:         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
+103:         for table, group, seed, reference in captured:
+104:             table_checks.append(handwritten.verify_native_table(table, group, seed, reference, active))
+105:             progress("native_table_precision", table_precision=table_checks)
+106:         return row
+107:     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
+108:     updated(control,"allocation",1)
+109:     work=out/"work";work.mkdir(); identities={}
+110:     def metadata(label):
+111:         return dict(fixture=label,**method.metadata(active),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
+112:     common_path=work/"common.pt";common_meta=metadata("One actual "+control+" update; common current fixture Adam step1")
+113:     common = timed("s_F",lambda:native_save(common_path,model,optimizer,common_meta,check))
+114:     identities["common"] = common
+115:     def reload(path,receipt):
+116:         return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
+117:     reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
+118:     reload(common_path,common); hrow=updated(active,"A",2)
+119:     effects["current"] = component_effects(model,gcurrent,optimizer=optimizer)
+120:     for key in probes:
+121:         delta=float((gradients[2]["current"][key]-gradients[3]["current"][key]).abs().max())
+122:         if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
+123:         effects["current"][key]["pre_clip_gradient_max_delta"]=delta
+124:     progress("native_effects", effects=effects)
+125:     objective_pairs["current"] = run.native_objective_pair(updates[1]["log"], hrow, 1)
+126:     progress("native_objective_pair", objective_pairs=objective_pairs)
+127:     del gcurrent;gc.collect()
+128:     reload(common_path,common)
+129:     # Same trained-one-step parameters/moments, but legal B epoch1 counter336 for the paired fixture.
+130:     for value in optimizer.state.values(): value["step"].fill_(336)
+131:     with diag.neutral(model):table=timed("v",lambda:record.reference(model,history,c,check))
+132:     i,j=np.triu_indices(224,1);target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
+133:     paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from one real "+control+" allocation update")
+134:     paired=timed("s_F",lambda:native_save(paired_path,model,optimizer,paired_meta,check));identities["paired"]=paired
+135:     reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
+136:     reload(paired_path,paired);first=updated(active,"B",49,history,target)
+137:     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
+138:     effects["paired"]=component_effects(model,gpaired,optimizer=optimizer)
+139:     for key in probes:
+140:         delta=float((gradients[4]["history"][key]-gradients[5]["history"][key]).abs().max())
+141:         if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
+142:         effects["paired"][key]["pre_clip_gradient_max_delta"]=delta
+143:         branch_deltas = {}
+144:         for role in ("current", "history"):
+145:             off = gradients[4][role][key]-(gradients[4]["current"][key] if role == "history" else 0)
+146:             on = gradients[5][role][key]-(gradients[5]["current"][key] if role == "history" else 0)
+147:             branch_deltas[role] = float((off-on).abs().max())
+148:             if branch_deltas[role] <= 0:
+149:                 raise ValueError("Missing isolated native rank effect: "+role+"/"+key)
+150:         effects["paired"][key]["isolated_branch_preclip_deltas"] = branch_deltas
+151:     progress("native_effects", effects=effects)
+152:     objective_pairs["paired"] = run.native_objective_pair(updates[3]["log"], first, 2)
+153:     progress("native_objective_pair", objective_pairs=objective_pairs)
+154:     del gpaired;gc.collect()
+155:     expected, expected_rng = state(model,optimizer), diag.rng_state()
+156:     reload(paired_path,paired)
+157:     memory=handwritten.shared_memory(active);memory.begin_stage(2)
+158:     for _ in range(48):memory.draw()
+159:     payload=memory.to_bytes();rng=diag.rng_state();modes=[m.training for m in model.modules()]
+160:     fit=[handwritten.handmade_group(f"native_fit_{i}") for i in range(48)]
+161:     valid=[data.Group(g.uid,g.sellers,g.items) for g in [handwritten.handmade_group(f"native_valid_{i}") for i in range(40)]]
+162:     before=core.state_digest(state(model,optimizer));droot=out/"diagnostics";droot.mkdir()
+163:     progress("actual_candidate_full_role_capture", actual_updates=len(updates))
+164:     method.capture(model,optimizer,fit,memory,valid,c,active,2,1,droot,"handwritten",check)
+165:     if before!=core.state_digest(state(model,optimizer)) or rng!=diag.rng_state() or payload!=memory.to_bytes():
+166:         raise ValueError("Actual candidate capture mutated state")
+167:     repeated=updated(active,"B",49,history,target)
+168:     equality={"tensors":0,"elements":0};equal_state(expected,state(model,optimizer),equality)
+169:     if expected_rng!=diag.rng_state() or payload!=memory.to_bytes() or modes!=[m.training for m in model.modules()] or first!=repeated:
+170:         raise ValueError("Capture changed repeated next update")
+171:     del expected;gc.collect()
+172:     if len(updates)!=6 or run.parent.adam_step(optimizer)!=337:raise ValueError("Native call accounting differs")
+173:     def residual():
+174:         errors=[]
+175:         for seed in (None,data.seed_for(20261008,"ABC",2,history.uid,"diagnostic_regroup")):
+176:             slots=record.assignment(history,seed)
+177:             errors.append((method.account_logits(torch.from_numpy(table),slots,active)-
+178:                            method.account_logits(torch.from_numpy(target),slots,active)).numpy().astype(np.float64))
+179:         return dict(D0=float(np.mean(errors[0]**2)),D1=float(np.mean(errors[1]**2)))
+180:     residuals=timed("h",residual)
+181:     # Persist the actual candidate-updated state, releasing the obsolete common work file first.
+182:     data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=False))
+183:     common_path.unlink()
+184:     actual_meta=metadata("After actual candidate update6; H full-state restore")
+185:     actual=timed("s_F",lambda:native_save(common_path,model,optimizer,actual_meta,check))
+186:     identities["H_full"]=actual
+187:     with diag.neutral(model):
+188:         timed("v",lambda:record.reference(model,history,c,check))
+189:         before_scores=timed("v",lambda:method.restored_score(model,[history],c,check))
+190:     if reload(common_path,actual)!=actual_meta:raise ValueError("Full H metadata restore mismatch")
+191:     with diag.neutral(model):
+192:         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
+193:             raise ValueError("Full H scores not bitwise restored")
+194:     inference_path=work/"H_inference.pt";infer_meta=metadata("Actual candidate inference restore fixture")
+195:     infer=timed("s_I",lambda:native_save(inference_path,model,None,infer_meta,check));identities["inference"]=infer
+196:     if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,active))!=infer_meta:
+197:         raise ValueError("Inference H metadata restore mismatch")
+198:     with diag.neutral(model):
+199:         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
+200:             raise ValueError("Inference H scores not bitwise restored")
+201:     measurements["W_F"]=max(common_path.stat().st_size,paired_path.stat().st_size)
+202:     measurements["W_I"]=inference_path.stat().st_size
+203:     data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=False))
+204:     for path in (common_path,paired_path,inference_path):path.unlink()
+205:     work.rmdir();data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=True))
+206:     return dict(resources=resources,numerics=numerics,pretrained_archive=archive,initial_state=initial,
+207:         actual_updates=6,updates=updates,measurements=measurements,projection=run.single.projection(measurements),effects=effects,
+208:         both_phases_encoder_head_effect=True,pooling_restores_verified=True,next_update_bitwise_equal=True,
+209:         metadata=method.metadata(active), rank_precision_verified=bool(table_checks),
+210:         table_precision=table_checks, objective_pairs=objective_pairs,
+211:         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
+212:         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
+213: 
+214: def main():
+215:     import importlib
+216:     parser = argparse.ArgumentParser()
+217:     parser.add_argument("mode", choices=("cpu", "gpu"))
+218:     parser.add_argument("--output", type=Path, required=True)
+219:     parser.add_argument("--gate", type=Path)
+220:     parser.add_argument("--tests", nargs="*")
+221:     parser.add_argument("--prior-seconds", type=float, default=0.)
+222:     args = parser.parse_args()
+223:     args.output = args.output.resolve()
+224:     if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
+225:         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+226:     args.output.mkdir(parents=True)
+227:     sys.path.insert(0, str(data.ROOT/"tests"))
+228:     handwritten = importlib.import_module("test_step28_positive_ranking")
+229:     os.environ["G_HALF_TEST_ROOT"] = str(args.output)
+230:     os.environ["H_CONS_TEST_ROOT"] = str(args.output)
+231:     torch.set_num_threads(1)
+232:     torch.set_num_interop_threads(1)
+233:     numerics = run.parent.configure_numerics()
+234:     process = psutil.Process()
+235:     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
+236:     report = {"status": "RUNNING", "mode": args.mode, "scope": "S_pos_H_pos_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
+237:         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
+238:     stopped, lock = threading.Event(), threading.RLock()
+239:     arm_started = None
+240:     def write():
+241:         with lock:
+242:             report["elapsed_seconds"] = time.monotonic()-STARTED
+243:             report["cumulative_seconds"] = args.prior_seconds+report["elapsed_seconds"]
+244:             report["cumulative_charged_seconds"] = args.prior_seconds+math.ceil(report["elapsed_seconds"])
+245:             if "prior_actual_updates" in report:
+246:                 report["cumulative_actual_updates"] = report["prior_actual_updates"]+report.get("actual_updates", 0)
+247:             if args.mode == "gpu" and torch.cuda.is_initialized():
+248:                 report["max_reserved_bytes"] = torch.cuda.max_memory_reserved()
+249:             data.write_json(args.output/"result.json", report)
+250:     def check(reserve=0):
+251:         report["peak_rss_bytes"] = max(report["peak_rss_bytes"], process.memory_info().rss)
+252:         total, evidence = 0, 0
+253:         for path in args.output.parent.rglob("*"):
+254:             try:
+255:                 if path.is_file():
+256:                     size = path.stat().st_size
+257:                     total += size
+258:                     if "work" not in path.relative_to(args.output.parent).parts:
+259:                         evidence += size
+260:             except FileNotFoundError:
+261:                 pass
+262:         report["peak_work_bytes"] = max(report["peak_work_bytes"], total)
+263:         disk_reserve(args.output, total, reserve, limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"]))
+264:         if (time.monotonic()-STARTED+args.prior_seconds > limits["maximum_seconds"]
+265:                 or (arm_started is not None and time.monotonic()-arm_started > limits["per_arm_maximum_seconds"])
+266:                 or evidence > limits["maximum_evidence_bytes"] or total > limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"])
+267:                 or report["peak_rss_bytes"] > limits["maximum_rss_bytes"]
+268:                 or (args.mode == "gpu" and torch.cuda.is_initialized() and torch.cuda.max_memory_reserved() > 28*2**30)):
+269:             raise RuntimeError("Approved cumulative qualification budget exceeded")
+270:     def watchdog():
+271:         while not stopped.wait(.5):
+272:             try:
+273:                 check()
+274:             except BaseException as exc:
+275:                 report.update(status="BUDGET_STOP", error=str(exc))
+276:                 write()
+277:                 os._exit(2)
+278:     def progress(stage, **details):
+279:         report.update(stage=stage, **details)
+280:         write()
+281:     watcher = threading.Thread(target=watchdog, daemon=True)
+282:     watcher.start()
+283:     try:
+284:         if (len(process.cpu_affinity()) != 1 or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+285:                 or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+286:             raise ValueError("Pre-import single CPU/thread environment required")
+287:         if args.prior_seconds < limits["prior_charged_seconds"]:
+288:             raise ValueError("Prior charged budget cannot be reset")
+289:         if args.mode == "cpu":
+290:             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+291:                 raise ValueError("CPU qualification must disable GPU")
+292:             test_class = handwritten.PositiveRankingTests
+293:             selected = args.tests or unittest.defaultTestLoader.getTestCaseNames(test_class)
+294:             report["selected_tests"] = selected
+295:             suite = unittest.TestSuite(test_class(name) for name in selected)
+296:             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:
+297:                 result = unittest.TextTestRunner(stream=stream, verbosity=2, failfast=True).run(suite)
+298:             report.update(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped))
+299:             if not result.wasSuccessful() or result.skipped:
+300:                 raise RuntimeError("Affected handwritten qualification failed")
+301:         else:
+302:             if args.gate is None:
+303:                 raise ValueError("Implementation review gate required")
+304:             gate = run.reviewed_gate(args.gate, "NATIVE")
+305:             if args.prior_seconds != 0:
+306:                 raise ValueError("Unique dual native attempt; no automatic retry")
+307:             report["arms"] = {}
+308:             for arm in method.ARMS:
+309:                 arm_started = time.monotonic()
+310:                 arm_out = args.output/arm
+311:                 arm_out.mkdir()
+312:                 def arm_check(reserve=0):
+313:                     check(reserve)
+314:                     if time.monotonic()-arm_started > limits["per_arm_maximum_seconds"]:
+315:                         raise RuntimeError("Per-arm native budget exceeded")
+316:                 def arm_progress(stage, **details):
+317:                     if "actual_updates" in details:
+318:                         details["active_arm_actual_updates"] = details["actual_updates"]
+319:                         details["actual_updates"] += sum(v["actual_updates"] for v in report["arms"].values())
+320:                     progress(stage, active_arm=arm, **details)
+321:                 value = native(arm_check, arm_progress, handwritten, arm_out, arm,
+322:                                continuing=bool(report["arms"]))
+323:                 arm_check()
+324:                 value["charged_seconds"] = math.ceil(time.monotonic()-arm_started)
+325:                 report["arms"][arm] = value
+326:                 arm_started = None
+327:                 write()
+328:             report["actual_updates"] = sum(v["actual_updates"] for v in report["arms"].values())
+329:         check()
+330:         report["status"] = "PASS_HANDWRITTEN_ONLY"
+331:         if args.mode == "cpu":
+332:             report.update(qualified_tests=selected, unresolved_checks=[])
+333:     except BaseException as exc:
+334:         report.update(status="FAIL", traceback=traceback.format_exc())
+335:         raise
+336:     finally:
+337:         stopped.set()
+338:         watcher.join(timeout=2)
+339:         write()
+340: 
+341: if __name__ == "__main__":
+342:     main()

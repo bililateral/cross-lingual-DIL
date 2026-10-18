@@ -1,0 +1,421 @@
+{
+  "status": "PASS_SAVED_WIRING_REPLAY",
+  "failures": [],
+  "native_outer": {
+    "exit_code": 0,
+    "elapsed_seconds": 649.1371538639069,
+    "charged_seconds": 650,
+    "pid": 797388,
+    "command": [
+      "/home/yongpeng/miniconda3/envs/py310/bin/python",
+      "scripts/step28_positive_ranking_verify.py",
+      "gpu",
+      "--output",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/qualification/native",
+      "--gate",
+      "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/documentation/20261016/positive_ranking_implementation/qualification/native_gate.json"
+    ]
+  },
+  "native_internal": {
+    "elapsed_seconds": 647.85159631446,
+    "cumulative_charged_seconds": 648.0,
+    "max_reserved_bytes": 19153289216,
+    "peak_rss_bytes": 15655268352,
+    "peak_work_bytes": 9114438171,
+    "torch": "2.9.1+cu130",
+    "status": "PASS_HANDWRITTEN_ONLY",
+    "numerics": {
+      "cublas_workspace_config": ":4096:8",
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "cudnn_benchmark": false,
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false
+    }
+  },
+  "formal": {
+    "optimizer_updates": 1152,
+    "gradient_group_logs": 1728,
+    "rank_view_logs": 3456,
+    "maximum_scalar_rounding_errors": {
+      "view_total": 3.5762786865234375e-07,
+      "supervised": 2.384185791015625e-07,
+      "distillation": 0.0,
+      "supervised_contribution": 1.7881393421514957e-08,
+      "teacher_contribution": 0.0,
+      "weighted": 3.2782554615362614e-08,
+      "optimizer_total": 3.278255444882916e-08
+    },
+    "points": {
+      "A_S_pos": {
+        "updates": 288,
+        "adam_step": 288,
+        "measurements": {
+          "current_rank_pos": {
+            "count": 576,
+            "min": 0.6571810841560364,
+            "max": 3.2799899578094482,
+            "mean": 2.0969954985711308
+          },
+          "current_record_gradient_norm": {
+            "count": 288,
+            "min": 0.02409297414124012,
+            "max": 1.6167646646499634,
+            "mean": 0.9986401150171231
+          },
+          "current_supervised_contribution": {
+            "count": 288,
+            "min": 1.6634478569030762,
+            "max": 4.337058067321777,
+            "mean": 2.7157536803020372
+          },
+          "current_teacher_contribution": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "current_mse0": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "gradient_norm": {
+            "count": 288,
+            "min": 0.5265068411827087,
+            "max": 18.251789093017578,
+            "mean": 6.236828361948331
+          }
+        },
+        "memory_summary": {
+          "bytes": 341947,
+          "count": 0,
+          "members": [
+            "4493a33635ae54f36d0edb28b00917ca",
+            "5f010eb94c3730f85698b8fa9434c21d",
+            "ec09d6151be95df8f486a9115f6fc209",
+            "d8c40a84400eada98184e752d40f286b",
+            "cb72702c36441d8486ea59a9497d747c",
+            "19a7f577b51a4639a264ef63daf069aa"
+          ],
+          "origins": {
+            "19a7f577b51a4639a264ef63daf069aa": 1,
+            "4493a33635ae54f36d0edb28b00917ca": 1,
+            "5f010eb94c3730f85698b8fa9434c21d": 1,
+            "cb72702c36441d8486ea59a9497d747c": 1,
+            "d8c40a84400eada98184e752d40f286b": 1,
+            "ec09d6151be95df8f486a9115f6fc209": 1
+          },
+          "seen": 48,
+          "sha256": "c24875aef1cf83d6cc6b4005901aff917b761c729912378c8f3841f5f2e05a51",
+          "stage": 0,
+          "tables": {
+            "19a7f577b51a4639a264ef63daf069aa": "46f8d7165c0861d65742e9050d132576ed19012e071eb963ace0bdb6bbd9a67d",
+            "4493a33635ae54f36d0edb28b00917ca": "22472160d8c43306b4df1370c2b4ab85b7e11f45aa9867c0a1830956cc2d1ccc",
+            "5f010eb94c3730f85698b8fa9434c21d": "af2b40f680a40e12c7de762453ac97c2971a560ec127454447d53f7a99b8f21c",
+            "cb72702c36441d8486ea59a9497d747c": "7159fb4cdbd3e4ab9a7109c53a4b6f1c4b834c7e78bd0034326cf981dfaf34fc",
+            "d8c40a84400eada98184e752d40f286b": "c8cead5f5cbf57489d7942bc2091db5f5d2b51907d9fec40731aef982b6338d1",
+            "ec09d6151be95df8f486a9115f6fc209": "9db160af8ee0abf3962066b9dbd1cfe4af5783827e8e3a2e72b3ab0a21f3a122"
+          }
+        },
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      },
+      "B_S_pos": {
+        "updates": 288,
+        "adam_step": 576,
+        "measurements": {
+          "current_rank_pos": {
+            "count": 576,
+            "min": 0.35089030861854553,
+            "max": 3.3076083660125732,
+            "mean": 1.6097766657670338
+          },
+          "current_record_gradient_norm": {
+            "count": 288,
+            "min": 1.01771080493927,
+            "max": 2.3309662342071533,
+            "mean": 1.4735110344158278
+          },
+          "current_supervised_contribution": {
+            "count": 288,
+            "min": 1.2122294902801514,
+            "max": 3.203113079071045,
+            "mean": 2.200987989703814
+          },
+          "current_teacher_contribution": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "current_mse0": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "history_rank_pos": {
+            "count": 576,
+            "min": 0.5495722889900208,
+            "max": 2.867037773132324,
+            "mean": 1.647435143072572
+          },
+          "history_record_gradient_norm": {
+            "count": 288,
+            "min": 0.18288515508174896,
+            "max": 0.42505156993865967,
+            "mean": 0.27649669468195903
+          },
+          "history_supervised_contribution": {
+            "count": 288,
+            "min": 0.1508152335882187,
+            "max": 0.3017948269844055,
+            "mean": 0.22551702889096406
+          },
+          "history_teacher_contribution": {
+            "count": 288,
+            "min": 0.026704827323555946,
+            "max": 0.12725362181663513,
+            "mean": 0.07116113540380159
+          },
+          "history_mse0": {
+            "count": 288,
+            "min": 0.05340965464711189,
+            "max": 0.25450724363327026,
+            "mean": 0.14232227080760318
+          },
+          "gradient_norm": {
+            "count": 288,
+            "min": 5.346215724945068,
+            "max": 12.218138694763184,
+            "mean": 8.037315156724718
+          }
+        },
+        "memory_summary": {
+          "bytes": 348711,
+          "count": 288,
+          "members": [
+            "4493a33635ae54f36d0edb28b00917ca",
+            "5f010eb94c3730f85698b8fa9434c21d",
+            "ec09d6151be95df8f486a9115f6fc209",
+            "d8c40a84400eada98184e752d40f286b",
+            "cb72702c36441d8486ea59a9497d747c",
+            "19a7f577b51a4639a264ef63daf069aa"
+          ],
+          "origins": {
+            "19a7f577b51a4639a264ef63daf069aa": 1,
+            "4493a33635ae54f36d0edb28b00917ca": 1,
+            "5f010eb94c3730f85698b8fa9434c21d": 1,
+            "cb72702c36441d8486ea59a9497d747c": 1,
+            "d8c40a84400eada98184e752d40f286b": 1,
+            "ec09d6151be95df8f486a9115f6fc209": 1
+          },
+          "seen": 48,
+          "sha256": "b14c69e66b74f623f225dd60e26e1eb74d66bb24c9f49b02a70391d81f5ed0b2",
+          "stage": 2,
+          "tables": {
+            "19a7f577b51a4639a264ef63daf069aa": "46f8d7165c0861d65742e9050d132576ed19012e071eb963ace0bdb6bbd9a67d",
+            "4493a33635ae54f36d0edb28b00917ca": "22472160d8c43306b4df1370c2b4ab85b7e11f45aa9867c0a1830956cc2d1ccc",
+            "5f010eb94c3730f85698b8fa9434c21d": "af2b40f680a40e12c7de762453ac97c2971a560ec127454447d53f7a99b8f21c",
+            "cb72702c36441d8486ea59a9497d747c": "7159fb4cdbd3e4ab9a7109c53a4b6f1c4b834c7e78bd0034326cf981dfaf34fc",
+            "d8c40a84400eada98184e752d40f286b": "c8cead5f5cbf57489d7942bc2091db5f5d2b51907d9fec40731aef982b6338d1",
+            "ec09d6151be95df8f486a9115f6fc209": "9db160af8ee0abf3962066b9dbd1cfe4af5783827e8e3a2e72b3ab0a21f3a122"
+          }
+        },
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      },
+      "A_H_pos": {
+        "updates": 288,
+        "adam_step": 288,
+        "measurements": {
+          "current_rank_pos": {
+            "count": 576,
+            "min": 0.520054042339325,
+            "max": 3.2960195541381836,
+            "mean": 1.9790393199978604
+          },
+          "current_record_gradient_norm": {
+            "count": 288,
+            "min": 0.02409263700246811,
+            "max": 1.7561239004135132,
+            "mean": 1.0321020268343597
+          },
+          "current_supervised_contribution": {
+            "count": 288,
+            "min": 1.5706427097320557,
+            "max": 4.337058067321777,
+            "mean": 2.605065279122856
+          },
+          "current_teacher_contribution": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "current_mse0": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "gradient_norm": {
+            "count": 288,
+            "min": 0.526507556438446,
+            "max": 13.57863998413086,
+            "mean": 6.273228450160888
+          }
+        },
+        "memory_summary": {
+          "bytes": 342103,
+          "count": 0,
+          "members": [
+            "4493a33635ae54f36d0edb28b00917ca",
+            "5f010eb94c3730f85698b8fa9434c21d",
+            "ec09d6151be95df8f486a9115f6fc209",
+            "d8c40a84400eada98184e752d40f286b",
+            "cb72702c36441d8486ea59a9497d747c",
+            "19a7f577b51a4639a264ef63daf069aa"
+          ],
+          "origins": {
+            "19a7f577b51a4639a264ef63daf069aa": 1,
+            "4493a33635ae54f36d0edb28b00917ca": 1,
+            "5f010eb94c3730f85698b8fa9434c21d": 1,
+            "cb72702c36441d8486ea59a9497d747c": 1,
+            "d8c40a84400eada98184e752d40f286b": 1,
+            "ec09d6151be95df8f486a9115f6fc209": 1
+          },
+          "seen": 48,
+          "sha256": "2fdc86bb8dd2ba0a7e717ab343da7d3dea91c7f77b6ffadcf67d92aa4dbcecaf",
+          "stage": 0,
+          "tables": {
+            "19a7f577b51a4639a264ef63daf069aa": "cbcc97923da00ee3c15353960d8ad2dc0fd07f6c3ffa4171b141914b08b17521",
+            "4493a33635ae54f36d0edb28b00917ca": "882baa7367a44456c326a34e997966b243bca435d0597830e46e63a544095bae",
+            "5f010eb94c3730f85698b8fa9434c21d": "f0f33283dad0d182b00fddef8f3e220c316974908d9d237e548ca1bec0772300",
+            "cb72702c36441d8486ea59a9497d747c": "30349dfdd7b8659eac60690274c1854e629621a15398f585f43aeda0ca5d1b7b",
+            "d8c40a84400eada98184e752d40f286b": "3e38c20951c87f04fe9db9a47a76a8f5ad8f78f33fb10e5b1b488d3f40685c54",
+            "ec09d6151be95df8f486a9115f6fc209": "a36237021f1fdba0b4b97606fd24651dd81b4360bd8b81fca97bdc78bbef4ff9"
+          }
+        },
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      },
+      "B_H_pos": {
+        "updates": 288,
+        "adam_step": 576,
+        "measurements": {
+          "current_rank_pos": {
+            "count": 576,
+            "min": 0.2587744891643524,
+            "max": 3.372718572616577,
+            "mean": 1.4896358529933624
+          },
+          "current_record_gradient_norm": {
+            "count": 288,
+            "min": 0.9941872358322144,
+            "max": 2.481046676635742,
+            "mean": 1.4877375542289681
+          },
+          "current_supervised_contribution": {
+            "count": 288,
+            "min": 1.1215707063674927,
+            "max": 3.130096912384033,
+            "mean": 2.07502061376969
+          },
+          "current_teacher_contribution": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "current_mse0": {
+            "count": 288,
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0
+          },
+          "history_rank_pos": {
+            "count": 576,
+            "min": 0.2911232113838196,
+            "max": 2.8237388134002686,
+            "mean": 1.534987480379641
+          },
+          "history_record_gradient_norm": {
+            "count": 288,
+            "min": 0.18276944756507874,
+            "max": 0.4462321996688843,
+            "mean": 0.27776651249991524
+          },
+          "history_supervised_contribution": {
+            "count": 288,
+            "min": 0.14125728607177734,
+            "max": 0.2994399964809418,
+            "mean": 0.21427522516912884
+          },
+          "history_teacher_contribution": {
+            "count": 288,
+            "min": 0.026761574670672417,
+            "max": 0.12669679522514343,
+            "mean": 0.06964639442998709
+          },
+          "history_mse0": {
+            "count": 288,
+            "min": 0.05352314934134483,
+            "max": 0.25339359045028687,
+            "mean": 0.13929278885997418
+          },
+          "gradient_norm": {
+            "count": 288,
+            "min": 5.14430570602417,
+            "max": 12.571660041809082,
+            "mean": 7.793989539146423
+          }
+        },
+        "memory_summary": {
+          "bytes": 348865,
+          "count": 288,
+          "members": [
+            "4493a33635ae54f36d0edb28b00917ca",
+            "5f010eb94c3730f85698b8fa9434c21d",
+            "ec09d6151be95df8f486a9115f6fc209",
+            "d8c40a84400eada98184e752d40f286b",
+            "cb72702c36441d8486ea59a9497d747c",
+            "19a7f577b51a4639a264ef63daf069aa"
+          ],
+          "origins": {
+            "19a7f577b51a4639a264ef63daf069aa": 1,
+            "4493a33635ae54f36d0edb28b00917ca": 1,
+            "5f010eb94c3730f85698b8fa9434c21d": 1,
+            "cb72702c36441d8486ea59a9497d747c": 1,
+            "d8c40a84400eada98184e752d40f286b": 1,
+            "ec09d6151be95df8f486a9115f6fc209": 1
+          },
+          "seen": 48,
+          "sha256": "db02635a24cc1b9c8ec55efec865748735677d26104dd63e448ddc45b775ae98",
+          "stage": 2,
+          "tables": {
+            "19a7f577b51a4639a264ef63daf069aa": "cbcc97923da00ee3c15353960d8ad2dc0fd07f6c3ffa4171b141914b08b17521",
+            "4493a33635ae54f36d0edb28b00917ca": "882baa7367a44456c326a34e997966b243bca435d0597830e46e63a544095bae",
+            "5f010eb94c3730f85698b8fa9434c21d": "f0f33283dad0d182b00fddef8f3e220c316974908d9d237e548ca1bec0772300",
+            "cb72702c36441d8486ea59a9497d747c": "30349dfdd7b8659eac60690274c1854e629621a15398f585f43aeda0ca5d1b7b",
+            "d8c40a84400eada98184e752d40f286b": "3e38c20951c87f04fe9db9a47a76a8f5ad8f78f33fb10e5b1b488d3f40685c54",
+            "ec09d6151be95df8f486a9115f6fc209": "a36237021f1fdba0b4b97606fd24651dd81b4360bd8b81fca97bdc78bbef4ff9"
+          }
+        },
+        "full_restore_verified": true,
+        "inference_restore_verified": true
+      }
+    }
+  },
+  "resource": {
+    "start_utc": "2026-10-18T11:50:23.168852+00:00",
+    "wall_seconds": 0.09850670499872649,
+    "cpu_seconds": 0.09849469200000002,
+    "peak_rss_kib": 21932,
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]"
+  },
+  "checks_count": 86,
+  "mechanically_read_inputs": 94
+}

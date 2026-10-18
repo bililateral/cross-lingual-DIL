@@ -1,5 +1,5 @@
 {
-  "status": "FORMAL_COMPLETE_RESULT_RECOVERED_INDEPENDENTLY_ANALYZED_PRIMARY_FAILED",
+  "status": "FORMAL_AND_RESULT_REVIEW_COMPLETE_VALID_PRIMARY_NOT_MET",
   "observed_date": "2026-10-18",
   "methods": [
     "S_pos",
@@ -123,16 +123,16 @@
     "primary_disposition": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt",
     "remaining_specific_blockers": 0
   },
-  "next": "固定正式运行和Linux独立分析已完成，保留有效未达标结果；具体389成员结果包已获准并单次提交GPT 6 Pro外审，等待完整回收与独立主审，不重训/调参/选轮/补种子。四权重及四Memory继续保管，原H_cons删除许可不扩大。",
+  "next": "固定S_pos/H_pos及结果外审/独立主审均结案；有效未达主要目标，不自动重训/选轮/调参。Optuna仅讨论建议，未批准新搜索。用户最新明确批准后四权重已留证删除，四Memory留Linux；当前具体阻断0，不把无阻断写成性能达标。",
   "git": "local_only",
   "legacy_H_cons": "完成且原负结果/预算不改；两权重已删，Memory保留。",
-  "custody": "255份必要正式结果8685752字节及7份分析572387字节已SFTP回传逐项大小/SHA核对；权重/Memory留Linux，未载入/下载/删除；报告、分析源码和必要接收/收尾记录按实际同步回执保管。",
+  "custody": "255必要正式结果和7分析已回传核验；结果外审92必要原件及主审保留。用户最新明确批准后，四权重5217586212字节已于20:46:17留证删除，257非权重作业文件逐项不变，四Memory1381626字节留Linux，未载入/下载。",
   "execution": {
     "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace",
     "listener_pid": 788758,
     "listener_dispatch": "reports/documentation/20261016/positive_ranking_implementation/qualification/dispatch.json",
-    "last_observation": "reports/seller_alias_continual/20261018/positive_ranking_result/closeout.json",
-    "observed_at": "2026-10-18T19:32:27.462302+08:00",
+    "last_observation": "reports/seller_alias_continual/20261018/positive_ranking_result/review/closeout.json",
+    "observed_at": "2026-10-18T20:35:34.365229+08:00",
     "sequence": "one native attempt; validate actual evidence and projection; one formal attempt; remove listener source after first actual formal update; stop on any failure",
     "native_result": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/qualification/native/result.json",
     "native_wallclock": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_wallclock.json",
@@ -160,18 +160,41 @@
   "result": {
     "primary_passed": false,
     "secondary_H_pos_minus_S_both_positive": false,
-    "validity": "Valid fixed configuration; no execution or saved-result audit blocker found. Result-specific external review pending.",
+    "validity": "Valid fixed configuration within preserved evidence scope; result-specific external review and independent primary adjudication complete, no new scientific or reproducibility blocker; primary objective not met.",
     "report": "reports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt",
     "inventory": "reports/seller_alias_continual/20261018/positive_ranking_result/inventory.json",
     "receive_verification": "reports/seller_alias_continual/20261018/positive_ranking_result/receive_verification.json",
     "independent_audit": "reports/seller_alias_continual/20261018/positive_ranking_result/analysis/audit.json",
     "analysis_script": "scripts/step28_positive_ranking_audit.py",
     "review": {
-      "status": "SUBMITTED_IN_PROGRESS",
+      "status": "COMPLETE_RECOVERED_AND_INDEPENDENTLY_ADJUDICATED",
       "submission": "reports/seller_alias_continual/20261018/positive_ranking_result/review/submission.json",
       "url": "https://chatgpt.com/c/6ad4b0e7-4ee8-83eb-9777-fd67a74468af",
-      "observed_at": "2026-10-18T19:43:57.018+08:00",
-      "sha256": "4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7"
+      "observed_at": "2026-10-18T20:35:34.365229+08:00",
+      "sha256": "4eeeb5df0e93b6c32bf352f42b656b945a8d4e4f71078b73fa4df0e015ae63f7",
+      "external_report": "reports/seller_alias_continual/20261018/positive_ranking_result/review/external/S_pos_H_pos_external_review_20261018.zh.txt",
+      "recovery": "reports/seller_alias_continual/20261018/positive_ranking_result/review/recovery.json",
+      "primary_disposition": "reports/seller_alias_continual/20261018/positive_ranking_result/review/primary_disposition.zh.txt",
+      "remaining_specific_blockers": 0,
+      "primary_passed": false,
+      "interpretation_limits": [
+        "No label-level independent reconstruction",
+        "Epoch1-to-6; cache/A six surviving groups",
+        "Subgroup intervals are not interaction evidence or simultaneous intervals",
+        "A acquisition denotes A-end state, not gain against untrained model",
+        "Single seed/order and repeated development selection uncertainty excluded",
+        "External native evidence inherited; actual server metadata checked separately"
+      ],
+      "dedicated_page_closed": true
     }
+  },
+  "weight_cleanup": {
+    "status": "COMPLETE_EXPLICIT_USER_AUTHORIZATION",
+    "receipt": "reports/maintenance/20261018/positive_ranking_weights/receipt.json",
+    "observed_at": "2026-10-18T20:46:17.044325+08:00",
+    "removed_count": 4,
+    "removed_bytes": 5217586212,
+    "memory_retained_count": 4,
+    "nonmodel_files_unchanged": 257
   }
 }

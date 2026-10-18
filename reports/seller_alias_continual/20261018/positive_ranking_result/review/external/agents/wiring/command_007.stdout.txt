@@ -1,0 +1,89 @@
+
+=== workspace/scripts/step28_positive_ranking_run.py [245..276/541] ===
+245:         k = seen-1 if seen <= 6 else rng.randrange(seen)
+246:         if k < 6:
+247:             if k == len(retained):
+248:                 retained.append(uid)
+249:             else:
+250:                 retained[k] = uid
+251:     if retained != members:
+252:         raise ValueError("Independent Algorithm R differs")
+253:     for arm in entry.method.ARMS:
+254:         if (manifest["initials"][arm] != baseline["initial_identity"]
+255:                 or manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]):
+256:             raise ValueError("Independent starts/own A continuation missing")
+257:     scores, sequences = {}, {1: [], 2: []}
+258:     for name in entry.POINTS:
+259:         point = manifest["points"][name]
+260:         arm, stage = name[2:], "AB".index(name[0])+1
+261:         a_point = manifest["points"]["A_"+arm]
+262:         if (point["arm"] != arm or point["stage"] != stage or point["adam_step"] != stage*288
+263:                 or point["full_restore_verified"] is not True or point["inference_restore_verified"] is not True
+264:                 or any(point.get(k) != v for k, v in entry.method.metadata(arm).items())):
+265:             raise ValueError("Endpoint restoration missing")
+266:         logrec = manifest["training"][name]
+267:         log = data.read_json(data.verify(root/logrec["path"], logrec))
+268:         expected_fit = [r["group_uid"] for r in split["fit"] if r["domain"] == "AB"[stage-1]]
+269:         stream = data.seed_for(20260918, "ABC", stage, "current")
+270:         expected = data.schedule([type("ID", (), {"uid": u})() for u in expected_fit], 6, stream)
+271:         if log["updates"] != 288 or len(log["rows"]) != 288 or log["adam_step"] != stage*288 or log["current_ids"] != [g.uid for g in expected]:
+272:             raise ValueError("Main schedule/update count differs")
+273:         memory = entry.memory_from(data.verify(root/point["memory"]["path"], point["memory"]).read_bytes(), arm)
+274:         if (memory.summary() != point["memory_summary"] or memory.reservoir.seen != 48 or memory.summary()["members"] != members
+275:                 or memory.maps["pooling"] != entry.method.identity(arm)
+276:                 or point["continuity"]["memory_sha256"] != memory.summary()["sha256"]):
+
+=== workspace/scripts/run_step28_positive_ranking_linux_20261018.sh [1..23/23] ===
+1: #!/usr/bin/env bash
+2: set -euo pipefail
+3: export RECORD_REPLAY_STARTED_EPOCH="$(date +%s)"
+4: cd "$(dirname "$0")/.."
+5: cpu="$1"
+6: gate="$2"
+7: job="$3"
+8: test ! -e "$job"
+9: test -d "$(dirname "$job")"
+10: export CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+11: export CUBLAS_WORKSPACE_CONFIG=:4096:8 TOKENIZERS_PARALLELISM=false PYTHONDONTWRITEBYTECODE=1
+12: # Wrapper and interpreter startup, validation, and TERM grace are inside one deadline.
+13: limit=$(/home/yongpeng/miniconda3/envs/py310/bin/python -c 'import json; p=json.load(open("schema/step28_positive_ranking_policy.json")); r=p["runtime"]; assert r["maximum_gpu_stage_seconds"]==57600; print(r["maximum_gpu_stage_seconds"])')
+14: remaining=$((RECORD_REPLAY_STARTED_EPOCH + limit - $(date +%s) - 5))
+15: test "$remaining" -gt 0
+16: date -Is > "$job.wrapper.txt"
+17: set +e
+18: timeout --signal=TERM --kill-after=5 "$remaining" taskset -c "$cpu" /home/yongpeng/miniconda3/envs/py310/bin/python \
+19:   scripts/step28_positive_ranking_run.py --job "$job" --gate "$gate" > "$job.console.txt" 2>&1
+20: status=$?
+21: printf 'exit_code=%s\n' "$status" >> "$job.wrapper.txt"
+22: date -Is >> "$job.wrapper.txt"
+23: exit "$status"
+
+=== workspace/reports/launch/native.console.txt [1..4/4] ===
+1: /home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+2:   if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+3: /home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+4:   if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+
+=== workspace/reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt [1..22/22] ===
+1: cuBLAS工作区定向外审回收与独立主审
+2: 2026-10-18，Asia/Shanghai；针对源码d007230b，不追改38d05b9a前审原件。
+3: 
+4: 裁决：接受本轮R03关闭；R02第二臂准入的已知实现缺口整体关闭，R01前审关闭保持。当前所审变更及适用的继承证据范围内，进入原生资格前的具体科学/实现/复现阻断为0。此处不等于实际CUDA释放或两臂原生已经通过。
+5: 
+6: 回收：外部ZIP204106字节/66成员，SHA256 fd448ef6fa004b8280baec2eefd6f0c87edfb14b8c2278ab3a7eccc9e8ce69e5。66外部清单、65内部载荷、CRC、原送审111成员、独立报告27312字节及实际核对脚本身份全部逐项一致。全部66成员970337字节保留external/，包括两次外审机械脚本失败及修正版；这些失败不是项目科研失败，不进入项目52秒预算。完整报告已读，原阅读范围13全文/23选段/61机械/1manifest/1选段兼完整机械/12仅身份保留，不把成员数冒充全文阅读数。
+7: 
+8: 独立判断依据：
+9: 1. 回读实际verify.main、native、native_preflight及直接依赖。首臂严格preflight；只有native返回、arm_check通过并登记report.arms，下一臂才传continuing=True。清理发生在第二臂checked_fresh之前，包含于第二臂600秒和总1200秒，异常路径停止，无自动重试。
+10: 2. 独立查阅固定PyTorch v2.9.1的Module.cpp和CublasHandlePool.cpp。Python无参数绑定确实调用clearCublasWorkspaces，该函数清空cuBLAS与cuBLASLt两张持有DataPtr的map；后续获取工作区会在映射缺失时重新分配并设置。新增操作置于同步后、empty_cache前，解除的是前审指出的库所有权，不重置测量、不销毁活跃模型张量，也没有放宽零allocated/reserved门。固定:4096:8未改。
+11: 官方来源：
+12: https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp
+13: https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp
+14: 3. 回读完整受影响测试和CPU05原件：库持有、分配器缓存、额外残留分开；省略clear而保留empty_cache时生产门拒绝，恢复后通过。完整清理顺序、首臂不执行新clear、外部PID/低资源/其他作业及额外allocated/reserved拒绝保留。不是只凭PASS或函数名。仍为CPU mock，尚未在本机实际C++/GPU上测量归零。
+15: 4. native返回报告未新增模型/optimizer/GPU表引用；state使用CPU副本，fresh逐臂重新初始化和固定初始身份硬门不变。当前40来源仍与CPU05和送审包一致，38项未变；六项未变测试按AST及原证据继承，不重跑数学/评价/旧结果。CPU累计52/300秒、22次真实轻量更新及原两失败不改。
+16: 5. 检查外审机械脚本中的patch、来源闭包、AST、保存字段/累计账断言与其结果；输入、脚本及输出身份相符。未在Windows运行科研代码、复算指标或执行外审脚本。两次外审失败是旧receive04格式/反斜线处理，原件保留，未发现它们污染项目证据。
+17: 
+18: 尚待原生实证：本机二进制/驱动下释放后allocated/reserved实际为零；CUDA上下文保留时精确自身PID/资源门通过；两臂各6调用、独立起点、实际current/history与encoder/head梯度/参数/Adam作用、实际表精度、诊断中性和两种恢复/下一更新；总资源投影。上述未实测是原生资格的工作，不构成重开的静态R03，也不能预称PASS。
+19: 
+20: 最新执行授权：用户明确“外审已结束，把审查结果完整同步回来，仔细分析并独立主审，详细汇报 R03 是否真正关闭、是否还有进入原生资格前的实现阻断。没有问题的话就开始原生GPU校验，资源条件满足和GPU校验通过后开始正式训练”。据此在本轮主审无问题后，批准现有合同两臂一次原生资格，并在两臂真实通过、资源投影≤16小时/16GiB且现场门满足时启动一次正式训练。外审原文的“未批准”属于其12:49交付时点，不覆盖本轮用户新决定。明确记录在execution_authorization.json，不修改冻结合同/实现授权/外审原件或40来源。
+21: 
+22: 执行仍沿既有py310和原入口，原生每臂600秒/6调用、合计1200秒/12调用，失败即停，无第二attempt；正式总57600秒/16GiB、1152更新/1728梯度群/4端点/24capture/18判读，共享train解析1次、共同valid开放1次、test/owners0。不得从次级成功改主门。原生成功不保证正式结果超过S。资源不足时仅部署一次性等待流程，不动其他用户作业；条件满足后顺序运行，任何失败均留原件并停止后续训练。

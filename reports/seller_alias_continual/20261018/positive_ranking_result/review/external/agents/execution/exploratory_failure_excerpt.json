@@ -1,0 +1,12 @@
+{
+  "kind": "REVIEWER_INTERACTIVE_READ_ERROR",
+  "scope": "Saved native evidence field introspection; no production code or training execution",
+  "original_tool_chunk_id": "335dfa",
+  "exit_code": 1,
+  "wall_time_seconds_reported_by_tool": 0.000036929,
+  "command_fragment": "print('update identities',[(x['arm'],x['phase'],x['step'],x['log']['current_uid'],x['log'].get('history_uid')) for x in a['updates']])",
+  "error_text_transcribed_from_original_tool_return": "Traceback (most recent call last):\n  File \"<stdin>\", line 10, in <module>\nKeyError: 'current_uid'\n",
+  "cause": "Native update log does not carry current_uid; the reviewer initially assumed the formal wrapper's row schema.",
+  "completeness": "This is explicitly an excerpt/transcription of the original tool response. Full exploratory stdout and peak RSS were not saved. Do not call it a complete original subprocess log.",
+  "effect_on_project": "None. No project file was changed and no project experiment ran. Later independent audit attempts have exact pre-execution script snapshots and full stdout/stderr."
+}

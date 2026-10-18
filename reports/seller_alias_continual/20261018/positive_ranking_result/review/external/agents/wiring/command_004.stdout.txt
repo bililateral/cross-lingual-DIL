@@ -1,0 +1,441 @@
+
+=== workspace/scripts/step28_g_half.py [1..137/137] ===
+1: """Single fixed half-mean/half-LogAvgExp intervention; no data entry."""
+2: from __future__ import annotations
+3: 
+4: import hashlib
+5: import math
+6: from typing import Any
+7: 
+8: import numpy as np
+9: import torch
+10: 
+11: import step28_record_replay as record
+12: 
+13: data = record.data
+14: ARMS = ("G_half",)
+15: RNG_ORDER = "ABC"
+16: 
+17: 
+18: def identity(arm: str = "G_half") -> dict:
+19:     if arm != "G_half":
+20:         raise ValueError("Only the fixed G_half candidate is authorized")
+21:     return {"arm": arm, "mean_weight": .5, "logavgexp_weight": .5, "tau": 1.,
+22:             "record_order": "canonical_offdiagonal_upper_v1", "output_dtype": "float32",
+23:             "numerics": {"pooling": "float64_then_one_float32_cast", "encoder_forward": "bfloat16",
+24:                          "head_parameters_gradients_adam": "float32", "tf32": False,
+25:                          "deterministic_algorithms": True}}
+26: 
+27: 
+28: def bind(model, metadata: dict) -> str:
+29:     if metadata.get("pooling") != identity():
+30:         raise ValueError("Missing or incompatible G_half metadata")
+31:     model.pooling_identity = identity()
+32:     return "G_half"
+33: 
+34: 
+35: def metadata(arm: str = "G_half") -> dict:
+36:     return {"pooling": identity(arm)}
+37: 
+38: 
+39: def block_scores(blocks, arm: str = "G_half", stats: dict | None = None):
+40:     identity(arm)
+41:     if (blocks.ndim != 3 or not 2 <= blocks.shape[1] <= 8 or not 2 <= blocks.shape[2] <= 8
+42:             or blocks.dtype not in (torch.float32, torch.float64) or not torch.isfinite(blocks).all()):
+43:         raise ValueError("Finite complete 2..8 record blocks required")
+44:     values = blocks.double().flatten(1)
+45:     result = .5*values.mean(1)+.5*(torch.logsumexp(values, 1)-math.log(values.shape[1]))
+46:     result = result.to(blocks.dtype)
+47:     if not torch.isfinite(result).all():
+48:         raise ValueError("Nonfinite G_half output")
+49:     return result
+50: 
+51: 
+52: def account_logits(table, slots, arm: str, stats: dict | None = None, context=None):
+53:     identity(arm)
+54:     n = len(slots)
+55:     if table.shape != (n*(n-1)//2,) or not np.array_equal(np.unique(slots), np.arange(28)):
+56:         raise ValueError("Complete table and all canonical account slots required")
+57:     members = [np.flatnonzero(slots == i) for i in range(28)]
+58:     if any(not 2 <= len(x) <= 8 for x in members):
+59:         raise ValueError("Account records outside contract")
+60:     i, j = torch.triu_indices(n, n, 1, device=table.device)
+61:     matrix = table.new_zeros((n, n))
+62:     matrix[i, j], matrix[j, i] = table, table
+63:     buckets = {}
+64:     for index, (a, b) in enumerate(zip(*np.triu_indices(28, 1))):
+65:         buckets.setdefault((len(members[a]), len(members[b])), []).append((index, members[a], members[b]))
+66:     scores = table.new_zeros(378)
+67:     for entries in buckets.values():
+68:         ids = torch.tensor([e[0] for e in entries], device=table.device)
+69:         rows = torch.as_tensor(np.stack([e[1] for e in entries]), device=table.device)
+70:         cols = torch.as_tensor(np.stack([e[2] for e in entries]), device=table.device)
+71:         blocks = matrix[rows[:, :, None], cols[:, None, :]]
+72:         scores = scores.index_copy(0, ids, block_scores(blocks, arm, stats))
+73:     return scores
+74: 
+75: 
+76: def objective(table, group, regroup_seed, arm, reference=None, stats=None, context=None):
+77:     identity(arm)
+78:     if group.labels is None:
+79:         raise ValueError("Authorized train labels required")
+80:     slots = [record.assignment(group), record.assignment(group, regroup_seed)]
+81:     context = {**(context or {}), "group_uid": group.uid}
+82:     predicted = [account_logits(table, a, arm, stats, {**context, "view": "A"+str(i)}) for i, a in enumerate(slots)]
+83:     truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+84:     losses = [record.parent.ranking.objectives(v, truth, .5)["total"] for v in predicted]
+85:     supervised = (losses[0]+losses[1])/2
+86:     mse = table.new_zeros(())
+87:     if reference is not None:
+88:         target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
+89:         mse = ((predicted[0]-account_logits(target, slots[0], arm, stats, {**context, "view": "teacher_A0"}))**2).mean()
+90:     result = supervised if reference is None else .1*supervised+.5*mse
+91:     return result, {"supervised": float(supervised.detach()), "mse0": float(mse.detach()),
+92:                     "mse1": None, "distillation": float(mse.detach()), "weighted": float(result.detach())}
+93: 
+94: 
+95: def update(model, optimizer, current, history, reference, c, arm, stage, step, check=lambda: None, observe=None):
+96:     stats = c.setdefault("pooling_stats", {})
+97:     result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
+98:         stage, step, check, observe=observe,
+99:         objective_fn=lambda t, g, seed, a, ref: objective(t, g, seed, a, ref, stats,
+100:             {"stage": stage, "step": step, "role": "current" if ref is None else "history"}))
+101:     for role, g in (("current", current), ("history", history)):
+102:         if g is not None:
+103:             key = data.seed_for(20260918, RNG_ORDER, stage, step, role, g.uid, "regroup")
+104:             result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(g, key).tobytes()).hexdigest()
+105:     result["pooling"] = identity(arm)
+106:     return result
+107: 
+108: 
+109: def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None):
+110:     if not groups:
+111:         return np.empty((0, 378), np.float32)
+112:     identity(arm)
+113:     model.eval()
+114:     with torch.inference_mode():
+115:         rows = [account_logits(record.pair_table(model, record.record_vectors(model, g, c, check), check),
+116:                               record.assignment(g), arm, c.setdefault("pooling_stats", {}),
+117:                               {**c.get("pooling_context", {}), "group_uid": g.uid, "view": "A0"}).float().cpu().numpy()
+118:                 for g in groups]
+119:     result = np.stack(rows).astype(np.float32)
+120:     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
+121:         raise ValueError("Incomplete/nonfinite blind predictions")
+122:     return result
+123: 
+124: 
+125: def restored_score(model, groups, c, check=lambda: None):
+126:     arm = bind(model, {"pooling": getattr(model, "pooling_identity", None)})
+127:     return score(model, groups, c, arm, check)
+128: 
+129: 
+130: def capture(model, optimizer, current, memory, valid, c, arm, stage, epoch, root, point, check=lambda: None):
+131:     import step28_replay_diagnostics as diag
+132:     cfg = {**c, "pooling_stats": c.setdefault("pooling_stats", {}),
+133:            "pooling_context": {"stage": stage, "step": epoch*48, "role": "diagnostic_prediction"}}
+134:     return diag.capture(model, optimizer, current, memory, valid, cfg, arm, RNG_ORDER, stage, epoch, root,
+135:         point, check, scope="AB", score_fn=lambda m, gs, cfg, a, ck: score(m, gs, cfg, a, ck),
+136:         pooling_fn=lambda table, slots, g, view: account_logits(table, slots, arm, c["pooling_stats"],
+137:             {"stage": stage, "step": epoch*48, "role": "history_diagnostic", "group_uid": g.uid, "view": view}))
+
+=== workspace/scripts/step28_record_replay.py [1..300/332] ===
+1: """Complete-record regrouping and source-table replay; no formal data entry here."""
+2: from __future__ import annotations
+3: 
+4: import contextlib
+5: import copy
+6: import hashlib
+7: import json
+8: import random
+9: import struct
+10: from typing import Any, Callable
+11: 
+12: import numpy as np
+13: 
+14: import step28_bge_continual as parent
+15: 
+16: base, data, core = parent.base, parent.data, parent.core
+17: POLICY = data.ROOT / "schema/step28_record_replay_policy.json"
+18: 
+19: 
+20: def policy() -> dict:
+21:     p = data.read_json(POLICY)
+22:     if (p["methods"] != ["C", "S"] or p["orders"] != list(parent.ORDERS)
+23:             or p["physical_updates"] != 4320 or p["gradient_group_presentations"] != 7776
+24:             or p["pair_chunk"] != 512 or p["record_dimension"] != 2048
+25:             or p["history_supervision"] != .1 or p["teacher_weight"] != .5
+26:             or p["memory_maximum_bytes"] != 1048576):
+27:         raise ValueError("Record replay contract differs")
+28:     return p
+29: 
+30: 
+31: def config() -> dict:
+32:     c = copy.deepcopy(parent.config(parent.contract()))
+33:     c["runtime"] = policy()["runtime"]
+34:     # Reuse the pinned native loader, with this experiment's actual record head.
+35:     c["interventions"]["split_rank"]["account_dim"] = 2048
+36:     return c
+37: 
+38: 
+39: def load_model(c: dict, device: str = "cuda:0") -> Any:
+40:     return base.load_model(c, "split_rank", device)
+41: 
+42: 
+43: def record_vectors(model: Any, group: data.Group, c: dict,
+44:                    check: Callable = lambda: None) -> Any:
+45:     import torch
+46:     texts = base.record_texts(group, "separate_moments")
+47:     device = next(model.parameters()).device
+48:     parts = []
+49:     for i in range(0, len(texts), c["input"]["microbatch"]):
+50:         check()
+51:         features = model.encoder.tokenizer(texts[i:i+c["input"]["microbatch"]],
+52:             padding=True, truncation=False, return_tensors="pt")
+53:         if features["input_ids"].shape[1] > c["input"]["token_budget"]:
+54:             raise ValueError("Record exceeds frozen token budget; truncation forbidden")
+55:         features = {k: v.to(device) for k, v in features.items()}
+56:         autocast = (torch.autocast("cuda", dtype=torch.bfloat16)
+57:                     if device.type == "cuda" else contextlib.nullcontext())
+58:         with autocast:
+59:             output = model.encoder(features)["sentence_embedding"]
+60:         parts.append(output.float())
+61:     channels = torch.nn.functional.normalize(torch.cat(parts), dim=1)
+62:     title, description = channels.chunk(2)
+63:     return torch.cat((title, description), dim=1) / (2 ** .5)
+64: 
+65: 
+66: def assignment(group: data.Group, seed: int | None = None) -> np.ndarray:
+67:     """Record indices in frozen order; labels consulted only for training A1."""
+68:     counts = list(map(len, group.items))
+69:     slots = np.repeat(np.arange(28), counts)
+70:     if seed is None:
+71:         return slots
+72:     if group.labels is None:
+73:         raise ValueError("Regrouping requires authorized binary train labels")
+74:     adjacency = np.eye(28, dtype=bool)
+75:     left, right = np.triu_indices(28, 1)
+76:     adjacency[left, right] = group.labels
+77:     adjacency[right, left] = group.labels
+78:     components, remaining = [], set(range(28))
+79:     while remaining:
+80:         component = np.flatnonzero(adjacency[min(remaining)]).tolist()
+81:         if not set(component) <= remaining or not all(
+82:                 np.array_equal(adjacency[j], adjacency[component[0]]) for j in component):
+83:             raise ValueError("Positive labels must be disjoint cliques")
+84:         remaining.difference_update(component)
+85:         components.append(component)
+86:     if sorted(map(len, components)) != [2]*8 + [3]*4:
+87:         raise ValueError("Expected eight K2 and four K3")
+88:     rng = random.Random(seed)
+89:     result = slots.copy()
+90:     for component in components:
+91:         records = np.flatnonzero(np.isin(slots, component)).tolist()
+92:         rng.shuffle(records)
+93:         start = 0
+94:         for account in component:
+95:             result[records[start:start+counts[account]]] = account
+96:             start += counts[account]
+97:     if not np.array_equal(np.bincount(result, minlength=28), counts):
+98:         raise ValueError("Record count conservation failed")
+99:     return result
+100: 
+101: 
+102: def pair_table(model: Any, z: Any, check: Callable = lambda: None) -> Any:
+103:     import torch
+104:     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+105:     parts = []
+106:     for start in range(0, len(left), 512):
+107:         check()
+108:         u, v = z[left[start:start+512]], z[right[start:start+512]]
+109:         parts.append(model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten())
+110:     return torch.cat(parts)
+111: 
+112: 
+113: def account_logits(table: Any, slots: np.ndarray) -> Any:
+114:     import torch
+115:     n = len(slots)
+116:     if table.shape != (n*(n-1)//2,):
+117:         raise ValueError("Complete off-diagonal record table required")
+118:     left, right = torch.triu_indices(n, n, 1, device=table.device)
+119:     matrix = table.new_zeros((n, n))
+120:     matrix[left, right] = table
+121:     matrix[right, left] = table
+122:     assigned = torch.as_tensor(slots, device=table.device)
+123:     pooling = torch.nn.functional.one_hot(assigned, 28).T.to(table.dtype)
+124:     pooling = pooling / pooling.sum(1, keepdim=True)
+125:     scores = pooling @ matrix @ pooling.T
+126:     i, j = torch.triu_indices(28, 28, 1, device=table.device)
+127:     return scores[i, j]
+128: 
+129: 
+130: def objective(table: Any, group: data.Group, regroup_seed: int, arm: str,
+131:               reference: np.ndarray | None = None) -> tuple[Any, dict]:
+132:     import torch
+133:     if arm not in ("C", "S", "R0") or group.labels is None:
+134:         raise ValueError("Unknown arm or missing train labels")
+135:     slots = [assignment(group)]
+136:     if arm != "R0":
+137:         slots.append(assignment(group, regroup_seed))
+138:     predicted = [account_logits(table, a) for a in slots]
+139:     truth = torch.tensor(group.labels, dtype=table.dtype, device=table.device)
+140:     losses = [parent.ranking.objectives(v, truth, .5) for v in predicted]
+141:     supervised = (losses[0]["total"] if arm == "R0" else
+142:                   (losses[0]["total"] + losses[1]["total"]) / 2)
+143:     mse = table.new_zeros(())
+144:     mse0 = mse1 = mse
+145:     if reference is not None:
+146:         target = torch.as_tensor(reference, device=table.device, dtype=table.dtype)
+147:         errors = [((p-account_logits(target, a))**2).mean()
+148:                   for p, a in zip(predicted, slots)]
+149:         mse0 = errors[0]
+150:         if arm != "R0":
+151:             mse1 = errors[1]
+152:         mse = (mse0+mse1)/2 if arm == "C" else mse0
+153:     result = supervised if reference is None else .1*supervised + .5*mse
+154:     return result, {"supervised": float(supervised.detach()), "mse0": float(mse0.detach()),
+155:                     "mse1": None if arm == "R0" else float(mse1.detach()), "distillation": float(mse.detach()),
+156:                     "weighted": float(result.detach())}
+157: 
+158: 
+159: def backward_group(model: Any, group: data.Group, c: dict, arm: str,
+160:                    dropout_seed: int, regroup_seed: int, reference: np.ndarray | None,
+161:                    check: Callable = lambda: None, objective_fn: Callable | None = None) -> dict:
+162:     """One live encoder graph; exact chain rule through chunked deterministic head."""
+163:     import torch
+164:     torch.manual_seed(dropout_seed)
+165:     z = record_vectors(model, group, c, check)
+166:     with torch.no_grad():
+167:         values = pair_table(model, z.detach(), check)
+168:     proxy = values.detach().requires_grad_(True)
+169:     loss, log = (objective_fn or objective)(proxy, group, regroup_seed, arm, reference)
+170:     gradient, = torch.autograd.grad(loss, proxy)
+171:     leaf = z.detach().requires_grad_(True)
+172:     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+173:     for start in range(0, len(left), 512):
+174:         check()
+175:         u, v = leaf[left[start:start+512]], leaf[right[start:start+512]]
+176:         block = model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten()
+177:         block.backward(gradient[start:start+512])
+178:     if leaf.grad is None or not torch.isfinite(leaf.grad).all():
+179:         raise ValueError("Missing or nonfinite explicit dJ/dZ")
+180:     z.backward(leaf.grad)
+181:     log["record_gradient_norm"] = float(leaf.grad.norm())
+182:     return log
+183: 
+184: 
+185: def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+186:            reference: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+187:            step: int, check: Callable = lambda: None, observe: Callable | None = None,
+188:            objective_fn: Callable | None = None) -> dict:
+189:     import torch
+190:     model.train()
+191:     optimizer.zero_grad(set_to_none=True)
+192:     optimizer.param_groups[0]["lr"] = parent.stage_lr(step)
+193:     optimizer.param_groups[1]["lr"] = .001
+194:     logs = {}
+195:     for role, group, target in (("current", current, None), ("history", history, reference)):
+196:         if group is None:
+197:             continue
+198:         logs[role] = backward_group(model, group, c, arm,
+199:             data.seed_for(20260918, order, stage, step, role, "dropout"),
+200:             data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check,
+201:             objective_fn=objective_fn)
+202:         if observe is not None:
+203:             observe(role, logs[role])
+204:     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)
+205:     check()
+206:     optimizer.step()
+207:     return {**logs, "gradient_norm": float(norm), "encoder_lr": parent.stage_lr(step),
+208:             "head_lr": .001, "total": sum(v["weighted"] for v in logs.values())}
+209: 
+210: 
+211: def reference(model: Any, group: data.Group, c: dict, check: Callable = lambda: None) -> np.ndarray:
+212:     import torch
+213:     model.eval()
+214:     with torch.inference_mode():
+215:         table = pair_table(model, record_vectors(model, group, c, check), check)
+216:     result = table.float().cpu().numpy().copy()
+217:     if not np.isfinite(result).all():
+218:         raise ValueError("Nonfinite source table")
+219:     return result
+220: 
+221: 
+222: def score(model: Any, groups: list[data.Group], c: dict, check: Callable = lambda: None) -> np.ndarray:
+223:     import torch
+224:     model.eval()
+225:     with torch.inference_mode():
+226:         rows = [account_logits(pair_table(model, record_vectors(model, g, c, check), check),
+227:                                assignment(g)).float().cpu().numpy() for g in groups]
+228:     result = np.stack(rows).astype(np.float32)
+229:     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
+230:         raise ValueError("Incomplete blind scores")
+231:     return result
+232: 
+233: 
+234: class Memory:
+235:     """Single bounded payload: UTF-8 groups/metadata followed by binary FP32 tables."""
+236: 
+237:     def __init__(self, order: str):
+238:         if order not in parent.ORDERS:
+239:             raise ValueError("Unknown order")
+240:         self.order = order
+241:         self.reservoir = data.Memory(data.seed_for(20260930, order, "retention"))
+242:         self.tables: dict[str, np.ndarray] = {}
+243:         self.origins: dict[str, int] = {}
+244:         self.maps: dict = {}
+245:         self.stage = self.count = 0
+246:         self.draw_rng: random.Random | None = None
+247: 
+248:     def retain(self, current: list[data.Group], stage: int, teacher: Callable) -> dict:
+249:         if (stage not in (1, 2) or len(current) != 48 or self.reservoir.seen != 48*(stage-1)
+250:                 or (stage == 2 and (self.stage != 2 or self.count != 288))):
+251:             raise ValueError("Retention boundary differs")
+252:         old = {uid: hashlib.sha256(t.tobytes()).hexdigest() for uid, t in self.tables.items()}
+253:         self.reservoir.add_stage(sorted(current, key=lambda g: g.uid))
+254:         kept = {g.uid for g in self.reservoir.groups}
+255:         self.tables = {uid: table for uid, table in self.tables.items() if uid in kept}
+256:         self.origins = {uid: birth for uid, birth in self.origins.items() if uid in kept}
+257:         new = []
+258:         for group in self.reservoir.groups:
+259:             if group.uid not in self.tables:
+260:                 self.tables[group.uid] = np.asarray(teacher(group), dtype=np.float32).copy()
+261:                 self.origins[group.uid] = stage
+262:                 new.append(group.uid)
+263:         for uid in kept & old.keys():
+264:             if hashlib.sha256(self.tables[uid].tobytes()).hexdigest() != old[uid]:
+265:                 raise ValueError("Survivor source was refreshed")
+266:         self.stage = self.count = 0
+267:         self.draw_rng = None
+268:         self.to_bytes()
+269:         return {"created": new, "evicted": sorted(old.keys()-kept), "survivors_unchanged": True}
+270: 
+271:     def begin_stage(self, stage: int) -> None:
+272:         if stage not in (2, 3) or self.stage != 0 or self.reservoir.seen != 48*(stage-1):
+273:             raise ValueError("History stage boundary differs")
+274:         self.stage, self.count = stage, 0
+275:         self.draw_rng = random.Random(data.seed_for(20260930, self.order, stage, "history_draws"))
+276: 
+277:     def draw(self) -> tuple[data.Group, np.ndarray]:
+278:         if self.draw_rng is None or self.count >= 288 or len(self.reservoir.groups) != 6:
+279:             raise ValueError("History draw boundary differs")
+280:         group = self.draw_rng.choice(self.reservoir.groups)
+281:         self.count += 1
+282:         self.to_bytes()
+283:         return group, self.tables[group.uid]
+284: 
+285:     def to_bytes(self) -> bytes:
+286:         if set(self.tables) != {g.uid for g in self.reservoir.groups} or set(self.origins) != set(self.tables):
+287:             raise ValueError("Historical groups/source alignment differs")
+288:         blocks, records = [], []
+289:         for group in self.reservoir.groups:
+290:             n = sum(map(len, group.items))
+291:             t = self.tables[group.uid]
+292:             if t.shape != (n*(n-1)//2,) or t.dtype != np.float32 or not np.isfinite(t).all():
+293:                 raise ValueError("Historical table shape, type or finiteness differs")
+294:             blocks.append(t.astype("<f4", copy=False).tobytes())
+295:             records.append({"uid": group.uid, "count": len(t), "origin": self.origins[group.uid]})
+296:         header = data.json_bytes({"format": "record_table_f32_v1", "order": self.order,
+297:             "reservoir": json.loads(self.reservoir.to_bytes()), "tables": records, "maps": self.maps,
+298:             "stage": self.stage, "count": self.count,
+299:             "draw_rng": self.draw_rng.getstate() if self.draw_rng else None})
+300:         payload = struct.pack("<I", len(header)) + header + b"".join(blocks)
