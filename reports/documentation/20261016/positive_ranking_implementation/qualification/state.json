@@ -1,5 +1,5 @@
 {
-  "status": "AUTHORIZED_NATIVE_THEN_FORMAL_WAITING_RESOURCES",
+  "status": "NATIVE_PASSED_FORMAL_RUNNING",
   "observed_date": "2026-10-18",
   "methods": [
     "S_pos",
@@ -19,21 +19,81 @@
   },
   "gpu": {
     "authorized": true,
-    "actual_updates": 0,
+    "actual_updates": 12,
     "authorization": "reports/documentation/20261016/positive_ranking_implementation/qualification/execution_authorization.json",
     "maximum_seconds": 1200,
     "maximum_updates": 12,
     "automatic_retry": false,
-    "state": "WAIT_NATIVE_RESOURCES"
+    "state": "PASS_HANDWRITTEN_ONLY",
+    "charged_seconds": 650,
+    "inner_charged_seconds": 648,
+    "elapsed_seconds": 649.1371538639069,
+    "result": "reports/documentation/20261016/positive_ranking_implementation/qualification/native/result.json",
+    "wallclock": "reports/documentation/20261016/positive_ranking_implementation/qualification/native_wallclock.json",
+    "acceptance": "reports/documentation/20261016/positive_ranking_implementation/qualification/native_acceptance.json",
+    "receipt": "reports/documentation/20261016/positive_ranking_implementation/qualification/receive_native.json",
+    "independent_review": {
+      "source_bindings": 40,
+      "received_files": 19,
+      "received_bytes": 1000572,
+      "all_received_identities_match": true,
+      "arm_updates": {
+        "S_pos": 6,
+        "H_pos": 6
+      },
+      "arm_charged_seconds": {
+        "S_pos": 327,
+        "H_pos": 320
+      },
+      "second_arm_allowed_pid": 797388,
+      "second_arm_live_allocated_bytes": 0,
+      "second_arm_reserved_bytes": 0,
+      "per_arm_restored_tensors": 1967,
+      "per_arm_restored_elements": 1301039501,
+      "views_per_arm": 10,
+      "encoder_and_head_current_history_effects": true,
+      "adam_finite_and_effects_present": true,
+      "temporary_work_removed": true,
+      "R03": "Real CUDA second-arm preflight and all six updates succeeded; previous static closure now has native evidence. No new experiment or numerical recomputation."
+    }
   },
   "formal": {
     "authorized": true,
     "conditional_on": "Both native arms pass, saved behavior and resource projection verified, fresh production gate/resource checks pass",
-    "actual_updates": 0,
     "maximum_seconds": 57600,
     "maximum_output_bytes": 17179869184,
-    "state": "NOT_STARTED_NATIVE_PENDING",
-    "automatic_retry": false
+    "state": "RUNNING_B_S_pos",
+    "automatic_retry": false,
+    "started_at": "2026-10-18T14:14:43.561503+08:00",
+    "pid": 798095,
+    "wrapper_pid": 798087,
+    "timeout_pid": 798094,
+    "confirmed_updates_at_least": 289,
+    "confirmed_completed_endpoints": [
+      "A_S_pos"
+    ],
+    "access": {
+      "train": 1,
+      "valid": 0,
+      "heldout": 0,
+      "owners": 0
+    },
+    "completion_present": false,
+    "failure_present": false,
+    "estimate": {
+      "tentative_total_hours": [
+        3.5,
+        5.0
+      ],
+      "tentative_completion_shanghai": [
+        "2026-10-18T17:45:00+08:00",
+        "2026-10-18T19:15:00+08:00"
+      ],
+      "basis": "A S_pos 288 updates and six captures in35.54min plus endpoint about3.5min; native paired update about twice A and H similar. Early rough estimate, shared GPU and later endpoints/evaluation may alter it. Not statistical interval.",
+      "native_conservative_projection_seconds": 38079.87608841504,
+      "native_projected_peak_output_bytes": 12396649894,
+      "hard_deadline_shanghai": "2026-10-19T06:14:43+08:00"
+    }
   },
   "implementation_review": {
     "status": "COMPLETE_RECOVERED_AND_INDEPENDENTLY_ADJUDICATED",
@@ -65,33 +125,37 @@
     "primary_disposition": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt",
     "remaining_specific_blockers": 0
   },
-  "next": "已有唯一监听788758等待资源，不得重复启动。资源满足后原生一次两臂；只有实际行为/预算核对、投影及原正式入口验证通过才自动正式一次。任一失败停，不重试。下次恢复先核对实际监听、native result/wallclock/acceptance和formal job，不以本快照推断仍未执行。",
+  "next": "正式原进程798095继续；监听已自删退出，禁止重建。下次核对实际completion/failure、访问账及进程；完成且共同盲门通过后才按合同回传正式小原件并在Linux独立分析。失败保留现场，无自动重试。",
   "git": "local_only",
   "legacy_H_cons": "完成且原负结果/预算不改；两权重已删，Memory保留。",
-  "custody": "完整66份新外审原件、主审、执行许可和源码已SFTP部署至新独立workspace并逐项回读；当前状态/部署/队列观察随收尾同步。旧CPU05/前审保管继续保持。",
+  "custody": "已完整SFTP回传11份原生证据及8份启动/门禁/执行原件，共19文件1000572字节，大小/SHA全部一致。当前正式分数、模型和Memory留Linux活动目录，未下载或读取中途评价。",
   "execution": {
     "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace",
     "listener_pid": 788758,
     "listener_dispatch": "reports/documentation/20261016/positive_ranking_implementation/qualification/dispatch.json",
-    "last_observation": "reports/documentation/20261016/positive_ranking_implementation/qualification/queue_observation.json",
-    "observed_at": "2026-10-18T13:37:10.740239+08:00",
-    "resource_observed_at": "2026-10-18T13:36:50.440290+08:00",
-    "resource_state": {
-      "phase": "WAIT_NATIVE_RESOURCES",
-      "time": "2026-10-18T13:36:50.440290+08:00",
-      "pid": 788758,
-      "gpu": "0, GPU-47d540a1-1090-f2a1-7faa-793f35cca97d, 32607, 10862, 21248",
-      "compute_apps": "781788, python, 21172",
-      "project_jobs": [],
-      "host_available_bytes": 253028311040,
-      "disk_free_bytes": 736469966848
-    },
+    "last_observation": "Read-only actual process identity/cwd, job resource/access/console, absent failure/completion, source SHA and CUDA owner checks; no unfinished formal score transfer.",
+    "observed_at": "2026-10-18T14:55:26.669917+08:00",
     "sequence": "one native attempt; validate actual evidence and projection; one formal attempt; remove listener source after first actual formal update; stop on any failure",
     "native_result": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/qualification/native/result.json",
     "native_wallclock": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_wallclock.json",
     "automatic_acceptance": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_acceptance.json",
     "formal_gate": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/documentation/20261016/positive_ranking_implementation/qualification/formal_gate.json",
     "formal_job": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/job",
-    "listener_status": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/status.json"
+    "listener_status": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/status.json",
+    "listener_alive": false,
+    "listener_source_removed": true,
+    "listener_final": "reports/documentation/20261016/positive_ranking_implementation/qualification/listener_final.json",
+    "formal_pid": 798095,
+    "source_files_still_match": true,
+    "shared_gpu": {
+      "own_pid": 798095,
+      "own_mib": 8884,
+      "other_pid": 798117,
+      "other_user": "zhanglu",
+      "other_mib": 21172,
+      "other_started_after_formal_seconds": 27.19,
+      "current_blocker": false,
+      "note": "Formal entry resource gate passed before this later other-user job. Do not stop other jobs or restart this run; actual OOM/failure follows existing no-retry contract."
+    }
   }
 }

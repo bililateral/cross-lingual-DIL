@@ -10,6 +10,8 @@
 
 ## 2026-10-18 S_pos/H_pos实现、CPU与实现外审
 
+原生通过与正式启动的新增保管：原生11份必要小证据及8份启动/门禁/执行原件共19文件1000572字节，已按[来源清单](../reports/documentation/20261016/positive_ranking_implementation/qualification/receive_native.json)SFTP回传并核对大小/SHA。原生两臂临时work已由原入口清理，身份原件保留；正式14:14:43启动，14:15:03确认首个实际更新后Linux监听源码自删，Windows复现源保留。14:55原正式进程继续运行，正式模型/Memory/盲分数为活动资产，未下载或删除；本次不新增未完成训练的进度快照文件，只更新唯一当前入口。新材料仅本地Git，局部临时助手清理不重置大清理周期。
+
 最新cuBLAS复审已完整回收：66必要原件970337字节、外部身份、完整正文及独立主审保留；唯一输入ZIP仍供精确审查重放。新执行workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace`，163必要源码/资格/外审/许可/等待脚本1982089字节[SFTP回读一致](../reports/documentation/20261016/positive_ranking_implementation/qualification/native_deployment.json)。40来源与CPU05一致，12预训练文件仅链接；52开放旧对照SHA核对，7正式输入仅查存在。正式59逐文件链接只会在原生真实通过后建立，不暴露旧Memory/test/owners目录。唯一监听788758已在新目录等待资源；活动源码必须留到首个正式更新确认后自删，Windows保留复现源。原生临时权重按原合同成功后释放，正式新权重不沿用H_cons删除许可。已验收返回ZIP、下载网络临时记录及重复页面共11文件855168字节按精确路径清理，66审查原件和必要页面/身份保留；当前许可/部署/队列状态6文件98717字节[同步回读一致](../reports/documentation/20261016/positive_ranking_implementation/qualification/execution_sync.json)，主目录可变state先精确比对旧SHA再同步，新state两端相同。13:45:24[收尾现场](../reports/documentation/20261016/positive_ranking_implementation/qualification/closeout_observation.json)仍为原监听等待、GPU空闲10862MiB，无原生/正式输出。局部清理不重置10月23日周期。
 
 cuBLAS修复后再审：用户明确要求继续外审后，新[审查包](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/package.json)459440字节/111成员已单次上传原GPT-6 Pro会话并于12:27:57确认接收。该活动输入包、请求、111成员身份、模型选择器及接收凭据保存在Windows的review/workspace；当前state/导航更新也仅本地Git，未声称已把本轮新提交状态同步Linux。原CPU05及前轮完整外审/主审的Linux保管继续以已有sync_workspace.json为准。本轮无新增科研执行、没有重建监听；保留活动会话等待审查。准备页面与自动生成的重复快照/控制台日志核对无独立用途后清理，必要接收原件保留；局部临时清理不重置大清理周期。
