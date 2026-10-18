@@ -279,6 +279,79 @@ class PositiveRankingTests(unittest.TestCase):
                 actual_capture_populations=[48,6,40],teacher_both_views=True,full_inference_restores=True,own_identity_rejections=True)
         self.evidence("capture_restore",evidence)
 
+    def test_stage_a_empty_cache(self):
+        c=run.config();out=self.temporary();evidence={}
+        fit=[handmade_group(f"A_fit{i}") for i in range(48)]
+        valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"blind{i}") for i in range(40)]]
+        for arm in method.ARMS:
+            model=tiny_model();method.bind(model,method.metadata(arm));optimizer=core.make_optimizer(model,c)
+            method.update(model,optimizer,fit[0],None,None,c,arm,1,1)
+            for value in optimizer.state.values():value["step"].fill_(48)
+            saved,rng,modes=state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+            empty=method.score(model,[],c,arm)
+            self.assertEqual((empty.shape,empty.dtype),((0,378),np.dtype(np.float32)))
+            with self.assertRaisesRegex(ValueError,"Scoring candidate differs"):
+                method.score(model,[],c,"H_pos" if arm=="S_pos" else "S_pos")
+            capture=method.capture(model,optimizer,fit,None,valid,c,arm,1,1,out,"A_"+arm)
+            row=data.read_json(out/capture["path"]);run.validate_diagnostic(row,arm)
+            self.assertEqual((row["stage"],row["stage_step"],row["adam_step"]),(1,48,48))
+            self.assertEqual((row["cache_ids"],row["cache_domains"],row["teacher_errors"]),([],[],[]))
+            run.previous.array(out,row["cache"],(0,3),np.float64)
+            run.previous.array(out,row["fit"],(48,3),np.float64)
+            run.previous.array(out,row["valid_blind"],(40,378),np.float32)
+            self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
+            self.assertEqual((rng,modes),(diag.rng_state(),[m.training for m in model.modules()]))
+            # Reproduce the removed S dispatch failure without altering the frozen scorer.
+            with diag.neutral(model),self.assertRaisesRegex(ValueError,"need at least one array"):
+                record.score(model,[],c)
+            evidence[arm]=dict(actual_optimizer_calls=1,synthetic_clock=48,
+                capture_populations=[48,0,40],empty_score_shape=[0,378],cache_metric_shape=[0,3],
+                state_unchanged=True,wrong_arm_rejected=True,old_empty_dispatch_failure_reproduced=True)
+        self.evidence("stage_a_empty_cache",evidence)
+
+    def test_native_continuation_preflight(self):
+        import step28_positive_ranking_verify as verify
+        from types import SimpleNamespace
+        process=mock.Mock(pid=413);process.cpu_affinity.return_value=[0];process.parents.return_value=[]
+        sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0}
+        def query(args,**kwargs):
+            return (sample["apps"] if "--query-compute-apps=pid,process_name,used_memory" in args
+                    else f"0, handwritten-GPU, 32768, {sample['free']}, 1024")
+        env={"CUDA_VISIBLE_DEVICES":"0","OMP_NUM_THREADS":"1","MKL_NUM_THREADS":"1",
+             "OPENBLAS_NUM_THREADS":"1","TOKENIZERS_PARALLELISM":"false"}
+        with mock.patch.dict(os.environ,env),mock.patch.object(verify.psutil,"Process",return_value=process), \
+             mock.patch.object(verify.psutil,"process_iter",side_effect=lambda *a:sample["jobs"]), \
+             mock.patch.object(verify.psutil,"virtual_memory",side_effect=lambda:SimpleNamespace(available=sample["host"])), \
+             mock.patch.object(verify.subprocess,"check_output",side_effect=query), \
+             mock.patch.object(verify.gc,"collect") as collect, \
+             mock.patch.object(verify.torch.cuda,"synchronize"),mock.patch.object(verify.torch.cuda,"empty_cache") as empty, \
+             mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:sample["allocated"]), \
+             mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:sample["reserved"]):
+            first=verify.native_preflight(False)
+            self.assertEqual(first["compute_apps"],"");empty.assert_not_called()
+            sample["apps"]="413, python, 512"
+            with self.assertRaisesRegex(ValueError,"Resource gate failed"):
+                verify.native_preflight(False)
+            second=verify.native_preflight(True)
+            self.assertEqual(second["allowed_context_pid"],413);collect.assert_called_once();empty.assert_called_once()
+            rejected=[]
+            for key,value in (("apps","413, python, 512\n414, python, 1"),("free",30*1024-1),
+                    ("host",72*2**30-1),("allocated",4),("reserved",4),
+                    ("jobs",[SimpleNamespace(pid=415,info={"pid":415,"username":"same-user","cmdline":["step28_other.py"]})])):
+                previous=sample[key];sample[key]=value
+                with self.assertRaises(ValueError):verify.native_preflight(True)
+                sample[key]=previous;rejected.append(key)
+            # Reach the real native entry's resource call, stopping before model loading/GPU work.
+            class StopBeforeGPU(Exception):pass
+            with mock.patch.object(verify,"native_preflight",side_effect=StopBeforeGPU) as entry:
+                for continuing,arm in ((False,"S_pos"),(True,"H_pos")):
+                    with self.assertRaises(StopBeforeGPU):
+                        verify.native(lambda:None,lambda *a,**k:None,None,None,arm,continuing=continuing)
+                self.assertEqual(entry.call_args_list,[mock.call(False),mock.call(True)])
+        self.evidence("native_continuation_preflight",dict(first_strict=True,own_context_only_second=True,
+            rejected_cases=rejected,resource_thresholds_unchanged=True,real_native_entry_checked=True,
+            cuda_and_process_state="mocked handwritten fixtures",actual_gpu_calls=0))
+
     def test_dual_orchestration_and_joint_opening(self):
         root=self.temporary();groups={};metadata=[]
         for split,count in (("train",60),("development",20)):
@@ -333,8 +406,9 @@ class PositiveRankingTests(unittest.TestCase):
                 tables[g.uid]=np.asarray(values,np.float32)
             return tables[g.uid]+float(model.head[2].bias.detach())
         def score(model,gs,cfg,arm,check=lambda:None):
-            if not gs:return np.empty((0,378),np.float32)
+            if not gs:return production_score(model,gs,cfg,arm,check)
             return np.stack([method.account_logits(torch.from_numpy(reference(model,g,cfg)),record.assignment(g),arm).numpy() for g in gs]).astype(np.float32)
+        production_score = method.score
         with mock.patch.object(run,"baseline_inputs",return_value=(fake_baseline,oldroot,{},{"public_inputs":{"handwritten":True}})), \
              mock.patch.object(run,"baseline_runs",side_effect=lambda:{a:(oldroot,{}, {}) for a in ("S","G_half")}), \
              mock.patch.object(run,"pretrained_archive",return_value={"handwritten":True}), \

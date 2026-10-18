@@ -132,6 +132,8 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, reference: An
 def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None) -> np.ndarray:
     if bound_arm(model) != arm:
         raise ValueError("Scoring candidate differs from restored training identity")
+    if not groups:
+        return np.empty((0, 378), np.float32)
     return (record.score(model, groups, c, check) if arm == "S_pos"
             else h.score(model, groups, c, "G_half", check))
 

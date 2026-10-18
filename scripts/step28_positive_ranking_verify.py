@@ -6,6 +6,7 @@ import gc
 import math
 import os
 import shutil
+import subprocess
 from pathlib import Path
 import sys
 import threading
@@ -21,10 +22,39 @@ from step28_record_replay_numerics import equal_state
 method,record,diag,core,data=run.method,run.record,run.diag,run.core,run.data
 
 
-def native(check, progress, handwritten, out, arm):
+def native_preflight(continuing: bool = False) -> dict:
+    if not continuing:
+        return preflight()
+    # The completed first arm leaves a CUDA context, but no live model/state may survive.
+    gc.collect()
+    torch.cuda.synchronize()
+    torch.cuda.empty_cache()
+    if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
+        raise ValueError("Previous arm still owns live/reserved CUDA tensors")
+    process = psutil.Process()
+    if (os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1
+            or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+            or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+        raise ValueError("Physical GPU0 and pre-import single-thread environment required")
+    gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+                                   "--format=csv,noheader,nounits"], text=True).strip()
+    apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+                                    "--format=csv,noheader,nounits"], text=True).strip()
+    foreign_apps = [line for line in apps.splitlines() if int(line.split(",", 1)[0].strip()) != process.pid]
+    ancestors = {process.pid, *(p.pid for p in process.parents())}
+    jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+            if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+    available = psutil.virtual_memory().available
+    if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or foreign_apps or jobs:
+        raise ValueError(f"Continuation resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+    return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs,
+            "allowed_context_pid": process.pid, "live_allocated_bytes": 0, "reserved_bytes": 0}
+
+
+def native(check, progress, handwritten, out, arm, *, continuing=False):
     method = run.method
     active, control = arm, arm+"_old_rank"
-    resources = preflight()
+    resources = native_preflight(continuing)
     if shutil.disk_usage(out).free < 10*2**30:
         raise ValueError("Insufficient native temporary disk")
     numerics = run.parent.configure_numerics()
@@ -287,7 +317,8 @@ def main():
                         details["active_arm_actual_updates"] = details["actual_updates"]
                         details["actual_updates"] += sum(v["actual_updates"] for v in report["arms"].values())
                     progress(stage, active_arm=arm, **details)
-                value = native(arm_check, arm_progress, handwritten, arm_out, arm)
+                value = native(arm_check, arm_progress, handwritten, arm_out, arm,
+                               continuing=bool(report["arms"]))
                 arm_check()
                 value["charged_seconds"] = math.ceil(time.monotonic()-arm_started)
                 report["arms"][arm] = value

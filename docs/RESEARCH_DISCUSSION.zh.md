@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-18：两项执行缺陷的定向修复
+
+用户指出：“当前版本不宜直接进入原生资格，剩余阻断为两项具体执行缺陷——S_pos 的 A 阶段空缓存评分，以及原生第二臂的自身 CUDA 进程预检冲突”。独立核对实际入口后，在既有实现/300秒CPU许可内完成最小修复和四项受影响核验，累计49/300秒；原数学目标、S/H评分精度、预算/数据许可/正式判据均不变。原五项CPU通过的阶段覆盖不充分，保留原件并在[修复主审](../reports/documentation/20261016/positive_ranking_implementation/review/repair_disposition.zh.txt)明确纠正。原实现外审可见中途裁决，但完整报告/附件尚未交付；未宣称外审关闭、未新上传、未启动GPU或正式训练。
+
 ## 2026-10-18：批准具体双臂实现包外审
 
 用户明确回复：“批准上传该实现包外审”。自包含确认所指为333034字节／75成员、SHA256 81d3757f4acf1d6c9c93f0f921e2b8c38c5cf5b9c85aaebfe051449eebbf9342的[具体实现包](../reports/documentation/20261016/positive_ranking_implementation/review/package.json)，含合同、源码、CPU成功及失败原件和审查背景；不含正式数据/标签、权重、Memory或密码。许可仅外发，不启动GPU或正式训练。使用本地Playwright，第一次会话提交403未被接受；正常页面恢复后从资料库复用同一文件，第二次提交成功。10:11:34建立[唯一实现审查任务](https://chatgpt.com/c/6ad42ab0-aee0-83eb-b53a-81e1302fb008)，选择器GPT-6/Pro第5档，详见[发送回执](../reports/documentation/20261016/positive_ranking_implementation/review/submission.json)。一次上传、一个被接受任务；不把失败写成已开始，不另造重复审查。

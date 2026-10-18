@@ -33,7 +33,8 @@ COMPLETE = "COMPLETE_1152_UPDATES_4_RESTORES_24_DIAGNOSTICS_VALID_BLIND"
 COMPLETION_STATUS = "COMPLETE_S_POS_H_POS_FIXED_AB"
 CPU_TESTS = ("test_rank_reference_and_rejected_mutants", "test_views_history_and_actual_vjp_adamw",
              "test_capture_restore_and_next_update", "test_dual_orchestration_and_joint_opening",
-             "test_saved_comparisons_and_permissions")
+             "test_saved_comparisons_and_permissions", "test_stage_a_empty_cache",
+             "test_native_continuation_preflight")
 fresh, pretrained_archive = single.fresh, single.pretrained_archive
 public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
 baseline_runs, baseline_inputs = baselines.baseline_runs, baselines.baseline_inputs
