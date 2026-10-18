@@ -1,0 +1,124 @@
+
+FILE scripts/step28_record_replay.py
+   80         component = np.flatnonzero(adjacency[min(remaining)]).tolist()
+   81         if not set(component) <= remaining or not all(
+   82                 np.array_equal(adjacency[j], adjacency[component[0]]) for j in component):
+   83             raise ValueError("Positive labels must be disjoint cliques")
+   84         remaining.difference_update(component)
+   85         components.append(component)
+   86     if sorted(map(len, components)) != [2]*8 + [3]*4:
+   87         raise ValueError("Expected eight K2 and four K3")
+   88     rng = random.Random(seed)
+   89     result = slots.copy()
+   90     for component in components:
+   91         records = np.flatnonzero(np.isin(slots, component)).tolist()
+   92         rng.shuffle(records)
+   93         start = 0
+   94         for account in component:
+   95             result[records[start:start+counts[account]]] = account
+   96             start += counts[account]
+   97     if not np.array_equal(np.bincount(result, minlength=28), counts):
+   98         raise ValueError("Record count conservation failed")
+   99     return result
+  100 
+  101 
+  102 def pair_table(model: Any, z: Any, check: Callable = lambda: None) -> Any:
+  103     import torch
+  104     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+  105     parts = []
+  106     for start in range(0, len(left), 512):
+  107         check()
+  108         u, v = z[left[start:start+512]], z[right[start:start+512]]
+  109         parts.append(model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten())
+  110     return torch.cat(parts)
+  111 
+  112 
+  113 def account_logits(table: Any, slots: np.ndarray) -> Any:
+  114     import torch
+  115     n = len(slots)
+  116     if table.shape != (n*(n-1)//2,):
+  117         raise ValueError("Complete off-diagonal record table required")
+  118     left, right = torch.triu_indices(n, n, 1, device=table.device)
+  119     matrix = table.new_zeros((n, n))
+  120     matrix[left, right] = table
+  121     matrix[right, left] = table
+  122     assigned = torch.as_tensor(slots, device=table.device)
+  123     pooling = torch.nn.functional.one_hot(assigned, 28).T.to(table.dtype)
+  124     pooling = pooling / pooling.sum(1, keepdim=True)
+  125     scores = pooling @ matrix @ pooling.T
+  126     i, j = torch.triu_indices(28, 28, 1, device=table.device)
+  127     return scores[i, j]
+  159 def backward_group(model: Any, group: data.Group, c: dict, arm: str,
+  160                    dropout_seed: int, regroup_seed: int, reference: np.ndarray | None,
+  161                    check: Callable = lambda: None, objective_fn: Callable | None = None) -> dict:
+  162     """One live encoder graph; exact chain rule through chunked deterministic head."""
+  163     import torch
+  164     torch.manual_seed(dropout_seed)
+  165     z = record_vectors(model, group, c, check)
+  166     with torch.no_grad():
+  167         values = pair_table(model, z.detach(), check)
+  168     proxy = values.detach().requires_grad_(True)
+  169     loss, log = (objective_fn or objective)(proxy, group, regroup_seed, arm, reference)
+  170     gradient, = torch.autograd.grad(loss, proxy)
+  171     leaf = z.detach().requires_grad_(True)
+  172     left, right = torch.triu_indices(len(z), len(z), 1, device=z.device)
+  173     for start in range(0, len(left), 512):
+  174         check()
+  175         u, v = leaf[left[start:start+512]], leaf[right[start:start+512]]
+  176         block = model.head(torch.cat(((u-v).abs(), u*v), dim=1)).flatten()
+  177         block.backward(gradient[start:start+512])
+  178     if leaf.grad is None or not torch.isfinite(leaf.grad).all():
+  179         raise ValueError("Missing or nonfinite explicit dJ/dZ")
+  180     z.backward(leaf.grad)
+  181     log["record_gradient_norm"] = float(leaf.grad.norm())
+  182     return log
+  183 
+
+FILE scripts/step28_continual_population.py
+    1 """Trainable item/account pooling and symmetric pure-text pair classification."""
+    2 from __future__ import annotations
+    3 
+    4 import contextlib
+    5 import hashlib
+    6 from pathlib import Path
+    7 from typing import Any, Callable
+    8 
+    9 import numpy as np
+   10 
+   11 import step28_continual_population_data as data
+   12 
+   13 
+   14 def build_model(encoder: Any, dimension: int, hidden: int = 128) -> Any:
+   15     import torch
+   16 
+   17     class PairModel(torch.nn.Module):
+   18         def __init__(self) -> None:
+   19             super().__init__()
+   20             self.encoder = encoder
+   21             self.head = torch.nn.Sequential(torch.nn.Linear(dimension * 2, hidden),
+   22                                             torch.nn.ReLU(), torch.nn.Linear(hidden, 1))
+   23 
+   24         def pair_logits(self, accounts: Any) -> Any:
+   25             left, right = torch.triu_indices(len(accounts), len(accounts), 1, device=accounts.device)
+   26             u, v = accounts[left], accounts[right]
+   27             return self.head(torch.cat(((u - v).abs(), u * v), dim=1)).flatten()
+   28 
+   29     return PairModel()
+   30 
+   31 
+
+FILE reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt
+    1 S_pos/H_pos静态外审：独立主审与实施范围建议
+    2 2026-10-16，Asia/Shanghai。原提案、原外审及既有结果均冻结。本文件记录主执行者的独立判断；候选取舍尚待用户确认，外审的旧“仅静态许可”按后续明确决定解释。
+    3 
+    4 一、裁决
+    5 建议值得做一次有终点的S_pos单臂开发检验，但不应把它升格为已找到创新机制或必胜方案。H_pos有次级信息价值，不是回答“更换rank能否使完整S同时改善A/B”的必要臂；本轮推荐不做H_pos。原双臂不是科学错误，若用户更看重H的已有旧A优势能否与新rank结合，可前瞻确认保留双臂并支付相应资格、训练及选择成本。不能先看S_pos结果再在本合同中自动追加H_pos。
+    6 用户最新要求“外审已结束，把 S_pos/H_pos 的审查结果完整同步回来，仔细分析并独立主审，详细汇报这个方案是否值得做、两臂是否都有必要，以及需要修改哪些地方。确认后开始具体实现”。回收、分析、主审和具体实施范围准备可直接完成；单/双臂是本轮新的实质范围选择，科研纪律第2节要求确认。仅暂停依赖该选择的实施/科研计算，不重问已完成的回收或同步许可。
+    7 
+    8 二、完整回收与证据边界
+    9 从原会话https://chatgpt.com/c/6ad20bfc-173c-83ed-81c1-59ea049663f4确认最终回复已完成，回收完整中文正文、阅读范围及388411字节/47成员ZIP，SHA256 d811067d0eacf7613d3bd1bc597e9bce6c70aef989dab2ac7224d24d1d5033c9；独立外部TSV覆盖47成员，内部manifest覆盖46载荷，成员唯一、CRC、逐项大小/SHA及解包字节均一致。内嵌原ZIP及22输入成员、两份H_cons补充原件与本地送审原件完全相同。必要保管/去重及同步身份见recovery.json、sync.json。
+   10 网页TSV预览先打开导出菜单，选择TSV后亦未触发下载事件，两次等待超时；核对实际页面后通过原资源卡“下载文件”成功取得原TSV。没有补发消息、重复审查或伪造清单。ZIP原生下载一次成功。
+   11 读完external/review.zh.md全部正文、findings、reading_scope、执行账、手写核验源码和相关输入/保存结果；从本仓库核对base.objectives、ranking.hard_candidates/objectives、record.objective/backward_group/update、g_half目标/评分及实际core.make_optimizer。原生qualification只继承已关闭适用结论，本轮没有重跑科研脚本、载模、解析正式标签或新统计。
+   12 外审手写一次exit0、无修复重试；Python3.13.5/NumPy2.3.5，内部0.103887858秒、外层1.114774988秒，查询/图边有限差分误差5.560268912e-11/1.542453448e-11；预执行输入/源码身份相符。四种故意错误表达式按预期被拒绝，不是四次失败训练。其分数坐标证据不证明项目BGE、VJP、AdamW或新生产实现通过，也不计项目CPU/GPU账。
+   13 本地52份已开放S/H保存对照按既有baseline_sources.json重新机械核对，52份2940294字节及清单SHA b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3均一致。未重算指标/区间，未重开标签或Memory；未来实际比较前仍需核对部署原件和新旧日程/UID/初始化等配对条件。外审没收到这52份原件是其阅读边界，不是本项目已丢失比较证据。
+   14 

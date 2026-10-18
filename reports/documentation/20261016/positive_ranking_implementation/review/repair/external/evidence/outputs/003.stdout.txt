@@ -1,0 +1,410 @@
+
+FILE changes.patch
+    1 diff --git a/scripts/step28_positive_ranking.py b/scripts/step28_positive_ranking.py
+    2 index 53036cfa..3414c242 100644
+    3 --- a/scripts/step28_positive_ranking.py
+    4 +++ b/scripts/step28_positive_ranking.py
+    5 @@ -132,6 +132,8 @@ def update(model: Any, optimizer: Any, current: Any, history: Any, reference: An
+    6  def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None) -> np.ndarray:
+    7      if bound_arm(model) != arm:
+    8          raise ValueError("Scoring candidate differs from restored training identity")
+    9 +    if not groups:
+   10 +        return np.empty((0, 378), np.float32)
+   11      return (record.score(model, groups, c, check) if arm == "S_pos"
+   12              else h.score(model, groups, c, "G_half", check))
+   13  
+   14 diff --git a/scripts/step28_positive_ranking_run.py b/scripts/step28_positive_ranking_run.py
+   15 index cf81c781..8f394961 100644
+   16 --- a/scripts/step28_positive_ranking_run.py
+   17 +++ b/scripts/step28_positive_ranking_run.py
+   18 @@ -33,7 +33,8 @@ COMPLETE = "COMPLETE_1152_UPDATES_4_RESTORES_24_DIAGNOSTICS_VALID_BLIND"
+   19  COMPLETION_STATUS = "COMPLETE_S_POS_H_POS_FIXED_AB"
+   20  CPU_TESTS = ("test_rank_reference_and_rejected_mutants", "test_views_history_and_actual_vjp_adamw",
+   21               "test_capture_restore_and_next_update", "test_dual_orchestration_and_joint_opening",
+   22 -             "test_saved_comparisons_and_permissions")
+   23 +             "test_saved_comparisons_and_permissions", "test_stage_a_empty_cache",
+   24 +             "test_native_continuation_preflight")
+   25  fresh, pretrained_archive = single.fresh, single.pretrained_archive
+   26  public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
+   27  baseline_runs, baseline_inputs = baselines.baseline_runs, baselines.baseline_inputs
+   28 diff --git a/scripts/step28_positive_ranking_verify.py b/scripts/step28_positive_ranking_verify.py
+   29 index 78693961..402e91c4 100644
+   30 --- a/scripts/step28_positive_ranking_verify.py
+   31 +++ b/scripts/step28_positive_ranking_verify.py
+   32 @@ -6,6 +6,7 @@ import gc
+   33  import math
+   34  import os
+   35  import shutil
+   36 +import subprocess
+   37  from pathlib import Path
+   38  import sys
+   39  import threading
+   40 @@ -21,10 +22,39 @@ from step28_record_replay_numerics import equal_state
+   41  method,record,diag,core,data=run.method,run.record,run.diag,run.core,run.data
+   42  
+   43  
+   44 -def native(check, progress, handwritten, out, arm):
+   45 +def native_preflight(continuing: bool = False) -> dict:
+   46 +    if not continuing:
+   47 +        return preflight()
+   48 +    # The completed first arm leaves a CUDA context, but no live model/state may survive.
+   49 +    gc.collect()
+   50 +    torch.cuda.synchronize()
+   51 +    torch.cuda.empty_cache()
+   52 +    if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
+   53 +        raise ValueError("Previous arm still owns live/reserved CUDA tensors")
+   54 +    process = psutil.Process()
+   55 +    if (os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1
+   56 +            or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+   57 +            or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+   58 +        raise ValueError("Physical GPU0 and pre-import single-thread environment required")
+   59 +    gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+   60 +                                   "--format=csv,noheader,nounits"], text=True).strip()
+   61 +    apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+   62 +                                    "--format=csv,noheader,nounits"], text=True).strip()
+   63 +    foreign_apps = [line for line in apps.splitlines() if int(line.split(",", 1)[0].strip()) != process.pid]
+   64 +    ancestors = {process.pid, *(p.pid for p in process.parents())}
+   65 +    jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+   66 +            if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+   67 +    available = psutil.virtual_memory().available
+   68 +    if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or foreign_apps or jobs:
+   69 +        raise ValueError(f"Continuation resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+   70 +    return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs,
+   71 +            "allowed_context_pid": process.pid, "live_allocated_bytes": 0, "reserved_bytes": 0}
+   72 +
+   73 +
+   74 +def native(check, progress, handwritten, out, arm, *, continuing=False):
+   75      method = run.method
+   76      active, control = arm, arm+"_old_rank"
+   77 -    resources = preflight()
+   78 +    resources = native_preflight(continuing)
+   79      if shutil.disk_usage(out).free < 10*2**30:
+   80          raise ValueError("Insufficient native temporary disk")
+   81      numerics = run.parent.configure_numerics()
+   82 @@ -287,7 +317,8 @@ def main():
+   83                          details["active_arm_actual_updates"] = details["actual_updates"]
+   84                          details["actual_updates"] += sum(v["actual_updates"] for v in report["arms"].values())
+   85                      progress(stage, active_arm=arm, **details)
+   86 -                value = native(arm_check, arm_progress, handwritten, arm_out, arm)
+   87 +                value = native(arm_check, arm_progress, handwritten, arm_out, arm,
+   88 +                               continuing=bool(report["arms"]))
+   89                  arm_check()
+   90                  value["charged_seconds"] = math.ceil(time.monotonic()-arm_started)
+   91                  report["arms"][arm] = value
+   92 diff --git a/tests/test_step28_positive_ranking.py b/tests/test_step28_positive_ranking.py
+   93 index 74b3bc40..094828d0 100644
+   94 --- a/tests/test_step28_positive_ranking.py
+   95 +++ b/tests/test_step28_positive_ranking.py
+   96 @@ -279,6 +279,79 @@ class PositiveRankingTests(unittest.TestCase):
+   97                  actual_capture_populations=[48,6,40],teacher_both_views=True,full_inference_restores=True,own_identity_rejections=True)
+   98          self.evidence("capture_restore",evidence)
+   99  
+  100 +    def test_stage_a_empty_cache(self):
+  101 +        c=run.config();out=self.temporary();evidence={}
+  102 +        fit=[handmade_group(f"A_fit{i}") for i in range(48)]
+  103 +        valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"blind{i}") for i in range(40)]]
+  104 +        for arm in method.ARMS:
+  105 +            model=tiny_model();method.bind(model,method.metadata(arm));optimizer=core.make_optimizer(model,c)
+  106 +            method.update(model,optimizer,fit[0],None,None,c,arm,1,1)
+  107 +            for value in optimizer.state.values():value["step"].fill_(48)
+  108 +            saved,rng,modes=state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+  109 +            empty=method.score(model,[],c,arm)
+  110 +            self.assertEqual((empty.shape,empty.dtype),((0,378),np.dtype(np.float32)))
+  111 +            with self.assertRaisesRegex(ValueError,"Scoring candidate differs"):
+  112 +                method.score(model,[],c,"H_pos" if arm=="S_pos" else "S_pos")
+  113 +            capture=method.capture(model,optimizer,fit,None,valid,c,arm,1,1,out,"A_"+arm)
+  114 +            row=data.read_json(out/capture["path"]);run.validate_diagnostic(row,arm)
+  115 +            self.assertEqual((row["stage"],row["stage_step"],row["adam_step"]),(1,48,48))
+  116 +            self.assertEqual((row["cache_ids"],row["cache_domains"],row["teacher_errors"]),([],[],[]))
+  117 +            run.previous.array(out,row["cache"],(0,3),np.float64)
+  118 +            run.previous.array(out,row["fit"],(48,3),np.float64)
+  119 +            run.previous.array(out,row["valid_blind"],(40,378),np.float32)
+  120 +            self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
+  121 +            self.assertEqual((rng,modes),(diag.rng_state(),[m.training for m in model.modules()]))
+  122 +            # Reproduce the removed S dispatch failure without altering the frozen scorer.
+  123 +            with diag.neutral(model),self.assertRaisesRegex(ValueError,"need at least one array"):
+  124 +                record.score(model,[],c)
+  125 +            evidence[arm]=dict(actual_optimizer_calls=1,synthetic_clock=48,
+  126 +                capture_populations=[48,0,40],empty_score_shape=[0,378],cache_metric_shape=[0,3],
+  127 +                state_unchanged=True,wrong_arm_rejected=True,old_empty_dispatch_failure_reproduced=True)
+  128 +        self.evidence("stage_a_empty_cache",evidence)
+  129 +
+  130 +    def test_native_continuation_preflight(self):
+  131 +        import step28_positive_ranking_verify as verify
+  132 +        from types import SimpleNamespace
+  133 +        process=mock.Mock(pid=413);process.cpu_affinity.return_value=[0];process.parents.return_value=[]
+  134 +        sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0}
+  135 +        def query(args,**kwargs):
+  136 +            return (sample["apps"] if "--query-compute-apps=pid,process_name,used_memory" in args
+  137 +                    else f"0, handwritten-GPU, 32768, {sample['free']}, 1024")
+  138 +        env={"CUDA_VISIBLE_DEVICES":"0","OMP_NUM_THREADS":"1","MKL_NUM_THREADS":"1",
+  139 +             "OPENBLAS_NUM_THREADS":"1","TOKENIZERS_PARALLELISM":"false"}
+  140 +        with mock.patch.dict(os.environ,env),mock.patch.object(verify.psutil,"Process",return_value=process), \
+  141 +             mock.patch.object(verify.psutil,"process_iter",side_effect=lambda *a:sample["jobs"]), \
+  142 +             mock.patch.object(verify.psutil,"virtual_memory",side_effect=lambda:SimpleNamespace(available=sample["host"])), \
+  143 +             mock.patch.object(verify.subprocess,"check_output",side_effect=query), \
+  144 +             mock.patch.object(verify.gc,"collect") as collect, \
+  145 +             mock.patch.object(verify.torch.cuda,"synchronize"),mock.patch.object(verify.torch.cuda,"empty_cache") as empty, \
+  146 +             mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:sample["allocated"]), \
+  147 +             mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:sample["reserved"]):
+  148 +            first=verify.native_preflight(False)
+  149 +            self.assertEqual(first["compute_apps"],"");empty.assert_not_called()
+  150 +            sample["apps"]="413, python, 512"
+  151 +            with self.assertRaisesRegex(ValueError,"Resource gate failed"):
+  152 +                verify.native_preflight(False)
+  153 +            second=verify.native_preflight(True)
+  154 +            self.assertEqual(second["allowed_context_pid"],413);collect.assert_called_once();empty.assert_called_once()
+  155 +            rejected=[]
+  156 +            for key,value in (("apps","413, python, 512\n414, python, 1"),("free",30*1024-1),
+  157 +                    ("host",72*2**30-1),("allocated",4),("reserved",4),
+  158 +                    ("jobs",[SimpleNamespace(pid=415,info={"pid":415,"username":"same-user","cmdline":["step28_other.py"]})])):
+  159 +                previous=sample[key];sample[key]=value
+  160 +                with self.assertRaises(ValueError):verify.native_preflight(True)
+  161 +                sample[key]=previous;rejected.append(key)
+  162 +            # Reach the real native entry's resource call, stopping before model loading/GPU work.
+  163 +            class StopBeforeGPU(Exception):pass
+  164 +            with mock.patch.object(verify,"native_preflight",side_effect=StopBeforeGPU) as entry:
+  165 +                for continuing,arm in ((False,"S_pos"),(True,"H_pos")):
+  166 +                    with self.assertRaises(StopBeforeGPU):
+  167 +                        verify.native(lambda:None,lambda *a,**k:None,None,None,arm,continuing=continuing)
+  168 +                self.assertEqual(entry.call_args_list,[mock.call(False),mock.call(True)])
+  169 +        self.evidence("native_continuation_preflight",dict(first_strict=True,own_context_only_second=True,
+  170 +            rejected_cases=rejected,resource_thresholds_unchanged=True,real_native_entry_checked=True,
+  171 +            cuda_and_process_state="mocked handwritten fixtures",actual_gpu_calls=0))
+  172 +
+  173      def test_dual_orchestration_and_joint_opening(self):
+  174          root=self.temporary();groups={};metadata=[]
+  175          for split,count in (("train",60),("development",20)):
+  176 @@ -333,8 +406,9 @@ class PositiveRankingTests(unittest.TestCase):
+  177                  tables[g.uid]=np.asarray(values,np.float32)
+  178              return tables[g.uid]+float(model.head[2].bias.detach())
+  179          def score(model,gs,cfg,arm,check=lambda:None):
+  180 -            if not gs:return np.empty((0,378),np.float32)
+  181 +            if not gs:return production_score(model,gs,cfg,arm,check)
+  182              return np.stack([method.account_logits(torch.from_numpy(reference(model,g,cfg)),record.assignment(g),arm).numpy() for g in gs]).astype(np.float32)
+  183 +        production_score = method.score
+  184          with mock.patch.object(run,"baseline_inputs",return_value=(fake_baseline,oldroot,{},{"public_inputs":{"handwritten":True}})), \
+  185               mock.patch.object(run,"baseline_runs",side_effect=lambda:{a:(oldroot,{}, {}) for a in ("S","G_half")}), \
+  186               mock.patch.object(run,"pretrained_archive",return_value={"handwritten":True}), \
+
+FILE docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md
+    1 # S_pos / H_pos 固定逐正例排序合同
+    2 
+    3 2026-10-18实施稿。原方案、静态外审及独立主审见[设计提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)、[原始外审](../reports/documentation/20261016/s_improvement/review/external/review.zh.md)和[主审处置](../reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt)。本稿承接用户明确选择两臂，旧“建议单臂／待选择”只代表此前阶段。
+    4 
+    5 ## 1. 本次批准与待批准阶段
+    6 
+    7 用户在自包含的[实现范围](../reports/documentation/20261016/s_improvement/implementation_scope.zh.txt)确认问题下回复：“把两个都实现了，对比看看效果”。据此实现 S_pos、H_pos 两个固定候选，批准Linux既有py310手写CPU核验累计≤300秒、单线程、峰值RSS≤2GiB、证据≤64MiB，导入、失败与明确修复全部计费。仅手写分数／合法群／轻量模型，不读取正式文本或标签，不加载BGE、旧Memory，不用GPU。CPU范围内修复明确代码或夹具错误，保留失败原件及累计费用，不临场放宽精度或换科学问题。
+    8 
+    9 本稿后文将原生资格、正式训练及评价写具体以供实施审查；这些阶段的执行预算与数据许可仍未批准。代码以单独、对应当前源码和本合同的执行许可及已关闭实现外审／主审作为原生入口条件；正式入口再检查两臂原生证据及资源投影。已有CPU许可不能充当原生或正式许可。具体实现送审包准备好后按其内容确认外发，原静态包许可不自动扩展。新材料仅本地Git。
+   10 
+   11 ## 2. 问题、对手与固定目标
+   12 
+   13 主要问题：完整S仅替换rank后，B末A/B两域MAP是否均超过完整S。H_pos进一步检验同一替换在原H评分上表现如何，及其相对S_pos的系统差异。H在文件中的历史键为G_half。双臂不是新候选搜索，不加JS、其他教师、温度／权重网格或种子。S/H旧权重已删，本轮各从原预训练、规定head和空AdamW独立开始；对照只用既有52份开放保存结果。来源由现有baseline_sources.json SHA256 b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3固定；不重训旧S/H、不载旧Memory。
+   14 
+   15 该rank属于已知RINCE Log_out Positives目标的任务适配。原rank是合法的多正例外均值监督对比式，不定性为实现错误。完整S已有BCE及逐正例hard；新式改变梯度分配和有效相对权重，不等同于首次监督弱正例、不只删除正例竞争，不预宣称根因已证或论文创新。
+   16 
+   17 每群28账号、378无向边；固定8个K2、4个K3，每查询27候选、1或2正例。对每查询q：
+   18 
+   19 `L_pos(q) = mean_{p∈P(q)} logsumexp([0, {z_n-z_p : n∈N(q)}])`，再对28查询平均。
+   20 
+   21 排除自身、只用已知负例，另一正例不入负集；无额外÷27／378。每视图`B_pos=BCE+rank_pos+0.5hard`，hard仍各视图自己选top5已知负例。`Bbar=(B_pos(A0)+B_pos(A1))/2`；`J_A=Bbar_current`；`J_B=Bbar_current+0.1Bbar_history+0.5D0`。current/history、A0/A1四处均替换rank；D0只取本臂自然A0出生表，不能误乘成0.05或另加旧rank。日志保存两视图BCE/rank_pos/rank_used/hard/total、各分支监督、D0及实际加权贡献。
+   22 
+   23 S_pos沿用原record.account_logits的FP32矩阵均值路径；H_pos沿用原H的0.5mean+0.5logavgexp、tau1、FP64池化及一次FP32输出。两者新rank都在实际FP32账号分数上用差分logsumexp；FP64仅独立参考。encoder、head、record VJP、512块、AdamW、学习率、权重衰减、clip1、ABC随机键及各臂自己的Memory沿用原S/H实现。不改冻结旧源码或默认函数。
+   24 
+   25 ## 3. 必要增量证据
+   26 
+   27 固定FP64值／解析梯度atol=rtol=1e-12；FP32局部值／逐坐标梯度、完整图与实际VJP的分项、逐张量梯度、裁剪后梯度、参数及AdamW状态atol2e-6、rtol2e-5。FP64中心差分step1e-5、atol2e-8。原H池化精度条件继续适用，不由新rank容差放宽。同状态保存恢复、诊断中性及下一更新逐元素相等；不同数值算法不强求逐位。极端±1000检验有限稳定及实际浮点输入参考一致性，不要求下溢导数非零；m=1实数等价不强求两表达式FP32逐位相同。
+   28 
+   29 手写独立标量／解析参考检查正负集、先正例再查询平均、无向边两查询贡献、单正例、双正例不均匀／相等、A0/A1同K pullback；拒绝仅减log(m)、漏第二正例、另一正例当负例、额外平均和current改而history仍旧。实际轻量更新检查current及扣除current后的history梯度，完整图与proxy→head VJP→encoder→clip→AdamW一致；比较共同非空AdamW状态下旧／新目标实际作用，不靠总值不同或PASS标记替代。
+   30 
+   31 两臂评分／训练身份贯穿更新、Memory、完整／推理保存恢复和诊断。真实手写48 fit／6 history／40盲valid诊断与下一更新验证中性；另用明确标记的编排夹具检查两次独立初始化、各自A→B、1152次调度、4端点、24诊断和共同valid门。编排夹具的模拟更新计为0次真实优化，不能当训练证据；实际梯度／更新由独立轻量测试提供。评价用手写保存矩阵核对四比较、三角色、遗忘方向、分组和“次级成功不能覆盖主要失败”。不重跑全仓、无新通用框架。
+   32 
+   33 ## 4. 原生资格的具体待执行范围
+   34 
+   35 两臂顺序运行，各最多600秒、6次optimizer调用，合计1200秒／12调用；GPU reserved28GiB、RSS64GiB，临时载荷峰值10GiB、证据128MiB，单CPU线程。导入及装载计入总账，逐臂计时从本臂载模前起；失败即停，无自动第7调用、第二attempt或替代夹具。开始前独立目录、进程归属和资源门检查，原BGE归档按既有12文件身份；不新建环境。
+   36 
+   37 固定handmade_group("native_current",8,254)及native_history：28账号各8记录、每通道256 token，手写文本固定，不从正式样本选。每臂独立预训练／空AdamW。调用1用该评分的旧rank warm-up形成真实共同非空状态；调用2/3分别从共同状态在A step2作旧／新rank更新。调用4/5用共同参数／矩，明确把Adam计数置336作为合成B epoch1夹具，在B step49作同一current+history旧／新rank更新；参考表为eval历史记录表加固定`2sin(i*.31+j*.71)`，不冒称历史真训练。调用6从调用5前状态完整恢复，经实际48/6/40诊断后重演调用5。
+   38 
+   39 记录current和history独立preclip梯度、encoder/head裁剪后梯度、实际参数、Adam矩及计数差异；实际表上的A0/A1逐坐标rank精度需与独立参考一致。总损失可因舍入相等，不设严格不等硬门。两种恢复评分和下一更新要求逐元素一致，合成clock不算337实际调用。临时common、paired、inference只在成功或不可复用失败已保全证据后按精确路径清理，先留身份；不保留无后续作用的大载荷。
+   40 
+   41 原生实测投影沿原H公式逐臂训练288(t_A+t_B)、forward1446v+36h、装载及双端点IO、1800秒未测余量再乘1.25；双臂时间相加。输出峰值按1.1×(较大完整状态+两臂各两推理状态+2GiB)；必须≤16小时／16GiB才具备正式前提。实测不能替代用户执行许可。
+   42 
+   43 ## 5. 正式训练和数据的具体待批准范围
+   44 
+   45 固定s0、A→B，每臂576更新、864梯度群呈现、2端点、12诊断capture、9项严格判读；合计1152／1728／4／24／18。修正原静态提案误写“每臂24诊断”的计数，原提案字节不改。原H合同的数据、划分、调度、校准和Memory边界引用[原H合同](SELLER_ALIAS_G_HALF.zh.md)；本合同对双臂与新rank的明确条款优先。GPU正式总墙钟57600秒、产物峰值16GiB、GPU reserved28GiB、RSS64GiB，所有失败／装载／保存／评价计账。
+   46 
+   47 仅原7个正式文件：既有AB所需的ABC合表及训练／valid监督和对应公开元数据。先按metadata排除C，再构造Group／分词／保留内容和标签对齐；合表C只作必要筛选，不学习、评价或保留C内容。train监督总共一次解析后共享给两臂；每臂只能学习当前域和自身存活Memory。40群valid在训练／各轮capture／保存恢复中只产生盲分数；两臂全部288×2更新、来源、调度、4端点、各自Memory/出生表、两种恢复、24诊断都通过后，唯一一次开放valid监督。任一臂失败不自动只开另一臂。test、owners、Audit真值、private_custody及旧Memory访问为0；不重解析旧标签，不据中途／末端结果改方法、选轮、补种子或继续搜索。新启动独立目录、已有监听不重复；正式失败无自动重跑。
+   48 
+   49 ## 6. 比较、解释和交付
+   50 
+   51 主要比较S_pos−S的B末raw逐查询MAP，A/B各20群。用同一PCG64(20260930)的(5000,2,20)整群有放回抽样，直接成对差值条件95%百分位区间，两域下界都严格>0才通过主要门。固定次级H_pos−S、H_pos−H、H_pos−S_pos，不替换主要失败。三种概率角色raw/stage-cal/first-cal及全部22指标、混淆计数、A获得／B终点、B−A原始变化、方向一致的遗忘差值全部保存；Brier/log-loss低者好，遗忘方向与排序指标相反。分类分母零记N/A，不按臂删群或nanmean。
+   52 
+   53 从同一次valid开放派生每查询正例数，保存40×28的1/2计数；对新旧保存raw查询AP按同一行序分组，报告B末单／双正例MAP的四个比较及共享整群抽样区间。这是预定描述性诊断，不是新成功门，不能证明收益只来自K3或孤立机制因果。原有24序列过拟合／gap诊断完整报告，严格未触发不能等同没有过拟合。
+   54 
+   55 这是重复使用的开发集、一个种子及A→B顺序；条件区间不覆盖重训和选择不确定性。不因某臂赢而称原创、普遍优越或最终确认。完成后回传必要小原件，Linux独立分析、具体结果包外审和独立主审，保留有效负结果与旧账。模型保管依照科研纪律和实际后续用途，不把旧H_cons删除许可扩大至未来新权重。
+
+FILE schema/step28_positive_ranking_policy.json
+    1 {
+    2   "study": "fixed_positive_rank_S_and_H",
+    3   "methods": [
+    4     "S_pos",
+    5     "H_pos"
+    6   ],
+    7   "seed": "s0",
+    8   "domains": "AB",
+    9   "main_rng_order": "ABC",
+   10   "physical_updates": 1152,
+   11   "gradient_group_presentations": 1728,
+   12   "physical_stage_states": 4,
+   13   "epoch_diagnostic_points": 24,
+   14   "history_supervision": 0.1,
+   15   "teacher_weight": 0.5,
+   16   "memory_maximum_bytes": 1048576,
+   17   "cpu_verification": {
+   18     "maximum_seconds": 300,
+   19     "maximum_rss_bytes": 2147483648,
+   20     "maximum_evidence_bytes": 67108864,
+   21     "prior_charged_seconds": 0
+   22   },
+   23   "native_verification": {
+   24     "maximum_seconds": 1200,
+   25     "maximum_rss_bytes": 68719476736,
+   26     "maximum_work_bytes": 10737418240,
+   27     "maximum_evidence_bytes": 134217728,
+   28     "actual_updates": 12,
+   29     "prior_charged_seconds": 0,
+   30     "per_arm_maximum_seconds": 600
+   31   },
+   32   "runtime": {
+   33     "maximum_gpu_stage_seconds": 57600,
+   34     "maximum_output_bytes": 17179869184,
+   35     "maximum_cuda_reserved_bytes": 30064771072,
+   36     "maximum_rss_bytes": 68719476736,
+   37     "minimum_free_gpu_bytes": 32212254720,
+   38     "minimum_free_host_bytes": 77309411328,
+   39     "torch_cpu_threads": 1
+   40   },
+   41   "supervision": {
+   42     "train_parse_attempts": 1,
+   43     "valid_parse_attempts": 1,
+   44     "test_access": false,
+   45     "owners_access": false,
+   46     "automatic_retry": false
+   47   },
+   48   "evaluation": {
+   49     "bootstrap_replicates": 5000,
+   50     "bootstrap_seed": 20260930,
+   51     "comparisons": [
+   52       [
+   53         "S_pos",
+   54         "S"
+   55       ],
+   56       [
+   57         "H_pos",
+   58         "S"
+   59       ],
+   60       [
+   61         "H_pos",
+   62         "G_half"
+   63       ],
+   64       [
+   65         "H_pos",
+   66         "S_pos"
+   67       ]
+   68     ],
+   69     "primary_metric": "map",
+   70     "primary_role": "raw",
+   71     "success": "B_end_S_pos_minus_S_each_AB_MAP_CI_lower_strictly_positive"
+   72   },
+   73   "candidates": {
+   74     "S_pos": {
+   75       "pooling": {
+   76         "arm": "S",
+   77         "pooling": "complete_record_mean",
+   78         "record_order": "canonical_offdiagonal_upper_v1",
+   79         "output_dtype": "float32",
+   80         "numerics": "original_FP32_matrix_mean"
+   81       },
+   82       "training": {
+   83         "arm": "S_pos",
+   84         "rank": "mean_positive_logsumexp_zero_and_all_negative_differences",
+   85         "temperature": 1.0,
+   86         "queries": 28,
+   87         "candidates": 27,
+   88         "positive_counts": [
+   89           1,
+   90           2
+   91         ],
+   92         "reduction": "mean_positive_then_mean_query",
+   93         "precision": "actual_FP32_logits_FP32_rank",
+   94         "current_supervision": 1.0,
+   95         "history_supervision": 0.1,
+   96         "teacher_A0": 0.5,
+   97         "hard_weight": 0.5,
+   98         "optimizer": "AdamW",
+   99         "rng_order": "ABC"
+  100       }
+  101     },
+  102     "H_pos": {
+  103       "pooling": {
+  104         "arm": "G_half",
+  105         "mean_weight": 0.5,
+  106         "logavgexp_weight": 0.5,
+  107         "tau": 1,
+  108         "record_order": "canonical_offdiagonal_upper_v1",
+  109         "output_dtype": "float32",
+  110         "numerics": {
+  111           "pooling": "float64_then_one_float32_cast",
+  112           "encoder_forward": "bfloat16",
+  113           "head_parameters_gradients_adam": "float32",
+  114           "tf32": false,
+  115           "deterministic_algorithms": true
+  116         }
+  117       },
+  118       "training": {
+  119         "arm": "H_pos",
+  120         "rank": "mean_positive_logsumexp_zero_and_all_negative_differences",
+  121         "temperature": 1.0,
+  122         "queries": 28,
+  123         "candidates": 27,
+  124         "positive_counts": [
+  125           1,
+  126           2
+  127         ],
+  128         "reduction": "mean_positive_then_mean_query",
+  129         "precision": "actual_FP32_logits_FP32_rank",
+  130         "current_supervision": 1.0,
+  131         "history_supervision": 0.1,
+  132         "teacher_A0": 0.5,
+  133         "hard_weight": 0.5,
+  134         "optimizer": "AdamW",
+  135         "rng_order": "ABC"
+  136       }
+  137     }
+  138   }
+  139 }
+
+FILE reports/documentation/20261016/positive_ranking_implementation/authorization.json
+    1 {
+    2   "status": "APPROVED_DUAL_IMPLEMENTATION_CPU",
+    3   "recorded_date": "2026-10-18",
+    4   "user_quote": "把两个都实现了，对比看看效果",
+    5   "question_context": "候选确认问题明确：前两项均仅批准对应代码实现及Linux既有py310手写CPU核验累计≤300秒；不读取正式文本/标签、不加载BGE或旧Memory，GPU资格和正式训练另按具体合同批准。",
+    6   "scope_source": "reports/documentation/20261016/s_improvement/implementation_scope.zh.txt",
+    7   "methods": ["S_pos", "H_pos"],
+    8   "cpu_seconds": 300,
+    9   "cpu_threads": 1,
+   10   "maximum_rss_bytes": 2147483648,
+   11   "maximum_evidence_bytes": 67108864,
+   12   "formal_inputs": false,
+   13   "formal_labels": false,
+   14   "bge_loading": false,
+   15   "old_memory_loading": false,
+   16   "gpu_execution": false,
+   17   "formal_training": false,
+   18   "new_package_external_transmission": false,
+   19   "within_budget_explicit_code_or_fixture_repairs": true,
+   20   "historical_failed_attempts_must_be_retained": true,
+   21   "git_delivery": "local_only"
+   22 }

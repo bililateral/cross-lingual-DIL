@@ -1,0 +1,142 @@
+
+FILE scripts/step28_balanced_pooling_run.py
+  355 def fresh(c):
+  356     random.seed(c["initialization_seed"])
+  357     np.random.seed(c["initialization_seed"])
+  358     model = record.load_model(c)
+  359     optimizer = core.make_optimizer(model, c)
+  360     identity = {"model": core.state_digest(model.state_dict()), "adam": core.state_digest(optimizer.state_dict())}
+  361     return model, optimizer, identity
+  362 
+  363 
+  364 def verify_archive(archive: dict, c: dict) -> dict:
+  365     expected = c["models"]["split_rank"]
+  366     if not isinstance(archive, dict) or any(archive.get(k) != expected[k]
+  367             for k in ("file_count", "total_size_bytes", "content_sha256")):
+  368         raise ValueError("Pinned BGE archive differs or is missing")
+  369     return archive
+  370 
+  371 
+  372 def pretrained_archive(c: dict) -> dict:
+  373     return verify_archive(core.model_files(base.model_config(c, "split_rank")), c)
+  374 
+  375 
+  376 def train(job, budget):
+  377     import torch
+  378     root = job/"run"
+  379     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics", "sources"):
+  380         (root/sub).mkdir(parents=True)
+  381     c = config()
+  382     archive = pretrained_archive(c)
+  383     groups, metadata, checked = public_inputs(c)
+  384     _, split = partition(groups, metadata, c)
+  385     data.write_json(root/"partition.json", split)
+  386     manifest = {"status": "RUNNING", "source_files": sources(), "public_inputs": checked, "pretrained_archive": archive,
+  387         "partition": data.record(root/"partition.json", root), "points": {}, "training": {}, "diagnostics": {},
+  388         "initials": {}, "starts": {}, "physical_updates": 0, "gradient_group_presentations": 0}
+  389     data.write_json(root/"startup.json", manifest)
+  390     groups["train"] = previous.parse_once(job, groups["train"], c, "train",
+  391         loader=lambda gs, cfg, s: attach_labels(gs, cfg, s, metadata))
+  392     selected, after = partition(groups, metadata, c)
+  393     if after != split:
+  394         raise ValueError("Labels changed partition")
+  395     def domain(role, d):
+  396         return [g for g,r in zip(selected[role], split[role], strict=True) if r["domain"] == d]
+  397     valid = groups["development"]
+  398     for arm in method.ARMS:
+  399         c["pooling_stats"] = {}
+
+FILE scripts/step28_bge_continual.py
+   31 def configure_numerics() -> dict:
+   32     """Apply the historical LOGIT runtime before model work; read back actual flags."""
+   33     import torch
+   34     if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
+   35         raise RuntimeError("Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8")
+   36     torch.use_deterministic_algorithms(True)
+   37     torch.backends.cuda.matmul.allow_tf32 = False
+   38     torch.backends.cudnn.allow_tf32 = False
+   39     torch.backends.cudnn.benchmark = False
+   40     return {
+   41         "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+   42         "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+   43         "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+   44         "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+   45         "cudnn_benchmark": torch.backends.cudnn.benchmark,
+   46         "cublas_workspace_config": os.environ["CUBLAS_WORKSPACE_CONFIG"],
+   47     }
+   48 
+   49 
+   50 def contract() -> dict:
+   51     if data.sha256(POLICY) != POLICY_SHA256:
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/partial_page.json
+    1 {
+    2   "text": "分享\n你说：\n\npositive_ranking_implementation_review\n \n\n\n\n\n本次唯一输入ZIP：positive_ranking_implementation_review.zip，333034字节，75成员；SHA256 81d3757f4acf1d6c9c93f0f921e2b8c38c5cf5b9c85aaebfe051449eebbf9342。用户已批准该具体实现包外发。\n\n\n\n\n请对S_pos/H_pos双臂的具体实现及执行合同作一次有范围的静态科研外审。用户已明确“把两个都实现了，对比看看效果”，并允许代码实现和Linux既有py310手写CPU累计300秒；原生GPU、正式文本/标签及训练未批准。当前没有正式S_pos/H_pos效果，不以CPU通过代表能胜S。\n\n\n\n\n背景：完整S是主要内部对照；H=G_half在旧A有收益但新B未建立改善，H_cons未过相对S双域MAP主门，并对H旧A有代价。H_cons结果/方案外审已关闭、两权重已按许可删除，Memory未读取。新rank为已知RINCE Log_out Positives归一化适配，原rank合法，完整S已有逐正例hard及BCE。原静态外审全文及逐项主审、用户选择、具体实施合同均在包中；不用重开已关闭研究，不改旧结果/阈值。H_pos虽非回答主问题必要，用户已前瞻选择双臂，不再把建议单臂当阻断。\n\n\n\n\n当前实现：scripts/step28_positive_ranking.py、_run.py、_verify.py，tests/test_step28_positive_ranking.py，schema/step28_positive_ranking_policy.json及docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md。复用既有record实际VJP、Memory、模型、保存和诊断入口；旧冻结源码不改。代码/CPU来源40项绑定，CPU外层含两次失败保守30/300秒，5项通过。attempt01极端FP32 backward精度问题用显式峰值移位修复，attempt02标签dtype夹具错误修复，全部原件、改前文件及部署身份保留。请区分真实轻量14个optimizer调用（生产入口12、独立参考2）、模拟1152次编排调用、未来尚未执行的GPU12调用和正式1152调用。\n\n\n\n\n重点主审：\n1. 从actual objective_fn入口追踪current/history、A0/A1四处新rank、正负集、两个平均、D0系数0.5，是否误保留旧rank、误缩教师或存在断梯度。独立参考能否拒绝关键操作缺失，history实际梯度是否与current区分。\n2. 显式峰值移位的FP32值/梯度是否符合相同数学目标，m1、m2、极端和无向边两查询；S原FP32均值与H原FP64池化一次FP32路径是否完整保留。不得为了“更稳定”擅自改变S数值定义或放宽精度。\n3. 独立初始化、各自A→B、Memory/出生表、训练/评分身份、保存恢复、诊断及联合valid门；源绑定、52保存对照的组序/随机流/起点核对是否足够。包仅含保存对照身份清单，不含52原始性能载荷，本审不重算旧指标，也不声称独立核过那些原件。\n4. 四比较、22指标/三角色、概率代价、遗忘方向、同一5000整群配对抽样、单/双正例描述分组与主要S_pos−S双域门，是否有次级替代主要失败或隐性选择。重复开发集/单seed限制应保留。\n5. 已写但未运行的原生六调用/臂，实际梯度与AdamW差异、完整/推理恢复、诊断中性、非零LR/合成clock的含义和费用；正式1152/1728/4/24/18计数、各阶段权限、输出峰值和失败预算是否一致。\n6. 严格执行防伪实现，也审查过度设计：只指出会影响本轮科学正确性、真实接线、复现或明确合同的具体缺口。不要自动增加网格、额外seed、独立数据、全面重训/重跑、通用框架、网络安全加固或重复审计流程；合理后续建议不得伪装成当前阻断。主执行者独立裁决，不自动照单全收。\n\n\n\n\n允许：静态阅读包内必要文件，独立手写纯数学CPU核验累计≤60秒、1线程、RSS≤1GiB、证据≤16MiB；导入及失败均计费，若需计算先记录实际源码/输入/命令/环境。不得运行项目训练/测试CLI，不载BGE/旧权重/Memory，不连接项目Linux，不访问正式文本/标签/test/owners/private，不扩预算或执行网络安装。文献如必要仅查一手原论文，已有先例无需重复铺陈。\n\n\n\n\n请交付完整中文正文、实际阅读清单、逐项发现（位置、证据、影响、最小修复、级别），明示科学阻断/复现缺陷/建议/越界过度设计。保留所有实际执行源码、手写输入、日志、失败/修复、时间与资源账，计算未做就明确未做。不把模型自述当后台身份，不编造项目运行。\n返回一个可下载ZIP和外部逐成员路径/字节/SHA256清单；ZIP内含上述必要原件、manifest与输入身份验证结果。按包内package_manifest.json核对所有输入成员；无需重新打包重复输入，引用已提供路径和SHA即可。报告需给出是否可进入原生资格及剩余阻断，不给正式性能保证。原生/正式执行仍由用户批准且由主执行者在项目Linux实施。\n\n…\n显示更多\n查看中文审计输出\n查看中文审计输出\n\n我会先核对 ZIP 身份和全部成员清单，再沿实际目标函数、数值路径、执行编排及评价入口审查，交付完整中文报告和可下载审查包。我会使用文件交付技能保存产物；本轮不运行项目测试或训练，不连接项目 Linux。若需核验数学或数值问题，只做你限定预算内的独立手写计算。\n\n已运行命令\n共 4 个任务，已经完成 0 个\n1.\n核对输入 ZIP 与 package_manifest，读取现行合同、授权和审查范围。\n2.\n静态追踪新目标、数值路径、CPU证据、双臂编排及评价与资格入口。\n3.\n按需执行预算内独立手写数学核验，裁定具体缺口与最小修复。\n4.\n完成中文报告、阅读清单、资源账和可下载ZIP及外部成员清单。\n\n输入身份核对通过：333,034 字节、75 成员，SHA256 与你给定的一致；package_manifest.json 的 74 个载荷全部匹配，没有缺项、额外项或重复成员。现行合同也明确区分了已批准的实现／CPU范围与尚未批准的原生／正式执行。我会并行交叉检查编排、评价和资格证据，自己重点审查目标函数与数值路径，并对关键发现回读源码裁决。\n\nOrchestration、Evaluation和Qualification开始工作\n运行了命令\n\n目前沿实际 VJP 入口看，新 rank 已进入 current／history 的 A0、A1 四处，历史监督为 0.1、出生表 D0 为 0.5，未看到旧 rank 被加回总损失或梯度链被切断。\n\n交叉检查发现一个具体问题：S_pos 在 A 阶段尚无历史缓存时，诊断会向评分函数传入空列表，而原 S 评分入口没有处理空列表。我正在回读调用链和测试替代函数，确认触发位置及现有 CPU 核验为何未发现它。\n\n已运行命令\nQualification有了更新\n共 4 个任务，已经完成 1 个\n1.\n核对输入 ZIP 与 package_manifest，读取现行合同、授权和审查范围。\n2.\n静态追踪新目标、数值路径、CPU证据、双臂编排及评价与资格入口。\n3.\n按需执行预算内独立手写数学核验，裁定具体缺口与最小修复。\n4.\n完成中文报告、阅读清单、资源账和可下载ZIP及外部成员清单。\n\n已确认空缓存问题会在正式 S_pos 的 A 阶段第 48 次更新后、第一次诊断时触发；编排测试中的替代评分函数自行处理了空列表，因此掩盖了生产入口的缺口。另发现原生双臂在同一进程连续执行时，会重复调用“GPU 不得有任何计算进程”的预检，第二臂可能把第一臂留下的本进程 CUDA 上下文判为占用。这两项都可局部修复。\n\n接下来只做一次独立手写的 rank 数值核验，检查峰值移位前后的值与梯度；会先保存源码、输入、命令和环境记录，不导入项目模块。\n\nOrchestration已完成\n编辑了文件\nEvaluation已完成\n\n第一次独立数值核验在导入 PyTorch 时结束：当前隔离工作区没有该依赖。失败源码、日志和资源账已保留，保守计费 1 秒。后续改用标准库完成标量公式、解析梯度和有限差分核验；FP32 部分会明确标为逐运算模拟，不能作为项目 PyTorch 或 CUDA 的实际重放证据。\n\nQualification已完成\n编辑了文件\nOrchestration和Evaluation有了更新\nEvaluation已完成\n\n审查裁决已收敛：当前版本不宜直接进入原生资格，剩余阻断为两项具体执行缺陷——S_pos 的 A 阶段空缓存评分，以及原生第二臂的自身 CUDA 进程预检冲突。 本次未发现新 rank 的数学定义、四处分支替换、D0 权重或主比较判据存在新增科学阻断。\n\n独立标量核验已完成，两次尝试含导入失败累计保守计费 2／60 秒。普通、等分数和 ±1000 手写例支持峰值移位保持目标及梯度；FP32 模拟与项目原件中的实际 PyTorch 证据会分开陈述。现在正在整理完整报告、逐项定位、阅读范围及全部执行账和成员清单。\n\n已运行命令\n共 4 个任务，已经完成 3 个\n1.\n核验输入ZIP、逐成员清单与审查合同\n2.\n静态追踪目标函数、双臂编排、评价与原生资格合同\n3.\n完成获准的独立手写数学核验并记录资源账\n4.\n汇总中文审查、阅读清单与证据，核验并交付ZIP\n\n正文已完成，正在核对交付清单与资源账。我会明确区分本轮独立检查的结果、包内已有的 CPU 证据，以及尚未运行的原生和正式执行，避免把静态接线结论写成运行或性能保证。\n\n已读取文件\nQualification和Evaluation有了更新\nQualification和Evaluation已完成\n连接已中断，正在等待完整答复\nChatGPT 可能会出错。请核查重要信息。\n最新一条回复\n\n\n\n\nPro",
+    3   "links": [],
+    4   "observation": "2026-10-18 11:09 Asia/Shanghai; page reloaded once, connection interrupted, no final answer or artifact links; original task retained."
+    5 }
+
+FILE reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt
+    1 S_pos/H_pos静态外审：独立主审与实施范围建议
+    2 2026-10-16，Asia/Shanghai。原提案、原外审及既有结果均冻结。本文件记录主执行者的独立判断；候选取舍尚待用户确认，外审的旧“仅静态许可”按后续明确决定解释。
+    3 
+    4 一、裁决
+    5 建议值得做一次有终点的S_pos单臂开发检验，但不应把它升格为已找到创新机制或必胜方案。H_pos有次级信息价值，不是回答“更换rank能否使完整S同时改善A/B”的必要臂；本轮推荐不做H_pos。原双臂不是科学错误，若用户更看重H的已有旧A优势能否与新rank结合，可前瞻确认保留双臂并支付相应资格、训练及选择成本。不能先看S_pos结果再在本合同中自动追加H_pos。
+    6 用户最新要求“外审已结束，把 S_pos/H_pos 的审查结果完整同步回来，仔细分析并独立主审，详细汇报这个方案是否值得做、两臂是否都有必要，以及需要修改哪些地方。确认后开始具体实现”。回收、分析、主审和具体实施范围准备可直接完成；单/双臂是本轮新的实质范围选择，科研纪律第2节要求确认。仅暂停依赖该选择的实施/科研计算，不重问已完成的回收或同步许可。
+    7 
+    8 二、完整回收与证据边界
+    9 从原会话https://chatgpt.com/c/6ad20bfc-173c-83ed-81c1-59ea049663f4确认最终回复已完成，回收完整中文正文、阅读范围及388411字节/47成员ZIP，SHA256 d811067d0eacf7613d3bd1bc597e9bce6c70aef989dab2ac7224d24d1d5033c9；独立外部TSV覆盖47成员，内部manifest覆盖46载荷，成员唯一、CRC、逐项大小/SHA及解包字节均一致。内嵌原ZIP及22输入成员、两份H_cons补充原件与本地送审原件完全相同。必要保管/去重及同步身份见recovery.json、sync.json。
+   10 网页TSV预览先打开导出菜单，选择TSV后亦未触发下载事件，两次等待超时；核对实际页面后通过原资源卡“下载文件”成功取得原TSV。没有补发消息、重复审查或伪造清单。ZIP原生下载一次成功。
+   11 读完external/review.zh.md全部正文、findings、reading_scope、执行账、手写核验源码和相关输入/保存结果；从本仓库核对base.objectives、ranking.hard_candidates/objectives、record.objective/backward_group/update、g_half目标/评分及实际core.make_optimizer。原生qualification只继承已关闭适用结论，本轮没有重跑科研脚本、载模、解析正式标签或新统计。
+   12 外审手写一次exit0、无修复重试；Python3.13.5/NumPy2.3.5，内部0.103887858秒、外层1.114774988秒，查询/图边有限差分误差5.560268912e-11/1.542453448e-11；预执行输入/源码身份相符。四种故意错误表达式按预期被拒绝，不是四次失败训练。其分数坐标证据不证明项目BGE、VJP、AdamW或新生产实现通过，也不计项目CPU/GPU账。
+   13 本地52份已开放S/H保存对照按既有baseline_sources.json重新机械核对，52份2940294字节及清单SHA b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3均一致。未重算指标/区间，未重开标签或Memory；未来实际比较前仍需核对部署原件和新旧日程/UID/初始化等配对条件。外审没收到这52份原件是其阅读边界，不是本项目已丢失比较证据。
+   14 
+   15 三、独立数学和源码判断
+   16 新目标L_pos=(1/m)sum_p log(1+sum_n exp(z_n-z_p))可实现，RINCE Methods/Log_out Positives式(2)在正例上求和，本方案再按m平均、温度1；m可变为1或2，平均不能省略。主执行者再次核读作者HTML的该公式和SupCon §3.2.2式(2)，没有把完整RINCE的正例等级/递归/温度机制移植进本方案。来源：https://arxiv.org/html/2201.11736；https://arxiv.org/html/2004.11362。是已知目标适配，不是原创损失；旧目标同样合法。
+   17 设A=sum_neg exp(z_n)、a_p=exp(z_p)、Q=sum_pos a_p。旧正例导数a_p/(A+Q)-1/m；新正例导数-A/[m(A+a_p)]。旧负例导数exp(z_n)/(A+Q)，新负例导数exp(z_n)/m * sum_p 1/(A+a_p)。m=2时每个A+a_p<A+Q，所以新式对每个负例导数更大，即使两个正例相等、旧式并不下压任何正例。未来整套策略差不能归因给单一“取消正例竞争”。外部系数仍1不意味着相对BCE/hard/D0的有效权重不变。
+   18 已保存手写例(正例6、2，25负例0)的强正例梯度从+0.425682126变为-0.029176377，弱正例从-0.483045540变为-0.385932827，每负例从+0.002294537变为+0.016604368。它说明弱正例拉力可减小、负例力可增强；不是新式总比旧式更重视困难正例。数值直接摘自外审原件，主执行者没有在Windows重算科研量。
+   19 独立代数分解L_old=log(1+A/Q)+log(m)+KL(U||r)，r_p=a_p/Q，确认旧式本来就抑制正例概率过度集中。log(m)是无界分数条件下的下确界，有限分数且负例非空时达不到；仅令所有正负间隔变大，若正例不均匀，KL仍可能保留。新式也不在有限间隔/AP=1时必为0，不能称精确AP风险。
+   20 源码ranking.objectives逐查询、逐正例，对各自top5已知负例取softplus平均；base.objectives另有全部378边BCE。完整S已有困难正例监督，新变化是全部负例logsumexp的不同组织，不能称补上原来没有的监督。hard索引由detach分数选择、被选分数保持live是现行合法接线。
+   21 每条无向边进入两个查询。单正例查询局部函数不变，不代表其边梯度不变：若另一端是双正例查询，负边在共享参数之前已可变。再经A0/A1、current/history、出生表、clip和AdamW耦合，更不能推出每正例分数或MAP必升。
+   22 record.backward_group虽有proxy/leaf detach，但实际autograd.grad(loss,proxy)→512块head.backward→z.backward(leaf.grad)明确接通。不能仅看到detach判断梯度。新目标须经objective_fn实际注入；新臂名称和训练/评分身份、保存恢复及两诊断回调仍需真实实现。
+   23 实际优化器由step28_continual_population.make_optimizer构造torch.optim.AdamW，继承encoder decay .01、head decay0、betas .9/.999、eps1e-8、foreach=False。未来合同明确称AdamW，避免把“Adam状态”简称误作换优化器。
+   24 
+   25 四、逐项主审处置
+   26 F01 接受，已知目标/合法旧目标的主张边界保持。
+   27 F02 接受，明确已有逐正例hard和BCE；不据此推断新rank必冗余或原竞争必已抵消。
+   28 F03 接受并补独立推导；承认负例/弱正例和有效权重同时变化。不追加调权重消融来追求所谓纯机制。
+   29 F04 接受，修“最小值”为“下确界”；FP32允许不同表达式舍入差和极端下溢0，禁止把实数严格符号当浮点逐位/全非零硬门。数值合同须执行前冻结。
+   30 F05 部分层次区分：同意单S_pos优先；不同意把H_pos非必要写成双臂本身无效或科研阻断。用户确认取舍后再冻结对应范围。
+   31 F06 接受静态接线可行，当前没有新实现验证；不能以已有VJP入口或外审PASS替代新分支实际作用。
+   32 F07 接受，current/history、A0/A1逐分支独立参考与真实更新必须相互补足；总更新不同不足以证明history改了。六调用状态表及非退化手写输入必须在GPU前冻结。舍入total严格不等不作为门，既有精度不临场放宽。
+   33 F08 接受外审阅读限制，已补本地主执行者的52保存文件机械身份检查。实施前按实际需要复用，不能把它升级成重训旧S/H、再开旧Memory或重审全部历史的理由。
+
+FILE reports/documentation/20261016/s_improvement/implementation_scope.zh.txt
+    1 逐正例排序：待确认的具体实现范围
+    2 2026-10-16。依据review/primary_disposition.zh.txt。建议单S_pos；用户也可明确保留原S_pos/H_pos双臂。候选选择与以下新CPU额度确认前不实施或运行；本文件不是正式训练授权。
+    3 
+    4 1. 本轮交付
+    5 选择单臂时只实现S_pos；选择双臂时实现S_pos、H_pos两个预先固定候选。新增局部rank helper、实际objective_fn/update接线、训练/评分身份、runner/policy、保存恢复/校准/诊断接口、针对变化的手写测试与合同/实现外审包。复用原record训练/VJP、既有Memory、保存评价和资格编排；保持历史默认函数和冻结来源，不新写通用训练框架，不加入JS/新教师/温度或权重网格。
+    6 Linux既有py310，CPU单线程累计墙钟最多300秒，峰值RSS2GiB、证据64MiB，导入与失败计费；仅手写分数、合法轻量模型和固定图，无BGE加载、GPU、正式文本/标签、旧Memory、test/owners/private。预算内修复明确代码/夹具错误需保留失败与费用；不足时停。Windows只编辑和机械核对。新实现包形成后按其具体内容申请外发，原静态包许可不自动覆盖新源码包。
+    7 
+    8 2. 固定目标与数值
+    9 L_pos(q)=mean_p logsumexp([0, z_negative-z_positive])；全部27候选排除自身，1或2个正例逐个计算，另一个正例不入负集，先正例平均再28查询平均；无额外÷27或÷378。常数减log(m)不等于新目标。
+   10 每视图B_pos=BCE+rank_pos+0.5hard，各视图自己从已知负例选择top5；Bbar=(B_pos(A0)+B_pos(A1))/2。J_A=Bbar_current；J_B=Bbar_current+0.1Bbar_history+0.5D0。current/history、A0/A1均替换rank，D0只用本臂自然A0出生表，不误乘为0.05、不额外再加旧rank。日志逐分项可重建总目标。
+   11 S_pos保留record.account_logits的FP32 mean路径；双臂时H_pos沿原H FP64池化、一次FP32输出。新rank在实际FP32账号分数上执行稳定差分logsumexp，返回FP32；FP64仅独立参考/手写代数核对。不得为统一接口改变S数值路径。采用原AdamW与原权重衰减/学习率/clip/随机键。
+   12 拟固定增量标准：FP64值/解析坐标梯度atol=rtol=1e-12；普通手写FP32局部值/逐坐标梯度atol=2e-6、rtol=2e-5；轻量完整图与实际VJP的分项、逐张量梯度、裁剪后梯度、参数及AdamW状态同atol=2e-6/rtol=2e-5。FP64中心差分step1e-5、atol2e-8。极端±1000检查有限、稳定和对实际浮点输入的参考一致性，不强制所有导数非零；m=1实数相等不要求不同FP32表达式逐位同。实施前写入policy/test，失败不临场放宽。
+   13 同一状态保存恢复及诊断后下一更新使用逐元素/字节相等；该确定性要求不与不同算法或FP64/FP32近似比较混淆。原H精度标准若双臂保留仍继承，不被上述新rank容差放宽。
+   14 
+   15 3. 必要CPU验证
+   16 固定合法8个K2+4个K3手写图；独立标量/解析参考，不调用生产新helper生成答案。检查单正例等价、双正例不均匀/相等、正负坐标、自身/负集/平均、无向边两查询贡献、A0/A1同K各自pullback。必须拒绝仅减常数、漏第二正例、正例误作负例、额外÷27以及current改而history仍旧的错误变体；这些是资格反例，不新增科研候选。
+   17 独立完整J参考与实际proxy→512 head VJP→encoder→clip→AdamW对齐；current/history分开、D0非零且权重明确；测试训练/评分身份及保存恢复/诊断映射，避免只改ARMS或日志。每一项对应本次具体风险，旧VJP/Memory/评分未变部分复用适用证据，不全仓重跑。
+   18 
+   19 4. 实现完成后拟定的原生资格，不在本次CPU批准中执行
+   20 每臂最多6次optimizer调用、600秒。冻结现有最大合法手写current/history(28账号、各8记录、每通道256 token)、UID/随机键、非零学习率及共同初态；不用正式样本选夹具。
+   21 六调用安排草案：1从预训练/空AdamW作旧目标warm-up形成非空共同状态；2、3各从该共同状态作相同current更新，分别旧/新rank；4、5各从共同状态作相同current+history更新，分别旧/新rank；6从调用5前状态经完整恢复/诊断后重演调用5。每个分支固定step且不在LR=0末步；具体clock、文本、参考出生表和状态身份在实现代码及GPU合同冻结。调用2/3及4/5的encoder/head裁剪前后梯度、实际参数与AdamW矩/时钟分别比较；同K另核current/history和两视图，不能只凭总差异证明历史已改。完整/推理恢复、诊断中性、重演一致均须有实际证据。
+   22 不设舍入total必须严格不等、所有参数元素必须变化等假门。失败即停，无自动第7调用/新夹具或第二attempt。CPU通过、实现审查关闭及明确GPU许可后才运行。
+   23 
+   24 5. 未来正式合同应固定的范围，不由本次确认自动批准
+   25 每臂s0、A→B，从原预训练/规定head/空AdamW独立起步，各有自己的Memory和出生表；576调用、864梯度群、2端点、12诊断capture和9严格判读。若双臂合计1152/1728/4/24/18，共同完整门后才开放valid，某臂失败不自动单独开另一臂。新方案不借已删权重和旧Memory。
+   26 单S_pos主要比较S_pos-S的B末raw MAP，A/B直接整群配对条件95%区间下界均>0。双臂时H_pos-S、H_pos-H、H_pos-S_pos为预定次级，不能替换S_pos失败。复用相容旧保存对照，不重训S/H；所有22指标/三角色、概率代价、获得/终点/方向一致的遗忘、诊断/gap完整报告。未来同一valid仍为已反复使用的开发集。
+   27 正式七文件/一次train解析/完整门后一次valid监督/标签派生分组在未来合同单独授权。ABC合表C仅必要筛选，构造Group/分词/保留C内容和标签对齐前排除；C学习评价、test/owners/Audit/private=0。训练中不看盲valid表现，不据结果增加候选/seed或改公式。
+   28 原双臂预算建议仍为CPU300秒、GPU1200秒/12调用、正式57600秒及产物合计峰值16GiB。若选单臂，拟原生600秒/6调用、正式28800秒、产物10GiB，CPU仍300秒；这些GPU/正式额度须在具体实现/资源投影及合同中批准，不能由删除一臂机械自动生效。全部失败、加载、保存和分析计账，历史H_cons账不改。新增seed或独立数据确认另议。

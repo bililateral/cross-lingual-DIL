@@ -1,0 +1,474 @@
+
+FILE scripts/step28_positive_ranking_run.py
+    1 """Two fixed positive-rank arms; shared record lifecycle, one joint valid opening."""
+    2 from __future__ import annotations
+    3 
+    4 import argparse
+    5 import ast
+    6 from functools import partial
+    7 import math
+    8 import os
+    9 from pathlib import Path
+   10 import random
+   11 import shutil
+   12 import signal
+   13 import sys
+   14 import threading
+   15 import time
+   16 import traceback
+   17 import hashlib
+   18 
+   19 import numpy as np
+   20 
+   21 import step28_positive_ranking as method
+   22 import step28_g_half_run as single
+   23 import step28_h_consistency_run as baselines
+   24 
+   25 record, data, parent, core = single.record, single.data, single.parent, single.core
+   26 base, previous, diag = single.base, single.previous, single.diag
+   27 POLICY = data.ROOT/"schema/step28_positive_ranking_policy.json"
+   28 BASELINE = baselines.BASELINE
+   29 AUTHORIZATION = data.ROOT/"reports/documentation/20261016/positive_ranking_implementation/authorization.json"
+   30 CONTRACT = data.ROOT/"docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md"
+   31 POINTS = tuple(stage+"_"+arm for arm in method.ARMS for stage in "AB")
+   32 COMPLETE = "COMPLETE_1152_UPDATES_4_RESTORES_24_DIAGNOSTICS_VALID_BLIND"
+   33 COMPLETION_STATUS = "COMPLETE_S_POS_H_POS_FIXED_AB"
+   34 CPU_TESTS = ("test_rank_reference_and_rejected_mutants", "test_views_history_and_actual_vjp_adamw",
+   35              "test_capture_restore_and_next_update", "test_dual_orchestration_and_joint_opening",
+   36              "test_saved_comparisons_and_permissions", "test_stage_a_empty_cache",
+   37              "test_native_continuation_preflight")
+   38 fresh, pretrained_archive = single.fresh, single.pretrained_archive
+   39 public_inputs, attach_labels, partition = single.public_inputs, single.attach_labels, single.partition
+   40 baseline_runs, baseline_inputs = baselines.baseline_runs, baselines.baseline_inputs
+   41 query_metrics, undefined_metrics = single.query_metrics, single.undefined_metrics
+   42 pooled_rates, summarize = single.pooled_rates, single.summarize
+   43 trajectory = single.trajectory
+   44 
+   45 
+   46 def policy():
+   47     p = data.read_json(POLICY)
+   48     old = single.policy()
+   49     expected = {**old, "study": "fixed_positive_rank_S_and_H", "methods": list(method.ARMS),
+   50         "physical_updates": 1152, "gradient_group_presentations": 1728,
+   51         "physical_stage_states": 4, "epoch_diagnostic_points": 24,
+   52         "cpu_verification": {**old["cpu_verification"], "maximum_seconds": 300},
+   53         "native_verification": {**old["native_verification"], "maximum_seconds": 1200,
+   54                                 "per_arm_maximum_seconds": 600, "actual_updates": 12},
+   55         "runtime": {**old["runtime"], "maximum_gpu_stage_seconds": 57600, "maximum_output_bytes": 16*2**30},
+   56         "candidates": {arm: method.metadata(arm) for arm in method.ARMS},
+   57         "evaluation": dict(bootstrap_replicates=5000, bootstrap_seed=20260930,
+   58             comparisons=[["S_pos", "S"], ["H_pos", "S"], ["H_pos", "G_half"], ["H_pos", "S_pos"]],
+   59             primary_metric="map", primary_role="raw",
+   60             success="B_end_S_pos_minus_S_each_AB_MAP_CI_lower_strictly_positive")}
+   61     del expected["pooling"]
+   62     if p != expected:
+   63         raise ValueError("Fixed dual positive-rank policy differs")
+   64     return p
+   65 
+   66 
+   67 def config():
+   68     c = record.config()
+   69     c["runtime"] = policy()["runtime"]
+   70     return c
+   71 
+   72 
+   73 def sources():
+   74     paths = {data.ROOT/n for n in ("scripts/step28_positive_ranking_run.py",
+   75         "scripts/step28_positive_ranking_verify.py", "tests/test_step28_positive_ranking.py",
+   76         "tests/test_step28_g_half.py", "tests/test_step28_record_replay.py")}
+   77     todo = list(paths)
+   78     while todo:
+   79         for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
+   80             names = [x.name for x in node.names] if isinstance(node, ast.Import) else [node.module] if isinstance(node, ast.ImportFrom) else []
+   81             for name in names:
+   82                 if name and name.startswith("step28_"):
+   83                     child = data.ROOT/"scripts"/(name+".py")
+   84                     if child not in paths:
+   85                         paths.add(child)
+   86                         todo.append(child)
+   87     paths.update(data.ROOT/"schema"/n for n in ("step28_g_half_policy.json", "step28_record_replay_policy.json",
+   88         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
+   89     paths.update((POLICY, BASELINE, AUTHORIZATION, CONTRACT,
+   90                   data.ROOT/"scripts/run_step28_positive_ranking_linux_20261018.sh"))
+   91     return [data.record(p, data.ROOT) for p in sorted(paths)]
+   92 
+   93 
+   94 def loss_total(row, stage, arm):
+   95     if stage not in (1, 2) or any(row.get(k) != v for k, v in method.metadata(arm).items()):
+   96         raise ValueError("Wrong stage or update identity")
+   97     total = 0.
+   98     def close(a, b):
+   99         if not np.isfinite(a) or not np.isfinite(b) or not np.isclose(a, b, atol=2e-6, rtol=2e-6):
+  100             raise ValueError("Positive-rank loss decomposition differs")
+  101     for role, weight in (("current", 1.), ("history", .1)):
+  102         if role == "history" and stage == 1:
+  103             if role in row: raise ValueError("Stage A cannot use history")
+  104             continue
+  105         r = row[role]
+  106         if r["qualification_old_rank"] is not False or r["mse1"] is not None or len(r["views"]) != 2:
+  107             raise ValueError("Wrong rank/teacher/views in formal update")
+  108         if role == "current" and r["mse0"] != 0:
+  109             raise ValueError("Current used a birth teacher")
+  110         for v in r["views"]:
+  111             close(v["rank_used"], v["rank_pos"])
+  112             close(v["total"], v["bce"]+v["rank_pos"]+.5*v["hard"])
+  113         close(r["supervised"], sum(v["total"] for v in r["views"])/2)
+  114         close(r["distillation"], r["mse0"])
+  115         close(r["supervised_contribution"], weight*r["supervised"])
+  116         close(r["teacher_contribution"], .5*r["mse0"])
+  117         contribution = weight*r["supervised"]+.5*r["mse0"]
+  118         close(r["weighted"], contribution)
+  119         total += contribution
+  120     close(row["total"], total)
+  121     return total
+  122 
+  123 
+  124 def validate_diagnostic(d, arm):
+  125     if any(d.get(k) != v for k, v in method.metadata(arm).items()):
+  126         raise ValueError("Diagnostic scoring/training identity differs")
+  127 
+  128 
+  129 def native_objective_pair(off, on, stage):
+  130     arm = on["training"]["arm"]
+  131     loss_total(on, stage, arm)
+  132     if any(off.get(k) != v for k, v in method.metadata(arm).items()):
+  133         raise ValueError("Native control identity differs")
+  134     details = {}
+  135     for role in (("current",) if stage == 1 else ("current", "history")):
+  136         a, b = off[role], on[role]
+  137         if a["qualification_old_rank"] is not True or b["qualification_old_rank"] is not False:
+  138             raise ValueError("Wrong old/new rank switch")
+  139         for key in ("mse0", "mse1", "assignment_sha256", "teacher_contribution"):
+  140             if a[key] != b[key]: raise ValueError("Rank comparison changed teacher/allocation")
+  141         for va, vb in zip(a["views"], b["views"], strict=True):
+  142             for key in ("bce", "hard", "rank_pos"):
+  143                 if va[key] != vb[key]: raise ValueError("Rank comparison changed other terms")
+  144             if not np.isclose(va["total"], va["bce"]+va["rank_used"]+.5*va["hard"], atol=2e-6, rtol=2e-6):
+  145                 raise ValueError("Old-rank control arithmetic differs")
+  146         details[role] = dict(old_rank=[v["rank_used"] for v in a["views"]],
+  147             new_rank=[v["rank_pos"] for v in b["views"]], old_weighted=a["weighted"],new_weighted=b["weighted"],
+  148             actual_total_difference=b["weighted"]-a["weighted"], scalar_difference_is_not_effect_gate=True)
+  149     return details
+  150 
+  151 
+  152 class Budget(single.Budget):
+  153     def __init__(self, root):
+  154         super().__init__(root)
+  155         self.limits = policy()["runtime"]
+  156 
+  157 
+  158 def projection(measurements):
+  159     arms = {arm: single.projection(measurements[arm]) for arm in method.ARMS}
+  160     seconds = sum(p["projected_total_seconds"] for p in arms.values())
+  161     peak = math.ceil(1.1*(max(m["W_F"] for m in measurements.values())+
+  162                            sum(2*m["W_I"] for m in measurements.values())+2*2**30))
+  163     return dict(arms=arms, projected_total_seconds=seconds, projected_peak_output_bytes=peak,
+  164                 within_budget=seconds <= 57600 and peak <= 16*2**30)
+  165 
+  166 
+  167 def reviewed_gate(path, kind):
+  168     gate = data.read_json(path)
+  169     if (kind not in ("NATIVE", "FORMAL") or gate.get("kind") != kind
+  170             or gate.get("status") != "APPROVED_NO_OPEN_BLOCKERS" or gate.get("source_files") != sources()
+  171             or gate.get("candidates") != policy()["candidates"]
+  172             or gate.get("implementation_authorization") != data.record(AUTHORIZATION, data.ROOT)):
+  173         raise ValueError("Source-bound positive-rank implementation gate required")
+  174     # Implementation approval is not GPU/data permission. The future permission is a separate exact record.
+  175     permission = data.read_json(data.verify(data.ROOT/gate["execution_authorization"]["path"], gate["execution_authorization"]))
+  176     if (permission.get("status") != "APPROVED" or kind not in permission.get("stages", [])
+  177             or permission.get("contract") != data.record(CONTRACT, data.ROOT)
+  178             or permission.get("source_files") != sources() or not permission.get("user_quote")):
+  179         raise ValueError("Specific execution approval missing")
+  180     for key in ("external_review", "primary_disposition", "cpu"):
+  181         data.verify(data.ROOT/gate[key]["path"], gate[key])
+  182     cpu = data.read_json(data.ROOT/gate["cpu"]["path"])
+  183     if (cpu.get("status") != "PASS_HANDWRITTEN_ONLY" or cpu.get("mode") != "cpu"
+  184             or cpu.get("source_files") != sources() or cpu.get("cumulative_charged_seconds", math.inf) > 300
+  185             or cpu.get("unresolved_checks") != [] or set(cpu.get("qualified_tests", [])) != set(CPU_TESTS)):
+  186         raise ValueError("Affected CPU evidence missing")
+  187     return gate
+  188 
+  189 
+  190 def validate_gate(job, path):
+  191     gate = reviewed_gate(path, "FORMAL")
+  192     if (gate.get("job") != job.relative_to(data.ROOT).as_posix() or gate.get("runtime") != policy()["runtime"]
+  193             or gate.get("supervision") != policy()["supervision"]):
+  194         raise ValueError("Dual formal scope differs")
+  195     gpu = data.read_json(data.verify(data.ROOT/gate["gpu"]["path"], gate["gpu"]))
+  196     if (gpu.get("status") != "PASS_HANDWRITTEN_ONLY" or gpu.get("mode") != "gpu"
+  197             or gpu.get("source_files") != sources() or gpu.get("cumulative_charged_seconds", math.inf) > 1200
+  198             or set(gpu.get("arms", {})) != set(method.ARMS)):
+  199         raise ValueError("Both native candidates must qualify")
+  200     for arm, native in gpu["arms"].items():
+  201         if (native.get("actual_updates") != 6 or native.get("charged_seconds", math.inf) > 600
+  202                 or native.get("maximum_records") != 224 or native.get("channel_tokens") != 256
+  203                 or native.get("both_phases_encoder_head_effect") is not True
+  204                 or native.get("next_update_bitwise_equal") is not True
+  205                 or native.get("pooling_restores_verified") is not True
+  206                 or native.get("rank_precision_verified") is not True
+  207                 or native.get("metadata") != method.metadata(arm)):
+  208             raise ValueError("Native effects/restoration missing: "+arm)
+  209     if not projection({arm: v["measurements"] for arm, v in gpu["arms"].items()})["within_budget"]:
+  210         raise ValueError("Measured dual run exceeds budget")
+  211     return gate
+  212 
+  213 
+  214 # These functions already receive an explicit entry: no global mutation or default-arm substitution.
+  215 for _name in ("train_stage", "memory_from", "restore_point", "checkpoint", "train", "open_valid"):
+  216     globals()[_name] = partial(getattr(single, _name), entry=sys.modules[__name__])
+  217 
+  218 
+
+FILE reports/documentation/20261016/positive_ranking_implementation/qualification/cpu_gate_repair.json
+    1 {
+    2   "status": "PASS_HANDWRITTEN_ONLY",
+    3   "mode": "cpu",
+    4   "source_files": [
+    5     {
+    6       "bytes": 10133,
+    7       "path": "docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md",
+    8       "sha256": "6aef2124c0d4761e9b1488ece2950294e8714d2940df3edb2c8dd04dd41106e3"
+    9     },
+   10     {
+   11       "bytes": 26524,
+   12       "path": "reports/documentation/20261016/h_consistency/baseline_sources.json",
+   13       "sha256": "b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3"
+   14     },
+   15     {
+   16       "bytes": 993,
+   17       "path": "reports/documentation/20261016/positive_ranking_implementation/authorization.json",
+   18       "sha256": "a73de09f6eca3c6cf8f8102552b3eb0ccb1ba1376e83f1c7f7dc76988688b8ad"
+   19     },
+   20     {
+   21       "bytes": 3489,
+   22       "path": "schema/step28_alias_ranking_policy.json",
+   23       "sha256": "b5b7e4fc628c389d9cf91664dcff64c28b5fc8e8295bc3d8a82a6e5cb20f9b01"
+   24     },
+   25     {
+   26       "bytes": 5123,
+   27       "path": "schema/step28_bge_continual_policy.json",
+   28       "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534"
+   29     },
+   30     {
+   31       "bytes": 8439,
+   32       "path": "schema/step28_chinese_base_policy.json",
+   33       "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a"
+   34     },
+   35     {
+   36       "bytes": 1979,
+   37       "path": "schema/step28_g_half_policy.json",
+   38       "sha256": "5902105c0dba6542c56e2a8d575b33702421085aacb68ea1036548c69cabf042"
+   39     },
+   40     {
+   41       "bytes": 3618,
+   42       "path": "schema/step28_positive_ranking_policy.json",
+   43       "sha256": "fab05a1917d23a8eff26a0cc80cdf0fba9110599e72dd9fd4d9c00634cea60f3"
+   44     },
+   45     {
+   46       "bytes": 1680,
+   47       "path": "schema/step28_record_replay_policy.json",
+   48       "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f"
+   49     },
+   50     {
+   51       "bytes": 1149,
+   52       "path": "scripts/run_step28_positive_ranking_linux_20261018.sh",
+   53       "sha256": "1c014fc4296d5d04a35dcdb6439fd650d8aacf2056d9c44e756dbea919c9b3a4"
+   54     },
+   55     {
+   56       "bytes": 8818,
+   57       "path": "scripts/step28_alias_calibration.py",
+   58       "sha256": "d7e79ca1c84c23a5d4e9534028d6a44833ee3ccaece7fb1b6dfbbd38430a7cca"
+   59     },
+   60     {
+   61       "bytes": 11658,
+   62       "path": "scripts/step28_alias_ranking.py",
+   63       "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274"
+   64     },
+   65     {
+   66       "bytes": 14383,
+   67       "path": "scripts/step28_balanced_pooling.py",
+   68       "sha256": "2a4b10aeca83d9a52a493a18cec8fe6e200058512a5db64e19a85c3f7e3fbc0c"
+   69     },
+   70     {
+   71       "bytes": 55111,
+   72       "path": "scripts/step28_balanced_pooling_run.py",
+   73       "sha256": "561b53c651e432c4ddb0480a1e216ffb187134074a68b3acbed418f093db52d1"
+   74     },
+   75     {
+   76       "bytes": 17275,
+   77       "path": "scripts/step28_bge_continual.py",
+   78       "sha256": "62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d"
+   79     },
+   80     {
+   81       "bytes": 13765,
+   82       "path": "scripts/step28_bge_continual_evaluate.py",
+   83       "sha256": "55e9bf419801ec57686898cf78d8237962fc5e5549849a2e0eac3e66318353f1"
+   84     },
+   85     {
+   86       "bytes": 34672,
+   87       "path": "scripts/step28_bge_continual_run.py",
+   88       "sha256": "4ab2840dfe7ee27912e8e6ed19d3dd3d9919e668f1cbc10998ade2843966d181"
+   89     },
+   90     {
+   91       "bytes": 51352,
+   92       "path": "scripts/step28_chinese_base.py",
+   93       "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+   94     },
+   95     {
+   96       "bytes": 26322,
+   97       "path": "scripts/step28_continual_expression_run.py",
+   98       "sha256": "3df878e3d78c07444cc0400b574adaf3a495b74fe193a14853706c7e9f67a760"
+   99     },
+  100     {
+  101       "bytes": 9699,
+  102       "path": "scripts/step28_continual_population.py",
+  103       "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+  104     },
+  105     {
+  106       "bytes": 11587,
+  107       "path": "scripts/step28_continual_population_data.py",
+  108       "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+  109     },
+  110     {
+  111       "bytes": 20911,
+  112       "path": "scripts/step28_continual_population_evaluate.py",
+  113       "sha256": "398825da73b25b3d06420d7a75428451f38ff97f1239af02120d4921c70bca4a"
+  114     },
+  115     {
+  116       "bytes": 21310,
+  117       "path": "scripts/step28_continual_population_run.py",
+  118       "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+  119     },
+  120     {
+  121       "bytes": 12471,
+  122       "path": "scripts/step28_crossfit_retention.py",
+  123       "sha256": "0e98c4229807182a88472364d771dd8345def09e4e0593eb920f2a240db70f8a"
+  124     },
+  125     {
+  126       "bytes": 6786,
+  127       "path": "scripts/step28_g_half.py",
+  128       "sha256": "350f7d057a786aa151073ac54f1f697f40d081ecb5b67c02d6ee456a785febcb"
+  129     },
+  130     {
+  131       "bytes": 43231,
+  132       "path": "scripts/step28_g_half_run.py",
+  133       "sha256": "bc10d07efc47aba239bea8eb7217d7effd734eb9fe7a55749e8a54da09086677"
+  134     },
+  135     {
+  136       "bytes": 23640,
+  137       "path": "scripts/step28_g_half_verify.py",
+  138       "sha256": "76edbaf1d9b2714b90933a5c30b92589e98b0b5ca2781471ca00312371052622"
+  139     },
+  140     {
+  141       "bytes": 6759,
+  142       "path": "scripts/step28_h_consistency.py",
+  143       "sha256": "f922e6dfb341539c479db78ae14a992ed67eb76796200f02fb33bb157b4fe502"
+  144     },
+  145     {
+  146       "bytes": 15224,
+  147       "path": "scripts/step28_h_consistency_run.py",
+  148       "sha256": "0837bfd94f769b30b61e5b2fffd2e0a66ed66da70dcf60d3aeec60ab37702925"
+  149     },
+  150     {
+  151       "bytes": 7690,
+  152       "path": "scripts/step28_positive_ranking.py",
+  153       "sha256": "182a0a73cf4f44c539e6fa8819746e37e74f37ffaee10fe75d5612ee1229e3e1"
+  154     },
+  155     {
+  156       "bytes": 33254,
+  157       "path": "scripts/step28_positive_ranking_run.py",
+  158       "sha256": "c04867669e04153c04cae9782c46fbbdbcf59a783c2b4b2ededaadc3a9ab6447"
+  159     },
+  160     {
+  161       "bytes": 21586,
+  162       "path": "scripts/step28_positive_ranking_verify.py",
+  163       "sha256": "8504a1a9d1d31022d56836d29a66f7ee9c3c96a62152f1dda19e6b2e853df2c4"
+  164     },
+  165     {
+  166       "bytes": 15543,
+  167       "path": "scripts/step28_record_replay.py",
+  168       "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d"
+  169     },
+  170     {
+  171       "bytes": 12028,
+  172       "path": "scripts/step28_record_replay_numerics.py",
+  173       "sha256": "30fcb37ad43b823a87754bd660a42cdbedaa3ca8f0eb378b855d6666a96e408e"
+  174     },
+  175     {
+  176       "bytes": 33426,
+  177       "path": "scripts/step28_record_replay_run.py",
+  178       "sha256": "584ea874e50134e837613a664b531773797dad451be07b1d1ff06de4b3c38338"
+  179     },
+  180     {
+  181       "bytes": 11627,
+  182       "path": "scripts/step28_record_replay_verify.py",
+  183       "sha256": "c9b81490b83d9174ed4ee003ffe896dda20daf9fa4408bb8ca516b4cda38f2b9"
+  184     },
+  185     {
+  186       "bytes": 11971,
+  187       "path": "scripts/step28_replay_diagnostics.py",
+  188       "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea"
+  189     },
+  190     {
+  191       "bytes": 27081,
+  192       "path": "tests/test_step28_g_half.py",
+  193       "sha256": "583c1735e493acbbb74b7e6831f53b156d98100e26a2322b2016e3439e241997"
+  194     },
+  195     {
+  196       "bytes": 35571,
+  197       "path": "tests/test_step28_positive_ranking.py",
+  198       "sha256": "ea0890f954cf041d9f5408ff5a39cdc6ff4e37973d218c25a16a1ed5f43e6af4"
+  199     },
+  200     {
+  201       "bytes": 20239,
+  202       "path": "tests/test_step28_record_replay.py",
+  203       "sha256": "a15d88b84685f9cbe9c70581fb186d59218196851a25a7030dd8f9ecfe5b8ee4"
+  204     }
+  205   ],
+  206   "qualified_tests": [
+  207     "test_rank_reference_and_rejected_mutants",
+  208     "test_views_history_and_actual_vjp_adamw",
+  209     "test_saved_comparisons_and_permissions",
+  210     "test_stage_a_empty_cache",
+  211     "test_native_continuation_preflight",
+  212     "test_capture_restore_and_next_update",
+  213     "test_dual_orchestration_and_joint_opening"
+  214   ],
+  215   "unresolved_checks": [],
+  216   "cumulative_charged_seconds": 49.0,
+  217   "inherited": {
+  218     "path": "reports/documentation/20261016/positive_ranking_implementation/qualification/cpu_gate.json",
+  219     "bytes": 9611,
+  220     "sha256": "059476391006646744dc417721e753c777ef7c1072f680560e0b65d6b26f96d6"
+  221   },
+  222   "executed": {
+  223     "path": "reports/documentation/20261016/positive_ranking_implementation/qualification/cpu/attempt04/result/result.json",
+  224     "bytes": 6552,
+  225     "sha256": "1e6c8015c5efa067a53980f8f9136383eee3b5c3dcc8e3afff79a8f7b13d1a71"
+  226   },
+  227   "wallclock": {
+  228     "path": "reports/documentation/20261016/positive_ranking_implementation/qualification/cpu/attempt04/wallclock.json",
+  229     "bytes": 888,
+  230     "sha256": "62b76072752381a881bec280bd9e09f1361d99158ac0728373f6c08523b2953b"
+  231   },
+  232   "reused_tests": [
+  233     "test_rank_reference_and_rejected_mutants",
+  234     "test_views_history_and_actual_vjp_adamw",
+  235     "test_saved_comparisons_and_permissions"
+  236   ],
+  237   "reexecuted_tests": [
+  238     "test_stage_a_empty_cache",
+  239     "test_native_continuation_preflight",
+  240     "test_capture_restore_and_next_update",
+  241     "test_dual_orchestration_and_joint_opening"
+  242   ],
+  243   "reuse_basis": "Only empty scoring, second-arm preflight, CPU coverage list and targeted tests changed. Rank/objective/VJP/statistics and three reused test AST bodies unchanged; stage A real capture plus affected B capture and orchestration rechecked. Original receipts remain frozen.",
+  244   "attempt04_optimizer_calls": 8,
+  245   "cumulative_optimizer_calls": 22,
+  246   "gpu_updates": 0,
+  247   "formal_inputs": false,
+  248   "formal_labels": false,
+  249   "bge_loaded": false,
+  250   "native_resource_evidence": "CPU handwritten process/CUDA mocks; no actual CUDA continuation qualification",
+  251   "accounting": "Outer attempt04 18.448001861572266 seconds charged19 plus retained30; inner48 does not replace conservative outer49."
+  252 }

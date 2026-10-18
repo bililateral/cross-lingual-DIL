@@ -313,7 +313,19 @@ class PositiveRankingTests(unittest.TestCase):
         import step28_positive_ranking_verify as verify
         from types import SimpleNamespace
         process=mock.Mock(pid=413);process.cpu_affinity.return_value=[0];process.parents.return_value=[]
-        sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0}
+        sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0,
+                "workspace_held":True, "cached":True}
+        cleanup=[]
+        def clear_workspaces():
+            self.assertEqual(cleanup[-1],"synchronize")
+            cleanup.append("clear_workspaces");sample["workspace_held"]=False
+        def empty_cache():
+            cleanup.append("empty_cache")
+            if not sample["workspace_held"]:sample["cached"]=False
+        def memory(kind):
+            cleanup.append(kind)
+            held=sample["workspace_held"] if kind=="allocated" else sample["cached"]
+            return sample[kind]+(64 if held else 0)
         def query(args,**kwargs):
             return (sample["apps"] if "--query-compute-apps=pid,process_name,used_memory" in args
                     else f"0, handwritten-GPU, 32768, {sample['free']}, 1024")
@@ -323,17 +335,28 @@ class PositiveRankingTests(unittest.TestCase):
              mock.patch.object(verify.psutil,"process_iter",side_effect=lambda *a:sample["jobs"]), \
              mock.patch.object(verify.psutil,"virtual_memory",side_effect=lambda:SimpleNamespace(available=sample["host"])), \
              mock.patch.object(verify.subprocess,"check_output",side_effect=query), \
-             mock.patch.object(verify.gc,"collect") as collect, \
-             mock.patch.object(verify.torch.cuda,"synchronize"),mock.patch.object(verify.torch.cuda,"empty_cache") as empty, \
-             mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:sample["allocated"]), \
-             mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:sample["reserved"]):
+             mock.patch.object(verify.gc,"collect",side_effect=lambda:cleanup.append("collect")) as collect, \
+             mock.patch.object(verify.torch.cuda,"synchronize",side_effect=lambda:cleanup.append("synchronize")), \
+             mock.patch.object(verify.torch._C,"_cuda_clearCublasWorkspaces",side_effect=clear_workspaces) as clear, \
+             mock.patch.object(verify.torch.cuda,"empty_cache",side_effect=empty_cache) as empty, \
+             mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:memory("allocated")), \
+             mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:memory("reserved")):
             first=verify.native_preflight(False)
-            self.assertEqual(first["compute_apps"],"");empty.assert_not_called()
+            self.assertEqual(first["compute_apps"],"");empty.assert_not_called();clear.assert_not_called()
             sample["apps"]="413, python, 512"
             with self.assertRaisesRegex(ValueError,"Resource gate failed"):
                 verify.native_preflight(False)
             second=verify.native_preflight(True)
             self.assertEqual(second["allowed_context_pid"],413);collect.assert_called_once();empty.assert_called_once()
+            expected_cleanup=["collect","synchronize","clear_workspaces","empty_cache","allocated","reserved"]
+            self.assertEqual(cleanup,expected_cleanup)
+            # Omit the essential release: empty_cache cannot free a library-owned workspace.
+            sample.update(workspace_held=True,cached=True)
+            with mock.patch.object(verify.torch._C,"_cuda_clearCublasWorkspaces"):
+                with self.assertRaisesRegex(ValueError,"Previous arm still owns"):
+                    verify.native_preflight(True)
+            self.assertTrue(sample["workspace_held"]);self.assertTrue(sample["cached"])
+            verify.native_preflight(True)
             rejected=[]
             for key,value in (("apps","413, python, 512\n414, python, 1"),("free",30*1024-1),
                     ("host",72*2**30-1),("allocated",4),("reserved",4),
@@ -350,6 +373,7 @@ class PositiveRankingTests(unittest.TestCase):
                 self.assertEqual(entry.call_args_list,[mock.call(False),mock.call(True)])
         self.evidence("native_continuation_preflight",dict(first_strict=True,own_context_only_second=True,
             rejected_cases=rejected,resource_thresholds_unchanged=True,real_native_entry_checked=True,
+            cleanup_order=expected_cleanup,omitted_workspace_release_rejected=True,
             cuda_and_process_state="mocked handwritten fixtures",actual_gpu_calls=0))
 
     def test_dual_orchestration_and_joint_opening(self):

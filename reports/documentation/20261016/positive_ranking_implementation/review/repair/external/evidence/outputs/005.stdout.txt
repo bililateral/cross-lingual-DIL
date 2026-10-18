@@ -1,0 +1,371 @@
+
+FILE scripts/step28_g_half_verify.py
+    1 """Cumulative Linux handwritten CPU/native qualification; no formal inputs."""
+    2 from __future__ import annotations
+    3 
+    4 import time
+    5 import os
+    6 import math
+    7 STARTED = time.monotonic()-max(0.,time.time()-float(os.environ.get("QUALIFICATION_STARTED_EPOCH",time.time())))
+    8 
+    9 import argparse
+   10 import gc
+   11 from pathlib import Path
+   12 import shutil
+   13 import sys
+   14 import threading
+   15 import traceback
+   16 import unittest
+   17 
+   18 import numpy as np
+   19 import psutil
+   20 import torch
+   21 
+   22 import step28_g_half_run as run
+   23 from step28_record_replay_verify import preflight
+   24 from step28_record_replay_numerics import cpu_copy, equal_state
+   25 
+   26 method, record, diag, core, data = run.method, run.record, run.diag, run.core, run.data
+   27 
+   28 
+   29 def state(model, optimizer):
+   30     return cpu_copy({"model": model.state_dict(), "adam": optimizer.state_dict(),
+   31                      "grads": [p.grad for p in model.parameters()]})
+   32 
+   33 
+   34 def restore(model, optimizer, saved, rng, modes):
+   35     model.load_state_dict(saved["model"])
+   36     optimizer.load_state_dict(cpu_copy(saved["adam"]))
+   37     for p, g in zip(model.parameters(), saved["grads"], strict=True):
+   38         p.grad = None if g is None else g.to(p.device)
+   39     for m, mode in zip(model.modules(), modes, strict=True):
+   40         m.training = mode
+   41     diag.restore_rng(rng)
+   42 
+   43 
+   44 def adam_effects(model, optimizer, saved):
+   45     """Record on/off Adam states by actual optimizer parameter ID and model name."""
+   46     current = optimizer.state_dict()
+   47     if [g["params"] for g in current["param_groups"]] != [g["params"] for g in saved["param_groups"]]:
+   48         raise ValueError("On/off Adam parameter mapping differs")
+   49     names = {id(p): name for name, p in model.named_parameters()}
+   50     result = {component: {"finite": True, "parameters": []} for component in ("encoder", "head")}
+   51     for live, packed in zip(optimizer.param_groups, current["param_groups"], strict=True):
+   52         for parameter, pid in zip(live["params"], packed["params"], strict=True):
+   53             name = names[id(parameter)]
+   54             component = name.split(".", 1)[0]
+   55             before, after = saved["state"].get(pid), current["state"].get(pid)
+   56             row = {"name": name, "optimizer_parameter_id": pid, "state_present": after is not None}
+   57             if (before is None) != (after is None) or (after is None and parameter.grad is not None):
+   58                 raise ValueError("On/off Adam participation differs: "+name)
+   59             if after is not None:
+   60                 for key in ("step", "exp_avg", "exp_avg_sq"):
+   61                     if key not in before or key not in after:
+   62                         raise ValueError("Missing on/off Adam field: "+name+"/"+key)
+   63                     a, b = before[key], after[key].detach().cpu()
+   64                     if a.shape != b.shape or a.dtype != b.dtype or not torch.isfinite(a).all() or not torch.isfinite(b).all():
+   65                         raise ValueError("Invalid on/off Adam field: "+name+"/"+key)
+   66                     row[key] = {"max_abs_delta": float((a-b).abs().max())}
+   67                     if key == "step":
+   68                         row[key].update(off=float(a), on=float(b))
+   69             result[component]["parameters"].append(row)
+   70     return result
+   71 
+   72 
+   73 def component_effects(model, on, *, optimizer=None):
+   74     """Compare active paths; unused parameters must keep both mask and value."""
+   75     parameters = list(model.named_parameters())
+   76     effects = {}
+   77     for component in ("encoder", "head"):
+   78         active, inactive = [], []
+   79         for i, (name, parameter) in enumerate(parameters):
+   80             if not name.startswith(component+"."):
+   81                 continue
+   82             gradient, previous = parameter.grad, on["grads"][i]
+   83             if (gradient is None) != (previous is None):
+   84                 raise ValueError("On/off gradient participation changed: "+name)
+   85             if gradient is None:
+   86                 if not torch.equal(on["model"][name], parameter.detach().cpu()):
+   87                     raise ValueError("Unused parameter changed: "+name)
+   88                 inactive.append(name)
+   89             else:
+   90                 if not torch.isfinite(gradient).all() or not torch.isfinite(previous).all():
+   91                     raise ValueError("Nonfinite on/off gradient: "+name)
+   92                 active.append((i, name, parameter))
+   93         gradient_delta = max((float((on["grads"][i]-p.grad.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+   94         parameter_delta = max((float((on["model"][n]-p.detach().cpu()).abs().max()) for i, n, p in active), default=0.)
+   95         if not active or gradient_delta == 0 or parameter_delta == 0:
+   96             raise ValueError("No distinguishable encoder/head active update effect")
+   97         effects[component] = {"post_clip_gradient_distinguishable": True, "actual_update_distinguishable": True,
+   98             "finite": True, "active_grad_parameters": len(active), "inactive_grad_parameters": inactive,
+   99             "active_parameter_names": [n for i, n, p in active],
+  100             "post_clip_gradient_max_delta": gradient_delta, "parameter_max_delta": parameter_delta}
+  101     if optimizer is not None:
+  102         for component, value in adam_effects(model, optimizer, on["adam"]).items():
+  103             effects[component]["adam"] = value
+  104     return effects
+  105 
+  106 
+  107 def checked_fresh(c):
+  108     archive = run.pretrained_archive(c)
+  109     model, optimizer, initial = run.fresh(c)
+  110     return model, optimizer, initial, archive
+  111 
+  112 
+  113 def disk_reserve(path, total, reserve, maximum):
+  114     if total+reserve > maximum or shutil.disk_usage(path).free < reserve:
+  115         raise RuntimeError("Qualification checkpoint reserve exceeds available disk or approved work bytes")
+  116 
+  117 
+  118 def native_save(path, model, optimizer, metadata, check):
+  119     check(run.base.persistence.checkpoint_reserve(model, optimizer))
+  120     return core.save_state(path, model, optimizer, metadata)
+  121 
+  122 
+  123 def native(check, progress, handwritten, out, *, entry=None, consistency=False):
+  124     run = entry or sys.modules["step28_g_half_run"]
+  125     method = run.method
+  126     active, control = method.ARMS[0], "H" if consistency else "G"
+  127     import step28_balanced_pooling as original
+  128     resources = preflight()
+  129     if shutil.disk_usage(out).free < 10*2**30:
+  130         raise ValueError("Insufficient native temporary disk")
+  131     numerics = run.parent.configure_numerics()
+  132     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
+  133     measurements, updates = {}, []
+  134     def timed(name, fn):
+  135         check(); torch.cuda.synchronize(); started = time.monotonic()
+  136         value = fn(); torch.cuda.synchronize()
+  137         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
+  138         return value
+  139     c = run.config()
+  140     if consistency:
+  141         c["handwritten_qualification"] = True
+  142     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+  143     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+  144         raise ValueError("BF16/checkpointing required")
+  145     if consistency and initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
+  146             "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
+  147         raise ValueError("H_cons native initial identity differs")
+  148     method.bind(model, method.metadata())
+  149     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
+  150     for g in (current,history):
+  151         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
+  152         if len(lengths)!=448 or set(lengths)!={256}:
+  153             raise ValueError("Maximum N224/token256 fixture differs")
+  154     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
+  155     gradients, effects, table_checks, objective_pairs = {}, {}, [], {}
+
+FILE scripts/step28_record_replay_verify.py
+    1 """Budgeted handwritten CPU checks and reviewed native worst-shape first update."""
+    2 from __future__ import annotations
+    3 
+    4 import time
+    5 STARTED = time.monotonic()
+    6 
+    7 import argparse
+    8 import os
+    9 from pathlib import Path
+   10 import subprocess
+   11 import sys
+   12 import threading
+   13 import traceback
+   14 import unittest
+   15 
+   16 import psutil
+   17 import torch
+   18 
+   19 import step28_record_replay as method
+   20 import step28_record_replay_run as run
+   21 
+   22 
+   23 def preflight() -> dict:
+   24     process = psutil.Process()
+   25     if os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1:
+   26         raise ValueError("Physical GPU0 and exactly one CPU affinity required")
+   27     if any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS")):
+   28         raise ValueError("Single-thread environment must precede imports")
+   29     if os.environ.get("TOKENIZERS_PARALLELISM") != "false":
+   30         raise ValueError("Tokenizer parallelism must be disabled")
+   31     gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+   32                                    "--format=csv,noheader,nounits"], text=True).strip()
+   33     apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+   34                                     "--format=csv,noheader,nounits"], text=True).strip()
+   35     ancestors = {process.pid, *(p.pid for p in process.parents())}
+   36     jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+   37             if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+   38     available = psutil.virtual_memory().available
+   39     if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or apps or jobs:
+   40         raise ValueError(f"Resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+   41     return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs}
+   42 
+   43 
+   44 def native(check, progress, handmade) -> dict:
+   45     resources = preflight()
+   46     numerics = method.parent.configure_numerics()
+   47     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory, 0)
+   48     c = method.config()
+   49     model = method.load_model(c)
+   50     auto = model.encoder[0].auto_model
+   51     if not auto.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+   52         raise ValueError("Required native execution mode missing")
+   53     current, history = [handmade.handmade_group("native_"+role, 8, 254) for role in ("current", "history")]
+   54     for group in (current, history):
+   55         lengths = [len(v) for v in model.encoder.tokenizer(method.base.record_texts(group, "separate_moments"),
+
+FILE scripts/step28_positive_ranking.py
+    1 """Fixed S_pos/H_pos objectives on the existing record VJP; no data entry."""
+    2 from __future__ import annotations
+    3 
+    4 import hashlib
+    5 from typing import Any
+    6 
+    7 import numpy as np
+    8 import torch
+    9 
+   10 import step28_g_half as h
+   11 
+   12 record, data = h.record, h.data
+   13 ARMS = ("S_pos", "H_pos")
+   14 RNG_ORDER = "ABC"
+   15 
+   16 
+   17 def identity(arm: str) -> dict:
+   18     if arm not in ARMS:
+   19         raise ValueError("Only fixed S_pos/H_pos candidates are supported")
+   20     if arm == "H_pos":
+   21         return h.identity()
+   22     return dict(arm="S", pooling="complete_record_mean", record_order="canonical_offdiagonal_upper_v1",
+   23                 output_dtype="float32", numerics="original_FP32_matrix_mean")
+   24 
+   25 
+   26 def training_identity(arm: str) -> dict:
+   27     identity(arm)
+   28     return dict(arm=arm, rank="mean_positive_logsumexp_zero_and_all_negative_differences",
+   29                 temperature=1., queries=28, candidates=27, positive_counts=[1, 2],
+   30                 reduction="mean_positive_then_mean_query", precision="actual_FP32_logits_FP32_rank",
+   31                 current_supervision=1., history_supervision=.1, teacher_A0=.5, hard_weight=.5,
+   32                 optimizer="AdamW", rng_order=RNG_ORDER)
+   33 
+   34 
+   35 def metadata(arm: str) -> dict:
+   36     return dict(pooling=identity(arm), training=training_identity(arm))
+   37 
+   38 
+   39 def bind(model: Any, meta: dict) -> str:
+   40     arm = meta.get("training", {}).get("arm")
+   41     if any(meta.get(k) != v for k, v in metadata(arm).items()):
+   42         raise ValueError("Candidate scoring/training identity mismatch")
+   43     model.pooling_identity, model.training_identity = identity(arm), training_identity(arm)
+   44     return arm
+   45 
+   46 
+   47 def bound_arm(model: Any) -> str:
+   48     return bind(model, dict(pooling=getattr(model, "pooling_identity", None),
+   49                             training=getattr(model, "training_identity", None)))
+   50 
+   51 
+   52 def account_logits(table: Any, slots: np.ndarray, arm: str) -> Any:
+   53     identity(arm)
+   54     return (record.account_logits(table, slots) if arm == "S_pos"
+   55             else h.account_logits(table, slots, "G_half"))
+   56 
+   57 
+   58 def objectives(predicted: Any, truth: Any, *, old_rank: bool = False) -> dict:
+   59     """Replace rank, retaining the established label validation, BCE and hard."""
+   60     inherited = record.parent.ranking.objectives(predicted, truth, .5)
+   61     scores, positive, _ = record.parent.ranking.hard_candidates(predicted, truth)
+   62     diagonal = torch.eye(28, dtype=torch.bool, device=predicted.device)
+   63     negative = ~positive & ~diagonal
+   64     terms = []
+   65     for q in range(28):
+   66         pos, neg = scores[q, positive[q]], scores[q, negative[q]]
+   67         differences = neg[None, :] - pos[:, None]
+   68         terms_with_zero = torch.cat((differences.new_zeros((len(pos), 1)), differences), 1)
+   69         # Center explicitly so backward normalizes small FP32 values rather than
+   70         # subtracting a rounded, potentially large logsumexp from each difference.
+   71         peak = terms_with_zero.detach().amax(1, keepdim=True)
+   72         terms.append((torch.logsumexp(terms_with_zero-peak, 1)+peak[:, 0]).mean())
+   73     rank_pos = torch.stack(terms).mean()
+   74     if not torch.isfinite(rank_pos):
+   75         raise ValueError("Nonfinite positive ranking loss")
+   76     rank_used = inherited["rank"] if old_rank else rank_pos
+   77     # Do not add rank_pos to inherited total: that would retain the old rank.
+   78     return dict(bce=inherited["bce"], rank_pos=rank_pos, hard=inherited["hard"],
+   79                 rank_used=rank_used, total=inherited["bce"]+rank_used+.5*inherited["hard"])
+   80 
+   81 
+   82 def objective(table: Any, group: Any, regroup_seed: int, arm: str,
+   83               reference: np.ndarray | None = None, *, old_rank: bool = False) -> tuple[Any, dict]:
+   84     identity(arm)
+   85     if group.labels is None:
+   86         raise ValueError("Authorized training labels required")
+   87     slots = (record.assignment(group), record.assignment(group, regroup_seed))
+   88     predictions = [account_logits(table, a, arm) for a in slots]
+   89     truth = torch.as_tensor(group.labels, dtype=table.dtype, device=table.device)
+   90     pieces = [objectives(p, truth, old_rank=old_rank) for p in predictions]
+   91     supervised = (pieces[0]["total"]+pieces[1]["total"])/2
+   92     mse = table.new_zeros(())
+   93     if reference is not None:
+   94         target = torch.as_tensor(reference, dtype=table.dtype, device=table.device)
+   95         mse = (predictions[0]-account_logits(target, slots[0], arm)).square().mean()
+   96     weight = 1. if reference is None else .1
+   97     supervised_contribution, teacher_contribution = weight*supervised, .5*mse
+   98     total = supervised_contribution+teacher_contribution
+   99     if not torch.isfinite(total):
+  100         raise ValueError("Nonfinite complete objective")
+  101     return total, dict(supervised=float(supervised.detach()), mse0=float(mse.detach()), mse1=None,
+  102         distillation=float(mse.detach()), supervised_contribution=float(supervised_contribution.detach()),
+  103         teacher_contribution=float(teacher_contribution.detach()), weighted=float(total.detach()),
+  104         qualification_old_rank=old_rank,
+  105         views=[{k: float(v.detach()) for k, v in p.items()} for p in pieces])
+  106 
+  107 
+  108 def update(model: Any, optimizer: Any, current: Any, history: Any, reference: Any, c: dict,
+  109            arm: str, stage: int, step: int, check=lambda: None, observe=None,
+  110            *, qualification_old_rank: bool = False, table_observer=None) -> dict:
+  111     if bound_arm(model) != arm:
+  112         raise ValueError("Bound candidate differs from requested update")
+  113     if (qualification_old_rank or table_observer is not None) and c.get("handwritten_qualification") is not True:
+  114         raise ValueError("Only handwritten qualification can switch rank or observe tables")
+  115     if (history is None) != (reference is None):
+  116         raise ValueError("Historical group and its own birth table must be paired")
+  117     def target(table, group, seed, candidate, ref):
+  118         value, log = objective(table, group, seed, candidate, ref, old_rank=qualification_old_rank)
+  119         if table_observer is not None:
+  120             table_observer(table.detach(), group, seed, ref)
+  121         return value, log
+  122     result = record.update(model, optimizer, current, history, reference, c, arm, RNG_ORDER,
+  123                            stage, step, check, observe=observe, objective_fn=target)
+  124     for role, group in (("current", current), ("history", history)):
+  125         if group is not None:
+  126             seed = data.seed_for(20260918, RNG_ORDER, stage, step, role, group.uid, "regroup")
+  127             result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(group, seed).tobytes()).hexdigest()
+  128     result.update(metadata(arm))
+  129     return result
+  130 
+  131 
+  132 def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None) -> np.ndarray:
+  133     if bound_arm(model) != arm:
+  134         raise ValueError("Scoring candidate differs from restored training identity")
+  135     if not groups:
+  136         return np.empty((0, 378), np.float32)
+  137     return (record.score(model, groups, c, check) if arm == "S_pos"
+  138             else h.score(model, groups, c, "G_half", check))
+  139 
+  140 
+  141 def restored_score(model: Any, groups: list, c: dict, check=lambda: None) -> np.ndarray:
+  142     return score(model, groups, c, bound_arm(model), check)
+  143 
+  144 
+  145 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list, c: dict,
+  146             arm: str, stage: int, epoch: int, root, point: str, check=lambda: None) -> dict:
+  147     import step28_replay_diagnostics as diag
+  148     result = diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch,
+  149         root, point, check, scope="AB", score_fn=score,
+  150         pooling_fn=lambda table, slots, group, view: account_logits(table, slots, arm))
+  151     path = root/result["path"]
+  152     row = data.read_json(path)
+  153     row.update(metadata(arm))
+  154     data.write_json(path, row)
+  155     return data.record(path, root)

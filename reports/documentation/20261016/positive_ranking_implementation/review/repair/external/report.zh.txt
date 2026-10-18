@@ -1,0 +1,209 @@
+# S_pos / H_pos 修复版本定向实现复审
+
+审查对象：positive_ranking_repair_review.zip，申报实现提交 38d05b9a。
+审查日期：2026-10-18。执行方式：本轮独立静态审查，未委派子 agent。
+
+## 一、裁决
+
+本包的输入身份、新旧源码对应和 CPU 证据继承均通过机械核对。A 阶段空缓存诊断缺陷可以关闭；原生后续臂精确豁免自身 PID 的接线也已修好，且未发现返回报告持有首臂模型、optimizer 或 CUDA 张量的 Python 引用。
+
+但当前版本仍有 1 项 P1 执行阻断：继续第二臂之前，代码只调用 gc.collect、CUDA synchronize 和 empty_cache，随后要求 allocated/reserved 同时为零；它没有释放 PyTorch 持续持有的 cuBLAS 工作区。按照包中申报的 PyTorch 2.9.1+cu130、固定非零 CUBLAS_WORKSPACE_CONFIG 和实际 CUDA 矩阵乘法路径，上游分配器仍会把该工作区视作活跃分配，第二臂将在这道零内存门被拒绝。此结论来自版本对应的实现路径和官方依赖源码，不是本轮运行 CUDA 得到的结果，也不是把“尚未实测”本身当作缺陷。
+
+因此，本轮不能把当前实现评为“已具备进入待批准原生资格的实现条件”。最小处置是补全库工作区释放顺序及直接对应的 mock，再由主执行者处置并关闭该项。无需改变数学配置、放宽零内存门、增加原生调用、候选、seed 或训练规模。此项关闭后，可以重新判定实现是否可进入待批准的原生资格；该判定仍不等于用户已批准原生、不等于原生已通过，更不等于正式性能达标。
+
+本轮没有新增关于 rank 数学、S/H 非空评分定义或科研主门的否定结论；这些未变部分按本轮要求仅作身份和变更边界核对，不重复数学实验或重开旧研究。
+
+## 二、输入身份、证据等级及本轮边界
+
+唯一项目实现输入为用户本轮指定的修复 ZIP。实测文件为 394296 字节、94 个不重复成员，SHA256：
+2910ad3d7cea62a334e2fd3d3912dc9b5a9ae163b133111f2e48f783b47b92af。
+
+package_manifest.json 列出 93 个载荷成员；其每项路径、字节及 SHA256 全部一致，无缺失、额外或重复路径。第 94 个成员是 manifest 本身，26458 字节，SHA256：
+0d5936d8c5afd11b19c9581bdf9ba632a40d9af8eca6b5b01b1bdbf3016c0e07。
+manifest 不递归列出自身不是缺陷。本轮另行记录了它的身份，并在交付前再次确认全部解压成员与输入 ZIP 保持逐字节一致。[E1]
+
+38d05b9a 和 d914f43c 在此是提交方给出的版本标识。本轮验证了包内文件、patch 的 Git blob 前缀和实际内容，没有连接项目仓库或 Linux，也没有独立验证 Git commit tree、实际运行主机或后台模型身份。对原中断审查，仅保留包中可见中途裁决和主审处置的背景用途；不宣称旧实现外审已完整关闭，不恢复旧输入任务或旧数学计算。
+
+证据分为以下四层：
+
+| 层次 | 本轮能确认的内容 | 不能据此宣称的内容 |
+| --- | --- | --- |
+| 独立静态与机械核对 | ZIP、94 成员、patch、AST、40 来源、日志字段及实际调用路径 | 远端部署身份或运行真伪的独立认证 |
+| 包内既有 CPU 原件 | 源码绑定的 attempt04 四项 PASS、旧三项继承及累计账一致 | 本轮重跑了这些测试，或它们是 GPU 证据 |
+| 手写系统/CUDA mock | 指定输入下的 PID/阈值拒绝、分支转发 | 实际 CUDA 上下文释放或原生双臂通过 |
+| 必要的官方依赖静态阅读 | PyTorch 2.9 文档及 v2.9.1 cuBLAS 工作区所有权实现 | 已认证项目安装二进制与上游源码逐字节相同 |
+
+本轮没有运行项目训练/测试 CLI，没有导入执行项目科研模块，没有数学或数值实验，没有 BGE、权重、Memory 或正式数据读取，没有连接项目 Linux，没有 GPU 调用、安装或扩预算。辅助脚本只用标准库读取文件、解析 JSON/AST、计算文件身份、机械应用 patch、核算已有字段和打包。为判定新零分配门的可达性，定向阅读了官方 cuBLAS 工作区说明和固定版本源码；没有检索新论文或扩展科研问题。[E1–E4]
+
+## 三、逐项发现与关闭状态
+
+### R01｜原 A 阶段空缓存评分异常——关闭
+
+等级：原执行阻断已修复；当前无此阻断。
+
+位置：scripts/step28_positive_ranking.py 第 132–155 行；scripts/step28_replay_diagnostics.py 第 31–43、52–58、61–129 行；scripts/step28_g_half_run.py 第 177–196、333–350 行；tests/test_step28_positive_ranking.py 第 282–310、408–411 行。
+
+证据与实际路径：positive_ranking_run.train_stage 以 entry=当前正例模块委托既有 g_half 训练入口；各臂 A 阶段 Memory 初值为空，真实训练入口在每 48 次 optimizer 位置调用 entry.capture。capture 把 method.score 传给既有诊断器。诊断器为 A 构造 48 个 fit、0 个 cache 和 40 个盲 valid 项，依次请求评分，包括真实的 score(model, [])。现在 score 先调用 bound_arm 验证模型的臂身份，再在空 groups 时返回形状 (0,378) 的 NumPy FP32 数组。非空调用继续按臂原样委托 record.score 或 h.score。[P1–P3]
+
+这条修复补上实际生产评分入口的空集定义。空返回没有绕过臂身份校验，也没有提前覆盖非空路径。下游 metrics 对空 logits 返回 (0,3) FP64 指标数组；cache 的组身份、域及教师项为空，cache origins 为空对象。诊断保存仍经过既有中性上下文恢复训练模式与 RNG，并检查 Adam 时钟和 Memory 载荷不变。没有为了空缓存新增教师、虚构一行指标或跳过盲 valid。[P2]
+
+新增测试实际对两臂逐一构造轻量模型，各做 1 次真实非零学习率更新，再显式把 Adam 时钟置 48，调用生产 capture，检查 48/0/40、空评分 shape/dtype、空 cache 指标、空身份/域/教师、模型与 Adam/梯度摘要、RNG 和模式，并拒绝错误臂。它也直接调用原 record.score 的空列表路径并确认其异常。此反例能证明旧评分入口确实不能处理该空集，不依赖旧编排替代函数自行掩盖问题。[P4；C1]
+
+编排 mock 现在保存 production_score，在空分支转调该真实入口；非空编排评分仍属模拟。这消除了旧测试中空集分支完全自给自足的遮蔽。删除空分支、返回错误形状或 dtype、把空返回移到身份校验前，都会违反已写断言；本轮没有执行这些变异，也不把静态读断言说成已运行变异试验。[P4]
+
+影响与最小处置：A 阶段首次诊断不再因空 cache 的 np.stack 失败而中断。无需进一步修复此项。每臂仅 1 次真实更新加合成时钟的范围必须继续明确，不能表述为完成了 48 次更新。
+
+### R02｜原生第二臂自身 CUDA PID 被旧严格门拒绝——PID 子问题已修，整体准入尚未关闭
+
+等级：原执行缺陷部分关闭；未闭部分集中记入 R03，不重复计为两个新阻断。
+
+位置：scripts/step28_positive_ranking_verify.py 第 25–59、300–326 行；原 scripts/step28_record_replay_verify.py 第 23–41 行；tests/test_step28_positive_ranking.py 第 312–353 行。
+
+证据与实际路径：main 从空 report.arms 开始，第一臂调用 native 时 bool(report.arms) 为 False；native 的首个操作就是 native_preflight(continuing)。只有第一臂完整返回、随后逐臂预算检查成功，并把其结果登记到 report.arms 后，下一臂才收到 True。第一臂异常不会继续第二臂，也没有新增重试或可由 CLI 开关直接跳过首臂严格门的路径。[P5]
+
+continuing=False 原样调用冻结 preflight。True 分支先清理并检查零 allocated/reserved，再检查 GPU0 信息与 compute-apps；仅以解析后的整数 PID 等于 psutil.Process().pid 豁免本进程。其他 PID 即使名为 python、属于同一用户，仍进入 foreign_apps 并被拒绝。相关 step28 作业检查仍保留，并沿用既有自身/祖先进程排除方式；没有按进程名、用户名或“任何 Python 进程”扩大 CUDA 豁免。[P5]
+
+单物理 GPU0、单 CPU affinity、OMP/MKL/OPENBLAS 各 1、TOKENIZERS_PARALLELISM=false，GPU 空闲至少 30 GiB、主存可用至少 72 GiB 均保留。第一臂仍拒绝已有 compute-apps；后续分支也未修改冻结共用预检或引入子进程、监听、作业终止逻辑。[P5]
+
+返回对象和 Python 引用生命周期已逐层追踪，见下一节。未找到“main 仍持有首臂模型，所以 gc 永远无效”的路径。该辅助函数不是不可达的摆设；它在第二次 native 首部、加载新模型之前实际被调用。现有 mock 可以核对严格首臂、自身 PID 例外、其他 PID/作业、资源不足和预设残留内存的拒绝，也检查 native 的参数转发；其系统/CUDA 状态都是手写的，未运行 main 的真实 GPU 两臂。这是明确的证据边界。[P4–P5；C1]
+
+影响与最小处置：精确自身 PID 例外本身可接受，无需改回单臂、子进程平台或扩宽豁免。但完成第二臂准入还需要 R03 的库工作区清理，故不能把原生缺陷整体关闭。
+
+### R03｜库持有的 cuBLAS 工作区未释放，第二臂零分配门仍会拒绝——当前唯一 P1
+
+等级：P1，影响原生真实执行及执行合同；不是新数学错误，也不是性能失败。
+
+位置：scripts/step28_positive_ranking_verify.py 第 29–33 行；实际触发路径涉及该文件第 73–105 行、scripts/step28_record_replay.py 第 102–127、159–180 行、scripts/step28_continual_population.py 第 14–29 行；测试缺口位于 tests/test_step28_positive_ranking.py 第 312–353 行。数值配置来自 scripts/step28_bge_continual.py 第 31–47 行及 Linux 启动脚本第 11 行。当前包 result.json 申报 torch 为 2.9.1+cu130。[P5–P7；C1]
+
+可复核理由如下。
+
+1. 首臂不是只建立一个空 CUDA 上下文。native 真实更新使用 GPU 模型和 head Linear，record.backward_group 生成 GPU 表并调用 objective_fn。S 臂的 record.account_logits 第 125 行执行 pooling @ matrix @ pooling.T；其输入沿表的 device 建立。因此，即使不依赖 BGE 内部实现，也已有直接的 CUDA 矩阵乘法路径。[P6]
+2. 本合同固定 CUBLAS_WORKSPACE_CONFIG=:4096:8，申报 CPU 环境也记录了这个非零配置。未发现项目源码调用 clearCublasWorkspaces 或其 Python 清理入口。[E3；P7]
+3. PyTorch 2.9 官方 CUDA 文档指出，cuBLAS 工作区在相应 handle/stream 上建立后持续保留，专门的 torch._C._cuda_clearCublasWorkspaces() 可释放它；empty_cache 释放的是未被持有的分配器缓存。[U1]
+4. 固定 v2.9.1 的 CublasHandlePool.cpp 提供更直接的所有权证据：第 110–118 行的两个持久 map 持有 at::DataPtr；第 228–234 行使用 CUDACachingAllocator 分配；第 291–307 行把 handle/stream 的工作区插入 map 并传给 cuBLAS；第 330–354 行表明 CUDA 的 cuBLASLt handle 复用该 BLAS handle 路径。第 120–123 行的 clearCublasWorkspaces 才同时清空两张 map。[U2]
+5. Python 局部变量释放和 gc.collect 不会清空这些 C++ map。synchronize 仅等待已提交工作完成；empty_cache 不能释放仍被 map 的 DataPtr 持有的块。所以在上述申报版本与配置的正常 eager CUDA 路径下，第 32 行仍会看到非零活跃分配，在检查自身 PID 例外之前就失败。[P5；U1–U2]
+
+这里不主张曾经观察到该项目的具体显存字节数，也不把静态源码等同于项目二进制认证。判断条件是包中明示的 PyTorch 2.9.1 CUDA 实现与固定非零工作区配置；官方源码给出了正向、可定位的残留所有权，因而已经超出单纯“未实测所以不确定”的泛泛担心。这也不是首臂模型泄漏：被持有的是库工作区。[U2]
+
+现有测试为何没有拒绝：测试把 memory_allocated 和 memory_reserved 直接 mock 为 0，并对若干非零返回单独做拒绝断言。它证明“若已为零可通过、若非零会拒绝”，没有表达“矩阵乘法留下库工作区，必须经过专用释放才变为零”的状态转移。gc 和 empty_cache 的调用存在不能填补该证据缺口。此缺口与当前错误有直接对应关系，不要求通用 CUDA 测试平台。[P4]
+
+最小修复建议（只作审查建议，本轮未修改或执行）：在继续臂分支按以下顺序清理：
+
+    gc.collect()
+    torch.cuda.synchronize()
+    torch._C._cuda_clearCublasWorkspaces()
+    torch.cuda.empty_cache()
+    # 保留现有 allocated/reserved == 0、精确 PID、资源与作业检查。
+
+该 Python 清理入口在此次对应的官方 2.9 文档中有明确记录。将它放在同步之后、empty_cache 之前，使持有关系先解除，再退还分配器缓存。继续采用原数值配置，不把工作区设为零，不放宽精度，不把任意非零残留加入白名单，也不删除零分配门。[U1–U2]
+
+最小验证对应现有 preflight mock：让一个“库工作区仍被持有”的状态在专用 clear 之前保持正数、之后才允许零分配，并断言同步→专用 clear→empty_cache→内存查询的顺序；删掉专用 clear 应拒绝。保留已有首臂严格门、其他 PID、资源和作业的拒绝用例即可。代码和 CPU 处置由主执行者依既有许可、剩余累计预算执行并更新来源绑定；本审没有要求额外 GPU 试验来证明此项，也没有授予 GPU 权限。实际 CUDA 释放仍应在将来获批的既定原生资格中形成证据。
+
+## 四、首臂返回后的所有权与两臂独立起点
+
+这一部分专门区分 Python 业务对象与库内部工作区，避免把两者混为一个“显存没清”。
+
+| 对象/入口 | 实际保存或返回的内容 | 对首臂 CUDA 生命周期的判断 |
+| --- | --- | --- |
+| native 内 model、optimizer、probes | 函数局部对象，probes 指向模型参数 | 未加入返回 report；函数成功返回后离开该调用作用域 |
+| updated 的 captured 表与 objective 回调 | 临时捕获 GPU 表，供局部表/梯度检查 | 没有从 native 返回回调或原始表 |
+| gradients 与 state | 参数梯度显式 detach().cpu().clone；state 递归 cpu_copy | 对应保存副本在 CPU；未把参数张量作为报告载荷 |
+| component_effects、Adam 差异与表检查 | 浮点数、字符串、列表、布尔、维度/计数 | 没有返回原参数或 GPU 梯度 |
+| RNG 元数据 | RNG 状态转为列表/标量 | 不形成返回报告中的 CUDA 张量根 |
+| native_save / restore | 保存身份、SHA 和元数据；恢复局部载荷在 CPU | 返回值不是模型/optimizer state_dict 的 GPU 对象 |
+| main 的 report.arms、计时闭包 | native 返回的测量值、身份、判定和预算状态 | 没有捕获首臂模型或 optimizer |
+| PyTorch cuBLAS workspace map | C++ 持有的 at::DataPtr | 不属于上述 Python 清理范围，须按 R03 单独释放 |
+
+定位依据：positive_verify 第 82–110、126、153、170、205–211 行；g_half_verify 第 29–31、44–120 行；record_replay_numerics 第 45–52 行；bge_continual_run 第 58–71 行；continual_population 第 182–210 行。未返回的局部循环引用可由下一臂 gc.collect 处理。本结论只覆盖所追踪的实际业务返回路径，不把它外推为“所有原生库都已无内存”。[P5–P8]
+
+独立起点仍通过 checked_fresh 为每臂调用各自的 pretrained_archive/fresh。fresh 重置 Python/NumPy 随机起点，load_model 在 encoder/head 初始化前设定 torch seed，重新创建模型和 AdamW；native 对初始模型及空 Adam 身份作硬比较。第二臂不是从首臂 checkpoint 接着训练。两臂处于同一进程会共享库上下文和工作区，恰好说明清理 R03 与“模型独立初始化”是两个不同层面的要求。[P5、P7–P9]
+
+正式入口每臂自身的 A→B、Memory 从空开始及后续继承没有在本次 patch 中改变。未新增读取 Memory、训练、保存恢复实测或出生表重算；这些结论是入口静态追踪与未变源码绑定，不是新增正式证据。
+
+## 五、受影响回归与 CPU 账
+
+新增 A 空缓存测试覆盖实际两臂轻量更新和生产诊断。B 阶段 capture/restore/next-update 测试本次源码 AST 未变，但确实包含在 attempt04 四项执行中：每臂 3 次真实轻量更新，使用合成 Adam 336 时钟，检查 48 fit / 6 cache / 40 valid、教师/池化字段、完整与推理恢复、下一更新以及身份拒绝。它继续覆盖非空诊断和恢复，不因 A 空缓存提前返回而被替换。[P4；C1；E2]
+
+编排回归仍模拟两臂分别 A→B、4 个端点与 24 个诊断，并对联合 valid 开启的损坏情况作拒绝；空评分分支现在接入生产 score。其 1152 次调用是模拟更新、真实优化为 0，不能据此主张完成正式训练。对本次空分支改动而言，真实 A、真实 B 及编排空分支的组合足够覆盖受影响入口。原生资源 mock 的不足则精确限于 R03，不能拿 B 恢复 PASS 来替代库工作区释放证据。[P4；C1]
+
+| 证据/活动 | 本次包内事实 | 本轮外审做了什么 |
+| --- | --- | --- |
+| attempt04 | 4 tests，0 failure/error/skip；PASS_HANDWRITTEN_ONLY | 核源码、日志、选择集合、字段和身份，未重跑 |
+| 未变三项 | rank/reference、actual VJP/AdamW、saved comparisons/permissions 继承旧证据 | 确认相应 AST 未变与历史 40 来源对应 |
+| 当前资格集合 | 3 项继承 + 4 项执行 = 7 项 | 没有表述成 7 项都重跑 |
+| 新真实轻量 optimizer | A 空缓存 2 次 + B 恢复 6 次 = 8 次 | 仅核算保存事实 |
+| 累计真实轻量 optimizer | 旧 14 + 新 8 = 22；其中生产入口累计 20、独立参考 2 | 不算作原生或正式调用 |
+| 编排 | 1152 次模拟、0 次真实优化 | 静态核其 mock 与保存字段 |
+| 原生 | 计划每臂 6、合计 12；实际 GPU 0 | 无项目 CUDA 执行 |
+| 正式 | 计划 1152 optimizer / 1728 current-history 反传组 / 4 端点 / 24 诊断 / 18 项严格判读；实际未执行 | 核本次 patch 未改变合同 |
+
+项目 CPU 外层 attempt04 elapsed 为 18.448001861572266 秒，保守计 19；加旧两次失败和成功已计 30，累计 49/300 秒，剩余 251 秒。内层 result 的 cumulative_charged_seconds=48 不替代外层保守累计 49。旧失败原件及原预算继续保留，不追改、不清零。[C1–C2；E2]
+
+attempt04 自报 peak_rss_bytes=705761280、peak_work_bytes=8434471；这些是原件字段，不是本轮对项目进程的测量。外审机械脚本自身时间/RSS另见 resource_ledger.json 与各 pre_execution/result 原件，不混入项目 49 秒账。本轮新增科学计算、项目 optimizer、GPU 调用和项目测试次数均为 0。
+
+## 六、来源绑定、恢复与合同是否漂移
+
+changes.patch 的四处文件级变化均从 historical_sources 中相应原件在内存应用，并逐字节重建当前文件；全部 Git blob 前缀一致。四个改动文件为 method、run、verify 及正例测试。method 的函数级变化仅 score；run 的变化是 CPU_TESTS 集合；verify 改 native/main 并加入 native_preflight；测试加入两项定向测试，并修改编排空评分分支。旧 rank 参考、actual VJP/AdamW、saved comparison 三项测试 AST 一致，B 恢复测试 AST 也一致。[E2]
+
+本轮没有导入 run.sources；机械脚本解析 AST 的 import closure，再加入政策、授权、合同、baseline 清单和启动脚本，独立重建它应绑定的 40 个来源。当前 40 项与 cpu_gate_repair 和 attempt04 均一致；用四个 historical_sources 置换后，历史 40 项与 cpu_gate 和 attempt03 一致；其余 36 项逐字节未变。继承/本轮执行/外层时钟引用亦均吻合。[E2]
+
+deployment04 的 41 条记录对应 40 来源加 CPU wrapper，与包中身份一致；receive04 的 8 项、9497 字节与附带结果一致。本轮只能核收据和本包内容的内部对应，没有连接主机验证实际部署。包只含 52 保存对照的身份清单，没有这些原始性能载荷；本审没有重算旧指标或声称独立核过 52 原始文件。[E1–E2]
+
+数学目标、current/history 与 A0/A1 四处 rank、D0、S 原 FP32 与 H 原 FP64 池化后一次 FP32 的非空路径、完整 S 主对照、主要 S_pos−S 双域 B 末 raw MAP 门、固定次级比较、22 指标/三角色、重复开发集与单 seed 限制，均不在本次 patch 的改动中。本轮复用其既定合同边界，不重复旧数学核验，不重判 H/H_cons 的旧结论，不以 H_pos 次级改善替代主要失败。[E2；P1；D1]
+
+权限仍分阶段：已获代码与既有 py310 手写 CPU 累计 300 秒许可；本轮重送外审不是 GPU/BGE 或正式文本标签/训练的批准。原生 reviewed_gate 与正式 validate_gate 未被本次 repair 绕过。主执行者在项目 Linux 执行原生/正式仍须相应用户批准，外审意见不自动代替其裁决。[P5、P10；D1–D2]
+
+原生预算仍为每臂最多 600 秒、总体 1200 秒、每臂 6 次实际 optimizer；第二臂清理处于它的计时范围内，同时纳入总 watchdog。失败仍记录已耗时，无循环重试或删除失败账。本轮新增代码未更改 28 GiB GPU 限额/峰值约束、64 GiB RSS、10 GiB 原生临时工作区和 128 MiB 证据约束，也未改正式 57600 秒及 16 GiB 工作区合同。将来增加专用 clear 后，其时间也必须自然落在原有范围内；不增加调用预算。[P5；D1]
+
+## 七、实际阅读范围
+
+reading_scope.tsv / reading_scope.json 对输入全部 94 成员列出路径、字节、SHA256、身份核对、机械处理种类、实际显示阅读行范围与范围说明。这里区分“全文/选段语义阅读”“AST/字段机械处理”“仅身份核对”。对 94 成员做哈希不等于逐行科研审查了全部成员。
+
+主要语义阅读包括：完整 positive_ranking.py 与 positive_ranking_verify.py；positive_ranking_run.py 前 218 行；正例测试的导入、辅助摘要和第 235–463 行受影响测试；完整 changes.patch、当前正例政策与合同、修复请求/处置/授权、当前 CPU gate 及 attempt04 原件；record/g_half/diagnostics/model/RNG/save/restore/fresh 等实际调用链的相关选段。旧主审与实施范围只读必要背景。旧结果全文、未变数学详细论证、52 性能原件和 Memory 均不作为本轮重新审查对象。[E1–E3]
+
+partial_page.json 曾请求显示，但工具展示因长 JSON 内容截断；阅读清单明确记为背景选段/展示截断，不声称完整语义阅读或完整恢复原中断答复。部分读取命令的请求终止行超过文件行数，阅读清单按实际文件末行截断。日志保留原始请求范围，便于复核。
+
+额外依赖阅读仅是 U1 的相关两小节和 U2 的 357 行固定版本源码。原始 URL、文件身份、取回脚本、执行前记录、成功收据及先前网页访问失败说明均保留。网页 DisabledError 或无匹配属于资料读取失败，不是项目/数学运行失败。本轮三个审查辅助脚本的实际执行均成功；没有人为补造失败、修复运行或资源峰值。[E4]
+
+## 八、分级边界与必要后续
+
+当前未闭科学阻断：本轮没有新增；未变数学并未重新验证，不能由此外推全面科学无误。
+
+当前未闭实现/复现阻断：1 项，R03 的 cuBLAS 工作区释放。R02 的整体关闭取决于这一项；不能将同一清理缺口重复计数。
+
+建议：主执行者按 R03 给出的最小顺序处置，并让现有 mock 表达实际持有状态及清理顺序，按既有规则更新来源与 CPU 证据。此建议直接对应当前缺陷，没有扩大成通用框架或独立研究任务。本轮不执行代码修复或补跑。
+
+本轮不作为阻断的事项：没有实际 GPU 证据是现阶段授权边界；没有正式性能是实验尚未获批；只做单 seed 和重复开发集是已明示的研究限制；H_pos 已被用户选为次级臂。上述事实不能被重新包装为要求额外 seed、独立数据、单臂改选、全面重训或审计平台的理由。
+
+越界过度设计：为本次修复增加网格/候选、改数值定义、降精度门、重算旧指标、扩 GPU 次数、建立新的子进程调度平台、无关网络安全加固或重复全面审计，均无必要。本报告不提出这些要求。
+
+主执行者可独立接受或驳回本报告意见，但应针对 R03 的实际调用路径与上游所有权证据作技术处置。当前没有正式 S_pos/H_pos 效果，本报告不保证任何一臂胜过完整 S。
+
+## 九、证据索引与交付说明
+
+以下输入路径均相对于本次已经提供的 ZIP；不再次打包输入 ZIP 或其 94 个成员。每个输入的字节/SHA256 见 input_verification.json 和 reading_scope.tsv。阅读日志保留实际显示文本，因此含必要源码摘录；这不代表重新分发一个可运行项目副本。
+
+[E1] 本交付 input_verification.json；evidence/mechanical_operations.jsonl；evidence/pre_execution/；evidence/outputs/。
+[E2] 本交付 evidence/field_checks/result.json、pre_execution.json、stdout.txt、stderr.txt；evidence/scripts/check_repair_fields.py。
+[E3] 本交付 evidence/navigation_001.json 至 navigation_003.json；evidence/scripts/static_audit.py。
+[E4] 本交付 evidence/upstream/fetch_pre_execution.json、fetch_result.json、reading_and_retrieval.json；evidence/scripts/fetch_primary_source.py。
+[P1] scripts/step28_positive_ranking.py。
+[P2] scripts/step28_replay_diagnostics.py。
+[P3] scripts/step28_g_half_run.py。
+[P4] tests/test_step28_positive_ranking.py。
+[P5] scripts/step28_positive_ranking_verify.py；scripts/step28_record_replay_verify.py。
+[P6] scripts/step28_record_replay.py；scripts/step28_continual_population.py。
+[P7] scripts/step28_bge_continual.py；scripts/run_step28_positive_ranking_linux_20261018.sh。
+[P8] scripts/step28_g_half_verify.py；scripts/step28_record_replay_numerics.py；scripts/step28_bge_continual_run.py。
+[P9] scripts/step28_balanced_pooling_run.py；scripts/step28_chinese_base.py。
+[P10] scripts/step28_positive_ranking_run.py。
+[C1] reports/documentation/20261016/positive_ranking_implementation/qualification/cpu/attempt04/ 下的 wallclock.json、result/ 四项记录、result.json 与 unittest.txt。
+[C2] 同一 qualification/ 下 cpu_gate.json、cpu_gate_repair.json、deployment04.json、receive04.json 及 attempt01–03 已有身份/时钟记录。
+[D1] docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md；schema/step28_positive_ranking_policy.json。
+[D2] reports/documentation/20261016/positive_ranking_implementation/authorization.json；review/repair/authorization.json、request.zh.txt；review/repair_disposition.zh.txt；另以本轮用户最新指令为准。
+[U1] PyTorch 2.9 CUDA semantics，“Memory management” 与 “cuBLAS workspaces” 相关段落：
+https://docs.pytorch.org/docs/2.9/notes/cuda.html
+[U2] PyTorch v2.9.1 aten/src/ATen/cuda/CublasHandlePool.cpp，13701 字节，357 行，SHA256 e43440cfc3c89e9252d07e812e05c40c315283e4e9d33069b6c196ccdb24a786：
+https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp
+
+ZIP 内 manifest.json 列出除其自身外的全部交付成员；外部 *_members.tsv 列出 ZIP 内全部成员，包括 manifest.json，字段为逐成员路径/字节/SHA256。外部 *_delivery.json 给出 ZIP 身份、成员总数与复核结果。resource_ledger.json 区分包内项目账、本轮纯机械处理和未执行活动；打包与复核源码亦保留。本报告的独立核对范围不包含主机认证、后台模型认证或项目运行。

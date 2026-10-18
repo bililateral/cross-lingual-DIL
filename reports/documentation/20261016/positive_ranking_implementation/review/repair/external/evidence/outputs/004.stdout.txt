@@ -1,0 +1,343 @@
+
+FILE scripts/step28_positive_ranking_verify.py
+    1 """Bounded dual positive-rank CPU/native qualification; no formal data."""
+    2 from __future__ import annotations
+    3 from step28_g_half_verify import STARTED, state, restore, component_effects, checked_fresh, disk_reserve, native_save
+    4 import argparse
+    5 import gc
+    6 import math
+    7 import os
+    8 import shutil
+    9 import subprocess
+   10 from pathlib import Path
+   11 import sys
+   12 import threading
+   13 import time
+   14 import traceback
+   15 import unittest
+   16 import numpy as np
+   17 import psutil
+   18 import torch
+   19 import step28_positive_ranking_run as run
+   20 from step28_record_replay_verify import preflight
+   21 from step28_record_replay_numerics import equal_state
+   22 method,record,diag,core,data=run.method,run.record,run.diag,run.core,run.data
+   23 
+   24 
+   25 def native_preflight(continuing: bool = False) -> dict:
+   26     if not continuing:
+   27         return preflight()
+   28     # The completed first arm leaves a CUDA context, but no live model/state may survive.
+   29     gc.collect()
+   30     torch.cuda.synchronize()
+   31     torch.cuda.empty_cache()
+   32     if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
+   33         raise ValueError("Previous arm still owns live/reserved CUDA tensors")
+   34     process = psutil.Process()
+   35     if (os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1
+   36             or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+   37             or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+   38         raise ValueError("Physical GPU0 and pre-import single-thread environment required")
+   39     gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+   40                                    "--format=csv,noheader,nounits"], text=True).strip()
+   41     apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+   42                                     "--format=csv,noheader,nounits"], text=True).strip()
+   43     foreign_apps = [line for line in apps.splitlines() if int(line.split(",", 1)[0].strip()) != process.pid]
+   44     ancestors = {process.pid, *(p.pid for p in process.parents())}
+   45     jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+   46             if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+   47     available = psutil.virtual_memory().available
+   48     if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or foreign_apps or jobs:
+   49         raise ValueError(f"Continuation resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+   50     return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs,
+   51             "allowed_context_pid": process.pid, "live_allocated_bytes": 0, "reserved_bytes": 0}
+   52 
+   53 
+   54 def native(check, progress, handwritten, out, arm, *, continuing=False):
+   55     method = run.method
+   56     active, control = arm, arm+"_old_rank"
+   57     resources = native_preflight(continuing)
+   58     if shutil.disk_usage(out).free < 10*2**30:
+   59         raise ValueError("Insufficient native temporary disk")
+   60     numerics = run.parent.configure_numerics()
+   61     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
+   62     measurements, updates = {}, []
+   63     def timed(name, fn):
+   64         check(); torch.cuda.synchronize(); started = time.monotonic()
+   65         value = fn(); torch.cuda.synchronize()
+   66         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
+   67         return value
+   68     c = run.config()
+   69     c["handwritten_qualification"] = True
+   70     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+   71     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+   72         raise ValueError("BF16/checkpointing required")
+   73     if initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
+   74             "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
+   75         raise ValueError("positive-rank native initial identity differs")
+   76     method.bind(model, method.metadata(active))
+   77     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
+   78     for g in (current,history):
+   79         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
+   80         if len(lengths)!=448 or set(lengths)!={256}:
+   81             raise ValueError("Maximum N224/token256 fixture differs")
+   82     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
+   83     gradients, effects, table_checks, objective_pairs = {}, {}, [], {}
+   84     def updated(arm, phase, step, h=None, target=None):
+   85         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
+   86         pre = {}
+   87         def observe(role, log):
+   88             pre[role] = {}
+   89             for key,p in probes.items():
+   90                 if p.grad is None or not torch.isfinite(p.grad).all(): raise ValueError("Missing native gradient")
+   91                 pre[role][key] = p.grad.detach().cpu().clone()
+   92         captured = []
+   93         options = dict(qualification_old_rank=arm == control,
+   94             table_observer=(lambda table, group, seed, reference: captured.append((table.clone(), group, seed, reference))) if arm == active else None)
+   95         progress("native_call_started", attempted_calls=len(updates)+1, actual_updates=len(updates))
+   96         row = timed(("t_"+phase) if arm == active else "control_"+phase,
+   97             lambda: method.update(model,optimizer,current,h,target,c,active,
+   98                                   1 if h is None else 2,step,check,observe,**options))
+   99         updates.append(dict(arm=arm,phase=phase,step=step,log=row))
+  100         gradients[len(updates)] = pre
+  101         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
+  102         for table, group, seed, reference in captured:
+  103             table_checks.append(handwritten.verify_native_table(table, group, seed, reference, active))
+  104             progress("native_table_precision", table_precision=table_checks)
+  105         return row
+  106     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
+  107     updated(control,"allocation",1)
+  108     work=out/"work";work.mkdir(); identities={}
+  109     def metadata(label):
+  110         return dict(fixture=label,**method.metadata(active),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
+  111     common_path=work/"common.pt";common_meta=metadata("One actual "+control+" update; common current fixture Adam step1")
+  112     common = timed("s_F",lambda:native_save(common_path,model,optimizer,common_meta,check))
+  113     identities["common"] = common
+  114     def reload(path,receipt):
+  115         return timed("r_F",lambda:run.restore_point(path,receipt,model,optimizer,active))
+  116     reload(common_path,common); updated(control,"A",2); gcurrent=state(model,optimizer)
+  117     reload(common_path,common); hrow=updated(active,"A",2)
+  118     effects["current"] = component_effects(model,gcurrent,optimizer=optimizer)
+  119     for key in probes:
+  120         delta=float((gradients[2]["current"][key]-gradients[3]["current"][key]).abs().max())
+  121         if delta<=0:raise ValueError("Candidate-control preclip current gradient not distinguishable")
+  122         effects["current"][key]["pre_clip_gradient_max_delta"]=delta
+  123     progress("native_effects", effects=effects)
+  124     objective_pairs["current"] = run.native_objective_pair(updates[1]["log"], hrow, 1)
+  125     progress("native_objective_pair", objective_pairs=objective_pairs)
+  126     del gcurrent;gc.collect()
+  127     reload(common_path,common)
+  128     # Same trained-one-step parameters/moments, but legal B epoch1 counter336 for the paired fixture.
+  129     for value in optimizer.state.values(): value["step"].fill_(336)
+  130     with diag.neutral(model):table=timed("v",lambda:record.reference(model,history,c,check))
+  131     i,j=np.triu_indices(224,1);target=(table+2*np.sin(i*.31+j*.71)).astype(np.float32)
+  132     paired_path=work/"paired.pt";paired_meta=metadata("Synthetic Adam step336; parameters/moments from one real "+control+" allocation update")
+  133     paired=timed("s_F",lambda:native_save(paired_path,model,optimizer,paired_meta,check));identities["paired"]=paired
+  134     reload(paired_path,paired);updated(control,"B",49,history,target);gpaired=state(model,optimizer)
+  135     reload(paired_path,paired);first=updated(active,"B",49,history,target)
+  136     if first["history"]["mse0"]<=0 or first["history"]["supervised"]<=0:raise ValueError("Inactive D/history")
+  137     effects["paired"]=component_effects(model,gpaired,optimizer=optimizer)
+  138     for key in probes:
+  139         delta=float((gradients[4]["history"][key]-gradients[5]["history"][key]).abs().max())
+  140         if delta<=0:raise ValueError("Candidate-control preclip paired gradient not distinguishable")
+  141         effects["paired"][key]["pre_clip_gradient_max_delta"]=delta
+  142         branch_deltas = {}
+  143         for role in ("current", "history"):
+  144             off = gradients[4][role][key]-(gradients[4]["current"][key] if role == "history" else 0)
+  145             on = gradients[5][role][key]-(gradients[5]["current"][key] if role == "history" else 0)
+  146             branch_deltas[role] = float((off-on).abs().max())
+  147             if branch_deltas[role] <= 0:
+  148                 raise ValueError("Missing isolated native rank effect: "+role+"/"+key)
+  149         effects["paired"][key]["isolated_branch_preclip_deltas"] = branch_deltas
+  150     progress("native_effects", effects=effects)
+  151     objective_pairs["paired"] = run.native_objective_pair(updates[3]["log"], first, 2)
+  152     progress("native_objective_pair", objective_pairs=objective_pairs)
+  153     del gpaired;gc.collect()
+  154     expected, expected_rng = state(model,optimizer), diag.rng_state()
+  155     reload(paired_path,paired)
+  156     memory=handwritten.shared_memory(active);memory.begin_stage(2)
+  157     for _ in range(48):memory.draw()
+  158     payload=memory.to_bytes();rng=diag.rng_state();modes=[m.training for m in model.modules()]
+  159     fit=[handwritten.handmade_group(f"native_fit_{i}") for i in range(48)]
+  160     valid=[data.Group(g.uid,g.sellers,g.items) for g in [handwritten.handmade_group(f"native_valid_{i}") for i in range(40)]]
+  161     before=core.state_digest(state(model,optimizer));droot=out/"diagnostics";droot.mkdir()
+  162     progress("actual_candidate_full_role_capture", actual_updates=len(updates))
+  163     method.capture(model,optimizer,fit,memory,valid,c,active,2,1,droot,"handwritten",check)
+  164     if before!=core.state_digest(state(model,optimizer)) or rng!=diag.rng_state() or payload!=memory.to_bytes():
+  165         raise ValueError("Actual candidate capture mutated state")
+  166     repeated=updated(active,"B",49,history,target)
+  167     equality={"tensors":0,"elements":0};equal_state(expected,state(model,optimizer),equality)
+  168     if expected_rng!=diag.rng_state() or payload!=memory.to_bytes() or modes!=[m.training for m in model.modules()] or first!=repeated:
+  169         raise ValueError("Capture changed repeated next update")
+  170     del expected;gc.collect()
+  171     if len(updates)!=6 or run.parent.adam_step(optimizer)!=337:raise ValueError("Native call accounting differs")
+  172     def residual():
+  173         errors=[]
+  174         for seed in (None,data.seed_for(20261008,"ABC",2,history.uid,"diagnostic_regroup")):
+  175             slots=record.assignment(history,seed)
+  176             errors.append((method.account_logits(torch.from_numpy(table),slots,active)-
+  177                            method.account_logits(torch.from_numpy(target),slots,active)).numpy().astype(np.float64))
+  178         return dict(D0=float(np.mean(errors[0]**2)),D1=float(np.mean(errors[1]**2)))
+  179     residuals=timed("h",residual)
+  180     # Persist the actual candidate-updated state, releasing the obsolete common work file first.
+  181     data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=False))
+  182     common_path.unlink()
+  183     actual_meta=metadata("After actual candidate update6; H full-state restore")
+  184     actual=timed("s_F",lambda:native_save(common_path,model,optimizer,actual_meta,check))
+  185     identities["H_full"]=actual
+  186     with diag.neutral(model):
+  187         timed("v",lambda:record.reference(model,history,c,check))
+  188         before_scores=timed("v",lambda:method.restored_score(model,[history],c,check))
+  189     if reload(common_path,actual)!=actual_meta:raise ValueError("Full H metadata restore mismatch")
+  190     with diag.neutral(model):
+  191         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
+  192             raise ValueError("Full H scores not bitwise restored")
+  193     inference_path=work/"H_inference.pt";infer_meta=metadata("Actual candidate inference restore fixture")
+  194     infer=timed("s_I",lambda:native_save(inference_path,model,None,infer_meta,check));identities["inference"]=infer
+  195     if timed("r_I",lambda:run.restore_point(inference_path,infer,model,None,active))!=infer_meta:
+  196         raise ValueError("Inference H metadata restore mismatch")
+  197     with diag.neutral(model):
+  198         if not np.array_equal(before_scores,timed("v",lambda:method.restored_score(model,[history],c,check))):
+  199             raise ValueError("Inference H scores not bitwise restored")
+  200     measurements["W_F"]=max(common_path.stat().st_size,paired_path.stat().st_size)
+  201     measurements["W_I"]=inference_path.stat().st_size
+  202     data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=False))
+  203     for path in (common_path,paired_path,inference_path):path.unlink()
+  204     work.rmdir();data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=True))
+  205     return dict(resources=resources,numerics=numerics,pretrained_archive=archive,initial_state=initial,
+  206         actual_updates=6,updates=updates,measurements=measurements,projection=run.single.projection(measurements),effects=effects,
+  207         both_phases_encoder_head_effect=True,pooling_restores_verified=True,next_update_bitwise_equal=True,
+  208         metadata=method.metadata(active), rank_precision_verified=bool(table_checks),
+  209         table_precision=table_checks, objective_pairs=objective_pairs,
+  210         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
+  211         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
+  212 
+  213 def main():
+  214     import importlib
+  215     parser = argparse.ArgumentParser()
+  216     parser.add_argument("mode", choices=("cpu", "gpu"))
+  217     parser.add_argument("--output", type=Path, required=True)
+  218     parser.add_argument("--gate", type=Path)
+  219     parser.add_argument("--tests", nargs="*")
+  220     parser.add_argument("--prior-seconds", type=float, default=0.)
+  221     args = parser.parse_args()
+  222     args.output = args.output.resolve()
+  223     if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
+  224         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+  225     args.output.mkdir(parents=True)
+  226     sys.path.insert(0, str(data.ROOT/"tests"))
+  227     handwritten = importlib.import_module("test_step28_positive_ranking")
+  228     os.environ["G_HALF_TEST_ROOT"] = str(args.output)
+  229     os.environ["H_CONS_TEST_ROOT"] = str(args.output)
+  230     torch.set_num_threads(1)
+  231     torch.set_num_interop_threads(1)
+  232     numerics = run.parent.configure_numerics()
+  233     process = psutil.Process()
+  234     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
+  235     report = {"status": "RUNNING", "mode": args.mode, "scope": "S_pos_H_pos_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
+  236         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
+  237     stopped, lock = threading.Event(), threading.RLock()
+  238     arm_started = None
+  239     def write():
+  240         with lock:
+  241             report["elapsed_seconds"] = time.monotonic()-STARTED
+  242             report["cumulative_seconds"] = args.prior_seconds+report["elapsed_seconds"]
+  243             report["cumulative_charged_seconds"] = args.prior_seconds+math.ceil(report["elapsed_seconds"])
+  244             if "prior_actual_updates" in report:
+  245                 report["cumulative_actual_updates"] = report["prior_actual_updates"]+report.get("actual_updates", 0)
+  246             if args.mode == "gpu" and torch.cuda.is_initialized():
+  247                 report["max_reserved_bytes"] = torch.cuda.max_memory_reserved()
+  248             data.write_json(args.output/"result.json", report)
+  249     def check(reserve=0):
+  250         report["peak_rss_bytes"] = max(report["peak_rss_bytes"], process.memory_info().rss)
+  251         total, evidence = 0, 0
+  252         for path in args.output.parent.rglob("*"):
+  253             try:
+  254                 if path.is_file():
+  255                     size = path.stat().st_size
+  256                     total += size
+  257                     if "work" not in path.relative_to(args.output.parent).parts:
+  258                         evidence += size
+  259             except FileNotFoundError:
+  260                 pass
+  261         report["peak_work_bytes"] = max(report["peak_work_bytes"], total)
+  262         disk_reserve(args.output, total, reserve, limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"]))
+  263         if (time.monotonic()-STARTED+args.prior_seconds > limits["maximum_seconds"]
+  264                 or (arm_started is not None and time.monotonic()-arm_started > limits["per_arm_maximum_seconds"])
+  265                 or evidence > limits["maximum_evidence_bytes"] or total > limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"])
+  266                 or report["peak_rss_bytes"] > limits["maximum_rss_bytes"]
+  267                 or (args.mode == "gpu" and torch.cuda.is_initialized() and torch.cuda.max_memory_reserved() > 28*2**30)):
+  268             raise RuntimeError("Approved cumulative qualification budget exceeded")
+  269     def watchdog():
+  270         while not stopped.wait(.5):
+  271             try:
+  272                 check()
+  273             except BaseException as exc:
+  274                 report.update(status="BUDGET_STOP", error=str(exc))
+  275                 write()
+  276                 os._exit(2)
+  277     def progress(stage, **details):
+  278         report.update(stage=stage, **details)
+  279         write()
+  280     watcher = threading.Thread(target=watchdog, daemon=True)
+  281     watcher.start()
+  282     try:
+  283         if (len(process.cpu_affinity()) != 1 or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+  284                 or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+  285             raise ValueError("Pre-import single CPU/thread environment required")
+  286         if args.prior_seconds < limits["prior_charged_seconds"]:
+  287             raise ValueError("Prior charged budget cannot be reset")
+  288         if args.mode == "cpu":
+  289             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+  290                 raise ValueError("CPU qualification must disable GPU")
+  291             test_class = handwritten.PositiveRankingTests
+  292             selected = args.tests or unittest.defaultTestLoader.getTestCaseNames(test_class)
+  293             report["selected_tests"] = selected
+  294             suite = unittest.TestSuite(test_class(name) for name in selected)
+  295             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:
+  296                 result = unittest.TextTestRunner(stream=stream, verbosity=2, failfast=True).run(suite)
+  297             report.update(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped))
+  298             if not result.wasSuccessful() or result.skipped:
+  299                 raise RuntimeError("Affected handwritten qualification failed")
+  300         else:
+  301             if args.gate is None:
+  302                 raise ValueError("Implementation review gate required")
+  303             gate = run.reviewed_gate(args.gate, "NATIVE")
+  304             if args.prior_seconds != 0:
+  305                 raise ValueError("Unique dual native attempt; no automatic retry")
+  306             report["arms"] = {}
+  307             for arm in method.ARMS:
+  308                 arm_started = time.monotonic()
+  309                 arm_out = args.output/arm
+  310                 arm_out.mkdir()
+  311                 def arm_check(reserve=0):
+  312                     check(reserve)
+  313                     if time.monotonic()-arm_started > limits["per_arm_maximum_seconds"]:
+  314                         raise RuntimeError("Per-arm native budget exceeded")
+  315                 def arm_progress(stage, **details):
+  316                     if "actual_updates" in details:
+  317                         details["active_arm_actual_updates"] = details["actual_updates"]
+  318                         details["actual_updates"] += sum(v["actual_updates"] for v in report["arms"].values())
+  319                     progress(stage, active_arm=arm, **details)
+  320                 value = native(arm_check, arm_progress, handwritten, arm_out, arm,
+  321                                continuing=bool(report["arms"]))
+  322                 arm_check()
+  323                 value["charged_seconds"] = math.ceil(time.monotonic()-arm_started)
+  324                 report["arms"][arm] = value
+  325                 arm_started = None
+  326                 write()
+  327             report["actual_updates"] = sum(v["actual_updates"] for v in report["arms"].values())
+  328         check()
+  329         report["status"] = "PASS_HANDWRITTEN_ONLY"
+  330         if args.mode == "cpu":
+  331             report.update(qualified_tests=selected, unresolved_checks=[])
+  332     except BaseException as exc:
+  333         report.update(status="FAIL", traceback=traceback.format_exc())
+  334         raise
+  335     finally:
+  336         stopped.set()
+  337         watcher.join(timeout=2)
+  338         write()
+  339 
+  340 if __name__ == "__main__":
+  341     main()

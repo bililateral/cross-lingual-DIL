@@ -1,0 +1,496 @@
+
+FILE tests/test_step28_positive_ranking.py
+    1 """Changed-objective evidence only, entirely handwritten; Linux py310."""
+    2 from __future__ import annotations
+    3 import copy
+    4 import hashlib
+    5 import itertools
+    6 import math
+    7 import os
+    8 from pathlib import Path
+    9 import tempfile
+   10 import unittest
+   11 from unittest import mock
+   12 import numpy as np
+   13 import torch
+   14 
+   15 import step28_positive_ranking_run as run
+   16 from test_step28_record_replay import handmade_group, tiny_model
+   17 from test_step28_g_half import literal_pool as h_pool
+   18 from step28_g_half_verify import state, restore, component_effects
+   19 
+   20 method, record, core, data, diag = run.method, run.record, run.core, run.data, run.diag
+   21 PAIRS = list(itertools.combinations(range(28), 2))
+   22 LOOKUP = {p: k for k, p in enumerate(PAIRS)}
+   23 ATOL, RTOL = 2e-6, 2e-5
+   24 
+   25 
+   26 def independent_rank(values, labels, mutant=None):
+   27     """Separate candidate enumeration and logaddexp formulation."""
+   28     terms = []
+   29     for q in range(28):
+  110         value, grad, _ = analytic_rank(scores.detach().double().cpu().tolist(),group.labels)
+  111         np.testing.assert_allclose(float(rank.detach()),value,atol=ATOL,rtol=RTOL)
+  112         np.testing.assert_allclose(gradient.detach().cpu().numpy(),grad,atol=ATOL,rtol=RTOL)
+  113         rows.append(dict(view=name,value=float(rank.detach()),reference=value,gradient_max_error=float(np.max(np.abs(gradient.detach().cpu().numpy()-grad)))))
+  114     return dict(arm=arm,uid=group.uid,role="history" if reference is not None else "current",views=rows)
+  115 
+  116 
+  117 class PositiveRankingTests(unittest.TestCase):
+  118     def temporary(self):
+  119         t = tempfile.TemporaryDirectory(dir=os.environ["G_HALF_TEST_ROOT"])
+  120         self.addCleanup(t.cleanup)
+  121         return Path(t.name)
+  122 
+  123     def evidence(self,name,value):
+  124         data.write_json(Path(os.environ["G_HALF_TEST_ROOT"])/(name+".json"),value)
+  125 
+  126     def test_rank_reference_and_rejected_mutants(self):
+  127         g = handmade_group("rank")
+  128         labels = np.asarray(g.labels)
+  129         rows = []
+  130         for dtype in (torch.float64, torch.float32):
+  131             for tag, values in (("unequal",np.sin(np.arange(378)*.7)*4), ("equal",np.zeros(378)),
+  132                                 ("extreme",np.where(np.arange(378)%3,1000.,-1000.))):
+  133                 x = torch.tensor(values,dtype=dtype,requires_grad=True)
+  134                 actual = method.objectives(x,torch.tensor(labels,dtype=dtype))["rank_pos"]
+  135                 gradient, = torch.autograd.grad(actual,x)
+  136                 ref, grad, qgrad = analytic_rank(x.detach().tolist(),labels)
+  137                 atol,rtol = (1e-12,1e-12) if dtype == torch.float64 else (ATOL,RTOL)
+  138                 np.testing.assert_allclose(float(actual.detach()),ref,atol=atol,rtol=rtol)
+  139                 np.testing.assert_allclose(gradient.numpy(),grad,atol=atol,rtol=rtol)
+  140                 self.assertTrue(np.all(grad[labels.astype(bool)] <= 0))
+  141                 self.assertTrue(np.all(grad[~labels.astype(bool)] >= 0))
+  142                 for k,(a,b) in enumerate(PAIRS): self.assertAlmostEqual(grad[k],(qgrad[a][k]+qgrad[b][k])/28,places=12)
+  143                 if tag == "unequal" and dtype == torch.float64:
+  144                     for k in (0,1,53,97,377):
+  145                         xp,xm=values.copy(),values.copy();xp[k]+=1e-5;xm[k]-=1e-5
+  146                         fd=(analytic_rank(xp,labels)[0]-analytic_rank(xm,labels)[0])/2e-5
+  235     def test_capture_restore_and_next_update(self):
+  236         c=run.config();out=self.temporary();evidence={}
+  237         current,history=handmade_group("current"),handmade_group("history")
+  238         target=(3*np.sin(np.arange(1540)/7)).astype(np.float32)
+  239         for arm in method.ARMS:
+  240             model=tiny_model();method.bind(model,method.metadata(arm));optimizer=core.make_optimizer(model,c)
+  241             method.update(model,optimizer,current,None,None,c,arm,1,1)
+  242             for v in optimizer.state.values():v["step"].fill_(336)
+  243             saved,rng,modes=state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+  244             first=method.update(model,optimizer,current,history,target,c,arm,2,49)
+  245             expected,expected_rng=state(model,optimizer),diag.rng_state()
+  246             restore(model,optimizer,saved,rng,modes)
+  247             memory=shared_memory(arm);memory.begin_stage(2)
+  248             for _ in range(48):memory.draw()
+  249             payload=memory.to_bytes();fit=[handmade_group(f"fit{i}") for i in range(48)]
+  250             valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"valid{i}") for i in range(40)]]
+  251             capture=method.capture(model,optimizer,fit,memory,valid,c,arm,2,1,out,arm)
+  252             result=data.read_json(out/capture["path"]);run.validate_diagnostic(result,arm)
+  253             with diag.neutral(model):
+  254                 raw=method.score(model,valid,c,arm)
+  255                 np.testing.assert_array_equal(run.previous.array(out,result["valid_blind"],(40,378),np.float32),raw)
+  256                 for role,gs in (("fit",fit),("cache",memory.reservoir.groups)):
+  257                     np.testing.assert_array_equal(run.previous.array(out,result[role],(len(gs),3),np.float64),diag.metrics(gs,method.score(model,gs,c,arm)))
+  258                 g=memory.reservoir.groups[0];live=record.reference(model,g,c);old=memory.tables[g.uid]
+  259                 for key,seed in (("D0",None),("D1",data.seed_for(20261008,"ABC",2,g.uid,"diagnostic_regroup"))):
+  260                     slots=record.assignment(g,seed)
+  261                     error=(independent_pool(torch.from_numpy(live),slots,arm)-independent_pool(torch.from_numpy(old),slots,arm)).detach().numpy().astype(np.float64)
+  262                     self.assertAlmostEqual(result["teacher_errors"][0][key],float(np.mean(error**2)),places=6)
+  263             self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
+  264             self.assertEqual((rng,payload,modes),(diag.rng_state(),memory.to_bytes(),[m.training for m in model.modules()]))
+  265             repeated=method.update(model,optimizer,current,history,target,c,arm,2,49)
+  266             self.assertEqual(first,repeated);self.assertEqual(core.state_digest(expected),core.state_digest(state(model,optimizer)))
+  267             self.assertEqual(expected_rng,diag.rng_state())
+  268             meta={**method.metadata(arm),"rng":diag.rng_state(),"modes":[m.training for m in model.modules()]}
+  269             with diag.neutral(model):before=method.restored_score(model,[current],c)
+  270             for kind,opt in (("full",optimizer),("inference",None)):
+  271                 p=out/(arm+kind+".pt");receipt=core.save_state(p,model,opt,meta)
+  272                 model.training_identity={"arm":"incorrect"}
+  273                 run.restore_point(p,receipt,model,opt,arm)
+  274                 with diag.neutral(model):np.testing.assert_array_equal(before,method.restored_score(model,[current],c))
+  275             wrong="H_pos" if arm=="S_pos" else "S_pos"
+  276             with self.assertRaises(ValueError):method.bind(model,{**meta,"pooling":method.identity(wrong)})
+  277             with self.assertRaises(ValueError):run.memory_from(payload,wrong)
+  278             evidence[arm]=dict(actual_optimizer_calls=3,synthetic_clock=336,next_update_bitwise_equal=True,
+  279                 actual_capture_populations=[48,6,40],teacher_both_views=True,full_inference_restores=True,own_identity_rejections=True)
+  280         self.evidence("capture_restore",evidence)
+  281 
+  282     def test_stage_a_empty_cache(self):
+  283         c=run.config();out=self.temporary();evidence={}
+  284         fit=[handmade_group(f"A_fit{i}") for i in range(48)]
+  285         valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"blind{i}") for i in range(40)]]
+  286         for arm in method.ARMS:
+  287             model=tiny_model();method.bind(model,method.metadata(arm));optimizer=core.make_optimizer(model,c)
+  288             method.update(model,optimizer,fit[0],None,None,c,arm,1,1)
+  289             for value in optimizer.state.values():value["step"].fill_(48)
+  290             saved,rng,modes=state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+  291             empty=method.score(model,[],c,arm)
+  292             self.assertEqual((empty.shape,empty.dtype),((0,378),np.dtype(np.float32)))
+  293             with self.assertRaisesRegex(ValueError,"Scoring candidate differs"):
+  294                 method.score(model,[],c,"H_pos" if arm=="S_pos" else "S_pos")
+  295             capture=method.capture(model,optimizer,fit,None,valid,c,arm,1,1,out,"A_"+arm)
+  296             row=data.read_json(out/capture["path"]);run.validate_diagnostic(row,arm)
+  297             self.assertEqual((row["stage"],row["stage_step"],row["adam_step"]),(1,48,48))
+  298             self.assertEqual((row["cache_ids"],row["cache_domains"],row["teacher_errors"]),([],[],[]))
+  299             run.previous.array(out,row["cache"],(0,3),np.float64)
+  300             run.previous.array(out,row["fit"],(48,3),np.float64)
+  301             run.previous.array(out,row["valid_blind"],(40,378),np.float32)
+  302             self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
+  303             self.assertEqual((rng,modes),(diag.rng_state(),[m.training for m in model.modules()]))
+  304             # Reproduce the removed S dispatch failure without altering the frozen scorer.
+  305             with diag.neutral(model),self.assertRaisesRegex(ValueError,"need at least one array"):
+  306                 record.score(model,[],c)
+  307             evidence[arm]=dict(actual_optimizer_calls=1,synthetic_clock=48,
+  308                 capture_populations=[48,0,40],empty_score_shape=[0,378],cache_metric_shape=[0,3],
+  309                 state_unchanged=True,wrong_arm_rejected=True,old_empty_dispatch_failure_reproduced=True)
+  310         self.evidence("stage_a_empty_cache",evidence)
+  311 
+  312     def test_native_continuation_preflight(self):
+  313         import step28_positive_ranking_verify as verify
+  314         from types import SimpleNamespace
+  315         process=mock.Mock(pid=413);process.cpu_affinity.return_value=[0];process.parents.return_value=[]
+  316         sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0}
+  317         def query(args,**kwargs):
+  318             return (sample["apps"] if "--query-compute-apps=pid,process_name,used_memory" in args
+  319                     else f"0, handwritten-GPU, 32768, {sample['free']}, 1024")
+  320         env={"CUDA_VISIBLE_DEVICES":"0","OMP_NUM_THREADS":"1","MKL_NUM_THREADS":"1",
+  321              "OPENBLAS_NUM_THREADS":"1","TOKENIZERS_PARALLELISM":"false"}
+  322         with mock.patch.dict(os.environ,env),mock.patch.object(verify.psutil,"Process",return_value=process), \
+  323              mock.patch.object(verify.psutil,"process_iter",side_effect=lambda *a:sample["jobs"]), \
+  324              mock.patch.object(verify.psutil,"virtual_memory",side_effect=lambda:SimpleNamespace(available=sample["host"])), \
+  325              mock.patch.object(verify.subprocess,"check_output",side_effect=query), \
+  326              mock.patch.object(verify.gc,"collect") as collect, \
+  327              mock.patch.object(verify.torch.cuda,"synchronize"),mock.patch.object(verify.torch.cuda,"empty_cache") as empty, \
+  328              mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:sample["allocated"]), \
+  329              mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:sample["reserved"]):
+  330             first=verify.native_preflight(False)
+  331             self.assertEqual(first["compute_apps"],"");empty.assert_not_called()
+  332             sample["apps"]="413, python, 512"
+  333             with self.assertRaisesRegex(ValueError,"Resource gate failed"):
+  334                 verify.native_preflight(False)
+  335             second=verify.native_preflight(True)
+  336             self.assertEqual(second["allowed_context_pid"],413);collect.assert_called_once();empty.assert_called_once()
+  337             rejected=[]
+  338             for key,value in (("apps","413, python, 512\n414, python, 1"),("free",30*1024-1),
+  339                     ("host",72*2**30-1),("allocated",4),("reserved",4),
+  340                     ("jobs",[SimpleNamespace(pid=415,info={"pid":415,"username":"same-user","cmdline":["step28_other.py"]})])):
+  341                 previous=sample[key];sample[key]=value
+  342                 with self.assertRaises(ValueError):verify.native_preflight(True)
+  343                 sample[key]=previous;rejected.append(key)
+  344             # Reach the real native entry's resource call, stopping before model loading/GPU work.
+  345             class StopBeforeGPU(Exception):pass
+  346             with mock.patch.object(verify,"native_preflight",side_effect=StopBeforeGPU) as entry:
+  347                 for continuing,arm in ((False,"S_pos"),(True,"H_pos")):
+  348                     with self.assertRaises(StopBeforeGPU):
+  349                         verify.native(lambda:None,lambda *a,**k:None,None,None,arm,continuing=continuing)
+  350                 self.assertEqual(entry.call_args_list,[mock.call(False),mock.call(True)])
+  351         self.evidence("native_continuation_preflight",dict(first_strict=True,own_context_only_second=True,
+  352             rejected_cases=rejected,resource_thresholds_unchanged=True,real_native_entry_checked=True,
+  353             cuda_and_process_state="mocked handwritten fixtures",actual_gpu_calls=0))
+  354 
+  355     def test_dual_orchestration_and_joint_opening(self):
+  356         root=self.temporary();groups={};metadata=[]
+  357         for split,count in (("train",60),("development",20)):
+  358             groups[split]=[]
+  359             for d in "AB":
+  360                 for i in range(count):
+  361                     g=handmade_group(f"{d}_{split}_{i:02}")
+  362                     metadata.append(dict(group_uid=g.uid,domain=d,split=split,group_index=i))
+  363                     groups[split].append(g if split=="train" else data.Group(g.uid,g.sellers,g.items))
+  364         loads,calls=[],[];c=run.config()
+  365         _,split_expected=run.partition(groups,metadata,c)
+  366         oldroot=root/"frozen_fixture"; (oldroot/"run/updates").mkdir(parents=True)
+  367         data.write_json(oldroot/"run/partition.json",split_expected)
+  368         tiny=tiny_model(); tinyopt=core.make_optimizer(tiny,c)
+  369         fake_baseline={"initial_identity":{"model":core.state_digest(tiny.state_dict()),"adam":core.state_digest(tinyopt.state_dict())}}
+  370         del tiny,tinyopt
+  371         class Budget:
+  372             phase="handwritten orchestration"
+  373             def check(self,*args):pass
+  374             def snapshot(self):return {}
+  375         def load(cfg):
+  376             loads.append("fresh");return tiny_model()
+  377         def update(model,optimizer,current,history,target,cfg,arm,stage,step,check):
+  378             self.assertTrue(current.uid.startswith("AB"[stage-1]+"_"))
+  379             self.assertEqual(run.parent.adam_step(optimizer),(stage-1)*288+step-1)
+  380             calls.append((arm,stage,step,current.uid,None if history is None else history.uid))
+  381             if history:self.assertTrue(history.uid.startswith("A_"))
+  382             t=(stage-1)*288+step
+  383             for p in model.parameters():
+  384                 optimizer.state[p]={"step":torch.tensor(float(t)),"exp_avg":torch.zeros_like(p),"exp_avg_sq":torch.zeros_like(p)}
+  385             with torch.no_grad():model.head[2].bias.fill_(t*.001+method.ARMS.index(arm)*.3)
+  386             row=dict(total=1.,encoder_lr=run.parent.stage_lr(step),head_lr=.001,**method.metadata(arm))
+  387             for role,g in (("current",current),("history",history)):
+  388                 if g is not None:
+  389                     seed=data.seed_for(20260918,"ABC",stage,step,role,g.uid,"regroup")
+  390                     row[role]=dict(supervised=1.,weighted=1. if role=="current" else .1,mse0=0.,mse1=None,distillation=0.,
+  391                         supervised_contribution=1. if role=="current" else .1,teacher_contribution=0.,qualification_old_rank=False,
+  392                         views=[dict(bce=.2,rank_pos=.3,rank_used=.3,hard=1.,total=1.) for _ in range(2)],
+  393                         assignment_sha256=hashlib.sha256(record.assignment(g,seed).tobytes()).hexdigest())
+  394             if history:row["total"]=1.1
+  395             return row
+  396         truth=np.asarray(handmade_group("geometry").labels);tables={}
+  397         def reference(model,g,cfg,check=lambda:None):
+  398             if g.uid not in tables:
+  399                 slots=record.assignment(g)
+  400                 lookup={p:k for k,p in enumerate(itertools.combinations(range(28),2))}
+  401                 values=[]
+  402                 for i,j in itertools.combinations(range(len(slots)),2):
+  403                     a,b=sorted((int(slots[i]),int(slots[j])))
+  404                     k=0 if a==b else lookup[a,b]
+  405                     values.append((0 if a==b else truth[k]*3)+math.sin(i*.7+j*.3))
+  406                 tables[g.uid]=np.asarray(values,np.float32)
+  407             return tables[g.uid]+float(model.head[2].bias.detach())
+  408         def score(model,gs,cfg,arm,check=lambda:None):
+  409             if not gs:return production_score(model,gs,cfg,arm,check)
+  410             return np.stack([method.account_logits(torch.from_numpy(reference(model,g,cfg)),record.assignment(g),arm).numpy() for g in gs]).astype(np.float32)
+  411         production_score = method.score
+  412         with mock.patch.object(run,"baseline_inputs",return_value=(fake_baseline,oldroot,{},{"public_inputs":{"handwritten":True}})), \
+  413              mock.patch.object(run,"baseline_runs",side_effect=lambda:{a:(oldroot,{}, {}) for a in ("S","G_half")}), \
+  414              mock.patch.object(run,"pretrained_archive",return_value={"handwritten":True}), \
+  415              mock.patch.object(run,"public_inputs",return_value=(groups,metadata,{"handwritten":True})), \
+  416              mock.patch.object(run,"attach_labels",side_effect=lambda gs,cfg,s,meta:gs), \
+  417              mock.patch.object(core,"model_files",return_value=c["models"]["split_rank"]), \
+  418              mock.patch.object(record,"load_model",side_effect=load), \
+  419              mock.patch.object(method,"update",side_effect=update), \
+  420              mock.patch.object(record,"reference",side_effect=reference), \
+  421              mock.patch.object(method,"score",side_effect=score), \
+  422              mock.patch.object(diag,"metrics",side_effect=lambda gs,vs:np.zeros((len(gs),3),np.float64)), \
+  423              mock.patch.object(run.parent.calibration,"fit",return_value={"status":"PASS_CALIBRATION_FIT","a":1.,"b":0.}), \
+  424              mock.patch("builtins.print"):
+  425             data.write_json(root/"access.json",dict(train=0,valid=0,heldout=0,owners=0))
+  426             manifest,split,valid,meta=run.train(root,Budget())
+  427             self.assertEqual((len(loads),len(calls)),(2,1152))
+  428             self.assertEqual(manifest["physical_updates"],1152)
+  429             self.assertEqual(manifest["gradient_group_presentations"],1728)
+  430             self.assertEqual(sum(map(len,manifest["diagnostics"].values())),24)
+  431             self.assertEqual(len(list((root/"run/memory").glob("*.bin"))),4)
+  432             self.assertFalse(list((root/"run/work").glob("*.pt")))
+  433             for stage in "AB":
+  434                 log=data.read_json(root/"run/updates"/(stage+"_S_pos.json"))
+  435                 for other in ("S","G_half"):data.write_json(oldroot/"run/updates"/(stage+"_"+other+".json"),log)
+  436             scores,checked=run.blind_gate(root/"run",manifest)
+  437             self.assertEqual((set(scores),checked),(set(run.POINTS),split))
+  438             for arm in method.ARMS:
+  439                 self.assertEqual(manifest["starts"][arm],manifest["points"]["A_"+arm]["continuity"])
+  440             for collection,key in (("points","A_S_pos"),("diagnostics","B_H_pos"),("training","A_S_pos"),("starts","H_pos")):
+  441                 damaged=copy.deepcopy(manifest);del damaged[collection][key]
+  442                 with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
+  443                 self.assertEqual(data.read_json(root/"access.json")["valid"],0)
+  444             damaged=copy.deepcopy(manifest);damaged["starts"]["H_pos"]["model"]="wrong_A"
+  445             with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
+  446             damaged=copy.deepcopy(manifest);damaged["points"]["B_H_pos"]["pooling"]={"arm":"S"}
+  447             with self.assertRaises(ValueError):run.open_valid(root,damaged,valid,meta,c)
+  448             self.assertEqual(data.read_json(root/"access.json")["valid"],0)
+  449             badlog=data.read_json(oldroot/"run/updates/B_G_half.json")
+  450             badlog["rows"][0]["current"]["assignment_sha256"]="wrong"
+  451             data.write_json(oldroot/"run/updates/B_G_half.json",badlog)
+  452             with self.assertRaises(ValueError):run.open_valid(root,manifest,valid,meta,c)
+  453             self.assertEqual(data.read_json(root/"access.json")["valid"],0)
+  454         self.evidence("orchestration",dict(fixture="Actual scheduler, pooling, Memory and checkpoint/diagnostic IO; mocked update/forward/metrics/calibration only",
+  455             scheduler_calls=len(calls),real_updates_in_this_fixture=0,independent_initializations=len(loads),
+  456             diagnostics=24,endpoints=4,own_A_states=True,blind_rejections=True,
+  457             scope="Control-flow evidence only. Real tiny gradient/update and actual diagnostic tests are separate."))
+  458 
+  459     def test_saved_comparisons_and_permissions(self):
+  460         labelled=[handmade_group(f"{d}_valid_{i:02}") for d in "AB" for i in range(20)]
+  461         split={"development":[dict(group_uid=g.uid,domain=g.uid[0]) for g in labelled]}
+  462         raw=np.stack([np.asarray(g.labels,np.float32)*2-1+np.sin(np.arange(378)+i).astype(np.float32)*.2 for i,g in enumerate(labelled)])
+  463         scores={p:{"raw":raw.copy(),"stage-cal":raw.astype(np.float64),"first-cal":raw.astype(np.float64)} for p in run.POINTS}
+
+FILE scripts/step28_replay_diagnostics.py
+    1 """Epoch diagnostics on current fit/cache and blind valid, without learner mutation."""
+    2 from __future__ import annotations
+    3 
+    4 from contextlib import contextmanager
+    5 import random
+    6 from pathlib import Path
+    7 from typing import Any, Callable
+    8 
+    9 import numpy as np
+   10 
+   11 import step28_record_replay as record
+   12 import step28_bge_continual_run as previous
+   13 
+   14 parent, data = record.parent, record.data
+   15 COLUMNS = ("map", "recall_at_5", "log_loss")
+   16 
+   17 
+   18 def rng_state() -> dict:
+   19     value = np.random.get_state()
+   20     return {"torch": previous.rng_state(), "python": random.getstate(),
+   21             "numpy": [value[0], value[1].tolist(), int(value[2]), int(value[3]), float(value[4])]}
+   22 
+   23 
+   24 def restore_rng(state: dict) -> None:
+   25     previous.restore_rng(state["torch"])
+   26     random.setstate(data.tuple_state(state["python"]))
+   27     n = state["numpy"]
+   28     np.random.set_state((n[0], np.asarray(n[1], np.uint32), n[2], n[3], n[4]))
+   29 
+   30 
+   31 @contextmanager
+   32 def neutral(model: Any):
+   33     """Restore individual modes and global RNGs even if a diagnostic fails."""
+   34     import torch
+   35     state, modes = rng_state(), [(m, m.training) for m in model.modules()]
+   36     try:
+   37         model.eval()
+   38         with torch.inference_mode():
+   39             yield
+   40     finally:
+   41         for module, mode in modes:
+   42             module.training = mode
+   43         restore_rng(state)
+   44 
+   45 
+   46 def score(model: Any, groups: list, c: dict, arm: str, check: Callable) -> np.ndarray:
+   47     if not groups:
+   48         return np.empty((0, 378), np.float32)
+   49     return (parent.ranking.score if arm == "LOGIT0.1" else record.score)(model, groups, c, check)
+   50 
+   51 
+   52 def metrics(groups: list, values: np.ndarray) -> np.ndarray:
+   53     if not groups:
+   54         return np.empty((0, len(COLUMNS)), np.float64)
+   55     if any(g.labels is None for g in groups):
+   56         raise ValueError("Only current authorized labelled groups may be scored")
+   57     matrix, _ = parent.metrics.group_metrics(np.asarray([g.labels for g in groups], np.uint8), values)
+   58     return matrix[:, [parent.metrics.COLUMNS.index(k) for k in COLUMNS]]
+   59 
+   60 
+   61 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list,
+   62             c: dict, arm: str, order: str, stage: int, epoch: int, root: Path,
+   63             point: str, check: Callable = lambda: None, scope: str = "ABC",
+   64             table_diagnostic: Callable | None = None, score_fn: Callable | None = None,
+   65             pooling_fn: Callable | None = None) -> dict:
+   66     """Called by the actual training loop after every 48 updates; never loads labels."""
+   67     import torch
+   68     if epoch not in range(1, 7) or parent.adam_step(optimizer) != (stage-1)*288+epoch*48:
+   69         raise ValueError("Diagnostic not at the registered epoch endpoint")
+   70     if scope not in ("ABC", "AB") or len(current) != 48 or len(valid) != 20*len(scope) or any(g.labels is not None for g in valid):
+   71         raise ValueError("Diagnostic fit/valid scope differs")
+   72     cache = [] if memory is None else list(memory.reservoir.groups)
+   73     if len(cache) != (0 if stage == 1 else 6):
+   74         raise ValueError("Wrong surviving cache")
+   75     before = memory.to_bytes() if memory is not None else None
+   76     step_before = parent.adam_step(optimizer)
+   77     origins = ({} if memory is None else memory.reference_origins if arm == "LOGIT0.1" else memory.origins)
+   78     scorer, pool = score_fn or score, pooling_fn or record.account_logits
+   79     with neutral(model):
+   80         fit_values = metrics(current, scorer(model, current, c, arm, check))
+   81         cache_scores = scorer(model, cache, c, arm, check)
+   82         cache_values = metrics(cache, cache_scores)
+   83         blind = scorer(model, valid, c, arm, check)
+   84         errors = []
+   85         for i, group in enumerate(cache):
+   86             check()
+   87             if arm == "LOGIT0.1":
+   88                 e0 = cache_scores[i] - memory.references[group.uid]
+   89                 errors.append({"uid": group.uid, "D0": float(np.mean(e0.astype(np.float64)**2)),
+   90                                "D1": None, "residual_cross_mean": None, "residual_difference_mse": None})
+   91             elif arm in ("C_cf", "C_perm"):
+   92                 from step28_crossfit_retention import floor_loss
+   93                 # The saved score is the actual FP32 A0 pooling result. No extra forward.
+   94                 _, details = floor_loss(torch.from_numpy(cache_scores[i]), group, memory.tables[group.uid])
+   95                 errors.append({"uid": group.uid, **details})
+   96             else:
+   97                 live = record.reference(model, group, c, check)
+   98                 target = memory.tables[group.uid]
+   99                 seeds = (None, data.seed_for(20261008, order, stage, group.uid, "diagnostic_regroup"))
+  100                 residual = []
+  101                 for seed in seeds:
+  102                     slots = record.assignment(group, seed)
+  103                     # Eval-only CPU pooling of the same FP32 tables; no model gradient.
+  104                     view = "A0" if seed is None else "A1"
+  105                     live_score = pool(torch.from_numpy(live), slots, group, view) if pooling_fn else pool(torch.from_numpy(live), slots)
+  106                     teacher_score = pool(torch.from_numpy(target), slots, group, "teacher_"+view) if pooling_fn else pool(torch.from_numpy(target), slots)
+  107                     residual.append((live_score-teacher_score).numpy().astype(np.float64))
+  108                 e0, e1 = residual
+  109                 errors.append({"uid": group.uid, "D0": float(np.mean(e0**2)), "D1": float(np.mean(e1**2)),
+  110                                "residual_cross_mean": float(np.mean(e0*e1)),
+  111                                "residual_difference_mse": float(np.mean((e1-e0)**2))})
+  112                 if table_diagnostic is not None:
+  113                     errors[-1].update(table_diagnostic(live, group, target))
+  114     if (parent.adam_step(optimizer) != step_before
+  115             or (memory.to_bytes() if memory is not None else None) != before):
+  116         raise ValueError("Diagnostics changed optimizer step or bounded history")
+  117     tag = f"{point}_epoch{epoch}"
+  118     result = {"point": point, "order": order, "arm": arm, "stage": stage, "epoch": epoch,
+  119               "stage_step": epoch*48, "adam_step": step_before, "seed": "s0", "metric_columns": list(COLUMNS),
+  120               "fit_ids": [g.uid for g in current], "fit_domains": [order[stage-1]]*48,
+  121               "cache_ids": [g.uid for g in cache], "cache_domains": [order[origins[g.uid]-1] for g in cache],
+  122               "valid_ids": [g.uid for g in valid], "teacher_errors": errors,
+  123               "mode": "A0_eval_no_autograd", "valid_labels_used": False,
+  124               "fit": previous.save_array(root/(tag+"_fit.npy"), fit_values, root),
+  125               "cache": previous.save_array(root/(tag+"_cache.npy"), cache_values, root),
+  126               "valid_blind": previous.save_array(root/(tag+"_valid.npy"), blind, root)}
+  127     path = root/(tag+".json")
+  128     data.write_json(path, result)
+  129     return data.record(path, root)
+  130 
+  131 
+  132 def summary(values: np.ndarray, draws: np.ndarray) -> dict:
+  133     estimates = values[draws].mean(axis=1)
+  134     return {"mean": values.mean(axis=0).tolist(),
+  135             "conditional_95pct_interval": np.quantile(estimates, [.025, .975], axis=0).T.tolist()}
+  136 
+  137 
+
+FILE scripts/step28_record_replay_numerics.py
+    1 """One bounded native C/S update comparison on handwritten inputs; no formal data."""
+    2 from __future__ import annotations
+    3 
+    4 import time
+    5 STARTED = time.monotonic()
+    6 
+    7 import argparse
+    8 import copy
+    9 import hashlib
+   10 import json
+   11 import os
+   12 from pathlib import Path
+   13 import random
+   14 import sys
+   15 import threading
+   16 import traceback
+   17 
+   18 import numpy as np
+   19 import psutil
+   20 import torch
+   21 
+   22 import step28_record_replay as method
+   23 import step28_record_replay_run as run
+   24 from step28_record_replay_verify import preflight
+   25 
+   26 
+   27 def old_numerics() -> dict:
+   28     # Literal settings of the SHA-bound historical LOGIT execute, lines 520--523.
+   29     torch.use_deterministic_algorithms(True)
+   30     torch.backends.cuda.matmul.allow_tf32 = False
+   31     torch.backends.cudnn.allow_tf32 = False
+   32     torch.backends.cudnn.benchmark = False
+   33     return observed()
+   34 
+   35 
+   36 def observed() -> dict:
+   37     return {"deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+   38             "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+   39             "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+   40             "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+   41             "cudnn_benchmark": torch.backends.cudnn.benchmark,
+   42             "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG")}
+   43 
+   44 
+   45 def cpu_copy(value):
+   46     if isinstance(value, torch.Tensor):
+   47         return value.detach().cpu().clone()
+   48     if isinstance(value, dict):
+   49         return {k: cpu_copy(v) for k, v in value.items()}
+   50     if isinstance(value, (list, tuple)):
+   51         return type(value)(cpu_copy(v) for v in value)
+   52     return copy.deepcopy(value)
+   53 
+   54 
+   55 def equal_state(left, right, counts, path="state"):
+   56     if isinstance(left, torch.Tensor):
+   57         if (left.dtype != right.dtype or left.shape != right.shape or
+   58                 not torch.equal(left.contiguous().reshape(-1).view(torch.uint8),

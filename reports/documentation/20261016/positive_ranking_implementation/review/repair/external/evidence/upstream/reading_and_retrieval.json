@@ -1,0 +1,93 @@
+{
+  "purpose": "Direct static dependency check for repaired zero-CUDA-allocation guard; no new mathematical or numerical experiment.",
+  "project_input": "positive_ranking_repair_review.zip",
+  "official_document": {
+    "url": "https://docs.pytorch.org/docs/2.9/notes/cuda.html",
+    "reference": "turn2view0",
+    "sections": [
+      "Memory management",
+      "cuBLAS workspaces"
+    ],
+    "read_scope": "Relevant paragraphs; no new paper search."
+  },
+  "upstream_source": {
+    "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+    "bytes": 13701,
+    "sha256": "e43440cfc3c89e9252d07e812e05c40c315283e4e9d33069b6c196ccdb24a786",
+    "read_lines": [
+      1,
+      357
+    ],
+    "relevant_lines": [
+      [
+        110,
+        123
+      ],
+      [
+        125,
+        166
+      ],
+      [
+        228,
+        257
+      ],
+      [
+        291,
+        307
+      ],
+      [
+        330,
+        354
+      ]
+    ],
+    "command": "nl -ba repair_audit_work/upstream/CublasHandlePool_v2.9.1.cpp",
+    "run_code": false
+  },
+  "retrieval_events": [
+    {
+      "tool": "web open",
+      "urls": [
+        "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+        "https://docs.pytorch.org/docs/stable/notes/cuda.html"
+      ],
+      "result": "raw source DisabledError; stable documentation redirects to 2.14; stable page not used for version-specific conclusion"
+    },
+    {
+      "tool": "web open and system2 query",
+      "urls": [
+        "https://github.com/pytorch/pytorch/blob/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+        "https://docs.pytorch.org/docs/2.9/notes/cuda.html"
+      ],
+      "query": "site:github.com/pytorch/pytorch \"cublas_handle_stream_to_workspace\" \"CUDACachingAllocator\"",
+      "result": "GitHub source DisabledError; no query matches; official 2.9 documentation read"
+    },
+    {
+      "tool": "web find and system1 queries",
+      "patterns": [
+        "cuBLAS workspaces",
+        "clearCublas",
+        "workspace"
+      ],
+      "queries": [
+        "site:github.com/pytorch/pytorch/blob/v2.9.1 \"CublasHandlePool.cpp\"",
+        "site:github.com/pytorch/pytorch \"cublas_handle_stream_to_workspace\" \"allocate\""
+      ],
+      "result": "Official documentation workspace section found; unrelated query results not used"
+    },
+    {
+      "tool": "web open",
+      "urls": [
+        "https://raw.githubusercontent.com/pytorch/pytorch/refs/tags/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+        "https://github.com/pytorch/pytorch/raw/refs/tags/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+        "https://docs.pytorch.org/docs/2.9/_modules/torch/cuda/memory.html"
+      ],
+      "result": "Two DisabledError responses; memory source page inaccessible"
+    },
+    {
+      "tool": "version-pinned text fetch",
+      "script": "fetch_primary_source.py",
+      "result": "HTTP 200; exact identity and execution metadata in fetch_result.json"
+    }
+  ],
+  "limits": "Upstream tag semantics checked; installed project binary not accessed or independently authenticated. Fetch/read failures are not scientific run failures. Full upstream text remains a read-only temporary reference, identified by canonical URL and SHA; project attachment is the sole project implementation input."
+}

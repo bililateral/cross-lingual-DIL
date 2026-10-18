@@ -1,0 +1,434 @@
+
+FILE scripts/step28_g_half_run.py
+    1 """Fixed single G_half trajectory with read-only saved S/G comparators."""
+    2 from __future__ import annotations
+    3 
+    4 import argparse
+    5 import ast
+    6 import gc
+    7 import hashlib
+    8 import math
+    9 import os
+   10 from pathlib import Path
+   11 import random
+   12 import shutil
+   13 import signal
+   14 import sys
+   15 import threading
+   16 import time
+   17 import traceback
+   18 
+   19 import numpy as np
+   20 
+   21 import step28_g_half as method
+   22 import step28_balanced_pooling_run as saved
+   23 import step28_replay_diagnostics as diag
+   24 import step28_record_replay_run as legacy
+   25 
+   26 record, data = method.record, method.data
+   27 parent, core = record.parent, record.core
+   28 base, previous = record.base, legacy.previous
+   29 POLICY = data.ROOT / "schema/step28_g_half_policy.json"
+   30 BASELINE = data.ROOT / "reports/documentation/20261015/g_refinement/baseline_sources.json"
+   31 AUTHORIZATION = data.ROOT / "reports/documentation/20261015/g_half_implementation/authorization.json"
+   32 POINTS = ("A_G_half", "B_G_half")
+   33 COMPLETE = "COMPLETE_576_UPDATES_2_RESTORES_12_DIAGNOSTICS_VALID_BLIND"
+   34 # These data/metric helpers retain their closed S/G/F semantics; no old training/qualification entry is invoked.
+   35 public_inputs, attach_labels, partition = saved.public_inputs, saved.attach_labels, saved.partition
+   36 query_metrics, undefined_metrics = saved.query_metrics, saved.undefined_metrics
+   37 pooled_rates, summarize = saved.pooled_rates, saved.summarize
+   38 fresh, verify_archive, pretrained_archive = saved.fresh, saved.verify_archive, saved.pretrained_archive
+   39 
+   40 
+   41 def policy() -> dict:
+   42     p = data.read_json(POLICY)
+   43     if (p["methods"] != ["G_half"] or p["domains"] != "AB" or p["main_rng_order"] != "ABC"
+   44             or p["physical_updates"] != 576 or p["gradient_group_presentations"] != 864
+   45             or p["physical_stage_states"] != 2 or p["epoch_diagnostic_points"] != 12
+   46             or p["history_supervision"] != .1 or p["teacher_weight"] != .5 or p["seed"] != "s0"
+   47             or p["memory_maximum_bytes"] != 1048576 or p["pooling"] != method.identity()
+   48             or p["evaluation"] != dict(bootstrap_replicates=5000, bootstrap_seed=20260930,
+   49                 comparisons=[["G_half", "S"], ["G_half", "G"]], primary_metric="map",
+   50                 primary_role="raw", success="B_end_H_minus_S_each_AB_MAP_CI_lower_strictly_positive")
+   51             or p["cpu_verification"]["maximum_seconds"] != 180
+   52             or p["native_verification"]["maximum_seconds"] != 600
+   53             or p["native_verification"]["actual_updates"] != 6
+  177 def train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget, *, entry=None):
+  178     entry = entry or sys.modules[__name__]
+  179     if parent.adam_step(optimizer) != (stage-1)*288:
+  180         raise ValueError("Stage continuity differs")
+  181     if memory is not None:
+  182         memory.begin_stage(stage)
+  183     before = None if memory is None else memory.summary()
+  184     schedule, _ = parent.schedule(current, parent.contract(), entry.method.RNG_ORDER, stage)
+  185     name = "AB"[stage-1]+"_"+arm
+  186     budget.phase = name
+  187     rows, captures = [], []
+  188     for step, group in enumerate(schedule, 1):
+  189         history, target = (None, None) if memory is None else memory.draw()
+  190         row = entry.method.update(model, optimizer, group, history, target, c, arm, stage, step, budget.check)
+  191         if parent.adam_step(optimizer) != (stage-1)*288+step:
+  192             raise ValueError("Actual optimizer call missing")
+  193         rows.append({**row, "step": step, "current_uid": group.uid, "history_uid": history.uid if history else None})
+  194         if step % 48 == 0:
+  195             captures.append(entry.method.capture(model, optimizer, current, memory, valid, c, arm,
+  196                 stage, step//48, root/"diagnostics", name, budget.check))
+  197         if step == 1 or step % 24 == 0:
+  198             print(data.json_bytes({"event": "updates", "point": name, "completed": step, **budget.snapshot()}).decode(), flush=True)
+  199     after = None if memory is None else memory.summary()
+  200     if before is not None and any(before[k] != after[k] for k in ("members", "seen", "origins", "tables")):
+  201         raise ValueError("History targets/membership changed within B")
+  202     path = root/"updates"/(name+".json")
+  203     data.write_json(path, {"arm": arm, "stage": stage, "updates": 288, "adam_step": parent.adam_step(optimizer),
+  204         "current_ids": [g.uid for g in schedule], "history_ids": [r["history_uid"] for r in rows if r["history_uid"]],
+  205         "memory_before": before, "memory_after": after, "rows": rows})
+  206     return data.record(path, root), captures
+  207 
+  208 
+  209 def memory_from(payload: bytes, arm: str, *, entry=None):
+  210     entry = entry or sys.modules[__name__]
+  211     if arm not in entry.method.ARMS:
+  212         raise ValueError("Unknown arm Memory")
+  213     memory = record.Memory.from_bytes(payload)
+  214     if any(memory.maps.get(k) != v for k, v in entry.method.metadata(arm).items()):
+  215         raise ValueError("Memory candidate identity differs")
+  216     return memory
+  217 
+  218 
+  219 def continuity(model, optimizer, memory):
+  220     return {"model": core.state_digest(model.state_dict()), "adam": core.state_digest(optimizer.state_dict()),
+  221             "rng": diag.rng_state(), "modes": [m.training for m in model.modules()],
+  222             "memory_sha256": hashlib.sha256(memory.to_bytes()).hexdigest()}
+  223 
+  224 
+  225 def restore_point(path, expected, model, optimizer, arm, *, entry=None):
+  226     entry = entry or sys.modules[__name__]
+  227     meta = core.restore_state(path, model, optimizer, expected["state_sha256"])
+  228     if entry.method.bind(model, meta) != arm:
+  229         raise ValueError("Restored arm differs")
+  230     for m, mode in zip(model.modules(), meta["modes"], strict=True):
+  231         m.training = mode
+  232     diag.restore_rng(meta["rng"])
+  233     return meta
+  234 
+  235 
+  236 def checkpoint(root, name, model, optimizer, memory, current, calibration, valid, c, arm, stage, budget, *, entry=None):
+  237     entry = entry or sys.modules[__name__]
+  238     if len(calibration) != 12 or len(valid) != 40 or parent.adam_step(optimizer) != 288*stage:
+  239         raise ValueError("Endpoint scope differs")
+  319         raise ValueError("H partition differs from frozen S/G")
+  320     data.write_json(root/"partition.json", split)
+  321     manifest = {"status": "RUNNING", "source_files": entry.sources(), "public_inputs": checked, "pretrained_archive": archive,
+  322         "partition": data.record(root/"partition.json", root), "points": {}, "training": {}, "diagnostics": {},
+  323         "baseline_identity": data.record(entry.BASELINE, data.ROOT), "initials": {}, "starts": {}, "physical_updates": 0, "gradient_group_presentations": 0}
+  324     data.write_json(root/"startup.json", manifest)
+  325     groups["train"] = previous.parse_once(job, groups["train"], c, "train",
+  326         loader=lambda gs, cfg, s: entry.attach_labels(gs, cfg, s, metadata))
+  327     selected, after = entry.partition(groups, metadata, c)
+  328     if after != split:
+  329         raise ValueError("Labels changed partition")
+  330     def domain(role, d):
+  331         return [g for g,r in zip(selected[role], split[role], strict=True) if r["domain"] == d]
+  332     valid = groups["development"]
+  333     for arm in entry.method.ARMS:
+  334         c["pooling_stats"] = {}
+  335         model, optimizer, initial = entry.fresh(c)
+  336         entry.method.bind(model, entry.method.metadata(arm))
+  337         manifest["initials"][arm] = initial
+  338         if initial != baseline["initial_identity"] or parent.adam_step(optimizer) != 0:
+  339             raise ValueError("Independent identical untrained starts required")
+  340         memory = None
+  341         for stage, d in enumerate("AB", 1):
+  342             name = d+"_"+arm
+  343             if stage == 2:
+  344                 manifest["starts"][arm] = continuity(model, optimizer, memory)
+  345                 if manifest["starts"][arm] != manifest["points"]["A_"+arm]["continuity"]:
+  346                     raise ValueError("B did not continue its own restored A state")
+  347             current = domain("fit", d)
+  348             log, captures = entry.train_stage(model, optimizer, current, memory, valid, c, arm, stage, root, budget)
+  349             endpoint, memory = entry.checkpoint(root, name, model, optimizer, memory, current if stage==1 else None,
+  350                 domain("calibration", d), valid, c, arm, stage, budget)
+  351             manifest["training"][name], manifest["diagnostics"][name], manifest["points"][name] = log, captures, endpoint
+  352             manifest["physical_updates"] += 288
+  353             manifest["gradient_group_presentations"] += 288*stage
+  354             data.write_json(root/"progress.json", manifest)
+  355         del model, optimizer, memory
+  356         gc.collect()
+  357         if torch.cuda.is_initialized():
+  358             torch.cuda.empty_cache()
+  359     manifest["status"] = entry.COMPLETE
+  360     data.write_json(root/"manifest.json", manifest)
+  361     for source in manifest["source_files"]:
+  362         destination = root/"sources"/source["path"]
+  363         destination.parent.mkdir(parents=True, exist_ok=True)
+  364         shutil.copyfile(data.verify(data.ROOT/source["path"], source), destination)
+  365     return manifest, split, valid, metadata
+
+FILE tests/test_step28_positive_ranking.py
+   80     for q in range(28):
+   81         ids = [(j, LOOKUP[tuple(sorted((q,j)))]) for j in range(28) if j != q]
+   82         pos = [k for j,k in ids if group.labels[k]]
+   83         neg = sorted([(j,k) for j,k in ids if not group.labels[k]], key=lambda jk:(-float(values[jk[1]].detach()),jk[0]))[:5]
+   84         hard.append(torch.stack([torch.nn.functional.softplus(values[n]-values[p]) for p in pos for j,n in neg]).mean())
+   85     return bce+independent_rank(values, group.labels)+.5*torch.stack(hard).mean()
+   86 
+   87 
+   88 def independent_objective(table, group, seed, arm, target=None):
+   89     a0, a1 = record.assignment(group), record.assignment(group, seed)
+   90     v0, v1 = [independent_pool(table, slots, arm) for slots in (a0,a1)]
+   91     supervised = (independent_loss(v0, group)+independent_loss(v1, group))/2
+   92     return supervised if target is None else .1*supervised+.5*(v0-independent_pool(torch.as_tensor(target,device=table.device,dtype=table.dtype),a0,arm)).square().mean()
+   93 
+   94 
+   95 def shared_memory(arm):
+   96     groups = [handmade_group(f"A_fit_{i:02}") for i in range(48)]
+   97     memory = record.Memory("ABC")
+   98     memory.retain(groups, 1, lambda g: (np.sin(np.arange(1540)/7)*2).astype(np.float32))
+   99     memory.maps.update(method.metadata(arm))
+  100     return memory
+  101 
+  102 
+  103 def verify_native_table(table, group, seed, reference, arm):
+  104     """Actual FP32 table -> both views -> independent rank values/gradients."""
+  105     rows = []
+  106     for name, slots in (("A0",record.assignment(group)),("A1",record.assignment(group,seed))):
+  107         scores = method.account_logits(table,slots,arm).detach().requires_grad_(True)
+  108         rank = method.objectives(scores,torch.as_tensor(group.labels,device=scores.device,dtype=scores.dtype))["rank_pos"]
+  109         gradient, = torch.autograd.grad(rank,scores)
+  110         value, grad, _ = analytic_rank(scores.detach().double().cpu().tolist(),group.labels)
+  111         np.testing.assert_allclose(float(rank.detach()),value,atol=ATOL,rtol=RTOL)
+  112         np.testing.assert_allclose(gradient.detach().cpu().numpy(),grad,atol=ATOL,rtol=RTOL)
+  113         rows.append(dict(view=name,value=float(rank.detach()),reference=value,gradient_max_error=float(np.max(np.abs(gradient.detach().cpu().numpy()-grad)))))
+  114     return dict(arm=arm,uid=group.uid,role="history" if reference is not None else "current",views=rows)
+
+FILE scripts/step28_record_replay.py
+    1 """Complete-record regrouping and source-table replay; no formal data entry here."""
+    2 from __future__ import annotations
+    3 
+    4 import contextlib
+    5 import copy
+    6 import hashlib
+    7 import json
+    8 import random
+    9 import struct
+   10 from typing import Any, Callable
+   11 
+   12 import numpy as np
+   13 
+   14 import step28_bge_continual as parent
+   15 
+   16 base, data, core = parent.base, parent.data, parent.core
+   17 POLICY = data.ROOT / "schema/step28_record_replay_policy.json"
+   18 
+   19 
+   20 def policy() -> dict:
+   21     p = data.read_json(POLICY)
+   22     if (p["methods"] != ["C", "S"] or p["orders"] != list(parent.ORDERS)
+   23             or p["physical_updates"] != 4320 or p["gradient_group_presentations"] != 7776
+   24             or p["pair_chunk"] != 512 or p["record_dimension"] != 2048
+   25             or p["history_supervision"] != .1 or p["teacher_weight"] != .5
+   26             or p["memory_maximum_bytes"] != 1048576):
+   27         raise ValueError("Record replay contract differs")
+   28     return p
+   29 
+   30 
+   31 def config() -> dict:
+   32     c = copy.deepcopy(parent.config(parent.contract()))
+   33     c["runtime"] = policy()["runtime"]
+   34     # Reuse the pinned native loader, with this experiment's actual record head.
+   35     c["interventions"]["split_rank"]["account_dim"] = 2048
+   36     return c
+   37 
+   38 
+   39 def load_model(c: dict, device: str = "cuda:0") -> Any:
+   40     return base.load_model(c, "split_rank", device)
+   41 
+   42 
+  185 def update(model: Any, optimizer: Any, current: data.Group, history: data.Group | None,
+  186            reference: np.ndarray | None, c: dict, arm: str, order: str, stage: int,
+  187            step: int, check: Callable = lambda: None, observe: Callable | None = None,
+  188            objective_fn: Callable | None = None) -> dict:
+  189     import torch
+  190     model.train()
+  191     optimizer.zero_grad(set_to_none=True)
+  192     optimizer.param_groups[0]["lr"] = parent.stage_lr(step)
+  193     optimizer.param_groups[1]["lr"] = .001
+  194     logs = {}
+  195     for role, group, target in (("current", current, None), ("history", history, reference)):
+  196         if group is None:
+  197             continue
+  198         logs[role] = backward_group(model, group, c, arm,
+  199             data.seed_for(20260918, order, stage, step, role, "dropout"),
+  200             data.seed_for(20260918, order, stage, step, role, group.uid, "regroup"), target, check,
+  201             objective_fn=objective_fn)
+  202         if observe is not None:
+  203             observe(role, logs[role])
+  204     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1., error_if_nonfinite=True)
+  205     check()
+  206     optimizer.step()
+  207     return {**logs, "gradient_norm": float(norm), "encoder_lr": parent.stage_lr(step),
+  208             "head_lr": .001, "total": sum(v["weighted"] for v in logs.values())}
+  209 
+  210 
+  211 def reference(model: Any, group: data.Group, c: dict, check: Callable = lambda: None) -> np.ndarray:
+  212     import torch
+  213     model.eval()
+  214     with torch.inference_mode():
+  215         table = pair_table(model, record_vectors(model, group, c, check), check)
+  216     result = table.float().cpu().numpy().copy()
+  217     if not np.isfinite(result).all():
+  218         raise ValueError("Nonfinite source table")
+  219     return result
+  220 
+  221 
+  222 def score(model: Any, groups: list[data.Group], c: dict, check: Callable = lambda: None) -> np.ndarray:
+  223     import torch
+  224     model.eval()
+  225     with torch.inference_mode():
+  226         rows = [account_logits(pair_table(model, record_vectors(model, g, c, check), check),
+  227                                assignment(g)).float().cpu().numpy() for g in groups]
+  228     result = np.stack(rows).astype(np.float32)
+  229     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
+  230         raise ValueError("Incomplete blind scores")
+  231     return result
+  232 
+
+FILE scripts/step28_bge_continual_run.py
+   58 def rng_state() -> dict:
+   59     import torch
+   60     return {"cpu": torch.get_rng_state().tolist(),
+   61             "cuda": [state.tolist() for state in torch.cuda.get_rng_state_all()]
+   62             if torch.cuda.is_available() else []}
+   63 
+   64 
+   65 def restore_rng(state: dict) -> None:
+   66     import torch
+   67     torch.set_rng_state(torch.tensor(state["cpu"], dtype=torch.uint8))
+   68     if state["cuda"]:
+   69         if len(state["cuda"]) != torch.cuda.device_count():
+   70             raise ValueError("CUDA RNG count differs")
+   71         torch.cuda.set_rng_state_all([torch.tensor(row, dtype=torch.uint8) for row in state["cuda"]])
+   72     if rng_state() != state:
+
+FILE scripts/step28_continual_population.py
+   32 def make_optimizer(model: Any, config: dict) -> Any:
+   33     import torch
+   34     p = config["optimizer"]
+   35     return torch.optim.AdamW(
+   36         [{"params": model.encoder.parameters(), "lr": p["encoder_lr"],
+   37           "weight_decay": p["encoder_weight_decay"]},
+   38          {"params": model.head.parameters(), "lr": p["head_lr"],
+   39           "weight_decay": p["head_weight_decay"]}],
+   40         betas=tuple(p["betas"]), eps=p["eps"], foreach=p["foreach"])
+   41 
+   42 
+   43 def model_files(config: dict) -> dict:
+   44     base = data.ROOT / config["model"]["path"]
+   45     rows = [{"path": path.relative_to(base).as_posix(), "size_bytes": path.stat().st_size,
+   46              "sha256": data.sha256(path)}
+   47             for path in sorted(base.rglob("*"), key=lambda p: p.relative_to(base).as_posix())
+   48             if path.is_file() and ".cache" not in path.parts and "__pycache__" not in path.parts
+   49             and path.suffix != ".pyc"]
+   50     # Preserve step7's canonical_hash: size_bytes keys and no trailing newline.
+   51     content = hashlib.sha256(data.json_bytes(rows).rstrip(b"\n")).hexdigest()
+   52     return {"files": rows, "file_count": len(rows),
+   53             "total_size_bytes": sum(row["size_bytes"] for row in rows), "content_sha256": content}
+   54 
+   55 
+   56 def load_model(config: dict, device: str = "cuda:0") -> Any:
+   57     import torch
+   58     from sentence_transformers import SentenceTransformer
+   59 
+   60     torch.manual_seed(config["initialization_seed"])
+   61     encoder = SentenceTransformer(str(data.ROOT / config["model"]["path"]),
+   62                                   device=device, local_files_only=True)
+   63     encoder.default_prompt_name = None
+   64     encoder.max_seq_length = config["model"]["token_budget"]
+   65     if encoder.get_sentence_embedding_dimension() != config["model"]["embedding_dim"]:
+   66         raise ValueError("LaBSE embedding dimension differs")
+   67     if config["model"]["activation_checkpointing"]:
+   68         encoder[0].auto_model.gradient_checkpointing_enable(
+   69             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+   70     # Head initialization must not depend on encoder loader's incidental RNG use.
+   71     torch.manual_seed(config["initialization_seed"])
+   72     return build_model(encoder, config["model"]["embedding_dim"], config["model"]["pair_head"][1]).to(device)
+  157 def state_digest(value: Any) -> str:
+  158     """All tensors, scalar state and optimizer parameter groups, without aliases."""
+  159     import torch
+  160     digest = hashlib.sha256()
+  161 
+  162     def visit(item: Any) -> None:
+  163         if isinstance(item, torch.Tensor):
+  164             tensor = item.detach().contiguous().cpu()
+  165             digest.update(data.json_bytes([str(tensor.dtype), list(tensor.shape)]))
+  166             digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
+  167         elif isinstance(item, dict):
+  168             for key in sorted(item, key=str):
+  169                 digest.update(data.json_bytes([str(type(key)), str(key)]))
+  170                 visit(item[key])
+  171         elif isinstance(item, (tuple, list)):
+  172             digest.update(data.json_bytes(["sequence", len(item)]))
+  173             for child in item:
+  174                 visit(child)
+  175         else:
+  176             digest.update(data.json_bytes(item))
+  177 
+  178     visit(value)
+  179     return digest.hexdigest()
+  180 
+  181 
+  182 def save_state(path: Path, model: Any, optimizer: Any | None, metadata: dict) -> dict:
+  183     import torch
+  184     if path.exists():
+  185         raise FileExistsError(path)
+  186     payload = {"model": model.state_dict(), "metadata": metadata,
+  187                "optimizer": optimizer.state_dict() if optimizer is not None else None}
+  188     digest = state_digest(payload)
+  189     torch.save(payload, path)
+  190     return {"state_sha256": digest, **data.record(path, path.parent)}
+  191 
+  192 
+  193 def restore_state(path: Path, model: Any, optimizer: Any | None, expected_digest: str) -> dict:
+  194     import torch
+  195     saved = torch.load(path, map_location="cpu", weights_only=True)
+  196     if state_digest(saved) != expected_digest:
+  197         raise ValueError("Saved model/optimizer state differs")
+  198     model.load_state_dict(saved["model"], strict=True)
+  199     if optimizer is not None:
+  200         if saved["optimizer"] is None:
+  201             raise ValueError("Missing required Adam state")
+  202         optimizer.load_state_dict(saved["optimizer"])
+  203     loaded = {"model": model.state_dict(), "metadata": saved["metadata"],
+  204               "optimizer": optimizer.state_dict() if optimizer is not None else None}
+  205     # Inference loads may deliberately omit saved Adam, but model bytes must match.
+  206     if state_digest(loaded["model"]) != state_digest(saved["model"]):
+  207         raise ValueError("Actual loaded model differs")
+  208     if optimizer is not None and state_digest(loaded) != expected_digest:
+  209         raise ValueError("Actual loaded Adam state differs")
+  210     return saved["metadata"]
+
+FILE scripts/step28_continual_population_data.py
+   29     return (json.dumps(value, ensure_ascii=False, sort_keys=True,
+   30                        separators=(",", ":"), allow_nan=False) + "\n").encode("utf-8")
+   31 
+   32 
+   33 def write_json(path: Path, value: Any) -> None:
+   34     path.write_bytes(json_bytes(value))
+   35 
+   36 
+   37 def sha256(path: Path) -> str:
+   38     digest = hashlib.sha256()
+   39     with path.open("rb") as stream:
+   40         for block in iter(lambda: stream.read(4 * 1024 * 1024), b""):
+   41             digest.update(block)
+   42     return digest.hexdigest()
+   43 
+   44 
+   45 def record(path: Path, base: Path) -> dict:
+   46     return {"path": path.relative_to(base).as_posix(), "bytes": path.stat().st_size,
+   47             "sha256": sha256(path)}
+   48 
+   49 
+   50 def verify(path: Path, expected: dict) -> Path:
+   51     if path.stat().st_size != expected["bytes"] or sha256(path) != expected["sha256"]:
+   52         raise ValueError(f"File differs: {path.name}")

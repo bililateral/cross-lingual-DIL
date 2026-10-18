@@ -1,0 +1,38 @@
+S_pos/H_pos修复版本外审回收与独立主审
+2026-10-18，Asia/Shanghai。
+
+一、主审结论
+本轮94成员输入的定向外审已完整回收。外审针对送审提交38d05b9a的结论为：R01空缓存评分关闭，R02精确自身PID例外正确，R03库持有cuBLAS工作区未释放构成唯一P1执行阻断。我独立接受这三项判断；R02与R03是同一第二臂准入问题的不同部分，不重复计两个新阻断。
+
+R03属于已确认实现范围内的明确执行缺陷，不改变科研问题、数值定义、候选、预算或权限。已按外审提出的最小顺序补上一行专用释放，并在Linux既有py310完成唯一受影响CPU测试。当前本地主审关闭R03及R02整体执行缺口，未发现其他开放的具体实现阻断，可以准备待批准的原生资格。此裁决不是“网页对修改后代码再次给出PASS”；网页原件仍针对38d05b9a保留P1，本次关闭由对应官方源码、与建议一致的一行修复及attempt05证据共同支撑。没有为该最小处置重复发送新包或重审未变数学。
+
+二、完整回收与身份
+原会话https://chatgpt.com/c/6ad42ab0-aee0-83eb-b53a-81e1302fb008。首次页面读数残缺且有停止按钮，正常刷新后取得完整最终文本、stop=0及交付链接；未向审查者追加消息。返回ZIP189487字节/62成员，SHA256 fbb2b8af50ebb075ffc5954e5777bfb31c6c0a092e693ac6dee22b61088ae999；62外部清单条目、61内部载荷、CRC及独立报告身份一致。94原输入逐项与本地唯一送审ZIP一致。原件保留external/，身份和回收过程见recovery.json、delivery.json、external_members.tsv、final_page.json。
+
+完整报告27968字节已读，包括R01—R03、Python对象生命周期、来源/预算、阅读范围与证据限制；回查findings.json、field_checks源码/结果、static_audit源码的核对/读取分支、官方依赖取回脚本/记录及项目原始CPU回执。外审的94成员身份检查不等于94文件全量语义审查；其20全文、18选段、31机械等分类与截断背景说明保留。旧75成员中断生成的完整报告和独立数学运行原件仍未回收，不能因本轮新审查完成追称旧任务完整关闭。未复算旧指标或再次读取52份对照原始载荷。
+
+三、逐项独立裁决
+R01接受关闭。真实路径positive_ranking_run.train_stage→g_half_run.train_stage→method.capture→diagnostics.capture→method.score，A阶段传入合法空cache。当前score先检查绑定臂，再返回(0,378)FP32，非空保留原S/H路径；下游空指标(0,3)FP64。attempt04两臂真实生产capture48/0/40及错误臂拒绝/旧评分异常反例支持关闭。每臂仅1次实际CPU更新加合成Adam时钟48，不外推为48次真实更新。本次这条路径未改，不重跑。
+
+R02接受PID子问题已关闭。main仅在首臂native完整返回、逐臂预算通过并登记report.arms后传continuing=True；第二臂在fresh载模前清理，仅放行整数PID等于自身的上下文。其他PID/项目作业、GPU空闲30GiB/主存72GiB、单CPU/线程/GPU0约束保留。回读native返回字段、gradients.detach().cpu().clone、state/cpu_copy及计时闭包，未发现报告持有首臂模型/optimizer/GPU表的路径。两臂独立checked_fresh/空Adam起点未改。
+
+R03接受为真实执行缺陷，不把它混称模型泄漏或新rank错误。独立查阅PyTorch2.9官方CUDA文档“Memory management”“cuBLAS workspaces”、固定v2.9.1 CublasHandlePool.cpp以及torch/csrc/cuda/Module.cpp的绑定：持久map持有DataPtr，工作区经CUDACachingAllocator分配，专用clear同时清理cuBLAS与cuBLASLt持有；Python入口绑定存在。首臂实际record.account_logits的矩阵乘法及Linear会走相应CUDA路径，固定:4096:8并非零工作区。gc/synchronize/empty_cache不解除C++持有关系，因此与零allocated/reserved门冲突的静态判断成立。这里没有声称测到实际GPU残留字节，也未把上游源码当成本机二进制逐字节认证。
+
+官方来源：
+https://docs.pytorch.org/docs/2.9/notes/cuda.html#cublas-workspaces
+https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp
+https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp
+
+四、最小修复及能识别遗漏的核验
+生产代码仅在native_preflight的synchronize与empty_cache之间加入torch._C._cuda_clearCublasWorkspaces()。顺序为gc.collect→synchronize→专用clear→empty_cache→allocated/reserved零检查，之后原PID、资源和作业门不变。清理自然处于第二臂及总预算内。没有改CUBLAS_WORKSPACE_CONFIG、容差、数学目标、数据门、训练入口或源绑定规则，没有新增子进程框架。
+
+只修改原test_native_continuation_preflight：手写状态区分“库仍持有”和“分配器仍缓存”，clear释放前始终非零，empty_cache只有在解除持有后才清缓存；检查完整调用顺序。将关键clear临时替换为空操作后，生产预检确实抛出残留错误；恢复clear则可通过。首臂不调用新清理，外部PID、低GPU/主存、残留allocated/reserved及其他项目作业继续拒绝。现有native入口转发核验保留。此反例不是只检查函数名存在；但所有CUDA/进程状态仍是CPU mock，不能替代真实释放证据。
+
+12:05:48现场：属主1014、无相关step28作业、可用主存245465872KiB、磁盘736535367680字节。独立workspace为/home/yongpeng/cross-lingual/reports/documentation/20261016/positive_ranking_implementation/cpu/20261018_121000/workspace，41来源/包装器701596字节SFTP回读一致。目录名是唯一运行ID；实际开始以wallclock.started_epoch为准。attempt05在既有py310、单线程、CUDA_VISIBLE_DEVICES为空执行1项，PASS，0失败/错误/跳过，unittest0.006秒；外层2.1005420684814453秒保守计3秒，累计52/300秒。峰值RSS555044864字节，记录的peak_work600字节；5份原件7689字节回传核对。没有载BGE、正式文本/标签、旧Memory或实际GPU调用，新增optimizer为0，累计真实轻量更新仍22。
+
+当前40来源与attempt05一致；仅verify和定向测试两个文件相对送审版变化，其余38项相同。6个未变测试体AST与送审版相同，沿cpu_gate_repair继承；当前资格集合为6项复用+1项本轮执行，不宣称7项重跑。新cpu_gate_workspace.json记录当前来源、继承/执行原件与52秒账；旧失败、旧gate、旧外审输入/结论字节不改。未变数学、评分、VJP/Adam、A/B诊断与编排不重复测试。
+
+五、完成边界和下一步
+本轮外审回收、独立主审及当前明确错误的修复/受影响CPU核验完成，开放的具体实现缺陷0。实际CUDA释放和顺序双臂原生行为仍未验证；原生/正式权限均为false，无执行门、监听或训练启动。下一阶段仅可在明确批准后按现有合同进行两臂原生资格：每臂600秒/6调用，合计1200秒/12调用，GPU28GiB、RSS64GiB、临时10GiB/证据128MiB，失败即停，不自动重试。原生通过及16小时/16GiB投影也不自动授权正式训练。
+
+没有新增数学/主判据否定，亦没有正式S_pos/H_pos效果。用户已选双臂，不重开H_pos必要性选择；S_pos−S双域B末raw MAP仍为主要门，H_pos次级不能替代失败。没有扩候选、seed、数据、预算、宽容差或通用验证平台。单seed/反复使用开发集的限制及旧有效负结果继续保留。

@@ -1,0 +1,84 @@
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/repair/request.zh.txt
+    1 请对本次修复后的S_pos/H_pos实施版本作一次定向实现复审。用户明确要求“拿着这个修改后的版本重新送去外审”，本轮以新附件positive_ranking_repair_review.zip为当前实现，旧333034字节包仅为历史。原会话停留在“连接已中断，正在等待完整答复”，没有最终报告/附件交付；为执行用户重送要求已停止旧输入生成。此前可见中途裁决保留，不冒称旧实现外审完整关闭，也不要求恢复旧任务计算。
+    2 
+    3 背景及范围：两臂已获代码和Linux既有py310手写CPU累计300秒许可，GPU/BGE/正式文本标签及训练仍未批准。S_pos为主要候选，H_pos为用户已选次级对照，不重开候选取舍。数学目标、S/H非空评分精度、current/history与A0/A1四处rank、D0权重、Memory、主要S_pos−S双域B末raw MAP门、固定次级比较、22指标/三角色、预算和数据权限均未改变。原静态审查/主审和必要历史背景在包内，只作背景复用，不重审未变部分，不重复数学核验。
+    4 
+    5 本次修复对应已独立确认的两项执行缺陷：
+    6 1. S_pos A阶段首次诊断的cache为空。method.score现在先验证臂身份，再对空列表返回(0,378) FP32；非空仍分别委托原S/H评分。旧编排测试替代函数曾自行处理空列表，现空分支转调生产入口。新增实际两臂A阶段48 fit/0 cache/40盲valid capture，检查缓存指标(0,3)、空身份/域/教师项、状态/RNG/模式/optimizer中性及错误臂拒绝；原record.score空列表异常直接复现。每臂只1个真实轻量更新后显式将Adam时钟置48，不冒称完成48更新。
+    7 2. 原生两臂同进程顺序运行，旧严格preflight会把自身CUDA上下文也拒绝。首臂仍沿原严格preflight。main仅在第一臂成功完成并登记report.arms后传continuing=True；第二臂先gc.collect/synchronize/empty_cache，要求allocated/reserved均0，再检查GPU0资源、精确PID及相关项目作业。只豁免当前PID的上下文，其他PID/作业仍拒绝；空闲GPU>=30GiB、主存>=72GiB、单CPU/线程/物理GPU0条件不变。未修改冻结共用预检，未新增子进程平台、监听或重试。
+    8 
+    9 请独立追踪实际main→native→native_preflight、首臂函数返回后的引用/张量生命周期、返回结果中的对象、模型/optimizer/RNG独立起点；判断此次清理是否真实可达，以及是否会遗留活跃CUDA张量使第二臂仍必败。不能仅看辅助函数存在或mock PASS，也不要把尚未实测等同已证实缺陷。核对首臂严格门、后续仅精确自身PID例外、资源阈值及逐臂/总体计费是否保留，是否误放行其他作业。
+   10 请同样追踪A阶段真实训练诊断链和空缓存shape/dtype/身份/输出，确认修复不会跳过非空评分或改变S/H数学路径。核对新增测试是否能发现关键操作缺失，原B阶段诊断/恢复和编排回归是否足够覆盖受影响部分。
+   11 
+   12 当前项目CPU事实：attempt04四项通过、0失败/错误/跳过，外层18.448001861572266秒保守19秒，连同原两失败/成功30秒累计49/300秒。新增8次真实轻量optimizer，累计22次；1152次编排模拟仍为0真实优化。资源预检的系统/CUDA状态全部是手写mock，实际GPU调用0，不构成实际CUDA释放或双臂原生资格。当前资格是3项未变证据复用+4项本轮执行，不是7项重跑。cpu_gate_repair.json明确继承旧gate和attempt04；当前40来源绑定成功源码。historical_sources/内提供旧d914f43c的四个修改前文件，与CPU03来源对应；changes.patch精确列出38d05b9a的代码变化，原件和新旧源身份可以分别核对。
+   13 
+   14 本轮只作静态阅读、ZIP/来源身份及已有字段的机械核对；不运行项目训练/测试CLI、不导入执行项目科研模块、不新做数学/数值实验、不载BGE/权重/Memory、不连接项目Linux、不读正式数据/test/owners/private、不网络安装或扩预算。本轮请独立执行，不委派子agent。外部静态核对不能冒充Linux原生证据。
+   15 
+   16 避免过度设计：只报告影响本轮科学正确性、真实执行、证据对应或合同的具体问题。不要增加网格/seed/候选/全面重训/通用框架、无关安全加固或重复审计；若发现新问题须给出实际调用路径与可复核理由。未变数学/旧有效负结果和过去预算不追改。主执行者独立处置你的意见，外审不代替执行授权。
+   17 
+   18 请一次性交付完整中文报告、实际阅读范围、逐项发现/等级/位置/证据/影响/最小修复、两项缺陷是否关闭及是否还存在进入原生资格前的实现阻断。明确“实现可进入待批准的原生资格”与“已批准/已通过原生资格/性能达标”的区别。保留实际机械核对脚本/日志和身份结果；没执行的明说，不伪造失败/资源账或后台模型身份。
+   19 按package_manifest.json核对全部输入成员。交付可下载ZIP及外部逐成员路径/字节/SHA256清单，ZIP内含报告/阅读范围/发现/核对原件/manifest；无需打包重复输入。优先完整交付这次定向审查，不继续扩展研究。
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/repair/authorization.json
+    1 {
+    2   "status": "APPROVED",
+    3   "user_quote": "拿着这个修改后的版本重新送去外审",
+    4   "date": "2026-10-18",
+    5   "scope": "Submit current repaired S_pos/H_pos implementation, targeted CPU evidence, exact four-file change and necessary prior context to chatgpt.com GPT 6 Pro for implementation re-review.",
+    6   "implementation_commit": "38d05b9a",
+    7   "prior_commit": "d914f43c",
+    8   "destination": "chatgpt.com via local Playwright MCP, GPT 6 Pro",
+    9   "gpu_execution": false,
+   10   "formal_training": false,
+   11   "new_data_access": false,
+   12   "public_push": false,
+   13   "superseded_review": "Prior review delivery interrupted; retain partial evidence, replace its generation with revised input in the same conversation, no parallel duplicate task."
+   14 }
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/repair_disposition.zh.txt
+    1 两项执行缺陷：独立确认、最小修复与增量证据
+    2 2026-10-18，Asia/Shanghai。此为两项具体缺陷的本地主审，不冒称完整实现外审已回收或关闭。
+    3 
+    4 用户指出：“当前版本不宜直接进入原生资格，剩余阻断为两项具体执行缺陷——S_pos 的 A 阶段空缓存评分，以及原生第二臂的自身 CUDA 进程预检冲突”。原会话可见同一中途裁决；11:09正常刷新后仍显示“连接已中断，正在等待完整答复”，无最终报告或附件链接。保留partial_page.json；未追加消息、停止任务、重复上传或另建审查。完整报告、发现列表、阅读范围及外审计算原件尚不能宣称已验收。页面声称外审两次数学核验累计2/60秒（首次缺PyTorch）；这是未回收原件的审查者自述，不计项目CPU账。
+    5 
+    6 一、独立确认与原证据缺口
+    7 1. 真实调用链为single.train_stage→method.capture→diag.capture→score(model,cache,...)。A阶段cache合法为空；S_pos原适配直接调用record.score，后者np.stack(rows)对空rows抛错。正式触发点是A阶段第48更新后首次诊断，不是loss计算错误。此前真实capture只覆盖B阶段48/6/40；编排夹具自行处理空列表，使原五项PASS不能证明这一阶段完整执行。我此前将这些证据概括为充分的实现核验过宽，现明确收回该范围判断；旧测试实际通过及数学/VJP证据仍保留，不追改原件。
+    8 2. 原生两臂在同一进程顺序调用native，每次先执行冻结record preflight；后者拒绝任何compute app。第一臂创建的本PID CUDA上下文不会因函数返回自动消失，因此第二臂会与自身冲突；局部循环引用还可能延迟模型/优化器释放。原CPU没有实际运行GPU入口，这个限制此前未被验证。两项均为真实执行/复现缺陷，阻止旧版本直接进入资格；不从中推断rank数学或正式科学负结果。
+    9 
+   10 二、修复范围
+   11 1. 只在本轮method.score的臂身份校验后补空列表返回np.empty((0,378),np.float32)。非空S/H评分、精度、loss及旧冻结record源码不动。错误臂即使空列表仍拒绝。编排测试空列表转调生产score，去掉掩盖缺口的独立空分支。
+   12 2. 第一臂仍调用原严格preflight。只有已完成第一臂并写入report.arms，main才给第二臂传continuing=True。第二臂先gc.collect、CUDA同步、empty_cache，要求allocated和reserved均0，再读真实GPU0资源/进程；compute app仅豁免当前精确PID，其他PID和相关step28作业仍拒绝。GPU空闲至少30GiB、主存至少72GiB、单线程/单CPU/物理GPU0条件不变；不复用上一臂模型、参数、AdamW或Memory，不终止其他作业。为保持历史来源冻结，本轮局部保留第二臂资源检查，不修改共用旧函数，也不新增子进程平台、监听或重试。
+   13 
+   14 三、Linux增量核验
+   15 11:09:37只读现场无相关属主作业，主存可用261702217728字节、磁盘751655931904字节、负载0.02/0.23/0.61；不动其他agent服务。41必要文件SFTP部署并逐字节回读至cpu/20261018_111500/workspace，源码40项见deployment04.json。使用既有py310、CPU0、单线程、CUDA_VISIBLE_DEVICES空、无正式输入/模型链接。
+   16 attempt04：四项测试全部通过，0失败/错误/跳过，unittest16.378秒；外层18.448001861572266秒保守19秒，加原30秒，累计49/300秒。内部48秒不替代外层49。峰值RSS705761280字节，work8434471字节。8份必要原件9497字节已SFTP回传逐字节验证，见../qualification/receive04.json。
+   17 新增A阶段真实capture覆盖两臂48/0/40，空分数(0,378)FP32、缓存指标(0,3)FP64，cache IDs/domains/teacher错误列表均空，状态/RNG/模式/optimizer不变；原record空分支异常被直接复现。每臂只作1次轻量真实update后把Adam时钟明确设48，不冒称真训练48步。
+   18 新增资源测试以手写系统/进程/CUDA状态覆盖首臂严格拒绝自身、次臂允许自身、外部PID/显存不足/主存不足/存活allocated/reserved/其他项目作业拒绝，并到达真实native入口资源调用后在GPU/载模前停止。这里CUDA调用均mock，实际GPU调用0，不能写作实际CUDA释放或第二臂已原生通过。
+   19 重跑受影响的B阶段真实capture/恢复/下一更新和双臂编排，均通过；后者空缓存改用生产入口，1152模拟调度仍为0实际优化。新A测试2次、B恢复测试6次，共新增8次轻量CPU优化，连同此前14次累计22次。未改变的rank/独立VJP/保存比较三项测试体AST及对应计算未变，复用attempt03证据而不全量重跑。当前资格集合7项由3复用+4本轮执行组成，见../qualification/cpu_gate_repair.json。
+   20 
+   21 四、当前裁决与边界
+   22 两项已知缺陷已完成代码修复及对应CPU证据，旧版本不得再用于资格；当前40来源与attempt04逐项一致。原合同、policy、比较、精度、300秒预算及失败账均不变。外审完整交付与独立主审仍未完成，修复后的实际CUDA生命周期亦未运行。没有原生/正式执行许可或启动门；不能以本CPU通过、可见中途裁决或剩余预算启动GPU。沿原会话回收完整材料后，只处置具体新增发现和受影响修正，不重开全部历史研究或增加候选。
+
+FILE reports/documentation/20261016/positive_ranking_implementation/qualification/outcome.zh.txt
+    1 S_pos/H_pos实现与手写CPU独立验收
+    2 2026-10-18，Asia/Shanghai。用户明确保留两臂；仅本轮实现／手写CPU300秒获准。原静态审查处置见../../s_improvement/review/primary_disposition.zh.txt，既有数学主张、有效负结果与外推限制不改。
+    3 
+    4 结果：当前40项源码／政策／合同／授权身份与Linux attempt03逐项一致；5项针对性测试通过、0失败／错误／跳过。外层23.005051136秒保守24秒，加前两次各3秒，累计30/300秒；原result内部计29秒不覆盖外层更保守计费。峰值RSS746295296字节（约711.7MiB），核验工作峰值8433183字节（约8.04MiB）。GPU调用、BGE加载、正式文本／标签和旧Memory读取均0。该结果不是性能实验或原生资格。
+    5 
+    6 失败保留与最小修复：
+    7 attempt01：2.051609993秒、计3秒，在极端±1000 FP32坐标梯度处失败1项，最大违反误差3.59543732e-6，相对5.03361225e-5。原差分logsumexp仍会在backward中减去舍入后的大logsumexp值。显式先减detached峰值，在小量上计算logsumexp再加峰值；数学目标、FP32路径和既定容差不变，移位导数抵消故峰值可固定。旧方法源码保存在attempt01/sources，原工作区不覆盖。
+    8 attempt02：2.051151276秒、计3秒。前面极端数值断言已过，但同一测试后段的等分数旧BCE夹具标签遗漏dtype而为Long，触发Double不能转Long；这是测试构造错误，生产代码未改。仅将该处两份标签设为与zero相同dtype，旧夹具在attempt02/sources保留。
+    9 attempt03：23.005051136秒、计24秒。5项全部通过，unittest时间20.931秒；此前失败费用和原件均保留，无临场放宽精度或换科学输入。
+   10 
+   11 实际证据：
+   12 1. 独立标量／解析参考与生产rank，合法8K2+4K3图，FP64普通/相等/极端的最大坐标梯度差分别2.77555756156e-17、6.93889390391e-18、1.38777878078e-17；FP32分别1.57778110299e-8、1.67842749421e-9、7.93905896579e-9。中心差分、每边两查询贡献与符号检查通过。常数减项、漏第二正例、另一正例作负例及额外平均四个变体被拒绝。参见rank_reference.json。
+   13 2. 真实轻量完整图对齐原proxy→512块head VJP→encoder→clip→AdamW。S_pos和H_pos的实际完整J分别6.428766489028931和6.4180485010147095，与各自独立图参考一致；这些是手写夹具损失，不能比较正式性能。两臂current/history分项和A0/A1均核对；逐张量pre/postclip、参数、AdamW step/一阶/二阶矩在原容差内一致。
+   14 3. 从共同非空AdamW状态切换旧／新rank：S_pos current encoder/head梯度差3.200466745e-5／4.541873932e-4，独立history差3.777837264e-6／8.840858936e-5；H_pos对应3.189453855e-5／4.550144076e-4、3.775348887e-6／8.852779865e-5。这里history差先扣current累计梯度，能排除“只改current”。两臂encoder参数最大差均3.576278687e-7，head分别2.355128527e-5／2.215802670e-5，AdamW矩也发生实际差异；不要求所有参数元素都变，例如H_pos最终head bias可相同。另一个保留旧history rank的反例被拒绝。参见actual_vjp_adamw.json。
+   15 4. 每臂真实手写48 fit／6 history／40盲valid捕获，fit/cache/valid评分、D0/D1各按本臂池化；完整／推理恢复评分一致；诊断后下一更新的模型、梯度、AdamW、RNG、模式、Memory及日志逐元素/字节一致。跨臂身份恢复被拒绝。此夹具Adam计数336明确为合成，不冒称已做336步。
+   16 5. 真实调度、Memory、保存及诊断IO的编排夹具，2次独立初始化、1152次模拟调用、4端点、24capture、自身A接B均成立。任何一臂缺端点／日志／诊断、错误A延续、错误身份或配对随机序列都会阻止valid开放。该夹具优化调用为模拟，真实optimizer调用为0；实际method.update入口在VJP及恢复测试合计每臂6次、双臂12次；独立完整图参考还各执行一次od.step，共2次。因此本次CPU真实optimizer总计14次，和拟原生12次无关，原生实际仍0。actual_vjp_adamw.json中的actual_optimizer_calls=3仅数该测试每臂的生产method.update调用，不包含其独立参考的一次；本处明示完整计数而不追改原输出。
+   17 6. 手写保存矩阵核对全部22指标／三角色、四比较、遗忘方向及单/双正例MAP；特意构造S_pos主门失败、H_pos次级通过，结果主门仍false。错误UID、缺执行许可和超额资源投影被拒绝。夹具的MAP/区间和9667.5秒投影是构造数值，不是正式结果或服务器实测排程。参见comparison_permissions.json。
+   18 
+   19 复用与限制：原S/H池化、record VJP、Memory/校准/指标及既有数据筛选的未改部分复用适用关闭证据，冻结旧源码未修改。H原FP64池化和原精度标准保持。新rank、双臂编排、身份、损失重建、共同valid门及新的描述性分组已具体接线；原生六调用编排和正式执行入口已写入代码，但尚未在BGE/CUDA或正式数据上运行。原生各臂600秒／6次及正式16小时／16GiB只为具体待审范围，不是已获许可。
+   20 
+   21 外发范围须按新包确认；不把静态外审关闭或本CPU通过当作实现外审、原生或正式效果已通过。必要材料按实际文件SFTP核对；不载入已删H_cons权重、不读两份保留Memory。旧H_cons正式／原生／CPU账均不变。下一步：具体实现包外审、完整回收并独立处置，再依据明确GPU/正式许可及现场资源推进。

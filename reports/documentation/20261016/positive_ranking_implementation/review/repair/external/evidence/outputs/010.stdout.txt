@@ -1,0 +1,116 @@
+
+FILE reports/documentation/20261016/positive_ranking_implementation/qualification/cpu_wrapper.py
+    1 """Linux CPU wallclock wrapper; all attempts count against the approved 300 s."""
+    2 import json
+    3 import math
+    4 import os
+    5 from pathlib import Path
+    6 import subprocess
+    7 import sys
+    8 import time
+    9 
+   10 started = float(os.environ['QUALIFICATION_STARTED_EPOCH'])
+   11 root, prior = Path(sys.argv[1]).resolve(), float(sys.argv[2])
+   12 if os.name != 'posix' or root.exists() or prior < 0 or prior >= 300:
+   13     raise ValueError('Linux, independent attempt and remaining cumulative budget required')
+   14 root.mkdir(parents=True)
+   15 command = ['taskset','-c','0','/home/yongpeng/miniconda3/envs/py310/bin/python',
+   16            'scripts/step28_positive_ranking_verify.py','cpu','--output',str(root/'result'),
+   17            '--prior-seconds',str(prior),*sys.argv[3:]]
+   18 receipt = dict(command=command, started_epoch=started, prior_charged_seconds=prior,
+   19                deadline_epoch=started+300-prior, scope='Handwritten CPU only; no formal inputs/model links')
+   20 with (root/'console.txt').open('w',encoding='utf-8') as output:
+   21     process=subprocess.Popen(command,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
+   22     receipt['pid']=process.pid
+   23     try:
+   24         process.wait(timeout=max(.01,started+300-prior-time.time()-5))
+   25     except subprocess.TimeoutExpired:
+   26         import signal
+   27         os.killpg(process.pid,signal.SIGTERM)
+   28         try:process.wait(timeout=5)
+   29         except subprocess.TimeoutExpired:
+   30             os.killpg(process.pid,signal.SIGKILL);process.wait()
+   31         receipt['timeout']=True
+   32 receipt.update(exit_code=process.returncode,elapsed_seconds=time.time()-started)
+   33 receipt['charged_seconds']=math.ceil(receipt['elapsed_seconds'])
+   34 receipt['cumulative_charged_seconds']=prior+receipt['charged_seconds']
+   35 (root/'wallclock.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8')
+   36 print(json.dumps(receipt),flush=True)
+   37 sys.exit(process.returncode)
+
+FILE scripts/step28_chinese_base.py
+   81 
+   82 def schedule(groups: list[data.Group], c: dict) -> tuple[list, int]:
+   83     if len(groups) != 144 or len({g.uid for g in groups}) != 144:
+   84         raise ValueError("Only 144 fitting groups can enter the optimizer")
+   85     seed = data.seed_for(c["schedule_seed"], "BASE_JOINT", "current")
+   86     return data.schedule(groups, 6, seed), seed
+   87 
+   88 
+   89 def model_config(c: dict, arm: str) -> dict:
+   90     if arm not in ARMS:
+   91         raise ValueError("Unknown model")
+   92     return {"model": {**c["models"][arm], **c["input"]},
+   93             "optimizer": c["optimizer"], "initialization_seed": c["initialization_seed"]}
+   94 
+   95 
+   96 def pooling_modes(pool: Any) -> list[str]:
+   97     """Read actual native pooling across the installed and legacy module APIs."""
+   98     mode = getattr(pool, "pooling_mode", None)
+   99     if isinstance(mode, str):
+  100         return [mode]
+  101     if isinstance(mode, (tuple, list)) and all(isinstance(value, str) for value in mode):
+  102         return list(mode)
+  103     if mode is not None:
+  104         raise ValueError("Unrecognized native pooling representation")
+  105     names = {"pooling_mode_cls_token": "cls", "pooling_mode_mean_tokens": "mean"}
+  106     return [names.get(key, key) for key, value in vars(pool).items()
+  107             if key.startswith("pooling_mode_") and value is True]
+  108 
+  109 
+  110 def load_model(c: dict, arm: str, device: str = "cuda:0") -> Any:
+  111     import torch
+  112     from sentence_transformers import SentenceTransformer
+  113     m = c["models"][arm]
+  114     torch.manual_seed(c["initialization_seed"])
+  115     encoder = SentenceTransformer(str(data.ROOT / m["path"]), device=device,
+  116                                   local_files_only=True, trust_remote_code=False)
+  117     encoder.default_prompt_name = None
+  118     encoder.max_seq_length = c["input"]["token_budget"]
+  119     pools = [v for v in encoder if type(v).__name__ == "Pooling"]
+  120     has_dense = any(type(v).__name__ == "Dense" for v in encoder)
+  121     if len(pools) != 1 or has_dense != m["dense_module"]:
+  122         raise ValueError("Native encoder modules differ from the registered model")
+  123     pool = pools[0]
+  124     if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+  125         raise ValueError("Native pooling or output dimension differs")
+  126     if c["input"]["activation_checkpointing"]:
+  127         encoder[0].auto_model.gradient_checkpointing_enable(
+  128             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+  129     torch.manual_seed(c["initialization_seed"])
+  130     return core.build_model(encoder, c["interventions"][arm]["account_dim"],
+  131                             c["input"]["head_hidden"]).to(device)
+  132 
+  133 
+
+FILE scripts/step28_g_half.py
+  103             key = data.seed_for(20260918, RNG_ORDER, stage, step, role, g.uid, "regroup")
+  104             result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(g, key).tobytes()).hexdigest()
+  105     result["pooling"] = identity(arm)
+  106     return result
+  107 
+  108 
+  109 def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None):
+  110     if not groups:
+  111         return np.empty((0, 378), np.float32)
+  112     identity(arm)
+  113     model.eval()
+  114     with torch.inference_mode():
+  115         rows = [account_logits(record.pair_table(model, record.record_vectors(model, g, c, check), check),
+  116                               record.assignment(g), arm, c.setdefault("pooling_stats", {}),
+  117                               {**c.get("pooling_context", {}), "group_uid": g.uid, "view": "A0"}).float().cpu().numpy()
+  118                 for g in groups]
+  119     result = np.stack(rows).astype(np.float32)
+  120     if result.shape != (len(groups), 378) or not np.isfinite(result).all():
+  121         raise ValueError("Incomplete/nonfinite blind predictions")
+  122     return result

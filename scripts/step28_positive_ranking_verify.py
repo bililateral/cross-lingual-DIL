@@ -28,6 +28,7 @@ def native_preflight(continuing: bool = False) -> dict:
     # The completed first arm leaves a CUDA context, but no live model/state may survive.
     gc.collect()
     torch.cuda.synchronize()
+    torch._C._cuda_clearCublasWorkspaces()
     torch.cuda.empty_cache()
     if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
         raise ValueError("Previous arm still owns live/reserved CUDA tensors")

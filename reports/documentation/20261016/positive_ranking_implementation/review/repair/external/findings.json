@@ -1,0 +1,54 @@
+{
+  "review_scope": "38d05b9a repair package; independent targeted static re-review; no project execution or subagents",
+  "input_sha256": "2910ad3d7cea62a334e2fd3d3912dc9b5a9ae163b133111f2e48f783b47b92af",
+  "current_implementation_ready_for_pending_approval_native_qualification": false,
+  "native_approved_by_this_review": false,
+  "native_pass_observed": false,
+  "performance_claim": "None; no formal S_pos/H_pos effects",
+  "open_execution_blocker_count": 1,
+  "new_mathematical_blocker_count": 0,
+  "unchanged_math_revalidated": false,
+  "findings": [
+    {
+      "id": "R01",
+      "title_zh": "A 阶段空缓存评分入口修复",
+      "classification": "closed_previous_execution_defect",
+      "severity": "CLOSED",
+      "status": "closed",
+      "locations": ["scripts/step28_positive_ranking.py:132-155", "scripts/step28_replay_diagnostics.py:31-129", "scripts/step28_g_half_run.py:177-196,333-350", "tests/test_step28_positive_ranking.py:282-310,408-411"],
+      "evidence_zh": "实际 A train_stage→capture→score 的空 cache 分支先验证臂身份，再返回 NumPy (0,378) FP32；非空仍委托原 S/H。新增两臂生产诊断检查 48/0/40、(0,3) FP64 缓存指标、空身份/域/教师及状态/RNG/模式中性；原 record.score 空输入异常直接作为反例。编排空分支也转调生产 score。",
+      "impact_zh": "关闭 A 首次诊断因空 cache 堆叠异常而必然中断的问题。",
+      "minimum_fix_zh": "无新增修复要求；继续明示每臂 1 次实际轻量更新后把 Adam 时钟置 48，不能冒称完成 48 次更新。",
+      "observed_by_reviewer": "static paths and saved fields only; supplied CPU PASS not rerun"
+    },
+    {
+      "id": "R02",
+      "title_zh": "原生后续臂的精确自身 PID 例外",
+      "classification": "partially_closed_previous_execution_defect",
+      "severity": "PARTIAL_CLOSURE",
+      "status": "PID_clause_closed_end_to_end_readiness_depends_on_R03",
+      "locations": ["scripts/step28_positive_ranking_verify.py:25-59,300-326", "scripts/step28_record_replay_verify.py:23-41", "tests/test_step28_positive_ranking.py:312-353"],
+      "evidence_zh": "main 首臂 report.arms 为空，沿严格 preflight；首臂成功返回并预算检查后登记结果，第二臂才传 continuing=True。仅精确整数自身 PID 被豁免，其他 PID/作业及资源门保留。native 返回的是身份/标量/测量，不返回模型、optimizer、回调或 GPU 表；下一臂清理入口可达。",
+      "impact_zh": "自身 CUDA 上下文被误作外来作业的子问题已修。Python 层未发现报告持有首臂 CUDA 模型；完整第二臂准入仍因 R03 未闭。",
+      "minimum_fix_zh": "保留当前严格首臂及精确 PID 逻辑，按 R03 补全库工作区清理；不另计一个新阻断。",
+      "observed_by_reviewer": "static call path and ownership review; CUDA/system preflight evidence is supplied handwritten mock only"
+    },
+    {
+      "id": "R03",
+      "title_zh": "继续臂零分配门之前缺少 cuBLAS 工作区释放",
+      "classification": "execution_and_reproducibility_blocker",
+      "severity": "P1",
+      "status": "open",
+      "locations": ["scripts/step28_positive_ranking_verify.py:29-33,73-105", "scripts/step28_record_replay.py:102-127,159-180", "scripts/step28_continual_population.py:14-29", "scripts/step28_bge_continual.py:31-47", "tests/test_step28_positive_ranking.py:312-353", "PyTorch v2.9.1 aten/src/ATen/cuda/CublasHandlePool.cpp:110-123,228-257,291-307,330-354"],
+      "evidence_zh": "包申报 PyTorch 2.9.1+cu130 且固定非零 :4096:8 工作区；实际首臂执行 CUDA Linear/矩阵乘法。对应上游源码用 CUDACachingAllocator 分配工作区并以持久 C++ map 的 at::DataPtr 持有。gc.collect/synchronize/empty_cache 不解除该持有，当前 allocated/reserved==0 门会拒绝。现有 mock 直接预设分配为 0，未建模专用 clear 才解除的持有状态。",
+      "impact_zh": "在申报版本和配置的正常 CUDA 路径下，第二臂在自身 PID 检查之前因残留库分配失败，双臂原生资格无法完整执行。此为静态推断，未实测项目 GPU，未认证项目二进制，也未声称模型泄漏或性能失败。",
+      "minimum_fix_zh": "继续臂依次 gc.collect、CUDA synchronize、torch._C._cuda_clearCublasWorkspaces()、empty_cache，再保留现有零 allocated/reserved、PID、阈值和作业门。现有定向 mock 加入 clear 前正数/clear 后释放的状态和顺序断言；更新源绑定并由主执行者在原许可/预算内处置。不得改 :4096:8 数值配置、放宽零门或增加 GPU 次数。",
+      "primary_sources": ["https://docs.pytorch.org/docs/2.9/notes/cuda.html", "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp"],
+      "upstream_source_sha256": "e43440cfc3c89e9252d07e812e05c40c315283e4e9d33069b6c196ccdb24a786",
+      "observed_by_reviewer": "version-pinned static dependency proof plus actual project source path; no CUDA execution"
+    }
+  ],
+  "not_current_blockers": ["No approved or executed native GPU trial yet", "No formal performance effect yet", "User-selected H_pos secondary arm", "Declared single-seed/repeated-development-set limitations"],
+  "out_of_scope_overengineering": ["Extra grids, seeds or candidates", "Independent data or full retraining", "Changed numerical definition or loosened tolerances", "Recomputation of old results", "Generic subprocess/testing framework", "Unrelated security hardening", "Repeated broad audits"],
+  "executor_disposition": "Primary executor independently adjudicates; review grants no native/formal authorization."
+}
