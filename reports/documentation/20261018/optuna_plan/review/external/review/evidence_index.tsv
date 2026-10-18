@@ -1,0 +1,32 @@
+id	path_or_url	actual_scope	use
+E01	proposal.zh.txt	全文1—133行	本次具体方案
+E02	request.zh.txt	全文1—18行，另结合用户本轮直接补充	当前静态范围和依赖状态；补充另存submission_supplement.zh.txt
+E03	docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md	全文1—55行	既有固定目标与运行边界
+E04	reports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt	全文1—193行	保存结果与限制
+E05	reports/seller_alias_continual/20261018/positive_ranking_result/review/primary_disposition.zh.txt	全文1—68行；同时全文阅读同目录external/findings.json	独立主审、历史外审发现和删除后补充
+E06	reports/seller_alias_continual/20261018/positive_ranking_result/review/external/S_pos_H_pos_external_review_20261018.zh.txt	正文第1—14节，1—335行；第15节附录未逐行审查	历史裁决、原生/投影、诊断限制
+E07	reports/seller_alias_continual/20261018/positive_ranking_result/analysis/summary.json	完整JSON机械解析；定向absolute/raw/map、success、诊断与其他已有字段位置	已有MAP、结果状态；未重算标签原值或区间
+E08	scripts/step28_positive_ranking.py	全文1—155行	目标、评分、正式/资格身份、更新
+E09	scripts/step28_record_replay.py	全文1—332行	完整S目标、VJP、LR、Memory
+E10	scripts/step28_positive_ranking_run.py	全文1—541行	双臂盲门、固定身份、评价和执行入口
+E11	scripts/step28_g_half_run.py	1—140、146—365、506—514行	直接复用的资格投影、训练、保存恢复和open_valid
+E12	scripts/step28_balanced_pooling_run.py	1—58、70—201、215—265、343—385、585—650行	公开输入/标签、固定划分、fresh、查询指标与固定群数
+E13	scripts/step28_g_half.py	全文1—137行；另scripts/step28_alias_ranking.py 1—154行	H池化与S rank/hard接口
+E14	scripts/step28_replay_diagnostics.py	全文1—208行	诊断中性、随机根/身份、群范围
+E15	schema/step28_positive_ranking_policy.json	另bge_continual和record_replay三份全文；chinese_base定向输入/划分/seed/optimizer/rank字段	继承合同与固定根
+E16	reports/documentation/20261016/h_consistency/baseline_sources.json	完整JSON机械解析；定向基线身份/文件映射/限制	52份基线索引；不等于实际52载荷重读
+E17	reports/maintenance/20261018/positive_ranking_weights/receipt.json	完整JSON机械解析；定向删除/保留/访问/限制字段	四旧权重删除回执；非服务器实时确认
+E18	docs/RESEARCH_DISCIPLINE.zh.md	1—181行适用规则	研究边界；不把历史授权移入本轮
+E19	docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md	1—76、114—194行	数据、固定任务/种子、旧test和新留出路线
+E20	scripts/step28_bge_continual.py	1—200行	config、stage_lr、schedule、Supply、旧Memory接口
+M01	mechanical/input_identity.json; mechanical/manifest_check.json	机械输出	附件/载荷身份
+M02	mechanical/budget_arithmetic.json	合同算术	预算/数量/LR/权重估算
+M03	mechanical/targeted_fields.json	已有字段及算术	S0/seed/历史投影
+M04	mechanical/source_locations.json; mechanical/saved_field_extract.json	静态位置和字段	不作为动态覆盖或原值重算
+W01	https://optuna.readthedocs.io/en/v4.6.0/reference/samplers/generated/optuna.samplers.TPESampler.html	参数表、startup说明及相关文档段落；未执行采样。	Optuna 4.6.0 TPESampler
+W02	https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/samplers/_tpe/sampler.html	定向阅读COMPLETE/PRUNED计数、随机sampler初始化、默认gamma及采样入口。	Optuna 4.6.0 TPE sampler source
+W03	https://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.study.Study.html	enqueue_trial、ask/tell、optimize的trial/timeout与状态说明。	Optuna 4.6.0 Study
+W04	https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/study.html	定向阅读_get_best_trial、ask中的waiting trial及ask/tell入口。	Optuna 4.6.0 Study source
+W05	https://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.pruners.NopPruner.html	全文简短API说明。	Optuna 4.6.0 NopPruner
+W06	https://optuna.readthedocs.io/en/v4.6.0/faq.html	定向阅读可复现性、串行、异常和NaN问答；不是FAQ所有问题逐项审查。	Optuna 4.6.0 FAQ
+W07	https://jmlr.org/papers/v11/cawley10a.html	论文出版页与摘要；未读取论文PDF全文。	Cawley & Talbot (2010), On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation

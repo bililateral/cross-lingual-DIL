@@ -1,0 +1,544 @@
+{
+  "schema_version": "1.0",
+  "review_title": "S / S_pos / H_pos 三臂有限Optuna开发方案：静态反对性外审",
+  "review_date_utc": "2026-10-18",
+  "reviewer": {
+    "execution_model_identity": "GPT-6 Astra Pro",
+    "user_requested_label": "GPT 6 Pro",
+    "backend_route_independently_verified": false,
+    "independent_single_instance": true,
+    "subagents_used": false
+  },
+  "input_identity": {
+    "size_bytes": 186342,
+    "member_count": 26,
+    "sha256": "60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd"
+  },
+  "decision": {
+    "code": "LIMITED_DEVELOPMENT_DESIGN_SUPPORTED_WITH_TARGETED_SPECIFICATION",
+    "summary": "支持有限开发设计；定向补充实施稿后由主执行者独立处置、用户随后确认。不是实施、GPU、45次训练或最终确认许可。",
+    "core_redesign_required": false,
+    "core_retained": [
+      "S/S_pos/H_pos三臂",
+      "两参数固定空间",
+      "每臂12完整slot含锚点",
+      "三个独立study",
+      "固定S0的min双域目标与精确并列",
+      "三份唯一theta*和九次固定新seed复验",
+      "最终直接比较调参后的S",
+      "新独立数据确认单独合同"
+    ],
+    "priority_definition": {
+      "P1": "涉及对应阶段执行/确认正确性，执行前须关闭；不等于禁止为解决问题编写另行获准代码。",
+      "P2": "科学表述/规格澄清；不改变核心研究问题。"
+    },
+    "scope_classes": {
+      "implementation_specification": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05"
+      ],
+      "formal_resource_evidence": [
+        "F06"
+      ],
+      "final_confirmation_only": [
+        "F07"
+      ],
+      "claim_limit": [
+        "F08"
+      ]
+    }
+  },
+  "authorization": {
+    "this_turn": "唯一附件静态审查、已有字段/预算机械核对与交付审查文件",
+    "research_code_authorized": false,
+    "project_cpu_qualification_authorized": false,
+    "gpu_or_formal_runs_authorized": false,
+    "new_data_generation_or_access_authorized": false,
+    "latest_dependency_supplement": {
+      "optuna_version": "4.6.0",
+      "additional_dependencies": 6,
+      "prior_packages_unchanged": 137,
+      "import_and_pip_check": "用户转述主执行者已通过",
+      "separately_authorized_install": true,
+      "reviewer_server_verification": false,
+      "does_not_authorize_research_execution": true
+    }
+  },
+  "actual_execution": {
+    "project_modules_imported": false,
+    "optuna_run": false,
+    "model_load_or_inference": false,
+    "training_or_resampling": false,
+    "new_data_read_or_generated": false,
+    "project_server_connected": false,
+    "packages_installed": false,
+    "agents_delegated": false,
+    "mechanical_scripts": "仅标准库附件/已有字段/AST静态位置/预算算术；详细命令与失败另见execution。"
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "priority": "P1",
+      "title": "随机根、旧s0强制兼容与新seed身份须同时接通",
+      "issue_type": "已定位的新增规格/接线缺项；不是已关闭历史实验的新缺陷",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§3、§6、§9",
+          "fact": "给出复验三个角色根，但36搜索全部固定s0根依赖继承含义。"
+        },
+        {
+          "ref": "E09",
+          "locator": "192—208、237—325行",
+          "fact": "逐步随机根与Memory留存/抽样/重建仍为固定旧根。"
+        },
+        {
+          "ref": "E11",
+          "locator": "184、335—339行",
+          "fact": "日程读取parent.contract；初始身份强制等于历史s0。"
+        },
+        {
+          "ref": "E10",
+          "locator": "242—305、348—353行",
+          "fact": "盲门独立重建旧根、旧LR与旧S/H轨迹。"
+        },
+        {
+          "ref": "E12",
+          "locator": "176—195、355—361行",
+          "fact": "partition有独立固定seed；fresh的可见配置入口不能代替缺少的loader/optimizer定义。"
+        },
+        {
+          "ref": "E14",
+          "locator": "99、119、203行",
+          "fact": "固定诊断扰动根、seed='s0'元数据与统计抽样根须区分。"
+        },
+        {
+          "ref": "E15",
+          "locator": "初始化/日程/Memory/partition字段",
+          "fact": "继承根分别20260909、20260918、20260930；划分20260918。"
+        },
+        {
+          "ref": "E20",
+          "locator": "62—82行",
+          "fact": "继承config与schedule读取policy而非自动读取新trial规格。"
+        }
+      ],
+      "risk": "只改配置可能继续使用旧轨迹；新seed也可能被旧hash/轨迹门错误拒绝，或为通过而被不当删门。",
+      "minimum_changes": [
+        "实施稿显式冻结36搜索与9复验的分角色根表，采样器种子单独列出，固定48/12划分。",
+        "将trial规格传到实际日程/dropout/regroup/Memory路径，保存并恢复未来Memory抽样根与状态。",
+        "旧s0精确兼容只用于对应默认锚点；新seed检查自己的预训练/随机head起点、空Adam及同seed配对和自身A→B连续性。",
+        "诊断评价随机根可以固定；运行身份必须真实；只补受影响loader/optimizer定义供后续审查。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "后续获准实施的定向源码与CPU/原生接线记录；本轮不执行。",
+      "not_required": [
+        "全仓回归",
+        "删除旧校验",
+        "加载旧Memory",
+        "全局替换所有同数字seed"
+      ]
+    },
+    {
+      "id": "F02",
+      "priority": "P1",
+      "title": "lambda/LR及完整S正式分支必须进入真实更新",
+      "issue_type": "实施中必须落实的已知增量；原生六调用表待形成",
+      "actual_evidence": [
+        {
+          "ref": "E08",
+          "locator": "13—32、58—129行",
+          "fact": "ARMS只有两正例臂；rank系数1；old_rank限制为手写资格。"
+        },
+        {
+          "ref": "E09",
+          "locator": "130—208行",
+          "fact": "完整S目标、共享VJP和逐步LR赋值；encoder/head会覆盖仅在构造时设置的倍率。"
+        },
+        {
+          "ref": "E10",
+          "locator": "94—121行",
+          "fact": "保存loss校验也按两正例臂正式目标解释。"
+        },
+        {
+          "ref": "E11",
+          "locator": "209—302行",
+          "fact": "保存/恢复及校准身份需跟随新trial。"
+        },
+        {
+          "ref": "E01",
+          "locator": "§2、§9",
+          "fact": "明确两参数作用范围、四处rank及18次原生总额。"
+        }
+      ],
+      "risk": "出现日志变了但更新不变、遗漏history或误缩D0；把资格old_rank开关伪装成完整S正式入口。",
+      "minimum_changes": [
+        "增加显式完整S正式身份/旧rank路径，S_pos/H_pos各保留对应评分和新rank；默认入口保持兼容。",
+        "lambda进入current/history×A0/A1的真实目标/VJP；BCE、hard、D0系数保持合同；head和encoder实际逐步LR及日志一致。",
+        "CPU用独立参考分别隔离lambda与LR；在现有每臂六次原生调用内给出共同状态、默认/非默认、A/B位置和恢复关系。",
+        "LR单步独立变化无须强求Adam一/二阶矩不同；须证明实际参数组LR、更新公式和encoder/head作用。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "受影响目标/更新/身份/保存恢复代码及预定CPU、原生增量证据；不能只报总损失差或梯度非零。",
+      "not_required": [
+        "增加超参",
+        "额外原生调用数",
+        "重开R01/R02/R03",
+        "旧权重热启动"
+      ]
+    },
+    {
+      "id": "F03",
+      "priority": "P1",
+      "title": "控制器显式处理精确并列、有限目标、失败slot和硬截止",
+      "issue_type": "科学规则与Optuna默认行为的接口缺项",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§3—4、§7",
+          "fact": "独立study、固定S0、精确三级选参、失败即停和硬上限。"
+        },
+        {
+          "ref": "E07",
+          "locator": "absolute/B_S/raw/A/map与B/map",
+          "fact": "保存全精度值对应方案显示，但不是本轮重算52基线。"
+        },
+        {
+          "ref": "W02",
+          "locator": "startup与随机sampler源码",
+          "fact": "真实完成锚点计入startup；sampler状态应各study连续持有。"
+        },
+        {
+          "ref": "W04",
+          "locator": "_get_best_trial",
+          "fact": "默认best_trial不实现项目的第二级平均改善并列规则。"
+        },
+        {
+          "ref": "W06",
+          "locator": "NaN FAQ",
+          "fact": "NaN会标FAIL，但不会默认中止study。"
+        }
+      ],
+      "risk": "用best_params替代协议选择；读取正文舍入S0；非有限目标/异常状态后继续自动补抽；把Optuna timeout当强制终止。",
+      "minimum_changes": [
+        "绑定S0文件/SHA/字段或分数列、域/群顺序及唯一归约函数，不随新S结果移动。",
+        "三study独立sampler对象，固定建议顺序，真实排队锚点计入slot；重复消耗slot。",
+        "仅向study提交完整门通过且有限的D_A、D_B、U；按(U,mean_delta,-trial.number)明确selected_trial。",
+        "非COMPLETE、异常/超时/FAIL/意外PRUNED后停止后续调度，保留实际slot、时间与读取账；硬截止由项目外层兑现。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "后续控制器定向材料，包括并列/NaN/失败/重复等手写负例；本轮未执行Optuna。",
+      "not_required": [
+        "远程数据库",
+        "heartbeat系统",
+        "通用恢复框架",
+        "自动补抽"
+      ]
+    },
+    {
+      "id": "F04",
+      "priority": "P1",
+      "title": "九次复验统一开放须有真实入口，45/37须明确为监督解析次数",
+      "issue_type": "现入口与拟议访问节奏的直接不匹配",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§5",
+          "fact": "36次各自反馈；9次全部完成后集中解析valid一次；总45/37。"
+        },
+        {
+          "ref": "E10",
+          "locator": "478—523行，尤其514—520",
+          "fact": "现execute每次训练后立即open_valid、collect、诊断与finalize。"
+        },
+        {
+          "ref": "E11",
+          "locator": "506—514行",
+          "fact": "现单次open_valid读取监督。"
+        },
+        {
+          "ref": "E12",
+          "locator": "89—173行",
+          "fact": "每运行公开文本/元数据盲评分与监督解析不同；合表C技术扫描后排除。"
+        }
+      ],
+      "risk": "直接循环旧execute九次会提前开放九次监督；把37误写成所有valid技术读取上限。",
+      "minimum_changes": [
+        "九复验只训练/盲保存，统一完整门之后集中一次监督解析并评价九条轨迹；搜索保持单个完整trial反馈。",
+        "明定train_label_parse_attempts≤45、valid_label_parse_attempts≤37，七文件内公开文本/元数据的逐运行盲评分按原语义披露。",
+        "单trial检查576更新/864呈现/2端点/12捕获，九次批量门检查全部轨迹；不跳过诊断或将旧双臂门直接删除。",
+        "区分A学习器不使用未来B与控制器使用前次AB开发反馈；不将合表C扫描称为零字节接触。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "后续单trial与九次批量开放的定向入口、访问账语义和负例；本轮无正式数据访问。",
+      "not_required": [
+        "新数据",
+        "逐操作系统read计费系统",
+        "通用全流程状态机",
+        "只用A选参的新研究问题"
+      ]
+    },
+    {
+      "id": "F05",
+      "priority": "P1",
+      "title": "集中评价的预算归属尚未充分闭合",
+      "issue_type": "预算执行语义缺项；总额加法本身正确",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§5、§7，60、77—83行",
+          "fact": "九次完成后统一评价，但所有评价同时被写入各trial外层；3300秒名称为控制/独立分析。"
+        },
+        {
+          "ref": "M02",
+          "locator": "component_seconds及development_hours",
+          "fact": "各分项合计410400秒=114小时，没有加法错误。"
+        }
+      ],
+      "risk": "已经结束的前八次外层无法自然计入后续集中评价；可能漏计或重复计算等待。",
+      "minimum_changes": [
+        "在现有3300秒或81000秒阶段额度内明确统一开放及完整生产评价的预算归属。",
+        "冻结九次各自外层结束点与集中评价起止；排队、等待和实际占用按合同区分。",
+        "保持总开发≤410400秒及各层上限，不自动追加时间，不减少任一臂公平slot。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "实施稿明确的计时/计费定义和阶段分配即可先关闭规格项；后续真实执行按其记录。",
+      "not_required": [
+        "提高114小时上限",
+        "新增评价成功门",
+        "改动三臂或搜索空间"
+      ]
+    },
+    {
+      "id": "F06",
+      "priority": "P1",
+      "title": "旧资源投影不能证明新的9000秒单次准入",
+      "issue_type": "现有证据与新资源上限不匹配",
+      "actual_evidence": [
+        {
+          "ref": "E06",
+          "locator": "第60行",
+          "fact": "保存旧双臂保守资源投影38079.876088秒。"
+        },
+        {
+          "ref": "E10",
+          "locator": "158—164、209行",
+          "fact": "旧两臂投影相加，旧合同57600秒。"
+        },
+        {
+          "ref": "E11",
+          "locator": "163—174行",
+          "fact": "旧逐臂投影包含更新、验证、历史、IO和固定余量。"
+        },
+        {
+          "ref": "E01",
+          "locator": "§7",
+          "fact": "新9000秒每次；旧外层均值6330.5仅粗估。"
+        },
+        {
+          "ref": "M03",
+          "locator": "historical_two_arm_projection_seconds及proposed_two_run_caps_seconds",
+          "fact": "38079.876088大于18000；仅保存字段算术比较。"
+        }
+      ],
+      "risk": "沿用旧within_budget/PASS或用实际均值替代新保守资格；正式开始后因不匹配停项的风险尚无新证据排除。",
+      "minimum_changes": [
+        "在正式运行前冻结逐臂、单trial的工作量与投影依据，明确装载/恢复/诊断/评价的成本归属。",
+        "使用获准增量实测和可引用已保存成本证明≤9000及阶段/总额；不能临时缩安全系数贴预算。",
+        "若合法投影不满足，停止在正式搜索之前，报告资源条件未具备，交用户决定是否变更范围。"
+      ],
+      "gates": {
+        "plan_detail_required": true,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": true,
+        "blocks_replication_until_closed": true,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": false
+      },
+      "closure_evidence": "新范围对应的合法投影与必要原生增量证据；不代表必须本轮执行，也不证明新运行必然超时。",
+      "not_required": [
+        "立即提高预算",
+        "为证明可行先试正式训练",
+        "使用Optuna timeout替代硬截止",
+        "削减诊断"
+      ]
+    },
+    {
+      "id": "F07",
+      "priority": "P1",
+      "title": "新80群及对应评价适配尚未具备，只限制最终确认",
+      "issue_type": "方案已诚实承认的后续前提，非当前有限开发新增阻断",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§8",
+          "fact": "新AB各40共80群为提议；生成/隔离/保管/预算待另合同。"
+        },
+        {
+          "ref": "E19",
+          "locator": "§10及已保存后续结果",
+          "fact": "基础test已用、valid反复开发，不能改名独立留出。"
+        },
+        {
+          "ref": "E10",
+          "locator": "370—390、413—415行",
+          "fact": "旧评价群数40、每域20及5000次95%区间固定。"
+        },
+        {
+          "ref": "E12",
+          "locator": "595—643行",
+          "fact": "现有指标入口与群数需要新80群有针对性适配。"
+        }
+      ],
+      "risk": "把尚不存在的新集视为已就绪；以ID不同代替来源隔离；把40×3当独立样本或套用旧统计门。",
+      "minimum_changes": [
+        "另立来源/生成器/种子/群与控制者隔离/失败处置/保管及生成核验预算合同，不在本轮读test/owners或新数据。",
+        "明确抽样独立单位与条件总体：同生成机制下的整群，不承诺seed总体或真实市场。",
+        "最终阶段只针对新80群、固定九轨迹18端点、一次开放及20000/1.25%规则适配受影响评价入口。",
+        "冻结全部轨迹与评价合同后才生成/接入、盲评分及一次统一开放；6小时推理预留不包含数据构建。"
+      ],
+      "gates": {
+        "plan_detail_required": false,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": false,
+        "blocks_replication_until_closed": false,
+        "final_confirmation_only": true,
+        "blocks_final_data_generation_or_confirmation_until_closed": true,
+        "blocks_out_of_scope_claims": true
+      },
+      "closure_evidence": "未来单独的数据合同、获准来源隔离证据与最终评价适配；本轮不存在新80群验收结果。",
+      "not_required": [
+        "现在读取封存来源",
+        "新增本轮调参",
+        "把旧test/valid重分作为新集",
+        "将同valid新seed称独立确认"
+      ]
+    },
+    {
+      "id": "F08",
+      "priority": "P2",
+      "title": "有限机会、TPE尺度、因果和创新表述应保持有限",
+      "issue_type": "解释与科学主张边界",
+      "actual_evidence": [
+        {
+          "ref": "E01",
+          "locator": "§2—4、§10",
+          "fact": "同12slot、对数参数空间、独立TPE轨迹；方案已承认有限最优性。"
+        },
+        {
+          "ref": "E04",
+          "locator": "主结果和诊断限制",
+          "fact": "原主要目标未达到；概率与局部负向保留。"
+        },
+        {
+          "ref": "E05",
+          "locator": "独立处置",
+          "fact": "H_pos−H两域总MAP未确定，旧修复已关闭。"
+        },
+        {
+          "ref": "W01",
+          "locator": "TPESampler说明",
+          "fact": "后续TPE提案不是每点独立log-uniform。"
+        },
+        {
+          "ref": "W07",
+          "locator": "出版摘要",
+          "fact": "有限样本选择偏差原则，不提供本项目范围/预算最优性证明。"
+        }
+      ],
+      "risk": "把同额有限机会称为充分调优；把新rank的同lambda当同梯度尺度；把调参收益归因超参数根因或方法创新。",
+      "minimum_changes": [
+        "用“同额有限调参后的S”和“12个已采样完整点中的协议最优”，不称全空间最优。",
+        "区分固定锚点、log随机startup和自适应TPE；teacher定义/系数不变而自己的A状态及表值会改变。",
+        "保留raw概率恶化、18个差距、双正例局部负向与epoch1→6/6存活群等限制。",
+        "有H_pos而无新H意味着不回答相对充分调参H或纯rank因果问题；最终通过仅支持预定条件下双域排序。"
+      ],
+      "gates": {
+        "plan_detail_required": false,
+        "blocks_preparatory_code_by_itself": false,
+        "blocks_formal_search_until_closed": false,
+        "blocks_replication_until_closed": false,
+        "final_confirmation_only": false,
+        "blocks_out_of_scope_claims": true
+      },
+      "closure_evidence": "定向修改实施稿与后续结果表述，无须新实验。",
+      "not_required": [
+        "增加H臂",
+        "更多超参数",
+        "机制消融",
+        "论文创新检索",
+        "新增概率成功门"
+      ]
+    }
+  ],
+  "accepted_scientific_points": [
+    {
+      "topic": "机会公平",
+      "judgment": "同空间、默认锚点计预算、同额完整slot是可接受的有限机会；不证明充分优化或同梯度尺度。"
+    },
+    {
+      "topic": "目标",
+      "judgment": "固定S0避免参考移动；min不是对S_tuned双域胜出的保证。"
+    },
+    {
+      "topic": "唯一选择",
+      "judgment": "有限结果按(U,mean_delta,-trial.number)精确字典序自洽；实现须显式。"
+    },
+    {
+      "topic": "新seed",
+      "judgment": "同valid上的九次复验仅增加对预定轨迹的开发认识，不是新数据确认。"
+    },
+    {
+      "topic": "最终统计",
+      "judgment": "先对三固定seed做组内MAP差均值，再按域40群配对bootstrap；四单侧1.25%边界的Bonferroni名义分配与六格正方向规则自洽。"
+    },
+    {
+      "topic": "外推",
+      "judgment": "条件于三次训练、AB顺序和冻结生成机制；bootstrap是近似，未建立功效或seed总体/真实市场结论。"
+    }
+  ],
+  "report_path": "report.zh.txt",
+  "evidence_index_path": "evidence_index.tsv",
+  "reading_scope_path": "reading_scope.json",
+  "web_sources_path": "sources.web.json",
+  "interpretation_limits": "哈希、匹配、脚本退出码或检查数量仅证明相应机械事实，不证明科学有效性或授予项目执行许可。"
+}
+

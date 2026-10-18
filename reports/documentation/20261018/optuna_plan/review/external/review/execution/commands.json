@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "environment": {
+    "os": "Linux",
+    "python": "Python 3.12.14",
+    "meaning": "隔离审查环境；不是用户项目Linux py310"
+  },
+  "record_scope": "保留必要机械脚本的实际命令、工具返回与输出文件。普通cat/sed/rg只读查看未逐一复制终端全文；长输出所需部分已定向补读。",
+  "commands": [
+    {
+      "command": "python3 --version && uname -s",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 0,
+      "tool_chunk_id": "86ebc8",
+      "observed_stdout": "Python 3.12.14\nLinux",
+      "purpose": "审查环境身份，不作项目环境核验"
+    },
+    {
+      "command": "python3 optuna_static_review/scripts/inspect_input.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 0,
+      "tool_chunk_id": "888b84",
+      "tool_wall_time_seconds": 4.071e-05,
+      "purpose": "附件身份、ZIP成员、安全相对路径与隔离解包",
+      "outputs": [
+        "mechanical/input_identity.json"
+      ],
+      "standalone_raw_stdout_file_retained": false
+    },
+    {
+      "command": "python3 optuna_static_review/scripts/mechanical_checks.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 0,
+      "tool_chunk_id": "97ea3c",
+      "tool_wall_time_seconds": 0.091284668,
+      "purpose": "载荷清单、AST位置、已有JSON字段、合同预算/LR算术",
+      "outputs": [
+        "mechanical/manifest_check.json",
+        "mechanical/source_locations.json",
+        "mechanical/saved_field_extract.json",
+        "mechanical/budget_arithmetic.json"
+      ],
+      "standalone_raw_stdout_file_retained": false
+    },
+    {
+      "command": "python3 optuna_static_review/scripts/targeted_fields.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 0,
+      "tool_chunk_id": "324c1b",
+      "tool_wall_time_seconds": 3.3117e-05,
+      "purpose": "已有S0字段显示、继承seed与旧投影/新限额比较",
+      "outputs": [
+        "mechanical/targeted_fields.json"
+      ],
+      "standalone_raw_stdout_file_retained": false
+    },
+    {
+      "id": "PACKAGING_ATTEMPT_1",
+      "command": "python3 optuna_static_review/scripts/package_review.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 1,
+      "tool_chunk_id": "03125b",
+      "tool_wall_time_seconds": 0.061752148,
+      "script_sha256": "75c94ae88e6f85369f9c18265d8719968789ebed30d70b64852fbfce29565249",
+      "cause": "新来源索引第33行为空行，被四列TSV机械格式条件拒绝；非项目执行失败。",
+      "minimum_fix": "仅去除末尾多余空行，保持所有来源记录和四列规则；打包脚本未修改。"
+    },
+    {
+      "id": "PACKAGING_ATTEMPT_2",
+      "command": "python3 optuna_static_review/scripts/package_review.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 0,
+      "tool_chunk_id": "83b430",
+      "tool_wall_time_seconds": 3.3025e-05,
+      "outcome": "四列TSV修正后打包成功；随后因保存失败留证而更新审查产物，最终重新打包。",
+      "superseded_zip": {
+        "size_bytes": 258653,
+        "member_count": 22,
+        "sha256": "21c041d47b4e518709da50a77a32b5f491bb497ede5c8a11f8d577d28ced134e"
+      }
+    }
+  ],
+  "tool_wall_time_note": "此字段仅原工具返回；不是CPU或项目资源测量，不用于证明114小时/9000秒可行。",
+  "packaging_command": {
+    "command": "python3 optuna_static_review/scripts/package_review.py",
+    "completion_record_location": "ZIP旁optuna_plan_external_review.identity.json",
+    "purpose": "仅组装审查交付，不执行研究"
+  },
+  "research_execution": "未运行，因用户本轮未授权。没有项目成功/失败日志可提供。",
+  "mechanical_failures": [
+    "PACKAGING_ATTEMPT_1，详见failures.json"
+  ],
+  "failure_record_path": "failures.json",
+  "file_delivery_operations": [
+    {
+      "id": "FILE_DELIVERY_ATTEMPT_1",
+      "operation": "相同五文件批次的保存助手",
+      "process_started": true,
+      "exit_code": 1,
+      "tool_chunk_id": "ca53cf",
+      "tool_wall_time_seconds": 0.142397332,
+      "observed_output": "library upload failed: hosted apps tools/list request failed: network",
+      "stage": "tools/list阶段，未返回任何已创建文件",
+      "scope": "文件交付服务；不是项目服务器、科研实现或新数据访问"
+    },
+    {
+      "id": "FILE_DELIVERY_ATTEMPT_2",
+      "operation": "相同五文件批次申请require_escalated后保存",
+      "process_started": false,
+      "exit_code": null,
+      "result": "自动审批拒绝，进程未创建",
+      "visible_reason": "该命令会把包含内部审查报告、原始附件副本、源码证据和结构化发现的五个文件上传到外部 Library 保存服务；用户授权了形成和交付报告/ZIP，但未在可信用户文本中明确授权将这些敏感内容发送到该具体目的地，且当前证据未验证该 Library 目的地为…11 chars truncated…此属于未经充分授权的敏感数据外发。",
+      "retention_limit": "工具显示的拒绝理由中有11字符截断，未补写不可见文字。",
+      "action_taken": "不绕过拒绝，不切换直接写入，不再次尝试上传；完成本地交付并请求仅针对文件持久保存的明确授权。",
+      "research_authorization_effect": "无；科研实现、CPU/原生资格、搜索、GPU、新数据仍未批准。"
+    }
+  ]
+}

@@ -1,0 +1,788 @@
+- main [ref=f5e503]:
+  - generic:
+    - generic:
+      - generic:
+        - button "分享" [ref=f5e506] [cursor=pointer]
+        - button "切换摘要面板固定状态" [ref=f5e512] [cursor=pointer]
+        - button "更多" [ref=f5e518] [cursor=pointer]
+  - region "对话" [ref=f5e537]:
+    - generic [ref=f5e538]:
+      - generic [ref=f5e547]:
+        - generic [ref=f5e548]:
+          - generic [ref=f5e549]:
+            - heading "你说：" [level=4] [ref=f5e550]
+            - generic [ref=f5e551]:
+              - generic [ref=f5e554]:
+                - button "optuna_plan_review.zip" [ref=f5e555] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "optuna_plan_review.zip"
+                    - generic: 文件
+              - generic [ref=f5e557]:
+                - generic [ref=f5e559]:
+                  - generic [ref=f5e560]:
+                    - generic [ref=f5e561]: 请使用GPT 6 Pro对这份S/S_pos/H_pos三臂Optuna有限开发方案做静态反对性外审。用户本轮只要求具体方案、结合前次结果外审独立主审后再确认实施；尚未批准代码、CPU/GPU、正式搜索、新数据生成/查看。本请求本身也不授予项目执行权限。 背景：完整S是主要内部对照，H=历史G_half。S_pos/H_pos仅替换rank的固定s0、A→B实验已完成并审结，有效未达到双域超过S的原主要目标。H_pos对S旧A有正向，但直接H_pos−H两域总MAP未确定。raw概率恶化、18个差距扩大区间全正、新B双正例局部负向均保留；诊断只覆盖epoch1→6、cache/A仅6存活群，分组跨零差异非交互、A末不是相对初始模型的净获得，未重建标签派生原值。R01/R02/R03已有修复和原生证据，此次不用重开无变化历史实现审查。 四份本次权重已按用户明确要求留证删除，必要保存指标/分数/日志仍在；现存旧Memory不允许新学习器加载。新搜索必须从同一预训练独立开始。旧基础test120群已用于基础验收，现有valid多次开发，二者都不能作为新的独立最终确认集。 请先读proposal.zh.txt，重点反驳： 1. 两参数lambda_rank[0.25,2]、lr_multiplier[0.5,2]，三臂同空间/先验/12完整slot、默认锚点算入预算，能否提供合理可比机会？不额外加入H或大量超参是否合理？ 2. 三独立study、固定历史S0参考的min双域改善目标、唯一最优点与精确并列规则是否自洽？最终必须对调参后的S比较；搜索赢家的旧valid CI不作独立确认。 3. 36搜索+9固定新seed复验，参数/随机流/数据划分的真实接线是否遗漏？现有逐步LR和多处seed硬编码，是否会出现只改配置未生效的伪实现？CPU/原生拟议增量范围是否与缺口匹配，是否过度设计？ 4. 新增train最多45、valid最多37次的技术读取，完整trial后反馈、九次复验统一开放，未来域学习边界和开发B域反馈披露是否清楚？ 5. 45次正式训练、114小时开发硬上限、约79小时粗估及另6小时最终推理预留是否算术/执行一致？失败消费slot/时间且停止，不能自动补抽或把Optuna timeout当硬截止。 6. 最终AB新80群只是需要独立生成合同的提议，来源隔离/生成预算尚未确定；不得假称存在。三seed均值的整群bootstrap、四个单侧Bonferroni边界、逐seed方向要求和外推范围是否可支持明确而有限的最终主张？不能把同valid的新seed复验当新数据确认。 7. 现有结果是否只支持有限试验，而非超参数根因已证、保证超过S或论文创新？请指出必须修改的具体科学问题，区分执行前材料缺项、合理后续建议和无关扩展。 本轮限静态阅读及文件/已有字段/预算算术的机械核对；不运行科研实现、Optuna搜索、模型推理或重采样，不生成/读取新数据，不连接项目服务器，不安装包、不委派子agent。所附源码仅帮助核对实际入口与最小变更。既有全文报告/结构化意见是历史原件，不能修改。网页资料如需核对只用官方一手来源。 交付完整中文报告和结构化发现；说明各意见的实际证据、优先级、是否阻止实施/仅阻止最终确认，以及最小修改。保留使用的必要机械脚本/实际失败（若无运行如实写未运行）。不要把哈希/PASS或检查数量当科学有效性证明；不要要求在本轮额外调参、全仓回归、通用恢复或网络加固。形成必要返回ZIP及成员大小/SHA清单，避免只有摘要。主执行者会独立处置，用户随后才确认实施。 提交补充（不改冻结输入包）：用户已明确批准该具体方案包静态外审。唯一附件optuna_plan_review.zip，186342字节、26成员，SHA256 60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd。请核对后按上述范围审查。 用户随后另行明确授权主执行者：服务器缺少Optuna时自行安装。主执行者已在既有Linux py310安装Optuna 4.6.0及六个缺失依赖，原有137包版本不变，导入和pip check通过。此依赖准备不改变本网页静态审查范围；包内“安装尚未批准/依赖未核实”是形成时状态，以此最新补充为准。科研实现、搜索、GPU训练和新数据访问仍未批准。请勿把环境安装当作研究执行获准或原生资格已通过。
+                    - generic [aria-hidden] [ref=f5e564]: …
+                  - button "显示更多" [ref=f5e565] [cursor=pointer]
+                - generic [ref=f5e571]:
+                  - button "复制消息" [ref=f5e573] [cursor=pointer]
+                  - button "共享提示" [ref=f5e577] [cursor=pointer]
+                  - button "编辑消息" [ref=f5e581] [cursor=pointer]
+          - generic [ref=f5e589]:
+            - button "思考了 42m 1s" [ref=f5e590] [cursor=pointer]
+            - generic: 思考了 42m 1s
+          - generic [ref=f5e592]:
+            - heading "ChatGPT 说：" [level=4] [ref=f5e593]
+            - generic [ref=f5e595]:
+              - generic [ref=f5e596]:
+                - paragraph [ref=f5e597]:
+                  - strong [ref=f5e598]: 已完成静态反对性外审。我的裁决是：可以保留“三臂、两参数、每臂 12 个完整搜索 slot、各 3 个固定新 seed 复验”的有限开发方向；需要定向补清实施规格和资源依据，再由主执行者独立处置、用户确认实施。
+                - paragraph [ref=f5e599]: 现有材料不支持认定超参数已经被证明是原负结果的根因，也不支持保证超过 S、宣称各臂已经充分优化，或确认论文方法创新。本轮没有运行科研实现、Optuna、模型推理或重采样，没有访问新数据、连接项目服务器、安装包或委派子 agent。
+                - heading "完整交付文件" [level=2] [ref=f5e600]
+                - paragraph [ref=f5e601]:
+                  - text: 以下是已完成的本地下载文件。
+                  - strong [ref=f5e602]: 持久保存被自动审批拒绝，具体原因和仅涉及文件保存的授权问题见文末；审查内容与返回 ZIP 已完整形成。
+                - generic [ref=f5e603]:
+                  - table [ref=f5e606]:
+                    - rowgroup [ref=f5e607]:
+                      - row [ref=f5e608]:
+                        - columnheader "文件" [ref=f5e609]
+                        - columnheader "内容" [ref=f5e610]
+                    - rowgroup [ref=f5e611]:
+                      - row [ref=f5e612]:
+                        - cell [ref=f5e613]:
+                          - button "下载 optuna_plan_external_review.zip" [ref=f5e616] [cursor=pointer]:
+                            - generic [ref=f5e617]: optuna_plan_external_review.zip
+                        - cell "完整返回包：报告、结构化发现、阅读范围、证据索引、必要机械脚本与输出、实际失败记录，以及未修改的原附件副本" [ref=f5e624]
+                      - row [ref=f5e625]:
+                        - cell [ref=f5e626]:
+                          - button "打开 optuna_plan_external_review.zh.txt 的预览" [ref=f5e629] [cursor=pointer]:
+                            - generic [ref=f5e630]: optuna_plan_external_review.zh.txt
+                        - cell "完整中文报告，逐项展开科学判断、实际证据、阶段影响和最小修改" [ref=f5e637]
+                      - row [ref=f5e638]:
+                        - cell [ref=f5e639]:
+                          - button "打开 optuna_plan_external_review.findings.json 的预览" [ref=f5e642] [cursor=pointer]:
+                            - generic [ref=f5e643]: optuna_plan_external_review.findings.json
+                        - cell "八项结构化发现，包含优先级、证据位置、最小处置及是否阻止正式运行或仅阻止最终确认" [ref=f5e649]
+                      - row [ref=f5e650]:
+                        - cell [ref=f5e651]:
+                          - button "打开 optuna_plan_external_review.members.tsv 的预览" [ref=f5e654] [cursor=pointer]:
+                            - generic [ref=f5e655]: optuna_plan_external_review.members.tsv
+                        - cell [ref=f5e659]:
+                          - text: 返回 ZIP 全部
+                          - strong [ref=f5e660]: 22 个实际成员
+                          - text: 的大小与 SHA256，包括包内清单自身
+                      - row [ref=f5e661]:
+                        - cell [ref=f5e662]:
+                          - button "打开 optuna_plan_external_review.identity.json 的预览" [ref=f5e665] [cursor=pointer]:
+                            - generic [ref=f5e666]: optuna_plan_external_review.identity.json
+                        - cell "返回 ZIP 整体身份、原附件一致性、最终打包实际返回及保存状态" [ref=f5e672]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=f5e673]:
+                  - strong [ref=f5e674]: 附件身份核对一致：
+                - list [ref=f5e675]:
+                  - listitem [ref=f5e676]:
+                    - text: 原附件：
+                    - strong [ref=f5e677]: 186342 字节、26 成员
+                    - text: 。
+                  - listitem [ref=f5e678]: 原附件 SHA256：60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd
+                  - listitem [ref=f5e679]:
+                    - text: 返回 ZIP：
+                    - strong [ref=f5e680]: 260847 字节、22 成员
+                    - text: 。
+                  - listitem [ref=f5e681]: 返回 ZIP SHA256：f69b61035f3788b633a42430ae42909684b8e0d5ab3050e6a15346428733e727
+                - paragraph [ref=f5e682]: 原附件中的 25 项载荷与其 manifest 的路径、大小、SHA 一致，历史报告和结构化意见均未修改。上述核对只证明文件身份及对应关系，不证明科学有效性。
+                - heading "一、需要主执行者处置的八项发现" [level=2] [ref=f5e683]
+                - paragraph [ref=f5e684]:
+                  - text: 这里的 P1 表示“对应阶段执行前必须闭合”，
+                  - strong [ref=f5e685]: 不表示禁止为解决该问题编写另行获准的代码
+                  - text: 。当前代码、CPU/原生资格、正式搜索和新数据权限仍以用户随后明确授权为准。
+                - generic [ref=f5e686]:
+                  - table [ref=f5e689]:
+                    - rowgroup [ref=f5e690]:
+                      - row [ref=f5e691]:
+                        - columnheader "编号" [ref=f5e692]
+                        - columnheader "优先级" [ref=f5e693]
+                        - columnheader "主要发现与实际证据" [ref=f5e694]
+                        - columnheader "阶段影响及最小修改" [ref=f5e695]
+                    - rowgroup [ref=f5e696]:
+                      - row [ref=f5e697]:
+                        - cell [ref=f5e698]:
+                          - strong [ref=f5e699]: F01
+                        - cell "P1" [ref=f5e700]
+                        - cell "新 seed 会遇到旧 s0 初始身份、日程、Memory 和轨迹相等门；部分日程入口仍读取继承 policy，多处训练随机根硬编码。" [ref=f5e701]
+                        - cell [ref=f5e702]:
+                          - text: 实施稿明确搜索及复验的分角色根表，并贯通实际训练、保存、恢复与盲门。新 seed 按自身规定起点及同 seed 配对核验，不能删除校验来放行。
+                          - strong [ref=f5e703]: 正式搜索/复验前须落实。
+                      - row [ref=f5e704]:
+                        - cell [ref=f5e705]:
+                          - strong [ref=f5e706]: F02
+                        - cell "P1" [ref=f5e707]
+                        - cell "实际更新每步重设 encoder/head LR；rank 系数仍固定为 1；现有 old_rank 开关属于手写资格，不能直接充当完整 S 正式入口。" [ref=f5e708]
+                        - cell [ref=f5e709]:
+                          - text: 显式增加完整 S 正式分支；lambda 接入 current/history × A0/A1 四处；逐步 LR、日志与恢复一致。原生六调用表须明确共同状态和独立观察。
+                          - strong [ref=f5e710]: 阻止把“只改配置”认作新资格通过。
+                      - row [ref=f5e711]:
+                        - cell [ref=f5e712]:
+                          - strong [ref=f5e713]: F03
+                        - cell "P1" [ref=f5e714]
+                        - cell "精确并列规则在数学上成立，但 Optuna 默认 best_trial 不实现第二级均值排序；NaN 标 FAIL 后也不会自动停掉 study。" [ref=f5e715]
+                        - cell [ref=f5e716]:
+                          - text: 显式生成 selected_trial；绑定全精度 S0 来源与唯一归约；检查有限目标；任何异常状态停止后续调度，保留 slot/费用；硬截止独立于 Optuna timeout。
+                          - strong [ref=f5e717]: 正式搜索前须核验。
+                      - row [ref=f5e718]:
+                        - cell [ref=f5e719]:
+                          - strong [ref=f5e720]: F04
+                        - cell "P1" [ref=f5e721]
+                        - cell "旧 execute 每次训练后立即开放 valid 并评价。直接循环九次，会违反九次统一开放，并把 valid 监督解析从拟议 37 次变成 45 次。" [ref=f5e722]
+                        - cell [ref=f5e723]:
+                          - text: 九次复验先各自盲完成，再经统一门一次开放；明确 45/37 是监督解析次数，另披露公开文本和元数据的逐运行盲评分。
+                          - strong [ref=f5e724]: 实施稿与真实入口须一致。
+                      - row [ref=f5e725]:
+                        - cell [ref=f5e726]:
+                          - strong [ref=f5e727]: F05
+                        - cell "P1" [ref=f5e728]
+                        - cell "114 小时加法正确，但九次全部完成后的集中评价，尚未明确落在哪段预算中。" [ref=f5e729]
+                        - cell [ref=f5e730]:
+                          - text: 在现有
+                          - strong [ref=f5e731]: 3300 秒
+                          - text: 或
+                          - strong [ref=f5e732]: 81000 秒
+                          - text: 额度内明确归属，冻结各次外层结束点；不漏计、不重复计算等待、不增加总额。
+                          - strong [ref=f5e733]: 正式运行计时合同前须补清。
+                      - row [ref=f5e734]:
+                        - cell [ref=f5e735]:
+                          - strong [ref=f5e736]: F06
+                        - cell "P1" [ref=f5e737]
+                        - cell [ref=f5e738]:
+                          - text: 保存的旧双臂保守投影为
+                          - strong [ref=f5e739]: 38079.876088 秒
+                          - text: ，高于新两次各 9000 秒的合计
+                          - strong [ref=f5e740]: 18000 秒
+                          - text: 。旧 PASS 对应旧上限。
+                        - cell [ref=f5e741]:
+                          - text: 冻结新逐臂工作量、计费范围和投影依据；由后续获准增量及可引用成本证明新上限可行。
+                          - strong [ref=f5e742]: 目前不能直接认定 45 次运行已有资源资格。
+                      - row [ref=f5e743]:
+                        - cell [ref=f5e744]:
+                          - strong [ref=f5e745]: F07
+                        - cell "P1，仅最终确认" [ref=f5e746]
+                        - cell "新 AB 80 群尚不存在；生成、来源隔离、保管及预算合同未形成。现评价入口还固定旧 40 群及旧区间设置。" [ref=f5e747]
+                        - cell [ref=f5e748]:
+                          - text: 留给后续独立数据合同和受影响评价入口适配。
+                          - strong [ref=f5e749]: 只限制最终新数据生成/确认，不阻止现有数据上的有限开发。
+                      - row [ref=f5e750]:
+                        - cell [ref=f5e751]:
+                          - strong [ref=f5e752]: F08
+                        - cell "P2" [ref=f5e753]
+                        - cell "同额有限机会不等于充分优化；对数搜索空间不等于后八个 TPE 点仍均匀；调参收益不能单独证明根因或创新。" [ref=f5e754]
+                        - cell [ref=f5e755]:
+                          - text: 使用“同额有限调参后的 S”“已采样点中的协议最优”等准确表述，保留概率代价、局部负向及诊断限制。
+                          - strong [ref=f5e756]: 不阻止有限实现，但限制超范围主张。
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=f5e757]: 完整报告及 JSON 为每一项列出了具体源码行、方案章节、保存字段或官方来源，并区分了“当前材料缺项”“实施时落实”“正式运行前证据”和“仅最终确认前置”。
+                - heading "二、核心科学设计可以保留，但可比机会的含义必须有限" [level=2] [ref=f5e758]
+                - heading "两参数和每臂 12 个 slot 是合理的有限试验" [level=3] [ref=f5e759]
+                - paragraph [ref=f5e760]: lambda_rank ∈ [0.25, 2]、lr_multiplier ∈ [0.5, 2] 包含默认锚点，维度少，干预含义明确。lambda 不含 0，也使本轮保持在调节既有 rank 的问题内。
+                - paragraph [ref=f5e761]:
+                  - text: 完整 S 获得同一空间、默认锚点和同额完整训练机会，符合主要内部对照的角色。
+                  - strong [ref=f5e762]: 没有必要为回答当前问题额外加入 H，或扩展温度、teacher、Memory、epoch 等大量参数。
+                  - text: 不新增 H 的代价是：本轮不能回答“H_pos 是否胜过同样调参后的 H”，也不能据此隔离纯 rank 的因果效果。
+                - paragraph [ref=f5e763]: 需要保留两个限制：
+                - list [ref=f5e764]:
+                  - listitem [ref=f5e765]: 相同 lambda 数值不保证新旧 rank 的梯度尺度相同；相同 12 次预算也不保证各臂都接近其空间最优。
+                  - listitem [ref=f5e766]: 后八个 TPE 点依赖各自 study 的反馈，因此这是“方法及固定调参程序”的系统比较。不能在某臂结果不理想时，事后给它补搜索机会。
+                - heading "锚点、startup 和八个 TPE 点的安排自洽" [level=3] [ref=f5e767]
+                - paragraph [ref=f5e768]: Optuna 4.6.0 的 TPE 根据已完成的试验状态判断是否仍处于 startup。这里不剪枝、失败即停，真实执行完成的默认锚点可以计入四个 startup，因此可以实现：
+                - list [ref=f5e769]:
+                  - listitem [ref=f5e770]: trial 0：固定默认锚点；
+                  - listitem [ref=f5e771]: trial 1—3：三个随机启动点；
+                  - listitem [ref=f5e772]:
+                    - text: trial 4—11：八个自适应 TPE 点。
+                    - 'link "Optuna 4.6.0 documentation: optuna.samplers.TPESampler, https://optuna.readthedocs.io/en/v4.6.0/reference/samplers/generated/optuna.samplers.TPESampler.html?utm_source=chatgpt.com, 另外 1 个来源" [ref=f5e776] [cursor=pointer]':
+                      - /url: https://optuna.readthedocs.io/en/v4.6.0/reference/samplers/generated/optuna.samplers.TPESampler.html?utm_source=chatgpt.com
+                      - generic [ref=f5e777]:
+                        - generic [ref=f5e778]: Optuna 4.6.0 documentation
+                        - generic [aria-hidden] [ref=f5e781]: "+1"
+                - paragraph [ref=f5e782]: 实施时，每个 study 应持有自己的、连续保留状态的 sampler 对象。不能三个 study 共用一个对象，也不能每次轮转都重新建立同种子的 sampler。前三个随机配置配对，是后续 CPU 增量中应核对的实现事实；本轮没有实际运行 Optuna 序列。
+                - heading "三、固定 S0 的 min 目标与唯一选参规则成立" [level=2] [ref=f5e783]
+                - paragraph [ref=f5e784]: 令：
+                - generic [ref=f5e787]:
+                  - math [ref=f5e789]:
+                    - generic [ref=f5e791]:
+                      - generic [ref=f5e792]: a
+                      - generic [ref=f5e793]: =
+                      - generic [ref=f5e794]:
+                        - generic [ref=f5e795]: D
+                        - generic [ref=f5e796]: A
+                      - generic [ref=f5e797]: (
+                      - generic [ref=f5e798]: m
+                      - generic [ref=f5e799]: ","
+                      - generic [ref=f5e800]: θ
+                      - generic [ref=f5e801]: )
+                      - generic [ref=f5e802]: −
+                      - generic [ref=f5e803]:
+                        - generic [ref=f5e804]: D
+                        - generic [ref=f5e805]: A
+                      - generic [ref=f5e806]: (
+                      - generic [ref=f5e807]:
+                        - generic [ref=f5e808]: S
+                        - generic [ref=f5e809]: "0"
+                      - generic [ref=f5e810]: )
+                      - generic [ref=f5e811]: ","
+                      - generic [ref=f5e812]: b
+                      - generic [ref=f5e813]: =
+                      - generic [ref=f5e814]:
+                        - generic [ref=f5e815]: D
+                        - generic [ref=f5e816]: B
+                      - generic [ref=f5e817]: (
+                      - generic [ref=f5e818]: m
+                      - generic [ref=f5e819]: ","
+                      - generic [ref=f5e820]: θ
+                      - generic [ref=f5e821]: )
+                      - generic [ref=f5e822]: −
+                      - generic [ref=f5e823]:
+                        - generic [ref=f5e824]: D
+                        - generic [ref=f5e825]: B
+                      - generic [ref=f5e826]: (
+                      - generic [ref=f5e827]:
+                        - generic [ref=f5e828]: S
+                        - generic [ref=f5e829]: "0"
+                      - generic [ref=f5e830]: )
+                      - generic [ref=f5e831]: ","
+                      - generic [ref=f5e832]: U
+                      - generic [ref=f5e833]: =
+                      - generic [ref=f5e834]: min
+                      - generic: ⁡
+                      - generic [ref=f5e835]: (
+                      - generic [ref=f5e836]: a
+                      - generic [ref=f5e837]: ","
+                      - generic [ref=f5e838]: b
+                      - generic [ref=f5e839]: )
+                      - generic [ref=f5e840]: .
+                  - generic [aria-hidden] [ref=f5e841]:
+                    - generic [ref=f5e842]: a =
+                    - generic [ref=f5e843]:
+                      - generic [ref=f5e844]:
+                        - text: D
+                        - generic [ref=f5e845]: A
+                      - text: (m, θ) −
+                    - generic [ref=f5e853]:
+                      - generic [ref=f5e854]:
+                        - text: D
+                        - generic [ref=f5e855]: A
+                      - text: (
+                      - generic [ref=f5e863]:
+                        - text: S
+                        - generic [ref=f5e864]: "0"
+                      - text: ), b =
+                    - generic [ref=f5e872]:
+                      - generic [ref=f5e873]:
+                        - text: D
+                        - generic [ref=f5e874]: B
+                      - text: (m, θ) −
+                    - generic [ref=f5e882]:
+                      - generic [ref=f5e883]:
+                        - text: D
+                        - generic [ref=f5e884]: B
+                      - text: (
+                      - generic [ref=f5e892]:
+                        - text: S
+                        - generic [ref=f5e893]: "0"
+                      - text: ), U =
+                    - generic [ref=f5e901]: min(a, b).
+                - paragraph [ref=f5e902]:
+                  - text: 固定 S0 能使三 study 使用同一个、不随搜索进程移动的标尺。它保护的是
+                  - strong [ref=f5e903]: 相对 S0 的较弱域
+                  - text: ，并不保证超过最终选出的
+                  - generic [ref=f5e905]:
+                    - math [ref=f5e907]:
+                      - generic [ref=f5e910]:
+                        - generic [ref=f5e911]: S
+                        - generic [ref=f5e912]: tuned
+                    - generic [ref=f5e915]:
+                      - text: S
+                      - generic [ref=f5e916]: tuned
+                  - text: 。
+                - paragraph [ref=f5e926]: 对于有限且有效的 12 个结果，按
+                - generic [ref=f5e929]:
+                  - math [ref=f5e931]:
+                    - generic [ref=f5e933]:
+                      - generic [ref=f5e934]: (
+                      - generic [ref=f5e935]: U
+                      - generic [ref=f5e936]: ","
+                      - generic [ref=f5e937]:
+                        - generic [ref=f5e938]:
+                          - generic [ref=f5e939]: a
+                          - generic [ref=f5e940]: +
+                          - generic [ref=f5e941]: b
+                        - generic [ref=f5e942]: "2"
+                      - generic [ref=f5e943]: ","
+                      - generic [ref=f5e944]: −
+                      - generic [ref=f5e945]: trial.number
+                      - generic [ref=f5e946]: )
+                  - generic [ref=f5e949]:
+                    - generic [ref=f5e950]: (
+                    - text: U,
+                    - generic [ref=f5e955]:
+                      - generic [ref=f5e956]: "2"
+                      - generic [ref=f5e958]: a + b
+                    - text: ", −"
+                    - generic [ref=f5e962]: trial.number
+                    - generic [ref=f5e963]: )
+                - paragraph [ref=f5e964]:
+                  - text: 作精确字典序最大化，能够唯一选出一个已采样点。这个规则不是多目标搜索，也不是事后把 min 改成平均目标。需要显式实现，因为默认 best_trial 不会自动执行项目定义的第二级平均改善并列规则。
+                  - 'link "Optuna 4.6.0 documentation: optuna.study.study, https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/study.html?utm_source=chatgpt.com" [ref=f5e968] [cursor=pointer]':
+                    - /url: https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/study.html?utm_source=chatgpt.com
+                    - generic [ref=f5e969]: Optuna 4.6.0 documentation
+                - paragraph [ref=f5e973]: 保存的 summary 中，S0 的两域值与方案显示小数相符：
+                - list [ref=f5e974]:
+                  - listitem [ref=f5e975]: A：0.49413171588434307
+                  - listitem [ref=f5e976]: B：0.5058704368257183
+                - paragraph [ref=f5e977]:
+                  - text: 但本轮只核对了这些
+                  - strong [ref=f5e978]: 已有字段
+                  - text: ，没有重算索引所列的 52 份基线载荷。实施稿仍应绑定确定的文件/SHA、字段或分数列、域和群顺序及唯一归约路径，不能从正文显示小数读取，也不能在锚点偏差后替换 S0。
+                - paragraph [ref=f5e979]:
+                  - text: 另外，
+                  - strong [ref=f5e980]: NaN 标 FAIL 不等于 study 自动停止
+                  - text: 。官方 FAQ 明确说明 NaN 试验会失败，但 study 会继续，因此必须另外兑现本合同的“任一失败停止后续调度”。
+                  - 'link "Optuna 4.6.0 documentation: FAQ, https://optuna.readthedocs.io/en/v4.6.0/faq.html?utm_source=chatgpt.com" [ref=f5e984] [cursor=pointer]':
+                    - /url: https://optuna.readthedocs.io/en/v4.6.0/faq.html?utm_source=chatgpt.com
+                    - generic [ref=f5e985]: Optuna 4.6.0 documentation
+                - paragraph [ref=f5e989]: 搜索结束后只能直接比较：
+                - list [ref=f5e990]:
+                  - listitem [ref=f5e991]:
+                    - generic [ref=f5e993]:
+                      - math [ref=f5e995]:
+                        - generic [ref=f5e997]:
+                          - generic [ref=f5e998]:
+                            - generic [ref=f5e999]: S
+                            - generic [ref=f5e1000]: pos
+                          - generic [ref=f5e1001]: (
+                          - generic [ref=f5e1002]:
+                            - generic [ref=f5e1003]: θ
+                            - generic [ref=f5e1004]: pos
+                            - generic [ref=f5e1005]: ∗
+                          - generic [ref=f5e1006]: )
+                          - generic [ref=f5e1007]: −
+                          - generic [ref=f5e1008]: S
+                          - generic [ref=f5e1009]: (
+                          - generic [ref=f5e1010]:
+                            - generic [ref=f5e1011]: θ
+                            - generic [ref=f5e1012]: S
+                            - generic [ref=f5e1013]: ∗
+                          - generic [ref=f5e1014]: )
+                      - generic [aria-hidden] [ref=f5e1015]:
+                        - generic [ref=f5e1016]:
+                          - generic [ref=f5e1017]:
+                            - text: S
+                            - generic [ref=f5e1018]: pos
+                          - text: (
+                          - generic [ref=f5e1028]:
+                            - text: θ
+                            - generic [ref=f5e1032]:
+                              - generic [ref=f5e1033]: pos
+                              - generic [ref=f5e1036]: ∗
+                          - text: ) −
+                        - generic [ref=f5e1040]:
+                          - text: S(
+                          - generic [ref=f5e1041]:
+                            - text: θ
+                            - generic [ref=f5e1045]:
+                              - generic [ref=f5e1046]: S
+                              - generic [ref=f5e1047]: ∗
+                          - text: )
+                  - listitem [ref=f5e1051]:
+                    - generic [ref=f5e1053]:
+                      - math [ref=f5e1055]:
+                        - generic [ref=f5e1057]:
+                          - generic [ref=f5e1058]:
+                            - generic [ref=f5e1059]: H
+                            - generic [ref=f5e1060]: pos
+                          - generic [ref=f5e1061]: (
+                          - generic [ref=f5e1062]:
+                            - generic [ref=f5e1063]: θ
+                            - generic [ref=f5e1064]: H
+                            - generic [ref=f5e1065]: ∗
+                          - generic [ref=f5e1066]: )
+                          - generic [ref=f5e1067]: −
+                          - generic [ref=f5e1068]: S
+                          - generic [ref=f5e1069]: (
+                          - generic [ref=f5e1070]:
+                            - generic [ref=f5e1071]: θ
+                            - generic [ref=f5e1072]: S
+                            - generic [ref=f5e1073]: ∗
+                          - generic [ref=f5e1074]: )
+                      - generic [aria-hidden] [ref=f5e1075]:
+                        - generic [ref=f5e1076]:
+                          - generic [ref=f5e1077]:
+                            - text: H
+                            - generic [ref=f5e1078]: pos
+                          - text: (
+                          - generic [ref=f5e1088]:
+                            - text: θ
+                            - generic [ref=f5e1092]:
+                              - generic [ref=f5e1093]: H
+                              - generic [ref=f5e1094]: ∗
+                          - text: ) −
+                        - generic [ref=f5e1098]:
+                          - text: S(
+                          - generic [ref=f5e1099]:
+                            - text: θ
+                            - generic [ref=f5e1103]:
+                              - generic [ref=f5e1104]: S
+                              - generic [ref=f5e1105]: ∗
+                          - text: )
+                - paragraph [ref=f5e1109]:
+                  - text: 搜索赢家在旧 valid 上的 CI，以及同 valid 上新 seed 的 CI，仍是开发描述。有限样本上的选择准则本身可以被过拟合，继续使用同一 valid 的区间不能消除该选择偏差。
+                  - 'link "jmlr.org: On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation, https://jmlr.org/papers/v11/cawley10a.html?utm_source=chatgpt.com" [ref=f5e1113] [cursor=pointer]':
+                    - /url: https://jmlr.org/papers/v11/cawley10a.html?utm_source=chatgpt.com
+                    - generic [ref=f5e1114]: jmlr.org
+                - heading "四、最容易出现的伪实现，已经定位到实际入口" [level=2] [ref=f5e1118]
+                - paragraph [ref=f5e1119]: 这部分不是要求重开旧实现审查。旧代码完成的是固定 s0、固定两臂实验；新方案改变了接口要求。
+                - paragraph [ref=f5e1120]:
+                  - strong [ref=f5e1121]: 第一，LR 必须进入逐步赋值。
+                  - text: 现有更新函数每步重新设置 encoder LR 和 head LR，只改 optimizer 构造或配置字段会被覆盖。第 1、29、30、288 步的实际参数组值和日志，应来自同一个冻结 trial 规格。
+                - paragraph [ref=f5e1122]:
+                  - strong [ref=f5e1123]: 第二，lambda 必须进入全部规定位置。
+                  - text: 它应作用于 current/history 的 A0/A1 四处 rank，随后保留历史监督 0.1 和独立的 0.5D0。不能漏掉 history，也不能将 D0 误缩为 0.05。S 仍须使用完整旧 rank 和完整训练结构。
+                - paragraph [ref=f5e1124]:
+                  - strong [ref=f5e1125]: 第三，新 seed 不能继续被旧 s0 门约束。
+                  - text: 建议明确全部 36 次搜索固定使用初始化、训练日程、Memory 三个旧根：
+                - paragraph [ref=f5e1126]: 20260909 / 20260918 / 20260930
+                - paragraph [ref=f5e1127]: 复验使用方案预定的新根，但 fit/calibration 划分根 20260918 固定。Optuna sampler 的 20261018 应单独列出，不能混入训练随机根。
+                - paragraph [ref=f5e1128]: 当前旧初始 hash、日程复核、Memory 抽样和冻结轨迹相等检查，都需要按这个新规格对应处理。新 seed 应核对其规定的预训练编码器、随机 head、空 Adam 和同 seed 三臂配对，不能要求它的完整初始化身份等于旧 s0。
+                - paragraph [ref=f5e1129]:
+                  - strong [ref=f5e1130]: 第四，原生增量需要具体六调用表。
+                  - text: 现拟 300 秒 CPU、每臂六次原生调用的范围可以接受。应说明共同状态、默认/非默认配置、A/B 位置和恢复关系，使 lambda 与 LR 的作用可分别辨认。只看到两参数一起改变后的总损失或参数差，不足以证明两条接线。
+                - paragraph [ref=f5e1131]: 这里也不能制造错误验收要求：在同一状态下只改变 LR，单步 Adam 一、二阶矩可以相同。需要证明的是实际 LR、梯度路径、更新和恢复关系。
+                - heading "五、45/37 读取与 114 小时预算：算术正确，执行归属有缺口" [level=2] [ref=f5e1132]
+                - heading "读取次数成立的前提" [level=3] [ref=f5e1133]
+                - paragraph [ref=f5e1134]: 新增监督解析上限为：
+                - generic [ref=f5e1137]:
+                  - math [ref=f5e1139]:
+                    - generic [ref=f5e1141]:
+                      - generic [ref=f5e1142]: train
+                      - generic [ref=f5e1143]: =
+                      - generic [ref=f5e1144]: "36"
+                      - generic [ref=f5e1145]: +
+                      - generic [ref=f5e1146]: "9"
+                      - generic [ref=f5e1147]: =
+                      - generic [ref=f5e1148]: "45"
+                      - generic [ref=f5e1149]: ","
+                      - generic [ref=f5e1150]: valid
+                      - generic [ref=f5e1151]: =
+                      - generic [ref=f5e1152]: "36"
+                      - generic [ref=f5e1153]: +
+                      - generic [ref=f5e1154]: "1"
+                      - generic [ref=f5e1155]: =
+                      - generic [ref=f5e1156]: "37."
+                  - generic [aria-hidden] [ref=f5e1157]:
+                    - generic [ref=f5e1158]:
+                      - generic [ref=f5e1159]: train
+                      - text: =
+                    - generic [ref=f5e1160]: 36 +
+                    - generic [ref=f5e1161]: 9 =
+                    - generic [ref=f5e1162]:
+                      - text: 45,
+                      - generic [ref=f5e1163]: valid
+                      - text: =
+                    - generic [ref=f5e1164]: 36 +
+                    - generic [ref=f5e1165]: 1 =
+                    - generic [ref=f5e1166]: "37."
+                - paragraph [ref=f5e1167]: 其中“+1”必须是真正的九次复验集中开放。直接运行九次现有完整 execute 不符合该规则。
+                - paragraph [ref=f5e1168]: 同时，37 不能被解释成所有 valid 文件操作总共只有 37 次。公开文本、元数据、文件身份核对及逐运行盲评分，与监督解析不同；应沿既有七文件范围明确计数语义。合表 C 是技术扫描后排除，也不能改称为字节层面完全未接触 C。
+                - paragraph [ref=f5e1169]: 未来域边界应保持两层披露：A 阶段学习器按合同只使用 A；控制器在完整 trial 后利用 AB 开发 MAP 选择下一配置。后者是明确的 B 域开发反馈，不能声称调参过程也不知道未来域。
+                - heading "预算核算" [level=3] [ref=f5e1170]
+                - generic [ref=f5e1171]:
+                  - table [ref=f5e1174]:
+                    - rowgroup [ref=f5e1175]:
+                      - row [ref=f5e1176]:
+                        - columnheader "部分" [ref=f5e1177]
+                        - columnheader "秒数" [ref=f5e1178]
+                        - columnheader "小时" [ref=f5e1179]
+                    - rowgroup [ref=f5e1180]:
+                      - row [ref=f5e1181]:
+                        - cell "手写 CPU 增量" [ref=f5e1182]
+                        - cell "300" [ref=f5e1183]
+                        - cell "0.0833" [ref=f5e1184]
+                      - row [ref=f5e1185]:
+                        - cell "三臂原生增量" [ref=f5e1186]
+                        - cell "1,800" [ref=f5e1187]
+                        - cell "0.5" [ref=f5e1188]
+                      - row [ref=f5e1189]:
+                        - cell "36 次搜索" [ref=f5e1190]
+                        - cell "324,000" [ref=f5e1191]
+                        - cell "90" [ref=f5e1192]
+                      - row [ref=f5e1193]:
+                        - cell "9 次复验" [ref=f5e1194]
+                        - cell "81,000" [ref=f5e1195]
+                        - cell "22.5" [ref=f5e1196]
+                      - row [ref=f5e1197]:
+                        - cell "控制及独立保存结果分析" [ref=f5e1198]
+                        - cell "3,300" [ref=f5e1199]
+                        - cell "0.9167" [ref=f5e1200]
+                      - row [ref=f5e1201]:
+                        - cell [ref=f5e1202]:
+                          - strong [ref=f5e1203]: 开发合计
+                        - cell [ref=f5e1204]:
+                          - strong [ref=f5e1205]: 410,400
+                        - cell [ref=f5e1206]:
+                          - strong [ref=f5e1207]: "114"
+                      - row [ref=f5e1208]:
+                        - cell "另拟最终推理/评价" [ref=f5e1209]
+                        - cell "21,600" [ref=f5e1210]
+                        - cell "6" [ref=f5e1211]
+                      - row [ref=f5e1212]:
+                        - cell [ref=f5e1213]:
+                          - strong [ref=f5e1214]: 两部分合计
+                        - cell [ref=f5e1215]:
+                          - strong [ref=f5e1216]: 432,000
+                        - cell [ref=f5e1217]:
+                          - strong [ref=f5e1218]: "120"
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=f5e1219]:
+                  - text: 45 次正式训练对应
+                  - strong [ref=f5e1220]: 25920 次更新、38880 次梯度群呈现、90 个端点、540 次诊断捕获、405 次判读
+                  - text: 。原生 18 次真实 optimizer 调用另列。
+                - paragraph [ref=f5e1221]:
+                  - text: 以旧双臂外层 12661 / 2 = 6330.5 秒估算，45 次为
+                  - strong [ref=f5e1222]: 79.13125 小时
+                  - text: ，算术没有错误；它只是按旧入口成本作粗估，不包括另外列出的阶段，也不是新单 trial 的资源准入证明。
+                - paragraph [ref=f5e1223]: 两项需要补清：
+                - list [ref=f5e1224]:
+                  - listitem [ref=f5e1225]:
+                    - strong [ref=f5e1226]: 九次复验后的集中评价计入哪里。
+                    - text: 不能在前八次外层已经结束后，既不计后续评价，也不能把等待其余运行的时间重复算成训练。可在现有 3300 秒或复验 81000 秒中明确预留，总额保持不变。
+                  - listitem [ref=f5e1227]:
+                    - strong [ref=f5e1228]: 新的 9000 秒上限尚无旧资格直接支持。
+                    - text: 保存的旧双臂保守投影为 38079.876088 秒，旧 PASS 是在旧限额内成立。这个数字不能证明新运行必然超时，但足以说明旧 PASS 不能迁移成新的 9000 秒单次资格。
+                - paragraph [ref=f5e1229]: 若后续合法投影不能满足新上限，就不能按现范围启动正式搜索。不能靠临时缩安全系数、把 Optuna timeout 当硬截止，或用粗估均值替代资格依据。失败消费实际 slot、时间和读取账，停止而不自动补抽的规则应保留。
+                - heading "六、新 80 群与最终统计规则，支持的是明确而有限的确认" [level=2] [ref=f5e1230]
+                - paragraph [ref=f5e1231]:
+                  - strong [ref=f5e1232]: 新 AB 80 群目前只是提议，不能假称存在。
+                  - text: 来源、生成器、群与控制者隔离、保管、结构失败处置和预算，需要后续独立合同。命名空间不同只能减少 ID 冲突，不能单独证明内容或潜在来源独立。
+                - paragraph [ref=f5e1233]:
+                  - text: 基础 test120 已用，现 valid 已反复开发，两者都不能改名为新的独立确认集。生成和隔离核验成本也不在 114 小时开发或 6 小时推理预留内，所以
+                  - strong [ref=f5e1234]: 120 小时并非已覆盖整个数据构建过程的总预算
+                  - text: 。
+                - paragraph [ref=f5e1235]: 在这个前提下，拟定统计规则基本自洽：
+                - generic [ref=f5e1238]:
+                  - math [ref=f5e1240]:
+                    - generic [ref=f5e1242]:
+                      - generic [ref=f5e1243]:
+                        - generic [ref=f5e1244]: δ
+                        - generic [ref=f5e1245]:
+                          - generic [ref=f5e1246]: c
+                          - generic [ref=f5e1247]: ","
+                          - generic [ref=f5e1248]: d
+                          - generic [ref=f5e1249]: ","
+                          - generic [ref=f5e1250]: g
+                      - generic [ref=f5e1251]: =
+                      - generic [ref=f5e1252]:
+                        - generic [ref=f5e1253]: "1"
+                        - generic [ref=f5e1254]: "3"
+                      - generic [ref=f5e1255]:
+                        - generic [ref=f5e1256]: ∑
+                        - generic [ref=f5e1257]: s
+                      - generic [ref=f5e1258]:
+                        - generic [ref=f5e1259]: (
+                        - generic [ref=f5e1260]: M
+                        - generic [ref=f5e1261]: A
+                        - generic [ref=f5e1262]:
+                          - generic [ref=f5e1263]: P
+                          - generic [ref=f5e1264]:
+                            - generic [ref=f5e1265]: c
+                            - generic [ref=f5e1266]: ","
+                            - generic [ref=f5e1267]: s
+                            - generic [ref=f5e1268]: ","
+                            - generic [ref=f5e1269]: d
+                            - generic [ref=f5e1270]: ","
+                            - generic [ref=f5e1271]: g
+                        - generic [ref=f5e1272]: −
+                        - generic [ref=f5e1273]: M
+                        - generic [ref=f5e1274]: A
+                        - generic [ref=f5e1275]:
+                          - generic [ref=f5e1276]: P
+                          - generic [ref=f5e1277]:
+                            - generic [ref=f5e1278]:
+                              - generic [ref=f5e1279]: S
+                              - generic [ref=f5e1280]: tuned
+                            - generic [ref=f5e1281]: ","
+                            - generic [ref=f5e1282]: s
+                            - generic [ref=f5e1283]: ","
+                            - generic [ref=f5e1284]: d
+                            - generic [ref=f5e1285]: ","
+                            - generic [ref=f5e1286]: g
+                        - generic [ref=f5e1287]: )
+                      - generic [ref=f5e1288]: .
+                  - generic [aria-hidden] [ref=f5e1289]:
+                    - generic [ref=f5e1290]:
+                      - generic [ref=f5e1291]:
+                        - text: δ
+                        - generic [ref=f5e1292]: c,d,g
+                      - text: =
+                    - generic [ref=f5e1301]:
+                      - generic [ref=f5e1306]:
+                        - generic [ref=f5e1307]: "3"
+                        - generic [ref=f5e1309]: "1"
+                      - generic [ref=f5e1316]:
+                        - generic [ref=f5e1317]: s
+                        - generic [ref=f5e1318]: ∑
+                      - generic [ref=f5e1322]:
+                        - text: (MA
+                        - generic [ref=f5e1323]:
+                          - text: P
+                          - generic [ref=f5e1324]: c,s,d,g
+                        - text: − MA
+                        - generic [ref=f5e1333]:
+                          - text: P
+                          - generic [ref=f5e1339]:
+                            - generic [ref=f5e1340]:
+                              - text: S
+                              - generic [ref=f5e1341]: tuned
+                            - text: ",s,d,g"
+                        - text: )
+                      - text: .
+                - paragraph [ref=f5e1354]:
+                  - text: 这是三个模型各自 MAP 差的平均，不是分数集成。域内的重复单位是
+                  - strong [ref=f5e1355]: 40 个新群
+                  - text: ，不能当作 120 个独立 seed×群样本，也不能当作独立查询。
+                - paragraph [ref=f5e1356]: 按域整群配对 bootstrap 20,000 次，同一抽样索引保留候选、S 与全部 seed 的配对；四个单侧边界各使用 1.25% 线性分位数，对应 Bonferroni 的 0.05 / 4，逻辑成立。四项比较共享 S，不要求它们彼此独立才能应用 Bonferroni。
+                - paragraph [ref=f5e1357]: 但 40 群的百分位 bootstrap 仍是有限样本近似。Bonferroni 不会把近似覆盖变成精确保证，20,000 次重采样也不会增加独立群数或证明功效充分。
+                - paragraph [ref=f5e1358]: 某候选只有在：
+                - list [ref=f5e1359]:
+                  - listitem [ref=f5e1360]: A/B 两个调整后下界都严格大于 0；
+                  - listitem [ref=f5e1361]: 三个预定 seed × 两域的六个点差也都严格大于 0；
+                - paragraph [ref=f5e1362]: 时才通过该协议的双域排序门。后一条件进一步收紧裁决，不提供 seed 总体概率保证。
+                - paragraph [ref=f5e1363]:
+                  - text: 若最终通过，可支持的主张是：
+                  - strong [ref=f5e1364]: 在固定 A→B 任务、冻结生成机制、同额有限调参预算和三条预定训练轨迹下，该候选对调参后的 S，在新留出群的两域 B 末 raw MAP 上获得协议规定的条件支持。
+                - paragraph [ref=f5e1365]: 它不自动支持任意 seed、其他到达顺序、真实市场、概率质量改善、已证明的遗忘机制，或方法创新。
+                - heading "七、旧结果支持继续有限试验，不支持根因已经确定" [level=2] [ref=f5e1366]
+                - paragraph [ref=f5e1367]: 保存结果仍然是：
+                - generic [ref=f5e1368]:
+                  - table [ref=f5e1371]:
+                    - rowgroup [ref=f5e1372]:
+                      - row [ref=f5e1373]:
+                        - columnheader "比较" [ref=f5e1374]
+                        - columnheader "旧 A 的 B 末 MAP 差" [ref=f5e1375]
+                        - columnheader "新 B 的 B 末 MAP 差" [ref=f5e1376]
+                    - rowgroup [ref=f5e1377]:
+                      - row [ref=f5e1378]:
+                        - cell "S_pos−S" [ref=f5e1379]
+                        - cell "+0.010147834827；区间下界仍为负" [ref=f5e1380]
+                        - cell "−0.006673599973；区间跨零" [ref=f5e1381]
+                      - row [ref=f5e1382]:
+                        - cell "H_pos−S" [ref=f5e1383]
+                        - cell "+0.031936970847；旧 A 有正向支持" [ref=f5e1384]
+                        - cell "−0.006183666761；区间跨零" [ref=f5e1385]
+                      - row [ref=f5e1386]:
+                        - cell "H_pos−H" [ref=f5e1387]
+                        - cell "+0.003955830047；区间跨零" [ref=f5e1388]
+                        - cell "−0.004661292176；区间跨零" [ref=f5e1389]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=f5e1390]: 这些数值及完整原区间来自保存报告，没有在本轮重算。H_pos 对 S 的旧 A 优势不能替代原双域目标失败，也不能替代 H_pos−H 的直接比较。
+                - paragraph [ref=f5e1391]: raw 概率恶化、18 个差距扩大区间全正、新 B 双正例局部负向，说明损失权重和优化强度值得有限检查；它们没有排除目标取舍、数据结构、缓存覆盖或表示学习等其他解释。epoch1→6、6 个存活 cache 群、分组区间非交互、A 末不是相对初始模型净获得等限制，都已保留。
+                - paragraph [ref=f5e1392]: 因此，不要求增加 H、大量超参、机制消融或新成功门；也不重开无变化的 R01/R02/R03、全仓回归、通用恢复或网络加固。
+                - heading "八、实际审查记录与保存阻断" [level=2] [ref=f5e1393]
+                - paragraph [ref=f5e1394]:
+                  - text: 本轮由当前
+                  - strong [ref=f5e1395]: GPT-6 Astra Pro
+                  - text: 实例独立完成。先读完整方案，再结合旧结果、旧外审正文及独立主审处置，定向核对实际入口。逐文件语义阅读范围另列；没有把 AST 解析、JSON 解析或哈希冒充全文科学复审，也没有重建标签派生原值。
+                - paragraph [ref=f5e1396]:
+                  - text: 最新依赖补充已按现行状态采纳：Optuna 4.6.0 和六个依赖由主执行者另行获准安装，原有 137 包未变、导入和 pip check 通过。
+                  - strong [ref=f5e1397]: 这不是本轮服务器复核，也不等于研究执行或原生资格已经通过。
+                - paragraph [ref=f5e1398]: 实际失败已留证：
+                - list [ref=f5e1399]:
+                  - listitem [ref=f5e1400]: 三份附件/字段/预算机械脚本均退出 0。
+                  - listitem [ref=f5e1401]: 首次打包因来源 TSV 末尾多余空行退出 1；只修正该空行，保留了错误全文、失败输入和脚本身份；最终打包成功。
+                  - listitem [ref=f5e1402]: 三次 Optuna 官方源码网页取源返回 Internal Error，未假称读到对应模块。
+                  - listitem [ref=f5e1403]: 文件保存先发生网络失败，随后受控权限申请被自动审批拒绝；拒绝后没有绕过或再次上传。
+                - paragraph [ref=f5e1404]:
+                  - strong [ref=f5e1405]: 自动审批拒绝的具体动作，是将以上五份交付文件上传到 Library 保存服务。
+                  - text: 审批认为，虽然用户已授权形成和交付外审报告/ZIP，但未明确授权把其中的内部报告、原附件副本和源码证据发送到该具体保存目的地。因此，持久保存尚未成功；上方提供的是完整本地下载文件。
+                - paragraph [ref=f5e1406]:
+                  - strong [ref=f5e1407]: 是否明确授权将这五份已完成的外审交付文件保存到当前 ChatGPT 的 Library？该授权仅用于文件保存，不授予代码、CPU/GPU、搜索、推理或新数据访问权限。
+              - generic [ref=f5e1410]:
+                - generic [ref=f5e1411]:
+                  - button "打开 optuna_plan_external_review.zh.txt 的预览" [ref=f5e1412] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "optuna_plan_external_review.zh.txt"
+                      - generic: 文档
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=f5e1413]:
+                  - button "打开 optuna_plan_external_review.findings.json 的预览" [ref=f5e1414] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "optuna_plan_external_review.findings.json"
+                      - generic: 代码
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=f5e1415]:
+                  - button "打开 optuna_plan_external_review.members.tsv 的预览" [ref=f5e1416] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "optuna_plan_external_review.members.tsv"
+                      - generic: 电子表格
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+                - generic [ref=f5e1417]:
+                  - button "打开 optuna_plan_external_review.identity.json 的预览" [ref=f5e1418] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic "optuna_plan_external_review.identity.json"
+                      - generic: 代码
+                    - generic:
+                      - generic:
+                        - generic:
+                          - button "下载文件"
+        - generic [ref=f5e1420]:
+          - button "复制" [ref=f5e1422] [cursor=pointer]
+          - button "评价回复" [ref=f5e1426] [cursor=pointer]
+          - button "分享" [ref=f5e1430] [cursor=pointer]
+          - button "朗读" [ref=f5e1434] [cursor=pointer]
+          - button "重新生成回复" [ref=f5e1438] [cursor=pointer]
+          - button "更多操作" [ref=f5e1441] [cursor=pointer]
+          - button "来源" [ref=f5e1445] [cursor=pointer]
+      - generic [ref=f5e1449]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - button "滚动到底部" [ref=f5e1453] [cursor=pointer]
+        - heading "最新一条回复" [level=4] [ref=f5e1456]
+        - status [ref=f5e1457]
+        - generic [ref=f5e1477]:
+          - button "添加文件等内容" [ref=f5e1482] [cursor=pointer]
+          - textbox "询问 ChatGPT" [ref=f5e1489]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=f5e1492]:
+            - button "选择 ChatGPT 模型" [ref=f5e1497] [cursor=pointer]:
+              - generic [ref=f5e1498]: Pro
+            - generic [ref=f5e1508]:
+              - button "听写" [ref=f5e1512] [cursor=pointer]
+              - button "开始语音" [ref=f5e1517] [cursor=pointer]

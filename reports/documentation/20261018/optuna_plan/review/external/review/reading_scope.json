@@ -1,0 +1,281 @@
+{
+  "schema_version": "1.0",
+  "input_identity": {
+    "size_bytes": 186342,
+    "member_count": 26,
+    "sha256": "60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd"
+  },
+  "reading_order": "先proposal和request；再合同、旧结果/外审/主审；再定向实际入口与官方固定版资料。",
+  "scope_note": "所有26成员完成逐字节机械读取/哈希；以下semantic_scope单独说明语义阅读，不把JSON全文解析、AST解析或哈希当全文外审。历史外审第15节附录未逐行重审。长工具输出有截断时仅据后续定向补读标注范围。",
+  "members": [
+    {
+      "path": "proposal.zh.txt",
+      "size_bytes": 23801,
+      "sha256": "270c2eb800f1e12daf95daeec9daa29c1a03f9665494d7bdc5b551c7ca81a484",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E01",
+      "semantic_scope": "全文1—133行",
+      "purpose": "本次具体方案"
+    },
+    {
+      "path": "request.zh.txt",
+      "size_bytes": 3754,
+      "sha256": "5be026ea6ce6958313dd30fbcd6fa04873cbfbd0894b89853e7d132eb97adca6",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E02",
+      "semantic_scope": "全文1—18行，另结合用户本轮直接补充",
+      "purpose": "当前静态范围和依赖状态；补充另存submission_supplement.zh.txt"
+    },
+    {
+      "path": "docs/RESEARCH_DISCIPLINE.zh.md",
+      "size_bytes": 28564,
+      "sha256": "b8d5a1066ec89cf1a977382f7e0ef41d74793d81397075fdd50d627146214c38",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E18",
+      "semantic_scope": "1—181行适用规则",
+      "purpose": "研究边界；不把历史授权移入本轮"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md",
+      "size_bytes": 10133,
+      "sha256": "6aef2124c0d4761e9b1488ece2950294e8714d2940df3edb2c8dd04dd41106e3",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E03",
+      "semantic_scope": "全文1—55行",
+      "purpose": "既有固定目标与运行边界"
+    },
+    {
+      "path": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+      "size_bytes": 32430,
+      "sha256": "88c6eae5e2179f1671694ebeaa34258a9decab3f0baa70d23387ad5ba54e1485",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E19",
+      "semantic_scope": "1—76、114—194行",
+      "purpose": "数据、固定任务/种子、旧test和新留出路线"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt",
+      "size_bytes": 23089,
+      "sha256": "f15aa3671a213597fb597c8ec7afab48d46e2a2f21c0b97d9feafd3a22f14e9d",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E04",
+      "semantic_scope": "全文1—193行",
+      "purpose": "保存结果与限制"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/review/external/S_pos_H_pos_external_review_20261018.zh.txt",
+      "size_bytes": 68197,
+      "sha256": "1aeb33dcd785ba8b8b2e5e4ccd58b409f10cd8302c872df6b130816a98d1121b",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E06",
+      "semantic_scope": "正文第1—14节，1—335行；第15节附录未逐行审查",
+      "purpose": "历史裁决、原生/投影、诊断限制"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/review/external/findings.json",
+      "size_bytes": 4585,
+      "sha256": "fbd83f06391a1b9c6ac6c17853d4e5db60f12ce844349f3e29f8d510b74daa91",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E05",
+      "semantic_scope": "全文JSON语义阅读；历史原件未修改。",
+      "purpose": "历史结构化发现与独立处置对应"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/review/primary_disposition.zh.txt",
+      "size_bytes": 10759,
+      "sha256": "170c588574a61fbfa69438a03393ae94910093a2b2bd649b52cdd27d8ce37e34",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA和静态文本读取",
+      "evidence_ref": "E05",
+      "semantic_scope": "全文1—68行；同时全文阅读同目录external/findings.json",
+      "purpose": "独立主审、历史外审发现和删除后补充"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/analysis/summary.json",
+      "size_bytes": 92383,
+      "sha256": "6ad47620c634f35275621ff006a5838a55fbe5650884fa4d5d9c3de4814365d1",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E07",
+      "semantic_scope": "完整JSON机械解析；定向absolute/raw/map、success、诊断与其他已有字段位置",
+      "purpose": "已有MAP、结果状态；未重算标签原值或区间"
+    },
+    {
+      "path": "reports/maintenance/20261018/positive_ranking_weights/receipt.json",
+      "size_bytes": 3368,
+      "sha256": "5ac069869dfb96bfc37345b63d2e1682ee5c5a9e2d4018f5de3bd2de13b76d70",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E17",
+      "semantic_scope": "完整JSON机械解析；定向删除/保留/访问/限制字段",
+      "purpose": "四旧权重删除回执；非服务器实时确认"
+    },
+    {
+      "path": "reports/documentation/20261016/h_consistency/baseline_sources.json",
+      "size_bytes": 26524,
+      "sha256": "b71119f5f278776cfa64f2a175acbadecc1614e8103a869319d9270522ececf3",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E16",
+      "semantic_scope": "完整JSON机械解析；定向基线身份/文件映射/限制",
+      "purpose": "52份基线索引；不等于实际52载荷重读"
+    },
+    {
+      "path": "schema/step28_positive_ranking_policy.json",
+      "size_bytes": 3618,
+      "sha256": "fab05a1917d23a8eff26a0cc80cdf0fba9110599e72dd9fd4d9c00634cea60f3",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E15",
+      "semantic_scope": "另bge_continual和record_replay三份全文；chinese_base定向输入/划分/seed/optimizer/rank字段",
+      "purpose": "继承合同与固定根"
+    },
+    {
+      "path": "schema/step28_bge_continual_policy.json",
+      "size_bytes": 5123,
+      "sha256": "28036c44903bb848d596c71ae987ce81beb2edc181fb846c010c4b70f6195534",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E15",
+      "semantic_scope": "全文JSON语义阅读。",
+      "purpose": "继承目标、seed和预算边界"
+    },
+    {
+      "path": "schema/step28_record_replay_policy.json",
+      "size_bytes": 1680,
+      "sha256": "fbf82f180ed8e0e1140d1a11d137abc1ff3efb50ceac877d843d63e1e89a065f",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E15",
+      "semantic_scope": "全文JSON语义阅读。",
+      "purpose": "继承目标、seed和预算边界"
+    },
+    {
+      "path": "schema/step28_chinese_base_policy.json",
+      "size_bytes": 8439,
+      "sha256": "add77dd222c8308eb013bd8226b1f6f51dc3a2403a533010322d27848c597f2a",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "E15",
+      "semantic_scope": "完整JSON机械解析；定向数据身份、input、partition、seed、optimizer与ranking字段。",
+      "purpose": "固定数据划分、初始化、优化器基值"
+    },
+    {
+      "path": "scripts/step28_positive_ranking.py",
+      "size_bytes": 7690,
+      "sha256": "182a0a73cf4f44c539e6fa8819746e37e74f37ffaee10fe75d5612ee1229e3e1",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E08",
+      "semantic_scope": "全文1—155行",
+      "purpose": "目标、评分、正式/资格身份、更新"
+    },
+    {
+      "path": "scripts/step28_positive_ranking_run.py",
+      "size_bytes": 33254,
+      "sha256": "c04867669e04153c04cae9782c46fbbdbcf59a783c2b4b2ededaadc3a9ab6447",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E10",
+      "semantic_scope": "全文1—541行",
+      "purpose": "双臂盲门、固定身份、评价和执行入口"
+    },
+    {
+      "path": "scripts/step28_record_replay.py",
+      "size_bytes": 15543,
+      "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E09",
+      "semantic_scope": "全文1—332行",
+      "purpose": "完整S目标、VJP、LR、Memory"
+    },
+    {
+      "path": "scripts/step28_g_half.py",
+      "size_bytes": 6786,
+      "sha256": "350f7d057a786aa151073ac54f1f697f40d081ecb5b67c02d6ee456a785febcb",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E13",
+      "semantic_scope": "全文1—137行；另scripts/step28_alias_ranking.py 1—154行",
+      "purpose": "H池化与S rank/hard接口"
+    },
+    {
+      "path": "scripts/step28_g_half_run.py",
+      "size_bytes": 43231,
+      "sha256": "bc10d07efc47aba239bea8eb7217d7effd734eb9fe7a55749e8a54da09086677",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E11",
+      "semantic_scope": "1—140、146—365、506—514行",
+      "purpose": "直接复用的资格投影、训练、保存恢复和open_valid"
+    },
+    {
+      "path": "scripts/step28_bge_continual.py",
+      "size_bytes": 17275,
+      "sha256": "62a3c6d5eeb1180a9014f157c79c9ccf210df2f379946d345184d2b544869e0d",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E20",
+      "semantic_scope": "1—200行",
+      "purpose": "config、stage_lr、schedule、Supply、旧Memory接口"
+    },
+    {
+      "path": "scripts/step28_balanced_pooling_run.py",
+      "size_bytes": 55111,
+      "sha256": "561b53c651e432c4ddb0480a1e216ffb187134074a68b3acbed418f093db52d1",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E12",
+      "semantic_scope": "1—58、70—201、215—265、343—385、585—650行",
+      "purpose": "公开输入/标签、固定划分、fresh、查询指标与固定群数"
+    },
+    {
+      "path": "scripts/step28_alias_ranking.py",
+      "size_bytes": 11658,
+      "sha256": "1b99709f55e1e4a6851bc7022410707e575fc898632351b4725e8db5435c3274",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E13",
+      "semantic_scope": "1—154行定向阅读；未重审155—222行未变范围。",
+      "purpose": "原rank/hard接口"
+    },
+    {
+      "path": "scripts/step28_replay_diagnostics.py",
+      "size_bytes": 11971,
+      "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及AST语法位置解析（不执行/导入）",
+      "evidence_ref": "E14",
+      "semantic_scope": "全文1—208行",
+      "purpose": "诊断中性、随机根/身份、群范围"
+    },
+    {
+      "path": "manifest.json",
+      "size_bytes": 6991,
+      "sha256": "48f9d005ff8bfeed5983d482a4651d30ebd54b29e92856034cf609bc42ea546b",
+      "directory": false,
+      "mechanical_scope": "逐字节大小/SHA及JSON机械解析",
+      "evidence_ref": "M01",
+      "semantic_scope": "全文结构与范围说明、25载荷记录机械核对。",
+      "purpose": "附件身份与非执行依赖闭包说明"
+    }
+  ],
+  "not_read_or_run": [
+    "52份基线索引所列实际载荷并未全部随包提供；不声称重算52份原件。",
+    "实际模型、预训练归档、旧Memory/权重和正式文本/标签未读取。",
+    "base.load_model、core.make_optimizer等未附定义不声称已读取。",
+    "没有项目服务器连接、安装或Optuna/训练/推理/重采样。",
+    "未委派子agent；旧R01/R02/R03无变化实现不重审。"
+  ],
+  "web_scope_reference": "sources.web.json"
+}
+

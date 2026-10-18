@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "mechanical_script_failures": [
+    {
+      "id": "PACKAGING_ATTEMPT_1",
+      "command": "python3 optuna_static_review/scripts/package_review.py",
+      "cwd": "/workspace/scratch/5c678bf9678b",
+      "exit_code": 1,
+      "tool_chunk_id": "03125b",
+      "tool_wall_time_seconds": 0.061752148,
+      "script_sha256": "75c94ae88e6f85369f9c18265d8719968789ebed30d70b64852fbfce29565249",
+      "observed_output": "Traceback (most recent call last):\n  File \"/workspace/scratch/5c678bf9678b/optuna_static_review/scripts/package_review.py\", line 157, in <module>\n    main()\n  File \"/workspace/scratch/5c678bf9678b/optuna_static_review/scripts/package_review.py\", line 77, in main\n    raise ValueError(\"Evidence index is not a four-column TSV\")\nValueError: Evidence index is not a four-column TSV\n",
+      "cause": "新来源索引第33行为空行，被四列TSV机械格式条件拒绝；非项目执行失败。",
+      "failed_input_snapshot": {
+        "path": "evidence_index.tsv",
+        "sha256": "b88803c036ca11bd8bb5a60f82fb9fda58922f1014935189762c475d2d1914f0",
+        "utf8_text": "id\tpath_or_url\tactual_scope\tuse\nE01\tproposal.zh.txt\t全文1—133行\t本次具体方案\nE02\trequest.zh.txt\t全文1—18行，另结合用户本轮直接补充\t当前静态范围和依赖状态；补充另存submission_supplement.zh.txt\nE03\tdocs/SELLER_ALIAS_POSITIVE_RANKING.zh.md\t全文1—55行\t既有固定目标与运行边界\nE04\treports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt\t全文1—193行\t保存结果与限制\nE05\treports/seller_alias_continual/20261018/positive_ranking_result/review/primary_disposition.zh.txt\t全文1—68行；同时全文阅读同目录external/findings.json\t独立主审、历史外审发现和删除后补充\nE06\treports/seller_alias_continual/20261018/positive_ranking_result/review/external/S_pos_H_pos_external_review_20261018.zh.txt\t正文第1—14节，1—335行；第15节附录未逐行审查\t历史裁决、原生/投影、诊断限制\nE07\treports/seller_alias_continual/20261018/positive_ranking_result/analysis/summary.json\t完整JSON机械解析；定向absolute/raw/map、success、诊断与其他已有字段位置\t已有MAP、结果状态；未重算标签原值或区间\nE08\tscripts/step28_positive_ranking.py\t全文1—155行\t目标、评分、正式/资格身份、更新\nE09\tscripts/step28_record_replay.py\t全文1—332行\t完整S目标、VJP、LR、Memory\nE10\tscripts/step28_positive_ranking_run.py\t全文1—541行\t双臂盲门、固定身份、评价和执行入口\nE11\tscripts/step28_g_half_run.py\t1—140、146—365、506—514行\t直接复用的资格投影、训练、保存恢复和open_valid\nE12\tscripts/step28_balanced_pooling_run.py\t1—58、70—201、215—265、343—385、585—650行\t公开输入/标签、固定划分、fresh、查询指标与固定群数\nE13\tscripts/step28_g_half.py\t全文1—137行；另scripts/step28_alias_ranking.py 1—154行\tH池化与S rank/hard接口\nE14\tscripts/step28_replay_diagnostics.py\t全文1—208行\t诊断中性、随机根/身份、群范围\nE15\tschema/step28_positive_ranking_policy.json\t另bge_continual和record_replay三份全文；chinese_base定向输入/划分/seed/optimizer/rank字段\t继承合同与固定根\nE16\treports/documentation/20261016/h_consistency/baseline_sources.json\t完整JSON机械解析；定向基线身份/文件映射/限制\t52份基线索引；不等于实际52载荷重读\nE17\treports/maintenance/20261018/positive_ranking_weights/receipt.json\t完整JSON机械解析；定向删除/保留/访问/限制字段\t四旧权重删除回执；非服务器实时确认\nE18\tdocs/RESEARCH_DISCIPLINE.zh.md\t1—181行适用规则\t研究边界；不把历史授权移入本轮\nE19\tdocs/SELLER_ALIAS_BGE_CONTINUAL.zh.md\t1—76、114—194行\t数据、固定任务/种子、旧test和新留出路线\nE20\tscripts/step28_bge_continual.py\t1—200行\tconfig、stage_lr、schedule、Supply、旧Memory接口\nM01\tmechanical/input_identity.json; mechanical/manifest_check.json\t机械输出\t附件/载荷身份\nM02\tmechanical/budget_arithmetic.json\t合同算术\t预算/数量/LR/权重估算\nM03\tmechanical/targeted_fields.json\t已有字段及算术\tS0/seed/历史投影\nM04\tmechanical/source_locations.json; mechanical/saved_field_extract.json\t静态位置和字段\t不作为动态覆盖或原值重算\nW01\thttps://optuna.readthedocs.io/en/v4.6.0/reference/samplers/generated/optuna.samplers.TPESampler.html\t参数表、startup说明及相关文档段落；未执行采样。\tOptuna 4.6.0 TPESampler\nW02\thttps://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/samplers/_tpe/sampler.html\t定向阅读COMPLETE/PRUNED计数、随机sampler初始化、默认gamma及采样入口。\tOptuna 4.6.0 TPE sampler source\nW03\thttps://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.study.Study.html\tenqueue_trial、ask/tell、optimize的trial/timeout与状态说明。\tOptuna 4.6.0 Study\nW04\thttps://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/study.html\t定向阅读_get_best_trial、ask中的waiting trial及ask/tell入口。\tOptuna 4.6.0 Study source\nW05\thttps://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.pruners.NopPruner.html\t全文简短API说明。\tOptuna 4.6.0 NopPruner\nW06\thttps://optuna.readthedocs.io/en/v4.6.0/faq.html\t定向阅读可复现性、串行、异常和NaN问答；不是FAQ所有问题逐项审查。\tOptuna 4.6.0 FAQ\nW07\thttps://jmlr.org/papers/v11/cawley10a.html\t论文出版页与摘要；未读取论文PDF全文。\tCawley & Talbot (2010), On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation\n\n"
+      },
+      "minimum_fix": "仅去除末尾多余空行，保持所有来源记录和四列规则；打包脚本未修改。",
+      "retry_status": "最终实际完成状态另见ZIP旁identity.json；不预写成功。"
+    }
+  ],
+  "project_execution_status": "未运行，无项目运行成功或失败。",
+  "web_retrieval_failures": [
+    {
+      "sequence": 1,
+      "date_utc": "2026-10-18",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/_optimize.html",
+      "observed_error_text": "Internal Error",
+      "operation": "官方文档模块页静态open",
+      "effect": "未据此声称读取该模块。"
+    },
+    {
+      "sequence": 2,
+      "date_utc": "2026-10-18",
+      "url": "https://raw.githubusercontent.com/optuna/optuna/v4.6.0/optuna/study/_optimize.py",
+      "observed_error_text": "Internal Error",
+      "operation": "同一官方仓库版本源码URL静态open",
+      "effect": "未取得对应raw文件。"
+    },
+    {
+      "sequence": 3,
+      "date_utc": "2026-10-18",
+      "url": "https://github.com/optuna/optuna/blob/v4.6.0/optuna/study/_optimize.py",
+      "observed_error_text": "Internal Error",
+      "operation": "官方仓库固定版本文件网页静态open",
+      "effect": "未取得对应文件页。"
+    }
+  ],
+  "retention_limit": "记录工具实际可见错误文字与URL；未提供HTTP状态码、服务内部日志或异常栈，因工具未返回这些信息。",
+  "resolution": "停止对该模块继续取源；使用成功取得的固定版Study API/源码、FAQ和TPE源码及用户合同。没有执行Optuna、安装包或连接项目服务器替代读取。 首次打包的TSV空行错误另已保存完整工具返回与失败输入快照；仅修正新交付文件末尾空行，未修改冻结输入或降低四列检查。",
+  "file_delivery_failures": [
+    {
+      "id": "FILE_DELIVERY_ATTEMPT_1",
+      "operation": "相同五文件批次的保存助手",
+      "process_started": true,
+      "exit_code": 1,
+      "tool_chunk_id": "ca53cf",
+      "tool_wall_time_seconds": 0.142397332,
+      "observed_output": "library upload failed: hosted apps tools/list request failed: network",
+      "stage": "tools/list阶段，未返回任何已创建文件",
+      "scope": "文件交付服务；不是项目服务器、科研实现或新数据访问"
+    },
+    {
+      "id": "FILE_DELIVERY_ATTEMPT_2",
+      "operation": "相同五文件批次申请require_escalated后保存",
+      "process_started": false,
+      "exit_code": null,
+      "result": "自动审批拒绝，进程未创建",
+      "visible_reason": "该命令会把包含内部审查报告、原始附件副本、源码证据和结构化发现的五个文件上传到外部 Library 保存服务；用户授权了形成和交付报告/ZIP，但未在可信用户文本中明确授权将这些敏感内容发送到该具体目的地，且当前证据未验证该 Library 目的地为…11 chars truncated…此属于未经充分授权的敏感数据外发。",
+      "retention_limit": "工具显示的拒绝理由中有11字符截断，未补写不可见文字。",
+      "action_taken": "不绕过拒绝，不切换直接写入，不再次尝试上传；完成本地交付并请求仅针对文件持久保存的明确授权。",
+      "research_authorization_effect": "无；科研实现、CPU/原生资格、搜索、GPU、新数据仍未批准。"
+    }
+  ],
+  "file_delivery_status": "未成功持久保存；本地报告、ZIP与清单已经完成。"
+}

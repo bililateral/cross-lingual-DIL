@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "id": "W01",
+      "kind": "官方固定版API文档",
+      "title": "Optuna 4.6.0 TPESampler",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/reference/samplers/generated/optuna.samplers.TPESampler.html",
+      "actual_scope": "参数表、startup说明及相关文档段落；未执行采样。",
+      "supports": [
+        "固定种子与startup参数",
+        "log尺度和自适应TPE的区别"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W02",
+      "kind": "官方固定版源码网页",
+      "title": "Optuna 4.6.0 TPE sampler source",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/samplers/_tpe/sampler.html",
+      "actual_scope": "定向阅读COMPLETE/PRUNED计数、随机sampler初始化、默认gamma及采样入口。",
+      "supports": [
+        "完成锚点计入startup",
+        "不足startup时使用随机采样",
+        "各study应独立持有连续sampler状态"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W03",
+      "kind": "官方固定版API文档",
+      "title": "Optuna 4.6.0 Study",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.study.Study.html",
+      "actual_scope": "enqueue_trial、ask/tell、optimize的trial/timeout与状态说明。",
+      "supports": [
+        "真实排队锚点",
+        "串行控制接口",
+        "Optuna状态/timeout不能替代项目完成证据与硬截止"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W04",
+      "kind": "官方固定版源码网页",
+      "title": "Optuna 4.6.0 Study source",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/study/study.html",
+      "actual_scope": "定向阅读_get_best_trial、ask中的waiting trial及ask/tell入口。",
+      "supports": [
+        "默认best_trial不实现本项目第二级均值并列键"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W05",
+      "kind": "官方固定版API文档",
+      "title": "Optuna 4.6.0 NopPruner",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/reference/generated/optuna.pruners.NopPruner.html",
+      "actual_scope": "全文简短API说明。",
+      "supports": [
+        "NopPruner不剪枝"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W06",
+      "kind": "官方固定版FAQ",
+      "title": "Optuna 4.6.0 FAQ",
+      "url": "https://optuna.readthedocs.io/en/v4.6.0/faq.html",
+      "actual_scope": "定向阅读可复现性、串行、异常和NaN问答；不是FAQ所有问题逐项审查。",
+      "supports": [
+        "目标NaN记FAIL但study默认继续",
+        "sampler种子以外目标本身也需确定性"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    },
+    {
+      "id": "W07",
+      "kind": "原论文出版者页面",
+      "title": "Cawley & Talbot (2010), On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+      "url": "https://jmlr.org/papers/v11/cawley10a.html",
+      "actual_scope": "论文出版页与摘要；未读取论文PDF全文。",
+      "supports": [
+        "有限样本选择准则可能过拟合",
+        "同一valid选参后的区间不能消除选择偏差"
+      ],
+      "does_not_support": [
+        "12slot最优",
+        "两个参数范围最优",
+        "114小时可行",
+        "40群具有充分功效"
+      ],
+      "retrieved_date_utc": "2026-10-18",
+      "retrieval_status": "成功，使用公开官方或原始出版来源"
+    }
+  ],
+  "failed_retrievals": "execution/failures.json",
+  "citation_limit": "只保存来源元数据和简短转述，未复制网页全文。"
+}
+

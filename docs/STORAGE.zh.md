@@ -8,6 +8,11 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-18 Optuna方案外审回收及主审
+
+已完整回收260847字节/22成员外审返回包；22外部成员、20内部载荷、内嵌原包及25输入载荷身份一致，见[回收核验/保管映射](../reports/documentation/20261018/optuna_plan/review/recovery.json)。保留21必要外审原件220049字节、外部身份/成员清单、最终网页、[主审](../reports/documentation/20261018/optuna_plan/review/primary_disposition.zh.txt)及[待确认实施稿](../reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt)。唯一原186342字节输入ZIP继续保留；冗余返回ZIP、浏览器重复包/清单、内嵌重复输入及下载临时记录共10文件按精确路径核对后清理，实际字节数见recovery。外审机械脚本如需重放，原输入路径映射已记录，不修改外审原件。专用页已确认无生成/待发内容并关闭。
+
+F05计费规格已补清，F06资源可行性未建立；本地预算补充和新实施稿尚未送外审。无新科学执行或Linux同步，材料仅Windows/本地Git；原proposal/ZIP/提交时点记录及已有依赖安装事实不追改。本次局部冗余清理不重置项目大清理周期。
 ## 2026-10-18 Optuna静态方案待审材料
 
 后续用户指出时间资格与集中评价计费两项缺口，已另存[预算补充](../reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt)，仅Windows保管/本地Git，尚未外发；原26成员输入包及原稿不改。当前9000秒/114小时可行性未建立，集中评价归已有3300秒共享段，详见补充。未新增Linux执行/同步/数据读取或依赖变更。
