@@ -1,0 +1,83 @@
+{
+  "review": "d007230b targeted cuBLAS workspace repair review",
+  "input": {
+    "name": "cublas_workspace_review.zip",
+    "bytes": 459440,
+    "members": 111,
+    "sha256": "5a35e220d570779f88418385682bf22e64a9bf5b016a1cea78f2586335b768e7"
+  },
+  "decision": {
+    "R03": "CLOSED_IN_STATIC_IMPLEMENTATION_SCOPE",
+    "implementation_ready_to_prepare_pending_approval_native_qualification": true,
+    "open_specific_implementation_blockers": 0,
+    "new_scientific_blockers": 0,
+    "unchanged_math_revalidated": false,
+    "native_execution_authorized": false,
+    "native_execution_passed": false,
+    "formal_execution_authorized": false,
+    "formal_performance_established": false,
+    "executor_independent_disposition_required": true
+  },
+  "findings": [
+    {
+      "id": "R03",
+      "title_zh": "cuBLAS/cuBLASLt 工作区释放遗漏已修复",
+      "severity": "CLOSED_PREVIOUS_P1",
+      "category": "execution_and_reproducibility",
+      "locations": ["scripts/step28_positive_ranking_verify.py:25-34,55-76,301-327", "tests/test_step28_positive_ranking.py:312-377", "PyTorch v2.9.1 torch/csrc/cuda/Module.cpp:1537-1543,1967-1970", "PyTorch v2.9.1 aten/src/ATen/cuda/CublasHandlePool.cpp:110-123,228-257,303-307"],
+      "evidence_zh": "首臂成功返回并登记后，第二臂 native 在 fresh 前执行 collect/synchronize/专用clear/empty_cache/零内存检查。固定版本 Python 绑定直接调用清空两张工作区 map 的 C++ 函数；测试对省略 clear 的生产预检作拒绝反例。当前40来源与CPU05对应。",
+      "impact_zh": "前审已知库持有残留不再构成当前静态必败路径。没有认证项目二进制或实测 CUDA 归零。",
+      "minimum_fix_zh": "当前修复已足够，无新增修复或额外实验要求。",
+      "evidence_level": "actual source paths + fixed-version upstream text + source-bound saved CPU mock evidence; no reviewer project execution"
+    },
+    {
+      "id": "R02",
+      "title_zh": "首臂严格门与后续精确自身 PID 例外保持",
+      "severity": "CLOSED_RETAINED",
+      "category": "execution_contract",
+      "locations": ["scripts/step28_positive_ranking_verify.py:25-52,301-327", "scripts/step28_record_replay_verify.py:23-41", "tests/test_step28_positive_ranking.py:344-373"],
+      "evidence_zh": "首臂严格preflight不调用clear；其他PID/相关作业、非零独立allocated/reserved、GPU/主存阈值仍拒绝；新调用处于第二臂和总计时内，native/main AST均未改变。",
+      "impact_zh": "R03关闭后，前审第二臂准入的具体实现缺口整体关闭；实际运行资源门仍须未来获批后实测。",
+      "minimum_fix_zh": "无。"
+    },
+    {
+      "id": "R01",
+      "title_zh": "A 空缓存评分关闭结论保留",
+      "severity": "CLOSED_UNAFFECTED",
+      "category": "scoring_and_diagnostics",
+      "locations": ["scripts/step28_positive_ranking.py:132-155", "tests/test_step28_positive_ranking.py:test_stage_a_empty_cache", "changes.patch"],
+      "evidence_zh": "评分模块逐字节未变；身份验证先于空(0,378)FP32返回，非空原S/H评分不变；A/B诊断及编排测试是本轮六项未变证据复用。",
+      "impact_zh": "没有本次引入的空缓存回归或评分数学改变；未重复执行原测试。",
+      "minimum_fix_zh": "无；不把复用表述成重跑。"
+    },
+    {
+      "id": "W01",
+      "title_zh": "来源与CPU05账对应通过",
+      "severity": "PASS_OBSERVATION",
+      "category": "evidence_correspondence",
+      "locations": ["changes.patch", "history/initial_repair.patch", "qualification/cpu_gate_workspace.json", "qualification/cpu/attempt01-05", "qualification/deployment05.json", "qualification/receive05.json"],
+      "evidence_zh": "两文件精确patch、三时点40来源、CPU01–05原件对应；当前38来源不变，6项复用+1项执行；外层52/300、新增真实optimizer0、累计22；41部署记录和5回传记录匹配包内字节。",
+      "impact_zh": "现有资格证据能够对应当前实现；不构成项目主机或后台身份认证。",
+      "minimum_fix_zh": "无。"
+    },
+    {
+      "id": "W02",
+      "title_zh": "原生与正式证据仍未产生",
+      "severity": "LIMITATION_NOT_BLOCKER",
+      "category": "authorization_and_inference_boundary",
+      "locations": ["review/workspace/authorization.json", "qualification/cpu_gate_workspace.json:244-251", "qualification/cpu/attempt05/result/native_continuation_preflight.json", "docs/SELLER_ALIAS_POSITIVE_RANKING.zh.md:33-55"],
+      "evidence_zh": "全部系统/CUDA测试状态为手写mock，实际GPU0；本轮没有项目执行、数学实验、模型/Memory或正式数据读取。",
+      "impact_zh": "实现可准备待批准原生资格，与用户批准、原生实测通过及正式性能达标分别独立。",
+      "minimum_fix_zh": "无新增当前试验要求；未来按既有合同获批后由主执行者在项目Linux执行。"
+    }
+  ],
+  "additional_required_repairs": [],
+  "optional_research_suggestions": [],
+  "out_of_scope": ["New candidates/seeds/grids/data", "Repeated full mathematical or project audit", "Generic subprocess/CUDA management framework", "Unrelated security hardening", "Relaxed numerical or zero-memory thresholds", "Extra GPU calls or full retraining"],
+  "reviewer_mechanical_failures": {
+    "count": 2,
+    "reason": "Receipt list shape and Windows path separator handling in this reviewer helper; archived, corrected, final mechanical check passed",
+    "project_failures_added": 0,
+    "project_cpu_budget_changed": false
+  }
+}

@@ -1,0 +1,127 @@
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/repair/external/report.zh.txt
+  102 ## 四、首臂返回后的所有权与两臂独立起点
+  103 
+  104 这一部分专门区分 Python 业务对象与库内部工作区，避免把两者混为一个“显存没清”。
+  105 
+  106 | 对象/入口 | 实际保存或返回的内容 | 对首臂 CUDA 生命周期的判断 |
+  107 | --- | --- | --- |
+  108 | native 内 model、optimizer、probes | 函数局部对象，probes 指向模型参数 | 未加入返回 report；函数成功返回后离开该调用作用域 |
+  109 | updated 的 captured 表与 objective 回调 | 临时捕获 GPU 表，供局部表/梯度检查 | 没有从 native 返回回调或原始表 |
+  110 | gradients 与 state | 参数梯度显式 detach().cpu().clone；state 递归 cpu_copy | 对应保存副本在 CPU；未把参数张量作为报告载荷 |
+  111 | component_effects、Adam 差异与表检查 | 浮点数、字符串、列表、布尔、维度/计数 | 没有返回原参数或 GPU 梯度 |
+  112 | RNG 元数据 | RNG 状态转为列表/标量 | 不形成返回报告中的 CUDA 张量根 |
+  113 | native_save / restore | 保存身份、SHA 和元数据；恢复局部载荷在 CPU | 返回值不是模型/optimizer state_dict 的 GPU 对象 |
+  114 | main 的 report.arms、计时闭包 | native 返回的测量值、身份、判定和预算状态 | 没有捕获首臂模型或 optimizer |
+  115 | PyTorch cuBLAS workspace map | C++ 持有的 at::DataPtr | 不属于上述 Python 清理范围，须按 R03 单独释放 |
+  116 
+  117 定位依据：positive_verify 第 82–110、126、153、170、205–211 行；g_half_verify 第 29–31、44–120 行；record_replay_numerics 第 45–52 行；bge_continual_run 第 58–71 行；continual_population 第 182–210 行。未返回的局部循环引用可由下一臂 gc.collect 处理。本结论只覆盖所追踪的实际业务返回路径，不把它外推为“所有原生库都已无内存”。[P5–P8]
+  118 
+  119 独立起点仍通过 checked_fresh 为每臂调用各自的 pretrained_archive/fresh。fresh 重置 Python/NumPy 随机起点，load_model 在 encoder/head 初始化前设定 torch seed，重新创建模型和 AdamW；native 对初始模型及空 Adam 身份作硬比较。第二臂不是从首臂 checkpoint 接着训练。两臂处于同一进程会共享库上下文和工作区，恰好说明清理 R03 与“模型独立初始化”是两个不同层面的要求。[P5、P7–P9]
+  120 
+  121 正式入口每臂自身的 A→B、Memory 从空开始及后续继承没有在本次 patch 中改变。未新增读取 Memory、训练、保存恢复实测或出生表重算；这些结论是入口静态追踪与未变源码绑定，不是新增正式证据。
+
+FILE reports/documentation/20261016/positive_ranking_implementation/review/repair/external/findings.json
+    1 {
+    2   "review_scope": "38d05b9a repair package; independent targeted static re-review; no project execution or subagents",
+    3   "input_sha256": "2910ad3d7cea62a334e2fd3d3912dc9b5a9ae163b133111f2e48f783b47b92af",
+    4   "current_implementation_ready_for_pending_approval_native_qualification": false,
+    5   "native_approved_by_this_review": false,
+    6   "native_pass_observed": false,
+    7   "performance_claim": "None; no formal S_pos/H_pos effects",
+    8   "open_execution_blocker_count": 1,
+    9   "new_mathematical_blocker_count": 0,
+   10   "unchanged_math_revalidated": false,
+   11   "findings": [
+   12     {
+   13       "id": "R01",
+   14       "title_zh": "A 阶段空缓存评分入口修复",
+   15       "classification": "closed_previous_execution_defect",
+   16       "severity": "CLOSED",
+   17       "status": "closed",
+   18       "locations": ["scripts/step28_positive_ranking.py:132-155", "scripts/step28_replay_diagnostics.py:31-129", "scripts/step28_g_half_run.py:177-196,333-350", "tests/test_step28_positive_ranking.py:282-310,408-411"],
+   19       "evidence_zh": "实际 A train_stage→capture→score 的空 cache 分支先验证臂身份，再返回 NumPy (0,378) FP32；非空仍委托原 S/H。新增两臂生产诊断检查 48/0/40、(0,3) FP64 缓存指标、空身份/域/教师及状态/RNG/模式中性；原 record.score 空输入异常直接作为反例。编排空分支也转调生产 score。",
+   20       "impact_zh": "关闭 A 首次诊断因空 cache 堆叠异常而必然中断的问题。",
+   21       "minimum_fix_zh": "无新增修复要求；继续明示每臂 1 次实际轻量更新后把 Adam 时钟置 48，不能冒称完成 48 次更新。",
+   22       "observed_by_reviewer": "static paths and saved fields only; supplied CPU PASS not rerun"
+   23     },
+   24     {
+   25       "id": "R02",
+   26       "title_zh": "原生后续臂的精确自身 PID 例外",
+   27       "classification": "partially_closed_previous_execution_defect",
+   28       "severity": "PARTIAL_CLOSURE",
+   29       "status": "PID_clause_closed_end_to_end_readiness_depends_on_R03",
+   30       "locations": ["scripts/step28_positive_ranking_verify.py:25-59,300-326", "scripts/step28_record_replay_verify.py:23-41", "tests/test_step28_positive_ranking.py:312-353"],
+   31       "evidence_zh": "main 首臂 report.arms 为空，沿严格 preflight；首臂成功返回并预算检查后登记结果，第二臂才传 continuing=True。仅精确整数自身 PID 被豁免，其他 PID/作业及资源门保留。native 返回的是身份/标量/测量，不返回模型、optimizer、回调或 GPU 表；下一臂清理入口可达。",
+   32       "impact_zh": "自身 CUDA 上下文被误作外来作业的子问题已修。Python 层未发现报告持有首臂 CUDA 模型；完整第二臂准入仍因 R03 未闭。",
+   33       "minimum_fix_zh": "保留当前严格首臂及精确 PID 逻辑，按 R03 补全库工作区清理；不另计一个新阻断。",
+   34       "observed_by_reviewer": "static call path and ownership review; CUDA/system preflight evidence is supplied handwritten mock only"
+   35     },
+   36     {
+   37       "id": "R03",
+   38       "title_zh": "继续臂零分配门之前缺少 cuBLAS 工作区释放",
+   39       "classification": "execution_and_reproducibility_blocker",
+   40       "severity": "P1",
+   41       "status": "open",
+   42       "locations": ["scripts/step28_positive_ranking_verify.py:29-33,73-105", "scripts/step28_record_replay.py:102-127,159-180", "scripts/step28_continual_population.py:14-29", "scripts/step28_bge_continual.py:31-47", "tests/test_step28_positive_ranking.py:312-353", "PyTorch v2.9.1 aten/src/ATen/cuda/CublasHandlePool.cpp:110-123,228-257,291-307,330-354"],
+   43       "evidence_zh": "包申报 PyTorch 2.9.1+cu130 且固定非零 :4096:8 工作区；实际首臂执行 CUDA Linear/矩阵乘法。对应上游源码用 CUDACachingAllocator 分配工作区并以持久 C++ map 的 at::DataPtr 持有。gc.collect/synchronize/empty_cache 不解除该持有，当前 allocated/reserved==0 门会拒绝。现有 mock 直接预设分配为 0，未建模专用 clear 才解除的持有状态。",
+   44       "impact_zh": "在申报版本和配置的正常 CUDA 路径下，第二臂在自身 PID 检查之前因残留库分配失败，双臂原生资格无法完整执行。此为静态推断，未实测项目 GPU，未认证项目二进制，也未声称模型泄漏或性能失败。",
+   45       "minimum_fix_zh": "继续臂依次 gc.collect、CUDA synchronize、torch._C._cuda_clearCublasWorkspaces()、empty_cache，再保留现有零 allocated/reserved、PID、阈值和作业门。现有定向 mock 加入 clear 前正数/clear 后释放的状态和顺序断言；更新源绑定并由主执行者在原许可/预算内处置。不得改 :4096:8 数值配置、放宽零门或增加 GPU 次数。",
+   46       "primary_sources": ["https://docs.pytorch.org/docs/2.9/notes/cuda.html", "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp"],
+   47       "upstream_source_sha256": "e43440cfc3c89e9252d07e812e05c40c315283e4e9d33069b6c196ccdb24a786",
+   48       "observed_by_reviewer": "version-pinned static dependency proof plus actual project source path; no CUDA execution"
+   49     }
+   50   ],
+   51   "not_current_blockers": ["No approved or executed native GPU trial yet", "No formal performance effect yet", "User-selected H_pos secondary arm", "Declared single-seed/repeated-development-set limitations"],
+   52   "out_of_scope_overengineering": ["Extra grids, seeds or candidates", "Independent data or full retraining", "Changed numerical definition or loosened tolerances", "Recomputation of old results", "Generic subprocess/testing framework", "Unrelated security hardening", "Repeated broad audits"],
+   53   "executor_disposition": "Primary executor independently adjudicates; review grants no native/formal authorization."
+   54 }
+
+FILE scripts/step28_g_half_run.py
+   20 
+   21 import step28_g_half as method
+   22 import step28_balanced_pooling_run as saved
+   23 import step28_replay_diagnostics as diag
+   24 import step28_record_replay_run as legacy
+   25 
+   26 record, data = method.record, method.data
+   27 parent, core = record.parent, record.core
+   28 base, previous = record.base, legacy.previous
+   29 POLICY = data.ROOT / "schema/step28_g_half_policy.json"
+   30 BASELINE = data.ROOT / "reports/documentation/20261015/g_refinement/baseline_sources.json"
+   31 AUTHORIZATION = data.ROOT / "reports/documentation/20261015/g_half_implementation/authorization.json"
+   32 POINTS = ("A_G_half", "B_G_half")
+   33 COMPLETE = "COMPLETE_576_UPDATES_2_RESTORES_12_DIAGNOSTICS_VALID_BLIND"
+   34 # These data/metric helpers retain their closed S/G/F semantics; no old training/qualification entry is invoked.
+   35 public_inputs, attach_labels, partition = saved.public_inputs, saved.attach_labels, saved.partition
+   36 query_metrics, undefined_metrics = saved.query_metrics, saved.undefined_metrics
+   37 pooled_rates, summarize = saved.pooled_rates, saved.summarize
+   38 fresh, verify_archive, pretrained_archive = saved.fresh, saved.verify_archive, saved.pretrained_archive
+   39 
+   40 
+   41 def policy() -> dict:
+   42     p = data.read_json(POLICY)
+
+FILE scripts/step28_continual_population.py
+   32 def make_optimizer(model: Any, config: dict) -> Any:
+   33     import torch
+   34     p = config["optimizer"]
+   35     return torch.optim.AdamW(
+   36         [{"params": model.encoder.parameters(), "lr": p["encoder_lr"],
+   37           "weight_decay": p["encoder_weight_decay"]},
+   38          {"params": model.head.parameters(), "lr": p["head_lr"],
+   39           "weight_decay": p["head_weight_decay"]}],
+   40         betas=tuple(p["betas"]), eps=p["eps"], foreach=p["foreach"])
+   41 
+
+FILE scripts/step28_record_replay_numerics.py
+   45 def cpu_copy(value):
+   46     if isinstance(value, torch.Tensor):
+   47         return value.detach().cpu().clone()
+   48     if isinstance(value, dict):
+   49         return {k: cpu_copy(v) for k, v in value.items()}
+   50     if isinstance(value, (list, tuple)):
+   51         return type(value)(cpu_copy(v) for v in value)
+   52     return copy.deepcopy(value)
+   53 
+   54 

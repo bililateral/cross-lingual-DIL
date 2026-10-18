@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-18 回收cuBLAS复审，并批准条件式原生/正式执行
+
+用户原话：“外审已结束，把审查结果完整同步回来，仔细分析并独立主审，详细汇报 R03 是否真正关闭、是否还有进入原生资格前的实现阻断。没有问题的话就开始原生GPU校验，资源条件满足和GPU校验通过后开始正式训练”。本轮完整回收66成员并独立主审关闭R03，剩余具体阻断0；[执行授权](../reports/documentation/20261016/positive_ranking_implementation/qualification/execution_authorization.json)绑定原合同及40来源，批准唯一原生1200秒/12调用，原生实证/资源投影与现场门通过后唯一正式57600秒/16GiB。旧“未批准”不再是当前阻断，CPU52秒/原失败及原判据不追改。
+
+13:28现场发现其他用户CUDA进程，不能启动；按已有一次性等待规则部署新独立workspace，163文件1982089字节回读一致，52已开放对照原件核对，7正式文件只查存在、不解析。13:36:50启动唯一监听788758，13:37:10核对进程归属/cwd/CPU0和等待状态。监听只执行原合同顺序：资源满足→原生一次→实际证据/外层预算/投影核对→正式入口再次验证→正式一次；失败停，首个实际正式更新确认后删除监听源码。没有停止其他用户作业、扩大权限或另建重复队列。见[独立主审](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt)和[现场观测](../reports/documentation/20261016/positive_ranking_implementation/qualification/queue_observation.json)。
+
 ## 2026-10-18 cuBLAS修复后继续定向外审
 
 用户原话：“修复后继续提交外审审查，交代清楚背景上下文”。这是对当前最小修复版及必要背景再次外发至原GPT 6 Pro会话的明确许可，不扩展GPU、正式数据或训练权限。已准备并核对d007230b的40来源、两文件差异、CPU01—05及原审背景，形成459440字节/111成员包；[完整请求](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/submitted_request.zh.txt)交代S/H/H_cons历史、用户选双臂、前审R01/R02/R03、52/300秒账、反例与真实CUDA边界，限制为定向静态和机械审查。12:27:45经本地Playwright单次上传/发送，选择器GPT-6、Pro第5档，12:27:57收到明确接收；[提交回执](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/submission.json)及原页面保留，尚无最终裁决。本轮未新增科研执行，新材料仅本地Git；旧审查/失败/主审原件不追改。

@@ -1,0 +1,303 @@
+
+FILE scripts/step28_g_half_verify.py
+    1 """Cumulative Linux handwritten CPU/native qualification; no formal inputs."""
+    2 from __future__ import annotations
+    3 
+    4 import time
+    5 import os
+    6 import math
+    7 STARTED = time.monotonic()-max(0.,time.time()-float(os.environ.get("QUALIFICATION_STARTED_EPOCH",time.time())))
+    8 
+    9 import argparse
+   10 import gc
+   11 from pathlib import Path
+   12 import shutil
+   13 import sys
+   14 import threading
+   15 import traceback
+   16 import unittest
+   17 
+   18 import numpy as np
+   19 import psutil
+   20 import torch
+   21 
+   22 import step28_g_half_run as run
+   23 from step28_record_replay_verify import preflight
+   24 from step28_record_replay_numerics import cpu_copy, equal_state
+   25 
+   26 method, record, diag, core, data = run.method, run.record, run.diag, run.core, run.data
+   27 
+   28 
+   29 def state(model, optimizer):
+   30     return cpu_copy({"model": model.state_dict(), "adam": optimizer.state_dict(),
+   31                      "grads": [p.grad for p in model.parameters()]})
+   32 
+   33 
+   34 def restore(model, optimizer, saved, rng, modes):
+   35     model.load_state_dict(saved["model"])
+   36     optimizer.load_state_dict(cpu_copy(saved["adam"]))
+   37     for p, g in zip(model.parameters(), saved["grads"], strict=True):
+   38         p.grad = None if g is None else g.to(p.device)
+   39     for m, mode in zip(model.modules(), modes, strict=True):
+   40         m.training = mode
+  107 def checked_fresh(c):
+  108     archive = run.pretrained_archive(c)
+  109     model, optimizer, initial = run.fresh(c)
+  110     return model, optimizer, initial, archive
+  111 
+  112 
+  113 def disk_reserve(path, total, reserve, maximum):
+  114     if total+reserve > maximum or shutil.disk_usage(path).free < reserve:
+  115         raise RuntimeError("Qualification checkpoint reserve exceeds available disk or approved work bytes")
+  116 
+  117 
+  118 def native_save(path, model, optimizer, metadata, check):
+  119     check(run.base.persistence.checkpoint_reserve(model, optimizer))
+  120     return core.save_state(path, model, optimizer, metadata)
+  121 
+
+FILE scripts/step28_balanced_pooling_run.py
+  355 def fresh(c):
+  356     random.seed(c["initialization_seed"])
+  357     np.random.seed(c["initialization_seed"])
+  358     model = record.load_model(c)
+  359     optimizer = core.make_optimizer(model, c)
+  360     identity = {"model": core.state_digest(model.state_dict()), "adam": core.state_digest(optimizer.state_dict())}
+  361     return model, optimizer, identity
+  362 
+  363 
+  364 def verify_archive(archive: dict, c: dict) -> dict:
+  365     expected = c["models"]["split_rank"]
+  366     if not isinstance(archive, dict) or any(archive.get(k) != expected[k]
+  367             for k in ("file_count", "total_size_bytes", "content_sha256")):
+  368         raise ValueError("Pinned BGE archive differs or is missing")
+  369     return archive
+  370 
+  371 
+  372 def pretrained_archive(c: dict) -> dict:
+  373     return verify_archive(core.model_files(base.model_config(c, "split_rank")), c)
+  374 
+  375 
+  376 def train(job, budget):
+  377     import torch
+  378     root = job/"run"
+  379     for sub in ("models", "work", "memory", "points", "scores", "maps", "updates", "diagnostics", "sources"):
+
+FILE scripts/step28_chinese_base.py
+  110 def load_model(c: dict, arm: str, device: str = "cuda:0") -> Any:
+  111     import torch
+  112     from sentence_transformers import SentenceTransformer
+  113     m = c["models"][arm]
+  114     torch.manual_seed(c["initialization_seed"])
+  115     encoder = SentenceTransformer(str(data.ROOT / m["path"]), device=device,
+  116                                   local_files_only=True, trust_remote_code=False)
+  117     encoder.default_prompt_name = None
+  118     encoder.max_seq_length = c["input"]["token_budget"]
+  119     pools = [v for v in encoder if type(v).__name__ == "Pooling"]
+  120     has_dense = any(type(v).__name__ == "Dense" for v in encoder)
+  121     if len(pools) != 1 or has_dense != m["dense_module"]:
+  122         raise ValueError("Native encoder modules differ from the registered model")
+  123     pool = pools[0]
+  124     if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+  125         raise ValueError("Native pooling or output dimension differs")
+  126     if c["input"]["activation_checkpointing"]:
+  127         encoder[0].auto_model.gradient_checkpointing_enable(
+  128             gradient_checkpointing_kwargs={"use_reentrant": False, "preserve_rng_state": True})
+  129     torch.manual_seed(c["initialization_seed"])
+  130     return core.build_model(encoder, c["interventions"][arm]["account_dim"],
+  131                             c["input"]["head_hidden"]).to(device)
+  132 
+  133 
+
+FILE scripts/step28_positive_ranking.py
+    1 """Fixed S_pos/H_pos objectives on the existing record VJP; no data entry."""
+    2 from __future__ import annotations
+    3 
+    4 import hashlib
+    5 from typing import Any
+    6 
+    7 import numpy as np
+    8 import torch
+    9 
+   10 import step28_g_half as h
+   11 
+   12 record, data = h.record, h.data
+   13 ARMS = ("S_pos", "H_pos")
+   14 RNG_ORDER = "ABC"
+   15 
+   16 
+   17 def identity(arm: str) -> dict:
+   18     if arm not in ARMS:
+   19         raise ValueError("Only fixed S_pos/H_pos candidates are supported")
+   20     if arm == "H_pos":
+   21         return h.identity()
+   22     return dict(arm="S", pooling="complete_record_mean", record_order="canonical_offdiagonal_upper_v1",
+   23                 output_dtype="float32", numerics="original_FP32_matrix_mean")
+   24 
+   25 
+   26 def training_identity(arm: str) -> dict:
+   27     identity(arm)
+   28     return dict(arm=arm, rank="mean_positive_logsumexp_zero_and_all_negative_differences",
+   29                 temperature=1., queries=28, candidates=27, positive_counts=[1, 2],
+   30                 reduction="mean_positive_then_mean_query", precision="actual_FP32_logits_FP32_rank",
+   31                 current_supervision=1., history_supervision=.1, teacher_A0=.5, hard_weight=.5,
+   32                 optimizer="AdamW", rng_order=RNG_ORDER)
+   33 
+   34 
+   35 def metadata(arm: str) -> dict:
+   36     return dict(pooling=identity(arm), training=training_identity(arm))
+   37 
+   38 
+   39 def bind(model: Any, meta: dict) -> str:
+   40     arm = meta.get("training", {}).get("arm")
+   41     if any(meta.get(k) != v for k, v in metadata(arm).items()):
+   42         raise ValueError("Candidate scoring/training identity mismatch")
+   43     model.pooling_identity, model.training_identity = identity(arm), training_identity(arm)
+   44     return arm
+   45 
+   46 
+   47 def bound_arm(model: Any) -> str:
+   48     return bind(model, dict(pooling=getattr(model, "pooling_identity", None),
+   49                             training=getattr(model, "training_identity", None)))
+   50 
+   51 
+   52 def account_logits(table: Any, slots: np.ndarray, arm: str) -> Any:
+   53     identity(arm)
+   54     return (record.account_logits(table, slots) if arm == "S_pos"
+   55             else h.account_logits(table, slots, "G_half"))
+  127             result[role]["assignment_sha256"] = hashlib.sha256(record.assignment(group, seed).tobytes()).hexdigest()
+  128     result.update(metadata(arm))
+  129     return result
+  130 
+  131 
+  132 def score(model: Any, groups: list, c: dict, arm: str, check=lambda: None) -> np.ndarray:
+  133     if bound_arm(model) != arm:
+  134         raise ValueError("Scoring candidate differs from restored training identity")
+  135     if not groups:
+  136         return np.empty((0, 378), np.float32)
+  137     return (record.score(model, groups, c, check) if arm == "S_pos"
+  138             else h.score(model, groups, c, "G_half", check))
+  139 
+  140 
+  141 def restored_score(model: Any, groups: list, c: dict, check=lambda: None) -> np.ndarray:
+  142     return score(model, groups, c, bound_arm(model), check)
+  143 
+  144 
+  145 def capture(model: Any, optimizer: Any, current: list, memory: Any, valid: list, c: dict,
+  146             arm: str, stage: int, epoch: int, root, point: str, check=lambda: None) -> dict:
+  147     import step28_replay_diagnostics as diag
+  148     result = diag.capture(model, optimizer, current, memory, valid, c, arm, RNG_ORDER, stage, epoch,
+  149         root, point, check, scope="AB", score_fn=score,
+  150         pooling_fn=lambda table, slots, group, view: account_logits(table, slots, arm))
+  151     path = root/result["path"]
+  152     row = data.read_json(path)
+  153     row.update(metadata(arm))
+  154     data.write_json(path, row)
+  155     return data.record(path, root)
+
+FILE scripts/step28_bge_continual.py
+   31 def configure_numerics() -> dict:
+   32     """Apply the historical LOGIT runtime before model work; read back actual flags."""
+   33     import torch
+   34     if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
+   35         raise RuntimeError("Start Python with CUBLAS_WORKSPACE_CONFIG=:4096:8")
+   36     torch.use_deterministic_algorithms(True)
+   37     torch.backends.cuda.matmul.allow_tf32 = False
+   38     torch.backends.cudnn.allow_tf32 = False
+   39     torch.backends.cudnn.benchmark = False
+   40     return {
+   41         "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+   42         "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+   43         "cuda_matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32,
+   44         "cudnn_allow_tf32": torch.backends.cudnn.allow_tf32,
+   45         "cudnn_benchmark": torch.backends.cudnn.benchmark,
+   46         "cublas_workspace_config": os.environ["CUBLAS_WORKSPACE_CONFIG"],
+   47     }
+
+FILE scripts/run_step28_positive_ranking_linux_20261018.sh
+    1 #!/usr/bin/env bash
+    2 set -euo pipefail
+    3 export RECORD_REPLAY_STARTED_EPOCH="$(date +%s)"
+    4 cd "$(dirname "$0")/.."
+    5 cpu="$1"
+    6 gate="$2"
+    7 job="$3"
+    8 test ! -e "$job"
+    9 test -d "$(dirname "$job")"
+   10 export CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+   11 export CUBLAS_WORKSPACE_CONFIG=:4096:8 TOKENIZERS_PARALLELISM=false PYTHONDONTWRITEBYTECODE=1
+   12 # Wrapper and interpreter startup, validation, and TERM grace are inside one deadline.
+   13 limit=$(/home/yongpeng/miniconda3/envs/py310/bin/python -c 'import json; p=json.load(open("schema/step28_positive_ranking_policy.json")); r=p["runtime"]; assert r["maximum_gpu_stage_seconds"]==57600; print(r["maximum_gpu_stage_seconds"])')
+   14 remaining=$((RECORD_REPLAY_STARTED_EPOCH + limit - $(date +%s) - 5))
+   15 test "$remaining" -gt 0
+   16 date -Is > "$job.wrapper.txt"
+   17 set +e
+   18 timeout --signal=TERM --kill-after=5 "$remaining" taskset -c "$cpu" /home/yongpeng/miniconda3/envs/py310/bin/python \
+   19   scripts/step28_positive_ranking_run.py --job "$job" --gate "$gate" > "$job.console.txt" 2>&1
+   20 status=$?
+   21 printf 'exit_code=%s\n' "$status" >> "$job.wrapper.txt"
+   22 date -Is >> "$job.wrapper.txt"
+   23 exit "$status"
+
+FILE reports/documentation/20261016/positive_ranking_implementation/qualification/cpu_wrapper.py
+    1 """Linux CPU wallclock wrapper; all attempts count against the approved 300 s."""
+    2 import json
+    3 import math
+    4 import os
+    5 from pathlib import Path
+    6 import subprocess
+    7 import sys
+    8 import time
+    9 
+   10 started = float(os.environ['QUALIFICATION_STARTED_EPOCH'])
+   11 root, prior = Path(sys.argv[1]).resolve(), float(sys.argv[2])
+   12 if os.name != 'posix' or root.exists() or prior < 0 or prior >= 300:
+   13     raise ValueError('Linux, independent attempt and remaining cumulative budget required')
+   14 root.mkdir(parents=True)
+   15 command = ['taskset','-c','0','/home/yongpeng/miniconda3/envs/py310/bin/python',
+   16            'scripts/step28_positive_ranking_verify.py','cpu','--output',str(root/'result'),
+   17            '--prior-seconds',str(prior),*sys.argv[3:]]
+   18 receipt = dict(command=command, started_epoch=started, prior_charged_seconds=prior,
+   19                deadline_epoch=started+300-prior, scope='Handwritten CPU only; no formal inputs/model links')
+   20 with (root/'console.txt').open('w',encoding='utf-8') as output:
+   21     process=subprocess.Popen(command,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
+   22     receipt['pid']=process.pid
+   23     try:
+   24         process.wait(timeout=max(.01,started+300-prior-time.time()-5))
+   25     except subprocess.TimeoutExpired:
+   26         import signal
+   27         os.killpg(process.pid,signal.SIGTERM)
+   28         try:process.wait(timeout=5)
+   29         except subprocess.TimeoutExpired:
+   30             os.killpg(process.pid,signal.SIGKILL);process.wait()
+   31         receipt['timeout']=True
+   32 receipt.update(exit_code=process.returncode,elapsed_seconds=time.time()-started)
+   33 receipt['charged_seconds']=math.ceil(receipt['elapsed_seconds'])
+   34 receipt['cumulative_charged_seconds']=prior+receipt['charged_seconds']
+   35 (root/'wallclock.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8')
+   36 print(json.dumps(receipt),flush=True)
+   37 sys.exit(process.returncode)
+
+FILE reports/documentation/20261016/positive_ranking_implementation/authorization.json
+    1 {
+    2   "status": "APPROVED_DUAL_IMPLEMENTATION_CPU",
+    3   "recorded_date": "2026-10-18",
+    4   "user_quote": "把两个都实现了，对比看看效果",
+    5   "question_context": "候选确认问题明确：前两项均仅批准对应代码实现及Linux既有py310手写CPU核验累计≤300秒；不读取正式文本/标签、不加载BGE或旧Memory，GPU资格和正式训练另按具体合同批准。",
+    6   "scope_source": "reports/documentation/20261016/s_improvement/implementation_scope.zh.txt",
+    7   "methods": ["S_pos", "H_pos"],
+    8   "cpu_seconds": 300,
+    9   "cpu_threads": 1,
+   10   "maximum_rss_bytes": 2147483648,
+   11   "maximum_evidence_bytes": 67108864,
+   12   "formal_inputs": false,
+   13   "formal_labels": false,
+   14   "bge_loading": false,
+   15   "old_memory_loading": false,
+   16   "gpu_execution": false,
+   17   "formal_training": false,
+   18   "new_package_external_transmission": false,
+   19   "within_budget_explicit_code_or_fixture_repairs": true,
+   20   "historical_failed_attempts_must_be_retained": true,
+   21   "git_delivery": "local_only"
+   22 }

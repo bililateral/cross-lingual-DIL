@@ -1,0 +1,28 @@
+{
+  "scope": "This reviewer administrative JSON/path handling only; no supplied project file or scientific code changed.",
+  "attempts": [
+    {
+      "attempt": 1,
+      "directory": "evidence/field_checks_attempt01",
+      "status": "failed",
+      "reason": "Historical receive04.json uses a top-level list; helper originally expected an object containing files.",
+      "minimal_repair": "Accept both observed list and object receipt formats."
+    },
+    {
+      "attempt": 2,
+      "directory": "evidence/field_checks_attempt02",
+      "status": "failed",
+      "reason": "The same historical receipt records Windows backslash paths; helper initially looked for them literally in the POSIX extracted tree.",
+      "minimal_repair": "Normalize recorded separators to ZIP relative POSIX paths for matching, retain the original recorded_path alongside it."
+    },
+    {
+      "attempt": 3,
+      "directory": "evidence/field_checks",
+      "status_source": "result.json operation.exit_code"
+    }
+  ],
+  "scientific_computation": false,
+  "project_test_failures_added": 0,
+  "project_cpu_ledger_changed": false,
+  "original_failed_scripts_and_logs_retained": true
+}

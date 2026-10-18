@@ -1,0 +1,430 @@
+
+FILE scripts/step28_positive_ranking_verify.py
+    1 """Bounded dual positive-rank CPU/native qualification; no formal data."""
+    2 from __future__ import annotations
+    3 from step28_g_half_verify import STARTED, state, restore, component_effects, checked_fresh, disk_reserve, native_save
+    4 import argparse
+    5 import gc
+    6 import math
+    7 import os
+    8 import shutil
+    9 import subprocess
+   10 from pathlib import Path
+   11 import sys
+   12 import threading
+   13 import time
+   14 import traceback
+   15 import unittest
+   16 import numpy as np
+   17 import psutil
+   18 import torch
+   19 import step28_positive_ranking_run as run
+   20 from step28_record_replay_verify import preflight
+   21 from step28_record_replay_numerics import equal_state
+   22 method,record,diag,core,data=run.method,run.record,run.diag,run.core,run.data
+   23 
+   24 
+   25 def native_preflight(continuing: bool = False) -> dict:
+   26     if not continuing:
+   27         return preflight()
+   28     # The completed first arm leaves a CUDA context, but no live model/state may survive.
+   29     gc.collect()
+   30     torch.cuda.synchronize()
+   31     torch._C._cuda_clearCublasWorkspaces()
+   32     torch.cuda.empty_cache()
+   33     if torch.cuda.memory_allocated() or torch.cuda.memory_reserved():
+   34         raise ValueError("Previous arm still owns live/reserved CUDA tensors")
+   35     process = psutil.Process()
+   36     if (os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1
+   37             or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+   38             or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+   39         raise ValueError("Physical GPU0 and pre-import single-thread environment required")
+   40     gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+   41                                    "--format=csv,noheader,nounits"], text=True).strip()
+   42     apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+   43                                     "--format=csv,noheader,nounits"], text=True).strip()
+   44     foreign_apps = [line for line in apps.splitlines() if int(line.split(",", 1)[0].strip()) != process.pid]
+   45     ancestors = {process.pid, *(p.pid for p in process.parents())}
+   46     jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+   47             if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+   48     available = psutil.virtual_memory().available
+   49     if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or foreign_apps or jobs:
+   50         raise ValueError(f"Continuation resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+   51     return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs,
+   52             "allowed_context_pid": process.pid, "live_allocated_bytes": 0, "reserved_bytes": 0}
+   53 
+   54 
+   55 def native(check, progress, handwritten, out, arm, *, continuing=False):
+   56     method = run.method
+   57     active, control = arm, arm+"_old_rank"
+   58     resources = native_preflight(continuing)
+   59     if shutil.disk_usage(out).free < 10*2**30:
+   60         raise ValueError("Insufficient native temporary disk")
+   61     numerics = run.parent.configure_numerics()
+   62     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
+   63     measurements, updates = {}, []
+   64     def timed(name, fn):
+   65         check(); torch.cuda.synchronize(); started = time.monotonic()
+   66         value = fn(); torch.cuda.synchronize()
+   67         measurements[name] = max(measurements.get(name,0.),time.monotonic()-started)
+   68         return value
+   69     c = run.config()
+   70     c["handwritten_qualification"] = True
+   71     model, optimizer, initial, archive = timed("L", lambda: checked_fresh(c))
+   72     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+   73         raise ValueError("BF16/checkpointing required")
+   74     if initial != {"model": "13b535e1d66a0f13f0d87461835bd3ba0cee69c531307884b471f8702bd14e4b",
+   75             "adam": "de5b1864dc195dd65286e083567e3fd8bb6a146a9ecfcc3bae6b3fdda8c32d20"}:
+   76         raise ValueError("positive-rank native initial identity differs")
+   77     method.bind(model, method.metadata(active))
+   78     current, history = [handwritten.handmade_group("native_"+s,8,254) for s in ("current","history")]
+   79     for g in (current,history):
+   80         lengths = [len(v) for v in model.encoder.tokenizer(run.base.record_texts(g,"separate_moments"),padding=False,truncation=False)["input_ids"]]
+   81         if len(lengths)!=448 or set(lengths)!={256}:
+   82             raise ValueError("Maximum N224/token256 fixture differs")
+   83     probes = {"encoder":model.encoder[0].auto_model.encoder.layer[0].attention.self.query.weight,"head":model.head[0].weight}
+   84     gradients, effects, table_checks, objective_pairs = {}, {}, [], {}
+   85     def updated(arm, phase, step, h=None, target=None):
+   86         if len(updates)>=6: raise ValueError("Six actual native calls exhausted")
+   87         pre = {}
+   88         def observe(role, log):
+   89             pre[role] = {}
+   90             for key,p in probes.items():
+   91                 if p.grad is None or not torch.isfinite(p.grad).all(): raise ValueError("Missing native gradient")
+   92                 pre[role][key] = p.grad.detach().cpu().clone()
+   93         captured = []
+   94         options = dict(qualification_old_rank=arm == control,
+   95             table_observer=(lambda table, group, seed, reference: captured.append((table.clone(), group, seed, reference))) if arm == active else None)
+   96         progress("native_call_started", attempted_calls=len(updates)+1, actual_updates=len(updates))
+   97         row = timed(("t_"+phase) if arm == active else "control_"+phase,
+   98             lambda: method.update(model,optimizer,current,h,target,c,active,
+   99                                   1 if h is None else 2,step,check,observe,**options))
+  100         updates.append(dict(arm=arm,phase=phase,step=step,log=row))
+  101         gradients[len(updates)] = pre
+  102         progress("native_update",actual_updates=len(updates),updates=updates,measurements=measurements)
+  103         for table, group, seed, reference in captured:
+  104             table_checks.append(handwritten.verify_native_table(table, group, seed, reference, active))
+  105             progress("native_table_precision", table_precision=table_checks)
+  106         return row
+  107     # The only actual allocation update. Subsequent fixture clocks are explicit, not claimed training.
+  108     updated(control,"allocation",1)
+  109     work=out/"work";work.mkdir(); identities={}
+  110     def metadata(label):
+  111         return dict(fixture=label,**method.metadata(active),rng=diag.rng_state(),modes=[m.training for m in model.modules()])
+  201     measurements["W_F"]=max(common_path.stat().st_size,paired_path.stat().st_size)
+  202     measurements["W_I"]=inference_path.stat().st_size
+  203     data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=False))
+  204     for path in (common_path,paired_path,inference_path):path.unlink()
+  205     work.rmdir();data.write_json(out/"temporary_checkpoint_identity.json",dict(files=identities,removed=True))
+  206     return dict(resources=resources,numerics=numerics,pretrained_archive=archive,initial_state=initial,
+  207         actual_updates=6,updates=updates,measurements=measurements,projection=run.single.projection(measurements),effects=effects,
+  208         both_phases_encoder_head_effect=True,pooling_restores_verified=True,next_update_bitwise_equal=True,
+  209         metadata=method.metadata(active), rank_precision_verified=bool(table_checks),
+  210         table_precision=table_checks, objective_pairs=objective_pairs,
+  211         equality_counts=equality,maximum_records=224,channel_tokens=256,memory_bytes=len(payload),residuals=residuals,
+  212         fixture="Six actual updates only. Common model/moments after call1; paired counter336 explicitly synthetic. Calls5/6 differ only by actual capture. No formal input.")
+  213 
+  214 def main():
+  215     import importlib
+  216     parser = argparse.ArgumentParser()
+  217     parser.add_argument("mode", choices=("cpu", "gpu"))
+  218     parser.add_argument("--output", type=Path, required=True)
+  219     parser.add_argument("--gate", type=Path)
+  220     parser.add_argument("--tests", nargs="*")
+  221     parser.add_argument("--prior-seconds", type=float, default=0.)
+  222     args = parser.parse_args()
+  223     args.output = args.output.resolve()
+  224     if os.name != "posix" or args.output.exists() or args.prior_seconds < 0:
+  225         parser.error("Linux, new evidence and cumulative ledger required; GPU has no automatic retry")
+  226     args.output.mkdir(parents=True)
+  227     sys.path.insert(0, str(data.ROOT/"tests"))
+  228     handwritten = importlib.import_module("test_step28_positive_ranking")
+  229     os.environ["G_HALF_TEST_ROOT"] = str(args.output)
+  230     os.environ["H_CONS_TEST_ROOT"] = str(args.output)
+  231     torch.set_num_threads(1)
+  232     torch.set_num_interop_threads(1)
+  233     numerics = run.parent.configure_numerics()
+  234     process = psutil.Process()
+  235     limits = run.policy()["cpu_verification" if args.mode == "cpu" else "native_verification"]
+  236     report = {"status": "RUNNING", "mode": args.mode, "scope": "S_pos_H_pos_increment", "source_files": run.sources(), "formal_inputs": False, "torch": torch.__version__,
+  237         "formal_labels": False, "prior_compute_seconds": args.prior_seconds, "peak_rss_bytes": 0, "peak_work_bytes": 0, "numerics": numerics}
+  238     stopped, lock = threading.Event(), threading.RLock()
+  239     arm_started = None
+  240     def write():
+  241         with lock:
+  242             report["elapsed_seconds"] = time.monotonic()-STARTED
+  243             report["cumulative_seconds"] = args.prior_seconds+report["elapsed_seconds"]
+  244             report["cumulative_charged_seconds"] = args.prior_seconds+math.ceil(report["elapsed_seconds"])
+  245             if "prior_actual_updates" in report:
+  246                 report["cumulative_actual_updates"] = report["prior_actual_updates"]+report.get("actual_updates", 0)
+  247             if args.mode == "gpu" and torch.cuda.is_initialized():
+  248                 report["max_reserved_bytes"] = torch.cuda.max_memory_reserved()
+  249             data.write_json(args.output/"result.json", report)
+  250     def check(reserve=0):
+  251         report["peak_rss_bytes"] = max(report["peak_rss_bytes"], process.memory_info().rss)
+  252         total, evidence = 0, 0
+  253         for path in args.output.parent.rglob("*"):
+  254             try:
+  255                 if path.is_file():
+  256                     size = path.stat().st_size
+  257                     total += size
+  258                     if "work" not in path.relative_to(args.output.parent).parts:
+  259                         evidence += size
+  260             except FileNotFoundError:
+  261                 pass
+  262         report["peak_work_bytes"] = max(report["peak_work_bytes"], total)
+  263         disk_reserve(args.output, total, reserve, limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"]))
+  264         if (time.monotonic()-STARTED+args.prior_seconds > limits["maximum_seconds"]
+  265                 or (arm_started is not None and time.monotonic()-arm_started > limits["per_arm_maximum_seconds"])
+  266                 or evidence > limits["maximum_evidence_bytes"] or total > limits.get("maximum_work_bytes", limits["maximum_evidence_bytes"])
+  267                 or report["peak_rss_bytes"] > limits["maximum_rss_bytes"]
+  268                 or (args.mode == "gpu" and torch.cuda.is_initialized() and torch.cuda.max_memory_reserved() > 28*2**30)):
+  269             raise RuntimeError("Approved cumulative qualification budget exceeded")
+  270     def watchdog():
+  271         while not stopped.wait(.5):
+  272             try:
+  273                 check()
+  274             except BaseException as exc:
+  275                 report.update(status="BUDGET_STOP", error=str(exc))
+  276                 write()
+  277                 os._exit(2)
+  278     def progress(stage, **details):
+  279         report.update(stage=stage, **details)
+  280         write()
+  281     watcher = threading.Thread(target=watchdog, daemon=True)
+  282     watcher.start()
+  283     try:
+  284         if (len(process.cpu_affinity()) != 1 or any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
+  285                 or os.environ.get("TOKENIZERS_PARALLELISM") != "false"):
+  286             raise ValueError("Pre-import single CPU/thread environment required")
+  287         if args.prior_seconds < limits["prior_charged_seconds"]:
+  288             raise ValueError("Prior charged budget cannot be reset")
+  289         if args.mode == "cpu":
+  290             if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+  291                 raise ValueError("CPU qualification must disable GPU")
+  292             test_class = handwritten.PositiveRankingTests
+  293             selected = args.tests or unittest.defaultTestLoader.getTestCaseNames(test_class)
+  294             report["selected_tests"] = selected
+  295             suite = unittest.TestSuite(test_class(name) for name in selected)
+  296             with (args.output/"unittest.txt").open("w", encoding="utf-8") as stream:
+  297                 result = unittest.TextTestRunner(stream=stream, verbosity=2, failfast=True).run(suite)
+  298             report.update(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped))
+  299             if not result.wasSuccessful() or result.skipped:
+  300                 raise RuntimeError("Affected handwritten qualification failed")
+  301         else:
+  302             if args.gate is None:
+  303                 raise ValueError("Implementation review gate required")
+  304             gate = run.reviewed_gate(args.gate, "NATIVE")
+  305             if args.prior_seconds != 0:
+  306                 raise ValueError("Unique dual native attempt; no automatic retry")
+  307             report["arms"] = {}
+  308             for arm in method.ARMS:
+  309                 arm_started = time.monotonic()
+  310                 arm_out = args.output/arm
+  311                 arm_out.mkdir()
+  312                 def arm_check(reserve=0):
+  313                     check(reserve)
+  314                     if time.monotonic()-arm_started > limits["per_arm_maximum_seconds"]:
+  315                         raise RuntimeError("Per-arm native budget exceeded")
+  316                 def arm_progress(stage, **details):
+  317                     if "actual_updates" in details:
+  318                         details["active_arm_actual_updates"] = details["actual_updates"]
+  319                         details["actual_updates"] += sum(v["actual_updates"] for v in report["arms"].values())
+  320                     progress(stage, active_arm=arm, **details)
+  321                 value = native(arm_check, arm_progress, handwritten, arm_out, arm,
+  322                                continuing=bool(report["arms"]))
+  323                 arm_check()
+  324                 value["charged_seconds"] = math.ceil(time.monotonic()-arm_started)
+  325                 report["arms"][arm] = value
+  326                 arm_started = None
+  327                 write()
+  328             report["actual_updates"] = sum(v["actual_updates"] for v in report["arms"].values())
+  329         check()
+  330         report["status"] = "PASS_HANDWRITTEN_ONLY"
+  331         if args.mode == "cpu":
+  332             report.update(qualified_tests=selected, unresolved_checks=[])
+  333     except BaseException as exc:
+  334         report.update(status="FAIL", traceback=traceback.format_exc())
+  335         raise
+  336     finally:
+  337         stopped.set()
+  338         watcher.join(timeout=2)
+  339         write()
+  340 
+  341 if __name__ == "__main__":
+  342     main()
+
+FILE scripts/step28_record_replay_verify.py
+    1 """Budgeted handwritten CPU checks and reviewed native worst-shape first update."""
+    2 from __future__ import annotations
+    3 
+    4 import time
+    5 STARTED = time.monotonic()
+    6 
+    7 import argparse
+    8 import os
+    9 from pathlib import Path
+   10 import subprocess
+   11 import sys
+   12 import threading
+   13 import traceback
+   14 import unittest
+   15 
+   16 import psutil
+   17 import torch
+   18 
+   19 import step28_record_replay as method
+   20 import step28_record_replay_run as run
+   21 
+   22 
+   23 def preflight() -> dict:
+   24     process = psutil.Process()
+   25     if os.environ.get("CUDA_VISIBLE_DEVICES") != "0" or len(process.cpu_affinity()) != 1:
+   26         raise ValueError("Physical GPU0 and exactly one CPU affinity required")
+   27     if any(os.environ.get(k) != "1" for k in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS")):
+   28         raise ValueError("Single-thread environment must precede imports")
+   29     if os.environ.get("TOKENIZERS_PARALLELISM") != "false":
+   30         raise ValueError("Tokenizer parallelism must be disabled")
+   31     gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=index,uuid,memory.total,memory.free,memory.used",
+   32                                    "--format=csv,noheader,nounits"], text=True).strip()
+   33     apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,process_name,used_memory",
+   34                                     "--format=csv,noheader,nounits"], text=True).strip()
+   35     ancestors = {process.pid, *(p.pid for p in process.parents())}
+   36     jobs = [p.info for p in psutil.process_iter(["pid", "username", "cmdline"])
+   37             if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+   38     available = psutil.virtual_memory().available
+   39     if int(gpu.split(",")[-2]) < 30*1024 or available < 72*2**30 or apps or jobs:
+   40         raise ValueError(f"Resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+   41     return {"gpu": gpu, "compute_apps": apps, "host_available_bytes": available, "project_jobs": jobs}
+   42 
+   43 
+
+FILE tests/test_step28_positive_ranking.py
+    1 """Changed-objective evidence only, entirely handwritten; Linux py310."""
+    2 from __future__ import annotations
+    3 import copy
+    4 import hashlib
+    5 import itertools
+    6 import math
+    7 import os
+    8 from pathlib import Path
+    9 import tempfile
+   10 import unittest
+   11 from unittest import mock
+   12 import numpy as np
+   13 import torch
+   14 
+   15 import step28_positive_ranking_run as run
+   16 from test_step28_record_replay import handmade_group, tiny_model
+   17 from test_step28_g_half import literal_pool as h_pool
+   18 from step28_g_half_verify import state, restore, component_effects
+   19 
+   20 method, record, core, data, diag = run.method, run.record, run.core, run.data, run.diag
+   21 PAIRS = list(itertools.combinations(range(28), 2))
+   22 LOOKUP = {p: k for k, p in enumerate(PAIRS)}
+   23 ATOL, RTOL = 2e-6, 2e-5
+   24 
+   25 
+   26 def independent_rank(values, labels, mutant=None):
+   27     """Separate candidate enumeration and logaddexp formulation."""
+   28     terms = []
+   29     for q in range(28):
+  282     def test_stage_a_empty_cache(self):
+  283         c=run.config();out=self.temporary();evidence={}
+  284         fit=[handmade_group(f"A_fit{i}") for i in range(48)]
+  285         valid=[data.Group(g.uid,g.sellers,g.items) for g in [handmade_group(f"blind{i}") for i in range(40)]]
+  286         for arm in method.ARMS:
+  287             model=tiny_model();method.bind(model,method.metadata(arm));optimizer=core.make_optimizer(model,c)
+  288             method.update(model,optimizer,fit[0],None,None,c,arm,1,1)
+  289             for value in optimizer.state.values():value["step"].fill_(48)
+  290             saved,rng,modes=state(model,optimizer),diag.rng_state(),[m.training for m in model.modules()]
+  291             empty=method.score(model,[],c,arm)
+  292             self.assertEqual((empty.shape,empty.dtype),((0,378),np.dtype(np.float32)))
+  293             with self.assertRaisesRegex(ValueError,"Scoring candidate differs"):
+  294                 method.score(model,[],c,"H_pos" if arm=="S_pos" else "S_pos")
+  295             capture=method.capture(model,optimizer,fit,None,valid,c,arm,1,1,out,"A_"+arm)
+  296             row=data.read_json(out/capture["path"]);run.validate_diagnostic(row,arm)
+  297             self.assertEqual((row["stage"],row["stage_step"],row["adam_step"]),(1,48,48))
+  298             self.assertEqual((row["cache_ids"],row["cache_domains"],row["teacher_errors"]),([],[],[]))
+  299             run.previous.array(out,row["cache"],(0,3),np.float64)
+  300             run.previous.array(out,row["fit"],(48,3),np.float64)
+  301             run.previous.array(out,row["valid_blind"],(40,378),np.float32)
+  302             self.assertEqual(core.state_digest(saved),core.state_digest(state(model,optimizer)))
+  303             self.assertEqual((rng,modes),(diag.rng_state(),[m.training for m in model.modules()]))
+  304             # Reproduce the removed S dispatch failure without altering the frozen scorer.
+  305             with diag.neutral(model),self.assertRaisesRegex(ValueError,"need at least one array"):
+  306                 record.score(model,[],c)
+  307             evidence[arm]=dict(actual_optimizer_calls=1,synthetic_clock=48,
+  308                 capture_populations=[48,0,40],empty_score_shape=[0,378],cache_metric_shape=[0,3],
+  309                 state_unchanged=True,wrong_arm_rejected=True,old_empty_dispatch_failure_reproduced=True)
+  310         self.evidence("stage_a_empty_cache",evidence)
+  311 
+  312     def test_native_continuation_preflight(self):
+  313         import step28_positive_ranking_verify as verify
+  314         from types import SimpleNamespace
+  315         process=mock.Mock(pid=413);process.cpu_affinity.return_value=[0];process.parents.return_value=[]
+  316         sample={"apps":"", "free":31*1024, "host":80*2**30, "jobs":[], "allocated":0, "reserved":0,
+  317                 "workspace_held":True, "cached":True}
+  318         cleanup=[]
+  319         def clear_workspaces():
+  320             self.assertEqual(cleanup[-1],"synchronize")
+  321             cleanup.append("clear_workspaces");sample["workspace_held"]=False
+  322         def empty_cache():
+  323             cleanup.append("empty_cache")
+  324             if not sample["workspace_held"]:sample["cached"]=False
+  325         def memory(kind):
+  326             cleanup.append(kind)
+  327             held=sample["workspace_held"] if kind=="allocated" else sample["cached"]
+  328             return sample[kind]+(64 if held else 0)
+  329         def query(args,**kwargs):
+  330             return (sample["apps"] if "--query-compute-apps=pid,process_name,used_memory" in args
+  331                     else f"0, handwritten-GPU, 32768, {sample['free']}, 1024")
+  332         env={"CUDA_VISIBLE_DEVICES":"0","OMP_NUM_THREADS":"1","MKL_NUM_THREADS":"1",
+  333              "OPENBLAS_NUM_THREADS":"1","TOKENIZERS_PARALLELISM":"false"}
+  334         with mock.patch.dict(os.environ,env),mock.patch.object(verify.psutil,"Process",return_value=process), \
+  335              mock.patch.object(verify.psutil,"process_iter",side_effect=lambda *a:sample["jobs"]), \
+  336              mock.patch.object(verify.psutil,"virtual_memory",side_effect=lambda:SimpleNamespace(available=sample["host"])), \
+  337              mock.patch.object(verify.subprocess,"check_output",side_effect=query), \
+  338              mock.patch.object(verify.gc,"collect",side_effect=lambda:cleanup.append("collect")) as collect, \
+  339              mock.patch.object(verify.torch.cuda,"synchronize",side_effect=lambda:cleanup.append("synchronize")), \
+  340              mock.patch.object(verify.torch._C,"_cuda_clearCublasWorkspaces",side_effect=clear_workspaces) as clear, \
+  341              mock.patch.object(verify.torch.cuda,"empty_cache",side_effect=empty_cache) as empty, \
+  342              mock.patch.object(verify.torch.cuda,"memory_allocated",side_effect=lambda:memory("allocated")), \
+  343              mock.patch.object(verify.torch.cuda,"memory_reserved",side_effect=lambda:memory("reserved")):
+  344             first=verify.native_preflight(False)
+  345             self.assertEqual(first["compute_apps"],"");empty.assert_not_called();clear.assert_not_called()
+  346             sample["apps"]="413, python, 512"
+  347             with self.assertRaisesRegex(ValueError,"Resource gate failed"):
+  348                 verify.native_preflight(False)
+  349             second=verify.native_preflight(True)
+  350             self.assertEqual(second["allowed_context_pid"],413);collect.assert_called_once();empty.assert_called_once()
+  351             expected_cleanup=["collect","synchronize","clear_workspaces","empty_cache","allocated","reserved"]
+  352             self.assertEqual(cleanup,expected_cleanup)
+  353             # Omit the essential release: empty_cache cannot free a library-owned workspace.
+  354             sample.update(workspace_held=True,cached=True)
+  355             with mock.patch.object(verify.torch._C,"_cuda_clearCublasWorkspaces"):
+  356                 with self.assertRaisesRegex(ValueError,"Previous arm still owns"):
+  357                     verify.native_preflight(True)
+  358             self.assertTrue(sample["workspace_held"]);self.assertTrue(sample["cached"])
+  359             verify.native_preflight(True)
+  360             rejected=[]
+  361             for key,value in (("apps","413, python, 512\n414, python, 1"),("free",30*1024-1),
+  362                     ("host",72*2**30-1),("allocated",4),("reserved",4),
+  363                     ("jobs",[SimpleNamespace(pid=415,info={"pid":415,"username":"same-user","cmdline":["step28_other.py"]})])):
+  364                 previous=sample[key];sample[key]=value
+  365                 with self.assertRaises(ValueError):verify.native_preflight(True)
+  366                 sample[key]=previous;rejected.append(key)
+  367             # Reach the real native entry's resource call, stopping before model loading/GPU work.
+  368             class StopBeforeGPU(Exception):pass
+  369             with mock.patch.object(verify,"native_preflight",side_effect=StopBeforeGPU) as entry:
+  370                 for continuing,arm in ((False,"S_pos"),(True,"H_pos")):
+  371                     with self.assertRaises(StopBeforeGPU):
+  372                         verify.native(lambda:None,lambda *a,**k:None,None,None,arm,continuing=continuing)
+  373                 self.assertEqual(entry.call_args_list,[mock.call(False),mock.call(True)])
+  374         self.evidence("native_continuation_preflight",dict(first_strict=True,own_context_only_second=True,
+  375             rejected_cases=rejected,resource_thresholds_unchanged=True,real_native_entry_checked=True,
+  376             cleanup_order=expected_cleanup,omitted_workspace_release_rejected=True,
+  377             cuda_and_process_state="mocked handwritten fixtures",actual_gpu_calls=0))
+  378 
+  379     def test_dual_orchestration_and_joint_opening(self):
+  380         root=self.temporary();groups={};metadata=[]

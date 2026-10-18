@@ -1,5 +1,5 @@
 {
-  "status": "WORKSPACE_FIX_REVIEW_IN_PROGRESS_CPU_READY_NATIVE_NOT_AUTHORIZED",
+  "status": "AUTHORIZED_NATIVE_THEN_FORMAL_WAITING_RESOURCES",
   "observed_date": "2026-10-18",
   "methods": [
     "S_pos",
@@ -18,15 +18,25 @@
     "tests_passed_definition": "6 unchanged tests inherited through attempt04 plus1 executed on attempt05; not7 rerun"
   },
   "gpu": {
-    "authorized": false,
-    "actual_updates": 0
+    "authorized": true,
+    "actual_updates": 0,
+    "authorization": "reports/documentation/20261016/positive_ranking_implementation/qualification/execution_authorization.json",
+    "maximum_seconds": 1200,
+    "maximum_updates": 12,
+    "automatic_retry": false,
+    "state": "WAIT_NATIVE_RESOURCES"
   },
   "formal": {
-    "authorized": false,
-    "actual_updates": 0
+    "authorized": true,
+    "conditional_on": "Both native arms pass, saved behavior and resource projection verified, fresh production gate/resource checks pass",
+    "actual_updates": 0,
+    "maximum_seconds": 57600,
+    "maximum_output_bytes": 17179869184,
+    "state": "NOT_STARTED_NATIVE_PENDING",
+    "automatic_retry": false
   },
   "implementation_review": {
-    "status": "IN_REVIEW",
+    "status": "COMPLETE_RECOVERED_AND_INDEPENDENTLY_ADJUDICATED",
     "submission": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/submission.json",
     "url": "https://chatgpt.com/c/6ad42ab0-aee0-83eb-b53a-81e1302fb008",
     "accepted_at": "2026-10-18T12:27:57+08:00",
@@ -49,10 +59,39 @@
       "current_source_binding": "reports/documentation/20261016/positive_ranking_implementation/qualification/cpu_gate_workspace.json",
       "post_review_patch_uploaded": false
     },
-    "scope": "Focused R03 cuBLAS workspace repair; unchanged math and prior evidence reused."
+    "scope": "Focused R03 cuBLAS workspace repair; unchanged math and prior evidence reused.",
+    "external_report": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/external/report.zh.txt",
+    "recovery": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/recovery.json",
+    "primary_disposition": "reports/documentation/20261016/positive_ranking_implementation/review/workspace/primary_disposition.zh.txt",
+    "remaining_specific_blockers": 0
   },
-  "next": "等待本次cuBLAS修复定向外审完成后完整回收并独立主审；实际CUDA尚未验证，GPU/正式仍未批准，无执行门或监听。",
+  "next": "已有唯一监听788758等待资源，不得重复启动。资源满足后原生一次两臂；只有实际行为/预算核对、投影及原正式入口验证通过才自动正式一次。任一失败停，不重试。下次恢复先核对实际监听、native result/wallclock/acceptance和formal job，不以本快照推断仍未执行。",
   "git": "local_only",
   "legacy_H_cons": "完成且原负结果/预算不改；两权重已删，Memory保留。",
-  "custody": "CPU05/前审完整原件和主审按sync_workspace.json已在Linux保管；本次新外审包、提交回执及当前state更新保存在Windows，仅本地Git，尚未同步该新提交状态至Linux。"
+  "custody": "完整66份新外审原件、主审、执行许可和源码已SFTP部署至新独立workspace并逐项回读；当前状态/部署/队列观察随收尾同步。旧CPU05/前审保管继续保持。",
+  "execution": {
+    "workspace": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace",
+    "listener_pid": 788758,
+    "listener_dispatch": "reports/documentation/20261016/positive_ranking_implementation/qualification/dispatch.json",
+    "last_observation": "reports/documentation/20261016/positive_ranking_implementation/qualification/queue_observation.json",
+    "observed_at": "2026-10-18T13:37:10.740239+08:00",
+    "resource_observed_at": "2026-10-18T13:36:50.440290+08:00",
+    "resource_state": {
+      "phase": "WAIT_NATIVE_RESOURCES",
+      "time": "2026-10-18T13:36:50.440290+08:00",
+      "pid": 788758,
+      "gpu": "0, GPU-47d540a1-1090-f2a1-7faa-793f35cca97d, 32607, 10862, 21248",
+      "compute_apps": "781788, python, 21172",
+      "project_jobs": [],
+      "host_available_bytes": 253028311040,
+      "disk_free_bytes": 736469966848
+    },
+    "sequence": "one native attempt; validate actual evidence and projection; one formal attempt; remove listener source after first actual formal update; stop on any failure",
+    "native_result": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/qualification/native/result.json",
+    "native_wallclock": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_wallclock.json",
+    "automatic_acceptance": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/native_acceptance.json",
+    "formal_gate": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/documentation/20261016/positive_ranking_implementation/qualification/formal_gate.json",
+    "formal_job": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/job",
+    "listener_status": "/home/yongpeng/cross-lingual/reports/documentation/20261018/positive_ranking_execution/20261018_133500/workspace/reports/launch/status.json"
+  }
 }

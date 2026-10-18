@@ -1,0 +1,111 @@
+{
+  "operation": {
+    "timestamp_utc": "2026-10-18T04:31:35.388023+00:00",
+    "command_argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "cublas_audit_work/read_primary.py"
+    ],
+    "source_sha256": "4be8a543971562dc2ead1d4799c8d7ef287782de92ed4db5fa7cd5ac137d7460",
+    "source_bytes": 4749,
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "cwd": "/workspace/scratch/2456d4553fd5",
+    "inputs": [
+      {
+        "name": "CublasHandlePool_v2.9.1.cpp",
+        "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+        "patterns": [
+          "cublas_handle_stream_to_workspace",
+          "cublaslt_handle_stream_to_workspace",
+          "clearCublasWorkspaces",
+          "getNewWorkspace",
+          "getCurrentCUDABlasHandle",
+          "getCurrentCUDABlasLtHandle",
+          "cublasSetWorkspace",
+          "CUDACachingAllocator::get()->allocate"
+        ]
+      },
+      {
+        "name": "Module_v2.9.1.cpp",
+        "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp",
+        "patterns": [
+          "THCPModule_clearBlasWorkspaces",
+          "_cuda_clearCublasWorkspaces",
+          "clearCublasWorkspaces"
+        ]
+      }
+    ],
+    "purpose": "Only fixed-version CUDA workspace ownership and Python binding, directly required by current repair.",
+    "scientific_computation": false,
+    "project_code_executed": false,
+    "project_linux_connection": false,
+    "network_installation": false
+  },
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+      "name": "CublasHandlePool_v2.9.1.cpp",
+      "http_status": 200,
+      "final_url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+      "status": "READ_ONLY_SOURCE_FETCHED",
+      "bytes": 13701,
+      "sha256": "e43440cfc3c89e9252d07e812e05c40c315283e4e9d33069b6c196ccdb24a786",
+      "lines": 357,
+      "read_ranges": [
+        [
+          17,
+          38
+        ],
+        [
+          103,
+          136
+        ],
+        [
+          221,
+          274
+        ],
+        [
+          296,
+          321
+        ],
+        [
+          323,
+          344
+        ],
+        [
+          346,
+          357
+        ]
+      ],
+      "local_path": "/workspace/scratch/2456d4553fd5/cublas_audit_work/primary/CublasHandlePool_v2.9.1.cpp",
+      "executed": false,
+      "wall_seconds": 0.2998020790000737
+    },
+    {
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp",
+      "name": "Module_v2.9.1.cpp",
+      "http_status": 200,
+      "final_url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp",
+      "status": "READ_ONLY_SOURCE_FETCHED",
+      "bytes": 74652,
+      "sha256": "215983e28f5a0d66a43c6d3c6fb78166a5f4054709a72eab90ba6b2457bcbd59",
+      "lines": 2202,
+      "read_ranges": [
+        [
+          1530,
+          1555
+        ],
+        [
+          1960,
+          1982
+        ]
+      ],
+      "local_path": "/workspace/scratch/2456d4553fd5/cublas_audit_work/primary/Module_v2.9.1.cpp",
+      "executed": false,
+      "wall_seconds": 0.3395801919996302
+    }
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.6461682410008507,
+  "process_maxrss_bytes": 55517184
+}

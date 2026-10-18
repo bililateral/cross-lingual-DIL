@@ -1,0 +1,42 @@
+{
+  "timestamp_utc": "2026-10-18T04:31:35.388023+00:00",
+  "command_argv": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "cublas_audit_work/read_primary.py"
+  ],
+  "source_sha256": "4be8a543971562dc2ead1d4799c8d7ef287782de92ed4db5fa7cd5ac137d7460",
+  "source_bytes": 4749,
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "cwd": "/workspace/scratch/2456d4553fd5",
+  "inputs": [
+    {
+      "name": "CublasHandlePool_v2.9.1.cpp",
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/cuda/CublasHandlePool.cpp",
+      "patterns": [
+        "cublas_handle_stream_to_workspace",
+        "cublaslt_handle_stream_to_workspace",
+        "clearCublasWorkspaces",
+        "getNewWorkspace",
+        "getCurrentCUDABlasHandle",
+        "getCurrentCUDABlasLtHandle",
+        "cublasSetWorkspace",
+        "CUDACachingAllocator::get()->allocate"
+      ]
+    },
+    {
+      "name": "Module_v2.9.1.cpp",
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/torch/csrc/cuda/Module.cpp",
+      "patterns": [
+        "THCPModule_clearBlasWorkspaces",
+        "_cuda_clearCublasWorkspaces",
+        "clearCublasWorkspaces"
+      ]
+    }
+  ],
+  "purpose": "Only fixed-version CUDA workspace ownership and Python binding, directly required by current repair.",
+  "scientific_computation": false,
+  "project_code_executed": false,
+  "project_linux_connection": false,
+  "network_installation": false
+}
