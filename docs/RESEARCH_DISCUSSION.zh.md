@@ -6,7 +6,9 @@
 
 已核对实际每步LR及多处seed硬编码，静态明确lambda/学习率/seed须真实影响目标、VJP/encoder/head/Adam、日程/Memory和恢复；不只写配置。保留本轮外审的概率/差距/分组及选择偏差限制，不承诺调参可超过S。新训练、三种数据权限、失败/选参/确认、多比较和权重生命周期均为待确认提案，不移用已结束合同余额。
 
-按科研纪律第6节准备186342字节/26成员、SHA256 60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd的[新静态包](../reports/documentation/20261018/optuna_plan/review/package.json)，只含方案/请求、已开放历史结果/外审、必要源码和规则，无正式文本/标签原表、权重、Memory载荷或凭据。尚未上传，具体新包须确认；本轮未连接Linux、安装Optuna、科研计算或实现训练，新材料仅本地Git。
+按科研纪律第6节准备186342字节/26成员、SHA256 60a248b5599f96e3a944a530fa6818e31d8bfc90133e74a0d7634fd0b9fd81cd的[新静态包](../reports/documentation/20261018/optuna_plan/review/package.json)，只含方案/请求、已开放历史结果/外审、必要源码和规则，无正式文本/标签原表、权重、Memory载荷或凭据。用户明确回复：“批准该具体方案包静态外审”。21:18:18已通过本地Playwright单次提交GPT 6 Pro，见[提交回执](../reports/documentation/20261018/optuna_plan/review/submission.json)；页面可见GPT-6及Pro强度5/5，后台身份未独立取得，审查正在进行。
+
+用户随后明确：“optuna服务器没装的话，你自己装上”。据此连接既有Linux py310，确认原来缺失；先锁定现有137包并检查依赖解析只新增，再安装Optuna 4.6.0和六必需依赖。原包版本无变更，前后pip check与导入通过，未触碰同环境其他运行服务，未新建环境或使用GPU。见[安装回执](../reports/maintenance/20261018/optuna_install/receipt.json)及[11文件SFTP核验](../reports/maintenance/20261018/optuna_install/receive_verification.json)。最新授权和安装事实补入[实际送审请求](../reports/documentation/20261018/optuna_plan/review/submitted_request.zh.txt)，不改冻结输入包。此安装许可不授予科研实现、搜索、训练或新数据访问；仍待外审回收/独立主审后确认实施，新材料仅本地Git。
 
 ## 2026-10-18 明确删除本次S_pos/H_pos四份训练权重
 

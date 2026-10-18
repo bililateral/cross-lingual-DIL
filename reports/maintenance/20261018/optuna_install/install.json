@@ -1,0 +1,583 @@
+{
+  "version": "1",
+  "pip_version": "26.1.2",
+  "install": [
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/58/de/3d8455b08cb6312f8cc46aacdf16c71d4d881a1db4a4140fc5ef31108422/optuna-4.6.0-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "4c3a9facdef2b2dd7e3e2a8ae3697effa70fae4056fcf3425cfc6f5a40feb069"
+          },
+          "hash": "sha256=4c3a9facdef2b2dd7e3e2a8ae3697effa70fae4056fcf3425cfc6f5a40feb069"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "optuna",
+        "version": "4.6.0",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "A hyperparameter optimization framework",
+        "description_content_type": "text/markdown",
+        "author": "Takuya Akiba",
+        "license_file": [
+          "LICENSE",
+          "LICENSE_THIRD_PARTY"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Science/Research",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: MIT License",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.9",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3 :: Only",
+          "Topic :: Scientific/Engineering",
+          "Topic :: Scientific/Engineering :: Mathematics",
+          "Topic :: Scientific/Engineering :: Artificial Intelligence",
+          "Topic :: Software Development",
+          "Topic :: Software Development :: Libraries",
+          "Topic :: Software Development :: Libraries :: Python Modules"
+        ],
+        "requires_dist": [
+          "alembic>=1.5.0",
+          "colorlog",
+          "numpy",
+          "packaging>=20.0",
+          "sqlalchemy>=1.4.2",
+          "tqdm",
+          "PyYAML",
+          "asv>=0.5.0; extra == \"benchmark\"",
+          "cma; extra == \"benchmark\"",
+          "virtualenv; extra == \"benchmark\"",
+          "black<25.9.0; extra == \"checking\"",
+          "blackdoc<0.4.2; extra == \"checking\"",
+          "flake8; extra == \"checking\"",
+          "isort; extra == \"checking\"",
+          "mypy; extra == \"checking\"",
+          "mypy_boto3_s3; extra == \"checking\"",
+          "scipy-stubs; python_version >= \"3.10\" and extra == \"checking\"",
+          "types-PyYAML; extra == \"checking\"",
+          "types-redis; extra == \"checking\"",
+          "types-setuptools; extra == \"checking\"",
+          "types-tqdm; extra == \"checking\"",
+          "typing_extensions>=3.10.0.0; extra == \"checking\"",
+          "ase; extra == \"document\"",
+          "cmaes>=0.12.0; extra == \"document\"",
+          "fvcore; extra == \"document\"",
+          "kaleido<0.4; extra == \"document\"",
+          "lightgbm; extra == \"document\"",
+          "matplotlib!=3.6.0; extra == \"document\"",
+          "pandas; extra == \"document\"",
+          "pillow; extra == \"document\"",
+          "plotly>=4.9.0; extra == \"document\"",
+          "scikit-learn; extra == \"document\"",
+          "sphinx; extra == \"document\"",
+          "sphinx-copybutton; extra == \"document\"",
+          "sphinx-gallery; extra == \"document\"",
+          "sphinx-notfound-page; extra == \"document\"",
+          "sphinx_rtd_theme>=1.2.0; extra == \"document\"",
+          "torch; extra == \"document\"",
+          "torchvision; extra == \"document\"",
+          "boto3; extra == \"optional\"",
+          "cmaes>=0.12.0; extra == \"optional\"",
+          "google-cloud-storage; extra == \"optional\"",
+          "matplotlib!=3.6.0; extra == \"optional\"",
+          "pandas; extra == \"optional\"",
+          "plotly>=4.9.0; extra == \"optional\"",
+          "redis; extra == \"optional\"",
+          "scikit-learn>=0.24.2; extra == \"optional\"",
+          "scipy; extra == \"optional\"",
+          "torch; extra == \"optional\"",
+          "greenlet; extra == \"optional\"",
+          "grpcio; extra == \"optional\"",
+          "protobuf>=5.28.1; extra == \"optional\"",
+          "coverage; extra == \"test\"",
+          "fakeredis[lua]; extra == \"test\"",
+          "kaleido<0.4; extra == \"test\"",
+          "moto; extra == \"test\"",
+          "pytest; extra == \"test\"",
+          "pytest-xdist; extra == \"test\"",
+          "scipy>=1.9.2; extra == \"test\"",
+          "torch; extra == \"test\"",
+          "greenlet; extra == \"test\"",
+          "grpcio; extra == \"test\"",
+          "protobuf>=5.28.1; extra == \"test\""
+        ],
+        "requires_python": ">=3.9",
+        "project_url": [
+          "homepage, https://optuna.org/",
+          "repository, https://github.com/optuna/optuna",
+          "documentation, https://optuna.readthedocs.io",
+          "bugtracker, https://github.com/optuna/optuna/issues"
+        ],
+        "provides_extra": [
+          "benchmark",
+          "checking",
+          "document",
+          "optional",
+          "test"
+        ],
+        "description": "<div align=\"center\"><img src=\"https://raw.githubusercontent.com/optuna/optuna/master/docs/image/optuna-logo.png\" width=\"800\"/></div>\n\n# Optuna: A hyperparameter optimization framework\n\n[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org)\n[![pypi](https://img.shields.io/pypi/v/optuna.svg)](https://pypi.python.org/pypi/optuna)\n[![conda](https://img.shields.io/conda/vn/conda-forge/optuna.svg)](https://anaconda.org/conda-forge/optuna)\n[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/optuna/optuna)\n[![Read the Docs](https://readthedocs.org/projects/optuna/badge/?version=stable)](https://optuna.readthedocs.io/en/stable/)\n[![Codecov](https://codecov.io/gh/optuna/optuna/branch/master/graph/badge.svg)](https://codecov.io/gh/optuna/optuna)\n\n:link: [**Website**](https://optuna.org/)\n| :page_with_curl: [**Docs**](https://optuna.readthedocs.io/en/stable/)\n| :gear: [**Install Guide**](https://optuna.readthedocs.io/en/stable/installation.html)\n| :pencil: [**Tutorial**](https://optuna.readthedocs.io/en/stable/tutorial/index.html)\n| :bulb: [**Examples**](https://github.com/optuna/optuna-examples)\n| [**Twitter**](https://twitter.com/OptunaAutoML)\n| [**LinkedIn**](https://www.linkedin.com/showcase/optuna/)\n| [**Medium**](https://medium.com/optuna)\n\n*Optuna* is an automatic hyperparameter optimization software framework, particularly designed\nfor machine learning. It features an imperative, *define-by-run* style user API. Thanks to our\n*define-by-run* API, the code written with Optuna enjoys high modularity, and the user of\nOptuna can dynamically construct the search spaces for the hyperparameters.\n\n## :loudspeaker: News\nHelp us create the next version of Optuna!\n\nOptuna 5.0 Roadmap published for review. Please take a look at [the planned improvements to Optuna](https://medium.com/optuna/optuna-v5-roadmap-ac7d6935a878), and share your feedback in [the github issues](https://github.com/optuna/optuna/labels/v5). PR contributions also welcome!\n\nPlease take a few minutes to fill in [this survey](https://forms.gle/wVwLCQ9g6st6AXuq9), and let us know how you use Optuna now and what improvements you'd like.🤔\nAll questions are optional. 🙇‍♂️\n\n<!-- TODO: when you add a new line, please delete the oldest line -->\n* **Oct 28, 2025**: A new article [AutoSampler: Full Support for Multi-Objective & Constrained Optimization](https://medium.com/optuna/autosampler-full-support-for-multi-objective-constrained-optimization-c1c4fc957ba2) has been published.\n* **Sep 22, 2025**: A new article [[Optuna v4.5] Gaussian Process-Based Sampler (GPSampler) Can Now Perform Constrained Multi-Objective Optimization](https://medium.com/optuna/optuna-v4-5-81e78d8e077a) has been published.\n* **Jun 16, 2025**: Optuna 4.4.0 has been released! Check out [the release blog](https://medium.com/optuna/announcing-optuna-4-4-ece661493126).\n* **May 26, 2025**: Optuna 5.0 roadmap has been published! See [the blog](https://medium.com/optuna/optuna-v5-roadmap-ac7d6935a878) for more details.\n* **Apr 14, 2025**: Optuna 4.3.0 is out! Check out [the release note](https://github.com/optuna/optuna/releases/tag/v4.3.0) for details.\n* **Mar 24, 2025**: A new article [Distributed Optimization in Optuna and gRPC Storage Proxy](https://medium.com/optuna/distributed-optimization-in-optuna-and-grpc-storage-proxy-08db83f1d608) has been published.\n\n## :fire: Key Features\n\nOptuna has modern functionalities as follows:\n\n- [Lightweight, versatile, and platform agnostic architecture](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/001_first.html)\n  - Handle a wide variety of tasks with a simple installation that has few requirements.\n- [Pythonic search spaces](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/002_configurations.html)\n  - Define search spaces using familiar Python syntax including conditionals and loops.\n- [Efficient optimization algorithms](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/003_efficient_optimization_algorithms.html)\n  - Adopt state-of-the-art algorithms for sampling hyperparameters and efficiently pruning unpromising trials.\n- [Easy parallelization](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/004_distributed.html)\n  - Scale studies to tens or hundreds of workers with little or no changes to the code.\n- [Quick visualization](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/005_visualization.html)\n  - Inspect optimization histories from a variety of plotting functions.\n\n\n## Basic Concepts\n\nWe use the terms *study* and *trial* as follows:\n\n- Study: optimization based on an objective function\n- Trial: a single execution of the objective function\n\nPlease refer to the sample code below. The goal of a *study* is to find out the optimal set of\nhyperparameter values (e.g., `regressor` and `svr_c`) through multiple *trials* (e.g.,\n`n_trials=100`). Optuna is a framework designed for automation and acceleration of\noptimization *studies*.\n\n<details open>\n<summary>Sample code with scikit-learn</summary>\n\n[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/optuna/optuna-examples/blob/main/quickstart.ipynb)\n\n```python\nimport optuna\nimport sklearn\n\n\n# Define an objective function to be minimized.\ndef objective(trial):\n\n    # Invoke suggest methods of a Trial object to generate hyperparameters.\n    regressor_name = trial.suggest_categorical(\"regressor\", [\"SVR\", \"RandomForest\"])\n    if regressor_name == \"SVR\":\n        svr_c = trial.suggest_float(\"svr_c\", 1e-10, 1e10, log=True)\n        regressor_obj = sklearn.svm.SVR(C=svr_c)\n    else:\n        rf_max_depth = trial.suggest_int(\"rf_max_depth\", 2, 32)\n        regressor_obj = sklearn.ensemble.RandomForestRegressor(max_depth=rf_max_depth)\n\n    X, y = sklearn.datasets.fetch_california_housing(return_X_y=True)\n    X_train, X_val, y_train, y_val = sklearn.model_selection.train_test_split(X, y, random_state=0)\n\n    regressor_obj.fit(X_train, y_train)\n    y_pred = regressor_obj.predict(X_val)\n\n    error = sklearn.metrics.mean_squared_error(y_val, y_pred)\n\n    return error  # An objective value linked with the Trial object.\n\n\nstudy = optuna.create_study()  # Create a new study.\nstudy.optimize(objective, n_trials=100)  # Invoke optimization of the objective function.\n```\n</details>\n\n> [!NOTE]\n> More examples can be found in [optuna/optuna-examples](https://github.com/optuna/optuna-examples).\n>\n> The examples cover diverse problem setups such as multi-objective optimization, constrained optimization, pruning, and distributed optimization.\n\n## Installation\n\nOptuna is available at [the Python Package Index](https://pypi.org/project/optuna/) and on [Anaconda Cloud](https://anaconda.org/conda-forge/optuna).\n\n```bash\n# PyPI\n$ pip install optuna\n```\n\n```bash\n# Anaconda Cloud\n$ conda install -c conda-forge optuna\n```\n\n> [!IMPORTANT]\n> Optuna supports Python 3.9 or newer.\n>\n> Also, we provide Optuna docker images on [DockerHub](https://hub.docker.com/r/optuna/optuna).\n\n## Integrations\n\nOptuna has integration features with various third-party libraries. Integrations can be found in [optuna/optuna-integration](https://github.com/optuna/optuna-integration) and the document is available [here](https://optuna-integration.readthedocs.io/en/stable/index.html).\n\n<details>\n<summary>Supported integration libraries</summary>\n\n* [Catboost](https://github.com/optuna/optuna-examples/tree/main/catboost/catboost_pruning.py)\n* [Dask](https://github.com/optuna/optuna-examples/tree/main/dask/dask_simple.py)\n* [fastai](https://github.com/optuna/optuna-examples/tree/main/fastai/fastai_simple.py)\n* [Keras](https://github.com/optuna/optuna-examples/tree/main/keras/keras_integration.py)\n* [LightGBM](https://github.com/optuna/optuna-examples/tree/main/lightgbm/lightgbm_integration.py)\n* [MLflow](https://github.com/optuna/optuna-examples/tree/main/mlflow/keras_mlflow.py)\n* [PyTorch](https://github.com/optuna/optuna-examples/tree/main/pytorch/pytorch_simple.py)\n* [PyTorch Ignite](https://github.com/optuna/optuna-examples/tree/main/pytorch/pytorch_ignite_simple.py)\n* [PyTorch Lightning](https://github.com/optuna/optuna-examples/tree/main/pytorch/pytorch_lightning_simple.py)\n* [TensorBoard](https://github.com/optuna/optuna-examples/tree/main/tensorboard/tensorboard_simple.py)\n* [TensorFlow](https://github.com/optuna/optuna-examples/tree/main/tensorflow/tensorflow_estimator_integration.py)\n* [tf.keras](https://github.com/optuna/optuna-examples/tree/main/tfkeras/tfkeras_integration.py)\n* [Weights & Biases](https://github.com/optuna/optuna-examples/tree/main/wandb/wandb_integration.py)\n* [XGBoost](https://github.com/optuna/optuna-examples/tree/main/xgboost/xgboost_integration.py)\n</details>\n\n## Web Dashboard\n\n[Optuna Dashboard](https://github.com/optuna/optuna-dashboard) is a real-time web dashboard for Optuna.\nYou can check the optimization history, hyperparameter importance, etc. in graphs and tables.\nYou don't need to create a Python script to call [Optuna's visualization](https://optuna.readthedocs.io/en/stable/reference/visualization/index.html) functions.\nFeature requests and bug reports are welcome!\n\n![optuna-dashboard](https://user-images.githubusercontent.com/5564044/204975098-95c2cb8c-0fb5-4388-abc4-da32f56cb4e5.gif)\n\n`optuna-dashboard` can be installed via pip:\n\n```shell\n$ pip install optuna-dashboard\n```\n\n> [!TIP]\n> Please check out the convenience of Optuna Dashboard using the sample code below.\n\n<details>\n<summary>Sample code to launch Optuna Dashboard</summary>\n\nSave the following code as `optimize_toy.py`.\n\n```python\nimport optuna\n\n\ndef objective(trial):\n    x1 = trial.suggest_float(\"x1\", -100, 100)\n    x2 = trial.suggest_float(\"x2\", -100, 100)\n    return x1**2 + 0.01 * x2**2\n\n\nstudy = optuna.create_study(storage=\"sqlite:///db.sqlite3\")  # Create a new study with database.\nstudy.optimize(objective, n_trials=100)\n```\n\nThen try the commands below:\n\n```shell\n# Run the study specified above\n$ python optimize_toy.py\n\n# Launch the dashboard based on the storage `sqlite:///db.sqlite3`\n$ optuna-dashboard sqlite:///db.sqlite3\n...\nListening on http://localhost:8080/\nHit Ctrl-C to quit.\n```\n\n</details>\n\n\n## OptunaHub\n\n[OptunaHub](https://hub.optuna.org/) is a feature-sharing platform for Optuna.\nYou can use the registered features and publish your packages.\n\n### Use registered features\n\n`optunahub` can be installed via pip:\n\n```shell\n$ pip install optunahub\n# Install AutoSampler dependencies (CPU only is sufficient for PyTorch)\n$ pip install cmaes scipy torch --extra-index-url https://download.pytorch.org/whl/cpu\n```\n\nYou can load registered module with `optunahub.load_module`.\n\n```python\nimport optuna\nimport optunahub\n\n\ndef objective(trial: optuna.Trial) -> float:\n    x = trial.suggest_float(\"x\", -5, 5)\n    y = trial.suggest_float(\"y\", -5, 5)\n    return x**2 + y**2\n\n\nmodule = optunahub.load_module(package=\"samplers/auto_sampler\")\nstudy = optuna.create_study(sampler=module.AutoSampler())\nstudy.optimize(objective, n_trials=10)\n\nprint(study.best_trial.value, study.best_trial.params)\n```\n\nFor more details, please refer to [the optunahub documentation](https://optuna.github.io/optunahub/).\n\n### Publish your packages\n\nYou can publish your package via [optunahub-registry](https://github.com/optuna/optunahub-registry).\nSee the [Tutorials for Contributors](https://optuna.github.io/optunahub/tutorials_for_contributors.html) in OptunaHub.\n\n\n## Communication\n\n- [GitHub Discussions] for questions.\n- [GitHub Issues] for bug reports and feature requests.\n\n[GitHub Discussions]: https://github.com/optuna/optuna/discussions\n[GitHub issues]: https://github.com/optuna/optuna/issues\n\n\n## Contribution\n\nAny contributions to Optuna are more than welcome!\n\nIf you are new to Optuna, please check the [good first issues](https://github.com/optuna/optuna/labels/good%20first%20issue). They are relatively simple, well-defined, and often good starting points for you to get familiar with the contribution workflow and other developers.\n\nIf you already have contributed to Optuna, we recommend the other [contribution-welcome issues](https://github.com/optuna/optuna/labels/contribution-welcome).\n\nFor general guidelines on how to contribute to the project, take a look at [CONTRIBUTING.md](./CONTRIBUTING.md).\n\n\n## Reference\n\nIf you use Optuna in one of your research projects, please cite [our KDD paper](https://doi.org/10.1145/3292500.3330701) \"Optuna: A Next-generation Hyperparameter Optimization Framework\":\n\n<details open>\n<summary>BibTeX</summary>\n\n```bibtex\n@inproceedings{akiba2019optuna,\n  title={{O}ptuna: A Next-Generation Hyperparameter Optimization Framework},\n  author={Akiba, Takuya and Sano, Shotaro and Yanase, Toshihiko and Ohta, Takeru and Koyama, Masanori},\n  booktitle={The 25th ACM SIGKDD International Conference on Knowledge Discovery \\& Data Mining},\n  pages={2623--2631},\n  year={2019}\n}\n```\n</details>\n\n\n## License\n\nMIT License (see [LICENSE](./LICENSE)).\n\nOptuna uses the codes from SciPy and fdlibm projects (see [LICENSE_THIRD_PARTY](./LICENSE_THIRD_PARTY)).\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/3f/27/78a89b55b0904d222183164e079b4ca56208e94eff1d35ad1f1ad5be9b06/alembic-1.20.0-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "77eb101048d95f982c0353e9233404889dcd7a6fc244c107836c0e2fc9cf7d9d"
+          },
+          "hash": "sha256=77eb101048d95f982c0353e9233404889dcd7a6fc244c107836c0e2fc9cf7d9d"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "alembic",
+        "version": "1.20.0",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "A database migration tool for SQLAlchemy.",
+        "description_content_type": "text/x-rst",
+        "author_email": "Mike Bayer <mike_mp@zzzcomputing.com>",
+        "license_expression": "MIT",
+        "license_file": [
+          "LICENSE"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Environment :: Console",
+          "Operating System :: OS Independent",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: 3.15",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Database :: Front-Ends"
+        ],
+        "requires_dist": [
+          "SQLAlchemy>=2.0",
+          "Mako",
+          "typing-extensions>=4.12",
+          "tomli; python_version < \"3.11\"",
+          "tzdata; extra == \"tz\""
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Homepage, https://alembic.sqlalchemy.org",
+          "Documentation, https://alembic.sqlalchemy.org/en/latest/",
+          "Changelog, https://alembic.sqlalchemy.org/en/latest/changelog.html",
+          "Source, https://github.com/sqlalchemy/alembic/",
+          "Issue Tracker, https://github.com/sqlalchemy/alembic/issues/"
+        ],
+        "provides_extra": [
+          "tz"
+        ],
+        "description": "Alembic is a database migrations tool written by the author\nof `SQLAlchemy <http://www.sqlalchemy.org>`_.  A migrations tool\noffers the following functionality:\n\n* Can emit ALTER statements to a database in order to change\n  the structure of tables and other constructs\n* Provides a system whereby \"migration scripts\" may be constructed;\n  each script indicates a particular series of steps that can \"upgrade\" a\n  target database to a new version, and optionally a series of steps that can\n  \"downgrade\" similarly, doing the same steps in reverse.\n* Allows the scripts to execute in some sequential manner.\n\nThe goals of Alembic are:\n\n* Very open ended and transparent configuration and operation.   A new\n  Alembic environment is generated from a set of templates which is selected\n  among a set of options when setup first occurs. The templates then deposit a\n  series of scripts that define fully how database connectivity is established\n  and how migration scripts are invoked; the migration scripts themselves are\n  generated from a template within that series of scripts. The scripts can\n  then be further customized to define exactly how databases will be\n  interacted with and what structure new migration files should take.\n* Full support for transactional DDL.   The default scripts ensure that all\n  migrations occur within a transaction - for those databases which support\n  this (Postgresql, Microsoft SQL Server), migrations can be tested with no\n  need to manually undo changes upon failure.\n* Minimalist script construction.  Basic operations like renaming\n  tables/columns, adding/removing columns, changing column attributes can be\n  performed through one line commands like alter_column(), rename_table(),\n  add_constraint(). There is no need to recreate full SQLAlchemy Table\n  structures for simple operations like these - the functions themselves\n  generate minimalist schema structures behind the scenes to achieve the given\n  DDL sequence.\n* \"auto generation\" of migrations. While real world migrations are far more\n  complex than what can be automatically determined, Alembic can still\n  eliminate the initial grunt work in generating new migration directives\n  from an altered schema.  The ``--autogenerate`` feature will inspect the\n  current status of a database using SQLAlchemy's schema inspection\n  capabilities, compare it to the current state of the database model as\n  specified in Python, and generate a series of \"candidate\" migrations,\n  rendering them into a new migration script as Python directives. The\n  developer then edits the new file, adding additional directives and data\n  migrations as needed, to produce a finished migration. Table and column\n  level changes can be detected, with constraints and indexes to follow as\n  well.\n* Full support for migrations generated as SQL scripts.   Those of us who\n  work in corporate environments know that direct access to DDL commands on a\n  production database is a rare privilege, and DBAs want textual SQL scripts.\n  Alembic's usage model and commands are oriented towards being able to run a\n  series of migrations into a textual output file as easily as it runs them\n  directly to a database. Care must be taken in this mode to not invoke other\n  operations that rely upon in-memory SELECTs of rows - Alembic tries to\n  provide helper constructs like bulk_insert() to help with data-oriented\n  operations that are compatible with script-based DDL.\n* Non-linear, dependency-graph versioning.   Scripts are given UUID\n  identifiers similarly to a DVCS, and the linkage of one script to the next\n  is achieved via human-editable markers within the scripts themselves.\n  The structure of a set of migration files is considered as a\n  directed-acyclic graph, meaning any migration file can be dependent\n  on any other arbitrary set of migration files, or none at\n  all.  Through this open-ended system, migration files can be organized\n  into branches, multiple roots, and mergepoints, without restriction.\n  Commands are provided to produce new branches, roots, and merges of\n  branches automatically.\n* Provide a library of ALTER constructs that can be used by any SQLAlchemy\n  application. The DDL constructs build upon SQLAlchemy's own DDLElement base\n  and can be used standalone by any application or script.\n* At long last, bring SQLite and its inability to ALTER things into the fold,\n  but in such a way that SQLite's very special workflow needs are accommodated\n  in an explicit way that makes the most of a bad situation, through the\n  concept of a \"batch\" migration, where multiple changes to a table can\n  be batched together to form a series of instructions for a single, subsequent\n  \"move-and-copy\" workflow.   You can even use \"move-and-copy\" workflow for\n  other databases, if you want to recreate a table in the background\n  on a busy system.\n\nDocumentation and status of Alembic is at https://alembic.sqlalchemy.org/\n\nThe SQLAlchemy Project\n======================\n\nAlembic is part of the `SQLAlchemy Project <https://www.sqlalchemy.org>`_ and\nadheres to the same standards and conventions as the core project.\n\nDevelopment / Bug reporting / Pull requests\n___________________________________________\n\nPlease refer to the\n`SQLAlchemy Community Guide <https://www.sqlalchemy.org/develop.html>`_ for\nguidelines on coding and participating in this project.\n\nCode of Conduct\n_______________\n\nAbove all, SQLAlchemy places great emphasis on polite, thoughtful, and\nconstructive communication between users and developers.\nPlease see our current Code of Conduct at\n`Code of Conduct <https://www.sqlalchemy.org/codeofconduct.html>`_.\n\nLicense\n=======\n\nAlembic is distributed under the `MIT license\n<https://opensource.org/licenses/MIT>`_.\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/4e/1f/c4661f84df99587a216fd2f11c00a19776c4d67428dc084db6dd745a4c23/sqlalchemy-2.0.55-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "0772f7bb7cdade7041cd8bfa1bb63ea61eaa42710d395aa1163f36bd5baca222"
+          },
+          "hash": "sha256=0772f7bb7cdade7041cd8bfa1bb63ea61eaa42710d395aa1163f36bd5baca222"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "SQLAlchemy",
+        "version": "2.0.55",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "Database Abstraction Library",
+        "description_content_type": "text/x-rst",
+        "home_page": "https://www.sqlalchemy.org",
+        "author": "Mike Bayer",
+        "author_email": "mike_mp@zzzcomputing.com",
+        "license": "MIT",
+        "license_file": [
+          "LICENSE",
+          "AUTHORS"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Operating System :: OS Independent",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.7",
+          "Programming Language :: Python :: 3.8",
+          "Programming Language :: Python :: 3.9",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: 3.15",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Database :: Front-Ends"
+        ],
+        "requires_dist": [
+          "importlib-metadata; python_version < \"3.8\"",
+          "greenlet>=1; platform_machine == \"aarch64\" or (platform_machine == \"ppc64le\" or (platform_machine == \"x86_64\" or (platform_machine == \"amd64\" or (platform_machine == \"AMD64\" or (platform_machine == \"win32\" or platform_machine == \"WIN32\")))))",
+          "typing-extensions>=4.6.0",
+          "greenlet>=1; extra == \"asyncio\"",
+          "mypy>=0.910; extra == \"mypy\"",
+          "pyodbc; extra == \"mssql\"",
+          "pymssql; extra == \"mssql-pymssql\"",
+          "pyodbc; extra == \"mssql-pyodbc\"",
+          "mysqlclient>=1.4.0; extra == \"mysql\"",
+          "mysql-connector-python; extra == \"mysql-connector\"",
+          "mariadb!=1.1.10,!=1.1.2,!=1.1.5,>=1.0.1; extra == \"mariadb-connector\"",
+          "cx_oracle>=8; extra == \"oracle\"",
+          "oracledb>=1.0.1; extra == \"oracle-oracledb\"",
+          "psycopg2>=2.7; extra == \"postgresql\"",
+          "pg8000>=1.29.1; extra == \"postgresql-pg8000\"",
+          "greenlet>=1; extra == \"postgresql-asyncpg\"",
+          "asyncpg; extra == \"postgresql-asyncpg\"",
+          "psycopg2-binary; extra == \"postgresql-psycopg2binary\"",
+          "psycopg2cffi; extra == \"postgresql-psycopg2cffi\"",
+          "psycopg>=3.0.7; extra == \"postgresql-psycopg\"",
+          "psycopg[binary]>=3.0.7; extra == \"postgresql-psycopgbinary\"",
+          "pymysql; extra == \"pymysql\"",
+          "greenlet>=1; extra == \"aiomysql\"",
+          "aiomysql>=0.2.0; extra == \"aiomysql\"",
+          "greenlet>=1; extra == \"aioodbc\"",
+          "aioodbc; extra == \"aioodbc\"",
+          "greenlet>=1; extra == \"asyncmy\"",
+          "asyncmy>=0.2.12; extra == \"asyncmy\"",
+          "greenlet>=1; extra == \"aiosqlite\"",
+          "aiosqlite; extra == \"aiosqlite\"",
+          "typing_extensions!=3.10.0.1; extra == \"aiosqlite\"",
+          "sqlcipher3_binary; extra == \"sqlcipher\""
+        ],
+        "requires_python": ">=3.7",
+        "project_url": [
+          "Documentation, https://docs.sqlalchemy.org",
+          "Issue Tracker, https://github.com/sqlalchemy/sqlalchemy/"
+        ],
+        "provides_extra": [
+          "asyncio",
+          "mypy",
+          "mssql",
+          "mssql-pymssql",
+          "mssql-pyodbc",
+          "mysql",
+          "mysql-connector",
+          "mariadb-connector",
+          "oracle",
+          "oracle-oracledb",
+          "postgresql",
+          "postgresql-pg8000",
+          "postgresql-asyncpg",
+          "postgresql-psycopg2binary",
+          "postgresql-psycopg2cffi",
+          "postgresql-psycopg",
+          "postgresql-psycopgbinary",
+          "pymysql",
+          "aiomysql",
+          "aioodbc",
+          "asyncmy",
+          "aiosqlite",
+          "sqlcipher"
+        ],
+        "description": "SQLAlchemy\n==========\n\n|PyPI| |Python| |Downloads|\n\n.. |PyPI| image:: https://img.shields.io/pypi/v/sqlalchemy\n    :target: https://pypi.org/project/sqlalchemy\n    :alt: PyPI\n\n.. |Python| image:: https://img.shields.io/pypi/pyversions/sqlalchemy\n    :target: https://pypi.org/project/sqlalchemy\n    :alt: PyPI - Python Version\n\n.. |Downloads| image:: https://static.pepy.tech/badge/sqlalchemy/month\n    :target: https://pepy.tech/project/sqlalchemy\n    :alt: PyPI - Downloads\n\n\nThe Python SQL Toolkit and Object Relational Mapper\n\nIntroduction\n-------------\n\nSQLAlchemy is the Python SQL toolkit and Object Relational Mapper\nthat gives application developers the full power and\nflexibility of SQL. SQLAlchemy provides a full suite\nof well known enterprise-level persistence patterns,\ndesigned for efficient and high-performing database\naccess, adapted into a simple and Pythonic domain\nlanguage.\n\nMajor SQLAlchemy features include:\n\n* An industrial strength ORM, built\n  from the core on the identity map, unit of work,\n  and data mapper patterns.   These patterns\n  allow transparent persistence of objects\n  using a declarative configuration system.\n  Domain models\n  can be constructed and manipulated naturally,\n  and changes are synchronized with the\n  current transaction automatically.\n* A relationally-oriented query system, exposing\n  the full range of SQL's capabilities\n  explicitly, including joins, subqueries,\n  correlation, and most everything else,\n  in terms of the object model.\n  Writing queries with the ORM uses the same\n  techniques of relational composition you use\n  when writing SQL.  While you can drop into\n  literal SQL at any time, it's virtually never\n  needed.\n* A comprehensive and flexible system\n  of eager loading for related collections and objects.\n  Collections are cached within a session,\n  and can be loaded on individual access, all\n  at once using joins, or by query per collection\n  across the full result set.\n* A Core SQL construction system and DBAPI\n  interaction layer.  The SQLAlchemy Core is\n  separate from the ORM and is a full database\n  abstraction layer in its own right, and includes\n  an extensible Python-based SQL expression\n  language, schema metadata, connection pooling,\n  type coercion, and custom types.\n* All primary and foreign key constraints are\n  assumed to be composite and natural.  Surrogate\n  integer primary keys are of course still the\n  norm, but SQLAlchemy never assumes or hardcodes\n  to this model.\n* Database introspection and generation.  Database\n  schemas can be \"reflected\" in one step into\n  Python structures representing database metadata;\n  those same structures can then generate\n  CREATE statements right back out - all within\n  the Core, independent of the ORM.\n\nSQLAlchemy's philosophy:\n\n* SQL databases behave less and less like object\n  collections the more size and performance start to\n  matter; object collections behave less and less like\n  tables and rows the more abstraction starts to matter.\n  SQLAlchemy aims to accommodate both of these\n  principles.\n* An ORM doesn't need to hide the \"R\".   A relational\n  database provides rich, set-based functionality\n  that should be fully exposed.   SQLAlchemy's\n  ORM provides an open-ended set of patterns\n  that allow a developer to construct a custom\n  mediation layer between a domain model and\n  a relational schema, turning the so-called\n  \"object relational impedance\" issue into\n  a distant memory.\n* The developer, in all cases, makes all decisions\n  regarding the design, structure, and naming conventions\n  of both the object model as well as the relational\n  schema.   SQLAlchemy only provides the means\n  to automate the execution of these decisions.\n* With SQLAlchemy, there's no such thing as\n  \"the ORM generated a bad query\" - you\n  retain full control over the structure of\n  queries, including how joins are organized,\n  how subqueries and correlation is used, what\n  columns are requested.  Everything SQLAlchemy\n  does is ultimately the result of a developer-initiated \n  decision.\n* Don't use an ORM if the problem doesn't need one.\n  SQLAlchemy consists of a Core and separate ORM\n  component.   The Core offers a full SQL expression\n  language that allows Pythonic construction\n  of SQL constructs that render directly to SQL\n  strings for a target database, returning\n  result sets that are essentially enhanced DBAPI\n  cursors.\n* Transactions should be the norm.  With SQLAlchemy's\n  ORM, nothing goes to permanent storage until\n  commit() is called.  SQLAlchemy encourages applications\n  to create a consistent means of delineating\n  the start and end of a series of operations.\n* Never render a literal value in a SQL statement.\n  Bound parameters are used to the greatest degree\n  possible, allowing query optimizers to cache\n  query plans effectively and making SQL injection\n  attacks a non-issue.\n\nDocumentation\n-------------\n\nLatest documentation is at:\n\nhttps://www.sqlalchemy.org/docs/\n\nInstallation / Requirements\n---------------------------\n\nFull documentation for installation is at\n`Installation <https://www.sqlalchemy.org/docs/intro.html#installation>`_.\n\nGetting Help / Development / Bug reporting\n------------------------------------------\n\nPlease refer to the `SQLAlchemy Community Guide <https://www.sqlalchemy.org/support.html>`_.\n\nCode of Conduct\n---------------\n\nAbove all, SQLAlchemy places great emphasis on polite, thoughtful, and\nconstructive communication between users and developers.\nPlease see our current Code of Conduct at\n`Code of Conduct <https://www.sqlalchemy.org/codeofconduct.html>`_.\n\nLicense\n-------\n\nSQLAlchemy is distributed under the `MIT license\n<https://www.opensource.org/licenses/mit-license.php>`_.\n\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/94/5c/092682ae7ca1aadd44aa36b0bc35c48c9ed55f9ffebb5794980b1e2ae74b/greenlet-3.5.6-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "eed88b64a5e5da72d6a71cdc5aaeefaa5ced9b748f8d19f89800b339961dad39"
+          },
+          "hash": "sha256=eed88b64a5e5da72d6a71cdc5aaeefaa5ced9b748f8d19f89800b339961dad39"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "greenlet",
+        "version": "3.5.6",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "Lightweight in-process concurrent programming",
+        "description_content_type": "text/x-rst",
+        "keywords": [
+          "greenlet",
+          "coroutine",
+          "concurrency",
+          "threads",
+          "cooperative"
+        ],
+        "author_email": "Alexey Borzenkov <snaury@gmail.com>",
+        "maintainer_email": "Jason Madden <jason@seecoresoftware.com>",
+        "license_expression": "MIT AND PSF-2.0",
+        "license_file": [
+          "LICENSE",
+          "LICENSE.PSF"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Natural Language :: English",
+          "Programming Language :: C",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: 3.15",
+          "Operating System :: OS Independent",
+          "Topic :: Software Development :: Libraries :: Python Modules"
+        ],
+        "requires_dist": [
+          "Sphinx; extra == \"docs\"",
+          "furo; extra == \"docs\"",
+          "objgraph; extra == \"test\"",
+          "psutil; extra == \"test\"",
+          "setuptools; extra == \"test\""
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Homepage, https://greenlet.readthedocs.io",
+          "Documentation, https://greenlet.readthedocs.io",
+          "Repository, https://github.com/python-greenlet/greenlet",
+          "Issues, https://github.com/python-greenlet/greenlet/issues",
+          "Changelog, https://greenlet.readthedocs.io/en/latest/changes.html"
+        ],
+        "provides_extra": [
+          "docs",
+          "test"
+        ],
+        "description": ".. This file is included into docs/history.rst\n\n\nGreenlets are lightweight coroutines for in-process concurrent\nprogramming.\n\nThe \"greenlet\" package is a spin-off of `Stackless`_, a version of\nCPython that supports micro-threads called \"tasklets\". Tasklets run\npseudo-concurrently (typically in a single or a few OS-level threads)\nand are synchronized with data exchanges on \"channels\".\n\nA \"greenlet\", on the other hand, is a still more primitive notion of\nmicro-thread with no implicit scheduling; coroutines, in other words.\nThis is useful when you want to control exactly when your code runs.\nYou can build custom scheduled micro-threads on top of greenlet;\nhowever, it seems that greenlets are useful on their own as a way to\nmake advanced control flow structures. For example, we can recreate\ngenerators; the difference with Python's own generators is that our\ngenerators can call nested functions and the nested functions can\nyield values too. (Additionally, you don't need a \"yield\" keyword. See\nthe example in `test_generator.py\n<https://github.com/python-greenlet/greenlet/blob/adca19bf1f287b3395896a8f41f3f4fd1797fdc7/src/greenlet/tests/test_generator.py#L1>`_).\n\nGreenlets are provided as a C extension module for the regular unmodified\ninterpreter.\n\n.. _`Stackless`: http://www.stackless.com\n\n\nWho is using Greenlet?\n======================\n\nThere are several libraries that use Greenlet as a more flexible\nalternative to Python's built in coroutine support:\n\n - `Concurrence`_\n - `Eventlet`_\n - `Gevent`_\n\n.. _Concurrence: http://opensource.hyves.org/concurrence/\n.. _Eventlet: http://eventlet.net/\n.. _Gevent: http://www.gevent.org/\n\nGetting Greenlet\n================\n\nThe easiest way to get Greenlet is to install it with pip::\n\n  pip install greenlet\n\n\nSource code archives and binary distributions are available on the\npython package index at https://pypi.org/project/greenlet\n\nThe source code repository is hosted on github:\nhttps://github.com/python-greenlet/greenlet\n\nDocumentation is available on readthedocs.org:\nhttps://greenlet.readthedocs.io\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/d4/19/0b6647bf5e331521e55d2b63bfbdc210bd9cd605189273f03614a05f702d/colorlog-6.12.0-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "30d392604e9110045a2c2aeefc27d7a017abbab63f3a8aee594eac0801df784e"
+          },
+          "hash": "sha256=30d392604e9110045a2c2aeefc27d7a017abbab63f3a8aee594eac0801df784e"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "colorlog",
+        "version": "6.12.0",
+        "dynamic": [
+          "author",
+          "author-email",
+          "classifier",
+          "description",
+          "description-content-type",
+          "home-page",
+          "license",
+          "license-file",
+          "provides-extra",
+          "requires-python",
+          "summary"
+        ],
+        "summary": "Add colours to the output of Python's logging module.",
+        "description_content_type": "text/markdown",
+        "home_page": "https://github.com/borntyping/python-colorlog",
+        "author": "Sam Clements",
+        "author_email": "sam@borntyping.co.uk",
+        "license": "MIT License",
+        "license_file": [
+          "LICENSE"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Environment :: Console",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: MIT License",
+          "Operating System :: OS Independent",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7",
+          "Programming Language :: Python :: 3.8",
+          "Programming Language :: Python :: 3.9",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Topic :: Terminals",
+          "Topic :: Utilities"
+        ],
+        "requires_dist": [
+          "colorama; sys_platform == \"win32\"",
+          "black; extra == \"development\"",
+          "flake8; extra == \"development\"",
+          "mypy; extra == \"development\"",
+          "pytest; extra == \"development\"",
+          "types-colorama; extra == \"development\""
+        ],
+        "requires_python": ">=3.6",
+        "provides_extra": [
+          "development"
+        ],
+        "description": "# Log formatting with colors!\n\n[![](https://img.shields.io/pypi/v/colorlog.svg)](https://pypi.org/project/colorlog/)\n[![](https://img.shields.io/pypi/l/colorlog.svg)](https://pypi.org/project/colorlog/)\n\nAdd colours to the output of Python's `logging` module.\n\n- [Source on GitHub](https://github.com/borntyping/python-colorlog)\n- [Package on PyPI](https://pypi.org/pypi/colorlog/)\n\n## Status\n\ncolorlog currently requires Python 3.6 or higher. Older versions (below 5.x.x)\nsupport Python 2.6 and above.\n\n- colorlog 6.x requires Python 3.6 or higher.\n- colorlog 5.x is an interim version that will warn Python 2 users to downgrade.\n- colorlog 4.x is the final version supporting Python 2.\n\n[colorama] is included as a dependency on Windows, where it is automatically\ninitialised to support colored output.\n\nThis library is over a decade old and supported a wide set of Python versions\nfor most of its life, which has made it a difficult library to add new features\nto. colorlog 6 may break backwards compatibility so that newer features\ncan be added more easily, but may still not accept all changes or feature\nrequests. colorlog 4 might accept essential bugfixes but should not be\nconsidered actively maintained and will not accept any major changes or new\nfeatures.\n\n## Installation\n\nInstall from PyPI with:\n\n```bash\npip install colorlog\n```\n\nSeveral Linux distributions provide official packages ([Debian], [Arch],\n[Fedora], [Gentoo], [OpenSuse] and [Ubuntu]), and others have user provided\npackages ([BSD ports], [Conda]).\n\n## Usage\n\n```python\nimport colorlog\n\nhandler = colorlog.StreamHandler()\nhandler.setFormatter(colorlog.ColoredFormatter())\n\nlogger = colorlog.getLogger('example')\nlogger.addHandler(handler)\n```\n\n### Arguments\n\n`ColoredFormatter` extends [`logging.Formatter`][formatter] and accepts the\nfollowing arguments:\n\n- `fmt` *(default=`None`)*: A format string used to output the message. If\n  `None`, a default format string is selected based on `style` (e.g.\n  `%(log_color)s%(levelname)s:%(name)s:%(message)s` for `%` style).\n- `datefmt`, `style`, `validate`, `defaults`: see\n  [`logging.Formatter`][formatter].\n- `reset` *(default=`True`)*: Implicitly adds a color reset code to the\n  message output, unless the output already ends with one.\n- `log_colors` *(default=`None`)*: A mapping of record level names to color\n  names. If `None`, `colorlog.default_log_colors` is used.\n- `secondary_log_colors` *(default=`None`)*: A mapping of names to `log_colors`\n  style mappings, defining additional colors that can be used in format strings.\n  If `None`, an empty mapping is used.\n- `stream` *(default=`None`)*: The stream being written to (e.g. `sys.stderr`).\n  Used to detect whether the output is a TTY. Colors are disabled automatically\n  on non-TTY streams unless `force_color` is set.\n- `no_color` *(default=`False`)*: Disable color output. Can also be set via the\n  `NO_COLOR` environment variable.\n- `force_color` *(default=`False`)*: Force color output even on non-TTY streams.\n  Takes precedence over `no_color`. Can also be set via the `FORCE_COLOR`\n  environment variable.\n\n### Color escape codes\n\nColor escape codes can be selected based on the log records level, by adding\nparameters to the format string:\n\n- `log_color`: Return the color associated with the records level.\n- `<name>_log_color`: Return another color based on the records level if the\n  formatter has secondary colors configured (see `secondary_log_colors` below).\n\nMultiple escape codes can be used at once by joining them with commas when\nconfiguring the color for a log level (but can't be used directly in the format\nstring). For example, `black,bg_white` would use the escape codes for black\ntext on a white background.\n\nThe following escape codes are made available for use in the format string:\n\n- `{color}`, `fg_{color}`, `bg_{color}`: Foreground and background colors.\n- `bold`, `bold_{color}`, `fg_bold_{color}`, `bg_bold_{color}`: Bold/bright\n  colors.\n- `thin`, `thin_{color}`, `fg_thin_{color}`: Thin colors (terminal dependent).\n- `reset`: Clear all formatting (both foreground and background colors).\n\nThe available color names are:\n\n- `black`\n- `red`\n- `green`\n- `yellow`\n- `blue`\n- `purple`\n- `cyan`\n- `white`\n\nYou can also use \"bright\" colors. These aren't standard ANSI codes, and\nsupport for these varies wildly across different terminals.\n\n- `light_black`\n- `light_red`\n- `light_green`\n- `light_yellow`\n- `light_blue`\n- `light_purple`\n- `light_cyan`\n- `light_white`\n\nIn addition to pre-defined color names, you can use integers from 0 to 255 for\n256-color support (e.g. `fg_196`, `bg_42`).\n\n## Examples\n\n![Example output](docs/example.png)\n\nThe following snippet creates a `ColoredFormatter` for use in a logging setup,\nwith a custom format string and log colors:\n\n```python\nfrom colorlog import ColoredFormatter\n\nformatter = ColoredFormatter(\n\t\"%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s\",\n\tlog_colors={\n\t\t\"DEBUG\": \"cyan\",\n\t\t\"INFO\": \"green\",\n\t\t\"WARNING\": \"yellow\",\n\t\t\"ERROR\": \"red\",\n\t\t\"CRITICAL\": \"red,bg_white\",\n\t}\n)\n```\n\n*See `docs/example.py` for full example script.*\n\n### Using `secondary_log_colors`\n\nSecondary log colors are a way to have more than one color that is selected\nbased on the log level. Each key in `secondary_log_colors` adds an attribute\nthat can be used in format strings (`message` becomes `message_log_color`), and\nhas a corresponding value that is identical in format to the `log_colors`\nargument.\n\nThe following example highlights the level name using the default log colors,\nand highlights the message in red for `error` and `critical` level log messages.\n\n```python\nfrom colorlog import ColoredFormatter\n\nformatter = ColoredFormatter(\n\t\"%(log_color)s%(levelname)-8s%(reset)s %(message_log_color)s%(message)s\",\n\tsecondary_log_colors={\n\t\t'message': {\n\t\t\t'ERROR': 'red',\n\t\t\t'CRITICAL': 'red'\n\t\t}\n\t}\n)\n```\n\n### With [`dictConfig`][dictconfig]\n\n```python\nlogging.config.dictConfig({\n\t'formatters': {\n\t\t'colored': {\n\t\t\t'()': 'colorlog.ColoredFormatter',\n\t\t\t'format': \"%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s\"\n\t\t}\n\t}\n})\n```\n\nA full example dictionary can be found in `tests/test_colorlog.py`.\n\n### With [`fileConfig`][fileconfig]\n\n```ini\n...\n\n[formatters]\nkeys=color\n\n[formatter_color]\nclass=colorlog.ColoredFormatter\nformat=%(log_color)s%(levelname)-8s%(reset)s %(bg_blue)s[%(name)s]%(reset)s %(message)s from fileConfig\ndatefmt=%m-%d %H:%M:%S\n```\n\nAn instance of ColoredFormatter created with those arguments will then be used\nby any handlers that are configured to use the `color` formatter.\n\nA full example configuration can be found in `tests/test_config.ini`.\n\n### With custom log levels\n\nColoredFormatter will work with custom log levels added with\n[`logging.addLevelName`][addlevelname]:\n\n```python\nimport logging, colorlog\nTRACE = 5\nlogging.addLevelName(TRACE, 'TRACE')\nformatter = colorlog.ColoredFormatter(log_colors={'TRACE': 'yellow'})\nhandler = logging.StreamHandler()\nhandler.setFormatter(formatter)\nlogger = logging.getLogger('example')\nlogger.addHandler(handler)\nlogger.setLevel('TRACE')\nlogger.log(TRACE, 'a message using a custom level')\n```\n\n## Tests\n\nTests similar to the above examples are found in `tests/test_colorlog.py`.\n\n## Status\n\ncolorlog is in maintenance mode. I try and ensure bugfixes are published,\nbut compatibility a wide set of Python versions makes this a difficult\ncodebase to add features to. Any changes that might break backwards\ncompatibility for existing users will not be considered.\n\n## Alternatives\n\nThere are some more modern libraries for improving Python logging you may\nfind useful.\n\n- [structlog]\n- [jsonlog]\n\n## Projects using colorlog\n\nGitHub provides [a list of projects that depend on colorlog][dependents].\n\nSome early adopters included [Errbot], [Pythran], and [zenlog].\n\n## Licence\n\nCopyright (c) 2012-2025 Sam Clements <sam@borntyping.co.uk>\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of\nthis software and associated documentation files (the \"Software\"), to deal in\nthe Software without restriction, including without limitation the rights to\nuse, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of\nthe Software, and to permit persons to whom the Software is furnished to do so,\nsubject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS\nFOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR\nCOPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER\nIN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\nCONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n[addlevelname]: https://docs.python.org/3/library/logging.html#logging.addLevelName\n[arch]: https://archlinux.org/packages/extra/any/python-colorlog/\n[bsd ports]: https://www.freshports.org/devel/py-colorlog/\n[colorama]: https://pypi.python.org/pypi/colorama\n[conda]: https://anaconda.org/conda-forge/colorlog\n[debian]: https://packages.debian.org/trixie/python3-colorlog\n[dependents]: https://github.com/borntyping/python-colorlog/network/dependents?package_id=UGFja2FnZS01MDk3NDcyMQ%3D%3D\n[dictconfig]: http://docs.python.org/3/library/logging.config.html#logging.config.dictConfig\n[errbot]: http://errbot.io/\n[fedora]: https://src.fedoraproject.org/rpms/python-colorlog\n[fileconfig]: http://docs.python.org/3/library/logging.config.html#logging.config.fileConfig\n[formatter]: http://docs.python.org/3/library/logging.html#logging.Formatter\n[gentoo]: https://packages.gentoo.org/packages/dev-python/colorlog\n[jsonlog]: https://github.com/borntyping/jsonlog\n[opensuse]: http://rpm.pbone.net/index.php3?stat=3&search=python-colorlog&srodzaj=3\n[pythran]: https://github.com/serge-sans-paille/pythran\n[structlog]: https://www.structlog.org/en/stable/\n[ubuntu]: https://launchpad.net/python-colorlog\n[zenlog]: https://github.com/ManufacturaInd/python-zenlog\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/6d/a0/053d6af3e8f871e0073b4a36732d9e65be77a72e5434c31b94f6af78a6bb/mako-1.4.3-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f"
+          },
+          "hash": "sha256=723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "Mako",
+        "version": "1.4.3",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "A super-fast templating language that borrows the best ideas from the existing templating languages.",
+        "description_content_type": "text/x-rst",
+        "author_email": "Mike Bayer <mike@zzzcomputing.com>",
+        "license_expression": "MIT",
+        "license_file": [
+          "LICENSE"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Environment :: Web Environment",
+          "Intended Audience :: Developers",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: 3.15",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
+        ],
+        "requires_dist": [
+          "MarkupSafe>=2.0",
+          "pytest; extra == \"testing\"",
+          "Babel; extra == \"babel\"",
+          "lingua>=4.16; extra == \"lingua\""
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Homepage, https://www.makotemplates.org/",
+          "Documentation, https://docs.makotemplates.org",
+          "Issue Tracker, https://github.com/sqlalchemy/mako"
+        ],
+        "provides_extra": [
+          "testing",
+          "babel",
+          "lingua"
+        ],
+        "description": "=========================\nMako Templates for Python\n=========================\n\nMako is a template library written in Python. It provides a familiar, non-XML \nsyntax which compiles into Python modules for maximum performance. Mako's \nsyntax and API borrows from the best ideas of many others, including Django\ntemplates, Cheetah, Myghty, and Genshi. Conceptually, Mako is an embedded \nPython (i.e. Python Server Page) language, which refines the familiar ideas\nof componentized layout and inheritance to produce one of the most \nstraightforward and flexible models available, while also maintaining close \nties to Python calling and scoping semantics.\n\nNutshell\n========\n\n::\n\n    <%inherit file=\"base.html\"/>\n    <%\n        rows = [[v for v in range(0,10)] for row in range(0,10)]\n    %>\n    <table>\n        % for row in rows:\n            ${makerow(row)}\n        % endfor\n    </table>\n\n    <%def name=\"makerow(row)\">\n        <tr>\n        % for name in row:\n            <td>${name}</td>\\\n        % endfor\n        </tr>\n    </%def>\n\nPhilosophy\n===========\n\nPython is a great scripting language. Don't reinvent the wheel...your templates can handle it !\n\nDocumentation\n==============\n\nSee documentation for Mako at https://docs.makotemplates.org/en/latest/\n\nLicense\n========\n\nMako is licensed under an MIT-style license (see LICENSE).\nOther incorporated projects may be licensed under different licenses.\nAll licenses allow for non-commercial and commercial use.\n"
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://pypi.tuna.tsinghua.edu.cn/packages/60/3f/3e3f8fd0919249b0200c80fbc4f9a1e70be19f9883da71dfb7f8b9ab8aca/tomli-2.5.0-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "32a7b79ac57a2e83670ce329ccf675798bc5a2094783a63676866b70503f2e2b"
+          },
+          "hash": "sha256=32a7b79ac57a2e83670ce329ccf675798bc5a2094783a63676866b70503f2e2b"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.5",
+        "name": "tomli",
+        "version": "2.5.0",
+        "summary": "A lil' TOML parser",
+        "description_content_type": "text/markdown",
+        "keywords": [
+          "toml"
+        ],
+        "author_email": "Taneli Hukkinen <hukkin@users.noreply.github.com>",
+        "license_expression": "MIT",
+        "license_file": [
+          "LICENSE"
+        ],
+        "classifier": [
+          "Operating System :: MacOS",
+          "Operating System :: Microsoft :: Windows",
+          "Operating System :: POSIX :: Linux",
+          "Programming Language :: Python :: 3 :: Only",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Software Development :: Libraries :: Python Modules",
+          "Typing :: Typed"
+        ],
+        "requires_python": ">=3.8",
+        "project_url": [
+          "Changelog, https://github.com/hukkin/tomli/blob/master/CHANGELOG.md",
+          "Homepage, https://github.com/hukkin/tomli"
+        ],
+        "description": "[![Build Status](https://github.com/hukkin/tomli/actions/workflows/tests.yaml/badge.svg?branch=master)](https://github.com/hukkin/tomli/actions?query=workflow%3ATests+branch%3Amaster+event%3Apush)\n[![PyPI version](https://img.shields.io/pypi/v/tomli)](https://pypi.org/project/tomli)\n\n# Tomli\n\n> A lil' TOML parser\n\n**Table of Contents** *generated with [mdformat-toc](https://github.com/hukkin/mdformat-toc)*\n\n<!-- mdformat-toc start --slug=github --maxlevel=6 --minlevel=2 -->\n\n- [Intro](#intro)\n- [Installation](#installation)\n- [Usage](#usage)\n  - [Parse a TOML string](#parse-a-toml-string)\n  - [Parse a TOML file](#parse-a-toml-file)\n  - [Handle invalid TOML](#handle-invalid-toml)\n  - [Construct `decimal.Decimal`s from TOML floats](#construct-decimaldecimals-from-toml-floats)\n  - [Building a `tomli`/`tomllib` compatibility layer](#building-a-tomlitomllib-compatibility-layer)\n- [FAQ](#faq)\n  - [Why this parser?](#why-this-parser)\n  - [Is comment preserving round-trip parsing supported?](#is-comment-preserving-round-trip-parsing-supported)\n  - [Is there a `dumps`, `write` or `encode` function?](#is-there-a-dumps-write-or-encode-function)\n  - [How do TOML types map into Python types?](#how-do-toml-types-map-into-python-types)\n- [Performance](#performance)\n  - [Mypyc generated wheel](#mypyc-generated-wheel)\n  - [Pure Python](#pure-python)\n\n<!-- mdformat-toc end -->\n\n## Intro<a name=\"intro\"></a>\n\nTomli is a Python library for parsing [TOML](https://toml.io).\nVersion 2.4.0 and later are compatible with [TOML v1.1.0](https://toml.io/en/v1.1.0).\nOlder versions are [TOML v1.0.0](https://toml.io/en/v1.0.0) compatible.\n\nA version of Tomli, the `tomllib` module,\nwas added to the standard library in Python 3.11\nvia [PEP 680](https://www.python.org/dev/peps/pep-0680/).\nTomli provides a TOML v1.1.0 compatible backport for Pythons older than 3.15.\nOn the other hand, installing `tomli<2.4` allows TOML v1.0.0 parsing on Python 3.15+.\n\nTomli uses [mypyc](https://github.com/mypyc/mypyc)\nto generate binary wheels for most of the widely used platforms,\nso some may prefer it over `tomllib` for improved performance.\nPure Python wheels are available on any platform and should perform the same as `tomllib`.\n\n## Installation<a name=\"installation\"></a>\n\n```bash\npip install tomli\n```\n\n## Usage<a name=\"usage\"></a>\n\n### Parse a TOML string<a name=\"parse-a-toml-string\"></a>\n\n```python\nimport tomli\n\ntoml_str = \"\"\"\n[[players]]\nname = \"Lehtinen\"\nnumber = 26\n\n[[players]]\nname = \"Numminen\"\nnumber = 27\n\"\"\"\n\ntoml_dict = tomli.loads(toml_str)\nassert toml_dict == {\n    \"players\": [{\"name\": \"Lehtinen\", \"number\": 26}, {\"name\": \"Numminen\", \"number\": 27}]\n}\n```\n\n### Parse a TOML file<a name=\"parse-a-toml-file\"></a>\n\n```python\nimport tomli\n\nwith open(\"path_to_file/conf.toml\", \"rb\") as f:\n    toml_dict = tomli.load(f)\n```\n\nThe file must be opened in binary mode (with the `\"rb\"` flag).\nBinary mode will enforce decoding the file as UTF-8 with universal newlines disabled,\nboth of which are required to correctly parse TOML.\n\n### Handle invalid TOML<a name=\"handle-invalid-toml\"></a>\n\n```python\nimport tomli\n\ntry:\n    toml_dict = tomli.loads(\"]] this is invalid TOML [[\")\nexcept tomli.TOMLDecodeError:\n    print(\"Yep, definitely not valid.\")\n```\n\nNote that error messages are considered informational only.\nThey should not be assumed to stay constant across Tomli versions.\n\n### Construct `decimal.Decimal`s from TOML floats<a name=\"construct-decimaldecimals-from-toml-floats\"></a>\n\n```python\nfrom decimal import Decimal\nimport tomli\n\ntoml_dict = tomli.loads(\"precision-matters = 0.982492\", parse_float=Decimal)\nassert isinstance(toml_dict[\"precision-matters\"], Decimal)\nassert toml_dict[\"precision-matters\"] == Decimal(\"0.982492\")\n```\n\nNote that `decimal.Decimal` can be replaced with another callable that converts a TOML float from string to a Python type.\nThe `decimal.Decimal` is, however, a practical choice for use cases where float inaccuracies can not be tolerated.\n\nIllegal types are `dict` and `list`, and their subtypes.\nA `ValueError` will be raised if `parse_float` produces illegal types.\n\n### Building a `tomli`/`tomllib` compatibility layer<a name=\"building-a-tomlitomllib-compatibility-layer\"></a>\n\nPython versions 3.11+ ship with a version of Tomli:\nthe `tomllib` standard library module.\nTo build code that uses the standard library if available,\nbut still works seamlessly with Python 3.6+,\ndo the following.\n\nInstead of a hard Tomli dependency, use the following\n[dependency specifier](https://packaging.python.org/en/latest/specifications/dependency-specifiers/)\nto only require Tomli when the standard library module is not available:\n\n```\ntomli >= 1.1.0 ; python_version < \"3.11\"\n```\n\nThen, in your code, import a TOML parser using the following fallback mechanism:\n\n```python\nimport sys\n\nif sys.version_info >= (3, 11):\n    import tomllib\nelse:\n    import tomli as tomllib\n\ntomllib.loads(\"['This parses fine with Python 3.6+']\")\n```\n\n## FAQ<a name=\"faq\"></a>\n\n### Why this parser?<a name=\"why-this-parser\"></a>\n\n- it's lil'\n- pure Python with zero dependencies\n- the fastest pure Python parser [\\*](#pure-python):\n  14x as fast as [tomlkit](https://pypi.org/project/tomlkit/),\n  2.1x as fast as [toml](https://pypi.org/project/toml/)\n- outputs [basic data types](#how-do-toml-types-map-into-python-types) only\n- 100% spec compliant: passes all tests in\n  [toml-lang/toml-test](https://github.com/toml-lang/toml-test)\n  test suite\n- thoroughly tested: 100% branch coverage\n\n### Is comment preserving round-trip parsing supported?<a name=\"is-comment-preserving-round-trip-parsing-supported\"></a>\n\nNo.\n\nThe `tomli.loads` function returns a plain `dict` that is populated with builtin types and types from the standard library only.\nPreserving comments requires a custom type to be returned so will not be supported,\nat least not by the `tomli.loads` and `tomli.load` functions.\n\nLook into [TOML Kit](https://github.com/sdispater/tomlkit) if preservation of style is what you need.\n\n### Is there a `dumps`, `write` or `encode` function?<a name=\"is-there-a-dumps-write-or-encode-function\"></a>\n\n[Tomli-W](https://github.com/hukkin/tomli-w) is the write-only counterpart of Tomli, providing `dump` and `dumps` functions.\n\nThe core library does not include write capability, as most TOML use cases are read-only, and Tomli intends to be minimal.\n\n### How do TOML types map into Python types?<a name=\"how-do-toml-types-map-into-python-types\"></a>\n\n| TOML type        | Python type         | Details                                                      |\n| ---------------- | ------------------- | ------------------------------------------------------------ |\n| Document Root    | `dict`              |                                                              |\n| Key              | `str`               |                                                              |\n| String           | `str`               |                                                              |\n| Integer          | `int`               |                                                              |\n| Float            | `float`             |                                                              |\n| Boolean          | `bool`              |                                                              |\n| Offset Date-Time | `datetime.datetime` | `tzinfo` attribute set to an instance of `datetime.timezone` |\n| Local Date-Time  | `datetime.datetime` | `tzinfo` attribute set to `None`                             |\n| Local Date       | `datetime.date`     |                                                              |\n| Local Time       | `datetime.time`     |                                                              |\n| Array            | `list`              |                                                              |\n| Table            | `dict`              |                                                              |\n| Inline Table     | `dict`              |                                                              |\n\n## Performance<a name=\"performance\"></a>\n\nThe `benchmark/` folder in this repository contains a performance benchmark for comparing the various Python TOML parsers.\n\nBelow are the results for commit [064e492](https://github.com/hukkin/tomli/tree/064e492919b2338def788753b8c981c9131334c0).\n\n### Mypyc generated wheel<a name=\"mypyc-generated-wheel\"></a>\n\n```console\nfoo@bar:~/dev/tomli$ python --version\nPython 3.14.2\nfoo@bar:~/dev/tomli$ pip freeze\npytomlpp==1.1.0\nrtoml==0.13.0\ntoml==0.10.2\ntomli @ file:///home/foo/dev/tomli\ntomlkit==0.13.3\nfoo@bar:~/dev/tomli$ python benchmark/run.py\nParsing data.toml 5000 times:\n------------------------------------------------------\n    parser |  exec time | performance (more is better)\n-----------+------------+-----------------------------\n     rtoml |    0.328 s | baseline (100%)\n  pytomlpp |    0.365 s | 89.75%\n     tomli |    0.838 s | 39.12%\n      toml |     3.01 s | 10.90%\n   tomlkit |     20.7 s | 1.59%\n```\n\n### Pure Python<a name=\"pure-python\"></a>\n\n```console\nfoo@bar:~/dev/tomli$ python benchmark/run.py\nParsing data.toml 5000 times:\n------------------------------------------------------\n    parser |  exec time | performance (more is better)\n-----------+------------+-----------------------------\n     rtoml |    0.323 s | baseline (100%)\n  pytomlpp |    0.365 s | 88.40%\n     tomli |     1.44 s | 22.36%\n      toml |     3.03 s | 10.65%\n   tomlkit |     20.6 s | 1.57%\n```\n\n"
+      }
+    }
+  ],
+  "environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.10.19",
+    "os_name": "posix",
+    "platform_machine": "x86_64",
+    "platform_release": "6.8.0-138-generic",
+    "platform_system": "Linux",
+    "platform_version": "#138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC ",
+    "python_full_version": "3.10.19",
+    "platform_python_implementation": "CPython",
+    "python_version": "3.10",
+    "sys_platform": "linux"
+  }
+}
