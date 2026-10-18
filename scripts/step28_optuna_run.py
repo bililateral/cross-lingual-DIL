@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+from contextlib import contextmanager
 from functools import partial
 import math
 import os
@@ -23,11 +24,15 @@ POLICY = data.ROOT/"schema/step28_optuna_policy.json"
 CONTRACT = data.ROOT/"docs/SELLER_ALIAS_OPTUNA.zh.md"
 SCOPE = data.ROOT/"reports/documentation/20261018/optuna_plan/implementation_scope.zh.txt"
 AUTHORIZATION = data.ROOT/"reports/documentation/20261018/optuna_implementation/authorization.json"
+REPAIR_SCOPE = data.ROOT/"reports/documentation/20261018/optuna_implementation/review/repair_scope.zh.txt"
+REPAIR_AUTHORIZATION = data.ROOT/"reports/documentation/20261018/optuna_implementation/repair/authorization.json"
+EVIDENCE_LIMIT=2*2**30
 COMPLETE = single.COMPLETE
 CPU_TESTS=("test_actual_objective_vjp_lr_and_rejected_omissions", "test_seeds_own_memory_capture_and_restore",
     "test_real_optuna_selection_and_stop", "test_disjoint_budgets_and_real_launcher_failure",
     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
-    "test_cpu_six_call_fixture_orchestration")
+    "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
+    "test_repair_controller_boundaries")
 
 
 def sources():
@@ -46,7 +51,7 @@ def sources():
                         paths.add(child); todo.append(child)
     paths.update(data.ROOT/"schema"/n for n in ("step28_g_half_policy.json", "step28_record_replay_policy.json",
         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
-    paths.update((POLICY, CONTRACT, SCOPE, AUTHORIZATION))
+    paths.update((POLICY, CONTRACT, SCOPE, AUTHORIZATION, REPAIR_SCOPE, REPAIR_AUTHORIZATION))
     paths.add(data.ROOT/"scripts/run_step28_optuna_cpu_linux_20261018.sh")
     return [data.record(p, data.ROOT) for p in sorted(paths)]
 
@@ -68,18 +73,43 @@ def runtime():
 
 
 class Budget(single.legacy.Budget):
-    def __init__(self, root, seconds=9000):
+    def __init__(self, root, seconds=9000, *, campaign=None):
         super().__init__(root)
         self.limits = {**runtime(), "maximum_gpu_stage_seconds": seconds}
+        self.campaign = campaign if campaign is not None else root.parent
 
     def output_files(self):
-        return list(self.root.parent.rglob("*"))
+        return list(self.campaign.rglob("*"))
 
-    def check(self,reserve=0):
-        previous_scan=self.last_disk
-        super().check(reserve)
-        if self.last_disk!=previous_scan and sum(p.stat().st_size for p in self.root.parent.rglob("*") if p.is_file() and p.suffix!=".pt")>2*2**30:
-            raise RuntimeError("Campaign evidence exceeds 2 GiB")
+    def check(self,reserve=0,*,force=False):
+        with self.lock:
+            if force:self.last_disk=-float("inf")
+            previous_scan=self.last_disk
+            super().check(reserve)
+            if self.last_disk!=previous_scan and sum(p.stat().st_size for p in self.output_files() if p.is_file() and p.suffix!=".pt")>EVIDENCE_LIMIT:
+                raise RuntimeError("Campaign evidence exceeds 2 GiB")
+
+
+@contextmanager
+def shared_resources(campaign,kind):
+    """Check the actual CPU evaluator/analyzer and the complete campaign output."""
+    if os.environ.get("CUDA_VISIBLE_DEVICES")!="":raise ValueError("Shared stages require hidden GPU")
+    budget=Budget(campaign,control.SHARED[kind],campaign=campaign)
+    budget.phase=kind
+    budget.check(force=True)
+    stop=threading.Event()
+    def watch():
+        while not stop.wait(.2):
+            try:budget.check()
+            except BaseException:
+                data.write_json(campaign/(kind+"_resource_failure.json"),dict(traceback=traceback.format_exc(),budget=budget.snapshot()))
+                os._exit(2)
+    thread=threading.Thread(target=watch,daemon=True);thread.start()
+    try:
+        yield budget
+        budget.check(force=True)
+    finally:
+        stop.set();thread.join()
 
 
 class Entry:
@@ -170,7 +200,10 @@ def anchor_compatibility(entry, scores):
         return None
     root = (entry.baseline_runs()["S"][0] if entry.spec.arm == "S" else
             data.ROOT/"reports/seller_alias_continual/20261018/positive_ranking_result/job")
-    manifest = data.read_json(root/"run/manifest.json")
+    manifest_path=root/"run/manifest.json"
+    if entry.spec.arm!="S":
+        data.verify(manifest_path,dict(bytes=210304,sha256="ef6416de2070376c4e45613493a23bd92083293f9b5b8bad8fabf430d5742d35"))
+    manifest = data.read_json(manifest_path)
     for name in entry.POINTS:
         prior = previous.array(root/"run", manifest["points"][name]["scores"]["raw"], (40, 378), np.float32)
         if not np.array_equal(scores[name]["raw"], prior):
@@ -277,6 +310,11 @@ def execute_trial(job, spec, gate_path):
 
 
 def joint_evaluate(campaign, specs, records):
+    with shared_resources(campaign,"evaluation") as budget:
+        return _joint_evaluate(campaign,specs,records,budget)
+
+
+def _joint_evaluate(campaign, specs, records, budget):
     control.joint_opening(records,specs)
     prepared=[]
     for spec in specs:
@@ -297,10 +335,13 @@ def joint_evaluate(campaign, specs, records):
         loader=lambda gs,c,s:single.attach_labels(gs,c,s,metadata))
     for job,entry,manifest,scores,split in prepared:
         evaluate_run(job,entry,manifest,scores,labelled,split)
+        budget.check(force=True)
     return replication_statistics(campaign,specs)
 
 
 def replication_statistics(campaign,specs):
+    if len(specs)!=9 or {(s.arm,s.seed) for s in specs}!={(a,s) for a in ARMS for s in (1,2,3)}:
+        raise ValueError("All three fixed seeds required for each arm")
     cols={};arrays={}
     for spec in specs:
         root=campaign/spec.run_id/"evaluation";col=data.read_json(root/"collected.json")
@@ -315,27 +356,28 @@ def replication_statistics(campaign,specs):
     for arm in ARMS:
         result["three_seed_absolute"][arm]={phase:{role:old.summarize(np.mean([arrays[arm,s][phase+"_"+arm][role] for s in (1,2,3)],axis=0),rows,draws)
             for role in parent.ROLES} for phase in "AB"}
-    for arm in ("S_pos","H_pos"):
+    for arm,opponent in (("S_pos","S"),("H_pos","S"),("H_pos","S_pos")):
         each={};aggregate={}
         for seed in (1,2,3):
-            a,b=arrays[arm,seed],arrays["S",seed]
-            each[str(seed)]={phase:{role:old.summarize(a[phase+"_"+arm][role]-b[phase+"_S"][role],rows,draws)
+            a,b=arrays[arm,seed],arrays[opponent,seed]
+            each[str(seed)]={phase:{role:old.summarize(a[phase+"_"+arm][role]-b[phase+"_"+opponent][role],rows,draws)
                 for role in parent.ROLES} for phase in "AB"}
             each[str(seed)]["forgetting"]={role:old.summarize(((a["A_"+arm][role]-a["B_"+arm][role])-
-                (b["A_S"][role]-b["B_S"][role]))*signs,rows,draws)["A"] for role in parent.ROLES}
+                (b["A_"+opponent][role]-b["B_"+opponent][role]))*signs,rows,draws)["A"] for role in parent.ROLES}
         for phase in "AB":
             aggregate[phase]={role:old.summarize(np.mean([arrays[arm,s][phase+"_"+arm][role]-
-                arrays["S",s][phase+"_S"][role] for s in (1,2,3)],axis=0),rows,draws) for role in parent.ROLES}
+                arrays[opponent,s][phase+"_"+opponent][role] for s in (1,2,3)],axis=0),rows,draws) for role in parent.ROLES}
         aggregate["forgetting"]={role:old.summarize(np.mean([((arrays[arm,s]["A_"+arm][role]-arrays[arm,s]["B_"+arm][role])-
-            (arrays["S",s]["A_S"][role]-arrays["S",s]["B_S"][role]))*signs for s in (1,2,3)],axis=0),rows,draws)["A"] for role in parent.ROLES}
-        result["comparisons"][arm+"-S"]=dict(by_seed=each,three_seed_mean=aggregate)
-        result["development_direction_consistency"][arm]=all(each[str(s)]["B"]["raw"][d]["map"]["mean"]>0 for s in (1,2,3) for d in "AB")
+            (arrays[opponent,s]["A_"+opponent][role]-arrays[opponent,s]["B_"+opponent][role]))*signs for s in (1,2,3)],axis=0),rows,draws)["A"] for role in parent.ROLES}
+        result["comparisons"][arm+"-"+opponent]=dict(by_seed=each,three_seed_mean=aggregate)
+        if opponent=="S":
+            result["development_direction_consistency"][arm]=all(each[str(s)]["B"]["raw"][d]["map"]["mean"]>0 for s in (1,2,3) for d in "AB")
         sub={}
         for count in (1,2):
             deltas=[];by_seed={}
             for seed in (1,2,3):
                 pair=[]
-                for candidate in (arm,"S"):
+                for candidate in (arm,opponent):
                     spec=next(s for s in specs if s.arm==candidate and s.seed==seed)
                     root=campaign/spec.run_id/"evaluation";col=cols[candidate,seed]
                     degrees=previous.array(root,col["query_positive_counts"],(40,28),np.uint8)
@@ -345,9 +387,44 @@ def replication_statistics(campaign,specs):
                 by_seed[str(seed)]={d:dict(mean=float(delta[r].mean()),conditional_95pct_interval=np.quantile(delta[r][draws[:,i,:]].mean(1),[.025,.975]).tolist()) for i,(d,r) in enumerate(zip("AB",rows))}
             delta=np.mean(deltas,axis=0)
             sub[str(count)]=dict(by_seed=by_seed,three_seed_mean={d:dict(mean=float(delta[r].mean()),conditional_95pct_interval=np.quantile(delta[r][draws[:,i,:]].mean(1),[.025,.975]).tolist()) for i,(d,r) in enumerate(zip("AB",rows))})
-        result["query_subgroup_MAP_comparisons"][arm+"-S"]=sub
+        result["query_subgroup_MAP_comparisons"][arm+"-"+opponent]=sub
+    result["diagnostics"]=replication_diagnostics(campaign,specs)
     result.update(status="NINE_REPLICATIONS_EVALUATED",limits="Development only; all nine retained regardless of six-cell result. No seed-population or final independent confirmation claim.")
     data.write_json(campaign/"joint/evaluation.json",result)
+    return result
+
+
+def replication_diagnostics(campaign,specs):
+    """Describe fixed-seed point curves; retain conditional intervals per seed only."""
+    result={}
+    for arm in ARMS:
+        per_seed={}
+        for seed in (1,2,3):
+            spec=next(s for s in specs if s.arm==arm and s.seed==seed)
+            job=campaign/spec.run_id
+            path=job/"diagnostics_evaluation/overfitting.json"
+            report=data.read_json(path);manifest=data.read_json(job/"run/manifest.json")
+            populations={}
+            for phase in "AB":
+                rec=manifest["diagnostics"][phase+"_"+arm][0]
+                captured=data.read_json(data.verify(job/"run/diagnostics"/rec["path"],rec))
+                populations[phase]={k:captured[k] for k in ("fit_ids","fit_domains","cache_ids","cache_domains","valid_ids")}
+            per_seed[str(seed)]=dict(source=data.record(path,campaign),populations=populations,points=report["points"])
+        means={}
+        for phase in "AB":
+            means[phase]={}
+            for role,domains in (("fit",phase),("cache","A" if phase=="B" else "")):
+                means[phase][role]={}
+                for domain in domains:
+                    rows=[per_seed[str(s)]["points"][phase+"_"+arm][role][domain] for s in (1,2,3)]
+                    if any(r["status"]!="DESCRIPTIVE_CONDITIONAL_DEVELOPMENT_DIAGNOSIS" for r in rows):
+                        raise ValueError("Complete seed diagnostics required")
+                    means[phase][role][domain]={k:np.mean([r[k] for r in rows],axis=0).tolist()
+                        for k in ("train_raw_curve","valid_raw_curve","benefit_gap_curve")}
+                    means[phase][role][domain].update({k:np.mean([r[k]["mean"] for r in rows],axis=0).tolist()
+                        for k in ("epoch1_to_6_train_benefit","epoch1_to_6_valid_benefit","epoch1_to_6_gap_widening")})
+        result[arm]=dict(by_seed=per_seed,three_fixed_seed_point_means=means,
+            limits="Equal-weight descriptive points only; populations stay per seed, no pooled cache sample, averaged CI or seed-population inference.")
     return result
 
 

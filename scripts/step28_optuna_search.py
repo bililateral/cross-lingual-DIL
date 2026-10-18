@@ -14,10 +14,29 @@ import subprocess
 import sys
 import time
 import traceback
+import json
 
-import step28_optuna_run as run
-from step28_optuna import ARMS, TrialSpec
-from step28_optuna_control import Ledger, Search, S0, projected_gate, replication_specs, joint_opening
+
+def expired(signum,frame):
+    raise TimeoutError("Hard campaign interval deadline")
+
+
+# Arm the control deadline before importing torch/Optuna or any project module.
+# Imports of this module by trial children do not install a controller timer.
+if __name__=="__main__":
+    signal.signal(signal.SIGALRM,expired)
+    signal.setitimer(signal.ITIMER_REAL,max(.001,300-(time.monotonic()-MODULE_STARTED)))
+
+try:
+    import step28_optuna_run as run
+    from step28_optuna import ARMS, TrialSpec
+    from step28_optuna_control import Ledger, Search, S0, projected_gate, replication_specs, joint_opening
+except BaseException:
+    if __name__=="__main__":
+        signal.setitimer(signal.ITIMER_REAL,2)
+        print(json.dumps(dict(status="CONTROLLER_IMPORT_FAILED_NO_DISPATCH",control_seconds=time.monotonic()-MODULE_STARTED,
+            traceback=traceback.format_exc())),flush=True)
+    raise
 
 data=run.data
 
@@ -94,18 +113,47 @@ def fixed_reference():
 
 @contextmanager
 def charged(ledger,kind,**kwargs):
-    def expired(signum,frame):raise TimeoutError("Hard campaign interval deadline")
-    with ledger.interval(kind,**kwargs) as seconds:
-        prior=signal.signal(signal.SIGALRM,expired)
-        signal.setitimer(signal.ITIMER_REAL,seconds)
-        try:yield seconds
-        finally:
-            signal.setitimer(signal.ITIMER_REAL,0);signal.signal(signal.SIGALRM,prior)
+    bill_control_gap(ledger)
+    try:
+        with ledger.interval(kind,**kwargs) as seconds:
+            prior=signal.signal(signal.SIGALRM,expired)
+            signal.setitimer(signal.ITIMER_REAL,seconds)
+            try:yield seconds
+            finally:
+                signal.setitimer(signal.ITIMER_REAL,0);signal.signal(signal.SIGALRM,prior)
+    finally:
+        if getattr(ledger,"continuous_control",False):
+            ledger.control_since=time.monotonic()
+            if not ledger.failed:
+                signal.signal(signal.SIGALRM,expired)
+                signal.setitimer(signal.ITIMER_REAL,max(.001,ledger.remaining("control")))
+
+
+def bill_control_gap(ledger,*,enforce=True):
+    start=getattr(ledger,"control_since",None)
+    if start is None:return
+    ledger.control_since=None
+    elapsed=time.monotonic()-start
+    ledger.used["control"]+=elapsed
+    ledger.intervals.append(dict(kind="control",run_id=None,arm=None,seconds=elapsed,error=None))
+    if enforce and ledger.remaining("control")<=0:
+        ledger.failed=True
+        raise TimeoutError("Controller startup/gap/finalization exhausted C")
+
+
+def group_members(pgid):
+    import psutil
+    members=[]
+    for p in psutil.process_iter(["pid","status"]):
+        try:
+            # Zombies have released memory/device/file resources; the leader is reaped separately.
+            if os.getpgid(p.pid)==pgid and p.info["status"]!=psutil.STATUS_ZOMBIE:members.append(p.pid)
+        except (ProcessLookupError,PermissionError,psutil.NoSuchProcess):pass
+    return members
 
 
 def launch(command,log,seconds,env):
     """Bound the owned process group including import, exit and worker release."""
-    import psutil
     started=time.monotonic();deadline=started+seconds
     with log.open("x",encoding="utf-8") as stream:
         child=subprocess.Popen(command,stdout=stream,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -113,20 +161,25 @@ def launch(command,log,seconds,env):
             while True:
                 if time.monotonic()>=deadline:raise TimeoutError("Child hard deadline")
                 code=child.poll()
-                members=[]
-                for p in psutil.process_iter(["pid"]):
-                    try:
-                        if os.getpgid(p.pid)==child.pid:members.append(p.pid)
-                    except (ProcessLookupError,PermissionError):pass
+                members=group_members(child.pid)
                 if code is not None and not members:break
                 time.sleep(.1)
             if code!=0:raise RuntimeError(f"Owned child failed with exit {code}")
             return dict(child_pid=child.pid,child_exit_code=code,resources_released=True,child_seconds=time.monotonic()-started)
         except BaseException:
             # Only this freshly launched process group's members can be terminated.
+            signal.setitimer(signal.ITIMER_REAL,0)
             try:os.killpg(child.pid,signal.SIGKILL)
             except ProcessLookupError:pass
-            child.wait()
+            cleanup_deadline=time.monotonic()+2
+            while time.monotonic()<cleanup_deadline:
+                if child.poll() is not None and not group_members(child.pid):break
+                time.sleep(.02)
+            remaining=group_members(child.pid)
+            stream.write(json.dumps(dict(status="FAILED_OWN_GROUP_CLEANUP",leader_exited=child.poll() is not None,
+                residual_pids=remaining,resources_released=child.poll() is not None and not remaining,
+                child_seconds=time.monotonic()-started,overrun_seconds=max(0.,time.monotonic()-deadline)))+"\n")
+            stream.flush()
             raise
 
 
@@ -152,12 +205,13 @@ def clean_search_weights(job):
 
 def execute(job,gate_path):
     ledger=Ledger();search=None
-    ledger.used["control"]=time.monotonic()-MODULE_STARTED
-    if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
-        raise ValueError("New independent campaign output required")
-    job.mkdir(parents=True)
+    ledger.continuous_control=True;ledger.control_since=MODULE_STARTED
+    owned=False;error=None;access=None
     try:
         with charged(ledger,"control"):
+            if job.exists() or not job.is_relative_to(data.ROOT/"reports"):
+                raise ValueError("New independent campaign output required")
+            job.mkdir(parents=True);owned=True
             gate,cpu,native=validate_gate(gate_path)
             if gate["job"]!=job.relative_to(data.ROOT).as_posix():raise ValueError("Approved campaign path differs")
             ledger.qualification=cpu["cumulative_charged_seconds"]+native["cumulative_charged_seconds"]
@@ -174,6 +228,9 @@ def execute(job,gate_path):
                     "--spec",str(spec_path),"--gate",str(gate_path)],job/(spec.run_id+".console.txt"),seconds,env)
                 result=data.read_json(path/"completion.json")
                 if result.get("source_files")!=run.sources() or (path/"failure.json").exists():raise ValueError("Invalid child completion")
+                if spec.phase=="search":
+                    from step28_optuna_verify import independent_feedback
+                    independent_feedback(path,spec,result)
                 result.update(receipt,completion_identity=data.record(path/"completion.json",data.ROOT))
             return result
         for number in range(12):
@@ -202,13 +259,45 @@ def execute(job,gate_path):
         with charged(ledger,"control"):
             access=access_total(job)
             if access!=dict(train=45,valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
-            data.write_json(job/"completion.json",dict(status="COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS",access=access,source_files=run.sources()))
+            run.Budget(job,300,campaign=job).check(force=True)
+    except BaseException:
+        error=traceback.format_exc();ledger.failed=True
+        raise
+    finally:
+        finalize(ledger,job,owned,search,error,access)
+
+
+def finalize(ledger,job,owned,search,error,access):
+    # Terminal writes are bounded control work even after Ledger.failed. No dispatch can resume.
+    signal.setitimer(signal.ITIMER_REAL,0)
+    bill_control_gap(ledger,enforce=False)
+    remaining=ledger.remaining("control")
+    ledger.control_since=time.monotonic()
+    signal.signal(signal.SIGALRM,expired)
+    signal.setitimer(signal.ITIMER_REAL,max(.001,min(2.,remaining)) if error else max(.001,remaining))
+    try:
+        if remaining<=0:raise TimeoutError("No successful finalization budget remains")
+        if owned:
+            if error:
+                if search is not None:search.fail(error)
+                data.write_json(job/"failure.json",dict(status="STOP_NO_RETRY",traceback=error,access=access_total(job)))
+            else:
+                data.write_json(job/"completion.json",dict(status="COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS",access=access,source_files=run.sources()))
+            data.write_json(job/"ledger.json",dict(**ledger.snapshot(),terminal_accounting="Final stdout record includes this file write"))
+            run.Budget(job,300,campaign=job).check(force=True)
     except BaseException:
         ledger.failed=True
-        if search is not None:search.fail(traceback.format_exc())
-        data.write_json(job/"failure.json",dict(status="STOP_NO_RETRY",traceback=traceback.format_exc(),access=access_total(job)))
+        if owned and (job/"completion.json").exists():(job/"completion.json").unlink()
         raise
-    finally:data.write_json(job/"ledger.json",ledger.snapshot())
+    finally:
+        bill_control_gap(ledger,enforce=False)
+        exceeded=ledger.remaining("control")<0
+        if exceeded:
+            ledger.failed=True
+            if owned and (job/"completion.json").exists():(job/"completion.json").unlink()
+        print("FINAL_ACCOUNTING "+json.dumps(ledger.snapshot()),flush=True)
+        # Keep the bounded timer armed through interpreter exit, including stdout flush.
+        if exceeded:raise TimeoutError("Controller final writes exceeded remaining budget")
 
 
 if __name__=="__main__":

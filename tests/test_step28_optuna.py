@@ -248,9 +248,32 @@ class OptunaTests(unittest.TestCase):
             col=run.old.collect(root/"evaluation",scores,groups,split,entry=entry)
             col["status"]="ALL_6_TRIAL_METRIC_COUNT_SETS_SAVED";data.write_json(root/"evaluation/collected.json",col)
             run.statistics(root/"evaluation",col,spec.arm)
+            # Handwritten saved diagnostic curves with distinct seed populations and values.
+            manifest={"diagnostics":{}};points={}
+            for phase in "AB":
+                point=phase+"_"+spec.arm
+                capture=dict(fit_ids=[f"fit_{spec.seed}"],fit_domains=[phase],cache_ids=[] if phase=="A" else [f"cache_{spec.seed}"],
+                    cache_domains=[] if phase=="A" else ["A"],valid_ids=[g.uid for g in groups])
+                target=root/"run/diagnostics"/(point+".json");target.parent.mkdir(parents=True,exist_ok=True);data.write_json(target,capture)
+                manifest["diagnostics"][point]=[data.record(target,root/"run/diagnostics")]
+                row=dict(status="DESCRIPTIVE_CONDITIONAL_DEVELOPMENT_DIAGNOSIS",fit_or_cache_groups=1,valid_groups=20,
+                    train_raw_curve=[[spec.seed+epoch]*3 for epoch in range(6)],valid_raw_curve=[[spec.seed-epoch]*3 for epoch in range(6)],
+                    benefit_gap_curve=[[2*epoch]*3 for epoch in range(6)],interpretation={"map":"未见明确迹象"})
+                for key in ("epoch1_to_6_train_benefit","epoch1_to_6_valid_benefit","epoch1_to_6_gap_widening"):
+                    row[key]=dict(mean=[spec.seed]*3,conditional_95pct_interval=[[spec.seed-1,spec.seed+1]]*3)
+                points[point]=dict(fit={phase:copy.deepcopy(row)},cache={"A":copy.deepcopy(row)} if phase=="B" else {"status":"NOT_APPLICABLE_FIRST_STAGE"})
+            data.write_json(root/"run/manifest.json",manifest)
+            data.write_json(root/"run/partition.json",split)
+            (root/"diagnostics_evaluation").mkdir()
+            data.write_json(root/"diagnostics_evaluation/overfitting.json",dict(points=points))
         (campaign/"joint").mkdir();joint=run.replication_statistics(campaign,specs)
         self.assertTrue(joint["development_direction_consistency"]["S_pos"])
         self.assertFalse(joint["development_direction_consistency"]["H_pos"])
+        self.assertIn("H_pos-S_pos",joint["comparisons"])
+        self.assertEqual(joint["diagnostics"]["H_pos"]["three_fixed_seed_point_means"]["B"]["cache"]["A"]["train_raw_curve"][0],[2.]*3)
+        self.assertNotEqual(joint["diagnostics"]["S"]["by_seed"]["1"]["populations"]["B"]["cache_ids"],
+            joint["diagnostics"]["S"]["by_seed"]["2"]["populations"]["B"]["cache_ids"])
+        with self.assertRaises(ValueError):run.replication_statistics(campaign,specs[:-1])
         for arm in ("S_pos","H_pos"):
             for d in "AB":
                 rows=range(20) if d=="A" else range(20,40)
@@ -272,6 +295,9 @@ class OptunaTests(unittest.TestCase):
             for number in range(12):
                 spec=m.TrialSpec(arm,"search",number)
                 shutil.copytree(campaign/origin.run_id/"evaluation",campaign/spec.run_id/"evaluation")
+                (campaign/spec.run_id/"run").mkdir()
+                data.write_json(campaign/spec.run_id/"run/partition.json",split)
+                data.write_json(campaign/spec.run_id/"completion.json",dict(trial=spec.identity(),domains=domains))
                 search[arm].append(dict(number=number,state="COMPLETE",spec=spec.identity(),domains=domains,value=ctl.objective(domains,ctl.S0)))
         data.write_json(campaign/"search.json",search)
         data.write_json(campaign/"selected.json",{a:ctl.select_trial(search[a],ctl.S0) for a in m.ARMS})
@@ -279,6 +305,22 @@ class OptunaTests(unittest.TestCase):
         from step28_optuna_verify import independent_analysis
         independent_analysis(campaign)
         audit=data.read_json(campaign/"analysis/audit.json");self.assertEqual(audit["status"],"PASS_SAVED_ARITHMETIC")
+        from step28_optuna_verify import independent_feedback
+        target=m.TrialSpec("S","search",0);root=campaign/target.run_id
+        feedback=copy.deepcopy(search["S"][0]);feedback["domains"]["A"]+=.1
+        feedback["value"]=ctl.objective(feedback["domains"],ctl.S0)
+        completion=data.read_json(root/"completion.json");completion["domains"]=feedback["domains"];data.write_json(root/"completion.json",completion)
+        evaluation=data.read_json(root/"evaluation/evaluation.json");evaluation["domains"]=feedback["domains"];data.write_json(root/"evaluation/evaluation.json",evaluation)
+        with self.assertRaisesRegex(ValueError,"B/raw"):independent_feedback(root,target,feedback)
+        # Internal feedback/selection agreement cannot conceal a wrong saved source.
+        changed=copy.deepcopy(search);changed["S"][0]=feedback
+        data.write_json(campaign/"search.json",changed)
+        data.write_json(campaign/"selected.json",{a:ctl.select_trial(changed[a],ctl.S0) for a in m.ARMS})
+        with self.assertRaisesRegex(ValueError,"B/raw"):independent_analysis(campaign)
+        col=data.read_json(root/"evaluation/collected.json")
+        col["points"]["B_S"]["raw"]["matrix"]=col["points"]["A_S"]["raw"]["matrix"]
+        data.write_json(root/"evaluation/collected.json",col)
+        with self.assertRaisesRegex(ValueError,"A/cal"):independent_feedback(root,target,feedback)
         self.evidence("saved_evaluation",dict(actual_handwritten_collections=9,synthetic_analysis_slots=45,audit=audit,
             synthetic_copies_are_not_training=True,actual_optimizer_calls=0))
 
@@ -295,7 +337,13 @@ class OptunaTests(unittest.TestCase):
             def tokenizer(self,texts,**kwargs):
                 if kwargs.get("padding") is False:return {"input_ids":[[0]*256 for _ in texts]}
                 return super().tokenizer(texts,**kwargs)
+        archive_times=[]
+        def archive(c):
+            import time
+            time.sleep(.02);archive_times.append(time.monotonic())
+            return {"handwritten_no_archive":True}
         def fresh(c):
+            self.assertTrue(archive_times)
             torch.manual_seed(c["initialization_seed"])
             model=core.build_model(FixtureEncoder(),8,5);optimizer=core.make_optimizer(model,c)
             return model,optimizer,dict(model=core.state_digest(model.state_dict()),adam=core.state_digest(optimizer.state_dict()))
@@ -305,7 +353,7 @@ class OptunaTests(unittest.TestCase):
                 ("torch.cuda.synchronize",dict(return_value=None)),("torch.cuda.set_per_process_memory_fraction",dict(return_value=None)),
                 ("torch.cuda.get_device_properties",dict(return_value=SimpleNamespace(total_memory=48*2**30))),
                 ("torch.cuda.is_bf16_supported",dict(return_value=True)),
-                ("step28_optuna_run.Entry.pretrained_archive",dict(return_value={"handwritten_no_archive":True})),
+                ("step28_optuna_run.Entry.pretrained_archive",dict(side_effect=archive)),
                 ("step28_optuna_run.Entry.fresh",dict(side_effect=fresh)),
                 ("step28_optuna_run.Entry.validate_initial",dict(return_value=True)),
                 ("step28_optuna_run.Entry.baseline_inputs",dict(return_value=({},None,None,None))),
@@ -313,6 +361,90 @@ class OptunaTests(unittest.TestCase):
             def progress(stage,**value):self.evidence("six_call_progress",dict(stage=stage,**value,CPU_fixture_only=True))
             value=native_arm(self.temporary(),"H_pos",lambda reserve=0:None,progress,False)
         self.assertEqual(value["actual_updates"],6)
+        self.assertGreaterEqual(value["measurements"]["L"],.02)
         self.evidence("six_call_fixture",dict(actual_CPU_optimizer_calls=6,native_BGE_GPU_evidence=False,
             maximum_shape_tokenizer_check_mocked=True,initial_and_resource_checks_mocked=True,
             actual_next_update_equal=value["next_update_bitwise_equal"],effects=value["effects"],updates=value["updates"]))
+
+    def test_repair_resources_and_anchor(self):
+        from types import SimpleNamespace
+        from step28_optuna_verify import native_arm
+        out=self.temporary()
+        with mock.patch("step28_positive_ranking_verify.native_preflight",return_value={}), \
+                mock.patch("step28_g_half_verify.shutil.disk_usage",return_value=SimpleNamespace(free=1)), \
+                mock.patch.object(run.Entry,"fresh") as load:
+            with self.assertRaisesRegex(RuntimeError,"disk"):native_arm(out,"S",lambda *a:None,lambda *a,**k:None,False)
+            load.assert_not_called()
+        from step28_g_half_verify import disk_reserve
+        with mock.patch("step28_g_half_verify.shutil.disk_usage",return_value=SimpleNamespace(free=1)):
+            with self.assertRaises(RuntimeError):disk_reserve(out,0,2,10)
+        for phase in ("evaluation","analysis"):
+            root=self.temporary()
+            with mock.patch.object(run,"EVIDENCE_LIMIT",100000):
+                with self.assertRaisesRegex(RuntimeError,"evidence"):
+                    with run.shared_resources(root,phase):
+                        # Final check must not reuse the preceding <10-second cached scan.
+                        (root/"large.txt").write_bytes(b"x"*100001)
+            with self.assertRaisesRegex(RuntimeError,"budget"):
+                with run.shared_resources(root,phase) as budget:
+                    budget.limits["maximum_rss_bytes"]=1
+                    budget.check()
+        entry=run.Entry(m.TrialSpec("S_pos","search",0))
+        with mock.patch.object(data,"verify",side_effect=ValueError("unbound old manifest")) as verify, \
+                mock.patch.object(run.previous,"array") as array:
+            with self.assertRaisesRegex(ValueError,"unbound"):run.anchor_compatibility(entry,{})
+            self.assertEqual(verify.call_args.args[1]["sha256"],"ef6416de2070376c4e45613493a23bd92083293f9b5b8bad8fabf430d5742d35")
+            array.assert_not_called()
+        self.evidence("repair_resources",dict(native_low_actual_free_rejected_before_load=True,
+            E_A_force_final_evidence_and_actual_RSS_rejected=True,old_manifest_checked_before_arrays=True,actual_optimizer_calls=0))
+
+    def test_repair_controller_boundaries(self):
+        import contextlib
+        import io
+        import json
+        import signal
+        import sys
+        import time
+        import step28_optuna_search as search
+        out=self.temporary()
+        worker_pid=out/"worker.pid"
+        code="import os,time; p=os.fork(); " + "open("+repr(str(worker_pid))+",'w').write(str(os.getpid())) if p==0 else None; time.sleep(10)"
+        with self.assertRaises(TimeoutError):search.launch([sys.executable,"-c",code],out/"worker.log",.3,os.environ.copy())
+        pid=int(worker_pid.read_text())
+        import psutil
+        self.assertTrue(not psutil.pid_exists(pid) or psutil.Process(pid).status()==psutil.STATUS_ZOMBIE)
+        cleanup=json.loads((out/"worker.log").read_text().splitlines()[-1])
+        self.assertTrue(cleanup["resources_released"]);self.assertEqual(cleanup["residual_pids"],[])
+        # Execute the actual pre-import prefix with an intentionally slow import and scaled test deadline.
+        prefix=(data.ROOT/"scripts/step28_optuna_search.py").read_text().split("\ndata=run.data")[0]
+        code="""import builtins,signal,time
+original_import=builtins.__import__
+original_timer=signal.setitimer
+def delayed(name,*args,**kwargs):
+    if name=='step28_optuna_run':time.sleep(.2)
+    return original_import(name,*args,**kwargs)
+def timer(kind,seconds,*args):return original_timer(kind,min(seconds,.05),*args)
+builtins.__import__=delayed
+signal.setitimer=timer
+exec(compile(SOURCE,'actual_controller_prefix','exec'),{'__name__':'__main__'})
+""".replace("SOURCE",repr(prefix))
+        with self.assertRaises(RuntimeError):search.launch([sys.executable,"-c",code],out/"import.log",5,os.environ.copy())
+        self.assertIn("CONTROLLER_IMPORT_FAILED_NO_DISPATCH",(out/"import.log").read_text())
+        elapsed={}
+        for failure in (False,True):
+            root=self.temporary();ledger=ctl.Ledger();ledger.control_since=time.monotonic();ledger.continuous_control=True
+            original=data.write_json
+            def slow_write(path,value):
+                if path.name in ("ledger.json","failure.json","completion.json"):time.sleep(.02)
+                return original(path,value)
+            output=io.StringIO()
+            try:
+                with contextlib.redirect_stdout(output),mock.patch.object(data,"write_json",side_effect=slow_write):
+                    search.finalize(ledger,root,True,None,"handwritten failure" if failure else None,{})
+            finally:signal.setitimer(signal.ITIMER_REAL,0)
+            receipt=json.loads(output.getvalue().split("FINAL_ACCOUNTING ",1)[1])
+            self.assertGreaterEqual(receipt["used"]["control"],.04)
+            self.assertEqual(receipt["used"]["search"],0)
+            elapsed[str(failure)]=receipt["used"]["control"]
+        self.evidence("repair_controller",dict(own_worker_release=cleanup,pre_import_hard_deadline=True,
+            successful_and_failed_final_writes_control_seconds=elapsed,actual_optimizer_calls=0))

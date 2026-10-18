@@ -8,6 +8,14 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-19 Optuna修复、CPU与Linux一次性监听
+
+修复使用独立`/home/yongpeng/cross-lingual/reports/documentation/20261018/optuna_implementation/repair/workspace`；qualification与workspace并列。48份科学来源及2份调度源码逐项两端一致；52份历史已开放结果和8份直接来源核验，既有BGE只建立获准原生所需链接，未同步正式文本/标签或旧Memory。CPU和部署13个载荷311018字节按[接收清单](../reports/documentation/20261018/optuna_implementation/repair/receive_manifest.json)核验；attempt07_sources.zip是必要源码冻结快照，继续保管，非冗余运输包。
+
+当前CPU/native门、批准及修订主审在repair目录两端保管；[实际监听回执](../reports/documentation/20261018/optuna_implementation/repair/dispatch.json)和四载荷[清单](../reports/documentation/20261018/optuna_implementation/repair/dispatch_manifest.json)已回传核验。活动脚本为Linux qualification/active_wait.py，PID963024；Windows scripts/step28_optuna_wait.py保留复现源码。活动脚本在确认首次实际更新后自删，原native_dispatch及日志保留，不重复部署。误建应用内跟进已删除，具体状态只看真实Linux进程及status/result。
+
+临时deployment/native_deployment/dispatch及两份接收ZIP在验收后按精确路径清理；原实现外审输入ZIP因必要来源重放仍保留，不改冻结审查原件和失败账。可变主目录docs在Windows维护，不声称全仓同步；科研来源和必要证据已在独立Linux目录保管。新材料仅本地Git，不重置10月23日大清理周期。
+
 ## 2026-10-19 Optuna实现外审完整回收及主审
 
 [回收核验](../reports/documentation/20261018/optuna_implementation/review/recovery.json)：返回ZIP297884字节/58成员、SHA256 f7632fd38f714f0634d013e19b890152a8f1a5d9604268081383927c400bd216；58外部成员、56内部载荷及原140输入回执一致，解包1061502字节。完整外审原文/findings/阅读范围/机械证据/六次失败/辅助原意见均保留，外层身份/成员清单和完成网页齐全。主审及待确认修复范围保存在同review目录。68必要文件1196148字节按[sync](../reports/documentation/20261018/optuna_implementation/review/sync.json)同步Linux同相对目录并逐项核对；不执行外审程序或科研测试，不覆盖隔离workspace。

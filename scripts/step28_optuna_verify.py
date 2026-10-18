@@ -22,12 +22,49 @@ from step28_optuna_control import ARMS
 data,core,diag,record=run.data,run.core,run.diag,run.method.record
 
 
+def independent_feedback(job,spec,feedback):
+    """Derive the two feedback values from bound B/raw group MAP, not the selector."""
+    from step28_optuna_control import S0
+    root=job/"evaluation"
+    col=data.read_json(root/"collected.json")
+    partition=data.read_json(job/"run/partition.json")["development"]
+    if (col["group_ids"]!=[g["group_uid"] for g in partition]
+            or col["domains"]!=[g["domain"] for g in partition]):raise ValueError("Feedback group alignment differs")
+    rec=col["points"]["B_"+spec.arm]["raw"]["matrix"]
+    if rec["path"]!="B_"+spec.arm+"_raw_metrics.json":raise ValueError("Feedback must name B/raw, not A/cal")
+    matrix=data.read_json(data.verify(root/rec["path"],rec))
+    values=np.asarray(matrix["values"],dtype=np.float64)
+    if matrix["columns"]!=list(run.parent.metrics.COLUMNS) or values.shape!=(40,22):raise ValueError("Feedback B/raw matrix differs")
+    expected={}
+    for domain in "AB":
+        indices=[i for i,d in enumerate(col["domains"]) if d==domain]
+        if len(indices)!=20:raise ValueError("Feedback population differs")
+        expected[domain]=float(np.sum(values[indices,matrix["columns"].index("map")],dtype=np.float64)/20)
+    if not all(math.isfinite(x) for x in expected.values()):raise ValueError("Nonfinite feedback MAP")
+    evaluation=data.read_json(root/"evaluation.json")
+    completion=data.read_json(job/"completion.json")
+    if completion.get("trial")!=spec.identity() or any(row.get("domains")!=expected for row in (evaluation,completion,feedback)):
+        raise ValueError("Feedback is not the saved B/raw domain MAP")
+    u=min(expected["A"]-S0["A"],expected["B"]-S0["B"])
+    if "value" in feedback and feedback["value"]!=u:raise ValueError("Independent objective differs")
+    return dict(domains=expected,value=u,matrix=rec)
+
+
 def independent_analysis(job):
     """Saved group matrices only; independent means/quantiles, no model or labels."""
     selected=data.read_json(job/"selected.json")
     search=data.read_json(job/"search.json")
-    from step28_optuna_control import select_trial,S0
-    if selected!={a:select_trial(search[a],S0) for a in ARMS}:raise ValueError("Frozen selector differs")
+    from step28_optuna_control import S0
+    for arm in ARMS:
+        rows=search[arm]
+        if len(rows)!=12 or sorted(r["number"] for r in rows)!=list(range(12)):raise ValueError("Missing search slot")
+        for row in rows:
+            spec=TrialSpec.from_dict(row["spec"])
+            if row["state"]!="COMPLETE" or spec.arm!=arm or row["number"]!=spec.number:raise ValueError("Search identity differs")
+            independent_feedback(job/spec.run_id,spec,row)
+        winner=max(rows,key=lambda r:(min(r["domains"][d]-S0[d] for d in "AB"),
+            ((r["domains"]["A"]-S0["A"])+(r["domains"]["B"]-S0["B"]))/2,-r["number"]))
+        if selected[arm]!=winner:raise ValueError("Independent frozen selector differs")
     specs=[TrialSpec.from_dict(r["trial"]) for r in data.read_json(job/"replications.json")]
     rows_checked=0;maximum_error=0.
     def check(value,expected):
@@ -63,19 +100,46 @@ def independent_analysis(job):
             audit_summary(delta,{"A":saved["old_changes"][role]},rows,domains="A")
         if spec.phase=="replication":matrices[spec.arm,spec.seed]=arrays
     joint=data.read_json(job/"joint/evaluation.json")
-    for arm in ("S_pos","H_pos"):
-        contrasts=joint["comparisons"][arm+"-S"];six=[]
+    for arm,opponent in (("S_pos","S"),("H_pos","S"),("H_pos","S_pos")):
+        contrasts=joint["comparisons"][arm+"-"+opponent];six=[]
         for seed in (1,2,3):
             for phase in "AB":
                 for role in run.parent.ROLES:
-                    delta=matrices[arm,seed][phase+"_"+arm][role]-matrices["S",seed][phase+"_S"][role]
+                    delta=matrices[arm,seed][phase+"_"+arm][role]-matrices[opponent,seed][phase+"_"+opponent][role]
                     audit_summary(delta,contrasts["by_seed"][str(seed)][phase][role],rows)
                     if phase=="B" and role=="raw":six.extend(float(np.sum(delta[r,12])/20)>0 for r in rows)
         for phase in "AB":
             for role in run.parent.ROLES:
-                delta=sum(matrices[arm,s][phase+"_"+arm][role]-matrices["S",s][phase+"_S"][role] for s in (1,2,3))/3
+                delta=sum(matrices[arm,s][phase+"_"+arm][role]-matrices[opponent,s][phase+"_"+opponent][role] for s in (1,2,3))/3
                 audit_summary(delta,contrasts["three_seed_mean"][phase][role],rows)
-        if joint["development_direction_consistency"][arm]!=all(six):raise ValueError("Six-cell development rule differs")
+        if opponent=="S" and joint["development_direction_consistency"][arm]!=all(six):raise ValueError("Six-cell development rule differs")
+    for arm in ARMS:
+        diagnostic=joint["diagnostics"][arm]
+        if set(diagnostic["by_seed"])!={"1","2","3"} or set(diagnostic["three_fixed_seed_point_means"])!={"A","B"}:
+            raise ValueError("Missing seed/phase diagnostic")
+        for seed in (1,2,3):
+            saved=diagnostic["by_seed"][str(seed)]
+            original=data.read_json(data.verify(job/saved["source"]["path"],saved["source"]))
+            if saved["points"]!=original["points"]:raise ValueError("Per-seed diagnostic source differs")
+            spec=next(s for s in specs if s.arm==arm and s.seed==seed)
+            root=job/spec.run_id;manifest=data.read_json(root/"run/manifest.json")
+            for phase in "AB":
+                rec=manifest["diagnostics"][phase+"_"+arm][0]
+                capture=data.read_json(data.verify(root/"run/diagnostics"/rec["path"],rec))
+                if saved["populations"][phase]!={k:capture[k] for k in ("fit_ids","fit_domains","cache_ids","cache_domains","valid_ids")}:
+                    raise ValueError("Seed diagnostic populations differ")
+        for phase,roles in diagnostic["three_fixed_seed_point_means"].items():
+            if set(roles)!={"fit","cache"} or set(roles["fit"])!={phase} or set(roles["cache"])!=({"A"} if phase=="B" else set()):
+                raise ValueError("Missing diagnostic comparison")
+            for role,domains in roles.items():
+                for domain,fields in domains.items():
+                    original=[diagnostic["by_seed"][str(s)]["points"][phase+"_"+arm][role][domain] for s in (1,2,3)]
+                    expected_keys={"train_raw_curve","valid_raw_curve","benefit_gap_curve",
+                        "epoch1_to_6_train_benefit","epoch1_to_6_valid_benefit","epoch1_to_6_gap_widening"}
+                    if set(fields)!=expected_keys:raise ValueError("Missing descriptive diagnostic fields")
+                    for key,value in fields.items():
+                        vals=[r[key]["mean"] if key.startswith("epoch") else r[key] for r in original]
+                        check(value,(np.asarray(vals[0])+np.asarray(vals[1])+np.asarray(vals[2]))/3)
     out=job/"analysis";out.mkdir()
     data.write_json(out/"audit.json",dict(status="PASS_SAVED_ARITHMETIC",checked_fields=rows_checked,
         maximum_absolute_error=maximum_error,source_files=run.sources(),formal_label_reads=0,model_loads=0,
@@ -85,10 +149,11 @@ def independent_analysis(job):
 def native_arm(out,arm,check,progress,continuing):
     """Exactly six real calls; Q0/QB cross-parameter replay is a handwritten fixture only."""
     from step28_positive_ranking_verify import native_preflight
-    from step28_g_half_verify import native_save,state
+    from step28_g_half_verify import native_save,state,disk_reserve
     from step28_record_replay_numerics import equal_state
     from test_step28_record_replay import handmade_group
     resources=native_preflight(continuing)
+    disk_reserve(out,0,10*2**30,10*2**30)
     run.parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
     entries=[run.Entry(TrialSpec(arm,"handwritten",i,w,lr)) for i,(w,lr) in enumerate(((1,1),(.5,1),(.5,.5)))]
@@ -96,8 +161,11 @@ def native_arm(out,arm,check,progress,continuing):
     def timed(name,fn):
         check();torch.cuda.synchronize();start=time.monotonic();value=fn();torch.cuda.synchronize()
         measurements[name]=max(measurements.get(name,0.),time.monotonic()-start);return value
-    c=entries[0].config();archive=entries[0].pretrained_archive(c)
-    model,optimizer,initial=timed("L",lambda:entries[0].fresh(c))
+    c=entries[0].config()
+    def checked_fresh():
+        archive=entries[0].pretrained_archive(c)
+        return (*entries[0].fresh(c),archive)
+    model,optimizer,initial,archive=timed("L",checked_fresh)
     if not entries[0].validate_initial(model,optimizer,initial,entries[0].baseline_inputs()[0]):raise ValueError("Native initial differs")
     entries[0].method.bind(model,entries[0].method.metadata(arm))
     current,history=[handmade_group("native_"+role,8,254) for role in ("current","history")]
@@ -213,7 +281,9 @@ def main():
     args=parser.parse_args()
     if os.name!="posix":parser.error("Linux existing py310 only")
     if args.analyze:
-        independent_analysis(args.analyze);return
+        with run.shared_resources(args.analyze,"analysis"):
+            independent_analysis(args.analyze)
+        return
     out=args.output.resolve()
     if out.exists() or not 0<=args.prior_seconds<300:parser.error("New output and cumulative prior required")
     native=args.native_gate is not None
@@ -230,6 +300,9 @@ def main():
         report["peak_rss_bytes"]=max(report["peak_rss_bytes"],process.memory_info().rss)
         size=sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
         report["peak_output_bytes"]=max(report["peak_output_bytes"],size+reserve)
+        if native:
+            from step28_g_half_verify import disk_reserve
+            disk_reserve(out,size,reserve,10*2**30)
         if (args.prior_seconds+time.monotonic()-started>=limit or arm_deadline[0] is not None and time.monotonic()>=arm_deadline[0]
             or report["peak_rss_bytes"]>(64 if native else 2)*2**30
             or size+reserve>(10*2**30 if native else 64*2**20)):raise RuntimeError("Qualification cumulative resource limit")
