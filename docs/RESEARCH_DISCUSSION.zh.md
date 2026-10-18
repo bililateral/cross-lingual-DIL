@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-18 cuBLAS修复后继续定向外审
+
+用户原话：“修复后继续提交外审审查，交代清楚背景上下文”。这是对当前最小修复版及必要背景再次外发至原GPT 6 Pro会话的明确许可，不扩展GPU、正式数据或训练权限。已准备并核对d007230b的40来源、两文件差异、CPU01—05及原审背景，形成459440字节/111成员包；[完整请求](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/submitted_request.zh.txt)交代S/H/H_cons历史、用户选双臂、前审R01/R02/R03、52/300秒账、反例与真实CUDA边界，限制为定向静态和机械审查。12:27:45经本地Playwright单次上传/发送，选择器GPT-6、Pro第5档，12:27:57收到明确接收；[提交回执](../reports/documentation/20261016/positive_ranking_implementation/review/workspace/submission.json)及原页面保留，尚无最终裁决。本轮未新增科研执行，新材料仅本地Git；旧审查/失败/主审原件不追改。
+
 ## 2026-10-18：回收修复版外审并处置cuBLAS工作区缺口
 
 用户明确：“外审已结束”。沿原会话完整回收62成员和外部逐成员清单，核对94输入及完整正文。外审对送审38d05b9a关闭A空缓存、认可精确自身PID接线，并提出唯一P1：cuBLAS工作区持有与零内存门冲突。独立核对官方版本源码及实际入口后接受，在既有实现/CPU300秒许可内增加专用释放一行及一个受影响测试中的所有权状态/遗漏反例，attempt05通过，累计52/300秒；6个未变测试复用，不再全面重跑。见[完整主审](../reports/documentation/20261016/positive_ranking_implementation/review/repair/primary_disposition.zh.txt)。
