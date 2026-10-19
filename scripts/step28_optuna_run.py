@@ -32,7 +32,8 @@ CPU_TESTS=("test_actual_objective_vjp_lr_and_rejected_omissions", "test_seeds_ow
     "test_real_optuna_selection_and_stop", "test_disjoint_budgets_and_real_launcher_failure",
     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
     "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
-    "test_repair_controller_boundaries", "test_budget_amendment_gate")
+    "test_repair_controller_boundaries", "test_budget_amendment_gate",
+    "test_resource_wait_and_admission", "test_specific_resource_recovery")
 
 
 def sources():
@@ -54,6 +55,7 @@ def sources():
     paths.update((POLICY, CONTRACT, SCOPE, AUTHORIZATION, REPAIR_SCOPE, REPAIR_AUTHORIZATION))
     paths.update(data.ROOT/p for p in ("scripts/run_step28_optuna_cpu_linux_20261018.sh",
         "scripts/step28_optuna_formal_wait.py",
+        "reports/documentation/20261019/optuna_recovery/scope.zh.txt",
         "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
         "reports/documentation/20261019/optuna_budget/authorization.json"))
     return [data.record(p, data.ROOT) for p in sorted(paths)]
@@ -72,7 +74,7 @@ def policy():
 
 def runtime():
     return {**single.policy()["runtime"], "maximum_gpu_stage_seconds": 21600,
-            "maximum_output_bytes": 64*2**30}
+            "maximum_output_bytes": 64*2**30, "minimum_free_gpu_bytes": 9*2**30}
 
 
 class Budget(single.legacy.Budget):
@@ -274,12 +276,12 @@ def evaluate_run(job, entry, manifest, scores, labelled, split):
 
 def execute_trial(job, spec, gate_path):
     import torch
-    from step28_record_replay_verify import preflight
+    from step28_optuna_recovery import formal_preflight
     from step28_optuna_search import validate_gate
     validate_gate(gate_path)
     if spec.phase not in ("search", "replication") or job.exists():
         raise ValueError("Fresh formal run required")
-    resources = preflight()
+    resources = formal_preflight(data.ROOT)
     torch.set_num_threads(1); torch.set_num_interop_threads(1)
     parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)

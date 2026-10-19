@@ -63,6 +63,7 @@ class Ledger:
         self.intervals = []
         self.active = None
         self.failed = False
+        self.calendar_wait_seconds = 0.
 
     def remaining(self, kind: str, arm: str | None = None) -> float:
         total = 979200-self.qualification-sum(self.used.values())
@@ -79,6 +80,11 @@ class Ledger:
         if kind in ("search", "replication") and (arm not in ARMS or not run_id):
             raise ValueError("Own run identity required")
         allowed = self.remaining(kind, arm)
+        if run_id is not None:
+            # Resource-only admission attempts and the recovered failed attempt
+            # still consume this candidate's original single-run allowance.
+            prior = sum(row["seconds"] for row in self.intervals if row["kind"] == kind and row["run_id"] == run_id)
+            allowed = min(allowed, 21600.-prior)
         if allowed <= 0:
             self.failed = True
             raise TimeoutError("No allotted budget remains")
@@ -112,7 +118,8 @@ class Ledger:
     def snapshot(self) -> dict:
         return dict(qualification_seconds=self.qualification, used=self.used.copy(),
                     by_arm={k: v.copy() for k, v in self.arm_used.items()},
-                    intervals=list(self.intervals), failed=self.failed)
+                    intervals=list(self.intervals), failed=self.failed,
+                    calendar_wait_seconds=self.calendar_wait_seconds)
 
 
 class Search:

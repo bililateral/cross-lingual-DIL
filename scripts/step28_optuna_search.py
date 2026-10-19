@@ -64,8 +64,10 @@ def reused_qualification(cpu,reuse,current):
     allowed={"schema/step28_optuna_policy.json","scripts/step28_optuna_control.py",
         "scripts/step28_optuna_run.py","scripts/step28_optuna_search.py","tests/test_step28_optuna.py",
         "scripts/step28_optuna_formal_wait.py","reports/documentation/20261019/optuna_budget/proposal.zh.txt",
-        "reports/documentation/20261019/optuna_budget/authorization.json"}
-    if (reuse.get("status")!="ACCEPTED_BUDGET_CLOCK_ONLY" or reuse.get("source_files")!=current
+        "reports/documentation/20261019/optuna_budget/authorization.json",
+        "scripts/step28_optuna_recovery.py","reports/documentation/20261019/optuna_recovery/scope.zh.txt"}
+    expected_status="ACCEPTED_RESOURCE_ADMISSION_RECOVERY" if "scripts/step28_optuna_recovery.py" in after else "ACCEPTED_BUDGET_CLOCK_ONLY"
+    if (reuse.get("status")!=expected_status or reuse.get("source_files")!=current
         or reuse.get("changed_paths")!=changed or not set(changed)<=allowed or before.keys()-after.keys()):
         raise ValueError("Unapproved native source reuse")
     with zipfile.ZipFile(data.verify(data.ROOT/reuse["original_archive"]["path"],reuse["original_archive"])) as archive:
@@ -80,7 +82,8 @@ def reused_qualification(cpu,reuse,current):
     if prior["source_files"]!=native["source_files"] or prior["cumulative_charged_seconds"]!=108:
         raise ValueError("Specific prior CPU acceptance differs")
     latest=read_bound(cpu["new_result"])
-    required={"test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate"}
+    required={"test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate",
+              "test_resource_wait_and_admission","test_specific_resource_recovery"}
     if (latest.get("status")!="PASS_HANDWRITTEN_ONLY" or latest["source_files"]!=current
         or not required<=set(latest["qualified_tests"]) or latest.get("unresolved_checks")!=[]
         or set(cpu["qualified_tests"])!=set(prior["qualified_tests"])|set(latest["qualified_tests"])):
@@ -128,6 +131,12 @@ def validate_gate(path):
         or permission.get("source_files")!=current or not permission.get("user_quote")
         or permission.get("search_weight_lifecycle") is not True or permission.get("job")!=gate.get("job")):
         raise ValueError("Specific 45-run data/budget/lifecycle permission missing")
+    if permission.get("resource_admission")!=dict(minimum_free_gpu_mib=9216,allow_other_cuda=True):
+        raise ValueError("Explicit 9 GiB/shared CUDA admission permission missing")
+    if "recovery" in gate:
+        if permission.get("recovery")!=gate["recovery"]:
+            raise ValueError("Specific recovery evidence must be part of permission")
+        bound("recovery")
     for key in ("external_review","primary_disposition"):
         data.verify(data.ROOT/gate[key]["path"],gate[key])
     cpu=bound("cpu")
@@ -224,7 +233,28 @@ def group_members(pgid):
     return members
 
 
-def launch(command,log,seconds,env):
+def wait_resources(ledger,job,*,probe=None,sleep=time.sleep):
+    from step28_optuna_formal_wait import resources
+    probe=probe or (lambda:resources(data.ROOT))
+    while True:
+        with charged(ledger,"control"):
+            state=probe()
+            data.write_json(job/"resource_wait.json",dict(at=time.time(),resources=state,
+                calendar_wait_seconds=ledger.calendar_wait_seconds))
+        if state["ready"]:return
+        # Only sleep is excluded. Resource queries and all bookkeeping stay in C.
+        bill_control_gap(ledger)
+        signal.setitimer(signal.ITIMER_REAL,0)
+        started=time.monotonic()
+        try:sleep(60)
+        finally:
+            ledger.calendar_wait_seconds+=time.monotonic()-started
+            ledger.control_since=time.monotonic()
+            signal.signal(signal.SIGALRM,expired)
+            signal.setitimer(signal.ITIMER_REAL,max(.001,ledger.remaining("control")))
+
+
+def launch(command,log,seconds,env,*,allow_resource_deferral=False):
     """Bound the owned process group including import, exit and worker release."""
     started=time.monotonic();deadline=started+seconds
     with log.open("x",encoding="utf-8") as stream:
@@ -238,7 +268,8 @@ def launch(command,log,seconds,env):
                 members=group_members(child.pid)
                 if code is not None and not members:break
                 time.sleep(.1)
-            if code!=0:raise RuntimeError(f"Owned child failed with exit {code}")
+            if code!=0 and not (code==75 and allow_resource_deferral):
+                raise RuntimeError(f"Owned child failed with exit {code}")
             return dict(child_pid=child.pid,child_exit_code=code,resources_released=True,child_seconds=time.monotonic()-started)
         except BaseException:
             # Only this freshly launched process group's members can be terminated.
@@ -291,24 +322,47 @@ def execute(job,gate_path):
             ledger.qualification=cpu["cumulative_charged_seconds"]+native["cumulative_charged_seconds"]
             search=Search("sqlite:///"+str(job/"studies.sqlite3"),fixed_reference())
             data.write_json(job/"startup.json",dict(source_files=run.sources(),gate=data.record(gate_path,data.ROOT)))
+            pending=None
+            if "recovery" in gate:
+                from step28_optuna_recovery import restore_prior
+                approval=read_bound(gate["recovery"])
+                pending=restore_prior(search,ledger,job,approval,data)
         def trial(spec):
+            from step28_optuna_recovery import validate_deferral
             path=job/spec.run_id
             with charged(ledger,"control"):
                 spec_path=job/(spec.run_id+".json");data.write_json(spec_path,spec.identity())
                 access_total(job)
-            with charged(ledger,spec.phase,arm=spec.arm,run_id=spec.run_id) as seconds:
-                receipt=launch([sys.executable,str(data.ROOT/"scripts/step28_optuna_run.py"),"--job",str(path),
-                    "--spec",str(spec_path),"--gate",str(gate_path)],job/(spec.run_id+".console.txt"),seconds,os.environ.copy())
-                result=data.read_json(path/"completion.json")
-                if result.get("source_files")!=run.sources() or (path/"failure.json").exists():raise ValueError("Invalid child completion")
-                if spec.phase=="search":
-                    from step28_optuna_verify import independent_feedback
-                    independent_feedback(path,spec,result)
-                result.update(receipt,completion_identity=data.record(path/"completion.json",data.ROOT))
-            return result
+            attempt=0
+            while True:
+                wait_resources(ledger,job)
+                suffix="" if not attempt else f".admission_{attempt:03}"
+                log=job/(spec.run_id+suffix+".console.txt")
+                with charged(ledger,spec.phase,arm=spec.arm,run_id=spec.run_id) as seconds:
+                    receipt=launch([sys.executable,str(data.ROOT/"scripts/step28_optuna_run.py"),"--job",str(path),
+                        "--spec",str(spec_path),"--gate",str(gate_path)],log,seconds,os.environ.copy(),allow_resource_deferral=True)
+                    if receipt["child_exit_code"]==75:
+                        deferred=validate_deferral(log,path)
+                    else:
+                        result=data.read_json(path/"completion.json")
+                        if result.get("source_files")!=run.sources() or (path/"failure.json").exists():raise ValueError("Invalid child completion")
+                        if spec.phase=="search":
+                            from step28_optuna_verify import independent_feedback
+                            independent_feedback(path,spec,result)
+                        result.update(receipt,completion_identity=data.record(path/"completion.json",data.ROOT))
+                if receipt["child_exit_code"]==0:return result
+                with charged(ledger,"control"):
+                    data.write_json(job/(spec.run_id+f".deferred_{attempt:03}.json"),dict(
+                        trial=spec.identity(),receipt=receipt,pre_data=deferred,ledger=ledger.snapshot()))
+                attempt+=1
         for number in range(12):
             for arm in Search.order(number):
-                with charged(ledger,"control"):spec=search.ask(arm,number)
+                if number<len(search.rows[arm]):continue
+                with charged(ledger,"control"):
+                    if pending is not None:
+                        if (pending.arm,pending.number)!=(arm,number):raise ValueError("Recovery dispatch order differs")
+                        spec,pending=pending,None
+                    else:spec=search.ask(arm,number)
                 result=trial(spec)
                 with charged(ledger,"control"):
                     search.tell(result)

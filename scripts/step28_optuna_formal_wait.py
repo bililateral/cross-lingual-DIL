@@ -33,11 +33,13 @@ def resources(workspace):
     free=int(subprocess.check_output(["nvidia-smi","-i","0","--query-gpu=memory.free","--format=csv,noheader,nounits"],text=True,timeout=15).strip())
     apps=subprocess.check_output(["nvidia-smi","-i","0","--query-compute-apps=pid","--format=csv,noheader,nounits"],text=True,timeout=15).split()
     ancestors={os.getpid(),*(p.pid for p in psutil.Process().parents())}
+    owner=psutil.Process().username()
     jobs=[p.info for p in psutil.process_iter(["pid","username","cmdline"])
-        if p.pid not in ancestors and any("step28" in x for x in (p.info["cmdline"] or []))]
+        if p.pid not in ancestors and p.info["username"]==owner
+        and any("step28" in x for x in (p.info["cmdline"] or []))]
     host=psutil.virtual_memory().available;disk=shutil.disk_usage(workspace).free
     return dict(gpu_free_mib=free,compute_pids=apps,project_jobs=jobs,host_free_bytes=host,disk_free_bytes=disk,
-        ready=free>=30720 and host>=72*2**30 and disk>=64*2**30 and not apps and not jobs)
+        ready=free>=9216 and host>=72*2**30 and disk>=64*2**30 and not jobs)
 
 
 def first_update(job):
@@ -57,6 +59,7 @@ def main(workspace,gate_path,base):
     source=workspace/"scripts/step28_optuna_formal_wait.py"
     if active.read_bytes()!=source.read_bytes():raise ValueError("Active listener differs from bound source")
     dependencies=[gate[k] for k in ("cpu","native_reuse","time_qualification","execution_authorization","external_review","primary_disposition")]
+    if "recovery" in gate:dependencies.append(gate["recovery"])
     verify(workspace,gate["source_files"]+dependencies)
     with (base/"formal_dispatch.json").open("x",encoding="utf-8") as stream:
         json.dump(dict(status="CLAIMED_ONCE",pid=os.getpid(),at=now(),job=str(job),gate=str(gate_path)),stream)

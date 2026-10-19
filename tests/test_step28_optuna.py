@@ -258,7 +258,8 @@ class OptunaTests(unittest.TestCase):
             arms={a:dict(actual_updates=6,charged_seconds=100,measurements=measurements,**flags) for a in m.ARMS})
         reuse=dict(status="ACCEPTED_BUDGET_CLOCK_ONLY",source_files=current,changed_paths=[source.relative_to(out).as_posix()],
             original_result=save("native.json",native),original_wrapper=wrapper("native.wrapper",876),original_archive=data.record(archive,out))
-        tests=["test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate"]
+        tests=["test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate",
+               "test_resource_wait_and_admission","test_specific_resource_recovery"]
         cpu=dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,cumulative_charged_seconds=124,unresolved_checks=[],
             qualified_tests=list(run.CPU_TESTS),prior_gate=save("prior.json",dict(source_files=before,cumulative_charged_seconds=108,qualified_tests=list(run.CPU_TESTS[:-1]))),
             new_result=save("cpu.json",dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,prior_charged_seconds=116,qualified_tests=tests,unresolved_checks=[])),
@@ -275,7 +276,7 @@ class OptunaTests(unittest.TestCase):
             measurement_evidence=[c,f,data.record(out/"historical.wrapper",out),data.record(out/"historical.console",out)])
         policy=run.policy();policy_path=out/"policy.json";data.write_json(policy_path,policy)
         permission=dict(status="APPROVED",stages=["FORMAL"],source_files=current,user_quote="Handwritten fixture only",
-            search_weight_lifecycle=True,job="reports/fixture")
+            search_weight_lifecycle=True,job="reports/fixture",resource_admission=dict(minimum_free_gpu_mib=9216,allow_other_cuda=True))
         gate=dict(kind="FORMAL",status="APPROVED_NO_OPEN_BLOCKERS",source_files=current,policy=data.record(policy_path,out),job="reports/fixture",
             execution_authorization=save("permission.json",permission),external_review=save("external.json",{}),primary_disposition=save("primary.json",{}),
             cpu=save("cpu_gate.json",cpu),native_reuse=save("reuse.json",reuse),time_qualification=save("time.json",projection))
@@ -298,7 +299,7 @@ class OptunaTests(unittest.TestCase):
         # The actual listener resource predicate rejects each insufficient resource.
         from types import SimpleNamespace
         with mock.patch.object(wait.psutil,"process_iter",return_value=[]):
-            for gpu,apps,host,disk,expected in ((32000,"",80,70,True),(30000,"",80,70,False),(32000,"1",80,70,False),
+            for gpu,apps,host,disk,expected in ((9216,"",80,70,True),(9215,"",80,70,False),(9216,"1",80,70,True),
                     (32000,"",71,70,False),(32000,"",80,63,False)):
                 with mock.patch.object(wait.subprocess,"check_output",side_effect=[str(gpu),apps]), \
                     mock.patch.object(wait.psutil,"virtual_memory",return_value=SimpleNamespace(available=host*2**30)), \
@@ -582,3 +583,166 @@ exec(compile(SOURCE,'actual_controller_prefix','exec'),{'__name__':'__main__'})
         self.evidence("repair_controller",dict(own_worker_release=cleanup,pre_import_hard_deadline=True,
             successful_and_failed_final_writes_control_seconds=elapsed,shared_child_clocks=clock_evidence,
             inherited_campaign_clock_negative_rejected=True,actual_optimizer_calls=0))
+
+    def test_resource_wait_and_admission(self):
+        import contextlib
+        import io
+        import json
+        import signal
+        import sys
+        from types import SimpleNamespace
+        import step28_optuna_search as search
+        import step28_optuna_recovery as recovery
+        out=self.temporary();now=[0.];calls=[]
+        ledger=ctl.Ledger(lambda:now[0]);ledger.continuous_control=True;ledger.control_since=0.
+        def probe():
+            calls.append("check");now[0]+=2
+            return dict(ready=len(calls)==2)
+        def sleep(seconds):
+            self.assertEqual(seconds,60);now[0]+=seconds
+        with mock.patch.object(search.time,"monotonic",side_effect=lambda:now[0]),mock.patch.object(search.signal,"setitimer"):
+            search.wait_resources(ledger,out,probe=probe,sleep=sleep)
+        self.assertEqual(ledger.used["control"],4.)
+        self.assertEqual(ledger.used["search"],0.)
+        self.assertEqual(ledger.calendar_wait_seconds,60.)
+        with ledger.interval("search",arm="S_pos",run_id="same") as first:now[0]+=2
+        with ledger.interval("search",arm="S_pos",run_id="same") as second:now[0]+=3
+        self.assertEqual(first,21600);self.assertEqual(second,21598)
+        # Actual production entry must stop before model construction/data access.
+        spec=m.TrialSpec("S_pos","search",1,.7,1.2);path=out/spec.run_id
+        env={"CUDA_VISIBLE_DEVICES":"0","OMP_NUM_THREADS":"1","MKL_NUM_THREADS":"1",
+             "OPENBLAS_NUM_THREADS":"1","TOKENIZERS_PARALLELISM":"false"}
+        fake_process=SimpleNamespace(cpu_affinity=lambda:[0])
+        capture=io.StringIO()
+        with mock.patch.dict(os.environ,env),mock.patch.object(recovery.psutil,"Process",return_value=fake_process), \
+                mock.patch.object(recovery,"resources",return_value=dict(ready=False,gpu_free_mib=9215,compute_pids=[123])), \
+                mock.patch.object(search,"validate_gate",return_value=({}, {}, {})),mock.patch.object(run,"Entry") as entry, \
+                mock.patch.object(run.parent,"configure_numerics") as numerics,contextlib.redirect_stdout(capture):
+            with self.assertRaises(SystemExit) as exited:run.execute_trial(path,spec,out/"unused_gate")
+            self.assertEqual(exited.exception.code,75);entry.assert_not_called();numerics.assert_not_called()
+        self.assertFalse(path.exists())
+        log=out/"deferred.log";log.write_text(capture.getvalue());recovery.validate_deferral(log,path)
+        path.mkdir()
+        with self.assertRaisesRegex(ValueError,"admission"):recovery.validate_deferral(log,path)
+        path.rmdir()
+        valid=capture.getvalue()
+        log.write_text(valid.replace('"updates": 0','"updates": 1'))
+        with self.assertRaisesRegex(ValueError,"receipt"):recovery.validate_deferral(log,path)
+        # Real child exit 75 is distinct from an ordinary error; no worker remains.
+        code="print("+repr(valid.strip())+");raise SystemExit(75)"
+        receipt=search.launch([sys.executable,"-c",code],out/"child.log",10,os.environ.copy(),allow_resource_deferral=True)
+        self.assertEqual(receipt["child_exit_code"],75);self.assertTrue(receipt["resources_released"])
+        recovery.validate_deferral(out/"child.log",path)
+        with self.assertRaises(RuntimeError):search.launch([sys.executable,"-c",code],out/"ordinary.log",10,os.environ.copy())
+        # The real controller must wait on each admission, reuse the pending
+        # candidate after a race, then stop at an ordinary later child failure.
+        root=self.temporary();job=root/"reports/job";events=[];seen=[]
+        def launched(command,log,seconds,env,**kwargs):
+            events.append("launch");s=m.TrialSpec.from_dict(data.read_json(Path(command[command.index("--spec")+1])))
+            seen.append(s.identity());target=Path(command[command.index("--job")+1])
+            if len(seen)==1:
+                log.write_text(valid);return dict(child_exit_code=75,resources_released=True,child_seconds=.01)
+            if len(seen)==3:raise RuntimeError("handwritten ordinary child failure")
+            target.mkdir();a=dict(train=1,valid=1,heldout=0,owners=0)
+            data.write_json(target/"access.json",a)
+            data.write_json(target/"completion.json",dict(status="SEARCH_COMPLETE",trial=s.identity(),source_files=[],
+                anchor_compatible=True,access=a,domains=ctl.S0))
+            return dict(child_exit_code=0,resources_released=True,child_seconds=.01)
+        gate=root/"gate.json";data.write_json(gate,{})
+        try:
+            with mock.patch.object(data,"ROOT",root),mock.patch.object(search,"fixed_reference",return_value=ctl.S0), \
+                    mock.patch.object(search,"validate_gate",return_value=(dict(job="reports/job"),dict(cumulative_charged_seconds=124),dict(cumulative_charged_seconds=876))), \
+                    mock.patch.object(run,"sources",return_value=[]),mock.patch.object(search,"launch",side_effect=launched), \
+                    mock.patch.object(search,"wait_resources",side_effect=lambda *a:events.append("wait")), \
+                    mock.patch.object(search,"clean_search_weights"),mock.patch("step28_optuna_verify.independent_feedback"), \
+                    mock.patch.object(run,"Budget",return_value=SimpleNamespace(check=lambda **k:None)),contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaisesRegex(RuntimeError,"ordinary"):search.execute(job,gate)
+        finally:signal.setitimer(signal.ITIMER_REAL,0)
+        self.assertEqual(events,["wait","launch"]*3)
+        self.assertEqual(seen[0],seen[1]);self.assertNotEqual(seen[1]["arm"],seen[2]["arm"])
+        self.assertEqual(data.read_json(job/"failure.json")["access"],dict(train=1,valid=1,heldout=0,owners=0))
+        self.assertEqual(len(list(job.glob("*.deferred_*.json"))),1)
+        self.evidence("resource_admission",dict(check_seconds=4,calendar_sleep_seconds=60,
+            production_pre_data_exit=75,model_constructed=False,formal_data_read=False,
+            same_candidate_after_race=True,ordinary_failure_stops=True,actual_optimizer_calls=0))
+
+    def test_specific_resource_recovery(self):
+        import json
+        import sqlite3
+        import step28_optuna_recovery as recovery
+        root=self.temporary();prior=root/"workspace/reports/job";prior.mkdir(parents=True)
+        sources=[dict(path="handwritten_only",bytes=0,sha256="handwritten")]
+        original=ctl.Search("sqlite:///"+str(prior/"studies.sqlite3"),ctl.S0)
+        uninterrupted=ctl.Search(None,ctl.S0)
+        intervals=[]
+        def completed(spec):
+            values={d:ctl.S0[d]+.001*(spec.number+1)*(m.ARMS.index(spec.arm)+1) for d in "AB"}
+            return dict(status="SEARCH_COMPLETE",trial=spec.identity(),source_files=sources,
+                access=dict(train=1,valid=1,heldout=0,owners=0),anchor_compatible=True,
+                domains=values,child_exit_code=0,resources_released=True,completion_identity={})
+        for arm in m.ARMS:
+            spec=original.ask(arm,0);self.assertEqual(uninterrupted.ask(arm,0).identity(),spec.identity())
+            r=completed(spec);original.tell(r);uninterrupted.tell(r)
+            own=prior/spec.run_id;own.mkdir();data.write_json(own/"completion.json",r)
+            data.write_json(own/"before_valid.json",dict(status="ALL_BLIND_GATES_PASS"))
+            data.write_json(own/"access.json",r["access"])
+            intervals.append(dict(kind="search",arm=arm,run_id=spec.run_id,seconds=10.,error=None))
+        failed=original.ask("S_pos",1);expected_pending=uninterrupted.ask("S_pos",1)
+        self.assertEqual(failed.identity(),expected_pending.identity());original.fail("fixture preflight resource failure")
+        data.write_json(prior/(failed.run_id+".json"),failed.identity())
+        (prior/(failed.run_id+".console.txt")).write_text('preflight\nValueError: Resource gate failed: handwritten\n'+
+            json.dumps(dict(status="FAILED_OWN_GROUP_CLEANUP",resources_released=True,residual_pids=[]))+"\n")
+        data.write_json(prior/"failure.json",dict(status="STOP_NO_RETRY",access=dict(train=3,valid=3,heldout=0,owners=0)))
+        intervals.extend([dict(kind="search",arm="S_pos",run_id=failed.run_id,seconds=2.,error="RuntimeError"),
+                          dict(kind="control",arm=None,run_id=None,seconds=7.,error=None)])
+        old=dict(qualification_seconds=1000,used=dict(search=32.,replication=0.,control=7.,evaluation=0.,analysis=0.),
+            by_arm=dict(search=dict(S=10.,S_pos=12.,H_pos=10.),replication={a:0. for a in m.ARMS}),intervals=intervals,failed=True)
+        (root/"execution").mkdir();(root/"execution/formal.console.txt").write_text("FINAL_ACCOUNTING "+json.dumps(old)+"\n")
+        approval=dict(status="APPROVED_SPECIFIC_PRE_DATA_RECOVERY",prior_root=str(root),prior_sources=sources,
+            files=[data.record(p,root) for p in sorted(root.rglob("*")) if p.is_file()])
+        stopped=self.temporary();(stopped/"workspace/reports/job").mkdir(parents=True);(stopped/"execution").mkdir()
+        data.write_json(stopped/"workspace/reports/job/failure.json",dict(access=dict(train=0,valid=0,heldout=0,owners=0)))
+        stopped_interval=dict(kind="control",arm=None,run_id=None,seconds=4.,error="ValueError")
+        stopped_account=dict(qualification_seconds=0,failed=True,used={k:4. if k=="control" else 0. for k in old["used"]},intervals=[stopped_interval])
+        (stopped/"execution/formal.console.txt").write_text("FINAL_ACCOUNTING "+json.dumps(stopped_account)+"\n")
+        approval["pre_dispatch_failure"]=dict(root=str(stopped),files=[data.record(p,stopped) for p in sorted(stopped.rglob("*")) if p.is_file()])
+        def fresh():
+            target=self.temporary();return ctl.Search(None,ctl.S0),ctl.Ledger(prior_cpu=140,prior_native=876),target
+        resumed,ledger,target=fresh()
+        now=[0.];ledger.clock=lambda:now[0]
+        with ledger.interval("control"):
+            now[0]=3.
+        startup_intervals=list(ledger.intervals)
+        pending=recovery.restore_prior(resumed,ledger,target,approval,data)
+        self.assertEqual(pending.identity(),failed.identity())
+        self.assertEqual(ledger.qualification,1016)
+        self.assertEqual(ledger.used,{**old["used"],"control":14.})
+        self.assertEqual(ledger.intervals,intervals+startup_intervals+[stopped_interval]);self.assertFalse(ledger.failed)
+        self.assertEqual(ledger.remaining("control"),886.)
+        self.assertEqual(len(list(target.glob("search_*"))),3)
+        # Original SQLite retains FAIL; source bytes remain exact after the copy.
+        for row in approval["files"]:data.verify(root/row["path"],row)
+        with sqlite3.connect((prior/"studies.sqlite3").as_uri()+"?mode=ro",uri=True) as db:
+            self.assertEqual(db.execute("SELECT state FROM trials ORDER BY trial_id").fetchall()[-1],("FAIL",))
+        reproduced=[]
+        for number in range(1,12):
+            for arm in ctl.Search.order(number):
+                if (arm,number)==("S_pos",1):a,b=pending,expected_pending
+                else:a,b=resumed.ask(arm,number),uninterrupted.ask(arm,number)
+                self.assertEqual(a.identity(),b.identity());reproduced.append(a.identity())
+                resumed.tell(completed(a));uninterrupted.tell(completed(b))
+        self.assertEqual(resumed.selected(),uninterrupted.selected())
+        # Already-admitted run and modified candidate are both unrecoverable.
+        (prior/failed.run_id).mkdir()
+        with self.assertRaisesRegex(ValueError,"data admission"):recovery.restore_prior(*fresh(),approval,data)
+        (prior/failed.run_id).rmdir()
+        changed=copy.deepcopy(failed.identity());changed["lambda_rank"]+=.01
+        data.write_json(prior/(failed.run_id+".json"),changed)
+        with self.assertRaises(ValueError):recovery.restore_prior(*fresh(),approval,data)
+        rebound=copy.deepcopy(approval)
+        rebound["files"]=[data.record(root/r["path"],root) for r in approval["files"]]
+        with self.assertRaisesRegex(ValueError,"sampler"):recovery.restore_prior(*fresh(),rebound,data)
+        self.evidence("resource_recovery",dict(old_fail_and_charges_retained=True,already_admitted_rejected=True,
+            changed_bound_file_rejected=True,changed_parameters_rejected=True,new_startup_seconds_retained=3.,prior_pre_dispatch_control_retained=4.,
+            subsequent_random_and_TPE_specs_equal=reproduced,old_completed_runs_retrained=0,
+            synthetic_records_only=True,actual_optimizer_calls=0,formal_data_read=False))
