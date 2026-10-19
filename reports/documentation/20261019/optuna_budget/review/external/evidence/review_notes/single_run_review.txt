@@ -1,0 +1,67 @@
+单 run 成本模型定向静态核查（子任务）
+
+结论：576 更新、864 梯度群呈现、1446 额外群前向和 36 组 CPU 残差计数成立；本次保存测量导出的三臂 P 与 calculations.json 完全一致。统一 21600 秒保留 1.25 与 1800，并将同一 P 用于 search/rep，可作为透明的工程准入代理。未发现需要增加单 run 6 小时或改变 272 小时的直接数值矛盾。预算修订的实际代码接线及正式门尚待执行方有限核验，此静态核查不签发正式准入 PASS。
+
+1. 计数及直接证据
+
+1.1 每个 run 仅有 spec.arm，一个连续 A→B 轨迹。
+scripts/step28_optuna.py:128–130 将 Method.ARMS 设为单元素；scripts/step28_optuna_run.py:122–127 将 train_stage/train/checkpoint 接到 single。
+scripts/step28_bge_continual.py:76–82 要求 48 个 fit 群并明确 schedule(current,6,...)；scripts/step28_g_half_run.py:177–205 每个 schedule 元素一次 update，每 48 更新一次 capture。
+scripts/step28_g_half_run.py:333–355 枚举 A、B 两阶段，分别累加 288 更新和 288*stage 呈现，故 576 与 864 正确。B update 内部 current/history 两分支各一次 backward、最后一次 optimizer.step（scripts/step28_optuna.py:188–216），因此 t_B 已含两个分支，不能再乘二。
+
+1.2 A 六次 capture：6*(48 fit+40 valid)=528。
+B 六次 capture：6*(48 fit+6 cache+40 valid+6 cache reference)=600。
+证据 scripts/step28_replay_diagnostics.py:68–83 校验 48/40/6 并计算三种 score；:85–113 对每个 cache 群重新 record.reference。Optuna S/S_pos/H_pos 走该 else 分支，而非 LOGIT 或 C_cf/C_perm 复用 cache_scores 分支。因此 B 残差的 36 次 reference 是实际独立调用，不能删去。
+
+1.3 两个端点各原始、full restore、inference restore 三轮 (12 calibration+40 valid) score，即 2*3*52=312。
+证据 scripts/step28_g_half_run.py:236–246、267–286。两种校准后的概率变换在 :287–289 完成，不新增 encoder 前向。
+
+1.4 A 端点新增出生教师只作用最终保留的六群，即 6。
+scripts/step28_g_half_run.py:257–258 只在 stage==1 调 retain。scripts/step28_record_replay.py:248–262 先对全 48 群完成 reservoir.add_stage，再对最终 groups 内尚无 table 的群求 teacher。容量默认六见 scripts/step28_continual_population_data.py:202–225；Optuna 自有 Memory 保留同容量构造，见 scripts/step28_optuna.py:90–100。
+合计 528+600+312+6=1446。每个 B capture 六 cache 群各计算一次双视图残差核，六个 epoch 合 36 组 h；不是 72h，h 自身已经包含两视图。
+
+2. 测量边界与不可夸大的部分
+
+2.1 原生 timed 在 CUDA 前后同步，同一计时名称取 max（scripts/step28_optuna_verify.py:161–163）。每臂 6 调用保存为 2 次 A、4 次 B，合 18；不是完整 A→B 运行。源 result.json 为单行，相关 JSON 字段为 arms.<arm>.actual_updates、updates、measurements、maximum_shape_verified，原始状态 PASS_HANDWRITTEN_ONLY。
+
+2.2 L 在 :165–168 内含 pretrained_archive 和 fresh。fresh 包含模型/优化器初始化和初始状态 digest（scripts/step28_balanced_pooling_run.py:355–373）；归档遍历、文件 hash 由 scripts/step28_continual_population.py:43–53 完成。原生后续 initial 验证和正式入口其他 baseline/input/source 核对不全在 L 内，应保留为 1800 未单测项。无需重开已关闭 T01。
+
+2.3 v 并非只测裸 encoder。原生 :218 测 record.reference；:253/255 测 restored_score，取最大值。reference 包含文本构造、microbatch tokenization、两通道 encoder、完整 record pair table，以及 CPU numpy 返回（scripts/step28_record_replay.py:43–63、102–110、211–229；scripts/step28_chinese_base.py:134–140）。score 还包含 canonical assignment 和账号 pooling；Optuna score 路由见 scripts/step28_optuna.py:219–229。用较大的同臂 v 同时代入 score/reference 属于明确保守交叉覆盖，不是实际二次收费。
+
+2.4 s_F/s_I 测 native_save，含 reserve 检查及 save_state 的状态 digest、torch.save、文件身份 hash；r_F/r_I 含 torch.load CPU、digest、实际模型/Adam 回载及回载 digest 核对（scripts/step28_g_half_verify.py:118–120；scripts/step28_continual_population.py:157–210；scripts/step28_optuna_verify.py:178–189、254–258）。正式每端点一次 full save/restore 和一次 inference save/restore，系数 2*(s_F+r_F+s_I+r_I) 正确。原生 fixture 的多次临时保存/重载不可全部投影成正式次数。
+
+2.5 【解释限制 F-SR1】最大 N224/token256 不保证整条路径的最慢调度形状。
+原生当前/历史群为 28 账号各 8 条，见 scripts/step28_optuna_verify.py:171–175，手写生成器见 tests/test_step28_record_replay.py:23–35；合法正式群允许每账号 2..8 条，见 scripts/step28_continual_population_data.py:73–80。H_pos 的 G_half.account_logits 按两端条数有序组合分桶，随后逐桶处理（scripts/step28_g_half.py:57–72）。全 8 条只有 (8,8) 一个桶，混合条数可有更多桶（可能达 7*7=49），小算子/主机调度开销不能仅由 N 的单调性证明。新 seed 不新增算法类型，但会改变被抽群及其条数组合。应将此保留为未测波动/工程余量解释，不把最大输入形状说成严格时间上界。不据此追加 GPU、资格或改变 272 小时；当前证据没有证明余量不足。
+
+2.6 【解释限制 F-SR2】h 是双视图 CPU pooling/平方误差核代理，并非完整 capture CPU 耗时。
+原生 scripts/step28_optuna_verify.py:260–266 计算两视图均方差；正式 scripts/step28_replay_diagnostics.py:97–113 还含 numpy 转换、cross mean、difference mse 等，并在 capture 其他位置计算 fit/cache 指标、Memory 比较及写盘。这些都不新增模型前向，已属于 proposal 第 37 行明确的 1800 余量；不据此加倍 h。36h 保存值仅 S 0.0902113896 秒、S_pos 0.0926591065 秒、H_pos 0.2232698277 秒，不可用此宣称完整 CPU 诊断耗时已实测。
+
+2.7 【解释限制 F-SR3】两类 restore 测量发生于本 fixture 刚写过/已经读过的文件，和正式端点立即 save→restore 相似，未建立冷缓存或长期共享存储最坏上界。原生 saved meta 为 trial/RNG/modes/fixture（verify:178–180）；正式 meta 另含 members/maps/Memory 身份及 policy（single:259–264），但完整 Memory 载荷单独写入 memory/*.bin，不嵌入模型权重。完整原生 model/Adam 仍是真实全参数状态，不能因仅六更新就称小模型 IO；相反也不能把小 meta/Memory fixture 说成全真实端点耗时。Memory 序列化与额外 continuity/digest 应留在 1800/25% 中。没有依据删减 L、IO 或重复加上原生全部文件操作。
+
+2.8 λ_rank 与 lr_multiplier 仅影响损失标量和两个 optimizer param group 的学习率；范围检查、目标、更新及 seeds 见 scripts/step28_optuna.py:35–58、74–86、159–216。没有参数变化引入新 epoch、新群或新增前向路径。校准拟合与排序/数值轨迹可改变 CPU 时间，proposal 明确由未测余量和硬限约束；现有证据不支持承诺每次均成功。
+
+3. 独立保存字段算术（仅 Python 标准库；不导入项目）
+
+从原生 result.json 逐臂读取全部 11 个 measurement 字段，独立计算 288*(t_A+t_B)、1446*v+36*h、L+2*(s_F+r_F+s_I+r_I) 及 P=1.25*(前三项+1800)。33 个 measurement 字段与 calculations.json 完全一致；三个 P 与 calculations.search_projection、replication_projection 及原 result.old_cost_projection 的绝对差均为 0。
+
+S：训练 10013.751799017191；额外前向/残差 3515.8705818532035；L/IO 63.411643833853304；P 19241.29253088031；距21600余 2358.7074691196904。
+S_pos：训练 9811.84315019846；额外前向/残差 3339.519582448527；L/IO 53.901628052815795；P 18756.580450874753；余 2843.4195491252467。
+H_pos：训练 9791.485034912825；额外前向/残差 3356.7406494878232；L/IO 53.7023797230795；P 18752.41008015466；余 2847.589919845341。
+
+4. search/rep 的同一 P 与实际账
+
+scripts/step28_optuna_run.py:294–304：两者均训练及盲门；只有 search 在本 run 内读取开发标签并 evaluate_run，replication 盲完成后退出。:312–339 才为九 run 集中读取一次并从保存分数评价。因此原 P 的 1800 中未拆开的搜索评价余量可保留用于 rep 的同一上包络，集中 E 另预留，属于预测中的有意冗余。实际账必须使 E 仅收一次，且退出后的等待不回加到先完成的 rep。本子任务只确认成本模型与入口边界；实际 campaign timer 接线由主审另一范围核验。当前 run Budget 仍旧 9000 的实现事实不被此静态预算认可替代。
+
+5. 实际阅读范围
+
+完整阅读：reports/documentation/20261019/optuna_budget/proposal.zh.txt（1–122）；同目录 calculations.json（1–245）；scripts/step28_optuna.py（全241行）；scripts/step28_g_half.py（全137行）；scripts/step28_record_replay.py（全332行）。
+定向完整函数/连续段阅读：scripts/step28_g_half_run.py（1–367，含 projection/train_stage/checkpoint/train；未读后续全部 blind/evaluation/gate 实现）；scripts/step28_replay_diagnostics.py（1–129 capture 完整；未读 evaluate 函数）；scripts/step28_optuna_verify.py（149–350，native_arm/main 完整；前149行分析器未在本子任务审查）；scripts/step28_optuna_run.py（115–175、260–342，Entry 接线与实际 run/集中入口；其余仅 rg 定位）；scripts/step28_balanced_pooling_run.py（355–373 fresh/archive）；scripts/step28_bge_continual.py（46–91 contract/config/schedule）；scripts/step28_continual_population_data.py（1–89、202–247）；scripts/step28_continual_population.py（35–73、140–210）；scripts/step28_chinese_base.py（100–140）；scripts/step28_g_half_verify.py（104–130、220–275，后一区间为旧 native 保存背景，未据此重审资格）；scripts/step28_positive_ranking.py（47–108，路由/目标）；scripts/step28_continual_population_run.py（85–126，辅助保存背景）；tests/test_step28_record_replay.py（1–67，手写生成器）；schema/step28_chinese_base_policy.json（13–46）；schema/step28_bge_continual_policy.json、schema/step28_alias_ranking_policy.json 仅 rg 定位常数。
+原生 result.json（原文件单行1）：标准库完整解析，实质审阅 arms 下 measurement、6更新的分支计数、数值/restore状态、耗时、formal_inputs/labels 和来源字段；未对每个梯度标量重新评价科学结果。
+未读/未重审：关闭的 N01–N08/T01 全部原外审、整个历史依赖库、正式资料、标签、模型/Memory 载荷；控制器/共享预算完整逻辑由主审其他任务处理。
+
+6. 实际执行与失败披露
+
+仅在隔离 scratch 工作区使用 pwd、rg、nl/sed 读文件，Python pathlib/json/math/ast 读取保存 JSON 并计算成本、静态解析五份源码的函数起止行。未执行/导入项目脚本，未运行 pytest/numpy/torch，未载模，未访问项目 Linux/网络/正式文本标签，未产生原生或科学性能证据。
+一次 rg 同时搜索两个猜测依赖路径 scripts/step28_group_continual_data.py 和 scripts/step28_bge_continual_data.py，返回 No such file or directory；随后沿真实 import 找到 step28_continual_population_data.py 并读取。一次并行读取与一次原生单行 JSON rg 的输出被工具截断；相关必要源码以窄范围补读，JSON 改用标准库提取字段。不把被截断未看到的文本计为完整语义阅读；不宣称此次静态算术为 Linux 原生复验。
+
+本子任务新增 finding 全部为解释限制；没有另立单 run 预算实质阻断，没有要求额外 GPU 或改变科学范围。最小实施与实际门须继续按照已批准条件完成，由主执行者负责，而非重复询问同一许可。

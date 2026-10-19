@@ -1,0 +1,272 @@
+{
+  "review_scope": "定向静态预算及接线审查",
+  "budget_adoption": "可采纳21600/C900/E3600/A600/979200秒",
+  "amended_implementation": "尚待实际完成和获准CPU核验",
+  "formal_authorization": "已获条件自动启动许可，当前执行条件未全部满足，未启动",
+  "budget_design_blockers": [],
+  "implementation_required_ids": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05"
+  ],
+  "interpretation_limits_ids": [
+    "B06",
+    "B07",
+    "B08"
+  ],
+  "scope_or_budget_changes_recommended": [],
+  "findings": [
+    {
+      "id": "B01",
+      "category": "实施必改",
+      "blocks_budget_adoption": false,
+      "completion_boundary": "正式派发前",
+      "title": "预算值必须贯通真实断言、运行限额与实际定时器",
+      "observation": "冻结附件仍为9000/114小时，属于修订尚未实施；只修改policy或文字不够。",
+      "required_action": "同步单次21600、各臂259200/64800、阶段777600/194400、C/E/A900/3600/600、共享5100、总979200及导入前/末端timer；资格和非时间限额不变。",
+      "locations": [
+        {
+          "path": "schema/step28_optuna_policy.json",
+          "lines": "9-13",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": "59-79",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_control.py",
+          "lines": "11,36-50,56-73",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "28,262,287",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "category": "实施必改",
+      "blocks_budget_adoption": false,
+      "completion_boundary": "正式资源入口与共享阶段接线完成前",
+      "title": "隔离C/E/A的阶段起点，不能继承整场campaign起始epoch",
+      "observation": "Budget祖先从RECORD_REPLAY_STARTED_EPOCH回溯起点；trial会更新该变量，E/A只继承父环境，C末检也用该Budget。",
+      "trigger": "若新的controller外层设置或遗留整个campaign起点，E/A和C末检可能把多天历时误计成本段耗时；本包无未来入口，未证实已触发。",
+      "required_action": "E/A使用本次阶段启动epoch或显式本段起点，C资源检查不使用整场历时；父Ledger保留互斥权威收费，局部手写CPU核对错误原点及真实阶段超限。",
+      "locations": [
+        {
+          "path": "scripts/step28_record_replay_run.py",
+          "lines": "60-70",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": "75-79,93-99",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "225-228,252-258,262,287",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "category": "实施必改",
+      "blocks_budget_adoption": false,
+      "completion_boundary": "新formal gate接受证据前",
+      "title": "旧18调用与CPU适用证据由本次来源复用关系接受",
+      "observation": "当前原生48来源与本附件完全相同；预算改源后原native.source_files不再等于新current，当前门的严格等式会拒绝。",
+      "required_action": "保留原result/wrapper/source_files，绑定原48来源与修订实际来源及限定差异；确认科学计算和依赖不变。CPU以旧适用证据加新局部核验覆盖九项，原始局部报告仅写实际运行子集。新来源成员数依实物。",
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "44-70",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": "31-56",
+          "detail": ""
+        },
+        {
+          "path": "reports/documentation/20261018/optuna_implementation/repair/primary_disposition.zh.txt",
+          "lines": "15-19",
+          "detail": ""
+        },
+        {
+          "path": "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+          "lines": "109-111",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "category": "实施必改",
+      "blocks_budget_adoption": false,
+      "completion_boundary": "资格接受记录与总账初始化前",
+      "title": "原生费用使用外层876，CPU从外层108继续累计",
+      "observation": "原raw累计875，wrapper875953454299ns上取整876；父入口当前直接相加raw累计会少计1秒。",
+      "required_action": "保留raw875，接受记录实际核wrapper并以876入账；CPU108继续累计，起账984。CPU余192，native账面余924无再试许可。",
+      "locations": [
+        {
+          "path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native.wrapper.txt",
+          "lines": "1-3",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "215-217",
+          "detail": ""
+        },
+        {
+          "path": "reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07.wrapper.txt",
+          "lines": "1-4",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "category": "实施必改",
+      "blocks_budget_adoption": false,
+      "completion_boundary": "新时间资格生成与验证前",
+      "title": "重算保留P、绑定共享代理公式，并更新新旧负例语义",
+      "observation": "当前新门名仍NEW_9000_SECOND_QUALIFICATION；共享段只核文件身份和字段相等，未重算本次共享公式；旧18844和301秒负例数值语义将变化。",
+      "required_action": "绑定已批预算、原生复用与calculations直接字段，重算各臂P并核共享具体公式/性质；超过21600或错误来源/旧状态继续拒绝，旧18844数值本身不再视为超限。",
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "71-86",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_control.py",
+          "lines": "36-50",
+          "detail": ""
+        },
+        {
+          "path": "tests/test_step28_optuna.py",
+          "lines": "188-214",
+          "detail": ""
+        },
+        {
+          "path": "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+          "lines": "108-111",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B06",
+      "category": "解释限制",
+      "blocks_budget_adoption": false,
+      "blocks_formal_after_implementation": false,
+      "title": "最大N/token不是全路径最慢调度，h和IO也有明确测量边界",
+      "observation": "N224每账号8条仅一个(8,8)桶，合法混合条数产生更多桶；36h仅双视图残差核；恢复IO为刚写/曾读文件，正式元信息与Memory另有工作。",
+      "required_action": "明确未测工作归既有1800/25%余量，不称严格最坏上界；不增加1446/36h/两端点系数，不追加GPU或预算。",
+      "locations": [
+        {
+          "path": "scripts/step28_optuna_verify.py",
+          "lines": "161-175,178-189,253-266",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_g_half.py",
+          "lines": "57-72",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_replay_diagnostics.py",
+          "lines": "80-128",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_g_half_run.py",
+          "lines": "257-284",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_continual_population.py",
+          "lines": "157-210",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B07",
+      "category": "解释限制",
+      "blocks_budget_adoption": false,
+      "blocks_formal_after_implementation": false,
+      "title": "共享代理不是完整阶段新实测，手写诊断曲线不得升级覆盖",
+      "observation": "R不是直接hash测量；14秒非45次正式调度；26秒诊断为fixture；209.219609为含端点和全双臂评价的旧尾段。",
+      "required_action": "认可有依据的工程代理并保留局限，不将小数值或新命名当完整实测PASS；不要求正式trial/标签/九复验作为准入试跑。",
+      "locations": [
+        {
+          "path": "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+          "lines": "53-76",
+          "detail": ""
+        },
+        {
+          "path": "tests/test_step28_optuna.py",
+          "lines": "159-186,237-306",
+          "detail": ""
+        },
+        {
+          "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.console.txt",
+          "lines": "107",
+          "detail": ""
+        },
+        {
+          "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.wrapper.txt",
+          "lines": "1-3",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_run.py",
+          "lines": "317-339",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "B08",
+      "category": "解释限制",
+      "blocks_budget_adoption": false,
+      "blocks_formal_after_implementation": false,
+      "title": "预测冗余、父活动收费和日历时间不混同",
+      "observation": "同P给rep并另留E是明确预算冗余；父run费用还含child退出后的completion/source/feedback核对，child_seconds不是完整run收费。",
+      "required_action": "实际E只计一次，前八rep退出后的等待不回加；父收尾不再计C；272h不是日历保证，失败/超限清理真实记账。",
+      "locations": [
+        {
+          "path": "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+          "lines": "37-39,95-101",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_search.py",
+          "lines": "225-258",
+          "detail": ""
+        },
+        {
+          "path": "scripts/step28_optuna_control.py",
+          "lines": "67-115",
+          "detail": ""
+        },
+        {
+          "path": "reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt",
+          "lines": "26-62",
+          "detail": ""
+        }
+      ]
+    }
+  ],
+  "not_an_execution_gate": true
+}

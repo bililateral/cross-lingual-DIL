@@ -1,0 +1,58 @@
+{
+  "conclusion": "Single-run model arithmetic and loop counts supported; no identified evidence requiring 6h/272h increase; implementation gates pending.",
+  "findings": [
+    {
+      "id": "F-SR1",
+      "class": "解释限制",
+      "blocking": false,
+      "title": "N224/token256不构成H_pos分桶调度的最慢时间证明",
+      "evidence": [
+        "scripts/step28_optuna_verify.py:171-175",
+        "tests/test_step28_record_replay.py:23-35",
+        "scripts/step28_g_half.py:57-72",
+        "scripts/step28_continual_population_data.py:73-80"
+      ],
+      "required_change": "在未测余量解释中说明最大输入shape与最长运行时间不等价；无需增加GPU或改变272h。"
+    },
+    {
+      "id": "F-SR2",
+      "class": "解释限制",
+      "blocking": false,
+      "title": "36h是双视图CPU残差核代理",
+      "evidence": [
+        "scripts/step28_optuna_verify.py:260-266",
+        "scripts/step28_replay_diagnostics.py:97-113"
+      ],
+      "required_change": "保留1800对完整CPU诊断/IO等未单测项的覆盖，不把h写成完整capture实测，不加倍h。"
+    },
+    {
+      "id": "F-SR3",
+      "class": "解释限制",
+      "blocking": false,
+      "title": "IO复用有完整模型/Adam支撑，未形成冷存储/全真实端点耗时上界",
+      "evidence": [
+        "scripts/step28_optuna_verify.py:178-189",
+        "scripts/step28_optuna_verify.py:254-258",
+        "scripts/step28_g_half_run.py:259-264",
+        "scripts/step28_continual_population.py:182-210"
+      ],
+      "required_change": "保留文件缓存、Memory/meta差异与continuity核对的未测边界；不改两端点IO系数。"
+    }
+  ],
+  "arithmetic_evidence": "single_run_arithmetic.json",
+  "ast_evidence": "single_run_ast_ranges.json",
+  "full_notes": "single_run_review.txt",
+  "failures": [
+    {
+      "operation": "rg candidate dependency paths",
+      "detail": "step28_group_continual_data.py and step28_bge_continual_data.py did not exist; actual dependency located via imports."
+    },
+    {
+      "operation": "large text output",
+      "detail": "Two outputs truncated; necessary ranges reread and native JSON selected with standard-library parser."
+    }
+  ],
+  "executed_project_code": false,
+  "network_or_project_linux_access": false,
+  "training_or_model_or_formal_data_access": false
+}

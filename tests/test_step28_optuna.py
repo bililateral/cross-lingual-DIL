@@ -199,11 +199,31 @@ class OptunaTests(unittest.TestCase):
         self.assertTrue(ledger.failed)
         ledger=ctl.Ledger(lambda:now[0])
         with self.assertRaises(TimeoutError):
-            with ledger.interval("control"):now[0]+=301
-        self.assertEqual(ledger.used["control"],301);self.assertTrue(ledger.failed)
+            with ledger.interval("control"):now[0]+=901
+        self.assertEqual(ledger.used["control"],901);self.assertTrue(ledger.failed)
         projected=dict(arms={a:dict(search=8000,replication=8000) for a in m.ARMS},shared=dict(ctl.SHARED))
         ctl.projected_gate(projected);projected["arms"]["S_pos"]["search"]=18844.60961239063
+        ctl.projected_gate(projected)
+        projected["arms"]["S_pos"]["search"]=21600.01
         with self.assertRaises(ValueError):ctl.projected_gate(projected)
+        self.assertEqual(run.policy()["total_seconds"],979200)
+        self.assertEqual(run.runtime()["maximum_gpu_stage_seconds"],21600)
+        self.assertEqual(run.Budget(self.temporary()).limits["maximum_gpu_stage_seconds"],21600)
+        ledger=ctl.Ledger(lambda:now[0],prior_cpu=116,prior_native=876)
+        with ledger.interval("control"):now[0]+=301
+        self.assertEqual(ledger.remaining("control"),599)
+        self.assertEqual(ledger.remaining("evaluation"),3600)
+        self.assertEqual(ledger.remaining("analysis"),600)
+        ledger.arm_used["search"]["S"]=259199
+        self.assertEqual(ledger.remaining("search","S"),1)
+        ledger.arm_used["replication"]["S_pos"]=64799
+        self.assertEqual(ledger.remaining("replication","S_pos"),1)
+        ledger.used["search"]=777599
+        self.assertEqual(ledger.remaining("search","H_pos"),1)
+        ledger.used["replication"]=194399
+        self.assertEqual(ledger.remaining("replication","H_pos"),1)
+        ledger.used["search"]=979200-ledger.qualification-sum(ledger.used[k] for k in ledger.used if k!="search")-1
+        self.assertEqual(ledger.remaining("evaluation"),1)
         from step28_optuna_search import launch
         import sys
         out=self.temporary()
@@ -211,7 +231,81 @@ class OptunaTests(unittest.TestCase):
         self.assertEqual(receipt["child_exit_code"],0)
         with self.assertRaises(RuntimeError):launch([sys.executable,"-c","raise SystemExit(3)"],out/"fail.txt",5,os.environ.copy())
         with self.assertRaises(TimeoutError):launch([sys.executable,"-c","import time; time.sleep(5)"],out/"timeout.txt",.2,os.environ.copy())
-        self.evidence("budgets",dict(waiting_not_charged=True,evaluation_once=True,old_pass_rejected=True,hard_timeout_and_failure=True,failed_seconds_retained=301))
+        self.evidence("budgets",dict(waiting_not_charged=True,evaluation_once=True,old_18844_now_within_cap=True,
+            above_21600_rejected=True,per_arm_stage_total_limits=True,hard_timeout_and_failure=True,failed_seconds_retained=901))
+
+    def test_budget_amendment_gate(self):
+        import json
+        import zipfile
+        import step28_optuna_search as search
+        import step28_optuna_formal_wait as wait
+        out=self.temporary();source=out/"scripts/step28_optuna_control.py";source.parent.mkdir()
+        source.write_text("old budget fixture");before=[data.record(source,out)]
+        archive=out/"original.zip"
+        with zipfile.ZipFile(archive,"w") as z:z.write(source,before[0]["path"])
+        source.write_text("new budget fixture");current=[data.record(source,out)]
+        def save(name,value):
+            path=out/name;data.write_json(path,value);return data.record(path,out)
+        def wrapper(name,seconds,cumulative=None):
+            path=out/name
+            path.write_text(f"exit_code=0\nwall_ns={seconds*1000000000}\ncharged_seconds={seconds}\n"+
+                (f"cumulative_charged_seconds={cumulative}\n" if cumulative is not None else ""))
+            return data.record(path,out)
+        flags={k:True for k in ("current_history_lambda_effect","actual_lr_effect","next_update_bitwise_equal",
+            "inference_restore_equal","maximum_shape_verified")}
+        measurements=dict(t_A=1.,t_B=2.,v=.1,h=.01,L=1.,s_F=2.,r_F=3.,s_I=1.,r_I=1.,W_F=100,W_I=50)
+        native=dict(status="PASS_HANDWRITTEN_ONLY",source_files=before,cumulative_charged_seconds=875,
+            arms={a:dict(actual_updates=6,charged_seconds=100,measurements=measurements,**flags) for a in m.ARMS})
+        reuse=dict(status="ACCEPTED_BUDGET_CLOCK_ONLY",source_files=current,changed_paths=[source.relative_to(out).as_posix()],
+            original_result=save("native.json",native),original_wrapper=wrapper("native.wrapper",876),original_archive=data.record(archive,out))
+        tests=["test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate"]
+        cpu=dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,cumulative_charged_seconds=124,unresolved_checks=[],
+            qualified_tests=list(run.CPU_TESTS),prior_gate=save("prior.json",dict(source_files=before,cumulative_charged_seconds=108,qualified_tests=list(run.CPU_TESTS[:-1]))),
+            new_result=save("cpu.json",dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,prior_charged_seconds=116,qualified_tests=tests,unresolved_checks=[])),
+            subsequent_wrappers=[wrapper("clock.wrapper",8,116),wrapper("cpu.wrapper",8,124)])
+        c=wrapper("control.wrapper",14);f=wrapper("fixture.wrapper",26)
+        (out/"historical.wrapper").write_text("2026-10-18T14:14:43+08:00\nexit_code=0\n2026-10-18T17:45:44+08:00\n")
+        (out/"historical.console").write_text('console text\n'+json.dumps(dict(event="updates",point="B_H_pos",completed=288,elapsed_seconds=12451.78039111523))+"\n")
+        tail=12661-12451.78039111523
+        projection=dict(status="APPROVED_21600_SECOND_BUDGET_QUALIFICATION",source_files=current,cost_model="legacy_1.25_allowance1800",
+            arms={a:{k:run.single.projection(measurements)["projected_total_seconds"] for k in ("search","replication")} for a in m.ARMS},
+            shared=dict(control=1.25*(72+14+120),evaluation=1.25*(9*tail+18+26+300),analysis=182.5),
+            shared_basis=dict(kind="CONSERVATIVE_PROXIES_NOT_WHOLE_STAGE_MEASUREMENTS",control_wrapper=c["path"],fixture_wrapper=f["path"],
+                historical_wrapper="historical.wrapper",historical_console="historical.console"),
+            measurement_evidence=[c,f,data.record(out/"historical.wrapper",out),data.record(out/"historical.console",out)])
+        policy=run.policy();policy_path=out/"policy.json";data.write_json(policy_path,policy)
+        permission=dict(status="APPROVED",stages=["FORMAL"],source_files=current,user_quote="Handwritten fixture only",
+            search_weight_lifecycle=True,job="reports/fixture")
+        gate=dict(kind="FORMAL",status="APPROVED_NO_OPEN_BLOCKERS",source_files=current,policy=data.record(policy_path,out),job="reports/fixture",
+            execution_authorization=save("permission.json",permission),external_review=save("external.json",{}),primary_disposition=save("primary.json",{}),
+            cpu=save("cpu_gate.json",cpu),native_reuse=save("reuse.json",reuse),time_qualification=save("time.json",projection))
+        gate_path=out/"gate.json";data.write_json(gate_path,gate)
+        with mock.patch.object(data,"ROOT",out),mock.patch.object(run,"POLICY",policy_path),mock.patch.object(run,"sources",return_value=current):
+            _,accepted_cpu,accepted_native=search.validate_gate(gate_path)
+            self.assertEqual(accepted_native["cumulative_charged_seconds"],876)
+            self.assertEqual(accepted_cpu["cumulative_charged_seconds"],124)
+            cases=[]
+            for key,original,mutate in (
+                ("time_qualification",projection,lambda p:p.update(status="NEW_9000_SECOND_QUALIFICATION")),
+                ("time_qualification",projection,lambda p:p["shared"].update(evaluation=1.)),
+                ("time_qualification",projection,lambda p:p["arms"]["S"].update(search=21601.)),
+                ("native_reuse",reuse,lambda p:p.update(changed_paths=[])),
+                ("native_reuse",reuse,lambda p:p.update(source_files=[])),
+                ("cpu",cpu,lambda p:p.update(cumulative_charged_seconds=123))):
+                bad=copy.deepcopy(original);mutate(bad);bad_gate={**gate,key:save("bad.json",bad)};data.write_json(gate_path,bad_gate)
+                with self.assertRaises(ValueError):search.validate_gate(gate_path)
+                cases.append(key)
+        # The actual listener resource predicate rejects each insufficient resource.
+        from types import SimpleNamespace
+        with mock.patch.object(wait.psutil,"process_iter",return_value=[]):
+            for gpu,apps,host,disk,expected in ((32000,"",80,70,True),(30000,"",80,70,False),(32000,"1",80,70,False),
+                    (32000,"",71,70,False),(32000,"",80,63,False)):
+                with mock.patch.object(wait.subprocess,"check_output",side_effect=[str(gpu),apps]), \
+                    mock.patch.object(wait.psutil,"virtual_memory",return_value=SimpleNamespace(available=host*2**30)), \
+                    mock.patch.object(wait.shutil,"disk_usage",return_value=SimpleNamespace(free=disk*2**30)):
+                    self.assertEqual(wait.resources(out)["ready"],expected)
+        self.evidence("budget_gate",dict(actual_formal_validator_used=True,native_outer_876=True,cpu_outer_chain=True,
+            bound_formula_negative_cases=len(cases),listener_resource_cases=5,actual_optimizer_calls=0,handwritten_only=True))
 
     def test_entry_orchestration_and_access_negative_controls(self):
         # This isolates the real 288-step caller and actual config; updates here are deliberately simulated.

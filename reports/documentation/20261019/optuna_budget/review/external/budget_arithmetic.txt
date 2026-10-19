@@ -1,0 +1,41 @@
+独立预算算术表（单位：秒，显示六位小数）
+
+仅从附件保存字段独立四则核对；不是Linux原生实测或科研指标重算。
+
+臂	训练项	额外前向/残差	L/IO	P	21600-P
+S	10013.751799	3515.870582	63.411644	19241.292531	2358.707469
+S_pos	9811.843150	3339.519582	53.901628	18756.580451	2843.419549
+H_pos	9791.485035	3356.740649	53.702380	18752.410080	2847.589920
+
+共享段	代理	硬限	余量
+control	450.712409	900	449.287591
+evaluation	2832.023702	3600	767.976298
+analysis	182.500000	600	417.500000
+
+总预算：36×21600 + 9×21600 + 900+3600+600 + 300+1800 = 979200秒 = 272小时。
+每臂搜索259200；每臂复验64800；搜索总777600；复验总194400；共享5100；资格2100。
+较原410400增加568800秒=158小时；运行额度增加157.5小时，共享增加0.5小时。
+CPU已用108，余192；native外层876、内层875，账面余924，不允许再试。已用资格984；总硬额扣已用为978216，不能跨段花用。
+
+R_max_r_I: 3.146804547868669
+T_C_outer_ceiling: 14
+T_F_outer_ceiling: 26
+historical_wrapper_seconds: 12661.0
+last_update_log_line: 107
+last_update_elapsed: 12451.78039111523
+T_tail_proxy: 209.21960888477042
+historical_completion_elapsed: 12659.635004023556
+same_internal_clock_last_update_to_completion: 207.8546129083261
+wrapper_minus_internal_completion: 1.3649959764443338
+
+one_each_sum: 56750.28306190972
+search_36: 681003.3967429167
+replication_9: 170250.84918572917
+all_45: 851254.2459286458
+shared_proxies_sum: 3465.2361115888925
+with_full_shared_and_qualification_reserves: 858454.2459286458
+with_shared_proxies_and_full_qualification_reserves: 856819.4820402347
+full_reserve_hours: 238.45951275795719
+hard_limit_minus_full_reserve_projection: 120745.75407135417
+
+三个P和C/E/A代理与输入calculations的差均为0。完整输入字段、精度和独立计算见independent_arithmetic.json。

@@ -1,0 +1,1022 @@
+- main [ref=e92]:
+  - generic:
+    - generic:
+      - generic:
+        - button "分享" [ref=e125] [cursor=pointer]
+        - button "切换摘要面板固定状态" [ref=e131] [cursor=pointer]
+        - button "更多" [ref=e137] [cursor=pointer]
+  - region "对话" [ref=e150]:
+    - generic [ref=e151]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - generic [ref=e162]:
+            - heading "你说：" [level=4] [ref=e163]
+            - generic [ref=e164]:
+              - generic [ref=e167]:
+                - button "optuna_budget_review.zip" [ref=e168] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "optuna_budget_review.zip"
+                    - generic: 文件
+              - generic [ref=e170]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]:
+                    - generic [ref=e174]: 最新授权与历史时点说明（2026-10-19，先于以下冻结请求阅读）： 用户最新原话：“批准272小时预算修订，并将这个具体方案包上传GPT 6 Pro外审，交代清楚背景。外审回收并独立主审通过、必要CPU核验及资源条件满足后，自动启动S、S_pos、H_pos三臂的36次搜索和9次复验。” 本次附上的正是用户批准的 optuna_budget_review.zip：377084字节、72成员（71载荷＋清单），SHA256 58c4e04cc7f397fda0909331f6e6eabd9b8e63090cfa6b3a1efcbdd7b786d1b5。包字节保持冻结，不为更新授权措辞重打包。请先核对身份。 包内proposal、primary_disposition和request中的“待确认”“正式当前未授权”是制作时状态，现由上述直接批准在对应范围取代。当前正确状态：272小时修订及具体包静态外发已批准；最小预算/实际timer/门禁接线和剩余CPU核验按方案获准；正式36＋9已获条件自动启动许可，但外审尚待完成回收，必要接线/CPU/资源与新时间门仍未完成，正式尚未启动。请不要将历史待确认措辞误报为当前缺少用户授权，也不要把条件许可当成已通过执行门。 你的任务仍仅是定向静态审查，不授权你执行项目程序、训练、载模或访问正式文本/标签。既有科学方法、两参数公平范围、各臂12完整搜索＋3新seed复验、失败停止及开发/最终确认边界保持。核心问题是根据本次真实原生测量验证新的单次6小时、C900/E3600/A600与272小时总预算，以及保留旧18调用数值证据所需的最小来源/门禁接线。 原生只发生唯一三臂各6调用，共18；数值/恢复通过，旧9000秒时间门失败后正确停止。外层876秒与内部875秒的区别、CPU已用108/300秒、剩余192秒、不允许以原生剩余924秒重跑，都请纳入判断。共享公式是透明代理与明确余量，绝非新完整C/E/A测量；请指出具体不足，避免要求用正式标签/首个真实trial/九次正式复验进行准入试跑。 外审回收后由主执行者独立处置，仅做必要修正及获准CPU核验；全部条件成立即可自动启动，不重复询问同一许可。若发现需改变272小时、三臂次数、数据边界、科学设计或主判据的实质选择，请具体列出变更与证据，不能由审查意见自动扩权。请提供完整中文审查正文、findings、独立算术及可下载的必要审查证据包；记明静态核对实际范围和失败，不冒称Linux原生实测。以下为包内原请求全文，其冲突的历史授权状态以上述最新说明为准。 ——冻结原请求全文—— 请作一次定向静态外审：三臂Optuna时间预算修订与最小接线方案。 项目背景：S为主要完整内部对照，S_pos/H_pos既有固定实验已有效完成但未达到双域主要目标；用户要求三臂有同等有限Optuna机会。科学设计已审查并实现：每臂12次完整搜索、固定选择后各3新seed复验，共36+9；不剪枝、不换主指标、不追加候选。此前实现外审N01—N08及主审补充T01已在修订实现/CPU范围关闭，用户免除该次修复再外审。请仅复用该结论，不重新要求所有历史方案/模型/正式数据。 新事实：本次唯一原生三臂各6真实更新，共18，数值/参数作用/最大N224-token256/恢复检查通过；外层876秒，内部875是退出前记账。监听正确停止在9000秒新时间门：三臂保守投影18752—19241秒，正式训练0次。旧9000/114小时与保留模型不相容；共享C300/E2400/A600此前未建立完整容量依据。 用户现要求仔细核对模型，结合本次原生提出单次/共享/总预算，独立主审后汇报，确认后才正式训练。本包是新预算提案静态材料；不授权审查方执行项目程序、训练、访问正式文本/标签、载模或用外部算力获取新科研结果。只可做文件/身份/AST/保存字段算术核对，任何辅助过程和失败如实说明。不需要运行pytest、numpy/torch项目代码或重新计算科研评价指标。 重点阅读：reports/documentation/20261019/optuna_budget/proposal.zh.txt、calculations.json、primary_disposition.zh.txt；原始native result/wrapper/outcome；当前g_half投影/训练/checkpoint、replay_diagnostics、record.Memory、optuna run/control/search/verify及测试；原预算补充、实施规格和原外审预算段。输入清单包括全部当前48绑定来源以便核对，未变部分不逐项重审。 请求独立判断： 1. 576更新、1446额外群前向（528+600+312+6）、36h、两端点IO与L的边界是否准确；是否漏计、重复算实际账或误把最大形状估计作ETA。 2. 不删1.25/1800、各臂search/rep使用同一保守P，改统一21600秒/6小时是否有依据。请区分有意保守预测冗余与实际重复计费。 3. 共享代理公式的实际支撑与缺口：R=max r_I；T_C14为完整手写SQLite36槽测试外层；T_F26为完整attempt07外层含45槽独立分析；T_tail209.219609为旧双臂最后B更新到整段退出，含最后端点及全双臂评价。 P_C=1.25*(72R+14+120)=450.712409，C上限900； P_E=1.25*(9T_tail+18R+26+300)=2832.023702，E上限3600； P_A=1.25*(26+120)=182.5，A上限600。 它们明确是保守代理、未单测余量和既有实测，不是新完整C/E/A实测。不允许只因数值小就判PASS；也请勿要求先跑正式锚点/九次正式复验来解决准入循环。若需增量证据，限定到有具体缺口的手写CPU/保存字段，不加GPU更新，不建设通用性能框架。 4. 每臂搜索259200/复验64800、搜索总777600/复验总194400、共享5100、资格300+1800，总979200秒=272小时是否完整；资格已用108+876，剩余CPU192，原生余924不授予再试。 5. 最小实施映射是否足够：实际timer/单run Budget/控制startup-finalization/分段与总额/门禁语义/outer876同步；当前source改变时需明确原18调用证据复用绑定，不修改原report.source_files，不因预算变化重复原生。正式资源入口仅启动45-run controller，不重走已结束的native listener。 6. 三臂公平搜索、新seed集中开放、失败停止及所有既定数据/结果边界是否保持。确认该提案不等于最终独立80群确认，也不承诺提升。 请交付中文主报告、具体finding与证据路径/行号、预算独立算术表、阅读/未读范围及你实际执行的静态核对和失败。明确“预算方案可采纳”“最小实现待核验”“正式当前未授权/未启动”层次。每个建议注明是本轮具体阻断、实施必改、解释限制还是可选后续；不得把合理泛化建议自动变成阻断。若建议改变272小时或范围，给出具体数字与理由，不直接改科学合同。
+                    - generic [aria-hidden] [ref=e177]: …
+                  - button "显示更多" [ref=e178] [cursor=pointer]
+                - generic [ref=e184]:
+                  - button "复制消息" [ref=e186] [cursor=pointer]
+                  - button "共享提示" [ref=e190] [cursor=pointer]
+                  - button "编辑消息" [ref=e194] [cursor=pointer]
+          - generic [ref=e202]:
+            - button "思考了 33m 5s" [ref=e203] [cursor=pointer]
+            - generic: 思考了 33m 5s
+          - generic [ref=e205]:
+            - heading "ChatGPT 说：" [level=4] [ref=e206]
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - heading "审查结论" [level=2] [ref=e210]
+                - paragraph [ref=e211]:
+                  - strong [ref=e212]: 272 小时预算方案可以采纳；最小实现尚待核验；正式 36＋9 已获条件自动启动许可，当前执行条件尚未全部满足，正式未启动。
+                - paragraph [ref=e213]:
+                  - text: 本轮没有发现需要增加 272 小时总额、改变三臂次数、扩大两参数范围、改动数据边界、科学方法或主要判据的具体证据。需要在正式派发前落实的是
+                  - strong [ref=e214]: B01—B05 五项实施接线
+                  - text: ，尤其是实际定时器、共享阶段时间原点、旧 18 调用证据复用及外层 876 秒记账。
+                - paragraph [ref=e215]:
+                  - text: 包内“待确认”“正式当前未授权”等文字按制作时点保留，
+                  - strong [ref=e216]: 已由你本轮的直接批准在对应范围取代
+                  - text: 。主执行者回收外审并独立处置通过，完成必要修正、获准 CPU 核验以及现场资源和新时间门检查后，可沿已有许可自动启动，无须再次询问同一许可。本审查实例仍只进行了静态审查。
+                - heading "完整交付" [level=3] [ref=e217]
+                - list [ref=e218]:
+                  - listitem [ref=e219]:
+                    - button "打开 optuna_budget_review_report.zh.txt 的预览" [ref=e222] [cursor=pointer]:
+                      - generic [ref=e223]: optuna_budget_review_report.zh.txt
+                    - text: — 完整中文审查正文，含逐项判断、8 项 findings、证据路径与行号、实际范围和失败记录。
+                  - listitem [ref=e230]:
+                    - button "下载 optuna_budget_static_review_20261019.zip" [ref=e233] [cursor=pointer]:
+                      - generic [ref=e234]: optuna_budget_static_review_20261019.zip
+                    - text: — 必要审查证据包，含结构化 findings、独立算术、来源与 AST 核对、逐文件阅读范围、实际执行记录、辅助失败记录及标准库静态核对脚本。
+                - separator [ref=e241]
+                - heading "一、冻结包身份核对通过" [level=2] [ref=e242]
+                - generic [ref=e243]:
+                  - table [ref=e246]:
+                    - rowgroup [ref=e247]:
+                      - row [ref=e248]:
+                        - columnheader "核对项" [ref=e249]
+                        - columnheader "实际结果" [ref=e250]
+                    - rowgroup [ref=e251]:
+                      - row [ref=e252]:
+                        - cell "输入文件大小" [ref=e253]
+                        - cell [ref=e254]:
+                          - strong [ref=e255]: 377084 字节
+                      - row [ref=e256]:
+                        - cell "ZIP 成员" [ref=e257]
+                        - cell [ref=e258]:
+                          - strong [ref=e259]: 72 个：71 项载荷＋清单
+                      - row [ref=e260]:
+                        - cell "输入 SHA256" [ref=e261]
+                        - cell "58c4e04cc7f397fda0909331f6e6eabd9b8e63090cfa6b3a1efcbdd7b786d1b5" [ref=e262]
+                      - row [ref=e263]:
+                        - cell "清单逐项大小和 SHA256" [ref=e264]
+                        - cell [ref=e265]:
+                          - strong [ref=e266]: 71／71 一致
+                          - text: ，无缺项、无清单外载荷
+                      - row [ref=e267]:
+                        - cell "原 native 报告绑定来源" [ref=e268]
+                        - cell [ref=e269]:
+                          - strong [ref=e270]: 48／48 与冻结附件一致
+                      - row [ref=e271]:
+                        - cell "calculations 绑定来源" [ref=e272]
+                        - cell [ref=e273]:
+                          - strong [ref=e274]: 16／16 与附件一致
+                      - row [ref=e275]:
+                        - cell "Python AST 纯解析" [ref=e276]
+                        - cell [ref=e277]:
+                          - strong [ref=e278]: 36／36 可解析
+                          - text: ，未导入或执行项目模块
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e279]: 原 ZIP 字节保持冻结。以上证明输入身份和静态语法一致，不能据此宣称新实现、真实定时器或正式执行门已经通过。
+                - paragraph [ref=e280]: 下文证据路径均相对于冻结 ZIP；完整索引在主报告第十节，逐文件阅读层次在证据包 reading_scope.json。
+                - heading "二、单次 6 小时：保留模型的次数和独立算术成立" [level=2] [ref=e281]
+                - paragraph [ref=e282]: 保留公式为：
+                - generic [ref=e285]:
+                  - math [ref=e287]:
+                    - generic [ref=e289]:
+                      - generic [ref=e290]:
+                        - generic [ref=e291]: P
+                        - generic [ref=e292]: a
+                      - generic [ref=e293]: =
+                      - generic [ref=e294]: "1.25"
+                      - generic [ref=e295]:
+                        - generic [ref=e296]: "["
+                        - generic [ref=e297]: "288"
+                        - generic [ref=e298]: (
+                        - generic [ref=e299]:
+                          - generic [ref=e300]: t
+                          - generic [ref=e301]:
+                            - generic [ref=e302]: A
+                            - generic [ref=e303]: ","
+                            - generic [ref=e304]: a
+                        - generic [ref=e305]: +
+                        - generic [ref=e306]:
+                          - generic [ref=e307]: t
+                          - generic [ref=e308]:
+                            - generic [ref=e309]: B
+                            - generic [ref=e310]: ","
+                            - generic [ref=e311]: a
+                        - generic [ref=e312]: )
+                        - generic [ref=e313]: +
+                        - generic [ref=e314]: "1446"
+                        - generic [ref=e315]:
+                          - generic [ref=e316]: v
+                          - generic [ref=e317]: a
+                        - generic [ref=e318]: +
+                        - generic [ref=e319]: "36"
+                        - generic [ref=e320]:
+                          - generic [ref=e321]: h
+                          - generic [ref=e322]: a
+                        - generic [ref=e323]: +
+                        - generic [ref=e324]:
+                          - generic [ref=e325]: L
+                          - generic [ref=e326]: a
+                        - generic [ref=e327]: +
+                        - generic [ref=e328]: "2"
+                        - generic [ref=e329]: (
+                        - generic [ref=e330]:
+                          - generic [ref=e331]: s
+                          - generic [ref=e332]:
+                            - generic [ref=e333]: F
+                            - generic [ref=e334]: ","
+                            - generic [ref=e335]: a
+                        - generic [ref=e336]: +
+                        - generic [ref=e337]:
+                          - generic [ref=e338]: r
+                          - generic [ref=e339]:
+                            - generic [ref=e340]: F
+                            - generic [ref=e341]: ","
+                            - generic [ref=e342]: a
+                        - generic [ref=e343]: +
+                        - generic [ref=e344]:
+                          - generic [ref=e345]: s
+                          - generic [ref=e346]:
+                            - generic [ref=e347]: I
+                            - generic [ref=e348]: ","
+                            - generic [ref=e349]: a
+                        - generic [ref=e350]: +
+                        - generic [ref=e351]:
+                          - generic [ref=e352]: r
+                          - generic [ref=e353]:
+                            - generic [ref=e354]: I
+                            - generic [ref=e355]: ","
+                            - generic [ref=e356]: a
+                        - generic [ref=e357]: )
+                        - generic [ref=e358]: +
+                        - generic [ref=e359]: "1800"
+                        - generic [ref=e360]: "]"
+                      - generic [ref=e361]: .
+                  - generic [aria-hidden] [ref=e362]:
+                    - generic [ref=e363]:
+                      - generic [ref=e364]:
+                        - text: P
+                        - generic [ref=e365]: a
+                      - text: =
+                    - generic [ref=e373]:
+                      - text: "1.25"
+                      - generic [ref=e374]:
+                        - text: "[288("
+                        - generic [ref=e375]:
+                          - text: t
+                          - generic [ref=e376]: A,a
+                        - text: +
+                        - generic [ref=e385]:
+                          - text: t
+                          - generic [ref=e386]: B,a
+                        - text: ) + 1446
+                        - generic [ref=e395]:
+                          - text: v
+                          - generic [ref=e396]: a
+                        - text: + 36
+                        - generic [ref=e404]:
+                          - text: h
+                          - generic [ref=e405]: a
+                        - text: +
+                        - generic [ref=e413]:
+                          - text: L
+                          - generic [ref=e414]: a
+                        - text: + 2(
+                        - generic [ref=e422]:
+                          - text: s
+                          - generic [ref=e423]: F,a
+                        - text: +
+                        - generic [ref=e432]:
+                          - text: r
+                          - generic [ref=e433]: F,a
+                        - text: +
+                        - generic [ref=e442]:
+                          - text: s
+                          - generic [ref=e443]: I,a
+                        - text: +
+                        - generic [ref=e452]:
+                          - text: r
+                          - generic [ref=e453]: I,a
+                        - text: ) + 1800]
+                      - text: .
+                - paragraph [ref=e462]:
+                  - text: 其中
+                  - generic [ref=e464]:
+                    - math [ref=e466]:
+                      - generic [ref=e467]: h
+                    - generic [ref=e471]: h
+                  - text: 是一次两视图 CPU 残差核耗时，
+                  - generic [ref=e473]:
+                    - math [ref=e475]:
+                      - generic [ref=e477]:
+                        - generic [ref=e478]: "36"
+                        - generic [ref=e479]: h
+                    - generic [ref=e481]: 36h
+                  - text: 是调用次数乘耗时。
+                - heading "1. 576 更新、1446 额外前向、36h 与两端点 IO 没有发现次数漏计" [level=3] [ref=e482]
+                - generic [ref=e483]:
+                  - table [ref=e486]:
+                    - rowgroup [ref=e487]:
+                      - row [ref=e488]:
+                        - columnheader "项目" [ref=e489]
+                        - columnheader "独立展开" [ref=e490]
+                        - columnheader "判断" [ref=e491]
+                    - rowgroup [ref=e492]:
+                      - row [ref=e493]:
+                        - cell "A 更新" [ref=e494]
+                        - cell [ref=e495]:
+                          - generic [ref=e497]:
+                            - math [ref=e499]:
+                              - generic [ref=e501]:
+                                - generic [ref=e502]: "6"
+                                - generic [ref=e503]: ×
+                                - generic [ref=e504]: "48"
+                                - generic [ref=e505]: =
+                                - generic [ref=e506]: "288"
+                            - generic [aria-hidden] [ref=e507]:
+                              - generic [ref=e508]: 6 ×
+                              - generic [ref=e509]: 48 =
+                              - generic [ref=e510]: "288"
+                        - cell "正确" [ref=e511]
+                      - row [ref=e512]:
+                        - cell "B 更新" [ref=e513]
+                        - cell [ref=e514]:
+                          - generic [ref=e516]:
+                            - math [ref=e518]:
+                              - generic [ref=e520]:
+                                - generic [ref=e521]: "6"
+                                - generic [ref=e522]: ×
+                                - generic [ref=e523]: "48"
+                                - generic [ref=e524]: =
+                                - generic [ref=e525]: "288"
+                            - generic [aria-hidden] [ref=e526]:
+                              - generic [ref=e527]: 6 ×
+                              - generic [ref=e528]: 48 =
+                              - generic [ref=e529]: "288"
+                        - cell "正确；单次 B 已含 current/history" [ref=e530]
+                      - row [ref=e531]:
+                        - cell "optimizer 调用" [ref=e532]
+                        - cell [ref=e533]:
+                          - generic [ref=e535]:
+                            - math [ref=e537]:
+                              - generic [ref=e539]:
+                                - generic [ref=e540]: "288"
+                                - generic [ref=e541]: +
+                                - generic [ref=e542]: "288"
+                                - generic [ref=e543]: =
+                                - generic [ref=e544]: "576"
+                            - generic [aria-hidden] [ref=e545]:
+                              - generic [ref=e546]: 288 +
+                              - generic [ref=e547]: 288 =
+                              - generic [ref=e548]: "576"
+                        - cell "正确" [ref=e549]
+                      - row [ref=e550]:
+                        - cell "梯度群呈现" [ref=e551]
+                        - cell [ref=e552]:
+                          - generic [ref=e554]:
+                            - math [ref=e556]:
+                              - generic [ref=e558]:
+                                - generic [ref=e559]: "288"
+                                - generic [ref=e560]: +
+                                - generic [ref=e561]: "2"
+                                - generic [ref=e562]: ×
+                                - generic [ref=e563]: "288"
+                                - generic [ref=e564]: =
+                                - generic [ref=e565]: "864"
+                            - generic [aria-hidden] [ref=e566]:
+                              - generic [ref=e567]: 288 +
+                              - generic [ref=e568]: 2 ×
+                              - generic [ref=e569]: 288 =
+                              - generic [ref=e570]: "864"
+                        - cell [ref=e571]:
+                          - text: 不应因此再把
+                          - generic [ref=e573]:
+                            - math [ref=e575]:
+                              - generic [ref=e578]:
+                                - generic [ref=e579]: t
+                                - generic [ref=e580]: B
+                            - generic [ref=e583]:
+                              - text: t
+                              - generic [ref=e584]: B
+                          - text: 翻倍
+                      - row [ref=e592]:
+                        - cell "A 六次诊断前向" [ref=e593]
+                        - cell [ref=e594]:
+                          - generic [ref=e596]:
+                            - math [ref=e598]:
+                              - generic [ref=e600]:
+                                - generic [ref=e601]: "6"
+                                - generic [ref=e602]: ×
+                                - generic [ref=e603]: (
+                                - generic [ref=e604]: "48"
+                                - generic [ref=e605]: +
+                                - generic [ref=e606]: "40"
+                                - generic [ref=e607]: )
+                                - generic [ref=e608]: =
+                                - generic [ref=e609]: "528"
+                            - generic [aria-hidden] [ref=e610]:
+                              - generic [ref=e611]: 6 ×
+                              - generic [ref=e612]: (48 +
+                              - generic [ref=e613]: 40) =
+                              - generic [ref=e614]: "528"
+                        - cell "正确" [ref=e615]
+                      - row [ref=e616]:
+                        - cell "B 六次诊断前向" [ref=e617]
+                        - cell [ref=e618]:
+                          - generic [ref=e620]:
+                            - math [ref=e622]:
+                              - generic [ref=e624]:
+                                - generic [ref=e625]: "6"
+                                - generic [ref=e626]: ×
+                                - generic [ref=e627]: (
+                                - generic [ref=e628]: "48"
+                                - generic [ref=e629]: +
+                                - generic [ref=e630]: "6"
+                                - generic [ref=e631]: +
+                                - generic [ref=e632]: "40"
+                                - generic [ref=e633]: +
+                                - generic [ref=e634]: "6"
+                                - generic [ref=e635]: )
+                                - generic [ref=e636]: =
+                                - generic [ref=e637]: "600"
+                            - generic [aria-hidden] [ref=e638]:
+                              - generic [ref=e639]: 6 ×
+                              - generic [ref=e640]: (48 +
+                              - generic [ref=e641]: 6 +
+                              - generic [ref=e642]: 40 +
+                              - generic [ref=e643]: 6) =
+                              - generic [ref=e644]: "600"
+                        - cell "最后 6 个 reference 仍实际调用" [ref=e645]
+                      - row [ref=e646]:
+                        - cell "两端点评分及恢复核对" [ref=e647]
+                        - cell [ref=e648]:
+                          - generic [ref=e650]:
+                            - math [ref=e652]:
+                              - generic [ref=e654]:
+                                - generic [ref=e655]: "2"
+                                - generic [ref=e656]: ×
+                                - generic [ref=e657]: "3"
+                                - generic [ref=e658]: ×
+                                - generic [ref=e659]: (
+                                - generic [ref=e660]: "12"
+                                - generic [ref=e661]: +
+                                - generic [ref=e662]: "40"
+                                - generic [ref=e663]: )
+                                - generic [ref=e664]: =
+                                - generic [ref=e665]: "312"
+                            - generic [aria-hidden] [ref=e666]:
+                              - generic [ref=e667]: 2 ×
+                              - generic [ref=e668]: 3 ×
+                              - generic [ref=e669]: (12 +
+                              - generic [ref=e670]: 40) =
+                              - generic [ref=e671]: "312"
+                        - cell "原评分、完整恢复评分、推理恢复评分" [ref=e672]
+                      - row [ref=e673]:
+                        - cell "A 末出生教师" [ref=e674]
+                        - cell "最终保留的 6 群，共 6" [ref=e675]
+                        - cell "先选留，再对新留存群生成教师" [ref=e676]
+                      - row [ref=e677]:
+                        - cell "额外群前向合计" [ref=e678]
+                        - cell [ref=e679]:
+                          - generic [ref=e681]:
+                            - math [ref=e683]:
+                              - generic [ref=e685]:
+                                - generic [ref=e686]: "528"
+                                - generic [ref=e687]: +
+                                - generic [ref=e688]: "600"
+                                - generic [ref=e689]: +
+                                - generic [ref=e690]: "312"
+                                - generic [ref=e691]: +
+                                - generic [ref=e692]: "6"
+                                - generic [ref=e693]: =
+                                - generic [ref=e694]: "1446"
+                            - generic [aria-hidden] [ref=e695]:
+                              - generic [ref=e696]: 528 +
+                              - generic [ref=e697]: 600 +
+                              - generic [ref=e698]: 312 +
+                              - generic [ref=e699]: 6 =
+                              - generic [ref=e700]: "1446"
+                        - cell "正确" [ref=e701]
+                      - row [ref=e702]:
+                        - cell "CPU 残差核" [ref=e703]
+                        - cell [ref=e704]:
+                          - generic [ref=e706]:
+                            - math [ref=e708]:
+                              - generic [ref=e710]:
+                                - generic [ref=e711]: "6"
+                                - generic [ref=e712]: ×
+                                - generic [ref=e713]: "6"
+                                - generic [ref=e714]: =
+                                - generic [ref=e715]: "36"
+                                - generic [ref=e716]: h
+                            - generic [aria-hidden] [ref=e717]:
+                              - generic [ref=e718]: 6 ×
+                              - generic [ref=e719]: 6 =
+                              - generic [ref=e720]: 36h
+                        - cell [ref=e721]:
+                          - generic [ref=e723]:
+                            - math [ref=e725]:
+                              - generic [ref=e726]: h
+                            - generic [ref=e730]: h
+                          - text: 内部已含两视图，不应改成
+                          - generic [ref=e732]:
+                            - math [ref=e734]:
+                              - generic [ref=e736]:
+                                - generic [ref=e737]: "72"
+                                - generic [ref=e738]: h
+                            - generic [ref=e740]: 72h
+                      - row [ref=e741]:
+                        - cell "端点 IO" [ref=e742]
+                        - cell "两端点各完整保存／恢复、推理保存／恢复一次" [ref=e743]
+                        - cell "系数 2 正确" [ref=e744]
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e745]: 关键证据：scripts/step28_g_half_run.py:177–206、236–286、333–355；scripts/step28_replay_diagnostics.py:61–128；scripts/step28_record_replay.py:248–269。
+                - paragraph [ref=e746]:
+                  - text: 这里有两处容易误改：
+                  - strong [ref=e747]: 已有 cache_scores 并不消除 B 诊断另行调用的 reference；A 末出生教师也不是对全部 48 群再做一次。
+                - heading "2. 三臂投影重算与保存值一致" [level=3] [ref=e748]
+                - paragraph [ref=e749]: 以下直接从 native 保存的 measurements 取数，用标准库四则运算计算，没有调用项目 projection 或科研评价器。
+                - generic [ref=e750]:
+                  - region "可滚动表格" [ref=e751]:
+                    - table [ref=e753]:
+                      - rowgroup [ref=e754]:
+                        - row [ref=e755]:
+                          - columnheader "臂" [ref=e756]
+                          - columnheader "训练项／秒" [ref=e757]
+                          - columnheader "额外前向＋残差／秒" [ref=e758]
+                          - columnheader "L＋IO／秒" [ref=e759]
+                          - columnheader "保留未测余量／秒" [ref=e760]
+                          - columnheader "最终 P／秒" [ref=e761]
+                          - columnheader "距 21600 秒余量" [ref=e762]
+                      - rowgroup [ref=e763]:
+                        - row [ref=e764]:
+                          - cell "S" [ref=e765]
+                          - cell "10013.751799" [ref=e766]
+                          - cell "3515.870582" [ref=e767]
+                          - cell "63.411644" [ref=e768]
+                          - cell "1800" [ref=e769]
+                          - cell [ref=e770]:
+                            - strong [ref=e771]: "19241.292531"
+                          - cell [ref=e772]:
+                            - strong [ref=e773]: "2358.707469"
+                        - row [ref=e774]:
+                          - cell "S_pos" [ref=e775]
+                          - cell "9811.843150" [ref=e776]
+                          - cell "3339.519582" [ref=e777]
+                          - cell "53.901628" [ref=e778]
+                          - cell "1800" [ref=e779]
+                          - cell [ref=e780]:
+                            - strong [ref=e781]: "18756.580451"
+                          - cell [ref=e782]:
+                            - strong [ref=e783]: "2843.419549"
+                        - row [ref=e784]:
+                          - cell "H_pos" [ref=e785]
+                          - cell "9791.485035" [ref=e786]
+                          - cell "3356.740649" [ref=e787]
+                          - cell "53.702380" [ref=e788]
+                          - cell "1800" [ref=e789]
+                          - cell [ref=e790]:
+                            - strong [ref=e791]: "18752.410080"
+                          - cell [ref=e792]:
+                            - strong [ref=e793]: "2847.589920"
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e794]: 三臂 33 个测量字段与提案 calculations 一致，三个最终 P 与原生保存投影、当前提案计算的差均为 0。证据为原 native/result.json 的 arms.*.measurements 与当前 optuna_budget/calculations.json；完整算术输入和中间项已交付。
+                - paragraph [ref=e795]:
+                  - text: "**三臂仅训练项、尚未乘 1.25 就都超过 9000 秒。**因此旧门失败是保留模型下的真实结果，不能用“平均可能更快”撤销。统一 21600 秒在最大 P 之外还有约"
+                  - strong [ref=e796]: 39 分 19 秒
+                  - text: ；这一余量已经位于 1800 秒和 1.25 之后，不再乘入 P。
+                - paragraph [ref=e797]:
+                  - text: 据此，
+                  - strong [ref=e798]: 6 小时有充分的工程预算依据
+                  - text: 。现有材料没有支持必须改为 8 小时或增加 272 小时总额的具体证据，也不能据此保证全部 45 次必然成功完成。
+                - heading "3. 测量解释仍有明确边界" [level=3] [ref=e799]
+                - paragraph [ref=e800]: L 现在已包含 pretrained_archive 检查和 fresh 装载／初始化，T01 不应重新打开。完整权重和 Adam 的保存／恢复也确实参与测量，不能称为“小模型 IO”。但 L 未单测覆盖所有正式启动检查，36h 未覆盖完整诊断 CPU 工作，正式元信息、Memory 序列化、校准及写盘等仍依赖保留的 1800 秒余量。证据：scripts/step28_optuna_verify.py:149–274、scripts/step28_g_half_run.py:257–284。
+                - paragraph [ref=e801]: 另一个具体限制是：原生 N224/token256 由 28 个账号各 8 条记录组成，G_half 只有一个 (8,8) 分桶。正式合法的 2—8 条混合记录数可能产生更多分桶和调度开销。因此最大 N/token 已验证，并不证明所有实际形状都比本次快。证据：scripts/step28_g_half.py:57–72、scripts/step28_optuna_verify.py:171–175。
+                - paragraph [ref=e802]:
+                  - text: 这些是
+                  - strong [ref=e803]: B06 解释限制
+                  - text: ，不据此追加 GPU 更新、正式 trial 准入试跑或新的性能框架。
+                - heading "三、共享 C900／E3600／A600 可以采纳，但必须保留代理性质" [level=2] [ref=e804]
+                - heading "1. 独立重算" [level=3] [ref=e805]
+                - generic [ref=e808]:
+                  - math [ref=e810]:
+                    - generic [ref=e812]:
+                      - generic [ref=e813]: R
+                      - generic [ref=e814]: =
+                      - generic [ref=e815]: max
+                      - generic: ⁡
+                      - generic [ref=e816]:
+                        - generic [ref=e817]: r
+                        - generic [ref=e818]: I
+                      - generic [ref=e819]: =
+                      - generic [ref=e820]: "3.146804547868669"
+                      - generic [ref=e821]: 秒
+                      - generic [ref=e822]: .
+                  - generic [aria-hidden] [ref=e823]:
+                    - generic [ref=e824]: R =
+                    - generic [ref=e825]:
+                      - text: max
+                      - generic [ref=e826]:
+                        - text: r
+                        - generic [ref=e827]: I
+                      - text: =
+                    - generic [ref=e835]:
+                      - text: "3.146804547868669"
+                      - generic [ref=e837]: 秒
+                      - text: .
+                - paragraph [ref=e838]: 历史尾段独立计算为：
+                - generic [ref=e841]:
+                  - math [ref=e843]:
+                    - generic [ref=e845]:
+                      - generic [ref=e846]:
+                        - generic [ref=e847]: T
+                        - generic [ref=e848]: tail
+                      - generic [ref=e849]: =
+                      - generic [ref=e850]: "12661"
+                      - generic [ref=e851]: −
+                      - generic [ref=e852]: "12451.78039111523"
+                      - generic [ref=e853]: =
+                      - generic [ref=e854]: "209.21960888477042"
+                      - generic [ref=e855]: 秒
+                      - generic [ref=e856]: .
+                  - generic [aria-hidden] [ref=e857]:
+                    - generic [ref=e858]:
+                      - generic [ref=e859]:
+                        - text: T
+                        - generic [ref=e860]: tail
+                      - text: =
+                    - generic [ref=e870]: 12661 −
+                    - generic [ref=e871]: 12451.78039111523 =
+                    - generic [ref=e872]:
+                      - text: "209.21960888477042"
+                      - generic [ref=e874]: 秒
+                      - text: .
+                - generic [ref=e875]:
+                  - table [ref=e878]:
+                    - rowgroup [ref=e879]:
+                      - row [ref=e880]:
+                        - columnheader "阶段" [ref=e881]
+                        - columnheader "冻结代理公式" [ref=e882]
+                        - columnheader "独立结果／秒" [ref=e883]
+                        - columnheader "上限／秒" [ref=e884]
+                        - columnheader "上限余量／秒" [ref=e885]
+                    - rowgroup [ref=e886]:
+                      - row [ref=e887]:
+                        - cell "C" [ref=e888]
+                        - cell [ref=e889]:
+                          - generic [ref=e891]:
+                            - math [ref=e893]:
+                              - generic [ref=e895]:
+                                - generic [ref=e896]: "1.25"
+                                - generic [ref=e897]: (
+                                - generic [ref=e898]: "72"
+                                - generic [ref=e899]: R
+                                - generic [ref=e900]: +
+                                - generic [ref=e901]: "14"
+                                - generic [ref=e902]: +
+                                - generic [ref=e903]: "120"
+                                - generic [ref=e904]: )
+                            - generic [aria-hidden] [ref=e905]:
+                              - generic [ref=e906]: 1.25(72R +
+                              - generic [ref=e907]: 14 +
+                              - generic [ref=e908]: 120)
+                        - cell [ref=e909]:
+                          - strong [ref=e910]: "450.712409"
+                        - cell [ref=e911]:
+                          - strong [ref=e912]: "900"
+                        - cell "449.287591" [ref=e913]
+                      - row [ref=e914]:
+                        - cell "E" [ref=e915]
+                        - cell [ref=e916]:
+                          - generic [ref=e918]:
+                            - math [ref=e920]:
+                              - generic [ref=e922]:
+                                - generic [ref=e923]: "1.25"
+                                - generic [ref=e924]: (
+                                - generic [ref=e925]: "9"
+                                - generic [ref=e926]:
+                                  - generic [ref=e927]: T
+                                  - generic [ref=e928]: tail
+                                - generic [ref=e929]: +
+                                - generic [ref=e930]: "18"
+                                - generic [ref=e931]: R
+                                - generic [ref=e932]: +
+                                - generic [ref=e933]: "26"
+                                - generic [ref=e934]: +
+                                - generic [ref=e935]: "300"
+                                - generic [ref=e936]: )
+                            - generic [aria-hidden] [ref=e937]:
+                              - generic [ref=e938]:
+                                - text: 1.25(9
+                                - generic [ref=e939]:
+                                  - text: T
+                                  - generic [ref=e940]: tail
+                                - text: +
+                              - generic [ref=e950]: 18R +
+                              - generic [ref=e951]: 26 +
+                              - generic [ref=e952]: 300)
+                        - cell [ref=e953]:
+                          - strong [ref=e954]: "2832.023702"
+                        - cell [ref=e955]:
+                          - strong [ref=e956]: "3600"
+                        - cell "767.976298" [ref=e957]
+                      - row [ref=e958]:
+                        - cell "A" [ref=e959]
+                        - cell [ref=e960]:
+                          - generic [ref=e962]:
+                            - math [ref=e964]:
+                              - generic [ref=e966]:
+                                - generic [ref=e967]: "1.25"
+                                - generic [ref=e968]: (
+                                - generic [ref=e969]: "26"
+                                - generic [ref=e970]: +
+                                - generic [ref=e971]: "120"
+                                - generic [ref=e972]: )
+                            - generic [aria-hidden] [ref=e973]:
+                              - generic [ref=e974]: 1.25(26 +
+                              - generic [ref=e975]: 120)
+                        - cell [ref=e976]:
+                          - strong [ref=e977]: "182.500000"
+                        - cell [ref=e978]:
+                          - strong [ref=e979]: "600"
+                        - cell "417.500000" [ref=e980]
+                      - row [ref=e981]:
+                        - cell "合计" [ref=e982]
+                        - cell "三段相加" [ref=e983]
+                        - cell [ref=e984]:
+                          - strong [ref=e985]: "3465.236112"
+                        - cell [ref=e986]:
+                          - strong [ref=e987]: "5100"
+                        - cell [ref=e988]:
+                          - strong [ref=e989]: "1634.763888"
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e990]:
+                  - text: 三个代理结果与 calculations 的差均为 0。
+                  - strong [ref=e991]: 接受它们的理由是工作量、来源和余量有对应关系，不能仅以数值小于上限判为完整容量实测 PASS。
+                - heading "2. 每个代理的实际支撑与不足" [level=3] [ref=e992]
+                - paragraph [ref=e993]: "**C：72 次权重身份读取有实际代码来源。**36 个成功搜索各两个端点，父控制在留证删除前做身份读取，因此不能只按轻量 ask/tell 估计。14 秒是完整手写 SQLite 36 槽测试的外层保守收费，实际外层为 13.257703867 秒；加 72R、120 秒未测工作余量和 1.25，支持 C900。证据：scripts/step28_optuna_search.py:196–203、236–244，attempt01 wrapper 和 tests/test_step28_optuna.py:159–186。"
+                - paragraph [ref=e994]: 不足在于 R 是恢复测量，不是直接 hash 吞吐量测量，且可能受热缓存影响；14 秒也不是完整 45 次正式控制阶段。因此它是工程代理，不是未来文件系统负载下的逐文件上界。
+                - paragraph [ref=e995]: "**E：9 倍旧双臂尾段具有保守尺度依据。**当前集中评价对应 54 套端点指标／计数、108 个诊断捕获和 18 次权重身份读取。旧双臂有 24 个捕获，新每 run 为 12 个；每个新 run 都分配一次旧双臂完整尾段而不除以 2，保守方向明确。尾段还包含最后端点和退出，而非纯评价。证据：scripts/step28_optuna_run.py:317–339、scripts/step28_positive_ranking_run.py:261–328，历史 job.console.txt:107 与 wrapper、completion 保存字段。"
+                - paragraph [ref=e996]:
+                  - text: 26 秒是 attempt07 完整外层，实际为 25.194099902 秒，确实包含九份手写群指标／统计以及 45 保存槽独立分析。但 tests/test_step28_optuna.py:251–268 直接构造了诊断曲线，
+                  - strong [ref=e997]: 没有执行全部 108 个正式捕获的诊断评价
+                  - text: 。因此 26 秒不能单独证明完整 E；同类完整诊断成本主要由旧尾段支持。加上 18R、300 秒未测余量及 1.25，可接受 E3600。
+                - paragraph [ref=e998]: "**A：实际独立分析核心已在 45 个手写保存槽上执行。**保存结果记有 36090 个核对字段，未新增 optimizer 调用、载模或正式标签读取。用包含其他检查的完整 26 秒，再加 120 秒和 1.25，支持维持 A600。证据：tests/test_step28_optuna.py:289–306 与 attempt07 的 saved_evaluation.json。"
+                - paragraph [ref=e999]:
+                  - text: 这 45 个槽是合成保存材料，不是 45 条真实训练轨迹；保存级分析也不等于重新从标签独立重建全部指标。以上属于
+                  - strong [ref=e1000]: B07 解释限制
+                  - text: ，不形成要求先跑正式锚点或九复验的准入循环。
+                - heading "四、272 小时总额与资格账完整" [level=2] [ref=e1001]
+                - heading "1. 硬额度独立算术" [level=3] [ref=e1002]
+                - generic [ref=e1003]:
+                  - table [ref=e1006]:
+                    - rowgroup [ref=e1007]:
+                      - row [ref=e1008]:
+                        - columnheader "项目" [ref=e1009]
+                        - columnheader "算式" [ref=e1010]
+                        - columnheader "秒" [ref=e1011]
+                        - columnheader "小时" [ref=e1012]
+                    - rowgroup [ref=e1013]:
+                      - row [ref=e1014]:
+                        - cell "每臂搜索" [ref=e1015]
+                        - cell [ref=e1016]:
+                          - generic [ref=e1018]:
+                            - math [ref=e1020]:
+                              - generic [ref=e1022]:
+                                - generic [ref=e1023]: "12"
+                                - generic [ref=e1024]: ×
+                                - generic [ref=e1025]: "21600"
+                            - generic [aria-hidden] [ref=e1026]:
+                              - generic [ref=e1027]: 12 ×
+                              - generic [ref=e1028]: "21600"
+                        - cell "259200" [ref=e1029]
+                        - cell "72" [ref=e1030]
+                      - row [ref=e1031]:
+                        - cell "每臂复验" [ref=e1032]
+                        - cell [ref=e1033]:
+                          - generic [ref=e1035]:
+                            - math [ref=e1037]:
+                              - generic [ref=e1039]:
+                                - generic [ref=e1040]: "3"
+                                - generic [ref=e1041]: ×
+                                - generic [ref=e1042]: "21600"
+                            - generic [aria-hidden] [ref=e1043]:
+                              - generic [ref=e1044]: 3 ×
+                              - generic [ref=e1045]: "21600"
+                        - cell "64800" [ref=e1046]
+                        - cell "18" [ref=e1047]
+                      - row [ref=e1048]:
+                        - cell "三臂搜索总额" [ref=e1049]
+                        - cell [ref=e1050]:
+                          - generic [ref=e1052]:
+                            - math [ref=e1054]:
+                              - generic [ref=e1056]:
+                                - generic [ref=e1057]: "36"
+                                - generic [ref=e1058]: ×
+                                - generic [ref=e1059]: "21600"
+                            - generic [aria-hidden] [ref=e1060]:
+                              - generic [ref=e1061]: 36 ×
+                              - generic [ref=e1062]: "21600"
+                        - cell [ref=e1063]:
+                          - strong [ref=e1064]: "777600"
+                        - cell [ref=e1065]:
+                          - strong [ref=e1066]: "216"
+                      - row [ref=e1067]:
+                        - cell "三臂复验总额" [ref=e1068]
+                        - cell [ref=e1069]:
+                          - generic [ref=e1071]:
+                            - math [ref=e1073]:
+                              - generic [ref=e1075]:
+                                - generic [ref=e1076]: "9"
+                                - generic [ref=e1077]: ×
+                                - generic [ref=e1078]: "21600"
+                            - generic [aria-hidden] [ref=e1079]:
+                              - generic [ref=e1080]: 9 ×
+                              - generic [ref=e1081]: "21600"
+                        - cell [ref=e1082]:
+                          - strong [ref=e1083]: "194400"
+                        - cell [ref=e1084]:
+                          - strong [ref=e1085]: "54"
+                      - row [ref=e1086]:
+                        - cell "共享 C＋E＋A" [ref=e1087]
+                        - cell [ref=e1088]:
+                          - generic [ref=e1090]:
+                            - math [ref=e1092]:
+                              - generic [ref=e1094]:
+                                - generic [ref=e1095]: "900"
+                                - generic [ref=e1096]: +
+                                - generic [ref=e1097]: "3600"
+                                - generic [ref=e1098]: +
+                                - generic [ref=e1099]: "600"
+                            - generic [aria-hidden] [ref=e1100]:
+                              - generic [ref=e1101]: 900 +
+                              - generic [ref=e1102]: 3600 +
+                              - generic [ref=e1103]: "600"
+                        - cell [ref=e1104]:
+                          - strong [ref=e1105]: "5100"
+                        - cell "1 小时 25 分" [ref=e1106]
+                      - row [ref=e1107]:
+                        - cell "CPU 资格" [ref=e1108]
+                        - cell "保留原累计额度" [ref=e1109]
+                        - cell [ref=e1110]:
+                          - strong [ref=e1111]: "300"
+                        - cell "5 分" [ref=e1112]
+                      - row [ref=e1113]:
+                        - cell "原生资格" [ref=e1114]
+                        - cell "保留原额度" [ref=e1115]
+                        - cell [ref=e1116]:
+                          - strong [ref=e1117]: "1800"
+                        - cell "30 分" [ref=e1118]
+                      - row [ref=e1119]:
+                        - cell [ref=e1120]:
+                          - strong [ref=e1121]: 总硬上限
+                        - cell [ref=e1122]:
+                          - generic [ref=e1124]:
+                            - math [ref=e1126]:
+                              - generic [ref=e1128]:
+                                - generic [ref=e1129]: "777600"
+                                - generic [ref=e1130]: +
+                                - generic [ref=e1131]: "194400"
+                                - generic [ref=e1132]: +
+                                - generic [ref=e1133]: "5100"
+                                - generic [ref=e1134]: +
+                                - generic [ref=e1135]: "300"
+                                - generic [ref=e1136]: +
+                                - generic [ref=e1137]: "1800"
+                            - generic [aria-hidden] [ref=e1138]:
+                              - generic [ref=e1139]: 777600 +
+                              - generic [ref=e1140]: 194400 +
+                              - generic [ref=e1141]: 5100 +
+                              - generic [ref=e1142]: 300 +
+                              - generic [ref=e1143]: "1800"
+                        - cell [ref=e1144]:
+                          - strong [ref=e1145]: "979200"
+                        - cell [ref=e1146]:
+                          - strong [ref=e1147]: "272"
+                  - generic:
+                    - generic:
+                      - button "复制表格"
+                    - generic:
+                      - button "展开表格"
+                - paragraph [ref=e1148]: 三臂 45 次运行额度合计 270 小时，共享和资格恰为 2 小时。
+                - paragraph [ref=e1149]:
+                  - text: 旧 114 小时到新 272 小时增加
+                  - strong [ref=e1150]: 158 小时
+                  - text: ，其中 45 次单 run 增额贡献 157.5 小时，共享增额贡献 0.5 小时；A、CPU、native 额度没有增加。证据：当前 calculations.json 与原 optuna_plan/budget_amendment.zh.txt:1–75。
+                - paragraph [ref=e1151]:
+                  - text: 保留三臂 P 后，45 次运行投影为
+                  - strong [ref=e1152]: 851254.245929 秒
+                  - text: ；再加完整共享与资格额度，为
+                  - strong [ref=e1153]: 858454.245929 秒，约 238.459513 小时
+                  - text: ，距总硬额还有
+                  - strong [ref=e1154]: 120745.754071 秒
+                  - text: 。这是预算投影，不能当作日历 ETA。
+                - heading "2. 876 与 875 的口径必须同时保留" [level=3] [ref=e1155]
+                - paragraph [ref=e1156]: 原生外层：
+                - generic [ref=e1159]:
+                  - math [ref=e1161]:
+                    - generic [ref=e1163]:
+                      - generic [ref=e1164]: "875953454299"
+                      - generic [ref=e1165]: ns
+                      - generic [ref=e1166]: =
+                      - generic [ref=e1167]: "875.953454299"
+                      - generic [ref=e1168]: s
+                      - generic [ref=e1169]: ⇒
+                      - generic [ref=e1170]: ⌈
+                      - generic [ref=e1171]: ⋅
+                      - generic [ref=e1172]: ⌉
+                      - generic [ref=e1173]: =
+                      - generic [ref=e1174]: "876"
+                      - generic [ref=e1175]: s
+                      - generic [ref=e1176]: .
+                  - generic [aria-hidden] [ref=e1177]:
+                    - generic [ref=e1178]:
+                      - text: "875953454299"
+                      - generic [ref=e1180]: ns
+                      - text: =
+                    - generic [ref=e1181]:
+                      - text: "875.953454299"
+                      - generic [ref=e1183]: s
+                      - text: ⇒
+                    - generic [ref=e1184]: ⌈⋅⌉ =
+                    - generic [ref=e1185]:
+                      - text: "876"
+                      - generic [ref=e1187]: s
+                      - text: .
+                - paragraph [ref=e1188]: 内部 cumulative_charged_seconds=875 是报告写出／退出前记账；三臂 300＋287＋288 也合为 875。它们不能替代覆盖外层退出的 876。证据：原 native.wrapper.txt:1–3 和 native/result.json 保存字段。
+                - paragraph [ref=e1189]: 因此当前账应为：
+                - list [ref=e1190]:
+                  - listitem [ref=e1191]:
+                    - strong [ref=e1192]: 已用资格：CPU108＋native876＝984 秒。
+                  - listitem [ref=e1193]:
+                    - strong [ref=e1194]: 剩余 CPU：300−108＝192 秒。
+                  - listitem [ref=e1195]:
+                    - strong [ref=e1196]: 原生账面剩余：1800−876＝924 秒；允许再次原生尝试仍为 0。
+                - paragraph [ref=e1197]: CPU108 由 attempt07 外层累计以及修复主审的 82＋26 支持。本包没有 attempt02—06 全部原始 wrapper，本轮复用已关闭的前 82 秒结论，没有冒称重新加总全部旧 CPU 原始日志。
+                - heading "五、正式派发前必须完成的五项 finding" [level=2] [ref=e1198]
+                - paragraph [ref=e1199]:
+                  - text: 这五项是
+                  - strong [ref=e1200]: 实施必改
+                  - text: ，不是否决本次预算方案，也不要求追加科研实验。
+                - heading "B01：所有实际限额和定时器必须同步" [level=3] [ref=e1201]
+                - paragraph [ref=e1202]: 当前 policy、等值断言、runtime、Budget 默认、导入前 timer、末端资源 Budget 和控制层余额仍有旧值。
+                - paragraph [ref=e1203]: 必须贯通：
+                - list [ref=e1204]:
+                  - listitem [ref=e1205]: 单 run：21600；
+                  - listitem [ref=e1206]: 每臂搜索／复验：259200／64800；
+                  - listitem [ref=e1207]: 搜索／复验总额：777600／194400；
+                  - listitem [ref=e1208]: C／E／A：900／3600／600，共享 5100；
+                  - listitem [ref=e1209]: 总额：979200。
+                - paragraph [ref=e1210]: CPU300、native1800、每臂原生600、18 调用以及非时间资源限额保持。只改 JSON 会碰到旧等值断言；只改 gate 仍会受旧真实 timer 约束。
+                - paragraph [ref=e1211]: 证据：schema/step28_optuna_policy.json:9–13；scripts/step28_optuna_run.py:59–79；scripts/step28_optuna_control.py:11、36–73；scripts/step28_optuna_search.py:28、262、287。
+                - heading "B02：共享阶段必须使用本阶段时间原点" [level=3] [ref=e1212]
+                - paragraph [ref=e1213]: 这是本轮指出的具体接线风险：
+                - paragraph [ref=e1214]:
+                  - text: Budget.started 会采用 RECORD_REPLAY_STARTED_EPOCH 回溯时间。trial 子进程已重设该值，但 E／A 启动代码只复制父环境。
+                  - strong [ref=e1215]: 如果未来正式入口设置或继承整个 campaign 的开始时间，E／A 可能把前面多日历时套进 3600／600 秒，C 末检也可能套进 900 秒，产生阶段刚开始就伪超限。
+                - paragraph [ref=e1216]: 新正式入口尚未提供，不能声称这种失败已经发生。
+                - paragraph [ref=e1217]: 最小处置是为 E／A 显式设置本次阶段起点，并使 C 临时资源检查不继承 campaign 历时；累计 C 仍由父 Ledger 记账。剩余 CPU 核验应覆盖遗留父 epoch 和真实本段超限两个反例，不用正式运行触发。
+                - paragraph [ref=e1218]: 证据：scripts/step28_record_replay_run.py:60–70；scripts/step28_optuna_run.py:75–79、93–99；scripts/step28_optuna_search.py:225–228、252–262、287。
+                - heading "B03：新门必须精确验证原 18 调用的复用关系" [level=3] [ref=e1219]
+                - paragraph [ref=e1220]: 当前门要求 native 保存来源等于当前来源。预算代码修改后，不能继续直接套用这个判据，也不能修改原始 report.source_files 来制造一致。
+                - paragraph [ref=e1221]: 应形成并由新门实际核验：
+                - list [ref=e1222]:
+                  - listitem [ref=e1223]: 原 native result、wrapper 和原 48 来源身份；
+                  - listitem [ref=e1224]: 修订后的实际完整来源集合；
+                  - listitem [ref=e1225]: 逐项差异及其只涉及预算、计时、记账、门禁的适用说明；
+                  - listitem [ref=e1226]: 科学计算、评分、恢复及相应直接依赖未变的核对。
+                - paragraph [ref=e1227]:
+                  - text: 新集合成员数按实际记录，不预设仍为 48。
+                  - strong [ref=e1228]: 不需要为了新 hash 再跑原生。
+                - paragraph [ref=e1229]: CPU 可沿“旧适用证据＋新增局部证据”聚合，但新局部原始报告只能写实际执行的检查子集，不能伪装成九项全量重跑。
+                - paragraph [ref=e1230]: 证据：scripts/step28_optuna_search.py:44–70；scripts/step28_optuna_run.py:31–56；修复 primary_disposition.zh.txt:15–19；当前 proposal 第 109–111 行。
+                - heading "B04：父总账必须接受外层 876，CPU 从 108 继续累加" [level=3] [ref=e1231]
+                - paragraph [ref=e1232]: 当前父入口直接读取 raw native 的 cumulative_charged_seconds，会带入 875，产生一秒漏计。
+                - paragraph [ref=e1233]: 应在本次被 gate 验证的接受／复用记录中绑定原报告和 wrapper，核对外层上取整为 876，并以 876 起账；原 raw875 保持不改。CPU 后续继续累加完整外层费用，资格起账为 984。
+                - paragraph [ref=e1234]: 证据：scripts/step28_optuna_search.py:215–217、原 native wrapper 和 attempt07 wrapper。
+                - heading "B05：新时间门必须验证保留 P 和本次共享公式" [level=3] [ref=e1235]
+                - paragraph [ref=e1236]: 当前单 run 门会重算 P，共享部分主要验证 evidence 身份与数值字段相等。新门应绑定本次 R、14、26、旧 tail、72／18 次数、120／300 余量及其代理性质，并重算或严格核验本次审定结果。不能仅靠自填小数和 PASS 放行。
+                - paragraph [ref=e1237]:
+                  - text: 旧负例也必须更新：原来的
+                  - strong [ref=e1238]: 18844.609612 秒
+                  - text: 在 21600 下已满足数值限额，应区分：
+                - list [ref=e1239]:
+                  - listitem [ref=e1240]: 真正超过 21600，仍拒绝；
+                  - listitem [ref=e1241]: 旧门状态、错误来源、未通过本次复用，仍拒绝；
+                  - listitem [ref=e1242]: C 超限反例改为超过 900，不能继续把 301 当作超限。
+                - paragraph [ref=e1243]: 证据：scripts/step28_optuna_search.py:71–86；scripts/step28_optuna_control.py:36–50；tests/test_step28_optuna.py:188–214。
+                - heading "六、预测冗余、实际收费及科学边界" [level=2] [ref=e1244]
+                - paragraph [ref=e1245]: "**搜索与复验使用同一保守 P 可以保留。**复验集中评价另入 E，但 1800 秒未测部分没有细分依据，无法可靠扣出复验“省下”的评价成本。这是有意的预算冗余。"
+                - paragraph [ref=e1246]:
+                  - text: 实际收费必须互斥：每个复验退出后结束该 run 的活动计时，前八个退出后的等待不能回加；集中 E 只收一次。父 run 区间还包含 child 退出后的 completion/source 核对和搜索 independent_feedback，所以 child_seconds 不等于全部 run 收费，也不能把该收尾再计入 C。证据：scripts/step28_optuna_search.py:225–258、scripts/step28_optuna_control.py:67–115。这是
+                  - strong [ref=e1247]: B08 解释限制
+                  - text: ，本轮没有发现保存证据已发生实际重复计费。
+                - paragraph [ref=e1248]: 科学合同继续保持：
+                - list [ref=e1249]:
+                  - listitem [ref=e1250]: 三臂各 12 次完整搜索，既定两参数范围、trial0、随机／TPE 分配及轮转不变；完整 S 保留。
+                  - listitem [ref=e1251]: 配置固定后各 3 个新 seed，共九次；全部盲完成并退出、valid=0 后，才集中一次开放。
+                  - listitem [ref=e1252]: 选择仍按固定 S0 下的既定双域主要判据及平局规则；H_pos−S_pos 保持描述性次级比较。
+                  - listitem [ref=e1253]: 失败、超时、非有限即停止后续调度，不补槽、不自动恢复。
+                  - listitem [ref=e1254]: 开发 valid 上换 seed 不恢复未见性；本提案不等于最终独立新 80 群确认。
+                  - listitem [ref=e1255]: 不新增 test、owners、private_custody、旧 Memory 或最终确认数据权限，也不承诺性能提升。
+                - heading "七、实际审查范围与失败披露" [level=2] [ref=e1256]
+                - paragraph [ref=e1257]: 本轮完成了冻结包身份、清单和来源哈希核对，36 份 Python AST 纯解析，指定提案／原生／预算／实现与测试的定向阅读，以及保存字段的独立算术。三项并行静态追踪用于单 run、共享代理和计时／来源接线，主实例对关键结论回查并形成综合裁决。
+                - paragraph [ref=e1258]:
+                  - strong [ref=e1259]: 没有执行项目程序、pytest/unittest、NumPy/Torch、训练、载模、正式文本／标签访问或科研指标重算；没有连接项目 Linux、签发正式 gate 或创建启动监听。
+                  - text: “正式未启动”的依据是用户最新说明和保存回执，不是新的服务器进程现场观测。
+                - paragraph [ref=e1260]: 如实记录了以下辅助问题：
+                - list [ref=e1261]:
+                  - listitem [ref=e1262]: 一次 rg 使用两个猜测但不存在的路径，出现 No such file or directory，随后沿实际 import 找到文件。
+                  - listitem [ref=e1263]: 首遍历史 console 算术将非 JSON 行当作 JSON，发生 JSONDecodeError、exit1；按 JSON 记录筛选后成功，失败输出保留。
+                  - listitem [ref=e1264]: 若干长输出被截断，必要部分缩小范围补读；没有把请求读取范围直接冒称完整可见阅读。
+                  - listitem [ref=e1265]: 其余交付辅助记录也保留在证据包。它们不构成新的项目 CPU 或原生资格执行。
+                - paragraph [ref=e1266]:
+                  - text: 完整证据包为
+                  - strong [ref=e1267]: 75431 字节、26 成员（25 项载荷＋清单）
+                  - text: ，成员大小、SHA256 和 ZIP 完整性已核验。外层 SHA256：
+                - generic [ref=e1269]:
+                  - generic [ref=e1270]:
+                    - generic [ref=e1273]: 纯文本
+                    - generic [ref=e1274]:
+                      - button "启用自动换行" [ref=e1276] [cursor=pointer]
+                      - button "复制代码" [ref=e1280] [cursor=pointer]
+                  - code [ref=e1284]:
+                    - generic [ref=e1285]: e078f171b13c28e6f506437fa2eba19d4d97ecef5aa64522c1abf21588e61287
+                - paragraph [ref=e1286]:
+                  - text: 主执行者下一步可在已有授权内完成 B01—B05，并在
+                  - strong [ref=e1287]: 剩余 CPU192 秒
+                  - text: 内只核受影响事项。独立主审、当前来源复用、新时间门及现场资源全部满足后，从
+                  - strong [ref=e1288]: 45-run controller 的正式入口
+                  - text: 自动启动，避免重入已结束的 native listener。若实际需要改变 272 小时、三臂次数、数据边界、科学设计或主要判据，应提出具体变更和证据；本轮审查没有提出这类变更。
+              - generic [ref=e1292]:
+                - button "打开 optuna_budget_review_report.zh.txt 的预览" [ref=e1293] [cursor=pointer]
+                - generic:
+                  - generic:
+                    - generic "optuna_budget_review_report.zh.txt"
+                    - generic: 文档
+                  - generic:
+                    - generic:
+                      - generic:
+                        - button "下载文件"
+        - generic [ref=e1295]:
+          - button "复制" [ref=e1297] [cursor=pointer]
+          - button "评价回复" [ref=e1301] [cursor=pointer]
+          - button "分享" [ref=e1305] [cursor=pointer]
+          - button "朗读" [ref=e1309] [cursor=pointer]
+          - button "重新生成回复" [ref=e1313] [cursor=pointer]
+          - button "更多操作" [ref=e1316] [cursor=pointer]
+          - button "来源" [ref=e1320] [cursor=pointer]
+      - generic [ref=e1324]: ChatGPT 可能会出错。请核查重要信息。
+    - generic:
+      - generic:
+        - button "滚动到底部" [ref=e1394] [cursor=pointer]
+        - heading "最新一条回复" [level=4] [ref=e1328]
+        - status [ref=e1329]
+        - generic [ref=e1351]:
+          - button "添加文件等内容" [ref=e1356] [cursor=pointer]
+          - textbox "询问 ChatGPT" [active] [ref=e1363]:
+            - paragraph: 询问 ChatGPT
+          - generic [ref=e1366]:
+            - button "选择 ChatGPT 模型" [ref=e1371] [cursor=pointer]:
+              - generic [ref=e1372]: Pro
+            - generic [ref=e1382]:
+              - button "听写" [ref=e1386] [cursor=pointer]
+              - button "开始语音" [ref=e1391] [cursor=pointer]

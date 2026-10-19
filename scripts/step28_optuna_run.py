@@ -32,7 +32,7 @@ CPU_TESTS=("test_actual_objective_vjp_lr_and_rejected_omissions", "test_seeds_ow
     "test_real_optuna_selection_and_stop", "test_disjoint_budgets_and_real_launcher_failure",
     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
     "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
-    "test_repair_controller_boundaries")
+    "test_repair_controller_boundaries", "test_budget_amendment_gate")
 
 
 def sources():
@@ -52,7 +52,10 @@ def sources():
     paths.update(data.ROOT/"schema"/n for n in ("step28_g_half_policy.json", "step28_record_replay_policy.json",
         "step28_bge_continual_policy.json", "step28_alias_ranking_policy.json", "step28_chinese_base_policy.json"))
     paths.update((POLICY, CONTRACT, SCOPE, AUTHORIZATION, REPAIR_SCOPE, REPAIR_AUTHORIZATION))
-    paths.add(data.ROOT/"scripts/run_step28_optuna_cpu_linux_20261018.sh")
+    paths.update(data.ROOT/p for p in ("scripts/run_step28_optuna_cpu_linux_20261018.sh",
+        "scripts/step28_optuna_formal_wait.py",
+        "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+        "reports/documentation/20261019/optuna_budget/authorization.json"))
     return [data.record(p, data.ROOT) for p in sorted(paths)]
 
 
@@ -60,20 +63,20 @@ def policy():
     p = data.read_json(POLICY)
     if p != dict(arms=list(method.ARMS), search_trials_per_arm=12, replication_seeds=[1, 2, 3],
         cpu_seconds=300, native_seconds=1800, native_calls_per_arm=6, per_arm_native_seconds=600,
-        run_seconds=9000, search_seconds=324000, replication_seconds=81000,
-        shared_seconds=control.SHARED, total_seconds=410400, train_parse_attempts=45, valid_parse_attempts=37,
+        run_seconds=21600, search_seconds=777600, replication_seconds=194400,
+        shared_seconds=control.SHARED, total_seconds=979200, train_parse_attempts=45, valid_parse_attempts=37,
         maximum_output_bytes=64*2**30, maximum_evidence_bytes=2*2**30):
         raise ValueError("Frozen finite campaign policy differs")
     return p
 
 
 def runtime():
-    return {**single.policy()["runtime"], "maximum_gpu_stage_seconds": 9000,
+    return {**single.policy()["runtime"], "maximum_gpu_stage_seconds": 21600,
             "maximum_output_bytes": 64*2**30}
 
 
 class Budget(single.legacy.Budget):
-    def __init__(self, root, seconds=9000, *, campaign=None, started=None):
+    def __init__(self, root, seconds=21600, *, campaign=None, started=None):
         super().__init__(root)
         if started is not None:
             self.started = started

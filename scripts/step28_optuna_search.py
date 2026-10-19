@@ -25,7 +25,7 @@ def expired(signum,frame):
 # Imports of this module by trial children do not install a controller timer.
 if __name__=="__main__":
     signal.signal(signal.SIGALRM,expired)
-    signal.setitimer(signal.ITIMER_REAL,max(.001,300-(time.monotonic()-MODULE_STARTED)))
+    signal.setitimer(signal.ITIMER_REAL,max(.001,900-(time.monotonic()-MODULE_STARTED)))
 
 try:
     import step28_optuna_run as run
@@ -39,6 +39,80 @@ except BaseException:
     raise
 
 data=run.data
+
+
+def read_bound(record):
+    return data.read_json(data.verify(data.ROOT/record["path"],record))
+
+
+def wrapper_charge(record):
+    path=data.verify(data.ROOT/record["path"],record)
+    row=dict(line.split("=",1) for line in path.read_text().splitlines())
+    charged=math.ceil(int(row["wall_ns"])/1e9)
+    if int(row["exit_code"])!=0 or int(row["charged_seconds"])!=charged:
+        raise ValueError("Successful outer qualification accounting required")
+    return charged,row
+
+
+def reused_qualification(cpu,reuse,current):
+    """Only this approved budget/clock amendment may reuse the frozen 18 calls."""
+    import hashlib
+    import zipfile
+    native=read_bound(reuse["original_result"])
+    before={r["path"]:r for r in native["source_files"]};after={r["path"]:r for r in current}
+    changed=sorted(p for p in before.keys()|after.keys() if before.get(p)!=after.get(p))
+    allowed={"schema/step28_optuna_policy.json","scripts/step28_optuna_control.py",
+        "scripts/step28_optuna_run.py","scripts/step28_optuna_search.py","tests/test_step28_optuna.py",
+        "scripts/step28_optuna_formal_wait.py","reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+        "reports/documentation/20261019/optuna_budget/authorization.json"}
+    if (reuse.get("status")!="ACCEPTED_BUDGET_CLOCK_ONLY" or reuse.get("source_files")!=current
+        or reuse.get("changed_paths")!=changed or not set(changed)<=allowed or before.keys()-after.keys()):
+        raise ValueError("Unapproved native source reuse")
+    with zipfile.ZipFile(data.verify(data.ROOT/reuse["original_archive"]["path"],reuse["original_archive"])) as archive:
+        for p,row in before.items():
+            payload=archive.read(p)
+            if len(payload)!=row["bytes"] or hashlib.sha256(payload).hexdigest()!=row["sha256"]:
+                raise ValueError("Frozen native source payload differs")
+    charged,_=wrapper_charge(reuse["original_wrapper"])
+    if charged!=876 or native["cumulative_charged_seconds"]!=875:
+        raise ValueError("This reuse must preserve inner875 and charge outer876")
+    prior=read_bound(cpu["prior_gate"])
+    if prior["source_files"]!=native["source_files"] or prior["cumulative_charged_seconds"]!=108:
+        raise ValueError("Specific prior CPU acceptance differs")
+    latest=read_bound(cpu["new_result"])
+    required={"test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate"}
+    if (latest.get("status")!="PASS_HANDWRITTEN_ONLY" or latest["source_files"]!=current
+        or not required<=set(latest["qualified_tests"]) or latest.get("unresolved_checks")!=[]
+        or set(cpu["qualified_tests"])!=set(prior["qualified_tests"])|set(latest["qualified_tests"])):
+        raise ValueError("Affected current CPU checks missing")
+    total=108
+    for record in cpu["subsequent_wrappers"]:
+        seconds,row=wrapper_charge(record);total+=seconds
+        if int(row["cumulative_charged_seconds"])!=total:raise ValueError("CPU failure/time chain differs")
+    if total!=cpu["cumulative_charged_seconds"] or latest["prior_charged_seconds"]!=total-seconds:
+        raise ValueError("CPU outer charge differs")
+    return {**native,"cumulative_charged_seconds":charged}
+
+
+def shared_projection(projection,native):
+    """Re-derive the approved engineering proxies from their original saved fields."""
+    from datetime import datetime
+    rows={r["path"]:data.verify(data.ROOT/r["path"],r) for r in projection["measurement_evidence"]}
+    basis=projection["shared_basis"]
+    if basis["kind"]!="CONSERVATIVE_PROXIES_NOT_WHOLE_STAGE_MEASUREMENTS":raise ValueError("Proxy scope missing")
+    def wrapper_seconds(key):
+        values=dict(line.split("=",1) for line in rows[basis[key]].read_text().splitlines())
+        return math.ceil(int(values["wall_ns"])/1e9)
+    control,fixture=wrapper_seconds("control_wrapper"),wrapper_seconds("fixture_wrapper")
+    lines=rows[basis["historical_wrapper"]].read_text().splitlines()
+    wall=(datetime.fromisoformat(lines[2])-datetime.fromisoformat(lines[0])).total_seconds()
+    events=[json.loads(line) for line in rows[basis["historical_console"]].read_text().splitlines() if line.startswith("{")]
+    final=[e for e in events if e.get("point")=="B_H_pos" and e.get("completed")==288 and e.get("event")=="updates"]
+    if control!=14 or fixture!=26 or len(final)!=1 or lines[1]!="exit_code=0":raise ValueError("Specific shared basis differs")
+    tail=wall-final[0]["elapsed_seconds"];restore=max(r["measurements"]["r_I"] for r in native["arms"].values())
+    expected=dict(control=1.25*(72*restore+control+120),evaluation=1.25*(9*tail+18*restore+fixture+300),analysis=1.25*(fixture+120))
+    if projection["shared"]!=expected:raise ValueError("Shared formula/proxy evidence differs")
+    return expected
 
 
 def validate_gate(path):
@@ -56,11 +130,12 @@ def validate_gate(path):
         raise ValueError("Specific 45-run data/budget/lifecycle permission missing")
     for key in ("external_review","primary_disposition"):
         data.verify(data.ROOT/gate[key]["path"],gate[key])
-    cpu,native=bound("cpu"),bound("native")
+    cpu=bound("cpu")
+    native=reused_qualification(cpu,bound("native_reuse"),current)
     if (cpu.get("status")!="PASS_HANDWRITTEN_ONLY" or cpu.get("source_files")!=current
         or cpu.get("cumulative_charged_seconds",math.inf)>300 or cpu.get("unresolved_checks")!=[]
         or set(cpu.get("qualified_tests",[]))!=set(run.CPU_TESTS)
-        or native.get("status")!="PASS_HANDWRITTEN_ONLY" or native.get("source_files")!=current
+        or native.get("status")!="PASS_HANDWRITTEN_ONLY"
         or native.get("cumulative_charged_seconds",math.inf)>1800 or set(native.get("arms",{}))!=set(ARMS)):
         raise ValueError("Current bounded CPU/native evidence missing")
     for arm,row in native["arms"].items():
@@ -69,7 +144,7 @@ def validate_gate(path):
                 "next_update_bitwise_equal","inference_restore_equal","maximum_shape_verified"))):
             raise ValueError("Native actual effects missing: "+arm)
     projection=bound("time_qualification")
-    if projection.get("status")!="NEW_9000_SECOND_QUALIFICATION" or projection.get("source_files")!=current:
+    if projection.get("status")!="APPROVED_21600_SECOND_BUDGET_QUALIFICATION" or projection.get("source_files")!=current:
         raise ValueError("Old mathematical PASS is not new time qualification")
     for record in projection["measurement_evidence"]:
         data.verify(data.ROOT/record["path"],record)
@@ -79,10 +154,7 @@ def validate_gate(path):
                    for key in ("search","replication")} for arm in ARMS}
     if projection.get("cost_model")!="legacy_1.25_allowance1800" or projection["arms"]!=expected:
         raise ValueError("Projection must recompute the retained cost model; a revised model needs a reviewed amendment")
-    for key in ("control","evaluation","analysis"):
-        bound=projection["shared_evidence"][key]
-        data.verify(data.ROOT/bound["evidence"]["path"],bound["evidence"])
-        if bound["conservative_seconds"]!=projection["shared"][key]:raise ValueError("Unbound shared-stage projection")
+    shared_projection(projection,native)
     projected_gate(projection)
     run.policy()
     return gate,cpu,native

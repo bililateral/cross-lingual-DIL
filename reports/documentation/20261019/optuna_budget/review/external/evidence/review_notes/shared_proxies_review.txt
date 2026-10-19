@@ -1,0 +1,58 @@
+共享 C/E/A 代理及边界定向静态审查分工
+2026-10-19；当前会话静态辅助分工，最终裁决由主审完成。
+
+一、结论
+
+在用户已批准 272 小时、限定接线/剩余 CPU 与条件自动启动的最新状态下，C900/E3600/A600 有可说明的工程依据，可随本预算提案采纳。我未发现迫使提高这三个数值或改变 272 小时/三臂次数/科学设计的具体保存证据。此判断只支持预算可采纳；当前输入代码仍为旧限额，新的实际计时/分账/时间资格及来源复用须完成最小接线核验，不能由本静态意见宣称 formal gate 已通过。
+
+不把代理未成为完整实测本身列为新致命缺陷。也不以代理数值小于限额单独判通过。依据是实际入口的工作量、R 的实际恢复路径、14/26 秒手写整段证据、旧双臂真实评价尾段的范围及明确未测余量共同构成。
+
+二、独立算术
+
+直接从 native/result.json 读取各臂 measurements.r_I，得 max R=3.146804547868669 秒（H_pos）。W_I 三臂分别 S 1304378315、S_pos 1304378379、H_pos 1304378571 字节。
+attempt01.wrapper.txt:1–4：wall_ns=13257703867，charged_seconds=14；不是把测试10.796秒再叠加14秒。
+attempt07.wrapper.txt:1–4：wall_ns=25194099902，charged_seconds=26，累计108；不是把测试22.981秒再叠加26秒。
+历史 job.wrapper.txt:1–3 两个时间戳相差12661秒。job.console.txt:107 最后 B_H_pos completed=288 的 elapsed_seconds=12451.78039111523。T_tail=209.21960888477042秒。
+
+P_C=1.25*(72R+14+120)=450.7124093081802秒；C900余量449.2875906918198秒。
+P_E=1.25*(9*T_tail+18R+26+300)=2832.0237022807123秒；E3600余量767.9762977192877秒。
+P_A=1.25*(26+120)=182.5秒；A600余量417.5秒。
+共享代理合3465.2361115888925秒；硬额合5100秒。与 calculations.json 对应值的双精度差均0。13个直接引用文件的大小及SHA256独立核对均匹配 calculations.sources。详细机器可读结果见同目录 shared_proxies_review.json。
+
+三、具体 findings 与处置分类
+
+SP01【解释限制；无新增预算阻断】R 是来源可追的、较重恢复路径的 IO 代理，不是测得的整文件哈希耗时或严格上界。
+证据：scripts/step28_optuna_verify.py:161–168,256–259 计时 r_I，保存后立即恢复；scripts/step28_g_half_run.py:225–233；scripts/step28_continual_population.py:157–179,193–210 的 restore_state 包含 torch.load、saved 状态摘要、实际参数装入、再次摘要比较与元数据恢复。scripts/step28_continual_population_data.py:37–52 的身份核验只顺序读取文件做 SHA256。相同缓存与存储条件下，恢复路径含比单次文件哈希更多的工作，故用R有合理偏保守依据。但本次是写后恢复，缓存、共享存储负载与未来 E 中久存文件不同，无法从代码证明所有 hash<=R。proposal:56 明确承认这一点；继续保留此限制即可，不据此要求新1.304GB权重读取、GPU调用或正式试跑。
+
+SP02【解释限制；预算可采纳】C 的主要 IO 计数正确，14秒只为真实手写控制核心参照。
+证据：scripts/step28_optuna_search.py:196–203 为成功搜索两端点取 data.record 后删除；:236–244 在C区间做 tell/权重退休/账目。36次成功搜索×2=72次权重文件完整身份读取。tests/test_step28_optuna.py:159–186 实际创建 SQLite 三study，并执行12×3 ask/tell与选参及失败/集中开放负例；attempt01/unittest.txt:1–10 和 wrapper:1–4 覆盖该完整测试。Tc14没有45次实际启动、72大文件hash、正式退出全过程；P_C 明确另加72R和120秒未测控制余量，900相对450.712409有实质余量。因此原C300不能作为容量已建立，新C900合理但不承诺共享机器最坏情形。
+
+SP03【解释限制；预算可采纳】E 工作量及尾段代理的保守方向成立；26秒没有实际运行108次诊断评价。
+证据：scripts/step28_optuna_run.py:317–339 对九run逐一盲门、复核一致分区、一次 public_inputs、一次 development parse，再逐run evaluate_run；:262–267 内有真实 old.collect、diag.evaluate、statistics；Entry.POINTS :124 每run两点，ROLES由 bge_continual.py:24 给三种，故54套指标计数与108捕获评价正确。盲门经 scripts/step28_positive_ranking_run.py:261–328 每两端点做:316模型文件身份核验；九run共18次。
+历史 job/completion.json 保存 status=COMPLETE_S_POS_H_POS_FIXED_AB、physical_updates=1152、presentations=1728，budget.phase=evaluation、elapsed_seconds=12659.635004023556，支持尾段已完成旧双臂完整评价与退出。当前 positive_ranking_run.py:517–528 在训练后统一 open_valid、collect、diag.evaluate 和 finalize。diag.evaluate（replay_diagnostics.py:171–208）对全部点每6次捕获重建valid三指标及曲线。旧双臂有四点/24捕获，本次每run两点/12捕获；给每个新run一整个旧双臂尾段，而非除2，覆盖方向保守，9次尾段相当于216个旧捕获评价额度，对应实际108个新捕获。此外尾段含最后端点/盲核验/退出，多于纯评价；另加18R有意冗余，并非实际重复收费。
+tests/test_step28_optuna.py:237–250 对九份40群×378分数手写输入做真实collect和statistics；:251–268 的诊断曲线由fixture直接构造，未调用108捕获的diag.evaluate；:269,289–307 覆盖真实三seed聚合与45槽独立分析。attempt07因此为新聚合路径参照，不能当全E实测。T_tail 提供其缺失的同类真实诊断工作依据，300秒另留公开输入/Memory/来源/日程/启动退出等未测量。本证据组合足以支持E3600的有限工程预算，不能推成纯评价必在2832秒或3600秒内结束。
+
+SP04【解释限制；预算可采纳】A600有相当直接的规模参照，但独立性边界不能升级。
+证据：scripts/step28_optuna_verify.py:53–146 的 independent_analysis 对36搜索反馈/选择、all_specs=36+9保存矩阵及区间、复验比较与诊断来源/三seed均值做核对。tests/test_step28_optuna.py:289–325 把手写保存集扩展为36搜索槽后实际运行此入口，包含反馈偏移/错A/cal负例。attempt07/saved_evaluation.json明确45 synthetic_analysis_slots、actual_optimizer_calls=0、checked_fields=36090、formal_label_reads=0、model_loads=0，不能称独立重建全部标签级指标。用完整26秒覆盖其中分析核心，加120秒并乘1.25，182.5对600有余量；没有增加A预算的具体必要。
+
+SP05【实施必改；属于已提出的最小接线，不新增科学门】共享时间资格需绑定并核验本次具体代理、源字段和性质，不能只把5100或若干小数字写入PASS。
+证据：scripts/step28_optuna_search.py:71–85 当前读取旧 NEW_9000_SECOND_QUALIFICATION；单run通过 native.measurements重算保留公式，但共享仅验证 evidence文件身份和 conservative_seconds与projected.shared字段相等。该接口当前没有重算P_C/P_E/P_A。本提案:108–111要求绑定calculations/代理性质、原18调用来源复用及定向CPU。实现时按这三个冻结公式和已核身份字段完成明确对应，并同步父/子实际timer、共享分段及总额，即可；不要求新增通用性能框架或真实trial准入。实施后的CPU只核字段/公式/错误来源拒绝及受影响计时语义，计入剩余192秒；不能把924秒native余额当重试许可。
+
+SP06【解释限制；未发现本轮公平/数据边界改变】三臂36+9保持同等机会，完成次数服从失败停止；新seed仍开发复验。
+证据：control.py:22–33 每臂12个完整槽，U/平均改善/较小number择优；:121–155 三独立study、固定默认点/随机/TPE与相同范围、轮转；:157–191 非有限/无效结果停止后续；:194–209 冻结全三配置后1/2/3 seed九条均需自有盲完成退出。search.py:186–193,236–258/270–287 的全额调度、集中开放与失败留证；run.py:373–392保持六格开发判读且全部九run保留。proposal:12–15/114–115明确失败不补slot、test/owners/private_custody边界、新80群独立最终确认不在272小时内。统计机会公平与达到双域提升是两件事，不承诺改进或把新seed同valid复验改称最终独立确认。
+
+四、历史来源对应的阅读限制
+
+历史 completion 的 source_files 中 record_replay_run.py、replay_diagnostics.py 与当前输入逐字节身份一致；positive_ranking_run.py 和 g_half_run.py 哈希不一致，当前包提供的是为Optuna适配后的入口，未提供历史该两文件的逐字节源码。本轮按要求复用已关闭旧实现/结果，未据这个预期版本差异重开历史阻断；T_tail依据保存wrapper/末更新/completion、未改的计时/诊断核心与当前闭合入口解释。没有声称执行旧完整重放或逐字节重审旧整段调用。原wrapper shell不在本分工输入读取范围；Budget的共同时间原点机制见 record_replay_run.py:60–71（从RECORD_REPLAY_STARTED_EPOCH折算），整秒端点边界仍是代理限制的一部分。
+
+五、实际读取范围
+
+完整读取文本：budget/proposal.zh.txt、calculations.json、primary_disposition.zh.txt；scripts/step28_optuna_control.py；scripts/step28_optuna_run.py（分两段完整读取）；reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt；attempt01/07的wrapper和unittest。
+定向源码读取：optuna_search.py:1–290（未读291起）；optuna_verify.py:1–274（计时/原生函数只读源码，未运行）；tests/test_step28_optuna.py:158–330及相关rg定位；positive_ranking_run.py:1–96,219–410,480–541；g_half_run.py:145–241；record_replay_run.py:56–105；replay_diagnostics.py:112–208；continual_population_data.py:31–60；continual_population.py:150–210；bge_continual.py:1–32,214–306（后段只用于确认别名定位，未审训练）；repair_scope/repair primary/implementation_scope和原external report仅读取明确rg命中的相关段落。
+保存字段读取：native result 的状态/arms/measurement字段；attempt01 optuna_control全部JSON解析并仅汇总槽数/选择/布尔证据；attempt07 saved_evaluation全部JSON解析并汇总audit及来源；旧positive completion全部JSON解析但只审运行计数/时间/相关source_files；旧console 52条JSON进度及wrapper两个时间戳。
+未读/未运行：没有正式文本/标签/模型/Memory载荷读取，没有numpy/torch项目模块导入，没有pytest/unittest执行、GPU/科研代码或新指标归约。未连接项目Linux，未网络检索。未全量重审48来源和历史论文/方法，未重新验证被明确复用的N01–N08/T01完整实现。
+
+六、实际辅助操作与失败
+
+工具仅为rg定位、nl/sed文本显示、标准库json/pathlib/hashlib/datetime保存字段/身份/算术，和写本分工临时材料。两次并行读取合并输出触发显示截断，随后按单个已存返回值/定向分段重新显示，未把截断内容算作已经阅读。
+发生一次实质辅助失败 SP_EXEC_01：首遍静态算术脚本把旧console每个非空行都交json.loads，遇非JSON进度行报JSONDecodeError，exit1，脚本第12行。退出发生在输出文件写入前；没有项目模块或科研计算执行。随后仅解析首非空字符为“{”的行，保留排除行号1/2/55/56，52条JSON记录解析成功。实际失败命令/可见错误抄录另存 shared_proxies_failure_01.txt，未重现故障。最终算术及13项来源身份核验完成，无其他辅助命令失败。

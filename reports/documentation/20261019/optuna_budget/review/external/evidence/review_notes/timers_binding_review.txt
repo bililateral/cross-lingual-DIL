@@ -1,0 +1,83 @@
+# 预算实际计时、门禁与来源复用：定向静态审查分项
+
+审查范围：当前三臂 Optuna 预算修订最小接线。用户最新授权优先：272 小时预算、具体静态送审、最小实施和剩余 CPU 核验均已批准，36+9 具有条件自动启动许可；外审/主审、接线/CPU/资源/新时间门未完成，正式未启动。本分项没有要求重复许可。
+
+结论：支持预算方案进入已授权的最小实施；当前包是未实施方案，不能把随包旧源码仍为 9000/C300/E2400/114h 当成“已按新预算执行失败”，也不能把静态方案可采纳写成 formal gate 已过。没有发现必须改变 272 小时、科学设计或三臂次数的理由。以下是具体实施必改/核验点，均可在已批准预算接线及剩余 CPU 范围内落实，不要求 GPU、新标签或正式 trial 准入试跑。
+
+## TB01 实施必改：实际旧常量必须全部同步
+
+证据：
+- schema/step28_optuna_policy.json:9–13：当前 run/search/rep/shared/total 为 9000/324000/81000/300+2400+600/410400。
+- scripts/step28_optuna_run.py:59–79：policy() 自身硬断言旧值；runtime.maximum_gpu_stage_seconds=9000；Budget 默认 seconds=9000。只改 JSON 会先被 policy() 拒绝；只改 policy 与 gate，仍会被真正 run Budget 提前截止。
+- scripts/step28_optuna_control.py:11,36–50,56–73：SHARED、projected_gate、Ledger.remaining 的分段/单次/每臂/总额分别固化旧值。
+- scripts/step28_optuna_search.py:24–28：控制器导入前真实 signal timer 仍是 300 秒；262、287：整体末端资源检查创建的 Budget 仍显式 300 秒。
+
+同步映射：单次21600；搜索各臂259200、总777600；复验各臂64800、总194400；C900/E3600/A600，共享5100；总979200。CPU300、native1800、每臂原生600、原生各6调用不改。需要覆盖真实导入前 timer、父 charged/launch、子 Budget/runtime、C终止落盘路径、E/A shared_resources。提案 proposal.zh.txt:103–114 已明确这些方向；本分项是具体落点核对，不认定它们已经实现。
+
+## TB02 实施必改：控制、E/A 与单 run 的时间原点必须隔离
+
+证据：
+- scripts/step28_record_replay_run.py:60–64：基类 Budget.started 根据环境 RECORD_REPLAY_STARTED_EPOCH 回溯；77–104 用这一 elapsed 与所给限额比较。
+- scripts/step28_optuna_run.py:75–79 原样继承该起点；93–99 为 E/A 构造 Budget。
+- scripts/step28_optuna_search.py:225–228 为每个 trial 显式重设 RECORD_REPLAY_STARTED_EPOCH；252–258 的 E/A 启动仅复制 os.environ 并隐藏 GPU；262、287 的 C资源检查同样继承该环境读取规则。
+
+具体风险条件：若待建正式 controller 外层继承或设置了整个 campaign 开始的 RECORD_REPLAY_STARTED_EPOCH，E/A 及 C末端资源检查会把此前数天运行套在本段 3600/600/900 秒内，从而在全部科学计算正常时立即伪超时。包内没有未来正式外层启动脚本，不能断言已经发生，也不据此重开 N08 历史结论。
+
+最小解决：明确并核验新入口的环境边界。E/A 使用自己的启动 epoch 或显式本段起点；C资源检查采用其本次资源检查起点/已存在累计C账，不能采用 campaign历时。父 Ledger 的互斥 charged 是整段权威账，子 Budget 只监控本阶段；不把父计费和子快照相加。可用手写环境/假时钟验证这一个分支，无需新模型或标签。
+
+## TB03 实施必改：原 18 调用只能通过本次特定复用绑定进入新门
+
+证据：
+- scripts/step28_optuna_search.py:44–70 当前形式门要求 native.source_files==当前 sources，所有三臂各6次与既定五项 native检查为真。
+- scripts/step28_optuna_run.py:38–56 当前来源集合由 AST 依赖闭包与固定合同/政策/包装构成。
+- proposal.zh.txt:108–110 要求绑定原48来源与新来源、列预算/计费差异、检查训练/评分/目标/恢复及依赖未变，原 report.source_files 不改。
+
+本分项用标准库按原 native/result.json 的 source_files 逐文件核 SHA/大小：48项均与本包当前来源相等，没有缺失或不匹配；三臂6+6+6=18。该核对只是当前冻结来源身份，不能预先证明未来修改来源仍适用。
+
+最小接线：新复用记录绑定原 result 文件身份、原48来源、修订后实际来源集合、明确允许的预算/timer/gate/测试差异及当前CPU证据；形式门实际验证这一精确关系。新预算补充/calculations 与主审处置也应有明确哈希引用。未变代码/科学函数及其依赖可用逐项diff/AST核对，但不能仅以“方法文件未改”替代全部影响检查。发现科学变化就停止，不把本次复用关系泛化，也不为新哈希重跑原生。
+
+## TB04 实施必改：外层资格费与 CPU 证据复用必须贯通当前门
+
+原生保存字段：native/result.json（单行JSON）status=PASS_HANDWRITTEN_ONLY，mode=gpu，elapsed_seconds=874.7400503358804，cumulative_charged_seconds=875.0；formal_inputs=false，formal_labels=false。native.wrapper.txt:1–3 是 exit_code=0，wall_ns=875953454299，charged_seconds=876。整数上取整独立算得 ceil(875953454299/1e9)=876。三个臂内部 charged 为300/287/288，不可把其和875代替全外层876。
+
+问题落点：scripts/step28_optuna_search.py:217 目前直接把 cpu/native 的 cumulative_charged_seconds 相加；若继续直接取 raw native 就只记875。应经独立接受记录带入原 wrapper876；raw result、wrapper、source_files 保持原字节。CPU从108继续以新完整wrapper累加，不能用内层107/新内层采样，也不能把native余924变成再试。
+
+CPU复用落点：scripts/step28_optuna_search.py:59–65 当前还要求 cpu.source_files==current 且 qualified_tests 与 run.CPU_TESTS 全9项相等；scripts/step28_optuna_verify.py:319–325 的新局部run只会报告实际执行子集。必须沿用原明确聚合方式，区分“以前适用证据”和“此次实际受影响检查”，不能把局部报告改写成全9项重测，也不必全回归。repair/primary_disposition.zh.txt:15–19 已有四项旧证据+五项新证据的聚合先例。新CPU仍在108/300、余192之内；旧失败账保留。
+
+## TB05 实施必改：新时间门重算保留模型，旧负例含义需更新
+
+证据：scripts/step28_optuna_search.py:71–86 当前状态要求 NEW_9000_SECOND_QUALIFICATION，按 native.measurements 重算 legacy_1.25_allowance1800 的 search/rep，绑定 shared证据数字；control.py:36–50再核旧阈值。
+
+最小接线：新门用明确的6小时/272小时状态和当前政策绑定，从原测量重算每臂保留P，分别保存search与rep；共享部分绑定经本次审查采纳的 calculations 原件和各来源，并核 P_C/P_E/P_A 的数值/公式/代理性质及固定余量。不能只换状态名或把450/2832/182.5填进自称PASS字段。原单臂 within_budget=true 仍属于28800旧门，原9000失败状态保持。
+
+重要测试修订：tests/test_step28_optuna.py:204–206 当前把18844.60961239063本身当旧9000负例；新21600门下这一数值不再超限。必须拆成“正确绑定且低于21600的预测可准入”“超过21600仍拒绝”“旧状态/错误来源/未做本次复用即使数值不大仍拒绝”。不能为保留旧负例而错误拒绝合法新预算，也不能删掉旧资格拒绝。控制300→900的对应负例（188–214）同步到新限额。所需是假时钟、手写子进程与保存字段核对；不是18调用重跑。
+
+## TB06 解释限制与明确启动接线：互斥账成立，完整45计划不保证失败后凑齐
+
+scripts/step28_optuna_control.py:75–110 拒绝重叠区间并保留失败实际费用；scripts/step28_optuna_search.py:114–141 把控制空隙计C、其他阶段暂停C计费；225–235每个run独立；252–258集中E与A各一次。只要同步各自固定上限，共享5100使C最多900而保留E+A=4200，E最多3600而保留A600，无需新预留状态机。
+
+实际单run charged区间除子进程完整生命周期，还包括其退出之后 completion/source核对及搜索的 independent_feedback（search.py:225–234）。这些费用可以由保留1800未测项覆盖；文字应把父活动区间作为账终点，不把 launch.child_seconds 当作本run总账，也不要再次转计C。属于边界解释，不是目前实际双计证据。
+
+公平性现有路径：control.py:118–155三独立study、固定轮转12槽；22–33按(U,双域均值,-number)选；194–209固定九复验与集中盲门；search.py:236–258依次完整调度，任一异常即退出且不补slot。预算不引入新科学分支。
+
+native_wait_status.json:2–12保存原9000时间门失败、formal_started=false、automatic_retry=false及active_removed=true；native_outcome.json:59–64保存当时无监听、无正式gate/dispatch、原生权重清空。它们是保存观察，未现场连接服务器确认。未来新正式资源入口未附，本轮不能审成已部署；按提案仅启动45-run controller并满足资源门，不再进入 native 分支。用户最新条件许可已足够，门满足后无需重复询问同一许可。
+
+## 实际阅读及工具范围
+
+完整阅读：
+- reports/documentation/20261019/optuna_budget/proposal.zh.txt（1–122）、primary_disposition.zh.txt（1–30）、calculations.json（1–245）。
+- scripts/step28_optuna.py（1–241）、step28_optuna_control.py（1–209）、step28_optuna_run.py（1–443）、step28_optuna_search.py（1–307）。
+- tests/test_step28_optuna.py（1–450）、schema/step28_optuna_policy.json（1–18）。
+- scripts/run_step28_optuna_cpu_linux_20261018.sh（1–21）。
+- reports/documentation/20261018/optuna_plan/budget_amendment.zh.txt（1–75）。
+- repair/native_completed/qualification/native.wrapper.txt、native_outcome.json、native_wait_status.json；repair/primary_disposition.zh.txt全文经带上下文检索读取。
+
+定向阅读：
+- scripts/step28_record_replay_run.py 1–110及Budget上下文；step28_g_half_run.py仅与Budget/projection/train/checkpoint检索命中上下文。
+- scripts/step28_optuna_verify.py的1–20、25–146检索上下文，native_arm计时/返回上下文149–274，main277–350完整；未逐项审全部native数值实现。
+- 原实现外审report.zh.txt、implementation_scope.zh.txt、review/repair_scope.zh.txt的预算、CPU复用、N08/T01、计时门禁命中段；不重新审未变历史全报告。
+- native/result.json按状态、计费、三臂更新数、测量、48来源字段抽取与哈希核对，未重算科研指标或逐项复核保存梯度数值。
+
+实际执行：仅文件检索/文本读取，标准库JSON、SHA256、整数算术、AST解析（六份脚本+当前测试）及本分项临时证据写盘；没有import或运行项目模块/pytest/unittest/numpy/torch，没有GPU、模型/Memory载入、正式文本/标签读取，没有连接项目Linux。AST不求值。所有静态命令最终退出0。若干长工具输出被截断，随后用定向读取/JSON字段抽取补足本分项所需内容；没有把截断内容声明为逐字完整阅读。一个标准库检查工具返回可继续会话ID，随后空poll确认exit0，非测试失败。没有隐藏的科研失败或新增原生实测。
+
+附属机械证据：audit_work/timers_binding_static_checks.json。

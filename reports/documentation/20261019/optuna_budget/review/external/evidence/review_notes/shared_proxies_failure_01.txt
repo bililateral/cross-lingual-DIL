@@ -1,0 +1,56 @@
+SP_EXEC_01 — 本次真实失败的命令及可见返回抄录；没有为了保存本文件重现故障。
+工作目录：/workspace/scratch/a8b291861509
+操作：静态保存字段算术，标准库 python；未导入项目代码。
+当次 functions.exec 调用 tools.exec_command 后只 text(r.output)，所以下面为实际可见 combined output；未保存或声称有单独 stderr。
+
+实际 cmd：
+python - <<'PY'
+from pathlib import Path
+from datetime import datetime
+import json,hashlib,math
+root=Path('review_input')
+base=root/'reports/documentation/20261019/optuna_budget'
+calc=json.loads((base/'calculations.json').read_text())
+native_path=root/'reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json'
+native=json.loads(native_path.read_text())
+wrapped=(root/'reports/seller_alias_continual/20261018/positive_ranking_result/job.wrapper.txt').read_text().splitlines()
+old_wall=(datetime.fromisoformat(wrapped[2])-datetime.fromisoformat(wrapped[0])).total_seconds()
+console_path=root/'reports/seller_alias_continual/20261018/positive_ranking_result/job.console.txt'
+logs=[json.loads(line) for line in console_path.read_text().splitlines() if line.strip()]
+last=[row for row in logs if row.get('point')=='B_H_pos' and row.get('completed')==288][-1]
+tail=old_wall-last['elapsed_seconds']
+def wrapper_seconds(rel):
+    return {k:int(v) for k,v in (line.split('=',1) for line in (root/rel).read_text().splitlines())}
+control_wrapper=wrapper_seconds('reports/documentation/20261018/optuna_implementation/qualification/attempt01.wrapper.txt')
+analysis_wrapper=wrapper_seconds('reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07.wrapper.txt')
+R=max(row['measurements']['r_I'] for row in native['arms'].values())
+Tc=control_wrapper['charged_seconds'];Tf=analysis_wrapper['charged_seconds']
+independent={'control':1.25*(36*2*R+Tc+120),'evaluation':1.25*(9*tail+9*2*R+Tf+300),'analysis':1.25*(Tf+120)}
+checks={k:{'independent_seconds':v,'proposal_seconds':calc['shared'][k]['projected_seconds'],'difference_seconds':v-calc['shared'][k]['projected_seconds'],'cap_seconds':calc['shared'][k]['hard_cap_seconds'],'cap_minus_projection':calc['shared'][k]['hard_cap_seconds']-v} for k,v in independent.items()}
+source_checks=[]
+for rec in calc['sources']:
+    p=root/rec['path']
+    if any(x in rec['path'] for x in ('native/result.json','attempt01.wrapper','attempt01/unittest','attempt07.wrapper','attempt07/unittest','positive_ranking_result/job.wrapper','positive_ranking_result/job.console','optuna_run.py','optuna_control.py','optuna_verify.py','optuna_search.py','replay_diagnostics.py','test_step28_optuna.py')):
+        source_checks.append({'path':rec['path'],'size_equal':p.stat().st_size==rec['bytes'],'sha256_equal':hashlib.sha256(p.read_bytes()).hexdigest()==rec['sha256']})
+result={'scope':'Static saved-field arithmetic only; no project import/evaluation or native execution','basis':{'R':R,'r_I_by_arm':{a:r['measurements']['r_I'] for a,r in native['arms'].items()},'W_I_by_arm':{a:r['measurements']['W_I'] for a,r in native['arms'].items()},'T_C_wrapper':control_wrapper,'T_F_wrapper':analysis_wrapper,'historical_wrapper_seconds':old_wall,'historical_final_update_elapsed_seconds':last['elapsed_seconds'],'T_tail':tail},'shared':checks,'shared_sum':sum(independent.values()),'shared_cap_sum':900+3600+600,'payload_identity_checks':source_checks,'workload_counts':{'search_weight_hashes':36*2,'joint_endpoint_weight_hashes':9*2,'joint_metric_sets':9*2*3,'joint_diagnostic_captures':9*2*6,'tail_proxy_includes_historical_capture_evaluations_per_new_run':2*2*6},'exceptions':[]}
+assert all(x['size_equal'] and x['sha256_equal'] for x in source_checks)
+assert all(abs(r['difference_seconds'])<1e-9 for r in checks.values())
+out=Path('audit_work');out.mkdir(exist_ok=True)
+(out/'shared_proxies_review.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(result,ensure_ascii=False,indent=2))
+PY
+
+实际可见 combined output：
+Traceback (most recent call last):
+  File "<stdin>", line 12, in <module>
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+处置：仅解析首非空字符为 { 的日志行，且保存其他非空行号；成功解析52条JSON，非JSON行号1、2、55、56。首遍失败发生于任何输出写入前，后续计算结果见 shared_proxies_review.json。未重新运行故障。

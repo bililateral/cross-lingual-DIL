@@ -4,14 +4,11 @@
 
 ## 已确认范围内
 
-已批准的[H_cons合同](SELLER_ALIAS_H_CONSISTENCY.zh.md)及[原生资格补充](SELLER_ALIAS_H_CONSISTENCY_NATIVE_AMENDMENT.zh.md)所限定正式作业现已完成，完整回传与独立分析已完成，获准结果外审及独立主审均已完成；实际退出、观测、累计账及证据只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。不重启已执行资格或正式作业、不另建监听；冻结算法、44来源、原精度、S/H保存对照及原数据权限。
+按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。
 
-[完整结果](../reports/seller_alias_continual/20261016/h_consistency_result/report.zh.txt)及Linux独立核算已完成，原双域胜S门false、相对H新B直接门true，同时旧A有负向代价；原判据和范围不改。获准具体结果包已在原会话完成审查，96返回成员验收及[独立处置](../reports/seller_alias_continual/20261016/h_consistency_result/review/primary_disposition.zh.txt)已完成，无新增开放科学阻断；必要证据已同步、专用页关闭。原生标量条件免审与本次结果审查范围分别保留。两份H_cons权重已按最新明确许可留证删除，两Memory及完整有效负结果证据保留，见[存储记录](STORAGE.zh.md)。有效未达目标也结案，不自动开启下一候选；实际累计账及证据见当前交接。
+搜索按已固定双域U和精确tie规则选参；九次复验全部盲完成后统一开放，不依据中途复验结果增改候选。任一正式失败、超时或非有限值保留已用预算和访问账后停止，无自动重试。完整结果按合同回传并独立分析；未完成的日常进度核对按用户要求简报，不另造流水。新包外发仍按具体包权限。
 
-完整S/G/F及H=G_half均已结束，结果外审和独立主审已关闭，具体证据见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)与交接历史。F未建立主要收益，G/H旧A的局部正向证据不构成双域胜S；H原双域目标false保留。本轮只新增H_cons并复用合同指定的S/H保存对照，不重训旧臂、不转用旧预算，也不将实现修复或资格通过写成性能提升。
-
-用户本轮另要求仔细研究超过S的方案。已形成[逐正例排序有限开发提案](../reports/documentation/20261016/s_improvement/proposal.zh.txt)及可审查的具体静态包：优先S_pos、固定H_pos结构对照，不增加JS、教师或参数网格；该目标已有直接文献先例，现有局部梯度推导不证明正式瓶颈。用户现已批准具体静态包及必要背景外发，19:36:28经本地Playwright单次提交GPT 6 Pro，见[提交回执](../reports/documentation/20261016/s_improvement/review/submission.json)；完整回收及[独立主审](../reports/documentation/20261016/s_improvement/review/primary_disposition.zh.txt)现已完成，建议只做S_pos；H_pos信息价值与额外轨迹成本已说明。[具体实现/CPU范围](../reports/documentation/20261016/s_improvement/implementation_scope.zh.txt)待用户确认单/双臂后开始；GPU与正式合同另按范围批准，不复活旧C或S_strong。
-
+H_cons与固定S_pos/H_pos已完成并有有效未达主要目标的结果；这些旧实验不重启。当前公平调参是否带来双域收益尚待完整结果，开发valid和三个新seed均不替代未来独立AB80群最终确认。新增科学范围、数据或预算另行确认。
 ## 已完成路线与后续研究边界
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。

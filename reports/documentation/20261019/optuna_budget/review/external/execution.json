@@ -1,0 +1,61 @@
+{
+  "record_kind": "Truthful task-level static-operation and issue index; not an exhaustive raw tool-call transcript",
+  "work_directory": "/workspace/scratch/a8b291861509",
+  "allowed_operations_performed": [
+    "local attachment byte/hash/ZIP member inspection",
+    "safe extraction",
+    "rg and bounded text reads",
+    "stdlib json/pathlib/hashlib/datetime/math/Decimal arithmetic",
+    "ast.parse without evaluating imports",
+    "review report and evidence packaging"
+  ],
+  "prohibited_project_operations_performed": [],
+  "primary_independent_audit": {
+    "command": "python /workspace/scratch/a8b291861509/audit_work/static_audit.py /workspace/scratch/a8b291861509/review_input /workspace/scratch/a8b291861509/audit_work",
+    "exit_code": 0,
+    "summary": "All 11 named static checks true; no project qualification certified."
+  },
+  "issues": [
+    {
+      "id": "STATIC_PATH_01",
+      "type": "missing guessed dependency paths",
+      "scope": "single_run_cost auxiliary",
+      "paths": [
+        "scripts/step28_group_continual_data.py",
+        "scripts/step28_bge_continual_data.py"
+      ],
+      "visible_error": "No such file or directory",
+      "individual_rg_exit_code": null,
+      "overall_multi_command_exit_code": 0,
+      "resolution": "Followed actual imports to step28_continual_population_data.py; did not reproduce failed search.",
+      "record": "evidence/review_notes/single_run_failure_01.txt"
+    },
+    {
+      "id": "STATIC_JSON_01",
+      "type": "JSONDecodeError in first stdlib historical log parse",
+      "scope": "shared_proxies auxiliary",
+      "exit_code": 1,
+      "exception": "Expecting value: line 1 column 1 (char 0)",
+      "resolution": "Parse only lines starting with {; retained 52 JSON records and non-JSON line indices 1,2,55,56.",
+      "outputs_written_before_failure": false,
+      "record": "evidence/review_notes/shared_proxies_failure_01.txt"
+    },
+    {
+      "id": "DISPLAY_TRUNCATION",
+      "type": "display/output truncations",
+      "scope": "primary and auxiliary",
+      "primary_instances": [
+        "initial manifest plus current prose combined output",
+        "broad multi-file rg output",
+        "combined multi-source read",
+        "discipline plus source combined read"
+      ],
+      "auxiliary_records": "see each review_notes read/failure section",
+      "resolution": "Re-read needed sections in bounded ranges or selected JSON fields; not counted as project failures."
+    }
+  ],
+  "original_project_failure_preserved": "Unique native numerical checks passed; old9000 time gate failed and formal dispatch stopped.",
+  "project_cpu_qualification_executed_by_reviewer_seconds": 0,
+  "project_native_calls_executed_by_reviewer": 0,
+  "artifact_saving": "Separate deliverable operation; no project or formal-data access."
+}

@@ -8,7 +8,7 @@ import time
 from step28_optuna import ARMS, TrialSpec
 
 S0 = {"A": .49413171588434307, "B": .5058704368257183}
-SHARED = {"control": 300., "evaluation": 2400., "analysis": 600.}
+SHARED = {"control": 900., "evaluation": 3600., "analysis": 600.}
 
 
 def objective(values: dict, reference: dict) -> float:
@@ -39,14 +39,14 @@ def projected_gate(projected: dict) -> None:
     search = replication = 0.
     for p in projected["arms"].values():
         for key in ("search", "replication"):
-            if not math.isfinite(p[key]) or not 0 < p[key] <= 9000:
+            if not math.isfinite(p[key]) or not 0 < p[key] <= 21600:
                 raise ValueError("Old PASS cannot satisfy the new single-run budget")
         search += 12*p["search"]
         replication += 3*p["replication"]
     shared = projected["shared"]
     if set(shared) != set(SHARED) or any(not math.isfinite(shared[k]) or not 0 < shared[k] <= SHARED[k] for k in SHARED):
         raise ValueError("Shared evaluation/analysis reserve not demonstrated")
-    if search > 324000 or replication > 81000 or 300+1800+search+replication+sum(shared.values()) > 410400:
+    if search > 777600 or replication > 194400 or 300+1800+search+replication+sum(shared.values()) > 979200:
         raise ValueError("Stage/total projection exceeds proposal")
 
 
@@ -65,12 +65,12 @@ class Ledger:
         self.failed = False
 
     def remaining(self, kind: str, arm: str | None = None) -> float:
-        total = 410400-self.qualification-sum(self.used.values())
-        shared = 3300-sum(self.used[k] for k in SHARED)
+        total = 979200-self.qualification-sum(self.used.values())
+        shared = 5100-sum(self.used[k] for k in SHARED)
         if kind in SHARED:
             return min(SHARED[kind]-self.used[kind], shared, total)
-        per_arm, stage = (108000., 324000.) if kind == "search" else (27000., 81000.)
-        return min(9000., per_arm-self.arm_used[kind][arm], stage-self.used[kind], total)
+        per_arm, stage = (259200., 777600.) if kind == "search" else (64800., 194400.)
+        return min(21600., per_arm-self.arm_used[kind][arm], stage-self.used[kind], total)
 
     @contextmanager
     def interval(self, kind: str, *, arm=None, run_id=None):

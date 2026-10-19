@@ -8,6 +8,15 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-19 272小时外审、预算接线与正式启动
+
+[外审回收](../reports/documentation/20261019/optuna_budget/review/recovery.json)保管26返回原件及完整报告，25内部载荷/71输入身份核验；必要失败、阅读范围及主审完整保留，专用页关闭。原获准72成员输入ZIP继续保留，现为具体原生48来源复用的实际门依赖；不得作为冗余上传包删除。外审返回运输ZIP可在解包和同步核验后清理。
+
+当前51来源部署在`/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace`，保留qualification/budget_sources.zip作为attempt09与正式来源快照；旧clock_sources及native原件不改。七份新增CPU证据9148字节按[清单](../reports/documentation/20261019/optuna_budget/qualification/budget_receive_manifest.json)逐项回传；14份启动/进程/访问/首更新/部署证据28026字节按[执行清单](../reports/documentation/20261019/optuna_budget/execution/receive_manifest.json)核验。门文件置于该workspace内同项目相对路径，原结果/原生/审查依赖不改写。
+
+固定52份S/H已开放基线、8份直接来源及9份固定摘要/锚点文件已核对；首次机械部署因Linux主目录缺S0摘要而中止，未开始训练/CPU/数据访问，随后由已核Windows归档SCP补齐，保留deployment_failure与实际deployment原件。只建立7个合同允许的train/development及公开身份文件链接和既有BGE链接，不链接heldout/owners/private或旧Memory。启动后新权重和Memory仅留Linux，搜索权重按每run成功完整核对后留证清理，复验18端点保留；活动作业载荷不清理。
+
+当前启动状态与PID只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。运输formal_deployment、anchor_sources及两份receive ZIP在核验后按精确路径清理，来源快照及门依赖保留；本轮只本地Git，不改变10月23日大清理周期。
 ## 2026-10-19 Optuna共享起点修复与CPU证据
 
 只同步48份当前科学来源至新`/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace`；未覆盖旧repair/workspace、未部署模型或正式数据。来源快照qualification/clock_sources.zip为264850字节、SHA256 c210be20811a9ea321b66a05a0611d8797dd9dbd82eba12bf0008e35a0f92cd5，作为attempt08复现源码保留；两端逐文件身份一致。七份CPU原件8611字节按[接收清单](../reports/documentation/20261019/optuna_budget/qualification/clock_receive_manifest.json)SCP回传逐项核验，外层8秒、累计116/300，见[处置](../reports/documentation/20261019/optuna_budget/clock_disposition.zh.txt)。仅三项定向手写CPU、0 optimizer/GPU/正式调用；原生及当前外审输入包不改，新证据尚未外发。新材料仅本地Git，大清理周期不变。

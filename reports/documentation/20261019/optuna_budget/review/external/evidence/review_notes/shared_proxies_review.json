@@ -1,0 +1,149 @@
+{
+  "scope": "Static saved-field arithmetic only; no project import/evaluation or native execution",
+  "basis": {
+    "R": 3.146804547868669,
+    "r_I_by_arm": {
+      "H_pos": 3.146804547868669,
+      "S": 3.1226372071541846,
+      "S_pos": 3.12859728327021
+    },
+    "W_I_by_arm": {
+      "H_pos": 1304378571,
+      "S": 1304378315,
+      "S_pos": 1304378379
+    },
+    "T_C_wrapper": {
+      "exit_code": 0,
+      "wall_ns": 13257703867,
+      "charged_seconds": 14,
+      "cumulative_charged_seconds": 14
+    },
+    "T_F_wrapper": {
+      "exit_code": 0,
+      "wall_ns": 25194099902,
+      "charged_seconds": 26,
+      "cumulative_charged_seconds": 108
+    },
+    "historical_wrapper_seconds": 12661.0,
+    "historical_final_update_elapsed_seconds": 12451.78039111523,
+    "historical_final_update_line": 107,
+    "T_tail": 209.21960888477042,
+    "console_json_records": 52,
+    "console_nonempty_nonjson_lines": [
+      1,
+      2,
+      55,
+      56
+    ]
+  },
+  "shared": {
+    "control": {
+      "independent_seconds": 450.7124093081802,
+      "proposal_seconds": 450.7124093081802,
+      "difference_seconds": 0.0,
+      "cap_seconds": 900,
+      "cap_minus_projection": 449.2875906918198
+    },
+    "evaluation": {
+      "independent_seconds": 2832.0237022807123,
+      "proposal_seconds": 2832.0237022807123,
+      "difference_seconds": 0.0,
+      "cap_seconds": 3600,
+      "cap_minus_projection": 767.9762977192877
+    },
+    "analysis": {
+      "independent_seconds": 182.5,
+      "proposal_seconds": 182.5,
+      "difference_seconds": 0.0,
+      "cap_seconds": 600,
+      "cap_minus_projection": 417.5
+    }
+  },
+  "shared_sum": 3465.2361115888925,
+  "shared_cap_sum": 5100,
+  "payload_identity_checks": [
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01.wrapper.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01/unittest.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07.wrapper.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07/unittest.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.wrapper.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.console.txt",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "scripts/step28_replay_diagnostics.py",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "scripts/step28_optuna_run.py",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "scripts/step28_optuna_search.py",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "scripts/step28_optuna_control.py",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "scripts/step28_optuna_verify.py",
+      "size_equal": true,
+      "sha256_equal": true
+    },
+    {
+      "path": "tests/test_step28_optuna.py",
+      "size_equal": true,
+      "sha256_equal": true
+    }
+  ],
+  "workload_counts": {
+    "search_weight_hashes": 72,
+    "joint_endpoint_weight_hashes": 18,
+    "joint_metric_sets": 54,
+    "joint_diagnostic_captures": 108,
+    "tail_proxy_includes_historical_capture_evaluations_per_new_run": 24
+  },
+  "exceptions": [
+    {
+      "id": "SP_EXEC_01",
+      "operation": "First stdlib arithmetic pass attempted json.loads on every nonempty historical console line",
+      "exception": "json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "script_line": 12,
+      "exit_code": 1,
+      "effect": "Aborted before output files were written; no project module or scientific calculation executed",
+      "correction": "Only parse log lines whose first nonspace character is {; retain excluded line numbers"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+单 run 子任务：不存在路径检索错误的原始可见记录
+
+记录性质：依据本轮已经返回的工具消息转录；没有重现故障，没有再次运行该检索。
+
+工具：functions.exec 内的 tools.exec_command
+cwd / workdir：/workspace/scratch/a8b291861509/review_input
+
+实际 cmd（原三行整体提交，保留换行）：
+rg -n 'def schedule|epochs|fit_per_domain|groups_per_domain|microbatch|token_budget|maximum_records|8|class Memory|def add_stage|class Group' scripts/step28_bge_continual.py schema/step28_bge_continual_policy.json schema/step28_alias_ranking_policy.json scripts/step28_group_continual_data.py scripts/step28_chinese_base.py scripts/step28_bge_continual_data.py
+rg --files scripts | rg 'data\.py$|core\.py$|state|persist'
+nl -ba scripts/step28_optuna_run.py | sed -n '260,342p'
+
+原 tools.exec_command 返回的可见元数据：
+chunk_id: ea33c7
+wall_time_seconds: 0.79699737
+exit_code: 0
+original_token_count: 3775
+
+原工具输出中逐字可见的错误文本（两行）：
+rg: scripts/step28_group_continual_data.py: No such file or directory (os error 2)
+rg: scripts/step28_bge_continual_data.py: No such file or directory (os error 2)
+
+退出码解释与缺失：上述 exit_code=0 是工具对整个三行 shell 命令的返回值；后续两行仍输出了有效的文件清单与源码。首行 rg 的单独退出码没有被原命令捕获、没有被工具另行返回，因此本记录不知道其单独退出码，不猜测为任何值。这里仅转录必要错误片段及命令/元数据，没有将同一工具结果其余成功匹配和源码输出全部复制到此失败记录。
+
+后续处置：原失败之后已沿实际 import 定位 scripts/step28_continual_population_data.py，并在先前读源码步骤中补齐必要范围。不存在项目执行失败；此次为隔离工作区静态文件检索中的两个候选路径不存在。此记录本身没有新增项目核验。
