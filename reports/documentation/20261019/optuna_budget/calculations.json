@@ -1,0 +1,245 @@
+{
+  "status": "PROPOSED_NOT_AUTHORIZED_OR_FORMALLY_QUALIFIED",
+  "date": "2026-10-19",
+  "scope": "Saved-field arithmetic and static source inspection only; no new scientific execution",
+  "formula": "P=1.25*(288*(t_A+t_B)+1446*v+36*h+L+2*(s_F+r_F+s_I+r_I)+1800)",
+  "counts": {
+    "optimizer_updates": 576,
+    "gradient_group_presentations": 864,
+    "epoch_A_forwards": "6*(48+40)=528",
+    "epoch_B_forwards": "6*(48+6+40+6)=600",
+    "endpoints_forwards": "2*3*(12+40)=312",
+    "memory_birth_forwards": 6,
+    "total_extra_group_forwards": 1446,
+    "residual_groups": 36
+  },
+  "arms": {
+    "S": {
+      "measurements": {
+        "L": 5.4118858417496085,
+        "W_F": 3904680645,
+        "W_I": 1304378315,
+        "h": 0.002505871932953596,
+        "r_F": 11.605019561946392,
+        "r_I": 3.1226372071541846,
+        "s_F": 11.445843072142452,
+        "s_I": 2.8263791548088193,
+        "t_A": 12.315755436196923,
+        "t_B": 22.454216088168323,
+        "v": 2.431383382063359
+      },
+      "training_seconds": 10013.751799017191,
+      "additional_forward_residual_seconds": 3515.8705818532035,
+      "load_io_seconds": 63.411643833853304,
+      "unmeasured_allowance_seconds": 1800,
+      "factor": 1.25,
+      "search_projection_seconds": 19241.29253088031,
+      "replication_projection_seconds": 19241.29253088031,
+      "run_cap_seconds": 21600,
+      "run_margin_seconds": 2358.7074691196904,
+      "search_12_projection_seconds": 230895.51037056372,
+      "replication_3_projection_seconds": 57723.87759264093,
+      "search_arm_cap_seconds": 259200,
+      "replication_arm_cap_seconds": 64800
+    },
+    "S_pos": {
+      "measurements": {
+        "L": 2.475694051012397,
+        "W_F": 3904680709,
+        "W_I": 1304378379,
+        "h": 0.0025738640688359737,
+        "r_F": 11.21121586393565,
+        "r_I": 3.12859728327021,
+        "s_F": 8.567022064700723,
+        "s_I": 2.806131788995117,
+        "t_A": 11.331171789206564,
+        "t_B": 22.73772803787142,
+        "v": 2.3094238750636578
+      },
+      "training_seconds": 9811.84315019846,
+      "additional_forward_residual_seconds": 3339.519582448527,
+      "load_io_seconds": 53.901628052815795,
+      "unmeasured_allowance_seconds": 1800,
+      "factor": 1.25,
+      "search_projection_seconds": 18756.580450874753,
+      "replication_projection_seconds": 18756.580450874753,
+      "run_cap_seconds": 21600,
+      "run_margin_seconds": 2843.4195491252467,
+      "search_12_projection_seconds": 225078.96541049704,
+      "replication_3_projection_seconds": 56269.74135262426,
+      "search_arm_cap_seconds": 259200,
+      "replication_arm_cap_seconds": 64800
+    },
+    "H_pos": {
+      "measurements": {
+        "L": 2.4633675357326865,
+        "W_F": 3904680901,
+        "W_I": 1304378571,
+        "h": 0.006201939657330513,
+        "r_F": 11.061484342906624,
+        "r_I": 3.146804547868669,
+        "s_F": 8.568925621919334,
+        "s_I": 2.842291580978781,
+        "t_A": 11.329518273007125,
+        "t_B": 22.668693653773516,
+        "v": 2.3212430011481047
+      },
+      "training_seconds": 9791.485034912825,
+      "additional_forward_residual_seconds": 3356.7406494878232,
+      "load_io_seconds": 53.7023797230795,
+      "unmeasured_allowance_seconds": 1800,
+      "factor": 1.25,
+      "search_projection_seconds": 18752.41008015466,
+      "replication_projection_seconds": 18752.41008015466,
+      "run_cap_seconds": 21600,
+      "run_margin_seconds": 2847.589919845341,
+      "search_12_projection_seconds": 225028.9209618559,
+      "replication_3_projection_seconds": 56257.23024046398,
+      "search_arm_cap_seconds": 259200,
+      "replication_arm_cap_seconds": 64800
+    }
+  },
+  "shared": {
+    "model": "Explicit conservative proxies, not measured whole C/E/A durations or strict worst-case proofs",
+    "inference_restore_proxy_seconds": 3.146804547868669,
+    "historical_tail_seconds": 209.21960888477042,
+    "control": {
+      "formula": "1.25*(72*max_r_I + 14 + 120)",
+      "measured_or_saved_basis": "72 search weight hashes; native inference restore as per-weight I/O proxy; attempt01 entire measured wrapper 14s includes 36 real SQLite ask/tell handwritten slots",
+      "unmeasured_reserve_seconds": 120,
+      "projected_seconds": 450.7124093081802,
+      "hard_cap_seconds": 900
+    },
+    "evaluation": {
+      "formula": "1.25*(9*historical_tail + 18*max_r_I + 26 + 300)",
+      "measured_or_saved_basis": "Historical final B_H_pos update to full two-arm wrapper exit, including final endpoint and all old result evaluation; conservatively use whole two-arm tail for each of nine runs; add eighteen weight identity reads and entire attempt07 wrapper for new aggregate paths",
+      "unmeasured_reserve_seconds": 300,
+      "projected_seconds": 2832.0237022807123,
+      "hard_cap_seconds": 3600
+    },
+    "analysis": {
+      "formula": "1.25*(26 + 120)",
+      "measured_or_saved_basis": "Entire attempt07 wrapper includes actual independent analysis over 45 handmade saved-result slots; diagnostics are handwritten fixtures, not full original label-level audit",
+      "unmeasured_reserve_seconds": 120,
+      "projected_seconds": 182.5,
+      "hard_cap_seconds": 600
+    },
+    "sum_projected_seconds": 3465.2361115888925,
+    "sum_hard_caps_seconds": 5100
+  },
+  "budgets": {
+    "cpu_cap_seconds": 300,
+    "cpu_used_seconds": 108,
+    "cpu_remaining_seconds": 192,
+    "native_cap_seconds": 1800,
+    "native_used_outer_seconds": 876,
+    "native_inner_record_seconds": 875,
+    "native_new_attempts_authorized": 0,
+    "search_runs": 36,
+    "replication_runs": 9,
+    "run_cap_seconds": 21600,
+    "search_cap_seconds": 777600,
+    "replication_cap_seconds": 194400,
+    "shared_cap_seconds": 5100,
+    "total_hard_cap_seconds": 979200,
+    "total_hard_cap_hours": 272,
+    "prior_total_seconds": 410400,
+    "increase_seconds": 568800,
+    "increase_hours": 158,
+    "actual_qualification_charged_seconds": 984,
+    "nominal_total_minus_already_charged_seconds": 978216,
+    "important": "Remaining total is not fungible; unused native allowance is not retry or extra trial permission"
+  },
+  "projections": {
+    "one_each_sum_seconds": 56750.28306190972,
+    "search_seconds": 681003.3967429167,
+    "replication_seconds": 170250.84918572917,
+    "all_45_seconds": 851254.2459286458,
+    "with_shared_proxies_and_full_qualification_reserve_seconds": 856819.4820402347,
+    "with_full_shared_and_qualification_caps_seconds": 858454.2459286458,
+    "with_full_caps_hours": 238.45951275795719,
+    "hard_cap_minus_conservative_full_reserves_seconds": 120745.75407135417
+  },
+  "sources": [
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+      "bytes": 60298,
+      "sha256": "fc2c4bad7be704d86cd7cfd95e7f24ef4bc8e5612fd51c90d32606f1c13d4fcd"
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native.wrapper.txt",
+      "bytes": 53,
+      "sha256": "00ec8b05df881f39fbfb55fd0bd28a46613f4e3285dcce6e6120aa2b7e9ad92e"
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01.wrapper.txt",
+      "bytes": 81,
+      "sha256": "8cd32e4fce9d340ee25284dd52b087f038c959cc955da1592f727e6b80e78d58"
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/qualification/attempt01/unittest.txt",
+      "bytes": 531,
+      "sha256": "41205194c0069ca78416297353ad84c27fedd922ec0f9ab1564b2e9b31b60a50"
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07.wrapper.txt",
+      "bytes": 82,
+      "sha256": "df5fd6ba002413d368d91147cb8d2d939ffb32a5b519fb1e593696fbdb3ff18e"
+    },
+    {
+      "path": "reports/documentation/20261018/optuna_implementation/repair/qualification/attempt07/unittest.txt",
+      "bytes": 506,
+      "sha256": "1b8b1f9ed865cea19c6fe7cb00b2c14429e166c46deea13348d15ba64b707fd7"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.wrapper.txt",
+      "bytes": 64,
+      "sha256": "73722860214df31b1a38e6ab298acd7159c1ea747c557f7808e9ecec00df3128"
+    },
+    {
+      "path": "reports/seller_alias_continual/20261018/positive_ranking_result/job.console.txt",
+      "bytes": 24451,
+      "sha256": "95052c830656c0b47f296897274a3c7d14aaaa8ebc865f7b877312fbd9bb4396"
+    },
+    {
+      "path": "scripts/step28_g_half_run.py",
+      "bytes": 43378,
+      "sha256": "e084eb141dee5e815ead59bb70e7d8c3dd5b1b4f7c64fe609c5635cc002708f5"
+    },
+    {
+      "path": "scripts/step28_replay_diagnostics.py",
+      "bytes": 11971,
+      "sha256": "8b09a00bcd973045d198e1ca305afe55030d21a953cc1334d457dde89974c2ea"
+    },
+    {
+      "path": "scripts/step28_optuna_run.py",
+      "bytes": 25596,
+      "sha256": "e3abfcbf05fbb9e142393f4084fa2b48df7895d79344d48f7a6d616a5ea8d1dc"
+    },
+    {
+      "path": "scripts/step28_optuna_search.py",
+      "bytes": 16395,
+      "sha256": "7000e4f8e74a94a3235a2a22a8fc66bba27122168b0b26228eb0bc8bcc028f8d"
+    },
+    {
+      "path": "scripts/step28_optuna_control.py",
+      "bytes": 10087,
+      "sha256": "cb493dadabf2a43c3fe9967b995f8775892a1f837762826d8b35ba039d7e50de"
+    },
+    {
+      "path": "scripts/step28_optuna_verify.py",
+      "bytes": 24617,
+      "sha256": "c4e2b816548ce16de49fd46e5aa66ed01000346a37e6435021507aa85014105d"
+    },
+    {
+      "path": "scripts/step28_record_replay.py",
+      "bytes": 15543,
+      "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d"
+    },
+    {
+      "path": "tests/test_step28_optuna.py",
+      "bytes": 31830,
+      "sha256": "a05d33a2411c897b0e04a15d11c3f2b2c823fde1d58cb75e0b2abf754addf739"
+    }
+  ]
+}

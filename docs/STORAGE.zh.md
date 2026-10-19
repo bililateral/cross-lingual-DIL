@@ -8,6 +8,10 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-19 Optuna预算修订静态材料
+
+新提案、保存字段算术和来源身份、独立主审及定向外审请求保存在reports/documentation/20261019/optuna_budget。当前只Windows文件管理/算术，未同步Linux或改生产源码，不声称已实施。具体静态包[optuna_budget_review.zip](../reports/documentation/20261019/optuna_budget/review/optuna_budget_review.zip)377084字节/72成员，SHA256 58c4e04cc7f397fda0909331f6e6eabd9b8e63090cfa6b3a1efcbdd7b786d1b5；71载荷1087615字节及清单逐项验收。包含当前48绑定来源、原生/CPU必要小证据和历史预算/实现审查背景，不含正式文本/标签原表、权重、Memory或凭据。具体包待授权，尚无浏览器上传/审查会话；为本轮确切待审用途保留，不额外复制旧ZIP或模型，新材料只本地Git。
+
 ## 2026-10-19 Optuna原生完成证据回传
 
 原生三臂完成、正式时间门失败后，28份必要载荷264917字节按[清单](../reports/documentation/20261018/optuna_implementation/repair/native_completed/native_receive_manifest.json)SCP回传并逐项核大小/SHA；运输ZIP188386字节，SHA256 1211a27666bb6b2b0bbd5708dbe9e1d35ac8d0a4c15a6bb2fc7e5d6cf88d1b0e。Windows统一保管在repair/native_completed，清单相对该目录；Linux原件在repair，清单相对该目录。此映射保留原始qualification/native_wait_status.json启动快照，完成快照另存，不覆盖旧dispatch_manifest绑定原件。48科研来源、2调度源码和4门依赖均与原门一致。
