@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-19 Optuna原生完成证据回传
+
+原生三臂完成、正式时间门失败后，28份必要载荷264917字节按[清单](../reports/documentation/20261018/optuna_implementation/repair/native_completed/native_receive_manifest.json)SCP回传并逐项核大小/SHA；运输ZIP188386字节，SHA256 1211a27666bb6b2b0bbd5708dbe9e1d35ac8d0a4c15a6bb2fc7e5d6cf88d1b0e。Windows统一保管在repair/native_completed，清单相对该目录；Linux原件在repair，清单相对该目录。此映射保留原始qualification/native_wait_status.json启动快照，完成快照另存，不覆盖旧dispatch_manifest绑定原件。48科研来源、2调度源码和4门依赖均与原门一致。
+
+原生结果、手写诊断矩阵、临时状态身份/退休原件、控制台、外层计时及完成核对齐全；不含正式数据/标签、模型或Memory载荷。现场三臂临时权重无残留、active_wait.py已自删、PID963024退出，复现源码继续保留，不重建监听。两端临时native_receive.zip在验收后精确清理；必要清单和原件保留，新材料仅本地Git，不改变大清理周期。
+
 ## 2026-10-19 Optuna修复、CPU与Linux一次性监听
 
 修复使用独立`/home/yongpeng/cross-lingual/reports/documentation/20261018/optuna_implementation/repair/workspace`；qualification与workspace并列。48份科学来源及2份调度源码逐项两端一致；52份历史已开放结果和8份直接来源核验，既有BGE只建立获准原生所需链接，未同步正式文本/标签或旧Memory。CPU和部署13个载荷311018字节按[接收清单](../reports/documentation/20261018/optuna_implementation/repair/receive_manifest.json)核验；attempt07_sources.zip是必要源码冻结快照，继续保管，非冗余运输包。
