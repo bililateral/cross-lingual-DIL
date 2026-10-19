@@ -407,6 +407,44 @@ class OptunaTests(unittest.TestCase):
         import time
         import step28_optuna_search as search
         out=self.temporary()
+        # Run the real launcher and E/A resource context under a seven-day-old parent clock.
+        stale=str(time.time()-7*86400)
+        child_code="""import json,os,time
+before_import=time.time()
+time.sleep(.05)
+import step28_optuna_run as run
+from pathlib import Path
+root=Path(ROOT)
+with run.shared_resources(root,PHASE) as budget:
+    age=budget.snapshot()['elapsed_seconds']
+    assert age>=.05, 'Import/startup time was discarded'
+    budget.started-=budget.limits['maximum_gpu_stage_seconds']+1
+    try:budget.check()
+    except RuntimeError:expired=True
+    else:raise AssertionError('Own elapsed limit was disabled')
+    budget.started+=budget.limits['maximum_gpu_stage_seconds']+1
+print(json.dumps(dict(epoch=float(os.environ['RECORD_REPLAY_STARTED_EPOCH']),before_import=before_import,
+    age=age,own_limit_rejected=expired)))
+"""
+        clock_evidence={}
+        env={**os.environ,"RECORD_REPLAY_STARTED_EPOCH":stale,"CUDA_VISIBLE_DEVICES":"",
+             "PYTHONPATH":str(data.ROOT/"scripts")}
+        for phase in ("evaluation","analysis"):
+            root=self.temporary()
+            code=child_code.replace("ROOT",repr(str(root))).replace("PHASE",repr(phase))
+            before=time.time()
+            search.launch([sys.executable,"-c",code],out/(phase+"_clock.log"),20,env)
+            row=json.loads((out/(phase+"_clock.log")).read_text().splitlines()[-1])
+            self.assertGreaterEqual(row["epoch"],before)
+            self.assertLessEqual(row["epoch"],row["before_import"])
+            self.assertTrue(row["own_limit_rejected"])
+            clock_evidence[phase]=row
+        self.assertEqual(env["RECORD_REPLAY_STARTED_EPOCH"],stale)
+        # Bypassing the launch reset reproduces the original failure before shared work.
+        negative=search.subprocess.run([sys.executable,"-c",code],env=env,capture_output=True,text=True,timeout=20)
+        self.assertNotEqual(negative.returncode,0)
+        self.assertIn("Approved cumulative budget exceeded",negative.stderr)
+        (out/"inherited_clock_negative.txt").write_text(negative.stderr)
         worker_pid=out/"worker.pid"
         code="import os,time; p=os.fork(); " + "open("+repr(str(worker_pid))+",'w').write(str(os.getpid())) if p==0 else None; time.sleep(10)"
         with self.assertRaises(TimeoutError):search.launch([sys.executable,"-c",code],out/"worker.log",.3,os.environ.copy())
@@ -439,7 +477,8 @@ exec(compile(SOURCE,'actual_controller_prefix','exec'),{'__name__':'__main__'})
                 return original(path,value)
             output=io.StringIO()
             try:
-                with contextlib.redirect_stdout(output),mock.patch.object(data,"write_json",side_effect=slow_write):
+                with contextlib.redirect_stdout(output),mock.patch.object(data,"write_json",side_effect=slow_write), \
+                        mock.patch.dict(os.environ,{"RECORD_REPLAY_STARTED_EPOCH":stale}):
                     search.finalize(ledger,root,True,None,"handwritten failure" if failure else None,{})
             finally:signal.setitimer(signal.ITIMER_REAL,0)
             receipt=json.loads(output.getvalue().split("FINAL_ACCOUNTING ",1)[1])
@@ -447,4 +486,5 @@ exec(compile(SOURCE,'actual_controller_prefix','exec'),{'__name__':'__main__'})
             self.assertEqual(receipt["used"]["search"],0)
             elapsed[str(failure)]=receipt["used"]["control"]
         self.evidence("repair_controller",dict(own_worker_release=cleanup,pre_import_hard_deadline=True,
-            successful_and_failed_final_writes_control_seconds=elapsed,actual_optimizer_calls=0))
+            successful_and_failed_final_writes_control_seconds=elapsed,shared_child_clocks=clock_evidence,
+            inherited_campaign_clock_negative_rejected=True,actual_optimizer_calls=0))

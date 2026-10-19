@@ -156,6 +156,8 @@ def launch(command,log,seconds,env):
     """Bound the owned process group including import, exit and worker release."""
     started=time.monotonic();deadline=started+seconds
     with log.open("x",encoding="utf-8") as stream:
+        # Every child owns its clock, including E/A imports; never inherit campaign age.
+        env={**env,"RECORD_REPLAY_STARTED_EPOCH":str(time.time())}
         child=subprocess.Popen(command,stdout=stream,stderr=subprocess.STDOUT,env=env,start_new_session=True)
         try:
             while True:
@@ -223,9 +225,8 @@ def execute(job,gate_path):
                 spec_path=job/(spec.run_id+".json");data.write_json(spec_path,spec.identity())
                 access_total(job)
             with charged(ledger,spec.phase,arm=spec.arm,run_id=spec.run_id) as seconds:
-                env={**os.environ,"RECORD_REPLAY_STARTED_EPOCH":str(time.time())}
                 receipt=launch([sys.executable,str(data.ROOT/"scripts/step28_optuna_run.py"),"--job",str(path),
-                    "--spec",str(spec_path),"--gate",str(gate_path)],job/(spec.run_id+".console.txt"),seconds,env)
+                    "--spec",str(spec_path),"--gate",str(gate_path)],job/(spec.run_id+".console.txt"),seconds,os.environ.copy())
                 result=data.read_json(path/"completion.json")
                 if result.get("source_files")!=run.sources() or (path/"failure.json").exists():raise ValueError("Invalid child completion")
                 if spec.phase=="search":
@@ -259,7 +260,8 @@ def execute(job,gate_path):
         with charged(ledger,"control"):
             access=access_total(job)
             if access!=dict(train=45,valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
-            run.Budget(job,300,campaign=job).check(force=True)
+            # C remains cumulative in Ledger and SIGALRM; this is a local resource scan.
+            run.Budget(job,ledger.remaining("control"),campaign=job,started=time.monotonic()).check(force=True)
     except BaseException:
         error=traceback.format_exc();ledger.failed=True
         raise
@@ -284,7 +286,7 @@ def finalize(ledger,job,owned,search,error,access):
             else:
                 data.write_json(job/"completion.json",dict(status="COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS",access=access,source_files=run.sources()))
             data.write_json(job/"ledger.json",dict(**ledger.snapshot(),terminal_accounting="Final stdout record includes this file write"))
-            run.Budget(job,300,campaign=job).check(force=True)
+            run.Budget(job,ledger.remaining("control"),campaign=job,started=time.monotonic()).check(force=True)
     except BaseException:
         ledger.failed=True
         if owned and (job/"completion.json").exists():(job/"completion.json").unlink()

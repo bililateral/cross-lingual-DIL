@@ -73,8 +73,10 @@ def runtime():
 
 
 class Budget(single.legacy.Budget):
-    def __init__(self, root, seconds=9000, *, campaign=None):
+    def __init__(self, root, seconds=9000, *, campaign=None, started=None):
         super().__init__(root)
+        if started is not None:
+            self.started = started
         self.limits = {**runtime(), "maximum_gpu_stage_seconds": seconds}
         self.campaign = campaign if campaign is not None else root.parent
 

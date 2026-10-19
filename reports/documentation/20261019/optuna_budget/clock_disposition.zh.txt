@@ -1,0 +1,16 @@
+Optuna共享阶段起点继承缺陷：独立处置
+2026-10-19，用户指出共享Budget可能把campaign起点带入E/A，导致把此前多天算入3600/600秒。此项在最新已批准预算/计时最小修复和累计CPU300秒范围内直接处理，不新增预算、候选或正式访问。
+
+判断：具体执行缺陷成立。step28_record_replay_run.Budget.__init__用RECORD_REPLAY_STARTED_EPOCH把monotonic起点向前平移；Optuna Budget继承该行为。原trial调用单独刷新环境起点，但E/A的launch只复制os.environ并隐藏GPU；若正式控制器继承campaign起点，shared_resources第一次check就误超时。execute末尾和finalize中的控制资源检查也直接继承同一旧环境。此前N02/N08检查没有注入陈旧campaign起点，不能证明这条路径正确；原通过原件保留，覆盖缺口在此补正。缺陷在已送审72成员原包中仍存在，外审回收时必须独立对应，不把本次CPU证据冒称外审已认可。
+
+最小修复：
+1. step28_optuna_search.launch在Popen前复制传入env并设置本子进程的RECORD_REPLAY_STARTED_EPOCH；train/rep/E/A均经过该实际入口，删除trial调用点重复设置。父进程环境不变，导入、子进程及所属worker退出仍由原launch/父interval完整计费。
+2. Optuna Budget允许显式传入monotonic起点，仅两处控制收尾资源扫描使用局部起点和ledger.remaining(control)。C累计开销、导入、间隙、最终写盘仍由原Ledger/SIGALRM约束；没有把整个C账清零或用campaign日历耗时替代它。
+3. 没有在shared_resources内部重置Budget起点，避免漏计子进程导入/初始化；原预算硬限/失败停止、磁盘/RSS检查保持。科学目标、梯度、优化器、训练日程、评分及模型恢复无变更。
+
+核验：新的隔离Linux工作区reports/documentation/20261019/optuna_budget/workspace，现有py310、单CPU/单线程、GPU隐藏，仅手写输入；未部署BGE、正式数据或旧Memory。48来源核验，其中仅optuna_run、optuna_search、test_step28_optuna三个文件不同于原native来源，其余45逐字节一致。旧repair/workspace和原生原件不覆盖、不改标当前。
+attempt08三项全部通过：repair_controller_boundaries、repair_resources_and_anchor、disjoint_budgets_and_real_launcher_failure；0失败/错误/跳过，0 optimizer调用。实际子进程E/A从各自launch开始，进入共享检查时约1.109421/1.099971秒（含导入和人为50ms前置等待）。每阶段人为推进自身已耗时到限额以上，检查仍拒绝；绕开launch刷新、直接继承七天前起点的独立负例返回非0并含原预算超限异常，证明遗漏关键修复会失败。负例stderr由测试断言验证，临时文件随fixture清理，未冒称已保留该独立stderr原件。父env未被更改。成功/失败finalize在相同旧env下均通过，慢写实际C计费0.312464/0.041744秒；既有own-worker退出、导入前硬限、共享强制最终资源扫描、失败及等待分账反例继续通过。
+
+外层wrapper wall_ns=7152398356，7.152398356秒，向上计8秒；CPU由108增至116/300，剩余184秒，失败旧账不清零。原生仍876/1800及18真实调用，本次GPU调用0。CPU report内退出前数值不替代wrapper。七份原件共8611字节按clock_receive_manifest逐项大小/SHA回传核对；当前48来源与clock_sources和attempt08对应，来源快照clock_sources.zip保留用于重放。
+
+裁决：本项起点继承实现缺陷已修复，所需定向CPU证据充分，不扩展计时框架或全仓回归。CPU证据使用当前生产仍为旧E2400/C300等数值，修复按阶段实际limit通用验证；272小时新21600/C900/E3600/A600接线、具体原生复用门及完整外审/独立主审尚待完成，不能据此签发正式gate或启动训练。正式0次，不重跑原生，不重复询问已获授权；完整预算实施应从CPU116继续，并把本项处置纳入当前外审主审。
