@@ -17,6 +17,9 @@
 固定52份S/H已开放基线、8份直接来源及9份固定摘要/锚点文件已核对；首次机械部署因Linux主目录缺S0摘要而中止，未开始训练/CPU/数据访问，随后由已核Windows归档SCP补齐，保留deployment_failure与实际deployment原件。只建立7个合同允许的train/development及公开身份文件链接和既有BGE链接，不链接heldout/owners/private或旧Memory。启动后新权重和Memory仅留Linux，搜索权重按每run成功完整核对后留证清理，复验18端点保留；活动作业载荷不清理。
 
 当前启动状态与PID只看[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。运输formal_deployment、anchor_sources及两份receive ZIP在核验后按精确路径清理，来源快照及门依赖保留；本轮只本地Git，不改变10月23日大清理周期。
+
+18:15—18:17状态检查发现正式作业已于16:38因第4个派发的GPU资源预检失败停止。必要停止证据保管于[resource_stop](../reports/documentation/20261019/optuna_budget/execution/resource_stop/manifest.json)：28载荷218477字节（加清单共29成员），含原日志、退出/失败/收费、只读核对的停止SQLite、三个完成/访问/盲门/退休回执及现场观测；从Linux原件SCP回传逐项大小/SHA一致。运输ZIP为39874字节、SHA256 beb473fc5ba9a88412f56b190efb445b1dc1b6355bfaaeaaf222bf0dda83d1e2，验收后两端删除。原job、全部结果/分数/Memory、绑定来源和失败账保留；本轮不载模、不重算、不新建监听、不重启，不删除科研载荷。三个成功搜索的6端点权重已由原控制器按既定生命周期删除，非本轮人工操作；恢复权限与最新阻断只见交接顶部。
+
 ## 2026-10-19 Optuna共享起点修复与CPU证据
 
 只同步48份当前科学来源至新`/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace`；未覆盖旧repair/workspace、未部署模型或正式数据。来源快照qualification/clock_sources.zip为264850字节、SHA256 c210be20811a9ea321b66a05a0611d8797dd9dbd82eba12bf0008e35a0f92cd5，作为attempt08复现源码保留；两端逐文件身份一致。七份CPU原件8611字节按[接收清单](../reports/documentation/20261019/optuna_budget/qualification/clock_receive_manifest.json)SCP回传逐项核验，外层8秒、累计116/300，见[处置](../reports/documentation/20261019/optuna_budget/clock_disposition.zh.txt)。仅三项定向手写CPU、0 optimizer/GPU/正式调用；原生及当前外审输入包不改，新证据尚未外发。新材料仅本地Git，大清理周期不变。

@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace/scripts/step28_optuna_run.py", line 448, in <module>
+    execute_trial(args.job,method.TrialSpec.from_dict(data.read_json(args.spec)),args.gate)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace/scripts/step28_optuna_run.py", line 282, in execute_trial
+    resources = preflight()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_budget/workspace/scripts/step28_record_replay_verify.py", line 40, in preflight
+    raise ValueError(f"Resource gate failed: gpu={gpu}, apps={apps}, host={available}, jobs={jobs}")
+ValueError: Resource gate failed: gpu=0, GPU-47d540a1-1090-f2a1-7faa-793f35cca97d, 32607, 10863, 21247, apps=1039133, python, 21172, host=252887396352, jobs=[]
+{"status": "FAILED_OWN_GROUP_CLEANUP", "leader_exited": true, "residual_pids": [], "resources_released": true, "child_seconds": 1.8343831226229668, "overrun_seconds": 0.0}
