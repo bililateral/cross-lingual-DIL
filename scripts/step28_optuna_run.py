@@ -33,7 +33,7 @@ CPU_TESTS=("test_actual_objective_vjp_lr_and_rejected_omissions", "test_seeds_ow
     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
     "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
     "test_repair_controller_boundaries", "test_budget_amendment_gate",
-    "test_resource_wait_and_admission", "test_specific_resource_recovery")
+    "test_resource_wait_and_admission", "test_specific_resource_recovery", "test_specific_reboot_recovery")
 
 
 def sources():
@@ -56,6 +56,7 @@ def sources():
     paths.update(data.ROOT/p for p in ("scripts/run_step28_optuna_cpu_linux_20261018.sh",
         "scripts/step28_optuna_formal_wait.py",
         "reports/documentation/20261019/optuna_recovery/scope.zh.txt",
+        "reports/documentation/20261021/optuna_reboot/scope.zh.txt",
         "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
         "reports/documentation/20261019/optuna_budget/authorization.json"))
     return [data.record(p, data.ROOT) for p in sorted(paths)]

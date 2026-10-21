@@ -8,6 +8,12 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-21 Optuna服务器重启恢复
+
+当前workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`，启动和首更新在并列execution。旧optuna_recovery/resume_workspace的4,322文件/1,442,097,470字节按[重启恢复绑定](../reports/documentation/20261021/optuna_reboot/recovery_bound.json)冻结，包括25次完成结果、SQLite残留RUNNING和中断S第9次的A推理权重/Memory；没有载入、覆盖或删除旧状态。新workspace直接复制25次结果用于原45轨迹收尾，未重训重评；新中断尝试访问记录独立留账。新生成的活动模型和Memory继续仅留Linux。
+
+本次用户再次明确免审，见[原话及范围](../reports/documentation/20261021/optuna_reboot/waiver.json)；没有外发新包。CPU attempt13/14分别保留原件及54来源ZIP，均六项通过，外层各15秒，累计188/300；原18原生/876秒复用。初稿C补计1秒被主审核对为遗漏未结控制区间，正式前修正为保守4秒，attempt13原来源保持。详细费用及工程边界见[独立主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)。启动/正式门/实际访问和预算小原件已SCP回传，具体身份在execution/receive_manifest.json；所有正式文本标签原表、权重和Memory载荷均未回传。本轮只作本地Git交付，旧公开推送范围不泛化；局部运输件清理不重置10月23日周期。
+
 ## 2026-10-19 Optuna资源恢复与9GiB准入修订
 
 当前运行在`/home/yongpeng/cross-lingual/reports/documentation/20261019/optuna_recovery/resume_workspace`，启动/观测在并列resume_execution。原optuna_budget/workspace的三完成结果和资源FAIL保持；原optuna_recovery/workspace及execution保留18:52零派发来源排序失败，未覆盖其门和源码。当前53来源依Linux attempt12原顺序，资格累计158/300；原18调用/876秒复用。旧三个run结果复制到新job用于完整45轨迹收尾，未重训重评；原6权重已退休，未恢复权重或重新加载旧Memory。

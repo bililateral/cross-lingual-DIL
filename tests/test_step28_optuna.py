@@ -259,7 +259,7 @@ class OptunaTests(unittest.TestCase):
         reuse=dict(status="ACCEPTED_BUDGET_CLOCK_ONLY",source_files=current,changed_paths=[source.relative_to(out).as_posix()],
             original_result=save("native.json",native),original_wrapper=wrapper("native.wrapper",876),original_archive=data.record(archive,out))
         tests=["test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate",
-               "test_resource_wait_and_admission","test_specific_resource_recovery"]
+               "test_resource_wait_and_admission","test_specific_resource_recovery","test_specific_reboot_recovery"]
         cpu=dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,cumulative_charged_seconds=124,unresolved_checks=[],
             qualified_tests=list(run.CPU_TESTS),prior_gate=save("prior.json",dict(source_files=before,cumulative_charged_seconds=108,qualified_tests=list(run.CPU_TESTS[:-1]))),
             new_result=save("cpu.json",dict(status="PASS_HANDWRITTEN_ONLY",source_files=current,prior_charged_seconds=116,qualified_tests=tests,unresolved_checks=[])),
@@ -665,6 +665,80 @@ exec(compile(SOURCE,'actual_controller_prefix','exec'),{'__name__':'__main__'})
         self.evidence("resource_admission",dict(check_seconds=4,calendar_sleep_seconds=60,
             production_pre_data_exit=75,model_constructed=False,formal_data_read=False,
             same_candidate_after_race=True,ordinary_failure_stops=True,actual_optimizer_calls=0))
+
+    def test_specific_reboot_recovery(self):
+        import json
+        import sqlite3
+        import step28_optuna_recovery as recovery
+        import step28_optuna_search as dispatch
+        root=self.temporary();original=ctl.Search("sqlite:///"+str(root/"studies.sqlite3"),ctl.S0)
+        uninterrupted=ctl.Search(None,ctl.S0)
+        order=[(a,n) for n in range(12) for a in ctl.Search.order(n)]
+        intervals=[]
+        def completed(spec):
+            return dict(status="SEARCH_COMPLETE",trial=spec.identity(),source_files=[],
+                access=dict(train=1,valid=1,heldout=0,owners=0),anchor_compatible=True,
+                domains={d:ctl.S0[d]+.001*(spec.number+1)*(m.ARMS.index(spec.arm)+1) for d in "AB"},
+                child_exit_code=0,resources_released=True,completion_identity={})
+        for arm,number in order[:25]:
+            spec=original.ask(arm,number);result=completed(spec);original.tell(result)
+            self.assertEqual(uninterrupted.ask(arm,number).identity(),spec.identity());uninterrupted.tell(result)
+            own=root/spec.run_id;own.mkdir()
+            data.write_json(own/"completion.json",result)
+            data.write_json(own/"before_valid.json",dict(status="ALL_BLIND_GATES_PASS"))
+            data.write_json(own/"access.json",result["access"])
+            intervals.append(dict(kind="search",arm=arm,run_id=spec.run_id,seconds=10.,error=None))
+        pending=original.ask("S",8);(root/pending.run_id).mkdir()
+        self.assertEqual(uninterrupted.ask("S",8).identity(),pending.identity())
+        data.write_json(root/(pending.run_id+".json"),pending.identity())
+        data.write_json(root/pending.run_id/"access.json",dict(train=1,valid=0,heldout=0,owners=0))
+        data.write_json(root/"search.json",original.rows)
+        intervals.append(dict(kind="control",arm=None,run_id=None,seconds=7.,error=None))
+        old=dict(qualification_seconds=1034,used=dict(search=250.,replication=0.,control=7.,evaluation=0.,analysis=0.),
+            by_arm=dict(search=dict(S=80.,S_pos=80.,H_pos=90.),replication={a:0. for a in m.ARMS}),
+            intervals=intervals,failed=False,calendar_wait_seconds=60.)
+        data.write_json(root/"ledger.json",old)
+        approval=dict(status="APPROVED_SPECIFIC_REBOOT_RECOVERY",prior_job=str(root),pending=pending.identity(),
+            interruption=dict(previous_completion_epoch=997.,ledger_saved_epoch=1000.,dispatch_epoch=1000.1,last_update_epoch=1030.,shutdown_epoch=1040.,
+                charged_search_seconds=40,charged_control_seconds=4),
+            files=[data.record(p,root) for p in sorted(root.rglob("*")) if p.is_file()])
+        def fresh():
+            ledger=ctl.Ledger(prior_cpu=170,prior_native=876)
+            ledger.used["control"]=3.
+            ledger.intervals=[dict(kind="control",arm=None,run_id=None,seconds=3.,error=None)]
+            return ctl.Search(None,ctl.S0),ledger,self.temporary()
+        resumed,ledger,target=fresh()
+        restored=recovery.restore_prior(resumed,ledger,target,approval,data)
+        self.assertEqual(restored.identity(),pending.identity())
+        self.assertEqual(ledger.used,dict(search=290.,replication=0.,control=14.,evaluation=0.,analysis=0.))
+        self.assertEqual(ledger.arm_used["search"],dict(S=120.,S_pos=80.,H_pos=90.))
+        self.assertEqual(ledger.qualification,1046);self.assertEqual(ledger.calendar_wait_seconds,60.)
+        self.assertEqual(dispatch.access_total(target),dict(train=26,valid=25,heldout=0,owners=0))
+        self.assertEqual(dispatch.train_attempt_limit(target),46)
+        self.assertFalse((target/pending.run_id).exists())
+        with ledger.interval("search",arm="S",run_id=pending.run_id) as allowed:
+            self.assertEqual(allowed,21600-40)
+        reproduced=[]
+        for i,(arm,number) in enumerate(order[25:]):
+            a=restored if i==0 else resumed.ask(arm,number)
+            b=pending if i==0 else uninterrupted.ask(arm,number)
+            self.assertEqual(a.identity(),b.identity());reproduced.append(a.identity())
+            resumed.tell(completed(a));uninterrupted.tell(completed(b))
+        self.assertEqual(resumed.selected(),uninterrupted.selected())
+        for row in approval["files"]:data.verify(root/row["path"],row)
+        with sqlite3.connect((root/"studies.sqlite3").as_uri()+"?mode=ro",uri=True) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM trials WHERE state='COMPLETE'").fetchone()[0],25)
+            self.assertEqual(db.execute("SELECT count(*) FROM trials WHERE state='RUNNING'").fetchone()[0],1)
+        wrong=copy.deepcopy(approval);wrong["pending"]["lambda_rank"]*=1.01
+        with self.assertRaises(ValueError):recovery.restore_prior(*fresh(),wrong,data)
+        wrong=copy.deepcopy(approval);wrong["interruption"]["charged_search_seconds"]=0
+        with self.assertRaises(ValueError):recovery.restore_prior(*fresh(),wrong,data)
+        extra=target/"extra";extra.mkdir();data.write_json(extra/"access.json",dict(train=21,valid=0,heldout=0,owners=0))
+        with self.assertRaisesRegex(ValueError,"access exceeded"):dispatch.access_total(target)
+        self.evidence("reboot_recovery",dict(completed_runs_retrained=0,completed_results_preserved=25,
+            interrupted_candidate_and_next_TPE_specs_equal=reproduced,prior_control_plus_startup_plus_gap=14,
+            interrupted_charge=40,remaining_same_candidate_seconds=21560,extra_train_read_retained=True,
+            synthetic_records_only=True,actual_optimizer_calls=0,formal_data_read=False))
 
     def test_specific_resource_recovery(self):
         import json

@@ -66,6 +66,7 @@ def reused_qualification(cpu,reuse,current):
         "scripts/step28_optuna_formal_wait.py","reports/documentation/20261019/optuna_budget/proposal.zh.txt",
         "reports/documentation/20261019/optuna_budget/authorization.json",
         "scripts/step28_optuna_recovery.py","reports/documentation/20261019/optuna_recovery/scope.zh.txt"}
+    allowed.add("reports/documentation/20261021/optuna_reboot/scope.zh.txt")
     expected_status="ACCEPTED_RESOURCE_ADMISSION_RECOVERY" if "scripts/step28_optuna_recovery.py" in after else "ACCEPTED_BUDGET_CLOCK_ONLY"
     if (reuse.get("status")!=expected_status or reuse.get("source_files")!=current
         or reuse.get("changed_paths")!=changed or not set(changed)<=allowed or before.keys()-after.keys()):
@@ -84,6 +85,8 @@ def reused_qualification(cpu,reuse,current):
     latest=read_bound(cpu["new_result"])
     required={"test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate",
               "test_resource_wait_and_admission","test_specific_resource_recovery"}
+    if "reports/documentation/20261021/optuna_reboot/scope.zh.txt" in after:
+        required.add("test_specific_reboot_recovery")
     if (latest.get("status")!="PASS_HANDWRITTEN_ONLY" or latest["source_files"]!=current
         or not required<=set(latest["qualified_tests"]) or latest.get("unresolved_checks")!=[]
         or set(cpu["qualified_tests"])!=set(prior["qualified_tests"])|set(latest["qualified_tests"])):
@@ -293,9 +296,22 @@ def access_total(job):
     for path in job.glob("*/access.json"):
         row=data.read_json(path)
         for k in result:result[k]+=row[k]
-    if result["train"]>45 or result["valid"]>37 or result["heldout"] or result["owners"]:
+    if result["train"]>train_attempt_limit(job) or result["valid"]>37 or result["heldout"] or result["owners"]:
         raise ValueError("Campaign access exceeded; preserve attempts")
     return result
+
+
+def train_attempt_limit(job):
+    receipt=job/"recovery.json"
+    if receipt.exists():
+        row=data.read_json(receipt)
+        if row.get("status")=="RESTORED_25_SEARCHES_AFTER_REBOOT":
+            if (row.get("prior_access")!=dict(train=1,valid=0,heldout=0,owners=0)
+                    or row.get("interrupted_run_restarts")!=1 or row.get("train_attempt_limit")!=46
+                    or row.get("valid_attempt_limit")!=37):
+                raise ValueError("Specific reboot access accounting differs")
+            return 46
+    return 45
 
 
 def clean_search_weights(job):
@@ -385,7 +401,7 @@ def execute(job,gate_path):
                 job/"analysis.console.txt",seconds,{**os.environ,"CUDA_VISIBLE_DEVICES":""})
         with charged(ledger,"control"):
             access=access_total(job)
-            if access!=dict(train=45,valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
+            if access!=dict(train=train_attempt_limit(job),valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
             # C remains cumulative in Ledger and SIGALRM; this is a local resource scan.
             run.Budget(job,ledger.remaining("control"),campaign=job,started=time.monotonic()).check(force=True)
     except BaseException:
