@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-22 同步交付记录并只读查询实验进度
+
+用户原话：“把这次更新的交付记录也同步到 Linux，核对两端一致，原有未提交修改和 Optuna 文件都不要动。顺便查询一下具体实验进度”。本轮仅向Linux项目根`/home/yongpeng/cross-lingual/docs/`同步`AI_RESEARCH_HANDOFF.zh.md`和`RESEARCH_DISCUSSION.zh.md`，并只读查询活动作业；不向Optuna独立workspace写入，不修改代码、合同、数据库、日志、模型、Memory、结果或运行状态，不启动/停止作业，不新建监听。
+
+同步前Linux两份文档的大小/SHA256分别与本地清理提交`c179fffa`中的版本完全一致，没有远端独有的新修改。已将上一轮最终交付提交`ebd2c17d17ca1b731ca1bfa54ceaa722b48fc534`对应的两份文档通过SFTP补齐，2026-10-22 19:35:44（Asia/Shanghai）独立从Linux读取校验：交接81389字节、SHA256 `c70470ef557543bb9726cddf672b16283b48c594f8b95cd7f8d34926427d3d1c`；讨论318728字节、SHA256 `d8a76d3a8beb1d6579972849585d54dcf3c304676b90201ebc56b2f45cc277a8`，两端一致。这些是补齐上一轮记录的中间身份，本条及当前进度更新后再同步并核对最终字节，不循环追加自身哈希回执。
+
+19:31—19:35实查：当前workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`。只读核对其`reports/job/`下SQLite的study/state计数、各run completion/before_valid/access、replications、ledger、活动console的updates事件、startup所绑定54来源及formal_gate，并核对实际进程属主/启动时刻/命令/cwd。三臂搜索各12 COMPLETE，36份SEARCH_COMPLETE及2份REPLICATION_BLIND_COMPLETE均有盲门通过；S/s1和S_pos/s1完成，H_pos/s1由87311运行，19:35已记录A阶段48次更新，控制器11157仍唯一。当前train40/valid36/heldout0/owners0，九复验valid仍0，joint尚不存在；未读复验盲分数、正式文本/标签或Memory，不形成新的性能结论。具体计时、剩余范围、预计10月23日09:30—11:30完成及272小时硬限写入[唯一当前入口](AI_RESEARCH_HANDOFF.zh.md#当前工作)；既有失败/中断账和原始观测不覆盖。GPU当时仅列本作业训练进程，磁盘可用约551GiB、主存可用约243GiB，未干预他人资源。
+
+本轮开始时，用户原有未提交`reports/documentation/20261022/continual_progress.zh.md`已在前轮后继续编辑，实际14579字节、SHA256 `e9548eb69bc52c7ccbc0a6386c15b736ae0bfa6e1ca80fd411a1f87324a6806e`；以此本轮基准保护，不用旧记录中的哈希恢复文件，不暂存或同步该文件。只将两份总文档的本轮维护作本地Git提交，不扩大前轮具体推送许可。
+
 ## 2026-10-22 推送七个已有提交并保留未提交修改
 
 用户原话：“把本地这 7 个未推送提交推送到现有远端分支，并更新交付记录，原有未提交修改和 Optuna 文件不要动。”本次明确授权范围为7个已有提交及对应交付记录，目的地为既有`https://github.com/bililateral/cross-lingual-DIL.git`的`method/step27-english-pretrained-synthetic-adaptation`分支；不是后续新材料的永久推送许可，也不授权修改Optuna实验文件或处理原有未提交差异。
