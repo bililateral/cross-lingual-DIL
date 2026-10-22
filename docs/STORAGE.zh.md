@@ -20,7 +20,15 @@
 
 三个`SKILL.md`的SHA256依次为`ce7c4d20329b96b03b0f0c0bb744411b1b4deaa7a7b69b90757705a83c195b12`、`5aefe708a2531c5ddaa8ee74d5155d747e96c0f21a33143d38316b7c5c88ffc4`、`3d914e73f023cab4f247d82f906a948307de8a867fd6c33df999badf67c5d5f2`。完整技能目录保存在仓库外，不把上游源码／资产复制进科研Git；恢复时按上述提交重新安装同三个`skills/`路径。安装器运输缓存及本轮临时源清单验收后清理，不新增长期并行清单。
 
-此次是本机技能文件安装和文档维护，未运行上游写作／绘图脚本、未安装额外Python依赖、未配置自动更新hook或外部图像API、未连接或改动Linux。`nature-figure/requirements.txt`声明`PyMuPDF>=1.24.0,<2.0.0`；这是上游依赖信息，不代表本次已验证科研运行环境。首次实际使用时按既有Linux py310和任务范围核对所需依赖，安装完成不冒称绘图运行通过。项目的明确用户决定、现行合同、科研纪律、外审与最小充分核验继续决定适用范围；本次不新增实验／数据／预算／外发权限，不替代GPT 6 Pro外审。技能从下一轮对话可用，未将本轮登记写成已实际调用。
+12:02的安装验收只覆盖文件与引用，当时未运行写作／绘图脚本、未安装额外Python依赖、未连接Linux；该历史边界不追改。随后用户要求“能用吗？你要保证这些skill能用啊”，本轮会话已实际识别两个主技能并加载共享参考，按既有Linux py310完成下列最小功能验收。
+
+- 写作：按`manuscript / algorithmic / experiments / zh-to-en / generic`路径，将已开放且已有独立主审的H_pos结果写成[英文结果段与中文说明](../reports/maintenance/20261022/nature_skills/writing_sample.txt)，附术语表和主张—证据对应；逐项核对原记录中的MAP差值及条件区间，保留新域未确立改善、固定种子／开发集和主次判据边界。没有重算指标或形成新研究方案。
+- 依赖：Linux既有py310缺少PDF碰撞检查所需的PyMuPDF。原镜像dry-run因SSL连接失败，无包变更；改由Windows下载PyPI官方`PyMuPDF==1.26.5`的Linux wheel，校验SHA256后经SCP离线`--no-index --no-deps`安装，满足上游`>=1.24.0,<2.0.0`。完整前后包清单留Linux，[差异原件](../reports/maintenance/20261022/nature_skills/package_changes.json)确认仅新增此包；Matplotlib 3.10.7、NumPy 2.2.6、Pillow 12.0.0均未改变。wheel来源及哈希见[固定依赖记录](../reports/maintenance/20261022/nature_skills/wheel.json)。通过上游配置脚本保存本机`C:/Users/35734/.config/nature-skills/nature-figure.json`的`backend=python`，未改技能源码。
+- 绘图：在独立`/home/yongpeng/cross-lingual/reports/maintenance/20261022/nature_skills`中，用[手写示例](../reports/maintenance/20261022/nature_skills/smoke_figure.py)实际生成183×80mm双面板PDF／SVG／600dpi PNG及TIFF。首轮源码检查因直接声明DejaVu Sans未匹配上游字体族检查而停止；保留`attempt01.*`，按约定显式配置sans-serif、DejaVu Sans字体并补齐TIFF后复验。最终严格源码检查21通过／0警告／0失败，实际面板对齐通过且无豁免，PDF最小字号6pt、无低于5pt文字，实际PDF碰撞检查0失败／0警告。已目视检查[从PDF渲染的预览](../reports/maintenance/20261022/nature_skills/figure.pdf-preview.png)：文字、刻度、线条和两面板布局完整，图内明确标识仅为工具检查。执行原件见[execution.json](../reports/maintenance/20261022/nature_skills/execution.json)及相邻审计输出；最终检查与渲染约3.85秒，连首轮失败及PDF预览合计约4.11秒，单CPU、CUDA不可见、子进程峰值RSS约117.2MiB。
+
+26份Linux返回载荷已SCP回传并按[接收清单](../reports/maintenance/20261022/nature_skills/receive_manifest.json)逐项核对；写作例稿、初始运输来源身份及验收原件保存在同目录。Linux保留审计脚本、原件和前后包清单；本机保留完整已安装技能。两端运输ZIP／wheel和本轮临时目录在核对后清理，不改变大清理日期。上游四个审计脚本从上述固定提交原样使用；恢复时按原技能提交及固定wheel版本安装，在Linux既有py310按execution.json所列命令执行，审计脚本须位于工作目录或Python搜索路径。
+
+当前已验证的是项目会用到的证据约束写作与Python科研图导出／审计路径；未将R、外部图像API或所有复杂图型写成已测试。后续具体论文和图件仍按实际证据核验。项目的明确用户决定、现行合同、科研纪律和GPT 6 Pro外审要求继续适用；本次没有正式数据读取、GPU、载模、训练或活动Optuna调度变更，不新增实验／数据／外发权限，也不修改其预算账。
 
 ## 2026-10-21 Optuna服务器重启恢复
 

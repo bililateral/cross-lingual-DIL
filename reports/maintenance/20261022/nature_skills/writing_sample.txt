@@ -1,0 +1,29 @@
+Nature writing/shared functional example — 2026-10-22
+
+Route: manuscript / algorithmic / experiments / zh-to-en / generic journal.
+Input: previously released, independently reviewed fixed-seed H_pos results.
+This is a writing demonstration; no metrics were recomputed and no new experimental conclusion is approved here.
+
+English draft
+In the fixed-seed A→B development experiment, H_pos achieved higher final mean average precision (MAP) than S on the old domain A (0.5261 versus 0.4941; difference, +0.0319; conditional 95% confidence interval, 0.0154 to 0.0485). On the new domain B, MAP was slightly lower (0.4997 versus 0.5059; difference, −0.0062; conditional 95% confidence interval, −0.0195 to 0.0072). Thus, this comparison supported an old-domain ranking gain under the evaluated conditions, but did not establish improvement on both domains. The intervals were conditional on the fitted models and did not quantify variation across training seeds or model selection. This secondary comparison did not replace the study's unsuccessful primary S_pos-versus-S criterion.
+
+中文说明
+这段文字保留了正负两面的结果：旧域A优于S，但新域B未确立改善，因此不能写成“双域全面胜出”。它只描述固定s0、A→B、反复用于开发的valid组上的已有结果，不冒充独立test，也不由终点MAP比较推导出“抗遗忘已经得到证明”。条件区间不包含训练种子或选参不确定性，H_pos次级比较不能替换原S_pos−S主判据。
+
+Terminology ledger
+H_pos / S: preserve the recorded method identifiers.
+mean average precision (MAP): 平均精度均值；ranking metric, not classification accuracy.
+old domain A / new domain B: 旧域A／新域B, under the A→B sequence.
+conditional 95% confidence interval: 条件95%置信区间, conditional on the fitted models.
+
+Claim-to-evidence map
+Old-domain gain: A ΔMAP=0.031936970847; conditional CI=[0.015393975701, 0.048513720033].
+New-domain improvement not established: B ΔMAP=−0.006183666761; conditional CI=[−0.019524668627, 0.007188357531].
+Bounds: fixed s0; A→B only; 20 valid groups per domain; 5,000 group bootstrap resamples; secondary comparison; no independent held-out test claim.
+Source: reports/seller_alias_continual/20261018/positive_ranking_result/review/primary_disposition.zh.txt
+Supporting source: reports/seller_alias_continual/20261018/positive_ranking_result/report.zh.txt
+
+Structure choices
+- State the old-domain effect and its magnitude, then retain the new-domain counter-evidence.
+- Place the joint-improvement and uncertainty limits next to the quantitative claims.
+- Retain the original primary/secondary distinction; omit unsupported novelty or mechanism claims.

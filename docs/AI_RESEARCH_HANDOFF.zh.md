@@ -4,7 +4,7 @@
 
 本节是唯一当前执行入口；Optuna最新已核对事实见[10月21日重启后恢复实查](../reports/documentation/20261021/optuna_reboot/execution/observation.json)；此前[11:29接手实查](../reports/documentation/20261019/optuna_recovery/resume_execution/observation_20261021.json)和10月19日启动均为历史。变化须核对Linux实际status/result及进程。下方已结束工作按日期解释，旧“待授权／失败停止／当前”不覆盖最新决定；S_pos/H_pos固定实验旧state仅保留历史。按[AGENTS.md](../AGENTS.md)补读本轮合同及直接证据。
 
-本机写作／绘图工具（2026-10-22 12:02）：按用户明确要求，`nature-writing`、`nature-figure`和支持包`nature-shared`已完整安装到`C:/Users/35734/.codex/skills/`，固定上游提交、版本、228文件身份及9项必需引用核验见[存储记录](STORAGE.zh.md#2026-10-22-nature-skills本机安装)，授权见[讨论记录](RESEARCH_DISCUSSION.zh.md#2026-10-22-安装三个nature-skills并更新现有记录)。从下一轮对话可用，按具体论文写作／科研图任务调用；不自动加载全套参考或新增检查流程。此次未连接Linux或改变活动实验，未验证绘图运行依赖；现行科研纪律、合同和网页外审要求继续适用。
+本机写作／绘图工具（2026-10-22）：`nature-writing`、`nature-figure`和支持包`nature-shared`已完整安装到`C:/Users/35734/.codex/skills/`，当前会话已识别并实际调用；固定来源、228文件身份、9项必需引用以及后续功能验收见[存储记录](STORAGE.zh.md#2026-10-22-nature-skills本机安装)，授权见[讨论记录](RESEARCH_DISCUSSION.zh.md#2026-10-22-安装三个nature-skills并更新现有记录)。已完成H_pos开放结果约束写作示例；Linux既有py310补齐PyMuPDF 1.26.5，只有该包新增，手写双面板图的PDF／SVG／600dpi PNG和TIFF导出、实际布局／字号／碰撞审计及PDF目视核验通过，首轮失败原件保留。本机后端偏好为Python；R及外部图像API未测，不自动加载全套参考或新增检查流程。现行科研纪律、合同和网页外审要求继续适用，未改变活动Optuna实验或其预算账。
 
 | 项目 | 当前范围、证据与接手动作 |
 |---|---|
