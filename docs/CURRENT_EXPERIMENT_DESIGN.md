@@ -2,6 +2,8 @@
 
 本页索引合同及当前待审静态提案，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
+持续学习抗遗忘主线的横向回顾见[2026-10-22配置与完整指标表](../reports/documentation/20261022/continual_review/tables.zh.md)。该表只整理已开放的历史结果，区分三域与固定A→B、不同训练批次和原验收口径；Optuna仅列方案及带日期的既有观测，不替代实时状态。
+
 [C_q实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)及获准的一次原生补核已执行完毕，固定四臂于2026-10-13 22:55:47正常完成。[原静态方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)冻结，[主审补正](../reports/documentation/20261013/query_replay/review/primary_disposition.zh.txt)中的信息损失、偏置、条件控制与共享状态要求不变。10月14日[保存结果分析](../reports/seller_alias_continual/20261014/query_replay_result/report.zh.txt)未建立相对完整S的排序收益；四比较八个A/B MAP区间均跨零，概率代价和训练—valid差距分别保留，不推成等价或整个方法家族失败。结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭；24个未定义导出零值按N/A解释，宏／汇总分类及证据边界已补明，正式数值和原判据不变。五权重已按本次具体批准留证删除。原生累计11步／469秒与失败账不清零，旧C诊断不恢复；实际状态及授权只看[当前交接](AI_RESEARCH_HANDOFF.zh.md)。
 
 已结束的[C_cf合同](SELLER_ALIAS_CROSSFIT_RETENTION.zh.md)固定完整S／C_cf／C_perm、s0 A→B于10月12日19:53:39正常完成；[结果](../reports/seller_alias_continual/20261013/crossfit_retention_result/report.zh.txt)未建立C_cf相对完整S的排序提升，也未建立对一次可行错配的优势。[独立主审](../reports/seller_alias_continual/20261013/crossfit_retention_result/review/primary_disposition.zh.txt)已关闭，补齐训练—valid差距及原判据解释，无当前科学／复现阻断。冻结原稿、实施审查、资格及失败账保持；已批准运行范围不转成新候选许可。
