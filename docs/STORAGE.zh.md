@@ -8,6 +8,20 @@
 
 本次按用户要求不另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对。
 
+## 2026-10-22 Nature Skills本机安装
+
+用户明确要求安装`nature-writing`、`nature-figure`、`nature-shared`并及时更新现有记录。12:02（Asia/Shanghai）验收：使用内置`skill-installer`从[Yuan1z0825/nature-skills](https://github.com/Yuan1z0825/nature-skills)的固定提交[`c6ae86c742705fd968b13c79db1a8518a84089d4`](https://github.com/Yuan1z0825/nature-skills/tree/c6ae86c742705fd968b13c79db1a8518a84089d4)下载并完整安装至本机用户目录`C:/Users/35734/.codex/skills/`。安装前这三个目录均不存在；安装器退出0，228个文件的路径／字节数／Git blob身份与该提交的公开tree逐项一致，两个主技能的9个`always_load`引用均可解析，包括共享依赖。
+
+| 目录 | 上游版本 | 文件数 | 字节数 | 用途 |
+|---|---|---:|---:|---|
+| `nature-writing/` | manifest 1.5.0 | 77 | 211998 | 论文论证组织、章节起草与首次投稿材料 |
+| `nature-figure/` | manifest 2.8.0 | 130 | 35144935 | 科研图、方法图、排版导出及图件检查 |
+| `nature-shared/` | 以上固定提交；入口无独立版本号 | 21 | 135606 | 按主技能需要加载的共享参考，不作为独立用户工作流 |
+
+三个`SKILL.md`的SHA256依次为`ce7c4d20329b96b03b0f0c0bb744411b1b4deaa7a7b69b90757705a83c195b12`、`5aefe708a2531c5ddaa8ee74d5155d747e96c0f21a33143d38316b7c5c88ffc4`、`3d914e73f023cab4f247d82f906a948307de8a867fd6c33df999badf67c5d5f2`。完整技能目录保存在仓库外，不把上游源码／资产复制进科研Git；恢复时按上述提交重新安装同三个`skills/`路径。安装器运输缓存及本轮临时源清单验收后清理，不新增长期并行清单。
+
+此次是本机技能文件安装和文档维护，未运行上游写作／绘图脚本、未安装额外Python依赖、未配置自动更新hook或外部图像API、未连接或改动Linux。`nature-figure/requirements.txt`声明`PyMuPDF>=1.24.0,<2.0.0`；这是上游依赖信息，不代表本次已验证科研运行环境。首次实际使用时按既有Linux py310和任务范围核对所需依赖，安装完成不冒称绘图运行通过。项目的明确用户决定、现行合同、科研纪律、外审与最小充分核验继续决定适用范围；本次不新增实验／数据／预算／外发权限，不替代GPT 6 Pro外审。技能从下一轮对话可用，未将本轮登记写成已实际调用。
+
 ## 2026-10-21 Optuna服务器重启恢复
 
 当前workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`，启动和首更新在并列execution。旧optuna_recovery/resume_workspace的4,322文件/1,442,097,470字节按[重启恢复绑定](../reports/documentation/20261021/optuna_reboot/recovery_bound.json)冻结，包括25次完成结果、SQLite残留RUNNING和中断S第9次的A推理权重/Memory；没有载入、覆盖或删除旧状态。新workspace直接复制25次结果用于原45轨迹收尾，未重训重评；新中断尝试访问记录独立留账。新生成的活动模型和Memory继续仅留Linux。

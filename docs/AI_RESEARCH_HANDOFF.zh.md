@@ -4,6 +4,8 @@
 
 本节是唯一当前执行入口；Optuna最新已核对事实见[10月21日重启后恢复实查](../reports/documentation/20261021/optuna_reboot/execution/observation.json)；此前[11:29接手实查](../reports/documentation/20261019/optuna_recovery/resume_execution/observation_20261021.json)和10月19日启动均为历史。变化须核对Linux实际status/result及进程。下方已结束工作按日期解释，旧“待授权／失败停止／当前”不覆盖最新决定；S_pos/H_pos固定实验旧state仅保留历史。按[AGENTS.md](../AGENTS.md)补读本轮合同及直接证据。
 
+本机写作／绘图工具（2026-10-22 12:02）：按用户明确要求，`nature-writing`、`nature-figure`和支持包`nature-shared`已完整安装到`C:/Users/35734/.codex/skills/`，固定上游提交、版本、228文件身份及9项必需引用核验见[存储记录](STORAGE.zh.md#2026-10-22-nature-skills本机安装)，授权见[讨论记录](RESEARCH_DISCUSSION.zh.md#2026-10-22-安装三个nature-skills并更新现有记录)。从下一轮对话可用，按具体论文写作／科研图任务调用；不自动加载全套参考或新增检查流程。此次未连接Linux或改变活动实验，未验证绘图运行依赖；现行科研纪律、合同和网页外审要求继续适用。
+
 | 项目 | 当前范围、证据与接手动作 |
 |---|---|
 | 当前Optuna实查（2026-10-21 17:05:21，Asia/Shanghai） | **已在重启后恢复：搜索S 8/12、S_pos 8/12、H_pos 9/12，共25/36；复验0/9。** 用户明确从中断候选重跑且“此次依旧免审”；[具体补充](../reports/documentation/20261021/optuna_reboot/scope.zh.txt)、[主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)及[免审原话](../reports/documentation/20261021/optuna_reboot/waiver.json)已落实。17:04:19唯一控制器11157启动，训练11164实际A_S更新已出现；wrapper11152只等退出，活动监听已自删。当前workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`，54来源一致，无campaign/run failure。中断的是`search_08_S_s0`（S第9次），同lambda1.2450012290684322/lr0.9227201063294653/s0重新完整A→B；25次完成结果不重训不重评。旧中断至少A288/B96，完整Adam已不在，未宣称逐步恢复。当前train27/valid25/heldout0/owners0，含旧中断train1，最终应46/37、仍45完整科学轨迹。CPU188/300，原生18调用/876秒；旧search173258.710069/C60.853884继承，另保守补中断4051秒和未结C4秒，资格更新1064，启动前约49.56627/272小时，新活动继续计费。同候选剩17549秒，单次/分臂/共享及272小时均不重置。余11次搜索含当前+9复验，按既有约1.9小时/次预计39—43小时，10月23日08:00—12:00完成（首启至完成约93—97小时，含重启离线；资源竞争可延后）。实际启动证据见execution/receive_manifest.json。 |
