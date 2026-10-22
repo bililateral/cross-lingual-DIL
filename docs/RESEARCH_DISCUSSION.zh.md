@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-22 推送七个已有提交并保留未提交修改
+
+用户原话：“把本地这 7 个未推送提交推送到现有远端分支，并更新交付记录，原有未提交修改和 Optuna 文件不要动。”本次明确授权范围为7个已有提交及对应交付记录，目的地为既有`https://github.com/bililateral/cross-lingual-DIL.git`的`method/step27-english-pretrained-synthetic-adaptation`分支；不是后续新材料的永久推送许可，也不授权修改Optuna实验文件或处理原有未提交差异。
+
+推送前独立查询远端为`ae648cbd820deec741154f897ad71ae1c0e49c5e`，与本地跟踪分支一致且为当前HEAD祖先。7个提交按原顺序为`592c52bb`、`88fd7f4d`、`3fa38550`、`a73d44f9`、`ec15075f`、`08795c46`、`c179fffa`，涵盖已提交的Optuna重启恢复记录、进度报告、Nature Skills安装／验收及图件删除、两端清理与记录。核对范围内201条变更路径和LFS状态，没有新增待推LFS对象；历史原件的CRLF／末尾空行提示保留原字节，不为交付改写冻结材料。
+
+已按普通快进推送至`c179fffa5e50472dbf3c3a446c9351e695d5ff26`，2026-10-22 18:06（Asia/Shanghai）再次独立查询实际远端ref一致。本条及[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)组成一个单独交付记录提交，并在本次范围内一并推送，不为记录自身哈希循环追加提交。原有未提交`reports/documentation/20261022/continual_progress.zh.md`的SHA256为`06dd0c49e4bf18b2812661a922e5baead2f1debaaffbfce1a91350b0c013bf4b`，保持原样且不暂存；已提交的该文件版本随原提交正常交付。未使用stash、reset、rebase、force-push或改写历史，未连接Linux或更动Optuna工作区／作业；本次Git交付不声明Linux文档已再次同步。
+
 ## 2026-10-22 提前执行两端大清理并保留Optuna
 
 用户先要求：“先盘点一下 Windows 和 Linux 两端的项目文件，把建议清理的范围、预计能腾出的空间和需要保留的文件列出来，我确认后再删。”在两端盘点期间明确：“Optuna实验的文件都不要动啊，我们明天会处理”。据此将Optuna全部实验与相关临时材料排除，仅呈现Windows 77个、Linux 15个历史重复归档，共197.27MiB，逐项说明保留位置；未凭盘点自行删除。
