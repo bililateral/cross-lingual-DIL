@@ -137,3 +137,30 @@ L²R把每个训练查询的旧负例记忆用于后续文本排序，与“留�
 另已精确区分L²R式(8)／表3与vanilla兼容版本，补充CLUDA的伪身份／特征关系及DwoPP保留教师的边界。初次来源清单中“Vanilla method remains relevant”措辞易误读，适用的明确说明以本次复核目录为准。
 
 外审所谓`SCIENTIFIC_BLOCKER`主要针对“已经找到方法空白／创新成立”的更强主张；本项目当前未作该主张，本次补充也没有证明新机制成立。F8属于已确认的提交呈现与来源定位缺陷，已用原件留存及清晰目录处理。没有由本次文献审查确认的活动训练阻断；扩大数据范围、增加索引任务或要求复现全部近邻均不执行。未新增研究设计，不重复送审未变化证据。完整证据、处置和剩余阅读限制见主审记录。
+
+## 8. 2026-10-23：商品文本卖家关联比较文献补查
+
+用户本轮要求为2022—2026年、CCF A/B或北大中文核心，重点是利用商品标题和描述关联卖家账号的具体方法；不以数据集论文、任务不匹配论文或同一方法的多个版本补足3篇。本节只补充书目、输入对象和检索状态，不批准新增实验、改变模型输入或比较合同，也不覆盖上面的历史审查与运行状态。
+
+资格按用户提供的[CCF目录](../CCF推荐目录.pdf)和[北大核心目录](../北大中文核心期刊目录.pdf)核对：CCF PDF第22页将TrustCom列为C类，第23页将ICICS、PETS列为C类；北大核心PDF第28页列有《计算机工程》《信息安全研究》，未列《信息安全学报》，两刊不能混认。页码指PDF物理页。
+
+### 新增核查与保留边界
+
+| 文献与正式来源 | 输入／具体任务的证据 | 本轮筛选状态 |
+| --- | --- | --- |
+| [VendorLink，ACL 2023主会](https://aclanthology.org/2023.acl-long.481/) | 正文§2、§3、§4.1—4.2：标题与描述用`[SEP]`拼接，卖家监督训练后提取广告表示，计算广告间余弦相似度，并用账号内部自相似度归一化账号间分数；有[作者代码](https://github.com/maastrichtlawtech/VendorLink)。 | **目前唯一已确认同时满足本轮年份、刊会和直接任务要求的方法候选。**具体中文适配与复现仍未执行，不能写成已复现。 |
+| [You May Not Be Your Username: Cross-Market Vendor Alias Attribution with Automatic Multi-Signal Evaluation，TrustCom 2025](https://doi.org/10.1109/TRUSTCOM66490.2025.00129) | 引文索引和[DBLP书目](https://dblp.org/rec/conf/trustcom/KwanTPSM25.html)核实题名、作者、年份及1119—1126页；本轮未获得全文，不能仅从题名推定各信号及训练细节。 | 新增直接任务线索，但**CCF C**，不计入；未将其写成可复现或纯文本方法。 |
+| [Multi-Identity Recognition of Darknet Vendors Based on Metric Learning，Applied Sciences 2024，14(4):1619](https://www.mdpi.com/2076-3417/14/4/1619) | 已获取全文：商品文字与图片特征，经PCA／WGCCA等处理，用孪生网络和度量学习识别同一卖家的多个账号；正文与参考文献回溯到eDarkFind等前序方法。 | 确为具体账号关联方法，但刊物不满足所给目录资格，且完整方法使用图片；不计入。 |
+| [Link Prediction-Based Multi-Identity Recognition of Darknet Vendors，ICICS 2023:317—332](https://link.springer.com/chapter/10.1007/978-981-99-7356-9_19) | Springer摘要及参考文献：商品文本、图片、写作风格及异构关系，图神经网络与孪生网络预测账号是否属于同一供应者；作者为Futai Zou、Yuelin Hu、Wenliang Xu、Yue Wu。尚未取得全文完成代码级复现判断。 | 新增直接任务方法，但**CCF C**，且原方法有额外模态；不计入。 |
+| [Follow Your Hidden Traces: Underground Forum-Based Darknet Market Sybil Detection，ICWS 2025:218—224](https://doi.org/10.1109/ICWS67624.2025.00035) | [作者机构摘要](https://pure.korea.ac.kr/en/publications/follow-your-hidden-traces-underground-forum-based-darknet-market-/)明确：筛选马甲相关论坛帖子，抽取多个账号的信息，再核验账号是否存在于市场。 | ICWS为B类、目标涉及卖家马甲，但输入依赖额外论坛线索，不能直接放入仅有屏蔽后商品标题／描述的实验；不计入本轮3个直接比较方法。 |
+| [Detect Your Fingerprint in Your Photographs: Photography-based Multi-Feature Sybil Detection，PoPETs 2023(1):244—263](https://petsymposium.org/popets/2023/popets-2023-0015.php) | 官方摘要：从商品照片提取图像哈希、类别、复原及OCR文字特征，融合后匹配卖家；其中“text”是照片中的文字。 | 图片依赖与本项目输入不符；所给目录中的PETS条目也是C类，不能因摘要含text便计作商品文本方法。 |
+| [暗网网页用户身份信息聚合方法，计算机工程2023，49(11):187—194,210](https://www.ecice06.com/CN/10.19678/j.issn.1000-3428.0066805) | 已读正文及37条参考文献：ConRE围绕身份实体对、其上下文及实体类型做共指关系抽取；不是从两个卖家的商品集合估计同控关系。 | 北大核心且为方法论文，但目标对象与所需输入不同。将其改成商品对分类器会改变论文方法，不能据此声称直接复现；不计入。 |
+| [去除主题偏差的暗网论坛作者归属分析方法，信息安全学报2026，11(3):18—33](https://xuebao.iie.ac.cn/ch/reader/view_abstract.aspx?file_no=20260302&flag=1) | 已获取正文：基于论坛帖子、作者／主题分组的表示学习和去偏约束；不是持续学习实验，也没有商品标题／描述卖家关联的直接验证。 | 《信息安全学报》不在所给北大核心目录中；不与《信息安全研究》混同，不计入。 |
+| [FCA-XLNet-BiGRU Multi-task Framework for Darknet Transactions，KSEM 2025会议／2026卷](https://link.springer.com/chapter/10.1007/978-981-95-3072-4_8) | Springer摘要明确任务为闭集交易分类、开放集检测和低资源适配；引用VendorLink并不使其成为卖家账号关联方法。 | 任务不匹配，不计入。在线日期2025-10-11与卷引用年份2026分别保留。 |
+
+### 实际追踪路径和未解决缺口
+
+- 沿VendorLink正文的前序方法追到[eDarkFind（WWW 2020）](https://doi.org/10.1145/3366423.3380263)、[KDD 2019账号匹配](https://doi.org/10.1145/3292500.3330763)、[uStyle-uID（WWW 2019）](https://doi.org/10.1145/3308558.3313537)，再通过OpenAlex的`cites`查询筛查它们2022—2026年的被引文献；前序论文年份不合本轮要求，不能充作新论文。VendorLink正式版与arXiv版、同一工作的学位论文归为同一方法。
+- 本轮OpenAlex记录分别为VendorLink `W4385570400`、eDarkFind `W3012857244`、KDD 2019 `W2953027522`、uStyle-uID `W2988701063`、2024度量学习 `W4391948814`；接口筛选日期为2022-01-01至2026-12-31，返回结果仍须按实际出版日期、原文和目录核对。没有把检索结果数量当作独立方法数量，也没有把索引未收录解释为文献不存在。
+- 中文路线核对ConRE参考文献，并追查作者、相邻成果与可公开检索的引用线索；《暗网高质量威胁情报获取技术与实现》（计算机工程2026）虽与上述上海交大团队相关，但其任务是主题筛选、实体抽取与情报时新性评估，不是卖家账号配对。未获得CNKI／万方的完整被引导出，不能宣称中文被引已穷尽。
+- **严格清单目前为1/3，另2个空缺仍未补齐。**这是当前已核实证据的范围，不是断言全球不存在另外两篇。数据集、通用作者归属、商品分类、图片指纹、额外身份标识符抽取以及C类论文均不冒充合格直接比较方法。没有新训练、数据读取或基线实现；不能把“未研究持续遗忘”写成“已经证明会遗忘”。
