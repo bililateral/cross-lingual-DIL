@@ -1,0 +1,25 @@
+请作为独立科研审查者，只核查下面公开论文的方法与一种通用任务适配是否成立，不做实验、不索要私有数据、不编造已复现结果。请直接给出推荐/不推荐、最小必要修正和原文定位，中文回答。重点反对过度设计、伪实现和把弱化版本冒称完整方法。
+
+目标：选择一个2022—2026年CCF A/B持续学习对照，用于仅根据商品标题和描述进行账号关联的监督任务。训练接收分阶段的完整候选群，每群有多账号、账号含多条记录，标签是账号对是否同一身份；模型输出成对得分并进行候选排序。阶段之间训练身份不同，评价身份也不与训练身份重合。监督损失包含账号对项和组内排序项。因此不能为了适配持续学习论文而改成固定卖家分类，或丢弃排序项。这里不提供任何项目文件、数据、结果或运行参数。
+
+拟推荐：GCR, “Gradient Coreset based Replay Buffer Selection for Continual Learning”, CVPR 2022, DOI 10.1109/CVPR52688.2022.00020。具体采用作者补充材料§C/表9的 ER+GCR 组合，明确不是完整GCR（完整版本还有历史logit蒸馏与监督对比损失）。
+正文：https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf
+补充：https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf
+可访问作者稿：https://arxiv.org/pdf/2111.11210
+项目：https://gradientcoreset.github.io/
+官方代码：https://github.com/google-research/google-research/tree/master/gradient_coresets_replay
+
+已读原文要点：§4.1式(4)联合选择子集与非负权重，使其加权回放损失梯度近似候选集合的梯度，OMP求解；旧权重继续参与下一轮目标，所得权重必须进入实际回放。§4.1明确可用于任意指定回放损失，补充§C/表9实测ER+GCR。原算法用reservoir维护当前候选池，从旧缓冲和当前候选池自适应抽样；§6.1候选池与历史缓冲各K，§7承认额外内存。
+
+拟适配：保持共同文本编码器、账号评分和监督目标，以完整训练群为选择单位，求该群损失相对于实际打分头的梯度；用有限当前候选群及存活历史群做GradApprox并真正加权回放。保留梯度匹配、非负权重、旧权重递推、候选池和抽样机制，不把梯度范数/多样性启发式冒充GCR。完整群的关系构成一致，不人为给群新增身份类别；原逐类配额改成按完整群选择，这是明确披露的适配差异。梯度空间采用真实打分头导数，不盲抄图像线性分类头公式。
+
+公平性：同输入、监督、拆分、起点、顺序/种子、训练与调参机会；给各方法自己的选样权，统一容量/数据访问边界。计量文本、标签、权重等全部持久状态，并单列当前候选池、峰值内存、梯度选择计算成本；不访问淘汰历史或未来/评价数据。同时比较旧域保持、新域学习和最终排序，不以不学习换低遗忘。当前只是选型，不承诺训练授权或效果。
+
+静态代码核查发现：gcr.py的observe确实将权重乘入回放损失再backward；gradmatchstrategy.py使用OMP；dataselectionstrategy.py算输出及最后线性层梯度。代码的逐类配额默认按比例，与论文等额描述有差异；coreset.py导入continual_learning_rishabh旧包名，gradmatchstrategy.py传perClass而签名是per_class。故不能说代码开箱可运行，拟以明确论文定义为准、适配时做必要修复。
+
+请重点判断：
+1. 上述完整群 ER+GCR 适配是否保留论文主要机制，还是已经变成另一个方法？
+2. 同一群内有正负关系且存在排序损失，按群选择能否合理替代逐类配额？有什么真正阻断推荐的条件？
+3. 打分头梯度、旧权重递推与回放归一化有什么必须说清的细节？
+4. 推荐阶段哪些事项必须解决，哪些只能作为后续实施验证，避免无止境加实验？
+5. 请核对上述公开原文事实；无法取得材料就说明，勿把建议当成已发生实验。

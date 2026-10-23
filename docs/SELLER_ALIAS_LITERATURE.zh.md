@@ -317,3 +317,47 @@ ICASI线索补查发现[官方论文集模板页](https://2026icasi.wind-tech.co
 另沿引用链读取ECAI 2024《Entity Matching Across Small Networks Using Node Attributes》的[作者机构摘要](https://publications.idiap.ch/publications/show/5369)，并定位到[作者原稿](https://publications.idiap.ch/attachments/papers/2024/Ahmadi_ECAI-PAIS2024_2024.pdf)的索引片段：UGC-DeepLink使用通话／论坛交互形成的小网络及节点属性，结合图结构学习和文本信息匹配实体；不是仅用商品标题、描述关联卖家，不能因ECAI刊会符合就补位。新的中文作者线索指向[《面向暗网抑制的普适性安全理论研究构想和成果展望》](https://doi.org/10.12454/j.jsuese.202400800)，工程科学与技术2025年第57卷第1期；已读摘要和开篇研究构想，其流量识别、连接性预测、陷阱节点溯源方向没有提供本项目所需商品账号对方法，不以综述／研究构想充数。
 
 **本轮没有新增合格方法，仍是VendorLink一项、两个空缺。**实际进展是新增线索和若干原先未能访问来源的一手核实；它不等于完成目标，也不构成不存在其他合格文献的证明。ICASI 2026仍是缺正式出版与方法证据的线索，不升级为比较方法。检索、全文追查与资格判断继续由执行者承担；本次只更新文献事实与阅读范围，不改变实验合同、运行或比较方案。
+
+## 16. 2026-10-23：保留L²R，第二个持续学习对照的GCR核查
+
+用户明确保留L²R，要求继续找2022—2026年、CCF A/B或知名刊会的第二个持续学习方法；允许适配商品标题／描述账号关联，但须保留原方法核心、公平比较抗遗忘。持续学习组不要求原论文也研究暗网卖家，静态卖家方法组的资格不随之改变。
+
+**当前选型：L²R已由用户确认保留；主执行者推荐GCR的ER+GCR版本作为第二个候选，正在进行独立网页外审，尚未实施或复现。**本次不把新方法加入已冻结五方法运行，不更改原固定随机记忆合同。
+
+### 16.1 正式身份与实际阅读
+
+Rishabh Tiwari、Krishnateja Killamsetty、Rishabh Iyer、Pradeep Shenoy：**GCR: Gradient Coreset based Replay Buffer Selection for Continual Learning**，CVPR 2022，99—108，DOI：[10.1109/CVPR52688.2022.00020](https://doi.org/10.1109/CVPR52688.2022.00020)。正式发表年份2022，预印本首发2021不改变该身份；CVPR在所给CCF目录人工智能部分为A类。
+
+已通读CVF正式开放版10页正文（含实验、局限和参考文献）及4页补充材料，逐页核对第102—103页式(4)和算法1—2、补充§A抽样算法、§C／表9的ER+GCR。保留[正式论文](../reports/seller_alias_papers/20261023/continual_baseline/gcr.pdf)和[补充材料](../reports/seller_alias_papers/20261023/continual_baseline/gcr_supp.pdf)。公开入口：[作者项目页](https://gradientcoreset.github.io/)、[CVF正文](https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf)、[CVF补充](https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf)。
+
+### 16.2 原方法与适配依据
+
+式(4)联合选择有限子集和非负权重，使加权回放梯度接近可用集合的梯度，并正则化权重。OMP选择后，权重必须实际用于训练；下一轮目标沿用存活旧记忆及其权重，不能恢复淘汰数据。当前候选池由reservoir维护，训练包含旧记忆／当前候选池的自适应抽样。
+
+完整GCR另含历史logit蒸馏与监督对比损失。**本次明确建议作者补充§C／表9验证的ER+GCR组合，不冒称完整GCR配置。**正文§4.1说明GradApprox可用于其他指定回放损失，补充给出实际ER组合证据。原图像实验不是本项目效果证据。
+
+以下为主执行者的适配推论，尚未执行：
+
+| 组成 | 账号关联适配及边界 |
+| --- | --- |
+| 监督目标 | 沿用共同BGE编码、账号打分和监督目标，以完整训练群选样并求梯度，保留候选排序；不能只抽孤立账号对并删掉排序项。 |
+| GradApprox／OMP | 用当前候选群和存活历史群做梯度匹配、非负权重拟合、加权回放；只按梯度范数排序、选后权重全置1或只记录不更新均不算实现。 |
+| 记忆递推 | 延续旧权重，保留有界候选池及相应抽样／更新；不读回淘汰历史、不接触未来或评价标签。 |
+| 原逐类配额 | 完整群具有固定关系构成，不能给群伪造身份类别。按群选样须披露为适配差异，不声称逐字复现图像逐类配额。 |
+
+该机制不依赖图像、商品类别或发货地，也不要求新增伪标签或固定卖家分类输出，故可以保留未见身份账号排序任务。梯度选择依据必须是允许的训练监督，不使用评价身份或结果。
+
+### 16.3 公平性与实现证据
+
+- 同输入、监督、划分、起点、顺序／种子和开发预算；共同观察旧域保持、新域学习及最终排序，不以少学习换取低遗忘。
+- 计量文本、标签、权重等全部历史状态，并单列当前候选池、峰值内存和梯度选择开销。原论文候选池与回放池各K，§7承认额外内存，不能把候选池当作免费空间。
+- L²R和GCR须有各自选样权。强制与当前所有臂使用同一Algorithm R成员会删掉它们的核心机制。新比较须在共同容量／访问范围内允许算法选样；这不改动活动实验。
+- [作者代码](https://github.com/google-research/google-research/tree/master/gradient_coresets_replay)已静态读取：`gcr.py`权重进入回放损失及反向更新，`gradmatchstrategy.py`调用OMP，`dataselectionstrategy.py`采用输出层／最后线性层梯度表示。文本适配须明确梯度空间并直接求实际打分头导数，不能把分类头特征乘积公式照搬到记录池化模型。
+- 当前公开实现的具体差异／缺陷：论文逐类等额、代码默认按类比例；`coreset.py`仍导入`continual_learning_rishabh`旧包名；`gradmatchstrategy.py`传`perClass=True`，被调用签名却是`per_class`。因此没有声称官方仓库开箱可运行。实施时须固定论文／代码取舍并作最小修复及真实接线核验。
+- 权重使用还有一个与当前小批训练直接相关的必要条件：若每次只回放一群，再除以该批权重和，所得权重会被自身消去。选样目标、全局归一化、抽样概率及实际梯度必须一致，不能把“张量里有权重”当成加权回放生效。式(4)左侧使用旧权重定义目标，右侧拟合新的实际权重，不能未经推导重复乘旧权重。
+
+### 16.4 其他线索与外审状态
+
+DwoPP（BMVC 2022）与未见身份的持续度量学习直接相关；所给CCF目录将BMVC列为C类，且方法保留旧教师。本轮已有A类适配候选，优先GCR。DGC（ICML 2024，[正式出版页](https://proceedings.mlr.press/v235/lin24a.html)）取得18页全文，定向读§3.1—3.3／算法1：递推历史梯度校正量并保留参考参数，额外状态与现行极小历史预算衔接更复杂，暂不优先。OCS（ICLR 2022）只作检索线索，未完成全文核查，不作排除或效果结论。
+
+19:35曾把模型菜单无障碍快照中的“已达到使用上限”误读成GPT-6 Pro不可用。用户追问后，19:43复查可见界面及DOM，确认两条提示为`sr-only`文本，并未绑定当前GPT-6选项；界面显示剩余8%。该错误判断已撤回。19:46通过指定本地Playwright单次成功提交[公开方法适配审查](https://chatgpt.com/c/6adb48e9-5e88-83e9-a68d-1d728a23faf5)，出现“正在回应”及“停止”，可见GPT-6／Pro；[实际请求](../reports/seller_alias_papers/20261023/continual_baseline/review/request.zh.txt)只含公开论文／代码和通用适配论证，无项目文件、数据、实验结果、运行参数或凭据。以[回执](../reports/seller_alias_papers/20261023/continual_baseline/review/submission.json)记录后续完成状态；此时未取得最终审查，不写已通过。本轮未SSH或运行科研实现。
