@@ -1,0 +1,30 @@
+test_confirmation_restore_cells_and_joint_numeric_labels (test_step28_continual_five.FiveTests) ... FAIL
+test_domain_paired_statistics_and_access_attempts (test_step28_continual_five.FiveTests) ... ok
+
+======================================================================
+FAIL: test_confirmation_restore_cells_and_joint_numeric_labels (test_step28_continual_five.FiveTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/tests/test_step28_continual_five.py", line 401, in test_confirmation_restore_cells_and_joint_numeric_labels
+    np.testing.assert_allclose(np.load(job/point["scores"]["stage-cal"]["path"]),
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 1715, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/numpy/testing/_private/utils.py", line 921, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=1e-12, atol=1e-12
+
+Mismatched elements: 12132 / 15120 (80.2%)
+Max absolute difference among violations: 1.19209289e-08
+Max relative difference among violations: 5.65324683e-07
+ ACTUAL: array([[-0.036007, -0.05059 , -0.039286, ..., -0.031323, -0.04151 ,
+        -0.047685],
+       [-0.061653, -0.039105, -0.038293, ..., -0.06093 , -0.082096,...
+ DESIRED: array([[-0.036007, -0.05059 , -0.039286, ..., -0.031323, -0.04151 ,
+        -0.047685],
+       [-0.061653, -0.039105, -0.038293, ..., -0.06093 , -0.082096,...
+
+----------------------------------------------------------------------
+Ran 2 tests in 5.027s
+
+FAILED (failures=1)

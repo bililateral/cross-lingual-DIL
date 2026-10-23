@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 230, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 226, in main
+    native_batch(args.job, args.ledger)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 174, in native_batch
+    ctl.dispatch([row], root, ledger, "native", command, max_workers=1, tail=15)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_control.py", line 206, in dispatch
+    raise pending_error
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_control.py", line 155, in dispatch
+    completed.append(ledger.settle(identity, success=process.returncode == 0))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_control.py", line 66, in settle
+    raise RuntimeError("Failed/over-budget task retained; stop all dispatch")
+RuntimeError: Failed/over-budget task retained; stop all dispatch

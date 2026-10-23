@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-23 五方法实现、限定资格与待回收实现外审
+
+用户已批准五方法/零HPO/45轨迹/三路/490累计小时，已在Linux独立`reports/documentation/20261023/continual_implementation/workspace`部署最小实现；61份当前来源1056846字节已逐项与Windows核验一致，见[current_sources](../reports/documentation/20261023/continual_implementation/current_sources.json)。模型只链接既有BGE归档，数据目录仅建立既有数据链接，资格均使用手写群，尚未正式训练/生成确认数据/打开正式标签。旧workspace及模型保管不改。
+
+CPU01—07与native01/02失败/完成原件、账本和必要资源样本在两端保管；GPU临时完整/推理状态在实际恢复验证及留存大小/SHA后退休。当前核验源快照source_cpu01_native01.zip、qualification_fix.zip、implementation_update.zip保留其具体重放用途；不是无用传输重复副本。独立处置、预算投影和控制费保守补记见[资格主审](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。新正式权重尚不存在，计划135阶段推理状态须保留供确认，存储cap224GiB/free288GiB仍是执行上限，不能写成当前占用。
+
+实现输入包continual_implementation_review.zip为836755字节、158成员，SHA256 6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63；157载荷1790191字节及ZIP逐项身份核验一致。含源码、冻结方案、手写资格和来源/运行记录，不含正式文本/标签/owners/Memory或模型载荷/凭据。自动审批首次拒绝后，用户明确批准整个具体包上传到chatgpt.com；15:49已单次提交原会话，当前待完整回收，见[具体授权](../reports/documentation/20261023/continual_implementation/review/authorization.json)与[提交回执](../reports/documentation/20261023/continual_implementation/review/submission.json)。GPU问题修复明确免审，不把此次实现审查扩大为GPU复审。输入包因在审和身份复核保留，不能提前删；未创建重复审查或重新上传。新材料仅本地Git，不推送。
+
 ## 2026-10-23 五方法修订方案送审材料
 
 新方案、预算、请求、清单、普通字段/算术核对、明确授权和实际页面/提交回执位于Windows [continual_baselines](../reports/documentation/20261023/continual_baselines)。输入ZIP `review/continual_baseline_plan_review.zip`为42232字节、8成员（7载荷+清单），SHA256 `0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300`，逐项大小/SHA一致；载荷仅本次方案/预算/请求、前次主审处置、selected.json及ER/LOGIT历史结果文档，不含正式数据/标签/Memory/模型/凭据。原六臂输入ZIP字节未改。

@@ -2,7 +2,7 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
-当前下一阶段以[五方法修订方案](../reports/documentation/20261023/continual_baselines/proposal.zh.txt)及其独立主审补充为待确认方案：SEQ/ER0.1/LOGIT0.1历史已开发配置与S/H_pos各自Optuna选中配置全部参加本批ABC/BCA/CAB×s4/s5/s6，45完整轨迹、新三域120群一次确认，零新增HPO、最多三路。是否有必要为特定基线补最少调参须按公平性和主张判断，不机械补36次，也不拿历史结果替代本批对照。拟450h训练共享池+36h确认+4h其他，单run最高24h仍受450h池约束；全部未批准实施。具体包已完整回收并完成[11项独立主审处置](../reports/documentation/20261023/continual_baselines/review/primary_disposition.zh.txt)，推荐五臂零新HPO不变；下一步等待用户确认具体范围，之后才做必要实现/受影响资格/实施审查及运行。真实接线、父子共享额度、完整ID开放门、三路资源吞吐、存储/RSS条件均未由本次静态审查替代；不得因旧dev效果撤销确认或把未完成子集当原设计。旧六臂783.5h、三臂297.5h和已结束272h均不能拿来启动。S_pos、原H完整2×2、全六顺序及独立新训练流不自动加入核心计划。
+当前执行[已批准五方法方案](../reports/documentation/20261023/continual_implementation/authorization.json)：SEQ/ER0.1/LOGIT0.1冻结历史配置与S/H_pos各自Optuna配置参加ABC/BCA/CAB×s4/s5/s6，45完整轨迹、新三域120群确认，零新增HPO、同卡三路。490累计小时分为450训练+36确认+4其他，单run最高24h仍受池内预留；不能减臂/减seed或借旧余额。先完成最小实现、限定资格及必要实现外审/主审，按已通过的资源/整批预算条件签发实际来源门后连续执行。用户已明确免除本次GPU审查发现问题之修改的外审，仍保留实际行为验证和失败账；不扩大为整个新实现或最终结果免审。三路资格及预算投影已形成，当前进展见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)与[独立资格处置](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。未满足开工前提前不训练、不生成确认群、不打开正式评价标签。
 
 ## 已确认范围内
 

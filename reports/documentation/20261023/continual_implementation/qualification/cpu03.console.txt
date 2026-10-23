@@ -1,0 +1,22 @@
+test_actual_endpoint_calibration_restore_and_stage3_supply (test_step28_continual_five.FiveTests) ... ok
+test_actual_five_updates_and_omission_controls (test_step28_continual_five.FiveTests) ... ok
+test_domain_paired_statistics_and_access_attempts (test_step28_continual_five.FiveTests) ... ok
+test_exact_complete_id_gate (test_step28_continual_five.FiveTests) ... ok
+test_real_child_timeout_failure_and_pending_projection (test_step28_continual_five.FiveTests) ... ERROR
+test_real_restore_next_update_and_budget (test_step28_continual_five.FiveTests) ... ok
+test_three_stage_memory_orders_seeds_and_birth_targets (test_step28_continual_five.FiveTests) ... ok
+
+======================================================================
+ERROR: test_real_child_timeout_failure_and_pending_projection (test_step28_continual_five.FiveTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/tests/test_step28_continual_five.py", line 241, in test_real_child_timeout_failure_and_pending_projection
+    ctl.dispatch(queue, root, ledger, "cpu", lambda row, job, deadline: [sys.executable, "-c", "print('handwritten child')"], tail=1)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_control.py", line 145, in dispatch
+    raise RuntimeError("Distinct single-core workers unavailable")
+RuntimeError: Distinct single-core workers unavailable
+
+----------------------------------------------------------------------
+Ran 7 tests in 12.500s
+
+FAILED (errors=1)

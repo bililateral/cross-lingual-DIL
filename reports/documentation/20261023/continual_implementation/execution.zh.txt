@@ -1,0 +1,17 @@
+五方法持续学习：获批实施边界（2026-10-23）
+
+授权：authorization.json中的用户原话。科学设定以../continual_baselines/proposal.zh.txt及review/primary_disposition.zh.txt为准，原件不修改。预算以该目录budget.json的数值为准，历史status不是当前授权状态。
+
+固定SEQ_ref、ER0.1_ref、LOGIT0.1_ref、S_tuned、H_pos_tuned；ABC/BCA/CAB×s4/s5/s6，45条独立三阶段864更新。零新增HPO、无已训练首阶段共享。采用既有账号损失、ER加权更新、记录VJP、两视图与H_pos汇聚函数；新增接口只传真实order/seed/stage、固定参数并约束连续Adam与Memory。全部历史状态含教师/辅助信息≤1MiB，Algorithm R保留6群且出生教师不刷新。SEQ没有样本Memory，端点映射作为评价元数据保存。
+
+训练离线派发角色按既有Supply协议索引训练导出；实际train_stage/update只接收当前48fit及生存Memory，checkpoint只接收当前12cal、当前fit用于retain及60旧dev盲文本。每run逻辑train/cal读取一次，实际worker读取登记；旧dev/heldout/owners标签读取为0。新确认生成、标签级评价及统计入口已接入；正式使用前冻结全部来源，当前训练门未签发。旧Supply是同进程离线派发边界，不声称操作系统进程隔离；资格只用手写输入，未解析正式训练或评价标签。
+
+同卡最多3独立worker，每个单计算线程、独立CPU核心；固定(order,seed,method)队列补空位。controller为单一账本写者，原子保存已结算费用、活跃完整预留、退出状态；预留包含该任务全部未结算elapsed，退出按实际总秒数结算，不重复加账。训练450h共享池，每条分配额度≤24h且预留剩余全部任务投影；父子传同一绝对deadline，60s尾部提前停止。正式controller正常30秒检查、临近deadline缩短，child自身持续检查；纯等待不记C，实际控制工作及失败保留。资格使用同样调度/保存函数，GPU全体≤5400累计秒/36次调用；CPU全体≤1200秒。桶不可互借，失败保留并停止派发，不自动重试正式任务或换seed。
+
+限定资格只用手写群，既有py310及已固定BGE；验证五方法实际目标/梯度/更新、缺失关键项的反例、阶段2到3的Memory/出生目标/随机恢复与下一更新、完整45ID门和父子共享预算。三路资格用S/H/LOGIT最大224记录、每通道256tokens的组合覆盖两类真实结构，包含Adam驻留、训练、载入/保存及下一更新恢复；不穷举所有三元组合。测试用合成Adam步数明确标记为手写状态，不冒充已训练历史。必要证据充分即停。
+
+实际native01在单S最大形状首次前向触及9.25GiB限制，已计费10.462970732秒、尝试1次但完成0次optimizer更新；这不是三路通过。针对全群前向保留每个微批各层激活的具体缺口，新入口在模型实例上增加整个encoder的非重入激活检查点，保留已有层内检查点、参数名/形状、microbatch=4、BF16/FP32、数据/损失/Adam和随机种子。不是降低输入形状或换数值精度。单S和单LOGIT资格比较原执行与新重算后的实际更新状态；三路统一使用新重算。新增计算成本必须体现在整批预算投影中，未通过不正式启动。
+
+native02已验证每worker9.25GiB allocator下同时S/H/LOGIT最大224记录/256token：三路peak reserved各7.36—7.38GiB、采样整卡最低空闲7310MiB。正式开工空闲≥30GiB、后续补位空闲≥10GiB且无他人CUDA作业；每worker RSS≤64GiB，owned PID并集含controller≤192GiB，开工host available≥208GiB。存储全campaign≤224GiB、开工free≥288GiB，小证据≤2GiB；checkpoint写入以同一个文件锁串行检查预留与保存，模型计算仍三路并行。每个worker最多一份待核实full，核实完成后按既有remove_work_file删除；135推理权重保留供确认，失败载荷计入空间。资格与保守整批投影见resource_projection.json及qualification/primary.zh.txt，不把资格通过写成45条已完成或效果成立。
+
+GPU资格发现问题的对应修改已获用户明确免外审，仍由本地实际资格及独立主审负责。原要求的新增五方法/第三阶段/共享控制/确认统计实现外审和独立处置完成后，才签发绑定实际来源的正式门；不要求再次审查已免审的GPU修复。旧方案外审不是实现通过。确认/分析维持原120新群、六格及SEQ两格、唯一H−S主要门、六探索性比较、5000次实际域配对bootstrap；不能据旧dev效果撤销/更改确认，不能拿未完成子集替代45条。所有F/D等输出保留合同的字面R差公式，Brier/log-loss越低越好，其取得值减最终值为正表示损失改善，不能误称遗忘；主要判据只针对raw MAP。结果外审另行完成；此文件不宣布效果或正式启动。

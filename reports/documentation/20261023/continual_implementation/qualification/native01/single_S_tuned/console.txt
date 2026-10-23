@@ -1,0 +1,70 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 230, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 221, in main
+    native(args.job, m.Spec.from_dict(m.data.read_json(args.spec)), args.deadline, args.barrier)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 89, in native
+    timed("current_update", lambda: update(1, 1))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 54, in timed
+    value = fn()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 89, in <lambda>
+    timed("current_update", lambda: update(1, 1))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five_verify.py", line 83, in update
+    result = method.update(model, optimizer, current, history if target is not None else None,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_continual_five.py", line 182, in update
+    logs[role] = record.backward_group(model, group, c, spec.arm, dropout, regroup, target, check,
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_record_replay.py", line 165, in backward_group
+    z = record_vectors(model, group, c, check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/workspace/scripts/step28_record_replay.py", line 59, in record_vectors
+    output = model.encoder(features)["sentence_embedding"]
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/sentence_transformers/base/model.py", line 511, in forward
+    input = module(input, **module_kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/sentence_transformers/base/modules/transformer.py", line 1096, in forward
+    model_output = model_method(**filtered_kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
+    encoder_outputs = self.encoder(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 684, in forward
+    layer_outputs = self._gradient_checkpointing_func(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 1044, in _fn
+    return fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 503, in checkpoint
+    ret = function(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 627, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 248, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 639, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 539, in forward
+    hidden_states = self.dense(hidden_states)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 31.32 GiB of which 21.29 GiB is free. Including non-PyTorch memory, this process has 9.85 GiB memory in use. 9.25 GiB allowed; Of the allocated memory 9.23 GiB is allocated by PyTorch, and 15.76 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

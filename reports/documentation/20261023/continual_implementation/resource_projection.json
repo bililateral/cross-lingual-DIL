@@ -1,0 +1,45 @@
+{
+  "status": "RESOURCE_QUALIFICATION_PASSED_PROJECTION_PENDING_FINAL_REVIEW",
+  "source_result": "qualification/native02/result.json",
+  "source_sha256": "14ec5006c1bd6492a395fe4262fc842a0bd23f74a09940082407aca062710130",
+  "source_measurements_seconds": {
+    "current": 18.609738530009054,
+    "replay": 36.627237249020254,
+    "forward_or_teacher": 3.1874511950009037,
+    "io": {
+      "load": 2.6732390679826494,
+      "save_full": 30.03190760500729,
+      "restore_full": 12.71143372298684,
+      "save_inference": 8.383315653016325,
+      "restore_inference": 4.21183209400624
+    }
+  },
+  "formula": "1.25 * (864*t_current for SEQ or 288*t_current+576*t_replay for memory; plus 648 endpoint/restore forwards + <=12 birth-teacher forwards + one model load + three full/inference save/reload cycles + 1800s unmeasured per-run allowance)",
+  "per_run_projected_seconds": {
+    "SEQ_ref": 25190.0,
+    "ER0.1_ref": 38162.0,
+    "LOGIT0.1_ref": 38162.0,
+    "S_tuned": 38162.0,
+    "H_pos_tuned": 38162.0
+  },
+  "single_run_hard_max_seconds": 86400,
+  "training_projected_seconds": 1600542.0,
+  "training_pool_seconds": 1620000,
+  "training_margin_seconds": 19458.0,
+  "three_slot_projected_finish_seconds": [
+    546486.0,
+    521296.0,
+    532760.0
+  ],
+  "training_calendar_projection_seconds": 546486.0,
+  "allocator_bytes": 9932111872,
+  "minimum_free_gpu_bytes": 32212254720,
+  "minimum_free_slot_bytes": 10737418240,
+  "observed_sample_count": 393,
+  "observed_min_free_MiB": 7310.0,
+  "observed_peak_owned_rss_bytes": 20801998848.0,
+  "native_cumulative_seconds": 782.9099497859424,
+  "native_attempted_calls": 16,
+  "native_completed_calls": 15,
+  "limits": "Maximum-shape short measurements, not a full-run performance guarantee. Three-way mixture S/H/LOGIT; no exhaustive triples. No formal launch before remaining implementation/qualification/review conditions."
+}
