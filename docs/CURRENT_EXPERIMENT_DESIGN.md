@@ -8,7 +8,7 @@
 
 本页索引合同及当前待审静态提案，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
-持续学习抗遗忘主线的横向回顾见[2026-10-22配置与完整指标表](../reports/documentation/20261022/continual_review/tables.zh.md)。该表只整理已开放的历史结果，区分三域与固定A→B、不同训练批次和原验收口径。后续Optuna三臂36搜索+9复验已于2026-10-23完成，见[完整结果与独立主审](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)及[22指标完整表](../reports/seller_alias_continual/20261023/optuna_result/tables.zh.md)：两候选六格开发门均未通过，H_pos旧A条件优势保留，新B及较少遗忘未获确定证据。仍只覆盖A→B及重复开发集，不替代多顺序／独立留出确认；本轮具体结果包已获准，于2026-10-23 10:40:04单次提交GPT 6 Pro，55文件外审已完整回收、14项意见经[独立主审](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)处置结案，专用页已关闭，无新增运行／评价阻断；两候选主门失败及外推边界保持，预算末位和概率区间计数按附注解释。
+持续学习抗遗忘主线按下表逐实验合同及[交接历史与证据](AI_RESEARCH_HANDOFF.zh.md#历史与证据)追溯；关键三域归因见[LOGIT／R0／S原结果](../reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt)。横向比较须区分三域与固定A→B、不同训练批次和原验收口径。原2026-10-22横向表当前已删除，本入口不再依赖该文件，也不恢复既有删除。后续Optuna三臂36搜索+9复验已于2026-10-23完成，见[完整结果与独立主审](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)及[22指标完整表](../reports/seller_alias_continual/20261023/optuna_result/tables.zh.md)：两候选六格开发门均未通过，H_pos旧A条件优势保留，新B及较少遗忘未获确定证据。仍只覆盖A→B及重复开发集，不替代多顺序／独立留出确认；本轮具体结果包已获准，于2026-10-23 10:40:04单次提交GPT 6 Pro，55文件外审已完整回收、14项意见经[独立主审](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)处置结案，专用页已关闭，无新增运行／评价阻断；两候选主门失败及外推边界保持，预算末位和概率区间计数按附注解释。
 
 最新保管：用户明确要求的Linux遗留Optuna训练权重清理已于2026-10-23 11:15完成，19份权重删除、Memory和正式证据保留，见[存储记录](STORAGE.zh.md#2026-10-23-optuna训练权重清理)。当前可变入口反映该决定，冻结合同及完成时原件不追改；后续方案不能假定旧端点仍可加载或直接续C。
 
