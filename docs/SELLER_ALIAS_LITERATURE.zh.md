@@ -248,4 +248,10 @@ L²R把每个训练查询的旧负例记忆用于后续文本排序，与“留�
 
 本轮还发现一处会误导引用追查的表述：[DarkBIP-FW原文](https://link.springer.com/article/10.1007/s42452-025-07217-5)§2.2把文献[27—29]概括为利用商品描述作跨市场身份关联，但回查实际来源，[27]为2016年论坛写作风格识别，[28]为2022年[Tracking Discourse Influence in Darknet Forums](https://arxiv.org/abs/2202.02081)（论坛话语影响分析技术报告），[29]为[SYSML，EMNLP 2021](https://aclanthology.org/2021.emnlp-main.548/)（论坛作者关联）。它们不能据此成为2022—2026年的商品卖家文本关联方法。引用链中的年份、研究对象及方法作用须以被引原文为准。
 
+后续补查作者团队及近期参考文献：直接读取[上海交大团队成果页](https://netsec.sjtu.edu.cn/)，商品卖家关联条目仍指向已核实的ICICS 2023与Applied Sciences 2024；同团队LLM-TIKG（Computers & Security 2024，DOI `10.1016/j.cose.2024.103999`）的[作者仓库说明](https://github.com/Netsec-SJTU/LLM-TIKG-dataset)明确是从威胁情报文本抽取实体和关系，不能因刊会合格就替代卖家账号任务。另取得ICWS 2025《Follow Your Hidden Traces》的[Crossref参考文献元数据](https://api.crossref.org/works/10.1109/ICWS67624.2025.00035)，其中市场方法线索回到eDarkFind、uStyle、KDD 2019及PoPETs 2023图片方法，未补出新的合格文本方法；本轮获得的是书目数据，不冒称取得该篇方法全文。
+
+检索出现的2022年Dark Vendor Profiling（DVP）介绍也已回查：[Tennessee Tech原始发布页](https://publish.tntech.edu/index.php/PSRCI/article/view/673)明确日期为2020-05-11，实际方法融合写作风格、图片和商品属性。2022年报道不能将2020年成果变成近期论文，此线索不计入。
+
+ICASI线索补查发现[官方论文集模板页](https://2026icasi.wind-tech.com.tw/proceeding-template/)同时列出IET和Taylor & Francis出版路径，因而不将“未找到IEEE DOI”单独当作未发表证明。已据此补查IET、Taylor & Francis、IEEE标题入口和Crossref完整标题查询，仍未取得该篇正式书目／全文；作者公开展示说明可以交叉印证展示主张，但不补足账号评分、未见身份实验或刊会资格证据。保留这一具体缺口，未反复请求用户放宽条件或自行联系作者。
+
 **本轮没有新增合格名额，仍为VendorLink一项、另外两项空缺。**这表示已核查范围内尚未找到另外两个满足条件的方法，不表示证明此类论文不存在。继续检索时保留用户已明确的输入与未见身份任务，不重复推荐已排除的多模态适配、论坛方法或旧年份工作；只有新的原文证据才能改变其状态。本轮仅更新公开文献记录，未访问实验数据、连接Linux、联系作者或改变活动比较实验。
