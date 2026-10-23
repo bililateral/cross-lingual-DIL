@@ -1,5 +1,5 @@
 {
-  "status": "SUBMITTED_GENERATING_AWAITING_REVIEW",
+  "status": "COMPLETED_RETRIEVED_PRIMARY_REVIEWED_AWAITING_USER_CONFIRMATION",
   "package": "continual_baseline_plan_review.zip",
   "size_bytes": 42232,
   "sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
@@ -31,13 +31,49 @@
   "request": "submitted_request.zh.txt",
   "authorization": "authorization.json",
   "page_evidence": "submitted_page.json",
-  "page_closed": false,
+  "page_closed": true,
   "package_changed": false,
   "followup": {
     "automation_id": "automation",
     "name": "回收五方法修订方案外审",
     "interval_minutes": 10,
     "scope": "This exact revised five-arm review only; retrieve, independently scrutinize, report, close dedicated page and delete follow-up",
-    "status": "ACTIVE"
+    "status": "DELETED_AFTER_COMPLETE_RECOVERY_AND_PRIMARY_DISPOSITION"
+  },
+  "last_check": {
+    "checked_at": "2026-10-23T13:51:28+08:00",
+    "status": "COMPLETED_RECOVERED_AND_REVIEWED",
+    "stop_button_count": 0,
+    "final_new_report_available": true,
+    "dedicated_page_closed": true,
+    "followup_deleted": true
+  },
+  "recovery": {
+    "completed_at": "2026-10-23T13:51:28+08:00",
+    "final_page": "completed_page.json",
+    "returned_zip_bytes": 42613,
+    "returned_zip_sha256": "0f11166ff8259ae7ebd64eb2631521199ae8d4029113f93b5359560aed582daa",
+    "returned_members": 8,
+    "verified_payloads": 7,
+    "full_report": "external/review_report.zh.txt",
+    "findings_count": 11,
+    "primary_disposition": "primary_disposition.zh.txt",
+    "primary_verification": "primary_verification.json",
+    "implementation_resource_conditions_unverified": 5,
+    "review_input_unchanged": true,
+    "transport_archives_deleted_after_verification": true,
+    "deleted_transport_paths": [
+      "reports/documentation/20261023/continual_baselines/review/continual_baseline_external_review_20261023.zip",
+      ".playwright-mcp/continual-baseline-external-review-20261023.zip"
+    ]
+  },
+  "prior_pending_check": {
+    "checked_at": "2026-10-23T13:40:33+08:00",
+    "status": "STILL_GENERATING",
+    "conversation_url": "https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a",
+    "new_request_confirmed": "13:18 five-arm request with 42232-byte package",
+    "stop_button_count": 1,
+    "final_new_report_available": false,
+    "action": "Retain pending status and existing follow-up; no download, duplicate submission or experiment"
   }
 }

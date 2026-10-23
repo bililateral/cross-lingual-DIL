@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-当前送审版本：[2026-10-23五方法修订方案](../reports/documentation/20261023/continual_baselines/proposal.zh.txt)。按用户明确提出的基线比较需求，SEQ/ER0.1/LOGIT0.1/完整S/H_pos均进入同批三域三顺序、三个新seed评价，共45路径/38880更新；基线冻结历史开发配置，S/H冻结Optuna全精度参数，零新增HPO，公平性边界及有无必要补调参交外审重点判断。新确认120群/11520前向、135状态、最多三路；拟共享450h训练+36h确认+4h其他，单run24h仍受共享池约束；存储224GiB/free288GiB。用户已明确批准42232字节完整新包外发，13:18:51成功提交同一GPT-6 Pro会话，实际状态见[回执](../reports/documentation/20261023/continual_baselines/review/submission.json)。先回收并独立处置，再由用户确认实施；旧三臂建议及六臂原稿均为历史，下面保留其来由，不授予本轮执行权限。
+当前待确认版本：[五方法送审原提案](../reports/documentation/20261023/continual_baselines/proposal.zh.txt)及[本轮外审后的独立主审补充](../reports/documentation/20261023/continual_baselines/review/primary_disposition.zh.txt)。完整外审和11意见已回收处置，推荐SEQ/ER0.1/LOGIT0.1/完整S/H_pos、零新HPO、三循环×三个新seed，共45路径/38880更新；新120群确认11520前向/135状态，单5090最多三路。公平性限定为冻结配置系统比较，H−S为唯一主要比较，不新增基线搜索或更强确认家族。拟共享450h训练+36h确认+4h其他，单run≤24h仍受450h池约束；存储224GiB/free288GiB。主审补清同转换SEQ场景、冻结与旧dev非选择、父子额度/尾部/PID并集。五项实施及资源条件尚未验证，用户确认后才接线、限定资格及必要实现审查；当前没有科研执行、数据权限或预算采纳。具体[回收/关闭状态](../reports/documentation/20261023/continual_baselines/review/submission.json)，旧三臂及六臂均为历史。
 
 前次外审后的三臂建议（历史版本）：[2026-10-23外审独立处置及精简范围](../reports/documentation/20261023/continual_mainline/review/primary_disposition.zh.txt)。完整外审已回收，12项意见已独立处置；推荐SEQ_ref/S_tuned/H_pos_tuned、三循环×三个新seed，共27轨迹/23328更新、零新HPO、同卡最多三路。保留已学域六格及SEQ两格G，新120群确认共7200前向；拟累计297.5h、存储160GiB/free224GiB。S与H使用原Optuna全精度选中参数；LOGIT/ER历史可复用但不冒充本批确认。唯一主要比较及数据/机制/外推边界见该具体方案。尚未批准实施或预算，现有代码仍未接通新范围；静态审查不替代受影响原生核验和实施审查。下面六臂版本为原送审历史，字节保持，不再作为主审推荐范围。
 

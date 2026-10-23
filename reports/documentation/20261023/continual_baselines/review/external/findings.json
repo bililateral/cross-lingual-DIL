@@ -1,0 +1,662 @@
+{
+  "schema_version": "1.0",
+  "review_date": "2026-10-23",
+  "input_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+  "overall_disposition": "RECOMMEND_CURRENT_FIVE_ARM_STATIC_DESIGN_WITH_EXISTING_CLAIM_BOUNDARIES_AND_PREEXECUTION_CONDITIONS",
+  "recommended_current_design": {
+    "methods": 5,
+    "new_hpo_runs": 0,
+    "full_paths": 45,
+    "confirmation_groups": 120,
+    "max_workers_same_single_gpu": 3,
+    "proposed_cumulative_task_hours": 490
+  },
+  "counts": {
+    "findings": 11,
+    "confirmed_scientific_blockers_current_claim": 0,
+    "confirmed_unresolved_reproducibility_defects_in_current_static_proposal": 0,
+    "implementation_or_resource_conditions_before_formal_execution": 5,
+    "by_category": {
+      "ACCEPTABLE_WITH_CLAIM_BOUNDARY": 1,
+      "VERIFIED_DESIGN_AND_ARITHMETIC": 1,
+      "INTERPRETATION_CLARIFICATION": 1,
+      "OPTIONAL_FOLLOWUP_DEPENDING_ON_CLAIM": 1,
+      "IMPLEMENTATION_CONDITION": 4,
+      "UNVERIFIED_RESOURCE_CONDITION": 1,
+      "EVIDENCE_LIMITATION_AND_VERIFIED_ARITHMETIC": 1,
+      "OUT_OF_SCOPE_OVERDESIGN": 1
+    }
+  },
+  "classification_note": "未实施新入口不是已发生的新实现缺陷；旧源码与新需求的确定差异需在获批后接线/资格。条件未满足不代表静态方案需加臂/HPO。严重性针对忽视该条件后的影响，非宣称错误已经发生。",
+  "authorization": {
+    "review_upload_authorized_by_user": true,
+    "execution_authorized_by_this_review": false,
+    "budget_authorized_by_this_review": false,
+    "data_access_authorized_by_this_review": false
+  },
+  "findings": [
+    {
+      "id": "B01",
+      "title": "五臂必要性与零新增HPO成立于固定配置比较",
+      "category": "ACCEPTABLE_WITH_CLAIM_BOUNDARY",
+      "severity": "INFO",
+      "evidence_status": "VERIFIED_PROVIDED_EVIDENCE",
+      "observation": "用户明确要求本批SEQ/ER/LOGIT；三基线有相应科学用途，ER/LOGIT有历史开发来源。S/H各12次同两维开发，五者总开发机会不相同。删除S_pos不破坏当前系统主张。",
+      "impact": "若删ER/LOGIT会删去用户目标；若把当前设计叫五家族等机会或家族最佳，会越过证据边界。",
+      "minimal_action": "保留五臂、ref/tuned标签与已冻结全精度参数；最低新增HPO=0。不补S_pos/H/R0。若将来改为相同12次机会，只开发被该目标明确选择的基线。",
+      "necessity": "CURRENT_SCIENTIFIC_SCOPE_REQUIRES_FIVE_REFERENCES; ADDITIONAL_HPO_DEPENDS_ON_CHANGED_CLAIM",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            12,
+            47
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "docs/SELLER_ALIAS_ER_LOW_RESULT.zh.md",
+          "lines": [
+            7,
+            16
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "docs/SELLER_ALIAS_ER_LOW_RESULT.zh.md",
+          "lines": [
+            41,
+            55
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "docs/SELLER_ALIAS_ER_LOW_RESULT.zh.md",
+          "lines": [
+            110,
+            112
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md",
+          "lines": [
+            60,
+            84
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json",
+          "json_pointer": ""
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "2–3"
+    },
+    {
+      "id": "B02",
+      "title": "规模与六格加SEQ两格计数正确；诊断删除有明确边界",
+      "category": "VERIFIED_DESIGN_AND_ARITHMETIC",
+      "severity": "INFO",
+      "evidence_status": "MECHANICALLY_VERIFIED",
+      "observation": "45路径、38880更新、59616梯度群呈现、135阶段状态、11520确认群前向正确；真实独立群120。六格保留R21，SEQ增加R12/R23足够计算计划终点。",
+      "impact": "删epoch/未训练初始评分不损害冻结端点问题，但失去epoch曲线、初始到首学净增益；11520不包含训练池内旧dev/cal/恢复/教师前向。",
+      "minimal_action": "维持现行评分矩阵；保留真实更新/Adam/Memory/来源/恢复证据，不恢复全部旧诊断，不把评分次数当独立样本。",
+      "necessity": "CURRENT_ENDPOINTS_SUFFICIENT; REAL_UPDATE_AND_RESTORE_EVIDENCE_REQUIRED",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            53,
+            55
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            65,
+            81
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            85,
+            89
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/confirmation"
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/diagnostics"
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "4"
+    },
+    {
+      "id": "B03",
+      "title": "SEQ“伴随”应按同run同转换解释",
+      "category": "INTERPRETATION_CLARIFICATION",
+      "severity": "LOW",
+      "evidence_status": "DERIVED_INTERPRETATION_RISK_NOT_CONFIRMED_MISREPORTING",
+      "observation": "现有格足够构造D2/G2、D3/G3，但集合平均F/G同为正不自动表示同一路径同次转换同时退化与学习。",
+      "impact": "若混同两个层次，会夸大场景结论；不影响现有格对主O/F比较的有效性。",
+      "minimal_action": "用D2=R11−R21、G2=R22−R12；D3=[R21−R31+R22−R32]/2、G3=R33−R23并列既有点值。F=D2/2+D3。只作描述澄清，不新增二值场景资格、评分或训练。",
+      "necessity": "MINIMAL_REPORTING_CLARIFICATION",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            13,
+            15
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            69,
+            79
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "5.4"
+    },
+    {
+      "id": "B04",
+      "title": "共同主终点与探索性次级比较合理；更强确认需先固定声明粒度",
+      "category": "OPTIONAL_FOLLOWUP_DEPENDING_ON_CLAIM",
+      "severity": "INFO",
+      "evidence_status": "VERIFIED_CURRENT_RULE_AND_OPTIONAL_EXTENSION",
+      "observation": "O/F同时通过是交并要求，不需仅因两个共同终点机械Holm。N/Z点保护不是统计非劣。六个次级对比预定探索性足以定位五个配置。群bootstrap仅条件于固定训练流、三seed、三循环。",
+      "impact": "不能把点保护叫非劣、把点对点区间叫同时95%覆盖，或从若干探索性胜出宣布多个确认性胜出。",
+      "minimal_action": "当前规则维持。若另要逐个确认，可开放前固定H−S→H−LOGIT→H−ER→H−SEQ顺序门；若只要全部基线都胜的单一合取声明，预定全部方向通过且不挑单项。无需加训练或HPO。",
+      "necessity": "CURRENT_EXPLORATORY_GOAL_SUFFICIENT; STRONGER_CLAIM_OPTIONAL",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            73,
+            81
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            111,
+            111
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "5"
+    },
+    {
+      "id": "B05",
+      "title": "受影响五方法/第三阶段接线与真实恢复尚须资格",
+      "category": "IMPLEMENTATION_CONDITION",
+      "severity": "HIGH",
+      "evidence_status": "CONFIRMED_LEGACY_ENTRY_DIFFERENCES_NEW_IMPLEMENTATION_NOT_PROVIDED",
+      "observation": "旧加权账号入口有0.1历史及独立0.5教师实现，通用账号入口历史项默认1；旧Optuna适配存在固定ABC/stage1–2限制。新五臂入口尚未实施。",
+      "impact": "只改方法名、断言或日志，可能遗漏真实权重/梯度、第三阶段合法Memory、出生教师、实际order/seed及完整恢复，令将来结果无效。当前不能断言新代码已犯这些错。",
+      "minimal_action": "复用加权入口和未变证据；仅对受影响分支验证实际梯度/更新、合法retain与旧教师不刷新、Adam288/576/864、真实order/seed/RNG、完整恢复及必要下一更新。资格≤36调用/5400s，充分即停。",
+      "necessity": "REQUIRED_BEFORE_AFFECTED_FORMAL_EXECUTION",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            29,
+            37
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            51,
+            59
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            85,
+            89
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_er_weight.py",
+          "lines": [
+            229,
+            295
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_bge_continual.py",
+          "lines": [
+            251,
+            321
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            60,
+            78
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            278,
+            317
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_record_attribution_run.py",
+          "lines": [
+            93,
+            105
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": true,
+      "blocking_assessment": "不否决当前静态设计；对应实施条件未满足前不得启动依赖的正式运行。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "7.1,7.4"
+    },
+    {
+      "id": "B06",
+      "title": "450h单账原子预留及父子实际额度接线不可省",
+      "category": "IMPLEMENTATION_CONDITION",
+      "severity": "HIGH",
+      "evidence_status": "CONFIRMED_LEGACY_6H_LIMIT_AND_SINGLE_ACTIVE_LEDGER",
+      "observation": "提案450h共享池/单run≤24h自洽，但旧child Budget(job)默认21600s、旧controller单active，不具备新额度语义。24×45=1080h不构成授权。",
+      "impact": "仅改父超时会仍在6h退出；每worker复制共享余额或只预留10h却允跑24h会破坏总池；免费退出尾部/失败重置也会漏账。",
+      "minimal_action": "单controller原子保证已结算U+全部活跃完整预留≤450h；r_i≤同run剩余24h且涵盖投影及尾部，传入父launcher和child预算。结算真实elapsed、释放未用额，失败/恢复不清零，尾部提前留在原r_i内；超限据实报告。确认/资格也用共享累计口径。",
+      "necessity": "REQUIRED_FOR_EXECUTABLE_BUDGET_NOT_ADDED_BUDGET",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            93,
+            99
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/accounting"
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            76,
+            86
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            137,
+            138
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            278,
+            300
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            53,
+            116
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            260,
+            291
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": true,
+      "blocking_assessment": "不否决当前静态设计；对应实施条件未满足前不得启动依赖的正式运行。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "7.2,8"
+    },
+    {
+      "id": "B07",
+      "title": "并行完整ID全局门与角色访问账须落实",
+      "category": "IMPLEMENTATION_CONDITION",
+      "severity": "HIGH",
+      "evidence_status": "CORRECT_PROPOSAL_UNIMPLEMENTED_CONCURRENT_GATE",
+      "observation": "提案已分生成验证、盲评分、评价权限；旧门按9项规格和zip(records,specs)对应，不是新45完整路径的乱序完成门。",
+      "impact": "只计数量或按完成顺序归位会错配模型/域/seed，或在快子集后提前开结果；旧dev效果性取消确认会重新引入选择。",
+      "minimal_action": "以冻结method/order/seed完整ID集合核齐来源、三个端点、实际恢复和盲分数；全45完成后旧dev一次开，全确认格完成后new pairs联合开。逻辑/物理读取分开记；配置使用前冻结；不按旧dev胜负改/撤确认，不新增权限。",
+      "necessity": "REQUIRED_FOR_VALID_COMPLETE_COMPARISON_AND_APPROVED_ACCESS_BOUNDARIES",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            57,
+            69
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            85,
+            85
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            95,
+            95
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            209,
+            216
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            162,
+            163
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": true,
+      "blocking_assessment": "不否决当前静态设计；对应实施条件未满足前不得启动依赖的正式运行。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "6,7.3"
+    },
+    {
+      "id": "B08",
+      "title": "同卡最多三路的吞吐/峰值未测，不能凭显存相加准入",
+      "category": "UNVERIFIED_RESOURCE_CONDITION",
+      "severity": "HIGH",
+      "evidence_status": "EXPLICITLY_UNMEASURED_NOT_RESOURCE_FAILURE",
+      "observation": "P/B给出一张5090快照，三路qualification=false、throughput_ratio_measured=false。3×旧reserved与空闲差约4.6992GiB，不是含所有上下文/最大shape的并发峰值。",
+      "impact": "无法据此保证三倍加速、24h每run足够、450h完成或36h确认桶必够；q甚至可能<1。",
+      "minimal_action": "只在批准后的总36调用/5400s资格内，将必需小更新与同步驻留、设备总体占用、载入/保存峰值和短聚合吞吐观测合用。未满足则按训练条款停机报告；确认可按其明确条款降低并发。不得改batch/LR或新增DDP。",
+      "necessity": "REQUIRED_BEFORE_THREE_WORKER_FORMAL_TRAINING",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            87,
+            105
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/resources"
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/limits"
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt",
+          "lines": [
+            17,
+            17
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/H_pos/resources"
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": true,
+      "blocking_assessment": "不否决当前静态设计；对应实施条件未满足前不得启动依赖的正式运行。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "7.4,9–10"
+    },
+    {
+      "id": "B09",
+      "title": "224GiB与RSS总门算术合理，但需实际生命周期和PID并集归属",
+      "category": "IMPLEMENTATION_CONDITION",
+      "severity": "MEDIUM",
+      "evidence_status": "MECHANICAL_CAPACITY_VERIFIED_NEW_PEAK_NOT_VERIFIED",
+      "observation": "已列存储192.183599858GiB，224cap余31.816400142GiB；288free另留64GiB。预算假设同时最多6full和3额外inference；全campaign RSS≤192GiB。",
+      "impact": "如果写入替换/失败残留多出临时副本或排除controller/辅助PID，会超估余量；不能为守盘删唯一恢复状态。",
+      "minimal_action": "按真实生命周期约束所有临时/失败文件，把新数据及来源纳入cap；全campaign owned PID并集含controller计一次，保留推理状态至审查完成及活动run必需恢复状态。不加存储额度或删除授权。",
+      "necessity": "REQUIRED_IMPLEMENTATION_OF_EXISTING_CAPS",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            59,
+            59
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            101,
+            103
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/storage"
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/resources"
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "scripts/step28_g_half_run.py",
+          "lines": [
+            265,
+            301
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/H_pos/measurements/W_F"
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": true,
+      "blocking_assessment": "不否决当前静态设计；对应实施条件未满足前不得启动依赖的正式运行。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "9"
+    },
+    {
+      "id": "B10",
+      "title": "490h与条件工期计算相容；硬件原采样与精确旧计时未独立见到",
+      "category": "EVIDENCE_LIMITATION_AND_VERIFIED_ARITHMETIC",
+      "severity": "LOW",
+      "evidence_status": "SOURCE_STATEMENTS_AND_ORDINARY_ARITHMETIC_ONLY",
+      "observation": "450+36+4=490h正确；旧字段S/H单路代理7.2492/7.1637h，确认前向9.7255h正确。新包未附硬件raw采样；98727.018326只由新B/PD给出，旧报告为98728整数秒。",
+      "impact": "规划数字可注明来源使用，但不能包装为本审连接服务器实测、精确原计时重现、资源预约或新资格PASS。490h不能除3当工期。",
+      "minimal_action": "保留累计任务elapsed、日历墙钟与GPU占用并集三种口径。条件q表明确未测且无完成承诺，旧计时约0.98s差不需新实验。静态审查不要求额外上传或即时服务器测量。",
+      "necessity": "SOURCE_AND_FORECAST_LABELING_ONLY",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            93,
+            105
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/budget_seconds"
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "json_pointer": "/forecast"
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt",
+          "lines": [
+            11,
+            17
+          ]
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/S/measurements"
+        },
+        {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/H_pos/measurements"
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "8–10"
+    },
+    {
+      "id": "B11",
+      "title": "未列目标不应自动加臂、搜索、诊断或通用框架",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "evidence_status": "SCOPE_JUDGMENT_ABOUT_POTENTIAL_ADDITIONS_NOT_CURRENT_PROPOSAL_ERROR",
+      "observation": "本轮没有rank/pooling纯机制、家族最佳、全六顺序或训练seed总体主张；五臂中的ER/LOGIT则是用户明确目标。",
+      "impact": "为追求形式完整恢复S_pos/H/R0、机械36HPO、全epoch/初始评分、全历史重跑或DDP/全仓回归，会扩展无依据工作和预算。",
+      "minimal_action": "这些归后续目标或过度设计，不默认实施。保留当前五臂，复用适用旧证据，资格达足够证据即停；不得把36调用/5400s当强制满额。",
+      "necessity": "OUT_OF_SCOPE_FOR_CURRENT_REQUEST",
+      "evidence": [
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            6,
+            25
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            39,
+            47
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            65,
+            69
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": [
+            85,
+            89
+          ]
+        },
+        {
+          "package_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+          "file": "reports/documentation/20261023/continual_baselines/review/request.zh.txt",
+          "lines": [
+            1,
+            15
+          ]
+        }
+      ],
+      "blocks_current_static_plan": false,
+      "blocks_formal_execution_until_condition_met": false,
+      "blocking_assessment": "不阻断当前限定范围的静态方案。",
+      "new_experiment_or_hpo_required_for_current_claim": false,
+      "grants_execution_or_budget_permission": false,
+      "report_section": "11–12"
+    }
+  ]
+}

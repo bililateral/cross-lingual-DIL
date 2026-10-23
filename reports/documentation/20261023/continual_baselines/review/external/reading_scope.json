@@ -1,0 +1,414 @@
+{
+  "review_date": "2026-10-23",
+  "model_identity": {
+    "visible_session_self_identification": "GPT-6 Astra Pro",
+    "user_requested_session_label": "GPT 6 Pro",
+    "backend_identity_independently_verified": false,
+    "ui_selection_backend_mapping_verified": false,
+    "statement": "可见会话配置/模型自述，不是后台路由或型号核验。"
+  },
+  "review_scope": "只对当前五臂修订作定向静态审查；先前六臂外审与并行补充为已完成背景；旧三臂建议不作为当前范围或批准预算。",
+  "current_input": {
+    "file": "continual_baseline_plan_review.zip",
+    "bytes": 42232,
+    "sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+    "zip_members": 8,
+    "manifest_payloads": 7,
+    "identity_check": "ALL_MATCH",
+    "files": [
+      {
+        "alias": "P",
+        "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+        "bytes": 19889,
+        "sha256": "4b6b90bc195bc43d444d986375dabdb3e8d35ddf69f44b5e88b3e3c979e0f4a9",
+        "physical_lines": 111,
+        "root_reading": "FULL_TEXT",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "B",
+        "file": "reports/documentation/20261023/continual_baselines/budget.json",
+        "bytes": 4299,
+        "sha256": "60774e6bb1109ba94f46c8fcb1e40c14e64ab8025e2757e3810dfdd703f343f9",
+        "physical_lines": 162,
+        "root_reading": "FULL_JSON_PARSE_AND_RELEVANT_CONTENT_READ",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "REQ",
+        "file": "reports/documentation/20261023/continual_baselines/review/request.zh.txt",
+        "bytes": 3381,
+        "sha256": "53b573e27478b3d8a46fd3444cfc06f0e4233bb12fe59dac1b7af11cb258f4dc",
+        "physical_lines": 15,
+        "root_reading": "FULL_TEXT",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "PD",
+        "file": "reports/documentation/20261023/continual_mainline/review/primary_disposition.zh.txt",
+        "bytes": 15428,
+        "sha256": "bc3bf164314fb30f603f031c705d197f11688945cfffaacebc72b6e8f46fb368",
+        "physical_lines": 80,
+        "root_reading": "FULL_TEXT",
+        "scope": "只作历史变化背景，不作为当前结论/授权"
+      },
+      {
+        "alias": "SEL",
+        "file": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json",
+        "bytes": 1236,
+        "sha256": "dd84e4ca4341fee34632c50af054372f2f2e1db24777053961cd050ccfc279aa",
+        "physical_lines": 1,
+        "root_reading": "FULL_JSON_PARSE_AND_RELEVANT_CONTENT_READ",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "ER",
+        "file": "docs/SELLER_ALIAS_ER_LOW_RESULT.zh.md",
+        "bytes": 16515,
+        "sha256": "e374d6ff4cc95b634a18519611c10d227d1301f6cf1d72b809382030738a274c",
+        "physical_lines": 208,
+        "root_reading": "FULL_TEXT",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "LOG",
+        "file": "docs/SELLER_ALIAS_LOGIT_RISK_RESULT.zh.md",
+        "bytes": 16239,
+        "sha256": "e4c0f2b35ce03e7c9db96635ecc3f5eeff3f7a42dc10e4369d277d140b56546d",
+        "physical_lines": 128,
+        "root_reading": "FULL_TEXT",
+        "scope": "全部本次载荷语义已读"
+      },
+      {
+        "alias": "IM",
+        "file": "input_manifest.json",
+        "bytes": 1709,
+        "sha256": "193abc65879e32b884b8f3f5b7508859d960199bdd3300e70d22f055ff6a2480",
+        "physical_lines": 45,
+        "root_reading": "FULL_JSON_PARSE_AND_RELEVANT_CONTENT_READ",
+        "scope": "全清单、大小和SHA核对"
+      }
+    ]
+  },
+  "prior_input": {
+    "file": "continual_mainline_plan_review.zip",
+    "bytes": 233582,
+    "sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+    "zip_members": 35,
+    "manifest_payloads": 34,
+    "available_in_same_conversation": true,
+    "mechanical_identity_and_all_payload_hashes_rechecked": true,
+    "all_payloads_semantically_reread_this_revision": false,
+    "root_targeted_current_reads": [
+      {
+        "file": "scripts/step28_er_weight.py",
+        "root_current_read_ranges": [
+          [
+            190,
+            295
+          ]
+        ],
+        "purpose": "账号加权历史项与独立logit系数、实际更新",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_bge_continual.py",
+        "root_current_read_ranges": [
+          [
+            215,
+            321
+          ]
+        ],
+        "purpose": "基础账号更新、梯度与优化器语义",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_optuna_control.py",
+        "root_current_read_ranges": [
+          [
+            1,
+            120
+          ],
+          [
+            201,
+            216
+          ]
+        ],
+        "purpose": "旧单active预算、完整结果门",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_optuna_run.py",
+        "root_current_read_ranges": [
+          [
+            1,
+            165
+          ],
+          [
+            278,
+            347
+          ]
+        ],
+        "purpose": "旧ID/阶段与child预算、资源限制",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_optuna_search.py",
+        "root_current_read_ranges": [
+          [
+            198,
+            291
+          ]
+        ],
+        "purpose": "旧控制计时、父launcher/进程组和尾部",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt",
+        "root_current_read_ranges": [
+          [
+            1,
+            30
+          ]
+        ],
+        "purpose": "旧三域计时/峰值/历史范围",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+        "root_current_read_ranges": [
+          [
+            80,
+            100
+          ]
+        ],
+        "purpose": "基础算法/教师定义与优化因素边界；另以rg定位第31行",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_g_half_run.py",
+        "root_current_read_ranges": [
+          [
+            265,
+            301
+          ]
+        ],
+        "purpose": "完整/推理恢复与full文件生命周期",
+        "not_full_current_semantic_review": true
+      },
+      {
+        "file": "scripts/step28_record_attribution_run.py",
+        "root_current_read_ranges": [
+          [
+            93,
+            105
+          ]
+        ],
+        "purpose": "LOGIT0.1实际调用传参",
+        "not_full_current_semantic_review": true
+      }
+    ],
+    "additional_targeted_current_reads": [
+      {
+        "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+        "mode": "RG_KEYWORD_LINES",
+        "focus_lines": [
+          81,
+          111,
+          124,
+          162,
+          163
+        ],
+        "note": "关键词匹配及相应已给条款，不声称本轮再次全文阅读186行。"
+      },
+      {
+        "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+        "mode": "FULL_JSON_PARSE_TARGETED_FIELD_INSPECTION",
+        "fields": [
+          "/arms/S/measurements",
+          "/arms/H_pos/measurements",
+          "/arms/*/resources",
+          "/measurements",
+          "/peak_output_bytes",
+          "/peak_rss_bytes"
+        ],
+        "note": "解析/提取已开放计量字段及资源状态；不把解析全部JSON当全部语义审查；一次rg长行截断未据此声称全读。"
+      },
+      {
+        "file": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json",
+        "mode": "BYTE_EQUALITY_TO_FULLY_READ_CURRENT_COPY"
+      }
+    ],
+    "prior_completed_review_evidence_reused": [
+      {
+        "file": "scripts/step28_optuna.py",
+        "previous_ranges": [
+          [
+            1,
+            112
+          ],
+          [
+            164,
+            241
+          ]
+        ],
+        "purpose": "冻结选参与历史协议"
+      },
+      {
+        "file": "scripts/step28_record_attribution_run.py",
+        "previous_ranges": [
+          [
+            143,
+            170
+          ],
+          [
+            230,
+            280
+          ]
+        ],
+        "purpose": "三阶段已有入口"
+      },
+      {
+        "file": "scripts/step28_record_replay.py",
+        "previous_ranges": [
+          [
+            245,
+            310
+          ]
+        ],
+        "purpose": "合法Memory/记录级分支"
+      },
+      {
+        "file": "scripts/step28_g_half_run.py",
+        "previous_ranges": [
+          [
+            163,
+            195
+          ],
+          [
+            230,
+            301
+          ],
+          [
+            325,
+            365
+          ]
+        ],
+        "purpose": "出生教师/阶段端点/恢复"
+      },
+      {
+        "file": "scripts/step28_continual_expression_data.py",
+        "previous_ranges": [
+          [
+            130,
+            150
+          ],
+          [
+            185,
+            220
+          ],
+          [
+            250,
+            329
+          ]
+        ],
+        "purpose": "受限新确认生成入口的旧约束"
+      },
+      {
+        "file": "scripts/step28_continual_expression_data_verify.py",
+        "previous_ranges": [
+          [
+            200,
+            250
+          ]
+        ],
+        "purpose": "原验证与权限边界"
+      },
+      {
+        "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+        "previous_ranges": [
+          [
+            1,
+            186
+          ]
+        ],
+        "purpose": "原方案/闭合结论及并行补充；当前五臂范围优先"
+      },
+      {
+        "file": "reports/seller_alias_continual/20261023/optuna_result/report.zh.md",
+        "mode": "PRIOR_COMPLETED_REVIEW_CONCLUSIONS_REUSED",
+        "purpose": "原开发门失败、初学与下降分解；本轮不重算旧结果"
+      }
+    ]
+  },
+  "internal_subreviews": {
+    "primary_reviewer_independently_integrated_findings": true,
+    "not_independent_backend_model_certification": true,
+    "division": [
+      "五臂必要性/固定参公平性",
+      "统计/评价格/权限",
+      "预算/旧代码接线/并发"
+    ],
+    "additional_agent_current_reads_beyond_root": [
+      {
+        "file": "scripts/step28_bge_continual.py",
+        "ranges": [
+          [
+            136,
+            197
+          ]
+        ],
+        "purpose": "retain/Memory阶段分支"
+      },
+      {
+        "file": "docs/SELLER_ALIAS_RECORD_ATTRIBUTION.zh.md",
+        "ranges": [
+          [
+            15,
+            25
+          ]
+        ],
+        "purpose": "完整记录级系统边界"
+      },
+      {
+        "file": "scripts/step28_optuna_control.py",
+        "ranges": [
+          [
+            121,
+            122
+          ]
+        ],
+        "purpose": "旧控制限额相邻上下文"
+      }
+    ],
+    "notes_not_packaged_as_extra_authority": true
+  },
+  "actions_performed": [
+    "本次及原ZIP的只读大小/SHA/成员/清单核对",
+    "提供文本与源码的静态阅读、字段解析和普通算术",
+    "编写审查报告/结构化发现/复算脚本/交付ZIP"
+  ],
+  "actions_not_performed": [
+    "未执行或导入项目科研模块",
+    "未训练、推理或加载模型/权重",
+    "未生成科研数据或确认结果",
+    "未bootstrap/重采样",
+    "未读取或索取未提供labels/owners/private_custody/Memory/市场导出",
+    "未连接项目服务器或进行当前硬件/吞吐测量",
+    "未浏览网络或重新核查外部论文",
+    "未授予实施、预算或数据开放权限"
+  ],
+  "limitations": [
+    "新五臂并发实现未提供，不能核验其已通过",
+    "硬件快照仅在提供方案/预算中转述，原12采样/raw日志未附",
+    "旧9路径精确98727.018326秒只见新预算/处置文本，旧报告仅到整数秒",
+    "未提供的源码依赖及实际载荷不索取、不执行；不声称全仓审查",
+    "36调用/5400s资格、24h/450h/36h新资源可行性均未执行",
+    "统计适用性是设计分析，不是功效测量或已观察确认结果"
+  ],
+  "authorization": {
+    "user_authorized_package_upload_and_external_review": true,
+    "implementation_or_budget_approval_inferred": false,
+    "historical_pending_words_treated_as_historical_snapshot": true
+  }
+}

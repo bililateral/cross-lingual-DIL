@@ -1,0 +1,237 @@
+{
+  "scope": "仅提供文档/保存字段与机械算术；没有研究执行或新资源测量。",
+  "current_input_sha256": "0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300",
+  "prior_input_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+  "sources": {
+    "proposal": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+    "budget": "reports/documentation/20261023/continual_baselines/budget.json",
+    "selected": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json",
+    "old_native": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+    "old_resource_report": "reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt"
+  },
+  "source_lines": {
+    "scope_and_formulas": [
+      29,
+      55
+    ],
+    "confirmation": [
+      63,
+      81
+    ],
+    "budget_resources_forecast": [
+      93,
+      105
+    ],
+    "old_gpu_peak": [
+      17,
+      17
+    ]
+  },
+  "selected_parameters_match": {
+    "S_tuned": {
+      "selected_trial": 10,
+      "lambda_rank": 1.3572393683805832,
+      "lr_multiplier": 1.295036258870551
+    },
+    "H_pos_tuned": {
+      "selected_trial": 11,
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686
+    }
+  },
+  "counts": {
+    "methods": 5,
+    "orders": 3,
+    "seeds": 3,
+    "full_paths": 45,
+    "SEQ_paths": 9,
+    "memory_paths": 36,
+    "updates_per_path": 864,
+    "updates": 38880,
+    "gradient_groups_SEQ": 7776,
+    "gradient_groups_memory": 51840,
+    "gradient_groups_total": 59616,
+    "stage_states": 135,
+    "confirmation_core_sixcell_forwards": 10800,
+    "confirmation_SEQ_extra_forwards": 720,
+    "confirmation_total_forwards": 11520,
+    "independent_confirmation_groups": 120,
+    "excluded_from_confirmation_count": "训练端点的旧dev/cal评分、恢复、教师出生前向计入训练池，不是11520的一部分。"
+  },
+  "budget": {
+    "buckets_seconds": {
+      "training_shared_pool": 1620000,
+      "confirmation_shared_pool": 129600,
+      "cpu_qualification": 1200,
+      "native_qualification": 5400,
+      "data_generation_verification": 600,
+      "control": 1800,
+      "old_dev_evaluation": 3600,
+      "analysis_including_all_bootstrap": 1800
+    },
+    "other_seconds": 14400,
+    "other_hours": 4.0,
+    "total_seconds": 1764000,
+    "total_hours": 490.0,
+    "training_pool_hours": 450.0,
+    "run_max_hours": 24.0,
+    "average_planning_hours": 10.0,
+    "45_times_24h_arithmetic_only_not_authorized": 1080,
+    "native_optimizer_calls_cap": 36
+  },
+  "reduced_training_proxy": {
+    "formula": "1.25*[288*(t_A+2*t_B)+660*v+L+3*(s_F+r_F+s_I+r_I)+2700]",
+    "forward_count": {
+      "three_endpoints_three_passes_cal_dev": 648,
+      "birth_teacher_upper": 12,
+      "sum": 660
+    },
+    "removed": "2088轮诊断前向、60未训练起点评分、72次旧诊断历史教师投影；训练更新与必要端点不删。",
+    "arms": {
+      "S": {
+        "source": {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/S/measurements"
+        },
+        "stored_measurements": {
+          "L": 5.4118858417496085,
+          "W_F": 3904680645,
+          "W_I": 1304378315,
+          "h": 0.002505871932953596,
+          "r_F": 11.605019561946392,
+          "r_I": 3.1226372071541846,
+          "s_F": 11.445843072142452,
+          "s_I": 2.8263791548088193,
+          "t_A": 12.315755436196923,
+          "t_B": 22.454216088168323,
+          "v": 2.431383382063359
+        },
+        "components": {
+          "training_proxy_seconds": 16480.566032409668,
+          "endpoint_and_birth_forward_proxy_seconds": 1604.713032161817,
+          "load_proxy_seconds": 5.4118858417496085,
+          "three_endpoint_io_proxy_seconds": 86.99963698815554,
+          "unmeasured_allowance_seconds": 2700
+        },
+        "factor": 1.25,
+        "single_run_serial_proxy_seconds": 26097.113234251738,
+        "single_run_serial_proxy_hours": 7.249198120625483,
+        "three_times_elapsed_proxy_hours": 21.74759436187645,
+        "status": "OLD_FIELDS_MECHANICAL_PROXY_NOT_NEW_QUALIFICATION"
+      },
+      "H_pos": {
+        "source": {
+          "package_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+          "file": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+          "json_pointer": "/arms/H_pos/measurements"
+        },
+        "stored_measurements": {
+          "L": 2.4633675357326865,
+          "W_F": 3904680901,
+          "W_I": 1304378571,
+          "h": 0.006201939657330513,
+          "r_F": 11.061484342906624,
+          "r_I": 3.146804547868669,
+          "s_F": 8.568925621919334,
+          "s_I": 2.842291580978781,
+          "t_A": 11.329518273007125,
+          "t_B": 22.668693653773516,
+          "v": 2.3212430011481047
+        },
+        "components": {
+          "training_proxy_seconds": 16320.068807199597,
+          "endpoint_and_birth_forward_proxy_seconds": 1532.020380757749,
+          "load_proxy_seconds": 2.4633675357326865,
+          "three_endpoint_io_proxy_seconds": 76.85851828102022,
+          "unmeasured_allowance_seconds": 2700
+        },
+        "factor": 1.25,
+        "single_run_serial_proxy_seconds": 25789.263842217624,
+        "single_run_serial_proxy_hours": 7.163684400616007,
+        "three_times_elapsed_proxy_hours": 21.491053201848022,
+        "status": "OLD_FIELDS_MECHANICAL_PROXY_NOT_NEW_QUALIFICATION"
+      }
+    }
+  },
+  "confirmation_proxy": {
+    "old_max_v_seconds": 2.431383382063359,
+    "single_route_forward_only_hours": 9.725533528253436,
+    "three_times_task_forward_only_hours": 29.17660058476031,
+    "36h_minus_three_times_forward_proxy_hours": 6.823399415239692,
+    "not_included_in_forward_proxy": "新载模/I/O/标签指标/失败尾部；三倍不是已证实上界。"
+  },
+  "storage_proxy": {
+    "components": {
+      "permanent_135_inference_GiB": 164.70439732074738,
+      "concurrent_6_full_GiB": 21.81910481862724,
+      "concurrent_3_temporary_inference_GiB": 3.6600977182388306,
+      "small_evidence_GiB": 2
+    },
+    "named_total_GiB": 192.18359985761344,
+    "headroom_to_224GiB": 31.816400142386556,
+    "cap_GiB": 224,
+    "required_free_GiB": 288,
+    "headroom_free_requirement_over_cap_GiB": 64,
+    "full_file_proxy_matches_old_native_max": true,
+    "status": "生命周期及新文件峰值未执行验证"
+  },
+  "gpu_proxy": {
+    "snapshot_source": "本次proposal101及budget/resources转述；raw server_resources.json未提供，未独立核验。",
+    "snapshot_total_GiB": 31.8427734375,
+    "snapshot_free_GiB": 31.1484375,
+    "old_single_torch_reserved_GiB": 8.81640625,
+    "three_times_old_torch_reserved_GiB": 26.44921875,
+    "snapshot_free_minus_three_old_reserved_GiB": 4.69921875,
+    "not_a_concurrent_admission_proof": true,
+    "old_native_resources_note": "旧native中部分reserved=0属于释放后字段，不能作为运行峰值。"
+  },
+  "forecast": {
+    "old_9path_exact_seconds_source": "本次budget/forecast和历史主审转述；没有独立取得精确原计时字段。",
+    "old_9path_exact_seconds_as_provided": 98727.018326,
+    "old_report_integer_wall_seconds": 98728,
+    "difference_seconds": 0.9816739999951096,
+    "serial_equivalent_work_hours": 137.1208587861111,
+    "conditions": [
+      {
+        "q_assumption": 1.0,
+        "training_wall_hours_proxy": 137.1208587861111,
+        "training_cumulative_task_hours_if_three_active": 411.36257635833334,
+        "calendar_proxy_with_confirmation_10_to_13h_and_other_full_4h": [
+          151.1208587861111,
+          154.1208587861111
+        ]
+      },
+      {
+        "q_assumption": 1.5,
+        "training_wall_hours_proxy": 91.41390585740741,
+        "training_cumulative_task_hours_if_three_active": 274.2417175722222,
+        "calendar_proxy_with_confirmation_10_to_13h_and_other_full_4h": [
+          105.41390585740741,
+          108.41390585740741
+        ]
+      },
+      {
+        "q_assumption": 2.0,
+        "training_wall_hours_proxy": 68.56042939305556,
+        "training_cumulative_task_hours_if_three_active": 205.68128817916667,
+        "calendar_proxy_with_confirmation_10_to_13h_and_other_full_4h": [
+          82.56042939305556,
+          85.56042939305556
+        ]
+      }
+    ],
+    "q_for_450h_full_three_proxy_only_not_a_new_gate": 0.9141390585740741,
+    "exact_task_accounting_relation": "sum_i elapsed_i = integral(active_worker_count(t) dt); 满三路才约等于3*训练墙钟。",
+    "q_measured": false,
+    "current_server_checked": false,
+    "calendar_guarantee": false
+  },
+  "accounting_semantics": {
+    "time_units": "累计任务外层elapsed，不是CPU user/system时间、墙钟或物理GPU小时。",
+    "reservation": "已结算U+活跃run未结算整段预留+未覆盖尾部<=共享池；预留含已发生但尚未结算部分。",
+    "child_limit": "实际分配r_i<=24h须传入父launcher和child Budget/watchdog，不能留旧21600s。",
+    "failure": "失败与恢复耗时保留，同run不能清零；不完整45条不得用子集开结果。",
+    "other_pools": "确认36h、资格5400s也按共享累计口径，不各worker再获完整一份。"
+  }
+}
