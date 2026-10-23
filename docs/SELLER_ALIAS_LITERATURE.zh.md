@@ -164,3 +164,22 @@ L²R把每个训练查询的旧负例记忆用于后续文本排序，与“留�
 - 本轮OpenAlex记录分别为VendorLink `W4385570400`、eDarkFind `W3012857244`、KDD 2019 `W2953027522`、uStyle-uID `W2988701063`、2024度量学习 `W4391948814`；接口筛选日期为2022-01-01至2026-12-31，返回结果仍须按实际出版日期、原文和目录核对。没有把检索结果数量当作独立方法数量，也没有把索引未收录解释为文献不存在。
 - 中文路线核对ConRE参考文献，并追查作者、相邻成果与可公开检索的引用线索；《暗网高质量威胁情报获取技术与实现》（计算机工程2026）虽与上述上海交大团队相关，但其任务是主题筛选、实体抽取与情报时新性评估，不是卖家账号配对。未获得CNKI／万方的完整被引导出，不能宣称中文被引已穷尽。
 - **严格清单目前为1/3，另2个空缺仍未补齐。**这是当前已核实证据的范围，不是断言全球不存在另外两篇。数据集、通用作者归属、商品分类、图片指纹、额外身份标识符抽取以及C类论文均不冒充合格直接比较方法。没有新训练、数据读取或基线实现；不能把“未研究持续遗忘”写成“已经证明会遗忘”。
+
+## 9. 2026-10-23后续：放宽刊会范围后的直接方法核查
+
+用户随后将刊会要求放宽为“2022—2026年、CCF A/B或知名期刊会议”，仍要求商品标题／描述用于卖家账号关联。第8节保留当时较严格条件下的结果；新条件下不再仅因TrustCom、ICICS为C类直接排除。以下是文献事实与待核实边界，不是新增比较方案、实施授权或复现完成声明。
+
+### 两篇有正文依据的直接任务候选
+
+1. **DarkBIP-FW：Decoding the shadows: multi-modal identity profiling in darknet markets using latent behavior feature fusion**。Xuan Zhang、Pengfei Li、Xin Tong、K. P. Chow、DeYu Yuan、Si Chen、Bo Jin；*Discover Applied Sciences*，2025，7:656，2025-06-17发表，[DOI及出版社全文](https://link.springer.com/article/10.1007/s42452-025-07217-5)。本轮实际核读§4.2.3、§5、§6.1—6.6与参考文献。§4.2.3将中文商品标题和描述拼接，由`bert-base-chinese`编码；§5使用卖家标签嵌入及LabelSimCos损失；§6.5.2明确包含**DarkBIP (Only Text)**，不是本项目自行臆造的消融。§6.6.2另以卖家嵌入的两两余弦相似度筛选疑似多账号，故不能把此文概括成只有商品分类或活跃度分组。须分开三类证据：Only Text的结果是已见卖家分类，疑似账号关联案例没有独立报告Only Text版本，尚未验证本项目未见身份／同控真值设定。文本消融与原文关联规则能否组合成可复现比较臂仍需明确聚合、标签嵌入和评价适配，不能借用完整多模态案例的效果。
+2. **Multi-Identity Recognition of Darknet Vendors Based on Metric Learning**。Yilei Wang、Yuelin Hu、Wenliang Xu、Futai Zou；*Applied Sciences*，2024，14(4):1619，2024-02-17发表，[DOI及出版社页面](https://www.mdpi.com/2076-3417/14/4/1619)、[出版社全文PDF](https://mdpi-res.com/d_attachment/applsci/applsci-14-01619/article_deploy/applsci-14-01619-v2.pdf?version=1708313082)。已核读全文。§3.2.1分别对标题、描述提取冻结BERT、Doc2Vec和写作风格特征，再聚合为账号特征；§3.2.3降维，§3.3用共享参数孪生网络及对比损失学习账号距离，目标就是不同账号是否属于同一卖家。完整模型还含ResNet50图片特征；§3.2.2明确无图片商品用零向量。因此存在按文字输入研究其缺图版本的具体依据，但“所有商品均缺图”的文本实验仍属适配，正文未给出独立纯文本消融成绩。英文风格特征、784维降维、标题Jaccard预筛及用户名／伪标签流程不能不加说明地移植到当前中文固定候选集与已知标签合同。
+
+两篇的任务都直接涉及卖家身份／多账号，具备比数据集论文或泛作者归属更具体的比较依据；二者的文本适用证据强度不同。刊物资格仍如实标注：均非本轮已核对的CCF A/B条目，不能把出版社知名等同于刊物达到顶刊档次。[Discover Applied Sciences官网](https://link.springer.com/journal/42452)列明ESCI、Scopus、Ei Compendex收录；本轮不将其写成SCIE或A/B期刊。不因放宽范围便宣称已找到另外两篇无需适配、可原样复现的纯文本方法。尚未找到并核验这两篇的官方实现。
+
+### TrustCom 2025的新证据与暂留问题
+
+[You May Not Be Your Username](https://doi.org/10.1109/TRUSTCOM66490.2025.00129)已由[作者机构发表清单](https://www.cpp.edu/faculty/santanamarin/publications.shtml)、Crossref及IEEE公开页面元数据交叉核实；正确IEEE记录为[11354938](https://ieeexplore.ieee.org/document/11354938/)，作者Wesley H. Kwan、Lynn K. Takahashi、Nathan Pham、Apurva Sista、Ericsson Marin，1119—1126页。相较第8节，本轮已取得正式摘要：模型在一个市场的带卖家标签数据上训练，对未见市场商品预测；Oracle通过用户名、图片相似度和文本签名交叉核验预测。**Oracle是摘要所述评价机制，不能据此断言预测模型一定依赖图片，也不能反向断言模型仅用标题／描述。**全文和官方代码仍未取得，具体模型、输入与账号聚合尚不清楚，暂不将其计为可落地的已核实纯文本比较方法。
+
+另外复核了ICICS 2023的Springer摘要、参考文献及OpenReview书目；后者为书目入口，未获得全文，不冒称已读方法。其图结构和图片依赖未解决，因此没有拿它与2024同团队论文直接拼成两个已经独立核实的文本方法。扩展的取证路线中，Single-Vendor Marketplaces相似度论文主要使用网页结构／元数据，Busting up Monopoly涉及市场监测及加密货币关联，Pathway toward the Surface Web涉及追踪代码／站点连接；均未据此补足商品文本账号关联名额。
+
+本轮只检索公开论文、核对书目与方法正文并更新本记录；未发送作者邮件、读取项目实验数据、连接Linux、实现或运行新的比较方法。已获全文的候选可进入后续复现可行性核查，但不把候选数量写成已完成比较数量。
