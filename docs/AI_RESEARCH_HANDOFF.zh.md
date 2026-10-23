@@ -2,6 +2,10 @@
 
 ## 当前工作
 
+最新进展同步（2026-10-23 17:00:36，Asia/Shanghai）：只读SSH复核既定`formal_20261023`，wrapper/controller及首批ABC_s4的SEQ/ER/LOGIT三worker均仍存活，属主、启动时刻、命令与工作目录对应原运行。三路最新已落盘更新事件均为首域A的264/288步（日志每24步报告，实际可能已继续），完整轨迹0/45；controller及三worker均无failure，正式退出回执尚未形成。61份冻结workspace来源与current_sources.json大小/SHA全部一致。三worker各train=1、worker_train_reads=1，valid/heldout/owners均0；确认生成未开始。单5090当时利用率90%，空闲12468/32607MiB，三个训练进程各占6470MiB；磁盘可用511815266304字节。账本training=0为活跃任务尚未退出结算，三笔完整预留仍在，不能解释为没有训练消耗。总工期继续沿用三槽151.80小时训练的保守投影，观测时已运行约34分钟、训练估计尚余约151.24小时；加确认/分析仍约7天，条件完成时点10月30日白天至晚间，未根据首阶段短段速度重新承诺工期。硬限仍为490累计分桶小时，非墙钟保证。
+
+本轮同步前五份可变总文档两端同字节；本次仅补交接现场与讨论澄清、同步已提交的[最新文献核查](SELLER_ALIAS_LITERATURE.zh.md#11-2026-10-23用户提供两篇全文后的方法核实)，冻结workspace及活动训练不改。文献线当前已取得并核实ICICS 2023与TrustCom 2025两篇全文，但输入/任务适配缺口未消除，当前仍仅VendorLink计入，另外两项未补齐；用户已选择保持当前输入和任务条件继续寻找，不能据此擅自增加训练比较臂。原有历史回顾表删除及其他未提交材料保留原状，不纳入本次交付。
+
 五方法正式训练已启动（2026-10-23 16:26:59，Asia/Shanghai）：实现外审完整回收，I01评价文件重名、I02控制落盘计时、I03小证据2GiB限制经[独立主审](../reports/documentation/20261023/continual_implementation/review/primary_disposition.zh.txt)最小修复；cpu08三项通过，CPU累计68秒，native782.909949786秒及失败账保留。16:26:15实查61项当前来源、完整45预算、单5090空闲31896MiB、RAM可用242.73GiB/disk476.64GiB、无旧作业后，按已有授权签发[正式门](../reports/documentation/20261023/continual_implementation/formal_gate.json)，直接三路启动，无重复批准。实际campaign为`/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/formal_20261023`，workspace仍为同目录下workspace。wrapper PID245792、controller PID245796；首批ABC_s4的SEQ/ER/LOGIT worker分别245806/245811/245816，CPU核0/1/2。16:28:19[现场回执](../reports/documentation/20261023/continual_implementation/formal_observation.json)确认三路均已完成真实optimizer更新、无失败，GPU利用率89%/空闲12474MiB；不是只启动进程。每条完成后按冻结队列补位，最终五方法×三顺序×三seed=45，不加HPO。禁止重复启动或修改冻结workspace来源，正式失败保留并停派，无自动重试。
 
 工期与后续：当前45条训练保守投影444.595累计任务小时，450h池余5.405h；固定三槽墙钟约151.80h，条件训练完成时点约10月30日00:15，新确认及分析后整批约10月30日白天至晚间，总计约7天，当前尚余约7天。490h仍为累计分桶硬限，不是墙钟工期；实际变慢/资源不足不承诺全45完成，不能改臂或借预算。全部45盲完成后才联合开旧dev、再按冻结方案生成/确认/分析；目前确认生成和评价标签开放均0。实现外审专用页已关闭，一次性“回收实现外审并启动三路主线”跟进automation已删除，不影响automation-2；实际Linux控制器持续运行，不新建监听。完整外审原文、主审、资格和启动证据两端保管，当前来源已冻结；下面未启动/待外审文字均为更早时点历史。
