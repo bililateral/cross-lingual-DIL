@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-10-23 三域主线静态方案待审材料
+
+新具体方案、预算及外审请求保存在Windows `reports/documentation/20261023/continual_mainline/`。已准备[方案审查ZIP](../reports/documentation/20261023/continual_mainline/review/continual_mainline_plan_review.zip)：233582字节、35成员（34载荷及manifest），SHA256 `17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487`；34载荷608117字节的大小/SHA逐项一致，见[准备回执](../reports/documentation/20261023/continual_mainline/review/preparation.json)。仅含具体方案、预算、请求、相关已开放报告/合同/源码/资格字段和权重删除回执，没有正式文本、标签、owners、private_custody、模型载荷或凭据。当前未上传、未连接Linux、未新增科研执行，具体包先供用户审阅确认；旧结果包批准不扩大到本包。新方案及元数据作本地Git交付，ZIP留Windows供待审上传，不推送、不覆盖冻结历史来源。此新增待审包有当前用途，不属于应清理的已验收无用副本；其他Optuna保管决定不变。
+
 ## 项目大清理周期
 
 最近一次两端项目大清理完成日期：**2026-10-22**。下一次到期日期：**2026-11-06**，到期须先说明理由及具体范围、取得用户许可，再执行；局部缓存清理不重置该周期。用户明确将原定10月23日的大清理提前至10月22日执行，已按确认清单完成后重新计时。

@@ -1,0 +1,88 @@
+{
+  "version": "2026-10-23-v1",
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "core_arms": [
+    "SEQ_tuned",
+    "ER0.1_tuned",
+    "LOGIT0.1_tuned",
+    "S_tuned",
+    "S_pos_tuned",
+    "H_pos_tuned"
+  ],
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "confirmation_seeds": [
+    4,
+    5,
+    6
+  ],
+  "new_baseline_searches": 36,
+  "new_full_trajectories": 54,
+  "optimizer_updates": {
+    "search": 20736,
+    "full": 46656,
+    "total": 67392,
+    "native_qualification_upper": 24
+  },
+  "gradient_group_presentations": {
+    "search": 27648,
+    "full": 72576,
+    "total": 100224
+  },
+  "endpoints": {
+    "search": 72,
+    "full": 162,
+    "initial_confirmation_scoring_states": 18,
+    "confirmation_scoring_states": 180,
+    "confirmation_group_forwards": 21600
+  },
+  "diagnostic_captures": {
+    "search": 432,
+    "full": 972,
+    "total": 1404
+  },
+  "budget_seconds": {
+    "baseline_search": 777600,
+    "full_trajectories": 1944000,
+    "confirmation": 86400,
+    "cpu_qualification": 1200,
+    "native_qualification": 3600,
+    "data_generation_verification": 600,
+    "control": 1800,
+    "old_dev_evaluation": 3600,
+    "analysis": 1800
+  },
+  "per_trajectory_limits_seconds": {
+    "AB_search": 21600,
+    "full_3stage": 36000
+  },
+  "storage": {
+    "campaign_max_GiB": 256,
+    "small_evidence_max_GiB": 2,
+    "minimum_disk_free_GiB": 320,
+    "inference_files_upper": 180,
+    "inference_file_estimated_upper_bytes": 1310000000
+  },
+  "resources_proposed": {
+    "minimum_gpu_free_GiB": 14,
+    "maximum_process_reserved_GiB": 12,
+    "maximum_process_tree_RSS_GiB": 64,
+    "minimum_host_available_GiB": 72
+  },
+  "forecast_hours": {
+    "planning_low": 220,
+    "planning_high": 300,
+    "note": "Planning estimate only; not a current native qualification or calendar promise."
+  },
+  "old_native_projection": {
+    "S": 32625.603143565822,
+    "S_pos": 32031.213724438567,
+    "H_pos": 32022.359474869445,
+    "note": "Stored old maximum-shape timing fields + planned three-stage operation counts, not new native execution."
+  },
+  "total_seconds": 2820600,
+  "total_hours": 783.5
+}

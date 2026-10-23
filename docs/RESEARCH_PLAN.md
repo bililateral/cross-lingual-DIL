@@ -2,6 +2,8 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
+当前待审下一阶段已具体化为[三域三顺序主线确认方案](../reports/documentation/20261023/continual_mainline/proposal.zh.txt)：先补SEQ/ER0.1/LOGIT0.1各12次共同两维选参，再冻结六方法，使用新s4/s5/s6完成54三阶段轨迹及新120群一次确认；具体判据、数据权限、最小实现、预算和停止条件均在提案。拟总硬限783.5小时，不能用旧272小时余额启动。先向用户汇报确认、提交方案外审并独立处置，实施范围与实际资格随后确定；当前不是新的运行合同。原H完整2×2、全六顺序及独立新训练流为有条件后续，不自动加入核心计划。
+
 ## 已确认范围内
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。

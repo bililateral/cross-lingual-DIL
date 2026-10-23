@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+最新待审设计：[2026-10-23持续学习主线完整方案](../reports/documentation/20261023/continual_mainline/proposal.zh.txt)，含六方法／三循环顺序／三个未用seed、三个基线各12次共同两维选参、新三域120群独立确认、O/F共同主要终点与783.5小时分桶硬限。当前为用户要求的具体提案，先汇报确认、方案外审与独立处置，再按批准范围实施；不是正式执行合同，不能据此读新标签、训练或套用旧免审。已有三臂Optuna参数与结果直接衔接，已删除权重不作可续前缀；[送审请求](../reports/documentation/20261023/continual_mainline/review/request.zh.txt)明确本次只审新增方案和最小实现缺口，不重审全部历史。
+
 本页索引合同及当前待审静态提案，执行状态与授权补充见[当前交接](AI_RESEARCH_HANDOFF.zh.md)。合同记录该轮形成时的设定；其中“待批准”“保留权重”等措辞须结合后续明确决定解释，科学公式、访问、预算和原判据不追改。
 
 持续学习抗遗忘主线的横向回顾见[2026-10-22配置与完整指标表](../reports/documentation/20261022/continual_review/tables.zh.md)。该表只整理已开放的历史结果，区分三域与固定A→B、不同训练批次和原验收口径。后续Optuna三臂36搜索+9复验已于2026-10-23完成，见[完整结果与独立主审](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)及[22指标完整表](../reports/seller_alias_continual/20261023/optuna_result/tables.zh.md)：两候选六格开发门均未通过，H_pos旧A条件优势保留，新B及较少遗忘未获确定证据。仍只覆盖A→B及重复开发集，不替代多顺序／独立留出确认；本轮具体结果包已获准，于2026-10-23 10:40:04单次提交GPT 6 Pro，55文件外审已完整回收、14项意见经[独立主审](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)处置结案，专用页已关闭，无新增运行／评价阻断；两候选主门失败及外推边界保持，预算末位和概率区间计数按附注解释。
