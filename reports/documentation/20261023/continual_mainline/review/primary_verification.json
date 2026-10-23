@@ -1,0 +1,139 @@
+{
+  "checked_at": "2026-10-23T12:42:47.4137334+08:00",
+  "method": "PowerShell saved-field arithmetic only; no project modules, statistics, inference or training executed",
+  "original_budget_seconds": 2820600.0,
+  "original_budget_hours": 783.5,
+  "projections": [
+    {
+      "arm": "H_pos",
+      "original_P3_seconds": 32022.359474869445,
+      "reduced_no_epoch_no_initial_proxy_seconds": 25789.263842217624,
+      "v": 2.3212430011481047,
+      "W_F": 3904680901,
+      "W_I": 1304378571
+    },
+    {
+      "arm": "S",
+      "original_P3_seconds": 32625.603143565822,
+      "reduced_no_epoch_no_initial_proxy_seconds": 26097.113234251738,
+      "v": 2.431383382063359,
+      "W_F": 3904680645,
+      "W_I": 1304378315
+    },
+    {
+      "arm": "S_pos",
+      "original_P3_seconds": 32031.213724438567,
+      "reduced_no_epoch_no_initial_proxy_seconds": 25830.17897212645,
+      "v": 2.3094238750636578,
+      "W_F": 3904680709,
+      "W_I": 1304378379
+    }
+  ],
+  "external_old_v_matches": true,
+  "reduced_proposed": {
+    "arms": [
+      "SEQ_ref",
+      "S_tuned",
+      "H_pos_tuned"
+    ],
+    "orders": [
+      "ABC",
+      "BCA",
+      "CAB"
+    ],
+    "seeds": [
+      4,
+      5,
+      6
+    ],
+    "trajectories": 27,
+    "optimizer_updates": 23328,
+    "gradient_group_presentations": 33696,
+    "phase_checkpoints": 81,
+    "core_confirmation_cells": [
+      "R11",
+      "R21",
+      "R22",
+      "R31",
+      "R32",
+      "R33"
+    ],
+    "additional_SEQ_cells": [
+      "R12",
+      "R23"
+    ],
+    "confirmation_group_forwards": 7200,
+    "original_external_D3_forwards": 6120,
+    "retained_R21_extra_forwards": 1080,
+    "inference_weight_bytes_proxy": 106110000000.0,
+    "inference_weight_GiB_proxy": 98.82263839244843,
+    "serial_confirmation_forward_proxy_hours": 6.0784584551583976,
+    "three_times_confirmation_task_hours_proxy": 18.235375365475193,
+    "training_task_cap_hours": 270,
+    "confirmation_task_cap_hours": 24,
+    "other_cap_hours": 3.5,
+    "total_task_cap_hours": 297.5,
+    "budget_authorized": false,
+    "execution_authorized": false,
+    "concurrency_target": 3,
+    "old_serial_training_work_proxy_hours": 82.27251527179692,
+    "concurrency_throughput_measured": false,
+    "native_calls_max": 24,
+    "native_seconds_max": 3600,
+    "campaign_cap_GiB": 160,
+    "minimum_free_disk_GiB": 224
+  },
+  "independently_read_source_identities": [
+    {
+      "path": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+      "sha256": "a51d589b3639761f6d17580313fe819ab2359f7593d9a8263b1b4301848cf807",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "reports/documentation/20261023/continual_mainline/budget.json",
+      "sha256": "fe39951f1293b75ab17769c95c00d3e19c9d8344fcc5cd459d456395678d1f6d",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_optuna.py",
+      "sha256": "0ff083717ee0f01720ddf21ef41cce61def85ab0eef28817386aecba66873336",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_optuna_control.py",
+      "sha256": "7c905ab419f30f1502f955edc354ba070011ea1ca62656d931e9d0c6190c66ef",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_optuna_search.py",
+      "sha256": "695456251d825242dc7581cbb1249d3fc17e441a5ac912e813729c03e09f63d5",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_optuna_run.py",
+      "sha256": "2e9bcb446c571e37b1e4e3e3b2d39c92661fdcd3151ec4328cda2d1462ed8cfe",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_record_attribution_run.py",
+      "sha256": "111d5a8b29b5d284c47340e7b30e276a515a0330f0352199e0b40340eef87155",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_record_replay.py",
+      "sha256": "ca3a7aadaa16d51e78d65d6e25fe714dcf1495b9bab60f2dce3b3cb8893e7f0d",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_continual_expression_data.py",
+      "sha256": "23608792b288891f9bf9d51c4765c1ad0d38b13acefb9e904f509ed93376f7ef",
+      "matches_reviewed_input": true
+    },
+    {
+      "path": "scripts/step28_continual_expression_data_verify.py",
+      "sha256": "28391e8c89c4cf9bd637dff8c5c7600c68c24d6bd9c72cf2b6684d9c082b45fe",
+      "matches_reviewed_input": true
+    }
+  ],
+  "delivery_note": "External design_comparison.csv retains its original BOM/CRLF bytes and verified hash. Git whitespace check treats CR at end of line as original line ending; no external artifact normalized."
+}

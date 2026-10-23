@@ -2,6 +2,8 @@
 
 ## 2026-10-23 三域主线静态方案待审材料
 
+12:35后的完整回收：返回continual_mainline_external_review_20261023.zip为55479字节/9成员，SHA256 fc01291f38f46a88d3daf7f76e31ff595d4f387a9bd1d7ea447d2800cf6b29ae。原文、发现、阅读范围、机械复核脚本/输出和交付清单共9原件已核对后保留于[review/external](../reports/documentation/20261023/continual_mainline/review/external)，网页正文、回收核验与独立处置/普通算术记录在同级review。返回传输ZIP验收后无额外用途，按纪律清理该下载副本；原输入ZIP仍为外审复核脚本的必要输入而保留。专用页已关闭、回收跟进已删除，未向Linux新增备份或同步。旧六臂方案原件保持，当前推荐27路径的具体范围与预算另见主审处置，仍待用户确认。
+
 随后用户明确批准该具体ZIP外发，并要求重点审查过度设计及必要实验。2026-10-23 12:04:45（Asia/Shanghai）原包身份不变、经本地Playwright单次提交成功；[授权](../reports/documentation/20261023/continual_mainline/review/authorization.json)、实际请求、提交页面及[回执](../reports/documentation/20261023/continual_mainline/review/submission.json)新增在同目录，回执保留先前拒绝历史。当前在审、待完整回收和独立处置；包内待确认字样是形成时状态，不重打包覆写。实施／预算仍未批准。
 
 新具体方案、预算及外审请求保存在Windows `reports/documentation/20261023/continual_mainline/`。已准备[方案审查ZIP](../reports/documentation/20261023/continual_mainline/review/continual_mainline_plan_review.zip)：233582字节、35成员（34载荷及manifest），SHA256 `17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487`；34载荷608117字节的大小/SHA逐项一致，见[准备回执](../reports/documentation/20261023/continual_mainline/review/preparation.json)。仅含具体方案、预算、请求、相关已开放报告/合同/源码/资格字段和权重删除回执，没有正式文本、标签、owners、private_custody、模型载荷或凭据。当前未上传、未连接Linux、未新增科研执行，具体包先供用户审阅确认；旧结果包批准不扩大到本包。新方案及元数据作本地Git交付，ZIP留Windows供待审上传，不推送、不覆盖冻结历史来源。此新增待审包有当前用途，不属于应清理的已验收无用副本；其他Optuna保管决定不变。

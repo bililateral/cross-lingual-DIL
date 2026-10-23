@@ -1,0 +1,706 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-10-23",
+  "timezone": "UTC+08:00",
+  "input_name": "continual_mainline_plan_review.zip",
+  "input_sha256": "17d1bfd3214d6b9f164274527925ef2d14774967edd0ae2d22947e620097f487",
+  "overall_disposition": "RECOMMEND_SCOPE_REDUCTION_BEFORE_USER_IMPLEMENTATION_DECISION",
+  "overall_disposition_zh": "不按最小方案原样推荐六臂36搜索；主线首选三臂27完整路径零搜索，唯一主比较可缩为两臂18路径。",
+  "confirmed_scientific_blockers_requiring_new_experiments": 0,
+  "confirmed_reproducibility_defects": 1,
+  "unqualified_for_execution_reason": "本轮只是静态方案评审；用户尚未批准实施/预算，新实现和资格尚未进行。",
+  "finding_count": 12,
+  "findings": [
+    {
+      "id": "F-01",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "high_scope_cost",
+      "status": "CONFIRMED_SCOPE_MISMATCH",
+      "title": "六臂与36次新增搜索不是唯一H_pos−S主比较的必要规模",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            7,
+            8
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            46,
+            64
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            68,
+            77
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            112,
+            115
+          ]
+        }
+      ],
+      "impact": "原案同时承载候选确认、无记忆场景、强基线、普通重放和rank/pooling解释，不能把全部成本作为原主线最低投入。",
+      "minimum_recommendation": "唯一主比较用S/H_pos两臂18路径零HPO；若本轮还重证无记忆场景，采用SEQ_ref/S/H_pos三臂27路径零HPO。LOGIT、ER、S_pos逐项随明确主张选入。",
+      "necessity": "科学上必须保留S与H_pos；其他臂取决于目标主张。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-02",
+      "category": "合理后续建议",
+      "severity": "material_interpretation",
+      "status": "CONFIRMED_FAIRNESS_BOUNDARY",
+      "title": "精简搜索必须同步收窄公平性措辞，冻结SEQ诊断不需要12次搜索",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            55,
+            64
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            69,
+            77
+          ]
+        },
+        {
+          "file": "reports/documentation/20261022/continual_review/tables.zh.md",
+          "lines": [
+            17,
+            20
+          ]
+        }
+      ],
+      "impact": "取消基线搜索后仍宣称同两维同12次机会会失真；但为纯现象诊断SEQ强制搜索会无谓增加72h拟训练额度。",
+      "minimum_recommendation": "SEQ_ref冻结原配置并继续训练，只作现象诊断；主要对手保持S_tuned。若要求同12次条件下对LOGIT优越，才给LOGIT单独12次；否则明确比较冻结历史版本。",
+      "necessity": "取决于目标主张；禁止靠削弱主要S对手省算力。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "未给新增机会却声称所有保留基线同两维同12次调参",
+        "有限两维搜索等于全局最优或完全等探索"
+      ],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-03",
+      "category": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "medium_scope_cost",
+      "status": "CONFIRMED_ENDPOINT_REDUNDANCY",
+      "title": "初始18状态、完整4×3矩阵和全epoch诊断不都是核心终点必要工作",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            88,
+            88
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            103,
+            110
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            140,
+            154
+          ]
+        }
+      ],
+      "impact": "O/F/N/Z只需每路径R11,R22,R31,R32,R33，原54路径核心前向10800而非21600；原始取得水平并不因删除初始模型而丢失。",
+      "minimum_recommendation": "保留三个阶段权重及必要恢复；五格主终点为核心。需G才加R12/R23，需中间旧域轨迹才加R21。推荐三臂对SEQ额外保留G，总确认6120前向。全epoch过程诊断按明确主张取消或缩减。保留同分数的概率代价指标。",
+      "necessity": "五格为科学必要；额外格与诊断取决于目标主张。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-04",
+      "category": "合理后续建议",
+      "severity": "material_interpretation",
+      "status": "CONFIRMED_ALGEBRAIC_LIMIT_NOT_NEW_EXECUTION_DEFECT",
+      "title": "O/F共同门不能独立排除低获得起点或隔离历史保持机制",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            31,
+            40
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            103,
+            112
+          ]
+        },
+        {
+          "file": "reports/seller_alias_continual/20261011/record_attribution_result/report.zh.txt",
+          "lines": [
+            63,
+            75
+          ]
+        },
+        {
+          "file": "reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt",
+          "lines": [
+            23,
+            24
+          ]
+        }
+      ],
+      "impact": "F=A_acq−O，ΔF=ΔA_acq−ΔO；共同方向成立不蕴含ΔA_acq非负。已写的系统边界需在结论中贯彻。",
+      "minimum_recommendation": "保留共同门，并列两个旧域获得时与最终值、ΔA_acq和ΔF分解；不补新臂，不新增事后非劣界。",
+      "necessity": "科学上必须保留解释边界；不需要新实验。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "O/F共同通过即可证明历史支路或rank/pooling为唯一原因",
+        "最终旧域优势全部来自少忘"
+      ],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-05",
+      "category": "合理后续建议",
+      "severity": "minor_wording",
+      "status": "CONFIRMED_WORDING_AND_AGGREGATION_LIMIT",
+      "title": "N/Z点保护不是非劣，确定无损和逐阶段无损措辞须收窄",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            105,
+            106
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            113,
+            117
+          ]
+        }
+      ],
+      "impact": "ΔN/ΔZ均非负仍可有第二阶段新域差2ΔN−ΔZ为负；条件区间也不是逻辑确定保证。",
+      "minimum_recommendation": "保留N/Z点保护及完整区间，改为对应平均指标的条件方向证据；披露已有阶段/域/seed格，不加每格必须胜门。",
+      "necessity": "科学解释所需，无新增试验。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "点保护证明总体非劣",
+        "两个均值保护等于所有阶段/实际域无损",
+        "95%区间给出确定无损保证"
+      ],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-06",
+      "category": "合理后续建议",
+      "severity": "material_interpretation",
+      "status": "CONFIRMED_DIFFERENT_SCOPE_FROM_OLD_CONTRACT",
+      "title": "SEQ平均F为正只证明旧域退化，不能独自证明新学习与遗忘并存",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            109,
+            114
+          ]
+        },
+        {
+          "file": "docs/SELLER_ALIAS_BGE_CONTINUAL.zh.md",
+          "lines": [
+            140,
+            144
+          ]
+        }
+      ],
+      "impact": "新案第114行比旧首轮现象判读窄；五格不足以计算G，删去G后不能保留同一新学习主张。",
+      "minimum_recommendation": "若保留本批场景验证，使用已计划的G及逐阶段信息，SEQ额外R12/R23即可；否则收窄为旧域平均退化，或仅引用历史场景。无需复活旧总门或补训练臂。",
+      "necessity": "取决于是否主张本批新学习与旧域下降并存。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-07",
+      "category": "REPRODUCIBILITY_DEFECT",
+      "severity": "low",
+      "status": "CONFIRMED_PROPOSED_ACCOUNTING_AMBIGUITY",
+      "title": "bootstrap在分析A桶和确认桶说明中重复出现",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            130,
+            139
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            150,
+            150
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/budget.json",
+          "json_pointer": "/budget_seconds"
+        }
+      ],
+      "impact": "文字职责重叠，未来计费归属不够清楚；当前未实施，没有实际双计证据，原总和仍为783.5h。",
+      "minimum_recommendation": "在合同中把重采样明确归A桶一次，或明确另一唯一归属并同步预算说明；不加额度、不重跑。",
+      "necessity": "形成具体执行预算前需修正的轻微口径缺陷。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": "实际执行前明确唯一计费归属；不阻断本轮静态结论或精简设计。",
+      "execution_requires_condition_if_this_branch_is_selected": true,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-08",
+      "category": "合理后续建议",
+      "severity": "implementation_condition",
+      "status": "CONFIRMED_OLD_INTERFACE_LIMIT_NEW_CODE_NOT_SUBMITTED",
+      "title": "应复用既有三阶段基础，只核验调参适配器等真正新增连接",
+      "evidence": [
+        {
+          "file": "scripts/step28_record_attribution_run.py",
+          "lines": [
+            143,
+            170
+          ]
+        },
+        {
+          "file": "scripts/step28_record_attribution_run.py",
+          "lines": [
+            257,
+            266
+          ]
+        },
+        {
+          "file": "scripts/step28_record_replay.py",
+          "lines": [
+            248,
+            303
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna.py",
+          "lines": [
+            188,
+            240
+          ]
+        },
+        {
+          "file": "scripts/step28_bge_continual.py",
+          "lines": [
+            251,
+            280
+          ]
+        },
+        {
+          "file": "scripts/step28_er_weight.py",
+          "lines": [
+            229,
+            267
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            121,
+            126
+          ]
+        }
+      ],
+      "impact": "全项目已有stage3/两次retain；当前Optuna适配仍AB/固定ABC。基线内部覆盖LR，单写config不是倍率生效。不能把尚未实施称已失败，亦不能仅改断言称完成。",
+      "minimum_recommendation": "按保留方法接通真实order、新seed、stage3、自己的出生教师和恢复身份；删去基线HPO时同步取消不需的倍率适配。定向核验实际作用，复用同源旧证据。",
+      "necessity": "未来被选实现分支的必要条件，不是追加通用测试框架。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": "新入口和受影响资格尚未完成，不授予正式运行。",
+      "execution_requires_condition_if_this_branch_is_selected": true,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-09",
+      "category": "合理后续建议",
+      "severity": "uncertainty",
+      "status": "NOT_MEASURED_NOT_A_CONFIRMED_RESOURCE_FAILURE",
+      "title": "新时间、资源和存储峰值仍是待验证条件",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            145,
+            155
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/budget.json",
+          "json_pointer": "/old_native_projection"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/budget.json",
+          "json_pointer": "/storage"
+        }
+      ],
+      "impact": "旧计时P3代入成立，但不能证明stage3实际10h/12GiB、256GiB峰值或服务器当前资源通过；亦无证据断言必定不足。",
+      "minimum_recommendation": "最终仅按选定分支测受影响形状并核对实际同时存活文件；删臂/删矩阵后改调用表，不按比例编造新实测或扩大资源。",
+      "necessity": "未来实施准入；24调用为上限非任务量。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [],
+      "future_execution_condition": "按已选范围实际资格及资源满足后才运行，仍需用户实施决定。",
+      "execution_requires_condition_if_this_branch_is_selected": true,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-10",
+      "category": "合理后续建议",
+      "severity": "scope_limit",
+      "status": "CONFIRMED_AND_ALREADY_DISCLOSED",
+      "title": "新测试群、固定训练seed和独立新训练场景是不同证据",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            49,
+            51
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            81,
+            99
+          ]
+        },
+        {
+          "file": "schema/step28_continual_expression_policy.json",
+          "lines": [
+            77,
+            83
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_expression_data.py",
+          "lines": [
+            138,
+            147
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_expression_data_verify.py",
+          "lines": [
+            202,
+            248
+          ]
+        }
+      ],
+      "impact": "同机制新群可做条件确认，不能外推真实市场/所有顺序/seed总体；新确认薄入口和验证器尚待实现。未发现需要扩权的实质权限缺口。",
+      "minimum_recommendation": "保留三角色访问和一次开放，固定生成依赖；按范围实现仅120群入口及匹配验证器。独立新训练流、全六顺序、真实市场归后续，不为本轮自动增加。",
+      "necessity": "当前结论边界必要；更广外推实验可选后续。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "同生成器新群等于独立新训练场景或真实市场验证",
+        "三个固定seed支持训练seed总体推断"
+      ],
+      "future_execution_condition": null,
+      "execution_requires_condition_if_this_branch_is_selected": false,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-11",
+      "category": "合理后续建议",
+      "severity": "parallel_implementation_condition",
+      "status": "CONFIRMED_SERIAL_CODE_LIMIT_NOT_A_FAILED_NEW_IMPLEMENTATION",
+      "title": "独立轨迹和独立study可并行，旧控制器需要小范围队列与身份调整",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            73,
+            89
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            94,
+            99
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            161,
+            165
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            53,
+            116
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            125,
+            190
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            209,
+            216
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            198,
+            225
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            260,
+            291
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            374,
+            401
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna.py",
+          "lines": [
+            60,
+            65
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            325,
+            345
+          ]
+        }
+      ],
+      "impact": "全部串行并非科学必需；但旧single active/global pending/阻塞launch/单SIGALRM不能直接并发复用，run_id缺order、按列表zip的开放检查不适合乱序返回。",
+      "minimum_recommendation": "以完整method/order/seed路径为独立进程，单路径stage1→2→3顺序；单controller维护小队列、独立目录/RNG/pgid/deadline与每study一个pending。同study保持ask→完整运行反馈→tell→下一ask；冻结run_id集合完整校验后统一开olddev/newpairs，不能先完成先开放。零HPO方案免做study并行接线；不加DDP或实验。",
+      "necessity": "采用并行时必要的执行条件；串行与并行都不新增统计独立样本。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "现有旧入口只设并发数即可运行",
+        "同study一次ask多个trial仍完全保持原TPE协议",
+        "以先完成子集代替全部冻结确认结果"
+      ],
+      "future_execution_condition": "如用户选并行实施，先完成受影响队列、状态身份及全局开放行为核验；不要求重跑旧科研实验。",
+      "execution_requires_condition_if_this_branch_is_selected": true,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    },
+    {
+      "id": "F-12",
+      "category": "合理后续建议",
+      "severity": "parallel_accounting_and_resource_condition",
+      "status": "CONFIRMED_DISTINCT_UNITS_WITH_UNMEASURED_PARALLEL_CAPACITY",
+      "title": "累计任务小时、墙钟和GPU占用不可混同，并行需共享余额与聚合资源预留",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            8,
+            8
+          ]
+        },
+        {
+          "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+          "lines": [
+            130,
+            155
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_control.py",
+          "lines": [
+            68,
+            109
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            198,
+            225
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            277,
+            290
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_search.py",
+          "lines": [
+            124,
+            172
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            81,
+            98
+          ]
+        },
+        {
+          "file": "scripts/step28_optuna_run.py",
+          "lines": [
+            278,
+            288
+          ]
+        }
+      ],
+      "impact": "783.5h是累计拟上限，220—300h为未验证单卡串行外推；不能除以并发度承诺工期。仅已结算余额和单worker显存/RSS/磁盘检查会漏掉其他活跃run的预留；同卡装得下不能证明吞吐。当前服务器未检查。",
+      "minimum_recommendation": "每run外层elapsed相加含失败及尾部，父等待/子执行不重复计；墙钟和物理GPU占用另列。单controller用已结算+活跃预留+未覆盖尾部≤桶限，完成后实际替换预留。多卡优先一GPU一路径；同卡多进程仅在适用已有或未来获批最小吞吐/资源证据下采用，聚合RAM和同时存活checkpoint峰值。新12GiB/设备映射等须实际接线，不能借旧9GiB门/28GiB设置。",
+      "necessity": "并行执行计费与准入所需；无新增研究实验要求、无当前测量或预算批准。",
+      "blocks_current_static_proposal": false,
+      "blocks_scientific_validity_of_reduced_primary_comparison": false,
+      "blocked_overstated_claims": [
+        "783.5h等于并行墙钟",
+        "220—300h除以并发数即承诺工期",
+        "显存足够等于并发更快",
+        "原256GiB自动覆盖任意并发峰值"
+      ],
+      "future_execution_condition": "未来按被选范围及实际并发条件核对适用资格与聚合资源；本轮不执行吞吐测试或连接服务器。",
+      "execution_requires_condition_if_this_branch_is_selected": true,
+      "requires_new_research_experiment_to_resolve_this_finding": false
+    }
+  ],
+  "parallel_review": {
+    "requested_by": "用户本轮补充",
+    "independent_trajectories_parallelizable": true,
+    "within_trajectory_stage_order": "stage1→stage2→stage3，模型/Adam/RNG/Memory连续依赖",
+    "independent_studies_parallelizable": true,
+    "within_study_semantics": "最多一个pending；ask→完成及反馈→tell→下一ask",
+    "preferred_gpu_mapping": "多卡时一GPU一完整轨迹",
+    "same_gpu_multiprocess_condition": "适用已有或未来获批最小吞吐/资源证据；只看显存不足",
+    "global_opening": "全部冻结run与恢复有效且按ID完整对齐后才开放，不按完成时间选择",
+    "current_server_resources_verified": false,
+    "parallel_wall_clock_estimate_hours": null,
+    "scope": "只提出最小队列/身份/预算/开放调整，不实施，不加实验，不改变batch/LR或数据权限"
+  },
+  "validated_items": [
+    {
+      "topic": "附件身份",
+      "result": "PASS_34_OF_34_PAYLOADS",
+      "evidence": "input_identity_check.json"
+    },
+    {
+      "topic": "原预算和P3算术",
+      "result": "MATCHES_PROVIDED_FIELDS_NOT_NEW_MEASUREMENT",
+      "evidence": "mechanical_checks.json"
+    },
+    {
+      "topic": "O/F共同终点",
+      "result": "交并式要求合理；无需仅因两个共同终点自动加Holm",
+      "source": {
+        "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+        "lines": [
+          111,
+          115
+        ]
+      }
+    },
+    {
+      "topic": "实际域整群配对",
+      "result": "跨方法/seed/order/阶段复用群索引且条件于固定训练集合，避免伪重复",
+      "source": {
+        "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+        "lines": [
+          103,
+          111
+        ]
+      }
+    },
+    {
+      "topic": "三类权限与恢复计账",
+      "result": "生成/验证、评分、评价与结果选择基本分开；cal及额外物理读取边界清楚",
+      "source": {
+        "file": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+        "lines": [
+          88,
+          99
+        ]
+      }
+    },
+    {
+      "topic": "历史结案复用",
+      "result": "旧失败不追改；旧上传时点不覆盖当前用户明确批准；无新全历史重审要求",
+      "source": {
+        "file": "reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt",
+        "lines": [
+          5,
+          5
+        ]
+      }
+    }
+  ],
+  "not_asserted": [
+    "新实验已实施",
+    "新CPU/GPU资格已通过",
+    "已有后台模型路由独立认证",
+    "H_pos已经证实抗遗忘",
+    "六臂方案必定超资源",
+    "给出新的科研效果或重采样区间"
+  ]
+}

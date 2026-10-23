@@ -1,0 +1,363 @@
+{
+  "scope": "文档与已开放JSON字段的机械算术；无项目代码执行，无科研训练/推理/重采样/数据生成。",
+  "source_paths": {
+    "proposal": "reports/documentation/20261023/continual_mainline/proposal.zh.txt",
+    "budget": "reports/documentation/20261023/continual_mainline/budget.json",
+    "native": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+    "selected": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json"
+  },
+  "source_lines": {
+    "original_budget_counts": [
+      130,
+      153
+    ],
+    "endpoint_definitions": [
+      103,
+      117
+    ],
+    "P3_formula": [
+      146,
+      150
+    ]
+  },
+  "budget_buckets_seconds": {
+    "baseline_search": 777600,
+    "full_trajectories": 1944000,
+    "confirmation": 86400,
+    "cpu_qualification": 1200,
+    "native_qualification": 3600,
+    "data_generation_verification": 600,
+    "control": 1800,
+    "old_dev_evaluation": 3600,
+    "analysis": 1800
+  },
+  "total_seconds": 2820600,
+  "total_hours": 783.5,
+  "original_nontraining_hours": 27.5,
+  "time_semantics": {
+    "budget_hours": "累计任务外层elapsed及互斥职责桶的拟上限；不是CPU user/system时间、并行墙钟或GPU设备小时。",
+    "overlap": "不同run重叠仍逐run累计；同run的launcher等待与child执行不重复计费；纯资源等待另列。",
+    "old_220_300h": "原单卡串行未验证外推；不转换成并行工期承诺。",
+    "parallel_wall_clock_estimate_hours": null,
+    "current_server_resources_verified": false,
+    "parallel_budget_reservation": "已结算U+活跃run预留之和+未覆盖的必要尾部预留≤桶上限；退出后以实际替换预留。",
+    "gpu_device_hours": "各物理GPU实际占用区间另计；同卡多worker按该卡时间并集，不等于任务小时之和。",
+    "same_gpu_condition": "适用已有或未来获批的最小吞吐/资源证据；未执行测量。"
+  },
+  "counts": {
+    "HPO_updates": 20736,
+    "full_updates": 46656,
+    "total_updates": 67392,
+    "HPO_gradient_groups": 27648,
+    "full_gradient_groups": 72576,
+    "total_gradient_groups": 100224,
+    "HPO_endpoints": 72,
+    "full_endpoints": 162,
+    "HPO_epoch_captures": 432,
+    "full_epoch_captures": 972,
+    "initial_scoring_states": 18,
+    "confirmation_scoring_states": 180,
+    "confirmation_full_matrix_group_forwards": 21600,
+    "confirmation_core_5cell_group_forwards": 10800
+  },
+  "P3_group_forward_decomposition": {
+    "epoch_stage1": 648,
+    "epoch_stages2_3": 1440,
+    "three_endpoints_three_score_passes": 648,
+    "birth_teacher_upper": 12,
+    "initial_old_dev": 60,
+    "sum": 2808
+  },
+  "P3_teacher_projection_count": {
+    "count": 72,
+    "unit_note": "h是单次历史教师投影秒数，不是小时。"
+  },
+  "old_measurement_projections": {
+    "S": {
+      "source_path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+      "source_pointer": "/arms/S/measurements",
+      "stored_measurements": {
+        "L": 5.4118858417496085,
+        "W_F": 3904680645,
+        "W_I": 1304378315,
+        "h": 0.002505871932953596,
+        "r_F": 11.605019561946392,
+        "r_I": 3.1226372071541846,
+        "s_F": 11.445843072142452,
+        "s_I": 2.8263791548088193,
+        "t_A": 12.315755436196923,
+        "t_B": 22.454216088168323,
+        "v": 2.431383382063359
+      },
+      "components": {
+        "training_seconds_proxy": 16480.566032409668,
+        "group_forward_seconds_proxy": 6827.324536833912,
+        "teacher_projection_seconds_proxy": 0.18042277917265892,
+        "load_seconds_proxy": 5.4118858417496085,
+        "checkpoint_io_seconds_proxy": 86.99963698815554,
+        "unmeasured_allowance_seconds": 2700
+      },
+      "factor": 1.25,
+      "computed_seconds": 32625.603143565822,
+      "budget_seconds": 32625.603143565822,
+      "computed_hours": 9.062667539879396,
+      "status": "OLD_MEASUREMENT_MECHANICAL_PROJECTION_NOT_NEW_QUALIFICATION"
+    },
+    "S_pos": {
+      "source_path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+      "source_pointer": "/arms/S_pos/measurements",
+      "stored_measurements": {
+        "L": 2.475694051012397,
+        "W_F": 3904680709,
+        "W_I": 1304378379,
+        "h": 0.0025738640688359737,
+        "r_F": 11.21121586393565,
+        "r_I": 3.12859728327021,
+        "s_F": 8.567022064700723,
+        "s_I": 2.806131788995117,
+        "t_A": 11.331171789206564,
+        "t_B": 22.73772803787142,
+        "v": 2.3094238750636578
+      },
+      "components": {
+        "training_seconds_proxy": 16360.308825105429,
+        "group_forward_seconds_proxy": 6484.862241178751,
+        "teacher_projection_seconds_proxy": 0.1853182129561901,
+        "load_seconds_proxy": 2.475694051012397,
+        "checkpoint_io_seconds_proxy": 77.1389010027051,
+        "unmeasured_allowance_seconds": 2700
+      },
+      "factor": 1.25,
+      "computed_seconds": 32031.213724438567,
+      "budget_seconds": 32031.213724438567,
+      "computed_hours": 8.897559367899602,
+      "status": "OLD_MEASUREMENT_MECHANICAL_PROJECTION_NOT_NEW_QUALIFICATION"
+    },
+    "H_pos": {
+      "source_path": "reports/documentation/20261018/optuna_implementation/repair/native_completed/qualification/native/result.json",
+      "source_pointer": "/arms/H_pos/measurements",
+      "stored_measurements": {
+        "L": 2.4633675357326865,
+        "W_F": 3904680901,
+        "W_I": 1304378571,
+        "h": 0.006201939657330513,
+        "r_F": 11.061484342906624,
+        "r_I": 3.146804547868669,
+        "s_F": 8.568925621919334,
+        "s_I": 2.842291580978781,
+        "t_A": 11.329518273007125,
+        "t_B": 22.668693653773516,
+        "v": 2.3212430011481047
+      },
+      "components": {
+        "training_seconds_proxy": 16320.068807199597,
+        "group_forward_seconds_proxy": 6518.050347223878,
+        "teacher_projection_seconds_proxy": 0.44653965532779694,
+        "load_seconds_proxy": 2.4633675357326865,
+        "checkpoint_io_seconds_proxy": 76.85851828102022,
+        "unmeasured_allowance_seconds": 2700
+      },
+      "factor": 1.25,
+      "computed_seconds": 32022.359474869445,
+      "budget_seconds": 32022.359474869445,
+      "computed_hours": 8.895099854130402,
+      "status": "OLD_MEASUREMENT_MECHANICAL_PROJECTION_NOT_NEW_QUALIFICATION"
+    }
+  },
+  "old_maximum_v_seconds": 2.431383382063359,
+  "original_confirmation_forward_proxy_hours_only": 18.235375365475193,
+  "original_180_inference_bytes_proxy": 235800000000,
+  "original_180_inference_GiB_proxy": 219.60586309432983,
+  "original_256GiB_slack_before_other_files": 36.394136905670166,
+  "remove_18_initial_weights_GiB_proxy": 21.960586309432983,
+  "selected_parameter_fields": {
+    "S": {
+      "trial": 10,
+      "lambda_rank": 1.3572393683805832,
+      "lr_multiplier": 1.295036258870551
+    },
+    "S_pos": {
+      "trial": 11,
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686
+    },
+    "H_pos": {
+      "trial": 11,
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686
+    }
+  },
+  "generic_formulas": {
+    "p": "a*q*s; a方法数,q顺序数,s固定seed数,b需新增12次HPO的基线数",
+    "new_HPO_trials": "12*b",
+    "successful_updates": "864*p+6912*b",
+    "stage_weights": "3*p",
+    "core_confirmation_forwards": "200*p",
+    "training_hard_hours": "10*p+72*b",
+    "interpretation": "保留原单run拟硬限作累计任务范围比较，不是并行墙钟、测得的新限额或实施批准。"
+  },
+  "designs": [
+    {
+      "id": "D1_single_seed_pair",
+      "arms": "S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 1,
+      "new_HPO_trials": 0,
+      "full_paths": 6,
+      "successful_updates": 5184,
+      "gradient_group_presentations": 8640,
+      "stage_inference_weights": 18,
+      "stage_inference_weight_GiB_proxy": 21.960586309432983,
+      "core_5cell_group_forwards": 1200,
+      "extra_SEQ_G_forwards": 0,
+      "core_plus_SEQ_G_forwards": 1200,
+      "all_methods_core_plus_R21_forwards": 1440,
+      "all_methods_core_plus_G_forwards": 1680,
+      "training_hard_hours_using_original_6h_10h_limits": 60,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 87.5,
+      "core_forward_old_proxy_hours_only": 1.0130764091930662,
+      "core_plus_SEQ_G_old_proxy_hours_only": 1.0130764091930662
+    },
+    {
+      "id": "D2_pair",
+      "arms": "S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 0,
+      "full_paths": 18,
+      "successful_updates": 15552,
+      "gradient_group_presentations": 25920,
+      "stage_inference_weights": 54,
+      "stage_inference_weight_GiB_proxy": 65.88175892829895,
+      "core_5cell_group_forwards": 3600,
+      "extra_SEQ_G_forwards": 0,
+      "core_plus_SEQ_G_forwards": 3600,
+      "all_methods_core_plus_R21_forwards": 4320,
+      "all_methods_core_plus_G_forwards": 5040,
+      "training_hard_hours_using_original_6h_10h_limits": 180,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 207.5,
+      "core_forward_old_proxy_hours_only": 3.0392292275791988,
+      "core_plus_SEQ_G_old_proxy_hours_only": 3.0392292275791988
+    },
+    {
+      "id": "D3_mainline_recommended",
+      "arms": "SEQ_ref,S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 0,
+      "full_paths": 27,
+      "successful_updates": 23328,
+      "gradient_group_presentations": 33696,
+      "stage_inference_weights": 81,
+      "stage_inference_weight_GiB_proxy": 98.82263839244843,
+      "core_5cell_group_forwards": 5400,
+      "extra_SEQ_G_forwards": 720,
+      "core_plus_SEQ_G_forwards": 6120,
+      "all_methods_core_plus_R21_forwards": 6480,
+      "all_methods_core_plus_G_forwards": 7560,
+      "training_hard_hours_using_original_6h_10h_limits": 270,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 297.5,
+      "core_forward_old_proxy_hours_only": 4.558843841368798,
+      "core_plus_SEQ_G_old_proxy_hours_only": 5.166689686884638
+    },
+    {
+      "id": "D3L_strong_reference",
+      "arms": "LOGIT0.1_tuned,S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 12,
+      "full_paths": 27,
+      "successful_updates": 30240,
+      "gradient_group_presentations": 49248,
+      "stage_inference_weights": 81,
+      "stage_inference_weight_GiB_proxy": 98.82263839244843,
+      "core_5cell_group_forwards": 5400,
+      "extra_SEQ_G_forwards": 0,
+      "core_plus_SEQ_G_forwards": 5400,
+      "all_methods_core_plus_R21_forwards": 6480,
+      "all_methods_core_plus_G_forwards": 7560,
+      "training_hard_hours_using_original_6h_10h_limits": 342,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 369.5,
+      "core_forward_old_proxy_hours_only": 4.558843841368798,
+      "core_plus_SEQ_G_old_proxy_hours_only": 4.558843841368798
+    },
+    {
+      "id": "D4_add_LOGIT_ref",
+      "arms": "SEQ_ref,LOGIT0.1_ref,S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 0,
+      "full_paths": 36,
+      "successful_updates": 31104,
+      "gradient_group_presentations": 46656,
+      "stage_inference_weights": 108,
+      "stage_inference_weight_GiB_proxy": 131.7635178565979,
+      "core_5cell_group_forwards": 7200,
+      "extra_SEQ_G_forwards": 720,
+      "core_plus_SEQ_G_forwards": 7920,
+      "all_methods_core_plus_R21_forwards": 8640,
+      "all_methods_core_plus_G_forwards": 10080,
+      "training_hard_hours_using_original_6h_10h_limits": 360,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 387.5,
+      "core_forward_old_proxy_hours_only": 6.0784584551583976,
+      "core_plus_SEQ_G_old_proxy_hours_only": 6.686304300674237
+    },
+    {
+      "id": "D4_add_LOGIT_tuned",
+      "arms": "SEQ_ref,LOGIT0.1_tuned,S_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 12,
+      "full_paths": 36,
+      "successful_updates": 38016,
+      "gradient_group_presentations": 57024,
+      "stage_inference_weights": 108,
+      "stage_inference_weight_GiB_proxy": 131.7635178565979,
+      "core_5cell_group_forwards": 7200,
+      "extra_SEQ_G_forwards": 720,
+      "core_plus_SEQ_G_forwards": 7920,
+      "all_methods_core_plus_R21_forwards": 8640,
+      "all_methods_core_plus_G_forwards": 10080,
+      "training_hard_hours_using_original_6h_10h_limits": 432,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 459.5,
+      "core_forward_old_proxy_hours_only": 6.0784584551583976,
+      "core_plus_SEQ_G_old_proxy_hours_only": 6.686304300674237
+    },
+    {
+      "id": "ORIGINAL",
+      "arms": "SEQ_tuned,ER0.1_tuned,LOGIT0.1_tuned,S_tuned,S_pos_tuned,H_pos_tuned",
+      "orders": 3,
+      "new_seeds": 3,
+      "new_HPO_trials": 36,
+      "full_paths": 54,
+      "successful_updates": 67392,
+      "gradient_group_presentations": 100224,
+      "stage_inference_weights": 162,
+      "stage_inference_weight_GiB_proxy": 197.64527678489685,
+      "core_5cell_group_forwards": 10800,
+      "extra_SEQ_G_forwards": 720,
+      "core_plus_SEQ_G_forwards": 11520,
+      "all_methods_core_plus_R21_forwards": 12960,
+      "all_methods_core_plus_G_forwards": 15120,
+      "training_hard_hours_using_original_6h_10h_limits": 756,
+      "illustrative_total_keep_original_all_27_5_nontraining_hours": 783.5,
+      "core_forward_old_proxy_hours_only": 9.117687682737596,
+      "core_plus_SEQ_G_old_proxy_hours_only": 9.725533528253436
+    }
+  ],
+  "not_verified": [
+    "新代码实现",
+    "新CPU/GPU资格",
+    "新实际耗时",
+    "未来同时存活文件峰值",
+    "服务器当前资源",
+    "训练seed在包外历史中从未使用"
+  ],
+  "budget_wording_ambiguity": {
+    "proposal_lines": [
+      139,
+      150
+    ],
+    "detail": "bootstrap同时出现于A桶和确认桶说明；需选定唯一归属，未证明实际重复收费。"
+  }
+}

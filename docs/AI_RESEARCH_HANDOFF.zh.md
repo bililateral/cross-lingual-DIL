@@ -2,11 +2,13 @@
 
 ## 当前工作
 
+主线方案外审与独立主审已完成（2026-10-23）：12:35同一网页确认最终回答完成，主报告含并行补充；55479字节/9成员返回包及8载荷身份全部核验，完整原件见[外审报告](../reports/documentation/20261023/continual_mainline/review/external/review_report.zh.txt)。[独立主审及具体待确认方案](../reports/documentation/20261023/continual_mainline/review/primary_disposition.zh.txt)逐项处置12意见，接受删减但按完整逐阶段主线保留所有方法R21：建议SEQ_ref/S_tuned/H_pos_tuned、ABC/BCA/CAB×s4/5/6、27完整轨迹、23328更新、零新HPO、用户指定同卡最多三路；新确认120群、7200群前向、81阶段权重。拟累计上限297.5h=270训练+24确认+3.5其他，bootstrap唯一归A；磁盘拟160GiB/free224GiB。未测并行吞吐，旧训练工作量代理82.27h不能直接当三路累计账或除3承诺工期。完整S为唯一主要强对手，SEQ仅场景诊断；不含LOGIT/ER时不宣称新确认胜过它们。原方案/预算/ZIP保持。专用页已关闭，本次回收跟进已删除；无训练/数据生成/新标签/科研实现或新预算批准。当前下一步是向用户汇报并等待其对上述具体范围确认，之后才做最小实施与受影响资格/实现审查。
+
 服务器实查与三路安排（2026-10-23 12:24—12:29，Asia/Shanghai）：用户要求先查实际GPU/显存/占用并报告工期，明确不启动；随后指定“改成三路”。已只读SSH确认1张RTX5090，总32607MiB、空闲31896MiB、12次采样利用率0%，无CUDA计算进程，只有其他用户桌面显示进程；RAM可用243.85GiB、磁盘可用477.92GiB。见[现场记录](../reports/documentation/20261023/continual_mainline/server_resources.json)。当前并行目标改为同卡3条独立轨迹，单轨迹三阶段仍顺序；旧三域每run保留显存峰值8.8164GiB，三路合计26.4492GiB，尚需上下文/新阶段峰值余量，未实测三路资格或吞吐。旧12GiB每run额度不能同时兑现到三路。54路径的单路等效约164.5h，原整套点估计250—265h、规划220—300h；未测吞吐前不能直接除3承诺工期。详细安排与条件估算已补入[并行补充](../reports/documentation/20261023/continual_mainline/parallel_addendum.zh.txt)。本次未启动/压测/载模/读取正式数据或写远端，SSH已退出；未改实现/原ZIP/预算，实施仍等外审及用户确认。只读时点空闲不等于未来资源预留。
 
 并行调度补充（2026-10-23 12:16）：用户指出54独立轨迹不应默认串行。已形成[并行补充](../reports/documentation/20261023/continual_mainline/parallel_addendum.zh.txt)：不同方法／顺序／seed可并行，同轨迹三阶段须顺序；若保留Optuna，跨study可并行，同study保持原反馈次序。累计进程小时与墙钟／GPU占用分开，不承诺同卡多进程线性加速；原控制器与共享账仍为串行实现，须最小适配后才可运行。12:16:11已在同一在审会话单次发送[并行审查补充](../reports/documentation/20261023/continual_mainline/review/parallel_supplement.zh.txt)，原ZIP不变。回收须包含完整主报告及此补充，不能只取其中之一；当前仍待审、未实施。当时尚未核实硬件；后续实查与用户指定三路见上段。
 
-外审回收跟进：为完成用户“审完取回来仔细审查并汇报”的明确要求，已建立本线程跟进`回收持续学习主线方案外审`（automationId=`automation`，每10分钟）。只检查下述唯一在审会话；未完则结束该次检查，完毕后完整回收、独立判断过度设计／必要实验／精简方案并向用户汇报，然后删除本次跟进。当前没有实施许可，不重复送审。主执行者已完成独立预核：S_pos／ER的完整确认必要性与每条18次epoch诊断的成本应分别论证，不能把所有历史消融或诊断自动变成主线前提；最终处置等外审完整返回后形成。
+外审回收跟进已结束：`回收持续学习主线方案外审`（automationId=`automation`）完成唯一会话的完整回收与独立处置后已删除，不再重复检查或汇报。专用页关闭，当前等待用户实施决定；不创建新监听或审查。
 
 最新外审进展（2026-10-23 12:04:45，Asia/Shanghai）：用户已明确批准具体`continual_mainline_plan_review.zip`上传chatgpt.com并要求重点审查过度设计／必要实验，审完回收、独立审查汇报，用户确认后才实施。[授权](../reports/documentation/20261023/continual_mainline/review/authorization.json)已记录；原包233582字节/SHA不变，经本地Playwright单次成功提交至[审查持续学习方案](https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a)，可见GPT-6／Pro、网页正在回应，当前待回收。完整[实际请求](../reports/documentation/20261023/continual_mainline/review/submitted_request.zh.txt)明确六臂／90轨迹／783.5小时均须接受删减与必要性审查，不默认批准。当前[提交回执](../reports/documentation/20261023/continual_mainline/review/submission.json)保留此前自动审批拒绝的历史；它已由本次明确授权解除，不再作为当前阻断。未实施、未批准预算、未连接Linux或生成数据；不重复提交／新建审查。外审完成后取回全报告及附件、独立处置，再向用户报告。
 
