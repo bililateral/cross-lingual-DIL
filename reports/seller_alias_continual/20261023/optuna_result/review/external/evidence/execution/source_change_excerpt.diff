@@ -1,0 +1,148 @@
+--- result/job/search_00_S_s0/run/sources/scripts/step28_optuna_run.py
++++ result/sources/scripts/step28_optuna_run.py
+@@ -32,7 +32,8 @@
+     "test_real_optuna_selection_and_stop", "test_disjoint_budgets_and_real_launcher_failure",
+     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
+     "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
+-    "test_repair_controller_boundaries", "test_budget_amendment_gate")
++    "test_repair_controller_boundaries", "test_budget_amendment_gate",
++    "test_resource_wait_and_admission", "test_specific_resource_recovery", "test_specific_reboot_recovery")
+ 
+ 
+ def sources():
+@@ -54,6 +55,8 @@
+     paths.update((POLICY, CONTRACT, SCOPE, AUTHORIZATION, REPAIR_SCOPE, REPAIR_AUTHORIZATION))
+     paths.update(data.ROOT/p for p in ("scripts/run_step28_optuna_cpu_linux_20261018.sh",
+         "scripts/step28_optuna_formal_wait.py",
++        "reports/documentation/20261019/optuna_recovery/scope.zh.txt",
++        "reports/documentation/20261021/optuna_reboot/scope.zh.txt",
+         "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+         "reports/documentation/20261019/optuna_budget/authorization.json"))
+     return [data.record(p, data.ROOT) for p in sorted(paths)]
+@@ -72,7 +75,7 @@
+ 
+ def runtime():
+     return {**single.policy()["runtime"], "maximum_gpu_stage_seconds": 21600,
+-            "maximum_output_bytes": 64*2**30}
++            "maximum_output_bytes": 64*2**30, "minimum_free_gpu_bytes": 9*2**30}
+ 
+ 
+ class Budget(single.legacy.Budget):
+@@ -274,12 +277,12 @@
+ 
+ def execute_trial(job, spec, gate_path):
+     import torch
+-    from step28_record_replay_verify import preflight
++    from step28_optuna_recovery import formal_preflight
+     from step28_optuna_search import validate_gate
+     validate_gate(gate_path)
+     if spec.phase not in ("search", "replication") or job.exists():
+         raise ValueError("Fresh formal run required")
+-    resources = preflight()
++    resources = formal_preflight(data.ROOT)
+     torch.set_num_threads(1); torch.set_num_interop_threads(1)
+     parent.configure_numerics()
+     torch.cuda.set_per_process_memory_fraction(28*2**30/torch.cuda.get_device_properties(0).total_memory,0)
+--- result/job/search_01_S_s0/run/sources/scripts/step28_optuna_run.py
++++ result/sources/scripts/step28_optuna_run.py
+@@ -33,7 +33,7 @@
+     "test_entry_orchestration_and_access_negative_controls", "test_nine_saved_evaluation_and_independent_analysis",
+     "test_cpu_six_call_fixture_orchestration", "test_repair_resources_and_anchor",
+     "test_repair_controller_boundaries", "test_budget_amendment_gate",
+-    "test_resource_wait_and_admission", "test_specific_resource_recovery")
++    "test_resource_wait_and_admission", "test_specific_resource_recovery", "test_specific_reboot_recovery")
+ 
+ 
+ def sources():
+@@ -56,6 +56,7 @@
+     paths.update(data.ROOT/p for p in ("scripts/run_step28_optuna_cpu_linux_20261018.sh",
+         "scripts/step28_optuna_formal_wait.py",
+         "reports/documentation/20261019/optuna_recovery/scope.zh.txt",
++        "reports/documentation/20261021/optuna_reboot/scope.zh.txt",
+         "reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+         "reports/documentation/20261019/optuna_budget/authorization.json"))
+     return [data.record(p, data.ROOT) for p in sorted(paths)]
+--- result/job/search_00_S_s0/run/sources/scripts/step28_optuna_control.py
++++ result/sources/scripts/step28_optuna_control.py
+@@ -63,6 +63,7 @@
+         self.intervals = []
+         self.active = None
+         self.failed = False
++        self.calendar_wait_seconds = 0.
+ 
+     def remaining(self, kind: str, arm: str | None = None) -> float:
+         total = 979200-self.qualification-sum(self.used.values())
+@@ -79,6 +80,11 @@
+         if kind in ("search", "replication") and (arm not in ARMS or not run_id):
+             raise ValueError("Own run identity required")
+         allowed = self.remaining(kind, arm)
++        if run_id is not None:
++            # Resource-only admission attempts and the recovered failed attempt
++            # still consume this candidate's original single-run allowance.
++            prior = sum(row["seconds"] for row in self.intervals if row["kind"] == kind and row["run_id"] == run_id)
++            allowed = min(allowed, 21600.-prior)
+         if allowed <= 0:
+             self.failed = True
+             raise TimeoutError("No allotted budget remains")
+@@ -112,7 +118,8 @@
+     def snapshot(self) -> dict:
+         return dict(qualification_seconds=self.qualification, used=self.used.copy(),
+                     by_arm={k: v.copy() for k, v in self.arm_used.items()},
+-                    intervals=list(self.intervals), failed=self.failed)
++                    intervals=list(self.intervals), failed=self.failed,
++                    calendar_wait_seconds=self.calendar_wait_seconds)
+ 
+ 
+ class Search:
+--- result/job/search_01_S_s0/run/sources/scripts/step28_optuna_search.py
++++ result/sources/scripts/step28_optuna_search.py
+@@ -66,6 +66,7 @@
+         "scripts/step28_optuna_formal_wait.py","reports/documentation/20261019/optuna_budget/proposal.zh.txt",
+         "reports/documentation/20261019/optuna_budget/authorization.json",
+         "scripts/step28_optuna_recovery.py","reports/documentation/20261019/optuna_recovery/scope.zh.txt"}
++    allowed.add("reports/documentation/20261021/optuna_reboot/scope.zh.txt")
+     expected_status="ACCEPTED_RESOURCE_ADMISSION_RECOVERY" if "scripts/step28_optuna_recovery.py" in after else "ACCEPTED_BUDGET_CLOCK_ONLY"
+     if (reuse.get("status")!=expected_status or reuse.get("source_files")!=current
+         or reuse.get("changed_paths")!=changed or not set(changed)<=allowed or before.keys()-after.keys()):
+@@ -84,6 +85,8 @@
+     latest=read_bound(cpu["new_result"])
+     required={"test_disjoint_budgets_and_real_launcher_failure","test_repair_controller_boundaries","test_budget_amendment_gate",
+               "test_resource_wait_and_admission","test_specific_resource_recovery"}
++    if "reports/documentation/20261021/optuna_reboot/scope.zh.txt" in after:
++        required.add("test_specific_reboot_recovery")
+     if (latest.get("status")!="PASS_HANDWRITTEN_ONLY" or latest["source_files"]!=current
+         or not required<=set(latest["qualified_tests"]) or latest.get("unresolved_checks")!=[]
+         or set(cpu["qualified_tests"])!=set(prior["qualified_tests"])|set(latest["qualified_tests"])):
+@@ -293,9 +296,22 @@
+     for path in job.glob("*/access.json"):
+         row=data.read_json(path)
+         for k in result:result[k]+=row[k]
+-    if result["train"]>45 or result["valid"]>37 or result["heldout"] or result["owners"]:
++    if result["train"]>train_attempt_limit(job) or result["valid"]>37 or result["heldout"] or result["owners"]:
+         raise ValueError("Campaign access exceeded; preserve attempts")
+     return result
++
++
++def train_attempt_limit(job):
++    receipt=job/"recovery.json"
++    if receipt.exists():
++        row=data.read_json(receipt)
++        if row.get("status")=="RESTORED_25_SEARCHES_AFTER_REBOOT":
++            if (row.get("prior_access")!=dict(train=1,valid=0,heldout=0,owners=0)
++                    or row.get("interrupted_run_restarts")!=1 or row.get("train_attempt_limit")!=46
++                    or row.get("valid_attempt_limit")!=37):
++                raise ValueError("Specific reboot access accounting differs")
++            return 46
++    return 45
+ 
+ 
+ def clean_search_weights(job):
+@@ -385,7 +401,7 @@
+                 job/"analysis.console.txt",seconds,{**os.environ,"CUDA_VISIBLE_DEVICES":""})
+         with charged(ledger,"control"):
+             access=access_total(job)
+-            if access!=dict(train=45,valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
++            if access!=dict(train=train_attempt_limit(job),valid=37,heldout=0,owners=0):raise ValueError("Incomplete final access coverage")
+             # C remains cumulative in Ledger and SIGALRM; this is a local resource scan.
+             run.Budget(job,ledger.remaining("control"),campaign=job,started=time.monotonic()).check(force=True)
+     except BaseException:

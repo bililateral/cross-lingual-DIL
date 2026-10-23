@@ -1,0 +1,258 @@
+{
+  "input_identity": {
+    "archive_path": "/workspace/scratch/b8d3bc717e75/upload/optuna_result_review.zip",
+    "archive_bytes": 103538522,
+    "archive_sha256": "be13255ad50a0fe814f58a150574f8403181cf3a9e7aa0af37293834188baac6",
+    "zip_members": 7679,
+    "payloads": 7678,
+    "uncompressed_bytes": 223173726,
+    "duplicate_zip_paths": 0,
+    "unexpected": [],
+    "missing": [],
+    "mismatches": [],
+    "all_payloads_verified": true
+  },
+  "review_date": "2026-10-23",
+  "timezone": "UTC+08:00",
+  "disposition_zh": "本批有效完成、未达预定目标；不需新增科研执行即可结束结果审查。",
+  "findings_count": 14,
+  "primary_gate": {
+    "S_pos": {
+      "cells": [
+        {
+          "seed": 1,
+          "domain": "A",
+          "difference": 0.004140707611513683,
+          "strictly_positive": true
+        },
+        {
+          "seed": 1,
+          "domain": "B",
+          "difference": 0.0035250093302129,
+          "strictly_positive": true
+        },
+        {
+          "seed": 2,
+          "domain": "A",
+          "difference": -0.007774987366210159,
+          "strictly_positive": false
+        },
+        {
+          "seed": 2,
+          "domain": "B",
+          "difference": 0.0008465632251769245,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "A",
+          "difference": 0.020412019644876687,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "B",
+          "difference": -0.005791848950885445,
+          "strictly_positive": false
+        }
+      ],
+      "positive_cells": 4,
+      "passed": false
+    },
+    "H_pos": {
+      "cells": [
+        {
+          "seed": 1,
+          "domain": "A",
+          "difference": 0.02853555386286461,
+          "strictly_positive": true
+        },
+        {
+          "seed": 1,
+          "domain": "B",
+          "difference": -0.005630258478320413,
+          "strictly_positive": false
+        },
+        {
+          "seed": 2,
+          "domain": "A",
+          "difference": 0.013974360563979183,
+          "strictly_positive": true
+        },
+        {
+          "seed": 2,
+          "domain": "B",
+          "difference": 0.0054808904376321245,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "A",
+          "difference": 0.030638301248702027,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "B",
+          "difference": 0.001128923912404553,
+          "strictly_positive": true
+        }
+      ],
+      "positive_cells": 5,
+      "passed": false
+    }
+  },
+  "selected": [
+    {
+      "arm": "S",
+      "trial": 10,
+      "lambda_rank": 1.3572393683805832,
+      "lr_multiplier": 1.295036258870551,
+      "U": 0.006697368263867132
+    },
+    {
+      "arm": "S_pos",
+      "trial": 11,
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "U": 0.0055023673208193236
+    },
+    {
+      "arm": "H_pos",
+      "trial": 11,
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "U": 0.004715856139795527
+    }
+  ],
+  "forgetting_decomposition": {
+    "S_pos": {
+      "final_old_A_advantage": 0.005592579963393403,
+      "advantage_already_at_A_end": -0.0009206417906977748,
+      "less_forgetting_point_estimate": 0.006513221754091178,
+      "identity_residual": -8.673617379884035e-19
+    },
+    "H_pos": {
+      "final_old_A_advantage": 0.024382738558515273,
+      "advantage_already_at_A_end": 0.014690193476518305,
+      "less_forgetting_point_estimate": 0.009692545081996969,
+      "identity_residual": 0.0
+    }
+  },
+  "budget": {
+    "final_stdout_used": {
+      "control": 98.76268308745784,
+      "evaluation": 58.38235590100521,
+      "analysis": 11.173053767008241,
+      "search": 258010.73137479374,
+      "replication": 66451.14288364197
+    },
+    "interval_sums": {
+      "control": 98.76268308745784,
+      "evaluation": 58.38235590100521,
+      "analysis": 11.173053767008241,
+      "search": 258010.73137479372,
+      "replication": 66451.14288364197
+    },
+    "qualification_seconds": 1064,
+    "additional_analysis_charged_seconds": 1,
+    "total_seconds": 325695.1923511912,
+    "total_hours": 90.47088676421977,
+    "report_total_seconds": 325695.192355,
+    "report_minus_recomputed_seconds": 3.80881829187274e-06,
+    "final_stdout_minus_snapshot_control_seconds": 0.46993112200289033,
+    "longest_candidate": "search_08_S_s0",
+    "longest_candidate_seconds": 10939.655007698,
+    "failed_or_conservative_intervals": [
+      {
+        "arm": "S_pos",
+        "error": "RuntimeError",
+        "kind": "search",
+        "run_id": "search_01_S_pos_s0",
+        "seconds": 1.8346303282305598
+      },
+      {
+        "arm": null,
+        "error": "ValueError",
+        "kind": "control",
+        "run_id": null,
+        "seconds": 0.28996595880016685
+      },
+      {
+        "kind": "search",
+        "run_id": "search_08_S_s0",
+        "arm": "S",
+        "seconds": 4051,
+        "error": "SERVER_REBOOT",
+        "accounting": "CONSERVATIVE_BOUND_TO_RECORDED_SHUTDOWN"
+      },
+      {
+        "kind": "control",
+        "run_id": null,
+        "arm": null,
+        "seconds": 4,
+        "error": "SERVER_REBOOT",
+        "accounting": "CONSERVATIVE_BOUND_TO_RECORDED_SHUTDOWN"
+      }
+    ],
+    "by_arm": {
+      "replication": {
+        "H_pos": 22066.365703650998,
+        "S": 22921.239734506977,
+        "S_pos": 21463.53744548399
+      },
+      "search": {
+        "H_pos": 85586.11194069631,
+        "S": 88026.46144076287,
+        "S_pos": 84398.15799333455
+      }
+    },
+    "interval_kind_counts": {
+      "control": 406,
+      "search": 38,
+      "replication": 9,
+      "evaluation": 1,
+      "analysis": 1
+    },
+    "reboot_search_upper_bound": 4051,
+    "reboot_control_upper_bound": 4,
+    "note": "The historical reboot C=4-second charge is a disclosed conservative upper bound and may slightly overlap the prior child tail; do not describe all historical intervals as exact mutually exclusive measurements."
+  },
+  "verification": {
+    "execution_assertions": 181860,
+    "search_checks": 568,
+    "metric_domain_rows": 11880,
+    "metric_max_abs_error": 5.551115123125783e-16,
+    "conditional_summary_rows": 4800,
+    "conditional_undefined_rows": 358,
+    "conditional_finite_scalars": 13326,
+    "conditional_max_abs_error": 3.3306690738754696e-16
+  },
+  "actual_scope": {
+    "archive_members": 7679,
+    "payload_identity_verified": 7678,
+    "inventory_manifest_extra_member": 1,
+    "exclusive_strongest_level_counts": {
+      "direct_targeted_or_fields": 51,
+      "direct_full_text": 30,
+      "identity_only": 2752,
+      "machine_content_check": 4846
+    },
+    "unique_direct_read_paths": 81,
+    "unique_machine_content_check_paths": 4878,
+    "exclusions": [
+      "正式标签/文本原表",
+      "模型权重",
+      "Memory载荷",
+      "项目服务器连接",
+      "训练/推理",
+      "原包代码执行"
+    ],
+    "notes": [
+      "全文数仅依据记录的full_text；片段相加不自动视为全文。",
+      "direct与machine可重叠；exclusive_strongest_level_counts四类互斥且合计7679。",
+      "identity_only仍已完成字节身份核对，不表示内容被研究解释。",
+      "脚本自身范围表中的human仅区分直接文本审阅与程序处理，不声称另有人类外审。"
+    ]
+  }
+}

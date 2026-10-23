@@ -1,0 +1,104 @@
+交付路径说明：本分项报告内 result/、context/、request.zh.txt 均指原输入包；无目录前缀的分项核对文件位于 evidence/execution/，阅读记录位于 scope/execution/，自写脚本位于 scripts/。综合裁决以根 review_report.zh.txt 与 findings.json 为准。
+
+# 执行、来源、访问与预算分项外审
+
+## 结论
+
+在本次送审的保存证据范围内，45 条完整成功轨迹、盲门及访问计数、各自冻结来源、恢复后的旧结果保留和累计预算相互对应，未发现会推翻本轮结果有效性的执行阻断。该结论是对送审证据链的审查，不是连接原服务器取得的新原生资格，也不把日志或摘要中的参数变化信息冒称为独立加载模型重放。
+
+需要一项很小的列账文字勘误：按权威 `result/execution/formal.console.txt` 的 `FINAL_ACCOUNTING` 五段累计，加资格 1,064 秒和本轮分析 1 秒，合计 **325,695.1923511912 秒**；保留六位小数应写 **325,695.192351 秒**。请求及主报告的 325,695.192355 秒高约 3.81 微秒。小时数仍为 90.470887，预算余量、最长候选和任何科学结论均不受影响。无需重跑或更改冻结原始账，仅更正派生文字即可。
+
+此外，重启时补记的控制 C=4 秒是已披露的保守上界，可与上一子进程尾部小幅重叠。应继续保留这一限定，不能把所有历史收费都写成精确互斥实测；它没有产生漏记费用或借用其他段预算的问题。
+
+## 一、核对方法和可复现性
+
+独立脚本为 `audit_execution.py`，不导入送审项目模块，不读取正式标签，不加载模型，不连接网络，不调用训练入口。只处理 JSON 保存字段、已开放分数数组及来源字节身份。运行方式：
+
+```bash
+python audit_execution.py INPUT_ROOT OUTPUT_ROOT
+```
+
+`INPUT_ROOT` 为送审 ZIP 解压根目录。需要 Python 与 NumPy。脚本输出 `execution_audit.json`、`run_audit.csv`、`source_changes.csv`、`replication_timing.csv` 和 `machine_read_scope.json`；本轮终态为 PASS，零未解决机械矛盾。共有 181,860 次断言检查，不能将这个数字理解为 181,860 份独立原生证据。逐文件机械核对范围列出 6,833 个不同输入路径；同一文件可能同时接受嵌套清单校验与结构检查。
+
+人工实际阅读范围另见 `human_read_scope.json`，明确区分全文、定位片段、差异片段和结构抽取。没有将所有 7,678 个输入载荷声称为人工逐行阅读全文。
+
+## 二、45 条轨迹及保存恢复
+
+本分项从实际 run 目录集合独立核对 36 个 `search_00..11_{S,S_pos,H_pos}_s0` 与 9 个 `replication_00..02_{S,S_pos,H_pos}_s1..3`，集合恰好等于合同规定的 45 个身份；没有重复或替代轨迹。
+
+| 项目 | 独立核对结果 |
+|---|---:|
+| 完整轨迹 | 45 |
+| 实际 update 行 | 25,920 |
+| 梯度群呈现（A 当前 + B 当前/历史） | 38,880 |
+| 端点 | 90 |
+| epoch 诊断捕获 | 540 |
+| 有限且大于零的 record_gradient_norm 保存值 | 38,880 |
+| 端点模型 state_sha256 不同值 | 90 |
+
+每条轨迹 A/B 各 288 行、阶段 step 为 1—288、末端 Adam step 分别 288/576；每阶段 48 个不同当前群，各呈现 6 次。A 没有历史分支；B 每次都有来自该 run 自己六群 Memory 摘要的历史分支。逐行 trial 身份、lambda、保存梯度和损失数值的有限性一致。此处核查的是更新日志实物及其相互约束，不是本次再次执行 25,920 次训练。
+
+每条轨迹 A 末 continuity 与 B 起点 `starts[arm]` 完全一致；同一 seed 的 encoder/head 初始化一致，初始 Adam 矩为空。初始完整 Adam 哈希会随学习率不同而变化，因此不能把不同调参点或 S 与候选复验的 Adam 元数据哈希差异误判为随机起点不公平。
+
+90 端点的 `full_restore_verified` 与 `inference_restore_verified` 均为 true，且独立读取的 `raw`、`full-raw`、`inference-raw` 数组逐值相等、有限。所有保存分数、映射、更新文件和诊断数组均与相应内层 manifest 大小/SHA 对应。90 个 Memory 摘要均为六群且低于 1 MiB；Memory 载荷不在包内，本次没有解析载荷，摘要检查不能替代载荷级检查。
+
+直接证据路径模式：`result/job/<run_id>/run/manifest.json`、`run/updates/{A,B}_<arm>.json`、`run/points/{A,B}_<arm>.json`、`run/scores/*`、`run/diagnostics/*`。每条核对结果见 `run_audit.csv`。
+
+## 三、盲门、集中开放和读取账
+
+45 个 `before_valid.json` 均为 `ALL_BLIND_GATES_PASS`，trial 与 execution/completion 一致，无 run 内 failure 文件。36 个搜索的保存读取账均为 train1/valid1/heldout0/owners0；9 个复验各自为 train1/valid0/heldout0/owners0。`replications.json` 对这 9 份自己的 completion 大小和 SHA256 逐项绑定，均保存 child_exit_code=0、resources_released=true，并保持 valid=0。
+
+之后 `result/job/joint/access.json` 为 train0/valid1；`interrupted_attempt/access.json` 保留 train1/valid0。因此总读取账独立相加恰为 **train46、valid37、heldout0、owners0**，与 campaign completion 一致。原失败读取没有被清零。
+
+实际顺序的静态直接来源是 `result/sources/scripts/step28_optuna_search.py` 的 `execute`（327—406 行）、`step28_optuna_control.py` 的 `joint_opening`（209—216 行）、`step28_optuna_run.py` 的 `execute_trial` 和 `_joint_evaluate`（278—347 行）。训练先通过 blind_gate 再写 before_valid；只有搜索单 run 进入开发标签解析；复验自己的子进程先盲完成、退出、释放资源，全部九条核对后才进入共同评价。集中评价再次绑定各自 completion 和访问账。
+
+以上证据支持这批保存结果按既定盲门和集中开放执行。外审没有原主机全程系统追踪，不将该结论扩写为超出记录范围的第三方主机证明。旧恢复的 25 次成功结果通过原结果保留、历史父账和恢复链交叉支持；本包并未把原服务器所有旧 PID/退出观察记录完整重复搬入，按请求复用已关闭恢复审查即可。
+
+对诊断 seed 命名作了定向排疑：虽然祖先诊断入口有默认 s0，实际 `step28_optuna.py` 的 `Method.capture`（231—241行）写回本 run 的 seed 和 metadata。全部540份实际捕获的 seed 与 trial 精确对应；9复验的108份捕获为 s1/s2/s3各36份。这是已排除的疑点，不构成发现或修复要求。
+
+## 四、来源版本和恢复保留
+
+每条轨迹的 execution、before_valid、completion 和 run manifest 的来源清单相互完全一致。独立哈希结果为：
+
+| 轨迹版本 | 条数 | 每条来源数 | 合计快照 |
+|---|---:|---:|---:|
+| 最早成功三锚点 | 3 | 51 | 153 |
+| 资源恢复之后、重启之前的成功轨迹 | 22 | 53 | 1,166 |
+| 本次重启恢复以后 | 20 | 54 | 1,080 |
+| 合计 | 45 | — | 2,399 |
+
+当前 `result/sources` 的 54 项也独立核对通过。不能要求旧 run 声称运行新 54 项，包保留自己的实际旧冻结快照是正确的。出现多版本的文件为 optuna 控制、正式等待、恢复、run、search 和相应 tests。所阅差异中 run 的变化限来源/测试集合、9 GiB 预检与恢复接线，目标、训练、保存恢复和评价计算没有在这批来源演进中被替换。
+
+重启补充绑定的 25 个旧成功 run，共 **4,169 份**在本包实际保留的小证据，与 `context/.../optuna_reboot/recovery_bound.json` 的旧字节身份逐一相同；该 25 run 另有 50 份旧 Memory 载荷不在包内，正是声明排除范围，不属于漏传本次所需统计证据。待重跑的唯一身份为 `search_08_S_s0`，lambda=1.2450012290684322、LR倍率=0.9227201063294653；恢复回执仍为 completed_runs_retrained=0、interrupted_run_restarts=1。
+
+恢复许可、9 GiB 与其他 CUDA 共存、一次中断重跑、总读取46/37，分别见两份 scope、主审及最终 `formal_authorization.json`。两次免审仅适用恢复实施，本分项没有把它们解释成结果外审通过。旧未授权/待审核文字按形成时点解释，本轮用户直接外审请求授予本次附件审查。
+
+成功轨迹的 25,920 更新不能写成全部历史尝试精确总数。旧主审记载中断尝试日志至少 A288+B96=384 更新；本包不含旧中断日志正文，本分项仅继承其记录边界，不把“至少384”升级为本次独立重放验证或精确最后更新数。
+
+## 五、预算复算
+
+权威终账是 `result/execution/formal.console.txt` 第 4 行的 `FINAL_ACCOUNTING`。`ledger.json` 明示自身不含最后写盘尾段；独立差值为 C=0.46993112200289033 秒。最终 stdout 已包含该尾段，不能再把它加一次，也不能使用旧快照漏掉它。
+
+| 收费类别 | 按原始字段复算，秒 | 上限，秒 |
+|---|---:|---:|
+| 搜索及继承失败/中断 | 258,010.73137479374 | 777,600 |
+| 九复验盲运行 | 66,451.14288364197 | 194,400 |
+| C | 98.76268308745784 | 900 |
+| E | 58.38235590100521 | 3,600 |
+| A（原11.173053767008241 + 本轮1） | 12.173053767008241 | 600 |
+| 资格（CPU188 + 原生876） | 1,064 | 2,100 |
+| 合计 | **325,695.1923511912** | **979,200** |
+
+38 个搜索收费区间等于 36 个成功搜索加原资源失败一次和重启中断一次；9 个复验收费区间、E/A 各1个区间和406个C区间均可逐项重加。原资源失败 1.8346303282305598 秒仍在 S_pos trial1；旧来源排序失败的控制工作仍留在C链；重启搜索保守4051秒、控制保守4秒都明确标记 `CONSERVATIVE_BOUND_TO_RECORDED_SHUTDOWN`。
+
+4051=ceil(shutdown_epoch−dispatch_epoch)，4=ceil(dispatch_epoch−previous_completion_epoch)，独立按恢复字段重算相同。最终累计最长候选仍为 `search_08_S_s0`，4051 + 6888.655007698 = **10,939.655007698 秒**，小于21,600；重跑没有重新获得完整单次上限。三个臂的搜索、复验分账也逐项相加匹配，全部低于各自259,200/64,800秒。
+
+`step28_optuna_control.py` 53—122行只有一个活动 interval，并对已累计同 run 费用扣减单次余额。`step28_optuna_search.py` 199—224行将C间隙与活动阶段分开，260—276行每次子进程派发都重新赋 `RECORD_REPLAY_STARTED_EPOCH`，包括E/A；406、431行C资源扫描使用局部 monotonic 起点。最早51来源快照也已包含这些局部起点修复。九复验保存的本地预算秒数≤各自 child_launch_through_exit 秒数≤父账自身运行秒数，逐条见 `replication_timing.csv`。前八次复验等待后续训练没有被加回各自费用。
+
+当前报告的“共享各段未互借”成立；若使用“全部区间严格互斥精确实测”则超出证据，因为重启4秒C是已披露的保守估计。累计90.47小时还包括CPU和原生资格、控制、评价、失败及中断，不是纯GPU训练时长。当前没有预算阻断，剩余额度也不形成追加实验许可。
+
+## 六、必要修正与不需要扩大的工作
+
+1. 派生总秒数末位改为325,695.192351，或写约325,695.192秒；保存原始账不变。该项属于低级报告精度勘误。
+2. 保留“45条成功轨迹”“额外一次中断读取”“重启C保守上界可能小幅重叠”和“条件下的保存证据审查”等限定。
+3. 本分项没有发现要求新增候选、换seed/epoch、重启训练、重开正式标签或增加通用工程核验的具体理由。科学门是否达标以及统计解释由结果分项独立裁决，执行完整不等于科学成功。

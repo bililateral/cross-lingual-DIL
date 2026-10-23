@@ -1,0 +1,140 @@
+{
+  "status": "PASS",
+  "environment": "external isolated review workspace",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "input_archive_sha256": "be13255ad50a0fe814f58a150574f8403181cf3a9e7aa0af37293834188baac6",
+  "checked_summary_rows": 4800,
+  "undefined_rows": 358,
+  "compared_finite_scalars": 13326,
+  "maximum_absolute_error": 3.3306690738754696e-16,
+  "mismatches": [],
+  "bootstrap": {
+    "algorithm": "PCG64",
+    "seed": 20260930,
+    "replicates": 5000,
+    "domains": 2,
+    "groups_each": 20,
+    "draw_shape": [
+      5000,
+      2,
+      20
+    ],
+    "draw_dtype": "int64",
+    "draw_sha256": "b1a539f80631940936dbd78b7141db5b37d96eeb9283a28c964afc733eda552e",
+    "method": "whole groups paired across arms and seeds; average three fixed seeds before resampling"
+  },
+  "export_matches": {
+    "three_seed_absolute": true,
+    "comparisons": true,
+    "positive_count": true,
+    "diagnostics": true,
+    "direction_gate": true
+  },
+  "gates": {
+    "S_pos": {
+      "cells": [
+        {
+          "seed": 1,
+          "domain": "A",
+          "difference": 0.004140707611513683,
+          "strictly_positive": true
+        },
+        {
+          "seed": 1,
+          "domain": "B",
+          "difference": 0.0035250093302129,
+          "strictly_positive": true
+        },
+        {
+          "seed": 2,
+          "domain": "A",
+          "difference": -0.007774987366210159,
+          "strictly_positive": false
+        },
+        {
+          "seed": 2,
+          "domain": "B",
+          "difference": 0.0008465632251769245,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "A",
+          "difference": 0.020412019644876687,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "B",
+          "difference": -0.005791848950885445,
+          "strictly_positive": false
+        }
+      ],
+      "positive_cells": 4,
+      "passed": false
+    },
+    "H_pos": {
+      "cells": [
+        {
+          "seed": 1,
+          "domain": "A",
+          "difference": 0.02853555386286461,
+          "strictly_positive": true
+        },
+        {
+          "seed": 1,
+          "domain": "B",
+          "difference": -0.005630258478320413,
+          "strictly_positive": false
+        },
+        {
+          "seed": 2,
+          "domain": "A",
+          "difference": 0.013974360563979183,
+          "strictly_positive": true
+        },
+        {
+          "seed": 2,
+          "domain": "B",
+          "difference": 0.0054808904376321245,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "A",
+          "difference": 0.030638301248702027,
+          "strictly_positive": true
+        },
+        {
+          "seed": 3,
+          "domain": "B",
+          "difference": 0.001128923912404553,
+          "strictly_positive": true
+        }
+      ],
+      "positive_cells": 5,
+      "passed": false
+    }
+  },
+  "decomposition": {
+    "S_pos": {
+      "final_old_A_advantage": 0.005592579963393403,
+      "advantage_already_at_A_end": -0.0009206417906977748,
+      "less_forgetting_point_estimate": 0.006513221754091178,
+      "identity_residual": -8.673617379884035e-19
+    },
+    "H_pos": {
+      "final_old_A_advantage": 0.024382738558515273,
+      "advantage_already_at_A_end": 0.014690193476518305,
+      "less_forgetting_point_estimate": 0.009692545081996969,
+      "identity_residual": 0.0
+    }
+  },
+  "formal_label_reads": 0,
+  "model_loads": 0,
+  "training_calls": 0,
+  "project_server_connections": 0,
+  "elapsed_seconds": 1.486575749000167,
+  "limits": "Saved-metric arithmetic and conditional bootstrap only; not an independent label-level reconstruction or seed-population/holdout inference."
+}

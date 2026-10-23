@@ -1,0 +1,49 @@
+{
+  "scope": "execution_provenance_access_budget",
+  "overall": "No new scientific execution blocker found within submitted evidence",
+  "findings": [
+    {
+      "id": "EXEC-01",
+      "category": "verified_result_integrity",
+      "severity": "information",
+      "status": "supported",
+      "title": "45条成功轨迹的更新、端点、恢复、捕获与访问账对应",
+      "facts": {"runs":45,"updates":25920,"gradient_presentations":38880,"endpoints":90,"captures":540,"train":46,"valid":37,"heldout":0,"owners":0},
+      "evidence": ["result/job/*/run/manifest.json","result/job/*/run/updates/*.json","result/job/*/run/points/*.json","result/job/*/before_valid.json","result/job/replications.json","result/job/joint/access.json","result/job/interrupted_attempt/access.json"],
+      "limits": "Saved logs and arrays independently checked; no new project-server run or model loading."
+    },
+    {
+      "id": "EXEC-02",
+      "category": "report_precision_correction",
+      "severity": "low",
+      "status": "confirmed",
+      "title": "累计预算秒数末位有约3.81微秒派生文字差",
+      "reported": 325695.192355,
+      "recomputed": 325695.1923511912,
+      "difference_seconds": 0.00000380881829187274,
+      "evidence": ["result/execution/formal.console.txt:FINAL_ACCOUNTING.used","result/execution/formal.console.txt:FINAL_ACCOUNTING.qualification_seconds","result/analysis_wallclock.json:charged_seconds","result/report.zh.md:143","request.zh.txt"],
+      "impact": "No impact on budget compliance, 90.470887 hours, candidate ceiling, or scientific conclusions.",
+      "required_action": "Correct derived prose to 325695.192351 seconds at six decimal places, or use an explicitly rounded approximation; do not edit frozen raw ledger."
+    },
+    {
+      "id": "EXEC-03",
+      "category": "preserve_accounting_qualification",
+      "severity": "information",
+      "status": "already_disclosed",
+      "title": "重启补记C=4秒为保守上界，不能泛称全部历史账精确互斥",
+      "evidence": ["context/reports/documentation/20261021/optuna_reboot/scope.zh.txt","context/reports/documentation/20261021/optuna_reboot/primary.zh.txt","context/reports/documentation/20261021/optuna_reboot/recovery_bound.json:interruption","result/execution/formal.console.txt:FINAL_ACCOUNTING.intervals"],
+      "impact": "Possible small conservative overlap with the preceding child tail, with no undercount or budget expansion.",
+      "required_action": "Retain the existing conservative-bound wording; no implementation or rerun request."
+    },
+    {
+      "id": "EXEC-04",
+      "category": "verified_provenance",
+      "severity": "information",
+      "status": "supported",
+      "title": "各run保留自己的51/53/54来源，25个旧成功结果未被追贴新来源",
+      "facts": {"runs_51_sources":3,"runs_53_sources":22,"runs_54_sources":20,"frozen_snapshots":2399,"current_sources":54,"retained_old_runs":25,"matching_retained_old_payloads":4169,"excluded_old_memory_payloads":50},
+      "evidence": ["result/job/*/run/sources","result/job/*/run/manifest.json:source_files","result/sources","context/reports/documentation/20261021/optuna_reboot/recovery_bound.json:files","result/job/recovery.json"],
+      "limits": "Excluded models/Memory/formal labels were not loaded; old process observations and qualification are reused within the closed review boundary."
+    }
+  ]
+}

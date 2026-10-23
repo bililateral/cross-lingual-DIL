@@ -1,0 +1,232 @@
+{
+  "schema_version": "1.0",
+  "review_date": "2026-10-23",
+  "timezone": "UTC+08:00",
+  "input_sha256": "be13255ad50a0fe814f58a150574f8403181cf3a9e7aa0af37293834188baac6",
+  "overall_disposition": "accept_valid_completed_batch_primary_objective_not_met",
+  "overall_disposition_zh": "接收当前有效完成结果；两候选均未达到预定主目标",
+  "new_execution_blockers": 0,
+  "defects_requiring_new_experiment": 0,
+  "finding_count": 14,
+  "findings": [
+    {
+      "id": "REV-01",
+      "category": "input_integrity",
+      "severity": "information",
+      "status": "verified",
+      "title": "附件与内部清单一致",
+      "detail": "实收103538522字节；7679成员，其中7678载荷逐项大小/SHA256一致。未收到另行预期哈希，故不宣称外部哈希认证。",
+      "evidence": [
+        "evidence/identity_verification.json",
+        "scope/input_inventory_verified.csv"
+      ],
+      "disposition": "采用当前实收包开展审查。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-02",
+      "category": "scientific_claim_limit",
+      "severity": "claim_blocking",
+      "status": "confirmed",
+      "title": "两候选均未通过六格方向一致门",
+      "detail": "S_pos为4/6正，s2/A与s3/B负；H_pos为5/6正，s1/B负。最终对手是同seed重新调参训练的S。",
+      "evidence": [
+        "evidence/search/six_cell_gate_independent.csv",
+        "evidence/statistics/statistics_audit.json"
+      ],
+      "disposition": "接收有效未达目标的结果；不得宣称本轮双域稳定胜出。",
+      "blocks_acceptance_of_current_batch": false,
+      "blocked_claims": [
+        "两候选任一达到预定六格目标",
+        "双域稳定超过充分调参S"
+      ],
+      "facts": {
+        "S_pos_positive_cells": 4,
+        "H_pos_positive_cells": 5,
+        "cells_per_candidate": 6
+      }
+    },
+    {
+      "id": "REV-03",
+      "category": "conditional_effect",
+      "severity": "material_interpretation",
+      "status": "supported",
+      "title": "H_pos旧域最终排序有条件优势，新域未确定",
+      "detail": "H_pos−S旧A MAP差+0.024382738558515273，95%条件区间[0.01159438242318344,0.03705919173097784]；新B差+0.00032651862390542204，区间[-0.011354330233860387,0.011627761138181715]。",
+      "evidence": [
+        "evidence/statistics/comparison_effects.json",
+        "evidence/statistics/replication_map_independent.csv"
+      ],
+      "disposition": "保留旧A优势；不以新B跨零证明非劣、等价或无效。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-04",
+      "category": "mechanism_and_forgetting_limit",
+      "severity": "claim_blocking",
+      "status": "confirmed",
+      "title": "主MAP遗忘改善只有有利点估计",
+      "detail": "H_pos−S的MAP遗忘差−0.009692545081996969，区间[-0.021116943702594006,0.0020908653494745902]。最终旧A差中0.014690193476518305已在A末存在，余0.009692545081996969为较少下降点估计。S_pos遗忘差区间也跨零。",
+      "evidence": [
+        "evidence/statistics/statistics_audit.json",
+        "evidence/statistics/comparison_effects.json"
+      ],
+      "disposition": "不能将最终旧A差全归因于抗遗忘或宣称已证MAP遗忘改善。",
+      "blocks_acceptance_of_current_batch": false,
+      "blocked_claims": [
+        "已证主MAP显著减少遗忘"
+      ]
+    },
+    {
+      "id": "REV-05",
+      "category": "probability_cost",
+      "severity": "material_interpretation",
+      "status": "confirmed",
+      "title": "raw概率质量代价与零预测正例须完整保留",
+      "detail": "两候选×两域的Brier/log loss共8个条件区间均严格为正；九复验B末raw阈值0.5在两域均无预测正例。阶段校准后的部分改善不抹去raw代价。",
+      "evidence": [
+        "evidence/statistics/comparison_effects.json",
+        "evidence/metrics/score_role_checks.csv"
+      ],
+      "disposition": "分别报告排序、概率质量与阈值决策；不得事后挑阈值改变成功判定。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-06",
+      "category": "search_integrity",
+      "severity": "information",
+      "status": "verified",
+      "title": "公平机会、自身反馈与冻结选择对应",
+      "detail": "三study各12完整候选、同空间与默认点、无剪枝。36份自身B末raw MAP/U及SQLite一致；选S10、S_pos11、H_pos11，九复验沿用冻结参数。",
+      "evidence": [
+        "evidence/search/search_audit_result.json",
+        "evidence/search/search_checks.json",
+        "evidence/search/search_independent.csv"
+      ],
+      "disposition": "无选参修复要求；12点有限搜索不支持全局最优宣称。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-07",
+      "category": "resolved_suspicion",
+      "severity": "information",
+      "status": "explained_with_limit",
+      "title": "相同TPE提议不是复制反馈的证据",
+      "detail": "三臂12参数位置相同、36个B末raw数组哈希不同。固定Optuna4.6.0下，trial4—10好集合均{1}，trial11均{1,10}；共享sampler seed与相同历史可解释同提议。本次未运行sampler。",
+      "evidence": [
+        "evidence/search/tpe_partition_evidence.json",
+        "evidence/search/external_reference.json"
+      ],
+      "disposition": "写成12共享参数位置、36次训练评价；不声称36不同位置或外审完整重放TPE。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-08",
+      "category": "execution_integrity",
+      "severity": "information",
+      "status": "verified",
+      "title": "45轨迹、恢复、来源及读取账形成一致证据链",
+      "detail": "45成功轨迹、25920更新、38880梯度群、90端点、540捕获；train46/valid37/heldout0/owners0；2399run来源与当前54来源对应，旧25run的4169保留小证据一致。108复验capture的实际seed覆盖正确。",
+      "evidence": [
+        "evidence/execution/execution_audit.json",
+        "evidence/execution/run_audit.csv",
+        "evidence/metrics/independent_metrics_audit.json"
+      ],
+      "disposition": "接受保存证据范围的完整性；不冒称外审再次观察硬件全程。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-09",
+      "category": "report_precision_correction",
+      "severity": "minor",
+      "status": "confirmed",
+      "title": "累计秒数需极小文字精度勘误",
+      "detail": "权威终账加新增分析和资格为325695.1923511912秒；原文字325695.192355相差3.80881829187274e-6秒。小时数和所有预算门不变。",
+      "evidence": [
+        "evidence/execution/execution_audit.json",
+        "原包 result/execution/formal.console.txt:FINAL_ACCOUNTING",
+        "原包 result/analysis_wallclock.json"
+      ],
+      "disposition": "派生文字改为325695.192351秒或90.470887小时；冻结原账保持原样。",
+      "blocks_acceptance_of_current_batch": false,
+      "facts": {
+        "reported_seconds": 325695.192355,
+        "recomputed_seconds": 325695.1923511912,
+        "difference_seconds": 3.80881829187274e-06
+      }
+    },
+    {
+      "id": "REV-10",
+      "category": "wording_clarification",
+      "severity": "minor",
+      "status": "recommended",
+      "title": "明确raw概率为四组比较、八个指标区间",
+      "detail": "原四组条件区间表述可指四个方法×域组合，但实际覆盖Brier与log loss共8个指标区间。",
+      "evidence": [
+        "原包 result/report.zh.md:112",
+        "evidence/statistics/comparison_effects.json"
+      ],
+      "disposition": "建议改为“四组方法×域比较的8个指标区间”；科学结论不变。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-11",
+      "category": "audit_scope_limit",
+      "severity": "nonblocking",
+      "status": "retained",
+      "title": "审查范围有限且已显式记录",
+      "detail": "没有历史六份raw副本用于二次逐位比对；未标签级重建AP/AUC/Brier/log loss；未全量重算诊断bootstrap及自动标签；未加载模型/Memory或运行项目资格。S0历史群矩阵身份与全精度均值已独立核对。",
+      "evidence": [
+        "scope/actual_read_scope.csv",
+        "evidence/search/search_audit_result.json",
+        "evidence/metrics/independent_metrics_audit.json"
+      ],
+      "disposition": "引用本审查时保留限制，不把上述边界变为追加训练或重新开放标签的前提。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-12",
+      "category": "statistical_and_causal_limit",
+      "severity": "material_interpretation",
+      "status": "retained",
+      "title": "重复开发、固定seed与缺少H对照限制外推",
+      "detail": "条件整群区间只覆盖固定模型与开发群重抽；不含调参选择偏差、seed总体或真实市场。H_pos与S_pos同参数比较仍包含整个训练轨迹；缺少充分调参原H，不能隔离新rank贡献或证明原创。",
+      "evidence": [
+        "evidence/statistics/statistics_audit.json",
+        "evidence/search/search_audit_result.json",
+        "review_report.zh.txt 第六节"
+      ],
+      "disposition": "将其作为系统层面有限调参比较；不要求本轮追加第四臂或新seed。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-13",
+      "category": "diagnostic_limit",
+      "severity": "material_interpretation",
+      "status": "supported",
+      "title": "训练开发差距扩大仍存在，根因未被确定",
+      "detail": "全部540捕获的保存曲线和点变化复算；90处epoch6与端点对齐。三seed点均值差距均扩大；epoch1已训练48更新，每seed缓存诊断仅6群。",
+      "evidence": [
+        "evidence/metrics/independent_diagnostics.csv",
+        "evidence/metrics/independent_metrics_audit.json"
+      ],
+      "disposition": "只作诊断性描述，不挑epoch、不合并三个seed缓存为新总体、不宣称唯一根因。",
+      "blocks_acceptance_of_current_batch": false
+    },
+    {
+      "id": "REV-14",
+      "category": "budget_qualification",
+      "severity": "nonblocking",
+      "status": "already_disclosed",
+      "title": "重启C收费包含保守上界口径",
+      "detail": "重启搜索4051秒及C4秒明确为保守上界。C4秒可能少量覆盖上一子进程尾部；原失败费用保留、最长累计候选10939.655007698秒，所有上限内。",
+      "evidence": [
+        "evidence/execution/execution_audit.json",
+        "evidence/execution/replication_timing.csv",
+        "review_report.zh.txt 第八节"
+      ],
+      "disposition": "保留历史保守计费说明，避免将全历史账描述成精确互斥测量。",
+      "blocks_acceptance_of_current_batch": false
+    }
+  ]
+}

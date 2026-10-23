@@ -1,0 +1,49 @@
+{
+  "review_date": "2026-10-23",
+  "timezone": "UTC+08:00",
+  "organization": "当前主审实例负责综合裁决；执行预算、搜索选参、指标诊断三项并行分审；主实例独立统计复算及交叉复核。",
+  "model_route": "沿用当前会话模型；未调用独立产品模型选择接口，未把界面名称映射作为外部已核验事实。",
+  "input_method": "用户所给本地上传ZIP；首先核对包与内部清单，再读取请求和定位证据。",
+  "submitted_project_code_executed": false,
+  "project_server_connections": 0,
+  "formal_label_reads": 0,
+  "model_loads": 0,
+  "memory_payload_loads": 0,
+  "training_calls": 0,
+  "fresh_inference_calls": 0,
+  "custom_review_scripts": [
+    "scripts/audit_execution.py",
+    "scripts/audit_search.py",
+    "scripts/independent_metrics_check.py",
+    "scripts/audit_statistics.py"
+  ],
+  "scientific_audits": {
+    "execution": "PASS",
+    "search": "568/568 PASS",
+    "metrics": "PASS",
+    "statistics": "PASS"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "note": "审查工作区运行；不计入项目预算，也不是项目原生资格重跑。"
+  },
+  "external_reference": "仅Optuna4.6.0官方固定版源码，见evidence/search/external_reference.json；查询未包含项目资料。",
+  "tool_level_notes": [
+    "初次目录定位涉及不存在的可选目录，命令非零退出；用户上传路径已定位并正常读取，未作为科学审计失败。",
+    "初次长清单及部分长源码输出被控制台截断。清单全条目通过程序核对；必要段落定向补读；直接阅读表未把截断输出记为全文。",
+    "报告文字编辑有一次定位未匹配，随后以完整行成功修正措辞；输入包和科研数据未变。",
+    "最终主报告的指标、概率、诊断、执行、预算、来源和范围表述由对应分审再次对照既有证据，未追加科学运行。"
+  ],
+  "limitations": [
+    "正式标签/文本原表",
+    "模型权重",
+    "Memory载荷",
+    "项目服务器连接",
+    "训练/推理",
+    "原包代码执行",
+    "未重放Optuna随机提议；只核对保存历史与固定源码分组机制。",
+    "历史六raw未外审二次逐位比对；保存回执与S0群矩阵身份分别报告。",
+    "未独立重建标签级AP/AUC/Brier/log loss；未全量复算诊断区间及自动标签。"
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "scope": "search_selection_only",
+  "findings": [
+    {
+      "id": "SEL-01",
+      "category": "verified_scientific_limit",
+      "severity": "claim_blocking",
+      "title": "两候选预定六格方向一致门均失败",
+      "status": "confirmed",
+      "evidence": [
+        "result/job/replication_*/evaluation/B_*_raw_metrics.json",
+        "result/analysis/summary.json:direction_gate",
+        "evidence/search/six_cell_gate_independent.csv"
+      ],
+      "finding": "S_pos4/6格正；H_pos5/6格正。S_pos s2/A、s3/B及H_pos s1/B下降。",
+      "required_action": "保留有效未达标结论，不以均值或条件区间替换六格门。",
+      "blocks_acceptance_of_existing_results": false,
+      "blocks_claim": "本轮双域稳定超过充分调参S"
+    },
+    {
+      "id": "SEL-02",
+      "category": "verified_correctness",
+      "severity": "information",
+      "title": "固定S0与36条实际反馈/唯一选参一致",
+      "status": "passed",
+      "evidence": [
+        "result/job/studies.sqlite3",
+        "result/job/search.json",
+        "result/job/selected.json",
+        "evidence/search/search_checks.json"
+      ],
+      "finding": "36条own B/raw域MAP、U、completion大小/SHA、SQLite目标与参数全匹配；S10、S_pos11、H_pos11。",
+      "required_action": "无修复要求。",
+      "blocks_acceptance_of_existing_results": false
+    },
+    {
+      "id": "SEL-03",
+      "category": "explanatory_clarification",
+      "severity": "information",
+      "title": "三臂12参数点相同与自身TPE反馈相容",
+      "status": "supported",
+      "evidence": [
+        "result/sources/scripts/step28_optuna_control.py:128-159",
+        "evidence/search/tpe_partition_evidence.json",
+        "https://optuna.readthedocs.io/en/v4.6.0/_modules/optuna/samplers/_tpe/sampler.html"
+      ],
+      "finding": "trial4-10各臂好集合均为[1]，trial11均为[1,10]，共享sampler seed与序列足以解释同提议。36个B raw数组哈希不同。",
+      "required_action": "可补充机制说明；不把36次训练称36个不同参数位置，不称已在外审重新运行Optuna。",
+      "blocks_acceptance_of_existing_results": false
+    },
+    {
+      "id": "SEL-04",
+      "category": "audit_scope_limit",
+      "severity": "information",
+      "title": "历史六份raw锚点未在外审二次逐位比较",
+      "status": "scope_limited",
+      "evidence": [
+        "result/job/search_00_*/completion.json:anchor_compatible",
+        "result/sources/scripts/step28_optuna_run.py:206-219",
+        "result/job/search_00_S_s0/evaluation/B_S_raw_metrics.json"
+      ],
+      "finding": "原生记录及源码支持锚点兼容，本包没有独立历史六raw副本；S0历史B末群指标矩阵SHA及全精度均值可独立核对。",
+      "required_action": "明确原生记录支持与外审独立复算范围；不重开已关闭资格、不要求新训练。",
+      "blocks_acceptance_of_existing_results": false
+    },
+    {
+      "id": "SEL-05",
+      "category": "verified_correctness",
+      "severity": "information",
+      "title": "九复验使用冻结各臂配置及三个预定种子",
+      "status": "passed",
+      "evidence": [
+        "result/job/replications.json",
+        "result/job/replication_*/completion.json",
+        "result/job/selected.json"
+      ],
+      "finding": "参数与selected逐字段一致，9个seed/arm组合全覆盖，盲完成valid0、exit0与完成文件hash一致。",
+      "required_action": "继续使用同seed S_tuned作直接对手，不用历史S0替代。",
+      "blocks_acceptance_of_existing_results": false
+    },
+    {
+      "id": "SEL-06",
+      "category": "verified_correctness",
+      "severity": "information",
+      "title": "25个旧完成身份保留且中断候选参数未重抽",
+      "status": "passed",
+      "evidence": [
+        "result/job/recovery.json",
+        "context/reports/documentation/20261021/optuna_reboot/recovery_bound.json",
+        "evidence/search/search_audit_result.json:pre_reboot_preserved"
+      ],
+      "finding": "25个completion大小/SHA与重启前绑定匹配；S trial8规格与pending完全相同。",
+      "required_action": "保留旧失败与额外train读取；恢复重建SQLite不得被描述为历史从无FAIL/RUNNING。",
+      "blocks_acceptance_of_existing_results": false
+    }
+  ]
+}

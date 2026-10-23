@@ -1,0 +1,76 @@
+[
+  {
+    "id": "MET-01",
+    "category": "verified_consistency",
+    "severity": "informational",
+    "status": "confirmed",
+    "title": "45轨迹保存评价与逐查询/计数/校准/恢复证据一致",
+    "detail": "270端点角色组、11880域级指标条及792展示单元格对应，最大浮点差5.55e-16，无新的数值阻断。",
+    "evidence": [
+      "independent_metrics_audit.json",
+      "independent_all_run_metrics.csv",
+      "score_role_checks.csv"
+    ]
+  },
+  {
+    "id": "MET-02",
+    "category": "scientific_cost",
+    "severity": "material_interpretation",
+    "status": "confirmed",
+    "title": "两个候选raw概率质量在两域均变差",
+    "detail": "两候选×两域×Brier/log loss，共8个条件区间全正；阶段校准改善不能抹去raw代价。",
+    "evidence": [
+      "result/job/joint/evaluation.json#comparisons",
+      "result/report.zh.md:105-114"
+    ]
+  },
+  {
+    "id": "MET-03",
+    "category": "verified_consistency",
+    "severity": "informational",
+    "status": "confirmed",
+    "title": "N/A与pooled分类率按不同分母正确处理",
+    "detail": "raw零预测正例导致precision/MCC未定义，其他指标不是N/A；宏平均有未定义群时保持N/A，pooled先合计计数。",
+    "evidence": [
+      "result/sources/scripts/step28_balanced_pooling_run.py:648-682",
+      "independent_metrics_audit.json"
+    ]
+  },
+  {
+    "id": "MET-04",
+    "category": "scientific_limit",
+    "severity": "material_interpretation",
+    "status": "retained",
+    "title": "诊断差距扩大成立，不能据此确定唯一根因或选epoch",
+    "detail": "540捕获覆盖、90个epoch6分数与端点一致；三seed缓存总体不合并，epoch1非未训练状态。诊断所有bootstrap区间并非本分项独立重算范围。",
+    "evidence": [
+      "independent_diagnostics.csv",
+      "result/report.zh.md:118-129",
+      "result/sources/scripts/step28_replay_diagnostics.py:138-168"
+    ]
+  },
+  {
+    "id": "MET-05",
+    "category": "evidence_limit",
+    "severity": "nonblocking",
+    "status": "retained",
+    "title": "本次为保存证据复算，不是独立标签级重建",
+    "detail": "底层AP/AUC/Brier/log loss按保存指标与已关闭实现引用，正式标签0读取、模型0加载。无需为本次已限定结果审查另行开放标签。",
+    "evidence": [
+      "request.zh.txt:24",
+      "independent_metrics_audit.json"
+    ]
+  },
+  {
+    "id": "MET-06",
+    "category": "wording_clarification",
+    "severity": "minor",
+    "status": "recommended",
+    "title": "概率质量区间数量宜明确为4组比较/8个区间",
+    "detail": "report第112行“四组条件区间”宜改为“四组方法×域比较的8个指标区间”；不改变结果、不构成运行阻断。",
+    "evidence": [
+      "result/report.zh.md:112",
+      "result/job/joint/evaluation.json#comparisons"
+    ]
+  }
+]
