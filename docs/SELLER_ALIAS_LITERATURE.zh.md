@@ -258,4 +258,22 @@ ICASI线索补查发现[官方论文集模板页](https://2026icasi.wind-tech.co
 
 最后补查其他作者、机构／预印本入口及GitHub公开README的精确标题，未补得ICASI候选的全文或官方实现。新发现的[darshankumar97/DARK_WEB-Vendor_Profiling](https://github.com/darshankumar97/DARK_WEB-Vendor_Profiling)已实际读取唯一源码[vendor.py](https://github.com/darshankumar97/DARK_WEB-Vendor_Profiling/blob/main/vendor.py)：将商品名称与描述拼接，使用TF-IDF一／二元词组和K-Means作商品聚类，按现有`Vendor Name`分组展示统计；没有两个账号的同控分数、账号关联监督或未见身份评价。仓库未给出对应论文，作者身份与ICASI论文的对应关系也未核实，因此既不能当作论文官方实现，也不能由商品聚类替代账号关联。未执行该源码或下载其数据。
 
-**当前检索受阻，目标未完成。**引用追查（提交`c25efbb9`）、作者及出版路径补查（`00731c57`）和本轮公开实现核查后，同一缺口连续三轮未解除：没有另外两个满足既定条件且有足够原始证据的方法；尚存的ICASI直接线索仍缺正式出版／方法证据，其他具体线索已排除或不能计入。现有可追查来源暂不能继续推进资格核实，需要新的相关论文全文、可确认对应论文的官方实现或正式出版记录等外部证据；取得后仍须逐项核验，不能预先认定合格。这是当前证据条件下的受阻判断，不是不存在此类论文的证明，不更改用户条件、不计作完成，也不授权联系作者或开展适配实验。
+**本阶段结束时检索受阻，目标未完成（后续恢复检索见第13节）。**引用追查（提交`c25efbb9`）、作者及出版路径补查（`00731c57`）和本轮公开实现核查后，同一缺口连续三轮未解除：没有另外两个满足既定条件且有足够原始证据的方法；尚存的ICASI直接线索仍缺正式出版／方法证据，其他具体线索已排除或不能计入。现有可追查来源暂不能继续推进资格核实，需要新的相关论文全文、可确认对应论文的官方实现或正式出版记录等外部证据；取得后仍须逐项核验，不能预先认定合格。这是当时证据条件下的受阻判断，不是不存在此类论文的证明，不更改用户条件、不计作完成，也不授权联系作者或开展适配实验。
+
+## 13. 2026-10-23：恢复检索，补查法证语言分析与卖家关联线索
+
+目标恢复为active后，核对现有记录并补查卖家画像、广告语言痕迹、关联卖家档案及其引用链；输入、任务、年份与刊会条件不变。以下是本轮新取得的证据，不把新增排除项算作合格名额。
+
+| 新核查对象 | 一手证据、阅读范围与结论 |
+| --- | --- |
+| [Analysing the digital transformation of the market for fake documents using a computational linguistic approach](https://doi.org/10.1016/j.fsisyn.2022.100287)，Clara Degeneve、Julien Longhi、Quentin Rossy，Forensic Science International: Synergy 5 (2022):100287 | 已通过[Europe PMC公开全文XML](https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9596726/fullTextXML)实际读取§3—5。摘要虽提出能否联系不同卖家，§3.2明确商品描述经尝试后被排除；实际分析商品标题，另分析卖家个人简介。IRaMuTeQ作下降层次分析（DHA）、对应因子分析（CFA）及词共现图；§3.4／4.4按卖家ID聚合词频、人工逐轮排除离群卖家，再依据投影位置分组。标题分析最后保留67／86个卖家，四组对应不同商品供应类型，并非四个同控身份。没有报告同控账号对训练目标、身份打分或未见身份验证。因此它是商品／卖家经营类型的探索性分组，不能因为摘要中有“link distinct vendors”就计作马甲关联方法；无须靠刊会层级弥补任务不符。 |
+| [Illuminating the dark web market of fraudulent identity documents and personal information: An international and Australian perspective](https://doi.org/10.1016/j.forsciint.2024.112203)，Forensic Science International 363 (2024):112203 | 从上一篇被引记录定位，核查[出版社索引正文](https://www.sciencedirect.com/science/article/pii/S0379073824002846)的方法段。研究White House Market和Empire Market，确实比较跨市场卖家，但账号对应依据为清理格式后的PGP公钥与用户名比较，商品标题／描述用于市场与产品分析，未形成所需的纯商品文本身份打分方法。直接网页／机构PDF打开出现403，不冒称已取得完整PDF；上述具体关联规则有出版社返回正文支持。依赖本项目不可用的身份标识符，不计入。 |
+| [Identification of Linked Seller Profiles on Marketplaces through Behavioral Data Analysis and Machine Learning](https://www.hse.ru/en/edu/vkr/1159983183)，Polina Trubkina，HSE大学2026年硕士论文 | 大学原始条目明确是学位论文，描述了卖家对二分类、Logistic Regression／Random Forest／LightGBM及后续图特征／邻域表示。虽然研究多账号卖家，输入还包括商品组合同步性、经营规模相似性及广告文字重合；页面称经营规模是关键预测特征。当前只核实大学条目，未取得方法全文、官方实现、未见身份拆分或对应合格刊会版本。作者名与完整题名追索未补足正式版本，不能把学位论文或摘要效果直接计为所需论文。 |
+| [Darknet Market Vendor Analysis](https://www.darkowl.com/blog-content/darknet-market-vendor-analysis/)，DarkOwl，2026-06-03 | 企业原始文章以账号全部商品的归一化类别分布构造指纹，作相似性检索与经营模式分析；正文明确此类指纹是相似信号，不能独自证明身份归属。没有给出合格刊会论文、标题／描述账号对学习规则或独立身份验证。因此仅为产业线索，不计入。 |
+| [Connecting Illegal Vendors on Darknet Markets: Responsible Authorship Attribution to Link and Connect Online Cybercrimes](https://github.com/maastrichtlawtech/CyberCrimelinker) | 团队公开README把它定位为教学工作坊，列出的对应发表成果仍为VendorLink（ACL 2023）与IDTraffickers（EMNLP 2023）。虽有Agora账号识别／检索notebook，不能把教学材料当作另一个已发表的新方法，也不能重复计算VendorLink。只读说明，未执行notebook或下载数据。 |
+
+引用追查的实际范围：OpenAlex对2022年法证论文（`W4297200383`）的2022-01-01至2026-10-23被引查询返回7项。逐项筛查书目后，进一步核查上述2024年市场研究，以及[WIREs Forensic Science 2024综述](https://doi.org/10.1002/wfs2.1528)的原始摘要和[同作者2026年法语论文](https://doi.org/10.26034/la.cfs.2026.8332)的期刊摘要／参考文献；后者研究爱情诈骗案例之间重复话术的传播，未转成商品卖家账号方法。该索引返回范围不是穷尽所有被引论文的证明；首次沙盒请求连接失败，不作为零篇结果。
+
+另定位到ICSPIS 2024《Data Analysis of Dark Web Marketplaces using Machine Learning》，[IEEE记录](https://ieeexplore.ieee.org/document/10812633)、DOI `10.1109/ICSPIS63676.2024.10812633`及[作者所在大学成果页](https://rvu.edu.in/faculty/dr-sarasvathi-v/)可对应题名。当前IEEE返回页未提供方法正文，尚未取得原始全文、账号对评分或满足刊会条件的证据，保留待核实，不以第三方摘要补齐资格。
+
+**本轮仍为VendorLink一项、另外两项空缺，goal保持active且未完成。**新增证据进一步区分了商品类型分组、基于标识符的跨市场对应、行为特征反欺诈与本项目的纯商品文本未见身份关联。下一步从ICSPIS原始全文／作者公开成果及新发现的相关正式发表记录继续核对；不重复打开已排除方法来凑名额，不改变比较合同、不开展实验。
