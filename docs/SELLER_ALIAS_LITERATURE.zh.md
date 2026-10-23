@@ -276,4 +276,24 @@ ICASI线索补查发现[官方论文集模板页](https://2026icasi.wind-tech.co
 
 另定位到ICSPIS 2024《Data Analysis of Dark Web Marketplaces using Machine Learning》，[IEEE记录](https://ieeexplore.ieee.org/document/10812633)、DOI `10.1109/ICSPIS63676.2024.10812633`及[作者所在大学成果页](https://rvu.edu.in/faculty/dr-sarasvathi-v/)可对应题名。当前IEEE返回页未提供方法正文，尚未取得原始全文、账号对评分或满足刊会条件的证据，保留待核实，不以第三方摘要补齐资格。
 
-**本轮仍为VendorLink一项、另外两项空缺，goal保持active且未完成。**新增证据进一步区分了商品类型分组、基于标识符的跨市场对应、行为特征反欺诈与本项目的纯商品文本未见身份关联。下一步从ICSPIS原始全文／作者公开成果及新发现的相关正式发表记录继续核对；不重复打开已排除方法来凑名额，不改变比较合同、不开展实验。
+**该轮仍为VendorLink一项、另外两项空缺，结束时goal保持active且未完成；后续核查见第14节。**新增证据进一步区分了商品类型分组、基于标识符的跨市场对应、行为特征反欺诈与本项目的纯商品文本未见身份关联。该轮留下的下一步是ICSPIS原始全文／作者公开成果及相关正式发表记录；不改变比较合同、不开展实验。
+
+## 14. 2026-10-23：ICSPIS引用链与跨市场标识符方法核查
+
+用户询问ICASI 2026题名后，已再次核对[Princia D’Souza的公开介绍](https://github.com/princia05/PRINCIA)与[会议官网](https://2026.icasi-conf.net/)。题名和作者展示主张未变，也没有新增正式书目、全文或账号打分证据；该答复没有增加合格候选。本轮继续处理第13节留下的ICSPIS线索，复用已经取得的出版社元数据，不将重复核对计作新方法。
+
+**ICSPIS 2024的阅读范围已推进到作者摘要与引用链，尚未取得方法全文。**[作者Pratham Rao的公开发表介绍](https://in.linkedin.com/in/prathamrao-)给出摘要，研究重点是Tor爬虫、按商品类别及地理来源分析卖家经营模式；本轮读到的是搜索返回的作者页面内容，不是完整论文。它没有给出商品文本账号对目标、聚合／打分规则或未见身份验证，因而不能升级为可直接比较方法；也不据此断言未读全文中绝无其他分析。题名和作者另有[会议正式议程](https://edas.info/web/icspis2024/program.html)对应。
+
+取得的[Crossref原始元数据](https://api.crossref.org/works/10.1109/ICSPIS63676.2024.10812633)包含12条出版社提交的DOI参考文献，abstract字段为空。这是书目证据，不等于读过12篇全文。由其中近期条目及其直接相关引用，补充核查如下：
+
+| 来源与阅读范围 | 对本任务的具体判断 |
+| --- | --- |
+| [A Comparative Analysis of Models for Dark Web Data Classification](https://link.springer.com/chapter/10.1007/978-981-97-0180-3_20)，2024，出版社摘要 | TF-IDF／BOW与SVM、Naive Bayes、RNN用于色情、枪支、毒品、黑客等内容类别分类，未形成卖家同控账号对方法。 |
+| [An Analysis of Topic Modeling Approaches for Unlabeled Dark Web Data Classification](https://link.springer.com/chapter/10.1007/978-3-031-69201-7_12)，2024，出版社摘要 | 对爬取HTML文字比较LDA、LSA、Top2Vec、BERTopic、NMF，由专家评价主题；任务是内容主题识别，不是账号身份关联。 |
+| [Unveiling Challenges and Solutions with Intelligence in the Dark and Deep Web](https://link.springer.com/chapter/10.1007/978-3-031-70018-7_42)，2024，出版社摘要 | 概述暗网／深网、监测及机器学习用途；没有提供可核实的商品文本卖家关联算法，不能用框架性描述补位。 |
+| [Analysis of Security Mechanisms of Dark Web Markets](https://www.cs.kent.ac.uk/people/staff/ba284/home/Papers/SecurityMechanisms-EICC2024-AAM.pdf)，EICC 2024，DOI `10.1145/3655693.3655700`；以及同团队[Secure in the dark? An in-depth analysis of dark web markets security](https://link.springer.com/article/10.1007/s10207-025-01015-1)，IJIS 2025 | 实际核读前者摘要、相关工作、方法和参考文献，后者出版社摘要与引言／相关工作。研究网站、账号和金融安全机制；账号安全指密码、PIN、MFA等，不是马甲身份学习。前者相关工作[2]、[19]分别为2019、2018年工作；[13]引向下列ARES 2023论文，已继续核查。 |
+| [Cheaper than you thought? A dive into the darkweb market of cyber-crime products](https://www.ricardoyaben.com/assets/papers/ares-2023.pdf)，Dimitrios Georgoulias、Ricardo Yaben、Emmanouil Vasilomanolakis，ARES 2023，DOI `10.1145/3600160.3605012` | 已读取作者提供PDF的摘要、引言和§4.4。确实分析跨市场卖家，但图10交叉匹配用户名，图11按相同PGP公钥连接账号；原文同时指出相同用户名未必属于同一身份。商品描述相同是后续观察，不是以标题／描述产生账号对分数的算法。因此依赖本项目不可用的身份标识符，不计入；没有把“跨市场”措辞当作输入符合的证据。 |
+| [Dark Ending: What Happens when a Dark Web Market Closes down](https://www.scitepress.org/PublishedPapers/2023/116816/)，ICISSP 2023，DOI `10.5220/0011681600003405`；[作者大学记录](https://kar.kent.ac.uk/100540/) | 出版社和大学摘要明确分析六个市场关闭前的变化与预警特征，未提供所需卖家账号关联方法。部分PDF入口超时／403，未据此声称全文已读或论文不存在。 |
+| [Research on Intelligence Mining of Illegal Underground Internet Production on Anonymous Network: Taking Personal Information Trading as an Example](https://doi.org/10.1109/ITNEC56291.2023.10081964)，ITNEC 2023 | DOI由上述出版社参考文献指向，书目线索可对应；IEEE入口和题名／DOI检索仍未取得可用原始方法正文，不能核实其是否包含本任务。保留“证据不足”，不伪装成已证实任务不符，也不把ResearchGate页面中其他推荐论文的摘要当作本篇摘要。 |
+
+**目前仍仅VendorLink计入，另外两个方法未补齐。**恢复检索后的法证文献追查、ICASI核实及本轮ICSPIS引用追查，均未解除同一缺口：没有另外两个同时具备合格发表出处、纯商品文本输入、账号对方法与未见身份适用证据的方法。具体可定位来源已核查到上述范围；余下直接线索仍需要新的正式出版记录、可读方法全文或能确认对应论文的官方实现，现有材料不足以继续完成资格判断。这是本次恢复检索后的受阻状态，不是证明此类论文不存在，也不影响其他已授权科研工作。目标未完成；不放宽用户条件、不再反复请求接受文本适配、不联系作者、不改比较合同或开展实验。
