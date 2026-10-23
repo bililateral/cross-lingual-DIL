@@ -2,6 +2,10 @@
 
 ## 当前工作
 
+接手只读复核（2026-10-23 16:00—16:06，Asia/Shanghai）：本轮按用户要求梳理项目历史、科研纪律与各实验前提；已核对本地科研分支及原有暂存／未暂存改动，不接管或覆盖它们。Linux既定五方法workspace的61项实际来源全部与current_sources.json大小／SHA一致；未发现该实验或Optuna的活动训练／控制进程，五方法正式门及正式完成／访问账尚不存在。GPU当时为RTX5090、32607MiB总／31896MiB空闲、0%利用率且无CUDA计算进程，主存可用261200945152字节、磁盘可用511801655296字节；这只证明该观测时点，不是资源预留。Optuna现场完成状态仍为COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS，访问46/37/0/0，当前campaign的.pt载荷为0。五份可变总文档在本次维护前两端同字节。
+
+实现外审的当前可核实边界：保存的submission.json记录15:49已提交并生成中；本轮本地Playwright返回浏览器配置目录被占用，未取得页面实时状态，不能将保存状态冒称16时实时生成中或已完成。未关闭占用进程、改用CUA、重复上传／提交或签发正式门。先恢复原会话的可读访问、完整回收本次实现报告并独立处置；原训练授权持续有效，具备全部前提后按原三路范围执行，不重问已经批准的五方法和490小时。下方方案审查时的“待批准／未实施”均是早于本段及最新授权的历史事实。
+
 当前五方法实施（2026-10-23）：用户已批准SEQ_ref/ER0.1_ref/LOGIT0.1_ref/S_tuned/H_pos_tuned、零新增HPO、ABC/BCA/CAB×s4/5/6共45完整轨迹、同卡三路及490累计任务小时，见[授权](../reports/documentation/20261023/continual_implementation/authorization.json)。用户随后明确“此次GPU审查中发现的所有问题的修改都免去外审”，见[免审范围](../reports/documentation/20261023/continual_implementation/gpu_review_waiver.json)。此前待确认文字按历史时点解释，不重复询问实施或预算许可。
 
 最小实现及限定资格已形成，见[执行边界](../reports/documentation/20261023/continual_implementation/execution.zh.txt)、[独立资格处置](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)和[原始费用](../reports/documentation/20261023/continual_implementation/qualification/accounting.json)。CPU累计63/1200秒；native01最大形状OOM尝试1/完成0保留，整体encoder激活重算修复后native02单路原/新下一更新逐位一致，三路S/H/LOGIT最大224记录×256tokens、Adam/保存恢复及下一更新通过。GPU累计782.90995/5400秒、16尝试/15完成，未再扩大核验；393采样整卡最低空闲7310MiB、三worker reserved各约7.36—7.38GiB。控制漏计另保守补120秒，未伪称精确测量或重写原账。资格全部使用手写群，确认适配器CPU小模型证据不冒充BGE原生；正式训练/确认生成/正式标签接触均0。
@@ -114,7 +118,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 目标为具有实质方法贡献的CCF B／C期刊或会议投稿；刊会与期限未指定，不阻塞已批准工作。历史训练数据可用量有限，新卖家群体按分布分批到达，研究旧分布未见卖家的候选排序／基础识别保持和新群体学习。当前是中文合成受控任务，输入只含屏蔽标题／描述，无身份特征；不研究同一控制者跨阶段新开别名追踪，不转向一般作者识别或AI文本检测。
 
-每群28账号，每查询27候选且有同控候选；结论不能直接外推到全市场、无正候选查询或真实中文市场。先完成中文合成主线，再决定扩展。编码器与评分模型继续训练；LOGIT0.1是历史比较对手，当前Optuna比较S/S_pos/H_pos；基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，但具体新方案仍须用户与外审双审及相应范围确认。
+每群28账号，每查询27候选且有同控候选；结论不能直接外推到全市场、无正候选查询或真实中文市场。先完成中文合成主线，再决定扩展。编码器与评分模型继续训练；Optuna三臂开发已经结束，当前五方法确认范围为SEQ_ref／ER0.1_ref／LOGIT0.1_ref／S_tuned／H_pos_tuned，具体执行前提见顶部；基础排序提升、已知方法适配、调λ或常规模块叠加均不自动构成创新。用户允许修改算法核心，但具体新方案仍须用户与外审双审及相应范围确认。
 
 ## 接手顺序与信息地图
 
@@ -123,7 +127,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 | 要掌握的信息 | 入口与使用边界 |
 |---|---|
 | 用户问题、研究前提、后续决定 | [讨论记录](RESEARCH_DISCUSSION.zh.md)、[计划](RESEARCH_PLAN.md)；辨认每项决定的对象、时点和范围。 |
-| 当前计算、真实更新及资格 | [Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)、[资源恢复补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及[重启恢复补充](../reports/documentation/20261021/optuna_reboot/scope.zh.txt)，实际入口[search](../scripts/step28_optuna_search.py)／[run](../scripts/step28_optuna_run.py)及其直接依赖。最终执行的[重启恢复正式门](../reports/documentation/20261021/optuna_reboot/formal_gate.json)绑定54来源，CPU累计188/300秒，原生18调用/876秒复用，见[重启恢复主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)。10月19日53来源、CPU158秒的恢复门保留为前一阶段证据；45条成功轨迹各自的51/53/54来源不追贴最终版本。已结束资格不自动授权新运行。 |
+| 当前计算、真实更新及资格 | [五方法执行边界](../reports/documentation/20261023/continual_implementation/execution.zh.txt)、[用户授权](../reports/documentation/20261023/continual_implementation/authorization.json)、[资格主审](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)及[61项实际来源](../reports/documentation/20261023/continual_implementation/current_sources.json)。实际入口为step28_continual_five_run.py／control.py／evaluate.py；实现外审及正式门状态见顶部。已结束Optuna的51／53／54来源、两次恢复及失败账仍按其原合同／补充与顶部历史结果追溯，不作为当前启动入口。 |
 | 数据究竟改变什么 | [表达生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮数据合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；主题混合与表达机制同时变化，不称纯表达因果实验。 |
 | 早期来源与身份资格 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核冻结](STEP5_REVIEW_AND_FREEZE.md)；历史来源链不授予真值或当前正式数据读取许可。 |
 | 评价定义与不确定性 | 本轮合同明确继承的[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)及实际评价函数。区分AP、逐查询MAP、raw与校准，不从简称重写公式。 |
@@ -150,7 +154,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 10月8—9日五臂均使用已选中文BAAI/bge-large-zh-v1.5同一预训练归档（revision 79e7739b6ab944e86d6171e44d24c997fc1e0116）；四个记录表臂网络相同，LOGIT的聚合／头不同，各自训练后参数分化。36份Memory是27个记录表与9个LOGIT物理阶段的历史缓存快照，共11,479,595字节；每条实时路径最多六群／完整状态1MiB，包含允许的训练文本、标签、教师目标及附属状态。归档快照不合并成学习器可用历史，不等于模型权重；具体说明见[关闭记录](../reports/maintenance/20261009/replay_improvement_closure/closure.zh.txt)。
 
-10月9—11日归因实验中，O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子；当前Optuna按A→B合同开展s0搜索及s1/s2/s3复验，逐域比较，不混用三顺序汇总对象。开发valid不是独立确认集，既有120群基础test已使用。新最终留出、当前Optuna以外的多seed确认、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
+10月9—11日归因实验中，O为最终两个旧域能力，N为后两阶段刚学完的新域能力，Z为最终最新域能力；F_first为首域获得后至最终的损失，G为同一路径的新域学习增益。三个顺序不是三个训练种子；已结束Optuna按A→B合同完成s0搜索及s1/s2/s3复验，逐域比较，不混用三顺序汇总对象。开发valid不是独立确认集，既有120群基础test已使用。本轮五方法的三域120新确认群及s4/s5/s6已获附前提许可，生成／评分／标签开放分别等合同完整门；该范围以外的新留出、追加seed、大候选库和无正候选查询尚无执行许可。Audit A/B真值、Audit B预测、owners与私有身份资产保持既定封存边界。
 
 保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、排序s0_hard与s0_d两份例外及必要科研证据继续保留。ER0.1六份末端权重已于10月16日10:09按本轮Linux清理要求、核对无现行载模依赖后留证删除，共7,838,864,652字节；273份其余文件SHA不变，含三份Memory。另删57份冗余／成员已保管ZIP，本轮合计63文件约7.49GiB，见[实际回执](../reports/maintenance/20261016/linux_cleanup/receipt.json)。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
 

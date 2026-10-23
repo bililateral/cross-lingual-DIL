@@ -4,15 +4,15 @@
 
 当前执行[已批准五方法方案](../reports/documentation/20261023/continual_implementation/authorization.json)：SEQ/ER0.1/LOGIT0.1冻结历史配置与S/H_pos各自Optuna配置参加ABC/BCA/CAB×s4/s5/s6，45完整轨迹、新三域120群确认，零新增HPO、同卡三路。490累计小时分为450训练+36确认+4其他，单run最高24h仍受池内预留；不能减臂/减seed或借旧余额。先完成最小实现、限定资格及必要实现外审/主审，按已通过的资源/整批预算条件签发实际来源门后连续执行。用户已明确免除本次GPU审查发现问题之修改的外审，仍保留实际行为验证和失败账；不扩大为整个新实现或最终结果免审。三路资格及预算投影已形成，当前进展见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)与[独立资格处置](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。未满足开工前提前不训练、不生成确认群、不打开正式评价标签。
 
-## 已确认范围内
+## 已结束Optuna的授权与恢复历史
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。
 
-10月21日服务器重启后，用户明确要求“从中断的那次搜索开始重新运行”，并确认“此次依旧免审”。按[本次特定恢复补充](../reports/documentation/20261021/optuna_reboot/scope.zh.txt)及[独立主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)保留25次完成结果，从S第9次搜索原参数/种子完整重跑，再接续原36+9；保留中断费用与额外train1，最终实际读取46/37，科学轨迹数不变。当前入口已换到optuna_reboot/workspace，旧两次恢复是历史，不据旧路径另起作业。
+10月21日服务器重启后，用户明确要求“从中断的那次搜索开始重新运行”，并确认“此次依旧免审”。按[本次特定恢复补充](../reports/documentation/20261021/optuna_reboot/scope.zh.txt)及[独立主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)保留25次完成结果，从S第9次搜索原参数/种子完整重跑，再接续原36+9；保留中断费用与额外train1，最终实际读取46/37，科学轨迹数不变。该次恢复使用optuna_reboot/workspace；Optuna现已结束，三次workspace均只按历史身份追溯，不据旧路径另起作业。
 
 搜索按已固定双域U和精确tie规则选参；九次复验全部盲完成后统一开放，不依据中途复验结果增改候选。除上述本次明确授权的服务器重启恢复外，正式失败、超时或非有限值保留已用预算和访问账后停止，无自动重试。完整结果按合同回传并独立分析；未完成的日常进度核对按用户要求简报，不另造流水。新包外发仍按具体包权限。
 
-H_cons、固定S_pos/H_pos及本轮Optuna均已完成。Optuna结果外审和独立主审已结案，两候选六格门均未通过；H_pos旧A最终排序有条件优势，新B及较少遗忘未获确定证据。当前只覆盖A→B及重复开发集，三固定新seed不替代独立最终确认。下一阶段围绕冻结方法／主对手／超参数后的ABC/BCA/CAB三阶段及覆盖三域的独立留出讨论；具体臂、实现、种子、数据权限、预算和判据须另定合同，新AB80群不能代替完整主线确认。Linux遗留19份Optuna权重已按用户要求删除，Memory和证据保留；不能直接续用已删除端点，不自动重训。当前结论、审查和保管从[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)进入。
+H_cons、固定S_pos/H_pos及本轮Optuna均已完成。Optuna结果外审和独立主审已结案，两候选六格门均未通过；H_pos旧A最终排序有条件优势，新B及较少遗忘未获确定证据。当前只覆盖A→B及重复开发集，三固定新seed不替代独立最终确认。其后续三阶段和三域独立留出范围现已由本页顶部获批五方法方案确定；原AB80群设想不再作为当前确认方案。Linux遗留19份Optuna权重已按用户要求删除，Memory和证据保留；不能直接续用已删除端点，不自动重训。当前结论、审查和保管从[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)进入。
 ## 已完成路线与后续研究边界
 
 已批准的[C_q具体实现与执行合同](SELLER_ALIAS_QUERY_REPLAY.zh.md)固定四臂已正常完成，保存结果已回传并在Linux独立分析；原资格、失败及[实现主审](../reports/documentation/20261013/query_replay_implementation/review/primary_disposition.zh.txt)证据按适用范围复用。[原方案](../reports/documentation/20261013/query_replay/proposal.zh.txt)、原判据和上传包冻结。本次获准的结果外审已完整回收并经[独立主审](../reports/seller_alias_continual/20261014/query_replay_result/review/primary_disposition.zh.txt)关闭：补明未定义字段、分类汇总和证据范围，未修改正式数值，也没有需要重训的科学阻断；本固定实验按原范围结案，实际收尾见[交接顶部](AI_RESEARCH_HANDOFF.zh.md)。不得据已见结果自行调参、重训、补种子或恢复旧C诊断。
