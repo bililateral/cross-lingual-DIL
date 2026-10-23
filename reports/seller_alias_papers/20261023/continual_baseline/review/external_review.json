@@ -1,0 +1,115 @@
+{
+  "url": "https://chatgpt.com/c/6adb48e9-5e88-83e9-a68d-1d728a23faf5",
+  "title": "评审ERGCR适配",
+  "text": "分享\n你说：\n\n请作为独立科研审查者，只核查下面公开论文的方法与一种通用任务适配是否成立，不做实验、不索要私有数据、不编造已复现结果。请直接给出推荐/不推荐、最小必要修正和原文定位，中文回答。重点反对过度设计、伪实现和把弱化版本冒称完整方法。\n\n\n\n\n目标：选择一个2022—2026年CCF A/B持续学习对照，用于仅根据商品标题和描述进行账号关联的监督任务。训练接收分阶段的完整候选群，每群有多账号、账号含多条记录，标签是账号对是否同一身份；模型输出成对得分并进行候选排序。阶段之间训练身份不同，评价身份也不与训练身份重合。监督损失包含账号对项和组内排序项。因此不能为了适配持续学习论文而改成固定卖家分类，或丢弃排序项。这里不提供任何项目文件、数据、结果或运行参数。\n\n\n\n\n拟推荐：GCR, “Gradient Coreset based Replay Buffer Selection for Continual Learning”, CVPR 2022, DOI 10.1109/CVPR52688.2022.00020。具体采用作者补充材料§C/表9的 ER+GCR 组合，明确不是完整GCR（完整版本还有历史logit蒸馏与监督对比损失）。\n正文：https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf\n补充：https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf\n可访问作者稿：https://arxiv.org/pdf/2111.11210\n项目：https://gradientcoreset.github.io/\n官方代码：\nhttps://github.com/google-research/google-research/tree/master/gradient_coresets_replay\n\n\n\n\n已读原文要点：§4.1式(4)联合选择子集与非负权重，使其加权回放损失梯度近似候选集合的梯度，OMP求解；旧权重继续参与下一轮目标，所得权重必须进入实际回放。§4.1明确可用于任意指定回放损失，补充§C/表9实测ER+GCR。原算法用reservoir维护当前候选池，从旧缓冲和当前候选池自适应抽样；§6.1候选池与历史缓冲各K，§7承认额外内存。\n\n\n\n\n拟适配：保持共同文本编码器、账号评分和监督目标，以完整训练群为选择单位，求该群损失相对于实际打分头的梯度；用有限当前候选群及存活历史群做GradApprox并真正加权回放。保留梯度匹配、非负权重、旧权重递推、候选池和抽样机制，不把梯度范数/多样性启发式冒充GCR。完整群的关系构成一致，不人为给群新增身份类别；原逐类配额改成按完整群选择，这是明确披露的适配差异。梯度空间采用真实打分头导数，不盲抄图像线性分类头公式。\n\n\n\n\n公平性：同输入、监督、拆分、起点、顺序/种子、训练与调参机会；给各方法自己的选样权，统一容量/数据访问边界。计量文本、标签、权重等全部持久状态，并单列当前候选池、峰值内存、梯度选择计算成本；不访问淘汰历史或未来/评价数据。同时比较旧域保持、新域学习和最终排序，不以不学习换低遗忘。当前只是选型，不承诺训练授权或效果。\n\n\n\n\n静态代码核查发现：gcr.py的observe确实将权重乘入回放损失再backward；gradmatchstrategy.py使用OMP；dataselectionstrategy.py算输出及最后线性层梯度。代码的逐类配额默认按比例，与论文等额描述有差异；coreset.py导入continual_learning_rishabh旧包名，gradmatchstrategy.py传perClass而签名是per_class。故不能说代码开箱可运行，拟以明确论文定义为准、适配时做必要修复。\n\n\n\n\n请重点判断：\n1. 上述完整群 ER+GCR 适配是否保留论文主要机制，还是已经变成另一个方法？\n2. 同一群内有正负关系且存在排序损失，按群选择能否合理替代逐类配额？有什么真正阻断推荐的条件？\n3. 打分头梯度、旧权重递推与回放归一化有什么必须说清的细节？\n4. 推荐阶段哪些事项必须解决，哪些只能作为后续实施验证，避免无止境加实验？\n5. 请核对上述公开原文事实；无法取得材料就说明，勿把建议当成已发生实验。\n\n收起\n思考了 5m 2s\nChatGPT 说：\n结论：推荐，但应明确命名为“ER+GCR 的完整群任务适配”\n\n你提出的适配保留了 GCR 的主要选样机制，足以作为这个监督账号关联任务的持续学习对照。现有描述没有足以否决选型的实质障碍。 推荐采用的名称是：\n\nER+GCR（完整群选择、打分头梯度适配；依据作者补充材料 §C／表9）\n\n它具有明确的作者方法来源，同时披露了选择单位、梯度空间和逐类约束的变化。不能将其简称为“完整 GCR 的原样复现”，也不能将论文的图像分类效果视为该账号关联任务的效果证据。\n\n论文确为 CVPR 2022，pp. 99–108；CVPR 在 CCF 人工智能会议目录中属于 A 类，符合你要求的年份和级别。\nopenaccess.thecvf.com\n+1\n\n本次已取得并核对 CVF 正文、独立补充材料、作者稿，以及官方仓库相关源码。以下涉及代码的判断均为静态阅读；没有执行作者程序、运行实验或接触项目数据。\n\n一、公开原文事实：你的主要概括成立\n\n下面正文页码采用 CVPR 正式排版页码，括号内为 PDF 页序；补充材料采用其独立 PDF 页序。\n\n核查事项\t结论与原文定位\n作者是否实际提出并测试过 ER+GCR\t是。 补充 §C 在第1页，表9在第2页。它是作者给 ER 接入 GradApprox 的组合。\narxiv.org\n\n是否允许替换回放损失\t是。 正文 §4.1，p.102（第4页），明确说明可用于指定回放损失，并以 vanilla ER 为例。\narxiv.org\n\n梯度匹配的完整定义\t式(4)包含非负权重、平方梯度残差及 权重的 L2 正则项；同节采用 OMP，并规定逐类等额选择。定位：p.102及算法2，p.103。\narxiv.org\n\n旧权重是否递推、是否必须用于回放\t是。 式(4)后说明权重用途；§4.3式(7)、算法1将旧权重与当前候选的单位权重一起传入下一次选择。定位：pp.102–103。\narxiv.org\n+1\n\n完整 GCR 与 ER+GCR 的区别\t完整版本的 §4.2式(5)另有历史 logit 蒸馏和监督对比项。定位：pp.102–103。你的版本区分正确。\narxiv.org\n\n候选池、抽样和额外内存\t算法1使用 reservoir；补充 A 算法3使用当前池／历史池混合抽样。§6.1，p.104规定实验候选池与缓冲同大；§7，p.106承认额外内存。\narxiv.org\n+3\n\n原文入口：CVPR 正文、独立补充材料。\n\n二、完整群选择成立，但不等价于原逐类配额\n1. 群内有正负关系和排序项，不妨碍梯度匹配\n\n以下是对你所述任务的数学判断，不是论文已经完成的账号关联实验。\n\n将一个完整候选群记为 \n𝐺\nG，保留共同监督目标：\n\n𝐿\n𝐺\n(\n𝜃\n)\n=\n𝐿\np\na\ni\nr\n,\n𝐺\n(\n𝜃\n)\n+\n𝜌\n𝐿\nr\na\nn\nk\n,\n𝐺\n(\n𝜃\n)\n,\nL\nG\n\t​\n\n(θ)=L\npair,G\n\t​\n\n(θ)+ρL\nrank,G\n\t​\n\n(θ),\n\n其中 \n𝜌\nρ 和两项内部的求和、平均口径沿用共同任务。\n\n只要总体训练目标可以按群相加，就有：\n\n∇\n𝜙\n∑\n𝐺\n𝐿\n𝐺\n=\n∑\n𝐺\n∇\n𝜙\n𝐿\n𝐺\n,\n∇\nϕ\n\t​\n\nG\n∑\n\t​\n\nL\nG\n\t​\n\n=\nG\n∑\n\t​\n\n∇\nϕ\n\t​\n\nL\nG\n\t​\n\n,\n\n其中 \n𝜙\nϕ 是实际打分头参数。这足以把完整群作为梯度匹配的一个原子。原子内部可以同时包含正关系、负关系和候选间耦合的排序损失，不要求它只有一个分类标签。\n\n决定该适配是否成立的关键是：保存并回放这个群，是否足以重新计算所定义的完整群损失。 你给出的“完整候选群＋组内排序”支持这一条件。阶段间身份不同、评价身份与训练身份不重合，也不破坏上述运算；模型学习的是关联评分函数，无须改成固定卖家分类。\n\n2. 应披露“取消逐类约束”，不能宣称完整群天然实现类平衡\n\n原论文的逐类等额选择，和你的全局完整群选择，不是等价操作。完整群内同时有正负关系，并不保证：\n\n不同关系类型的梯度分别得到保留；\n每个旧阶段都占有缓冲名额；\n正负梯度不会抵消。\n\n但这些差异不足以自动否决推荐。你保留的是 GradApprox 的带权梯度压缩机制，并针对不可拆分的排序训练单元改变选择约束。\n\n因此，准确表述应是：\n\n将选择单元改为完整候选群，取消原图像分类设置中的逐类等额划分；保留群内全部监督关系与排序计算，执行群级带权梯度匹配。\n\n没有必要为弥补这项差异，再人为添加“群身份类别”、正负双池、逐身份配额或多套梯度目标。那才会把一个必要的任务适配扩成新的方法设计。\n\n三、最小必要修正：把四个定义写清\n1. 选择梯度必须来自完整群目标和真实打分头\n\n建议明确：\n\n𝑔\n𝐺\n=\n∇\n𝜙\n𝐿\n𝐺\n(\n𝜃\n𝑡\n)\n,\ng\nG\n\t​\n\n=∇\nϕ\n\t​\n\nL\nG\n\t​\n\n(θ\nt\n\t​\n\n),\n\n所有候选群都在同一选择时点的参数 \n𝜃\n𝑡\nθ\nt\n\t​\n\n 下计算。历史群沿用的是旧权重，不能把历史模型时刻保存的旧梯度直接冒充当前梯度。\n\n排序项必须进入这份导数。若群内得分集合为 \n{\n𝑠\n𝑒\n}\n{s\ne\n\t​\n\n}，真实头梯度为：\n\n𝑔\n𝐺\n=\n∑\n𝑒\n∂\n𝐿\n𝐺\n∂\n𝑠\n𝑒\n∇\n𝜙\n𝑠\n𝑒\n,\ng\nG\n\t​\n\n=\ne\n∑\n\t​\n\n∂s\ne\n\t​\n\n∂L\nG\n\t​\n\n\t​\n\n∇\nϕ\n\t​\n\ns\ne\n\t​\n\n,\n\n其中 \n∂\n𝐿\n𝐺\n/\n∂\n𝑠\n𝑒\n∂L\nG\n\t​\n\n/∂s\ne\n\t​\n\n 必须包含排序竞争带来的贡献。\n\n这也说明了为什么不能直接抄图像分类的最后线性层公式。你的打分头是什么结构，就对其实际参数求导。\n\n还需保留两个边界：\n\n头梯度匹配只是参数子空间中的近似，不保证整个文本编码器的梯度也得到匹配。\n用头梯度选样，不等于训练时只更新头。 实际回放仍按共同训练安排更新编码器和打分头。\n\n若刻意只取一个对排序没有信息的参数，例如对所有候选共同加上的偏置，而排序损失只依赖得分差，那么该参数上的排序梯度会恒为零。这种实现才会实质性削弱你声称保留的排序目标。正常使用实际打分头参数，不需要为此再增加全编码器梯度对照实验。\n\n2. 明确“旧权重进入目标，新权重是绝对回放系数”\n\n最清楚、也最接近你所述论文定义的写法是：\n\n𝐷\n𝑡\n=\n𝑀\n𝑡\n−\n1\n∪\n𝐶\n𝑡\n,\n𝑏\n𝑡\n=\n∑\n𝐺\n∈\n𝑀\n𝑡\n−\n1\n𝑤\n𝐺\no\nl\nd\n𝑔\n𝐺\n+\n∑\n𝐺\n∈\n𝐶\n𝑡\n𝑔\n𝐺\n.\nD\nt\n\t​\n\n=M\nt−1\n\t​\n\n∪C\nt\n\t​\n\n,b\nt\n\t​\n\n=\nG∈M\nt−1\n\t​\n\n∑\n\t​\n\nw\nG\nold\n\t​\n\ng\nG\n\t​\n\n+\nG∈C\nt\n\t​\n\n∑\n\t​\n\ng\nG\n\t​\n\n.\n\n在完整群预算内，用 OMP 近似求解：\n\nmin\n⁡\n𝑆\n⊆\n𝐷\n𝑡\n,\n \n∣\n𝑆\n∣\n≤\n𝐾\n\n\n𝑣\n𝐺\n≥\n0\n∥\n𝑏\n𝑡\n−\n∑\n𝐺\n∈\n𝑆\n𝑣\n𝐺\n𝑔\n𝐺\n∥\n2\n2\n+\n𝜆\n∑\n𝐺\n∈\n𝑆\n𝑣\n𝐺\n2\n.\nS⊆D\nt\n\t​\n\n, ∣S∣≤K\nv\nG\n\t​\n\n≥0\n\t​\n\nmin\n\t​\n\n\t​\n\nb\nt\n\t​\n\n−\nG∈S\n∑\n\t​\n\nv\nG\n\t​\n\ng\nG\n\t​\n\n\t​\n\n2\n2\n\t​\n\n+λ\nG∈S\n∑\n\t​\n\nv\nG\n2\n\t​\n\n.\n\n这里有三点必须明确：\n\n字典列 \n𝑔\n𝐺\ng\nG\n\t​\n\n 是没有再乘旧 coreset 权重的群梯度。\n输出 \n𝑣\n𝐺\nv\nG\n\t​\n\n 是新的绝对权重，保存后直接用于回放；不能再乘一次旧权重。\n补上原式的权重正则项。无需现在增加 HPO，但不能默默删除后仍称完整采用式(4)。\n\n如果实现把旧权重预先乘进字典列，那么 OMP 输出就变成相对于这些加权列的系数，需要转换回作用于原始群损失的权重，正则项的参数含义也必须对应。两种表示不能混用。\n\n此外，不要每轮随手把保存权重重新缩放为“均值1”，却仍让新候选权重保持1；这会改变下一轮历史群与当前候选的相对贡献。\n\n3. 回放分母不能把所得权重消掉\n\n这是本次最值得补充的实现约束。\n\n官方 \ngcr.py 的 observe() 对监督回放采用的是：\n\n𝐿\n^\n𝐵\n=\n∑\n𝐺\n∈\n𝐵\n𝑤\n𝐺\n𝐿\n𝐺\n∑\n𝐺\n∈\n𝐵\n𝑤\n𝐺\n.\nL\nB\n\t​\n\n=\n∑\nG∈B\n\t​\n\nw\nG\n\t​\n\n∑\nG∈B\n\t​\n\nw\nG\n\t​\n\nL\nG\n\t​\n\n\t​\n\n.\n\n若适配后一次只回放一个完整群，且仍采用这种批内归一化，那么\n\n𝐿\n^\n{\n𝐺\n}\n=\n𝑤\n𝐺\n𝐿\n𝐺\n𝑤\n𝐺\n=\n𝐿\n𝐺\n.\nL\n{G}\n\t​\n\n=\nw\nG\n\t​\n\nw\nG\n\t​\n\nL\nG\n\t​\n\n\t​\n\n=L\nG\n\t​\n\n.\n\n在抽样也不依赖该权重的情况下，权重对实际更新完全消失。此时即使代码里写了“乘 weights”，也不能称为你要求的真正加权回放。\n\n最小处理是：明确采用不会逐群约掉权重的分母，例如对抽到的 \n𝑚\nm 个群计算\n\n𝐿\n^\nr\ne\np\n=\n1\n𝑚\n∑\n𝑗\n=\n1\n𝑚\n𝑎\n𝐺\n𝑗\n𝐿\n𝐺\n𝑗\n,\nL\nrep\n\t​\n\n=\nm\n1\n\t​\n\nj=1\n∑\nm\n\t​\n\na\nG\nj\n\t​\n\n\t​\n\nL\nG\nj\n\t​\n\n\t​\n\n,\n\n其中当前候选的 \n𝑎\n𝐺\n=\n1\na\nG\n\t​\n\n=1，历史群使用保存的权重。外层回放系数另按共同训练定义处理。\n\n还应区分两件事：选择时匹配的梯度和，与训练抽样产生的期望更新。如果保留原算法的池间概率 \n𝑝\np、池内均匀抽样，上式的期望为：\n\n𝐸\n[\n𝐿\n^\nr\ne\np\n]\n=\n𝑝\n∣\n𝐶\n𝑡\n∣\n∑\n𝐺\n∈\n𝐶\n𝑡\n𝐿\n𝐺\n+\n1\n−\n𝑝\n∣\n𝑀\n𝑡\n−\n1\n∣\n∑\n𝐺\n∈\n𝑀\n𝑡\n−\n1\n𝑤\n𝐺\n𝐿\n𝐺\n.\nE[\nL\nrep\n\t​\n\n]=\n∣C\nt\n\t​\n\n∣\np\n\t​\n\nG∈C\nt\n\t​\n\n∑\n\t​\n\nL\nG\n\t​\n\n+\n∣M\nt−1\n\t​\n\n∣\n1−p\n\t​\n\nG∈M\nt−1\n\t​\n\n∑\n\t​\n\nw\nG\n\t​\n\nL\nG\n\t​\n\n.\n\n它不会自动变成全部已见历史的均匀平均风险。这不要求你额外加入重要性采样；保留论文的自适应抽样可以成立，只需如实描述实际目标。 抽样计数也应统一映射到群单位，不能混用群数、账号数和账号对数。\n\n4. 公平性只需补清“等容量”的具体含义\n\n你的公平性框架总体可接受。需要补清的一点是：\n\n单列候选池开销，能够披露额外资源，但不自动等于“等总内存”。\n\n如果比较的是相同历史记忆字节预算，当前候选池另行允许并计量，就应称为“等历史记忆预算，另报当前池及峰值开销”。如果声称等总数据记忆，则当前池保存的文本、标签等也必须计入同一总额。\n\n不需要因此增加新的背包求解器或资源优化算法。实施时确认完整群能在所声明预算内保存、候选池不成为隐形历史缓存即可。\n\n四、官方代码核查：你的发现属实，但还有一处权重语义问题\n\n以下均针对本次读取的官方公开 master，不代表已经验证论文当年的运行版本。\n\n你的代码判断\t静态核查结果\nobserve() 将权重乘入回放并执行 backward()\t属实，但同时除以抽中批次的权重和，存在上文所述单群抵消问题。定位：\ngcr.py，observe()。\n使用 OMP\t属实。 ompwrapper() 调用 OMP，并设置 positive=True。定位：\ngradmatchstrategy.py。\n使用输出及最后线性层梯度\t属实。 compute_gradients() 对输出求导，再与输入该线性层的表示组合。定位：\ndataselectionstrategy.py。\n逐类配额默认按比例\t属实。 get_budget_per_class(..., keep_ratio=True) 是默认路径，与正文等额描述不同。定位同上。\ncontinual_learning_rishabh 旧包名\t属实。 定位：\ncoreset.py 的导入语句。\nperClass 与 per_class 不一致\t属实。 调用端传 perClass=True，被调用方法签名为 per_class=False。定位上述两个 strategy 文件。\n\n另一个与本次适配直接相关的发现，是不能仅凭“旧 weights 已传入”就认定递推正确：\n\nselect_subset.py 的 CustomLoss 先将旧权重乘进损失，随后产生的字典梯度已经带旧权重；OMP 返回的系数又由 coreset.py 直接写回 buffer_weights，这条路径没有显示将系数转换回原始未加权损失上的绝对权重。\n\n这是一个静态代数对应问题，不是本次观察到的训练失败或性能退化。它支持你的处理原则：以明确论文定义为准，适配时核对选样到回放的权重链条，不能简单复制公开源码。\n\n因此，“代码不是开箱可运行”这一判断成立；但也不能把“修正两个名称”说成已经完成正确复现。本次没有必要把整个公开库修复成可运行状态后，才允许完成选型。\n\n五、什么会真正阻断推荐，什么留给实施\n\n对你当前描述，我没有发现已成立的阻断。以下具体情况才会使我对某个实际适配改判：\n\n群损失不闭合： 排序依赖群外或已淘汰数据，而保存群无法重建原目标。\n监督被削弱： 选择或回放丢掉排序项，或改成固定身份分类，却仍声称保持原任务。\nGCR 核心被替换： 用范数、多样性或任意挑样代替梯度匹配；旧权重失效；最终权重没有影响实际回放。\n资源陈述不成立： 完整群和必要状态装不进声明预算，实际依赖未计量数据或回查淘汰历史。\n\n至于群间梯度抵消、头梯度可能不足以代表编码器、某些旧阶段可能没有入选，都是该适配的能力边界或潜在负结果来源，不能单凭这些可能性要求新增一整套机制后才推荐。\n\n推荐阶段与后续工作的边界可以明确到下面这个程度：\n\n现在应完成的定义\t后续实施才需验证\n名称明确为 ER+GCR 的群级适配，披露取消逐类配额\t实现与该定义对应\n完整群损失包含原 pair 和 rank，明确头参数集合\t导数确实包含两项，实际训练参数收到更新\n明确非负目标、正则、旧权重与新绝对权重\tOMP 返回值、保存及回放链条正确\n明确抽样、分母和群计数口径\t权重未被归一化抵消，抽样符合定义\n明确历史容量、当前池及访问范围\t实际状态大小、峰值内存和选择成本\n\n选型不需要先证明它优于其他方法，也不需要新增种子、配额消融、全编码器梯度实验、图像基准复现或私有数据。 后续只应做落实上述定义所必需的有限核验；旧域保持、新域学习和最终排序的实际效果，留给另行授权的正式比较。\n\nChatGPT 可能会出错。请核查重要信息。\n最新一条回复\n\n\n\n\nPro",
+  "links": [
+    {
+      "text": "https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf",
+      "href": "https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf"
+    },
+    {
+      "text": "https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf",
+      "href": "https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf"
+    },
+    {
+      "text": "https://arxiv.org/pdf/2111.11210",
+      "href": "https://arxiv.org/pdf/2111.11210"
+    },
+    {
+      "text": "https://gradientcoreset.github.io/",
+      "href": "https://gradientcoreset.github.io/"
+    },
+    {
+      "text": "https://github.com/google-research/google-research/tree/master/gradient_coresets_replay",
+      "href": "https://github.com/google-research/google-research/tree/master/gradient_coresets_replay"
+    },
+    {
+      "text": "openaccess.thecvf.com\n+1",
+      "href": "https://openaccess.thecvf.com/content/CVPR2022/html/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.html?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org",
+      "href": "https://arxiv.org/pdf/2111.11210?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org",
+      "href": "https://arxiv.org/pdf/2111.11210?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org",
+      "href": "https://arxiv.org/html/2111.11210v3?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org\n+1",
+      "href": "https://arxiv.org/pdf/2111.11210?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org",
+      "href": "https://arxiv.org/pdf/2111.11210?utm_source=chatgpt.com"
+    },
+    {
+      "text": "arxiv.org\n+3",
+      "href": "https://arxiv.org/pdf/2111.11210?utm_source=chatgpt.com"
+    },
+    {
+      "text": "CVPR 正文",
+      "href": "https://openaccess.thecvf.com/content/CVPR2022/papers/Tiwari_GCR_Gradient_Coreset_Based_Replay_Buffer_Selection_for_Continual_Learning_CVPR_2022_paper.pdf"
+    },
+    {
+      "text": "独立补充材料",
+      "href": "https://openaccess.thecvf.com/content/CVPR2022/supplemental/Tiwari_GCR_Gradient_Coreset_CVPR_2022_supplemental.pdf"
+    },
+    {
+      "text": "gcr.py 的 observe()",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/gcr.py"
+    },
+    {
+      "text": "gcr.py，observe()",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/gcr.py"
+    },
+    {
+      "text": "gradmatchstrategy.py",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/gradmatchstrategy.py"
+    },
+    {
+      "text": "dataselectionstrategy.py",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/dataselectionstrategy.py"
+    },
+    {
+      "text": "coreset.py 的导入语句",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/coreset.py"
+    },
+    {
+      "text": "select_subset.py 的 CustomLoss",
+      "href": "https://github.com/google-research/google-research/blob/master/gradient_coresets_replay/utils/select_subset.py"
+    }
+  ],
+  "visibleStop": false,
+  "formulas_tex": [
+    "G",
+    "L_G(\\theta)\n=\nL_{\\mathrm{pair},G}(\\theta)\n+\\rho L_{\\mathrm{rank},G}(\\theta),",
+    "\\rho",
+    "\\nabla_\\phi\\sum_G L_G\n=\n\\sum_G\\nabla_\\phi L_G,",
+    "\\phi",
+    "g_G=\\nabla_\\phi L_G(\\theta_t),",
+    "\\theta_t",
+    "\\{s_e\\}",
+    "g_G\n=\n\\sum_e\n\\frac{\\partial L_G}{\\partial s_e}\n\\nabla_\\phi s_e,",
+    "\\partial L_G/\\partial s_e",
+    "D_t=M_{t-1}\\cup C_t,\n\\qquad\nb_t=\n\\sum_{G\\in M_{t-1}}w_G^{\\mathrm{old}}g_G\n+\n\\sum_{G\\in C_t}g_G.",
+    "\\min_{\\substack{S\\subseteq D_t,\\ |S|\\le K\\\\v_G\\ge0}}\n\\left\\|\nb_t-\\sum_{G\\in S}v_Gg_G\n\\right\\|_2^2\n+\\lambda\\sum_{G\\in S}v_G^2.",
+    "g_G",
+    "v_G",
+    "\\widehat L_B\n=\n\\frac{\\sum_{G\\in B}w_GL_G}\n{\\sum_{G\\in B}w_G}.",
+    "\\widehat L_{\\{G\\}}=\\frac{w_GL_G}{w_G}=L_G.",
+    "m",
+    "\\widehat L_{\\mathrm{rep}}\n=\n\\frac1m\\sum_{j=1}^{m}a_{G_j}L_{G_j},",
+    "a_G=1",
+    "p",
+    "\\mathbb E[\\widehat L_{\\mathrm{rep}}]\n=\n\\frac{p}{|C_t|}\\sum_{G\\in C_t}L_G\n+\n\\frac{1-p}{|M_{t-1}|}\n\\sum_{G\\in M_{t-1}}w_GL_G."
+  ],
+  "download_links": [],
+  "retrieved_at": "2026-10-23T12:09:45.865Z",
+  "extraction": "Rendered main text preserved verbatim; formula TeX collected separately to disambiguate accessibility duplication.",
+  "completed_observation": "Full final answer present, visible stop absent; no downloadable attachments in the response."
+}

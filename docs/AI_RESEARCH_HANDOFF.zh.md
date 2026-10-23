@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-文献线更新（2026-10-23 19:46，Asia/Shanghai）：用户明确保留L²R并允许持续学习基线按商品文本账号关联任务适配；主执行者通读GCR的CVPR 2022正式正文／补充及关键官方代码，推荐作者ER+GCR组合的完整群适配作为第二候选，见[全文、核心保留与公平性依据](SELLER_ALIAS_LITERATURE.zh.md#16-2026-10-23保留l²r第二个持续学习对照的gcr核查)。指定本地Playwright的GPT-6／Pro审查请求已单次成功，当前按[唯一回执](../reports/seller_alias_papers/20261023/continual_baseline/review/submission.json)回收；先前“已达上限”系误读隐藏无障碍提示，已由可见界面和成功提交纠正。未实施新方法、增设比较臂、改变活动合同或连接Linux；以下17:00训练观测不因本次文献工作升级成实时状态。
+文献线结案（2026-10-23 20:12，Asia/Shanghai）：已通过指定本地Playwright回收原GPT-6／Pro会话完整报告并完成[独立主审与最终选型](SELLER_ALIAS_LITERATURE.zh.md#165-外审回收独立主审与最终选型)。持续学习组确定推荐L²R（CIKM 2023，CCF B）与ER+GCR完整群适配（CVPR 2022，CCF A），2/2；暗网卖家组仍只VendorLink（ACL 2023，CCF A），1/3，另两项未补齐。正文、补充及实际代码支持GCR核心保留；已明确取消逐类配额、当前头梯度、旧／新绝对权重、单群权重不得抵消和候选池预算。完整原文与[唯一回执](../reports/seller_alias_papers/20261023/continual_baseline/review/submission.json)保留；此前上限误报已撤回。完成的是方法选型，尚未实施新方法、增设比较臂、改变活动合同或连接Linux；以下17:00训练观测不因本次文献工作升级成实时状态。
 
 最新进展同步（2026-10-23 17:00:36，Asia/Shanghai）：只读SSH复核既定`formal_20261023`，wrapper/controller及首批ABC_s4的SEQ/ER/LOGIT三worker均仍存活，属主、启动时刻、命令与工作目录对应原运行。三路最新已落盘更新事件均为首域A的264/288步（日志每24步报告，实际可能已继续），完整轨迹0/45；controller及三worker均无failure，正式退出回执尚未形成。61份冻结workspace来源与current_sources.json大小/SHA全部一致。三worker各train=1、worker_train_reads=1，valid/heldout/owners均0；确认生成未开始。单5090当时利用率90%，空闲12468/32607MiB，三个训练进程各占6470MiB；磁盘可用511815266304字节。账本training=0为活跃任务尚未退出结算，三笔完整预留仍在，不能解释为没有训练消耗。总工期继续沿用三槽151.80小时训练的保守投影，观测时已运行约34分钟、训练估计尚余约151.24小时；加确认/分析仍约7天，条件完成时点10月30日白天至晚间，未根据首阶段短段速度重新承诺工期。硬限仍为490累计分桶小时，非墙钟保证。
 
