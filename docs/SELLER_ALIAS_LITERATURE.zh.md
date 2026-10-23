@@ -233,3 +233,19 @@ L²R把每个训练查询的旧负例记忆用于后续文本排序，与“留�
 此外发现[作者公开简介](https://github.com/princia05/PRINCIA)中的《Cross-Market Vendor Profiling in Darknet Marketplaces Using Semantic Similarity》：作者称在IEEE ICASI 2026展示，使用26000余条记录、Sentence-BERT和余弦相似度。[会议官网](https://2026.icasi-conf.net/)及[议程](https://2026.icasi-conf.net/agenda/)可核实2026年4月14—17日京都会议，但当前精确标题检索、Crossref标题检索和作者公开仓库未补足该篇正式出版记录、方法全文／实现及满足“知名刊会”的证据；仅作新线索，不计入。另一个[学生项目仓库](https://github.com/Islam-dabbour/Vendor-Linking-in-Darknet-Marketplaces-Text-vs-Hybrid-ML)自述TF-IDF／BERT／混合模型比较，没有正式论文出处，不能当作TrustCom官方代码或合格论文。[LLM-HetGDT（Findings of ACL 2025）](https://aclanthology.org/2025.findings-acl.725/)检测Twitter贩毒参与者，不解决商品文本卖家账号关联，予以排除。
 
 本次记录解除两篇论文的全文获取缺口，但**当前仍仅VendorLink计入，另外两项未补齐，goal未完成**。在获知两篇的具体适配缺口后，用户明确选择“保持当前输入和任务要求，继续找可直接比较的方法”，因此不将文本适配版转成已批准候选，也不重新询问是否放宽这一条件。本节是文献原文事实与本项目既有输入／输出边界的核对，不采纳新比较臂、不修改合同、不运行适配实验，也不宣称已通过新的方法外审。
+
+## 12. 2026-10-23：保持原输入与任务后的引用追查
+
+继续沿近期论文参考文献、[DNM研究目录](https://gwern.net/doc/darknet-market/dnm-archive/index)、作者公开资料与正式出版入口追索，并补查vendor re-identification、seller entity resolution及中文卖家／多身份关联等表述。本轮新增核查如下；目录、索引和检索摘要只用于定位，具体输入／任务判断回到原文。
+
+| 新核查对象 | 原始证据与适用结论 |
+| --- | --- |
+| [NBC-Softmax: Darkweb Author Fingerprinting and Migration Tracking](https://arxiv.org/abs/2212.08184)，2022 | 已读[全文](https://arxiv.org/pdf/2212.08184)§3.6—4.3：以帖子文字、星期及子论坛上下文组成episode，沿用SYSML架构，加入NBC-Softmax对比损失；实验为Silk Road、Silk Road 2、Agora、Black Market Reloaded的**讨论论坛帖子**。表2虽有去时间、去图上下文的消融，仍不是商品标题／描述卖家账号实验。作者给出[代码](https://github.com/gayanku/NBC-Softmax)，但本轮没有查到符合条件的正式刊会版本，不因有代码或2022年预印本而计入。公开索引全文检索另返回T5-CSBoost，题目与摘要为LLM生成文本指纹识别，也不是卖家账号方法；不把索引引用计数当作已穷尽全部被引文献。 |
+| [Identifying Similar Users Between Dark Web and Surface Web Using BERTopic and Authorship Attribution](https://doi.org/10.3390/electronics14010148)，Electronics，2025 | 出版社正文描述先用BERTopic找两类网络中的相近话题，再以作者风格相似度关联用户；研究对象为一个明网论坛与两个暗网论坛。即使是文本方法，也没有补足商品标题／描述卖家关联证据，不计入。 |
+| [Multimodal Threat Actor Profiling on the Tor Network: Techniques, Datasets, and Ethical Challenges](https://www.ijcaonline.org/archives/volume187/number20/pativada-2025-ijca-925278.pdf)，International Journal of Computer Applications，2025 | 已读公开全文；文章是综述和概念框架，案例为假设性合成示例。相关商品方法引向uStyle（2019）和eDarkFind（2020）；不能把本文年份转移给这些旧方法，也不能将概念框架当作已核实可复现的新增账号对算法。 |
+| Cross-Market Vendor Profiling in Darknet Marketplaces Using Semantic Similarity，作者称ICASI 2026展示 | 继续查[会议历届论文集入口](https://2026.icasi-conf.net/past-conferences-proceedings/)及议程，当前页面未提供该篇正式出版记录／全文。官网允许投稿manuscript或abstract，因此展示本身不足以证明正式全文发表，也不能反向断言该篇一定只是摘要。OpenAlex精确短语查询未补到记录，DBLP请求遇到反机器人页；后者不是“零篇”证据。输入、账号聚合、未见身份评价及刊会资格仍未补足，维持未核实线索。 |
+| Automated Models for Darknet Monitoring and Criminal Attribution | 检索发现该标题与卖家重新识别有关，但目前仅有第三方书目将其列为《Demystifying the Darknet: Technologies, Threats, and Trends》的59—84页章节；[出版社图书页](https://www.igi-global.com/book/demystifying-darknet-technologies-threats-trends/400777)可对应电子ISBN 9798337397573。未取得该章方法全文或符合条件的刊会出处，且不同入口的出版年份／状态表述不一致；不将摘要中的准确率当作已验证结果，不计入。 |
+
+本轮还发现一处会误导引用追查的表述：[DarkBIP-FW原文](https://link.springer.com/article/10.1007/s42452-025-07217-5)§2.2把文献[27—29]概括为利用商品描述作跨市场身份关联，但回查实际来源，[27]为2016年论坛写作风格识别，[28]为2022年[Tracking Discourse Influence in Darknet Forums](https://arxiv.org/abs/2202.02081)（论坛话语影响分析技术报告），[29]为[SYSML，EMNLP 2021](https://aclanthology.org/2021.emnlp-main.548/)（论坛作者关联）。它们不能据此成为2022—2026年的商品卖家文本关联方法。引用链中的年份、研究对象及方法作用须以被引原文为准。
+
+**本轮没有新增合格名额，仍为VendorLink一项、另外两项空缺。**这表示已核查范围内尚未找到另外两个满足条件的方法，不表示证明此类论文不存在。继续检索时保留用户已明确的输入与未见身份任务，不重复推荐已排除的多模态适配、论坛方法或旧年份工作；只有新的原文证据才能改变其状态。本轮仅更新公开文献记录，未访问实验数据、连接Linux、联系作者或改变活动比较实验。
