@@ -6,6 +6,8 @@
 
 最新保管（2026-10-23 11:15，Asia/Shanghai）：按用户明确要求，已删除Linux遗留Optuna训练权重19份、24783347439字节（23.08GiB），包括当前九复验18端点及旧中断1端点；[逐文件回执](../reports/maintenance/20261023/optuna_weights/receipt.json)两端保管。四个Optuna目录的13702个非权重文件和33个符号链接前后身份一致，147个Memory全部保留（当前完整campaign为90个）。当前完成／访问账及54来源一致，无相关活动训练进程；已删除载荷不能靠哈希恢复，也不授予新训练。最新结果外审已结案，本轮将交接、讨论、存储、计划、设计入口五份可变总文档SFTP同步Linux项目根docs并核对身份，冻结workspace不动；本地提交不扩大既往推送范围。详见[存储记录](STORAGE.zh.md#2026-10-23-optuna训练权重清理)。
 
+接手现场复核（2026-10-23 11:31:30，Asia/Shanghai）：只读核对既定Linux workspace，完成状态仍为`COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS`，访问账46/37/0/0、54份实际来源大小／SHA与completion全部一致；未发现匹配的Optuna训练／控制／监听进程。当前campaign推理权重0，90份Memory共30883495字节仍在，旧中断A权重也不存在；本次仅查Memory文件元数据，未读取载荷。[正式退出原件](../reports/seller_alias_continual/20261023/optuna_result/execution/formal_exit.json)和[删除回执](../reports/maintenance/20261023/optuna_weights/receipt.json)与Windows大小／SHA一致，原09:58:42正常完成及11:15删除事实保持。修改前五份可变总文档两端同字节；本次仅补当前导航与接手范围，不执行新实验或重复科学核验。
+
 主线衔接（2026-10-23讨论，非新运行合同）：本轮三臂在固定A→B开发与选参，完整持续学习主张还需冻结方法后与基础参照一致的ABC/BCA/CAB三阶段评价，并使独立留出覆盖相应范围。用户原话、理由及下一阶段未定事项见[选参细节与主线衔接](RESEARCH_DISCUSSION.zh.md#2026-10-23-optuna选参细节与持续学习主线衔接)。已冻结S的trial10参数为lambda_rank=1.3572393683805832、LR倍率=1.295036258870551；S_pos/H_pos各自trial11均为1.3051794547562026、1.2832655111666686，同臂三复验沿用。参数、日程和三种子原始身份均有直接引用；rng_order=ABC仅为随机流命名，本轮没有C阶段。结果外审与独立处置已完成；下一步先确定三阶段方案和最小必要实现范围，当前更新入口仅支持stage1/2、诊断固定AB，不能只改名称就续C。不因开发均值优势宣称全面胜出或已证实较少遗忘，也不把新AB80群当三域主线最终确认。
 
 本机写作／绘图工具（2026-10-22）：`nature-writing`、`nature-figure`和支持包`nature-shared`已完整安装到`C:/Users/35734/.codex/skills/`，当前会话已识别并实际调用；固定来源、228文件身份、9项必需引用以及后续功能验收见[存储记录](STORAGE.zh.md#2026-10-22-nature-skills本机安装)，授权见[讨论记录](RESEARCH_DISCUSSION.zh.md#2026-10-22-安装三个nature-skills并更新现有记录)。已完成H_pos开放结果约束写作示例；Linux既有py310补齐PyMuPDF 1.26.5，只有该包新增，手写双面板图的PDF／SVG／600dpi PNG和TIFF导出、实际布局／字号／碰撞审计及PDF目视核验通过，首轮失败原件保留。随后按用户要求删除两端各6个测试图件，技能及文字／JSON验收记录保留。本机后端偏好为Python；R及外部图像API未测，不自动加载全套参考或新增检查流程。现行科研纪律、合同和网页外审要求继续适用，未改变活动Optuna实验或其预算账。
@@ -97,7 +99,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 | 要掌握的信息 | 入口与使用边界 |
 |---|---|
 | 用户问题、研究前提、后续决定 | [讨论记录](RESEARCH_DISCUSSION.zh.md)、[计划](RESEARCH_PLAN.md)；辨认每项决定的对象、时点和范围。 |
-| 当前计算、真实更新及资格 | [Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)、[资源恢复补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)，实际入口[search](../scripts/step28_optuna_search.py)／[run](../scripts/step28_optuna_run.py)及其直接依赖。[恢复正式门](../reports/documentation/20261019/optuna_recovery/qualification/resume/formal_gate.json)绑定53来源，CPU158/300秒及原18调用/876秒的具体复用见[最终主审](../reports/documentation/20261019/optuna_recovery/qualification/resume/primary.zh.txt)。按明确范围继承旧证据，不把旧通过当作新实现已审。 |
+| 当前计算、真实更新及资格 | [Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)、[资源恢复补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及[重启恢复补充](../reports/documentation/20261021/optuna_reboot/scope.zh.txt)，实际入口[search](../scripts/step28_optuna_search.py)／[run](../scripts/step28_optuna_run.py)及其直接依赖。最终执行的[重启恢复正式门](../reports/documentation/20261021/optuna_reboot/formal_gate.json)绑定54来源，CPU累计188/300秒，原生18调用/876秒复用，见[重启恢复主审](../reports/documentation/20261021/optuna_reboot/primary.zh.txt)。10月19日53来源、CPU158秒的恢复门保留为前一阶段证据；45条成功轨迹各自的51/53/54来源不追贴最终版本。已结束资格不自动授权新运行。 |
 | 数据究竟改变什么 | [表达生成结果](SELLER_ALIAS_EXPRESSION_DATA_RESULT.zh.md)、[首轮数据合同](SELLER_ALIAS_BGE_CONTINUAL.zh.md#2-数据和逐阶段可见范围)；主题混合与表达机制同时变化，不称纯表达因果实验。 |
 | 早期来源与身份资格 | [schema](STEP1_SCHEMA.md)、[隔离](STEP2_SPLIT_AND_LEAKAGE.md)、[画像](STEP3_SELLER_PROFILE.md)、[silver候选](STEP4_SILVER_CANDIDATES.md)、[复核冻结](STEP5_REVIEW_AND_FREEZE.md)；历史来源链不授予真值或当前正式数据读取许可。 |
 | 评价定义与不确定性 | 本轮合同明确继承的[首轮第7节](SELLER_ALIAS_BGE_CONTINUAL.zh.md#7-评价对象和统计)及实际评价函数。区分AP、逐查询MAP、raw与校准，不从简称重写公式。 |
@@ -111,7 +113,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 - 服务器：yongpeng@10.201.109.111；项目根：/home/yongpeng/cross-lingual；Python：/home/yongpeng/miniconda3/envs/py310/bin/python。沿用既有SSH认证，密码只作认证输入，不写入项目。同步用SFTP／SCP，Git仅在Windows执行。
 - 已结束的72小时五臂workspace：/home/yongpeng/cross-lingual/reports/seller_alias_continual/20261008/replay_improvement_execution/20261008_151407/workspace，28项来源见[来源清单](../reports/documentation/20261008/record_replay_improvement/budget_72h/sources.json)。原48小时workspace（同一上级下20261008_131300/workspace）和首次原生证据保留；均为历史证据，不作为现行启动入口。
 - 已完成五臂作业：上述72小时workspace下reports/job；资格与启动记录在reports/qualification，历史正式入口scripts/run_step28_replay_improvement_linux_20261008.sh。原单CPU0／GPU0训练PID3407207及wrapper3407201已于10月9日13:38:39正常退出，不重启。完整小结果及分析归档为reports/seller_alias_continual/20261009/replay_improvement_result；原job/run/models的36权重已于14:48:54按许可留证删除，36份Memory继续保留job/run/memory。旧workspace的attempt01亦已结束。
-- 主目录的规则与交接是可维护文件；10月9日已撤下主目录五臂活动入口。独立workspace及结果归档中的冻结源码、合同、来源身份和运行证据不得被同步或代码清理覆盖；该五臂已送审28来源仍保持原字节，当前Optuna的53来源另按顶部核对。
+- 主目录的规则与交接是可维护文件；10月9日已撤下主目录五臂活动入口。独立workspace及结果归档中的冻结源码、合同、来源身份和运行证据不得被同步或代码清理覆盖；该五臂已送审28来源仍保持原字节，Optuna最终执行的54来源另按顶部核对，前期51/53来源快照保持各自身份。
 - 旧运行路径只用于追溯：C/S为reports/seller_alias_continual/20261007/record_replay_execution/20261007_225409/workspace，完整小结果为reports/seller_alias_continual/20261008/record_replay_result；LOGIT0.1为reports/seller_alias_continual/20261003/logit_low_execution/20261003_150000/workspace；ER0.1为reports/seller_alias_continual/20261002/er_low_execution/20261002_124018/job；LOGIT0.25为reports/seller_alias_continual/20261002/logit_weight_execution/20261002_153200/workspace。这些作业已结束，旧监听已退出／自删，不重建或重启。
 
 ## 数据、保管和未授权范围
@@ -128,7 +130,7 @@ Git交付（2026-10-22）：用户明确要求将本地7个未推送提交交付
 
 保管按最新[存储记录](STORAGE.zh.md)及实际依赖核对：BGE预训练、首轮三个共享首域完整状态、排序s0_hard与s0_d两份例外及必要科研证据继续保留。ER0.1六份末端权重已于10月16日10:09按本轮Linux清理要求、核对无现行载模依赖后留证删除，共7,838,864,652字节；273份其余文件SHA不变，含三份Memory。另删57份冗余／成员已保管ZIP，本轮合计63文件约7.49GiB，见[实际回执](../reports/maintenance/20261016/linux_cleanup/receipt.json)。10月9日本轮36权重、此前C/S十五权重、旧LOGIT0.1／risk十二权重、LOGIT0.25六权重及关系／函数记忆相关已清理权重，不按旧清单假定仍存在。SHA不能恢复已删模型，重训仍需相应授权。
 
-两端项目大清理已于10月8日完成；最近完成日期、下一到期日期和独立提醒任务统一见[清理周期](STORAGE.zh.md#项目大清理周期)。提醒仅提示到期，实际清理仍须先说明理由、范围、空间收益及保留依赖并征得许可。局部清理不重置周期，普通删除提交不等于改写Git历史。
+最近一次两端项目大清理为10月22日，下一到期日期为11月6日；日期与独立提醒任务统一以[清理周期](STORAGE.zh.md#项目大清理周期)为准。提醒仅提示到期，实际清理仍须先说明理由、范围、空间收益及保留依赖并征得许可。10月23日Optuna权重局部清理不重置周期，普通删除提交不等于改写Git历史。
 
 ## 近期历史进展
 
