@@ -297,3 +297,23 @@ ICASI线索补查发现[官方论文集模板页](https://2026icasi.wind-tech.co
 | [Research on Intelligence Mining of Illegal Underground Internet Production on Anonymous Network: Taking Personal Information Trading as an Example](https://doi.org/10.1109/ITNEC56291.2023.10081964)，ITNEC 2023 | DOI由上述出版社参考文献指向，书目线索可对应；IEEE入口和题名／DOI检索仍未取得可用原始方法正文，不能核实其是否包含本任务。保留“证据不足”，不伪装成已证实任务不符，也不把ResearchGate页面中其他推荐论文的摘要当作本篇摘要。 |
 
 **目前仍仅VendorLink计入，另外两个方法未补齐。**恢复检索后的法证文献追查、ICASI核实及本轮ICSPIS引用追查，均未解除同一缺口：没有另外两个同时具备合格发表出处、纯商品文本输入、账号对方法与未见身份适用证据的方法。具体可定位来源已核查到上述范围；余下直接线索仍需要新的正式出版记录、可读方法全文或能确认对应论文的官方实现，现有材料不足以继续完成资格判断。这是本次恢复检索后的受阻状态，不是证明此类论文不存在，也不影响其他已授权科研工作。目标未完成；不放宽用户条件、不再反复请求接受文本适配、不联系作者、不改比较合同或开展实验。
+
+## 15. 2026-10-23：继续引用追查，补足IEEE原始摘要证据
+
+用户指出前述停留于受阻和排除清单的处理未达到要求。本轮继续执行原检索要求；第14节末的受阻叙述是该轮结束时判断，不能替代继续追查，也不能把取得公开证据的责任推给用户。合格名额仍按独立方法计数，不能用搜索次数、排除项数量或同一论文的不同入口补位。
+
+重新检索VendorLink及早期市场关联方法、2024年度量学习方法的被引书目，并追查作者机构成果页。OpenAlex联合引用查询在2022-01-01至2026-10-23范围返回63条书目；这只是该索引、该查询的返回范围，包含重复版本和不相关论文，不是63篇方法全文，也不证明检索穷尽。新增直接线索GraySniffer与Software Solutions的出版社参考文献已取得，分别35条、15条；参考文献回查没有产生新的合格方法。
+
+检索工具未能读取的IEEE页面，经本地Playwright正常公开网页入口实际读到了下列原始摘要／开放引言。需要登录的正文没有读取，不把摘要核实写成全文核实；本轮专用标签页已关闭。
+
+| 来源 | 本轮补足的一手证据与资格判断 |
+| --- | --- |
+| [GraySniffer: A Cliques Discovering Method for Illegal SIM Card Vendor Based on Multi-Source Data](https://ieeexplore.ieee.org/document/10945061)，TrustCom 2024，DOI `10.1109/TrustCom63139.2024.00065` | IEEE摘要明确输入为群聊、论坛和对话；RoPE与BiLSTM抽取实体属性，构建情报库，再由GNN及自编码器发现售卡团伙。报告3792节点、25602关系与12个团伙。它研究多个卖家的组织关系，不是证明多个账号属于同一卖家的商品文本配对方法；依赖额外关系数据，不计入。没有取得完整方法正文。 |
+| [Software Solutions for Identifying Users Behind Social Media-Based Drug Trafficking](https://ieeexplore.ieee.org/document/11380142)，ICEC2NT 2025，DOI `10.1109/ICEC2NT65402.2025.11380142` | 会议日期2025-09-03—04，IEEE收录日期2026-02-19，分别保留。原始摘要与开放引言说明用POS、关键词、上下文及CNN图片模型检测社交媒体涉毒活动，图片训练集为Roboflow毒品检测数据；88%是检测准确率，不能写成卖家账号关联准确率。题名中的“Identifying Users”不足以证明同控配对，不计入。 |
+| [Research on Intelligence Mining of Illegal Underground Internet Production on Anonymous Network: Taking Personal Information Trading as an Example](https://ieeexplore.ieee.org/document/10081964)，ITNEC 2023 | 第14节仅有书目线索，本轮补到IEEE摘要和开放引言：主动／被动节点发现、爬虫采集，再按时间、空间、类型、主题分析个人信息交易。已读部分没有商品文本账号表示、配对目标或同控评分，不能升级为直接比较方法；没有声称未读全文中绝无其他分析。 |
+| [Data Analysis of Dark Web Marketplaces using Machine Learning](https://ieeexplore.ieee.org/document/10812633)，ICSPIS 2024 | 从作者介绍推进到IEEE原始摘要、开放引言；出版社明确以自建Tor爬虫获取市场数据，按商品类别、地理来源分析卖家经营模式。现有证据没有给出账号对关联算法，保留不计入；全文仍需登录，未取得。 |
+| [Follow Your Hidden Traces: Underground Forum-Based Darknet Market Sybil Detection](https://ieeexplore.ieee.org/document/11169719)，ICWS 2025 | IEEE原始摘要和开放引言再次明确：筛选论坛帖子、抽取马甲卖家信息、核验市场存在性，论坛是额外输入；不改变第8、12节判断。另查[作者实验室成果页](https://issl.korea.ac.kr/publications)与[作者主页](https://yrkim.oopy.io/)，未取得该篇全文下载入口。正式[会议议程](https://services.conferences.computer.org/2025/wp-content/uploads/sites/3/2025/07/SERVICES_webprogram7-5.pdf)将其列为short paper（CWS_SHT_65），不能省略论文类型。 |
+
+另沿引用链读取ECAI 2024《Entity Matching Across Small Networks Using Node Attributes》的[作者机构摘要](https://publications.idiap.ch/publications/show/5369)，并定位到[作者原稿](https://publications.idiap.ch/attachments/papers/2024/Ahmadi_ECAI-PAIS2024_2024.pdf)的索引片段：UGC-DeepLink使用通话／论坛交互形成的小网络及节点属性，结合图结构学习和文本信息匹配实体；不是仅用商品标题、描述关联卖家，不能因ECAI刊会符合就补位。新的中文作者线索指向[《面向暗网抑制的普适性安全理论研究构想和成果展望》](https://doi.org/10.12454/j.jsuese.202400800)，工程科学与技术2025年第57卷第1期；已读摘要和开篇研究构想，其流量识别、连接性预测、陷阱节点溯源方向没有提供本项目所需商品账号对方法，不以综述／研究构想充数。
+
+**本轮没有新增合格方法，仍是VendorLink一项、两个空缺。**实际进展是新增线索和若干原先未能访问来源的一手核实；它不等于完成目标，也不构成不存在其他合格文献的证明。ICASI 2026仍是缺正式出版与方法证据的线索，不升级为比较方法。检索、全文追查与资格判断继续由执行者承担；本次只更新文献事实与阅读范围，不改变实验合同、运行或比较方案。
