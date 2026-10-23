@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-23 五方法修订方案送审材料
+
+新方案、预算、请求、清单、普通字段/算术核对、明确授权和实际页面/提交回执位于Windows [continual_baselines](../reports/documentation/20261023/continual_baselines)。输入ZIP `review/continual_baseline_plan_review.zip`为42232字节、8成员（7载荷+清单），SHA256 `0c95fd669fc41cc7423c36038fb2c6d356a607d0676ad69cf8f070aeb63a8300`，逐项大小/SHA一致；载荷仅本次方案/预算/请求、前次主审处置、selected.json及ER/LOGIT历史结果文档，不含正式数据/标签/Memory/模型/凭据。原六臂输入ZIP字节未改。
+
+自动审批首次拒绝及用户随后对整个新包的明确批准均保留；原包13:18:51已在原GPT-6 Pro会话提交，当前有活跃审查用途而保留。待完整回收/独立处置后按实际依赖处理输入与返回重复包，正式原文和必要证据仍须保存。新材料只作本地Git交付，不推送、不声称已同步Linux，也不改冻结workspace或旧权重保管事实。当前490h/224GiB是未批准的未来预算，不是已发生占用。旧六臂/三臂材料按下面历史记录解释，当前入口见交接顶部。
+
 ## 2026-10-23 三域主线静态方案待审材料
 
 12:35后的完整回收：返回continual_mainline_external_review_20261023.zip为55479字节/9成员，SHA256 fc01291f38f46a88d3daf7f76e31ff595d4f387a9bd1d7ea447d2800cf6b29ae。原文、发现、阅读范围、机械复核脚本/输出和交付清单共9原件已核对后保留于[review/external](../reports/documentation/20261023/continual_mainline/review/external)，网页正文、回收核验与独立处置/普通算术记录在同级review。返回传输ZIP验收后无额外用途，按纪律清理该下载副本；原输入ZIP仍为外审复核脚本的必要输入而保留。专用页已关闭、回收跟进已删除，未向Linux新增备份或同步。旧六臂方案原件保持，当前推荐27路径的具体范围与预算另见主审处置，仍待用户确认。

@@ -1,0 +1,162 @@
+{
+  "version": "2026-10-23-v2-five-frozen-arms",
+  "status": "PROPOSED_NOT_AUTHORIZED_FOR_EXECUTION",
+  "arms": [
+    {
+      "name": "SEQ_ref",
+      "lambda_rank": 1,
+      "lr_multiplier": 1,
+      "memory": false
+    },
+    {
+      "name": "ER0.1_ref",
+      "lambda_rank": 1,
+      "lr_multiplier": 1,
+      "replay_weight": 0.1,
+      "memory": true
+    },
+    {
+      "name": "LOGIT0.1_ref",
+      "lambda_rank": 1,
+      "lr_multiplier": 1,
+      "replay_weight": 0.1,
+      "logit_distillation_weight": 0.5,
+      "memory": true
+    },
+    {
+      "name": "S_tuned",
+      "lambda_rank": 1.3572393683805832,
+      "lr_multiplier": 1.295036258870551,
+      "selected_trial": 10,
+      "memory": true
+    },
+    {
+      "name": "H_pos_tuned",
+      "lambda_rank": 1.3051794547562026,
+      "lr_multiplier": 1.2832655111666686,
+      "selected_trial": 11,
+      "memory": true
+    }
+  ],
+  "orders": [
+    "ABC",
+    "BCA",
+    "CAB"
+  ],
+  "seeds": [
+    4,
+    5,
+    6
+  ],
+  "new_hpo_runs": 0,
+  "new_full_trajectories": 45,
+  "optimizer_updates": 38880,
+  "gradient_group_presentations": 59616,
+  "stage_checkpoints": 135,
+  "confirmation": {
+    "domains": 3,
+    "groups_per_domain": 40,
+    "independent_groups": 120,
+    "core_cells": [
+      "R11",
+      "R21",
+      "R22",
+      "R31",
+      "R32",
+      "R33"
+    ],
+    "extra_SEQ_cells": [
+      "R12",
+      "R23"
+    ],
+    "group_forwards": 11520,
+    "root_seed": 2026102301,
+    "namespace": "continual_confirmation_20261023"
+  },
+  "diagnostics": {
+    "epoch_full_captures": 0,
+    "initial_full_scoring": 0,
+    "old_dev_stage_endpoint_groups": 60,
+    "real_endpoint_restore_checks_retained": true
+  },
+  "budget_seconds": {
+    "training_shared_pool": 1620000,
+    "confirmation_shared_pool": 129600,
+    "cpu_qualification": 1200,
+    "native_qualification": 5400,
+    "data_generation_verification": 600,
+    "control": 1800,
+    "old_dev_evaluation": 3600,
+    "analysis_including_all_bootstrap": 1800
+  },
+  "total_seconds": 1764000,
+  "total_hours": 490,
+  "limits": {
+    "max_active_workers": 3,
+    "full_run_outer_max_seconds": 86400,
+    "full_run_average_planning_seconds": 36000,
+    "native_optimizer_calls_max": 36,
+    "native_seconds_max": 5400
+  },
+  "accounting": "sum task outer elapsed including contention, failures and termination; training settled + active worst-case reservations <=450h; per-run24h is bounded by shared pool; parent wait not charged twice",
+  "storage": {
+    "campaign_max_GiB": 224,
+    "minimum_free_GiB": 288,
+    "small_evidence_max_GiB": 2,
+    "inference_files": 135,
+    "inference_file_proxy_bytes": 1310000000,
+    "max_concurrent_full_files": 6,
+    "full_file_proxy_bytes": 3904680901,
+    "max_concurrent_temporary_inference_files": 3
+  },
+  "resources": {
+    "gpu_count_observed": 1,
+    "gpu_model": "RTX5090",
+    "gpu_total_MiB": 32607,
+    "gpu_free_MiB": 31896,
+    "snapshot_time_local": "2026-10-23 12:24-12:29 Asia/Shanghai",
+    "host_available_GiB": 243.85,
+    "disk_available_GiB": 477.92,
+    "maximum_worker_tree_RSS_GiB": 64,
+    "maximum_campaign_RSS_GiB": 192,
+    "minimum_host_available_GiB": 208,
+    "concurrent_qualification_completed": false,
+    "throughput_ratio_measured": false
+  },
+  "forecast": {
+    "old_9path_training_seconds": 98727.018326,
+    "serial_equivalent_training_hours": 137.1208587861111,
+    "old_max_group_forward_seconds": 2.431383382063359,
+    "serial_confirmation_forward_proxy_hours": 9.725533528253436,
+    "three_times_confirmation_task_proxy_hours": 29.17660058476031,
+    "calendar_total_hours_conditions": [
+      {
+        "throughput_ratio": 1,
+        "low": 151,
+        "high": 154
+      },
+      {
+        "throughput_ratio": 1.5,
+        "low": 105,
+        "high": 108
+      },
+      {
+        "throughput_ratio": 2,
+        "low": 83,
+        "high": 86
+      }
+    ],
+    "note": "conditional proxies, not measured throughput or deadline guarantees"
+  },
+  "primary_comparison": "H_pos_tuned - S_tuned",
+  "secondary_exploratory_comparisons": [
+    "ER0.1_ref - SEQ_ref",
+    "LOGIT0.1_ref - ER0.1_ref",
+    "S_tuned - LOGIT0.1_ref",
+    "H_pos_tuned - LOGIT0.1_ref",
+    "H_pos_tuned - ER0.1_ref",
+    "H_pos_tuned - SEQ_ref"
+  ],
+  "execution_authorized": false,
+  "budget_authorized": false
+}
