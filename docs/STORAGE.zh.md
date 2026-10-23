@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-23 五方法正式启动与实现外审闭环
+
+16:26:59已按原授权启动Linux独立`reports/documentation/20261023/continual_implementation/formal_20261023`，冻结workspace/61来源和正式门两端身份核对，首批三worker实际更新见[启动观察](../reports/documentation/20261023/continual_implementation/formal_observation.json)。完整外审9文件原件、主审处置、cpu08增量证据及当前账已同步Linux；135正式阶段推理权重按后续确认依赖留Linux，尚未形成的权重不冒称已有。full仅真实恢复核实后按既有生命周期退休；不清理活动状态或Memory。当前权重/正式小证据均受224GiB全量和2GiB小证据上限约束。
+
+本次72705字节/9成员外审返回包与网页SHA256一致，8载荷逐项核验；原文和必要附件保留review/external，完成处置后删除返回传输ZIP及浏览器重复下载。原836755字节输入ZIP仍是所保留mechanical_checks.py的具体复核输入和审查前来源，继续保留；没有增加重复备份。完整身份及清理事实见[主审核对](../reports/documentation/20261023/continual_implementation/review/primary_verification.json)，本次只本地Git不推送。下面“待回收/未正式训练”为形成时历史。
+
 ## 2026-10-23 五方法实现、限定资格与待回收实现外审
 
 用户已批准五方法/零HPO/45轨迹/三路/490累计小时，已在Linux独立`reports/documentation/20261023/continual_implementation/workspace`部署最小实现；61份当前来源1056846字节已逐项与Windows核验一致，见[current_sources](../reports/documentation/20261023/continual_implementation/current_sources.json)。模型只链接既有BGE归档，数据目录仅建立既有数据链接，资格均使用手写群，尚未正式训练/生成确认数据/打开正式标签。旧workspace及模型保管不改。

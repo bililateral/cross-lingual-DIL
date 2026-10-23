@@ -75,7 +75,7 @@ class Budget:
     def __init__(self, campaign: Path, deadline: float, tail: float = 60.):
         self.root, self.deadline, self.tail = campaign, deadline, tail
         self.started, self.last_checked = time.monotonic(), -float("inf")
-        self.peak_rss = self.peak_disk = 0
+        self.peak_rss = self.peak_disk = self.peak_small = 0
 
     def check(self, reserve: int = 0) -> None:
         now = time.monotonic()
@@ -84,10 +84,19 @@ class Budget:
         if reserve or now-self.last_checked >= 5:
             self.last_checked = now
             rss = resident_bytes(owned_processes(os.getpid()))
-            used = sum(p.stat().st_size for p in self.root.rglob("*") if p.is_file() and not p.is_symlink())
+            used = small = 0
+            for p in self.root.rglob("*"):
+                if p.is_file() and not p.is_symlink():
+                    size = p.stat().st_size
+                    used += size
+                    if p.suffix != ".pt":  # Actual full/inference checkpoint payloads only.
+                        small += size
             self.peak_rss, self.peak_disk = max(self.peak_rss, rss), max(self.peak_disk, used)
+            self.peak_small = max(self.peak_small, small)
             if rss > 64*2**30 or used+reserve > 224*2**30:
                 raise RuntimeError("Approved worker RSS or campaign storage cap exceeded")
+            if small > 2*2**30:
+                raise RuntimeError("Approved 2 GiB small-evidence cap exceeded")
             if shutil.disk_usage(self.root).free < reserve+64*2**30:
                 raise RuntimeError("System disk safety margin unavailable")
 
@@ -100,10 +109,11 @@ class Budget:
             fcntl.flock(lock, fcntl.LOCK_UN)
 
     def snapshot(self) -> dict:
+        self.last_checked = -float("inf")
         self.check()
         return dict(elapsed_seconds=time.monotonic()-self.started, deadline_monotonic=self.deadline,
                     stop_before_deadline_seconds=self.tail, peak_worker_rss_bytes=self.peak_rss,
-                    peak_campaign_bytes=self.peak_disk)
+                    peak_campaign_bytes=self.peak_disk, peak_small_evidence_bytes=self.peak_small)
 
 
 def save(path: Path, model, optimizer, meta: dict, budget: Budget) -> dict:

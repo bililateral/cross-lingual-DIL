@@ -1,0 +1,143 @@
+必要小证据摘录；均来自本次已核验输入，未修改源码。
+行号为输入物理行。完整来源身份见input_identity_check.json。
+这些片段只说明三个发现，不代替完整调用链阅读或既存资格。
+
+I01: exact run ID
+scripts/step28_continual_five.py : 81-82
+源SHA256=803f883b6b02705a52d5c4c0355f6810cc22577701ef80a65bea6ffbb02441d6
+81:     def run_id(self) -> str:
+82:         return f"{self.order}_s{self.seed}_{self.name}"
+
+I01: metric filenames
+scripts/step28_continual_five_evaluate.py : 46-59
+源SHA256=1b7fe2c240200552fca60cfe7aa10d90f26448b8b4e0e85d564eaf96f7233a33
+46: def metric_set(root: Path, labels: np.ndarray, logits: np.ndarray) -> dict:
+47:     matrix, counts = m.parent.metrics.group_metrics(labels, logits)
+48:     queries = query_metrics(labels, logits)
+49:     if (matrix.shape != (len(labels), 22) or queries.shape != (len(labels), 28, 10)
+50:             or not np.allclose(matrix[:, 12:], queries.mean(1), rtol=1e-12, atol=1e-12)
+51:             or any(v["tp"]+v["fn"] != 20 or v["tn"]+v["fp"] != 358 for v in counts)):
+52:         raise ValueError("Full metric/query/confusion correspondence differs")
+53:     matrix[undefined_metrics(counts)] = np.nan
+54:     nullable = matrix.astype(object)
+55:     nullable[np.isnan(matrix)] = None
+56:     data.write_json(root.with_suffix(".json"), dict(columns=list(m.parent.metrics.COLUMNS),
+57:         values=nullable.tolist(), counts=counts, na_reason="Undefined precision/MCC denominator; never zero-fill"))
+58:     query_rec = run.save_array(root.with_suffix(".npy"), queries, root.parent)
+59:     return dict(matrix=data.record(root.with_suffix(".json"), root.parent), queries=query_rec)
+
+I01: logical opening precedes metrics
+scripts/step28_continual_five_evaluate.py : 70-71
+源SHA256=1b7fe2c240200552fca60cfe7aa10d90f26448b8b4e0e85d564eaf96f7233a33
+70:     access(campaign, "old_dev_joint", ("old_development_pairs",))
+71:     labelled = m.base.public.attach_labels(groups["development"], c, "development")
+
+I01: old-dev stem
+scripts/step28_continual_five_evaluate.py : 80-85
+源SHA256=1b7fe2c240200552fca60cfe7aa10d90f26448b8b4e0e85d564eaf96f7233a33
+80:             for role in m.parent.ROLES:
+81:                 budget.check()
+82:                 rec = point["scores"][role]
+83:                 values = np.load(data.verify(campaign/spec.run_id/"run"/rec["path"], rec), allow_pickle=False)
+84:                 name = f"{spec.run_id}_{stage}_{role}"
+85:                 result["runs"][spec.run_id][f"{stage}_{role}"] = metric_set(job/name, truth, values)
+
+I01: confirmation stem
+scripts/step28_continual_five_evaluate.py : 217-220
+源SHA256=1b7fe2c240200552fca60cfe7aa10d90f26448b8b4e0e85d564eaf96f7233a33
+217:             for role, rec in point["scores"].items():
+218:                 budget.check()
+219:                 values = np.load(data.verify(job/rec["path"], rec), allow_pickle=False)
+220:                 point["metrics"][role] = metric_set(job/f"metrics_{spec.run_id}_{cell}_{role}", labels, values)
+
+I01: immutable NPY path
+scripts/step28_bge_continual_run.py : 49-55
+源SHA256=4ab2840dfe7ee27912e8e6ed19d3dd3d9919e668f1cbc10998ade2843966d181
+49: def save_array(path: Path, values: np.ndarray, root: Path) -> dict:
+50:     if path.exists():
+51:         raise FileExistsError(path)
+52:     np.save(path, values, allow_pickle=False)
+53:     if not np.array_equal(np.load(path, allow_pickle=False), values):
+54:         raise ValueError("Array roundtrip changed values")
+55:     return data.record(path, root)
+
+I01: JSON overwrites
+scripts/step28_continual_population_data.py : 33-34
+源SHA256=49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d
+33: def write_json(path: Path, value: Any) -> None:
+34:     path.write_bytes(json_bytes(value))
+
+I02: timing boundary
+scripts/step28_continual_five_control.py : 211-216
+源SHA256=f210888458d16bcff9255018f1358adc437e56ee43060d6f3166c8a9c3cca627
+211:             elapsed = time.monotonic()-tick
+212:             tick = None
+213:             ledger.charge("control", elapsed)
+214:             if active:
+215:                 next_stop = min(ledger.active[identity]["deadline"]-tail for identity in active)
+216:                 time.sleep(max(0., min(poll_seconds, next_stop-time.monotonic())))
+
+I02: charged interval ends before save
+scripts/step28_continual_five_control.py : 69-75
+源SHA256=f210888458d16bcff9255018f1358adc437e56ee43060d6f3166c8a9c3cca627
+69:     def charge(self, bucket: str, actual: float) -> None:
+70:         self.used[bucket] += actual
+71:         over = self.available(bucket) < 0
+72:         self.failed |= over
+73:         self.save()
+74:         if over:
+75:             raise RuntimeError("Cumulative bucket exceeded")
+
+I02: save work
+scripts/step28_continual_five_control.py : 32-36
+源SHA256=f210888458d16bcff9255018f1358adc437e56ee43060d6f3166c8a9c3cca627
+32:     def save(self) -> None:
+33:         if self.path:
+34:             temporary = self.path.with_suffix(".tmp")
+35:             data.write_json(temporary, self.snapshot())
+36:             os.replace(temporary, self.path)
+
+I02: failure record
+scripts/step28_continual_five_control.py : 308-309
+源SHA256=f210888458d16bcff9255018f1358adc437e56ee43060d6f3166c8a9c3cca627
+308:         data.write_json(campaign/"failure.json", dict(status="STOP_NO_RETRY", error=repr(error),
+309:                                                      traceback=traceback.format_exc(), budget=ledger.snapshot()))
+
+I03: actual caps
+scripts/step28_continual_five_run.py : 80-92
+源SHA256=d1b8eca42d5fc8fb62612f46a4b69375b9f273b83acd2fed74e0b6b00eda4cdc
+80:     def check(self, reserve: int = 0) -> None:
+81:         now = time.monotonic()
+82:         if now >= self.deadline-self.tail:
+83:             raise TimeoutError("Allocated task allowance reached; termination tail reserved")
+84:         if reserve or now-self.last_checked >= 5:
+85:             self.last_checked = now
+86:             rss = resident_bytes(owned_processes(os.getpid()))
+87:             used = sum(p.stat().st_size for p in self.root.rglob("*") if p.is_file() and not p.is_symlink())
+88:             self.peak_rss, self.peak_disk = max(self.peak_rss, rss), max(self.peak_disk, used)
+89:             if rss > 64*2**30 or used+reserve > 224*2**30:
+90:                 raise RuntimeError("Approved worker RSS or campaign storage cap exceeded")
+91:             if shutil.disk_usage(self.root).free < reserve+64*2**30:
+92:                 raise RuntimeError("System disk safety margin unavailable")
+
+I03: frozen small-evidence cap
+reports/documentation/20261023/continual_baselines/budget.json : 102-110
+源SHA256=60774e6bb1109ba94f46c8fcb1e40c14e64ab8025e2757e3810dfdd703f343f9
+102:   "storage": {
+103:     "campaign_max_GiB": 224,
+104:     "minimum_free_GiB": 288,
+105:     "small_evidence_max_GiB": 2,
+106:     "inference_files": 135,
+107:     "inference_file_proxy_bytes": 1310000000,
+108:     "max_concurrent_full_files": 6,
+109:     "full_file_proxy_bytes": 3904680901,
+110:     "max_concurrent_temporary_inference_files": 3
+
+I01 coverage: two names without a dot
+tests/test_step28_continual_five.py : 340-343
+源SHA256=1feea8c0863e6baa31809da9abc0cc9b9970c3ca858e8733e537369689b6cc6f
+340:     def test_confirmation_restore_cells_and_joint_numeric_labels(self):
+341:         # Exercise the new adapter on two representatives and handwritten groups.
+342:         # The separate 45-ID test covers global admission. No generator is called.
+343:         specs = [m.Spec("SEQ_ref", "BCA", 4), m.Spec("H_pos_tuned", "CAB", 5)]
+

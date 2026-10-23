@@ -51,6 +51,62 @@ class FiveTests(unittest.TestCase):
     def evidence(self, name, row):
         m.data.write_json(Path(os.environ["FIVE_TEST_ROOT"])/(name+".json"), row)
 
+    def test_metric_filenames_for_all_frozen_outputs(self):
+        # Filesystem regression only: fixed numeric placeholders, no model or labels.
+        names = []
+        for spec in m.specifications():
+            names.extend(f"{spec.run_id}_{stage}_{role}" for stage in (1, 2, 3) for role in m.parent.ROLES)
+            cells = evaluation.CORE_CELLS+(((1, 2), (2, 3)) if spec.name == "SEQ_ref" else ())
+            names.extend(f"metrics_{spec.run_id}_{i}_{j}_{role}" for i, j in cells for role in m.parent.ROLES)
+        self.assertEqual(len(names), 405+864)
+        self.assertEqual(len(set(names)), len(names))
+        with tempfile.TemporaryDirectory(dir=os.environ["FIVE_TEST_ROOT"]) as temporary:
+            root = Path(temporary)
+            counts = [dict(tp=20, fn=0, tn=358, fp=0)]
+            with mock.patch.object(m.parent.metrics, "group_metrics", return_value=(np.zeros((1, 22)), counts)), \
+                    mock.patch.object(evaluation, "query_metrics", return_value=np.zeros((1, 28, 10))):
+                for name in names:
+                    result = evaluation.metric_set(root/name, np.zeros((1, 378)), np.zeros((1, 378)))
+                    self.assertEqual(result["matrix"]["path"], name+".json")
+                    self.assertEqual(result["queries"]["path"], name+".npy")
+                    self.assertEqual(np.load(root/result["queries"]["path"], allow_pickle=False).shape, (1, 28, 10))
+            self.assertEqual(len(list(root.glob("*.json"))), 1269)
+            self.assertEqual(len(list(root.glob("*.npy"))), 1269)
+        self.evidence("metric_paths", dict(old_dev=405, confirmation=864, unique_actual_json=1269,
+            unique_actual_npy=1269, fixed_placeholder_metrics_only=True, formal_data_access=0))
+
+    def test_control_write_carry_and_small_evidence_cap(self):
+        now = [0.]
+        with tempfile.TemporaryDirectory(dir=os.environ["FIVE_TEST_ROOT"]) as temporary:
+            root = Path(temporary)
+            ledger = ctl.Ledger(root/"ledger.json", clock=lambda: now[0])
+            original_save = ledger.save
+            def timed_save():
+                original_save()
+                now[0] += .25  # Deterministic measured disk-write cost.
+            with mock.patch.object(ledger, "save", side_effect=timed_save):
+                ledger.charge("control", 1.)
+                ledger.charge("control", 2.)
+                self.assertEqual(m.data.read_json(root/"ledger.json")["used"]["control"], 3.25)
+                ledger.used["control"] = ctl.LIMITS["control"]-.1
+                with self.assertRaises(RuntimeError):
+                    ledger.charge("control", 0.)
+                self.assertGreater(ledger.used["control"], ctl.LIMITS["control"])
+            # Sparse filesystem placeholders; no weights, labels or 5 GiB payload allocation.
+            with (root/"stage1.pt").open("wb") as handle:
+                handle.truncate(3*2**30)
+            budget = run.Budget(root, __import__("time").monotonic()+60, tail=1)
+            budget.check()
+            self.assertGreaterEqual(budget.peak_disk, 3*2**30)
+            self.assertLess(budget.peak_small, 2**20)
+            with (root/"evidence.bin").open("wb") as handle:
+                handle.truncate(2*2**30+1)
+            with self.assertRaisesRegex(RuntimeError, "small-evidence"):
+                budget.snapshot()
+        self.evidence("review_accounting_storage", dict(control_write_carried=True,
+            carry_can_trigger_existing_cap=True, small_evidence_cap_enforced=True,
+            checkpoint_excluded_only_from_small_subset=True, sparse_files_removed=True))
+
     def test_actual_five_updates_and_omission_controls(self):
         current, history = handmade_group("current"), handmade_group("history")
         evidence = {}

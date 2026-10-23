@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "review_kind": "FIRST_IMPLEMENTATION_REVIEW",
+  "language": "zh-CN",
+  "input_zip_sha256": "6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63",
+  "verdict": "REPAIR_I01_BEFORE_FORMAL_CAMPAIGN; NO_NEW_RESEARCH_OR_GPU_REVIEW_REQUIRED_BY_THIS_REVIEW",
+  "visible_model_self_description": "GPT-6 Astra Pro",
+  "backend_identity_independently_verified": false,
+  "approved_scope": {
+    "methods": 5,
+    "new_HPO": 0,
+    "full_paths": 45,
+    "max_workers_same_GPU": 3,
+    "total_task_hours": 490
+  },
+  "summary": {
+    "confirmed_SCIENTIFIC_BLOCKER": 0,
+    "confirmed_REPRODUCIBILITY_DEFECT": 3,
+    "independently_blocking_defects": [
+      "I01"
+    ],
+    "low_non_independent_blockers": [
+      "I02",
+      "I03"
+    ],
+    "formal_results_generated": false
+  },
+  "severity_definition": {
+    "HIGH": "当前完整流水线确定失败，必须在启动前修正",
+    "LOW": "已证实有限接线/计量缺口，未见实际超额，不独立否决方案",
+    "INFO": "已核对范围、限制、合理后续或不应新增的工作，不作为确定缺陷计数"
+  },
+  "entries": [
+    {
+      "id": "I01",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "HIGH",
+      "evidence_status": "CONFIRMED_STATIC_AND_PURE_PATH_REPRODUCTION",
+      "title": "含小数点方法名被Path.with_suffix截断，旧dev和确认metric_set发生文件碰撞",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five.py",
+          "lines": "81-82"
+        },
+        {
+          "file": "scripts/step28_continual_five_evaluate.py",
+          "lines": "46-59,70-85,220"
+        },
+        {
+          "file": "scripts/step28_continual_population_data.py",
+          "lines": "33-34"
+        },
+        {
+          "file": "scripts/step28_bge_continual_run.py",
+          "lines": "49-55"
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "295-301"
+        },
+        {
+          "file": "tests/test_step28_continual_five.py",
+          "lines": "340-343"
+        }
+      ],
+      "impact": "18条ER/LOGIT运行受影响。首次ER的第二role先覆盖指标JSON，再因同名NPY已存在失败；旧dev标签此前已按门打开。当前完整正式流水线不能完成。是静态可证失败，不是已发生正式项目失败。",
+      "minimum_disposition": "保留完整stem后追加.json/.npy，返回record同样使用完整路径；核对固定45身份及既有stage/cell/role路径唯一性，更新实际来源绑定，再由主执行者处置。无需GPU、数据或指标运算。",
+      "blocks_current_complete_pipeline": true,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": true,
+      "minimum_verification": "标准库纯路径枚举；不是研究实验或数值资格。",
+      "mechanical_evidence_file": "mechanical_checks.json",
+      "mechanical_json_pointer": "/metric_filename_defect",
+      "affected_runs": 18,
+      "old_dev_expected": 405,
+      "old_dev_current_unique": 261,
+      "confirmation_expected": 864,
+      "confirmation_current_unique": 558,
+      "existing_evidence_reusable": "CPU数值/域映射/恢复等适用证据仍可复用；两结构代表未覆盖小数点名称。",
+      "deletion_cost": "不能删除ER/LOGIT或删评价role来躲避错误；会删掉用户明确目标或冻结输出。",
+      "confirmed_scientific_effect": false
+    },
+    {
+      "id": "I02",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "evidence_status": "CONFIRMED_STATIC_ACCOUNTING_GAP",
+      "title": "正式C计时未覆盖自身charge/save和有限循环外收尾",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "32-36,69-75,169,211-216,241,308-309"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/execution.zh.txt",
+          "lines": "9"
+        }
+      ],
+      "impact": "存在未量化的非等待计量尾部遗漏；未见实际C超额，不推翻450h完整预留或已有native保守补记。",
+      "minimum_disposition": "建议在既有C1800s内结转上次落盘时间或明确有限收尾预提；主执行者记录具体处置。不要求无限递归精确计时、回算已豁免GPU资格或新增预算。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": true,
+      "actual_overrun_observed": false,
+      "blocking_rationale": "不独立否决科学方案或完整实现；属有限低成本计量口径处置。",
+      "existing_evidence_reusable": "原生资格C保守补120s原样保留，不重开GPU修复。"
+    },
+    {
+      "id": "I03",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "evidence_status": "CONFIRMED_STATIC_CAP_WIRING_GAP",
+      "title": "小证据≤2GiB未接入现有campaign目录检查",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_baselines/budget.json",
+          "lines": "102-110",
+          "json_pointer": "/storage/small_evidence_max_GiB"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/execution.zh.txt",
+          "lines": "15"
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "lines": "80-100"
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "178-181,247-262"
+        }
+      ],
+      "impact": "已有224GiB全campaign上限不能自动证明2GiB小证据子集上限。主要固定数组约297.56MiB，非完整总量实测；未见实际超限。",
+      "minimum_disposition": "建议复用已有目录计量，按既有权重/小证据输出类别累计并记录/落实2GiB，不引入存储平台或新GPU资格。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": true,
+      "actual_overrun_observed": false,
+      "blocking_rationale": "低严重性单独cap接线遗漏，不独立否决科学方案或完整实现。"
+    },
+    {
+      "id": "I04",
+      "type": "VERIFIED_IN_SCOPE",
+      "severity": "INFO",
+      "evidence_status": "STATIC_PATH_CHECKED_WITH_SCOPED_SUPPLIED_EVIDENCE",
+      "title": "五方法目标、全精度参数、实际第三阶段与出生教师未检出新的科学接线阻断",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five.py",
+          "lines": "19-22,49-137,163-259"
+        },
+        {
+          "file": "scripts/step28_er_weight.py",
+          "lines": "229-295"
+        },
+        {
+          "file": "scripts/step28_optuna.py",
+          "lines": "155-186"
+        },
+        {
+          "file": "scripts/step28_record_replay.py",
+          "lines": "159-182,234-332"
+        },
+        {
+          "file": "scripts/step28_positive_ranking.py",
+          "lines": "52-105"
+        },
+        {
+          "file": "scripts/step28_g_half.py",
+          "lines": "39-73"
+        },
+        {
+          "file": "tests/test_step28_continual_five.py",
+          "lines": "26-166"
+        }
+      ],
+      "impact": "ER完整历史监督×0.1，LOGIT原始logit项×0.5独立；S/H双视图及各自A0教师与冻结目标对应。新入口并非只改旧AB断言。未见必须新增方法或资格的具体缺口。",
+      "minimum_disposition": "保持获批五系统及受限主张，复用适用旧计算和手写CPU证据；不宣布纯机制因果或同等HPO机会。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false,
+      "scientific_blocker_found": false,
+      "evidence_limit": "TinyEncoder/小维度/人工Adam状态，不证明已跑前624步或45正式路径。"
+    },
+    {
+      "id": "I05",
+      "type": "VERIFIED_IN_SCOPE",
+      "severity": "INFO",
+      "evidence_status": "STATIC_BOUNDARY_AND_GATE_CHECKED",
+      "title": "current-only角色、真实恢复、全45身份和两级联合开放有实际接线",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "lines": "114-177,180-264"
+        },
+        {
+          "file": "scripts/step28_bge_continual.py",
+          "lines": "85-120,129-239"
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "78-138,265-305"
+        },
+        {
+          "file": "scripts/step28_continual_five_evaluate.py",
+          "lines": "26-43,62-149,152-221"
+        }
+      ],
+      "impact": "学习器只收当前fit及生存Memory，Supply仍为同进程离线角色；full验证后退休，135推理状态保留；全部45盲完成后开放旧dev，全部确认格评分后联合开pairs。",
+      "minimum_disposition": "保持源冻结、精确身份、实际恢复、固定后处理和角色分账。I01应在昂贵训练和开放前修正。无需系统级隔离平台。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false,
+      "not_OS_level_isolation": true,
+      "new_generation_executed_by_reviewer": false
+    },
+    {
+      "id": "I06",
+      "type": "VERIFIED_IN_SCOPE",
+      "severity": "INFO",
+      "evidence_status": "STATIC_STATISTICAL_INTERFACE_CHECKED",
+      "title": "实际域配对bootstrap、O/F共同门、取得分解与点保护接线吻合冻结合同",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five_evaluate.py",
+          "lines": "20-23,46-59,167-221,224-304"
+        },
+        {
+          "file": "scripts/step28_continual_population_evaluate.py",
+          "lines": "21-26,225-228"
+        },
+        {
+          "file": "scripts/step28_balanced_pooling_run.py",
+          "lines": "595-614,648-655"
+        },
+        {
+          "file": "tests/test_step28_continual_five.py",
+          "lines": "278-298,340-410"
+        }
+      ],
+      "impact": "11520前向、22指标与查询/N/A、raw/stage/first、5000次同域共享抽样、唯一H−S rawMAP主门静态相容。除I01持久化问题，未发现另一个必然失败。",
+      "minimum_disposition": "正式报告保留O=A_acq−F、单run同转换SEQ D/G、N/Z点保护非统计非劣、其他六比较探索性及损失方向。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false,
+      "bootstrap_executed_by_reviewer": false
+    },
+    {
+      "id": "I07",
+      "type": "UNVERIFIED_LIMITATION",
+      "severity": "INFO",
+      "evidence_status": "FULL_CAMPAIGN_RUNTIME_NOT_MEASURED",
+      "title": "444.595h及约7天仅条件投影，不能保证45条全成",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_implementation/resource_projection.json",
+          "lines": "5-44"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt",
+          "lines": "19-26"
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "24-75,158-244,247-305"
+        }
+      ],
+      "impact": "算术符合现有字段，450h余5.405h；全批持续吞吐、未来实时资源、整批小证据体积尚未成为实测事实。不能用预算除以三当工期或按成功子集完成原确认。",
+      "minimum_disposition": "继续使用已有全pending投影、450h硬池、实际资源开工/补位门及失败停止；不足时报告由用户/主执行者决定。不要为消除所有不确定性再跑整批资格。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false,
+      "uncertainty_is_not_proven_defect": true,
+      "requires_additional_qualification": false
+    },
+    {
+      "id": "I08",
+      "type": "EVIDENCE_SCOPE",
+      "severity": "INFO",
+      "evidence_status": "SUPPLIED_QUALIFICATION_WITH_FAILURE_HISTORY",
+      "title": "CPU与native证据分层；GPU修复明确免外审",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_implementation/gpu_review_waiver.json",
+          "lines": "1-10"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt",
+          "lines": "5-17,22-26"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/accounting.json",
+          "lines": "1-24"
+        },
+        {
+          "file": "tests/test_step28_continual_five.py",
+          "lines": "26-37,54-121,340-410"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/cpu03/result.json",
+          "json_pointer": "/status"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/cpu06/result.json",
+          "json_pointer": "/status"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/qualification/cpu07/confirmation_adapter.json",
+          "json_pointer": "/"
+        }
+      ],
+      "impact": "CPU63s、native782.909949786s及16尝试15完成为包内既存登记；CPU03/04/06总体失败保留。CPU07两代表560前向/6恢复不是正式确认或GPU证明。",
+      "minimum_disposition": "复用有效分项并保留版本与替身范围；native仅作本地主执行者处置背景，不要求重送GPU修复、不宣布网页GPU通过。正式门承接已耗资格及保守C补记。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false,
+      "waived_GPU_repair_review": false
+    },
+    {
+      "id": "I09",
+      "type": "REASONABLE_FOLLOWUP",
+      "severity": "INFO",
+      "evidence_status": "WITHIN_ALREADY_AUTHORIZED_REPORTING",
+      "title": "既定正式执行时保留完整受限解释及失败台账",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_implementation/execution.zh.txt",
+          "lines": "9,17"
+        },
+        {
+          "file": "scripts/step28_continual_five_evaluate.py",
+          "lines": "272-304"
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "lines": "57-67,293-309"
+        }
+      ],
+      "impact": "主要门失败不能由探索性成功替代；损失指标字面取得减最终为正不能误称遗忘。失败或不完整批次不能删去再宣传45条完成。",
+      "minimum_disposition": "按现有冻结输出报告单run、绝对水平/取得分解、固定系统/三循环三seed/同生成器条件性；这不是新增实验或额外开放许可。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": true,
+      "confirmed_problem": false
+    },
+    {
+      "id": "I10",
+      "type": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "evidence_status": "REJECTED_AS_UNSUPPORTED_SCOPE_EXPANSION",
+      "title": "无具体缺口支持追加方法/HPO/顺序/数据/资格网格/通用框架",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261023/continual_implementation/authorization.json",
+          "lines": "1-17"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/review/request.zh.txt",
+          "lines": "1-20"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/gpu_review_waiver.json",
+          "lines": "1-10"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "lines": "25-37"
+        }
+      ],
+      "impact": "这些扩展会超出已批准固定五系统问题，不能作为本次修复或正式开工必需项。旧六臂783.5h/旧三臂297.5h不是当前预算。",
+      "minimum_disposition": "不要求S_pos/H/R0、全部六顺序、新seed/HPO、全epoch/初始评分、全三元组资格、DDP、全仓/历史重跑、通用安全平台或花满36调用上限。",
+      "blocks_current_complete_pipeline": false,
+      "blocks_scientific_design": false,
+      "requires_new_research": false,
+      "requires_GPU_re_review": false,
+      "primary_executor_disposition_required": false,
+      "confirmed_problem": false
+    }
+  ]
+}

@@ -19,6 +19,7 @@ import step28_continual_five_run as run
 data = m.data
 LIMITS = dict(training=1620000., confirmation=129600., cpu=1200., native=5400.,
               generation=600., control=1800., evaluation=3600., analysis=1800.)
+CONTROL_TAIL_PROVISION = 30.  # Within C: last ledger write and finite outer setup/exit.
 
 
 class Ledger:
@@ -28,6 +29,7 @@ class Ledger:
         self.used = {k: 0. for k in LIMITS}
         self.active, self.completed = {}, []
         self.failed = False
+        self.control_write_carry = 0.
 
     def save(self) -> None:
         if self.path:
@@ -67,10 +69,18 @@ class Ledger:
         return row
 
     def charge(self, bucket: str, actual: float) -> None:
+        started = self.clock()
+        if bucket == "control":
+            actual += self.control_write_carry
+            self.control_write_carry = 0.
         self.used[bucket] += actual
         over = self.available(bucket) < 0
         self.failed |= over
-        self.save()
+        try:
+            self.save()
+        finally:
+            if bucket == "control":
+                self.control_write_carry += self.clock()-started
         if over:
             raise RuntimeError("Cumulative bucket exceeded")
 
@@ -269,10 +279,11 @@ def execute(campaign: Path, gate_path: Path) -> dict:
         raise ValueError("Fresh approved complete campaign required")
     preflight = resource_admission(gate, 0, campaign.parent, startup=True)
     campaign.mkdir(parents=True)
-    data.write_json(campaign/"preflight.json", preflight)
+    data.write_json(campaign/"preflight.json", {**preflight,
+                    "control_tail_provision_seconds": CONTROL_TAIL_PROVISION})
     ledger = Ledger(campaign/"budget.json")
     ledger.used.update(gate["prior_charged_seconds"])
-    ledger.charge("control", time.monotonic()-CONTROLLER_STARTED)
+    ledger.charge("control", time.monotonic()-CONTROLLER_STARTED+CONTROL_TAIL_PROVISION)
     ledger.save()
     queue = [dict(id=s.run_id, spec=s.identity(), allowance=gate["per_run_allowance_seconds"][s.name],
                   projected_seconds=gate["per_run_projected_seconds"][s.name]) for s in m.specifications()]

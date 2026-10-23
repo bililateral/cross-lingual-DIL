@@ -1731,3 +1731,5 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 用户询问“什么时候开始正式训练啊，三路并行吧”。保持此前五方法/零HPO/45路径/三路/490h授权；主执行者说明三路资格和预算投影已形成，新增实现审查尚待完成，满足前提后直接启动，不再重复询问训练许可。
 
 具体836755字节、SHA256 6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63实现ZIP初次上传被自动审批因缺少具体载荷/目的地授权拒绝。用户随后对该完整包明确答复“批准该完整包上传并外审”，见[具体授权](../reports/documentation/20261023/continual_implementation/review/authorization.json)。15:49经本地Playwright在原会话成功单次提交，见[回执](../reports/documentation/20261023/continual_implementation/review/submission.json)。GPU修复继续免审，本次审查新增方法/第三阶段/预算控制/确认统计实现，不扩大研究范围或预算。
+
+用户随后询问：“外审结束后你审核完毕就能正式启动训练了吧”。按已有完整训练授权，外审回收、独立处置及必要修复/资源/预算前提满足后直接启动，不再重复申请相同许可。完整报告回收后修复I01—I03，CPU增量三项/5秒通过；2026-10-23 16:26:59正式三路启动，16:28:19确认三个独立worker均实际更新。没有增加方法、HPO、数据、顺序、seed或预算；原GPU问题修复豁免不扩大为结果免审。见[独立主审](../reports/documentation/20261023/continual_implementation/review/primary_disposition.zh.txt)及[当前实际状态](AI_RESEARCH_HANDOFF.zh.md#当前工作)。

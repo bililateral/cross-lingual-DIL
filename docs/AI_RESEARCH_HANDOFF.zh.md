@@ -2,6 +2,10 @@
 
 ## 当前工作
 
+五方法正式训练已启动（2026-10-23 16:26:59，Asia/Shanghai）：实现外审完整回收，I01评价文件重名、I02控制落盘计时、I03小证据2GiB限制经[独立主审](../reports/documentation/20261023/continual_implementation/review/primary_disposition.zh.txt)最小修复；cpu08三项通过，CPU累计68秒，native782.909949786秒及失败账保留。16:26:15实查61项当前来源、完整45预算、单5090空闲31896MiB、RAM可用242.73GiB/disk476.64GiB、无旧作业后，按已有授权签发[正式门](../reports/documentation/20261023/continual_implementation/formal_gate.json)，直接三路启动，无重复批准。实际campaign为`/home/yongpeng/cross-lingual/reports/documentation/20261023/continual_implementation/formal_20261023`，workspace仍为同目录下workspace。wrapper PID245792、controller PID245796；首批ABC_s4的SEQ/ER/LOGIT worker分别245806/245811/245816，CPU核0/1/2。16:28:19[现场回执](../reports/documentation/20261023/continual_implementation/formal_observation.json)确认三路均已完成真实optimizer更新、无失败，GPU利用率89%/空闲12474MiB；不是只启动进程。每条完成后按冻结队列补位，最终五方法×三顺序×三seed=45，不加HPO。禁止重复启动或修改冻结workspace来源，正式失败保留并停派，无自动重试。
+
+工期与后续：当前45条训练保守投影444.595累计任务小时，450h池余5.405h；固定三槽墙钟约151.80h，条件训练完成时点约10月30日00:15，新确认及分析后整批约10月30日白天至晚间，总计约7天，当前尚余约7天。490h仍为累计分桶硬限，不是墙钟工期；实际变慢/资源不足不承诺全45完成，不能改臂或借预算。全部45盲完成后才联合开旧dev、再按冻结方案生成/确认/分析；目前确认生成和评价标签开放均0。实现外审专用页已关闭，一次性“回收实现外审并启动三路主线”跟进automation已删除，不影响automation-2；实际Linux控制器持续运行，不新建监听。完整外审原文、主审、资格和启动证据两端保管，当前来源已冻结；下面未启动/待外审文字均为更早时点历史。
+
 接手只读复核（2026-10-23 16:00—16:06，Asia/Shanghai）：本轮按用户要求梳理项目历史、科研纪律与各实验前提；已核对本地科研分支及原有暂存／未暂存改动，不接管或覆盖它们。Linux既定五方法workspace的61项实际来源全部与current_sources.json大小／SHA一致；未发现该实验或Optuna的活动训练／控制进程，五方法正式门及正式完成／访问账尚不存在。GPU当时为RTX5090、32607MiB总／31896MiB空闲、0%利用率且无CUDA计算进程，主存可用261200945152字节、磁盘可用511801655296字节；这只证明该观测时点，不是资源预留。Optuna现场完成状态仍为COMPLETE_36_SEARCH_9_REPLICATIONS_AND_ANALYSIS，访问46/37/0/0，当前campaign的.pt载荷为0。五份可变总文档在本次维护前两端同字节。
 
 实现外审的当前可核实边界：保存的submission.json记录15:49已提交并生成中；本轮本地Playwright返回浏览器配置目录被占用，未取得页面实时状态，不能将保存状态冒称16时实时生成中或已完成。未关闭占用进程、改用CUA、重复上传／提交或签发正式门。先恢复原会话的可读访问、完整回收本次实现报告并独立处置；原训练授权持续有效，具备全部前提后按原三路范围执行，不重问已经批准的五方法和490小时。下方方案审查时的“待批准／未实施”均是早于本段及最新授权的历史事实。

@@ -53,10 +53,11 @@ def metric_set(root: Path, labels: np.ndarray, logits: np.ndarray) -> dict:
     matrix[undefined_metrics(counts)] = np.nan
     nullable = matrix.astype(object)
     nullable[np.isnan(matrix)] = None
-    data.write_json(root.with_suffix(".json"), dict(columns=list(m.parent.metrics.COLUMNS),
+    json_path, npy_path = root.parent/(root.name+".json"), root.parent/(root.name+".npy")
+    data.write_json(json_path, dict(columns=list(m.parent.metrics.COLUMNS),
         values=nullable.tolist(), counts=counts, na_reason="Undefined precision/MCC denominator; never zero-fill"))
-    query_rec = run.save_array(root.with_suffix(".npy"), queries, root.parent)
-    return dict(matrix=data.record(root.with_suffix(".json"), root.parent), queries=query_rec)
+    query_rec = run.save_array(npy_path, queries, root.parent)
+    return dict(matrix=data.record(json_path, root.parent), queries=query_rec)
 
 
 def old_dev(campaign: Path, job: Path, records: list, budget: run.Budget) -> None:
