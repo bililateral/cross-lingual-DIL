@@ -8,6 +8,21 @@
 
 2026-10-08大清理按用户要求未另建删除文件清单或逐项回执。Windows冗余历史大载荷仅在Linux原件逐项大小／SHA一致后移除，恢复仍以Linux项目内原相对路径为准；Linux独有科研来源、正式结果和明确保留模型继续保管。Git采用普通删除提交，历史提交保留。旧清单仅证明记录时点的保管事实，不能替代当前实物核对；本次保管位置的变化见下节。
 
+## 2026-10-23 Optuna训练权重清理
+
+用户明确要求同步最新进展并删除Linux遗留Optuna训练权重，覆盖此前仅针对这些权重的暂存安排。2026-10-23 11:15:09（Asia/Shanghai）已删除19个普通文件，共24783347439字节（23.08GiB）；11:15:12完成删除后复核。两端同路径保管[逐文件删除回执](../reports/maintenance/20261023/optuna_weights/receipt.json)，每项保留原路径、大小、SHA、属主与文件身份及删除结果，目标残留0。
+
+| 删除范围（相对Linux项目根） | 文件数 | 字节数 |
+|---|---:|---:|
+| `reports/documentation/20261021/optuna_reboot/workspace/reports/job/replication_*/run/models/`内九复验A/B端点 | 18 | 23478977354 |
+| `reports/documentation/20261019/optuna_recovery/resume_workspace/reports/job/search_08_S_s0/run/models/A_S.pt`，重启前中断遗留 | 1 | 1304370085 |
+
+删除前核对完成状态、当前54份来源、访问账train46/valid37/heldout0/owners0及失败记录；没有相关训练进程，未见可访问描述符打开目标。全部目标属本账号、普通文件且单硬链接，最终路径位于确认的Optuna目录；系统SSH/PAM/FUSE/SFTP辅助进程部分描述符不可读的限制已记录。两次机械预检在任何删除前停止，修正路径排序核对及识别当前SFTP辅助进程后才执行，不计为新的科研尝试。
+
+核对覆盖10月18日implementation、10月19日budget/recovery及10月21日reboot四个Optuna目录：13702个非权重普通文件（434350451字节）和33个符号链接前后身份完全一致。147个Memory载荷（50587385字节）全部保留，其中当前完整campaign的90个为30883495字节；原配置／源码快照、SQLite、完成／失败／费用与访问账、预测／指标／诊断、日志和审查材料保留。未加载或下载权重／Memory，未删除预训练或其他实验模型。权重已无可恢复载荷，哈希仅证明删除前身份；今后训练或载模需求不能据本回执自动重训，也不能把旧A→B权重当作可续C的现存起点。
+
+本轮同时核对最新外审结案记录，更新并SFTP同步五份可变总文档：交接、讨论、存储、计划和设计入口。同步前实际比较两端差异，Linux仍为旧进度，未发现远端独有新决定；同步后核对字节数／SHA一致。冻结workspace不覆盖；审查返回原件及主审仍按下节Windows保管位置查阅，不声称全部结果目录已同步Linux。删除回执与文档作范围明确的本地提交，既有未提交成果不纳入，未推送新材料。本次局部权重清理不改变最近大清理2026-10-22和下次到期2026-11-06。
+
 ## 2026-10-23 Optuna完整结果回传与独立分析
 
 原执行workspace为`/home/yongpeng/cross-lingual/reports/documentation/20261021/optuna_reboot/workspace`，正式job及其历史来源保持。09:58:42正常完成，退出及最终stdout费用已回收；本轮成果统一在Windows `reports/seller_alias_continual/20261023/optuna_result`，Linux同相对目录保留分析和回传清单，正式载荷仍以原workspace为原件。完整7639小证据215787086字节及10分析文件3057672字节，经SCP回传全部大小/SHA一致，见[接收核验](../reports/seller_alias_continual/20261023/optuna_result/receive_verification.json)。来源快照2399项和45轨迹/90端点/540捕获核对一致；36,090字段既有分析及179,478标量增量核对完成，详见[报告](../reports/seller_alias_continual/20261023/optuna_result/report.zh.md)。首次SCP认证前连接关闭后重传成功，无新增科研失败。
@@ -16,7 +31,7 @@
 
 随后用户明确批准`review/optuna_result_review.zip`上传至chatgpt.com，10:40:04经本地Playwright单次提交；具体包103538522字节、7679成员，SHA256及会话身份见[提交回执](../reports/seller_alias_continual/20261023/optuna_result/review/submission.json)。输入ZIP、request、input_manifest、准备／许可记录及已发送页面证据留在Windows同一review目录，提交时为待回收状态；本轮已回收结案，见下文。已发送包内报告的“尚未送审”等文字保留形成时原貌，当前状态从[交接](AI_RESEARCH_HANDOFF.zh.md)进入，不重打包覆盖已发送原件。随后11:01:55实查最终外审完成，完整回收1256622字节返回ZIP和external/55文件（11321058字节），SHA256 7a0b57de2c24768b6ef9c34318d4b07bb691a269c713947a114fbd1c1e07f9c0，54内部载荷核对一致。完整报告、14项发现、阅读范围、复算代码及证据均保管；[独立主审及勘误](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)完成，专用页已关闭，当前状态由submission.json承接。输入／返回ZIP按既有Optuna保留决定及本次用户查阅需要继续保管，本轮不作实验文件清理；仅处理本次下载新增的浏览器重复临时副本。不把已删除运输ZIP与保留的审查ZIP混淆。
 
-本次文档补齐只维护Windows四份现有总文档，不声称Linux项目根docs已同步到本次内容。实验权重、Memory、旧中断目录的保管事实引用完成回执，本轮没有重新连接Linux或新增删除。10月22日“明天处理Optuna”是后续安排，不能以已到10月23日自动执行清理；本次未改变最近大清理日期或11月6日到期日。
+此前文档补齐只维护Windows四份现有总文档，当时没有同步Linux项目根docs、重新连接Linux或新增删除。上文权重及旧中断目录的保管事实是完成时点记录；后续用户明确授权的19权重删除及五份总文档同步见本页上一节，Memory继续保留。10月22日“明天处理Optuna”本身不是删除许可，实际清理依据10月23日新的明确要求；大清理周期保持。
 
 ## 2026-10-22 两端项目大清理提前完成
 
