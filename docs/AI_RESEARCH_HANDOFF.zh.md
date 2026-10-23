@@ -2,6 +2,10 @@
 
 ## 当前工作
 
+外审回收跟进：为完成用户“审完取回来仔细审查并汇报”的明确要求，已建立本线程跟进`回收持续学习主线方案外审`（automationId=`automation`，每10分钟）。只检查下述唯一在审会话；未完则结束该次检查，完毕后完整回收、独立判断过度设计／必要实验／精简方案并向用户汇报，然后删除本次跟进。当前没有实施许可，不重复送审。主执行者已完成独立预核：S_pos／ER的完整确认必要性与每条18次epoch诊断的成本应分别论证，不能把所有历史消融或诊断自动变成主线前提；最终处置等外审完整返回后形成。
+
+最新外审进展（2026-10-23 12:04:45，Asia/Shanghai）：用户已明确批准具体`continual_mainline_plan_review.zip`上传chatgpt.com并要求重点审查过度设计／必要实验，审完回收、独立审查汇报，用户确认后才实施。[授权](../reports/documentation/20261023/continual_mainline/review/authorization.json)已记录；原包233582字节/SHA不变，经本地Playwright单次成功提交至[审查持续学习方案](https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a)，可见GPT-6／Pro、网页正在回应，当前待回收。完整[实际请求](../reports/documentation/20261023/continual_mainline/review/submitted_request.zh.txt)明确六臂／90轨迹／783.5小时均须接受删减与必要性审查，不默认批准。当前[提交回执](../reports/documentation/20261023/continual_mainline/review/submission.json)保留此前自动审批拒绝的历史；它已由本次明确授权解除，不再作为当前阻断。未实施、未批准预算、未连接Linux或生成数据；不重复提交／新建审查。外审完成后取回全报告及附件、独立处置，再向用户报告。
+
 送审实际阻断（2026-10-23 11:59，Asia/Shanghai）：主执行者在用户质疑后尝试按本轮送审意图继续，通过本地Playwright核对可见GPT-6／Pro并选择具体方案ZIP，但`browser_file_upload`被自动审批拒绝，理由是新包包含私有方案／证据／源码而缺少该新包向chatgpt.com的具体外发授权，旧Optuna包许可不覆盖。**文件未上传、请求未发送、无外审会话或在审任务**；文件选择已取消、专用页已关闭，未换工具绕过。详见[阻断回执](../reports/documentation/20261023/continual_mainline/review/submission.json)。此前“可以直接继续送审”的表述已纠正；方案／预算仍待审、未实施。待明确新包外发授权后再按同一冻结包提交，不把授权扩大到训练／数据生成／预算。
 
 最新主线方案（2026-10-23，待用户确认）：按用户要求已完成[持续学习主线重整具体提案](../reports/documentation/20261023/continual_mainline/proposal.zh.txt)及[分桶预算](../reports/documentation/20261023/continual_mainline/budget.json)。拟六方法、ABC/BCA/CAB、未运行s4/s5/s6，共54完整三阶段轨迹；另给SEQ/ER0.1/LOGIT0.1各12次同两维AB选参，已有S/S_pos/H_pos参数冻结；新三域120群只在方法及全部轨迹冻结后一次确认。拟总硬限783.5小时、规划耗时220—300小时，均非已有运行授权或新实测。H_pos−S以O改善和F减少为共同主终点，N/Z点保护不冒称统计非劣；三循环顺序、同生成器新测试群及有限seed的外推边界明确。具体送审材料已准备，先汇报并确认后通过本地Playwright交GPT 6 Pro方案外审，再独立处置并按确认范围实施；本轮只Windows文档／已开放字段机械核对，没有Linux连接、训练、生成数据、重采样、结果新开放或新上传。旧权重已删，不能直接续C。详细用户原话见[本次讨论](RESEARCH_DISCUSSION.zh.md#2026-10-23-重整持续学习主线并形成待审方案)。
