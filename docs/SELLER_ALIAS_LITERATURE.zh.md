@@ -183,3 +183,19 @@ L²R把每个训练查询的旧负例记忆用于后续文本排序，与“留�
 另外复核了ICICS 2023的Springer摘要、参考文献及OpenReview书目；后者为书目入口，未获得全文，不冒称已读方法。其图结构和图片依赖未解决，因此没有拿它与2024同团队论文直接拼成两个已经独立核实的文本方法。扩展的取证路线中，Single-Vendor Marketplaces相似度论文主要使用网页结构／元数据，Busting up Monopoly涉及市场监测及加密货币关联，Pathway toward the Surface Web涉及追踪代码／站点连接；均未据此补足商品文本账号关联名额。
 
 本轮只检索公开论文、核对书目与方法正文并更新本记录；未发送作者邮件、读取项目实验数据、连接Linux、实现或运行新的比较方法。已获全文的候选可进入后续复现可行性核查，但不把候选数量写成已完成比较数量。
+
+## 10. 2026-10-23：持续检索目标与作者、犯罪学及2026年来源补查
+
+用户明确要求设定goal，在VendorLink之外补齐另外两个2022—2026年、CCF A/B或知名刊会的商品标题／描述卖家账号关联方法。目标已建立并保持进行中；检索渠道不限，年份、输入、任务和刊会条件不因此放宽。第9节的“候选”是相关文献线索，不代表名额已补齐：**DarkBIP-FW仅作相关参考，不计入；Applied Sciences 2024度量学习方法的刊会资格与纯文本适配证据仍不足，也不计入。当前已确认清单仍为VendorLink一项，另外两项空缺。**数据库收录、影响因子或出版社品牌不能单独证明符合用户所说的知名刊会。
+
+本次补查所得的一手证据与限定结论如下：
+
+| 来源 | 核查所得 | 对名额的影响 |
+| --- | --- | --- |
+| Saxena博士论文[Connecting online criminal behavior with machine learning](https://arxiv.org/abs/2605.04080) | 已取得公开全文，核对出版物清单与章节对应关系；暗网商品方法为VendorLink，另有IDTraffickers、MATCHED及伦理准则。MATCHED的正式来源为[Findings of ACL 2025，4334—4373](https://aclanthology.org/2025.findings-acl.225/)，不因学位论文中笼统的main-track表述改写正式书目。 | 学位论文中的VendorLink不另计一个方法；IDTraffickers、MATCHED围绕陪侍广告，虽含身份识别／验证及文本基线，但不能充作两项已在商品卖家账号任务核实的方法。 |
+| [The Network of Online Stolen Data Markets: How Vendor Flows Connect Digital Marketplaces](https://academic.oup.com/bjc/article/62/6/1518/6503727)，British Journal of Criminology，2022，62(6):1518—1536 | 出版社正文“Digital trace data on the darkweb”明确以卖家别名完全匹配确认同一卖家，再构造市场迁移网络；同时承认换名和冒名的局限。另定位到[CrimRxiv存档](https://www.crimrxiv.com/pub/orvi17zc/release/1)，其下载访问未成功，未冒称已下载该存档全文。 | 不是以商品文字识别不同卖家账号的算法，不计入。 |
+| [Stayin’ Alive: How Global Stolen Data Markets Thrive on Telegram](https://www.usenix.org/conference/usenixsecurity26/presentation/marjanov)，USENIX Security 2026，5473—5492 | 已查看[作者机构公开PDF](https://www.andrew.cmu.edu/user/nicolasc/publications/Marjanov-USENIXSec26.pdf)的研究问题与方法范围：盗售数据类型分类、渠道发现、语言／地区与频道存续分析。 | 刊会与年份符合，但没有所需商品文本卖家账号配对任务，不计入。 |
+| TrustCom 2025作者公开资料 | 复核[作者实验室项目页](https://www.cpp.edu/calsys/projects.shtml)、[研究人员页](https://www.cpp.edu/calsys/researchers.shtml)及[DMDb公开说明](https://www.cpp.edu/calsys/database.shtml)。项目页确有Vendor Alias Attribution，但没有补足架构、训练目标和账号打分细节；已核实实验室GitHub组织当前没有公开仓库。IEEE公开PDF入口也未取得全文。 | 保留为直接相关待核实线索；未把项目简介当作代码或方法全文，也未申请数据库、联系作者或冒用机构访问。其Oracle属于评价信号的边界仍按第9节。 |
+| [NLP-based techniques for Cyber Threat Intelligence](https://doi.org/10.1016/j.cosrev.2025.100765)，Computer Science Review 58 (2025):100765 | 已取得[作者机构49页公开全文](https://iris.uniupo.it/retrieve/ee584c74-d1f4-4602-9d83-a7df99b9e55f/15%29CosRev_NLP.pdf)，定向核查暗网商品、身份及关联段落。涉及5个市场、7911卖家的文献[130]实际为2019年《Dark-net ecosystem cyber-threat intelligence (CTI) tool》，不能依据综述年份把它算作2025年新方法。 | 作为追索来源，综述本身及该2019年工作均不计入。 |
+
+本次还扩展检索了seller entity resolution、seller account linkage、vendor attribution及中文商家／卖家身份关联等表述；返回的商品匹配、销售预测、论坛作者归属与身份标识符聚类均未据此补位。宽检索的部分接口输出存在截断和无关结果，不声称已逐篇穷尽筛查，更不将“尚未找到”写成“相关论文不存在”。后续继续追查直接方法的公开全文、官方实现和近期引用；只有补足输入、训练、账号表示与打分及刊会证据，才改变名额状态。本节仅更新公开文献核查记录，不产生新实验或改变既有研究合同。
