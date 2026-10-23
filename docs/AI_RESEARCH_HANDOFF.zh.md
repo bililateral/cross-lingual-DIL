@@ -2,6 +2,8 @@
 
 ## 当前工作
 
+送审实际阻断（2026-10-23 11:59，Asia/Shanghai）：主执行者在用户质疑后尝试按本轮送审意图继续，通过本地Playwright核对可见GPT-6／Pro并选择具体方案ZIP，但`browser_file_upload`被自动审批拒绝，理由是新包包含私有方案／证据／源码而缺少该新包向chatgpt.com的具体外发授权，旧Optuna包许可不覆盖。**文件未上传、请求未发送、无外审会话或在审任务**；文件选择已取消、专用页已关闭，未换工具绕过。详见[阻断回执](../reports/documentation/20261023/continual_mainline/review/submission.json)。此前“可以直接继续送审”的表述已纠正；方案／预算仍待审、未实施。待明确新包外发授权后再按同一冻结包提交，不把授权扩大到训练／数据生成／预算。
+
 最新主线方案（2026-10-23，待用户确认）：按用户要求已完成[持续学习主线重整具体提案](../reports/documentation/20261023/continual_mainline/proposal.zh.txt)及[分桶预算](../reports/documentation/20261023/continual_mainline/budget.json)。拟六方法、ABC/BCA/CAB、未运行s4/s5/s6，共54完整三阶段轨迹；另给SEQ/ER0.1/LOGIT0.1各12次同两维AB选参，已有S/S_pos/H_pos参数冻结；新三域120群只在方法及全部轨迹冻结后一次确认。拟总硬限783.5小时、规划耗时220—300小时，均非已有运行授权或新实测。H_pos−S以O改善和F减少为共同主终点，N/Z点保护不冒称统计非劣；三循环顺序、同生成器新测试群及有限seed的外推边界明确。具体送审材料已准备，先汇报并确认后通过本地Playwright交GPT 6 Pro方案外审，再独立处置并按确认范围实施；本轮只Windows文档／已开放字段机械核对，没有Linux连接、训练、生成数据、重采样、结果新开放或新上传。旧权重已删，不能直接续C。详细用户原话见[本次讨论](RESEARCH_DISCUSSION.zh.md#2026-10-23-重整持续学习主线并形成待审方案)。
 
 本节是唯一当前执行入口；Optuna已于2026-10-23 09:58:42（Asia/Shanghai）完整完成，36搜索+9复验、集中评价和独立分析已结束。10:40:04经本地Playwright单次提交的GPT 6 Pro结果外审现已完整回收并经[独立主审处置](../reports/seller_alias_continual/20261023/optuna_result/review/primary_disposition.zh.txt)结案：11:01:55实查最终报告生成完毕，55文件返回包及54内部载荷大小/SHA一致，14项意见均已处置，无新增运行／评价有效性阻断；两候选六格门失败保持。完整[外审原文](../reports/seller_alias_continual/20261023/optuna_result/review/external/review_report.zh.txt)、[机械核对](../reports/seller_alias_continual/20261023/optuna_result/review/primary_verification.json)和[提交／关闭回执](../reports/seller_alias_continual/20261023/optuna_result/review/submission.json)已保存，专用页已关闭。原报告／请求及送审包冻结保留；累计秒数末位与概率区间计数的两处文字勘误见主审附注，科学结论不变。当前转入下一阶段具体方案的讨论，不新增训练／留出开放／调参；用户随后明确授权的Optuna权重清理已完成，见下一段。下方旧停止／待授权按历史时点解释，不覆盖最新决定。
