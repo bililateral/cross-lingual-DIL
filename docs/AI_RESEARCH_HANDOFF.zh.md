@@ -2,6 +2,8 @@
 
 ## 当前工作
 
+并行调度补充（2026-10-23 12:16）：用户指出54独立轨迹不应默认串行。已形成[并行补充](../reports/documentation/20261023/continual_mainline/parallel_addendum.zh.txt)：不同方法／顺序／seed可并行，同轨迹三阶段须顺序；若保留Optuna，跨study可并行，同study保持原反馈次序。累计进程小时与墙钟／GPU占用分开，不承诺同卡多进程线性加速；原控制器与共享账仍为串行实现，须最小适配后才可运行。12:16:11已在同一在审会话单次发送[并行审查补充](../reports/documentation/20261023/continual_mainline/review/parallel_supplement.zh.txt)，原ZIP不变。回收须包含完整主报告及此补充，不能只取其中之一；当前仍待审、未实施。硬件实时资源未核实，不据历史显存记录宣称现有多卡。
+
 外审回收跟进：为完成用户“审完取回来仔细审查并汇报”的明确要求，已建立本线程跟进`回收持续学习主线方案外审`（automationId=`automation`，每10分钟）。只检查下述唯一在审会话；未完则结束该次检查，完毕后完整回收、独立判断过度设计／必要实验／精简方案并向用户汇报，然后删除本次跟进。当前没有实施许可，不重复送审。主执行者已完成独立预核：S_pos／ER的完整确认必要性与每条18次epoch诊断的成本应分别论证，不能把所有历史消融或诊断自动变成主线前提；最终处置等外审完整返回后形成。
 
 最新外审进展（2026-10-23 12:04:45，Asia/Shanghai）：用户已明确批准具体`continual_mainline_plan_review.zip`上传chatgpt.com并要求重点审查过度设计／必要实验，审完回收、独立审查汇报，用户确认后才实施。[授权](../reports/documentation/20261023/continual_mainline/review/authorization.json)已记录；原包233582字节/SHA不变，经本地Playwright单次成功提交至[审查持续学习方案](https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a)，可见GPT-6／Pro、网页正在回应，当前待回收。完整[实际请求](../reports/documentation/20261023/continual_mainline/review/submitted_request.zh.txt)明确六臂／90轨迹／783.5小时均须接受删减与必要性审查，不默认批准。当前[提交回执](../reports/documentation/20261023/continual_mainline/review/submission.json)保留此前自动审批拒绝的历史；它已由本次明确授权解除，不再作为当前阻断。未实施、未批准预算、未连接Linux或生成数据；不重复提交／新建审查。外审完成后取回全报告及附件、独立处置，再向用户报告。
