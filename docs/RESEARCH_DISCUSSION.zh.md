@@ -1,4 +1,12 @@
 # 训练期间的科研流程与需求讨论
+## 2026-10-24 接手核对、历史边界与恢复现场补齐
+
+用户要求仔细接手项目，详细汇报历史、主线、实验前提与科研讨论，重点掌握过度设计、伪实现、规则理由及适用场景。本轮按现行入口读取纪律／交接／合同索引，追溯早期数据与迁移、LaBSE及BGE、ER／LOGIT、关系／函数记忆、C/S归因、C_cf／C_q、S/G/F／H／H_cons、逐正例及Optuna、当前45条与两新对照的相关合同／结果／讨论；直接阅读当前恢复的合并外审、修订外审及主审，并静态追踪五方法更新／第三阶段／恢复和新适配器的实际调用。不声称逐一重审全部历史源码／原始外审，亦未重新计算科研结果。
+
+20:14—20:23通过既定SSH只读核对资源、进程及允许的运行元数据，未载模、读取Memory正文、正式监督或未开放效果。61份原冻结来源、恢复4份来源、授权及CPU回执均匹配。既有监听610563于20:14:47自动启动恢复控制器628701；恢复入口已盲核对24条成功载荷并接续原费用。随后其他用户作业占用显存，控制器等待单槽10GiB；20:23现场活跃worker=0、空闲349MiB、21条新尝试未开始、无新failure，launcher仍待真实更新后自删。六份必要现场回执已SFTP回传并核对大小／SHA，见[接手证据](../reports/documentation/20261024/continual_recovery/qualification/takeover/observation.json)。没有重复启动、干预他人作业、改变冻结来源、增加运行或创建自动化。原waiter_status的READY仅为首次准入时点，不能覆盖恢复控制器的后续补槽状态。
+
+本轮只补正现有交接顶部与设计入口，明确两新方法有限原生资格已由更晚的合并外审结案，保留15:41等历史段落。正式18条、新确认及独立预算仍未授权；原生资格不是效果或稳定共存证明。密码仅作SSH／SFTP认证，不入项目材料。未修改常设纪律、冻结合同、原验收、失败账或科研代码；保留原有删除及未提交成果，本轮仅本地Git，不扩大历史push许可。
+
 ## 2026-10-24 外审回收、补槽规则收窄及等待包装修复
 
 本轮后续结案：修订完整外审关闭C-R01、C-R02、C2及单槽补任务，无新前置修改；主执行者逐项对照代码／CPU原件独立同意，不新增测试。经Linux核对四项修订来源、当前授权、CPU02和原61冻结文件后，已发布review_ready，唯一等待610563获准按既有范围自动恢复，无须用户再批准。资源曾短时达到31.10GiB／无CUDA，但放行时已被其他作业占用，最新状态为约4.54GiB、review_ready=true而resource_ready=false，正式恢复未开始。完整[修订报告](../reports/documentation/20261024/continual_recovery/review/refill_revision/report.zh.txt)、[主审](../reports/documentation/20261024/continual_recovery/review/refill_revision/primary_disposition.zh.txt)和[放行原件](../reports/documentation/20261024/continual_recovery/review_release.json)已保管；下方“正在回应”是提交时点历史。
