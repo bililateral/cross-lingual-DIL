@@ -2,6 +2,8 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
+修订外审于13:29起完整回收，保留[第二次回复DOM／公式](../reports/documentation/20261024/continual_comparison/review/revision_external_review.json)、[完整转录](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)、[独立处置及最终补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)和[回收记录](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)。复审仅引用同名校准脚本，预览关键片段与原本地代码一致；未当作新补丁或下载重复源码，未声称完整附件字节身份已核验。原方案、首次补充及修订提交回执冻结，实际大小／SHA核对留回收记录。无新ZIP、模型／Memory操作或Linux副本；专用页关闭以实际回执为准。新材料只本地Git；局部外审收尾不重置大清理周期。
+
 13:16用户明确要求修订版也外审，已用[修订正文](../reports/documentation/20261024/continual_comparison/review/revision_request.zh.txt)向原会话单次发送定向复核，复用网页已有原附件，未重新打包／上传。正文、来源SHA及[新提交回执](../reports/documentation/20261024/continual_comparison/review/revision_submission.json)留Windows；修订在审，原会话已重新打开保留。此前输入ZIP清理和首轮关闭仍为实际发生历史，不重建冗余包；公开原文、原16载荷及完整首轮审查均保管。
 
 新[设计](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)拟复用formal_20261023中S_tuned/H_pos_tuned各9条轨迹、每条3阶段，共54推理端点及其匹配校准/来源。该批状态在本次对比方案待决期间具有后续依赖，不能只因原批确认结束便按“无用途”清理；尚未形成的状态不记为已存在。当前未SSH查数量、载模、复制或删除权重，原活动状态与已批准生命周期保持；旧Optuna权重已删除，不作为本次可用依赖。
