@@ -390,3 +390,23 @@ DwoPP（BMVC 2022）与未见身份的持续度量学习直接相关；所给CCF
 | 持续学习2 | ER+GCR完整群适配，CVPR 2022，CCF A | 保留OMP梯度匹配、正则与非负权重、记忆递推、候选池和实际加权回放；按本节明确选择单位及权重差异。外审与独立主审已完成，未实施或报告本任务效果。 |
 
 因此，**当前方法选型为静态卖家组1/3、持续学习组2/2，总计3个已选方法、2个空缺**。两项持续学习对照分别覆盖文本排序中的负例记忆选择和训练梯度保持，两者可用于检验所提方法相对于已有抗遗忘机制的收益；选中它们本身不能证明本项目方法有效，也不预设输赢。
+
+## 17. 2026-10-24：固定持续学习组后续查静态卖家方法
+
+用户本轮明确保留L²R与ER+GCR；第16节的持续学习组选型现为**用户已确认2/2**。本轮只续查暗网卖家组，要求2022—2026年、CCF A/B或知名期刊会议，实际输入仅商品标题／描述，输出能关联训练未见身份的卖家账号。将多模态模型删掉其他模态、将固定卖家分类器另改配对器、只把未知类别拒识称为未见身份关联，均不能据此计入。没有新论文完成符合这些条件的全文确认，**本轮新增合格方法0项；VendorLink仍为1/3，另两项未补齐。**
+
+本轮继续从VendorLink及已知多身份方法的相关文献、跨市场卖家研究、法证／犯罪学刊物和中英文商品卖家关联检索推进。下表记录新增或补强的一手证据；“读了方法段”不写成“通读全文”，只取得摘要的论文也不据此断言全文绝无其他方法。
+
+| 来源与实际阅读范围 | 能确认的内容及本轮处置 |
+| --- | --- |
+| [Identifying & linking Darknet vendors through NLP applications](https://clin2022.tshdresearch.org/identifying-linking-darknet-vendors-through-nlp-applications/)，CLIN32 2022；完整官方报告摘要 | 作者Saxena、Spanakis、Van Dijck与VendorLink重合；内容为BERT监督卖家训练、广告嵌入相似度、七市场迁移／马甲关联与知识蒸馏。官方页面没有提供独立于VendorLink的第二套方法全文；按同一研究线的早期报告处理，不把报告和ACL论文占两个名额。 |
+| [Decoding hidden darknet networks: What we learned about the illicit fentanyl trade on AlphaBay](https://doi.org/10.1111/1556-4029.15341)，Journal of Forensic Sciences 2023；从作者中心公开19页PDF定向读§3.3.3、§5及相关前后段落 | §3.3.3（PDF第9页）以Gephi构造卖家与商品、芬太尼／暗语的二部网络，边不表示两个账号同控。§5（PDF第15页）讨论以卖家名和PGP公钥跨市场追踪。它没有在已核对的方法中给出仅标题／描述的未见身份账号对评分，不能将“隐藏网络解码”当作马甲配对算法。[作者中心全文入口](https://ccybers.org/wp-content/uploads/2024/07/Journal-of-Forensic-Sciences-Maras-at-al.-2023-Decoding-hidden-darknet-networks-What-we-learned-about-the-illicit-fentanyl__.pdf)。网页已读到上述原文；本地下载超时，未声称已保管PDF或通读19页。 |
+| [The Network of Online Stolen Data Markets: How Vendor Flows Connect Digital Marketplaces](https://academic.oup.com/bjc/article/62/6/1518/6503727)，The British Journal of Criminology 2022，62(6):1518–1536；出版社正文的Digital Trace Data与Analytic Approach及相关讨论 | 原文明确要求卖家别名精确相同才判为同一卖家，并承认不同别名／冒用别名的限制。ERGM建模的是市场之间卖家流动，不是从商品文字识别账号同控；不能把市场网络的边当成账号对分数。此前机构摘要线索本轮补到原始方法正文。 |
+| [Distinguishing Sellers Reported as Scammers on Online Illicit Markets Using Their Language Traces](https://www.mdpi.com/2226-471X/9/7/235)，Languages 2024，9(7):235；出版社原始摘要与公开重印本的摘要页 | 确实使用卖家主页／商品描述等语言线索，但目标是区分被举报诈骗的卖家与信誉卖家，并使用Dread报告；不是同控账号关联。未取得并通读完整方法，不作全文核实合格声明，也不将这类状态分类作为身份配对方法。 |
+| [From Sign-Up to Multi-million Revenues: A Deep Dive Into Vendors on Darknet Marketplaces](https://link.springer.com/chapter/10.1007/978-3-032-00635-6_13)，IWCC／ARES 2025 workshops，pp.221–238；出版社摘要、出版身份及参考文献 | 研究卖家入驻条件、市场佣金与收入；现有公开内容没有可直接比较的商品文本账号对算法。参考文献继续指向2019年Adversarial Matching等已知工作。正文为订阅内容，本轮没有取得；记录为缺乏方法证据，不把工作坊冒称ARES主会论文，也不凭题名推定它完全没有身份分析。 |
+| [Automatic User Profiling in Darknet Markets: a Scalability Study](https://arxiv.org/abs/2203.13179)，2022；作者原始摘要 | 研究文本风格人口属性画像（年龄／性别）及规模变化，不是卖家账号同控。所见记录为预印本，未取得符合要求的正式刊会证据，不计入。 |
+| [FCA-XLNet-BiGRU Multi-task Framework for Darknet Transactions](https://link.springer.com/chapter/10.1007/978-981-95-3072-4_8)，KSEM 2025，书卷标©2026；重新核对出版社摘要 | 原摘要的closed-set classification／open-set detection描述交易类别识别，不能据“open-set”一词推导为对训练未见卖家进行账号配对。仍未取得完整方法正文，维持不计入，不写成已完成全文排除。 |
+
+另定位到2025年综述[NLP-based techniques for Cyber Threat Intelligence](https://doi.org/10.1016/j.cosrev.2025.100765)的出版社与作者机构公开版本；实际读到的相关段落将其[144]描述为暗网市场威胁分类，尚未从中取得新的商品账号关联方法证据，未声称核读全部引用。2026年《Automated Models for Darknet Monitoring and Criminal Attribution》只取得书籍章节的书目／二手摘要线索，没有合格刊会或完整方法证据；不引用其中准确率作为本项目可比较效果，不计入。
+
+本次结果不证明满足全部条件的另外两篇论文不存在；也没有找到足以将两个空缺升级为正式对照的证据。已知ICICS 2023、TrustCom 2025、多模态度量方法和ICASI 2026的限制仍按第8—15节处理，不重复包装为新候选。本轮只补公开文献事实、阅读范围与用户决定，没有新增科研方案／效果结论，不重新外审既定持续学习选型；未实施、训练、连接Linux、追加预算或改变活动合同。
