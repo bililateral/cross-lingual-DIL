@@ -2,6 +2,8 @@
 
 ## 当前工作
 
+最终补正已按用户要求再次送审（2026-10-24 13:39，Asia/Shanghai）：用户最新明确“继续提交外审是否还存在问题”，覆盖下方本地主审原定不再重复审查的安排。已将[完整补正及定向请求](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)单次提交[原会话](https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72)，核对可见GPT-6／Pro第5档，13:39:21停止按钮可见，已有针对G02与抽样／计数衔接的审查开场。见[新提交回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)。本轮仅发送补正正文，复用原附件，未上传新包；完整意见尚未回收。专用页保留，不重复提交／建监听；原补正与前两轮原件不改。下文“已知设计缺口已处置”是主执行者13:29后的判断，不代表本轮外审已经确认。无新科研执行或预算授权。
+
 修订版定向外审已回收并独立处置（2026-10-24，Asia/Shanghai；13:29起）：用户再次告知“外审已结束”。[完整复审](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)接受L01—L04、G01、G03—G04、E01—E04，留下G02两处分支缺陷。主执行者核对零目标和过早停止的代数反例后，按外审明确修法形成[最终设计补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)：允许合法空权重结果；取消微小改善便撤销／整体停止，改为核验合格后继续原最多6轮，只对超容差目标反向增加报数值失败。BM25补avgdl>0，保留实际记忆容量不足与回放次数上限说明。已知设计缺口已处置，不冒称原提交稿无条件通过或实现／资格已通过；不重复审同一修法，后续新增实现仍按要求外审。原提交稿和首轮补充冻结，冲突处以最终设计补正为准；[本次回收及收尾](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)保留实际状态。尚无新资格／训练／确认数据／预算许可，本轮未SSH或科研计算，活动45条及下方带时点观测不改。
 
 持续学习新对照设计外审已回收并独立处置（2026-10-24，Asia/Shanghai；13:04起回收）：保留L²R和ER+GCR，H_pos_tuned为主、S_tuned参照，固定配置／零新HPO。[送审原稿](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)冻结，须与[独立主审及设计补充](../reports/documentation/20261024/continual_comparison/review/primary_disposition.zh.txt)合读。补齐L²R逐正例PSS/ISD、固定参考集合／BM25、逐query负例表和有偿历史关系；GCR选择梯度改为grad(0.5 L_G)、lambda=0.5，明确非负OMP和绝对权重链条；校正O/F/A_acq及聚合N/Z保护、同时方向界限的解释，保留原数值判据。设计缺口已处置，未冒称实现／原生资格或效果已通过。

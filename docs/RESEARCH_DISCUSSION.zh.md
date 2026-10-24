@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 用户要求继续外审最终补正
+
+用户原话：“继续提交外审是否还存在问题”。据此覆盖主执行者此前“不因采纳同一建议再启动重复全文审查”的安排，原处置作为形成时记录保持。已于13:39通过指定本地Playwright，向原会话单次提交[完整补正及定向请求](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)，实际可见GPT-6／Pro第5档；[回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)确认停止按钮及针对本轮的审查开场。要求核实R-G02-A/B是否真正关闭，检查空池／计数／数值失败衔接及有证据的其他设计问题，区分未来实现验证与已证实设计缺陷；未变结论复用，不扩大实验。只发设计正文，未上传新包或数据；当前待完整回收与独立处置，不声称已经通过。本轮无SSH、科研执行、新预算、同步Linux或push。
+
 ## 2026-10-24 修订版外审回收与GCR分支补正
 
 用户再次原话：“外审已结束”。13:29起通过指定本地Playwright核实原会话第二条完整回复已完成，回收[修订外审全文](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)和DOM／原公式，未重复发送或上传。外审接受L01—L04、G01、G03—G04、E01—E04；G02两处为可手算证实的复现缺陷：合法零目标会被非空硬门拒绝；最大相关列的微小改善不能推出剩余候选无收益。

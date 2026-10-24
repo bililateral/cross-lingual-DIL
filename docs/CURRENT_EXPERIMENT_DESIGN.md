@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+最终补正继续外审中（2026-10-24 13:39）：用户明确要求“继续提交外审是否还存在问题”，已向原GPT-6／Pro会话单次发送[最终补正全文与核查重点](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)，[提交回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)确认审查已开始。复用原背景和附件，重点核查两项G02修复及其衔接，也允许有新证据的其他设计问题；尚未取得完整结论。下方为已完成的前轮外审／本地主审，不冒充本次复核通过；无新增实施或预算许可。
+
 修订复核已完成（2026-10-24，13:29起回收）：[完整修订外审](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)接受L²R、GCR尺度和评价定义，只留下G02合法空结果／提前停止两处分支。经独立代数核对，已按审查给出的明确修法形成[最终设计补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)：允许合法空支持、取消微小改善整体终止、保留六轮／NNLS／KKT及数值失败规则；其他方法、参数、规模和判据不变。与原稿及首轮补充合读，冲突处以此最终补正为准。当前已知设计缺口已处置，具体实现／资格／资源／端点实物仍待后续获准核验；未新增训练授权。见[回收记录](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)。
 
 新增设计已完成方案外审／独立主审（2026-10-24）：[L²R与ER+GCR四系统固定配置原稿](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)及[主审设计补充](../reports/documentation/20261024/continual_comparison/review/primary_disposition.zh.txt)，冲突处以后者为准。用户已明确H_pos_tuned主方法、S_tuned参照、两新对照按原文公开设置／作者默认及明确任务适配做固定配置，零新HPO。补清L²R逐正例选择／逐query记忆／付费关系，GCR采用grad(0.5 L_G)、lambda=.5及明确非负OMP，落实新确认入口与限定统计解释。仍拟18新增训练、条件复用H/S54状态、新120群共同确认；完整[外审原文](../reports/documentation/20261024/continual_comparison/review/report.zh.txt)已回收。这不是已批准运行合同或已完成实现；独立资格／正式预算尚未测定获准，不改变下方活动五方法及490小时。
