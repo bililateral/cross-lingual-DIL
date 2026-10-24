@@ -4,6 +4,10 @@
 
 当前执行[已批准五方法方案](../reports/documentation/20261023/continual_implementation/authorization.json)：SEQ/ER0.1/LOGIT0.1冻结历史配置与S/H_pos各自Optuna配置参加ABC/BCA/CAB×s4/s5/s6，45完整轨迹、新三域120群确认，零新增HPO、同卡三路。490累计小时分为450训练+36确认+4其他，单run最高24h仍受池内预留；不能减臂/减seed或借旧余额。先完成最小实现、限定资格及必要实现外审/主审，按已通过的资源/整批预算条件签发实际来源门后连续执行。用户已明确免除本次GPU审查发现问题之修改的外审，仍保留实际行为验证和失败账；不扩大为整个新实现或最终结果免审。三路资格及预算投影已形成，当前进展见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)与[独立资格处置](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。未满足开工前提前不训练、不生成确认群、不打开正式评价标签。
 
+原45条的资源故障与恢复按[当前明确重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)及[独立处置](../reports/documentation/20261024/continual_retry/primary.zh.txt)接续：保留24成功轨迹，未完成21条按原身份运行；旧费用和读取不清零。资源不足只暂停补入一个空槽，其他worker继续；首次启动和其他故障条件保持。已有控制器／监听的身份、真实更新和完成状态统一看交接，不因旧待运行文字重复建队列。此恢复不是任意中断的自动断点续训授权。
+
+L²R／ER+GCR的设计、实现和有限BGE资格已完成相应审查与主审，见[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)；资格不证明正式效果或稳定共存。两方法拟18条新增轨迹、新120群确认及独立正式预算仍须落实相应授权，不能借原490小时。先保留原批次所需H/S54阶段端点依赖，后续按具体合同核对复用，不提前开放评价或重复资格。
+
 ## 已结束Optuna的授权与恢复历史
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。
