@@ -1,7 +1,7 @@
 # 科研文件存储与恢复
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
-本轮复审收尾：修订完整8376字符正文／146282字符DOM、独立处置及真实review_ready／放行原件两端保管，专用网页已关闭。新33514字节传输ZIP在确认13载荷逐项仍同字节、清单与审查原文保留后删除，见refill_revision/transport_cleanup.json；没有为删除而新建Linux整包备份。较早native／合并包尚未在本轮完成全载荷去重保管核对，不在本次局部删除中处理。等待610563已放行但因最新资源不足未开训，原24成功和两失败状态继续保留。当前总文档及相关必要审查记录已SFTP同步核对，最新现场以waiter02/released_status.json为准。
+该次复审收尾：修订完整8376字符正文／146282字符DOM、独立处置及真实review_ready／放行原件两端保管，专用网页已关闭。新33514字节传输ZIP在确认13载荷逐项仍同字节、清单与审查原文保留后删除，见refill_revision/transport_cleanup.json；没有为删除而新建Linux整包备份。较早native／合并包尚未在该轮完成全载荷去重保管核对，不在该次局部删除中处理。等待610563放行后的资源等待、原24成功和两失败保管，以及该轮总文档／必要审查记录SFTP同步，均为当时事实；waiter02/released_status.json只对应该轮观测。后续载模OOM、失败账与失败载荷的接续保管，以[独立重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)及[主审](../reports/documentation/20261024/continual_retry/primary.zh.txt)为准；最新运行状态统一从[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)进入，不用旧放行回执推定仍在训练，也不据旧同步事实声称后续材料已全部同步。
 
 19:42修订保管：原合并审查完整正文／DOM和独立处置已保存continual_recovery/review/external及primary_disposition.zh.txt。旧等待583238的源码／授权／身份／状态及费用承接记录在qualification/waiter01，修订代码、CPU02原日志和回执、替代等待610563回执在对应目录，两端同字节。旧原45冻结workspace和权重／Memory未动；没有正式恢复目录或review_ready。新33514字节／14成员增量包已获具体授权并成功提交原网页，会话在审，原合并包及新包继续保留；不提前删除仍有复审依赖的材料。来源／原件与当前状态分开，旧19:00段落按历史时点解释。本次不重置保管周期。
 
