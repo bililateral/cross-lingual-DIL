@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-BGE/GPU科研操作已完成（2026-10-24）：ER+GCR在7.75GiB allocator下通过；L²R原228账号最大图OOM后增加保留梯度的CLS复制，CPU独立数值／梯度／存储检查通过，用户批准一次补核后native06最大图及完整阶段末通过。原生累计2479/3000秒、14次实际更新，CPU42秒，见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。同时发现原45控制器与外来CUDA进程不兼容，17:12生成failure.json并退出；具体故障日志读取待用户批准，不重启原批次。L²R最后最大图／端点主要在原worker退出后运行，不能称完整并发资格通过。新资格／存储修复外审尚未完成，正式18轨迹、新确认和H/S实物仍未放行。
+BGE/GPU科研操作已完成（2026-10-24）：ER+GCR在7.75GiB allocator下通过；L²R原228账号最大图OOM后增加保留梯度的CLS复制，CPU独立数值／梯度／存储检查通过，用户批准一次补核后native06最大图及完整阶段末通过。原生累计2479/3000秒、14次实际更新，CPU42秒，见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。同时发现原45控制器与外来CUDA进程不兼容，17:12生成failure.json并退出；故障日志现已获准读取并确认补槽准入异常，独立核验CUDA进程违反原控制器规则。24成功／2中断／19未启动，旧训练费74.291599小时；恢复补充拟保留24、重跑2并续19，尚未获批。18:27显存只空闲4438MiB且有另一用户作业，不满足30GiB启动门，当前无恢复训练／监听；见[故障诊断与恢复方案](../reports/documentation/20261024/continual_comparison/implementation/qualification/original45_failure/primary.zh.txt)。L²R最后最大图／端点主要在原worker退出后运行，不能称完整并发资格通过。新资格／存储修复外审尚未完成，正式18轨迹、新确认和H/S实物仍未放行。
 
 实现定向复审已关闭（2026-10-24 15:41）：[完整复审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/report.zh.txt)及[独立核对](../reports/documentation/20261024/continual_comparison/implementation/review/repair/primary.zh.txt)确认阶段末求导边界已实际修复、已批准的float64舍入误差证书计算及OMP／Memory／回放接线成立，两项均关闭且无新增必须修改项。原CPU01/02失败不追改；新证书仅保证相应真实违反量不超过tau0+2E，不声称旧精度或全局最优子集。未变设计与证据复用，累计36/1200秒不变。下一步是有限真实BGE/GPU形状、端点实物及资源资格的具体范围／预算，尚非正式运行许可；54端点的1944校准／恢复群前向须进入未来预算。
 

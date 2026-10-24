@@ -2,7 +2,7 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
-原生资格保管更新（2026-10-24）：Windows已核对回收native01—06及CPU07/08原始证据；native06回传15项、45运行来源结束后全部大小／SHA一致。每轮不同源码已在source子目录保管；native05旧L²R及原测试源码保留，原OOM不改写。native02/03失败临时全状态、native04及native06经验证的临时推理状态均已留证删除；native01—06目前无.pt，本次没有活动资格进程。手写Memory／分数留作资格证据，不是正式商品数据。原45控制器退出且出现failure.json，读取故障内容被自动审批阻断，尚未做恢复或正式权重清理。主审区分原生数学／显存证据和并行兼容性遗漏，具体见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。本轮不重置大清理周期。
+原生资格保管更新（2026-10-24）：Windows已核对回收native01—06及CPU07/08原始证据；native06回传15项、45运行来源结束后全部大小／SHA一致。每轮不同源码已在source子目录保管；native05旧L²R及原测试源码保留，原OOM不改写。native02/03失败临时全状态、native04及native06经验证的临时推理状态均已留证删除；native01—06目前无.pt，本次没有活动资格进程。手写Memory／分数留作资格证据，不是正式商品数据。原45控制器退出且出现failure.json，故障内容随后获用户明确批准读取，8份运行故障／进度原件已SFTP回收并核对大小／SHA，保管于qualification/original45_failure。H_pos中断stage2完整状态3904681285字节及推理状态／Memory保留；SEQ无检查点。全部24条成功状态和旧失败载荷未清理，未载模或恢复。现GPU资源不够且恢复补充未批准，没有恢复监听；新故障原件仅本地保管，未加入待授权外审包。主审区分原生数学／显存证据和并行兼容性遗漏，具体见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。本轮不重置大清理周期。
 
 15:41定向实现审查已完整回收并独立结案，repair目录保管[原文、DOM／TeX和主审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/recovery.json)；11卡片都是输入引用，无新返回ZIP，专用页已关闭。当前38来源与CPU06匹配；cpu_checkpoint.zip中的CPU05过渡run/test原字节也与回执匹配，必要CPU快照和全部失败／通过证据保留。两份已结束上传ZIP已[逐项确认载荷同字节保管后删除](../reports/documentation/20261024/continual_comparison/implementation/review/repair/transport_cleanup.json)，合计368457字节：原62载荷中57在当前文件、5在核实的29092249提交，增量16载荷全在当前文件，输入清单／身份和本地Git均保留。代码／CPU证据仍两端保管，本轮新审查／可变文档只Windows；未SSH、删除权重／Memory或改活动45条，不重置大清理周期。下方在审保留文字是原提交时点历史。
 
