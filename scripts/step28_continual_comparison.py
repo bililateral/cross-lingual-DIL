@@ -72,7 +72,8 @@ class Method:
     def metadata(self) -> dict:
         return dict(comparison_spec=self.spec.identity(), method=self.spec.name,
                     architecture='raw_cls_account_dot' if self.algorithm is l2r else 'record_mean_mlp',
-                    definition='20261024_final_design', outer_encoder_recompute=True)
+                    definition='20261024_final_design', outer_encoder_recompute=True,
+                    numerical_certificate=gcr.CERTIFICATE if self.algorithm is gcr else None)
 
     def bind(self, model, metadata: dict) -> None:
         if any(metadata.get(k) != v for k, v in self.metadata().items()):

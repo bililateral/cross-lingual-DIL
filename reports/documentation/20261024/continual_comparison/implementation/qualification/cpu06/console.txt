@@ -1,0 +1,14 @@
+Environment: 3.10.19 | packaged by conda-forge | (main, Oct 22 2025, 22:29:10) [GCC 14.3.0] numpy 2.2.6 scipy 1.15.3 torch 2.9.1+cu130
+test_roundoff_certificate_against_exact_stored_weights (__main__.ComparisonTests) ... Stored float64 exact-rational certificate evidence: {'version': '20261024_float64_componentwise_roundoff_v1', 'passed': True, 'weights': [2.3999999998396815, 2.3999999998392805], 'h': [0.0010172295147405919, -0.0011148868068122653], 'residual_form_h': [0.0012196644483544183, -0.0012196660529417702], 'roundoff_bound': [0.0015987211553642711, 0.0015987211553590312], 'threshold': [0.0015988811655365661, 0.0015988811655313262], 'violation': [0.0012196644483544183, 0.0012196660529417702], 'true_violation_bound': [0.0031976023209008375, 0.003197602320890358], 'kkt_max': 0.0012196660529417702, 'tolerance': 1.6001017229514742e-07, 'legacy_passed': False} wrong weight rejected: True
+ok
+test_omp_ridge_zero_and_small_improvement (__main__.ComparisonTests) ... ok
+test_omp_keeps_tiny_first_step (__main__.ComparisonTests) ... ok
+test_gcr_selection_weights_reach_later_replay (__main__.ComparisonTests) ... ok
+test_stage_checkpoint_runs_gcr_gradient_maintenance (__main__.ComparisonTests) ... Actual GCR stage checkpoint evidence: {'updates': 288, 'head_gradients': [('handwritten005', 91), ('handwritten008', 91), ('handwritten015', 91), ('handwritten035', 91), ('handwritten036', 91), ('handwritten038', 91)], 'memory': {'bytes': 36386, 'groups': ['handwritten005', 'handwritten008', 'handwritten015', 'handwritten035', 'handwritten036', 'handwritten038'], 'weights': {'handwritten005': 0.41806026387050116, 'handwritten008': 0.41948317859330875, 'handwritten015': 0.4168030075609959, 'handwritten035': 0.41987966898522894, 'handwritten036': 0.41651480678233527, 'handwritten038': 0.41948317859330875}, 'stage': 1, 'seen': 48, 'slots': 168}, 'full_restore': True, 'inference_restore': True, 'calibration_group_forwards': 36, 'state_rng_modes_unchanged': True}
+ok
+test_actual_checkpoint_resume_next_update (__main__.ComparisonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 5.687s
+
+OK

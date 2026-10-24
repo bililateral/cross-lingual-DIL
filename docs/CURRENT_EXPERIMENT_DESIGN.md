@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+实现修复与数值补充（2026-10-24 15:18）：[独立处置](../reports/documentation/20261024/continual_comparison/implementation/review/primary_disposition.zh.txt)接受并最小修复GCR阶段末inference_mode误用；原大范数反例的float64精度问题按[用户批准的前瞻补充](../reports/documentation/20261024/continual_comparison/implementation/review/numerical_authorization.json)改为残差式＋保守舍入误差证书。目标／参数／SciPy／float64／绝对权重及科学成功门保持，原失败留证。增量CPU通过，累计36/1200秒；用户已批准具体增量包，已于15:21单次提交定向外审，当前等待完整意见，未声称新证书已审通过。未来独立预算须计入54端点的1944校准／恢复群前向；真实形状及正式运行前提未完成。
+
 首版实施已送审（2026-10-24 14:23）：固定设计对应的两适配器、独立单轨迹与确认／统计入口已形成；[手写CPU证据](../reports/documentation/20261024/continual_comparison/implementation/qualification/primary.zh.txt)为11个不同测试通过、1个GCR大范数KKT反例未关闭，原失败账计入19/1200秒。经用户批准具体新包，已提交[实现外审](../reports/documentation/20261024/continual_comparison/implementation/review/submission.json)，当前待完整意见及独立处置。设计审查关闭不等于数值资格通过；不新增真实BGE/GPU、新确认数据或正式训练，活动45条不改。
 
 最终补正审查已关闭（2026-10-24 13:43）：[完整外审](../reports/documentation/20261024/continual_comparison/review/closure/report.zh.txt)及[独立主审](../reports/documentation/20261024/continual_comparison/review/closure/primary.zh.txt)均未发现新增必须修改的设计问题，R-G02-A/B已关闭；原稿→首轮补充→最终补正的优先关系保持。用户已明确“没问题就可以开始具体实验方案的实现了”，现进入已定范围的代码实现。新增资格资源、确认数据与正式训练预算尚待具体落实，不继承活动45条预算。

@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 实现外审回收与批准数值补充及增量复审
+
+用户原话：“外审已结束”。完整回收后独立确认GCR阶段末关闭求导和原float64权重精度不相容两项问题。给出具体前瞻数值补充后，用户明确答复：“批准该前瞻补充，在现有 CPU 预算内实现核验（推荐）”。已[绑定具体条款字节](../reports/documentation/20261024/continual_comparison/implementation/review/numerical_authorization.json)，原失败和原验收保留。CPU05两项、CPU06六项通过，累计36/1200秒，修复与证据见[独立主审](../reports/documentation/20261024/continual_comparison/implementation/review/primary_disposition.zh.txt)。
+
+62340字节／17成员增量包形成后，用户另明确：“批准该完整增量包上传定向外审（推荐）”。[该次许可](../reports/documentation/20261024/continual_comparison/implementation/review/repair/authorization.json)仅覆盖原chatgpt.com会话的修订复核，未泛化原306117字节包许可，不新增数据、GPU、预算或正式训练。15:21已单次提交[原会话并确认生成](../reports/documentation/20261024/continual_comparison/implementation/review/repair/submission.json)；新证书尚未获外审结论。
+
 ## 2026-10-24 批准手写CPU核验并提交首版实现外审
 
 用户对implementation_scope.zh.txt所列范围明确答复：“批准上述手写 CPU 核验”。已按Linux既有py310、单线程／4GiB／256MiB／1200累计秒、手写群及小型可微encoder执行；未载真实BGE、读正式数据或使用GPU。四次尝试累计记账19秒，12个不同测试11通过，1个GCR大范数反例在既有SciPy1.15.3下未满足冻结KKT；失败／诊断回执均保留，继续独立代码和行为核验而不改容差择优，见[资格处置](../reports/documentation/20261024/continual_comparison/implementation/qualification/primary.zh.txt)。

@@ -11,6 +11,82 @@ import step28_record_replay as record
 data = record.data
 
 
+CERTIFICATE = '20261024_float64_componentwise_roundoff_v1'
+
+
+def _up(value):
+    return np.nextafter(value, np.inf)
+
+
+def _gamma(k):
+    if not 0 <= k < 2**53 or k*2.**-53 >= 1:
+        raise ValueError('GCR roundoff operation count outside certificate')
+    if k == 0:
+        return 0.
+    return float(_up((k*2.**-53)/np.nextafter(1-k*2.**-53, -np.inf)))
+
+
+def _upper_dot(a, x):
+    # Nonnegative products round upward, then enclose the nonnegative sum.
+    products = _up(a*x)
+    n = a.shape[-1]
+    if n == 0:
+        return np.zeros(a.shape[:-1])
+    if n == 1:
+        return products[..., 0]
+    denominator = np.nextafter(1-_gamma(n-1), -np.inf)
+    if denominator <= 0:
+        raise ValueError('GCR positive sum outside certificate')
+    return _up(products.sum(axis=-1, dtype=np.float64)/denominator)
+
+
+def _normal_products(a, x):
+    import math
+    av, xv = np.abs(a), np.abs(x)
+    av, xv = av[av != 0], xv[xv != 0]
+    if av.size and xv.size:
+        # frexp mantissas are at least .5, so this is a conservative bound.
+        if math.frexp(float(av.min()))[1]+math.frexp(float(xv.min()))[1]-2 < -1022:
+            raise ValueError('GCR nonzero products outside normal-range certificate')
+
+
+def kkt_certificate(d, b, weights):
+    """Approved forward certificate for the actual stored float64 weights."""
+    if (d.ndim != 2 or not 1 <= d.shape[1] <= 6 or d.shape[0] < 1
+            or b.shape != (d.shape[0],) or weights.shape != (d.shape[1],)
+            or any(x.dtype != np.float64 for x in (d, b, weights))
+            or not all(np.isfinite(x).all() for x in (d, b, weights)) or np.any(weights < 0)):
+        raise ValueError('Invalid GCR certificate input')
+    _normal_products(d, weights)
+    _normal_products(np.array([.5]), weights)
+    residual = d @ weights-b
+    if not np.isfinite(residual).all():
+        raise ValueError('Nonfinite GCR residual')
+    _normal_products(d, residual)
+    t, z = d.T @ residual, .5*weights
+    h = t+z
+    normal, rhs = d.T @ d+.5*np.eye(len(weights)), d.T @ b
+    normal_product = normal @ weights
+    old_h = normal_product-rhs
+    tolerance = 1e-8*max(np.linalg.norm(rhs, np.inf), np.linalg.norm(normal_product, np.inf), 1e-30)
+    absolute = np.abs(d)
+    er = _up(_gamma(d.shape[1]+1)*_up(_upper_dot(absolute, np.abs(weights))+np.abs(b)))
+    error = _up(_upper_dot(absolute.T, er)+_up(_gamma(d.shape[0])*_upper_dot(absolute.T, np.abs(residual))))
+    error = _up(error+_up(_gamma(1)*(.5*np.abs(weights))))
+    error = _up(error+_up(_gamma(1)*_up(np.abs(t)+np.abs(z))))
+    threshold = np.nextafter(tolerance+error, -np.inf)
+    violation = np.where(weights > 0, np.abs(h), np.maximum(0., -h))
+    true_bound = _up(threshold+error)
+    if not all(np.isfinite(x).all() for x in (t, z, h, normal, rhs, normal_product,
+                                              old_h, error, threshold, true_bound, np.asarray(tolerance))):
+        raise ValueError('Nonfinite GCR roundoff certificate')
+    return dict(version=CERTIFICATE, passed=bool(np.all(violation <= threshold)), weights=weights.tolist(),
+                h=old_h.tolist(), residual_form_h=h.tolist(), roundoff_bound=error.tolist(),
+                threshold=threshold.tolist(), violation=violation.tolist(), true_violation_bound=true_bound.tolist(),
+                kkt_max=float(np.max(violation)), tolerance=float(tolerance),
+                legacy_passed=bool(np.all(np.where(weights > 0, np.abs(old_h), np.maximum(0., -old_h)) <= tolerance)))
+
+
 def nonnegative_omp(dictionary: np.ndarray, target: np.ndarray, ids: list[str]) -> tuple:
     """At most six positive-correlation expansions with augmented ridge NNLS."""
     from scipy.optimize import nnls
@@ -38,22 +114,17 @@ def nonnegative_omp(dictionary: np.ndarray, target: np.ndarray, ids: list[str]) 
         ds = d[:, support]
         augmented = np.vstack((ds, np.sqrt(.5)*np.eye(len(support))))
         weights, rnorm = nnls(augmented, np.r_[b, np.zeros(len(support))], maxiter=1000)
-        normal, rhs = ds.T @ ds+.5*np.eye(len(support)), ds.T @ b
-        h = normal @ weights-rhs
-        tolerance = 1e-8*max(np.linalg.norm(rhs, np.inf), np.linalg.norm(normal @ weights, np.inf), 1e-30)
-        violation = np.where(weights > 0, np.abs(h), np.maximum(0., -h))
-        if (not np.isfinite(weights).all() or not np.isfinite(h).all() or not np.isfinite(rnorm)
-                or np.any(weights < 0) or np.max(violation, initial=0.) > tolerance):
-            raise ValueError('Nonnegative GCR refit failed fixed KKT conditions: '+json.dumps(dict(
-                support=[ids[j] for j in support], weights=weights.tolist(), h=h.tolist(),
-                residual_form_h=(ds.T @ (ds @ weights-b)+.5*weights).tolist(),
-                kkt_max=float(np.max(violation, initial=0.)), tolerance=float(tolerance))))
+        certificate = kkt_certificate(ds, b, weights)
+        if not np.isfinite(rnorm) or not certificate['passed']:
+            raise ValueError('Nonnegative GCR refit failed approved roundoff KKT certificate: '+json.dumps(dict(
+                support=[ids[j] for j in support], **certificate)))
         new_objective = float(rnorm*rnorm)
         if new_objective-objective > 1e-10*max(objective, 1e-30):
             raise ValueError('GCR objective increased beyond fixed numerical tolerance')
         trace.append(dict(selected=ids[chosen], correlation=float(correlations[chosen]),
                           objective=new_objective, change=new_objective-objective,
-                          kkt_max=float(np.max(violation, initial=0.)), kkt_tolerance=float(tolerance)))
+                          kkt_max=certificate['kkt_max'], kkt_tolerance=certificate['tolerance'],
+                          certificate=certificate))
         objective, residual = new_objective, b-ds @ weights
     result = {ids[j]: float(w) for j, w in zip(support, weights, strict=True) if w > 0}
     return result, dict(stop_reason=reason, target_norm=float(np.linalg.norm(b)),

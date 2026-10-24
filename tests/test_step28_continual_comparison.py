@@ -90,10 +90,11 @@ class ComparisonTests(unittest.TestCase):
         self.assertTrue(w)
         self.assertEqual(len(log['expansions']), 6)
         self.assertGreater(sum(w.values()), 0.)
-        # One atom points away from the target, exercising an active zero bound.
-        w, _ = m.gcr.nonnegative_omp(np.array([[1., -1.], [0., 1.]]), np.array([1., 0.]), ['a', 'b'])
-        self.assertAlmostEqual(w['a'], 2/3)
-        self.assertNotIn('b', w)
+        # Both atoms enter; the second refit sends the first weight to its zero bound.
+        w, log = m.gcr.nonnegative_omp(np.array([[10., 1.], [1., 0.]]), np.array([1., -5.]), ['a', 'b'])
+        self.assertEqual([row['selected'] for row in log['expansions']], ['a', 'b'])
+        self.assertAlmostEqual(w['b'], 2/3)
+        self.assertNotIn('a', w)
 
     def test_omp_keeps_tiny_first_step(self):
         d = np.array([[2., 1., 1., 2., 1., 1.], [1e6, -1e6, 0., 1e6, -1e6, 0.]])
@@ -101,6 +102,49 @@ class ComparisonTests(unittest.TestCase):
         self.assertTrue(w)
         self.assertGreaterEqual(len(log['expansions']), 2)
         self.assertLess(log['objective'], 64/3)
+
+    def test_roundoff_certificate_against_exact_stored_weights(self):
+        from fractions import Fraction as F
+        large = np.array([[2., 1.], [1e6, -1e6]])
+        saved = np.array([2.3999999998396815, 2.3999999998392805])
+        cases = [(large, np.array([8., 0.]), saved),
+                 (np.array([[10., 1.], [1., 0.]]), np.array([1., -5.]), np.array([0., 2/3])),
+                 (np.array([[2.]]), np.array([3.]), np.array([6/4.5])),
+                 (np.array([[.1, -.3, .7], [-.6, .2, -.5], [.4, -.8, .9]]),
+                  np.array([.9, -.2, .4]), np.array([.13, .21, .34]))]
+        for d, b, v in cases:
+            cert = m.gcr.kkt_certificate(d, b, v)
+            # Exact rational arithmetic on actual binary64 inputs, not an alternative ideal solution.
+            residual = [sum(F(float(x))*F(float(w)) for x, w in zip(row, v))-F(float(y))
+                        for row, y in zip(d, b)]
+            exact = [sum(F(float(d[i, j]))*residual[i] for i in range(len(d)))+F(1, 2)*F(float(v[j]))
+                     for j in range(len(v))]
+            for j, h in enumerate(exact):
+                error = abs(F(cert['residual_form_h'][j])-h)
+                self.assertLessEqual(error, F(cert['roundoff_bound'][j]))
+                if cert['passed']:
+                    violation = abs(h) if v[j] > 0 else max(F(0), -h)
+                    self.assertLessEqual(violation, F(cert['true_violation_bound'][j]))
+                    self.assertLessEqual(violation, F(cert['tolerance'])+2*F(cert['roundoff_bound'][j]))
+        cert = m.gcr.kkt_certificate(large, np.array([8., 0.]), saved)
+        self.assertFalse(cert['legacy_passed'])
+        self.assertTrue(cert['passed'])
+        self.assertGreater(max(cert['violation']), cert['tolerance'])
+        wrong = m.gcr.kkt_certificate(large, np.array([8., 0.]), saved+np.array([.01, 0.]))
+        self.assertFalse(wrong['passed'])
+        # The actual OMP entry must reject a deliberately wrong solver result.
+        with mock.patch('scipy.optimize.nnls', return_value=(np.array([99.]), 1.)):
+            with self.assertRaisesRegex(ValueError, 'roundoff KKT certificate'):
+                m.gcr.nonnegative_omp(np.array([[2.]]), np.array([3.]), ['a'])
+        for a, x in [(np.array([[.1, .3, .7]]), np.array([.2, .4, .6])),
+                     (np.array([[1e-300, 0., 1e-310]]), np.array([1e-20, 1., 1e-20])),
+                     (np.array([[1e200, 1e-200, 3.]]), np.array([1e-200, 1e200, .1]))]:
+            exact = sum(F(float(y))*F(float(z)) for y, z in zip(a[0], x))
+            self.assertGreaterEqual(F(float(m.gcr._upper_dot(a, x)[0])), exact)
+        with self.assertRaisesRegex(ValueError, 'normal-range'):
+            m.gcr.kkt_certificate(np.array([[1e-300]]), np.array([0.]), np.array([1e-300]))
+        print('Stored float64 exact-rational certificate evidence:', cert,
+              'wrong weight rejected:', not wrong['passed'], flush=True)
 
     def test_pss_sign_and_fixed_reference_isd(self):
         q, p = np.array([1., 0.]), np.array([2., 0.])
@@ -293,6 +337,47 @@ class ComparisonTests(unittest.TestCase):
                 actual = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
                                                  transient=restored.transient(), memory=restored.memory.to_bytes().decode()))
                 self.assertEqual(reference, actual)
+
+    def test_stage_checkpoint_runs_gcr_gradient_maintenance(self):
+        method, model, optimizer, c = fixture('ER_GCR_group_fixed')
+        current, calibration = [group(i) for i in range(48)], [group(i) for i in range(60, 72)]
+        stage = method.stage(1, current, method.memory(), model)
+        for step in range(1, 289):
+            method.update(model, optimizer, stage, current[(step-1) % 48], c, step)
+        before = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
+                                         rng=m.diag.rng_state(), modes=[v.training for v in model.modules()]))
+        gradient = m.gcr.head_gradient
+        observed = []
+        def traced_gradient(*args, **kwargs):
+            self.assertFalse(torch.is_inference_mode_enabled())
+            self.assertTrue(torch.is_grad_enabled())
+            result = gradient(*args, **kwargs)
+            self.assertGreater(float(np.linalg.norm(result)), 0.)
+            observed.append((args[1].uid, result.size))
+            return result
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for name in ('models', 'work', 'memory', 'maps', 'scores', 'points'):
+                (root/name).mkdir()
+            with mock.patch.object(m.gcr, 'head_gradient', side_effect=traced_gradient):
+                point, memory, first = run.checkpoint(root, method, model, optimizer, stage, calibration,
+                                                      c, None, mock.Mock(check=lambda *a: None))
+            self.assertEqual(len(observed), 6)
+            self.assertEqual([uid for uid, _ in observed], point['maintenance']['candidate_ids'])
+            self.assertTrue(all(n == sum(p.numel() for p in model.head.parameters()) for _, n in observed))
+            self.assertTrue(memory.weights)
+            self.assertEqual(memory.to_bytes(), stage.memory.to_bytes())
+            self.assertEqual(first, point['maps']['first'])
+            self.assertTrue(point['full_restore_verified'] and point['inference_restore_verified'])
+            self.assertFalse((root/'work/stage1.pt').exists())
+            self.assertTrue((root/'models/stage1.pt').is_file())
+            after = m.core.state_digest(dict(model=model.state_dict(), optimizer=optimizer.state_dict(),
+                                            rng=m.diag.rng_state(), modes=[v.training for v in model.modules()]))
+            self.assertEqual(before, after)
+            self.assertEqual(m.parent.adam_step(optimizer), 288)
+            print('Actual GCR stage checkpoint evidence:', dict(updates=288, head_gradients=observed,
+                  memory=memory.summary(), full_restore=True, inference_restore=True,
+                  calibration_group_forwards=36, state_rng_modes_unchanged=True), flush=True)
 
     def test_evaluation_domain_pairing_order_guard_and_four_directions(self):
         spec = m.Spec('L2R_text_fixed', 'BCA', 4)

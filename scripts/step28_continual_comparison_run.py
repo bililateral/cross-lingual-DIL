@@ -45,7 +45,8 @@ def sources() -> list[dict]:
     seen.add(data.ROOT/'tests/test_step28_continual_comparison.py')
     seen.update(data.ROOT/DESIGN/name for name in (
         'proposal.zh.txt', 'review/primary_disposition.zh.txt', 'review/revision_disposition.zh.txt',
-        'review/closure/primary.zh.txt'))
+        'review/closure/primary.zh.txt', 'implementation/review/numerical_amendment.proposed.zh.txt',
+        'implementation/review/numerical_authorization.json'))
     return [data.record(path, data.ROOT) for path in sorted(seen)]
 
 
@@ -153,6 +154,7 @@ def save(path, model, optimizer, metadata, budget):
 
 
 def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map, budget):
+    import torch
     number = stage.stage
     if len(calibration) != 12 or m.parent.adam_step(optimizer) != 288*number:
         raise ValueError('Current calibration/stage endpoint differs')
@@ -166,7 +168,9 @@ def checkpoint(root, method, model, optimizer, stage, calibration, c, first_map,
             raise ValueError('Current calibration failed; no retry or confirmation refit')
         current_map = dict(zip(('a', 'b'), m.parent.calibration.parameters(fitted)))
         first_map = current_map if first_map is None else first_map
-        maintenance = stage.retain(model, c, budget.check)
+        # GCR maintenance differentiates the real head; neutral() disables autograd.
+        with torch.inference_mode(False), torch.enable_grad():
+            maintenance = stage.retain(model, c, budget.check)
     memory_path = root/'memory'/f'stage{number}.bin'
     memory_path.write_bytes(stage.memory.to_bytes())
     memory = method.memory_from(memory_path.read_bytes())
