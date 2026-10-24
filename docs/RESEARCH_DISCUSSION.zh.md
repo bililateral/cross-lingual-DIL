@@ -7,6 +7,8 @@
 
 本轮只补正现有交接顶部与设计入口，明确两新方法有限原生资格已由更晚的合并外审结案，保留15:41等历史段落。正式18条、新确认及独立预算仍未授权；原生资格不是效果或稳定共存证明。密码仅作SSH／SFTP认证，不入项目材料。未修改常设纪律、冻结合同、原验收、失败账或科研代码；保留原有删除及未提交成果，本轮仅本地Git，不扩大历史push许可。
 
+随后用户明确要求：“在你交接确认完毕后，顺便提交本地和远端commit，包括你此次交接过程中对落后记录的更新(如果有的话)”。据此授权交付本轮接手提交及正常快进所需的已有前置科研提交到现有科研分支；不把上一段形成时的“仅本地Git”恢复为当前推送阻断。推送前已核对实际远端ref、提交范围及材料边界，原有未提交删除／实验材料保持原状，不擅自加入；实际推送结果须另以远端ref核实，本段只记录授权，不预称推送成功。
+
 ## 2026-10-24 外审回收、补槽规则收窄及等待包装修复
 
 本轮后续结案：修订完整外审关闭C-R01、C-R02、C2及单槽补任务，无新前置修改；主执行者逐项对照代码／CPU原件独立同意，不新增测试。经Linux核对四项修订来源、当前授权、CPU02和原61冻结文件后，已发布review_ready，唯一等待610563获准按既有范围自动恢复，无须用户再批准。资源曾短时达到31.10GiB／无CUDA，但放行时已被其他作业占用，最新状态为约4.54GiB、review_ready=true而resource_ready=false，正式恢复未开始。完整[修订报告](../reports/documentation/20261024/continual_recovery/review/refill_revision/report.zh.txt)、[主审](../reports/documentation/20261024/continual_recovery/review/refill_revision/primary_disposition.zh.txt)和[放行原件](../reports/documentation/20261024/continual_recovery/review_release.json)已保管；下方“正在回应”是提交时点历史。
