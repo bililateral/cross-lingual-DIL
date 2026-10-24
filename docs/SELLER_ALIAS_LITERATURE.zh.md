@@ -410,3 +410,30 @@ DwoPP（BMVC 2022）与未见身份的持续度量学习直接相关；所给CCF
 另定位到2025年综述[NLP-based techniques for Cyber Threat Intelligence](https://doi.org/10.1016/j.cosrev.2025.100765)的出版社与作者机构公开版本；实际读到的相关段落将其[144]描述为暗网市场威胁分类，尚未从中取得新的商品账号关联方法证据，未声称核读全部引用。2026年《Automated Models for Darknet Monitoring and Criminal Attribution》只取得书籍章节的书目／二手摘要线索，没有合格刊会或完整方法证据；不引用其中准确率作为本项目可比较效果，不计入。
 
 本次结果不证明满足全部条件的另外两篇论文不存在；也没有找到足以将两个空缺升级为正式对照的证据。已知ICICS 2023、TrustCom 2025、多模态度量方法和ICASI 2026的限制仍按第8—15节处理，不重复包装为新候选。本轮只补公开文献事实、阅读范围与用户决定，没有新增科研方案／效果结论，不重新外审既定持续学习选型；未实施、训练、连接Linux、追加预算或改变活动合同。
+
+## 18. 2026-10-24：去重续查与StyleLink全文核对
+
+用户再次要求“继续找剩下两个，别再重复已经排除的论文”，并保持2022—2026年、CCF A/B或知名刊会、仅商品标题／描述、训练未见身份账号关联四项条件。本轮按已有第8—17节去重，使用中英文检索、Crossref／OpenAlex书目检索及新论文引用链寻找新增方法；检索返回的记录数不是通读论文数，也没有遍历索引中全部命中。已知排除项的再次命中不作为新候选或新增成果。
+
+**本轮新增合格方法仍为0；静态卖家组仍为VendorLink 1/3，两个空缺尚未补齐。**持续学习组按用户决定保留L²R与ER+GCR，不重新选型。以下仅记录此前未列入排除记录的新线索及其实际证据层次。
+
+### 18.1 新候选StyleLink：完整原文核对后不计入
+
+Wenwen Xu、Benjamin C. M. Fung：[StyleLink: User Identity Linkage Across Social Media with Stylometric Representations](https://ojs.aaai.org/index.php/ICWSM/article/view/35920)，ICWSM 2025，19(1):2076–2088，DOI：10.1609/icwsm.v19i1.35920。本轮通过[官方13页PDF](https://ojs.aaai.org/index.php/ICWSM/article/download/35920/38074/39988)阅读全部正文、实验、讨论、参考文献及附录／检查表；读取的是网页PDF文本，未声称已下载本地PDF或执行代码。
+
+- 原文p.2078将输入定义为G={V,E,X}，E是关注者／被关注者关系；X包括274项英文风格特征。p.2079式(1)—(5)的GCN／GAT编码依赖邻接关系及邻居聚合，不是仅对账号文本集合独立编码。
+- p.2080式(6)用已知跨平台身份锚点训练三元组映射；实验对象是X（Twitter）与Foursquare。它确实做账号关联，但不能把保留测试锚点直接等同于已证明可在本项目训练未见身份上使用。
+- p.2082表3的消融只分别去掉四类风格特征，仍保留关系图。p.2083图4展示GCN前后的表示可视化，没有给出独立纯文本账号关联版本；不能据这张图声称论文已有文本单模态方法。
+
+据原方法的实际输入，**StyleLink不满足本项目仅标题／描述的直接比较条件**。删去关系图、改成文本相似图或自行增设纯文本分支均属于另行改造，不能作为已经核实的原论文方法补位。本轮没有实施这些改造，也不主张其效果好坏。
+
+### 18.2 其他新线索的初筛与引用链
+
+| 新来源与实际阅读范围 | 原文能够支持的判断 |
+| --- | --- |
+| [Identification of Criminal Networks via External Identifier-Based Clustering on the Dark Web](https://doi.org/10.1109/ACCESS.2026.3658951)，Dong-Won Kang、Jiyeon Kim，IEEE Access 2026，14:15394–15413；书目及[公开作者页面中的原始摘要](https://www.researchgate.net/publication/400200353_Identification_of_Criminal_Networks_via_External_Identifier-based_Clustering_on_the_Dark_Web) | 聚合的是邮件地址、Telegram、Twitter等外部身份标识符，分析单位为暗网站点／犯罪网络。摘要已经明确额外输入，不符合商品文本账号关联入口；未通读20页，不作全文核实合格声明。 |
+| [From cryptomarkets to the surface web: Scouting eBay for counterfeits](https://arxiv.org/abs/2406.05021)，Felix Soldner等，2024；作者预印本摘要、书目及2022年Cambridge Cybercrime Conference报告入口 | 以图片和文字相似度寻找暗网与eBay上的对应商品，目标不是两个卖家账号是否同控。2024入口标注pre-print，未核实合格正式刊会版本；未通读全文，不计入。 |
+
+沿StyleLink引用取得Senette、Siino、Tesconi的[User Identity Linkage on Social Networks: A Review of Modern Techniques and Applications](https://doi.org/10.1109/ACCESS.2024.3500374)（IEEE Access 2024，12:171241–171268）。正式PDF入口可见但后续分页读取超时，改读作者[arXiv版本](https://arxiv.org/html/2409.08966v1)的文本／属性方法、图嵌入方法及对应参考文献，并对照公开正式版本的部分书目；两个版本参考文献编号不同，不混用编号，不声称通读28页正式全文。此次引用链没有提供新的、已由原论文确认合格的商品文本账号方法；综述本身不占对照名额。
+
+截至本轮，没有足够证据填补两个空缺；这不是满足条件的方法不存在的证明。本次只维护公开文献输入／任务事实与阅读范围，未新增科研方案、比较臂或效果结论，未重新外审既定持续学习选型，未执行科研代码、连接Linux或改变活动实验。
