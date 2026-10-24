@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+新增待审提案（2026-10-24）：[L²R与ER+GCR任务适配及四系统固定配置比较](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)。用户已明确H_pos_tuned主方法、S_tuned参照、新对照先用论文设置／公开默认做固定配置，不做新搜索。方案具体规定有偿query记忆、PSS/ISD／OMP权重链条、作者默认与项目适配的区别、拟18新增训练与条件复用H/S54状态、独立120群及O/F/N/Z评价；这不是已批准运行合同。完整包获用户具体外发许可后已通过指定Playwright提交[本次方案外审](https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72)，待回收／独立处置；不修改下方正在执行的五方法和490小时预算，不把本轮尚未测定的运行资源写成已获许可。
+
 当前已批准版本：[五方法提案](../reports/documentation/20261023/continual_baselines/proposal.zh.txt)及[独立主审补充](../reports/documentation/20261023/continual_baselines/review/primary_disposition.zh.txt)，由[用户明确授权](../reports/documentation/20261023/continual_implementation/authorization.json)转为执行范围：五方法、零HPO、45条三阶段轨迹、三路并行、490累计小时。实际入口为scripts/step28_continual_five_run.py、step28_continual_five_control.py和step28_continual_five_evaluate.py；方法、队列和确认统计在使用前冻结。限定CPU/GPU资格及保守预算投影已形成，GPU问题修改明确免审；新增实现外审/独立主审与定向修复已完成，实际来源门已签发并于10月23日16:26:59正式三路启动，详见[执行边界](../reports/documentation/20261023/continual_implementation/execution.zh.txt)和[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。不新增基线搜索、S_pos或全六顺序，不用历史结果代替本批基线，不根据旧dev效果取消确认。
 
 前次外审后的三臂建议（历史版本）：[2026-10-23外审独立处置及精简范围](../reports/documentation/20261023/continual_mainline/review/primary_disposition.zh.txt)。完整外审已回收，12项意见已独立处置；推荐SEQ_ref/S_tuned/H_pos_tuned、三循环×三个新seed，共27轨迹/23328更新、零新HPO、同卡最多三路。保留已学域六格及SEQ两格G，新120群确认共7200前向；拟累计297.5h、存储160GiB/free224GiB。S与H使用原Optuna全精度选中参数；LOGIT/ER历史可复用但不冒充本批确认。唯一主要比较及数据/机制/外推边界见该具体方案。尚未批准实施或预算，现有代码仍未接通新范围；静态审查不替代受影响原生核验和实施审查。下面六臂版本为原送审历史，字节保持，不再作为主审推荐范围。

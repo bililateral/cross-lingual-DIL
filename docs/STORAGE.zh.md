@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
+
+新[设计](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)拟复用formal_20261023中S_tuned/H_pos_tuned各9条轨迹、每条3阶段，共54推理端点及其匹配校准/来源。该批状态在本次对比方案待决期间具有后续依赖，不能只因原批确认结束便按“无用途”清理；尚未形成的状态不记为已存在。当前未SSH查数量、载模、复制或删除权重，原活动状态与已批准生命周期保持；旧Optuna权重已删除，不作为本次可用依赖。
+
+方案、背景请求、公开L²R原文及[外审回执](../reports/documentation/20261024/continual_comparison/review/submission.json)保存在Windows reports/documentation/20261024/continual_comparison。审查包1214368字节、17成员，SHA256 11d3582f12674c1df16b8b6a999dfabf5d8081c3598cdd48331b3b760c8c1332；16载荷逐项大小/SHA核验。包含方案/请求、三份公开论文正文或补充、既有公开方法审查、十份直接相关源码及清单，不含正式文本/标签、Memory/模型或凭据。首次自动审批拒绝历史及用户对完整包的具体许可均保留；11:59已单次提交原会话，当前在审，输入包仍有必要用途。新文件及当前文档仅本地Git，不新增Linux副本、不改冻结workspace；在审专用页保留，无新监听或自动化。
+
 ## 2026-10-23 五方法正式启动与实现外审闭环
 
 16:26:59已按原授权启动Linux独立`reports/documentation/20261023/continual_implementation/formal_20261023`，冻结workspace/61来源和正式门两端身份核对，首批三worker实际更新见[启动观察](../reports/documentation/20261023/continual_implementation/formal_observation.json)。完整外审9文件原件、主审处置、cpu08增量证据及当前账已同步Linux；135正式阶段推理权重按后续确认依赖留Linux，尚未形成的权重不冒称已有。full仅真实恢复核实后按既有生命周期退休；不清理活动状态或Memory。当前权重/正式小证据均受224GiB全量和2GiB小证据上限约束。
