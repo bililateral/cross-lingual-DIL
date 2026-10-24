@@ -1,6 +1,8 @@
 # 当前实验设计入口
 
-新增待审提案（2026-10-24）：[L²R与ER+GCR任务适配及四系统固定配置比较](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)。用户已明确H_pos_tuned主方法、S_tuned参照、新对照先用论文设置／公开默认做固定配置，不做新搜索。方案具体规定有偿query记忆、PSS/ISD／OMP权重链条、作者默认与项目适配的区别、拟18新增训练与条件复用H/S54状态、独立120群及O/F/N/Z评价；这不是已批准运行合同。完整包获用户具体外发许可后已通过指定Playwright提交[本次方案外审](https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72)，待回收／独立处置；不修改下方正在执行的五方法和490小时预算，不把本轮尚未测定的运行资源写成已获许可。
+修订复核状态（2026-10-24 13:16）：用户要求修订版也外审，已单次向原GPT-6／Pro会话提交[修订设计全文](../reports/documentation/20261024/continual_comparison/review/revision_request.zh.txt)，[回执](../reports/documentation/20261024/continual_comparison/review/revision_submission.json)确认生成中；沿用原附件，未上传新包。下面是首轮本地主审完成状态，修订版尚待完整回收和独立处置，不视为最终设计外审已通过。
+
+新增设计已完成方案外审／独立主审（2026-10-24）：[L²R与ER+GCR四系统固定配置原稿](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)及[主审设计补充](../reports/documentation/20261024/continual_comparison/review/primary_disposition.zh.txt)，冲突处以后者为准。用户已明确H_pos_tuned主方法、S_tuned参照、两新对照按原文公开设置／作者默认及明确任务适配做固定配置，零新HPO。补清L²R逐正例选择／逐query记忆／付费关系，GCR采用grad(0.5 L_G)、lambda=.5及明确非负OMP，落实新确认入口与限定统计解释。仍拟18新增训练、条件复用H/S54状态、新120群共同确认；完整[外审原文](../reports/documentation/20261024/continual_comparison/review/report.zh.txt)已回收。这不是已批准运行合同或已完成实现；独立资格／正式预算尚未测定获准，不改变下方活动五方法及490小时。
 
 当前已批准版本：[五方法提案](../reports/documentation/20261023/continual_baselines/proposal.zh.txt)及[独立主审补充](../reports/documentation/20261023/continual_baselines/review/primary_disposition.zh.txt)，由[用户明确授权](../reports/documentation/20261023/continual_implementation/authorization.json)转为执行范围：五方法、零HPO、45条三阶段轨迹、三路并行、490累计小时。实际入口为scripts/step28_continual_five_run.py、step28_continual_five_control.py和step28_continual_five_evaluate.py；方法、队列和确认统计在使用前冻结。限定CPU/GPU资格及保守预算投影已形成，GPU问题修改明确免审；新增实现外审/独立主审与定向修复已完成，实际来源门已签发并于10月23日16:26:59正式三路启动，详见[执行边界](../reports/documentation/20261023/continual_implementation/execution.zh.txt)和[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。不新增基线搜索、S_pos或全六顺序，不用历史结果代替本批基线，不根据旧dev效果取消确认。
 

@@ -2,9 +2,13 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
+13:16用户明确要求修订版也外审，已用[修订正文](../reports/documentation/20261024/continual_comparison/review/revision_request.zh.txt)向原会话单次发送定向复核，复用网页已有原附件，未重新打包／上传。正文、来源SHA及[新提交回执](../reports/documentation/20261024/continual_comparison/review/revision_submission.json)留Windows；修订在审，原会话已重新打开保留。此前输入ZIP清理和首轮关闭仍为实际发生历史，不重建冗余包；公开原文、原16载荷及完整首轮审查均保管。
+
 新[设计](../reports/documentation/20261024/continual_comparison/proposal.zh.txt)拟复用formal_20261023中S_tuned/H_pos_tuned各9条轨迹、每条3阶段，共54推理端点及其匹配校准/来源。该批状态在本次对比方案待决期间具有后续依赖，不能只因原批确认结束便按“无用途”清理；尚未形成的状态不记为已存在。当前未SSH查数量、载模、复制或删除权重，原活动状态与已批准生命周期保持；旧Optuna权重已删除，不作为本次可用依赖。
 
-方案、背景请求、公开L²R原文及[外审回执](../reports/documentation/20261024/continual_comparison/review/submission.json)保存在Windows reports/documentation/20261024/continual_comparison。审查包1214368字节、17成员，SHA256 11d3582f12674c1df16b8b6a999dfabf5d8081c3598cdd48331b3b760c8c1332；16载荷逐项大小/SHA核验。包含方案/请求、三份公开论文正文或补充、既有公开方法审查、十份直接相关源码及清单，不含正式文本/标签、Memory/模型或凭据。首次自动审批拒绝历史及用户对完整包的具体许可均保留；11:59已单次提交原会话，当前在审，输入包仍有必要用途。新文件及当前文档仅本地Git，不新增Linux副本、不改冻结workspace；在审专用页保留，无新监听或自动化。
+方案、背景请求、公开L²R原文及[外审原回执](../reports/documentation/20261024/continual_comparison/review/submission.json)保存在Windows reports/documentation/20261024/continual_comparison。送审包原为1214368字节、17成员，SHA256 11d3582f12674c1df16b8b6a999dfabf5d8081c3598cdd48331b3b760c8c1332；16载荷含方案/请求、三份公开论文、前次方法审查、十份脚本，不含正式文本/标签、Memory/模型或凭据。首次自动审批拒绝及用户具体许可、11:59单次提交历史不改。
+
+13:04起完整回收后，保留[网页原文及公式](../reports/documentation/20261024/continual_comparison/review/external_review.json)、[可读原文](../reports/documentation/20261024/continual_comparison/review/report.zh.txt)、[独立主审及设计补充](../reports/documentation/20261024/continual_comparison/review/primary_disposition.zh.txt)和[收尾记录](../reports/documentation/20261024/continual_comparison/review/recovery.json)。16个原载荷再次与清单大小/SHA一致，文本来源已有本地Git冻结，公开PDF继续保管；无新增返回证据包。验收后清理本轮冗余输入传输ZIP及临时页面提取，具体事实以收尾记录为准，不新增备份或Linux副本。新材料仅本地Git，未改冻结workspace、既有删除或其他未提交产物；无新监听或自动化。上述是局部外审收尾，不重置项目大清理周期。
 
 ## 2026-10-23 五方法正式启动与实现外审闭环
 
