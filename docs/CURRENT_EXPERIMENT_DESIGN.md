@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-实现修复与数值补充（2026-10-24 15:18）：[独立处置](../reports/documentation/20261024/continual_comparison/implementation/review/primary_disposition.zh.txt)接受并最小修复GCR阶段末inference_mode误用；原大范数反例的float64精度问题按[用户批准的前瞻补充](../reports/documentation/20261024/continual_comparison/implementation/review/numerical_authorization.json)改为残差式＋保守舍入误差证书。目标／参数／SciPy／float64／绝对权重及科学成功门保持，原失败留证。增量CPU通过，累计36/1200秒；用户已批准具体增量包，已于15:21单次提交定向外审，当前等待完整意见，未声称新证书已审通过。未来独立预算须计入54端点的1944校准／恢复群前向；真实形状及正式运行前提未完成。
+实现定向复审已关闭（2026-10-24 15:41）：[完整复审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/report.zh.txt)及[独立核对](../reports/documentation/20261024/continual_comparison/implementation/review/repair/primary.zh.txt)确认阶段末求导边界已实际修复、已批准的float64舍入误差证书计算及OMP／Memory／回放接线成立，两项均关闭且无新增必须修改项。原CPU01/02失败不追改；新证书仅保证相应真实违反量不超过tau0+2E，不声称旧精度或全局最优子集。未变设计与证据复用，累计36/1200秒不变。下一步是有限真实BGE/GPU形状、端点实物及资源资格的具体范围／预算，尚非正式运行许可；54端点的1944校准／恢复群前向须进入未来预算。
 
 首版实施已送审（2026-10-24 14:23）：固定设计对应的两适配器、独立单轨迹与确认／统计入口已形成；[手写CPU证据](../reports/documentation/20261024/continual_comparison/implementation/qualification/primary.zh.txt)为11个不同测试通过、1个GCR大范数KKT反例未关闭，原失败账计入19/1200秒。经用户批准具体新包，已提交[实现外审](../reports/documentation/20261024/continual_comparison/implementation/review/submission.json)，当前待完整意见及独立处置。设计审查关闭不等于数值资格通过；不新增真实BGE/GPU、新确认数据或正式训练，活动45条不改。
 

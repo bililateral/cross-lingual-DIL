@@ -1,5 +1,10 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 两处修订复审结案及后续资格边界
+
+用户原话：“外审已结束，回收完整意见，独立核对两处修改是否真正解决了问题，告诉我还有没有需要处理的地方。”已完整回收修订定向报告，并独立重新核对实际checkpoint／head_gradient、KKT上界推导、实际NNLS权重到Memory与回放、测试原件及当前来源。外审与[独立主审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/primary.zh.txt)均关闭I-GCR-CTX、I-GCR-NUM，无新增必须修改项；数值项按此前明确批准的新证书关闭，旧判据失败保持。
+
+本轮只读核对、记录及机械收尾，不再追加无指向测试或修改，CPU仍36/1200秒。后续需要具体有限的真实BGE/GPU资格、H/S54实物、新确认隔离和实测预算；当前请求不增加上述数据／GPU／正式训练授权，不借原45条490小时。完整意见与必要证据保留，网页已关闭，无用途的两份上传ZIP在载荷同字节保管核对后清理；只本地Git，不push。
 ## 2026-10-24 实现外审回收与批准数值补充及增量复审
 
 用户原话：“外审已结束”。完整回收后独立确认GCR阶段末关闭求导和原float64权重精度不相容两项问题。给出具体前瞻数值补充后，用户明确答复：“批准该前瞻补充，在现有 CPU 预算内实现核验（推荐）”。已[绑定具体条款字节](../reports/documentation/20261024/continual_comparison/implementation/review/numerical_authorization.json)，原失败和原验收保留。CPU05两项、CPU06六项通过，累计36/1200秒，修复与证据见[独立主审](../reports/documentation/20261024/continual_comparison/implementation/review/primary_disposition.zh.txt)。
