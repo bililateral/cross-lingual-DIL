@@ -1,0 +1,20 @@
+原45条恢复编排／等待脚本：实施和限定核验记录
+2026-10-24，Asia/Shanghai；当前外审进行、等待进程存活，正式恢复尚未启动。
+
+原故障诊断、费用和24成功／2中断／19未启动的原件在../continual_comparison/implementation/qualification/original45_failure。用户先要求编写等待脚本，自动审批拒绝把这项指令解释为启动后台自动恢复；之后明确“批准启动上述后台等待与条件恢复”，由authorization.json记录。原冻结方案、失败账本及recovery.proposed.zh.txt的历史措辞不追改；最新批准覆盖保留24、重跑2和续19、原3-worker和全45后既定评价，不增加总预算。未授权在原3-worker运行中另开GPU核验。
+
+实际变化仅两个入口和一份针对性测试。step28_continual_five_recover.py保持原训练／评价来源不变，在新campaign挂接正规文件硬链接以纳入原24成功产物及两旧失败目录，完整性核对只读哈希／大小／完成元数据；派发21个固定身份，旧费用进入新used，旧失败原件不变。最终调用原joint_opening及原评价脚本，没有把评价留为占位。run_step28_continual_recovery_linux_20261024.sh以既有py310和原环境启动等待动作；实际资源和已关闭实现审查同时满足后才派发，首次新轨迹真实update事件后删除精确launcher。旧活动来源未改，未检查真实训练效果、未载模型／Memory，也未重启。
+
+Linux CPU01：4项通过，实际11.268439430976287秒／向上计12秒，原CPU68→80/1200秒，本恢复限180秒已用12秒，RSS峰值582471680字节。测试在单核3、单计算线程、无GPU／正式数据／预训练模型下执行。
+1. 调用真实split_attempts和原Ledger／dispatch，执行21个手写单槽子进程，24成功ID未产生新任务，旧training费用1000保持并累加新费用、旧cpu/control分别增加指定增量；原失败输入逐值不变；错误的失败／成功覆盖拒绝。此处单槽只验证队列／接账，原三槽调度函数及已有三路BGE资格未改，不冒称本轮又跑三路BGE。
+2. 实际硬链接具有相同inode／字节SHA，原Budget.rglob计入成功和prior_failed两处实际正规文件，模拟500字节模型与2字节证据两份共1004字节、小证据4字节；重复目标拒绝。没有用符号链接绕过原容量统计。
+3. 31GiB空闲且无CUDA作业可满足资源谓词；存在foreign PID或仅4438MiB即不满足。实现review门缺失时实际wait循环不调用Popen；重复waiter_started身份拒绝。
+4. 一个真实手写子进程写入模拟update日志后，实际等待代码仅删除指定launcher、保存首更新回执，保留授权文件；子进程恰好一次。这证明等待生命周期分支，不能把手写update事件描述为BGE正式更新。正式接线依靠原train_stage在实际method.update完成后才打印同一事件。
+
+CPU回执和console已SFTP回传，与远端SHA分别60aaa31c8abebd384f2a7533fc8eb8a90aadb2fb62139188dd055e51cff529c0、ba2808611f33d2dbdc132a7f3c2a30af5a03050376045dadc9db9a0862b700f1一致。回执记录原61项冻结来源核对及本次四文件来源。测试后的授权变化只是补入用户明确后台启动许可，旧授权字节保留为authorization.wait_request.json；程序和测试字节未改，未因此重复测试。
+
+部署事实：Linux独立目录/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_recovery；18:45:48启动实际等待PID583238，属主yongpeng，gate SHA ebaf816a94eabf77d50e74465164439fd69dfea18d56b6fb6191514b982dfae5。启动前核对无同类进程、waiter_started／review_ready／formal均不存在。18:46再次查PID及WAITING，review_ready=false、resource_ready=false；随后资源再次下降到约4GiB，不能用早先约25GiB快照断言持续余量。当前只等待，不训练，不停止其他用户。纯sleep不收费，实际非等待检查记原控制桶，停止与自删按代码，原任务失败不自动重试。
+
+外审：用户要求把已完成的L²R／ER+GCR原生资格和恢复启动门合并送审，主执行者已完成595997字节／164成员包。自动审批先拒绝外传；用户随后明确批准此具体完整包、原会话和提交。18:59在https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72单次发送成功，附件已进入消息，页面显示正在回应及停止按钮。新review_ready.json尚未生成，恢复实现未声称外审通过。
+
+发送前模型菜单显示GPT-6已选、思考强度Pro，同时出现“已达到使用上限／已锁定”的提示；在未换模型下实际点击发送后请求被接受并进入回应状态。记录可见选择及实际提交，不据菜单提示误称无法送审，也不声称独立验证了后台路由。后续完整回收和主审需核对实际回复，不以正在回应代替审查完成。

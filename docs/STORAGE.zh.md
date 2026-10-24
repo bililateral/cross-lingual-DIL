@@ -1,6 +1,7 @@
 # 科研文件存储与恢复
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
+19:00恢复与合并外审保管更新：原故障8份运行原件已经回收核验，记录见original45_failure；原24成功产物和两中断载荷仍在原Linux目录，没有删除或载入。独立continual_recovery目录保存恢复代码、实际授权、CPU01日志／回执及等待状态；PID583238已运行等待，正式campaign尚未创建。CPU证据回传SHA一致，授权补明确后台启动后保留旧字节authorization.wait_request.json，不追改原CPU来源。最新合并包continual_recovery_native.zip为595997字节／164成员、SHA256 6b6dc3827a8a3759a43c2772d5cf2b126ea978c244c4dbd3c32b8abc85972fbb，已获具体许可并于18:59成功上传外审；当前在审保留，不提前清理。原505696字节native包未直接上传，载荷原字节纳入新包，保持两包身份和历史记录。审查请求／回执及最新可变总文档目前主要保管Windows；部署代码／CPU／等待状态两端有对应证据。本轮不重置大清理周期。
 
 原生资格保管更新（2026-10-24）：Windows已核对回收native01—06及CPU07/08原始证据；native06回传15项、45运行来源结束后全部大小／SHA一致。每轮不同源码已在source子目录保管；native05旧L²R及原测试源码保留，原OOM不改写。native02/03失败临时全状态、native04及native06经验证的临时推理状态均已留证删除；native01—06目前无.pt，本次没有活动资格进程。手写Memory／分数留作资格证据，不是正式商品数据。原45控制器退出且出现failure.json，故障内容随后获用户明确批准读取，8份运行故障／进度原件已SFTP回收并核对大小／SHA，保管于qualification/original45_failure。H_pos中断stage2完整状态3904681285字节及推理状态／Memory保留；SEQ无检查点。全部24条成功状态和旧失败载荷未清理，未载模或恢复。现GPU资源不够且恢复补充未批准，没有恢复监听；新故障原件仅本地保管，未加入待授权外审包。主审区分原生数学／显存证据和并行兼容性遗漏，具体见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。本轮不重置大清理周期。
 
