@@ -2,7 +2,7 @@
 
 ## 当前工作
 
-最终补正已按用户要求再次送审（2026-10-24 13:39，Asia/Shanghai）：用户最新明确“继续提交外审是否还存在问题”，覆盖下方本地主审原定不再重复审查的安排。已将[完整补正及定向请求](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)单次提交[原会话](https://chatgpt.com/c/6adc2cf8-61b8-83ea-90d2-0a79dd218a72)，核对可见GPT-6／Pro第5档，13:39:21停止按钮可见，已有针对G02与抽样／计数衔接的审查开场。见[新提交回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)。本轮仅发送补正正文，复用原附件，未上传新包；完整意见尚未回收。专用页保留，不重复提交／建监听；原补正与前两轮原件不改。下文“已知设计缺口已处置”是主执行者13:29后的判断，不代表本轮外审已经确认。无新科研执行或预算授权。
+最终补正外审与独立主审已完成（2026-10-24 13:43，Asia/Shanghai）：[完整报告](../reports/documentation/20261024/continual_comparison/review/closure/report.zh.txt)关闭R-G02-A/B，未发现新增必须修正的科学／复现设计缺陷；[独立核对](../reports/documentation/20261024/continual_comparison/review/closure/primary.zh.txt)确认零目标、扩支持可行性、空池／计数及冻结规模自洽，未改方案。完整DOM／公式和[回收记录](../reports/documentation/20261024/continual_comparison/review/closure/recovery.json)已保存，专用页关闭。用户随后明确“没问题就可以开始具体实验方案的实现了”，条件已满足，当前进入两适配器及独立入口的代码实现；历史“未授权实现”不再阻断。Linux资格资源、新确认数据和正式训练预算仍需具体范围，不能借原45条490小时；设计通过不等于实际实现／数值／资源通过。
 
 修订版定向外审已回收并独立处置（2026-10-24，Asia/Shanghai；13:29起）：用户再次告知“外审已结束”。[完整复审](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)接受L01—L04、G01、G03—G04、E01—E04，留下G02两处分支缺陷。主执行者核对零目标和过早停止的代数反例后，按外审明确修法形成[最终设计补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)：允许合法空权重结果；取消微小改善便撤销／整体停止，改为核验合格后继续原最多6轮，只对超容差目标反向增加报数值失败。BM25补avgdl>0，保留实际记忆容量不足与回放次数上限说明。已知设计缺口已处置，不冒称原提交稿无条件通过或实现／资格已通过；不重复审同一修法，后续新增实现仍按要求外审。原提交稿和首轮补充冻结，冲突处以最终设计补正为准；[本次回收及收尾](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)保留实际状态。尚无新资格／训练／确认数据／预算许可，本轮未SSH或科研计算，活动45条及下方带时点观测不改。
 

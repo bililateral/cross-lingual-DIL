@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-最终补正继续外审中（2026-10-24 13:39）：用户明确要求“继续提交外审是否还存在问题”，已向原GPT-6／Pro会话单次发送[最终补正全文与核查重点](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)，[提交回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)确认审查已开始。复用原背景和附件，重点核查两项G02修复及其衔接，也允许有新证据的其他设计问题；尚未取得完整结论。下方为已完成的前轮外审／本地主审，不冒充本次复核通过；无新增实施或预算许可。
+最终补正审查已关闭（2026-10-24 13:43）：[完整外审](../reports/documentation/20261024/continual_comparison/review/closure/report.zh.txt)及[独立主审](../reports/documentation/20261024/continual_comparison/review/closure/primary.zh.txt)均未发现新增必须修改的设计问题，R-G02-A/B已关闭；原稿→首轮补充→最终补正的优先关系保持。用户已明确“没问题就可以开始具体实验方案的实现了”，现进入已定范围的代码实现。新增资格资源、确认数据与正式训练预算尚待具体落实，不继承活动45条预算。
 
 修订复核已完成（2026-10-24，13:29起回收）：[完整修订外审](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)接受L²R、GCR尺度和评价定义，只留下G02合法空结果／提前停止两处分支。经独立代数核对，已按审查给出的明确修法形成[最终设计补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)：允许合法空支持、取消微小改善整体终止、保留六轮／NNLS／KKT及数值失败规则；其他方法、参数、规模和判据不变。与原稿及首轮补充合读，冲突处以此最终补正为准。当前已知设计缺口已处置，具体实现／资格／资源／端点实物仍待后续获准核验；未新增训练授权。见[回收记录](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)。
 

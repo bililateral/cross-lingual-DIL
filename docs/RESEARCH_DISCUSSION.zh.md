@@ -1,5 +1,9 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 最终外审关闭并授权具体实现
+
+用户原话：“外审已结束，回收完整意见，独立核对后告诉我是否还有问题。”随后补充：“没问题就可以开始具体实验方案的实现了”。13:43完整回收[第三轮外审](../reports/documentation/20261024/continual_comparison/review/closure/report.zh.txt)，R-G02-A/B均关闭，无新增必须修改的科学／复现设计缺陷。[独立主审](../reports/documentation/20261024/continual_comparison/review/closure/primary.zh.txt)复核目标、分支、计数及规模后接受，满足用户条件，进入固定方案代码实现。原文未取得本地原始字节的限制如实保留，本地实际身份另行核对。专用页已关闭；后续只核验新增实现及对应真实行为。授权实现不等于新增资格资源、新确认数据或正式训练预算；原45条活动实验不改。
+
 ## 2026-10-24 用户要求继续外审最终补正
 
 用户原话：“继续提交外审是否还存在问题”。据此覆盖主执行者此前“不因采纳同一建议再启动重复全文审查”的安排，原处置作为形成时记录保持。已于13:39通过指定本地Playwright，向原会话单次提交[完整补正及定向请求](../reports/documentation/20261024/continual_comparison/review/closure/request.zh.txt)，实际可见GPT-6／Pro第5档；[回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)确认停止按钮及针对本轮的审查开场。要求核实R-G02-A/B是否真正关闭，检查空池／计数／数值失败衔接及有证据的其他设计问题，区分未来实现验证与已证实设计缺陷；未变结论复用，不扩大实验。只发设计正文，未上传新包或数据；当前待完整回收与独立处置，不声称已经通过。本轮无SSH、科研执行、新预算、同步Linux或push。

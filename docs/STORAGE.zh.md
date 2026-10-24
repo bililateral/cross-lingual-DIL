@@ -2,6 +2,8 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
+13:43完整回收最终补正外审，review/closure保管[原文及独立处置](../reports/documentation/20261024/continual_comparison/review/closure/recovery.json)，没有新返回附件／ZIP；请求及最终补正的原始大小／SHA保持。网页已实际关闭，原“待审”段落为提交时点历史。此轮仅本地保管，无Linux模型／Memory操作，不重置大清理周期。
+
 13:39按用户最新要求再次提交最终补正正文，新增[定向请求／回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)及实际页面证据保存在review/closure，原补正7459字节／SHA256 2845359d15bae8a462e79dbbb35089b225d49e06648d3b4b65d20acc1a148576未变。原会话再次打开并保留待审；无新ZIP、附件上传或下载，原公开来源及前两轮证据继续复用。下面关闭事实为前轮实际收尾，未追改；本轮不操作Linux、模型或Memory。
 
 修订外审于13:29起完整回收，保留[第二次回复DOM／公式](../reports/documentation/20261024/continual_comparison/review/revision_external_review.json)、[完整转录](../reports/documentation/20261024/continual_comparison/review/revision_report.zh.txt)、[独立处置及最终补正](../reports/documentation/20261024/continual_comparison/review/revision_disposition.zh.txt)和[回收记录](../reports/documentation/20261024/continual_comparison/review/revision_recovery.json)。复审仅引用同名校准脚本，预览关键片段与原本地代码一致；未当作新补丁或下载重复源码，未声称完整附件字节身份已核验。原方案、首次补充及修订提交回执冻结，实际大小／SHA核对留回收记录。无新ZIP、模型／Memory操作或Linux副本；专用页关闭以实际回执为准。新材料只本地Git；局部外审收尾不重置大清理周期。
