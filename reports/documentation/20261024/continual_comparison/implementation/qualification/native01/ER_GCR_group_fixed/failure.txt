@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 288, in main
+    worker(args.job, args.worker, args.deadline)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 73, in worker
+    c, method = m.config(spec), m.Method(spec)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_continual_comparison.py", line 59, in config
+    c = five.record.config()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_record_replay.py", line 32, in config
+    c = copy.deepcopy(parent.config(parent.contract()))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_bge_continual.py", line 51, in contract
+    if data.sha256(POLICY) != POLICY_SHA256:
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_continual_population_data.py", line 39, in sha256
+    with path.open("rb") as stream:
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/schema/step28_bge_continual_policy.json'

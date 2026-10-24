@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 共享显存试跑与L²R一次补核
+
+用户依次要求“继续完成BGE/GPU核验”“8GB空闲显存不够运行吗？”“试一下看看能不能运行BGE/GPU核验”。主执行者原拟30GiB／无其他CUDA进程的准入过于保守，不能称作实测最低需求；随后限定7.75GiB allocator、单worker、1800秒，使用真实本地BGE及全部手写输入试跑。GCR科研部分通过，L²R最大图OOM；具体有效操作、核验入口的三项错误、收尾错误、全部费用及自设6次调用限制实际被超过的偏差，见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。不将入口错误写成算法失败，也不将部分通过写成整个资格通过。
+
+主执行者对L²R raw CLS切片只追加保留梯度的clone，CPU独立值／梯度及存储测试通过后，提出追加1200秒、累计3000秒、扣除1469秒后仅一个L²R worker／最多3更新的[具体补充](../reports/documentation/20261024/continual_comparison/implementation/native_supplement.zh.txt)。用户明确回答：“批准这一次 L²R 补核”。这一批准不提高显存上限、不缩小输入、不重跑GCR、不增加正式训练／数据权限。原OOM及调用偏差不追改；新资格结果与一行修复需要后续定向外审，具体包许可独立处理。
+
+native06全部科研操作完成后，累计原生2479秒／14实际更新，CPU42秒。另在17:16资源观测中发现原45控制器／worker已退出，17:12:52产生failure.json；原冻结控制器与本地同字节，明确把自身进程树外CUDA PID视为foreign并在补槽异常后终止存活worker。本轮事前只检查显存和归属、漏查旧队列兼容性，是主执行者的执行遗漏；不以两方法资格通过掩盖该问题。读取原故障文件被自动审批拒绝，已请求用户只批准运行故障日志读取，不查效果／标签，不重启原批次。因果与损失以获准后的实际日志为准，不能提前断言无影响，也不能把L²R最后阶段写成始终三worker共存验收。
+
 ## 2026-10-24 两处修订复审结案及后续资格边界
 
 用户原话：“外审已结束，回收完整意见，独立核对两处修改是否真正解决了问题，告诉我还有没有需要处理的地方。”已完整回收修订定向报告，并独立重新核对实际checkpoint／head_gradient、KKT上界推导、实际NNLS权重到Memory与回放、测试原件及当前来源。外审与[独立主审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/primary.zh.txt)均关闭I-GCR-CTX、I-GCR-NUM，无新增必须修改项；数值项按此前明确批准的新证书关闭，旧判据失败保持。

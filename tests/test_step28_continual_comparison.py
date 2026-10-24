@@ -454,6 +454,54 @@ class ComparisonTests(unittest.TestCase):
                   output['comparisons']['H_pos_tuned-L2R_text_fixed']['raw']['O']['map'], flush=True)
 
 
+class NativeSnapshotContract(unittest.TestCase):
+    def test_real_candidate_admission_and_rng_replay(self):
+        from step28_comparison_native import transient_snapshot
+        method = m.Method(m.Spec('ER_GCR_group_fixed', 'ABC', 4))
+        current = [group(i) for i in range(48)]
+        stage = method.stage(1, current, method.memory(), None)
+        before = transient_snapshot(stage)
+        stage.after_update(current[0])
+        drawn = stage.draw()
+        after = transient_snapshot(stage)
+        self.assertEqual(before['candidates'], [])
+        self.assertIsInstance(before['rng'], tuple)
+        stage.restore_transient(before)
+        stage.after_update(current[0])
+        self.assertEqual(stage.draw(), drawn)
+        self.assertEqual(stage.transient(), after)
+        print('Actual candidate admission and random draw repeat after independent typed snapshot', flush=True)
+
+    def test_raw_cls_releases_full_sequence_storage_and_preserves_gradient(self):
+        class WideTransformer(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.values = torch.nn.Parameter(torch.arange(4*256*4, dtype=torch.float32).reshape(4,256,4)/1000)
+            def forward(self, features):
+                return {'token_embeddings': self.values[:len(features['input_ids'])]}
+        model = torch.nn.Module()
+        model.encoder = torch.nn.ModuleList([WideTransformer()])
+        model.encoder.tokenizer = Tokenizer()
+        rows = m.l2r.accounts(group(), 'A')[:2]
+        cat, storage = torch.cat, []
+        def observed_cat(tensors, *args, **kwargs):
+            if tensors and all(t.ndim == 2 for t in tensors):
+                storage.extend((t.untyped_storage().nbytes(), t.numel()*t.element_size()) for t in tensors)
+            return cat(tensors, *args, **kwargs)
+        with mock.patch.object(torch, 'cat', side_effect=observed_cat):
+            actual = m.l2r.encode(model, rows, {'input': {'microbatch': 4, 'token_budget': 256}})
+        cls = model.encoder[0].values[:,0].detach()
+        means = torch.stack(((cls[0]+cls[1])/2, (cls[2]+cls[3])/2))
+        expected = torch.cat((means,means),1)/(2**.5)
+        torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+        actual.sum().backward()
+        gradient = torch.zeros_like(model.encoder[0].values)
+        gradient[:,0] = 2**-.5
+        torch.testing.assert_close(model.encoder[0].values.grad, gradient, rtol=1e-6, atol=1e-7)
+        self.assertEqual(storage, [(64,64),(64,64)])
+        print('Raw CLS storage: 2 x 64 bytes, not 2 x 16384; independent value and gradient reference passed', flush=True)
+
+
 if __name__ == '__main__':
     import scipy
     print('Environment:', sys.version, 'numpy', np.__version__, 'scipy', scipy.__version__,

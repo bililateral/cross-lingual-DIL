@@ -1,0 +1,70 @@
+/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_chinese_base.py:124: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  if pooling_modes(pool) != [m["pooling"]] or encoder.get_sentence_embedding_dimension() != m["embedding_dim"]:
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 313, in <module>
+    main()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 303, in main
+    worker(args.job, args.worker, args.deadline)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 184, in worker
+    envelope = timed('maximum_encoding_graph', maximum_graph)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 85, in timed
+    result = action()
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_native.py", line 176, in maximum_graph
+    z = m.l2r.encode(model, rows, c, budget.check)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_comparison_l2r.py", line 77, in encode
+    outputs.append(model.encoder[0](f)['token_embeddings'][:, 0].float())
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_continual_five.py", line 37, in checkpointed_encoder_forward
+    return checkpoint(forward, *args, use_reentrant=False, preserve_rng_state=True, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 1044, in _fn
+    return fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 503, in checkpoint
+    ret = function(*args, **kwargs)
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/native_workspace/scripts/step28_continual_five.py", line 35, in forward
+    return encoder._five_original_forward(*copied, **options)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/sentence_transformers/base/modules/transformer.py", line 1096, in forward
+    model_output = model_method(**filtered_kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
+    encoder_outputs = self.encoder(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 684, in forward
+    layer_outputs = self._gradient_checkpointing_func(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 1044, in _fn
+    return fn(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 503, in checkpoint
+    ret = function(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 627, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 248, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 640, in feed_forward_chunk
+    layer_output = self.output(intermediate_output, attention_output)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/transformers/models/bert/modeling_bert.py", line 554, in forward
+    hidden_states = self.LayerNorm(hidden_states + input_tensor)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/modules/normalization.py", line 229, in forward
+    return F.layer_norm(
+  File "/home/yongpeng/miniconda3/envs/py310/lib/python3.10/site-packages/torch/nn/functional.py", line 2901, in layer_norm
+    return torch.layer_norm(
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 31.32 GiB of which 7.69 GiB is free. Process 489844 has 7.53 GiB memory in use. Process 509546 has 7.53 GiB memory in use. Including non-PyTorch memory, this process has 8.38 GiB memory in use. 7.75 GiB allowed; Of the allocated memory 7.73 GiB is allocated by PyTorch, and 9.66 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

@@ -74,7 +74,9 @@ def encode(model, rows: list[Account], c: dict, check=lambda: None):
         f = {key: value.to(device) for key, value in f.items()}
         cast = torch.autocast('cuda', dtype=torch.bfloat16) if device.type == 'cuda' else contextlib.nullcontext()
         with cast:
-            outputs.append(model.encoder[0](f)['token_embeddings'][:, 0].float())
+            # A float32 CLS view otherwise pins every token's storage until cat().
+            # Clone only the CLS slice; values and its gradient connection stay intact.
+            outputs.append(model.encoder[0](f)['token_embeddings'][:, 0].float().clone())
     title, description = torch.cat(outputs).chunk(2)
     counts = [len(a.items) for a in rows]
     result = torch.stack([torch.cat((t.mean(0), d.mean(0)))/math.sqrt(2)

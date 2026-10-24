@@ -2,6 +2,8 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
+原生资格保管更新（2026-10-24）：Windows已核对回收native01—06及CPU07/08原始证据；native06回传15项、45运行来源结束后全部大小／SHA一致。每轮不同源码已在source子目录保管；native05旧L²R及原测试源码保留，原OOM不改写。native02/03失败临时全状态、native04及native06经验证的临时推理状态均已留证删除；native01—06目前无.pt，本次没有活动资格进程。手写Memory／分数留作资格证据，不是正式商品数据。原45控制器退出且出现failure.json，读取故障内容被自动审批阻断，尚未做恢复或正式权重清理。主审区分原生数学／显存证据和并行兼容性遗漏，具体见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。本轮不重置大清理周期。
+
 15:41定向实现审查已完整回收并独立结案，repair目录保管[原文、DOM／TeX和主审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/recovery.json)；11卡片都是输入引用，无新返回ZIP，专用页已关闭。当前38来源与CPU06匹配；cpu_checkpoint.zip中的CPU05过渡run/test原字节也与回执匹配，必要CPU快照和全部失败／通过证据保留。两份已结束上传ZIP已[逐项确认载荷同字节保管后删除](../reports/documentation/20261024/continual_comparison/implementation/review/repair/transport_cleanup.json)，合计368457字节：原62载荷中57在当前文件、5在核实的29092249提交，增量16载荷全在当前文件，输入清单／身份和本地Git均保留。代码／CPU证据仍两端保管，本轮新审查／可变文档只Windows；未SSH、删除权重／Memory或改活动45条，不重置大清理周期。下方在审保留文字是原提交时点历史。
 
 14:23首版实现已送审：新[具体包及许可](../reports/documentation/20261024/continual_comparison/implementation/review/authorization.json)为306117字节／63成员，处于在审保留期，未当作旧包重复上传。当前源码、首轮及增量源码快照、CPU01—04原失败／通过console及receipt保存在Windows implementation和Linux独立implementation/workspace、qualification；8份回传证据大小/SHA核验一致，未同步正式数据／模型／Memory。源码快照用于重放已发生失败及增量核验，暂有明确用途；不是新增大载荷备份。当前新源码及CPU证据两端保管，外审/可变总文档本轮仅Windows；原45条workspace及H/S权重依赖不改，没有新的训练权重清理。局部实施／送审不重置项目大清理周期。

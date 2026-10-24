@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+BGE/GPU科研操作已完成（2026-10-24）：ER+GCR在7.75GiB allocator下通过；L²R原228账号最大图OOM后增加保留梯度的CLS复制，CPU独立数值／梯度／存储检查通过，用户批准一次补核后native06最大图及完整阶段末通过。原生累计2479/3000秒、14次实际更新，CPU42秒，见[原生主审](../reports/documentation/20261024/continual_comparison/implementation/qualification/native_primary.zh.txt)。同时发现原45控制器与外来CUDA进程不兼容，17:12生成failure.json并退出；具体故障日志读取待用户批准，不重启原批次。L²R最后最大图／端点主要在原worker退出后运行，不能称完整并发资格通过。新资格／存储修复外审尚未完成，正式18轨迹、新确认和H/S实物仍未放行。
+
 实现定向复审已关闭（2026-10-24 15:41）：[完整复审](../reports/documentation/20261024/continual_comparison/implementation/review/repair/report.zh.txt)及[独立核对](../reports/documentation/20261024/continual_comparison/implementation/review/repair/primary.zh.txt)确认阶段末求导边界已实际修复、已批准的float64舍入误差证书计算及OMP／Memory／回放接线成立，两项均关闭且无新增必须修改项。原CPU01/02失败不追改；新证书仅保证相应真实违反量不超过tau0+2E，不声称旧精度或全局最优子集。未变设计与证据复用，累计36/1200秒不变。下一步是有限真实BGE/GPU形状、端点实物及资源资格的具体范围／预算，尚非正式运行许可；54端点的1944校准／恢复群前向须进入未来预算。
 
 首版实施已送审（2026-10-24 14:23）：固定设计对应的两适配器、独立单轨迹与确认／统计入口已形成；[手写CPU证据](../reports/documentation/20261024/continual_comparison/implementation/qualification/primary.zh.txt)为11个不同测试通过、1个GCR大范数KKT反例未关闭，原失败账计入19/1200秒。经用户批准具体新包，已提交[实现外审](../reports/documentation/20261024/continual_comparison/implementation/review/submission.json)，当前待完整意见及独立处置。设计审查关闭不等于数值资格通过；不新增真实BGE/GPU、新确认数据或正式训练，活动45条不改。
