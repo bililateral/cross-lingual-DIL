@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-24 批准手写CPU核验并提交首版实现外审
+
+用户对implementation_scope.zh.txt所列范围明确答复：“批准上述手写 CPU 核验”。已按Linux既有py310、单线程／4GiB／256MiB／1200累计秒、手写群及小型可微encoder执行；未载真实BGE、读正式数据或使用GPU。四次尝试累计记账19秒，12个不同测试11通过，1个GCR大范数反例在既有SciPy1.15.3下未满足冻结KKT；失败／诊断回执均保留，继续独立代码和行为核验而不改容差择优，见[资格处置](../reports/documentation/20261024/continual_comparison/implementation/qualification/primary.zh.txt)。
+
+新增实现送审包已具体形成后，用户明确答复：“批准该完整实现包上传外审”。这是306117字节、63成员、SHA256 5ad2439ade5d3e079b2fb9f3fec5899a6e2ecf6403111b6262c34d697de1894d的完整代码／直接依赖／已审规范／CPU证据包，非旧17成员方案包许可的泛化。14:22本地Playwright单次上传／发送至原会话，14:23已开始审查，见[授权及提交](../reports/documentation/20261024/continual_comparison/implementation/review/submission.json)。要求明确背景、未见身份／纯文本限制、H/S调参差异、已知数值失败及未测原生范围；外审不在网页环境跑科研代码。不新增GPU、正式数据、预算或训练授权，未重复启动旧作业。
+
 ## 2026-10-24 最终外审关闭并授权具体实现
 
 用户原话：“外审已结束，回收完整意见，独立核对后告诉我是否还有问题。”随后补充：“没问题就可以开始具体实验方案的实现了”。13:43完整回收[第三轮外审](../reports/documentation/20261024/continual_comparison/review/closure/report.zh.txt)，R-G02-A/B均关闭，无新增必须修改的科学／复现设计缺陷。[独立主审](../reports/documentation/20261024/continual_comparison/review/closure/primary.zh.txt)复核目标、分支、计数及规模后接受，满足用户条件，进入固定方案代码实现。原文未取得本地原始字节的限制如实保留，本地实际身份另行核对。专用页已关闭；后续只核验新增实现及对应真实行为。授权实现不等于新增资格资源、新确认数据或正式训练预算；原45条活动实验不改。

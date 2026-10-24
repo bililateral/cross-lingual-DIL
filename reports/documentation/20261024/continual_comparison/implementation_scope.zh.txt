@@ -1,0 +1,10 @@
+持续学习比较：具体实现与首批CPU核验范围
+2026-10-24。设计依据为proposal.zh.txt、review/primary_disposition.zh.txt、review/revision_disposition.zh.txt及review/closure的完整外审／独立主审。用户“没问题就可以开始具体实验方案的实现了”的条件已满足，允许开始具体代码实现。
+
+实现仅包括L²R和ER+GCR适配器、独立训练与评价入口、对应少量手写行为核验。冻结原45条来源不改；H/S只加载既有合格端点，不新增重训入口。参数、工作量、历史容量、确认指标及判据沿已审规范。Linux资格资源、新确认数据和正式训练尚无新增预算许可。
+
+首批可审查CPU核验已具体形成：scripts/step28_comparison_l2r.py、step28_comparison_gcr.py、step28_continual_comparison.py及tests/test_step28_continual_comparison.py。手写28账号群与小型可微编码器，不载真实BGE、不读取商品文件／正式训练或评价标签、不使用GPU。核查PSS符号／ISD、两项OMP反例及正则单原子解、完整目标头梯度与绝对回放权重、真实optimizer更新／候选入池时序、K3正例与假负屏蔽、序列化状态。数值失败保留，不能为了通过而改方法／容差；修复明确实现错误后仅重跑受影响测试，全部尝试计入累计预算。
+
+申请该手写CPU阶段累计外层不超过1200秒、单CPU线程、RSS不超过4GiB、独立输出不超过256MiB；使用Linux既有py310，不安装或升级依赖。先只读核对自身作业与共享资源；源码SFTP到独立目录，不覆盖活动workspace；记录命令、环境、来源、实际通过／失败和累计用时。此次CPU许可不覆盖真实BGE原生资格、GPU、正式训练、数据生成或确认；这些须依据具体代码和资源测量另行落实。
+
+新独立入口及评价仍在同一授权范围内实现；CPU阶段实际运行须等上述资源范围获得用户确认。本说明不自称已获准预算，也不冒称代码已通过核验。

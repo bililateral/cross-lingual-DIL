@@ -1,0 +1,21 @@
+test_gcr_full_head_gradient_and_absolute_replay_weight (__main__.ComparisonTests) ... ok
+test_gcr_real_update_admission_and_roundtrip (__main__.ComparisonTests) ... ok
+test_l2r_multi_positive_real_update_and_false_negative_mask (__main__.ComparisonTests) ... ok
+test_omp_keeps_tiny_first_step (__main__.ComparisonTests) ... ERROR
+test_omp_ridge_zero_and_small_improvement (__main__.ComparisonTests) ... ok
+test_pss_sign_and_fixed_reference_isd (__main__.ComparisonTests) ... ok
+
+======================================================================
+ERROR: test_omp_keeps_tiny_first_step (__main__.ComparisonTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/workspace/tests/test_step28_continual_comparison.py", line 98, in test_omp_keeps_tiny_first_step
+    w, log = m.gcr.nonnegative_omp(d, d.sum(1), list('abcdef'))
+  File "/home/yongpeng/cross-lingual/reports/documentation/20261024/continual_comparison/implementation/workspace/scripts/step28_comparison_gcr.py", line 47, in nonnegative_omp
+    raise ValueError('Nonnegative GCR refit failed fixed KKT conditions')
+ValueError: Nonnegative GCR refit failed fixed KKT conditions
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.223s
+
+FAILED (errors=1)

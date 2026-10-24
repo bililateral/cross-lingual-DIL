@@ -2,6 +2,8 @@
 
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 
+14:23首版实现已送审：新[具体包及许可](../reports/documentation/20261024/continual_comparison/implementation/review/authorization.json)为306117字节／63成员，处于在审保留期，未当作旧包重复上传。当前源码、首轮及增量源码快照、CPU01—04原失败／通过console及receipt保存在Windows implementation和Linux独立implementation/workspace、qualification；8份回传证据大小/SHA核验一致，未同步正式数据／模型／Memory。源码快照用于重放已发生失败及增量核验，暂有明确用途；不是新增大载荷备份。当前新源码及CPU证据两端保管，外审/可变总文档本轮仅Windows；原45条workspace及H/S权重依赖不改，没有新的训练权重清理。局部实施／送审不重置项目大清理周期。
+
 13:43完整回收最终补正外审，review/closure保管[原文及独立处置](../reports/documentation/20261024/continual_comparison/review/closure/recovery.json)，没有新返回附件／ZIP；请求及最终补正的原始大小／SHA保持。网页已实际关闭，原“待审”段落为提交时点历史。此轮仅本地保管，无Linux模型／Memory操作，不重置大清理周期。
 
 13:39按用户最新要求再次提交最终补正正文，新增[定向请求／回执](../reports/documentation/20261024/continual_comparison/review/closure/submission.json)及实际页面证据保存在review/closure，原补正7459字节／SHA256 2845359d15bae8a462e79dbbb35089b225d49e06648d3b4b65d20acc1a148576未变。原会话再次打开并保留待审；无新ZIP、附件上传或下载，原公开来源及前两轮证据继续复用。下面关闭事实为前轮实际收尾，未追改；本轮不操作Linux、模型或Memory。
