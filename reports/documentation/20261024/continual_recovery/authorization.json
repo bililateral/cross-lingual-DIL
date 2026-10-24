@@ -43,5 +43,15 @@
   "external_upload_authorized": false,
   "no_extra_gpu_qualification": true,
   "background_start_authorization_quote": "批准启动上述后台等待与条件恢复",
-  "background_start_scope": "One persistent waiter; after reviewed recovery and all original resources, automatically recover the fixed 21 pending trajectories and original all-45-gated evaluation; retain prior costs and total limits."
+  "background_start_scope": "One persistent waiter; after reviewed recovery and all original resources, automatically recover the fixed 21 pending trajectories and original all-45-gated evaluation; retain prior costs and total limits.",
+  "prior_wait_control_seconds": 32.48167012195336,
+  "refill_amendment": {
+    "user_quote": "原实验补任务时的检测逻辑也得改，改成补任务时不满10GB空闲显存则停止该worker，其余worker仍正常运行。注意只改补任务时的逻辑，其余不要改",
+    "clarification": "按此修改，显存不足只暂停补任务（推荐）",
+    "per_vacant_slot_bytes": 10737418240,
+    "foreign_pid_veto_at_refill": false,
+    "insufficient_gpu_action": "WAIT_WITH_OTHER_WORKERS_CONTINUING",
+    "original_startup_and_other_experiment_logic_unchanged": true
+  },
+  "wrapper_repair_clarification": "记账修复和来源校验，这是指等待程序吧。我指的其余不要修改是针对原实验程序的。"
 }

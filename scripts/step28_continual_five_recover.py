@@ -118,13 +118,23 @@ def validate_ready(gate, gate_path):
     if (ready['status'] != 'REVIEW_CLOSED_AND_CPU_PASSED'
             or ready['authorization_sha256'] != sha(gate_path)):
         raise ValueError('Recovery review does not bind this authorization')
+    required = {str(Path(__file__).resolve()),
+                str(Path(gate_path).parent/'scripts/step28_continual_refill.py'),
+                str(Path(gate_path).parent/'tests/test_step28_continual_recovery.py'),
+                str(Path(gate_path).parent/gate['launcher_name'])}
+    if {r['path'] for r in ready['sources']} != required or len(ready['sources']) != len(required):
+        raise ValueError('Recovery source coverage differs')
     for record in ready['sources']:
         if sha(record['path']) != record['sha256']:
             raise ValueError('Reviewed recovery source changed')
     receipt = read(ready['cpu_receipt'])
     if (sha(ready['cpu_receipt']) != ready['cpu_receipt_sha256'] or receipt['exit_code'] != 0
-            or receipt['charged_seconds'] > 180 or receipt['formal_data_reads'] != 0):
+            or receipt['recovery_cumulative_seconds'] > 180 or receipt['formal_data_reads'] != 0
+            or receipt['campaign_cumulative_cpu_seconds'] > 1200):
         raise ValueError('Bounded handwritten CPU evidence absent')
+    tested = {r['path']: r['sha256'] for r in receipt['sources']}
+    if any(tested.get(r['path']) != r['sha256'] for r in ready['sources']):
+        raise ValueError('Reviewed sources differ from CPU evidence')
     return ready
 
 
@@ -152,7 +162,8 @@ def qualify_cpu(gate_path, job):
     if limit <= 0 or job.exists() or job.parent != root/'qualification':
         raise ValueError('Fresh bounded CPU attempt required')
     job.mkdir(parents=True)
-    source_paths = [Path(__file__).resolve(), root/'tests/test_step28_continual_recovery.py',
+    source_paths = [Path(__file__).resolve(), root/'scripts/step28_continual_refill.py',
+                    root/'tests/test_step28_continual_recovery.py',
                     root/gate['launcher_name'], gate_path]
     sources = [dict(path=str(p), sha256=sha(p), bytes=p.stat().st_size) for p in source_paths]
     original = read(gate['original_gate'])
@@ -204,19 +215,22 @@ def wait_for_recovery(gate_path, launcher):
     with lock.open('x', encoding='utf-8') as stream:
         json.dump(dict(pid=os.getpid(), owner=psutil.Process().username(),
                        created=psutil.Process().create_time(), gate_sha256=sha(gate_path)), stream)
-    charged = 0.
+    charged = gate.get('prior_wait_control_seconds', 0.)
     try:
         while True:
             tick = time.monotonic()
-            row, ready = resources(), validate_ready(gate, gate_path)
-            launch = ready is not None and resource_ready(row)
-            observed_cost = time.monotonic()-tick
-            if gate['prior_control_seconds']+charged+observed_cost >= 1740:
-                raise RuntimeError('Remaining control allowance reserved for shutdown')
-            write(root/'waiter_status.json', dict(status='READY' if launch else 'WAITING',
-                  review_ready=ready is not None, resource_ready=resource_ready(row), resource=row,
-                  control_seconds=charged+observed_cost, sleep_seconds=60))
-            charged += time.monotonic()-tick
+            try:
+                row, ready = resources(), validate_ready(gate, gate_path)
+                launch = ready is not None and resource_ready(row)
+                observed_cost = time.monotonic()-tick
+                if gate['prior_control_seconds']+charged+observed_cost >= 1740:
+                    raise RuntimeError('Remaining control allowance reserved for shutdown')
+                write(root/'waiter_status.json', dict(status='READY' if launch else 'WAITING',
+                      review_ready=ready is not None, resource_ready=resource_ready(row), resource=row,
+                      control_seconds=charged+observed_cost, sleep_seconds=60))
+            finally:
+                # Exactly one charge per check, including exceptions; sleep is outside.
+                charged += time.monotonic()-tick
             if launch:
                 break
             time.sleep(60)
@@ -295,16 +309,17 @@ def execute(gate_path, wait_seconds):
         for identity in FAILED_IDS:
             # Count retained failed payloads in the same original disk budget.
             hardlink_tree(old/identity, prior_failed/identity)
-        ledger.charge('control', time.monotonic()-started+30.)
         preparing = False
+        ledger.charge('control', time.monotonic()-started+30.)
         queue = [dict(id=s.run_id, spec=s.identity(), allowance=86400.,
                       projected_seconds=original_gate['per_run_projected_seconds'][s.name]) for s in pending]
         def command(row, job, deadline):
             run.data.write_json(job/'spec.json', row['spec'])
             return [sys.executable, '-B', str(Path(run.__file__)), '--job', str(job),
                     '--spec', str(job/'spec.json'), '--deadline', str(deadline), '--gate', gate['original_gate']]
-        receipts = ctl.dispatch(queue, campaign, ledger, 'training', command,
-                                admit=lambda active: ctl.resource_admission(original_gate, active, campaign))
+        import step28_continual_refill as refill
+        receipts = refill.dispatch(ctl, queue, campaign, ledger, 'training', command,
+                                  admit=lambda active: refill.slot_available(original_gate, active, campaign))
         tick = time.monotonic()
         records = [read(campaign/s.run_id/'run/completion.json') for s in m.specifications()]
         ctl.joint_opening(records, original_gate['sources'])
@@ -324,10 +339,16 @@ def execute(gate_path, wait_seconds):
         write(campaign/'completion.json', {**result, 'status':'ALL_45_AND_FROZEN_CONFIRMATION_ANALYSIS_COMPLETE',
                                           'budget':ledger.snapshot()})
     except BaseException as error:
+        original_traceback = traceback.format_exc()
+        accounting_error = None
         if preparing:
-            ledger.charge('control', time.monotonic()-started+30.)
+            preparing = False
+            try:
+                ledger.charge('control', time.monotonic()-started+30.)
+            except BaseException as charge_error:
+                accounting_error = repr(charge_error)
         write(campaign/'failure.json', dict(status='STOP_NO_RETRY', error=repr(error),
-                                            traceback=traceback.format_exc(), budget=ledger.snapshot()))
+              traceback=original_traceback, accounting_error=accounting_error, budget=ledger.snapshot()))
         raise
 
 

@@ -1,4 +1,18 @@
 # 训练期间的科研流程与需求讨论
+## 2026-10-24 外审回收、补槽规则收窄及等待包装修复
+
+本轮后续结案：修订完整外审关闭C-R01、C-R02、C2及单槽补任务，无新前置修改；主执行者逐项对照代码／CPU原件独立同意，不新增测试。经Linux核对四项修订来源、当前授权、CPU02和原61冻结文件后，已发布review_ready，唯一等待610563获准按既有范围自动恢复，无须用户再批准。资源曾短时达到31.10GiB／无CUDA，但放行时已被其他作业占用，最新状态为约4.54GiB、review_ready=true而resource_ready=false，正式恢复未开始。完整[修订报告](../reports/documentation/20261024/continual_recovery/review/refill_revision/report.zh.txt)、[主审](../reports/documentation/20261024/continual_recovery/review/refill_revision/primary_disposition.zh.txt)和[放行原件](../reports/documentation/20261024/continual_recovery/review_release.json)已保管；下方“正在回应”是提交时点历史。
+
+用户告知合并“外审已结束”，主执行者完整回收原文并独立核对：L²R／GCR有限原生资格可结案，恢复正常映射及评价接线可复用；两处包装程序记账错误与来源覆盖需修。主执行者另确认原补槽逻辑仍会因外来CUDA进程报错并终止其余worker，不能据外审认可正常路径就原样恢复。
+
+用户先要求按实际GPU资源决定并答复“按此修改，显存不足只暂停补任务（推荐）”，随后进一步明确：“原实验补任务时的检测逻辑也得改，改成补任务时不满10GB空闲显存则停止该worker，其余worker仍正常运行。注意只改补任务时的逻辑，其余不要改”。主执行者明确解释为待补空槽不启动、现有worker继续，按原额度10 GiB判断一个空槽，不再按所有空缺槽合并门槛；原实验初始启动和其他逻辑保持。该最终限定优先于前一轮笼统的所有空槽表述。
+
+自动审批曾拒绝合并补丁，将“其余不改”解读为连恢复包装记账也不准改；该次没有实际改文件。用户明确澄清：“记账修复和来源校验，这是指等待程序吧。我指的其余不要修改是针对原实验程序的。自动审查什么傻逼”。据此只改原实验的补槽行为，同时继续修复等待／恢复包装的C-R01、C-R02与来源覆盖，不新增预算或科研选择，不再重复询问此实施范围。
+
+CPU02十项通过，含真实手写三进程的两个继续存活、空槽低显存不启动／足额补入；准备失败只收费一次且保存原故障，等待失败收费且sleep不收费，空／错源拒绝。新增16秒，恢复28/180秒、原批CPU96/1200秒。旧等待583238仅在确认无child、无正式目录及无review_ready后为更新已加载函数而停止，旧字节、费用归档；替代610563单一等待，原费用承接。原训练／评价冻结61来源完全一致，无GPU或正式数据读取。
+
+用户明确“批准该完整增量包上传原会话定向复审（推荐）”，许可33514字节／14成员、SHA256 292bf87931419e613b6e33af2486b9c66fdd7d43d163833e07aacd5df7477865的continual_recovery_refill_repair.zip。19:42在原会话单次成功提交，页面正在回应；见[完整范围](../reports/documentation/20261024/continual_recovery/review/refill_revision/scope.zh.txt)、[独立处置](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)及[提交回执](../reports/documentation/20261024/continual_recovery/review/refill_revision/submission.json)。没有生成正式review_ready，不把手写验证当成已恢复训练。
+
 ## 2026-10-24 条件恢复等待已启动、两项合并外审已提交
 
 用户要求编写等待脚本后，主执行者完成恢复编排／launcher及4项Linux手写核验，新增CPU12秒，未使用GPU或正式数据。后台启动首次被自动审批拒绝；用户随后明确“批准启动上述后台等待与条件恢复”，覆盖保留24成功条、重跑2中断条并续19、原3-worker和490h、全45完成后的原评价。18:45:48实际等待PID583238启动，已有监听不重建；review_ready文件缺失及资源不足均阻止训练，未把等待进程说成恢复已开训。
