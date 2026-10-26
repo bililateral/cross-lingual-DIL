@@ -1,0 +1,11 @@
+2026-10-26 结果分析必要勘误
+
+结果外审仍在生成，以下不是完整外审结案，而是主执行者针对中间具体疑点已经独立核实的修正。原9017557字节送审ZIP、report.zh.txt和audit02/audit.json不覆盖；首次分析来源可在本地Git fe56061e按原路径重取。
+
+1. Memory尺寸下界：原报告第二节及audit02的216828字节应为188788字节，上界364137不变。108份非SEQ端点的保存元数据逐项机械核对，最小值为BCA_s4_ER0.1_ref第2阶段serialized_bytes=188788，auxiliary_serialized_bytes=28040。冻结scripts/step28_bge_continual.py的to_bytes已把auxiliary写入同一payload；summary的serialized_bytes=len(payload)，auxiliary_serialized_bytes只是其中子集。原核对脚本又相加一次，是本轮结果审计的重复统计，不是正式学习器超占Memory或保存内容缺失。
+
+主执行者直接阅读该序列化／summary代码及记录结构Memory的bytes字段，并在Windows仅提取108个已保存大小字段机械比较。未解码Memory、读取标签、载模或执行科研模块。当前audit脚本该行改为账号结构直接取serialized_bytes；没有重跑原完整核对或把新脚本冒称已经执行。原成功核对回执仍绑定19257字节SHA d5ca0e01245265d663229db356003153daa3b3a2c392408582a376872b95a89c的旧核对脚本，原首轮字段缺失失败也继续保留。此修正不改变低于1048576字节的判断、正式数值、配对区间、主门false或费用；无需重跑2772项统计或GPU资格。
+
+2. 状态时序：report.zh.txt和package.json形成时为尚未送审／待具体许可；用户随后明确批准同一完整包，10:13已在原GPT-6/Pro会话单次提交。当前状态以review/submission.json为准，报告中的形成时状态不恢复为当前阻断。新增L²R/ER+GCR的另行开训准备及额度讨论由共享当前交接的对应段落跟踪，不由本轮结果分析授权或否决；本批分析与其执行权限、预算分别处理。
+
+其余外审意见等待完整报告回收后逐项独立处置；不将生成中的部分内容当最终外审。

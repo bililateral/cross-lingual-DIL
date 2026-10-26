@@ -147,7 +147,7 @@ def main(campaign, output):
                 restore_checks += 2
                 mem = point["memory_summary"]
                 if mem is not None:
-                    size = mem["bytes"] if "bytes" in mem else mem["serialized_bytes"]+mem["auxiliary_serialized_bytes"]
+                    size = mem["bytes"] if "bytes" in mem else mem["serialized_bytes"]
                     assert size <= 1048576 and len(mem["members"]) == 6
                     memory_bytes.append(size)
             expected = set(CELLS) | ({"1_2", "2_3"} if rid.endswith("SEQ_ref") else set())
