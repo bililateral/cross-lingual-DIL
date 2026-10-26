@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+当前原版补充实现（2026-10-26）：用户指定S_default＋历史H（G_half），已按[最小实现范围](../reports/documentation/20261026/continual_defaults/implementation.zh.txt)接入原训练器并完成限定手写CPU（7/120秒）。[新实现外审](../reports/documentation/20261026/continual_defaults/review/submission.json)11:26单次提交原GPT-6/Pro会话，正在生成。只复用原公式/三阶段框架并新增显式配置接线，不增加H_pos_default；正式18条预算、评价数据/开封及执行门尚未确定，活动下方L²R/GCR队列不改。完整状态见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+
 当前新对照执行（2026-10-26）：用户已批准822小时完整预算、18条L²R／ER+GCR训练及后续固定新确认，明确仅本次新增编排免外审。按[执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[独立处置](../reports/documentation/20261026/continual_comparison/primary.zh.txt)，复用原算法资格和H/S54状态，独立三路已实际开训；实时进度统一见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。原45条不重训，旧失败不清零；下方历史“新18条／新确认／独立预算未授权”已被最新明确决定取代，不恢复为阻断。算法、评价判据及未来结果审查不在新增编排免审范围内。
 
 当前五方法结果（2026-10-26）：45条及冻结新确认／统计均完整完成，见[独立结果分析](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)。H−S最终旧域／新域MAP正向，但遗忘差区间跨零，原O/F共同门未过；不因结果新增训练、调参或变更判据。本轮结果外审已完整回收并独立结案，见[完整外审](../reports/seller_alias_continual/20261026/continual_result/review/external/review_report.zh.txt)及[主审处置](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)。唯一Memory尺寸摘要重复计数及两处文字已追加[勘误](../reports/seller_alias_continual/20261026/continual_result/errata.zh.txt)，不影响原主门；不新增修复实验，专用页已关闭。两新对照另行执行范围／预算按最新决定，本结果审查不授予新实验。下方启动／等待文字保留各自时点，不据此重复运行；当前状态统一看[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。

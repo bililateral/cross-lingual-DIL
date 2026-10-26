@@ -216,17 +216,20 @@ def train_stage(method, model, optimizer, current, memory, c, stage, root, budge
     return data.record(path, root)
 
 
-def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path) -> dict:
+def execute(job: Path, spec: m.Spec, deadline: float, gate_path: Path, *,
+            implementation=m, source_files=None) -> dict:
     import torch
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     gate = data.read_json(gate_path)
-    if (gate.get("status") != "APPROVED_IMPLEMENTATION_AND_RESOURCES" or gate["sources"] != sources()
-            or gate["runs"] != [s.identity() for s in m.specifications()]):
-        raise ValueError("Exact implementation/qualification/45-run gate missing")
+    expected_sources = sources() if source_files is None else source_files
+    expected_runs = [s.identity() for s in implementation.specifications()]
+    if (gate.get("status") != "APPROVED_IMPLEMENTATION_AND_RESOURCES" or gate["sources"] != expected_sources
+            or gate["runs"] != expected_runs or spec.identity() not in expected_runs):
+        raise ValueError("Exact implementation/qualification/run-list gate missing")
     budget = Budget(job.parent, deadline)
     budget.check()
-    c, method = m.config(spec), m.Method(spec)
+    c, method = implementation.config(spec), implementation.Method(spec)
     parent.configure_numerics()
     torch.cuda.set_per_process_memory_fraction(gate["allocator_bytes"]/torch.cuda.get_device_properties(0).total_memory)
     archive = core.model_files(base.model_config(c, "split_rank"))

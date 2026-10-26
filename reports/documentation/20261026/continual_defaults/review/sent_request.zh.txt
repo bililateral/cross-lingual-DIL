@@ -1,0 +1,18 @@
+用户已明确要求这次最小实现提交外审，并另批准限定CPU验证。请审查本轮新附件，不是此前已结案的五方法结果报告。附件 continual_defaults_implementation_review.zip，369325 字节，72 成员（71 载荷及清单），SHA256 f1f46d53703b501b16f8ddd86337404760dac1e393dbd923de12d6dfd7315845。
+
+原版S与历史H最小实现外审——请在同一GPT 6 Pro会话审查本轮新包。
+
+用户最新明确选择“S_default＋历史H（G_half）：复核此前约0.52的原方法”，并要求在本批脚本基础上尽快实现、提交外审；另明确批准仅120秒/单线程/4GiB/32MiB手写CPU核验。当前已完成cpu01，7/120秒。当前请求覆盖该新增实现及必要证据上传，不借旧结果ZIP的限定许可；不含正式文本/标签源、权重、Memory载荷、私有资产或密码。不要将同会话此前五方法结果/实现意见当本轮审查。
+
+先读reports/documentation/20261026/continual_defaults/implementation.zh.txt、authorization.json、qualification/primary.zh.txt、cpu01原件与inheritance.json，再读新adapter、单轨迹入口、原runner增量diff及直接历史损失/评分。input_manifest.json提供全部实际载荷大小/SHA；请在最终网页公布实际收到ZIP的大小/SHA，并核对清单。
+
+最重要的问题：
+1. S_default是否真正原rank、均值汇聚、lambda/LR=1；H_default是否真正历史G_half原rank与0.5mean+0.5logmeanexp，而非H_pos仅换参数。目标/教师/实际梯度、优化器、评分和恢复是否都用同一个方法身份，是否有只改名称或配置未生效的伪实现。
+2. 新方法直接复用旧record.objective与g_half.objective/score，继承five.Method三阶段update、Memory、恢复；原run只增加显式implementation/source_files参数及实际run-list检查。是否已最小充分，哪些新行确有必要、哪些可删。不要另建通用配置平台、重写训练器或强加全历史回归。
+3. 三项手写CPU证据是否能辨别错误rank、H退回mean、缺A1/教师，真实encoder/head及Adam更新、恢复下一步/分数。入口检查在config处截断、空Memory只核身份、手写Adam624等限制是否如实。不把名称、哈希、测试数量、exit0当行为证据；也不因旧适用证据不是新跑而自动要求重复GPU/全模型网格。指出实际未验证且影响当前交付的缺口。
+4. 默认原五方法仍45身份，新的18身份为ABC/BCA/CAB×s4-s6×两方法，旧45门不能通用。活动L²R/GCR独立workspace未动。新单轨迹入口可供后续既有队列调用，当前未生成新正式门、累计预算、队列或评价/标签开放。这一实现审查不等于已批准正式18条运行；请不要将尚未确定的正式数据/预算方案当成已实现再审，也不要据此要求现在创造无用框架。
+5. 复核既有证据的适用边界：原损失/评分和三阶段更新/保存未变，只补配置适配及实际入口接线。配置内optuna_trial和继承的self.tuned只是历史接口字段，本次没有study/HPO。S_tuned−S_default能看已选参数整体影响；H_pos_tuned−H_default混合rank及参数，不能独立归因Optuna。三阶段新seed协议不能保证复现历史单s0/AB的0.5221。
+6. 原120确认群已经见过，后续若复用只能称事后诊断；独立新确认及共同评分另需明确范围。保留原H/S主门false，不自动新增HPO、第三臂H_pos_default、seed、顺序、全epoch诊断或新数据。本轮不能为翻转主门扩张。
+
+输出完整中文报告、逐项findings与证据/最小建议、实际阅读范围和限制。区分已证科学阻断、必要复现缺陷、未核实疑点、合理后续和过度设计；明确哪些必须在本轮实现交付前修复，哪些只在正式预算/评价方案确定后需要落实。当前是实现增量审查，不要求再对已关闭结果做bootstrap或给性能结论。
+仅阅读提供文件及做普通机械核对；不连接项目Linux，不执行项目科研训练/载模/推理/重采样，不生成数据或索取未提供资产；不要把网页环境运行当项目py310资格。请把完整报告及必要小附件打为一个可下载ZIP，附逐载荷清单，并在网页公布返回ZIP大小/SHA。主执行者将独立处置，外审意见不授予正式训练、数据或预算权限。

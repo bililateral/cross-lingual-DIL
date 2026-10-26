@@ -1899,3 +1899,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 执行者区分了H_pos_default（仅恢复默认两维参数）与历史H/G_half（还恢复原rank）后，用户明确选择：“S_default＋历史 H（G_half）：复核此前约 0.52 的原方法”。本轮已明确补充对象和研究目的；不是选择H_pos_default，也不自动增加第三臂。拟沿用原三域三循环和s4—s6时，最小补充为2×3×3=18完整轨迹，15552更新、54阶段状态；这是待形成具体合同和资源范围的规模推导，尚未授予新运行预算、数据权限或修改活动队列。
 
 S_default与历史H都保持lambda_rank=1、LR倍率=1及原rank；前者记录对均值，后者0.5mean＋0.5logmeanexp、tau=1。H−S可回答默认配置下历史汇聚策略的系统增量，S_tuned−S_default可描述本次入选两参数配置的差异；H_pos_tuned−历史H同时含rank与超参数变化，不能全部解释成Optuna作用。历史s0/AB证据可复用作背景，不能替代新三阶段/多seed轨迹；本批H_pos_tuned−S_tuned主门false不追改。已开放120确认群只能作明确事后补充比较；若要新的独立确认主张，须前瞻冻结相应未见评价安排。不自动并入正在运行的L²R/ER+GCR、借490h/822h余额或重开已关闭结果审查。本轮仅核对既有配置和记录用户决定，未SSH、改科研代码或启动实验。
+
+## 2026-10-26 授权原版S/H最小实现、限定CPU与实现外审
+
+用户原话：“那是不是很好改，我理解就在原本此次实验的脚本基础上换一个训练配置就行，别的都不需要改。赶紧实现提交外审”。范围承接上一条明确选择S_default＋历史H（G_half）；S恢复lambda/LR=1，历史H同时使用旧rank与固定混合聚合，不用H_pos_default代替。
+用户在看到单线程120秒累计、4GiB/32MiB、既有Linux py310、仅手写输入、不载BGE/不用GPU/不读正式数据、不借旧预算的具体范围后答复：“批准这项限定 CPU 验证”。该许可已执行，不再重复询问。
+最小实现、三项实际核验与独立处置见[implementation](../reports/documentation/20261026/continual_defaults/implementation.zh.txt)和[qualification/primary](../reports/documentation/20261026/continual_defaults/qualification/primary.zh.txt)。cpu01零失败，累计7/120秒，未启动正式补充训练。38个旧冻结来源同字节复用，原runner一项小改，新增适配/入口/CPU及本轮范围；当前45项资格来源逐项一致。
+按本轮直接实现/提交外审要求，经本地Playwright将369325字节/72成员新实现包单次提交原会话，11:26显示生成；具体身份、发送全文及实际页面见[提交回执](../reports/documentation/20261026/continual_defaults/review/submission.json)。本次许可不依赖此前仅指定旧结果ZIP的上传批准；包内仅新增实现、手写证据与直接适用背景，没有正式数据/标签源、模型或Memory载荷。
+正式18条队列与评价配置须在相应预算/数据范围确定后填入既有编排；本轮未签正式门或创建自动开训。旧120确认群已见和H_pos_tuned对历史H的混合干预边界保持，当前L²R/GCR运行不变，先等新完整外审并独立处置。
