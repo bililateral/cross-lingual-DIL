@@ -1,0 +1,28 @@
+{
+  "status": "SUBMITTED_GENERATING",
+  "submitted_at": "2026-10-26T14:18:24+08:00",
+  "conversation": "https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a",
+  "input": {
+    "file": "continual_defaults_wait_review.zip",
+    "bytes": 360013,
+    "sha256": "2d9028dfd2ef4d3509e95ad53078191557b20b961324fe13bf66d8955d580bd8",
+    "file_members": 80,
+    "payload_members": 79,
+    "payload_manifest_verified": true
+  },
+  "authorization": "authorization.json",
+  "request": "request.zh.txt",
+  "visible_model": {
+    "family": "GPT-6",
+    "effort": "Pro",
+    "backend_identity_verified": false,
+    "menu_note": "选择器曾显示已达到使用上限，但实际单次发送后出现正在思考和停止按钮；未切换模型"
+  },
+  "upload_count": 1,
+  "submit_count": 1,
+  "prior_navigation_issue": "初次载入/正常重试出现403无法加载；刷新后从同一最近会话链接成功恢复；未新建审查",
+  "formal_listener_started": false,
+  "formal_training_started": false,
+  "request_text": "continual_defaults_wait_review.zip\n文件\n请使用当前 GPT-6 / Pro 对本次新增等待与派发进行一次增量外审。唯一新输入 continual_defaults_wait_review.zip：360,013字节；SHA256 2d9028dfd2ef4d3509e95ad53078191557b20b961324fe13bf66d8955d580bd8；80个文件成员=79载荷+input_manifest.json。用户已批准该完整包上传到本会话。\n\n先核对清单，再完整阅读包内 reports/documentation/20261026/continual_defaults/waiting/review/request.zh.txt 及对应当前源码、CPU证据、已有原生结果与主审处置。以本次请求和用户最新授权为准：S_default＋历史H（G_half），三顺序×三种子共18条、最多三路；108h训练（每条最多6h）+2h辅助=110累计任务小时；仅训练和54端点/旧dev盲分数，不开放评价标签、不生成新确认、零新增HPO。当前CPU累计56/120秒、原生累计171/900秒含旧失败。H的3次原生验证已完成，S复用；不再重复GPU资格。\n\n用户特别强调：GPU资源满足指当前剩余显存满足本实验所需，不是没有CUDA进程。不得恢复旧空卡硬条件。本脚本先等指定L2R/GCR批次包括随后确认/分析全部成功、控制器与worker退出；再逐路按10.25GiB=9.25GiB allocator+1GiB余量准入，扣除本批已启动任务尚未实际占用的预留，最多三路；其他CUDA存在不是否决条件。不能仅等最初三PID：14:05现场首条GCR已完成并补了新worker，旧总批仍运行。\n\n重点审：前序整批结束判定、显存预留与共享边界、一次性监听/真实更新后自删、108+2h及失败/预留记账、实际S/G_half训练入口与54盲端点接线、是否过度设计。复用未改科学实现与原生证据；只提出当前必要最小修正，不扩成全项目重审或新增研究。draft_gate故意不可执行，外审/主审未闭合前不签正式门、不启动监听。\n\n仅静态阅读与普通机械文件/JSON核对；不要连接项目服务器、导入或执行项目科研模块/测试、载模、训练、推理、生成数据或重采样。完整报告请提供可下载ZIP，包含中文全文、结构化意见、阅读范围和必要证据、逐载荷清单；网页公布输入/输出大小SHA。区分已证阻断、必要复现修复、证据限制、后续建议和过度设计。模型选择器和自述与后台身份分别说明。主执行者会独立审查处置。",
+  "last_observed_generating_at": "2026-10-26T06:19:30.196Z"
+}

@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-当前原版补充实现（2026-10-26）：S_default＋历史H（G_half）已接入原训练器，[CPU实现主审](../reports/documentation/20261026/continual_defaults/review/primary_disposition.zh.txt)及[GPU增量外审/主审](../reports/documentation/20261026/continual_defaults/review/native/primary_disposition.zh.txt)均已关闭具体缺口。用户批准H-only代表资格并明确直接与现有三路共存；一次部署缺失模型路径失败计4秒，经明确批准用原预算余额重启，真实3更新及恢复核验通过。见[有限原生结果](../reports/documentation/20261026/continual_defaults/native_execution/result.zh.txt)：CPU累计51/120秒，GPU核验含失败171/900秒，S按适用证据复用。正式两方法定义不改；S/H18条正式预算、评价数据/开放及执行门仍待明确，不借活动L²R/GCR预算，不增H_pos_default，不据本次资格宣称抗遗忘效果。完整状态见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+当前原版补充实现（2026-10-26）：S_default＋历史H（G_half）方法实现及H-only有限原生资格已完成，S复用，原生含失败171/900秒。[新正式授权](../reports/documentation/20261026/continual_defaults/waiting/authorization.json)明确18条、最多三路、108h训练＋2h辅助=110h，仅训练和54端点/旧dev盲分数，无评价标签/新确认/HPO。新增[等待与派发入口](../scripts/step28_defaults_control.py)用指定旧批最终成功/退出与足够剩余显存作AND门，不要求全卡无CUDA；cpu08通过后CPU累计56/120秒。[增量外审](../reports/documentation/20261026/continual_defaults/waiting/review/submission.json)已获具体上传授权并于14:18提交原会话，生成中；尚未启用监听/训练。原方法、历史负结果和归因边界保持，不借活动L²R/GCR预算。当前状态统一见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
 当前新对照执行（2026-10-26）：用户已批准822小时完整预算、18条L²R／ER+GCR训练及后续固定新确认，明确仅本次新增编排免外审。按[执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[独立处置](../reports/documentation/20261026/continual_comparison/primary.zh.txt)，复用原算法资格和H/S54状态，独立三路已实际开训；实时进度统一见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。原45条不重训，旧失败不清零；下方历史“新18条／新确认／独立预算未授权”已被最新明确决定取代，不恢复为阻断。算法、评价判据及未来结果审查不在新增编排免审范围内。
 

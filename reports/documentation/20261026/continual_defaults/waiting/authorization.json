@@ -1,0 +1,19 @@
+{
+  "status": "USER_APPROVED_110H_BLIND_TRAINING",
+  "date": "2026-10-26",
+  "user_statement": "批准110小时及上述训练范围",
+  "scope": "S_default＋历史H（G_half）；ABC/BCA/CAB×s4/s5/s6共18条、最多三路；训练与54端点/旧dev盲分数保存；不开放评价标签、不生成新确认；零新增HPO",
+  "budget_seconds": {
+    "training": 388800,
+    "control": 7200
+  },
+  "per_run_seconds": 21600,
+  "cpu_prior_seconds": 51,
+  "cpu_total_limit_seconds": 120,
+  "native_prior_seconds": 171,
+  "new_gpu_qualification": false,
+  "resource_correction": "GPU资源满足的定义是满足当前实验所需的GPU显存，而不是当前没有CUDA进程",
+  "waiting_request": "当三路任务运行结束且GPU资源满足时开始运行这两个实验",
+  "review": "新增编排外审或明确限定免审尚待关闭；不继承L2R/GCR免审",
+  "failure": "失败保留并停止，不自动重试；纯等待不计计算费；实际检查/控制计辅助"
+}

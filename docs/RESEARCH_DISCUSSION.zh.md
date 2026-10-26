@@ -1,5 +1,15 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-26 原版S/H等待条件、110小时批准与编排外审
+
+用户先要求“写一个等待脚本(按照科研纪律要求)，当三路任务运行结束且GPU资源满足时开始运行这两个实验，想清楚这个条件该怎么写”，随后强调“GPU资源满足的定义是满足当前实验所需的GPU显存，而不是当前没有CUDA进程”。因此指定前序整批完成与显存够下一路是并列必要条件，不采用全机CUDA为空的硬门，也不能只等待最初三个worker。
+
+在具体18条/最多三路/108h训练＋2h辅助、每条6h上限、仅训练和54端点/旧dev盲分数、不开放评价标签/生成新确认的自包含问题后，用户明确回答：“批准110小时及上述训练范围”。这是S_default＋历史H（G_half）的新正式范围，不恢复旧待预算阻断，不扩到H_pos_default、评价结果开放或新HPO。旧CPU/原生失败承接，新CPU08计5秒后CPU56/120、原生171/900；其余执行细节见[授权](../reports/documentation/20261026/continual_defaults/waiting/authorization.json)、[提案](../reports/documentation/20261026/continual_defaults/waiting/proposal.zh.txt)与[当前状态](../reports/documentation/20261026/continual_defaults/waiting/status.json)。
+
+新等待编排复用原三路dispatcher/Ledger及实际S/H训练器，只补前序最终完成与进程身份、剩余显存/欠占预留、单次claim和真实更新自删。Linux cpu08六项通过；先前算法及H-only原生证据继续适用，不另跑GPU。14:05旧批第一条GCR完成后已补发另一条，整批仍在；这正是不能仅等原PID的具体现场依据。
+
+本轮360013字节continual_defaults_wait_review.zip（SHA256 2d9028dfd2ef4d3509e95ad53078191557b20b961324fe13bf66d8955d580bd8）在完整准备后，用户明确“批准上传该完整增量包并外审”。14:18通过本地Playwright向原会话单次提交，14:19生成中；[提交回执](../reports/documentation/20261026/continual_defaults/waiting/review/submission.json)。仅审新增等待/派发，不把此前L2R/GCR免审扩大到本轮，不把旧GPU外审当本次结果。实际listener/训练尚未启用，待本次完整外审及独立处置后按既有批准范围推进。
+
 ## 2026-10-26 GPU外审回收、直接共存核验与一次限额恢复
 
 用户原话：“GPU原生校验外审已结束，取回来仔细审核，向我汇报外审意见、你的独立判断和下一步怎么做。”完整报告已按[独立主审](../reports/documentation/20261026/continual_defaults/review/native/primary_disposition.zh.txt)处置：接受H代表/3调用、S复用的精简建议；两个必要控制缺口修复并定向CPU通过，不重跑原数值或旧GPU网格。

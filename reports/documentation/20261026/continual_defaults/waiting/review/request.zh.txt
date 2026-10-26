@@ -1,0 +1,26 @@
+原版S/H等待与正式盲训练编排：一次增量实现审查
+
+范围：用户已明确批准110累计任务小时、S_default＋历史H（G_half）、ABC/BCA/CAB×s4/s5/s6共18条、最多三路；仅训练与54端点/旧dev盲分数保存。没有评价标签、新确认生成或新增HPO许可。用户要求旧三路批次结束且GPU显存足够后自动启动，并特别纠正“足够”不等于不存在CUDA进程。请仅审新增等待/编排及本次预算接线，不重审未改算法或整个项目。
+
+实际变更：新增scripts/step28_defaults_control.py及run_step28_defaults_linux_20261026.sh、6项手写CPU测试；既有CPU wrapper仅增加waiting suite。实际训练调用仍为step28_continual_defaults_run→five_run，用既有S/G_half目标。队列、独立CPU核、失败停止、完整队列额度预留直接复用已核验的comparison_control.dispatch/Ledger；未调用它的旧空卡resource门、生成或评价入口，也未修改活动workspace。独立waiting_workspace已准备，未签可执行formal_gate、未启动监听/正式训练。
+
+明确启动条件：
+- 锁定continual_comparison的原formal_gate/launch/campaign身份。必须最终completion=ALL_COMPARISON_TRAINING_CONFIRMATION_ANALYSIS_COMPLETE，同来源，18训练及generation/confirmation/analysis均成功、active空、无failure/failed，再确认该workspace旧控制器及worker均退出。只见training_complete、旧三个PID退出或CUDA空闲不能代表整批结束。
+- GPU每待启动一路10.25GiB=9.25allocator+1余量；按实际free逐路补至3。已启动但尚未显存分配的本批worker保留其欠占部分，防止同一空闲量重复准入。外来CUDA进程非空不是否决条件，实际占用计入free。不是系统级显存锁，也不保证他人后来增长。RAM首次208GiB/补位64GiB，disk首次192GiB/补位76GiB。资源查询各10秒有界。
+- 新campaign只能独占创建一次，启动前重核来源/前序；独立Linux监听副本仅在匹配run_id的真实训练update日志completed>0后自删。保留仓库原码及首步回执。失败保留并停止，不自动重试、不动他人作业。
+
+预算：训练108h=18×6h，辅助2h，累计110h。原18条S_tuned/H_pos完整轨迹实际约60h、单条3.003—3.998h，6h是上限非保证。当前CPU累计56秒（含旧失败；总限120秒不变），原生171秒（含载模前失败4秒）；本次SSH元数据/复制/链接准备保守计120秒，非精确实测。门prior_control=347秒；控制器另保守计60秒覆盖导入/前验/最终写入，其余查询/控制按实际计入。sleep不计计算费。无新GPU资格，不借490/822h。
+
+验证及复用：Linux既有py310 cpu08六项通过，实际4.034617652秒向上计5，累计56；峰值RSS1117016064字节，无BGE/正式数据/GPU。测试覆盖foreign CUDA准入、欠占预留、旧批最终成功/仍存controller/缺收尾/失败、PID重用、真实更新自删、实际独立副本CLI拒绝未授权门、等待再派发、18固定配置及真实runner/deadline接线、重复campaign拒绝。最后一个编排测试用mock边界，不冒称真实18条训练已执行。既有dispatcher真实三child/失败清理证据直接复用，未另跑全历史。cpu08来源58=57实际编排依赖+wrapper，均与当前文件匹配；科学来源44全部与native_h02证据来源匹配。H本次原生3真实调用和full恢复下一更新/推理等价已完成；S复用。手设Adam624、同对象推理回读等限制保持。
+
+现场14:05:45：旧控制器1198791仍在，原首条GCR已完成并补新worker1246109；另外两L2R仍在，最终completion不存在、无failure，GPU11220/32607MiB空闲。它说明不能只等待原3个PID。新formal目录不存在，未创建S/H listener。详见resource_before及preparation原件；未读取效果。
+
+请重点回答：
+1. 完成条件能否防止旧队列补发/随后确认任务与新批冲突？正常成功、退出不完整、失败路径是否正确？
+2. 显存公式是否落实用户定义，能否避免启动瞬间双算free？9.25+1GiB及三路容量解释是否足够，不能恢复空卡硬条件。
+3. 原始S/H真实入口、18配置、54端点/盲分数及无标签开放是否正确衔接？是否存在缺操作/伪实现？
+4. 108+2h/6h每条、历史失败、预留、检查与等待计费、失败停止和自删是否有具体缺口？
+5. 是否有过度设计？仅指出当前必要最小修正；不能因为存在未改比较模块源码就把旧生成/评价等全部重审或扩展本次范围。
+
+draft_gate.json故意是PENDING_ORCHESTRATION_REVIEW，review_ready为空。实际外审或明确限定免审后由主执行者独立处置，并填真实闭合回执和最终来源身份才可启用。它不是运行批准门；不把旧L2R/GCR免审扩大到本次编排。
+请核对包内清单，完整返回中文报告、逐项意见与必要证据（可下载ZIP，公布大小/SHA及载荷清单）。只做包内审查，不运行项目训练/推理/科研测试或访问项目服务器；机械JSON/源码/文件身份核对可以。外部建议不能替代用户授权，主执行者独立处置。
