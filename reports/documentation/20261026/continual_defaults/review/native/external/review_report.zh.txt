@@ -1,0 +1,195 @@
+原版S_default／历史H（G_half）：有限GPU原生验证方案与入口增量外审
+日期：2026-10-26，Asia/Shanghai
+当前输入：continual_defaults_native_increment.zip
+性质：待执行方案与6份新/改代码的静态增量审查；不是GPU结果，也不重做已关闭CPU方法或五方法结果外审。
+
+一、结论与最小处置
+
+未发现原S/H目标、教师、默认LR、外层checkpoint或共享更新/恢复链的新科学计算错误。SCIENTIFIC_BLOCKER为0。真实BGE资格不是因为方法名变成S_default/H_default便必须重做；CPU方法证据和未改底座可按适用范围复用。
+
+推荐将本轮候选执行收窄为：仅H_default，ABC/s4，一个独立进程，最多3次optimizer调用。S_default本轮新增原生调用为0，明确记为继承证据，而非声称它已在当前版入口逐臂实测。若只为接受已审方法实现，0次新增GPU也可成立；代价是不能写“当前原生入口已真实BGE跑通”。两臂各3次、合计6次只在用户确实要求两个默认系统各有一份当前版GPU直接记录时才有相应价值，不是科学上最低要求。不得因额度尚余自动补S或重试。[N01；E01、E02、E03、E07、E08]
+
+在实施任何后续有限GPU尝试前，有两项局部控制缺陷需修：
+N03，MEDIUM／REPRODUCIBILITY_DEFECT：新controller把资源查询纳入900秒整体时限口径，但admission调用的两次nvidia-smi没有timeout；阻塞可绕过整体deadline收尾。给这两个查询传入当前剩余额度的有界timeout，并在实际启动worker前重算剩余时间即可。
+N04，LOW／REPRODUCIBILITY_DEFECT：本次合法新job已创建后，锁open/flock仍在try/finally外；锁被占时会遗漏status及charged_seconds。将拥有新job后的锁获取纳入现有失败/结算边界即可。不得恢复对被拒既有目录的写入。
+这两项都是提供源码中的确定控制路径，未在本审执行，也没有证据表明当前已发生GPU超时、漏费或误写。
+
+另有一项条件性执行阻断N02：当前三既有worker各7.75GiB allocator，加新9.25GiB，共32.5GiB，超过32607MiB整卡的31.8427734375GiB，尚未计非allocator。current_comparison白名单及瞬时10.25GiB准入不能证明这种四进程共存安全。首选未来idle_only，且既有批已自然结束或确认没有待补发GPU任务；不擅停、改队列。若以后坚持共存，必须有覆盖现有进程增长和补发、非allocator占用的可持续容量依据，当前三路配置不可据此放行。[E01:14；E02:49—69]
+
+900秒可以作为后续用户考虑的一次、共享、失败即停的上限候选；它是旧耗时代理上的余量，不是本次测速、完成保证或18轨迹工期。推荐先缩工作量，不扩预算。当前无GPU执行批准文件，900秒、sharing、正式18条及数据开放仍未批准。本报告没有执行或修改项目代码，没有授予任何运行权限。
+
+二、输入身份、实际阅读与证据继承
+
+1. 输入校验
+实际ZIP为54,945字节，SHA256：
+321e17f6edb310f5e8266fc78f06895b674dd3771b3843b91caeb229f4b0b5ad。
+实际有25个文件成员：24载荷＋input_manifest.json；另有5个目录条目，因此ZIP中央目录总条目为30。用户所述“25成员”与文件数一致；不是多出5个载荷。24载荷的实际大小/SHA全部匹配，无重复、缺失或额外文件。
+本审首次把25与全部ZipInfo数直接比较，触发普通核对脚本断言；随后区分文件/目录后确认上述事实，未更改输入。这次本地核对失败及处理保留在mechanical_attempts.json，不隐去，也不误写为项目科研失败。
+
+2. 当前52项清单不是本包52份源码
+current_sources.json共52项。实际6项来自本增量包；42项在同会话此前defaults_review/input副本中可取；另4项在同会话result_review/input中可取。52项实际字节均与清单匹配。后4项是expression_data、expression_data_verify、five_control、five_evaluate，仅为来源闭包核对，不据此重审生成或旧结果。
+
+新原生entry.sources的静态闭包实际为51项；52项CPU清单多出的唯一文件为scripts/step28_defaults_cpu.py。当前没有执行批准文件，所以不存在已签门不匹配。未来批准应绑定实际native.sources()所返回的51项，或删减修订后重新枚举的实际闭包；不能将52项CPU清单机械原样粘为GPU批准sources。[N06；provenance_native.json]
+
+本轮实际读取proposal、review_authorization、current_sources、request、新native、共享native增量、两个入口/包装、新旧测试相关段落、两个diff、cpu02—05全部console和小JSON及receipt字段；直接未改依赖只沿当前调用追读必要段落。逐文件新包及复用范围见reading_scope.json。哈希、AST和搜索不计全文语义阅读。
+
+旧native02耗时/显存没有在本包提供原回执，本审只把proposal所摘录数值当作主执行者提供的历史代理，不声称本次重新查验原件或独立测量。旧GPU修复及原生资格未重开；新控制接口与限额的具体矛盾仍按当前作用处理。
+
+3. 模型与操作范围
+当前会话可见模型自述为GPT-6 Astra Pro；无法独立核验后台模型ID、路由或它与界面“GPT 6 Pro”的精确对应。主审与三个定向协作分支分别追读方法/最小调用、控制资源、CPU来源；主审直接核对关键新源码并独立裁决。
+本审仅阅读提供文件，执行标准库ZIP/大小/SHA、JSON算术、AST及diff机械检查。没有导入或执行项目科研模块/测试，没有连接项目Linux、载模、训练、推理、重采样、生成数据或读取未提供正式资产。隔离环境普通核对不能称项目py310或GPU资格。
+
+三、分别判断S/H的必要性与最少调用
+
+1. S_default：没有发现本轮独有的GPU科学缺口
+原mean/原rank/完整监督/自身教师及默认参数，在已审CPU反例和真实Tiny encoder/head/Adam对照中已有实质证据。新的Spec与adapter没有新增BGE层、张量形状、outer checkpoint机制、优化器或保存格式。新worker的注入已在CPU到config处验证，S与H共享底座；S不应仅为新名称再跑旧全网格。
+若只要求方法实现验收，S新增GPU为0足够。若另要求“S_default当前版在本次资源条件下独立完成BGE/恢复且保存直接资源数值”，则需为这条更强运行陈述保留S自己的原生调用，不能由H代表测试替它声称已测。两种证据目标应先区分，不应反向把更强陈述当科研必需。
+
+2. H_default：科学上也非新算法资格；作为新入口代表最合适
+历史G_half的原rank与0.5mean＋0.5logmeanexp实现未改；CPU已有错rank、mean回退、缺A1/教师及真实更新的辨别证据。没有发现因为H_default而必须再验证整个GPU方法族的理由。
+若用户本轮要取得新入口真实BGE跑通证据，推荐H作为唯一代表：它经过混合汇聚、原rank、两视图、完整自身教师、默认LR及同一最大形状BGE更新/恢复/评分链。该代表性是共享链与较丰富汇聚路径的实现推断，不是严格资源单调上界；不能宣称H一定在所有输入上比S耗时或占显存更多。
+
+3. 三种可执行范围
+方案A：新增0调用。接受方法实现与静态入口接线，复用既有证据；不取得当前原生入口的真实GPU记录。无新的GPU执行预算需求。
+方案B（推荐，若要本轮真实入口证据）：仅H_default，3调用。取得一个当前版共享BGE链代表的最大形状、真实更新、完整恢复下一步及评分记录；S本轮仍是继承证据。
+方案C：S/H各3，共6。分别取得两个默认系统当前版GPU/资源直接记录；较B增加一轮fresh/load、3更新、保存/恢复/评分及资源占用，未解决另一项已知科学矛盾。只有目标确实要求逐臂原生直接记录时才保留。
+
+当前代码METHODS=m.METHODS、approval.max_update_calls==6、逐臂3及两个完成态硬编码为方案C。方案B不能只改批准JSON，否则会被拒绝。最小实现改动限于本native补充入口的固定范围为H-only、总上限3、对应完成态/断言/测试fixture；不能修改原methods模块的两方法定义、正式18身份或训练协议。来源随修订重新绑定，无需建立任意方法选择平台。[E02:19—25、36—46、96—130；E03:86—100、113—122]
+
+4. 为什么代表方案仍保留3次而非机械减到2次
+第一次current update是实际0→1，让Adam产生本模型的真实exp_avg/exp_avg_sq；随后只把step手写为624。保存完整状态后执行一次stage3/step49的带历史更新，再恢复并重复该更新，检查返回值、RNG及模型/Adam摘要。
+若删掉第一步却保留相同恢复含义，就须另行人工构造/移植Adam矩，增加替身程度及代码；不是更小的等价证据。三次调用并不表示曾训练624步，其真正更新量为current一次和current+history两次，共5次梯度群呈现。两个臂方案则6更新、10梯度群呈现，均与正式864步不同。
+
+可选微小删减：E03第102行前置raw=method.score在record方法中不参与teacher选择，真正教师来自record.reference；第124及129行仍覆盖更新后评分和推理回读。仅对本defaults分支跳过这次前置评分，可每个执行臂少一个最大形状群评分；需删去对应前置测速陈述。它不是阻断缺陷，也不必为此改通用旧native行为或增加配置平台。[N08]
+
+四、新worker的真实数值路径与资格边界
+
+worker向verified.native显式传implementation=m（defaults）、allocator_bytes=9.25GiB、compare_legacy=False、实际批准sources及本地Budget。shared native第49行使用implementation.config/Method，非旧five.Method的硬编码实例。defaults.Spec.arm分别为S/G_half；默认rank/LR倍率1通过旧已审adapter和实际每步rates进入更新。
+
+方法仍用原rank；S均值与H半均值/LME分别进入监督、教师投影和评分。当前监督为两视图平均；历史为完整基础监督×0.1＋自然A0自身教师×0.5。原教师及LR语义未因本次资格入口改变。本轮不重新证明此前已充分的原数学与所有Memory行为，只确认当前真实派发未错接。[E07、E08]
+
+fresh实际加载冻结BGE档案，检查file_count/total_size/content_sha，再装外层encoder checkpoint；compare_legacy=False使第75行旧高显存关闭分支不执行，第76—79行要求外层checkpoint、encoder内部checkpoint及BF16支持。启动仍须满足未改configure_numerics的CUBLAS_WORKSPACE_CONFIG=:4096:8等既定要求；新worker继承环境并由该函数检查，当前没有现场核验，不另加新资格。完整恢复后设置outer checkpoint为True，与首次带历史更新的状态相同。不能把“outer_checkpoint_equals_legacy=False”解读为没有checkpoint；它表示本次不运行旧无外层checkpoint比较。[E03:45—79、116—122]
+
+最大形状是手写28账号×8记录=224记录；两个文本通道共448个tokenizer输入，各长度精确256。记录对数为224×223/2=24976。tokenizer实际检查长度，未用正式文本、标签源或生成器。组内controller关系也是手写已知结构，并非正式训练身份。[E03:80—85；E09]
+
+教师为本臂模型在手写history群上的完整记录对表，再加固定2sin(0.31i)扰动，使教师项不因学生/教师完全相同而退化。它验证非零教师路径的实际运算，不是正式出生教师生命周期或保留群历史的重演。Adam624也明确为手写计数；第一次产生的真实矩不等于此前624步的真实训练矩。
+
+actual update确实调用method.update和optimizer.step；继承方法前后检查Adam步数，记录current/history损失、梯度范数及LR。full恢复在模型/Adam已改变后进行，然后重复实际更新，比较返回值、RNG以及模型/Adam完整摘要，足以区分简单no-op恢复。这不是只检查PASS或调用名。
+
+推理保存后在同一个未扰动对象回读，逐元素比分数；它单独不能排除no-op loader。本次底层restore_state未改且确实load_state_dict、核对模型及Adam字节，完整恢复已有跨变化证据，因此保留该限制即可，不机械加另一套GPU恢复矩阵。现有原生程序也没有单独比较每个encoder/head参数相对初始变化；具体反传/逐参数证据复用cpu01与旧底座，不能在未来报告声称本次额外做了该未实现检查。[E03:111—139；E08；E10]
+
+五、控制路径、必要修复及已有修复关闭
+
+1. 已接通的正常/失败控制
+controller只接收另行批准的状态、准确job、方法、限额、来源、手写范围与sharing；本包review_authorization状态并不是执行批准。父进程deadline=STARTED+批准total_seconds，只生成一次。两个subprocess.run顺序等待，第二臂沿用同一绝对deadline，没有再领完整额度。
+父进程为worker timeout留5秒，worker Budget合作式检查在deadline前15秒停止。每worker update在真实调用前记STARTED，最多3次；完成数及逐臂身份/来源/full下一步/推理结果再由父验证。失败、超时或不合格result使本次停止，第二臂不启动，不重试。
+subprocess.run正常退出并验收通过后才进入下一臂；超时时终止并等待自有子进程后停止本次尝试。当前调用链没有另行创建科研GPU子进程；不把这种顺序退出说成已实测GPU释放延迟。后续worker启动前重新admission。不能为了共存杀其他任务。
+
+成功时先保存完整/推理文件哈希和结果，随后只删除本job/work下两份临时.pt；worker只有成功返回/exit0后才被父接受。若保存/恢复/删除失败，父按非零退出停止，失败载荷可留证，不静默重跑。不能由结果文件先写了PASS而忽略父进程非零失败状态。[E02:83—137；E03:86—143；E11]
+
+2. N03：整体900秒口径尚有无界资源查询
+admission在E02第97行先调用verified.resources，再到101行计算worker剩余时间。E03第27—30行两次subprocess.check_output(nvidia-smi)均未传timeout。若其中一次不返回，控制流程无法到达剩余额度检查或现有finally，故worker的硬timeout不能保护这段控制耗时。
+这不是声称nvidia-smi本次已经挂起；它是新入口所承诺“900秒包括控制”的路径缺口。旧resources未改不构成豁免，因为本轮把它接入了新的整体预算边界。无需重开旧GPU数值修复。
+最小处置：两次资源命令各使用当时剩余deadline及收尾余量计算出的有界timeout；超时通过现有失败/计费路径退出、不起worker；真正调用subprocess.run前重算剩余值，避免把前置状态写入时间继续算进可用worker预算。不要新建总控服务、监听线程或无限重试。
+最小验收为手写/模拟资源查询超时后不启动worker、保留失败及已用时间；只补这一控制分支即可，不跑模型或整套CPU数值。
+
+3. N04：新job已创建后的锁失败漏记
+E02第88行已经mkdir，93—94行open和非阻塞flock在95行try之前。合法新attempt若锁已被占用，flock抛BlockingIOError，131—136行status/charged_seconds不会运行；main也不再代写失败文件。这与“拒绝已有job后不得写入”不同，目录已由本次合法建立，应保留本次失败/时间。
+最小处置：将拥有新job后的锁open/flock放进现有result异常/结算范围，保留非阻塞和失败即停，不改活动队列、不引入锁管理平台。新目录建立前或既有目录拒绝仍不写任何文件。最低验收只需一个已有锁导致拒绝的手写情形，检查新attempt有失败/收费且没有调用worker；不覆盖另一attempt内容。
+
+4. 前次D01已在指定范围关闭
+新defaults_run在独立scope/campaign/train_data/fresh检查通过后才包裹inherited.execute；只有本调用后续已建立目录时写failure。main不再对所有异常无条件写文件。CPU04实际调用main，验证未授权拒绝、接受但未建目录时原异常保留、已有failure文件逐字节不变、合法本次建目录后失败留证。下游训练器是模拟；这种模拟恰好覆盖待修CLI边界，不需要科研执行。[E05；E06:59—100；cpu04]
+
+新native.main同样不再对拒绝的既有目录写failure。CPU05在成功/非零/超时/坏result四种模拟worker情形后，再经main检查整个已有job字节不变。此同类问题可关闭；但CPU05没有覆盖N04的锁获取路径，也没有覆盖N03无界真实资源查询，不能以它PASS把两项新发现关闭。[E04:82—132]
+
+六、资源是否足够，何时只能等待
+
+1. GPU容量与共存
+既有3×7.75+新9.25=32.5GiB=33280MiB；整卡32607MiB，差673MiB=0.6572265625GiB。这个上限加法已不成立，尚不计上下文、工作区、其他非allocator或显示占用。
+proposal的12:08:55快照空闲11256MiB=10.9921875GiB，较10.25GiB准入仅多760MiB。快照既不是当前值，也不预留这部分空间；已知peer有权继续增长。PID用户/cwd/命令白名单只证明它属于允许的已有工作负载，不证明未来显存需求。
+
+可执行的最小选择：
+— 首选等待既有批自然结束，再选择idle_only；现场同时确认没有仍会补发GPU作业的控制器/待派任务。仅看某一瞬间compute_apps为空不足以排除即将补发。
+— 如果批末自然只剩至多两个worker且不会再补成三路，名义合计2×7.75+9.25=24.75GiB，较整卡余7.0927734375GiB。该算术只是必要余量，仍需当时资源、非allocator开销及无补发条件支持，并由用户决定sharing。
+— 三worker仍可能增长/补发且无总需求保证时，当前current_comparison不能准入，只能等待；不得用本资格当四路压力实验，不得擅降现有任务上限或改batch/LR/队列。
+
+若本次选择idle_only并落实无补发条件，不必为未启用的共存模式另建调度器。若以后要启用current_comparison，应先用已知任务上限和现场事实落实可持续需求界限；有具体不足再小修准入，不能仅凭进程名接受。[N02；E01:14；E02:49—69]
+
+2. 9.25GiB allocator
+set_per_process_memory_fraction实际在载模前设置，且明确关闭旧28GiB/无外层checkpoint支路。9.25GiB比proposal摘录旧checkpoint路径reserved7.35546875GiB多1.89453125GiB；这只是旧配置/旧运行代理，不能保证新原rank与当时竞争下峰值完全相同。allocator限额也不是CUDA进程全部显存的系统预留。10.25GiBfree为新allocator另留约1GiB瞬时差额，仍不能保证共存。
+
+3. RSS/目录/磁盘
+Budget继承真实检查：worker及其子进程RSS、整个本次父目录、非.pt证据量；新阈值为32GiB、12GiB、256MiB。正常资源采样约每5秒，save reserve和snapshot强制刷新。它们是运行内采样/预留检查，不是OS硬配额，也不保证每个瞬态；不为此要求cgroup或新安全平台。
+保存前按model.state_dict张量字节P作full=3P+64MiB、inference=P+64MiB预留；full仍在时，两份的保守包络约4P+128MiB加小证据。两臂顺序成功退休，不需同时常驻两臂所有权重。没有本次新BGE文件大小实测，不能由公式宣称12GiB已经通过；当前也未发现必须自动加大的具体证据。
+初始磁盘76GiB=12GiB输出+64GiB余量，保存时再检查剩余reserve+64GiB。admission查data.ROOT所在盘，Budget查job.parent；未来job应位于同一文件系统，或准入改查实际目标盘。当前未定job，列作后续路径条件，不扩成新的存储平台缺陷。
+RAM32GiB available与worker32GiB是拟议门限，现有进程也可能变化；当前服务器并未现场核实。资源不足时停止/等待，不增加预算或改活动任务。
+
+七、900秒提案与CPU累计费用
+
+proposal摘录旧两条耗时174.40055、173.23868秒，相加347.63923秒。
+900/347.63923=2.5888907877，余552.36077秒。它是旧两worker耗时之和，不能自动当作旧并行墙钟，更不是本次两臂串行实测。方法、资源限制、共存构成及环境可能不同，旧记录还可能含等待；本包未提供原件以独立拆分这些部分。
+
+该比例能支持“考虑一次有共享上限、失败即停的受限尝试”，不能支持“900秒内必成”。当前没有具体已测证据要求自动扩额，也没有必要把资格当整18条工期预测。若采用H-only/3，先减少执行量；不必按两臂数量机械承诺时间减半，更不能因留下时限就追加S、其他shape或重试。900本身也不因本审认可其提案逻辑而获得批准。
+
+controller的charged_seconds按单个真实controller进程STARTED至收尾计算，包含顺序子进程等待；不能再把各child elapsed相加重复收费。第二worker沿用deadline而非各有900秒。当前N03/N04修好后仍需保留失败、超时和尾部实际耗时，不能只记录成功调用。普通合作式检查与进程终止/收尾存在系统延迟，不应承诺精确零超时抖动。
+
+CPU原件如下（费用不是GPU执行量）：
+cpu01：7秒，累计7；此前完整方法/Tiny资格，按旧来源保留。
+cpu02：6.372361268秒向上计7，exit1，累计14。失败为测试夹具用严格JSON writer写NaN，在到达待测授权解析器之前抛错；不是GPU或算法失败。
+cpu03：4.059349497秒向上计5，exit0，累计19。仅补授权/资源/worker选路的单项；资源/CUDA均模拟。
+cpu04：2.079937293秒向上计3，exit0，累计22。定向旧D01 CLI四分支。
+cpu05：6.730980460秒向上计7，exit0，累计29。模拟顺序/共享deadline/失败/超时/坏结果及既有目录不变。
+总计7+7+5+3+7=29/120，余额91；失败7秒保留。CPU05小JSON内四个charged_seconds来自同一测试进程STARTED的累计模拟值，不相加成GPU费用。[E12；provenance_native.json]
+
+cpu04/05的52项sources与current_sources逐项相同。cpu02/03相对当前分别5/4路径已变，旧receipt不能说成当前同版全量通过。对应旧预期字节分别可取48/52及49/52；少数变更前入口/测试版本只有回执身份，没有全文，不能假称逐行旧版重验，也不要求为此补传全历史。旧cpu01三个测试及独立参考函数经AST比较未变，本次只新增CLI测试；保留其适用数值证据，不要求因为新文件总哈希变化而重跑全部CPU/GPU。
+
+八、逐项意见及阶段边界
+
+N01｜INFO｜SCIENTIFIC_SCOPE_DECISION
+推荐真实入口目标采用H-only/3，S为0新增；0/3/6的证据代价如第三节。当前两臂硬编码如选择缩减，需小改native固定范围；不改正式两方法定义。
+
+N02｜MEDIUM｜CONDITIONAL_EXECUTION_BLOCK
+已证当前三peer allocator＋新worker上限超整卡，现有白名单/瞬时free不充分。阻断此配置的current_comparison执行；不阻断满足无补发条件的未来idle_only。不是科学方法失败，也不是已经发生OOM。
+
+N03｜MEDIUM｜REPRODUCIBILITY_DEFECT
+无timeout资源查询不受总体deadline约束。整体限时入口交付前需局部修复；后续有限GPU执行前必须闭合。只补资源查询超时的控制验收，不重跑科研资格。
+
+N04｜LOW｜REPRODUCIBILITY_DEFECT
+合法新job建好后的锁失败在结算外。脚本交付前需局部修复，保留失败和已用时间；只补一个占锁分支，不恢复既有目录写入。
+
+N05｜INFO｜CLOSED_PRIOR_DEFECT_AND_EVIDENCE_LIMIT
+旧D01及native既有目录同类问题在各自范围可关闭；CPU02失败保留，累计29/120。新CPU模拟不构成真实BGE/GPU通过，cpu01真Tiny只在其旧来源范围复用。
+
+N06｜INFO｜SOURCE_AND_AUTHORIZATION_CONDITION
+52项CPU来源全部可取且匹配；原生闭包实际51，未来批准须绑定实际来源和选定范围。当前无执行文件，不是已签门错配。900秒、sharing、正式18条和数据均未批准。
+
+N07｜INFO｜SUPPORTED_WITH_LIMITS
+方法选择、outer checkpoint、最大shape、真实optimizer/fullrestore/RNG/评分及成功退休静态接通；尚未执行，手写624/教师扰动/同对象推理回读/采样资源限制保留。不产生性能或正式完整训练结论。
+
+N08｜INFO｜OPTIONAL_REDUCTION
+本defaults路径前置raw评分不供教师使用，可以省略；非阻断，不要求通用native重构，不借此追加诊断。
+
+N09｜INFO｜OUT_OF_SCOPE_OVERDESIGN
+不增加方法、HPO、seed/order/数据规模、全epoch/全模型GPU网格、DDP、通用平台、系统隔离、全部历史复验；不花满CPU/GPU上限，不借本次重开旧GPU修复，也不改变活动L²R/GCR作业。
+
+必须当前修：N03、N04。必须在实际GPU尝试前确定：采用0/3/6何种证据目标、据此冻结代码/来源/批准；N02所述安全共存或等待条件；目标文件系统及当时资源。没有一个尚未核实疑点被写成已发生科学故障；资源够不够、当前实际吞吐以及目标环境运行成功率仍未实测，不靠新增研究来替代这些执行前条件。
+
+九、必要证据索引
+
+以下相对路径以本增量包为根；标“复用”者来自同会话先前已提供副本，实际大小/SHA与当前清单匹配。
+E01 reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt，1—16行；同review_authorization.json，1—23行；同request.zh.txt，1—17行。
+E02 scripts/step28_defaults_native.py，1—156行，重点36—80、83—137。
+E03 scripts/step28_continual_five_verify.py，26—143行；其native之外的旧native_batch/main按不变范围不重开。
+E04 tests/test_step28_defaults_native.py，1—138行；尤其30—80与82—132。
+E05 scripts/step28_continual_defaults_run.py，17—65行。
+E06 tests/test_step28_continual_defaults.py，59—100行；其旧参考/三测试按AST及前轮已审证据复用。
+E07 复用defaults_review/input/scripts/step28_continual_defaults.py，13—80行；原rank/目标详细语义按前轮报告及同身份record/g_half源码继承。
+E08 复用defaults_review/input/scripts/step28_continual_five.py，25—46、95—107、145—219、253—259行。
+E09 复用defaults_review/input/tests/test_step28_record_replay.py，23—35行。
+E10 复用defaults_review/input/scripts/step28_continual_population.py，157—210行。
+E11 复用defaults_review/input/scripts/step28_continual_five_run.py，55—121行；scripts/step28_continual_population_run.py，63—74行。
+E12 reports/documentation/20261026/continual_defaults/qualification/cpu02—05/console.txt、receipt.json及所附native_wiring/cli_rejection/native_control小JSON；cpu01从前轮副本复用。
+E13 reports/documentation/20261026/continual_defaults/review/native/{current_sources.json,inherited_entry.diff,cpu_method_test.diff,five_verify.before.py}；前后diff/AST与清单机械核对见provenance_native.json和diff_checks.json。
+E14 scripts/step28_defaults_cpu.py，16—64行；复用defaults_review/input/scripts/step28_bge_continual.py，31—46行，既定numerics启动要求。
+
+返回包不复制整个输入或旧依赖。reading_scope.json区分当前文件、旧文件实际选段、仅字节/AST及未核验范围；input_identity_check.json、mechanical_checks.zh.txt、provenance_native.json、control_native_mechanical.json、diff_checks.json、mechanical_attempts.json保留必要核对。delivery_manifest.json逐载荷列大小/SHA；外层返回ZIP身份在网页公布。主执行者独立处置，最终预算和共存授权属于用户。

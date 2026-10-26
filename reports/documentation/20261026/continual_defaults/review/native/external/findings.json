@@ -1,0 +1,385 @@
+{
+  "review": "S_default / historical H limited native proposal and entry increment",
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "model_identity": {
+    "visible_self_description": "GPT-6 Astra Pro",
+    "backend_independently_verified": false
+  },
+  "input": {
+    "name": "continual_defaults_native_increment.zip",
+    "bytes": 54945,
+    "sha256": "321e17f6edb310f5e8266fc78f06895b674dd3771b3843b91caeb229f4b0b5ad",
+    "file_members": 25,
+    "payloads": 24,
+    "directory_entries": 5,
+    "total_zip_entries": 30
+  },
+  "verdict": {
+    "scientific_blockers": 0,
+    "necessary_current_control_reproducibility_defects": 2,
+    "must_fix_ids": [
+      "N03",
+      "N04"
+    ],
+    "conditional_resource_execution_block_ids": [
+      "N02"
+    ],
+    "recommended_new_native_scope_if_direct_current_entry_evidence_wanted": {
+      "methods": [
+        "H_default"
+      ],
+      "order": "ABC",
+      "seed": 4,
+      "max_optimizer_calls": 3
+    },
+    "science_method_acceptance_requires_new_gpu": false,
+    "gpu_execution_authorized": false,
+    "formal18_or_data_or_budget_authorization_granted": false,
+    "project_code_executed_by_reviewers": false
+  },
+  "classification_note": "已证静态路径与实发运行分开；N02只阻断未解决容量的共存选择，N03/N04为本轮小修；N01目标依赖的范围选择，不预设6必需；N06无现存执行门错配。",
+  "findings": [
+    {
+      "id": "N01",
+      "type": "SCIENTIFIC_SCOPE_DECISION",
+      "severity": "INFO",
+      "status": "SUPPORTED_SCOPE_INFERENCE",
+      "title": "6次不是科学必需；真实入口目标首选H-only/3，S复用",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt",
+          "location": "L6-L8; L16",
+          "meaning": "当前6调用只是候选；历史底座与CPU已结案",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L21; L36-L46; L96-L130",
+          "meaning": "现实现固定两方法、6上限及两臂完成态",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_five_verify.py",
+          "location": "L86-L122",
+          "meaning": "第一次真实Adam矩初始化，其后保存/更新/恢复重复",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_defaults.py",
+          "location": "L13-L80",
+          "meaning": "两臂复用同一底座、原目标与默认参数",
+          "origin": "PRIOR_DEFAULTS_PACKAGE_MATCHED_CURRENT_SHA"
+        }
+      ],
+      "impact": "0新增GPU足以维持已审方法实现结论，但无本版原生入口实测；H3提供一条真实共享链记录而不伪称S已逐臂实测；6仅支持两臂各有当前版直接记录。H代表不是S显存/时间的严格数学上界。",
+      "minimum_recommendation": "若后续要求真实入口证据，固定native补充范围为H_default/ABC/s4、3调用，同步批准校验/完成态/控制期望和来源；不改正式两方法定义。不能只改批准JSON，不自动用剩余额度加S/重试。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": false,
+      "phase": "SCOPE_CHOICE_BEFORE_ANY_EXECUTION",
+      "alternatives": [
+        {
+          "updates": 0,
+          "meaning": "复用，不能主张当前原生已跑通"
+        },
+        {
+          "updates": 3,
+          "methods": [
+            "H_default"
+          ],
+          "recommended_for_current_entry_evidence": true
+        },
+        {
+          "updates": 6,
+          "methods": [
+            "S_default",
+            "H_default"
+          ],
+          "condition": "明确要求逐臂直接原生记录"
+        }
+      ]
+    },
+    {
+      "id": "N02",
+      "type": "CONDITIONAL_EXECUTION_BLOCK",
+      "severity": "MEDIUM",
+      "status": "CONFIRMED_STATIC_CAPACITY_AND_GATE_GAP",
+      "title": "三既有worker加新worker的共存没有可持续容量依据",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt",
+          "location": "L10; L14",
+          "meaning": "3个7.75GiB、新9.25GiB、整卡32607MiB；快照11256MiBfree",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L49-L69",
+          "meaning": "只检查瞬时free/RAM/disk及peer身份，不约束合计峰值/补发",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "3*7.75+9.25=32.5GiB>31.8427734375GiB，超673MiB且未计非allocator；白名单/过去快照不能保证持续共存。未观察到本轮OOM、损坏或执行。",
+      "minimum_recommendation": "不放行当前三peer的current_comparison。首选以后idle_only并确认旧批自然结束/不再补发，重新核现场资源；共存仅在包含增长、补发、非allocator的持续余量有具体依据时另定。不要改/停活动任务或试探四路压力。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": true,
+      "phase": "RESOURCE_AND_SHARING_CONDITION",
+      "minimal_code_change_required_if_idle_only_chosen": false,
+      "mechanical_record": "control_native_mechanical.json#/resource_calculations",
+      "execution_block_condition": "ONLY_CURRENT_THREE_PEER_COEXISTENCE_OR_UNRESOLVED_CAPACITY"
+    },
+    {
+      "id": "N03",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "status": "CONFIRMED_STATIC_PATH_NOT_OBSERVED_TIMEOUT",
+      "title": "无界资源查询未纳入包含控制的共享deadline",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L49-L56; L97-L114; L131-L136",
+          "meaning": "先admission，后算worker剩余额度；controller宣称总额包含控制",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_five_verify.py",
+          "location": "L26-L33",
+          "meaning": "两个nvidia-smi check_output均无timeout",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt",
+          "location": "L10-L12",
+          "meaning": "拟议900秒为两worker及控制共享总时限",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "若准入查询阻塞，流程到不了worker timeout及结算；当前不能把整个入口宣称严格受同一有限总额约束。旧resources未改，但此缺口来自本次新总deadline接线，不重开旧GPU修复。",
+      "minimum_recommendation": "给两个资源查询各自传入当时剩余deadline和尾部余量形成的有界timeout；查询超时进入已有失败/计费路径，不启动worker；在实际subprocess.run前重算剩余额度。不要新监控平台或无限重试。",
+      "minimum_acceptance": "仅模拟资源查询超时，核对不启动worker、有本次失败及耗时；不载模、不跑GPU、不重跑算法数值。",
+      "must_fix_before_script_delivery": true,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": true,
+      "phase": "CURRENT_NATIVE_CONTROL_FIX",
+      "requires_new_research_or_gpu": false
+    },
+    {
+      "id": "N04",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "status": "CONFIRMED_STATIC_PATH_NOT_OBSERVED_LOCK_FAILURE",
+      "title": "合法新job的锁获取失败跳过status和charged_seconds",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L88-L95; L131-L136; L147-L152",
+          "meaning": "新job已建，锁open/flock仍在try外，main无其他结算",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "tests/test_step28_defaults_native.py",
+          "location": "L82-L132",
+          "meaning": "CPU05模拟worker四分支，没有锁冲突",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "锁被占用时产生新attempt目录却不记失败与已用时间；不涉及旧目录写入，不证明已发生漏账，不改变CPU数值。",
+      "minimum_recommendation": "仅把合法拥有新目录后的锁open/acquire纳入现有result异常/结算范围，保留非阻塞、失败即停与旧目录拒绝不写入。",
+      "minimum_acceptance": "仅一个手写占锁情形，核对新attempt失败/计时留存、无worker启动、其他attempt不变。",
+      "must_fix_before_script_delivery": true,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": true,
+      "phase": "CURRENT_NATIVE_CONTROL_FIX",
+      "requires_new_research_or_gpu": false
+    },
+    {
+      "id": "N05",
+      "type": "CLOSED_PRIOR_DEFECT_AND_EVIDENCE_LIMIT",
+      "severity": "INFO",
+      "status": "SUPPORTED_BY_CURRENT_SOURCE_AND_SUPPLIED_CPU",
+      "title": "旧D01及native旧目录拒绝修复适当；当前CPU29/120含失败",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_defaults_run.py",
+          "location": "L38-L61",
+          "meaning": "早拒绝直接抛出，合法新目录后失败才落盘",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "tests/test_step28_continual_defaults.py",
+          "location": "L59-L100",
+          "meaning": "CPU04调用真实main，四个拒绝/留证分支",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L83-L86; L140-L152",
+          "meaning": "拒绝既有job不再补写",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "tests/test_step28_defaults_native.py",
+          "location": "L120-L132",
+          "meaning": "CPU05经main比较已有目录字节不变",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/cpu02/console.txt",
+          "location": "L1-L25",
+          "meaning": "NaN夹具写出失败，保留exit1",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/cpu05/receipt.json",
+          "location": "/charged_seconds; /cumulative_seconds; /sources",
+          "meaning": "费用7、累计29、当前52来源",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "cpu02—05是控制/入口模拟，非新真实Tiny或GPU资格；cpu01未改数值测试可继承。旧7/19只是历史，cpu02失败7秒计入29。cpu05场景累计值不另相加。",
+      "minimum_recommendation": "按版本和证据类型保留原件；关闭原D01及既有目录同类问题，但不以CPU05关闭未覆盖的N03/N04。不重复全部CPU数值或旧GPU。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": false,
+      "phase": "CLOSE_LOCAL_PRIOR_REPAIRS_AND_REUSE",
+      "mechanical_record": "provenance_native.json#/cumulative_accounting"
+    },
+    {
+      "id": "N06",
+      "type": "SOURCE_AND_AUTHORIZATION_CONDITION",
+      "severity": "INFO",
+      "status": "CONFIRMED_COUNTS_NO_EXECUTION_APPROVAL_EXISTS",
+      "title": "CPU来源52与原生闭包51须准确绑定，执行仍未授权",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/current_sources.json",
+          "location": "L1-L262",
+          "meaning": "52项CPU来源身份，不代表本包含全部文件",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L24-L25; L36-L46",
+          "meaning": "执行校验使用实际native.sources",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_defaults_run.py",
+          "location": "L17-L35",
+          "meaning": "静态来源闭包，不包含CPUwrapper",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/review_authorization.json",
+          "location": "L18-L22",
+          "meaning": "GPU/正式训练false、900未批准、sharing null",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "本包6项＋前轮defaults42项＋result4项共52匹配；native闭包51，唯一差项CPU包装器。cpu04/05与当前52同版；cpu02/03有5/4路径差异。当前没有已签批准门错配。",
+      "minimum_recommendation": "未来仅绑定实际native闭包和选定范围/总时限/sharing/job；缩减后更新来源。不得借用旧490/822小时。旧少数版本源码缺席如实披露，不索取全历史或扩测。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": true,
+      "phase": "FUTURE_EXECUTION_FREEZE_ONLY",
+      "mechanical_record": "provenance_native.json#/static_native_source_closure",
+      "execution_block_condition": "UNTIL_SEPARATE_USER_DECISION_AND_SOURCE_BOUND_SCOPE"
+    },
+    {
+      "id": "N07",
+      "type": "SUPPORTED_WITH_LIMITS",
+      "severity": "INFO",
+      "status": "STATICALLY_CONNECTED_NOT_YET_EXECUTED",
+      "title": "真实defaults/BGE/checkpoint/恢复路径接通，有限证据不外推",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_native.py",
+          "location": "L72-L80",
+          "meaning": "传defaults/9.25GiB/compare_legacyFalse及Budget",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_five_verify.py",
+          "location": "L44-L143",
+          "meaning": "真实模型、最大shape、真实update、全恢复/RNG和推理回读/退休",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "tests/test_step28_defaults_native.py",
+          "location": "L30-L80; L82-L132",
+          "meaning": "模拟CUDA、config截断和模拟subprocess的范围",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "location": "L73-L121",
+          "meaning": "继承资源采样和save预留",
+          "origin": "PRIOR_DEFAULTS_PACKAGE_MATCHED_CURRENT_SHA"
+        }
+      ],
+      "impact": "尚无真实BGE新运行；Adam624/扰动teacher为手写资格，不是正式历史；inference同未扰动对象不能单独排除no-op；32GiB/12GiB/64GiB是采样/预留，不是已实测通过或OS硬隔离。900为2.58889倍旧摘录代理，不保证完成。",
+      "minimum_recommendation": "保留上述限定；未来核现场资源、已有numerics启动环境及目标磁盘，成功与否按本次有限尝试实际回执判定。无需独立全图GPU数值oracle或重新关闭checkpoint比较。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": false,
+      "phase": "EVIDENCE_BOUNDARY_AND_FUTURE_FIELD_CONDITIONS",
+      "requires_new_research_or_gpu": false
+    },
+    {
+      "id": "N08",
+      "type": "REASONABLE_OPTIONAL_REDUCTION",
+      "severity": "INFO",
+      "status": "CONFIRMED_UNUSED_PRE_SCORE_FOR_RECORD_METHODS",
+      "title": "可省本defaults分支前置一次群评分",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_five_verify.py",
+          "location": "L101-L105; L123-L129",
+          "meaning": "raw仅非record教师使用；后面已评分并推理回读",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "scripts/step28_continual_defaults.py",
+          "location": "L22-L24",
+          "meaning": "两默认方法恒为record",
+          "origin": "PRIOR_DEFAULTS_PACKAGE_MATCHED_CURRENT_SHA"
+        }
+      ],
+      "impact": "前置score不供这两臂目标/教师/恢复判据使用；删除仅失去独立前置forward计时，不减少optimizer调用。",
+      "minimum_recommendation": "可只对本defaults分支省一次最大形状评分，并不再宣称该测速项；非阻断，不为此重构通用native或新增诊断。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": false,
+      "phase": "OPTIONAL_MICRO_REDUCTION"
+    },
+    {
+      "id": "N09",
+      "type": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "status": "REJECT_AS_CURRENT_REQUIREMENT",
+      "title": "不以原生增量扩张研究、历史资格或通用平台",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/request.zh.txt",
+          "location": "L8-L17",
+          "meaning": "最小充分、旧证据复用、静态范围和禁止扩张",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt",
+          "location": "L16",
+          "meaning": "不得重开旧GPU、增加HPO/臂/seed/order/诊断/框架",
+          "origin": "CURRENT_INCREMENT_PACKAGE"
+        }
+      ],
+      "impact": "逐臂全网格、全顺序/seed、完整Memory或864步资格、DDP、通用安全/日志/资源平台及为消耗余额追加工作均无本轮具体必要性。",
+      "minimum_recommendation": "只处理N03/N04与实际采用的sharing条件；按0/3/6证据目标选择，不追加研究、数据或预算，不改/停活动L²R/GCR。",
+      "must_fix_before_script_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "blocks_future_gpu_execution": false,
+      "phase": "OUT_OF_SCOPE"
+    }
+  ]
+}

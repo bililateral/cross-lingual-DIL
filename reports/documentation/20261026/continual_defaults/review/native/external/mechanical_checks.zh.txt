@@ -1,0 +1,75 @@
+有限原生增量：普通机械核对记录
+2026-10-26（Asia/Shanghai）
+
+范围与方法
+只对提供ZIP/文本/JSON做标准库大小、SHA256、静态AST、diff重建及普通算术。没有导入或执行任何项目模块、测试、GPU、模型、训练、推理、重采样或生成器，没有项目Linux连接。下列CPU原件数值不是本审新测量，旧GPU数字仅按当前proposal摘录核算。
+
+一、当前输入身份
+continual_defaults_native_increment.zip：实际54945字节；SHA256：
+321e17f6edb310f5e8266fc78f06895b674dd3771b3843b91caeb229f4b0b5ad。
+中央目录总30条=25文件+5目录；25文件=24载荷+input_manifest.json。
+24载荷大小/SHA与清单逐项一致，无重复、缺失或额外文件。
+清单自身5237字节，SHA256 efde0bd75a30905a7f39e63abdc32883c6ab748b8207bec39391eec60bc8ffdc，受已匹配外层ZIP身份约束。
+来源：input_identity_check.json。
+
+首次普通核对将用户25个成员数直接与全部ZipInfo条数比较，触发断言；随后读取entry.is_dir区别5个目录，校准为25文件并通过。此本审工具失败没有删除，见mechanical_attempts.json。它不是项目科研运行失败，也不是包SHA或载荷不匹配。输入没有重打包或更改。
+
+二、52项当前来源与51项原生闭包
+current_sources.json有52个唯一path。
+6项在当前增量包；42项从同会话defaults_review/input匹配；4项从result_review/input匹配。52/52实际大小及SHA全部一致。后4项为expression_data、expression_data_verify、five_control和five_evaluate，仅作来源身份/AST闭包，不重审生成器或旧正式结果。
+
+通过解析defaults_run.sources的起点、静态import、4份policy及2份上下文，连同native指定的extra_paths重建，不执行sources函数。实际原生闭包51项；52项CPU清单仅多scripts/step28_defaults_cpu.py。
+执行批准尚不存在，所以没有“现有批准门不匹配”的结果；未来sources要取当时实际闭包，缩减后重新绑定。
+来源：provenance_native.json:/sources、/static_native_source_closure。
+
+三、diff及未改函数
+两份provided diff可逐字节重建4个当前文件：defaults_run、five_verify、defaults_cpu、test_continual_defaults。
+普通检查逐hunk核旧上下文、删增行数，使用旧文本重建，再和当前文件字节比较；全部一致。没有应用任何补丁到输入实现，也没有执行项目。
+共享five_verify.before.py为12773字节，SHA256 48ddba63db808d9c0dba4cc81eb2a578b4b600f0a1415991a89a5742039e83a0，与同会话implementation/result包对应旧文件相同；AST顶层只有native改变，resources/native_batch/main不变。
+旧CPU01测试的old_loss/reference/fixture/evidence及三个测试函数AST全部不变；只新增CLI拒绝测试和sys import。不能因文件整体SHA变了就说旧数值方法已改，也不能说CPU04重新跑了这三个数值测试。
+来源：diff_checks.json；provenance_native.json:/five_verify_before_snapshot、/method_test_ast_vs_cpu01_input。
+
+四、CPU版本、失败和费用
+CPU01（旧输入）wall6.260977405006997秒，ceil7，累计7。
+CPU02 wall6.3723612680332735秒，ceil7，exit1，累计14。
+CPU03 wall4.059349497023504秒，ceil5，累计19。
+CPU04 wall2.0799372929614037秒，ceil3，累计22。
+CPU05 wall6.730980460008141秒，ceil7，累计29。
+逐次ceil之和7+7+5+3+7=29；wall之和25.50360592303332；120−29=91。
+所有receipt的prior承接一致。CPU02失败7秒保留，没有清零、覆盖或只取成功子集。
+
+CPU02错误定位为正常严格JSON writer不接受NaN，测试夹具在调用待测authorization解析器前失败；CPU03改写外部畸形JSON后只补该项。CPU04/05当前52项清单与current_sources完全相同；CPU02/03分别5/4路径与当前有变。旧预期版本字节只恢复48/52和49/52，缺席旧版本不伪称逐行核验。
+CPU05小JSON中约0.704687、1.932084、3.167940、4.457888秒是同一个测试进程STARTED起的场景累计模拟值，不能求和再计为GPU/CPU费用。该轮实际费用只取外层7秒。
+CPU02—05真实BGE loads/native updates均未发生；这些是控制/入口模拟原件。真正Tiny数值证据为前轮CPU01适用部分。
+来源：四份console/receipt、小JSON及provenance_native.json:/cpu_receipts、/cumulative_accounting、/cpu05_simulated_controller_timing。
+
+五、GPU/RAM/存储普通算术
+整卡32607MiB/1024=31.8427734375GiB。
+3个peer allocator×7.75+新9.25=32.5GiB，32.5×1024−32607=673MiB，未计非allocator。
+2×7.75+9.25=24.75GiB，算术剩余7.0927734375GiB；仍须无第三个补发及真实其他占用条件，不能仅凭这一步放行。
+proposal历史快照11256MiB=10.9921875GiB；10.25GiB准入=10496MiB，快照比准入多760MiB。该数值不是当前现场值或预留。
+allocator9.25GiB=9932111872字节；free门10.25GiB=11005853696字节。
+旧checkpoint reserved7.35546875GiB与9.25GiB差1.89453125GiB，仅为proposal摘录代理；本审未重新核旧GPU原回执。
+RSS32GiB=34359738368字节；两臂总目录12GiB=12884901888字节；小证据256MiB=268435456字节。
+12GiB输出+64GiB磁盘余量=76GiB启动磁盘门。运行保存前再核reserve+64GiB。
+
+设model.state_dict张量总字节P：full预留3P+64MiB；inference预留P+64MiB；full同时保留时合计包络4P+128MiB加其他证据。没有本次真实权重大小、RSS或显存测量。通常5秒采样，snapshot/save reserve强制刷新，不是OS硬上限。
+来源：proposal L10/L14、native入口LIMITS/admission/Budget、同身份five_run.Budget/save及population_run.checkpoint_reserve；详细计算见control_native_mechanical.json。
+
+六、时限代理与工作量
+旧摘录174.40055+173.23868=347.63923秒；900/347.63923=2.588890787728416，差552.36077秒。
+这是旧两worker耗时相加的代理，不自动等于旧并行墙钟或本次串行实测；本审未重新读旧原始native回执。900未批准、不保证完成、不预测正式18条工期。
+一次H代表方案3次optimizer调用：1当前+2次（当前+历史）=5梯度群呈现。两臂候选6次=10梯度群呈现。
+28账号×8记录=224记录；两通道448段；完整表224×223/2=24976项，FP32表99904字节。此为手写形状算术，不是正式数据或完整Memory运行。
+
+七、静态控制缺口与小修记录
+N03：native.py L97先查admission；five_verify.py L27—30两次check_output无timeout。若查询阻塞，worker timeout和controller结算尚未到达。属确定静态覆盖缺口，未观察实际超时。最小将两查询约束到同一剩余deadline，在启动child前重算timeout。
+N04：native.py L88建新job，L93—94锁open/flock在L95 try外；占锁失败跳过L131—136的FAILED/status/charged。属确定静态路径，未运行占锁测试、未观察实际漏记。最小把拥有新job后的锁获取纳入已有结算范围，不改旧目录。
+N02：三peer+新worker的容量与准入不足是条件性执行阻断；不是已发生OOM或方法失败。可在未来选择idle_only且无补发条件下避免此共存配置，不增平台、不擅停现有任务。
+机械分审原ID映射：control_native_mechanical中CN01→最终N02，CN02→N04，CN03→N03。
+
+八、范围统计与复核边界
+当前25文件：19份全文/完整JSON，5份选段或结构化字段（包含4个receipt的非sources字段及完整sources机械比较、旧before部分），1份清单结构/身份。
+同会话额外54份版本文件记录在scope中：6份本轮全文、14份选段/结构化字段、34份仅哈希/AST/结构。没有把上次全文审查自动算本次重新全文阅读。
+当前52来源全部可用不等于52源码全部语义重审。实际文件与根、行段、SHA以及操作类型详见reading_scope.json。
+所有判断为静态方案/实现外审；没有GPU执行、当前资源实测、科研新结果、预算批准或正式18条结论。报告/结构化意见中的“需修”未由本审实施到输入代码。

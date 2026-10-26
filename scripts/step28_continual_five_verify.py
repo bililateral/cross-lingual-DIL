@@ -23,11 +23,15 @@ import step28_continual_five_control as ctl
 ALLOCATOR_BYTES = int(9.25*2**30)
 
 
-def resources() -> dict:
-    gpu = subprocess.check_output(["nvidia-smi", "--id=0", "--query-gpu=name,memory.total,memory.free,utilization.gpu",
-                                   "--format=csv,noheader,nounits"], text=True).strip()
-    apps = subprocess.check_output(["nvidia-smi", "--id=0", "--query-compute-apps=pid,used_memory",
-                                    "--format=csv,noheader,nounits"], text=True).strip()
+def resources(deadline: float | None = None) -> dict:
+    def query(fields):
+        timeout = None if deadline is None else deadline-time.monotonic()-5
+        if timeout is not None and timeout <= 0:
+            raise TimeoutError("No remaining resource-query allowance")
+        return subprocess.check_output(["nvidia-smi", "--id=0", fields,
+            "--format=csv,noheader,nounits"], text=True, timeout=timeout).strip()
+    gpu = query("--query-gpu=name,memory.total,memory.free,utilization.gpu")
+    apps = query("--query-compute-apps=pid,used_memory")
     return dict(time=time.time(), gpu=gpu, compute_apps=apps,
                 host_available_bytes=psutil.virtual_memory().available,
                 disk_available_bytes=__import__("shutil").disk_usage(m.data.ROOT).free)

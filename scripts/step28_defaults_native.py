@@ -46,9 +46,9 @@ def authorization(path: Path, job: Path) -> dict:
     return row
 
 
-def admission(sharing: str) -> dict:
+def admission(sharing: str, deadline: float) -> dict:
     import psutil
-    row = verified.resources()
+    row = verified.resources(deadline)
     fields = row["gpu"].split(",")
     free = int(fields[2].strip())*2**20
     if (free < LIMITS["free_gpu_bytes"] or row["host_available_bytes"] < LIMITS["rss_bytes"]
@@ -90,17 +90,14 @@ def controller(job: Path, approval_path: Path) -> dict:
     result = dict(status="RUNNING", sources=approval["sources"], receipts=receipts,
                   deadline_monotonic=deadline, total_seconds=approval["total_seconds"])
     # Lock only this supplemental lane; never lock or modify another campaign.
-    with (job.parent/"defaults_native.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        try:
+    try:
+        with (job.parent/"defaults_native.lock").open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             for name in METHODS:
-                resource = admission(approval["sharing"])
+                resource = admission(approval["sharing"], deadline)
                 child_job = job/name
                 child_job.mkdir()
                 m.data.write_json(child_job/"resource_before.json", resource)
-                remaining = deadline-time.monotonic()-5
-                if remaining <= 15:
-                    raise TimeoutError("No remaining native allowance; first-arm cost is retained")
                 command = [sys.executable, "-B", str(Path(__file__).resolve()), "--job", str(child_job),
                     "--authorization", str(approval_path.resolve()), "--worker", name, "--deadline", str(deadline)]
                 environment = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1",
@@ -109,6 +106,9 @@ def controller(job: Path, approval_path: Path) -> dict:
                 m.data.write_json(job/"status.json", {**result, "active": name})
                 try:
                     with (child_job/"console.txt").open("w") as log:
+                        remaining = deadline-time.monotonic()-5
+                        if remaining <= 15:
+                            raise TimeoutError("No remaining native allowance; prior cost is retained")
                         # subprocess.run kills and waits only for this owned child on timeout.
                         code = subprocess.run(command, env=environment, stdout=log, stderr=subprocess.STDOUT,
                             timeout=remaining, check=False).returncode
@@ -128,12 +128,12 @@ def controller(job: Path, approval_path: Path) -> dict:
                         or not outcome.get("actual_next_update_equal") or not outcome.get("inference_equal")):
                     raise ValueError("Native worker receipt does not prove the required fixed scope")
             result["status"] = "COMPLETE_TWO_ORIGINAL_NATIVE_CHECKS"
-        except BaseException:
-            result.update(status="FAILED_STOP_NO_RETRY", traceback=traceback.format_exc())
-            raise
-        finally:
-            result["charged_seconds"] = time.monotonic()-STARTED
-            m.data.write_json(job/"status.json", result)
+    except BaseException:
+        result.update(status="FAILED_STOP_NO_RETRY", traceback=traceback.format_exc())
+        raise
+    finally:
+        result["charged_seconds"] = time.monotonic()-STARTED
+        m.data.write_json(job/"status.json", result)
     return result
 
 

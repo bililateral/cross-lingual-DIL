@@ -1,0 +1,255 @@
+{
+  "mode": "Read supplied text/JSON and ordinary arithmetic only; no project import/execution/test/GPU/network",
+  "resource_calculations": {
+    "sources": [
+      "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt:10,12,14",
+      "scripts/step28_defaults_native.py:18-20,49-69"
+    ],
+    "gpu_total_mib": 32607,
+    "gpu_total_gib": 31.8427734375,
+    "existing_workers": 3,
+    "existing_allocator_gib_each": 7.75,
+    "existing_allocator_total_gib": 23.25,
+    "new_allocator_gib": 9.25,
+    "combined_allocator_gib": 32.5,
+    "combined_minus_physical_gib": 0.6572265625,
+    "combined_minus_physical_mib": 673.0,
+    "two_peer_plus_new_allocator_gib": 24.75,
+    "two_peer_arithmetic_remainder_gib": 7.0927734375,
+    "two_peer_limit": "Arithmetic remainder is not a coexistence permission: existing queue may refill and nonallocator memory must also fit.",
+    "proposal_snapshot_free_mib": 11256,
+    "proposal_snapshot_free_gib": 10.9921875,
+    "admission_minimum_free_mib": 10496,
+    "snapshot_minus_admission_threshold_mib": 760,
+    "new_allocator_mib": 9472,
+    "snapshot_minus_new_allocator_mib": 1784,
+    "allocator_bytes": 9932111872,
+    "free_gpu_bytes": 11005853696,
+    "worker_sampled_rss_bytes": 34359738368,
+    "campaign_bytes": 12884901888,
+    "non_weight_bytes": 268435456,
+    "disk_reserve_bytes": 68719476736,
+    "initial_disk_available_bytes": 81604378624,
+    "initial_disk_available_gib": 76,
+    "important_boundary": "No current live resource measurement, GPU execution, reservation or proof of simultaneous allocator peaks is claimed."
+  },
+  "time_proxy": {
+    "source": "reports/documentation/20261026/continual_defaults/review/native/proposal.zh.txt:12",
+    "old_S_seconds_as_quoted": "174.40055",
+    "old_H_seconds_as_quoted": "173.23868",
+    "sum_old_seconds": "347.63923",
+    "proposed_shared_seconds": 900,
+    "ratio": "2.588890787728416036360453335",
+    "proxy_extra_seconds": "552.36077",
+    "observed_here": false,
+    "raw_old_native_receipts_in_this_package": false,
+    "scope": "Old quoted method/co-resident workload differs; upper bound for a stop-on-failure attempt, not completion guarantee nor formal18 forecast."
+  },
+  "call_and_deadline_path": {
+    "sources": [
+      "scripts/step28_defaults_native.py:72-80,83-137",
+      "scripts/step28_continual_five_verify.py:36-143"
+    ],
+    "fixed_methods": [
+      "S_default",
+      "H_default"
+    ],
+    "worker_update_limit": 3,
+    "successful_controller_expected_total": 6,
+    "per_worker_stages_and_steps": [
+      [
+        1,
+        1
+      ],
+      [
+        3,
+        49
+      ],
+      [
+        3,
+        49
+      ]
+    ],
+    "handwritten_adam_step_before_replay": 624,
+    "absolute_deadline_expression": "parent STARTED + approved total_seconds",
+    "second_worker_deadline_is_same": true,
+    "parent_nominal_tail_seconds": 5,
+    "child_cooperative_tail_seconds": 15,
+    "charging": "Parent wall elapsed includes both sequential workers and control once. Child elapsed rows are component diagnostics, not extra charges."
+  },
+  "storage_path": {
+    "sources": [
+      "scripts/step28_defaults_native.py:28-33",
+      "scripts/step28_continual_five_verify.py:106-143",
+      "defaults_review/input/scripts/step28_continual_five_run.py:73-121",
+      "defaults_review/input/scripts/step28_continual_population_run.py:63-74"
+    ],
+    "formula_if_model_state_tensor_bytes_P": "full reserve=3P+64MiB; inference reserve=P+64MiB; combined conservative envelope=4P+128MiB plus other evidence if full remains present.",
+    "snapshot_forces_resource_refresh": true,
+    "ordinary_resource_poll_minimum_interval_seconds": 5,
+    "scope": "Sampled worker RSS and disk with checkpoint reserve; not OS hard quotas. Successful full/inference hashes retained before deletion; no actual new state sizes measured."
+  },
+  "cpu_metadata_arithmetic": {
+    "prior_cpu01_seconds": 7,
+    "provided_receipts": [
+      {
+        "file": "reports/documentation/20261026/continual_defaults/qualification/cpu02/receipt.json",
+        "exit_code": 1,
+        "wall_seconds": 6.3723612680332735,
+        "ceil_wall_seconds": 7,
+        "charged_seconds": 7,
+        "cumulative_seconds": 14,
+        "source_count": 52,
+        "reported_formal_data_reads": 0,
+        "reported_pretrained_loads": 0,
+        "reported_gpu": false
+      },
+      {
+        "file": "reports/documentation/20261026/continual_defaults/qualification/cpu03/receipt.json",
+        "exit_code": 0,
+        "wall_seconds": 4.059349497023504,
+        "ceil_wall_seconds": 5,
+        "charged_seconds": 5,
+        "cumulative_seconds": 19,
+        "source_count": 52,
+        "reported_formal_data_reads": 0,
+        "reported_pretrained_loads": 0,
+        "reported_gpu": false
+      },
+      {
+        "file": "reports/documentation/20261026/continual_defaults/qualification/cpu04/receipt.json",
+        "exit_code": 0,
+        "wall_seconds": 2.0799372929614037,
+        "ceil_wall_seconds": 3,
+        "charged_seconds": 3,
+        "cumulative_seconds": 22,
+        "source_count": 52,
+        "reported_formal_data_reads": 0,
+        "reported_pretrained_loads": 0,
+        "reported_gpu": false
+      },
+      {
+        "file": "reports/documentation/20261026/continual_defaults/qualification/cpu05/receipt.json",
+        "exit_code": 0,
+        "wall_seconds": 6.730980460008141,
+        "ceil_wall_seconds": 7,
+        "charged_seconds": 7,
+        "cumulative_seconds": 29,
+        "source_count": 52,
+        "reported_formal_data_reads": 0,
+        "reported_pretrained_loads": 0,
+        "reported_gpu": false
+      }
+    ],
+    "sum_prior_and_charges": 29,
+    "remaining_of_120_seconds": 91,
+    "failed_cpu02_seconds_retained": 7,
+    "cpu05_control_scenario_rows_are_simulated_not_separate_native_charges": true
+  },
+  "reused_source_identity_checks": [
+    {
+      "reused_input": "defaults_review/input",
+      "actual": {
+        "path": "scripts/step28_continual_five_run.py",
+        "bytes": 15683,
+        "sha256": "1099a94cd2ac9ecd82a1255a8403d6065fbab0609eb4cedc48798b6874ce335a"
+      },
+      "current_sources_record": {
+        "path": "scripts/step28_continual_five_run.py",
+        "bytes": 15683,
+        "sha256": "1099a94cd2ac9ecd82a1255a8403d6065fbab0609eb4cedc48798b6874ce335a"
+      },
+      "size_sha_matches_current": true
+    },
+    {
+      "reused_input": "defaults_review/input",
+      "actual": {
+        "path": "scripts/step28_continual_population_run.py",
+        "bytes": 21310,
+        "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+      },
+      "current_sources_record": {
+        "path": "scripts/step28_continual_population_run.py",
+        "bytes": 21310,
+        "sha256": "f0da5d51bb1291abe3417e5d695d8fc9134522d9fc7ced536417f4e484ab25e4"
+      },
+      "size_sha_matches_current": true
+    },
+    {
+      "reused_input": "defaults_review/input",
+      "actual": {
+        "path": "scripts/step28_continual_population.py",
+        "bytes": 9699,
+        "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+      },
+      "current_sources_record": {
+        "path": "scripts/step28_continual_population.py",
+        "bytes": 9699,
+        "sha256": "f8f158fff648990ae575228d1b8dc112ac8c515ec5d6acc23a598120d770db20"
+      },
+      "size_sha_matches_current": true
+    },
+    {
+      "reused_input": "defaults_review/input",
+      "actual": {
+        "path": "scripts/step28_chinese_base.py",
+        "bytes": 51352,
+        "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+      },
+      "current_sources_record": {
+        "path": "scripts/step28_chinese_base.py",
+        "bytes": 51352,
+        "sha256": "2b298459235d05d0934a0c822a14f8b91014e5d3797038b080eec5d9230225cc"
+      },
+      "size_sha_matches_current": true
+    },
+    {
+      "reused_input": "defaults_review/input",
+      "actual": {
+        "path": "scripts/step28_continual_population_data.py",
+        "bytes": 11587,
+        "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+      },
+      "current_sources_record": {
+        "path": "scripts/step28_continual_population_data.py",
+        "bytes": 11587,
+        "sha256": "49cca1268b57422a46deefa8bc360423ccaeb8b5062750a39b540f0fb400e08d"
+      },
+      "size_sha_matches_current": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "CN01",
+      "severity": "MEDIUM",
+      "type": "REPRODUCIBILITY_DEFECT_OR_CONDITIONAL_EXECUTION_BLOCK",
+      "confirmed": "The current_comparison branch lacks a sustainable capacity check; the three advertised peer caps plus new cap exceed physical memory. No actual OOM or damage observed.",
+      "evidence": [
+        "scripts/step28_defaults_native.py:49-69",
+        "proposal.zh.txt:14"
+      ],
+      "minimal": "Do not approve/launch this four-process coexistence configuration. Prefer future idle_only after existing dispatch is finished; alternative must have bounded, sustainable total demand including peer refill and nonallocator use. No stop/change of current queue and no automatic extra GPU trials."
+    },
+    {
+      "id": "CN02",
+      "severity": "LOW",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "confirmed": "New lawful job is made at L88, but lock open/flock L93-94 is outside try/finally L95-136, so lock contention leaves no status/charged record in that new job.",
+      "evidence": [
+        "scripts/step28_defaults_native.py:83-95,130-136"
+      ],
+      "minimal": "Move only lock open/acquire under existing owned-job failure/charge handling. Keep nonblocking lock and never write rejected existing job."
+    },
+    {
+      "id": "CN03",
+      "severity": "LOW_OR_MEDIUM_FOR_ROOT_DISPOSITION",
+      "type": "DEADLINE_IMPLEMENTATION_GAP",
+      "confirmed": "admission calls two unbounded nvidia-smi check_output commands before parent computes remaining; run timeout also uses an earlier remaining value before status/log setup.",
+      "evidence": [
+        "scripts/step28_defaults_native.py:96-114",
+        "scripts/step28_continual_five_verify.py:26-33"
+      ],
+      "minimal": "Bound these two resource queries by the same remaining absolute deadline and recompute subprocess timeout just before launch. No observed overrun, no universal supervisor requested."
+    }
+  ]
+}

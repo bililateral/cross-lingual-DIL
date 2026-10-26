@@ -27,6 +27,57 @@ class NativeEntryTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         return Path(temporary.name)
 
+    def test_resource_query_deadline_and_owned_lock_failure(self):
+        evidence = []
+        for failed_query in (0, 1):
+            root = self.temporary()
+            job, auth = root/"native", root/"authorization.json"
+            n.m.data.write_json(auth, approval(job))
+            timeouts = []
+            def query(command, *, text, timeout):
+                self.assertGreater(timeout, 0)
+                self.assertLessEqual(timeout, 120)
+                timeouts.append(timeout)
+                if len(timeouts)-1 == failed_query:
+                    raise subprocess.TimeoutExpired(command, timeout)
+                return "RTX 5090, 32607, 11256, 90\n"
+            with mock.patch.object(n.verified.subprocess, "check_output", side_effect=query), \
+                    mock.patch.object(n.subprocess, "run") as launch:
+                with self.assertRaises(subprocess.TimeoutExpired):
+                    n.controller(job, auth)
+                launch.assert_not_called()
+            result = n.m.data.read_json(job/"status.json")
+            self.assertEqual(result["status"], "FAILED_STOP_NO_RETRY")
+            self.assertEqual(result["receipts"], [])
+            self.assertGreater(result["charged_seconds"], 0)
+            self.assertEqual(len(timeouts), failed_query+1)
+            self.assertEqual(timeouts, sorted(timeouts, reverse=True))
+            evidence.append(dict(scenario="resource_query_timeout", query=failed_query+1,
+                timeouts=timeouts, charged_seconds=result["charged_seconds"], launched=0))
+        root = self.temporary()
+        job, auth = root/"native", root/"authorization.json"
+        n.m.data.write_json(auth, approval(job))
+        lock_path = root/"defaults_native.lock"
+        lock_path.write_text("existing owner's marker\n")
+        original = lock_path.read_bytes()
+        with lock_path.open("a") as held:
+            n.fcntl.flock(held, n.fcntl.LOCK_EX | n.fcntl.LOCK_NB)
+            with mock.patch.object(n, "admission") as admission, mock.patch.object(n.subprocess, "run") as launch:
+                with self.assertRaises(BlockingIOError):
+                    n.controller(job, auth)
+                admission.assert_not_called()
+                launch.assert_not_called()
+        result = n.m.data.read_json(job/"status.json")
+        self.assertEqual(result["status"], "FAILED_STOP_NO_RETRY")
+        self.assertEqual(result["receipts"], [])
+        self.assertGreater(result["charged_seconds"], 0)
+        self.assertEqual(original, lock_path.read_bytes())
+        evidence.append(dict(scenario="real_nonblocking_lock_conflict", launched=0,
+            charged_seconds=result["charged_seconds"], existing_lock_unchanged=True))
+        n.m.data.write_json(Path(os.environ["DEFAULTS_TEST_ROOT"])/"native_review_fixes.json",
+            dict(cases=evidence, resource_commands_simulated=True, lock_conflict_real=True,
+                 actual_bge_loads=0, actual_native_updates=0))
+
     def test_authorization_resources_and_new_worker_arguments(self):
         root = self.temporary()
         job, auth = root/"native", root/"authorization.json"
@@ -44,13 +95,13 @@ class NativeEntryTests(unittest.TestCase):
         observed = dict(gpu="RTX 5090, 32607, 11256, 90", compute_apps="",
                         host_available_bytes=128*n.GIB, disk_available_bytes=128*n.GIB)
         with mock.patch.object(n.verified, "resources", return_value=observed):
-            self.assertEqual(n.admission("idle_only")["free_gpu_bytes"], 11256*2**20)
+            self.assertEqual(n.admission("idle_only", time.monotonic()+60)["free_gpu_bytes"], 11256*2**20)
             observed["compute_apps"] = "123, 7000"
             with self.assertRaisesRegex(RuntimeError, "occupied"):
-                n.admission("idle_only")
+                n.admission("idle_only", time.monotonic()+60)
             observed.update(compute_apps="", gpu="RTX 5090, 32607, 10000, 90")
             with self.assertRaisesRegex(RuntimeError, "insufficient"):
-                n.admission("idle_only")
+                n.admission("idle_only", time.monotonic()+60)
         child = job/"H_default"
         child.mkdir(parents=True)
         with mock.patch.object(n.verified, "native", return_value={}) as native:
