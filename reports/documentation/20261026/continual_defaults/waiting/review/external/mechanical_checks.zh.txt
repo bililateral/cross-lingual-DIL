@@ -1,0 +1,83 @@
+等待与派发外审：普通机械核对及静态反例记录
+审查日期：2026-10-26（UTC+8）
+
+性质
+本记录来自隔离审查环境的字节／JSON／AST／算术。没有导入项目模块，没有调用项目测试函数，没有运行GPU命令或科研计算。反例是手写数值与源码控制流推演；不是新增实验、GPU实测、真实故障或Linux py310资格。
+机械执行入口为本返回包mechanical_review.py。它只用Python标准库；从所给解压输入读取，独立重构本轮导入闭包并核对身份，输出source_identity_checks.json和resource_arithmetic.json。新环境可用：
+  python3 mechanical_review.py --input-dir <本输入ZIP的解压目录> --output-dir <独立机械输出目录>
+这里不需要模型、正式数据、项目依赖或项目workspace，不执行源文件。输入ZIP本体核对在input_identity_check.json；Python包内ZIP字节核验使用zipfile/hashlib，逐载荷读取同时校验ZIP校验码。
+
+1. 输入身份
+实际360013字节，SHA256=2d9028dfd2ef4d3509e95ad53078191557b20b961324fe13bf66d8955d580bd8。
+80文件=79载荷+清单；另4目录，共84中央目录记录。79载荷逐项大小/SHA一致；无重复、缺失或额外文件。安全解压只写本次审查副本，输入ZIP和提供源码未改。
+来源：input_manifest.json全79条；见input_identity_check.json的members数组。
+
+2. 静态来源关系
+用AST读取import/ImportFrom，不导入模块：
+  scientific=44；与draft_gate.sources精确相同。
+  orchestration=57；与draft_gate.orchestration_sources精确相同。
+  cpu08=58；所有文件实字节匹配，唯一超出编排闭包的是scripts/step28_defaults_cpu.py。
+  native worker与controller各51源完全相同；科学44均包含且大小/SHA一致。
+  本包可核对native源48项；缺3项：scripts/step28_continual_five_verify.py、scripts/step28_defaults_native.py、tests/test_step28_defaults_native.py。
+这些缺件现版源码没有在本轮重新阅读；它们不是新增等待与派发的执行入口，也不因此要求再次上传或重做GPU。
+旧dispatcher CPU01清单中当前comparison_control和test_step28_comparison_control均匹配；旧shell不在本输入，因此未称完整重验旧三文件发布包。旧正式门、launch及本新draft.predecessor的大小/SHA/路径关系相符。
+来源：defaults_run.sources的静态实现；本包draft、CPU08、native_h02、continual_comparison gate/launch/cpu01回执。所有对比按path/bytes/SHA字段，不依赖JSON键插入顺序。
+
+3. 精确任务和端点
+2方法×3顺序×3seed=18；完整有序identity列表和roots、lambda_rank=1、lr_multiplier=1与draft一致。
+18×864=15552更新。
+每条第一阶段288群呈现，第二/三阶段各576；18×1440=25920梯度群呈现。
+18×3=54端点。每端点60旧dev：3240个主要盲评分群；12当前cal：648群。
+继承checkpoint在初始及full/inference恢复后各评分12cal+60dev：54×72×3=11664群前向小计。它不含训练与Memory/teacher前向，不是整批完整前向预算；stage-cal/first-cal转换本身不增加模型前向。
+来源：defaults.specifications、five_run.train_stage/checkpoint/execute及draft.runs。没有执行或生成任何端点。
+
+4. W01：两次显存查询的算术见证
+Q=10.25GiB。
+t1：active=1，own=0，free=16GiB。
+本批加载8GiB，外来进程不变。
+t2：own=8，实际free=8GiB。
+当前源码拼合t1 free与t2 own：U=max(0,10.25−8)=2.25，required=10.25+2.25=12.5；16>=12.5，于是放行。
+同一t2关系：8<12.5，应等待。实际free8也低于新槽自身10.25。
+定位：scripts/step28_defaults_control.py:130–151；tests/test_step28_defaults_control.py:17–25只测试一致静态数。
+结论：自身启动阶段的可达采样缺口已证；没有证明现场发生过OOM。不是外来任务后续增长这一独立边界。
+
+同项条件性抵扣见证：active=2、own=[11.25,0]、free=20。
+当前聚合：U=max(0,20.5−11.25)=9.25，required=19.5，放行。
+逐路欠占：max(0,10.25−11.25)+max(0,10.25−0)=10.25，required=20.5，等待。
+进程总11.25并未在本包观察到；它只说明allocator9.25不等同进程总显存硬封顶10.25时，不能聚合后让超占抵扣别路预留。
+
+5. W02：首次资源门控制流见证
+初始startup检查208/192GiB通过；进入dispatcher后GPU不足，尚无首派。
+等待期间RAM下降至80GiB、目标盘至100GiB；随后GPU足够。
+实际admit默认startup=False，因此80>=64且100>=76通过；但80<208、100<192，首次门未继续执行。
+定位：defaults_control.py:155–156,223,242–245。
+这不是实际现场内存不足测量；是现有分支可达的不一致。局部首派状态即可修复，GPU非空卡定义不变。
+
+6. 显存与存储单位
+1GiB=1073741824B，1MiB=1048576B。
+allocator9.25GiB=9932111872B=9472MiB。
+Q10.25GiB=11005853696B=10496MiB。
+3Q=30.75GiB=31488MiB；包内卡32607MiB=31.8427734375GiB，差1119MiB。
+旧14:05快照free11220MiB，比一槽多724MiB；前序尚未结束且快照不是当前准入。
+54×1304378699 + 3×3904608813 = 82150276185B ≈76.508406722GiB。
+这是同架构原生序列化尺寸代理，另有Memory/scores/logs等；不是54端点实际磁盘测量，不据此擅加128GiB限额。
+来源：waiting/resource_before.json；native_h02/H_default/result.json的inference_bytes/full_bytes。
+
+7. 费用与时间
+training=18×21600=388800秒=108h；control=7200秒=2h；合计396000秒=110h。
+CPU08 ceil(4.034617652010638)=5；51+5=56/120，剩64。
+native_h02 ceil(166.01006911695004)=167；历史失败4后171/900，剩729不作为追加资格要求。
+prior=56+171+120=347秒。120是准备保守承接。
+另预提60秒控制开销；7200−347−60=6793秒。
+validate_gate旧最低222，比347少125；draft实际347正确，没有自动少记路径。正式门必须承接之后新增实耗。
+来源：CPU08 receipt；native_h02 status；native_execution/result.zh.txt；draft_gate.prior_breakdown_seconds；defaults_control:62–66,215–218。
+
+8. 最大形状代理与退出尾部
+(288×19.91334528697189 + 576×37.727047094958834)/3600 = 7.629395158151165h（普通更新代理）。
+此算式把所有更新当手写最大形状，不包含完整端点评分/保存，不能当实际固定训练池的整条预测，更不能以此改变用户6h上限或自动扩预算。
+现每次admission两查询×10s；已有a=1/2/3个旧近deadline worker时最多补3−a路，查询20(3−a)+清理15a为55/50/45s，未含其他控制I/O。只是现代码范围的算术，不是OS硬实时保证。修采样不得变成无界重试而侵蚀60s尾部。
+累计进程时间、墙钟及GPU忙时是不同口径；110/3不是工期承诺。
+
+9. 检查结果与限制
+本轮输入、身份、来源及上述算术核对通过；普通机械脚本未出现失败。早期宽输出被截断的显示部分已按需补读或明确记录选段，未把截断文本计作主审全文阅读。未执行任何项目资格；不存在“审查环境测试通过即Linux资格通过”的结论。
+机械脚本只检查所声明字段/关系，不证明真实训练将成功、不证明当前资源可用、不验证未提供标签/权重，也不取代主执行者对修订实现的独立处置。

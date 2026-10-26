@@ -1,0 +1,124 @@
+{
+  "observed": "2026-10-26T15:04:05.435921+08:00",
+  "pid": 1257448,
+  "owner": "yongpeng",
+  "created": 1792998182.07,
+  "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_defaults/waiting_workspace",
+  "command": [
+    "/home/yongpeng/miniconda3/envs/py310/bin/python",
+    "-B",
+    "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_defaults/active_defaults_wait.py",
+    "--workspace",
+    "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_defaults/waiting_workspace",
+    "--gate",
+    "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_defaults/waiting/formal_gate.json"
+  ],
+  "status": "sleeping",
+  "rss_bytes": 554487808,
+  "cpu_times": {
+    "user": 2.73,
+    "system": 0.3,
+    "children_user": 0.0,
+    "children_system": 0.0,
+    "iowait": 0.0
+  },
+  "unique_listener": true,
+  "waiting": {
+    "epoch": 1792998185.5442934,
+    "predecessor": {
+      "processes": [
+        {
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "scripts/step28_comparison_control.py",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json"
+          ],
+          "created": 1792981520.79,
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+          "owner": "yongpeng",
+          "pid": 1198791
+        },
+        {
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s4_L2R_text_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s4_L2R_text_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+            "--deadline",
+            "672349.027562453"
+          ],
+          "created": 1792981572.02,
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+          "owner": "yongpeng",
+          "pid": 1198941
+        },
+        {
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s5_L2R_text_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s5_L2R_text_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+            "--deadline",
+            "672349.176471035"
+          ],
+          "created": 1792981572.17,
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+          "owner": "yongpeng",
+          "pid": 1198951
+        },
+        {
+          "command": [
+            "/home/yongpeng/miniconda3/envs/py310/bin/python",
+            "-B",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+            "--job",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s5_ER_GCR_group_fixed",
+            "--spec",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s5_ER_GCR_group_fixed/spec.json",
+            "--gate",
+            "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+            "--deadline",
+            "469298.240786542"
+          ],
+          "created": 1792994521.24,
+          "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+          "owner": "yongpeng",
+          "pid": 1246109
+        }
+      ],
+      "ready": false,
+      "reason": "PREDECESSOR_STILL_RUNNING"
+    },
+    "resources": null,
+    "status": "WAITING"
+  },
+  "budget": {
+    "active": {},
+    "completed": [],
+    "cumulative_seconds": 530.1080083180568,
+    "failed": false,
+    "limits": {
+      "control": 7200,
+      "training": 388800
+    },
+    "used": {
+      "control": 530.1080083180568,
+      "training": 0.0
+    }
+  },
+  "failure_exists": false,
+  "formal_dispatch_started": false,
+  "listener_copy_exists": true
+}

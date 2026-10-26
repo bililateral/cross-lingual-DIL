@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import step28_defaults_control as control
@@ -23,6 +24,44 @@ class DefaultsControlTest(unittest.TestCase):
         self.assertTrue(control.gpu_admission(21*gib, [(900, 10*gib)], {101}, 1)['ready'])
         self.assertTrue(control.gpu_admission(13*gib, [(101, 8*gib), (900, 10*gib)], {101}, 1)['ready'])
         self.assertFalse(control.gpu_admission(12*gib, [(101, 8*gib), (900, 10*gib)], {101}, 1)['ready'])
+        self.assertFalse(control.gpu_admission(20*gib, [(101, int(11.25*gib))], {101, 102}, 2)['ready'])
+
+    def test_growth_release_and_stable_foreign_cuda_at_actual_resource_entry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            gib = control.GIB
+            cases = [
+                # Old free=16 followed by own=8 must not pass against required=12.5.
+                (['16384', '101, 8192', '8192', '101, 8192'], False),
+                # Reverse ordering alone would miss own release; defer this changed observation too.
+                (['8192', '101, 8192', '16384', ''], False),
+                # Free held constant by other activity still cannot hide a change in own allocation.
+                (['16384', '', '16384', '101, 8192'], False),
+                (['13312', '101, 8192\n900, 10240', '13312', '101, 8192\n900, 10240'], True),
+            ]
+            with patch.object(control.shared.prior.run, 'owned_processes', return_value={101: None}), \
+                    patch.object(control.psutil, 'virtual_memory', return_value=SimpleNamespace(available=256*gib)), \
+                    patch('shutil.disk_usage', return_value=SimpleNamespace(free=256*gib)):
+                for outputs, expected in cases:
+                    with self.subTest(outputs=outputs), \
+                            patch.object(control.subprocess, 'check_output', side_effect=outputs) as query:
+                        row = control.resources(Path(directory), 1)
+                        self.assertEqual(row['ready'], expected)
+                        self.assertEqual(query.call_count, 4)
+                        self.assertTrue(all(0 < call.kwargs['timeout'] <= 10 for call in query.call_args_list))
+                with patch.object(control.time, 'monotonic', side_effect=[0., 1., 8., 16., 21.]), \
+                        patch.object(control.subprocess, 'check_output', side_effect=['13312', '101, 8192', '13312']) as query:
+                    with self.assertRaises(TimeoutError):
+                        control.resources(Path(directory), 1)
+                    self.assertEqual(query.call_count, 3)
+
+    def test_prior_uses_latest_cpu_and_retains_native_and_preparation(self):
+        gate = dict(prior_used_seconds={'control': 352}, prior_breakdown_seconds=dict(
+            cpu_all_attempts=61, native_all_attempts=171, preparation_conservative_charge=120))
+        control.validate_prior(gate, {'cumulative_seconds': 61})
+        for wrong in (222, 347):
+            gate['prior_used_seconds']['control'] = wrong
+            with self.assertRaises(ValueError):
+                control.validate_prior(gate, {'cumulative_seconds': 61})
 
     def predecessor(self, directory):
         root = Path(directory)
@@ -116,7 +155,7 @@ class DefaultsControlTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             campaign = root/'formal'
-            gate = dict(campaign=str(campaign), prior_used_seconds={'control': 222}, predecessor={},
+            gate = dict(campaign=str(campaign), prior_used_seconds={'control': 347}, predecessor={},
                         sources=control.run.sources(), limits={'disk_bytes': 128*control.GIB, 'small_bytes': 2*control.GIB})
             dispatched = []
             def dispatch(queue, target, ledger, bucket, command, **options):
@@ -129,8 +168,21 @@ class DefaultsControlTest(unittest.TestCase):
                 self.assertEqual(line[-2:], ['--deadline', '12345.0'])
                 self.assertEqual(control.data.read_json(metadata/'spec.json'), queue[0]['spec'])
                 self.assertFalse((campaign/queue[0]['id']).exists())
+                # Delayed first dispatch must keep startup thresholds, even after the precheck.
+                self.assertTrue(options['admit'](0))
+                self.assertTrue(resources.call_args.kwargs['startup'])
+                with patch.object(control, 'resources', wraps=original_resources), \
+                        patch.object(control, 'gpu_snapshot', return_value=(16*control.GIB, [])), \
+                        patch.object(control.shared.prior.run, 'owned_processes', return_value={}), \
+                        patch.object(control.psutil, 'virtual_memory', return_value=SimpleNamespace(available=80*control.GIB)), \
+                        patch('shutil.disk_usage', return_value=SimpleNamespace(free=100*control.GIB)):
+                    self.assertFalse(options['admit'](0))
+                    ledger.completed.append({'id': queue[0]['id'], 'success': True})
+                    self.assertTrue(options['admit'](0))
                 self.assertTrue(options['admit'](1))
+                self.assertFalse(resources.call_args.kwargs['startup'])
                 dispatched.append(queue)
+            original_resources = control.resources
             with patch.object(control, 'validate_gate', return_value=gate), \
                     patch.object(control, 'predecessor_state', side_effect=[{'ready': False}, {'ready': True}, {'ready': True}]) as previous, \
                     patch.object(control, 'resources', return_value={'ready': True}) as resources, \

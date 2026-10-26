@@ -1,5 +1,13 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-26 等待编排外审闭合与唯一监听启用
+
+用户明确：“外审已结束，取回来仔细审核，向我汇报外审意见和你的独立判断；必要问题修好并验证后，就按已批准范围启用等待脚本。”这直接授权了必要修复、限定验证、正式门和监听启用，不再重问已批18条/三路/110h；不扩大数据、HPO、预算或自动重试。
+
+[完整本轮报告](../reports/documentation/20261026/continual_defaults/waiting/review/external/review_report.zh.txt)已回收。主执行者独立确认W01显存交叉采样/跨槽抵扣与W02首派门丢失是真实局部控制缺口；W03当前draft347正确，旧222只是陈旧防错下界，不称已发生漏账。仅改controller/test，Linux cpu09四项通过、计3秒，累计CPU59/120、原生171不变；[独立逐项处置](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)关闭必要问题，不增加GPU资格或通用框架。
+
+[正式门](../reports/documentation/20261026/continual_defaults/waiting/formal_gate.json)绑定实际新来源/CPU证据，承接59+171+240=470秒准备前账，启动另60秒保守计费，均在辅助2h内。15:03唯一PID1257448已启用，15:04核实正在等指定前序整批、尚无训练派发/费用，见[启动](../reports/documentation/20261026/continual_defaults/waiting/launch.json)与[实际观察](../reports/documentation/20261026/continual_defaults/waiting/observation.json)。当前不需用户再次许可；禁止重复启动。首个实际训练更新后副本自删，来源/回执保留；失败停止、不自动重试。完整审查及主审已双端保存，专用页关闭。
+
 ## 2026-10-26 原版S/H等待条件、110小时批准与编排外审
 
 用户先要求“写一个等待脚本(按照科研纪律要求)，当三路任务运行结束且GPU资源满足时开始运行这两个实验，想清楚这个条件该怎么写”，随后强调“GPU资源满足的定义是满足当前实验所需的GPU显存，而不是当前没有CUDA进程”。因此指定前序整批完成与显存够下一路是并列必要条件，不采用全机CUDA为空的硬门，也不能只等待最初三个worker。

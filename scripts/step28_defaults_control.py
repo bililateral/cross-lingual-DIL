@@ -61,10 +61,19 @@ def validate_gate(path: Path, active: Path) -> dict:
         raise ValueError('Applicable original-method native evidence missing')
     if gate['prior_used_seconds'].get('training', 0) != 0:
         raise ValueError('This fresh campaign cannot conceal previous training attempts')
-    prior = gate['prior_used_seconds']['control']
-    if not math.isfinite(prior) or not 222 <= prior <= BUDGET['control']-60:
-        raise ValueError('Inherited CPU/native charges or finalization reserve missing')
+    validate_prior(gate, cpu)
     return gate
+
+
+def validate_prior(gate: dict, cpu: dict) -> None:
+    prior = gate['prior_used_seconds']['control']
+    parts = gate['prior_breakdown_seconds']
+    if (parts.get('cpu_all_attempts') != cpu['cumulative_seconds']
+            or parts['cpu_all_attempts'] < 56 or parts.get('native_all_attempts') != 171
+            or parts.get('preparation_conservative_charge', 0) < 120
+            or not all(math.isfinite(v) and v >= 0 for v in parts.values())
+            or prior != sum(parts.values()) or not 347 <= prior <= BUDGET['control']-60):
+        raise ValueError('Inherited CPU/native/preparation charges or finalization reserve missing')
 
 
 def predecessor_processes(predecessor: dict, launch: dict) -> list[dict]:
@@ -128,31 +137,48 @@ def predecessor_state(predecessor: dict) -> dict:
 
 
 def gpu_admission(free: int, applications: list[tuple[int, int]], owned: set[int], active: int) -> dict:
-    allocated = sum(size for pid, size in applications if pid in owned)
+    # One GPU process per unchanged training worker; no worker borrows another slot's reserve.
+    own = {pid: size for pid, size in applications if pid in owned}
+    allocated = sum(min(size, SLOT_BYTES) for size in own.values())
     unmaterialized = max(0, active*SLOT_BYTES-allocated)
     required = SLOT_BYTES+unmaterialized
     return dict(free_gpu_bytes=free, own_allocated_bytes=allocated,
                 unmaterialized_own_reserve_bytes=unmaterialized, required_free_gpu_bytes=required,
-                ready=free >= required)
+                ready=len(own) <= active and free >= required)
 
 
-def resources(campaign: Path, active: int, *, startup: bool = False) -> dict:
-    import shutil
-    free = int(subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.free',
-        '--format=csv,noheader,nounits'], text=True, timeout=10).strip())*2**20
-    text = subprocess.check_output(['nvidia-smi', '--id=0', '--query-compute-apps=pid,used_memory',
-        '--format=csv,noheader,nounits'], text=True, timeout=10).strip()
+def gpu_snapshot(deadline: float) -> tuple[int, list[tuple[int, int]]]:
+    def query(field: str) -> str:
+        remaining = deadline-time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('Bounded GPU admission snapshot expired')
+        return subprocess.check_output(['nvidia-smi', '--id=0', field,
+            '--format=csv,noheader,nounits'], text=True, timeout=min(10., remaining)).strip()
+    free = int(query('--query-gpu=memory.free'))*2**20
+    text = query('--query-compute-apps=pid,used_memory')
     applications = []
     for line in text.splitlines():
         pid, size = (v.strip() for v in line.split(','))
         # Unknown own use is conservatively left reserved. Foreign CUDA is not a veto.
         applications.append((int(pid), int(size)*2**20 if size.isdecimal() else 0))
+    return free, applications
+
+
+def resources(campaign: Path, active: int, *, startup: bool = False) -> dict:
+    import shutil
     own = set(shared.prior.run.owned_processes(os.getpid()))
-    row = gpu_admission(free, applications, own, active)
-    row.update(epoch=time.time(), cuda_processes=applications, active_workers=active,
+    # Two bounded observations must agree; growth or release defers this refill.
+    # All four queries share the previous 20-second admission allowance, with no retry loop.
+    deadline = time.monotonic()+20.
+    first, second = gpu_snapshot(deadline), gpu_snapshot(deadline)
+    own_use = lambda sample: {pid: size for pid, size in sample[1] if pid in own}
+    stable = first[0] == second[0] and own_use(first) == own_use(second)
+    row = gpu_admission(min(first[0], second[0]), second[1], own, active)
+    row.update(epoch=time.time(), cuda_processes=second[1], samples=[first, second],
+               stable_gpu_observation=stable, active_workers=active, startup=startup,
                host_available_bytes=psutil.virtual_memory().available,
                disk_free_bytes=shutil.disk_usage(campaign).free)
-    row['ready'] &= (row['host_available_bytes'] >= (208 if startup else 64)*GIB
+    row['ready'] &= (stable and row['host_available_bytes'] >= (208 if startup else 64)*GIB
                      and row['disk_free_bytes'] >= (192 if startup else 76)*GIB)
     shared.write(campaign/'resource_status.json', row)
     return row
@@ -241,7 +267,7 @@ def execute(gate_path: Path, active: Path) -> None:
         shared.write(campaign/'start.json', dict(epoch=time.time(), pid=os.getpid(), sources=gate['sources']))
         shared.dispatch(queue, campaign, ledger, 'training',
             lambda row, job, deadline, metadata: training_command(row, job, deadline, metadata, gate_path),
-            admit=lambda count: resources(campaign, count)['ready'],
+            admit=lambda count: resources(campaign, count, startup=not (ledger.active or ledger.completed))['ready'],
             check=lambda: shared.campaign_size(campaign, gate['limits']),
             observe=lambda: first_update(campaign, active, run_ids))
         tick = time.monotonic()

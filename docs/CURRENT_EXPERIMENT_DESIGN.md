@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-当前原版补充实现（2026-10-26）：S_default＋历史H（G_half）方法实现及H-only有限原生资格已完成，S复用，原生含失败171/900秒。[新正式授权](../reports/documentation/20261026/continual_defaults/waiting/authorization.json)明确18条、最多三路、108h训练＋2h辅助=110h，仅训练和54端点/旧dev盲分数，无评价标签/新确认/HPO。新增[等待与派发入口](../scripts/step28_defaults_control.py)用指定旧批最终成功/退出与足够剩余显存作AND门，不要求全卡无CUDA；cpu08通过后CPU累计56/120秒。[增量外审](../reports/documentation/20261026/continual_defaults/waiting/review/submission.json)已获具体上传授权并于14:18提交原会话，生成中；尚未启用监听/训练。原方法、历史负结果和归因边界保持，不借活动L²R/GCR预算。当前状态统一见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+当前原版补充执行（2026-10-26）：S_default＋历史H（G_half）18条/最多三路/110h、只训练与54端点/旧dev盲分数已获明确授权。[等待增量外审及主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)已闭合，显存观测/逐槽预留、真实首派门和最新费用承接已修复；cpu09后CPU59/120，H原生含失败171/900复用，44科学来源未改。[正式门](../reports/documentation/20261026/continual_defaults/waiting/formal_gate.json)已冻结，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)15:03实际启用，PID1257448；15:04仍等指定旧批完整成功退出，无新轨迹派发。按实际剩余显存补位，不要求全卡无CUDA；不增HPO/标签/确认/预算，失败停且不自动重试。来源/完整审查/主审及回执双端保管，禁止重复启动；动态状态见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
 当前新对照执行（2026-10-26）：用户已批准822小时完整预算、18条L²R／ER+GCR训练及后续固定新确认，明确仅本次新增编排免外审。按[执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[独立处置](../reports/documentation/20261026/continual_comparison/primary.zh.txt)，复用原算法资格和H/S54状态，独立三路已实际开训；实时进度统一见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。原45条不重训，旧失败不清零；下方历史“新18条／新确认／独立预算未授权”已被最新明确决定取代，不恢复为阻断。算法、评价判据及未来结果审查不在新增编排免审范围内。
 

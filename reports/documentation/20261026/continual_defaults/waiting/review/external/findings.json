@@ -1,0 +1,541 @@
+{
+  "review": "continual_defaults_wait_increment",
+  "date": "2026-10-26",
+  "timezone": "UTC+08:00",
+  "model_identity": {
+    "visible_self_description": "GPT-6 Astra Pro",
+    "user_requested_selector": "GPT-6 / Pro",
+    "selector_independently_verified": false,
+    "backend_identity_independently_verified": false
+  },
+  "verdict": "REQUIRES_TWO_LOCAL_ORCHESTRATION_FIXES_BEFORE_LAUNCH; NO_NEW_SCIENTIFIC_BLOCKER",
+  "counts": {
+    "confirmed_scientific_blockers": 0,
+    "required_code_fixes": 2,
+    "low_gate_accounting_condition": 1
+  },
+  "permission_statement": "Review only; user-approved 18 blind runs/110h remain the boundary. This report does not sign a formal gate, start a listener, authorize labels/data/budget expansion, or require new GPU qualification.",
+  "findings": [
+    {
+      "id": "W01",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "HIGH",
+      "title": "显存准入拼接较早free与较晚本批占用，可重复释放本批启动预留",
+      "evidence_status": "CONFIRMED_STATIC_REACHABLE_DEFECT; NO_OBSERVED_GPU_FAILURE",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "先读free再读compute-apps；以聚合owned抵扣active槽位。",
+          "lines": [
+            130,
+            151
+          ]
+        },
+        {
+          "file": "tests/test_step28_defaults_control.py",
+          "supports": "现测试只给一致静态数，不覆盖两次查询间变化。",
+          "lines": [
+            17,
+            25
+          ]
+        }
+      ],
+      "finding": "active=1时先见free16GiB、own0；本批worker在两查询间分配8GiB，后见own8但真实free8。现式用旧16与required12.5比较而放行，当前真实8不足。无需外来CUDA增长，8GiB在既定allocator上限内。",
+      "conditional_subfinding": "若单路进程总显存超过10.25GiB，当前总和后截断会用超额占用冲销别路欠占；9.25GiB只限allocator，未证明总进程用量≤槽位。例own[11.25,0]、free20时现式需19.5而逐路需20.5；这是条件性不变量缺口，未观察到这种实际占用。",
+      "impact": "可能在自己的加载阶段超额派发，破坏本轮承诺的欠占预留；可导致正式路径失败、已批准预算消耗及停止，不能用共享环境限制代替修复。不是算法/效果的已证错误。",
+      "minimal_action": "仅修有界、一致且保守的free/own采样；采样变化不能保守解释则本轮不补位。按活跃worker抵扣，单路最多抵扣10.25GiB、缺失按0。不能只倒置查询顺序并宣称覆盖释放回落；任何额外采样共享现有有界检查和deadline尾部，不引入无界稳定重试/系统锁。",
+      "minimal_evidence": "在已有CPU余额内用手写查询序列覆盖增长反例、释放/回落、单路超槽不得冲销另一路，及稳定foreign CUDA仍可准入。无需BGE/GPU或旧方法数值复验；本轮审查未运行这些测试。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": true,
+        "listener_start": true,
+        "formal_training": true
+      },
+      "resolution_gate": "局部修订和针对性CPU证据由主执行者闭合后重新绑定编排来源；科学来源不变则继承原生证据。"
+    },
+    {
+      "id": "W02",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "MEDIUM",
+      "title": "首次RAM/磁盘阈值没有延续到真实第一次派发",
+      "evidence_status": "CONFIRMED_STATIC_CONTROL_FLOW_DEFECT; NOT_AN_OBSERVED_RESOURCE_FAILURE",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "startup选择208/192或64/76GiB阈值。",
+          "lines": [
+            139,
+            156
+          ]
+        },
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "前置等待用startup=True，但dispatch回调永远不传startup。",
+          "lines": [
+            219,
+            246
+          ]
+        },
+        {
+          "file": "tests/test_step28_defaults_control.py",
+          "supports": "正常编排测试mock resources，未测延迟首派后不同阈值。",
+          "lines": [
+            115,
+            148
+          ]
+        }
+      ],
+      "finding": "初次资源预检通过后，dispatch可能因GPU暂不足继续等；后来首派可在RAM80GiB、磁盘100GiB时按补位门64/76通过，尽管尚未真实派发且已不满足首次208/192门。",
+      "impact": "当前实现无法兑现文档定义的首次资源门，可能过早开始受磁盘/RAM约束的整批工作；没有证据表明已发生失败。",
+      "minimal_action": "在尚无本批真实派发时持续对实际admit使用startup=True，首条派发后才切换补位；用现有Ledger派发状态或局部标志。不要把批中暂时active=0误当首次，也不要增加空卡条件。",
+      "minimal_evidence": "一个手写初检通过、GPU延迟、RAM/disk下降的场景和首派后补位场景；无新GPU资格或调度器重写。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": true,
+        "listener_start": true,
+        "formal_training": true
+      },
+      "resolution_gate": "实际首次派发门与既定阈值一致，局部CPU检查及新来源闭合。"
+    },
+    {
+      "id": "W03",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "title": "历史承接校验下界仍为222秒；当前draft的347秒本身正确",
+      "evidence_status": "CONFIRMED_STALE_GUARD; NO_ACTUAL_UNDERCHARGE_IN_CURRENT_DRAFT",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "最低prior_control为222。",
+          "lines": [
+            62,
+            66
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/draft_gate.json",
+          "supports": "实际prior347，分项56+171+120。",
+          "lines": [
+            788,
+            795
+          ]
+        },
+        {
+          "file": "scripts/step28_comparison_control.py",
+          "supports": "Ledger准确承接传入prior，不会将347自动改为222。",
+          "lines": [
+            27,
+            82
+          ]
+        }
+      ],
+      "finding": "门校验允许222至上限，未同步当前56秒CPU、171秒原生及120秒准备共347；若误签222，将少承接125。当前draft347、未启动，没有实际漏记，也没有自动导致少记的执行路径。",
+      "impact": "最终门装配防错较弱；必须保留真实累计及失败，不可回退旧时点费用。",
+      "minimal_action": "签门至少保留347+此后实际新增费用，并核对prior_breakdown及最新CPU累计。同步一行floor或用已有cpu.cumulative+171+120作校验均可；按正确累计签门也可闭合当前条件，不强制新会计框架。",
+      "minimal_evidence": "普通JSON/算术核对即可；若改校验，验证当前真累计被接受、少记值被拒绝，保持既有CPU预算。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      },
+      "conditional_execution_block": "仅当最终实际门少于当前应承接费用时阻断；当前347模板不触发。"
+    },
+    {
+      "id": "W04",
+      "type": "SUPPORTED_WITH_LIMITS",
+      "severity": "INFO",
+      "title": "前序整批结束、动态进程识别和真实更新后一次性自删具备必要接线",
+      "evidence_status": "SUPPORTED_BY_CURRENT_CODE_AND_LIMITED_CPU_EVIDENCE",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "身份、21项最终完成及动态相关进程。",
+          "lines": [
+            70,
+            127
+          ]
+        },
+        {
+          "file": "scripts/step28_comparison_control.py",
+          "supports": "旧completion确在生成/确认/分析之后。",
+          "lines": [
+            276,
+            290
+          ]
+        },
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "匹配run_id/stage/completed>0后自删。",
+          "lines": [
+            161,
+            176
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "supports": "真实update返回后打印事件。",
+          "lines": [
+            190,
+            206
+          ]
+        },
+        {
+          "file": "run_step28_defaults_linux_20261026.sh",
+          "supports": "独立副本、noclobber及入口。",
+          "lines": [
+            1,
+            14
+          ]
+        },
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "独占campaign及派发前重核。",
+          "lines": [
+            211,
+            238
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/resource_before.json",
+          "supports": "旧controller与替补worker快照，无最终completion。",
+          "lines": [
+            2,
+            100
+          ]
+        }
+      ],
+      "finding": "不是只等待最初三PID；精确前序最终21项成功、无失败、无活跃并要求该workspace相关进程退出。部分完成/失败/无收尾退出不会放行。副本删除基于真实更新日志语义，不影响余下worker或保留源码。",
+      "impact": "可复用；没有必要另建进程平台、重审前序科学结果或恢复全机无CUDA条件。",
+      "minimal_action": "保持该路径；未来实际运行留等待/首步/失败元数据。当前快照及mock测试不称现场监听已通过。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      }
+    },
+    {
+      "id": "W05",
+      "type": "SUPPORTED_WITH_LIMITS",
+      "severity": "INFO",
+      "title": "实际S/G_half、18身份与54盲端点接线成立，没有新增评价开放调用",
+      "evidence_status": "STATIC_WIRING_AND_UNCHANGED_SOURCE_INHERITANCE",
+      "evidence": [
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "真实命令及盲完成汇总。",
+          "lines": [
+            180,
+            208
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_defaults_run.py",
+          "supports": "implementation=defaults与实际source_files注入。",
+          "lines": [
+            38,
+            61
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_defaults.py",
+          "supports": "方法/目标/评分及默认倍率。",
+          "lines": [
+            10,
+            80
+          ]
+        },
+        {
+          "file": "scripts/step28_g_half.py",
+          "supports": "历史混合汇聚及原rank、A0教师。",
+          "lines": [
+            39,
+            92
+          ]
+        },
+        {
+          "file": "scripts/step28_record_replay.py",
+          "supports": "S原均值和原目标。",
+          "lines": [
+            113,
+            156
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five.py",
+          "supports": "fresh、实际LR及Adam更新链。",
+          "lines": [
+            163,
+            219
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "supports": "当前cal、blind dev、两种恢复及状态保存。",
+          "lines": [
+            124,
+            187
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "supports": "18实际列表与仅train attach_labels。",
+          "lines": [
+            219,
+            276
+          ]
+        },
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "本批只dispatch训练，不调用生成/评价。",
+          "lines": [
+            239,
+            255
+          ]
+        }
+      ],
+      "finding": "两方法各三顺序×三seed；15552更新、25920梯度群呈现、54端点。原均值S和历史G_half仍直接使用未改原目标，非H_pos换名；默认倍率1，无HPO。训练监督与当前cal允许，60旧dev无评价标签。",
+      "limitations": [
+        "54端点是未来成功时的完成状态，本包没有其实际权重/分数。",
+        "父汇总对payload复核大小，没有再次重读全部权重SHA或独立载模；worker已有保存记录和恢复预测验证。",
+        "Supply和access字段不是操作系统隔离或I/O审计。"
+      ],
+      "minimal_action": "保持既有科研底座与盲范围；未来消费资产时使用既有身份核验。不为父汇总再加全权重重读、GPU网格或标签开放。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      }
+    },
+    {
+      "id": "W06",
+      "type": "EVIDENCE_LIMIT",
+      "severity": "INFO",
+      "title": "CPU08与H原生证据可按原范围继承，不能将mock/清单当真实18条运行",
+      "evidence_status": "VERIFIED_RECORD_IDENTITY_WITH_EXPLICIT_RUNTIME_LIMITATIONS",
+      "evidence": [
+        {
+          "file": "tests/test_step28_defaults_control.py",
+          "supports": "六项实际测试正文及mock边界。",
+          "lines": [
+            17,
+            148
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/cpu08/receipt.json",
+          "supports": "4.0346秒计5、累计56，58来源。",
+          "json_pointers": [
+            "/wall_seconds",
+            "/charged_seconds",
+            "/cumulative_seconds",
+            "/sources"
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/native_h02/H_default/result.json",
+          "supports": "H三调用及51来源。",
+          "json_pointers": [
+            "/spec",
+            "/actual_calls",
+            "/actual_next_update_equal",
+            "/inference_equal",
+            "/source_files"
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/native_h02/status.json",
+          "supports": "控制计时、child exit及来源。",
+          "json_pointers": [
+            "/charged_seconds",
+            "/receipts",
+            "/sources"
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/native_execution/result.zh.txt",
+          "supports": "历史失败承接和原生限制。",
+          "lines": [
+            7,
+            20
+          ]
+        }
+      ],
+      "finding": "科学44、编排57、CPU58逐项匹配；44科学源全部在H51原生来源中。H原生当前166.010069秒向上167，承接4后171；CPU08累计56。没有理由重复S或H GPU资格。",
+      "limitations": [
+        "CPU08正常execute分支mock了gate/resources/dispatch/complete_blind；真实CLI只测拒绝。",
+        "本包缺当前native三个入口/测试源码，未重新审阅其当前执行实现；未提供逐步原输出或模型。",
+        "H手设Adam624、扰动教师及同对象推理回读按原有限解释；S没有新增逐臂GPU记录。",
+        "旧失败及早期累计主要按主执行者记录和累计回执承接，未重供所有历史原件。"
+      ],
+      "minimal_action": "只为本轮具体编排修复补定向手写CPU证据，计入现有120秒累计和2h辅助；继承未改科学来源及已闭合原生证据。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      }
+    },
+    {
+      "id": "W07",
+      "type": "CONDITIONAL_EXECUTION_REQUIREMENT",
+      "severity": "INFO",
+      "title": "draft故意不可执行；最新用户授权不等于已闭合实际来源门",
+      "evidence_status": "EXPECTED_PRELAUNCH_STATE_NOT_A_CODE_DEFECT",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/review/request.zh.txt",
+          "supports": "本轮范围与待闭合门。",
+          "lines": [
+            3,
+            26
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/authorization.json",
+          "supports": "110h盲训练/非空卡定义。",
+          "lines": [
+            2,
+            18
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/draft_gate.json",
+          "supports": "有意pending/null/盲范围。",
+          "json_pointers": [
+            "/status",
+            "/review_ready",
+            "/approved_actions",
+            "/evaluation_labels",
+            "/new_confirmation_data"
+          ]
+        },
+        {
+          "file": "scripts/step28_defaults_control.py",
+          "supports": "实际门/来源/CPU/native校验。",
+          "lines": [
+            34,
+            67
+          ]
+        }
+      ],
+      "finding": "现draft的PENDING和review_ready=null会拒绝启动，是正确预备状态。历史文件待许可/idle_only不覆盖本轮用户110h、允许外来CUDA的授权。旧comparison的限定免审也不外推本次编排。",
+      "minimal_action": "W01/W02及必要账目处置闭合后，以真实新编排来源、相应CPU证据、原生适用关系签正式门；保持18/110h/train_blind和评价/生成false。不要只改状态字符串，不必重问已批准范围。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": true,
+        "formal_training": true
+      },
+      "blocking_reason": "当前门故意未闭合的正常前提，不能计作新增缺陷；主执行者按既定程序完成。"
+    },
+    {
+      "id": "W08",
+      "type": "EVIDENCE_LIMIT",
+      "severity": "INFO",
+      "title": "累计预算主干自洽，资源容量与并行工期只能作受条件限制的判断",
+      "evidence_status": "CODE_AND_ARITHMETIC_SUPPORTED; CURRENT_SITE_AND_FORMAL_THROUGHPUT_NOT_VERIFIED",
+      "evidence": [
+        {
+          "file": "scripts/step28_comparison_control.py",
+          "supports": "历史费用/完整预留/实际结算。",
+          "lines": [
+            27,
+            82
+          ]
+        },
+        {
+          "file": "scripts/step28_comparison_control.py",
+          "supports": "固定队列、最多三路、deadline/失败清理/非等待控制费。",
+          "lines": [
+            149,
+            219
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five_control.py",
+          "supports": "只终止自身进程组与等待时间。",
+          "lines": [
+            151,
+            165
+          ]
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "supports": "共享deadline及资源采样。",
+          "lines": [
+            73,
+            116
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/proposal.zh.txt",
+          "supports": "资源阈值和历史耗时代理。",
+          "lines": [
+            10,
+            17
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/native_h02/H_default/result.json",
+          "supports": "有限原生尺寸/时钟记录。",
+          "json_pointers": [
+            "/inference_bytes",
+            "/full_bytes",
+            "/measurements",
+            "/resources"
+          ]
+        }
+      ],
+      "finding": "18×6h=108h，辅助2h；已用+活跃整额+未派发整额受池约束；失败结算停止，无自动重试。347+60后辅助余6793秒。3槽30.75GiB比所给卡容量少1119MiB；54推理+3full尺寸代理76.508GiB，未见必须扩大128GiB的依据。",
+      "limitations": [
+        "110h是累计任务进程小时，不是CPU忙时、GPU忙时或墙钟承诺。",
+        "旧18条约60h仅本包提案摘录；H全最大形状更新代理7.629395h不是正式整轨预测。",
+        "外来任务后续增长、现场容量、实际长期峰值/吞吐未核实。",
+        "存储/内存是采样和预留检查，不是OS硬配额；进程调度/查询不是硬实时保证。"
+      ],
+      "minimal_action": "保持既定预算、失败账和有界检查；记录实际成本/资源，资源不足等候，失败停止。不得机械除以3承诺工期，不因代理更慢自动加上限。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      }
+    },
+    {
+      "id": "W09",
+      "type": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "title": "本轮没有必要新增研究或泛化基础设施",
+      "evidence_status": "SCOPE_DECISION",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/review/request.zh.txt",
+          "supports": "明确仅增量编排、旧科学证据复用与不扩权。",
+          "lines": [
+            3,
+            26
+          ]
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/waiting/authorization.json",
+          "supports": "18/110h/零HPO/无标签新确认。",
+          "lines": [
+            5,
+            18
+          ]
+        }
+      ],
+      "finding": "不新增HPO、方法/seed/顺序/数据；不重复GPU资格、旧全历史测试/效果审查；不新增DDP、通用调度/安全平台；不恢复空卡门、不停改他人任务；不使用剩余资格预算追加工作或按结果择优子集。",
+      "minimal_action": "只闭合W01/W02与W03签门账目；后续评价/共同评分按另行明确范围进行，当前不创建。",
+      "blocks": {
+        "scientific_design": false,
+        "current_orchestration_delivery": false,
+        "listener_start": false,
+        "formal_training": false
+      }
+    }
+  ]
+}
