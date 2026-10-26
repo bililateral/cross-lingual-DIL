@@ -1,0 +1,261 @@
+{
+  "observed_at": "2026-10-26T10:27:27.393645+08:00",
+  "scope": "Startup processes, actual update events, access and resource metadata only; no labels, effect metrics, prediction arrays, model or Memory parsed.",
+  "campaign": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal",
+  "launch": {
+    "pid": 1198791,
+    "owner": "yongpeng",
+    "created": 1792981520.79,
+    "started_at": "2026-10-26T10:25:21.213586+08:00",
+    "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+    "formal_gate": {
+      "path": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+      "bytes": 15937,
+      "sha256": "008f2aaee019281b7d83a2bc40b5d9e2710a0b459fea46f1499b2b6e95147b54"
+    }
+  },
+  "budget": {
+    "active": {
+      "ABC_s4_ER_GCR_group_fixed": {
+        "allowance": 43200,
+        "bucket": "training",
+        "deadline": 456349.098986622,
+        "id": "ABC_s4_ER_GCR_group_fixed",
+        "started": 413149.098986622
+      },
+      "ABC_s4_L2R_text_fixed": {
+        "allowance": 259200,
+        "bucket": "training",
+        "deadline": 672349.027562453,
+        "id": "ABC_s4_L2R_text_fixed",
+        "started": 413149.027562453
+      },
+      "ABC_s5_L2R_text_fixed": {
+        "allowance": 259200,
+        "bucket": "training",
+        "deadline": 672349.176471035,
+        "id": "ABC_s5_L2R_text_fixed",
+        "started": 413149.176471035
+      }
+    },
+    "completed": [],
+    "cumulative_seconds": 2753.929555493989,
+    "failed": false,
+    "limits": {
+      "analysis": 1800,
+      "confirmation": 64800,
+      "control": 3600,
+      "cpu": 1200,
+      "generation": 600,
+      "native": 3000,
+      "preparation": 4200,
+      "training": 2880000
+    },
+    "used": {
+      "analysis": 0.0,
+      "confirmation": 0.0,
+      "control": 0.33935935801127926,
+      "cpu": 45.0,
+      "generation": 0.0,
+      "native": 2479.0,
+      "preparation": 229.59019613597775,
+      "training": 0.0
+    }
+  },
+  "first_update": {
+    "epoch": 1792981602.6446555,
+    "event": {
+      "completed": 1,
+      "deadline_monotonic": 456349.098986622,
+      "event": "updates",
+      "peak_disk_bytes": 20404,
+      "peak_rss_bytes": 2542505984,
+      "run_id": "ABC_s4_ER_GCR_group_fixed",
+      "stage": 1,
+      "wall_seconds": 12.334113869001158
+    },
+    "launcher_deleted": true,
+    "log": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s4_ER_GCR_group_fixed/console.txt"
+  },
+  "launcher_exists": false,
+  "runs": [
+    {
+      "id": "ABC_s4_ER_GCR_group_fixed",
+      "process": {
+        "created": 1792981572.1,
+        "owner": "yongpeng",
+        "pid": 1198946
+      },
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "updates": [
+        {
+          "event": "updates",
+          "run_id": "ABC_s4_ER_GCR_group_fixed",
+          "stage": 1,
+          "completed": 1,
+          "wall_seconds": 12.334113869001158,
+          "peak_rss_bytes": 2542505984,
+          "peak_disk_bytes": 20404,
+          "deadline_monotonic": 456349.098986622
+        }
+      ],
+      "failure": false,
+      "completion": false
+    },
+    {
+      "id": "ABC_s4_L2R_text_fixed",
+      "process": {
+        "created": 1792981572.02,
+        "owner": "yongpeng",
+        "pid": 1198941
+      },
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "updates": [],
+      "failure": false,
+      "completion": false
+    },
+    {
+      "id": "ABC_s5_L2R_text_fixed",
+      "process": {
+        "created": 1792981572.17,
+        "owner": "yongpeng",
+        "pid": 1198951
+      },
+      "access": {
+        "heldout": 0,
+        "owners": 0,
+        "train": 1,
+        "valid": 0,
+        "worker_train_reads": 1
+      },
+      "updates": [],
+      "failure": false,
+      "completion": false
+    }
+  ],
+  "processes": [
+    {
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "scripts/step28_comparison_control.py",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json"
+      ],
+      "username": "yongpeng",
+      "cpu_times": [
+        41.06,
+        10.03,
+        0.02,
+        0.21,
+        0.0
+      ],
+      "create_time": 1792981520.79,
+      "pid": 1198791,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+      "rss_bytes": 551845888
+    },
+    {
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s4_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s4_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+        "--deadline",
+        "672349.027562453"
+      ],
+      "username": "yongpeng",
+      "cpu_times": [
+        72.18,
+        2.65,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "create_time": 1792981572.02,
+      "pid": 1198941,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+      "rss_bytes": 3183955968
+    },
+    {
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s4_ER_GCR_group_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s4_ER_GCR_group_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+        "--deadline",
+        "456349.098986622"
+      ],
+      "username": "yongpeng",
+      "cpu_times": [
+        72.39,
+        2.34,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "create_time": 1792981572.1,
+      "pid": 1198946,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+      "rss_bytes": 2663485440
+    },
+    {
+      "cmdline": [
+        "/home/yongpeng/miniconda3/envs/py310/bin/python",
+        "-B",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace/scripts/step28_continual_comparison_run.py",
+        "--job",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/ABC_s5_L2R_text_fixed",
+        "--spec",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal/dispatch/ABC_s5_L2R_text_fixed/spec.json",
+        "--gate",
+        "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/formal_gate.json",
+        "--deadline",
+        "672349.176471035"
+      ],
+      "username": "yongpeng",
+      "cpu_times": [
+        72.11,
+        2.55,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "create_time": 1792981572.17,
+      "pid": 1198951,
+      "cwd": "/home/yongpeng/cross-lingual/reports/documentation/20261026/continual_comparison/workspace",
+      "rss_bytes": 3108212736
+    }
+  ],
+  "scientific_sources": {
+    "count": 47,
+    "mismatches": []
+  },
+  "campaign_failure": false,
+  "gpu": "NVIDIA GeForce RTX 5090, 32607 MiB, 16280 MiB, 88 %, 59",
+  "gpu_apps": "1198946, 7646 MiB\n1198951, 3980 MiB\n1198941, 3920 MiB",
+  "ram_available_GiB": 236.6319923400879,
+  "disk_free_GiB": 208.83795547485352
+}

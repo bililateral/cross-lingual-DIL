@@ -1,0 +1,42 @@
+{
+  "status": "PROPOSED_RESOURCE_ALLOCATION_NOT_AUTHORIZED",
+  "basis": "Existing maximum-shape handwritten BGE timings; 288 current-only and 576 history updates per trajectory, three checkpoint allowances, loading, 1800 seconds unmeasured work, factor 1.25. No new benchmark or real train data parsed.",
+  "methods": [
+    {
+      "method": "L2R_text_fixed",
+      "native_receipt": "reports/documentation/20261024/continual_comparison/implementation/qualification/native06/L2R_text_fixed/result.json",
+      "native_receipt_sha256": "1138da5b88865fbba3a94d2b17bb19f12c372fa5695d6597ac1f5f278acb00ab",
+      "current_seconds": 181.97672072198475,
+      "history_seconds": 264.8701611820143,
+      "checkpoint_seconds": 114.40699205297278,
+      "unmeasured_overhead_seconds": 1800,
+      "trajectory_base_hours": 57.53360275836382,
+      "trajectory_projected_hours": 71.91700344795477,
+      "proposed_trajectory_cap_hours": 72,
+      "trajectories": 9
+    },
+    {
+      "method": "ER_GCR_group_fixed",
+      "native_receipt": "reports/documentation/20261024/continual_comparison/implementation/qualification/native04/ER_GCR_group_fixed/result.json",
+      "native_receipt_sha256": "e0c26a12564f98b60a3a74e51b449c602f0645359bae7ca2017b4f2ee46959c9",
+      "current_seconds": 20.971064616984222,
+      "history_seconds": 40.2724540969939,
+      "checkpoint_seconds": 208.84832262899727,
+      "unmeasured_overhead_seconds": 1800,
+      "trajectory_base_hours": 8.796274759169707,
+      "trajectory_projected_hours": 10.995343448962133,
+      "proposed_trajectory_cap_hours": 12,
+      "trajectories": 9
+    }
+  ],
+  "sum_projected_task_hours": 746.2111220722521,
+  "sum_trajectory_caps_hours": 756,
+  "proposed_training_pool_hours": 800,
+  "proposed_confirmation_pool_hours": 18,
+  "proposed_auxiliary_pool_hours": 4,
+  "proposed_total_hours": 822,
+  "prior_qualification_cpu_seconds": 42,
+  "prior_qualification_native_seconds": 2479,
+  "limits_note": "Prior qualification charges retained in their original 1200/3000-second qualification ledger, not reset or borrowed. New proposed 822h is separate from original five-method 490h. Maximum three workers is a scheduling proposal, not validated stable coexistence or a time guarantee.",
+  "uncertainty": "Handwritten maximum inputs differ from real texts; contention and L2R selection/maintenance vary. Projection is a conservative planning proxy, not a confidence interval. No exact completion date is asserted before actual dispatch."
+}

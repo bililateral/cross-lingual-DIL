@@ -2,6 +2,8 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
+两新对照的现行执行范围已于2026-10-26明确批准：[822小时执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)覆盖L²R／ER+GCR各9条、H/S54阶段权重复用及原定新120群确认；新增编排明确免外审，既有算法／资格结论复用。按固定队列完成18条盲训练、全108端点门后连续进入生成／确认／统计；失败保留费用并停派，不自动重试。下方关于新正式预算尚待授权的旧段落不再是当前状态，原算法及结果审查边界保持。
+
 当前执行[已批准五方法方案](../reports/documentation/20261023/continual_implementation/authorization.json)：SEQ/ER0.1/LOGIT0.1冻结历史配置与S/H_pos各自Optuna配置参加ABC/BCA/CAB×s4/s5/s6，45完整轨迹、新三域120群确认，零新增HPO、同卡三路。490累计小时分为450训练+36确认+4其他，单run最高24h仍受池内预留；不能减臂/减seed或借旧余额。先完成最小实现、限定资格及必要实现外审/主审，按已通过的资源/整批预算条件签发实际来源门后连续执行。用户已明确免除本次GPU审查发现问题之修改的外审，仍保留实际行为验证和失败账；不扩大为整个新实现或最终结果免审。三路资格及预算投影已形成，当前进展见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)与[独立资格处置](../reports/documentation/20261023/continual_implementation/qualification/primary.zh.txt)。未满足开工前提前不训练、不生成确认群、不打开正式评价标签。
 
 原45条的资源故障与恢复按[当前明确重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)及[独立处置](../reports/documentation/20261024/continual_retry/primary.zh.txt)接续：保留24成功轨迹，未完成21条按原身份运行；旧费用和读取不清零。资源不足只暂停补入一个空槽，其他worker继续；首次启动和其他故障条件保持。已有控制器／监听的身份、真实更新和完成状态统一看交接，不因旧待运行文字重复建队列。此恢复不是任意中断的自动断点续训授权。

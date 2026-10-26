@@ -1,5 +1,7 @@
 # 当前实验设计入口
 
+当前新对照执行（2026-10-26）：用户已批准822小时完整预算、18条L²R／ER+GCR训练及后续固定新确认，明确仅本次新增编排免外审。按[执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[独立处置](../reports/documentation/20261026/continual_comparison/primary.zh.txt)，复用原算法资格和H/S54状态，独立三路已实际开训；实时进度统一见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。原45条不重训，旧失败不清零；下方历史“新18条／新确认／独立预算未授权”已被最新明确决定取代，不恢复为阻断。算法、评价判据及未来结果审查不在新增编排免审范围内。
+
 当前五方法结果（2026-10-26）：45条及冻结新确认／统计均完整完成，见[独立结果分析](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)。H−S最终旧域／新域MAP正向，但遗忘差区间跨零，原O/F共同门未过；不因结果新增训练、调参或变更判据。本轮具体结果包获用户批准后10:13已提交原GPT-6/Pro会话，等待完整结果，见[回执](../reports/seller_alias_continual/20261026/continual_result/review/submission.json)。两新对照另行执行范围／预算按最新决定，本结果审查不授予新实验。下方启动／等待文字保留各自时点，不据此重复运行；当前状态统一看[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
 当前执行入口（2026-10-24，本次明确重试授权）：用户在获知首轮恢复载模OOM后明确“赶紧重试”；原24成功／21未完成、五方法／三顺序／s4—6、三路／单槽10GiB／首次30GiB、490h及全45后评价不变。当前独立[重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)、[身份／费用／保管增量处置](../reports/documentation/20261024/continual_retry/primary.zh.txt)及[恢复运行观察](../reports/documentation/20261024/continual_retry/qualification/startup/observation.json)承接旧失败；不直接重跑旧命令或覆盖旧目录。原61科学来源与补槽helper不变；已由原等待程序自动启动并确认三路真实更新，等待／launcher按约结束；不得重复启动。两新方法有限BGE资格已由[后续合并主审](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)结案，下方15:41的待资格为历史。限定CPU累计及真实进程／资源／ETA统一见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。复用原外审及必要增量核验，不冒称新增网页外审；不重复GPU资格。旧较早放行／等待文字只证明当时状态，新两方法18条／新确认／独立正式预算仍未授权。

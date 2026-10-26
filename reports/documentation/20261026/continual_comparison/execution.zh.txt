@@ -1,0 +1,19 @@
+L²R／ER+GCR：822小时已批准执行范围与启动准备
+2026-10-26，Asia/Shanghai。
+
+用户原话：“批准822小时的完整预算，训练和后续确认一起完成，复用已有H/S权重和资格，赶紧把必要的启动准备做好并开始训练。”
+本决定覆盖原execution.proposed.zh.txt的完整分支，历史待预算不再阻断。新18轨迹／15552更新／54新状态、H/S54复用、新120群／四系统8640确认群前向及固定统计保持；不借原45条490小时。原生CPU42秒／native2479秒、14次更新及旧失败、OOM和限制偏差承接，不重复已合格GPU资格，也不重新做H/S1944校准前向。
+
+精确分桶
+训练2880000秒（800小时），确认64800秒（18小时）。其他14400秒（4小时）：CPU1200、native3000、生成600、控制3600、统计1800、准备4200。共2959200秒=822小时，桶不可互借。native仅保留已用2479、不新增试跑。CPU当前45秒=旧42＋本次3秒。准备保守预提180秒用于部署／来源装配／元数据核对，不冒称精确秒表测量。训练每条L²R最多259200秒／72小时，GCR43200秒／12小时，全18最高额度合计756小时，任一时点已用＋活跃完整预留＋待派发额度不超过800小时。
+
+最小新增编排
+scripts/step28_comparison_control.py只接固定18条队列和已经外审关闭的comparison_run/evaluate；算法、损失、采样、Memory、优化、校准及统计文件均原字节不改。旧five调度器的24小时单条限制不适用新批准额度；旧调度器预先mkdir也与新入口自行创建job目录不兼容。新编排把dispatch/spec/console/process元数据置于campaign/dispatch/<id>，实际训练仍位于campaign/<id>/run，由原训练入口创建；不改原训练程序来迁就包装。
+单父进程写预算、原子落盘；活跃额度包含未结算elapsed，不重复计费。子进程失败／超时保留实际费用并停止，终止范围仅自身Popen进程组，无自动重试／换目录或换seed。最多三worker、独立CPU核及单线程、allocator7.75GiB、单worker RSS64GiB及owned并集192GiB；首次30GiB／无CUDA／RAM208GiB／disk192GiB，后续单空槽10GiB／RAM64GiB／disk76GiB，不足只等空槽。当前资源需启动前重查，不把瞬时空闲当预留或承诺长期三路共存。
+独立workspace只链接已获准BGE和五份训练所需文件（manifest、validation、groups.csv、train/items、train/supervision/pairs）；不链接旧dev、test、owners或private_custody。新campaign存储128GiB／小证据2GiB／磁盘保留64GiB。H/S位于固定reference_campaign，54模型及18完成记录由已有preflight逐字节绑定。18条完成后由原full_gate检查全部108端点、来源、训练划分及校准映射，再调用原generate→confirmation→analyze；不提前开新pairs、不重拟合确认校准。
+控制器首次进入后独占mkdir正式目录，重复启动不能复用；资源不足时同一进程等待，不再增建第二监听。实际更新日志出现后，按既有规则删除本次Linux launcher自身并保存first_update回执。
+
+增量核验与边界
+Linux既有py310运行tests/test_step28_comparison_control.py，4项通过，outer2.886945秒、收费3秒、峰值RSS580886528字节，模型加载0／正式数据0／GPU0。实际手写进程验证三核／单线程／worker自行创建目录、两次低资源延期后补位，失败终止剩余自有worker并保留费用；独立假时钟核对72小时可预留、全待运行额度保护、失败不能重复派发，以及两并发任务只结算实际5＋7=12秒而非预留80秒。
+另在Linux调用实际run.gate形成47科学来源及18精确身份，来源缺失在绑定前拒绝；补齐冻结设计文档和生成policy/catalog后形成formal_gate.proposed.json。实际control.validate_gate在review_ready缺失时拒绝，正式目录没有创建。此元数据装配探针不是正式训练或另一个科学资格尝试。
+当前只形成待启用的门和编排，尚未创建formal_gate.json、review_ready、正式campaign或控制器。新增编排需按AGENTS.md及科研纪律第6节处理增量外审／明确免审；不能把旧算法与原生审查闭合说成新编排已经外审。具体外发包另列request和清单，既有具体包许可不自动扩大。用户明确免审时仅按其范围采纳，依实际CPU与主审证据放行，不冒称网页外审。
