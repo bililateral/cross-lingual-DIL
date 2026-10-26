@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 import types
@@ -118,9 +119,16 @@ class NativeEntryTests(unittest.TestCase):
                     self.assertEqual(result["status"], "FAILED_STOP_NO_RETRY")
                 with self.assertRaisesRegex(ValueError, "overwritten"):
                     n.controller(job, auth)
+                before = {str(p.relative_to(job)): p.read_bytes() for p in job.rglob("*") if p.is_file()}
+                with mock.patch.object(sys, "argv", ["native", "--job", str(job), "--authorization", str(auth)]):
+                    with self.assertRaisesRegex(ValueError, "overwritten"):
+                        n.main()
+                self.assertEqual(before, {str(p.relative_to(job)): p.read_bytes()
+                                         for p in job.rglob("*") if p.is_file()})
             self.assertGreater(result["charged_seconds"], 0)
             evidence.append(dict(scenario=failure or "success", launched=len(calls),
-                                 charged_seconds=result["charged_seconds"], simulated_workers=True))
+                                 charged_seconds=result["charged_seconds"], simulated_workers=True,
+                                 rejected_existing_cli_job_unchanged=True))
         n.m.data.write_json(Path(os.environ["DEFAULTS_TEST_ROOT"])/"native_control.json", evidence)
 
 

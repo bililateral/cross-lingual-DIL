@@ -40,7 +40,15 @@ def execute(job: Path, spec: method.Spec, deadline: float, gate_path: Path) -> d
     if (gate.get("scope") != "original_s_h_three_stage" or gate.get("train_data") is not True
             or gate.get("campaign") != str(job.parent.resolve()) or job.exists()):
         raise ValueError("Fresh independently authorized original-method trajectory required")
-    return inherited.execute(job, spec, deadline, gate_path, implementation=method, source_files=sources())
+    try:
+        return inherited.execute(job, spec, deadline, gate_path, implementation=method, source_files=sources())
+    except BaseException as error:
+        # Only the accepted fresh run may create this directory. Early rejection
+        # keeps its original exception and never writes into a rejected old job.
+        if job.is_dir():
+            data.write_json(job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc(),
+                                                   status="STOP_NO_RETRY", time=time.time()))
+        raise
 
 
 def main() -> None:
@@ -50,12 +58,7 @@ def main() -> None:
     parser.add_argument("--deadline", type=float, required=True)
     parser.add_argument("--gate", type=Path, required=True)
     args = parser.parse_args()
-    try:
-        execute(args.job, method.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
-    except BaseException as error:
-        data.write_json(args.job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc(),
-                                                    status="STOP_NO_RETRY", time=time.time()))
-        raise
+    execute(args.job, method.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
 
 
 if __name__ == "__main__":

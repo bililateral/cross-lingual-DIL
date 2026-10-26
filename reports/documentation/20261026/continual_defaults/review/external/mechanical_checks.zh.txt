@@ -1,0 +1,69 @@
+本轮机械核对记录与可复核来源
+日期：2026-10-26（Asia/Shanghai）
+范围：仅提供文件的字节/JSON/静态源码及普通算术。未导入或执行项目模块、测试、模型、训练、推理、bootstrap或生成器；未连接项目Linux。下文“CPU结果”均指输入包已保存原件，不是本审重新运行。
+
+1. 输入身份
+文件 continual_defaults_implementation_review.zip：369325字节。
+SHA256 f1f46d53703b501b16f8ddd86337404760dac1e393dbd923de12d6dfd7315845。
+72个ZIP成员，71个清单载荷，另1个input_manifest.json；无重复、缺失、额外成员。
+逐载荷读取实际解压字节，len(bytes)和hashlib.sha256(bytes)与清单比较，71/71一致。
+input_manifest.json自身13258字节，SHA256 5b9f99d6f8eafd83b0da705af756f0acdeb621d4921158878c4b37d4d4ff5e22；清单不自校验，其字节受已匹配外层ZIP身份约束。
+来源：input_manifest.json；逐项记录：input_identity_check.json、provenance_checks.json:/input_manifest。
+
+2. 新旧来源和最小diff
+qualification/cpu_sources.json共45项，与cpu01/receipt.json的sources逐项相同；实际文件大小/SHA全部匹配。
+与旧reports/documentation/20261023/continual_implementation/formal_gate.json的61源列表对照：38项同字节、1项改变、6项新增。旧列表另22项不在这次CPU闭包，不据此要求重审。
+新defaults_run.sources的静态导入闭包为44项；CPU来源仅另加scripts/step28_defaults_cpu.py，合计45。来源闭包通过AST读取import及常量重建，不执行模块/函数。
+
+旧runner副本：15434字节，SHA256 04109114c9a0e07eddfa92e634c510c4bc43411bcdf67bf7c7a8f8c988efcbb1，与旧门一致。
+新runner：15683字节，SHA256 1099a94cd2ac9ecd82a1255a8403d6065fbab0609eb4cedc48798b6874ce335a。
+提供的implementation.diff共30行、一个hunk；逐行核上下文/增删计数，以旧字节重建后与新文件完全相同。AST顶层仅execute函数变化。未修改任何输入文件。
+未改five.py：11302字节，SHA256 803f883b6b02705a52d5c4c0355f6810cc22577701ef80a65bea6ffbb02441d6，与旧门一致。
+这证明来源差异，不代替损失/更新语义追读或GPU行为资格。
+详细路径、各哈希、导入边和diff记录：provenance_checks.json:/cpu_sources、/inheritance、/entry_static_source_closure、/runner_diff。
+
+3. 身份与协议计数
+原five.py的METHODS/ORDERS/SEEDS及run_id字面规则，通过AST常量和普通字符串拼接独立重建45身份，与旧门45项一致；不调用specifications函数。
+新2方法×3循环×3seed=18，身份全部唯一。每条：3×288=864更新；288+576+576=1440梯度群呈现；3端点。
+18条：18×864=15552更新；18×1440=25920群呈现；18×3=54端点。
+以上为未来完整协议计数，不是cpu01已执行数量，也不是正式18条预算/运行许可。
+来源：scripts/step28_continual_defaults.py、step28_continual_five.py；详细身份列表：provenance_checks.json:/identity_arithmetic。
+
+4. 已保存CPU时间、RSS和回传文件
+cpu01/console.txt：三项测试，测试计时4.609秒，状态OK。
+cpu01/receipt.json：包装计时6.260977405006997秒；ceil(6.260977405006997)=7秒。
+累计7/120秒，120−7=113秒；记录内前置CPU费用由7−7=0推导。
+测试与包装差6.260977405006997−4.609=1.6519774050069973秒，不称其为精确独立控制费。
+子进程树采样RSS峰值778833920字节；除以2^30为0.7253456115722656GiB。
+4GiB=4294967296字节；与该采样峰值之差3516133376字节。不是wrapper及每个瞬态的总RSS保证。
+
+回传5文件：receipt8072＋console326＋objectives606＋updates_restore912＋wiring141=10057字节。
+32MiB=33554432字节；与保留量差33544375字节。没有保存临时输出全程峰值，不能把10057当峰值。
+transfer.json所列5项大小/SHA与实际回传字节均一致。
+wrapper在子进程启动后计时，前置来源核对和最后receipt写入不在这一计时内；RSS按0.1秒采样子进程树，不含wrapper自身。报告保留这些具体口径，不升级为系统级隔离或项目总资源承诺。
+来源：qualification/cpu01/receipt.json、console.txt、transfer.json，scripts/step28_defaults_cpu.py；详见cpu_mechanical.json及provenance_checks.json:/transfer、/cpu_receipt_arithmetic。
+
+5. 已保存目标/梯度判别数值
+从objectives.json仅读标量，不载tensor、不重新计算梯度。
+12个错误变体的最大梯度差，全部大于现有判别阈值1e−7。
+最小4.4872216519998166e−05；最大0.020679627344613087。
+它们辨别错误positive rank、缺A1、H退回mean及缺出生教师，不是科研性能或统计显著性。
+两方法完整表目标/梯度与独立参考对照的阈值、每参数及Adam对照方式由测试源码静态追读；不以PASS名称代替其调用链。
+
+updates_restore.json中两臂最大参数误差均1.862645149230957e−09，encoder参数变化各2.014636993408203e−05；head也有实际变化。
+测试结构：每臂一次stage3实际更新、一次完整恢复后重复更新、一次stage1更新，共2×3=6次生产Tiny更新；独立完整图参考每臂一次Adam，共2次。
+Adam624为手写状态，实际只走624→625，未执行前624步。推理保存回读同未扰动对象，不能单独排除no-op；完整恢复下一步则实际跨越了权重/Adam变化。
+来源：tests/test_step28_continual_defaults.py、cpu01/objectives.json、updates_restore.json；详见cpu_mechanical.json。
+
+6. D01静态路径而非运行结果
+defaults_run.py入口拒绝已存在job；runner在目录创建前有来源/列表/预算/配置检查；main捕获异常后总写job/failure.json；data.write_json只Path.write_bytes。
+因此不存在job的早拒绝会产生第二层FileNotFoundError；已有job的拒绝仍可能写入/覆盖该目录failure.json。原拒绝在异常链中仍保留。
+本审没有执行这些路径，没有观察到实际覆盖。现有wiring只调用execute，不能覆盖main处理。
+最小修复/验收限定这两个拒绝分支，无需GPU、训练、数据或新增日志平台。
+来源：cli_failure_trace.json及findings.json:D01。
+provenance_checks.json保留分审原ID W01/W02；它们分别对应最终D01/D02，不是另两项问题。
+
+7. 阅读范围与限制
+72成员均做字节身份/清单核对。实际语义阅读并集：28份全文/完整JSON，15份选段；22份只作搜索/结构/AST，7份只作字节身份。逐文件、逐读者、逐行段详见reading_scope.json；这不是声称72份都逐行审读。
+没有运行项目资格或科研模块，因此没有本审新科研运行的PASS、失败、耗时、资源或效果；输入中的cpu01原件保持其既有证据地位。本审只记录机械核对和源码路径判断，不把静态潜在失败写成现场失败。
+没有重做已关闭结果的bootstrap，没有复核缺席的旧CPU/GPU原件，没有现场核实活动workspace、远端当前资源或所有系统I/O。所有结论按报告相应限制成立。

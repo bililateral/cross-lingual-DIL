@@ -1,0 +1,251 @@
+原版S与历史H最小实现：定向科研外审报告
+日期：2026-10-26，Asia/Shanghai
+唯一当前输入：continual_defaults_implementation_review.zip
+审查性质：新增实现、直接继承路径及已提供手写CPU证据；不是此前五方法结果复审。
+
+一、结论与处置顺序
+
+当前S_default与H_default的方法语义和数值接线可以接受。S_default确实调用原record.objective/score，使用完整记录均值、原rank及单位rank/LR倍率；H_default确实调用历史G_half.objective/score，使用原rank和0.5mean＋0.5log-mean-exp，不能将它误判为H_pos仅换参数。两臂沿用同一三阶段更新、Memory、出生教师、评分和恢复底座。cpu01对本轮派发错误具有实质辨别力，不是只有名称、哈希或exit0。
+
+尚有一项必须在本轮实现交付关闭前修复的局部问题：D01，LOW／REPRODUCIBILITY_DEFECT。新CLI的异常分支无条件写job/failure.json，而入口要求job尚不存在。早期拒绝时会再抛FileNotFoundError；若拒绝原因是job已存在，则可能在该既有目录写入或覆盖failure.json。该问题由提供源码的确定路径证实，未在本审执行，也没有证据说明cpu01或正式作业已经发生误写。原拒绝异常仍留在Python异常链中，不能说所有原因都消失；问题是最外层错误和预期回执失真，以及拒绝后可能改写既有结果。数据/模型访问门没有被绕过，目标函数、梯度和已有CPU数值结果不受影响。
+
+最小处置只涉及新defaults_run的失败处理：仅向本调用通过检查后实际建立的job写失败回执；对于尚未建立或原本已存在而被拒绝的job，保留原traceback和非零退出，不向被拒目录写入。可利用已有调用方的尝试日志，不必新建日志目录体系或通用错误框架。验收只需覆盖这两个拒绝分支，不要求重新执行损失/更新、GPU、完整864步或正式数据。修订文件记录新身份，cpu01仍绑定原来源，未改数值证据继续复用。
+
+另一项D02是非阻断编辑建议：qualification/primary.zh.txt第16行“11:19前现场资源记录”与resource_before.txt实际2026-10-26T11:22:55+08:00不一致，建议按原快照更正文句。无需修改原快照或新增资源测量。
+
+已证实SCIENTIFIC_BLOCKER：0。
+必须局部修复的REPRODUCIBILITY_DEFECT：1，LOW，仅新CLI失败处理。
+需要靠新增科研数值/GPU实验才能解除的当前疑点：0。
+当前尚不能标为“无待办的单轨迹入口完成版”；完成D01局部修复后，可由主执行者按本报告独立处置本轮实现增量。正式18条运行、数据、评价和累计预算仍未批准，不能由方法实现或CPU通过推导执行许可。
+
+二、身份、授权和本轮实际工作
+
+当前会话可见身份自述为GPT-6 Astra Pro；无法独立核验后台模型ID、路由或它与界面“GPT 6 Pro”的精确对应。自述及用户指定名称不作为后台身份证明。主审与三个定向协作分支分别阅读方法、CPU和接线/来源；主审重新直接核对新文件、实际调用链和D01源码，并独立合并裁决。
+
+实际收到ZIP：369,325字节，72成员，即71载荷及input_manifest.json。
+SHA256：f1f46d53703b501b16f8ddd86337404760dac1e393dbd923de12d6dfd7315845。
+71载荷大小/SHA256逐项匹配，无重复、缺失或额外成员。逐项记录见input_identity_check.json。
+
+用户已批准本次最小实现提交外审，并另批准120秒、单线程、4GiB、32MiB手写CPU核验。新包上传/审查许可来自本轮明确请求，不借用旧结果ZIP许可。authorization.json第20—22行明确正式训练、新评价数据未授权，旧490/822小时不借用。包内历史合同“待审/待许可”以各自形成时点解释，不覆盖当前明确许可；同时也不把旧五方法正式批准迁移给这两条新方法。
+
+本审只阅读提供文件，使用标准库作ZIP、JSON、大小/SHA、静态AST/diff和普通算术核对；没有导入或执行项目科研模块、测试、训练、载模、推理、bootstrap或生成器，没有连接项目Linux，也没有索取或访问未提供正式文本、标签源、owners、权重、Memory载荷或私有资产。cpu01数值是包内既有Linux回执，本审没有重新执行它，更不将隔离网页环境当项目py310资格。
+
+三、两方法的真实计算及身份贯通
+
+1. 为什么小适配器有必要
+
+defaults.py的Spec将S_default映射为S，H_default映射为G_half，is_record恒为true，lambda_rank与lr_multiplier均固定1。OriginalObjective.objective直接调用旧record.objective或历史g_half.objective；score同样分派到对应旧评分函数。Method只把继承five.Method所用的self.tuned替换成该适配器，因此继承update里的objective_fn确实改变到原方法，而非仅修改展示名称。[E01：defaults.py 13—39、61—80；E02：five.py 178—219]
+
+仅把H_pos_tuned的两个参数调为1并不能得到历史H：旧tuned.Method对非S目标使用positive rank，而本次H必须回到原rank。当前适配器处理了这项实质差异。config=five.config、optuna_trial字段和self.tuned成员名是接口复用；没有创建study、ask/tell、trial队列或HPO执行。不能由字段名推断新搜索，也没有必要为改掉这些历史名字重构配置平台。[E03：optuna.py 78—87、159—180]
+
+两个容易误读的名称已核清：defaults.py第50行的positive.identity("S_pos")只返回arm="S"、complete_record_mean的汇聚元数据，不调用positive rank；CPU参考中的"H_pos"字符串只选择独立H块汇聚，其损失随后明确使用old_loss。两处都不是新臂偷用H_pos训练目标。[E04：positive_ranking.py 17—23；E05：tests 18—36]
+
+2. 原rank与完整监督项
+
+对每个query q，P_q为1或2个正候选；27个非自身候选全部进入分母。原rank为：
+  R_old(s,y) = (1/28) Σ_q [log Σ_(j≠q) exp(s_qj) − (1/|P_q|) Σ_(p∈P_q) s_qp]。
+
+BCE对378账号对平均；hard项按该方法当次分数选择5个已知负例，保留选中分数的梯度。单视图监督为：
+  L_m(A) = BCE_378(P_m(K,A),y) + R_old(P_m(K,A),y) + 0.5 Hard_top5(P_m(K,A),y)。
+
+alias_ranking.objectives实际调用base.objectives(...,rank_weight=1)，再加0.5hard。默认rank系数1因此进入真实公式，不只出现在metadata。[E06：chinese_base.py 165—191；alias_ranking.py 89—129]
+
+令A0为自然账号归属、A1为同控制者分量内保持账号记录数量的完整记录重组：
+  当前群：B_m = [L_m(A0)+L_m(A1)]/2。
+  历史群：0.1 B_m + 0.5 D_m,0。
+  D_m,0 = mean_378[(P_m(K_current,A0)−P_m(T_birth,A0))²]。
+
+阶段2/3的一次更新累积当前群及抽取历史群两项，然后统一clip一次、AdamW.step一次。没有把教师0.5再乘历史0.1，没有除以1.1，也没有把A1教师项加入训练。S旧函数会计算并记录mse1作为诊断，但其arm=S时实际distillation选择mse0；不能把日志里存在mse1误读为损失改变。[E07：record_replay.py 130—182；E08：g_half.py 76—92；E02：five.py 203—219]
+
+3. 两种汇聚都贯穿学生、教师及实际评分
+
+S使用每个账号对完整记录块K的mean。H使用：
+  H(K)=0.5 mean(K)+0.5[logsumexp(K)−log(|K|)]，tau=1。
+
+H按真实记录块大小做归一化，先double计算，再返回输入dtype；生产FP32表对应最后一次FP32输出。它没有退回mean、纯logsumexp或两个独立模型集成。H的BCE、原rank、hard索引和D0均消费H自己汇聚后的分数；D0是先对学生/教师作H投影再平方，不是mean误差平方与log-mean-exp误差平方的平均。[E07：113—127；E08：18—25、39—92、109—122]
+
+A1仅在同控制者K2/K3分量内重排完整记录，维持每账号槽记录数；预测只用自然A0，不需标签重组。教师T是本方法自身模型在该群出生保留阶段生成的完整FP32记录对表，随后用该方法汇聚。five.Method.retain调用record.reference只保存原表，不表示教师被错误接成S均值分数；H损失稍后自行对T作H汇聚。[E07：66—99、211—231、248—269；E02：239—251]
+
+4. 默认LR、真实更新与恢复身份
+
+LR=1在本请求中指倍率1，不是绝对学习率数值1。配置初始optimizer保留默认基值，实际每步由spec.rates设置encoder原288步warmup/下降日程及head 0.001；没有残留S_tuned/H_pos_tuned的1.295…或1.283…倍率。lambda_rank=1同样不残留旧已选系数。[E03：78—87；E02：95—107、199—201；E09：bge_continual.py 70—82]
+
+实际梯度经过完整表proxy的dJ/dK、512记录对分块head VJP、z.backward回encoder；并非只更新detached表或head。新的continual_spec与objective身份在bind/check_model、update、score及restore中一致。restore从保存metadata重新绑定本方法，恢复模型/optimizer、模式和RNG；RecordMemory外层也携带同一Spec并拒绝异臂。[E07：159—182；E02：110—175、178—259]
+
+历史g_half模块中的RNG_ORDER="ABC"属于其旧update/capture入口；当前调用的是接受传入regroup_seed的objective及自然评分score。新训练随机流由five.Method按spec.order/seed/stage/step派生，并未使BCA/CAB悄悄使用旧ABC日程。旧初始化/训练/Memory s0根也没有被误当成当前s4—s6根。[E08：76—117；E02：75—78、189—209]
+
+四、三阶段、Memory与最小复用边界
+
+新18身份为2方法×3循环×3seed。每条288×3=864更新；首阶段288群呈现、后两阶段各576群呈现，共1440。因而18条协议计数为15,552更新、25,920群呈现、54端点。这些都是将来完整运行的计数，不是cpu01已经执行的科研量。
+
+继承的stage1/2/3要求Adam连续0→288→576→864，current-only learner只收到当前48拟合群和存活历史；Supply作为同进程离线派发角色可索引授权档案，不等于系统级数据隔离。每端点当前12cal、全60旧dev盲评分、实际恢复及full状态退休逻辑未变。[E10：five_run.py 124—216、239—276]
+
+RecordMemory沿用六群Algorithm R、出生完整表、同order/seed根和阶段抽样。阶段1/2保留边界更新reservoir，为新存活群生成教师；幸存表不刷新；阶段3仅消费已经到达的两旧域Memory，阶段3末不再生成无后续用途的教师。RecordMemory的身份封装支持新Spec，不需重写整个Memory类。[E02：110—137、221—251；E07：234—332]
+
+本轮CPU只对空Memory身份往返及异臂拒绝作新验证，没有实际新跑完整六群生存/出生教师流程。旧适用证据来自当前包所附已关闭五方法资格/主处置及历史H原审/主处置，直接继承源码大小/SHA也与旧门匹配。这里没有把旧证据说成新跑，也没有把原生GPU资格报告当成新adapter的独立完整GPU执行。当前没有具体矛盾要求再跑所有18身份或非空Memory全生命周期。
+
+本包未重复提供旧cpu08全部原件和旧GPU原始载荷，当前只能读所附资格/主处置及来源身份。本审依用户指定按未改路径复用，不声称在新附件中重新阅读了那些缺席原件，也不因此要求补传或重新资格。新改变的目标派发、默认配置、方法身份和单轨迹入口则由本轮源码及cpu01分别覆盖。
+
+五、三项CPU证据：有辨别力，也有边界
+
+1. 目标与梯度：能排除本次关键伪实现
+
+手写群28账号，每账号2记录，共56记录及1540记录对，包含8个K2和4个K3。多正候选使原rank与逐正例rank不会退化成相同算式。参考独立逐候选枚举原rank、BCE和top5hard，逐块计算S/H汇聚；实际adapter目标值和完整1540维表梯度按atol=rtol=1e−12对照。[E05：18—36、58—86；E11：positive_ranking测试26—43、69—85、g_half测试20—29]
+
+随后检查12个错误变体的梯度最大差均>1e−7：
+错误变体                 S当前         S历史         H当前         H历史
+误用positive rank        .000448722    .000044872    .000510307    .000051031
+缺A1重组监督             .012545056    .001254506    .020679627    .002067963
+H退回mean                不适用        不适用        .008706679    .001167435
+缺出生教师               不适用        .002597213    不适用        .002904802
+
+最小差约4.48722×10^−5，高于既定辨别阈值。这里的“差”是错误实现与正确实现的手写表梯度差，不是科研效果差或显著性检验。独立参考共享未改assignment底座，不能说它重新独立证明整个重组算法；其独立性恰好覆盖本次目标/汇聚派发风险。FP64目标测试也不冒充BF16 GPU证据。
+
+2. encoder/head、Adam与完整恢复下一步
+
+fixture构造真实可训练TinyEncoder（Embedding＋Dropout）及两层head、真实AdamW和实际encoder checkpoint包装。stage3/step49前的Adam624明确手工设置；实际只执行624→625。独立参照关闭外层重算，建立完整encoder/head图，按相同dropout/regroup根独立损失反传，再单次clip/Adam。逐参数及step/exp_avg/exp_avg_sq比较，容差2e−6/2e−5，而不是只看总梯度非零。[E05：39—51、88—128]
+
+两臂最大参数误差均1.862645149230957e−9，encoder权重和head各参数均实际变化。完整状态先在更新前保存，更新后恢复，再重复同一步并核对返回值和模型/Adam摘要逐位相等；恢复若不生效，前置Adam状态及后续摘要不能相符。另各执行无历史stage1的0→1，检查默认LR及无history返回。每臂3次生产Tiny更新，共6次；独立参考另2次Adam。没有执行此前624步或完整864步，更没有正式训练18条。[E05：99—150；cpu01/updates_restore.json]
+
+3. 推理恢复与入口截断应精确解释
+
+评分对独立自然A0汇聚结果吻合。随后推理保存/恢复在同一个未扰动对象上进行，分数逐元素一致；这一子项单独不能排除“恢复不覆盖权重”的no-op变体。旧底层restore_state未改，完整恢复测试已有真实状态变化和下一步证据，历史推理恢复证据也适用。因此本项应按有限证据报告，不因此自动补一套GPU/载模资格。[E05：134—144；E12：continual_population.py 157—210]
+
+wiring测试逐个核18配置身份及其根，与原45保持；实际调用defaults_run.execute→five_run.execute，并在implementation.config处有意抛异常。它证明新配置模块被选择、旧45列表在到达config前拒绝，但没有经过后续CUDA、预训练档案、正式输入、Supply和完整端点。Budget和线程设置也被patch，不是资源或完整runner行为验证。数值目标/update/score的真实调用由前两项另证。[E05：162—194]
+
+尤其是该测试直接调用execute，未进入main的except分支。因此三项PASS不能关闭本审D01的CLI失败处理缺陷。该缺口只需对应新CLI路径的局部验收，不影响已经充分的数值测试范围。
+
+4. CPU费用与资源口径
+
+cpu01子测试4.609秒，包装计时6.260977405006997秒，ceil=7，累计7/120，余113秒。采样子进程树RSS峰值778,833,920字节≈0.725346GiB。5份回传保留产物合计10,057字节，低于32MiB；这不是临时权重文件的全时段峰值证明。45源身份及5回传文件大小/SHA均匹配。[E13；cpu_mechanical.json]
+
+wrapper设OMP/MKL/OPENBLAS单线程、CUDA不可见，测试main设torch intra/inter-op各1；每0.1秒采样子进程树RSS及job内产物，预留1秒尾部并向上计秒。计时不含前置来源校验及最后receipt写入；RSS不含wrapper自身，未保存输出峰值。应按这一具体口径理解“外层实测”和“峰值”，不扩写为系统硬隔离或每个瞬态的精确总量。当前没有超限、失败漏记、正式数据/模型/GPU使用的具体证据，不要求为此重构资源平台。[E14：defaults_cpu.py 22—61]
+
+receipt的formal_data_reads=0等字段是范围声明，不是syscall计数器；它与手写fixture、config截断和CUDA不可见设置相符。剩余113秒不等于网页审查可以执行任何项目程序，本审没有消耗项目资格预算。
+
+六、真实入口、来源和必要修改
+
+1. 正常路径接线足够明确
+
+新defaults_run先核scope="original_s_h_three_stage"、train_data=true、campaign=job.parent以及fresh job；再显式传入implementation=method和实际sources。旧runner按implementation.specifications()构造精确列表，核source、run-list及本次spec确在列表中，然后调用implementation.config和Method。旧默认参数仍指向原five模块及原sources函数，没有把原五方法全局改成两方法。[E15：defaults_run.py 37—42；E10：219—241]
+
+旧45门不能用于新18身份，也不能声称新源码仍与旧已签来源同版。cpu01的旧45拒绝例保留新scope和sources、仅把runs改为旧45，确实辨别了run-list门。活动L²R/GCR的独立workspace没有作为本轮修改对象；本审未访问远端，不能将主执行者“未动活动workspace”的声明升级为现场文件系统审计。
+
+2. 实际增量机械核对
+
+CPU来源45项：38项与旧formal_gate字节相同、1项修改（five_run）、6项新增（两文档、adapter、独立入口、CPU包装和新测试）。新入口AST静态来源闭包44项，CPU清单仅多CPU包装1项。全部对应文件存在且大小/SHA匹配，receipt.sources与cpu_sources完全一致。
+
+five_run.before.py与旧门中的runner身份相同；提供的唯一diff hunk可逐字节重建当前runner；AST顶层只有execute改变。修改内容正是implementation/source_files显式注入、实际run-list与成员核对、配置和Method派发。原five.py未变，旧45身份按源码字面常量和公式机械重建后与旧门完全一致。[E16；provenance_checks.json]
+
+哈希/AST只证明来源和差异，不替代前述语义追读与CPU行为证据，也不表示所有旧源码重新逐行审查。
+
+3. D01：必须局部修复的CLI失败处理
+
+证据链：
+（a）defaults_run.py 39—41拒绝job已存在；输入scope、campaign、train_data不合也在这里拒绝。
+（b）five_run.py 224—232在创建job前还会拒绝来源/列表/预算或配置；合法输出目录到239—241行才创建。
+（c）defaults_run.py 54—56捕获这些异常后，无条件data.write_json(args.job/"failure.json",...)。
+（d）population_data.py 33—34只有path.write_bytes(json_bytes(value))，不创建父目录。
+
+路径A：job尚不存在→早期门拒绝→写不存在父目录下的failure.json→FileNotFoundError成为最外层错误，预期STOP_NO_RETRY回执未落盘；原拒绝仍在异常链。
+路径B：job预先存在→fresh检查拒绝→若目录可写，仍创建或覆盖其failure.json；这改变了本应被拒绝的既有结果目录。
+
+这是确定的源码路径，不是声称本次cpu01发生过这些错误，也不是推断正式数据已被越权读取。缺陷发生于新增CLI的可用性和留证边界，故列LOW复现缺陷，而非SCIENTIFIC_BLOCKER。
+
+最小修复仅处理新main：只在本调用已经合法创建的job内记录运行失败；早期拒绝不存在/既有job时直接保留原异常和非零退出，避免制造第二个写文件异常或触碰已有目录。无需给拒绝另造复杂状态机，也无需修改未变损失/更新器或活动队列。
+
+最小验收只有两点：不存在job的拒绝保留原错误，既有job的拒绝前后目录字节不变。可用手写临时目录和既有截断方式完成，不经过CUDA/模型/正式数据；不需要重跑三项全部数值测试。若主执行者实施修复，保存修订来源与该局部证据，不覆盖cpu01旧来源或把其说成新版本全量通过。
+
+4. D02：非阻断时间文字勘误
+
+qualification/primary.zh.txt第16行“11:19前”与resource_before.txt第1行11:22:55+08:00不符。建议改为实际记录时间或删去错误时间限定，保留原快照。它不改变CPU数值或7秒费用，不构成新的GPU可用性证据；本轮无需再测GPU。
+
+七、哪些新增行必要，哪些无需再增加
+
+本次新增方法身份/arm映射、单位参数、旧目标与评分派发、保存恢复身份校验是必要增量，不能仅改旧H_pos参数替代。显式implementation/source_files及实际run-list检查，使同一训练底座可按新身份运行并拒绝旧门，也有实际用途。入口保持独立campaign/fresh约束，与冻结活动workspace分开合理。现有小adapter并没有引入注册中心、动态候选搜索、通用平台或新训练器。
+
+配置别名和少量默认值显式覆盖虽可机械缩短几行，但没有科学或运行理由要求删去；删后反而降低本次固定语义的可读性。sources闭包沿原风格收集实际依赖和资格源码，不应为了省几行改成手工猜测旧45完整来源。唯一需要修改/可能删减的是D01中对所有异常无条件落盘的分支；不要求保留其无效的“必写failure.json”行为。
+
+当前不应增建正式18条controller、累计预算和评价生成器来让接口看起来完整。这些取决于尚未确定的正式方案；单轨迹入口本身可以先交付。也不应为清理optuna_trial/self.tuned历史字段而重写底座，或为名称适配强加全部历史回归、18身份逐一GPU、所有最大形状网格、非空Memory全生命周期再跑。
+
+八、后续正式条件与科学解释边界
+
+下列事项只在用户确定正式预算/评价方案后落实，不是本轮应立即创建的新功能：
+1. 在独立campaign中冻结精确18身份、实际修订来源、正式训练/读取授权；旧45门不通用。
+2. 明确本次累计训练及评价预算、剩余任务投影和既有队列调用；继承的单条Budget检查不等于新的总额许可，旧490/822小时不自动借用。
+3. 根据实际开工时间核对资源和已有作业；当前resource_before只是当时CPU开工背景，不承诺现在额外三路GPU可用。
+4. 明确评价对象、共同评分系统/端点、数据及结果开放范围，再按既有实现接线；不能先运行后选择有利评价口径。
+
+本次没有实施正式门、队列、标签开放或确认生成，也没有伪装成整批流水线已完成。上述等待是当前明确范围，不是应该由外审强制填补的缺陷。
+
+比较的正确解释：
+— S_tuned−S_default，在相同协议和评价对象对齐后，可看这组已选lambda/LR相对(1,1)的整体影响；不能分别归因两参数，更不能由此宣称Optuna算法一般有益/有害。
+— H_default−S_default保留同一原rank和默认参数，比较混合汇聚贯穿训练、出生教师及评分的系统干预；不是同一训练模型只换推理池化的效果。
+— H_pos_tuned−H_default同时改变rank与参数，不能独立归因Optuna或positive rank。当前无需为隔离所有机制自动加第三臂H_pos_default。
+
+历史约0.5221是用户指向原方法的动机，不是新实现验收数值。历史单s0、A→B、旧初始化/日程/Memory根，与当前三阶段、三循环、s4—s6不同。应保留ABC路径第二阶段后旧A这个历史对应位置，并完整报告三阶段O/N/Z、取得水平和F；不能把新协议均值直接与旧单AB端点相减后宣称调参导致变化，也不能只挑接近0.52的格。本文没有重新从历史原指标核算0.5221。[E17：历史合同49—57；E18：历史结果主处置4—5、23—27]
+
+原120确认群已见结果。若后续用于新默认方法比较，只能称已见群上的事后诊断；它不会因换方法重新变为独立未见确认。若用户要新独立确认，则另行确定新批及共同评分范围、预算和权限。本轮不自动生成新群，也不自动把所有旧模型/历史轨迹重跑。旧五方法H_pos_tuned−S_tuned主门false和历史H双域门false均保留，CPU通过不能回溯翻转。[E19；当前implementation.zh.txt 19—22]
+
+九、逐项分类汇总
+
+D01｜LOW｜REPRODUCIBILITY_DEFECT｜已证静态路径
+当前实现交付前需修：是，仅新CLI失败处理。
+科学阻断：否。需要新科研/GPU执行：否。
+最小建议：合法本次job内才写回执；早期拒绝保留原异常并不改既有目录；局部核对两个拒绝分支。
+
+D02｜LOW｜REPORTING_CLARIFICATION｜已证文字时间不符
+当前实现交付阻断：否。
+最小建议：按11:22:55快照更正“11:19前”；不要求新资源采样。
+
+D03｜INFO｜SUPPORTED_IMPLEMENTATION｜已核方法语义和派发
+原rank、S/H汇聚、单位参数、A0/A1、历史监督/教师、真实VJP与身份贯通合理。
+无必须方法修复，不因遗留字段名引入配置平台。
+
+D04｜INFO｜SUPPORTED_WITH_LIMITS｜CPU与继承证据边界
+三项证据有辨别力；Tiny/手设624/空Memory/config截断/同对象推理回读及采样资源按其有限范围接受。
+不能以PASS关闭D01，也不将这些有限范围自动升级成新的科学阻断。无需重复旧GPU/完整Memory/全历史测试。
+
+D05｜INFO｜DEFER_UNTIL_FORMAL_SCOPE｜正式预算/队列/评价条件
+仅后续正式方案确定时落实，不要求本轮补造未授权整批配置。
+
+D06｜INFO｜SCIENTIFIC_INTERPRETATION_BOUNDARY｜比较、历史数值及已见确认
+不独立归因混合变化，不保证0.5221，不重新宣称原120群未见，旧主门false保留。
+
+D07｜INFO｜OUT_OF_SCOPE_OVERDESIGN｜拒绝扩张本轮
+不加HPO、第三臂、seed、顺序、全epoch诊断、新数据、DDP、通用平台或全历史回归；不审活动L²R/GCR，不重开已关闭GPU修复。
+
+未核实疑点与已证错误分开：本轮没有一个尚未核实且需要新增科研实验才能解决的具体阻断疑点。旧原生执行原件未全包含、推理子测试辨别力有限、当前远端资源未现场核验，是明确证据限制；不能据此推定代码失效或数据违规。
+
+十、实际阅读范围与审查限制
+
+逐文件reading_scope.json列出72成员的实际阅读方式，区分全文、选段、结构化字段、AST解析和仅字节身份。主审全文阅读本轮implementation、authorization、qualification primary、inheritance、cpu01五原件、新adapter80行、新入口61行、新CPU包装65行、新测试200行、原runner当前296行及其30行diff；沿直接依赖阅读five.Method及原record/H损失、评分、Memory、rank和配置/优化器/恢复的相关段落。分支提供补充直接源码和资格来源阅读，不把哈希/AST遍历计为全文语义阅读。
+
+所附旧五方法和历史H的资格、主执行者处置用于判断继承边界；旧外审原件若在reading_scope.json中仅列字节身份，则不宣称已重新语义阅读。未重新打开全部历史研究或GPU修复。旧结果及其Memory勘误已由所附处置结案，本审没有重做其864矩阵、2772统计或bootstrap，也没有提出新效果结论。
+
+本审没有现场重演cpu01，无法从附件证明所有操作系统访问或瞬态资源事实；没有正式标签、权重/Memory来做底层效果重建。提供源码＋匹配来源＋已保存CPU行为证据支持这次增量审查，不能扩写为正式18条资源、完整训练或性能认证。
+
+交付的provenance_checks.json和cpu_mechanical.json保存全部来源/差异/计数核对；cli_failure_trace.json保留D01静态证据链及其未执行限定；mechanical_checks.zh.txt说明普通核对方法、已有CPU结果与本审零项目执行的区别。输入原件未修改，返回包不嵌入整个输入副本。delivery_manifest.json列每个返回载荷大小/SHA，外层ZIP身份在最终网页公布。
+
+十一、证据索引（路径均相对本轮输入根）
+
+E01 scripts/step28_continual_defaults.py，1—80行。
+E02 scripts/step28_continual_five.py，尤其49—107、110—175、178—259行。
+E03 scripts/step28_optuna.py，78—87、132—186行；这里只读直接配置/目标，不执行study。
+E04 scripts/step28_positive_ranking.py，17—23、58—104行。
+E05 tests/test_step28_continual_defaults.py，1—200行。
+E06 scripts/step28_chinese_base.py，37—40、110—140、165—191行；scripts/step28_alias_ranking.py，89—129行。
+E07 scripts/step28_record_replay.py，31—36、43—182、211—332行。
+E08 scripts/step28_g_half.py，1—137行。
+E09 scripts/step28_bge_continual.py，31—120行。
+E10 scripts/step28_continual_five_run.py，1—296行；仅execute为本轮修改，其他路径用于追踪继承接口。
+E11 tests/test_step28_positive_ranking.py，20—43、69—85行；tests/test_step28_g_half.py，20—29行；tests/test_step28_record_replay.py，23—48行。
+E12 scripts/step28_continual_population.py，14—40、157—210行；scripts/step28_continual_population_data.py，24—34行。
+E13 reports/documentation/20261026/continual_defaults/qualification/cpu01/{console.txt,objectives.json,updates_restore.json,wiring.json,receipt.json}；同qualification/{cpu_sources.json,transfer.json,inheritance.json,primary.zh.txt,resource_before.txt}。
+E14 scripts/step28_defaults_cpu.py，1—65行。
+E15 scripts/step28_continual_defaults_run.py，1—61行。
+E16 reports/documentation/20261026/continual_defaults/review/{five_run.before.py,implementation.diff}；reports/documentation/20261023/continual_implementation/formal_gate.json:/sources、/runs。before文件逐字节/AST比较不等于逐行科研重审。
+E17 docs/SELLER_ALIAS_G_HALF.zh.md，9—34、47—57行。
+E18 reports/seller_alias_continual/20261016/g_half_result/review/primary_disposition.zh.txt，4—5、23—27行；reports/documentation/20261015/g_half_implementation/review/primary_disposition.zh.txt，1—23行。旧外审原报告仅核身份，不声称本轮重读。
+E19 reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt，6—8、30—49行；同continual_result/errata.zh.txt。仅用于已关闭结果与已见数据边界。
+E20 reports/documentation/20261026/continual_defaults/{implementation.zh.txt,authorization.json,review/request.zh.txt}；reports/documentation/20261023/continual_implementation/{qualification/primary.zh.txt,review/primary_disposition.zh.txt}。

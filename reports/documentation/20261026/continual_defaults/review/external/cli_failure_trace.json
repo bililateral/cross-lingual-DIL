@@ -1,0 +1,70 @@
+{
+  "finding": "D01",
+  "basis": "STATIC_SOURCE_CONTROL_FLOW; no project code executed",
+  "observed_runtime_failure": false,
+  "observed_overwrite": false,
+  "evidence_files": [
+    {
+      "path": "scripts/step28_continual_defaults_run.py",
+      "lines": [
+        37,
+        57
+      ]
+    },
+    {
+      "path": "scripts/step28_continual_five_run.py",
+      "lines": [
+        219,
+        241
+      ]
+    },
+    {
+      "path": "scripts/step28_continual_population_data.py",
+      "lines": [
+        24,
+        34
+      ]
+    },
+    {
+      "path": "tests/test_step28_continual_defaults.py",
+      "lines": [
+        180,
+        194
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "case": "job does not yet exist; gate/source/list/config refusal",
+      "steps": [
+        "main calls execute",
+        "defaults or inherited execute raises before runner creates job/run",
+        "main except calls write_json(job/failure.json)",
+        "write_json calls Path.write_bytes without parent mkdir",
+        "FileNotFoundError becomes outer exception; original refusal remains chained"
+      ],
+      "impact": "Expected STOP_NO_RETRY JSON is absent; refusal itself still prevents model/data work."
+    },
+    {
+      "case": "job already exists and is writable",
+      "steps": [
+        "defaults execute rejects job.exists()",
+        "main except still calls write_json(job/failure.json)",
+        "existing file may be overwritten or a new failure file added"
+      ],
+      "impact": "Rejected existing results directory may be modified; this is static reachability, not an observed overwrite."
+    }
+  ],
+  "cpu_wiring_scope": "Calls execute directly and stops at config; never enters CLI main exception handler.",
+  "minimum_disposition": "Only write failure records in a job legitimately created by this invocation; preserve original exception/nonzero exit and leave preexisting or uncreated job untouched on early refusal.",
+  "minimal_acceptance": [
+    "Early refusal before job creation retains original error without second file-write exception.",
+    "Preexisting rejected job contents remain byte-identical."
+  ],
+  "out_of_scope": [
+    "No CUDA/model/data calls",
+    "No new budget/state-machine/logging platform",
+    "No full numerical rerun or full-history regression"
+  ],
+  "input_changes_made_by_reviewer": false
+}

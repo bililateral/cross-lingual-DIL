@@ -1,0 +1,27 @@
+原版S与历史H CPU实现外审：独立主审与局部修复
+2026-10-26，Asia/Shanghai
+
+一、身份与结案意见
+唯一会话 https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a；用户告知“CPU校验外审已结束”后，于12:02实际页面见“回答已完成”、无停止生成按钮，取回本轮完整报告。输入369325字节/72成员，SHA256 f1f46d53703b501b16f8ddd86337404760dac1e393dbd923de12d6dfd7315845，与原提交及本地冻结包匹配。返回54953字节/9成员，SHA256 f62438f5f55f62db253fbea5f187a335125e371425df1889dee74206d0940c85；8载荷大小/SHA逐项一致，完整网页末轮文本另存external_page.json。原submission保留形成时“生成中”，当前状态以recovery.json及本记录为准。
+外审结论：方法语义与CPU数值接线可接受，已证科学阻断0；D01一个LOW复现缺陷需本轮局部修复，D02一个非阻断时点文字错误，其余D03—D07为接受、证据边界、后续条件及防止过度设计。主执行者阅读全文、findings、mechanical_checks和cli_failure_trace，并核对reading_scope实际范围与直接源码/原CPU字段。不是只依据对方PASS或清单。
+当前独立结论：D01已修复并由cpu04验收，D02在本记录勘误；本轮CPU实现外审可结案。不宣称审查者复跑了项目测试、不宣称正式18条或新增GPU入口已获外审/预算许可。可见选择器原记录GPT-6/Pro、外审自述GPT-6 Astra Pro；未独立验证后台身份。
+
+二、逐项主审处置
+D01【采纳并修复】直接检查defaults_run.main的无条件failure写入、execute的fresh拒绝、inherited.execute在建目录前的来源/配置检查及write_json不建父目录，确认静态路径成立。没有证据证明旧cpu01曾实际覆写目录。修复把失败回执放到execute通过scope/campaign/train_data/fresh检查后的try内，只有继承执行已建立job时写入；main直接调用，不再在解析或早拒绝后补写。正常目标、数据门、更新器与恢复不改。
+cpu04实际调用main：无目录且scope拒绝保留ValueError；合法scope下模拟继承入口在建目录前抛出同一RuntimeError对象，目录不产生；已有job/failure.json字节及成员不变且不进入继承执行；本次合法新建job后失败仍保留STOP_NO_RETRY回执。下游模拟只隔离CUDA/模型/正式数据，不作为训练证据。一次定向测试通过，不重跑原三项数值资格。
+独立追加的同类小修：上一轮新增、未在外审包中的defaults_native.main也会在拒绝既有job后写failure.txt。该重复兜底已删除，控制器原status及自有worker console继续留失败；cpu05经实际main核对已有目录逐文件字节不变，并复用/重验原顺序、共同deadline、非零/超时/无效结果停止。此项由主执行者发现及验收，不记作本次网页审过GPU入口，不新增GPU计算。
+D02【文字勘误】冻结qualification/primary.zh.txt的“11:19前”应为resource_before.txt原件2026-10-26T11:22:55+08:00；该快照仅为当时CPU准备背景。原文及快照不追改，在当前交接更正引用时点。CPU数值、7秒费用和数据权限均不变。
+D03【独立同意】adapter直接派发record.objective/score与g_half.objective/score，历史H确为0.5mean+0.5logmeanexp、原rank、lambda/LR倍率1；不是H_pos改名。five.Method.update实际调用该objective_fn、设置spec.rates并经record.backward_group的表梯度→head VJP→encoder backward执行clip/Adam；历史监督0.1和A0教师0.5独立。查阅g_half、record和five的对应实际分支，未发现伪实现。旧字段optuna_trial/self.tuned不代表新HPO，保留接口复用。
+D04【接受有限证据】cpu01目标反例最小差4.4872216519998166e-5，参数对独立参考最大差1.862645149230957e-9，encoder/head实际改变；完整保存后先更新再恢复并重复下一步，具有实际状态变化。推理同未扰动对象回读这项单独不能排除no-op；直接核对未改restore_state确实load_state_dict、恢复Adam并核实实际载入状态，结合完整恢复及旧适用证据接受，不为此再造GPU/全历史测试。Tiny、手设Adam624、空Memory和config截断限制仍在；RSS为采样子树、保留字节不是瞬态峰值，不把范围声明当系统级I/O审计。
+D05【仅留后续正式条件】新18身份的正式累计预算、队列、评价数据及共同评分/开放范围未定，不据外审补造框架或借490/822小时。正式实施前再绑定实际修订来源和相应范围。
+D06【接受解释边界】S_tuned−S_default只能看已选lambda/LR组合整体影响；H_pos_tuned−历史H还混合rank变化，不能独立归因Optuna。历史s0/AB约0.5221不是本次三阶段新seed的验收值；未来可保留ABC第二阶段旧A的对应位置并同时报告完整三阶段取得/遗忘。旧120群已见，复用只能事后诊断，旧主门false不变。
+D07【接受精简】不增HPO、第三臂H_pos_default、seed、顺序、epoch诊断、全历史回归或通用平台。当前修改只解决已证入口缺陷；旧数值/Memory/恢复未变部分直接复用，不将网页建议全盘升级成新任务。
+
+三、本轮实际资格与来源
+12:08:55只读现场：现有1198791控制器及1198941/1198946/1198951三worker属yongpeng，cwd均为独立continual_comparison/workspace；5090空闲11256/32607MiB、利用率90%，RAM available241628MiB、磁盘328711077888字节。仅作为单线程小CPU修复核验背景，不用作新增GPU准入，未改/停活动作业。
+独立review_fix_workspace的52来源从Windows经SCP同步，执行前完整字节核对。输入传输SHA256 0185fb789da753aed60482485434b8741d8636eadeabd1fe547b290148ef337b。cpu04：exit0，2.0799372929614037秒向上记3秒，累计22；峰值RSS567418880字节。cpu05：exit0，6.730980460008141秒向上记7秒，累计29/120；峰值RSS564170752字节。均单线程、CUDA不可见、BGE/正式数据/原生更新0。旧cpu02测试夹具失败7秒仍计费，未清零。
+回传6原件归档3973字节，SHA256 cb57ce86c15bba5fb776c6f90b3fe3d2093ff59d8f9a14d0c1bddfc0c67cb918，两端一致；cpu04/cpu05来源相同并与当前52文件匹配。相对cpu03仅defaults_run、defaults_native和对应两测试改变。cpu01绑定原45来源，cpu02/cpu03绑定各自旧来源，不追改成当前全量通过。无需重新执行未改公式或真实Tiny优化资格。
+
+四、当前待办边界
+本轮CPU实现审查及已证缺陷处置完成。先前用户要求的有限GPU原生脚本已实现，其单路两臂、各3调用、9.25GiB allocator与保留外层checkpoint规格仍是准备状态；本网页输入在其形成之前冻结，不能把CPU审查结论算作该新脚本外审。GPU总时限及共存/空卡安排仍未批准，正式18条预算和评价范围亦未确定。本轮没有启动GPU、正式训练、确认生成或新标签访问。
+外审8份载荷、清单与必要页面记录保管；返回ZIP仅作传输，原件校验和处置完成后清理重复ZIP。冻结输入包仍用于旧来源复核，保留。关闭本轮专用页，无跟进自动化可撤销；不重复上传或再次提交同一审查。

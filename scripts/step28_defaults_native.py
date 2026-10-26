@@ -144,15 +144,12 @@ def main() -> None:
     parser.add_argument("--worker", choices=METHODS)
     parser.add_argument("--deadline", type=float)
     args = parser.parse_args()
-    try:
-        if args.worker:
-            worker(args.job, args.worker, args.deadline, args.authorization)
-        else:
-            controller(args.job, args.authorization)
-    except BaseException:
-        if args.job.is_dir():
-            (args.job/"failure.txt").write_text(traceback.format_exc(), encoding="utf-8")
-        raise
+    # Controller status and each owned child's console already retain failures.
+    # Do not add a file to a pre-existing job rejected before launch.
+    if args.worker:
+        worker(args.job, args.worker, args.deadline, args.authorization)
+    else:
+        controller(args.job, args.authorization)
 
 
 if __name__ == "__main__":

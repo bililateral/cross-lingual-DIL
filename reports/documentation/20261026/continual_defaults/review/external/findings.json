@@ -1,0 +1,253 @@
+{
+  "review": "2026-10-26 S_default and historical H minimal implementation",
+  "input": {
+    "file": "continual_defaults_implementation_review.zip",
+    "bytes": 369325,
+    "members": 72,
+    "payloads": 71,
+    "sha256": "f1f46d53703b501b16f8ddd86337404760dac1e393dbd923de12d6dfd7315845"
+  },
+  "model_identity": {
+    "visible_self_description": "GPT-6 Astra Pro",
+    "backend_verified": false
+  },
+  "verdict": {
+    "scientific_blockers": 0,
+    "necessary_reproducibility_defects": 1,
+    "necessary_reproducibility_defect_severity": "LOW",
+    "method_semantics_accepted": true,
+    "current_cli_small_fix_pending": true,
+    "formal_18_run_authorization_granted": false,
+    "new_scientific_or_gpu_tests_required_by_review": 0
+  },
+  "classification_note": "D01是已证静态失败路径，未声称已实发；D02是非阻断编辑；D04为证据限制不推定故障；D05只在未来正式范围确定后落实。",
+  "findings": [
+    {
+      "id": "D01",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "status": "CONFIRMED_STATIC_PATH_NOT_OBSERVED_EXECUTION",
+      "title": "新CLI在拒绝后无条件写failure.json，可能新增路径异常或改写既有job",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_defaults_run.py",
+          "location": "L37-L42; L52-L57",
+          "meaning": "入口要求fresh job；main对所有异常无条件写job/failure.json"
+        },
+        {
+          "file": "scripts/step28_continual_population_data.py",
+          "location": "L24-L34",
+          "meaning": "write_json只Path.write_bytes，不创建父目录"
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "location": "L224-L241",
+          "meaning": "来源/列表/预算/配置检查在job目录创建之前"
+        },
+        {
+          "file": "tests/test_step28_continual_defaults.py",
+          "location": "L180-L194",
+          "meaning": "wiring只调用execute，不经过main异常处理"
+        }
+      ],
+      "impact": "未创建job时早拒绝会另抛FileNotFoundError，原拒绝保留在异常链但预期回执未落盘；已有job被fresh拒绝后仍可能创建/覆盖其failure.json。未证明实际发生误写，数据/模型门没有绕过，CPU数值不受影响。",
+      "minimum_recommendation": "只在本调用通过检查后实际建立的job内记录运行失败；尚未建立或原本存在而被拒绝时保留原traceback/非零退出且不写被拒目录。可由已有调用方尝试日志留证，无需新目录体系。",
+      "minimum_acceptance": "仅核早期拒绝保留原错误、已有job字节不变；可用手写临时目录及既有截断方式，不经CUDA/模型/数据，不重跑数值资格。记录改动文件新身份，cpu01原版本证据保留。",
+      "must_fix_before_current_implementation_delivery": true,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "CURRENT_INCREMENTAL_DELIVERY",
+      "reviewer_proof": "cli_failure_trace.json"
+    },
+    {
+      "id": "D02",
+      "type": "REPORTING_CLARIFICATION",
+      "severity": "LOW",
+      "status": "CONFIRMED_TEXT_MISMATCH",
+      "title": "CPU资源快照的时间说明不符",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/primary.zh.txt",
+          "location": "L16",
+          "meaning": "文字为11:19前"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/resource_before.txt",
+          "location": "L1",
+          "meaning": "实际为2026-10-26T11:22:55+08:00"
+        }
+      ],
+      "impact": "时间描述不精确；不影响cpu01数值和7秒计费，不能据此推断更多时间线或当前GPU资源。",
+      "minimum_recommendation": "把说明改成实际记录时间或删除11:19前限定，保留原快照；无需重测。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "EDITORIAL_RECOMMENDATION"
+    },
+    {
+      "id": "D03",
+      "type": "SUPPORTED_IMPLEMENTATION",
+      "severity": "INFO",
+      "status": "SUPPORTED_BY_SOURCE_AND_SUPPLIED_CPU",
+      "title": "原S/历史H目标、评分、默认参数与身份实际接通",
+      "evidence": [
+        {
+          "file": "scripts/step28_continual_defaults.py",
+          "location": "L13-L80",
+          "meaning": "arm、is_record、lambda/LR固定，原objective/score派发，继承Method使用新adapter"
+        },
+        {
+          "file": "scripts/step28_record_replay.py",
+          "location": "L113-L182; L211-L231",
+          "meaning": "均值、原rank、双视图/教师和实际VJP/score"
+        },
+        {
+          "file": "scripts/step28_g_half.py",
+          "location": "L39-L92; L109-L122",
+          "meaning": "历史混合池化、原rank、教师和实际评分"
+        },
+        {
+          "file": "scripts/step28_continual_five.py",
+          "location": "L145-L219; L239-L259",
+          "meaning": "身份绑定、单位倍率实际LR、更新及恢复"
+        }
+      ],
+      "impact": "没有发现只改名称或配置未生效；H_default不是H_pos仅改参数。metadata中的S_pos仅取均值身份，optuna_trial/self.tuned不是study执行。",
+      "minimum_recommendation": "保留现有薄适配器和明确语义；无需改配置平台或重写训练器。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "CURRENT_METHOD_ACCEPTANCE"
+    },
+    {
+      "id": "D04",
+      "type": "EVIDENCE_LIMITATION",
+      "severity": "INFO",
+      "status": "SUPPORTED_WITH_LIMITS",
+      "title": "三CPU测试足以支持新数值派发；范围不扩为整轨迹/GPU/全部恢复变体",
+      "evidence": [
+        {
+          "file": "tests/test_step28_continual_defaults.py",
+          "location": "L18-L36; L58-L194",
+          "meaning": "独立参考/12错误变体、真实Tiny更新、完整恢复下一步、推理同对象回读、空Memory及config截断"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/cpu01/objectives.json",
+          "location": "L1",
+          "meaning": "12变体梯度差均大于1e-7"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/qualification/cpu01/updates_restore.json",
+          "location": "L1",
+          "meaning": "参数/Adam/恢复已保存结果"
+        },
+        {
+          "file": "scripts/step28_defaults_cpu.py",
+          "location": "L22-L61",
+          "meaning": "CPU包装采样/计费的实际口径"
+        }
+      ],
+      "impact": "不能称已执行624前置步、864完整步、18GPU轨迹、完整非空Memory或系统I/O隔离；同未扰动对象推理回读单独不能排除no-op。旧恢复底座未变且完整恢复下一步有实质证据，因此不自动追加测试。",
+      "minimum_recommendation": "保留手写/Tiny/624/空Memory/config/采样资源等限定；可补充同对象推理回读的范围说明。D01不在wiring覆盖内，需单独小修。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "EVIDENCE_SCOPE_ONLY"
+    },
+    {
+      "id": "D05",
+      "type": "DEFERRED_FORMAL_CONDITION",
+      "severity": "INFO",
+      "status": "NOT_YET_AUTHORIZED_OR_IMPLEMENTED_BY_DESIGN",
+      "title": "正式18条累计预算、队列、数据和评价门只在后续范围确定时落实",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/authorization.json",
+          "location": "L20-L22",
+          "meaning": "正式训练、新评价数据、借用旧490/822小时均为false"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/implementation.zh.txt",
+          "location": "L12-L21",
+          "meaning": "明确单轨迹入口已交付、正式编排和评价未擅定"
+        },
+        {
+          "file": "scripts/step28_continual_defaults_run.py",
+          "location": "L37-L42",
+          "meaning": "独立scope/campaign/train_data/fresh检查"
+        },
+        {
+          "file": "scripts/step28_continual_five_run.py",
+          "location": "L219-L232",
+          "meaning": "实际来源与精确身份列表检查"
+        }
+      ],
+      "impact": "缺少本轮正式门/累计预算/队列不是当前接口伪实现；旧45门不能用于新18。继承Budget数字不等于新总额许可。",
+      "minimum_recommendation": "用户确定正式范围后再绑定独立campaign、18身份及修订来源，明确累计预算、资源和评价数据/共同评分/开放角色；现在不生成新框架。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "ONLY_AFTER_FORMAL_PLAN_AND_AUTHORIZATION"
+    },
+    {
+      "id": "D06",
+      "type": "SCIENTIFIC_INTERPRETATION_BOUNDARY",
+      "severity": "INFO",
+      "status": "SUPPORTED_WITH_LIMITS",
+      "title": "已选参数、rank、历史0.5221与已见120群须分开解释",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/implementation.zh.txt",
+          "location": "L12; L19-L22",
+          "meaning": "协议变化和比较边界"
+        },
+        {
+          "file": "scripts/step28_continual_five.py",
+          "location": "L19-L22; L75-L78",
+          "meaning": "原tuned参数和当前随机根"
+        },
+        {
+          "file": "docs/SELLER_ALIAS_G_HALF.zh.md",
+          "location": "L49-L57",
+          "meaning": "历史单s0 AB与旧随机根"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt",
+          "location": "L30-L49",
+          "meaning": "旧主门false、已见确认和外推限制"
+        }
+      ],
+      "impact": "S_tuned−S_default只能看已选两参数整体效果；H_pos_tuned−H_default混合rank与参数；当前三阶段新seed不保证复现旧0.5221；旧120群复用是事后诊断。",
+      "minimum_recommendation": "保留ABC阶段2旧A历史对应端点和完整三阶段O/N/Z、取得水平/F；不单独归因Optuna、不翻旧主门；需要独立新确认时另定共同评分范围，不自动加臂。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "FUTURE_REPORTING_AND_EVALUATION_SCOPE"
+    },
+    {
+      "id": "D07",
+      "type": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "status": "REJECT_AS_CURRENT_REQUIREMENT",
+      "title": "不因默认方法适配扩张研究或重开旧GPU/历史实现",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261026/continual_defaults/review/request.zh.txt",
+          "location": "L9-L16",
+          "meaning": "用户明确限定最小增量、继承证据、禁止自动扩臂/预算/数据"
+        },
+        {
+          "file": "reports/documentation/20261026/continual_defaults/implementation.zh.txt",
+          "location": "L15-L22",
+          "meaning": "旧适用证据复用和未定正式范围"
+        }
+      ],
+      "impact": "新HPO、H_pos_default第三臂、额外seed/顺序/epoch诊断、全历史回归、GPU全网格、DDP、通用平台均无当前必要性。",
+      "minimum_recommendation": "只修D01并准确记录边界；不审/改活动L²R/GCR，不恢复已关闭GPU审查。",
+      "must_fix_before_current_implementation_delivery": false,
+      "blocks_scientific_method_acceptance": false,
+      "requires_new_research_or_gpu": false,
+      "phase": "OUT_OF_SCOPE"
+    }
+  ]
+}

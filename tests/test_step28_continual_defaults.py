@@ -2,6 +2,7 @@
 import copy
 import os
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -54,6 +55,49 @@ def fixture(name, step=624):
 class DefaultsTests(unittest.TestCase):
     def evidence(self, name, row):
         m.data.write_json(Path(os.environ["DEFAULTS_TEST_ROOT"])/(name+".json"), row)
+
+    def test_cli_rejection_preserves_paths_and_original_error(self):
+        with tempfile.TemporaryDirectory(dir=os.environ["DEFAULTS_TEST_ROOT"]) as temporary:
+            root = Path(temporary)
+            job, gate_path, spec_path = root/"job", root/"gate.json", root/"spec.json"
+            spec = m.specifications()[0]
+            m.data.write_json(spec_path, spec.identity())
+            gate = dict(scope="original_s_h_three_stage", train_data=True, campaign=str(root.resolve()))
+            command = ["defaults", "--job", str(job), "--spec", str(spec_path),
+                       "--deadline", "99999", "--gate", str(gate_path)]
+            with mock.patch.object(sys, "argv", command):
+                m.data.write_json(gate_path, {**gate, "train_data": False})
+                with self.assertRaisesRegex(ValueError, "Fresh independently authorized"):
+                    run.main()
+                self.assertFalse(job.exists())
+                m.data.write_json(gate_path, gate)
+                error = RuntimeError("before_job_creation")
+                with mock.patch.object(run.inherited, "execute", side_effect=error):
+                    with self.assertRaises(RuntimeError) as caught:
+                        run.main()
+                    self.assertIs(caught.exception, error)
+                self.assertFalse(job.exists())
+                job.mkdir()
+                original = b"prior failure must remain unchanged\n"
+                (job/"failure.json").write_bytes(original)
+                with mock.patch.object(run.inherited, "execute") as inherited:
+                    with self.assertRaisesRegex(ValueError, "Fresh independently authorized"):
+                        run.main()
+                    inherited.assert_not_called()
+                self.assertEqual(list(job.iterdir()), [job/"failure.json"])
+                self.assertEqual((job/"failure.json").read_bytes(), original)
+                (job/"failure.json").unlink()
+                job.rmdir()
+                def accepted_failure(*args, **kwargs):
+                    job.mkdir()
+                    raise RuntimeError("after_owned_job_creation")
+                with mock.patch.object(run.inherited, "execute", side_effect=accepted_failure):
+                    with self.assertRaisesRegex(RuntimeError, "after_owned_job_creation"):
+                        run.main()
+                self.assertEqual(m.data.read_json(job/"failure.json")["status"], "STOP_NO_RETRY")
+        self.evidence("cli_rejection", dict(early_error_preserved=True, absent_job_not_created=True,
+            existing_job_unchanged=True, accepted_job_failure_recorded=True,
+            downstream_run_simulated=True, actual_native_updates=0))
 
     def test_original_objectives_and_missing_operations(self):
         group = handmade_group("current")
