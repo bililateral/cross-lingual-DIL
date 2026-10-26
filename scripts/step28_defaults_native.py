@@ -1,4 +1,4 @@
-"""Two sequential BGE checks; requires a separate, source-bound GPU authorization."""
+"""One historical-H BGE check; requires a source-bound GPU authorization."""
 from __future__ import annotations
 
 import time
@@ -18,7 +18,7 @@ import step28_continual_five_verify as verified
 GIB = 2**30
 LIMITS = dict(allocator_bytes=int(9.25*GIB), rss_bytes=32*GIB, disk_bytes=12*GIB,
               small_bytes=256*2**20, free_reserve_bytes=64*GIB, free_gpu_bytes=int(10.25*GIB))
-METHODS = m.METHODS
+METHODS = ("H_default",)
 
 
 def sources() -> list[dict]:
@@ -39,7 +39,7 @@ def authorization(path: Path, job: Path) -> dict:
     if (row.get("status") != "APPROVED_ORIGINAL_DEFAULTS_NATIVE"
             or row.get("job") != str(job.resolve()) or row.get("methods") != list(METHODS)
             or row.get("limits") != LIMITS or row.get("sources") != sources()
-            or row.get("max_update_calls") != 6 or row.get("handwritten_only") is not True
+            or row.get("max_update_calls") != 3 or row.get("handwritten_only") is not True
             or row.get("sharing") not in ("idle_only", "current_comparison")
             or type(seconds) not in (int, float) or not 60 < seconds < float("inf")):
         raise ValueError("Separate GPU scope, allocation and exact sources must be approved")
@@ -119,7 +119,7 @@ def controller(job: Path, approval_path: Path) -> dict:
                         elapsed_seconds=time.monotonic()-started))
                     m.data.write_json(job/"status.json", result)
                 if code != 0:
-                    raise RuntimeError("Native worker failed; no retry or second arm")
+                    raise RuntimeError("Native worker failed; no retry")
                 outcome = m.data.read_json(child_job/"result.json")
                 if (outcome.get("status") != "PASS_NATIVE_HANDWRITTEN" or outcome.get("attempted_calls") != 3
                         or outcome.get("actual_calls") != 3 or outcome.get("spec") != m.Spec(name, "ABC", 4).identity()
@@ -127,7 +127,7 @@ def controller(job: Path, approval_path: Path) -> dict:
                         or outcome.get("outer_checkpoint_equals_legacy") is not False
                         or not outcome.get("actual_next_update_equal") or not outcome.get("inference_equal")):
                     raise ValueError("Native worker receipt does not prove the required fixed scope")
-            result["status"] = "COMPLETE_TWO_ORIGINAL_NATIVE_CHECKS"
+            result["status"] = "COMPLETE_ORIGINAL_H_NATIVE_CHECK"
     except BaseException:
         result.update(status="FAILED_STOP_NO_RETRY", traceback=traceback.format_exc())
         raise

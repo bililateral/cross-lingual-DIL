@@ -1,5 +1,5 @@
 {
-  "status": "RECOVERED_AND_INDEPENDENTLY_DISPOSED_PENDING_GPU_SCOPE",
+  "status": "RECOVERED_DISPOSED_AND_AUTHORIZED_NATIVE_COMPLETED",
   "completed_at": "2026-10-26T13:03:18.481+08:00",
   "conversation_url": "https://chatgpt.com/c/6adadcc3-d608-83ea-b542-323e35022c4a",
   "input": {
@@ -42,23 +42,12 @@
     ],
     "pretrained_model_loads": 0,
     "gpu": false,
-    "formal_data_reads": 0
+    "formal_data_reads": 0,
+    "subsequent_attempt": "cpu07",
+    "latest_cumulative_seconds": 51
   },
-  "recommended_gpu_scope": {
-    "status": "PROPOSED_NOT_APPROVED",
-    "methods": [
-      "H_default"
-    ],
-    "order": "ABC",
-    "seed": 4,
-    "max_update_calls": 3,
-    "total_seconds": 900,
-    "sharing": "idle_only",
-    "requires_no_pending_gpu_dispatch": true,
-    "code_still_two_methods_pending_scope_decision": true
-  },
-  "gpu_execution_authorized": false,
-  "gpu_execution_started": false,
+  "gpu_execution_authorized": true,
+  "gpu_execution_started": true,
   "formal18_budget_and_evaluation_not_approved": true,
   "visible_model": "GPT-6",
   "visible_effort": "Pro (5/5)",
@@ -76,5 +65,44 @@
     "linux_frozen_cpu_workspace_retained": true,
     "input_review_zip_retained": true
   },
-  "ssh_closed": true
+  "ssh_closed": true,
+  "subsequent_user_decision": {
+    "quotes": [
+      "直接开始检验",
+      "直接运行，不要空卡再运行",
+      "批准，原预算余额内重启一次"
+    ],
+    "supersedes_idle_only": true,
+    "execution_record": "../../native_execution/status.json"
+  },
+  "native_completion": {
+    "status": "COMPLETE_H_NATIVE_WITH_RETAINED_FIRST_FAILURE",
+    "actual_update_calls": 3,
+    "aggregate_charged_seconds": 171,
+    "total_approved_seconds": 900
+  },
+  "review_time_recommendation": {
+    "status": "H_ONLY_SELECTED_BY_USER_THEN_SHARING_OVERRIDDEN_TO_CURRENT_COMPARISON",
+    "methods": [
+      "H_default"
+    ],
+    "order": "ABC",
+    "seed": 4,
+    "max_update_calls": 3,
+    "total_seconds": 900,
+    "sharing": "idle_only",
+    "requires_no_pending_gpu_dispatch": true,
+    "code_still_two_methods_pending_scope_decision": false
+  },
+  "current_execution_scope": {
+    "methods": [
+      "H_default"
+    ],
+    "sharing": "current_comparison",
+    "original_total_seconds": 900,
+    "aggregate_charged_seconds": 171,
+    "actual_update_calls": 3,
+    "status": "COMPLETE",
+    "authorization": "../../native_execution/authorization.json"
+  }
 }

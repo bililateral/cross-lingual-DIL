@@ -17,7 +17,7 @@ import step28_defaults_native as n
 
 def approval(job):
     return dict(status="APPROVED_ORIGINAL_DEFAULTS_NATIVE", job=str(job.resolve()),
-        methods=list(n.METHODS), limits=n.LIMITS, sources=n.sources(), max_update_calls=6,
+        methods=list(n.METHODS), limits=n.LIMITS, sources=n.sources(), max_update_calls=3,
         handwritten_only=True, sharing="idle_only", total_seconds=120)
 
 
@@ -130,7 +130,7 @@ class NativeEntryTests(unittest.TestCase):
                  original_adapter_and_bounded_allocator_selected=True, gpu_calls_simulated=True,
                  actual_bge_loads=0, actual_native_updates=0))
 
-    def test_sequential_deadline_and_stop_without_retry(self):
+    def test_single_h_deadline_and_stop_without_retry(self):
         evidence = []
         for failure in (None, "nonzero", "timeout", "invalid_result"):
             root = self.temporary()
@@ -159,9 +159,10 @@ class NativeEntryTests(unittest.TestCase):
                     mock.patch.object(n.subprocess, "run", side_effect=simulated):
                 if failure is None:
                     result = n.controller(job, auth)
-                    self.assertEqual(result["status"], "COMPLETE_TWO_ORIGINAL_NATIVE_CHECKS")
+                    self.assertEqual(result["status"], "COMPLETE_ORIGINAL_H_NATIVE_CHECK")
                     self.assertEqual([c[0] for c in calls], list(n.METHODS))
-                    self.assertEqual(calls[0][1], calls[1][1])
+                    self.assertEqual([c[0] for c in calls], ["H_default"])
+                    self.assertEqual(calls[0][1], n.STARTED+row["total_seconds"])
                 else:
                     with self.assertRaises((RuntimeError, ValueError)):
                         n.controller(job, auth)
