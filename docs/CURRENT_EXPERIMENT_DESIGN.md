@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-当前原版补充实现（2026-10-26）：用户指定S_default＋历史H（G_half），已按[最小实现范围](../reports/documentation/20261026/continual_defaults/implementation.zh.txt)接入原训练器并完成限定手写CPU（7/120秒）。[新实现外审](../reports/documentation/20261026/continual_defaults/review/submission.json)11:26单次提交原GPT-6/Pro会话，正在生成。只复用原公式/三阶段框架并新增显式配置接线，不增加H_pos_default；正式18条预算、评价数据/开封及执行门尚未确定，活动下方L²R/GCR队列不改。完整状态见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+当前原版补充实现（2026-10-26）：用户指定S_default＋历史H（G_half），已按[最小实现范围](../reports/documentation/20261026/continual_defaults/implementation.zh.txt)接入原训练器并完成方法及新增入口限定手写CPU（累计19/120秒）。[新实现外审](../reports/documentation/20261026/continual_defaults/review/submission.json)11:26单次提交原GPT-6/Pro会话，提交时观测正在生成。随后按用户要求完成[GPU原生入口](../reports/documentation/20261026/continual_defaults/native.zh.txt)，尚未执行；该增量不在已提交包内，GPU额度/共享安排尚待明确。只复用原公式/三阶段框架并新增显式配置接线，不增加H_pos_default；正式18条预算、评价数据/开封及执行门尚未确定，活动下方L²R/GCR队列不改。完整状态见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
 当前新对照执行（2026-10-26）：用户已批准822小时完整预算、18条L²R／ER+GCR训练及后续固定新确认，明确仅本次新增编排免外审。按[执行范围](../reports/documentation/20261026/continual_comparison/execution.zh.txt)及[独立处置](../reports/documentation/20261026/continual_comparison/primary.zh.txt)，复用原算法资格和H/S54状态，独立三路已实际开训；实时进度统一见[交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。原45条不重训，旧失败不清零；下方历史“新18条／新确认／独立预算未授权”已被最新明确决定取代，不恢复为阻断。算法、评价判据及未来结果审查不在新增编排免审范围内。
 

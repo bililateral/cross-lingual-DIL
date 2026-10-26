@@ -17,6 +17,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", type=Path, required=True)
     parser.add_argument("--prior", type=int, required=True)
+    parser.add_argument("--suite", choices=("methods", "native-entry"), default="methods")
+    parser.add_argument("tests", nargs="*")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     if not 0 <= args.prior < 120 or args.job.exists():
@@ -30,7 +32,8 @@ def main():
     environment = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1",
         TOKENIZERS_PARALLELISM="false", CUDA_VISIBLE_DEVICES="", PYTHONDONTWRITEBYTECODE="1",
         DEFAULTS_TEST_ROOT=str(args.job), PYTHONPATH=str(root/"scripts")+":"+str(root/"tests"))
-    command = [sys.executable, "-B", str(root/"tests/test_step28_continual_defaults.py")]
+    test_file = "test_step28_continual_defaults.py" if args.suite == "methods" else "test_step28_defaults_native.py"
+    command = [sys.executable, "-B", str(root/"tests"/test_file), *args.tests]
     started, peak, reason = time.monotonic(), 0, None
     with (args.job/"console.txt").open("w") as output:
         child = subprocess.Popen(command, cwd=root, env=environment, stdout=output, stderr=subprocess.STDOUT,

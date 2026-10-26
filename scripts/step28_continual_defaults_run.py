@@ -14,9 +14,10 @@ data = method.data
 CONTEXT = "reports/documentation/20261026/continual_defaults"
 
 
-def sources() -> list[dict]:
+def sources(extra_paths: tuple[str, ...] = ()) -> list[dict]:
     paths = {data.ROOT/p for p in (
         "scripts/step28_continual_defaults_run.py", "tests/test_step28_continual_defaults.py")}
+    paths.update(data.ROOT/p for p in extra_paths)
     todo = list(paths)
     while todo:
         for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):

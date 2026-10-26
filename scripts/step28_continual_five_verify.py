@@ -33,17 +33,20 @@ def resources() -> dict:
                 disk_available_bytes=__import__("shutil").disk_usage(m.data.ROOT).free)
 
 
-def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> dict:
+def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None, *,
+           implementation=m, allocator_bytes=None, compare_legacy=None,
+           source_files=None, budget_factory=run.Budget) -> dict:
     import torch
     sys.path.insert(0, str(m.data.ROOT/"tests"))
     from test_step28_record_replay import handmade_group
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
     m.parent.configure_numerics()
-    allocator = ALLOCATOR_BYTES if barrier else 28*2**30
+    compare_legacy = barrier is None if compare_legacy is None else compare_legacy
+    allocator = (ALLOCATOR_BYTES if barrier else 28*2**30) if allocator_bytes is None else allocator_bytes
     torch.cuda.set_per_process_memory_fraction(allocator/torch.cuda.get_device_properties(0).total_memory)
-    budget = run.Budget(job.parent, deadline, tail=15)
-    c, method = m.config(spec), m.Method(spec)
+    budget = budget_factory(job.parent, deadline, tail=15)
+    c, method = implementation.config(spec), implementation.Method(spec)
     measurements, calls = {}, []
     def progress(event):
         m.data.write_json(job/"progress.json", dict(event=event, attempted_calls=len(calls), calls=calls,
@@ -68,8 +71,10 @@ def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> di
     if any(archive[k] != c["models"]["split_rank"][k] for k in ("file_count", "total_size_bytes", "content_sha256")):
         raise ValueError("Native pretrained archive differs")
     model, optimizer = timed("load", lambda: method.fresh(c))
-    if barrier is None:
+    if compare_legacy:
         model.encoder._five_outer_checkpoint = False  # Named qualification comparator only.
+    elif not model.encoder._five_outer_checkpoint:
+        raise ValueError("Production outer checkpoint must remain enabled")
     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
         raise ValueError("Required BF16/checkpointing unavailable")
     current, history = [handmade_group("native_"+role, 8, 254) for role in ("current", "history")]
@@ -129,9 +134,9 @@ def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> di
         native_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
         native_peak_reserved_bytes=torch.cuda.max_memory_reserved(), allocator_cap_bytes=allocator,
         full_bytes=full["bytes"], inference_bytes=inference["bytes"], resources=budget.snapshot(),
-        actual_next_update_equal=True, outer_checkpoint_equals_legacy=barrier is None,
+        actual_next_update_equal=True, outer_checkpoint_equals_legacy=compare_legacy,
         inference_equal=True, maximum_shape=[224, 256], archive=archive,
-        retired_temporary_states=files, source_files=run.sources())
+        retired_temporary_states=files, source_files=run.sources() if source_files is None else source_files)
     m.data.write_json(job/"result.json", result)
     for p in (path, inference_path):
         m.base.persistence.remove_work_file(p, job)
