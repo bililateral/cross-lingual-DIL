@@ -1874,3 +1874,9 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 具体836755字节、SHA256 6a792263593188bbf89217f928de67626588b11bb5c329c81151e2f63aa9ff63实现ZIP初次上传被自动审批因缺少具体载荷/目的地授权拒绝。用户随后对该完整包明确答复“批准该完整包上传并外审”，见[具体授权](../reports/documentation/20261023/continual_implementation/review/authorization.json)。15:49经本地Playwright在原会话成功单次提交，见[回执](../reports/documentation/20261023/continual_implementation/review/submission.json)。GPU修复继续免审，本次审查新增方法/第三阶段/预算控制/确认统计实现，不扩大研究范围或预算。
 
 用户随后询问：“外审结束后你审核完毕就能正式启动训练了吧”。按已有完整训练授权，外审回收、独立处置及必要修复/资源/预算前提满足后直接启动，不再重复申请相同许可。完整报告回收后修复I01—I03，CPU增量三项/5秒通过；2026-10-23 16:26:59正式三路启动，16:28:19确认三个独立worker均实际更新。没有增加方法、HPO、数据、顺序、seed或预算；原GPU问题修复豁免不扩大为结果免审。见[独立主审](../reports/documentation/20261023/continual_implementation/review/primary_disposition.zh.txt)及[当前实际状态](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
+
+## 2026-10-26 五方法已完成结果的独立分析
+
+用户原话：“实验已结束，文件都已同步回来了，你来仔细分析”。该指令使工作从前一轮仅回收／机械核对推进到已开放结果的独立分析；没有新增训练、候选、数据或预算授权。按冻结五方法合同，在Linux既有py310从保存结果复核配对统计和已保存分类／query／校准对应，不重新读取标签、载模或推理。首轮Memory元数据字段适配失败1秒及修正后成功4秒保留，计入原A1800秒桶，正式原件不覆盖。
+
+[完整报告](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)保留原主要门失败：H−S旧域最终MAP正向，但遗忘差区间跨零；取得水平、逐域和顺序／seed反转、概率及误报代价、基线开发机会与条件区间边界均独立解释。材料形成时未获新包许可；随后用户对9017557字节、SHA256 b89c158f49315e9dc9db660163e7047f907fd29ec63946ddbcdd07b2f32da963的完整结果包明确答复“批准该完整结果包上传并外审”。10:13经指定本地Playwright单次提交原GPT-6/Pro会话并确认正在生成，见[具体授权与提交](../reports/seller_alias_continual/20261026/continual_result/review/submission.json)。本许可仅结果外审；两新对照执行及额度按另行最新决定，不由本轮借用原余额或扩大。
