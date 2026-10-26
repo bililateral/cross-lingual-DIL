@@ -1889,3 +1889,5 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 用户原话：“实验已结束，文件都已同步回来了，你来仔细分析”。该指令使工作从前一轮仅回收／机械核对推进到已开放结果的独立分析；没有新增训练、候选、数据或预算授权。按冻结五方法合同，在Linux既有py310从保存结果复核配对统计和已保存分类／query／校准对应，不重新读取标签、载模或推理。首轮Memory元数据字段适配失败1秒及修正后成功4秒保留，计入原A1800秒桶，正式原件不覆盖。
 
 [完整报告](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)保留原主要门失败：H−S旧域最终MAP正向，但遗忘差区间跨零；取得水平、逐域和顺序／seed反转、概率及误报代价、基线开发机会与条件区间边界均独立解释。材料形成时未获新包许可；随后用户对9017557字节、SHA256 b89c158f49315e9dc9db660163e7047f907fd29ec63946ddbcdd07b2f32da963的完整结果包明确答复“批准该完整结果包上传并外审”。10:13经指定本地Playwright单次提交原GPT-6/Pro会话并确认正在生成，见[具体授权与提交](../reports/seller_alias_continual/20261026/continual_result/review/submission.json)。本许可仅结果外审；两新对照执行及额度按另行最新决定，不由本轮借用原余额或扩大。
+
+用户随后告知“外审已结束”。10:34起从原会话完整回收本轮结果报告及11项附件，按[独立主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)处置R01—R09：Memory元数据口径已纠正，两处文字及现成不利次级结果追加勘误，原H−S共同主门false不改。未新增科研执行或SSH，专用页已关闭；新对照822小时及三路运行继续遵从另行有效授权。本轮原件、独立核对和[回收记录](../reports/seller_alias_continual/20261026/continual_result/review/recovery.json)仅Windows/本地Git保管，不冒称已同步Linux。

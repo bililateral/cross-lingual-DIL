@@ -1,0 +1,320 @@
+{
+  "review": "2026-10-26 formal results external review",
+  "input_sha256": "b89c158f49315e9dc9db660163e7047f907fd29ec63946ddbcdd07b2f32da963",
+  "model": {
+    "visible_self_description": "GPT-6 Astra Pro",
+    "backend_identity_independently_verified": false
+  },
+  "verdict": {
+    "primary_pass": false,
+    "confirmed_scientific_blockers": 0,
+    "confirmed_reproducibility_defects": 1,
+    "reproducibility_defect_severity": "LOW",
+    "core_scientific_conclusion_supported": true,
+    "mandatory_new_experiments": 0,
+    "needs_minor_report_errata": true,
+    "authorization_granted_by_review": false
+  },
+  "classification_note": "主门失败不是SCIENTIFIC_BLOCKER；R01为已证实低级复现/审计口径缺陷；R02为编辑精确化；R04为可选解释补充；未核范围不当作推定错误。",
+  "findings": [
+    {
+      "id": "R01",
+      "type": "REPRODUCIBILITY_DEFECT",
+      "severity": "LOW",
+      "status": "CONFIRMED",
+      "title": "账号Memory辅助状态字节被新增审计重复相加",
+      "evidence": [
+        {
+          "file": "scripts/step28_bge_continual.py",
+          "location": "L191-L207; L231-L239",
+          "meaning": "完整payload已含auxiliary，serialized_bytes是总量"
+        },
+        {
+          "file": "scripts/step28_continual_result_audit.py",
+          "location": "L148-L152; L297",
+          "meaning": "账号分支将总量与子量再次相加并汇总范围"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/BCA_s4_ER0.1_ref/run/completion.json",
+          "location": "/points/2/memory/bytes; /points/2/memory_summary/{serialized_bytes,auxiliary_serialized_bytes}",
+          "meaning": "188788总量+28040子量=原错误最小值216828"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L22",
+          "meaning": "范围沿用错误最小值"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/audit02/audit.json",
+          "location": "/memory_bytes_min",
+          "meaning": "原审计结果216828"
+        }
+      ],
+      "impact": "保存尺寸记录范围应为188788—364137字节；最大值及≤1MiB判断不变，不影响训练、指标、统计或主门。",
+      "minimum_disposition": "追加尺寸口径勘误；如维护审计代码，只将账号分支改取serialized_bytes并核对point.memory.bytes。保留原audit01/audit02。无需重读Memory、重训、推理、重采统计或GPU外审。",
+      "required_for_accurate_report": true,
+      "changes_scientific_conclusion": false,
+      "reviewer_evidence": "execution_mechanical.json#/memory_metadata_arithmetic",
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R02",
+      "type": "REPORTING_CLARIFICATION",
+      "severity": "LOW",
+      "status": "CONFIRMED",
+      "title": "两处报告字面范围需精确化",
+      "evidence": [
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L86",
+          "meaning": "本次12次Optuna机会可与本批零新增HPO混淆"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L149",
+          "meaning": "各格存在未定义群的字面范围过宽"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/confirmation/metrics_ABC_s5_H_pos_tuned_3_2_stage-cal.json",
+          "location": "/counts; /values",
+          "meaning": "该矩阵40群均有正预测，precision/MCC有定义"
+        }
+      ],
+      "impact": "当前结果或协议没有改变；实际694/864矩阵含未定义群，170矩阵全部有定义。",
+      "minimum_disposition": "改为此前固定AB阶段各12次Optuna开发机会、本批沿用；改各格为部分评分格。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "reviewer_evidence": "metrics_calculation.json#/matrix_na_coverage",
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false,
+      "editorial_recommendation": true
+    },
+    {
+      "id": "R03",
+      "type": "SCIENTIFIC_CONCLUSION",
+      "severity": "INFO",
+      "status": "SUPPORTED",
+      "title": "最终旧域MAP条件优势保留，额外抗遗忘主门未通过",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/analysis/result.json",
+          "location": "/comparisons/H_pos_tuned-S_tuned/raw; /primary; /primary_pass",
+          "meaning": "O下界正、F上界仍正；N/Z点为正"
+        },
+        {
+          "file": "scripts/step28_continual_five_evaluate.py",
+          "location": "L225-L305",
+          "meaning": "冻结端点和交集门"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "location": "L69-L81",
+          "meaning": "事前判据"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L28-L53; L90-L120",
+          "meaning": "正确保留F不确定和路径反向"
+        }
+      ],
+      "impact": "主门false不是实验无效；不能升级为额外抗遗忘、等价、正式非劣或因果比例。",
+      "minimum_disposition": "保留false及限定结论；不得用探索性结果或改判据翻转。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "reviewer_evidence": "independent_recalculation.json#/primary_conditions",
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R04",
+      "type": "REASONABLE_REPORTING_SUGGESTION",
+      "severity": "LOW",
+      "status": "OPTIONAL",
+      "title": "正文可补两条已披露的次级代价",
+      "evidence": [
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/audit02/tables.zh.txt",
+          "location": "L1903; L1913",
+          "meaning": "raw旧域O的F1/recall条件差为负"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/audit02/tables.zh.txt",
+          "location": "L1852",
+          "meaning": "Recall@FPR≤1%的F差为正，双方自身F均负"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/analysis/result.json",
+          "location": "/comparisons/H_pos_tuned-S_tuned/raw",
+          "meaning": "完整次级统计"
+        }
+      ],
+      "impact": "完整22指标表已经披露，不属于选择性隐藏；便于读者理解raw阈值退步及低FPR召回的较少后续提升。",
+      "minimum_disposition": "可补两句解释现成结果，标明探索性。无需变阈值、重跑统计、加诊断或新增主门。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R05",
+      "type": "EVIDENCE_BOUNDARY",
+      "severity": "INFO",
+      "status": "SUPPORTED_WITH_LIMITS",
+      "title": "六基线比较限于预定固定系统探索",
+      "evidence": [
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L57-L86; L163-L165",
+          "meaning": "探索性及开发机会不对称已披露"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_baselines/proposal.zh.txt",
+          "location": "L41-L43; L77-L79",
+          "meaning": "固定ref配置与主要H−S目标"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261023/optuna_result/job/selected.json",
+          "location": "selected configuration records",
+          "meaning": "S/H沿用历史完整精度参数"
+        }
+      ],
+      "impact": "不能升级为方法家族最优公平竞赛或单模块因果；当前目标不要求新增36次搜索。",
+      "minimum_disposition": "保留ref/tuned开发机会差异、六比较探索性和无家族调整的说明。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R06",
+      "type": "EXECUTION_ACCOUNTING",
+      "severity": "INFO",
+      "status": "VERIFIED_METADATA_ONLY",
+      "title": "45身份和费用承接在提供回执层面一致",
+      "evidence": [
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/completion.json",
+          "location": "/run_ids; /receipts; /budget; /sources",
+          "meaning": "精确45，49成功任务和最终账"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/recovery.json",
+          "location": "reused/pending/prior attempt and budget records",
+          "meaning": "24复用+21固定身份重试，旧失败保留"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/budget.json",
+          "location": "used/limits/cumulative receipt records",
+          "meaning": "累计账在各冻结桶内"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/evaluation_access.json",
+          "location": "/events",
+          "meaning": "三个既定逻辑读取角色"
+        }
+      ],
+      "impact": "含本地两次审计5秒为143.287910091累计任务小时；不是墙钟或GPU占用。更早失败全日志和全部实际I/O没有在外审重演。",
+      "minimum_disposition": "保留本地回执依赖和失败承接，不将成功回执数等同全历史读取/更新数。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "reviewer_evidence": "execution_mechanical.json",
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R07",
+      "type": "UNVERIFIED_LIMITATION",
+      "severity": "INFO",
+      "status": "NOT_INDEPENDENTLY_VERIFIED",
+      "title": "标签级和载模级复现超出提供材料",
+      "evidence": [
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/review/request.zh.txt",
+          "location": "L1-L18",
+          "meaning": "输入范围明示省略NPY、标签、权重及Memory"
+        },
+        {
+          "file": "scripts/step28_continual_result_audit.py",
+          "location": "L1-L339",
+          "meaning": "本地审计依赖原workspace与数组"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/qualification/result_transfer_manifest.json",
+          "location": "/files; /scope",
+          "meaning": "本次提供原转移清单的917项，其余为范围内明确省略"
+        }
+      ],
+      "impact": "可独立复算已保存群指标统计，不能宣称已从标签重建AP/ROC/Brier/log-loss/query MAP或执行恢复。材料省略本身不是已证实缺陷。",
+      "minimum_disposition": "如实标注证据层级；不要求额外上传受限载荷，不将原本地成功回执冒充本次独立运行。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R08",
+      "type": "EVIDENCE_BOUNDARY",
+      "severity": "INFO",
+      "status": "SUPPORTED_WITH_LIMITS",
+      "title": "旧AB与同机制新确认的衔接合理但有明确外推边界",
+      "evidence": [
+        {
+          "file": "reports/seller_alias_continual/20261026/continual_result/report.zh.txt",
+          "location": "L151-L159",
+          "meaning": "历史衔接和训练世界/市场限制"
+        },
+        {
+          "file": "reports/seller_alias_continual/20261023/optuna_result/report.zh.md",
+          "location": "L30-L64; L89-L101; L151-L159",
+          "meaning": "旧AB有限结果和原门失败"
+        },
+        {
+          "file": "reports/documentation/20261024/continual_retry/formal/generation/result.json",
+          "location": "/root_seed; /namespace; /groups; /status",
+          "meaning": "同机制固定新seed/namespace与120群元数据"
+        }
+      ],
+      "impact": "不支持全部六顺序、独立新训练场景或真实市场泛化；条件区间未重采seed/order。",
+      "minimum_disposition": "保留原限制，不跨不同批次端点做未经设计的效应差显著性判断。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    },
+    {
+      "id": "R09",
+      "type": "OUT_OF_SCOPE_OVERDESIGN",
+      "severity": "INFO",
+      "status": "REJECT_AS_CURRENT_REQUIREMENT",
+      "title": "不因主门失败追加研究或重开豁免GPU复审",
+      "evidence": [
+        {
+          "file": "当前用户完整结果外审请求",
+          "location": "范围与最后段",
+          "meaning": "只结果外审，无训练、新数据、预算或更改冻结方案授权"
+        },
+        {
+          "file": "reports/documentation/20261023/continual_implementation/gpu_review_waiver.json",
+          "location": "provided waiver record",
+          "meaning": "GPU问题修复明确免外审"
+        }
+      ],
+      "impact": "自动增HPO/seed/顺序/臂/诊断/数据、全历史重跑、DDP或通用框架均非当前必要处置。",
+      "minimum_disposition": "本轮以已获数据和冻结判据结案；若未来改变目标另立研究与授权，不从剩余额度推导许可。",
+      "required_for_accurate_report": false,
+      "changes_scientific_conclusion": false,
+      "blocks_current_result": false,
+      "blocks_reporting_after_minor_errata": false,
+      "requires_new_experiment": false
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 # 科研文件存储与恢复
 
+## 2026-10-26 五方法结果外审回收与局部传输清理
+
+原会话完整结果外审已回收并独立处置，33743字节原文、网页DOM、11项附件及逐载荷清单保存在[review/external](../reports/seller_alias_continual/20261026/continual_result/review/external/review_report.zh.txt)，主审和具体保管事实见[回收记录](../reports/seller_alias_continual/20261026/continual_result/review/recovery.json)。返回ZIP为277771字节、SHA256 beafdd3d2e248b28f4e4df862f266a1a2feabda865f4ff742344ffd66c03f386，11载荷全部验证后删除review传输ZIP和浏览器同字节下载副本，共555542字节；无递归删除。原9017557字节输入ZIP是返回独立复算程序所需的精确冻结1000载荷目录来源，包含已勘误前审计源码，继续保留该实际复现依赖。原报告与audit01/02不覆盖，必要勘误另存。专用页已关闭，本轮无自动化、SSH或Linux文件变动，新回收材料仅Windows/本地Git；H/S54端点仍供另行批准新对照使用。本次局部传输清理不重置大清理周期。
+
 ## 2026-10-24 两种新持续学习对照的方案外审与权重依赖
 该次复审收尾：修订完整8376字符正文／146282字符DOM、独立处置及真实review_ready／放行原件两端保管，专用网页已关闭。新33514字节传输ZIP在确认13载荷逐项仍同字节、清单与审查原文保留后删除，见refill_revision/transport_cleanup.json；没有为删除而新建Linux整包备份。较早native／合并包尚未在该轮完成全载荷去重保管核对，不在该次局部删除中处理。等待610563放行后的资源等待、原24成功和两失败保管，以及该轮总文档／必要审查记录SFTP同步，均为当时事实；waiter02/released_status.json只对应该轮观测。后续载模OOM、失败账与失败载荷的接续保管，以[独立重试范围](../reports/documentation/20261024/continual_retry/scope.zh.txt)及[主审](../reports/documentation/20261024/continual_retry/primary.zh.txt)为准；最新运行状态统一从[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)进入，不用旧放行回执推定仍在训练，也不据旧同步事实声称后续材料已全部同步。
 
