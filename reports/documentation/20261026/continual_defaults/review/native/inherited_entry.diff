@@ -1,0 +1,123 @@
+diff --git a/scripts/step28_continual_defaults_run.py b/scripts/step28_continual_defaults_run.py
+index f0069514..1169af31 100644
+--- a/scripts/step28_continual_defaults_run.py
++++ b/scripts/step28_continual_defaults_run.py
+@@ -14,9 +14,10 @@ data = method.data
+ CONTEXT = "reports/documentation/20261026/continual_defaults"
+ 
+ 
+-def sources() -> list[dict]:
++def sources(extra_paths: tuple[str, ...] = ()) -> list[dict]:
+     paths = {data.ROOT/p for p in (
+         "scripts/step28_continual_defaults_run.py", "tests/test_step28_continual_defaults.py")}
++    paths.update(data.ROOT/p for p in extra_paths)
+     todo = list(paths)
+     while todo:
+         for node in ast.walk(ast.parse(todo.pop().read_text(encoding="utf-8"))):
+@@ -39,7 +40,15 @@ def execute(job: Path, spec: method.Spec, deadline: float, gate_path: Path) -> d
+     if (gate.get("scope") != "original_s_h_three_stage" or gate.get("train_data") is not True
+             or gate.get("campaign") != str(job.parent.resolve()) or job.exists()):
+         raise ValueError("Fresh independently authorized original-method trajectory required")
+-    return inherited.execute(job, spec, deadline, gate_path, implementation=method, source_files=sources())
++    try:
++        return inherited.execute(job, spec, deadline, gate_path, implementation=method, source_files=sources())
++    except BaseException as error:
++        # Only the accepted fresh run may create this directory. Early rejection
++        # keeps its original exception and never writes into a rejected old job.
++        if job.is_dir():
++            data.write_json(job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc(),
++                                                   status="STOP_NO_RETRY", time=time.time()))
++        raise
+ 
+ 
+ def main() -> None:
+@@ -49,12 +58,7 @@ def main() -> None:
+     parser.add_argument("--deadline", type=float, required=True)
+     parser.add_argument("--gate", type=Path, required=True)
+     args = parser.parse_args()
+-    try:
+-        execute(args.job, method.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
+-    except BaseException as error:
+-        data.write_json(args.job/"failure.json", dict(error=repr(error), traceback=traceback.format_exc(),
+-                                                    status="STOP_NO_RETRY", time=time.time()))
+-        raise
++    execute(args.job, method.Spec.from_dict(data.read_json(args.spec)), args.deadline, args.gate)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/scripts/step28_continual_five_verify.py b/scripts/step28_continual_five_verify.py
+index 2d43592f..a52aac6d 100644
+--- a/scripts/step28_continual_five_verify.py
++++ b/scripts/step28_continual_five_verify.py
+@@ -33,17 +33,20 @@ def resources() -> dict:
+                 disk_available_bytes=__import__("shutil").disk_usage(m.data.ROOT).free)
+ 
+ 
+-def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> dict:
++def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None, *,
++           implementation=m, allocator_bytes=None, compare_legacy=None,
++           source_files=None, budget_factory=run.Budget) -> dict:
+     import torch
+     sys.path.insert(0, str(m.data.ROOT/"tests"))
+     from test_step28_record_replay import handmade_group
+     torch.set_num_threads(1)
+     torch.set_num_interop_threads(1)
+     m.parent.configure_numerics()
+-    allocator = ALLOCATOR_BYTES if barrier else 28*2**30
++    compare_legacy = barrier is None if compare_legacy is None else compare_legacy
++    allocator = (ALLOCATOR_BYTES if barrier else 28*2**30) if allocator_bytes is None else allocator_bytes
+     torch.cuda.set_per_process_memory_fraction(allocator/torch.cuda.get_device_properties(0).total_memory)
+-    budget = run.Budget(job.parent, deadline, tail=15)
+-    c, method = m.config(spec), m.Method(spec)
++    budget = budget_factory(job.parent, deadline, tail=15)
++    c, method = implementation.config(spec), implementation.Method(spec)
+     measurements, calls = {}, []
+     def progress(event):
+         m.data.write_json(job/"progress.json", dict(event=event, attempted_calls=len(calls), calls=calls,
+@@ -68,8 +71,10 @@ def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> di
+     if any(archive[k] != c["models"]["split_rank"][k] for k in ("file_count", "total_size_bytes", "content_sha256")):
+         raise ValueError("Native pretrained archive differs")
+     model, optimizer = timed("load", lambda: method.fresh(c))
+-    if barrier is None:
++    if compare_legacy:
+         model.encoder._five_outer_checkpoint = False  # Named qualification comparator only.
++    elif not model.encoder._five_outer_checkpoint:
++        raise ValueError("Production outer checkpoint must remain enabled")
+     if not model.encoder[0].auto_model.is_gradient_checkpointing or not torch.cuda.is_bf16_supported():
+         raise ValueError("Required BF16/checkpointing unavailable")
+     current, history = [handmade_group("native_"+role, 8, 254) for role in ("current", "history")]
+@@ -129,9 +134,9 @@ def native(job: Path, spec: m.Spec, deadline: float, barrier: Path | None) -> di
+         native_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
+         native_peak_reserved_bytes=torch.cuda.max_memory_reserved(), allocator_cap_bytes=allocator,
+         full_bytes=full["bytes"], inference_bytes=inference["bytes"], resources=budget.snapshot(),
+-        actual_next_update_equal=True, outer_checkpoint_equals_legacy=barrier is None,
++        actual_next_update_equal=True, outer_checkpoint_equals_legacy=compare_legacy,
+         inference_equal=True, maximum_shape=[224, 256], archive=archive,
+-        retired_temporary_states=files, source_files=run.sources())
++        retired_temporary_states=files, source_files=run.sources() if source_files is None else source_files)
+     m.data.write_json(job/"result.json", result)
+     for p in (path, inference_path):
+         m.base.persistence.remove_work_file(p, job)
+diff --git a/scripts/step28_defaults_cpu.py b/scripts/step28_defaults_cpu.py
+index 67ee3a69..5bba93fb 100644
+--- a/scripts/step28_defaults_cpu.py
++++ b/scripts/step28_defaults_cpu.py
+@@ -17,6 +17,8 @@ def main():
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--job", type=Path, required=True)
+     parser.add_argument("--prior", type=int, required=True)
++    parser.add_argument("--suite", choices=("methods", "native-entry"), default="methods")
++    parser.add_argument("tests", nargs="*")
+     args = parser.parse_args()
+     root = Path(__file__).resolve().parents[1]
+     if not 0 <= args.prior < 120 or args.job.exists():
+@@ -30,7 +32,8 @@ def main():
+     environment = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1",
+         TOKENIZERS_PARALLELISM="false", CUDA_VISIBLE_DEVICES="", PYTHONDONTWRITEBYTECODE="1",
+         DEFAULTS_TEST_ROOT=str(args.job), PYTHONPATH=str(root/"scripts")+":"+str(root/"tests"))
+-    command = [sys.executable, "-B", str(root/"tests/test_step28_continual_defaults.py")]
++    test_file = "test_step28_continual_defaults.py" if args.suite == "methods" else "test_step28_defaults_native.py"
++    command = [sys.executable, "-B", str(root/"tests"/test_file), *args.tests]
+     started, peak, reason = time.monotonic(), 0, None
+     with (args.job/"console.txt").open("w") as output:
+         child = subprocess.Popen(command, cwd=root, env=environment, stdout=output, stderr=subprocess.STDOUT,
