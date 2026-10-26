@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-26 五臂中的三臂权重清理
+
+用户要求删除五臂模型权重，获知当前新对照仍需加载 H/S 后明确选择：‘保留 H/S 54份供后续确认，其余三臂权重删除（推荐）’。11:29:59（Asia/Shanghai）已删除 Linux 的 SEQ_ref、ER0.1_ref、LOGIT0.1_ref 各27份阶段权重，共81份独立载荷、105823904280字节（98.556191GiB）。原 formal_20261023、continual_recovery/formal、continual_retry/formal 之间存在硬链接，实际删除171个文件路径；按inode去重计空间，未将路径字节重复相加。81份实际SHA均与最终完成记录匹配，所有选中inode的链接均在清理范围且无打开句柄。逐路径与保留对象见[盘点原件](../reports/maintenance/20261026/five_weights/inventory.json)，实际删除与复核见[回执](../reports/maintenance/20261026/five_weights/receipt.json)，两端大小／SHA一致。
+
+H/S54端点共70436051280字节继续供新确认使用；其余7713个保留文件的inode／大小／mtime／链接数前后不变，含全部非权重证据及未选中的H/S、旧失败载荷。H/S此次按完成记录核对大小并验证元数据未变，所录SHA为原预期身份，不冒称本次重算54份散列。原指标、分数、Memory、日志、代码与审查结论保留；被删权重不能靠SHA恢复，重训仍需授权。Windows对应三目录无权重副本。盘点初次误尝试打开受保护owners文件被权限拒绝，未获取内容、未删除；修正为保留文件只查元数据。首次删除命令因终端折行抄错清单SHA在变更前停止，核实SHA后才执行；均如实留于回执。
+
+删除后当前新对照控制器1198791及三worker1198941／1198946／1198951仍在，campaign无failure.json；未停止、重启或修改冻结队列。删除后共享磁盘可用330027536384字节，仅作现场观察，不把共享空间变化全部归因本次。新清理说明仅Windows／本地Git，Linux保管盘点与删除回执；本次局部清理不重置大清理周期。
+
 ## 2026-10-26 五方法结果外审回收与局部传输清理
 
 原会话完整结果外审已回收并独立处置，33743字节原文、网页DOM、11项附件及逐载荷清单保存在[review/external](../reports/seller_alias_continual/20261026/continual_result/review/external/review_report.zh.txt)，主审和具体保管事实见[回收记录](../reports/seller_alias_continual/20261026/continual_result/review/recovery.json)。返回ZIP为277771字节、SHA256 beafdd3d2e248b28f4e4df862f266a1a2feabda865f4ff742344ffd66c03f386，11载荷全部验证后删除review传输ZIP和浏览器同字节下载副本，共555542字节；无递归删除。原9017557字节输入ZIP是返回独立复算程序所需的精确冻结1000载荷目录来源，包含已勘误前审计源码，继续保留该实际复现依赖。原报告与audit01/02不覆盖，必要勘误另存。专用页已关闭，本轮无自动化、SSH或Linux文件变动，新回收材料仅Windows/本地Git；H/S54端点仍供另行批准新对照使用。本次局部传输清理不重置大清理周期。
