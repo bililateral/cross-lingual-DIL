@@ -1891,3 +1891,11 @@ Linux独立workspace于18:26建立，29来源核对。CPU attempt01的第二项�
 [完整报告](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)保留原主要门失败：H−S旧域最终MAP正向，但遗忘差区间跨零；取得水平、逐域和顺序／seed反转、概率及误报代价、基线开发机会与条件区间边界均独立解释。材料形成时未获新包许可；随后用户对9017557字节、SHA256 b89c158f49315e9dc9db660163e7047f907fd29ec63946ddbcdd07b2f32da963的完整结果包明确答复“批准该完整结果包上传并外审”。10:13经指定本地Playwright单次提交原GPT-6/Pro会话并确认正在生成，见[具体授权与提交](../reports/seller_alias_continual/20261026/continual_result/review/submission.json)。本许可仅结果外审；两新对照执行及额度按另行最新决定，不由本轮借用原余额或扩大。
 
 用户随后告知“外审已结束”。10:34起从原会话完整回收本轮结果报告及11项附件，按[独立主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)处置R01—R09：Memory元数据口径已纠正，两处文字及现成不利次级结果追加勘误，原H−S共同主门false不改。未新增科研执行或SSH，专用页已关闭；新对照822小时及三路运行继续遵从另行有效授权。本轮原件、独立核对和[回收记录](../reports/seller_alias_continual/20261026/continual_result/review/recovery.json)仅Windows/本地Git保管，不冒称已同步Linux。
+
+## 2026-10-26 选择补充原版S与历史H的研究范围
+
+用户询问：“这次训练ER、logit都是没有optuna调参过的吗？那我们是不是应该补S和H的原版实验呢？”实际45轨迹配置及冻结方案确认：ER/LOGIT各9条均lambda_rank=1、LR倍率=1，未参加S/S_pos/H_pos各12次的两维Optuna；ER0.1及LOGIT0.1有历史有限开发来源，不能说从未调过参。当前比较因此是冻结系统比较，五者开发机会并不完全对称。
+
+执行者区分了H_pos_default（仅恢复默认两维参数）与历史H/G_half（还恢复原rank）后，用户明确选择：“S_default＋历史 H（G_half）：复核此前约 0.52 的原方法”。本轮已明确补充对象和研究目的；不是选择H_pos_default，也不自动增加第三臂。拟沿用原三域三循环和s4—s6时，最小补充为2×3×3=18完整轨迹，15552更新、54阶段状态；这是待形成具体合同和资源范围的规模推导，尚未授予新运行预算、数据权限或修改活动队列。
+
+S_default与历史H都保持lambda_rank=1、LR倍率=1及原rank；前者记录对均值，后者0.5mean＋0.5logmeanexp、tau=1。H−S可回答默认配置下历史汇聚策略的系统增量，S_tuned−S_default可描述本次入选两参数配置的差异；H_pos_tuned−历史H同时含rank与超参数变化，不能全部解释成Optuna作用。历史s0/AB证据可复用作背景，不能替代新三阶段/多seed轨迹；本批H_pos_tuned−S_tuned主门false不追改。已开放120确认群只能作明确事后补充比较；若要新的独立确认主张，须前瞻冻结相应未见评价安排。不自动并入正在运行的L²R/ER+GCR、借490h/822h余额或重开已关闭结果审查。本轮仅核对既有配置和记录用户决定，未SSH、改科研代码或启动实验。
