@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 Harness与当前文档同步交付
+
+用户明确要求推送本地提交（含Harness优化），并同步服务器相关文档，禁止覆盖活动实验冻结文件。原11个本地提交已普通快进推送至现有科研分支，实际远端从4ca9d6b8774434d6db5591fb7c7f93dd41130adc到0e9a1614b5a17c5217038dcb8bd5e8a70cef6ced，经独立ls-remote核对；本轮同步收尾记录另随当次提交交付，不改变此前各轮授权的历史范围。
+
+服务器同步只更新/home/yongpeng/cross-lingual下AGENTS.md，以及docs中的RESEARCH_DISCIPLINE.zh.md、AI_RESEARCH_HANDOFF.zh.md、CURRENT_EXPERIMENT_DESIGN.md、RESEARCH_PLAN.md、RESEARCH_DISCUSSION.zh.md、STORAGE.zh.md。七个原文件均为本用户普通单链接文件、无路径跳转，原字节全部能在已有Git历史定位，未发现服务器独有修改；经SFTP暂存、核对原文件未变及新文件身份后逐文件原子替换。最终七份大小/SHA及保护核对见[同步记录](../reports/documentation/20261029/harness_delivery.json)。活动新对照47项来源、原版等待44项来源及两份正式门文件同步前后保持同字节；没有向独立workspace、运行目录、模型、Memory或标签文件写入。未在Linux执行Git或刷新训练进度。
+
+新同步记录另存Linux同路径；新回收VendorLink外审正文/附件仍按上一轮Windows保管范围，未借文档同步扩传其他科研材料。原服务器文档由既有Git恢复，临时传输副本核对后清理，不另存重复备份、不重置大清理周期。下方“总文档只Windows”保留其原记录时点。
+
 ## 2026-10-29 VendorLink定向复核结案与进度快照
 
 修复复核已完整回收并经[独立主审](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)关闭F01—F04。Windows的review/repair/external保管16,939字节原文、检查附件与输出清单，另存完整页面及身份核对。10载荷再次逐项核对后，删除33,237字节返回ZIP和同字节浏览器副本，合计66,474字节；[清理回执](../reports/documentation/20261029/vendorlink/implementation/review/repair/transport_cleanup.json)保留原大小/SHA及实际删除结果。51,586字节修复输入、48,396字节首轮输入和cpu_transfer.zip分别作为当前/首轮源码及cpu01来源桥的明确复核依赖继续保留；不新建备份。专用会话和下载页已关闭，无本轮自动化。下方“在审/保留网页”是提交时点历史。

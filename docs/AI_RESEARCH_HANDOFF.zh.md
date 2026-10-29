@@ -15,7 +15,7 @@
 
 工期按同次保存的operational_eta：持续三槽可补位时训练尚余42.44h，预计服务器10月31日08:17结束；加确认/分析2.5—4h，预计31日10:47—12:17（距观测44.94—46.44h），自控制器26日10:25启动计约120.36—121.86h，外审另计。若后续慢20%，整批预计31日19:16—20:46，不是统计区间或保证上界。CAB首阶段现在有95.73秒/步实测，后两阶段仍借同阶段跨顺序池，资源等待和三L²R争用会改变预测；[回传与口径核对](../reports/documentation/20261026/continual_comparison/qualification/harness_observation_receipt.json)保存文件SHA及计时来源。S/H等待不承诺开训日。
 
-科研范围：中文合成三域主线与VendorLink受控观察账号视图扩展分别解释；后者每query单正例，所以MAP=MRR，不证明真实跨账号马甲识别。新回收审查/可变总文档当前主要Windows；运行事实以Linux既定目录为准，不能把本地记录更新写成已同步Linux。常设Harness已按用户后续要求完成[规则优化](RESEARCH_DISCUSSION.zh.md#2026-10-29-科研harness优化落地)，执行看[科研纪律](RESEARCH_DISCIPLINE.zh.md)；本次只改规则和导航，未刷新上述运行观测，不改变活动合同。
+科研范围：中文合成三域主线与VendorLink受控观察账号视图扩展分别解释；后者每query单正例，所以MAP=MRR，不证明真实跨账号马甲识别。常设Harness已完成[规则优化](RESEARCH_DISCUSSION.zh.md#2026-10-29-科研harness优化落地)，执行看[科研纪律](RESEARCH_DISCIPLINE.zh.md)。用户随后要求推送及同步，现有11提交已交付到远端0e9a1614，根AGENTS及六份可变文档已SFTP同步Linux；本轮收尾记录随当次交付，详见[同步范围与核对](STORAGE.zh.md#2026-10-29-harness与当前文档同步交付)。新回收外审正文/附件仍按Windows范围保管；活动冻结来源保持同字节，未刷新上述训练观测或改变合同。
 
 ## 近期执行与审查历史
 
