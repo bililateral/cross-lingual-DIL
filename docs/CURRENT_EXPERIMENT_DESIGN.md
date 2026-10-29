@@ -1,6 +1,6 @@
 # 当前实验设计入口
 
-VendorLink新场景建议（2026-10-29）：用户已选择完整H迁移，并明确要求原VendorLink方法作独立对照；[具体建议](../reports/documentation/20261029/vendorlink/proposal.zh.txt)说明原方法顺序适配、H必要消融、真实/代理标签边界、最小实现与预算依据。当前为静态方案，未批准新数据访问/训练计算或送审；四臂36轨迹与首阶段共享不是已批准合同，不改变下面活动实验。
+VendorLink新场景实现（2026-10-29）：用户已选完整H迁移并要求原方法对照，进一步接受观察账号商品视图代理任务、掩码平均复现假设和300秒限定手写CPU。四臂及单条三阶段入口/梯度/记忆/恢复已实现，累计CPU20/300秒，见[实际范围与资格](../reports/documentation/20261029/vendorlink/implementation/implementation.zh.txt)；原[静态提议](../reports/documentation/20261029/vendorlink/proposal.zh.txt)保留，不替代最新补充。48,396字节具体实现包已按用户本轮指令单次提交[GPT-6/Pro网页外审](../reports/documentation/20261029/vendorlink/implementation/review/submission.json)，正在生成。正式三市场数据准备、真实英文GPU及整批三路/预算未获准；36条及90阶段节省不是已执行或批准的正式合同，不改变下面活动实验。
 
 当前原版补充执行（2026-10-26）：S_default＋历史H（G_half）18条/最多三路/110h、只训练与54端点/旧dev盲分数已获明确授权。[等待增量外审及主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)已闭合，显存观测/逐槽预留、真实首派门和最新费用承接已修复；cpu09后CPU59/120，H原生含失败171/900复用，44科学来源未改。[正式门](../reports/documentation/20261026/continual_defaults/waiting/formal_gate.json)已冻结，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)15:03实际启用，PID1257448；15:26现场复核仍为唯一监听，等指定旧批完整成功退出，无新轨迹派发，见[当前观测](../reports/documentation/20261026/continual_comparison/qualification/status_20261026_152622.json)。按实际剩余显存补位，不要求全卡无CUDA；不增HPO/标签/确认/预算，失败停且不自动重试。来源/完整审查/主审及回执双端保管，禁止重复启动；动态状态见[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
