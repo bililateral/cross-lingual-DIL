@@ -1,0 +1,87 @@
+{
+  "scope": "isolated reviewer workspace; 240 handwritten strings, pure data and NumPy protocol checks",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "source_hashes": {
+    "scripts/step29_vendorlink_data.py": "c480c3b270dd536233c59c8cd6f599894d7f65edd82ce9f8fe4c428b089d91e3",
+    "scripts/step29_vendorlink_run.py": "5172bca563707bdfc1b5061a2733f78c08123548c1060b04ac593fb318219d5c"
+  },
+  "source_rows": 240,
+  "accounts": 12,
+  "fit_payload_and_qrels_equal_to_baseline": true,
+  "dev_heldout_qrels_match_private_fixture_membership": true,
+  "ids_and_blind_payload_independent_of_identity_and_old_view_uid": true,
+  "blind_and_evaluation_order_idempotent": true,
+  "view_input_order_does_not_change_canonical_blind_payload": true,
+  "evaluate_output_ids_align_with_scores": true,
+  "actual_query_ap_matches_independent_single_positive_reference": true,
+  "uniform_random_tie_expectation_not_required_for_fixed_realization": true,
+  "cases": [
+    {
+      "split": "dev",
+      "all_tied": true,
+      "query_ap": [
+        0.25,
+        0.3333333333333333,
+        0.14285714285714285,
+        0.5,
+        1.0,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.3333333333333333
+      ],
+      "per_query_storage_permutation_invariant": true
+    },
+    {
+      "split": "dev",
+      "all_tied": false,
+      "query_ap": [
+        0.5,
+        0.16666666666666666,
+        0.14285714285714285,
+        0.16666666666666666,
+        1.0,
+        0.14285714285714285,
+        0.14285714285714285,
+        0.16666666666666666
+      ],
+      "per_query_storage_permutation_invariant": true
+    },
+    {
+      "split": "heldout",
+      "all_tied": true,
+      "query_ap": [
+        1.0,
+        1.0,
+        0.16666666666666666,
+        0.14285714285714285,
+        0.2,
+        0.2,
+        0.3333333333333333,
+        0.25
+      ],
+      "per_query_storage_permutation_invariant": true
+    },
+    {
+      "split": "heldout",
+      "all_tied": false,
+      "query_ap": [
+        0.25,
+        0.16666666666666666,
+        0.5,
+        0.2,
+        0.14285714285714285,
+        0.16666666666666666,
+        1.0,
+        0.5
+      ],
+      "per_query_storage_permutation_invariant": true
+    }
+  ],
+  "models_loaded": 0,
+  "training_runs": 0,
+  "test_suite_runs": 0,
+  "formal_data_or_labels_read": 0,
+  "torch_or_transformers_imported": false
+}

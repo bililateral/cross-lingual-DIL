@@ -1,0 +1,368 @@
+--- cpu01/scripts/step29_vendorlink_data.py
++++ first_review/scripts/step29_vendorlink_data.py
+@@ -83,7 +83,7 @@
+         raise ValueError("Three nonempty split fractions required")
+     if records_per_view < 2 or identities_per_group < 4:
+         raise ValueError("Two records/view and at least four identities/group required")
+-    accounts, owners, ads = {}, {}, {}
++    accounts, owners, ads, raw_owners, raw_fingerprints = {}, {}, {}, {}, {}
+     for row in rows:
+         if any(not isinstance(row.get(k), str) for k in ("market", "vendor", "title", "description")):
+             raise ValueError("Explicit canonical string fields required; no silent NaN conversion")
+@@ -92,6 +92,8 @@
+         if not market or not vendor or not title or not description:
+             raise ValueError("Empty market/vendor/title/description")
+         key = (market, vendor)  # Case variants are NOT asserted to be the same observed account.
++        raw_fingerprint = hashlib.sha256((title+"\0"+description).casefold().encode()).hexdigest()
++        raw_owners.setdefault(raw_fingerprint, set()).add(key)
+         # Remove this account's direct identifier consistently for all models.
+         pattern = re.compile(r"(?<!\w)"+re.escape(vendor)+r"(?!\w)", re.IGNORECASE)
+         title, description = pattern.sub("[VENDOR]", title), pattern.sub("[VENDOR]", description)
+@@ -99,10 +101,12 @@
+         owners.setdefault(fingerprint, set()).add(key)
+         accounts.setdefault(key, set()).add(fingerprint)
+         ads[(key, fingerprint)] = Ad(fingerprint, title, description)
++        raw_fingerprints.setdefault((key, fingerprint), set()).add(raw_fingerprint)
+     buckets, rejected = {}, {"shared_exact_text": 0, "too_few_ads": 0, "insufficient_group": 0}
+     for key in sorted(accounts):
+         market, vendor = key
+-        clean = [f for f in accounts[key] if len(owners[f]) == 1]
++        clean = [f for f in accounts[key] if len(owners[f]) == 1 and all(
++            len(raw_owners[raw]) == 1 for raw in raw_fingerprints[(key, f)])]
+         rejected["shared_exact_text"] += len(accounts[key])-len(clean)
+         # Paper's 20-ad eligibility, plus the requested disjoint view capacity.
+         if len(clean) < max(20, 2*records_per_view):
+
+--- first_review/scripts/step29_vendorlink_data.py
++++ repair/scripts/step29_vendorlink_data.py
+@@ -56,8 +56,22 @@
+             raise ValueError("Blind views do not contain relation labels")
+         return [int(a.identity == b.identity) for i, a in enumerate(self.views) for b in self.views[i+1:]]
+ 
++    def evaluation_order(self) -> Group:
++        """Prepare private qrels in the same opaque, relation-independent order as scoring.
++
++        IDs hash each disjoint record set, never identity or the old view UID.
++        This is idempotent and must run before exporting the aligned qrels.
++        """
++        views = []
++        for view in self.views:
++            key = ["evaluation_view", self.uid, sorted(r.uid for r in view.records)]
++            uid = hashlib.sha256(json.dumps(key, ensure_ascii=False).encode()).hexdigest()
++            views.append(View(uid, view.records, view.identity))
++        return Group(self.uid, self.domain, self.split, tuple(sorted(views, key=lambda v: v.uid)))
++
+     def blind(self) -> Group:
+-        return Group(self.uid, self.domain, self.split, tuple(View(v.uid, v.records) for v in self.views))
++        group = self.evaluation_order()
++        return Group(group.uid, group.domain, group.split, tuple(View(v.uid, v.records) for v in group.views))
+ 
+     @classmethod
+     def from_dict(cls, value: dict) -> Group:
+@@ -132,6 +146,8 @@
+             group = Group(f"{market}:{split}:{index}", market, split,
+                           tuple(v for _, views in chunk for v in views))
+             group.validate(training=split == "fit")
++            if split != "fit":
++                group = group.evaluation_order()
+             labels[group.uid] = group.labels()
+             # Evaluation inputs carry no identity labels; these remain in the separate qrels output.
+             payloads.setdefault(f"{market}:{split}", []).append(asdict(group if split == "fit" else group.blind()))
+
+--- cpu01/scripts/step29_vendorlink_methods.py
++++ first_review/scripts/step29_vendorlink_methods.py
+@@ -30,6 +30,7 @@
+     head_lr: float = .001
+     vendor_lr: float = 4e-5
+     weight_decay: float = .01
++    vendor_weight_decay: float = 0.
+     microbatch: int = 8
+     vendor_batch: int = 32
+     channel_tokens: int = 256
+@@ -142,7 +143,7 @@
+         self.dropout = nn.Dropout(bert.config.hidden_dropout_prob)
+ 
+     def start_vendor_stage(self, classes, initialization_seed):
+-        if self.settings.method != "VendorLink_SEQ" or len(classes) < 2:
++        if self.settings.method != "VendorLink_SEQ" or len(set(classes)) < 2 or len(classes) != len(set(classes)):
+             raise ValueError("VendorLink requires current-stage training classes")
+         self.classes = tuple(sorted(classes))
+         torch.manual_seed(initialization_seed)
+@@ -217,7 +218,7 @@
+     if s.method == "VendorLink_SEQ":
+         if model.classifier is None:
+             raise ValueError("Current-stage class head must be initialized first")
+-        return torch.optim.AdamW(model.parameters(), lr=s.vendor_lr, weight_decay=s.weight_decay, eps=1e-8)
++        return torch.optim.AdamW(model.parameters(), lr=s.vendor_lr, weight_decay=s.vendor_weight_decay, eps=1e-8)
+     return torch.optim.AdamW([{"params": model.encoder.parameters(), "lr": s.encoder_lr*s.lr_multiplier},
+                              {"params": model.head.parameters(), "lr": s.head_lr*s.lr_multiplier}],
+                             weight_decay=s.weight_decay, eps=1e-8)
+
+--- cpu01/scripts/step29_vendorlink_run.py
++++ first_review/scripts/step29_vendorlink_run.py
+@@ -80,8 +80,8 @@
+ def execute(model, load_fit, job, *, order, seed, epochs, identity, check=lambda: None, resume=None):
+     """Only requests the current domain. History comes exclusively from Memory.
+ 
+-    Per-stage optimizer reset is explicit for all four methods. Encoder/head
+-    weights continue, except VendorLink's new current-domain classification head.
++    H retains its Adam state across domains, as in the existing mainline.
++    VendorLink resets its optimizer with the new current-domain class head.
+     Save each epoch and each stage; failed attempts retain their own directory.
+     """
+     if len(order) != 3 or len(set(order)) != 3 or epochs < 1 or job.exists():
+@@ -107,7 +107,9 @@
+             if cursor["next_epoch"] == 0:
+                 if settings.method == "VendorLink_SEQ":
+                     model.start_vendor_stage(classes, seed_for(seed, order, stage, "head"))
+-                optimizer = make_optimizer(model)
++                    optimizer = make_optimizer(model)
++                elif optimizer is None:
++                    optimizer = make_optimizer(model)
+             elif settings.method == "VendorLink_SEQ" and tuple(classes) != model.classes:
+                 raise ValueError("Recovered classifier no longer matches current fit identities")
+             if settings.method == "VendorLink_SEQ":
+
+--- first_review/scripts/step29_vendorlink_run.py
++++ repair/scripts/step29_vendorlink_run.py
+@@ -13,6 +13,7 @@
+ import math
+ from pathlib import Path
+ import random
++import shutil
+ import time
+ 
+ import numpy as np
+@@ -24,6 +25,14 @@
+ 
+ def write_json(path, value):
+     path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
++
++
++def file_sha256(path):
++    digest = hashlib.sha256()
++    with path.open("rb") as stream:
++        for block in iter(lambda: stream.read(1024*1024), b""):
++            digest.update(block)
++    return digest.hexdigest()
+ 
+ 
+ def rng_state():
+@@ -95,7 +104,20 @@
+         optimizer, cursor = load_state(resume, model, memory, identity)
+     if cursor["complete"]:
+         raise ValueError("Completed trajectory must not be resumed")
++    inherited = []
+     try:
++        # A fresh recovery directory must retain every already learned endpoint.
++        # Copy existing states; never retrain earlier domains to fill this list.
++        if resume is not None:
++            for index in range(1, cursor["stage"]+1):
++                check()
++                source = Path(resume).resolve().parent/f"stage{index}.pt"
++                target = job/source.name
++                digest = file_sha256(source)  # Missing ancestors fail before further training.
++                shutil.copyfile(source, target)
++                if file_sha256(target) != digest:
++                    raise ValueError("Inherited endpoint copy differs")
++                inherited.append({"path": target.name, "source": str(source), "sha256": digest})
+         for stage in range(cursor["stage"], 3):
+             check()
+             groups = load_fit(order[stage])
+@@ -156,7 +178,7 @@
+             del groups
+         write_json(job/"completion.json", {"status": "THREE_STAGES_TRAINED_NOT_EVALUATED",
+             "identity": identity, "updates": cursor["updates"], "memory_bytes": len(memory.bytes()),
+-            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)]})
++            "stage_endpoints": [f"stage{i}.pt" for i in (1, 2, 3)], "inherited_endpoints": inherited})
+         return cursor
+     except BaseException as error:
+         write_json(job/"failure.json", {"status": "STOP_NO_AUTOMATIC_RETRY", "error": repr(error), "cursor": cursor})
+@@ -173,19 +195,27 @@
+     return result
+ 
+ 
+-def query_ap(scores, labels, n):
+-    """Deterministic query MAP ingredients, not pairwise AP. Zero positives fail."""
++def query_ap(scores, labels, view_ids):
++    """Per-query AP with fixed opaque-ID ties; independent of input row order.
++
++    Scores and private qrels must share the exported view_ids ordering.
++    """
++    n = len(view_ids)
++    if n < 2 or len(set(view_ids)) != n or not all(isinstance(v, str) and v for v in view_ids):
++        raise ValueError("Distinct opaque view IDs required")
+     matrix, truth = np.zeros((n, n)), np.zeros((n, n), dtype=bool)
+     indices = np.triu_indices(n, 1)
+     if len(scores) != len(indices[0]) or len(labels) != len(scores):
+         raise ValueError("Incomplete pair table")
++    if not np.isfinite(scores).all() or not np.isin(labels, [0, 1]).all():
++        raise ValueError("Finite scores and binary aligned qrels required")
+     matrix[indices], truth[indices] = scores, labels
+     matrix += matrix.T
+     truth |= truth.T
+     result = []
+     for q in range(n):
+         candidates = [i for i in range(n) if i != q]
+-        ordered = sorted(candidates, key=lambda i: (-matrix[q, i], i))
++        ordered = sorted(candidates, key=lambda i: (-matrix[q, i], view_ids[i]))
+         hits = truth[q, ordered]
+         if not hits.any():
+             raise ValueError("Query has no known positive")
+
+--- cpu01/tests/test_step29_vendorlink.py
++++ first_review/tests/test_step29_vendorlink.py
+@@ -188,8 +188,8 @@
+         other.step()
+         for p, q in zip(model.parameters(), direct.parameters()):
+             torch.testing.assert_close(p, q, atol=2e-7, rtol=2e-5)
+-        encoder_change = float((model.encoder.embeddings.word_embeddings.weight-initial.encoder.embeddings.word_embeddings.weight).abs().max())
+-        head_change = float((model.head[0].weight-initial.head[0].weight).abs().max())
++        encoder_change = float((model.encoder.embeddings.word_embeddings.weight-initial.encoder.embeddings.word_embeddings.weight).detach().abs().max())
++        head_change = float((model.head[0].weight-initial.head[0].weight).detach().abs().max())
+         self.assertGreater(encoder_change, 1e-7)
+         self.assertGreater(head_change, 1e-7)
+         memory = m.Memory(5, model.settings)
+@@ -234,6 +234,8 @@
+             self.assertEqual(result["updates"], 3)
+             self.assertGreater(float((model.encoder.embeddings.word_embeddings.weight-before).abs().max()), 0)
+             states = [torch.load(job/f"stage{i}.pt", weights_only=False) for i in (1, 2, 3)]
++            expected_steps = 1 if method == "VendorLink_SEQ" else 3
++            self.assertTrue(all(int(value["step"]) == expected_steps for value in states[-1]["optimizer"]["state"].values()))
+             if method in ("H_ER", "H_full"):
+                 first = states[0]["memory"]["entries"][0]
+                 survivors = {v["group"]["uid"]: v for v in states[1]["memory"]["entries"]}
+@@ -249,13 +251,32 @@
+             if method == "VendorLink_SEQ":
+                 self.assertTrue(all(c.startswith("C:") for c in model.classes))
+                 self.assertTrue(all("cross_entropy" in log for log in logs))
++                probe = model_for(method, self.root)
++                probe.start_vendor_stage(sorted({v.identity for v in fixture().views}), 15)
++                probe_optimizer = m.make_optimizer(probe)
++                before_head = probe.classifier.weight.detach().clone()
++                records = [r for v in fixture().views for r in v.records]
++                identities = [v.identity for v in fixture().views for r in v.records]
++                m.update_vendor(probe, probe_optimizer, records, identities, 17)
++                self.assertGreater(float((probe.classifier.weight-before_head).detach().abs().max()), 1e-7)
++            resumed = model_for(method, self.root)
++            loaded_after_recovery = []
++            def resume_load(domain):
++                loaded_after_recovery.append(domain)
++                return [fixture(domain)]
++            run.execute(resumed, resume_load, self.root/(method+"_resumed"), order="ABC", seed=7, epochs=1,
++                identity={"scope": "handwritten", "method": method}, resume=job/"stage1.pt")
++            self.assertEqual(loaded_after_recovery, ["B", "C"])
++            for key, value in model.state_dict().items():
++                torch.testing.assert_close(resumed.state_dict()[key], value, atol=0, rtol=0)
+             blind = fixture("A", "dev").blind()
+             scores = run.evaluate(model, [blind])[blind.uid]["scores"]
+             ap = run.query_ap(scores, fixture("A", "dev").labels(), len(blind.views))
+             self.assertEqual(len(ap), len(blind.views))
+             self.assertTrue(all(0 <= v <= 1 for v in ap))
+             evidence[method] = {"loaded_domains": loaded, "updates": result["updates"],
+-                "history_members": len(states[-1]["memory"]["entries"]), "blind_pairs": len(scores)}
++                "history_members": len(states[-1]["memory"]["entries"]), "blind_pairs": len(scores),
++                "stage_boundary_resume_exact": True, "recovered_stage_loads": loaded_after_recovery}
+         self.evidence("actual_four_trajectories", evidence)
+ 
+ 
+
+--- first_review/tests/test_step29_vendorlink.py
++++ repair/tests/test_step29_vendorlink.py
+@@ -102,6 +102,10 @@
+                     uid_split[ad.uid] = group.split
+                     self.assertNotRegex(ad.description, r"vendor\d+")
+             self.assertEqual(len(labels[group.uid]), len(group.views)*(len(group.views)-1)//2)
++            # Handwritten product number is private fixture truth, independent of output order.
++            expected = [int(a.records[0].title.split()[1] == b.records[0].title.split()[1])
++                        for i, a in enumerate(group.views) for b in group.views[i+1:]]
++            self.assertEqual(labels[group.uid], expected)
+         self.assertGreater(report["rejected"]["shared_exact_text"], 0)
+         blind = fixture(split="dev").blind()
+         with self.assertRaises(ValueError):
+@@ -113,6 +117,42 @@
+         self.assertEqual(len(scores[blind.uid]["scores"]), len(blind.views)*(len(blind.views)-1)//2)
+         self.evidence("data", {**report, "blind_regroup_rejected": True, "fit_evaluation_rejected": True,
+                                "blind_scoring_uses_no_identity": True})
++
++    def test_blind_alignment_and_ties(self):
++        source = fixture(split="dev")
++        aligned, blind = source.evaluation_order(), source.blind()
++        self.assertEqual(blind, aligned.blind())
++        self.assertTrue(all(v.identity is None for v in blind.views))
++        self.assertTrue(all(len(v.uid) == 64 and ":" not in v.uid for v in blind.views))
++        # Recover labels here only from private fixture membership, not exported IDs.
++        private = {r.uid: v.identity for v in source.views for r in v.records}
++        expected = [int(private[a.records[0].uid] == private[b.records[0].uid])
++                    for i, a in enumerate(blind.views) for b in blind.views[i+1:]]
++        self.assertEqual(expected, aligned.labels())
++        self.assertNotEqual(expected, [int(i//2 == j//2) for i in range(8) for j in range(i+1, 8)])
++        self.assertEqual(source.blind(), d.Group(source.uid, source.domain, source.split, source.views[::-1]).blind())
++        # Relabel identities and old view UIDs: neither may affect public IDs/order.
++        relabeled = d.Group(source.uid, source.domain, source.split, tuple(
++            d.View("changed-"+str(i), v.records, "other-"+v.identity) for i, v in enumerate(source.views)))
++        self.assertEqual(blind, relabeled.blind())
++        ids = [v.uid for v in blind.views]
++        scores = [0.]*len(expected)
++        ap = run.query_ap(scores, expected, ids)
++        reference = []
++        for q, view in enumerate(aligned.views):
++            ranked_ids = sorted(v.uid for v in aligned.views if v.uid != view.uid)
++            partner = next(v.uid for v in aligned.views if v.uid != view.uid and v.identity == view.identity)
++            reference.append(1/(ranked_ids.index(partner)+1))
++        self.assertEqual(ap, reference)
++        # Permuting storage changes neither score/label pairing nor AP by query ID.
++        permutation = [5, 0, 7, 2, 1, 6, 3, 4]
++        other = [aligned.views[i] for i in permutation]
++        other_labels = [int(a.identity == b.identity) for i, a in enumerate(other) for b in other[i+1:]]
++        other_ap = run.query_ap(scores, other_labels, [v.uid for v in other])
++        self.assertEqual(dict(zip(ids, ap)), dict(zip([v.uid for v in other], other_ap)))
++        self.evidence("blind_ties", {"qrels_aligned": True, "identity_and_old_uid_independent": True,
++            "storage_permutation_invariant": True, "all_equal_score_ap": ap,
++            "fixed_tie_rule": "opaque_view_id", "uniform_tie_expectation_not_a_per_instance_target": True})
+ 
+     def test_vendor_representation_and_diagonal_reference(self):
+         layers = tuple(torch.arange(24, dtype=torch.float32).reshape(2, 3, 4)/(k+2) for k in range(5))
+@@ -168,7 +208,8 @@
+         self.evidence("h_math", errors)
+ 
+     def test_actual_vjp_updates_and_full_restore(self):
+-        group, history = fixture(), fixture("B")
++        # 35 records / 595 pairs / 70 channel texts cross BOTH actual block boundaries.
++        group, history = fixture(component_sizes=(2,)*7), fixture("B", component_sizes=(2,)*7)
+         model = model_for("H_full", self.root)
+         teacher = model.teacher(history)+.6
+         initial = copy.deepcopy(model)
+@@ -214,6 +255,7 @@
+                 torch.testing.assert_close(restored_optimizer.state_dict()["state"][key][field], value, atol=0, rtol=0)
+         self.evidence("actual_update_restore", {"tiny_random_bert": True, "encoder_change": encoder_change,
+             "head_change": head_change, "restored_next_update_exact": True, "direct_autograd_agrees": True,
++            "records": 35, "record_pairs": 595, "channel_texts": 70, "head_block": 512, "microbatch": 64,
+             "pretrained_weights_loaded": False})
+ 
+     def test_four_actual_trajectories_memory_and_future_access(self):
+@@ -267,16 +309,22 @@
+             run.execute(resumed, resume_load, self.root/(method+"_resumed"), order="ABC", seed=7, epochs=1,
+                 identity={"scope": "handwritten", "method": method}, resume=job/"stage1.pt")
+             self.assertEqual(loaded_after_recovery, ["B", "C"])
++            recovered_job = self.root/(method+"_resumed")
++            completion = json.loads((recovered_job/"completion.json").read_text())
++            self.assertTrue(all((recovered_job/p).is_file() for p in completion["stage_endpoints"]))
++            self.assertEqual(run.file_sha256(job/"stage1.pt"), run.file_sha256(recovered_job/"stage1.pt"))
++            self.assertEqual(completion["inherited_endpoints"][0]["sha256"], run.file_sha256(job/"stage1.pt"))
+             for key, value in model.state_dict().items():
+                 torch.testing.assert_close(resumed.state_dict()[key], value, atol=0, rtol=0)
+             blind = fixture("A", "dev").blind()
+             scores = run.evaluate(model, [blind])[blind.uid]["scores"]
+-            ap = run.query_ap(scores, fixture("A", "dev").labels(), len(blind.views))
++            ap = run.query_ap(scores, fixture("A", "dev").evaluation_order().labels(), [v.uid for v in blind.views])
+             self.assertEqual(len(ap), len(blind.views))
+             self.assertTrue(all(0 <= v <= 1 for v in ap))
+             evidence[method] = {"loaded_domains": loaded, "updates": result["updates"],
+                 "history_members": len(states[-1]["memory"]["entries"]), "blind_pairs": len(scores),
+-                "stage_boundary_resume_exact": True, "recovered_stage_loads": loaded_after_recovery}
++                "stage_boundary_resume_exact": True, "recovered_stage_loads": loaded_after_recovery,
++                "all_recovered_endpoints_exist": True, "inherited_endpoint_same_bytes": True}
+         self.evidence("actual_four_trajectories", evidence)
+ 
+ 

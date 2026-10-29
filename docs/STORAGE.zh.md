@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 VendorLink定向复核结案与进度快照
+
+修复复核已完整回收并经[独立主审](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)关闭F01—F04。Windows的review/repair/external保管16,939字节原文、检查附件与输出清单，另存完整页面及身份核对。10载荷再次逐项核对后，删除33,237字节返回ZIP和同字节浏览器副本，合计66,474字节；[清理回执](../reports/documentation/20261029/vendorlink/implementation/review/repair/transport_cleanup.json)保留原大小/SHA及实际删除结果。51,586字节修复输入、48,396字节首轮输入和cpu_transfer.zip分别作为当前/首轮源码及cpu01来源桥的明确复核依赖继续保留；不新建备份。专用会话和下载页已关闭，无本轮自动化。下方“在审/保留网页”是提交时点历史。
+
+本轮为记录维护，只读核对Linux已授权作业元数据；[13:50服务器快照](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_harness.json)194,687字节、SHA256 203352cdd92b603ef91f24baeb1508b512adc285a5ddb03832ba9891dcd26561，SCP回传与服务器同字节。只用既有py310读取来源/进程/更新计数/访问账/时间/资源，不载模、不读正式文本/标签或效果；单次临时采集器已删除，SSH退出，活动源码/作业未改。已有12:01快照及其原回执身份另行核对保留。新外审、主审及可变总文档本轮只保管Windows；不冒称已同步Linux，也不重置大清理周期。
+
 ## 2026-10-29 VendorLink首轮回收与CPU增量保管
 
 首轮完整外审原文、10载荷、网页公布身份、返回清单核对与[主审处置](../reports/documentation/20261029/vendorlink/implementation/review/primary_disposition.zh.txt)已保存在Windows。35,412字节返回ZIP及同字节浏览器下载副本在载荷验证后删除；原48,396字节输入包继续作为冻结审查源码的复现依赖。cpu_transfer.zip内五份旧源与cpu01逐项同字节，作为F03来源桥保留；核对后的临时解包副本删除。清理明细见[transport_cleanup](../reports/documentation/20261029/vendorlink/implementation/review/transport_cleanup.json)，不重置大清理周期。

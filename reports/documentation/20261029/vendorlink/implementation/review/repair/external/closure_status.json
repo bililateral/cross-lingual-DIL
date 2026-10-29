@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "status": "TARGETED_RECHECK_COMPLETED_F01_F04_CLOSED",
+  "input_sha256": "e45f69e07f956d881baf1f4b8ac528e279ca853214135257b51e143186f82bde",
+  "base_input_sha256": "5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2",
+  "closures": [
+    {
+      "id": "F01",
+      "original_category": "SCIENTIFIC_BLOCKER",
+      "status": "CLOSED",
+      "basis": "按opaque view_ids破平，实际builder/qrels/评分ID顺序一致；全同分及部分同分的行序重排按query ID保持AP。",
+      "source": [
+        "scripts/step29_vendorlink_run.py:188-223",
+        "scripts/step29_vendorlink_data.py:59-74,149-153",
+        "tests/test_step29_vendorlink.py:121-155,319-323"
+      ],
+      "evidence": [
+        "implementation/cpu05/blind_ties.json",
+        "implementation/cpu05/console.txt",
+        "data_metric_checks.json"
+      ],
+      "scope_limit": "不要求一次固定排列AP等于均匀随机破平期望。"
+    },
+    {
+      "id": "F02",
+      "original_category": "REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED",
+      "basis": "每视图由group UID和本视图商品UID集合独立生成ID，不使用identity/旧view UID；qrels先对齐后blind，幂等；fit载荷与标签不变。",
+      "source": [
+        "scripts/step29_vendorlink_data.py:59-74,114-117,149-153",
+        "tests/test_step29_vendorlink.py:105-108,121-137"
+      ],
+      "evidence": [
+        "implementation/cpu05/data.json",
+        "implementation/cpu05/blind_ties.json",
+        "data_metric_checks.json"
+      ],
+      "scope_limit": "关闭显式元数据关系编码，不声称文本不可预测关系。"
+    },
+    {
+      "id": "F03",
+      "original_category": "REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED",
+      "basis": "嵌套归档五份旧源逐项匹配原cpu01 receipt；逐行差异及33个函数/类AST对照建立未变证据复用范围。",
+      "source": [
+        "implementation/cpu_transfer.zip",
+        "implementation/review/source_bridge.json",
+        "prior_input/implementation/cpu01/receipt.json"
+      ],
+      "evidence": [
+        "input_and_nested_verification.json",
+        "source_diffs.txt",
+        "source_and_cpu05_checks.json"
+      ],
+      "scope_limit": "cpu01复用未变数学/表示/实际更新及同版本恢复；当前Adam阶段流程用cpu04/05；cpu03不作当前资格；不推断跨版本checkpoint直接兼容。"
+    },
+    {
+      "id": "F04",
+      "original_category": "REPRODUCIBILITY_DEFECT",
+      "status": "CLOSED",
+      "basis": "后续阶段训练前复制全部已完成端点，源/目标流式SHA一致后登记来源；恢复目录三端点齐全，继承首端点同字节，最终模型一致。",
+      "source": [
+        "scripts/step29_vendorlink_run.py:30-35,103-123,179-185,243-244",
+        "tests/test_step29_vendorlink.py:309-318"
+      ],
+      "evidence": [
+        "implementation/cpu05/actual_four_trajectories.json",
+        "implementation/cpu05/console.txt",
+        "source_and_cpu05_checks.json"
+      ],
+      "scope_limit": "缺祖先失败在进一步load_fit/训练前，非load_state前；网页仅抽取复制块微核对，未重新执行模型路径。"
+    }
+  ],
+  "multiblock_qualification": {
+    "status": "CLOSED_IN_HANDWRITTEN_RANDOM_TINY_BERT_SCOPE",
+    "records": 35,
+    "record_pairs": 595,
+    "head_block_size": 512,
+    "channel_texts": 70,
+    "encoder_microbatch": 64,
+    "update_comparison": {
+      "atol": 2e-07,
+      "rtol": 2e-05,
+      "compared": "updated parameters, not every raw parameter.grad"
+    },
+    "restored_next_model_and_adam_exact": true,
+    "source": "tests/test_step29_vendorlink.py:210-259"
+  },
+  "cpu05": {
+    "sources_matching_current": 5,
+    "wall_seconds": 5.18633585202042,
+    "charged_seconds": 6,
+    "prior_seconds": 20,
+    "cumulative_seconds": 26,
+    "authorized_limit_seconds": 300,
+    "peak_rss_bytes": 776126464
+  },
+  "new_scientific_blockers": [],
+  "new_reproducibility_defects": [],
+  "remaining_mandatory_repairs": [],
+  "unchanged_optional_scope": [
+    "near-duplicate/template sensitivity",
+    "real-controller labels",
+    "VendorLink+ER",
+    "shared first stage"
+  ],
+  "formal_training_authorized": false,
+  "formal_prerequisites": "unchanged; separate data/model/GPU/evaluation/three-way admission/cumulative-budget contract required",
+  "reviewer_execution": {
+    "environment": "isolated webpage workspace, Python 3.12.14, NumPy 2.3.5",
+    "models_loaded": 0,
+    "training_runs": 0,
+    "existing_test_suite_runs": 0,
+    "formal_data_or_labels_read": 0,
+    "project_server_accesses": 0,
+    "torch_or_transformers_imported": false
+  }
+}

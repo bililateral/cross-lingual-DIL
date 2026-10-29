@@ -1,0 +1,215 @@
+VendorLink 首轮 F01—F04 定向增量复核报告
+日期：2026-10-29（Asia/Shanghai，UTC+8）
+范围：承接同一会话首轮报告，只复核四项修复、来源桥与 cpu05 定向证据。
+
+一、最终裁决
+
+增量复核已完成，F01、F02、F03、F04 均关闭。首轮提出的真实分块 VJP 覆盖缺口也已由 cpu05 的限定原生证据补齐。本轮新改动中未发现需要继续修复的具体实质问题；没有新增 SCIENTIFIC_BLOCKER 或 REPRODUCIBILITY_DEFECT。
+
+这一关闭针对首轮已列明的问题及本次限定修复范围。未变的方法判断直接复用，不重审整个项目，不要求新增方法、HPO、数据范围或全面历史重测。正式运行仍需另行合同；原有正式数据、预训练模型／GPU、评价开放、三路准入与累计预算前提不被重新记作“修复失败”。
+
+逐项状态：
+F01（原 SCIENTIFIC_BLOCKER，同分排序偏差）：CLOSED。
+F02（原 REPRODUCIBILITY_DEFECT，盲载荷关系编码）：CLOSED。
+F03（原 REPRODUCIBILITY_DEFECT，旧 CPU 证据来源桥）：CLOSED。
+F04（原 REPRODUCIBILITY_DEFECT，恢复端点清单）：CLOSED。
+真实分块资格覆盖：CLOSED_IN_HANDWRITTEN_RANDOM_TINY_BERT_SCOPE。
+剩余必修项：无。
+
+二、输入与来源身份
+
+2.1 本轮唯一增量输入
+
+文件：vendorlink_repair_review.zip
+实际大小：51,586 字节。
+实际 SHA256：e45f69e07f956d881baf1f4b8ac528e279ca853214135257b51e143186f82bde。
+成员：17 个，16 载荷＋MANIFEST.json。
+结果：成员集合精确一致，无重复／不安全路径；16 个载荷逐项大小和 SHA256 全部匹配 MANIFEST，解包副本也与对应 ZIP 字节一致。
+
+承接首包：5274c7fe508ade3fa0197f3b189ade7d97c0027d897a8e7da35a670b62a7a7e2。
+承接首轮报告归档：4abc45df424dce4585424d599c53f97c41e68306963ce9fd22c8f0431dccd10c。
+
+2.2 嵌套旧源
+
+implementation/cpu_transfer.zip：19,270 字节。
+SHA256：ef4b86268496f603ec690c8385db6fe907786854a0b022deb1e377f79f513e6b。
+包含六个成员：五份旧源码及 cpu_sources.json。内部 cpu_sources.json 与首包 cpu01/receipt.json 的五项 sources 完全一致；五份旧源实际字节和 SHA 均匹配原 cpu01 receipt。
+
+旧源 | 字节数 | 原 cpu01 身份
+scripts/step29_vendorlink_data.py | 7,935 | 匹配
+scripts/step29_vendorlink_methods.py | 14,202 | 匹配
+scripts/step29_vendorlink_run.py | 12,338 | 匹配
+scripts/step29_vendorlink_cpu.py | 3,196 | 匹配
+tests/test_step29_vendorlink.py | 15,084 | 匹配
+
+本结论来自实际逐项计算，没有直接接受 source_bridge.json 的 match:true。完整逐文件数值见 input_and_nested_verification.json。
+
+2.3 当前 CPU 来源
+
+cpu05 receipt 的五项来源与本包当前源码大小／SHA 全部一致。methods.py 与首轮逐字节相同，SHA256 仍为 5d0bec81b0f3ceb17b677bf832b6ebc57c7baf5d09e5f2c50c840ed210b9e664；CPU wrapper 和 authorization.json 也未改变。其余变动限定在评价排列／接口、恢复端点继承及相应测试。具体差异已保存为 source_diffs.txt。
+
+本报告后文 data.py、methods.py、run.py、tests.py 分别指 scripts/step29_vendorlink_data.py、scripts/step29_vendorlink_methods.py、scripts/step29_vendorlink_run.py、tests/test_step29_vendorlink.py。行号按本轮修订源码；“旧→首轮”专指 cpu01 旧源到首包源码。
+
+三、F01／F02：实际排列与标签接线已闭合
+
+3.1 当前数据链
+
+data.py 第 59—70 行的 Group.evaluation_order() 对每个视图构造键：
+["evaluation_view", group.uid, sorted(record.uid for record in view.records)]。
+随后计算该视图的 SHA256 ID，并按新 ID 排列视图。这里读取的是 group UID 与该视图自己的商品 UID 集合，不读取 identity，也不读取旧 view UID。当前 builder 的商品 UID 来自处理后的文本指纹（第 114—117 行），不是原观察账号 identity 前缀。
+
+第 149—153 行只对非 fit 组执行 evaluation_order，然后先按该顺序生成 group.labels()，再导出 group.blind()。第 72—74 行的 blind() 再次执行同一规范排列并清除 identity；由于计算不依赖旧 view UID／identity，第二次调用不改变 ID 或顺序。因此实际 builder 输出的 qrels 与盲组顺序一致。
+
+fit 分支没有进入新排列，原训练组、标签、assignment 和损失不变。这里修复的是评价元数据接口，不是变更 H 的训练问题。
+
+3.2 当前评分链
+
+run.py 第 188—195 行的 evaluate() 输出该组实际评分对应的 view_ids。第 198—223 行的 query_ap() 显式接收这些 ID，要求 ID 唯一且非空、分数有限、标签为二元，并用：
+(-matrix[q, i], view_ids[i])
+破平（第 218 行）。原候选下标破平已移除。分数／qrels 与 ID 对应重排后，逐 query ID 的 AP 保持一致。
+
+原生调用点 tests.py 第 319—323 行也已改为 evaluation_order().labels() 配合实际盲评分顺序的 view_ids，避免修了 builder 却仍把旧顺序标签传给指标。
+
+3.3 cpu05 具体断言
+
+tests.py 第 105—108 行使用手写商品编号所确定的私有成员关系，逐对核对 builder 导出的 qrels，不以导出 ID 反推标签作为参考。
+
+第 121—155 行另外核对：
+（1）opaque ID 与私有关系对齐，显式 identity 清空；
+（2）固定两两相邻规则不再复原该手写组标签；
+（3）反转旧视图顺序不改变规范盲输出；
+（4）改变 identity 与旧 view UID 不改变公开盲载荷；
+（5）全同分 AP 与固定 ID 排名的独立单正例参考一致；
+（6）进行非平凡存放重排后，按 query ID 对应的 AP 字典完全一致。
+
+cpu05/console.txt 明确执行了上述数据与 blind/ties 两项测试。cpu05/blind_ties.json 同时保存具体 AP 值和对应检查结果，不是只保存 PASS 名称。
+
+3.4 网页端独立微核对
+
+本次额外使用 240 条手写字符串、12 个观察账号，分别构成 fit/dev/heldout 各四账号。只调用数据构造，并通过 AST 单独提取实际 evaluate/query_ap，以纯数值评分器检查协议。结果如下：
+
+— fit 载荷和 fit qrels 与首轮逐项相同；
+— dev/heldout qrels 与私有手写成员逐对一致；
+— 更改 identity／旧 view UID 不改变公开盲载荷；
+— evaluation_order 和 blind 幂等，反转输入顺序仍得到相同规范盲组；
+— 实际 evaluate 返回的 ID 与分数顺序一致；
+— 全同分和部分同分两种情况下，正确重排分数／标签／ID 后，逐 query ID 的 AP 严格不变，且与独立单正例秩参考一致。
+
+完整脚本与结果见 checks/data_metric_checks.py、data_metric_checks.json。纯数值评分器只验证接口接线，不能当模型效果或项目原生资格。
+
+3.5 关闭判断
+
+F01 与 F02 均关闭。修复去除了原显式共同身份前缀、固定正例相邻结构和依赖该结构的下标破平。一次固定排列的 AP 不必等于均匀随机破平期望 363/980；本轮材料没有错误地设置这个目标。
+
+本关闭不声称商品文本无法预测关系，也不把 opaque ID 当通用身份加密方案。这里排除的是首轮具体指出的直接元数据编码；不额外要求近重复系统或文本不可识别性。
+
+四、F03：旧证据来源桥已闭合，复用范围明确
+
+4.1 旧→首轮的实际差异
+
+在验证五份旧源身份后，我检查了逐行差异，并对相关函数／类做三版 AST 对比：cpu01 旧源、首轮源码、本轮源码。
+
+methods.py 旧→首轮仅新增 VendorLink 专用 vendor_weight_decay=0、分类类别唯一性检查，以及 VendorLink 优化器使用专用 weight_decay；H 的优化器返回分支不变。
+
+run.py 旧→首轮修改 execute 的阶段优化器构造，使 H 跨域继承 Adam，并更新对应说明；save_state/load_state 和 RNG 函数不变。
+
+data.py 旧→首轮只修 build_views 的处理前精确重复检查；实际数学／梯度所依赖的 Group.validate、Group.labels、Group.from_dict、assignment、Ad/View、seed_for 不变。
+
+tests.py 的独立池化／损失参考和 H 数学／VendorLink 表示评分测试不变；旧实际 VJP 测试到首轮只在两个参数变化标量读取处加 detach。四臂阶段测试另增强了 Adam 继承、分类头更新和阶段边界恢复检查，这些增强使用后续证据。
+
+4.2 已机械核对的未变部分
+
+33 个选定函数／类在旧→首轮→本轮三版 AST 一致，详情见 source_and_cpu05_checks.json，包括：
+
+— VendorLink 的 vendor_embeddings、vendor_scores、encode／score、update_vendor；
+— H 的 h_pool、h_loss、h_objective、记录表示／记录表／backward_h、teacher、update_h；
+— 整个 Memory 类；
+— rng_state、restore_rng、save_state、load_state、set_rates；
+— 上述必要数据依赖与独立数学参考、相关数学测试。
+
+同时核对 H optimizer 的返回分支 AST 未变，Settings 的旧→首轮差异仅新增 VendorLink 专用衰减字段。当前 methods.py 又与首轮逐字节相同，因此本轮未改变已审 H 数学或 VendorLink 表示／评分。
+
+4.3 准确复用结论
+
+cpu01 的 VendorLink 表示／评分数学、H 数学、H 实际更新链和同版本下一步恢复机制证据可以按未变范围复用。数据去重修复仍由 cpu02 支持，跨阶段 Adam 及阶段流程由 cpu04／cpu05 支持，本轮评价／继承端点／多块增量由 cpu05 支持。
+
+不把 cpu01 旧阶段流程用于证明后来才修正的 H Adam 继承；不把同版本保存恢复证据扩大成旧 checkpoint 已通过跨版本直接加载。cpu03 仍只是旧来源重复，不作为当前资格证据，原费用保留。
+
+F03 关闭。无需全套重跑旧数学或恢复测试。
+
+五、F04：恢复目录的完整端点交接已修复
+
+5.1 当前控制流
+
+run.py 第 30—35 行增加 file_sha256，以 1 MiB 块流式读取文件。第 111—120 行在开始后续阶段循环前，对 1..cursor.stage 的已完成端点逐项执行：
+
+（1）定位恢复来源目录中的 stageN.pt；
+（2）计算源 SHA；
+（3）复制到新 job；
+（4）核对目标 SHA；
+（5）记录目标相对路径、来源绝对路径和 SHA。
+
+只有完成这一步后，第 121—123 行才进入阶段循环并调用 load_fit。缺祖先文件或校验失败会进入现有 failure 路径，不继续训练。load_state 在此前已调用，所以准确表述是“进一步训练前失败”，并非“模型加载前失败”。
+
+第 179—181 行 completion 同时保存完整三端点列表和 inherited_endpoints，原来恢复后相对 stage1.pt 不存在的缺口已被补齐。stage2 恢复时会复制 stage1 与 stage2，不是只补一个固定首端点。
+
+5.2 原生证据
+
+tests.py 第 309—318 行对四臂实际从 stage1 恢复，要求只请求 B/C；新 completion 所列三端点全部存在；原 stage1 和继承 stage1 的 SHA 相同；清单 SHA 与源文件一致；恢复后的最终模型与连续训练模型逐位一致。
+
+cpu05/actual_four_trajectories.json 的四臂均保存完整端点、继承首端点同字节和阶段恢复一致的结果，console 明确执行对应测试。证据支持的是“完整三端点存在、复制的首端点字节相同、最终模型状态相同”，不额外声称新生成 stage2/stage3 整个序列化文件与原目录逐字节相同。
+
+5.3 网页端有限补核
+
+我通过 AST 仅提取当前 file_sha256 与继承复制代码块，对手写字节文件检查 stage1 继承一个文件、stage2 继承两个文件；包含 1 MiB＋17 字节例以实际跨读取块。源／目标字节、SHA 和清单来源路径均一致。缺 stage1 的手写目录触发 FileNotFoundError，未产生目标端点。
+
+该补核没有运行完整 execute、load_state 或模型，没有把手写 .pt 后缀字节文件当成训练权重。缺文件故障路径的结论来自该微例及复制块位于训练前的静态控制流，不冒称 cpu05 已额外执行了这一故障测试。见 checks/source_and_copy_checks.py 与 source_and_cpu05_checks.json。
+
+F04 关闭；不需要通用恢复平台或新增原生模型测试。run.py 第 243—244 行仍禁止未经新合同的正式 CLI resume，修复没有扩大发布或执行权限。
+
+六、cpu05 的资格与账目
+
+6.1 四项实际测试
+
+测试 | 受影响范围与实际断言
+test_data_views_splits_and_no_label_scoring | builder qrels 与手写私有成员逐对一致，原数据门和盲评分约束保留。
+test_blind_alignment_and_ties | opaque ID、identity／旧 UID 独立性、固定 ID 破平和存放重排不变性。
+test_actual_vjp_updates_and_full_restore | 当前／历史两支实际跨块更新，与 direct autograd 更新对照，实际参数变化及下一步恢复。
+test_four_actual_trajectories_memory_and_future_access | 四臂阶段／Adam／历史作用和恢复；三个端点齐全，继承首端点 SHA 一致，最终模型一致。
+
+cpu05/console.txt 第 1—12 行记录这四项执行并通过；依据是当前测试源码中的具体断言与对应原件，而非名称或 PASS 数量。
+
+6.2 两处真实分块边界已覆盖
+
+tests.py 第 212 行确实把当前与历史夹具都改成 component_sizes=(2,)*7。按实际 fixture 得到 14 个视图、35 条记录，因此有 595 个无序记录对；标题／描述共 70 条通道文本。model_for 保持 microbatch=64，而生产头部分块为 512。该例同时跨过两处边界，不是仅改证据 JSON 中的计数。
+
+第 219 行运行生产 update_h；第 222—229 行分别对当前和历史执行普通 autograd，合并 clip 并优化一步；第 230—231 行比较全部参数的一步更新结果，容差 atol=2e-7、rtol=2e-5。第 232—235 行要求 encoder/head 真实变化。第 240—255 行保存恢复 Python／NumPy／Torch RNG，并核对恢复下一步模型和 Adam 状态，atol=rtol=0。
+
+保存数值：encoder_change=1.2837350368499756e-05；head_change=0.0012855231761932373。
+
+准确结论是“生产分块路径与 direct autograd 的一步参数更新在既定容差内一致，恢复下一步模型／Adam 状态逐位一致”。测试没有逐项比对两条路径原始 parameter.grad，因此不写成“所有原始梯度逐位相同”。该证据足以关闭首轮指出的多块覆盖缺口，但仍只属于随机微型 HF BERT 的手写资格，不扩展为完整英文预训练 BERT、长文本或 GPU 资格。
+
+6.3 来源与费用
+
+五份当前来源与 cpu05 receipt 全部大小／SHA 一致。
+原始 wall：5.18633585202042 秒。
+本次收费：ceil(wall)=6 秒。
+原累计：20 秒；本次后累计：26／300 秒。
+本次峰值 RSS：776,126,464 字节。
+exit_code=0；limit_reason=null；formal_data_reads=0；pretrained_model_loads=0；gpu=false。
+
+cpu01 失败、cpu03 旧来源重复及 20 秒旧账均保留，没有以修复通过覆盖历史。verification.json 中的服务器／传输描述作为交付记录阅读，本报告未访问服务器重新测量；本轮可独立核对的是归档／源码身份、代码断言、console 和保存结果的对应。
+
+七、实际阅读与独立执行范围
+
+先完整阅读 implementation/review/primary_disposition.zh.txt，再阅读 source_bridge、cpu05 全部原件及当前 data/run/tests 的修订和必要上下文。对嵌套五份旧源，做逐文件身份、旧→首轮差异及相关函数／依赖的 AST 对照。methods、CPU wrapper、authorization 及首轮未变判断按身份与差异复用，不重新展开全项目方法审查。实际范围表见 reading_scope.tsv。
+
+本次网页工作区：Python 3.12.14、NumPy 2.3.5、Linux-6.18.55-x86_64-with-glibc2.39。独立执行只包括哈希、AST／差异、手写数据／纯数值接口与手写字节复制。没有导入 Torch／Transformers，没有加载模型、执行训练／现有测试套件、读取正式数据／标签或访问项目服务器。网页补核不等于项目 Linux 既有 py310 的 cpu05 原生资格；两类证据在本报告中分别引用。
+
+八、完成状态与权限边界
+
+本次修复复核完成，F01—F04 全部关闭，多块手写资格覆盖补齐，未发现本轮新引入的具体实质问题，没有剩余必修项。可将本轮处置记为 TARGETED_RECHECK_COMPLETED / F01_F04_CLOSED。
+
+四臂、受控账号视图代理、原方法掩码均值假设、既有 H 参数和零新增 HPO 均沿用首轮。近重复／模板、真实控制者标签、VendorLink+ER、首阶段共享维持首轮已限定的可选范围；本报告不增加这些要求。
+
+真实三市场读取、预训练模型下载、真实 GPU 资格、正式 36 轨迹、三路准入与累计预算、最终评价／标签开放仍需另行合同及授权。当前无首阶段共享，不计 90 阶段节省。以上是未变的正式运行前提，不是四项修复未通过，也不需要为关闭本轮审查再行补测。
