@@ -23,6 +23,9 @@ import step29_vendorlink_data as d
 import step29_vendorlink_methods as m
 import step29_vendorlink_run as run
 import step29_vendorlink_prepare as prepare
+import step29_vendorlink_export as export_data
+import step29_vendorlink_native as native
+import step29_vendorlink_native_control as native_control
 
 
 def fixture(domain="A", split="fit", component_sizes=(2, 2, 2, 2)):
@@ -89,6 +92,91 @@ class Qualification(unittest.TestCase):
 
     def evidence(self, name, value):
         run.write_json(Path(os.environ["VENDORLINK_TEST_ROOT"])/(name+".json"), value)
+
+    def test_native_g1_actual_updates_and_recovery(self):
+        domains = ("AlphaBay", "Dream", "Agora")
+        sample_sources = {}
+        for domain in domains:
+            groups = []
+            for part in range(3):
+                views = []
+                for identity in range(part*8, (part+1)*8):
+                    for view in range(2):
+                        records = tuple(d.Ad(f"{domain}-{identity}-{view}-{k}",
+                            f"blue item {identity}", f"text sample {view} {k}") for k in range(2))
+                        views.append(d.View(f"{domain}-{identity}-{view}", records, f"{domain}:{identity}"))
+                groups.append(d.Group(f"{domain}:fit:{part}", domain, "fit", tuple(views)))
+            path = self.root/f"{domain}.json"
+            # Full head contains classes absent from the three fit groups.
+            run.write_json(path, dict(domain=domain, groups=[asdict(g) for g in groups],
+                                     classes=[f"{domain}:{i}" for i in range(35)]))
+            sample_sources[domain] = dict(path=str(path), bytes=path.stat().st_size,
+                                         sha256=run.file_sha256(path), classes=35)
+        result = native.qualify_g1(lambda method: model_for(method, self.root),
+                                  native.stage_loader(sample_sources), self.root/"native")
+        self.assertEqual(sum(r["updates"] for r in result.values()), 15)
+        self.assertEqual(result["VendorLink_SEQ"]["classes"], [35, 35, 35])
+        for method in ("H_ER", "H_full"):
+            self.assertEqual([r["groups"] for r in result[method]["retention"]], [3, 6])
+        self.assertTrue(all(x > 0 for x in result["H_full"]["kd"]["gradient_max_difference"].values()))
+        self.assertEqual(result["H_full"]["recovery"], "nonempty_adam_memory_rng_next_step")
+        self.assertEqual(result["VendorLink_SEQ"]["recovery"], "nonempty_state_roundtrip_and_stage_boundary_next_step")
+        for method in m.METHODS:
+            state = torch.load(self.root/"native"/method/"stage3.pt", weights_only=False)
+            if method == "VendorLink_SEQ":
+                self.assertEqual(state["model"]["classifier.weight"].shape[0], 35)
+            self.assertEqual(result[method]["blind_view_pairs"], 231)
+        self.evidence("native_g1", {method: {k: r[k] for k in ("classes", "updates", "recovery", "kd", "retention")}
+                                     for method, r in result.items()})
+
+    def test_native_export_isolation_and_resource_accounting(self):
+        rows = [dict(market=market, vendor=f"seller-{i}", title=f"item {market} {i} {j}",
+                     description=f"description sample {market} {i} {j}")
+                for market in ("AlphaBay", "Dream", "Agora") for i in range(80) for j in range(20)]
+        partition = dict(split_seed=20261029, train_fraction=.7, dev_fraction=.15,
+                         records_per_view=2, identities_per_group=8)
+        expected = d.preview_counts(rows, **partition)["partitions"]
+        result = export_data.export(rows, partition, self.root/"export", self.root/"private_custody", expected)
+        for domain, source in result["qualification_samples"].items():
+            value = json.loads(Path(source["path"]).read_text())
+            self.assertEqual(len(value["groups"]), 3)
+            self.assertEqual(len(value["classes"]), expected[domain+":fit"]["accounts"])
+            self.assertTrue(all(g["split"] == "fit" for g in value["groups"]))
+        for domain in ("AlphaBay", "Dream", "Agora"):
+            values = json.loads((self.root/"export"/f"{domain}_heldout.json").read_text())
+            qrels = json.loads((self.root/"private_custody"/f"{domain}_heldout_qrels.json").read_text())
+            for group in values:
+                self.assertTrue(all(v["identity"] is None for v in group["views"]))
+                self.assertEqual(qrels[group["uid"]]["view_ids"], [v["uid"] for v in group["views"]])
+            self.assertFalse((self.root/"export"/f"{domain}_heldout_qrels.json").exists())
+        with self.assertRaises(ValueError):
+            native.stage_loader(result["qualification_samples"])("Dream", self.root/"bad_access.jsonl")
+        # Current occupancy is already deducted from free; reserve only the unseen remainder.
+        snapshot = dict(free=15, processes={101: 5})
+        self.assertTrue(native_control.fits(snapshot, {101: 10}, 10))
+        self.assertFalse(native_control.fits(dict(free=14, processes={101: 5}), {101: 10}, 10))
+        self.assertTrue(native_control.overlap([[dict(started=0, ended=4)], [dict(started=2, ended=5)],
+                                               [dict(started=3, ended=6)]]))
+        self.assertFalse(native_control.overlap([[dict(started=0, ended=1)], [dict(started=1, ended=2)],
+                                                [dict(started=2, ended=3)]]))
+        self.evidence("native_export_control", dict(partitions=len(result["counts"]),
+            full_classes=True, sealed_qrels=True, future_domain_rejected=True,
+            reservations_count_only_unreflected=True, disjoint_updates_rejected=True))
+
+    def test_native_supervisor_charges_and_stops_real_children(self):
+        ledger = dict(aux=0, g1=0, g2=0, attempts=[])
+        native_control.supervise([[sys.executable, "-c", "print('handwritten child completed')"]],
+            [self.root/"success"], 10, "aux", self.root, dict(os.environ), ledger, {})
+        first_charge = ledger["aux"]
+        self.assertGreaterEqual(first_charge, 1)
+        with self.assertRaises(RuntimeError):
+            native_control.supervise([[sys.executable, "-c", "import time; time.sleep(30)"]],
+                [self.root/"timeout"], 3, "aux", self.root, dict(os.environ), ledger, {})
+        self.assertEqual(ledger["status"], "STOP_NO_AUTOMATIC_RETRY")
+        self.assertGreater(ledger["aux"], first_charge)
+        self.assertEqual(len(ledger["attempts"]), 2)
+        self.assertEqual(ledger["attempts"][-1]["tasks"][0]["returncode"], -9)
+        self.evidence("native_supervisor", ledger)
 
     def test_public_source_adapter(self):
         headers = ['hash', 'market_name', 'item_link', 'vendor_name', 'name', 'description']

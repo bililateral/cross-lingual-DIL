@@ -1,0 +1,69 @@
+{
+  "scope": "Reviewer isolated environment; handwritten CSV/tar.xz/ZIP only. No original archives, cache, Torch, model, training or server access.",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+  },
+  "source_sha256": "36438694953d1d580855282ec57c3b2e62715b7f26ad9409f239b10c4aa7d98a",
+  "checks": {
+    "archive_order_invariance": true,
+    "earliest_complete_not_earliest_incomplete": true,
+    "ambiguous_listing_excluded": true,
+    "actual_full_grams_header_with_trailing_blank": true,
+    "utf8_bom_and_latin1_accents": true,
+    "numeric_handles_preserve_string": true,
+    "wrong_market_extra_and_missing_columns_rejected": true,
+    "replacement_char_text_rejected": true,
+    "unexpected_agora_member_rejected": true,
+    "provided_inventory_source_arithmetic": true,
+    "provided_inventory_config_identity": true
+  },
+  "handwritten_report": {
+    "markets": {
+      "AlphaBay": {
+        "snapshot_files": 3,
+        "parsed_rows": 11,
+        "valid_rows": 5,
+        "replacement_character_rows": 1,
+        "repeated_listing_rows": 2,
+        "missing_required_rows": 2,
+        "wrong_market_rows": 1,
+        "malformed_rows": 2,
+        "distinct_listing_keys": 3,
+        "ambiguous_account_listings_removed": 1,
+        "canonical_rows": 2
+      },
+      "Dream": {
+        "snapshot_files": 1,
+        "parsed_rows": 1,
+        "valid_rows": 1,
+        "distinct_listing_keys": 1,
+        "canonical_rows": 1
+      },
+      "Agora": {
+        "parsed_rows": 4,
+        "valid_rows": 2,
+        "missing_required_rows": 1,
+        "malformed_rows": 1,
+        "canonical_rows": 2
+      }
+    },
+    "dates": {
+      "AlphaBay": {
+        "first": "2016-01-01",
+        "last": "2016-01-03",
+        "snapshots": 3
+      },
+      "Dream": {
+        "first": "2016-01-01",
+        "last": "2016-01-01",
+        "snapshots": 1
+      }
+    }
+  },
+  "original_archive_identity_independently_rehashed": false,
+  "qualifications": [
+    "Canonical text has intentional NFKC/whitespace normalization; preservation means string type/meaningful leading zeros, not original bytes.",
+    "This checker tests pinned-schema behavior, not an exhaustive CSV parser or full production corpus."
+  ]
+}

@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 数据外审回收与限定原生工作区
+
+三市场数据外审返回51161字节ZIP（SHA07b356d6…）已核对全部12载荷；[完整原文与附件](../reports/documentation/20261029/vendorlink/three_market/review/external/report.zh.txt)、网页完成原件和主审保留Windows，重复返回ZIP已删除。原106444字节输入暂供后续实施审查来源衔接，不再作为待回收状态。
+
+新增Linux独立`reports/documentation/20261029/vendorlink/native/workspace`，九源码与cpu08实物对应；手写CPU07/08及资源元数据八个文件SFTP回传后逐项大小/SHA匹配，见[清单](../reports/documentation/20261029/vendorlink/native/transfer.json)。cpu07_sources.zip保留原失败/局部通过的旧源码，不当作无用传输包删除；39336字节后续deploy.zip在当前源码确认后已删除两端。config/permit/implementation三个小文件已同步Linux并核对SHA，permit实施门false、qualification目录不存在；没有真实视图/qrels或GPU产物。新136445字节实施送审包按用户具体授权上传，原件保留待回收。根可变文档此次仍只Windows更新，不覆盖活动实验冻结文件；不重置大清理周期。
+
 ## 2026-10-29 三市场规范来源缓存与独立数据工作区
 
 用户明确采用AlphaBay/Dream/Agora后，Linux新增`/home/yongpeng/cross-lingual/data/vendorlink/three_market_20261029/canonical.jsonl`，127537165字节、SHA256 fc80eaf41e712691bd15761a8854a3f094f93ce1153799dabb84a7b9753f4855，包含236457条规范公开商品记录；它服务后续一次数据构建，不是训练器可访问的历史Memory。原两个归档不变，缓存正文未回传Windows、不进入Git/外审。

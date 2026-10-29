@@ -1,0 +1,153 @@
+{
+  "review": "DATA_NATIVE_PLAN_TARGETED_REVIEW_COMPLETED",
+  "date_local": "2026-10-29",
+  "timezone": "UTC+08:00",
+  "input": {
+    "name": "vendorlink_data_native_plan_review.zip",
+    "bytes": 106444,
+    "sha256": "c7f59348077e7163f6ace756eaebfbbe388edf2375a4ec8c5a6c467c02247949",
+    "members": 29,
+    "payloads": 28
+  },
+  "data_implementation": "PASS_WITH_STATED_PROXY_AND_EVIDENCE_BOUNDARIES",
+  "new_scientific_blockers": [],
+  "new_reproducibility_defects": [],
+  "prior_findings": {
+    "F01": "CLOSED_UNCHANGED_EVIDENCE_REUSED",
+    "F02": "CLOSED_UNCHANGED_EVIDENCE_REUSED",
+    "F03": "CLOSED_UNCHANGED_EVIDENCE_REUSED",
+    "F04": "CLOSED_UNCHANGED_EVIDENCE_REUSED"
+  },
+  "gpu_plan": {
+    "assessment": "ACCEPTABLE_BOUNDED_PROPOSAL_PENDING_SPECIFIC_IMPLEMENTATION_ACCEPTANCE_AND_AUTHORIZATION",
+    "task_seconds_ceiling": 2100,
+    "optimizer_steps_ceiling": 24,
+    "implemented": false,
+    "authorized": false,
+    "executed": false,
+    "qualification_pass_claimed": false,
+    "required_acceptance_clarifications": [
+      {
+        "id": "G01",
+        "issue": "Small fit groups do not create the full 775/270/1007-class heads via execute",
+        "source": "run.py:128-132; methods.py:145-152",
+        "minimum": "Current-domain complete class metadata, fixed authorized small text samples, actual full-head update"
+      },
+      {
+        "id": "G02",
+        "issue": "All encoder microbatch graphs remain resident until backward",
+        "source": "methods.py:161-193",
+        "minimum": "Measure full approved training shapes with nonempty Adam/current+history; allocated/reserved/NVML peak; no assumed 8-text residency"
+      },
+      {
+        "id": "G03",
+        "issue": "Memory full payload size differs from token count",
+        "source": "methods.py:262-293",
+        "minimum": "Within authorized samples retain up to 3 groups from each of first two domains, measure 6-group complete serialization without additional optimizer steps"
+      },
+      {
+        "id": "G04",
+        "issue": "Positive KD scalar alone does not prove gradient participation",
+        "source": "methods.py:116-132,177-194; run.py:83-86",
+        "minimum": "Natural frozen birth teacher; same-state/RNG KD on/off gradient check without extra step; identify zero encoder LR on step 2 if total=2"
+      },
+      {
+        "id": "G05",
+        "issue": "Vendor stage transition resets Adam after restore",
+        "source": "run.py:60-73,128-132",
+        "minimum": "Compare restored nonempty state before reset and name boundary-next-step evidence accurately; H_full covers shared nonempty Adam next-step path"
+      },
+      {
+        "id": "G06",
+        "issue": "Three live processes are not three overlapping updates",
+        "source": "plan.zh.txt:40-42",
+        "minimum": "Measured heaviest branch, actual synchronized update overlap, state changes, same-sample resource reservations and cumulative task charging"
+      },
+      {
+        "id": "G07",
+        "issue": "All-market canonical cache is preparation-only",
+        "source": "prepare.py:139-152; run.py:123-125,161-164",
+        "minimum": "Stage-bound fit/class-metadata allowlist; past only surviving Memory; no dev/heldout/qrels access"
+      }
+    ]
+  },
+  "reasonable_followups": [
+    {
+      "id": "N01",
+      "requires_new_execution": false,
+      "minimum": "Clarify 9511 account-text object units and canonical string preservation; no new scan"
+    },
+    {
+      "id": "N02",
+      "user_confirmation_required": true,
+      "minimum": "Formal view/qrels export with proposed fixed config and separate label custody"
+    },
+    {
+      "id": "N03",
+      "user_confirmation_required": true,
+      "minimum": "Bounded native GPU qualification implementation and approval before execution"
+    },
+    {
+      "id": "N04",
+      "user_confirmation_required": true,
+      "minimum": "Measured admission/peak/concurrency/accounting; unmet checks remain uncovered"
+    },
+    {
+      "id": "N05",
+      "user_confirmation_required": true,
+      "minimum": "Later formal epoch, Q/O/F/N, paired dependence, label opening, campaign and cumulative budget contract"
+    }
+  ],
+  "optional_not_auto_adopted": [
+    {
+      "item": "near-duplicate/template robustness",
+      "if_omitted": "Exact-deduplicated observed-account proxy only"
+    },
+    {
+      "item": "additional Dream data/groups/seeds",
+      "if_omitted": "Finite fixed-sample and run-condition precision only"
+    },
+    {
+      "item": "real controller labels",
+      "if_omitted": "No real alias/control truth claim"
+    },
+    {
+      "item": "VendorLink+ER",
+      "if_omitted": "No cross-method equal-memory attribution"
+    },
+    {
+      "item": "first-stage sharing",
+      "if_omitted": "108 physical stages in proposed 36-trajectory design"
+    }
+  ],
+  "out_of_scope_overdesign": [
+    "all order permutations",
+    "every-epoch diagnostics",
+    "all old baselines",
+    "CKA or HPO",
+    "outcome-dependent parameter choice",
+    "new raw source solely for paper-version identity",
+    "generic data/recovery/scheduling platforms",
+    "full historical requalification"
+  ],
+  "native_cpu_record": {
+    "wall_seconds": 3.9504025779897347,
+    "charged_seconds": 4,
+    "prior_charged_seconds": 26,
+    "cumulative_charged_seconds": 30,
+    "peak_rss_bytes": 767422464
+  },
+  "reviewer_execution": {
+    "environment": {
+      "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+    },
+    "stdlib_only": true,
+    "original_unittest_executed": false,
+    "torch_or_transformers_imported": false,
+    "training_or_gpu": false,
+    "project_server_access": false,
+    "formal_text_cache_models_qrels_read": false
+  },
+  "completion": "Review completed; no mandatory code repair. Formal running requires a separate contract."
+}

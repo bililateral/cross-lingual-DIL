@@ -1,0 +1,34 @@
+VendorLink固定导出与限定原生资格：最小实现和执行边界
+2026-10-29。用户“外审已结束，继续按计划推进”承接此前已呈现的三市场/四臂/限定2100秒方案；本文件不是36条正式训练合同。
+
+1. 输入与审查承接
+数据方案外审完整回收、逐项核对并经独立主审结案，见../three_market/review/primary_disposition.zh.txt。三市场AlphaBay/Dream/Agora、既有四方法、H两参数、历史0.1/0.5、6群/1MiB、Vendor原方法掩码平均复现假设均保持；零新增HPO。旧数学、cpu05多块、盲化/同分/恢复端点复制复用。当前新增三个具体入口，未更改data/methods/run生产算法。
+
+2. 实际入口与数据边界
+step29_vendorlink_export.py：从固定canonical SHA构建已有split_seed20261029、70/15/15、2广告/视图、8账号/群，实际builder输出与既有九分区预览逐项计数相符才写文件。每市场fit/dev/heldout分开；dev/heldout已盲化，qrels另存private_custody，路径700/文件600，当前不做指标或标签开放。fit同时导出最多3个固定正常满群及当域完整classes；按原builder顺序取前三个满群，不依据模型结果选择。正式源、生成文本、类别表、qrels均只留Linux。
+全部新运行产物位于permit.job下；export与private_custody也是该目录的子目录，监督器32GiB总产物计数涵盖它们。原canonical仍是准备资产，资格worker配置虽定位export清单，但只读取其中qualification_samples的当前域小文件，不把canonical或盲评价集传给模型。
+
+step29_vendorlink_native.py：轻量资格循环直接调用实际Model/start_vendor_stage/make_optimizer/set_rates/update_vendor/update_h/Memory/save_state/load_state/evaluate。它不调用正式execute把三个小群全训练一遍；每域选一个群做基本更新、前两域各3群用于Memory保留，避免将9更新误记为3更新。正式execute未改变，也未声称此驱动是36条批次系统。
+G1四臂基本三阶段12次；H_full第二阶段加一次及其恢复重复一次；Vendor第二阶段恢复重复一次，共15次。Vendor完整类别头从当前类别表构造，预期775/270/1007；CPU夹具用35类且小群只含24类，明确检查真实35行classifier。
+前两域基本更新使用真实fit小样本，第三阶段使用同一fit群结构/类别的手写满长压力文本，准确标为long_stress，不把该步称第三域真实正文训练或效果。实际tokenizer检查32条达到H256/Vendor512；H实际records包含标题与描述64通道。44广告/88通道/946记录对的手写blind组通过evaluate生成231视图对分数。没有真实heldout/qrels进入GPU资格；压力文本不进入正式训练或Memory。
+KD开关只backward：同模型/真实出生teacher/同随机种子比较H_full与H_ER历史分支所有encoder/head梯度。零梯度差或非有限会失败；有差异仅报告梯度作用，不声称含/不含KD的Adam更新差。H_full第二阶段第2步沿用total=2，encoder LR为0、head仍更新；其他已有非零LR步核对encoder变化，不改调度凑证据。
+每步完整选定embedding矩阵及头矩阵变化检查，保存同步后的真实更新起止/损失/学习率/allocated与reserved峰值。Memory保留3→6群及完整bytes，已有teacher逐项不变；H_full恢复比较非空Adam、模型、Memory/teacher/sampler、RNG、游标和模式及下一步。Vendor按外审建议准确命名完整状态往返+阶段边界下一步。恢复浮点标准在GPU前固定为rtol1e-5/atol1e-6，离散值和RNG不能事后放宽。torch确定性开启、TF32关闭、无AMP、CUBLAS_WORKSPACE_CONFIG=:4096:8；不支持或失败按未通过报告。
+
+step29_vendorlink_native_control.py：只监督本次export/G1/G2，检查固定来源/模型/许可，既有py310。permit中的implementation_review_closed当前false，所以不能实际启动。G1先free≥17GiB，allocator限制16GiB，RAM24GiB、disk32GiB；G1峰值由reserved及同一XML采样的NVML进程占用取较大者。实际较重方法决定G2，不能预设H最重。
+G2最多3worker各300秒，实施每路2次更新、共6次，未超过9上限；从G1最后阶段非空Adam和存活Memory恢复，当前只读Agora小文件，三worker全部ready后打开同一个起跑文件。验收真实optimizer区间存在三路交集且各自encoder/head变化；若没重叠则失败，不用进程数冒充资格。每槽R=max(对应NVML峰值,reserved峰值)+max(1GiB,10%)；同一次free/各PID占用采样，补入只扣max(R-已反映占用,0)，不重复扣完整R。
+资源不够保存WAIT_RESOURCE，不开GPU、不停止他人任务；同配置可继续资源等待。正式调度器/常驻监听未启动。失败保存已用账及STOP_NO_AUTOMATIC_RETRY，不自动重复、不清零；确定实现错误仍须明确按原余额和剩余更新处理，当前监督器不自动执行该重试。
+
+3. 预算与计量
+G1累计任务墙钟≤900秒，最多15更新；G2各worker从Popen到退出≤300秒，三路相加≤900，最多9更新（当前实现6）；辅助≤300；总≤2100。加载、保存、失败和CUDA同步含于worker墙钟；每次任务向上取整。辅助计export墙钟加不与worker监督区间重叠的准备/收尾墙钟；父进程在子任务期间的监督已包含该区间，不再双计成另一个300秒任务。启动/等待barrier均计对应worker；资源不足时立即返回，后续检查继续原账，不把闲置时段记成GPU占用。G1/G2留2秒退出尾部，原生内部另留20秒检查尾部；如实际超限如实标BUDGET_EXCEEDED，不抹平。
+CPU增量仍使用原300秒手写额度，与未来2100秒不同账；不借490/822/110小时。没有E、正式36条预算、效果判据或标签开放授权。
+
+4. 本轮真实核验与失败
+cpu07：Linux原py310、随机微型四层BERT、手写文本，两个测试中G1完整操作通过，导出测试因内存整数直方图键与JSON字符串键比较报错。wall14.850980503018945，收费15，累计45/300，峰值786702336字节；全部原件和cpu07_sources.zip保留。该错误发生在写正式输出之前，没有真实数据/标签读取。
+修复只统一待比较直方图的键表示。cpu08只补导出/资源条件及真实子进程监督，两个测试通过，wall4.842890752945095，收费5，累计50/300，峰值745381888字节。监督器实测一个正常Python子进程成功、另一个手写sleep进程按时限被SIGKILL，收费均保留；这不是科研任务失败。三个测试整体覆盖本轮当前缺口，未重跑G1数学。
+G1已测作用：四臂4/3/3/5=15次真实optimizer更新；3→6群完整Memory；H_full自然teacher KD对encoder/head梯度最大差0.00945437/0.02827030，监督项对照相同；H与Vendor对应恢复重放通过；最大盲形状231对。微型模型/手写35类头证据不冒称真实BERT775/270/1007类或GPU合格。
+cpu07到cpu08仅export的键规范化及新增监督器测试；native/control及既有G1测试函数未改。cpu07_sources.zip可恢复旧源码，当前九来源与cpu08一致；已SFTP回收8个证据/资源文件并逐项匹配。没有在Windows执行科研实现/测试。
+资源快照：服务器2026-10-29T18:32:37+08:00，free15190MiB（约14.83GiB），仍小于17GiB尝试门；RAM240575131648字节、disk274235441152字节。这是新快照，不改旧10074MiB原观测。root显示进程cwd不可读，记录不可用而未提权；可读科研进程身份另列resource.json。没有新GPU进程/正式导出/模型加载或监听。
+
+5. 下一步与外发
+本次新增GPU/导出实现须定向实施外审；新具体输入包仍需对应上传授权，旧106444字节许可不自动覆盖新包。材料包括当前源码/固定config/执行门、CPU07失败和CPU08修复原件、旧源及本轮已结案外审/主审；不含真实文本、正式类别载荷、qrels、模型、Memory或密码。
+外审/独立处置关闭后才能把实施门置为closed并执行已批准下一阶段范围；资源不满足则按本项目一次性等待规则处理，不能空卡才运行，也不现在建立重复监听。资格完成后依实测给正式共同曝光E、评价口径及累计预算供确认。

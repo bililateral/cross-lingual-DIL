@@ -1,0 +1,275 @@
+{
+  "scope": "web_review_container_stdlib_static_and_handwritten_only_not_project_py310_qualification",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "formal_text_qrels_or_models_read": false,
+  "torch_or_transformers_imported": false,
+  "training_or_native_test_suite_executed": false,
+  "nested_archive": {
+    "bytes": 10003,
+    "sha256": "7a369d6f55e419f726a8ebbdbc7c9a98c5649d722e85fc9542139706d0b5cb83",
+    "comment_claimed_git_commit": "7d74e718af9c88b4ce274bf448d6a81f9cf1653f",
+    "members": [
+      {
+        "path": "scripts/",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "directory": true
+      },
+      {
+        "path": "scripts/step29_vendorlink_data.py",
+        "bytes": 9122,
+        "sha256": "c480c3b270dd536233c59c8cd6f599894d7f65edd82ce9f8fe4c428b089d91e3",
+        "directory": false
+      },
+      {
+        "path": "tests/",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "directory": true
+      },
+      {
+        "path": "tests/test_step29_vendorlink.py",
+        "bytes": 20336,
+        "sha256": "5bd11992271df5b2945343e3eeeb40b34563c98f205919312106c3ca99f6975e",
+        "directory": false
+      }
+    ],
+    "old_source_matches_cpu05_receipt": true
+  },
+  "byte_identical_cpu05_sources": [
+    {
+      "path": "scripts/step29_vendorlink_methods.py",
+      "bytes": 14287,
+      "sha256": "5d0bec81b0f3ceb17b677bf832b6ebc57c7baf5d09e5f2c50c840ed210b9e664",
+      "cpu05_match": true
+    },
+    {
+      "path": "scripts/step29_vendorlink_run.py",
+      "bytes": 13884,
+      "sha256": "5172bca563707bdfc1b5061a2733f78c08123548c1060b04ac593fb318219d5c",
+      "cpu05_match": true
+    },
+    {
+      "path": "scripts/step29_vendorlink_cpu.py",
+      "bytes": 3196,
+      "sha256": "4fc9b9a623bb002180dafdeb5467c05b3a91efc8d3d417726e890e70169c9b0a",
+      "cpu05_match": true
+    }
+  ],
+  "cpu06_all_six_source_files_match": true,
+  "unchanged_data_ast": [
+    "seed_for",
+    "Ad",
+    "View",
+    "Group",
+    "canonical",
+    "assignment"
+  ],
+  "unchanged_previous_test_ast": [
+    "fixture",
+    "model_for",
+    "independent_pool",
+    "independent_loss",
+    "Qualification.setUp",
+    "Qualification.tearDown",
+    "Qualification.evidence",
+    "Qualification.test_data_views_splits_and_no_label_scoring",
+    "Qualification.test_blind_alignment_and_ties",
+    "Qualification.test_vendor_representation_and_diagonal_reference",
+    "Qualification.test_h_math_and_missing_operations",
+    "Qualification.test_actual_vjp_updates_and_full_restore",
+    "Qualification.test_four_actual_trajectories_memory_and_future_access"
+  ],
+  "differential_handwritten_cases": [
+    {
+      "case": "empty",
+      "handwritten_rows": 0,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 0,
+        "too_few_ads": 0,
+        "insufficient_group": 0
+      },
+      "group_counts": {}
+    },
+    {
+      "case": "three_market",
+      "handwritten_rows": 1800,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 0,
+        "too_few_ads": 0,
+        "insufficient_group": 0
+      },
+      "group_counts": {
+        "A:dev": 1,
+        "A:fit": 3,
+        "A:heldout": 1,
+        "B:dev": 1,
+        "B:fit": 3,
+        "B:heldout": 1,
+        "C:dev": 1,
+        "C:fit": 3,
+        "C:heldout": 1
+      }
+    },
+    {
+      "case": "19_vs_20",
+      "handwritten_rows": 312,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 0,
+        "too_few_ads": 8,
+        "insufficient_group": 0
+      },
+      "group_counts": {
+        "A:fit": 1
+      }
+    },
+    {
+      "case": "larger_view_capacity",
+      "handwritten_rows": 752,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 0,
+        "too_few_ads": 16,
+        "insufficient_group": 3
+      },
+      "group_counts": {
+        "A:fit": 2
+      }
+    },
+    {
+      "case": "joint_raw_exact_and_within_account_duplicate",
+      "handwritten_rows": 801,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 2,
+        "too_few_ads": 2,
+        "insufficient_group": 2
+      },
+      "group_counts": {
+        "A:fit": 2,
+        "A:heldout": 1,
+        "B:fit": 2,
+        "B:heldout": 1
+      }
+    },
+    {
+      "case": "post_mask_exact_shared",
+      "handwritten_rows": 400,
+      "old_new_outputs_equal": true,
+      "preview_full_aggregate_agreement": true,
+      "rejected": {
+        "shared_exact_text": 2,
+        "too_few_ads": 2,
+        "insufficient_group": 1
+      },
+      "group_counts": {
+        "A:fit": 2,
+        "A:heldout": 1
+      }
+    }
+  ],
+  "independent_joint_raw_and_masked_duplicate_threshold_oracles": true,
+  "group_chunk_size_oracle_0_through_24": {
+    "0": [],
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [
+      4
+    ],
+    "5": [
+      5
+    ],
+    "6": [
+      6
+    ],
+    "7": [
+      7
+    ],
+    "8": [
+      8
+    ],
+    "9": [
+      9
+    ],
+    "10": [
+      10
+    ],
+    "11": [
+      11
+    ],
+    "12": [
+      8,
+      4
+    ],
+    "13": [
+      8,
+      5
+    ],
+    "14": [
+      8,
+      6
+    ],
+    "15": [
+      8,
+      7
+    ],
+    "16": [
+      8,
+      8
+    ],
+    "17": [
+      8,
+      9
+    ],
+    "18": [
+      8,
+      10
+    ],
+    "19": [
+      8,
+      11
+    ],
+    "20": [
+      8,
+      8,
+      4
+    ],
+    "21": [
+      8,
+      8,
+      5
+    ],
+    "22": [
+      8,
+      8,
+      6
+    ],
+    "23": [
+      8,
+      8,
+      7
+    ],
+    "24": [
+      8,
+      8,
+      8
+    ]
+  },
+  "split_formula_and_casefold_oracle": true,
+  "all_nine_inventory_partition_arithmetic_checks": true,
+  "limitations": [
+    "No original source/cache bytes available; aggregate source counts not independently recomputed.",
+    "Shared helpers alone cannot exclude common-mode errors; old-builder equality and handwritten independent expectations are used here.",
+    "No new mathematical, gradient, optimizer, model, or GPU evidence is produced."
+  ]
+}

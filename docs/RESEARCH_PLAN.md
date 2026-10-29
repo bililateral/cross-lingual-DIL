@@ -14,7 +14,7 @@ VendorLink扩展已由用户明确选择完整H迁移，并要求原论文方法
 
 L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
 
-VendorLink三市场已由用户确定为AlphaBay/Dream/Agora，来源接线和实际联合盘点已完成，下一步以[增量方案](../reports/documentation/20261029/vendorlink/three_market/plan.zh.txt)及其定向外审为准，不再询问市场或等待SR1。先关闭数据接线/划分及原生资格方案审查，再确认真实视图导出和限定GPU范围，补齐必要资格入口与实施审查后测单/三路资源。依据实测固定正式epoch、评价编排和累计预算，批准后运行。沿用四臂/零新增HPO；时间、反馈匹配、摘要文本及代理主张边界明示。2100秒及36条仍未批准，不能把本次数据准备/CPU验证当正式训练许可。
+VendorLink三市场AlphaBay/Dream/Agora的数据实现/划分/原生方案外审已[独立结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)。用户随后“继续按计划推进”承接已呈现的一次固定导出和2100秒限定资格，新增[实施入口](../reports/documentation/20261029/vendorlink/native/implementation.zh.txt)已完成手写增量核验并提交定向外审。下一步回收新实施意见、独立处置必要问题；关闭实施门后才导出和按所需资源执行G1/G2，不重复询问市场，不要求空卡。资格后依据实测提出正式epoch、评价/依赖口径和累计预算，再获确认后正式运行36条。四臂/零新增HPO及代理任务边界保持，不能把CPU通过或外审提交当GPU资格通过。
 
 ## 已结束Optuna的授权与恢复历史
 

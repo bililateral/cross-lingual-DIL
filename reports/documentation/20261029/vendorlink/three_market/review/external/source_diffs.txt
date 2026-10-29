@@ -1,0 +1,235 @@
+--- cpu05/scripts/step29_vendorlink_data.py
++++ current/scripts/step29_vendorlink_data.py
+@@ -5,6 +5,7 @@
+ from __future__ import annotations
+ 
+ from dataclasses import asdict, dataclass
++from collections import Counter
+ import hashlib
+ import json
+ import random
+@@ -85,18 +86,10 @@
+     return " ".join(unicodedata.normalize("NFKC", text).split())
+ 
+ 
+-def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
+-                dev_fraction: float, records_per_view: int, identities_per_group: int) -> tuple[dict, dict, dict]:
+-    """Canonical rows: market/vendor/title/description. No model-based selection.
+-
+-    Equal lowercased handles share a split across markets, NOT a relation label.
+-    Exact text shared across observed accounts is excluded, not labeled positive.
+-    Near duplicates and true owner separation are not claimed.
+-    """
+-    if not (0 < train_fraction < 1 and 0 < dev_fraction < 1-train_fraction):
+-        raise ValueError("Three nonempty split fractions required")
+-    if records_per_view < 2 or identities_per_group < 4:
+-        raise ValueError("Two records/view and at least four identities/group required")
++def eligible_ads(rows: list[dict], records_per_view: int):
++    """Shared exact cleaning for inventory and actual view construction."""
++    if records_per_view < 2:
++        raise ValueError("Two records/view required")
+     accounts, owners, ads, raw_owners, raw_fingerprints = {}, {}, {}, {}, {}
+     for row in rows:
+         if any(not isinstance(row.get(k), str) for k in ("market", "vendor", "title", "description")):
+@@ -116,7 +109,7 @@
+         accounts.setdefault(key, set()).add(fingerprint)
+         ads[(key, fingerprint)] = Ad(fingerprint, title, description)
+         raw_fingerprints.setdefault((key, fingerprint), set()).add(raw_fingerprint)
+-    buckets, rejected = {}, {"shared_exact_text": 0, "too_few_ads": 0, "insufficient_group": 0}
++    eligible, rejected = {}, {"shared_exact_text": 0, "too_few_ads": 0, "insufficient_group": 0}
+     for key in sorted(accounts):
+         market, vendor = key
+         clean = [f for f in accounts[key] if len(owners[f]) == 1 and all(
+@@ -126,8 +119,67 @@
+         if len(clean) < max(20, 2*records_per_view):
+             rejected["too_few_ads"] += 1
+             continue
+-        value = seed_for(split_seed, "identity_split", vendor.casefold()) / 2**31
+-        split = "fit" if value < train_fraction else "dev" if value < train_fraction+dev_fraction else "heldout"
++        eligible[key] = clean
++    return eligible, ads, rejected, len(accounts)
++
++
++def split_for(vendor: str, split_seed: int, train_fraction: float, dev_fraction: float) -> str:
++    value = seed_for(split_seed, "identity_split", vendor.casefold()) / 2**31
++    return "fit" if value < train_fraction else "dev" if value < train_fraction+dev_fraction else "heldout"
++
++
++def group_chunks(values: list, identities_per_group: int) -> list[list]:
++    chunks = [values[i:i+identities_per_group] for i in range(0, len(values), identities_per_group)]
++    if chunks and len(chunks[-1]) < 4:
++        if len(chunks) == 1:
++            return []
++        chunks[-2].extend(chunks.pop())
++    return chunks
++
++
++def validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group):
++    if not (0 < train_fraction < 1 and 0 < dev_fraction < 1-train_fraction):
++        raise ValueError("Three nonempty split fractions required")
++    if records_per_view < 2 or identities_per_group < 4:
++        raise ValueError("Two records/view and at least four identities/group required")
++
++
++def preview_counts(rows: list[dict], *, split_seed: int, train_fraction: float,
++                   dev_fraction: float, records_per_view: int, identities_per_group: int) -> dict:
++    """Only aggregate proposed split counts. Does not create views or qrels."""
++    validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group)
++    eligible, ads, rejected, observed = eligible_ads(rows, records_per_view)
++    buckets, markets = {}, {}
++    for (market, vendor), clean in eligible.items():
++        split = split_for(vendor, split_seed, train_fraction, dev_fraction)
++        buckets.setdefault((market, split), []).append(len(clean))
++        m = markets.setdefault(market, {"eligible_accounts": 0, "clean_ads_in_eligible_accounts": 0})
++        m["eligible_accounts"] += 1
++        m["clean_ads_in_eligible_accounts"] += len(clean)
++    partitions = {}
++    for (market, split), values in sorted(buckets.items()):
++        chunks = group_chunks(values, identities_per_group)
++        used = sum(map(len, chunks))
++        partitions[market+":"+split] = {"accounts": len(values), "used_accounts": used,
++            "groups": len(chunks), "group_account_sizes": dict(Counter(map(len, chunks))),
++            "views": 2*used, "selected_ads": 2*records_per_view*used,
++            "h_updates_per_epoch": len(chunks),
++            "vendor_updates_per_epoch_batch32": (2*records_per_view*used+31)//32}
++        rejected["insufficient_group"] += len(values)-used
++    return {"source_rows": len(rows), "observed_accounts": observed, "rejected": rejected,
++        "markets": markets, "partitions": partitions, "planning_only": True,
++        "views_or_qrels_created": False, "cleaning": "same eligible_ads as build_views"}
++
++
++def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
++                dev_fraction: float, records_per_view: int, identities_per_group: int) -> tuple[dict, dict, dict]:
++    """Equal casefold handles share split only; no inferred real-owner labels."""
++    validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group)
++    eligible, ads, rejected, observed = eligible_ads(rows, records_per_view)
++    buckets = {}
++    for (market, vendor), clean in sorted(eligible.items()):
++        key = (market, vendor)
++        split = split_for(vendor, split_seed, train_fraction, dev_fraction)
+         identity = hashlib.sha256(json.dumps(key, ensure_ascii=False).encode()).hexdigest()
+         selected = sorted(clean, key=lambda f: (seed_for(split_seed, "ads", identity, f), f))[:2*records_per_view]
+         views = tuple(View(identity+f":view{k}", tuple(ads[(key, f)] for f in
+@@ -136,12 +188,8 @@
+     payloads, labels = {}, {}
+     for (market, split), identities in sorted(buckets.items()):
+         identities.sort(key=lambda x: (seed_for(split_seed, "groups", market, x[0]), x[0]))
+-        chunks = [identities[i:i+identities_per_group] for i in range(0, len(identities), identities_per_group)]
+-        if len(chunks[-1]) < 4:
+-            if len(chunks) == 1:
+-                rejected["insufficient_group"] += len(chunks[0])
+-                continue
+-            chunks[-2].extend(chunks.pop())
++        chunks = group_chunks(identities, identities_per_group)
++        rejected["insufficient_group"] += len(identities)-sum(map(len, chunks))
+         for index, chunk in enumerate(chunks):
+             group = Group(f"{market}:{split}:{index}", market, split,
+                           tuple(v for _, views in chunk for v in views))
+@@ -152,7 +200,7 @@
+             # Evaluation inputs carry no identity labels; these remain in the separate qrels output.
+             payloads.setdefault(f"{market}:{split}", []).append(asdict(group if split == "fit" else group.blind()))
+     return payloads, labels, {"scope": "observed_account_disjoint_ad_views_not_verified_aliases",
+-        "source_rows": len(rows), "observed_accounts": len(accounts), "rejected": rejected,
++        "source_rows": len(rows), "observed_accounts": observed, "rejected": rejected,
+         "group_counts": {k: len(v) for k, v in payloads.items()}, "split_key": "casefold_handle_across_markets",
+         "near_duplicate_exclusion": False, "latent_owner_disjointness_verified": False}
+ 
+--- cpu05/tests/test_step29_vendorlink.py
++++ current/tests/test_step29_vendorlink.py
+@@ -1,14 +1,18 @@
+ """Handwritten-only Linux qualification; real tiny BERT, no downloaded weights."""
+ import copy
++import csv
+ from dataclasses import asdict
+ import json
++import io
+ import math
+ import os
+ from pathlib import Path
+ import random
+ import sys
+ import tempfile
++import tarfile
+ import unittest
++import zipfile
+ 
+ import numpy as np
+ import torch
+@@ -18,6 +22,7 @@
+ import step29_vendorlink_data as d
+ import step29_vendorlink_methods as m
+ import step29_vendorlink_run as run
++import step29_vendorlink_prepare as prepare
+ 
+ 
+ def fixture(domain="A", split="fit", component_sizes=(2, 2, 2, 2)):
+@@ -84,6 +89,69 @@
+ 
+     def evidence(self, name, value):
+         run.write_json(Path(os.environ["VENDORLINK_TEST_ROOT"])/(name+".json"), value)
++
++    def test_public_source_adapter(self):
++        headers = ['hash', 'market_name', 'item_link', 'vendor_name', 'name', 'description']
++        early = [['1', 'AlphaBay', 'url1', 'alice', 'first title', 'first description'],
++                 ['2', 'AlphaBay', 'url2', 'bob', 'ambiguous title', 'ambiguous description'],
++                 ['3', 'Dream', 'wrong', 'other', 'wrong market', 'wrong text'],
++                 ['4', 'AlphaBay', 'bad', 'bad', 'extra', 'bad', 'extra column']]
++        later = [['1', 'AlphaBay', 'url1', 'alice', 'later title', 'later description'],
++                 ['2', 'AlphaBay', 'url2', 'charlie', 'changed owner', 'changed owner text']]
++        dream = [['5', 'Dream', 'dream1', 'dream_vendor', 'dream title', 'dream description']]
++        grams, agora = self.root/'grams.tar.xz', self.root/'agora.zip'
++        with tarfile.open(grams, 'w:xz') as archive:
++            # Later snapshot first in archive: date, not traversal, must choose the retained text.
++            for name, records in [('root/2016-01-02/Alpha.csv', later),
++                                  ('root/2016-01-01/Alpha.csv', early),
++                                  ('root/2016-01-01/Dream.csv', dream)]:
++                text = io.StringIO(newline='')
++                writer = csv.writer(text)
++                writer.writerows([headers, *records])
++                payload = text.getvalue().encode()
++                member = tarfile.TarInfo(name)
++                member.size = len(payload)
++                archive.addfile(member, io.BytesIO(payload))
++        with zipfile.ZipFile(agora, 'w') as archive:
++            text = io.StringIO(newline='')
++            csv.writer(text).writerows([['Vendor', ' Item', ' Item Description'],
++                                        ['00123', 'agora title', 'agora description'],
++                                        ['empty', 'empty title', '']])
++            archive.writestr('Agora.csv', text.getvalue().encode('ISO-8859-1'))
++        rows, report = prepare.read_sources(grams, agora)
++        self.assertEqual(len(rows), 3)
++        by_market = {r['market']: r for r in rows}
++        self.assertEqual(by_market['AlphaBay']['title'], 'first title')
++        self.assertEqual(by_market['Agora']['vendor'], '00123')
++        self.assertEqual(report['markets']['AlphaBay']['ambiguous_account_listings_removed'], 1)
++        self.assertEqual(report['markets']['AlphaBay']['wrong_market_rows'], 1)
++        self.assertEqual(report['markets']['AlphaBay']['malformed_rows'], 1)
++        self.assertEqual(report['markets']['Agora']['missing_required_rows'], 1)
++        self.evidence('source_adapter', {'canonical_rows': len(rows), 'earliest_not_archive_order': True,
++            'ambiguous_listing_excluded': True, 'numeric_handle_string_preserved': True,
++            'wrong_market_and_bad_rows_excluded': True, 'handwritten_only': True})
++
++    def test_joint_preview_and_actual_builder_agree(self):
++        rows = [{'market': market, 'vendor': f'handle{i}', 'title': f'{market} product {i} {j}',
++                 'description': f'{market} text {i} {j}'}
++                for market in ('A', 'B', 'C') for i in range(90) for j in range(20)]
++        rows[1800] = {**rows[0], 'market': 'B'}
++        rows.append(dict(rows[0]))
++        options = dict(split_seed=20261029, train_fraction=.7, dev_fraction=.15,
++                       records_per_view=2, identities_per_group=8)
++        preview = d.preview_counts(rows, **options)
++        self.assertEqual([preview['markets'][m]['eligible_accounts'] for m in 'ABC'], [89, 89, 90])
++        self.assertFalse(preview['views_or_qrels_created'])
++        payload, labels, report = d.build_views(rows, **options)
++        for key, values in payload.items():
++            part = preview['partitions'][key]
++            self.assertEqual(part['groups'], len(values))
++            self.assertEqual(part['views'], sum(len(g['views']) for g in values))
++            self.assertEqual(part['selected_ads'], sum(len(v['records']) for g in values for v in g['views']))
++        self.assertEqual(preview['rejected'], report['rejected'])
++        self.evidence('joint_preview', {'expected_eligible_accounts': [89, 89, 90],
++            'cross_market_shared_text_removes_both_accounts_at_threshold': True,
++            'preview_matches_actual_builder_groups_views_ads': True, 'handwritten_only': True})
+ 
+     def test_data_views_splits_and_no_label_scoring(self):
+         rows = [{"market": market, "vendor": f"vendor{i}", "title": f"product {i} {j} {market}",

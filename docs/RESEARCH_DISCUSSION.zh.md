@@ -1,5 +1,11 @@
 # 训练期间的科研流程与需求讨论
 
+## 2026-10-29 三市场外审结案后继续限定原生实现
+
+用户明确：“外审已结束，继续按计划推进”。此时已呈现下一阶段固定导出、900+900+300=2100累计秒GPU资格及实施审查前提；依科研纪律第2节执行这个具体下一阶段，不重复询问市场或既定预算。正式36条的epoch/总预算尚未给出，不由“继续”推定补齐。三市场外审已完整回收并[独立处置结案](../reports/documentation/20261029/vendorlink/three_market/review/primary_disposition.zh.txt)，无新增必修实现缺陷；9511单位和CSV规范化措辞以补充为准，冻结原件不改。
+
+随后已实现固定导出/G1/G2监督入口，限定手写CPU内完成必要增量与修复；具体作用、失败、来源及边界见[实施说明](../reports/documentation/20261029/vendorlink/native/implementation.zh.txt)。用户对新的136445字节、SHA256 0d2124d490d4048f635f6b15f2538a883a20d0c2995084364849b3d1bc9280ad实施包明确回复“批准该完整实施包上传并外审”。已通过本地Playwright提交原VendorLink会话GPT-6／Pro，当前状态及凭据见[新增实施外审](../reports/documentation/20261029/vendorlink/native/review/submission.json)。此新包许可不混同上一轮106444字节输入许可；数据结案与新实施待回收分别登记。实施门仍关闭，未进行真实导出/预训练载模/GPU/正式训练。
+
 ## 2026-10-29 确定AlphaBay/Dream/Agora并推进数据接线
 
 后续具体外发授权：用户对106444字节、SHA256 c7f59348077e7163f6ace756eaebfbbe388edf2375a4ec8c5a6c467c02247949的vendorlink_data_native_plan_review.zip明确回复“批准该完整增量包上传并外审”。许可只用于原VendorLink会话的这次数据接线/划分/限定GPU方案外审，不启动GPU或正式训练。本地Playwright于17:49（UTC+8）完成上传并发送，17:50:29网页显示新附件/请求、正在思考及停止按钮；完整请求与观测见[提交记录](../reports/documentation/20261029/vendorlink/three_market/review/submission.json)。模型菜单先前有上限提示，但请求实际进入生成，未切换模型；审查尚未完成，下文“询问上传”为此前准备时点。
