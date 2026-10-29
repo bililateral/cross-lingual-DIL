@@ -12,7 +12,7 @@ VendorLink新场景实现（2026-10-29）：首轮[完整外审](../reports/docu
 
 当前五方法结果（2026-10-26）：45条及冻结新确认／统计均完整完成，见[独立结果分析](../reports/seller_alias_continual/20261026/continual_result/report.zh.txt)。H−S最终旧域／新域MAP正向，但遗忘差区间跨零，原O/F共同门未过；不因结果新增训练、调参或变更判据。本轮结果外审已完整回收并独立结案，见[完整外审](../reports/seller_alias_continual/20261026/continual_result/review/external/review_report.zh.txt)及[主审处置](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)。唯一Memory尺寸摘要重复计数及两处文字已追加[勘误](../reports/seller_alias_continual/20261026/continual_result/errata.zh.txt)，不影响原主门；不新增修复实验，专用页已关闭。两新对照另行执行范围／预算按最新决定，本结果审查不授予新实验。下方启动／等待文字保留各自时点，不据此重复运行；当前状态统一看[交接顶部](AI_RESEARCH_HANDOFF.zh.md#当前工作)。
 
-VendorLink后续明确范围（2026-10-29）：用户已批准服务器实际数据资格盘点和正式所需模型下载，替代上段相关事项尚未获准的旧范围；[本轮盘点及下一步提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)记录实际缺失三市场来源、官方申请入口、固定BERT文件身份，以及待确认的数据划分和2100累计任务秒GPU范围。该提议不是正式合同，现有来源中silk road 3.1不替代原始Silk Road；不因模型文件已齐授予载模/开训，既有四臂实现审查不重开。
+VendorLink后续明确范围（2026-10-29）：用户已批准服务器数据盘点/模型准备，并进一步批准Gwern候选下载、检查及“可用只留Linux、不适用删除”。[初次盘点及提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)保留当时范围；[下载后的实际资格检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)补充公开归档结果、商品去重口径、来源偏差及保管事实。新来源资格不等于正式数据合同，70/15/15及2100累计任务秒GPU提议仍未批准；不因文件已齐授予载模/开训，不用silk road 3.1替换原始Silk Road，不重开未改变的四臂实现审查。
 
 ## 设计与审查沿革（历史）
 

@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 Gwern候选下载、资格与按需清理
+
+用户明确要求下载检查，并指示“确认了的搬运到Linux上，windows上不留副本。不行的就直接删掉”。[本轮检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)后仅保留Linux `/home/yongpeng/cross-lingual/data/vendorlink/gwern_20261029/grams-20150714-20160417.tar.xz`，67788336字节，SHA256 3163bc149144b8460216ee81e7ded5594b653ad0b89bd49a88f9eff544913c97。未完整解包，AlphaBay/Dream正文只在Linux解析。两个源的大小/SHA256跨端一致，SHA1与发布方一致。
+
+SR1 2013包因仅9个账号满足20广告门槛，不足当前提议的三划分各4账号，已[删除](../reports/documentation/20261029/vendorlink/gwern_inventory/rejected_archive.json)11151256字节，未留解包副本。Windows两包共78939592字节在Linux身份验证后已[删除](../reports/documentation/20261029/vendorlink/gwern_inventory/cleanup_windows.json)；Linux初次直连失败的605903字节也已清理。无新的模型/权重/训练，未动活动冻结来源，不重置大清理日期。
+
+小型报告/来源身份/核验脚本两端保管。原资格JSON/log中异常市场字段含错位商品文本，自动审批拒绝覆盖/删除Linux原件后，改为保留Linux原始审计证据，另导出qualification_summary.json；跨端核对原件SHA及汇总计数一致后，只删除Windows原始证据副本，见[汇总导出](../reports/documentation/20261029/vendorlink/gwern_inventory/summary_export.json)及[Windows证据副本清理](../reports/documentation/20261029/vendorlink/gwern_inventory/cleanup_evidence_copies.json)。Windows无本轮数据归档/正文副本，只有代码、去除文本片段的汇总和元数据。根级交接/设计/计划/讨论/存储文档仅Windows更新；本轮只本地Git，不借先前Harness推送范围扩大外发。
+
 ## 2026-10-29 VendorLink数据盘点与英文模型保管
 
 用户明确批准盘点及下载正式所需模型，并要求Windows后备下载完成搬运后删除副本。官方google-bert/bert-base-cased固定revision cd5ef92a9fb2f889e972770a36d4ed042daf221e六文件共436414632字节，最终保管在Linux `/home/yongpeng/cross-lingual/models/step29/bert_base_cased`；[最终回执](../reports/documentation/20261029/vendorlink/data_qualification/model_ready.json)保存逐文件身份。主权重435755784字节，官方SHA256为1d8bdcee6021e2c25f0325e84889b61c2eb26b843eef5659c247af138d64f050；预训练pooler键存在，未载模/推理/训练。
