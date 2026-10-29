@@ -2,7 +2,7 @@
 
 状态与观测只维护在[当前交接](AI_RESEARCH_HANDOFF.zh.md)，本页说明后续动作及其授权边界，不复制执行流水。
 
-VendorLink扩展已由用户明确选择完整H迁移，并要求原论文方法对照；受控账号商品视图代理、原方法掩码平均补全和300秒手写CPU均已批准。四臂实现及F01—F04[定向审查结案](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)完成，下一步只落实实际三市场文件/字段/数据资格、英文模型和限定GPU、固定曝光与评价、三路资源及累计预算。当前不增加VendorLink+ER或HPO；真实控制者关系不是已有真值。36条为前瞻提议，首阶段未共享时按108阶段估算；不得借490/822/110小时或据代码存在启动正式实验。具体设计从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)定位，不在本页复制CPU/网页/进度流水。
+VendorLink扩展已明确选择完整H迁移及原论文方法对照，四臂为VendorLink_SEQ、H_SEQ、H_ER、H_full。AlphaBay/Dream/Agora来源、固定划分导出与实施审查已经落实，详见[设计入口](CURRENT_EXPERIMENT_DESIGN.md)；不再把“落实三市场文件”列为尚未开始的下一步。当前沿用唯一监听完成已批准2100累计秒的限定GPU资格，具体10GiB单次尝试及G2实测门见下方执行段。资格结束后依据实测提交正式epoch、评价/依赖口径和累计预算，确认后才能运行拟议36条。代理任务与原方法掩码平均补全假设保持；不增加第五臂或HPO，不借490/822/110小时预算，不把观察账号视图当真实潜在同控真值。首阶段未共享时按108阶段估算，不虚计共享节省。
 
 原版S_default＋历史H（G_half）的补充范围也已批准：三顺序×三种子×两方法18条、最多三路、108h训练＋2h辅助=110h，单条6h；只训练、保存54端点及旧dev盲分数，不开放评价标签、不新增确认或HPO。[等待增量主审](../reports/documentation/20261026/continual_defaults/waiting/review/primary_disposition.zh.txt)及必要修复核验已完成，[唯一监听](../reports/documentation/20261026/continual_defaults/waiting/launch.json)已启用。下一步由现有监听等指定L²R／ER+GCR整批训练、生成、确认和分析全部成功、相关进程退出，再按实验所需剩余显存和RAM/disk门逐路派发；不要求整卡没有CUDA进程，禁止重复启动。失败停止且不自动重试，原失败和费用均承接。
 

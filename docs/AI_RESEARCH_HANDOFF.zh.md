@@ -2,14 +2,28 @@
 
 ## 当前工作
 
-本节只给当前状态、有效范围和下一步；下方历史段落按原观测时点保留，不作为新的启动或授权指令。合同从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，后续动作看[计划](RESEARCH_PLAN.md)。本次文档核对为2026-10-29；运行时间使用服务器Asia/Shanghai时钟，已知约比本机快5分14秒，未改系统时钟。
+本节只维护当前状态、有效范围和下一步；历史叙述按原观测时点保留，不作为新启动或新授权。合同从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)进入，后续动作看[计划](RESEARCH_PLAN.md)。本次实际观测为服务器2026-10-29 22:18—22:19（Asia/Shanghai）；沿用已知服务器约比本机快5分14秒的偏差，未调系统时钟，下列预计完成时刻也是服务器时钟。
 
 | 工作 | 最新有效状态与证据 | 下一步与边界 |
 |---|---|---|
-| VendorLink四臂与三市场准备 | 既有[实施外审及主审闭合](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)保持。用户最新要求“把17G先改成10G门槛，先尝试一下”，已按[本次补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)启用唯一等待进程2439822。固定导出18载荷完整，原CLI末尾print错误已修；CPU11/12/13累计76/300秒，包含实际导出CLI与等待单次派发/自删核验。 | 有效来源及门为[waiting配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)、[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)，旧repair/trial按历史保留。等指定新增任务释放GPU且空闲≥10GiB、RAM≥24GiB、disk≥32GiB，再尝试一次；分配器9GiB，其他CUDA不阻断，G2仍按实测3槽门。最新[现场](../reports/documentation/20261029/vendorlink/native/waiting/observation.json)为WAITING，GPU更新0；原导出失败aux15秒承接，导出核对1秒、首次监听检查1秒后aux17/300，G1/G2均0/900。总2100秒不增，正式36条/E/总预算/评价开放未批准。 |
-| L²R／ER+GCR新对照 | 服务器2026-10-29 13:50:06：[实际快照](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_harness.json)显示10/18完整、3活跃、5待派发，34/54新端点。控制器1198791与三worker身份相符、日志继续推进、无failure，47来源匹配。 | 按已批822累计小时（800训练+18确认+4辅助）、三路、全18盲完成及108状态完整门后生成/确认/分析。H/S54仅复用，不重训；没有提前开放效果。 |
-| S_default＋历史H（G_half） | 同次现场：唯一监听1257448仍WAITING／PREDECESSOR_STILL_RUNNING，未派发，训练0，控制872.08/7200秒，无失败，44来源匹配。 | 已批18条、最多三路、110累计小时、单条6h，只训练/54端点/旧dev盲分数。等待前批完整成功退出后按所需剩余显存等资源派发，不重复启动、不要求全卡无CUDA。 |
-| 原五方法45条及Optuna | 均已完成并结案，证据从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)追溯。五方法H−S最终旧域MAP正向，但原O/F共同主要门false。 | 不为翻转结论重训/调参；已删除权重不可由SHA恢复。VendorLink及原版补充均不追改旧验收和标签接触事实。 |
+| L²R／ER+GCR新对照 | 22:18:05[实际快照](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_evening.json)：**13/18完整、3活跃、2待派发，41/54新端点**。相较13:50新增BCA_s5／s6 L²R与CAB_s4 GCR完成。控制器1198791及三worker身份、更新日志、CPU推进相符，47来源匹配，无failure。 | 按822累计小时（800训练＋18确认＋4辅助）、三路、全18盲完成及108状态完整门后生成／确认／分析；H/S54仅复用。16条已启动run的valid/heldout/owners均0，新确认生成、确认和分析均未开始；尚无可报告的新效果。 |
+| S_default＋历史H（G_half） | 同次现场：唯一监听1257448仍WAITING／PREDECESSOR_STILL_RUNNING，无dispatch，训练0，控制910.53/7200秒，无failure，44来源匹配。 | 已批18条、最多三路、110累计小时、单条6h，仅训练、54端点及旧dev盲分数。等指定前批训练／生成／确认／分析全部成功且相关进程退出，再按本任务资源门派发；不重复启动。H_default使用原rank，不是H_pos_default；结果开放与新确认尚未授权。 |
+| VendorLink四臂与三市场 | 22:19:05[实际快照](../reports/documentation/20261029/vendorlink/native/waiting/observation_evening.json)：唯一监听2439822身份相符，仍WAITING／TARGET_STILL_USING_GPU；七执行来源及配置身份一致。固定导出18载荷已完成，CPU累计76/300秒；G1/G2目录尚未形成、GPU更新0，aux20/300秒，原导出失败费用保留。 | 当前有效[10GiB补充](../reports/documentation/20261029/vendorlink/native/waiting/scope.zh.txt)、[配置](../reports/documentation/20261029/vendorlink/native/waiting/config.json)和[许可](../reports/documentation/20261029/vendorlink/native/waiting/permit.json)：等指定任务2428471释放GPU且空闲≥10GiB、RAM≥24GiB、disk≥32GiB后单次尝试，allocator9GiB；G2仍须独立满足实测三槽门。2100累计秒不增；正式36条、epoch、总预算及评价开放未批准。 |
+| 原五方法45条及Optuna | 均已完成并结案。五方法训练／新120群确认／统计于26日02:08:11收尾；[结果主审](../reports/seller_alias_continual/20261026/continual_result/review/primary_disposition.zh.txt)保留H−S最终旧域MAP正向及原O/F共同主门false。 | 不重训以翻转判据，不把排序收益改称额外抗遗忘已确认。H/S54端点保留给新对照；已删SEQ/ER/LOGIT81份独立权重不可由SHA恢复。Optuna旧六格门失败也保持。 |
+
+三路最新日志：CAB_s4_L²R第二阶段A 24/288（累计312/864），CAB_s5_L²R第一阶段C 96/288，CAB_s5_GCR第二阶段A 192/288（累计480/864）；各PID为2311259／2416861／2434376。短采样user CPU分别增加0.09／0.09／0.08秒；全批日志至少12120/15552更新（每24步报告，非瞬时精确值）。单5090总32607MiB、空闲1762MiB、GPU89%、62℃；本批三CUDA约7686／6460／7682MiB，另有他人任务2428471占8230MiB，未干预。RAM可用217813897216字节、disk267284979712字节。训练已结算232.47h，活跃已过16.90h，预约额度不当作已用；原822h及L²R每条72h／GCR12h硬限不变。
+
+工期复用同一只读观测器及原FIFO／三槽估算：若后续持续可补位，训练剩35.83h，预计服务器10月31日10:08；再留确认／分析2.5—4h，预计31日12:38—14:08，距观测38.33—39.83h，自26日10:25启动计约122.2—123.7h，结果外审另计。后续用时慢20%的同条件情景为31日19:48—21:18；两者均不是置信区间或保证上界。CAB首阶段已有112.09秒/步实测，后两阶段仍借跨顺序同阶段池；现有外来CUDA和单槽10GiB补位门可能引入额外等待，因此旧13:50预测不再作当前工期，也不承诺S/H或VendorLink启动日期。
+
+本次梳理的理解沿用已审结论：中文合成主线检验未见身份上的保持／学习，五方法证明固定系统的最终排序优势但未建立H对S的额外抗遗忘；L²R/GCR补已有持续学习方法的固定系统比较，原版S/H补默认配置与历史池化参照；VendorLink扩展到真实商品文本，但标签来自同一观察账号的两个人工视图，单query单正例、MAP=MRR，不能写成真实跨账号马甲识别已验证。四线的数据资格、预算、评价开放和解释边界独立。详细方法参照已有[同事汇报稿](L2R_GCR_VENDORLINK_BRIEF.zh.md)，该稿不是新的实验合同。
+
+本轮只核对已有授权记录、已开放结果、实际入口及只读运行元数据，没有新增训练／推理／指标重算／标签开放或监听。两份新观察原件SCP回传后大小/SHA一致；可变文档本轮只更新Windows，不覆盖活动冻结来源、不自动扩大10月29日此前批次的远端push许可。保管见[存储记录](STORAGE.zh.md#2026-10-29-晚间接手核对与进度补齐)。
+
+## 近期执行与审查历史
+
+以下保留当时原件和叙述；“正在生成”“未授权”“当前”等词仅对各段注明的日期、对象成立。当前动作只由上表与对应最新合同/补充决定。
+
+2026-10-29晚间更新前的13:50运行／文档交付及16:12数据盘点记录（已由顶部新观测和后续资格范围承接）：
 
 三路现场：BCA_s5_L²R第三阶段A 264/288（总840/864），BCA_s6_L²R第三阶段A 144/288（总720/864），CAB_s4_L²R第一阶段C 72/288。三worker PID1797385/1902791/2311259，短采样user CPU分别增加0.09/0.10/0.09秒；相较12:01日志均推进。全批已记录至少10272/15552更新（日志每24步报告，非精确瞬时数）。单5090使用22042/32607MiB、空闲10034MiB、GPU89%、60℃，三CUDA均为本批worker；RAM可用247580094464字节、disk276794634240字节。费用为已结算161.60h加活跃已过62.37h，预留不是已用；822h及单条L²R72h/GCR12h硬限不变。已启动run的valid/heldout/owners均0，未载模型、Memory或正式文本/标签。
 
@@ -18,10 +32,6 @@
 科研范围：中文合成三域主线与VendorLink受控观察账号视图扩展分别解释；后者每query单正例，所以MAP=MRR，不证明真实跨账号马甲识别。常设Harness已完成[规则优化](RESEARCH_DISCUSSION.zh.md#2026-10-29-科研harness优化落地)，执行看[科研纪律](RESEARCH_DISCIPLINE.zh.md)。用户随后要求推送及同步，现有11提交已交付到远端0e9a1614，根AGENTS及六份可变文档已SFTP同步Linux；本轮收尾记录随当次交付，详见[同步范围与核对](STORAGE.zh.md#2026-10-29-harness与当前文档同步交付)。新回收外审正文/附件仍按Windows范围保管；活动冻结来源保持同字节，未刷新上述训练观测或改变合同。
 
 VendorLink后续实际观测：2026-10-29服务器16:12:10[资格汇总](../reports/documentation/20261029/vendorlink/gwern_inventory/qualification_summary.json)，AlphaBay/Dream/SR1各有90151/36696/773个商品键、4153/1276/110个观察账号，合格账号1147/390/9。仅为数据盘点，无正式划分。Grams保管Linux67788336字节，两个下载源SHA1均匹配发布方；不足的SR1已按用户指示删除11151256字节，Windows两包78939592字节已清理。原审计JSON/log因异常源字段混有文本片段，仅留Linux原件；Windows只留脱敏汇总，计数机械核对不变。先前[本地缺源盘点](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)及[公开目录发现](../reports/documentation/20261029/vendorlink/data_qualification/gwern_sources.json)保留各自时点，不再当作“当前未下载”。本轮新小证据两端保管，根可变文档仅Windows更新；没有更改活动冻结文件或刷新训练效果/完成数。模型已核验但未载入，GPU资格/正式预算仍未执行。
-
-## 近期执行与审查历史
-
-以下保留当时原件和叙述；“正在生成”“未授权”“当前”等词仅对各段注明的日期、对象成立。当前动作只由上表与对应最新合同/补充决定。
 
 VendorLink实现与外审（2026-10-29 13:33，本机Asia/Shanghai）：首轮完整报告已从[唯一会话](https://chatgpt.com/c/6ae2cbeb-9774-83ea-930b-63c866dde2d0)回收，35,412字节返回包及10载荷身份一致，见[原文](../reports/documentation/20261029/vendorlink/implementation/review/external/report.zh.txt)与[独立主审](../reports/documentation/20261029/vendorlink/implementation/review/primary_disposition.zh.txt)。保留VendorLink_SEQ/H_SEQ/H_ER/H_full四臂；F01同分行号偏差/F02盲UID与排列暴露关系已一起修复，F03旧CPU五源码来源补齐，F04恢复首端点缺失已修。Linux独立repair_workspace/cpu05四项定向通过，含595对/70通道跨块、标签重排、四臂恢复端点同字节，收费6秒，累计26/300秒；旧失败/重复费用不改，无正式数据/预训练/GPU。修复包首次上传被自动审批拒绝后，用户明确批准具体51,586字节/SHA e45f69e0…完整包外发；13:33经本地Playwright成功单次提交同会话，见[增量提交](../reports/documentation/20261029/vendorlink/implementation/review/repair/submission.json)，正在思考/有停止按钮。下一步只回收本次F01—F04增量，勿把首轮12m49s旧报告当新结果，不重复上传/发送。专用页为待回收保留，无新自动化。正式三市场数据资格、英文GPU与三路/累计预算仍未批准；36条为提议，无共享是108阶段，不计90节省。当前每query单正例，MAP=MRR；只能主张观察账号视图代理结果。下述活动实验保持各自观测时点。
 

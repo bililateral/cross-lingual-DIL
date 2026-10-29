@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 晚间接手核对与进度补齐
+
+复用已有一次性只读运行观测器，在Linux既有py310采集作业元数据和工期；不调用科研实现、载模、Memory载荷、正式正文或评价标签。两份新原件经SCP回传并与Linux实际大小/SHA256核对：[新对照及原版等待现场](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_evening.json)224416字节／`82248ab47333a6d43c082842739d6b2074e818907411c304320cab40cadb955e`；[VendorLink等待现场](../reports/documentation/20261029/vendorlink/native/waiting/observation_evening.json)7356字节／`0d6a545a952852d9d494902d6642ffa3c37a334b90a854ae277bb55d1917102a`。保留旧观测，不覆盖原授权、配置、门、启动或失败记录。临时Linux采集脚本已删除；Windows中转文件移至各自已有qualification／waiting目录，无新增监听或状态系统。
+
+第一次采集包装因exec共用命名空间中的变量被观测器覆盖，在写出前报AttributeError；未形成文件或触及训练。隔离执行命名空间后重新只读采集，以上原件来自成功的第二次观察，不把第一次写成成功。此次不是科研执行／预算失败，原各实验账不改。交接、计划、讨论、存储四份可变文档只更新Windows；此次两份现场证据两端保管不等于总文档已同步Linux，也不等于Git已推送。原有删除及未跟踪材料保留，不重置大清理周期。
+
 ## 2026-10-29 VendorLink导出收尾及10GiB等待
 
 本轮固定导出已在Linux `native/qualification/export` 和 `private_custody` 形成18载荷，共8454714字节；以[机械复用核对](../reports/documentation/20261029/vendorlink/native/waiting/export_reuse.json)为准，Windows未保存正式文本或qrels，仅保存聚合计数/哈希。原导出末尾CLI报错、aux15秒及原trial配置保留；原控制账另存waiting/export_failure_ledger.json，当前账承接失败后复用同一导出，未重分数据。原始15秒账同时在trial/execution按失败来源保管，不以恢复覆盖失败事实。
