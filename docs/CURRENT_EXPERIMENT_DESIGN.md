@@ -14,7 +14,7 @@ VendorLink新场景实现（2026-10-29）：首轮[完整外审](../reports/docu
 
 VendorLink后续明确范围（2026-10-29）：用户已批准服务器数据盘点/模型准备，并进一步批准Gwern候选下载、检查及“可用只留Linux、不适用删除”。[初次盘点及提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)保留当时范围；[下载后的实际资格检查](../reports/documentation/20261029/vendorlink/gwern_inventory/report.zh.txt)补充公开归档结果、商品去重口径、来源偏差及保管事实。新来源资格不等于正式数据合同，70/15/15及2100累计任务秒GPU提议仍未批准；不因文件已齐授予载模/开训，不用silk road 3.1替换原始Silk Road，不重开未改变的四臂实现审查。
 
-Agora候选补充（2026-10-29）：用户要求“找agora”，已完成[公开原CSV取得与资格盘点](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)。建议后续将AlphaBay/Dream/Agora纳入数据方案，不将找源等同于批准第三市场替换。现有XLSX与原CSV行数不同，推荐固定新取得CSV；单市场数量不能替代联合去重、最终划分和曝光合同。短描述、无真实同控真值等边界保持，未改变四臂或启动任何GPU/正式训练。
+三市场后续明确决定（2026-10-29）：用户在[Agora原CSV盘点](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)后明确采用AlphaBay/Dream/Agora并继续推进，市场映射A/B/C由此确定，不再待确认。已完成真实来源接线、共用清理/分组预览和联合盘点；当前范围及数据/GPU资格提议见[增量方案](../reports/documentation/20261029/vendorlink/three_market/plan.zh.txt)。划分规则只作一次聚合预览，无真实views/qrels导出，CPU增量只用手写样例；GPU入口、实际资源资格与正式曝光/预算尚待落实。四方法的数学/训练入口及已有审查结论保持，不借数据准备许可开训或开放标签。
 
 ## 设计与审查沿革（历史）
 

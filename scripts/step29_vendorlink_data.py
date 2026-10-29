@@ -5,6 +5,7 @@ Preparation is a separately authorized operation. No files are read on import.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from collections import Counter
 import hashlib
 import json
 import random
@@ -85,18 +86,10 @@ def canonical(text: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", text).split())
 
 
-def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
-                dev_fraction: float, records_per_view: int, identities_per_group: int) -> tuple[dict, dict, dict]:
-    """Canonical rows: market/vendor/title/description. No model-based selection.
-
-    Equal lowercased handles share a split across markets, NOT a relation label.
-    Exact text shared across observed accounts is excluded, not labeled positive.
-    Near duplicates and true owner separation are not claimed.
-    """
-    if not (0 < train_fraction < 1 and 0 < dev_fraction < 1-train_fraction):
-        raise ValueError("Three nonempty split fractions required")
-    if records_per_view < 2 or identities_per_group < 4:
-        raise ValueError("Two records/view and at least four identities/group required")
+def eligible_ads(rows: list[dict], records_per_view: int):
+    """Shared exact cleaning for inventory and actual view construction."""
+    if records_per_view < 2:
+        raise ValueError("Two records/view required")
     accounts, owners, ads, raw_owners, raw_fingerprints = {}, {}, {}, {}, {}
     for row in rows:
         if any(not isinstance(row.get(k), str) for k in ("market", "vendor", "title", "description")):
@@ -116,7 +109,7 @@ def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
         accounts.setdefault(key, set()).add(fingerprint)
         ads[(key, fingerprint)] = Ad(fingerprint, title, description)
         raw_fingerprints.setdefault((key, fingerprint), set()).add(raw_fingerprint)
-    buckets, rejected = {}, {"shared_exact_text": 0, "too_few_ads": 0, "insufficient_group": 0}
+    eligible, rejected = {}, {"shared_exact_text": 0, "too_few_ads": 0, "insufficient_group": 0}
     for key in sorted(accounts):
         market, vendor = key
         clean = [f for f in accounts[key] if len(owners[f]) == 1 and all(
@@ -126,8 +119,67 @@ def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
         if len(clean) < max(20, 2*records_per_view):
             rejected["too_few_ads"] += 1
             continue
-        value = seed_for(split_seed, "identity_split", vendor.casefold()) / 2**31
-        split = "fit" if value < train_fraction else "dev" if value < train_fraction+dev_fraction else "heldout"
+        eligible[key] = clean
+    return eligible, ads, rejected, len(accounts)
+
+
+def split_for(vendor: str, split_seed: int, train_fraction: float, dev_fraction: float) -> str:
+    value = seed_for(split_seed, "identity_split", vendor.casefold()) / 2**31
+    return "fit" if value < train_fraction else "dev" if value < train_fraction+dev_fraction else "heldout"
+
+
+def group_chunks(values: list, identities_per_group: int) -> list[list]:
+    chunks = [values[i:i+identities_per_group] for i in range(0, len(values), identities_per_group)]
+    if chunks and len(chunks[-1]) < 4:
+        if len(chunks) == 1:
+            return []
+        chunks[-2].extend(chunks.pop())
+    return chunks
+
+
+def validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group):
+    if not (0 < train_fraction < 1 and 0 < dev_fraction < 1-train_fraction):
+        raise ValueError("Three nonempty split fractions required")
+    if records_per_view < 2 or identities_per_group < 4:
+        raise ValueError("Two records/view and at least four identities/group required")
+
+
+def preview_counts(rows: list[dict], *, split_seed: int, train_fraction: float,
+                   dev_fraction: float, records_per_view: int, identities_per_group: int) -> dict:
+    """Only aggregate proposed split counts. Does not create views or qrels."""
+    validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group)
+    eligible, ads, rejected, observed = eligible_ads(rows, records_per_view)
+    buckets, markets = {}, {}
+    for (market, vendor), clean in eligible.items():
+        split = split_for(vendor, split_seed, train_fraction, dev_fraction)
+        buckets.setdefault((market, split), []).append(len(clean))
+        m = markets.setdefault(market, {"eligible_accounts": 0, "clean_ads_in_eligible_accounts": 0})
+        m["eligible_accounts"] += 1
+        m["clean_ads_in_eligible_accounts"] += len(clean)
+    partitions = {}
+    for (market, split), values in sorted(buckets.items()):
+        chunks = group_chunks(values, identities_per_group)
+        used = sum(map(len, chunks))
+        partitions[market+":"+split] = {"accounts": len(values), "used_accounts": used,
+            "groups": len(chunks), "group_account_sizes": dict(Counter(map(len, chunks))),
+            "views": 2*used, "selected_ads": 2*records_per_view*used,
+            "h_updates_per_epoch": len(chunks),
+            "vendor_updates_per_epoch_batch32": (2*records_per_view*used+31)//32}
+        rejected["insufficient_group"] += len(values)-used
+    return {"source_rows": len(rows), "observed_accounts": observed, "rejected": rejected,
+        "markets": markets, "partitions": partitions, "planning_only": True,
+        "views_or_qrels_created": False, "cleaning": "same eligible_ads as build_views"}
+
+
+def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
+                dev_fraction: float, records_per_view: int, identities_per_group: int) -> tuple[dict, dict, dict]:
+    """Equal casefold handles share split only; no inferred real-owner labels."""
+    validate_partition(train_fraction, dev_fraction, records_per_view, identities_per_group)
+    eligible, ads, rejected, observed = eligible_ads(rows, records_per_view)
+    buckets = {}
+    for (market, vendor), clean in sorted(eligible.items()):
+        key = (market, vendor)
+        split = split_for(vendor, split_seed, train_fraction, dev_fraction)
         identity = hashlib.sha256(json.dumps(key, ensure_ascii=False).encode()).hexdigest()
         selected = sorted(clean, key=lambda f: (seed_for(split_seed, "ads", identity, f), f))[:2*records_per_view]
         views = tuple(View(identity+f":view{k}", tuple(ads[(key, f)] for f in
@@ -136,12 +188,8 @@ def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
     payloads, labels = {}, {}
     for (market, split), identities in sorted(buckets.items()):
         identities.sort(key=lambda x: (seed_for(split_seed, "groups", market, x[0]), x[0]))
-        chunks = [identities[i:i+identities_per_group] for i in range(0, len(identities), identities_per_group)]
-        if len(chunks[-1]) < 4:
-            if len(chunks) == 1:
-                rejected["insufficient_group"] += len(chunks[0])
-                continue
-            chunks[-2].extend(chunks.pop())
+        chunks = group_chunks(identities, identities_per_group)
+        rejected["insufficient_group"] += len(identities)-sum(map(len, chunks))
         for index, chunk in enumerate(chunks):
             group = Group(f"{market}:{split}:{index}", market, split,
                           tuple(v for _, views in chunk for v in views))
@@ -152,7 +200,7 @@ def build_views(rows: list[dict], *, split_seed: int, train_fraction: float,
             # Evaluation inputs carry no identity labels; these remain in the separate qrels output.
             payloads.setdefault(f"{market}:{split}", []).append(asdict(group if split == "fit" else group.blind()))
     return payloads, labels, {"scope": "observed_account_disjoint_ad_views_not_verified_aliases",
-        "source_rows": len(rows), "observed_accounts": len(accounts), "rejected": rejected,
+        "source_rows": len(rows), "observed_accounts": observed, "rejected": rejected,
         "group_counts": {k: len(v) for k, v in payloads.items()}, "split_key": "casefold_handle_across_markets",
         "near_duplicate_exclusion": False, "latent_owner_disjointness_verified": False}
 

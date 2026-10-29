@@ -1,14 +1,18 @@
 """Handwritten-only Linux qualification; real tiny BERT, no downloaded weights."""
 import copy
+import csv
 from dataclasses import asdict
 import json
+import io
 import math
 import os
 from pathlib import Path
 import random
 import sys
 import tempfile
+import tarfile
 import unittest
+import zipfile
 
 import numpy as np
 import torch
@@ -18,6 +22,7 @@ from transformers import BertConfig, BertModel, BertTokenizer
 import step29_vendorlink_data as d
 import step29_vendorlink_methods as m
 import step29_vendorlink_run as run
+import step29_vendorlink_prepare as prepare
 
 
 def fixture(domain="A", split="fit", component_sizes=(2, 2, 2, 2)):
@@ -84,6 +89,69 @@ class Qualification(unittest.TestCase):
 
     def evidence(self, name, value):
         run.write_json(Path(os.environ["VENDORLINK_TEST_ROOT"])/(name+".json"), value)
+
+    def test_public_source_adapter(self):
+        headers = ['hash', 'market_name', 'item_link', 'vendor_name', 'name', 'description']
+        early = [['1', 'AlphaBay', 'url1', 'alice', 'first title', 'first description'],
+                 ['2', 'AlphaBay', 'url2', 'bob', 'ambiguous title', 'ambiguous description'],
+                 ['3', 'Dream', 'wrong', 'other', 'wrong market', 'wrong text'],
+                 ['4', 'AlphaBay', 'bad', 'bad', 'extra', 'bad', 'extra column']]
+        later = [['1', 'AlphaBay', 'url1', 'alice', 'later title', 'later description'],
+                 ['2', 'AlphaBay', 'url2', 'charlie', 'changed owner', 'changed owner text']]
+        dream = [['5', 'Dream', 'dream1', 'dream_vendor', 'dream title', 'dream description']]
+        grams, agora = self.root/'grams.tar.xz', self.root/'agora.zip'
+        with tarfile.open(grams, 'w:xz') as archive:
+            # Later snapshot first in archive: date, not traversal, must choose the retained text.
+            for name, records in [('root/2016-01-02/Alpha.csv', later),
+                                  ('root/2016-01-01/Alpha.csv', early),
+                                  ('root/2016-01-01/Dream.csv', dream)]:
+                text = io.StringIO(newline='')
+                writer = csv.writer(text)
+                writer.writerows([headers, *records])
+                payload = text.getvalue().encode()
+                member = tarfile.TarInfo(name)
+                member.size = len(payload)
+                archive.addfile(member, io.BytesIO(payload))
+        with zipfile.ZipFile(agora, 'w') as archive:
+            text = io.StringIO(newline='')
+            csv.writer(text).writerows([['Vendor', ' Item', ' Item Description'],
+                                        ['00123', 'agora title', 'agora description'],
+                                        ['empty', 'empty title', '']])
+            archive.writestr('Agora.csv', text.getvalue().encode('ISO-8859-1'))
+        rows, report = prepare.read_sources(grams, agora)
+        self.assertEqual(len(rows), 3)
+        by_market = {r['market']: r for r in rows}
+        self.assertEqual(by_market['AlphaBay']['title'], 'first title')
+        self.assertEqual(by_market['Agora']['vendor'], '00123')
+        self.assertEqual(report['markets']['AlphaBay']['ambiguous_account_listings_removed'], 1)
+        self.assertEqual(report['markets']['AlphaBay']['wrong_market_rows'], 1)
+        self.assertEqual(report['markets']['AlphaBay']['malformed_rows'], 1)
+        self.assertEqual(report['markets']['Agora']['missing_required_rows'], 1)
+        self.evidence('source_adapter', {'canonical_rows': len(rows), 'earliest_not_archive_order': True,
+            'ambiguous_listing_excluded': True, 'numeric_handle_string_preserved': True,
+            'wrong_market_and_bad_rows_excluded': True, 'handwritten_only': True})
+
+    def test_joint_preview_and_actual_builder_agree(self):
+        rows = [{'market': market, 'vendor': f'handle{i}', 'title': f'{market} product {i} {j}',
+                 'description': f'{market} text {i} {j}'}
+                for market in ('A', 'B', 'C') for i in range(90) for j in range(20)]
+        rows[1800] = {**rows[0], 'market': 'B'}
+        rows.append(dict(rows[0]))
+        options = dict(split_seed=20261029, train_fraction=.7, dev_fraction=.15,
+                       records_per_view=2, identities_per_group=8)
+        preview = d.preview_counts(rows, **options)
+        self.assertEqual([preview['markets'][m]['eligible_accounts'] for m in 'ABC'], [89, 89, 90])
+        self.assertFalse(preview['views_or_qrels_created'])
+        payload, labels, report = d.build_views(rows, **options)
+        for key, values in payload.items():
+            part = preview['partitions'][key]
+            self.assertEqual(part['groups'], len(values))
+            self.assertEqual(part['views'], sum(len(g['views']) for g in values))
+            self.assertEqual(part['selected_ads'], sum(len(v['records']) for g in values for v in g['views']))
+        self.assertEqual(preview['rejected'], report['rejected'])
+        self.evidence('joint_preview', {'expected_eligible_accounts': [89, 89, 90],
+            'cross_market_shared_text_removes_both_accounts_at_threshold': True,
+            'preview_matches_actual_builder_groups_views_ads': True, 'handwritten_only': True})
 
     def test_data_views_splits_and_no_label_scoring(self):
         rows = [{"market": market, "vendor": f"vendor{i}", "title": f"product {i} {j} {market}",

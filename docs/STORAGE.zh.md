@@ -1,5 +1,11 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 三市场规范来源缓存与独立数据工作区
+
+用户明确采用AlphaBay/Dream/Agora后，Linux新增`/home/yongpeng/cross-lingual/data/vendorlink/three_market_20261029/canonical.jsonl`，127537165字节、SHA256 fc80eaf41e712691bd15761a8854a3f094f93ce1153799dabb84a7b9753f4855，包含236457条规范公开商品记录；它服务后续一次数据构建，不是训练器可访问的历史Memory。原两个归档不变，缓存正文未回传Windows、不进入Git/外审。
+
+实际代码部署在`reports/documentation/20261029/vendorlink/three_market/workspace`，与活动实验隔离；cpu06手写输出、联合inventory及来源配置/方案等小证据保管两端，八份回传实物与[Linux清单](../reports/documentation/20261029/vendorlink/three_market/transfer.json)一致。26872字节临时deploy.zip在六源码/产物验证并保留workspace后已删除两端副本，SHA476b6fdc…；旧源码桥及待审包继续服务当前复核。正式视图、qrels和新模型/权重均未生成；既有预训练不变。根可变文档只Windows更新，未覆盖活动冻结来源或推送本轮新材料。详见[方案与保管边界](../reports/documentation/20261029/vendorlink/three_market/plan.zh.txt)，不重置大清理周期。
+
 ## 2026-10-29 Agora原CSV取得与Linux保管
 
 按用户“找agora”及此前可用数据只留Linux要求，已取得VendorLink官方指向的Kaggle公开CSV ZIP，最终路径`/home/yongpeng/cross-lingual/data/vendorlink/agora_20261029/kaggle.zip`，8071841字节、SHA256 e982c503097893f5aa07a3122ef2b0a8f96c81458966d09600d9bbf0128b26d8，内含单份32484217字节Agora.csv，直接流式解析未完整解包。Linux直连超时后由Windows现有代理中转，SFTP及两端身份核对后Windows副本/临时目录已删除；Linux1407422字节未完成片段也已删除，下载失败日志保留，见[检查和清理](../reports/documentation/20261029/vendorlink/agora_inventory/report.zh.txt)。
