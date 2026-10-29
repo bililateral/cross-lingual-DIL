@@ -22,17 +22,18 @@ def write(path, value):
     temporary.replace(path)
 
 
-def sha(path):
+def sha(path, check=lambda: None):
     h = hashlib.sha256()
     with Path(path).open("rb") as stream:
         for block in iter(lambda: stream.read(1024*1024), b""):
+            check()
             h.update(block)
     return h.hexdigest()
 
 
-def gpu_snapshot():
+def gpu_snapshot(timeout=10):
     # One XML capture supplies global free and all process occupancies together.
-    raw = subprocess.check_output(["nvidia-smi", "-q", "-x", "-i", "0"], timeout=10)
+    raw = subprocess.check_output(["nvidia-smi", "-q", "-x", "-i", "0"], timeout=timeout)
     gpu = ET.fromstring(raw).find("gpu")
     mib = lambda text: int(text.split()[0])*2**20
     return dict(at=time.monotonic(), free=mib(gpu.findtext("fb_memory_usage/free")),
@@ -53,28 +54,87 @@ def overlap(rows):
                for a in rows[0] for b in rows[1] for c in rows[2])
 
 
-def source_check(config):
+def source_check(config, check=lambda: None):
     for row in config["sources"]+config["model_files"]:
+        check()
         path = Path(row["path"])
-        if path.stat().st_size != row["bytes"] or sha(path) != row["sha256"]:
+        if path.stat().st_size != row["bytes"] or sha(path, check) != row["sha256"]:
             raise ValueError("Frozen source/model identity differs: "+str(path))
 
 
-def supervise(commands, folders, seconds, phase, job, environment, ledger, config, reserve=0):
+def union_seconds(intervals):
+    total, end = 0., float("-inf")
+    for start, stop in sorted(intervals):
+        total += max(0., stop-max(start, end))
+        end = max(end, stop)
+    return total
+
+
+def auxiliary_remaining(ledger, started, attempt_start, active=()):
+    intervals = [(t["started"], t["ended"]) for a in ledger["attempts"][attempt_start:] for t in a["tasks"]]
+    elapsed = max(0., time.monotonic()-started-union_seconds([*intervals, *active]))
+    return 300-ledger["aux"]-math.ceil(elapsed)
+
+
+def sample_timeout(deadlines=(), remaining_aux=300):
+    # A blocking resource query must return before the nearest kill boundary.
+    remaining = min(deadlines)-time.monotonic() if deadlines else remaining_aux
+    if remaining <= 2:
+        raise TimeoutError("No resource-query time before exit tail")
+    return min(10., remaining-2)
+
+
+def consume_launch(config_path, permit, config):
+    """One inherited pipe read, only for this supervisor's exact child command."""
+    fd = os.environ.pop("VENDORLINK_LAUNCH_FD", None)
+    if fd is None:
+        raise ValueError("Internal child: use step29_vendorlink_native_control.py")
+    with os.fdopen(int(fd)) as stream:
+        launch = json.load(stream)
+    root = Path(permit["job"]).resolve()
+    if (launch["parent"] != os.getppid() or launch["command"] != sys.argv
+            or launch["job"] != str(root) or launch["config_sha256"] != sha(config_path)
+            or time.monotonic() >= launch["deadline"]-2
+            or any(Path(config[key]).resolve() != root/name for key, name in
+                   (("export", "export"), ("custody", "private_custody"), ("export_manifest", "export/manifest.json")))):
+        raise ValueError("Child does not match its bounded supervisor launch")
+    return launch["deadline"]
+
+
+def supervise(commands, folders, seconds, phase, job, environment, ledger, config, reserve=0,
+              check_aux=lambda active=(): 300):
     children, handles, starts, stops = [], [], [], {}
     usage, nvml, failure = [], {}, None
     watch_started = time.monotonic()
     try:
         reservations = {}
         for command, folder in zip(commands, folders):
-            if reserve and not fits(gpu_snapshot(), reservations, reserve):
+            active = [(s, stops.get(p.pid, time.monotonic())) for p, s in zip(children, starts)]
+            remaining = check_aux(active)
+            deadlines = [s+seconds for p, s in zip(children, starts) if p.poll() is None]
+            if reserve and not fits(gpu_snapshot(sample_timeout(deadlines, remaining)), reservations, reserve):
                 raise RuntimeError("Resource changed during reserved launch; no automatic retry")
+            remaining = check_aux([(s, stops.get(p.pid, time.monotonic())) for p, s in zip(children, starts)])
+            if phase == "aux":
+                seconds = min(seconds, remaining-2)
             handle = (job/(folder.name+"_console.txt")).open("w")
             handles.append(handle)
-            starts.append(time.monotonic())
-            child = subprocess.Popen(command, env=environment, stdout=handle, stderr=subprocess.STDOUT,
-                                     start_new_session=True)
+            read_fd, write_fd = os.pipe()
+            try:
+                launch = dict(parent=os.getpid(), command=command[2:], job=str(job.resolve()),
+                              config_sha256=ledger.get("config_sha256"), deadline=time.monotonic()+seconds)
+                os.write(write_fd, json.dumps(launch).encode())
+                os.close(write_fd)
+                write_fd = None
+                start = time.monotonic()
+                child = subprocess.Popen(command, env=dict(environment, VENDORLINK_LAUNCH_FD=str(read_fd)),
+                    stdout=handle, stderr=subprocess.STDOUT, start_new_session=True, pass_fds=(read_fd,))
+            finally:
+                os.close(read_fd)
+                if write_fd is not None:
+                    os.close(write_fd)
             children.append(child)
+            starts.append(start)
             reservations[child.pid] = reserve
         gate_open = False
         next_sample = 0.
@@ -103,8 +163,11 @@ def supervise(commands, folders, seconds, phase, job, environment, ledger, confi
                 if sum(p.stat().st_size for p in job.rglob("*") if p.is_file()) > 32*GIB:
                     raise MemoryError("Qualification outputs exceed 32 GiB")
                 if phase != "aux":
-                    sample = gpu_snapshot()
-                    active = "g2"
+                    deadlines = [s+seconds for p, s in zip(children, starts) if p.poll() is None]
+                    if not deadlines:
+                        break
+                    sample = gpu_snapshot(sample_timeout(deadlines))
+                    active = "startup" if phase == "g1" else "g2"
                     if phase == "g1" and (folders[0]/"active.json").exists():
                         active = json.loads((folders[0]/"active.json").read_text())["method"]
                     nvml[active] = max(nvml.get(active, 0), *(sample["processes"].get(p.pid, 0) for p in children))
@@ -127,6 +190,7 @@ def supervise(commands, folders, seconds, phase, job, environment, ledger, confi
             child.wait()
             ended = stops.setdefault(child.pid, time.monotonic())
             usage.append(dict(pid=child.pid, returncode=child.returncode,
+                              started=start, ended=ended,
                               wall_seconds=ended-start, charged_seconds=math.ceil(ended-start)))
         for handle in handles:
             handle.close()
@@ -141,6 +205,7 @@ def supervise(commands, folders, seconds, phase, job, environment, ledger, confi
 
 
 def main():
+    started = time.monotonic()
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--permit", type=Path, required=True)
@@ -153,7 +218,6 @@ def main():
             or permit.get("job") != str(args.job.resolve())):
         raise ValueError("Exact reviewed/approved scope and Linux py310 required")
     root = Path(__file__).resolve().parent
-    started = time.monotonic()
     if args.job.exists():
         ledger = json.loads((args.job/"ledger.json").read_text())
         if ledger["status"] != "WAIT_RESOURCE" or ledger["config_sha256"] != sha(args.config):
@@ -162,21 +226,28 @@ def main():
         args.job.mkdir(parents=True)
         ledger = dict(status="PREPARING", config_sha256=sha(args.config), aux=0, g1=0, g2=0, attempts=[])
     attempt_start = len(ledger["attempts"])
+    def check_aux(active=()):
+        remaining = auxiliary_remaining(ledger, started, attempt_start, active)
+        if remaining <= 2:
+            raise TimeoutError("Auxiliary balance exhausted; no next dispatch")
+        return remaining
     environment = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1",
         CUDA_VISIBLE_DEVICES="0", TOKENIZERS_PARALLELISM="false", TRANSFORMERS_OFFLINE="1", HF_HUB_OFFLINE="1",
         PYTHONDONTWRITEBYTECODE="1", CUBLAS_WORKSPACE_CONFIG=":4096:8")
     base = ["--config", str(args.config), "--permit", str(args.permit)]
     try:
-        source_check(config)
-        if ledger["aux"] >= 290:
-            raise TimeoutError("Insufficient auxiliary balance for qualification supervision")
+        check_aux()
+        source_check(config, check_aux)
+        check_aux()
         if "export_manifest_sha256" not in ledger:
             _, elapsed = supervise([[sys.executable, "-B", str(root/"step29_vendorlink_export.py"), *base]],
-                [Path(config["export"])], 295-ledger["aux"], "aux", args.job, environment, ledger, config)
+                [Path(config["export"])], check_aux()-2, "aux", args.job, environment, ledger, config,
+                check_aux=check_aux)
             ledger["export_manifest_sha256"] = sha(config["export_manifest"])
         if sha(config["export_manifest"]) != ledger["export_manifest_sha256"]:
             raise ValueError("Export manifest changed")
-        sample = gpu_snapshot()
+        sample = gpu_snapshot(sample_timeout(remaining_aux=check_aux()))
+        check_aux()
         write(args.job/"resource.json", sample)
         if psutil.virtual_memory().available < 24*GIB or psutil.disk_usage(args.job).free < 32*GIB:
             ledger["status"] = "WAIT_RESOURCE"
@@ -188,7 +259,7 @@ def main():
                 return
             nvml, elapsed = supervise([[sys.executable, "-B", str(root/"step29_vendorlink_native.py"),
                 *base, "--mode", "g1", "--job", str(g1)]], [g1], 900-ledger["g1"], "g1", args.job,
-                environment, ledger, config, reserve=17*GIB)
+                environment, ledger, config, reserve=17*GIB, check_aux=check_aux)
             ledger["g1_nvml"] = nvml
         result = json.loads((g1/"result.json").read_text())
         if result["status"] != "G1_PASSED" or result["updates"] > 15:
@@ -196,7 +267,8 @@ def main():
         peaks = {m: max(r["peak"]["reserved"], ledger["g1_nvml"].get(m, 0)) for m, r in result["methods"].items()}
         method = max(peaks, key=peaks.get)
         reserve = math.ceil(peaks[method]+max(GIB, peaks[method]*.1))
-        sample = gpu_snapshot()
+        sample = gpu_snapshot(sample_timeout(remaining_aux=check_aux()))
+        check_aux()
         ledger["g2_admission"] = dict(method=method, per_slot=reserve, resource=sample)
         if sample["free"] < 3*reserve or psutil.virtual_memory().available < 72*GIB:
             ledger["status"] = "WAIT_RESOURCE"
@@ -206,7 +278,7 @@ def main():
             "--mode", "g2", "--job", str(f), "--method", method, "--checkpoint", result["methods"][method]["checkpoint"],
             "--gate", str(args.job/"g2_gate.json")] for f in folders]
         _, elapsed = supervise(commands, folders, min(300, (900-ledger["g2"])//3), "g2", args.job,
-            environment, ledger, config, reserve=reserve)
+            environment, ledger, config, reserve=reserve, check_aux=check_aux)
         results = [json.loads((f/"result.json").read_text()) for f in folders]
         if any(r["status"] != "G2_WORKER_PASSED" for r in results) or not overlap([r["rows"] for r in results]):
             raise AssertionError("No actual three-way optimizer-update overlap")
@@ -217,7 +289,8 @@ def main():
         raise
     finally:
         # Parent supervision overlaps workers; only nonoverlapping preparation/finish time is extra.
-        child_union = sum(r["supervision_wall_seconds"] for r in ledger["attempts"][attempt_start:])
+        child_union = union_seconds([(t["started"], t["ended"])
+            for r in ledger["attempts"][attempt_start:] for t in r["tasks"]])
         ledger["aux"] += math.ceil(max(0, time.monotonic()-started-child_union))
         if ledger["aux"] > 300 or ledger["g1"] > 900 or ledger["g2"] > 900:
             ledger["status"] = "BUDGET_EXCEEDED_STOP"

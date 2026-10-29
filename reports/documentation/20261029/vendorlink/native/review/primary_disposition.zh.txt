@@ -1,0 +1,38 @@
+VendorLink 新增实施外审：独立主审与最小修复结案
+2026-10-29，UTC+8。本轮用户要求取回仔细审核、避免过度设计、拒绝无意义修改，必要问题修复验证后汇报。
+
+1. 回收身份与裁决
+唯一会话 https://chatgpt.com/c/6ae2cbeb-9774-83ea-930b-63c866dde2d0。
+本轮输入136445字节、SHA256 0d2124d490d4048f635f6b15f2538a883a20d0c2995084364849b3d1bc9280ad，不是上一轮数据方案。19:02:50.447网页停止按钮消失并显示回答已完成；先前仍在输出的正文未当作最终报告。
+返回vendorlink_native_implementation_audit_20261029.zip，46153字节，SHA256 7123f89d8b33fa6db5b8ca2a0d98908dad33a223ffd771db7b885ec9be8f2c10；13成员=12载荷+OUTPUT_MANIFEST。Windows逐载荷核对大小/SHA全部相符；全文34384字节已完整阅读，原文及附件保留external/，网页最终正文保留completed_page.json。外审网页核验不是项目Linux/GPU执行证据。
+
+外审提出NI01—NI03三个复现/执行缺陷，没有新增科学阻断，未否定原数学、数据及F01—F04。主审逐项读实际入口、源差异和反例后，接受三个具体缺陷，但将修复严格限于已有有界资格；不接受由此扩建平台或重复科学核验。修复后本地主审闭合，不冒称新源码已再次网页复审。依据科研纪律第6节：修法已由审查/合同确定、没有新科学选择、影响可界定且必要证据充分，可在本主审结案，不自动再开一轮网页。
+
+2. NI01：接受，最小修复闭合
+原控制器将整个supervise区间当子进程时间并集扣除，首次资源查询尚未启动worker，却不进入辅助账。原source_check后仅检查旧aux，亦会在285+16=301秒后派发GPU。这是实际路径缺陷，不是要求重新制定预算；此前没有正式资格运行，不存在需要撤销的结果。
+修复：记录Popen前到观察退出的每worker起止；辅助只减这些区间的并集，G2仍逐worker向上收费相加。资源查询、建立启动管道、无worker收尾均进入辅助。每次准备/哈希块/派发前按旧账加本次非重叠耗时检查余额；export时限扣除当前准备费用。NVML查询timeout受最早worker截止点与2秒尾部约束；已经全部退出不再发阻塞查询。未增加线程、监护进程、预算平台或重试系统。
+CPU09四项通过后，主审进一步将起时点移到建立管道之后、Popen之前，并在采样前发现所有worker退出时直接结束；仅control改变。CPU10补受影响三项，不重跑active或G1。
+实际证据：cpu10/native_budget_repair.json中285+16的真实main分支拒绝派发、dispatched=0，301账保留并标超限；区间0–2/1–5/8–9并集=6；实际短子进程前资源查询约0.04092444秒未被扣掉。手写截止点剩3秒时查询timeout=1秒，剩2秒拒绝。真实正常子进程/超时SIGKILL及收费由cpu10/native_supervisor.json补证。这些是手写控制证据，不是实际GPU或300秒额度发生超支。
+
+3. NI02：接受有限入口约束，拒绝权限系统扩展，闭合
+正常control命令原本正确，但两个公开子CLI可在门关闭后误直调，绕过累计账；native还允许自由job/checkpoint/gate参数。因此仅靠注释不足，但无须防御可任意修改同用户源码的攻击者。
+最小实现仅复用control模块的小函数：父监督器用一次继承管道交给子进程完整argv、父PID、job根、config SHA和截止点；子进程在读取正式来源/载模前消费一次，检查父子关系、完整参数和固定导出路径。改变checkpoint/gate/mode/job等参数会与父argv不符；无管道或重复调用拒绝。没有签名、令牌存储、注册服务、启动数据库或常驻守护；环境变量只携带本次文件描述符编号，不是凭据。仍不声称防御蓄意篡改源码/管道。
+CPU10用真正Python子进程验证合法派发成功、第二次消费拒绝、修改命令及许可根拒绝；无监督启动也拒绝。自然review_closed=false门继续沿既有入口在消费前检查。未训练、未读正式数据。见cpu10/native_launch_repair.json；失败子进程为预定反例，费用全部在CPU wrapper中保留。
+
+4. NI03：接受，局部发布修复闭合
+原active在factory后发布，载模NVML可能归前一方法；write_text还存在读到截断JSON导致误停的窗口。reserved高水位仍覆盖载模，故不能夸大成旧数学或实际最重方法必定错误。
+现仅把active在前方法清理之后、factory之前通过现有control.write的同目录临时文件+replace发布；不改生产run.write_json或所有文件写入规则。首方法marker之前的资源样本准确标startup，不冒称g2。CPU09实际进入qualify_g1，到factory时核对marker已完整存在即停止，不载模型；替换前目标保持完整旧JSON、替换后是完整新JSON。cpu10仅改control.supervise局部计时，write/native/此测试未变，按cpu09_sources.zip复用。见cpu09/native_active_repair.json。
+
+5. 费用、来源与明确不做的修改
+旧50/300秒保持。CPU09：wall5.188968927017413秒、收费6、累计56，峰值747069440字节，四项通过。CPU10：wall5.238994444953278秒、收费6、累计62，峰值740671488字节，受影响三项通过。均Linux原py310/单线程/原4GiB和64MiB限制，正式数据读取0、预训练载入0、GPU0；未使用剩余238秒去扩测。
+当前九源码与CPU10 receipt和Linux实际文件逐项相符。CPU09原九源留cpu09_sources.zip（42164字节，SHA91bd5bfa45e889e6a9e8783dd62ce4aae005ff29c7f7d9c68615ddacca63f805）；cpu07旧源/失败和cpu08原件保持。原审查来源可由Git 5c74f229ddf898a7b87e455bc3ca4cbb121c1840恢复。
+本次只改export/native的内部入口、native的marker及control编排，data/prepare/methods/run/cpu不变。cpu07的15次微型更新、KD、Memory/恢复，cpu08导出与此前cpu05分块数学仍在原范围复用，不把旧receipt称成新源码全量运行。当前cpu_sources位于repair/，原native/cpu_sources冻结不覆盖。
+
+明确不实施：额外第16次Agora真实正文更新、Vendor同域第二步专项、第七Memory群/全reservoir重验、更高频NVML或kernel trace、全面cpu01—08重跑、凑满G2九步、通用权限/调度/恢复平台、正式36条系统、第五臂/HPO/全排列/epoch诊断。前四类不是当前资格所需，后几类越界或重复。外审本来也没有把它们列为必修；主审不是虚构反对意见，而是确认不将可选项转为工作量。
+保留边界：第三域只有真实fit结构/完整类别与手写满长压力更新；Vendor是完整状态往返+阶段边界下一步；H恢复下一步时3群，完整6群另有序列化验证；G2取实测最重方法且不一定有Memory；三路更新任务区间重叠不等于GPU kernel硬件同时执行。对真实BERT、真实6群bytes和GPU峰值仍无完成证据。
+
+6. 当前执行入口与交付
+修复来源部署在native/repair/workspace，新的repair/config.json（SHA081468256f6d98ca785a92615dc55aab228d8250e481e9efc458fbad070f1ea2）及repair/permit.json承接原已批准一次固定导出/2100累计秒，仅改修复来源路径/身份并记录主审闭合。原配置、原false门和原实施说明是送审原件，不追改。现行新门implementation_review_closed=true，来源已核对；不会自动执行任何任务。
+服务器19:18:19.489816（Asia/Shanghai，沿用已知服务器时钟偏差）只读实查：VendorLink相关进程为空、qualification目录不存在，GPU32607MiB总/11252MiB空闲/85%利用率，空闲低于17408MiB门；RAM223859310592字节，disk273995517952字节。见repair/resource.json。资源满足仍指所需剩余显存，不要求全卡无CUDA进程。
+本轮按用户“修好并验证后向我汇报”完成修复交付，未启动真实导出/G1/G2、正式训练或等待监听。下一阶段仍为原已批准900+900+300=2100累计秒，最多15+9更新（实现15+6）；正式36条/E/评价开放及总小时预算未批准。进入下一阶段时先复核实时资源/无重复作业，再按既有一次性等待规则处理资源不足；不为本轮修复创建常驻监控。
+完整报告及12附件保留Windows；CPU09/10、修复来源、配置/门两端保管，15份文件回传身份匹配见repair/transfer.json。临时返回ZIP和已结案输入ZIP无额外复现用途，验收后删除；必要原始报告/附件、原配置/来源清单及Git来源保持。专用审查/下载页已关闭，无本轮自动化需要删除。根可变文档在Windows更新；修复主审同步到Linux独立repair目录，不覆盖活动实验冻结文件。本轮本地commit，不扩大此前push许可。

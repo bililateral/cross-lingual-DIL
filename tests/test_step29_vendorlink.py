@@ -12,6 +12,7 @@ import sys
 import tempfile
 import tarfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 import numpy as np
@@ -177,6 +178,109 @@ class Qualification(unittest.TestCase):
         self.assertEqual(len(ledger["attempts"]), 2)
         self.assertEqual(ledger["attempts"][-1]["tasks"][0]["returncode"], -9)
         self.evidence("native_supervisor", ledger)
+
+    def test_native_budget_admission_and_intervals(self):
+        self.assertEqual(native_control.union_seconds([(0, 2), (1, 5), (8, 9)]), 6)
+        ledger = dict(aux=7, attempts=[dict(tasks=[dict(started=105, ended=110), dict(started=108, ended=115)])])
+        with patch.object(native_control.time, "monotonic", return_value=120):
+            self.assertEqual(native_control.auxiliary_remaining(ledger, 100, 0), 283)
+            self.assertEqual(native_control.sample_timeout([123]), 1)
+            with self.assertRaises(TimeoutError):
+                native_control.sample_timeout([122])
+        actual_ledger = dict(aux=0, g1=0, g2=0, attempts=[])
+        def slow_snapshot(timeout):
+            native_control.time.sleep(.04)
+            return dict(free=2, processes={})
+        with patch.object(native_control, "gpu_snapshot", side_effect=slow_snapshot):
+            native_control.supervise([[sys.executable, "-c", "print('no GPU in this child')"]],
+                [self.root/"pre_launch"], 10, "g1", self.root, dict(os.environ), actual_ledger, {}, reserve=1)
+        attempt = actual_ledger["attempts"][0]
+        lifecycle = native_control.union_seconds([(t["started"], t["ended"]) for t in attempt["tasks"]])
+        self.assertGreaterEqual(attempt["supervision_wall_seconds"]-lifecycle, .04)
+        # Exercise main's actual continuation guard: 285 old + 16 new must not launch.
+        config_path, permit_path, job = self.root/"config.json", self.root/"permit.json", self.root/"job"
+        job.mkdir()
+        run.write_json(config_path, {})
+        config_sha = run.file_sha256(config_path)
+        run.write_json(permit_path, dict(operation="vendorlink_native_qualification", approved=True,
+            implementation_review_closed=True, config_sha256=config_sha, job=str(job)))
+        run.write_json(job/"ledger.json", dict(status="WAIT_RESOURCE", config_sha256=config_sha,
+                                              aux=285, g1=0, g2=0, attempts=[]))
+        clock = [100.]
+        def slow_source(config, check):
+            clock[0] += 16
+        with patch.object(sys, "argv", ["control", "--config", str(config_path), "--permit", str(permit_path),
+                                       "--job", str(job)]), \
+                patch.object(native_control.time, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(native_control, "source_check", side_effect=slow_source), \
+                patch.object(native_control, "supervise") as dispatch:
+            with self.assertRaises(TimeoutError):
+                native_control.main()
+            dispatch.assert_not_called()
+        stopped = json.loads((job/"ledger.json").read_text())
+        self.assertEqual(stopped["aux"], 301)
+        self.assertEqual(stopped["status"], "BUDGET_EXCEEDED_STOP")
+        self.evidence("native_budget_repair", dict(pre_worker_seconds_retained=10,
+            three_interval_union=6, deadline_query_timeout=1, old_plus_new_aux=301, dispatched=0,
+            actual_prelaunch_aux_seconds=attempt["supervision_wall_seconds"]-lifecycle))
+
+    def test_native_internal_launch_is_one_use(self):
+        # Real bounded children consume the parent's pipe; no model or data is loaded.
+        config_path = self.root/"child_config.json"
+        config = {key: str(self.root/name) for key, name in (("export", "export"),
+                  ("custody", "private_custody"), ("export_manifest", "export/manifest.json"))}
+        run.write_json(config_path, config)
+        child = self.root/"handwritten_child.py"
+        child.write_text("""import json, os, sys, time
+from pathlib import Path
+from step29_vendorlink_native_control import consume_launch
+p=Path(sys.argv[1]); c=json.loads(p.read_text()); permit={'job':sys.argv[2]}
+fd=os.environ.get('VENDORLINK_LAUNCH_FD')
+if sys.argv[3]=='wrong_checkpoint': sys.argv.append('--checkpoint=foreign')
+elif sys.argv[3]=='wrong_job': permit['job'] += '/outside'
+deadline=consume_launch(p,permit,c)
+try:
+    consume_launch(p,permit,c)
+except ValueError:
+    print(json.dumps({'accepted':True,'second_read_rejected':True,'deadline_future':deadline>time.monotonic()}))
+else: raise AssertionError('repeat accepted')
+""")
+        ledger = dict(aux=0, g1=0, g2=0, attempts=[], config_sha256=run.file_sha256(config_path))
+        command = [sys.executable, "-B", str(child), str(config_path), str(self.root), "valid"]
+        native_control.supervise([command], [self.root/"legal"], 10, "aux", self.root,
+                                 dict(os.environ), ledger, config)
+        accepted = json.loads((self.root/"legal_console.txt").read_text())
+        self.assertTrue(all(accepted.values()))
+        for invalid in ("wrong_checkpoint", "wrong_job"):
+            with self.assertRaises(RuntimeError):
+                native_control.supervise([[*command[:-1], invalid]], [self.root/invalid], 10, "aux",
+                                         self.root, dict(os.environ), ledger, config)
+        with patch.dict(os.environ, {}, clear=True), self.assertRaises(ValueError):
+            native_control.consume_launch(config_path, {"job": str(self.root)}, config)
+        self.evidence("native_launch_repair", dict(accepted=accepted, mismatched_command_rejected=True,
+            outside_job_rejected=True, unsupervised_rejected=True, tasks=ledger["attempts"]))
+
+    def test_native_active_precedes_factory_and_is_atomic(self):
+        job = self.root/"g1"
+        class BeforeModel(Exception):
+            pass
+        def factory(method):
+            self.assertEqual(json.loads((job/"active.json").read_text()), {"method": method})
+            raise BeforeModel
+        with patch.object(torch.cuda, "is_available", return_value=False), self.assertRaises(BeforeModel):
+            native.qualify_g1(factory, None, job)
+        path = job/"active.json"
+        previous = path.read_bytes()
+        original_replace = Path.replace
+        def inspect_replace(source, target):
+            self.assertEqual(target.read_bytes(), previous)
+            self.assertEqual(json.loads(source.read_text()), {"method": "H_full"})
+            return original_replace(source, target)
+        with patch.object(Path, "replace", inspect_replace):
+            native.atomic_write(path, {"method": "H_full"})
+        self.assertEqual(json.loads(path.read_text()), {"method": "H_full"})
+        self.evidence("native_active_repair", dict(published_before_factory=True,
+            previous_complete_until_replace=True, next_complete_after_replace=True, model_loaded=False))
 
     def test_public_source_adapter(self):
         headers = ['hash', 'market_name', 'item_link', 'vendor_name', 'name', 'description']

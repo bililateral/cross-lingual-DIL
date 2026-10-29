@@ -1,0 +1,49 @@
+{
+  "scope": "AST extracted source with fake clock/process functions; no real process, GPU, model or training",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+  },
+  "source_sha256": "88bbd4cd0d453deefe6192cc402db2f87823b5a4b319547fe45f79d5413d5077",
+  "pre_popen_accounting": {
+    "pre_popen_resource_seconds": 5,
+    "simulated_elapsed_seconds": 7.0999999999999925,
+    "charged_g1_seconds": 3,
+    "charged_aux_seconds": 0,
+    "whole_supervise_subtracted_seconds": 7.0999999999999925,
+    "all_pre_popen_seconds_excluded": true,
+    "real_subprocess_or_gpu_started": false
+  },
+  "auxiliary_admission": {
+    "initial_aux": 285,
+    "this_invocation_source_check_seconds": 16,
+    "attempted_phase_calls": [
+      {
+        "phase": "g1",
+        "simulated_parent_seconds": 16.0,
+        "aux_already_used_at_call": 301.0
+      }
+    ],
+    "final_status": "BUDGET_EXCEEDED_STOP",
+    "budget_exceeded_detected_only_after_attempted_gpu_admission": true,
+    "real_subprocess_or_gpu_started": false
+  },
+  "active_publish_window": {
+    "fixture_state": "active.json exists with zero bytes, a non-atomic write_text publication intermediate state",
+    "resulting_failure": "JSONDecodeError('Expecting value: line 1 column 1 (char 0)')",
+    "status": "STOP_NO_AUTOMATIC_RETRY",
+    "fake_child_returncode": -9,
+    "charged_g1_seconds": 1,
+    "real_concurrency_or_project_incident_claimed": false,
+    "real_subprocess_or_gpu_started": false
+  },
+  "worker_entry_gate": {
+    "execution": "Only permission Boolean expressions from current AST; no file, model, subprocess or main() call",
+    "native_gate_line": 283,
+    "control_gate_line": 150,
+    "g1_outside_permit_root_accepted_by_worker_gate": true,
+    "same_outside_job_rejected_by_control_gate": true,
+    "g2_foreign_checkpoint_and_gate_accepted_by_worker_gate": true,
+    "later_main_was_not_executed": true
+  }
+}

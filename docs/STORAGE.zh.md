@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 原生实施外审回收与修复保管
+
+本轮46153字节返回ZIP（SHA7123f89d…）的12载荷逐项核对；[完整原文和附件](../reports/documentation/20261029/vendorlink/native/review/external/report.zh.txt)、最终网页及[独立主审](../reports/documentation/20261029/vendorlink/native/review/primary_disposition.zh.txt)保留。已结案136445字节输入ZIP与临时返回ZIP无额外用途，验收后删除；原输入身份、原配置/门/CPU07/08和Git 5c74f229源码保留，不追改送审历史。
+
+修复部署Linux独立native/repair/workspace，当前九源与CPU10一致；CPU09原九源以42164字节cpu09_sources.zip保留，供cpu09原子发布证据复用，非无用传输包。CPU09/10、新配置/门、资源观察等15个小文件已SFTP核对，见[清单](../reports/documentation/20261029/vendorlink/native/repair/transfer.json)；主审另同步repair目录并核对SHA。原native/workspace、活动实验冻结文件不动；真实数据、模型、Memory没有回传。新门仅解除实施审查前提，没有自动启动作业，qualification仍不存在。
+
+根可变文档只Windows更新，本轮本地Git提交，不扩大先前推送范围；临时浏览器下载页/会话页和日志已关闭/清理，无新自动化或常驻监听，不重置大清理周期。
+
 ## 2026-10-29 数据外审回收与限定原生工作区
 
 三市场数据外审返回51161字节ZIP（SHA07b356d6…）已核对全部12载荷；[完整原文与附件](../reports/documentation/20261029/vendorlink/three_market/review/external/report.zh.txt)、网页完成原件和主审保留Windows，重复返回ZIP已删除。原106444字节输入暂供后续实施审查来源衔接，不再作为待回收状态。

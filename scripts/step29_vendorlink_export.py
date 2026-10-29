@@ -7,6 +7,7 @@ import sys
 
 from step29_vendorlink_data import Group, build_views
 from step29_vendorlink_run import file_sha256, write_json
+from step29_vendorlink_native_control import consume_launch
 
 
 def export(rows, partition, output, custody, expected):
@@ -70,6 +71,7 @@ def main():
             or not permit.get("approved") or not permit.get("implementation_review_closed")
             or permit.get("config_sha256") != file_sha256(args.config)):
         raise ValueError("Approved fixed config and closed implementation review required")
+    consume_launch(args.config, permit, config)
     source = Path(config["canonical"]["path"])
     if source.stat().st_size != config["canonical"]["bytes"] or file_sha256(source) != config["canonical"]["sha256"]:
         raise ValueError("Canonical source differs")

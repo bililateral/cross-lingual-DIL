@@ -15,6 +15,7 @@ import torch
 from step29_vendorlink_data import Ad, View, Group, seed_for
 from step29_vendorlink_methods import METHODS, Memory, Model, Settings, make_optimizer, update_h, update_vendor
 from step29_vendorlink_run import (file_sha256, write_json, save_state, load_state, set_rates, rng_state, evaluate)
+from step29_vendorlink_native_control import consume_launch, write as atomic_write
 
 
 def long_group(group):
@@ -142,10 +143,10 @@ def qualify_g1(factory, load_stage, job, check=lambda: None):
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             torch.cuda.reset_peak_memory_stats()
+        atomic_write(job/"active.json", dict(method=method))
         model = factory(method)
         folder = job/method
         folder.mkdir()
-        write_json(job/"active.json", dict(method=method))
         identity = dict(scope="vendorlink_native_only", method=method)
         memory = Memory(411, model.settings)
         optimizer = None
@@ -284,7 +285,8 @@ def main():
             or not permit.get("approved") or not permit.get("implementation_review_closed")
             or permit.get("config_sha256") != file_sha256(args.config)):
         raise ValueError("Approved fixed config and closed implementation review required")
-    # Only the reviewed supervisor starts workers and supplies this exact export manifest.
+    deadline = consume_launch(args.config, permit, config)-20
+    # The inherited launch also binds argv, including job/checkpoint/gate/method.
     manifest = json.loads(Path(config["export_manifest"]).read_text())
     samples = manifest["qualification_samples"]
     torch.set_num_threads(1)
@@ -292,7 +294,6 @@ def main():
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
     torch.cuda.set_per_process_memory_fraction(16*2**30/torch.cuda.get_device_properties(0).total_memory)
-    deadline = time.monotonic()+(880 if args.mode == "g1" else 280)
     def check():
         if time.monotonic() >= deadline:
             raise TimeoutError("Native worker budget tail reserved")

@@ -1,0 +1,193 @@
+{
+  "review_status": "NATIVE_IMPLEMENTATION_TARGETED_REVIEW_COMPLETED_WITH_REQUIRED_FIXES",
+  "review_date": "2026-10-29",
+  "input": {
+    "name": "vendorlink_native_implementation_review.zip",
+    "bytes": 136445,
+    "sha256": "0d2124d490d4048f635f6b15f2538a883a20d0c2995084364849b3d1bc9280ad",
+    "members": 35,
+    "payloads": 34
+  },
+  "input_manifest": {
+    "bytes": 5489,
+    "sha256": "bdbe8002fa6923ebb93df81180cbaac37d48cb1487e636d6b3956acb9badf1ca",
+    "all_payloads_match": true
+  },
+  "prior_review_reuse": {
+    "F01": "CLOSED_REUSED",
+    "F02": "CLOSED_REUSED",
+    "F03": "CLOSED_REUSED",
+    "F04": "CLOSED_REUSED",
+    "three_market_data_review": "INDEPENDENTLY_CLOSED_REUSED"
+  },
+  "verdict": {
+    "implementation_exists": true,
+    "export_core_wiring": "ACCEPTED_WITHIN_SCOPE",
+    "g1_model_update_memory_kd_recovery": "ACCEPTED_WITHIN_PROVIDED_MICRO_CPU_SCOPE",
+    "new_scientific_blockers": 0,
+    "required_reproducibility_defects": 3,
+    "implementation_review_may_close_now": false
+  },
+  "current_gate": {
+    "approved": true,
+    "implementation_review_closed": false,
+    "config_sha256": "814124cc200d441c45d1649fde0b73529cadcf2de66e5f28019cd808a659ad1a",
+    "review_changed_gate": false,
+    "review_grants_execution_permission": false
+  },
+  "findings": [
+    {
+      "id": "NI01",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "priority": "HIGH",
+      "status": "OPEN_REQUIRED_BEFORE_IMPLEMENTATION_REVIEW_CLOSE",
+      "title": "辅助时间漏计与旧余额准入，阻塞采样未服从最近截止点",
+      "source_locations": [
+        "scripts/step29_vendorlink_native_control.py:33-35",
+        "scripts/step29_vendorlink_native_control.py:63-78",
+        "scripts/step29_vendorlink_native_control.py:88-106",
+        "scripts/step29_vendorlink_native_control.py:125-140",
+        "scripts/step29_vendorlink_native_control.py:170-175",
+        "scripts/step29_vendorlink_native_control.py:218-224"
+      ],
+      "actual_trigger": "整个supervise时长被扣作child_union，含首个Popen前资源查询；准入只看旧aux账。",
+      "evidence": [
+        "control_budget_checks.json/pre_popen_accounting",
+        "control_budget_checks.json/auxiliary_admission"
+      ],
+      "claim_impact": "无法据当前实现关闭900+900+300累计预算约束；不影响已证实模型数学或CPU作用。",
+      "minimal_fix": "按实际worker生命周期并集扣重叠，实时扣本次辅助消耗并在准备/每次派发前校验余额；采样timeout服从最近deadline。",
+      "minimal_verification": "假时钟覆盖无worker准备、三路并集、WAIT续账与拒绝超额派发；仅受影响stop路径必要时补一条短子进程。",
+      "real_project_budget_overrun_observed": false
+    },
+    {
+      "id": "NI02",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "priority": "HIGH",
+      "status": "OPEN_REQUIRED_BEFORE_IMPLEMENTATION_REVIEW_CLOSE",
+      "title": "独立export/native命令行缺本次监督启动及派生路径约束",
+      "source_locations": [
+        "scripts/step29_vendorlink_native.py:271-289",
+        "scripts/step29_vendorlink_native.py:310-324",
+        "scripts/step29_vendorlink_export.py:62-79",
+        "scripts/step29_vendorlink_native_control.py:150-167",
+        "scripts/step29_vendorlink_native_control.py:204-209"
+      ],
+      "actual_trigger": "在假定review_closed已合法置true时，native许可条件不含job/checkpoint/gate或监督上下文，export也可独立执行而未入辅助账。",
+      "evidence": [
+        "control_budget_checks.json/worker_entry_gate",
+        "report.zh.txt/NI02"
+      ],
+      "claim_impact": "同一许可未来不能自行保证一次有界任务、输出范围、累计账和G2端点来源。当前false门有效。",
+      "minimal_fix": "仅control公开执行；内部入口验证本job一次启动上下文与config/mode/派生job/checkpoint/gate/deadline；无需通用权限平台。",
+      "minimal_verification": "只用手写配置/许可/启动记录检查载模前的接受与拒绝，不执行模型。",
+      "current_review_false_gate_bypassed": false,
+      "full_worker_execution_tested_by_reviewer": false
+    },
+    {
+      "id": "NI03",
+      "classification": "REPRODUCIBILITY_DEFECT",
+      "priority": "MEDIUM",
+      "status": "OPEN_REQUIRED_BEFORE_IMPLEMENTATION_REVIEW_CLOSE",
+      "title": "active标记发布太晚且非原子，存在峰值归属与半写JSON中断窗口",
+      "source_locations": [
+        "scripts/step29_vendorlink_native.py:142-148",
+        "scripts/step29_vendorlink_run.py:26-27",
+        "scripts/step29_vendorlink_native_control.py:105-110",
+        "scripts/step29_vendorlink_native_control.py:120-139"
+      ],
+      "actual_trigger": "factory后write_text覆盖active，读者可看到空/部分文件并JSONDecodeError停止。",
+      "evidence": [
+        "control_budget_checks.json/active_publish_window",
+        "report.zh.txt/NI03"
+      ],
+      "claim_impact": "资格可无关模型失败而中断，载模NVML可能归入旧方法；没有实测最重方法选错的证据。",
+      "minimal_fix": "清理完成后factory前用同目录临时文件replace原子发布active。",
+      "minimal_verification": "标准库只检查发布顺序和完整读写；不重跑G1、训练或GPU。",
+      "actual_project_race_incident_observed": false,
+      "actual_gpu_method_misranking_observed": false
+    }
+  ],
+  "evidence_reuse": {
+    "cpu07_g1": "REUSABLE_EXACT_NATIVE_AND_G1_TEST_SOURCE_BRIDGE",
+    "cpu07_export_failure": "PRESERVED_FIXED_BY_HISTOGRAM_KEY_NORMALIZATION",
+    "cpu08_export": "VALID_WITHIN_SCOPE",
+    "cpu08_real_supervision_children": "VALID_BUT_NOT_MAIN_RESERVE_OR_ENTRY_COVERAGE",
+    "cpu03": "NOT_USED",
+    "cpu05_math_gradient_restore": "REUSED_UNCHANGED_SCOPE"
+  },
+  "cpu_budget": {
+    "prior": 30,
+    "cpu07_wall": 14.850980503018945,
+    "cpu07_charge": 15,
+    "cpu07_exit_code": 1,
+    "cpu08_wall": 4.842890752945095,
+    "cpu08_charge": 5,
+    "cpu08_exit_code": 0,
+    "total": 50
+  },
+  "native_qualification": {
+    "planned_g1_updates": 15,
+    "implemented_g2_updates": 6,
+    "implemented_total_updates": 21,
+    "maximum_updates": 24,
+    "budget_seconds": {
+      "g1": 900,
+      "g2_cumulative": 900,
+      "aux": 300,
+      "total": 2100
+    },
+    "actual_formal_export_executed": false,
+    "actual_pretrained_gpu_qualification_executed": false,
+    "formal_campaign_or_labels_authorized": false
+  },
+  "reasonable_followup": [
+    "仅修NI01—NI03并更新来源桥与受影响小证据",
+    "按既有权限和资源门进行限定真实资格，未实测不保证时长或峰值",
+    "正式E/36条/统计/标签/小时预算另行冻结"
+  ],
+  "optional_omissions_with_bounds": [
+    {
+      "item": "额外真实Agora正文更新",
+      "omission_boundary": "第三阶段仅结构/完整类别与手写满长资格"
+    },
+    {
+      "item": "Vendor同域非空Adam下一步专测",
+      "omission_boundary": "Vendor只称完整状态往返和阶段边界下一步；H覆盖共享非空Adam下一步"
+    },
+    {
+      "item": "第七Memory群或全部reservoir重验",
+      "omission_boundary": "当前新增证明六群容量/序列化/旧teacher不刷新"
+    },
+    {
+      "item": "硬件kernel trace或更高NVML频率",
+      "omission_boundary": "仅称更新任务区间重叠及采样占用峰值"
+    }
+  ],
+  "out_of_scope_overdesign": [
+    "通用访问/恢复/调度平台",
+    "正式36条批次系统作为此次修复条件",
+    "新增VendorLink+ER或全部旧基线作为此次强制条件",
+    "全排列/全epoch/CKA/HPO",
+    "全面重跑历史CPU",
+    "为凑次数新增更新",
+    "看最终效果选参数或事后放宽容差"
+  ],
+  "reviewer_checks": {
+    "environment": {
+      "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39"
+    },
+    "stdlib_only": true,
+    "handwritten_export_records": 4800,
+    "fake_clock_process_control_examples": true,
+    "torch_or_transformers_imported": false,
+    "original_test_suite_executed": false,
+    "training_or_gpu_executed": false,
+    "server_or_project_network_access": false,
+    "formal_data_qrels_memory_weights_credentials_read": false,
+    "project_sources_modified": false,
+    "real_qualification_or_supervisor_test_subprocesses_started": false
+  },
+  "completion": "本轮外审已完成；必修三项待处理，实施门仍false；不重开已结案数据/F01—F04。"
+}

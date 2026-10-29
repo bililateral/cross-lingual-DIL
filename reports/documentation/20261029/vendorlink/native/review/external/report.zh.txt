@@ -1,0 +1,275 @@
+VendorLink 固定导出与限定原生资格：新增实施定向独立外审
+审查日期：2026-10-29
+本轮状态：NATIVE_IMPLEMENTATION_TARGETED_REVIEW_COMPLETED_WITH_REQUIRED_FIXES
+
+一、裁决与适用范围
+
+本轮定向外审已完成。固定导出以及 G1/G2 的具体资格入口已经实现；不能再沿用上一轮“尚无资格入口”的状态。新导出确实调用既有 build_views，G1 确实调用生产 Model、损失、反向传播、optimizer.step、Memory、保存恢复和盲评分。cpu07 的导出键类型错误已被当前代码修复，cpu07 中未变的 G1 成功证据可以按来源桥复用；cpu08 对导出和真实子进程监督的证据也成立。
+
+但当前实施不宜关闭：发现三项具体 REPRODUCIBILITY_DEFECT，均限于本次有界执行控制，不是重新否定 H 数学、三市场数据或既有 F01—F04。
+
+NI01（必修，高）：辅助时间漏计，且启动下一阶段前只检查旧辅助账，没有扣本次已消耗的准备时间。现有“最终超额才标 BUDGET_EXCEEDED”不能替代启动前预算约束。
+NI02（必修，高）：native/export 的独立命令行没有落实“只能由本次监督器启动”的约束；native 的 --job、G2 checkpoint/gate 未绑定本次许可目录及监督启动记录。将来合法关闭实施门后，可以绕过累计账直接调用 worker。当前 implementation_review_closed=false 仍有效，没有本轮已经越权执行的证据。
+NI03（必修，中）：active.json 在 factory 载模之后通过非原子 write_text 发布，存在载模峰值归属窗口，以及父监督器读到空/半写 JSON 后中断资格的窗口。无需训练即可修复、核对。
+
+本轮没有发现新增 SCIENTIFIC_BLOCKER。上述三项应在本次实施门关闭前最小修复并定向补证；它们不要求新增方法臂、HPO、真实数据、GPU 更新次数或预算。实际全尺寸 GPU 资格尚未执行，属于下一阶段本来就要取得的证据，不列为“修复失败”。
+
+当前许可原件为 approved=true、implementation_review_closed=false，operation=vendorlink_native_qualification。审查不修改许可、不签发执行门。本报告也不授权正式 36 条、epoch/E、小时预算或评价标签开放。[证据：native/permit.json；native/config.json；native/implementation.zh.txt 第 1—5 节]
+
+本报告只审新增 export/native/native_control 三入口、三项手写测试及其接线。F01—F04 维持 CLOSED；三市场数据审查维持已独立结案。四臂 VendorLink_SEQ/H_SEQ/H_ER/H_full、H 的既有两参数与历史 0.1/0.5、6 群/1 MiB、零新增 HPO 均保持。原 VendorLink 的有效 token 掩码平均仍是明确复现假设；原中文合成共同主门 false 不变。本轮没有产生新的效果或额外抗遗忘结论。
+
+二、准确输入身份、清单及来源桥
+
+2.1 外层唯一新增输入
+
+文件：vendorlink_native_implementation_review.zip
+实际字节数：136445
+实际 SHA256：0d2124d490d4048f635f6b15f2538a883a20d0c2995084364849b3d1bc9280ad
+实际成员：35；34 个载荷 + MANIFEST.json。
+MANIFEST.json：5489 字节；SHA256 bdbe8002fa6923ebb93df81180cbaac37d48cb1487e636d6b3956acb9badf1ca。
+
+逐成员读取 ZIP 字节，核对路径集合、唯一性、大小和 SHA；34/34 载荷与 MANIFEST 完全相符，无额外成员、重名成员、路径穿越或符号链接成员。完整逐文件预期/实测大小和 SHA 在 input_manifest_verification.tsv 与 package_checks.json，不用总 PASS 数替代此表。
+
+2.2 当前九份来源
+
+下列简称仅为报告行号引用；均指本轮 ZIP 中的原始文件：
+data = scripts/step29_vendorlink_data.py
+prepare = scripts/step29_vendorlink_prepare.py
+methods = scripts/step29_vendorlink_methods.py
+run = scripts/step29_vendorlink_run.py
+cpu = scripts/step29_vendorlink_cpu.py
+export = scripts/step29_vendorlink_export.py
+native = scripts/step29_vendorlink_native.py
+control = scripts/step29_vendorlink_native_control.py
+tests = tests/test_step29_vendorlink.py
+
+当前九份文件的大小/SHA 全部同时匹配 native/cpu_sources.json 和 native/cpu08/receipt.json。data/prepare/methods/run/cpu 五个旧核心与 cpu06 来源相同；methods/run 的已审数学、梯度、恢复作用可沿既有证据链复用。native/config.json 为 7053 字节，SHA256 814124cc200d441c45d1649fde0b73529cadcf2de66e5f28019cd808a659ad1a，正确绑定当前 permit。
+
+2.3 cpu07 嵌套旧源
+
+native/cpu07_sources.zip：39032 字节；SHA256 ebbf4f403c6dc8c965bd083e68ef35e9fe9249a7046e5fa3be4e818d85a1dc2f；10 成员=9 源码+cpu_sources.json。逐文件大小/SHA 全匹配嵌套清单，清单与 cpu07 receipt 的 sources 完全相等。
+
+旧源到当前只有 export 和 tests 改变：export:25—29 将预览直方图参考键规范为字符串；tests 新增真实子进程监督测试。native、control、既有 G1 测试以及所有旧测试函数 AST 未变。精确差异附 cpu07_to_cpu08.diff.txt。因此 cpu07 G1 不是错用旧来源，可按其原范围复用；cpu03 继续不作为当前资格证据。
+
+native/transfer.json 所列八个证据/资源文件逐项身份匹配。上一轮数据报告及 disposition 的 SHA 也与本包承接身份一致；它们仅支持未变部分和既有决定，不能替代本轮三入口的独立判断。
+
+模型文件只有元数据。检查确认 native/config.json 的六个 model_files 与 data_qualification/model_ready.json 一致；没有在网页读取或重新哈希模型权重。canonical 也只有固定路径/大小/SHA 元数据；本轮没有读取其真实内容。[证据：package_checks.json 的 cpu07_nested、cpu08_sources、unchanged_core_from_cpu06、model_metadata_consistent_not_model_bytes_rehashed]
+
+三、固定导出与隔离：实现主体通过
+
+3.1 冻结来源确实接到 builder
+
+export:67—76 先读取 config/permit，检查 Linux、operation、approved、review_closed、config SHA，再检查 canonical 大小/SHA，之后才读取 JSONL。export:15 实际调用 build_views，而非复制预览数字。export:16—29 从真实 builder 产物重新计分区、账号、群、视图、广告和群大小直方图；分区集合和各已计算计数与固定预览一致后才创建输出目录。
+
+config.canonical 与既有 inventory.canonical_cache 相等，partition 与 source_config.proposed_partition 相等，九分区 expected_partitions 与 inventory 完全相等。该链条没有把“来源文件名写在配置里”冒充实际接线。计数比较覆盖本次导出实际消费的字段；预览中的派生训练更新数并非模型效果指标，也没有被用于筛样本。[证据：export:12—31；native/config.json；three_market/inventory.json；three_market/source_config.json]
+
+3.2 盲载荷、qrels、类别与小样本
+
+export:33—58 分域/split 写载荷。fit 保留训练身份；dev/heldout 沿既有 builder 盲化规则导出。私有 qrels 的每个 group 同时保存公开载荷顺序的 view_ids 和 builder 产生的同序 labels。private_custody 新目录 0700，qrels 文件 0600；manifest 只给其路径/大小/SHA，资格 worker 仅读 qualification_samples，没有读取 qrels 或开放评价标签。
+
+full classes 来自整个当前域 fit 的全部视图身份（export:39），不是三个小群。选择规则为 builder 既有顺序中前三个 16 视图满群（export:41）；三个群合计 24 个账号，但类别表预期分别为 AlphaBay 775、Dream 270、Agora 1007。没有根据模型效果筛群。
+
+九分区固定规模：fit 合计 2052 账号/257 群，dev 504/63，heldout 456/57，共 3012 账号。此处只核对冻结元数据与导出消费关系，未重新盘点正式文本，也未重新审查已结案数据规则。[证据：export:35—58；native/config.json expected_partitions；native:244—268]
+
+当前配置中 export、private_custody 是 permit.job 的子目录，export manifest 也位于其中；通过 control 正常启动的 G1/G2 目录都派生于同一个 job。control:102—104 对 job 递归计大小，包含导出和保管文件。NI02 处理的是独立 worker CLI 尚未强制这些约束，不能据此否定当前冻结路径本身。
+
+3.3 只读当前域与有限历史
+
+native.stage_loader 按 AlphaBay→Dream→Agora 循环，只在当前阶段打开对应小文件，并验证大小/SHA、domain、fit、3 群、每群 16 视图、每视图 2 广告、类别唯一且包含小群身份。四方法逐一执行时重复三阶段属于明确资格计划；不是跨阶段任意读回全部来源。G2 仅读 Agora 小文件，从 G1 stage3 checkpoint 恢复历史 Memory。canonical 未传入生产 update，dev/heldout/qrels 不进入模型。
+
+fit 的全类别表是该域分类头定义，不能当作广告历史回放。Memory 之外没有从过去市场小文件重新取文本的训练分支。[证据：native:80—87、155—168、206—217、244—268、314—327]
+
+3.4 cpu07 键错误及本网页补查
+
+cpu07 export 比较自身字符串键直方图与 preview_counts 内存整数键，导致 Agora:dev 的 Export counts differ，发生在目录创建之前。当前只复制 reference 并统一 str(k)，没有改变分组、监督或筛选。既支持原内存对象，也支持 JSON 读回后的字符串键。
+
+本网页标准库手写检查用 4800 条虚构记录，实际调用已读的数据模块以及 AST 提取的 export/stage_loader：复现旧失败；检查当前两种键表示；逐一比较九分区；独立以手写商品 owner 关系核对全部 dev/heldout qrels；检查盲身份、前三满群、完整类别、权限、哈希、未来域拒绝和错误预览写前失败。所有范围内断言成立。初次网页检查器把内存 tuple 与 JSON list 直接比较，已仅在检查器中规范化并记入结果；未改项目代码。[证据：checks/export_bridge_checks.py；export_bridge_checks.json]
+
+四、G1：生产运算、15 次更新与 CPU 证据
+
+4.1 更新确实发生，数量没有缩记
+
+native.step:74—98 调用生产 update_vendor/update_h；methods:227—252 包含真实 backward、有限梯度裁剪及 optimizer.step。更新前后比较完整选定 embedding 权重矩阵与 head/classifier 权重矩阵，且用 CUDA synchronize 包住生产 update 的起止。此检查证明所选 encoder/head 参数发生更新；不是声称逐个 BERT 参数都必须改变。
+
+四臂更新分解：
+VendorLink_SEQ：A/B/C 基本各 1 次 + B 阶段边界恢复重演 1 次 = 4。
+H_SEQ：A/B/C 基本各 1 次 = 3。
+H_ER：A/B/C 基本各 1 次 = 3。
+H_full：A/B/C 基本各 1 次 + B 额外步 1 次 + 该步恢复重演 1 次 = 5。
+合计 15。每阶段只更新 groups[0]；另两个群可供 retain，没有把三个群都训练却计成一个。KD 对照只 backward，不增加 optimizer 更新。[证据：native:140—204、238—240；cpu07/native_g1.json]
+
+4.2 Vendor 完整类别头
+
+native:157—163 将当前完整 classes 传给 start_vendor_stage，再新建优化器；methods:145—152 创建 len(classes) 行分类头，methods:241—252 的交叉熵消费整个头的 logits。即使某类不出现在当前小群，仍在完整 softmax 中，并非只做 8/24 类头。
+
+tests:96—130 故意提供 35 类，其中小群合计只有 24 类；除了 classes 数字，还加载 stage3 实际权重检查 classifier.weight.shape[0]==35。故此测试能识别“只根据小群重建类别”的错误路径。它证明微型 35 类接线，不证明真实 775/270/1007 类全尺寸 GPU 已通过。实际大头显存与运算留待本次限定 G1。
+
+4.3 H 的历史消融未改变
+
+native 使用同一生产模型和 Settings；H_SEQ 无历史，H_ER/H_full 按存活 Memory.draw 取历史。原记录对评分、半均值半 log-mean-exp、自然/同控重组监督、非加权 BCE、正例 rank/HardTop5、历史监督 0.1、教师保持 0.5 都由未变 methods 承接；当前 H 方法未被资格循环替换。H optimizer 跨域保留，Vendor 新域头和 optimizer 重置。[证据：methods:71—134、161—195、216—252；native:159—168；既有已审来源桥]
+
+本轮不为组件名称重新做一遍数学审判；已核对新入口实际调用这些函数，且 cpu05 的跨 512 记录对分块、跨 64 编码微批直接 autograd 对照及下一步恢复保持原证据范围。原 CPU05 受测设置与正式默认 microbatch 不要混称：当前正式 Settings.microbatch=8，H 的 64 通道训练会保留八段编码图直到反传；并非每段执行完就释放所有图。因此 17 GiB 只能是尝试准入，不能凭微批名称保证峰值可行。[证据：methods:25—39、161—195；implementation/cpu05/receipt.json；implementation/review/repair/primary_disposition.zh.txt]
+
+4.4 long_stress 与最大盲评分
+
+第三域 long_group 保留 fit 的 group/类别/广告 UID 结构，用明确手写长字符串替换标题和描述；阶段 1、2 将来使用真实 fit 小样本。第三域不 retain，压力文本不进入六群 Memory。CPU07 三域全部是手写夹具，不含真实英文广告。
+
+G1 训练形状：8 账号×2 视图×2 广告=32 广告，H 64 通道、496 个无序记录对；满长检查为 32×H256 或 Vendor512。检查显式读取标题，两个通道都由相同长文本构成，生产 records 实际同时编码标题和描述，故描述通道也达到对应上限。Vendor 生产更新拼接标题和描述后截断到 512。
+
+盲压力组：11 账号×2 视图×2 广告=44 广告、88 通道、946 记录对、22 视图的 231 视图对；native:226—230 实际调用 evaluate 并要求 231 个有限分数。它没有 qrels/MAP，也不能支持第三市场正文效果结论。[证据：native:20—31、164—168、206、219—230；methods:161—195、202—213、247]
+
+此组合足够覆盖本次模型/形状/数值/资源资格目的。无需自动增加第 16 次真实 Agora 正文更新；省去该项后的准确边界是“第三域只有真实 fit 结构/完整类别、手写满长数值资格，没有该域真实正文更新证据”。跨块数学继续复用 cpu05，不为 946 对推理再新增一套训练梯度验证。
+
+五、Memory、KD 与恢复的确切证据边界
+
+5.1 六群及出生 teacher
+
+native:206—217 在前两域各 retain 三群，记录 groups、完整 len(memory.bytes()) 和 origin，并要求群数分别 3、6；已存 teacher 逐项 rtol=0/atol=0 比较。methods:262—291 的 bytes 序列化包含文本、teacher、seen 和 sampler RNG，1 MiB 约束并非只数文本字符串。
+
+CPU07 实测：H_ER 3 群 22625 字节、6 群 40021 字节；H_full 3 群 22625、6 群 41557。origin 从 [1,1,1] 到 [1,1,1,2,2,2]。这些数字只属于手写微型实例，不代表真实长文本的最终 Memory 占用。未来限定 G1 会使用真实前两域小群并执行相同完整 bytes 检查；无需加第七群或重测全部 reservoir 算法。
+
+5.2 KD 的真实作用
+
+native.gradient_kd:101—123 在同一模型、同一存活历史、同一出生 teacher 上，固定 seed=813，分别以 H_full/H_ER 运行生产 backward_h(history, teacher, history=True)，收集所有非 None 参数梯度，比较 encoder/head 两组全部受测梯度，不通过人为偏移 teacher 制造差异。
+
+cpu07 encoder 最大差=0.009454370476305485，head=0.028270304203033447；两个监督标量都为 4.503927230834961，full distillation=0.0008745547966100276。其 weighted 值 0.45083001255989075 与 replay-only 0.4503927230834961 对应现有 0.1/0.5 权重。生产 objective 与梯度接线使这组差异有解释力；不是仅以正 KD 标量作为充分证据。
+
+结论限于 KD 真实进入 encoder/head 梯度。原件明确 optimizer_step_comparison=false，不能改写为“含/不含 KD 的 Adam 参数差已直接比较”。额外两次 B 域 step 是恢复重放，不是 KD 两条件更新对照。
+
+5.3 学习率与两种恢复
+
+H_full 的额外步及恢复重复步使用 number=2,total=2，现有调度使 encoder LR=0，head LR 仍正；native.step 按实际 LR 判断是否要求 encoder 变化。其他非零 LR 步都要求 encoder/head 变化。此处理如实承认零 LR，没有改调度凑通过。[证据：run:76—87；native:74—98、189—204]
+
+H_full：保存 B 域额外步前的非空 Adam、3 群 Memory 等状态，执行一步，恢复，再重复同一步；递归比较保存的模型、classes、Adam、Memory/teacher/sampler、RNG、游标、模式及下一步产物。六群完整序列化另在 B retain 后验证，stage3 checkpoint 携带六群；不能把该下一步恢复测试本身说成“从六群状态重演”。G2 实际从最终存活 Memory 端点恢复，若选中的最重方法无记忆，则其 Memory 自然为空，不能声称 G2 必然又测一次六群 H 恢复。
+
+Vendor：先恢复 A 端点并比较非空完整状态，再以同 seed 重建 B 类别头和新优化器，重演 B 首步；准确名称为 nonempty_state_roundtrip_and_stage_boundary_next_step。它不是 Vendor 同域非空 Adam 的第二步对照，也不需要为本次方案另加该测试。
+
+恢复容差预先在 assert_state_equal 固定为 rtol=1e-5/atol=1e-6，equal_nan=false；非 tensor 离散项精确比较，NumPy 状态 array_equal，当前 uint8 Torch/CUDA RNG 的一个字节差远大于此容差。不要泛称所有 tensor “逐位相同”，浮点是容差内相同。确定性算法、TF32 关闭、CUBLAS_WORKSPACE_CONFIG、无 AMP 已落实。真实 GPU 不支持确定性或重放失败时应按未通过保存，不应事后放宽。[证据：native:34—53、126—134、170—204、291—293；run:38—73；control:165—167]
+
+六、G1 峰值、G2 并发与资源准入
+
+G1 每方法在 factory 前 reset_peak，结束盲评分后取累计 allocated/reserved 峰值，完整包括更新、retain、保存恢复相关 GPU 操作和评分；CPU 模型返回零 GPU 峰值，不能拿它估计全尺寸消耗。control 同时每约一秒读取 nvidia-smi XML 的进程占用。正确名称是“allocated/reserved 高水位与采样 NVML 峰值”，不是连续捕获每个瞬时 NVML 峰值。NI03 需要修正方法归属和文件发布后，这条选择链才能可靠关闭。[证据：native:56—64、142—148、231—237；control:102—113、196—198]
+
+较重方法按实测 max(reserved, 对应方法 NVML 采样值) 选择，不预设 H_full。每槽预留 R=峰值+max(1 GiB,10%峰值)。首次 G1 需要 free≥17 GiB，allocator 限制 16 GiB；这些是有限尝试门，不是 BERT 一定能跑完的保证。G1 失败要保留失败和计费，不改记成资格完成。
+
+G2 三个 worker 各两次真实更新，共 6≤9；G1+G2 实施为 21 次，原允许上限为 15+9=24，不需要把余量凑满。G2 从选中方法 G1 stage3 的非空 Adam 端点恢复，使用 Agora 结构的满长压力群。两步 k=1,2,total=3 保持 encoder 非零 LR，分别验证参数变化；全部 ready 后父进程打开同一 gate。[证据：native:310—329；control:204—214]
+
+overlap 检查三路生产 update 起止区间存在共同非空交集；这些区间经过 CUDA 同步并包含真实反向/step。它能够拒绝仅有三个 PID、实际串行不相交的情况。结论应称“三 worker 的实际更新任务区间重叠”，不声称 GPU kernels 必须在硬件上同时执行。CPU08 只检查手写区间逻辑，不证明三路 GPU 已重叠。
+
+首派和逐路补入都用同一个 XML 样本中的 free 与各 PID 占用；fits 只扣 max(预留−已反映占用,0)，避免把已包含在 free 中的占用再扣一次。例：free=15、已占5、预留10、新需10 时正好可入；free=14 不可入，源码与 CPU 断言相符。G2 起跑等待、checkpoint 加载和保存都包含在 worker Popen 到退出墙钟内。[证据：control:33—47、69—78、114—130；tests:154—161]
+
+包内资源快照为服务器 2026-10-29T18:32:37.222482+08:00，free15190 MiB；17 GiB=17408 MiB，尚差 2218 MiB，不满足初始 G1 尝试门。本网页未刷新服务器资源。未启动监听；代码不要求无 CUDA 进程，资源不足时 WAIT_RESOURCE 返回且不停止他人任务。初始不足与派发中资源突变需区别：后者按现代码是 STOP_NO_AUTOMATIC_RETRY，不是自动等待/重试。[证据：native/resource.json；control:70—71、181—208]
+
+七、必修发现及最小处理
+
+NI01 — 辅助计费漏项、旧余额准入及阻塞采样尾部
+分类：REPRODUCIBILITY_DEFECT；影响本次 900+900+300 有界资格；实施关闭前必修。
+
+来源：control:63—78、125—140、170—175、189—209、218—224；采样阻塞为 control:33—35、88—89、105—106。
+
+已证实的第一个缺口：main:220 将整个 supervision_wall_seconds 当成 child_union 扣除；但 watch_started 在首次 gpu_snapshot 和 Popen 之前。worker 从 starts/Popen 计费，尚无任何 worker 存活的资源查询/准备区间被两边同时排除。任务结束后 supervise 内的少量收尾也有同类问题。避免父子重叠双计是正确目的，实际扣除集合却大于真正子进程生命周期的并集。
+
+标准库 AST 假时钟例直接执行当前 supervise：首次 Popen 前资源查询消耗 5 秒，假 worker 约 2.1 秒；总约 7.1 秒。当前账仅 G1=ceil(2.1)=3，aux=0；5 秒启动前工作完全未归辅助。这是可复核的现有逻辑反例，不是项目已发生的真实超支。
+
+第二个缺口：source_check 先执行，之后只检查旧 ledger.aux>=290；本次准备耗时直到 finally 才加入。手写 continuation 夹具旧 aux=285，source_check 消耗16秒，此时实际已301秒，仍进入 G1 supervise；finally 才标 BUDGET_EXCEEDED_STOP。该标记诚实保留失败，但不能说明“超限前不会开始 GPU”。
+
+同一问题还影响出口/后续阶段可用时长：export 的 295-ledger.aux 未减本次准备消耗；启动 G1/G2 前没有实时非重叠辅助余额核验。另有明确的截止时限风险：gpu_snapshot 最长可阻塞10秒，父循环只留2秒退出尾部；接近 worker 截止点时，正常调用这项采样可越过父监督的 kill 时刻。无需断言任何本轮实测已超限，即可从调用位置看到该窗口。
+
+最小处理：
+（1）记录本次各实际 worker 的 start/end 区间，辅助只扣其时间并集；G2 worker 仍逐个向上取整后相加，不能把三路之和当墙钟并集扣除。无子进程的前置查询、启动失败、收尾计入辅助；已经落在任一 worker 生命周期中的父监督不重复收费。
+（2）在耗时准备前/期间及每次 Popen、export/G1/G2 转换前，用旧账+本次已用非重叠时间计算真实剩余额度，保留退出余量；source/model 流式检查可在块间检查截止点。余额不足直接停止并落原账。
+（3）采样调用超时上限服从最近仍存活 worker 的剩余硬截止点和退出尾部；不要允许固定10秒阻塞越过该点。失去采样/超时按停止路径处理，不自动加预算。
+
+最小补证：仅用假时钟/短手写子进程核对首个 Popen 前耗时、三路区间并集、资源等待后旧账继续、已不足时拒绝 Popen、采样接近截止点。cpu08 已有真实成功/kill 作用可以复用，修复影响 stop 路径时只补一条短子进程即可；不需要任何 BERT/GPU 更新。不得删除 cpu07/08 失败原件或清零账。
+
+NI02 — 独立 worker/export CLI 未绑定有限监督启动
+分类：REPRODUCIBILITY_DEFECT；影响“一次固定导出、同 job、累计账和 G2 固定端点”；实施关闭前必修。
+
+来源：native:271—289、310—324；export:62—79；对照 control:150—167、189—190、204—209。
+
+control 对 Linux py310、operation、approved/review_closed、config SHA 和 permit.job 都有检查；正常派发的路径也正确。但 native 的 gate 没检查 args.job，未验证 checkpoint/gate 来自本次选中 G1 端点，也没有核对由监督器创建的本次启动上下文。native:287 的“Only the reviewed supervisor starts workers”是注释，没有对应条件。export 虽使用固定配置路径，也可在门关闭后独立启动而不进入辅助账。
+
+标准库检查只计算实际 AST 的许可条件：在纯手写、假定已合法关闭 review 的 permit 中，同一 config SHA、job 指向许可根以外，native 条件接受而 control 条件拒绝；G2 的外部 checkpoint/gate 同样未进入该条件。未执行 native.main、未读外部 checkpoint、未加载模型；不是声称任意错误 checkpoint 都能通过 load_state 的其他检查。
+
+影响是具体的受支持 CLI 入口约束不一致：将来正确关闭实施门后，误直调/重复调用 worker 能绕过本次累计账，产物可离开 job 的32 GiB统计范围；G2 可使用其他路径的端点/起跑门。它不依赖修改源码或伪造模型，也不是要求防御有能力篡改同用户所有文件的人。
+
+最小处理：把 control 定为唯一公开执行入口，export/native 降为内部子入口并在读取来源/载模前拒绝无对应监督启动上下文的 CLI；或用本 job 内的一次启动记录绑定 config SHA、mode、派生 job、选中 checkpoint、共同 gate、剩余截止点，并验证当前监督实例。所有路径按 resolve 后的本次固定派生关系核对。两种实现择一即可，不要求签名服务、通用权限平台或多租户系统。不能仅补 job 路径检查而继续允许同目录未计费重启。
+
+最小补证：在模型加载前用手写 permit/config/启动记录覆盖“当前 review_closed=false 拒绝”“合法派发接受”“无监督记录/外部 job/错误 G2 checkpoint/gate 拒绝”“已使用尝试不可独立重启”。只测解析与启动约束，不训练，不需要读取正式 qrels 或服务器路径。
+
+NI03 — active.json 非原子发布与峰值归属窗口
+分类：REPRODUCIBILITY_DEFECT；影响资格稳定性和较重方法选择的测量归属；实施关闭前必修。
+
+来源：native:142—148；run:26—27；control:105—110、120—139。
+
+当前 factory(method) 完成后才写 active.json。载模期间第一方法无 marker 时会记到默认 g2，后续载模可能仍记到上一方法。每方法 CUDA reserved 高水位本身覆盖 factory，故不能据此断言实际最重方法一定选错；但说明中“全过程按方法 NVML 峰值”尚不完整。
+
+更直接的触发是 run.write_json 使用 Path.write_text 覆盖既有 active.json，open(w) 截断后、完整内容写完前，父进程 exists 检查可成功而 json.loads 读到空/半写内容。当前监督器将 JSONDecodeError 当 worker 监督失败，kill 后 STOP_NO_AUTOMATIC_RETRY。小文件不等于原子发布。
+
+标准库假进程检查将 active.json 设为这种合法中间态的空字符串，执行当前 AST supervise，得到 JSONDecodeError、STOP_NO_AUTOMATIC_RETRY、假 returncode=-9、G1收费1秒。没有真实并发、没有真实子进程/GPU，也不声称项目此前发生过此事件。
+
+最小处理：清理前方法后、factory 前，使用同目录临时文件+replace 原子发布当前 active。可以只在 native 增加这个小 helper，避免为此修改未变 run 的全部写文件语义。明确方法切换/清理归属；NVML 仍按采样观测表述，不承诺毫秒级无误差归属。
+
+最小补证：标准库检查 marker 先于 factory、完整发布和重复发布期间读者不会见截断内容；无需重跑完整 G1、KD、VJP、恢复或 GPU。原有成功 G1 的模型数学证据可继续使用，修复后的源桥必须重新记录。
+
+八、原生 CPU 原件如何支持、不能支持什么
+
+cpu07：项目 Linux 既有 py310；随机微型四层 HF BERT，hidden_size=8、H16/Vendor24 token、microbatch64；全为手写文本。G1 测试实际运行并通过，export 测试报键类型错误，wrapper exit=1，limit_reason=null。
+实际 wall=14.850980503018945 秒；收费15；累计45/300；峰值RSS786702336字节。
+
+cpu08：项目相同原生 py310；导出与真实监督子进程测试通过，wrapper exit=0。
+实际 wall=4.842890752945095 秒；收费5；累计50/300；峰值RSS745381888字节。
+原30+15+5=50，cpu07失败没有抹除。unittest内部11.679秒/1.407秒不能替代 wrapper 墙钟。[证据：native/cpu07、native/cpu08 各 console/receipt 与作用 JSON；tests:43—55、96—179]
+
+cpu08/native_supervisor.json：正常 Python 子进程 wall0.11414144409354776，收费1，exit0；sleep 子进程 wall1.0434531149221584，收费2，returncode=-9；两者由实际 supervise 启动/停止，局部辅助账3。它证明真实 Popen、kill、失败保留和计费分支，并非单看 PASS 名称。
+
+但该测试 phase=aux、reserve=0，且不运行 control.main，因此未覆盖 NI01 的首次 GPU 资源查询、辅助余额 continuation 或 main 最终扣除；也未覆盖 NI02 独立入口，NI03 跨进程 active 发布或真实 NVML。指出这些缺口无需否定已证实路径，更不要求全面重验所有历史。
+
+所有 CPU 原件明确 formal_data_reads=0、pretrained_model_loads=0、gpu=false。它们不是实际 BERT-base/GPU/775、270、1007 类头/三路并发的通过证据。未来本来就需要的限定原生资格不得以本报告或微型 CPU 数字替代。
+
+九、可复用、可删减及后续事项分级
+
+9.1 可以直接复用
+
+F01—F04 关闭状态；已审三市场清理、预览、盲化与固定划分；methods/run 数学、生产更新及 cpu05 分块 VJP；cpu07 未变 G1 的真实微型更新/KD/Memory/恢复；cpu08 已修导出的操作路径、真实成功/超时子进程。后续仅控制器/入口/active 修复不触及这些运算时，不要求重跑其训练验证。每次来源变化仍需小范围 diff/哈希桥，不能把旧 receipt 冒称新文件执行证据。
+
+9.2 合理后续（本来就未完成，不是本轮新增缺陷）
+
+修复 NI01—NI03并完成针对性复核/独立处置后，再按既有权限流程处理实施关闭门；资源满足时执行已呈现的固定导出及限定 G1/G2。仍需实测实际 BERT/完整类头/保留微批图的峰值、真实前两域六群 bytes、固定容差 GPU 恢复和三路更新区间重叠；都可在现有15+6次实施及900+900+300上限内尝试。未实测前不保证2100秒一定完成，也不给正式累计小时保证。
+
+正式 epoch/E、共同当前曝光、36条安排、Q/O/F/N与六格三角的统计依赖和域间权重、评价开放、正式小时预算另行冻结。不得看 heldout 效果选择 epoch/参数。首阶段共享尚未实现，不能计入90阶段节省。市场选择与数据源准备已经确定，无须重新等待 Silk Road 或申请同一市场决定。
+
+9.3 可选且可删，删后边界明确
+
+真实 Agora 正文额外更新：本次不必；删掉后只有第三域结构/类别及手写满长资格，保留此命名即可。
+Vendor 同域非空 Adam 第二步专测：本次不必；删掉后 Vendor 证据是完整状态往返+新域重置后的下一步，H 非空 Adam 下一步提供共享恢复路径证据。
+第七群淘汰/全部 reservoir 重验：本次不必；删掉后证明当前六群保留、序列化与旧 teacher 不刷新，完整 reservoir 算法仍沿既有证据。
+额外 NVML 高频采样或硬件 kernel trace：不是本次必要项；删掉后只声称采样占用峰值与同步生产更新区间重叠，不声称瞬时全峰值/硬件并行。
+近重复/模板、真实控制者隔离、VendorLink+ER：保持此前可选范围；不做时结论继续局限于观察账号双视图的小群代理应用比较，以及 H_full 对 H_ER 的内部历史归因，不能升级成真实全市场马甲识别或同记忆权限全面优越性。
+
+上述新增实验/数据/参数/预算若另行提出，均待用户确认；本报告没有自动加入执行范围。
+
+9.4 OUT_OF_SCOPE_OVERDESIGN
+
+为本次修复建设通用访问/调度/恢复平台、正式36条批次系统、常驻 GPU 监听；新增全部旧基线、VendorLink+ER作为本次强制项、全排列、全epoch诊断、CKA/HPO；全面重验 cpu01—cpu06；为命名更整齐凑满 G2 九次；通过放宽容差、调整 H 参数或追看最终结果“修”资格。均不属于本次必要最小处理。
+
+十、本网页实际环境、检查附件与完成状态
+
+本网页隔离环境：Python 3.12.14，Linux 6.18.55 x86_64 / glibc 2.39。只使用标准库完成 ZIP/哈希、JSON/AST、精确 diff、手写导出和假时钟/假进程协议推演。没有导入 Torch/Transformers，没有执行原 unittest、模型或 optimizer.step，没有访问项目服务器/网络，没有下载正式数据/模型，也没有读取正式文本、classes/qrels、Memory或凭据。
+
+项目 Linux py310 cpu07/08 是包内原生证据，本网页只是检查源码、断言、原件、身份桥并复核有限接线；两者不可互换。原生参数变化/KD数值来自原件，不冒称网页独立训练复现。所有包内输入源码保持原字节，未自动实施修复。
+
+主要输出：
+report.zh.txt：完整中文报告。
+disposition.json：本轮三项必修与分级、范围及执行门状态。
+input_manifest_verification.tsv：34载荷+输入MANIFEST的逐项大小/SHA核对。
+package_checks.json：包身份、九来源、嵌套cpu07、配置/模型元数据与CPU账目。
+cpu07_to_cpu08.diff.txt：两份改变文件的精确差异。
+export_bridge_checks.json：手写导出/来源桥检查结果。
+control_budget_checks.json：NI01/NI02/NI03的有限静态及假时钟反例。
+checks/verify_package.py、checks/export_bridge_checks.py、checks/control_budget_microcheck.py：标准库可复核脚本。
+reading_scope.tsv：源码/证据作用与未重开范围。
+README.zh.txt：复核方式、环境与限制。
+OUTPUT_MANIFEST.json：所有交付载荷的大小/SHA清单，自身不递归哈希。
+
+完成状态：本轮新增实施定向外审已完成；三项 REPRODUCIBILITY_DEFECT 待最小修复，当前实施关闭门应保持 false。既有 F01—F04与数据结案不重开；固定导出/真实原生资格尚未执行；正式训练和标签开放仍需后续合同。本报告不是执行许可，也不以旧报告或 PASS 数量代替本轮审查结论。
