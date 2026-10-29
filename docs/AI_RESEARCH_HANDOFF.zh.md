@@ -17,7 +17,7 @@
 
 科研范围：中文合成三域主线与VendorLink受控观察账号视图扩展分别解释；后者每query单正例，所以MAP=MRR，不证明真实跨账号马甲识别。常设Harness已完成[规则优化](RESEARCH_DISCUSSION.zh.md#2026-10-29-科研harness优化落地)，执行看[科研纪律](RESEARCH_DISCIPLINE.zh.md)。用户随后要求推送及同步，现有11提交已交付到远端0e9a1614，根AGENTS及六份可变文档已SFTP同步Linux；本轮收尾记录随当次交付，详见[同步范围与核对](STORAGE.zh.md#2026-10-29-harness与当前文档同步交付)。新回收外审正文/附件仍按Windows范围保管；活动冻结来源保持同字节，未刷新上述训练观测或改变合同。
 
-本轮VendorLink具体观测：服务器14:49:31读取商品表，wall13.73秒，目标三市场已查来源合格账号均0（缺源，不是清洗淘汰结论）；未读取身份/PGP/封存内容。14:58后[资源快照](../reports/documentation/20261029/vendorlink/data_qualification/resources.json)为5090空闲10076MiB，三CUDA为既有作业，未复算整批完成数或工期。模型小文件Linux直连、主权重Windows既有代理119.48秒下载后SFTP；[最终身份](../reports/documentation/20261029/vendorlink/data_qualification/model_ready.json)六文件436414632字节，pooler存在但未载模；[清理回执](../reports/documentation/20261029/vendorlink/data_qualification/transfer_cleanup.json)确认Windows权重副本已删。官方三数据入口均需访问申请，未代申请/下载新数据。新盘点证据与提议在两端保存；上一段Git交付仍仅指此前Harness批次，本轮新成果先本地提交。
+本轮VendorLink具体观测：服务器14:49:31读取商品表，wall13.73秒，目标三市场已查来源合格账号均0（缺源，不是清洗淘汰结论）；未读取身份/PGP/封存内容。14:58后[资源快照](../reports/documentation/20261029/vendorlink/data_qualification/resources.json)为5090空闲10076MiB，三CUDA为既有作业，未复算整批完成数或工期。模型小文件Linux直连、主权重Windows既有代理119.48秒下载后SFTP；[最终身份](../reports/documentation/20261029/vendorlink/data_qualification/model_ready.json)六文件436414632字节，pooler存在但未载模；[清理回执](../reports/documentation/20261029/vendorlink/data_qualification/transfer_cleanup.json)确认Windows权重副本已删。官方IMPACT三数据入口均需访问申请，未代申请/下载新数据。随后按用户提供的Gwern链接[核对公开替代来源](../reports/documentation/20261029/vendorlink/data_qualification/gwern_sources.json)：AlphaBay/Dream/SR1均有归档入口，六候选HEAD均200；Grams第二期覆盖前两市场，SR1的2013抓取为待核验候选，Christin公开删减版缺商品文本不可用。只查网页与响应头，未下载解析；来源不等同论文版本，不能把候选发现写成数据资格通过。新来源记录与此交接仅Windows更新，旧盘点证据与提议已两端保存；上一段Git交付仍仅指此前Harness批次，本轮新成果先本地提交。
 
 ## 近期执行与审查历史
 

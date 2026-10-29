@@ -1,0 +1,75 @@
+{
+  "checked_date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "request": "用户要求查看 https://gwern.net/dnm-archive 是否有所需数据集",
+  "scope": "公开说明、目录及六个候选文件HTTP HEAD；未下载归档正文、解包、读取正式样本或启动科研计算",
+  "sources": {
+    "overview": "https://gwern.net/dnm-archive",
+    "directory": "https://gwern.net/doc/darknet-market/dnm-archive/file/index",
+    "mirror_directory": "https://archive.org/download/dnmarchives",
+    "christin_public_release": "https://gwern.net/doc/www/arima.cylab.cmu.edu/22393221aa52b89fcf80452bd80fb35edcba8d4c.html"
+  },
+  "head_observations": [
+    {
+      "url": "https://gwern.net/doc/darknet-market/dnm-archive/file/alphabay.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 938817380,
+      "etag": "67ca6383-37f53764",
+      "assessment": "AlphaBay候选市场抓取归档；实际正文、账号及合格数量未核验"
+    },
+    {
+      "url": "https://gwern.net/doc/darknet-market/dnm-archive/file/dreammarket.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 124980888,
+      "etag": "67ca6501-7730e98",
+      "assessment": "Dream候选市场抓取归档；实际正文、账号及合格数量未核验"
+    },
+    {
+      "url": "https://gwern.net/doc/darknet-market/dnm-archive/file/silkroad1-20130703-anonymous.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 11151256,
+      "etag": "67ca6589-aa2798",
+      "assessment": "原始Silk Road 1的2013抓取候选；商品标题/描述/卖家映射及样本规模尚未核验"
+    },
+    {
+      "url": "https://gwern.net/doc/darknet-market/dnm-archive/file/silkroad1-20120723-christin-censored.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 24538920,
+      "etag": "67ca658b-1766f28",
+      "assessment": "排除作为文本模型训练源：原作者公开版本说明删除商品名称、描述及反馈文本，账号/商品标识也已哈希；此判断来自来源说明，未解析归档"
+    },
+    {
+      "url": "https://gwern.net/doc/darknet-market/dnm-archive/file/grams-20150714-20160417.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 67788336,
+      "etag": "67ca6525-40a5e30",
+      "assessment": "优先资格候选：页面明确该期Grams CSV覆盖AlphaBay和Dream；页面示例schema含market_name/vendor_name/name/description/item_link，示例为SR2，不能冒充这两市场实际表头；跨日期重复、文本完整性及实际合格账号需核验"
+    },
+    {
+      "url": "https://gwern.net/doc/darknet-market/alphabay/2017-01-28-alphabay.tar.xz",
+      "http_status": 200,
+      "content_type": "application/x-xz",
+      "content_length": 132927548,
+      "etag": "66faa791-7ec503c",
+      "assessment": "AlphaBay另一候选：页面称McKenna/Goode于2017-01-26至28抓取并提供Python提取；实际结构未核验"
+    }
+  ],
+  "transport": {
+    "method": "Windows curl HEAD via existing 127.0.0.1:10808 proxy",
+    "attempts": "沙箱内连接本机代理失败；获工具审批后相同只读HEAD成功，六文件均200",
+    "complete_download_verified": false,
+    "archive_hash_verified": false
+  },
+  "independent_assessment": [
+    "三个目标市场均找到公开归档入口；本地缺源结论保留，外部获取路径不再只限IMPACT申请。",
+    "这些归档尚未证明与VendorLink原论文非匿名CMU/IMPACT输入同版本、同采样或同反馈匹配总体，不能直接复用论文规模或数值。",
+    "建议最小下一步资格候选为Grams第二期与SR1 2013匿名提供者抓取，共78939592压缩字节；这是候选建议，未授权/执行下载解析或采用新来源。",
+    "是否能用于当前代理任务取决于真实商品正文、稳定账号对应、去重后每账号数量及三域规模。来源改变须在后续方案中明确，不改变四臂算法或把代理结果称为真实跨账号同控证明。"
+  ],
+  "storage": "本轮仅Windows保存此元数据和更新交接；既有盘点报告、files.json、sync_receipt.json及Linux冻结来源未改"
+}
