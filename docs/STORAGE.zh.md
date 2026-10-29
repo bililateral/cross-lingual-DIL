@@ -1,5 +1,13 @@
 # 科研文件存储与恢复
 
+## 2026-10-29 VendorLink数据盘点与英文模型保管
+
+用户明确批准盘点及下载正式所需模型，并要求Windows后备下载完成搬运后删除副本。官方google-bert/bert-base-cased固定revision cd5ef92a9fb2f889e972770a36d4ed042daf221e六文件共436414632字节，最终保管在Linux `/home/yongpeng/cross-lingual/models/step29/bert_base_cased`；[最终回执](../reports/documentation/20261029/vendorlink/data_qualification/model_ready.json)保存逐文件身份。主权重435755784字节，官方SHA256为1d8bdcee6021e2c25f0325e84889b61c2eb26b843eef5659c247af138d64f050；预训练pooler键存在，未载模/推理/训练。
+
+Linux直连小文件成功、权重过慢的尝试及中止保留model_receipt.json与日志；Windows经现有本机代理下载119.479901秒后SFTP，Linux重新核对全部官方身份。已删除Linux2097152字节未完成权重和Windows435755784字节临时权重，见[搬运清理](../reports/documentation/20261029/vendorlink/data_qualification/transfer_cleanup.json)；无Windows模型副本、无全局代理变更、不重置大清理周期。六文件只含一份PyTorch兼容safetensors，没有额外TF/Flax/bin。
+
+实际数据资格原件/限定下一步提议保管在两端同路径reports/documentation/20261029/vendorlink/data_qualification；Windows只保留小型汇总、脚本和文档，没有新拷贝正式商品文本或身份材料。现有market_item.xlsx与9月迁移SHA一致；AlphaBay/Dream/原始Silk Road商品表未找到，未下载新市场数据，不从身份SQL/HTML补造商品表。本轮仅编辑相关可变文档并同步本轮新证据，不覆盖任何活动冻结来源；当前根文档仍由Windows本次版本为准。
+
 ## 2026-10-29 Harness与当前文档同步交付
 
 用户明确要求推送本地提交（含Harness优化），并同步服务器相关文档，禁止覆盖活动实验冻结文件。原11个本地提交已普通快进推送至现有科研分支，实际远端从4ca9d6b8774434d6db5591fb7c7f93dd41130adc到0e9a1614b5a17c5217038dcb8bd5e8a70cef6ced，经独立ls-remote核对；本轮同步收尾记录另随当次提交交付，不改变此前各轮授权的历史范围。

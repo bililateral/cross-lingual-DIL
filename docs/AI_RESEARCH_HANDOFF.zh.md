@@ -6,7 +6,7 @@
 
 | 工作 | 最新有效状态与证据 | 下一步与边界 |
 |---|---|---|
-| VendorLink四臂实现 | 首轮及13:33提交的增量已完整回收；[增量原文](../reports/documentation/20261029/vendorlink/implementation/review/repair/external/report.zh.txt)、[独立结案](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)确认F01—F04全部关闭、无剩余必修项。CPU26/300秒，未新增测试；专用页已关闭，无自动化。 | 实现审查已结案，不再等待或重复提交。下一步落实实际三市场数据范围/资格、英文模型及限定GPU、评价与正式预算。四臂/代理任务不变；正式36条未批准，无首阶段共享时108阶段，不计90节省。 |
+| VendorLink四臂与数据资格 | F01—F04[独立结案](../reports/documentation/20261029/vendorlink/implementation/review/repair/primary_disposition.zh.txt)保持，CPU26/300秒不变。用户新授权实际盘点及模型准备，已完成[盘点与具体提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)：现有商品表367465行，缺AlphaBay/Dream/原始Silk Road；silk road 3.1不能替代。官方BERT固定版本六文件已在Linux核验，Windows副本已删。 | 先取得获批三市场商品来源，再固定真实人数、划分/曝光及评价。新70/15/15划分、2记录视图/8账号群和2100累计秒GPU资格均为待确认/增量审查提议；未载模/用GPU/生成视图或qrels。四臂/代理边界不变，正式36条未批准、108阶段，不虚计共享节省。 |
 | L²R／ER+GCR新对照 | 服务器2026-10-29 13:50:06：[实际快照](../reports/documentation/20261026/continual_comparison/qualification/status_20261029_harness.json)显示10/18完整、3活跃、5待派发，34/54新端点。控制器1198791与三worker身份相符、日志继续推进、无failure，47来源匹配。 | 按已批822累计小时（800训练+18确认+4辅助）、三路、全18盲完成及108状态完整门后生成/确认/分析。H/S54仅复用，不重训；没有提前开放效果。 |
 | S_default＋历史H（G_half） | 同次现场：唯一监听1257448仍WAITING／PREDECESSOR_STILL_RUNNING，未派发，训练0，控制872.08/7200秒，无失败，44来源匹配。 | 已批18条、最多三路、110累计小时、单条6h，只训练/54端点/旧dev盲分数。等待前批完整成功退出后按所需剩余显存等资源派发，不重复启动、不要求全卡无CUDA。 |
 | 原五方法45条及Optuna | 均已完成并结案，证据从[设计入口](CURRENT_EXPERIMENT_DESIGN.md)追溯。五方法H−S最终旧域MAP正向，但原O/F共同主要门false。 | 不为翻转结论重训/调参；已删除权重不可由SHA恢复。VendorLink及原版补充均不追改旧验收和标签接触事实。 |
@@ -16,6 +16,8 @@
 工期按同次保存的operational_eta：持续三槽可补位时训练尚余42.44h，预计服务器10月31日08:17结束；加确认/分析2.5—4h，预计31日10:47—12:17（距观测44.94—46.44h），自控制器26日10:25启动计约120.36—121.86h，外审另计。若后续慢20%，整批预计31日19:16—20:46，不是统计区间或保证上界。CAB首阶段现在有95.73秒/步实测，后两阶段仍借同阶段跨顺序池，资源等待和三L²R争用会改变预测；[回传与口径核对](../reports/documentation/20261026/continual_comparison/qualification/harness_observation_receipt.json)保存文件SHA及计时来源。S/H等待不承诺开训日。
 
 科研范围：中文合成三域主线与VendorLink受控观察账号视图扩展分别解释；后者每query单正例，所以MAP=MRR，不证明真实跨账号马甲识别。常设Harness已完成[规则优化](RESEARCH_DISCUSSION.zh.md#2026-10-29-科研harness优化落地)，执行看[科研纪律](RESEARCH_DISCIPLINE.zh.md)。用户随后要求推送及同步，现有11提交已交付到远端0e9a1614，根AGENTS及六份可变文档已SFTP同步Linux；本轮收尾记录随当次交付，详见[同步范围与核对](STORAGE.zh.md#2026-10-29-harness与当前文档同步交付)。新回收外审正文/附件仍按Windows范围保管；活动冻结来源保持同字节，未刷新上述训练观测或改变合同。
+
+本轮VendorLink具体观测：服务器14:49:31读取商品表，wall13.73秒，目标三市场已查来源合格账号均0（缺源，不是清洗淘汰结论）；未读取身份/PGP/封存内容。14:58后[资源快照](../reports/documentation/20261029/vendorlink/data_qualification/resources.json)为5090空闲10076MiB，三CUDA为既有作业，未复算整批完成数或工期。模型小文件Linux直连、主权重Windows既有代理119.48秒下载后SFTP；[最终身份](../reports/documentation/20261029/vendorlink/data_qualification/model_ready.json)六文件436414632字节，pooler存在但未载模；[清理回执](../reports/documentation/20261029/vendorlink/data_qualification/transfer_cleanup.json)确认Windows权重副本已删。官方三数据入口均需访问申请，未代申请/下载新数据。新盘点证据与提议在两端保存；上一段Git交付仍仅指此前Harness批次，本轮新成果先本地提交。
 
 ## 近期执行与审查历史
 

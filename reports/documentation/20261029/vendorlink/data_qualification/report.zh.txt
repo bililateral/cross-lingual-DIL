@@ -1,0 +1,83 @@
+VendorLink三市场资格盘点、模型准备及下一步提议
+2026-10-29。本轮用户已明确授权服务器数据资格盘点和模型下载；GPU核验、数据集申请/下载与正式训练不在本轮执行范围内。
+
+一、结论与实际范围
+
+已完成Linux既有py310上的文件/字段/目标市场盘点。现有归档没有可用于本轮AlphaBay、Dream、原始Silk Road的三份商品表。market_item.xlsx实际367465行、24个market取值；这三个目标市场均0行、0个可核实商品账号、0个合格账号。这里的0只描述本项目已查来源，不代表这些市场在外部数据集中没有账号，不把“缺源”写成“清洗后无样本”。尚不能给出真实三域fit/dev/heldout人数，也未生成视图或qrels。
+
+完整原件见inventory.json、discovery.json、source_search.json、resources.json；audit.py为实际运行源码，SHA d0e435f1151c09be40dbfb42f2599dcd59b2c1dad36b53062409180df09bd045。服务器14:49:31开始的单线程盘点wall13.727541秒、进程CPU13.933317秒、峰值RSS242428KiB。两种时间起点不同，CPU含脚本开始前导入；不借用之前300秒手写CPU预算，也不把本次盘点写成GPU资格。未加载模型、未碰未开放评价、没有修改或停止活动任务。
+
+实际文件：
+1. /home/yongpeng/cross-lingual/market_item.xlsx：63190060字节；vendor/ship_from/title/description/price/category/market七字段，商品字段映射可以直接建立，但目标市场不存在。实际SHA 3625a226974827a0441ec87c54688f85ed0ff93a1c4c687532ef550ec1640187，与20260914/local_hashes.json原迁移身份一致。
+2. 同根2017-12-05-philipjames11-darknetmarketplacedataagora20142015.xlsx：11650639字节，工作表元数据109761行含表头；Vendor、带前导空格的Category/Item/Item Description/Price/Origin/Destination/Rating/Remarks共九字段。仅查表头及行元数据，没有为本轮重新逐行统计Agora；它不是所需三市场。
+3. 同根products_data.csv：2127701字节，既有schema明确是来源市场未解决的中文商品表，不冒充三市场，未重读其内容。
+4. html-rips与2017-12-09-grams-christopher分别20602文件、888612877字节；既有schema定位为卖家身份HTML快照，非三市场商品表。本次只查文件元数据，未读身份内容。tijkc3xx.sql（4966881字节）和3z669jwe.sql（98252886字节）分别为身份登记/PGP来源，同样未读内容。
+5. 用户home下深度不超过6的文件名检索未发现AlphaBay/Dream/Silk Road/对应preprocessed来源路径；排除miniconda、隐藏目录、reports、private_custody等。结论不是声称扫描了整台共享服务器、其他用户或全部封存区。项目已登记的原始来源均已逐个核对。
+
+特别区分：market_item.xlsx含silk road 3.1的45917行，不能当作论文Silk Road-1。其余较大市场为Lime122203、apollon62934、agartha46189；不自动改成这些市场或扩大读取/比较范围。
+
+二、缺失来源与获取路径
+
+官方固定代码commit 9d0ba5dba665f0e057426cb3b88fae402658d361的README指向以下IMPACT目录，已于本轮读取官方公开元数据：
+AlphaBay：https://www.impactcybertrust.org/dataset_view?idDataset=897
+DOI10.23721/116/1462165，目录2014-12-31至2017-05-26，标示4.1GB。
+Dream等四市场：https://www.impactcybertrust.org/dataset_view?idDataset=1201
+DOI10.23721/116/1503879，目录2017-07-15至2018-08-22，标示427.8MB；本轮仅取其中Dream。
+Silk Road：https://www.impactcybertrust.org/dataset_view?idDataset=812
+DOI10.23721/116/1406256，目录2012-03-04至2012-07-23，标示13.8MB。
+
+三个入口均为restricted的非匿名文本版本，需要登录IMPACT申请；网页要求学术机构邮箱/研究页面、项目简介和导师申请或背书。这里没有代用户注册、提交申请、接受协议或外发材料。代理只能解决网络连接，不能代替数据访问许可。目录大小不是到手文件核验值；README的时间/规模概述与目录不完全一致，尤其Silk Road，必须以获批包的实际版本和清单明确偏差，不能把README统计写成我们的实测规模。
+
+原作者格式化代码：https://raw.githubusercontent.com/maastrichtlawtech/VendorLink/9d0ba5dba665f0e057426cb3b88fae402658d361/utilities/formatData.py
+AlphaBay/Dream预期items.csv字段marketplace,title,vendor,description，并与feedbacks.csv的reciever/order_title匹配；Silk Road预期items.csv中marketplace,title,seller_id,listing_description。实际到手后按列名映射，不能盲从该脚本位置重命名推断字段，也不能以此文件预期代替实际表头。拟保留AlphaBay/Dream的反馈匹配资格、去除一对多合并造成的广告重复，使四臂共用同一广告集合；若获批包不含反馈，要单独说明来源偏差并确认，不静默改样本总体。反馈内容及交易金额不进模型。
+
+建议下一步先取得上述原始来源及访问许可，再做相同的实际资格核验。已有已获批副本时只需提供位置；没有时先准备申请说明，由有资格的研究者办理。本轮不把换用现有市场当成原计划的自动修复。
+
+三、数据划分提议（未冻结、未执行，待实际来源补齐及审查）
+
+保留四臂VendorLink_SEQ、H_SEQ、H_ER、H_full。目标是完整H在真实商品文本的观察账号视图代理上是否缓解持续学习遗忘，原论文方法实际进入同一协议。不是复现论文表中准确率，也不是证明真实跨账号马甲关系。
+
+建议固定A=AlphaBay、B=Dream、C=Silk Road；ABC/BCA/CAB是三种循环次序，不是历史时间顺序。36条/108物理阶段仍为先前提议，本轮不签发正式预算或启动许可。
+
+资格沿用已审builder：显式有效market/vendor/title/description字符串，NFKC与空白标准化；统一屏蔽文本中的本账号直接名称；账号内按完整标题+描述去重，排除跨账号共享的原文或掩码后完全相同文本。账号键为市场+原账号，不用跨市场同名生成正例；同casefold账号名跨市场只共用split，以保守减少泄漏。阈值为每账号至少20条干净不同广告，不将原始抓取行/反馈行当独立商品。
+
+建议split_seed=20261029，fit/dev/heldout=70%/15%/15%，用现有seed_for(split_seed,'identity_split',vendor.casefold())哈希一次划分，不反复换seed凑人数或挑效果。全部三域先完成此资格及固定清单；正式阶段只读取当前域fit及允许的Memory，不提前用未来域训练。dev暂保留，不做新增HPO；heldout仅在整批冻结盲评分完整后按未来确认合同开放。
+
+建议records_per_view=2，每账号固定选4条不同广告，分两个互不重叠的2条视图；这是最低多商品集合任务，符合当前实现，不声称完整商品目录覆盖。每账号剩余广告不用于另造独立确认，也不在看到结果后增加视图。≥20是来源资格，实际选4是固定输入规模，二者分别报告。
+
+建议identities_per_group=8：常规16视图、32商品、每query15候选（1正14负）。末组少于4账号时合并前组，最大11账号/22视图/44商品/每query21候选；不同行为的分组难度必须分层报告。当前小组内排序的MAP不能外推为全市场数千账号检索，也不能与其他候选规模的0.52直接比。每query单正例时MAP=MRR，不双报成两项独立证据。
+
+每市场的fit/dev/heldout至少各4个合格账号，否则该三域方案不成立；不自动降低20广告门槛、更换随机种子或填充重复账号。至少4只是技术成组门，不代表统计样本已充分；真实账号规模、最大组、训练曝光/epoch、独立确认与预算仍须到手后冻结。无真实数据规模时，不能承诺正式更新数或小时数。
+
+评价继续Q/O/F/N与完整三角矩阵：H_full对H_ER检验保持项增量，对H_SEQ检验整套历史机制，对VendorLink_SEQ作受限系统比较；H与VendorLink历史权限不同，不能声称同记忆预算下优越。少遗忘需结合获得水平、最终旧域及新域，不以最初学得差造成的F低当成功。近重复、潜在控制者跨split以及token截断后相似文本未被完全排除；不为此新建近重复平台。
+
+四、限定GPU原生验证提议（总计2100累计任务秒，尚未批准/执行）
+
+建议等三市场来源资格通过后，一次完成必要的真实BERT/GPU增量；不先用缺失数据制造正式资格。已有随机微型BERT的CPU26/300秒、四臂实现及两轮已结案审查直接复用，不全量重测或重审原公式。
+
+输入：本次固定BERT和已审代码；每市场仅固定fit小样本（按身份无关的固定哈希取最多三个群），加覆盖长度上界的手写英文样例。只取当前阶段fit，不读dev/heldout/qrels/真实控制者材料。真实记录只输出尺寸/哈希/损失及资源统计，不输出账号或正文。GPU核验样本的后续用途在正式合同留痕，不把它们算独立效果证据。
+
+G1，单路依次验证四方法，累计最多900任务秒、最多15次optimizer.step：四臂各三阶段最小更新，H_full阶段2额外一次使旧teacher与当前模型已产生差异，共13次；VendorLink及H_full各一次保存—恢复后的重复下一步核对，共2次。验证实际编码器/头更新、H_ER实际历史监督与H_full teacher项作用、三阶段头/优化器行为、盲评分有限且ID对齐、继承端点和下一步状态、Memory实际字节及两处生产分块。正式建议最大44商品/88通道/946记录对覆盖编码块8与记录对块512；VendorLink训练需覆盖32广告、512 token，H每通道256 token。原始词法配置do_lower_case=True依已审作者实现保留，不静默改成另一tokenizer方案。
+
+资源资格以最坏批准形状为准，不拿短文本均值低估。初次G1拟设PyTorch分配上限16GiB，另留1GiB非allocator余量，首派free至少17GiB、RAM至少24GiB、产物磁盘至少32GiB；这些是建议的试验上限/准入余量，不是已测得实际需求或保证足够。不改AMP、梯度检查点、batch或样本形状求通过。超过该范围即保留失败并停止依赖，具体资源/实现调整另说明；不能把一次OOM当正式负结果。
+
+G2，只在G1已证明可行后验证三路，累计最多900任务秒（每worker300秒）、最多3×3=9次更新。使用G1测得资源最重的允许形状/分支，记录三路真实重叠的更新时间和峰值；若三路显存不容纳，则G2不启动并直接报告可行并发数，不因用户偏好三路擅自缩数据或换精度。
+
+三路准入：单槽需求R为G1实测完整峰值再加max(1GiB,10%峰值)余量，同时参考NVML进程占用与PyTorch峰值；首派k槽要求free≥kR，补位要求free≥R+sum(max(0,R-各在途本批实占))。观测取同一次采样，跨采样不抵扣。外来CUDA进程非空不否决，只看资源是否足够；不停止或改他人/当前既有任务，也不新建等待监听。若3R超过整卡可用容量，三路在该形状下就是不成立，改为报告1/2路方案待确认。
+
+辅助准备/序列化核对最多300任务秒，所有GPU进程从启动至退出的载模、前后向、保存、恢复和失败均计入所在900秒桶；三路按worker时间相加，不能只记300秒。总上限900+900+300=2100秒（35累计任务分钟），最多24次真实更新，最多三在途，单进程RAM24GiB、总RAM72GiB、总产物上限32GiB；审查/编辑/等待无GPU不冒充训练时间。资源等待不运行轮询任务，不计为GPU执行，但控制准备耗时进辅助账。
+
+普通明确实现错误可在同桶剩余时间/更新数内修复补测，失败保留且不清账；预算耗尽、数据权限不符、非有限数、OOM或资源不足停止，不自动放宽门槛/另借旧预算。通过后的冗余资格权重在证据充分、无继续恢复依赖时清理，保存必要来源、状态差异、日志、尺寸与哈希；不把临时资格状态当正式起点。正式训练仍重新从固定预训练起点启动。
+
+此预算只是资格上限，不是完成时长保证，也不是正式36条预算。当前resources.json记录单5090总32607MiB、已用22000MiB、空闲10076MiB，三CUDA均为既有项目作业，本轮GPU0。当前余量未达到本提议G1首派17GiB，更没有三路资格实测。正式预算要由实际合格群数、固定epoch、单/三路吞吐、保存及216评价格实际前向规模测出；不沿用中文490/822/110h，不直接除3承诺工期。
+
+五、模型已就绪及本轮交付
+
+官方模型：https://huggingface.co/google-bert/bert-base-cased/tree/cd5ef92a9fb2f889e972770a36d4ed042daf221e
+固定revision cd5ef92a9fb2f889e972770a36d4ed042daf221e。
+最终Linux目录：/home/yongpeng/cross-lingual/models/step29/bert_base_cased。
+六文件436414632字节；其中model.safetensors为435755784字节，SHA256 1d8bdcee6021e2c25f0325e84889b61c2eb26b843eef5659c247af138d64f050。
+Linux能直连API与小文件，大权重约150秒仅2MiB，主动中止该下载；原尝试model_receipt.json和log保留。随后使用Windows已有127.0.0.1:10808代理，以curl下载同一revision权重，119.479901秒、3647109字节/秒；SFTP传Linux，最终六文件逐项核对官方LFS SHA256或Git blob身份。safetensors头证实含BERT编码器及预训练pooler；结构12层/768维/12heads、vocab28996、max512，未用torch/transformers加载模型。
+只保留一种PyTorch兼容权重，不重复下载TF/Flax/bin。Linux2MiB未完成副本及Windows435755784字节临时权重均在最终Linux身份核对后删除，见model_ready.json、windows_weight_verification.json、transfer_cleanup.json；未改系统代理、未安装依赖。
+
+本轮建议依赖顺序：补齐获批三市场原始数据→形成真实人数/固定划分与曝光→将数据及原生资格具体方案作必要增量审查并确认预算→原生资格与三路测量→正式配置、评价编排与整批预算确认→正式训练。此次报告中的新划分和2100秒提议尚未外审/批准，既有实现审查结案不变，不冒称新方案已通过。

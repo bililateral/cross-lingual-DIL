@@ -14,6 +14,8 @@ VendorLink扩展已由用户明确选择完整H迁移，并要求原论文方法
 
 L²R／ER+GCR的设计、实现和有限BGE资格复用[合并结案](../reports/documentation/20261024/continual_recovery/review/primary_disposition.zh.txt)，不重复资格；当前18条及新确认按上述822小时授权执行。原“新比较及独立预算尚待授权”是批准前历史，不再构成待办；资格及顺利运行仍不能代替最终效果或确认结论。
 
+VendorLink后续推进以[本次资格盘点及提议](../reports/documentation/20261029/vendorlink/data_qualification/report.zh.txt)为补充：模型下载/文件核验已获准并完成；目标三市场商品来源仍需取得，不能用silk road 3.1或其他现有市场替代。先补获批来源并明确真实划分人数/曝光，再将限定GPU范围作必要增量审查、确认后执行；三路资源与整批预算按该模型/形状实测，正式训练另等条件与用户确认。不得将新2100秒资格提议当现行许可。
+
 ## 已结束Optuna的授权与恢复历史
 
 已按[S/S_pos/H_pos有限Optuna合同](SELLER_ALIAS_OPTUNA.zh.md)、[272小时预算补充](../reports/documentation/20261019/optuna_budget/proposal.zh.txt)及[自动执行授权](../reports/documentation/20261019/optuna_budget/authorization.json)完成三臂36次搜索、9次新seed复验与集中评价/独立分析；审查与实际执行状态只看[当前交接](AI_RESEARCH_HANDOFF.zh.md#当前工作)。既有18次原生调用复用，不增加资格尝试，不重复启动已派发的控制器或已自删监听。已发生资源停止的恢复仅按[具体补充](../reports/documentation/20261019/optuna_recovery/scope.zh.txt)及最新用户决定：9GiB空闲/允许其他CUDA、从S_pos第2次搜索原参数继续，三个已完成实验不重跑；保留失败收费，本轮明确免审、独立主审及恢复门通过后已于10月19日18:58恢复，实际状态只看交接。
